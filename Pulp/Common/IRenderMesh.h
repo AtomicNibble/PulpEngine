@@ -39,6 +39,9 @@ struct IRenderMesh
 
 
 
+
+
+
 X_NAMESPACE_END
 
 #endif // !X_RENDER_MODEL_I_H_
