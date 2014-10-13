@@ -56,7 +56,7 @@ Bsp::~Bsp()
 
 }
 
-bool Bsp::LoadBsp(const char* filename)
+bool Bsp::LoadFromFile(const char* filename)
 {
 	X_ASSERT_NOT_NULL(filename);
 
@@ -99,7 +99,7 @@ bool Bsp::LoadBsp(const char* filename)
 		if (hdr.version != BSP_VERSION)
 		{
 			X_ERROR("Bsp", "%s has a invalid version. provided: %i required: %i",
-				hdr.version, BSP_VERSION);
+				path.fileName(), hdr.version, BSP_VERSION);
 			return false;
 		}
 

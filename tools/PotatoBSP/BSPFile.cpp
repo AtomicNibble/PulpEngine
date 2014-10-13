@@ -61,8 +61,8 @@ bool BSPFile::save(const char* name)
 	{
 		file->writeObj(hdr);
 
+		SaveLump<Area>(file, hdr.lumps[LumpType::Areas], data_.areas);
 		SaveLump<Surface>(file, hdr.lumps[LumpType::Surfaces], data_.surfaces);
-
 		SaveLump<Vertex>(file, hdr.lumps[LumpType::Verts], data_.verts);
 		SaveLump<Index>(file, hdr.lumps[LumpType::Indexes], data_.indexes);
 

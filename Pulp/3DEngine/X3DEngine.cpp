@@ -58,7 +58,9 @@ bool X3DEngine::Init()
 	// load a lvl lol.
 	bsp::Bsp map;
 
-	map.LoadBsp("box"); // mmmmm
+	map.LoadFromFile("box"); // mmmmm
+
+//	const bsp::BSPData& data = map.getData();
 
 	return false;
 }

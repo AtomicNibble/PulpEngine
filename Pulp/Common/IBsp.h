@@ -138,6 +138,11 @@ X_NAMESPACE_BEGIN(bsp)
 //	Surfaces:
 //		Array of BSP::Surface, info for drawing each surface.
 //
+//	Areas:
+//		Areas are basically a section of the map, or the whole map (in the case of zero portals)
+//		Each area is seperated by one or more portals.
+//
+//		It provides surface info offset, so that all the surfaces for this area can be located.
 //
 //	=== Rendering ===
 //
@@ -176,9 +181,9 @@ X_NAMESPACE_BEGIN(bsp)
 //	planes be drawn to be a issue.
 //
 
-static const uint32_t	 BSP_VERSION = 1; // wonder what version i will get upto in a year 10 maybe ^^?
+static const uint32_t	 BSP_VERSION = 2; //  chnage everytime the format changes.
 static const uint32_t	 BSP_FOURCC = X_TAG('x', 'b', 's', 'p');
-static const uint32_t	 BSP_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r');
+static const uint32_t	 BSP_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r'); // if a file falid to write the final header, this will be it's FourCC
 static const char*		 BSP_FILE_EXTENSION = ".xbsp";
 
 // a level can not exceed this size.
@@ -188,6 +193,8 @@ static const int32_t	 MAX_WORLD_SIZE = (MAX_WORLD_COORD - MIN_WORLD_COORD);
 
 // All these limits are applied AFTER it has been compiled.
 // as a map will typically have less sides etc once compiled.
+// I currently check these when loading aswell as compiling.
+// Limits must be obeyed ;)
 static const uint32_t	 MAP_MAX_PLANES = 65536;
 static const uint32_t	 MAP_MAX_VERTS = 65536;
 static const uint32_t	 MAP_MAX_INDEXES = 65536;
@@ -216,7 +223,7 @@ X_DECLARE_FLAGS(MatContentFlags)(SOLID, WATER, PLAYER_CLIP, MONSTER_CLIP, TRIGGE
 X_DECLARE_FLAGS(MatSurfaceFlags)(NO_DRAW, LADDER);
 
 // may add more as i make them.
-X_DECLARE_ENUM(LumpType)(Entities,Materials,Planes,Verts,Indexes,BrushSide,Brush,Surfaces);
+X_DECLARE_ENUM(LumpType)(Entities, Materials, Planes, Verts, Indexes, BrushSide, Brush, Surfaces, Areas);
 X_DECLARE_ENUM(SurfaceType)(Invalid,Plane, Patch);
 
 
@@ -264,6 +271,16 @@ struct Brush
 	int32_t	shaderNum;
 };
 
+struct Area
+{
+	int32_t surfaceStartIdx;
+	int32_t numSurfaces;
+
+	int32_t brushStartIds;
+	int32_t numBrushes;
+
+	AABB bounds;
+};
 
 // gives offset to the lump.
 struct FileLump
