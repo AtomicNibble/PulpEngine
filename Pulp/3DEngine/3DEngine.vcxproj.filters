@@ -1,0 +1,58 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="RenderEngine.cpp" />
+    <ClCompile Include="stdafx.cpp" />
+    <ClCompile Include="ModelLoader.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialManager.cpp">
+      <Filter>Material</Filter>
+    </ClCompile>
+    <ClCompile Include="X3DEngine.cpp">
+      <Filter>Engine</Filter>
+    </ClCompile>
+    <ClCompile Include="BspLoader.cpp">
+      <Filter>Level</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h" />
+    <ClInclude Include="ModelLoader.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialManager.h">
+      <Filter>Material</Filter>
+    </ClInclude>
+    <ClInclude Include="XModel.h">
+      <Filter>Model</Filter>
+    </ClInclude>
+    <ClInclude Include="X3DEngine.h">
+      <Filter>Engine</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineBase.h" />
+    <ClInclude Include="BspLoader.h">
+      <Filter>Level</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Material">
+      <UniqueIdentifier>{837bf555-33f5-48ac-81e4-b129441b18b3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Model">
+      <UniqueIdentifier>{99d35eff-241a-423e-89a4-fdefd680f967}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Engine">
+      <UniqueIdentifier>{253c833b-0a18-47f4-912e-9a19fba55b61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Level">
+      <UniqueIdentifier>{689f5c3d-f3d7-46f5-94d9-b78b112d39fb}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

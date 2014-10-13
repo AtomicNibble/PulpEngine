@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="NullImplementation">
+      <UniqueIdentifier>{9f90a8e0-2933-4792-a246-f710e6b13dd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\win32">
+      <UniqueIdentifier>{ea570fa0-7427-4055-817a-51bdbfa30bd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\win32">
+      <UniqueIdentifier>{28af8a08-6952-4e78-883e-d61cfc4460c5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ExtensionSystem">
+      <UniqueIdentifier>{2e7d6035-ee5e-4181-acdd-748e67aeec35}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileSys">
+      <UniqueIdentifier>{6235cefa-4126-4ed5-911c-956a56658cd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FileSys\win32">
+      <UniqueIdentifier>{b1377700-dc67-40b3-8fe8-f8ae2432d432}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Profile">
+      <UniqueIdentifier>{e6a198f6-b7fe-4943-afa8-bde28cb2a259}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Profile">
+      <UniqueIdentifier>{14d0cb70-d03d-45bb-895f-68f32a0445ee}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Core.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NullImplementation\NullInput.h">
+      <Filter>NullImplementation</Filter>
+    </ClInclude>
+    <ClInclude Include="Timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Cpu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Console.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleVariable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\SystemTimer.h">
+      <Filter>Header Files\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemTimer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GoatFactoryRegistryImpl.h">
+      <Filter>ExtensionSystem</Filter>
+    </ClInclude>
+    <ClInclude Include="Log.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="xFileSys.h">
+      <Filter>FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="OsFile.h">
+      <Filter>FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\OsFile.h">
+      <Filter>FileSys\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSysVars.h">
+      <Filter>FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="XFindData.h">
+      <Filter>FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\ModuleExports.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ConsoleNULL.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CoreEventDispatcher.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XProfile.h">
+      <Filter>Header Files\Profile</Filter>
+    </ClInclude>
+    <ClInclude Include="DiskFile.h">
+      <Filter>FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="DiskFileAsync.h">
+      <Filter>FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\OsFileAsync.h">
+      <Filter>FileSys\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\OsFileModeFlags.h">
+      <Filter>FileSys\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\OsFileAsyncOperation.h">
+      <Filter>FileSys\win32</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DllMain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CoreInit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Cpu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Console.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ConsoleVariable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\SystemTimer.cpp">
+      <Filter>Source Files\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="GoatFactoryRegistryImpl.cpp">
+      <Filter>ExtensionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="Log.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CoreRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="xFileSys.cpp">
+      <Filter>FileSys</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\OsFile.cpp">
+      <Filter>FileSys\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="DiskFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CoreEventDispatcher.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XProfile.cpp">
+      <Filter>Source Files\Profile</Filter>
+    </ClCompile>
+    <ClCompile Include="XProfileRender.cpp">
+      <Filter>Source Files\Profile</Filter>
+    </ClCompile>
+    <ClCompile Include="DiskFileAsync.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\OsFileAsync.cpp">
+      <Filter>FileSys\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\OsFileAsyncOperation.cpp">
+      <Filter>FileSys\win32</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Cpu.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="win32\SystemTimer.inl">
+      <Filter>Header Files\win32</Filter>
+    </None>
+  </ItemGroup>
+</Project>

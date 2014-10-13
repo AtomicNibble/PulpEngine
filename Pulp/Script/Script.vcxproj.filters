@@ -1,0 +1,263 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Lua">
+      <UniqueIdentifier>{c005b23f-ea18-4277-b757-3fba370e2888}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Binds">
+      <UniqueIdentifier>{735b706d-fa43-4bdf-8de4-47421b56728c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Lua\src">
+      <UniqueIdentifier>{26a6a525-0647-49de-9880-873633e9330d}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptSys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lapi.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lauxlib.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lcode.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\ldebug.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\ldo.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lfunc.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lgc.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\llex.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\llimits.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lmem.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lobject.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lopcodes.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lparser.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lstate.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lstring.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\ltable.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\ltm.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lua.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\luaconf.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lualib.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lundump.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lvm.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="lua\lzio.h">
+      <Filter>Lua</Filter>
+    </ClInclude>
+    <ClInclude Include="binds\ScriptBinds.h">
+      <Filter>Binds</Filter>
+    </ClInclude>
+    <ClInclude Include="binds\ScriptBinds_core.h">
+      <Filter>Binds</Filter>
+    </ClInclude>
+    <ClInclude Include="binds\ScriptableBase.h">
+      <Filter>Binds</Filter>
+    </ClInclude>
+    <ClInclude Include="ScriptTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="FunctionHandler.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="binds\ScriptBinds_script.h">
+      <Filter>Binds</Filter>
+    </ClInclude>
+    <ClInclude Include="binds\ScriptBinds_sound.h">
+      <Filter>Binds</Filter>
+    </ClInclude>
+    <ClInclude Include="binds\ScriptBinds_io.h">
+      <Filter>Binds</Filter>
+    </ClInclude>
+    <ClInclude Include="TableDump.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptSys.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IPScriptSys.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="binds\ScriptBinds.cpp">
+      <Filter>Binds</Filter>
+    </ClCompile>
+    <ClCompile Include="binds\ScriptBinds_core.cpp">
+      <Filter>Binds</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptTable.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FunctionHandler.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="binds\ScriptBinds_script.cpp">
+      <Filter>Binds</Filter>
+    </ClCompile>
+    <ClCompile Include="binds\ScriptBinds_io.cpp">
+      <Filter>Binds</Filter>
+    </ClCompile>
+    <ClCompile Include="binds\ScriptBinds_sound.cpp">
+      <Filter>Binds</Filter>
+    </ClCompile>
+    <ClCompile Include="TableDump.cpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lapi.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lauxlib.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lbaselib.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lbitlib.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lcode.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\ldblib.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\ldebug.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\ldo.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\ldump.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lfunc.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lgc.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\linit.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\liolib.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\llex.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lmathlib.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lmem.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\loadlib.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lobject.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lopcodes.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\loslib.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lparser.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lstate.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lstring.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lstrlib.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\ltable.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\ltablib.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\ltm.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lua.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\luac.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lundump.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lvm.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\lzio.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\print.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+    <ClCompile Include="lua\Vector.c">
+      <Filter>Lua\src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

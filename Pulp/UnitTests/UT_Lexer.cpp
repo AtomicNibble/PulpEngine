@@ -1,0 +1,582 @@
+#include "stdafx.h"
+
+#include "gtest/gtest.h"
+
+#include <String\Lexer.h>
+#include <String\StrRef.h>
+#include <String\StackString.h>
+
+#include <IFileSys.h>
+
+X_USING_NAMESPACE;
+
+using namespace core;
+
+class XMapBrush;
+
+class XMapPrimitive 
+{
+public:
+	enum { TYPE_INVALID = -1, TYPE_BRUSH, TYPE_PATCH };
+
+public:
+	XMapPrimitive(void) { type = TYPE_INVALID; }
+	virtual	~XMapPrimitive(void) {}
+
+	int	GetType(void) const { return type; }
+
+protected:
+	int	type;
+};
+
+class XMapBrushSide {
+	friend class XMapBrush;
+
+public:
+	XMapBrushSide(void) {}
+	~XMapBrushSide(void) { }
+	const char *			GetMaterial(void) const { return material.name.c_str(); }
+	const Planef &			GetPlane(void) const { return plane; }
+
+protected:
+	struct MaterialInfo
+	{
+		core::StackString<64> name;
+		Vec2f				  matRepeate;
+		Vec2f				  shift;
+		float				  rotate;
+	};
+
+	Planef			plane;	
+	MaterialInfo	material;
+	MaterialInfo	lightMap;
+
+protected:
+
+	static bool ParseMatInfo(XLexer& src, MaterialInfo& mat);
+};
+
+class XMapBrush : public XMapPrimitive 
+{
+public:
+	XMapBrush(void) { type = TYPE_BRUSH;  sides.reserve(6); }
+	~XMapBrush(void) { }
+
+	int						GetNumSides(void) const { return (int)sides.size(); }
+	void					AddSide(XMapBrushSide *side) { sides.push_back(side); }
+	XMapBrushSide *			GetSide(int i) const { return sides[i]; }
+	unsigned int			GetGeometryCRC(void) const;
+
+public:
+	static XMapBrush *		Parse(XLexer &src, const Vec3f &origin);
+
+protected:
+	std::vector<XMapBrushSide*> sides;
+};
+
+class XMapPatch : public XMapPrimitive
+{
+public:
+	XMapPatch(void) { type = TYPE_PATCH; }
+	~XMapPatch(void) { }
+
+public:
+	static XMapPatch* Parse(XLexer &src, const Vec3f &origin);
+
+protected:
+
+
+};
+
+XMapPatch* XMapPatch::Parse(XLexer &src, const Vec3f &origin)
+{
+	X_PROFILE_BEGIN("parse mesh", core::ProfileSubSys::CORE);
+
+	// goaty meshes!
+	XLexToken token;
+	core::StackString<64> mat_name, light_map;
+
+	int groups, entries, dunno1, dunno2;
+	int x, y;
+	float v[3], t[4];
+	int  c[4];
+
+	if (!src.ExpectTokenString("{")) {
+		return nullptr;
+	}
+
+	// while we have pairs get naked and skip them.
+	while (1)
+	{
+		if (!src.ReadToken(token)) {
+			src.Error("XMapPatch::Parse: unexpected EOF");
+			return false;
+		}
+
+		if (src.ReadTokenOnLine(token))
+		{
+			src.SkipRestOfLine();
+		}
+		else
+		{
+			src.UnreadToken(token);
+			break;
+		}
+	}
+
+	// read the material name
+	if (!src.ReadToken(token)) {
+		src.Error("XMapPatch::Parse: unable to read material.");
+		return false;
+	}
+
+	mat_name = core::StackString<64>(token.begin(), token.end());
+
+	// read the light map name
+	if (!src.ReadToken(token)) {
+		src.Error("XMapPatch::Parse: unable to read light map material.");
+		return false;
+	}
+
+	light_map = core::StackString<64>(token.begin(), token.end());
+
+
+	// sometimes we have smmothing bullshit.
+	if (src.PeekTokenString("smoothing"))
+	{
+		src.SkipRestOfLine();
+	}
+
+	// we now have goaty info.
+	groups = src.ParseInt();
+	entries = src.ParseInt();
+
+	// dunno yet
+	dunno1 = src.ParseInt();
+	dunno2 = src.ParseInt();
+
+	// we now how x groups each with y entryies.
+	for (x = 0; x < groups; x++)
+	{
+		if (!src.ExpectTokenString("(")) {
+			return nullptr;
+		}
+
+		for (y = 0; y < entries; y++)
+		{
+			// each line has a -v and a -t
+			if (!src.ExpectTokenString("v")) 
+				return nullptr;		
+
+
+			v[0] = src.ParseFloat();
+			v[1] = src.ParseFloat();
+			v[2] = src.ParseFloat();
+
+			// we can have a color here.
+			if (!src.ReadToken(token)) {
+				src.Error("XMapPatch::Parse: unexpected EOF");
+				return false;
+			}
+
+			if (token.isEqual("c"))
+			{
+				c[0] = src.ParseInt();
+				c[1] = src.ParseInt();
+				c[2] = src.ParseInt();
+				c[3] = src.ParseInt();
+
+				if (!src.ExpectTokenString("t"))
+					return nullptr;
+			}
+			else if(!token.isEqual("t"))
+			{
+				src.Error("XMapPatch::Parse: expected t");
+				return false;
+			}
+
+			t[0] = src.ParseFloat();
+			t[1] = src.ParseFloat();
+			t[2] = src.ParseFloat();
+			t[3] = src.ParseFloat();
+
+			// some lines have "f 1"
+			// get rekt.
+			src.SkipRestOfLine();
+		}
+
+		if (!src.ExpectTokenString(")")) {
+			return nullptr;
+		}
+	}
+
+	// read the last 2 } }
+	if (src.ExpectTokenString("}"))
+	{
+		if (src.ExpectTokenString("}"))
+		{
+			// valid
+			XMapPatch *patch = new XMapPatch();
+			return patch;
+		}
+	}
+
+	return nullptr;
+}
+
+class XMapEntity
+{
+
+public:
+
+	XMapEntity(void) {}
+	~XMapEntity(void) {}
+	int						GetNumPrimitives(void) const { return (int)primitives.size(); }
+	XMapPrimitive *			GetPrimitive(int i) const { return primitives[i]; }
+	void					AddPrimitive(XMapPrimitive *p) { primitives.push_back(p); }
+	unsigned int			GetGeometryCRC(void) const;
+	void					RemovePrimitiveData();
+
+public:
+	static XMapEntity*	Parse(XLexer &src, bool worldSpawn = false);
+private:
+	std::vector<XMapPrimitive*>	primitives;
+
+
+};
+
+bool XMapBrushSide::ParseMatInfo(XLexer &src, XMapBrushSide::MaterialInfo& info)
+{
+	X_PROFILE_BEGIN("parse brush material", core::ProfileSubSys::CORE);
+
+	XLexToken token;
+
+	// read the material name
+	if (!src.ReadTokenOnLine(token)) {
+		src.Error("MapBrushMat::Parse: unable to read brush material.");
+		return false;
+	}
+
+	info.name = core::StackString<64>(token.begin(), token.end());
+
+	info.matRepeate[0] = src.ParseFloat();
+	info.matRepeate[1] = src.ParseFloat();
+
+	info.shift[0] = src.ParseFloat();
+	info.shift[1] = src.ParseFloat();
+
+	info.rotate = src.ParseFloat();
+
+	// dunno what this value is.
+	src.ParseFloat();
+	return true;
+}
+
+XMapBrush* XMapBrush::Parse(XLexer &src, const Vec3f &origin)
+{
+	X_PROFILE_BEGIN("parse brush", core::ProfileSubSys::CORE);
+
+//	int i;
+	Vec3f planepts[3];
+	XLexToken token;
+	XMapBrushSide* side;
+	XMapBrush* brush;
+
+	brush = new XMapBrush();
+
+	do 
+	{
+		if (!src.ReadToken(token)) {
+			src.Error("MapBrush::Parse: unexpected EOF");
+			delete brush;
+			return nullptr;
+		}
+		if (token.isEqual("}")) {
+			break;
+		}
+
+		// here we may have to jump over brush epairs ( only used in editor )
+		do {
+			// if token is a brace
+			if (token.isEqual("(")) {
+				break;
+			}
+			// the token should be a key string for a key/value pair
+			if (token.type != TT_NAME) {
+				src.Error("MapBrush::Parse: unexpected %.*s, expected '(' or pair key string.", 
+					token.length(), token.begin());
+				delete brush;
+				return nullptr;
+			}
+
+			if (!src.ReadTokenOnLine(token) || (token.type != TT_STRING && token.type != TT_NAME)) {
+				src.Error("MapBrush::Parse: expected pair value string not found.");
+				delete brush;
+				return nullptr;
+			}
+
+			// try to read the next key
+			if (!src.ReadToken(token)) {
+				src.Error("MapBrush::Parse: unexpected EOF");
+				delete brush;
+				return nullptr;
+			}
+
+			if (token.isEqual(";")) {
+				if (!src.ReadToken(token)) {
+					src.Error("MapBrush::Parse: unexpected EOF");
+					delete brush;
+					return nullptr;
+				}
+			}
+
+		} while (1);
+
+		src.UnreadToken(token);
+
+		side = new XMapBrushSide();
+		brush->sides.push_back(side);
+
+		// read the three point plane definition
+		if (!src.Parse1DMatrix(3, &planepts[0][0]) ||
+			!src.Parse1DMatrix(3, &planepts[1][0]) ||
+			!src.Parse1DMatrix(3, &planepts[2][0])) {
+			src.Error("MapBrush::Parse: unable to read brush plane definition.");
+			delete brush;
+			return nullptr;
+		}
+
+		planepts[0] -= origin;
+		planepts[1] -= origin;
+		planepts[2] -= origin;
+
+		side->plane.set(planepts[0], planepts[1], planepts[2]);
+
+		XMapBrushSide::ParseMatInfo(src, side->material);
+		XMapBrushSide::ParseMatInfo(src, side->lightMap);
+
+	} while (1);
+
+
+	return brush;
+}
+
+
+XMapEntity*	XMapEntity::Parse(XLexer &src, bool worldSpawn)
+{
+	X_PROFILE_BEGIN("parse entity", core::ProfileSubSys::CORE);
+
+	XLexToken token;
+	XMapEntity *mapEnt;
+	XMapBrush *mapBrush;
+	XMapPatch *mapPatch;
+	Vec3f origin;
+	float v1, v2, v3;
+	bool worldent;
+
+	if (!src.ReadToken(token)) {
+		return nullptr;
+	}
+
+	if (!token.isEqual("{")) {
+		src.Error("MapEntity::Parse: { not found.");
+		return nullptr;
+	}
+
+	mapEnt = new XMapEntity();
+
+	if (worldSpawn) {
+		mapEnt->primitives.reserve(1024);
+	}
+
+	worldent = false;
+	origin = Vec3f::zero();
+
+	do 
+	{
+		if (!src.ReadToken(token)) {
+			src.Error("MapEntity::Parse: EOF without closing brace");
+			return nullptr;
+		}
+		if (token.isEqual("}")) {
+			break;
+		}
+
+		if (token.isEqual("{"))
+		{
+			// we need to check for 'mesh'
+			if (!src.ReadToken(token)) {
+				src.Error("MapEntity::Parse: EOF without closing brace");
+				return nullptr;
+			}
+
+			if (worldent) {
+				origin = Vec3f::zero();
+			}
+
+			if (token.isEqual("mesh") || token.isEqual("curve")) 
+			{
+				mapPatch = XMapPatch::Parse(src,origin);
+				if (!mapPatch) {
+					return nullptr;
+				}
+
+				mapEnt->AddPrimitive(mapPatch);
+			}
+			else
+			{
+				src.UnreadToken(token);
+				mapBrush = XMapBrush::Parse(src, origin);
+				if (!mapBrush) {
+					return nullptr;
+				}
+
+				mapEnt->AddPrimitive(mapBrush);
+			}
+
+		}
+		else
+		{
+			core::StackString512 key, value;
+
+			// parse a key / value pair
+			key = StackString512(token.begin(),token.end());
+			src.ReadTokenOnLine(token);
+			value = StackString512(token.begin(), token.end());
+		
+			// strip trailing spaces
+			value.trimWhitespace();
+			key.trimWhitespace();
+
+			if (key.isEqual("origin"))
+			{
+				v1 = v2 = v3 = 0;
+				sscanf_s(value.c_str(), "%f %f %f", &v1, &v2, &v3);
+				origin.x = v1;
+				origin.y = v2;
+				origin.z = v3;
+			}
+			else if (key.isEqual("classname") && value.isEqual( "worldspawn")) {
+				worldent = true;
+			}
+
+		}
+
+	} while (1);
+
+
+	return mapEnt;
+}
+
+class XMapFile
+{
+public:
+	XMapFile() {}
+
+	bool Parse(core::XFile* file);
+
+	int	GetNumEntities(void) const { return (int)entities.size(); }
+
+	XMapEntity* GetEntity(int i) const { return entities[i]; }
+
+private:
+	std::vector<XMapEntity *>	entities;
+
+};
+
+
+
+bool XMapFile::Parse(core::XFile* file)
+{
+	size_t size = file->remainingBytes();
+
+	char* pData = new char[size];
+
+	entities.reserve(2048);
+
+	gEnv->pCore->GetIProfileSys()->FrameBegin();
+
+
+	if (file->read(pData, (uint32_t)size) == size)
+	{
+		XLexer lexer(pData, pData + size);
+		XLexToken token;
+		XMapEntity *mapEnt;
+
+		lexer.setFlags(LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES);
+
+		// we need to parse up untill the first brace.
+		while (lexer.ReadToken(token))
+		{
+			if (token.isEqual("{"))
+			{
+				lexer.UnreadToken(token);
+				break;
+			}
+		}
+	
+
+		while (1) {
+			mapEnt = XMapEntity::Parse(lexer, (entities.size() == 0));
+			if (!mapEnt) {
+				break;
+			}
+			entities.push_back(mapEnt);
+		}
+
+	}
+
+	gEnv->pCore->GetIProfileSys()->FrameEnd();
+
+
+	delete pData;
+	return true;
+}
+
+TEST(Lexer, Mapfile) 
+{
+	// load a map file Drool
+
+	core::XFileScoped map_file;
+	core::IFileSys::fileModeFlags mode;
+	mode.Set(fileMode::READ);
+
+	if (map_file.openFile("alcatraz.map", mode))
+	{
+		XMapFile map;
+
+		EXPECT_TRUE(map.Parse(map_file.GetFile()));
+
+		// work out some info.
+		int num = map.GetNumEntities();
+		int i, x;
+
+		int num_patch = 0;
+		int num_brush = 0;
+
+		for (i = 0; i < num; i++)
+		{
+			XMapEntity* ent = map.GetEntity(i);
+			XMapPrimitive* prim;
+
+			for (x = 0; x < ent->GetNumPrimitives(); x++)
+			{
+				prim = ent->GetPrimitive(x);
+
+				if (prim->GetType() == XMapPrimitive::TYPE_BRUSH)
+					num_brush++;
+				else if (prim->GetType() == XMapPrimitive::TYPE_PATCH)
+					num_patch++;
+			}
+		}
+
+		X_LOG0("MapInfo", "num entites: %i", num);
+		X_LOG0("MapInfo", "num brushes: %i", num_brush);
+		X_LOG0("MapInfo", "num patches: %i", num_patch);
+
+	}
+	else
+	{
+
+	}
+}

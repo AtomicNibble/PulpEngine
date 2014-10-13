@@ -1,0 +1,246 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resources">
+      <UniqueIdentifier>{ae84586d-d486-4f4c-af8b-dca73485566f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tests">
+      <UniqueIdentifier>{b73dca5b-c519-47a7-b733-a3ba204770d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tests\Allocators">
+      <UniqueIdentifier>{39a7f039-bc18-44f4-968e-49efa4c11982}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tests\Textures">
+      <UniqueIdentifier>{52ff8a46-abe6-4a36-97f9-35f322a92f2c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tests\Debugging">
+      <UniqueIdentifier>{ccfe057f-5069-4f6f-a016-b3e790085282}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tests\String">
+      <UniqueIdentifier>{01a9f422-a2a6-49e5-8063-e6d5f640d35f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tests\Math">
+      <UniqueIdentifier>{17972a28-d719-4515-b962-5da97144b025}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tests\Containers">
+      <UniqueIdentifier>{a4f41d7e-fe8f-4a00-a1b0-e5b88804aa3c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UnitTester.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Resources</Filter>
+    </ClInclude>
+    <ClInclude Include="test_resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="UT_AssertChecker.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UnitTester.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_BitUtil.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Flags.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Hash.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Thread.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Pointer.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Random.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_SymbolRes.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_TypeTraits.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Breakpoints.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_F_ReadWrite.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_ModelLoading.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_MemoryCursor.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Mem_Stack.cpp">
+      <Filter>Source Files\tests\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Mem_PoolAllocator.cpp">
+      <Filter>Source Files\tests\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Mem_MallocFree.cpp">
+      <Filter>Source Files\tests\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Mem_LinearAllocator.cpp">
+      <Filter>Source Files\tests\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_AssertChecker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Mem_GrowingMicroAllocator.cpp">
+      <Filter>Source Files\tests\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Mem_GrowingBlockAllocator.cpp">
+      <Filter>Source Files\tests\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Mem_GrowingGenericAllocator.cpp">
+      <Filter>Source Files\tests\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Mem_GrowingStackAllocator.cpp">
+      <Filter>Source Files\tests\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Mem_GrowingPoolAllocator.cpp">
+      <Filter>Source Files\tests\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_TexureLoaders.cpp">
+      <Filter>Source Files\tests\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Lexer.cpp">
+      <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Aabb.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Color.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Half.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Intersect.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Matrix22.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Matrix33.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Matrix44.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Obb.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Pair.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Plane.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Quat.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_QuatComp.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Ray.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Rect.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Sphere.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Vector.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_StringTable.cpp">
+      <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_StringUtil.cpp">
+      <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_VectorA.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_C_Array.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_C_BitStream.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_C_ByteStream.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_C_Fifo.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_C_FixedArray.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_C_FixedFifo.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_C_FixedStack.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_C_FreeList.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_C_HashMap.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_C_Stack.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_C_LinkedList.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Matrix34.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_M_Winding.cpp">
+      <Filter>Source Files\tests\Math</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="UnitTester.rc">
+      <Filter>Resources</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\..\_res\potato.ico">
+      <Filter>Resources</Filter>
+    </Image>
+  </ItemGroup>
+</Project>

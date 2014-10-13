@@ -1,0 +1,353 @@
+#include "stdafx.h"
+#include "XRender.h"
+
+#include <String\HumanSize.h>
+#include <Util\LastError.h>
+#include <ICore.h>
+
+#include <ITexture.h>
+
+#include "ReaderThread.h"
+#include "Textures\XTexture.h"
+#include "Model\XRenderMesh.h"
+
+#if X_PLATFORM_WIN32 == 1
+X_LINK_LIB("D3D11.lib")
+X_LINK_LIB("D3Dx10.lib")
+X_LINK_LIB("dxgi.lib")
+#endif
+
+
+X_NAMESPACE_BEGIN(render)
+
+
+using namespace texture;
+
+XRender* gRenDev = nullptr;
+ID3D11RenderTargetView* backbuffer = nullptr;    // global declaration
+
+// pretty sure this needs to be in order i forget
+uint32_t XRender::vertexFormatStride[shader::VertexFormat::Num] =
+{
+	sizeof(Vertex_P3F_C4B_T2F), // P3F_C4B_T2F
+	sizeof(Vertex_P3F_C4B_T2S), // P3F_C4B_T2S
+
+	sizeof(Vertex_P3F_T3F), // P3F_T3F
+
+	sizeof(Vertex_P3F_N10_C4B_T2S), // P3F_N10_C4B_T2S
+	sizeof(Vertex_P3F_T4F_N3F_C4B), // P3F_T4F_N3F_C4B
+};
+
+
+XRender::XRender() :
+	m_pRt(nullptr),
+	fontIdx_(0),
+	pDefaultFont_(nullptr),
+	RenderResources_(g_rendererArena)
+{
+}
+
+
+XRender::~XRender()
+{
+	// THIS function is not called at shutdown.
+	// render object is a global in the dll.
+	// 
+	// Place code in 'Shutdown' instead.
+
+}
+
+void XRender::SetArenas(core::MemoryArenaBase* arena)
+{
+	X_ASSERT_NOT_NULL(arena);
+
+	RenderResources_.setArena(arena);
+	textDrawList_.setArena(arena);
+}
+
+bool XRender::Init(HWND hWnd, uint32_t width, uint32_t hieght)
+{
+	width_ = width;
+	height_ = hieght;
+
+	m_pRt = X_NEW_ALIGNED(XRenderThread,g_rendererArena,"renderThread",X_ALIGN_OF(XRenderThread));
+	m_pRt->startRenderThread();
+
+	vidMemMng_.StartUp();
+
+
+	if (gEnv->pFont)
+		pDefaultFont_ = gEnv->pFont->GetFont("default");
+
+	return true;
+}
+
+void XRender::ShutDown()
+{
+	X_LOG0("render", "Shutting down");
+
+	m_pRt->quitRenderThread();
+	m_pRt->quitRenderLoadingThread();
+
+	freeResources();
+
+	X_DELETE(m_pRt, g_rendererArena);
+}
+
+void XRender::freeResources()
+{
+	texture::XTexture::shutDown();
+
+//	FX_PipelineShutdown();
+
+	m_ShaderMan.Shutdown();
+
+	vidMemMng_.ShutDown();
+	textDrawList_.free();
+}
+
+
+
+void XRender::RenderBegin()
+{
+
+}
+
+void XRender::RenderEnd()
+{
+
+	RT_FlushTextBuffer();
+
+}
+
+
+
+
+// Textures 
+texture::ITexture* XRender::LoadTexture(const char* path, texture::TextureFlags flags)
+{
+	X_ASSERT_NOT_NULL(path);
+
+	XTexture* pText = XTexture::FromName(path, flags);
+
+	return pText;
+}
+
+// ~Textures 
+
+
+// Font
+
+int XRender::FontCreateTexture(const Vec2i& size, BYTE *pData,
+	Texturefmt::Enum textureFmt, bool genMips)
+{
+	if (!pData)
+		return -1;
+
+	TextureFlags Flags = TextureFlags::TEX_FONT | TextureFlags::DONT_STREAM | TextureFlags::DONT_RESIZE;
+
+	if (genMips)
+		Flags.Set(TextureFlags::FORCE_MIPS);
+
+	core::StackString<64> name;
+	name.appendFmt("$font_texure_%i", fontIdx_++);
+
+	XTexture* tex = XTexture::Create2DTexture(name.c_str(), size,
+		1, Flags, pData, textureFmt);
+
+	return tex->getID();
+}
+
+void XRender::DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
+	const wchar_t* pStr, const font::XTextDrawConect& ctx) const
+{
+
+	pFont->RenderCallback(pos, pStr, ctx);
+}
+
+// ~Font
+
+// Model
+
+model::IRenderMesh* XRender::createRenderMesh(void)
+{
+	model::XRenderMesh* pMesh = X_NEW_ALIGNED(
+		model::XRenderMesh,g_rendererArena,
+		"RenderMesh", X_ALIGN_OF(model::XRenderMesh))(nullptr,nullptr);
+	
+
+	return pMesh;
+}
+
+void XRender::freeRenderMesh(model::IRenderMesh* pMesh)
+{
+	X_ASSERT_NOT_NULL(pMesh);
+
+	core::SafeRelease(pMesh);
+}
+
+
+// ~Model
+
+
+// Drawing
+
+void XRender::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args)
+{
+	core::StackString512 temp;
+	temp.appendFmt(format, args);
+
+	textDrawList_.addEntry(pos,ti,temp.c_str());
+}
+
+
+void XRender::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text)
+{
+	textDrawList_.addEntry(pos, ti, text);
+}
+
+
+void XRender::DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
+	const core::MemoryAllocatorStatistics& allocStats, const char* title)
+{
+	core::StackString512 str;
+	core::HumanSize::Str temp;
+
+	str.appendFmt("Num:%i\n", allocStats.m_allocationCount);
+	str.appendFmt("Num(Max):%i\n", allocStats.m_allocationCountMax);
+	str.appendFmt("Physical:%s\n", core::HumanSize::toString(temp, allocStats.m_physicalMemoryAllocated));
+	str.appendFmt("Physical(Used):%s\n", core::HumanSize::toString(temp, allocStats.m_physicalMemoryUsed));
+	str.appendFmt("Virtual(Res):%s\n", core::HumanSize::toString(temp, allocStats.m_virtualMemoryReserved));
+	str.appendFmt("WasteAlign:%s\n", core::HumanSize::toString(temp, allocStats.m_wasteAlignment));
+	str.appendFmt("WasteUnused:%s\n", core::HumanSize::toString(temp, allocStats.m_wasteUnused));
+	str.appendFmt("Overhead:%s\n", core::HumanSize::toString(temp, allocStats.m_internalOverhead));
+
+	DrawTextQueued(pos + Vec3f(0, 15, 0), ti, str.c_str());
+
+	XDrawTextInfo ti2 = ti;
+	ti2.col = Col_Red;
+	ti2.flags |= DrawTextFlags::FRAMED;
+
+	DrawTextQueued(pos, ti2, title);
+}
+
+void XRender::FlushTextBuffer(void)
+{
+	if (!textDrawList_.isEmpty())
+	{
+		rThread()->RC_FlushTextBuffer();
+	}
+}
+
+void XRender::RT_FlushTextBuffer(void)
+{
+	const XTextDrawList::TextEntry* entry;
+	
+	while (entry = textDrawList_.getNextTextEntry())
+	{
+		const Vec3f& pos = entry->pos;
+		const char* pStr = entry->getText();
+		
+		float posX, posY;
+
+		posX = pos.x;
+		posY = pos.y;
+
+		XDrawTextInfo ti;
+		ti.flags = entry->flags;
+		ti.col = entry->color;
+
+		Draw2dText(posX, posY, pStr, ti);
+
+	}
+
+	textDrawList_.clear();
+}
+
+
+void XRender::Draw2dText(float posX, float posY, const char* pStr, const XDrawTextInfo& ti)
+{
+	static const float UIDRAW_TEXTSIZEFACTOR = 16.f;
+
+	font::IFFont* pFont = pDefaultFont_;
+	if (!pFont)
+		return;
+
+
+	font::XTextDrawConect ctx;
+	ctx.SetColor(ti.col);
+	ctx.SetCharWidthScale(1.0f);
+
+	if (ti.flags.IsSet(DrawTextFlags::FRAMED))
+	{
+		ctx.SetDrawFrame(true);
+	}
+
+	if (ti.flags.IsSet(DrawTextFlags::MONOSPACE))
+	{
+	//	if (ti.flags.IsSet(DrawTextFlags::FIXED_SIZE))
+	//		ctx.SetSizeIn800x600(false);
+		ctx.SetSize(Vec2f(UIDRAW_TEXTSIZEFACTOR, UIDRAW_TEXTSIZEFACTOR));
+		ctx.SetCharWidthScale(0.5f);
+		ctx.SetProportional(false);
+
+	//	if (ti.flags & eDrawText_800x600)
+	//		ScaleCoordInternal(posX, posY);
+	}
+	else if (ti.flags.IsSet(DrawTextFlags::FIXED_SIZE))
+	{
+//		ctx.SetSizeIn800x600(false);
+		ctx.SetSize(Vec2f(UIDRAW_TEXTSIZEFACTOR, UIDRAW_TEXTSIZEFACTOR));
+		ctx.SetProportional(true);
+
+	//	if (ti.flags & eDrawText_800x600)
+	//		ScaleCoordInternal(posX, posY);
+	}
+	else
+	{
+//		ctx.SetSizeIn800x600(true);
+		ctx.SetProportional(false);
+		ctx.SetCharWidthScale(0.5f);
+		ctx.SetSize(Vec2f(UIDRAW_TEXTSIZEFACTOR, UIDRAW_TEXTSIZEFACTOR));
+	}
+
+	// align left/right/center
+	bool align = (ti.flags & (DrawTextFlags::CENTER | DrawTextFlags::RIGHT | DrawTextFlags::CENTER_VER)).IsAnySet();
+
+	if (align)
+	{
+		Vec2f textSize = pFont->GetTextSize(pStr, ctx);
+		if (ti.flags.IsSet(DrawTextFlags::CENTER))
+			posX -= textSize.x * 0.5f;
+		else if (ti.flags.IsSet(DrawTextFlags::RIGHT))
+			posX -= textSize.x;
+
+		if (ti.flags.IsSet(DrawTextFlags::CENTER_VER))
+			posY -= textSize.y * 0.5f;
+	}
+
+	pFont->DrawString(posX, posY, pStr, ctx);
+}
+
+// ~Drawing
+
+
+// Shader Stuff
+
+shader::XShaderItem XRender::LoadShaderItem(shader::XInputShaderResources& res)
+{
+	// we want a shader + texture collection plz!
+	shader::XShaderItem item;
+
+	item.pShader_ = m_ShaderMan.m_FixedFunction;
+	item.pShader_->addRef();
+	item.technique_ = 2;
+	item.pResources_ = m_ShaderMan.createShaderResources(res);
+
+	return item;
+}
+
+// ~Shader Stuff
+
+
+X_NAMESPACE_END

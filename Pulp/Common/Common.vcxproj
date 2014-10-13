@@ -1,0 +1,964 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug Dynamic|Win32">
+      <Configuration>Debug Dynamic</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug Dynamic|x64">
+      <Configuration>Debug Dynamic</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Super Dynamic|Win32">
+      <Configuration>Super Dynamic</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Super Dynamic|x64">
+      <Configuration>Super Dynamic</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Super|Win32">
+      <Configuration>Super</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Super|x64">
+      <Configuration>Super</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Assets\AssertContainer.h" />
+    <ClInclude Include="Casts\safe_static_cast.h" />
+    <ClInclude Include="Casts\union_cast.h" />
+    <ClInclude Include="CompileTime\ClassInfo.h" />
+    <ClInclude Include="CompileTime\ExtractCount.h" />
+    <ClInclude Include="CompileTime\ExtractType.h" />
+    <ClInclude Include="CompileTime\IntToType.h" />
+    <ClInclude Include="CompileTime\IsPOD.h" />
+    <ClInclude Include="CompileTime\IsPointer.h" />
+    <ClInclude Include="CompileTime\IsStringLiteral.h" />
+    <ClInclude Include="Configuration.h" />
+    <ClInclude Include="ConfigurationWin32.h" />
+    <ClInclude Include="Containers\BitStream.h" />
+    <ClInclude Include="Containers\ByteStream.h" />
+    <ClInclude Include="Containers\ByteStreamFifo.h" />
+    <ClInclude Include="Containers\Fifo.h" />
+    <ClInclude Include="Containers\FixedArray.h" />
+    <ClInclude Include="Containers\FixedFifo.h" />
+    <ClInclude Include="Containers\FixedRingBuffer.h" />
+    <ClInclude Include="Containers\FixedStack.h" />
+    <ClInclude Include="Containers\Freelist.h" />
+    <ClInclude Include="Containers\Array.h" />
+    <ClInclude Include="Containers\HashBase.h" />
+    <ClInclude Include="Containers\HashMap.h" />
+    <ClInclude Include="Containers\LinkedList.h" />
+    <ClInclude Include="Containers\LinkedListIntrusive.h" />
+    <ClInclude Include="Containers\Stack.h" />
+    <ClInclude Include="Debugging\AbortHandler.h" />
+    <ClInclude Include="Debugging\Assert.h" />
+    <ClInclude Include="Debugging\AssertionHandler.h" />
+    <ClInclude Include="Debugging\AssertMacros.h" />
+    <ClInclude Include="Debugging\CallStack.h" />
+    <ClInclude Include="Debugging\DebuggerBreakpoint.h" />
+    <ClInclude Include="Debugging\DebuggerBreakpointMacros.h" />
+    <ClInclude Include="Debugging\DebuggerConnection.h" />
+    <ClInclude Include="Debugging\DefaultAssertionHandler.h" />
+    <ClInclude Include="Debugging\ExceptionHandler.h" />
+    <ClInclude Include="Debugging\HardwareBreakpoint.h" />
+    <ClInclude Include="Debugging\InvalidParameterHandler.h" />
+    <ClInclude Include="Debugging\MiniDump.h" />
+    <ClInclude Include="Debugging\PureVirtualFunctionCallHandler.h" />
+    <ClInclude Include="Debugging\SymbolInfo.h" />
+    <ClInclude Include="Debugging\SymbolResolution.h" />
+    <ClInclude Include="Debugging\win32\AbortHandler.h" />
+    <ClInclude Include="Debugging\win32\CallStack.h" />
+    <ClInclude Include="Debugging\win32\DebuggerBreakpointMacros.h" />
+    <ClInclude Include="Debugging\win32\DebuggerConnection.h" />
+    <ClInclude Include="Debugging\win32\ExceptionHandler.h" />
+    <ClInclude Include="Debugging\win32\HardwareBreakpoint.h" />
+    <ClInclude Include="Debugging\win32\InvalidParameterHandler.h" />
+    <ClInclude Include="Debugging\win32\MiniDump.h" />
+    <ClInclude Include="Debugging\win32\PureVirtualFunctionCallHandler.h" />
+    <ClInclude Include="Debugging\win32\SymbolResolution.h" />
+    <ClInclude Include="EngineCommon.h" />
+    <ClInclude Include="Extension\FactoryRegNode.h" />
+    <ClInclude Include="Extension\GoatCreateClass.h" />
+    <ClInclude Include="Extension\IGoatClass.h" />
+    <ClInclude Include="Extension\IGoatFactory.h" />
+    <ClInclude Include="Extension\IGoatFactoryRegistry.h" />
+    <ClInclude Include="Extension\IGoatFactoryRegistryImpl.h" />
+    <ClInclude Include="Extension\XExtensionMacros.h" />
+    <ClInclude Include="Hashing\crc32.h" />
+    <ClInclude Include="Hashing\Fnva1Hash.h" />
+    <ClInclude Include="Hashing\crc32.inl" />
+    <ClInclude Include="Hashing\MurmurHash.h" />
+    <ClInclude Include="Hashing\sha1.h" />
+    <ClInclude Include="IAnimation.h" />
+    <ClInclude Include="IAssetPak.h" />
+    <ClInclude Include="IBsp.h" />
+    <ClInclude Include="IConsole.h" />
+    <ClInclude Include="ICore.h" />
+    <ClInclude Include="IDirectoryWatcher.h" />
+    <ClInclude Include="IEngineModule.h" />
+    <ClInclude Include="IFileSys.h" />
+    <ClInclude Include="IFont.h" />
+    <ClInclude Include="IInput.h" />
+    <ClInclude Include="ILog.h" />
+    <ClInclude Include="IMaterial.h" />
+    <ClInclude Include="IModel.h" />
+    <ClInclude Include="IProfile.h" />
+    <ClInclude Include="IRender.h" />
+    <ClInclude Include="I3DEngine.h" />
+    <ClInclude Include="IRenderAux.h" />
+    <ClInclude Include="IRenderMesh.h" />
+    <ClInclude Include="IScriptSys.h" />
+    <ClInclude Include="IShader.h" />
+    <ClInclude Include="ISound.h" />
+    <ClInclude Include="ITexture.h" />
+    <ClInclude Include="ITimer.h" />
+    <ClInclude Include="Logging\FilterPolicies\LoggerNoFilterPolicy.h" />
+    <ClInclude Include="Logging\FilterPolicies\LoggerVerbosityFilterPolicy.h" />
+    <ClInclude Include="Logging\FormatPolicies\LoggerExtendedFormatPolicy.h" />
+    <ClInclude Include="Logging\FormatPolicies\LoggerFullFormatPolicy.h" />
+    <ClInclude Include="Logging\FormatPolicies\LoggerInternalConsoleFormatPolicy.h" />
+    <ClInclude Include="Logging\FormatPolicies\LoggerSimpleFormatPolicy.h" />
+    <ClInclude Include="Logging\Logger.h" />
+    <ClInclude Include="Logging\LoggerBase.h" />
+    <ClInclude Include="Logging\LogMacros.h" />
+    <ClInclude Include="Logging\WritePolicies\LoggerConsoleWritePolicy.h" />
+    <ClInclude Include="Logging\WritePolicies\LoggerDebuggerWritePolicy.h" />
+    <ClInclude Include="Logging\WritePolicies\LoggerInternalConsoleWritePolicy.h" />
+    <ClInclude Include="Math\VertexFormats.h" />
+    <ClInclude Include="Math\XAabb.h" />
+    <ClInclude Include="Math\XAlignment.h" />
+    <ClInclude Include="Math\XCamera.h" />
+    <ClInclude Include="Math\XColor.h" />
+    <ClInclude Include="Math\XColorPacking.h" />
+    <ClInclude Include="Math\XFrustum.h" />
+    <ClInclude Include="Math\XHalf.h" />
+    <ClInclude Include="Math\XIntersect.h" />
+    <ClInclude Include="Math\XMath.h" />
+    <ClInclude Include="Math\XMatrix.h" />
+    <ClInclude Include="Math\XMatrix22.h" />
+    <ClInclude Include="Math\XMatrix33.h" />
+    <ClInclude Include="Math\XMatrix34.h" />
+    <ClInclude Include="Math\XMatrix44.h" />
+    <ClInclude Include="Math\XMatrixAffine2.h" />
+    <ClInclude Include="Math\XMatrixAlgo.h" />
+    <ClInclude Include="Math\XObb.h" />
+    <ClInclude Include="Math\XPair.h" />
+    <ClInclude Include="Math\XPlane.h" />
+    <ClInclude Include="Math\XQuat.h" />
+    <ClInclude Include="Math\XQuatCompressed.h" />
+    <ClInclude Include="Math\XRay.h" />
+    <ClInclude Include="Math\XRect.h" />
+    <ClInclude Include="Math\XSphere.h" />
+    <ClInclude Include="Math\XVecCompressed.h" />
+    <ClInclude Include="Math\XVector.h" />
+    <ClInclude Include="Math\XVectorAligned.h" />
+    <ClInclude Include="Math\XWinding.h" />
+    <ClInclude Include="Memory\AllocationPolicies\GrowingBlockAllocator.h" />
+    <ClInclude Include="Memory\AllocationPolicies\GrowingGenericAllocator.h" />
+    <ClInclude Include="Memory\AllocationPolicies\GrowingMicroAllocator.h" />
+    <ClInclude Include="Memory\AllocationPolicies\GrowingPoolAllocator.h" />
+    <ClInclude Include="Memory\AllocationPolicies\GrowingStackAllocator.h" />
+    <ClInclude Include="Memory\AllocationPolicies\LinearAllocator.h" />
+    <ClInclude Include="Memory\AllocationPolicies\MallocFreeAllocator.h" />
+    <ClInclude Include="Memory\AllocationPolicies\PoolAllocator.h" />
+    <ClInclude Include="Memory\AllocationPolicies\StackAllocator.h" />
+    <ClInclude Include="Memory\BoundsCheckingPolicies\NoBoundsChecking.h" />
+    <ClInclude Include="Memory\BoundsCheckingPolicies\SimpleBoundsChecking.h" />
+    <ClInclude Include="Memory\dlmalloc-2.8.6.h" />
+    <ClInclude Include="Memory\HeapArea.h" />
+    <ClInclude Include="Memory\MemCursor.h" />
+    <ClInclude Include="Memory\MemInfo.h" />
+    <ClInclude Include="Memory\MemoryAllocatorStatistics.h" />
+    <ClInclude Include="Memory\MemoryArena.h" />
+    <ClInclude Include="Memory\MemoryArenaBase.h" />
+    <ClInclude Include="Memory\MemoryArenaStatistics.h" />
+    <ClInclude Include="Memory\MemoryTaggingPolicies\NoMemoryTagging.h" />
+    <ClInclude Include="Memory\MemoryTaggingPolicies\SimpleMemoryTagging.h" />
+    <ClInclude Include="Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.h" />
+    <ClInclude Include="Memory\MemoryTrackingPolicies\FullMemoryTracking.h" />
+    <ClInclude Include="Memory\MemoryTrackingPolicies\NoMemoryTracking.h" />
+    <ClInclude Include="Memory\MemoryTrackingPolicies\SimpleMemoryTracking.h" />
+    <ClInclude Include="Memory\NewAndDelete.h" />
+    <ClInclude Include="Memory\NewAndDeleteMacros.h" />
+    <ClInclude Include="Memory\ThreadPolicies\MultiThreadPolicy.h" />
+    <ClInclude Include="Memory\ThreadPolicies\SingleThreadPolicy.h" />
+    <ClInclude Include="Memory\VirtualMem.h" />
+    <ClInclude Include="Platform.h" />
+    <ClInclude Include="PlatformWin32.h" />
+    <ClInclude Include="Platform\ClipBoard.h" />
+    <ClInclude Include="Platform\Compiler.h" />
+    <ClInclude Include="Platform\Console.h" />
+    <ClInclude Include="Platform\DirectoryWatcher.h" />
+    <ClInclude Include="Platform\Types.h" />
+    <ClInclude Include="Platform\win32\ClipBoard.h" />
+    <ClInclude Include="Platform\win32\Compiler.h" />
+    <ClInclude Include="Platform\win32\Console.h" />
+    <ClInclude Include="Platform\win32\DirectoryWatcher.h" />
+    <ClInclude Include="Platform\win32\Window.h" />
+    <ClInclude Include="Platform\Window.h" />
+    <ClInclude Include="Prepro\PreproCommaIf.h" />
+    <ClInclude Include="Prepro\PreproDecrement.h" />
+    <ClInclude Include="Prepro\PreproExpandArgs.h" />
+    <ClInclude Include="Prepro\PreproHasComma.h" />
+    <ClInclude Include="Prepro\PreproIf.h" />
+    <ClInclude Include="Prepro\PreproIncrement.h" />
+    <ClInclude Include="Prepro\PreproIsEmpty.h" />
+    <ClInclude Include="Prepro\PreproJoin.h" />
+    <ClInclude Include="Prepro\PreproList.h" />
+    <ClInclude Include="Prepro\PreproNumArgs.h" />
+    <ClInclude Include="Prepro\PreproPassArgs.h" />
+    <ClInclude Include="Prepro\PreproRepeat.h" />
+    <ClInclude Include="Prepro\PreproString.h" />
+    <ClInclude Include="Prepro\PreproStringize.h" />
+    <ClInclude Include="Prepro\PreproToBool.h" />
+    <ClInclude Include="Prepro\PreproUniqueName.h" />
+    <ClInclude Include="Profile\ProfilerTypes.h" />
+    <ClInclude Include="Random\MultiplyWithCarry.h" />
+    <ClInclude Include="Random\XorShift.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="String\HumanSize.h" />
+    <ClInclude Include="String\Lexer.h" />
+    <ClInclude Include="String\StackString.h" />
+    <ClInclude Include="String\Path.h" />
+    <ClInclude Include="String\StringHash.h" />
+    <ClInclude Include="String\StringRange.h" />
+    <ClInclude Include="String\StringTable.h" />
+    <ClInclude Include="String\StringTokenizer.h" />
+    <ClInclude Include="String\StringUtil.h" />
+    <ClInclude Include="String\StrRef.h" />
+    <ClInclude Include="String\Xml.h" />
+    <ClInclude Include="Threading\Atomic.h" />
+    <ClInclude Include="Threading\AtomicInt.h" />
+    <ClInclude Include="Threading\ConditionVariable.h" />
+    <ClInclude Include="Threading\CriticalSection.h" />
+    <ClInclude Include="Threading\Semaphore.h" />
+    <ClInclude Include="Threading\Spinlock.h" />
+    <ClInclude Include="Threading\Thread.h" />
+    <ClInclude Include="Threading\ThreadLocalStorage.h" />
+    <ClInclude Include="TimeVal.h" />
+    <ClInclude Include="Time\CompressedStamps.h" />
+    <ClInclude Include="Time\DateStamp.h" />
+    <ClInclude Include="Time\TimeStamp.h" />
+    <ClInclude Include="Traits\FunctionSignatureTraits.h" />
+    <ClInclude Include="Traits\FunctionTraits.h" />
+    <ClInclude Include="Traits\MemberFunctionTraits.h" />
+    <ClInclude Include="Traits\SignedTypes.h" />
+    <ClInclude Include="Traits\UnsignedTypes.h" />
+    <ClInclude Include="Types.h" />
+    <ClInclude Include="Util\BitUtil.h" />
+    <ClInclude Include="Util\ClassMacros.h" />
+    <ClInclude Include="Util\Delegate.h" />
+    <ClInclude Include="Util\EndianUtil.h" />
+    <ClInclude Include="Util\EnumMacros.h" />
+    <ClInclude Include="Util\Event.h" />
+    <ClInclude Include="Util\Flags.h" />
+    <ClInclude Include="Util\FlagsMacros.h" />
+    <ClInclude Include="Util\FloatIEEEUtil.h" />
+    <ClInclude Include="Util\GenericUtil.h" />
+    <ClInclude Include="Util\HelperMacros.h" />
+    <ClInclude Include="Util\LastError.h" />
+    <ClInclude Include="Util\NamespaceMacros.h" />
+    <ClInclude Include="Util\Pointer64.h" />
+    <ClInclude Include="Util\PointerFlags.h" />
+    <ClInclude Include="Util\PointerUtil.h" />
+    <ClInclude Include="Util\ReferenceCounted.h" />
+    <ClInclude Include="Util\ReferenceCountedOwner.h" />
+    <ClInclude Include="Util\SmartPointer.h" />
+    <ClInclude Include="Util\SourceInfo.h" />
+    <ClInclude Include="Util\SourceInfoMacros.h" />
+    <ClInclude Include="Util\StopWatch.h" />
+    <ClInclude Include="Util\ToggleChecker.h" />
+    <ClInclude Include="Util\win32\LastError.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Casts\safe_static_cast.inl" />
+    <None Include="Casts\union_cast.inl" />
+    <None Include="Containers\BitStream.inl" />
+    <None Include="Containers\ByteStream.inl" />
+    <None Include="Containers\ByteStreamFifo.inl" />
+    <None Include="Containers\Fifo.inl" />
+    <None Include="Containers\FixedArray.inl" />
+    <None Include="Containers\FixedFifo.inl" />
+    <None Include="Containers\FixedRingBuffer.inl" />
+    <None Include="Containers\FixedStack.inl" />
+    <None Include="Containers\Freelist.inl" />
+    <None Include="Containers\Array.inl" />
+    <None Include="Containers\HashMap.inl" />
+    <None Include="Containers\LinkedList.inl" />
+    <None Include="Containers\LinkedListIntrusive.inl" />
+    <None Include="Containers\Stack.inl" />
+    <None Include="Debugging\Assert.inl" />
+    <None Include="Debugging\SymbolInfo.inl" />
+    <None Include="Debugging\win32\CallStack.inl" />
+    <None Include="Logging\FilterPolicies\LoggerNoFilterPolicy.inl" />
+    <None Include="Logging\Logger.inl" />
+    <None Include="Logging\LoggerBase.inl" />
+    <None Include="Math\XFrustum.inl" />
+    <None Include="Math\XQuatTrans.inl" />
+    <None Include="Math\XAabb.inl" />
+    <None Include="Math\XColor.inl" />
+    <None Include="Math\XMatrix22.inl" />
+    <None Include="Math\XMatrix33.inl" />
+    <None Include="Math\XMatrix34.inl" />
+    <None Include="Math\XMatrix44.inl" />
+    <None Include="Math\XObb.inl" />
+    <None Include="Math\XPair.inl" />
+    <None Include="Math\XQuat.inl" />
+    <None Include="Math\XQuatCompressed.inl" />
+    <None Include="Math\XRect.inl" />
+    <None Include="Math\XSphere.inl" />
+    <None Include="Math\XWinding.inl" />
+    <None Include="Memory\AllocationPolicies\GrowingBlockAllocator.inl" />
+    <None Include="Memory\AllocationPolicies\GrowingGenericAllocator.inl" />
+    <None Include="Memory\AllocationPolicies\GrowingMicroAllocator.inl" />
+    <None Include="Memory\AllocationPolicies\GrowingPoolAllocator.inl" />
+    <None Include="Memory\AllocationPolicies\GrowingStackAllocator.inl" />
+    <None Include="Memory\AllocationPolicies\LinearAllocator.inl" />
+    <None Include="Memory\AllocationPolicies\MallocFreeAllocator.inl" />
+    <None Include="Memory\AllocationPolicies\PoolAllocator.inl" />
+    <None Include="Memory\AllocationPolicies\StackAllocator.inl" />
+    <None Include="Memory\HeapArea.inl" />
+    <None Include="Memory\MemoryArena.inl" />
+    <None Include="Memory\MemoryTrackingPolicies\SimpleMemoryTracking.inl" />
+    <None Include="Memory\NewAndDelete.inl" />
+    <None Include="Memory\ThreadPolicies\MultiThreadPolicy.inl" />
+    <None Include="Platform\win32\Console.inl" />
+    <None Include="Platform\win32\Window.inl" />
+    <None Include="Random\MultiplyWithCarry.inl" />
+    <None Include="Random\XorShift.inl" />
+    <None Include="String\StackString.inl" />
+    <None Include="String\Path.inl" />
+    <None Include="String\StringHash.inl" />
+    <None Include="String\StringRange.inl" />
+    <None Include="String\StringUtil.inl" />
+    <None Include="StrRef.inl" />
+    <None Include="Threading\Atomic.inl" />
+    <None Include="Threading\AtomicInt.inl" />
+    <None Include="Threading\CriticalSection.inl" />
+    <None Include="Threading\Semaphore.inl" />
+    <None Include="Threading\Spinlock.inl" />
+    <None Include="Threading\ThreadLocalStorage.inl" />
+    <None Include="Util\BitUtil.inl" />
+    <None Include="Util\EndianUtil.inl" />
+    <None Include="Util\Flags.inl" />
+    <None Include="Util\Pointer64.inl" />
+    <None Include="Util\PointerFlags.inl" />
+    <None Include="Util\PointerUtil.inl" />
+    <None Include="Util\ReferenceCounted.inl" />
+    <None Include="Util\ReferenceCountedOwner.inl" />
+    <None Include="Util\SmartPointer.inl" />
+    <None Include="Util\SourceInfo.inl" />
+    <None Include="Util\StopWatch.inl" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Assets\AssetContainer.cpp" />
+    <ClCompile Include="Debugging\Assert.cpp" />
+    <ClCompile Include="Debugging\SymbolInfo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\AbortHandler.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\CallStack.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\DebuggerBreakpoint.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\DebuggerConnection.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\ExceptionHandler.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\HardwareBreakpoint.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\InvalidParameterHandler.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\MiniDump.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\PureVirtualFunctionCallHandler.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\SymbolResolution.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="EngineCommon.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Hashing\Fnva1Hash.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Hashing\MurmurHash.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Hashing\sha1.cpp" />
+    <ClCompile Include="Logging\FilterPolicies\LoggerVerbosityFilterPolicy.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Logging\FormatPolicies\LoggerExtendedFormatPolicy.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Logging\FormatPolicies\LoggerFullFormatPolicy.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Logging\FormatPolicies\LoggerInternalConsoleFormatPolicy.cpp" />
+    <ClCompile Include="Logging\FormatPolicies\LoggerSimpleFormatPolicy.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Logging\LoggerBase.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Logging\WritePolicies\LoggerConsoleWritePolicy.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Logging\WritePolicies\LoggerDebuggerWritePolicy.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Logging\WritePolicies\LoggerInternalConsoleWritePolicy.cpp" />
+    <ClCompile Include="Math\XWinding.cpp" />
+    <ClCompile Include="Math\XFrustum.cpp" />
+    <ClCompile Include="Math\XVectorAligned.cpp" />
+    <ClCompile Include="Memory\AllocationPolicies\GrowingBlockAllocator.cpp" />
+    <ClCompile Include="Memory\AllocationPolicies\GrowingGenericAllocator.cpp" />
+    <ClCompile Include="Memory\AllocationPolicies\GrowingMicroAllocator.cpp" />
+    <ClCompile Include="Memory\AllocationPolicies\GrowingPoolAllocator.cpp" />
+    <ClCompile Include="Memory\AllocationPolicies\GrowingStackAllocator.cpp" />
+    <ClCompile Include="Memory\AllocationPolicies\LinearAllocator.cpp" />
+    <ClCompile Include="Memory\AllocationPolicies\MallocFreeAllocator.cpp" />
+    <ClCompile Include="Memory\AllocationPolicies\PoolAllocator.cpp" />
+    <ClCompile Include="Memory\AllocationPolicies\StackAllocator.cpp" />
+    <ClCompile Include="Memory\BoundsCheckingPolicies\NoBoundsChecking.cpp" />
+    <ClCompile Include="Memory\BoundsCheckingPolicies\SimpleBoundsChecking.cpp" />
+    <ClCompile Include="Memory\dlmalloc-2.8.6.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Memory\HeapArea.cpp" />
+    <ClCompile Include="Memory\MemInfo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Memory\MemoryTaggingPolicies\NoMemoryTagging.cpp" />
+    <ClCompile Include="Memory\MemoryTaggingPolicies\SimpleMemoryTagging.cpp" />
+    <ClCompile Include="Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.cpp" />
+    <ClCompile Include="Memory\MemoryTrackingPolicies\FullMemoryTracking.cpp" />
+    <ClCompile Include="Memory\MemoryTrackingPolicies\NoMemoryTracking.cpp" />
+    <ClCompile Include="Memory\MemoryTrackingPolicies\SimpleMemoryTracking.cpp" />
+    <ClCompile Include="Memory\ThreadPolicies\MultiThreadPolicy.cpp" />
+    <ClCompile Include="Memory\ThreadPolicies\SingleThreadPolicy.cpp" />
+    <ClCompile Include="Memory\VirtualMem.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Platform\win32\ClipBoard.cpp" />
+    <ClCompile Include="Platform\win32\Console.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Platform\win32\CustomFrame.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Platform\win32\DirectoryWatcher.cpp" />
+    <ClCompile Include="Platform\win32\Window.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Random\MultiplyWithCarry.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Random\XorShift.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="String\HumanSize.cpp" />
+    <ClCompile Include="String\Lexer.cpp" />
+    <ClCompile Include="String\StringTokenizer.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="String\StringUtil.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="String\Xml.cpp" />
+    <ClCompile Include="Threading\ConditionVariable.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Threading\CriticalSection.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Threading\Thread.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <ClCompile Include="Time\CompressedStamps.cpp" />
+    <ClCompile Include="Time\DateStamp.cpp" />
+    <ClCompile Include="Time\TimeStamp.cpp" />
+    <ClCompile Include="Util\win32\LastError.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{07328CCB-F9CC-4967-861E-272BCA0CAB04}</ProjectGuid>
+    <Keyword>Win32Proj</Keyword>
+    <RootNamespace>Common</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Super|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Super|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\solutions\_engine.props" />
+    <Import Project="..\..\solutions\_engine_win32_debug.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\solutions\_engine.props" />
+    <Import Project="..\..\solutions\_engine_win32_debug.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\solutions\_engine.props" />
+    <Import Project="..\..\solutions\_engine_win64_debug.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\solutions\_engine.props" />
+    <Import Project="..\..\solutions\_engine_win64_debug.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\solutions\_engine.props" />
+    <Import Project="..\..\solutions\_engine_win32_release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\solutions\_engine.props" />
+    <Import Project="..\..\solutions\_engine_win64_release.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\solutions\_engine.props" />
+    <Import Project="..\..\solutions\_engine_win32_super.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\solutions\_engine.props" />
+    <Import Project="..\..\solutions\_engine_win32_super.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\solutions\_engine.props" />
+    <Import Project="..\..\solutions\_engine_win64_super.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\solutions\_engine.props" />
+    <Import Project="..\..\solutions\_engine_win64_super.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
+      <MinimalRebuild>false</MinimalRebuild>
+      <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
+      <MinimalRebuild>false</MinimalRebuild>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">
+    <ClCompile>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Super|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

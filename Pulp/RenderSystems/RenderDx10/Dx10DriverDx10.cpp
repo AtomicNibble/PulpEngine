@@ -1,0 +1,100 @@
+#include "stdafx.h"
+#include <ModuleExports.h>
+
+#include <ICore.h>
+#include <IRender.h>
+#include <IEngineModule.h>
+
+#include <Extension\XExtensionMacros.h>
+
+// #include "../Common/XRender.h"
+#include "Dx10Render.h"
+
+X_USING_NAMESPACE;
+
+
+#include <Memory\MemoryTrackingPolicies\FullMemoryTracking.h>
+#include <Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.h>
+
+typedef core::MemoryArena<
+	core::MallocFreeAllocator,
+	core::SingleThreadPolicy,
+	core::SimpleBoundsChecking,
+//	core::SimpleMemoryTracking,
+//	core::ExtendedMemoryTracking,
+	core::FullMemoryTracking,
+	core::SimpleMemoryTagging
+> RendererArena;
+
+
+
+// the allocator dose not check for leaks so it
+// dose not need to go out of scope.
+namespace {
+	core::MallocFreeAllocator g_RenderAlloc;
+}
+
+core::MemoryArenaBase* g_rendererArena = nullptr;
+
+
+extern "C" DLL_EXPORT render::IRender* CreateRender(ICore *pCore)
+{
+	LinkModule(pCore, "Render");
+
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pArena);
+//	X_ASSERT_NOT_NULL(gEnv->pMalloc);
+
+
+	g_rendererArena = X_NEW_ALIGNED(RendererArena, gEnv->pArena, "RendererArena", 8)(&g_RenderAlloc, "RendererArena");
+
+	render::IRender* pRender = &render::g_Dx11D3D;
+
+	return pRender;
+}
+
+
+//////////////////////////////////////////////////////////////////////////
+class XEngineModule_Render : public IEngineModule
+{
+	X_GOAT_GENERATE_SINGLETONCLASS(XEngineModule_Render, "Engine_RenderDx10");
+	//////////////////////////////////////////////////////////////////////////
+	virtual const char *GetName() X_OVERRIDE{ return "RenderDx10"; };
+
+	//////////////////////////////////////////////////////////////////////////
+	virtual bool Initialize(SCoreGlobals &env, const SCoreInitParams &initParams) X_OVERRIDE
+	{
+
+		ICore* pCore = env.pCore;
+		render::IRender *pRender = 0;
+
+
+		pRender = CreateRender(pCore);
+
+
+		env.pRender = pRender;
+		return true;
+	}
+
+
+	virtual bool ShutDown(void) X_OVERRIDE
+	{
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pArena);
+
+		X_DELETE(g_rendererArena, gEnv->pArena);
+
+		return true;
+	}
+};
+
+X_GOAT_REGISTER_CLASS(XEngineModule_Render);
+
+XEngineModule_Render::XEngineModule_Render()
+{
+};
+
+XEngineModule_Render::~XEngineModule_Render()
+{
+};
+

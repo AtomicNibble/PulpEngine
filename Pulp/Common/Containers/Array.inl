@@ -1,0 +1,435 @@
+
+template<typename T>
+X_INLINE Array<T>::Array(MemoryArenaBase* arena) :
+	granularity_( 16 ),
+	list_( nullptr ),
+	num_( 0 ),
+	size_( 0 ),
+	arena_(arena)
+{
+//	X_ASSERT_NOT_NULL(arena);
+}
+
+
+template<typename T>
+X_INLINE Array<T>::Array(MemoryArenaBase* arena, size_type size) :
+	granularity_(16),
+	list_(nullptr),
+	num_(size),
+	size_(size),
+	arena_(arena)
+{
+	X_ASSERT(size > 0, "List size must be positive")(size);
+	X_ASSERT_NOT_NULL(arena);
+
+	list_ = Allocate(size);
+
+	for (size_type i = 0; i<size; ++i)
+		Mem::Construct<T>(list_ + i);
+}
+
+template<typename T>
+X_INLINE Array<T>::Array(MemoryArenaBase* arena, size_type size, const T& initialValue) :
+granularity_(16),
+list_(nullptr),
+num_(size),
+size_(size),
+arena_(arena)
+{
+	X_ASSERT(size > 0, "List size must be positive")(size);
+	X_ASSERT_NOT_NULL(arena);
+
+	list_ = Allocate(size);
+
+	for (size_type i = 0; i<size; ++i)
+		Mem::Construct<T>(list_ + i, initialValue);
+}
+
+
+
+template<typename T>
+X_INLINE Array<T>::Array(const Array<T>& oth)
+{
+	*this = oth;
+}
+
+
+template<typename T>
+X_INLINE Array<T>::~Array(void) 
+{
+	free();
+}
+
+template<typename T>
+X_INLINE void Array<T>::setArena(MemoryArenaBase* arena)
+{
+	X_ASSERT(arena_ == nullptr || num_ == 0, "can't set arena on a array that has items")(num_);
+	arena_ = arena;
+}
+
+template<typename T>
+X_INLINE void Array<T>::setArena(MemoryArenaBase* arena, size_type capacity)
+{
+	X_ASSERT(arena_ == nullptr || num_ == 0, "can't set arena on a array that has items")(num_);
+	arena_ = arena;
+
+	reserve(capacity);
+}
+
+// ---------------------------------------------------------
+template<typename T>
+Array<T>& Array<T>::operator=(const Array<T> &oth)
+{
+	size_type i;
+	free();
+
+	num_ = oth.num_;
+	size_ = oth.size_;
+	granularity_ = oth.granularity_;
+	arena_ = oth.arena_;
+
+	if (size_) {
+		list_ = Allocate(size_);
+		for (i = 0; i < num_; i++) {
+			Mem::Construct(&list_[i], oth.list_[i]);
+		}
+	}
+
+	return *this;
+}
+
+template<typename T>
+X_INLINE const T&Array<T>::operator[](size_type idx) const {
+	X_ASSERT(idx >= 0 && idx < num_, "Array index out of bounds")(idx, num_);
+	return list_[idx];
+}
+
+
+template<typename T>
+X_INLINE T&Array<T>::operator[](size_type idx) {
+	X_ASSERT(idx >= 0 && idx < num_, "Array index out of bounds")(idx, num_);
+	return list_[idx];
+}
+
+// ---------------------------------------------------------
+
+template<typename T>
+X_INLINE T *Array<T>::ptr(void) {
+	return list_;
+}
+
+
+template<typename T>
+const X_INLINE T *Array<T>::ptr(void) const {
+	return list_;
+}
+
+// ---------------------------------------------------------
+
+template<typename T>
+X_INLINE const bool Array<T>::isEmpty(void) const
+{
+	return num_ == 0;
+}
+
+template<typename T>
+X_INLINE void Array<T>::clear(void) 
+{
+	// properly destruct the instances
+	size_t i;
+
+	for (i = 0; i<size(); ++i)
+		Mem::Destruct(list_ + i);
+
+	num_ = 0; // don't free any memory
+}
+
+template<typename T>
+X_INLINE void Array<T>::free(void)
+{
+	clear(); // make sure to destruct the objects.
+
+	if (list_)
+		DeleteArr(list_);
+
+	list_ = nullptr;
+	num_ =  0;
+	size_ = 0;
+}
+
+
+template<typename T>
+X_INLINE typename Array<T>::size_type Array<T>::size(void) const {
+	return num_;
+}
+
+
+template<typename T>
+X_INLINE typename Array<T>::size_type Array<T>::capacity(void) const {
+	return size_;
+}
+
+
+template<typename T>
+X_INLINE void Array<T>::setGranularity(size_type newgranularity)
+{
+	X_ASSERT( newgranularity >= 0, "granularity size must be positive" )( newgranularity );
+
+	granularity_ = newgranularity;
+}
+
+
+template<typename T>
+X_INLINE typename Array<T>::size_type Array<T>::granularity(void) const {
+	return granularity_;
+}
+
+// ---------------------------------------------------------
+
+
+// Inserts or erases elements at the end such that size is 'size'
+template<typename T>
+X_INLINE void Array<T>::resize(size_type newNum, const T& t) 
+{
+	X_ASSERT(newNum >= 0, "array size must be positive")(newNum);
+
+	size_type	i;
+
+	// same amount of items?
+	if (newNum == num_)
+		return;
+
+	// remove some?
+	if (newNum < num_)
+	{
+		// we don't delete memory just deconstruct.
+		Mem::DestructArray<T>(&list_[newNum], num_ - newNum);
+	}
+	else
+	{
+		// adding items.
+		// do we have room?
+		ensureSize(newNum);
+
+		// construct the new items.
+		for (i = num_; i < newNum; i++)
+			Mem::Construct<T>(&list_[i], t);
+	}
+
+	// set num
+	num_ = newNum;
+}
+
+
+// --------------------------------------------------
+
+
+template<typename T>
+X_INLINE void Array<T>::reserve(size_type __size) 
+{
+	X_ASSERT(__size >= 0, "array size must be positive")(__size);
+	ensureSize(__size);
+}
+
+
+// ---------------------------------------------------------
+
+template<typename T>
+X_INLINE typename Array<T>::size_type Array<T>::append(T const& obj) {
+	// if list empty allocate it
+	if ( !list_ ) 
+		reserve(granularity_);
+	// grow if needs be.
+	if ( num_ == size_ ) 
+		reserve(size_ + granularity_);
+
+	Mem::Construct(&list_[num_], obj);
+	num_++;
+	return num_ - 1;
+}
+
+template<typename T>
+X_INLINE typename Array<T>::size_type Array<T>::push_back(T const& obj) {
+	// if list empty allocate it
+	if (!list_)
+		reserve(granularity_);
+	// grow if needs be.
+	if (num_ == size_)
+		reserve(size_ + granularity_);
+
+	Mem::Construct(&list_[num_], obj);
+	num_++;
+	return num_ - 1;
+}
+
+// -----------------------------------------------
+
+template<typename T>
+X_INLINE void Array<T>::pop_back()
+{
+	if (size() > 0)
+	{
+		Mem::Destruct(end() - 1);
+		num_--;
+	}
+}
+
+// -----------------------------------------------
+
+template<typename T>
+X_INLINE typename Array<T>::size_type Array<T>::insert(const Type& obj, size_type index)
+{
+	if (!list_) 
+		reserve(granularity_);
+
+	if (num_ == size_) {
+		size_type newsize = size_ + granularity_;
+
+		reserve(newsize);
+	}
+
+	if (index < 0) 
+		index = 0;
+	else if (index > num_) 
+		index = num_;
+
+	for (size_type i = num_; i > index; --i)
+		list_[i] = list_[i - 1];
+
+	num_++;
+	list_[index] = obj;
+
+	return index;
+}
+
+
+template<typename T>
+bool Array<T>::removeIndex(size_type idx)
+{
+	size_type i;
+
+	if (idx == (size_type)-1)
+		return false;
+
+	X_ASSERT_NOT_NULL(list_);
+	X_ASSERT(idx >= 0, "index is invalid")(idx);
+	X_ASSERT(idx < num_, "index is out of bounds")(idx, num_);
+
+	if ((idx < 0) || (idx >= num_)) {
+		return false;
+	}
+
+	num_--;
+	for (i = idx; i < num_; i++) 
+		list_[i] = list_[i + 1];
+
+	return true;
+}
+
+template<typename T>
+typename Array<T>::size_type Array<T>::find(const Type& val)
+{
+	size_type i;
+	size_type num = num_;
+
+	for (i = 0; i < num; i++)
+	{
+		if (list_[i] == val)
+			return i;
+	}
+
+	return (size_type)-1;
+}
+
+template<typename T>
+void Array<T>::swap(Array& oth)
+{
+	// swap them baby.
+	core::Swap(list_, oth.list_);
+	core::Swap(num_, oth.num_);
+	core::Swap(size_, oth.size_);
+	core::Swap(granularity_, oth.granularity_);
+
+	core::Swap(arena_, oth.arena_);
+}
+
+
+// -----------------------------------------------
+
+template<typename T>
+inline typename Array<T>::Iterator Array<T>::begin(void)
+{
+	return list_;
+}
+
+template<typename T>
+inline typename Array<T>::ConstIterator Array<T>::begin(void) const
+{
+	return list_;
+}
+
+template<typename T>
+inline typename Array<T>::Iterator Array<T>::end(void)
+{
+	return list_ + num_;
+}
+
+template<typename T>
+inline typename Array<T>::ConstIterator Array<T>::end(void) const
+{
+	return list_ + num_;
+}
+
+
+// -----------------------------------------------
+
+template<typename T>
+void Array<T>::ensureSize(size_type size)
+{
+	if (size > size_)
+	{
+		Type* pOldList;
+		size_type	i;
+		size_type	newsize;
+
+		newsize = bitUtil::RoundUpToMultiple(size, granularity_);
+		pOldList = list_;
+
+		// new array baby!
+		list_ = Allocate(newsize);
+
+		// copy old items over.
+		if (pOldList)
+		{
+			for (i = 0; i < num_; i++)
+				Mem::Construct(&list_[i], pOldList[i]);
+
+			// delete old.
+			DeleteArr(pOldList);
+		}
+
+		// set the rounded size
+		size_ = newsize;
+	}
+}
+
+
+template<typename T>
+X_INLINE void Array<T>::DeleteArr(T* pArr)
+{
+	X_ASSERT_NOT_NULL(arena_);
+
+	arena_->free(pArr);
+	// X_DELETE_ARRAY(pArr, arena_);
+}
+
+template<typename T>
+X_INLINE T* Array<T>::Allocate(size_type num)
+{
+	X_ASSERT_NOT_NULL(arena_);
+
+	// we don't allocate the object type.
+	// since we don't want to construct any of them.
+	// that is done on a per item bases.
+	return static_cast<T*>(arena_->allocate(sizeof(T)*num, X_ALIGN_OF(T), 0, "Array", "T[]", X_SOURCE_INFO));
+}

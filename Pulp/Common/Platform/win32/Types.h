@@ -1,0 +1,180 @@
+#pragma once
+
+#ifndef _X_TYPES_H_
+#define _X_TYPES_H_
+
+#include "Compiler.h"
+
+#ifdef DWORD
+#undef DWORD
+#endif
+
+#ifdef LONG
+#undef LONG
+#endif
+
+#ifdef WORD
+#undef WORD
+#endif
+
+#ifdef BYTE
+#undef BYTE
+#endif
+
+#ifdef FLOAT
+#undef FLOAT
+#endif
+
+#ifdef VOID
+#undef VOID
+#endif
+
+#ifdef BOOL
+#undef BOOL
+#endif
+
+#ifdef INT
+#undef INT
+#endif
+
+#ifdef UINT
+#undef UINT
+#endif
+
+typedef unsigned long       DWORD;
+typedef long				LONG;
+typedef unsigned short      WORD;
+typedef unsigned char       BYTE;
+typedef float               FLOAT;
+typedef void				VOID;
+
+typedef int                 BOOL;
+typedef int                 INT;
+typedef unsigned int        UINT;
+
+typedef unsigned __int64	QWORD;
+
+// kinky !
+
+typedef signed char int8_t;
+typedef short int16_t;
+typedef int int32_t;
+
+typedef unsigned char uint8_t;
+typedef unsigned short uint16_t;
+typedef unsigned int uint32_t;
+
+typedef signed char int_least8_t;
+typedef short int_least16_t;
+typedef int int_least32_t;
+
+typedef unsigned char uint_least8_t;
+typedef unsigned short uint_least16_t;
+typedef unsigned int uint_least32_t;
+
+typedef char int_fast8_t;
+typedef int int_fast16_t;
+typedef int int_fast32_t;
+
+typedef unsigned char uint_fast8_t;
+typedef unsigned int uint_fast16_t;
+typedef unsigned int uint_fast32_t;
+
+
+typedef unsigned char      uint8;
+typedef signed char        int8;
+typedef unsigned short     uint16;
+typedef signed short       int16;
+typedef unsigned int       uint32;
+typedef uint32             uint;
+typedef signed int         int32;
+
+typedef unsigned __int64   uint64;
+typedef signed __int64     int64;
+
+
+
+/* VC++ COMPILER PARAMETERS */
+#define _LONGLONG	__int64
+#define _ULONGLONG	unsigned __int64
+#define _LLONG_MAX	0x7fffffffffffffff
+#define _ULLONG_MAX	0xffffffffffffffff
+
+/* INTEGER PROPERTIES */
+#define _C2				1	/* 0 if not 2's complement */
+
+#define _MAX_EXP_DIG	8	/* for parsing numerics */
+#define _MAX_INT_DIG	32
+#define _MAX_SIG_DIG	36
+
+typedef _LONGLONG _Longlong;
+typedef _ULONGLONG _ULonglong;
+
+typedef _Longlong int64_t;
+typedef _ULonglong uint64_t;
+
+typedef _Longlong int_least64_t;
+typedef _ULonglong uint_least64_t;
+
+typedef _Longlong int_fast64_t;
+typedef _ULonglong uint_fast64_t;
+
+typedef _Longlong intmax_t;
+typedef _ULonglong uintmax_t;
+
+
+#undef INT8_MIN
+#undef INT8_MAX
+#undef INT16_MIN
+#undef INT16_MAX
+#undef INT32_MIN
+#undef INT32_MAX
+#undef INT64_MIN
+#undef INT64_MAX
+
+#undef UINT8_MAX
+#undef UINT16_MAX
+#undef UINT32_MAX
+#undef UINT64_MAX
+
+const uint8  UINT8_MIN = 0;
+const uint8  UINT8_MAX = 0xFFU;
+const uint16 UINT16_MIN = 0;
+const uint16 UINT16_MAX = 0xFFFFU;
+const uint32 UINT32_MIN = 0;
+const uint32 UINT32_MAX = 0xFFFFFFFFU;
+const uint64 UINT64_MIN = 0;
+const uint64 UINT64_MAX = 0xFFFFFFFFFFFFFFFFULL; //0xFFFFFFFFFFFFFFFFui64;
+
+const int8  INT8_MIN = -128;
+const int8  INT8_MAX = 127;
+const int16 INT16_MIN = -32768;
+const int16 INT16_MAX = 32767;
+const int32 INT32_MIN = (-2147483647 - 1);
+const int32 INT32_MAX = 2147483647;
+const int64 INT64_MIN = (int64)0x8000000000000000ULL; //(-9223372036854775807i64 - 1);
+const int64 INT64_MAX = (int64)0x7FFFFFFFFFFFFFFFULL; // 9223372036854775807i64;
+
+
+typedef float	float32_t;
+typedef double	float64_t;
+
+
+static_assert(sizeof(float32_t) == 4, "sizeof(float32_t) is not 4 bytes");
+static_assert(sizeof(float64_t) == 8, "sizeof(float64_t) is not 8 bytes");
+
+static_assert(sizeof(uint8_t) == 1, "sizeof(uint8_t) is not 1 byte");
+static_assert(sizeof(int8_t) == 1, "sizeof(int8_t) is not 1 byte");
+
+static_assert(sizeof(uint16_t) == 2, "sizeof(uint16_t) is not 2 bytes");
+static_assert(sizeof(int16_t) == 2, "sizeof(int16_t) is not 2 bytes");
+
+static_assert(sizeof(uint32_t) == 4, "sizeof(uint32_t) is not 4 bytes");
+static_assert(sizeof(int32_t) == 4, "sizeof(int32_t) is not 4 bytes");
+
+static_assert(sizeof(uint64_t) == 8, "sizeof(uint64_t) is not 8 bytes");
+static_assert(sizeof(int64_t) == 8, "sizeof(int64_t) is not 8 bytes");
+
+static_assert(sizeof(QWORD) == 8, "sizeof(QWORD) is not 8 bytes");
+
+#endif // !_X_TYPES_H_

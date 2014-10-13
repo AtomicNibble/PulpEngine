@@ -1,0 +1,81 @@
+#include "stdafx.h"
+#include <ModuleExports.h>
+
+#include <ICore.h>
+#include <IEngineModule.h>
+
+
+#include "X3DEngine.h"
+
+#include <Extension\XExtensionMacros.h>
+
+
+
+X_USING_NAMESPACE;
+
+typedef core::MemoryArena<
+	core::MallocFreeAllocator,
+	core::SingleThreadPolicy,
+	core::SimpleBoundsChecking,
+	core::SimpleMemoryTracking,
+	//	core::FullMemoryTracking,
+	//	core::ExtendedMemoryTracking,
+	core::SimpleMemoryTagging
+> Engine3DArena;
+
+// the allocator dose not check for leaks so it
+// dose not need to go out of scope.
+namespace {
+	core::MallocFreeAllocator g_3dEngineAlloc;
+}
+
+core::MemoryArenaBase* g_3dEngineArena = nullptr;
+
+//////////////////////////////////////////////////////////////////////////
+class XEngineModule_3DEngine : public IEngineModule
+{
+	X_GOAT_GENERATE_SINGLETONCLASS(XEngineModule_3DEngine, "Engine_3DEngine");
+	//////////////////////////////////////////////////////////////////////////
+	virtual const char *GetName() X_OVERRIDE{ return "3DEngine"; };
+
+	//////////////////////////////////////////////////////////////////////////
+	virtual bool Initialize(SCoreGlobals &env, const SCoreInitParams &initParams) X_OVERRIDE
+	{
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pArena);
+
+		ICore* pCore = env.pCore;
+		engine::I3DEngine* engine = nullptr;
+
+		g_3dEngineArena = X_NEW_ALIGNED(Engine3DArena, gEnv->pArena, "3DEngineArena", 8)(&g_3dEngineAlloc, "3DEngineArena");
+
+
+		engine = X_NEW_ALIGNED(engine::X3DEngine, g_3dEngineArena, "3DEngine", X_ALIGN_OF(engine::X3DEngine));
+
+		env.p3DEngine = engine;
+		return true;
+	}
+
+	virtual bool ShutDown(void) X_OVERRIDE
+	{
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pArena);
+
+		X_DELETE_AND_NULL(g_3dEngineArena, gEnv->pArena);
+
+		return true;
+	}
+};
+
+
+
+X_GOAT_REGISTER_CLASS(XEngineModule_3DEngine);
+
+XEngineModule_3DEngine::XEngineModule_3DEngine()
+{
+};
+
+XEngineModule_3DEngine::~XEngineModule_3DEngine()
+{
+};
+

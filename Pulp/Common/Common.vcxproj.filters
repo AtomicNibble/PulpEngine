@@ -1,0 +1,1357 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Interfaces_h">
+      <UniqueIdentifier>{130428b9-3c86-43bb-bc91-a4dcb5ba73fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles">
+      <UniqueIdentifier>{8eeb3a8a-c0f4-455c-86fb-498b808c1f41}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\win32">
+      <UniqueIdentifier>{0c7100fa-b5fb-44bb-8e44-37cbc3e595e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Logging">
+      <UniqueIdentifier>{9c16086b-b413-491d-a978-f8f058a8fb46}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Logging\Policys">
+      <UniqueIdentifier>{4ac76976-7431-4788-98f5-ba0ec5d0b331}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{49cfdf90-3d42-46cd-a1e2-3bc3691f5598}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Threading">
+      <UniqueIdentifier>{8aa5c77b-2b99-424f-8096-90c70cbfff58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Platform">
+      <UniqueIdentifier>{ac124dc2-00b1-404c-b24d-d3a0a9ad10e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Platform\win32">
+      <UniqueIdentifier>{aeccfe00-6849-4d06-a2d4-62fbd7b165eb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Prepo">
+      <UniqueIdentifier>{8062a30e-2f96-48f7-8a13-11756bdb03a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Profile">
+      <UniqueIdentifier>{fc57f187-6c40-4b77-8bff-2f96eb2f3d79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Random">
+      <UniqueIdentifier>{59471cdf-df38-41b8-a5b0-4ebc0fa82efa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Math">
+      <UniqueIdentifier>{cfa41367-6762-4936-afc5-eb2df869befb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Logging">
+      <UniqueIdentifier>{d8d484b3-6b25-45d4-b8a6-53c6376ff806}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Logging\FilterPolicies">
+      <UniqueIdentifier>{3751d672-6526-4eaf-8887-7a31a90856f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Logging\FormatPolicies">
+      <UniqueIdentifier>{b5121143-1d76-4dfb-85c2-e51141f291fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Logging\WritePolicies">
+      <UniqueIdentifier>{838ed40c-4155-4aa4-b033-1de3076b0f0b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Hashing">
+      <UniqueIdentifier>{79db9e81-e85d-425a-8699-e12aac88b7b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Extension">
+      <UniqueIdentifier>{d721103a-f25c-4eb5-a280-604493539e31}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Casts">
+      <UniqueIdentifier>{bb14670d-a59f-4197-9c0f-904c4c2cd518}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\CompileTime">
+      <UniqueIdentifier>{95799102-7b8e-47ea-895d-216d4cc8c1ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Core">
+      <UniqueIdentifier>{e2ced94d-a142-4cd6-b398-e8a4b584323f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Debugging">
+      <UniqueIdentifier>{1ba2eb5f-a1b8-455d-bd85-60798f2fbd50}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\String">
+      <UniqueIdentifier>{e4ceb261-482d-456e-9e4c-686b2d7b82a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Timer">
+      <UniqueIdentifier>{3eaf8db3-d000-4514-9c7d-87ca1fc913d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Util">
+      <UniqueIdentifier>{c47de0f9-49fe-49c1-bc2c-3b73ea9c199f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Util\win32">
+      <UniqueIdentifier>{2c2a8e22-ea0e-418e-91ae-a7368d26d3f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Hashing">
+      <UniqueIdentifier>{e5c47922-4c7f-41e2-be3a-9189f896b32a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Random">
+      <UniqueIdentifier>{9bb8b8cb-95ed-4e85-a02b-74b6e2c6cfa9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\String">
+      <UniqueIdentifier>{262fb0d9-6168-4938-ad70-45ce2eb485e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Debugging">
+      <UniqueIdentifier>{95722026-acf9-49b5-80b6-3edf9d694a9d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Debugging\win32">
+      <UniqueIdentifier>{2ebd519d-18a2-48be-8a8f-64d19e6f3804}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Debugging\win32">
+      <UniqueIdentifier>{4af9be20-3b85-4c36-86b0-ee2587c020fe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Memory">
+      <UniqueIdentifier>{9751b698-5e4f-423d-b3d0-15acb3fafff6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Memory">
+      <UniqueIdentifier>{e3cb03e7-46cf-46e9-b184-bf765ff0762b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Threading">
+      <UniqueIdentifier>{87b35fc5-82f0-4be1-b2ad-976430af862e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Platform">
+      <UniqueIdentifier>{83eab3bc-2ef0-4901-b70e-0f9dddfdb8f1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Platform\win32">
+      <UniqueIdentifier>{b6bd653c-7e74-46cf-a3e5-aee2c0511c09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Containers">
+      <UniqueIdentifier>{2a667316-876f-4048-8d58-ec59f0b00add}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Time">
+      <UniqueIdentifier>{1e51c921-0810-4913-b0d6-1fca51525815}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Time">
+      <UniqueIdentifier>{9a61819a-f620-4d13-8c8a-e7ae2ab8d527}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Memory\AllocationPolicies">
+      <UniqueIdentifier>{c79b02ad-c0ab-418b-abf4-217ab8ed7cb8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Memory\BoundsCheckingPolicies">
+      <UniqueIdentifier>{0a8bbb1c-ac29-4573-ba52-8656282ad030}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Memory\MemoryTaggingPolicies">
+      <UniqueIdentifier>{88fd3b17-6e84-4f78-857c-3b884e446c58}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Memory\MemoryTrackingPolicies">
+      <UniqueIdentifier>{8d7b16c9-c79a-4f61-abc7-4b4ddfbd3450}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Memory\ThreadPolicies">
+      <UniqueIdentifier>{cb89b6cd-c976-4b9c-8564-94454b96bf28}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Memory\ThreadPolicies">
+      <UniqueIdentifier>{5693e6e6-99c0-4327-a3e2-49338844ad98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Memory\MemoryTrackingPolicies">
+      <UniqueIdentifier>{f4a977b7-24e8-4606-9996-9fe0027ecb61}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Memory\MemoryTaggingPolicies">
+      <UniqueIdentifier>{6f5f2f29-97a3-4192-b037-d24ae6885dc4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Memory\BoundsCheckingPolicies">
+      <UniqueIdentifier>{a27e612e-1fd6-4748-9d9a-b176dc0e762e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Memory\AllocationPolicies">
+      <UniqueIdentifier>{0eeb5a98-fc9f-4365-a4e4-c7c9a8973969}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Math">
+      <UniqueIdentifier>{f165ae30-ee25-4d82-bedc-ec35ee284b5e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Assets">
+      <UniqueIdentifier>{19aa5e98-fd49-4648-b969-e0dd17b05657}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Assets">
+      <UniqueIdentifier>{24918921-fb7a-45b0-971b-acda80c26dd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Traits">
+      <UniqueIdentifier>{febee5e6-6f7b-4aad-a82a-5b381e289e40}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Prepro\PreproCommaIf.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="Prepro\PreproDecrement.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="Prepro\PreproExpandArgs.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="Prepro\PreproHasComma.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="Prepro\PreproIf.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="Prepro\PreproIncrement.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="Prepro\PreproIsEmpty.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="Prepro\PreproJoin.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="Prepro\PreproList.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="Prepro\PreproNumArgs.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="Prepro\PreproPassArgs.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="Prepro\PreproRepeat.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="Prepro\PreproString.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="Prepro\PreproStringize.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="Prepro\PreproToBool.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="Prepro\PreproUniqueName.h">
+      <Filter>Headers\Prepo</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineCommon.h" />
+    <ClInclude Include="Types.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Types.h">
+      <Filter>Headers\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Configuration.h">
+      <Filter>Headers\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="ConfigurationWin32.h">
+      <Filter>Headers\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform.h">
+      <Filter>Headers\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="PlatformWin32.h">
+      <Filter>Headers\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\BitUtil.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\ClassMacros.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Event.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Flags.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\FlagsMacros.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\GenericUtil.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\HelperMacros.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\LastError.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\NamespaceMacros.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\PointerFlags.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\PointerUtil.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\ReferenceCounted.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\ReferenceCountedOwner.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\SourceInfo.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\SourceInfoMacros.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\StopWatch.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\win32\LastError.h">
+      <Filter>Headers\Util\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Traits\FunctionSignatureTraits.h">
+      <Filter>Headers\Traits</Filter>
+    </ClInclude>
+    <ClInclude Include="Traits\FunctionTraits.h">
+      <Filter>Headers\Traits</Filter>
+    </ClInclude>
+    <ClInclude Include="Traits\MemberFunctionTraits.h">
+      <Filter>Headers\Traits</Filter>
+    </ClInclude>
+    <ClInclude Include="Traits\SignedTypes.h">
+      <Filter>Headers\Traits</Filter>
+    </ClInclude>
+    <ClInclude Include="Casts\safe_static_cast.h">
+      <Filter>Headers\Casts</Filter>
+    </ClInclude>
+    <ClInclude Include="Casts\union_cast.h">
+      <Filter>Headers\Casts</Filter>
+    </ClInclude>
+    <ClInclude Include="IInput.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="ICore.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\win32\Compiler.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="IEngineModule.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="ITimer.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeVal.h">
+      <Filter>Headers\Timer</Filter>
+    </ClInclude>
+    <ClInclude Include="IConsole.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="String\StrRef.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
+    <ClInclude Include="String\StringUtil.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\Assert.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\AssertMacros.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="Hashing\crc32.h">
+      <Filter>Headers\Hashing</Filter>
+    </ClInclude>
+    <ClInclude Include="Hashing\Fnva1Hash.h">
+      <Filter>Headers\Hashing</Filter>
+    </ClInclude>
+    <ClInclude Include="Hashing\MurmurHash.h">
+      <Filter>Headers\Hashing</Filter>
+    </ClInclude>
+    <ClInclude Include="CompileTime\ClassInfo.h">
+      <Filter>Headers\CompileTime</Filter>
+    </ClInclude>
+    <ClInclude Include="CompileTime\ExtractCount.h">
+      <Filter>Headers\CompileTime</Filter>
+    </ClInclude>
+    <ClInclude Include="CompileTime\ExtractType.h">
+      <Filter>Headers\CompileTime</Filter>
+    </ClInclude>
+    <ClInclude Include="CompileTime\IntToType.h">
+      <Filter>Headers\CompileTime</Filter>
+    </ClInclude>
+    <ClInclude Include="CompileTime\IsPOD.h">
+      <Filter>Headers\CompileTime</Filter>
+    </ClInclude>
+    <ClInclude Include="CompileTime\IsPointer.h">
+      <Filter>Headers\CompileTime</Filter>
+    </ClInclude>
+    <ClInclude Include="CompileTime\IsStringLiteral.h">
+      <Filter>Headers\CompileTime</Filter>
+    </ClInclude>
+    <ClInclude Include="Random\MultiplyWithCarry.h">
+      <Filter>Headers\Random</Filter>
+    </ClInclude>
+    <ClInclude Include="Random\XorShift.h">
+      <Filter>Headers\Random</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XMath.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XVector.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XQuat.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XMatrix.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XMatrix22.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XMatrix33.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XMatrix44.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XMatrixAffine2.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XMatrixAlgo.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XHalf.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XColor.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XColorPacking.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XPlane.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XRay.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XRect.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XSphere.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XCamera.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XMatrix34.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="IFont.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\IGoatFactory.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\IGoatClass.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\XExtensionMacros.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\GoatCreateClass.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\IGoatFactoryRegistry.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\IGoatFactoryRegistryImpl.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\FactoryRegNode.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="String\StringHash.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
+    <ClInclude Include="ISound.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="ILog.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\LoggerBase.h">
+      <Filter>Headers\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\FilterPolicies\LoggerNoFilterPolicy.h">
+      <Filter>Headers\Logging\FilterPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\FormatPolicies\LoggerSimpleFormatPolicy.h">
+      <Filter>Headers\Logging\FormatPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\WritePolicies\LoggerDebuggerWritePolicy.h">
+      <Filter>Headers\Logging\WritePolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\Logger.h">
+      <Filter>Headers\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\CriticalSection.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\FilterPolicies\LoggerVerbosityFilterPolicy.h">
+      <Filter>Headers\Logging\FilterPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\FormatPolicies\LoggerExtendedFormatPolicy.h">
+      <Filter>Headers\Logging\FormatPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\FormatPolicies\LoggerFullFormatPolicy.h">
+      <Filter>Headers\Logging\FormatPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\WritePolicies\LoggerConsoleWritePolicy.h">
+      <Filter>Headers\Logging\WritePolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\SymbolInfo.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\SymbolResolution.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\win32\SymbolResolution.h">
+      <Filter>Headers\Debugging\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\win32\MiniDump.h">
+      <Filter>Headers\Debugging\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\win32\PureVirtualFunctionCallHandler.h">
+      <Filter>Headers\Debugging\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\win32\AbortHandler.h">
+      <Filter>Headers\Debugging\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\win32\DebuggerBreakpointMacros.h">
+      <Filter>Headers\Debugging\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\win32\DebuggerConnection.h">
+      <Filter>Headers\Debugging\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\win32\ExceptionHandler.h">
+      <Filter>Headers\Debugging\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\win32\HardwareBreakpoint.h">
+      <Filter>Headers\Debugging\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\win32\InvalidParameterHandler.h">
+      <Filter>Headers\Debugging\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\LogMacros.h">
+      <Filter>Headers\Logging</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\DebuggerConnection.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\DebuggerBreakpoint.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\DebuggerBreakpointMacros.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\DefaultAssertionHandler.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\ExceptionHandler.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\HardwareBreakpoint.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\InvalidParameterHandler.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\MiniDump.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\PureVirtualFunctionCallHandler.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Console.h">
+      <Filter>Headers\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\win32\Console.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XAlignment.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XPair.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="IScriptSys.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\dlmalloc-2.8.6.h">
+      <Filter>Headers\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\VirtualMem.h">
+      <Filter>Headers\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\MemInfo.h">
+      <Filter>Headers\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="IRender.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Window.h">
+      <Filter>Headers\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\win32\Window.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="ITexture.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\Atomic.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\AtomicInt.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\ConditionVariable.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\Semaphore.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\Spinlock.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\ThreadLocalStorage.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\Thread.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="IProfile.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Profile\ProfilerTypes.h">
+      <Filter>Headers\Profile</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\CallStack.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\win32\CallStack.h">
+      <Filter>Headers\Debugging\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Compiler.h">
+      <Filter>Headers\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\ByteStream.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\BitStream.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\Stack.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\NewAndDelete.h">
+      <Filter>Headers\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\NewAndDeleteMacros.h">
+      <Filter>Headers\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\FixedStack.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\Freelist.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\HeapArea.h">
+      <Filter>Headers\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\FixedArray.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\Array.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\HashMap.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\HashBase.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\Fifo.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\FixedFifo.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\DateStamp.h">
+      <Filter>Headers\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\TimeStamp.h">
+      <Filter>Headers\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="IFileSys.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="String\Path.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
+    <ClInclude Include="String\StackString.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
+    <ClInclude Include="IAssetPak.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="IModel.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="IAnimation.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XQuatCompressed.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XAabb.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XObb.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XIntersect.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\CompressedStamps.h">
+      <Filter>Headers\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="String\StringTable.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\MemCursor.h">
+      <Filter>Headers\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\ThreadPolicies\MultiThreadPolicy.h">
+      <Filter>Headers\Memory\ThreadPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\ThreadPolicies\SingleThreadPolicy.h">
+      <Filter>Headers\Memory\ThreadPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.h">
+      <Filter>Headers\Memory\MemoryTrackingPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\MemoryTrackingPolicies\FullMemoryTracking.h">
+      <Filter>Headers\Memory\MemoryTrackingPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\MemoryTrackingPolicies\NoMemoryTracking.h">
+      <Filter>Headers\Memory\MemoryTrackingPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\MemoryTrackingPolicies\SimpleMemoryTracking.h">
+      <Filter>Headers\Memory\MemoryTrackingPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\MemoryTaggingPolicies\NoMemoryTagging.h">
+      <Filter>Headers\Memory\MemoryTaggingPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\MemoryTaggingPolicies\SimpleMemoryTagging.h">
+      <Filter>Headers\Memory\MemoryTaggingPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\BoundsCheckingPolicies\NoBoundsChecking.h">
+      <Filter>Headers\Memory\BoundsCheckingPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\BoundsCheckingPolicies\SimpleBoundsChecking.h">
+      <Filter>Headers\Memory\BoundsCheckingPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\AllocationPolicies\GrowingBlockAllocator.h">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\AllocationPolicies\GrowingGenericAllocator.h">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\AllocationPolicies\GrowingMicroAllocator.h">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\AllocationPolicies\GrowingPoolAllocator.h">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\AllocationPolicies\GrowingStackAllocator.h">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\AllocationPolicies\LinearAllocator.h">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\AllocationPolicies\MallocFreeAllocator.h">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\AllocationPolicies\PoolAllocator.h">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\AllocationPolicies\StackAllocator.h">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\AssertionHandler.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="Hashing\sha1.h">
+      <Filter>Headers\Hashing</Filter>
+    </ClInclude>
+    <ClInclude Include="Hashing\crc32.inl">
+      <Filter>Headers\Hashing</Filter>
+    </ClInclude>
+    <ClInclude Include="IMaterial.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XVecCompressed.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\EndianUtil.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="I3DEngine.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\ByteStreamFifo.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="IShader.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Debugging\AbortHandler.h">
+      <Filter>Headers\Debugging</Filter>
+    </ClInclude>
+    <ClInclude Include="String\StringRange.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
+    <ClInclude Include="String\StringTokenizer.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
+    <ClInclude Include="String\Lexer.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XVectorAligned.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\VertexFormats.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\ToggleChecker.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\DirectoryWatcher.h">
+      <Filter>Headers\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\win32\DirectoryWatcher.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="IDirectoryWatcher.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\ClipBoard.h">
+      <Filter>Headers\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\win32\ClipBoard.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\WritePolicies\LoggerInternalConsoleWritePolicy.h">
+      <Filter>Headers\Logging\WritePolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="Logging\FormatPolicies\LoggerInternalConsoleFormatPolicy.h">
+      <Filter>Headers\Logging\FormatPolicies</Filter>
+    </ClInclude>
+    <ClInclude Include="String\Xml.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\AssertContainer.h">
+      <Filter>Headers\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\EnumMacros.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Pointer64.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\SmartPointer.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\MemoryAllocatorStatistics.h">
+      <Filter>Headers\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\MemoryArena.h">
+      <Filter>Headers\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\MemoryArenaBase.h">
+      <Filter>Headers\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Memory\MemoryArenaStatistics.h">
+      <Filter>Headers\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\FixedRingBuffer.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderAux.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Traits\UnsignedTypes.h">
+      <Filter>Headers\Traits</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Delegate.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XFrustum.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="String\HumanSize.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\LinkedList.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Containers\LinkedListIntrusive.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XWinding.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="IBsp.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\FloatIEEEUtil.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderMesh.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Util\BitUtil.inl">
+      <Filter>Headers\Util</Filter>
+    </None>
+    <None Include="Util\Flags.inl">
+      <Filter>Headers\Util</Filter>
+    </None>
+    <None Include="Util\PointerFlags.inl">
+      <Filter>Headers\Util</Filter>
+    </None>
+    <None Include="Util\PointerUtil.inl">
+      <Filter>Headers\Util</Filter>
+    </None>
+    <None Include="Util\ReferenceCounted.inl">
+      <Filter>Headers\Util</Filter>
+    </None>
+    <None Include="Util\ReferenceCountedOwner.inl">
+      <Filter>Headers\Util</Filter>
+    </None>
+    <None Include="Util\SourceInfo.inl">
+      <Filter>Headers\Util</Filter>
+    </None>
+    <None Include="Util\StopWatch.inl">
+      <Filter>Headers\Util</Filter>
+    </None>
+    <None Include="Casts\safe_static_cast.inl">
+      <Filter>Headers\Casts</Filter>
+    </None>
+    <None Include="Casts\union_cast.inl">
+      <Filter>Headers\Casts</Filter>
+    </None>
+    <None Include="String\StringUtil.inl">
+      <Filter>Headers\String</Filter>
+    </None>
+    <None Include="Debugging\Assert.inl">
+      <Filter>Headers\Debugging</Filter>
+    </None>
+    <None Include="Random\MultiplyWithCarry.inl">
+      <Filter>Headers\Random</Filter>
+    </None>
+    <None Include="Random\XorShift.inl">
+      <Filter>Headers\Random</Filter>
+    </None>
+    <None Include="Math\XMatrix22.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="Math\XMatrix33.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="Math\XMatrix44.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="Math\XMatrix34.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="Math\XQuat.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="Math\XColor.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="String\StringHash.inl">
+      <Filter>Headers\String</Filter>
+    </None>
+    <None Include="Logging\LoggerBase.inl">
+      <Filter>Headers\Logging</Filter>
+    </None>
+    <None Include="Logging\FilterPolicies\LoggerNoFilterPolicy.inl">
+      <Filter>Headers\Logging\FilterPolicies</Filter>
+    </None>
+    <None Include="Logging\Logger.inl">
+      <Filter>Headers\Logging</Filter>
+    </None>
+    <None Include="Threading\CriticalSection.inl">
+      <Filter>Headers\Threading</Filter>
+    </None>
+    <None Include="Debugging\SymbolInfo.inl">
+      <Filter>Headers\Debugging</Filter>
+    </None>
+    <None Include="Platform\win32\Console.inl">
+      <Filter>Headers\Platform\win32</Filter>
+    </None>
+    <None Include="Math\XPair.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="Math\XRect.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="Platform\win32\Window.inl">
+      <Filter>Headers\Platform\win32</Filter>
+    </None>
+    <None Include="Threading\Atomic.inl">
+      <Filter>Headers\Threading</Filter>
+    </None>
+    <None Include="Threading\AtomicInt.inl">
+      <Filter>Headers\Threading</Filter>
+    </None>
+    <None Include="Threading\Spinlock.inl">
+      <Filter>Headers\Threading</Filter>
+    </None>
+    <None Include="Threading\Semaphore.inl">
+      <Filter>Headers\Threading</Filter>
+    </None>
+    <None Include="Threading\ThreadLocalStorage.inl">
+      <Filter>Headers\Threading</Filter>
+    </None>
+    <None Include="Debugging\win32\CallStack.inl">
+      <Filter>Headers\Debugging\win32</Filter>
+    </None>
+    <None Include="Math\XSphere.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="Containers\ByteStream.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="Containers\Stack.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="Memory\NewAndDelete.inl">
+      <Filter>Headers\Memory</Filter>
+    </None>
+    <None Include="Containers\FixedStack.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="Containers\Freelist.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="Memory\HeapArea.inl">
+      <Filter>Headers\Memory</Filter>
+    </None>
+    <None Include="Containers\BitStream.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="Containers\Array.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="Containers\Fifo.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="Containers\FixedFifo.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="String\Path.inl">
+      <Filter>Headers\String</Filter>
+    </None>
+    <None Include="String\StackString.inl">
+      <Filter>Headers\String</Filter>
+    </None>
+    <None Include="Math\XQuatCompressed.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="Math\XAabb.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="Math\XObb.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="Containers\HashMap.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="Containers\FixedArray.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="Memory\ThreadPolicies\MultiThreadPolicy.inl">
+      <Filter>Headers\Memory\ThreadPolicies</Filter>
+    </None>
+    <None Include="Memory\MemoryTrackingPolicies\SimpleMemoryTracking.inl">
+      <Filter>Headers\Memory\MemoryTrackingPolicies</Filter>
+    </None>
+    <None Include="Memory\AllocationPolicies\GrowingBlockAllocator.inl">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </None>
+    <None Include="Memory\AllocationPolicies\GrowingGenericAllocator.inl">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </None>
+    <None Include="Memory\AllocationPolicies\GrowingMicroAllocator.inl">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </None>
+    <None Include="Memory\AllocationPolicies\GrowingPoolAllocator.inl">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </None>
+    <None Include="Memory\AllocationPolicies\GrowingStackAllocator.inl">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </None>
+    <None Include="Memory\AllocationPolicies\LinearAllocator.inl">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </None>
+    <None Include="Memory\AllocationPolicies\MallocFreeAllocator.inl">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </None>
+    <None Include="Memory\AllocationPolicies\PoolAllocator.inl">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </None>
+    <None Include="Memory\AllocationPolicies\StackAllocator.inl">
+      <Filter>Headers\Memory\AllocationPolicies</Filter>
+    </None>
+    <None Include="Util\EndianUtil.inl">
+      <Filter>Headers\Util</Filter>
+    </None>
+    <None Include="Containers\ByteStreamFifo.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="String\StringRange.inl">
+      <Filter>Headers\String</Filter>
+    </None>
+    <None Include="Util\Pointer64.inl">
+      <Filter>Headers\Util</Filter>
+    </None>
+    <None Include="Util\SmartPointer.inl">
+      <Filter>Headers\Util</Filter>
+    </None>
+    <None Include="Memory\MemoryArena.inl">
+      <Filter>Headers\Memory</Filter>
+    </None>
+    <None Include="StrRef.inl">
+      <Filter>Headers\String</Filter>
+    </None>
+    <None Include="Containers\FixedRingBuffer.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="Math\XQuatTrans.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="Math\XFrustum.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="Containers\LinkedList.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="Containers\LinkedListIntrusive.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="Math\XWinding.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Logging\LoggerBase.cpp">
+      <Filter>SourceFiles\Logging</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\WritePolicies\LoggerConsoleWritePolicy.cpp">
+      <Filter>SourceFiles\Logging\Policys</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\WritePolicies\LoggerDebuggerWritePolicy.cpp">
+      <Filter>SourceFiles\Logging\Policys</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\FormatPolicies\LoggerExtendedFormatPolicy.cpp">
+      <Filter>SourceFiles\Logging\Policys</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\FormatPolicies\LoggerFullFormatPolicy.cpp">
+      <Filter>SourceFiles\Logging\Policys</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\FormatPolicies\LoggerSimpleFormatPolicy.cpp">
+      <Filter>SourceFiles\Logging\Policys</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\FilterPolicies\LoggerVerbosityFilterPolicy.cpp">
+      <Filter>SourceFiles\Logging\Policys</Filter>
+    </ClCompile>
+    <ClCompile Include="Hashing\Fnva1Hash.cpp">
+      <Filter>SourceFiles\Hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="Hashing\MurmurHash.cpp">
+      <Filter>SourceFiles\Hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="Random\MultiplyWithCarry.cpp">
+      <Filter>SourceFiles\Random</Filter>
+    </ClCompile>
+    <ClCompile Include="Random\XorShift.cpp">
+      <Filter>SourceFiles\Random</Filter>
+    </ClCompile>
+    <ClCompile Include="String\StringTokenizer.cpp">
+      <Filter>SourceFiles\String</Filter>
+    </ClCompile>
+    <ClCompile Include="String\StringUtil.cpp">
+      <Filter>SourceFiles\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugging\SymbolInfo.cpp">
+      <Filter>SourceFiles\Debugging</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\SymbolResolution.cpp">
+      <Filter>SourceFiles\Debugging\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\MiniDump.cpp">
+      <Filter>SourceFiles\Debugging\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\PureVirtualFunctionCallHandler.cpp">
+      <Filter>SourceFiles\Debugging\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\AbortHandler.cpp">
+      <Filter>SourceFiles\Debugging\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\DebuggerBreakpoint.cpp">
+      <Filter>SourceFiles\Debugging\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\DebuggerConnection.cpp">
+      <Filter>SourceFiles\Debugging\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\ExceptionHandler.cpp">
+      <Filter>SourceFiles\Debugging\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\HardwareBreakpoint.cpp">
+      <Filter>SourceFiles\Debugging\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\InvalidParameterHandler.cpp">
+      <Filter>SourceFiles\Debugging\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\dlmalloc-2.8.6.c">
+      <Filter>SourceFiles\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\VirtualMem.cpp">
+      <Filter>SourceFiles\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\MemInfo.cpp">
+      <Filter>SourceFiles\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\CriticalSection.cpp">
+      <Filter>SourceFiles\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\win32\LastError.cpp">
+      <Filter>SourceFiles\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\win32\Console.cpp">
+      <Filter>SourceFiles\Platform\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\win32\CustomFrame.cpp">
+      <Filter>SourceFiles\Platform\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\win32\Window.cpp">
+      <Filter>SourceFiles\Platform\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\Thread.cpp">
+      <Filter>SourceFiles\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\ConditionVariable.cpp">
+      <Filter>SourceFiles\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugging\win32\CallStack.cpp">
+      <Filter>SourceFiles\Debugging\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineCommon.cpp" />
+    <ClCompile Include="Memory\HeapArea.cpp">
+      <Filter>SourceFiles\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\TimeStamp.cpp">
+      <Filter>SourceFiles\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\DateStamp.cpp">
+      <Filter>SourceFiles\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\CompressedStamps.cpp">
+      <Filter>SourceFiles\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\ThreadPolicies\MultiThreadPolicy.cpp">
+      <Filter>SourceFiles\Memory\ThreadPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\ThreadPolicies\SingleThreadPolicy.cpp">
+      <Filter>SourceFiles\Memory\ThreadPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\MemoryTrackingPolicies\SimpleMemoryTracking.cpp">
+      <Filter>SourceFiles\Memory\MemoryTrackingPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\MemoryTrackingPolicies\NoMemoryTracking.cpp">
+      <Filter>SourceFiles\Memory\MemoryTrackingPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.cpp">
+      <Filter>SourceFiles\Memory\MemoryTrackingPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\MemoryTaggingPolicies\SimpleMemoryTagging.cpp">
+      <Filter>SourceFiles\Memory\MemoryTaggingPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\MemoryTaggingPolicies\NoMemoryTagging.cpp">
+      <Filter>SourceFiles\Memory\MemoryTaggingPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\BoundsCheckingPolicies\NoBoundsChecking.cpp">
+      <Filter>SourceFiles\Memory\BoundsCheckingPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\BoundsCheckingPolicies\SimpleBoundsChecking.cpp">
+      <Filter>SourceFiles\Memory\BoundsCheckingPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\AllocationPolicies\GrowingBlockAllocator.cpp">
+      <Filter>SourceFiles\Memory\AllocationPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\AllocationPolicies\GrowingGenericAllocator.cpp">
+      <Filter>SourceFiles\Memory\AllocationPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\AllocationPolicies\GrowingMicroAllocator.cpp">
+      <Filter>SourceFiles\Memory\AllocationPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\AllocationPolicies\GrowingPoolAllocator.cpp">
+      <Filter>SourceFiles\Memory\AllocationPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\AllocationPolicies\LinearAllocator.cpp">
+      <Filter>SourceFiles\Memory\AllocationPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\AllocationPolicies\MallocFreeAllocator.cpp">
+      <Filter>SourceFiles\Memory\AllocationPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\AllocationPolicies\PoolAllocator.cpp">
+      <Filter>SourceFiles\Memory\AllocationPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\AllocationPolicies\StackAllocator.cpp">
+      <Filter>SourceFiles\Memory\AllocationPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\AllocationPolicies\GrowingStackAllocator.cpp">
+      <Filter>SourceFiles\Memory\AllocationPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Debugging\Assert.cpp">
+      <Filter>SourceFiles\Debugging</Filter>
+    </ClCompile>
+    <ClCompile Include="Hashing\sha1.cpp">
+      <Filter>SourceFiles\Hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="String\Lexer.cpp">
+      <Filter>SourceFiles\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\XVectorAligned.cpp">
+      <Filter>SourceFiles\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\win32\DirectoryWatcher.cpp">
+      <Filter>SourceFiles\Platform\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\win32\ClipBoard.cpp">
+      <Filter>SourceFiles\Platform\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\WritePolicies\LoggerInternalConsoleWritePolicy.cpp">
+      <Filter>SourceFiles\Logging\Policys</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\FormatPolicies\LoggerInternalConsoleFormatPolicy.cpp">
+      <Filter>SourceFiles\Logging\Policys</Filter>
+    </ClCompile>
+    <ClCompile Include="String\Xml.cpp">
+      <Filter>SourceFiles\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\AssetContainer.cpp">
+      <Filter>SourceFiles\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\MemoryTrackingPolicies\FullMemoryTracking.cpp">
+      <Filter>SourceFiles\Memory\MemoryTrackingPolicies</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\XFrustum.cpp">
+      <Filter>SourceFiles\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="String\HumanSize.cpp">
+      <Filter>SourceFiles\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\XWinding.cpp">
+      <Filter>SourceFiles\Math</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,66 @@
+#pragma once
+
+#ifndef _X_FONT_RENDER_H_
+#define _X_FONT_RENDER_H_
+
+#define FT_EXPORT(x) x
+// #define FT_EXPORT_DEF(x) x
+// #define FT_EXPORT_VAR( x ) x
+#include "freetype-2.5.3\include\ft2build.h"
+#include FT_FREETYPE_H
+
+X_NAMESPACE_BEGIN(font)
+
+// Corresponds to the Unicode character set. This value covers all versions of the Unicode repertoire,
+// including ASCII and Latin-1. Most fonts include a Unicode charmap, but not all of them.
+#define X_FONT_ENCODING_UNICODE		(FT_ENCODING_UNICODE)
+// Corresponds to the Microsoft Symbol encoding, used to encode mathematical symbols in the 32..255 character code range.
+// For more information, see `http://www.ceviz.net/symbol.htm'.
+#define X_FONT_ENCODING_SYMBOL		(FT_ENCODING_MS_SYMBOL)
+
+
+#define X_FONT_DEBUG_RENDER 0
+
+
+class XGlyphBitmap;
+
+// uses free type to render glyphs for a font.
+class XFontRender
+{
+public:
+	XFontRender();
+	~XFontRender();
+
+	bool LoadFromMemory(BYTE* pBuffer, size_t bufferLength);
+	bool Release(); 
+
+	bool GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* iGlyphWidth, uint8* iGlyphHeight, 
+		char &iCharOffsetX, char &iCharOffsetY, int iX, int iY, int iCharCode);
+
+	// scale the glyphs.
+	X_INLINE void			SetSizeRatio(float fSizeRatio) { fSizeRatio_ = fSizeRatio; };
+	X_INLINE float			GetSizeRatio() const { return fSizeRatio_; };
+	
+	bool					SetEncoding(FT_Encoding pEncoding);
+	X_INLINE FT_Encoding	GetEncoding() const { return pEncoding_; };
+
+	void					SetGlyphBitmapSize(int iWidth, int iHeight);
+	void					GetGlyphBitmapSize(int* pWidth, int* pHeight) const;
+
+
+private:
+	FT_Library		pLibrary_;
+	FT_Face			pFace_;
+	FT_GlyphSlot	pGlyph_;
+	FT_Encoding		pEncoding_;
+
+	float			fSizeRatio_;
+
+	int				iGlyphBitmapWidth_;
+	int				iGlyphBitmapHeight_;
+};
+
+
+X_NAMESPACE_END
+
+#endif // !_X_FONT_RENDER_H_

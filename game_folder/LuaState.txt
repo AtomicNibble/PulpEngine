@@ -1,0 +1,221 @@
+[    47]  OnInit()
+[   151]  string = {
+[   195] 	 sub()
+[   241] 	 upper()
+[   285] 	 len()
+[   331] 	 gfind()
+[   375] 	 rep()
+[   420] 	 find()
+[   466] 	 match()
+[   511] 	 char()
+[   556] 	 dump()
+[   603] 	 gmatch()
+[   651] 	 reverse()
+[   696] 	 byte()
+[   743] 	 format()
+[   788] 	 gsub()
+[   834] 	 lower()
+[   834]  }
+[   883]  TestFile()
+[   987]  package = {
+[  1091] 	 preload = {
+[  1091] 	 }
+[  1139] 	 loadlib()
+[  1243] 	 loaded = {
+[  1347] 		 math = {
+[  1391] 			 log()
+[  1435] 			 max()
+[  1480] 			 acos()
+[  1525] 			 huge=1.#INF
+[  1571] 			 ldexp()
+[  1614] 			 pi=3.14159
+[  1658] 			 cos()
+[  1703] 			 tanh()
+[  1747] 			 pow()
+[  1791] 			 deg()
+[  1835] 			 tan()
+[  1880] 			 cosh()
+[  1925] 			 sinh()
+[  1972] 			 random()
+[  2023] 			 randomseed()
+[  2069] 			 frexp()
+[  2114] 			 ceil()
+[  2160] 			 floor()
+[  2204] 			 rad()
+[  2248] 			 abs()
+[  2293] 			 sqrt()
+[  2338] 			 modf()
+[  2383] 			 asin()
+[  2427] 			 min()
+[  2471] 			 mod()
+[  2516] 			 fmod()
+[  2562] 			 log10()
+[  2608] 			 atan2()
+[  2652] 			 exp()
+[  2696] 			 sin()
+[  2741] 			 atan()
+[  2741] 		 }
+[  2845] 		 string = {
+[  2845] 		 }
+[  2949] 		 debug = {
+[  3000] 			 getupvalue()
+[  3046] 			 debug()
+[  3094] 			 sethook()
+[  3147] 			 getmetatable()
+[  3195] 			 gethook()
+[  3248] 			 setmetatable()
+[  3297] 			 setlocal()
+[  3347] 			 traceback()
+[  3395] 			 setfenv()
+[  3443] 			 getinfo()
+[  3494] 			 setupvalue()
+[  3543] 			 getlocal()
+[  3595] 			 getregistry()
+[  3643] 			 getfenv()
+[  3643] 		 }
+[  3747] 		 table = {
+[  3792] 			 setn()
+[  3839] 			 insert()
+[  3884] 			 getn()
+[  3933] 			 foreachi()
+[  3978] 			 maxn()
+[  4026] 			 foreach()
+[  4073] 			 concat()
+[  4118] 			 sort()
+[  4165] 			 remove()
+[  4165] 		 }
+[  4269] 		 package = {
+[  4269] 		 }
+[  4373] 		 _G = {
+[  4373] 		 }
+[  4477] 		 coroutine = {
+[  4524] 			 resume()
+[  4570] 			 yield()
+[  4617] 			 status()
+[  4662] 			 wrap()
+[  4709] 			 create()
+[  4757] 			 running()
+[  4757] 		 }
+[  4861] 		 bit32 = {
+[  4906] 			 band()
+[  4954] 			 extract()
+[  4998] 			 bor()
+[  5043] 			 bnot()
+[  5091] 			 arshift()
+[  5138] 			 rshift()
+[  5186] 			 rrotate()
+[  5234] 			 replace()
+[  5281] 			 lshift()
+[  5329] 			 lrotate()
+[  5375] 			 btest()
+[  5420] 			 bxor()
+[  5420] 		 }
+[  5420] 	 }
+[  5524] 	 loaders = {
+[  5568] 		 [01]()
+[  5612] 		 [02]()
+[  5656] 		 [03]()
+[  5700] 		 [04]()
+[  5700] 	 }
+[  5746] 	 cpath=
+[  5794] 	 config=\
+;
+?
+!
+-
+[  5849] 	 path=
+[  5897] 	 seeall()
+[  5897]  }
+[  5946]  tostring()
+[  5995]  _VERSION=Lua 5.1
+[  6107]  table = {
+[  6107]  }
+[  6155]  require()
+[  6259]  bit32 = {
+[  6259]  }
+[  6363]  Script = {
+[  6410] 	 UnLoad()
+[  6457] 	 ReLoad()
+[  6502] 	 Load()
+[  6553] 	 ListLoaded()
+[  6553]  }
+[  6600]  assert()
+[  6651]  LogWarning()
+[  6700]  tonumber()
+[  6804]  io = {
+[  6853] 	 openFile()
+[  6903] 	 closeFile()
+[  6903]  }
+[  6949]  count()
+[  7004]  collectgarbage()
+[  7102]  getmetatable()
+[  7149]  module()
+[  7193]  Log()
+[  7238]  data=potato5--test0.454540014266970.0012512588873506
+[  7335]  TestRead()
+[  7439]  math = {
+[  7439]  }
+[  7543]  coroutine = {
+[  7543]  }
+[  7588]  type()
+[  7637]  LogError()
+[  7741]  debug = {
+[  7741]  }
+[  7845]  Core = {
+[  7893] 	 Warning()
+[  7942] 	 DrawLine()
+[  7991] 	 DrawCone()
+[  8044] 	 GetFrameTime()
+[  8088] 	 Log()
+[  8137] 	 DrawText()
+[  8189] 	 GetCurrTime()
+[  8240] 	 DrawLine2D()
+[  8288] 	 SetDvar()
+[  8339] 	 GetDvarInt()
+[  8392] 	 GetDvarFloat()
+[  8449] 	 GetCurrAsyncTime()
+[  8497] 	 GetDvar()
+[  8543] 	 Error()
+[  8543]  }
+[  8647]  Sound = {
+[  8700] 	 SetSoundLoop()
+[  8755] 	 GetSoundVolume()
+[  8810] 	 SetSoundPaused()
+[  8867] 	 SetSoundPosition()
+[  8914] 	 PlayEx()
+[  8963] 	 Precache()
+[  9013] 	 IsPlaying()
+[  9068] 	 SetSoundVolume()
+[  9113] 	 Play()
+[  9163] 	 StopSound()
+[  9163]  }
+[  9212]  newproxy()
+[  9258]  _time=3.16665
+[  9311]  setmetatable()
+[  9415]  Game = {
+[  9519] 	 __index = {
+[  9519] 	 }
+[  9519]  }
+[  9565]  pairs()
+[  9612]  ipairs()
+[  9612]  }
+[  9612]  }
+[  9612]  }
+[  9612]  }
+[  9612]  }
+[  9657] 	 read()
+[  9703] 	 write()
+[  9748] 	 seek()
+[  9793] 	 __gc()
+[  9897] 	 __index = {
+[  9897] 	 }
+[  9897]  }
+[  9897]  }
+[  9897]  }
+[  9897]  }
+[  9897]  }
+[  9897]  }
+[  9897]  }
+[  9897]  }
+[  9897]  }
+[  9897]  }

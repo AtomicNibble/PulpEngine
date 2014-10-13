@@ -1,0 +1,220 @@
+[    47]  OnInit()
+[   151]  string = {
+[   195] 	 sub()
+[   241] 	 upper()
+[   285] 	 len()
+[   331] 	 gfind()
+[   375] 	 rep()
+[   420] 	 find()
+[   466] 	 match()
+[   511] 	 char()
+[   556] 	 dump()
+[   603] 	 gmatch()
+[   651] 	 reverse()
+[   696] 	 byte()
+[   743] 	 format()
+[   788] 	 gsub()
+[   834] 	 lower()
+[   834]  }
+[   883]  TestFile()
+[   987]  package = {
+[  1091] 	 preload = {
+[  1091] 	 }
+[  1139] 	 loadlib()
+[  1243] 	 loaded = {
+[  1347] 		 string = {
+[  1347] 		 }
+[  1451] 		 debug = {
+[  1502] 			 getupvalue()
+[  1548] 			 debug()
+[  1596] 			 sethook()
+[  1649] 			 getmetatable()
+[  1697] 			 gethook()
+[  1750] 			 setmetatable()
+[  1799] 			 setlocal()
+[  1849] 			 traceback()
+[  1897] 			 setfenv()
+[  1945] 			 getinfo()
+[  1996] 			 setupvalue()
+[  2045] 			 getlocal()
+[  2097] 			 getregistry()
+[  2145] 			 getfenv()
+[  2145] 		 }
+[  2249] 		 package = {
+[  2249] 		 }
+[  2353] 		 _G = {
+[  2353] 		 }
+[  2457] 		 table = {
+[  2502] 			 setn()
+[  2549] 			 insert()
+[  2594] 			 getn()
+[  2643] 			 foreachi()
+[  2688] 			 maxn()
+[  2736] 			 foreach()
+[  2783] 			 concat()
+[  2828] 			 sort()
+[  2875] 			 remove()
+[  2875] 		 }
+[  2979] 		 math = {
+[  3023] 			 max()
+[  3067] 			 log()
+[  3112] 			 huge=1.#INF
+[  3157] 			 acos()
+[  3201] 			 pi2=6.28319
+[  3247] 			 ldexp()
+[  3290] 			 pi=3.14159
+[  3334] 			 cos()
+[  3379] 			 tanh()
+[  3423] 			 pow()
+[  3467] 			 deg()
+[  3511] 			 tan()
+[  3556] 			 cosh()
+[  3601] 			 sinh()
+[  3648] 			 random()
+[  3699] 			 randomseed()
+[  3745] 			 frexp()
+[  3790] 			 ceil()
+[  3836] 			 floor()
+[  3880] 			 rad()
+[  3924] 			 abs()
+[  3969] 			 sqrt()
+[  4014] 			 modf()
+[  4059] 			 asin()
+[  4103] 			 min()
+[  4147] 			 mod()
+[  4192] 			 fmod()
+[  4238] 			 log10()
+[  4284] 			 atan2()
+[  4328] 			 exp()
+[  4372] 			 sin()
+[  4417] 			 atan()
+[  4417] 		 }
+[  4521] 		 vec = {
+[  4616] 			 normalize()
+[  4660] 			 dot()
+[  4751] 			 length()
+[  4797] 			 cross()
+[  4841] 			 new()
+[  4841] 		 }
+[  4945] 		 coroutine = {
+[  4992] 			 resume()
+[  5038] 			 yield()
+[  5085] 			 status()
+[  5130] 			 wrap()
+[  5177] 			 create()
+[  5225] 			 running()
+[  5225] 		 }
+[  5329] 		 bit32 = {
+[  5374] 			 band()
+[  5422] 			 extract()
+[  5466] 			 bor()
+[  5511] 			 bnot()
+[  5559] 			 arshift()
+[  5606] 			 rshift()
+[  5654] 			 rrotate()
+[  5702] 			 replace()
+[  5749] 			 lshift()
+[  5797] 			 lrotate()
+[  5843] 			 btest()
+[  5888] 			 bxor()
+[  5888] 		 }
+[  5888] 	 }
+[  5992] 	 loaders = {
+[  6036] 		 [01]()
+[  6080] 		 [02]()
+[  6124] 		 [03]()
+[  6168] 		 [04]()
+[  6168] 	 }
+[  6214] 	 cpath=
+[  6262] 	 config=\
+;
+?
+!
+-
+[  6317] 	 path=
+[  6365] 	 seeall()
+[  6365]  }
+[  6414]  tostring()
+[  6463]  _VERSION=Lua 5.1
+[  6575]  table = {
+[  6575]  }
+[  6672]  require()
+[  6776]  bit32 = {
+[  6776]  }
+[  6880]  debug = {
+[  6880]  }
+[  6927]  assert()
+[  6978]  LogWarning()
+[  7027]  tonumber()
+[  7131]  io = {
+[  7180] 	 openFile()
+[  7230] 	 closeFile()
+[  7230]  }
+[  7276]  count()
+[  7331]  collectgarbage()
+[  7384]  getmetatable()
+[  7431]  module()
+[  7475]  Log()
+[  7524]  TestRead()
+[  7628]  math = {
+[  7628]  }
+[  7732]  Sound = {
+[  7785] 	 SetSoundLoop()
+[  7840] 	 GetSoundVolume()
+[  7895] 	 SetSoundPaused()
+[  7952] 	 SetSoundPosition()
+[  7999] 	 PlayEx()
+[  8048] 	 Precache()
+[  8098] 	 IsPlaying()
+[  8153] 	 SetSoundVolume()
+[  8198] 	 Play()
+[  8248] 	 StopSound()
+[  8248]  }
+[  8293]  type()
+[  8342]  LogError()
+[  8495]  Script = {
+[  8542] 	 UnLoad()
+[  8589] 	 ReLoad()
+[  8634] 	 Load()
+[  8685] 	 ListLoaded()
+[  8685]  }
+[  8736]  TestVector()
+[  8840]  Core = {
+[  8888] 	 Warning()
+[  8937] 	 DrawLine()
+[  8986] 	 DrawCone()
+[  9039] 	 GetTimeScale()
+[  9092] 	 GetFrameTime()
+[  9136] 	 Log()
+[  9185] 	 DrawText()
+[  9237] 	 GetCurrTime()
+[  9288] 	 DrawLine2D()
+[  9336] 	 SetDvar()
+[  9387] 	 GetDvarInt()
+[  9440] 	 GetDvarFloat()
+[  9497] 	 GetCurrAsyncTime()
+[  9545] 	 GetDvar()
+[  9591] 	 Error()
+[  9591]  }
+[  9637]  _time=52.8747
+[  9690]  setmetatable()
+[  9794]  coroutine = {
+[  9794]  }
+[  9840]  pairs()
+[  9887]  ipairs()
+[  9991]  vec = {
+[  9991]  }
+[ 10040]  newproxy()
+[ 10040]  }
+[ 10040]  }
+[ 10040]  }
+[ 10085] 	 seek()
+[ 10130] 	 read()
+[ 10176] 	 write()
+[ 10222] 	 close()
+[ 10222]  }
+[ 10222]  }
+[ 10222]  }
+[ 10222]  }
+[ 10222]  }
+[ 10222]  }

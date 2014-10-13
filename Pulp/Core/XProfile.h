@@ -1,0 +1,158 @@
+#pragma once
+
+#ifndef _X_PROFILE_H_
+#define _X_PROFILE_H_
+
+#include <Containers\Array.h>
+
+#include <IRender.h>
+
+X_NAMESPACE_DECLARE(render, struct IRender);
+
+#define X_PROFILE_FRAME_TIME_HISTORY_SIZE 64
+
+X_NAMESPACE_BEGIN(core)
+
+class XProfileSys : public IProfileSys
+{
+public:
+	XProfileSys();
+	~XProfileSys() X_OVERRIDE;
+
+	virtual void Init(ICore* pCore) X_OVERRIDE;
+
+	virtual void AddProfileData(XProfileData* pData) X_OVERRIDE;
+
+	virtual void FrameBegin() X_OVERRIDE;
+	virtual void FrameEnd() X_OVERRIDE;
+
+
+
+private:
+	void UpdateProfileData();
+
+	static void ScopeStart(XProfileScope* pProScope);
+	static void ScopeEnd(XProfileScope* pProScope);
+
+	static XProfileSys* s_this;
+
+private:
+
+	class XStack
+	{
+	public:
+		XStack() :
+			pCurrent_(nullptr)
+		{
+
+		}
+
+		X_INLINE void Push(XProfileScope* pScope)
+		{
+			pScope->pParent_ = pCurrent_;
+			pCurrent_ = pScope;
+		}
+
+		X_INLINE void Pop(XProfileScope* pScope)
+		{
+			pCurrent_ = pScope->pParent_;
+		}
+
+	private:
+		XProfileScope* pCurrent_;
+	};
+
+	XStack callstack_;
+
+	struct ProfileDisplayInfo
+	{
+		int depth;
+		XProfileData* pData;
+	};
+
+	struct XSubSystemInfo
+	{
+		const char* name;
+		float selfTime;
+		float avg;
+
+		void calAvg(void) {
+			selfhistory.append(selfTime);
+			avg = selfhistory.getAvg();
+		}
+
+		ProfilerHistory<float, X_PROFILE_HISTORY_SIZE> selfhistory;
+	};
+
+
+	void AddProfileDisplayData_r(XProfileData* pData, int lvl);
+	void DisplayProfileData();
+
+public:
+	// Rendering (called by core)
+	void Render(void);
+
+	X_INLINE bool isEnabled(void) const {
+		return enabled_;
+	}
+
+	X_INLINE void setEnabled(bool val) {
+		enabled_ = val;
+	}
+
+private:
+
+
+	void RenderSubSysInfo(float x, float y, float& width, float& height);
+	void RenderMemoryInfo(float x, float y, float width, float height);
+	void RenderProfileData(float x, float y, float width, float height);
+	void RenderProfileDataHeader(float& x, float& y, float& width, float& height);
+	void RenderFrameTimes(float x, float y, float width, float height);
+
+	void DrawLabel(float x, float y, const char* pStr, Color& col);
+	void DrawLabel(float x, float y, const char* pStr, Color& col, Flags<render::DrawTextFlags> flags);
+
+	void DrawRect(float x1, float y1, float x2, float y2, Color& col);
+	void DrawRect(Vec4f& rec, Color& col);
+
+
+	void DrawPercentageBlock(float x, float y,
+		float width, float height, float ms, float percent,
+		const char* name);
+
+	// ~Rendering
+	void UpdateSubSystemInfo();
+	void ClearSubSystems();
+
+private:
+	typedef core::Array<XProfileData*>	Profilers;
+	typedef core::Array<ProfileDisplayInfo>	DisplayInfo;
+
+	typedef core::ProfilerHistory<float, X_PROFILE_FRAME_TIME_HISTORY_SIZE> FrameTimes;
+
+
+	ICore*		pCore_;
+	render::IRender* pRender_;
+
+	Profilers	profiles_;
+	DisplayInfo displayInfo_;
+
+	uint64_t	frameStartTime_;
+	uint64_t	frameTime_;
+	uint64_t	totalTime_;
+
+	XSubSystemInfo subSystemInfo_[ProfileSubSys::ENUM_COUNT];
+	float subSystemTotal_;
+
+	bool enabled_;
+
+	FrameTimes  frameTimeHistory_;
+};
+
+
+
+X_NAMESPACE_END
+
+#endif // !_X_PROFILE_H_
+
+

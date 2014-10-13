@@ -1,0 +1,204 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="FreeType">
+      <UniqueIdentifier>{8b576eb3-b52f-4c6c-a546-9680b3f40136}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FreeType\Modules">
+      <UniqueIdentifier>{9db581a7-b443-4fa8-8e54-91593e3c9687}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XFont.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Font.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XFontTexture.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XGlyphCache.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XNullfont.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XFontRender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="XGlyphBitmap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IXFont.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XFontTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XGlyphCache.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XNullfont.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XFontRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\autofit\autofit.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\bdf\bdf.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\cff\cff.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftbitmap.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\cache\ftcache.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftdebug.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftfstype.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftgasp.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftglyph.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\gzip\ftgzip.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\lzw\ftlzw.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftstroke.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\smooth\smooth.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\basepic.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftapi.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftbase.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftbdf.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftcid.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftdbgmem.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftlcdfil.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftotval.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftpic.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftwinfnt.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftsystem.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftinit.c">
+      <Filter>FreeType</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\psnames\psmodule.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\sfnt\sfnt.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\pshinter\pshinter.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\type42\type42.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\type1\type1.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\cid\type1cid.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\psaux\psaux.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\pfr\pfr.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\pcf\pcf.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\truetype\truetype.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\raster\raster.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftxf86.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\winfonts\winfnt.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftbbox.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftpfr.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="freetype-2.5.3\src\base\ftmm.c">
+      <Filter>FreeType\Modules</Filter>
+    </ClCompile>
+    <ClCompile Include="XGlyphBitmap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="XFont.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FontXml.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

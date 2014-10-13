@@ -1,0 +1,767 @@
+#include "stdafx.h"
+#include "TextureLoaderDDS.h"
+
+#include <String\StringUtil.h>
+#include <IFileSys.h>
+
+#include "XTextureFile.h"
+
+X_NAMESPACE_BEGIN(texture)
+
+namespace DDS
+{
+	namespace
+	{
+		static const char* DDS_FILE_EXTENSION = ".dds";
+
+		#define GL_COMPRESSED_RGB_S3TC_DXT1_EXT		0x83F0
+		#define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT	0x83F1
+		#define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT	0x83F2
+		#define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT	0x83F3
+
+		#define GL_UNSIGNED_SHORT_5_6_5				0x8363
+		#define GL_UNSIGNED_SHORT_1_5_5_5_REV		0x8366
+
+		#define GL_RGB8								0x8051
+		#define GL_BGR								0x80E0
+		#define GL_UNSIGNED_BYTE					0x1401
+		#define GL_RGBA8							0x8058
+		#define GL_BGRA								0x80E1
+		#define GL_RGB5_A1							0x8057
+		#define GL_RGB5								0x8050
+		#define GL_RGB								0x1907
+
+		#define PIXEL_FMT_FOURCC(a, b, c, d) ((a) | ((b) << 8U) | ((c) << 16U) | ((d) << 24U))
+
+		enum pixel_format
+		{
+			PIXEL_FMT_INVALID = 0,
+
+			PIXEL_FMT_DXT1 = PIXEL_FMT_FOURCC('D', 'X', 'T', '1'),
+			PIXEL_FMT_DXT2 = PIXEL_FMT_FOURCC('D', 'X', 'T', '2'),
+			PIXEL_FMT_DXT3 = PIXEL_FMT_FOURCC('D', 'X', 'T', '3'),
+			PIXEL_FMT_DXT4 = PIXEL_FMT_FOURCC('D', 'X', 'T', '4'),
+			PIXEL_FMT_DXT5 = PIXEL_FMT_FOURCC('D', 'X', 'T', '5'),
+			PIXEL_FMT_3DC = PIXEL_FMT_FOURCC('A', 'T', 'I', '2'), // DXN_YX
+			PIXEL_FMT_DXN = PIXEL_FMT_FOURCC('A', '2', 'X', 'Y'), // DXN_XY
+			PIXEL_FMT_DXT5A = PIXEL_FMT_FOURCC('A', 'T', 'I', '1'), // ATI1N, http://developer.amd.com/media/gpu_assets/Radeon_X1x00_Programming_Guide.pdf
+
+			// Non-standard, crnlib-specific pixel formats (some of these are supported by ATI's compressonator)
+			PIXEL_FMT_DXT5_CCxY = PIXEL_FMT_FOURCC('C', 'C', 'x', 'Y'),
+			PIXEL_FMT_DXT5_xGxR = PIXEL_FMT_FOURCC('x', 'G', 'x', 'R'),
+			PIXEL_FMT_DXT5_xGBR = PIXEL_FMT_FOURCC('x', 'G', 'B', 'R'),
+			PIXEL_FMT_DXT5_AGBR = PIXEL_FMT_FOURCC('A', 'G', 'B', 'R'),
+
+			PIXEL_FMT_DXT1A = PIXEL_FMT_FOURCC('D', 'X', '1', 'A'),
+
+			PIXEL_FMT_R8G8B8 = PIXEL_FMT_FOURCC('R', 'G', 'B', 'x'),
+			PIXEL_FMT_L8 = PIXEL_FMT_FOURCC('L', 'x', 'x', 'x'),
+			PIXEL_FMT_A8 = PIXEL_FMT_FOURCC('x', 'x', 'x', 'A'),
+			PIXEL_FMT_A8L8 = PIXEL_FMT_FOURCC('L', 'x', 'x', 'A'),
+			PIXEL_FMT_A8R8G8B8 = PIXEL_FMT_FOURCC('R', 'G', 'B', 'A')
+		};
+
+		enum dxt_format
+		{
+			cDXTInvalid = -1,
+
+			// cDXT1/1A must appear first!
+			cDXT1,
+			cDXT1A,
+
+			cDXT3,
+			cDXT5,
+			cDXT5A,
+
+			cDXN_XY,    // inverted relative to standard ATI2, 360's DXN
+			cDXN_YX     // standard ATI2
+		};
+
+		const unsigned DDSMaxImageDimensions = TEX_MAX_DIMENSIONS;
+
+		// Total size of header is sizeof(unsigned32)+cDDSSizeofDDSurfaceDesc2;
+		const unsigned DDSSizeofDDSurfaceDesc2 = 124;
+		const unsigned DDSHeaderSize = 128;
+
+		// "DDS "
+		const unsigned DDSFileSignature = 0x20534444;
+		const unsigned DDS_MAGIC = DDSFileSignature;
+
+
+		const unsigned DDSD_CAPS = 0x00000001;
+		const unsigned DDSD_HEIGHT = 0x00000002;
+		const unsigned DDSD_WIDTH = 0x00000004;
+		const unsigned DDSD_PITCH = 0x00000008;
+
+		const unsigned DDSD_BACKBUFFERCOUNT = 0x00000020;
+		const unsigned DDSD_ZBUFFERBITDEPTH = 0x00000040;
+		const unsigned DDSD_ALPHABITDEPTH = 0x00000080;
+
+		const unsigned DDSD_LPSURFACE = 0x00000800;
+
+		const unsigned DDSD_PIXELFORMAT = 0x00001000;
+		const unsigned DDSD_CKDESTOVERLAY = 0x00002000;
+		const unsigned DDSD_CKDESTBLT = 0x00004000;
+		const unsigned DDSD_CKSRCOVERLAY = 0x00008000;
+
+		const unsigned DDSD_CKSRCBLT = 0x00010000;
+		const unsigned DDSD_MIPMAPCOUNT = 0x00020000;
+		const unsigned DDSD_REFRESHRATE = 0x00040000;
+		const unsigned DDSD_LINEARSIZE = 0x00080000;
+
+		const unsigned DDSD_TEXTURESTAGE = 0x00100000;
+		const unsigned DDSD_FVF = 0x00200000;
+		const unsigned DDSD_SRCVBHANDLE = 0x00400000;
+		const unsigned DDSD_DEPTH = 0x00800000;
+
+		const unsigned DDSD_ALL = 0x00fff9ee;
+
+		const unsigned DDPF_ALPHAPIXELS = 0x00000001;
+		const unsigned DDPF_ALPHA = 0x00000002;
+		const unsigned DDPF_FOURCC = 0x00000004;
+		const unsigned DDPF_PALETTEINDEXED8 = 0x00000020;
+		const unsigned DDPF_INDEXED = 0x00000020;
+		const unsigned DDPF_RGB = 0x00000040;
+		const unsigned DDPF_LUMINANCE = 0x00020000;
+
+		const unsigned DDSCAPS_COMPLEX = 0x00000008;
+		const unsigned DDSCAPS_TEXTURE = 0x00001000;
+		const unsigned DDSCAPS_MIPMAP = 0x00400000;
+
+		const unsigned DDSCAPS2_CUBEMAP = 0x00000200;
+		const unsigned DDSCAPS2_CUBEMAP_POSITIVEX = 0x00000400;
+		const unsigned DDSCAPS2_CUBEMAP_NEGATIVEX = 0x00000800;
+
+		const unsigned DDSCAPS2_CUBEMAP_POSITIVEY = 0x00001000;
+		const unsigned DDSCAPS2_CUBEMAP_NEGATIVEY = 0x00002000;
+		const unsigned DDSCAPS2_CUBEMAP_POSITIVEZ = 0x00004000;
+		const unsigned DDSCAPS2_CUBEMAP_NEGATIVEZ = 0x00008000;
+
+		const unsigned DDSCAPS2_VOLUME = 0x00200000;
+
+
+		//  DDPIXELFORMAT
+		struct PixelFormat_t
+		{
+			unsigned int    dwSize;
+			unsigned int    dwFlags;
+			unsigned int    dwFourCC;
+			unsigned int    dwRGBBitCount;
+			unsigned int    dwRBitMask;
+			unsigned int    dwGBitMask;
+			unsigned int    dwBBitMask;
+			unsigned int    dwAlphaBitMask;
+		};
+
+		//  DDCAPS2
+		struct Caps_t
+		{
+			unsigned int    dwCaps1;
+			unsigned int    dwCaps2;
+			unsigned int    dwDDSX;
+			unsigned int    dwReserved;
+		};
+
+		union DDS_header
+		{
+			struct {
+				unsigned int    dwMagic;
+				unsigned int    dwSize;
+				unsigned int    dwFlags;
+				unsigned int    dwHeight;
+				unsigned int    dwWidth;
+				unsigned int    dwPitchOrLinearSize;
+				unsigned int    dwDepth;
+				unsigned int    dwMipMapCount;
+				unsigned int    dwReserved1[11];
+
+				PixelFormat_t	sPixelFormat;
+				Caps_t			sCaps;
+
+				unsigned int    dwReserved2;
+			};
+
+			X_INLINE bool isValid() const
+			{
+				return dwMagic == DDS_MAGIC;
+			}
+
+			char data[128];
+		};
+
+		uint32_t ComputMaxMips(uint32_t Width, uint32_t Height)
+		{
+			uint32_t Biggest = core::Max<uint32_t>(Width, Height);
+			uint32_t mips = 0;
+			while (Biggest > 0) {
+				mips++;
+				Biggest >>= 1;
+			}
+			return mips;
+		}
+
+		namespace pixel_util
+		{
+
+			inline bool is_dxt(pixel_format fmt)
+			{
+				switch (fmt)
+				{
+				case PIXEL_FMT_DXT1:
+				case PIXEL_FMT_DXT1A:
+				case PIXEL_FMT_DXT2:
+				case PIXEL_FMT_DXT3:
+				case PIXEL_FMT_DXT4:
+				case PIXEL_FMT_DXT5:
+				case PIXEL_FMT_3DC:
+				case PIXEL_FMT_DXT5A:
+				case PIXEL_FMT_DXN:
+				case PIXEL_FMT_DXT5_CCxY:
+				case PIXEL_FMT_DXT5_xGxR:
+				case PIXEL_FMT_DXT5_xGBR:
+				case PIXEL_FMT_DXT5_AGBR:
+					return true;
+				default: break;
+				}
+				return false;
+			}
+
+			inline dxt_format get_dxt_format(pixel_format fmt)
+			{
+				switch (fmt)
+				{
+				case PIXEL_FMT_DXT1:         return cDXT1;
+				case PIXEL_FMT_DXT1A:        return cDXT1A;
+				case PIXEL_FMT_DXT2:         return cDXT3;
+				case PIXEL_FMT_DXT3:         return cDXT3;
+				case PIXEL_FMT_DXT4:         return cDXT5;
+				case PIXEL_FMT_DXT5:         return cDXT5;
+				case PIXEL_FMT_3DC:          return cDXN_YX;
+				case PIXEL_FMT_DXT5A:        return cDXT5A;
+				case PIXEL_FMT_DXN:          return cDXN_XY;
+				case PIXEL_FMT_DXT5_CCxY:    return cDXT5;
+				case PIXEL_FMT_DXT5_xGxR:    return cDXT5;
+				case PIXEL_FMT_DXT5_xGBR:    return cDXT5;
+				case PIXEL_FMT_DXT5_AGBR:    return cDXT5;
+				default: break;
+				}
+				return cDXTInvalid;
+			}
+
+			inline pixel_format from_dxt_format(dxt_format dxt_fmt)
+			{
+				switch (dxt_fmt)
+				{
+				case cDXT1:
+					return PIXEL_FMT_DXT1;
+				case cDXT1A:
+					return PIXEL_FMT_DXT1A;
+				case cDXT3:
+					return PIXEL_FMT_DXT3;
+				case cDXT5:
+					return PIXEL_FMT_DXT5;
+				case cDXN_XY:
+					return PIXEL_FMT_DXN;
+				case cDXN_YX:
+					return PIXEL_FMT_3DC;
+				case cDXT5A:
+					return PIXEL_FMT_DXT5A;
+				default: break;
+				}
+				X_ASSERT_UNREACHABLE();
+				return PIXEL_FMT_INVALID;
+			}
+
+			inline unsigned get_bpp(pixel_format fmt)
+			{
+				switch (fmt)
+				{
+				case PIXEL_FMT_DXT1:      return 4;
+				case PIXEL_FMT_DXT1A:     return 4;
+				case PIXEL_FMT_DXT2:      return 8;
+				case PIXEL_FMT_DXT3:      return 8;
+				case PIXEL_FMT_DXT4:      return 8;
+				case PIXEL_FMT_DXT5:      return 8;
+				case PIXEL_FMT_3DC:       return 8;
+				case PIXEL_FMT_DXT5A:     return 4;
+				case PIXEL_FMT_R8G8B8:    return 24;
+				case PIXEL_FMT_A8R8G8B8:  return 32;
+				case PIXEL_FMT_A8:        return 8;
+				case PIXEL_FMT_L8:        return 8;
+				case PIXEL_FMT_A8L8:      return 16;
+				case PIXEL_FMT_DXN:       return 8;
+				case PIXEL_FMT_DXT5_CCxY: return 8;
+				case PIXEL_FMT_DXT5_xGxR: return 8;
+				case PIXEL_FMT_DXT5_xGBR: return 8;
+				case PIXEL_FMT_DXT5_AGBR: return 8;
+				default:
+					break;
+				}
+				return 0;
+			};
+
+			inline bool has_alpha(pixel_format fmt)
+			{
+				switch (fmt)
+				{
+				case PIXEL_FMT_DXT1A:
+				case PIXEL_FMT_DXT2:
+				case PIXEL_FMT_DXT3:
+				case PIXEL_FMT_DXT4:
+				case PIXEL_FMT_DXT5:
+				case PIXEL_FMT_DXT5A:
+				case PIXEL_FMT_A8R8G8B8:
+				case PIXEL_FMT_A8:
+				case PIXEL_FMT_A8L8:
+				case PIXEL_FMT_DXT5_AGBR:
+					return true;
+				default: break;
+				}
+				return false;
+			}
+
+			inline bool is_normal_map(pixel_format fmt)
+			{
+				switch (fmt)
+				{
+				case PIXEL_FMT_3DC:
+				case PIXEL_FMT_DXN:
+				case PIXEL_FMT_DXT5_xGBR:
+				case PIXEL_FMT_DXT5_xGxR:
+				case PIXEL_FMT_DXT5_AGBR:
+					return true;
+				default: break;
+				}
+				return false;
+			}
+
+			inline unsigned get_dxt_bytes_per_block(pixel_format fmt)
+			{
+				switch (fmt)
+				{
+				case PIXEL_FMT_DXT1:      return 8;
+				case PIXEL_FMT_DXT1A:     return 8;
+				case PIXEL_FMT_DXT5A:     return 8;
+
+				case PIXEL_FMT_DXT2:      return 16;
+				case PIXEL_FMT_DXT3:      return 16;
+				case PIXEL_FMT_DXT4:      return 16;
+				case PIXEL_FMT_DXT5:      return 16;
+				case PIXEL_FMT_3DC:       return 16;
+				case PIXEL_FMT_DXN:       return 16;
+				case PIXEL_FMT_DXT5_CCxY: return 16;
+				case PIXEL_FMT_DXT5_xGxR: return 16;
+				case PIXEL_FMT_DXT5_xGBR: return 16;
+				case PIXEL_FMT_DXT5_AGBR: return 16;
+				default:
+					break;
+				}
+				return 0;
+			}
+
+			inline Texturefmt::Enum get_text_fnt_from_pixel(pixel_format fmt)
+			{
+				switch (fmt)
+				{
+				case PIXEL_FMT_A8:
+					return Texturefmt::A8;
+				case PIXEL_FMT_R8G8B8:
+					return Texturefmt::R8G8B8;
+				case PIXEL_FMT_A8R8G8B8:
+					return Texturefmt::A8R8G8B8;
+
+				case PIXEL_FMT_DXT1:
+					return Texturefmt::BC1;
+				case PIXEL_FMT_DXT3:
+					return Texturefmt::BC2;
+				case PIXEL_FMT_DXT5:
+					return Texturefmt::BC3;
+
+				case PIXEL_FMT_3DC:
+					return Texturefmt::ATI2;
+				}
+
+				return Texturefmt::UNKNOWN;
+			}
+
+
+
+			inline unsigned get_data_size(unsigned width, unsigned height, unsigned depth, unsigned mips, pixel_format fmt)
+			{
+				unsigned size = 0;
+				unsigned i;
+
+				const unsigned bits_per_pixel = get_bpp(fmt);
+				const unsigned bytes_per_block = get_dxt_bytes_per_block(fmt);
+				const bool isDXT = is_dxt(fmt);
+
+				for (i = 0; i < mips; i++)
+				{
+					width = core::Max(1u, width);
+					height = core::Max(1u, height);
+					depth = core::Max(1u, depth);
+
+					// work out total pixels.
+					if (isDXT)
+						size += core::Max(bytes_per_block, ((bits_per_pixel * width) * height) / 8);
+					else
+						size += core::Max(bytes_per_block, ((bits_per_pixel * width) * height) / 8);
+
+					// shift
+					width >>= 1;
+					height >>= 1;
+					depth--;
+				}
+
+				return size;
+			}
+		} // namespace pixel_util
+
+		X_ENSURE_SIZE(DDS_header, 128);
+	}
+
+	XTexLoaderDDS::XTexLoaderDDS()
+	{
+
+	}
+
+	XTexLoaderDDS::~XTexLoaderDDS()
+	{
+
+	}
+
+	// ITextureLoader
+
+	bool XTexLoaderDDS::canLoadFile(const core::Path& path) const
+	{
+		return core::strUtil::IsEqual(DDS_FILE_EXTENSION, path.extension());
+	}
+
+	XTextureFile* XTexLoaderDDS::loadTexture(core::XFile* file)
+	{
+		X_ASSERT_NOT_NULL(file);
+
+		DDS_header hdr;
+		uint32_t num_mip_maps, num_faces;
+		dxt_format dxt_fmt = cDXTInvalid;
+		pixel_format format = PIXEL_FMT_INVALID;
+
+		num_mip_maps = 1;
+
+		if (file->readObj(hdr) != DDSHeaderSize)
+		{
+			X_ERROR("DDSLoader", "failed to read image header");
+			return nullptr;
+		}
+
+		if (!hdr.isValid())
+		{
+			X_ERROR("DDSLoader", "image head is invalid");
+			return nullptr;
+		}
+
+		if (hdr.dwSize != DDSSizeofDDSurfaceDesc2)
+		{
+			X_ERROR("DDSLoader", "image header surface size is invalid. provided: %i epected: 124", hdr.dwSize);
+			return nullptr;
+		}
+
+		if (hdr.dwHeight > DDSMaxImageDimensions && hdr.dwWidth > DDSMaxImageDimensions)
+		{
+			X_ERROR("DDSLoader", "image dimensions exceed the max. provided: %ix%i max: %ix%i",
+				hdr.dwHeight, hdr.dwWidth, DDSMaxImageDimensions, DDSMaxImageDimensions);
+			return nullptr;
+		}
+
+		if (!core::bitUtil::IsPowerOfTwo(hdr.dwHeight) || !core::bitUtil::IsPowerOfTwo(hdr.dwWidth))
+		{
+			X_ERROR("DDSLoader", "invalid image dimensions, must be power of two. provided: %ix%i", hdr.dwHeight, hdr.dwWidth);
+			return nullptr;
+		}
+		
+
+		if ((hdr.dwFlags & DDSD_MIPMAPCOUNT) && (hdr.dwMipMapCount))
+		{
+			if (!(hdr.sCaps.dwCaps1 & DDSCAPS_MIPMAP))
+			{
+				X_WARNING("DDSLoader", "DDS header is missing DDSCAPS_MIPMAP flag, yet mipcount is defined");
+			}
+
+			num_mip_maps = hdr.dwMipMapCount;
+
+			if (num_mip_maps != ComputMaxMips(hdr.dwWidth, hdr.dwHeight)) {
+				X_ERROR("DDSLoader", "mip map count is incorrect. provided: %i expected: %i", num_mip_maps,
+					ComputMaxMips(hdr.dwWidth, hdr.dwHeight));
+				return nullptr;
+			}
+		}
+
+		// Check for faces / volume
+		if (hdr.sCaps.dwCaps1 & DDSCAPS_COMPLEX)
+		{
+			if (hdr.sCaps.dwCaps2 & DDSCAPS2_CUBEMAP)
+			{
+				const unsigned all_faces_mask = DDSCAPS2_CUBEMAP_POSITIVEX | DDSCAPS2_CUBEMAP_NEGATIVEX | DDSCAPS2_CUBEMAP_POSITIVEY | DDSCAPS2_CUBEMAP_NEGATIVEY | DDSCAPS2_CUBEMAP_POSITIVEZ | DDSCAPS2_CUBEMAP_NEGATIVEZ;
+				if ((hdr.sCaps.dwCaps2 & all_faces_mask) != all_faces_mask)
+				{
+					X_ERROR("DDSLoader", "cubemaps must have 6 faces");
+					return nullptr;
+				}
+
+				num_faces = 6; // cubemap :)
+			}
+			else if (hdr.sCaps.dwCaps2 & DDSCAPS2_VOLUME)
+			{
+				X_ERROR("DDSLoader", "Volume textures unsupported");
+				return false;
+			}
+			else
+			{
+				num_faces = 1;
+			}
+		}
+		else
+		{
+			num_faces = 1;
+		}
+		
+		// what are you doing!
+		if (hdr.sPixelFormat.dwFlags & DDPF_PALETTEINDEXED8) {
+			X_ERROR("DDSLoader", "Palettized textures unsupported");
+			return false;
+		}
+
+
+		if (hdr.sPixelFormat.dwFlags & DDPF_FOURCC)
+		{
+			// http://code.google.com/p/nvidia-texture-tools/issues/detail?id=41
+			// ATI2 YX:            0 (0x00000000)
+			// ATI2 XY:   1498952257 (0x59583241) (BC5)
+			// ATI Compressonator obeys this stuff, nvidia's tools (like readdxt) don't - oh great
+
+			switch (hdr.sPixelFormat.dwFourCC)
+			{
+				case PIXEL_FMT_DXT1:
+				{
+					format = PIXEL_FMT_DXT1;
+					dxt_fmt = cDXT1;
+					break;
+				}
+				case PIXEL_FMT_DXT2:
+				case PIXEL_FMT_DXT3:
+				{
+					format = PIXEL_FMT_DXT3;
+					dxt_fmt = cDXT3;
+					break;
+				}
+				case PIXEL_FMT_DXT4:
+				case PIXEL_FMT_DXT5:
+				{
+					switch (hdr.sPixelFormat.dwRGBBitCount)
+					{
+					case PIXEL_FMT_DXT5_CCxY:
+						format = PIXEL_FMT_DXT5_CCxY;
+						break;
+					case PIXEL_FMT_DXT5_xGxR:
+						format = PIXEL_FMT_DXT5_xGxR;
+						break;
+					case PIXEL_FMT_DXT5_xGBR:
+						format = PIXEL_FMT_DXT5_xGBR;
+						break;
+					case PIXEL_FMT_DXT5_AGBR:
+						format = PIXEL_FMT_DXT5_AGBR;
+						break;
+					default:
+						format = PIXEL_FMT_DXT5;
+						break;
+					}
+
+					dxt_fmt = cDXT5;
+					 break;
+				}
+				case PIXEL_FMT_3DC:
+				{
+					if (hdr.sPixelFormat.dwRGBBitCount == PIXEL_FMT_DXN)
+					{
+						dxt_fmt = cDXN_XY;
+						format = PIXEL_FMT_DXN;
+					}
+					else
+					{
+						dxt_fmt = cDXN_YX; // aka ATI2
+						format = PIXEL_FMT_3DC;
+					}
+					break;
+				}
+				case PIXEL_FMT_DXT5A:
+				{
+					format = PIXEL_FMT_DXT5A;
+					dxt_fmt = cDXT5A;
+					break;
+				}
+				default:
+				{				
+					X_ERROR("DDSLoader", "Unsupported DDS FOURCC format: 0x%08X", hdr.sPixelFormat.dwFourCC);	
+					return nullptr;
+				}
+			}
+		}
+		else if ((hdr.sPixelFormat.dwRGBBitCount < 8) || (hdr.sPixelFormat.dwRGBBitCount > 32) || (hdr.sPixelFormat.dwRGBBitCount & 7))
+		{
+			X_ERROR("DDSLoader", "Unsupported bit count: %i", hdr.sPixelFormat.dwRGBBitCount);
+			return nullptr;
+		}
+		else if (hdr.sPixelFormat.dwFlags & DDPF_RGB)
+		{
+			if (hdr.sPixelFormat.dwFlags & DDPF_LUMINANCE)
+			{
+				if (hdr.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS) {
+					format = PIXEL_FMT_A8L8;
+				}
+				else
+					format = PIXEL_FMT_L8;
+			}
+			else if (hdr.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS) {
+				format = PIXEL_FMT_A8R8G8B8;
+			}
+			else
+				format = PIXEL_FMT_R8G8B8;
+		}
+		else if (hdr.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS)
+		{
+			if (hdr.sPixelFormat.dwFlags & DDPF_LUMINANCE)
+				format = PIXEL_FMT_A8L8;
+			else
+				format = PIXEL_FMT_A8;
+		}
+		else if (hdr.sPixelFormat.dwFlags & DDPF_LUMINANCE)
+		{
+			format = PIXEL_FMT_L8;
+		}
+		else if (hdr.sPixelFormat.dwFlags & DDPF_ALPHA)
+		{
+			format = PIXEL_FMT_A8;
+		}
+		else
+		{
+			X_ERROR("DDSLoader", "Unsupported format");
+			return nullptr;
+		}
+
+		uint32_t bits_per_pixel = hdr.sPixelFormat.dwRGBBitCount;
+		uint32_t pitch = hdr.dwPitchOrLinearSize;
+		uint32_t default_pitch;
+		uint32_t mask_size[4];
+		uint32_t mask_ofs[4];
+
+		if (hdr.sPixelFormat.dwFlags & DDPF_FOURCC)
+			bits_per_pixel = pixel_util::get_bpp(format);
+
+		if (hdr.sPixelFormat.dwFlags & DDPF_FOURCC)
+			default_pitch = (((hdr.dwWidth + 3) & ~3) * ((hdr.dwHeight + 3) & ~3) * bits_per_pixel) >> 3;
+		else
+			default_pitch = (hdr.dwWidth * bits_per_pixel) >> 3;
+
+		if (!pitch)
+			pitch = default_pitch;
+		else if (pitch > default_pitch * 8)
+		{
+			X_ERROR("DDSLoader", "Pitch Error");
+			return nullptr;
+		}
+
+		mask_size[0] = core::bitUtil::CountBits(hdr.sPixelFormat.dwRBitMask);
+		mask_size[1] = core::bitUtil::CountBits(hdr.sPixelFormat.dwGBitMask);
+		mask_size[2] = core::bitUtil::CountBits(hdr.sPixelFormat.dwBBitMask);
+		mask_size[3] = core::bitUtil::CountBits(hdr.sPixelFormat.dwAlphaBitMask);
+
+		mask_ofs[0] = core::bitUtil::ScanBitsForward(hdr.sPixelFormat.dwRBitMask);
+		mask_ofs[1] = core::bitUtil::ScanBitsForward(hdr.sPixelFormat.dwGBitMask);
+		mask_ofs[2] = core::bitUtil::ScanBitsForward(hdr.sPixelFormat.dwBBitMask);
+		mask_ofs[3] = core::bitUtil::ScanBitsForward(hdr.sPixelFormat.dwAlphaBitMask);
+
+		if ((hdr.sPixelFormat.dwFlags & DDPF_LUMINANCE) && (!mask_size[0]))
+		{
+			mask_size[0] = hdr.sPixelFormat.dwRGBBitCount >> 3;
+			if (hdr.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS)
+				mask_size[0] /= 2;
+		}
+
+		// map th format
+		Texturefmt::Enum mapped_format = Texturefmt::UNKNOWN;
+		mapped_format = pixel_util::get_text_fnt_from_pixel(format);
+
+		if (mapped_format == Texturefmt::UNKNOWN)
+		{
+			X_ERROR("DDSLoader", "Unsupported supported.");
+			return nullptr;
+		}
+
+
+		// load the image data.
+		XTextureFile* img = X_NEW_ALIGNED(XTextureFile, g_rendererArena, "TextureFile", 8);
+		TextureFlags flags;
+
+		if (pixel_util::has_alpha(format))
+			flags.Set(TextureFlags::ALPHA);
+
+		if (pixel_util::is_normal_map(format))
+			flags.Set(TextureFlags::NORMAL);
+
+		if (num_mip_maps == 1)
+			flags.Set(TextureFlags::NOMIPS);
+
+		if (num_faces == 1)
+			img->setType(TextureType::T2D);
+		else
+			img->setType(TextureType::TCube);
+
+
+		// set the info
+		img->setWidth(hdr.dwWidth);
+		img->setHeigth(hdr.dwHeight);
+		img->setNumMips(num_mip_maps);
+		img->setNumFaces(num_faces); // 1 for 2D 6 for a cube.
+		img->setDepth(1); /// We Don't allow volume texture loading yet.
+		img->setFlags(flags);
+		img->setFormat(mapped_format);
+
+		uint32_t i, bytes_read;
+		uint32_t total_bytes_per_face = pixel_util::get_data_size(hdr.dwWidth, hdr.dwHeight, 1, num_mip_maps, format);
+
+		img->setDataSize(total_bytes_per_face);
+
+		// allocate memory / read.
+		// no idear if allocating then reading has any benfits for cube maps.
+		for (i = 0; i < num_faces; i++)
+		{
+			img->pFaces[i] = X_NEW_ARRAY_ALIGNED(uint8_t,total_bytes_per_face,g_rendererArena,"DDSFaceBuffer", 8);
+
+			bytes_read = file->read(img->pFaces[i], total_bytes_per_face);
+
+			if (bytes_read != total_bytes_per_face)
+			{
+				X_ERROR("DDSLoader", "failed to read all mips. requested: %i bytes got: %i bytes", 
+					total_bytes_per_face, bytes_read);
+
+				X_DELETE(img,g_rendererArena);
+				return nullptr;
+			}
+
+#if X_DEBUG == 1
+			size_t left = file->remainingBytes();
+			X_WARNING_IF(left > 0, "DDSLoader", "potential read fail, bytes left in file: %i", left);
+#endif
+		}
+
+		return img;
+	}
+
+	// ~ITextureLoader
+
+
+
+} // namespace DDS
+
+
+X_NAMESPACE_END

@@ -1,0 +1,17 @@
+<font source = "UbuntuMono-R.ttf">
+	<effect name = "normal" >
+		<!-- normal pass -->
+		<pass>
+		</pass>	
+	</effect>
+	<effect name = "drop" >
+		<!-- drop shadow -->
+		<pass>
+			<color r="0" g="0" b="0" a="1" />
+			<pos x="2" y="2"/>
+		</pass>
+		<!-- normal pass -->
+		<pass>
+		</pass>
+	</effect>
+</font>

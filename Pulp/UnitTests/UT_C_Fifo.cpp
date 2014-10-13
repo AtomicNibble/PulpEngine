@@ -1,0 +1,162 @@
+#include "stdafx.h"
+#include <gtest\gtest.h>
+#include <Containers\Fifo.h>
+
+
+X_USING_NAMESPACE;
+
+using namespace core;
+
+namespace {
+
+	struct CustomType
+	{
+		static int CONSTRUCTION_COUNT;
+		static int DECONSTRUCTION_COUNT;
+
+		CustomType() : val_(0) {
+			CONSTRUCTION_COUNT++;
+		}
+		CustomType(int val) : val_(val) {
+			CONSTRUCTION_COUNT++;
+		}
+		CustomType(const CustomType& oth) : val_(oth.val_) {
+			CONSTRUCTION_COUNT++;
+		}
+		~CustomType() {
+			DECONSTRUCTION_COUNT++;
+		}
+
+		CustomType& operator += (const CustomType& oth) {
+			val_ += oth.val_;
+			return *this;
+		}
+
+		operator int() const { return val_; }
+	private:
+		int val_;
+	};
+
+	int CustomType::CONSTRUCTION_COUNT = 0;
+	int CustomType::DECONSTRUCTION_COUNT = 0;
+}
+
+typedef ::testing::Types<short, int, float, CustomType> MyTypes;
+TYPED_TEST_CASE(FifoTest, MyTypes);
+
+template <typename T>
+class FifoTest : public ::testing::Test {
+public:
+};
+
+TYPED_TEST(FifoTest, Types)
+{
+	Fifo<TypeParam> fifo(g_arena);
+
+	EXPECT_EQ(0, fifo.size());
+	EXPECT_EQ(0, fifo.capacity());
+
+	fifo.reserve(3);
+
+	EXPECT_EQ(0, fifo.size());
+	ASSERT_EQ(3, fifo.capacity());
+
+	// Push
+
+	fifo.push(16);
+	EXPECT_EQ(1, fifo.size());
+	ASSERT_EQ(3, fifo.capacity());
+
+	fifo.push(32);
+	EXPECT_EQ(2, fifo.size());
+	ASSERT_EQ(3, fifo.capacity());
+
+	fifo.push(48);
+	EXPECT_EQ(3, fifo.size());
+	ASSERT_EQ(3, fifo.capacity());
+
+	// Pop
+
+	EXPECT_EQ(16, fifo.peek());
+	fifo.pop();
+	EXPECT_EQ(2, fifo.size());
+	ASSERT_EQ(3, fifo.capacity());
+
+
+	EXPECT_EQ(32, fifo.peek());
+	fifo.pop();
+	EXPECT_EQ(1, fifo.size());
+	ASSERT_EQ(3, fifo.capacity());
+
+	EXPECT_EQ(48, fifo.peek());
+	fifo.pop();
+	EXPECT_EQ(0, fifo.size());
+	ASSERT_EQ(3, fifo.capacity());
+
+	// push again so we over wright.
+	fifo.push(64);
+	EXPECT_EQ(1, fifo.size());
+	ASSERT_EQ(3, fifo.capacity());
+
+	EXPECT_EQ(64, fifo.peek());
+	fifo.clear();
+	EXPECT_EQ(0, fifo.size());
+	ASSERT_EQ(3, fifo.capacity());
+
+	fifo.free();
+
+	EXPECT_EQ(0, fifo.size());
+	ASSERT_EQ(0, fifo.capacity());
+
+	// only matters on custom type.
+	EXPECT_EQ(CustomType::CONSTRUCTION_COUNT, CustomType::DECONSTRUCTION_COUNT);
+}
+
+TYPED_TEST(FifoTest, Iteration)
+{
+	{
+		Fifo<TypeParam> fifo(g_arena);
+
+		fifo.reserve(3);
+
+		EXPECT_EQ(0, fifo.size());
+		ASSERT_EQ(3, fifo.capacity());
+
+		fifo.push(16);
+		fifo.push(32);
+		fifo.push(48);
+		fifo.push(128);
+
+		int numvalues = 0;
+		TypeParam valueSum = 0;
+
+		for (Fifo<TypeParam>::iterator it = fifo.begin(); it != fifo.end(); ++it)
+		{
+			numvalues++;
+			valueSum += (*it);
+		}
+
+		EXPECT_EQ(3, numvalues);
+		EXPECT_EQ(208, valueSum);
+
+		numvalues = 0;
+		valueSum = 0;
+
+		for (Fifo<TypeParam>::const_iterator it = fifo.begin(); it != fifo.end(); ++it)
+		{
+			numvalues++;
+			valueSum += (*it);
+		}
+
+		EXPECT_EQ(3, numvalues);
+		EXPECT_EQ(208, valueSum);
+
+		for (int i = 0; i < 64; i++)
+			fifo.push((TypeParam)(64 + i));
+
+		fifo.clear();
+	}
+
+	// only matters on custom type.
+	EXPECT_EQ(CustomType::CONSTRUCTION_COUNT, CustomType::DECONSTRUCTION_COUNT);
+}

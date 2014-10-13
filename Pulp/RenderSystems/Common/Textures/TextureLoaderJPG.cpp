@@ -1,0 +1,260 @@
+#include "stdafx.h"
+#include "TextureLoaderJPG.h"
+
+#include <String\StringUtil.h>
+#include <IFileSys.h>
+
+#include "jpeg-6b\jpeglib.h"
+
+#include "XTextureFile.h"
+
+
+
+#if X_DEBUG
+X_LINK_LIB("jpegd");
+#else
+X_LINK_LIB("jpeg");
+#endif // !X_DEBUG
+
+
+X_NAMESPACE_BEGIN(texture)
+
+namespace JPG
+{
+	namespace
+	{
+		static const char* JPG_FILE_EXTENSION = ".jpg";
+		static const size_t JPEG_MGR_BUFFER_SIZE = (1 << 10);
+
+		struct jpeg_xfile_src_mgr
+		{
+			jpeg_source_mgr mgr;
+			uint32_t bytes_read;
+			core::XFile* file;
+			unsigned char buffer[JPEG_MGR_BUFFER_SIZE];
+		};
+
+		static void xfile_init_source(j_decompress_ptr cinfo)
+		{
+			jpeg_xfile_src_mgr* src = (jpeg_xfile_src_mgr*)cinfo->src;
+
+			// files already open since engine filesystem 
+			// will only give back a file object when it's valid and open.
+
+		}
+
+		static boolean xfile_fill_input_buffer(j_decompress_ptr cinfo)
+		{
+			jpeg_xfile_src_mgr* src = (jpeg_xfile_src_mgr*)cinfo->src;
+
+			uint32 bytes_read;
+			bytes_read = src->file->read(src->buffer, JPEG_MGR_BUFFER_SIZE);
+
+			src->mgr.next_input_byte = src->buffer;
+			src->mgr.bytes_in_buffer = (size_t)bytes_read;
+			if (0 == src->mgr.bytes_in_buffer)
+			{
+				/* The image file is truncated. We insert EOI marker to tell the library to stop processing. */
+				src->buffer[0] = (JOCTET)0xFF;
+				src->buffer[1] = (JOCTET)JPEG_EOI;
+				src->mgr.bytes_in_buffer = 2;
+			}
+			return TRUE;
+		}
+
+		static void xfile_skip_input_data(j_decompress_ptr cinfo, long num_bytes)
+		{
+			jpeg_xfile_src_mgr* src = (jpeg_xfile_src_mgr*)cinfo->src;
+
+			if (num_bytes <= 0)
+				return;
+
+			if (num_bytes <= safe_static_cast<long,size_t>(src->mgr.bytes_in_buffer))
+			{
+				src->mgr.next_input_byte += (size_t)num_bytes;
+				src->mgr.bytes_in_buffer -= (size_t)num_bytes;
+			}
+			else
+			{
+				size_t skip = num_bytes - src->mgr.bytes_in_buffer;
+
+				cinfo->src->bytes_in_buffer = 0;
+				src->file->seek(skip, core::SeekMode::CUR);
+			}
+		}
+
+		static void xfile_term_source(j_decompress_ptr cinfo)
+		{
+			// we don't close the file handle.
+			// since this reader is called with the open file.
+			// code the calls it is responsible for closing the file.
+		}
+
+		static void init_file_stream(j_decompress_ptr cinfo, jpeg_xfile_src_mgr* src, core::XFile* file)
+		{
+			src->file = file;
+			src->bytes_read = 0;
+			src->mgr.init_source = xfile_init_source;
+			src->mgr.fill_input_buffer = xfile_fill_input_buffer;
+			src->mgr.skip_input_data = xfile_skip_input_data;
+			src->mgr.resync_to_restart = jpeg_resync_to_restart;
+			src->mgr.term_source = xfile_term_source;
+			src->mgr.bytes_in_buffer = 0;
+			src->mgr.next_input_byte = nullptr;
+			cinfo->src = (jpeg_source_mgr*)src;
+		}
+
+		struct my_error_mgr {
+			struct jpeg_error_mgr pub;	/* "public" fields */
+
+			jmp_buf setjmp_buffer;	/* for return to caller */
+		};
+
+		typedef struct my_error_mgr * my_error_ptr;
+
+		static void my_error_exit(j_common_ptr cinfo)
+		{
+			my_error_ptr myerr = (my_error_ptr)cinfo->err;
+
+			char jpeg_last_error[JMSG_LENGTH_MAX];
+			(*cinfo->err->format_message) (cinfo, jpeg_last_error);
+
+			X_ERROR("TextureJPG", jpeg_last_error);
+
+			/* Return control to the setjmp point */
+			longjmp(myerr->setjmp_buffer, 1);
+		}
+
+		static void output_message(j_common_ptr cinfo)
+		{
+			char jpeg_msg[JMSG_LENGTH_MAX];
+
+			(*cinfo->err->format_message)(cinfo, jpeg_msg);
+			
+			X_ERROR("TextureJPG", jpeg_msg);
+		}
+	}
+
+	XTexLoaderJPG::XTexLoaderJPG()
+	{
+
+	}
+
+	XTexLoaderJPG::~XTexLoaderJPG()
+	{
+		
+	}
+
+	// ITextureLoader
+	bool XTexLoaderJPG::canLoadFile(const core::Path& path) const
+	{
+		return  core::strUtil::IsEqual(JPG_FILE_EXTENSION, path.extension());
+	}
+
+	XTextureFile* XTexLoaderJPG::loadTexture(core::XFile* file)
+	{
+		X_ASSERT_NOT_NULL(file);
+
+		struct jpeg_decompress_struct cinfo;
+		struct my_error_mgr jerr;
+		struct jpeg_xfile_src_mgr file_reader;
+
+		JSAMPROW* row_pointer;
+		uint32_t row_stride, inflated_size;
+
+		core::zero_object(cinfo);
+
+		cinfo.err = jpeg_std_error(&jerr.pub);
+		jerr.pub.error_exit = my_error_exit;
+		jerr.pub.output_message = output_message;
+
+		if (setjmp(jerr.setjmp_buffer)) {
+			jpeg_finish_decompress(&cinfo);
+			jpeg_destroy_decompress(&cinfo);
+			return nullptr;
+		}
+
+		jpeg_create_decompress(&cinfo);
+	
+		init_file_stream(&cinfo, &file_reader, file);
+		jpeg_read_header(&cinfo, TRUE);
+		jpeg_start_decompress(&cinfo);
+
+		// check we can load this.
+		if (cinfo.output_height < 0 || cinfo.output_height > TEX_MAX_DIMENSIONS ||
+			cinfo.output_width < 0 || cinfo.output_width > TEX_MAX_DIMENSIONS)
+		{
+			X_ERROR("TextureJPG", "invalid image dimensions. provided: %ix%i max: %ix%i", 
+				cinfo.output_height, cinfo.output_width, TEX_MAX_DIMENSIONS, TEX_MAX_DIMENSIONS);
+
+			longjmp(jerr.setjmp_buffer, 1);
+		}
+
+		if (!core::bitUtil::IsPowerOfTwo(cinfo.output_height) || !core::bitUtil::IsPowerOfTwo(cinfo.output_width))
+		{
+			X_ERROR("TextureJPG", "invalid image dimensions, must be power of two. provided: %ix%i",
+				cinfo.output_height, cinfo.output_width);
+
+			longjmp(jerr.setjmp_buffer, 1);
+		}
+
+		inflated_size = cinfo.output_width * cinfo.output_height * cinfo.num_components;
+		row_stride = cinfo.output_width * cinfo.output_components;
+		row_pointer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, row_stride, 1);
+
+
+		if (cinfo.out_color_space != JCS_RGB)
+		{
+			X_ERROR("TextureJPG", "invalid colorspace, must be RGB");
+			longjmp(jerr.setjmp_buffer, 1);
+		}
+
+		// just check incase.
+		if (cinfo.output_components != 3)
+		{
+			X_ERROR("TextureJPG", "invalid output_components. provided: %i expected: 3", cinfo.output_components);
+			longjmp(jerr.setjmp_buffer, 1);
+		}
+
+		// create the img obj.
+		XTextureFile* img = X_NEW_ALIGNED(XTextureFile,g_rendererArena,"TextureFile",8);
+		TextureFlags flags;
+		flags.Set(TextureFlags::NOMIPS);
+
+		img->pFaces[0] = X_NEW_ARRAY_ALIGNED(uint8_t,inflated_size,g_rendererArena,"JpgFaceBuffer",8);
+		img->setNumFaces(1);
+		img->setNumMips(1);
+		img->setDepth(1);
+		img->setFlags(flags);
+		img->setFormat(Texturefmt::R8G8B8);
+		img->setType(TextureType::T2D);
+		img->setHeigth(cinfo.output_height);
+		img->setWidth(cinfo.output_width);
+		img->setDataSize(inflated_size);
+
+		uint8_t* pBuffer = img->pFaces[0];
+		while (cinfo.output_scanline < cinfo.output_height)
+		{
+			jpeg_read_scanlines(&cinfo, row_pointer, 1);
+
+			// copy into final buffer.
+			memcpy(pBuffer, row_pointer, row_stride);
+			pBuffer += row_stride;
+		}
+
+
+		jpeg_finish_decompress(&cinfo);
+		jpeg_destroy_decompress(&cinfo);
+
+#if X_DEBUG == 1
+		size_t left = file->remainingBytes();
+		X_WARNING_IF(left > 0, "TextureJPG", "potential read fail, bytes left in file: %i", left);
+#endif
+
+		return img;
+	}
+	// ~ITextureLoader
+
+} // namespace JPG
+
+X_NAMESPACE_END

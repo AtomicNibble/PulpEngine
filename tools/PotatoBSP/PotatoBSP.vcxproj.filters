@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\BSP">
+      <UniqueIdentifier>{8af85325-275b-4a4c-9b4b-c08b2fcddc43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\BSP">
+      <UniqueIdentifier>{8372cc90-6ca3-4dc8-9c84-249d54b75926}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\MapFile">
+      <UniqueIdentifier>{adebf7d5-4a0b-4422-84e2-0f1d42c15234}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{0946935c-ec71-4ac9-8df3-4a02e906d184}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\MapFile">
+      <UniqueIdentifier>{1d03dafd-7f52-4023-9abf-2c547d55d9b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Util">
+      <UniqueIdentifier>{a77a343c-0d7f-4796-be4d-2a65ae44c311}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PotatoBSP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineApp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BSPTypes.h">
+      <Filter>Header Files\BSP</Filter>
+    </ClInclude>
+    <ClInclude Include="MapTypes.h">
+      <Filter>Header Files\MapFile</Filter>
+    </ClInclude>
+    <ClInclude Include="PlaneSet.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Winding.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="BSPFile.h">
+      <Filter>Header Files\BSP</Filter>
+    </ClInclude>
+    <ClInclude Include="StringPair.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="HashIndex.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="TriTools.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="MapLoader.h">
+      <Filter>Header Files\MapFile</Filter>
+    </ClInclude>
+    <ClInclude Include="VertexFmt.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="BSPData.h">
+      <Filter>Header Files\BSP</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PotatoBSP.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EngineApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BSPFaces.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="Winding.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="BSPFile.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="BSPPortal.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="BSPBrush.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="HashIndex.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="BSPSurface.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="Tjunction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TriTools.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="MapLoader.cpp">
+      <Filter>Source Files\MapFile</Filter>
+    </ClCompile>
+    <ClCompile Include="MapTypes.cpp">
+      <Filter>Source Files\MapFile</Filter>
+    </ClCompile>
+    <ClCompile Include="BSPCompiler.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="BSPTypes.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="BSPProcess.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="BSPFilter.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="BSPSurfaceMeta.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PotatoBSP.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="small.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="PotatoBSP.ico">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+</Project>
