@@ -1,21 +1,4 @@
 [    47]  OnInit()
-[   151]  string = {
-[   195] 	 sub()
-[   241] 	 upper()
-[   285] 	 len()
-[   331] 	 gfind()
-[   375] 	 rep()
-[   420] 	 find()
-[   466] 	 match()
-[   511] 	 char()
-[   556] 	 dump()
-[   603] 	 gmatch()
-[   651] 	 reverse()
-[   696] 	 byte()
-[   743] 	 format()
-[   788] 	 gsub()
-[   834] 	 lower()
-[   834]  }
 [   987]  package = {
 [  1091] 	 preload = {
 [  1091] 	 }
