@@ -27,8 +27,11 @@ X_NAMESPACE_BEGIN(bsp)
 //
 // File Layout:
 //		||||| Header ||||||
-//		||||| BlockHeader[ numblocks ] |||||| <- block layout from quake bsp, good idear makes file quite flexible can omit blocks etc.
+//		||||| BlockHeader[ numblocks ] ||||||
 //      ||||| blockData[ numblocks ] ||||	
+//
+//	This layout is simular to quake bsp's I more than likly will update this layout
+//	to one i can map in memory so i don't have to allocate other buffers.
 //
 //
 //	Info: (talking to myself / planning stuff)
@@ -112,8 +115,7 @@ X_NAMESPACE_BEGIN(bsp)
 //		This means no duplicates and the order is important.
 //
 //	Planes:
-//	
-//
+//		Used for stuff like finding where the camera is.
 //
 //	Verts:
 //		Array of BSP::Vertex.
@@ -137,6 +139,14 @@ X_NAMESPACE_BEGIN(bsp)
 //
 //	Surfaces:
 //		Array of BSP::Surface, info for drawing each surface.
+//
+//  Leafs:
+//
+//
+//
+//	Nodes:
+//
+//
 //
 //	Areas:
 //		Areas are basically a section of the map, or the whole map (in the case of zero portals)
@@ -191,45 +201,55 @@ static const int32_t	 MAX_WORLD_COORD = (128 * 1024);
 static const int32_t	 MIN_WORLD_COORD = (-128 * 1024);
 static const int32_t	 MAX_WORLD_SIZE = (MAX_WORLD_COORD - MIN_WORLD_COORD);
 
-// All these limits are applied AFTER it has been compiled.
-// as a map will typically have less sides etc once compiled.
-// I currently check these when loading aswell as compiling.
-// Limits must be obeyed ;)
+// some of these limts are done on .map load.
+// others checked while compiling bsp.
+
 static const uint32_t	 MAP_MAX_PLANES = 65536;
 static const uint32_t	 MAP_MAX_VERTS = 65536;
 static const uint32_t	 MAP_MAX_INDEXES = 65536;
 static const uint32_t	 MAP_MAX_BRUSHES = 32768;
-static const uint32_t	 MAP_MAX_EDGES = (65536) * 4;
-static const uint32_t	 MAP_MAX_ENTITIES = 16384;
 static const uint32_t	 MAP_MAX_BRUSHSIDES = 65536;	// total sides in map / bsp
 static const uint32_t	 MAP_MAX_SIDES_PER_BRUSH = 64;	// max sides a single brush can have.
+static const uint32_t	 MAP_MAX_NODES = 65536;
 static const uint32_t	 MAP_MAX_LEAFS = 65536;
+static const uint32_t	 MAP_MAX_AREAS = 0x100;
+static const uint32_t	 MAP_MAX_SURFACES = 65536;
 
-static const uint32_t	 MAP_MAX_MODELS = 1024;
+// Compiler limits, has no effect on bsp.
+static const uint32_t	 MAP_MAX_MODELS = 0x400;
+static const uint32_t	 MAP_MAX_ENTITES = 0x400;
 static const uint32_t	 MAP_MAX_LIGHTS_WORLD = 4096;
-static const uint32_t	 MAP_MAX_NODES = 2048;
-static const uint32_t	 MAP_MAX_TEXTURES = 1024;
 
-
+// might be removed in-favor of embeded binary materials
 static const uint32_t	 MAP_MAX_MATERIAL_LEN = 64;
-
 
 // Key / Value limits
 static const uint32_t	 MAX_KEY_LENGTH = 64;			// KVP: name
 static const uint32_t	 MAX_VALUE_LENGTH = 256;		// KVP: value
+
+static const uint32_t	 LIGHT_MAP_WIDTH = 128;
+static const uint32_t	 LIGHT_MAP_HEIGHT = 128;
+
 
 
 X_DECLARE_FLAGS(MatContentFlags)(SOLID, WATER, PLAYER_CLIP, MONSTER_CLIP, TRIGGER, NO_FALL_DMG, DETAIL, STRUCTURAL, ORIGIN);
 X_DECLARE_FLAGS(MatSurfaceFlags)(NO_DRAW, LADDER);
 
 // may add more as i make them.
-X_DECLARE_ENUM(LumpType)(Entities, Materials, Planes, Verts, Indexes, BrushSide, Brush, Surfaces, Areas);
+X_DECLARE_ENUM(LumpType)(Entities, Materials, Planes, Verts, Indexes, Brushes, BrushSides, Surfaces, Nodes, Leafs, Areas);
 X_DECLARE_ENUM(SurfaceType)(Invalid,Plane, Patch);
 
 
 typedef Flags<MatContentFlags> MatContentFlag;
 typedef Flags<MatSurfaceFlags> MatSurfaceFlag;
 
+// I might make this a actualy material definition.
+// instead of the name of a material.
+// might as well make it internal.
+// Hotreload:
+//	how would i hotreload materials then?
+//	i guess I could check the maps material list 
+//  and update the memory. [:-)]
 struct Material
 {
 	core::StackString<MAP_MAX_MATERIAL_LEN> Name;
@@ -238,11 +258,16 @@ struct Material
 };
 
 
+// Vertex and index types.
+// must be one from vertexForamts.h and one the engine understands.
 typedef Vertex_P3F_T4F_N3F_C4B Vertex;
-
 typedef int Index;
 
+// plane type for BSP.
+typedef Planef Plane;
 
+// a surface which can be a plane or a patch.
+// a Patch also uses indexes.
 struct Surface
 {
 	int32_t				materialIdx;
@@ -254,13 +279,19 @@ struct Surface
 	int32_t				indexStartIdx;
 	int32_t				numIndexes;	// 24
 
-	Vec3f				normal;		// 36
-	Vec2<int32_t>		patchSize;	// 44
-}; // 44
+	int32_t				lightMapNum;
+	Vec2<int32_t>		lightMapPos;
+	Vec2<int32_t>		lightMapDimensions;
 
+	// only set for patches.
+	Vec2<int32_t>		patchSize;	// 44
+}; 
+
+
+// Used for collision detection, not rendering.
 struct BrushSide
 {
-	int32_t plane;
+	int32_t planeIdx;
 	int32_t shaderNum;
 };
 
@@ -271,21 +302,45 @@ struct Brush
 	int32_t	shaderNum;
 };
 
+struct Leaf
+{
+	int32_t cluster;	//cluster index for visdata
+	int32_t area;		// areaportal area
+
+	AABB bounds; // 0x20
+
+	int32_t leafFaceStartIdx;	// first index in leafFaces array
+	int32_t numFaces;	
+	int32_t leafBrushStartIdx;	// first index into leaf brushes array
+	int32_t numBrushes;	// 0x30
+};
+
+
+struct Node
+{
+	int32_t planeIdx;
+	// child nodes,  negative numbers are 'struct Leaf' not nodes.
+	int32_t front, back;
+	AABB bounds; // 0x24
+};
+
 struct Area
 {
 	int32_t surfaceStartIdx;
 	int32_t numSurfaces;
 
 	int32_t brushStartIds;
-	int32_t numBrushes;
+	int32_t numBrushes; // 0x10
 
-	AABB bounds;
+	AABB bounds; // 0x28
 };
 
-// gives offset to the lump.
+
+// ============ File only =========
+
 struct FileLump
 {
-	uint32_t offset;
+	uint32_t offset; // no 4gb+ bsp's for you!
 	uint32_t size;
 
 	const bool isValid(void) const {
@@ -304,10 +359,9 @@ struct FileHeader
 
 	// crc32 is made from just the lump info.
 	// used for reload checks.
-	// this might make a pretty good integrity check.
-	// as what 4 bytes are they gonna change without fucking up the file.
-	// unless they change last lumps offset to fix crc32 and null pad the shit out
-	// of the file lol.
+	// -potentialy good for basic integreity checks.
+	// -as tricky to change 4 bytes in lump info to forge it.
+	// -crc32 value in the file could not be trusted tho, for obvious reasons.
 	uint32_t datacrc32;
 
 	FileLump lumps[LumpType::ENUM_COUNT];
@@ -320,18 +374,23 @@ struct FileHeader
 
 
 X_ENSURE_SIZE(Material, 76);
-// X_ENSURE_SIZE(BSPNode, 36);
-// X_ENSURE_SIZE(BSPLeaf, 48);
-// X_ENSURE_SIZE(BSPModel, 40);
+
 
 X_ENSURE_SIZE(Vertex, 44);
+X_ENSURE_SIZE(Index, 4);
+X_ENSURE_SIZE(Plane, 16);
+
 X_ENSURE_SIZE(Surface, 44);
 
 X_ENSURE_SIZE(BrushSide, 8);
 X_ENSURE_SIZE(Brush, 12);
 
-X_ENSURE_SIZE(FileLump, 8);
+X_ENSURE_SIZE(Leaf, 0x30);
+X_ENSURE_SIZE(Node, 0x24);
+X_ENSURE_SIZE(Area, 0x28);
 
+
+X_ENSURE_SIZE(FileLump, 8);
 X_ENSURE_SIZE(FileHeader, (16 + (8 * LumpType::ENUM_COUNT)));
 
 X_NAMESPACE_END

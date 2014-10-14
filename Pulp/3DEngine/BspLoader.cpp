@@ -30,14 +30,14 @@ namespace
 	}
 
 	template<typename T>
-	bool IsBelowLimit(const FileLump& lump, uint32_t max, const char* str)
+	bool IsBelowLimit(const FileHeader& hdr, LumpType::Enum type, uint32_t max)
 	{
-		uint32_t num = lump.size / sizeof(T);
+		uint32_t num = hdr.lumps[type].size / sizeof(T);
 
 		if (num > max) 
 		{
 			X_ERROR("Bsp", "too many %s: %i max: %i",
-				str, num, max);
+				LumpType::ToString(type), num, max);
 			return false;
 		}
 		return true;
@@ -106,8 +106,9 @@ bool Bsp::LoadFromFile(const char* filename)
 		// do some limit checking.
 		// no pesky bsp's !
 		bool belowLimits = true;
-		belowLimits &= IsBelowLimit<Vertex>(hdr.lumps[LumpType::Verts], MAP_MAX_VERTS, "verts");
-		belowLimits &=  IsBelowLimit<Vertex>(hdr.lumps[LumpType::Indexes], MAP_MAX_INDEXES, "indexes");
+		belowLimits &= IsBelowLimit<Vertex>(hdr, LumpType::Surfaces, MAP_MAX_SURFACES);
+		belowLimits &= IsBelowLimit<Vertex>(hdr, LumpType::Verts, MAP_MAX_VERTS);
+		belowLimits &= IsBelowLimit<Vertex>(hdr, LumpType::Indexes, MAP_MAX_INDEXES);
 
 		if (belowLimits == false)
 		{
