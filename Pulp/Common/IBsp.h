@@ -140,19 +140,27 @@ X_NAMESPACE_BEGIN(bsp)
 //	Surfaces:
 //		Array of BSP::Surface, info for drawing each surface.
 //
+//  Nodes:
+//		Used to find the leaf we are in.
+//		We traverse it untill we find a leaf.
+//
 //  Leafs:
+//		A leaf has info like bounds and cluster.
+//		If we get the Leaf from traversing the nodes.
 //
-//
-//
-//	Nodes:
-//
-//
+//		We can use that cluster to check what other leaves are potentialy visable.
+//		By doing a bit lookup in the VisData
 //
 //	Areas:
 //		Areas are basically a section of the map, or the whole map (in the case of zero portals)
 //		Each area is seperated by one or more portals.
 //
 //		It provides surface info offset, so that all the surfaces for this area can be located.
+//
+//  VisData:
+//
+//	The visdata is a collection of bits, that can be used to check if another cluster is visable.
+//
 //
 //	=== Rendering ===
 //
@@ -191,7 +199,7 @@ X_NAMESPACE_BEGIN(bsp)
 //	planes be drawn to be a issue.
 //
 
-static const uint32_t	 BSP_VERSION = 2; //  chnage everytime the format changes.
+static const uint32_t	 BSP_VERSION = 3; //  chnage everytime the format changes.
 static const uint32_t	 BSP_FOURCC = X_TAG('x', 'b', 's', 'p');
 static const uint32_t	 BSP_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r'); // if a file falid to write the final header, this will be it's FourCC
 static const char*		 BSP_FILE_EXTENSION = ".xbsp";
@@ -213,6 +221,7 @@ static const uint32_t	 MAP_MAX_SIDES_PER_BRUSH = 64;	// max sides a single brush
 static const uint32_t	 MAP_MAX_NODES = 65536;
 static const uint32_t	 MAP_MAX_LEAFS = 65536;
 static const uint32_t	 MAP_MAX_AREAS = 0x100;
+static const uint32_t	 MAP_MAX_VISDATA_BYTES = 0x100;
 static const uint32_t	 MAP_MAX_SURFACES = 65536;
 
 // Compiler limits, has no effect on bsp.
@@ -222,6 +231,7 @@ static const uint32_t	 MAP_MAX_LIGHTS_WORLD = 4096;
 
 // might be removed in-favor of embeded binary materials
 static const uint32_t	 MAP_MAX_MATERIAL_LEN = 64;
+static const uint32_t	 MAP_MAX_MATERIALs = 64;
 
 // Key / Value limits
 static const uint32_t	 MAX_KEY_LENGTH = 64;			// KVP: name
@@ -236,7 +246,7 @@ X_DECLARE_FLAGS(MatContentFlags)(SOLID, WATER, PLAYER_CLIP, MONSTER_CLIP, TRIGGE
 X_DECLARE_FLAGS(MatSurfaceFlags)(NO_DRAW, LADDER);
 
 // may add more as i make them.
-X_DECLARE_ENUM(LumpType)(Entities, Materials, Planes, Verts, Indexes, Brushes, BrushSides, Surfaces, Nodes, Leafs, Areas);
+X_DECLARE_ENUM(LumpType)(Entities, Materials, Planes, Verts, Indexes, Brushes, BrushSides, Surfaces, Nodes, Leafs, Areas, VisData);
 X_DECLARE_ENUM(SurfaceType)(Invalid,Plane, Patch);
 
 
@@ -249,7 +259,8 @@ typedef Flags<MatSurfaceFlags> MatSurfaceFlag;
 // Hotreload:
 //	how would i hotreload materials then?
 //	i guess I could check the maps material list 
-//  and update the memory. [:-)]
+//  and update the memory, or they could just be sent to material loader.
+//  allmost like a package.
 struct Material
 {
 	core::StackString<MAP_MAX_MATERIAL_LEN> Name;
@@ -358,10 +369,10 @@ struct FileHeader
 	core::dateTimeStampSmall modified;
 
 	// crc32 is made from just the lump info.
-	// used for reload checks.
+	// used for reload checks only.
 	// -potentialy good for basic integreity checks.
 	// -as tricky to change 4 bytes in lump info to forge it.
-	// -crc32 value in the file could not be trusted tho, for obvious reasons.
+	// -the crc32 value in the file could not be trusted tho, for obvious reasons.
 	uint32_t datacrc32;
 
 	FileLump lumps[LumpType::ENUM_COUNT];
@@ -372,15 +383,14 @@ struct FileHeader
 };
 
 
-
+// my nipples don't mess around.
 X_ENSURE_SIZE(Material, 76);
-
 
 X_ENSURE_SIZE(Vertex, 44);
 X_ENSURE_SIZE(Index, 4);
 X_ENSURE_SIZE(Plane, 16);
 
-X_ENSURE_SIZE(Surface, 44);
+X_ENSURE_SIZE(Surface, 0x34);
 
 X_ENSURE_SIZE(BrushSide, 8);
 X_ENSURE_SIZE(Brush, 12);

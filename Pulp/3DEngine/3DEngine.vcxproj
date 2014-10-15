@@ -360,7 +360,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="BspLoader.h" />
+    <ClInclude Include="Bsp.h" />
     <ClInclude Include="EngineBase.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialManager.h" />
@@ -370,7 +370,7 @@
     <ClInclude Include="XModel.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BspLoader.cpp" />
+    <ClCompile Include="Bsp.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
     <ClCompile Include="ModelLoader.cpp" />

@@ -15,7 +15,7 @@
     <ClCompile Include="X3DEngine.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="BspLoader.cpp">
+    <ClCompile Include="Bsp.cpp">
       <Filter>Level</Filter>
     </ClCompile>
   </ItemGroup>
@@ -37,7 +37,7 @@
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="EngineBase.h" />
-    <ClInclude Include="BspLoader.h">
+    <ClInclude Include="Bsp.h">
       <Filter>Level</Filter>
     </ClInclude>
   </ItemGroup>

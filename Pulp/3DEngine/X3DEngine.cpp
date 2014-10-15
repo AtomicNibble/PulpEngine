@@ -11,7 +11,7 @@
 
 #include "ModelLoader.h"
 #include "MaterialManager.h"
-#include "BspLoader.h"
+#include "Bsp.h"
 
 X_NAMESPACE_BEGIN(engine)
 

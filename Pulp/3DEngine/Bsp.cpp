@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "BspLoader.h"
+#include "Bsp.h"
 
 #include <IFileSys.h>
 
@@ -106,9 +106,18 @@ bool Bsp::LoadFromFile(const char* filename)
 		// do some limit checking.
 		// no pesky bsp's !
 		bool belowLimits = true;
-		belowLimits &= IsBelowLimit<Vertex>(hdr, LumpType::Surfaces, MAP_MAX_SURFACES);
+		belowLimits &= IsBelowLimit<Vertex>(hdr, LumpType::Materials, MAP_MAX_MATERIALs);
+		belowLimits &= IsBelowLimit<Vertex>(hdr, LumpType::Planes, MAP_MAX_PLANES);
 		belowLimits &= IsBelowLimit<Vertex>(hdr, LumpType::Verts, MAP_MAX_VERTS);
-		belowLimits &= IsBelowLimit<Vertex>(hdr, LumpType::Indexes, MAP_MAX_INDEXES);
+		belowLimits &= IsBelowLimit<Index>(hdr, LumpType::Indexes, MAP_MAX_INDEXES);
+		belowLimits &= IsBelowLimit<Brush>(hdr, LumpType::Brushes, MAP_MAX_BRUSHES);
+		belowLimits &= IsBelowLimit<BrushSide>(hdr, LumpType::BrushSides, MAP_MAX_BRUSHSIDES);
+		belowLimits &= IsBelowLimit<Surface>(hdr, LumpType::Surfaces, MAP_MAX_SURFACES);
+		belowLimits &= IsBelowLimit<Node>(hdr, LumpType::Nodes, MAP_MAX_NODES);
+		belowLimits &= IsBelowLimit<Leaf>(hdr, LumpType::Leafs, MAP_MAX_LEAFS);
+		belowLimits &= IsBelowLimit<Area>(hdr, LumpType::Areas, MAP_MAX_AREAS);
+		belowLimits &= IsBelowLimit<uint8_t>(hdr, LumpType::VisData, MAP_MAX_VISDATA_BYTES);
+
 
 		if (belowLimits == false)
 		{
