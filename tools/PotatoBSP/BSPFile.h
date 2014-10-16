@@ -13,13 +13,12 @@ X_NAMESPACE_BEGIN(bsp)
 class BSPFile
 {
 public:
-	BSPFile(const BSPData& Data);
+	BSPFile();
 
-	bool save(const char* name);
+	bool save(const BSPData& Data, const char* name);
 
 private:
 
-	const BSPData& data_;
 };
 
 

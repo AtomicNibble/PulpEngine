@@ -27,15 +27,14 @@ namespace
 }
 
 
-BSPFile::BSPFile(const BSPData& Data) :
-data_(Data)
+BSPFile::BSPFile()
 {
 
 }
 
 
 
-bool BSPFile::save(const char* name)
+bool BSPFile::save(const BSPData& data, const char* name)
 {
 	core::fileModeFlags mode;
 	FileHeader hdr;
@@ -61,10 +60,10 @@ bool BSPFile::save(const char* name)
 	{
 		file->writeObj(hdr);
 
-		SaveLump<Area>(file, hdr.lumps[LumpType::Areas], data_.areas);
-		SaveLump<Surface>(file, hdr.lumps[LumpType::Surfaces], data_.surfaces);
-		SaveLump<Vertex>(file, hdr.lumps[LumpType::Verts], data_.verts);
-		SaveLump<Index>(file, hdr.lumps[LumpType::Indexes], data_.indexes);
+		SaveLump<Area>(file, hdr.lumps[LumpType::Areas], data.areas);
+		SaveLump<Surface>(file, hdr.lumps[LumpType::Surfaces], data.surfaces);
+		SaveLump<Vertex>(file, hdr.lumps[LumpType::Verts], data.verts);
+		SaveLump<Index>(file, hdr.lumps[LumpType::Indexes], data.indexes);
 
 		// update FourcCC to mark this bsp as valid.
 		hdr.fourCC = BSP_FOURCC;

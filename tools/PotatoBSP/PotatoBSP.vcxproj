@@ -254,7 +254,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Tjunction.cpp" />
     <ClCompile Include="TriTools.cpp" />
     <ClCompile Include="Winding.cpp" />
   </ItemGroup>

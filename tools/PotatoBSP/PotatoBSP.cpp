@@ -132,9 +132,9 @@ void CompileBSP(core::Path& path)
 			{
 				if (bsp.ProcessModels())
 				{
-					bsp::BSPFile writer(bsp.getCompiledData());
+					bsp::BSPFile writer;
 
-					if (writer.save(path.fileName()))
+					if (writer.save(bsp.getCompiledData(), path.fileName()))
 					{
 						X_LOG0("Bsp", "saved as: %s", path.fileName());
 					}
@@ -150,7 +150,6 @@ void CompileBSP(core::Path& path)
 			end = gEnv->pTimer->GetAsyncTime();
 			X_LOG0("Info", "Total Time: %.4fms", (end - start).GetMilliSeconds());
 			
-
 	//		gEnv->pCore->GetIProfileSys()->FrameEnd();
 		}
 

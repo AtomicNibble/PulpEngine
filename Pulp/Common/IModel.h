@@ -213,18 +213,20 @@ struct MeshHeader
 	uint32_t startVertex;
 	uint32_t startIndex; // 8
 
-	// bind sizes.
-	CompbindInfo CompBinds; // 8
-
 	core::Pointer64<Vertex>		verts; // 8
 	core::Pointer64<Face>		faces; // 8
-
-
-	AABB boundingBox;	// 24
 
 	// 16
 	core::Pointer64<IMaterial> pMat;
 	core::Pointer64<const char> materialName;
+
+	/* cold fields down here, shizz that's not 
+		accessed much. */
+
+	// bind sizes.
+	CompbindInfo CompBinds; // 8
+
+	AABB boundingBox;	// 24
 
 	// 80 so far.
 	// lots of spare pickle bytes to play with.
@@ -243,7 +245,8 @@ struct MeshHeader
 
 
 
-// a lod is considered a single mesh.
+// a lod is a single Vb / IB
+// mesh heads define the vertex offets / counts.
 struct LODHeader
 {
 	LODHeader() : 

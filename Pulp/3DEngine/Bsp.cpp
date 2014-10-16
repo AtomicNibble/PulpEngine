@@ -116,7 +116,7 @@ bool Bsp::LoadFromFile(const char* filename)
 		belowLimits &= IsBelowLimit<Node>(hdr, LumpType::Nodes, MAP_MAX_NODES);
 		belowLimits &= IsBelowLimit<Leaf>(hdr, LumpType::Leafs, MAP_MAX_LEAFS);
 		belowLimits &= IsBelowLimit<Area>(hdr, LumpType::Areas, MAP_MAX_AREAS);
-		belowLimits &= IsBelowLimit<uint8_t>(hdr, LumpType::VisData, MAP_MAX_VISDATA_BYTES);
+		belowLimits &= IsBelowLimit<uint8_t>(hdr, LumpType::Portals, MAP_MAX_PORTALS);
 
 
 		if (belowLimits == false)
@@ -130,13 +130,13 @@ bool Bsp::LoadFromFile(const char* filename)
 		LumpsLoaded &= LoadLump<Surface>(file, hdr.lumps[LumpType::Surfaces], data_.surfaces);
 		LumpsLoaded &= LoadLump<Vertex>(file, hdr.lumps[LumpType::Verts], data_.verts);
 		LumpsLoaded &= LoadLump<Index>(file, hdr.lumps[LumpType::Indexes], data_.indexes);
+		LumpsLoaded &= LoadLump<Area>(file, hdr.lumps[LumpType::Areas], data_.areas);
 
 		if (LumpsLoaded == false)
 		{
 			X_ERROR("Bsp", "Failed to load lumps from: %s", path.fileName());
 			return false;
 		}
-
 
 
 		file.close(); // not needed but makes my nipples more perky.

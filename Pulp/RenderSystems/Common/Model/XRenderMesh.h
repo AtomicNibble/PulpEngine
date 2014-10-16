@@ -55,16 +55,37 @@ struct XMeshDevStream
 		return true;
 	}
 
-
 	XMeshDevBuf devBuf;    // device buffer
 };
 
 
+struct XMeshSurface
+{
+
+};
 
 // A mesh can be a model or world geo.
 // they are both treated the same for rendering.
 // this class supports sub mehses but all of them are stored
 // in a single vertex / index buffer
+// since it's pretty rare a mesh dose not render all it's sub meshes.
+// 
+// Supports multiple vertex formats.
+// Should I allow support for 32bit indices.
+// Only need for it would be for map's that have like no portals.
+//
+//	I'm leaning towards, the stance that if you want more than 65k verts.
+//	fucking portal your map lol.
+//
+//	65k verts allows for: (65k / 6): 10922 square faces
+//	
+//	That is without index duplicate removing, which should allow for a very large amount, since 95% of brush
+//	sides will use the same 6 indexs.
+//
+//
+//	
+//
+//
 class XRenderMesh : public IRenderMesh, public core::XBaseAsset
 {
 public:
@@ -80,6 +101,7 @@ public:
 		const int refs = XBaseAsset::release();
 		if (refs == 0) {
 
+			X_ASSERT_NOT_IMPLEMENTED();
 
 		}
 		return refs;
@@ -119,6 +141,9 @@ protected:
 
 	shader::VertexFormat::Enum vertexFmt_;
 
+
+	// Can i use this for world meshes?
+	// or should I make a genral structure.
 	model::LODHeader const* pLod_;
 
 	// we can have multiple streams.

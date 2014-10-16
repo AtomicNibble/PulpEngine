@@ -55,4 +55,7 @@
       <UniqueIdentifier>{689f5c3d-f3d7-46f5-94d9-b78b112d39fb}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="bsp.cd" />
+  </ItemGroup>
 </Project>

@@ -157,52 +157,60 @@ X_NAMESPACE_BEGIN(bsp)
 //
 //		It provides surface info offset, so that all the surfaces for this area can be located.
 //
-//  VisData:
+//	Portals:
 //
-//	The visdata is a collection of bits, that can be used to check if another cluster is visable.
+//		
 //
 //
 //	=== Rendering ===
 //
-//	How to render this sexy pickle.
-//	Each area is a model basically
-//	with multiple sub meshes for all the diffrent 
-//	faces.
+//	Step 1:
+//		
+//		Find out what are the camera is in.
+//		This is done by traversing the BSP tree from the root.
+//		checking what side of the plane we are on.
+//		
+//		Once we have reached a leaf node, we can get the area number from the leaf.
+//
+//	Step 2:	
+//		
+//		Now that we have the area, we want to know what other area's needed to be rendered.
+//		Each area has a collection of portals, for each portal we check that one the plane of
+//		the portals plane is facing away from us. (aka the direction of the portal, leaving the area basically).
+//		
+//		We then clip out current portal planes with the winding of the portal.
+//		If the clipped area is zero in size then it's not visable.
+//		
+//		When a portal is visable, we then go into the next area, passing the current clipped planes
+//		Down via a stack so that the next area's portal must then be inside the current portal.
+//		
+//	Step 3:
+//
+//		We can then use this info to create scissor rects, so that when we draw the area visable via
+//		the doorway or what ever, only the shit inside the doorway will have pixel operations run.
+//
+//		The scissor is a retangle, so the smallest rectange that contains the portal is made.
+//		Meaning some overdraw will occur but very minimal.
+//
+//	Step 4:	
+//
+//		Each area that has been determined as visable, is then drawn.
+//		Optionaly do I want to frustrum cull geo?
+//		Or keep that to just FX's
+//
+//	-----------------------------------------
+//
+//	Each area in the map is considered to be a model with x surfaces.
 //	
-//	All faces in area with same texture should be rendered as a single call.
 //
-//	I want a single area to be a single VB / IB, or dose it matter?
-//	would save rebinding for each area(if i use single VB / IB for whole map.)
-//
-//	for reloading the map seprate area vb's would help i guess.
-//	it makes a diffrence for the BSP compiler as i would check for duplicates
-//	across whole level, so i can't make it a engine option. (well i could but not have all benfits)
-//
-//	we have a collection of surfaces for the map.
-//	they are grouped for each area
-//	so that each area has a start index and draws the surfaces for that area.
-//
-//	=== Culling ===
-//
-//	Even tho I am only going to be rendering area's i may want to now render the
-//	whole area. so I will check onjects in the area to see if they should be culled.
-//	
-//	This is fine since even tho everything in the area will be in a single VB / IB
-//	and each one is draw seprate, but we have the problem of gouping.
-//
-//	since I group everything that uses same material etc.
-//	It means that if you can see some object in that area all others that use it will be drawn
-//	Thinking about it, this won't really be a issue since the map's structure is quite low
-//	poly, since models are seprate.
-//
-//	And a map won't typically have too much texture reusesage for the slightly large number of 
-//	planes be drawn to be a issue.
 //
 
-static const uint32_t	 BSP_VERSION = 3; //  chnage everytime the format changes.
-static const uint32_t	 BSP_FOURCC = X_TAG('x', 'b', 's', 'p');
+static const uint32_t	 BSP_VERSION = 4; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
+static const uint32_t	 BSP_FOURCC = X_TAG('x', 'l', 'v', 'l');
 static const uint32_t	 BSP_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r'); // if a file falid to write the final header, this will be it's FourCC
-static const char*		 BSP_FILE_EXTENSION = ".xbsp";
+// feels kinda wrong to call it a '.bsp', since it's otherthings as well. 
+// '.level' is more pleasing to me and more importantly the BushMaster of Christmas Island(Southeast Asia).
+static const char*		 BSP_FILE_EXTENSION = ".level"; // ".bsp";
 
 // a level can not exceed this size.
 static const int32_t	 MAX_WORLD_COORD = (128 * 1024);
@@ -211,44 +219,49 @@ static const int32_t	 MAX_WORLD_SIZE = (MAX_WORLD_COORD - MIN_WORLD_COORD);
 
 // some of these limts are done on .map load.
 // others checked while compiling bsp.
-
-static const uint32_t	 MAP_MAX_PLANES = 65536;
-static const uint32_t	 MAP_MAX_VERTS = 65536;
-static const uint32_t	 MAP_MAX_INDEXES = 65536;
-static const uint32_t	 MAP_MAX_BRUSHES = 32768;
-static const uint32_t	 MAP_MAX_BRUSHSIDES = 65536;	// total sides in map / bsp
-static const uint32_t	 MAP_MAX_SIDES_PER_BRUSH = 64;	// max sides a single brush can have.
+// slap a hat, swing a rat and hit it with a bat.
+static const uint32_t	 MAP_MAX_PLANES = 65536;		
+static const uint32_t	 MAP_MAX_VERTS = 65536;			
+static const uint32_t	 MAP_MAX_INDEXES = 65536;		
+static const uint32_t	 MAP_MAX_BRUSHES = 32768;		
+static const uint32_t	 MAP_MAX_BRUSHSIDES = 65536;		// total sides in map / bsp
+static const uint32_t	 MAP_MAX_SIDES_PER_BRUSH = 64;		// max sides a single brush can have.
 static const uint32_t	 MAP_MAX_NODES = 65536;
 static const uint32_t	 MAP_MAX_LEAFS = 65536;
 static const uint32_t	 MAP_MAX_AREAS = 0x100;
-static const uint32_t	 MAP_MAX_VISDATA_BYTES = 0x100;
-static const uint32_t	 MAP_MAX_SURFACES = 65536;
+static const uint32_t	 MAP_MAX_PORTALS = 0x100;
+static const uint32_t	 MAP_MAX_SURFACES = 65536;		
+static const uint32_t	 MAP_MAX_MODELS = 0x400;			// a model is a 'area'.
+static const uint32_t	 MAP_MAX_MODEL_SURFACES = 65536;	// the maximum surfaces a map model can have.
+static const uint32_t	 MAP_MAX_MATERIALs = 0x800;		
 
-// Compiler limits, has no effect on bsp.
-static const uint32_t	 MAP_MAX_MODELS = 0x400;
+// Should be checked in compiler.
 static const uint32_t	 MAP_MAX_ENTITES = 0x400;
 static const uint32_t	 MAP_MAX_LIGHTS_WORLD = 4096;
 
 // might be removed in-favor of embeded binary materials
 static const uint32_t	 MAP_MAX_MATERIAL_LEN = 64;
-static const uint32_t	 MAP_MAX_MATERIALs = 64;
 
 // Key / Value limits
 static const uint32_t	 MAX_KEY_LENGTH = 64;			// KVP: name
 static const uint32_t	 MAX_VALUE_LENGTH = 256;		// KVP: value
 
+// show me the light, o holy one.
 static const uint32_t	 LIGHT_MAP_WIDTH = 128;
 static const uint32_t	 LIGHT_MAP_HEIGHT = 128;
 
+
+// forward Decs.
+class XWinding;
+// ~forward Decs.
 
 
 X_DECLARE_FLAGS(MatContentFlags)(SOLID, WATER, PLAYER_CLIP, MONSTER_CLIP, TRIGGER, NO_FALL_DMG, DETAIL, STRUCTURAL, ORIGIN);
 X_DECLARE_FLAGS(MatSurfaceFlags)(NO_DRAW, LADDER);
 
 // may add more as i make them.
-X_DECLARE_ENUM(LumpType)(Entities, Materials, Planes, Verts, Indexes, Brushes, BrushSides, Surfaces, Nodes, Leafs, Areas, VisData);
-X_DECLARE_ENUM(SurfaceType)(Invalid,Plane, Patch);
-
+X_DECLARE_ENUM(LumpType)(Entities, Materials, Planes, Verts, Indexes, Brushes, BrushSides, Surfaces, Nodes, Leafs, Areas, Portals);
+X_DECLARE_ENUM(SurfaceType)(Invalid, Plane, Patch);
 
 typedef Flags<MatContentFlags> MatContentFlag;
 typedef Flags<MatSurfaceFlags> MatSurfaceFlag;
@@ -257,10 +270,9 @@ typedef Flags<MatSurfaceFlags> MatSurfaceFlag;
 // instead of the name of a material.
 // might as well make it internal.
 // Hotreload:
-//	how would i hotreload materials then?
-//	i guess I could check the maps material list 
-//  and update the memory, or they could just be sent to material loader.
-//  allmost like a package.
+//	still work fine, since all materials will end up
+//	in the mat manager even if loaded from here.
+//	so the entry in the map manger we just be updated.
 struct Material
 {
 	core::StackString<MAP_MAX_MATERIAL_LEN> Name;
@@ -278,7 +290,7 @@ typedef int Index;
 typedef Planef Plane;
 
 // a surface which can be a plane or a patch.
-// a Patch also uses indexes.
+// a plane also uses indexes.
 struct Surface
 {
 	int32_t				materialIdx;
@@ -335,19 +347,27 @@ struct Node
 	AABB bounds; // 0x24
 };
 
+struct Portal
+{
+	int32_t		areaTo;		// the area this portal leads to.
+	XWinding*	pWinding;	// winding points have counter clockwise ordering seen this area
+							// should i add seralise support to winding?
+							// or i could have a diffrent portal structure for the file.
+
+	Planef		plane;		// view must be on the positive side of the plane to cross
+//	Portal*		pNext;		
+};
+
 struct Area
 {
-	int32_t surfaceStartIdx;
-	int32_t numSurfaces;
-
-	int32_t brushStartIds;
-	int32_t numBrushes; // 0x10
+	int32_t areaNum;
+	int32_t numPortals;
+	Portal* pPortals;
 
 	AABB bounds; // 0x28
 };
 
-
-// ============ File only =========
+// ============ File Structure stuff =========
 
 struct FileLump
 {
@@ -366,12 +386,13 @@ struct FileHeader
 	uint8_t  version;
 	uint8_t  blank[3];
 
-	core::dateTimeStampSmall modified;
+	core::dateTimeStampSmall modified; // 4
 
 	// crc32 is made from just the lump info.
 	// used for reload checks only.
 	// -potentialy good for basic integreity checks.
 	// -as tricky to change 4 bytes in lump info to forge it.
+	// -if we don't allow a offset to be provided without a size that is. (currently allowed)
 	// -the crc32 value in the file could not be trusted tho, for obvious reasons.
 	uint32_t datacrc32;
 
@@ -397,6 +418,7 @@ X_ENSURE_SIZE(Brush, 12);
 
 X_ENSURE_SIZE(Leaf, 0x30);
 X_ENSURE_SIZE(Node, 0x24);
+X_ENSURE_SIZE(Portal, 0x28);
 X_ENSURE_SIZE(Area, 0x28);
 
 
