@@ -4,9 +4,15 @@
 #define X_BSP_LOADER_H_
 
 #include <IBsp.h>
+// #include <IModel.h>
+
+X_NAMESPACE_DECLARE(model,
+struct MeshHeader;
+struct IRenderMesh;
+)
+
 
 X_NAMESPACE_BEGIN(bsp)
-
 
 struct BSPData
 {
@@ -23,18 +29,38 @@ struct BSPData
 	core::Array<bsp::Index> indexes;
 };
 
+
+
 class Bsp
 {
 public:
 	Bsp();
 	~Bsp();
 
+	void free(void);
+	bool render(void);
+
 	bool LoadFromFile(const char* filename);
 
 
 private:
-
 	BSPData data_;
+
+
+	struct AreaModel
+	{
+		AreaModel() {
+			pMesh = nullptr;
+			pRenderMesh = nullptr;
+		}
+
+		model::MeshHeader* pMesh;
+		model::IRenderMesh* pRenderMesh;
+	};
+
+	core::Array<AreaModel> areaModels_;
+
+	uint8_t* pFileData_;
 };
 
 

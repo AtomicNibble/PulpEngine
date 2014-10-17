@@ -133,7 +133,7 @@
       <AdditionalDependencies>Foundation.lib;OpenMaya.lib;OpenMayaUI.lib;OpenMayaAnim.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "C:\Users\Tom\Documents\Visual Studio 2013\Projects\WinEngine\build\Win32\Debug\engine_MayaExport.mll" "C:\Users\Tom\Documents\maya\2011\plug-ins\engine_MayaExport.mll"</Command>
+      <Command>copy "$(TargetPath)" "C:\Users\Tom\Documents\maya\2011\plug-ins\engine_MayaExport.mll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

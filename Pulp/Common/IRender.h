@@ -19,6 +19,7 @@ struct XTextDrawConect;
 
 X_NAMESPACE_DECLARE(model,
 struct IRenderMesh;
+struct MeshHeader;
 )
 
 
@@ -372,6 +373,8 @@ struct IRender
 
 	// Model
 	virtual model::IRenderMesh* createRenderMesh(void) X_ABSTRACT;
+	virtual model::IRenderMesh* createRenderMesh(model::MeshHeader* pMesh, 
+		shader::VertexFormat::Enum fmt, const char* name) X_ABSTRACT;
 	virtual void freeRenderMesh(model::IRenderMesh* pMesh) X_ABSTRACT;
 	 
 	// ~Model

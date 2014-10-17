@@ -1,29 +1,108 @@
 #include "stdafx.h"
 #include "XRenderMesh.h"
 
+#include "Dx10Render.h"
+
+#include "DeviceManager\VidMemManager.h"
+
 X_NAMESPACE_BEGIN(model)
 
 
-
-XRenderMesh::XRenderMesh(model::LODHeader* pLod, const char* pName) 
+XRenderMesh::XRenderMesh()
 {
-	X_ASSERT_NOT_NULL(pLod);
+	pMesh_ = nullptr;
+	vertexFmt_ = (shader::VertexFormat::Enum) - 1;
+}
+
+XRenderMesh::XRenderMesh(model::MeshHeader* pMesh, shader::VertexFormat::Enum fmt, 
+	const char* pName)
+{
+	X_ASSERT_NOT_NULL(pMesh);
 	X_ASSERT_NOT_NULL(pName);
 
 	name_ = pName;
-	pLod_ = pLod;
+	pMesh_ = pMesh;
+	vertexFmt_ = fmt;
 }
 
 XRenderMesh::~XRenderMesh()
 {
-
 }
 
 // returns false if no Video memory.
 bool XRenderMesh::canRender(void)
 {
+	using namespace render;
 
-	return false;
+	return indexStream_.BufId != VidMemManager::null_id && 
+		vertexStreams_[VertexStream::VERT].BufId != VidMemManager::null_id;
+}
+
+bool XRenderMesh::uploadToGpu(void)
+{
+	X_ASSERT_NOT_NULL(pMesh_);
+	X_ASSERT((int32)vertexFmt_ != -1, "vertex format has not been set")(vertexFmt_);
+	using namespace render;
+
+	uint32_t ibSize, vbSize;
+
+	ibSize = pMesh_->numIndexes * sizeof(model::Index);
+	vbSize = pMesh_->numVerts * DX11XRender::vertexFormatStride[vertexFmt_];
+
+	indexStream_.BufId = g_Dx11D3D.VidMemMng()->CreateIB(ibSize, pMesh_->indexes);
+	vertexStreams_[VertexStream::VERT].BufId = g_Dx11D3D.VidMemMng()->CreateVB(vbSize, pMesh_->verts);
+
+	return canRender();
+}
+
+
+bool XRenderMesh::render(void)
+{
+	using namespace render;
+
+	if (!canRender())
+		return false;
+
+//	m_ViewMat.LoadIdentity();
+//	m_ProMat.LoadIdentity();
+
+	D3DXMatrixPerspectiveRH(g_Dx11D3D.pCurProjMat(), 800, 600, 0.001f, 1.0f);
+
+	Matrix44f* pPro = g_Dx11D3D.pCurProjMat();
+
+	// test.
+	Vec3f* pos = pMesh_->verts.as<Vec3f>();
+
+	Vec3f out = (*pos) * (*pPro);
+
+	g_Dx11D3D.SetWorldShader();
+	g_Dx11D3D.FX_SetVertexDeclaration(vertexFmt_);
+	g_Dx11D3D.FX_SetIStream(indexStream_.BufId);
+	g_Dx11D3D.FX_SetVStream(
+		vertexStreams_[VertexStream::VERT].BufId, 
+		0, 
+		DX11XRender::vertexFormatStride[vertexFmt_],
+		0
+	);
+
+	uint32_t i, num;
+	
+	num = pMesh_->numSubMeshes;
+
+	for (i = 0; i < num; i++)
+	{
+		const model::SubMeshHeader* mesh = pMesh_->subMeshHeads[i];
+
+		g_Dx11D3D.FX_DrawIndexPrimitive(
+			PrimitiveType::TriangleList,
+			mesh->numIndexes,
+			mesh->startIndex,
+			mesh->startVertex
+			);
+
+	}
+
+	return true;
 }
 
 // genral Info
@@ -34,20 +113,18 @@ const char* XRenderMesh::getName(void) const
 
 int XRenderMesh::getNumVerts(void) const
 {
-	return pLod_->numVerts;
+	return pMesh_->numVerts;
 }
 
-int XRenderMesh::getNumIndexs(void) const
+int XRenderMesh::getNumIndexes(void) const
 {
-	return pLod_->numIndexs;
+	return pMesh_->numIndexes;
 }
 
 int XRenderMesh::getNumSubMesh(void) const
 {
-	return pLod_->numMesh;
+	return pMesh_->numSubMeshes;
 }
-
-
 
 
 

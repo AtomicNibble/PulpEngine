@@ -46,18 +46,6 @@ struct XMeshDevBuf
 	uint32_t BufId;
 };
 
-struct XMeshDevStream
-{
-	XMeshDevStream() {
-	}
-
-	X_INLINE bool isValid(void) const {
-		return true;
-	}
-
-	XMeshDevBuf devBuf;    // device buffer
-};
-
 
 struct XMeshSurface
 {
@@ -89,7 +77,8 @@ struct XMeshSurface
 class XRenderMesh : public IRenderMesh, public core::XBaseAsset
 {
 public:
-	XRenderMesh(model::LODHeader* pLod, const char* name);
+	XRenderMesh();
+	XRenderMesh(model::MeshHeader* pMesh, shader::VertexFormat::Enum fmt, const char* name);
 	~XRenderMesh() X_OVERRIDE;
 
 	// IRenderModel
@@ -107,13 +96,17 @@ public:
 		return refs;
 	}
 
+	// draw
+	virtual bool render(void) X_OVERRIDE;
+
 	// returns false if no Video memory.
 	virtual bool canRender(void) X_OVERRIDE;
+	virtual bool uploadToGpu(void) X_OVERRIDE;
 
 	// genral Info
 	virtual const char* getName(void) const X_OVERRIDE;
 	virtual int getNumVerts(void) const X_OVERRIDE;
-	virtual int getNumIndexs(void) const X_OVERRIDE;
+	virtual int getNumIndexes(void) const X_OVERRIDE;
 	virtual int getNumSubMesh(void) const X_OVERRIDE;
 
 	virtual shader::VertexFormat::Enum getVertexFmt(void) const X_OVERRIDE{
@@ -135,20 +128,16 @@ public:
 	void freeSystemMem(void);
 
 protected:
-	// might make a const char* since lod is owned.
-	// or if i make model have a string, memory will just be ref counted.
 	core::string name_; 
 
 	shader::VertexFormat::Enum vertexFmt_;
 
 
-	// Can i use this for world meshes?
-	// or should I make a genral structure.
-	model::LODHeader const* pLod_;
+	model::MeshHeader const* pMesh_;
 
 	// we can have multiple streams.
-	XMeshDevStream vertexStreams_[VertexStream::ENUM_COUNT];
-	XMeshDevStream indexStream_;
+	XMeshDevBuf vertexStreams_[VertexStream::ENUM_COUNT];
+	XMeshDevBuf indexStream_;
 };
 
 

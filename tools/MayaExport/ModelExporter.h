@@ -255,13 +255,13 @@ public:
 	uint32_t totalVerts(void) const {
 		uint32_t total = 0;
 		for (auto m : meshes_)
-			total += m->verts.size();
+			total += safe_static_cast<uint32_t,size_t>(m->verts.size());
 		return total;
 	}
 	uint32_t totalIndexs(void) const {
 		uint32_t total = 0;
 		for (auto m : meshes_)
-			total += m->faces.size();
+			total += safe_static_cast<uint32_t, size_t>(m->faces.size());
 		return total;
 	}
 

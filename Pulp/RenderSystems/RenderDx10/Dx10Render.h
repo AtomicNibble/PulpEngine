@@ -240,6 +240,7 @@ public:
 	// Shaders 
 	virtual void FX_PipelineShutdown() X_OVERRIDE;
 
+	virtual bool SetWorldShader(void);
 	virtual bool SetFFE(bool textured = false);
 	virtual bool SetFontShader();
 	virtual bool SetZPass();

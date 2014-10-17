@@ -173,11 +173,21 @@ model::IRenderMesh* XRender::createRenderMesh(void)
 {
 	model::XRenderMesh* pMesh = X_NEW_ALIGNED(
 		model::XRenderMesh,g_rendererArena,
-		"RenderMesh", X_ALIGN_OF(model::XRenderMesh))(nullptr,nullptr);
+		"RenderMesh", X_ALIGN_OF(model::XRenderMesh))();
 	
-
 	return pMesh;
 }
+
+model::IRenderMesh* XRender::createRenderMesh(model::MeshHeader* pMesh, 
+	shader::VertexFormat::Enum fmt, const char* name)
+{
+	model::XRenderMesh* pRenMesh = X_NEW_ALIGNED(
+		model::XRenderMesh, g_rendererArena,
+		"RenderMesh", X_ALIGN_OF(model::XRenderMesh))(pMesh, fmt, name);
+
+	return pRenMesh;
+}
+
 
 void XRender::freeRenderMesh(model::IRenderMesh* pMesh)
 {

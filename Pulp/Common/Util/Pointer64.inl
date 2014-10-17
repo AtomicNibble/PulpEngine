@@ -25,3 +25,21 @@ Pointer64<T>::operator T*() const
 {
 	return (T*)raw_;
 }
+
+template<typename T>
+template<typename Type>
+Type* Pointer64<T>::as() const
+{
+	return (Type*)raw_;
+}
+
+
+template<typename T>
+const T* Pointer64<T>::operator[](int i) const {
+	return ((T*)raw_ + i);
+}
+
+template<typename T>
+T* Pointer64<T>::operator[](int i) {
+	return ((T*)raw_ + i);
+}

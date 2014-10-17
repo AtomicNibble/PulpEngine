@@ -205,7 +205,7 @@ X_NAMESPACE_BEGIN(bsp)
 //
 //
 
-static const uint32_t	 BSP_VERSION = 4; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
+static const uint32_t	 BSP_VERSION = 7; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
 static const uint32_t	 BSP_FOURCC = X_TAG('x', 'l', 'v', 'l');
 static const uint32_t	 BSP_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r'); // if a file falid to write the final header, this will be it's FourCC
 // feels kinda wrong to call it a '.bsp', since it's otherthings as well. 
@@ -233,6 +233,8 @@ static const uint32_t	 MAP_MAX_PORTALS = 0x100;
 static const uint32_t	 MAP_MAX_SURFACES = 65536;		
 static const uint32_t	 MAP_MAX_MODELS = 0x400;			// a model is a 'area'.
 static const uint32_t	 MAP_MAX_MODEL_SURFACES = 65536;	// the maximum surfaces a map model can have.
+static const uint32_t	 MAP_MAX_MODEL_VERTS = 65536;		// the maximum verts a map model can have.
+static const uint32_t	 MAP_MAX_MODEL_INDEXES = 65536;		// the maximum indexes a map model can have.
 static const uint32_t	 MAP_MAX_MATERIALs = 0x800;		
 
 // Should be checked in compiler.
@@ -388,15 +390,13 @@ struct FileHeader
 
 	core::dateTimeStampSmall modified; // 4
 
-	// crc32 is made from just the lump info.
-	// used for reload checks only.
-	// -potentialy good for basic integreity checks.
-	// -as tricky to change 4 bytes in lump info to forge it.
-	// -if we don't allow a offset to be provided without a size that is. (currently allowed)
-	// -the crc32 value in the file could not be trusted tho, for obvious reasons.
+	// crc32 is just the header data
 	uint32_t datacrc32;
 
-	FileLump lumps[LumpType::ENUM_COUNT];
+	uint32_t datasize;
+	uint32_t numAreaModels;
+
+//	FileLump lumps[LumpType::ENUM_COUNT];
 
 	const bool isValid(void) const {
 		return fourCC == BSP_FOURCC;
@@ -418,12 +418,12 @@ X_ENSURE_SIZE(Brush, 12);
 
 X_ENSURE_SIZE(Leaf, 0x30);
 X_ENSURE_SIZE(Node, 0x24);
-X_ENSURE_SIZE(Portal, 0x28);
+// X_ENSURE_SIZE(Portal, 0x28);
 X_ENSURE_SIZE(Area, 0x28);
 
 
 X_ENSURE_SIZE(FileLump, 8);
-X_ENSURE_SIZE(FileHeader, (16 + (8 * LumpType::ENUM_COUNT)));
+// X_ENSURE_SIZE(FileHeader, (16 + (8 * LumpType::ENUM_COUNT)));
 
 X_NAMESPACE_END
 

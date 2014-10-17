@@ -182,7 +182,8 @@ BspEntity::BspEntity()
 	pPatches = nullptr;
 	mapEntity = nullptr;
 
-	firstDrawSurf = 0;
+	numBrushes = 0;
+	numPatches = 0;
 }
 
 // ------------------------------ Tris -----------------------------------

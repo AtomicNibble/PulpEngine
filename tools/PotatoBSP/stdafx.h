@@ -16,7 +16,6 @@
 
 #include "StringPair.h"
 
-#include "BSPFile.h"
 
 #include <IBsp.h>
 

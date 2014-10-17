@@ -215,7 +215,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="BSPData.h" />
-    <ClInclude Include="BSPFile.h" />
     <ClInclude Include="BSPTypes.h" />
     <ClInclude Include="EngineApp.h" />
     <ClInclude Include="HashIndex.h" />
@@ -231,15 +230,10 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BSPBrush.cpp" />
-    <ClCompile Include="BSPFilter.cpp" />
-    <ClCompile Include="BSPPortal.cpp" />
-    <ClCompile Include="BSPFaces.cpp" />
+    <ClCompile Include="BSPAreaModel.cpp" />
     <ClCompile Include="BSPFile.cpp" />
     <ClCompile Include="BSPProcess.cpp" />
-    <ClCompile Include="BSPSurface.cpp" />
     <ClCompile Include="BSPCompiler.cpp" />
-    <ClCompile Include="BSPSurfaceMeta.cpp" />
     <ClCompile Include="BSPTypes.cpp" />
     <ClCompile Include="EngineApp.cpp" />
     <ClCompile Include="HashIndex.cpp" />

@@ -40,7 +40,7 @@ bool XShader::FXSetTechnique(const core::StrHash& name)
 		}
 	}
 
-	X_WARNING("Shader", "failed to find technique: %s", name);
+	X_WARNING("Shader", "failed to find technique: %i", name);
 	return false;
 }
 
@@ -181,6 +181,33 @@ X_NAMESPACE_END
 // =========================================================
 
 X_NAMESPACE_BEGIN(render)
+
+
+
+bool DX11XRender::SetWorldShader()
+{
+	using namespace shader;
+
+	XShader* pSh = XShaderManager::m_FixedFunction;
+	uint32_t pass;
+
+	if (!pSh)
+		return false;
+
+	core::StrHash tech("Solid");
+
+	if (!pSh->FXSetTechnique(tech))
+		return false;
+
+	if (!pSh->FXBegin(&pass, 0))
+		return false;
+
+	if (!pSh->FXBeginPass(pass))
+		return false;
+
+	FX_ComitParams();
+	return true;
+}
 
 bool DX11XRender::SetFFE(bool textured)
 {

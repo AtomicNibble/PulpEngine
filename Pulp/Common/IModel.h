@@ -19,7 +19,7 @@ X_NAMESPACE_BEGIN(model)
 // The Model Foramts
 //
 //  File Ext: .model
-//	Version: 5.0 (i keep adding features / improving :( )
+//	Version: 6.0 (i keep adding features / improving :( )
 //  Info:
 //  
 //  This format contains the model info.
@@ -57,11 +57,15 @@ X_NAMESPACE_BEGIN(model)
 //		END
 //
 //
+//	Version 6:
+//		renamed some shit, and refactored some struts.
+//
+//
 
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
 #define X_MODEL_MTL_LOWER_CASE_NAMES 1
 
-static const uint32_t	 MODEL_VERSION = 5;
+static const uint32_t	 MODEL_VERSION = 6;
 static const uint32_t	 MODEL_MAX_BONES = 255;
 static const uint32_t	 MODEL_MAX_BONE_NAME_LENGTH = 64;
 static const uint32_t	 MODEL_MAX_MESH = 64;
@@ -158,14 +162,14 @@ struct VertexFull
 	uint8_t			_pad[4];
 }; // 64 bytes
 
-
-typedef Vec3<uint16_t> Face;
+typedef uint16_t Index;
+typedef Vec3<Index> Face;
 
 
 struct CompbindInfo
 {
 	CompbindInfo() {
-		core::zero_this(CompBinds_);
+		core::zero_object(CompBinds_);
 	}
 
 	uint16_t& operator[](int idx) {
@@ -193,19 +197,24 @@ private:
 	uint16_t CompBinds_[MODEL_MAX_VERT_BINDS];
 };
 
-
-struct MeshHeader
+// SubMeshHeader is part of a single mesh.
+// each SubMeshHeader typically has a diffrent material.
+// the submesh provides vertex / index Offsets, for the verts.
+// in the meshes IB / VB
+struct SubMeshHeader
 {
-	MeshHeader() {
+	SubMeshHeader() {
 		numVerts = 0;
-		numFaces = 0;
+		numIndexes = 0;
 		numBinds = 0;
 		_unused = 0;
+
+		core::zero_object(_pad);
 	}
 
 	// sizes
 	uint16_t numVerts;
-	uint16_t numFaces;
+	uint16_t numIndexes;
 	uint16_t numBinds;	// used for solid binds.
 	uint16_t _unused; // 8
 
@@ -213,8 +222,9 @@ struct MeshHeader
 	uint32_t startVertex;
 	uint32_t startIndex; // 8
 
-	core::Pointer64<Vertex>		verts; // 8
-	core::Pointer64<Face>		faces; // 8
+	// needs to be void, since we have diffrent vertex formats.
+	core::Pointer64<void>		verts; // 8
+	core::Pointer64<Index>		indexes; // 8
 
 	// 16
 	core::Pointer64<IMaterial> pMat;
@@ -226,11 +236,10 @@ struct MeshHeader
 	// bind sizes.
 	CompbindInfo CompBinds; // 8
 
-	AABB boundingBox;	// 24
-
 	// 80 so far.
 	// lots of spare pickle bytes to play with.
-	char __pad[32];
+	// should i add bounds info for each submesh?
+	AABB boundingBox;
 	char _pad[16];
 
 	// moved out since it takes lots of room.
@@ -239,46 +248,62 @@ struct MeshHeader
 	// which is set on load.
 //	core::StackString<MTL_MATERIAL_MAX_LEN> material;
 
-	X_NO_COPY(MeshHeader);
-	X_NO_ASSIGN(MeshHeader);
-}; // 128
+//	X_NO_COPY(SubMeshHeader);
+	X_NO_ASSIGN(SubMeshHeader);
+}; // 96
 
 
 
-// a lod is a single Vb / IB
-// mesh heads define the vertex offets / counts.
-struct LODHeader
+// a mesh is a single Vb / IB
+// It can have many sub-meshes.
+// for 3D Models it's limits are above.
+// level models have diffrent limits. <IBsp.h>
+// respect both when changing type sizes.
+struct MeshHeader
 {
-	LODHeader() : 
-	lodDistance(0.f),
-	numMesh(0),
+	MeshHeader() :
+	numSubMeshes(0),
 	_blank(0)
 	{}
 
-	// 8
-	float		lodDistance;
-	uint16_t	numMesh;
+	// 4
+	uint16_t	numSubMeshes; // levels support 65k sub meshes
 	uint16_t	_blank;
 
-	// 8 total of all meshes.
+	// 8 total of all sub-meshes.
 	uint32_t    numVerts;
-	uint32_t	numIndexs;
+	uint32_t	numIndexes;
 
 	// 4 + 4
 	Flags<MeshState> state;
 	uint32_t __blank;
 
 	// 8
-	core::Pointer64<MeshHeader> MeshHeads;
+	core::Pointer64<SubMeshHeader> subMeshHeads;
 
-	// Version 5, pointer to lods verts / faces.
-	core::Pointer64<Vertex>		verts; // 8
-	core::Pointer64<Face>		faces; // 8
+	// Version 5, pointer to meshes verts / faces.
+	// all sub meshes / index verts are stored contiguous
+	core::Pointer64<void>		verts; // 8
+	core::Pointer64<Index>		indexes; // 8
 
+	// 24
+	AABB boundingBox;	
 
-	X_NO_COPY(LODHeader);
-	X_NO_ASSIGN(LODHeader);
+	X_NO_COPY(MeshHeader);
+	X_NO_ASSIGN(MeshHeader);
 };
+
+
+// a lod is a mesh with a distance
+struct LODHeader : public MeshHeader
+{
+	LODHeader() :
+	lodDistance(0.f)
+	{}
+
+	float lodDistance;
+};
+
 
 class XModel // a loaded mesh
 {
@@ -309,12 +334,12 @@ public:
 	X_INLINE int totalMeshNum(void) const { return totalMeshNum_; }
 	X_INLINE bool hasLods(void) const { return numLods_ > 1; }
 	
-	X_INLINE const LODHeader& getLod(int idx) const { 
+	X_INLINE const LODHeader& getLod(int idx) const {
 		X_ASSERT(idx < numLods_, "invalid lod index")(numLods(), idx);
 		return lodInfo_[idx]; 
 	}
 
-	X_INLINE const MeshHeader* getMeshHead(int idx) const {
+	X_INLINE const SubMeshHeader* getMeshHead(int idx) const {
 		X_ASSERT(idx < totalMeshNum(), "invalid mesh index")(totalMeshNum(), idx);
 		return &pMeshHeads_[idx];
 	}
@@ -334,7 +359,7 @@ private:
 	const Vec3f*			pBonePos_;
 	// pointer to all the meshes headers for all lods
 	// sotred in lod order.
-	const MeshHeader*		pMeshHeads_; 
+	const SubMeshHeader*	pMeshHeads_;
 
 	int numLods_;
 	int numBones_;
@@ -363,7 +388,9 @@ struct ModelHeader // File header.
 	uint16_t materialNameDataSize;	// size of material name block
 	uint16_t tagNameDataSize;		// size of tag name block.
 
-	AABB boundingBox;
+	// do i need this?
+	// the lods store one for each mesh so kinda redundant.
+//	AABB boundingBox;
 
 	LODHeader lodInfo[MODEL_MAX_LODS];
 
@@ -382,9 +409,10 @@ X_ENSURE_SIZE(singleBind, 8);
 X_ENSURE_SIZE(Vertex, 32);
 X_ENSURE_SIZE(Face, 6);
 
-X_ENSURE_SIZE(MeshHeader, 128);
-X_ENSURE_SIZE(LODHeader, 48);
-X_ENSURE_SIZE(ModelHeader, (sizeof(LODHeader)*MODEL_MAX_LODS) + 48);
+X_ENSURE_SIZE(SubMeshHeader, 96);
+X_ENSURE_SIZE(MeshHeader, 0x48);
+X_ENSURE_SIZE(LODHeader, 0x48 + 8);
+X_ENSURE_SIZE(ModelHeader, (sizeof(LODHeader)*MODEL_MAX_LODS) + (48 - 24));
 
 
 

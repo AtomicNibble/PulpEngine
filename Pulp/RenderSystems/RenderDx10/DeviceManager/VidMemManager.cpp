@@ -441,6 +441,7 @@ bool VidMemManager::DeviceCreateIB(X3DBuffer* pBuf, const void* pData, const Cpu
 	if (pData) // optional data
 	{
 		ResData.pSysMem = pData;
+		ResData.SysMemPitch = 0;
 		pResData = &ResData;
 	}
 

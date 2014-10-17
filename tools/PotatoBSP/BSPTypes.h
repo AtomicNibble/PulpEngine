@@ -4,6 +4,8 @@
 #ifndef X_BSP_TYPES_H_
 #define X_BSP_TYPES_H_
 
+#include <IModel.h>
+
 #include <Containers\LinkedListIntrusive.h>
 
 #include "BSPData.h"
@@ -72,12 +74,13 @@ struct BspEntity
 {
 	BspEntity();
 
-	Vec3f					origin;
-//	BspPrimitive*			primitives;
-	int firstDrawSurf;
+	Vec3f				origin;
 
-	struct bspBrush*		pBrushes;
-	struct bspTris*			pPatches;
+	struct bspBrush*	pBrushes;
+	struct bspTris*		pPatches;
+
+	size_t	numBrushes;
+	size_t  numPatches;
 
 	mapfile::XMapEntity*	mapEntity;		// points to the map data this was made from.
 };
@@ -412,6 +415,20 @@ inline void FreeBrush(uBrush_t* brushes)
 
 #endif
 
+struct AreaModel
+{
+	AreaModel();
+
+	bool BelowLimits();
+	void BeginModel(const BspEntity& ent);
+	void EndModel();
+
+	core::Array<model::SubMeshHeader> meshes;
+	core::Array<bsp::Vertex> verts;
+	core::Array<model::Face> indexes;
+
+	model::MeshHeader model;
+};
 
 
 
@@ -423,10 +440,7 @@ public:
 	bool LoadFromMap(mapfile::XMapFile* map);
 	bool ProcessModels(void);
 
-
-	const BSPData& getCompiledData(void) {
-		return out_;
-	}
+	bool save(const char* filename);
 
 private:
 
@@ -461,148 +475,16 @@ private:
 	bool ProcessWorldModel(const BspEntity& ent);
 
 
-	bspFace* MakeStructuralBspFaceList(bspBrush* list);
-
-	// Face tree building.
-	bspTree* FaceBSP(bspFace* list);
-	void BuildFaceTree_r(bspNode* node, bspFace* list);
-
-	void SelectSplitPlaneNum(bspNode* node, bspFace* list, int *splitPlaneNum);
-
-
-	// Filter
-	void FilterStructuralBrushesIntoTree(const BspEntity& ent, bspTree* pTree);
-	int FilterBrushIntoTree_r(bspBrush* b, bspNode* node);
-
-	// Clip
-	void ClipSidesIntoTree(const BspEntity& ent, bspTree* pTree);
-	void ClipSideIntoTree_r(XWinding* w, BspSide *side, bspNode *node);
-
-	// bRush Util
-	void SplitBrush(bspBrush* brush, int planenum, bspBrush **front, bspBrush **back);
-
-	// Draw Surface
-	bspDrawSurface* DrawSurfaceForSide(const BspEntity& ent, bspBrush *b, BspSide *s, XWinding *w);
-
-	void AddEntitySurfaceModels(const BspEntity& ent);
-	int AddSurfaceModels(const bspDrawSurface& surface);
-
-
-	void FilterDrawsurfsIntoTree(const BspEntity& ent, bspTree* pTree);
-
-
-	static int CountFaceList(bspFace* list);
-
-
-	int FilterFaceIntoTree(bspDrawSurface* ds, bspTree* pTree);
-
-	void EmitFaceSurface(bspDrawSurface* ds);
-	void EmitTriangleSurface(bspDrawSurface* ds);
-
-
-	void MakeEntityMetaTriangles(const BspEntity& ent);
-	void TidyEntitySurfaces(const BspEntity& ent);
-
-	void StripFaceSurface(bspDrawSurface* ds);
-	void SurfaceToMetaTriangles(bspDrawSurface* ds);
-
-//	face_t *MakeStructuralBSPFaceList(brush_t *list);
-
-	/*
-	int FindFloatPlane(const Planef& plane);
-	
-
-
-	int SelectSplitPlaneNum(node_t* node, bspface_t* list);
-
-	float BrushVolume(uBrush_t* brush);
-
-	void SplitBrush(uBrush_t* brush, int planenum, uBrush_t **front, uBrush_t **back);
-	int FilterBrushIntoTree_r(uBrush_t *b, node_t *node);
-	void FilterBrushesIntoTree(uEntity_t *e);
-
-	// ---------
-
-	XWinding *BaseWindingForNode(node_t *node);
-	void MakeNodePortal(node_t *node);
-	void SplitNodePortals(node_t *node);
-	void MakeTreePortals_r(node_t *node);
-	void MakeTreePortals(tree_t *tree);
-
-	static void RemovePortalFromNode(uPortal_t  *portal, node_t *l);
-	static void CalcNodeBounds(node_t *node); 
-	static void MakeHeadnodePortals(tree_t *tree);
-	static void AddPortalToNodes(uPortal_t  *p, node_t *front, node_t *back);
-
-
-	// ---------
-
-	bool FloodEntities(tree_t *tree);
-	bool PlaceOccupant(node_t* headnode, Vec3f& origin, uEntity_t* occupant);
-
-	static void FloodPortals_r(node_t *node, int dist);
-
-	void FillOutside_r(node_t *node);
-	void FillOutside(uEntity_t *e);
-
-	// -------------------------
-
-	void ClipSideByTree_r(XWinding *w, side_t *side, node_t *node);
-	void ClipSidesByTree(uEntity_t *e);
-
-	// -------------------------
-
-	void FloodAreas(uEntity_t *e);
-
-	// -------------------------
-
-	void PutPrimitivesInAreas(uEntity_t *e);
-	void PutWindingIntoAreas_r(uEntity_t *e, const XWinding *w, side_t *side, node_t *node);
-	int CheckWindingInAreas_r(const XWinding *w, node_t *node);
-	void ClipTriIntoTree_r(XWinding *w, mapTri_t *originalTri, uEntity_t *e, node_t *node);
-	void AddMapTriToAreas(mapTri_t *tri, uEntity_t *e);
-
-	mapTri_t *TriListForSide(const side_t *s, const XWinding *w);
-	
-	// -------------------------
-
-	void Prelight(uEntity_t *e);
-	void CarveGroupsByLight(uEntity_t *e, mapLight_t *light);
-
-
-	// -------------------------
-
-	void BuildLightShadows(uEntity_t *e, mapLight_t *light);
-
-	// -------------------------
-
-	void FixGlobalTjunctions(uEntity_t *e);
-	void FixEntityTjunctions(uEntity_t *e);
-
-	// -------------------------
-
-	void WriteBspMap(primitive_t *list);
-	*/
-
-	void EmitDrawVerts(bspDrawSurface* ds, bsp::Surface* out);
-	void EmitDrawIndexes(bspDrawSurface* ds, bsp::Surface* out);
-
-
 private:
 	core::Array<BspEntity>		entities;
-	core::Array<bspDrawSurface> drawSurfs_;
-//	std::vector<mapLight_t*>	mapLights;
+	core::Array<AreaModel*>		areaModels;
 
+	//	core::Array<bspDrawSurface> drawSurfs_;
 
-	BSPData out_;
-
-	int numSurfacesByType_[DrawSurfaceType::ENUM_COUNT];
-
-	XPlaneSet planes;
-
-	AABB	mapBounds;
-
-	Vec3f blockSize_;
+	BSPData		data_;
+	XPlaneSet	planes;
+	AABB		mapBounds;
+	Vec3f		blockSize_;
 
 	struct Stats
 	{
@@ -616,6 +498,5 @@ private:
 	Stats stats_;
 };
 
-// extern MapGlobals gMapGlobals;
 
 #endif // X_BSP_TYPES_H_

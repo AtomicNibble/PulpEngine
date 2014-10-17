@@ -5,6 +5,7 @@
 
 #include "I3DEngine.h"
 #include "EngineBase.h"
+#include "Bsp.h"
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -29,6 +30,8 @@ private:
 
 	int width;
 	int height;
+
+	bsp::Bsp map;
 };
 
 

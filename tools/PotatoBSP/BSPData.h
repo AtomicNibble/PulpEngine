@@ -17,7 +17,6 @@ struct BSPData
 
 	core::Array<bsp::Area> areas;
 	core::Array<bsp::Surface> surfaces;
-
 	core::Array<bsp::Vertex> verts;
 	core::Array<bsp::Index> indexes;
 };

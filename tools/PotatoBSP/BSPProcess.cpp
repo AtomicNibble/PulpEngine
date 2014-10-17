@@ -1,7 +1,207 @@
 #include "stdafx.h"
 #include "BSPTypes.h"
 
+#include <Containers\FixedArray.h>
 
+#include <IModel.h>
+
+namespace
+{
+
+	// ---------------------------------------------
+	static const size_t MAX_INDEXES = 1024;
+
+#define TINY_AREA   1.0f
+
+	bool IsTriangleDegenerate(bsp::Vertex* points, const model::Face& face)
+	{
+		Vec3f v1, v2, v3;
+		float d;
+
+		v1 = points[face.y].pos = points[face.x].pos;
+		v2 = points[face.z].pos = points[face.x].pos;
+		v3 = v2.cross(v1);
+		d = v3.length();
+
+
+		// assume all very small or backwards triangles will cause problems 
+		if (d < TINY_AREA) {
+			return true;
+		}
+
+		return false;
+	}
+
+
+	bool FanFaceSurface(AreaModel* pArea, model::SubMeshHeader& mesh)
+	{
+		int i, j;
+		bsp::Vertex *verts, *centroid, *dv;
+		float iv;
+
+		int numVerts = mesh.numVerts;
+
+		verts = &pArea->verts[mesh.startVertex];
+
+		pArea->verts.insert(bsp::Vertex(), mesh.startVertex);
+
+		centroid = &pArea->verts[mesh.startVertex];
+		// add up the drawverts to create a centroid 
+  		for (i = 1, dv = &verts[1]; i < (numVerts + 1); i++, dv++)
+		{
+			centroid->pos += dv->pos;
+			centroid->normal += dv->normal;
+			for (j = 0; j < 4; j++)
+			{
+				if (j < 2) {
+			//		centroid->st[j] += dv->st[j];
+				}
+			}
+		}
+
+		// average the centroid 
+		iv = 1.0f / numVerts;
+		centroid->pos *= iv;
+		centroid->normal.normalize();
+	//	if (centroid->normal.normalize() <= 0) {
+	//		VectorCopy(verts[1].normal, centroid->normal);
+	//	}
+		for (j = 0; j < 4; j++)
+		{
+			if (j < 2) {
+	//			centroid->st[j] *= iv;
+			}
+		}
+
+		// add to vert count 
+		mesh.numVerts++;
+
+		// fill indexes in triangle fan order 
+		mesh.numIndexes = 0;
+		for (i = 1; i < mesh.numVerts; i++)
+		{
+			model::Face face;
+			face.x = 0;
+			face.y = i;
+			face.z = (i + 1) % mesh.numVerts;
+			face.z = face.z ? face.z : 1;
+
+			pArea->indexes.append(face);
+		}
+
+		return true;
+	}
+
+
+	bool createIndexs(AreaModel* pArea, model::SubMeshHeader& mesh)
+	{
+		X_ASSERT_NOT_NULL(pArea);
+
+		int least;
+		int i, r, ni;
+		int rotate;
+		int numIndexes;
+		int numVerts;
+		bsp::Vertex* pVerts;
+		core::FixedArray<model::Face, 1024> indexes;
+
+		numVerts = mesh.numVerts;
+		pVerts = &pArea->verts[mesh.startVertex];
+
+		X_ASSERT_NOT_NULL(pVerts);
+
+		if (numVerts == 0)
+		{
+			X_WARNING("Bsp", "submesh has zero verts");
+			return false;
+		}
+
+		// is this a simple triangle? 
+		if (numVerts == 3)
+		{
+			pArea->indexes.append(model::Face(0, 1, 2));
+			mesh.numIndexes = 3;
+			return true;
+		}
+		else
+		{
+			least = 0;
+
+			// determine ho many indexs are needed.
+			numIndexes = (numVerts - 2) * 3;
+
+			if (numIndexes > indexes.capacity())
+			{
+				X_ERROR("Meta", "MAX_INDEXES exceeded for surface (%d > %d) (%d verts)",
+					numIndexes, indexes.capacity(), numVerts);
+			}
+
+			// try all possible orderings of the points looking for a non-degenerate strip order 
+			for (r = 0; r < numVerts; r++)
+			{
+				// set rotation 
+				rotate = (r + least) % numVerts;
+
+				// walk the winding in both directions 
+				for (ni = 0, i = 0; i < numVerts - 2 - i; i++)
+				{
+					// make indexes 
+					model::Face face;
+					face.x = (numVerts - 1 - i + rotate) % numVerts;
+					face.y = (i + rotate) % numVerts;
+					face.z = (numVerts - 2 - i + rotate) % numVerts;
+
+					// test this triangle 
+					if (numVerts > 4 && IsTriangleDegenerate(pVerts, face)) {
+						break;
+					}
+					indexes.append(face);
+
+					// handle end case 
+					if (i + 1 != numVerts - 1 - i)
+					{
+						// make indexes 
+						face.x = (numVerts - 2 - i + rotate) % numVerts;
+						face.y = (i + rotate) % numVerts;
+						face.z = (i + 1 + rotate) % numVerts;
+
+						// test triangle 
+						if (numVerts > 4 && IsTriangleDegenerate(pVerts, face)) {
+							break;
+						}
+
+						indexes.append(face);
+					}
+				}
+
+				// valid strip? 
+				if ((indexes.size() * 3) == numIndexes) {
+					break;
+				}
+
+				indexes.clear();
+			}
+
+			// if any triangle in the strip is degenerate, render from a centered fan point instead 
+			if ((indexes.size() * 3) < numIndexes)
+			{
+				return FanFaceSurface(pArea, mesh);
+			}
+		}
+
+		core::FixedArray<model::Face, 1024>::const_iterator it = indexes.begin();
+
+		for (; it != indexes.end(); ++it)
+		{
+			pArea->indexes.append(*it);
+		}
+
+		mesh.numIndexes = safe_static_cast<uint32_t,size_t>(indexes.size() * 3);
+		return true;
+	}
+
+
+}
 
 bool BSPBuilder::ProcessModels(void)
 {
@@ -43,349 +243,76 @@ bool BSPBuilder::ProcessModel(const BspEntity& ent)
 	return true;
 }
 
+
+
+
 bool BSPBuilder::ProcessWorldModel(const BspEntity& ent)
 {
-	bspFace*	pFaces;
-	bspTree*	pTree;
+	X_LOG0("Bsp", "Processing World Entity");
+	AreaModel* pArea;
+	bspBrush* pBrush;
+	size_t i;
+	int x, p;
 
-	pFaces = MakeStructuralBspFaceList(ent.pBrushes);
-	pTree = FaceBSP(pFaces);
+	pArea = X_NEW(AreaModel, g_arena, "AreaModel");
+	pArea->BeginModel(ent);
 
+	areaModels.append(pArea);
+	
+	// Split the map via portals.
+	// each area is then turned into a model.
+	// Each brush is made into a subMesh.
+	// and the verts + indexes added to the models buffer.
 
-	FilterStructuralBrushesIntoTree(ent, pTree);
+	pBrush = ent.pBrushes;
 
-
-	ClipSidesIntoTree(ent, pTree);
-
-
-	AddEntitySurfaceModels(ent);
-
-
-
-	// ydnar: meta surfaces 
-	MakeEntityMetaTriangles(ent);
-//	SmoothMetaTriangles();
-//	FixMetaTJunctions();
-//	MergeMetaTriangles();
-
-
-	FilterDrawsurfsIntoTree(ent, pTree);
-
-
-	return true;
-}
-
-
-
-// ---------------------------------------------
-
-
-
-void BSPBuilder::AddEntitySurfaceModels(const BspEntity& ent)
-{
-	int i;
-	int num = safe_static_cast<int, size_t>(drawSurfs_.size());
-
-	int numSurfaceModels = 0;
-	for (i = ent.firstDrawSurf; i < num; i++)
+	for (i = 0; i < ent.numBrushes; i++)
 	{
-		numSurfaceModels += AddSurfaceModels(drawSurfs_[i]);
-	}
-
-}
-
-int BSPBuilder::AddSurfaceModels(const bspDrawSurface& surface)
-{
-
-	return 1;
-}
-
-
-// ---------------------------------------------
-
-/*
-FilterDrawsurfsIntoTree()
-upon completion, all drawsurfs that actually generate a reference
-will have been emited to the bspfile arrays, and the references
-will have valid final indexes
-*/
-
-void BSPBuilder::FilterDrawsurfsIntoTree(const BspEntity& ent, bspTree* pTree)
-{
-	int i;
-	bspDrawSurface    *ds;
-
-	Vec3f origin;
-	// mins, maxs;
-
-	int refs;
-	int numSurfs, numRefs, numSkyboxSurfaces;
-
-
-	X_LOG0("Bsp", "--- FilterDrawsurfsIntoTree ---");
-
-	numSurfs = 0;
-	numRefs = 0;
-	numSkyboxSurfaces = 0;
-	for (i = ent.firstDrawSurf; i < (int)drawSurfs_.size(); i++)
-	{
-		/* get surface and try to early out */
-		ds = &drawSurfs_[i];
-		if (ds->numVerts == 0) {
-			continue;
-		}
-
-		refs = 0;
-
-		switch (ds->type)
+		X_ASSERT_NOT_NULL(pBrush);
+		for (x = 0; x < pBrush->numsides; x++)
 		{
-			case DrawSurfaceType::FACE:
-				if (refs == 0) 
-					refs = FilterFaceIntoTree(ds, pTree);
-				if (refs > 0) 
-					EmitFaceSurface(ds);
-			break;
+			if (!pBrush->sides[x].pWinding)
+				continue;
 
-			default:
-				refs = 0;
-			break;
-		}
+			model::SubMeshHeader mesh;
 
-		// tot up the references 
-		if (refs > 0)
-		{
-			// tot up counts 
-			numSurfs++;
-			numRefs += refs;
+			mesh.boundingBox = pBrush->bounds;
+			mesh.startVertex = safe_static_cast<uint32_t, size_t>(pArea->verts.size());
+			mesh.startIndex = safe_static_cast<uint32_t, size_t>(pArea->indexes.size() * 3);
 
-			// emit extra surface data 
-		//	SetSurfaceExtra(ds, numBSPDrawSurfaces - 1);
-			//%	Sys_FPrintf( SYS_VRB, "%d verts %d indexes\n", ds->numVerts, ds->numIndexes );
+			const BspSide& side = pBrush->sides[x];
+			const XWinding* w = side.pWinding;
 
-			// one last sanity check 
-#if 0
+			int numPoints = w->GetNumPoints();
+			for (p = 0; p < numPoints; p++)
 			{
-				bspDrawSurface_t    *out;
-				out = &bspDrawSurfaces[numBSPDrawSurfaces - 1];
-				if (out->numVerts == 3 && out->numIndexes > 3) {
-					Sys_Printf("\nWARNING: Potentially bad %s surface (%d: %d, %d)\n     %s\n",
-						surfaceTypes[ds->type],
-						numBSPDrawSurfaces - 1, out->numVerts, out->numIndexes, si->shader);
-				}
+				bsp::Vertex vert;
+
+				vert.pos = (*w)[p];
+				vert.normal = planes[side.planenum].getNormal();
+				vert.color = Col_White;
+				
+				pArea->verts.append(vert);
 			}
-#endif
-		}
+
+			mesh.numVerts = numPoints;
+
+			// create some indexes
+			createIndexs(pArea, mesh);
+
+			pArea->meshes.append(mesh);
+		}	
+
+		pBrush = pBrush->next;
 	}
+	
+	if (!pArea->BelowLimits())
+		return false;
 
-	/* emit some statistics */
-	X_LOG0("Stats", "%9d references", numRefs);
-/*	X_LOG0("Stats", "%9d (%d) emitted drawsurfs", numSurfs, numBSPDrawSurfaces);
-	X_LOG0("Stats", "%9d stripped face surfaces", numStripSurfaces);
-	X_LOG0("Stats", "%9d fanned face surfaces", numFanSurfaces);
-	X_LOG0("Stats", "%9d surface models generated", numSurfaceModels);
-	X_LOG0("Stats", "%9d skybox surfaces generated", numSkyboxSurfaces);
-	for (i = 0; i < DrawSurfaceType::ENUM_COUNT; i++)
-		X_LOG0("Stats", "%9d %s surfaces", numSurfacesByType[i], surfaceTypes[i]);
+	pArea->EndModel();
 
-	X_LOG0("Stats", "%9d redundant indexes supressed, saving %d Kbytes", numRedundantIndexes, (numRedundantIndexes * 4 / 1024));
-	*/
-}
-
-int BSPBuilder::FilterFaceIntoTree(bspDrawSurface* ds, bspTree* pTree)
-{
-//	XWinding* w;
-//	int refs = 0;
-
-	// make a winding and filter it into the tree 
-//	w = WindingFromDrawSurf(ds);
-//	refs = FilterWindingIntoTree_r(w, ds, pTree->headnode);
-
-
-	return 1;
+ 	return true;
 }
 
 
 
-void BSPBuilder::EmitFaceSurface(bspDrawSurface* ds)
-{
-	EmitTriangleSurface(ds);
-}
-
-
-/*
-EmitTriangleSurface()
-creates a bsp drawsurface from arbitrary triangle surfaces
-*/
-
-void BSPBuilder::EmitTriangleSurface(bspDrawSurface* ds)
-{
-//	int i, temp;
-	bsp::Surface        *out;
-
-
-	// invert the surface if necessary 
-/*	if (ds->backSide || ds->shaderInfo->invert)
-	{
-		// walk the indexes, reverse the triangle order 
-		for (i = 0; i < ds->numIndexes; i += 3)
-		{
-			temp = ds->indexes[i];
-			ds->indexes[i] = ds->indexes[i + 1];
-			ds->indexes[i + 1] = temp;
-		}
-
-		// walk the verts, flip the normal 
-		for (i = 0; i < ds->numVerts; i++)
-			VectorScale(ds->verts[i].normal, -1.0f, ds->verts[i].normal);
-
-		// invert facing 
-		VectorScale(ds->lightmapVecs[2], -1.0f, ds->lightmapVecs[2]);
-	}
-	*/
-
-	// allocate a new surface 
-//	if (numBSPDrawSurfaces == MAX_MAP_DRAW_SURFS) {
-//		Error("MAX_MAP_DRAW_SURFS");
-//	}
-//	out = &bspDrawSurfaces[numBSPDrawSurfaces];
-//	ds->outputNum = numBSPDrawSurfaces;
-//	numBSPDrawSurfaces++;
-//	memset(out, 0, sizeof(*out));
-
-
-	out_.surfaces.append(bsp::Surface());
-	out = out_.surfaces.end() - 1;
-	out->materialIdx = -1;
-	out->surfaceType = bsp::SurfaceType::Patch;
-
-	ds->outputNum = safe_static_cast<int,size_t>(out_.surfaces.size());
-
-
-
-	/* ydnar: gs mods: handle lightmapped terrain (force to planar type) */
-	//%	else if( VectorLength( ds->lightmapAxis ) <= 0.0f || ds->type == SURFACE_TRIANGLES || ds->type == SURFACE_FOGHULL || debugSurfaces )
-/*	else if ((VectorLength(ds->lightmapAxis) <= 0.0f && ds->planar == qfalse) ||
-		ds->type == SURFACE_TRIANGLES ||
-		ds->type == SURFACE_FOGHULL ||
-		ds->numVerts > maxLMSurfaceVerts ||
-		debugSurfaces) {
-		out->surfaceType = MST_TRIANGLE_SOUP;
-	}
-	else */
-	{
-//		out->surfaceType = MST_PLANAR;
-	}
-
-	/* set it up */
-/*	if (debugSurfaces) {
-		out->shaderNum = EmitShader("debugsurfaces", NULL, NULL);
-	}
-	else{
-		out->shaderNum = EmitShader(ds->shaderInfo->shader, &ds->shaderInfo->contentFlags, &ds->shaderInfo->surfaceFlags);
-	}
-	*/
-
-//	out->patchWidth = ds->patchWidth;
-//	out->patchHeight = ds->patchHeight;
-//	out->fogNum = ds->fogNum;
-
-	// debug inset (push each triangle vertex towards the center of each triangle it is on 
-/*	if (debugInset) 
-{
-		bspDrawVert_t   *a, *b, *c;
-		vec3_t cent, dir;
-
-
-		// nwalk triangle list 
-		for (i = 0; i < ds->numIndexes; i += 3)
-		{
-			// get verts 
-			a = &ds->verts[ds->indexes[i]];
-			b = &ds->verts[ds->indexes[i + 1]];
-			c = &ds->verts[ds->indexes[i + 2]];
-
-			// calculate centroid 
-			VectorCopy(a->xyz, cent);
-			VectorAdd(cent, b->xyz, cent);
-			VectorAdd(cent, c->xyz, cent);
-			VectorScale(cent, 1.0f / 3.0f, cent);
-
-			// offset each vertex 
-			VectorSubtract(cent, a->xyz, dir);
-			VectorNormalize(dir, dir);
-			VectorAdd(a->xyz, dir, a->xyz);
-			VectorSubtract(cent, b->xyz, dir);
-			VectorNormalize(dir, dir);
-			VectorAdd(b->xyz, dir, b->xyz);
-			VectorSubtract(cent, c->xyz, dir);
-			VectorNormalize(dir, dir);
-			VectorAdd(c->xyz, dir, c->xyz);
-		}
-	}*/
-
-	// RBSP 
-/*	for (i = 0; i < MAX_LIGHTMAPS; i++)
-	{
-		out->lightmapNum[i] = -3;
-		out->lightmapStyles[i] = LS_NONE;
-		out->vertexStyles[i] = LS_NONE;
-	}
-	out->lightmapStyles[0] = LS_NORMAL;
-	out->vertexStyles[0] = LS_NORMAL;
-*/
-
-	/*
-	// lightmap vectors (lod bounds for patches 
-	VectorCopy(ds->lightmapOrigin, out->lightmapOrigin);
-	VectorCopy(ds->lightmapVecs[0], out->lightmapVecs[0]);
-	VectorCopy(ds->lightmapVecs[1], out->lightmapVecs[1]);
-	VectorCopy(ds->lightmapVecs[2], out->lightmapVecs[2]);
-
-	// ydnar: gs mods: clear out the plane normal 
-	if (ds->planar == qfalse) {
-		VectorClear(out->lightmapVecs[2]);
-	}
-*/
-
-	// optimize the surface's triangles 
-//	OptimizeTriangleSurface(ds);
-
-	// emit the verts and indexes 
-	EmitDrawVerts(ds, out);
-	EmitDrawIndexes(ds, out);
-
-	// add to count 
-	numSurfacesByType_[ds->type]++;
-}
-
-
-
-// ----------------------
-
-void BSPBuilder::EmitDrawVerts(bspDrawSurface* ds, bsp::Surface* out)
-{
-	int i;
-
-	// copy the verts 
-	out->vertexStartIdx = safe_static_cast<int, size_t>(out_.verts.size());
-	out->numVerts = ds->numVerts;
-
-	for (i = 0; i < ds->numVerts; i++)
-	{
-		out_.verts.append(ds->pVerts[i]);
-	}
-}
-
-void BSPBuilder::EmitDrawIndexes(bspDrawSurface* ds, bsp::Surface* out)
-{
-	int i;
-
-	// copy indexs
-	out->indexStartIdx = safe_static_cast<int,size_t>(out_.indexes.size());
-	out->numIndexes = ds->numVerts;
-
-	for (i = 0; i < ds->numIndexes; i++)
-	{
-		out_.indexes.append(ds->pIndexes[i]);
-	}
-}

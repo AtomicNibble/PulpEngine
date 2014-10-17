@@ -59,7 +59,7 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 	{
 		LODHeader& lod = header_.lodInfo[i];
 
-		if (lod.numMesh == 0) {
+		if (lod.numSubMeshes == 0) {
 			X_ERROR("Model", "model lod(%i) has no meshes defined", i);
 			return false;
 		}
@@ -67,7 +67,7 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 			X_ERROR("Model", "model lod(%i) has no verts defined", i);
 			return false;
 		}
-		if (lod.numIndexs == 0) {
+		if (lod.numIndexes == 0) {
 			X_ERROR("Model", "model lod(%i) has no indexs defined", i);
 			return false;
 		}
@@ -111,7 +111,7 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 	model.pTagTree_ = cursor.postSeekPtr<uint8_t>(numBone);
 	model.pBoneAngles_ = cursor.postSeekPtr<XQuatCompressedf>(numBone);
 	model.pBonePos_ = cursor.postSeekPtr<Vec3f>(numBone);
-	model.pMeshHeads_ = cursor.getPtr<MeshHeader>();
+	model.pMeshHeads_ = cursor.getPtr<SubMeshHeader>();
 	model.pData_ = pData;
 
 	// we now have the mesh headers.
@@ -119,7 +119,7 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 	{
 		LODHeader& lod = header_.lodInfo[i];
 
-		lod.MeshHeads = cursor.postSeekPtr<MeshHeader>(lod.numMesh);
+		lod.subMeshHeads = cursor.postSeekPtr<SubMeshHeader>(lod.numSubMeshes);
 	}
 
 	// ok we now need to set vert and face pointers.
@@ -130,26 +130,26 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 
 		// we have 3 blocks of data.
 		// Verts, Faces, Binddata
-		MeshHeader* meshHeads = lod.MeshHeads;
+		SubMeshHeader* meshHeads = lod.subMeshHeads;
 
 		// verts
-		for (x = 0; x < lod.numMesh; x++)
+		for (x = 0; x < lod.numSubMeshes; x++)
 		{
-			MeshHeader& mesh = meshHeads[x];
+			SubMeshHeader& mesh = meshHeads[x];
 			mesh.verts = cursor.postSeekPtr<Vertex>(mesh.numVerts);
 		}
 
 		// Faces
-		for (x = 0; x < lod.numMesh; x++)
+		for (x = 0; x < lod.numSubMeshes; x++)
 		{
-			MeshHeader& mesh = meshHeads[x];
-			mesh.faces = cursor.postSeekPtr<Face>(mesh.numFaces);
+			SubMeshHeader& mesh = meshHeads[x];
+			mesh.indexes = cursor.postSeekPtr<Index>(mesh.numIndexes);
 		}
 
 		// BindData
-		for (x = 0; x < lod.numMesh; x++)
+		for (x = 0; x < lod.numSubMeshes; x++)
 		{
-			MeshHeader& mesh = meshHeads[x];
+			SubMeshHeader& mesh = meshHeads[x];
 
 			uint32_t size = (uint32_t)mesh.CompBinds.dataSizeTotal();
 
@@ -157,7 +157,7 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 		}
 
 		lod.verts = meshHeads[0].verts;
-		lod.faces = meshHeads[0].faces;
+		lod.indexes = meshHeads[0].indexes;
 	}
 
 	
@@ -170,7 +170,7 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 		core::StackString<MTL_MATERIAL_MAX_LEN> name;
 		for (i = 0; i < header_.numMesh; i++)
 		{		
-			MeshHeader* pMesh = const_cast<MeshHeader*>(&model.pMeshHeads_[i]);
+			SubMeshHeader* pMesh = const_cast<SubMeshHeader*>(&model.pMeshHeads_[i]);
 			// set the pointer.
 			pMesh->materialName = mat_name_cursor.getPtr<const char>();
 
@@ -250,8 +250,7 @@ bool ModelHeader::isValid(void) const
 		numLod > 0 &&
 		numLod <= MODEL_MAX_LODS &&
 		materialNameDataSize > 0 &&
-		subDataSize > 0 && // replace 0 with a real min later. TODO
-		!boundingBox.isEmpty();
+		subDataSize > 0; // replace 0 with a real min later. TODO
 }
 
 X_NAMESPACE_END

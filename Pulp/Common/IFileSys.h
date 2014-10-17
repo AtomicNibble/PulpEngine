@@ -134,6 +134,11 @@ struct XFile
 		return write(&object, sizeof(T));
 	}
 
+	template <typename T>
+	inline uint32_t writeObj(const T* objects, size_t num) {
+		return write(objects, safe_static_cast<uint32_t, size_t>(sizeof(T)* num));
+	}
+
 	inline uint32_t writeString(const char* str) {
 		return write(str, safe_static_cast<uint32_t, size_t>(strlen(str) + 1));
 	}
@@ -377,15 +382,15 @@ public:
 #endif
 
 
+	inline uint32_t write(const void* pBuf, size_t Len) {
+		X_ASSERT_NOT_NULL(pFile_);
+		return pFile_->write(pBuf, safe_static_cast<uint32_t, size_t>(Len));
+	}
 	inline uint32_t write(const void* pBuf, uint32_t Len) {
 		X_ASSERT_NOT_NULL(pFile_);
 		return pFile_->write(pBuf, Len);
 	}
 
-	inline uint32_t write(const void* pBuf, size_t Len) {
-		X_ASSERT_NOT_NULL(pFile_);
-		return pFile_->write(pBuf, safe_static_cast<uint32_t,size_t>(Len));
-	}
 
 	inline void seek(size_t position, SeekMode::Enum origin) {
 		X_ASSERT_NOT_NULL(pFile_);

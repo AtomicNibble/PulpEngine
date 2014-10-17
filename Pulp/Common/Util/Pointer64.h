@@ -18,6 +18,13 @@ public:
 	X_INLINE Pointer64& operator = (T* p);
 	X_INLINE operator T*() const;
 
+	template<typename Type>
+	X_INLINE Type* as() const;
+
+
+	X_INLINE const T* operator[](int i) const;
+	X_INLINE T* operator[](int i);
+
 private:
 	//should be ok since same type.
 //	X_NO_ASSIGN(Pointer64);

@@ -1526,7 +1526,7 @@ bool MayaModel::save(const char *filename)
 		header.numLod = safe_static_cast<uint8_t, size_t>(numLods);
 		header.numMesh = safe_static_cast<uint8_t, size_t>(totalMeshes());
 		header.modified = core::dateTimeStampSmall::systemDateTime();
-		header.boundingBox = this->boundingBox;
+//		header.boundingBox = this->boundingBox;
 
 		// Sizes
 		header.tagNameDataSize = this->calculateTagNameDataSize();
@@ -1545,15 +1545,15 @@ bool MayaModel::save(const char *filename)
 		{
 			model::LODHeader& lod = header.lodInfo[i];
 			lod.lodDistance = g_options.lodInfo_[i].distance;
-			lod.numMesh = safe_static_cast<uint16_t,size_t>(lods_[i].numMeshes());
+			lod.numSubMeshes = safe_static_cast<uint16_t,size_t>(lods_[i].numMeshes());
 			// we want to know the offset o.o
-			lod.MeshHeads = meshHeadOffsets;
+			lod.subMeshHeads = meshHeadOffsets;
 
 			// version 5.0 info
 			lod.numVerts = lods_[i].totalVerts();
-			lod.numIndexs = lods_[i].totalIndexs();
+			lod.numIndexes = lods_[i].totalIndexs();
 
-			meshHeadOffsets += lod.numMesh * sizeof(model::MeshHeader);
+			meshHeadOffsets += lod.numSubMeshes * sizeof(model::MeshHeader);
 		}
 
 		fwrite(&header, sizeof(header), 1, f);
@@ -1639,14 +1639,14 @@ bool MayaModel::save(const char *filename)
 
 				for (x = 0; x < meshes->size(); x++)
 				{
-					model::MeshHeader mesh;
+					model::SubMeshHeader mesh;
 					core::zero_object(mesh);
 
 					MayaMesh* pMesh = (*meshes)[x];
 
 					mesh.numBinds = 0;
 					mesh.numVerts = safe_static_cast<uint16_t, size_t>(pMesh->verts.size());
-					mesh.numFaces = safe_static_cast<uint16_t, size_t>(pMesh->faces.size());
+					mesh.numIndexes = safe_static_cast<uint16_t, size_t>(pMesh->faces.size());
 			//		mesh.material = pMesh->material;
 					mesh.CompBinds = pMesh->CompBinds;
 					mesh.boundingBox = pMesh->boundingBox;
@@ -1657,11 +1657,11 @@ bool MayaModel::save(const char *filename)
 
 					// inc the offsets
 					vertOffset += mesh.numVerts;
-					indexOffset += mesh.numFaces;
+					indexOffset += mesh.numIndexes;
 
 					g_stats.totalMesh++;
 					g_stats.totalVerts += mesh.numVerts;
-					g_stats.totalFaces += mesh.numFaces;
+					g_stats.totalFaces += mesh.numIndexes;
 
 					fwrite(&mesh, sizeof(mesh), 1, f);
 				}

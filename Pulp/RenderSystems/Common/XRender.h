@@ -115,6 +115,8 @@ public:
 
 	// Model
 	virtual model::IRenderMesh* createRenderMesh(void) X_OVERRIDE;
+	virtual model::IRenderMesh* createRenderMesh(model::MeshHeader* pMesh, 
+		shader::VertexFormat::Enum fmt, const char* name) X_OVERRIDE;
 	virtual void freeRenderMesh(model::IRenderMesh* pMesh) X_OVERRIDE;
 
 	// ~Model

@@ -9,7 +9,7 @@
 
 #include "MapLoader.h"
 #include "BSPTypes.h"
-#include "BSPFile.h"
+
 
 #define _LAUNCHER
 #include <ModuleExports.h>
@@ -78,7 +78,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 			core::Path name;
 			name.setFileName("basic - Copy.map");
 			name.setFileName("alcatraz.map");
-		//	name.setFileName("killzone.map");
+			name.setFileName("killzone.map");
 			name.setFileName("box.map");
 			
 			CompileBSP(name);
@@ -126,34 +126,25 @@ void CompileBSP(core::Path& path)
 			}
 
 			// all loaded time to get naked.
-			// 
-
 			if (bsp.LoadFromMap(&map))
 			{
 				if (bsp.ProcessModels())
 				{
-					bsp::BSPFile writer;
-
-					if (writer.save(bsp.getCompiledData(), path.fileName()))
+					if (bsp.save(path.fileName()))
 					{
-						X_LOG0("Bsp", "saved as: %s", path.fileName());
+						X_LOG0("Bsp", "saved as: \"%s\"", path.fileName());
 					}
 					else
 					{
-						X_ERROR("Bsp", "Failed to save: %s", path.fileName());
+						X_ERROR("Bsp", "Failed to save: \"%s\"", path.fileName());
 					}
-
 				}
 			}
 
 
 			end = gEnv->pTimer->GetAsyncTime();
 			X_LOG0("Info", "Total Time: %.4fms", (end - start).GetMilliSeconds());
-			
-	//		gEnv->pCore->GetIProfileSys()->FrameEnd();
 		}
-
-	//	system("pause");
 
 		gEnv->pFileSys->closeFileMem(pFile);
 	}

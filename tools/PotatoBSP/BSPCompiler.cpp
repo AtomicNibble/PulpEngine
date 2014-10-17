@@ -27,12 +27,11 @@ X_USING_NAMESPACE;
 
 BSPBuilder::BSPBuilder() :
 entities(g_arena),
-drawSurfs_(g_arena),
-out_(g_arena)
+areaModels(g_arena),
+data_(g_arena)
 {
 	core::zero_object(stats_);
 
-	drawSurfs_.reserve(4096 * 4);
 }
 
 
@@ -41,9 +40,7 @@ bool BSPBuilder::LoadFromMap(mapfile::XMapFile* map)
 	X_ASSERT_NOT_NULL(map);
 
 	int i;
-	int triSurfs;
 	bspBrush* pBrush;
-	bspTris* pTris;
 
 	// Bitch i've told you once!
 	// don't make me tell you again.
@@ -54,25 +51,27 @@ bool BSPBuilder::LoadFromMap(mapfile::XMapFile* map)
 	
 	entities.resize(map->getNumEntities());
 
-	for (i = 0; i < map->getNumEntities(); i++) {
+	for (i = 0; i < map->getNumEntities(); i++)
+	{
 		processMapEntity(entities[i], map->getEntity(i));
 	}
 
-	triSurfs = 0;
 
 	// get bounds of map.
 	mapBounds.clear();
+
+
 	for (pBrush = entities[0].pBrushes; pBrush; pBrush = pBrush->next) {
 		mapBounds.add(pBrush->bounds);
 	}
-	for (pTris = entities[0].pPatches; pTris; pTris = pTris->next) {
-		triSurfs++;
-	}
+
+	// TODO: add patches to bounds?
 
 
-	X_LOG0("Map", "Total world brush: %i", stats_.numBrushes);
-	X_LOG0("Map", "Total world Surfs: %i", triSurfs);
-	X_LOG0("Map", "Total patches: %i", stats_.numPatches);
+	X_LOG0("Map", "Total world brush: %i", entities[0].numBrushes);
+	X_LOG0("Map", "Total world patches: %i", entities[0].numBrushes);
+	X_LOG0("Map", "Total total brush: %i", stats_.numBrushes);
+	X_LOG0("Map", "Total total patches: %i", stats_.numPatches);
 	X_LOG0("Map", "Total entities: %i", stats_.numEntities);
 	X_LOG0("Map", "Total planes: %i", this->planes.size());
 	X_LOG0("Map", "Total areapotrals: %i", stats_.numAreaPortals);
@@ -132,6 +131,7 @@ bool BSPBuilder::processBrush(BspEntity& ent, mapfile::XMapBrush* mapBrush, int 
 	int				i;
 
 	stats_.numBrushes++;
+	ent.numBrushes++;
 
 	pBrush = AllocBrush(mapBrush->GetNumSides());
 
@@ -152,6 +152,7 @@ bool BSPBuilder::processBrush(BspEntity& ent, mapfile::XMapBrush* mapBrush, int 
 
 	if (!removeDuplicateBrushPlanes(pBrush)) {
 		FreeBrush(pBrush);
+		ent.numBrushes--;
 		return false;
 	}
 
@@ -162,6 +163,7 @@ bool BSPBuilder::processBrush(BspEntity& ent, mapfile::XMapBrush* mapBrush, int 
 	// create windings for sides + bounds for brush
 	if (!pBrush->createBrushWindings(planes)) {
 		FreeBrush(pBrush);
+		ent.numBrushes--;
 		return false;
 	}
 
@@ -195,6 +197,7 @@ bool BSPBuilder::processPatch(BspEntity& ent, mapfile::XMapPatch* mapBrush, int 
 	}
 
 	stats_.numPatches++;
+	ent.numPatches++;
 
 	mapBrush->Subdivide(DEFAULT_CURVE_MAX_ERROR, DEFAULT_CURVE_MAX_ERROR, DEFAULT_CURVE_MAX_LENGTH, true);
 
@@ -364,21 +367,6 @@ bspNode* BSPBuilder::AllocNode(void)
 void BSPBuilder::FreeNode(bspNode* pNode)
 {
 	X_DELETE(pNode, g_arena);
-}
-
-bspDrawSurface* BSPBuilder::AllocDrawSurface(DrawSurfaceType::Enum type)
-{
-	bspDrawSurface* pDs;
-
-	drawSurfs_.append(bspDrawSurface());
-
-	pDs = drawSurfs_.end() - 1;
-	pDs->type = type;
-	pDs->planeNum = -1;
-	pDs->outputNum = -1;                    
-	pDs->surfaceNum = safe_static_cast<int,size_t>(drawSurfs_.size() - 1);  
-
-	return pDs;
 }
 
 

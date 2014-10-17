@@ -11,7 +11,6 @@
 
 #include "ModelLoader.h"
 #include "MaterialManager.h"
-#include "Bsp.h"
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -56,11 +55,8 @@ bool X3DEngine::Init()
 	ADD_CVAR_REF("height", height, 100, -9999, 9999, 0, "");
 
 	// load a lvl lol.
-	bsp::Bsp map;
-
 	map.LoadFromFile("box"); // mmmmm
 
-//	const bsp::BSPData& data = map.getData();
 
 	return false;
 }
@@ -98,6 +94,9 @@ void X3DEngine::OnFrameBegin(void)
 	frustum.setAxis(Matrix33f::createRotation(s_angDefaultCam));
 	frustum.SetFrustum(width, height, fov, 0.01f, 0.5f, 1.0);
 
+	
+
+	/*
 	render::IRenderAux* pAux = gEnv->pRender->GetIRenderAuxGeo();
 
 	render::XAuxGeomRenderFlags flags = pAux->getRenderFlags();
@@ -105,6 +104,9 @@ void X3DEngine::OnFrameBegin(void)
 	pAux->setRenderFlags(flags);
 
 	pAux->drawFrustum(frustum, Col_Red);
+	*/
+
+	map.render();
 }
 
 void X3DEngine::update(void)

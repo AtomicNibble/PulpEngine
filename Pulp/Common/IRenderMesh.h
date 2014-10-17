@@ -18,12 +18,16 @@ struct IRenderMesh
 	virtual const int addRef(void) X_ABSTRACT;
 	virtual const int release(void) X_ABSTRACT;
 
+	virtual bool render(void) X_ABSTRACT;
+
+	// returns false if no Video memory.
 	virtual bool canRender(void) X_ABSTRACT;
+	virtual bool uploadToGpu(void) X_ABSTRACT;
 
 	// genral Info
 	virtual const char* getName(void) const X_ABSTRACT;
 	virtual int getNumVerts(void) const X_ABSTRACT;
-	virtual int getNumIndexs(void) const X_ABSTRACT;
+	virtual int getNumIndexes(void) const X_ABSTRACT;
 	virtual int getNumSubMesh(void) const X_ABSTRACT;
 
 	virtual shader::VertexFormat::Enum getVertexFmt(void) const X_ABSTRACT;

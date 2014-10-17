@@ -57,9 +57,6 @@
     <ClInclude Include="Winding.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="BSPFile.h">
-      <Filter>Header Files\BSP</Filter>
-    </ClInclude>
     <ClInclude Include="StringPair.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
@@ -89,26 +86,14 @@
     <ClCompile Include="EngineApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="BSPFaces.cpp">
-      <Filter>Source Files\BSP</Filter>
-    </ClCompile>
     <ClCompile Include="Winding.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
     <ClCompile Include="BSPFile.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>
-    <ClCompile Include="BSPPortal.cpp">
-      <Filter>Source Files\BSP</Filter>
-    </ClCompile>
-    <ClCompile Include="BSPBrush.cpp">
-      <Filter>Source Files\BSP</Filter>
-    </ClCompile>
     <ClCompile Include="HashIndex.cpp">
       <Filter>Source Files\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="BSPSurface.cpp">
-      <Filter>Source Files\BSP</Filter>
     </ClCompile>
     <ClCompile Include="TriTools.cpp">
       <Filter>Source Files\Util</Filter>
@@ -128,10 +113,7 @@
     <ClCompile Include="BSPProcess.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>
-    <ClCompile Include="BSPFilter.cpp">
-      <Filter>Source Files\BSP</Filter>
-    </ClCompile>
-    <ClCompile Include="BSPSurfaceMeta.cpp">
+    <ClCompile Include="BSPAreaModel.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>
   </ItemGroup>
