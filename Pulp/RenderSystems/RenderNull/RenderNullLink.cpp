@@ -14,10 +14,9 @@
 X_USING_NAMESPACE;
 
 
-
-extern "C" DLL_EXPORT render::IRender* CreateRender(ICore *pCore)
+render::IRender* CreateRender(ICore *pCore)
 {
-	LinkModule(pCore, "RenderNul");
+	LinkModule(pCore, "RenderNull");
 
 	render::IRender* pRender = &render::g_NullRender;
 

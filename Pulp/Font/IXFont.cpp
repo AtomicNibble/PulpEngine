@@ -20,7 +20,7 @@ namespace {
 	core::MallocFreeAllocator g_fontAlloc;
 }
 
-extern "C" X_NAMESPACE_NAME::font::IXFontSys* CreateFontInterface(ICore *pCore)
+X_NAMESPACE_NAME::font::IXFontSys* CreateFontInterface(ICore *pCore)
 {
 	LinkModule(pCore, "XFont");
  
@@ -29,7 +29,7 @@ extern "C" X_NAMESPACE_NAME::font::IXFontSys* CreateFontInterface(ICore *pCore)
 //	X_ASSERT_NOT_NULL(gEnv->pMalloc);
 
 	// kinky shit.
-	g_fontArena = X_NEW_ALIGNED(FontArena, gEnv->pArena, "InputArena", 8)(&g_fontAlloc, "InputArena");
+	g_fontArena = X_NEW(FontArena, gEnv->pArena, "InputArena")(&g_fontAlloc, "InputArena");
 
 
 
@@ -37,17 +37,17 @@ extern "C" X_NAMESPACE_NAME::font::IXFontSys* CreateFontInterface(ICore *pCore)
 	if (gEnv->IsDedicated())
 	{
 #if defined(X_USE_NULLFONT)
-		return X_NEW_ALIGNED(font::XFontSysNull,g_fontArena, "FontSysNull", 8)();
+		return X_NEW(font::XFontSysNull,g_fontArena, "FontSysNull")();
 #else
 		return nullptr;
 #endif // !X_USE_NULLFONT
 	}
 
 #if defined(X_USE_NULLFONT)
-	return X_NEW_ALIGNED(font::XFontSysNull,g_fontArena, "FontSysNull", 8)();
+	return X_NEW(font::XFontSysNull,g_fontArena, "FontSysNull")();
 #else
 
-	return X_NEW_ALIGNED(font::XFont,g_fontArena,"fontSys",8)(pCore);
+	return X_NEW(font::XFont,g_fontArena,"fontSys")(pCore);
 #endif // !X_USE_NULLFONT
 }
 

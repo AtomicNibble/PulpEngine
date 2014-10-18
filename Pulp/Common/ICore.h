@@ -45,6 +45,10 @@ struct IRender;
 X_NAMESPACE_DECLARE(engine,
 struct I3DEngine;
 )
+X_NAMESPACE_DECLARE(game,
+struct IGame;
+)
+
 
 
 X_USING_NAMESPACE;
@@ -207,6 +211,7 @@ struct SCoreGlobals
 	script::IScriptSys*			pScriptSys;
 	render::IRender*			pRender;
 	engine::I3DEngine*			p3DEngine;
+	game::IGame*				pGame;
 
 	core::IXDirectoryWatcher*   pDirWatcher;
 	core::IXHotReloadManager*   pHotReload;

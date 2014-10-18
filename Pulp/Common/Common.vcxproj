@@ -118,6 +118,7 @@
     <ClInclude Include="IEngineModule.h" />
     <ClInclude Include="IFileSys.h" />
     <ClInclude Include="IFont.h" />
+    <ClInclude Include="IGame.h" />
     <ClInclude Include="IInput.h" />
     <ClInclude Include="ILog.h" />
     <ClInclude Include="IMaterial.h" />

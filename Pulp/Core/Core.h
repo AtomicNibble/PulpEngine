@@ -169,6 +169,8 @@ private:
 	bool InitScriptSys(const SCoreInitParams &startupParams);
 	bool InitRenderSys(const SCoreInitParams &startupParams);
 	bool Init3DEngine(const SCoreInitParams &startupParams);
+	bool InitGameDll(const SCoreInitParams &startupParams);
+	
 	
 	void CreateSystemVars();
 

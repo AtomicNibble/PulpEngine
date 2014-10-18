@@ -18,6 +18,7 @@
 #include <I3DEngine.h>
 #include <IFont.h>
 #include <IFileSys.h>
+#include <IGame.h>
 
 #include <Extension\IGoatClass.h>
 #include <Extension\IGoatFactory.h>
@@ -45,6 +46,7 @@ X_USING_NAMESPACE;
 #define DLL_RENDER			"Engine_RenderDx10"
 #define DLL_RENDER_NULL		"Engine_RenderNull"
 #define DLL_3D_ENGINE		"Engine_3DEngine"
+#define DLL_GAME_DLL		"Engine_GameDLL"
 
 
 
@@ -118,6 +120,10 @@ bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassNa
 	if (GoatCreateClassInstance(moduleClassName, pModule))
 	{
 		res = pModule->Initialize(env_, initParams);
+	}
+	else
+	{
+		X_ERROR("Core", "failed to find interface: %s -> %s", dllName, moduleClassName);
 	}
 
 	moduleInterfaces_.append(pModule);
@@ -271,6 +277,12 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 			return false;	
 	}
 
+	//  #------------------------- Game Dll -------------------------
+	if (!startupParams.bTesting && !startupParams.isCoreOnly()) {
+		if (!InitGameDll(startupParams))
+			return false;
+	}
+
 	// #------------------------- Console ---------------------------
 	if (!InitConsole())
 		return false;
@@ -382,7 +394,7 @@ bool XCore::InitFont(const SCoreInitParams &initParams)
 	return true;
 }
 
-bool XCore::InitSound(const SCoreInitParams &initParams)
+bool XCore::InitSound(const SCoreInitParams& initParams)
 {
 	if (initParams.bSkipSound) {
 		env_.pSound = nullptr;
@@ -395,7 +407,7 @@ bool XCore::InitSound(const SCoreInitParams &initParams)
 	return env_.pSound != nullptr;
 }
 
-bool XCore::InitScriptSys(const SCoreInitParams &initParams)
+bool XCore::InitScriptSys(const SCoreInitParams& initParams)
 {
 	if (!IntializeEngineModule(DLL_SCRIPT, "Engine_Script", initParams))
 		return false;
@@ -408,7 +420,7 @@ bool XCore::InitScriptSys(const SCoreInitParams &initParams)
 	return true;
 }
 
-bool XCore::InitRenderSys(const SCoreInitParams &initParams)
+bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 {
 	if (initParams.bTesting)
 	{
@@ -446,7 +458,7 @@ bool XCore::InitRenderSys(const SCoreInitParams &initParams)
 }
 
 
-bool XCore::Init3DEngine(const SCoreInitParams &initParams)
+bool XCore::Init3DEngine(const SCoreInitParams& initParams)
 {
 	if (!IntializeEngineModule(DLL_3D_ENGINE, "Engine_3DEngine", initParams))
 		return false;
@@ -458,6 +470,19 @@ bool XCore::Init3DEngine(const SCoreInitParams &initParams)
 
 	return env_.p3DEngine != nullptr;
 }
+
+bool XCore::InitGameDll(const SCoreInitParams& initParams)
+{
+	if (!IntializeEngineModule(DLL_GAME_DLL, "Engine_Game", initParams))
+		return false;
+
+	if (env_.pGame) {
+		env_.pGame->Init();
+	}
+
+	return env_.pGame != nullptr;
+}
+
 
 // ->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->
 void WindowPosVarChange(core::ICVar* pVar)

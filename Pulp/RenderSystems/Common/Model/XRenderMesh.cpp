@@ -68,12 +68,15 @@ bool XRenderMesh::render(void)
 
 	D3DXMatrixPerspectiveRH(g_Dx11D3D.pCurProjMat(), 800, 600, 0.001f, 1.0f);
 
+
+	g_Dx11D3D.Set2D(true);
+
 	Matrix44f* pPro = g_Dx11D3D.pCurProjMat();
 
 	// test.
 	Vec3f* pos = pMesh_->verts.as<Vec3f>();
 
-	Vec3f out = (*pos) * (*pPro);
+	Vec3f out = (*pPro) * (*pos);
 
 	g_Dx11D3D.SetWorldShader();
 	g_Dx11D3D.FX_SetVertexDeclaration(vertexFmt_);
@@ -101,6 +104,7 @@ bool XRenderMesh::render(void)
 			);
 
 	}
+	g_Dx11D3D.Set2D(false);
 
 	return true;
 }
