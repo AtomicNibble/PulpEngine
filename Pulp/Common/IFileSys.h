@@ -381,11 +381,12 @@ public:
 	}
 #endif
 
-
+#if X_64
 	inline uint32_t write(const void* pBuf, size_t Len) {
 		X_ASSERT_NOT_NULL(pFile_);
 		return pFile_->write(pBuf, safe_static_cast<uint32_t, size_t>(Len));
 	}
+#endif // !X_64
 	inline uint32_t write(const void* pBuf, uint32_t Len) {
 		X_ASSERT_NOT_NULL(pFile_);
 		return pFile_->write(pBuf, Len);

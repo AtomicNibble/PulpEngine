@@ -120,6 +120,7 @@ public:
 	RenderState() :
 		vertexLayoutDescriptions({ g_rendererArena, 
 		g_rendererArena,
+	//	g_rendererArena,
 		g_rendererArena,
 		g_rendererArena,
 		g_rendererArena })
@@ -234,7 +235,8 @@ public:
 		int texture_id, float s0, float t0, float s1, float t1, const Colorf& col, bool filtered = true);
 
 	virtual void ReleaseTexture(texture::TexID id) X_OVERRIDE;
-
+	
+	virtual bool SetTexture(int texId) X_OVERRIDE;
 	// ~Textures 
 
 	// Shaders 

@@ -52,15 +52,15 @@ shader
 		{
 			name 		"SolidTestWorld"
 			vertex_shader   	"BasicVSTest"
-			pixel_shader    	"TexturePS"	
+			pixel_shader    	"SolidWorldPS"	
 			src_blend_color  	src_alpha
 			src_blend_alpha  	src_alpha
 			dst_blend_color  	inv_src_alpha
 			dst_blend_alpha  	inv_src_alpha
-			cull_mode           back
-			depth_test         less
+			cull_mode           none
+			depth_test         always
 			depth_write        true
-			wireframe		false
+			wireframe		true
 		}	
 
 

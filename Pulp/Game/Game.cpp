@@ -25,6 +25,7 @@ X_LINK_LIB("engine_Script")
 X_LINK_LIB("engine_Sound")
 X_LINK_LIB("engine_RenderDx10")
 X_LINK_LIB("engine_3DEngine")
+X_LINK_LIB("engine_GameDLL")
 
 X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Input@@0V12@A")
 X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Font@@0V12@A")
@@ -32,6 +33,7 @@ X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Script@@0V12@A")
 X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Sound@@0V12@A")
 X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
 X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_3DEngine@@0V12@A")
+X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Game@@0V12@A")
 
 #endif // !X_LIB
 

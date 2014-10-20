@@ -127,7 +127,6 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 	for (i = 0; i < header_.numLod; i++)
 	{
 		LODHeader& lod = header_.lodInfo[i];
-
 		// we have 3 blocks of data.
 		// Verts, Faces, Binddata
 		SubMeshHeader* meshHeads = lod.subMeshHeads;

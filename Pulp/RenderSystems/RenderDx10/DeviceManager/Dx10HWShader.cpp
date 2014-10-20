@@ -102,18 +102,19 @@ namespace
 		// World
 		Matrix44f matRotation = Matrix44f::createRotation(Vec3f(0, 1, 0.5), rotation);
 		Matrix44f matScale = Matrix44f::createScale(Vec3f(scale, scale, scale));
-		Matrix44f trans = Matrix44f::createTranslation(Vec3f(pos_x, pos_y, pos_z));
+		Matrix44f trans = Matrix44f::createTranslation(Vec3f(0, 0, 0));
 
-		World = trans * matScale * matRotation;
-		World.transpose();
+		World = trans ;
+
 
 		r->GetModelViewMatrix(&View);
 		r->GetProjectionMatrix(&Projection);
+	
 
-	
-		// set it.
-		*pMat = World * View * Projection;
-	
+	//	*pMat = World * View * Projection;
+		*pMat = Projection * View * World;
+		pMat->transpose();
+
 
 		float time = gEnv->pTimer->GetCurrTime();
 		
@@ -196,13 +197,15 @@ namespace
 		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
 
 		r->GetModelViewMatrix(pMat);
+
+		pMat->transpose();
 	}
 
 	X_INLINE void getProjectionMatrix(render::DX11XRender* r)
 	{
 		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
 
-		r->GetModelViewMatrix(pMat);
+		r->GetProjectionMatrix(pMat);
 	}
 
 

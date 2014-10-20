@@ -10,6 +10,7 @@
 #include <IRender.h>
 #include <IScriptSys.h>
 #include <IFont.h>
+#include <IGame.h>
 #include <IEngineModule.h>
 
 #include <Hashing\crc32.h>
@@ -304,8 +305,13 @@ bool XCore::Update()
 
 	dirWatcher_.tick();
 
+	if (env_.pGame)
+	{
+		env_.pGame->Update();
+	}
+
 	if (env_.p3DEngine)
-		env_.p3DEngine->OnFrameBegin();
+		env_.p3DEngine->Update();
 
 	if (env_.pInput)
 	{
@@ -328,6 +334,7 @@ bool XCore::Update()
 	{
 		env_.pScriptSys->Update();
 	}
+
 
 #if X_SUPER == 0 && 1
 	static core::TimeVal start = time_.GetAsyncTime();

@@ -88,6 +88,12 @@ public:
 	X_INLINE Vec3f GetPosition() const { return matrix_.getTranslate(); }
 	X_INLINE void SetPosition(const Vec3f& vec) { matrix_.setTranslate(vec); UpdateFrustum(); }
 
+	X_INLINE void SetAngles(const Vec3f& angles)	{
+		matrix_ = Matrix34f::createRotation(angles);
+		UpdateFrustum();
+	}
+
+
 	// planes
 	X_INLINE float32_t GetNearPlane() const { return edge_nlt_.y; }
 	X_INLINE float32_t GetFarPlane() const { return edge_flt_.y; }

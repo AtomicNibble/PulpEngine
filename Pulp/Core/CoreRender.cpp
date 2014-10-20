@@ -4,6 +4,7 @@
 #include <IConsole.h>
 #include <IRender.h>
 #include <IFont.h>
+#include <I3DEngine.h>
 
 X_USING_NAMESPACE;
 
@@ -14,7 +15,7 @@ void XCore::RenderBegin()
 
 
 	env_.pRender->RenderBegin();
-
+	env_.p3DEngine->OnFrameBegin();
 }
 
 

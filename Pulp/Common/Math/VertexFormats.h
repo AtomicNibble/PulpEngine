@@ -54,6 +54,7 @@ struct Vertex_P3F_T4F_N3F_C4B
 
 
 
+
 struct Vertex_Tangents
 {
 	compressedVec3 tangent;

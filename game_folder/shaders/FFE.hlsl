@@ -51,7 +51,14 @@ VS_OUTPUT BasicVSTest(VS_INPUT input)
     return output;
 }
 
-
+PS_OUTPUT SolidWorldPS(PS_INPUT input)
+{
+    PS_OUTPUT output;
+    output.color = input.color;
+    output.color.r = 1.0;
+        output.color.g = 0.0;
+    return output;
+}
 
 
 VS_OUTPUT BasicVS(VS_INPUT input)

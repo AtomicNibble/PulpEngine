@@ -786,7 +786,7 @@ bool XConsole::OnInputEventChar(const input::InputEvent& event)
 
 	AddInputChar(event.inputchar);
 
-	return false;
+	return true;
 }
 
 void XConsole::AddInputChar(const char c)
@@ -936,7 +936,7 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 		ClearInputBuffer();
 	}
 
-	return false;
+	return true;
 }
 
 const char* XConsole::GetHistory(CmdHistory::Enum direction)

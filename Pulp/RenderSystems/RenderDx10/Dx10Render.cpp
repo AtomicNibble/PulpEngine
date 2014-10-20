@@ -599,11 +599,11 @@ void DX11XRender::RenderBegin()
 	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 
-	m_ViewMat.LoadIdentity();
-	m_ProMat.LoadIdentity();
+//	m_ViewMat.LoadIdentity();
+//	m_ProMat.LoadIdentity();
 
 	
-	D3DXMatrixPerspectiveRH(m_ProMat.GetTop(), 800,600,0.001f, 1.0f);
+//	D3DXMatrixPerspectiveRH(m_ProMat.GetTop(), 800,600,0.001f, 1.0f);
 	
 //	test(m_ProMat.GetTop());
 
@@ -1533,28 +1533,24 @@ void DX11XRender::SetCamera(const XCamera& cam)
 	float ProjectionRatio = cam.GetProjectionRatio();
 	float fov = cam.GetFov();
 
-	float wT = math<float>::tan(fov*0.5f)*cam.GetNearPlane();
-	float wB = -wT;
-	float wR = wT * ProjectionRatio;
-	float wL = -wR;
+//	float wT = math<float>::tan(fov*0.5f)*cam.GetNearPlane();
+//	float wB = -wT;
+//	float wR = wT * ProjectionRatio;
+//	float wL = -wR;
 
 	Matrix34f m = cam.GetMatrix();
 	Vec3f vEye = cam.GetPosition();
-	Vec3f vAt = vEye + Vec3f(m.m01, m.m11, m.m21); 
-//	Vec3f vAt(0, 0, 0);
+	Vec3f vAt = vEye + Vec3f(m.m01, m.m11, m.m21);
 	Vec3f vUp = Vec3f(m.m02, m.m12, m.m22);
 
 	// View
 	Matrix44f* pView = m_ViewMat.GetTop();
-	MatrixLookAtLH(pView, vEye, vAt, vUp);
+	MatrixLookAtRH(pView, vEye, vAt, vUp);
 
-	
 	// Proj
 	Matrix44f* pProj = m_ProMat.GetTop();
-	MatrixPerspectivOffCenterLH(pProj, wL, wR, wB, wT, cam.GetNearPlane(), cam.GetFarPlane());
+	MatrixPerspectiveFovRH(pProj, fov, ProjectionRatio, 1.0f, 6000.0f);
 
-
-	Matrix44f test1 = Matrix44f::identity();
 
 	cam_ = cam;
 
@@ -1585,6 +1581,18 @@ void DX11XRender::ReleaseTexture(texture::TexID id)
 	texture::ITexture* pTex = texture::XTexture::getByID(id);
 
 	core::SafeRelease(pTex);
+}
+
+
+bool DX11XRender::SetTexture(int texId)
+{
+	texture::XTexture* pTex = texture::XTexture::getByID(texId);
+
+	// should not be null.
+	X_ASSERT_NOT_NULL(pTex);
+
+	pTex->apply(0);
+	return true;
 }
 
 // ~Textures 
@@ -1638,6 +1646,11 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 
 	D3D11_INPUT_ELEMENT_DESC elem_t3f = { "TEXCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 
+
+	D3D11_INPUT_ELEMENT_DESC elem_tag101010 = { "TANGENT", 0, DXGI_FORMAT_R10G10B10A2_TYPELESS, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+	D3D11_INPUT_ELEMENT_DESC elem_bi101010 = { "BINORMAL", 0, DXGI_FORMAT_R10G10B10A2_TYPELESS, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+
+
 	// Tangent / binormal stream
 	static D3D11_INPUT_ELEMENT_DESC elem_tangents[] =
 	{
@@ -1687,6 +1700,24 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 			layout.append(elem_col8888);
 
 		}
+	/*	else if (i == VertexFormat::P3F_C4B_T2S_N10_T10_B10)
+		{
+			elem_col8888.AlignedByteOffset = 12;
+			layout.append(elem_col8888);
+
+			elem_uv1616.AlignedByteOffset = 16;
+			layout.append(elem_uv1616);
+
+			elem_nor101010.AlignedByteOffset = 20;
+			layout.append(elem_nor101010);
+
+
+			elem_tag101010.AlignedByteOffset = 24;
+			layout.append(elem_tag101010);
+
+			elem_bi101010.AlignedByteOffset = 28;
+			layout.append(elem_bi101010);
+		}*/
 		else if (i == VertexFormat::P3F_T3F)
 		{
 			elem_t3f.AlignedByteOffset = 12;

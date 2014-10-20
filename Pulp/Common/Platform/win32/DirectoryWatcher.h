@@ -55,10 +55,10 @@ private:
 	struct Info_t
 	{
 		Info_t() : mtime(0), size(0) {}
-		Info_t(__time64_t time_, size_t size_) : mtime(time_), size(size_) {}
+		Info_t(__time64_t time_, int64 size_) : mtime(time_), size(size_) {}
 
 		__time64_t mtime;
-		size_t	   size;
+		int64	   size;
 
 		bool operator==(const Info_t& oth) const {
 			return mtime == oth.mtime && size == oth.size;

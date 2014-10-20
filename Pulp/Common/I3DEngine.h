@@ -17,7 +17,7 @@ struct I3DEngine
 
 	virtual void OnFrameBegin(void) X_ABSTRACT;
 
-	virtual void update(void) X_ABSTRACT;
+	virtual void Update(void) X_ABSTRACT;
 
 
 

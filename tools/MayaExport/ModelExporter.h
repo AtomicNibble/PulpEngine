@@ -262,7 +262,7 @@ public:
 		uint32_t total = 0;
 		for (auto m : meshes_)
 			total += safe_static_cast<uint32_t, size_t>(m->faces.size());
-		return total;
+		return total * 3;
 	}
 
 public:

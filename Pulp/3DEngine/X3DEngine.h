@@ -7,6 +7,9 @@
 #include "EngineBase.h"
 #include "Bsp.h"
 
+#include <IModel.h>
+#include <IRenderMesh.h>
+
 X_NAMESPACE_BEGIN(engine)
 
 
@@ -19,19 +22,17 @@ struct X3DEngine : public I3DEngine, public XEngineBase
 
 	virtual void OnFrameBegin(void) X_OVERRIDE;
 
-	virtual void update(void) X_OVERRIDE;
+	virtual void Update(void) X_OVERRIDE;
 
 	virtual void LoadModel(void) X_OVERRIDE;
 
 
 
 private:
-	Vec3f rotation, pos;
-
-	int width;
-	int height;
 
 	bsp::Bsp map;
+	model::XModel model;
+	model::IRenderMesh* pMesh;
 };
 
 

@@ -109,6 +109,8 @@ struct VertexFormat
 		P3F_N10_C4B_T2S,
 		P3F_T4F_N3F_C4B,
 
+	//	P3F_C4B_T2S_N10_T10_B10,
+
 		Num
 	};
 
@@ -124,6 +126,8 @@ struct VertexFormat
 				return "P3F_N10_C4B_T2S";
 			case P3F_T4F_N3F_C4B:
 				return "P3F_T4F_N3F_C4B";
+	//		case P3F_C4B_T2S_N10_T10_B10:
+	//			return "P3F_C4B_T2S_N10_T10_B10";
 
 #if X_DEBUG
 			case Num:

@@ -1467,7 +1467,7 @@ uint32_t MayaModel::calculateSubDataSize(void)
 	uint32_t size = this->calculateBoneDataSize();
 
 	// size of all the mesh headers.
-	size += sizeof(model::MeshHeader) * (uint32_t)totalMeshes();
+	size += sizeof(model::SubMeshHeader) * (uint32_t)totalMeshes();
 
 	for (i = 0; i < 4; i++)
 	{
@@ -1555,6 +1555,8 @@ bool MayaModel::save(const char *filename)
 
 			meshHeadOffsets += lod.numSubMeshes * sizeof(model::MeshHeader);
 		}
+
+	//	const size_t temp = sizeof(header);
 
 		fwrite(&header, sizeof(header), 1, f);
 
@@ -1646,7 +1648,7 @@ bool MayaModel::save(const char *filename)
 
 					mesh.numBinds = 0;
 					mesh.numVerts = safe_static_cast<uint16_t, size_t>(pMesh->verts.size());
-					mesh.numIndexes = safe_static_cast<uint16_t, size_t>(pMesh->faces.size());
+					mesh.numIndexes = safe_static_cast<uint16_t, size_t>(pMesh->faces.size() * 3);
 			//		mesh.material = pMesh->material;
 					mesh.CompBinds = pMesh->CompBinds;
 					mesh.boundingBox = pMesh->boundingBox;
@@ -1707,10 +1709,11 @@ bool MayaModel::save(const char *filename)
 					const MayaVertex Mvert = mesh->verts[x];
 
 					vert.pos = Mvert.pos;
-					vert.uv = XHalf2(Mvert.uv[0], Mvert.uv[1]);
-					vert.normal = Mvert.normal;
-					vert.tangent = Mvert.tangent;
-					vert.binormal = Mvert.binormal;
+					vert.uv = Mvert.uv;
+//					vert.uv = XHalf2(Mvert.uv[0], Mvert.uv[1]);
+//					vert.normal = Mvert.normal;
+//					vert.tangent = Mvert.tangent;
+//					vert.binormal = Mvert.binormal;
 					vert.col = Mvert.col;
 
 					stream.write(vert);

@@ -194,7 +194,7 @@ bool DX11XRender::SetWorldShader()
 	if (!pSh)
 		return false;
 
-	core::StrHash tech("Solid");
+	core::StrHash tech("SolidTestWorld");
 
 	if (!pSh->FXSetTechnique(tech))
 		return false;

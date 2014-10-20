@@ -317,6 +317,8 @@ struct IRender
 		float w, float h, texture::TexID texture_id, ColorT<float>& col) X_ABSTRACT;
 
 	virtual void ReleaseTexture(texture::TexID id) X_ABSTRACT;
+
+	virtual bool SetTexture(int texId) X_ABSTRACT;
 	// ~Textures
 
 	// Drawing

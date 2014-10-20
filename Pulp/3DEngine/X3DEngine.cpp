@@ -24,7 +24,7 @@ render::IRender* X3DEngine::pRender = nullptr;
 // 3d
 engine::XMaterialManager* X3DEngine::pMaterialManager = nullptr;
 
-
+texture::ITexture* pTex;
 
 bool X3DEngine::Init()
 {
@@ -40,24 +40,13 @@ bool X3DEngine::Init()
 	pMaterialManager->Init();
 
 
-	rotation = Vec3f(0, 90, 75);
-
-	ADD_CVAR_REF("r_x", rotation.x, 0, -9999, 9999, 0, "");
-	ADD_CVAR_REF("r_y", rotation.y, 0, -9999, 9999, 0, "");
-	ADD_CVAR_REF("r_z", rotation.z, 0, -9999, 9999, 0, "");
-
-	ADD_CVAR_REF("p_x", pos.x, 0, -9999, 9999, 0, "");
-	ADD_CVAR_REF("p_y", pos.y, 0, -9999, 9999, 0, "");
-	ADD_CVAR_REF("p_z", pos.z, 0, -9999, 9999, 0, "");
-
-
-	ADD_CVAR_REF("width", width, 100, -9999, 9999, 0, "");
-	ADD_CVAR_REF("height", height, 100, -9999, 9999, 0, "");
-
 	// load a lvl lol.
-	map.LoadFromFile("box"); // mmmmm
+	map.LoadFromFile("killzone"); // mmmmm
 
+	pTex = pRender->LoadTexture("core_assets/Textures/white.dds",
+		texture::TextureFlags::DONT_STREAM);
 
+//	LoadModel();
 	return false;
 }
 
@@ -83,36 +72,17 @@ void X3DEngine::OnFrameBegin(void)
 {
 	X_PROFILE_BEGIN("3DFrameBegin", core::ProfileSubSys::ENGINE3D);
 
-	XFrustum frustum;
 
-	float fov = (75.0f*PIf / 180.0f);
-
-	static const Vec3f	s_angDefaultCam(toRadians(-10.f), 0, toRadians(17.f));
-	static const Vec3f	s_vDefaultCamPos(1, 1, 1);
-
-	frustum.setPosition(s_vDefaultCamPos);
-	frustum.setAxis(Matrix33f::createRotation(s_angDefaultCam));
-	frustum.SetFrustum(width, height, fov, 0.01f, 0.5f, 1.0);
-
+//	pMesh->render();
 	
-
-	/*
-	render::IRenderAux* pAux = gEnv->pRender->GetIRenderAuxGeo();
-
-	render::XAuxGeomRenderFlags flags = pAux->getRenderFlags();
-	flags.SetMode2D3DFlag(render::AuxGeom_Mode2D3D::Mode3D);
-	pAux->setRenderFlags(flags);
-
-	pAux->drawFrustum(frustum, Col_Red);
-	*/
+	pRender->SetTexture(pTex->getTexID());
 
 	map.render();
 }
 
-void X3DEngine::update(void)
+void X3DEngine::Update(void)
 {
 	X_PROFILE_BEGIN("3DUpdate", core::ProfileSubSys::ENGINE3D);
-
 
 
 }
@@ -120,11 +90,16 @@ void X3DEngine::update(void)
 void X3DEngine::LoadModel(void)
 {
 	model::ModelLoader loader;
-	model::XModel model;
 
-	loader.LoadModel(model, "default.model");
+	loader.LoadModel(model, "box.model");
 
+	pMesh = gEnv->pRender->createRenderMesh(
+		(model::MeshHeader*)&model.getLod(0),
+		shader::VertexFormat::P3F_C4B_T2F,
+		model.getName()
+		);
 
+	pMesh->uploadToGpu();
 }
 
 

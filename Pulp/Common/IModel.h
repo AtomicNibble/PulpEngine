@@ -60,12 +60,15 @@ X_NAMESPACE_BEGIN(model)
 //	Version 6:
 //		renamed some shit, and refactored some struts.
 //
-//
+//	Version 7:
+//		changed vertex format.
+//	
+//	
 
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
 #define X_MODEL_MTL_LOWER_CASE_NAMES 1
 
-static const uint32_t	 MODEL_VERSION = 6;
+static const uint32_t	 MODEL_VERSION = 7;
 static const uint32_t	 MODEL_MAX_BONES = 255;
 static const uint32_t	 MODEL_MAX_BONE_NAME_LENGTH = 64;
 static const uint32_t	 MODEL_MAX_MESH = 64;
@@ -140,13 +143,13 @@ struct Vertex // aim to keep this 32 bytes. or 16.
 {
 	Vec3f		pos;				// 12
 	Color8u		col;				// 4
-	XHalf2		uv;					// 4
+	Vec2f		uv;					// 8
 
 	// 12 bytes to play with.
 	// leaves these in here untill i have a better use for them.
-	compressedVec3 normal;		// 4
-	compressedVec3 tangent;		// 4
-	compressedVec3 binormal;	// 4
+//	compressedVec3 normal;		// 4
+//	compressedVec3 tangent;		// 4
+//	compressedVec3 binormal;	// 4
 }; // 32
 
 
@@ -406,7 +409,7 @@ struct ModelHeader // File header.
 X_ENSURE_SIZE(compressedVec3, 4);
 X_ENSURE_SIZE(singleBind, 8);
 
-X_ENSURE_SIZE(Vertex, 32);
+X_ENSURE_SIZE(Vertex, 24);
 X_ENSURE_SIZE(Face, 6);
 
 X_ENSURE_SIZE(SubMeshHeader, 96);

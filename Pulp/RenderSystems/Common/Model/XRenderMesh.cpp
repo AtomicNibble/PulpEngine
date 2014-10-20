@@ -12,6 +12,8 @@ XRenderMesh::XRenderMesh()
 {
 	pMesh_ = nullptr;
 	vertexFmt_ = (shader::VertexFormat::Enum) - 1;
+
+	indexStream_.BufId = render::VidMemManager::null_id;
 }
 
 XRenderMesh::XRenderMesh(model::MeshHeader* pMesh, shader::VertexFormat::Enum fmt, 
@@ -23,6 +25,8 @@ XRenderMesh::XRenderMesh(model::MeshHeader* pMesh, shader::VertexFormat::Enum fm
 	name_ = pName;
 	pMesh_ = pMesh;
 	vertexFmt_ = fmt;
+
+	indexStream_.BufId = render::VidMemManager::null_id;
 }
 
 XRenderMesh::~XRenderMesh()
@@ -63,20 +67,10 @@ bool XRenderMesh::render(void)
 	if (!canRender())
 		return false;
 
-//	m_ViewMat.LoadIdentity();
-//	m_ProMat.LoadIdentity();
+	Matrix44f WPM;
+	Matrix44f View;
+	Matrix44f Projection;
 
-	D3DXMatrixPerspectiveRH(g_Dx11D3D.pCurProjMat(), 800, 600, 0.001f, 1.0f);
-
-
-	g_Dx11D3D.Set2D(true);
-
-	Matrix44f* pPro = g_Dx11D3D.pCurProjMat();
-
-	// test.
-	Vec3f* pos = pMesh_->verts.as<Vec3f>();
-
-	Vec3f out = (*pPro) * (*pos);
 
 	g_Dx11D3D.SetWorldShader();
 	g_Dx11D3D.FX_SetVertexDeclaration(vertexFmt_);
@@ -104,7 +98,7 @@ bool XRenderMesh::render(void)
 			);
 
 	}
-	g_Dx11D3D.Set2D(false);
+//	g_Dx11D3D.Set2D(false);
 
 	return true;
 }
