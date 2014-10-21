@@ -57,10 +57,10 @@ shader
 			src_blend_alpha  	src_alpha
 			dst_blend_color  	inv_src_alpha
 			dst_blend_alpha  	inv_src_alpha
-			cull_mode           none
-			depth_test         always
+			cull_mode           back
+			depth_test         less
 			depth_write        true
-			wireframe		true
+			wireframe		false
 		}	
 
 

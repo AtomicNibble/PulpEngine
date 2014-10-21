@@ -38,10 +38,9 @@ class XMapBrushSide
 public:
 	XMapBrushSide(void) {}
 	~XMapBrushSide(void) { }
-	const char*			GetMaterial(void) const { return material.name.c_str(); }
+	const char*			GetMaterialName(void) const { return material.name.c_str(); }
 	const Planef&		GetPlane(void) const { return plane; }
 
-protected:
 	struct MaterialInfo
 	{
 		core::StackString<bsp::MAP_MAX_MATERIAL_LEN> name;
@@ -50,9 +49,13 @@ protected:
 		float				  rotate;
 	};
 
-	Planef			plane;
 	MaterialInfo	material;
 	MaterialInfo	lightMap;
+
+protected:
+
+	Planef			plane;
+
 
 protected:
 	static bool ParseMatInfo(XLexer& src, MaterialInfo& mat);

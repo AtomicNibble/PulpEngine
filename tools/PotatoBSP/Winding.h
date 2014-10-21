@@ -30,8 +30,8 @@ public:
 	~XWinding(void);
 
 	XWinding &		operator=(const XWinding &winding);
-	const Vec3f &	operator[](const int index) const;
-	Vec3f &			operator[](const int index);
+	const Vec5f &	operator[](const int index) const;
+	Vec5f &			operator[](const int index);
 
 
 	// number of points on winding
@@ -48,6 +48,7 @@ public:
 	float			GetRadius(const Vec3f &center) const;
 	void			GetPlane(Vec3f &normal, float &dist) const;
 	void			GetPlane(Planef &plane) const;
+	void			GetAABB(AABB& bounds) const;
 
 	float			PlaneDistance(const Planef &plane) const;
 	Planeside::Enum PlaneSide(const Planef &plane, const float epsilon = ON_EPSILON) const;
@@ -91,7 +92,7 @@ public:
 
 protected:
 	int				numPoints;				// number of points
-	Vec3f *			p;						// pointer to point data
+	Vec5f *			p;						// pointer to point data
 	int				allocedSize;
 
 	bool			EnsureAlloced(int n, bool keep = false);
@@ -122,8 +123,10 @@ X_INLINE XWinding::XWinding(const Vec3f *verts, const int n)
 		numPoints = 0;
 		return;
 	}
-	for (i = 0; i < n; i++) {
-		p[i] = verts[i];
+	for (i = 0; i < n; i++)
+	{
+		p[i].asVec3() = verts[i];
+		p[i].s = p[i].t = 0.0f;
 	}
 	numPoints = n;
 }
@@ -178,12 +181,12 @@ X_INLINE XWinding& XWinding::operator=(const XWinding &winding)
 	return *this;
 }
 
-X_INLINE const Vec3f& XWinding::operator[](const int index) const
+X_INLINE const Vec5f& XWinding::operator[](const int index) const
 {
 	return p[index];
 }
 
-X_INLINE Vec3f& XWinding::operator[](const int index)
+X_INLINE Vec5f& XWinding::operator[](const int index)
 {
 	return p[index];
 }
@@ -219,7 +222,7 @@ X_INLINE bool XWinding::IsTiny(void) const
 
 	edges = 0;
 	for (i = 0; i < numPoints; i++) {
-		delta = p[(i + 1) % numPoints] - p[i];
+		delta = p[(i + 1) % numPoints].xyz() - p[i].xyz();
 		len = delta.length();
 		if (len > EDGE_LENGTH) {
 			if (++edges == 3) {

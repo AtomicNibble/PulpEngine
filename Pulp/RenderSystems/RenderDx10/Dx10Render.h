@@ -211,13 +211,6 @@ public:
 	// ~States
 
 
-	// ViewPort
-	virtual void GetViewport(int* x, int* y, int* width, int* height) X_OVERRIDE;
-	virtual void SetViewport(int x, int y, int width, int height) X_OVERRIDE;
-	virtual void GetViewport(Vec4<int>& viewport) X_OVERRIDE;
-	virtual void SetViewport(const Vec4<int>& viewport) X_OVERRIDE;
-	// ~ViewPort
-
 	// Camera
 	virtual void  SetCamera(const XCamera& cam) X_OVERRIDE;
 	void SetCameraInfo(void);

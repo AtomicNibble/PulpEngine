@@ -287,11 +287,13 @@ bool BSPBuilder::ProcessWorldModel(const BspEntity& ent)
 			for (p = 0; p < numPoints; p++)
 			{
 				bsp::Vertex vert;
+				const Vec5f& vec = w->operator[](p);;
 
-				vert.pos = (*w)[p];
+				vert.pos = vec.asVec3();
 				vert.normal = planes[side.planenum].getNormal();
 				vert.color = Col_White;
-				
+				vert.texcoord[0] = Vec2f(vec.s,vec.t);
+
 				pArea->verts.append(vert);
 			}
 

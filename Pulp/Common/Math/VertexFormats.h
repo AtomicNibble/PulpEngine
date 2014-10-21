@@ -44,12 +44,13 @@ struct Vertex_P3F_N10_C4B_T2S
 };
 
 
-struct Vertex_P3F_T4F_N3F_C4B
+struct Vertex_P3F_N3F_C4B_T4F
 {
 	Vec3f		pos;			// Vertex position.
-	Vec2f		texcoord[2];	// Vertex texture coordinates. 0 = surface, 1 = lightmap.
 	Vec3f		normal;			// Vertex normal.
 	Color8u		color;			// RGBA col baby. tickle my alpha channel.
+	Vec2f		texcoord[2];	// Vertex texture coordinates. 0 = surface, 1 = lightmap.
+
 };
 
 

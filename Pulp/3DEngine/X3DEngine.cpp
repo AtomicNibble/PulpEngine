@@ -25,6 +25,7 @@ render::IRender* X3DEngine::pRender = nullptr;
 engine::XMaterialManager* X3DEngine::pMaterialManager = nullptr;
 
 texture::ITexture* pTex;
+texture::ITexture* pTex1;
 
 bool X3DEngine::Init()
 {
@@ -41,12 +42,16 @@ bool X3DEngine::Init()
 
 
 	// load a lvl lol.
-	map.LoadFromFile("killzone"); // mmmmm
+//	map.LoadFromFile("killzone"); // mmmmm
+	map.LoadFromFile("box"); // mmmmm
 
-	pTex = pRender->LoadTexture("core_assets/Textures/white.dds",
-		texture::TextureFlags::DONT_STREAM);
+		pTex = pRender->LoadTexture("core_assets/Textures/berlin_floors_rock_tile2_c.dds",
+			texture::TextureFlags::DONT_STREAM);
+		pTex1 = pRender->LoadTexture("core_assets/Textures/model_test.dds",
+			texture::TextureFlags::DONT_STREAM);
 
-//	LoadModel();
+
+	LoadModel();
 	return false;
 }
 
@@ -55,10 +60,12 @@ void X3DEngine::ShutDown()
 	X_LOG0("3DEngine", "Shutting Down");
 
 
+
 	if (pMaterialManager) {
 		pMaterialManager->ShutDown();
 		X_DELETE(pMaterialManager, g_3dEngineArena);
 	}
+
 }
 
 int X3DEngine::release(void)
@@ -72,8 +79,10 @@ void X3DEngine::OnFrameBegin(void)
 {
 	X_PROFILE_BEGIN("3DFrameBegin", core::ProfileSubSys::ENGINE3D);
 
+	pRender->SetTexture(pTex1->getTexID());
 
-//	pMesh->render();
+	if (pMesh)
+		pMesh->render();
 	
 	pRender->SetTexture(pTex->getTexID());
 
@@ -91,15 +100,16 @@ void X3DEngine::LoadModel(void)
 {
 	model::ModelLoader loader;
 
-	loader.LoadModel(model, "box.model");
+	if (loader.LoadModel(model, "core_assets/models/bo2_zom.model"))
+	{
+		pMesh = gEnv->pRender->createRenderMesh(
+			(model::MeshHeader*)&model.getLod(0),
+			shader::VertexFormat::P3F_C4B_T2F,
+			model.getName()
+			);
 
-	pMesh = gEnv->pRender->createRenderMesh(
-		(model::MeshHeader*)&model.getLod(0),
-		shader::VertexFormat::P3F_C4B_T2F,
-		model.getName()
-		);
-
-	pMesh->uploadToGpu();
+		pMesh->uploadToGpu();
+	}
 }
 
 

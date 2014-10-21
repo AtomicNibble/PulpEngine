@@ -350,10 +350,37 @@ bool XTexture::Load()
 {
 	bool bRes = this->LoadFromFile(this->FileName);
 
-	if (!bRes) {
+	if (!bRes) 
+	{
 		X_WARNING("Texture", "Failed to load: \"%s\"", this->FileName.c_str());
-
 		flags.Set(TextureFlags::LOAD_FAILED);
+
+
+		// can't do this since these are chnaged on reload.
+		// we must actualy return the default texture object.
+		// and add a refrence.
+		// for hot reloading i'll probs make it check if it's default.
+		// and if so just unrefrnce it.
+#if 0
+		// assing default.
+		if(XTexture::s_DefaultTexturesLoaded)
+		{
+			XTexture* pDefault = XTexture::s_pTexDefault;
+
+			this->DeviceTexture = pDefault->DeviceTexture;
+			this->defaultTexStateId_ = pDefault->defaultTexStateId_;
+			this->pDeviceShaderResource_ = pDefault->pDeviceShaderResource_;
+			this->pDeviceRenderTargetView_ = pDefault->pDeviceRenderTargetView_;
+
+			this->dimensions = pDefault->dimensions;
+			this->datasize = pDefault->datasize;
+			this->format = pDefault->format;
+			this->numMips = pDefault->numMips;
+			this->depth = pDefault->depth;
+			this->numFaces = pDefault->numFaces;
+
+		}
+#endif
 	}
 
 	return bRes;
@@ -462,7 +489,7 @@ void XTexture::preProcessImage(XTextureFile* image_data)
 
 // Static
 
-XTexture *XTexture::NewTexture(const char* name, const Vec2i& size, 
+XTexture* XTexture::NewTexture(const char* name, const Vec2i& size, 
 	TextureFlags Flags, Texturefmt::Enum fmt)
 {
 	X_ASSERT_NOT_NULL(s_pTextures);
@@ -593,7 +620,12 @@ XTexture* XTexture::FromName(const char* name, TextureFlags Flags)
 		// Add it.
 		s_pTextures->AddAsset(name, pTex);
 
-		pTex->Load();
+		if (!pTex->Load())
+		{
+
+
+			return XTexture::s_pTexDefault;
+		}
 	}
 
 	return pTex;
@@ -728,11 +760,11 @@ void XTexture::loadDefaultTextures(void)
 	s_ptexColorMagenta = XTexture::FromName("core_assets/Textures/Debug/color_Magenta.dds", default_flags);
 
 
-	Vec4<int> view;
-	render::gRenDev->GetViewport(view);
+	Recti rect;
+	render::gRenDev->GetViewport(rect);
 
-	uint32_t width = view.z;
-	uint32_t height = view.w;
+	uint32_t width = rect.getWidth();
+	uint32_t height = rect.getHeight();
 
 	s_GBuf_Depth = XTexture::CreateRenderTarget("$G_Depth", width, height, Texturefmt::R16G16F, TextureType::T2D);
 	s_GBuf_Albedo = XTexture::CreateRenderTarget("$G_Albedo", width, height, Texturefmt::R8G8B8A8, TextureType::T2D);
@@ -793,8 +825,11 @@ bool XTexture::reloadForName(const char* name)
 	X_ASSERT_NOT_NULL(s_pTextures);
 	X_ASSERT_NOT_NULL(name);
 
+	// all asset names need forward slashes, for the hash.
+	core::Path path(name);
+	path.replaceAll('\\','/');
 
-	XTexture* pTex = (XTexture*)s_pTextures->findAsset(name);
+	XTexture* pTex = (XTexture*)s_pTextures->findAsset(path.c_str());
 
 	if (pTex)
 	{

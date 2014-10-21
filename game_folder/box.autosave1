@@ -1,0 +1,26 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"classname" "worldspawn"
+// brush 0
+{
+ ( 280 56 0 ) ( 320 56 0 ) ( 320 80 0 ) berlin_ceilings_metal2_noscorch 256 128 0 0 0 0 lightmap_gray 16383.975 16384 -264 128 180 0
+ ( 272 88 128 ) ( 272 64 128 ) ( 232 64 128 ) berlin_ceilings_metal2_noscorch 256 128 0 0 0 0 lightmap_gray 16383.992 16384 -264 128 180 0
+ ( 224 128 0 ) ( 184 128 0 ) ( 184 128 -8 ) berlin_ceilings_metal2_noscorch 256 128 0 0 0 0 lightmap_gray 16384.018 -16384 -264 -8 180 0
+ ( 0 -216 8 ) ( 0 -240 8 ) ( 0 -240 0 ) berlin_ceilings_metal2_noscorch 256 128 0 0 0 0 lightmap_gray 16384.057 16384 -128 -8 180 0
+ ( 312 0 -8 ) ( 352 0 -8 ) ( 352 0 -16 ) berlin_ceilings_metal2_noscorch 256 128 0 0 0 0 lightmap_gray 16384.018 -16384 -264 -8 -180 0
+ ( 128 80 8 ) ( 128 104 8 ) ( 128 80 0 ) berlin_ceilings_metal2_noscorch 256 128 0 0 0 0 lightmap_gray 16384 -16384 -128 -8 180 0
+}
+}
+// entity 1
+{
+"classname" "info_player_start"
+"origin" "176.0 -240.0 52.0"
+}
+// entity 2
+{
+"origin" "128.0 128.0 0.0"
+"classname" "script_model"
+}

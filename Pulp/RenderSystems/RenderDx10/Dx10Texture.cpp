@@ -142,7 +142,7 @@ void XTexture::unbind(void)
 void XTexture::apply(int slot, int state_id, shader::ShaderType::Enum type)
 {
 	ID3D11DeviceContext* dv = g_Dx11D3D.DxDeviceContext();
-	ID3D11ShaderResourceView *pResView = nullptr;
+	ID3D11ShaderResourceView* pResView = nullptr;
 
 	if (slot >= TEX_MAX_SLOTS) {
 		X_ERROR("Texture", "texture slot exceededs max. slot: %i max: %i");
@@ -154,8 +154,9 @@ void XTexture::apply(int slot, int state_id, shader::ShaderType::Enum type)
 		return;
 	s_pCurrentTexture[slot] = this;
 
-//	X_LOG_BULLET;
-//	X_LOG2("Texture", "bind: %s", this->FileName.c_str());
+
+	// can't bind a texture that dose not have a resource.
+	X_ASSERT_NOT_NULL(this->pDeviceShaderResource_);
 
 	setSamplerState(slot, state_id, type);
 

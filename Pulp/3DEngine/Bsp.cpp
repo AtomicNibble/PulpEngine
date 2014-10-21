@@ -184,7 +184,7 @@ bool Bsp::LoadFromFile(const char* filename)
 
 			AreaModel area;
 			area.pMesh = pMesh;
-			area.pRenderMesh = gEnv->pRender->createRenderMesh(pMesh, shader::VertexFormat::P3F_T4F_N3F_C4B, meshName.c_str());
+			area.pRenderMesh = gEnv->pRender->createRenderMesh(pMesh, shader::VertexFormat::P3F_N3F_C4B_T4F, meshName.c_str());
 			area.pRenderMesh->uploadToGpu();
 
 			areaModels_.append(area);

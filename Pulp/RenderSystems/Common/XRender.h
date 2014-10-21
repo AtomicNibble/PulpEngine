@@ -11,6 +11,8 @@
 
 #include <Containers\Array.h>
 
+#include <Math\XRect.h>
+
 #include "Shader\XShader.h"
 
 X_NAMESPACE_BEGIN(render)
@@ -24,12 +26,61 @@ struct RenderResource
 
 struct XViewPort
 {
-	Vec4<int> view;
-	Vec2f z;
-
 	X_INLINE bool operator==(const XViewPort& oth) const {
-		return z == oth.z && view == oth.view;
+		return z == oth.z; // && view == oth.view;
 	}
+
+	void setZ(float32_t near_, float32_t far_) {
+		z.x = near_;
+		z.y = far_;
+	}
+
+	void set(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom) {
+		view.set(left, top, right, bottom);
+		viewf.set(
+			static_cast<float>(left),
+			static_cast<float>(top),
+			static_cast<float>(right),
+			static_cast<float>(bottom));
+
+	}
+	void set(uint32_t width, uint32_t height) {
+		set(0, 0, width, height);
+	}
+	void set(const Vec2<uint32_t>& wh) {
+		set(wh.x,wh.y);
+	}
+
+	X_INLINE int getWidth(void) const {
+		return view.getWidth();
+	}
+	X_INLINE int getHeight(void) const {
+		return view.getHeight();
+	}
+	X_INLINE float getWidthf(void) const {
+		return viewf.getWidth();
+	}
+	X_INLINE float getHeightf(void) const {
+		return viewf.getHeight();
+	}
+
+	X_INLINE Recti getRect(void) {
+		return view; 
+	}
+	X_INLINE const Recti& getRect(void) const {
+		return view;
+	} 
+
+	X_INLINE float getZNear(void) const {
+		return z.x;
+	}
+	X_INLINE float getZFar(void) const {
+		return z.y;
+	}
+private:
+	Recti view;
+	Rectf viewf;
+	Vec2f z;
 };
 
 class XRender : public IRender
@@ -54,14 +105,45 @@ public:
 	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_ABSTRACT;
 
 
-	virtual void GetViewport(int* x, int* y, int* width, int* height) X_ABSTRACT;
-	virtual void SetViewport(int x, int y, int width, int height) X_ABSTRACT;
-	virtual void GetViewport(Vec4<int>& viewport) X_ABSTRACT;
-	virtual void SetViewport(const Vec4<int>& viewport) X_ABSTRACT;
+	// ViewPort
+	virtual void GetViewport(int* left, int* top, int* right, int* bottom) X_OVERRIDE;
+	virtual void SetViewport(int left, int top, int right, int bottom) X_OVERRIDE;
+	virtual void GetViewport(Recti& rect) X_OVERRIDE;
+	virtual void SetViewport(const Recti& rect) X_OVERRIDE;
 
-	virtual int getWidth(void) const X_OVERRIDE{ return width_; }
-	virtual int getHeight(void) const X_OVERRIDE{ return height_; }
+	virtual int getWidth(void) const X_OVERRIDE{ return ViewPort_.getWidth(); }
+	virtual int getHeight(void) const X_OVERRIDE{ return ViewPort_.getHeight(); }
+	virtual float getWidthf(void) const X_OVERRIDE{ return ViewPort_.getWidthf(); }
+	virtual float getHeightf(void) const X_OVERRIDE{ return ViewPort_.getHeightf(); }
+	// ~ViewPort
 
+	// scales from 800x600
+	virtual float ScaleCoordX(float value) const X_OVERRIDE{ return ScaleCoordXInternal(value); }
+	virtual float ScaleCoordY(float value) const X_OVERRIDE{ return ScaleCoordYInternal(value); }
+	virtual void ScaleCoord(float& x, float& y) const X_OVERRIDE{ ScaleCoordInternal(x, y); }
+	virtual void ScaleCoord(Vec2f& xy) const X_OVERRIDE{ ScaleCoordInternal(xy); }
+
+	// none virtual versions for this lib.
+	X_INLINE float ScaleCoordXInternal(float value) const
+	{
+		value *= ViewPort_.getWidthf() / 800.0f;
+		return (value);
+	}
+	X_INLINE float ScaleCoordYInternal(float value) const
+	{
+		value *= ViewPort_.getHeightf() / 600.0f;
+		return (value);
+	}
+	X_INLINE void ScaleCoordInternal(float& x, float& y) const
+	{
+		x = ScaleCoordXInternal(x);
+		y = ScaleCoordYInternal(y);
+	}
+	X_INLINE void ScaleCoordInternal(Vec2f& xy) const
+	{
+		xy.x = ScaleCoordXInternal(xy.x);
+		xy.y = ScaleCoordYInternal(xy.y);
+	}
 
 	// AuxGeo
 	virtual IRenderAux* GetIRenderAuxGeo(void) X_ABSTRACT;
@@ -193,11 +275,12 @@ protected:
 	X_ALIGN16_MATRIX44F(ViewProjMatrix_);
 	X_ALIGN16_MATRIX44F(ViewProjInvMatrix_);
 
-	int width_, height_;
+
 
 	XRenderThread* m_pRt;
 	VidMemManager vidMemMng_;
 
+	// stores the with + height and the znear + zfar
 	XViewPort ViewPort_;
 	XCamera cam_;
 

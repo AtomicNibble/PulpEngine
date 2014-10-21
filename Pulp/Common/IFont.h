@@ -62,13 +62,15 @@ struct XTextDrawConect
 	bool proportinal;
 	bool clipEnabled;
 	bool drawFrame;
-	bool pad[2];
+	bool scale800x600;
+//	bool pad[2];
 	uint32_t effectId;
 
 	XTextDrawConect() :
 		proportinal(true),
 		clipEnabled(false),
 		drawFrame(false),
+		scale800x600(false),
 		widthScale(1.f),
 		size(16.f,16.f),
 		effectId(0)
@@ -84,6 +86,7 @@ struct XTextDrawConect
 	void SetEffectId(uint32_t id) { effectId = id; }
 	void SetDefaultEffect(void) { effectId = 0; }
 	void SetDrawFrame(bool enable) { drawFrame = enable; }
+	void SetScaleFrom800x600(bool enable) { scale800x600 = enable; }
 
 	X_INLINE float GetCharWidth() const { return size.x; }
 	X_INLINE float GetCharWidthScaled() const { return size.x * widthScale; }
@@ -91,6 +94,7 @@ struct XTextDrawConect
 	X_INLINE float GetCharWidthScale() const { return widthScale; }
 	X_INLINE uint32_t GetEffectId() const { return effectId; }
 	X_INLINE bool getDrawFrame(void) const { return drawFrame; }
+	X_INLINE bool getScaleFrom800x600(void) const { return scale800x600; }
 };
 
 

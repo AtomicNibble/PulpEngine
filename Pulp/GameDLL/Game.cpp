@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "Game.h"
 
-
 #include <IRender.h>
 
 X_NAMESPACE_BEGIN(game)
 
 XGame::XGame(ICore* pCore) :
-pCore_(pCore)
+pCore_(pCore),
+pTimer_(nullptr)
 {
 	X_ASSERT_NOT_NULL(pCore);
 
@@ -22,11 +22,14 @@ bool XGame::Init(void)
 {
 	X_LOG0("Game", "init");
 	pCore_->GetIInput()->AddEventListener(this);
-
+	pTimer_ = gEnv->pTimer;
 
 	// static const Ang3	s_angDefaultCam(DEG2RAD( -10 ), 0, DEG2RAD( 17 ));
 
 	cameraAngle_ = Vec3f(0,0,0);
+
+	timeLast_ = pTimer_->GetAsyncTime();
+
 
 	return true;
 }
@@ -53,7 +56,7 @@ bool XGame::Update(void)
 	txt.appendFmt("Pos: (%f, %f, %f)\n", cameraPos_.x, cameraPos_.y, cameraPos_.z);
 	txt.appendFmt("Angle (%f,%f,%f)", cameraAngle_.x, cameraAngle_.y, cameraAngle_.z);
 
-	gEnv->pRender->DrawTextQueued(Vec3f(10, 40, 0), ti, txt.c_str());
+//	gEnv->pRender->DrawTextQueued(Vec3f(10, 40, 0), ti, txt.c_str());
 
 	XCamera cam;
 	cam.SetFrustum(800,600);
@@ -72,6 +75,7 @@ bool XGame::OnInputEvent(const input::InputEvent& event)
 	using namespace input;
 
 	Vec3f posDelta;
+	bool dontUpdate = false;
 
 	// rotate.
 	switch (event.keyId)
@@ -86,7 +90,13 @@ bool XGame::OnInputEvent(const input::InputEvent& event)
 		break;
 	}
 
-	const float moveDelta = 40.0f;
+	// we want to move a fixed amount of time.
+	// we track how much time has passed since that last update.
+	// and use that for delta.
+
+	// timeLast_ = pTimer_->GetAsyncTime() - timeLast_;
+
+	float moveDelta = 500.f * pTimer_->GetFrameTime();
 	switch (event.keyId)		
 	{
 		// forwards.
@@ -116,14 +126,18 @@ bool XGame::OnInputEvent(const input::InputEvent& event)
 		break;
 
 		default:
+		dontUpdate = true;
 			break;
 	}
+
+	if (dontUpdate)
+		return false;
 
 	// I want movement to be relative to the way the camera is facing.
 	// so if i'm looking 90 to the right the direction also needs to be rotated.
 	Matrix33f angle = Matrix33f::createRotation(cameraAngle_);
 
-	cameraPos_ += (angle * posDelta);
+	cameraPos_ +=  (angle * posDelta);
 	return false;
 }
 

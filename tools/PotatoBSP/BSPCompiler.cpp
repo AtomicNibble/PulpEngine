@@ -121,14 +121,51 @@ bool BSPBuilder::processMapEntity(BspEntity& ent, mapfile::XMapEntity* mapEnt)
 	return true;
 }
 
+void ComputeAxisBase(Vec3f normal, Vec3f& texS, Vec3f& texT)
+{
+	float RotY, RotZ;
+	// do some cleaning
+	if (fabs(normal[0]) < 1e-6) {
+		normal[0] = 0.0f;
+	}
+	if (fabs(normal[1]) < 1e-6) {
+		normal[1] = 0.0f;
+	}
+	if (fabs(normal[2]) < 1e-6) {
+		normal[2] = 0.0f;
+	}
+	RotY = -atan2(normal[2], sqrt(normal[1] * normal[1] + normal[0] * normal[0]));
+	RotZ = atan2(normal[1], normal[0]);
+	// rotate (0,1,0) and (0,0,1) to compute texS and texT
+	texS[0] = -sin(RotZ);
+	texS[1] = cos(RotZ);
+	texS[2] = 0;
+	// the texT vector is along -Z ( T texture coorinates axis )
+	texT[0] = -sin(RotY) * cos(RotZ);
+	texT[1] = -sin(RotY) * sin(RotZ);
+	texT[2] = -cos(RotY);
+}
 
+void ConvertTexMatWithQTexture(Vec3f texMat1[2], Vec3f texMat2[2])
+{
+	float s1, s2;
+	s1 = ( 512.0f) / ( 512.0f);
+	s2 = (512.0f) / (512.0f);
+	texMat2[0][0] = s1 * texMat1[0][0];
+	texMat2[0][1] = s1 * texMat1[0][1];
+	texMat2[0][2] = s1 * texMat1[0][2];
+	texMat2[1][0] = s2 * texMat1[1][0];
+	texMat2[1][1] = s2 * texMat1[1][1];
+	texMat2[1][2] = s2 * texMat1[1][2];
+}
 
 bool BSPBuilder::processBrush(BspEntity& ent, mapfile::XMapBrush* mapBrush, int ent_idx)
 {
 	const mapfile::XMapBrushSide* pMapBrushSide;
 	BspSide*		pSide;
 	bspBrush*		pBrush;
-	int				i;
+	XWinding*	w;
+	int				i, numSides;
 
 	stats_.numBrushes++;
 	ent.numBrushes++;
@@ -138,8 +175,9 @@ bool BSPBuilder::processBrush(BspEntity& ent, mapfile::XMapBrush* mapBrush, int 
 	pBrush->entityNum = stats_.numEntities;
 	pBrush->brushNum = ent_idx;
 	pBrush->numsides = mapBrush->GetNumSides();
-
-	for (i = 0; i < mapBrush->GetNumSides(); i++)
+	
+	numSides = mapBrush->GetNumSides();
+	for (i = 0; i < numSides; i++)
 	{
 		pSide = &pBrush->sides[i];
 		pMapBrushSide = mapBrush->GetSide(i);
@@ -168,9 +206,52 @@ bool BSPBuilder::processBrush(BspEntity& ent, mapfile::XMapBrush* mapBrush, int 
 	}
 
 
-//	pBrush->original = Brush;
+	Vec3f coords[2];
+	Vec2f out;
+	Vec2f size(512, 512);
 
-	// Add the primative.
+	coords[0][0] = 1.0f;
+	coords[1][1] = 1.0f;
+	ConvertTexMatWithQTexture(coords, coords);
+
+	Vec3f texX, texY;
+	float u, v;
+
+	for (i = 0; i < numSides; i++)
+	{
+
+		pSide = &pBrush->sides[i];
+		w = pSide->pWinding;
+		pMapBrushSide = mapBrush->GetSide(i);
+
+		Vec2f repeate = pMapBrushSide->material.matRepeate;
+
+		if (!w)
+			continue;
+
+		ComputeAxisBase(pMapBrushSide->GetPlane().getNormal(),
+			texX, texY);
+
+		for (int j = 0; j < w->GetNumPoints(); j++)
+		{
+			// gets me position from 0,0 from 2d plane.
+			Vec5f& point = w->operator[](j);
+			u = texX.dot(point.asVec3());
+			v = texY.dot(point.asVec3());
+
+			out[0] = coords[0][0] * u + coords[0][1] * v + coords[0][2];
+			out[1] = coords[1][0] * u + coords[1][1] * v + coords[1][2];
+
+			// I have a repeate rate.
+			out[0] = out[0] / size.x;
+			out[1] = out[1] / size.y;
+		
+			point.s = out[0];
+			point.t = out[1];
+		}
+
+
+	}
 
 	// Add to linked list.
 	pBrush->next = ent.pBrushes;

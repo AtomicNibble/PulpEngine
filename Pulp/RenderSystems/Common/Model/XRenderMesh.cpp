@@ -67,10 +67,9 @@ bool XRenderMesh::render(void)
 	if (!canRender())
 		return false;
 
-	Matrix44f WPM;
-	Matrix44f View;
-	Matrix44f Projection;
+	IRenderAux* pAux = g_Dx11D3D.GetIRenderAuxGeo();
 
+	pAux->setRenderFlags(render::AuxGeom_Defaults::Def3DRenderflags);
 
 	g_Dx11D3D.SetWorldShader();
 	g_Dx11D3D.FX_SetVertexDeclaration(vertexFmt_);
@@ -83,7 +82,6 @@ bool XRenderMesh::render(void)
 	);
 
 	uint32_t i, num;
-	
 	num = pMesh_->numSubMeshes;
 
 	for (i = 0; i < num; i++)
@@ -97,8 +95,11 @@ bool XRenderMesh::render(void)
 			mesh->startVertex
 			);
 
+		pAux->drawAABB(mesh->boundingBox,
+			Vec3f::zero(), false, Col_Red);
+
 	}
-//	g_Dx11D3D.Set2D(false);
+
 
 	return true;
 }

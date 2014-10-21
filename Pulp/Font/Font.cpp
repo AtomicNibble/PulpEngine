@@ -283,9 +283,15 @@ Vec2f XFFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& c
 	float32_t maxW = 0;
 	float32_t maxH = 0;
 
-	Vec2f size = ctx.size; // in pixels
 	Vec2f scale;
 	float rcpCellWidth;
+
+	// Scale it?
+	Vec2f size = ctx.size; // in pixel
+	if (ctx.getScaleFrom800x600())
+	{
+		pRenderer->ScaleCoord(size);
+	}
 
 	Prepare(pStr, false);
 
@@ -566,6 +572,13 @@ void XFFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDr
 	pRenderer->FontSetTexture(texID_);
 	pRenderer->FontSetRenderingState();
 
+	// Scale it?
+	Vec2f size = ctx.size; // in pixel
+	if (ctx.getScaleFrom800x600())
+	{
+		pRenderer->ScaleCoord(size);
+	}
+	
 	
 	// loop over the pases you silly slut !
 	size_t passIdx, effecIdx;
@@ -586,7 +599,6 @@ void XFFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDr
 		float rcpCellWidth;
 
 		Vec2f baseXY(pos.x, pos.y);
-		Vec2f size = ctx.size; // in pixel
 		Vec2f scale;
 
 		if (ctx.proportinal)

@@ -368,8 +368,6 @@ bool DX11XRender::Init(HWND hWnd,
 	viewport.TopLeftX = 0;
 	viewport.TopLeftY = 0;
 
-	ViewPort_.view = Vec4<int>(0, 0, width, hieght);
-	ViewPort_.z = Vec2f(0.f,1.f);
 
 	// Create the viewport.
 	m_deviceContext->RSSetViewports(1, &viewport);
@@ -561,24 +559,6 @@ void DX11XRender::FreeDynamicBuffers(void)
 }
 
 
-void test(Matrix44f* pMat)
-{
-
-	// Calculate the infinite matrix used for Z - Fail
-	float aspect_ratio = 800.f / 600.f;
-	float yScale = 1 / ((float)math<float>::tan(90.f) / 2.0f);
-	float xScale = (1 / aspect_ratio) * yScale;
-
-	float e = 0.000001f;
-
-	pMat->setToIdentity();
-
-	pMat->m00 = xScale;
-	pMat->m11 = yScale;
-	pMat->m22 = -1 + e;
-	pMat->m32 = -1;
-	pMat->m23 = -0.001f;
-}
 
 void DX11XRender::RenderBegin()
 {
@@ -599,192 +579,6 @@ void DX11XRender::RenderBegin()
 	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 
-//	m_ViewMat.LoadIdentity();
-//	m_ProMat.LoadIdentity();
-
-	
-//	D3DXMatrixPerspectiveRH(m_ProMat.GetTop(), 800,600,0.001f, 1.0f);
-	
-//	test(m_ProMat.GetTop());
-
-	static float rotate = 0.f;
-	/*
-	XCamera cam;
-	cam.SetFrustum(800,600);
-	cam.SetPosition(Vec3f(0, 0, -5.f));
-	cam.SetPosition(Vec3f(-2, -3, -1.f));
-
-
-	SetCamera(cam);
-	FX_ComitParams();
-	*/
-
-
-	// Deffered test.
-#if 0
-	DefferedTest();
-#else
-
-	/*
-	shader::XShader* pSh = shader::XShaderManager::m_FixedFunction;
-	uint32_t pass;
-
-	pSh->FXSetTechnique("SolidTestWorld");
-	pSh->FXBegin(&pass, 0);
-	pSh->FXBeginPass(pass);
-
-	texture::XTexture* pTex;
-	pTex = texture::XTexture::FromName("core_assets/Textures/color_grid.dds", texture::TextureFlags::DONT_STREAM);
-	pTex->apply(0);
-
-
-	FX_SetVStream(g_pVertexBuffer, 0, sizeof(model::Vertex), 0);
-	FX_SetIStream(g_pIndexBuffer);
-	if (SUCCEEDED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_C4B_T2S)))
-		FX_DrawIndexPrimitive(PrimitiveType::TriangleList, g_numFaces * 3, 0, 0);
-
-	FX_SetIStream(nullptr);
-	*/
-
-#endif
-
-#if 0
-	Set2D(true);
-
-#if 0
-	pTex = texture::XTexture::FromName("core_assets/Textures/potato_256.dds", texture::TextureFlags::DONT_STREAM);
-
-
-	DrawImage(
-		300, 300, 0,
-		128, 128,
-		pTex->getID(), // tex id
-		0, 1, 1, 0,
-		Col_White);
-
-	DrawImage(
-		450, 300, 0,
-		128, 128,
-		pTex->getID(), // tex id
-		0, 1, 1, 0,
-		Col_Olive);
-
-	// --------------------
-
-/*
-	Vec3f points[] = {
-		Vec3f(400, 400, 0),
-		Vec3f(600, 400, 0),
-		Vec3f(400, 500, 0),
-		Vec3f(600, 600, 0),
-	};
-
-	DrawRect(300,440,50,50, Col_White);
-	DrawRect(320, 450, 55, 50, Col_Aquamarine);
-*/
-
-//	DrawLines(points, 4, Col_Lime);
-#endif
-
-	Set2D(false);
-#endif
-
-#if 0
-
-	IRenderAux *pAux = GetIRenderAuxGeo();
-	XAuxGeomRenderFlags flags = pAux->getRenderFlags();
-	flags.SetMode2D3DFlag(AuxGeom_Mode2D3D::Mode2D);
-	pAux->setRenderFlags(flags);
-
-	float x1, x2, y1, y2;
-	x1 = 0.02f;
-	x2 = 0.6f;
-	y1 = 0.1f;
-	y2 = 0.5f;
-
-
-	Matrix44f test(
-		2, 0, 0, 0,
-		0, -2, 0, 0,
-		0, 0, 0, 0,
-		-1, 1, 0, 1);
-
-	test.transpose();
-
-	Vec4f vec(x1, y2, 0, 0);
-	Vec4f out = test * vec;
-
-	Color8u col = Col_Salmon;
-
-	Vec3f points[] = {
-		Vec3f(x1, y1, 0), Vec3f(x2, y1, 0),
-		Vec3f(x1, y2, 0), Vec3f(x2, y2, 0),
-		Vec3f(x1, y1, 0), Vec3f(x1, y2, 0),
-		Vec3f(x2, y1, 0), Vec3f(x2, y2, 0),
-	};
-	Color8u colors[] = {
-		Col_Salmon, Col_Red,
-		Col_Beige, Col_Darkgoldenrod,
-		Col_Firebrick, Col_Darkkhaki,
-		Col_Fuchsia, Col_Forestgreen,
-	};
-
-
-	pAux->drawLines(points, 8, colors);
-
-	Vec3f top(0.70f, 0.5f, 0);
-	Vec3f leftb(0.5f,0.85f,0.f);
-	Vec3f rightb(0.9f,0.85f,0.f);
-
-	pAux->drawTriangle(top, Col_Firebrick, leftb, Col_Darkgoldenrod, rightb, Col_Fuchsia);
-
-	Vec3f pos(0.10f,0.75f,0);
-	Vec3f dir(0.1f,0.4f,0.5f);
-	pAux->drawCylinder(pos,dir, 0.05f, 0.3f, Col_Forestgreen);
-
-	pos = Vec3f(0.35f, 0.65f, 0);
-	dir = Vec3f(0.1f, 0.8f, 0.5f);
-	pAux->drawCone(pos, dir, 0.1f,0.3f, Col_Tomato);
-
-	Sphere sphere;
-	sphere.setRadius(0.08f);
-	sphere.setCenter(Vec3f(0.2f, 0.35f, 0.5f));
-	pAux->drawSphere(sphere, Col_Gray);
-
-	AABB aabb;
-	aabb.min = Vec3f(0.1f,0.1f,0.1f);
-	aabb.max = Vec3f(0.2f,0.3f,0.2f);
-
-
-	Matrix34f trans = Matrix34f::createTranslation(Vec3f(0.9f,0.1f,0.0f));
-	
-	Vec3f direction(dir.normalized());
-	Vec3f orthogonal(direction.getOrthogonal().normalized());
-	Matrix33f matRot;
-	matRot.setToIdentity();
-	matRot.setColumn(0, orthogonal);
-	matRot.setColumn(1, direction);
-	matRot.setColumn(2, orthogonal.cross(direction));
-
-	Matrix34f mat = trans * matRot;
-
-	pAux->drawAABB(aabb, mat, false, Col_Red);
-
-	QuatTransf bone;
-	QuatTransf child;
-	QuatTransf child2;
-	QuatTransf child3;
-
-	bone.setTranslation(Vec3f(0.2f, 0.2f, 0.f));
-	child.setTranslation(Vec3f(0.4f, 0.2f, 0.f));
-	child2.setTranslation(Vec3f(0.6f, 0.55f, 0.f));
-	child3.setTranslation(Vec3f(0.2f, 0.55f, 0.f));
-
-	pAux->drawBone(bone, child, Col_Red);
-	pAux->drawBone(child, child2, Col_Red);
-	pAux->drawBone(child2, child3, Col_Red);
-
-#endif
 }
 
 void DX11XRender::RenderEnd()
@@ -1074,8 +868,8 @@ void DX11XRender::Set2D(bool enable, float znear, float zfar)
 		m_ProMat.Push();
 		m = m_ProMat.GetTop();
 
-		float width = 800;
-		float height = 600;
+		float width = getWidthf();
+		float height = getHeightf();
 
 		MatrixOrthoOffCenterLH(m, 0, width, height, 0, znear, zfar);
 
@@ -1485,40 +1279,6 @@ bool DX11XRender::SetDepthState(DepthState& state)
 }
 
 
-// ViewPort
-
-void DX11XRender::GetViewport(int* x, int* y, int* width, int* height)
-{
-	X_ASSERT_NOT_NULL(x);
-	X_ASSERT_NOT_NULL(y);
-	X_ASSERT_NOT_NULL(width);
-	X_ASSERT_NOT_NULL(height);
-
-	*x = ViewPort_.view.x;
-	*y = ViewPort_.view.y;
-	*width = ViewPort_.view.z;
-	*height = ViewPort_.view.w;
-}
-
-void DX11XRender::SetViewport(int x, int y, int width, int height)
-{
-	ViewPort_.view.x = x;
-	ViewPort_.view.y = y;
-	ViewPort_.view.z = width;
-	ViewPort_.view.w = height;
-}
-
-void DX11XRender::GetViewport(Vec4<int>& viewport)
-{
-	viewport = ViewPort_.view;
-}
-
-void DX11XRender::SetViewport(const Vec4<int>& viewport)
-{
-	ViewPort_.view = viewport;
-}
-
-// ~ViewPort
 
 // Camera
 
@@ -1642,7 +1402,7 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 	D3D11_INPUT_ELEMENT_DESC elem_col8888 = { "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 	D3D11_INPUT_ELEMENT_DESC elem_uv3232 = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 	D3D11_INPUT_ELEMENT_DESC elem_uv1616 = { "TEXCOORD", 0, DXGI_FORMAT_R16G16_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
-	D3D11_INPUT_ELEMENT_DESC elem_uv32323232 = { "TEXCOORD", 0, DXGI_FORMAT_R16G16_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+//	D3D11_INPUT_ELEMENT_DESC elem_uv32323232 = { "TEXCOORD", 0, DXGI_FORMAT_R16G16_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 
 	D3D11_INPUT_ELEMENT_DESC elem_t3f = { "TEXCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 
@@ -1688,16 +1448,21 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 			layout.append(elem_uv1616);
 
 		}
-		else if (i == VertexFormat::P3F_T4F_N3F_C4B)
+		else if (i == VertexFormat::P3F_N3F_C4B_T4F)
 		{
-			elem_uv32323232.AlignedByteOffset = 12;
-			layout.append(elem_uv32323232);
 
-			elem_nor101010.AlignedByteOffset = 28;
-			layout.append(elem_nor323232);
+			elem_nor101010.AlignedByteOffset = 12;
+			layout.append(elem_nor323232); // 12 bytes
 
-			elem_col8888.AlignedByteOffset = 40;
-			layout.append(elem_col8888);
+			elem_col8888.AlignedByteOffset = 24;
+			layout.append(elem_col8888); // 4
+
+			elem_uv3232.AlignedByteOffset = 28;
+			layout.append(elem_uv3232);
+
+			elem_uv3232.AlignedByteOffset = 36;
+			elem_uv3232.SemanticIndex = 1;
+			layout.append(elem_uv3232);
 
 		}
 	/*	else if (i == VertexFormat::P3F_C4B_T2S_N10_T10_B10)

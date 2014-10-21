@@ -35,7 +35,7 @@ uint32_t XRender::vertexFormatStride[shader::VertexFormat::Num] =
 	sizeof(Vertex_P3F_T3F), // P3F_T3F
 
 	sizeof(Vertex_P3F_N10_C4B_T2S), // P3F_N10_C4B_T2S
-	sizeof(Vertex_P3F_T4F_N3F_C4B), // P3F_T4F_N3F_C4B
+	sizeof(Vertex_P3F_N3F_C4B_T4F), // P3F_T4F_N3F_C4B_T4F
 
 //	sizeof(Vertex_P3F_C4B_T2S_N10_T10_B10), // P3F_C4B_T2S_N10_T10_B10
 };
@@ -67,10 +67,10 @@ void XRender::SetArenas(core::MemoryArenaBase* arena)
 	textDrawList_.setArena(arena);
 }
 
-bool XRender::Init(HWND hWnd, uint32_t width, uint32_t hieght)
+bool XRender::Init(HWND hWnd, uint32_t width, uint32_t height)
 {
-	width_ = width;
-	height_ = hieght;
+	ViewPort_.set(width,height);
+	ViewPort_.setZ(0.f, 1.f);
 
 	m_pRt = X_NEW_ALIGNED(XRenderThread,g_rendererArena,"renderThread",X_ALIGN_OF(XRenderThread));
 	m_pRt->startRenderThread();
@@ -123,6 +123,39 @@ void XRender::RenderEnd()
 }
 
 
+// ViewPort
+
+void XRender::GetViewport(int* left, int* top, int* right, int* bottom)
+{
+	X_ASSERT_NOT_NULL(left);
+	X_ASSERT_NOT_NULL(top);
+	X_ASSERT_NOT_NULL(right);
+	X_ASSERT_NOT_NULL(bottom);
+
+	const Recti& rect = ViewPort_.getRect();
+
+	*left = rect.x1;
+	*top = rect.y1;
+	*right = rect.x2;
+	*bottom = rect.y2;
+}
+
+void XRender::SetViewport(int left, int top, int right, int bottom)
+{
+	ViewPort_.set(left, top, right, bottom);
+}
+
+void XRender::GetViewport(Recti& rect)
+{
+	rect = ViewPort_.getRect();
+}
+
+void XRender::SetViewport(const Recti& rect)
+{
+	ViewPort_.getRect() = rect;
+}
+
+// ~ViewPort
 
 
 // Textures 

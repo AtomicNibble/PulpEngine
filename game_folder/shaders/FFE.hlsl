@@ -11,9 +11,18 @@
 struct VS_INPUT
 {
     float3 osPosition           	: POSITION;
+#ifdef PARAM_VS_Normal
+        float3 osNormal           	: NORMAL0;  
+#endif
     float4 color                	: COLOR0;
     float2 texCoord             	: TEXCOORD0;
+#ifdef PARAM_VS_Texcoord2
+    float2 texCoord2             	: TEXCOORD1;
+#endif
 };
+
+
+
 
 struct VS_OUTPUT
 {
@@ -54,9 +63,8 @@ VS_OUTPUT BasicVSTest(VS_INPUT input)
 PS_OUTPUT SolidWorldPS(PS_INPUT input)
 {
     PS_OUTPUT output;
-    output.color = input.color;
-    output.color.r = 1.0;
-        output.color.g = 0.0;
+    float4 textureCol = baseMap.Sample(baseMapSampler, input.texCoord);
+    output.color = input.color * textureCol;
     return output;
 }
 

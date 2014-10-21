@@ -205,7 +205,7 @@ X_NAMESPACE_BEGIN(bsp)
 //
 //
 
-static const uint32_t	 BSP_VERSION = 7; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
+static const uint32_t	 BSP_VERSION = 8; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
 static const uint32_t	 BSP_FOURCC = X_TAG('x', 'l', 'v', 'l');
 static const uint32_t	 BSP_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r'); // if a file falid to write the final header, this will be it's FourCC
 // feels kinda wrong to call it a '.bsp', since it's otherthings as well. 
@@ -285,7 +285,7 @@ struct Material
 
 // Vertex and index types.
 // must be one from vertexForamts.h and one the engine understands.
-typedef Vertex_P3F_T4F_N3F_C4B Vertex;
+typedef Vertex_P3F_N3F_C4B_T4F Vertex;
 typedef int Index;
 
 // plane type for BSP.

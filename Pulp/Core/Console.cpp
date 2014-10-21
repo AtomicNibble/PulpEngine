@@ -590,14 +590,19 @@ void XConsole::Startup(ICore* pCore)
 	X_ASSERT_NOT_NULL(pCore);
 	X_LOG0("Console", "Starting console");
 
-	// we want input events plooxx.
-	pCore->GetIInput()->AddEventListener(this);
 
 	pCore_ = pCore;
 	pFont_ = pCore->GetIFontSys()->GetFont("default");
 	pRender_ = pCore->GetIRender();
 	pInput_ = pCore->GetIInput();
 
+	X_ASSERT_NOT_NULL(pFont_);
+//	X_ASSERT_NOT_NULL(pRender_); // can be null i think, ask wincat.
+	X_ASSERT_NOT_NULL(pInput_);
+
+	// we want input events plooxx.
+	pInput_->AddConsoleEventListener(this);
+	
 	// add this as a logger.
 	pCore->GetILog()->AddLogger(&logger_);
 
@@ -648,6 +653,8 @@ void XConsole::ShutDown()
 
 	pCore_->GetHotReloadMan()->addfileType(nullptr, CONFIG_FILE_EXTENSION);
 	pCore_->GetILog()->RemoveLogger(&logger_);
+	pInput_->RemoveConsoleEventListener(this);
+
 
 	// clear up vars.
 	if (!VarMap_.empty())
@@ -677,8 +684,13 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 		repeatEvent_.keyId = input::KeyId::UNKNOWN;
 
 	if (event.action != input::InputState::PRESSED)
-//	if (event.action == input::InputState::RELEASED )
+	{
+		// if open we eat all none mouse
+		if (event.deviceId == input::InputDeviceType::KEYBOARD)
+			return isVisable();
+
 		return false;
+	}
 
 
 
@@ -1365,12 +1377,16 @@ void XConsole::ConfigExec(const char* command)
 	ExecuteStringInternal(command, ExecSource::CONFIG, false);
 }
 
-bool XConsole::CvarModifyBegin(ICVar *pCVar, ExecSource::Enum source)
+bool XConsole::CvarModifyBegin(ICVar* pCVar, ExecSource::Enum source)
 {
+	X_ASSERT_NOT_NULL(pCVar);
+
 	ICVar::FlagType flags = pCVar->GetFlags();
 
-	if (flags.IsSet(VarFlag::READONLY))
+	if (flags.IsSet(VarFlag::READONLY)) {
+		X_ERROR("Console", "can't set value of read only cvar: %s", pCVar->GetName());
 		return false;
+	}
 
 	if (source == ExecSource::CONFIG)
 	{
@@ -1616,12 +1632,16 @@ void XConsole::DrawBuffer()
 	ctx.SetProportional(false);
 	ctx.SetSize(Vec2f(20, 20));
 	ctx.SetCharWidthScale(0.5f);
+//	ctx.SetScaleFrom800x600(true);
+
+	float width = pRender_->getWidthf() - 10;
+	float height = pRender_->getHeightf() - 40;
 
 	if (pRender_)
 	{
 		pRender_->Set2D(true);
-		pRender_->DrawQuad(5, 5, 790, 24, console_input_box_color);
-		pRender_->DrawRect(5, 5, 790, 24, console_input_box_color_border);
+		pRender_->DrawQuad(5, 5, width, 24, console_input_box_color);
+		pRender_->DrawRect(5, 5, width, 24, console_input_box_color_border);
 
 	//	pRender_->DrawQuad(5, 35, 790, 24, console_input_box_color);
 
@@ -1630,10 +1650,10 @@ void XConsole::DrawBuffer()
 
 			// draw a channel colum?
 			if (console_output_draw_channel)
-				pRender_->DrawQuad(5, 35, 11 * ctx.GetCharWidthScaled(), 560, console_output_box_channel_color);
+				pRender_->DrawQuad(5, 35, 11 * ctx.GetCharWidthScaled(), height, console_output_box_channel_color);
 
-			pRender_->DrawQuad(5, 35, 790, 560, console_output_box_color);
-			pRender_->DrawRect(5, 35, 790, 560, console_output_box_color_border);
+			pRender_->DrawQuad(5, 35, width, height, console_output_box_color);
+			pRender_->DrawRect(5, 35, width, height, console_output_box_color_border);
 
 		}
 
@@ -1677,16 +1697,16 @@ void XConsole::DrawBuffer()
 
 			ConsoleBufferRItor ritor;
 			ritor = ConsoleLog_.rbegin();
-			int xPos = 8;
-			int yPos = 575;
+			float xPos = 8;
+			float yPos = height + 15; // 15 uints up
 			int nScroll = 0;
-			while (ritor != ConsoleLog_.rend() && yPos >= 30)
+			while (ritor != ConsoleLog_.rend() && yPos >= 30) // max 30 below top(not bottom)
 			{
 				if (nScroll >= ScrollPos_)
 				{
 					const char *buf = ritor->c_str();
 
-					pFont_->DrawString((float)xPos, (float)yPos, buf, ctx);
+					pFont_->DrawString(xPos, yPos, buf, ctx);
 					yPos -= CharHeight;
 				}
 				nScroll++;
@@ -1819,6 +1839,8 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 		ctx.SetProportional(false);
 		ctx.SetSize(Vec2f(14, 14));
 		ctx.SetCharWidthScale(0.65f);
+	//	ctx.SetScaleFrom800x600(true);
+
 
 		// Autocomplete
 		if (autoCompleteNum_ != results.size())

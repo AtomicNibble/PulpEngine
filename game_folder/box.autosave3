@@ -1,0 +1,66 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"classname" "worldspawn"
+// brush 0
+{
+ ( 16 -72 0 ) ( 56 -72 0 ) ( 56 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
+ ( -32 320 8 ) ( -72 320 8 ) ( -72 320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( -256 -24 8 ) ( -256 -48 8 ) ( -256 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( 48 -320 8 ) ( 88 -320 8 ) ( 88 -320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( 256 -96 16 ) ( 256 -72 16 ) ( 256 -72 8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( 56 -72 8 ) ( 16 -72 8 ) ( 56 -48 8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
+}
+// brush 1
+{
+ ( 16 -72 0 ) ( 56 -72 0 ) ( 56 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
+ ( 8 -40 128 ) ( 8 -64 128 ) ( -32 -64 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
+ ( -32 320 8 ) ( -72 320 8 ) ( -72 320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( -256 -24 8 ) ( -256 -48 8 ) ( -256 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( 256 -96 16 ) ( 256 -72 16 ) ( 256 -72 8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( -72 312 8 ) ( -32 312 8 ) ( -72 312 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+}
+// brush 2
+{
+ ( 16 -72 0 ) ( 56 -72 0 ) ( 56 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
+ ( 8 -40 128 ) ( 8 -64 128 ) ( -32 -64 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
+ ( -32 320 8 ) ( -72 320 8 ) ( -72 320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( -256 -24 8 ) ( -256 -48 8 ) ( -256 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( 48 -320 8 ) ( 88 -320 8 ) ( 88 -320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( -248 -48 8 ) ( -248 -24 8 ) ( -248 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+}
+// brush 3
+{
+ ( 16 -72 0 ) ( 56 -72 0 ) ( 56 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
+ ( 8 -40 128 ) ( 8 -64 128 ) ( -32 -64 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
+ ( -256 -24 8 ) ( -256 -48 8 ) ( -256 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( 48 -320 8 ) ( 88 -320 8 ) ( 88 -320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( 256 -96 16 ) ( 256 -72 16 ) ( 256 -72 8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( 88 -312 8 ) ( 48 -312 8 ) ( 88 -312 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+}
+// brush 4
+{
+ ( 16 -72 0 ) ( 56 -72 0 ) ( 56 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
+ ( 8 -40 128 ) ( 8 -64 128 ) ( -32 -64 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
+ ( -32 320 8 ) ( -72 320 8 ) ( -72 320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( 48 -320 8 ) ( 88 -320 8 ) ( 88 -320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( 256 -96 16 ) ( 256 -72 16 ) ( 256 -72 8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( 248 -72 16 ) ( 248 -96 16 ) ( 248 -72 8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+}
+// brush 5
+{
+ ( 264 -72 8 ) ( 304 -72 8 ) ( 304 -48 8 ) berlin_ceilings_metal2_noscorch 128 128 0 0 0 0 lightmap_gray 16383.975 16384 -248 0 -180 0
+ ( 256 -40 128 ) ( 256 -64 128 ) ( 216 -64 128 ) berlin_ceilings_metal2_noscorch 128 128 0 0 0 0 lightmap_gray 16384 16384 -248 0 180 0
+ ( 208 0 8 ) ( 168 0 8 ) ( 168 0 0 ) berlin_ceilings_metal2_noscorch 128 128 0 0 0 0 lightmap_gray 16384 -16384 -248 0 180 0
+ ( -16 -344 8 ) ( -16 -368 8 ) ( -16 -368 0 ) berlin_ceilings_metal2_noscorch 512 512 3.75 0 0 0 lightmap_gray 16384 16384 0 0 180 0
+ ( 296 -312 8 ) ( 336 -312 8 ) ( 336 -312 0 ) berlin_ceilings_metal2_noscorch 128 128 0 0 0 0 lightmap_gray 16384 -16384 -248 0 180 0
+ ( 0 -48 16 ) ( 0 -24 16 ) ( 0 -48 8 ) berlin_ceilings_metal2_noscorch 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+}
+}
+// entity 1
+{
+"origin" "176.0 -240.0 52.0"
+"classname" "info_player_start"
+}

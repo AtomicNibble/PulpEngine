@@ -67,7 +67,7 @@ struct BrushPlaneSide
 
 extern Settings gSettings;
 
-typedef Vec4f textureVectors[2];
+// typedef Vec4f textureVectors[2];
 
 
 struct BspEntity
@@ -94,7 +94,7 @@ struct BspSide
 	bool			visible;
 	bool			culled;
 
-	textureVectors	texVec;
+//	Vec2f			texVec;
 
 	XWinding*		pWinding;		// only clipped to the other sides of the brush
 	XWinding*       pVisibleHull;   // convex hull of all visible fragments 

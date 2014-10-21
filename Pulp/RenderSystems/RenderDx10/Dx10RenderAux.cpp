@@ -1050,12 +1050,6 @@ void XRenderAuxImp::AdjustRenderStates(const XAuxGeomRenderFlags& renderFlags)
 	{
 		matrices_.pCurTransMat = pNewTransMat;
 
-
-
-	//	renderer_.DirtyMatrix();
-	//	m_renderer.m_RP.m_TI[m_renderer.m_RP.m_nProcessThreadID].m_matView->LoadIdentity();
-	//	m_renderer.m_RP.m_TI[m_renderer.m_RP.m_nProcessThreadID].m_matProj->LoadMatrix(pNewTransMat);
-	//	m_renderer.EF_DirtyMatrix();
 	}
 
 	// set alpha blending mode

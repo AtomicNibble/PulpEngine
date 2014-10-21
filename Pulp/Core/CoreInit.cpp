@@ -260,7 +260,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		// Alogn it
 		if (pConsole)
 		{
-			pWindow_->AlignTo(pConsole->GetRect(), Alignment::TOP_ALIGN | Alignment::RIGHT_DOCK);
+		
+			pWindow_->AlignTo(core::xWindow::GetPrimaryRect(), 
+				Alignment::TOP_ALIGN | Alignment::RIGHT_ALIGN);
 		}
 	}
 
@@ -524,9 +526,9 @@ void XCore::CreateSystemVars()
 	var_win_pos_y = ADD_CVAR_REF("win_y_pos", g_coreVars.win_y_pos, 10, 0, desktop.getHeight(), 
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Game window position y");
 	var_win_width = ADD_CVAR_REF("win_width", g_coreVars.win_width, 800, 800, 1, 
-		VarFlag::SYSTEM | VarFlag::READONLY, "Game window width");
+		VarFlag::SYSTEM , "Game window width");
 	var_win_height = ADD_CVAR_REF("win_height", g_coreVars.win_height, 600, 600, 1, 
-		VarFlag::SYSTEM | VarFlag::READONLY, "Game window height");
+		VarFlag::SYSTEM , "Game window height");
 
 	var_win_pos_x->SetOnChangeCallback(WindowPosVarChange);
 	var_win_pos_y->SetOnChangeCallback(WindowPosVarChange);

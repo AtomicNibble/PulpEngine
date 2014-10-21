@@ -12,11 +12,11 @@ bool XWinding::EnsureAlloced(int n, bool keep)
 
 bool XWinding::ReAllocate(int n, bool keep)
 {
-	Vec3f* oldP;
+	Vec5f* oldP;
 
 	oldP = p;
 	n = (n + 3) & ~3;	// align up to multiple of four
-	p = new Vec3f[n];
+	p = new Vec5f[n];
 	if (oldP) {
 		if (keep) {
 			memcpy(p, oldP, numPoints * sizeof(p[0]));
@@ -83,10 +83,10 @@ void XWinding::BaseForPlane(const Vec3f &normal, const float dist)
 
 	EnsureAlloced(4);
 	numPoints = 4;
-	p[0] = org - vright + vup;
-	p[1] = org + vright + vup;
-	p[2] = org + vright - vup;
-	p[3] = org - vright - vup;
+	p[0].asVec3() = org - vright + vup;
+	p[1].asVec3() = org + vright + vup;
+	p[2].asVec3() = org + vright - vup;
+	p[3].asVec3() = org - vright - vup;
 
 
 //	Vec3f temp[4];
@@ -109,8 +109,8 @@ float XWinding::GetArea(void) const
 
 	total = 0.0f;
 	for (i = 2; i < numPoints; i++) {
-		d1 = p[i - 1] - p[0];
-		d2 = p[i] - p[0];
+		d1 = p[i - 1].asVec3() - p[0].asVec3();
+		d2 = p[i].asVec3() - p[0].asVec3();
 		cross = d1.cross(d2);
 		total += cross.length();
 	}
@@ -124,7 +124,7 @@ Vec3f XWinding::GetCenter(void) const
 
 	center = Vec3f::zero();
 	for (i = 0; i < numPoints; i++) {
-		center += p[i];
+		center += p[i].asVec3();
 	}
 	center *= (1.0f / numPoints);
 	return center;
@@ -138,7 +138,7 @@ float XWinding::GetRadius(const Vec3f &center) const
 
 	radius = 0.0f;
 	for (i = 0; i < numPoints; i++) {
-		dir = p[i] - center;
+		dir = p[i].asVec3() - center;
 		r = dir * dir;
 		if (r > radius) {
 			radius = r;
@@ -158,11 +158,11 @@ void XWinding::GetPlane(Vec3f &normal, float &dist) const
 	}
 
 	center = GetCenter();
-	v1 = p[0] - center;
-	v2 = p[1] - center;
+	v1 = p[0].asVec3() - center;
+	v2 = p[1].asVec3() - center;
 	normal = v2.cross(v1);
 	normal.normalize();
-	dist = p[0] * normal;
+	dist = p[0].asVec3() * normal;
 }
 
 
@@ -178,14 +178,44 @@ void XWinding::GetPlane(Planef &plane) const
 	}
 
 	center = GetCenter();
-	v1 = p[0] - center;
-	v2 = p[1] - center;
+	v1 = p[0].asVec3() - center;
+	v2 = p[1].asVec3() - center;
 	plane.setNormal(v2.cross(v1));
-	// plane.Normal_.normalize();
-	//	plane.normalize();
-	//	plane.FitThroughPoint(p[0]);
-	plane.setDistance(plane.getNormal() * p[0]);
+	plane.setDistance(plane.getNormal() * p[0].asVec3());
 }
+
+void XWinding::GetAABB(AABB& bounds) const
+{
+	int i;
+
+	if (!numPoints) {
+		bounds.clear();
+		return;
+	}
+
+	bounds.min = bounds.max = p[0].asVec3();
+	for (i = 1; i < numPoints; i++) {
+		if (p[i].x < bounds.min.x) {
+			bounds.min.x = p[i].x;
+		}
+		else if (p[i].x > bounds.max.x) {
+			bounds.max.x = p[i].x;
+		}
+		if (p[i].y < bounds.min.y) {
+			bounds.min.y = p[i].y;
+		}
+		else if (p[i].y > bounds.max.y) {
+			bounds.max.y = p[i].y;
+		}
+		if (p[i].z < bounds.min.z) {
+			bounds.min.z = p[i].z;
+		}
+		else if (p[i].z > bounds.max.z) {
+			bounds.max.z = p[i].z;
+		}
+	}
+}
+
 
 float XWinding::PlaneDistance(const Planef &plane) const
 {
@@ -228,7 +258,7 @@ Planeside::Enum XWinding::PlaneSide(const Planef &plane, const float epsilon) co
 	back = false;
 	for (i = 0; i < numPoints; i++) 
 	{
-		d = plane.distance(p[i]);
+		d = plane.distance(p[i].asVec3());
 		if (d < -epsilon) {
 			if (front) {
 				return Planeside::CROSS;
@@ -264,8 +294,8 @@ int XWinding::Split(const Planef& plane, const float epsilon, XWinding **front, 
 	int				counts[3];
 	float			dot;
 	int				i, j;
-	const Vec3f *	p1, *p2;
-	Vec3f			mid;
+	const Vec5f *	p1, *p2;
+	Vec5f			mid;
 	XWinding *		f, *b;
 	int				maxpts;
 
@@ -276,7 +306,7 @@ int XWinding::Split(const Planef& plane, const float epsilon, XWinding **front, 
 
 	// determine sides for each point
 	for (i = 0; i < numPoints; i++) {
-		dists[i] = dot = plane.distance(p[i]);
+		dists[i] = dot = plane.distance(p[i].asVec3());
 
 		if (dot > epsilon) {
 			sides[i] = Planeside::FRONT;
@@ -368,6 +398,9 @@ int XWinding::Split(const Planef& plane, const float epsilon, XWinding **front, 
 					mid[j] = (*p1)[j] + dot * ((*p2)[j] - (*p1)[j]);
 				}
 			}
+
+			mid.s = p1->s + dot * (p2->s - p1->s);
+			mid.t = p1->t + dot * (p2->t - p1->t);
 		}
 		else {
 			dot = dists[i + 1] / (dists[i + 1] - dists[i]);
@@ -383,6 +416,9 @@ int XWinding::Split(const Planef& plane, const float epsilon, XWinding **front, 
 					mid[j] = (*p2)[j] + dot * ((*p1)[j] - (*p2)[j]);
 				}
 			}
+
+			mid.s = p2->s + dot * (p1->s - p2->s);
+			mid.t = p2->t + dot * (p1->t - p2->t);
 		}
 
 		f->p[f->numPoints] = mid;
@@ -404,13 +440,13 @@ int XWinding::Split(const Planef& plane, const float epsilon, XWinding **front, 
 
 XWinding* XWinding::Clip(const Planef &plane, const float epsilon, const bool keepOn)
 {
-	Vec3f*		newPoints;
+	Vec5f*		newPoints;
 	int			newNumPoints;
 	int			counts[3];
 	float		dot;
 	int			i, j;
-	Vec3f *	p1, *p2;
-	Vec3f		mid;
+	Vec5f *	p1, *p2;
+	Vec5f		mid;
 	int			maxpts;
 
 	X_ASSERT_NOT_NULL(this);
@@ -420,11 +456,11 @@ XWinding* XWinding::Clip(const Planef &plane, const float epsilon, const bool ke
 
 	counts[Planeside::FRONT] = counts[Planeside::BACK] = counts[Planeside::ON] = 0;
 
-
+	
 
 	// determine sides for each point
 	for (i = 0; i < numPoints; i++) {
-		dists[i] = dot = plane.distance(p[i]);
+		dists[i] = dot = plane.distance(p[i].asVec3());
 		if (dot > epsilon) {
 			sides[i] = Planeside::FRONT;
 		}
@@ -446,7 +482,7 @@ XWinding* XWinding::Clip(const Planef &plane, const float epsilon, const bool ke
 	// if nothing at the front of the clipping plane
 	if (!counts[Planeside::FRONT]) {
 		delete this;
-		return NULL;
+		return nullptr;
 	}
 	// if nothing at the back of the clipping plane
 	if (!counts[Planeside::BACK]) {
@@ -455,7 +491,7 @@ XWinding* XWinding::Clip(const Planef &plane, const float epsilon, const bool ke
 
 	maxpts = numPoints + 4;		// cant use counts[0]+2 because of fp grouping errors
 
-	newPoints = (Vec3f *)_alloca16(maxpts * sizeof(Vec3f));
+	newPoints = (Vec5f *)_alloca16(maxpts * sizeof(Vec5f));
 	newNumPoints = 0;
 
 	for (i = 0; i < numPoints; i++) {
@@ -501,6 +537,9 @@ XWinding* XWinding::Clip(const Planef &plane, const float epsilon, const bool ke
 			}
 		}
 
+		mid.s = p1->s + dot * (p2->s - p1->s);
+		mid.t = p1->t + dot * (p2->t - p1->t);
+
 		newPoints[newNumPoints] = mid;
 		newNumPoints++;
 	}
@@ -510,7 +549,7 @@ XWinding* XWinding::Clip(const Planef &plane, const float epsilon, const bool ke
 	}
 
 	numPoints = newNumPoints;
-	memcpy(p, newPoints, newNumPoints * sizeof(Vec3f));
+	memcpy(p, newPoints, newNumPoints * sizeof(Vec5f));
 	return this;
 }
 
@@ -546,7 +585,7 @@ void XWinding::AddToConvexHull(const XWinding *winding, const Vec3f &normal, con
 	bool *			hullSide;
 	bool			outside;
 	int				numNewHullPoints;
-	Vec3f *			newHullPoints;
+	Vec5f *			newHullPoints;
 
 	if (!winding) {
 		return;
@@ -558,16 +597,16 @@ void XWinding::AddToConvexHull(const XWinding *winding, const Vec3f &normal, con
 		return;
 	}
 
-	newHullPoints = (Vec3f *)_alloca(maxPts * sizeof(Vec3f));
+	newHullPoints = (Vec5f *)_alloca(maxPts * sizeof(Vec5f));
 	hullDirs = (Vec3f *)_alloca(maxPts * sizeof(Vec3f));
 	hullSide = (bool *)_alloca(maxPts * sizeof(bool));
 
 	for (i = 0; i < winding->numPoints; i++) {
-		const Vec3f &p1 = winding->p[i];
+		const Vec5f &p1 = winding->p[i];
 
 		// calculate hull edge vectors
 		for (j = 0; j < this->numPoints; j++) {
-			dir = this->p[(j + 1) % this->numPoints] - this->p[j];
+			dir = this->p[(j + 1) % this->numPoints].asVec3() - this->p[j].asVec3();
 			dir.normalize();
 			hullDirs[j] = normal.cross(dir);
 		}
@@ -575,7 +614,7 @@ void XWinding::AddToConvexHull(const XWinding *winding, const Vec3f &normal, con
 		// calculate side for each hull edge
 		outside = false;
 		for (j = 0; j < this->numPoints; j++) {
-			dir = p1 - this->p[j];
+			dir = p1.asVec3() - this->p[j].asVec3();
 			d = dir * hullDirs[j];
 			if (d >= epsilon) {
 				outside = true;
@@ -636,7 +675,7 @@ void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const fl
 	float			d;
 	Vec3f *			hullDirs;
 	bool *			hullSide;
-	Vec3f *			hullPoints;
+	Vec5f *			hullPoints;
 	bool			outside;
 
 	switch (numPoints) {
@@ -647,31 +686,31 @@ void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const fl
 		}
 		case 1: {
 					// don't add the same point second
-					if (p[0].compare(point, epsilon)) {
+					if (p[0].asVec3().compare(point, epsilon)) {
 						return;
 					}
-					p[1] = point;
+					p[1].asVec3() = point;
 					numPoints++;
 					return;
 		}
 		case 2: {
 					// don't add a point if it already exists
-					if (p[0].compare(point, epsilon) || p[1].compare(point, epsilon)) {
+					if (p[0].asVec3().compare(point, epsilon) || p[1].asVec3().compare(point, epsilon)) {
 						return;
 					}
 					// if only two points make sure we have the right ordering according to the normal
-					dir = point - p[0];
-					dir = dir.cross(p[1] - p[0]);
+					dir = point - p[0].asVec3();
+					dir = dir.cross(p[1].asVec3() - p[0].asVec3());
 					if (dir[0] == 0.0f && dir[1] == 0.0f && dir[2] == 0.0f) {
 						// points don't make a plane
 						return;
 					}
 					if (dir * normal > 0.0f) {
-						p[2] = point;
+						p[2].asVec3() = point;
 					}
 					else {
 						p[2] = p[1];
-						p[1] = point;
+						p[1].asVec3() = point;
 					}
 					numPoints++;
 					return;
@@ -683,14 +722,14 @@ void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const fl
 
 	// calculate hull edge vectors
 	for (j = 0; j < numPoints; j++) {
-		dir = p[(j + 1) % numPoints] - p[j];
+		dir = p[(j + 1) % numPoints].asVec3() - p[j].asVec3();
 		hullDirs[j] = normal.cross(dir);
 	}
 
 	// calculate side for each hull edge
 	outside = false;
 	for (j = 0; j < numPoints; j++) {
-		dir = point - p[j];
+		dir = point - p[j].asVec3();
 		d = dir * hullDirs[j];
 		if (d >= epsilon) {
 			outside = true;
@@ -718,7 +757,7 @@ void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const fl
 		return;
 	}
 
-	hullPoints = (Vec3f *)_alloca((numPoints + 1) * sizeof(Vec3f));
+	hullPoints = (Vec5f *)_alloca((numPoints + 1) * sizeof(Vec5f));
 
 	// insert the point here
 	hullPoints[0] = point;

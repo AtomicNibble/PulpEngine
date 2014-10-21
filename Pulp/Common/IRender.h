@@ -292,15 +292,22 @@ struct IRender
 	virtual void SetCullMode(CullMode::Enum mode) X_ABSTRACT;
 	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_ABSTRACT;
 
-
-	virtual void GetViewport(int* x, int* y, int* width, int* height) X_ABSTRACT;
-	virtual void SetViewport(int x, int y, int width, int height) X_ABSTRACT;
-	virtual void GetViewport(Vec4<int>& viewport) X_ABSTRACT;
-	virtual void SetViewport(const Vec4<int>& viewport) X_ABSTRACT;
-
+	// ViewPort
+	virtual void GetViewport(int* left, int* top, int* right, int* bottom) X_ABSTRACT;
+	virtual void SetViewport(int left, int top, int right, int bottom) X_ABSTRACT;
+	virtual void GetViewport(Recti& rect) X_ABSTRACT;
+	virtual void SetViewport(const Recti& rect) X_ABSTRACT;
 
 	virtual int getWidth(void) const X_ABSTRACT;
 	virtual int getHeight(void) const X_ABSTRACT;
+	virtual float getWidthf(void) const X_ABSTRACT;
+	virtual float getHeightf(void) const X_ABSTRACT;
+	// ~ViewPort
+
+	virtual float ScaleCoordX(float value) const X_ABSTRACT;
+	virtual float ScaleCoordY(float value) const X_ABSTRACT;
+	virtual void ScaleCoord(float& x, float& y) const X_ABSTRACT;
+	virtual void ScaleCoord(Vec2f& xy) const X_ABSTRACT;
 
 
 	virtual void  SetCamera(const XCamera& cam) X_ABSTRACT;

@@ -6,61 +6,21 @@ iwmap 4
 "classname" "worldspawn"
 // brush 0
 {
- ( 16 -72 0 ) ( 56 -72 0 ) ( 56 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
- ( -32 320 8 ) ( -72 320 8 ) ( -72 320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( -256 -24 8 ) ( -256 -48 8 ) ( -256 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( 48 -320 8 ) ( 88 -320 8 ) ( 88 -320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( 256 -96 16 ) ( 256 -72 16 ) ( 256 -72 8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( 56 -72 8 ) ( 16 -72 8 ) ( 56 -48 8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
-}
-// brush 1
-{
- ( 8 -40 128 ) ( 8 -64 128 ) ( -32 -64 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
- ( -32 320 8 ) ( -72 320 8 ) ( -72 320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( -256 -24 8 ) ( -256 -48 8 ) ( -256 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( 48 -320 8 ) ( 88 -320 8 ) ( 88 -320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( 256 -96 16 ) ( 256 -72 16 ) ( 256 -72 8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( 8 -64 120 ) ( 8 -40 120 ) ( -32 -64 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
-}
-// brush 2
-{
- ( 16 -72 0 ) ( 56 -72 0 ) ( 56 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
- ( 8 -40 128 ) ( 8 -64 128 ) ( -32 -64 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
- ( -32 320 8 ) ( -72 320 8 ) ( -72 320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( -256 -24 8 ) ( -256 -48 8 ) ( -256 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( 256 -96 16 ) ( 256 -72 16 ) ( 256 -72 8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( -72 312 8 ) ( -32 312 8 ) ( -72 312 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
-}
-// brush 3
-{
- ( 16 -72 0 ) ( 56 -72 0 ) ( 56 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
- ( 8 -40 128 ) ( 8 -64 128 ) ( -32 -64 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
- ( -32 320 8 ) ( -72 320 8 ) ( -72 320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( -256 -24 8 ) ( -256 -48 8 ) ( -256 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( 48 -320 8 ) ( 88 -320 8 ) ( 88 -320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( -248 -48 8 ) ( -248 -24 8 ) ( -248 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
-}
-// brush 4
-{
- ( 16 -72 0 ) ( 56 -72 0 ) ( 56 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
- ( 8 -40 128 ) ( 8 -64 128 ) ( -32 -64 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
- ( -256 -24 8 ) ( -256 -48 8 ) ( -256 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( 48 -320 8 ) ( 88 -320 8 ) ( 88 -320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( 256 -96 16 ) ( 256 -72 16 ) ( 256 -72 8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( 88 -312 8 ) ( 48 -312 8 ) ( 88 -312 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
-}
-// brush 5
-{
- ( 16 -72 0 ) ( 56 -72 0 ) ( 56 -48 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
- ( 8 -40 128 ) ( 8 -64 128 ) ( -32 -64 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 180 0
- ( -32 320 8 ) ( -72 320 8 ) ( -72 320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( 48 -320 8 ) ( 88 -320 8 ) ( 88 -320 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( 256 -96 16 ) ( 256 -72 16 ) ( 256 -72 8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
- ( 248 -72 16 ) ( 248 -96 16 ) ( 248 -72 8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 0 0 180 0
+ ( 88 56 -8 ) ( 128 56 -8 ) ( 128 80 -8 ) berlin_ceilings_metal2_noscorch 384 128 0 0 0 0 lightmap_gray 16383.975 16384 -264 128 180 0
+ ( 280 88 0 ) ( 280 64 0 ) ( 240 64 0 ) berlin_ceilings_metal2_noscorch 512 512 0 0 0 0 lightmap_gray 16383.992 16384 -264 128 180 0
+ ( 224 128 0 ) ( 184 128 0 ) ( 184 128 -8 ) berlin_ceilings_metal2_noscorch 256 128 0 0 0 0 lightmap_gray 16384.018 -16384 -264 -8 180 0
+ ( -128 -216 8 ) ( -128 -240 8 ) ( -128 -240 0 ) berlin_ceilings_metal2_noscorch 256 128 0 0 0 0 lightmap_gray 16384.057 16384 -128 -8 180 0
+ ( 312 -128 -8 ) ( 352 -128 -8 ) ( 352 -128 -16 ) berlin_ceilings_metal2_noscorch 256 128 0 0 0 0 lightmap_gray 16384.018 -16384 -264 -8 -180 0
+ ( 128 80 8 ) ( 128 104 8 ) ( 128 80 0 ) berlin_ceilings_metal2_noscorch 256 128 0 0 0 0 lightmap_gray 16384 -16384 -128 -8 180 0
 }
 }
 // entity 1
 {
-"origin" "176.0 -240.0 52.0"
 "classname" "info_player_start"
+"origin" "176.0 -240.0 52.0"
+}
+// entity 2
+{
+"origin" "152.0 144.0 16.0"
+"classname" "script_model"
 }

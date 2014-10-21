@@ -50,8 +50,8 @@ void DX11XRender::FontSetRenderingState()
 	m_ProMat.Push();
 	m = m_ProMat.GetTop();
 
-	float width = 800;
-	float height = 600;
+	float width = getWidthf();
+	float height = getHeightf();
 	float znear = -1e10f;
 	float zfar = 1e10f;
 

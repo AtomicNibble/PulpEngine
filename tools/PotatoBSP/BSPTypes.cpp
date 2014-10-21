@@ -76,7 +76,7 @@ bool bspBrush::boundBrush(const XPlaneSet& planes)
 		if (!w)
 			continue;
 		for (j = 0; j < w->GetNumPoints(); j++)
-			bounds.add((*w)[j]);
+			bounds.add((*w)[j].asVec3());
 	}
 
 	for (i = 0; i < 3; i++) {
@@ -120,7 +120,7 @@ float bspBrush::Volume(const XPlaneSet& planes)
 		return 0;
 	}
 
-	corner = (*w)[0];
+	corner = (*w)[0].asVec3();
 
 	// make tetrahedrons to all other faces
 	volume = 0;
@@ -158,7 +158,7 @@ BrushPlaneSide::Enum bspBrush::BrushMostlyOnSide(const Planef& plane)
 
 		for (j = 0; j < w->GetNumPoints(); j++)
 		{
-			d = plane.distance((*w)[j]);
+			d = plane.distance((*w)[j].asVec3());
 			if (d > max)
 			{
 				max = d;

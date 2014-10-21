@@ -214,17 +214,36 @@ bool XMapBrushSide::ParseMatInfo(XLexer &src, XMapBrushSide::MaterialInfo& info)
 		return false;
 	}
 
-	info.name = core::StackString<64>(token.begin(), token.end());
+//	info.name = core::StackString<64>(token.begin(), token.end());
+	info.name.set(token.begin(), token.end());
 
+	// repeats every X / Y
+	// if this value is 512 x 512, this means the texture repeats every
+	// 512 uints, so if the brush is 256 x 256.
+	// only the top left of the texture will be used.
+	// [0,0]		[0.5,0]
+	//
+	//
+	// [0,0.5]		[0.5,0.5]
 	info.matRepeate[0] = src.ParseFloat();
 	info.matRepeate[1] = src.ParseFloat();
 
-	info.shift[0] = src.ParseFloat();
-	info.shift[1] = src.ParseFloat();
+	// I think it's like a vertex position offset.
+	// so a hoz shift of 64.
+	// makes it so the texture started 64 units to the left.(positive val)
+	// For example, using the 512 x 512 example above with the same size bursh.
+	// a shift of 128 on X would result in the following coords.
+	// [0.25,0]		[0.75,0]
+	//
+	//
+	// [0.25,0.5]	[0.75,0.5]
+	info.shift[0] = src.ParseFloat(); // hoz 
+	info.shift[1] = src.ParseFloat(); // vertical
 
+	// rotation clockwise in degrees(neg is anti)
 	info.rotate = src.ParseFloat();
 
-	// dunno what this value is.
+	// dunno what this value is, goat value?
 	src.ParseFloat();
 	return true;
 }
