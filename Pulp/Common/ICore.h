@@ -316,12 +316,14 @@ extern core::MallocFreeAllocator* gMalloc;
 
 
 #define ADD_CVAR_REF(name,_var,_def_val,_Min,_Max,_flags,_Desc)			gEnv->pConsole->Register(name, &(_var), (_def_val), (_Min), (_Max), (_flags), CVARTEXT(_Desc))
+#define ADD_CVAR_REF_VEC3(name,_var,_def_val,_flags,_Desc)				gEnv->pConsole->Register(name, &(_var), (_def_val), (_flags), CVARTEXT(_Desc))
 #define ADD_CVAR_REF_NO_NAME(_var,_def_val,_Min,_Max,_flags,_Desc)		gEnv->pConsole->Register(X_STRINGIZE(_var), &(_var), (_def_val), (_Min), (_Max), (_flags), CVARTEXT(_Desc))
 #define ADD_CVAR_REF_COL_NO_NAME(_var,_def_val,_flags,_Desc)			gEnv->pConsole->Register(X_STRINGIZE(_var), &(_var), (_def_val), (_flags), CVARTEXT(_Desc))
+#define ADD_CVAR_REF_VEC3_NO_NAME(_var,_def_val,_flags,_Desc)			gEnv->pConsole->Register(X_STRINGIZE(_var), &(_var), (_def_val), (_flags), CVARTEXT(_Desc))
 
-#define ADD_CVAR_INT(_name,_val,_Min,_Max,_flags,_Desc)		gEnv->pConsole->RegisterInt(_name, (_val), (_Min), (_Max), (_flags), CVARTEXT(_Desc))
-#define ADD_CVAR_FLOAT(_name,_val,_Min,_Max,_flags,_Desc)	gEnv->pConsole->RegisterFloat(_name, (_val), (_Min), (_Max), (_flags), CVARTEXT(_Desc))
-#define ADD_CVAR_STRING(_name,_val,_flags,_Desc)			gEnv->pConsole->RegisterString(_name, (_val), (_flags), CVARTEXT(_Desc))
+#define ADD_CVAR_INT(_name,_val,_Min,_Max,_flags,_Desc)					gEnv->pConsole->RegisterInt(_name, (_val), (_Min), (_Max), (_flags), CVARTEXT(_Desc))
+#define ADD_CVAR_FLOAT(_name,_val,_Min,_Max,_flags,_Desc)				gEnv->pConsole->RegisterFloat(_name, (_val), (_Min), (_Max), (_flags), CVARTEXT(_Desc))
+#define ADD_CVAR_STRING(_name,_val,_flags,_Desc)						gEnv->pConsole->RegisterString(_name, (_val), (_flags), CVARTEXT(_Desc))
 
 #define ADD_COMMAND(_name,_func,_flags,_Desc)	gEnv->pConsole->AddCommand(_name,_func,(_flags), CVARTEXT(_Desc))
 

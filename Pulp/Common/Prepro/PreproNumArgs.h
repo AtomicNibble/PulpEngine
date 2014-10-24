@@ -16,14 +16,14 @@
 /// for details. \ref X_PP_VA_NUM_ARGS contains a workaround for this bug.
 /// \sa X_PP_NUM_ARGS
 #if _MSC_VER >= 1400
-#	define X_PP_VA_NUM_ARGS_HELPER(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, N, ...)	N
-#	define X_PP_VA_NUM_ARGS_REVERSE_SEQUENCE			16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
+#	define X_PP_VA_NUM_ARGS_HELPER(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, N, ...)	N
+#	define X_PP_VA_NUM_ARGS_REVERSE_SEQUENCE			18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1
 #	define X_PP_VA_NUM_ARGS_LEFT (
 #	define X_PP_VA_NUM_ARGS_RIGHT )
 #	define X_PP_VA_NUM_ARGS(...)						X_PP_VA_NUM_ARGS_HELPER X_PP_VA_NUM_ARGS_LEFT __VA_ARGS__, X_PP_VA_NUM_ARGS_REVERSE_SEQUENCE X_PP_VA_NUM_ARGS_RIGHT
 #else
-#	define X_PP_VA_NUM_ARGS(...)						X_PP_VA_NUM_ARGS_HELPER(__VA_ARGS__, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
-#	define X_PP_VA_NUM_ARGS_HELPER(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, N, ...)	N
+#	define X_PP_VA_NUM_ARGS(...)						X_PP_VA_NUM_ARGS_HELPER(__VA_ARGS__, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1)
+#	define X_PP_VA_NUM_ARGS_HELPER(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, 17, 18, N, ...)	N
 #endif
 
 

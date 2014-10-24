@@ -18,7 +18,8 @@ struct ShaderStatus
 	enum Enum
 	{
 		NotCompiled,
-		ReadyToRock
+		ReadyToRock,
+		FailedToCompile
 	};
 };
 
@@ -205,7 +206,9 @@ public:
 	X_INLINE bool isValid(void) const {
 		return status_ == ShaderStatus::ReadyToRock;
 	}
-
+	X_INLINE bool FailedtoCompile(void) const {
+		return status_ == ShaderStatus::FailedToCompile;
+	}
 
 	static void Init(void);
 	static void shutDown(void);

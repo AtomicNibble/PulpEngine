@@ -20,7 +20,7 @@ shader
 			src_blend_alpha  	src_alpha
 			dst_blend_color  	inv_src_alpha
 			dst_blend_alpha  	inv_src_alpha
-			cull_mode           none
+			cull_mode           back
 			depth_test         always
 			depth_write        false
 		}		
@@ -32,7 +32,7 @@ shader
 			src_blend_alpha  	src_alpha
 			dst_blend_color  	inv_src_alpha
 			dst_blend_alpha  	inv_src_alpha
-			cull_mode           none
+			cull_mode           back
 			depth_test         always
 			depth_write        false
 		}	
@@ -44,7 +44,7 @@ shader
 			src_blend_alpha  	src_alpha
 			dst_blend_color  	inv_src_alpha
 			dst_blend_alpha  	inv_src_alpha
-			cull_mode           none
+			cull_mode           back
 			depth_test         always
 			depth_write        false
 		}
@@ -62,7 +62,20 @@ shader
 			depth_write        true
 			wireframe		false
 		}	
-
+		
+		{
+			name 		"Skybox"
+			vertex_shader   	"SkyboxVS"
+			pixel_shader    	"TexturePS"	
+			src_blend_color  	src_alpha
+			src_blend_alpha  	src_alpha
+			dst_blend_color  	inv_src_alpha
+			dst_blend_alpha  	inv_src_alpha
+			cull_mode           none
+			depth_test         less_equal
+			depth_write        true
+			wireframe		false
+		}	
 
 	}
 }

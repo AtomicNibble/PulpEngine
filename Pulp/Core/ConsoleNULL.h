@@ -37,6 +37,7 @@ public:
 	virtual ICVar* Register(const char* name, float* src, float defaultvalue, float Min, float Max, int nFlags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
 	virtual ICVar* Register(const char* name, int* src, int defaultvalue, int Min, int Max, int nFlags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
 	virtual ICVar* Register(const char* name, Color* src, Color defaultvalue, int nFlags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
+	virtual ICVar* Register(const char* name, Vec3f* src, Vec3f defaultvalue, int flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
 
 	virtual ICVar* GetCVar(const char* name) X_FINAL;
 

@@ -14,40 +14,52 @@
 
 X_NAMESPACE_BEGIN(engine)
 
-ICore* X3DEngine::pCore = nullptr;
+ICore* X3DEngine::pCore_ = nullptr;
 
-core::ITimer* X3DEngine::pTimer = nullptr;
-core::IFileSys* X3DEngine::pFileSys = nullptr;
-core::IConsole* X3DEngine::pConsole = nullptr;
-render::IRender* X3DEngine::pRender = nullptr;
+core::ITimer* X3DEngine::pTimer_ = nullptr;
+core::IFileSys* X3DEngine::pFileSys_ = nullptr;
+core::IConsole* X3DEngine::pConsole_ = nullptr;
+render::IRender* X3DEngine::pRender_ = nullptr;
 
 // 3d
-engine::XMaterialManager* X3DEngine::pMaterialManager = nullptr;
+engine::XMaterialManager* X3DEngine::pMaterialManager_ = nullptr;
 
-texture::ITexture* pTex;
-texture::ITexture* pTex1;
+texture::ITexture* pTex = nullptr;
+texture::ITexture* pTex1 = nullptr;
+texture::ITexture* pTexSky = nullptr;
 
 bool X3DEngine::Init()
 {
-	pCore = gEnv->pCore;
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pCore);
+	X_ASSERT_NOT_NULL(gEnv->pTimer);
+	X_ASSERT_NOT_NULL(gEnv->pFileSys);
+	X_ASSERT_NOT_NULL(gEnv->pConsole);
+	X_ASSERT_NOT_NULL(gEnv->pRender);
 
-	pTimer = gEnv->pTimer;
-	pFileSys = gEnv->pFileSys;
-	pConsole = gEnv->pConsole;
+	pCore_ = gEnv->pCore;
 
-	pRender = gEnv->pRender;
+	pTimer_ = gEnv->pTimer;
+	pFileSys_ = gEnv->pFileSys;
+	pConsole_ = gEnv->pConsole;
 
-	pMaterialManager = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager");
-	pMaterialManager->Init();
+	pRender_ = gEnv->pRender;
+
+	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager");
+	pMaterialManager_->Init();
 
 
 	// load a lvl lol.
 //	map.LoadFromFile("killzone"); // mmmmm
 	map.LoadFromFile("box"); // mmmmm
 
-		pTex = pRender->LoadTexture("core_assets/Textures/berlin_floors_rock_tile2_c.dds",
+		pTex = pRender_->LoadTexture("textures/berlin_floors_rock_tile2_c.dds",
 			texture::TextureFlags::DONT_STREAM);
-		pTex1 = pRender->LoadTexture("core_assets/Textures/model_test.dds",
+		pTex1 = pRender_->LoadTexture("textures/model_test.dds",
+			texture::TextureFlags::DONT_STREAM);
+
+
+		pTexSky = pRender_->LoadTexture("textures/skybox_sky.dds",
 			texture::TextureFlags::DONT_STREAM);
 
 
@@ -61,9 +73,9 @@ void X3DEngine::ShutDown()
 
 
 
-	if (pMaterialManager) {
-		pMaterialManager->ShutDown();
-		X_DELETE(pMaterialManager, g_3dEngineArena);
+	if (pMaterialManager_) {
+		pMaterialManager_->ShutDown();
+		X_DELETE(pMaterialManager_, g_3dEngineArena);
 	}
 
 }
@@ -79,14 +91,22 @@ void X3DEngine::OnFrameBegin(void)
 {
 	X_PROFILE_BEGIN("3DFrameBegin", core::ProfileSubSys::ENGINE3D);
 
-	pRender->SetTexture(pTex1->getTexID());
+	pRender_->SetTexture(pTex1->getTexID());
 
-	if (pMesh)
-		pMesh->render();
-	
-	pRender->SetTexture(pTex->getTexID());
+//	if (pMesh)
+//		pMesh->render();
 
-	map.render();
+	pRender_->SetTexture(pTex->getTexID());
+
+	pRender_->DefferedBegin();
+
+		map.render();
+
+	pRender_->DefferedEnd();
+
+	// a skybox test.
+//	pRender->SetTexture(pTexSky->getTexID());
+//	pSkybox->render();
 }
 
 void X3DEngine::Update(void)
@@ -100,6 +120,9 @@ void X3DEngine::LoadModel(void)
 {
 	model::ModelLoader loader;
 
+	pMesh = nullptr;
+	pSkybox = nullptr;
+
 	if (loader.LoadModel(model, "core_assets/models/bo2_zom.model"))
 	{
 		pMesh = gEnv->pRender->createRenderMesh(
@@ -109,6 +132,17 @@ void X3DEngine::LoadModel(void)
 			);
 
 		pMesh->uploadToGpu();
+	}
+
+	if (loader.LoadModel(modelSky, "models/skybox_sea.model"))
+	{
+		pSkybox = gEnv->pRender->createRenderMesh(
+			(model::MeshHeader*)&modelSky.getLod(0),
+			shader::VertexFormat::P3F_C4B_T2F,
+			modelSky.getName()
+			);
+
+		pSkybox->uploadToGpu();
 	}
 }
 

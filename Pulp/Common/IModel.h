@@ -68,7 +68,7 @@ X_NAMESPACE_BEGIN(model)
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
 #define X_MODEL_MTL_LOWER_CASE_NAMES 1
 
-static const uint32_t	 MODEL_VERSION = 7;
+static const uint32_t	 MODEL_VERSION = 8;
 static const uint32_t	 MODEL_MAX_BONES = 255;
 static const uint32_t	 MODEL_MAX_BONE_NAME_LENGTH = 64;
 static const uint32_t	 MODEL_MAX_MESH = 64;
@@ -211,8 +211,6 @@ struct SubMeshHeader
 		numIndexes = 0;
 		numBinds = 0;
 		_unused = 0;
-
-		core::zero_object(_pad);
 	}
 
 	// sizes
@@ -243,7 +241,8 @@ struct SubMeshHeader
 	// lots of spare pickle bytes to play with.
 	// should i add bounds info for each submesh?
 	AABB boundingBox;
-	char _pad[16];
+	Sphere boundingSphere;
+	
 
 	// moved out since it takes lots of room.
 	// i have moved names into the subdata.

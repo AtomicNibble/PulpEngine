@@ -36,7 +36,7 @@ int XLexToken::GetIntValue(void) {
 
 void XLexToken::NumberValue(void)
 {
-	int i, pow, div, c;
+	int i, pow, div, c, negative;
 	const char* p;
 	double m;
 
@@ -49,6 +49,8 @@ void XLexToken::NumberValue(void)
 	p = temp.c_str();
 	floatvalue = 0;
 	intvalue = 0;
+	negative = 0;
+
 	// floating point number
 	if (subtype & TT_FLOAT) 
 	{
@@ -69,8 +71,15 @@ void XLexToken::NumberValue(void)
 				floatvalue = (double)*(float*)&nan;
 			}
 		}
-		else {
-			while (*p && *p != '.' && *p != 'e' ) {
+		else 
+		{
+			if (*p == '-')
+			{
+				negative = 1;
+				p++;
+			}
+
+			while (*p && *p != '.' && *p != 'e') {
 				floatvalue = floatvalue * 10.0 + (double)(*p - '0');
 				p++;
 			}
@@ -108,16 +117,31 @@ void XLexToken::NumberValue(void)
 					floatvalue *= m;
 				}
 			}
+			
+			if (negative) {
+				floatvalue -= floatvalue * 2;
+			}
 		}
 #endif
 		intvalue = (unsigned long)(floatvalue);
 	}
 	else if (subtype & TT_DECIMAL) 
 	{
+		if (*p == '-')
+		{
+			negative = 1;
+			p++;
+		}
+
 		while (*p != ' ' && *p) {
 			intvalue = intvalue * 10 + (*p - '0');
 			p++;
 		}
+
+		if (negative) {
+			intvalue = -intvalue;
+		}
+
 		floatvalue = intvalue;
 	}
 	else if (subtype & TT_IPADDRESS) {
@@ -401,7 +425,8 @@ int	XLexer::ReadToken(XLexToken& token)
 	}
 	// if there is a number
 	else if ((c >= '0' && c <= '9') ||
-		(c == '.' && (*(current_ + 1) >= '0' && *(current_ + 1) <= '9'))) {
+		((c == '.' || c == '-') && (*(current_ + 1) >= '0' && *(current_ + 1) <= '9'))) 
+	{
 		if (!ReadNumber(token)) {
 			return 0;
 		}
@@ -948,7 +973,7 @@ X_INLINE int XLexer::CheckString(const char *str) const {
 
 int XLexer::ReadNumber(XLexToken& token) {
 	int i;
-	int dot;
+	int dot, negative;
 	char c, c2;
 
 	token.type = TT_NUMBER;
@@ -1003,11 +1028,15 @@ int XLexer::ReadNumber(XLexToken& token) {
 	else {
 		// decimal integer or floating point number or ip address
 		dot = 0;
+		negative = 0;
 		while (1) {
 			if (c >= '0' && c <= '9') {
 			}
-			else if (c == '.') {
+			else if (c == '.' ) {
 				dot++;
+			}
+			else if (c == '-') {
+				negative = 1;
 			}
 			else {
 				break;

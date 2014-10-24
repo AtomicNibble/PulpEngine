@@ -5,11 +5,13 @@
 
 X_NAMESPACE_BEGIN(core)
 
-#define CRC32_INIT_VALUE	0xffffffffL
-#define CRC32_XOR_VALUE		0xffffffffL
 
 X_ALIGNED_SYMBOL(class Crc32, 128)
 {
+	static const uint32_t CRC32_POLY_NORMAL = 0x04C11DB7;
+	static const uint32_t CRC32_INIT_VALUE = 0xffffffffL;
+	static const uint32_t CRC32_XOR_VALUE = 0xffffffffL;
+
 public:
 	Crc32();
 
@@ -18,9 +20,7 @@ public:
 			build_table();
 	}
 
-	uint32_t Combine(const uint32_t lhs, const uint32_t rhs) const {
-		return lhs ^ rhs;
-	}
+	uint32_t Combine(const uint32_t lhs, const uint32_t rhs, const uint32_t rhs_length) const;
 
 	uint32_t GetCRC32(const char* text) const;
 	uint32_t GetCRC32(const char* data, int size) const;

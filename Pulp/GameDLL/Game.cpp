@@ -2,8 +2,17 @@
 #include "Game.h"
 
 #include <IRender.h>
+#include <IConsole.h>
 
 X_NAMESPACE_BEGIN(game)
+
+namespace
+{
+	static const Vec3f s_DefaultCamPosition(0, -150, 150);
+	static const Vec3f s_DefaultCamAngle(toRadians(-45.f), 0, toRadians(0.f));
+
+
+}
 
 XGame::XGame(ICore* pCore) :
 pCore_(pCore),
@@ -21,15 +30,30 @@ XGame::~XGame()
 bool XGame::Init(void)
 {
 	X_LOG0("Game", "init");
-	pCore_->GetIInput()->AddEventListener(this);
+	X_ASSERT_NOT_NULL(gEnv->pInput);
+	X_ASSERT_NOT_NULL(gEnv->pTimer);
+	X_ASSERT_NOT_NULL(gEnv->pRender);
+
+	gEnv->pInput->AddEventListener(this);
 	pTimer_ = gEnv->pTimer;
-
-	// static const Ang3	s_angDefaultCam(DEG2RAD( -10 ), 0, DEG2RAD( 17 ));
-
-	cameraAngle_ = Vec3f(0,0,0);
+	pRender_ = gEnv->pRender;
 
 	timeLast_ = pTimer_->GetAsyncTime();
 
+	// register some vars
+	ADD_CVAR_REF_VEC3("cam_pos", cameraPos_, s_DefaultCamPosition, core::VarFlag::STATIC, "camera position");
+	ADD_CVAR_REF_VEC3("cam_angle", cameraAngle_, s_DefaultCamAngle, core::VarFlag::STATIC, "camera angle(radians)");
+
+	
+	uint32_t width, height;
+
+	height = gEnv->pRender->getHeight();
+	width = gEnv->pRender->getWidth(); 
+	
+	X_ASSERT(height > 0, "height is not valid")(height);
+	X_ASSERT(width > 0, "height is not valid")(width);
+
+	cam_.SetFrustum(width, height);
 
 	return true;
 }
@@ -48,22 +72,12 @@ bool XGame::Update(void)
 {
 	X_PROFILE_BEGIN("Update", core::ProfileSubSys::GAME);
 
-	core::StackString<256> txt;
-	render::XDrawTextInfo ti;
-	ti.col = Col_Whitesmoke;
-	//	ti.flags;
 
-	txt.appendFmt("Pos: (%f, %f, %f)\n", cameraPos_.x, cameraPos_.y, cameraPos_.z);
-	txt.appendFmt("Angle (%f,%f,%f)", cameraAngle_.x, cameraAngle_.y, cameraAngle_.z);
 
-//	gEnv->pRender->DrawTextQueued(Vec3f(10, 40, 0), ti, txt.c_str());
+	cam_.SetAngles(cameraAngle_);
+	cam_.SetPosition(cameraPos_);
 
-	XCamera cam;
-	cam.SetFrustum(800,600);
-	cam.SetAngles(cameraAngle_);
-	cam.SetPosition(cameraPos_);
-
-	gEnv->pRender->SetCamera(cam);
+	pRender_->SetCamera(cam_);
 
 	return true;
 }

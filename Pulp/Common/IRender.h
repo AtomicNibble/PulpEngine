@@ -285,6 +285,9 @@ struct IRender
 	virtual void RenderBegin() X_ABSTRACT;
 	virtual void RenderEnd() X_ABSTRACT;
 
+	virtual void DefferedBegin(void) X_ABSTRACT;
+	virtual void DefferedEnd(void) X_ABSTRACT;
+
 	virtual bool FlushRenderThreadCommands(bool wait) X_ABSTRACT;
 
 	virtual void SetState(StateFlag state) X_ABSTRACT;

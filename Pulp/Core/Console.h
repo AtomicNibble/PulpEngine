@@ -150,50 +150,51 @@ public:
 
 	virtual ~XConsole();
 
-	virtual void Startup(ICore* pCore) X_OVERRIDE;
-	virtual void ShutDown() X_OVERRIDE;
-	virtual void freeRenderResources() X_OVERRIDE;
+	virtual void Startup(ICore* pCore) X_FINAL;
+	virtual void ShutDown() X_FINAL;
+	virtual void freeRenderResources() X_FINAL;
 
-	virtual void Draw() X_OVERRIDE;
+	virtual void Draw() X_FINAL;
 
 	// input callbacks
-	virtual bool OnInputEvent(const input::InputEvent& event) X_OVERRIDE;
-	virtual bool OnInputEventChar(const input::InputEvent& event) X_OVERRIDE;
+	virtual bool OnInputEvent(const input::InputEvent& event) X_FINAL;
+	virtual bool OnInputEventChar(const input::InputEvent& event) X_FINAL;
 
 
-	virtual ICVar* RegisterString(const char* Name, const char* Value, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_OVERRIDE;
-	virtual ICVar* RegisterInt(const char* Name, int Value, int Min, int Max, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_OVERRIDE;
-	virtual ICVar* RegisterFloat(const char* Name, float Value, float Min, float Max, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_OVERRIDE;
+	virtual ICVar* RegisterString(const char* Name, const char* Value, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
+	virtual ICVar* RegisterInt(const char* Name, int Value, int Min, int Max, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
+	virtual ICVar* RegisterFloat(const char* Name, float Value, float Min, float Max, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
 
-	virtual ICVar* ConfigRegisterString(const char* Name, const char* Value, int Flags, const char* desc) X_OVERRIDE;
-	virtual ICVar* ConfigRegisterInt(const char* Name, int Value, int Min, int Max, int Flags, const char* desc) X_OVERRIDE;
-	virtual ICVar* ConfigRegisterFloat(const char* Name, float Value, float Min, float Max, int Flags, const char* desc) X_OVERRIDE;
+	virtual ICVar* ConfigRegisterString(const char* Name, const char* Value, int Flags, const char* desc) X_FINAL;
+	virtual ICVar* ConfigRegisterInt(const char* Name, int Value, int Min, int Max, int Flags, const char* desc) X_FINAL;
+	virtual ICVar* ConfigRegisterFloat(const char* Name, float Value, float Min, float Max, int Flags, const char* desc) X_FINAL;
 
 
 	// refrenced based, these are useful if we want to use the value alot so we just register it's address.
-	virtual ICVar* Register(const char* name, float* src, float defaultvalue, float Min, float Max, int nFlags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_OVERRIDE;
-	virtual ICVar* Register(const char* name, int* src, int defaultvalue, int Min, int Max, int nFlags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_OVERRIDE;
-	virtual ICVar* Register(const char* name, Color* src, Color defaultvalue, int nFlags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_OVERRIDE;
+	virtual ICVar* Register(const char* name, float* src, float defaultvalue, float Min, float Max, int nFlags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
+	virtual ICVar* Register(const char* name, int* src, int defaultvalue, int Min, int Max, int nFlags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
+	virtual ICVar* Register(const char* name, Color* src, Color defaultvalue, int nFlags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
+	virtual ICVar* Register(const char* name, Vec3f* src, Vec3f defaultvalue, int flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
 
 
-	virtual ICVar* GetCVar(const char* name) X_OVERRIDE;
+	virtual ICVar* GetCVar(const char* name) X_FINAL;
 
-	virtual void UnregisterVariable(const char* sVarName) X_OVERRIDE;
+	virtual void UnregisterVariable(const char* sVarName) X_FINAL;
 
-	virtual void AddCommand(const char* Name, ConsoleCmdFunc func, int Flags, const char* desc) X_OVERRIDE;
+	virtual void AddCommand(const char* Name, ConsoleCmdFunc func, int Flags, const char* desc) X_FINAL;
 
-	virtual void RemoveCommand(const char* Name) X_OVERRIDE;
+	virtual void RemoveCommand(const char* Name) X_FINAL;
 
-	virtual void Exec(const char* command, const bool DeferExecution) X_OVERRIDE;
+	virtual void Exec(const char* command, const bool DeferExecution) X_FINAL;
 
-//	virtual void ConfigExec(const char* command) X_OVERRIDE;
-	virtual void LoadConfig(const char* fileName) X_OVERRIDE;
+//	virtual void ConfigExec(const char* command) X_FINAL;
+	virtual void LoadConfig(const char* fileName) X_FINAL;
 
 	// IXHotReload
-	virtual bool OnFileChange(const char* name) X_OVERRIDE;
+	virtual bool OnFileChange(const char* name) X_FINAL;
 	// ~IXHotReload
 
-	void OnFrameBegin() X_OVERRIDE;
+	void OnFrameBegin() X_FINAL;
 
 	X_INLINE void ShowConsole(consoleState::Enum state) {
 		consoleState_ = state;
@@ -259,8 +260,8 @@ protected:
 
 public:
 
-	virtual void addLineToLog(const char* pStr, uint32_t length) X_OVERRIDE;
-	virtual int getLineCount(void) const X_OVERRIDE;
+	virtual void addLineToLog(const char* pStr, uint32_t length) X_FINAL;
+	virtual int getLineCount(void) const X_FINAL;
 
 
 private:

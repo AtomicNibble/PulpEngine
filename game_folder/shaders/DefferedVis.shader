@@ -19,6 +19,7 @@ shader
 		    pixel_shader         	"VisualizeNormalsPS"
 		    depth_test           	always
 		    depth_write          	false
+		    wireframe		false
 		}             
 		{
 		    name                 	"VisualizeDepth"

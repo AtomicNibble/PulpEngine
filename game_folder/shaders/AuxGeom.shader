@@ -11,9 +11,9 @@ shader
 			src_blend_alpha  	src_alpha
 			dst_blend_color  	inv_src_alpha
 			dst_blend_alpha  	inv_src_alpha
-			cull_mode           none
-			depth_test         always
-			depth_write        false
+			cull_mode           back
+			depth_test         less
+			depth_write        true
 		}
 		{
 			name 		"AuxGeometryObj"
@@ -23,9 +23,9 @@ shader
 			src_blend_alpha  	src_alpha
 			dst_blend_color  	inv_src_alpha
 			dst_blend_alpha  	inv_src_alpha
-			cull_mode           none
-			depth_test         always
-			depth_write        false
+			cull_mode           front
+			depth_write        true
+			depth_test         less
 			wireframe		false
 		}			
 	}

@@ -31,8 +31,9 @@ struct X3DEngine : public I3DEngine, public XEngineBase
 private:
 
 	bsp::Bsp map;
-	model::XModel model;
+	model::XModel model, modelSky;
 	model::IRenderMesh* pMesh;
+	model::IRenderMesh* pSkybox;
 };
 
 

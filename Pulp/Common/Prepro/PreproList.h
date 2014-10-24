@@ -21,6 +21,8 @@
 #define X_PP_LIST_14(op)					X_PP_LIST_13(op), op(13)
 #define X_PP_LIST_15(op)					X_PP_LIST_14(op), op(14)
 #define X_PP_LIST_16(op)					X_PP_LIST_15(op), op(15)
+#define X_PP_LIST_17(op)					X_PP_LIST_16(op), op(16)
+#define X_PP_LIST_18(op)					X_PP_LIST_17(op), op(17)
 
 
 /// \def X_PP_LIST

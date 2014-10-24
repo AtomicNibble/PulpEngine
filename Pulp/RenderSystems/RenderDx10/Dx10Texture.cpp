@@ -31,9 +31,18 @@ bool XTexture::RT_CreateDeviceTexture(XTextureFile* image_data)
 	/// must be called from the render thread :)
 	ReleaseDeviceTexture();
 
-	if (!g_Dx11D3D.Create2DTexture(image_data, this->DeviceTexture))
+	// cube map is just multiple 2D textures.
+	if (this->type == TextureType::T2D || this->type == TextureType::TCube)
 	{
-		X_FATAL("Texture", "failed to create 2dTexture");
+		if (!g_Dx11D3D.Create2DTexture(image_data, this->DeviceTexture))
+		{
+			X_FATAL("Texture", "failed to create 2dTexture");
+			return false;
+		}
+	}
+	else
+	{
+		X_ASSERT_NOT_IMPLEMENTED();
 		return false;
 	}
 

@@ -596,8 +596,13 @@ void XRenderAuxImp::DrawAuxObjects(XRenderAux::AuxSortedPushBuffer::const_iterat
 	// get draw params buffer
 	const XRenderAux::AuxDrawObjParamBuffer& auxDrawObjParamBuffer(GetAuxDrawObjParamBuffer());
 
+	Color8u lastCol;
+	bool lastShaded = false;
+
 	// process each entry
-	for (XRenderAux::AuxSortedPushBuffer::const_iterator it(itBegin); it != itEnd; ++it)
+	XRenderAux::AuxSortedPushBuffer::const_iterator it = itBegin;
+
+	for (; it != itEnd; ++it)
 	{
 		// get current push buffer entry
 		const XRenderAux::XAuxPushBufferEntry* curPBEntry = *it;
@@ -605,11 +610,19 @@ void XRenderAuxImp::DrawAuxObjects(XRenderAux::AuxSortedPushBuffer::const_iterat
 		// assert than all objects in this batch are of same type
 		X_ASSERT(XRenderAux::GetAuxObjType(curPBEntry->renderFlags) == objType, "invalid object type")(objType);
 
-		uint32 drawParamOffs(0);
+		uint32 drawParamOffs = 0;
 		if (curPBEntry->GetDrawParamOffs(drawParamOffs))
 		{
 			// get draw params
 			const XRenderAux::XAuxDrawObjParams& drawParams(auxDrawObjParamBuffer[drawParamOffs]);
+
+			if (drawParamOffs == 0)
+			{
+				lastCol = drawParams.color;
+				lastCol.r = ~lastCol.r;
+
+				lastShaded = !drawParams.shaded;
+			}
 
 			// Prepare d3d world space matrix in draw param structure 
 			// Attention: in d3d terms matWorld is actually matWorld^T
@@ -641,14 +654,18 @@ void XRenderAuxImp::DrawAuxObjects(XRenderAux::AuxSortedPushBuffer::const_iterat
 
 
 			// set color
-			Color colVec(drawParams.color);
-			core::StrHash auxGeomObjColorName("auxGeomObjColor");
-			pAuxGeomShader_->FXSetVSFloat(auxGeomObjColorName, (Vec4f*)&colVec, 1);
+			if (lastCol != drawParams.color) {
+				Color colVec(drawParams.color);
+				core::StrHash auxGeomObjColorName("auxGeomObjColor");
+				pAuxGeomShader_->FXSetVSFloat(auxGeomObjColorName, (Vec4f*)&colVec, 1);
+			}
 
 			// set shading flag
-			Vec4f shadingVec(drawParams.shaded ? 0.4f : 0, drawParams.shaded ? 0.6f : 1, 0, 0);
-			core::StrHash auxGeomObjShadingName("auxGeomObjShading");
-			pAuxGeomShader_->FXSetVSFloat(auxGeomObjShadingName, &shadingVec, 1);
+			if (lastShaded != drawParams.shaded) {
+				Vec4f shadingVec(drawParams.shaded ? 0.4f : 0, drawParams.shaded ? 0.6f : 1, 0, 0);
+				core::StrHash auxGeomObjShadingName("auxGeomObjShading");
+				pAuxGeomShader_->FXSetVSFloat(auxGeomObjShadingName, &shadingVec, 1);
+			}
 
 			// set light vector (rotate back into local space)
 			Matrix33f matWorldInv(drawParams.matWorld.inverted());
@@ -667,17 +684,15 @@ void XRenderAuxImp::DrawAuxObjects(XRenderAux::AuxSortedPushBuffer::const_iterat
 			Vec4f objCenterWorld;
 			Vec3f nullVec(0.0f, 0.0f, 0.0f);
 			objCenterWorld = matWorldT * nullVec;
-		//	mathVec3TransformF(&objCenterWorld, &nullVec, &matWorldT);
 			Vec4f objOuterRightWorld(objCenterWorld + (Vec4f(GetCurrentView().m00, GetCurrentView().m10, GetCurrentView().m20, 0.0f) * drawParams.size));
 
 			Vec4f v0, v1;
-			Vec3f objCenterWorldVec(objCenterWorld.x, objCenterWorld.y, objCenterWorld.z);
-			Vec3f objOuterRightWorldVec(objOuterRightWorld.x, objOuterRightWorld.y, objOuterRightWorld.z);
+			Vec3f objCenterWorldVec(objCenterWorld.xyz());
+			Vec3f objOuterRightWorldVec(objOuterRightWorld.xyz());
 		
 			v0 = (*matrices_.pCurTransMat) * objCenterWorldVec;
 			v1 = (*matrices_.pCurTransMat) * objOuterRightWorldVec;
-		//	mathVec3TransformF(&v0, &objCenterWorldVec, matrices_.pCurTransMat);
-		//	mathVec3TransformF(&v1, &objOuterRightWorldVec, matrices_.pCurTransMat);
+
 
 			float scale;
 			X_ASSERT(math<float>::abs(v0.w - v0.w) < 1e-4, "invalid")(math<float>::abs(v0.w - v0.w));
@@ -687,10 +702,7 @@ void XRenderAuxImp::DrawAuxObjects(XRenderAux::AuxSortedPushBuffer::const_iterat
 			}
 			else
 			{
-				if (v0.w != 0.f)
-					scale = ((v1.x - v0.x) / v0.w) * (float)core::Max(wndXRes_, wndYRes_) / 500.0f;
-				else
-					scale = 0.5f;
+				scale = ((v1.x - v0.x) / v0.w) * (float)core::Max(wndXRes_, wndYRes_) / 500.0f;
 			}
 
 			// map scale to detail level
@@ -699,7 +711,8 @@ void XRenderAuxImp::DrawAuxObjects(XRenderAux::AuxSortedPushBuffer::const_iterat
 			{
 				lodLevel = auxObjNumLOD - 1;
 			}
-
+			lodLevel = 1;
+	
 			// get appropriate mesh
 			X_ASSERT(lodLevel >= 0 && lodLevel < auxObjNumLOD, "invalid LOD level")(lodLevel);
 			XDrawObjMesh* pMesh = nullptr;
@@ -1222,7 +1235,7 @@ void XRenderAuxImp::XMatrices::UpdateMatrices(DX11XRender& renderer)
 	renderer.GetProjectionMatrix(&matProj);
 
 	matViewInv = matView.inverted();
-	matTrans3D = matView * matProj;
+	matTrans3D = matProj * matView;
 
 	pCurTransMat = nullptr;
 }

@@ -13,7 +13,7 @@ namespace DDS
 	namespace
 	{
 		static const char* DDS_FILE_EXTENSION = ".dds";
-
+#if 0
 		#define GL_COMPRESSED_RGB_S3TC_DXT1_EXT		0x83F0
 		#define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT	0x83F1
 		#define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT	0x83F2
@@ -30,7 +30,7 @@ namespace DDS
 		#define GL_RGB5_A1							0x8057
 		#define GL_RGB5								0x8050
 		#define GL_RGB								0x1907
-
+#endif
 		#define PIXEL_FMT_FOURCC(a, b, c, d) ((a) | ((b) << 8U) | ((c) << 16U) | ((d) << 24U))
 
 		enum pixel_format
@@ -621,9 +621,8 @@ namespace DDS
 				else
 					format = PIXEL_FMT_L8;
 			}
-			else if (hdr.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS) {
+			else if (hdr.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS) 
 				format = PIXEL_FMT_A8R8G8B8;
-			}
 			else
 				format = PIXEL_FMT_R8G8B8;
 		}
@@ -687,7 +686,12 @@ namespace DDS
 				mask_size[0] /= 2;
 		}
 
-		// map th format
+		// do i want todo anything with this mask data, or should i just use it above to work.
+		// out the format.
+
+
+
+		// map the format
 		Texturefmt::Enum mapped_format = Texturefmt::UNKNOWN;
 		mapped_format = pixel_util::get_text_fnt_from_pixel(format);
 
@@ -695,6 +699,56 @@ namespace DDS
 		{
 			X_ERROR("DDSLoader", "Unsupported supported.");
 			return nullptr;
+		}
+
+
+		// check mask sizes.
+		if (mapped_format == Texturefmt::A8R8G8B8 || 
+			mapped_format == Texturefmt::R8G8B8)
+		{
+			if (mask_size[0] != 8 || mask_size[1] != 8 ||
+				mask_size[2] != 8 || mask_size[3] != 8)
+			{
+				X_ERROR("DDSLoader", "Invalid mask sizes expected 8. (%i,%i,%i,%i)",
+					mask_size[0], mask_size[1], mask_size[2], mask_size[3]);
+				return nullptr;
+			}
+
+
+			// check for swizle
+			if (mapped_format == Texturefmt::A8R8G8B8)
+			{
+				if (mask_ofs[0] == 16 && mask_ofs[1] == 8 && mask_ofs[2] == 0
+					&& mask_ofs[3] == 24)
+				{
+					// this is BGRA
+					mapped_format = Texturefmt::B8G8R8A8;
+				}
+				else if (mask_ofs[0] != 0 || mask_ofs[1] == 8 || mask_ofs[2] == 16
+					|| mask_ofs[3] != 24)
+				{
+					// this is not a valid RGBA
+					X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8A8 expected(0,8,16,34) provided(%i,%i,%i,%i)",
+						mask_ofs[0], mask_ofs[1], mask_ofs[2], mask_ofs[3]);
+					return nullptr;
+				}
+			}
+			else if (mapped_format == Texturefmt::R8G8B8)
+			{
+				if (mask_ofs[0] == 16 && mask_ofs[1] == 8 && mask_ofs[2] == 0)
+				{
+					// this is BGR
+					mapped_format = Texturefmt::B8G8R8;
+				}
+				else if (mask_ofs[0] != 0 || mask_ofs[1] == 8 || mask_ofs[2] == 16
+					|| mask_ofs[3] != 24)
+				{
+					// this is not a valid RGB
+					X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8 expected(0,8,16) provided(%i,%i,%i)",
+						mask_ofs[0], mask_ofs[1], mask_ofs[2]);
+					return nullptr;
+				}
+			}
 		}
 
 
@@ -748,17 +802,17 @@ namespace DDS
 				return nullptr;
 			}
 
-#if X_DEBUG == 1
-			size_t left = file->remainingBytes();
-			X_WARNING_IF(left > 0, "DDSLoader", "potential read fail, bytes left in file: %i", left);
-#endif
 		}
+
+#if X_DEBUG == 1
+		size_t left = file->remainingBytes();
+		X_WARNING_IF(left > 0, "DDSLoader", "potential read fail, bytes left in file: %i", left);
+#endif
 
 		return img;
 	}
 
 	// ~ITextureLoader
-
 
 
 } // namespace DDS

@@ -7,6 +7,9 @@
 #include <IInput.h>
 #include <ITimer.h>
 
+X_NAMESPACE_DECLARE(render,
+struct IRender
+);
 
 X_NAMESPACE_BEGIN(game)
 
@@ -32,12 +35,16 @@ public:
 
 private:
 	ICore* pCore_;
+	render::IRender* pRender_;
+
 	core::ITimer* pTimer_;
 
 	core::TimeVal timeLast_;
 
 	Vec3f cameraPos_;
 	Vec3f cameraAngle_; // radins
+
+	XCamera cam_;
 };
 
 X_NAMESPACE_END

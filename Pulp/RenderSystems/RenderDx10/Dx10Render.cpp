@@ -587,64 +587,49 @@ void DX11XRender::RenderEnd()
 	XRender::RenderEnd();
 
 
-
 	if (m_AuxGeo_) {
-		m_AuxGeo_->GetRenderAuxGeom()->flush();
+	//	m_AuxGeo_->GetRenderAuxGeom()->flush();
 		m_AuxGeo_->GetRenderAuxGeom()->Reset();
 	}
-
 
 // slow as goat cus if large sleep.
 //	this->rThread()->syncMainWithRender();
 
 
-//	X_LOG0("render", "Swap");
-
 	m_swapChain->Present(0, 0);
 }
 
 
-void DX11XRender::DefferedTest()
+void DX11XRender::DefferedBegin()
 {
-	using namespace shader;
-
-	Color color = Col_White;
-	m_deviceContext->ClearRenderTargetView(texture::XTexture::s_GBuf_Albedo->getRenderTargetView(), color);
-	color = Col_Orange;
-	m_deviceContext->ClearRenderTargetView(texture::XTexture::s_GBuf_Depth->getRenderTargetView(), color);
-
+	using namespace texture;
 
 	ID3D11RenderTargetView* pViews[3] = {
-		texture::XTexture::s_GBuf_Albedo->getRenderTargetView(),
-		texture::XTexture::s_GBuf_Normal->getRenderTargetView(),
-		texture::XTexture::s_GBuf_Depth->getRenderTargetView(),
+		XTexture::s_GBuf_Albedo->getRenderTargetView(),
+		XTexture::s_GBuf_Normal->getRenderTargetView(),
+		XTexture::s_GBuf_Depth->getRenderTargetView(),
 	};
+
+	Colorf clear_col(0.0f, 0.f, 0.0f);
+
+	m_deviceContext->ClearRenderTargetView(pViews[0], clear_col);
+	m_deviceContext->ClearRenderTargetView(pViews[1], clear_col);
+	m_deviceContext->ClearRenderTargetView(pViews[2], clear_col);
+
 
 	SetZPass();
 
 	m_deviceContext->OMSetRenderTargets(3, pViews, m_depthStencilView);
+}
 
-
-	float fZ = 0.2f;
-	float val = 1.0f;
-	Vec3f v0, v1, v2, v3;
-
-
-	// Draw somthing i can see.
-//	FX_SetVStream(g_pVertexBuffer, 0, sizeof(model::Vertex), 0);
-//	FX_SetIStream(g_pIndexBuffer);
-//	if (SUCCEEDED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_C4B_T2S)))
-//		FX_DrawIndexPrimitive(PrimitiveType::TriangleList, 12 * 3, 0, 0);
-//	FX_SetIStream(nullptr);
-	
+void DX11XRender::DefferedEnd()
+{
+	using namespace shader;
+	using namespace texture;
 
 	XShader* pSh = XShaderManager::m_DefferedShaderVis;
 	uint32_t pass;
 
-
-	pSh->FXSetTechnique("VisualizeAlbedo");
-	pSh->FXBegin(&pass, 0);
-	pSh->FXBeginPass(pass);
 
 	// switch the render target back
 	ID3D11RenderTargetView* pViewsReset[3] = {
@@ -655,54 +640,63 @@ void DX11XRender::DefferedTest()
 
 	m_deviceContext->OMSetRenderTargets(3, pViewsReset, m_depthStencilView);
 
+//	Set2D(true);
+	SetCullMode(CullMode::NONE);
 
-#if 1
-	Set2D(true);
+	float height = this->getHeightf() - 10;
 
+	core::StrHash albedo("VisualizeAlbedo");
+	core::StrHash normal("VisualizeNormals");
+	core::StrHash depth("VisualizeDepth");
+	
+	// depth, normal, albedo
 
-	DrawImage(
-		20, 50, 0,
-		256, 256,
-		texture::XTexture::s_GBuf_Albedo->getID(), // tex id
-		0, 1, 1, 0,
-		Col_White);
+	XTexture::s_GBuf_Depth->apply(0);
+	XTexture::s_GBuf_Normal->apply(1);
+	XTexture::s_GBuf_Albedo->apply(2);
 
-	// need to unbind it so it can be used
-	// as part of gbuffer again.
-	texture::XTexture::s_GBuf_Albedo->unbind();
-
-	Set2D(false);
-
-#else
-	texture::XTexture::s_GBuf_Albedo->apply(2);
-
-
-	v0 = Vec3f(0.5f,-0.50f, fZ);
-	v1 = Vec3f(0.5, -val, fZ);
-	v2 = Vec3f(val, -0.5f, fZ);
-	v3 = Vec3f(val, -val, fZ);
-
-	DrawQuad3d(v0, v1, v2, v3, Col_White);
-
-	pSh->FXSetTechnique("VisualizeDepth");
+	pSh->FXSetTechnique(albedo);
 	pSh->FXBegin(&pass, 0);
 	pSh->FXBeginPass(pass);
 
-	texture::XTexture::s_GBuf_Albedo->unbind();
-	texture::XTexture::s_GBuf_Depth->apply(0);
+	Draw2dImage(	
+		-1.0f, -0.5f, 0.5f, -0.5f, 
+		0, Col_White);
 
-	v0 = Vec3f(0, -0.50f, fZ);
-	v1 = Vec3f(0, -val, fZ);
-	v2 = Vec3f(0.5, -0.5f, fZ);
-	v3 = Vec3f(0.5, -1.f, fZ);
+	pSh->FXSetTechnique(normal);
+	pSh->FXBegin(&pass, 0);
+	pSh->FXBeginPass(pass);
 
-	DrawQuad3d(v0, v1, v2, v3, Col_White);
+	Draw2dImage(
+		-0.5f, -0.5f, 0.5f, -0.5f,
+		0, Col_White);
 
-	texture::XTexture::s_GBuf_Depth->unbind();
-#endif
+	pSh->FXSetTechnique(depth);
+	pSh->FXBegin(&pass, 0);
+	pSh->FXBeginPass(pass);
 
-//	m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
+
+	Draw2dImage(
+		0.f, -0.5f, 0.5f, -0.5f,
+		0, Col_White);
+
+/*	Draw2dImage(10, height - 256, 256, 256,
+		XTexture::s_GBuf_Albedo->getID(), Col_White);
+	Draw2dImage(30 + 256, height - 256, 256, 256,
+		XTexture::s_GBuf_Normal->getID(), Col_White);
+	Draw2dImage(50 + 512, height - 256, 256, 256,
+		XTexture::s_GBuf_Depth->getID(),Col_White);
+*/
+
+	XTexture::s_GBuf_Albedo->unbind();
+	XTexture::s_GBuf_Normal->unbind();
+	XTexture::s_GBuf_Depth->unbind();
+
+
+//	Set2D(false);
 }
+
+
 
 void DX11XRender::DrawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2,
 	const Vec3f& pos3, const Color& col)
@@ -751,15 +745,31 @@ bool DX11XRender::Create2DTexture(texture::XTextureFile* img_data, texture::XDev
 	int i;
 	HRESULT hr;
 
-
 	if (img_data->getFlags().IsSet(texture::TexFlag::RENDER_TARGET))
 		nBindFlags |= D3D11_BIND_RENDER_TARGET;
+
+
+
+	if (img_data->getType() == texture::TextureType::T2D)
+	{
+		X_ASSERT(img_data->getNumFaces() == 1, "invalid number of faces for a 2d image")(img_data->getNumFaces());
+	}
+	else if (img_data->getType() == texture::TextureType::TCube)
+	{
+		X_ASSERT(img_data->getNumFaces() == 6, "invalid number of faces for a 2d image")(img_data->getNumFaces());
+	}
+	else
+	{
+		// this texture type should not be in here.
+		X_ASSERT_UNREACHABLE();
+		return false;
+	}
 
 
 	Desc.Height = img_data->getHeight();
 	Desc.Width = img_data->getWidth();
 	Desc.MipLevels = img_data->getNumMips();
-	Desc.ArraySize = 1;
+	Desc.ArraySize = img_data->getNumFaces();
 	Desc.Format = texture::XTexture::DCGIFormatFromTexFmt(img_data->getFormat());
 	Desc.SampleDesc.Count = 1;
 	Desc.SampleDesc.Quality = 0;
@@ -773,6 +783,17 @@ bool DX11XRender::Create2DTexture(texture::XTextureFile* img_data, texture::XDev
 	{
 		// must be a null pointer.
 		pSubResource = nullptr;
+	}
+	else if (img_data->getType() == texture::TextureType::TCube)
+	{
+		pSubResource = &SubResource[0];
+		for (i = 0; i < img_data->getNumFaces(); i++)
+		{
+			X_ASSERT(img_data->SubInfo[i].pSysMem != nullptr,"system mem must be set for all faces")();
+			SubResource[i].pSysMem = img_data->SubInfo[i].pSysMem;
+			SubResource[i].SysMemPitch = img_data->SubInfo[i].SysMemPitch;
+			SubResource[i].SysMemSlicePitch = 0; // img_data->SubInfo[0].SysMemSlicePitch;
+		}
 	}
 	else
 	{
@@ -914,6 +935,8 @@ void DX11XRender::RT_SetCameraInfo(void)
 	// instead of updating the cbuf's
 	// since if this function is called multiple times with no drawining.
 	// be wasted cbuffer updates.
+	// this also means camera cbuffer should not
+	// be updated when teh camera has not changed.
 
 	shader::XHWShader_Dx10::SetCameraDirty();
 }
@@ -1302,6 +1325,7 @@ void DX11XRender::SetCamera(const XCamera& cam)
 	Vec3f vEye = cam.GetPosition();
 	Vec3f vAt = vEye + Vec3f(m.m01, m.m11, m.m21);
 	Vec3f vUp = Vec3f(m.m02, m.m12, m.m22);
+//	Vec3f vUp = Vec3f(0,0,1);
 
 	// View
 	Matrix44f* pView = m_ViewMat.GetTop();
@@ -1638,8 +1662,8 @@ void DX11XRender::RT_DrawImageWithUV(float xpos, float ypos, float z, float w, f
 	float fw = w;
 	float fh = h;
 
-	SetCullMode(CullMode::NONE);
-	SetFFE(true);
+//	SetCullMode(CullMode::NONE);
+//	SetFFE(true);
 
 	// Lock the entire buffer and obtain a pointer to the location where we have to
 	uint32 nOffs;
@@ -1671,7 +1695,8 @@ void DX11XRender::RT_DrawImageWithUV(float xpos, float ypos, float z, float w, f
 	// We are finished with accessing the vertex buffer
  	m_DynVB[VertexPool::P3F_C4B_T2F].UnlockVB();
 
-	
+
+	/*
 	XTexState state;
 	state.setFilterMode(FilterMode::POINT);
 	state.setClampMode(TextureAddressMode::MIRROR, 
@@ -1683,7 +1708,7 @@ void DX11XRender::RT_DrawImageWithUV(float xpos, float ypos, float z, float w, f
 		texture_id,
 		texture::XTexture::getTexStateId(state)
 	);
-	
+	*/
 
 	// Bind our vertex as the first data stream of our device
 	m_DynVB[VertexPool::P3F_C4B_T2F].Bind();

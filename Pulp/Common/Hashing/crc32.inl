@@ -67,7 +67,6 @@ inline uint32_t Crc32::get_CRC32(const char *data, int size, uint32_t crcvalue) 
 }
 
 
-
 inline uint32_t Crc32::FinishChecksum(uint32_t crcvalue)  {
 	return crcvalue ^ CRC32_XOR_VALUE;
 }
@@ -90,39 +89,3 @@ inline uint32_t Crc32::Reflect(uint32_t iReflect, const char cChar)
 	return iValue;
 }
 
-inline void Crc32::build_table()
-{
-	// I could change this poly if i didnt want my crc to match
-	// a standard crc32
-	uint32_t uPolynomial = 0x04C11DB7;
-	//	uint32_t uCrc;
-
-	//	int i, j;
-	/*
-	for (i = 0; i < 256; i++) {
-	uCrc = i;
-	for (j = 8; j > 0; j--) {
-	if (uCrc & 1)
-	uCrc = (uCrc >> 1) ^ uPolynomial;
-	else
-	uCrc >>= 1;
-	}
-	crc32_table[i] = uCrc;
-	}*/
-	core::zero_object(crc32_table);
-
-	for (int iCodes = 0; iCodes <= 0xFF; iCodes++)
-	{
-		crc32_table[iCodes] = Reflect(iCodes, 8) << 24;
-
-		for (int iPos = 0; iPos < 8; iPos++)
-		{
-			crc32_table[iCodes] = (crc32_table[iCodes] << 1)
-				^ ((crc32_table[iCodes] & (1 << 31)) ? uPolynomial : 0);
-		}
-
-		crc32_table[iCodes] = Reflect(crc32_table[iCodes], 32);
-	}
-
-	tableInit_ = true;
-}

@@ -84,6 +84,7 @@ X_INLINE float AABB::radius() const
 
 X_INLINE float AABB::radiusSqr() const
 {
+//	return min.distanceSquared(max) * 0.5f; // same?
 	return ((max - min)*0.5f).lengthSquared();
 }
 

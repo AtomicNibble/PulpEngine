@@ -6,6 +6,8 @@
 #include <IFont.h>
 #include <I3DEngine.h>
 
+#include <IRenderAux.h>
+
 X_USING_NAMESPACE;
 
 
@@ -24,6 +26,9 @@ void XCore::RenderEnd()
 	{
 		X_PROFILE_BEGIN("CoreRenderEnd", core::ProfileSubSys::CORE);
 
+		if (render::IRenderAux* pAux = env_.pRender->GetIRenderAuxGeo()) {
+			pAux->flush();
+		}
 
 		// draw me all the profile wins!
 		if (var_profile_draw->GetInteger())

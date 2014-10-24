@@ -25,26 +25,26 @@ X_NAMESPACE_BEGIN(engine)
 
 struct XEngineBase
 {
-	static ICore* pCore;
+	static ICore* pCore_;
 
-	static core::ITimer* pTimer;
-	static core::IFileSys* pFileSys;
-	static core::IConsole* pConsole;
-	static render::IRender* pRender;
+	static core::ITimer* pTimer_;
+	static core::IFileSys* pFileSys_;
+	static core::IConsole* pConsole_;
+	static render::IRender* pRender_;
 
 	// 3d
-	static engine::XMaterialManager* pMaterialManager;
+	static engine::XMaterialManager* pMaterialManager_;
 
 
 	// goats.
-	X_INLINE static ICore* getCore(void) { return pCore; }
-	X_INLINE static core::ITimer* getTime(void) { return pTimer; }
-	X_INLINE static core::IFileSys* getFileSys(void) { return pFileSys; }
-	X_INLINE static core::IConsole* getConsole(void) { return pConsole; }
-	X_INLINE static render::IRender* getRender(void) { return pRender; }
+	X_INLINE static ICore* getCore(void) { return pCore_; }
+	X_INLINE static core::ITimer* getTime(void) { return pTimer_; }
+	X_INLINE static core::IFileSys* getFileSys(void) { return pFileSys_; }
+	X_INLINE static core::IConsole* getConsole(void) { return pConsole_; }
+	X_INLINE static render::IRender* getRender(void) { return pRender_; }
 
 	X_INLINE static IMaterialManager* getMaterialManager(void) { 
-		return reinterpret_cast<IMaterialManager*>(pMaterialManager); 
+		return reinterpret_cast<IMaterialManager*>(pMaterialManager_); 
 	}
 
 

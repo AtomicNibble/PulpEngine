@@ -73,13 +73,14 @@ public:
 	}
 	~XCamera() {}
 
-	X_INLINE void SetFrustum(int nWidth, int nHeight, float32_t FOV = DEFAULT_FOV,
-		float32_t nearplane = DEFAULT_NEAR, float32_t farpane = DEFAULT_FAR, float32_t fPixelAspectRatio = 1.0f);
+	X_INLINE void SetFrustum(uint32_t width, uint32_t height, 
+		float32_t fov = DEFAULT_FOV, float32_t nearplane = DEFAULT_NEAR, 
+		float32_t farpane = DEFAULT_FAR, float32_t pixelAspectRatio = 1.0f);
 
 	X_INLINE void UpdateFrustum();
 
-	X_INLINE int GetViewSurfaceX() const { return width_; }
-	X_INLINE int GetViewSurfaceZ() const { return height_; }
+	X_INLINE uint32_t GetViewSurfaceX() const { return width_; }
+	X_INLINE uint32_t GetViewSurfaceZ() const { return height_; }
 
 	X_INLINE float32_t GetFov() const { return fov_; }
 
@@ -111,8 +112,8 @@ protected:
 
 	Matrix34f matrix_;
 
-	int width_;
-	int height_;
+	uint32_t width_;
+	uint32_t height_;
 
 	float32_t fov_;
 
@@ -136,7 +137,7 @@ protected:
 // Frustum diagram: http://winpic.co/152d7037
 // goat: http://winpic.co/153f6eb6
 // --------------------------------------------
-X_INLINE void XCamera::SetFrustum(int nWidth, int nHeight, float32_t FOV,
+X_INLINE void XCamera::SetFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV,
 		float32_t nearplane, float32_t farpane, float32_t fPixelAspectRatio)
 {
 	X_ASSERT(nearplane > 0.001f, "near plane not valid")(nearplane);

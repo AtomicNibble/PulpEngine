@@ -68,6 +68,15 @@ PS_OUTPUT SolidWorldPS(PS_INPUT input)
     return output;
 }
 
+VS_OUTPUT SkyboxVS(VS_INPUT input)
+{
+    VS_OUTPUT output;
+    // we swizzle the result for 1.0 z.
+    output.ssPosition        	= mul(float4(input.osPosition, 1.0), worldToScreenMatrix).xyww;
+    output.texCoord          	= input.texCoord;
+    output.color             	= input.color;
+    return output;
+}
 
 VS_OUTPUT BasicVS(VS_INPUT input)
 {

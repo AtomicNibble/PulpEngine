@@ -143,6 +143,10 @@ DXGI_FORMAT XTexture::DCGIFormatFromTexFmt(Texturefmt::Enum fmt)
 			return DXGI_FORMAT_R8G8B8A8_UNORM;
 		case Texturefmt::R8G8B8A8:
 			return DXGI_FORMAT_R8G8B8A8_UNORM;
+
+		case Texturefmt::B8G8R8A8:
+		return DXGI_FORMAT_B8G8R8A8_UNORM;
+
 		case Texturefmt::A8:
 			return DXGI_FORMAT_A8_UNORM;
 
@@ -176,7 +180,13 @@ DXGI_FORMAT XTexture::DCGIFormatFromTexFmt(Texturefmt::Enum fmt)
 		case Texturefmt::R10G10B10A2:
 			return DXGI_FORMAT_R10G10B10A2_TYPELESS;
 
+#if X_DEBUG
+		default:
+		X_ASSERT_UNREACHABLE();
+		break;
+#else
 			X_NO_SWITCH_DEFAULT;
+#endif // !X_DEBUG
 	}
 	return DXGI_FORMAT_UNKNOWN;
 }
@@ -186,38 +196,46 @@ Texturefmt::Enum XTexture::TexFmtFromStr(const char* pStr)
 
 	if (core::strUtil::IsEqualCaseInsen("R8G8B8", pStr))
 		return Texturefmt::R8G8B8;
-	else if (core::strUtil::IsEqualCaseInsen("R8G8B8A8", pStr))
+	if (core::strUtil::IsEqualCaseInsen("R8G8B8A8", pStr))
 		return Texturefmt::R8G8B8A8;
-	else if (core::strUtil::IsEqualCaseInsen("A8", pStr))
+
+	if (core::strUtil::IsEqualCaseInsen("B8G8R8", pStr))
+		return Texturefmt::B8G8R8;
+	if (core::strUtil::IsEqualCaseInsen("B8G8R8A8", pStr))
+		return Texturefmt::B8G8R8A8;
+
+	if (core::strUtil::IsEqualCaseInsen("A8", pStr))
 		return Texturefmt::A8;
-	else if (core::strUtil::IsEqualCaseInsen("ATI2", pStr))
+	if (core::strUtil::IsEqualCaseInsen("ATI2", pStr))
 		return Texturefmt::ATI2;
-	else if (core::strUtil::IsEqualCaseInsen("ATI2_XY", pStr))
+	if (core::strUtil::IsEqualCaseInsen("ATI2_XY", pStr))
 		return Texturefmt::ATI2_XY;
-	else if (core::strUtil::IsEqualCaseInsen("BC1", pStr))
+	if (core::strUtil::IsEqualCaseInsen("BC1", pStr))
 		return Texturefmt::BC1;
-	else if (core::strUtil::IsEqualCaseInsen("BC2", pStr))
+	if (core::strUtil::IsEqualCaseInsen("BC2", pStr))
 		return Texturefmt::BC2;
-	else if (core::strUtil::IsEqualCaseInsen("BC3", pStr))
+	if (core::strUtil::IsEqualCaseInsen("BC3", pStr))
 		return Texturefmt::BC3;
-	else if (core::strUtil::IsEqualCaseInsen("BC4", pStr))
+	if (core::strUtil::IsEqualCaseInsen("BC4", pStr))
 		return Texturefmt::BC4;
-	else if (core::strUtil::IsEqualCaseInsen("BC4_SNORM", pStr))
+	if (core::strUtil::IsEqualCaseInsen("BC4_SNORM", pStr))
 		return Texturefmt::BC4_SNORM;
-	else if (core::strUtil::IsEqualCaseInsen("BC5", pStr))
+	if (core::strUtil::IsEqualCaseInsen("BC5", pStr))
 		return Texturefmt::BC5;
-	else if (core::strUtil::IsEqualCaseInsen("BC5_SNORM", pStr))
+	if (core::strUtil::IsEqualCaseInsen("BC5_SNORM", pStr))
 		return Texturefmt::BC5_SNORM;
-	else if (core::strUtil::IsEqualCaseInsen("BC6", pStr))
+	if (core::strUtil::IsEqualCaseInsen("BC6", pStr))
 		return Texturefmt::BC6;
-	else if (core::strUtil::IsEqualCaseInsen("BC7", pStr))
+	if (core::strUtil::IsEqualCaseInsen("BC7", pStr))
 		return Texturefmt::BC7;
-	else if (core::strUtil::IsEqualCaseInsen("R16G16F", pStr))
+	if (core::strUtil::IsEqualCaseInsen("R16G16F", pStr))
 		return Texturefmt::R16G16F;
-	else if (core::strUtil::IsEqualCaseInsen("R10G10B10A2", pStr))
+	if (core::strUtil::IsEqualCaseInsen("R10G10B10A2", pStr))
 		return Texturefmt::R10G10B10A2;
 
-
+	// this is here incase i've forgot to add a new format
+	// into this function.
+	X_ASSERT_UNREACHABLE();
 	return Texturefmt::UNKNOWN;
 }
 
@@ -271,8 +289,10 @@ uint32_t XTexture::get_bpp(Texturefmt::Enum fmt)
 	case Texturefmt::ATI2_XY:		return 8;
 
 	case Texturefmt::R8G8B8:		return 24;
+	case Texturefmt::B8G8R8:		return 24;
 	case Texturefmt::A8R8G8B8:		return 32;
 	case Texturefmt::R8G8B8A8:		return 32;
+	case Texturefmt::B8G8R8A8:		return 32;
 	case Texturefmt::A8:			return 8;
 
 	case Texturefmt::R16G16F:		return 32;
@@ -433,6 +453,16 @@ bool XTexture::LoadFromFile(const char* path_)
 
 bool XTexture::createTexture(XTextureFile* image_data)
 {
+	if (image_data->getType() == TextureType::TCube)
+	{
+		if (image_data->getNumMips() != 1)
+		{
+			X_ERROR("Texture", "cubemaps with mips are not supported.");
+			return false;
+		}
+	}
+
+
 	this->numFaces = image_data->getNumFaces();
 	this->numMips = image_data->getNumMips();
 	this->depth = image_data->getDepth();
@@ -443,8 +473,6 @@ bool XTexture::createTexture(XTextureFile* image_data)
 	this->flags |= image_data->getFlags();
 
 	preProcessImage(image_data);
-
-
 
 	return createDeviceTexture(image_data);
 }
@@ -463,25 +491,41 @@ void XTexture::preProcessImage(XTextureFile* image_data)
 	int width = getWidth();
 	int height = getHeight();
 
-	for (i = 0; i < image_data->getNumMips(); i++)
+	// might merge this when i support faces + mips.
+	if (image_data->getType() == TextureType::TCube)
 	{
-		XTextureFile::MipInfo& sub = image_data->SubInfo[i];
+		for (i = 0; i < image_data->getNumFaces(); i++)
+		{
+			XTextureFile::MipInfo& sub = image_data->SubInfo[i];
 
-		size = get_data_size(width,
-			height, 1, 1, getFormat());
+			size = get_data_size(width,height, 1, 1, getFormat());
 
-		void* test = image_data->pFaces[0];
+			sub.pSysMem = &image_data->pFaces[i][Offset];
+			sub.SysMemPitch = get_data_size(width, 1, 1, 1, getFormat());
+			sub.SysMemSlicePitch = size;
 
-		sub.pSysMem = &image_data->pFaces[0][Offset];
-		sub.SysMemPitch = get_data_size(width, 1, 1, 1, getFormat());
-		sub.SysMemSlicePitch = size;
-
-		Offset += size;
-
-		width >>= 1;
-		height >>= 1;
+		}
 	}
+	else
+	{
+		for (i = 0; i < image_data->getNumMips(); i++)
+		{
+			XTextureFile::MipInfo& sub = image_data->SubInfo[i];
 
+			size = get_data_size(width,
+				height, 1, 1, getFormat());
+
+
+			sub.pSysMem = &image_data->pFaces[0][Offset];
+			sub.SysMemPitch = get_data_size(width, 1, 1, 1, getFormat());
+			sub.SysMemSlicePitch = size;
+
+			Offset += size;
+
+			width >>= 1;
+			height >>= 1;
+		}
+	}
 
 }
 
@@ -766,8 +810,8 @@ void XTexture::loadDefaultTextures(void)
 	uint32_t width = rect.getWidth();
 	uint32_t height = rect.getHeight();
 
-	s_GBuf_Depth = XTexture::CreateRenderTarget("$G_Depth", width, height, Texturefmt::R16G16F, TextureType::T2D);
 	s_GBuf_Albedo = XTexture::CreateRenderTarget("$G_Albedo", width, height, Texturefmt::R8G8B8A8, TextureType::T2D);
+	s_GBuf_Depth = XTexture::CreateRenderTarget("$G_Depth", width, height, Texturefmt::R16G16F, TextureType::T2D);
 	s_GBuf_Normal = XTexture::CreateRenderTarget("$G_Normal", width, height, Texturefmt::R16G16F, TextureType::T2D);
 //	s_GBuf_Spec = XTexture::CreateRenderTarget("$G_spec", width, height, Texturefmt::R10G10B10A2, TextureType::T2D);
 

@@ -183,8 +183,8 @@ public:
 	int		linesCrossed;		// number of lines crossed in white space before token
 	int		flags;				// token flags, used for recursive defines
 
-	unsigned long	intvalue;	// integer value
-	double			floatvalue;
+	long		intvalue;	// integer value
+	double		floatvalue;
 
 	const char* start_;
 	const char* end_;

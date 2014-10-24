@@ -11,12 +11,14 @@ struct ICore;
 
 X_NAMESPACE_BEGIN(core)
 
+
 X_DECLARE_FLAGS(VarFlag) (
-ALL,			// all flags
+// ALL,			// all flags
 INT,			// variable is an integer
 FLOAT,			// variable is a float
 STRING,			// variable is a string
 COLOR,
+VECTOR,
 BITFIELD,
 
 STATIC,			// statically declared, not user created
@@ -30,7 +32,7 @@ CONFIG,			// loaded or set from a config file.
 SAVE_IF_CHANGED, // saved to config if changed.
 
 SYSTEM,			// system related
-TOOl			// tool related
+TOOL			// tool related
 );
 
 
@@ -69,18 +71,19 @@ struct IConsole
 	virtual void Draw() X_ABSTRACT;
 
 	// Register variables.
-	virtual ICVar* RegisterString(const char* Name, const char* Value, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;
-	virtual ICVar* RegisterInt(const char* Name, int Value, int Min, int Max, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;
-	virtual ICVar* RegisterFloat(const char* Name, float Value, float Min, float Max, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;
+	virtual ICVar* RegisterString(const char* Name, const char* Value, int flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;
+	virtual ICVar* RegisterInt(const char* Name, int Value, int Min, int Max, int flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;
+	virtual ICVar* RegisterFloat(const char* Name, float Value, float Min, float Max, int flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;
 
-	virtual ICVar* ConfigRegisterString(const char* Name, const char* Value, int Flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* ConfigRegisterInt(const char* Name, int Value, int Min, int Max, int Flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* ConfigRegisterFloat(const char* Name, float Value, float Min, float Max, int Flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* ConfigRegisterString(const char* Name, const char* Value, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* ConfigRegisterInt(const char* Name, int Value, int Min, int Max, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* ConfigRegisterFloat(const char* Name, float Value, float Min, float Max, int flags, const char* desc) X_ABSTRACT;
 
 	// refrenced based, these are useful if we want to use the value alot so we just register it's address.
-	virtual ICVar* Register(const char* name, float* src, float defaultvalue, float Min, float Max, int nFlags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;
-	virtual ICVar* Register(const char* name, int* src, int defaultvalue, int Min, int Max, int nFlags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;
-	virtual ICVar* Register(const char* name, Color* src, Color defaultvalue, int nFlags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;
+	virtual ICVar* Register(const char* name, float* src, float defaultvalue, float Min, float Max, int flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;
+	virtual ICVar* Register(const char* name, int* src, int defaultvalue, int Min, int Max, int flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;
+	virtual ICVar* Register(const char* name, Color* src, Color defaultvalue, int flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;
+	virtual ICVar* Register(const char* name, Vec3f* src, Vec3f defaultvalue, int flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;
 
 
 	virtual ICVar* GetCVar(const char* name) X_ABSTRACT;

@@ -277,6 +277,7 @@ bool BSPBuilder::ProcessWorldModel(const BspEntity& ent)
 			model::SubMeshHeader mesh;
 
 			mesh.boundingBox = pBrush->bounds;
+			mesh.boundingSphere = Sphere(pBrush->bounds);
 			mesh.startVertex = safe_static_cast<uint32_t, size_t>(pArea->verts.size());
 			mesh.startIndex = safe_static_cast<uint32_t, size_t>(pArea->indexes.size() * 3);
 

@@ -10,7 +10,8 @@ shader
                     name                	"WriteDeferred"
                     vertex_shader       	"WriteDeferredVS"
                     pixel_shader         	"DeferredShadingPS"
-                    cull_mode            	front
+                    cull_mode            	back
+		    depth_write          	true
                 }
 	}
 }

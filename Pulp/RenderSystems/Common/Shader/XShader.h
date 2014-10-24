@@ -18,10 +18,15 @@
 
 #include <unordered_set>
 
+X_NAMESPACE_DECLARE(core,
+	struct IConsoleCmdArgs;
+)
+
 X_NAMESPACE_BEGIN(shader)
 
 class XShaderManager;
 struct ShaderSourceFile;
+struct SourceFile;
 
 #define SHADER_BIND_SAMPLER 0x4000
 
@@ -107,8 +112,8 @@ protected:
 };
 
 
-
 class XShader;
+
 class XHWShader : public core::XBaseAsset
 {
 public:
@@ -119,6 +124,15 @@ public:
 
 	static const char* getProfileFromType(ShaderType::Enum type);
 
+	X_INLINE const char* getName(void) const {
+		return name.c_str();
+	}
+	X_INLINE const char* getSourceFileName(void) const {
+		return sourceFileName.c_str();
+	}
+	X_INLINE const char* getEntryPoint(void) const {
+		return entryPoint.c_str();
+	}
 protected:
 	static render::XRenderResourceContainer* pHWshaders;
 
@@ -155,7 +169,6 @@ struct XShaderTechnique
 
 
 
-
 class XShader : public IShader, public core::XBaseAsset
 {
 	friend class XShaderManager;
@@ -184,9 +197,16 @@ public:
 
 private:
 
+	X_INLINE size_t numTechs(void) const { return techs.size(); }
+
+
+private:
+
 	core::string name;
-	core::string sourceFile;
 	uint32_t sourceCrc32;
+	uint32_t hlslSourceCrc32;
+
+	SourceFile* pHlslFile;
 
 	VertexFormat::Enum vertexFmt;
 
@@ -251,6 +271,7 @@ protected:
 	SourceFile* pFile;
 	SourceFile* pHlslFile;
 	uint32_t sourceCrc32;
+	uint32_t hlslSourceCrc32;
 	core::Array<Technique> techniques;
 };
 
@@ -279,6 +300,8 @@ private:
 	bool loadCoreShaders(void);
 	bool freeCoreShaders(void);
 	bool freeSourcebin(void);
+	void listShaders(void);
+	void listShaderSources(void);
 
 
 //	bool loadShaderFile(const char* name);
@@ -289,12 +312,15 @@ private:
 	XShader* loadShader(const char* name);
 	XShader* reloadShader(const char* name);
 	
-	void ParseIncludeFiles_r(SourceFile* file, core::Array<SourceFile*>& includedFiles);
+	void ParseIncludeFiles_r(SourceFile* file, core::Array<SourceFile*>& includedFiles,
+		bool reload = false);
 
 
 private:
 	static void writeSourceToFile(core::XFile* f, const SourceFile* source);
 
+	friend void Cmd_ListShaders(core::IConsoleCmdArgs* pArgs);
+	friend void Cmd_ListShaderSources(core::IConsoleCmdArgs* pArgs);
 
 private:
 	typedef core::HashMap<core::string, SourceFile*> ShaderSourceMap;

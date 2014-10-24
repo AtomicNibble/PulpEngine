@@ -140,6 +140,10 @@ public:
 		return hash.end();
 	}
 
+	const size_t size(void) const {
+		return list.size();
+	}
+
 };
 
 

@@ -3,6 +3,7 @@
 
 #include <ICore.h>
 #include <IFileSys.h>
+#include <IConsole.h>
 
 #include <String\StrRef.h>
 #include <String\StringTokenizer.h>
@@ -119,7 +120,8 @@ XShader::XShader() :
 {
 	sourceCrc32 = 0;
 	vertexFmt = VertexFormat::P3F_C4B_T2F;
-	//	type = ShaderType::UnKnown;
+
+	pHlslFile = nullptr;
 }
 
 XShader::~XShader()
@@ -147,6 +149,16 @@ const int XShader::release()
 
 // --------------------------- Shader Manager --------------------------- 
 
+void Cmd_ListShaders(core::IConsoleCmdArgs* pArgs)
+{
+	render::gRenDev->m_ShaderMan.listShaders();
+}
+
+void Cmd_ListShaderSources(core::IConsoleCmdArgs* pArgs)
+{
+	render::gRenDev->m_ShaderMan.listShaderSources();
+}
+
 bool XShaderManager::Init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
@@ -168,6 +180,9 @@ bool XShaderManager::Init(void)
 	gEnv->pHotReload->addfileType(this, "inc");
 	gEnv->pHotReload->addfileType(this, "shader");
 	gEnv->pHotReload->addfileType(this, "fxcb");
+
+	ADD_COMMAND("shader_list", Cmd_ListShaders, core::VarFlag::SYSTEM, "lists the loaded shaders");
+	ADD_COMMAND("shader_listsourcebin", Cmd_ListShaderSources, core::VarFlag::SYSTEM, "lists the loaded shaders sources");
 
 	return true;
 }
@@ -233,7 +248,7 @@ bool XShaderManager::OnFileChange(const char* name)
 		// if i have some sort of reffrence hirarcy
 		// i can take any file and know what shaders use it.
 		core::Path temp(name);
-	//	temp.toLower(); // make all names lower?
+		temp.toLower(); // all source is lower case
 
 		ShaderSourceMap::const_iterator it = Sourcebin.find(temp.fileName());
 		if (it != Sourcebin.end())
@@ -246,6 +261,11 @@ bool XShaderManager::OnFileChange(const char* name)
 			{
 				reloadShader(name.c_str());
 			}
+		}
+		else
+		{
+			// log as not found.
+			X_WARNING("Shader", "\"%s\" not used, skippin reload", name);
 		}
 	}
 	else
@@ -266,49 +286,116 @@ XShader* XShaderManager::reloadShader(const char* name)
 
 	XShader* shader = nullptr;
 	ShaderSourceFile* source = nullptr;
-
+	size_t i, numTecs;
 
 	// already loaded?
 	shader = (XShader*)shaders.findAsset(name);
 
 	if (shader)
 	{
-		X_LOG0("Shader", "reloading shaader: %s", name);
+		X_LOG0("Shader", "reloading shader: %s", name);
 		// reload the shader file.
 		source = loadShaderFile(name, true);
 		if (source)
 		{
-			size_t i, numTecs;
-
-			numTecs = source->numTechs();
-
-			// might be more techs etc..
-			shader->techs.resize(numTecs);
-			shader->sourceCrc32 = source->sourceCrc32;
-
-			for (i = 0; i < numTecs; i++)
+			// we don't reload the .shader if the source is the same.
+			if (shader->sourceCrc32 != source->sourceCrc32)
 			{
-				XShaderTechnique& tech = shader->techs[i];
-				ShaderSourceFile::Technique& srcTech = source->techniques[i];
+				numTecs = source->numTechs();
 
-				tech.name = srcTech.name;
-				tech.nameHash = core::StrHash(srcTech.name);
-				// Blend info
-				tech.src = srcTech.src;
-				tech.dst = srcTech.dst;
-				// State
-				tech.state = srcTech.state;
-				// Cullmode
-				tech.cullMode = srcTech.cullMode;
+				// might be more techs etc..
+				shader->techs.resize(numTecs);
+				shader->sourceCrc32 = source->sourceCrc32;
+				shader->hlslSourceCrc32 = source->hlslSourceCrc32;
 
-				// create the hardware shaders.
-				// dose nothing if already loaded.
-				tech.pVertexShader = XHWShader::forName(name, srcTech.vertex_func,
-					source->pHlslFile->fileName.c_str(), ShaderType::Vertex, source->pHlslFile->sourceCrc32);
+				for (i = 0; i < numTecs; i++)
+				{
+					XShaderTechnique& tech = shader->techs[i];
+					ShaderSourceFile::Technique& srcTech = source->techniques[i];
 
-				tech.pPixelShader = XHWShader::forName(name, srcTech.pixel_func,
-					source->pHlslFile->fileName.c_str(), ShaderType::Pixel, source->pHlslFile->sourceCrc32);
+					tech.name = srcTech.name;
+					tech.nameHash = core::StrHash(srcTech.name);
+					// Blend info
+					tech.src = srcTech.src;
+					tech.dst = srcTech.dst;
+					// State
+					tech.state = srcTech.state;
+					// Cullmode
+					tech.cullMode = srcTech.cullMode;
 
+					// create the hardware shaders.
+					// dose nothing if already loaded.
+					tech.pVertexShader = XHWShader::forName(name, srcTech.vertex_func,
+						source->pHlslFile->fileName.c_str(), ShaderType::Vertex, source->pHlslFile->sourceCrc32);
+
+					tech.pPixelShader = XHWShader::forName(name, srcTech.pixel_func,
+						source->pHlslFile->fileName.c_str(), ShaderType::Pixel, source->pHlslFile->sourceCrc32);
+				}
+			}
+			else if (shader->hlslSourceCrc32 != source->hlslSourceCrc32)
+			{
+				if (source)
+				{
+					numTecs = shader->numTechs();
+
+					for (i = 0; i < numTecs; i++)
+					{
+						XShaderTechnique& tech = shader->techs[i];
+
+						// these have not changed.
+						// it's safe to pass the pointers.
+						const char* vertEntry = tech.pVertexShader->getEntryPoint();
+						const char* pixelEntry = tech.pPixelShader->getEntryPoint();
+
+						tech.pVertexShader = XHWShader::forName(name, vertEntry,
+							source->pHlslFile->fileName.c_str(), ShaderType::Vertex,
+							source->pHlslFile->sourceCrc32);
+
+						tech.pPixelShader = XHWShader::forName(name, pixelEntry,
+							source->pHlslFile->fileName.c_str(), ShaderType::Pixel,
+							source->pHlslFile->sourceCrc32);
+
+					}
+				}
+			}
+			else
+			{		
+				uint32_t lastCrc32 = shader->pHlslFile->sourceCrc32;
+
+				SourceFile* Hlslsource = loadRawSourceFile(shader->pHlslFile->fileName.c_str(), true);
+
+				if (source)
+				{
+					if (lastCrc32 != Hlslsource->sourceCrc32)
+					{
+						// the shaders source has changed.
+						// we end up here typically when a source file included by 
+						// this .shader main .hlsl forcing a reload of the .shader
+						// so that the main source can be checked.
+						// if we are in this scope we need to recompile all the hardware shaders.
+						numTecs = shader->numTechs();
+
+						for (i = 0; i < numTecs; i++)
+						{
+							XShaderTechnique& tech = shader->techs[i];
+
+							// these have not changed.
+							// it's safe to pass the pointers.
+							const char* vertEntry = tech.pVertexShader->getEntryPoint();
+							const char* pixelEntry = tech.pPixelShader->getEntryPoint();
+
+							tech.pVertexShader = XHWShader::forName(name, vertEntry,
+								source->pHlslFile->fileName.c_str(), ShaderType::Vertex,
+								source->pHlslFile->sourceCrc32);
+
+							tech.pPixelShader = XHWShader::forName(name, pixelEntry,
+								source->pHlslFile->fileName.c_str(), ShaderType::Pixel,
+								source->pHlslFile->sourceCrc32);
+
+						}
+
+					}
+				}
 			}
 
 			X_DELETE( source, g_rendererArena);
@@ -327,10 +414,10 @@ XShader* XShaderManager::reloadShader(const char* name)
 bool XShaderManager::loadCoreShaders(void)
 {
 	m_DefaultShader = createShader("default");
-	m_DebugShader = loadShader("gui");
-	m_FixedFunction = loadShader("ffe");
-	m_DefferedShader = loadShader("deffered");
-	m_DefferedShaderVis = loadShader("defferedVis");
+	m_DebugShader = forName("gui");
+	m_FixedFunction = forName("ffe");
+	m_DefferedShader = forName("deffered");
+	m_DefferedShaderVis = forName("defferedVis");
 
 	return true;
 }
@@ -365,6 +452,46 @@ bool XShaderManager::freeSourcebin(void)
 	return true;
 }
 
+void XShaderManager::listShaders(void)
+{
+	render::XRenderResourceContainer::ResourceConstItor it = shaders.begin();
+	XShader* pShader;
+
+	X_LOG0("Shader", "------------- ^8Shaders(%i)^7 -------------", shaders.size());
+	X_LOG_BULLET;
+
+	for (; it != shaders.end(); ++it)
+	{
+		pShader = (XShader*)it->second;
+
+		X_LOG0("Shader", "Name: ^2\"%s\"^7 tecs: %i crc: ^10x%08x^7 vertexFmt: %s",
+			pShader->name.c_str(),
+			pShader->techs.size(),
+			pShader->sourceCrc32,
+			VertexFormat::toString(pShader->vertexFmt));
+	}
+	X_LOG0("Shader", "------------ ^8Shaders End^7 -------------");
+}
+
+void XShaderManager::listShaderSources(void)
+{
+	ShaderSourceMap::const_iterator it = Sourcebin.begin();
+	const SourceFile* pSource;
+
+	X_LOG0("Shader", "--------- ^8Shader Sources(%i)^7 ---------", Sourcebin.size());
+	X_LOG_BULLET;
+
+	for (; it != Sourcebin.end(); ++it)
+	{
+		pSource = it->second;
+
+		X_LOG0("Shader", "Name: ^2\"%s\"^7 crc: ^10x%08x^7",
+			pSource->fileName.c_str(),
+			pSource->sourceCrc32);
+	}
+
+	X_LOG0("Shader", "--------- ^8Shader Sources End^7 ---------");
+}
 
 XShader* XShaderManager::loadShader(const char* name)
 {
@@ -390,6 +517,8 @@ XShader* XShaderManager::loadShader(const char* name)
 		shader = createShader(name);
 		shader->techs.resize(source->numTechs());
 		shader->sourceCrc32 = source->sourceCrc32;
+		shader->hlslSourceCrc32 = source->hlslSourceCrc32;
+		shader->pHlslFile = source->pHlslFile;
 
 		// I might use only the HLSL crc, do .shader changes matter?
 		// for now use hlsl + .shader
@@ -757,7 +886,10 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 				X_ERROR("Shader", "invalid source name Line: %i", token.line);
 				return nullptr;
 			}
-
+			else
+			{
+				sourceFileName.toLower();
+			}
 
 			{
 				if (!lex.ExpectTokenString("techniques"))
@@ -828,8 +960,13 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 
 		pShaderSource->pFile = pfile;
 		pShaderSource->name = name;
-		pShaderSource->sourceCrc32 = pfile->sourceCrc32 ^ pShaderSource->pHlslFile->sourceCrc32;
-	//	pShaderSource->sourceCrc32 = pfile->sourceCrc32;
+		// don't combine these, I want to check if just the .shader has changed.
+		// seprate to the .hlsl source.
+		pShaderSource->sourceCrc32 = pfile->sourceCrc32;
+		pShaderSource->hlslSourceCrc32 = pCrc32->Combine(pfile->sourceCrc32,
+			pShaderSource->pHlslFile->sourceCrc32, 
+			safe_static_cast<uint32_t,size_t>(pShaderSource->pHlslFile->fileData.size()));
+
 	}
 
 	return pShaderSource;
@@ -914,7 +1051,7 @@ SourceFile* XShaderManager::loadRawSourceFile(const char* name, bool reload)
 				pfile->fileData = str;
 
 				// load any files it includes.
-				ParseIncludeFiles_r(pfile, pfile->includedFiles);
+				ParseIncludeFiles_r(pfile, pfile->includedFiles, reload);
 
 				return pfile;
 			}
@@ -941,7 +1078,7 @@ SourceFile* XShaderManager::loadRawSourceFile(const char* name, bool reload)
 }
 
 void XShaderManager::ParseIncludeFiles_r(SourceFile* file,
-	core::Array<SourceFile*>& includedFiles)
+	core::Array<SourceFile*>& includedFiles, bool reload)
 {
 	X_ASSERT_NOT_NULL(file);
 
@@ -985,11 +1122,12 @@ void XShaderManager::ParseIncludeFiles_r(SourceFile* file,
 				X_WARNING("Shader", "invalid #include in: \"%s\" line: %i", file->name.c_str(), token.line);
 				return;
 			}
-			
-
+		
+			// all source names tolower for reload reasons.
+			fileName.toLower();
 
 			// load it PLZ.
-			SourceFile* childFile = loadRawSourceFile(fileName.c_str());
+			SourceFile* childFile = loadRawSourceFile(fileName.c_str(), reload);
 			if (childFile)
 			{
 				// is this file already included in the tree?
@@ -998,11 +1136,14 @@ void XShaderManager::ParseIncludeFiles_r(SourceFile* file,
 				{
 					// check if for includes.
 					ParseIncludeFiles_r(childFile, includedFiles);
-
+					
 					// add the include files crc to this one.
 					// only after parsing for child includes so that
 					// they are included.
-					file->sourceCrc32 ^= childFile->sourceCrc32;
+					file->sourceCrc32 = pCrc32->Combine(file->sourceCrc32, 
+						childFile->sourceCrc32, 
+						safe_static_cast<uint32_t, size_t>(childFile->fileData.length()));
+
 
 					includedFiles.append(childFile);
 				}

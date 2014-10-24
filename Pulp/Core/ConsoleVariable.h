@@ -572,7 +572,7 @@ class CVarColRef : public CVarBaseConst
 public:
 	// constructor
 	CVarColRef(XConsole* pConsole, const char* Name, Color* pVal, int nFlags, const char* desc)
-		: CVarBaseConst(pConsole, Name, nFlags | VarFlag::FLOAT, desc),
+		: CVarBaseConst(pConsole, Name, nFlags | VarFlag::FLOAT | VarFlag::COLOR, desc),
 		ColValue_(*pVal), ColDefault_(*pVal)
 	{
 	}
@@ -632,6 +632,75 @@ public:
 private:
 	Color&	ColValue_;
 	Color	ColDefault_;
+};
+
+
+//////////////////////////////////////////////////////////////////////////
+class CVarVec3Ref : public CVarBaseConst
+{
+public:
+	// constructor
+	CVarVec3Ref(XConsole* pConsole, const char* Name, Vec3f* pVal, int nFlags, const char* desc)
+		: CVarBaseConst(pConsole, Name, nFlags | VarFlag::FLOAT | VarFlag::VECTOR, desc),
+		Value_(*pVal), Default_(*pVal)
+	{
+	}
+
+	virtual int GetInteger() const X_OVERRIDE{ return static_cast<int>(0.f); }
+	virtual float GetFloat() const X_OVERRIDE{ return 0.f; }
+	virtual const char *GetString() X_OVERRIDE
+	{
+		static char szReturnString[128];
+		sprintf(szReturnString, "%g %g %g", Value_.x,
+			Value_.y, Value_.z);
+		return szReturnString;
+	}
+	virtual const char* GetDefaultStr() const X_OVERRIDE
+	{
+		static char szReturnString[64];
+		sprintf(szReturnString, "%g %g %g", Default_.x,
+			Default_.y, Default_.z);
+		return szReturnString;
+	}
+
+	virtual void Set(const char* s) X_OVERRIDE;
+
+	virtual void Set(const float f)
+	{
+		if (Flags_.IsSet(VarFlag::READONLY))
+			return;
+
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	virtual void Set(const int i)
+	{
+		if (Flags_.IsSet(VarFlag::READONLY))
+			return;
+
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	virtual void Reset() X_OVERRIDE{
+		Value_ = Default_;
+	}
+
+	virtual VarFlag::Enum GetType() X_OVERRIDE{ return VarFlag::VECTOR; }
+	virtual float GetMin(void) X_OVERRIDE{ return 0.f; }
+	virtual float GetMax(void) X_OVERRIDE{ return 1.f; }
+
+	const Vec3f& GetVal(void) const {
+		return Value_;
+	}
+	const Vec3f& GetDefaultVal(void) const {
+		return Default_;
+	}
+
+	static bool Vec3FromString(const char* pStr, Vec3f& out, bool Slient = true);
+
+private:
+	Vec3f&	Value_;
+	Vec3f	Default_;
 };
 
 X_NAMESPACE_END

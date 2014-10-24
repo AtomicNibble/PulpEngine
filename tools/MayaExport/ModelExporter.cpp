@@ -1652,6 +1652,7 @@ bool MayaModel::save(const char *filename)
 			//		mesh.material = pMesh->material;
 					mesh.CompBinds = pMesh->CompBinds;
 					mesh.boundingBox = pMesh->boundingBox;
+					mesh.boundingSphere = Sphere(pMesh->boundingBox);
 
 					// Version 5.0 info
 					mesh.startVertex = vertOffset;

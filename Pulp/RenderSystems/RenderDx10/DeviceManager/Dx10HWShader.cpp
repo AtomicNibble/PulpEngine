@@ -81,15 +81,7 @@ namespace
 		pMat->transpose();
 	}
 
-	X_INLINE void getObjectToWorldMatrix(render::DX11XRender* r)
-	{
-		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
 
-		*pMat = Matrix44f::identity();
-		pMat->transpose();
-	}
-
-#if 1
 	X_INLINE void getWorldViewProjectionMatrix(render::DX11XRender* r)
 	{
 		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
@@ -100,81 +92,21 @@ namespace
 
 
 		// World
-		Matrix44f matRotation = Matrix44f::createRotation(Vec3f(0, 1, 0.5), rotation);
-		Matrix44f matScale = Matrix44f::createScale(Vec3f(scale, scale, scale));
 		Matrix44f trans = Matrix44f::createTranslation(Vec3f(0, 0, 0));
 
-		World = trans ;
-
+		World = trans;
 
 		r->GetModelViewMatrix(&View);
 		r->GetProjectionMatrix(&Projection);
-	
 
-	//	*pMat = World * View * Projection;
 		*pMat = Projection * View * World;
 		pMat->transpose();
-
-
-		float time = gEnv->pTimer->GetCurrTime();
-		
-		rotation = time * 0.1f;
-		rotation /= 6.26f;
 	}
 
-#else
-	X_INLINE void getWorldViewProjectionMatrix(render::DX11XRender* r)
+	X_INLINE void getObjectToWorldMatrix(render::DX11XRender* r)
 	{
-		D3DXMATRIX* pMatD3D = (D3DXMATRIX*)(&vecTemp[0]);
-
-		D3DXMATRIX World, WorldTrans, WorldRotation;
-		D3DXMATRIX View;
-		D3DXMATRIX Projection;
-		D3DXMATRIX WVP;
-
-		// World
-		D3DXVECTOR3 axis(0.0f, 1.0f, 0.5f);
-		D3DXMatrixIdentity(&World);
-		D3DXMatrixTranslation(&WorldTrans, pos_x, pos_y, pos_z);
-		D3DXMatrixRotationAxis(&WorldRotation, &axis, rotation);
-
-		World = WorldRotation * WorldTrans;
-
-		// View
-		D3DXVECTOR3 Eye(eye_x, eye_y, eye_z); // the position
-		D3DXVECTOR3 At(0, 0, 0);
-		D3DXVECTOR3 wUp(0, 1, 0);
-		D3DXMatrixLookAtLH(&View, &Eye, &At, &wUp);
-
-		// Projection
-		float znear = 1.0f;
-		float zfar = 1000.f;
-		// float fov = toRadians(45.f);
-		int x, y, width, hieght;
-		r->GetViewport(&x, &y, &width, &hieght);
-	
-		float ProjectionRatio = (float)width / (float)hieght;
-		float wT = tanf(fov*0.5f)*znear;
-		float wB = -wT;
-		float wR = wT * ProjectionRatio;
-		float wL = -wR;
-
-		D3DXMatrixPerspectiveOffCenterLH(&Projection, wL, wR, wB, wT, znear, zfar);
-	
-	
-		// build final matrix.
-		WVP = World * View * Projection;
-
-		D3DXMatrixTranspose(pMatD3D, &WVP);
-
-		// Set it.
-		// *pMatD3D = WVP;
-
-		rotation += .0005f;
-		if (rotation > 6.26f)
-			rotation = 0.0f;
+		getWorldViewProjectionMatrix(r);
 	}
-#endif
 
 	X_INLINE void getWorldMatrix(render::DX11XRender* r)
 	{
@@ -228,11 +160,8 @@ namespace
 
 	X_INLINE void getScreenSize(render::DX11XRender* r)
 	{
-		int iTempX, iTempY, iWidth, iHeight;
-		r->GetViewport(&iTempX, &iTempY, &iWidth, &iHeight);
-
-		float w = (float)(iWidth > 1 ? iWidth : 1);
-		float h = (float)(iHeight > 1 ? iHeight : 1);
+		float w = r->getWidthf();
+		float h = r->getHeightf();
 
 
 		vecTemp[0].x = w;
@@ -953,10 +882,16 @@ bool XHWShader_Dx10::activate()
 {
 	if (!isValid())
 	{
+		if (FailedtoCompile())
+			return false;
+
 		if (!loadFromCache())
 		{
 			if (!loadFromSource())
 			{
+				// we need to set this shader as broken.
+				// instead of trying to compile it all the time.
+				status_ = ShaderStatus::FailedToCompile;
 				return false;
 			}
 		}

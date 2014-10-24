@@ -71,7 +71,9 @@ bool XRenderMesh::render(void)
 
 	pAux->setRenderFlags(render::AuxGeom_Defaults::Def3DRenderflags);
 
-	g_Dx11D3D.SetWorldShader();
+	
+//	g_Dx11D3D.SetWorldShader();
+
 	g_Dx11D3D.FX_SetVertexDeclaration(vertexFmt_);
 	g_Dx11D3D.FX_SetIStream(indexStream_.BufId);
 	g_Dx11D3D.FX_SetVStream(
@@ -88,16 +90,18 @@ bool XRenderMesh::render(void)
 	{
 		const model::SubMeshHeader* mesh = pMesh_->subMeshHeads[i];
 
+		if (mesh->numVerts == 69)
+		{
+	//		g_Dx11D3D.SetSkyboxShader();
+		}
+
+
 		g_Dx11D3D.FX_DrawIndexPrimitive(
 			PrimitiveType::TriangleList,
 			mesh->numIndexes,
 			mesh->startIndex,
 			mesh->startVertex
 			);
-
-		pAux->drawAABB(mesh->boundingBox,
-			Vec3f::zero(), false, Col_Red);
-
 	}
 
 

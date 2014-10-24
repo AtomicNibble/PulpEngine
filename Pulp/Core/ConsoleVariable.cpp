@@ -85,7 +85,7 @@ void CVarBase::Reset()
 	// nothing to set here :D
 }
 
-// =====================================
+// ========================================================
 
 
 bool CVarColRef::ColorFromString(const char* pStr, Color& out, bool Slient)
@@ -165,6 +165,77 @@ void CVarColRef::Set(const char* s)
 		pChangeFunc_(this); // change callback.	
 }
 
+
+// ========================================================
+
+bool CVarVec3Ref::Vec3FromString(const char* pStr, Vec3f& out, bool Slient)
+{
+	Vec3f vec;
+	int i;
+
+	core::XLexer lex(pStr, pStr + strlen(pStr));
+	core::XLexToken token;
+
+	for (i = 0; i < 3; i++)
+	{
+		if (lex.ReadToken(token))
+		{
+			if (token.type == TT_NUMBER)// && core::bitUtil::IsBitFlagSet(token.subtype,TT_FLOAT))
+			{
+				vec[i] = token.GetFloatValue();
+			}
+			else
+			{
+				X_ERROR_IF(!Slient, "CVar", "failed to set vec3, invalid input");
+				return false;
+			}
+		}
+		else
+		{
+			if (i == 1)
+			{
+				// we allow all 3 values to be set with 1 val.
+				vec.y = vec.x;
+				vec.z = vec.x;
+				break;
+			}
+			else
+			{
+				X_ERROR_IF(!Slient, "CVar", "failed to set vec3, require either 1 or 3 real numbers");
+				return false;
+			}
+		}
+	}
+
+
+	out = vec;
+	return true;
+}
+
+void CVarVec3Ref::Set(const char* s)
+{
+	X_ASSERT_NOT_NULL(s);
+
+	if (Flags_.IsSet(VarFlag::READONLY))
+		return;
+
+	Vec3f vec;
+
+	if (!Vec3FromString(s, vec, false))
+		return;
+
+	// any diffrent?
+	if (Value_.compare(vec, 0.001f))
+		return;
+
+	// assign
+	Value_ = vec;
+
+	OnModified();
+
+	if (pChangeFunc_)
+		pChangeFunc_(this); // change callback.	
+}
 
 
 X_NAMESPACE_END

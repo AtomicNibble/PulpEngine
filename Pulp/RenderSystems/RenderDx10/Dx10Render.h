@@ -188,6 +188,11 @@ public:
 	virtual void RenderBegin() X_OVERRIDE;
 	virtual void RenderEnd() X_OVERRIDE;
 
+
+	virtual void DefferedBegin(void) X_FINAL;
+	virtual void DefferedEnd(void) X_FINAL;
+
+
 	bool Create2DTexture(texture::XTextureFile* image_data,
 					texture::XDeviceTexture& dev_tex);
 
@@ -236,6 +241,7 @@ public:
 	virtual void FX_PipelineShutdown() X_OVERRIDE;
 
 	virtual bool SetWorldShader(void);
+	virtual bool SetSkyboxShader(void);
 	virtual bool SetFFE(bool textured = false);
 	virtual bool SetFontShader();
 	virtual bool SetZPass();
@@ -372,7 +378,7 @@ public:
 
 
 private:
-	void DefferedTest();
+
 
 	virtual void SetArenas(core::MemoryArenaBase* arena) X_OVERRIDE;
 	void OnPostCreateDevice(void);

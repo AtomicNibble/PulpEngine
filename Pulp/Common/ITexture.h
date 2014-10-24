@@ -44,6 +44,9 @@ struct Texturefmt
 		A8,
 		A8R8G8B8,
 
+		B8G8R8,
+		B8G8R8A8,
+
 		ATI2,		// DXN_YX / 3dc
 		ATI2_XY,	// DXN_XY
 
