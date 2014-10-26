@@ -2,105 +2,111 @@
 #include "Vertexbase.inc"
 #include "Linear.hlsl"
 
-cbuffer ObjectConstants  : register(cb1)
-{
-    float4x4    objectToWorldMatrix;
-};
 
 
 
 float3 PackNormal(float3 normal)
 {
-    return normal * 0.5 + 0.5;
+	return normal * 0.5 + 0.5;
 }
 
 float3 UnpackNormal(float3 normal)
 {
-    return normal * 2 - 1;
+	return normal * 2 - 1;
 }
 
 float4 ConvertNormal(float3 vsNormal)
 {
-    return float4( PackNormal(vsNormal), 0);
+	return float4( PackNormal(vsNormal), 0);
 }
 
 
 struct VS_WriteDeferred_Input
 {
-    float3 osPosition           	: POSITION;
-#ifdef PARAM_VS_Normal
-    float3 osNormal           	: NORMAL0;  
-#endif
-    float4 color                	: COLOR0;
-    float2 texCoord             	: TEXCOORD0;
-#ifdef PARAM_VS_Texcoord2
-    float2 texCoord2             	: TEXCOORD1;
-#endif
-    
-    
-    /*
-    float3 osPosition               : POSITION;
-    float4 color                    : COLOR;
-    float2 texCoord                 : TEXCOORD0;
-    float3 osNormal                 : NORMAL;
-    float3 osBinormal               : BINORMAL;
-    float3 osTangent                : TANGENT;
-*/
+	float3 osPosition           	: POSITION;
+	float3 osNormal           		: NORMAL0;  	
+	float4 color                		: COLOR0;
+	float2 texCoord             	: TEXCOORD0;
+	float2 texCoord1             	: TEXCOORD1;
 };
 
 
 struct VS_WriteDeferred_Output
-{
-    float4 ssPosition           	: SV_POSITION;    
-    float4 color                	: COLOR0;
-    float2 texCoord             	: TEXCOORD0;
+{ 
+	float4 depth                   	: TEXCOORD0;
+	float2 texCoord             	: TEXCOORD1;  
+	float3 vsNormal                : TEXCOORD2;
+	float4 color                		: COLOR0;
+	
+	// not passed
+	float4 ssPosition           	: SV_POSITION;   
 };
 
 struct PS_WriteDeferred_Input
 {
-    float4 ssPosition           	: SV_POSITION;
-    float4 color                	: COLOR0;
-    float2 texCoord             	: TEXCOORD0;
+	float4 depth                   	: TEXCOORD0;
+	float2 texCoord             	: TEXCOORD1;  
+	float3 vsNormal                : TEXCOORD2;
+	float4 color                		: COLOR0;
 };
 
 
 struct PS_WriteDeferred_Output
 {
-    float4 albedo                   : SV_Target0;
-    float4 normal                   : SV_Target1;
-    float4 depth                    : SV_Target2;
+	float4 albedo                   : SV_Target0;
+	float4 normal                   : SV_Target1;
+	float4 depth                    : SV_Target2;
 };
 
-Texture2D  	baseMap : register(t0);
+Texture2D  		baseMap : register(t0);
 SamplerState  	baseMapSampler;
 
 
 VS_WriteDeferred_Output WriteDeferredVS(VS_WriteDeferred_Input input)
 {
-   VS_WriteDeferred_Output output;
-   
-    float4 position    	= mul(float4(input.osPosition, 1.0), worldViewProjectionMatrix);
-  
-  
-    output.ssPosition     = position;
-    output.texCoord      = input.texCoord;
-    output.color            = input.color;
-    return output;
+	VS_WriteDeferred_Output output;
+	
+	float4x4 objectToWorldMatrixInvTrans = objectToWorldMatrix;
+
+	// word space
+	float4 wsPosition  = mul(float4(input.osPosition, 1.0), objectToWorldMatrix);
+	float3 wsNormal   = normalize( mul(input.osNormal,   (float3x3)objectToWorldMatrixInvTrans ) );
+
+	// View Space
+	float3 vsNormal   	= mul(wsNormal, (float3x3)worldToCameraMatrix );
+
+
+	float vsDepth = wsPosition.x * worldToCameraMatrix[0][2] +
+                    wsPosition.y * worldToCameraMatrix[1][2] +
+                    wsPosition.z * worldToCameraMatrix[2][2] +  
+										worldToCameraMatrix[3][2];
+
+	
+	output.depth          		= float4( vsDepth, 0, 0, 0 );	 
+	output.texCoord      	= input.texCoord;
+    output.vsNormal     		= vsNormal;
+	output.color            	= input.color;
+	
+	// vertex only
+	output.ssPosition     	= mul(wsPosition, worldToScreenMatrix);
+
+	return output;
 }
 
 
 PS_WriteDeferred_Output DeferredShadingPS(PS_WriteDeferred_Input input)
 {
-    PS_WriteDeferred_Output output;
-    
-    float4 textureCol = baseMap.Sample(baseMapSampler, input.texCoord);
+	PS_WriteDeferred_Output output;
+	
+	float4 textureCol = baseMap.Sample(baseMapSampler, input.texCoord);
  
-    output.albedo 		=  input.color * textureCol; 
-    output.normal          = float4(1,1,0,1);
-    output.depth           = float4(0.9, 0, 0, 1);
-    return output;
+     // Transform the normal into view space.
+    float3 vsNormal = normalize(input.vsNormal);  
+ 
+	output.albedo 			=  input.color * textureCol; 
+	output.normal          = ConvertNormal(vsNormal);
+	output.depth           = float4(input.depth.r, input.depth.g, 0, 0);
+	return output;
 }
-
-
 
 

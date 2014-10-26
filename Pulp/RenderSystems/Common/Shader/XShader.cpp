@@ -119,7 +119,7 @@ XShader::XShader() :
 	techs(g_rendererArena)
 {
 	sourceCrc32 = 0;
-	vertexFmt = VertexFormat::P3F_C4B_T2F;
+	vertexFmt = VertexFormat::P3F_T2F_C4B;
 
 	pHlslFile = nullptr;
 }
@@ -293,7 +293,7 @@ XShader* XShaderManager::reloadShader(const char* name)
 
 	if (shader)
 	{
-		X_LOG0("Shader", "reloading shader: %s", name);
+		
 		// reload the shader file.
 		source = loadShaderFile(name, true);
 		if (source)
@@ -301,6 +301,8 @@ XShader* XShaderManager::reloadShader(const char* name)
 			// we don't reload the .shader if the source is the same.
 			if (shader->sourceCrc32 != source->sourceCrc32)
 			{
+				X_LOG0("Shader", "reloading shader: %s", name);
+
 				numTecs = source->numTechs();
 
 				// might be more techs etc..
@@ -334,9 +336,13 @@ XShader* XShaderManager::reloadShader(const char* name)
 			}
 			else if (shader->hlslSourceCrc32 != source->hlslSourceCrc32)
 			{
+				X_LOG0("Shader", "reloading shader source: %s", shader->pHlslFile->name.c_str());
 				if (source)
 				{
 					numTecs = shader->numTechs();
+
+					// update crc
+					shader->hlslSourceCrc32 = source->hlslSourceCrc32;
 
 					for (i = 0; i < numTecs; i++)
 					{
@@ -368,6 +374,8 @@ XShader* XShaderManager::reloadShader(const char* name)
 				{
 					if (lastCrc32 != Hlslsource->sourceCrc32)
 					{
+						X_LOG0("Shader", "reloading shader source: %s", shader->pHlslFile->name.c_str());
+
 						// the shaders source has changed.
 						// we end up here typically when a source file included by 
 						// this .shader main .hlsl forcing a reload of the .shader
@@ -394,6 +402,10 @@ XShader* XShaderManager::reloadShader(const char* name)
 
 						}
 
+					}
+					else
+					{
+						X_LOG0("Shader", "shader source: %s has not changed, reload skipped", shader->pHlslFile->name.c_str());
 					}
 				}
 			}

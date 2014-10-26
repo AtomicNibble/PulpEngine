@@ -233,7 +233,7 @@ inline Matrix44f SseInvert( const Matrix44f& mat )
 
 #endif // #if defined( X_PLATFORM_WIN32 ) 
 
-
+#if 0
 X_INLINE void MatrixOrthoOffCenterLH(Matrix44f* pMat, float32_t left, float32_t right,
 	float32_t bottom, float32_t top, float32_t zn, float32_t zf)
 {
@@ -284,33 +284,6 @@ X_INLINE void MatrixPerspectivOffCenterLH(Matrix44f* pMat, float32_t left, float
 	pMat->m33 = 0;
 }
 
-X_INLINE void MatrixPerspectivOffCenterRH(Matrix44f* pMat, float32_t left, float32_t right,
-	float32_t bottom, float32_t top, float32_t zn, float32_t zf)
-{
-
-	pMat->m00 = 2.0f * zn / (right - left);
-	pMat->m10 = 0;
-	pMat->m20 = 0;
-	pMat->m30 = 0;
-
-	pMat->m01 = 0;
-	pMat->m11 = 2.0f * zn / (top - bottom);
-	pMat->m21 = 0;
-	pMat->m31 = 0;
-
-	pMat->m02 = (left + right) / (right - left);
-	pMat->m12 = (top + bottom) / (top - bottom);
-	pMat->m22 = zf / (zn - zf);
-	pMat->m32 = -1.f;
-
-	pMat->m03 = 0;
-	pMat->m13 = 0;
-	pMat->m23 = zn * zf / (zn - zf);
-	pMat->m33 = 0;
-}
-
-
-
 X_INLINE void MatrixLookAtLH(Matrix44f* pMat, const Vec3f& Eye, const Vec3f& At, const Vec3f& Up)
 {
 	Vec3f vLightDir = (At - Eye);
@@ -338,6 +311,58 @@ X_INLINE void MatrixLookAtLH(Matrix44f* pMat, const Vec3f& Eye, const Vec3f& At,
 	pMat->m13 = -yaxis.dot(Eye);
 	pMat->m23 = -zaxis.dot(Eye);
 	pMat->m33 = 1;
+}
+#endif
+
+X_INLINE void MatrixPerspectivOffCenterRH(Matrix44f* pMat, float32_t left, float32_t right,
+	float32_t bottom, float32_t top, float32_t zn, float32_t zf)
+{
+
+	pMat->m00 = 2.0f * zn / (right - left);
+	pMat->m10 = 0;
+	pMat->m20 = 0;
+	pMat->m30 = 0;
+
+	pMat->m01 = 0;
+	pMat->m11 = 2.0f * zn / (top - bottom);
+	pMat->m21 = 0;
+	pMat->m31 = 0;
+
+	pMat->m02 = (left + right) / (right - left);
+	pMat->m12 = (top + bottom) / (top - bottom);
+	pMat->m22 = zf / (zn - zf);
+	pMat->m32 = -1.f;
+
+	pMat->m03 = 0;
+	pMat->m13 = 0;
+	pMat->m23 = zn * zf / (zn - zf);
+	pMat->m33 = 0;
+}
+
+// todo
+X_INLINE void MatrixOrthoOffCenterRH(Matrix44f* pMat, float32_t left, float32_t right,
+	float32_t bottom, float32_t top, float32_t zn, float32_t zf)
+{
+
+	pMat->m00 = 2.0f / (right - left);
+	pMat->m10 = 0;
+	pMat->m20 = 0;
+	pMat->m30 = 0;
+
+	pMat->m01 = 0;
+	pMat->m11 = 2.0f / (top - bottom);
+	pMat->m21 = 0;
+	pMat->m31 = 0;
+
+	pMat->m02 = 0;
+	pMat->m12 = 0;
+	pMat->m22 = 1.0f / (zf - zn);
+	pMat->m32 = 0;
+
+	pMat->m03 = (left + right) / (left - right);
+	pMat->m13 = (top + bottom) / (bottom - top);
+	pMat->m23 = zn / (zn - zf);
+	pMat->m33 = 1.0f;
 }
 
 

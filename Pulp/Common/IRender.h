@@ -10,7 +10,7 @@
 
 typedef void* WIN_HWND;
 
-struct Vertex_P3F_C4B_T2F;
+struct Vertex_P3F_T2F_C4B;
 
 X_NAMESPACE_DECLARE(font,
 struct IXFont_RenderProxy;
@@ -281,12 +281,8 @@ struct IRender
 	virtual void ShutDown() X_ABSTRACT;
 	virtual void freeResources() X_ABSTRACT;
 
-
 	virtual void RenderBegin() X_ABSTRACT;
 	virtual void RenderEnd() X_ABSTRACT;
-
-	virtual void DefferedBegin(void) X_ABSTRACT;
-	virtual void DefferedEnd(void) X_ABSTRACT;
 
 	virtual bool FlushRenderThreadCommands(bool wait) X_ABSTRACT;
 
@@ -374,13 +370,16 @@ struct IRender
 	// ~Font
 
 	// used by font's mainly.
-	virtual void DrawVB(Vertex_P3F_C4B_T2F* pVertBuffer, uint32_t size,
+	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
 		PrimitiveTypePublic::Enum type) X_ABSTRACT;
 
 	// Shader Stuff
 
 	virtual shader::XShaderItem LoadShaderItem(shader::XInputShaderResources& res) X_ABSTRACT;
-
+	
+	virtual bool DefferedBegin(void) X_ABSTRACT;
+	virtual bool DefferedEnd(void) X_ABSTRACT;
+	virtual bool SetWorldShader(void) X_ABSTRACT;
 	// ~Shader Stuff
 
 	// Model

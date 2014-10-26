@@ -57,7 +57,7 @@ XFFont::XFFont(ICore* pCore, XFont* pXFont, const char* pFontName) :
 {
 	X_ASSERT_NOT_NULL(g_fontArena);
 
-	pVertBuffer_ = X_NEW_ARRAY_ALIGNED( Vertex_P3F_C4B_T2F, FONT_QUAD_BUFFER_SIZE, 
+	pVertBuffer_ = X_NEW_ARRAY_ALIGNED( Vertex_P3F_T2F_C4B, FONT_QUAD_BUFFER_SIZE, 
 		g_fontArena, "fontVertexBuffer", 16);
 }
 
@@ -548,7 +548,7 @@ void XFFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDr
 {
 	X_PROFILE_BEGIN("FontRender", core::ProfileSubSys::FONT);
 
-	Vertex_P3F_C4B_T2F* pQuad, *pVertex;
+	Vertex_P3F_T2F_C4B* pQuad, *pVertex;
 	XTextureSlot* pSlot;
 	render::IRender* pRenderer;
 	XCharCords cords;

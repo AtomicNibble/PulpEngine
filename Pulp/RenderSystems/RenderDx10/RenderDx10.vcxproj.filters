@@ -202,5 +202,11 @@
     <ClCompile Include="..\Common\TextDrawList.cpp">
       <Filter>Common</Filter>
     </ClCompile>
+    <ClCompile Include="Dx10DrawMisc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Dx10RenderStates.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

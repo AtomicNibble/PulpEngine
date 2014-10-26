@@ -812,7 +812,7 @@ void XTexture::loadDefaultTextures(void)
 
 	s_GBuf_Albedo = XTexture::CreateRenderTarget("$G_Albedo", width, height, Texturefmt::R8G8B8A8, TextureType::T2D);
 	s_GBuf_Depth = XTexture::CreateRenderTarget("$G_Depth", width, height, Texturefmt::R16G16F, TextureType::T2D);
-	s_GBuf_Normal = XTexture::CreateRenderTarget("$G_Normal", width, height, Texturefmt::R16G16F, TextureType::T2D);
+	s_GBuf_Normal = XTexture::CreateRenderTarget("$G_Normal", width, height, Texturefmt::R8G8B8A8, TextureType::T2D);
 //	s_GBuf_Spec = XTexture::CreateRenderTarget("$G_spec", width, height, Texturefmt::R10G10B10A2, TextureType::T2D);
 
 

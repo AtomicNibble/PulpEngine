@@ -47,9 +47,6 @@ VS_DeferredPass_Output DeferredPassVS(VS_DeferredPass_Input input)
 	float4 ssPosition = float4(input.osPosition, 1);
 
 	output.ssPosition   = ssPosition;
-//	output.ssPosition.x += 0.1;
-	
-	
 	output.projected.x  = ssPosition.x;
 	output.projected.y  = ssPosition.y;
 	output.projected.z  = 1;

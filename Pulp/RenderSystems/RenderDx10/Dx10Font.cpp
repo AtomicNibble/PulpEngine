@@ -55,7 +55,7 @@ void DX11XRender::FontSetRenderingState()
 	float znear = -1e10f;
 	float zfar = 1e10f;
 
-	MatrixOrthoOffCenterLH(m, 0, width, height, 0, znear, zfar);
+	MatrixOrthoOffCenterRH(m, 0, width, height, 0, znear, zfar);
 
 
 	m_ViewMat.Push();

@@ -11,17 +11,9 @@
 struct VS_INPUT
 {
     float3 osPosition           	: POSITION;
-#ifdef PARAM_VS_Normal
-        float3 osNormal           	: NORMAL0;  
-#endif
     float4 color                	: COLOR0;
     float2 texCoord             	: TEXCOORD0;
-#ifdef PARAM_VS_Texcoord2
-    float2 texCoord2             	: TEXCOORD1;
-#endif
 };
-
-
 
 
 struct VS_OUTPUT

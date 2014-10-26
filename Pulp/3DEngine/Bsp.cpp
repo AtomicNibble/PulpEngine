@@ -176,7 +176,7 @@ bool Bsp::LoadFromFile(const char* filename)
 			}
 
 			// set the mesh head pointers.
-			pMesh->verts = pMesh->subMeshHeads[0]->verts;
+			pMesh->streams[VertexStream::VERT] = pMesh->subMeshHeads[0]->verts;
 			pMesh->indexes = pMesh->subMeshHeads[0]->indexes;
 
 			meshName.clear();

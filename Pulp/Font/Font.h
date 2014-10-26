@@ -7,7 +7,7 @@
 #include <Containers\FixedArray.h>
 #include <Containers\Array.h>
 
-struct Vertex_P3F_C4B_T2F;
+struct Vertex_P3F_T2F_C4B;
 
 X_NAMESPACE_BEGIN(font)
 
@@ -103,7 +103,7 @@ private:
 
 	Effets effects_;
 
-	Vertex_P3F_C4B_T2F* pVertBuffer_;
+	Vertex_P3F_T2F_C4B* pVertBuffer_;
 };
 
 

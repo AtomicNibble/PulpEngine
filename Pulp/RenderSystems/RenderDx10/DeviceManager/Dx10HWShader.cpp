@@ -44,40 +44,37 @@ namespace
 	X_ALIGNED_SYMBOL(Vec4f vecTemp[32], 16);
 
 
-	static float rotation = 0.1f;
-
-	static float pos_x;
-	static float pos_y;
-	static float pos_z;
-	static float scale;
-
-	
 
 	X_INLINE void getworldToCameraMatrix(render::DX11XRender* r)
 	{
 		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
-		Matrix44f* pView = r->pCurViewMat();
 
-		*pMat = *pView;
-		pMat->transpose();
+		r->GetModelViewMatrix(pMat);
+
+	
 	}
 
 	X_INLINE void getworldToScreenMatrix(render::DX11XRender* r)
 	{
 		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
-		Matrix44f* pView = r->pCurViewMat();
-		Matrix44f* pProj = r->pCurProjMat();
-	
-		*pMat = (*pView) * (*pProj);
-	//	pMat->transpose();
+
+		Matrix44f View;
+		Matrix44f Projection;
+
+		r->GetModelViewMatrix(&View);
+		r->GetProjectionMatrix(&Projection);
+
+		*pMat = Projection * View;
+		pMat->transpose();
 	}
 
 	X_INLINE void getcameraToWorldMatrix(render::DX11XRender* r)
 	{
 		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
-		Matrix44f* pView = r->pCurViewMat();
 
-		*pMat = pView->inverted();
+		r->GetModelViewMatrix(pMat);
+
+		pMat->inverted();
 		pMat->transpose();
 	}
 
@@ -89,7 +86,6 @@ namespace
 		Matrix44f World;
 		Matrix44f View;
 		Matrix44f Projection;
-
 
 		// World
 		Matrix44f trans = Matrix44f::createTranslation(Vec3f(0, 0, 0));
@@ -105,23 +101,17 @@ namespace
 
 	X_INLINE void getObjectToWorldMatrix(render::DX11XRender* r)
 	{
-		getWorldViewProjectionMatrix(r);
+		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
+
+		pMat->setToIdentity();
+		pMat->transpose();
 	}
 
 	X_INLINE void getWorldMatrix(render::DX11XRender* r)
 	{
 		D3DXMATRIX* pMatD3D = (D3DXMATRIX*)(&vecTemp[0]);
 
-		// pMatD3D
-		D3DXMatrixIdentity(pMatD3D);
-		// rotate then translate.
-		D3DXMatrixRotationX(pMatD3D, toRadians(rotation));
-
-		rotation += 0.01f;
-		if (rotation > 179.f)
-			rotation = 0.f;
-
-
+		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
 	X_INLINE void getviewMatrix(render::DX11XRender* r)
@@ -129,7 +119,6 @@ namespace
 		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
 
 		r->GetModelViewMatrix(pMat);
-
 		pMat->transpose();
 	}
 
@@ -138,6 +127,7 @@ namespace
 		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
 
 		r->GetProjectionMatrix(pMat);
+		pMat->transpose();
 	}
 
 
@@ -155,7 +145,9 @@ namespace
 
 	X_INLINE void getCameraPos(render::DX11XRender* r)
 	{
+		Vec3f pos(r->GetCamera().GetPosition());
 
+		vecTemp[0] = pos;
 	}
 
 	X_INLINE void getScreenSize(render::DX11XRender* r)
@@ -173,17 +165,17 @@ namespace
 
 	X_INLINE void getCameraFront(render::DX11XRender* r)
 	{
-
+		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
 	X_INLINE void getCameraRight(render::DX11XRender* r)
 	{
-
+		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
 	X_INLINE void getCameraUp(render::DX11XRender* r)
 	{
-
+		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
 
@@ -341,15 +333,6 @@ void XHWShader_Dx10::InitBufferPointers()
 		}
 	}
 
-#if X_DEBUG
-
-	ADD_CVAR_REF_NO_NAME(pos_x, -2, -1000, 1000, 0, "");
-	ADD_CVAR_REF_NO_NAME(pos_y, 0, -1000, 1000, 0, "");
-	ADD_CVAR_REF_NO_NAME(pos_z, 0, -1000, 1000, 0, "");
-
-	ADD_CVAR_REF_NO_NAME(scale, 0.01F, 0.00001f, 1000, 0, "");
-
-#endif // !X_DEBUG
 
 }
 
@@ -497,7 +480,10 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 	flags |= D3DCOMPILE_OPTIMIZATION_LEVEL0 | D3DCOMPILE_DEBUG;
 #endif // !X_DEBUG
 
-	D3D_SHADER_MACRO Shader_Macros[2] = { "X_TEXTURED", "1", NULL, NULL };
+	D3D_SHADER_MACRO Shader_Macros[2] = { 
+		{ "PARAM_VS_Normal", "1" }, 
+		{ NULL, NULL } 
+	};
 
 	ID3DBlob* error;
 

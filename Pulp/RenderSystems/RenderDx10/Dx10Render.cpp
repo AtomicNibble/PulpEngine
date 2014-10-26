@@ -14,35 +14,6 @@
 
 X_NAMESPACE_BEGIN(render)
 
-namespace
-{
-	uint8 g_StencilFuncLookup[9] =
-	{
-		D3D11_COMPARISON_NEVER,
-		D3D11_COMPARISON_NEVER,				
-		D3D11_COMPARISON_LESS,	
-		D3D11_COMPARISON_LESS_EQUAL,		
-		D3D11_COMPARISON_GREATER,			
-		D3D11_COMPARISON_GREATER_EQUAL,		
-		D3D11_COMPARISON_EQUAL,				
-		D3D11_COMPARISON_NOT_EQUAL,
-		D3D11_COMPARISON_ALWAYS,
-	};
-
-	uint8 g_StencilOpLookup[9] =
-	{
-		D3D11_STENCIL_OP_KEEP,
-		D3D11_STENCIL_OP_KEEP,		
-		D3D11_STENCIL_OP_ZERO,
-		D3D11_STENCIL_OP_REPLACE,	
-		D3D11_STENCIL_OP_INCR_SAT,			
-		D3D11_STENCIL_OP_DECR_SAT,	
-		D3D11_STENCIL_OP_INVERT,
-		D3D11_STENCIL_OP_INCR,				
-		D3D11_STENCIL_OP_DECR,				
-	};
-
-}
 
 DX11XRender g_Dx11D3D;
 
@@ -534,13 +505,13 @@ void DX11XRender::InitDynamicBuffers(void)
 		int vertSize, numVerts;
 		switch (i)
 		{
-			case VertexPool::P3F_C4B_T2F:
+			case VertexPool::P3F_T2F_C4B:
 				numVerts = 32768 / 4;
-				vertSize = sizeof(Vertex_P3F_C4B_T2F);
+				vertSize = sizeof(Vertex_P3F_T2F_C4B);
 				break;
-			case VertexPool::P3F_C4B_T2S:
+			case VertexPool::P3F_T2S_C4B:
 				numVerts = 32768 / 4;
-				vertSize = sizeof(Vertex_P3F_C4B_T2S);
+				vertSize = sizeof(Vertex_P3F_T2S_C4B);
 				break;
 		}
 
@@ -600,7 +571,7 @@ void DX11XRender::RenderEnd()
 }
 
 
-void DX11XRender::DefferedBegin()
+bool DX11XRender::DefferedBegin()
 {
 	using namespace texture;
 
@@ -620,9 +591,11 @@ void DX11XRender::DefferedBegin()
 	SetZPass();
 
 	m_deviceContext->OMSetRenderTargets(3, pViews, m_depthStencilView);
+
+	return true;
 }
 
-void DX11XRender::DefferedEnd()
+bool DX11XRender::DefferedEnd()
 {
 	using namespace shader;
 	using namespace texture;
@@ -660,7 +633,7 @@ void DX11XRender::DefferedEnd()
 	pSh->FXBeginPass(pass);
 
 	Draw2dImage(	
-		-1.0f, -0.5f, 0.5f, -0.5f, 
+		-1.0f, -0.4f, 0.6f, -0.6f, 
 		0, Col_White);
 
 	pSh->FXSetTechnique(normal);
@@ -668,7 +641,7 @@ void DX11XRender::DefferedEnd()
 	pSh->FXBeginPass(pass);
 
 	Draw2dImage(
-		-0.5f, -0.5f, 0.5f, -0.5f,
+		-0.4f, -0.4f, 0.6f, -0.6f,
 		0, Col_White);
 
 	pSh->FXSetTechnique(depth);
@@ -677,57 +650,129 @@ void DX11XRender::DefferedEnd()
 
 
 	Draw2dImage(
-		0.f, -0.5f, 0.5f, -0.5f,
+		0.2f, -0.4f, 0.6f, -0.6f,
 		0, Col_White);
 
-/*	Draw2dImage(10, height - 256, 256, 256,
-		XTexture::s_GBuf_Albedo->getID(), Col_White);
-	Draw2dImage(30 + 256, height - 256, 256, 256,
-		XTexture::s_GBuf_Normal->getID(), Col_White);
-	Draw2dImage(50 + 512, height - 256, 256, 256,
-		XTexture::s_GBuf_Depth->getID(),Col_White);
-*/
 
 	XTexture::s_GBuf_Albedo->unbind();
 	XTexture::s_GBuf_Normal->unbind();
 	XTexture::s_GBuf_Depth->unbind();
 
 
-//	Set2D(false);
+	return true;
 }
 
 
 
-void DX11XRender::DrawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2,
-	const Vec3f& pos3, const Color& col)
+
+
+void DX11XRender::Set2D(bool enable, float znear, float zfar)
 {
+	Matrix44f* m;
 
-	uint32 nOffs;
-	Vertex_P3F_C4B_T2F* Quad = (Vertex_P3F_C4B_T2F*)m_DynVB[VertexPool::P3F_C4B_T2F].LockVB(4, nOffs);
+	static core::ToggleChecker in2dAlready(false);
 
-	Quad[0].pos = pos0;
-	Quad[1].pos = pos1;
-	Quad[2].pos = pos2;
-	Quad[3].pos = pos3;
+	// assets if already in 2d mode.
+	// might make it part of the ASSERT macro's
+	in2dAlready = enable;
 
-
-	for (uint32 i = 0; i < 4; ++i)
+	if (enable) 
 	{
-		Quad[i].color = col;
-		Quad[i].st = Vec2f::zero();
+		// make a matrix that maps shit on to the screen.
+		// we need the screen dimensions so that we can multiple 
+		// the values by the correct amount.
+		
+		m_ProMat.Push();
+		m = m_ProMat.GetTop();
+
+		float width = getWidthf();
+		float height = getHeightf();
+
+		MatrixOrthoOffCenterRH(m, 0, width, height, 0, znear, zfar);
+
+		// want a identiy view.
+		PushViewMatrix();
+		m_ViewMat.LoadIdentity();
+
+
+	} else {
+		m_ProMat.Pop();
+		PopViewMatrix();
 	}
 
-	m_DynVB[VertexPool::P3F_C4B_T2F].UnlockVB();
-	m_DynVB[VertexPool::P3F_C4B_T2F].Bind();
+	SetCameraInfo();
+}
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_C4B_T2F)))
-		return;
+// Camera
 
-	// Render the two triangles from the data stream
-	FX_DrawPrimitive(PrimitiveType::TriangleStrip, nOffs, 4);
+
+void DX11XRender::SetCameraInfo(void)
+{
+	m_pRt->RT_SetCameraInfo();
+}
+
+void DX11XRender::RT_SetCameraInfo(void)
+{
+	// calculate the current camera shit.
+
+	GetModelViewMatrix(&ViewMatrix_);
+	GetProjectionMatrix(&ProjMatrix_);
+
+
+//	ViewProjMatrix_ = ViewMatrix_ * ProjMatrix_;
+	ViewProjMatrix_ = ProjMatrix_ * ViewMatrix_;
+	ViewProjInvMatrix_ = ViewProjMatrix_.inverted();
+
+	// if the camera has changed then we need to tell the shader system 
+	// that the cameras are dirty!
+	// instead of updating the cbuf's
+	// since if this function is called multiple times with no drawining.
+	// be wasted cbuffer updates.
+	// this also means camera cbuffer should not
+	// be updated when teh camera has not changed.
+
+	shader::XHWShader_Dx10::SetCameraDirty();
 }
 
 
+
+void DX11XRender::SetCamera(const XCamera& cam)
+{
+	float ProjectionRatio = cam.GetProjectionRatio();
+	float fov = cam.GetFov();
+
+//	float wT = math<float>::tan(fov*0.5f)*cam.GetNearPlane();
+//	float wB = -wT;
+//	float wR = wT * ProjectionRatio;
+//	float wL = -wR;
+
+	Matrix34f m = cam.GetMatrix();
+	Vec3f vEye = cam.GetPosition();
+	Vec3f vAt = vEye + Vec3f(m.m01, m.m11, m.m21);
+	Vec3f vUp = Vec3f(m.m02, m.m12, m.m22);
+//	Vec3f vUp = Vec3f(0,0,1);
+
+	// View
+	Matrix44f* pView = m_ViewMat.GetTop();
+	MatrixLookAtRH(pView, vEye, vAt, vUp);
+
+	// Proj
+	Matrix44f* pProj = m_ProMat.GetTop();
+	MatrixPerspectiveFovRH(pProj, fov, ProjectionRatio, 1.0f, 6000.0f);
+
+
+	cam_ = cam;
+
+	SetCameraInfo();
+}
+
+
+
+// ~Camera
+
+
+
+// Textures 
 
 bool DX11XRender::Create2DTexture(texture::XTextureFile* img_data, texture::XDeviceTexture& dev_tex)
 {
@@ -789,7 +834,7 @@ bool DX11XRender::Create2DTexture(texture::XTextureFile* img_data, texture::XDev
 		pSubResource = &SubResource[0];
 		for (i = 0; i < img_data->getNumFaces(); i++)
 		{
-			X_ASSERT(img_data->SubInfo[i].pSysMem != nullptr,"system mem must be set for all faces")();
+			X_ASSERT(img_data->SubInfo[i].pSysMem != nullptr, "system mem must be set for all faces")();
 			SubResource[i].pSysMem = img_data->SubInfo[i].pSysMem;
 			SubResource[i].SysMemPitch = img_data->SubInfo[i].SysMemPitch;
 			SubResource[i].SysMemSlicePitch = 0; // img_data->SubInfo[0].SysMemSlicePitch;
@@ -824,538 +869,7 @@ bool DX11XRender::Create2DTexture(texture::XTextureFile* img_data, texture::XDev
 }
 
 
-void DX11XRender::SetState(StateFlag state)
-{
-	m_pRt->RC_SetState(state);
-}
 
-void DX11XRender::SetStencilState(StencilState::Value ss)
-{
-	DepthState depth = curDepthState();
-
-	StencilState::Value::Face& front = ss.faces[0];
-
-	int test = front.getStencilFuncIdx();
-	int test1 = front.getStencilFailOpIdx();
-	int test2 = front.getStencilZFailOpIdx();
-	int test3 = front.getStencilPassOpIdx();
-
-	depth.Desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
-	depth.Desc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
-	depth.Desc.FrontFace.StencilFunc = (D3D11_COMPARISON_FUNC)g_StencilFuncLookup[front.getStencilFuncIdx()];
-	depth.Desc.FrontFace.StencilFailOp = (D3D11_STENCIL_OP)g_StencilOpLookup[front.getStencilFailOpIdx()];
-	depth.Desc.FrontFace.StencilDepthFailOp = (D3D11_STENCIL_OP)g_StencilOpLookup[front.getStencilZFailOpIdx()];
-	depth.Desc.FrontFace.StencilPassOp = (D3D11_STENCIL_OP)g_StencilOpLookup[front.getStencilPassOpIdx()];
-
-	if (ss.backFaceInfo())
-	{
-		StencilState::Value::Face& back = ss.faces[1];
-
-		depth.Desc.BackFace.StencilFunc = (D3D11_COMPARISON_FUNC)g_StencilFuncLookup[back.getStencilFuncIdx()];
-		depth.Desc.BackFace.StencilFailOp = (D3D11_STENCIL_OP)g_StencilOpLookup[back.getStencilFailOpIdx()];
-		depth.Desc.BackFace.StencilDepthFailOp = (D3D11_STENCIL_OP)g_StencilOpLookup[back.getStencilZFailOpIdx()];
-		depth.Desc.BackFace.StencilPassOp = (D3D11_STENCIL_OP)g_StencilOpLookup[back.getStencilPassOpIdx()];
-	}
-	else
-	{
-		depth.Desc.BackFace = depth.Desc.FrontFace;
-	}
-
-	SetDepthState(depth);
-}
-
-void DX11XRender::SetCullMode(CullMode::Enum mode)
-{
-	m_pRt->RC_SetCullMode(mode);
-}
-
-
-void DX11XRender::Set2D(bool enable, float znear, float zfar)
-{
-	Matrix44f* m;
-
-	static core::ToggleChecker in2dAlready(false);
-
-	// assets if already in 2d mode.
-	// might make it part of the ASSERT macro's
-	in2dAlready = enable;
-
-	if (enable) 
-	{
-		// make a matrix that maps shit on to the screen.
-		// we need the screen dimensions so that we can multiple 
-		// the values by the correct amount.
-
-		m_ProMat.Push();
-		m = m_ProMat.GetTop();
-
-		float width = getWidthf();
-		float height = getHeightf();
-
-		MatrixOrthoOffCenterLH(m, 0, width, height, 0, znear, zfar);
-
-		PushMatrix();
-		m_ViewMat.LoadIdentity();
-
-		// set the 2d shader.
-		// do i want to slap a goat?
-		// I have a GUI shader that want's positions in screenspace -1.0 - 1.0
-		// meaning we don't need a matrix.
-		// the maxtrix above can be used to transform to screenspace.
-		// so that none gui stuff can be draw in 2d.
-		// need to switch to Fixedfunction tho.
-		// SetFFE();
-
-	} else {
-		m_ProMat.Pop();
-		PopMatrix();
-	}
-
-	SetCameraInfo();
-}
-
-void DX11XRender::SetCameraInfo(void)
-{
-	m_pRt->RT_SetCameraInfo();
-}
-
-void DX11XRender::RT_SetCameraInfo(void)
-{
-	// calculate the current camera shit.
-
-	GetModelViewMatrix(&ViewMatrix_);
-	GetProjectionMatrix(&ProjMatrix_);
-
-
-	ViewProjMatrix_ = ViewMatrix_ * ProjMatrix_;
-	ViewProjInvMatrix_ = ViewProjMatrix_.inverted();
-
-	// if the camera has changed then we need to tell the shader system 
-	// that the cameras are dirty!
-	// instead of updating the cbuf's
-	// since if this function is called multiple times with no drawining.
-	// be wasted cbuffer updates.
-	// this also means camera cbuffer should not
-	// be updated when teh camera has not changed.
-
-	shader::XHWShader_Dx10::SetCameraDirty();
-}
-
-void DX11XRender::RT_SetState(StateFlag state)
-{
-	BlendState blend = curBlendState();
-	RasterState raster = curRasterState();
-	DepthState depth = curDepthState();
-	
-	bool bDirtyBS = false;
-	bool bDirtyRS = false;
-	bool bDirtyDS = false;
-
-	int Changed;
-	Changed = state.ToInt() ^ m_State.currentState.ToInt();
-
-	
-	if (Changed & States::WIREFRAME)
-	{
-		bDirtyRS = true;
-
-		if (state.IsSet(StateFlag::WIREFRAME))
-			raster.Desc.FillMode = D3D11_FILL_WIREFRAME;
-		else
-			raster.Desc.FillMode = D3D11_FILL_SOLID;
-	}
-
-	if (Changed & States::DEPTHWRITE)
-	{
-		bDirtyDS = true;
-		if (state.IsSet(StateFlag::DEPTHWRITE))
-			depth.Desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ALL;
-		else
-			depth.Desc.DepthWriteMask = D3D11_DEPTH_WRITE_MASK_ZERO;
-	}
-
-	if (Changed & States::NO_DEPTH_TEST)
-	{
-		bDirtyDS = true;
-		if (state.IsSet(StateFlag::NO_DEPTH_TEST))
-			depth.Desc.DepthEnable = FALSE;
-		else
-			depth.Desc.DepthEnable = TRUE;
-	}
-
-	if (Changed & States::STENCIL)
-	{
-		bDirtyDS = true;
-		if (state.IsSet(StateFlag::STENCIL))
-			depth.Desc.StencilEnable = TRUE;
-		else
-			depth.Desc.StencilEnable = FALSE;
-	}
-
-
-	if (Changed & States::DEPTHFUNC_MASK)
-	{
-		bDirtyDS = true;
-
-		switch (state.ToInt() & States::DEPTHFUNC_MASK)
-		{
-			case States::DEPTHFUNC_LEQUAL:
-				depth.Desc.DepthFunc = D3D11_COMPARISON_LESS_EQUAL;
-				break;
-			case States::DEPTHFUNC_EQUAL:
-				depth.Desc.DepthFunc = D3D11_COMPARISON_EQUAL;
-				break;
-			case States::DEPTHFUNC_GREAT:
-				depth.Desc.DepthFunc = D3D11_COMPARISON_GREATER;
-				break;
-			case States::DEPTHFUNC_LESS:
-				depth.Desc.DepthFunc = D3D11_COMPARISON_LESS;
-				break;
-			case States::DEPTHFUNC_GEQUAL:
-				depth.Desc.DepthFunc = D3D11_COMPARISON_GREATER_EQUAL;
-				break;
-			case States::DEPTHFUNC_NOTEQUAL:
-				depth.Desc.DepthFunc = D3D11_COMPARISON_NOT_EQUAL;
-				break;
-		}
-	}
-
-
-
-	if (Changed & States::BLEND_MASK)
-	{
-		bDirtyBS = true;
-
-		// Blend.
-		if (state.IsSet(States::BLEND_MASK))
-		{
-			for (size_t i = 0; i<4; ++i)
-				blend.Desc.RenderTarget[i].BlendEnable = TRUE;
-
-
-			// Blend Src.
-			if (state.IsSet(States::BLEND_SRC_MASK))
-			{
-				switch (state.ToInt() & States::BLEND_SRC_MASK)
-				{
-					case States::BLEND_SRC_ZERO:
-						blend.Desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ZERO;
-						blend.Desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ZERO;
-						break;
-					case States::BLEND_SRC_ONE:
-						blend.Desc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
-						blend.Desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
-						break;
-					case States::BLEND_SRC_DEST_COLOR:
-						blend.Desc.RenderTarget[0].SrcBlend = D3D11_BLEND_DEST_COLOR;
-						blend.Desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_DEST_ALPHA;
-						break;
-					case States::BLEND_SRC_INV_DEST_COLOR:
-						blend.Desc.RenderTarget[0].SrcBlend = D3D11_BLEND_INV_DEST_COLOR;
-						blend.Desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_INV_DEST_ALPHA;
-						break;
-					case States::BLEND_SRC_SRC_ALPHA:
-						blend.Desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
-						blend.Desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA;
-						break;
-					case States::BLEND_SRC_INV_SRC_ALPHA:
-						blend.Desc.RenderTarget[0].SrcBlend = D3D11_BLEND_INV_SRC_ALPHA;
-						blend.Desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
-						break;
-					case States::BLEND_SRC_DEST_ALPHA:
-						blend.Desc.RenderTarget[0].SrcBlend = D3D11_BLEND_DEST_ALPHA;
-						blend.Desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_DEST_ALPHA;
-						break;
-					case States::BLEND_SRC_INV_DEST_ALPHA:
-						blend.Desc.RenderTarget[0].SrcBlend = D3D11_BLEND_INV_DEST_ALPHA;
-						blend.Desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_INV_DEST_ALPHA;
-						break;
-					case States::BLEND_SRC_ALPHA_SAT:
-						blend.Desc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA_SAT;
-						blend.Desc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_SRC_ALPHA_SAT;
-						break;
-				}
-			}
-
-			// Blend Dst.
-			if (state.IsSet(States::BLEND_DEST_MASK))
-			{
-				switch (state.ToInt() & States::BLEND_DEST_MASK)
-				{
-					case States::BLEND_DEST_ZERO:
-						blend.Desc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
-						blend.Desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
-						break;
-					case States::BLEND_DEST_ONE:
-						blend.Desc.RenderTarget[0].DestBlend = D3D11_BLEND_ONE;
-						blend.Desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ONE;
-						break;
-					case States::BLEND_DEST_SRC_COLOR:
-						blend.Desc.RenderTarget[0].DestBlend = D3D11_BLEND_SRC_COLOR;
-						blend.Desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_SRC_ALPHA;
-						break;
-					case States::BLEND_DEST_INV_SRC_COLOR:
-						blend.Desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_COLOR;
-						blend.Desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
-						break;
-					case States::BLEND_DEST_SRC_ALPHA:
-						blend.Desc.RenderTarget[0].DestBlend = D3D11_BLEND_SRC_ALPHA;
-						blend.Desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_SRC_ALPHA;
-						break;
-					case States::BLEND_DEST_INV_SRC_ALPHA:
-						blend.Desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
-						blend.Desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_SRC_ALPHA;
-						break;
-					case States::BLEND_DEST_DEST_ALPHA:
-						blend.Desc.RenderTarget[0].DestBlend = D3D11_BLEND_DEST_ALPHA;
-						blend.Desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_DEST_ALPHA;
-						break;
-					case States::BLEND_DEST_INV_DEST_ALPHA:
-						blend.Desc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_DEST_ALPHA;
-						blend.Desc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_INV_DEST_ALPHA;
-						break;
-				}
-
-			}
-
-			//Blending operation
-			D3D11_BLEND_OP blendOperation = D3D11_BLEND_OP_ADD;
-
-			switch (state.ToInt() & States::BLEND_OP_MASK)
-			{
-				case States::BLEND_OP_ADD:
-					blendOperation = D3D11_BLEND_OP_ADD;
-					break;
-				case States::BLEND_OP_SUB:
-					blendOperation = D3D11_BLEND_OP_SUBTRACT;
-					break;
-				case States::BLEND_OP_REB_SUB:
-					blendOperation = D3D11_BLEND_OP_REV_SUBTRACT;
-					break;
-				case States::BLEND_OP_MIN:
-					blendOperation = D3D11_BLEND_OP_MIN;
-					break;
-				case States::BLEND_OP_MAX:
-					blendOperation = D3D11_BLEND_OP_MAX;
-					break;
-			}
-
-			// todo: add separate alpha blend support for mrt
-			for (size_t i = 0; i < 4; ++i)
-			{
-				blend.Desc.RenderTarget[i].BlendOp = blendOperation;
-				blend.Desc.RenderTarget[i].BlendOpAlpha = blendOperation;
-			}
-		}
-		else
-		{
-			// disabel blending.
-			for (size_t i = 0; i < 4; ++i)
-				blend.Desc.RenderTarget[i].BlendEnable = FALSE;
-		}
-	}
-	
-	bool bCurATOC = blend.Desc.AlphaToCoverageEnable != 0;
-	bool bNewATOC = state.IsSet(States::ALPHATEST_MASK);
-	bDirtyBS |= bNewATOC ^ bCurATOC;
-	blend.Desc.AlphaToCoverageEnable = bNewATOC;
-
-	m_State.currentState = state;
-
-	if (bDirtyBS)
-		SetBlendState(blend);
-	if (bDirtyRS)
-		SetRasterState(raster);
-	if (bDirtyDS)
-		SetDepthState(depth);
-}
-
-
-
-void DX11XRender::RT_SetCullMode(CullMode::Enum mode)
-{
-	if (this->m_State.cullMode == mode)
-		return;
-
-	RasterState state = curRasterState();
-
-	switch (mode)
-	{
-		case CullMode::NONE:
-			state.Desc.CullMode = D3D11_CULL_NONE;
-		break;
-		case CullMode::BACK:
-			state.Desc.CullMode = D3D11_CULL_BACK;
-		break;
-		case CullMode::FRONT:
-			state.Desc.CullMode = D3D11_CULL_FRONT;
-		break;
-	}
-
-	m_State.cullMode = mode;
-
-	SetRasterState(state);
-}
-
-
-bool DX11XRender::SetBlendState(BlendState& state)
-{
-	// try find a matching state.
-	uint32_t i;
-	HRESULT hr = S_OK;
-
-	state.createHash();
-
-	for (i = 0; i< (uint32_t)m_BlendStates.size(); i++)
-	{
-		if (m_BlendStates[i] == state) {
-			break;
-		}
-	}
-
-	if (i == m_BlendStates.size())
-	{
-		// we dont have this state of this type on the gpu yet.
-		hr = DxDevice()->CreateBlendState(&state.Desc, &state.pState);
-		// save it, and since we add 1 i becomes a valid index.
-		m_BlendStates.push_back(state);
-	}
-
-	// needs changing?
-	if (i != m_CurBlendState)
-	{
-		m_CurBlendState = i;
-		DxDeviceContext()->OMSetBlendState(m_BlendStates[i].pState, 0, 0xFFFFFFFF);
-	}
-
-	return SUCCEEDED(hr);
-}
-
-
-bool DX11XRender::SetRasterState(RasterState& state)
-{
-	// try find a matching state.
-	uint32_t i;
-	HRESULT hr = S_OK;
-
-	state.createHash();
-
-	for (i = 0; i< (uint32_t)m_RasterStates.size(); i++)
-	{
-		if (m_RasterStates[i] == state) {
-			break;
-		}
-	}
-
-	if (i == m_RasterStates.size())
-	{
-		// we dont have this state of this type on the gpu yet.
-		hr = DxDevice()->CreateRasterizerState(&state.Desc, &state.pState);
-		// save it, and since we add 1 i becomes a valid index.
-		m_RasterStates.push_back(state);
-	}
-
-	// needs changing?
-	if (i != m_CurRasterState)
-	{
-		m_CurRasterState = i;
-		DxDeviceContext()->RSSetState(m_RasterStates[i].pState);
-	}
-
-	return SUCCEEDED(hr);
-}
-
-
-bool DX11XRender::SetDepthState(DepthState& state)
-{
-	// try find a matching state.
-	uint32_t i;
-	HRESULT hr = S_OK;
-
-	state.createHash();
-
-	for (i = 0; i< (uint32_t)m_DepthStates.size(); i++)
-	{
-		if (m_DepthStates[i] == state) {
-			break;
-		}
-	}
-
-	if (i == m_DepthStates.size())
-	{
-		// we dont have this state of this type on the gpu yet.
-		hr = DxDevice()->CreateDepthStencilState(&state.Desc, &state.pState);
-		// save it, and since we add 1 i becomes a valid index.
-		m_DepthStates.push_back(state);
-
-		D3DDebug::SetDebugObjectName(state.pState, __FUNCTION__);
-	}
-
-	// needs changing?
-	if (i != m_CurDepthState)
-	{
-		m_CurDepthState = i;
-		DxDeviceContext()->OMSetDepthStencilState(m_DepthStates[i].pState, 0);
-	}
-
-	return SUCCEEDED(hr);
-}
-
-
-
-// Camera
-
-
-
-
-
-
-
-void DX11XRender::SetCamera(const XCamera& cam)
-{
-	float ProjectionRatio = cam.GetProjectionRatio();
-	float fov = cam.GetFov();
-
-//	float wT = math<float>::tan(fov*0.5f)*cam.GetNearPlane();
-//	float wB = -wT;
-//	float wR = wT * ProjectionRatio;
-//	float wL = -wR;
-
-	Matrix34f m = cam.GetMatrix();
-	Vec3f vEye = cam.GetPosition();
-	Vec3f vAt = vEye + Vec3f(m.m01, m.m11, m.m21);
-	Vec3f vUp = Vec3f(m.m02, m.m12, m.m22);
-//	Vec3f vUp = Vec3f(0,0,1);
-
-	// View
-	Matrix44f* pView = m_ViewMat.GetTop();
-	MatrixLookAtRH(pView, vEye, vAt, vUp);
-
-	// Proj
-	Matrix44f* pProj = m_ProMat.GetTop();
-	MatrixPerspectiveFovRH(pProj, fov, ProjectionRatio, 1.0f, 6000.0f);
-
-
-	cam_ = cam;
-
-	SetCameraInfo();
-}
-
-
-
-// ~Camera
-
-
-
-// Textures 
-
-void DX11XRender::Draw2dImage(float xpos, float ypos,
-	float w, float h, texture::TexID texture_id, ColorT<float>& col)
-{
-	DrawImage(xpos, ypos, 0.f, w, h, texture_id, 
-		0, 1, 1, 0, col
-		);
-}
 
 void DX11XRender::ReleaseTexture(texture::TexID id)
 {
@@ -1386,9 +900,7 @@ bool DX11XRender::SetTexture(int texId)
 void DX11XRender::FX_PipelineShutdown()
 {
 
-
 	shader::XHWShader_Dx10::shutDown();
-
 
 }
 
@@ -1399,16 +911,6 @@ void DX11XRender::FX_Init(void)
 	InitVertexLayoutDescriptions();
 
 }
-
-struct VertexStreams
-{
-	enum Enum
-	{
-		GENERAL,
-		TANGENTS,
-		HWSKIN   // skinned
-	};
-};
 
 
 void DX11XRender::InitVertexLayoutDescriptions(void)
@@ -1430,27 +932,10 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 
 	D3D11_INPUT_ELEMENT_DESC elem_t3f = { "TEXCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 
-
-	D3D11_INPUT_ELEMENT_DESC elem_tag101010 = { "TANGENT", 0, DXGI_FORMAT_R10G10B10A2_TYPELESS, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
-	D3D11_INPUT_ELEMENT_DESC elem_bi101010 = { "BINORMAL", 0, DXGI_FORMAT_R10G10B10A2_TYPELESS, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
-
-
-	// Tangent / binormal stream
-	static D3D11_INPUT_ELEMENT_DESC elem_tangents[] =
-	{
-		{ "TANGENT", 0, DXGI_FORMAT_R16G16B16A16_SNORM, VertexStreams::TANGENTS, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "BINORMAL", 0, DXGI_FORMAT_R16G16B16A16_SNORM, VertexStreams::TANGENTS, 8, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-	};
-
-	// Skinning!
-	// I support 4 bones per vert.
-	// so 4 weights and 4 indexs.
-	// i support 255 bones so 8bits can fit the bone index.
-	static D3D11_INPUT_ELEMENT_DESC elem_skinning[] =
-	{
-		{ "BLENDWEIGHT", 0, DXGI_FORMAT_R8G8B8A8_UNORM, VertexStreams::HWSKIN, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
-		{ "BLENDINDEXS", 0, DXGI_FORMAT_R8G8B8A8_UNORM, VertexStreams::HWSKIN, 4, D3D11_INPUT_PER_VERTEX_DATA, 0 }, 
-	};
+	D3D11_INPUT_ELEMENT_DESC elem_tagent101010 = { "TANGENT", 0, DXGI_FORMAT_R10G10B10A2_TYPELESS, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+	D3D11_INPUT_ELEMENT_DESC elem_tagent323232 = { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+	D3D11_INPUT_ELEMENT_DESC elem_biNormal101010 = { "BINORMAL", 0, DXGI_FORMAT_R10G10B10A2_TYPELESS, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+	D3D11_INPUT_ELEMENT_DESC elem_biNormal323232 = { "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 
 
 	for (i = 0; i < max; i++)
@@ -1458,9 +943,53 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 		RenderState::XVertexLayout& layout = m_State.vertexLayoutDescriptions[i];
 
 		// for now all positions are just 32bit floats baby!
+		elem_pos.AlignedByteOffset = 0;
+		elem_pos.SemanticIndex = 0;
 		layout.append(elem_pos);
 
-		if (i == VertexFormat::P3F_N10_C4B_T2S)
+		if (i == VertexFormat::P3F_T2S || i == VertexFormat::P3F_T2S_C4B ||
+			i == VertexFormat::P3F_T2S_C4B_N3F || i == VertexFormat::P3F_T2S_C4B_N3F_TB3F)
+		{
+			elem_uv1616.AlignedByteOffset = 12;
+			layout.append(elem_uv1616);
+		}
+		if (i == VertexFormat::P3F_T2S_C4B ||
+			i == VertexFormat::P3F_T2S_C4B_N3F || i == VertexFormat::P3F_T2S_C4B_N3F_TB3F)
+		{
+			elem_col8888.AlignedByteOffset = 12 + 4;
+			layout.append(elem_col8888);
+		}
+
+		if (i == VertexFormat::P3F_T2S_C4B_N3F || i == VertexFormat::P3F_T2S_C4B_N3F_TB3F)
+		{
+			elem_nor323232.AlignedByteOffset = 12 + 4 + 4;
+			layout.append(elem_nor323232); // 12 bytes
+		}
+		if (i == VertexFormat::P3F_T2S_C4B_N3F_TB3F)
+		{
+			elem_tagent323232.AlignedByteOffset = 12 + 4 + 4 + 12;
+			layout.append(elem_tagent323232); // 12 bytes
+
+			elem_biNormal323232.AlignedByteOffset = 12 + 4 + 4 + 12 + 12;
+			layout.append(elem_biNormal323232); // 12 bytes
+		}
+
+
+		if (i == VertexFormat::P3F_T2F_C4B)
+		{
+			elem_uv3232.AlignedByteOffset = 16;
+			layout.append(elem_uv3232);
+
+			elem_col8888.AlignedByteOffset = 12;
+			layout.append(elem_col8888);
+
+		}
+		else if(i == VertexFormat::P3F_T3F)
+		{
+			elem_t3f.AlignedByteOffset = 12;
+			layout.append(elem_t3f);
+		}
+		else if (i == VertexFormat::P3F_N10_C4B_T2S)
 		{
 			elem_nor101010.AlignedByteOffset = 12;
 			layout.append(elem_nor101010);
@@ -1474,8 +1003,13 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 		}
 		else if (i == VertexFormat::P3F_N3F_C4B_T4F)
 		{
+			// pos 12:0:0
+			// normal 12:12:0
+			// color 4:24:0
+			// uv1 8:28:0
+			// uv2 8:36:1
 
-			elem_nor101010.AlignedByteOffset = 12;
+			elem_nor323232.AlignedByteOffset = 12;
 			layout.append(elem_nor323232); // 12 bytes
 
 			elem_col8888.AlignedByteOffset = 24;
@@ -1489,46 +1023,46 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 			layout.append(elem_uv3232);
 
 		}
-	/*	else if (i == VertexFormat::P3F_C4B_T2S_N10_T10_B10)
-		{
-			elem_col8888.AlignedByteOffset = 12;
-			layout.append(elem_col8888);
 
-			elem_uv1616.AlignedByteOffset = 16;
-			layout.append(elem_uv1616);
-
-			elem_nor101010.AlignedByteOffset = 20;
-			layout.append(elem_nor101010);
-
-
-			elem_tag101010.AlignedByteOffset = 24;
-			layout.append(elem_tag101010);
-
-			elem_bi101010.AlignedByteOffset = 28;
-			layout.append(elem_bi101010);
-		}*/
-		else if (i == VertexFormat::P3F_T3F)
-		{
-			elem_t3f.AlignedByteOffset = 12;
-			layout.append(elem_t3f);
-		}
-		else
-		{
-			elem_col8888.AlignedByteOffset = 12;
-			layout.append(elem_col8888);
-
-
-			elem_uv3232.AlignedByteOffset = 16;
-			elem_uv1616.AlignedByteOffset = 16;
-
-			if (i == VertexFormat::P3F_C4B_T2F) {
-				layout.append(elem_uv3232);
-			}
-			else if (i == VertexFormat::P3F_C4B_T2S) {
-				layout.append(elem_uv1616);
-			}
-		}
+	
 	}
+
+	// Streams
+
+	// color stream
+	static D3D11_INPUT_ELEMENT_DESC elem_stream_color[] =
+	{
+		{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, VertexStream::COLOR, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	// normals stream
+	static D3D11_INPUT_ELEMENT_DESC elem_stream_normals[] =
+	{
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, VertexStream::NORMALS, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	// Tangent / binormal stream
+	static D3D11_INPUT_ELEMENT_DESC elem_stream_tangents[] =
+	{
+		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, VertexStream::TANGENT_BI, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, VertexStream::TANGENT_BI, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	// Skinning!
+	// I support 4 bones per vert.
+	// so 4 weights and 4 indexs.
+	// i support 255 bones so 8bits can fit the bone index.
+#if 0
+	static_assert(model::MODEL_MAX_BONES <= 4, "code here only supports 4 bones");
+	static D3D11_INPUT_ELEMENT_DESC elem_skinning[] =
+	{
+		{ "BLENDWEIGHT", 0, DXGI_FORMAT_R8G8B8A8_UNORM, VertexStream::HWSKIN, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "BLENDINDEXS", 0, DXGI_FORMAT_R8G8B8A8_UNORM, VertexStream::HWSKIN, 4, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+#endif
+
+
+
 
 
 }
@@ -1586,19 +1120,17 @@ HRESULT DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFm
 	return S_OK;
 }
 
-void DX11XRender::FX_SetVStream(ID3D11Buffer* pVertexBuffer, uint32 startslot, 
+void DX11XRender::FX_SetVStream(ID3D11Buffer* pVertexBuffer, VertexStream::Enum streamSlot,
 	uint32 stride, uint32 offset)
 {
-	X_ASSERT(startslot < RenderState::MAX_VERTEX_STREAMS, "invalid vertex input slot")(startslot, RenderState::MAX_VERTEX_STREAMS);
-
-	RenderState::XStreamInfo& info = m_State.VertexStreams[startslot];
-
+	// check for redundant calls
+	RenderState::XStreamInfo& info = m_State.VertexStreams[streamSlot];
 	if (info.pBuf != pVertexBuffer || info.offset != offset)
 	{
 		info.pBuf = pVertexBuffer;
 		info.offset = offset;
 
-		m_deviceContext->IASetVertexBuffers(startslot, 1, &pVertexBuffer, &stride, &offset);
+		m_deviceContext->IASetVertexBuffers(streamSlot, 1, &pVertexBuffer, &stride, &offset);
 	}
 }
 
@@ -1612,12 +1144,12 @@ void DX11XRender::FX_SetIStream(ID3D11Buffer* pIndexBuffer)
 	}
 }
 
-void DX11XRender::FX_SetVStream(uint32_t VertexBuffer, uint32 startslot,
+void DX11XRender::FX_SetVStream(uint32_t VertexBuffer, VertexStream::Enum streamSlot,
 	uint32 stride, uint32 offset)
 {
 	FX_SetVStream(
 		vidMemMng_.getD3DVB(VertexBuffer),
-		startslot,
+		streamSlot,
 		stride,
 		offset
 	);
@@ -1626,360 +1158,6 @@ void DX11XRender::FX_SetVStream(uint32_t VertexBuffer, uint32 startslot,
 void DX11XRender::FX_SetIStream(uint32_t IndexBuffer)
 {
 	FX_SetIStream(vidMemMng_.getD3DIB(IndexBuffer));
-}
-
-void DX11XRender::DrawImage(float xpos, float ypos, float z, float w, float h,
-	int texture_id, float s0, float t0, float s1, float t1, const Colorf& col, bool filtered)
-{
-	float s[4], t[4];
-
-	s[0] = s0;	t[0] = 1.0f - t0;
-	s[1] = s1;	t[1] = 1.0f - t0;
-	s[2] = s0;	t[2] = 1.0f - t1;
-	s[3] = s1;	t[3] = 1.0f - t1;
-
-	DrawImageWithUV(xpos, ypos, 0, w, h, texture_id, s, t, col, filtered);
-}
-
-
-void DX11XRender::DrawImageWithUV(float xpos, float ypos, float z, float w, float h, 
-	int texture_id, float *s, float *t, const Colorf& col, bool filtered)
-{
-	X_ASSERT_NOT_NULL(s);
-	X_ASSERT_NOT_NULL(t);
-
-	rThread()->RC_DrawImageWithUV(xpos, ypos, z, w, h, texture_id, s, t, col, filtered);
-}
-
-
-void DX11XRender::RT_DrawImageWithUV(float xpos, float ypos, float z, float w, float h, 
-	int texture_id, float* s, float* t, const Colorf& col, bool filtered)
-{
-	using namespace shader;
-
-	float fx = xpos;
-	float fy = ypos;
-	float fw = w;
-	float fh = h;
-
-//	SetCullMode(CullMode::NONE);
-//	SetFFE(true);
-
-	// Lock the entire buffer and obtain a pointer to the location where we have to
-	uint32 nOffs;
-	Vertex_P3F_C4B_T2F* Quad = (Vertex_P3F_C4B_T2F*)m_DynVB[VertexPool::P3F_C4B_T2F].LockVB(4, nOffs);
-
-	// TL
-	Quad[0].pos.x = xpos;
-	Quad[0].pos.y = ypos;
-	Quad[0].pos.z = z;
-	// TR
-	Quad[1].pos.x = xpos + w;
-	Quad[1].pos.y = ypos;
-	Quad[1].pos.z = z;
-	// BL
-	Quad[2].pos.x = xpos;
-	Quad[2].pos.y = ypos + h;
-	Quad[2].pos.z = z;
-	// BR
-	Quad[3].pos.x = xpos + w;
-	Quad[3].pos.y = ypos + h;
-	Quad[3].pos.z = z;
-
-	for (uint32 i = 0; i<4; ++i)
-	{
-		Quad[i].color = col;
-		Quad[i].st = Vec2f(s[i], t[i]);
-	}
-
-	// We are finished with accessing the vertex buffer
- 	m_DynVB[VertexPool::P3F_C4B_T2F].UnlockVB();
-
-
-	/*
-	XTexState state;
-	state.setFilterMode(FilterMode::POINT);
-	state.setClampMode(TextureAddressMode::MIRROR, 
-		TextureAddressMode::MIRROR, TextureAddressMode::MIRROR);
-
-	// bind the texture.
-	texture::XTexture::applyFromId(
-		0,
-		texture_id,
-		texture::XTexture::getTexStateId(state)
-	);
-	*/
-
-	// Bind our vertex as the first data stream of our device
-	m_DynVB[VertexPool::P3F_C4B_T2F].Bind();
-
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_C4B_T2F)))
-		return;
-
-	// Render the two triangles from the data stream
-	FX_DrawPrimitive(PrimitiveType::TriangleStrip, nOffs, 4);
-}
-
-
-void DX11XRender::DrawVB(Vertex_P3F_C4B_T2F* pVertBuffer, uint32_t size,
-	PrimitiveTypePublic::Enum type)
-{
-	X_PROFILE_BEGIN("drawVB", core::ProfileSubSys::RENDER);
-
-	X_ASSERT_NOT_NULL(pVertBuffer);
-
-	if (size == 0)
-		return;
-
-	uint32 nOffs;
-	Vertex_P3F_C4B_T2F* pVertBuf;
-	
-	pVertBuf = (Vertex_P3F_C4B_T2F*)m_DynVB[VertexPool::P3F_C4B_T2F].LockVB(size, nOffs);
-
-	// copy data into gpu buffer.
-	memcpy(pVertBuf, pVertBuffer, size * sizeof(Vertex_P3F_C4B_T2F));
-
-	m_DynVB[VertexPool::P3F_C4B_T2F].UnlockVB();
-	m_DynVB[VertexPool::P3F_C4B_T2F].Bind();
-
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_C4B_T2F)))
-		return;
-
-
-	// Render the two triangles from the data stream
-	FX_DrawPrimitive(PrimitiveTypeToInternal(type), nOffs, size);
-}
-
-void DX11XRender::DrawQuad(float x, float y, float width, float height, const Color& col)
-{
-	DrawQuad(x,y,0.f,width,height,col);
-}
-
-void DX11XRender::DrawQuad(float x, float y, float width, float height, 
-	const Color& col, const Color& borderCol)
-{
-	DrawQuad(x, y, 0.f, width, height, col);
-	DrawRect(x, y, width, height, borderCol);
-}
-
-void DX11XRender::DrawQuad(float x, float y, float z, float width, float height,
-	const Color& col, const Color& borderCol)
-{
-	DrawQuad(x, y, z, width, height, col);
-	DrawRect(x, y, width, height, borderCol);
-}
-
-void DX11XRender::DrawQuad(float x, float y, float z, float width, float height, const Color& col)
-{
-	SetCullMode(CullMode::NONE);
-	SetFFE(false);
-
-	float fx = x;
-	float fy = y;
-	float fz = z;
-	float fw = width;
-	float fh = height;
-
-	uint32 nOffs;
-	Vertex_P3F_C4B_T2F* Quad = (Vertex_P3F_C4B_T2F*)m_DynVB[VertexPool::P3F_C4B_T2F].LockVB(4, nOffs);
-
-	// TL
-	Quad[0].pos.x = fx;
-	Quad[0].pos.y = fy;
-	Quad[0].pos.z = fz;
-	// TR
-	Quad[1].pos.x = fx + fw;
-	Quad[1].pos.y = fy;
-	Quad[1].pos.z = fz;
-	// BL
-	Quad[2].pos.x = fx;
-	Quad[2].pos.y = fy + fh;
-	Quad[2].pos.z = fz;
-	// BR
-	Quad[3].pos.x = fx + fw;
-	Quad[3].pos.y = fy + fh;
-	Quad[3].pos.z = fz;
-
-	for (uint32 i = 0; i<4; ++i)
-	{
-		Quad[i].color = col;
-		Quad[i].st = Vec2f::zero();
-	}
-
-	m_DynVB[VertexPool::P3F_C4B_T2F].UnlockVB();
-	m_DynVB[VertexPool::P3F_C4B_T2F].Bind();
-
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_C4B_T2F)))
-		return;
-
-	// Render the two triangles from the data stream
-	FX_DrawPrimitive(PrimitiveType::TriangleStrip, nOffs, 4);
-}
-
-void DX11XRender::DrawQuad(Vec2<float> pos, float width, float height, const Color& col)
-{
-	DrawQuad(pos.x, pos.y, width, height, col);
-}
-
-
-void DX11XRender::DrawLines(Vec3f* points, uint32_t num, const Color& col)
-{
-	X_ASSERT_NOT_NULL(points);
-
-	if (num < 2) // 2 points needed to make a line.
-		return;
-
-	rThread()->RC_DrawLines(points, num, col);
-}
-
-
-void DX11XRender::DrawLine(const Vec3f& pos1, const Vec3f& pos2)
-{
-	SetCullMode(CullMode::NONE);
-	SetFFE(false);
-
-	uint32 nOffs;
-	Vertex_P3F_C4B_T2F* Quad = (Vertex_P3F_C4B_T2F*)m_DynVB[VertexPool::P3F_C4B_T2F].LockVB(2, nOffs);
-
-	Quad[0].pos = pos1;
-	Quad[0].color = Color::white();
-	Quad[0].st = Vec2f::zero();
-
-	Quad[1].pos = pos2;
-	Quad[1].color = Color::white();
-	Quad[1].st = Vec2f::zero();
-
-	m_DynVB[VertexPool::P3F_C4B_T2F].UnlockVB();
-	m_DynVB[VertexPool::P3F_C4B_T2F].Bind();
-
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_C4B_T2F)))
-		return;
-
-	// Render the line
-	FX_DrawPrimitive(PrimitiveType::LineList, nOffs, 2);
-}
-
-
-void DX11XRender::DrawLineColor(const Vec3f& pos1, const Color& color1,
-	const Vec3f& pos2, const Color& vColor2)
-{
-	SetFFE(false);
-
-	// Lock the entire buffer and obtain a pointer to the location where we have to
-	uint32 nOffs;
-	Vertex_P3F_C4B_T2F* Quad = (Vertex_P3F_C4B_T2F*)m_DynVB[VertexPool::P3F_C4B_T2F].LockVB(2, nOffs);
-
-	Quad[0].pos = pos1;
-	Quad[0].color = color1;
-	Quad[1].pos = pos2;
-	Quad[1].color = color1;
-
-	m_DynVB[VertexPool::P3F_C4B_T2F].UnlockVB();
-	m_DynVB[VertexPool::P3F_C4B_T2F].Bind();
-
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_C4B_T2F)))
-		return;
-
-	// Render the line
-	FX_DrawPrimitive(PrimitiveType::LineList, nOffs, 2);
-}
-
-void DX11XRender::DrawRect(float x, float y, float width, float height, Color col)
-{
-	float x1 = x;
-	float y1 = y;
-	float x2 = x + width;
-	float y2 = y + height;
-
-	// Top
-	DrawLineColor(Vec3f(x1, y1, 0), col, Vec3f(x2, y1, 0), col);
-	// bottom
-	DrawLineColor(Vec3f(x1, y2, 0), col, Vec3f(x2, y2, 0), col);
-	// left down
-	DrawLineColor(Vec3f(x1, y1, 0), col, Vec3f(x1, y2, 0), col);
-	// right down
-	DrawLineColor(Vec3f(x2, y1, 0), col, Vec3f(x2, y2, 0), col);
-}
-
-void DX11XRender::DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
-	float padding, uint32_t max)
-{
-	X_ASSERT_NOT_NULL(heights);
-	X_ASSERT(num <= max, "Darw Chart has more items than max")(num, max);
-
-	if (num < 1)
-		return;
-
-	// calculate the bar width.
-	const float bar_width = ((rect.getWidth() / max) - padding) + padding / max;
-	
-
-	uint32 i, nOffs;
-	Vertex_P3F_C4B_T2F* Quads = (Vertex_P3F_C4B_T2F*)m_DynVB[VertexPool::P3F_C4B_T2F].LockVB(num * 6, nOffs);
-
-
-	float right = rect.getX2();
-	float bottom = rect.getY2();
-	float height = rect.getHeight();
-	float width = rect.getWidth();
-
-	Color8u col8(Col_Coral);
-
-
-	// TL - TR - BR
-	// BR - BL - TL
-	for (i = 0; i < num; i++)
-	{
-		Vertex_P3F_C4B_T2F* Quad = &Quads[i*6];
-		float cur_bar = heights[i];
-
-		// TL
-		Quad[0].pos.x = right - bar_width;
-		Quad[0].pos.y = bottom - (height * cur_bar);
-		Quad[0].pos.z = 0.f;
-		Quad[0].color = col8;
-
-		// TR
-		Quad[1].pos.x = right;
-		Quad[1].pos.y = bottom - (height * cur_bar);
-		Quad[1].pos.z = 0.f;
-		Quad[1].color = col8;
-
-		// BR
-		Quad[2].pos.x = right;
-		Quad[2].pos.y = bottom;
-		Quad[2].pos.z = 0.f;
-		Quad[2].color = col8;
-
-		// BR
-		Quad[3].pos.x = right;
-		Quad[3].pos.y = bottom;
-		Quad[3].pos.z = 0.f;
-		Quad[3].color = col8;
-
-		// BL
-		Quad[4].pos.x = right - bar_width;
-		Quad[4].pos.y = bottom;
-		Quad[4].pos.z = 0.f;
-		Quad[4].color = col8;
-
-		// TL
-		Quad[5].pos.x = right - bar_width;
-		Quad[5].pos.y = bottom - (height * cur_bar);
-		Quad[5].pos.z = 0.f;
-		Quad[5].color = col8;
-
-		right -= (bar_width + padding);
-	}
-
-	m_DynVB[VertexPool::P3F_C4B_T2F].UnlockVB();
-	m_DynVB[VertexPool::P3F_C4B_T2F].Bind();
-
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_C4B_T2F)))
-		return;
-
-	// Render the two triangles from the data stream
-	FX_DrawPrimitive(PrimitiveType::TriangleList, nOffs, 6 * num);	
 }
 
 

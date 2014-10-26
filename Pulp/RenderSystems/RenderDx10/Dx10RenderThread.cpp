@@ -14,9 +14,9 @@ void DX11XRender::RT_DrawLines(Vec3f* points, uint32_t num, const Colorf& col)
 	SetCullMode(CullMode::NONE);
 
 	uint32 nOffs, i;
-	Vertex_P3F_C4B_T2F* Quad;
+	Vertex_P3F_T2F_C4B* Quad;
 
-	Quad = (Vertex_P3F_C4B_T2F*)m_DynVB[VertexPool::P3F_C4B_T2F].LockVB(num, nOffs);
+	Quad = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(num, nOffs);
 
 	for (i = 0; i < num; i++)
 	{
@@ -25,10 +25,10 @@ void DX11XRender::RT_DrawLines(Vec3f* points, uint32_t num, const Colorf& col)
 		Quad[i].st = Vec2<float32_t>::zero();
 	}
 
-	m_DynVB[VertexPool::P3F_C4B_T2F].UnlockVB();
-	m_DynVB[VertexPool::P3F_C4B_T2F].Bind();
+	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
+	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_C4B_T2F)))
+	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
 		return;
 
 	// Render the line

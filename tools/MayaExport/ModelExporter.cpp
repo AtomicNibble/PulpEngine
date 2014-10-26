@@ -552,7 +552,8 @@ void MayaMesh::shareVerts(void)
 
 
 				faces[i][x] = (int)verts.append(vert);
-				CompBinds[vert.numWeights - 1]++;
+				if (vert.numWeights > 0)
+					CompBinds[vert.numWeights - 1]++;
 
 				Hashcontainer temp;
 				temp.pVert = &verts[verts.size() - 1];
@@ -693,7 +694,7 @@ void MayaLOD::pruneBones(void)
 	}
 }
 
-size_t MayaLOD::getSubDataSize(void)
+size_t MayaLOD::getSubDataSize(const Flags8<model::StreamType>& streams)
 {
 	size_t size = 0;
 	size_t i;
@@ -701,8 +702,16 @@ size_t MayaLOD::getSubDataSize(void)
 	{
 		const MayaMesh* mesh = meshes_[i];
 
-		size += sizeof(model::Vertex) * mesh->verts.size();
 		size += sizeof(model::Face) * mesh->faces.size();
+		size += sizeof(model::Vertex) * mesh->verts.size();
+
+		// streams.
+		if (streams.IsSet(model::StreamType::COLOR))
+			size += sizeof(model::VertexColor) * mesh->verts.size();
+		if (streams.IsSet(model::StreamType::NORMALS))
+			size += sizeof(model::VertexNormal) * mesh->verts.size();
+		if (streams.IsSet(model::StreamType::TANGENT_BI))
+			size += sizeof(model::VertexTangentBi) * mesh->verts.size();
 
 		// bind data
 		size += safe_static_cast<size_t, size_t>(mesh->CompBinds.dataSizeTotal());
@@ -1279,6 +1288,13 @@ MStatus MayaModel::loadBones(void)
 			return MStatus::kFailure;
 		}
 
+		if (new_bone.name.length() > model::MODEL_MAX_BONE_NAME_LENGTH)
+		{
+			MayaPrintError("Joints: max bone name length exceeded, MAX: %i '%' -> %i", 
+				model::MODEL_MAX_BONE_NAME_LENGTH, new_bone.name.c_str(), new_bone.name.length());
+			return MStatus::kFailure;
+		}
+
 		size_t idx = bones_.append(new_bone);
 
 		bone = &bones_[idx];
@@ -1459,7 +1475,7 @@ uint32_t MayaModel::calculateMaterialNameDataSize(void)
 	return size;
 }
 
-uint32_t MayaModel::calculateSubDataSize(void)
+uint32_t MayaModel::calculateSubDataSize(const Flags8<model::StreamType>& streams)
 {
 	// gonna just calculate it.
 	// saves a tell and a seek on the file.
@@ -1472,7 +1488,7 @@ uint32_t MayaModel::calculateSubDataSize(void)
 	for (i = 0; i < 4; i++)
 	{
 		// for each lod we have Vert, Face, bind
-		size += (uint32_t)lods_[i].getSubDataSize();
+		size += (uint32_t)lods_[i].getSubDataSize(streams);
 	}
 
 	return size;
@@ -1503,11 +1519,10 @@ bool MayaModel::save(const char *filename)
 	size_t i, x, k, j;
 	size_t numMesh;
 	size_t meshHeadOffsets = sizeof(model::ModelHeader);
-
 	size_t numLods = g_options.numLods();
 
 	// place file data in a stream.
-	// much faster, since we are doing lots of small writes.
+	// much faster(benchmarked), since we are doing lots of small writes.
 	core::ByteStream stream(&g_arena);
 
 	fopen_s(&f, filename, "wb");
@@ -1518,21 +1533,25 @@ bool MayaModel::save(const char *filename)
 
 		g_stats.totalJoints = numExportJoints_;
 
+		Flags8<model::StreamType> streamsFlags;
+		streamsFlags.Set(model::StreamType::COLOR);
+		streamsFlags.Set(model::StreamType::NORMALS);
+		streamsFlags.Set(model::StreamType::TANGENT_BI);
 
 		header.version = model::MODEL_VERSION;
-		header.flags.Set( model::ModelFlags::LOOSE );
+		header.flags.Set(model::ModelFlags::LOOSE);
+		header.flags.Set(model::ModelFlags::STREAMS);
 		header.numBones = numExportJoints_;
 		header.numBlankBones = tagOrigin_.keep ? 1:0;
 		header.numLod = safe_static_cast<uint8_t, size_t>(numLods);
 		header.numMesh = safe_static_cast<uint8_t, size_t>(totalMeshes());
 		header.modified = core::dateTimeStampSmall::systemDateTime();
-//		header.boundingBox = this->boundingBox;
 
 		// Sizes
 		header.tagNameDataSize = this->calculateTagNameDataSize();
 		header.materialNameDataSize = this->calculateMaterialNameDataSize();
 		header.boneDataSize = this->calculateBoneDataSize();
-		header.subDataSize = this->calculateSubDataSize();
+		header.subDataSize = this->calculateSubDataSize(streamsFlags);
 		header.dataSize = (header.subDataSize + 
 			header.tagNameDataSize + header.materialNameDataSize);
 
@@ -1552,6 +1571,21 @@ bool MayaModel::save(const char *filename)
 			// version 5.0 info
 			lod.numVerts = lods_[i].totalVerts();
 			lod.numIndexes = lods_[i].totalIndexs();
+
+			// Version 8.0 info
+			lod.streamsFlag = streamsFlags;
+
+			// work out bounds for all meshes.
+			lod.boundingBox.clear();
+			for (x = 0; x < lods_[i].meshes_.size(); x++)
+			{
+				const MayaMesh* pMesh = lods_[i].meshes_[x];
+
+				lod.boundingBox.add(pMesh->boundingBox);
+			}
+			// create sphere.
+			lod.boundingSphere = Sphere(lod.boundingBox);
+
 
 			meshHeadOffsets += lod.numSubMeshes * sizeof(model::MeshHeader);
 		}
@@ -1658,6 +1692,11 @@ bool MayaModel::save(const char *filename)
 					mesh.startVertex = vertOffset;
 					mesh.startIndex = indexOffset;
 
+					// Version 8.0 info
+					mesh.streamsFlag = streamsFlags; // currently a 3d model has identical flags for all meshes.
+					mesh.boundingBox = pMesh->boundingBox;
+					mesh.boundingSphere = Sphere(pMesh->boundingBox);
+
 					// inc the offsets
 					vertOffset += mesh.numVerts;
 					indexOffset += mesh.numIndexes;
@@ -1685,11 +1724,24 @@ bool MayaModel::save(const char *filename)
 			for (i = 0; i < numMesh; i++)
 			{
 				MayaMesh* mesh = lods_[j].meshes_[i];
-
-				requiredStreamSize += (mesh->verts.size() * sizeof(model::Vertex));
-				requiredStreamSize += (mesh->faces.size() * sizeof(model::Face));
+				
+				
 				requiredStreamSize += mesh->CompBinds.dataSizeTotal();
+				requiredStreamSize += (mesh->faces.size() * sizeof(model::Face));
+				requiredStreamSize += (mesh->verts.size() * sizeof(model::Vertex));
 
+				if (streamsFlags.IsSet(model::StreamType::COLOR))
+				{
+					requiredStreamSize += (mesh->verts.size() * sizeof(model::VertexColor));
+				}
+				if (streamsFlags.IsSet(model::StreamType::NORMALS))
+				{
+					requiredStreamSize += (mesh->verts.size() * sizeof(model::VertexNormal));
+				}
+				if (streamsFlags.IsSet(model::StreamType::TANGENT_BI))
+				{
+					requiredStreamSize += (mesh->verts.size() * sizeof(model::VertexTangentBi));
+				}
 			}
 
 			// writing this info to a stream makes write time 5x times faster.
@@ -1703,23 +1755,88 @@ bool MayaModel::save(const char *filename)
 
 				model::Vertex vert;
 				core::zero_object(vert);
-				vert.col.set(0xff, 0xff, 0xff, 0xff);
 
 				for (x = 0; x < mesh->verts.size(); x++)
 				{
 					const MayaVertex Mvert = mesh->verts[x];
 
 					vert.pos = Mvert.pos;
-					vert.uv = Mvert.uv;
-//					vert.uv = XHalf2(Mvert.uv[0], Mvert.uv[1]);
-//					vert.normal = Mvert.normal;
-//					vert.tangent = Mvert.tangent;
-//					vert.binormal = Mvert.binormal;
-					vert.col = Mvert.col;
+					vert.st[0] = XHalfCompressor::compress(Mvert.uv[0]);
+					vert.st[1] = XHalfCompressor::compress(Mvert.uv[1]);
 
 					stream.write(vert);
 				}
 			}
+
+
+			// write all the colors.
+			if (streamsFlags.IsSet(model::StreamType::COLOR))
+			{
+				for (i = 0; i < numMesh; i++)
+				{
+					MayaMesh* mesh = lods_[j].meshes_[i];
+
+					model::VertexColor col;
+					col.set(0xFF, 0xFF, 0xFF, 0xFF);
+
+					if (g_options.whiteVertColors_)
+					{
+						for (x = 0; x < mesh->verts.size(); x++)
+						{
+							stream.write(col);
+						}
+					}
+					else
+					{
+						for (x = 0; x < mesh->verts.size(); x++)
+						{
+							const MayaVertex Mvert = mesh->verts[x];
+							col = Mvert.col;
+							stream.write(col);
+						}
+					}
+				}
+			}
+
+			// write normals
+			if (streamsFlags.IsSet(model::StreamType::NORMALS))
+			{
+				for (i = 0; i < numMesh; i++)
+				{
+					MayaMesh* mesh = lods_[j].meshes_[i];
+
+					model::VertexNormal normal;
+
+					for (x = 0; x < mesh->verts.size(); x++)
+					{
+						const MayaVertex Mvert = mesh->verts[x];
+						normal = Mvert.normal;
+						stream.write(normal);
+					}
+				}
+			}
+
+			// write tangents and bi-normals
+			if (streamsFlags.IsSet(model::StreamType::TANGENT_BI))
+			{
+				for (i = 0; i < numMesh; i++)
+				{
+					MayaMesh* mesh = lods_[j].meshes_[i];
+
+					model::VertexTangentBi tangent;
+
+					for (x = 0; x < mesh->verts.size(); x++)
+					{
+						const MayaVertex Mvert = mesh->verts[x];
+
+						tangent.binormal = Mvert.binormal;
+						tangent.tangent = Mvert.tangent;
+
+						stream.write(tangent);
+					}
+				}
+			}
+
 
 			// write all the faces
 			for (i = 0; i < numMesh; i++)
@@ -1730,9 +1847,9 @@ bool MayaModel::save(const char *filename)
 				{
 					const Vec3<int32_t>& f = mesh->faces[x];
 
-					stream.write<uint16_t>(f[0]);
-					stream.write<uint16_t>(f[1]);
-					stream.write<uint16_t>(f[2]);
+					stream.write<model::Index>(f[0]);
+					stream.write<model::Index>(f[1]);
+					stream.write<model::Index>(f[2]);
 				}
 
 			}
@@ -1863,6 +1980,14 @@ MStatus PotatoExporter::convert()
 	MayaPrintMsg("Exporting to: '%s'", g_options.filePath_.c_str());
 	MayaPrintMsg("Scale: '%f'", g_options.scale_);
 	MayaPrintMsg(""); // new line
+
+	// name length check
+	if (g_options.filePath_.length() > model::MODEL_MAX_NAME_LENGTH)
+	{
+		MayaPrintError("Model name is too long. MAX: %i, provided: %i",
+			model::MODEL_MAX_NAME_LENGTH, g_options.filePath_.length());
+		return MS::kFailure;;
+	}
 
 	{
 		PROFILE_MAYA_NAME("Total Export time:");

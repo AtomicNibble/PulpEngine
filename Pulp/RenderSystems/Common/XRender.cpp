@@ -26,19 +26,24 @@ using namespace texture;
 XRender* gRenDev = nullptr;
 ID3D11RenderTargetView* backbuffer = nullptr;    // global declaration
 
-// pretty sure this needs to be in order i forget
+// this needs to be in order 1:1 mapping with enums
 uint32_t XRender::vertexFormatStride[shader::VertexFormat::Num] =
 {
-	sizeof(Vertex_P3F_C4B_T2F), // P3F_C4B_T2F
-	sizeof(Vertex_P3F_C4B_T2S), // P3F_C4B_T2S
+	sizeof(Vertex_P3F_T3F),					// P3F_T3F
 
-	sizeof(Vertex_P3F_T3F), // P3F_T3F
+	sizeof(Vertex_P3F_N10_C4B_T2S),			// P3F_N10_C4B_T2S
+	sizeof(Vertex_P3F_N3F_C4B_T4F),			// P3F_N3F_C4B_T4F
 
-	sizeof(Vertex_P3F_N10_C4B_T2S), // P3F_N10_C4B_T2S
-	sizeof(Vertex_P3F_N3F_C4B_T4F), // P3F_T4F_N3F_C4B_T4F
 
-//	sizeof(Vertex_P3F_C4B_T2S_N10_T10_B10), // P3F_C4B_T2S_N10_T10_B10
+	sizeof(Vertex_P3F_T2S),					// P3F_T2S
+	sizeof(Vertex_P3F_T2S_C4B),				// P3F_T2S_C4B
+	sizeof(Vertex_P3F_T2S_C4B_N3F),			// P3F_T2S_C4B_N3F
+	sizeof(Vertex_P3F_T2S_C4B_N3F_TB3F),	// P3F_T2S_C4B_N3F_TB3F
+
+	sizeof(Vertex_P3F_T2F_C4B),	// P3F_T2F_C4B
+
 };
+
 
 
 XRender::XRender() :
@@ -47,6 +52,14 @@ XRender::XRender() :
 	pDefaultFont_(nullptr),
 	RenderResources_(g_rendererArena)
 {
+	// try make sure that the array above is valid.
+#if X_DEBUG
+
+	for (int i = 0; i < shader::VertexFormat::Num; i++) {
+		X_ASSERT(vertexFormatStride[i] > 0,"invalid vertex stride info")();
+	}
+
+#endif // !X_DEBUG
 }
 
 

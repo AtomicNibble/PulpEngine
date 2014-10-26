@@ -37,8 +37,8 @@ struct VertexPool
 {
 	enum Enum
 	{
-		P3F_C4B_T2F,
-		P3F_C4B_T2S,
+		P3F_T2F_C4B,
+		P3F_T2S_C4B,
 		PoolMax
 	};
 };
@@ -118,12 +118,17 @@ public:
 	static const int MAX_VERTEX_STREAMS = 8;
 
 	RenderState() :
-		vertexLayoutDescriptions({ g_rendererArena, 
-		g_rendererArena,
-	//	g_rendererArena,
-		g_rendererArena,
-		g_rendererArena,
-		g_rendererArena })
+		vertexLayoutDescriptions({ 
+			g_rendererArena, 
+			g_rendererArena,
+			g_rendererArena,
+			g_rendererArena,
+			g_rendererArena,
+			g_rendererArena,
+			g_rendererArena,
+			g_rendererArena 
+		}
+	)
 	{
 		pIndexStream = nullptr;
 
@@ -145,7 +150,7 @@ public:
 
 	
 
-	XStreamInfo VertexStreams[MAX_VERTEX_STREAMS];
+	XStreamInfo VertexStreams[VertexStream::ENUM_COUNT];
 	ID3D11Buffer* pIndexStream;
 
 	// vertex format cache.
@@ -187,10 +192,6 @@ public:
 
 	virtual void RenderBegin() X_OVERRIDE;
 	virtual void RenderEnd() X_OVERRIDE;
-
-
-	virtual void DefferedBegin(void) X_FINAL;
-	virtual void DefferedEnd(void) X_FINAL;
 
 
 	bool Create2DTexture(texture::XTextureFile* image_data,
@@ -240,7 +241,11 @@ public:
 	// Shaders 
 	virtual void FX_PipelineShutdown() X_OVERRIDE;
 
-	virtual bool SetWorldShader(void);
+
+	virtual bool DefferedBegin(void) X_FINAL;
+	virtual bool DefferedEnd(void) X_FINAL;
+
+	virtual bool SetWorldShader(void) X_FINAL;
 	virtual bool SetSkyboxShader(void);
 	virtual bool SetFFE(bool textured = false);
 	virtual bool SetFontShader();
@@ -263,7 +268,7 @@ public:
 	virtual void DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
 		int texture_id, float* s, float* t, const Colorf& col, bool filtered = true) X_OVERRIDE;
 
-	virtual void DrawVB(Vertex_P3F_C4B_T2F* pVertBuffer, uint32_t size,
+	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
 		PrimitiveTypePublic::Enum type) X_OVERRIDE;
 
 	void DrawQuad(float x, float y, float z, float width, float height, const Color& col) X_OVERRIDE;
@@ -302,9 +307,9 @@ public:
 
 	HRESULT FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFmt);
 //	HRESULT FX_SetTextureAsVStream(int nID, texture::XTexture* pVBTexture, uint32 nStride);
-	void FX_SetVStream(ID3D11Buffer* pVertexBuffer, uint32 startslot,
+	void FX_SetVStream(ID3D11Buffer* pVertexBuffer, VertexStream::Enum streamSlot,
 				uint32 stride, uint32 offset);
-	void FX_SetVStream(uint32 VertexBuffer, uint32 startslot,
+	void FX_SetVStream(uint32 VertexBuffer, VertexStream::Enum streamSlot,
 		uint32 stride, uint32 offset);
 	void FX_SetIStream(ID3D11Buffer* pIndexBuffer);
 	void FX_SetIStream(uint32 IndexBuffer);
@@ -351,11 +356,11 @@ public:
 	}
 
 	  
-	X_INLINE void PushMatrix()
+	X_INLINE void PushViewMatrix()
 	{
 		m_ViewMat.Push();
 	}
-	X_INLINE void PopMatrix()
+	X_INLINE void PopViewMatrix()
 	{
 		m_ViewMat.Pop();
 		DirtyMatrix();

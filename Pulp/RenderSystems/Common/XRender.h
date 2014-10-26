@@ -208,7 +208,7 @@ public:
 	virtual void DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
 		int texture_id, float* s, float* t, const Colorf& col, bool filtered = true) X_ABSTRACT;
 
-	virtual void DrawVB(Vertex_P3F_C4B_T2F* pVertBuffer, uint32_t size,
+	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
 		PrimitiveTypePublic::Enum type) X_ABSTRACT;
 
 	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* format, va_list args) X_OVERRIDE;

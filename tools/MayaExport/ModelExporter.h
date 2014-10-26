@@ -111,6 +111,7 @@ public:
 	float scale_;
 	float jointThreshold_;
 	bool  zeroOrigin_;
+	bool  whiteVertColors_;
 	MString forceBoneFilters_;
 	MString progressCntl_;
 	ExpoMode exportMode_;
@@ -247,7 +248,7 @@ public:
 	void pruneBones(void);
 
 	size_t numMeshes(void) const { return meshes_.size(); }
-	size_t getSubDataSize(void);
+	size_t getSubDataSize(const Flags8<model::StreamType>& streams);
 
 	MStatus LoadMeshes(void);
 	void MergeMeshes(void);
@@ -290,7 +291,7 @@ public:
 	void calculateBoundingBox(void);
 	uint32_t calculateTagNameDataSize(void);
 	uint32_t calculateMaterialNameDataSize(void);
-	uint32_t calculateSubDataSize(void);
+	uint32_t calculateSubDataSize(const Flags8<model::StreamType>& streams);
 	uint32_t calculateBoneDataSize(void);
 
 	MayaBone *findJointReal(const char *name);

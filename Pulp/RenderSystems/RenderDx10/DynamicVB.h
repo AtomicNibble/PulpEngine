@@ -20,7 +20,8 @@ public:
 	X_INLINE HRESULT CreateVB(VidMemManager* pVidMem, uint32 vertCount, uint32 stride);
 	X_INLINE VertexType* LockVB(const uint32 requested_verts, uint32 &offset, bool write = true);
 	X_INLINE void UnlockVB();
-	X_INLINE HRESULT Bind(uint32 streamNumber = 0, int bytesOffset = 0, int stride = 0);
+	X_INLINE HRESULT Bind(VertexStream::Enum stream = VertexStream::VERT, int bytesOffset = 0, 
+		int stride = 0);
 
 private:
 
@@ -30,7 +31,6 @@ private:
 	bool	 Locked_;
 	bool	 ReadWrite_;
 	VertexType*   pLockedData_;
-//	ID3D11Buffer* pD3DBuffer_;
 	VidMemManager* pVidMem_;
 	uint32_t vbId_;
 };
@@ -89,39 +89,18 @@ void XDynamicVB<VertexType>::Release()
 	{
 		X_ASSERT_UNREACHABLE();
 	}
-//	if (pD3DBuffer_) {
-//		pD3DBuffer_->Release();
-//		pD3DBuffer_ = nullptr;
-//	}
 }
 
 template<class VertexType>
 HRESULT XDynamicVB<VertexType>::CreateVB(VidMemManager* pVidMem, uint32 vertCount, uint32 stride)
 {
 	HRESULT hr = S_OK;
-//	D3D11_BUFFER_DESC BufDesc;
-//	core::zero_object(BufDesc);
 	pVidMem_ = pVidMem;
 
 	// set info.
 	vertStride_ = stride;
 	vertsNum_ = vertCount;
-/*
-	BufDesc.ByteWidth = vertsNum_*vertStride_;
-	BufDesc.Usage = D3D11_USAGE_DYNAMIC;
-	BufDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	BufDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	BufDesc.MiscFlags = 0;
 
-	if (ReadWrite_)
-	{
-		BufDesc.CPUAccessFlags |= D3D11_CPU_ACCESS_READ;
-		BufDesc.Usage = D3D11_USAGE_STAGING;
-		BufDesc.BindFlags = 0;
-	}
-
-	hr = pD3D->CreateBuffer(&BufDesc, NULL, &pD3DBuffer_);
-	*/
 
 	VidMemManager::CpuAccessFlags cpuflags;
 
@@ -247,11 +226,11 @@ void XDynamicVB<VertexType>::UnlockVB()
 
 
 template<class VertexType>
-HRESULT XDynamicVB<VertexType>::Bind(uint32 streamNumber, int bytesOffset, int stride)
+HRESULT XDynamicVB<VertexType>::Bind(VertexStream::Enum stream, int bytesOffset, int stride)
 {
 	g_Dx11D3D.FX_SetVStream(
 		vbId_,
-		streamNumber,
+		stream,
 		stride == 0 ? vertStride_ : stride,
 		bytesOffset
 		);

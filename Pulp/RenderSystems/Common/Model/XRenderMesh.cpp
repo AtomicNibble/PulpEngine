@@ -54,7 +54,7 @@ bool XRenderMesh::uploadToGpu(void)
 	vbSize = pMesh_->numVerts * DX11XRender::vertexFormatStride[vertexFmt_];
 
 	indexStream_.BufId = g_Dx11D3D.VidMemMng()->CreateIB(ibSize, pMesh_->indexes);
-	vertexStreams_[VertexStream::VERT].BufId = g_Dx11D3D.VidMemMng()->CreateVB(vbSize, pMesh_->verts);
+	vertexStreams_[VertexStream::VERT].BufId = g_Dx11D3D.VidMemMng()->CreateVB(vbSize, pMesh_->streams[VertexStream::VERT]);
 
 	return canRender();
 }
@@ -72,13 +72,14 @@ bool XRenderMesh::render(void)
 	pAux->setRenderFlags(render::AuxGeom_Defaults::Def3DRenderflags);
 
 	
-//	g_Dx11D3D.SetWorldShader();
+	g_Dx11D3D.SetWorldShader();
 
 	g_Dx11D3D.FX_SetVertexDeclaration(vertexFmt_);
 	g_Dx11D3D.FX_SetIStream(indexStream_.BufId);
+
 	g_Dx11D3D.FX_SetVStream(
-		vertexStreams_[VertexStream::VERT].BufId, 
-		0, 
+		vertexStreams_[VertexStream::VERT].BufId,
+		VertexStream::VERT, 
 		DX11XRender::vertexFormatStride[vertexFmt_],
 		0
 	);

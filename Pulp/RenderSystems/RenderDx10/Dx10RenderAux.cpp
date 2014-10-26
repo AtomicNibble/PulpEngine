@@ -182,7 +182,7 @@ void XRenderAuxImp::RT_Flush(const XAuxGeomCBRawDataPackaged& data, size_t begin
 	pCurCBRawData_ = data.pData_;
 
 
-	renderer_.PushMatrix();
+	renderer_.PushViewMatrix();
 
 	if (!renderer_.IsDeviceLost())
 	{
@@ -264,8 +264,7 @@ void XRenderAuxImp::RT_Flush(const XAuxGeomCBRawDataPackaged& data, size_t begin
 		
 	}
 
-	renderer_.PopMatrix();
-	renderer_.DirtyMatrix();
+	renderer_.PopViewMatrix();
 
 
 	pCurCBRawData_ = nullptr;
@@ -315,7 +314,7 @@ void XRenderAuxImp::DrawAuxPrimitives(XRenderAux::AuxSortedPushBuffer::const_ite
 	bool streamsBound = false;
 
 	// bind vertex and index streams and set vertex declaration
-	streamsBound = BindStreams(shader::VertexFormat::P3F_C4B_T2F, auxGeomVB_, auxGeomIB_);
+	streamsBound = BindStreams(shader::VertexFormat::P3F_T2F_C4B, auxGeomVB_, auxGeomIB_);
 
 
 	// get aux vertex buffer
@@ -436,7 +435,7 @@ void XRenderAuxImp::DrawAuxIndexedPrimitives(XRenderAux::AuxSortedPushBuffer::co
 	bool streamsBound = false;
 
 	// bind vertex and index streams and set vertex declaration
-	streamsBound = BindStreams(shader::VertexFormat::P3F_C4B_T2F, auxGeomVB_, auxGeomIB_);
+	streamsBound = BindStreams(shader::VertexFormat::P3F_T2F_C4B, auxGeomVB_, auxGeomIB_);
 	
 
 	// get aux vertex and index buffer
@@ -1183,7 +1182,7 @@ bool XRenderAuxImp::BindStreams(shader::VertexFormat::Enum newVertexFormat,
 
 	if (curVB_ != NewVB)
 	{
-		renderer_.FX_SetVStream(NewVB, 0, XRender::vertexFormatStride[newVertexFormat], 0);
+		renderer_.FX_SetVStream(NewVB, VertexStream::VERT, XRender::vertexFormatStride[newVertexFormat], 0);
 		curVB_ = NewVB;
 	}
 	if (curIB_ != NewIB)

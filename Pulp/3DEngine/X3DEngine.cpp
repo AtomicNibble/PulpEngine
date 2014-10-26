@@ -51,7 +51,7 @@ bool X3DEngine::Init()
 
 	// load a lvl lol.
 //	map.LoadFromFile("killzone"); // mmmmm
-	map.LoadFromFile("box"); // mmmmm
+//	map.LoadFromFile("box"); // mmmmm
 
 		pTex = pRender_->LoadTexture("textures/berlin_floors_rock_tile2_c.dds",
 			texture::TextureFlags::DONT_STREAM);
@@ -93,20 +93,19 @@ void X3DEngine::OnFrameBegin(void)
 
 	pRender_->SetTexture(pTex1->getTexID());
 
-//	if (pMesh)
-//		pMesh->render();
+	if (pMesh)
+		pMesh->render();
 
 	pRender_->SetTexture(pTex->getTexID());
 
+
 	pRender_->DefferedBegin();
 
-		map.render();
+//	map.render();
 
 	pRender_->DefferedEnd();
 
-	// a skybox test.
-//	pRender->SetTexture(pTexSky->getTexID());
-//	pSkybox->render();
+
 }
 
 void X3DEngine::Update(void)
@@ -123,11 +122,11 @@ void X3DEngine::LoadModel(void)
 	pMesh = nullptr;
 	pSkybox = nullptr;
 
-	if (loader.LoadModel(model, "core_assets/models/bo2_zom.model"))
+	if (loader.LoadModel(model, "models/player.model"))
 	{
 		pMesh = gEnv->pRender->createRenderMesh(
 			(model::MeshHeader*)&model.getLod(0),
-			shader::VertexFormat::P3F_C4B_T2F,
+			shader::VertexFormat::P3F_T2S,
 			model.getName()
 			);
 
@@ -138,7 +137,7 @@ void X3DEngine::LoadModel(void)
 	{
 		pSkybox = gEnv->pRender->createRenderMesh(
 			(model::MeshHeader*)&modelSky.getLod(0),
-			shader::VertexFormat::P3F_C4B_T2F,
+			shader::VertexFormat::P3F_T2S,
 			modelSky.getName()
 			);
 

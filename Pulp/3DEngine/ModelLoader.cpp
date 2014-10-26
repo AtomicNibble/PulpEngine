@@ -138,6 +138,24 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 			mesh.verts = cursor.postSeekPtr<Vertex>(mesh.numVerts);
 		}
 
+		// color
+		if (lod.streamsFlag.IsSet(StreamType::COLOR))
+		{
+			lod.streams[VertexStream::COLOR] = cursor.postSeekPtr<VertexColor>(lod.numVerts);
+		}
+
+		// normals
+		if (lod.streamsFlag.IsSet(StreamType::NORMALS))
+		{
+			lod.streams[VertexStream::NORMALS] = cursor.postSeekPtr<VertexNormal>(lod.numVerts);
+		}
+
+		// tangents bi-normals
+		if (lod.streamsFlag.IsSet(StreamType::TANGENT_BI))
+		{
+			lod.streams[VertexStream::TANGENT_BI] = cursor.postSeekPtr<VertexTangentBi>(lod.numVerts);
+		}
+
 		// Faces
 		for (x = 0; x < lod.numSubMeshes; x++)
 		{
@@ -155,7 +173,9 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 			cursor.SeekBytes(size);
 		}
 
-		lod.verts = meshHeads[0].verts;
+		// index 0 is always valid, since a valid lod must
+		// have a mesh.
+		lod.streams[VertexStream::VERT] = meshHeads[0].verts;
 		lod.indexes = meshHeads[0].indexes;
 	}
 
