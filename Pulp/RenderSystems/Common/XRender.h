@@ -157,9 +157,7 @@ public:
 	// Textures 
 	virtual texture::ITexture* LoadTexture(const char* path, texture::TextureFlags flags) X_OVERRIDE;
 	
-	virtual void Draw2dImage(float xpos, float ypos,
-		float w, float h, texture::TexID texture_id, ColorT<float>& col) X_ABSTRACT;
-	
+
 	virtual void ReleaseTexture(texture::TexID id) X_ABSTRACT;
 	// ~Textures 
 
@@ -203,10 +201,10 @@ public:
 
 	// ~Model
 
-	// Drawing
+	// Drawing Util
 
 	virtual void DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
-		int texture_id, float* s, float* t, const Colorf& col, bool filtered = true) X_ABSTRACT;
+		texture::TexID texture_id, const float* s, const float* t, const Colorf& col, bool filtered = true) X_ABSTRACT;
 
 	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
 		PrimitiveTypePublic::Enum type) X_ABSTRACT;
@@ -242,7 +240,7 @@ public:
 	virtual void RT_SetCullMode(CullMode::Enum mode) X_ABSTRACT;
 
 	virtual void RT_DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
-		int texture_id, float *s, float *t, const Colorf& col, bool filtered = true) X_ABSTRACT;
+		texture::TexID texture_id, const float *s, const float *t, const Colorf& col, bool filtered = true) X_ABSTRACT;
 
 	virtual void RT_SetCameraInfo(void) X_ABSTRACT;
 

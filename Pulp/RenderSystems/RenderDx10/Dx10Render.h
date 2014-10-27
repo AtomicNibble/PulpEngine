@@ -227,11 +227,11 @@ public:
 	// ~AuxGeo
 
 	// Textures 
-	virtual void Draw2dImage(float xpos, float ypos,
-		float w, float h, texture::TexID texture_id, ColorT<float>& col) X_OVERRIDE;
+//	virtual void Draw2dImage(float xpos, float ypos,
+//		float w, float h, texture::TexID texture_id, ColorT<float>& col) X_OVERRIDE;
 
-	void DrawImage(float xpos, float ypos, float z, float w, float h,
-		int texture_id, float s0, float t0, float s1, float t1, const Colorf& col, bool filtered = true);
+//	void DrawImage(float xpos, float ypos, float z, float w, float h,
+//		int texture_id, float s0, float t0, float s1, float t1, const Colorf& col, bool filtered = true);
 
 	virtual void ReleaseTexture(texture::TexID id) X_OVERRIDE;
 	
@@ -264,12 +264,19 @@ public:
 
 	// ~font
 
+	// Drawing util
 
-	virtual void DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
-		int texture_id, float* s, float* t, const Colorf& col, bool filtered = true) X_OVERRIDE;
+	// Screen Space Draw: range 0-2 width / h is also scrrenspace not pixels
+	void DrawQuadSS(float x, float y, float width, float height, const Color& col) X_FINAL;
+	void DrawQuadSS(float x, float y, float width, float height, const Color& col, const Color& borderCol) X_FINAL;
+	void DrawQuadImageSS(float x, float y, float width, float height, texture::TexID texture_id, ColorT<float>& col) X_FINAL;
+	void DrawRectSS(float x, float y, float width, float height, const Color& col) X_FINAL;
+	virtual void DrawLineColorSS(const Vec2f& vPos1, const Color& color1,
+		const Vec2f& vPos2, const Color& vColor2) X_FINAL;
 
-	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
-		PrimitiveTypePublic::Enum type) X_OVERRIDE;
+
+	void DrawQuadImage(float x, float y, float width, float height, texture::TexID texture_id, ColorT<float>& col) X_FINAL;
+	void DrawQuadImage(float x, float y, float width, float height, texture::ITexture* pTexutre, ColorT<float>& col) X_FINAL;
 
 	void DrawQuad(float x, float y, float z, float width, float height, const Color& col) X_OVERRIDE;
 	void DrawQuad(float x, float y, float z, float width, float height, const Color& col, const Color& borderCol) X_OVERRIDE;
@@ -283,12 +290,25 @@ public:
 	void DrawLineColor(const Vec3f& vPos1, const Color& color1,
 		const Vec3f& vPos2, const Color& vColor2) X_OVERRIDE;
 
-	void DrawRect(float x, float y, float width, float height, Color col) X_OVERRIDE;
+	void DrawRect(float x, float y, float width, float height, const Color& col) X_OVERRIDE;
 	
 	void DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 		float padding, uint32_t max) X_OVERRIDE;
-	// RT
 
+	// not exposed
+	void DrawImage(float xpos, float ypos, float z, float w, float h,
+		int texture_id, float s0, float t0, float s1, float t1, const Colorf& col, bool filtered = true);
+
+	void DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
+		int texture_id, const float* s, const float* t, const Colorf& col, bool filtered);
+
+	// ~Drawing util
+
+	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
+		PrimitiveTypePublic::Enum type) X_OVERRIDE;
+
+
+	// RT
 	virtual void RT_DrawLines(Vec3f* points, uint32_t num, const Colorf& col) X_OVERRIDE;
 
 	virtual void RT_DrawString(const Vec3f& pos, const char* pStr) X_OVERRIDE;
@@ -297,7 +317,7 @@ public:
 	virtual void RT_SetCullMode(CullMode::Enum mode) X_OVERRIDE;
 
 	virtual void RT_DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
-		int texture_id, float *s, float *t, const Colorf& col, bool filtered = true) X_OVERRIDE;
+		texture::TexID texture_id, const float* s, const float* t, const Colorf& col, bool filtered = true) X_OVERRIDE;
 	
 	virtual void RT_SetCameraInfo(void) X_OVERRIDE;
 

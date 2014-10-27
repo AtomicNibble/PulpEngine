@@ -2124,7 +2124,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 		//		height += 5; // add a few pixels.
 
 				pRender_->Set2D(true);
-				pRender_->Draw2dImage(xpos, ypos, width, height, this->pBackground_->getTexID(), col);
+				pRender_->DrawQuadImage(xpos, ypos, width, height, this->pBackground_->getTexID(), col);
 				pRender_->DrawRect(xpos, ypos, width, height, console_output_box_color_border);
 				pRender_->Set2D(false);
 

@@ -73,7 +73,7 @@ public:
 	// remove the element at the given index
 	bool removeIndex(size_type idx);
 
-	size_type find(const Type& val);
+	size_type find(const Type& val) const;
 
 	// swaps the arrays
 	// A = B & B = A

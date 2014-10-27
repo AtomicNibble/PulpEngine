@@ -632,7 +632,7 @@ bool DX11XRender::DefferedEnd()
 	pSh->FXBegin(&pass, 0);
 	pSh->FXBeginPass(pass);
 
-	Draw2dImage(	
+	DrawQuadImage(
 		-1.0f, -0.4f, 0.6f, -0.6f, 
 		0, Col_White);
 
@@ -640,7 +640,7 @@ bool DX11XRender::DefferedEnd()
 	pSh->FXBegin(&pass, 0);
 	pSh->FXBeginPass(pass);
 
-	Draw2dImage(
+	DrawQuadImage(
 		-0.4f, -0.4f, 0.6f, -0.6f,
 		0, Col_White);
 
@@ -649,7 +649,7 @@ bool DX11XRender::DefferedEnd()
 	pSh->FXBeginPass(pass);
 
 
-	Draw2dImage(
+	DrawQuadImage(
 		0.2f, -0.4f, 0.6f, -0.6f,
 		0, Col_White);
 

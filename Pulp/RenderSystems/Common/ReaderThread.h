@@ -108,7 +108,7 @@ public:
 	void RC_ReleaseShaderResource(shader::XShaderResources* pRes);
 
 	void RC_DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
-		int texture_id, float* s, float* t, const Colorf& col, bool filtered);
+		texture::TexID texture_id, const float* s, const float* t, const Colorf& col, bool filtered);
 
 	void RT_SetCameraInfo(void);
 

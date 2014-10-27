@@ -286,7 +286,7 @@ void XRenderThread::RC_ReleaseShaderResource(shader::XShaderResources* pRes)
 }
 
 void XRenderThread::RC_DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
-	int texture_id, float* s, float* t, const Colorf& col, bool filtered)
+	texture::TexID texture_id, const float* s, const float* t, const Colorf& col, bool filtered)
 {
 	X_ASSERT_NOT_NULL(s);
 	X_ASSERT_NOT_NULL(t);

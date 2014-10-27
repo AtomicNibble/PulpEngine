@@ -257,6 +257,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;_USRDLL;RENDERSYS_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
+      <AdditionalIncludeDirectories>$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -362,6 +363,7 @@
   <ItemGroup>
     <ClInclude Include="Bsp.h" />
     <ClInclude Include="EngineBase.h" />
+    <ClInclude Include="Gui\XWindow.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialManager.h" />
     <ClInclude Include="ModelLoader.h" />
@@ -371,6 +373,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bsp.cpp" />
+    <ClCompile Include="Gui\XWindow.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
@@ -391,6 +394,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="bsp.cd" />
+    <None Include="Gui\XWindow.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,13 +1,184 @@
 #include "stdafx.h"
 #include "Dx10Render.h"
-
+#include "../Common/Textures/XTexture.h"
 
 X_NAMESPACE_BEGIN(render)
 
 
 
+void DX11XRender::DrawQuadSS(float x, float y, float width, float height, const Color& col)
+{
+	SetCullMode(CullMode::NONE);
+
+	// input is 0-2
+	// directx is like so:
+	//
+	// -1,1			1,1
+	//
+	//		  0,0
+	//
+	// -1,-1		1,-1
+	float x1, y1, x2, y2;
+	float z;
+
+	z = 0.f;
+	x1 = x - 1;
+	y1 = 2.f - y;
+
+	// now we need to add width / hiehgt
+	x2 = x1 + width;
+	y2 = y1 - height;
+
+
+	uint32 nOffs;
+	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
+
+	// TL
+	Quad[0].pos.x = x1;
+	Quad[0].pos.y = y1;
+	Quad[0].pos.z = z;
+	// TR
+	Quad[1].pos.x = x2;
+	Quad[1].pos.y = y1;
+	Quad[1].pos.z = z;
+	// BL
+	Quad[2].pos.x = x1;
+	Quad[2].pos.y = y2;
+	Quad[2].pos.z = z;
+	// BR
+	Quad[3].pos.x = x2;
+	Quad[3].pos.y = y2;
+	Quad[3].pos.z = z;
+
+	for (uint32 i = 0; i<4; ++i)
+	{
+		Quad[i].color = col;
+		Quad[i].st = Vec2f::zero();
+	}
+
+	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
+	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+
+	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+		return;
+
+	// Render the two triangles from the data stream
+	FX_DrawPrimitive(PrimitiveType::TriangleStrip, nOffs, 4);
+	
+
+}
+
+void DX11XRender::DrawQuadSS(float x, float y, float width, float height,
+	const Color& col, const Color& borderCol)
+{
+	DrawQuadSS(x, y, width, height, col);
+	DrawRectSS(x, y, width, height, borderCol);
+}
+
+void DX11XRender::DrawQuadImageSS(float x, float y, float width, float height,
+	texture::TexID texture_id, ColorT<float>& col)
+{
+	float x1, y1, x2, y2;
+	float z;
+	float s[4], t[4];
+
+	s[0] = 0;	t[0] = 1.0f - 1;
+	s[1] = 1;	t[1] = 1.0f - 1;
+	s[2] = 0;	t[2] = 1.0f - 0;
+	s[3] = 1;	t[3] = 1.0f - 0;
+
+	z = 0.f;
+	x1 = x - 1;
+	y1 = 2.f - y;
+	x2 = x1 + width;
+	y2 = y1 - height;
+
+
+	uint32 nOffs;
+	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
+
+	// TL
+	Quad[0].pos.x = x1;
+	Quad[0].pos.y = y1;
+	Quad[0].pos.z = z;
+	// TR
+	Quad[1].pos.x = x2;
+	Quad[1].pos.y = y1;
+	Quad[1].pos.z = z;
+	// BL
+	Quad[2].pos.x = x1;
+	Quad[2].pos.y = y2;
+	Quad[2].pos.z = z;
+	// BR
+	Quad[3].pos.x = x2;
+	Quad[3].pos.y = y2;
+	Quad[3].pos.z = z;
+
+	for (uint32 i = 0; i<4; ++i)
+	{
+		Quad[i].color = col;
+		Quad[i].st = Vec2f(s[i], t[i]);
+	}
+
+	// We are finished with accessing the vertex buffer
+	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
+
+
+	// Bind our vertex as the first data stream of our device
+	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+
+	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+		return;
+
+	// Render the two triangles from the data stream
+	FX_DrawPrimitive(PrimitiveType::TriangleStrip, nOffs, 4);
+}
+
+void DX11XRender::DrawRectSS(float x, float y, float width, float height, const Color& col)
+{
+	float x1, y1, x2, y2;
+
+	x1 = x - 1;
+	y1 = 2.f - y;
+	x2 = x1 + width;
+	y2 = y1 - height;
+
+	const Vec3f tl(x1, y1, 0);
+	const Vec3f tr(x2, y1, 0);
+	const Vec3f bl(x1, y2, 0);
+	const Vec3f br(x2, y2, 0);
+
+	// once the coords are mapped to directx coords.
+	// we can just use the default none SS functions.
+	// since the shader is what's important.
+
+	// Top
+	DrawLineColor(tl, col, tr, col);
+	// bottom
+	DrawLineColor(bl, col, br, col);
+	// left down
+	DrawLineColor(tl, col, bl, col);
+	// right down
+	DrawLineColor(tr, col, br, col);
+}
+
+void DX11XRender::DrawLineColorSS(const Vec2f& vPos1, const Color& color1,
+	const Vec2f& vPos2, const Color& color2)
+{
+	Vec3f pos1, pos2;
+
+	pos1.x = vPos1.x - 1;
+	pos1.y = 2.f - vPos1.y;
+
+	pos2.x = vPos2.x - 1;
+	pos2.y = 2.f - vPos2.y;
+
+	DrawLineColor(pos1, color1, pos2, color2);
+}
+
+
 void DX11XRender::DrawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2,
-const Vec3f& pos3, const Color& col)
+	const Vec3f& pos3, const Color& col)
 {
 
 	uint32 nOffs;
@@ -36,17 +207,21 @@ const Vec3f& pos3, const Color& col)
 }
 
 
-void DX11XRender::Draw2dImage(float xpos, float ypos,
+void DX11XRender::DrawQuadImage(float xpos, float ypos,
 	float w, float h, texture::TexID texture_id, ColorT<float>& col)
 {
-	DrawImage(xpos, ypos, 0.f, w, h, texture_id,
-		0, 1, 1, 0, col
-		);
+	DrawImage(xpos, ypos, 0.f, w, h, texture_id, 0, 1, 1, 0, col);
+}
+
+void DX11XRender::DrawQuadImage(float xpos, float ypos,
+	float w, float h, texture::ITexture* pTexutre, ColorT<float>& col)
+{
+	DrawImage(xpos, ypos, 0.f, w, h, pTexutre->getTexID(), 0, 1, 1, 0, col);
 }
 
 
 void DX11XRender::DrawImage(float xpos, float ypos, float z, float w, float h,
-	int texture_id, float s0, float t0, float s1, float t1, const Colorf& col, bool filtered)
+	texture::TexID texture_id, float s0, float t0, float s1, float t1, const Colorf& col, bool filtered)
 {
 	float s[4], t[4];
 
@@ -60,7 +235,7 @@ void DX11XRender::DrawImage(float xpos, float ypos, float z, float w, float h,
 
 
 void DX11XRender::DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
-	int texture_id, float *s, float *t, const Colorf& col, bool filtered)
+	texture::TexID texture_id, const float* s, const float* t, const Colorf& col, bool filtered)
 {
 	X_ASSERT_NOT_NULL(s);
 	X_ASSERT_NOT_NULL(t);
@@ -70,7 +245,7 @@ void DX11XRender::DrawImageWithUV(float xpos, float ypos, float z, float w, floa
 
 
 void DX11XRender::RT_DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
-	int texture_id, float* s, float* t, const Colorf& col, bool filtered)
+	texture::TexID texture_id, const float* s, const float* t, const Colorf& col, bool filtered)
 {
 	using namespace shader;
 
@@ -113,20 +288,6 @@ void DX11XRender::RT_DrawImageWithUV(float xpos, float ypos, float z, float w, f
 	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
 
 
-	/*
-	XTexState state;
-	state.setFilterMode(FilterMode::POINT);
-	state.setClampMode(TextureAddressMode::MIRROR,
-	TextureAddressMode::MIRROR, TextureAddressMode::MIRROR);
-
-	// bind the texture.
-	texture::XTexture::applyFromId(
-	0,
-	texture_id,
-	texture::XTexture::getTexStateId(state)
-	);
-	*/
-
 	// Bind our vertex as the first data stream of our device
 	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
 
@@ -137,35 +298,6 @@ void DX11XRender::RT_DrawImageWithUV(float xpos, float ypos, float z, float w, f
 	FX_DrawPrimitive(PrimitiveType::TriangleStrip, nOffs, 4);
 }
 
-
-void DX11XRender::DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
-	PrimitiveTypePublic::Enum type)
-{
-	X_PROFILE_BEGIN("drawVB", core::ProfileSubSys::RENDER);
-
-	X_ASSERT_NOT_NULL(pVertBuffer);
-
-	if (size == 0)
-		return;
-
-	uint32 nOffs;
-	Vertex_P3F_T2F_C4B* pVertBuf;
-
-	pVertBuf = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(size, nOffs);
-
-	// copy data into gpu buffer.
-	memcpy(pVertBuf, pVertBuffer, size * sizeof(Vertex_P3F_T2F_C4B));
-
-	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
-	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
-
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
-		return;
-
-
-	// Render the two triangles from the data stream
-	FX_DrawPrimitive(PrimitiveTypeToInternal(type), nOffs, size);
-}
 
 void DX11XRender::DrawQuad(float x, float y, float width, float height, const Color& col)
 {
@@ -301,21 +433,26 @@ void DX11XRender::DrawLineColor(const Vec3f& pos1, const Color& color1,
 	FX_DrawPrimitive(PrimitiveType::LineList, nOffs, 2);
 }
 
-void DX11XRender::DrawRect(float x, float y, float width, float height, Color col)
+void DX11XRender::DrawRect(float x, float y, float width, float height, const Color& col)
 {
 	float x1 = x;
 	float y1 = y;
 	float x2 = x + width;
 	float y2 = y + height;
 
+	const Vec3f tl(x1, y1, 0);
+	const Vec3f tr(x2, y1, 0);
+	const Vec3f bl(x1, y2, 0);
+	const Vec3f br(x2, y2, 0);
+
 	// Top
-	DrawLineColor(Vec3f(x1, y1, 0), col, Vec3f(x2, y1, 0), col);
+	DrawLineColor(tl, col, tr, col);
 	// bottom
-	DrawLineColor(Vec3f(x1, y2, 0), col, Vec3f(x2, y2, 0), col);
+	DrawLineColor(bl, col, br, col);
 	// left down
-	DrawLineColor(Vec3f(x1, y1, 0), col, Vec3f(x1, y2, 0), col);
+	DrawLineColor(tl, col, bl, col);
 	// right down
-	DrawLineColor(Vec3f(x2, y1, 0), col, Vec3f(x2, y2, 0), col);
+	DrawLineColor(tr, col, br, col);
 }
 
 void DX11XRender::DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
@@ -397,6 +534,36 @@ void DX11XRender::DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 
 	// Render the two triangles from the data stream
 	FX_DrawPrimitive(PrimitiveType::TriangleList, nOffs, 6 * num);
+}
+
+
+void DX11XRender::DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
+	PrimitiveTypePublic::Enum type)
+{
+	X_PROFILE_BEGIN("drawVB", core::ProfileSubSys::RENDER);
+
+	X_ASSERT_NOT_NULL(pVertBuffer);
+
+	if (size == 0)
+		return;
+
+	uint32 nOffs;
+	Vertex_P3F_T2F_C4B* pVertBuf;
+
+	pVertBuf = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(size, nOffs);
+
+	// copy data into gpu buffer.
+	memcpy(pVertBuf, pVertBuffer, size * sizeof(Vertex_P3F_T2F_C4B));
+
+	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
+	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+
+	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+		return;
+
+
+	// Render the two triangles from the data stream
+	FX_DrawPrimitive(PrimitiveTypeToInternal(type), nOffs, size);
 }
 
 

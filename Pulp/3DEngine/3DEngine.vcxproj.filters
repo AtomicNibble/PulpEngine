@@ -18,6 +18,9 @@
     <ClCompile Include="Bsp.cpp">
       <Filter>Level</Filter>
     </ClCompile>
+    <ClCompile Include="Gui\XWindow.cpp">
+      <Filter>Gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -40,6 +43,9 @@
     <ClInclude Include="Bsp.h">
       <Filter>Level</Filter>
     </ClInclude>
+    <ClInclude Include="Gui\XWindow.h">
+      <Filter>Gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Material">
@@ -54,8 +60,14 @@
     <Filter Include="Level">
       <UniqueIdentifier>{689f5c3d-f3d7-46f5-94d9-b78b112d39fb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Gui">
+      <UniqueIdentifier>{088ce574-42cf-4f73-b7e5-f88a3c8ac886}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="bsp.cd" />
+    <None Include="Gui\XWindow.inl">
+      <Filter>Gui</Filter>
+    </None>
   </ItemGroup>
 </Project>

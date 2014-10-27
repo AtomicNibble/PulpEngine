@@ -28,9 +28,6 @@ X_NAMESPACE_BEGIN(render)
 
 struct IRenderAux;
 
-//#define GS_WIREFRAME               0x00010000
-//#define GS_POINTRENDERING          0x00020000
-//#define GS_NODEPTHTEST             0x00040000
 
 struct CullMode
 {
@@ -303,6 +300,8 @@ struct IRender
 	virtual float getHeightf(void) const X_ABSTRACT;
 	// ~ViewPort
 
+	// scales from 800x600 range to what ever res.
+	// 400(x) on 1650x1050 becomes 825
 	virtual float ScaleCoordX(float value) const X_ABSTRACT;
 	virtual float ScaleCoordY(float value) const X_ABSTRACT;
 	virtual void ScaleCoord(float& x, float& y) const X_ABSTRACT;
@@ -319,20 +318,31 @@ struct IRender
 	// Textures 
 	virtual texture::ITexture* LoadTexture(const char* path, texture::TextureFlags flags) X_ABSTRACT;
 
-	virtual void Draw2dImage(float xpos, float ypos, 
-		float w, float h, texture::TexID texture_id, ColorT<float>& col) X_ABSTRACT;
-
 	virtual void ReleaseTexture(texture::TexID id) X_ABSTRACT;
 
 	virtual bool SetTexture(int texId) X_ABSTRACT;
 	// ~Textures
 
-	// Drawing
+	// Drawing util
+
+	// Screen Space Draw: range 0-2 width / h is also scrrenspace size not pixels
+	virtual void DrawQuadSS(float x, float y, float width, float height, const Color& col) X_ABSTRACT;
+	virtual void DrawQuadSS(float x, float y, float width, float height, const Color& col, const Color& borderCol) X_ABSTRACT;
+	virtual void DrawQuadImageSS(float x, float y, float width, float height, texture::TexID texture_id, ColorT<float>& col) X_ABSTRACT;
+	virtual void DrawRectSS(float x, float y, float width, float height, const Color& col) X_ABSTRACT;
+	virtual void DrawLineColorSS(const Vec2f& vPos1, const Color& color1,
+		const Vec2f& vPos2, const Color& vColor2) X_ABSTRACT;
+
+	virtual void DrawQuadImage(float x, float y, float width, float height, texture::TexID texture_id, ColorT<float>& col) X_ABSTRACT;
+	virtual void DrawQuadImage(float x, float y, float width, float height, texture::ITexture* pTexutre, ColorT<float>& col) X_ABSTRACT;
+
+	// for 2d, z is depth not position
 	virtual void DrawQuad(float x, float y, float z, float width, float height, const Color& col) X_ABSTRACT;
 	virtual void DrawQuad(float x, float y, float z, float width, float height, const Color& col, const Color& borderCol) X_ABSTRACT;
 	virtual void DrawQuad(float x, float y, float width, float height, const Color& col) X_ABSTRACT;
 	virtual void DrawQuad(float x, float y, float width, float height, const Color& col, const Color& borderCol) X_ABSTRACT;
 	virtual void DrawQuad(Vec2<float> pos, float width, float height, const Color& col) X_ABSTRACT;
+	// draw a quad in 3d z is position not depth.
 	virtual void DrawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, const Color& col) X_ABSTRACT;
 
 	virtual void DrawLines(Vec3f* points, uint32_t num, const Color& col) X_ABSTRACT;
@@ -340,7 +350,7 @@ struct IRender
 	virtual void DrawLineColor(const Vec3f& vPos1, const Color& color1,
 		const Vec3f& vPos2, const Color& vColor2) X_ABSTRACT;
 
-	virtual void DrawRect(float x, float y, float width, float height, Color col) X_ABSTRACT;
+	virtual void DrawRect(float x, float y, float width, float height, const Color& col) X_ABSTRACT;
 	
 	virtual void DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 		float padding, uint32_t max) X_ABSTRACT;
@@ -350,7 +360,6 @@ struct IRender
 
 	virtual void DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
 		const core::MemoryAllocatorStatistics& allocStats, const char* title) X_ABSTRACT;
-
 
 	virtual void FlushTextBuffer(void) X_ABSTRACT;
 	// ~Drawing

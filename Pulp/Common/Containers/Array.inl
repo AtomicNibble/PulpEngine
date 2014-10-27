@@ -327,7 +327,7 @@ bool Array<T>::removeIndex(size_type idx)
 }
 
 template<typename T>
-typename Array<T>::size_type Array<T>::find(const Type& val)
+typename Array<T>::size_type Array<T>::find(const Type& val) const
 {
 	size_type i;
 	size_type num = num_;

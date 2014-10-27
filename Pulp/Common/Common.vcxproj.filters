@@ -907,6 +907,9 @@
     <ClInclude Include="IGame.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
+    <ClInclude Include="IGui.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
