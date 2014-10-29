@@ -21,7 +21,6 @@ float4 VisualizeNormalsPS(PS_DeferredPass_Input input) : SV_Target0
 float4 VisualizeDepthPS(PS_DeferredPass_Input input) : SV_Target0
 {
 	return float4(depthTexture.Sample(depthTextureSampler, input.texCoord).rrr, 1);	
-	
 }
 
 

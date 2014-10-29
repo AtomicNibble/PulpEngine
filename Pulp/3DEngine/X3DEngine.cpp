@@ -93,8 +93,8 @@ void X3DEngine::OnFrameBegin(void)
 
 	pRender_->SetTexture(pTex1->getTexID());
 
-	if (pMesh)
-		pMesh->render();
+//	if (pMesh)
+//		pMesh->render();
 
 	pRender_->SetTexture(pTex->getTexID());
 

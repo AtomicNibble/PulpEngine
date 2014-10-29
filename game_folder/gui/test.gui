@@ -1,0 +1,79 @@
+/*
+#define WINDOW_STYLE_EMPTY				0	// no background
+#define WINDOW_STYLE_FILLED 				1	// filled with background color
+#define WINDOW_STYLE_GRADIENT			2	// gradient bar based on background color
+#define WINDOW_STYLE_SHADER 				3	// shader based on background color
+#define WINDOW_STYLE_TEAMCOLOR			4	// team color
+#define WINDOW_STYLE_DVAR_SHADER			5	// draws the shader specified by the dvar
+#define WINDOW_STYLE_LOADBAR 				6	// shader based on background color
+
+#define WINDOW_BORDER_NONE				0		// no border
+#define WINDOW_BORDER_FULL				1		// full border based on border color ( single pixel )
+#define WINDOW_BORDER_HORZ				2		// horizontal borders only
+#define WINDOW_BORDER_VERT				3		// vertical borders only
+#define WINDOW_BORDER_KCGRADIENT			4		// horizontal border using the gradient bars
+#define WINDOW_BORDER_RAISED				5		// darken the bottom and right sides of the border
+#define WINDOW_BORDER_SUNKEN				6		// darken the top and left sides of the border
+
+#define ITEM_TEXTSTYLE_NORMAL				0	// normal text
+#define ITEM_TEXTSTYLE_BLINK				1	// fast blinking
+#define ITEM_TEXTSTYLE_SHADOWED 			3	// drop shadow ( need a color for this )
+#define ITEM_TEXTSTYLE_SHADOWEDMORE 		6	// drop shadow ( need a color for this )
+
+
+#define FONTSCALE_SMALL		0.3095
+#define FONTSCALE_NORMAL		0.3810
+#define FONTSCALE_BOLD		0.5476
+#define FONTSCALE_BIG		0.5476
+#define FONTSCALE_EXTRABIG	1
+
+
+
+*/
+
+
+
+windowDef
+{
+	name 	"test_menu"
+	rect 		10 10 256 256
+	backcolor  	1 0 0 1
+	forecolor  	1 0 0 1
+	style		WINDOW_STYLE_EMPTY
+
+	onOpen
+	{
+		
+	}
+	onClose
+	{
+		
+	}
+		
+	itemDef
+	{
+		name			this_name_is_not_quoted
+		rect        		35 50 285 200 
+		backcolor   	0.5 0.6 0.6 0.3
+		forecolor   		0.7 0.7 0.4 1
+		bordercolor 	0.5 0.6 0.6 1
+		bordersize  		1
+		text        		"This is some Text!"
+		textscale   		0.5
+		visible     		1
+	}
+
+	itemDef
+	{
+		name			"a text item"
+		rect        		35 50 285 200 
+		backcolor   	0.5 0.6 0.6 0.3
+		forecolor   		0.75 0 0.25 1
+		bordercolor 	0 0 0.9 1
+		bordersize  		1
+		text        		"more text"
+		textscale   		0.75
+		visible     		1
+	}
+
+}

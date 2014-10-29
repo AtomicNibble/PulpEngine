@@ -363,6 +363,10 @@
   <ItemGroup>
     <ClInclude Include="Bsp.h" />
     <ClInclude Include="EngineBase.h" />
+    <ClInclude Include="Gui\Gui.h" />
+    <ClInclude Include="Gui\GuiManger.h" />
+    <ClInclude Include="Gui\SimpleWindow.h" />
+    <ClInclude Include="Gui\WinVar.h" />
     <ClInclude Include="Gui\XWindow.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialManager.h" />
@@ -373,6 +377,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Bsp.cpp" />
+    <ClCompile Include="Gui\Gui.cpp" />
+    <ClCompile Include="Gui\GuiManger.cpp" />
+    <ClCompile Include="Gui\SimpleWindow.cpp" />
+    <ClCompile Include="Gui\WinVar.cpp" />
     <ClCompile Include="Gui\XWindow.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
@@ -394,6 +402,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="bsp.cd" />
+    <None Include="Gui\Gui.inl" />
+    <None Include="Gui\SimpleWindow.inl" />
     <None Include="Gui\XWindow.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

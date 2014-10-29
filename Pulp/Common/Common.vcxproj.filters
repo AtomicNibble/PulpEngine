@@ -1146,6 +1146,7 @@
     <None Include="Math\XWinding.inl">
       <Filter>Headers\Math</Filter>
     </None>
+    <None Include="ClassDiagram.cd" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">

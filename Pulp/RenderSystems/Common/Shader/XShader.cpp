@@ -87,6 +87,8 @@ namespace
 XShader* XShaderManager::m_DefaultShader = nullptr;
 XShader* XShaderManager::m_DebugShader = nullptr;
 XShader* XShaderManager::m_FixedFunction = nullptr;
+XShader* XShaderManager::m_Font = nullptr;
+XShader* XShaderManager::m_Gui = nullptr;
 XShader* XShaderManager::m_DefferedShader = nullptr;
 XShader* XShaderManager::m_DefferedShaderVis = nullptr;
 
@@ -426,8 +428,10 @@ XShader* XShaderManager::reloadShader(const char* name)
 bool XShaderManager::loadCoreShaders(void)
 {
 	m_DefaultShader = createShader("default");
-	m_DebugShader = forName("gui");
+//	m_DebugShader = forName("gui");
 	m_FixedFunction = forName("ffe");
+	m_Font = forName("font");
+	m_Gui = forName("gui");
 	m_DefferedShader = forName("deffered");
 	m_DefferedShaderVis = forName("defferedVis");
 
@@ -440,10 +444,14 @@ bool XShaderManager::freeCoreShaders(void)
 {
 	if (m_DefaultShader)
 		m_DefaultShader->release();
-	if (m_DebugShader)
-		m_DebugShader->release();
+//	if (m_DebugShader)
+//		m_DebugShader->release();
 	if (m_FixedFunction)
 		m_FixedFunction->release();
+	if (m_Font)
+		m_Font->release();
+	if (m_Gui)
+		m_Gui->release();
 	if (m_DefferedShader)
 		m_DefferedShader->release();
 	if (m_DefferedShaderVis)

@@ -480,8 +480,9 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 	flags |= D3DCOMPILE_OPTIMIZATION_LEVEL0 | D3DCOMPILE_DEBUG;
 #endif // !X_DEBUG
 
-	D3D_SHADER_MACRO Shader_Macros[2] = { 
-		{ "PARAM_VS_Normal", "1" }, 
+	D3D_SHADER_MACRO Shader_Macros[] = { 
+		{ "PARAM_VS_Normal", "1" },
+		{ "PARAM_VS_Color", "1" },
 		{ NULL, NULL } 
 	};
 

@@ -255,7 +255,7 @@ void DX11XRender::RT_DrawImageWithUV(float xpos, float ypos, float z, float w, f
 	float fh = h;
 
 	//	SetCullMode(CullMode::NONE);
-	//	SetFFE(true);
+	// SetFFE(true);
 
 	// Lock the entire buffer and obtain a pointer to the location where we have to
 	uint32 nOffs;

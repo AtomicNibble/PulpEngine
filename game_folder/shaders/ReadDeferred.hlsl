@@ -4,8 +4,8 @@
 struct VS_DeferredPass_Input
 {
     float3 osPosition       : POSITION;
-    float4 color              : COLOR0;  
     float2 texCoord         : TEXCOORD0;
+    float4 color              : COLOR0;  
 };
 
 struct VS_DeferredPass_Output

@@ -21,6 +21,18 @@
     <ClCompile Include="Gui\XWindow.cpp">
       <Filter>Gui</Filter>
     </ClCompile>
+    <ClCompile Include="Gui\SimpleWindow.cpp">
+      <Filter>Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\GuiManger.cpp">
+      <Filter>Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Gui.cpp">
+      <Filter>Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\WinVar.cpp">
+      <Filter>Gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -46,6 +58,18 @@
     <ClInclude Include="Gui\XWindow.h">
       <Filter>Gui</Filter>
     </ClInclude>
+    <ClInclude Include="Gui\SimpleWindow.h">
+      <Filter>Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui\GuiManger.h">
+      <Filter>Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui\Gui.h">
+      <Filter>Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui\WinVar.h">
+      <Filter>Gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Material">
@@ -67,6 +91,12 @@
   <ItemGroup>
     <None Include="bsp.cd" />
     <None Include="Gui\XWindow.inl">
+      <Filter>Gui</Filter>
+    </None>
+    <None Include="Gui\SimpleWindow.inl">
+      <Filter>Gui</Filter>
+    </None>
+    <None Include="Gui\Gui.inl">
       <Filter>Gui</Filter>
     </None>
   </ItemGroup>

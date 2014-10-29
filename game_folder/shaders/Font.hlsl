@@ -1,13 +1,7 @@
-//--------------------------------------------------------------
-//  Version: 1.0
-//  MadeBy: WinCat
-//  Site: tom-crowley.co.uk
-//
-//  Info: fixed Function, used for drawing genral quads, used for debug drawing.
-//--------------------------------------------------------------
 
 #include "Vertexbase.inc"
 
+// All fonts are drawn with P3F_T2F_C4B
 struct VS_INPUT
 {
     float3 osPosition           	: POSITION;
@@ -48,20 +42,11 @@ VS_OUTPUT BasicVS(VS_INPUT input)
     return output;
 }
 
-PS_OUTPUT SolidPS(PS_INPUT input)
+
+PS_OUTPUT FontPS(PS_INPUT input)
 {
     PS_OUTPUT output;
     output.color = input.color;
+    output.color.a *= baseMap.Sample(baseMapSampler, input.texCoord).a;
     return output;
 }
-
-PS_OUTPUT TexturePS(PS_INPUT input)
-{
-    PS_OUTPUT output;
-    float4 textureCol = baseMap.Sample(baseMapSampler, input.texCoord);
-    output.color = input.color * textureCol;
-    return output;
-}
-
-
-

@@ -3,21 +3,24 @@
 #ifndef X_GUI_WINDOW_H_
 #define X_GUI_WINDOW_H_
 
-X_NAMESPACE_BEGIN(engine)
+#include <String\Lexer.h>
 
+X_NAMESPACE_BEGIN(gui)
 
-X_DECLARE_FLAGS(WindowFlag)
-(
-CAPTION,
-CHILD,
-BORDER,
-SIZABLE,
-MOVEABLE,
-FOCUS,
-SELECTED,
-NOCURSOR,
-ACTIVE
+class XWindowSimple;
+
+X_DECLARE_FLAGS(WindowFlag) (
+	CAPTION,
+	CHILD,
+	BORDER,
+	SIZABLE,
+	MOVEABLE,
+	FOCUS,
+	SELECTED,
+	NOCURSOR,
+	ACTIVE
 );
+
 
 
 static const uint32_t GUI_CAPTION_HEIGHT = 16;
@@ -32,6 +35,18 @@ class XWindow
 {
 public:
 	typedef Flags<WindowFlag> WindowFlags;
+
+	X_DECLARE_ENUM(Event) (
+		MOUSE_ENTER,
+		MOUSE_LEAVE,
+		ESC,
+		ENTER
+	);
+
+	static const char* ScriptNames[Event::ENUM_COUNT];
+
+	static const char* RegisterVars[];
+	static const int   NumRegisterVars;
 
 public:
 	XWindow();
@@ -63,6 +78,7 @@ public:
 
 
 	// Overrides
+	virtual bool Parse(core::XLexer& lex);
 	virtual void draw(int time, float x, float y);
 	virtual void activate(bool activate);
 	virtual void gainFocus(void);

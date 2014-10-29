@@ -334,6 +334,8 @@ public:
 	static XShader* m_DefaultShader;
 	static XShader* m_DebugShader;
 	static XShader* m_FixedFunction;
+	static XShader* m_Font;
+	static XShader* m_Gui;
 	static XShader* m_DefferedShader;
 	static XShader* m_DefferedShaderVis;
 	

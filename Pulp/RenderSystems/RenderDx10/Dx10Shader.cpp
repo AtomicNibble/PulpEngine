@@ -40,6 +40,7 @@ bool XShader::FXSetTechnique(const core::StrHash& name)
 		}
 	}
 
+	X_BREAKPOINT;
 	X_WARNING("Shader", "failed to find technique: %i", name);
 	return false;
 }
@@ -273,7 +274,7 @@ bool DX11XRender::SetFontShader()
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_FixedFunction;
+	XShader* pSh = XShaderManager::m_Font;
 	uint32_t pass;
 
 	if (!pSh)

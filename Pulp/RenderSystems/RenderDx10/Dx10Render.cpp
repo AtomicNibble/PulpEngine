@@ -600,6 +600,7 @@ bool DX11XRender::DefferedEnd()
 	using namespace shader;
 	using namespace texture;
 
+	// the shader
 	XShader* pSh = XShaderManager::m_DefferedShaderVis;
 	uint32_t pass;
 
@@ -613,7 +614,7 @@ bool DX11XRender::DefferedEnd()
 
 	m_deviceContext->OMSetRenderTargets(3, pViewsReset, m_depthStencilView);
 
-//	Set2D(true);
+
 	SetCullMode(CullMode::NONE);
 
 	float height = this->getHeightf() - 10;
@@ -945,6 +946,7 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 		// for now all positions are just 32bit floats baby!
 		elem_pos.AlignedByteOffset = 0;
 		elem_pos.SemanticIndex = 0;
+		elem_uv3232.SemanticIndex = 0;
 		layout.append(elem_pos);
 
 		if (i == VertexFormat::P3F_T2S || i == VertexFormat::P3F_T2S_C4B ||
@@ -977,10 +979,10 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 
 		if (i == VertexFormat::P3F_T2F_C4B)
 		{
-			elem_uv3232.AlignedByteOffset = 16;
+			elem_uv3232.AlignedByteOffset = 12;
 			layout.append(elem_uv3232);
 
-			elem_col8888.AlignedByteOffset = 12;
+			elem_col8888.AlignedByteOffset = 20;
 			layout.append(elem_col8888);
 
 		}
@@ -1100,7 +1102,23 @@ HRESULT DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFm
 				&m_State.vertexLayoutCache[vertexFmt]))
 			)
 		{
+			const char* pShaderName = shader::XHWShader_Dx10::pCurVS_->getName();
 			X_ERROR("Render", "Failed to CreateInputLayout: %i", hr);
+			X_ERROR("Render", "CurrentShader: %s", pShaderName);
+			X_ERROR("Render", "Layout:");
+			X_LOG_BULLET;
+			RenderState::XVertexLayout::ConstIterator it;
+			for ( it = layout.begin(); it != layout.end(); ++it)
+			{
+				X_LOG0("Layout", "\"%s(%i)\" ByteOffset: %i Slot: %i", 
+					it->SemanticName, it->SemanticIndex,
+					it->AlignedByteOffset, it->InputSlot );
+			}
+
+			// sleep in debug mode
+#if X_DEBUG
+			GoatSleep(500);
+#endif // !X_DEBUG
 			return hr;
 		}
 

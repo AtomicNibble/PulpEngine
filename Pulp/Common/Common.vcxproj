@@ -295,6 +295,7 @@
   <ItemGroup>
     <None Include="Casts\safe_static_cast.inl" />
     <None Include="Casts\union_cast.inl" />
+    <None Include="ClassDiagram.cd" />
     <None Include="Containers\BitStream.inl" />
     <None Include="Containers\ByteStream.inl" />
     <None Include="Containers\ByteStreamFifo.inl" />

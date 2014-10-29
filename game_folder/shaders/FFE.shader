@@ -36,46 +36,5 @@ shader
 			depth_test         always
 			depth_write        false
 		}	
-		{
-			name 		"Font"
-			vertex_shader   	"BasicVS"
-			pixel_shader    	"FontPS"		
-			src_blend_color  	src_alpha
-			src_blend_alpha  	src_alpha
-			dst_blend_color  	inv_src_alpha
-			dst_blend_alpha  	inv_src_alpha
-			cull_mode           back
-			depth_test         always
-			depth_write        false
-		}
-		
-		{
-			name 		"SolidTestWorld"
-			vertex_shader   	"BasicVSTest"
-			pixel_shader    	"SolidWorldPS"	
-			src_blend_color  	src_alpha
-			src_blend_alpha  	src_alpha
-			dst_blend_color  	inv_src_alpha
-			dst_blend_alpha  	inv_src_alpha
-			cull_mode           back
-			depth_test         less
-			depth_write        true
-			wireframe		false
-		}	
-		
-		{
-			name 		"Skybox"
-			vertex_shader   	"SkyboxVS"
-			pixel_shader    	"TexturePS"	
-			src_blend_color  	src_alpha
-			src_blend_alpha  	src_alpha
-			dst_blend_color  	inv_src_alpha
-			dst_blend_alpha  	inv_src_alpha
-			cull_mode           none
-			depth_test         less_equal
-			depth_write        true
-			wireframe		false
-		}	
-
 	}
 }

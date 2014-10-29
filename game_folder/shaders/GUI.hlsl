@@ -39,9 +39,9 @@ Texture2D  	baseMap : register(t0);
 SamplerState  	baseMapSampler;
 
 
-void MaterialShader( float2 texCoord, float4 color, inout Material material)
+void SampleTexture( float2 texCoord, float4 color, inout float4 resultColor)
 {
-	material.resultColor = baseMap.Sample(baseMapSampler, texCoord) * color;
+	resultColor = baseMap.Sample(baseMapSampler, texCoord) * color;
 }
 
 
@@ -50,40 +50,42 @@ VS_OUTPUT guiVS(VS_INPUT input)
 {
     VS_OUTPUT output;
     
-    output.position   	= mul(input.position, worldToScreenMatrix);
-    output.color       	= input.color * time;
+    // screen space input.
+    output.position   	= input.position; // mul(input.position, worldToScreenMatrix);
+    output.color       	= input.color;
     output.texCoord     	= input.texCoord;
 
     return output;
 }
 
+
 // =========== Pixel Shader ===========
 float4 guiPS(PS_INPUT input) : SV_TARGET
 {
-    Material material;
+    float4	resultColor;
     
 #if X_TEXTURED
-    MaterialShader(input.texCoord, input.color, material);
+    SampleTexture(input.texCoord, input.color, resultColor);
 #else
-   material.resultColor =  input.color;
+   resultColor =  input.color;
 #endif
 
-    return material.resultColor;
+    return resultColor;
 }
 
 
 float4 AlphaTestPS(PS_INPUT input) : SV_TARGET
 {
-    Material material;
+    float4 resultColor;
     
 #if X_TEXTURED
-    MaterialShader(input.texCoord, input.color, material);
+    SampleTexture(input.texCoord, input.color, resultColor);
 #else
-   material.resultColor =  input.color;
+   resultColor =  input.color;
 #endif
  
-    clip(material.resultColor.a - 0.5);
-    return material.resultColor;
+    clip(resultColor.a - 0.5);
+    return resultColor;
 }
 
 
