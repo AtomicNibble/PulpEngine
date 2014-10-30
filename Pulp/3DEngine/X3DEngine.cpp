@@ -9,6 +9,8 @@
 
 #include <IConsole.h>
 
+#include <IGui.h>
+
 #include "ModelLoader.h"
 #include "MaterialManager.h"
 
@@ -61,6 +63,7 @@ bool X3DEngine::Init()
 
 		pTexSky = pRender_->LoadTexture("textures/skybox_sky.dds",
 			texture::TextureFlags::DONT_STREAM);
+
 
 
 	LoadModel();

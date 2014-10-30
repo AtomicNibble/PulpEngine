@@ -52,6 +52,77 @@ static const char*  GUI_BINARY_FILE_EXTENSION = ".guib";
 static const uint32_t GUI_MAX_MENUS = 64;
 static const uint32_t GUI_MENU_MAX_ITEMS = 512; // max per a menu
 
+static const uint32_t GUI_CAPTION_HEIGHT = 16;
+static const uint32_t GUI_SCROLLER_SIZE = 16;
+static const uint32_t GUI_SCROLLBAR_SIZE = 16;
+
+static const uint32_t GUI_MAX_WINDOW_NAME_LEN = 28; // error on longer, instead of just clipping.
+static const uint32_t GUI_MAX_LIST_ITEMS = 1024;
+
+
+X_DECLARE_FLAGS(WindowFlag) (
+	CAPTION,	
+	CHILD,
+	BORDER,			// has a border, cyptic var name i know. (insert camel ascii here)
+	SIZABLE,
+	MOVEABLE,
+	FOCUS,
+	SELECTED,
+	NOCURSOR,
+	ACTIVE,
+	MODAL,			// eats events, instead of passing to children.
+	FULLSCREEN,
+	NO_CLIP,
+	NO_CURSOR
+);
+
+
+// adds some type saftey.
+// int values must be cast.
+struct TextAlign
+{
+	// 2|2
+	enum Enum : unsigned char
+	{
+		LEFT = 0x0,
+		CENTER = 0x1,
+		RIGHT = 0x2,
+
+		// bits 2&3
+		TOP = 0x4,
+		MIDDLE = 0x8,
+		BOTTOM = 0xc,
+
+		// masks
+		HOZ_MASK = 0x2,
+		VERT_MASK = 0x0c,
+	};
+
+	struct Bits
+	{
+		uint32_t BIT_hozalign : 2;
+		uint32_t BIT_vertAlign : 2;
+	};
+
+	// defaults to left align sinxe left is 0x0.
+	static const Enum TOP_LEFT = (Enum)(TOP | LEFT);
+	static const Enum TOP_CENTER = (Enum)(TOP | CENTER);
+	static const Enum TOP_RIGHT = (Enum)(TOP | RIGHT);
+
+	static const Enum MIDDLE_LEFT = (Enum)(MIDDLE | LEFT);
+	static const Enum MIDDLE_CENTER = (Enum)(MIDDLE | CENTER);
+	static const Enum MIDDLE_RIGHT = (Enum)(MIDDLE | RIGHT);
+
+	static const Enum BOTTOM_LEFT = (Enum)(BOTTOM | RIGHT);
+	static const Enum BOTTOM_CENTER = (Enum)(BOTTOM | RIGHT);
+	static const Enum BOTTOM_RIGHT = (Enum)(BOTTOM | RIGHT);
+
+	// max the value can be.
+	static const uint32_t MAX_VALUE = BOTTOM_RIGHT;
+};
+
+
+
 struct IGui
 {
 	virtual ~IGui() {};

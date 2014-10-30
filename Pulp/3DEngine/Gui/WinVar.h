@@ -47,10 +47,10 @@ protected:
 
 
 
-class idWinBool : public XWinVar {
+class XWinBool : public XWinVar {
 public:
-	idWinBool() : XWinVar() {};
-	~idWinBool()X_OVERRIDE{};
+	XWinBool() : XWinVar() {};
+	~XWinBool()X_OVERRIDE{};
 
 	virtual void Init(const char *_name, XWindow *win) X_OVERRIDE {
 		XWinVar::Init(_name, win);
@@ -68,7 +68,7 @@ public:
 		return temp.c_str();
 	}
 
-	idWinBool& operator=(const idWinBool& oth) {
+	XWinBool& operator=(const XWinBool& oth) {
 		XWinVar::operator=(oth);
 		value = oth.value;
 		return *this;
@@ -478,11 +478,11 @@ protected:
 	Rectf value;
 };
 
-class XWincolor : public XWinVar
+class XWinColor : public XWinVar
 {
 public:
-	XWincolor() : XWinVar() {};
-	~XWincolor() X_OVERRIDE{};
+	XWinColor() : XWinVar() {};
+	~XWinColor() X_OVERRIDE{};
 
 	virtual void Init(const char* _name, XWindow* win) X_OVERRIDE{
 		XWinVar::Init(_name, win);
@@ -505,7 +505,7 @@ public:
 	}
 
 
-	XWincolor& operator=(const XWincolor& oth) {
+	XWinColor& operator=(const XWinColor& oth) {
 		XWinVar::operator=(oth);
 		value = oth.value;
 		return *this;

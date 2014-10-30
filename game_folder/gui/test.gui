@@ -28,6 +28,16 @@
 #define FONTSCALE_EXTRABIG	1
 
 
+#define ITEM_ALIGN_LEFT 			0		// aligns left of text to left of containing rectangle
+#define ITEM_ALIGN_CENTER			1		// aligns center of text to center of containing rectangle
+#define ITEM_ALIGN_RIGHT			2		// aligns right of text to right of containing rectangle
+#define ITEM_ALIGN_X_MASK			3
+
+#define ITEM_ALIGN_LEGACY 			0		// aligns bottom of text to top of containing rectangle
+#define ITEM_ALIGN_TOP	 			4		// aligns top of text to top of containing rectangle
+#define ITEM_ALIGN_MIDDLE			8		// aligns middle of text to middle of containing rectangle
+#define ITEM_ALIGN_BOTTOM			12		// aligns bottom of text to bottom of containing rectangle
+#define ITEM_ALIGN_Y_MASK			12
 
 */
 

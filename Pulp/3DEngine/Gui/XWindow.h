@@ -3,47 +3,43 @@
 #ifndef X_GUI_WINDOW_H_
 #define X_GUI_WINDOW_H_
 
+#include <IGui.h>
+
 #include <String\Lexer.h>
+
+#include "WinVar.h"
 
 X_NAMESPACE_BEGIN(gui)
 
-class XWindowSimple;
-
-X_DECLARE_FLAGS(WindowFlag) (
-	CAPTION,
-	CHILD,
-	BORDER,
-	SIZABLE,
-	MOVEABLE,
-	FOCUS,
-	SELECTED,
-	NOCURSOR,
-	ACTIVE
+X_DECLARE_ENUM(RegisterType)
+(
+	BOOL,
+	INT,
+	FLOAT,
+	VEC2,
+	VEC3,
+	VEC4,
+	Color,
+	Rect,
+	STRING
 );
 
+// enum REGTYPE { VEC4 = 0, FLOAT, BOOL, INT, STRING, VEC2, VEC3, RECTANGLE, NUMTYPES };
 
-
-static const uint32_t GUI_CAPTION_HEIGHT = 16;
-static const uint32_t GUI_SCROLLER_SIZE = 16;
-static const uint32_t GUI_SCROLLBAR_SIZE = 16;
-
-static const uint32_t GUI_MAX_WINDOW_NAME = 28;
-static const uint32_t GUI_MAX_LIST_ITEMS = 1024;
-
-
+class XWindowSimple;
 class XWindow
 {
 public:
 	typedef Flags<WindowFlag> WindowFlags;
 
-	X_DECLARE_ENUM(Event) (
+	X_DECLARE_ENUM(ScriptFunction) (
 		MOUSE_ENTER,
 		MOUSE_LEAVE,
 		ESC,
 		ENTER
 	);
 
-	static const char* ScriptNames[Event::ENUM_COUNT];
+	static const char* ScriptNames[ScriptFunction::ENUM_COUNT];
 
 	static const char* RegisterVars[];
 	static const int   NumRegisterVars;
@@ -90,17 +86,43 @@ public:
 	virtual void mouseExit(void);
 	virtual void mouseEnter(void);
 
+private:
+	bool ParseString(core::XLexer& lex, core::string& out);
+	bool ParseVar(const core::XLexToken& token, core::XLexer& lex);
+	bool ParseRegEntry(const core::XLexToken& token, core::XLexer& lex);
+	bool ParseScriptFunction(const core::XLexToken& token, core::XLexer& lex);
+	bool ParseScript(core::XLexer& lex);
+
+	XWinVar* GetWinVarByName(const char* name);
 
 protected:
-	Rectf rect_;
+	Rectf rectDraw_;
 	Rectf rectClient_;
 
-	Color	backColor_;
-	Color	foreColor_;
-	Color	hoverColor_;
-	Color	borderColor_;
+	// Registers: shit that can be changed by code.
+	XWinRect	rect_;
+	XWinColor	backColor_;
+	XWinColor	foreColor_;
+	XWinColor	hoverColor_;
+	XWinColor	borderColor_;
+	XWinBool	visable_;
+	XWinBool	hideCursor_;
+	XWinFloat	textScale_;
+	XWinStr		text_;
+	// ~
 
+	// variables, can only be set by the gui file.
+	// can't change at runtime.
+	float borderSize_;
+	float textAlignX_;				// x offset from aligned position
+	float textAlignY_;				// y offset from aligned position.
+	TextAlign::Enum textAlign_;		// alignment type flags, LEFT, MIDDLE, BOTTOM, etc..
+	bool shadowText_;				// 'shadow'
+	bool __pad[2];
 	WindowFlags flags_;
+	core::StackString<GUI_MAX_WINDOW_NAME_LEN> name_;
+	// ~
+
 	uint32_t childId_; // if this is a child, this is it's id.
 
 	XWindow* pParent_;
@@ -109,16 +131,11 @@ protected:
 	XWindow* pOverChild_;		// if a child window has mouse capture
 
 	font::IFFont* pFont_;
-	core::string text_;
-
 
 	core::Array<XWindow*> children_;
-	core::StackString<GUI_MAX_WINDOW_NAME> name_;
 
-	bool	visible_;
-	bool	hideCursor_;
 	bool	hover_;
-	bool    __pad[1];
+	bool    ___pad[3];
 };
 
 #include "XWindow.inl"
