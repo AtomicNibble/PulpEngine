@@ -9,7 +9,8 @@ X_NAMESPACE_BEGIN(gui)
 
 class XWindow;
 
-// this is basically a menu.
+// This is a interface container.
+// it has a baser menu which may have multiple childs menus.
 class XGui : public IGui
 {
 public:

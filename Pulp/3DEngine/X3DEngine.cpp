@@ -50,6 +50,9 @@ bool X3DEngine::Init()
 	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager");
 	pMaterialManager_->Init();
 
+	guisMan_.Init();
+	guisMan_.loadGui("test");
+
 
 	// load a lvl lol.
 //	map.LoadFromFile("killzone"); // mmmmm
@@ -74,7 +77,7 @@ void X3DEngine::ShutDown()
 {
 	X_LOG0("3DEngine", "Shutting Down");
 
-
+	guisMan_.Shutdown();
 
 	if (pMaterialManager_) {
 		pMaterialManager_->ShutDown();

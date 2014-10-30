@@ -66,6 +66,7 @@
     <ClInclude Include="Containers\Freelist.h" />
     <ClInclude Include="Containers\Array.h" />
     <ClInclude Include="Containers\HashBase.h" />
+    <ClInclude Include="Containers\HashIndex.h" />
     <ClInclude Include="Containers\HashMap.h" />
     <ClInclude Include="Containers\LinkedList.h" />
     <ClInclude Include="Containers\LinkedListIntrusive.h" />
@@ -306,6 +307,7 @@
     <None Include="Containers\FixedStack.inl" />
     <None Include="Containers\Freelist.inl" />
     <None Include="Containers\Array.inl" />
+    <None Include="Containers\HashIndex.inl" />
     <None Include="Containers\HashMap.inl" />
     <None Include="Containers\LinkedList.inl" />
     <None Include="Containers\LinkedListIntrusive.inl" />
@@ -375,6 +377,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Assets\AssetContainer.cpp" />
+    <ClCompile Include="Containers\HashIndex.cpp" />
     <ClCompile Include="Debugging\Assert.cpp" />
     <ClCompile Include="Debugging\SymbolInfo.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>

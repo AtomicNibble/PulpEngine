@@ -196,7 +196,17 @@ namespace strUtil
 	/// Returns whether two strings are equal, checks the length of the 1st range.
 	bool IsEqualCaseInsen(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2)
 	{
-		return _stricmp(startInclusiveS1, startInclusiveS2) == 0;
+		size_t Len = endExclusiveS1 - startInclusiveS1;
+
+		while (Len && *startInclusiveS2 
+			&& (::tolower(*startInclusiveS1) == ::tolower(*startInclusiveS2)))
+		{
+			Len--;
+			startInclusiveS1++;
+			startInclusiveS2++;
+		}
+
+		return Len == 0 && !(*startInclusiveS2);
 	}
 
 	bool IsEqualCaseInsen(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2, const char* endExclusiveS2)

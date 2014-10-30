@@ -151,7 +151,11 @@ struct IGuiManger
 	virtual void Init(void) X_ABSTRACT;
 	virtual void Shutdown(void) X_ABSTRACT;
 
+	virtual IGui* loadGui(const char* name) X_ABSTRACT;
 
+
+
+	virtual void listGuis(const char* wildcardSearch = nullptr) const X_ABSTRACT;
 
 };
 

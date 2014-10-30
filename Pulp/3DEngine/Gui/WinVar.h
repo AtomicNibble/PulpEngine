@@ -143,11 +143,11 @@ protected:
 };
 
 
-class idWinInt : public XWinVar 
+class XWinInt : public XWinVar 
 {
 public:
-	idWinInt() : XWinVar() {};
-	~idWinInt() X_OVERRIDE{};
+	XWinInt() : XWinVar() {};
+	~XWinInt() X_OVERRIDE{};
 
 	virtual void Init(const char* _name, XWindow* win) X_OVERRIDE {
 		XWinVar::Init(_name, win);
@@ -165,7 +165,7 @@ public:
 		return temp.c_str();
 	}
 
-	idWinInt& operator=(const idWinInt& oth) {
+	XWinInt& operator=(const XWinInt& oth) {
 		XWinVar::operator=(oth);
 		value = oth.value;
 		return *this;

@@ -15,37 +15,41 @@ namespace
 	static const float g_DefaultTextScale = 0.35f;
 }
 
-const char* XWindow::RegisterVars[] =
+XRegEntry XWindow::s_RegisterVars[] =
 {
-	{ "rect" },
+	{ "rect", RegisterType::RECT },
 
-	{ "backcolor" },
-	{ "forecolor" },
-	{ "hovercolor" },
-	{ "bordercolor" },
+	{ "backcolor", RegisterType::COLOR },
+	{ "forecolor", RegisterType::COLOR },
+	{ "hovercolor", RegisterType::COLOR },
+	{ "bordercolor", RegisterType::COLOR },
 
-	{ "visible" },
-	{ "hidecursor" },
+	{ "visible", RegisterType::BOOL },
+	{ "hidecursor", RegisterType::BOOL },
 
-	{ "textscale" },
-	{ "text" },
+	{ "textscale", RegisterType::FLOAT },
+	{ "text", RegisterType::STRING },
 };
 
 
-const char* XWindow::ScriptNames[XWindow::ScriptFunction::ENUM_COUNT] = {
+const char* XWindow::s_ScriptNames[XWindow::ScriptFunction::ENUM_COUNT] = {
 	"onMouseEnter",
 	"onMouseExit",
 	"onEsc",
 	"onEnter",
+	"onOpen",
+	"onClose"
 };
 
 
-const int XWindow::NumRegisterVars = sizeof(RegisterVars) / sizeof(const char*);
+const int XWindow::s_NumRegisterVars = sizeof(s_RegisterVars) / sizeof(const char*);
 
+bool XWindow::s_registerIsTemporary[MAX_EXPRESSION_REGISTERS]; 
 
 
 XWindow::XWindow() :
-	children_(g_3dEngineArena)
+children_(g_3dEngineArena),
+expressionRegisters_(g_3dEngineArena)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pFont);
@@ -109,6 +113,18 @@ void XWindow::drawCaption(void)
 
 
 // -------------- Parsing ---------------
+void XWindow::SaveExpressionParseState()
+{
+	pSaveTemps_ = (bool*)X_NEW_ARRAY(bool, MAX_EXPRESSION_REGISTERS, g_3dEngineArena, "ParseState");
+	memcpy(pSaveTemps_, s_registerIsTemporary, MAX_EXPRESSION_REGISTERS * sizeof(bool));
+}
+
+void XWindow::RestoreExpressionParseState()
+{
+	memcpy(s_registerIsTemporary, pSaveTemps_, MAX_EXPRESSION_REGISTERS * sizeof(bool));
+	X_DELETE_ARRAY(pSaveTemps_,g_3dEngineArena);
+}
+
 
 bool XWindow::Parse(core::XLexer& lex)
 {
@@ -126,6 +142,15 @@ bool XWindow::Parse(core::XLexer& lex)
 	{
 		if (token.isEqual("itemDef"))
 		{
+			XWindow* win = X_NEW(XWindow,g_3dEngineArena,"ItemDef");
+			win->setParent(this);
+
+			SaveExpressionParseState();
+				win->Parse(lex);
+			RestoreExpressionParseState();
+
+			addChild(win);
+		//	SetFocus(win, false);
 
 		}
 		else if (ParseVar(token, lex))
@@ -149,8 +174,215 @@ bool XWindow::Parse(core::XLexer& lex)
 		}
 	}
 
+
+	EvalRegs(-1, true);
+
 	return true;
 }
+
+void XWindow::EvaluateRegisters(float* registers) 
+{
+	size_t i;
+	Vec4f v;
+
+	size_t erc = expressionRegisters_.size();
+
+	// copy the constants
+	for (i = WEXP_REG_NUM_PREDEFINED; i < erc; i++) {
+		registers[i] = expressionRegisters_[i];
+	}
+}
+
+float XWindow::EvalRegs(int test, bool force) 
+{
+	static float regs[MAX_EXPRESSION_REGISTERS];
+	static XWindow* lastEval = NULL;
+
+	if (!force && test >= 0 && test < MAX_EXPRESSION_REGISTERS && lastEval == this) {
+		return regs[test];
+	}
+
+	lastEval = this;
+
+	if (expressionRegisters_.size()) {
+		regList_.SetToRegs(regs);
+		EvaluateRegisters(regs);
+		regList_.GetFromRegs(regs);
+	}
+
+	if (test >= 0 && test < MAX_EXPRESSION_REGISTERS) {
+		return regs[test];
+	}
+
+	return 0.0;
+}
+
+
+
+int XWindow::ExpressionConstant(float f)
+{
+	int	i;
+
+	for (i = WEXP_REG_NUM_PREDEFINED; i < expressionRegisters_.size(); i++)
+	{
+		if (!s_registerIsTemporary[i] && expressionRegisters_[i] == f) {
+			return i;
+		}
+	}
+
+	if (expressionRegisters_.size() == MAX_EXPRESSION_REGISTERS) {
+	//	common->Warning("expressionConstant: gui %s hit MAX_EXPRESSION_REGISTERS", gui->GetSourceFile());
+		return 0;
+	}
+
+	int c = safe_static_cast<int, size_t>(expressionRegisters_.size());
+	if (i > c)
+	{
+		while (i > c) 
+		{
+			expressionRegisters_.append(-9999999);
+			i--;
+		}
+	}
+
+	i = safe_static_cast<int,size_t>(expressionRegisters_.append(f));
+	s_registerIsTemporary[i] = false;
+	return i;
+}
+
+int XWindow::ParseTerm(core::XLexer& lex, XWinVar* var, int component)
+{
+	core::XLexToken token;
+//	int	a, b;
+
+	lex.ReadToken(token);
+
+	/*
+	if (token.isEqual("("))
+	{
+		a = ParseExpression(lex);
+		src->ExpectTokenString(")");
+		return a;
+	}
+	*/
+
+	if (token.isEqual("time")) {
+		return WEXP_REG_TIME;
+	}
+
+	// parse negative numbers
+	if (token.isEqual("-")) 
+	{
+		lex.ReadToken(token);
+		if (token.type == TT_NUMBER || token.isEqual("."))
+		{
+			return ExpressionConstant(-(float)token.GetFloatValue());
+		}
+	//	src->Warning("Bad negative number '%s'", token.c_str());
+		return 0;
+	}
+
+	if (token.type == TT_NUMBER || token.isEqual(".") || token.isEqual("-")) {
+		return ExpressionConstant((float)token.GetFloatValue());
+	}
+
+	/*
+	// see if it is a table name
+	const idDeclTable *table = static_cast<const idDeclTable *>(declManager->FindType(DECL_TABLE, token.c_str(), false));
+	if (table) {
+		a = table->Index();
+		// parse a table expression
+		src->ExpectTokenString("[");
+		b = ParseExpression(src);
+		src->ExpectTokenString("]");
+		return EmitOp(a, b, WOP_TYPE_TABLE);
+	}
+
+	if (var == NULL) {
+		var = GetWinVarByName(token, true);
+	}
+	if (var) {
+		a = (int)var;
+		//assert(dynamic_cast<idWinVec4*>(var));
+		var->Init(token, this);
+		b = component;
+		if (dynamic_cast<idWinVec4*>(var)) {
+			if (src->ReadToken(&token)) {
+				if (token == "[") {
+					b = ParseExpression(src);
+					src->ExpectTokenString("]");
+				}
+				else {
+					src->UnreadToken(&token);
+				}
+			}
+			return EmitOp(a, b, WOP_TYPE_VAR);
+		}
+		else if (dynamic_cast<idWinFloat*>(var)) {
+			return EmitOp(a, b, WOP_TYPE_VARF);
+		}
+		else if (dynamic_cast<idWinInt*>(var)) {
+			return EmitOp(a, b, WOP_TYPE_VARI);
+		}
+		else if (dynamic_cast<idWinBool*>(var)) {
+			return EmitOp(a, b, WOP_TYPE_VARB);
+		}
+		else if (dynamic_cast<idWinStr*>(var)) {
+			return EmitOp(a, b, WOP_TYPE_VARS);
+		}
+		else {
+			src->Warning("Var expression not vec4, float or int '%s'", token.c_str());
+		}
+		return 0;
+	}
+	else {
+		// ugly but used for post parsing to fixup named vars
+		char *p = new (TAG_OLD_UI) char[token.Length() + 1];
+		strcpy(p, token);
+		a = (int)p;
+		b = -2;
+		return EmitOp(a, b, WOP_TYPE_VAR);
+	}
+	*/
+
+	return 0;
+}
+
+
+#define	TOP_PRIORITY 4
+int XWindow::ParseExpressionPriority(core::XLexer& lex, int priority,
+	XWinVar* var, int component)
+{
+	core::XLexToken token;
+	int a;
+
+	if (priority == 0) {
+		return ParseTerm(lex, var, component);
+	}
+
+
+	a = ParseExpressionPriority(lex, priority - 1, var, component);
+
+	if (!lex.ReadToken(token)) {
+		// we won't get EOF in a real file, but we can
+		// when parsing from generated strings
+		return a;
+	}
+
+
+	// assume that anything else terminates the expression
+	// not too robust error checking...
+	lex.UnreadToken(token);
+
+	return a;
+}
+
+
+int XWindow::ParseExpression(core::XLexer& lex, XWinVar* var)
+{
+	return ParseExpressionPriority(lex, TOP_PRIORITY, var);
+}
+
 
 bool XWindow::ParseString(core::XLexer& lex, core::string& out)
 {
@@ -255,8 +487,29 @@ bool XWindow::ParseVar(const core::XLexToken& token, core::XLexer& lex)
 
 bool XWindow::ParseRegEntry(const core::XLexToken& token, core::XLexer& lex)
 {
-	// parse any of the reg values that can be set.
+	core::StackString512 name(token.begin(), token.end());
+	core::XLexToken token2;
+	int i;
 
+	// find this register?
+	XWinVar* pVar = GetWinVarByName(name.c_str());
+	if (pVar)
+	{
+		// find it.
+		for (i = 0; i < s_NumRegisterVars; i++) {
+			if (name.isEqual(s_RegisterVars[i].name)) {
+				regList_.AddReg(name.c_str(), s_RegisterVars[i].type, lex, this, pVar);
+				return true;
+			}
+		}
+
+		return true;
+	}
+
+	if (lex.ReadToken(token2))
+	{
+
+	}
 
 	return false;
 }
@@ -266,7 +519,7 @@ bool XWindow::ParseScriptFunction(const core::XLexToken& token, core::XLexer& le
 {
 	for (int i = 0; i < ScriptFunction::ENUM_COUNT; i++)
 	{
-		if (core::strUtil::IsEqualCaseInsen(token.begin(), token.end(), ScriptNames[i]))
+		if (core::strUtil::IsEqualCaseInsen(token.begin(), token.end(), s_ScriptNames[i]))
 		{
 			return ParseScript(lex);
 		//	scripts[i] = new idGuiScriptList;

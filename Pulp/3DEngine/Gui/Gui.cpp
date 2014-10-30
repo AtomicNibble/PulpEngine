@@ -58,7 +58,7 @@ bool XGui::InitFromFile(const char* name)
 
 	pDesktop_ = X_NEW(XWindow, g_3dEngineArena, "MenuWindow");
 
-	path /= "gui/compiled/";
+	path = "gui/compiled/";
 	path.setFileName(name);
 	path.setExtension(GUI_BINARY_FILE_EXTENSION);
 
@@ -72,7 +72,7 @@ bool XGui::InitFromFile(const char* name)
 	}
 
 	// try none binary
-	path /= "gui/";
+	path = "gui/";
 	path.setFileName(name);
 	path.setExtension(GUI_FILE_EXTENSION);
 	if (file.openFile(path.c_str(), mode))

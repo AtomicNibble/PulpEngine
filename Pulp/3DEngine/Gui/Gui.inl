@@ -1,32 +1,32 @@
 
 
-const char*	XGui::getName(void) const
+X_INLINE const char* XGui::getName(void) const
 {
 	return name_.c_str();
 }
 
-void XGui::setCursorPos(float x, float y)
+X_INLINE void XGui::setCursorPos(float x, float y)
 {
 	cursorPos_.x = x;
 	cursorPos_.y = y;
 }
 
-void XGui::setCursorPos(const Vec2f& pos)
+X_INLINE void XGui::setCursorPos(const Vec2f& pos)
 {
 	cursorPos_ = pos;
 }
 
-Vec2f XGui::getCursorPos(void)
+X_INLINE Vec2f XGui::getCursorPos(void)
 {
 	return cursorPos_;
 }
 
-float XGui::getCursorPosX(void)
+X_INLINE float XGui::getCursorPosX(void)
 {
 	return cursorPos_.x;
 }
 
-float XGui::getCursorPosY(void)
+X_INLINE float XGui::getCursorPosY(void)
 {
 	return cursorPos_.y;
 }
@@ -34,7 +34,7 @@ float XGui::getCursorPosY(void)
 
 // ------------------------
 
-bool XGui::isDeskTopValid(void) const
+X_INLINE bool XGui::isDeskTopValid(void) const
 {
 	return pDesktop_ != nullptr;
 }

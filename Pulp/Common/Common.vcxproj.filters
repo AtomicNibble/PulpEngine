@@ -166,6 +166,9 @@
     <Filter Include="Headers\Traits">
       <UniqueIdentifier>{febee5e6-6f7b-4aad-a82a-5b381e289e40}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SourceFiles\Containers">
+      <UniqueIdentifier>{c7bb6186-46aa-4b85-8f65-a7a67ea958aa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -910,6 +913,9 @@
     <ClInclude Include="IGui.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
+    <ClInclude Include="Containers\HashIndex.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1147,6 +1153,9 @@
       <Filter>Headers\Math</Filter>
     </None>
     <None Include="ClassDiagram.cd" />
+    <None Include="Containers\HashIndex.inl">
+      <Filter>Headers\Containers</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">
@@ -1365,6 +1374,9 @@
     </ClCompile>
     <ClCompile Include="Hashing\Crc32.cpp">
       <Filter>SourceFiles\Hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="Containers\HashIndex.cpp">
+      <Filter>SourceFiles\Containers</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

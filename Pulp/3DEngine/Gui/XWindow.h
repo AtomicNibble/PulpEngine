@@ -8,23 +8,25 @@
 #include <String\Lexer.h>
 
 #include "WinVar.h"
+#include "RegExp.h"
 
 X_NAMESPACE_BEGIN(gui)
 
-X_DECLARE_ENUM(RegisterType)
-(
-	BOOL,
-	INT,
-	FLOAT,
-	VEC2,
-	VEC3,
-	VEC4,
-	Color,
-	Rect,
-	STRING
-);
+const int MAX_EXPRESSION_REGISTERS = 4096;
 
-// enum REGTYPE { VEC4 = 0, FLOAT, BOOL, INT, STRING, VEC2, VEC3, RECTANGLE, NUMTYPES };
+enum
+{
+	WEXP_REG_TIME,
+	WEXP_REG_NUM_PREDEFINED
+};
+
+
+struct XRegEntry 
+{
+	const char* name;
+	RegisterType::Enum type;
+};
+
 
 class XWindowSimple;
 class XWindow
@@ -36,13 +38,18 @@ public:
 		MOUSE_ENTER,
 		MOUSE_LEAVE,
 		ESC,
-		ENTER
+		ENTER,
+		OPEN,
+		CLOSE
 	);
 
-	static const char* ScriptNames[ScriptFunction::ENUM_COUNT];
+	static const char*	s_ScriptNames[ScriptFunction::ENUM_COUNT];
 
-	static const char* RegisterVars[];
-	static const int   NumRegisterVars;
+	static XRegEntry	s_RegisterVars[];
+	static const int	s_NumRegisterVars;
+
+private:
+	static bool s_registerIsTemporary[MAX_EXPRESSION_REGISTERS]; // statics to assist during parsing
 
 public:
 	XWindow();
@@ -86,7 +93,14 @@ public:
 	virtual void mouseExit(void);
 	virtual void mouseEnter(void);
 
+	int ParseExpression(core::XLexer& lex, XWinVar* var = nullptr);
+	int ParseTerm(core::XLexer& lex, XWinVar* var, int component);
+	int ExpressionConstant(float f);
+
 private:
+	int ParseExpressionPriority(core::XLexer& lex, int priority,
+		XWinVar* var, int component = 0);
+
 	bool ParseString(core::XLexer& lex, core::string& out);
 	bool ParseVar(const core::XLexToken& token, core::XLexer& lex);
 	bool ParseRegEntry(const core::XLexToken& token, core::XLexer& lex);
@@ -94,6 +108,13 @@ private:
 	bool ParseScript(core::XLexer& lex);
 
 	XWinVar* GetWinVarByName(const char* name);
+
+	void SaveExpressionParseState();
+	void RestoreExpressionParseState();
+
+	void EvaluateRegisters(float* registers);
+
+	float EvalRegs(int test = -1, bool force = false);
 
 protected:
 	Rectf rectDraw_;
@@ -132,7 +153,12 @@ protected:
 
 	font::IFFont* pFont_;
 
-	core::Array<XWindow*> children_;
+	core::Array<XWindow*>	children_;
+
+	core::Array<float>		expressionRegisters_;
+	XRegisterList			regList_;
+
+	bool* pSaveTemps_;
 
 	bool	hover_;
 	bool    ___pad[3];

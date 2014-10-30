@@ -33,6 +33,9 @@
     <ClCompile Include="Gui\WinVar.cpp">
       <Filter>Gui</Filter>
     </ClCompile>
+    <ClCompile Include="Gui\RegExp.cpp">
+      <Filter>Gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -68,6 +71,9 @@
       <Filter>Gui</Filter>
     </ClInclude>
     <ClInclude Include="Gui\WinVar.h">
+      <Filter>Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui\RegExp.h">
       <Filter>Gui</Filter>
     </ClInclude>
   </ItemGroup>

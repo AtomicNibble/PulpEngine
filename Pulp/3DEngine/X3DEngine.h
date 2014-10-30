@@ -10,6 +10,8 @@
 #include <IModel.h>
 #include <IRenderMesh.h>
 
+#include "Gui\GuiManger.h"
+
 X_NAMESPACE_BEGIN(engine)
 
 
@@ -29,6 +31,7 @@ struct X3DEngine : public I3DEngine, public XEngineBase
 
 
 private:
+	gui::XGuiManager guisMan_;
 
 	bsp::Bsp map;
 	model::XModel model, modelSky;
