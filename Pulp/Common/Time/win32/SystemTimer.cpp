@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "EngineCommon.h"
 #include "SystemTimer.h"
 
 #include <Util\LastError.h>

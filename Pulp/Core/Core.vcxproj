@@ -361,7 +361,6 @@
     <ClInclude Include="win32\OsFileAsync.h" />
     <ClInclude Include="win32\OsFileAsyncOperation.h" />
     <ClInclude Include="win32\OsFileModeFlags.h" />
-    <ClInclude Include="win32\SystemTimer.h" />
     <ClInclude Include="xFileSys.h" />
     <ClInclude Include="XFindData.h" />
     <ClInclude Include="XProfile.h" />
@@ -395,14 +394,12 @@
     <ClCompile Include="win32\OsFile.cpp" />
     <ClCompile Include="win32\OsFileAsync.cpp" />
     <ClCompile Include="win32\OsFileAsyncOperation.cpp" />
-    <ClCompile Include="win32\SystemTimer.cpp" />
     <ClCompile Include="xFileSys.cpp" />
     <ClCompile Include="XProfile.cpp" />
     <ClCompile Include="XProfileRender.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Cpu.inl" />
-    <None Include="win32\SystemTimer.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

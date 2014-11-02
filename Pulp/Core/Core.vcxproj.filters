@@ -12,12 +12,6 @@
     <Filter Include="NullImplementation">
       <UniqueIdentifier>{9f90a8e0-2933-4792-a246-f710e6b13dd8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\win32">
-      <UniqueIdentifier>{ea570fa0-7427-4055-817a-51bdbfa30bd8}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\win32">
-      <UniqueIdentifier>{28af8a08-6952-4e78-883e-d61cfc4460c5}</UniqueIdentifier>
-    </Filter>
     <Filter Include="ExtensionSystem">
       <UniqueIdentifier>{2e7d6035-ee5e-4181-acdd-748e67aeec35}</UniqueIdentifier>
     </Filter>
@@ -55,9 +49,6 @@
     </ClInclude>
     <ClInclude Include="ConsoleVariable.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\SystemTimer.h">
-      <Filter>Header Files\win32</Filter>
     </ClInclude>
     <ClInclude Include="SystemTimer.h">
       <Filter>Header Files</Filter>
@@ -136,9 +127,6 @@
     <ClCompile Include="ConsoleVariable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="win32\SystemTimer.cpp">
-      <Filter>Source Files\win32</Filter>
-    </ClCompile>
     <ClCompile Include="GoatFactoryRegistryImpl.cpp">
       <Filter>ExtensionSystem</Filter>
     </ClCompile>
@@ -179,9 +167,6 @@
   <ItemGroup>
     <None Include="Cpu.inl">
       <Filter>Header Files</Filter>
-    </None>
-    <None Include="win32\SystemTimer.inl">
-      <Filter>Header Files\win32</Filter>
     </None>
   </ItemGroup>
 </Project>
