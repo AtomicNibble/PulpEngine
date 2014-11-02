@@ -419,9 +419,14 @@ public:
 	virtual void Set(const char* val) X_OVERRIDE{
 		// make comma optional.
 		if (strchr(val, ','))
-		sscanf(val, "%f,%f,%f,%f", &value.x1, &value.y1, &value.x2, &value.y2);
+			sscanf(val, "%f,%f,%f,%f", &value.x1, &value.y1, &value.x2, &value.y2);
 		else
 			sscanf(val, "%f %f %f %f", &value.x1, &value.y1, &value.x2, &value.y2);
+
+		// turn from width / height into positions.
+		value.x2 = value.x1 + value.x2;
+		value.y2 = value.y1 + value.y2;
+
 	}
 	virtual void Update(void) X_OVERRIDE{
 		const char* s = getName();
@@ -524,6 +529,18 @@ public:
 		return value;
 	}
 
+	float r() const {
+		return value.r;
+	}
+	float g() const {
+		return value.g;
+	}	
+	float b() const {
+		return value.b;
+	}	
+	float a() const {
+		return value.a;
+	}
 protected:
 	Color value;
 };
