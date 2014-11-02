@@ -153,6 +153,8 @@
     <ClInclude Include="Math\XCamera.h" />
     <ClInclude Include="Math\XColor.h" />
     <ClInclude Include="Math\XColorPacking.h" />
+    <ClInclude Include="Math\XExtrapolate.h" />
+    <ClInclude Include="Math\XInterpolate.h" />
     <ClInclude Include="Math\XFrustum.h" />
     <ClInclude Include="Math\XHalf.h" />
     <ClInclude Include="Math\XIntersect.h" />
@@ -318,6 +320,7 @@
     <None Include="Logging\FilterPolicies\LoggerNoFilterPolicy.inl" />
     <None Include="Logging\Logger.inl" />
     <None Include="Logging\LoggerBase.inl" />
+    <None Include="Math\XInterpolate.inl" />
     <None Include="Math\XFrustum.inl" />
     <None Include="Math\XQuatTrans.inl" />
     <None Include="Math\XAabb.inl" />

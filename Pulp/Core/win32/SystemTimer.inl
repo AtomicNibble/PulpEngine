@@ -8,7 +8,7 @@ namespace SysTimer
 		typedef int64(*TimeUpdateFunc) ();
 		extern TimeUpdateFunc g_pUpdateFunc;
 
-		TimeUpdateFunc test = g_pUpdateFunc;
+	//	TimeUpdateFunc test = g_pUpdateFunc;
 		return g_pUpdateFunc();
 	}
 

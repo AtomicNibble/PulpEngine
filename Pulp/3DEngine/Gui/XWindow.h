@@ -6,11 +6,17 @@
 #include "EngineBase.h"
 
 #include <IGui.h>
+#include <ITimer.h>
 
 #include <String\Lexer.h>
+#include <Math\XExtrapolate.h>
+#include <Math\XInterpolate.h>
 
 #include "WinVar.h"
 #include "RegExp.h"
+#include "GuiScript.h"
+
+#include "SimpleWindow.h"
 
 X_NAMESPACE_BEGIN(gui)
 
@@ -22,6 +28,17 @@ enum
 	WEXP_REG_NUM_PREDEFINED
 };
 
+struct XDrawWin
+{
+	XDrawWin() : 
+		pWindow(nullptr), 
+		pSimpleWindow(nullptr)
+	{	
+	}
+
+	XWindow* pWindow;
+	XWindowSimple* pSimpleWindow;
+};
 
 struct XRegEntry 
 {
@@ -29,6 +46,29 @@ struct XRegEntry
 	RegisterType::Enum type;
 };
 
+struct XTransitionData
+{
+	XTransitionData() : pData(nullptr) {}
+
+	XWinVar* pData;
+	XInterpolateAccelDecelLinear<Vec4f> interp;
+};
+
+struct XTimeLineEvent
+{
+	XTimeLineEvent() : pending(true)
+	{
+		script = X_NEW(XGuiScriptList,g_3dEngineArena,"TimeGuiScript");
+	}
+	~XTimeLineEvent()
+	{
+		X_DELETE(script,g_3dEngineArena);
+	}
+
+	core::TimeVal time;
+	XGuiScriptList* script;
+	bool pending;
+};
 
 class XWindowSimple;
 class XWindow : public engine::XEngineBase
@@ -42,7 +82,8 @@ public:
 		ESC,
 		ENTER,
 		OPEN,
-		CLOSE
+		CLOSE,
+		ACTION // when you click it baby
 	);
 
 	static const char*	s_ScriptNames[ScriptFunction::ENUM_COUNT];
@@ -57,12 +98,15 @@ public:
 	XWindow();
 	~XWindow();
 
+	void init(void);
+	void clear(void);
+
 	// Parent
 	X_INLINE void setParent(XWindow* pParent);
 	X_INLINE XWindow* getParent(void);
 
 	// Flags
-	X_INLINE void setFlag(WindowFlag::Enum flag);
+	X_INLINE void setFlag(WindowFlag::Enum flag); // sets only one, intentional.
 	X_INLINE void clearFlags(void);
 	X_INLINE WindowFlags getFlags(void) const;
 
@@ -114,19 +158,37 @@ private:
 	bool ParseVar(const core::XLexToken& token, core::XLexer& lex);
 	bool ParseRegEntry(const core::XLexToken& token, core::XLexer& lex);
 	bool ParseScriptFunction(const core::XLexToken& token, core::XLexer& lex);
-	bool ParseScript(core::XLexer& lex);
-
-	XWinVar* GetWinVarByName(const char* name);
+	bool ParseScript(core::XLexer& lex, XGuiScriptList& list);
 
 	void SaveExpressionParseState();
 	void RestoreExpressionParseState();
 
 	void EvaluateRegisters(float* registers);
 
-	float EvalRegs(int test = -1, bool force = false);
-
 	// called post parse.
 	void SetupFromState(void);
+
+public:
+	float EvalRegs(int test = -1, bool force = false);
+
+	XWinVar* GetWinVarByName(const char* name);
+
+	void FixUpParms(void);
+
+	void StartTransition();
+	void AddTransition(XWinVar* dest, Vec4f from, Vec4f to,
+		int timeMs, float accelTime, float decelTime);
+	
+
+	void ResetTime(int timeMs);
+private:
+	bool RunTimeEvents(core::TimeVal time);
+	void Time(core::TimeVal time);
+
+	void Transition(void);
+
+	bool RunScriptList(XGuiScriptList* src);
+	bool RunScript(ScriptFunction::Enum func);
 
 protected:
 	typedef core::Array<XWindow*> Children;
@@ -134,6 +196,7 @@ protected:
 
 	Rectf rectDraw_;
 	Rectf rectClient_;
+	Rectf rectText_;
 
 	// Registers: shit that can be changed by code.
 	XWinRect	rect_;
@@ -159,6 +222,9 @@ protected:
 	core::StackString<GUI_MAX_WINDOW_NAME_LEN> name_;
 	// ~
 
+	core::TimeVal lastTimeRun_;
+	core::TimeVal timeLine_;
+
 	uint32_t childId_; // if this is a child, this is it's id.
 
 	XWindow* pParent_;
@@ -168,7 +234,13 @@ protected:
 
 	font::IFFont* pFont_;
 
+	XGuiScriptList* scripts_[ScriptFunction::ENUM_COUNT];
+
 	core::Array<XWindow*>	children_;
+	core::Array<XDrawWin>   drawWindows_;
+
+	core::Array<XTimeLineEvent*>	timeLineEvents_;
+	core::Array<XTransitionData>	transitions_;
 
 	core::Array<float>		expressionRegisters_;
 	XRegisterList			regList_;
@@ -176,7 +248,8 @@ protected:
 	bool* pSaveTemps_;
 
 	bool	hover_;
-	bool    ___pad[3];
+	bool	init_;
+	bool    ___pad[2];
 };
 
 #include "XWindow.inl"

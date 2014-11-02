@@ -62,6 +62,7 @@ static const uint32_t GUI_MAX_LIST_ITEMS = 1024;
 
 X_DECLARE_FLAGS(WindowFlag) (
 	CAPTION,	
+	DESKTOP,		// base window.
 	CHILD,
 	BORDER,			// has a border, cyptic var name i know. (insert camel ascii here)
 	SIZABLE,
@@ -72,8 +73,9 @@ X_DECLARE_FLAGS(WindowFlag) (
 	ACTIVE,
 	MODAL,			// eats events, instead of passing to children.
 	FULLSCREEN,
-	NO_CLIP,
-	NO_CURSOR
+	NO_CLIP,	
+	NO_CURSOR,
+	IN_TRANSITION
 );
 
 

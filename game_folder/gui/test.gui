@@ -71,6 +71,20 @@ windowDef
 		text        		"This is some Text!"
 		textscale   		0.5
 		visible     		1
+		
+		onMouseEnter  
+		{ 
+			
+			
+		} 
+		onMouseExit 
+		{ 
+			
+		} 
+		action 
+		{ 
+
+		} 
 	}
 	
 
@@ -85,6 +99,17 @@ windowDef
 		text        		"more text"
 		textscale   		0.75
 		visible     		1
+		
+		onTime 0 {
+			transition rect "235 120 300 100" "235 120 300 300" "2000" ;
+		}
+		onTime 3000 {
+			transition rect "235 120 300 100" "235 120 100 100" "2000" ;
+		}
+		onTime 6000 {
+			resetTime 0 ;
+		}
+
 	}
 
 	itemDef

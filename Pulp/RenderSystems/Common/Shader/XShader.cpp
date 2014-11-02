@@ -871,7 +871,7 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 		core::XLexer lex(pfile->fileData.begin(), pfile->fileData.end());
 		core::XLexToken token;
 
-		lex.setFlags(LEXFL_ALLOWPATHNAMES);
+		lex.setFlags(LexFlag::ALLOWPATHNAMES);
 
 		if (lex.SkipUntilString("shader"))
 		{
@@ -1111,7 +1111,7 @@ void XShaderManager::ParseIncludeFiles_r(SourceFile* file,
 		core::XLexToken token;
 		core::StackString512 fileName; 
 
-		lexer.setFlags(LEXFL_ALLOWPATHNAMES);
+		lexer.setFlags(LexFlag::ALLOWPATHNAMES);
 
 		while (lexer.SkipUntilString("#include"))
 		{

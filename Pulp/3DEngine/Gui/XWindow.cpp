@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "XWindow.h"
 
+
 #include <IFont.h>
 #include <IRender.h>
 #include <IRenderAux.h>
@@ -40,7 +41,8 @@ const char* XWindow::s_ScriptNames[XWindow::ScriptFunction::ENUM_COUNT] = {
 	"onEsc",
 	"onEnter",
 	"onOpen",
-	"onClose"
+	"onClose",
+	"action"
 };
 
 
@@ -51,10 +53,29 @@ bool XWindow::s_registerIsTemporary[MAX_EXPRESSION_REGISTERS];
 
 XWindow::XWindow() :
 children_(g_3dEngineArena),
-expressionRegisters_(g_3dEngineArena)
+drawWindows_(g_3dEngineArena),
+timeLineEvents_(g_3dEngineArena),
+transitions_(g_3dEngineArena),
+expressionRegisters_(g_3dEngineArena),
+init_(false)
+{
+	init();
+}
+
+XWindow::~XWindow()
+{
+	clear();
+}
+
+void XWindow::init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pFont);
+
+	if (init_)
+		return;
+
+	init_ = true;
 
 	// reg's
 	backColor_ = g_DefaultColor_Back;
@@ -66,7 +87,7 @@ expressionRegisters_(g_3dEngineArena)
 	textScale_ = g_DefaultTextScale;
 	// ~
 
-	borderSize_ = 1.f;
+	borderSize_ = 0.f; // no border by default.
 	textAlignX_ = 0.f;
 	textAlignY_ = 0.f;
 
@@ -85,14 +106,33 @@ expressionRegisters_(g_3dEngineArena)
 	pFont_ = gEnv->pFont->GetFont("default");
 
 	hover_ = false;
+
+	core::zero_object(scripts_);
 }
 
-XWindow::~XWindow()
+void XWindow::clear(void)
 {
+	if (!init_)
+		return;
 
+	regList_.Reset();
+
+	// we only clear instead of free.
+	// saves reallocating again for reload.
+	// memory is free when object is deleted.
+	children_.clear();
+	timeLineEvents_.clear();
+	expressionRegisters_.clear();
+
+	// delete any scripts.
+	for (int i = 0; i < ScriptFunction::ENUM_COUNT; i++) {
+		if (scripts_[i]) {
+			X_DELETE_AND_NULL(scripts_[i], g_3dEngineArena);
+		}
+	}
+
+	init_ = false;
 }
-
-
 
 
 
@@ -112,6 +152,10 @@ void XWindow::RestoreExpressionParseState()
 
 bool XWindow::Parse(core::XLexer& lex)
 {
+	// clear it.
+	clear();
+	init();
+
 	// we have a { }
 	core::XLexToken token;
 
@@ -137,6 +181,39 @@ bool XWindow::Parse(core::XLexer& lex)
 		//	SetFocus(win, false);
 
 		}
+		else if (token.isEqual("onTime"))
+		{
+			// timed event.
+			XTimeLineEvent* event = X_NEW(XTimeLineEvent, g_3dEngineArena, "GuiTimeEvent");
+
+			if (!lex.ReadToken(token)) {
+				return false;
+			}
+			if (token.length() > 64) {
+				X_ERROR("Gui", "time value is too long. line(%i)", token.line);
+				return false;
+			}
+			if (token.type != TT_NUMBER) {
+				X_ERROR("Gui", "expected number after 'onTime' line(%i)", token.line);
+				return false;
+			}
+
+			core::StackString<64> temp(token.begin(), token.end());
+
+			event->time.SetSeconds( ::atof(temp.c_str()) );
+
+			if (!ParseScript(lex, *event->script))
+			{
+				X_ERROR("Gui", "error parsing 'onTime' on line(%i)", token.line);
+				return false;
+			}
+
+			timeLineEvents_.append(event);
+		}
+		else if (ParseScriptFunction(token, lex))
+		{
+			// it's a function definition.
+		}
 		else if (ParseVar(token, lex))
 		{
 			// it's a var :)
@@ -145,10 +222,7 @@ bool XWindow::Parse(core::XLexer& lex)
 		{
 			// it's a registry var.
 		}
-		else if (ParseScriptFunction(token, lex))
-		{
-			// it's a function definition.
-		}
+
 
 
 		if (!lex.ReadToken(token))
@@ -173,6 +247,195 @@ void XWindow::SetupFromState(void)
 
 
 }
+
+void XWindow::FixUpParms(void)
+{
+	size_t i, num;
+
+	num = children_.size();
+	for (i = 0; i < num; i++) {
+		children_[i]->FixUpParms();
+	}
+
+	for (i = 0; i < ScriptFunction::ENUM_COUNT; i++) {
+		if (scripts_[i]) {
+			scripts_[i]->FixUpParms(this);
+		}
+	}
+
+	
+	num = timeLineEvents_.size();
+	for (i = 0; i < num; i++) {
+		timeLineEvents_[i]->script->FixUpParms(this);
+	}
+	/*
+	c = namedEvents.Num();
+	for (i = 0; i < c; i++) {
+		namedEvents[i]->mEvent->FixupParms(this);
+	}
+	*/
+
+	if (flags_.IsSet(WindowFlag::DESKTOP)) {
+		calcClientRect();
+	}
+}
+
+
+void XWindow::StartTransition()
+{
+	flags_.Set(WindowFlag::IN_TRANSITION);
+}
+
+void XWindow::AddTransition(XWinVar* dest, Vec4f from, Vec4f to,
+	int timeMs, float accelTime, float decelTime)
+{
+	int startTime = static_cast<int>(lastTimeRun_.GetMilliSeconds());
+
+	XTransitionData data;
+	data.pData = dest;
+	data.interp.Init(startTime, (int)(accelTime * timeMs), (int)(decelTime * timeMs), timeMs, from, to);
+	transitions_.append(data);
+}
+
+void XWindow::ResetTime(int timeMs)
+{
+	core::TimeVal time = pTimer_->GetFrameStartTime(core::ITimer::Timer::UI);
+	core::TimeVal temp;
+
+	int UItimeMs = static_cast<int>(time.GetMilliSeconds());
+
+	temp.SetMilliSeconds(timeMs);
+
+	timeLine_.SetMilliSeconds(UItimeMs - timeMs);
+
+	size_t i, num = timeLineEvents_.size();
+	for (i = 0; i < num; i++) {
+		if (timeLineEvents_[i]->time >= temp) {
+			timeLineEvents_[i]->pending = true;
+		}
+	}
+
+	// noTime = false;
+
+	num = transitions_.size();
+	for (i = 0; i < num; i++) {
+		XTransitionData* data = &transitions_[i];
+		if (data->interp.IsDone(UItimeMs) && data->pData) {
+			transitions_.removeIndex(i);
+			i--;
+			num--;
+		}
+	}
+
+}
+
+bool XWindow::RunTimeEvents(core::TimeVal time)
+{
+	if (lastTimeRun_ == time)
+		return false;
+
+	lastTimeRun_ = time;
+
+	if (flags_.IsSet(WindowFlag::IN_TRANSITION)) {
+		Transition();
+	}
+
+	Time(time);
+
+	size_t i, c = children_.size();
+	for (i = 0; i < c; i++) {
+		children_[i]->RunTimeEvents(time);
+	}
+
+	return true;
+}
+
+void XWindow::Time(core::TimeVal time)
+{
+	if (timeLine_.GetValue() == 0) {
+		timeLine_ = time;
+	}
+
+	core::Array<XTimeLineEvent*>::Iterator it;
+	core::TimeVal relTime = time - timeLine_;
+
+	for (it = timeLineEvents_.begin(); it != timeLineEvents_.end(); ++it)
+	{
+		XTimeLineEvent& event = *(*it);
+
+		if (event.pending)
+		{
+			if (relTime >= event.time)
+			{
+				event.pending = false;
+				RunScriptList(event.script);
+			}
+		}
+	}
+
+}
+
+void XWindow::Transition(void)
+{
+	size_t i, num = transitions_.size();
+	bool clear = true;
+
+	int timeMs = static_cast<int>(lastTimeRun_.GetMilliSeconds());
+
+	for (i = 0; i < num; i++) 
+	{
+		XTransitionData& data = transitions_[i];
+
+		XWinRect* r = nullptr;
+		if (!data.pData )
+		{
+
+			continue;
+		}
+
+		if (data.pData->getType() != VarType::RECT)
+			continue;
+
+		r = static_cast<XWinRect*>(data.pData);
+
+		if (data.interp.IsDone(timeMs))
+		{
+			r->Set(data.interp.GetEndValue());
+		}
+		else 
+		{
+			clear = false;
+			r->Set(data.interp.GetCurrentValue(timeMs));
+
+			X_LOG0("Gui", "time(%i) %g %g %g %g", timeMs, 
+				r->x1(), r->y1(), r->x2(), r->y2());
+		}
+	}
+
+	if (clear) {
+		transitions_.clear();
+		flags_.Remove(WindowFlag::IN_TRANSITION);
+	}
+}
+
+
+bool XWindow::RunScriptList(XGuiScriptList* src)
+{
+	if (src)
+	{
+		src->Execute(this);
+		return true;
+	}
+	return false;
+}
+
+bool XWindow::RunScript(ScriptFunction::Enum func)
+{
+	if (scripts_[func]) // this if is kinda un-needed :}
+		return RunScriptList(scripts_[func]);
+	return false;
+}
+
 
 void XWindow::EvaluateRegisters(float* registers) 
 {
@@ -456,9 +719,8 @@ bool XWindow::ParseScriptFunction(const core::XLexToken& token, core::XLexer& le
 	{
 		if (core::strUtil::IsEqualCaseInsen(token.begin(), token.end(), s_ScriptNames[i]))
 		{
-			return ParseScript(lex);
-		//	scripts[i] = new idGuiScriptList;
-		//	return ParseScript(src, *scripts[i]);
+			scripts_[i] = X_NEW(XGuiScriptList,g_3dEngineArena,"guiScriptList");
+			return ParseScript(lex, *scripts_[i]);
 		}
 	}
 
@@ -466,10 +728,15 @@ bool XWindow::ParseScriptFunction(const core::XLexToken& token, core::XLexer& le
 }
 
 
-bool XWindow::ParseScript(core::XLexer& lex)
+bool XWindow::ParseScript(core::XLexer& lex, XGuiScriptList& list )
 {
 	core::XLexToken token;
 	int nest = 0;
+
+	if (!lex.ExpectTokenString("{")) {
+		return false;
+	}
+
 
 	while (1)
 	{
@@ -486,6 +753,17 @@ bool XWindow::ParseScript(core::XLexer& lex)
 				return true;
 			}
 		}
+
+		lex.UnreadToken(token);
+
+		if (token.isEqual("{")) {
+			return false;
+		}
+
+		XGuiScript* gs = X_NEW(XGuiScript,g_3dEngineArena,"GuiScript");
+
+		gs->Parse(lex);
+		list.append(gs);
 	}
 
 	return false;
@@ -551,6 +829,11 @@ void XWindow::reDraw(void)
 {
 	calcClientRect();
 
+	core::TimeVal time = pTimer_->GetFrameStartTime(core::ITimer::Timer::UI);
+
+	if (flags_.IsSet(WindowFlag::DESKTOP)) {
+		RunTimeEvents(time);
+	}
 
 	drawBackground(rectDraw_);
 	drawBorder(rectDraw_);
@@ -570,7 +853,8 @@ void XWindow::drawDebug(void)
 	render::XDrawTextInfo ti;
 	Vec3f pos;
 
-	str.appendFmt("Text: '%s'\n", name_.c_str());
+	str.appendFmt("Name: '%s'\n", name_.c_str());
+	str.appendFmt("Text: '%s'\n", text_.c_str());
 	str.appendFmt("Draw: %g %g %g %g\n", rectDraw_.x1, rectDraw_.y1, rectDraw_.x2, rectDraw_.y2);
 	str.appendFmt("Client: %g %g %g %g\n", rectClient_.x1, rectClient_.y1, rectClient_.x2, rectClient_.y2);
 
@@ -619,16 +903,23 @@ void XWindow::calcClientRect(void)
 	// convert to 0-2 first.
 	rectDraw_.x1 = (rect.x1 / 400);
 	rectDraw_.y1 = (rect.y1 / 300);
-
-
 	rectDraw_.x2 = (rect.x2 / 400);
 	rectDraw_.y2 = (rect.y2 / 300);
-
 
 	rectDraw_.x1 *= scale_x;
 	rectDraw_.y1 *= scale_y;
 	rectDraw_.x2 *= scale_x;
 	rectDraw_.y2 *= scale_y;
+
+	if (rectClient_.getHeight() > 0.f && rectClient_.getWidth() > 0.f) {
+
+		// set text rect to client
+		rectText_ = rectClient_;
+		// offset x,y
+		// this will not move the bottom right of the rect
+		rectText_.x1 += textAlignX_;
+		rectText_.y1 += textAlignY_;
+	}
 
 }
 // -------------- Overrides ---------------

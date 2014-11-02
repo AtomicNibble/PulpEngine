@@ -2,7 +2,7 @@
 #include "SimpleWindow.h"
 
 
-X_NAMESPACE_BEGIN(engine)
+X_NAMESPACE_BEGIN(gui)
 
 XWindowSimple::XWindowSimple() :
 	pParent_(nullptr)

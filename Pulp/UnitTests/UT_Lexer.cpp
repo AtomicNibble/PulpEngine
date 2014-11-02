@@ -503,7 +503,7 @@ bool XMapFile::Parse(core::XFile* file)
 		XLexToken token;
 		XMapEntity *mapEnt;
 
-		lexer.setFlags(LEXFL_NOSTRINGCONCAT | LEXFL_NOSTRINGESCAPECHARS | LEXFL_ALLOWPATHNAMES);
+		lexer.setFlags(LexFlag::NOSTRINGCONCAT | LexFlag::NOSTRINGESCAPECHARS | LexFlag::ALLOWPATHNAMES);
 
 		// we need to parse up untill the first brace.
 		while (lexer.ReadToken(token))

@@ -916,6 +916,12 @@
     <ClInclude Include="Containers\HashIndex.h">
       <Filter>Headers\Containers</Filter>
     </ClInclude>
+    <ClInclude Include="Math\XInterpolate.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="Math\XExtrapolate.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1155,6 +1161,9 @@
     <None Include="ClassDiagram.cd" />
     <None Include="Containers\HashIndex.inl">
       <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="Math\XInterpolate.inl">
+      <Filter>Headers\Math</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

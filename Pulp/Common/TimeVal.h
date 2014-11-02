@@ -137,7 +137,9 @@ public:
 private:
 	TimeType time_;
 
+	// TODO needs to be set, this value should not be fixed.
 	static const TimeType		PRECISION = 3134375;			// one second
+
 };
 
 

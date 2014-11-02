@@ -365,6 +365,7 @@
     <ClInclude Include="EngineBase.h" />
     <ClInclude Include="Gui\Gui.h" />
     <ClInclude Include="Gui\GuiManger.h" />
+    <ClInclude Include="Gui\GuiScript.h" />
     <ClInclude Include="Gui\RegExp.h" />
     <ClInclude Include="Gui\SimpleWindow.h" />
     <ClInclude Include="Gui\WinVar.h" />
@@ -380,6 +381,7 @@
     <ClCompile Include="Bsp.cpp" />
     <ClCompile Include="Gui\Gui.cpp" />
     <ClCompile Include="Gui\GuiManger.cpp" />
+    <ClCompile Include="Gui\GuiScript.cpp" />
     <ClCompile Include="Gui\RegExp.cpp" />
     <ClCompile Include="Gui\SimpleWindow.cpp" />
     <ClCompile Include="Gui\WinVar.cpp" />

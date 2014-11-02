@@ -5,25 +5,27 @@
 #define X_STRING_LEXER_H_
 
 #include <String\StringUtil.h>
+#include <Util\FlagsMacros.h>
 
 X_NAMESPACE_BEGIN(core)
 
-typedef enum {
-	LEXFL_NOERRORS = BIT(0),	// don't print any errors
-	LEXFL_NOWARNINGS = BIT(1),	// don't print any warnings
-	LEXFL_NOFATALERRORS = BIT(2),	// errors aren't fatal
-	LEXFL_NOSTRINGCONCAT = BIT(3),	// multiple strings seperated by whitespaces are not concatenated
-	LEXFL_NOSTRINGESCAPECHARS = BIT(4),	// no escape characters inside strings
-	LEXFL_NODOLLARPRECOMPILE = BIT(5),	// don't use the $ sign for precompilation
-	LEXFL_NOBASEINCLUDES = BIT(6),	// don't include files embraced with < >
-	LEXFL_ALLOWPATHNAMES = BIT(7),	// allow path seperators in names
-	LEXFL_ALLOWNUMBERNAMES = BIT(8),	// allow names to start with a number
-	LEXFL_ALLOWIPADDRESSES = BIT(9),	// allow ip addresses to be parsed as numbers
-	LEXFL_ALLOWFLOATEXCEPTIONS = BIT(10),	// allow float exceptions like 1.#INF or 1.#IND to be parsed
-	LEXFL_ALLOWMULTICHARLITERALS = BIT(11),	// allow multi character literals
-	LEXFL_ALLOWBACKSLASHSTRINGCONCAT = BIT(12),	// allow multiple strings seperated by '\' to be concatenated
-	LEXFL_ONLYSTRINGS = BIT(13)	// parse as whitespace deliminated strings (quoted strings keep quotes)
-} lexerFlags_t;
+X_DECLARE_FLAGS(LexFlag)(
+	NOERRORS,					// don't print any errors
+	NOWARNINGS,					// don't print any warnings
+	NOFATALERRORS,				// errors aren't fatal
+	NOSTRINGCONCAT,				// multiple strings seperated by whitespaces are not concatenated
+	NOSTRINGESCAPECHARS,		// no escape characters inside strings
+	NODOLLARPRECOMPILE,			// don't use the $ sign for precompilation
+	NOBASEINCLUDES,				// don't include files embraced with < >
+	ALLOWPATHNAMES,				// allow path seperators in names
+	ALLOWNUMBERNAMES,			// allow names to start with a number
+	ALLOWIPADDRESSES,			// allow ip addresses to be parsed as numbers
+	ALLOWFLOATEXCEPTIONS,		// allow float exceptions like 1.#INF or 1.#IND to be parsed
+	ALLOWMULTICHARLITERALS,		// allow multi character literals
+	ALLOWBACKSLASHSTRINGCONCAT,	// allow multiple strings seperated by '\' to be concatenated
+	ONLYSTRINGS					// parse as whitespace deliminated strings (quoted strings keep quotes)
+);
+
 
 // token types
 #define TT_STRING					1		// string
@@ -194,6 +196,8 @@ class XLexer
 {
 	XLexer() {}
 public:
+	typedef Flags<LexFlag> LexFlags;
+
 	XLexer(const char* startInclusive, const char* endExclusive);
 
 	int	ReadToken(XLexToken& token);
@@ -222,7 +226,7 @@ public:
 
 	const int		GetLineNumber(void);
 
-	void setFlags(int flags) {
+	void setFlags(LexFlags flags) {
 		flags_ = flags;
 	}
 	void Error(const char *str, ...);
@@ -250,7 +254,7 @@ private:
 	const char* lastp_;
 	int			curLine_;
 	int			lastLine_;				// line before reading token
-	int			flags_;					
+	LexFlags	flags_;
 
 	XLexToken	token;
 	int			tokenavailable;

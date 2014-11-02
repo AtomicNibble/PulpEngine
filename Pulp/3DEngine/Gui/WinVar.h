@@ -3,9 +3,14 @@
 #ifndef X_GUI_WIN_VARS_H_
 #define X_GUI_WIN_VARS_H_
 
+#include "RegExp.h"
+
 X_NAMESPACE_BEGIN(gui)
 
 class XWindow;
+
+// same
+typedef RegisterType VarType;
 
 class XWinVar 
 {
@@ -17,6 +22,7 @@ public:
 	virtual void Set(const char* val) X_ABSTRACT;
 	virtual void Update(void) X_ABSTRACT;
 	virtual const char* c_str() const X_ABSTRACT;
+	virtual VarType::Enum getType(void) X_ABSTRACT;
 
 	X_INLINE XWinVar& operator=(const XWinVar& oth) {
 		name = oth.name;
@@ -67,6 +73,10 @@ public:
 		temp.appendFmt("%i", value);
 		return temp.c_str();
 	}
+	virtual VarType::Enum getType(void) X_OVERRIDE{
+		return VarType::BOOL;
+	}
+
 
 	XWinBool& operator=(const XWinBool& oth) {
 		XWinVar::operator=(oth);
@@ -107,7 +117,9 @@ public:
 	virtual const char* c_str() const X_OVERRIDE {
 		return value.c_str();
 	}
-
+	virtual VarType::Enum getType(void) X_OVERRIDE{
+		return VarType::STRING;
+	}
 
 	X_INLINE XWinStr& operator=(const XWinStr& oth) {
 		XWinVar::operator=(oth);
@@ -164,6 +176,9 @@ public:
 		temp.appendFmt("%i", value);
 		return temp.c_str();
 	}
+	virtual VarType::Enum getType(void) X_OVERRIDE{
+		return VarType::INT;
+	}
 
 	XWinInt& operator=(const XWinInt& oth) {
 		XWinVar::operator=(oth);
@@ -205,6 +220,9 @@ public:
 		temp.clear();
 		temp.appendFmt("%f", value);
 		return temp.c_str();
+	}
+	virtual VarType::Enum getType(void) X_OVERRIDE{
+		return VarType::FLOAT;
 	}
 
 	XWinFloat& operator=(const XWinFloat& oth) {
@@ -253,6 +271,9 @@ public:
 		temp.clear();
 		temp.appendFmt("%f %f", value.x, value.y);
 		return temp.c_str();
+	}
+	virtual VarType::Enum getType(void) X_OVERRIDE{
+		return VarType::VEC2;
 	}
 
 	XWinVec2& operator=(const XWinVec2& oth) {
@@ -309,7 +330,9 @@ public:
 		temp.appendFmt("%f %f %f", value.x, value.y, value.z);
 		return temp.c_str();
 	}
-
+	virtual VarType::Enum getType(void) X_OVERRIDE{
+		return VarType::VEC3;
+	}
 
 	XWinVec3& operator=(const XWinVec3& oth) {
 		XWinVar::operator=(oth);
@@ -369,7 +392,9 @@ public:
 		temp.appendFmt("%f %f %f %f", value.x, value.y, value.z, value.w);
 		return temp.c_str();
 	}
-
+	virtual VarType::Enum getType(void) X_OVERRIDE{
+		return VarType::VEC4;
+	}
 
 	XWinVec4& operator=(const XWinVec4& oth) {
 		XWinVar::operator=(oth);
@@ -428,6 +453,12 @@ public:
 		value.y2 = value.y1 + value.y2;
 
 	}
+	void Set(const Vec4f& oth) {
+		value.x1 = oth[0];
+		value.y1 = oth[1];
+		value.x2 = oth[2];
+		value.y2 = oth[3];
+	}
 	virtual void Update(void) X_OVERRIDE{
 		const char* s = getName();
 	}
@@ -437,7 +468,9 @@ public:
 		temp.appendFmt("%f %f %f %f", value.x1, value.y1, value.x2, value.y2);
 		return temp.c_str();
 	}
-
+	virtual VarType::Enum getType(void) X_OVERRIDE{
+		return VarType::RECT;
+	}
 
 	XWinRect& operator=(const XWinRect& oth) {
 		XWinVar::operator=(oth);
@@ -446,7 +479,6 @@ public:
 	}
 	Rectf& operator=(const Rectf& oth) {
 		value = oth;
-
 		return value;
 	}
 
@@ -508,7 +540,9 @@ public:
 		temp.appendFmt("%f %f %f %f", value.r, value.g, value.b, value.a);
 		return temp.c_str();
 	}
-
+	virtual VarType::Enum getType(void) X_OVERRIDE{
+		return VarType::COLOR;
+	}
 
 	XWinColor& operator=(const XWinColor& oth) {
 		XWinVar::operator=(oth);

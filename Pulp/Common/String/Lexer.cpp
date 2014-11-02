@@ -412,7 +412,7 @@ int	XLexer::ReadToken(XLexToken& token)
 	c = *current_;
 
 	// if we're keeping everything as whitespace deliminated strings
-	if (flags_ & LEXFL_ONLYSTRINGS) {
+	if (flags_.IsSet(LexFlag::ONLYSTRINGS)) {
 		// if there is a leading quote
 		if (c == '\"' || c == '\'') {
 			if (!ReadString(token, c)) {
@@ -431,7 +431,7 @@ int	XLexer::ReadToken(XLexToken& token)
 			return 0;
 		}
 		// if names are allowed to start with a number
-		if (flags_ & LEXFL_ALLOWNUMBERNAMES) {
+		if (flags_.IsSet(LexFlag::ALLOWNUMBERNAMES)) {
 			c = *current_;
 			if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_') {
 				if (!ReadName(token)) {
@@ -453,7 +453,7 @@ int	XLexer::ReadToken(XLexToken& token)
 		}
 	}
 	// names may also start with a slash when pathnames are allowed
-	else if ((flags_ & LEXFL_ALLOWPATHNAMES) && ((c == '/' || c == '\\') || c == '.')) {
+	else if ((flags_.IsSet(LexFlag::ALLOWPATHNAMES)) && ((c == '/' || c == '\\') || c == '.')) {
 		if (!ReadName(token)) {
 			return 0;
 		}
@@ -849,7 +849,7 @@ int XLexer::ReadString(XLexToken& token, int quote) {
 
 	while (1) {
 		// if there is an escape character and escape characters are allowed
-		if (*current_ == '\\' && !(flags_ & LEXFL_NOSTRINGESCAPECHARS)) {
+		if (*current_ == '\\' && !(flags_.IsSet(LexFlag::NOSTRINGESCAPECHARS))) {
 			if (!ReadEscapeCharacter(&ch)) {
 				return 0;
 			}
@@ -860,8 +860,8 @@ int XLexer::ReadString(XLexToken& token, int quote) {
 			// step over the quote
 			current_++;
 			// if consecutive strings should not be concatenated
-			if ((flags_ & LEXFL_NOSTRINGCONCAT) &&
-				(!(flags_ & LEXFL_ALLOWBACKSLASHSTRINGCONCAT) || (quote != '\"'))) {
+			if (flags_.IsSet(LexFlag::NOSTRINGCONCAT) &&
+				(!flags_.IsSet(LexFlag::ALLOWBACKSLASHSTRINGCONCAT) || (quote != '\"'))) {
 				break;
 			}
 
@@ -874,7 +874,7 @@ int XLexer::ReadString(XLexToken& token, int quote) {
 				break;
 			}
 
-			if (flags_ & LEXFL_NOSTRINGCONCAT) {
+			if (flags_.IsSet(LexFlag::NOSTRINGCONCAT)) {
 				if (*current_ != '\\') {
 					current_ = tmpscript_p;
 					curLine_ = tmpline;
@@ -916,7 +916,7 @@ int XLexer::ReadString(XLexToken& token, int quote) {
 	token.end_ = (current_-1);
 
 	if (token.type == TT_LITERAL) {
-		if (!(flags_ & LEXFL_ALLOWMULTICHARLITERALS)) {
+		if (!(flags_.IsSet(LexFlag::ALLOWMULTICHARLITERALS))) {
 			if (token.length() != 1) {
 				Warning("literal is not one character long");
 			}
@@ -948,9 +948,9 @@ int XLexer::ReadName(XLexToken& token) {
 		(c >= '0' && c <= '9') ||
 		c == '_' ||
 		// if treating all tokens as strings, don't parse '-' as a seperate token
-		((flags_ & LEXFL_ONLYSTRINGS) && (c == '-')) ||
+		(flags_.IsSet(LexFlag::ONLYSTRINGS) && (c == '-')) ||
 		// if special path name characters are allowed
-		((flags_ & LEXFL_ALLOWPATHNAMES) && (c == '/' || c == '\\' || c == ':' || c == '.')));
+		(flags_.IsSet(LexFlag::ALLOWPATHNAMES) && (c == '/' || c == '\\' || c == ':' || c == '.')));
 	//	token->data[token->len] = '\0';
 	//the sub type is the length of the name
 	//	token.subtype = token->Length();
@@ -1097,14 +1097,14 @@ int XLexer::ReadNumber(XLexToken& token) {
 					//				token->AppendDirty(c);
 					c = *(++current_);
 				}
-				if (!(flags_ & LEXFL_ALLOWFLOATEXCEPTIONS)) {
+				if (!flags_.IsSet(LexFlag::ALLOWFLOATEXCEPTIONS)) {
 					//				token->AppendDirty(0);	// zero terminate for c_str
 					//				Error("parsed %s", token->c_str());
 				}
 			}
 		}
 		else if (dot > 1) {
-			if (!(flags_ & LEXFL_ALLOWIPADDRESSES)) {
+			if (!flags_.IsSet(LexFlag::ALLOWIPADDRESSES)) {
 				Error("more than one dot in number");
 				return 0;
 			}

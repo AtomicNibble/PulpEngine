@@ -4,7 +4,7 @@
 #define X_GUI_SIMPLE_WINDOW_H_
 
 
-X_NAMESPACE_BEGIN(engine)
+X_NAMESPACE_BEGIN(gui)
 
 class XWindowSimple
 {

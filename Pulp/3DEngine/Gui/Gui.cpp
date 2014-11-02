@@ -72,13 +72,14 @@ bool XGui::InitFromFile(const char* name)
 		X_DELETE_AND_NULL(pDesktop_, g_3dEngineArena);
 
 		pDesktop_ = X_NEW(XWindow, g_3dEngineArena, "MenuWindow");
-
+		pDesktop_->setFlag(WindowFlag::DESKTOP);
 		// for reloading do we want to ignore compiled ones?
 		// i think so.
 		goto SourceLoad;
 	}
 
 	pDesktop_ = X_NEW(XWindow, g_3dEngineArena, "MenuWindow");
+	pDesktop_->setFlag(WindowFlag::DESKTOP);
 
 	path = "gui/compiled/";
 	path.setFileName(name);
@@ -112,13 +113,23 @@ SourceLoad:
 bool XGui::ParseTextFile(const char* begin, const char* end)
 {
 	core::XLexer lex(begin,end);
+	core::XLexer::LexFlags flags;
+
+	flags.Set(core::LexFlag::NOFATALERRORS);
+	flags.Set(core::LexFlag::NOSTRINGCONCAT);
+	flags.Set(core::LexFlag::ALLOWMULTICHARLITERALS);
+	flags.Set(core::LexFlag::ALLOWBACKSLASHSTRINGCONCAT);
+
+	lex.setFlags(flags);
 
 	// we have a window def first.
 	if (lex.ExpectTokenString("windowDef"))
 	{
-
-		return pDesktop_->Parse(lex);
-
+		if (pDesktop_->Parse(lex))
+		{
+			pDesktop_->FixUpParms();
+			return true;
+		}
 	}
 
 	return false;
