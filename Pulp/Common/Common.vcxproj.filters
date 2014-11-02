@@ -169,12 +169,6 @@
     <Filter Include="SourceFiles\Containers">
       <UniqueIdentifier>{c7bb6186-46aa-4b85-8f65-a7a67ea958aa}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SourceFiles\Time\win32">
-      <UniqueIdentifier>{d87bf13f-9d43-4261-8097-aae47ddfdb13}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headers\Timer\win32">
-      <UniqueIdentifier>{b1cc9a32-dd9c-48f6-85a4-fe1292b23872}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -928,12 +922,6 @@
     <ClInclude Include="Math\XExtrapolate.h">
       <Filter>Headers\Math</Filter>
     </ClInclude>
-    <ClInclude Include="Time\SystemTimer.h">
-      <Filter>Headers\Timer</Filter>
-    </ClInclude>
-    <ClInclude Include="Time\win32\SystemTimer.h">
-      <Filter>Headers\Timer\win32</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1177,9 +1165,6 @@
     <None Include="Math\XInterpolate.inl">
       <Filter>Headers\Math</Filter>
     </None>
-    <None Include="Time\win32\SystemTimer.inl">
-      <Filter>Headers\Timer\win32</Filter>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">
@@ -1401,9 +1386,6 @@
     </ClCompile>
     <ClCompile Include="Containers\HashIndex.cpp">
       <Filter>SourceFiles\Containers</Filter>
-    </ClCompile>
-    <ClCompile Include="Time\win32\SystemTimer.cpp">
-      <Filter>SourceFiles\Time\win32</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

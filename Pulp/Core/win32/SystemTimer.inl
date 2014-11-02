@@ -43,15 +43,23 @@ namespace SysTimer
 		return value * GetTickPerSec();
 	}
 
+	X_INLINE int64_t fromMilliSeconds(int value)
+	{
+		return fromMilliSeconds((int64_t)value);
+	}
+
 	X_INLINE int64_t fromMilliSeconds(float value)
 	{
 		extern float g_MilliToValueSingle;
+		float test = g_MilliToValueSingle;
 		return static_cast<int64_t>(value * g_MilliToValueSingle);
 	}
 
 	X_INLINE int64_t fromMilliSeconds(double value)
 	{
 		extern double g_MilliToValueDouble;
+		double test = g_MilliToValueDouble;
+
 		return static_cast<int64_t>(value * g_MilliToValueDouble);
 	}
 
@@ -73,4 +81,11 @@ namespace SysTimer
 		extern int64_t g_Frequency;
 		return g_Frequency;
 	}
+
+	//
+	//	how to share these values across the engine.
+	//	
+	//
+	//
+	//
 }

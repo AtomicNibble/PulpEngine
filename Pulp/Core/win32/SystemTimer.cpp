@@ -1,4 +1,4 @@
-#include "EngineCommon.h"
+#include "stdafx.h"
 #include "SystemTimer.h"
 
 #include <Util\LastError.h>
@@ -79,8 +79,6 @@ namespace SysTimer
 		
 		g_oneOverFrequency = static_cast<float>(resolution);
 		g_thousandOverFrequency = static_cast<float>(resolution * 1000.0);
-
-
 	}
 
 	void Shutdown(void)

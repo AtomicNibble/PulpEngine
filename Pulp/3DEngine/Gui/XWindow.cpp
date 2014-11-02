@@ -200,7 +200,7 @@ bool XWindow::Parse(core::XLexer& lex)
 
 			core::StackString<64> temp(token.begin(), token.end());
 
-			event->time.SetSeconds( ::atof(temp.c_str()) );
+			event->time.SetMilliSeconds( ::atof(temp.c_str()) );
 
 			if (!ParseScript(lex, *event->script))
 			{
@@ -401,14 +401,17 @@ void XWindow::Transition(void)
 		if (data.interp.IsDone(timeMs))
 		{
 			r->Set(data.interp.GetEndValue());
+
+	//		X_LOG0("Gui", "time(%i) %g %g %g %g", timeMs,
+	//			r->x1(), r->y1(), r->x2(), r->y2());
 		}
 		else 
 		{
 			clear = false;
 			r->Set(data.interp.GetCurrentValue(timeMs));
 
-			X_LOG0("Gui", "time(%i) %g %g %g %g", timeMs, 
-				r->x1(), r->y1(), r->x2(), r->y2());
+		//	X_LOG0("Gui", "time(%i) %g %g %g %g", timeMs, 
+		//		r->x1(), r->y1(), r->x2(), r->y2());
 		}
 	}
 

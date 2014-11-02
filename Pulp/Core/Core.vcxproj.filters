@@ -27,6 +27,12 @@
     <Filter Include="Header Files\Profile">
       <UniqueIdentifier>{14d0cb70-d03d-45bb-895f-68f32a0445ee}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\win32">
+      <UniqueIdentifier>{b0dde02a-b5c8-4295-9942-bd35ca72a1a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\win32">
+      <UniqueIdentifier>{9cb22ff1-6acd-4535-a134-eda65a43bf03}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -101,6 +107,9 @@
     <ClInclude Include="win32\OsFileAsyncOperation.h">
       <Filter>FileSys\win32</Filter>
     </ClInclude>
+    <ClInclude Include="win32\SystemTimer.h">
+      <Filter>Header Files\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -163,10 +172,16 @@
     <ClCompile Include="win32\OsFileAsyncOperation.cpp">
       <Filter>FileSys\win32</Filter>
     </ClCompile>
+    <ClCompile Include="win32\SystemTimer.cpp">
+      <Filter>Source Files\win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Cpu.inl">
       <Filter>Header Files</Filter>
+    </None>
+    <None Include="win32\SystemTimer.inl">
+      <Filter>Header Files\win32</Filter>
     </None>
   </ItemGroup>
 </Project>

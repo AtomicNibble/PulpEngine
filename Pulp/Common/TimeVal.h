@@ -3,8 +3,6 @@
 #ifndef _X_TIME_VAL_H_
 #define _X_TIME_VAL_H_
 
-#include "Time\SystemTimer.h"
-
 X_NAMESPACE_BEGIN(core)
 
 // Holds a time value :)
@@ -59,52 +57,60 @@ public:
 	// Use only for relative value, absolute values suffer a lot from precision loss.
 	X_INLINE float GetSeconds() const
 	{
-		return SysTimer::ToSeconds(time_);
+		return time_ * (1.f / PRECISION);
 	}
 
 	// Get relative time difference in seconds - call on the endTime object:  endTime.GetDifferenceInSeconds( startTime );
 	X_INLINE float GetDifferenceInSeconds(const TimeVal& startTime) const
 	{
-		return SysTimer::ToSeconds(time_ - startTime.time_);
+		return (time_ - startTime.time_) * (1.f / PRECISION);
 	}
 
 	X_INLINE void SetSeconds(const float infSec)
 	{
-		time_ = SysTimer::fromSeconds(infSec);
+		time_ = (TimeType)(infSec*PRECISION);
 	}
 
 	//
 	X_INLINE void SetSeconds(const double infSec)
 	{
-		time_ = SysTimer::fromSeconds(infSec);
+		time_ = (TimeType)(infSec*PRECISION);
 	}
 
 	//
 	X_INLINE void SetSeconds(const TimeType indwSec)
 	{
-		time_ = SysTimer::fromSeconds(indwSec);
+		time_ = indwSec*PRECISION;
 	}
 
+	X_INLINE void SetMilliSeconds(const int iniMilliSec)
+	{
+		time_ = iniMilliSec*(PRECISION / 1000);
+	}
+	X_INLINE void SetMilliSeconds(const double indMilliSec)
+	{
+		time_ = ((TimeType)indMilliSec)*(PRECISION / 1000);
+	}
 	//
 	X_INLINE void SetMilliSeconds(const TimeType indwMilliSec)
 	{
-		time_ = SysTimer::fromMilliSeconds(indwMilliSec);
+		time_ = indwMilliSec*(PRECISION / 1000);
 	}
 
 	X_INLINE void SetNanoSeconds(const TimeType indwNanoSec)
 	{
-		time_ = SysTimer::fromNanoSeconds(indwNanoSec);
+		time_ = indwNanoSec / (1000000 / PRECISION);
 	}
 
 	// Use only for relative value, absolute values suffer a lot from precision loss.
 	X_INLINE float GetMilliSeconds() const
 	{
-		return SysTimer::ToMilliSeconds(time_);
+		return time_ * (1000.f / PRECISION);
 	}
 
 	X_INLINE TimeType GetMilliSecondsAsInt64() const
 	{
-		return (TimeType)SysTimer::ToMilliSeconds(time_);
+		return time_ * 1000 / PRECISION;
 	}
 
 	X_INLINE TimeType GetValue() const
@@ -139,7 +145,9 @@ public:
 private:
 	TimeType time_;
 
-//	TimeType		PRECISION = 3134375;			// one second
+	static const TimeType		PRECISION = 
+		3134375;			// one second
+	//	100000;
 };
 
 

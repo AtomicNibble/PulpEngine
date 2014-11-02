@@ -35,6 +35,7 @@ namespace SysTimer
 	X_INLINE int64_t fromSeconds(float value);
 	X_INLINE int64_t fromSeconds(double value);
 	X_INLINE int64_t fromSeconds(int64_t value);
+	X_INLINE int64_t fromMilliSeconds(int value);
 	X_INLINE int64_t fromMilliSeconds(float value);
 	X_INLINE int64_t fromMilliSeconds(int64_t value);
 	X_INLINE int64_t fromNanoSeconds(int64_t value);

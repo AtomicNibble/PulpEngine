@@ -263,9 +263,7 @@
     <ClInclude Include="TimeVal.h" />
     <ClInclude Include="Time\CompressedStamps.h" />
     <ClInclude Include="Time\DateStamp.h" />
-    <ClInclude Include="Time\SystemTimer.h" />
     <ClInclude Include="Time\TimeStamp.h" />
-    <ClInclude Include="Time\win32\SystemTimer.h" />
     <ClInclude Include="Traits\FunctionSignatureTraits.h" />
     <ClInclude Include="Traits\FunctionTraits.h" />
     <ClInclude Include="Traits\MemberFunctionTraits.h" />
@@ -368,7 +366,6 @@
     <None Include="Threading\Semaphore.inl" />
     <None Include="Threading\Spinlock.inl" />
     <None Include="Threading\ThreadLocalStorage.inl" />
-    <None Include="Time\win32\SystemTimer.inl" />
     <None Include="Util\BitUtil.inl" />
     <None Include="Util\EndianUtil.inl" />
     <None Include="Util\Flags.inl" />
@@ -677,7 +674,6 @@
     <ClCompile Include="Time\CompressedStamps.cpp" />
     <ClCompile Include="Time\DateStamp.cpp" />
     <ClCompile Include="Time\TimeStamp.cpp" />
-    <ClCompile Include="Time\win32\SystemTimer.cpp" />
     <ClCompile Include="Util\win32\LastError.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>

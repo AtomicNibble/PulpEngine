@@ -379,7 +379,7 @@ public:
 	virtual void Set(const char* val) X_OVERRIDE{
 		// make comma optional.
 		if (strchr(val, ','))
-		sscanf(val, "%f,%f,%f,%f", &value.x, &value.y, &value.z, &value.w);
+			sscanf(val, "%f,%f,%f,%f", &value.x, &value.y, &value.z, &value.w);
 		else
 			sscanf(val, "%f %f %f %f", &value.x, &value.y, &value.z, &value.w);
 	}
@@ -412,6 +412,9 @@ public:
 	}
 
 	operator const Vec4f&() const {
+		return value;
+	}
+	Vec4f& getVec(void) {
 		return value;
 	}
 
@@ -485,6 +488,9 @@ public:
 //	bool operator==(const Rectf& oth) {
 //		return (value == oth);
 //	}
+	Vec4f asVec4(void) const {
+		return Vec4f(value.x1, value.y1, value.x2, value.y2);
+	}
 
 	operator const Rectf&() const {
 		return value;

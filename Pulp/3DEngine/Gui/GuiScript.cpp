@@ -31,8 +31,8 @@ namespace
 		{
 			VarType::Enum type = src[0].var->getType();
 
-			if (src[1].var->getType() != VarType::VEC4 ||
-				src[2].var->getType() != VarType::VEC4 ||
+			if (src[1].var->getType() != VarType::RECT ||
+				src[2].var->getType() != VarType::RECT ||
 				src[3].var->getType() != VarType::STRING )
 			{
 				X_WARNING("Gui", "invalid transition args: %s %s %s",
@@ -43,8 +43,8 @@ namespace
 				return;
 			}
 
-			XWinVec4* from = static_cast<XWinVec4*>(src[1].var);
-			XWinVec4* to = static_cast<XWinVec4*>(src[2].var);
+			XWinRect* from = static_cast<XWinRect*>(src[1].var);
+			XWinRect* to = static_cast<XWinRect*>(src[2].var);
 			XWinStr* timeStr = static_cast<XWinStr*>(src[3].var);
 
 			int time = ::atoi(*timeStr);
@@ -58,13 +58,14 @@ namespace
 			{
 				XWinRect* pRect = static_cast<XWinRect*>(src[0].var);
 				pRect->SetEval(false);
-				window->AddTransition(pRect, *from, *to, time, ac, dc);
+
+				window->AddTransition(pRect, from->asVec4(), to->asVec4(), time, ac, dc);
 			}
 			else if (type == VarType::VEC4)
 			{
-				XWinVec4* pVec4 = static_cast<XWinVec4*>(src[0].var);
-				pVec4->SetEval(false);
-				window->AddTransition(pVec4, *from, *to, time, ac, dc);
+			//	XWinVec4* pVec4 = static_cast<XWinVec4*>(src[0].var);
+			//	pVec4->SetEval(false);
+			//	window->AddTransition(pVec4, *from, *to, time, ac, dc);
 			}
 			else
 			{
@@ -233,13 +234,13 @@ void XGuiScript::FixUpParms(XWindow* win)
 
 				pStr = static_cast<XWinStr*>(parms[i].var);
 
-		/*		if (isRect && i == 1)
+				if (isRect)
 				{
 					XWinRect* rect = X_NEW(XWinRect, g_3dEngineArena, "TransParam");
 					rect->Set(pStr->c_str());
 					parms[i].var = rect;
 				}
-				else */
+				else 
 				{
 					XWinVec4* v4 = X_NEW(XWinVec4, g_3dEngineArena, "TransParam");		
 					v4->Set(pStr->c_str());

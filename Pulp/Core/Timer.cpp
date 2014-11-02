@@ -6,7 +6,7 @@
 
 #include <math.h> // TEMP!!
 
-#include <Time\SystemTimer.h>
+#include "SystemTimer.h"
 
 //! Profile smoothing time in seconds (original default was .8 / log(10) ~= .35 s)
 static const float fDEFAULT_PROFILE_SMOOTHING = 1.0f;
