@@ -28,6 +28,11 @@ namespace SysTimer
 
 	float g_oneOverFrequency; 
 	float g_thousandOverFrequency; 
+	float g_FrequencySingle;
+	double g_FrequencyDouble;
+
+	float g_MilliToValueSingle;
+	double g_MilliToValueDouble;
 
 	int64_t g_Frequency;
 
@@ -66,8 +71,16 @@ namespace SysTimer
 
 		double resolution = 1.0 / static_cast<double>(frequency.QuadPart);
 
+		g_FrequencySingle = static_cast<float>(frequency.QuadPart);
+		g_FrequencyDouble = static_cast<double>(frequency.QuadPart);
+		// times it by frequency * 1000
+		g_MilliToValueSingle = static_cast<float>(g_FrequencyDouble * 1000);
+		g_MilliToValueDouble = static_cast<double>(g_FrequencyDouble * 1000);
+		
 		g_oneOverFrequency = static_cast<float>(resolution);
 		g_thousandOverFrequency = static_cast<float>(resolution * 1000.0);
+
+
 	}
 
 	void Shutdown(void)

@@ -8,7 +8,6 @@ namespace SysTimer
 		typedef int64(*TimeUpdateFunc) ();
 		extern TimeUpdateFunc g_pUpdateFunc;
 
-	//	TimeUpdateFunc test = g_pUpdateFunc;
 		return g_pUpdateFunc();
 	}
 
@@ -23,6 +22,51 @@ namespace SysTimer
 		extern float g_thousandOverFrequency;
 		return count * g_thousandOverFrequency;
 	}
+
+
+	X_INLINE int64_t fromSeconds(float value)
+	{
+		// times by frequency.
+		extern float g_FrequencySingle;
+
+		return static_cast<int64_t>(value * g_FrequencySingle);
+	}
+	X_INLINE int64_t fromSeconds(double value)
+	{
+		extern double g_FrequencyDouble;
+
+		return static_cast<int64_t>(value * g_FrequencyDouble);
+	}
+
+	X_INLINE int64_t fromSeconds(int64_t value)
+	{
+		return value * GetTickPerSec();
+	}
+
+	X_INLINE int64_t fromMilliSeconds(float value)
+	{
+		extern float g_MilliToValueSingle;
+		return static_cast<int64_t>(value * g_MilliToValueSingle);
+	}
+
+	X_INLINE int64_t fromMilliSeconds(double value)
+	{
+		extern double g_MilliToValueDouble;
+		return static_cast<int64_t>(value * g_MilliToValueDouble);
+	}
+
+
+	X_INLINE int64_t fromMilliSeconds(int64_t value)
+	{
+		return value * GetTickPerSec() * 1000;
+	}
+
+	X_INLINE int64_t fromNanoSeconds(int64_t value)
+	{
+		return value * GetTickPerSec() * 1000000;
+	}
+
+
 
 	X_INLINE int64 GetTickPerSec()
 	{

@@ -3,6 +3,8 @@
 #ifndef _X_TIME_VAL_H_
 #define _X_TIME_VAL_H_
 
+#include "Time\SystemTimer.h"
+
 X_NAMESPACE_BEGIN(core)
 
 // Holds a time value :)
@@ -57,52 +59,52 @@ public:
 	// Use only for relative value, absolute values suffer a lot from precision loss.
 	X_INLINE float GetSeconds() const
 	{
-		return time_ * (1.f / PRECISION);
+		return SysTimer::ToSeconds(time_);
 	}
 
 	// Get relative time difference in seconds - call on the endTime object:  endTime.GetDifferenceInSeconds( startTime );
 	X_INLINE float GetDifferenceInSeconds(const TimeVal& startTime) const
 	{
-		return (time_ - startTime.time_) * (1.f / PRECISION);
+		return SysTimer::ToSeconds(time_ - startTime.time_);
 	}
 
 	X_INLINE void SetSeconds(const float infSec)
 	{
-		time_ = (TimeType)(infSec*PRECISION);
+		time_ = SysTimer::fromSeconds(infSec);
 	}
 
 	//
 	X_INLINE void SetSeconds(const double infSec)
 	{
-		time_ = (TimeType)(infSec*PRECISION);
+		time_ = SysTimer::fromSeconds(infSec);
 	}
 
 	//
 	X_INLINE void SetSeconds(const TimeType indwSec)
 	{
-		time_ = indwSec*PRECISION;
+		time_ = SysTimer::fromSeconds(indwSec);
 	}
 
 	//
 	X_INLINE void SetMilliSeconds(const TimeType indwMilliSec)
 	{
-		time_ = indwMilliSec*(PRECISION / 1000);
+		time_ = SysTimer::fromMilliSeconds(indwMilliSec);
 	}
 
 	X_INLINE void SetNanoSeconds(const TimeType indwNanoSec)
 	{
-		time_ = indwNanoSec / (1000000 / PRECISION);
+		time_ = SysTimer::fromNanoSeconds(indwNanoSec);
 	}
 
 	// Use only for relative value, absolute values suffer a lot from precision loss.
 	X_INLINE float GetMilliSeconds() const
 	{
-		return time_ * (1000.f / PRECISION);
+		return SysTimer::ToMilliSeconds(time_);
 	}
 
 	X_INLINE TimeType GetMilliSecondsAsInt64() const
 	{
-		return time_ * 1000 / PRECISION;
+		return (TimeType)SysTimer::ToMilliSeconds(time_);
 	}
 
 	X_INLINE TimeType GetValue() const
@@ -137,9 +139,7 @@ public:
 private:
 	TimeType time_;
 
-	// TODO needs to be set, this value should not be fixed.
-	static const TimeType		PRECISION = 3134375;			// one second
-
+//	TimeType		PRECISION = 3134375;			// one second
 };
 
 
