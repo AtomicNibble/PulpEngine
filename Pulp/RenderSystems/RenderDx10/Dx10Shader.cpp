@@ -319,6 +319,33 @@ bool DX11XRender::SetZPass()
 	shader::XHWShader_Dx10::setParams();
 	shader::XHWShader_Dx10::setParamsGlobal();
 
+	FX_ComitParams();
+	return true;
+}
+
+bool DX11XRender::setGUIShader(void)
+{
+	using namespace shader;
+
+	XShader* pSh = XShaderManager::m_Gui;
+	uint32_t pass;
+
+	if (!pSh)
+		return false;
+
+	core::StrHash tech("Fill");
+	if (!pSh->FXSetTechnique(tech))
+		return false;
+
+	if (!pSh->FXBegin(&pass, 0))
+		return false;
+
+	if (!pSh->FXBeginPass(pass))
+		return false;
+
+
+	shader::XHWShader_Dx10::setParams();
+	shader::XHWShader_Dx10::setParamsGlobal();
 
 	FX_ComitParams();
 	return true;

@@ -327,9 +327,11 @@ struct IRender
 
 	// Screen Space Draw: range 0-2 width / h is also scrrenspace size not pixels
 	virtual void DrawQuadSS(float x, float y, float width, float height, const Color& col) X_ABSTRACT;
+	virtual void DrawQuadSS(const Rectf& rect, const Color& col) X_ABSTRACT;
 	virtual void DrawQuadSS(float x, float y, float width, float height, const Color& col, const Color& borderCol) X_ABSTRACT;
 	virtual void DrawQuadImageSS(float x, float y, float width, float height, texture::TexID texture_id, ColorT<float>& col) X_ABSTRACT;
 	virtual void DrawRectSS(float x, float y, float width, float height, const Color& col) X_ABSTRACT;
+	virtual void DrawRectSS(const Rectf& rect, const Color& col) X_ABSTRACT;
 	virtual void DrawLineColorSS(const Vec2f& vPos1, const Color& color1,
 		const Vec2f& vPos2, const Color& vColor2) X_ABSTRACT;
 
@@ -389,6 +391,7 @@ struct IRender
 	virtual bool DefferedBegin(void) X_ABSTRACT;
 	virtual bool DefferedEnd(void) X_ABSTRACT;
 	virtual bool SetWorldShader(void) X_ABSTRACT;
+	virtual bool setGUIShader(void) X_ABSTRACT;
 	// ~Shader Stuff
 
 	// Model

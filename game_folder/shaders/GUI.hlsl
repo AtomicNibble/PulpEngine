@@ -51,7 +51,7 @@ VS_OUTPUT guiVS(VS_INPUT input)
     VS_OUTPUT output;
     
     // screen space input.
-    output.position   	= input.position; // mul(input.position, worldToScreenMatrix);
+    output.position   	= input.position;
     output.color       	= input.color;
     output.texCoord     	= input.texCoord;
 

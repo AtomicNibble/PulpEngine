@@ -5,6 +5,11 @@ X_INLINE const char* XGui::getName(void) const
 	return name_.c_str();
 }
 
+X_INLINE void XGui::setName(const char* name)
+{
+	name_ = name;
+}
+
 X_INLINE void XGui::setCursorPos(float x, float y)
 {
 	cursorPos_.x = x;

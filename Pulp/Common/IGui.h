@@ -45,8 +45,8 @@
 
 X_NAMESPACE_BEGIN(gui)
 
-static const char*	GUI_FILE_EXTENSION = ".gui";
-static const char*  GUI_BINARY_FILE_EXTENSION = ".guib";
+static const char*	GUI_FILE_EXTENSION = "gui";
+static const char*  GUI_BINARY_FILE_EXTENSION = "guib";
 
 // some limits
 static const uint32_t GUI_MAX_MENUS = 64;
@@ -136,7 +136,7 @@ struct IGui
 	virtual float getCursorPosY(void) X_ABSTRACT;
 
 	// repaints the ui
-	virtual void Redraw(int time, bool hud = false) X_ABSTRACT;
+	virtual void Redraw() X_ABSTRACT;
 	virtual void DrawCursor(void) X_ABSTRACT;
 
 	// dose shit.
@@ -152,6 +152,7 @@ struct IGuiManger
 	virtual void Shutdown(void) X_ABSTRACT;
 
 	virtual IGui* loadGui(const char* name) X_ABSTRACT;
+	virtual IGui* findGui(const char* name) X_ABSTRACT;
 
 
 

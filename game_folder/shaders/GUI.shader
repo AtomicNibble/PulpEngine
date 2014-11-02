@@ -13,13 +13,16 @@ shader
 	techniques
 	{
 		{
-			name 				"Fill(Textured)"
+			name 				"Fill"
 			vertex_shader   	"guiVS"
 			pixel_shader    	"guiPS"	
 			src_blend_color  	src_alpha
 			src_blend_alpha  	src_alpha
 			dst_blend_color  	inv_src_alpha
 			dst_blend_alpha  	inv_src_alpha
+			cull_mode           back
+			depth_test         always
+			depth_write        false
 		}
 		{
 			name 				"FillAdd(Textured)"
@@ -29,6 +32,9 @@ shader
 			src_blend_alpha 	src_alpha
 			dst_blend_color  	one
 			dst_blend_alpha 	one
+			cull_mode           back
+			depth_test         always
+			depth_write        false
 		}
 		{
 			name 				"FillMul(Textured)"
@@ -38,6 +44,9 @@ shader
 			src_blend_alpha 	zero
 			dst_blend_color  	src_color
 			dst_blend_alpha 	src_color
+			cull_mode           back
+			depth_test         always
+			depth_write        false
 		}		
 	}
 }

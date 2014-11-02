@@ -12,7 +12,7 @@ class RectT
 public:
 	T	x1, y1, x2, y2;
 
-	RectT() {}
+	RectT() : x1(0), y1(0), x2(0), y2(0) {}
 
 	RectT(T aX1, T aY1, T aX2, T aY2) {
 		set(aX1, aY1, aX2, aY2);

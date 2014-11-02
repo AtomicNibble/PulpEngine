@@ -26,6 +26,7 @@ public:
 	void Shutdown(void) X_FINAL;
 
 	IGui* loadGui(const char* name) X_FINAL;
+	IGui* findGui(const char* name) X_FINAL;
 
 	void listGuis(const char* wildcardSearch = nullptr) const X_FINAL;
 	//~IGuiManger

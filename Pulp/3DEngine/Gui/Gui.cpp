@@ -22,9 +22,10 @@ XGui::~XGui()
 
 }
 
-void XGui::Redraw(int time, bool hud)
+void XGui::Redraw()
 {
-
+	if (pDesktop_)
+		pDesktop_->reDraw();
 }
 
 void XGui::DrawCursor(void)
@@ -48,12 +49,33 @@ bool XGui::InitFromFile(const char* name)
 	core::XFileMemScoped file;
 	core::fileModeFlags mode;
 
+	// TODO remove extension.?
+	this->name_ = name;
+
+	mode.Set(core::fileMode::READ);
+
+
 	// already init?
 	if (isDeskTopValid())
 	{
-		X_WARNING("Gui", "gui item is already init from: \"%s\"",
-			name_.c_str());
-		return true;
+		// we are reloading most likley, warn if diffrent.
+		if (name_ != name)
+		{
+			X_WARNING("Gui", "gui item is already init for menu: \"%s\"",
+				name_.c_str());
+		}
+
+		// just delete the last one?
+		// would be cool if like state was preserved across a reload.
+		// so colors and sizes could be changed, and moving items still
+		// be on same path.
+		X_DELETE_AND_NULL(pDesktop_, g_3dEngineArena);
+
+		pDesktop_ = X_NEW(XWindow, g_3dEngineArena, "MenuWindow");
+
+		// for reloading do we want to ignore compiled ones?
+		// i think so.
+		goto SourceLoad;
 	}
 
 	pDesktop_ = X_NEW(XWindow, g_3dEngineArena, "MenuWindow");
@@ -62,14 +84,14 @@ bool XGui::InitFromFile(const char* name)
 	path.setFileName(name);
 	path.setExtension(GUI_BINARY_FILE_EXTENSION);
 
-	mode.Set(core::fileMode::READ);
-
 	if (file.openFile(path.c_str(), mode))
 	{
 		// load the compiled version.
 		X_LOG0("Gui", "loading: \"%s\"", path.c_str());
 		return false;
 	}
+
+SourceLoad:
 
 	// try none binary
 	path = "gui/";

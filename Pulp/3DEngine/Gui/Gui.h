@@ -8,6 +8,7 @@
 X_NAMESPACE_BEGIN(gui)
 
 class XWindow;
+class XGuiManager;
 
 // This is a interface container.
 // it has a baser menu which may have multiple childs menus.
@@ -26,20 +27,21 @@ public:
 	float getCursorPosY(void) X_FINAL;
 
 	// repaints the ui
-	void Redraw(int time, bool hud = false) X_FINAL;
+	void Redraw() X_FINAL;
 	void DrawCursor(void) X_FINAL;
 
 	const char* Activate(bool activate, int time) X_FINAL;
 
-public:
+
+protected:
+	friend class XGuiManager;
 
 	// Init this object with the contents of the file.
 	bool InitFromFile(const char* name);
 
-	bool ParseTextFile(const char* begin, const char* end);
-
-
+	void setName(const char* name);
 private:
+	bool ParseTextFile(const char* begin, const char* end);
 
 	bool isDeskTopValid(void) const;
 

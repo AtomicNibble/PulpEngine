@@ -64,8 +64,64 @@ void DX11XRender::DrawQuadSS(float x, float y, float width, float height, const 
 
 	// Render the two triangles from the data stream
 	FX_DrawPrimitive(PrimitiveType::TriangleStrip, nOffs, 4);
-	
+}
 
+void DX11XRender::DrawQuadSS(const Rectf& rect, const Color& col)
+{
+	SetCullMode(CullMode::NONE);
+
+	// input is 0-2
+	// directx is like so:
+	//
+	// -1,1			1,1
+	//
+	//		  0,0
+	//
+	// -1,-1		1,-1
+	float x1, y1, x2, y2;
+	float z;
+
+	z = 0.f;
+	x1 = rect.x1 - 1.f;
+	y1 = 1.f - rect.y1;
+	x2 = rect.x2 - 1.f;
+	y2 = 1.f - rect.y2;
+
+
+	uint32 nOffs;
+	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
+
+	// TL
+	Quad[0].pos.x = x1;
+	Quad[0].pos.y = y1;
+	Quad[0].pos.z = z;
+	// TR
+	Quad[1].pos.x = x2;
+	Quad[1].pos.y = y1;
+	Quad[1].pos.z = z;
+	// BL
+	Quad[2].pos.x = x1;
+	Quad[2].pos.y = y2;
+	Quad[2].pos.z = z;
+	// BR
+	Quad[3].pos.x = x2;
+	Quad[3].pos.y = y2;
+	Quad[3].pos.z = z;
+
+	for (uint32 i = 0; i<4; ++i)
+	{
+		Quad[i].color = col;
+		Quad[i].st = Vec2f::zero();
+	}
+
+	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
+	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+
+	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+		return;
+
+	// Render the two triangles from the data stream
+	FX_DrawPrimitive(PrimitiveType::TriangleStrip, nOffs, 4);
 }
 
 void DX11XRender::DrawQuadSS(float x, float y, float width, float height,
@@ -142,6 +198,34 @@ void DX11XRender::DrawRectSS(float x, float y, float width, float height, const 
 	y1 = 2.f - y;
 	x2 = x1 + width;
 	y2 = y1 - height;
+
+	const Vec3f tl(x1, y1, 0);
+	const Vec3f tr(x2, y1, 0);
+	const Vec3f bl(x1, y2, 0);
+	const Vec3f br(x2, y2, 0);
+
+	// once the coords are mapped to directx coords.
+	// we can just use the default none SS functions.
+	// since the shader is what's important.
+
+	// Top
+	DrawLineColor(tl, col, tr, col);
+	// bottom
+	DrawLineColor(bl, col, br, col);
+	// left down
+	DrawLineColor(tl, col, bl, col);
+	// right down
+	DrawLineColor(tr, col, br, col);
+}
+
+void DX11XRender::DrawRectSS(const Rectf& rect, const Color& col)
+{
+	float x1, y1, x2, y2;
+
+	x1 = rect.x1 - 1.f;
+	y1 = 1.f - rect.y1;
+	x2 = rect.x2 - 1.f;
+	y2 = 1.f - rect.y2;
 
 	const Vec3f tl(x1, y1, 0);
 	const Vec3f tr(x2, y1, 0);
@@ -385,7 +469,7 @@ void DX11XRender::DrawLines(Vec3f* points, uint32_t num, const Color& col)
 void DX11XRender::DrawLine(const Vec3f& pos1, const Vec3f& pos2)
 {
 	SetCullMode(CullMode::NONE);
-	SetFFE(false);
+//	SetFFE(false);
 
 	uint32 nOffs;
 	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(2, nOffs);
@@ -412,7 +496,7 @@ void DX11XRender::DrawLine(const Vec3f& pos1, const Vec3f& pos2)
 void DX11XRender::DrawLineColor(const Vec3f& pos1, const Color& color1,
 	const Vec3f& pos2, const Color& vColor2)
 {
-	SetFFE(false);
+//	SetFFE(false);
 
 	// Lock the entire buffer and obtain a pointer to the location where we have to
 	uint32 nOffs;

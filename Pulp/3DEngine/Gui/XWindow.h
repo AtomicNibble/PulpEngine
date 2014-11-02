@@ -3,6 +3,8 @@
 #ifndef X_GUI_WINDOW_H_
 #define X_GUI_WINDOW_H_
 
+#include "EngineBase.h"
+
 #include <IGui.h>
 
 #include <String\Lexer.h>
@@ -29,7 +31,7 @@ struct XRegEntry
 
 
 class XWindowSimple;
-class XWindow
+class XWindow : public engine::XEngineBase
 {
 public:
 	typedef Flags<WindowFlag> WindowFlags;
@@ -77,12 +79,12 @@ public:
 	// Drawing
 	void reDraw(void);
 	void drawDebug(void);
-	void drawCaption(void);
 
 
 	// Overrides
 	virtual bool Parse(core::XLexer& lex);
 	virtual void draw(int time, float x, float y);
+	virtual void drawBackground(const Rectf& drawRect);
 	virtual void activate(bool activate);
 	virtual void gainFocus(void);
 	virtual void loseFocus(void);
@@ -96,6 +98,13 @@ public:
 	int ParseExpression(core::XLexer& lex, XWinVar* var = nullptr);
 	int ParseTerm(core::XLexer& lex, XWinVar* var, int component);
 	int ExpressionConstant(float f);
+
+private:
+	// some none public drawing shiz.
+	void drawBorder(const Rectf& drawRect);
+
+
+	void calcClientRect(void);
 
 private:
 	int ParseExpressionPriority(core::XLexer& lex, int priority,
@@ -116,7 +125,13 @@ private:
 
 	float EvalRegs(int test = -1, bool force = false);
 
+	// called post parse.
+	void SetupFromState(void);
+
 protected:
+	typedef core::Array<XWindow*> Children;
+	typedef Children::Iterator Childit;
+
 	Rectf rectDraw_;
 	Rectf rectClient_;
 

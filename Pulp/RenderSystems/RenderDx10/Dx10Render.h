@@ -250,6 +250,7 @@ public:
 	virtual bool SetFFE(bool textured = false);
 	virtual bool SetFontShader();
 	virtual bool SetZPass();
+	virtual bool setGUIShader(void);
 
 	// ~Shaders 
 
@@ -268,10 +269,12 @@ public:
 
 	// Screen Space Draw: range 0-2 width / h is also scrrenspace not pixels
 	void DrawQuadSS(float x, float y, float width, float height, const Color& col) X_FINAL;
+	void DrawQuadSS(const Rectf& rect, const Color& col) X_FINAL;
 	void DrawQuadSS(float x, float y, float width, float height, const Color& col, const Color& borderCol) X_FINAL;
 	void DrawQuadImageSS(float x, float y, float width, float height, texture::TexID texture_id, ColorT<float>& col) X_FINAL;
 	void DrawRectSS(float x, float y, float width, float height, const Color& col) X_FINAL;
-	virtual void DrawLineColorSS(const Vec2f& vPos1, const Color& color1,
+	void DrawRectSS(const Rectf& rect, const Color& col) X_FINAL;
+	void DrawLineColorSS(const Vec2f& vPos1, const Color& color1,
 		const Vec2f& vPos2, const Color& vColor2) X_FINAL;
 
 

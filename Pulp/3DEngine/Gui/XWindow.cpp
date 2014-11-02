@@ -2,6 +2,8 @@
 #include "XWindow.h"
 
 #include <IFont.h>
+#include <IRender.h>
+#include <IRenderAux.h>
 
 X_NAMESPACE_BEGIN(gui)
 
@@ -93,24 +95,6 @@ XWindow::~XWindow()
 
 
 
-// ----------------------------------------
-
-// Drawing
-void XWindow::reDraw(void)
-{
-
-}
-
-void XWindow::drawDebug(void)
-{
-
-}
-
-void XWindow::drawCaption(void)
-{
-
-}
-
 
 // -------------- Parsing ---------------
 void XWindow::SaveExpressionParseState()
@@ -177,7 +161,17 @@ bool XWindow::Parse(core::XLexer& lex)
 
 	EvalRegs(-1, true);
 
+	SetupFromState();
+
 	return true;
+}
+
+void XWindow::SetupFromState(void)
+{
+	if (borderSize_ > 0.f)
+		flags_.Set(WindowFlag::BORDER);
+
+
 }
 
 void XWindow::EvaluateRegisters(float* registers) 
@@ -285,65 +279,6 @@ int XWindow::ParseTerm(core::XLexer& lex, XWinVar* var, int component)
 	if (token.type == TT_NUMBER || token.isEqual(".") || token.isEqual("-")) {
 		return ExpressionConstant((float)token.GetFloatValue());
 	}
-
-	/*
-	// see if it is a table name
-	const idDeclTable *table = static_cast<const idDeclTable *>(declManager->FindType(DECL_TABLE, token.c_str(), false));
-	if (table) {
-		a = table->Index();
-		// parse a table expression
-		src->ExpectTokenString("[");
-		b = ParseExpression(src);
-		src->ExpectTokenString("]");
-		return EmitOp(a, b, WOP_TYPE_TABLE);
-	}
-
-	if (var == NULL) {
-		var = GetWinVarByName(token, true);
-	}
-	if (var) {
-		a = (int)var;
-		//assert(dynamic_cast<idWinVec4*>(var));
-		var->Init(token, this);
-		b = component;
-		if (dynamic_cast<idWinVec4*>(var)) {
-			if (src->ReadToken(&token)) {
-				if (token == "[") {
-					b = ParseExpression(src);
-					src->ExpectTokenString("]");
-				}
-				else {
-					src->UnreadToken(&token);
-				}
-			}
-			return EmitOp(a, b, WOP_TYPE_VAR);
-		}
-		else if (dynamic_cast<idWinFloat*>(var)) {
-			return EmitOp(a, b, WOP_TYPE_VARF);
-		}
-		else if (dynamic_cast<idWinInt*>(var)) {
-			return EmitOp(a, b, WOP_TYPE_VARI);
-		}
-		else if (dynamic_cast<idWinBool*>(var)) {
-			return EmitOp(a, b, WOP_TYPE_VARB);
-		}
-		else if (dynamic_cast<idWinStr*>(var)) {
-			return EmitOp(a, b, WOP_TYPE_VARS);
-		}
-		else {
-			src->Warning("Var expression not vec4, float or int '%s'", token.c_str());
-		}
-		return 0;
-	}
-	else {
-		// ugly but used for post parsing to fixup named vars
-		char *p = new (TAG_OLD_UI) char[token.Length() + 1];
-		strcpy(p, token);
-		a = (int)p;
-		b = -2;
-		return EmitOp(a, b, WOP_TYPE_VAR);
-	}
-	*/
 
 	return 0;
 }
@@ -606,12 +541,114 @@ XWinVar* XWindow::GetWinVarByName(const char* name)
 
 	return retVar;
 }
+
+
+
+// ----------------------------------------
+
+// Drawing
+void XWindow::reDraw(void)
+{
+	calcClientRect();
+
+
+	drawBackground(rectDraw_);
+	drawBorder(rectDraw_);
+	drawDebug();
+
+	Childit it = children_.begin();
+	for (; it != children_.end(); ++it)
+	{
+		(*it)->reDraw();
+	}
+}
+
+void XWindow::drawDebug(void)
+{
+	using namespace render;
+	core::StackString<2048> str;
+	render::XDrawTextInfo ti;
+	Vec3f pos;
+
+	str.appendFmt("Text: '%s'\n", name_.c_str());
+	str.appendFmt("Draw: %g %g %g %g\n", rectDraw_.x1, rectDraw_.y1, rectDraw_.x2, rectDraw_.y2);
+	str.appendFmt("Client: %g %g %g %g\n", rectClient_.x1, rectClient_.y1, rectClient_.x2, rectClient_.y2);
+
+	ti.col = Col_White;
+	ti.flags = DrawTextFlags::MONOSPACE;
+
+	// pos :Z?
+	pos = Vec3f(rectClient_.getUpperLeft());
+	pos.x += 3.f;
+	pos.y += 3.f;
+
+	pRender_->DrawTextQueued(pos, ti, str.c_str());
+}
+
+
+
+void XWindow::drawBorder(const Rectf& drawRect)
+{
+	if (flags_.IsSet(WindowFlag::BORDER))
+	{
+		if (borderColor_.a() > 0.f)
+		{
+			pRender_->DrawRectSS(drawRect, borderColor_);
+		}
+	}
+}
+
+void XWindow::calcClientRect(void)
+{
+	const Rectf& rect = rect_;
+
+	const float width = pRender_->getWidthf();
+	const float height = pRender_->getHeightf();
+
+	// 800x600 virtual.
+	const float scale_x = width / 800;
+	const float scale_y = height / 600;
+
+	rectClient_ = rect_;
+	rectClient_.x1 *= scale_x;
+	rectClient_.y1 *= scale_y;
+	rectClient_.x2 *= scale_x;
+	rectClient_.y2 *= scale_y;
+
+	// make screen space baby.
+	// convert to 0-2 first.
+	rectDraw_.x1 = (rect.x1 / 400);
+	rectDraw_.y1 = (rect.y1 / 300);
+
+
+	rectDraw_.x2 = (rect.x2 / 400);
+	rectDraw_.y2 = (rect.y2 / 300);
+
+
+	rectDraw_.x1 *= scale_x;
+	rectDraw_.y1 *= scale_y;
+	rectDraw_.x2 *= scale_x;
+	rectDraw_.y2 *= scale_y;
+
+}
 // -------------- Overrides ---------------
 
 
 void XWindow::draw(int time, float x, float y)
 {
+	// draw the text.
+	if (text_.getLength() == 0)
+		return;
 
+
+}
+
+void XWindow::drawBackground(const Rectf& drawRect)
+{
+	//render::IRenderAux* paux = pRender_->GetIRenderAuxGeo();
+
+
+	pRender_->DrawQuadSS(drawRect, backColor_);
 }
 
 void XWindow::activate(bool activate)

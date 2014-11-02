@@ -136,8 +136,8 @@ void XRegister::GetFromRegs(float* registers)
 		case RegisterType::RECT:
 			rect.x1 = v.x;
 			rect.y1 = v.y;
-			rect.x2 = v.z;
-			rect.y2 = v.w;
+			rect.x2 = v.z + v.x;
+			rect.y2 = v.w + v.y;
 			*static_cast<XWinRect*>(var_) = rect;
 			break;
 
@@ -248,14 +248,14 @@ XRegister* XRegisterList::FindReg(const char* name)
 void XRegisterList::SetToRegs(float* registers)
 {
 	for (size_t i = 0; i < registers_.size(); i++) {
-		registers_[i]->GetFromRegs(registers);
+		registers_[i]->SetToRegs(registers);
 	}
 }
 
 void XRegisterList::GetFromRegs(float* registers)
 {
 	for (size_t i = 0; i < registers_.size(); i++) {
-		registers_[i]->SetToRegs(registers);
+		registers_[i]->GetFromRegs(registers);
 	}
 }
 

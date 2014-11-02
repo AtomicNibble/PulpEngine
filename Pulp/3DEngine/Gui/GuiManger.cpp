@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "GuiManger.h"
 
+#include "EngineBase.h"
+
 #include <IConsole.h>
 
 #include <algorithm>
@@ -72,8 +74,8 @@ void Command_ListUis(core::IConsoleCmdArgs* pArgs)
 		pSearchString = pArgs->GetArg(1);
 	}
 
-	// how to get the manger object :(
 
+	engine::XEngineBase::getGuiManager()->listGuis();
 }
 
 
@@ -119,6 +121,28 @@ void XGuiManager::Shutdown(void)
 IGui* XGuiManager::loadGui(const char* name)
 {
 	X_ASSERT_NOT_NULL(name);
+	XGui* pGui;
+
+	if (pGui = static_cast<XGui*>(findGui(name)))
+		return pGui;
+
+	// try load it :|
+	pGui = X_NEW(XGui, g_3dEngineArena, "GuiInterface");
+
+	if (pGui->InitFromFile(name))
+	{
+		guis_.append(pGui);
+		return pGui;
+	}
+
+	X_DELETE(pGui, g_3dEngineArena);
+	return nullptr;
+}
+
+IGui* XGuiManager::findGui(const char* name)
+{
+	X_ASSERT_NOT_NULL(name);
+
 	Guis::ConstIterator it;
 
 	const char* nameBegin = name;
@@ -132,18 +156,9 @@ IGui* XGuiManager::loadGui(const char* name)
 		}
 	}
 
-	// try load it :|
-	XGui* pGui = X_NEW(XGui, g_3dEngineArena, "GuiInterface");
-
-	if (pGui->InitFromFile(name))
-	{
-		guis_.append(pGui);
-		return pGui;
-	}
-
-	X_DELETE(pGui, g_3dEngineArena);
 	return nullptr;
 }
+
 
 
 
@@ -165,7 +180,7 @@ void XGuiManager::listGuis(const char* wildcardSearch) const
 	}
 
 	sortGuisByName(sorted_guis);
-	X_LOG0("Gui", "-------------- ^8Guis(%i)^7 --------------", sorted_guis.size());
+	X_LOG0("Gui", "-------------- ^8Guis(%i)^7 ---------------", sorted_guis.size());
 	X_LOG_BULLET;
 
 	itrGui = sorted_guis.begin();
@@ -182,7 +197,29 @@ void XGuiManager::listGuis(const char* wildcardSearch) const
 // IXHotReload
 bool XGuiManager::OnFileChange(const char* name)
 {
+	core::Path path(name);
+	XGui* pGui;
 
+	// we don't keep extension for name.
+	path.removeExtension();
+
+	if (pGui = static_cast<XGui*>(findGui(path.fileName())))
+	{
+		X_LOG0("Gui", "reloading \"%s\"", name);
+
+		if (pGui->InitFromFile(path.fileName()))
+		{
+
+		}
+		else
+		{
+			X_ERROR("Gui", "reload failed");
+		}
+	}
+	else
+	{
+		X_LOG0("Gui", "menu \"%s\" is not used, skipping reload.", name);
+	}
 
 	return false;
 }

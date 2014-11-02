@@ -26,9 +26,15 @@ render::IRender* X3DEngine::pRender_ = nullptr;
 // 3d
 engine::XMaterialManager* X3DEngine::pMaterialManager_ = nullptr;
 
+gui::XGuiManager* X3DEngine::pGuiManger_ = nullptr;
+
+
+//------------------------------------------
 texture::ITexture* pTex = nullptr;
 texture::ITexture* pTex1 = nullptr;
 texture::ITexture* pTexSky = nullptr;
+
+gui::IGui* gui = nullptr;
 
 bool X3DEngine::Init()
 {
@@ -50,10 +56,12 @@ bool X3DEngine::Init()
 	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager");
 	pMaterialManager_->Init();
 
+	pGuiManger_ = &guisMan_;
+
 	guisMan_.Init();
-	guisMan_.loadGui("test");
+	gui = guisMan_.loadGui("test");
 
-
+	
 	// load a lvl lol.
 //	map.LoadFromFile("killzone"); // mmmmm
 //	map.LoadFromFile("box"); // mmmmm
@@ -97,21 +105,25 @@ void X3DEngine::OnFrameBegin(void)
 {
 	X_PROFILE_BEGIN("3DFrameBegin", core::ProfileSubSys::ENGINE3D);
 
-	pRender_->SetTexture(pTex1->getTexID());
+//	pRender_->SetTexture(pTex1->getTexID());
 
 //	if (pMesh)
 //		pMesh->render();
 
-	pRender_->SetTexture(pTex->getTexID());
+//	pRender_->SetTexture(pTex->getTexID());
 
 
-	pRender_->DefferedBegin();
+//	pRender_->DefferedBegin();
 
 //	map.render();
 
-	pRender_->DefferedEnd();
+//	pRender_->DefferedEnd();
+//	pRender_->s
+	// draw me some gui baby
 
-
+	pRender_->setGUIShader();
+	if (gui)
+		gui->Redraw();
 }
 
 void X3DEngine::Update(void)
