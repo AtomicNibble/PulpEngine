@@ -549,6 +549,12 @@ public:
 	virtual VarType::Enum getType(void) X_OVERRIDE{
 		return VarType::COLOR;
 	}
+	virtual void Set(const Vec4f& oth) {
+		value.r = oth.x;
+		value.g = oth.y;
+		value.b = oth.z;
+		value.a = oth.w;
+	}
 
 	XWinColor& operator=(const XWinColor& oth) {
 		XWinVar::operator=(oth);

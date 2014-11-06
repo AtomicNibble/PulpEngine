@@ -922,6 +922,9 @@
     <ClInclude Include="Math\XExtrapolate.h">
       <Filter>Headers\Math</Filter>
     </ClInclude>
+    <ClInclude Include="String\XParser.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1386,6 +1389,9 @@
     </ClCompile>
     <ClCompile Include="Containers\HashIndex.cpp">
       <Filter>SourceFiles\Containers</Filter>
+    </ClCompile>
+    <ClCompile Include="String\XParser.cpp">
+      <Filter>SourceFiles\String</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

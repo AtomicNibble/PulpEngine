@@ -31,41 +31,58 @@ namespace
 		{
 			VarType::Enum type = src[0].var->getType();
 
-			if (src[1].var->getType() != VarType::RECT ||
-				src[2].var->getType() != VarType::RECT ||
-				src[3].var->getType() != VarType::STRING )
-			{
-				X_WARNING("Gui", "invalid transition args: %s %s %s",
-					VarType::ToString(src[1].var->getType()),
-					VarType::ToString(src[2].var->getType()),
-					VarType::ToString(src[3].var->getType())
-					);
-				return;
-			}
-
-			XWinRect* from = static_cast<XWinRect*>(src[1].var);
-			XWinRect* to = static_cast<XWinRect*>(src[2].var);
-			XWinStr* timeStr = static_cast<XWinStr*>(src[3].var);
-
-			int time = ::atoi(*timeStr);
-			float ac = 0.0f;
-			float dc = 0.0f;
-
-
-
-
 			if (type == VarType::RECT)
 			{
+				if (src[1].var->getType() != VarType::RECT ||
+					src[2].var->getType() != VarType::RECT ||
+					src[3].var->getType() != VarType::STRING )
+				{
+					X_WARNING("Gui", "invalid transition args: %s %s %s",
+						VarType::ToString(src[1].var->getType()),
+						VarType::ToString(src[2].var->getType()),
+						VarType::ToString(src[3].var->getType())
+						);
+					return;
+				}
+
+				XWinRect* from = static_cast<XWinRect*>(src[1].var);
+				XWinRect* to = static_cast<XWinRect*>(src[2].var);
+				XWinStr* timeStr = static_cast<XWinStr*>(src[3].var);
+
+				int time = ::atoi(*timeStr);
+				float ac = 0.0f;
+				float dc = 0.0f;
+
 				XWinRect* pRect = static_cast<XWinRect*>(src[0].var);
 				pRect->SetEval(false);
 
 				window->AddTransition(pRect, from->asVec4(), to->asVec4(), time, ac, dc);
 			}
-			else if (type == VarType::VEC4)
+			else if (type == VarType::VEC4 || type == VarType::COLOR)
 			{
-			//	XWinVec4* pVec4 = static_cast<XWinVec4*>(src[0].var);
-			//	pVec4->SetEval(false);
-			//	window->AddTransition(pVec4, *from, *to, time, ac, dc);
+				if (src[1].var->getType() != VarType::VEC4 ||
+					src[2].var->getType() != VarType::VEC4 ||
+					src[3].var->getType() != VarType::STRING)
+				{
+					X_WARNING("Gui", "invalid transition args: %s %s %s",
+						VarType::ToString(src[1].var->getType()),
+						VarType::ToString(src[2].var->getType()),
+						VarType::ToString(src[3].var->getType())
+						);
+					return;
+				}
+
+				XWinVec4* from = static_cast<XWinVec4*>(src[1].var);
+				XWinVec4* to = static_cast<XWinVec4*>(src[2].var);
+				XWinStr* timeStr = static_cast<XWinStr*>(src[3].var);
+
+				int time = ::atoi(*timeStr);
+				float ac = 0.0f;
+				float dc = 0.0f;
+
+				XWinVec4* pVec4 = static_cast<XWinVec4*>(src[0].var);
+				pVec4->SetEval(false);
+				window->AddTransition(pVec4, *from, *to, time, ac, dc);
 			}
 			else
 			{

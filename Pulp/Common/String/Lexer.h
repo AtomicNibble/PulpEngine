@@ -202,31 +202,38 @@ public:
 
 	int	ReadToken(XLexToken& token);
 
-	int				ExpectTokenString(const char* string);
-	int				ExpectTokenType(int type, int subtype, XLexToken& token);
+	int	ExpectTokenString(const char* string);
+	int	ExpectTokenType(int type, int subtype, XLexToken& token);
 
-	int				PeekTokenString(const char *string);
-	int				PeekTokenType(int type, int subtype, XLexToken& token);
+	int	PeekTokenString(const char *string);
+	int	PeekTokenType(int type, int subtype, XLexToken& token);
 
-	int				SkipUntilString(const char *string);
-	int				SkipRestOfLine(void);
+	int	SkipUntilString(const char *string);
+	int	SkipRestOfLine(void);
 
-	int				ParseInt(void);
-	bool			ParseBool(void);
-	float			ParseFloat();
+	int	ParseInt(void);
+	bool ParseBool(void);
+	float ParseFloat();
 
 	// parse matrices with floats
-	int				Parse1DMatrix(int x, float *m);
-	int				Parse2DMatrix(int y, int x, float *m);
-	int				Parse3DMatrix(int z, int y, int x, float *m);
+	int	Parse1DMatrix(int x, float *m);
+	int	Parse2DMatrix(int y, int x, float *m);
+	int	Parse3DMatrix(int z, int y, int x, float *m);
 
-	void			UnreadToken(const XLexToken& token);
+	void UnreadToken(const XLexToken& token);
 	// read a token only if on the same line
-	int				ReadTokenOnLine(XLexToken& token);
+	int	ReadTokenOnLine(XLexToken& token);
 
-	const int		GetLineNumber(void);
+	const int GetLineNumber(void);
 
-	void setFlags(LexFlags flags) {
+	X_INLINE bool isEOF(void) const {
+		// check if we have gone past the end for some strange reason.
+		// still returns true for EOF if past tho.
+		X_ASSERT(current_ <= end_, "current is past the end of the file")(current_, end_);
+		return current_ >= end_; 
+	}
+
+	X_INLINE void setFlags(LexFlags flags) {
 		flags_ = flags;
 	}
 	void Error(const char *str, ...);

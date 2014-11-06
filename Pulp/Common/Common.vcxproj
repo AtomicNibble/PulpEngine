@@ -252,6 +252,7 @@
     <ClInclude Include="String\StringUtil.h" />
     <ClInclude Include="String\StrRef.h" />
     <ClInclude Include="String\Xml.h" />
+    <ClInclude Include="String\XParser.h" />
     <ClInclude Include="Threading\Atomic.h" />
     <ClInclude Include="Threading\AtomicInt.h" />
     <ClInclude Include="Threading\ConditionVariable.h" />
@@ -650,6 +651,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="String\Xml.cpp" />
+    <ClCompile Include="String\XParser.cpp" />
     <ClCompile Include="Threading\ConditionVariable.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>

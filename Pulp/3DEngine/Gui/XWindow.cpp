@@ -386,32 +386,43 @@ void XWindow::Transition(void)
 	{
 		XTransitionData& data = transitions_[i];
 
-		XWinRect* r = nullptr;
-		if (!data.pData )
+		if (!data.pData)
 		{
-
+			X_ERROR("Gui", "transition data missing target var");
 			continue;
 		}
 
-		if (data.pData->getType() != VarType::RECT)
-			continue;
+		VarType::Enum type = data.pData->getType();
 
-		r = static_cast<XWinRect*>(data.pData);
-
-		if (data.interp.IsDone(timeMs))
+		if (type == VarType::RECT)
 		{
-			r->Set(data.interp.GetEndValue());
+			XWinRect* r = static_cast<XWinRect*>(data.pData);
 
-	//		X_LOG0("Gui", "time(%i) %g %g %g %g", timeMs,
-	//			r->x1(), r->y1(), r->x2(), r->y2());
+			if (data.interp.IsDone(timeMs))
+			{
+				r->Set(data.interp.GetEndValue());
+			}
+			else
+			{
+				clear = false;
+				r->Set(data.interp.GetCurrentValue(timeMs));
+			}
 		}
-		else 
+		else if (type == VarType::COLOR)
 		{
-			clear = false;
-			r->Set(data.interp.GetCurrentValue(timeMs));
+			XWinColor* color = static_cast<XWinColor*>(data.pData);
 
-		//	X_LOG0("Gui", "time(%i) %g %g %g %g", timeMs, 
-		//		r->x1(), r->y1(), r->x2(), r->y2());
+			if (data.interp.IsDone(timeMs))
+			{
+				color->Set(data.interp.GetEndValue());
+			}
+			else
+			{
+				clear = false;
+				color->Set(data.interp.GetCurrentValue(timeMs));
+				int goat = 0;
+			}
+
 		}
 	}
 
@@ -803,7 +814,7 @@ XWinVar* XWindow::GetWinVarByName(const char* name)
 	{
 		retVar = &borderColor_;
 	}
-	else if (IsEqualCaseInsen(nameBegin, nameEnd, "visable"))
+	else if (IsEqualCaseInsen(nameBegin, nameEnd, "visible"))
 	{
 		retVar = &visable_;
 	}
@@ -830,13 +841,19 @@ XWinVar* XWindow::GetWinVarByName(const char* name)
 // Drawing
 void XWindow::reDraw(void)
 {
-	calcClientRect();
+	X_PROFILE_BEGIN("GuiDraw", core::ProfileSubSys::ENGINE3D);
+
 
 	core::TimeVal time = pTimer_->GetFrameStartTime(core::ITimer::Timer::UI);
 
 	if (flags_.IsSet(WindowFlag::DESKTOP)) {
 		RunTimeEvents(time);
 	}
+
+	if (!visable_)
+		return;
+
+	calcClientRect();
 
 	drawBackground(rectDraw_);
 	drawBorder(rectDraw_);

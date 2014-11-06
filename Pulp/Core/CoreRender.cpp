@@ -31,8 +31,10 @@ void XCore::RenderEnd()
 		}
 
 		// draw me all the profile wins!
-		if (var_profile_draw->GetInteger())
+		if (var_profile_draw->GetInteger()) {
+			env_.pRender->FlushTextBuffer();
 			profileSys_.Render();
+		}
 
 		if (core::IConsole* pConsole = GetIConsole())
 			pConsole->Draw();
