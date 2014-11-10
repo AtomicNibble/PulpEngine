@@ -22,11 +22,42 @@
 X_NAMESPACE_BEGIN(gui)
 
 const int MAX_EXPRESSION_REGISTERS = 4096;
+const int MAX_EXPRESSION_OPS = 4096;
 
 enum
 {
 	WEXP_REG_TIME,
 	WEXP_REG_NUM_PREDEFINED
+};
+
+
+X_DECLARE_ENUM(OpType)(
+	ADD,
+	SUBTRACT,
+	MULTIPLY,
+	DIVIDE,
+	MOD,
+	TABLE,
+	GT,
+	GE,
+	LT,
+	LE,
+	EQ,
+	NE,
+	AND,
+	OR,
+	VAR,
+	VAR_STR,
+	VAR_FLOAT,
+	VAR_INT,
+	VAR_BOOL,
+	COND
+);
+
+struct xOpt
+{
+	OpType::Enum opType;
+	int	a, b, c, d;
 };
 
 struct XDrawWin
@@ -140,6 +171,8 @@ public:
 	virtual void mouseExit(void);
 	virtual void mouseEnter(void);
 
+	
+	
 	int ParseExpression(core::XParser& lex, XWinVar* var = nullptr);
 	int ParseTerm(core::XParser& lex, XWinVar* var, int component);
 	int ExpressionConstant(float f);
@@ -152,8 +185,16 @@ private:
 	void calcClientRect(void);
 
 private:
+	int ExpressionTemporary(void);
+	xOpt* ExpressionOp(void);
+
+	int EmitOp(int a, int b, OpType::Enum opType, xOpt** opp = nullptr);
+
+	int ParseEmitOp(core::XParser& lex, int a, OpType::Enum opType,
+		int priority, xOpt** opp = nullptr);
+
 	int ParseExpressionPriority(core::XParser& lex, int priority,
-		XWinVar* var, int component = 0);
+		XWinVar* var = nullptr, int component = 0);
 
 	bool ParseString(core::XParser& lex, core::string& out);
 	bool ParseVar(const core::XLexToken& token, core::XParser& lex);
@@ -244,6 +285,7 @@ protected:
 	core::Array<XTimeLineEvent*>	timeLineEvents_;
 	core::Array<XTransitionData>	transitions_;
 
+	core::Array<xOpt>		ops_;
 	core::Array<float>		expressionRegisters_;
 	XRegisterList			regList_;
 

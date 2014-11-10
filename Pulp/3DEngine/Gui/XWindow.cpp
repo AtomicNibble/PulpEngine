@@ -56,6 +56,7 @@ children_(g_3dEngineArena),
 drawWindows_(g_3dEngineArena),
 timeLineEvents_(g_3dEngineArena),
 transitions_(g_3dEngineArena),
+ops_(g_3dEngineArena),
 expressionRegisters_(g_3dEngineArena),
 init_(false)
 {
@@ -453,14 +454,146 @@ bool XWindow::RunScript(ScriptFunction::Enum func)
 
 void XWindow::EvaluateRegisters(float* registers) 
 {
-	size_t i;
+	size_t i, erc, oc;
+	int32_t	b;
 	Vec4f v;
+	xOpt* op;
 
-	size_t erc = expressionRegisters_.size();
+	erc = expressionRegisters_.size();
+	oc = ops_.size();
+
 
 	// copy the constants
 	for (i = WEXP_REG_NUM_PREDEFINED; i < erc; i++) {
 		registers[i] = expressionRegisters_[i];
+	}
+
+	// copy the local and global parameters
+	// registers[WEXP_REG_TIME] = 0; // gui->GetTime();
+
+
+	for (i = 0; i < oc; i++) 
+	{
+		op = &ops_[i];
+		if (op->b == -2) {
+			continue;
+		}
+		switch (op->opType)
+		{
+			case OpType::ADD:
+				registers[op->c] = registers[op->a] + registers[op->b];
+				break;
+			case OpType::SUBTRACT:
+				registers[op->c] = registers[op->a] - registers[op->b];
+				break;
+			case OpType::MULTIPLY:
+				registers[op->c] = registers[op->a] * registers[op->b];
+				break;
+			case OpType::DIVIDE:
+				if (registers[op->b] == 0.0f)
+				{
+					X_WARNING("Gui", "Divide by zero in: %s", getName());
+					registers[op->c] = registers[op->a];
+				}
+				else {
+					registers[op->c] = registers[op->a] / registers[op->b];
+				}
+				break;
+			case OpType::MOD:
+				b = static_cast<int>(registers[op->b]);
+				b = b != 0 ? b : 1;
+				registers[op->c] = static_cast<float>(
+					static_cast<int>(registers[op->a]) % b);
+				break;
+
+			
+			case OpType::GT:
+				registers[op->c] = registers[op->a] > registers[op->b];
+				break;
+			case OpType::GE:
+				registers[op->c] = registers[op->a] >= registers[op->b];
+				break;
+			case OpType::LT:
+				registers[op->c] = registers[op->a] < registers[op->b];
+				break;
+			case OpType::LE:
+				registers[op->c] = registers[op->a] <= registers[op->b];
+				break;
+			case OpType::EQ:
+				registers[op->c] = registers[op->a] == registers[op->b];
+				break;
+			case OpType::NE:
+				registers[op->c] = registers[op->a] != registers[op->b];
+				break;
+			case OpType::COND:
+				registers[op->c] = (registers[op->a]) ? registers[op->b] : registers[op->d];
+				break;
+			case OpType::AND:
+				registers[op->c] = registers[op->a] && registers[op->b];
+				break;
+			case OpType::OR:
+				registers[op->c] = registers[op->a] || registers[op->b];
+				break;
+			case OpType::VAR:
+				if (!op->a) {
+					registers[op->c] = 0.0f;
+					break;
+				}
+				if (op->b >= 0 && registers[op->b] >= 0 && registers[op->b] < 4) 
+				{
+					// grabs vector components
+					XWinVec4 *var = (XWinVec4 *)(op->a);
+					registers[op->c] = ((Vec4f&)var)[static_cast<int>(registers[op->b])];
+				}
+				else {
+					registers[op->c] = 0; // ((XWinVar*)(op->a))->x();
+				}
+				break;
+			case OpType::VAR_STR:
+				if (op->a) {
+					XWinStr* var = (XWinStr*)(op->a);
+					registers[op->c] = static_cast<float>(::atof(var->c_str()));
+				}
+				else {
+					registers[op->c] = 0;
+				}
+				break;
+			case OpType::VAR_FLOAT:
+				if (op->a) {
+					XWinFloat* var = (XWinFloat*)(op->a);
+					registers[op->c] = *var;
+				}
+				else {
+					registers[op->c] = 0;
+				}
+				break;
+			case OpType::VAR_INT:
+				if (op->a) {
+					XWinInt* var = (XWinInt*)(op->a);
+					registers[op->c] = static_cast<float>(*var);
+				}
+				else {
+					registers[op->c] = 0;
+				}
+				break;
+			case OpType::VAR_BOOL:
+				if (op->a) {
+					XWinBool* var = (XWinBool*)(op->a);
+					registers[op->c] = *var;
+				}
+				else {
+					registers[op->c] = 0;
+				}
+				break;
+#if X_DEBUG
+			default:
+				X_ASSERT_UNREACHABLE();
+				break;
+#else
+				X_NO_SWITCH_DEFAULT;
+#endif // !X_DEBUG
+				
+		}
 	}
 }
 
@@ -524,18 +657,17 @@ int XWindow::ExpressionConstant(float f)
 int XWindow::ParseTerm(core::XParser& lex, XWinVar* var, int component)
 {
 	core::XLexToken token;
-//	int	a, b;
+	int	a;
 
 	lex.ReadToken(token);
 
-	/*
 	if (token.isEqual("("))
 	{
 		a = ParseExpression(lex);
-		src->ExpectTokenString(")");
+		lex.ExpectTokenString(")");
 		return a;
 	}
-	*/
+	
 
 	if (token.isEqual("time")) {
 		return WEXP_REG_TIME;
@@ -561,6 +693,59 @@ int XWindow::ParseTerm(core::XParser& lex, XWinVar* var, int component)
 }
 
 
+int XWindow::ExpressionTemporary(void)
+{
+	if (expressionRegisters_.size() == MAX_EXPRESSION_REGISTERS) {
+		X_WARNING("Gui", "%s reached max expression registers. max: %i",
+			this->getName(), MAX_EXPRESSION_REGISTERS);
+		return 0;
+	}
+
+	int i = safe_static_cast<int,size_t>(expressionRegisters_.size());
+	s_registerIsTemporary[i] = true;
+	i = safe_static_cast<int,size_t>(expressionRegisters_.append(0));
+	return i;
+}
+
+
+xOpt* XWindow::ExpressionOp(void)
+{
+	if (ops_.size() == MAX_EXPRESSION_OPS) {
+		X_WARNING("Gui", "%s reached max expression ops. max: %i",
+			this->getName(), MAX_EXPRESSION_OPS);
+		return &ops_[0];
+	}
+
+	xOpt wop;
+
+	size_t i = ops_.append(wop);
+	return &ops_[i];
+}
+
+int XWindow::EmitOp(int a, int b, OpType::Enum opType, xOpt **opp)
+{
+	xOpt* op;
+
+	op = ExpressionOp();
+
+	op->opType = opType;
+	op->a = a;
+	op->b = b;
+	op->c = ExpressionTemporary();
+
+	if (opp) {
+		*opp = op;
+	}
+	return op->c;
+}
+
+int XWindow::ParseEmitOp(core::XParser& lex, int a, OpType::Enum opType,
+	int priority, xOpt** opp)
+{
+	int b = ParseExpressionPriority(lex , priority);
+	return EmitOp(a, b, opType, opp);
+}
+
 #define	TOP_PRIORITY 4
 int XWindow::ParseExpressionPriority(core::XParser& lex, int priority,
 	XWinVar* var, int component)
@@ -581,6 +766,58 @@ int XWindow::ParseExpressionPriority(core::XParser& lex, int priority,
 		return a;
 	}
 
+
+	if (priority == 1 && token.isEqual("*")) {
+		return ParseEmitOp(lex, a, OpType::MULTIPLY, priority);
+	}
+	if (priority == 1 && token.isEqual("/")) {
+		return ParseEmitOp(lex, a, OpType::DIVIDE, priority);
+	}
+	if (priority == 1 && token.isEqual("%")) {	// implied truncate both to integer
+		return ParseEmitOp(lex, a, OpType::MOD, priority);
+	}
+	if (priority == 2 && token.isEqual("+")) {
+		return ParseEmitOp(lex, a, OpType::ADD, priority);
+	}
+	if (priority == 2 && token.isEqual("-")) {
+		return ParseEmitOp(lex, a, OpType::SUBTRACT, priority);
+	}
+	if (priority == 3 && token.isEqual(">")) {
+		return ParseEmitOp(lex, a, OpType::GT, priority);
+	}
+	if (priority == 3 && token.isEqual(">=")) {
+		return ParseEmitOp(lex, a, OpType::GE, priority);
+	}
+	if (priority == 3 && token.isEqual("<")) {
+		return ParseEmitOp(lex, a, OpType::LT, priority);
+	}
+	if (priority == 3 && token.isEqual("<=")) {
+		return ParseEmitOp(lex, a, OpType::LE, priority);
+	}
+	if (priority == 3 && token.isEqual("==")) {
+		return ParseEmitOp(lex, a, OpType::EQ, priority);
+	}
+	if (priority == 3 && token.isEqual("!=")) {
+		return ParseEmitOp(lex, a, OpType::NE, priority);
+	}
+	if (priority == 4 && token.isEqual("&&")) {
+		return ParseEmitOp(lex, a, OpType::AND, priority);
+	}
+	if (priority == 4 && token.isEqual("||")) {
+		return ParseEmitOp(lex, a, OpType::OR, priority);
+	}
+	if (priority == 4 && token.isEqual("?")) {
+		xOpt* oop = nullptr;
+		int o = ParseEmitOp(lex, a, OpType::COND, priority, &oop);
+		if (!lex.ReadToken(token)) {
+			return o;
+		}
+		if (token.isEqual(":")) {
+			a = ParseExpressionPriority(lex, priority - 1, var);
+			oop->d = a;
+		}
+		return o;
+	}
 
 	// assume that anything else terminates the expression
 	// not too robust error checking...
@@ -881,6 +1118,8 @@ void XWindow::drawDebug(void)
 	str.appendFmt("Text: '%s'\n", text_.c_str());
 	str.appendFmt("Draw: %g %g %g %g\n", rectDraw_.x1, rectDraw_.y1, rectDraw_.x2, rectDraw_.y2);
 	str.appendFmt("Client: %g %g %g %g\n", rectClient_.x1, rectClient_.y1, rectClient_.x2, rectClient_.y2);
+	str.appendFmt("Backcolor: %g %g %g %g\n", backColor_.r(), backColor_.g(),
+		backColor_.b(), backColor_.a());
 
 	ti.col = Col_White;
 	ti.flags = DrawTextFlags::MONOSPACE;
