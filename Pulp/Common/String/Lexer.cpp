@@ -1263,6 +1263,7 @@ int XLexer::PeekTokenType(int type, int subtype, XLexToken& token) {
 	return 0;
 }
 
+
 int XLexer::SkipUntilString(const char *string) {
 	XLexToken token;
 

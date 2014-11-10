@@ -150,7 +150,7 @@ void XWindow::RestoreExpressionParseState()
 }
 
 
-bool XWindow::Parse(core::XLexer& lex)
+bool XWindow::Parse(core::XParser& lex)
 {
 	// clear it.
 	clear();
@@ -521,7 +521,7 @@ int XWindow::ExpressionConstant(float f)
 	return i;
 }
 
-int XWindow::ParseTerm(core::XLexer& lex, XWinVar* var, int component)
+int XWindow::ParseTerm(core::XParser& lex, XWinVar* var, int component)
 {
 	core::XLexToken token;
 //	int	a, b;
@@ -562,7 +562,7 @@ int XWindow::ParseTerm(core::XLexer& lex, XWinVar* var, int component)
 
 
 #define	TOP_PRIORITY 4
-int XWindow::ParseExpressionPriority(core::XLexer& lex, int priority,
+int XWindow::ParseExpressionPriority(core::XParser& lex, int priority,
 	XWinVar* var, int component)
 {
 	core::XLexToken token;
@@ -590,13 +590,13 @@ int XWindow::ParseExpressionPriority(core::XLexer& lex, int priority,
 }
 
 
-int XWindow::ParseExpression(core::XLexer& lex, XWinVar* var)
+int XWindow::ParseExpression(core::XParser& lex, XWinVar* var)
 {
 	return ParseExpressionPriority(lex, TOP_PRIORITY, var);
 }
 
 
-bool XWindow::ParseString(core::XLexer& lex, core::string& out)
+bool XWindow::ParseString(core::XParser& lex, core::string& out)
 {
 	core::XLexToken tok;
 	if (lex.ReadToken(tok)) {
@@ -606,7 +606,7 @@ bool XWindow::ParseString(core::XLexer& lex, core::string& out)
 	return false;
 }
 
-bool XWindow::ParseVar(const core::XLexToken& token, core::XLexer& lex)
+bool XWindow::ParseVar(const core::XLexToken& token, core::XParser& lex)
 {
 	const char* nameBegin = token.begin();
 	const char* nameEnd = token.end();
@@ -634,6 +634,10 @@ bool XWindow::ParseVar(const core::XLexToken& token, core::XLexer& lex)
 			X_WARNING("Gui", "failed to parse 'name' var for menu");
 			// return false here?
 		}
+	}
+	else if (IsEqualCaseInsen(nameBegin, nameEnd, "style"))
+	{
+		style_ = lex.ParseInt();
 	}
 	else if (IsEqualCaseInsen(nameBegin, nameEnd, "bordersize"))
 	{
@@ -697,7 +701,7 @@ bool XWindow::ParseVar(const core::XLexToken& token, core::XLexer& lex)
 	return true;
 }
 
-bool XWindow::ParseRegEntry(const core::XLexToken& token, core::XLexer& lex)
+bool XWindow::ParseRegEntry(const core::XLexToken& token, core::XParser& lex)
 {
 	core::StackString512 name(token.begin(), token.end());
 	core::XLexToken token2;
@@ -727,7 +731,7 @@ bool XWindow::ParseRegEntry(const core::XLexToken& token, core::XLexer& lex)
 }
 
 
-bool XWindow::ParseScriptFunction(const core::XLexToken& token, core::XLexer& lex)
+bool XWindow::ParseScriptFunction(const core::XLexToken& token, core::XParser& lex)
 {
 	for (int i = 0; i < ScriptFunction::ENUM_COUNT; i++)
 	{
@@ -742,7 +746,7 @@ bool XWindow::ParseScriptFunction(const core::XLexToken& token, core::XLexer& le
 }
 
 
-bool XWindow::ParseScript(core::XLexer& lex, XGuiScriptList& list )
+bool XWindow::ParseScript(core::XParser& lex, XGuiScriptList& list )
 {
 	core::XLexToken token;
 	int nest = 0;

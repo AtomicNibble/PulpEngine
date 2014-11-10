@@ -9,6 +9,7 @@
 #include <ITimer.h>
 
 #include <String\Lexer.h>
+#include <String\XParser.h>
 #include <Math\XExtrapolate.h>
 #include <Math\XInterpolate.h>
 
@@ -126,7 +127,7 @@ public:
 
 
 	// Overrides
-	virtual bool Parse(core::XLexer& lex);
+	virtual bool Parse(core::XParser& lex);
 	virtual void draw(int time, float x, float y);
 	virtual void drawBackground(const Rectf& drawRect);
 	virtual void activate(bool activate);
@@ -139,8 +140,8 @@ public:
 	virtual void mouseExit(void);
 	virtual void mouseEnter(void);
 
-	int ParseExpression(core::XLexer& lex, XWinVar* var = nullptr);
-	int ParseTerm(core::XLexer& lex, XWinVar* var, int component);
+	int ParseExpression(core::XParser& lex, XWinVar* var = nullptr);
+	int ParseTerm(core::XParser& lex, XWinVar* var, int component);
 	int ExpressionConstant(float f);
 
 private:
@@ -151,14 +152,14 @@ private:
 	void calcClientRect(void);
 
 private:
-	int ParseExpressionPriority(core::XLexer& lex, int priority,
+	int ParseExpressionPriority(core::XParser& lex, int priority,
 		XWinVar* var, int component = 0);
 
-	bool ParseString(core::XLexer& lex, core::string& out);
-	bool ParseVar(const core::XLexToken& token, core::XLexer& lex);
-	bool ParseRegEntry(const core::XLexToken& token, core::XLexer& lex);
-	bool ParseScriptFunction(const core::XLexToken& token, core::XLexer& lex);
-	bool ParseScript(core::XLexer& lex, XGuiScriptList& list);
+	bool ParseString(core::XParser& lex, core::string& out);
+	bool ParseVar(const core::XLexToken& token, core::XParser& lex);
+	bool ParseRegEntry(const core::XLexToken& token, core::XParser& lex);
+	bool ParseScriptFunction(const core::XLexToken& token, core::XParser& lex);
+	bool ParseScript(core::XParser& lex, XGuiScriptList& list);
 
 	void SaveExpressionParseState();
 	void RestoreExpressionParseState();
@@ -212,6 +213,7 @@ protected:
 
 	// variables, can only be set by the gui file.
 	// can't change at runtime.
+	int style_;
 	float borderSize_;
 	float textAlignX_;				// x offset from aligned position
 	float textAlignY_;				// y offset from aligned position.

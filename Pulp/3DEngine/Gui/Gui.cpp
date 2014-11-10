@@ -2,6 +2,7 @@
 #include "Gui.h"
 
 #include <String\Lexer.h>
+#include <String\XParser.h>
 
 #include <IFileSys.h>
 
@@ -112,13 +113,13 @@ SourceLoad:
 
 bool XGui::ParseTextFile(const char* begin, const char* end)
 {
-	core::XLexer lex(begin,end);
 	core::XLexer::LexFlags flags;
-
 	flags.Set(core::LexFlag::NOFATALERRORS);
 	flags.Set(core::LexFlag::NOSTRINGCONCAT);
 	flags.Set(core::LexFlag::ALLOWMULTICHARLITERALS);
 	flags.Set(core::LexFlag::ALLOWBACKSLASHSTRINGCONCAT);
+
+	core::XParser lex(begin,end, "", flags, g_3dEngineArena);
 
 	lex.setFlags(flags);
 

@@ -4,6 +4,7 @@
 #define X_GUI_SCRIPT_H_
 
 #include "String\Lexer.h"
+#include "String\XParser.h"
 // #include "XWindow.h"
 #include "WinVar.h"
 
@@ -32,7 +33,7 @@ public:
 	XGuiScript();
 	~XGuiScript();
 
-	bool Parse(core::XLexer& lex);
+	bool Parse(core::XParser& lex);
 	void Execute(XWindow* win);
 	void FixUpParms(XWindow* win);
 

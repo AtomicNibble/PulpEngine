@@ -194,7 +194,7 @@ void XRegisterList::AddReg(const char* name, RegisterType::Enum type, Vec4f data
 	}
 }
 
-void XRegisterList::AddReg(const char* name, RegisterType::Enum type, core::XLexer& lex,
+void XRegisterList::AddReg(const char* name, RegisterType::Enum type, core::XParser& lex,
 	XWindow* win, XWinVar* var)
 {
 	XRegister* reg;

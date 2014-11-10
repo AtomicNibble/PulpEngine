@@ -1,4 +1,4 @@
-/*
+
 #define WINDOW_STYLE_EMPTY				0	// no background
 #define WINDOW_STYLE_FILLED 				1	// filled with background color
 #define WINDOW_STYLE_GRADIENT			2	// gradient bar based on background color
@@ -33,13 +33,11 @@
 #define ITEM_ALIGN_RIGHT			2		// aligns right of text to right of containing rectangle
 #define ITEM_ALIGN_X_MASK			3
 
-#define ITEM_ALIGN_LEGACY 			0		// aligns bottom of text to top of containing rectangle
-#define ITEM_ALIGN_TOP	 			4		// aligns top of text to top of containing rectangle
+#define ITEM_ALIGN_LEGACY 		0		// aligns bottom of text to top of containing rectangle
+#define ITEM_ALIGN_TOP	 		4		// aligns top of text to top of containing rectangle
 #define ITEM_ALIGN_MIDDLE			8		// aligns middle of text to middle of containing rectangle
-#define ITEM_ALIGN_BOTTOM			12		// aligns bottom of text to bottom of containing rectangle
+#define ITEM_ALIGN_BOTTOM		12		// aligns bottom of text to bottom of containing rectangle
 #define ITEM_ALIGN_Y_MASK			12
-
-*/
 
 
 
@@ -49,7 +47,7 @@ windowDef
 	rect 		10 10 780 570
 	backcolor  	0.2 0.2 0.2 0.8
 	forecolor  	1 0 0 1
-//	style		WINDOW_STYLE_EMPTY
+	style		WINDOW_STYLE_FILLED
 
 	onOpen
 	{

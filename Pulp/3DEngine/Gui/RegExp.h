@@ -8,6 +8,7 @@
 
 #include <String\StringHash.h>
 #include <String\Lexer.h>
+#include <String\XParser.h>
 
 X_NAMESPACE_BEGIN(gui)
 
@@ -75,7 +76,7 @@ public:
 	~XRegisterList();
 
 	void AddReg(const char* name, RegisterType::Enum type, Vec4f data, XWindow* win, XWinVar* var);
-	void AddReg(const char *name, RegisterType::Enum type, core::XLexer& lex, XWindow *win, XWinVar *var);
+	void AddReg(const char *name, RegisterType::Enum type, core::XParser& lex, XWindow *win, XWinVar *var);
 
 	XRegister* FindReg(const char *name);
 	void SetToRegs(float *registers);

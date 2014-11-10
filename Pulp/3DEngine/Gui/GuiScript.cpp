@@ -139,7 +139,7 @@ XGuiScript::~XGuiScript()
 	}
 }
 
-bool XGuiScript::Parse(core::XLexer& lex)
+bool XGuiScript::Parse(core::XParser& lex)
 {
 	int i;
 

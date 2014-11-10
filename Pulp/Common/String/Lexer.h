@@ -26,6 +26,40 @@ X_DECLARE_FLAGS(LexFlag)(
 	ONLYSTRINGS					// parse as whitespace deliminated strings (quoted strings keep quotes)
 );
 
+X_DECLARE_ENUM(TokenType)(
+	STRING,
+	LITERAL,
+	NUMBER,
+	NAME,
+	PUNCTUATION
+);
+
+#ifdef NAN
+#undef NAN
+#endif 
+#ifdef INFINITE
+#undef INFINITE
+#endif 
+
+X_DECLARE_FLAGS(TokenTypeFlag)(
+	INTERGER,
+	DECIMAL,
+	HEX,
+	OCTAL,
+	BINARY,
+	LONG,
+	UNSIGNED,
+	FLOAT,
+	SINGLE_PRECISION,
+	DOUBLE_PRECISION,
+	INFINITE,
+	INDEFINITE,
+	NAN,
+	IPADDRESS,
+	IPPORT,
+	VALUESVALID
+);
+
 
 // token types
 #define TT_STRING					1		// string
@@ -131,8 +165,8 @@ class XLexer;
 class XLexToken
 {
 public:
-	XLexToken() : start_(nullptr), end_(nullptr) { Init(); }
-	XLexToken(const char* start, const char* end) : start_(start), end_(end) { Init(); }
+	XLexToken() : start_(nullptr), end_(nullptr), pNext_(nullptr) { Init(); }
+	XLexToken(const char* start, const char* end) : start_(start), end_(end), pNext_(nullptr) { Init(); }
 
 	size_t length() const { return end_ - start_; }
 
@@ -148,12 +182,10 @@ public:
 	unsigned long	GetUnsignedLongValue(void);		// unsigned long value of TT_NUMBER
 	int				GetIntValue(void);
 
-//	XLexToken& operator=(const XLexToken& oth) {
-//		return *this;
-//	}
 
 private:
 	friend class XLexer;
+	friend class XParser;
 
 	void NumberValue(void);
 
@@ -190,10 +222,16 @@ public:
 
 	const char* start_;
 	const char* end_;
+
+protected:
+	// shit used by parser.
+	XLexToken* pNext_;
 };
 
 class XLexer
 {
+	friend class XParser;
+
 	XLexer() {}
 public:
 	typedef Flags<LexFlag> LexFlags;

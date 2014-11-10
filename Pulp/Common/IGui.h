@@ -78,6 +78,24 @@ X_DECLARE_FLAGS(WindowFlag) (
 	IN_TRANSITION
 );
 
+X_DECLARE_ENUM(WindowStyle)(
+	EMPTY,
+	FILLED,
+	GRADIENT,
+	SHADER,
+	DVAR_SHADER,
+	LOADBAR
+);
+
+X_DECLARE_ENUM(WindowBorderStyle)(
+	NONE,
+	FULL,		// full border based on border color ( single pixel )
+	HORZ,		// horizontal borders only
+	VERT,		// vertical borders only
+	GRADIENT,	// horizontal border using the gradient bars
+	RAISED		// darken the bottom and right sides of the border
+);
+
 
 // adds some type saftey.
 // int values must be cast.
