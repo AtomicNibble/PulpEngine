@@ -874,7 +874,19 @@ bool XWindow::ParseVar(const core::XLexToken& token, core::XParser& lex)
 	}
 	else if (IsEqualCaseInsen(nameBegin, nameEnd, "style"))
 	{
-		style_ = lex.ParseInt();
+		int style32 = lex.ParseInt();
+
+		if (style32 >= 0 && style32 < WindowStyle::ENUM_COUNT)
+			style_ = (WindowStyle::Enum)style32;
+		else
+		{
+			X_WARNING("Gui", "unkown ");
+		}
+	}
+	else if (IsEqualCaseInsen(nameBegin, nameEnd, "borderstyle"))
+	{
+
+
 	}
 	else if (IsEqualCaseInsen(nameBegin, nameEnd, "bordersize"))
 	{

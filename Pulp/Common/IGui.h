@@ -79,12 +79,11 @@ X_DECLARE_FLAGS(WindowFlag) (
 );
 
 X_DECLARE_ENUM(WindowStyle)(
-	EMPTY,
-	FILLED,
-	GRADIENT,
-	SHADER,
-	DVAR_SHADER,
-	LOADBAR
+	EMPTY,			// no background
+	FILLED,			// filled with background color
+	GRADIENT,		// gradient bar based on background color
+	SHADER,			// material mixed with background color
+	DVAR_SHADER		// draws the material specified by the dvar
 );
 
 X_DECLARE_ENUM(WindowBorderStyle)(

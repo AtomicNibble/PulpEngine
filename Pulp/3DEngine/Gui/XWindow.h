@@ -254,7 +254,8 @@ protected:
 
 	// variables, can only be set by the gui file.
 	// can't change at runtime.
-	int style_;
+	WindowStyle::Enum style_;
+	WindowBorderStyle::Enum borderStyle_;
 	float borderSize_;
 	float textAlignX_;				// x offset from aligned position
 	float textAlignY_;				// y offset from aligned position.
