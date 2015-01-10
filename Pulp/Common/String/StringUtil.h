@@ -138,7 +138,10 @@ namespace strUtil
 	template <typename T>
 	inline T StringToFloat(const char* str);
 
+	bool HasFileExtension(const char* path);
+	bool HasFileExtension(const char* startInclusive, const char* endExclusive);
 
+	// returns nullptr if not found.
 	const char* FileExtension(const char* path);
 	const char* FileExtension(const char* startInclusive, const char* endExclusive);
 

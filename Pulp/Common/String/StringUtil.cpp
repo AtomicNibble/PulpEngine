@@ -441,6 +441,15 @@ namespace strUtil
 		return buff;
 	}
 
+	bool HasFileExtension(const char* path)
+	{
+		return FileExtension(path) != nullptr;
+	}
+
+	bool HasFileExtension(const char* startInclusive, const char* endExclusive)
+	{
+		return FileExtension(startInclusive, endExclusive) != nullptr;
+	}
 
 	const char* FileExtension(const char* path)
 	{
@@ -449,9 +458,9 @@ namespace strUtil
 	const char* FileExtension(const char* startInclusive, const char* endExclusive)
 	{
 		const char* res = strUtil::FindLast(startInclusive, endExclusive, '.');
-
-		if (!res || res == (endExclusive-1))
-			return startInclusive;
+		// I think it might be better to return null here, instead of start.
+		if (!res || res == (endExclusive - 1))
+			return nullptr;
 		return res + 1;
 	}
 
@@ -459,8 +468,6 @@ namespace strUtil
 	{
 		return FileName(path, path + strUtil::strlen(path));
 	}
-
-
 
 
 
