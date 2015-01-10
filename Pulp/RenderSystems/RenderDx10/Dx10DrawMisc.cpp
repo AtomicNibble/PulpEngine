@@ -132,7 +132,7 @@ void DX11XRender::DrawQuadSS(float x, float y, float width, float height,
 }
 
 void DX11XRender::DrawQuadImageSS(float x, float y, float width, float height,
-	texture::TexID texture_id, ColorT<float>& col)
+	texture::TexID texture_id, const Color& col)
 {
 	float x1, y1, x2, y2;
 	float z;
@@ -179,7 +179,6 @@ void DX11XRender::DrawQuadImageSS(float x, float y, float width, float height,
 	// We are finished with accessing the vertex buffer
 	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
 
-
 	// Bind our vertex as the first data stream of our device
 	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
 
@@ -189,6 +188,66 @@ void DX11XRender::DrawQuadImageSS(float x, float y, float width, float height,
 	// Render the two triangles from the data stream
 	FX_DrawPrimitive(PrimitiveType::TriangleStrip, nOffs, 4);
 }
+
+void DX11XRender::DrawQuadImageSS(const Rectf& rect, texture::TexID texture_id, const Color& col)
+{
+	float x1, y1, x2, y2;
+	float z;
+	float s[4], t[4];
+
+	s[0] = 0;	t[0] = 1.0f - 1;
+	s[1] = 1;	t[1] = 1.0f - 1;
+	s[2] = 0;	t[2] = 1.0f - 0;
+	s[3] = 1;	t[3] = 1.0f - 0;
+
+	z = 0.f;
+	x1 = rect.x1 - 1.f;
+	y1 = 1.f - rect.y1;
+	x2 = rect.x2 - 1.f;
+	y2 = 1.f - rect.y2;
+
+
+	uint32 nOffs;
+	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
+
+	// TL
+	Quad[0].pos.x = x1;
+	Quad[0].pos.y = y1;
+	Quad[0].pos.z = z;
+	// TR
+	Quad[1].pos.x = x2;
+	Quad[1].pos.y = y1;
+	Quad[1].pos.z = z;
+	// BL
+	Quad[2].pos.x = x1;
+	Quad[2].pos.y = y2;
+	Quad[2].pos.z = z;
+	// BR
+	Quad[3].pos.x = x2;
+	Quad[3].pos.y = y2;
+	Quad[3].pos.z = z;
+
+	for (uint32 i = 0; i<4; ++i)
+	{
+		Quad[i].color = col;
+		Quad[i].st = Vec2f(s[i], t[i]);
+	}
+
+	// We are finished with accessing the vertex buffer
+	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
+	// Bind our vertex as the first data stream of our device
+	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+
+
+	texture::XTexture::applyFromId(0, texture_id, 0);
+
+	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+		return;
+
+	// Render the two triangles from the data stream
+	FX_DrawPrimitive(PrimitiveType::TriangleStrip, nOffs, 4);
+}
+
 
 void DX11XRender::DrawRectSS(float x, float y, float width, float height, const Color& col)
 {
@@ -292,15 +351,22 @@ void DX11XRender::DrawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& 
 
 
 void DX11XRender::DrawQuadImage(float xpos, float ypos,
-	float w, float h, texture::TexID texture_id, ColorT<float>& col)
+	float w, float h, texture::TexID texture_id, const Color& col)
 {
 	DrawImage(xpos, ypos, 0.f, w, h, texture_id, 0, 1, 1, 0, col);
 }
 
 void DX11XRender::DrawQuadImage(float xpos, float ypos,
-	float w, float h, texture::ITexture* pTexutre, ColorT<float>& col)
+	float w, float h, texture::ITexture* pTexutre, const Color& col)
 {
 	DrawImage(xpos, ypos, 0.f, w, h, pTexutre->getTexID(), 0, 1, 1, 0, col);
+}
+
+void DX11XRender::DrawQuadImage(const Rectf& rect, texture::ITexture* pTexutre,
+	const Color& col)
+{
+	DrawImage(rect.getX1(), rect.getY1(), 0.f, rect.getWidth(), rect.getHeight(), 
+		pTexutre->getTexID(), 0, 1, 1, 0, col);
 }
 
 

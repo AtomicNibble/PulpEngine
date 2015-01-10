@@ -3,9 +3,7 @@
 #define WINDOW_STYLE_FILLED 				1	// filled with background color
 #define WINDOW_STYLE_GRADIENT			2	// gradient bar based on background color
 #define WINDOW_STYLE_SHADER 				3	// shader based on background color
-#define WINDOW_STYLE_TEAMCOLOR			4	// team color
-#define WINDOW_STYLE_DVAR_SHADER			5	// draws the shader specified by the dvar
-#define WINDOW_STYLE_LOADBAR 				6	// shader based on background color
+#define WINDOW_STYLE_DVAR_SHADER			4	// draws the shader specified by the dvar
 
 #define WINDOW_BORDER_NONE				0		// no border
 #define WINDOW_BORDER_FULL				1		// full border based on border color ( single pixel )
@@ -101,11 +99,15 @@ windowDef
 		
 		onTime 0 {
 			transition rect "235 120 300 100" "400 120 300 300" "2000" ;
-			transition backcolor "0.1 0.1 0.1 1" "0.8 0 0 1" "2000";
+			transition backcolor "0.1 0.1 0.1 1" "0.8 0 0 1" "1000";
 			transition bordercolor "1 0.563 0.00002 0.5" "1 1 1 1" "2000";
+		}
+		onTime 1000 {
+			transition backcolor "0.7 0.7 0.7 1" "0.7 0.7 0.7 1" "1000";
 		}
 		onTime 2000 {
 			transition rect "400 120 300 300" "235 120 300 100" "2000" ;
+			transition backcolor "0.7 0.7 0.7 1" "0.1 0.1 0.1 1" "1000";
 		}
 		onTime 4000 {
 			resetTime 0 ;
@@ -115,6 +117,7 @@ windowDef
 
 	itemDef
 	{
+		name			"moving"
 		rect        		50 500 64 64 
 		backcolor   	1 0 0.6 0.5
 		forecolor   		0.75 0 0.25 1
@@ -123,16 +126,42 @@ windowDef
 		visible     		1
 		
 		onTime 0 {
-			transition rect "50 500 64 64" "400 500 64 64" "1000" ;
+			transition rect "50 500 64 64" "200 500 64 64" "1000" ;
 		}
 		onTime 1000 {
-			transition rect "400 500 64 64" "400 50 64 64" "1000" ;
+			transition rect "200 500 64 64" "200 50 64 64" "1000" ;
 		}	
 		onTime 2000 {
-			transition rect "400 50 64 64" "50 500 64 64" "1000" ;
+			transition rect "200 50 64 64" "50 500 64 64" "1000" ;
 		}			
 		onTime 6000 {
 			resetTime 0 ;
 		}
+	}
+	
+	itemDef
+	{
+		name			"emtpy"
+		rect        		50 150 128 128 
+		backcolor   	1 1 1 1
+		forecolor   		1 0 0 1
+		bordercolor 	0 0 0 1
+		bordersize  		1
+		visible     		1
+		background		"test"
+		style 			WINDOW_STYLE_EMPTY
+	}
+	
+	itemDef
+	{
+		name			"shader"
+		rect        		450 400 256 128 
+		backcolor   	1 1 1 1
+		forecolor   		1 0 0 1
+		bordercolor 	0 0 0 1
+		bordersize  		1
+		visible     		1
+		background		"test"
+		style 			WINDOW_STYLE_SHADER
 	}
 }

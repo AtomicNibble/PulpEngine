@@ -250,6 +250,7 @@ protected:
 	XWinBool	hideCursor_;
 	XWinFloat	textScale_;
 	XWinStr		text_;
+	XWinStr		background_;
 	// ~
 
 	// variables, can only be set by the gui file.
@@ -277,6 +278,7 @@ protected:
 	XWindow* pOverChild_;		// if a child window has mouse capture
 
 	font::IFFont* pFont_;
+	texture::ITexture* pBackground_;
 
 	XGuiScriptList* scripts_[ScriptFunction::ENUM_COUNT];
 

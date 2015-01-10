@@ -119,11 +119,12 @@ void X3DEngine::OnFrameBegin(void)
 
 //	pRender_->DefferedEnd();
 //	pRender_->s
-	// draw me some gui baby
 
-	pRender_->setGUIShader();
-	if (gui)
+	// draw me some gui baby
+	if (gui) {
+		pRender_->setGUIShader();
 		gui->Redraw();
+	}
 }
 
 void X3DEngine::Update(void)

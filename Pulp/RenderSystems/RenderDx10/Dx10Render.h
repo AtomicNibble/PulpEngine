@@ -271,15 +271,17 @@ public:
 	void DrawQuadSS(float x, float y, float width, float height, const Color& col) X_FINAL;
 	void DrawQuadSS(const Rectf& rect, const Color& col) X_FINAL;
 	void DrawQuadSS(float x, float y, float width, float height, const Color& col, const Color& borderCol) X_FINAL;
-	void DrawQuadImageSS(float x, float y, float width, float height, texture::TexID texture_id, ColorT<float>& col) X_FINAL;
+	void DrawQuadImageSS(float x, float y, float width, float height, texture::TexID texture_id, const Color& col) X_FINAL;
+	void DrawQuadImageSS(const Rectf& rect, texture::TexID texture_id, const Color& col) X_FINAL;
 	void DrawRectSS(float x, float y, float width, float height, const Color& col) X_FINAL;
 	void DrawRectSS(const Rectf& rect, const Color& col) X_FINAL;
 	void DrawLineColorSS(const Vec2f& vPos1, const Color& color1,
 		const Vec2f& vPos2, const Color& vColor2) X_FINAL;
 
 
-	void DrawQuadImage(float x, float y, float width, float height, texture::TexID texture_id, ColorT<float>& col) X_FINAL;
-	void DrawQuadImage(float x, float y, float width, float height, texture::ITexture* pTexutre, ColorT<float>& col) X_FINAL;
+	void DrawQuadImage(float x, float y, float width, float height, texture::TexID texture_id, const Color& col) X_FINAL;
+	void DrawQuadImage(float x, float y, float width, float height, texture::ITexture* pTexutre, const Color& col) X_FINAL;
+	void DrawQuadImage(const Rectf& rect, texture::ITexture* pTexutre, const Color& col) X_OVERRIDE;
 
 	void DrawQuad(float x, float y, float z, float width, float height, const Color& col) X_OVERRIDE;
 	void DrawQuad(float x, float y, float z, float width, float height, const Color& col, const Color& borderCol) X_OVERRIDE;

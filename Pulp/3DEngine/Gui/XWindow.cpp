@@ -32,6 +32,8 @@ XRegEntry XWindow::s_RegisterVars[] =
 
 	{ "textscale", RegisterType::FLOAT },
 	{ "text", RegisterType::STRING },
+	{ "background", RegisterType::STRING },
+
 };
 
 
@@ -46,7 +48,7 @@ const char* XWindow::s_ScriptNames[XWindow::ScriptFunction::ENUM_COUNT] = {
 };
 
 
-const int XWindow::s_NumRegisterVars = sizeof(s_RegisterVars) / sizeof(const char*);
+const int XWindow::s_NumRegisterVars = sizeof(s_RegisterVars) / sizeof(XRegEntry);
 
 bool XWindow::s_registerIsTemporary[MAX_EXPRESSION_REGISTERS]; 
 
@@ -88,6 +90,11 @@ void XWindow::init(void)
 	textScale_ = g_DefaultTextScale;
 	// ~
 
+	// default styles
+	style_ = WindowStyle::FILLED;
+	borderStyle_ = WindowBorderStyle::FULL;
+
+
 	borderSize_ = 0.f; // no border by default.
 	textAlignX_ = 0.f;
 	textAlignY_ = 0.f;
@@ -105,6 +112,7 @@ void XWindow::init(void)
 
 	// default font
 	pFont_ = gEnv->pFont->GetFont("default");
+	pBackground_ = nullptr;
 
 	hover_ = false;
 
@@ -233,7 +241,6 @@ bool XWindow::Parse(core::XParser& lex)
 		}
 	}
 
-
 	EvalRegs(-1, true);
 
 	SetupFromState();
@@ -241,12 +248,13 @@ bool XWindow::Parse(core::XParser& lex)
 	return true;
 }
 
-void XWindow::SetupFromState(void)
+void XWindow::SetupFromState(void) 
 {
 	if (borderSize_ > 0.f)
 		flags_.Set(WindowFlag::BORDER);
 
-
+	if (style_ == WindowStyle::SHADER)
+		pBackground_ = pRender_->LoadTexture(background_.c_str(), texture::TextureFlags::DONT_STREAM);
 }
 
 void XWindow::FixUpParms(void)
@@ -1083,6 +1091,10 @@ XWinVar* XWindow::GetWinVarByName(const char* name)
 	{
 		retVar = &text_;
 	}
+	else if (IsEqualCaseInsen(nameBegin, nameEnd, "background"))
+	{
+		retVar = &background_;
+	}
 
 	return retVar;
 }
@@ -1108,8 +1120,11 @@ void XWindow::reDraw(void)
 
 	calcClientRect();
 
-	drawBackground(rectDraw_);
-	drawBorder(rectDraw_);
+	if (style_ != WindowStyle::EMPTY)
+	{
+		drawBackground(rectDraw_);
+		drawBorder(rectDraw_);
+	}
 	drawDebug();
 
 	Childit it = children_.begin();
@@ -1133,7 +1148,10 @@ void XWindow::drawDebug(void)
 	str.appendFmt("Backcolor: %g %g %g %g\n", backColor_.r(), backColor_.g(),
 		backColor_.b(), backColor_.a());
 
-	ti.col = Col_White;
+	// make the text visable.
+	float v = (backColor_.r() + backColor_.g() + backColor_.b()) / 3.f > 0.5f ? 0.f : 1.f;
+
+	ti.col = Color(v, v, v);
 	ti.flags = DrawTextFlags::MONOSPACE;
 
 	// pos :Z?
@@ -1212,9 +1230,19 @@ void XWindow::draw(int time, float x, float y)
 void XWindow::drawBackground(const Rectf& drawRect)
 {
 	//render::IRenderAux* paux = pRender_->GetIRenderAuxGeo();
+	if (style_ == WindowStyle::FILLED)
+	{
+		pRender_->DrawQuadSS(drawRect, backColor_);
+	}
+	else if (style_ == WindowStyle::GRADIENT)
+	{
 
-
-	pRender_->DrawQuadSS(drawRect, backColor_);
+	}
+	else if (style_ == WindowStyle::SHADER)
+	{
+		const Color& col = backColor_;
+		pRender_->DrawQuadImageSS(drawRect, pBackground_->getTexID(), col);
+	}
 }
 
 void XWindow::activate(bool activate)

@@ -13,7 +13,7 @@ shader
 	techniques
 	{
 		{
-			name 				"Fill"
+			name 				"Fill(Textured)"
 			vertex_shader   	"guiVS"
 			pixel_shader    	"guiPS"	
 			src_blend_color  	src_alpha

@@ -670,6 +670,17 @@ bool ShaderSourceFile::Technique::parse(core::XLexer& lex)
 		if (key.isEqual("name"))
 		{
 			name = value.c_str();
+
+			const char* options;
+			if ((options = name.find('(')))
+			{
+				// name can be Fill(Textured)
+				// this means we compile two versions of the shader.
+				// one that dose not supprt texures and another that does.
+
+
+			}
+
 			flags.Set(TechniquePrams::NAME);
 		}
 		else if (key.isEqual("vertex_shader"))

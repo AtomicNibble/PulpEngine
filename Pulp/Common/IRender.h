@@ -329,14 +329,16 @@ struct IRender
 	virtual void DrawQuadSS(float x, float y, float width, float height, const Color& col) X_ABSTRACT;
 	virtual void DrawQuadSS(const Rectf& rect, const Color& col) X_ABSTRACT;
 	virtual void DrawQuadSS(float x, float y, float width, float height, const Color& col, const Color& borderCol) X_ABSTRACT;
-	virtual void DrawQuadImageSS(float x, float y, float width, float height, texture::TexID texture_id, ColorT<float>& col) X_ABSTRACT;
+	virtual void DrawQuadImageSS(float x, float y, float width, float height, texture::TexID texture_id, const Color& col) X_ABSTRACT;
+	virtual void DrawQuadImageSS(const Rectf& rect, texture::TexID texture_id, const Color& col) X_ABSTRACT;
 	virtual void DrawRectSS(float x, float y, float width, float height, const Color& col) X_ABSTRACT;
 	virtual void DrawRectSS(const Rectf& rect, const Color& col) X_ABSTRACT;
 	virtual void DrawLineColorSS(const Vec2f& vPos1, const Color& color1,
 		const Vec2f& vPos2, const Color& vColor2) X_ABSTRACT;
 
-	virtual void DrawQuadImage(float x, float y, float width, float height, texture::TexID texture_id, ColorT<float>& col) X_ABSTRACT;
-	virtual void DrawQuadImage(float x, float y, float width, float height, texture::ITexture* pTexutre, ColorT<float>& col) X_ABSTRACT;
+	virtual void DrawQuadImage(float x, float y, float width, float height, texture::TexID texture_id, const Color& col) X_ABSTRACT;
+	virtual void DrawQuadImage(float x, float y, float width, float height, texture::ITexture* pTexutre, const Color& col) X_ABSTRACT;
+	virtual void DrawQuadImage(const Rectf& rect, texture::ITexture* pTexutre, const Color& col) X_ABSTRACT;
 
 	// for 2d, z is depth not position
 	virtual void DrawQuad(float x, float y, float z, float width, float height, const Color& col) X_ABSTRACT;
