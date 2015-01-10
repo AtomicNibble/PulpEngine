@@ -2,6 +2,7 @@
 #include "Material.h"
 
 
+X_NAMESPACE_BEGIN(engine)
 
 bool MaterialHeader::isValid(void) const
 {
@@ -13,10 +14,6 @@ bool MaterialHeader::isValid(void) const
 	return version == MTL_B_VERSION &&
 		fourCC == MTL_B_FOURCC;
 }
-
-
-
-X_NAMESPACE_BEGIN(engine)
 
 
 

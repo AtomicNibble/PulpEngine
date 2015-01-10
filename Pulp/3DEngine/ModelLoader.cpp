@@ -186,7 +186,7 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 
 	// Material name list null-term
 	{
-		core::StackString<MTL_MATERIAL_MAX_LEN> name;
+		core::StackString<engine::MTL_MATERIAL_MAX_LEN> name;
 		for (i = 0; i < header_.numMesh; i++)
 		{		
 			SubMeshHeader* pMesh = const_cast<SubMeshHeader*>(&model.pMeshHeads_[i]);

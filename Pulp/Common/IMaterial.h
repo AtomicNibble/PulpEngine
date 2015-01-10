@@ -6,12 +6,14 @@
 #include <IShader.h>
 #include "Util\GenericUtil.h"
 
+X_NAMESPACE_BEGIN(engine)
+
+
 static const uint32_t	 MTL_MATERIAL_MAX_LEN = 64;
 static const uint32_t	 MTL_B_VERSION = 1;
 static const uint32_t	 MTL_B_FOURCC = X_TAG('m', 't', 'l', 'b');
 static const char*		 MTL_B_FILE_EXTENSION = "mtlb";
 static const char*		 MTL_FILE_EXTENSION = "mtl";
-
 
 
 X_DECLARE_FLAGS(MaterialFlag)(TWO_SIDED, WIRE, ADDITIVE, NOSHADOW, NOLIGHTING, NODRAW, UI);
@@ -144,5 +146,6 @@ struct IMaterialManager
 	virtual void setListener(IMaterialManagerListener* pListner) X_ABSTRACT;
 };
 
+X_NAMESPACE_END
 
 #endif // _X_MATERIAL_I_H_

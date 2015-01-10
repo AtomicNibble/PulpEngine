@@ -226,59 +226,61 @@ bool XShaderManager::Shutdown(void)
 
 bool XShaderManager::OnFileChange(const char* name)
 {
-	const char* ext = core::strUtil::FileExtension(name);
-
-	// this is just a cache update ignore this.
-	if (core::strUtil::IsEqualCaseInsen(ext, "fxcb")) {
-		return true;
-	}
-
-
-	// is it source?
-	bool isSource = true;
-
-	if (core::strUtil::IsEqualCaseInsen(ext, "shader")) {
-		isSource = false;
-	}
-
-
-	if (isSource)
+	const char* ext;
+	if (ext = core::strUtil::FileExtension(name))
 	{
-		// if source has changed we need to recompile any shader that uses
-		// that source file.
-		// how to find the shaders that it uses?
-		// if i have some sort of reffrence hirarcy
-		// i can take any file and know what shaders use it.
-		core::Path temp(name);
-		temp.toLower(); // all source is lower case
 
-		ShaderSourceMap::const_iterator it = Sourcebin.find(temp.fileName());
-		if (it != Sourcebin.end())
+		// this is just a cache update ignore this.
+		if (core::strUtil::IsEqualCaseInsen(ext, "fxcb")) {
+			return true;
+		}
+
+
+		// is it source?
+		bool isSource = true;
+
+		if (core::strUtil::IsEqualCaseInsen(ext, "shader")) {
+			isSource = false;
+		}
+
+
+		if (isSource)
 		{
-			// reload the source file.
-			loadRawSourceFile(temp.fileName(), true);
+			// if source has changed we need to recompile any shader that uses
+			// that source file.
+			// how to find the shaders that it uses?
+			// if i have some sort of reffrence hirarcy
+			// i can take any file and know what shaders use it.
+			core::Path temp(name);
+			temp.toLower(); // all source is lower case
 
-			SourceFile* src = it->second;
-			for (auto name : src->refrences)
+			ShaderSourceMap::const_iterator it = Sourcebin.find(temp.fileName());
+			if (it != Sourcebin.end())
 			{
-				reloadShader(name.c_str());
+				// reload the source file.
+				loadRawSourceFile(temp.fileName(), true);
+
+				SourceFile* src = it->second;
+				for (auto name : src->refrences)
+				{
+					reloadShader(name.c_str());
+				}
+			}
+			else
+			{
+				// log as not found.
+				X_WARNING("Shader", "\"%s\" not used, skippin reload", name);
 			}
 		}
 		else
 		{
-			// log as not found.
-			X_WARNING("Shader", "\"%s\" not used, skippin reload", name);
+			core::Path temp(name);
+			temp.setExtension("");
+			temp.toLower();
+
+			reloadShader(temp.fileName());
 		}
 	}
-	else
-	{
-		core::Path temp(name);
-		temp.setExtension("");
-		temp.toLower();
-
-		reloadShader(temp.fileName());
-	}
-
 	return true;
 }
 
@@ -677,7 +679,8 @@ bool ShaderSourceFile::Technique::parse(core::XLexer& lex)
 				// name can be Fill(Textured)
 				// this means we compile two versions of the shader.
 				// one that dose not supprt texures and another that does.
-
+				// i don't want the types that can be added to be fixed.
+				// so custom ones can be made.
 
 			}
 

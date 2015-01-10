@@ -323,21 +323,23 @@ void XMaterialManager::ShutDown(void)
 
 bool XMaterialManager::OnFileChange(const char* name)
 {
-	const char* fileExt = core::strUtil::FileExtension(name);
-
-	if (core::strUtil::IsEqual(MTL_FILE_EXTENSION, fileExt))
+	const char* fileExt;		
+	if (fileExt = core::strUtil::FileExtension(name))
 	{
-		X_LOG0("Material", "reload material: \"%s\"", name);
+
+		if (core::strUtil::IsEqual(MTL_FILE_EXTENSION, fileExt))
+		{
+			X_LOG0("Material", "reload material: \"%s\"", name);
 
 
+		}
+		else if (core::strUtil::IsEqual(MTL_B_FILE_EXTENSION, fileExt))
+		{
+			//	X_LOG0("Material", "reload material: \"%s\"", name);
+
+
+		}
 	}
-	else if (core::strUtil::IsEqual(MTL_B_FILE_EXTENSION, fileExt))
-	{
-	//	X_LOG0("Material", "reload material: \"%s\"", name);
-
-
-	}
-
 	return true;
 }
 

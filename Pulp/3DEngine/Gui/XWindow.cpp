@@ -112,7 +112,7 @@ void XWindow::init(void)
 
 	// default font
 	pFont_ = gEnv->pFont->GetFont("default");
-	pBackground_ = nullptr;
+	pBackgroundMat_ = nullptr;
 
 	hover_ = false;
 
@@ -250,11 +250,13 @@ bool XWindow::Parse(core::XParser& lex)
 
 void XWindow::SetupFromState(void) 
 {
-	if (borderSize_ > 0.f)
+	if (borderSize_ > 0.f) {
 		flags_.Set(WindowFlag::BORDER);
+	}
 
-	if (style_ == WindowStyle::SHADER)
-		pBackground_ = pRender_->LoadTexture(background_.c_str(), texture::TextureFlags::DONT_STREAM);
+	if (style_ == WindowStyle::SHADER) {
+		pBackgroundMat_ = pMaterialManager_->loadMaterial(background_.c_str());
+	}
 }
 
 void XWindow::FixUpParms(void)
@@ -1241,7 +1243,8 @@ void XWindow::drawBackground(const Rectf& drawRect)
 	else if (style_ == WindowStyle::SHADER)
 	{
 		const Color& col = backColor_;
-		pRender_->DrawQuadImageSS(drawRect, pBackground_->getTexID(), col);
+		// pBackgroundMat_
+//		pRender_->DrawQuadImageSS(drawRect, pBackground_->getTexID(), col);
 	}
 }
 
