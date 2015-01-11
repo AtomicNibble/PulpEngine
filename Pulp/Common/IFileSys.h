@@ -414,8 +414,8 @@ public:
 	}
 
 	template <typename T>
-	inline uint32_t writeObjs(T& object, uint32_t num) {
-		return write(&object, sizeof(T)* num);
+	inline uint32_t writeObjs(T* objects, uint32_t num) {
+		return write(objects, sizeof(T)* num);
 	}
 
 
