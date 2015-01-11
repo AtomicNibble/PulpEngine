@@ -23,9 +23,18 @@ public:
 
 	void ShutDown(void);
 
+
+	X_INLINE const int addRef() X_OVERRIDE{ return XBaseAsset::addRef(); }
 	// XBaseAsset
-	virtual const int release() X_OVERRIDE;
+	X_INLINE const int release() X_OVERRIDE;
 	// ~XBaseAsset
+	X_INLINE const int forceRelease() X_OVERRIDE{
+		for (;;) {
+			if (release() <= 0)
+				break;
+		}
+		return 0;
+	}
 
 	virtual const char* getName() X_OVERRIDE { return MatName_; };
 	virtual void setName(const char* pName) X_OVERRIDE;

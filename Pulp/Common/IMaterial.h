@@ -70,6 +70,12 @@ struct IMaterial
 {
 	virtual ~IMaterial(){};
 
+
+	// materials are shared, we ref count them so we know when we are done.
+	virtual const int addRef() X_ABSTRACT;
+	virtual const int release() X_ABSTRACT;
+	virtual const int forceRelease() X_ABSTRACT;
+
 	virtual const char* getName() X_ABSTRACT;
 	virtual void setName(const char* pName) X_ABSTRACT;
 
