@@ -550,7 +550,7 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 	path.setFileName(MtlName);
 	path.setExtension(MTL_B_FILE_EXTENSION);
 
-	if (file.openFile(MtlName, core::fileMode::READ))
+	if (file.openFile(path.c_str(), core::fileMode::READ))
 	{
 		file.readObj(hdr);
 
@@ -561,7 +561,7 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 
 			uint32_t Num = core::Min<uint32_t>(hdr.numTextures, shader::ShaderTextureIdx::ENUM_COUNT);
 
-			if (file.readObjs(hdr.numTextures, hdr.numTextures) == Num)
+			if (file.readObjs(texture, Num) == Num)
 			{
 				pMat = (XMaterial*)createMaterial(MtlName);
 				pMat->CullType_ = hdr.cullType;
@@ -652,7 +652,7 @@ bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 	if (file.openFile(path.c_str(), core::fileMode::WRITE | core::fileMode::RECREATE))
 	{
 		file.writeObj(hdr);
-		file.writeObjs(textures[0], numTex);
+		file.writeObjs(textures, numTex);
 		return true;
 	}
 
