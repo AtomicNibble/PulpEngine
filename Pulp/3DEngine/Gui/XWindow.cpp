@@ -1197,16 +1197,34 @@ void XWindow::drawBorder(const Rectf& drawRect)
 					pRender_->DrawRectSS(drawRect, borderColor_);
 					break;
 				case WindowBorderStyle::HORZ:
-				
+					pRender_->DrawLineColorSS(drawRect.getUpperLeft(), borderColor_,
+						drawRect.getUpperRight(), borderColor_);
+					pRender_->DrawLineColorSS(drawRect.getLowerLeft(), borderColor_,
+						drawRect.getLowerRight(), borderColor_);
 					break;
 				case WindowBorderStyle::VERT:
-				
+					pRender_->DrawLineColorSS(drawRect.getUpperLeft(), borderColor_,
+						drawRect.getLowerLeft(), borderColor_);
+					pRender_->DrawLineColorSS(drawRect.getUpperRight(), borderColor_,
+						drawRect.getLowerRight(), borderColor_);
 					break;
 				case WindowBorderStyle::GRADIENT:
 
 					break;
 
+				case WindowBorderStyle::RAISED:
+
+					break;
+
+				case WindowBorderStyle::NONE:
+					break;
+#if X_DEBUG
 				default:
+					X_ASSERT_UNREACHABLE();
+					break;
+#else
+					X_NO_SWITCH_DEFAULT();
+#endif // !X_DEBUG
 			}
 		}
 	}
