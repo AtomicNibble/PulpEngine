@@ -415,10 +415,10 @@ IMaterial* XMaterialManager::loadMaterial(const char* MtlName)
 
 	}
 
-	// no name provided.
 	// try find it.
 	if (iMat = findMaterial(MtlName)){
-//		iMat->a
+		// inc ref count.
+		((XMaterial*)iMat)->addRef();
 		return iMat;
 	}
 
