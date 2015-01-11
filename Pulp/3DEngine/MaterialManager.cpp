@@ -393,7 +393,6 @@ IMaterial* XMaterialManager::findMaterial(const char* MtlName) const
 {
 	X_ASSERT_NOT_NULL(MtlName);
 
-	
 	IMaterial* pMaterial = (IMaterial*)materials_.findAsset(MtlName);
 	if (pMaterial)
 		return pMaterial;
@@ -405,29 +404,35 @@ IMaterial* XMaterialManager::loadMaterial(const char* MtlName)
 {
 	X_ASSERT_NOT_NULL(MtlName);
 	const char* pExt;
+	IMaterial* iMat;
 
 	if((pExt = core::strUtil::FileExtension(MtlName)))
 	{
-		if (core::strUtil::IsEqual(pExt, MTL_FILE_EXTENSION))
-		{
-			IMaterial* pMat = loadMaterialXML(MtlName);
-			if (pMat) 
-			{	// compile it baby!
-				saveMaterialCompiled(pMat);
-				return pMat;
-			}
-		}
-		else if (core::strUtil::IsEqual(pExt, MTL_B_FILE_EXTENSION))
-		{
-			return loadMaterialCompiled(MtlName);
-		}
-		else {
-			X_ERROR("MtlMan", "invalid mtl extension domain is: %s or %s", 
-				MTL_FILE_EXTENSION, MTL_B_FILE_EXTENSION);
-		}
+		// engine should not make requests for materials with a extensiob
+		X_ERROR("MtlMan", "invalid mtl name extension was included: %s",
+			pExt);
+		return getDefaultMaterial();
+
 	}
 
-	return nullptr;
+	// no name provided.
+	// try find it.
+	if (iMat = findMaterial(MtlName)){
+//		iMat->a
+		return iMat;
+	}
+
+	// lets look for binary first.
+	if ((iMat = loadMaterialCompiled(MtlName))) {
+		return iMat;
+	}
+
+	if ((iMat = loadMaterialXML(MtlName))) {
+		return iMat;
+	}
+
+	X_ERROR("MatMan", "failed to find material: %s", MtlName);
+	return getDefaultMaterial();
 }
 
 void XMaterialManager::unregister(IMaterial* pMat)
@@ -536,9 +541,14 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 {
 	X_ASSERT_NOT_NULL(MtlName);
 	core::XFileScoped file;
+	core::Path path;
 	MaterialHeader hdr;
 	XMaterial* pMat = nullptr;
 	uint32_t i;
+
+	path /= "core_assets/materials/";
+	path.setFileName(MtlName);
+	path.setExtension(MTL_B_FILE_EXTENSION);
 
 	if (file.openFile(MtlName, core::fileMode::READ))
 	{
