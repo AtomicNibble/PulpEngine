@@ -404,8 +404,8 @@ public:
 	}
 
 	template <typename T>
-	inline uint32_t readObjs(T& object, uint32_t num) {
-		return read(&object, sizeof(T)* num);
+	inline uint32_t readObjs(T* objects, uint32_t num) {
+		return read(objects, sizeof(T)* num) / sizeof(T);
 	}
 
 	template <typename T>
@@ -415,7 +415,7 @@ public:
 
 	template <typename T>
 	inline uint32_t writeObjs(T* objects, uint32_t num) {
-		return write(objects, sizeof(T)* num);
+		return write(objects, sizeof(T)* num) / sizeof(T);
 	}
 
 
