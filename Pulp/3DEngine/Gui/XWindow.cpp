@@ -890,13 +890,19 @@ bool XWindow::ParseVar(const core::XLexToken& token, core::XParser& lex)
 			style_ = (WindowStyle::Enum)style32;
 		else
 		{
-			X_WARNING("Gui", "unkown ");
+			X_WARNING("Gui", "unknown style: %i", style32);
 		}
 	}
 	else if (IsEqualCaseInsen(nameBegin, nameEnd, "borderstyle"))
 	{
+		int style32 = lex.ParseInt();
 
-
+		if (style32 >= 0 && style32 < WindowBorderStyle::ENUM_COUNT)
+			borderStyle_ = (WindowBorderStyle::Enum)style32;
+		else
+		{
+			X_WARNING("Gui", "unknown border stlye: %i", style32);
+		}
 	}
 	else if (IsEqualCaseInsen(nameBegin, nameEnd, "bordersize"))
 	{
@@ -1185,7 +1191,23 @@ void XWindow::drawBorder(const Rectf& drawRect)
 	{
 		if (borderColor_.a() > 0.f)
 		{
-			pRender_->DrawRectSS(drawRect, borderColor_);
+			switch (borderStyle_)
+			{
+				case WindowBorderStyle::FULL:
+					pRender_->DrawRectSS(drawRect, borderColor_);
+					break;
+				case WindowBorderStyle::HORZ:
+				
+					break;
+				case WindowBorderStyle::VERT:
+				
+					break;
+				case WindowBorderStyle::GRADIENT:
+
+					break;
+
+				default:
+			}
 		}
 	}
 }
@@ -1244,7 +1266,6 @@ void XWindow::draw(int time, float x, float y)
 
 void XWindow::drawBackground(const Rectf& drawRect)
 {
-	//render::IRenderAux* paux = pRender_->GetIRenderAuxGeo();
 	if (style_ == WindowStyle::FILLED)
 	{
 		pRender_->DrawQuadSS(drawRect, backColor_);
