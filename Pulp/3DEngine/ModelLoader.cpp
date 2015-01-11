@@ -223,6 +223,14 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 		}
 	}
 
+	// load the materials.
+	for (i = 0; i < header_.numMesh; i++)
+	{
+		SubMeshHeader* pMesh = const_cast<SubMeshHeader*>(&model.pMeshHeads_[i]);
+
+		pMesh->pMat = getMaterialManager()->loadMaterial(pMesh->materialName);
+	}
+
 	// copy lod info activating the data.
 	core::copy_object(model.lodInfo_, header_.lodInfo);
 

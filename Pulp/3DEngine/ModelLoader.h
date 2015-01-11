@@ -7,6 +7,8 @@
 #include "IModel.h"
 #include "XModel.h"
 
+#include "EngineBase.h"
+
 X_NAMESPACE_BEGIN(model)
 
 
@@ -33,7 +35,7 @@ X_NAMESPACE_BEGIN(model)
 //
 
 
-class ModelLoader
+class ModelLoader : public engine::XEngineBase
 {
 public:
 	ModelLoader();
