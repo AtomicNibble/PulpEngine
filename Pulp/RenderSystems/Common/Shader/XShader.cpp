@@ -1234,10 +1234,8 @@ XShaderResources* XShaderManager::createShaderResources(const XInputShaderResour
 		if (!res.name.isEmpty())
 		{
 			pRes->pTextures[i] = textureResourceForName(res.name);
-
 		}
 	}
-
 
 	return pRes;
 }
