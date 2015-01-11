@@ -282,15 +282,15 @@ protected:
 
 	XGuiScriptList* scripts_[ScriptFunction::ENUM_COUNT];
 
-	core::Array<XWindow*>	children_;
-	core::Array<XDrawWin>   drawWindows_;
+	core::Array<XWindow*>			children_;
+	core::Array<XDrawWin>			drawWindows_;
 
 	core::Array<XTimeLineEvent*>	timeLineEvents_;
 	core::Array<XTransitionData>	transitions_;
 
-	core::Array<xOpt>		ops_;
-	core::Array<float>		expressionRegisters_;
-	XRegisterList			regList_;
+	core::Array<xOpt>				ops_;
+	core::Array<float>				expressionRegisters_;
+	XRegisterList					regList_;
 
 	bool* pSaveTemps_;
 

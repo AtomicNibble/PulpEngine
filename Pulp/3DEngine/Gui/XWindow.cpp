@@ -1110,7 +1110,6 @@ void XWindow::reDraw(void)
 {
 	X_PROFILE_BEGIN("GuiDraw", core::ProfileSubSys::ENGINE3D);
 
-
 	core::TimeVal time = pTimer_->GetFrameStartTime(core::ITimer::Timer::UI);
 
 	if (flags_.IsSet(WindowFlag::DESKTOP)) {
@@ -1122,11 +1121,25 @@ void XWindow::reDraw(void)
 
 	calcClientRect();
 
+	if (style_ == WindowStyle::DVAR_SHADER) {
+		// this should not be null even if load fails.
+		X_ASSERT_NOT_NULL(pBackgroundMat_);
+	
+		// check if the dvar has changed.
+		if (!core::strUtil::IsEqual(pBackgroundMat_->getName(),background_.getName()))
+		{
+			pBackgroundMat_->release();
+			// this might cause a material to be loaded from disk.
+			pBackgroundMat_ = getMaterialManager()->loadMaterial(background_.c_str());
+		}
+	}
+
 	if (style_ != WindowStyle::EMPTY)
 	{
 		drawBackground(rectDraw_);
 		drawBorder(rectDraw_);
 	}
+
 	drawDebug();
 
 	Childit it = children_.begin();
@@ -1240,7 +1253,7 @@ void XWindow::drawBackground(const Rectf& drawRect)
 	{
 
 	}
-	else if (style_ == WindowStyle::SHADER)
+	else if (style_ == WindowStyle::SHADER || style_ == WindowStyle::DVAR_SHADER)
 	{
 		const Color& col = backColor_;
 		// pBackgroundMat_
