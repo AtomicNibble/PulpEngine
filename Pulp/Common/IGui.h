@@ -92,9 +92,9 @@ X_DECLARE_ENUM(WindowBorderStyle)(
 	HORZ,		// horizontal borders only
 	VERT,		// vertical borders only
 	GRADIENT,	// horizontal border using the gradient bars
-	RAISED		// darken the bottom and right sides of the border
+	RAISED,		// darken the bottom and right sides of the border
+	SUNKEN		// darken the top and left sides of the border
 );
-
 
 // adds some type saftey.
 // int values must be cast.

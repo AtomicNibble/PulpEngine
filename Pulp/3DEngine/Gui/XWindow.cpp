@@ -1209,13 +1209,54 @@ void XWindow::drawBorder(const Rectf& drawRect)
 						drawRect.getLowerRight(), borderColor_);
 					break;
 				case WindowBorderStyle::GRADIENT:
+					// humm
+					X_ASSERT_NOT_IMPLEMENTED();
 
 					break;
-
 				case WindowBorderStyle::RAISED:
+				{
+					const Color LTColor = borderColor_;
+					Color BRColor = borderColor_;
 
+					BRColor.shade(-30.f);
+
+					// top
+					pRender_->DrawLineColorSS(drawRect.getUpperLeft(), LTColor,
+						drawRect.getUpperRight(), LTColor);
+					// bottom
+					pRender_->DrawLineColorSS(drawRect.getLowerLeft(), BRColor,
+						drawRect.getLowerRight(), BRColor);
+					// left
+					pRender_->DrawLineColorSS(drawRect.getUpperLeft(), LTColor,
+						drawRect.getLowerLeft(), LTColor);
+					// right
+					pRender_->DrawLineColorSS(drawRect.getUpperRight(), BRColor,
+						drawRect.getLowerRight(), BRColor);
+					
 					break;
+				}
+				case WindowBorderStyle::SUNKEN:
+				{
+					Color LTColor = borderColor_;
+					Color BRColor = borderColor_;
 
+					LTColor.shade(-30.f);
+
+					// top
+					pRender_->DrawLineColorSS(drawRect.getUpperLeft(), LTColor,
+						drawRect.getUpperRight(), LTColor);
+					// bottom
+					pRender_->DrawLineColorSS(drawRect.getLowerLeft(), BRColor,
+						drawRect.getLowerRight(), BRColor);
+					// left
+					pRender_->DrawLineColorSS(drawRect.getUpperLeft(), LTColor,
+						drawRect.getLowerLeft(), LTColor);
+					// right
+					pRender_->DrawLineColorSS(drawRect.getUpperRight(), BRColor,
+						drawRect.getLowerRight(), BRColor);
+					
+					break;
+				}
 				case WindowBorderStyle::NONE:
 					break;
 #if X_DEBUG
