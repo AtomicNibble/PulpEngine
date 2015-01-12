@@ -6,6 +6,8 @@
 #include <IRender.h>
 #include <IRenderAux.h>
 
+#include "GuiManger.h"
+
 X_NAMESPACE_BEGIN(gui)
 
 namespace
@@ -1147,7 +1149,10 @@ void XWindow::reDraw(void)
 	}
 
 	draw(time, rectClient_.x1, rectClient_.y1);
-	drawDebug();
+
+	if (getGuiManager()->ShowDeubug()) {
+		drawDebug();
+	}
 
 	Childit it = children_.begin();
 	for (; it != children_.end(); ++it)
@@ -1348,6 +1353,7 @@ void XWindow::draw(core::TimeVal time, float x_, float y_)
 		case TextAlign::TOP_LEFT:
 		case TextAlign::TOP_CENTER:
 		case TextAlign::TOP_RIGHT:
+//		case TextAlign::TOP:
 
 			break;
 		default:
@@ -1360,7 +1366,8 @@ void XWindow::draw(core::TimeVal time, float x_, float y_)
 		case TextAlign::MIDDLE_LEFT:
 		case TextAlign::MIDDLE_CENTER:
 		case TextAlign::MIDDLE_RIGHT:
-			y += rect.getCenter().y;
+//		case TextAlign::MIDDLE:
+			y += (rect.getHeight() / 2);
 			y -= (textDimension.y / 2);
 			break;
 		default:
@@ -1373,6 +1380,7 @@ void XWindow::draw(core::TimeVal time, float x_, float y_)
 		case TextAlign::BOTTOM_LEFT:
 		case TextAlign::BOTTOM_CENTER:
 		case TextAlign::BOTTOM_RIGHT:
+//		case TextAlign::BOTTOM:
 			y += rect.getHeight();
 			y -= textDimension.y;
 			break;
@@ -1386,6 +1394,7 @@ void XWindow::draw(core::TimeVal time, float x_, float y_)
 		case TextAlign::TOP_LEFT:
 		case TextAlign::MIDDLE_LEFT:
 		case TextAlign::BOTTOM_LEFT:
+		case TextAlign::LEFT:
 
 			break;
 		default:
@@ -1398,7 +1407,8 @@ void XWindow::draw(core::TimeVal time, float x_, float y_)
 		case TextAlign::TOP_CENTER:
 		case TextAlign::MIDDLE_CENTER:
 		case TextAlign::BOTTOM_CENTER:
-			x += rect.getCenter().x;
+		case TextAlign::CENTER:
+			x += (rect.getWidth() / 2);
 			x -= (textDimension.x / 2);
 			break;
 		default:
@@ -1411,6 +1421,7 @@ void XWindow::draw(core::TimeVal time, float x_, float y_)
 		case TextAlign::TOP_RIGHT:
 		case TextAlign::MIDDLE_RIGHT:
 		case TextAlign::BOTTOM_RIGHT:
+		case TextAlign::RIGHT:
 			x += rect.getWidth();
 			x -= textDimension.x;
 			break;

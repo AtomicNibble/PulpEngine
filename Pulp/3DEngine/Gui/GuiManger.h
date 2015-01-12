@@ -35,6 +35,10 @@ public:
 	bool OnFileChange(const char* name) X_FINAL;
 	// ~IXHotReload
 
+	X_INLINE bool ShowDeubug(void) const{
+		return var_showDebug_ == 1;
+	}
+
 private:
 	typedef core::Array<XGui*> Guis;
 
@@ -42,6 +46,7 @@ private:
 
 	Guis guis_;
 
+	int var_showDebug_;
 
 	friend void Command_ListUis(core::IConsoleCmdArgs* pArgs);
 };

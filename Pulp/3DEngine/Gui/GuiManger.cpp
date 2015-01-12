@@ -103,6 +103,8 @@ void XGuiManager::Init(void)
 
 	ADD_COMMAND("ui_list", Command_ListUis, 0, "List the loaded ui's");
 
+	ADD_CVAR_REF("ui_DrawDebug", var_showDebug_, 1, 0, 1, core::VarFlag::SYSTEM, "draw debug info over gui");
+
 	gEnv->pHotReload->addfileType(this, gui::GUI_FILE_EXTENSION);
 	gEnv->pHotReload->addfileType(this, gui::GUI_BINARY_FILE_EXTENSION);
 
