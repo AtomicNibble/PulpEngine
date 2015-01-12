@@ -1146,6 +1146,7 @@ void XWindow::reDraw(void)
 		drawBorder(rectDraw_);
 	}
 
+	draw(time, rectClient_.x1, rectClient_.y1);
 	drawDebug();
 
 	Childit it = children_.begin();
@@ -1314,13 +1315,115 @@ void XWindow::calcClientRect(void)
 // -------------- Overrides ---------------
 
 
-void XWindow::draw(int time, float x, float y)
+void XWindow::draw(core::TimeVal time, float x_, float y_)
 {
 	// draw the text.
 	if (text_.getLength() == 0)
 		return;
 
+	Rectf rect = rectClient_;
 
+	float x = x_;
+	float y = y_;
+
+	font::XTextDrawConect contex;
+	contex.widthScale = 1.0f;
+	contex.col = foreColor_;
+
+	if (flags_.IsSet(WindowFlags::NO_CLIP))
+	{
+		contex.clipEnabled = false;
+	}
+	else
+	{
+		contex.clipEnabled = true;
+		contex.clip = rect;
+	}
+
+	Vec2f textDimension = pFont_->GetTextSize(text_, contex);
+
+	// top align
+	switch (textAlign_)
+	{
+		case TextAlign::TOP_LEFT:
+		case TextAlign::TOP_CENTER:
+		case TextAlign::TOP_RIGHT:
+
+			break;
+		default:
+			break;
+	}
+
+	// middle align
+	switch (textAlign_)
+	{
+		case TextAlign::MIDDLE_LEFT:
+		case TextAlign::MIDDLE_CENTER:
+		case TextAlign::MIDDLE_RIGHT:
+			y += rect.getCenter().y;
+			y -= (textDimension.y / 2);
+			break;
+		default:
+			break;
+	}
+
+	// bottom align
+	switch (textAlign_)
+	{
+		case TextAlign::BOTTOM_LEFT:
+		case TextAlign::BOTTOM_CENTER:
+		case TextAlign::BOTTOM_RIGHT:
+			y += rect.getHeight();
+			y -= textDimension.y;
+			break;
+		default:
+			break;
+	}
+
+	// left align
+	switch (textAlign_)
+	{
+		case TextAlign::TOP_LEFT:
+		case TextAlign::MIDDLE_LEFT:
+		case TextAlign::BOTTOM_LEFT:
+
+			break;
+		default:
+			break;
+	}
+
+	// center
+	switch (textAlign_)
+	{
+		case TextAlign::TOP_CENTER:
+		case TextAlign::MIDDLE_CENTER:
+		case TextAlign::BOTTOM_CENTER:
+			x += rect.getCenter().x;
+			x -= (textDimension.x / 2);
+			break;
+		default:
+			break;
+	}
+
+	// right
+	switch (textAlign_)
+	{
+		case TextAlign::TOP_RIGHT:
+		case TextAlign::MIDDLE_RIGHT:
+		case TextAlign::BOTTOM_RIGHT:
+			x += rect.getWidth();
+			x -= textDimension.x;
+			break;
+		default:
+			break;
+	}
+
+	// add the offsets.
+	x += textAlignX_;
+	y += textAlignY_;
+
+	// draw it.
+	pFont_->DrawString(Vec3f(x, y, 0.f), text_, contex);
 }
 
 void XWindow::drawBackground(const Rectf& drawRect)

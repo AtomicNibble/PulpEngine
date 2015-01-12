@@ -159,7 +159,7 @@ public:
 
 	// Overrides
 	virtual bool Parse(core::XParser& lex);
-	virtual void draw(int time, float x, float y);
+	virtual void draw(core::TimeVal time, float x, float y);
 	virtual void drawBackground(const Rectf& drawRect);
 	virtual void activate(bool activate);
 	virtual void gainFocus(void);
@@ -260,7 +260,7 @@ protected:
 	float borderSize_;
 	float textAlignX_;				// x offset from aligned position
 	float textAlignY_;				// y offset from aligned position.
-	TextAlign::Enum textAlign_;		// alignment type flags, LEFT, MIDDLE, BOTTOM, etc..
+	TextAlign::Value textAlign_;		// alignment type flags, LEFT, MIDDLE, BOTTOM, etc..
 	bool shadowText_;				// 'shadow'
 	bool __pad[2];
 	WindowFlags flags_;
