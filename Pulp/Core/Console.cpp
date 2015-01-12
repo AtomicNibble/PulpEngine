@@ -91,42 +91,6 @@ namespace
 		);
 	}
 
-	static int wildcmp(const char *wild, const char *string)
-	{
-		const char *cp = NULL, *mp = NULL;
-
-		while ((*string) && (*wild != '*')) {
-			if ((*wild != *string) && (*wild != '?')) {
-				return 0;
-			}
-			wild++;
-			string++;
-		}
-
-		while (*string) {
-			if (*wild == '*') {
-				if (!*++wild) {
-					return 1;
-				}
-				mp = wild;
-				cp = string + 1;
-			}
-			else if ((*wild == *string) || (*wild == '?')) {
-				wild++;
-				string++;
-			}
-			else {
-				wild = mp;
-				string = cp++;
-			}
-		}
-
-		while (*wild == '*') {
-			wild++;
-		}
-		return !*wild;
-	}
-
 	class CommandParser
 	{
 	public:
@@ -2233,7 +2197,7 @@ void XConsole::ListCommands(const char* searchPatten)
 	{
 		ConsoleCommand &cmd = itrCmd->second;
 
-		if (!searchPatten || wildcmp(searchPatten, cmd.Name))
+		if (!searchPatten || strUtil::WildCompare(searchPatten, cmd.Name))
 		{
 			sorted_cmds.append(&cmd);
 		}
@@ -2273,7 +2237,7 @@ void XConsole::ListVariables(const char* searchPatten)
 	{
 		ICVar* var = itrVar->second;
 
-		if (!searchPatten || wildcmp(searchPatten, var->GetName()))
+		if (!searchPatten || strUtil::WildCompare(searchPatten, var->GetName()))
 		{
 			sorted_vars.push_back(var);
 		}

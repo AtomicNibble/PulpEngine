@@ -483,7 +483,42 @@ namespace strUtil
 		return res + 1;
 	}
 
+	bool WildCompare(const char* wild, const char* string)
+	{
+		const char *cp = nullptr, *mp = nullptr;
 
+		while ((*string) && (*wild != '*')) {
+			if ((*wild != *string) && (*wild != '?')) {
+				return 0;
+			}
+			wild++;
+			string++;
+		}
+
+		while (*string) 
+		{
+			if (*wild == '*') {
+				if (!*++wild) {
+					return 1;
+				}
+				mp = wild;
+				cp = string + 1;
+			}
+			else if ((*wild == *string) || (*wild == '?')) {
+				wild++;
+				string++;
+			}
+			else {
+				wild = mp;
+				string = cp++;
+			}
+		}
+
+		while (*wild == '*') {
+			wild++;
+		}
+		return !*wild;
+	}
 
 
 }

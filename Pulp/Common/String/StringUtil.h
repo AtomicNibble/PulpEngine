@@ -147,8 +147,9 @@ namespace strUtil
 
 	const char* FileName(const char* path);
 	const char* FileName(const char* startInclusive, const char* endExclusive);
-
-
+	
+	// retrusn true if the wild card search patten matches the string.
+	bool WildCompare(const char* wild, const char* string);
 }
 
 #include "StringUtil.inl"
