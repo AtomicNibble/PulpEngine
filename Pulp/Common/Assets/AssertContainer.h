@@ -135,8 +135,14 @@ public:
 	ResourceItor begin(void) {
 		return hash.begin();
 	}
+	ResourceConstItor begin(void) const {
+		return hash.begin();
+	}
 
 	ResourceItor end(void) {
+		return hash.end();
+	}
+	ResourceConstItor end(void) const {
 		return hash.end();
 	}
 
