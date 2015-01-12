@@ -123,7 +123,9 @@ struct TextAlign
 		uint32_t BIT_vertAlign : 2;
 	};
 
-	// defaults to left align sinxe left is 0x0.
+	typedef uint32_t Value;
+
+	// defaults to left align since left is 0x0.
 	static const Enum TOP_LEFT = (Enum)(TOP | LEFT);
 	static const Enum TOP_CENTER = (Enum)(TOP | CENTER);
 	static const Enum TOP_RIGHT = (Enum)(TOP | RIGHT);
@@ -132,8 +134,8 @@ struct TextAlign
 	static const Enum MIDDLE_CENTER = (Enum)(MIDDLE | CENTER);
 	static const Enum MIDDLE_RIGHT = (Enum)(MIDDLE | RIGHT);
 
-	static const Enum BOTTOM_LEFT = (Enum)(BOTTOM | RIGHT);
-	static const Enum BOTTOM_CENTER = (Enum)(BOTTOM | RIGHT);
+	static const Enum BOTTOM_LEFT = (Enum)(BOTTOM | LEFT);
+	static const Enum BOTTOM_CENTER = (Enum)(BOTTOM | CENTER);
 	static const Enum BOTTOM_RIGHT = (Enum)(BOTTOM | RIGHT);
 
 	// max the value can be.
