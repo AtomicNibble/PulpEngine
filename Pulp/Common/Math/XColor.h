@@ -82,6 +82,8 @@ struct ColorT
 	X_INLINE uint32_t asABGR8888()	const;
 	X_INLINE uint32_t asARGB8888()	const;
 
+	// darken with negative values etc.
+	X_INLINE void shade(const float percent);
 
 	// ><><><><><<><><><><><><><><<><><><><><><><><<><><><><><><
 	static ColorT<T> zero()

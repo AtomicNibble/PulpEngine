@@ -358,3 +358,10 @@ X_INLINE uint32_t ColorT<T>::asARGB8888()	const {
 	return (ca << 24) | (cr << 16) | (cg << 8) | cb;
 }
 
+template<typename T>
+X_INLINE void ColorT<T>::shade(const float percent)
+{
+	r = static_cast<T>(static_cast<float>(r)* (100.f + percent) / 100.f);
+	g = static_cast<T>(static_cast<float>(g)* (100.f + percent) / 100.f);
+	b = static_cast<T>(static_cast<float>(b)* (100.f + percent) / 100.f);
+}
