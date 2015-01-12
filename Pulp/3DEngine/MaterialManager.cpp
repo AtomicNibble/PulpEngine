@@ -6,18 +6,22 @@
 #include <IFileSys.h>
 #include <IShader.h>
 #include <IRender.h>
+#include <IConsole.h>
 
 #include <String\Xml.h>
 #include <String\Path.h>
 
 #include <Memory\AllocationPolicies\MallocFreeAllocator.h>
 
+#include <algorithm>
+
+
 X_NAMESPACE_BEGIN(engine)
 
 using namespace core::xml::rapidxml;
 using namespace shader;
 
-namespace{
+namespace {
 
 	X_DECLARE_FLAGS(MtlXmlFlags)(NAME, FLAGS, SURFACETYPE);
 
@@ -263,6 +267,32 @@ namespace{
 
 		return true;
 	}
+
+	// Commands
+
+	void Cmd_ListMaterials(core::IConsoleCmdArgs* Cmd)
+	{
+		// optional search criteria
+		const char* searchPatten = nullptr;
+
+		if (Cmd->GetArgCount() >= 2) {
+			searchPatten = Cmd->GetArg(1);
+		}
+
+		((XMaterialManager*)XEngineBase::getMaterialManager())->ListMaterials(searchPatten);
+	}
+
+	static void sortMatsByName(core::Array<IMaterial*>& mats)
+	{
+		std::sort(mats.begin(), mats.end(),
+			[](IMaterial* a, IMaterial* b)
+			{
+				const char* nameA = a->getName();
+				const char* nameB = b->getName();
+				return strcmp(nameA, nameB) < 0;
+			}
+		);
+	}
 }
 
 XMaterialManager::XMaterialManager() :
@@ -285,6 +315,8 @@ void XMaterialManager::Init(void)
 
 	InitDefaults();
 
+
+	ADD_COMMAND("listMaterials", Cmd_ListMaterials, core::VarFlag::SYSTEM, "List all the loaded materials.");
 
 	// hotreload support.
 	gEnv->pHotReload->addfileType(this, MTL_FILE_EXTENSION);
@@ -471,7 +503,8 @@ void XMaterialManager::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_
 }
 // ~ICoreEventListener
 
-namespace {
+namespace 
+{
 	void* XmlAllocate(std::size_t size)
 	{
 		return X_NEW_ARRAY(char, size, g_3dEngineArena, "xmlPool");
@@ -658,5 +691,41 @@ bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 
 	return false;
 }
+
+
+
+void XMaterialManager::ListMaterials(const char* searchPatten) const
+{
+	core::Array<IMaterial*> sorted_mats(g_3dEngineArena);
+	sorted_mats.setGranularity(materials_.size());
+
+	MaterialCon::ResourceConstItor Matit;
+
+	for (Matit = materials_.begin(); Matit != materials_.end(); ++Matit)
+	{
+		IMaterial* mat = static_cast<XMaterial*>(Matit->second);
+
+		if (!searchPatten || core::strUtil::WildCompare(searchPatten, mat->getName()))
+		{
+			sorted_mats.push_back(mat);
+		}
+	}
+
+	sortMatsByName(sorted_mats);
+
+	X_LOG0("Console", "------------ ^8Materials(%i)^7 ------------", sorted_mats.size());
+	X_LOG_BULLET;
+
+	core::Array<IMaterial*>::ConstIterator it = sorted_mats.begin();
+	for (; it != sorted_mats.end(); ++it)
+	{
+		const IMaterial* mat = *it;
+		X_LOG0("Material", "^2\"%s\"^7", 
+			mat->getName());
+	}
+
+	X_LOG0("Console", "------------ ^8Materials End^7 ------------");
+}
+
 
 X_NAMESPACE_END

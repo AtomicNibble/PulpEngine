@@ -49,6 +49,8 @@ public:
 	virtual bool OnFileChange(const char* name) X_OVERRIDE;
 	// ~IXHotReload
 
+	void ListMaterials(const char* searchPatten = nullptr) const;
+
 protected:
 	friend class XMaterial;
 

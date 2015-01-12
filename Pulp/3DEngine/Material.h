@@ -36,7 +36,7 @@ public:
 		return 0;
 	}
 
-	virtual const char* getName() X_OVERRIDE { return MatName_; };
+	virtual const char* getName() const X_OVERRIDE { return MatName_.c_str(); };
 	virtual void setName(const char* pName) X_OVERRIDE;
 
 	virtual const MaterialFlags getFlags() const X_OVERRIDE;
