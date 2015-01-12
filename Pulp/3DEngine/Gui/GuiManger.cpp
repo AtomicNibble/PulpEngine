@@ -12,46 +12,9 @@ X_NAMESPACE_BEGIN(gui)
 
 namespace
 {
-	// TODO: move this into string util.
-	// a copy is also in Console.cpp
-	// Also maybe make this more seacure?
-	static bool wildcmp(const char* wild, const char* string)
-	{
-		const char *cp = nullptr, *mp = nullptr;
 
-		while ((*string) && (*wild != '*')) {
-			if ((*wild != *string) && (*wild != '?')) {
-				return 0;
-			}
-			wild++;
-			string++;
-		}
 
-		while (*string) {
-			if (*wild == '*') {
-				if (!*++wild) {
-					return true;
-				}
-				mp = wild;
-				cp = string + 1;
-			}
-			else if ((*wild == *string) || (*wild == '?')) {
-				wild++;
-				string++;
-			}
-			else {
-				wild = mp;
-				string = cp++;
-			}
-		}
-
-		while (*wild == '*') {
-			wild++;
-		}
-		return (!*wild);
-	}
-
-	static void sortGuisByName(core::Array<XGui*>& vars)
+static void sortGuisByName(core::Array<XGui*>& vars)
 	{
 		using namespace std;
 
@@ -175,7 +138,7 @@ void XGuiManager::listGuis(const char* wildcardSearch) const
 	{
 		XGui* pGui = *itrGui;
 
-		if (!wildcardSearch || wildcmp(wildcardSearch, pGui->getName()))
+		if (!wildcardSearch || core::strUtil::WildCompare(wildcardSearch, pGui->getName()))
 		{
 			sorted_guis.append(pGui);
 		}
