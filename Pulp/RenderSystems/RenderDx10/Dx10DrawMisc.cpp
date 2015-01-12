@@ -311,10 +311,10 @@ void DX11XRender::DrawLineColorSS(const Vec2f& vPos1, const Color& color1,
 	Vec3f pos1, pos2;
 
 	pos1.x = vPos1.x - 1;
-	pos1.y = 2.f - vPos1.y;
+	pos1.y = 1.f - vPos1.y;
 
 	pos2.x = vPos2.x - 1;
-	pos2.y = 2.f - vPos2.y;
+	pos2.y = 1.f - vPos2.y;
 
 	DrawLineColor(pos1, color1, pos2, color2);
 }
