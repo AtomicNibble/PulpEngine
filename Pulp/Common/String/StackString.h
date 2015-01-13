@@ -133,6 +133,7 @@ public:
 	inline uint32_t capacity(void) const;
 
 	inline bool isEmpty(void) const;
+	inline bool isNotEmpty(void) const;
 
 	void toLower(void);
 	void toUpper(void);

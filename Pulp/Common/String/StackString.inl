@@ -612,6 +612,11 @@ inline bool StackString<N>::isEmpty(void) const
 	return len_ == 0;
 }
 
+template <size_t N>
+inline bool StackString<N>::isNotEmpty(void) const
+{
+	return len_ > 0;
+}
 
 template <size_t N>
 inline void StackString<N>::toLower(void)
