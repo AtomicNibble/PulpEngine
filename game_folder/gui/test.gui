@@ -9,7 +9,7 @@
 #define WINDOW_BORDER_FULL				1		// full border based on border color ( single pixel )
 #define WINDOW_BORDER_HORZ				2		// horizontal borders only
 #define WINDOW_BORDER_VERT				3		// vertical borders only
-#define WINDOW_BORDER_KCGRADIENT			4		// horizontal border using the gradient bars
+#define WINDOW_BORDER_GRADIENT			4		// horizontal border using the gradient bars
 #define WINDOW_BORDER_RAISED				5		// darken the bottom and right sides of the border
 #define WINDOW_BORDER_SUNKEN				6		// darken the top and left sides of the border
 
@@ -19,11 +19,11 @@
 #define ITEM_TEXTSTYLE_SHADOWEDMORE 		6	// drop shadow ( need a color for this )
 
 
-#define FONTSCALE_SMALL		0.3095
-#define FONTSCALE_NORMAL		0.3810
-#define FONTSCALE_BOLD		0.5476
-#define FONTSCALE_BIG		0.5476
-#define FONTSCALE_EXTRABIG	1
+#define FONTSCALE_SMALL				0.3095
+#define FONTSCALE_NORMAL				0.3810
+#define FONTSCALE_BOLD				0.5476
+#define FONTSCALE_BIG				0.5476
+#define FONTSCALE_EXTRABIG			1
 
 
 #define ITEM_ALIGN_LEFT 			0		// aligns left of text to left of containing rectangle
@@ -93,8 +93,10 @@ windowDef
 		forecolor   		0.75 0 0.25 1
 		bordercolor 	1 0.563 0.00002 0.5
 		bordersize  		1
+		borderstyle		WINDOW_BORDER_HORZ
 		text        		"more text"
 		textscale   		0.75
+		textAlign		9
 		visible     		1
 		
 		onTime 0 {
@@ -158,8 +160,9 @@ windowDef
 		rect        		450 400 256 128 
 		backcolor   	1 1 1 1
 		forecolor   		1 0 0 1
-		bordercolor 	0 0 0 1
+		bordercolor 	1 0 0 1
 		bordersize  		1
+		borderstyle 	WINDOW_BORDER_RAISED
 		visible     		1
 		background		"test"
 		style 			WINDOW_STYLE_SHADER
