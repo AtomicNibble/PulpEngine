@@ -640,6 +640,12 @@ bool BlendInfo::ParseBlendInfo(const char* name,
 	return true;
 }
 
+ShaderSourceFile::Technique::Technique() :
+	compileFlags(g_rendererArena)
+{
+
+}
+
 bool ShaderSourceFile::Technique::parse(core::XLexer& lex)
 {
 	using namespace render;
@@ -949,12 +955,33 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 						ShaderSourceFile::Technique tech;
 						tech.parse(lex);
 
-						if (tech.name.find("("))
+						const char* pBrace, *pCloseBrace;
+						if ((pBrace = tech.name.find('(')))
 						{
 							// if we find a () 
 							// we have diffrent compile macro's for the 
-							// technique+
+							// technique
+							pCloseBrace = tech.name.find(')');
+							if (pCloseBrace < pBrace)
+							{
+								X_ERROR("Shader", "invalid name for shader: %s", tech.name.c_str());
+								return nullptr;
+							}
 
+							core::StackString512 flags(pBrace + 1, pCloseBrace - 1);
+							if (flags.isNotEmpty())
+							{
+								core::StringTokenizer tokens(flags.begin(),flags.end(),',');
+								core::StringRange flagName(nullptr,nullptr);
+
+								while (tokens.ExtractToken(flagName))
+								{
+									tech.compileFlags.append(core::string(flagName.GetStart(), flagName.GetEnd()));
+								}
+							}
+
+							// fix name.
+							tech.name.trimRight(pBrace);
 						}
 
 						pShaderSource->techniques.append(tech);

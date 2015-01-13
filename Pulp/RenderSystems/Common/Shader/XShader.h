@@ -246,6 +246,10 @@ struct ShaderSourceFile
 
 	struct Technique
 	{
+		Technique();
+
+		typedef core::Array<core::string> CompileFlagList;
+
 		core::string name;
 		core::string vertex_func;
 		core::string pixel_func;
@@ -258,6 +262,8 @@ struct ShaderSourceFile
 
 		render::StateFlag state;
 		Flags<TechniquePrams> flags;
+
+		CompileFlagList compileFlags;
 
 		bool parse(core::XLexer& lex);
 	};
