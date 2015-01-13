@@ -48,7 +48,11 @@ arena_(arena)
 
 
 template<typename T>
-X_INLINE Array<T>::Array(const Array<T>& oth)
+X_INLINE Array<T>::Array(const Array<T>& oth) :
+granularity_(16),
+list_(nullptr),
+num_(0),
+size_(0)
 {
 	*this = oth;
 }

@@ -50,7 +50,30 @@ namespace {
 }
 
 
+TYPED_TEST(ArrayTest, Contruct)
+{
+	Array<TypeParam> list(g_arena);
 
+	list.append(TypeParam());
+	list.append(TypeParam());
+	list.setGranularity(345);
+	list.append(TypeParam());
+	list.append(TypeParam());
+
+	Array<TypeParam> list2(list);
+
+	EXPECT_EQ(4, list.size());
+	EXPECT_EQ(4, list2.size());
+	EXPECT_EQ(345, list1.granularity());
+	EXPECT_EQ(345, list2.granularity());
+
+	list.free();
+
+	EXPECT_EQ(0, list.size());
+	EXPECT_EQ(4, list2.size());
+	EXPECT_EQ(345, list1.granularity());
+	EXPECT_EQ(345, list2.granularity());
+}
 
 TYPED_TEST(ArrayTest, Append)
 {
