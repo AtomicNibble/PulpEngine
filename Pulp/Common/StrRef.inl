@@ -391,7 +391,7 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::trimLeft(void)
 		makeUnique();
 		size_type nNewLength = length() - nOff;
 		_move(str_, str_ + nOff, nNewLength + 1);
-		header()->length = safe_static_cast<int, size_t>(nNewLength);
+		header()->length = safe_static_cast<length_type, size_type>(nNewLength);
 		str_[nNewLength] = 0;
 	}
 
@@ -421,7 +421,7 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::trimLeft(const_str sCharSet)
 		makeUnique();
 		size_type nNewLength = length() - nOff;
 		_move(str_, str_ + nOff, nNewLength + 1);
-		header()->length = nNewLength;
+		header()->length = safe_static_cast<length_type, size_type>(nNewLength);
 		str_[nNewLength] = 0;
 	}
 
@@ -444,7 +444,7 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::trimRight(void)
 		// Just shrink length of the string.
 		size_type nNewLength = (size_type)(str - str_) + 1; // str_ can change in _MakeUnique
 		makeUnique();
-		header()->length = safe_static_cast<int, size_t>(nNewLength);
+		header()->length = safe_static_cast<length_type, size_type>(nNewLength);
 		str_[nNewLength] = 0;
 	}
 
@@ -466,7 +466,7 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::trimRight(const_str sCharSet)
 
 	const value_type *last = str_ + length() - 1;
 	const value_type *str = last;
-	while ((str != str_) && (_strchr(sCharSet, *str) != 0))
+	while ((str != str_) && (strchr(sCharSet, *str) != 0))
 		str--;
 
 	if (str != last)
@@ -474,7 +474,7 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::trimRight(const_str sCharSet)
 		// Just shrink length of the string.
 		size_type nNewLength = (size_type)(str - str_) + 1; // str_ can change in _MakeUnique
 		makeUnique();
-		header()->length = nNewLength;
+		header()->length = safe_static_cast<length_type, size_type>(nNewLength);
 		str_[nNewLength] = 0;
 	}
 

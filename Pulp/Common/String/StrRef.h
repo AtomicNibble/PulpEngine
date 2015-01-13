@@ -35,6 +35,8 @@ public:
 	typedef pointer iterator;
 	typedef const_pointer const_iterator;
 
+	typedef int length_type;
+
 //	enum npos_type {
 //		npos = (size_type)~0
 //	};
@@ -200,7 +202,7 @@ protected:
 	struct XStrHeader
 	{
 		XStrHeader() : refCount(0), length(0), allocSize(0) {};
-		XStrHeader(int ref, int length, int alloc ) :
+		XStrHeader(int ref, length_type length, length_type alloc) :
 			refCount(ref), length(length), allocSize(alloc) {};
 
 		void	addRef(void)	{ refCount++; };
@@ -208,8 +210,8 @@ protected:
 		pointer getChars(void)	{ return (value_type*)(this + 1); }
 
 		int refCount;
-		int length;
-		int allocSize;
+		length_type length;
+		length_type allocSize;
 	};
 	X_PRAGMA(pack(pop))
 
