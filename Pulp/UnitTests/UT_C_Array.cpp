@@ -64,14 +64,14 @@ TYPED_TEST(ArrayTest, Contruct)
 
 	EXPECT_EQ(4, list.size());
 	EXPECT_EQ(4, list2.size());
-	EXPECT_EQ(345, list1.granularity());
+	EXPECT_EQ(345, list.granularity());
 	EXPECT_EQ(345, list2.granularity());
 
 	list.free();
 
 	EXPECT_EQ(0, list.size());
 	EXPECT_EQ(4, list2.size());
-	EXPECT_EQ(345, list1.granularity());
+	EXPECT_EQ(345, list.granularity());
 	EXPECT_EQ(345, list2.granularity());
 }
 
