@@ -980,7 +980,7 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 						// read a technique
 						ShaderSourceFile::Technique tech;
 						
-						if (tech.parse(lex))
+						if (!tech.parse(lex))
 						{
 							X_ERROR("Shader", "failed to parse tech");
 							X_DELETE(pShaderSource, g_rendererArena);
