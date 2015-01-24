@@ -493,12 +493,27 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 	flags |= D3DCOMPILE_OPTIMIZATION_LEVEL0 | D3DCOMPILE_DEBUG;
 #endif // !X_DEBUG
 
-	D3D_SHADER_MACRO Shader_Macros[] = { 
-		{ "PARAM_VS_Normal", "1" },
-		{ "PARAM_VS_Color", "1" },
-		{ NULL, NULL } 
-	};
-	
+	// allow 16 flags.
+	D3D_SHADER_MACRO Shader_Macros[17] = { NULL };
+	core::string names[16];
+
+	if (macros_.size() > 16)
+	{
+		X_ERROR("Shader", "too many macro's for shader: %s", this->name.c_str());
+		return false;
+	}
+
+	for (size_t i = 0; i < macros_.size(); i++)
+	{
+		// we "X_" prefix and upper case.
+		core::string& name = names[i];
+		name = "X_";
+		name += macros_[i];
+		name.toUpper();
+		// set the pointer.
+		Shader_Macros[i].Name = name.c_str();
+		Shader_Macros[i].Definition = "1";
+	}
 
 	ID3DBlob* error;
 
