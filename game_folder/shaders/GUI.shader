@@ -13,7 +13,7 @@ shader
 	techniques
 	{
 		{
-			name 				"Fill(Textured)"
+			name 				"Fill(Color, Textured)"
 			vertex_shader   	"guiVS"
 			pixel_shader    	"guiPS"	
 			src_blend_color  	src_alpha
@@ -25,7 +25,7 @@ shader
 			depth_write        false
 		}
 		{
-			name 				"FillAdd(Textured)"
+			name 				"FillAdd(Color, Textured)"
 			vertex_shader   	"guiVS"
 			pixel_shader    	"AlphaTestPS"		
 			src_blend_color  	src_alpha
@@ -37,7 +37,7 @@ shader
 			depth_write        false
 		}
 		{
-			name 				"FillMul(Textured)"
+			name 				"FillMul(Color, Textured)"
 			vertex_shader   	"guiVS"
 			pixel_shader    	"guiPS"		
 			src_blend_color  	zero
