@@ -419,8 +419,8 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::trimLeft(const_str sCharSet)
 	if (!sCharSet || !(*sCharSet))
 		return *this;
 
-	const value_type *str = str_;
-	while ((*str != 0) && (_strchr(sCharSet, *str) != 0))
+	const_str str = str_;
+	while ((*str != 0) && (!strUtil::IsEqual(sCharSet, str)))
 		str++;
 
 	if (str != str_)
