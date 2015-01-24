@@ -9,7 +9,7 @@
 X_NAMESPACE_BEGIN(shader)
 
 static const uint32_t X_SHADER_BIN_FOURCC = X_TAG('X','S','C','B');
-static const uint32_t X_SHADER_BIN_VERSION = 1;
+static const uint32_t X_SHADER_BIN_VERSION = 2; // change this to force all shaders to be recompiled.
 
 
 class XHWShader;
