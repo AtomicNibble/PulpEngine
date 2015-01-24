@@ -336,6 +336,7 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::toLower(void)
 	for (i = 0; i<len; ++i) {
 		str_[i] = safe_static_cast<CharT>(tolower(str_[i]));
 	}
+	return *this;
 }
 
 template<typename CharT>
@@ -348,6 +349,7 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::toUpper(void)
 	for ( i = 0; i<len; ++i) {
 		str_[i] = safe_static_cast<CharT>(toupper(str_[i]));
 	}
+	return *this;
 }
 
 
