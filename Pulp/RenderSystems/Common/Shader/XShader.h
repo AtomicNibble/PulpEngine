@@ -117,10 +117,13 @@ class XShader;
 class XHWShader : public core::XBaseAsset
 {
 public:
+	typedef core::Array<core::string> MacroList;
+
 	XHWShader();
 
 	static XHWShader* forName(const char* shader_name, const char* entry,
-		const char* sourceFile, ShaderType::Enum type, uint32_t sourceCrc);
+		const char* sourceFile, const MacroList& macros,
+		ShaderType::Enum type, uint32_t sourceCrc);
 
 	static const char* getProfileFromType(ShaderType::Enum type);
 
@@ -148,10 +151,13 @@ protected:
 
 struct XShaderTechnique
 {
+	typedef core::Array<core::string> CompileFlagList;
+
 	XShaderTechnique() :
 		pVertexShader(nullptr),
 		pPixelShader(nullptr),
-		pGeoShader(nullptr)
+		pGeoShader(nullptr),
+		compileFlags(g_rendererArena)
 	{}
 
 	core::string name;
@@ -165,6 +171,9 @@ struct XShaderTechnique
 	XHWShader* pVertexShader;
 	XHWShader* pPixelShader;
 	XHWShader* pGeoShader;
+
+	// leave at end, not accesed much.
+	CompileFlagList compileFlags;
 };
 
 

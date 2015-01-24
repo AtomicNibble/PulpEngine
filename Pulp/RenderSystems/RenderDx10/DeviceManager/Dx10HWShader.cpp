@@ -256,7 +256,8 @@ namespace
 
 
 XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
-	const char* sourceFile, ShaderType::Enum type, uint32_t sourceCrc)
+	const char* sourceFile, const MacroList& macros,
+	ShaderType::Enum type, uint32_t sourceCrc)
 {
 	X_ASSERT_NOT_NULL(pHWshaders);
 	X_ASSERT_NOT_NULL(shader_name);
@@ -268,6 +269,14 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 
 	name.appendFmt("%s@%s", shader_name, entry);
 
+	// macros are now part of the name.
+	if (macros.isNotEmpty())
+	{
+		for (auto const &it : macros)
+		{
+			name.append(it);
+		}
+	}
 
 	pShader = (XHWShader_Dx10*)pHWshaders->findAsset(name.c_str());
 
@@ -302,6 +311,9 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 		pShader->sourceFileName = sourceFile;
 		pShader->entryPoint = entry;
 		pShader->sourceCrc32 = sourceCrc;
+
+		// save macros
+		pShader->macros_ = macros;
 
 		// temp
 		pShader->activate();
@@ -395,7 +407,8 @@ XHWShader_Dx10::XHWShader_Dx10() :
 	status_(ShaderStatus::NotCompiled),
 	pBlob_(nullptr),
 	pHWHandle_(nullptr),
-	bindVars_(g_rendererArena)
+	bindVars_(g_rendererArena),
+	macros_(g_rendererArena)
 {
 	core::zero_object(maxVecs_);
 
@@ -485,6 +498,7 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 		{ "PARAM_VS_Color", "1" },
 		{ NULL, NULL } 
 	};
+	
 
 	ID3DBlob* error;
 
