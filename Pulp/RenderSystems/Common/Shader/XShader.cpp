@@ -979,7 +979,13 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 
 						// read a technique
 						ShaderSourceFile::Technique tech;
-						tech.parse(lex);
+						
+						if (tech.parse(lex))
+						{
+							X_ERROR("Shader", "failed to parse tech");
+							X_DELETE(pShaderSource, g_rendererArena);
+							return nullptr;
+						}
 
 						pShaderSource->techniques.append(tech);
 					}
