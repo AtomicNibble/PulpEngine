@@ -466,15 +466,15 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::trimRight(const_str sCharSet)
 	if (!sCharSet || !(*sCharSet) || length() < 1)
 		return *this;
 
-	const value_type *last = str_ + length() - 1;
-	const value_type *str = last;
-	while ((str != str_) && (strchr(sCharSet, *str) != 0))
+	const_str last = str_ + length() - 1;
+	const_str str = last;
+	while ((str != str_) && (!strUtil::IsEqual(sCharSet, str)))
 		str--;
 
 	if (str != last)
 	{
 		// Just shrink length of the string.
-		size_type nNewLength = (size_type)(str - str_) + 1; // str_ can change in _MakeUnique
+		size_type nNewLength = (size_type)(str - str_); // str_ can change in _MakeUnique
 		makeUnique();
 		header()->length = safe_static_cast<length_type, size_type>(nNewLength);
 		str_[nNewLength] = 0;
