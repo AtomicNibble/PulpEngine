@@ -37,6 +37,7 @@ public:
 	const T* ptr(void) const;
 
 	X_INLINE const bool isEmpty(void) const;
+	X_INLINE const bool isNotEmpty(void) const;
 
 	// clear the list, no memory free
 	void clear(void);		

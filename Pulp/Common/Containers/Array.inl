@@ -137,6 +137,12 @@ X_INLINE const bool Array<T>::isEmpty(void) const
 }
 
 template<typename T>
+X_INLINE const bool Array<T>::isNotEmpty(void) const
+{
+	return num_ > 0;
+}
+
+template<typename T>
 X_INLINE void Array<T>::clear(void) 
 {
 	// properly destruct the instances
