@@ -71,7 +71,7 @@ bool XShaderBin::loadShader(const char* path, uint32_t sourceCRC, ID3DBlob** pBl
 			if (hdr.version != X_SHADER_BIN_VERSION)
 			{
 				X_WARNING("Shader", "bin shader \"%s\" version is invalid. provided: %i, required: %i",
-					hdr.version, X_SHADER_BIN_VERSION);
+					path, hdr.version, X_SHADER_BIN_VERSION);
 				return false;
 			}
 
