@@ -86,6 +86,7 @@ public:
 	size_type capacity(void) const; 
 
 	bool isEmpty(void) const;
+	bool isNotEmpty(void) const;
 	
 	// clears the string and de-inc the ref
 	void clear(void);

@@ -179,6 +179,12 @@ bool StringRef<CharT>::isEmpty(void) const
 	return length() == 0;
 }
 
+template<typename CharT>
+bool StringRef<CharT>::isNotEmpty(void) const
+{
+	return length() > 0;
+}
+
 // clears the string and de-inc the ref
 template<typename CharT>
 void StringRef<CharT>::clear(void)
