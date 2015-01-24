@@ -461,6 +461,7 @@
     <ClCompile Include="UT_M_Winding.cpp" />
     <ClCompile Include="UT_Pointer.cpp" />
     <ClCompile Include="UT_Random.cpp" />
+    <ClCompile Include="UT_StringRef.cpp" />
     <ClCompile Include="UT_StringTable.cpp" />
     <ClCompile Include="UT_StringUtil.cpp" />
     <ClCompile Include="UT_SymbolRes.cpp" />

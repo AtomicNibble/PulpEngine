@@ -232,6 +232,9 @@
     <ClCompile Include="UT_M_Winding.cpp">
       <Filter>Source Files\tests\Math</Filter>
     </ClCompile>
+    <ClCompile Include="UT_StringRef.cpp">
+      <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">
