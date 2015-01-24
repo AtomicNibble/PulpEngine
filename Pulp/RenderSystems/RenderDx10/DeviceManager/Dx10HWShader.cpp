@@ -274,7 +274,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	{
 		for (auto const &it : macros)
 		{
-			name.append(it);
+			name.appendFmt("_%s", it);
 		}
 	}
 
