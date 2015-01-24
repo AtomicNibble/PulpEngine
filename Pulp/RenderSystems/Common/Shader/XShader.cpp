@@ -328,6 +328,8 @@ XShader* XShaderManager::reloadShader(const char* name)
 					tech.state = srcTech.state;
 					// Cullmode
 					tech.cullMode = srcTech.cullMode;
+					// compileflags
+					tech.compileFlags = srcTech.compileFlags;
 
 					// create the hardware shaders.
 					// dose nothing if already loaded.
@@ -562,6 +564,9 @@ XShader* XShaderManager::loadShader(const char* name)
 			tech.state = srcTech.state;
 			// Cullmode
 			tech.cullMode = srcTech.cullMode;
+			// compileflags
+			tech.compileFlags = srcTech.compileFlags;
+
 
 			// create the hardware shaders.
 			tech.pVertexShader = XHWShader::forName(name, srcTech.vertex_func,
