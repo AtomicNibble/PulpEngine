@@ -266,6 +266,7 @@ struct ShaderSourceFile
 		CompileFlagList compileFlags;
 
 		bool parse(core::XLexer& lex);
+		bool processName(void);
 	};
 
 

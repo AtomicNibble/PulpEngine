@@ -678,18 +678,6 @@ bool ShaderSourceFile::Technique::parse(core::XLexer& lex)
 		if (key.isEqual("name"))
 		{
 			name = value.c_str();
-
-			const char* options;
-			if ((options = name.find('(')))
-			{
-				// name can be Fill(Textured)
-				// this means we compile two versions of the shader.
-				// one that dose not supprt texures and another that does.
-				// i don't want the types that can be added to be fixed.
-				// so custom ones can be made.
-
-			}
-
 			flags.Set(TechniquePrams::NAME);
 		}
 		else if (key.isEqual("vertex_shader"))
@@ -868,11 +856,45 @@ bool ShaderSourceFile::Technique::parse(core::XLexer& lex)
 #endif
 	}
 
-
 	// did we reach EOF before close brace?
 	if (!token.isEqual("}")) {
 		X_ERROR("Shader", "technique missing closing brace");
 		return false;
+	}
+
+	return processName();
+}
+
+
+bool ShaderSourceFile::Technique::processName(void)
+{
+	const char* pBrace, *pCloseBrace;
+	if ((pBrace = name.find('(')))
+	{
+		// if we find a () 
+		// we have diffrent compile macro's for the 
+		// technique
+		pCloseBrace = name.find(')');
+		if (pCloseBrace < pBrace)
+		{
+			X_ERROR("Shader", "invalid name for shader: %s", name.c_str());
+			return false;
+		}
+
+		core::StackString512 flags(pBrace + 1, pCloseBrace - 1);
+		if (flags.isNotEmpty())
+		{
+			core::StringTokenizer tokens(flags.begin(), flags.end(), ',');
+			core::StringRange flagName(nullptr, nullptr);
+
+			while (tokens.ExtractToken(flagName))
+			{
+				compileFlags.append(core::string(flagName.GetStart(), flagName.GetEnd()));
+			}
+		}
+
+		// fix name.
+		name.trimRight(pBrace);
 	}
 	return true;
 }
@@ -954,35 +976,6 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 						// read a technique
 						ShaderSourceFile::Technique tech;
 						tech.parse(lex);
-
-						const char* pBrace, *pCloseBrace;
-						if ((pBrace = tech.name.find('(')))
-						{
-							// if we find a () 
-							// we have diffrent compile macro's for the 
-							// technique
-							pCloseBrace = tech.name.find(')');
-							if (pCloseBrace < pBrace)
-							{
-								X_ERROR("Shader", "invalid name for shader: %s", tech.name.c_str());
-								return nullptr;
-							}
-
-							core::StackString512 flags(pBrace + 1, pCloseBrace - 1);
-							if (flags.isNotEmpty())
-							{
-								core::StringTokenizer tokens(flags.begin(),flags.end(),',');
-								core::StringRange flagName(nullptr,nullptr);
-
-								while (tokens.ExtractToken(flagName))
-								{
-									tech.compileFlags.append(core::string(flagName.GetStart(), flagName.GetEnd()));
-								}
-							}
-
-							// fix name.
-							tech.name.trimRight(pBrace);
-						}
 
 						pShaderSource->techniques.append(tech);
 					}
