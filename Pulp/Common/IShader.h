@@ -76,16 +76,35 @@ struct BlendType
 // MP = Morph data
 */
 
-enum ShaderParamFreq
+struct ShaderParamFreq
 {
-	FRAME,
-	INSTANCE
-
+	enum Enum
+	{
+		FRAME,
+		INSTANCE
+	};
 };
 
 
 X_DECLARE_ENUM(ShaderType)(UnKnown, Vertex, Pixel, Geometry);
 X_DECLARE_ENUM(ShaderTextureIdx)(DIFFUSE, BUMP, SPEC);
+
+
+// a shader can have flags
+// Eg:
+//	"Fill(Textured)"
+//
+//	this means we compile it with thoses flags.
+//  
+//	"Fill(Textured)" -> compiled with X_TEXTURED
+//	"Fill(Color)" -> compiled with X_COLOR
+//	"Fill(Color, Textured)" -> compiled with X_COLOR then X_TEXTURED
+//
+//	how can the render system make use of this?
+//  what if a technique has flags that saying it supports Color, Textured
+//
+//
+
 
 
 // I support diffrent vertex formats
