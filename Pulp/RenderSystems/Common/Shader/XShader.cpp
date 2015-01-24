@@ -117,6 +117,27 @@ XShaderManager::~XShaderManager()
 // -------------------------------------------
 
 
+XShaderTechnique& XShaderTechnique::operator=(const ShaderSourceFile::Technique& srcTech)
+{
+	name = srcTech.name;
+	nameHash = core::StrHash(srcTech.name);
+	// Blend info
+	src = srcTech.src;
+	dst = srcTech.dst;
+	// State
+	state = srcTech.state;
+	// Cullmode
+	cullMode = srcTech.cullMode;
+	// compileflags
+	compileFlags = srcTech.compileFlags;
+
+	return *this;
+}
+
+
+// -------------------------------------------
+
+
 XShader::XShader() :
 	techs(g_rendererArena)
 {
@@ -319,17 +340,7 @@ XShader* XShaderManager::reloadShader(const char* name)
 					XShaderTechnique& tech = shader->techs[i];
 					ShaderSourceFile::Technique& srcTech = source->techniques[i];
 
-					tech.name = srcTech.name;
-					tech.nameHash = core::StrHash(srcTech.name);
-					// Blend info
-					tech.src = srcTech.src;
-					tech.dst = srcTech.dst;
-					// State
-					tech.state = srcTech.state;
-					// Cullmode
-					tech.cullMode = srcTech.cullMode;
-					// compileflags
-					tech.compileFlags = srcTech.compileFlags;
+					tech = srcTech;
 
 					// create the hardware shaders.
 					// dose nothing if already loaded.
@@ -555,18 +566,7 @@ XShader* XShaderManager::loadShader(const char* name)
 			XShaderTechnique& tech = shader->techs[i];
 			ShaderSourceFile::Technique& srcTech = source->techniques[i];
 
-			tech.name = srcTech.name;
-			tech.nameHash = core::StrHash(srcTech.name);
-			// Blend info
-			tech.src = srcTech.src;
-			tech.dst = srcTech.dst;
-			// State
-			tech.state = srcTech.state;
-			// Cullmode
-			tech.cullMode = srcTech.cullMode;
-			// compileflags
-			tech.compileFlags = srcTech.compileFlags;
-
+			tech = srcTech;
 
 			// create the hardware shaders.
 			tech.pVertexShader = XHWShader::forName(name, srcTech.vertex_func,

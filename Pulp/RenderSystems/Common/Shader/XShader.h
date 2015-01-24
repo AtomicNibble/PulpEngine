@@ -149,79 +149,6 @@ protected:
 	XShader* pShader;
 };
 
-struct XShaderTechnique
-{
-	typedef core::Array<core::string> CompileFlagList;
-
-	XShaderTechnique() :
-		pVertexShader(nullptr),
-		pPixelShader(nullptr),
-		pGeoShader(nullptr),
-		compileFlags(g_rendererArena)
-	{}
-
-	core::string name;
-	core::StrHash nameHash;
-	render::StateFlag state;
-	render::CullMode::Enum cullMode;
-
-	BlendInfo src;
-	BlendInfo dst;
-
-	XHWShader* pVertexShader;
-	XHWShader* pPixelShader;
-	XHWShader* pGeoShader;
-
-	// leave at end, not accesed much.
-	CompileFlagList compileFlags;
-};
-
-
-
-class XShader : public IShader, public core::XBaseAsset
-{
-	friend class XShaderManager;
-
-public:
-	XShader();
-	~XShader();
-
-	virtual ShaderID getID() X_OVERRIDE{ return XBaseAsset::getID(); }
-	virtual const int addRef() X_OVERRIDE{ return XBaseAsset::addRef(); }
-	virtual const int release() X_OVERRIDE;
-
-	virtual const char* getName() const X_OVERRIDE { return name.c_str(); }
-	virtual VertexFormat::Enum getVertexFmt() X_OVERRIDE{ return vertexFmt; }
-
-	// D3D Effects interface
-	bool FXSetTechnique(const char* name);
-	bool FXSetTechnique(const core::StrHash& name);
-	bool FXBegin(uint32 *uiPassCount, uint32 nFlags);
-	bool FXBeginPass(uint32 uiPass);
-	bool FXCommit(const uint32 nFlags);
-	bool FXEndPass();
-	bool FXEnd();
-
-	bool FXSetVSFloat(const core::StrHash& NameParam, const Vec4f* pVecs, uint32_t numVecs);
-
-private:
-
-	X_INLINE size_t numTechs(void) const { return techs.size(); }
-
-
-private:
-
-	core::string name;
-	uint32_t sourceCrc32;
-	uint32_t hlslSourceCrc32;
-
-	SourceFile* pHlslFile;
-
-	VertexFormat::Enum vertexFmt;
-
-	core::Array<XShaderTechnique> techs;
-};
-
 
 // a hlsl
 struct SourceFile
@@ -291,6 +218,78 @@ protected:
 	core::Array<Technique> techniques;
 };
 
+
+struct XShaderTechnique
+{
+	typedef core::Array<core::string> CompileFlagList;
+
+	XShaderTechnique() :
+		pVertexShader(nullptr),
+		pPixelShader(nullptr),
+		pGeoShader(nullptr),
+		compileFlags(g_rendererArena)
+	{}
+
+	XShaderTechnique& operator=(const ShaderSourceFile::Technique& srcTech);
+
+	core::string name;
+	core::StrHash nameHash;
+	render::StateFlag state;
+	render::CullMode::Enum cullMode;
+
+	BlendInfo src;
+	BlendInfo dst;
+
+	XHWShader* pVertexShader;
+	XHWShader* pPixelShader;
+	XHWShader* pGeoShader;
+
+	// leave at end, not accesed much.
+	CompileFlagList compileFlags;
+};
+
+class XShader : public IShader, public core::XBaseAsset
+{
+	friend class XShaderManager;
+
+public:
+	XShader();
+	~XShader();
+
+	virtual ShaderID getID() X_OVERRIDE{ return XBaseAsset::getID(); }
+	virtual const int addRef() X_OVERRIDE{ return XBaseAsset::addRef(); }
+	virtual const int release() X_OVERRIDE;
+
+	virtual const char* getName() const X_OVERRIDE{ return name.c_str(); }
+	virtual VertexFormat::Enum getVertexFmt() X_OVERRIDE{ return vertexFmt; }
+
+	// D3D Effects interface
+	bool FXSetTechnique(const char* name);
+	bool FXSetTechnique(const core::StrHash& name);
+	bool FXBegin(uint32 *uiPassCount, uint32 nFlags);
+	bool FXBeginPass(uint32 uiPass);
+	bool FXCommit(const uint32 nFlags);
+	bool FXEndPass();
+	bool FXEnd();
+
+	bool FXSetVSFloat(const core::StrHash& NameParam, const Vec4f* pVecs, uint32_t numVecs);
+
+private:
+
+	X_INLINE size_t numTechs(void) const { return techs.size(); }
+
+private:
+
+	core::string name;
+	uint32_t sourceCrc32;
+	uint32_t hlslSourceCrc32;
+
+	SourceFile* pHlslFile;
+
+	VertexFormat::Enum vertexFmt;
+
+	core::Array<XShaderTechnique> techs;
+};
 
 class XShaderManager : public core::IXHotReload
 {
