@@ -515,6 +515,13 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 		Shader_Macros[i].Definition = "1";
 	}
 
+	// log the macros
+	for (size_t i = 0; i < macros_.size(); i++)
+	{
+		X_LOG1("Shader", "Macro(%i): name: %s value: %s", 
+			i, Shader_Macros[i].Name, Shader_Macros[i].Definition);
+	}
+
 	ID3DBlob* error;
 
 	core::TimeVal start = gEnv->pTimer->GetAsyncTime();

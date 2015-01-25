@@ -315,8 +315,7 @@ public:
 		cleanUp();
 	}
 
-	void cleanUp(void) {
-		
+	X_INLINE void cleanUp(void) {	
 		core::SafeRelease(pITex);
 	}
 
