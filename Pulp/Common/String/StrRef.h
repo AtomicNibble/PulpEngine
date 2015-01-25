@@ -146,9 +146,9 @@ public:
 
 	// insert new elements to string.
 	StrT& insert(size_type nIndex, value_type ch);
-	StrT& insert(size_type nIndex, size_type nCount, value_type ch);
+	StrT& insert(size_type nIndex, size_type count, value_type ch);
 	StrT& insert(size_type nIndex, const_str pstr);
-	StrT& insert(size_type nIndex, const_str pstr, size_type nCount);
+	StrT& insert(size_type nIndex, const_str pstr, size_type count);
 
 	//! delete count characters starting at zero-based index
 	StrT& erase(size_type nIndex, size_type count = npos);
