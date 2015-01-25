@@ -425,7 +425,7 @@ IMaterial* XMaterialManager::findMaterial(const char* MtlName) const
 {
 	X_ASSERT_NOT_NULL(MtlName);
 
-	IMaterial* pMaterial = (IMaterial*)materials_.findAsset(MtlName);
+	XMaterial* pMaterial = (XMaterial*)materials_.findAsset(MtlName);
 	if (pMaterial)
 		return pMaterial;
 
