@@ -570,13 +570,12 @@ XShader* XShaderManager::loadShader(const char* name)
 
 			// create the hardware shaders.
 			tech.pVertexShader = XHWShader::forName(name, srcTech.vertex_func,
-				source->pHlslFile->fileName.c_str(), tech.compileFlags, 
+				source->pHlslFile->fileName.c_str(), tech.compileFlags,
 				ShaderType::Vertex, source->pHlslFile->sourceCrc32);
 
 			tech.pPixelShader = XHWShader::forName(name, srcTech.pixel_func,
-				source->pHlslFile->fileName.c_str(), tech.compileFlags, 
+				source->pHlslFile->fileName.c_str(), tech.compileFlags,
 				ShaderType::Pixel, source->pHlslFile->sourceCrc32);
-
 		}
 
 		X_DELETE(source,g_rendererArena);
@@ -904,6 +903,7 @@ bool ShaderSourceFile::Technique::processName(void)
 
 		// fix name.
 		name = name.substr(nullptr, pBrace);
+
 	}
 	return true;
 }
@@ -992,7 +992,30 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 							return nullptr;
 						}
 
-						pShaderSource->techniques.append(tech);
+						if (tech.compileFlags.isNotEmpty())
+						{
+							// we make tech's for each flag.
+							ShaderSourceFile::Technique::CompileFlagList flags(tech.compileFlags);
+							
+							// clear them.
+							tech.compileFlags.free();
+							
+							for (auto const &it : flags)
+							{
+								ShaderSourceFile::Technique newTech(tech);
+
+								newTech.name += '#';
+								newTech.name += it;
+								newTech.compileFlags.append(it);
+
+								// apend it.
+								pShaderSource->techniques.append(newTech);
+							}
+						}
+						else
+						{
+							pShaderSource->techniques.append(tech);
+						}
 					}
 				}
 

@@ -1439,7 +1439,7 @@ void XWindow::draw(core::TimeVal time, float x_, float y_)
 	y += textAlignY_;
 
 	// draw it.
-	pFont_->DrawString(Vec3f(x, y, 0.f), text_, contex);
+//	pFont_->DrawString(Vec3f(x, y, 0.f), text_, contex);
 }
 
 void XWindow::drawBackground(const Rectf& drawRect)

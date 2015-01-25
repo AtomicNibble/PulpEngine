@@ -333,7 +333,7 @@ bool DX11XRender::setGUIShader(void)
 	if (!pSh)
 		return false;
 
-	core::StrHash tech("Fill");
+	core::StrHash tech("Fill#Color");
 	if (!pSh->FXSetTechnique(tech))
 		return false;
 
