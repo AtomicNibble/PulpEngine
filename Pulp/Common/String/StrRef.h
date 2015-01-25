@@ -37,10 +37,6 @@ public:
 
 	typedef int length_type;
 
-//	enum npos_type {
-//		npos = (size_type)~0
-//	};
-
 public:
 	StringRef();
 	// from another string object
@@ -75,8 +71,6 @@ public:
 	// iterator
 	const_iterator begin(void) const;
 	const_iterator end(void) const;
-
-
 
 	// the length of the string
 	size_type length(void) const;
@@ -116,16 +110,16 @@ public:
 
 	// Trim it good
 	StrT& trim(void);
-	StrT& trim(value_type ch);
-	StrT& trim(const_str sCharSet);
+	StrT& trim(value_type ch); // trim this char
+	StrT& trim(const_str charSet); // trim this set of chars.
 
 	StrT& trimLeft(void);
 	StrT& trimLeft(value_type ch);
-	StrT& trimLeft(const_str sCharSet);
+	StrT& trimLeft(const_str charSet);
 
 	StrT& trimRight(void);
 	StrT& trimRight(value_type ch);
-	StrT& trimRight(const_str sCharSet);
+	StrT& trimRight(const_str charSet);
 
 	// append maybe mend?
 	StrT& append(const value_type* _Ptr);

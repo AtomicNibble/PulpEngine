@@ -365,7 +365,6 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::toUpper(void)
 template<typename CharT>
 typename StringRef<CharT>::StrT& StringRef<CharT>::trim(void)
 {
-
 	return trimRight().trimLeft();
 }
 
@@ -379,11 +378,11 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::trim(value_type ch)
 }
 
 template<typename CharT>
-typename StringRef<CharT>::StrT& StringRef<CharT>::trim(const_str sCharSet)
+typename StringRef<CharT>::StrT& StringRef<CharT>::trim(const_str charSet)
 {
 	makeUnique();
 
-	return trimRight(sCharSet).trimLeft(sCharSet);
+	return trimRight(charSet).trimLeft(charSet);
 }
 
 template<typename CharT>
@@ -414,13 +413,15 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::trimLeft(value_type ch)
 }
 
 template<typename CharT>
-typename StringRef<CharT>::StrT& StringRef<CharT>::trimLeft(const_str sCharSet)
+typename StringRef<CharT>::StrT& StringRef<CharT>::trimLeft(const_str charSet)
 {
-	if (!sCharSet || !(*sCharSet))
+	if (!charSet || !(*charSet))
 		return *this;
 
+	const_str charSetend = charSet + strlen(charSet);
+
 	const_str str = str_;
-	while ((*str != 0) && (!strUtil::IsEqual(sCharSet, str)))
+	while ((*str != 0) && (strUtil::Find(charSet, charSetend, *str) != nullptr))
 		str++;
 
 	if (str != str_)
@@ -467,14 +468,15 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::trimRight(value_type ch)
 }
 
 template<typename CharT>
-typename StringRef<CharT>::StrT& StringRef<CharT>::trimRight(const_str sCharSet)
+typename StringRef<CharT>::StrT& StringRef<CharT>::trimRight(const_str charSet)
 {
-	if (!sCharSet || !(*sCharSet) || length() < 1)
+	if (!charSet || !(*charSet) || length() < 1)
 		return *this;
 
+	const_str charSetend = charSet + strlen(charSet);
 	const_str last = str_ + length() - 1;
 	const_str str = last;
-	while ((str != str_) && (!strUtil::IsEqual(sCharSet, str)))
+	while ((str != str_) && (strUtil::Find(charSet, charSetend, *str) != nullptr))
 		str--;
 
 	if (str != last)
@@ -861,6 +863,7 @@ bool StringRef<CharT>::compare(const StrT& Str) const
 template<typename CharT>
 bool StringRef<CharT>::compare(const_str ptr) const
 {
+	X_ASSERT_NOT_NULL(ptr);
 	return core::strUtil::IsEqual(begin(), end(), ptr);
 }
 
@@ -873,6 +876,7 @@ int StringRef<CharT>::compareInt(const StrT& _Str) const
 template<typename CharT>
 int StringRef<CharT>::compareInt(const_str ptr) const
 {
+	X_ASSERT_NOT_NULL(ptr);
 	return strcmp(str_, ptr);
 }
 
