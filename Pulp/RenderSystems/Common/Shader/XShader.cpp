@@ -903,7 +903,7 @@ bool ShaderSourceFile::Technique::processName(void)
 		}
 
 		// fix name.
-		name.trimRight(pBrace);
+		name = name.substr(nullptr, pBrace);
 	}
 	return true;
 }
