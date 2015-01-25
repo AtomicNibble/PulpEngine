@@ -321,8 +321,15 @@ TYPED_TEST(StrRef, Insert)
 
 TYPED_TEST(StrRef, Erase)
 {
+	typedef StringRef<TypeParam> StrRefT;
 
+	StrRefT str("camel likes to ride his sheep");
 
+	str.erase(0, 6);
+	EXPECT_STREQ("likes to ride his sheep", str);
+
+	str.erase(17);
+	EXPECT_STREQ("likes to ride his", str);
 
 }
 

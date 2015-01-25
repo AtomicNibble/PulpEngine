@@ -55,6 +55,10 @@ public:
 	// removes a refrence from the string, delete if == 0
 	~StringRef();
 
+	enum npos_type {
+		npos = (size_type)~0
+	};
+
 protected:
 	// used by the charwrapper for allocation free construction.
 	StringRef(const ConstCharWrapper& str);	
