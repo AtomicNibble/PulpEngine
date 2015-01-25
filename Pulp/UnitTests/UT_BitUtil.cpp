@@ -173,10 +173,10 @@ TEST(BitTest, SignedBit)
 	EXPECT_TRUE(bitUtil::isSignBitSet(2537551548));
 
 
-	EXPECT_FALSE(bitUtil::isSignBitNotSet(62626));
-	EXPECT_FALSE(bitUtil::isSignBitNotSet(525));
-	EXPECT_FALSE(bitUtil::isSignBitNotSet(1));
-	EXPECT_FALSE(bitUtil::isSignBitNotSet(0));
-	EXPECT_FALSE(bitUtil::isSignBitNotSet(53636));
-	EXPECT_FALSE(bitUtil::isSignBitNotSet(1246374));
+	EXPECT_TRUE(bitUtil::isSignBitNotSet(62626));
+	EXPECT_TRUE(bitUtil::isSignBitNotSet(525));
+	EXPECT_TRUE(bitUtil::isSignBitNotSet(1));
+	EXPECT_TRUE(bitUtil::isSignBitNotSet(0));
+	EXPECT_TRUE(bitUtil::isSignBitNotSet(53636));
+	EXPECT_TRUE(bitUtil::isSignBitNotSet(1246374));
 }
