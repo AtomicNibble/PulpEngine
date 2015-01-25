@@ -140,8 +140,8 @@ public:
 	// replace part of string.
 	StrT& replace(value_type chOld, value_type chNew);
 	StrT& replace(const_str strOld, const_str strNew);
-	StrT& replace(size_type pos, size_type count, const_str strNew);
-	StrT& replace(size_type pos, size_type count, const_str strNew, size_type count2);
+	StrT& replace(size_type pos, size_type count, const_str strNew); // replace at offset the number of chars in count with the contents of new
+	StrT& replace(size_type pos, size_type count, const_str strNew, size_type count2); // same as above but only use count2 from new.
 	StrT& replace(size_type pos, size_type count, size_type nNumChars, value_type chNew);
 
 	// insert new elements to string.

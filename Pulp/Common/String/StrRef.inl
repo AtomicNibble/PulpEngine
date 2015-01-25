@@ -696,8 +696,8 @@ inline StringRef<T>& StringRef<T>::replace(const_str strOld, const_str strNew)
 	if (sourceLen == 0)
 		return *this;
 
-	value_type* strOldStart = strOld;
-	value_type* strOldEnd = strOld + sourceLen;
+	const_str strOldStart = strOld;
+	const_str strOldEnd = strOld + sourceLen;
 
 	size_type replacementLen = strlen(strNew);
 
@@ -707,7 +707,7 @@ inline StringRef<T>& StringRef<T>::replace(const_str strOld, const_str strNew)
 	value_type* strTarget;
 	while (strStart < strEnd)
 	{
-		while ((strTarget = strUtil::Find(strStart, strEnd, strOldStart, strOldEnd)) != nullptr)
+		while ((strTarget = const_cast<value_type*>(strUtil::Find(strStart, strEnd, strOldStart, strOldEnd))) != nullptr)
 		{
 			count++;
 			strStart = strTarget + sourceLen;
@@ -734,14 +734,14 @@ inline StringRef<T>& StringRef<T>::replace(const_str strOld, const_str strNew)
 
 		while (strStart < strEnd)
 		{
-			while ((strTarget = strUtil::Find(strStart, strEnd, strOldStart, strOldEnd)) != nullptr)
+			while ((strTarget = const_cast<value_type*>(strUtil::Find(strStart, strEnd, strOldStart, strOldEnd))) != nullptr)
 			{
 				size_type nBalance = nOldLength - ((size_type)(strTarget - str_) + sourceLen);
 				_move(strTarget + replacementLen, strTarget + sourceLen, nBalance);
 				_copy(strTarget, strNew, replacementLen);
 				strStart = strTarget + replacementLen;
 				strStart[nBalance] = 0;
-				nOldLength += (nReplacementLen - sourceLen);
+				nOldLength += (replacementLen - sourceLen);
 			}
 			strStart += strlen(strStart) + 1;
 		}
