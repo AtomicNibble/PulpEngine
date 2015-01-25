@@ -393,7 +393,7 @@ struct IRender
 	virtual bool DefferedBegin(void) X_ABSTRACT;
 	virtual bool DefferedEnd(void) X_ABSTRACT;
 	virtual bool SetWorldShader(void) X_ABSTRACT;
-	virtual bool setGUIShader(void) X_ABSTRACT;
+	virtual bool setGUIShader(bool textured = false) X_ABSTRACT;
 	// ~Shader Stuff
 
 	// Model

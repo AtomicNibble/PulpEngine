@@ -250,7 +250,7 @@ public:
 	virtual bool SetFFE(bool textured = false);
 	virtual bool SetFontShader();
 	virtual bool SetZPass();
-	virtual bool setGUIShader(void);
+	virtual bool setGUIShader(bool textured = false) X_FINAL;
 
 	// ~Shaders 
 

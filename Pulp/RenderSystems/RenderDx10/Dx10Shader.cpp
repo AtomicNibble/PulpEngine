@@ -323,7 +323,7 @@ bool DX11XRender::SetZPass()
 	return true;
 }
 
-bool DX11XRender::setGUIShader(void)
+bool DX11XRender::setGUIShader(bool textured)
 {
 	using namespace shader;
 
@@ -333,9 +333,18 @@ bool DX11XRender::setGUIShader(void)
 	if (!pSh)
 		return false;
 
-	core::StrHash tech("Fill#Color");
-	if (!pSh->FXSetTechnique(tech))
-		return false;
+	if (textured)
+	{
+		core::StrHash tech("Fill#Texture");
+		if (!pSh->FXSetTechnique(tech))
+			return false;
+	}
+	else
+	{
+		core::StrHash tech("Fill#Color");
+		if (!pSh->FXSetTechnique(tech))
+			return false;
+	}
 
 	if (!pSh->FXBegin(&pass, 0))
 		return false;
