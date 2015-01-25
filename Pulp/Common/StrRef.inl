@@ -482,7 +482,7 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::trimRight(const_str charSet)
 	if (str != last)
 	{
 		// Just shrink length of the string.
-		size_type nNewLength = (size_type)(str - str_); // str_ can change in _MakeUnique
+		size_type nNewLength = (size_type)(str - str_) + 1; // str_ can change in _MakeUnique
 		makeUnique();
 		header()->length = safe_static_cast<length_type, size_type>(nNewLength);
 		str_[nNewLength] = 0;
