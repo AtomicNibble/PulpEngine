@@ -689,10 +689,15 @@ inline StringRef<T>& StringRef<T>::replace(value_type chOld, value_type chNew)
 template <class T>
 inline StringRef<T>& StringRef<T>::replace(const_str strOld, const_str strNew)
 {
-	size_type nSourceLen = strlen(strOld);
-	if (nSourceLen == 0)
+	size_type sourceLen = strlen(strOld);
+
+	if (sourceLen == 0)
 		return *this;
-	size_type nReplacementLen = strlen(strNew);
+
+	value_type* strOldStart = strOld;
+	value_type* strOldEnd = strOld + sourceLen;
+
+	size_type replacementLen = strlen(strNew);
 
 	size_type nCount = 0;
 	value_type* strStart = str_;
@@ -700,12 +705,12 @@ inline StringRef<T>& StringRef<T>::replace(const_str strOld, const_str strNew)
 	value_type* strTarget;
 	while (strStart < strEnd)
 	{
-		while ((strTarget = _strstr(strStart, strOld)) != NULL)
+		while ((strTarget = strUtil::Find(strStart, strEnd, strOldStart, strOldEnd)) != nullptr)
 		{
 			nCount++;
-			strStart = strTarget + nSourceLen;
+			strStart = strTarget + sourceLen;
 		}
-		strStart += _strlen(strStart) + 1;
+		strStart += strlen(strStart) + 1;
 	}
 
 	if (nCount > 0)
@@ -713,7 +718,7 @@ inline StringRef<T>& StringRef<T>::replace(const_str strOld, const_str strNew)
 		makeUnique();
 
 		size_type nOldLength = length();
-		size_type nNewLength = nOldLength + (nReplacementLen - nSourceLen)*nCount;
+		size_type nNewLength = nOldLength + (replacementLen - sourceLen)*nCount;
 		if (capacity() < nNewLength || header()->refCount > 1)
 		{
 			XStrHeader* pOldData = header();
@@ -727,14 +732,14 @@ inline StringRef<T>& StringRef<T>::replace(const_str strOld, const_str strNew)
 
 		while (strStart < strEnd)
 		{
-			while ((strTarget = _strstr(strStart, strOld)) != NULL)
+			while ((strTarget = strUtil::Find(strStart, strEnd, strOldStart, strOldEnd)) != nullptr)
 			{
-				size_type nBalance = nOldLength - ((size_type)(strTarget - str_) + nSourceLen);
-				_move(strTarget + nReplacementLen, strTarget + nSourceLen, nBalance);
-				_copy(strTarget, strNew, nReplacementLen);
-				strStart = strTarget + nReplacementLen;
+				size_type nBalance = nOldLength - ((size_type)(strTarget - str_) + sourceLen);
+				_move(strTarget + replacementLen, strTarget + sourceLen, nBalance);
+				_copy(strTarget, strNew, replacementLen);
+				strStart = strTarget + replacementLen;
 				strStart[nBalance] = 0;
-				nOldLength += (nReplacementLen - nSourceLen);
+				nOldLength += (nReplacementLen - sourceLen);
 			}
 			strStart += strlen(strStart) + 1;
 		}
