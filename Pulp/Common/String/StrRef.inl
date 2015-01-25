@@ -504,7 +504,7 @@ inline StringRef<CharT>& StringRef<CharT>::append(const_str _Ptr)
 template <class CharT>
 inline StringRef<CharT>& StringRef<CharT>::append(const_str _Ptr, size_type count)
 {
-	_ConcatenateInPlace(_Ptr, count);
+	ConcatenateInPlace(_Ptr, count);
 	return *this;
 }
 
@@ -517,7 +517,7 @@ inline StringRef<CharT>& StringRef<CharT>::append(const StringRef<CharT>& _Str,
 		return *this;
 	if (off + count > len)
 		count = len - off;
-	_ConcatenateInPlace(_Str.str_ + off, count);
+	ConcatenateInPlace(_Str.str_ + off, count);
 	return *this;
 }
 
