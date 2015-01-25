@@ -142,6 +142,10 @@ void XWindow::clear(void)
 		}
 	}
 
+	// release mat.
+	if (pBackgroundMat_)
+		pBackgroundMat_->release();
+
 	init_ = false;
 }
 
@@ -258,11 +262,14 @@ void XWindow::SetupFromState(void)
 
 	if (style_ == WindowStyle::SHADER) {
 		pBackgroundMat_ = pMaterialManager_->loadMaterial(background_.c_str());
-
-		if (!pBackgroundMat_->getFlags().IsSet(engine::MaterialFlag::UI)) {
+	
+		engine::MaterialFlags flags = pBackgroundMat_->getFlags();
+#if 0	
+		if (!flags.IsSet(engine::MaterialFlag::UI)) {
 			X_WARNING("Gui", "Material %s is not a GUI material", background_.c_str());
 			pBackgroundMat_ = pMaterialManager_->getDefaultMaterial();
 		}
+#endif
 	}
 }
 
@@ -1202,6 +1209,8 @@ void XWindow::drawBorder(const Rectf& drawRect)
 	{
 		if (borderColor_.a() > 0.f)
 		{
+			pRender_->setGUIShader(false);
+
 			switch (borderStyle_)
 			{
 				case WindowBorderStyle::FULL:
@@ -1439,13 +1448,14 @@ void XWindow::draw(core::TimeVal time, float x_, float y_)
 	y += textAlignY_;
 
 	// draw it.
-//	pFont_->DrawString(Vec3f(x, y, 0.f), text_, contex);
+	pFont_->DrawString(Vec3f(x, y, 0.f), text_, contex);
 }
 
 void XWindow::drawBackground(const Rectf& drawRect)
 {
 	if (style_ == WindowStyle::FILLED)
 	{
+		pRender_->setGUIShader(false);
 		pRender_->DrawQuadSS(drawRect, backColor_);
 	}
 	else if (style_ == WindowStyle::GRADIENT)
@@ -1455,8 +1465,14 @@ void XWindow::drawBackground(const Rectf& drawRect)
 	else if (style_ == WindowStyle::SHADER || style_ == WindowStyle::DVAR_SHADER)
 	{
 		const Color& col = backColor_;
-		// pBackgroundMat_
-//		pRender_->DrawQuadImageSS(drawRect, pBackground_->getTexID(), col);
+
+		pRender_->setGUIShader(true);
+
+		shader::XShaderItem& item = pBackgroundMat_->getShaderItem();
+		shader::XTextureResource* texRes = item.pResources_->getTexture(shader::ShaderTextureIdx::DIFFUSE);
+		texture::TexID texId = texRes->pITex->getTexID();
+
+		pRender_->DrawQuadImageSS(drawRect, texId, col);
 	}
 }
 
