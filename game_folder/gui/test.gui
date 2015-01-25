@@ -158,13 +158,23 @@ windowDef
 	{
 		name			"shader"
 		rect        		450 400 256 128 
-		backcolor   	1 1 1 1
+		backcolor   	1 0 1 1
 		forecolor   		1 0 0 1
 		bordercolor 	1 0 0 1
-		bordersize  		1
+		bordersize  		0
 		borderstyle 	WINDOW_BORDER_RAISED
 		visible     		1
 		background		"test"
 		style 			WINDOW_STYLE_SHADER
+		
+		onTime 0 {
+			transition rect "450 400 256 128" "450 250 256 256" "1000" ;
+		}	
+		onTime 5000 {
+			transition rect "450 250 256 256" "450 400 256 128" "1000" ;
+		}			
+		onTime 6000 {
+			resetTime 0 ;
+		}
 	}
 }

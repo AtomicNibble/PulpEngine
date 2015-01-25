@@ -1,6 +1,6 @@
 <material name="" flags="0" SurfaceType="none">
 	<textures>
-		<texture type="albedo" image_name="core_assets/Textures/default.dds" />
+		<texture type="albedo" image_name="core_assets/Textures/potato_256.dds" />
 	</textures>
 
 	<Params 
