@@ -335,51 +335,170 @@ TYPED_TEST(StrRef, Erase)
 
 TYPED_TEST(StrRef, Compare)
 {
+	typedef StringRef<TypeParam> StrRefT;
+
+	StrRefT str("goat");
+	StrRefT str1("goat");
+	StrRefT str2("goot");
+
+	EXPECT_TRUE(str.compare(str1));
+	EXPECT_TRUE(str.compare("goat"));
+
+	EXPECT_FALSE(str.compare(str2));
+	EXPECT_FALSE(str.compare("goot"));
+
+}
 
 
+TYPED_TEST(StrRef, CompareInt)
+{
+	typedef StringRef<TypeParam> StrRefT;
 
+	StrRefT str("goat");
+	StrRefT str1("goat");
+	StrRefT str2("goot");
+	StrRefT str3("goaa");
+
+
+	EXPECT_EQ(0, str.compareInt(str1));
+	EXPECT_EQ(0, str.compareInt("goat"));
+
+	// it's 0 vs a so negative
+	EXPECT_EQ(-1, str.compareInt(str2));
+	EXPECT_EQ(-1, str.compareInt("goot"));
+
+	// do some positive ones.
+	EXPECT_EQ(1, str.compareInt(str3));
+	EXPECT_EQ(1, str.compareInt("goaa"));
+}
+
+TYPED_TEST(StrRef, CompareNoCase)
+{
+	typedef StringRef<TypeParam> StrRefT;
+
+	StrRefT str("goat");
+	StrRefT str1("GOaT");
+	StrRefT str2("GOot");
+
+	EXPECT_TRUE(str.compareCaseInsen(str1));
+	EXPECT_TRUE(str.compareCaseInsen("GOaT"));
+
+	EXPECT_FALSE(str.compareCaseInsen(str2));
+	EXPECT_FALSE(str.compareCaseInsen("GOot"));
+
+}
+
+TYPED_TEST(StrRef, Find)
+{
+	typedef StringRef<TypeParam> StrRefT;
+	
+	StrRefT str("goat likes to float in a moat");
+
+	EXPECT_EQ(str.begin() + 5,str.find("likes"));
+	EXPECT_EQ(str.begin() + 6, str.find('i'));
+
+	EXPECT_EQ(nullptr, str.find("ina"));
+	EXPECT_EQ(nullptr, str.find('x'));
 }
 
 TYPED_TEST(StrRef, Swap)
 {
+	typedef StringRef<TypeParam> StrRefT;
 
+	StrRefT str("goat");
+	StrRefT str1("boat");
 
+	str.swap(str1);
 
+	EXPECT_STREQ("goat", str1);
+	EXPECT_STREQ("boat", str);
 }
+
 
 TYPED_TEST(StrRef, SubStr)
 {
+	typedef StringRef<TypeParam> StrRefT;
 
+	StrRefT str("goat man"), str1, str2;
+	StrRefT::const_str pos = str.find("man");
 
+	str1 = str.substr(nullptr, pos);
 
+	EXPECT_STREQ("goat man", str);
+	EXPECT_STREQ("goat ", str1);
+
+	str2 = str.substr(pos);
+
+	EXPECT_STREQ("goat man", str);
+	EXPECT_STREQ("man", str2);
 }
 
 TYPED_TEST(StrRef, Left)
 {
+	typedef StringRef<TypeParam> StrRefT;
 
+	StrRefT str("goat man"), str1, str2;
 
+	str1 = str.left(2);
+	str2 = str.left(200); // give all
 
+	EXPECT_STREQ("goat man", str);
+	EXPECT_STREQ("goat man", str2);
+	EXPECT_STREQ("go", str1);
 }
 
 TYPED_TEST(StrRef, Right)
 {
+	typedef StringRef<TypeParam> StrRefT;
 
+	StrRefT str("goat man"), str1, str2;
 
+	str1 = str.right(2);
+	str2 = str.right(200); // give all
 
+	EXPECT_STREQ("goat man", str);
+	EXPECT_STREQ("goat man", str2);
+	EXPECT_STREQ("an", str1);
 }
 
 
 TYPED_TEST(StrRef, OPAssign)
 {
+	typedef StringRef<TypeParam> StrRefT;
 
+	StrRefT str("goat man");
+	StrRefT str1("candy in your nipple");
 
+	str = str1;
 
+	EXPECT_STREQ("candy in your nipple", str.c_str());
+
+	str = 'g';
+
+	EXPECT_STREQ("g", str.c_str());
+
+	str = "lemon wall";
+
+	EXPECT_STREQ("lemon wall", str.c_str());
 }
 
 TYPED_TEST(StrRef, OPConcat)
 {
+	typedef StringRef<TypeParam> StrRefT;
 
+	StrRefT str("goat man");
+	StrRefT str1(" likes t");
 
+	str += str1;
 
+	EXPECT_STREQ("goat man likes t", str.c_str());
+
+	str += 'o';
+
+	EXPECT_STREQ("goat man likes to", str.c_str());
+
+	str += " play with your nipples";
+
+	EXPECT_STREQ("goat man likes to play with your nipples", str.c_str());
 }
 

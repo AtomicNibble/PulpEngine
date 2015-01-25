@@ -162,7 +162,11 @@ public:
 	bool compare(const StrT& Str) const;
 	bool compare(const_str ptr) const;
 
-	// returns 0 if same.
+	//	<0	the first character that does not match has a lower
+	//		value in ptr1 than in ptr2
+	//	0	the contents of both strings are equal
+	//	>0	the first character that does not match has a greater 
+	//		value in ptr1 than in ptr2
 	int compareInt(const StrT& _Str) const;
 	int compareInt(const_str ptr) const;
 
