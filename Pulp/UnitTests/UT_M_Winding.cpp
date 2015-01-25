@@ -53,14 +53,14 @@ TEST(Winding, ConstructorNum)
 TEST(Winding, ConstructorVerts)
 {
 	Vec3f verts[8] = {
-		Vec3f(10, 10, 10),
-		Vec3f(10, 0, 10),
-		Vec3f(0, 10, 10),
-		Vec3f(0, 0, 10),
-		Vec3f(10, 10, -10),
-		Vec3f(10, 0, -10),
-		Vec3f(0, 10, -10),
-		Vec3f(0, 0, -10)
+		Vec3f(10, 10, 20),
+		Vec3f(10, 0, 20),
+		Vec3f(0, 10, 20),
+		Vec3f(0, 0, 20),
+		Vec3f(10, 10, 0),
+		Vec3f(10, 0, 0),
+		Vec3f(0, 10, 0),
+		Vec3f(0, 0, 0)
 	};
 
 	XWinding base(verts,8);
@@ -74,19 +74,20 @@ TEST(Winding, ConstructorVerts)
 	float expected_area = 0.f;
 
 	// top bottom
-	expected_area += (10 * 10) * 2;
+	// expected_area += (10 * 10) * 4;
 	// 4 sides
-	expected_area += (20 * 10) * 4;
-
+	// expected_area += (20 * 10) * 2;
+	
+	expected_area = 603.225f;
 
 	EXPECT_EQ(8, base.getNumPoints());
 	EXPECT_EQ(8, base.getAllocatedSize());
-	EXPECT_EQ(expected_area, base.getArea());
+	EXPECT_FLOAT_EQ(expected_area, base.getArea());
 	EXPECT_EQ(false, base.isHuge());
 	EXPECT_EQ(false, base.isTiny());
-	EXPECT_EQ(Vec3f(0,0,-10), aabb.min);
-	EXPECT_EQ(Vec3f(10, 10, 10), aabb.max);
-	EXPECT_EQ(Vec3f(5, 5, 0), base.getCenter());
+	EXPECT_EQ(Vec3f(0,0,0), aabb.min);
+	EXPECT_EQ(Vec3f(10, 10, 20), aabb.max);
+	EXPECT_EQ(Vec3f(5, 5, 10), base.getCenter());
 
 	base.clear();
 
