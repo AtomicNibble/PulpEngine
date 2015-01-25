@@ -25,7 +25,7 @@ StringRef<CharT>::StringRef(const StrT& str)
 	}
 	else
 	{
-		SetEmpty(); 
+		SetEmpty();
 	}
 }
 
@@ -42,8 +42,8 @@ template<typename CharT>
 StringRef<CharT>::StringRef(value_type ch, size_type numRepeat)
 {
 	SetEmpty(); // if for some reason repeat is 0 (maybe assert on it?)
-	X_ASSERT(numRepeat > 0, "string constructed with a char repeat value of 0.")(ch,numRepeat);
-	
+	X_ASSERT(numRepeat > 0, "string constructed with a char repeat value of 0.")(ch, numRepeat);
+
 	if (numRepeat > 0)
 	{
 		Allocate(numRepeat);
@@ -117,19 +117,19 @@ StringRef<CharT>::~StringRef()
 
 template<typename CharT>
 StringRef<CharT>::operator const_str(void) const
-{ 
-	return str_; 
+{
+	return str_;
 }
 
 template<typename CharT>
 typename StringRef<CharT>::const_pointer StringRef<CharT>::c_str(void) const
-{ 
+{
 	return str_;
 }
 
 template<typename CharT>
 typename StringRef<CharT>::const_pointer StringRef<CharT>::data(void) const
-{ 
+{
 	return str_;
 }
 
@@ -137,13 +137,13 @@ typename StringRef<CharT>::const_pointer StringRef<CharT>::data(void) const
 // iterator
 template<typename CharT>
 typename StringRef<CharT>::const_iterator StringRef<CharT>::begin(void) const
-{ 
+{
 	return str_;
 }
 
 template<typename CharT>
 typename StringRef<CharT>::const_iterator StringRef<CharT>::end(void) const
-{ 
+{
 	return str_ + length();
 }
 
@@ -204,7 +204,7 @@ void StringRef<CharT>::reserve(size_type size)
 {
 	if (size > capacity())
 	{
-		XStrHeader* pOldData =header();
+		XStrHeader* pOldData = header();
 		Allocate(size);
 		_copy(str_, pOldData->GetChars(), pOldData->length);
 		header()->length = pOldData->length;
@@ -289,7 +289,7 @@ template<typename CharT>
 typename StringRef<CharT>::StrT& StringRef<CharT>::operator=(value_type ch)
 {
 	// single char for my booty.
-	_Assign(&ch,1);
+	_Assign(&ch, 1);
 	return *this;
 }
 
@@ -314,7 +314,7 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::operator+=(const StrT& str)
 template<typename CharT>
 typename StringRef<CharT>::StrT& StringRef<CharT>::operator+=(value_type ch)
 {
-	ConcatenateInPlace(&ch,1);
+	ConcatenateInPlace(&ch, 1);
 	return *this;
 }
 
@@ -352,7 +352,7 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::toUpper(void)
 	size_type i, len;
 
 	len = length();
-	for ( i = 0; i<len; ++i) {
+	for (i = 0; i<len; ++i) {
 		str_[i] = safe_static_cast<CharT>(toupper(str_[i]));
 	}
 	return *this;
@@ -502,22 +502,22 @@ inline StringRef<CharT>& StringRef<CharT>::append(const_str _Ptr)
 }
 
 template <class CharT>
-inline StringRef<CharT>& StringRef<CharT>::append(const_str _Ptr, size_type nCount)
+inline StringRef<CharT>& StringRef<CharT>::append(const_str _Ptr, size_type count)
 {
-	ConcatenateInPlace(_Ptr, nCount);
+	_ConcatenateInPlace(_Ptr, count);
 	return *this;
 }
 
 template <class CharT>
 inline StringRef<CharT>& StringRef<CharT>::append(const StringRef<CharT>& _Str,
-	size_type off, size_type nCount)
+	size_type off, size_type count)
 {
 	size_type len = _Str.length();
 	if (off > len)
 		return *this;
-	if (off + nCount > len)
-		nCount = len - off;
-	ConcatenateInPlace(_Str.str_ + off, nCount);
+	if (off + count > len)
+		count = len - off;
+	_ConcatenateInPlace(_Str.str_ + off, count);
 	return *this;
 }
 
@@ -560,23 +560,23 @@ inline CheckConvert<D> check_convert(D& d)
 }
 
 template <class CharT>
-inline StringRef<CharT>& StringRef<CharT>::append(size_type nCount, value_type _Ch)
+inline StringRef<CharT>& StringRef<CharT>::append(size_type count, value_type _Ch)
 {
-	if (nCount > 0)
+	if (count > 0)
 	{
-		if (length() + nCount >= capacity())
+		if (length() + count >= capacity())
 		{
 			XStrHeader* pOldData = header();
-			Allocate(length() + nCount);
+			Allocate(length() + count);
 			_copy(str_, pOldData->getChars(), pOldData->length);
-			_set(str_ + pOldData->length, _Ch, nCount);
+			_set(str_ + pOldData->length, _Ch, count);
 			freeData(pOldData);
 		}
 		else
 		{
 			size_type nOldLength = length();
-			_set(str_ + nOldLength, _Ch, nCount);
-			check_convert(header()->length) = nOldLength + nCount;
+			_set(str_ + nOldLength, _Ch, count);
+			check_convert(header()->length) = nOldLength + count;
 			str_[length()] = 0; // Make null terminated string.
 		}
 	}
@@ -601,23 +601,23 @@ inline StringRef<CharT>& StringRef<CharT>::assign(const_str _Ptr)
 }
 
 template <class CharT>
-inline StringRef<CharT>& StringRef<CharT>::assign(const_str _Ptr, size_type nCount)
+inline StringRef<CharT>& StringRef<CharT>::assign(const_str _Ptr, size_type count)
 {
-	size_type len = strnlen(_Ptr, nCount);
+	size_type len = strnlen(_Ptr, count);
 	_Assign(_Ptr, len);
 	return *this;
 }
 
 template <class CharT>
 inline StringRef<CharT>& StringRef<CharT>::assign(const StringRef<CharT>& _Str,
-	size_type off, size_type nCount)
+	size_type off, size_type count)
 {
 	size_type len = _Str.length();
 	if (off > len)
 		return *this;
-	if (off + nCount > len)
-		nCount = len - off;
-	_Assign(_Str.str_ + off, nCount);
+	if (off + count > len)
+		count = len - off;
+	_Assign(_Str.str_ + off, count);
 	return *this;
 }
 
@@ -629,12 +629,12 @@ inline StringRef<CharT>& StringRef<CharT>::assign(const StringRef<CharT>& _Str)
 }
 
 template <class CharT>
-inline StringRef<CharT>& StringRef<CharT>::assign(size_type nCount, value_type _Ch)
+inline StringRef<CharT>& StringRef<CharT>::assign(size_type count, value_type _Ch)
 {
-	if (nCount >= 1)
+	if (count >= 1)
 	{
-		Allocate(nCount);
-		_set(str_, _Ch, nCount);
+		Allocate(count);
+		_set(str_, _Ch, count);
 	}
 	return *this;
 }
@@ -701,7 +701,7 @@ inline StringRef<T>& StringRef<T>::replace(const_str strOld, const_str strNew)
 
 	size_type replacementLen = strlen(strNew);
 
-	size_type nCount = 0;
+	size_type count = 0;
 	value_type* strStart = str_;
 	value_type* strEnd = str_ + length();
 	value_type* strTarget;
@@ -709,18 +709,18 @@ inline StringRef<T>& StringRef<T>::replace(const_str strOld, const_str strNew)
 	{
 		while ((strTarget = strUtil::Find(strStart, strEnd, strOldStart, strOldEnd)) != nullptr)
 		{
-			nCount++;
+			count++;
 			strStart = strTarget + sourceLen;
 		}
 		strStart += strlen(strStart) + 1;
 	}
 
-	if (nCount > 0)
+	if (count > 0)
 	{
 		makeUnique();
 
 		size_type nOldLength = length();
-		size_type nNewLength = nOldLength + (replacementLen - sourceLen)*nCount;
+		size_type nNewLength = nOldLength + (replacementLen - sourceLen)*count;
 		if (capacity() < nNewLength || header()->refCount > 1)
 		{
 			XStrHeader* pOldData = header();
@@ -761,7 +761,7 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::insert(size_type nIndex, valu
 }
 
 template<typename CharT>
-typename StringRef<CharT>::StrT& StringRef<CharT>::insert(size_type nIndex, size_type nCount, value_type ch)
+typename StringRef<CharT>::StrT& StringRef<CharT>::insert(size_type nIndex, size_type count, value_type ch)
 {
 	makeUnique();
 
@@ -771,7 +771,7 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::insert(size_type nIndex, size
 	size_type nNewLength = length();
 	if (nIndex > nNewLength)
 		nIndex = nNewLength;
-	nNewLength += nCount;
+	nNewLength += count;
 
 	if (capacity() < nNewLength)
 	{
@@ -782,9 +782,9 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::insert(size_type nIndex, size
 		freeData(pOldData);
 	}
 
-	_move(str_ + nIndex + nCount, str_ + nIndex, (nNewLength - nIndex));
-	_set(str_ + nIndex, ch, nCount);
-	header()->length = safe_static_cast<int,size_type>(nNewLength);
+	_move(str_ + nIndex + count, str_ + nIndex, (nNewLength - nIndex));
+	_set(str_ + nIndex, ch, count);
+	header()->length = safe_static_cast<int, size_type>(nNewLength);
 
 	return *this;
 }
@@ -796,12 +796,12 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::insert(size_type nIndex, cons
 }
 
 template<typename CharT>
-typename StringRef<CharT>::StrT& StringRef<CharT>::insert(size_type nIndex, const_str pstr, size_type nCount)
+typename StringRef<CharT>::StrT& StringRef<CharT>::insert(size_type nIndex, const_str pstr, size_type count)
 {
 	if (nIndex < 0)
 		nIndex = 0;
 
-	size_type nInsertLength = nCount;
+	size_type nInsertLength = count;
 	size_type nNewLength = length();
 	if (nInsertLength > 0)
 	{
@@ -931,9 +931,9 @@ StringRef<CharT> StringRef<CharT>::substr(const_str pBegin, const_str pEnd) cons
 	if (pBegin == nullptr || pBegin < begin())
 		pBegin = begin();
 
-	if (pEnd == nullptr || pEnd > end()) 
+	if (pEnd == nullptr || pEnd > end())
 		pEnd = end();
-	
+
 
 	return StringRef<CharT>(pBegin, pEnd);
 }
@@ -943,9 +943,9 @@ StringRef<CharT> StringRef<CharT>::substr(const_str pBegin, const_str pEnd) cons
 template <class CharT>
 inline StringRef<CharT> StringRef<CharT>::right(size_type count) const
 {
-//	if (count == npos)
-//		return StringRef<CharT>();
-//	else
+	//	if (count == npos)
+	//		return StringRef<CharT>();
+	//	else
 	if (count > length())
 		return *this;
 
@@ -955,9 +955,9 @@ inline StringRef<CharT> StringRef<CharT>::right(size_type count) const
 template <class CharT>
 inline StringRef<CharT> StringRef<CharT>::left(size_type count) const
 {
-//	if (count == npos)
-//		return StringRef<CharT>();
-//	else 
+	//	if (count == npos)
+	//		return StringRef<CharT>();
+	//	else 
 	if (count > length())
 		count = length();
 
@@ -1018,7 +1018,7 @@ void StringRef<CharT>::Allocate(size_type length)
 
 		size_type allocLen = sizeof(XStrHeader)+((length + 1)*sizeof(value_type));
 		XStrHeader* pData = (XStrHeader*)X_NEW_ARRAY_OFFSET(BYTE, allocLen, gEnv->pStrArena, "StringBuf", sizeof(XStrHeader));
-	//	XStrHeader* pData = (XStrHeader*)X_NEW_ARRAY(BYTE, allocLen, gEnv->pStrArena, "StringBuf");
+		//	XStrHeader* pData = (XStrHeader*)X_NEW_ARRAY(BYTE, allocLen, gEnv->pStrArena, "StringBuf");
 
 
 		pData->refCount = 1;
@@ -1141,7 +1141,7 @@ void StringRef<CharT>::freeData(XStrHeader* pData)
 			X_ASSERT_NOT_NULL(gEnv->pStrArena);
 
 			X_DELETE(pData, gEnv->pStrArena);
-		//	delete[] pData;
+			//	delete[] pData;
 		}
 	}
 }
@@ -1161,31 +1161,31 @@ inline bool operator==(const StringRef<T>& s1, const StringRef<T>& s2)
 	return s1.compare(s2);
 }
 
-template <class T> 
+template <class T>
 inline bool operator==(const StringRef<T>& s1, const typename StringRef<T>::value_type* s2)
 {
 	return s1.compare(s2);
 }
 
-template <class T> 
+template <class T>
 inline bool operator==(const typename StringRef<T>::value_type* s1, const StringRef<T>& s2)
 {
 	return s2.compare(s1);
 }
 
-template <class T> 
+template <class T>
 inline bool operator!=(const StringRef<T>& s1, const StringRef<T>& s2)
 {
 	return !s1.compare(s2);
 }
 
-template <class T> 
+template <class T>
 inline bool operator!=(const StringRef<T>& s1, const typename StringRef<T>::value_type* s2)
 {
 	return !s1.compare(s2);
 }
 
-template <class T> 
+template <class T>
 inline bool operator!=(const typename StringRef<T>::value_type* s1, const StringRef<T>& s2)
 {
 	return !s2.compare(s1);
@@ -1194,19 +1194,19 @@ inline bool operator!=(const typename StringRef<T>::value_type* s1, const String
 
 //! compare helpers
 
-template <class T> 
+template <class T>
 inline bool operator<(const StringRef<T>& s1, const StringRef<T>& s2)
 {
 	return s1.compareInt(s2) < 0;
 }
 
-template <class T> 
+template <class T>
 inline bool operator<(const StringRef<T>& s1, const typename StringRef<T>::value_type* s2)
 {
 	return s1.compareInt(s2) < 0;
 }
 
-template <class T> 
+template <class T>
 inline bool operator<(const typename StringRef<T>::value_type* s1, const StringRef<T>& s2)
 {
 	return s2.compareInt(s1) > 0;
@@ -1218,53 +1218,53 @@ inline bool operator>(const StringRef<T>& s1, const StringRef<T>& s2)
 	return s1.compareInt(s2) > 0;
 }
 
-template <class T> 
+template <class T>
 inline bool operator>(const StringRef<T>& s1, const typename StringRef<T>::value_type* s2)
 {
 	return s1.compareInt(s2) > 0;
 }
 
-template <class T> 
+template <class T>
 inline bool operator>(const typename StringRef<T>::value_type* s1, const StringRef<T>& s2)
 {
 	return s2.compareInt(s1) < 0;
 }
 
-template <class T> 
+template <class T>
 inline bool operator<=(const StringRef<T>& s1, const StringRef<T>& s2)
 {
 	return s1.compareInt(s2) <= 0;
 }
 
-template <class T> 
+template <class T>
 inline bool operator<=(const StringRef<T>& s1, const typename StringRef<T>::value_type* s2)
 {
 	return s1.compareInt(s2) <= 0;
 }
 
-template <class T> 
+template <class T>
 inline bool operator<=(const typename StringRef<T>::value_type* s1, const StringRef<T>& s2)
 {
 	return s2.compareInt(s1) >= 0;
 }
 
-template <class T> 
+template <class T>
 inline bool operator>=(const StringRef<T>& s1, const StringRef<T>& s2)
 {
 	return s1.compareInt(s2) >= 0;
 }
 
-template <class T> 
+template <class T>
 inline bool operator>=(const StringRef<T>& s1, const typename StringRef<T>::value_type* s2)
 {
 	return s1.compareInt(s2) >= 0;
 }
 
-template <class T> 
+template <class T>
 inline bool operator>=(const typename StringRef<T>::value_type* s1, const StringRef<T>& s2)
 {
 	return s2.compareInt(s1) <= 0;
-} 
+}
 
 // =============================================================================
 

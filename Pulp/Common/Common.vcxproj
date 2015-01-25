@@ -360,7 +360,7 @@
     <None Include="String\StringHash.inl" />
     <None Include="String\StringRange.inl" />
     <None Include="String\StringUtil.inl" />
-    <None Include="StrRef.inl" />
+    <None Include="String\StrRef.inl" />
     <None Include="Threading\Atomic.inl" />
     <None Include="Threading\AtomicInt.inl" />
     <None Include="Threading\CriticalSection.inl" />

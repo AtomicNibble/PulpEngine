@@ -1140,9 +1140,6 @@
     <None Include="Memory\MemoryArena.inl">
       <Filter>Headers\Memory</Filter>
     </None>
-    <None Include="StrRef.inl">
-      <Filter>Headers\String</Filter>
-    </None>
     <None Include="Containers\FixedRingBuffer.inl">
       <Filter>Headers\Containers</Filter>
     </None>
@@ -1167,6 +1164,9 @@
     </None>
     <None Include="Math\XInterpolate.inl">
       <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="String\StrRef.inl">
+      <Filter>Headers\String</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
