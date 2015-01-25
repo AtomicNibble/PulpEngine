@@ -275,9 +275,28 @@ TYPED_TEST(StrRef, Assign)
 
 TYPED_TEST(StrRef, Replace)
 {
+	typedef StringRef<TypeParam> StrRefT;
 
+	StrRefT str("camel likes to ride his bike");
 
+	str.replace('i', 'g');
+	EXPECT_STREQ("camel lgkes to rgde hgs bgke", str);
 
+	str.replace("camel", "goat");
+	EXPECT_STREQ("goat lgkes to rgde hgs bgke", str);
+
+	str.replace(6, 4, "ikes");
+	EXPECT_STREQ("goat likes to rgde hgs bgke", str);
+
+	str.replace(23, 4, "camelllls", 5);
+	EXPECT_STREQ("goat likes to rgde hgs camel", str);
+
+	str.replace(0, 4, 10, '#');
+	EXPECT_STREQ("########## likes to rgde hgs camel", str);
+
+	// provide a length longer than new string
+	str.replace(20, 4, "camelllls", 50);
+	EXPECT_STREQ("########## likes to camelllls", str);
 }
 
 TYPED_TEST(StrRef, Insert)
