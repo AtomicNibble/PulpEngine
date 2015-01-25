@@ -212,8 +212,33 @@ TYPED_TEST(StrRef, Trim)
 
 TYPED_TEST(StrRef, Append)
 {
+	typedef StringRef<TypeParam> StrRefT;
 
+	StrRefT str;
+	StrRefT str1("camel");
+	StrRefT str2("potato");
+	StrRefT str3("cat");
 
+	str.append("goat");
+	EXPECT_STREQ("goat", str);
+
+	str.append("man", 2);
+	EXPECT_STREQ("goatma", str);
+
+	str.append(str1, 1, 3);
+	EXPECT_STREQ("goatmaame", str);
+
+	str.append(str2);
+	EXPECT_STREQ("goatmaamepotato", str);
+
+	str.append(6, '@');
+	EXPECT_STREQ("goatmaamepotato@@@@@@", str);
+
+	str.append(str3.begin(), str3.begin()); // should add nothing.
+	EXPECT_STREQ("goatmaamepotato@@@@@@", str);
+
+	str.append(str3.begin(), str3.end()); // actualy append it now.
+	EXPECT_STREQ("goatmaamepotato@@@@@@cat", str);
 
 }
 

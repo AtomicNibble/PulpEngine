@@ -123,18 +123,18 @@ public:
 
 	// append maybe mend?
 	StrT& append(const value_type* _Ptr);
-	StrT& append(const value_type* _Ptr, size_type nCount);
-	StrT& append(const StrT& _Str, size_type nOff, size_type nCount);
+	StrT& append(const value_type* _Ptr, size_type count);
+	StrT& append(const StrT& _Str, size_type nOff, size_type count);
 	StrT& append(const StrT& _Str);
-	StrT& append(size_type nCount, value_type _Ch);
+	StrT& append(size_type count, value_type _Ch);
 	StrT& append(const_iterator _First, const_iterator _Last);
 	
 	// assign or to sign?
 	StrT& assign(const_str _Ptr);
-	StrT& assign(const_str _Ptr, size_type nCount);
-	StrT& assign(const StrT& _Str, size_type off, size_type nCount);
+	StrT& assign(const_str _Ptr, size_type count);
+	StrT& assign(const StrT& _Str, size_type off, size_type count);
 	StrT& assign(const StrT& _Str);
-	StrT& assign(size_type nCount, value_type _Ch);
+	StrT& assign(size_type count, value_type _Ch);
 	StrT& assign(const_iterator _First, const_iterator _Last);
 
 	// replace part of string.
