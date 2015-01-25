@@ -168,8 +168,8 @@ public:
 
 
 	// Case insensitive compare
-	bool compareNoCase(const StrT& _Str) const;
-	bool compareNoCase(const_str ptr) const;
+	bool compareCaseInsen(const StrT& _Str) const;
+	bool compareCaseInsen(const_str ptr) const;
 
 	// find
 	const_str find(value_type ch) const;

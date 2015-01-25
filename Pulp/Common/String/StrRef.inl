@@ -883,14 +883,14 @@ int StringRef<CharT>::compareInt(const_str ptr) const
 // =============================================================================
 
 template<typename CharT>
-bool StringRef<CharT>::compareNoCase(const StrT& Str) const
+bool StringRef<CharT>::compareCaseInsen(const StrT& Str) const
 {
-	return core::strUtil::IsEqual(begin(), end(), Str.begin(), Str.end());
+	return core::strUtil::IsEqualCaseInsen(begin(), end(), Str.begin(), Str.end());
 }
 
 
 template<typename CharT>
-bool StringRef<CharT>::compareNoCase(const_str ptr) const
+bool StringRef<CharT>::compareCaseInsen(const_str ptr) const
 {
 	return core::strUtil::IsEqualCaseInsen(begin(), end(), ptr);
 }
