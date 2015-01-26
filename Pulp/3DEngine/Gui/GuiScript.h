@@ -38,10 +38,12 @@ public:
 	void FixUpParms(XWindow* win);
 
 protected:
+	typedef core::Array<XGSWinVar> ParamsArr;
+
 	int conditionReg;
 	XGuiScriptList* ifList;
 	XGuiScriptList* elseList;
-	core::Array<XGSWinVar> parms;
+	ParamsArr parms;
 	void(*handler) (XWindow *window, core::Array<XGSWinVar>& src);
 };
 
