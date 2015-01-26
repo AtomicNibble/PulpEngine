@@ -170,7 +170,9 @@ bool XGuiManager::OnFileChange(const char* name)
 
 	if (pGui = static_cast<XGui*>(findGui(path.fileName())))
 	{
-		X_LOG0("Gui", "reloading \"%s\"", name);
+		path = path.fileName();
+
+		X_LOG0("Gui", "reloading \"%s\"", path.c_str());
 
 		if (pGui->InitFromFile(path.fileName()))
 		{
