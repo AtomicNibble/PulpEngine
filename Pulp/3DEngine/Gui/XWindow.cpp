@@ -264,7 +264,7 @@ void XWindow::SetupFromState(void)
 		pBackgroundMat_ = pMaterialManager_->loadMaterial(background_.c_str());
 	
 		engine::MaterialFlags flags = pBackgroundMat_->getFlags();
-#if 0	
+#if 1	
 		if (!flags.IsSet(engine::MaterialFlag::UI)) {
 			X_WARNING("Gui", "Material %s is not a GUI material", background_.c_str());
 			pBackgroundMat_ = pMaterialManager_->getDefaultMaterial();
