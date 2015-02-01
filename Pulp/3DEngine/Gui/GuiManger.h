@@ -26,7 +26,7 @@ public:
 	~XGuiManager() X_FINAL;
 
 	//IGuiManger
-	void Init(void) X_FINAL;
+	bool Init(void) X_FINAL;
 	void Shutdown(void) X_FINAL;
 
 	IGui* loadGui(const char* name) X_FINAL;
@@ -52,10 +52,12 @@ private:
 	typedef core::Array<XGui*> Guis;
 
 	Rectf screenRect_;
-
 	Guis guis_;
 
 	int var_showDebug_;
+
+	texture::ITexture* pCursorArrow_;
+
 
 	friend void Command_ListUis(core::IConsoleCmdArgs* pArgs);
 };

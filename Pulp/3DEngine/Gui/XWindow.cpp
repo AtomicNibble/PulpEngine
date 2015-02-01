@@ -1494,13 +1494,23 @@ bool XWindow::OnInputEvent(const input::InputEvent& event)
 		{
 			Childit it = children_.begin();
 
+
+
 			if (event.keyId == KeyId::MOUSE_LEFT)
 			{
+				for (; it != children_.end(); ++it)
+				{
 
+
+				}
 			}
 			else if (event.keyId == KeyId::MOUSE_RIGHT)
 			{
+				for (; it != children_.end(); ++it)
+				{
 
+
+				}
 			}
 			else if (event.keyId == KeyId::MOUSE_MIDDLE)
 			{

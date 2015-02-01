@@ -169,7 +169,7 @@ struct IGuiManger
 {
 	virtual ~IGuiManger() {};
 
-	virtual void Init(void) X_ABSTRACT;
+	virtual bool Init(void) X_ABSTRACT;
 	virtual void Shutdown(void) X_ABSTRACT;
 
 	virtual IGui* loadGui(const char* name) X_ABSTRACT;

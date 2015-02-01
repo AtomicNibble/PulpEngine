@@ -4,6 +4,7 @@
 #include "EngineBase.h"
 
 #include <IConsole.h>
+#include <IRender.h>
 
 #include <algorithm>
 
@@ -43,7 +44,8 @@ void Command_ListUis(core::IConsoleCmdArgs* pArgs)
 
 
 XGuiManager::XGuiManager() :
-	guis_(g_3dEngineArena)
+	guis_(g_3dEngineArena),
+	pCursorArrow_(nullptr)
 {
 	screenRect_.set(0, 0, 800, 600);
 
@@ -57,12 +59,13 @@ XGuiManager::~XGuiManager()
 }
 
 
-void XGuiManager::Init(void)
+bool XGuiManager::Init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pCore);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
 	X_ASSERT_NOT_NULL(gEnv->pInput);
+	X_ASSERT_NOT_NULL(gEnv->pRender);
 	X_LOG0("Gui", "Starting GUI System");
 
 	ADD_COMMAND("ui_list", Command_ListUis, 0, "List the loaded ui's");
@@ -73,6 +76,17 @@ void XGuiManager::Init(void)
 	gEnv->pHotReload->addfileType(this, gui::GUI_BINARY_FILE_EXTENSION);
 	// what's a gui without input :| ?
 	gEnv->pInput->AddEventListener(this);
+
+	// what you pointing at? rude..
+	pCursorArrow_ = gEnv->pRender->LoadTexture("core_assets/Textures/cursor_arrow.dds",
+		texture::TextureFlags::DONT_STREAM | texture::TextureFlags::NOMIPS);
+
+	if (!pCursorArrow_) {
+		X_FATAL("Gui", "failed to load cursor");
+		return false;
+	}
+
+	return true;
 }
 
 void XGuiManager::Shutdown(void)
@@ -84,6 +98,9 @@ void XGuiManager::Shutdown(void)
 	gEnv->pHotReload->addfileType(nullptr, gui::GUI_BINARY_FILE_EXTENSION);
 
 	gEnv->pInput->RemoveEventListener(this);
+
+	if (pCursorArrow_)
+		pCursorArrow_->release();
 }
 
 IGui* XGuiManager::loadGui(const char* name)
