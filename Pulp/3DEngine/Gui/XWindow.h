@@ -103,6 +103,7 @@ struct XTimeLineEvent
 	bool pending;
 };
 
+class XGui;
 class XWindowSimple;
 class XWindow : public engine::XEngineBase
 {
@@ -128,7 +129,7 @@ private:
 	static bool s_registerIsTemporary[MAX_EXPRESSION_REGISTERS]; // statics to assist during parsing
 
 public:
-	XWindow();
+	XWindow(XGui* pGui);
 	~XWindow();
 
 	void init(void);
@@ -295,6 +296,8 @@ protected:
 	core::Array<xOpt>				ops_;
 	core::Array<float>				expressionRegisters_;
 	XRegisterList					regList_;
+
+	XGui*							pGui_;
 
 	bool* pSaveTemps_;
 

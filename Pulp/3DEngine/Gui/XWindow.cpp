@@ -55,15 +55,17 @@ const int XWindow::s_NumRegisterVars = sizeof(s_RegisterVars) / sizeof(XRegEntry
 bool XWindow::s_registerIsTemporary[MAX_EXPRESSION_REGISTERS]; 
 
 
-XWindow::XWindow() :
+XWindow::XWindow(XGui* pGui) :
 children_(g_3dEngineArena),
 drawWindows_(g_3dEngineArena),
 timeLineEvents_(g_3dEngineArena),
 transitions_(g_3dEngineArena),
 ops_(g_3dEngineArena),
 expressionRegisters_(g_3dEngineArena),
-init_(false)
+init_(false),
+pGui_(pGui)
 {
+	X_ASSERT_NOT_NULL(pGui);
 	init();
 }
 
@@ -185,7 +187,7 @@ bool XWindow::Parse(core::XParser& lex)
 	{
 		if (token.isEqual("itemDef"))
 		{
-			XWindow* win = X_NEW(XWindow,g_3dEngineArena,"ItemDef");
+			XWindow* win = X_NEW(XWindow,g_3dEngineArena,"ItemDef")(pGui_);
 			win->setParent(this);
 
 			SaveExpressionParseState();
@@ -1170,6 +1172,15 @@ void XWindow::reDraw(void)
 	for (; it != children_.end(); ++it)
 	{
 		(*it)->reDraw();
+	}
+
+	// now draw cursor
+	if (flags_.IsSet(WindowFlag::DESKTOP)) 
+	{
+		if (!flags_.IsSet(WindowFlag::MOVEABLE) && !hideCursor_)
+		{
+			pGui_->DrawCursor();
+		}
 	}
 }
 

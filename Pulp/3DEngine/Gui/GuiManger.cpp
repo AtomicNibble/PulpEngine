@@ -82,7 +82,7 @@ bool XGuiManager::Init(void)
 		texture::TextureFlags::DONT_STREAM | texture::TextureFlags::NOMIPS);
 
 	if (!pCursorArrow_) {
-		X_FATAL("Gui", "failed to load cursor");
+		X_FATAL("Gui", "failed to load main cursor");
 		return false;
 	}
 

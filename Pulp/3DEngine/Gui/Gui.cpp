@@ -33,6 +33,7 @@ void XGui::Redraw()
 void XGui::DrawCursor(void)
 {
 
+
 }
 
 const char* XGui::Activate(bool activate, int time)
@@ -101,14 +102,14 @@ bool XGui::InitFromFile(const char* name)
 		// be on same path.
 		X_DELETE_AND_NULL(pDesktop_, g_3dEngineArena);
 
-		pDesktop_ = X_NEW(XWindow, g_3dEngineArena, "MenuWindow");
+		pDesktop_ = X_NEW(XWindow, g_3dEngineArena, "MenuWindow")(this);
 		pDesktop_->setFlag(WindowFlag::DESKTOP);
 		// for reloading do we want to ignore compiled ones?
 		// i think so.
 		goto SourceLoad;
 	}
 
-	pDesktop_ = X_NEW(XWindow, g_3dEngineArena, "MenuWindow");
+	pDesktop_ = X_NEW(XWindow, g_3dEngineArena, "MenuWindow")(this);
 	pDesktop_->setFlag(WindowFlag::DESKTOP);
 
 	path = "gui/compiled/";
@@ -119,6 +120,7 @@ bool XGui::InitFromFile(const char* name)
 	{
 		// load the compiled version.
 		X_LOG0("Gui", "loading: \"%s\"", path.c_str());
+		X_ASSERT_NOT_IMPLEMENTED();
 		return false;
 	}
 

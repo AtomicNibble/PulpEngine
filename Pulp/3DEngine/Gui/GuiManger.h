@@ -58,7 +58,7 @@ private:
 
 	texture::ITexture* pCursorArrow_;
 
-
+private:
 	friend void Command_ListUis(core::IConsoleCmdArgs* pArgs);
 };
 
