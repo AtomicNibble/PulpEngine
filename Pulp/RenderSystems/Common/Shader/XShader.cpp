@@ -1011,6 +1011,9 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 								// apend it.
 								pShaderSource->techniques.append(newTech);
 							}
+
+							// we also compile one without any flags that has name without flags.
+							pShaderSource->techniques.append(tech);
 						}
 						else
 						{
