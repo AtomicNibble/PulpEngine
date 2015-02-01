@@ -4,6 +4,7 @@
 #define X_GUI_H_
 
 #include <IGui.h>
+#include <IInput.h>
 
 X_NAMESPACE_BEGIN(gui)
 
@@ -32,6 +33,9 @@ public:
 
 	const char* Activate(bool activate, int time) X_FINAL;
 
+	// same as input interface but not. since we don't register them.
+	bool OnInputEvent(const input::InputEvent& event);
+	bool OnInputEventChar(const input::InputEvent& event);
 
 protected:
 	friend class XGuiManager;

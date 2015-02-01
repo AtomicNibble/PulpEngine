@@ -7,6 +7,7 @@
 
 #include <IGui.h>
 #include <ITimer.h>
+#include <IInput.h>
 
 #include <String\Lexer.h>
 #include <String\XParser.h>
@@ -156,6 +157,9 @@ public:
 	void reDraw(void);
 	void drawDebug(void);
 
+	// input
+	bool OnInputEvent(const input::InputEvent& event);
+	bool OnInputEventChar(const input::InputEvent& event);
 
 	// Overrides
 	virtual bool Parse(core::XParser& lex);
@@ -282,7 +286,7 @@ protected:
 
 	XGuiScriptList* scripts_[ScriptFunction::ENUM_COUNT];
 
-	core::Array<XWindow*>			children_;
+	Children						children_;
 	core::Array<XDrawWin>			drawWindows_;
 
 	core::Array<XTimeLineEvent*>	timeLineEvents_;

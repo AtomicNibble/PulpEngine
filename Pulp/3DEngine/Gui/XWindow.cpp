@@ -1476,6 +1476,48 @@ void XWindow::drawBackground(const Rectf& drawRect)
 	}
 }
 
+
+// input
+bool XWindow::OnInputEvent(const input::InputEvent& event)
+{
+	using namespace input;
+
+	if (flags_.IsSet(WindowFlag::DESKTOP))
+	{
+		// root window.
+
+	}
+
+	if (visable_)
+	{
+		if (event.deviceId == InputDevice::MOUSE)
+		{
+			Childit it = children_.begin();
+
+			if (event.keyId == KeyId::MOUSE_LEFT)
+			{
+
+			}
+			else if (event.keyId == KeyId::MOUSE_RIGHT)
+			{
+
+			}
+			else if (event.keyId == KeyId::MOUSE_MIDDLE)
+			{
+
+			}
+		}
+	}
+	return false;
+}
+
+bool XWindow::OnInputEventChar(const input::InputEvent& event)
+{
+
+	return false;
+}
+
+
 void XWindow::activate(bool activate)
 {
 

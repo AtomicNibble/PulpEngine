@@ -4,6 +4,7 @@
 #define X_GUI_MANAGER_H_
 
 #include <IGui.h>
+#include <IInput.h>
 
 #include "Gui.h"
 
@@ -15,7 +16,10 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(gui)
 
-class XGuiManager : public IGuiManger, public core::IXHotReload
+class XGuiManager :
+	public IGuiManger, 
+	public core::IXHotReload,
+	public input::IInputEventListner
 {
 public:
 	XGuiManager();
@@ -34,6 +38,11 @@ public:
 	// IXHotReload
 	bool OnFileChange(const char* name) X_FINAL;
 	// ~IXHotReload
+
+	// IInputEventListner
+	bool OnInputEvent(const input::InputEvent& event) X_FINAL;
+	bool OnInputEventChar(const input::InputEvent& event) X_FINAL;
+	// ~IInputEventListner
 
 	X_INLINE bool ShowDeubug(void) const{
 		return var_showDebug_ == 1;

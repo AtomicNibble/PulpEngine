@@ -62,6 +62,7 @@ void XGuiManager::Init(void)
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pCore);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
+	X_ASSERT_NOT_NULL(gEnv->pInput);
 	X_LOG0("Gui", "Starting GUI System");
 
 	ADD_COMMAND("ui_list", Command_ListUis, 0, "List the loaded ui's");
@@ -70,7 +71,8 @@ void XGuiManager::Init(void)
 
 	gEnv->pHotReload->addfileType(this, gui::GUI_FILE_EXTENSION);
 	gEnv->pHotReload->addfileType(this, gui::GUI_BINARY_FILE_EXTENSION);
-
+	// what's a gui without input :| ?
+	gEnv->pInput->AddEventListener(this);
 }
 
 void XGuiManager::Shutdown(void)
@@ -81,6 +83,7 @@ void XGuiManager::Shutdown(void)
 	gEnv->pHotReload->addfileType(nullptr, gui::GUI_FILE_EXTENSION);
 	gEnv->pHotReload->addfileType(nullptr, gui::GUI_BINARY_FILE_EXTENSION);
 
+	gEnv->pInput->RemoveEventListener(this);
 }
 
 IGui* XGuiManager::loadGui(const char* name)
@@ -191,5 +194,27 @@ bool XGuiManager::OnFileChange(const char* name)
 	return false;
 }
 // ~IXHotReload
+
+// IInputEventListner
+bool XGuiManager::OnInputEvent(const input::InputEvent& event)
+{
+	Guis::Iterator it;
+	for (it = guis_.begin(); it != guis_.end(); ++it) {
+		if ((*it)->OnInputEvent(event))
+			return true;
+	}
+	return false;
+}
+
+bool XGuiManager::OnInputEventChar(const input::InputEvent& event)
+{
+	Guis::Iterator it;
+	for (it = guis_.begin(); it != guis_.end(); ++it) {
+		if ((*it)->OnInputEventChar(event))
+			return true;
+	}
+	return false;
+}
+// ~IInputEventListner
 
 X_NAMESPACE_END

@@ -11,6 +11,7 @@
 
 X_NAMESPACE_BEGIN(gui)
 
+using namespace input;
 
 XGui::XGui() : 
 	pDesktop_(nullptr)
@@ -25,7 +26,7 @@ XGui::~XGui()
 
 void XGui::Redraw()
 {
-	if (pDesktop_)
+	if (isDeskTopValid())
 		pDesktop_->reDraw();
 }
 
@@ -41,6 +42,34 @@ const char* XGui::Activate(bool activate, int time)
 	return nullptr;
 }
 
+bool XGui::OnInputEvent(const input::InputEvent& event)
+{
+	if (event.deviceId == InputDevice::MOUSE)
+	{
+		if (event.action == InputState::CHANGED)
+		{
+			if (event.keyId == KeyId::MOUSE_X)
+				cursorPos_.x += event.value;
+			else if (event.keyId == KeyId::MOUSE_X)
+				cursorPos_.y += event.value;
+		}
+	}
+
+	if (isDeskTopValid())
+	{
+		pDesktop_->OnInputEvent(event);
+	}
+	return false;
+}
+
+bool XGui::OnInputEventChar(const input::InputEvent& event)
+{
+	if (isDeskTopValid())
+	{
+		pDesktop_->OnInputEventChar(event);
+	}
+	return false;
+}
 
 // -------------------------------------------
 
