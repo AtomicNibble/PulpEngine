@@ -76,8 +76,9 @@ bool XGui::OnInputEventChar(const input::InputEvent& event)
 
 bool XGui::InitFromFile(const char* name)
 {
-	core::Path path;
+	core::Path path, pathBinary;
 	core::XFileMemScoped file;
+	core::XFileScoped fileBinary;
 	core::fileModeFlags mode;
 
 	// TODO remove extension.?
@@ -112,35 +113,96 @@ bool XGui::InitFromFile(const char* name)
 	pDesktop_ = X_NEW(XWindow, g_3dEngineArena, "MenuWindow")(this);
 	pDesktop_->setFlag(WindowFlag::DESKTOP);
 
-	path = "gui/compiled/";
-	path.setFileName(name);
-	path.setExtension(GUI_BINARY_FILE_EXTENSION);
+	pathBinary = "gui/compiled/";
+	pathBinary.setFileName(name);
+	pathBinary.setExtension(GUI_BINARY_FILE_EXTENSION);
 
-	if (file.openFile(path.c_str(), mode))
+	// none binary
+	path = "gui/";
+	path.setFileName(name);
+	path.setExtension(GUI_FILE_EXTENSION);
+
+	// first we check if a binary file exsists.
+	FileHdr hdr;
+
+	if(gEnv->pFileSys->fileExists(pathBinary.c_str()))
 	{
-		// load the compiled version.
-		X_LOG0("Gui", "loading: \"%s\"", path.c_str());
-		X_ASSERT_NOT_IMPLEMENTED();
-		return false;
+		uint32_t sourceCrc32;
+		core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
+
+		// does a source version even exist?
+		if(gEnv->pFileSys->fileExists(path))
+		{
+			// TODO: check last modified.
+
+
+			// read the binary header.
+			if(!fileBinary.openFile(pathBinary.c_str(),mode))
+			{
+				X_ERROR("Gui", "Failed to open the compiled gui file, trying source.");
+				goto SourceLoad;
+			}
+
+			if(!fileBinary.readObj(hdr))
+			{
+				X_ERROR("Gui", "failed to read compiled gui header, trying source.");
+				goto SourceLoad;
+			}
+
+			if(!hdr.isValid())
+			{
+				X_ERROR("Gui", "compiled gui file header is corrupt, trying source");
+				goto SourceLoad;
+			}
+
+			// check the crc32 of the source.
+			if(file.openFile(path.c_str(), mode))
+			{
+				sourceCrc32 = pCrc32->GetCRC32(file.getBufferStart(), file.getSize());
+
+				if(hdr.crc32 != sourceCrc32)
+				{
+					goto SourceLoad;
+				}
+			}
+			else
+			{
+				X_ERROR("Gui", "Failed to read source version, trying binary.");
+				// try load binary?
+			}
+			
+			// we load the binary version if we are here.
+			return ParseBinaryFile(hdr, fileBinary);
+		}
+
 	}
 
 SourceLoad:
 
-	// try none binary
-	path = "gui/";
-	path.setFileName(name);
-	path.setExtension(GUI_FILE_EXTENSION);
-	if (file.openFile(path.c_str(), mode))
+	if(!file.IsOpen())
 	{
-		X_LOG0("Gui", "parsing: \"%s\"", path.c_str());
-		return ParseTextFile(file->getBufferStart(), file->getBufferEnd());
+		if (file.openFile(path.c_str(), mode))
+		{
+			X_DELETE_AND_NULL(pDesktop_, g_3dEngineArena);
+			X_ERROR("Gui", "failed to open gui file: \"%s\"", path.c_str());
+			return false;
+		}
 	}
 
-	X_DELETE_AND_NULL(pDesktop_, g_3dEngineArena);
-	X_ERROR("Gui", "failed to open gui file: \"%s\"", path.c_str());
-	return false;
+	X_LOG0("Gui", "parsing: \"%s\"", path.c_str());
+	return ParseTextFile(file->getBufferStart(), file->getBufferEnd());
 }
 
+
+bool XGui::ParseBinaryFile(const FileHdr& hdr, core::XFileScoped& file)
+{
+	// if we have no windows in the gui file we still class it as a valid file.
+	if(hdr.numWindows > 0)
+	{
+		return pDesktop_->Parse(hdr, file->GetFile());
+	}
+	return true;
+}
 
 bool XGui::ParseTextFile(const char* begin, const char* end)
 {

@@ -256,6 +256,15 @@ bool XWindow::Parse(core::XParser& lex)
 	return true;
 }
 
+
+bool XWindow::Parse(cost FileHdr& hdr, core::XFile* pFile)
+{
+	X_ASSERT_NOT_NULL(pFile);
+	uint32_t i, num = hdr.numWindows;
+
+	return true;
+}
+
 void XWindow::SetupFromState(void) 
 {
 	if (borderSize_ > 0.f) {

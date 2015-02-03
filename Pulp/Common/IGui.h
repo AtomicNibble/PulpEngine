@@ -48,6 +48,9 @@ X_NAMESPACE_BEGIN(gui)
 static const char*	GUI_FILE_EXTENSION = "gui";
 static const char*  GUI_BINARY_FILE_EXTENSION = "guib";
 
+static const uint32_t GUI_BINARY_MAGIC = TAG('g','u','i','b');
+static const uint8_t  GUI_BINARY_VERSION = 1;
+
 // some limits
 static const uint32_t GUI_MAX_MENUS = 64;
 static const uint32_t GUI_MENU_MAX_ITEMS = 512; // max per a menu
@@ -141,6 +144,38 @@ struct TextAlign
 	// max the value can be.
 	static const uint32_t MAX_VALUE = BOTTOM_RIGHT;
 };
+
+
+struct FileHdr
+{
+	FileHdr() {
+		core::zero_this(this);
+	}
+
+	uint32_t Magic;
+	uint8_t version;
+	uint8_t pad[3];
+	uint32_t crc32;
+	uint32_t Filesize;
+	uint32_t numWindows;
+
+	X_INLINE bool Isvalid(void) const {
+		return Magic == GUI_MAGIC;
+	}
+
+	X_INLINE bool IsCurrentVersion(void) const {
+		return version == GUI_BINARY_VERSION;
+	}
+
+	X_INLINE bool IsNotEmpty(void) const {
+		return numWindows > 0;
+	}
+};
+
+
+X_ENSURE_SIZE(FileHdr, 20)
+// i won't have a seprate gui flag.
+// i'll just implment a seralise methord in the window class.
 
 
 
