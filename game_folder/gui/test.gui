@@ -158,7 +158,7 @@ windowDef
 	{
 		name			"shader"
 		rect        		450 400 256 128 
-		backcolor   	1 0 1 1
+		backcolor   	1 1 1 1
 		forecolor   		1 0 0 1
 		bordercolor 	1 0 0 1
 		bordersize  		0
