@@ -172,8 +172,7 @@ bool XGui::InitFromFile(const char* name)
 			}
 			
 			// we load the binary version if we are here.
-			X_ASSERT_NOT_IMPLEMENTED();
-			
+			return ParseBinaryFile(hdr, fileBinary);
 		}
 
 	}
@@ -194,6 +193,16 @@ SourceLoad:
 	return ParseTextFile(file->getBufferStart(), file->getBufferEnd());
 }
 
+
+bool XGui::ParseBinaryFile(const FileHdr& hdr, core::XFileScoped& file)
+{
+	// if we have no windows in the gui file we still class it as a valid file.
+	if(hdr.numWindows > 0)
+	{
+		return pDesktop_->Parse(hdr, file->GetFile());
+	}
+	return true;
+}
 
 bool XGui::ParseTextFile(const char* begin, const char* end)
 {
