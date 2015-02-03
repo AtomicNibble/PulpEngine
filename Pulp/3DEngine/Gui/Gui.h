@@ -45,6 +45,7 @@ protected:
 
 	void setName(const char* name);
 private:
+	bool ParseBinaryFile(const FileHdr& hdr, core::XFile* pFile);
 	bool ParseTextFile(const char* begin, const char* end);
 
 	bool isDeskTopValid(void) const;

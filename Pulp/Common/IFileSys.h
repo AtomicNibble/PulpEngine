@@ -320,6 +320,9 @@ public:
 		return pFile_ != nullptr;
 	}
 
+	inline bool IsOpen(void) const {
+		return pFile_ != nullptr;
+	}
 
 	X_INLINE XFileMem* operator->(void) {
 		return pFile_;

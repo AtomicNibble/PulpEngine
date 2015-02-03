@@ -257,10 +257,11 @@ bool XWindow::Parse(core::XParser& lex)
 }
 
 
-bool XWindow::Parse(cost FileHdr& hdr, core::XFile* pFile)
+bool XWindow::Parse(uint32_t numChildren, core::XFile* pFile)
 {
 	X_ASSERT_NOT_NULL(pFile);
-	uint32_t i, num = hdr.numWindows;
+
+
 
 	return true;
 }

@@ -48,7 +48,7 @@ X_NAMESPACE_BEGIN(gui)
 static const char*	GUI_FILE_EXTENSION = "gui";
 static const char*  GUI_BINARY_FILE_EXTENSION = "guib";
 
-static const uint32_t GUI_BINARY_MAGIC = TAG('g','u','i','b');
+static const uint32_t GUI_BINARY_MAGIC = X_TAG('g','u','i','b');
 static const uint8_t  GUI_BINARY_VERSION = 1;
 
 // some limits
@@ -157,10 +157,10 @@ struct FileHdr
 	uint8_t pad[3];
 	uint32_t crc32;
 	uint32_t Filesize;
-	uint32_t numWindows;
+	uint32_t numchildren;
 
-	X_INLINE bool Isvalid(void) const {
-		return Magic == GUI_MAGIC;
+	X_INLINE bool IsValid(void) const {
+		return Magic == GUI_BINARY_MAGIC;
 	}
 
 	X_INLINE bool IsCurrentVersion(void) const {
@@ -168,7 +168,7 @@ struct FileHdr
 	}
 
 	X_INLINE bool IsNotEmpty(void) const {
-		return numWindows > 0;
+		return numchildren > 0;
 	}
 };
 

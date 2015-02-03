@@ -164,7 +164,7 @@ public:
 
 	// Overrides
 	virtual bool Parse(core::XParser& lex);
-	virtual bool Parse(cost FileHdr& hdr, core::XFile* pFile);
+	virtual bool Parse(const uint32_t numChildren, core::XFile* pFile);
 	virtual void draw(core::TimeVal time, float x, float y);
 	virtual void drawBackground(const Rectf& drawRect);
 	virtual void activate(bool activate);
