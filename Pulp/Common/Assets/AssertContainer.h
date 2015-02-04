@@ -4,6 +4,7 @@
 #ifndef X_BASE_ASSET_H_
 #define X_BASE_ASSET_H_
 
+
 #include <Threading\AtomicInt.h>
 #include <Containers\HashMap.h>
 #include <Containers\Array.h>
