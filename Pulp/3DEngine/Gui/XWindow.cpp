@@ -5,6 +5,7 @@
 #include <IFont.h>
 #include <IRender.h>
 #include <IRenderAux.h>
+#include <IFileSys.h>
 
 #include "GuiManger.h"
 
@@ -289,7 +290,7 @@ bool XWindow::Parse(core::XFile* pFile)
 	// shadow
 	pFile->readObj(shadowText_);
 	// flags
-	pFile->readObj(flags__);
+	pFile->readObj(flags_);
 
 	// read name :|
 	pFile->readObj(name_);

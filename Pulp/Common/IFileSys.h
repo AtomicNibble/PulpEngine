@@ -130,16 +130,16 @@ struct XFile
 	}
 
 	inline uint32_t readString(core::string& str) {
-			// uggh
-			char Char;
-			size_t pos = tell();
-			while(read(&Char, 1))
-			{
-					if(Char == '\0')
-						break;
-					str.append(Char);
-			}
-			return str.length(); 
+		// uggh
+		char Char;
+		size_t pos = tell();
+		while (read(&Char, 1))
+		{
+			if (Char == '\0')
+				break;
+			str += Char;
+		}
+		return safe_static_cast<uint32_t, size_t>(str.length());
 	}
 
 	template <typename T>

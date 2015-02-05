@@ -203,7 +203,7 @@ bool XGui::ParseBinaryFile(const FileHdr& hdr, core::XFile* pFile)
 	// i think i should just make it a memory file so that i can read form 
 	// that and it's provided th\t same functionatlity.
 
-	return pDesktop_->Parse(hdr.numchildren, pFile);
+	return pDesktop_->Parse(pFile);
 }
 
 bool XGui::ParseTextFile(const char* begin, const char* end)
