@@ -73,6 +73,19 @@ void XWinColor::fromFile(core::XFile* pFile)
 	pFile->readString(name);
 	pFile->readObj(value);
 }
+ 
+// write to file
+void XWinBool::toFile(core::XFile* pFile)
+{
+	pFile->writeString(name);
+	pFile->writeObj(value);
+}
+
+void XWinStr::toFile(core::XFile* pFile)
+{
+	pFile->writeString(name);
+	pFile->writeString(value);
+}
 
 
 X_NAMESPACE_END

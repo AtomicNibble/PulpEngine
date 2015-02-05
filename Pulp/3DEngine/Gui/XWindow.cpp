@@ -303,9 +303,12 @@ bool XWindow::Parse(core::XFile* pFile)
 	// read name :|
 	pFile->readObj(name_);
 
-	size_t i, numChildren;
+	// i still need to read the GuiScripts.
+	// and stuff like timeline events / transistions
+	// o.o
 
 	// numchildren at the end.
+	size_t i, numChildren;
 	pFile->readObj(numChildren);
 
 	if(numChildren > 0)
@@ -321,6 +324,18 @@ bool XWindow::Parse(core::XFile* pFile)
 	}
 
 	SetupFromState();
+	return true;
+}
+
+bool XWindow::WriteToFile(core::XFile* pFile)
+{
+	// for this i will need towrite all the vars to a 
+	// file and the scripts as well as all the transitions etc.	
+	// guess it's time to write the overrides for hte vars to be able tosae to a file.
+
+
+
+
 	return true;
 }
 

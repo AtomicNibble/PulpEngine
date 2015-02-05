@@ -47,6 +47,7 @@ public:
 	}
 
 	virtual void fromFile(core::XFile* pFile) X_ABSTRACT;
+	virtual void toFile(core::XFile* pFile) X_ABSTRACT;
 
 protected:
 	core::string name;
@@ -96,6 +97,9 @@ public:
 		value = oth;
 		return value;
 	}
+
+	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+
 
 protected:
 	bool value;
@@ -152,6 +156,8 @@ public:
 		return value.length();
 	}
 
+	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+
 protected:
 	core::string value;
 };
@@ -198,6 +204,8 @@ public:
 		return value;
 	}
 
+	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+
 protected:
 	int value;
 };
@@ -243,6 +251,8 @@ public:
 	operator float() const {
 		return value;
 	}
+
+	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
 
 protected:
 	float value;
@@ -302,6 +312,9 @@ public:
 	float y() const {
 		return value.y;
 	}
+
+	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+
 protected:
 	Vec2f value;
 };
@@ -364,6 +377,9 @@ public:
 	float z() const {
 		return value.z;
 	}
+
+	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+
 protected:
 	Vec3f value;
 };
@@ -432,6 +448,9 @@ public:
 	float w() const {
 		return value.w;
 	}
+
+	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+
 protected:
 	Vec4f value;
 };
@@ -519,6 +538,8 @@ public:
 		return value.getHeight();
 	}
 
+	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+
 protected:
 	Rectf value;
 };
@@ -589,6 +610,9 @@ public:
 	float a() const {
 		return value.a;
 	}
+
+	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+
 protected:
 	Color value;
 };
