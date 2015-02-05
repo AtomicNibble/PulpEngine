@@ -152,7 +152,7 @@ void XWindow::clear(void)
 	init_ = false;
 }
 
-coid XWindow::reset(void)
+void XWindow::reset(void)
 {
 	clear();
 	init();
@@ -283,7 +283,7 @@ bool XWindow::Parse(core::XFile* pFile)
 	hideCursor_.fromFile(pFile);
 	textScale_.fromFile(pFile);
 	// two srings.
-	text.fromFile(pFile);
+	text_.fromFile(pFile);
 	background_.fromFile(pFile);
 
 

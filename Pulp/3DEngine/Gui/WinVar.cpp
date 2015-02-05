@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "WinVar.h"
 
+#include <IFileSys.h>
+
 X_NAMESPACE_BEGIN(gui)
 
 XWinVar::XWinVar()
@@ -85,6 +87,48 @@ void XWinStr::toFile(core::XFile* pFile)
 {
 	pFile->writeString(name);
 	pFile->writeString(value);
+}
+
+void XWinInt::toFile(core::XFile* pFile)
+{
+	pFile->writeString(name);
+	pFile->writeObj(value);
+}
+
+void XWinFloat::toFile(core::XFile* pFile)
+{
+	pFile->writeString(name);
+	pFile->writeObj(value);
+}
+
+void XWinVec2::toFile(core::XFile* pFile)
+{
+	pFile->writeString(name);
+	pFile->writeObj(value);
+}
+
+void XWinVec3::toFile(core::XFile* pFile)
+{
+	pFile->writeString(name);
+	pFile->writeObj(value);
+}
+
+void XWinVec4::toFile(core::XFile* pFile)
+{
+	pFile->writeString(name);
+	pFile->writeObj(value);
+}
+
+void XWinRect::toFile(core::XFile* pFile)
+{
+	pFile->writeString(name);
+	pFile->writeObj(value);
+}
+
+void XWinColor::toFile(core::XFile* pFile)
+{
+	pFile->writeString(name);
+	pFile->writeObj(value);
 }
 
 

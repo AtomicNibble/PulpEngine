@@ -99,7 +99,7 @@ public:
 	}
 
 	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
-
+	virtual void toFile(core::XFile* pFile) X_OVERRIDE;
 
 protected:
 	bool value;
@@ -157,6 +157,7 @@ public:
 	}
 
 	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+	virtual void toFile(core::XFile* pFile) X_OVERRIDE;
 
 protected:
 	core::string value;
@@ -205,6 +206,7 @@ public:
 	}
 
 	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+	virtual void toFile(core::XFile* pFile) X_OVERRIDE;
 
 protected:
 	int value;
@@ -253,6 +255,7 @@ public:
 	}
 
 	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+	virtual void toFile(core::XFile* pFile) X_OVERRIDE;
 
 protected:
 	float value;
@@ -314,6 +317,7 @@ public:
 	}
 
 	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+	virtual void toFile(core::XFile* pFile) X_OVERRIDE;
 
 protected:
 	Vec2f value;
@@ -379,6 +383,7 @@ public:
 	}
 
 	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+	virtual void toFile(core::XFile* pFile) X_OVERRIDE;
 
 protected:
 	Vec3f value;
@@ -450,6 +455,7 @@ public:
 	}
 
 	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+	virtual void toFile(core::XFile* pFile) X_OVERRIDE;
 
 protected:
 	Vec4f value;
@@ -539,6 +545,7 @@ public:
 	}
 
 	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+	virtual void toFile(core::XFile* pFile) X_OVERRIDE;
 
 protected:
 	Rectf value;
@@ -612,6 +619,7 @@ public:
 	}
 
 	virtual void fromFile(core::XFile* pFile) X_OVERRIDE;
+	virtual void toFile(core::XFile* pFile) X_OVERRIDE;
 
 protected:
 	Color value;
