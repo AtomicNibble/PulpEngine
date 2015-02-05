@@ -151,6 +151,12 @@ void XWindow::clear(void)
 	init_ = false;
 }
 
+coid XWindow::reset(void)
+{
+	clear();
+	init();
+}
+
 
 
 // -------------- Parsing ---------------
@@ -170,8 +176,7 @@ void XWindow::RestoreExpressionParseState()
 bool XWindow::Parse(core::XParser& lex)
 {
 	// clear it.
-	clear();
-	init();
+	reset();
 
 	// we have a { }
 	core::XLexToken token;
@@ -264,18 +269,22 @@ bool XWindow::Parse(core::XFile* pFile)
 	// we read the info for this window out.
 	// read in the var's one by one.
 	// this will be a memory file so t's cheap.
+	reset();
 
-	pFile->readObj(rect_);
-	pFile->readObj(backColor_);
-	pFile->readObj(foreColor_);
-	pFile->readObj(hoverColor_);
-	pFile->readObj(borderColor_);
-	pFile->readObj(visable_);
-	pFile->readObj(hideCursor_);
-	pFile->readObj(textScale_);
+	// these are all vars and need to be parsed diffrent
+	// depending on the type.
+	rect_.fromFile(pFile);
+	backColor_.fromFile(pFile);
+	foreColor_.fromFile(pFile);
+	hoverColor_.fromFile(pFile);
+	borderColor_.fromFile(pFile);
+	visable_.fromFile(pFile);
+	hideCursor_.fromFile(pFile);
+	textScale_.fromFile(pFile);
 	// two srings.
-	pFile->readString(text_);
-	pFile->readString(background_);
+	text.fromFile(pFile);
+	background_.fromFile(pFile);
+
 
 	// style etc
 	pFile->readObj(style_);

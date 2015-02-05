@@ -133,6 +133,8 @@ struct XFile
 			// uggh
 			char Char;
 			size_t pos = tell();
+			str.clear();
+			str.reserve(16); // i'll probs have to re vists this whole function.
 			while(read(&Char, 1))
 			{
 					if(Char == '\0')

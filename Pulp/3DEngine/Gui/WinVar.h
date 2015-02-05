@@ -46,6 +46,8 @@ public:
 		return eval;
 	}
 
+	virtual void fromFile(core::XFile* pFile) X_ABSTRACT;
+
 protected:
 	core::string name;
 	bool eval;

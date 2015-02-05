@@ -134,6 +134,7 @@ public:
 
 	void init(void);
 	void clear(void);
+	void reset(void); // Clear() + Init();
 
 	// Parent
 	X_INLINE void setParent(XWindow* pParent);
