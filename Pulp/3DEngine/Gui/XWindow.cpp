@@ -268,7 +268,7 @@ bool XWindow::Parse(core::XFile* pFile)
 
 	// we read the info for this window out.
 	// read in the var's one by one.
-	// this will be a memory file so t's cheap.
+	// this will be a memory file so it's cheap.
 	reset();
 
 	// these are all vars and need to be parsed diffrent

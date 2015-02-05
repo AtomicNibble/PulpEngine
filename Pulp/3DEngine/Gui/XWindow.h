@@ -284,22 +284,22 @@ protected:
 	XWindow* pCaptureChild_;	// if a child window has mouse capture
 	XWindow* pOverChild_;		// if a child window has mouse capture
 
-	font::IFFont* pFont_;
-	engine::IMaterial* pBackgroundMat_;
+	font::IFFont* 			pFont_;
+	engine::IMaterial* 	pBackgroundMat_;
 
-	XGuiScriptList* scripts_[ScriptFunction::ENUM_COUNT];
+	XGuiScriptList* 		scripts_[ScriptFunction::ENUM_COUNT];
 
-	Children						children_;
-	core::Array<XDrawWin>			drawWindows_;
+	Children											children_;
+	core::Array<XDrawWin>					drawWindows_;
 
 	core::Array<XTimeLineEvent*>	timeLineEvents_;
 	core::Array<XTransitionData>	transitions_;
 
-	core::Array<xOpt>				ops_;
-	core::Array<float>				expressionRegisters_;
-	XRegisterList					regList_;
+	core::Array<xOpt>							ops_;
+	core::Array<float>						expressionRegisters_;
+	XRegisterList									regList_;
 
-	XGui*							pGui_;
+	XGui* pGui_;
 
 	bool* pSaveTemps_;
 

@@ -193,6 +193,8 @@ struct XFileMem : public XFile
 		X_DELETE_ARRAY(begin_,arena_);
 	}
 
+	// no need to add like readString() etc in here since they all call 
+	// read() which is overloaded here.
 	virtual uint32_t read(void* pBuf, uint32_t Len) X_FINAL{
 		size_t size = core::Min<size_t>(Len, remainingBytes());
 
