@@ -257,12 +257,61 @@ bool XWindow::Parse(core::XParser& lex)
 }
 
 
-bool XWindow::Parse(uint32_t numChildren, core::XFile* pFile)
+bool XWindow::Parse(core::XFile* pFile)
 {
 	X_ASSERT_NOT_NULL(pFile);
 
+	// we read the info for this window out.
+	// read in the var's one by one.
+	// this will be a memory file so t's cheap.
 
+	pFile->readObj(rect_);
+	pFile->readObj(backColor_);
+	pFile->readObj(foreColor_);
+	pFile->readObj(hoverColor_);
+	pFile->readObj(borderColor_);
+	pFile->readObj(visable_);
+	pFile->readObj(hideCursor_);
+	pFile->readObj(textScale_);
+	// two srings.
+	pFile->readString(text_);
+	pFile->readString(background_);
 
+	// style etc
+	pFile->readObj(style_);
+	// border
+	pFile->readObj(borderStyle_);
+	pFile->readObj(borderSize_);
+	// tezt align
+	pFile->readObj(textAlignX_);
+	pFile->readObj(textAlignY_);
+	pFile->readObj(textAlign_);
+	// shadow
+	pFile->readObj(shadowText_);
+	// flags
+	pFile->readObj(flags__);
+
+	// read name :|
+	pFile->readObj(name_);
+
+	size_t i, numChildren;
+
+	// numchildren at the end.
+	pFile->readObj(numChildren);
+
+	if(numChildren > 0)
+	{
+		for(i=0; i< numChildren; i++)
+		{
+				XWindow* pWin = X_NEW(XWindow,g_3dEngineArena,"ItemDef")(pGui_);
+				pWin->setParent(this);
+				pWin->Parse(pFile);
+
+				addChild(pWin);
+		}
+	}
+
+	SetupFromState();
 	return true;
 }
 

@@ -129,6 +129,19 @@ struct XFile
 		return read(&object, sizeof(T) * num);
 	}
 
+	inline uint32_t readString(core::string& str) {
+			// uggh
+			char Char;
+			size_t pos = tell();
+			while(read(&Char, 1))
+			{
+					if(Char == '\0')
+						break;
+					str.append(Char);
+			}
+			return str.length(); 
+	}
+
 	template <typename T>
 	inline uint32_t writeObj(const T& object) {
 		return write(&object, sizeof(T));

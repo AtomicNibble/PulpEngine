@@ -199,6 +199,9 @@ SourceLoad:
 
 bool XGui::ParseBinaryFile(const FileHdr& hdr, core::XFile* pFile)
 {
+	// should i just load the whole file and provides a meory cursor?
+	// i think i should just make it a memory file so that i can read form 
+	// that and it's provided th\t same functionatlity.
 
 	return pDesktop_->Parse(hdr.numchildren, pFile);
 }
