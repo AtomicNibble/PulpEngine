@@ -34,7 +34,11 @@ void XGui::Redraw()
 
 void XGui::DrawCursor(void)
 {
-
+	// windows call this function when they want the cursor draw.
+	// the position of the mouse is: cursorPos_
+	// GuiManger has the texture object.
+	// so that multiple gui's can share the same pointer.
+	// or maybe Gui should own it and it's just ref counted.
 
 }
 
