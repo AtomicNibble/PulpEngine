@@ -370,11 +370,11 @@ bool XWindow::WriteToFile(core::XFile* pFile)
 
 
 	// write how many children we have.
-	uint32_t numChildren = children_.size();
+	uint32_t numChildren = safe_static_cast<uint32_t, size_t>(children_.size());
 	pFile->writeObj(numChildren);
 
-	Childit it = children_;	
-	for(it = children_.begin(); it != children_.end(); ++it)
+	Childit it = children_.begin();
+	for(; it != children_.end(); ++it)
 	{
 		(*it)->WriteToFile(pFile);
 	}

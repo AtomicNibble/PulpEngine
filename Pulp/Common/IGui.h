@@ -168,7 +168,7 @@ struct FileHdr
 };
 
 
-X_ENSURE_SIZE(FileHdr, 20)
+X_ENSURE_SIZE(FileHdr, 16)
 // i won't have a seprate gui flag.
 // i'll just implment a seralise methord in the window class.
 

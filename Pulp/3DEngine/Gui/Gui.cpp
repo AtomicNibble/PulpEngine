@@ -5,6 +5,8 @@
 #include <String\XParser.h>
 
 #include <IFileSys.h>
+#include <IRender.h>
+#include "GuiManger.h"
 
 #include <Hashing\crc32.h>
 
@@ -40,13 +42,13 @@ void XGui::DrawCursor(void)
 	// so that multiple gui's can share the same pointer.
 	// or maybe Gui should own it and it's just ref counted.
 	
-	texture::ITexture* pCursorArrow_ = GetGuiManager()->GetCursor();
+	texture::ITexture* pCursorArrow = getGuiManager()->GetCursor();
 	render::IRender* pRender = getRender();
 
 	pRender->DrawQuadImageSS(
 		cursorPos_.x,cursorPos_.y,32,32,
 		pCursorArrow->getTexID(),
-		Col_Write
+		Col_White
 		);
 }
 
@@ -252,7 +254,7 @@ bool XGui::ParseTextFile(const char* begin, const char* end)
 bool XGui::SaveBinaryVersion(void)
 {
 	core::Path path;
-	core::XFileScoped fileBinary;
+	core::XFileScoped file;
 	core::fileModeFlags mode;
 	FileHdr hdr;
 
@@ -261,10 +263,10 @@ bool XGui::SaveBinaryVersion(void)
 	mode.Set(core::fileMode::RANDOM_ACCESS);
 
 	path = "gui\\compiled\\";
-	path.setFileName(name.c_str());
+	path.setFileName(getName());
 	path.setExtension(GUI_BINARY_FILE_EXTENSION);
 
-	if(file.Open(path.c_str(), mode))
+	if(file.openFile(path.c_str(), mode))
 	{
 		hdr.Magic = GUI_BINARY_MAGIC;
 		hdr.version = GUI_BINARY_VERSION;
@@ -274,7 +276,7 @@ bool XGui::SaveBinaryVersion(void)
 		file.writeObj(hdr);
 
 		// seralise all the chickens.
-		if(!pDesktop_->WriteToFile(file->GetFile()))
+		if(!pDesktop_->WriteToFile(file.GetFile()))
 		{
 			X_ERROR("Gui", "failed to save binary vesion of the following gui: %s", getName());
 			return false;
@@ -282,13 +284,9 @@ bool XGui::SaveBinaryVersion(void)
 
 		hdr.fileSize = safe_static_cast<uint32_t, size_t>(file.tell());
 
-		if(!file.seek(0,core::SeekMode::SET))
-		{
-			X_ERROR("Gui", "failed to update binary gui header");
-			return false; 
-		}
+		file.seek(0, core::SeekMode::SET);
 
-		return file.writeObj(hdr);
+		return file.writeObj(hdr) > 0;
 	}
 	return false;
 }
