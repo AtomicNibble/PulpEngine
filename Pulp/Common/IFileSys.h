@@ -412,7 +412,14 @@ public:
 	inline void seek(size_t position, SeekMode::Enum origin) {
 		X_ASSERT_NOT_NULL(pFile_);
 		pFile_->seek(position, origin);
+	}	
+
+	inline size_t tell(void) const {
+		X_ASSERT_NOT_NULL(pFile_);
+		return pFile_->tell();		
 	}
+
+
 
 	template <typename T>
 	inline uint32_t readObj(T& object) {
