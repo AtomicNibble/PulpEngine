@@ -48,6 +48,10 @@ public:
 		return var_showDebug_ == 1;
 	}
 
+	X_INLINE texture::ITexture* GetCursor(void) const {
+		return pCursorArrow_;
+	}
+
 private:
 	typedef core::Array<XGui*> Guis;
 

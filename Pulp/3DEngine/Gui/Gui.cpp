@@ -39,7 +39,15 @@ void XGui::DrawCursor(void)
 	// GuiManger has the texture object.
 	// so that multiple gui's can share the same pointer.
 	// or maybe Gui should own it and it's just ref counted.
+	
+	texture::ITexture* pCursorArrow_ = GetGuiManager()->GetCursor();
+	render::IRender* pRender = getRender();
 
+	pRender->DrawQuadImageSS(
+		cursorPos_.x,cursorPos_.y,32,32,
+		pCursorArrow->getTexID(),
+		Col_Write
+		);
 }
 
 const char* XGui::Activate(bool activate, int time)

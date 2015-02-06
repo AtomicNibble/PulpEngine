@@ -3,8 +3,12 @@
 #ifndef X_GUI_H_
 #define X_GUI_H_
 
+#include "EngineBase.h"
+
 #include <IGui.h>
 #include <IInput.h>
+
+
 
 X_NAMESPACE_BEGIN(gui)
 
@@ -13,7 +17,8 @@ class XGuiManager;
 
 // This is a interface container.
 // it has a baser menu which may have multiple childs menus.
-class XGui : public IGui
+class XGui : public IGui,
+ public engine::XEngineBase
 {
 public:
 	XGui();
