@@ -414,12 +414,16 @@ bool xFileSys::createDirectoryTree(pathType _path) const
 	X_ASSERT_NOT_NULL(_path);
 
 	// we want to just loop and create like a goat.
+	Path buf;
+
+	createOSPath(gameDir_, _path, buf);
+
 
 	// c:\\dir\\goat\\win\\bin
 	Path Path("");
 
-	const char* Start = _path;
-	const char* End = _path;
+	const char* Start = buf.begin();
+	const char* End = buf.begin();
 
 	lopi(MAX_PATH)
 	{
