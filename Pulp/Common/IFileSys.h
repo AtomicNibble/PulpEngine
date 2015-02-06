@@ -287,16 +287,16 @@ struct IFileSys
 	virtual void findClose(uintptr_t handle) X_ABSTRACT;
 
 	// Delete
-	virtual bool deleteFile(pathType path) const X_ABSTRACT;
+	virtual bool deleteFile(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_ABSTRACT;
 	virtual bool deleteDirectory(pathType path, bool recursive = false) const X_ABSTRACT;
 
 	// Create
-	virtual bool createDirectory(pathType path) const X_ABSTRACT;
-	virtual bool createDirectoryTree(pathType path) const X_ABSTRACT;
+	virtual bool createDirectory(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_ABSTRACT;
+	virtual bool createDirectoryTree(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_ABSTRACT;
 
 	// exsists.
-	virtual bool fileExists(pathType path) const X_ABSTRACT;
-	virtual bool directoryExists(pathType path) const X_ABSTRACT;
+	virtual bool fileExists(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_ABSTRACT;
+	virtual bool directoryExists(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_ABSTRACT;
 
 	// stats
 	virtual XFileStats& getStats(void) const X_ABSTRACT;

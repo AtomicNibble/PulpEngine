@@ -361,9 +361,12 @@ void xFileSys::findClose(uintptr_t handle)
 
 // --------------------- Delete ---------------------
 
-bool xFileSys::deleteFile(pathType path) const
+bool xFileSys::deleteFile(pathType path, WriteLocation::Enum location) const
 {
-	return ::DeleteFile(path) == TRUE;
+	Path buf;
+	createOSPath(gameDir_, path, buf);
+
+	return ::DeleteFile(buf.c_str()) == TRUE;
 }
 
 bool xFileSys::deleteDirectory(pathType path, bool recursive) const
@@ -371,7 +374,7 @@ bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 	Path temp;
 	core::zero_object(temp); // ensure 2 null bytes at end.
 
-	temp.append(path);
+	createOSPath(gameDir_, path, temp);
 
 	SHFILEOPSTRUCT file_op = {
 		NULL,
@@ -395,11 +398,14 @@ bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 
 // --------------------- Create ---------------------
 
-bool xFileSys::createDirectory(pathType path) const
+bool xFileSys::createDirectory(pathType path, WriteLocation::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
 
-	if (!::CreateDirectoryA(path, NULL) && lastError::Get() != ERROR_ALREADY_EXISTS)
+	Path buf;
+	createOSPath(gameDir_, path, buf);
+
+	if (!::CreateDirectoryA(buf.c_str(), NULL) && lastError::Get() != ERROR_ALREADY_EXISTS)
 	{
 		lastError::Description Dsc;
 		X_ERROR("xDir", "Failed to create directory. Error: %s", lastError::ToString(Dsc));
@@ -409,7 +415,7 @@ bool xFileSys::createDirectory(pathType path) const
 	return true;
 }
 
-bool xFileSys::createDirectoryTree(pathType _path) const
+bool xFileSys::createDirectoryTree(pathType _path, WriteLocation::Enum location) const
 {
 	X_ASSERT_NOT_NULL(_path);
 
@@ -460,7 +466,7 @@ bool xFileSys::createDirectoryTree(pathType _path) const
 
 // --------------------- exsists ---------------------
 
-bool xFileSys::fileExists(pathType path) const
+bool xFileSys::fileExists(pathType path, WriteLocation::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
 
@@ -486,7 +492,7 @@ bool xFileSys::fileExists(pathType path) const
 	return false;
 }
 
-bool xFileSys::directoryExists(pathType path) const
+bool xFileSys::directoryExists(pathType path, WriteLocation::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
 

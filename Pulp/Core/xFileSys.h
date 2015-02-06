@@ -93,16 +93,16 @@ public:
 	virtual void findClose(uintptr_t handle) X_FINAL;
 
 	// Delete
-	virtual bool deleteFile(pathType path) const X_FINAL;
+	virtual bool deleteFile(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_FINAL;
 	virtual bool deleteDirectory(pathType path, bool recursive = false) const X_FINAL;
 
 	// Create
-	virtual bool createDirectory(pathType path) const X_FINAL;
-	virtual bool createDirectoryTree(pathType path) const X_FINAL;
+	virtual bool createDirectory(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_FINAL;
+	virtual bool createDirectoryTree(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_FINAL;
 
 	// exsists.
-	virtual bool fileExists(pathType path) const X_FINAL;
-	virtual bool directoryExists(pathType path) const X_FINAL;
+	virtual bool fileExists(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_FINAL;
+	virtual bool directoryExists(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_FINAL;
 
 	// settings baby
 	const XFileSysVars* getVars() const { return &vars_; }
