@@ -156,8 +156,7 @@ struct FileHdr
 	uint8_t version;
 	uint8_t pad[3];
 	uint32_t crc32;
-	uint32_t Filesize;
-	uint32_t numchildren;
+	uint32_t fileSize;
 
 	X_INLINE bool IsValid(void) const {
 		return Magic == GUI_BINARY_MAGIC;
@@ -165,10 +164,6 @@ struct FileHdr
 
 	X_INLINE bool IsCurrentVersion(void) const {
 		return version == GUI_BINARY_VERSION;
-	}
-
-	X_INLINE bool IsNotEmpty(void) const {
-		return numchildren > 0;
 	}
 };
 

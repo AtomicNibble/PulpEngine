@@ -47,6 +47,7 @@ protected:
 
 	// Init this object with the contents of the file.
 	bool InitFromFile(const char* name);
+	bool SaveBinaryVersion(void);
 
 	void setName(const char* name);
 private:
@@ -60,6 +61,7 @@ private:
 	Vec2f cursorPos_;
 
 	XWindow*	pDesktop_;
+	uint32_t sourceCrc32_;
 };
 
 #include "Gui.inl"

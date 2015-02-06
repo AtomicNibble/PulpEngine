@@ -18,7 +18,7 @@ using namespace input;
 XGui::XGui() : 
 	pDesktop_(nullptr)
 {
-
+	sourceCrc32_ = 0;
 }
 
 XGui::~XGui()
@@ -137,13 +137,11 @@ bool XGui::InitFromFile(const char* name)
 	path.setFileName(name);
 	path.setExtension(GUI_FILE_EXTENSION);
 
-	// first we check if a binary file exsists.
+	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 
+	// first we check if a binary file exsists.
 	if(gEnv->pFileSys->fileExists(pathBinary.c_str()))
 	{
-		uint32_t sourceCrc32;
-		core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
-
 		// does a source version even exist?
 		if(gEnv->pFileSys->fileExists(path.c_str()))
 		{
@@ -172,10 +170,10 @@ bool XGui::InitFromFile(const char* name)
 			// check the crc32 of the source.
 			if(file.openFile(path.c_str(), mode))
 			{
-				sourceCrc32 = pCrc32->GetCRC32(file->getBufferStart(), 
+				sourceCrc32_ = pCrc32->GetCRC32(file->getBufferStart(), 
 					safe_static_cast<int32_t, size_t>(file->getSize()));
 
-				if(hdr.crc32 != sourceCrc32)
+				if(hdr.crc32 != sourceCrc32_)
 				{
 					goto SourceLoad;
 				}
@@ -202,6 +200,13 @@ SourceLoad:
 			X_ERROR("Gui", "failed to open gui file: \"%s\"", path.c_str());
 			return false;
 		}
+	}
+
+	// make sure we have a crc
+	if(sourceCrc32_ == 0)
+	{
+		sourceCrc32_ = pCrc32->GetCRC32(file->getBufferStart(), 
+			safe_static_cast<int32_t, size_t>(file->getSize()));
 	}
 
 	X_LOG0("Gui", "parsing: \"%s\"", path.c_str());
@@ -236,10 +241,55 @@ bool XGui::ParseTextFile(const char* begin, const char* end)
 		if (pDesktop_->Parse(lex))
 		{
 			pDesktop_->FixUpParms();
+			SaveBinaryVersion();
 			return true;
 		}
 	}
 
+	return false;
+}
+
+bool XGui::SaveBinaryVersion(void)
+{
+	core::Path path;
+	core::XFileScoped fileBinary;
+	core::fileModeFlags mode;
+	FileHdr hdr;
+
+	mode.Set(core::fileMode::WRITE);
+	mode.Set(core::fileMode::RECREATE);
+	mode.Set(core::fileMode::RANDOM_ACCESS);
+
+	path = "gui\\compiled\\";
+	path.setFileName(name.c_str());
+	path.setExtension(GUI_BINARY_FILE_EXTENSION);
+
+	if(file.Open(path.c_str(), mode))
+	{
+		hdr.Magic = GUI_BINARY_MAGIC;
+		hdr.version = GUI_BINARY_VERSION;
+		hdr.crc32 = sourceCrc32_;
+		hdr.fileSize = 0; // set after
+
+		file.writeObj(hdr);
+
+		// seralise all the chickens.
+		if(!pDesktop_->WriteToFile(file->GetFile()))
+		{
+			X_ERROR("Gui", "failed to save binary vesion of the following gui: %s", getName());
+			return false;
+		}
+
+		hdr.fileSize = safe_static_cast<uint32_t, size_t>(file.tell());
+
+		if(!file.seek(0,core::SeekMode::SET))
+		{
+			X_ERROR("Gui", "failed to update binary gui header");
+			return false; 
+		}
+
+		return file.writeObj(hdr);
+	}
 	return false;
 }
 
