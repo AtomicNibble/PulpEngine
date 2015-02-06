@@ -272,6 +272,7 @@ protected:
 	bool shadowText_;				// 'shadow'
 	bool __pad[2];
 	WindowFlags flags_;
+	// if you change this, update file read/write for XWindow
 	core::StackString<GUI_MAX_WINDOW_NAME_LEN> name_;
 	// ~
 

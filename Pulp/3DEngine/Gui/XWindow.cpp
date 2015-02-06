@@ -302,7 +302,7 @@ bool XWindow::Parse(core::XFile* pFile)
 	pFile->readObj(flags_);
 
 	// read name :|
-	pFile->readObj(name_);
+	pFile->readObj(name_); // it's Obj since stack string.
 
 	// i still need to read the GuiScripts.
 	// and stuff like timeline events / transistions
@@ -333,10 +333,51 @@ bool XWindow::WriteToFile(core::XFile* pFile)
 	// for this i will need towrite all the vars to a 
 	// file and the scripts as well as all the transitions etc.	
 	// guess it's time to write the overrides for hte vars to be able tosae to a file.
+	rect_.toFile(pFile);
+	backColor_.toFile(pFile);
+	foreColor_.toFile(pFile);
+	hoverColor_.toFile(pFile);
+	borderColor_.toFile(pFile);
+	visable_.toFile(pFile);
+	hideCursor_.toFile(pFile);
+	textScale_.toFile(pFile);
+	// two srings.
+	text_.toFile(pFile);
+	background_.toFile(pFile);
 
 
+	// style etc
+	pFile->writeObj(style_);
+	// border
+	pFile->writeObj(borderStyle_);
+	pFile->writeObj(borderSize_);
+	// tezt align
+	pFile->writeObj(textAlignX_);
+	pFile->writeObj(textAlignY_);
+	pFile->writeObj(textAlign_);
+	// shadow
+	pFile->writeObj(shadowText_);
+	// flags
+	pFile->writeObj(flags_);
+
+	// read name :|
+	pFile->writeObj(name_);
 
 
+	// need to write gui scripts and other things here.
+
+	
+
+
+	// write how many children we have.
+	uint32_t numChildren = children_.size();
+	pFile->writeObj(numChildren);
+
+	Childit it = children_;	
+	for(it = children_.begin(); it != children_.end(); ++it)
+	{
+		(*it)->WriteToFile(pFile);
+	}
 	return true;
 }
 

@@ -9,7 +9,7 @@
 #include <algorithm>
 
 
-X_NAMESPACE_BEGIN(gui)
+X_NAMESPACE_BEGIN(gui)                                                                                                                                        
 
 namespace
 {
