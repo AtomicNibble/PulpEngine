@@ -285,10 +285,15 @@ bool StackString<N>::replace(const char* start, const char* original, const char
 template <size_t N>
 bool StackString<N>::replace(const char* original, const char* replacement)
 {
-	X_ASSERT(strcmp(original, replacement) != 0, "Replace operation cannot be performed. Strings are identical.")(original, replacement);
-
 	// find the position of the string to replace
 	const uint32_t originalLength = strUtil::strlen(original);
+
+	if (originalLength == 0)
+		return true;
+
+	X_ASSERT(strcmp(original, replacement) != 0, "Replace operation cannot be performed. Strings are identical.")(original, replacement);
+
+
 	const char* pos = strUtil::Find(str_, str_ + len_, original, originalLength);
 	if (!pos)
 		return false;
