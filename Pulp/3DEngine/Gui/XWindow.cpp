@@ -314,13 +314,21 @@ bool XWindow::Parse(core::XFile* pFile)
 
 	if(numChildren > 0)
 	{
-		for(i=0; i< numChildren; i++)
+		if (numChildren < GUI_MENU_MAX_ITEMS)
 		{
-				XWindow* pWin = X_NEW(XWindow,g_3dEngineArena,"ItemDef")(pGui_);
+			for (i = 0; i < numChildren; i++)
+			{
+				XWindow* pWin = X_NEW(XWindow, g_3dEngineArena, "ItemDef")(pGui_);
 				pWin->setParent(this);
 				pWin->Parse(pFile);
 
 				addChild(pWin);
+			}
+		}
+		else
+		{
+			X_ERROR("Gui", "excceded max child items num: %i, max: %i", 
+				numChildren, GUI_MENU_MAX_ITEMS);
 		}
 	}
 
