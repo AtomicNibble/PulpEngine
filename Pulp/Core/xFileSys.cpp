@@ -148,7 +148,6 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, WriteLocation::Enum
 	}
 
 	return file;
-
 }
 
 void xFileSys::closeFile(XFile* file)
@@ -470,7 +469,11 @@ bool xFileSys::fileExists(pathType path, WriteLocation::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
 
-	DWORD dwAttrib = GetFileAttributes(path);
+	Path buf;
+	createOSPath(gameDir_, path, buf);
+
+
+	DWORD dwAttrib = GetFileAttributes(buf.c_str());
 
 	if (dwAttrib != INVALID_FILE_ATTRIBUTES) // make sure we did not fail for some shit, like permissions
 	{

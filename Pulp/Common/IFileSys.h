@@ -133,6 +133,7 @@ struct XFile
 		// uggh
 		char Char;
 		size_t pos = tell();
+		str.clear();
 		while (read(&Char, 1))
 		{
 			if (Char == '\0')
@@ -151,7 +152,9 @@ struct XFile
 	inline uint32_t writeObj(const T* objects, size_t num) {
 		return write(objects, safe_static_cast<uint32_t, size_t>(sizeof(T)* num));
 	}
-
+	inline uint32_t writeString(core::string& str) {
+		return write(str.c_str(), safe_static_cast<uint32_t, size_t>(str.length() + 1));
+	}
 	inline uint32_t writeString(const char* str) {
 		return write(str, safe_static_cast<uint32_t, size_t>(strlen(str) + 1));
 	}
