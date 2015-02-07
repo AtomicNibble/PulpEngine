@@ -266,6 +266,12 @@ bool XGui::SaveBinaryVersion(void)
 	path.setFileName(getName());
 	path.setExtension(GUI_BINARY_FILE_EXTENSION);
 
+	if (!gEnv->pFileSys->createDirectoryTree(path.c_str()))
+	{
+
+		return false;
+	}
+
 	if(file.openFile(path.c_str(), mode))
 	{
 		hdr.Magic = GUI_BINARY_MAGIC;
