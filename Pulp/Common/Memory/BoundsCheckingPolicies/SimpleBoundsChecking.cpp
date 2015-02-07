@@ -5,7 +5,7 @@
 X_NAMESPACE_BEGIN(core)
 
 
-const char* const SimpleBoundsChecking::TYPE_NAME = "";
+const char* const SimpleBoundsChecking::TYPE_NAME = "SimpleBoundsChecking";
 
 
 void SimpleBoundsChecking::GuardFront(void* memory)
