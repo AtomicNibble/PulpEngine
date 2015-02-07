@@ -268,7 +268,7 @@ bool XGui::SaveBinaryVersion(void)
 
 	if (!gEnv->pFileSys->createDirectoryTree(path.c_str()))
 	{
-
+		X_ERROR("Gui", "failed to create directory for saving binary version: %s", path.c_str());
 		return false;
 	}
 
