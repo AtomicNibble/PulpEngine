@@ -193,6 +193,7 @@ bool XGui::InitFromFile(const char* name)
 	}
 
 SourceLoad:
+	fileBinary.close();
 
 	if(!file.IsOpen())
 	{
@@ -243,7 +244,7 @@ bool XGui::ParseTextFile(const char* begin, const char* end)
 		if (pDesktop_->Parse(lex))
 		{
 			pDesktop_->FixUpParms();
-			SaveBinaryVersion();
+	//		SaveBinaryVersion();
 			return true;
 		}
 	}
@@ -266,11 +267,13 @@ bool XGui::SaveBinaryVersion(void)
 	path.setFileName(getName());
 	path.setExtension(GUI_BINARY_FILE_EXTENSION);
 
+#if 1
 	if (!gEnv->pFileSys->createDirectoryTree(path.c_str()))
 	{
 		X_ERROR("Gui", "failed to create directory for saving binary version: %s", path.c_str());
 		return false;
 	}
+#endif
 
 	if(file.openFile(path.c_str(), mode))
 	{
