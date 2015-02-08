@@ -158,3 +158,6 @@ $RECYCLE.BIN/
 
 #compiled shaders
 *.fxcb
+
+#compiled gui
+*.guib
