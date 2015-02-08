@@ -101,7 +101,8 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, WriteLocation::Enum
 	X_ASSERT_NOT_NULL(path);
 
 	XDiskFile* file = nullptr;
-	
+	core::Path real_path;
+
 	if (mode.IsSet(fileMode::READ))
 	{
 		_finddatai64_t findinfo;
@@ -109,7 +110,6 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, WriteLocation::Enum
 		XFindData FindData(path, this);
 		if (FindData.findnext(&findinfo))
 		{
-			core::Path real_path;
 			FindData.getOSPath(real_path, &findinfo);
 
 			// TODO: pool allocations.
@@ -129,17 +129,15 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, WriteLocation::Enum
 	}
 	else
 	{
-		Path buf;
-
 		// TODO: make createOSPath variation that takes a WriteLocation arg
 		if (location == WriteLocation::GAME)
-			createOSPath(gameDir_, path, buf);
+			createOSPath(gameDir_, path, real_path);
 		else
 		{
 			X_ASSERT_NOT_IMPLEMENTED();
 		}
 
-		file = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(buf.c_str(), mode);
+		file = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path.c_str(), mode);
 
 		if (!file->valid()) {
 			closeFile(file);
@@ -148,6 +146,7 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, WriteLocation::Enum
 	}
 
 	return file;
+
 }
 
 void xFileSys::closeFile(XFile* file)
