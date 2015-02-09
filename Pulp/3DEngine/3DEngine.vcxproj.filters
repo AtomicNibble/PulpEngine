@@ -101,7 +101,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="bsp.cd" />
     <None Include="Gui\XWindow.inl">
       <Filter>Gui</Filter>
     </None>
