@@ -96,7 +96,7 @@ void xFileSys::ShutDown()
 
 // --------------------- Open / Close ---------------------
 
-XFile* xFileSys::openFile(pathType path, fileModeFlags mode, WriteLocation::Enum location)
+XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location)
 {
 	X_ASSERT_NOT_NULL(path);
 
@@ -129,8 +129,8 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, WriteLocation::Enum
 	}
 	else
 	{
-		// TODO: make createOSPath variation that takes a WriteLocation arg
-		if (location == WriteLocation::GAME)
+		// TODO: make createOSPath variation that takes a VirtualDirectory arg
+		if (location == VirtualDirectory::GAME)
 			createOSPath(gameDir_, path, real_path);
 		else
 		{
@@ -160,7 +160,7 @@ void xFileSys::closeFile(XFile* file)
 
 
 // async
-XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, WriteLocation::Enum location)
+XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDirectory::Enum location)
 {
 	X_ASSERT_NOT_NULL(path);
 
@@ -359,7 +359,7 @@ void xFileSys::findClose(uintptr_t handle)
 
 // --------------------- Delete ---------------------
 
-bool xFileSys::deleteFile(pathType path, WriteLocation::Enum location) const
+bool xFileSys::deleteFile(pathType path, VirtualDirectory::Enum location) const
 {
 	Path buf;
 	createOSPath(gameDir_, path, buf);
@@ -396,7 +396,7 @@ bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 
 // --------------------- Create ---------------------
 
-bool xFileSys::createDirectory(pathType path, WriteLocation::Enum location) const
+bool xFileSys::createDirectory(pathType path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
 
@@ -413,7 +413,7 @@ bool xFileSys::createDirectory(pathType path, WriteLocation::Enum location) cons
 	return true;
 }
 
-bool xFileSys::createDirectoryTree(pathType _path, WriteLocation::Enum location) const
+bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(_path);
 
@@ -464,7 +464,7 @@ bool xFileSys::createDirectoryTree(pathType _path, WriteLocation::Enum location)
 
 // --------------------- exsists ---------------------
 
-bool xFileSys::fileExists(pathType path, WriteLocation::Enum location) const
+bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
 
@@ -494,7 +494,7 @@ bool xFileSys::fileExists(pathType path, WriteLocation::Enum location) const
 	return false;
 }
 
-bool xFileSys::directoryExists(pathType path, WriteLocation::Enum location) const
+bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
 

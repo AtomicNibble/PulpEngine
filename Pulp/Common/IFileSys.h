@@ -13,7 +13,7 @@ X_NAMESPACE_BEGIN(core)
 
 X_DECLARE_FLAGS(fileMode) (READ, WRITE, APPEND, WRITE_FLUSH, RECREATE, SHARE, RANDOM_ACCESS);
 X_DECLARE_FLAGS(SeekMode) (CUR, END, SET);
-X_DECLARE_ENUM(WriteLocation)(GAME, MOD);
+X_DECLARE_ENUM(VirtualDirectory)(GAME, MOD);
 
 typedef Flags<fileMode> fileModeFlags;
 
@@ -273,11 +273,11 @@ struct IFileSys
 	virtual void addModDir(pathType path) X_ABSTRACT;
 
 	// Open Files
-	virtual XFile* openFile(pathType path, fileModeFlags mode, WriteLocation::Enum location = WriteLocation::GAME) X_ABSTRACT;
+	virtual XFile* openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_ABSTRACT;
 	virtual void closeFile(XFile* file) X_ABSTRACT;
 
 	// async
-	virtual XFileAsync* openFileAsync(pathType path, fileModeFlags mode, WriteLocation::Enum location = WriteLocation::GAME) X_ABSTRACT;
+	virtual XFileAsync* openFileAsync(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_ABSTRACT;
 	virtual void closeFileAsync(XFileAsync* file) X_ABSTRACT;
 
 	// loads the whole file into memory.
@@ -290,16 +290,16 @@ struct IFileSys
 	virtual void findClose(uintptr_t handle) X_ABSTRACT;
 
 	// Delete
-	virtual bool deleteFile(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_ABSTRACT;
+	virtual bool deleteFile(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
 	virtual bool deleteDirectory(pathType path, bool recursive = false) const X_ABSTRACT;
 
 	// Create
-	virtual bool createDirectory(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_ABSTRACT;
-	virtual bool createDirectoryTree(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_ABSTRACT;
+	virtual bool createDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
+	virtual bool createDirectoryTree(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
 
 	// exsists.
-	virtual bool fileExists(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_ABSTRACT;
-	virtual bool directoryExists(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_ABSTRACT;
+	virtual bool fileExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
+	virtual bool directoryExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
 
 	// stats
 	virtual XFileStats& getStats(void) const X_ABSTRACT;

@@ -72,11 +72,11 @@ public:
 	void ShutDown() X_FINAL;
 
 	// Open / Close
-	XFile* openFile(pathType path, fileModeFlags mode, WriteLocation::Enum location = WriteLocation::GAME) X_FINAL;
+	XFile* openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;
 	void closeFile(XFile* file) X_FINAL;
 
 	// async
-	virtual XFileAsync* openFileAsync(pathType path, fileModeFlags mode, WriteLocation::Enum location = WriteLocation::GAME) X_FINAL;
+	virtual XFileAsync* openFileAsync(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;
 	virtual void closeFileAsync(XFileAsync* file) X_FINAL;
 
 	// Mem
@@ -93,16 +93,16 @@ public:
 	virtual void findClose(uintptr_t handle) X_FINAL;
 
 	// Delete
-	virtual bool deleteFile(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_FINAL;
+	virtual bool deleteFile(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
 	virtual bool deleteDirectory(pathType path, bool recursive = false) const X_FINAL;
 
 	// Create
-	virtual bool createDirectory(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_FINAL;
-	virtual bool createDirectoryTree(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_FINAL;
+	virtual bool createDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	virtual bool createDirectoryTree(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
 
 	// exsists.
-	virtual bool fileExists(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_FINAL;
-	virtual bool directoryExists(pathType path, WriteLocation::Enum location = WriteLocation::GAME) const X_FINAL;
+	virtual bool fileExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	virtual bool directoryExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
 
 	// settings baby
 	const XFileSysVars* getVars() const { return &vars_; }
