@@ -413,6 +413,10 @@ struct XShaderItem
 	technique_(0)
 	{}
 
+	// objects are ref counted so identical ones will point to the same memory.
+	// meaning the standard compare operator will work fine
+	// for checking if these are identical.
+
 	IShader* pShader_;
 	IRenderShaderResources* pResources_;
 	int32_t	 technique_;
