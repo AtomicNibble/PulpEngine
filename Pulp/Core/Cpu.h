@@ -41,10 +41,11 @@ public:
 				uint32_t m_name;							///< Identification String (part 2).
 			} edx;
 
-			static_assert(sizeof(EAX) == 4, "EAX has wrong size.");
-			static_assert(sizeof(EBX) == 4, "EBX has wrong size.");
-			static_assert(sizeof(ECX) == 4, "ECX has wrong size.");
-			static_assert(sizeof(EDX) == 4, "EDX has wrong size.");
+
+			X_ENSURE_SIZE(EAX, 4);
+			X_ENSURE_SIZE(EBX, 4);
+			X_ENSURE_SIZE(ECX, 4);
+			X_ENSURE_SIZE(EDX, 4);
 		};
 
 		/// Internal class representing general information (info type 1).
@@ -138,10 +139,10 @@ public:
 				uint32_t m_PBE : 1;							///< Pending break enable.
 			} edx;
 
-			static_assert(sizeof(EAX) == 4, "EAX has wrong size.");
-			static_assert(sizeof(EBX) == 4, "EBX has wrong size.");
-			static_assert(sizeof(ECX) == 4, "ECX has wrong size.");
-			static_assert(sizeof(EDX) == 4, "EDX has wrong size.");
+			X_ENSURE_SIZE(EAX, 4);
+			X_ENSURE_SIZE(EBX, 4);
+			X_ENSURE_SIZE(ECX, 4);
+			X_ENSURE_SIZE(EDX, 4);
 		};
 
 		/// Internal class representing extended information 0 (extended info type 0).
@@ -167,10 +168,12 @@ public:
 				uint32_t m_reserved2;						///< Reserved.
 			} edx;
 
-			static_assert(sizeof(EAX) == 4, "EAX has wrong size.");
-			static_assert(sizeof(EBX) == 4, "EBX has wrong size.");
-			static_assert(sizeof(ECX) == 4, "ECX has wrong size.");
-			static_assert(sizeof(EDX) == 4, "EDX has wrong size.");
+
+			X_ENSURE_SIZE(EAX, 4);
+			X_ENSURE_SIZE(EBX, 4);
+			X_ENSURE_SIZE(ECX, 4);
+			X_ENSURE_SIZE(EDX, 4);
+
 		};
 
 		/// Internal class representing extended information 1 (extended info type 1).
@@ -220,16 +223,17 @@ public:
 				uint32_t m_3Dnow : 1;						///< 3Dnow! instructions (AMD).
 			} edx;
 
-			static_assert(sizeof(EAX) == 4, "EAX has wrong size.");
-			static_assert(sizeof(EBX) == 4, "EBX has wrong size.");
-			static_assert(sizeof(ECX) == 4, "ECX has wrong size.");
-			static_assert(sizeof(EDX) == 4, "EDX has wrong size.");
+			X_ENSURE_SIZE(EAX, 4);
+			X_ENSURE_SIZE(EBX, 4);
+			X_ENSURE_SIZE(ECX, 4);
+			X_ENSURE_SIZE(EDX, 4);
+
 		};
 
-		static_assert(sizeof(Info0) == 16, "Info0 has wrong size.");
-		static_assert(sizeof(Info1) == 16, "Info1 has wrong size.");
-		static_assert(sizeof(InfoEx0) == 16, "InfoEx0 has wrong size.");
-		static_assert(sizeof(InfoEx1) == 16, "InfoEx1 has wrong size.");
+		X_ENSURE_SIZE(Info0, 16);
+		X_ENSURE_SIZE(Info1, 16);
+		X_ENSURE_SIZE(InfoEx0, 16);
+		X_ENSURE_SIZE(InfoEx1, 16);
 
 		Info0 info0;
 		Info1 info1;
@@ -237,7 +241,7 @@ public:
 		InfoEx1 infoEx1;
 	};
 
-	static_assert(sizeof(CpuID) == 16, "CpuID has wrong size.");
+	X_ENSURE_SIZE(CpuID, 16);
 
 
 	typedef PROCESSOR_CACHE_TYPE CacheType;
@@ -245,10 +249,10 @@ public:
 	/// Holds information about a particular cache.
 	struct CacheInfo
 	{
-		unsigned int	m_size;
-		unsigned short	m_lineSize;
-		unsigned char	m_associativity;
-		CacheType		m_type;
+		uint32_t	m_size;
+		uint16_t	m_lineSize;
+		uint8_t		m_associativity;
+		CacheType	m_type;
 	};
 
 public:
