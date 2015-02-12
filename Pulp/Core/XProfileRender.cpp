@@ -363,12 +363,12 @@ void XProfileSys::DrawLabel(float x, float y, const char* pStr, Color& col, Flag
 
 void XProfileSys::DrawRect(float x1, float y1, float x2, float y2, Color& col)
 {
-
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 void XProfileSys::DrawRect(Vec4f& rec, Color& col)
 {
-
+	X_ASSERT_NOT_IMPLEMENTED()
 }
 
 X_NAMESPACE_END
