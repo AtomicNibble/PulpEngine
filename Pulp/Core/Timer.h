@@ -21,42 +21,41 @@ public:
 //	virtual void StartUp();
 //	virtual void ShutDown();
 
-	bool Init(ICore *pCore);
+	bool Init(ICore *pCore) X_FINAL;
 
 	// reset the timers.
-	virtual void Reset();
+	virtual void Reset(void) X_FINAL;
 
 	// start of frame sets the timers values.
-	virtual void OnFrameBegin();
+	virtual void OnFrameBegin(void) X_FINAL;
 
-	virtual float GetCurrTime(Timer::Enum which = Timer::GAME) {
+	virtual float GetCurrTime(Timer::Enum which = Timer::GAME) X_FINAL{
 		return Timers_[which].GetSeconds();
 	}
 
 	// returns the start time of the frame for the respective timer
-	virtual const TimeVal& GetFrameStartTime(Timer::Enum which = Timer::GAME) {
+	virtual const TimeVal& GetFrameStartTime(Timer::Enum which = Timer::GAME) X_FINAL{
 		return Timers_[which];
 	}
 
 	// gets the time right now.
-	virtual TimeVal GetAsyncTime() const;
+	virtual TimeVal GetAsyncTime(void) const X_FINAL;
 	// gets the time right now as seconds.
-	virtual float GetAsyncCurTime();
+	virtual float GetAsyncCurTime(void) X_FINAL;
 
 	// gets avg frame time.
-	virtual float GetFrameTime() const;
+	virtual float GetFrameTime(void) const X_FINAL;
 
 	// get the time scale
-	virtual float GetTimeScale();
+	virtual float GetTimeScale(void) X_FINAL;
 	// set hte time scale
-	virtual void SetTimeScale(float scale);
+	virtual void SetTimeScale(float scale) X_FINAL;
 
 	// returns the current frame weight
-	virtual float GetFrameRate();
+	virtual float GetFrameRate(void) X_FINAL;
 
 private:
 	void RefreshTime(Timer::Enum which, int64 curTime);
-
 
 	float GetAverageFrameTime(float sec, float FrameTime, float LastAverageFrameTime);
 

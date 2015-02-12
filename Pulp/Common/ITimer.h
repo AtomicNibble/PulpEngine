@@ -20,8 +20,10 @@ struct ITimer
 
 	virtual bool Init(ICore *pCore) X_ABSTRACT;
 
+	virtual void Reset(void) X_ABSTRACT;
+
 	// start of frame sets the timers values.
-	virtual void OnFrameBegin() X_ABSTRACT;
+	virtual void OnFrameBegin(void) X_ABSTRACT;
 
 	// returns the start time of the frame for the respective timer
 	virtual float GetCurrTime(Timer::Enum which = Timer::GAME) X_ABSTRACT;
@@ -30,21 +32,21 @@ struct ITimer
 	virtual const TimeVal& GetFrameStartTime(Timer::Enum which = Timer::GAME) X_ABSTRACT;
 
 	// returns the absolute time right now
-	virtual TimeVal GetAsyncTime() const X_ABSTRACT;
+	virtual TimeVal GetAsyncTime(void) const X_ABSTRACT;
 	// returns the absolute time as seconds
-	virtual float GetAsyncCurTime() X_ABSTRACT;
+	virtual float GetAsyncCurTime(void) X_ABSTRACT;
 
 	// gets avg frame time.
-	virtual float GetFrameTime() const X_ABSTRACT;
+	virtual float GetFrameTime(void) const X_ABSTRACT;
 
 	// Returns the time scale applied to time values.
-	virtual float GetTimeScale() X_ABSTRACT;
+	virtual float GetTimeScale(void) X_ABSTRACT;
 
 	// Sets the time scale applied to time values.
 	virtual void SetTimeScale(float scale) X_ABSTRACT;
 
 	// Returns the current fps.
-	virtual float GetFrameRate() X_ABSTRACT;
+	virtual float GetFrameRate(void) X_ABSTRACT;
 
 
 protected:
