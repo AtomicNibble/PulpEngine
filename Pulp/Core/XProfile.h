@@ -17,19 +17,17 @@ class XProfileSys : public IProfileSys
 {
 public:
 	XProfileSys();
-	~XProfileSys() X_OVERRIDE;
+	~XProfileSys() X_FINAL;
 
-	virtual void Init(ICore* pCore) X_OVERRIDE;
+	virtual void Init(ICore* pCore) X_FINAL;
 
-	virtual void AddProfileData(XProfileData* pData) X_OVERRIDE;
+	virtual void AddProfileData(XProfileData* pData) X_FINAL;
 
-	virtual void FrameBegin() X_OVERRIDE;
-	virtual void FrameEnd() X_OVERRIDE;
-
-
+	virtual void FrameBegin(void) X_FINAL;
+	virtual void FrameEnd(void) X_FINAL;
 
 private:
-	void UpdateProfileData();
+	void UpdateProfileData(void);
 
 	static void ScopeStart(XProfileScope* pProScope);
 	static void ScopeEnd(XProfileScope* pProScope);
@@ -86,7 +84,7 @@ private:
 
 
 	void AddProfileDisplayData_r(XProfileData* pData, int lvl);
-	void DisplayProfileData();
+	void DisplayProfileData(void);
 
 public:
 	// Rendering (called by core)
@@ -121,8 +119,8 @@ private:
 		const char* name);
 
 	// ~Rendering
-	void UpdateSubSystemInfo();
-	void ClearSubSystems();
+	void UpdateSubSystemInfo(void);
+	void ClearSubSystems(void);
 
 private:
 	typedef core::Array<XProfileData*>	Profilers;

@@ -62,7 +62,7 @@ void XProfileSys::Render(void)
 	pRender_->FlushTextBuffer();
 }
 
-void XProfileSys::UpdateSubSystemInfo()
+void XProfileSys::UpdateSubSystemInfo(void)
 {
 	uint32_t i;
 	subSystemTotal_ = 0;
@@ -73,7 +73,7 @@ void XProfileSys::UpdateSubSystemInfo()
 	}
 }
 
-void XProfileSys::ClearSubSystems()
+void XProfileSys::ClearSubSystems(void)
 {
 	// reset
 	uint32_t i;

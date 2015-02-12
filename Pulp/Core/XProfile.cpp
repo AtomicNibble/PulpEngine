@@ -128,7 +128,7 @@ void XProfileSys::AddProfileData(XProfileData* pData)
 	profiles_.push_back(pData);
 }
 
-void XProfileSys::FrameBegin()
+void XProfileSys::FrameBegin(void)
 {
 	if (!isEnabled())
 		return;
@@ -139,7 +139,7 @@ void XProfileSys::FrameBegin()
 
 }
 
-void XProfileSys::FrameEnd()
+void XProfileSys::FrameEnd(void)
 {
 	if (!isEnabled())
 		return;
@@ -183,7 +183,7 @@ void XProfileSys::AddProfileDisplayData_r(XProfileData* pData, int lvl)
 
 
 
-void XProfileSys::DisplayProfileData()
+void XProfileSys::DisplayProfileData(void)
 {
 	size_t i;
 
@@ -207,7 +207,7 @@ void XProfileSys::DisplayProfileData()
 
 }
 
-void XProfileSys::UpdateProfileData()
+void XProfileSys::UpdateProfileData(void)
 {
 	for (int i = 0; i<(int)profiles_.size(); i++)
 	{
