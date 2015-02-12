@@ -19,7 +19,7 @@
 
 #include <String\StrRef.h>
 
-#include <TimeVal.h>
+#include <Time\TimeVal.h>
 
 #include "Logging\Logger.h"
 #include "Logging\FilterPolicies\LoggerNoFilterPolicy.h"

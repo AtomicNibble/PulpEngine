@@ -3,7 +3,7 @@
 #ifndef _X_TIMER_I_H_
 #define _X_TIMER_I_H_
 
-#include "TimeVal.h"
+#include <Time\TimeVal.h>
 
 #include <Util\FlagsMacros.h>
 
