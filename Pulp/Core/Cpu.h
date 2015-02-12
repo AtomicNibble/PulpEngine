@@ -249,10 +249,10 @@ public:
 	/// Holds information about a particular cache.
 	struct CacheInfo
 	{
-		uint32_t	m_size;
-		uint16_t	m_lineSize;
-		uint8_t		m_associativity;
-		CacheType	m_type;
+		uint32_t	size_;
+		uint16_t	lineSize_;
+		uint8_t		associativity_;
+		CacheType	type_;
 	};
 
 public:
@@ -305,23 +305,23 @@ private:
 	X_NO_ASSIGN(CpuInfo);
 	X_NO_COPY(CpuInfo);
 
-	char m_cpuVendor[16];
-	char m_cpuName[64];
+	char cpuVendor_[16];
+	char cpuName_[64];
 
-	CpuID::Info0 m_info0;
-	CpuID::Info1 m_info1;
-	CpuID::InfoEx0 m_infoEx0;
-	CpuID::InfoEx1 m_infoEx1;
+	CpuID::Info0 info0_;
+	CpuID::Info1 info1_;
+	CpuID::InfoEx0 infoEx0_;
+	CpuID::InfoEx1 infoEx1_;
 
-	uint32_t m_coreCount;
-	uint32_t m_logicalProcessorCount;
+	uint32_t coreCount_;
+	uint32_t logicalProcessorCount_;
 
 	// number of caches in each hierarchy (L1, L2, L3)
-	uint32_t m_cacheCount[3];
+	uint32_t cacheCount_[3];
 
 	// up to 64 cache infos for each cache in the hierarchy (L1, L2, L3)
 	// e.g., a PC with 32 cores and hyper-threading returns 64 L1 cache infos.
-	CacheInfo m_caches[3][MAX_CACHE_COUNT];
+	CacheInfo caches_[3][MAX_CACHE_COUNT];
 };
 
 

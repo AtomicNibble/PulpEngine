@@ -3,70 +3,70 @@
 
 X_INLINE const char* CpuInfo::GetCpuName(void) const
 {
-	return m_cpuName;
+	return cpuName_;
 }
 
 X_INLINE const char* CpuInfo::GetCpuVendor(void) const
 {
-	return m_cpuVendor;
+	return cpuVendor_;
 }
 
 X_INLINE unsigned int CpuInfo::GetCoreCount(void) const
 {
-	return m_coreCount;
+	return coreCount_;
 }
 
 X_INLINE unsigned int CpuInfo::GetLogicalProcessorCount(void) const
 {
-	return m_logicalProcessorCount;
+	return logicalProcessorCount_;
 }
 
 X_INLINE const CpuInfo::CpuID::Info0& CpuInfo::GetInfoType0(void) const
 {
-	return m_info0;
+	return info0_;
 }
 
 X_INLINE const CpuInfo::CpuID::Info1& CpuInfo::GetInfoType1(void) const
 {
-	return m_info1;
+	return info1_;
 }
 
 X_INLINE const CpuInfo::CpuID::InfoEx0& CpuInfo::GetExtendedInfoType0(void) const
 {
-	return m_infoEx0;
+	return infoEx0_;
 }
 
 X_INLINE const CpuInfo::CpuID::InfoEx1& CpuInfo::GetExtendedInfoType1(void) const
 {
-	return m_infoEx1;
+	return infoEx1_;
 }
 
 X_INLINE unsigned int CpuInfo::GetL1CacheCount(void) const
 {
-	return m_cacheCount[0];
+	return cacheCount_[0];
 }
 
 X_INLINE unsigned int CpuInfo::GetL2CacheCount(void) const
 {
-	return m_cacheCount[1];
+	return cacheCount_[1];
 }
 
 X_INLINE unsigned int CpuInfo::GetL3CacheCount(void) const
 {
-	return m_cacheCount[2];
+	return cacheCount_[2];
 }
 
 X_INLINE const CpuInfo::CacheInfo& CpuInfo::GetL1CacheInfo(unsigned int i) const
 {
-	return m_caches[0][i];
+	return caches_[0][i];
 }
 
 X_INLINE const CpuInfo::CacheInfo& CpuInfo::GetL2CacheInfo(unsigned int i) const
 {
-	return m_caches[1][i];
+	return caches_[1][i];
 }
 
 X_INLINE const CpuInfo::CacheInfo& CpuInfo::GetL3CacheInfo(unsigned int i) const
 {
-	return m_caches[2][i];
+	return caches_[2][i];
 }
