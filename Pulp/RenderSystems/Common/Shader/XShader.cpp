@@ -1220,7 +1220,7 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 
 		lexer.setFlags(LexFlag::ALLOWPATHNAMES);
 
-		while (lexer.SkipUntilString("#include"))
+		while (lexer.SkipUntilString("#"))
 		{
 			fileName.clear();
 
@@ -1238,7 +1238,10 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 				}
 				else
 				{
-					// not a valid include
+					// check if it's a valid prepro type.
+					ShaderPrePro prepro;
+
+					// add it to the prepro list.
 					continue;
 				}
 			}

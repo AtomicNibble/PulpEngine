@@ -150,6 +150,24 @@ protected:
 };
 
 
+struct ShaderPrePro
+{
+	struct Type
+	{
+		enum Enum 
+		{
+				DEFINE,
+				IFDEF,
+				IFNDEF,
+				ELSE,
+				ENDIF	
+		};
+
+	};
+
+	core::string expression;
+};
+
 // a hlsl
 struct SourceFile
 {
@@ -165,7 +183,7 @@ protected:
 	core::string fileName;
 	core::string fileData;
 	core::Array<SourceFile*> includedFiles;
-//	core::Array<core::string> refrences;
+	core::Array<ShaderPrePro> prePros;
 	std::unordered_set<core::string, core::hash<core::string>> refrences;
 	uint32_t sourceCrc32;
 };
