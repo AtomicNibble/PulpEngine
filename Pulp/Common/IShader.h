@@ -142,6 +142,8 @@ struct VertexFormat
 		Num
 	};
 
+	// REMEBER: if you add new types that the input layout sytem 
+	// will need to check for it's flag.
 	static const char* toString(Enum type) {
 		switch (type) {
 	//		case P3F_C4B_T2F:
