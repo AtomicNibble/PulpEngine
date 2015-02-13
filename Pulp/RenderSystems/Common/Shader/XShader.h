@@ -175,7 +175,8 @@ struct SourceFile
 
 	SourceFile() :
 		sourceCrc32(0),
-		includedFiles(g_rendererArena)
+		includedFiles(g_rendererArena),
+		prePros(g_rendererArena)
 	{}
 
 protected:
@@ -345,7 +346,7 @@ private:
 	XShader* loadShader(const char* name);
 	XShader* reloadShader(const char* name);
 	// ParseIncludesAndPrePro_r
-	void ParseIncludeFiles_r(SourceFile* file, core::Array<SourceFile*>& includedFiles,
+	void ParseIncludesAndPrePro_r(SourceFile* file, core::Array<SourceFile*>& includedFiles,
 		bool reload = false);
 
 

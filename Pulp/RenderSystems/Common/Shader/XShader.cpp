@@ -1178,7 +1178,7 @@ SourceFile* XShaderManager::loadRawSourceFile(const char* name, bool reload)
 				pfile->fileData = str;
 
 				// load any files it includes.
-				ParseIncludeFilesAndPrePro_r(pfile, pfile->includedFiles, reload);
+				ParseIncludesAndPrePro_r(pfile, pfile->includedFiles, reload);
 
 				return pfile;
 			}
@@ -1194,7 +1194,7 @@ SourceFile* XShaderManager::loadRawSourceFile(const char* name, bool reload)
 				Sourcebin.insert(std::make_pair(data->fileName, data));
 			
 				// load any files it includes.
-				ParseIncludeFilesAndPrePro_r(data, data->includedFiles);
+				ParseIncludesAndPrePro_r(data, data->includedFiles);
 				
 				return data;
 			}
@@ -1265,7 +1265,7 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 					== includedFiles.end())
 				{
 					// check if for includes.
-					ParseIncludeFilesAndPrePro_r(childFile, includedFiles);
+					ParseIncludesAndPrePro_r(childFile, includedFiles);
 					
 					// add the include files crc to this one.
 					// only after parsing for child includes so that
