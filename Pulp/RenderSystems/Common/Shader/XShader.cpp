@@ -21,6 +21,38 @@ X_NAMESPACE_BEGIN(shader)
 
 using namespace core;
 
+// flags for the diffrent input types that can be present in a shader.
+//
+//	base is awlways:
+//		
+//		POS, UV
+//
+//		so we need omes for:
+//
+//		Normals
+//		BiNornmals & Tangents (always together)
+//		Color
+//
+//		Nolte we have diffrent types for some.
+//		like there is UV that is 3 floats.
+//		other uv's are 2 16bit floats.
+//
+//		but this is worked out in reflection.
+//		since i can work out what type they are.
+//
+//		this bit needs to be done pre compiel tho since i need to know what inputs type it even supports.
+//
+
+
+namespace 
+{
+	const char* pInputFlags[] = {
+			"Normal",
+			"BiNornmal"
+			"Color"
+	};
+}
+
 
 BlendType::Enum BlendType::typeFromStr(const char* _str)
 {
