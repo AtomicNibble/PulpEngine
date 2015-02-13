@@ -160,25 +160,25 @@ CpuInfo::CpuInfo(void)
 	zero_object(*this);
 
 	if (!HasCPUID()) {
-	//	X_WARNING("CpuInfo", "CPU dose not support cpuid");
+		X_WARNING("CpuInfo", "CPU dose not support cpuid");
 		return;
 	}
 
-	ProcessVendor(m_info0, m_cpuVendor);
+	ProcessVendor(info0_, cpuVendor_);
 
-	if (m_info0.eax.m_maxValidValue >= 1)
+	if (info0_.eax.m_maxValidValue >= 1)
 	{
-		cpuid(&m_info1, 1);
-		cpuid(&m_infoEx0, 0x80000000);
+		cpuid(&info1_, 1);
+		cpuid(&infoEx0_, 0x80000000);
 
-		if (m_infoEx0.eax.m_maxValidValue >= 0x80000001)
+		if (infoEx0_.eax.m_maxValidValue >= 0x80000001)
 		{
-			cpuid(&m_infoEx1, 0x80000001);
+			cpuid(&infoEx1_, 0x80000001);
 		}
 
-		if (m_infoEx0.eax.m_maxValidValue >= 0x80000004)
+		if (infoEx0_.eax.m_maxValidValue >= 0x80000004)
 		{
-			ProcessCPUName(m_cpuName);
+			ProcessCPUName(cpuName_);
 		}
 	}
 
@@ -194,8 +194,8 @@ CpuInfo::CpuInfo(void)
 			switch (Rel)
 			{
 			case RelationProcessorCore:
-				m_coreCount++;
-				m_logicalProcessorCount += bitUtil::CountBits(cpuInfo[i].ProcessorMask);
+				coreCount_++;
+				logicalProcessorCount_ += bitUtil::CountBits(cpuInfo[i].ProcessorMask);
 				break;
 
 			case RelationNumaNode:
@@ -210,26 +210,26 @@ CpuInfo::CpuInfo(void)
 
 					if (Cache.Level <= 3)
 					{
-						uint32_t& Count = m_cacheCount[Cache.Level - 1];
+						uint32_t& Count = cacheCount_[Cache.Level - 1];
 
 						if (Count < 0x40)
 						{
-							CacheInfo& Info = m_caches[Cache.Level - 1][Count++];
+							CacheInfo& Info = caches_[Cache.Level - 1][Count++];
 
-							Info.m_associativity = Cache.Associativity;
-							Info.m_lineSize = Cache.LineSize;
-							Info.m_size = Cache.Size;
-							Info.m_type = Cache.Type;
+							Info.associativity_ = Cache.Associativity;
+							Info.lineSize_ = Cache.LineSize;
+							Info.size_ = Cache.Size;
+							Info.type_ = Cache.Type;
 						}
 						else
 						{
 							Count++; // inc before assert
-						//	X_ASSERT(false, "Unexpected number of caches at level %d.", Cache.Level)(Count);
+							X_ASSERT(false, "Unexpected number of caches at level %d.", Cache.Level)(Count);
 						}
 					}
 					else
 					{
-					//	X_ASSERT(false, "Unexpected cache level.")(Cache.Level);
+						X_ASSERT(false, "Unexpected cache level.")(Cache.Level);
 					}
 
 				}

@@ -51,7 +51,7 @@ bool XTimer::Init(ICore* pCore)
 //////////////////////////////////////////////////
 
 
-void XTimer::Reset()
+void XTimer::Reset(void)
 {
 	BaseTime_ = SysTimer::Get();
 	LastTime_ = 0;
@@ -64,7 +64,7 @@ void XTimer::Reset()
 
 //////////////////////////////////////////////////
 
-void XTimer::OnFrameBegin()
+void XTimer::OnFrameBegin(void)
 {
 	X_PROFILE_BEGIN("GameTimer", core::ProfileSubSys::CORE);
 
@@ -145,14 +145,14 @@ void XTimer::OnFrameBegin()
 }
 
 
-TimeVal XTimer::GetAsyncTime() const
+TimeVal XTimer::GetAsyncTime(void) const
 {
 	int64 now = SysTimer::Get();
 
 	return TimeVal(now);
 }
 
-float XTimer::GetAsyncCurTime()
+float XTimer::GetAsyncCurTime(void)
 {
 	int64 now = SysTimer::Get();
 
@@ -164,13 +164,13 @@ float XTimer::GetAsyncCurTime()
 }
 
 
-float XTimer::GetFrameTime() const
+float XTimer::GetFrameTime(void) const
 {
 	return FrameTimeActual_;
 }
 
 
-float XTimer::GetTimeScale()
+float XTimer::GetTimeScale(void)
 {
 	return this->time_scale_;
 }
@@ -182,7 +182,7 @@ void XTimer::SetTimeScale(float scale)
 
 
 // we should avg this.
-float XTimer::GetFrameRate()
+float XTimer::GetFrameRate(void)
 {
 	// the frame rate is 1 / the frame time
 	if (FrameTimeActual_ != 0.f) // prevent devide by zero.
