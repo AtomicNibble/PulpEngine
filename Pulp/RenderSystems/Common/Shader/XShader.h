@@ -326,7 +326,7 @@ private:
 	XShader* createShader(const char* name);
 	XShader* loadShader(const char* name);
 	XShader* reloadShader(const char* name);
-	
+	// ParseIncludesAndPrePro_r
 	void ParseIncludeFiles_r(SourceFile* file, core::Array<SourceFile*>& includedFiles,
 		bool reload = false);
 
