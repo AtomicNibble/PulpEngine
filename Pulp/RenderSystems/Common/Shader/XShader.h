@@ -191,6 +191,7 @@ protected:
 	core::Array<SourceFile*> includedFiles;
 	core::Array<PrePro> prePros;
 	std::unordered_set<core::string, core::hash<core::string>> refrences;
+	Flags<ILFlag> ILFlags;
 	uint32_t sourceCrc32;
 };
 

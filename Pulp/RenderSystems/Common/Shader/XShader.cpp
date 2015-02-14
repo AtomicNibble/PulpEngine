@@ -1302,9 +1302,7 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 									// starts with IL_
 									if (ifDefValue.findCaseInsen("IL_") == ifDefValue.begin())
 									{
-										Flags<ILFlag> flags;
-
-										if (!ILFlagFromStr(ifDefValue.begin() + 3, flags))
+										if (!ILFlagFromStr(ifDefValue.begin() + 3, file->ILFlags))
 										{
 											X_ERROR("Shader", "invalid InputLayout prepro in shader: % value: %s",
 												file->name.c_str(), ifDefValue.c_str());
