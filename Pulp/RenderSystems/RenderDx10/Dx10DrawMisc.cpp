@@ -178,9 +178,11 @@ void DX11XRender::DrawQuadImageSS(float x, float y, float width, float height,
 
 	// We are finished with accessing the vertex buffer
 	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
-
 	// Bind our vertex as the first data stream of our device
 	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+
+
+	texture::XTexture::applyFromId(0, texture_id, 0);
 
 	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
 		return;
