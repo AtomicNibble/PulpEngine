@@ -150,23 +150,28 @@ protected:
 };
 
 
-struct ShaderPrePro
+// in the shader name space so it's ok to call just: PrePro
+X_DECLARE_ENUM(PreProType)(Include, Define, Undef, If, IfDef, IfNDef, Else, EndIF);
+X_DECLARE_FLAGS(ILFlag)(Normal, BiNormal, Color);
+
+struct InputLayoutEntry
 {
-	struct Type
-	{
-		enum Enum 
-		{
-				DEFINE,
-				IFDEF,
-				IFNDEF,
-				ELSE,
-				ENDIF	
-		};
+	const char* name;
+	ILFlag::Enum flag;
+};
 
-	};
+struct PreProEntry
+{
+	const char* name;
+	PreProType::Enum type;
+};
 
+struct PrePro
+{
+	PreProType::Enum type;
 	core::string expression;
 };
+
 
 // a hlsl
 struct SourceFile
@@ -184,7 +189,7 @@ protected:
 	core::string fileName;
 	core::string fileData;
 	core::Array<SourceFile*> includedFiles;
-	core::Array<ShaderPrePro> prePros;
+	core::Array<PrePro> prePros;
 	std::unordered_set<core::string, core::hash<core::string>> refrences;
 	uint32_t sourceCrc32;
 };

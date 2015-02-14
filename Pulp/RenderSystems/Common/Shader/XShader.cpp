@@ -46,11 +46,55 @@ using namespace core;
 
 namespace 
 {
-	const char* pInputFlags[] = {
-			"Normal",
-			"BiNornmal"
-			"Color"
+	// must be prefixed with IL_ (Input Layout)
+	InputLayoutEntry g_ILFlags[] = {
+		{ "Normal", ILFlag::Normal },
+		{ "BiNornmal", ILFlag::BiNormal },
+		{ "Color", ILFlag::Color },
 	};
+
+
+	bool ILFlagFromStr(const char* pStr, Flags<ILFlag>& flagOut)
+	{
+		const size_t num = sizeof(g_ILFlags) / sizeof(const char*);
+		size_t i;
+		for (i = 0; i < num; i++)
+		{
+			if (strUtil::IsEqualCaseInsen(pStr, g_ILFlags[i].name))
+			{
+				flagOut.Set(g_ILFlags[i].flag);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	PreProEntry g_ProPros[] =
+	{
+		{ "include", PreProType::Include },
+		{ "define", PreProType::Define },
+		{ "undef", PreProType::Undef },
+		{ "if", PreProType::If },
+		{ "ifdef", PreProType::IfDef },
+		{ "ifndef", PreProType::IfNDef },
+		{ "else", PreProType::Else },
+		{ "endif", PreProType::EndIF },
+	};
+
+	bool PreProFromStr(core::XLexToken& token, PreProType::Enum& typeOut)
+	{
+		const size_t num = sizeof(g_ProPros) / sizeof(PreProEntry);
+		size_t i;
+		for (i = 0; i < num; i++)
+		{
+			if (strUtil::IsEqualCaseInsen(token.begin(), token.end(), g_ProPros[i].name))
+			{
+				typeOut = g_ProPros[i].type;
+				return true;
+			}
+		}
+		return false;
+	}
 }
 
 
@@ -1226,22 +1270,60 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 
 			if (lexer.ReadTokenOnLine(token))
 			{
-				if (token.isEqual("include"))
+				// check if it's a valid prepro type.
+				PrePro prepro;
+
+				if (PreProFromStr(token, prepro.type))
 				{
-					const char* start = token.begin() - 1;
-					
-					if (lexer.ReadTokenOnLine(token))
+					if (prepro.type == PreProType::Include)
 					{
-						fileName = StackString512(token.begin(), token.end());
-						memset((char*)start, ' ', (token.end() - start) + 1);
-					}			
+						const char* start = token.begin() - 1;
+						if (lexer.ReadTokenOnLine(token))
+						{
+							// get the file name, then remove it from the buffer
+							// to stop Dx compiler trying to include it.
+							fileName.set(token.begin(), token.end());
+							memset((char*)start, ' ', (token.end() - start) + 1);
+						}
+					}
+					else
+					{
+						// which ones do i care about :|
+						// ifdef only tbh, for IL
+						if (prepro.type == PreProType::IfDef)
+						{
+							core::StackString512 ifDefValue;
+							if (lexer.ReadTokenOnLine(token))
+							{
+								if (token.length() > 3) // IL_
+								{
+									ifDefValue.set(token.begin(), token.end());
+									ifDefValue.trim(); // remove white spaces
+									// starts with IL_
+									if (ifDefValue.findCaseInsen("IL_") == ifDefValue.begin())
+									{
+										Flags<ILFlag> flags;
+
+										if (!ILFlagFromStr(ifDefValue.begin() + 3, flags))
+										{
+											X_ERROR("Shader", "invalid InputLayout prepro in shader: % value: %s",
+												file->name.c_str(), ifDefValue.c_str());
+										}
+									}
+								}
+								else
+								{
+									// dont care about these.
+								}
+							}
+						}
+					}
 				}
 				else
 				{
-					// check if it's a valid prepro type.
-					ShaderPrePro prepro;
-
-					// add it to the prepro list.
+					// just make use of this buffer
+					fileName.set(token.begin(), token.end()); 
+					X_ERROR("Shader", "Invalid prepro in shader source: %s", fileName.c_str());
 					continue;
 				}
 			}
