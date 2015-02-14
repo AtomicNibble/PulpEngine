@@ -67,7 +67,7 @@ bool XGui::OnInputEvent(const input::InputEvent& event)
 		{
 			if (event.keyId == KeyId::MOUSE_X)
 				cursorPos_.x += event.value;
-			else if (event.keyId == KeyId::MOUSE_X)
+			else if (event.keyId == KeyId::MOUSE_Y)
 				cursorPos_.y += event.value;
 		}
 	}
