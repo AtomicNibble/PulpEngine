@@ -78,3 +78,8 @@ X_INLINE void xWindow::Destroy(void)
 {
 	DestroyWindow(m_window);
 }
+
+X_INLINE void xWindow::HideClientCursor(bool hide)
+{
+	this->m_HideClientCursor = hide;
+}

@@ -102,7 +102,10 @@ xWindow::xWindow(const char* const Title, int x, int y, int width, int height, M
 }
 */
 
-xWindow::xWindow() : m_NumMsgs(0), m_InputCheck(FALSE), m_pFrame(nullptr)
+xWindow::xWindow() : 
+m_NumMsgs(0),
+m_HideClientCursor(FALSE),
+m_pFrame(nullptr)
 {
 	RegisterClass();
 }
@@ -291,8 +294,15 @@ bool xWindow::Create(const char* const Title, int x, int y, int width, int heigh
 
 LRESULT xWindow::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 {
-	switch(msg)
+	switch (msg)
 	{
+		case WM_SETCURSOR:
+			if (LOWORD(lParam) == HTCLIENT && m_HideClientCursor)
+			{
+				SetCursor(NULL);
+				return TRUE;
+			}
+			break;
 		case WM_ACTIVATE:
 			gEnv->pCore->GetCoreEventDispatcher()->OnCoreEvent(
 				CoreEvent::CHANGE_FOCUS, wParam, lParam);

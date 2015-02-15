@@ -65,6 +65,7 @@ public:
 	X_INLINE void MaxiMise(void);
 	X_INLINE void Restore(void);
 	X_INLINE void Destroy(void);
+	X_INLINE void HideClientCursor(bool hide = true);
 //	X_INLINE bool isValid(void);
 	
 	virtual void MoveTo(int x, int y);
@@ -113,7 +114,7 @@ protected:
 
 	mutable DWORD m_NumMsgs;
 	HWND m_window;
-	BOOL m_InputCheck;
+	bool m_HideClientCursor;
 
 	xFrame* m_pFrame;
 
