@@ -374,33 +374,10 @@ bool XTexture::Load()
 	{
 		X_WARNING("Texture", "Failed to load: \"%s\"", this->FileName.c_str());
 		flags.Set(TextureFlags::LOAD_FAILED);
-
-
-		// can't do this since these are chnaged on reload.
-		// we must actualy return the default texture object.
-		// and add a refrence.
-		// for hot reloading i'll probs make it check if it's default.
-		// and if so just unrefrnce it.
-#if 0
-		// assing default.
-		if(XTexture::s_DefaultTexturesLoaded)
-		{
-			XTexture* pDefault = XTexture::s_pTexDefault;
-
-			this->DeviceTexture = pDefault->DeviceTexture;
-			this->defaultTexStateId_ = pDefault->defaultTexStateId_;
-			this->pDeviceShaderResource_ = pDefault->pDeviceShaderResource_;
-			this->pDeviceRenderTargetView_ = pDefault->pDeviceRenderTargetView_;
-
-			this->dimensions = pDefault->dimensions;
-			this->datasize = pDefault->datasize;
-			this->format = pDefault->format;
-			this->numMips = pDefault->numMips;
-			this->depth = pDefault->depth;
-			this->numFaces = pDefault->numFaces;
-
-		}
-#endif
+	}
+	else
+	{
+		flags.Remove(TextureFlags::LOAD_FAILED);
 	}
 
 	return bRes;
@@ -666,9 +643,10 @@ XTexture* XTexture::FromName(const char* name, TextureFlags Flags)
 
 		if (!pTex->Load())
 		{
-
-
-			return XTexture::s_pTexDefault;
+		//	i now return the correct texture object, so when loading fails.
+		//  a valid hot reload will correctly update the broken ones.
+		//  the use of default texture is now done and bind stage.
+		//	return XTexture::s_pTexDefault;
 		}
 	}
 

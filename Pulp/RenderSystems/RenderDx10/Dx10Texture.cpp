@@ -158,6 +158,13 @@ void XTexture::apply(int slot, int state_id, shader::ShaderType::Enum type)
 		return;
 	}
 
+	// valid?
+	if (this->flags.IsSet(TexFlag::LOAD_FAILED))
+	{
+		XTexture::s_pTexDefault->apply(slot,state_id, type);
+		return;
+	}
+
 	// changed?
 	if (s_pCurrentTexture[slot] == this)
 		return;
@@ -172,7 +179,6 @@ void XTexture::apply(int slot, int state_id, shader::ShaderType::Enum type)
 	pResView = (ID3D11ShaderResourceView*)this->pDeviceShaderResource_;
 
 	dv->PSSetShaderResources(slot, 1, &pResView);
-
 }
 
 
