@@ -256,6 +256,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		}
 
 		pWindow_->CustomFrame(true);
+		pWindow_->HideClientCursor(true);
 
 		// Alogn it
 		if (pConsole)
