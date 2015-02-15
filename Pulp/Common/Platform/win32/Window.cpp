@@ -96,16 +96,16 @@ void xWindow::UnRegisterClass(void)
 
 /* 
 xWindow::xWindow(const char* const Title, int x, int y, int width, int height, Mode::Enum mode) : m_NumMsgs(0), m_InputCheck(FALSE)
-	, m_pFrame( nullptr )
+	, pFrame_( nullptr )
 {
 	CreateWindow(Title, x, y, width, height, mode);
 }
 */
 
 xWindow::xWindow() : 
-m_NumMsgs(0),
-m_HideClientCursor(FALSE),
-m_pFrame(nullptr)
+numMsgs_(0),
+hideClientCursor_(FALSE),
+pFrame_(nullptr)
 {
 	RegisterClass();
 }
@@ -115,7 +115,7 @@ xWindow::~xWindow(void)
 {
 	Destroy();
 	UnRegisterClass();
-	X_DELETE(m_pFrame, gEnv->pArena);
+	X_DELETE(pFrame_, gEnv->pArena);
 }
 
 
@@ -129,7 +129,7 @@ xWindow::Notification::Enum xWindow::PumpMessages(void) const
 	// need two for WM_INPUT goat shiz.
 	while (PeekMessage(&msg, NULL, 0, WM_INPUT - 1, PM_REMOVE))
 	{
-		m_NumMsgs++;
+		numMsgs_++;
 
 		if (msg.message == WM_CLOSE)
 			return Notification::CLOSE;
@@ -140,7 +140,7 @@ xWindow::Notification::Enum xWindow::PumpMessages(void) const
 
 	while (PeekMessage(&msg, NULL, WM_INPUT + 1, 0xffffffff, PM_REMOVE))
 	{
-		m_NumMsgs++;
+		numMsgs_++;
 
 		if(msg.message == WM_CLOSE)
 			return Notification::CLOSE;
@@ -159,19 +159,19 @@ void xWindow::CustomFrame(bool val)
 {
 	if (val)
 	{
-		if (m_pFrame == nullptr)
-			m_pFrame = X_NEW( xFrame, gEnv->pArena, "Win32CustomFrame");
+		if (pFrame_ == nullptr)
+			pFrame_ = X_NEW( xFrame, gEnv->pArena, "Win32CustomFrame");
 	}
 	else
 	{
-		if (m_pFrame != nullptr)
+		if (pFrame_ != nullptr)
 		{
-			X_DELETE_AND_NULL(m_pFrame, gEnv->pArena);
+			X_DELETE_AND_NULL(pFrame_, gEnv->pArena);
 
 
-			RedrawWindow(m_window, NULL, NULL, RDW_FRAME | RDW_UPDATENOW | RDW_NOCHILDREN);
-			::InvalidateRect(m_window, NULL, TRUE);
-			::UpdateWindow(m_window);
+			RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_UPDATENOW | RDW_NOCHILDREN);
+			::InvalidateRect(window_, NULL, TRUE);
+			::UpdateWindow(window_);
 		}
 	}
 }
@@ -179,8 +179,8 @@ void xWindow::CustomFrame(bool val)
 void xWindow::MoveTo(int x, int y)
 {
 	RECT rect;
-	GetWindowRect( m_window, &rect );
-	MoveWindow( m_window, x, y, rect.right - rect.left, rect.bottom - rect.top, FALSE );
+	GetWindowRect( window_, &rect );
+	MoveWindow( window_, x, y, rect.right - rect.left, rect.bottom - rect.top, FALSE );
 }
 
 void xWindow::MoveTo(const Position& position)
@@ -192,7 +192,7 @@ void xWindow::MoveTo(const Position& position)
 void xWindow::AlignTo(const Recti& Rect, xAlign alignment)
 {
 	RECT _Rect;
-	GetWindowRect( m_window, &_Rect );
+	GetWindowRect( window_, &_Rect );
 
 	Recti rect = Convert(_Rect);
 	rect.Align(Rect, alignment);
@@ -204,7 +204,7 @@ void xWindow::AlignTo(const Recti& Rect, xAlign alignment)
 Recti xWindow::GetRect(void) const
 {
 	RECT rect;
-	GetWindowRect( m_window, &rect );
+	GetWindowRect( window_, &rect );
 
 	return Convert(rect);
 }
@@ -212,7 +212,7 @@ Recti xWindow::GetRect(void) const
 Recti xWindow::GetClientRect(void) const
 {
 	RECT rect;
-	::GetClientRect( m_window, &rect );
+	::GetClientRect( window_, &rect );
 
 	return Convert(rect);
 }
@@ -266,7 +266,7 @@ bool xWindow::Create(const char* const Title, int x, int y, int width, int heigh
 		height = safe_static_cast<int,LONG>( Rect.bottom - Rect.top );
 	}
 
-	m_window = CreateWindowEx( 
+	window_ = CreateWindowEx( 
 		0, 
 		g_EngineName, 
 		Title, 
@@ -281,12 +281,12 @@ bool xWindow::Create(const char* const Title, int x, int y, int width, int heigh
 
 
 	HICON hIcon = NULL; //  LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ENGINE_LOGO));
-	SendMessage(m_window, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
-	SendMessage(m_window, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+	SendMessage(window_, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
+	SendMessage(window_, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
 
-	X_ERROR_IF( m_window == NULL, "Window", "Failed to create window. Title: '%s'. Error: %s", Title, lastError::ToString( Dsc ) );
+	X_ERROR_IF( window_ == NULL, "Window", "Failed to create window. Title: '%s'. Error: %s", Title, lastError::ToString( Dsc ) );
 
-	return m_window != NULL;
+	return window_ != NULL;
 }
 
 
@@ -297,7 +297,7 @@ LRESULT xWindow::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 	switch (msg)
 	{
 		case WM_SETCURSOR:
-			if (LOWORD(lParam) == HTCLIENT && m_HideClientCursor)
+			if (LOWORD(lParam) == HTCLIENT && hideClientCursor_)
 			{
 				SetCursor(NULL);
 				return TRUE;
@@ -323,8 +323,8 @@ LRESULT xWindow::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 			break;
 	}
 
-	if( m_pFrame ) 
-		return m_pFrame->DrawFrame( hWnd, msg, wParam, lParam );		
+	if( pFrame_ ) 
+		return pFrame_->DrawFrame( hWnd, msg, wParam, lParam );		
 
 	return DefWindowProc( hWnd, msg, wParam, lParam );
 }

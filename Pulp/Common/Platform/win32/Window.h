@@ -21,8 +21,6 @@ class xFrame;
 class xWindow
 {
 public:
-//	static void Startup(void);
-//	static void Shutdown(void);
 
 public:
 	/// Types for position size etc.
@@ -30,8 +28,6 @@ public:
 	typedef Vec2i Position;
 	typedef Recti Rect;
 
-//	typedef Event<void (UINT, WPARAM, LPARAM)> InputEvent;
-//	typedef Event<void (RAWINPUT*)> RawInputEvent;
 
 	struct Mode {
 		enum Enum {
@@ -81,19 +77,16 @@ public:
 
 public:
 
-	const DWORD GetNumMsgs(void) const { return m_NumMsgs; }
-	const DWORD GetNumMsgsClear(void) const { DWORD ret = m_NumMsgs; m_NumMsgs = 0; return ret; }
+	X_INLINE const uint32_t GetNumMsgs(void) const;
+	X_INLINE const uint32_t GetNumMsgsClear(void) const;
 
-//	X_INLINE void Bind(InputEvent::Sink* sink);
-//	X_INLINE void Bind(RawInputEvent::Sink* sink);
-
-	X_INLINE unsigned int GetClientWidth(void) const;
-	X_INLINE unsigned int GetClientHeight(void) const;
+	X_INLINE uint32_t GetClientWidth(void) const;
+	X_INLINE uint32_t GetClientHeight(void) const;
 
 public:
-	/// Returns the xRect of the primary display monitor, not overlapping the taskbar.
+	// Returns the xRect of the primary display monitor, not overlapping the taskbar.
 	static Rect GetPrimaryRect(void);
-	/// Returns the xRect of the complete desktop area, spanning all monitors and overlapping the taskbar.
+	// Returns the xRect of the complete desktop area, spanning all monitors and overlapping the taskbar.
 	static Rect GetDesktopRect(void);
 
 	X_INLINE HWND GetNativeWindow(void);
@@ -109,14 +102,11 @@ private:
 	static void UnRegisterClass();
 
 protected:
-	//	InputEvent m_inputEvent;
-	//	RawInputEvent m_rawInputEvent;
+	mutable uint32_t numMsgs_;
+	HWND window_;
+	bool hideClientCursor_;
 
-	mutable DWORD m_NumMsgs;
-	HWND m_window;
-	bool m_HideClientCursor;
-
-	xFrame* m_pFrame;
+	xFrame* pFrame_;
 
 	static uint32_t s_numwindows;
 };

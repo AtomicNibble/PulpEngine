@@ -1,85 +1,84 @@
 
-X_INLINE unsigned int xWindow::GetClientWidth(void) const
+X_INLINE uint32_t xWindow::GetClientWidth(void) const
 {
-	return safe_static_cast<unsigned int>(GetClientRect().getWidth());
+	return safe_static_cast<uint32_t>(GetClientRect().getWidth());
 }
 
 
-X_INLINE unsigned int xWindow::GetClientHeight(void) const
+X_INLINE uint32_t xWindow::GetClientHeight(void) const
 {
-	return safe_static_cast<unsigned int>(GetClientRect().getHeight());
+	return safe_static_cast<uint32_t>(GetClientRect().getHeight());
 }
-
-/*
-X_INLINE void xWindow::Bind(InputEvent::Sink* sink)
-{
-	m_inputEvent.Bind(sink);
-}
-
-
-X_INLINE void xWindow::Bind(RawInputEvent::Sink* sink)
-{
-	m_rawInputEvent.Bind(sink);
-}*/
 
 
 X_INLINE HWND xWindow::GetNativeWindow(void)
 {
-	return m_window;
+	return window_;
 }
-
 
 X_INLINE const HWND xWindow::GetNativeWindow(void) const
 {
-	return m_window;
+	return window_;
 }
 
 X_INLINE bool xWindow::Hasfocus(void) const
 {
-	return ::GetForegroundWindow() == this->m_window;
+	return ::GetForegroundWindow() == this->window_;
 }
 
 X_INLINE void xWindow::Show(void)
 {
-	ShowWindow(m_window, SW_SHOW);
+	ShowWindow(window_, SW_SHOW);
 }
 
 X_INLINE void xWindow::Hide(void)
 {
-	ShowWindow(m_window, SW_HIDE);
+	ShowWindow(window_, SW_HIDE);
 }
 
 X_INLINE void xWindow::Minamise(void)
 {
-	ShowWindow(m_window, SW_MINIMIZE);
+	ShowWindow(window_, SW_MINIMIZE);
 }
 
 X_INLINE void xWindow::MaxiMise(void)
 {
-	ShowWindow(m_window, SW_MAXIMIZE);
+	ShowWindow(window_, SW_MAXIMIZE);
 }
 
 X_INLINE void xWindow::Restore(void)
 {
-	ShowWindow(m_window, SW_RESTORE);
+	ShowWindow(window_, SW_RESTORE);
 }
 
 X_INLINE void xWindow::Close(void)
 {
-	::PostMessage(m_window, WM_CLOSE, 0, 0);
+	::PostMessage(window_, WM_CLOSE, 0, 0);
 }
 
 X_INLINE void xWindow::SetTitle(const char* str)
 {
-	::SetWindowTextA(this->m_window, str);
+	::SetWindowTextA(window_, str);
 }
 
 X_INLINE void xWindow::Destroy(void)
 {
-	DestroyWindow(m_window);
+	DestroyWindow(window_);
 }
 
 X_INLINE void xWindow::HideClientCursor(bool hide)
 {
-	this->m_HideClientCursor = hide;
+	this->hideClientCursor_ = hide;
+}
+
+X_INLINE const uint32_t xWindow::GetNumMsgs(void) const
+{
+	return numMsgs_; 
+}
+
+X_INLINE const uint32_t xWindow::GetNumMsgsClear(void) const
+{
+	uint32_t ret = numMsgs_;
+	numMsgs_ = 0;
+	return ret;
 }
