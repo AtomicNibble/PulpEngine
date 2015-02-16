@@ -418,15 +418,17 @@ XShader* XShaderManager::reloadShader(const char* name)
 
 					tech = srcTech;
 
+					Flags<ILFlag> ILFlag;
+
 					// create the hardware shaders.
 					// dose nothing if already loaded.
 					tech.pVertexShader = XHWShader::forName(name, srcTech.vertex_func,
 						source->pHlslFile->fileName.c_str(), srcTech.compileFlags, 
-						ShaderType::Vertex, source->pHlslFile->sourceCrc32);
+						ShaderType::Vertex, ILFlag, source->pHlslFile->sourceCrc32);
 
 					tech.pPixelShader = XHWShader::forName(name, srcTech.pixel_func,
 						source->pHlslFile->fileName.c_str(), srcTech.compileFlags, 
-						ShaderType::Pixel, source->pHlslFile->sourceCrc32);
+						ShaderType::Pixel, ILFlag, source->pHlslFile->sourceCrc32);
 				}
 			}
 			else if (shader->hlslSourceCrc32 != source->hlslSourceCrc32)
@@ -448,13 +450,15 @@ XShader* XShaderManager::reloadShader(const char* name)
 						const char* vertEntry = tech.pVertexShader->getEntryPoint();
 						const char* pixelEntry = tech.pPixelShader->getEntryPoint();
 
+						Flags<ILFlag> ILFlag;
+
 						tech.pVertexShader = XHWShader::forName(name, vertEntry,
 							source->pHlslFile->fileName.c_str(), tech.compileFlags,
-							ShaderType::Vertex, source->pHlslFile->sourceCrc32);
+							ShaderType::Vertex, ILFlag, source->pHlslFile->sourceCrc32);
 
 						tech.pPixelShader = XHWShader::forName(name, pixelEntry,
 							source->pHlslFile->fileName.c_str(), tech.compileFlags, 
-							ShaderType::Pixel, source->pHlslFile->sourceCrc32);
+							ShaderType::Pixel, ILFlag, source->pHlslFile->sourceCrc32);
 
 					}
 				}
@@ -487,13 +491,16 @@ XShader* XShaderManager::reloadShader(const char* name)
 							const char* vertEntry = tech.pVertexShader->getEntryPoint();
 							const char* pixelEntry = tech.pPixelShader->getEntryPoint();
 
+							Flags<ILFlag> ILFlag;
+
+
 							tech.pVertexShader = XHWShader::forName(name, vertEntry,
 								source->pHlslFile->fileName.c_str(), tech.compileFlags,
-								ShaderType::Vertex, source->pHlslFile->sourceCrc32);
+								ShaderType::Vertex, ILFlag, source->pHlslFile->sourceCrc32);
 
 							tech.pPixelShader = XHWShader::forName(name, pixelEntry,
 								source->pHlslFile->fileName.c_str(), tech.compileFlags, 
-								ShaderType::Pixel, source->pHlslFile->sourceCrc32);
+								ShaderType::Pixel, ILFlag, source->pHlslFile->sourceCrc32);
 
 						}
 
@@ -644,14 +651,16 @@ XShader* XShaderManager::loadShader(const char* name)
 
 			tech = srcTech;
 
+			Flags<ILFlag> ILFlag;
+
 			// create the hardware shaders.
 			tech.pVertexShader = XHWShader::forName(name, srcTech.vertex_func,
 				source->pHlslFile->fileName.c_str(), tech.compileFlags,
-				ShaderType::Vertex, source->pHlslFile->sourceCrc32);
+				ShaderType::Vertex, ILFlag, source->pHlslFile->sourceCrc32);
 
 			tech.pPixelShader = XHWShader::forName(name, srcTech.pixel_func,
 				source->pHlslFile->fileName.c_str(), tech.compileFlags,
-				ShaderType::Pixel, source->pHlslFile->sourceCrc32);
+				ShaderType::Pixel, ILFlag, source->pHlslFile->sourceCrc32);
 		}
 
 		X_DELETE(source,g_rendererArena);

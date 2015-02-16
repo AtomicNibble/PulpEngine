@@ -55,7 +55,9 @@ struct BlendInfo
 
 X_DECLARE_FLAGS(TechniquePrams) (NAME, VERTEX_FNC, PIXEL_FNC);
 
-
+// in the shader name space so it's ok to call just: PrePro
+X_DECLARE_ENUM(PreProType)(Include, Define, Undef, If, IfDef, IfNDef, Else, EndIF);
+X_DECLARE_FLAGS(ILFlag)(Normal, BiNormal, Color);
 
 
 class XShaderResources : public IRenderShaderResources
@@ -154,10 +156,6 @@ protected:
 	XShader* pShader;
 };
 
-
-// in the shader name space so it's ok to call just: PrePro
-X_DECLARE_ENUM(PreProType)(Include, Define, Undef, If, IfDef, IfNDef, Else, EndIF);
-X_DECLARE_FLAGS(ILFlag)(Normal, BiNormal, Color);
 
 struct InputLayoutEntry
 {
