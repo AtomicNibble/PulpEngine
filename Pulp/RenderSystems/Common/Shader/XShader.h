@@ -136,6 +136,9 @@ public:
 	X_INLINE const char* getEntryPoint(void) const {
 		return entryPoint.c_str();
 	}
+	X_INLINE const VertexFormat::Enum getVertexFmt(void) const {
+		return vertexFmt;
+	}
 protected:
 	static render::XRenderResourceContainer* pHWshaders;
 
