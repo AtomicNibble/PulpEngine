@@ -123,7 +123,7 @@ public:
 
 	static XHWShader* forName(const char* shader_name, const char* entry,
 		const char* sourceFile, const MacroList& macros,
-		ShaderType::Enum type, uint32_t sourceCrc);
+		ShaderType::Enum type, Flags<ILFlag> ILFlag, uint32_t sourceCrc);
 
 	static const char* getProfileFromType(ShaderType::Enum type);
 
