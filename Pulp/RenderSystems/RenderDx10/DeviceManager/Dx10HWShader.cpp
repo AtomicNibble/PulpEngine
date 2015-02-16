@@ -257,7 +257,7 @@ namespace
 
 XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	const char* sourceFile, const MacroList& macros,
-	ShaderType::Enum type, uint32_t sourceCrc)
+	ShaderType::Enum type, Flags<ILFlag> ILFlags, uint32_t sourceCrc)
 {
 	X_ASSERT_NOT_NULL(pHWshaders);
 	X_ASSERT_NOT_NULL(shader_name);
@@ -277,6 +277,16 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 			name.appendFmt("_%s", it);
 		}
 	}
+	// input layout flags are also part of the name.
+	if(ILFlags.IsAnySet())
+	{
+			// append the 32bit int.
+			name.appendFmt("_%x", ILFlags.ToInt());
+	}
+
+#if X_DEBUG
+	X_LOG1("Shader", "HWS for name: \"%s\"", name.c_str());
+#endif // !X_DEBUG
 
 	pShader = (XHWShader_Dx10*)pHWshaders->findAsset(name.c_str());
 

@@ -123,7 +123,7 @@ public:
 
 	static XHWShader* forName(const char* shader_name, const char* entry,
 		const char* sourceFile, const MacroList& macros,
-		ShaderType::Enum type, uint32_t sourceCrc);
+		ShaderType::Enum type, Flags<ILFlag> ILFlag, uint32_t sourceCrc);
 
 	static const char* getProfileFromType(ShaderType::Enum type);
 
@@ -136,6 +136,9 @@ public:
 	X_INLINE const char* getEntryPoint(void) const {
 		return entryPoint.c_str();
 	}
+	X_INLINE const VertexFormat::Enum getVertexFmt(void) const {
+		return vertexFmt;
+	}
 protected:
 	static render::XRenderResourceContainer* pHWshaders;
 
@@ -145,6 +148,8 @@ protected:
 	core::string entryPoint;
 	uint32_t sourceCrc32; // the crc of the source this was compiled from.
 
+	// set for all shader types.
+	VertexFormat::Enum vertexFmt; 
 	ShaderType::Enum type; // V / P / G
 	XShader* pShader;
 };
