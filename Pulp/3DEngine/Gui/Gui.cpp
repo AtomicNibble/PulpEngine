@@ -45,8 +45,19 @@ void XGui::DrawCursor(void)
 	texture::ITexture* pCursorArrow = getGuiManager()->GetCursor();
 	render::IRender* pRender = getRender();
 
+	render::XDrawTextInfo ti;
+	ti.col = Col_Red;
+	core::StackString<64> posStr;
+	posStr.appendFmt("Pos: %g x %g", cursorPos_.x, cursorPos_.y);
+	pRender->DrawTextQueued(Vec3f(300, 10, 0), ti, posStr.c_str());
+
+
+	const float width = pRender->getWidthf();
+	const float height = pRender->getHeightf();
+
 	pRender->DrawQuadImageSS(
-		cursorPos_.x,cursorPos_.y,32,32,
+		cursorPos_.x / width, cursorPos_.y / height,
+		0.1f,0.1f,
 		pCursorArrow->getTexID(),
 		Col_White
 		);
