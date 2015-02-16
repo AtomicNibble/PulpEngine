@@ -11,6 +11,8 @@ XHWShader::XHWShader() :
 	pShader(nullptr),
 	sourceCrc32(0)
 {
+	// set as default layout.
+	vertexFmt = VertexFormat::P3F_T2S;
 }
 
 

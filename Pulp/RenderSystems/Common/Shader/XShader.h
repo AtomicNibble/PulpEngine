@@ -145,6 +145,8 @@ protected:
 	core::string entryPoint;
 	uint32_t sourceCrc32; // the crc of the source this was compiled from.
 
+	// set for all shader types.
+	VertexFormat::Enum vertexFmt; 
 	ShaderType::Enum type; // V / P / G
 	XShader* pShader;
 };
