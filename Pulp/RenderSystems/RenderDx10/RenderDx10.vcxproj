@@ -439,11 +439,11 @@
     <ClCompile Include="..\Common\Textures\TextureLoaderTGA.cpp" />
     <ClCompile Include="..\Common\Textures\XTexture.cpp" />
     <ClCompile Include="..\Common\XRender.cpp" />
-    <ClCompile Include="DeviceManager\Dx10HWShader.cpp" />
     <ClCompile Include="DeviceManager\VidMemManager.cpp" />
     <ClCompile Include="Dx10DrawMisc.cpp" />
     <ClCompile Include="Dx10DriverDx10.cpp" />
     <ClCompile Include="Dx10Font.cpp" />
+    <ClCompile Include="Dx10HWShader.cpp" />
     <ClCompile Include="Dx10RenderAux.cpp" />
     <ClCompile Include="DX10RenderAuxLods.cpp" />
     <ClCompile Include="Dx10RenderStates.cpp" />
