@@ -14,7 +14,7 @@ struct VS_INPUT
     float2 texCoord             	: TEXCOORD0;
 #ifdef IN_Color
     float4 color                	: COLOR0;
-#endf // !IN_Color
+#endif // !IN_Color
 };
 
 struct VS_OUTPUT
@@ -62,7 +62,7 @@ PS_OUTPUT SolidPS(PS_INPUT input)
 #ifdef IN_Color    
     output.color = input.color;
 #else
-    output.color = float4(1.0);
+    output.color = float4(1.0,1.0,1.0,1.0);
 #endif // !IN_Color
     return output;
 }
