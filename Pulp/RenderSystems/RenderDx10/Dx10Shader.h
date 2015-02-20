@@ -169,8 +169,36 @@ struct XShaderParam
 X_ENSURE_SIZE(ParamType::Enum, 1);
 
 
+// input layout tree nodes.
+struct ILTreeNode
+{
+	static const size_t MAX_IL_NODE_CHILDREN = 8;
 
+	ILTreeNode() {
+		core::zero_this(this);
+	}
 
+	ILTreeNode(const char* Sematic, bool isEnd) {
+		core::zero_this(this);
+		this->SematicName = Sematic;
+		this->isEnd = isEnd;
+	}
+
+	ILTreeNode& AddChild(ILTreeNode& node) {
+		for(size_t i=0; i< MAX_IL_NODE_CHILDREN; i++) {
+			if(pChild[i] == nullptr) {
+				pChild[i] = &node;
+				return node;
+			}
+		}
+		X_ERROR("Shader", "ILTree exceeded max children. max: %i", MAX_IL_NODE_CHILDREN);
+	}
+
+	const char* SematicName;
+	ILTreeNode* pChild[MAX_IL_NODE_CHILDREN]; // never gonna be that many children.
+	bool isEnd;
+	bool ___pad[3];
+};
 
 
 class XHWShader_Dx10 : public XHWShader
@@ -471,6 +499,10 @@ private:
 	static void FreeHWShaders();
 	static void FreeParams();
 
+	static void CreateInputLayoutTree(void);
+	static void FreeInputLayoutTree(void);
+
+	static ILTreeNode ILTree_;
 	static XShaderBin bin_;
 
 	// we have a set of const buffers for each shader type.
