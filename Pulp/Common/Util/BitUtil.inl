@@ -310,6 +310,12 @@ namespace bitUtil
 		return internal::Implementation<sizeof(T)>::IsBitSet(value, whichBit);
 	}
 
+	template <typename T>
+	inline bool IsBitNotSet(T value, unsigned int whichBit)
+	{
+		// defer the implementation to the correct helper template, based on the size of the type
+		return internal::Implementation<sizeof(T)>::IsBitSet(value, whichBit) == false;
+	}
 
 	template <typename T>
 	inline T SetBit(T value, unsigned int whichBit)

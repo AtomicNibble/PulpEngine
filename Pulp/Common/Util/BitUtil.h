@@ -24,6 +24,10 @@ namespace bitUtil
 	template <typename T>
 	inline bool IsBitSet(T value, unsigned int whichBit);
 
+	/// Returns whether a certain bit is set in the given integer value.
+	template <typename T>
+	inline bool IsBitNotSet(T value, unsigned int whichBit);
+
 	/// Sets a bit in an integer.
 	template <typename T>
 	inline T SetBit(T value, unsigned int whichBit);
