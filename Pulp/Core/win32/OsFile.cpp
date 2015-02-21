@@ -178,7 +178,7 @@ size_t OsFile::remainingBytes(void) const
 #if X_64 == 1
 	return MAKEQWORD(info.nFileSizeHigh, info.nFileSizeLow) - tell();
 #else
-	X_ASSERT(info.nFileSizeHigh == 0,"tell was called on a file larger than 1 << 32 not supported in 32bt build")(info,nFileSizeHigh);
+	X_ASSERT(info.nFileSizeHigh == 0, "tell was called on a file larger than 1 << 32 not supported in 32bt build")(info.nFileSizeHigh);
 	return info.nFileSizeLow - tell();
 #endif
 }
