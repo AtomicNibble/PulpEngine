@@ -679,8 +679,8 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 	X_LOG0("Shader", "Instructions: %i", shaderDesc.InstructionCount);
 	X_LOG0("Shader", "ConstantBuffers: %i", shaderDesc.ConstantBuffers);
 	X_LOG0("Shader", "BoundResources: %i", shaderDesc.BoundResources);
+	X_LOG0("Shader", "InputParameters: %i", shaderDesc.InputParameters);
 
-	
 	for (n = 0; n<shaderDesc.ConstantBuffers; n++)
 	{
 		pCB = pShaderReflection->GetConstantBufferByIndex(n);
@@ -889,6 +889,15 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 		// set max slots
 		if (pB->constBufferSlot < 3)
 			maxVecs_[pB->constBufferSlot] = core::Max(pB->bind + pB->numParameters, maxVecs_[pB->constBufferSlot]);
+	}
+
+	D3D11_SIGNATURE_PARAMETER_DESC InputDsc;
+	for (n = 0; n < shaderDesc.InputParameters; n++)
+	{
+		pShaderReflection->GetInputParameterDesc(n, &InputDsc);
+
+
+		int pad = 0;
 	}
 
 
