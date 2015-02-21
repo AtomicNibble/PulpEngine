@@ -54,6 +54,35 @@ TEST(BitTest, Set) {
 	EXPECT_TRUE(bitUtil::IsBitSet(val, 31));
 }
 
+TEST(BitTest, NotSet) {
+
+	uint32 val = 0;
+	val = bitUtil::SetBit(val, 0);
+
+	EXPECT_FALSE(bitUtil::IsBitNotSet(val, 0));
+
+	// all others should not be set.
+	for (int i = 1; i < 32; i++)
+		EXPECT_TRUE(bitUtil::IsBitNotSet(val, i));
+
+	val = 0;
+	val = bitUtil::SetBit(val, 2);
+	val = bitUtil::SetBit(val, 5);
+	val = bitUtil::SetBit(val, 8);
+	val = bitUtil::SetBit(val, 12);
+	val = bitUtil::SetBit(val, 23);
+	val = bitUtil::SetBit(val, 28);
+	val = bitUtil::SetBit(val, 31);
+
+	EXPECT_FALSE(bitUtil::IsBitNotSet(val, 2));
+	EXPECT_FALSE(bitUtil::IsBitNotSet(val, 5));
+	EXPECT_FALSE(bitUtil::IsBitNotSet(val, 8));
+	EXPECT_FALSE(bitUtil::IsBitNotSet(val, 12));
+	EXPECT_FALSE(bitUtil::IsBitNotSet(val, 23));
+	EXPECT_FALSE(bitUtil::IsBitNotSet(val, 28));
+	EXPECT_FALSE(bitUtil::IsBitNotSet(val, 31));
+}
+
 TEST(BitTest, Clear) {
 
 	// clearning any bits should should still return 0.
