@@ -208,5 +208,8 @@
     <ClCompile Include="Dx10HWShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\Common\Textures\XTextureFile.cpp">
+      <Filter>Common\Textures</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -438,6 +438,7 @@
     <ClCompile Include="..\Common\Textures\TextureLoaderPSD.cpp" />
     <ClCompile Include="..\Common\Textures\TextureLoaderTGA.cpp" />
     <ClCompile Include="..\Common\Textures\XTexture.cpp" />
+    <ClCompile Include="..\Common\Textures\XTextureFile.cpp" />
     <ClCompile Include="..\Common\XRender.cpp" />
     <ClCompile Include="DeviceManager\VidMemManager.cpp" />
     <ClCompile Include="Dx10DrawMisc.cpp" />
