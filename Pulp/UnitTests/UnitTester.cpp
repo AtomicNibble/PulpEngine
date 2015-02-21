@@ -38,7 +38,8 @@ X_LINK_LIB("engine_Font")
 X_LINK_LIB("engine_Core")
 X_LINK_LIB("engine_Script")
 X_LINK_LIB("engine_3DEngine")
-X_LINK_LIB("engine_RenderNull")
+// X_LINK_LIB("engine_RenderNull")
+
 
 X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Font@@0V12@A")
 X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Script@@0V12@A")

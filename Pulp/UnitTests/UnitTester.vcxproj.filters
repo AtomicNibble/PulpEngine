@@ -112,9 +112,6 @@
     <ClCompile Include="UT_Mem_LinearAllocator.cpp">
       <Filter>Source Files\tests\Allocators</Filter>
     </ClCompile>
-    <ClCompile Include="UT_AssertChecker.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="UT_Mem_GrowingMicroAllocator.cpp">
       <Filter>Source Files\tests\Allocators</Filter>
     </ClCompile>
@@ -234,6 +231,9 @@
     </ClCompile>
     <ClCompile Include="UT_StringRef.cpp">
       <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_AssertChecker.cpp">
+      <Filter>Source Files\tests\Debugging</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

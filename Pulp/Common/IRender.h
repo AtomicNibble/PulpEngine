@@ -320,7 +320,7 @@ struct IRender
 
 	virtual void ReleaseTexture(texture::TexID id) X_ABSTRACT;
 
-	virtual bool SetTexture(int texId) X_ABSTRACT;
+	virtual bool SetTexture(texture::TexID texId) X_ABSTRACT;
 	// ~Textures
 
 	// Drawing util

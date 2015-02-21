@@ -28,12 +28,23 @@ public:
 
 	virtual void GetViewport(int* x, int* y, int* width, int* height) X_OVERRIDE;
 	virtual void SetViewport(int x, int y, int width, int height) X_OVERRIDE;
-	virtual void GetViewport(Vec4<int>& viewport) X_OVERRIDE;
-	virtual void SetViewport(const Vec4<int>& viewport) X_OVERRIDE;
+	virtual void GetViewport(Recti& rect) X_OVERRIDE;
+	virtual void SetViewport(const Recti& rect) X_OVERRIDE;
 
 
 	virtual int getWidth(void) const X_FINAL;
 	virtual int getHeight(void) const X_FINAL;
+	virtual float getWidthf(void) const X_FINAL;
+	virtual float getHeightf(void) const X_FINAL;
+	// ~ViewPort
+
+	// scales from 800x600 range to what ever res.
+	// 400(x) on 1650x1050 becomes 825
+	virtual float ScaleCoordX(float value) const X_FINAL;
+	virtual float ScaleCoordY(float value) const X_FINAL;
+	virtual void ScaleCoord(float& x, float& y) const X_FINAL;
+	virtual void ScaleCoord(Vec2f& xy) const X_FINAL;
+
 
 	virtual void  SetCamera(const XCamera& cam) X_OVERRIDE;
 	virtual const XCamera& GetCamera() X_OVERRIDE;
@@ -45,13 +56,28 @@ public:
 	// Textures 
 	virtual texture::ITexture* LoadTexture(const char* path, texture::TextureFlags flags) X_OVERRIDE;
 
-	virtual void Draw2dImage(float xpos, float ypos,
-		float w, float h, texture::TexID texture_id, ColorT<float>& col) X_OVERRIDE;
-
 	virtual void ReleaseTexture(texture::TexID id) X_OVERRIDE;
+	virtual bool SetTexture(texture::TexID texId) X_OVERRIDE;
 	// ~Textures
 
 	// Drawing
+
+	// Screen Space Draw: range 0-2 width / h is also scrrenspace size not pixels
+	virtual void DrawQuadSS(float x, float y, float width, float height, const Color& col) X_OVERRIDE;
+	virtual void DrawQuadSS(const Rectf& rect, const Color& col) X_OVERRIDE;
+	virtual void DrawQuadSS(float x, float y, float width, float height, const Color& col, const Color& borderCol) X_OVERRIDE;
+	virtual void DrawQuadImageSS(float x, float y, float width, float height, texture::TexID texture_id, const Color& col) X_OVERRIDE;
+	virtual void DrawQuadImageSS(const Rectf& rect, texture::TexID texture_id, const Color& col) X_OVERRIDE;
+	virtual void DrawRectSS(float x, float y, float width, float height, const Color& col) X_OVERRIDE;
+	virtual void DrawRectSS(const Rectf& rect, const Color& col) X_OVERRIDE;
+	virtual void DrawLineColorSS(const Vec2f& vPos1, const Color& color1,
+		const Vec2f& vPos2, const Color& vColor2) X_OVERRIDE;
+
+	virtual void DrawQuadImage(float x, float y, float width, float height, texture::TexID texture_id, const Color& col) X_OVERRIDE;
+	virtual void DrawQuadImage(float x, float y, float width, float height, texture::ITexture* pTexutre, const Color& col) X_OVERRIDE;
+	virtual void DrawQuadImage(const Rectf& rect, texture::ITexture* pTexutre, const Color& col) X_OVERRIDE;
+
+
 	virtual void DrawQuad(float x, float y, float z, float width, float height, const Color& col) X_OVERRIDE;
 	virtual void DrawQuad(float x, float y, float z, float width, float height, const Color& col, const Color& borderCol) X_OVERRIDE;
 	virtual void DrawQuad(float x, float y, float width, float height, const Color& col) X_OVERRIDE;
@@ -64,7 +90,7 @@ public:
 	virtual void DrawLineColor(const Vec3f& vPos1, const Color& color1,
 		const Vec3f& vPos2, const Color& vColor2) X_OVERRIDE;
 
-	virtual void DrawRect(float x, float y, float width, float height, Color col) X_OVERRIDE;
+	virtual void DrawRect(float x, float y, float width, float height, const Color& col) X_OVERRIDE;
 
 	virtual void DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 		float padding, uint32_t max) X_OVERRIDE;
@@ -91,21 +117,27 @@ public:
 		const wchar_t* pStr, const font::XTextDrawConect& ctx) const X_OVERRIDE;
 	// ~Font
 
+	virtual void DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
+		PrimitiveTypePublic::Enum type) X_OVERRIDE;
 
 	// Shader Stuff
 
 	virtual shader::XShaderItem LoadShaderItem(shader::XInputShaderResources& res) X_OVERRIDE;
 
+	virtual bool DefferedBegin(void) X_OVERRIDE;
+	virtual bool DefferedEnd(void) X_OVERRIDE;
+	virtual bool SetWorldShader(void) X_OVERRIDE;
+	virtual bool setGUIShader(bool textured = false) X_OVERRIDE;
 	// ~Shader Stuff
 
 	// Model
 	virtual model::IRenderMesh* createRenderMesh(void) X_OVERRIDE;
+	virtual model::IRenderMesh* createRenderMesh(model::MeshHeader* pMesh,
+		shader::VertexFormat::Enum fmt, const char* name) X_OVERRIDE;
 	virtual void freeRenderMesh(model::IRenderMesh* pMesh) X_OVERRIDE;
 
 	// ~Model
 
-	virtual void DrawVB(Vertex_P3F_C4B_T2F* pVertBuffer, uint32_t size,
-		PrimitiveTypePublic::Enum type) X_OVERRIDE;
 
 private:
 	XCamera cam_;

@@ -88,15 +88,15 @@ void RenderNull::SetViewport(int x, int y, int width, int height)
 	X_UNUSED(height);
 }
 
-void RenderNull::GetViewport(Vec4<int>& viewport)
+void RenderNull::GetViewport(Recti& rect)
 {
-	X_UNUSED(viewport);
+	X_UNUSED(rect);
 
 }
 
-void RenderNull::SetViewport(const Vec4<int>& viewport)
+void RenderNull::SetViewport(const Recti& rect)
 {
-	X_UNUSED(viewport);
+	X_UNUSED(rect);
 
 }
 
@@ -108,6 +108,40 @@ int RenderNull::getWidth(void) const
 int RenderNull::getHeight(void) const
 {
 	return 0;
+}
+
+float RenderNull::getWidthf(void) const
+{
+	return 0.f; // return 1 maybe as i might divide by this.
+}
+
+float RenderNull::getHeightf(void) const
+{
+	return 0.f;
+}
+
+
+float RenderNull::ScaleCoordX(float value) const
+{
+	X_UNUSED(value);
+	return 0.f;
+}
+
+float RenderNull::ScaleCoordY(float value) const
+{
+	X_UNUSED(value);
+	return 0.f;
+}
+
+void RenderNull::ScaleCoord(float& x, float& y) const
+{
+	X_UNUSED(x);
+	X_UNUSED(y);
+}
+
+void RenderNull::ScaleCoord(Vec2f& xy) const
+{
+	X_UNUSED(xy);
 }
 
 
@@ -139,29 +173,129 @@ texture::ITexture* RenderNull::LoadTexture(const char* path, texture::TextureFla
 	return nullptr;
 }
 
-void RenderNull::Draw2dImage(float xpos, float ypos,
-	float w, float h, texture::TexID texture_id, ColorT<float>& col)
-{
-	X_UNUSED(xpos);
-	X_UNUSED(ypos);
-	X_UNUSED(w);
-	X_UNUSED(h);
-	X_UNUSED(texture_id);
-	X_UNUSED(col);
-
-}
 
 void RenderNull::ReleaseTexture(texture::TexID id)
 {
 	X_UNUSED(id);
-
 }
 
+bool RenderNull::SetTexture(texture::TexID id)
+{
+	X_UNUSED(id);
+	return false;
+}
 
 // ~Textures
 
 
 // Drawing
+
+
+void RenderNull::DrawQuadSS(float x, float y, float width, float height,
+	const Color& col)
+{
+	X_UNUSED(x);
+	X_UNUSED(y);
+	X_UNUSED(width);
+	X_UNUSED(height);
+	X_UNUSED(col);
+}
+
+
+void RenderNull::DrawQuadSS(const Rectf& rect, const Color& col)
+{
+	X_UNUSED(rect);
+	X_UNUSED(col);
+}
+
+void RenderNull::DrawQuadSS(float x, float y, float width, float height,
+	const Color& col, const Color& borderCol)
+{
+	X_UNUSED(x);
+	X_UNUSED(y);
+	X_UNUSED(width);
+	X_UNUSED(height);
+	X_UNUSED(col);
+	X_UNUSED(borderCol);
+}
+
+void RenderNull::DrawQuadImageSS(float x, float y, float width, float height,
+	texture::TexID texture_id, const Color& col)
+{
+	X_UNUSED(x);
+	X_UNUSED(y);
+	X_UNUSED(width);
+	X_UNUSED(height);
+	X_UNUSED(texture_id);
+	X_UNUSED(col);
+}
+
+void RenderNull::DrawQuadImageSS(const Rectf& rect, texture::TexID texture_id,
+	const Color& col)
+{
+	X_UNUSED(rect);
+	X_UNUSED(texture_id);
+	X_UNUSED(col);
+}
+
+void RenderNull::DrawRectSS(float x, float y, float width, float height,
+	const Color& col)
+{
+	X_UNUSED(x);
+	X_UNUSED(y);
+	X_UNUSED(width);
+	X_UNUSED(height);
+	X_UNUSED(col);
+}
+
+void RenderNull::DrawRectSS(const Rectf& rect, const Color& col)
+{
+	X_UNUSED(rect);
+	X_UNUSED(col);
+}
+
+void RenderNull::DrawLineColorSS(const Vec2f& vPos1, const Color& color1,
+	const Vec2f& vPos2, const Color& vColor2)
+{
+	X_UNUSED(vPos1);
+	X_UNUSED(color1);
+	X_UNUSED(vPos2);
+	X_UNUSED(vColor2);
+}
+
+void RenderNull::DrawQuadImage(float x, float y, float width, float height,
+	texture::TexID texture_id, const Color& col)
+{
+	X_UNUSED(x);
+	X_UNUSED(y);
+	X_UNUSED(width);
+	X_UNUSED(height);
+	X_UNUSED(texture_id);
+	X_UNUSED(col);
+}
+
+void RenderNull::DrawQuadImage(float x, float y, float width, float height,
+	texture::ITexture* pTexutre, const Color& col)
+{
+	X_UNUSED(x);
+	X_UNUSED(y);
+	X_UNUSED(width);
+	X_UNUSED(height);
+	X_UNUSED(pTexutre);
+	X_UNUSED(col);
+}
+
+void RenderNull::DrawQuadImage(const Rectf& rect, texture::ITexture* pTexutre,
+	const Color& col)
+{
+	X_UNUSED(rect);
+	X_UNUSED(pTexutre);
+	X_UNUSED(col);
+}
+
+
+
+
 void RenderNull::DrawQuad(float x, float y, float z, float width, float height, const Color& col)
 {
 	X_UNUSED(x);
@@ -249,7 +383,7 @@ void RenderNull::DrawLineColor(const Vec3f& pos1, const Color& color1,
 
 }
 
-void RenderNull::DrawRect(float x, float y, float width, float height, Color col)
+void RenderNull::DrawRect(float x, float y, float width, float height, const Color& col)
 {
 	X_UNUSED(x);
 	X_UNUSED(y);
@@ -371,40 +505,10 @@ void RenderNull::DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
 }
 
 
-
 // ~Font
 
 
-// Shader Stuff
-
-shader::XShaderItem RenderNull::LoadShaderItem(shader::XInputShaderResources& res)
-{
-	X_UNUSED(res);
-
-	shader::XShaderItem item;
-
-	return item;
-}
-
-// ~Shader Stuff
-
-
-// Model
-model::IRenderMesh* RenderNull::createRenderMesh(void)
-{
-	return nullptr;
-}
-
-void RenderNull::freeRenderMesh(model::IRenderMesh* pMesh)
-{
-	X_UNUSED(pMesh);
-
-}
-
-// ~Model
-
-
-void RenderNull::DrawVB(Vertex_P3F_C4B_T2F* pVertBuffer, uint32_t size,
+void RenderNull::DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
 	PrimitiveTypePublic::Enum type)
 {
 	X_ASSERT_NOT_NULL(pVertBuffer);
@@ -415,6 +519,62 @@ void RenderNull::DrawVB(Vertex_P3F_C4B_T2F* pVertBuffer, uint32_t size,
 
 }
 
+// Shader Stuff
+
+shader::XShaderItem RenderNull::LoadShaderItem(shader::XInputShaderResources& res)
+{
+	X_UNUSED(res);
+	return shader::XShaderItem();
+}
+
+
+bool RenderNull::DefferedBegin(void)
+{
+	return false;
+}
+
+bool RenderNull::DefferedEnd(void)
+{
+	return false;
+}
+
+bool RenderNull::SetWorldShader(void)
+{
+	return false;
+}
+
+bool RenderNull::setGUIShader(bool textured)
+{
+	X_UNUSED(textured);
+
+	return false;
+}
+
+// ~Shader Stuff
+
+// Model
+model::IRenderMesh* RenderNull::createRenderMesh(void)
+{
+	return nullptr;
+}
+
+model::IRenderMesh* RenderNull::createRenderMesh(model::MeshHeader* pMesh,
+	shader::VertexFormat::Enum fmt, const char* name)
+{
+	X_UNUSED(pMesh);
+	X_UNUSED(fmt);
+	X_UNUSED(name);
+
+	return nullptr;
+}
+
+void RenderNull::freeRenderMesh(model::IRenderMesh* pMesh)
+{
+	X_UNUSED(pMesh);
+
+}
+
+// ~Model
 
 
 
