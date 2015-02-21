@@ -280,8 +280,8 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	// input layout flags are also part of the name.
 	if(ILFlags.IsAnySet())
 	{
-		// append the 32bit int.
-		name.appendFmt("_%x", ILFlags.ToInt());
+			// append the 32bit int.
+			name.appendFmt("_%x", ILFlags.ToInt());
 	}
 
 #if X_DEBUG
@@ -679,7 +679,6 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 	X_LOG0("Shader", "Instructions: %i", shaderDesc.InstructionCount);
 	X_LOG0("Shader", "ConstantBuffers: %i", shaderDesc.ConstantBuffers);
 	X_LOG0("Shader", "BoundResources: %i", shaderDesc.BoundResources);
-	X_LOG0("Shader", "InputParameters: %i", shaderDesc.InputParameters);
 
 	
 	for (n = 0; n<shaderDesc.ConstantBuffers; n++)
@@ -892,15 +891,6 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 			maxVecs_[pB->constBufferSlot] = core::Max(pB->bind + pB->numParameters, maxVecs_[pB->constBufferSlot]);
 	}
 
-	D3D11_SIGNATURE_PARAMETER_DESC InputDsc;
-	for (n = 0; n < shaderDesc.InputParameters; n++)
-	{
-		pShaderReflection->GetInputParameterDesc(n, &InputDsc);
-	
-	
-		int pad = 0;
-	}
-
 
 	X_LOG_BULLET;
 	for (i = 0; i < BindVars.size(); i++)
@@ -1075,6 +1065,7 @@ void XHWShader_Dx10::Init(void)
 	}
 
 	InitBufferPointers();
+	CreateInputLayoutTree();
 }
 
 
@@ -1085,8 +1076,7 @@ void XHWShader_Dx10::shutDown(void)
 	FreeBufferPointers();
 	FreeHWShaders();
 	FreeParams();
-
-
+	FreeInputLayoutTree();
 
 	core::Mem::DeleteAndNull(pHWshaders, g_rendererArena);
 }
@@ -1290,9 +1280,27 @@ void XHWShader_Dx10::setParamValues(XShaderParam* pPrams, uint32_t numPrams,
 // ~====================== Static =============================
 
 
+void XHWShader_Dx10::CreateInputLayoutTree(void)
+{
+	// all the posible node types.
+	static ILTreeNode pos3("POSITION", false);
+	static ILTreeNode uv2("TEXCOORD0", true);
+	static ILTreeNode col4("COLOR", true);
 
 
 
+}
+
+
+void XHWShader_Dx10::FreeInputLayoutTree(void)
+{
+
+
+
+}
+
+
+// pILTree_
 
 void XHWShader_Dx10::addGlobalParams(core::Array<XShaderParam>& BindVars, ShaderType::Enum type)
 {
