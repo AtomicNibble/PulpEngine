@@ -47,8 +47,8 @@ bool XGame::Init(void)
 	
 	uint32_t width, height;
 
-	height = gEnv->pRender->getHeight();
-	width = gEnv->pRender->getWidth(); 
+	height = static_cast<uint32_t>(gEnv->pRender->getHeight());
+	width = static_cast<uint32_t>(gEnv->pRender->getWidth());
 	
 	X_ASSERT(height > 0, "height is not valid")(height);
 	X_ASSERT(width > 0, "height is not valid")(width);
@@ -101,7 +101,7 @@ bool XGame::OnInputEvent(const input::InputEvent& event)
 			cameraAngle_.x += -(event.value * 0.005f);
 			return false;
 		default:
-		break;
+			break;
 	}
 
 	// we want to move a fixed amount of time.

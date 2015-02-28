@@ -1428,7 +1428,8 @@ void XWindow::drawBorder(const Rectf& drawRect)
 					X_ASSERT_UNREACHABLE();
 					break;
 #else
-					X_NO_SWITCH_DEFAULT();
+				default:
+					X_NO_SWITCH_DEFAULT;
 #endif // !X_DEBUG
 			}
 		}

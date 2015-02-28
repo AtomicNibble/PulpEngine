@@ -154,7 +154,6 @@ MemoryAllocatorStatistics MemoryArena<AllocationPolicy, ThreadPolicy, BoundsChec
 	MemoryTrackingPolicy, MemoryTaggingPolicy>::getAllocatorStatistics(bool children) const
 {
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-
 	MemoryAllocatorStatistics stats = m_statistics.m_allocatorStatistics;
 
 	if (children) {
@@ -166,6 +165,8 @@ MemoryAllocatorStatistics MemoryArena<AllocationPolicy, ThreadPolicy, BoundsChec
 
 	return stats;
 #else
+	X_UNUSED(children);
+
 	MemoryAllocatorStatistics statistics;
 	core::zero_object(statistics);
 	return statistics;

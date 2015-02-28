@@ -168,9 +168,9 @@ struct VertexFormat
 
 			case P3F_T2F_C4B:
 				return "P3F_T2F_C4B";
-
-#if X_DEBUG
 			case Num:
+				return "";
+#if X_DEBUG		
 			default:
 				X_ASSERT_UNREACHABLE();
 #else

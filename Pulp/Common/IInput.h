@@ -385,7 +385,7 @@ struct IInputEventListner
 	virtual ~IInputEventListner(){}
 
 	virtual bool OnInputEvent(const InputEvent& event) X_ABSTRACT;
-	virtual bool OnInputEventChar(const InputEvent& event) { return false; };
+	virtual bool OnInputEventChar(const InputEvent& event) { X_UNUSED(event); return false; };
 
 	virtual int GetPriority() const { return 0; }
 };
