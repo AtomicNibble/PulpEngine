@@ -89,6 +89,28 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, uint32_t leng
 }
 
 
+size_t OsFileAsync::tell(void) const
+{
+	LARGE_INTEGER Move, current;
+	Move.QuadPart = 0;
+
+#if X_ENABLE_FILE_STATS
+	s_stats.NumTells++;
+#endif // !X_ENABLE_FILE_STATS
+
+	if (!SetFilePointerEx(file_, Move, &current, FILE_CURRENT))
+	{
+		lastError::Description dsc;
+		X_ERROR("File", "Failed to tell() file. Error: %s", lastError::ToString(dsc));
+	}
+
+#if X_64 == 1
+	return current.QuadPart;
+#else
+	return current.LowPart;
+#endif
+}
+
 size_t OsFileAsync::remainingBytes(void) const
 {
 	_BY_HANDLE_FILE_INFORMATION info;
@@ -104,8 +126,9 @@ size_t OsFileAsync::remainingBytes(void) const
 	}
 
 #if X_64 == 1
-	return MAKEQWORD(info.nFileSizeHigh, info.nFileSizeLow);
+	return MAKEQWORD(info.nFileSizeHigh, info.nFileSizeLow) - tell();
 #else
+	X_ASSERT(info.nFileSizeHigh == 0, "tell was called on a file larger than 1 << 32 not supported in 32bit build")(info.nFileSizeHigh);
 	return info.nFileSizeLow - tell();
 #endif
 }

@@ -7,6 +7,8 @@
 #include <String\StackString.h>
 #include <Time\CompressedStamps.h>
 
+#include <Util\Pointer64.h>
+
 X_NAMESPACE_BEGIN(bsp)
 
 
@@ -364,8 +366,8 @@ struct Area
 {
 	int32_t areaNum;
 	int32_t numPortals;
-	Portal* pPortals;
-
+	core::Pointer64<Portal> pPortals;
+	
 	AABB bounds; // 0x28
 };
 

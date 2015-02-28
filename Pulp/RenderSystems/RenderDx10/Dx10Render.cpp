@@ -363,7 +363,7 @@ bool DX11XRender::Init(HWND hWnd,
 
 void DX11XRender::ShutDown()
 {
-	int32_t i;
+	size_t i;
 
 	// needs clearingh before zrender::Shutdown.
 	// as we have VB / IB to free.

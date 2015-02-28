@@ -17,6 +17,7 @@ struct OsFileAsync
 	XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, uint32_t length, uint32_t position);
 	XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, uint32_t length, uint32_t position);
 
+	size_t tell(void) const;
 	size_t remainingBytes(void) const;
 
 	bool valid(void) const;

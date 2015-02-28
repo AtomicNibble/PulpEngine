@@ -10,7 +10,11 @@
 
 #include <xmmintrin.h>
 
+#if X_64
 X_ALIGNED_SYMBOL(class Vec4fA, 16)
+#else
+X_ALIGNED_SYMBOL(class Vec4fA, 8)
+#endif // X_64
 {
 public:
 	typedef float value_type;

@@ -151,9 +151,6 @@
     <ClCompile Include="win32\OsFile.cpp">
       <Filter>FileSys\win32</Filter>
     </ClCompile>
-    <ClCompile Include="DiskFile.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CoreEventDispatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -163,9 +160,6 @@
     <ClCompile Include="XProfileRender.cpp">
       <Filter>Source Files\Profile</Filter>
     </ClCompile>
-    <ClCompile Include="DiskFileAsync.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="win32\OsFileAsync.cpp">
       <Filter>FileSys\win32</Filter>
     </ClCompile>
@@ -174,6 +168,12 @@
     </ClCompile>
     <ClCompile Include="win32\SystemTimer.cpp">
       <Filter>Source Files\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="DiskFileAsync.cpp">
+      <Filter>FileSys</Filter>
+    </ClCompile>
+    <ClCompile Include="DiskFile.cpp">
+      <Filter>FileSys</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

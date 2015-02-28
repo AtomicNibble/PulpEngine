@@ -770,7 +770,7 @@ void XConsole::AddInputChar(const char c)
 	if (c == '`' || c == '¬') // sent twice.
 		return;
 	
-	if (CursorPos_ < InputBuffer_.length())
+	if (CursorPos_ < safe_static_cast<int32_t,uint32_t>(InputBuffer_.length()))
 		InputBuffer_.insert(CursorPos_, c);
 	else
 		InputBuffer_ = InputBuffer_ + c;
