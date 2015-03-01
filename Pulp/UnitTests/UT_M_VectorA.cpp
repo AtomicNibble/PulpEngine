@@ -101,7 +101,7 @@ TEST(XVectorAligned, Cross)
 	Vec4fA a3(4, 8, 10);
 	Vec4fA b3(2, 2, 1);
 
-	EXPECT_EQ(Vec4fA(-12, 16, -8), a3.cross(b3));
+	EXPECT_TRUE(Vec4fA(-12, 16, -8).compare(a3.cross(b3)));
 
 }
 
@@ -111,34 +111,34 @@ TEST(XVectorAligned, Arithmic)
 	// test some basic booty shaking.
 
 	// addition.
-	EXPECT_EQ(Vec3fA(5, 5, 10), Vec3fA(1, 4, 1) + Vec3fA(4, 1, 9));
+	EXPECT_TRUE(Vec3fA(5, 5, 10) == ( Vec3fA(1, 4, 1) + Vec3fA(4, 1, 9)));
 	EXPECT_TRUE(Vec4fA(5, 5, 10, 15) == (Vec4fA(2, 3, 5, 7) + Vec4fA(3, 2, 5, 8)));
 
 	// subtraction.
-	EXPECT_EQ(Vec3fA(-3, 3, -8), Vec3fA(1, 4, 1) - Vec3fA(4, 1, 9));
+	EXPECT_TRUE(Vec3fA(-3, 3, -8) == (Vec3fA(1, 4, 1) - Vec3fA(4, 1, 9)));
 	EXPECT_TRUE(Vec4fA(-1, 1, 0, -1) == (Vec4fA(2, 3, 5, 7) - Vec4fA(3, 2, 5, 8)));
 
 	// division.
-	EXPECT_EQ(Vec3fA(0.25f, 4, 0.1111111f), Vec3fA(1, 4, 1) / Vec3fA(4, 1, 9));
+	EXPECT_TRUE(Vec3fA(0.25f, 4, 0.1111111f) == (Vec3fA(1, 4, 1) / Vec3fA(4, 1, 9)));
 	EXPECT_TRUE(Vec4fA(0.666666f, 1.5f, 1, 0.875f) == (Vec4fA(2, 3, 5, 7) / Vec4fA(3, 2, 5, 8)));
 
 	// need to test assign operators.
 	// we just need to add the '=' it will make the correct code be used.
 
 	// addition.
-	EXPECT_EQ(Vec3fA(5, 5, 10), Vec3fA(1, 4, 1) += Vec3fA(4, 1, 9));
+	EXPECT_TRUE(Vec3fA(5, 5, 10) == (Vec3fA(1, 4, 1) += Vec3fA(4, 1, 9)));
 	EXPECT_TRUE(Vec4fA(5, 5, 10, 15) == (Vec4fA(2, 3, 5, 7) += Vec4fA(3, 2, 5, 8)));
 
 	// subtraction.
-	EXPECT_EQ(Vec3fA(-3, 3, -8), Vec3fA(1, 4, 1) -= Vec3fA(4, 1, 9));
+	EXPECT_TRUE(Vec3fA(-3, 3, -8) == (Vec3fA(1, 4, 1) -= Vec3fA(4, 1, 9)));
 	EXPECT_TRUE(Vec4fA(-1, 1, 0, -1) == (Vec4fA(2, 3, 5, 7) -= Vec4fA(3, 2, 5, 8)));
 
 	// multiplication.
-	EXPECT_EQ(Vec3fA(4, 4, 9), Vec3fA(1, 4, 1) *= Vec3fA(4, 1, 9));
+	EXPECT_TRUE(Vec3fA(4, 4, 9) == (Vec3fA(1, 4, 1) *= Vec3fA(4, 1, 9)));
 	EXPECT_TRUE(Vec4fA(6, 6, 25, 56) == (Vec4fA(2, 3, 5, 7) *= Vec4fA(3, 2, 5, 8)));
 
 	// division.
-	EXPECT_EQ(Vec3fA(0.25f, 4, 0.1111111f), Vec3fA(1, 4, 1) /= Vec3fA(4, 1, 9));
+	EXPECT_TRUE(Vec3fA(0.25f, 4, 0.1111111f) == (Vec3fA(1, 4, 1) /= Vec3fA(4, 1, 9)));
 	EXPECT_TRUE(Vec4fA(0.666666f, 1.5f, 1, 0.875f) == (Vec4fA(2, 3, 5, 7) /= Vec4fA(3, 2, 5, 8)));
 
 }
@@ -164,8 +164,8 @@ TEST(XVectorAligned, UnaryMinus)
 	Vec3fA a3(1.f, 3.f, 5.f);
 	Vec3fA b3(-1.f, -3.f, -5.f);
 
-	EXPECT_EQ(a3, -b3);
-	EXPECT_EQ(-a3, b3);
+	EXPECT_TRUE(a3 == -b3);
+	EXPECT_TRUE(-a3 == b3);
 
 	Vec4fA a4(1.f, 3.f, 5.f, 8.f);
 	Vec4fA b4(-1.f, -3.f, -5.f, -8.f);
@@ -181,12 +181,12 @@ TEST(XVectorAligned, Equality)
 	Vec3fA c3(1.f, 0.f, 3.f);
 	Vec3fA d3(1.f, 2.f, 0.f);
 
-	EXPECT_NE(a3, b3);
-	EXPECT_NE(a3, c3);
-	EXPECT_NE(a3, d3);
+	EXPECT_FALSE(a3 == b3);
+	EXPECT_FALSE(a3 == c3);
+	EXPECT_FALSE(a3 == d3);
 
-	EXPECT_EQ(a3, a3);
-	EXPECT_EQ(b3, b3);
+	EXPECT_TRUE(a3 == a3);
+	EXPECT_TRUE(b3 == b3);
 
 	Vec4fA a4(1.f, 2.f, 3.f, 4.f);
 	Vec4fA b4(0.f, 2.f, 3.f, 4.f);

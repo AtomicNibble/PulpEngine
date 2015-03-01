@@ -81,7 +81,7 @@ TYPED_TEST(ArrayTest, Append)
 
 	EXPECT_EQ(0, list.size());
 	EXPECT_EQ(0, list.capacity());
-	EXPECT_LT(0, list.granularity()); // gran should be above 0.
+	EXPECT_LT((Array<TypeParam>::size_type)0, list.granularity()); // gran should be above 0.
 
 	EXPECT_EQ(nullptr, list.ptr());
 

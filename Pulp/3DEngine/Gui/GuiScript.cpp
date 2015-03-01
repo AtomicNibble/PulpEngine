@@ -101,8 +101,8 @@ namespace
 	{
 		const char* name;
 		void(*handler) (XWindow *window, core::Array<XGSWinVar>& src);
-		int mMinParms;
-		int mMaxParms;
+		size_t MinParms;
+		size_t MaxParms;
 	};
 
 	guiCommand g_commandList[] =
@@ -199,9 +199,9 @@ bool XGuiScript::Parse(core::XParser& lex)
 
 
 	//  verify min/max params
-	if (parms.size() < g_commandList[i].mMinParms || parms.size() > g_commandList[i].mMaxParms) {
+	if (parms.size() < g_commandList[i].MinParms || parms.size() > g_commandList[i].MaxParms) {
 		X_ERROR("Gui", "incorrect number of parms for function '%s' min:%i max:%i provided:%i", name.c_str(),
-			g_commandList[i].mMinParms, g_commandList[i].mMaxParms, parms.size());
+			g_commandList[i].MinParms, g_commandList[i].MaxParms, parms.size());
 		return false;
 	}
 	

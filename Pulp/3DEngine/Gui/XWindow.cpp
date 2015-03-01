@@ -786,7 +786,8 @@ int XWindow::ExpressionConstant(float f)
 {
 	int	i;
 
-	for (i = WEXP_REG_NUM_PREDEFINED; i < expressionRegisters_.size(); i++)
+	for (i = WEXP_REG_NUM_PREDEFINED; 
+		i < safe_static_cast<int, size_t>(expressionRegisters_.size()); i++)
 	{
 		if (!s_registerIsTemporary[i] && expressionRegisters_[i] == f) {
 			return i;
