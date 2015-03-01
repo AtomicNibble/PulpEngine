@@ -122,9 +122,65 @@ namespace strUtil
 				Path::NON_NATIVE_SLASH, Path::NATIVE_SLASH);
 		}
 
+
+		template <size_t N>
+		struct Implementation {};
+
+		/// Template specialization for 4-byte types.
+		template <>
+		struct Implementation<8u>
+		{
+			static size_t strlen(const char* str)
+			{
+				__m128i zero = _mm_set1_epi8(0);
+				__m128i *s_aligned = (__m128i*) (((uint64_t)str) & -0x10L);
+				uint8_t misbits = (uint8_t)(((uint64_t)str) & 0xf);
+				__m128i s16cs = _mm_load_si128(s_aligned);
+				__m128i bytemask = _mm_cmpeq_epi8(s16cs, zero);
+				int bitmask = _mm_movemask_epi8(bytemask);
+				bitmask = (bitmask >> misbits) << misbits;
+
+				// Alternative: use TEST instead of BSF, then BSF at end (only). Much better on older CPUs
+				// TEST has latency 1, while BSF has 3!
+				while (bitmask == 0) {
+					s16cs = _mm_load_si128(++s_aligned);
+					bytemask = _mm_cmpeq_epi8(s16cs, zero);
+					bitmask = _mm_movemask_epi8(bytemask);
+				}
+
+				return (((const char*)s_aligned) - str) + (size_t)bitUtil::ScanBitsForward(bitmask);
+			}
+		};
+
+		template <>
+		struct Implementation<4u>
+		{
+#if X_64 == 0
+			static size_t strlen(const char* str)
+			{
+				__m128i zero = _mm_set1_epi8(0);
+				__m128i *s_aligned = (__m128i*) (((long)str) & -0x10L);
+				uint8_t misbits = (uint8_t)(((long)str) & 0xf);
+				__m128i s16cs = _mm_load_si128(s_aligned);
+				__m128i bytemask = _mm_cmpeq_epi8(s16cs, zero);
+				int bitmask = _mm_movemask_epi8(bytemask);
+				bitmask = (bitmask >> misbits) << misbits;
+
+				while (bitmask == 0) {
+					s16cs = _mm_load_si128(++s_aligned);
+					bytemask = _mm_cmpeq_epi8(s16cs, zero);
+					bitmask = _mm_movemask_epi8(bytemask);
+				}
+				return (((const char*)s_aligned) - str) + bitUtil::ScanBitsForward(bitmask);
+			}
+#endif
+		};
 	}
 
-
+	uint32_t strlen(const char* str)
+	{
+		return static_cast<uint32_t>(Implementation<sizeof(const char*)>::strlen(str));
+	}
 
 	const char* Convert(const wchar_t *input, char *output, uint32_t outputLength)
 	{
