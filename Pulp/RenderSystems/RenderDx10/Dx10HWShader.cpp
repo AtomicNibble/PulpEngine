@@ -280,8 +280,8 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	// input layout flags are also part of the name.
 	if(ILFlags.IsAnySet())
 	{
-			// append the 32bit int.
-			name.appendFmt("_%x", ILFlags.ToInt());
+		// append the 32bit int.
+		name.appendFmt("_%x", ILFlags.ToInt());
 	}
 
 #if X_DEBUG
