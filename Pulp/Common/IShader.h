@@ -121,20 +121,22 @@ struct VertexFormat
 	//         Type | Num | Format
 	// Eg: P3F -> Position 3 floats.
 	enum Enum
-	{
-	//	P3F_C4B_T2F, // used by gui.
-	//	P3F_C4B_T2S, // 16bit float tex cords.
-		
-		P3F_T3F,
+	{		
+		P3F_T3F, // what is this used for?
 
-		P3F_N10_C4B_T2S,
-		P3F_N3F_C4B_T4F,
+		// removed
+	//	P3F_N10_C4B_T2S,
+	//	P3F_N3F_C4B_T4F,
 
 		// 16bit tex coords
 		P3F_T2S,
 		P3F_T2S_C4B,
 		P3F_T2S_C4B_N3F,
 		P3F_T2S_C4B_N3F_TB3F,
+
+		// same as above but using compressed normals.
+		P3F_T2S_C4B_N10,
+		P3F_T2S_C4B_N10_TB3F,
 
 		// 32bit texcoords
 		P3F_T2F_C4B,  // used by gui.
@@ -146,16 +148,13 @@ struct VertexFormat
 	// will need to check for it's flag.
 	static const char* toString(Enum type) {
 		switch (type) {
-	//		case P3F_C4B_T2F:
-	//			return "P3F_C4B_T2F";
-	//		case P3F_C4B_T2S:
-	//			return "P3F_C4B_T2S";
 			case P3F_T3F:
 				return "P3F_T3F";
-			case P3F_N10_C4B_T2S:
+/*			case P3F_N10_C4B_T2S:
 				return "P3F_N10_C4B_T2S";
 			case P3F_N3F_C4B_T4F:
 				return "P3F_N3F_C4B_T4F";
+*/
 
 			case P3F_T2S:
 				return "P3F_T2S";
@@ -165,6 +164,11 @@ struct VertexFormat
 				return "P3F_T2S_C4B_N3F";
 			case P3F_T2S_C4B_N3F_TB3F:
 				return "P3F_T2S_C4B_N3F_TB3F";
+
+			case P3F_T2S_C4B_N10:
+				return "P3F_T2S_C4B_N10";
+			case P3F_T2S_C4B_N10_TB3F:
+				return "P3F_T2S_C4B_N10_TB3F";
 
 			case P3F_T2F_C4B:
 				return "P3F_T2F_C4B";
