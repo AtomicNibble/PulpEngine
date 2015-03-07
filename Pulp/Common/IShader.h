@@ -124,10 +124,6 @@ struct VertexFormat
 	{		
 		P3F_T3F, // what is this used for?
 
-		// removed
-	//	P3F_N10_C4B_T2S,
-	//	P3F_N3F_C4B_T4F,
-
 		// 16bit tex coords
 		P3F_T2S,
 		P3F_T2S_C4B,
@@ -136,10 +132,13 @@ struct VertexFormat
 
 		// same as above but using compressed normals.
 		P3F_T2S_C4B_N10,
-		P3F_T2S_C4B_N10_TB3F,
+		P3F_T2S_C4B_N10_TB10,
 
 		// 32bit texcoords
 		P3F_T2F_C4B,  // used by gui.
+
+		// double coords
+		P3F_T4F_C4B_N3F,
 
 		Num
 	};
@@ -150,11 +149,6 @@ struct VertexFormat
 		switch (type) {
 			case P3F_T3F:
 				return "P3F_T3F";
-/*			case P3F_N10_C4B_T2S:
-				return "P3F_N10_C4B_T2S";
-			case P3F_N3F_C4B_T4F:
-				return "P3F_N3F_C4B_T4F";
-*/
 
 			case P3F_T2S:
 				return "P3F_T2S";
@@ -167,11 +161,15 @@ struct VertexFormat
 
 			case P3F_T2S_C4B_N10:
 				return "P3F_T2S_C4B_N10";
-			case P3F_T2S_C4B_N10_TB3F:
-				return "P3F_T2S_C4B_N10_TB3F";
+			case P3F_T2S_C4B_N10_TB10:
+				return "P3F_T2S_C4B_N10_TB10";
 
 			case P3F_T2F_C4B:
 				return "P3F_T2F_C4B";
+
+			case P3F_T4F_C4B_N3F:
+				return "P3F_T4F_C4B_N3F";
+
 			case Num:
 				return "";
 #if X_DEBUG		

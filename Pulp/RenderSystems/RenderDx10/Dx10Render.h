@@ -126,6 +126,7 @@ public:
 			g_rendererArena,
 			g_rendererArena,
 			g_rendererArena,
+			g_rendererArena,
 			g_rendererArena 
 		}
 	)

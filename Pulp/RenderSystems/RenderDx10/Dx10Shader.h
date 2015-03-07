@@ -168,35 +168,64 @@ struct XShaderParam
 
 X_ENSURE_SIZE(ParamType::Enum, 1);
 
+X_DECLARE_ENUM(ILVarType)(FLOAT32_VEC3, FLOAT32_VEC2, FLOAT16_VEC2, BYTE_VEC4);
 
 // input layout tree nodes.
 struct ILTreeNode
 {
+	typedef core::Array<ILTreeNode> childVec;
 	static const size_t MAX_IL_NODE_CHILDREN = 8;
 
-	ILTreeNode() {
-		core::zero_this(this);
+	ILTreeNode() : children(g_rendererArena) {
+		this->SematicName = nullptr;
+		this->isEnd_ = false;
 	}
-
-	ILTreeNode(const char* Sematic, bool isEnd) {
-		core::zero_this(this);
+	ILTreeNode(const ILTreeNode& oth) : children(g_rendererArena)  {
+		this->children = oth.children;
+		this->SematicName = oth.SematicName;
+		this->type = oth.type;
+		this->isEnd_ = oth.isEnd_;
+	}
+	ILTreeNode(const char* Sematic, ILVarType::Enum type) : children(g_rendererArena) {
 		this->SematicName = Sematic;
-		this->isEnd = isEnd;
+		this->type = type;
+		this->isEnd_ = false;
 	}
 
 	ILTreeNode& AddChild(ILTreeNode& node) {
-		for(size_t i=0; i< MAX_IL_NODE_CHILDREN; i++) {
-			if(pChild[i] == nullptr) {
-				pChild[i] = &node;
-				return node;
-			}
+		if (children.size() < MAX_IL_NODE_CHILDREN)
+		{
+			children.append(node);
+			return children[children.size() - 1];
 		}
 		X_ERROR("Shader", "ILTree exceeded max children. max: %i", MAX_IL_NODE_CHILDREN);
+		static ILTreeNode s_node;
+		return s_node;
 	}
 
+	const ILTreeNode* GetChildWithFmt(const ILVarType::Enum fmt) const {
+		childVec::ConstIterator it = children.begin();
+		for (; it != children.end(); ++it) {
+			if (it->type == fmt)
+				return it;
+		}
+		return nullptr;
+	}
+
+	X_INLINE ILTreeNode& SetEnd(void) {
+		this->isEnd_ = true;
+		return *this;
+	}
+
+	X_INLINE bool IsEnd(void) const {
+		return this->isEnd_;
+	}
+
+private:
 	const char* SematicName;
-	ILTreeNode* pChild[MAX_IL_NODE_CHILDREN]; // never gonna be that many children.
-	bool isEnd;
+	ILVarType::Enum type;
+	childVec children; // never gonna be that many children.
+	bool isEnd_;
 	bool ___pad[3];
 };
 

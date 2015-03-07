@@ -950,13 +950,15 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 		layout.append(elem_pos);
 
 		if (i == VertexFormat::P3F_T2S || i == VertexFormat::P3F_T2S_C4B ||
-			i == VertexFormat::P3F_T2S_C4B_N3F || i == VertexFormat::P3F_T2S_C4B_N3F_TB3F)
+			i == VertexFormat::P3F_T2S_C4B_N3F || i == VertexFormat::P3F_T2S_C4B_N3F_TB3F || 
+			i == VertexFormat::P3F_T2S_C4B_N10 || i == VertexFormat::P3F_T2S_C4B_N10_TB10)
 		{
 			elem_uv1616.AlignedByteOffset = 12;
 			layout.append(elem_uv1616);
 		}
 		if (i == VertexFormat::P3F_T2S_C4B ||
-			i == VertexFormat::P3F_T2S_C4B_N3F || i == VertexFormat::P3F_T2S_C4B_N3F_TB3F)
+			i == VertexFormat::P3F_T2S_C4B_N3F || i == VertexFormat::P3F_T2S_C4B_N3F_TB3F ||
+			i == VertexFormat::P3F_T2S_C4B_N10 || i == VertexFormat::P3F_T2S_C4B_N10_TB10)
 		{
 			elem_col8888.AlignedByteOffset = 12 + 4;
 			layout.append(elem_col8888);
@@ -976,7 +978,6 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 			layout.append(elem_biNormal323232); // 12 bytes
 		}
 
-
 		if (i == VertexFormat::P3F_T2F_C4B)
 		{
 			elem_uv3232.AlignedByteOffset = 12;
@@ -991,41 +992,34 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 			elem_t3f.AlignedByteOffset = 12;
 			layout.append(elem_t3f);
 		}
-		else if (i == VertexFormat::P3F_N10_C4B_T2S)
-		{
-			elem_nor101010.AlignedByteOffset = 12;
-			layout.append(elem_nor101010);
 
-			elem_col8888.AlignedByteOffset = 16;
+
+		if (i == VertexFormat::P3F_T2S_C4B_N10 || i == VertexFormat::P3F_T2S_C4B_N10_TB10)
+		{
+			// 12 + 4 + 4
+			elem_nor101010.AlignedByteOffset = 20;
+			layout.append(elem_nor101010);
+		}
+		if (i == VertexFormat::P3F_T2S_C4B_N10_TB10)
+		{
+			elem_tagent101010.AlignedByteOffset = 24;
+			layout.append(elem_tagent101010);
+			elem_biNormal101010.AlignedByteOffset = 28;
+			layout.append(elem_biNormal101010);
+		}
+
+		if (i == VertexFormat::P3F_T4F_C4B_N3F)
+		{
+			// big man texcoords
+			elem_uv3232.AlignedByteOffset = 12;
+			layout.append(elem_uv3232);
+
+			elem_col8888.AlignedByteOffset = 20;
 			layout.append(elem_col8888);
 
-			elem_uv1616.AlignedByteOffset = 20;
-			layout.append(elem_uv1616);
-
+			elem_nor323232.AlignedByteOffset = 24;
+			layout.append(elem_nor323232); 
 		}
-		else if (i == VertexFormat::P3F_N3F_C4B_T4F)
-		{
-			// pos 12:0:0
-			// normal 12:12:0
-			// color 4:24:0
-			// uv1 8:28:0
-			// uv2 8:36:1
-
-			elem_nor323232.AlignedByteOffset = 12;
-			layout.append(elem_nor323232); // 12 bytes
-
-			elem_col8888.AlignedByteOffset = 24;
-			layout.append(elem_col8888); // 4
-
-			elem_uv3232.AlignedByteOffset = 28;
-			layout.append(elem_uv3232);
-
-			elem_uv3232.AlignedByteOffset = 36;
-			elem_uv3232.SemanticIndex = 1;
-			layout.append(elem_uv3232);
-
-		}
-
 	
 	}
 

@@ -23,7 +23,7 @@ XHWShader_Dx10* XHWShader_Dx10::pCurVS_ = nullptr;
 XHWShader_Dx10* XHWShader_Dx10::pCurPS_ = nullptr;
 XHWShader_Dx10* XHWShader_Dx10::pCurGS_ = nullptr;
 
-
+ILTreeNode XHWShader_Dx10::ILTree_;
 XShaderBin XHWShader_Dx10::bin_;
 
 ID3D11Buffer** XHWShader_Dx10::pConstBuffers_[ShaderType::ENUM_COUNT][ConstbufType::Num] = { nullptr };
@@ -891,13 +891,42 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 			maxVecs_[pB->constBufferSlot] = core::Max(pB->bind + pB->numParameters, maxVecs_[pB->constBufferSlot]);
 	}
 
+	const ILTreeNode* pILnode = &this->ILTree_;
+
 	D3D11_SIGNATURE_PARAMETER_DESC InputDsc;
 	for (n = 0; n < shaderDesc.InputParameters; n++)
 	{
 		pShaderReflection->GetInputParameterDesc(n, &InputDsc);
 
+		// how many?
+		uint32_t numVars = core::bitUtil::CountBits<uint32_t>(InputDsc.Mask);
+		ILVarType::Enum fmt;
 
-		int pad = 0;
+		if (numVars == 3)
+		{
+			if (InputDsc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
+				fmt = ILVarType::FLOAT32_VEC3;
+
+		}
+		else if (numVars == 2)
+		{
+			if (InputDsc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
+				fmt = ILVarType::FLOAT32_VEC2;
+
+		}
+		else if (numVars == 1)
+		{
+			if (InputDsc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
+				fmt = ILVarType::FLOAT32_VEC3;
+
+		}
+
+		pILnode = pILnode->GetChildWithFmt(fmt);
+		if (!pILnode)
+		{
+			X_ERROR("Shader", "input layout invalid.");
+			return true;
+		}
 	}
 
 
@@ -1292,12 +1321,22 @@ void XHWShader_Dx10::setParamValues(XShaderParam* pPrams, uint32_t numPrams,
 void XHWShader_Dx10::CreateInputLayoutTree(void)
 {
 	// all the posible node types.
-	static ILTreeNode pos3("POSITION", false);
-	static ILTreeNode uv2("TEXCOORD0", true);
-	static ILTreeNode col4("COLOR", true);
+	ILTreeNode blank;
+	ILTreeNode pos3("POSITION", ILVarType::FLOAT32_VEC3);
+	ILTreeNode uv2("TEXCOORD0", ILVarType::FLOAT16_VEC2);
+	ILTreeNode uv2f("TEXCOORD0", ILVarType::FLOAT32_VEC2);
+	ILTreeNode col4("COLOR", ILVarType::BYTE_VEC4);
+	ILTreeNode nor3("NORMAL", ILVarType::FLOAT32_VEC3);
+	
+
+	ILTreeNode& uvNode = pos3.AddChild(uv2).SetEnd();
+	ILTreeNode& colNode = uvNode.AddChild(col4).SetEnd();
+
+	colNode.AddChild(nor3).SetEnd();
 
 
-
+	ILTree_ = blank;
+	ILTree_.AddChild(pos3);
 }
 
 

@@ -27,23 +27,6 @@ struct Vertex_P3F_T3F
 	Vec3f st;
 };
 
-/*
-struct Vertex_P3F_N10_C4B_T2S
-{
-	Vec3f pos;
-	uint32_t normal; // 10|10|10|2 normals
-	Color8u color;
-	Vec2<XHalf> st;
-};
-
-struct Vertex_P3F_N3F_C4B_T4F
-{
-	Vec3f		pos;			// Vertex position.
-	Vec3f		normal;			// Vertex normal.
-	Color8u		color;			// RGBA col baby. tickle my alpha channel.
-	Vec2f		texcoord[2];	// Vertex texture coordinates. 0 = surface, 1 = lightmap.
-};
-*/
 
 struct Vertex_Tangents_BiNorm
 {
@@ -79,36 +62,30 @@ struct Vertex_P3F_T2S_C4B : public Vertex_P3F_T2S
 }; // 20
 
 
-
-struct Vertex_P3F_T2S_C4B_N3F : public Vertex_P3F_T2S
+struct Vertex_P3F_T2S_C4B_N3F : public Vertex_P3F_T2S_C4B
 {
-	Color8u		color;
 	Vec3f		normal;
 }; // 22
 
-struct Vertex_P3F_T2S_C4B_N3F_TB3F : 
-public Vertex_P3F_T2S, public Vertex_Tangents_BiNorm
+struct Vertex_P3F_T2S_C4B_N3F_TB3F : public Vertex_P3F_T2S_C4B
 {
-	Color8u		color;
 	Vec3f		normal;
+	Vec3f		tangent;
+	Vec3f		binormal;
 }; // 
 
 
-
-struct Vertex_P3F_T2S_C4B_N10 : public Vertex_P3F_T2S
+struct Vertex_P3F_T2S_C4B_N10 : public Vertex_P3F_T2S_C4B
 {
-	Color8u		color;
-	uint32_t  normal; // 10|10|10|2 normals
+	compressedVec3	normal; // 10|10|10|2 normals
 }; // 22
 
-struct Vertex_P3F_T2S_C4B_N10_TB20 : 
-public Vertex_P3F_T2S, public Vertex_Tangents_BiNorm_Compressed
+struct Vertex_P3F_T2S_C4B_N10_TB10 : public Vertex_P3F_T2S_C4B
 {
-	Color8u		color;
-	uint32_t  normal; // 10|10|10|2 normals
+	uint32_t		normal; // 10|10|10|2 normals
+	compressedVec3	tangent;
+	compressedVec3	binormal;
 }; // 
-
-
 
 
 // 32bit tex cords
@@ -120,6 +97,13 @@ struct Vertex_P3F_T2F_C4B
 }; // 16
 
 
+struct Vertex_P3F_T4F_C4B_N3F
+{
+	Vec3f		pos;	// 12
+	Vec2f		texcoord[2];	// Vertex texture coordinates. 0 = surface, 1 = lightmap.
+	Color8u		color;
+	Vec3f		normal;
+};
 
 
 

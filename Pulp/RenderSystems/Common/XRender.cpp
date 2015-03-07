@@ -31,16 +31,15 @@ uint32_t XRender::vertexFormatStride[shader::VertexFormat::Num] =
 {
 	sizeof(Vertex_P3F_T3F),					// P3F_T3F
 
-	sizeof(Vertex_P3F_N10_C4B_T2S),			// P3F_N10_C4B_T2S
-	sizeof(Vertex_P3F_N3F_C4B_T4F),			// P3F_N3F_C4B_T4F
-
-
 	sizeof(Vertex_P3F_T2S),					// P3F_T2S
 	sizeof(Vertex_P3F_T2S_C4B),				// P3F_T2S_C4B
 	sizeof(Vertex_P3F_T2S_C4B_N3F),			// P3F_T2S_C4B_N3F
 	sizeof(Vertex_P3F_T2S_C4B_N3F_TB3F),	// P3F_T2S_C4B_N3F_TB3F
 
-	sizeof(Vertex_P3F_T2F_C4B),	// P3F_T2F_C4B
+	sizeof(Vertex_P3F_T2S_C4B_N10),
+	sizeof(Vertex_P3F_T2S_C4B_N10_TB10),
+
+	sizeof(Vertex_P3F_T2F_C4B),				// P3F_T2F_C4B
 
 };
 

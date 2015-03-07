@@ -287,7 +287,7 @@ struct Material
 
 // Vertex and index types.
 // must be one from vertexForamts.h and one the engine understands.
-typedef Vertex_P3F_N3F_C4B_T4F Vertex;
+typedef Vertex_P3F_T4F_C4B_N3F Vertex;
 typedef int Index;
 
 // plane type for BSP.
