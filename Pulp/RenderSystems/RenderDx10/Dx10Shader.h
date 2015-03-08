@@ -168,13 +168,13 @@ struct XShaderParam
 
 X_ENSURE_SIZE(ParamType::Enum, 1);
 
-X_DECLARE_ENUM(ILVarType)(FLOAT32_VEC3, FLOAT32_VEC2, FLOAT16_VEC2, BYTE_VEC4);
+X_DECLARE_ENUM(ILVarType)(FLOAT32_VEC4, FLOAT32_VEC3, FLOAT32_VEC2, FLOAT16_VEC2, BYTE_VEC4, INVALID);
 
 // input layout tree nodes.
 struct ILTreeNode
 {
 	typedef core::Array<ILTreeNode> childVec;
-	static const size_t MAX_IL_NODE_CHILDREN = 8;
+	static const size_t MAX_IL_NODE_CHILDREN = 4;
 
 	ILTreeNode() : children(g_rendererArena) {
 		this->SematicName = nullptr;
@@ -192,11 +192,13 @@ struct ILTreeNode
 		this->isEnd_ = false;
 	}
 
-	ILTreeNode& AddChild(ILTreeNode& node) {
+	ILTreeNode& AddChild(ILTreeNode& node, bool end = false) {
 		if (children.size() < MAX_IL_NODE_CHILDREN)
 		{
 			children.append(node);
-			return children[children.size() - 1];
+			ILTreeNode& retnode = children[children.size() - 1];
+			retnode.isEnd_ = end;
+			return retnode;
 		}
 		X_ERROR("Shader", "ILTree exceeded max children. max: %i", MAX_IL_NODE_CHILDREN);
 		static ILTreeNode s_node;

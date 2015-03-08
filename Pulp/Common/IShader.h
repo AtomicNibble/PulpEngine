@@ -122,7 +122,7 @@ struct VertexFormat
 	// Eg: P3F -> Position 3 floats.
 	enum Enum
 	{		
-		P3F_T3F, // what is this used for?
+		P3F_T3F, // used in Aux Geo.
 
 		// 16bit tex coords
 		P3F_T2S,

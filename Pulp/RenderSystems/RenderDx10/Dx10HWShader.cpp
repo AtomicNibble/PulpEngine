@@ -891,44 +891,56 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 			maxVecs_[pB->constBufferSlot] = core::Max(pB->bind + pB->numParameters, maxVecs_[pB->constBufferSlot]);
 	}
 
-	const ILTreeNode* pILnode = &this->ILTree_;
-
-	D3D11_SIGNATURE_PARAMETER_DESC InputDsc;
-	for (n = 0; n < shaderDesc.InputParameters; n++)
+	if (this->type == ShaderType::Vertex)
 	{
-		pShaderReflection->GetInputParameterDesc(n, &InputDsc);
 
-		// how many?
-		uint32_t numVars = core::bitUtil::CountBits<uint32_t>(InputDsc.Mask);
-		ILVarType::Enum fmt;
-
-		if (numVars == 3)
+		const ILTreeNode* pILnode = &this->ILTree_;
+		D3D11_SIGNATURE_PARAMETER_DESC InputDsc;
+		for (n = 0; n < shaderDesc.InputParameters; n++)
 		{
-			if (InputDsc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
-				fmt = ILVarType::FLOAT32_VEC3;
+			pShaderReflection->GetInputParameterDesc(n, &InputDsc);
 
-		}
-		else if (numVars == 2)
-		{
-			if (InputDsc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
-				fmt = ILVarType::FLOAT32_VEC2;
+			// how many?
+			uint32_t numVars = core::bitUtil::CountBits<uint32_t>(InputDsc.Mask);
+			ILVarType::Enum fmt = ILVarType::INVALID;
 
-		}
-		else if (numVars == 1)
-		{
-			if (InputDsc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
-				fmt = ILVarType::FLOAT32_VEC3;
+			if (numVars == 4)
+			{
+				if (InputDsc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
+					fmt = ILVarType::FLOAT32_VEC4;
+			}
+			if (numVars == 3)
+			{
+				if (InputDsc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
+					fmt = ILVarType::FLOAT32_VEC3;
+			}
+			else if (numVars == 2)
+			{
+				if (InputDsc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
+					fmt = ILVarType::FLOAT32_VEC2;
 
+			}
+			else if (numVars == 1)
+			{
+				if (InputDsc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
+					fmt = ILVarType::FLOAT32_VEC3;
+
+			}
+
+			if (fmt == ILVarType::INVALID) {
+				X_ERROR("Shader", "could not work out input param var fmt.");
+				return false;
+			}
+
+			pILnode = pILnode->GetChildWithFmt(fmt);
+			if (!pILnode)
+			{
+				X_ERROR("Shader", "input layout invalid.");
+				return true;
+			}
 		}
 
-		pILnode = pILnode->GetChildWithFmt(fmt);
-		if (!pILnode)
-		{
-			X_ERROR("Shader", "input layout invalid.");
-			return true;
-		}
 	}
-
 
 	X_LOG_BULLET;
 	for (i = 0; i < BindVars.size(); i++)
@@ -1322,21 +1334,58 @@ void XHWShader_Dx10::CreateInputLayoutTree(void)
 {
 	// all the posible node types.
 	ILTreeNode blank;
-	ILTreeNode pos3("POSITION", ILVarType::FLOAT32_VEC3);
-	ILTreeNode uv2("TEXCOORD0", ILVarType::FLOAT16_VEC2);
-	ILTreeNode uv2f("TEXCOORD0", ILVarType::FLOAT32_VEC2);
-	ILTreeNode col4("COLOR", ILVarType::BYTE_VEC4);
-	ILTreeNode nor3("NORMAL", ILVarType::FLOAT32_VEC3);
+	ILTreeNode pos3f("POSITION", ILVarType::FLOAT32_VEC3);
+	ILTreeNode pos4f("POSITION", ILVarType::FLOAT32_VEC4);
+	ILTreeNode uv2s("TEXCOORD", ILVarType::FLOAT32_VEC2);
+	ILTreeNode uv3f("TEXCOORD", ILVarType::FLOAT32_VEC3);
+	ILTreeNode uv4f("TEXCOORD", ILVarType::FLOAT32_VEC4);
+	ILTreeNode col4b("COLOR", ILVarType::FLOAT32_VEC4);
+	ILTreeNode nor3f("NORMAL", ILVarType::FLOAT32_VEC3);
+	ILTreeNode nor10("NORMAL", ILVarType::FLOAT32_VEC3);
+	ILTreeNode tan3f("TANGENT", ILVarType::FLOAT32_VEC3);
+	ILTreeNode tan10("TANGENT", ILVarType::FLOAT32_VEC3);
+	ILTreeNode bin3f("BINORMAL", ILVarType::FLOAT32_VEC3);
+	ILTreeNode bin10("BINORMAL", ILVarType::FLOAT32_VEC3);
 	
+	// for shader input layouts the format is not given since the shader
+	// don't care what the format comes in as.
+	// so how can i work out what the formats are since i support identical sematic layouts
+	// with diffrent foramts :(
+	//
+	// maybe i should just have a sematic format, which can be used to tell if the current input
+	// layout will work with the shader :)
+	//
+	//        .
+	//        |
+	//       P3F_____
+	//       / \     \
+	//     T2S  T4F  T3F
+	//      |    |__
+	//     C4B	    |
+	//	  __|	   C4B 
+	//	 /  |       |
+	// N3F N10	   N3F
+	//  |    \
+	// TB3F  TB10
+	//
 
-	ILTreeNode& uvNode = pos3.AddChild(uv2).SetEnd();
-	ILTreeNode& colNode = uvNode.AddChild(col4).SetEnd();
+	ILTreeNode& subCol = pos3f.AddChild(uv2s, true).AddChild(col4b, true);
+	subCol.AddChild(nor3f, true).AddChild(tan3f, true).AddChild(bin3f, true);
+	subCol.AddChild(nor10, true).AddChild(tan10, true).AddChild(bin10, true);
+	pos3f.AddChild(uv4f).AddChild(col4b).AddChild(nor3f, true);
+	pos3f.AddChild(uv3f, true);
 
-	colNode.AddChild(nor3).SetEnd();
-
+	// pos4
+	ILTreeNode& subCol4 = pos4f.AddChild(uv2s, true).AddChild(col4b, true);
+	subCol4.AddChild(nor3f, true).AddChild(tan3f, true).AddChild(bin3f, true);
+	subCol4.AddChild(nor10, true).AddChild(tan10, true).AddChild(bin10, true);
+	pos4f.AddChild(uv4f).AddChild(col4b).AddChild(nor3f, true);
+	pos4f.AddChild(uv3f, true);
 
 	ILTree_ = blank;
-	ILTree_.AddChild(pos3);
+	ILTree_.AddChild(pos3f);
+	ILTree_.AddChild(pos4f);
+	int pad = 0;
 }
 
 
