@@ -175,13 +175,16 @@ struct ILTreeNode
 	typedef core::Array<ILTreeNode> childVec;
 
 	ILTreeNode() : children(g_rendererArena) {
+		this->fmt = InputLayoutFormat::Invalid;
 	}
 	ILTreeNode(const ILTreeNode& oth) : children(g_rendererArena) {
 		this->children = oth.children;
 		this->SematicName = oth.SematicName;
+		this->fmt = oth.fmt;
 	}
 	ILTreeNode(const char* Sematic) : children(g_rendererArena) {
 		this->SematicName.set(Sematic);
+		this->fmt = InputLayoutFormat::Invalid;
 	}
 
 	ILTreeNode& AddChild(ILTreeNode& node, 
@@ -219,6 +222,10 @@ struct ILTreeNode
 
 	X_INLINE bool IsEnd(void) const {
 		return this->fmt == InputLayoutFormat::Invalid;
+	}
+
+	X_INLINE InputLayoutFormat::Enum GetILFmt(void) const {
+		return fmt;
 	}
 
 private:

@@ -893,8 +893,6 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 
 	if (this->type == ShaderType::Vertex)
 	{
-		InputLayoutFormat::Enum fmt = InputLayoutFormat::Invalid;
-
 		const ILTreeNode* pILnode = &this->ILTree_;
 		D3D11_SIGNATURE_PARAMETER_DESC InputDsc;
 		for (n = 0; n < shaderDesc.InputParameters; n++)
@@ -904,7 +902,6 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 			// how many?
 			// uint32_t numVars = core::bitUtil::CountBits<uint32_t>(InputDsc.Mask);
 			// i only do sematic checks now, since i don't give a flying fuck about the format.
-
 			pILnode = pILnode->GetChildWithSemtaic(InputDsc.SemanticName);
 			if (!pILnode)
 			{
@@ -913,9 +910,13 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 			}
 		}
 
+		X_ASSERT_NOT_NULL(pILnode);
+
+		InputLayoutFormat::Enum fmt = pILnode->GetILFmt();
+
+		X_ASSERT(fmt != InputLayoutFormat::Invalid, "failed to detect correct input layout format")(fmt);
 		// work out the format from the node.
-
-
+		X_LOG0("Shader", "InputLayout Fmt: \"%s\"", InputLayoutFormat::ToString(fmt));
 	}
 
 	X_LOG_BULLET;
