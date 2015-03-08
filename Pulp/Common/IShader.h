@@ -184,6 +184,21 @@ struct VertexFormat
 	}
 };
 
+X_DECLARE_ENUM(InputLayoutFormat)(
+	POS_UV,
+	POS_UV_COL,
+	POS_UV_COL_NORM,
+	POS_UV_COL_NORM_TAN,
+	POS_UV_COL_NORM_TAN_BI,
+
+	POS_UV2,
+	POS_UV2_COL,
+	POS_UV2_COL_NORM,
+	POS_UV2_COL_NORM_TAN,
+	POS_UV2_COL_NORM_TAN_BI,
+
+	Invalid
+);
 
 
 struct TextureAddressMode

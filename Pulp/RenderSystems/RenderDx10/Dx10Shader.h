@@ -168,36 +168,30 @@ struct XShaderParam
 
 X_ENSURE_SIZE(ParamType::Enum, 1);
 
-X_DECLARE_ENUM(ILVarType)(FLOAT32_VEC4, FLOAT32_VEC3, FLOAT32_VEC2, FLOAT16_VEC2, BYTE_VEC4, INVALID);
-
 // input layout tree nodes.
 struct ILTreeNode
 {
-	typedef core::Array<ILTreeNode> childVec;
 	static const size_t MAX_IL_NODE_CHILDREN = 4;
+	typedef core::Array<ILTreeNode> childVec;
 
 	ILTreeNode() : children(g_rendererArena) {
-		this->SematicName = nullptr;
-		this->isEnd_ = false;
 	}
-	ILTreeNode(const ILTreeNode& oth) : children(g_rendererArena)  {
+	ILTreeNode(const ILTreeNode& oth) : children(g_rendererArena) {
 		this->children = oth.children;
 		this->SematicName = oth.SematicName;
-		this->type = oth.type;
-		this->isEnd_ = oth.isEnd_;
 	}
-	ILTreeNode(const char* Sematic, ILVarType::Enum type) : children(g_rendererArena) {
-		this->SematicName = Sematic;
-		this->type = type;
-		this->isEnd_ = false;
+	ILTreeNode(const char* Sematic) : children(g_rendererArena) {
+		this->SematicName.set(Sematic);
 	}
 
-	ILTreeNode& AddChild(ILTreeNode& node, bool end = false) {
+	ILTreeNode& AddChild(ILTreeNode& node, 
+		InputLayoutFormat::Enum fmt = InputLayoutFormat::Invalid) 
+	{
 		if (children.size() < MAX_IL_NODE_CHILDREN)
 		{
 			children.append(node);
 			ILTreeNode& retnode = children[children.size() - 1];
-			retnode.isEnd_ = end;
+			retnode.fmt = fmt;
 			return retnode;
 		}
 		X_ERROR("Shader", "ILTree exceeded max children. max: %i", MAX_IL_NODE_CHILDREN);
@@ -205,29 +199,32 @@ struct ILTreeNode
 		return s_node;
 	}
 
-	const ILTreeNode* GetChildWithFmt(const ILVarType::Enum fmt) const {
-		childVec::ConstIterator it = children.begin();
-		for (; it != children.end(); ++it) {
-			if (it->type == fmt)
+	const ILTreeNode* GetChildWithSemtaic(const char* sematic) const {
+		// we want to skip SEMTA0 SEMTA1 SEMTA2 etc so we only compare the length.
+		childVec::ConstIterator it;
+		for (it = children.begin(); it != children.end(); ++it)
+		{
+			if (core::strUtil::IsEqualCaseInsen(it->SematicName.begin(),
+				it->SematicName.end(), sematic, sematic + it->SematicName.length()))
+			{
 				return it;
+			}
 		}
 		return nullptr;
 	}
 
-	X_INLINE ILTreeNode& SetEnd(void) {
-		this->isEnd_ = true;
-		return *this;
+	X_INLINE void SetFormat(InputLayoutFormat::Enum fmt) {
+		this->fmt = fmt;
 	}
 
 	X_INLINE bool IsEnd(void) const {
-		return this->isEnd_;
+		return this->fmt == InputLayoutFormat::Invalid;
 	}
 
 private:
-	const char* SematicName;
-	ILVarType::Enum type;
+	core::StackString<64> SematicName;
+	InputLayoutFormat::Enum fmt;
 	childVec children; // never gonna be that many children.
-	bool isEnd_;
 	bool ___pad[3];
 };
 

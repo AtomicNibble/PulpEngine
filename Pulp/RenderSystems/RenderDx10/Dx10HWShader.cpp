@@ -893,6 +893,7 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 
 	if (this->type == ShaderType::Vertex)
 	{
+		InputLayoutFormat::Enum fmt = InputLayoutFormat::Invalid;
 
 		const ILTreeNode* pILnode = &this->ILTree_;
 		D3D11_SIGNATURE_PARAMETER_DESC InputDsc;
@@ -901,38 +902,10 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 			pShaderReflection->GetInputParameterDesc(n, &InputDsc);
 
 			// how many?
-			uint32_t numVars = core::bitUtil::CountBits<uint32_t>(InputDsc.Mask);
-			ILVarType::Enum fmt = ILVarType::INVALID;
+			// uint32_t numVars = core::bitUtil::CountBits<uint32_t>(InputDsc.Mask);
+			// i only do sematic checks now, since i don't give a flying fuck about the format.
 
-			if (numVars == 4)
-			{
-				if (InputDsc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
-					fmt = ILVarType::FLOAT32_VEC4;
-			}
-			if (numVars == 3)
-			{
-				if (InputDsc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
-					fmt = ILVarType::FLOAT32_VEC3;
-			}
-			else if (numVars == 2)
-			{
-				if (InputDsc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
-					fmt = ILVarType::FLOAT32_VEC2;
-
-			}
-			else if (numVars == 1)
-			{
-				if (InputDsc.ComponentType == D3D_REGISTER_COMPONENT_FLOAT32)
-					fmt = ILVarType::FLOAT32_VEC3;
-
-			}
-
-			if (fmt == ILVarType::INVALID) {
-				X_ERROR("Shader", "could not work out input param var fmt.");
-				return false;
-			}
-
-			pILnode = pILnode->GetChildWithFmt(fmt);
+			pILnode = pILnode->GetChildWithSemtaic(InputDsc.SemanticName);
 			if (!pILnode)
 			{
 				X_ERROR("Shader", "input layout invalid.");
@@ -940,12 +913,15 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 			}
 		}
 
+		// work out the format from the node.
+
+
 	}
 
 	X_LOG_BULLET;
 	for (i = 0; i < BindVars.size(); i++)
 	{
-	//	X_LOG0("ShaderPram", "Name: \"%s\"", BindVars[i].name.c_str());
+		X_LOG0("ShaderPram", "Name: \"%s\"", BindVars[i].name.c_str());
 	}
 
 	pShaderReflection->Release();
@@ -1334,18 +1310,12 @@ void XHWShader_Dx10::CreateInputLayoutTree(void)
 {
 	// all the posible node types.
 	ILTreeNode blank;
-	ILTreeNode pos3f("POSITION", ILVarType::FLOAT32_VEC3);
-	ILTreeNode pos4f("POSITION", ILVarType::FLOAT32_VEC4);
-	ILTreeNode uv2s("TEXCOORD", ILVarType::FLOAT32_VEC2);
-	ILTreeNode uv3f("TEXCOORD", ILVarType::FLOAT32_VEC3);
-	ILTreeNode uv4f("TEXCOORD", ILVarType::FLOAT32_VEC4);
-	ILTreeNode col4b("COLOR", ILVarType::FLOAT32_VEC4);
-	ILTreeNode nor3f("NORMAL", ILVarType::FLOAT32_VEC3);
-	ILTreeNode nor10("NORMAL", ILVarType::FLOAT32_VEC3);
-	ILTreeNode tan3f("TANGENT", ILVarType::FLOAT32_VEC3);
-	ILTreeNode tan10("TANGENT", ILVarType::FLOAT32_VEC3);
-	ILTreeNode bin3f("BINORMAL", ILVarType::FLOAT32_VEC3);
-	ILTreeNode bin10("BINORMAL", ILVarType::FLOAT32_VEC3);
+	ILTreeNode pos("POSITION");
+	ILTreeNode uv("TEXCOORD");
+	ILTreeNode col("COLOR");
+	ILTreeNode nor("NORMAL");
+	ILTreeNode tan("TANGENT");
+	ILTreeNode bin("BINORMAL");
 	
 	// for shader input layouts the format is not given since the shader
 	// don't care what the format comes in as.
@@ -1369,23 +1339,20 @@ void XHWShader_Dx10::CreateInputLayoutTree(void)
 	// TB3F  TB10
 	//
 
-	ILTreeNode& subCol = pos3f.AddChild(uv2s, true).AddChild(col4b, true);
-	subCol.AddChild(nor3f, true).AddChild(tan3f, true).AddChild(bin3f, true);
-	subCol.AddChild(nor10, true).AddChild(tan10, true).AddChild(bin10, true);
-	pos3f.AddChild(uv4f).AddChild(col4b).AddChild(nor3f, true);
-	pos3f.AddChild(uv3f, true);
+	ILTreeNode& uvBase = blank.AddChild(pos).AddChild(uv, InputLayoutFormat::POS_UV);
+	uvBase.AddChild(col, InputLayoutFormat::POS_UV_COL).
+		AddChild(nor, InputLayoutFormat::POS_UV_COL_NORM).
+		AddChild(tan, InputLayoutFormat::POS_UV_COL_NORM_TAN).
+		AddChild(bin, InputLayoutFormat::POS_UV_COL_NORM_TAN_BI);
 
-	// pos4
-	ILTreeNode& subCol4 = pos4f.AddChild(uv2s, true).AddChild(col4b, true);
-	subCol4.AddChild(nor3f, true).AddChild(tan3f, true).AddChild(bin3f, true);
-	subCol4.AddChild(nor10, true).AddChild(tan10, true).AddChild(bin10, true);
-	pos4f.AddChild(uv4f).AddChild(col4b).AddChild(nor3f, true);
-	pos4f.AddChild(uv3f, true);
+	// double text coords.
+	uvBase.AddChild(uv, InputLayoutFormat::POS_UV2).
+		AddChild(col, InputLayoutFormat::POS_UV2_COL).
+		AddChild(nor, InputLayoutFormat::POS_UV2_COL_NORM).
+		AddChild(tan, InputLayoutFormat::POS_UV2_COL_NORM_TAN).
+		AddChild(bin, InputLayoutFormat::POS_UV2_COL_NORM_TAN_BI);
 
 	ILTree_ = blank;
-	ILTree_.AddChild(pos3f);
-	ILTree_.AddChild(pos4f);
-	int pad = 0;
 }
 
 

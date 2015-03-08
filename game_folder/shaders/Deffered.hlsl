@@ -24,10 +24,10 @@ float4 ConvertNormal(float3 vsNormal)
 struct VS_WriteDeferred_Input
 {
 	float3 osPosition           	: POSITION;
-	float3 osNormal           		: NORMAL0;  	
-	float4 color                		: COLOR0;
 	float2 texCoord             	: TEXCOORD0;
 	float2 texCoord1             	: TEXCOORD1;
+	float4 color                		: COLOR0;
+	float3 osNormal           		: NORMAL0;  	
 };
 
 
