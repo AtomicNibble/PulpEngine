@@ -515,6 +515,7 @@ public:
 	}
 private:
 	ShaderStatus::Enum status_;
+	InputLayoutFormat::Enum IlFmt_;
 	ID3DBlob* pBlob_;
 	void* pHWHandle_;
 

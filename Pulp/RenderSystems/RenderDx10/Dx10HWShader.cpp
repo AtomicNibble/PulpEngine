@@ -917,6 +917,8 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 		X_ASSERT(fmt != InputLayoutFormat::Invalid, "failed to detect correct input layout format")(fmt);
 		// work out the format from the node.
 		X_LOG0("Shader", "InputLayout Fmt: \"%s\"", InputLayoutFormat::ToString(fmt));
+
+		IlFmt_ = fmt;
 	}
 
 	X_LOG_BULLET;
