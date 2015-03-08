@@ -268,17 +268,6 @@ struct XShaderTechnique
 	BlendInfo src;
 	BlendInfo dst;
 
-	// what's the use case for the diffrent vertext formats.
-	// a HW shader can only work out it's final vertex format post compile.
-	// before that i can only know if it takes normals / tangents / color etc.
-	// i set vertex format for rendering.
-	// so i need some way to quickly pick the correct hardware shader.
-	// based on the current input layout.
-	// i think this should be part of a a technique.
-	// since it's the same thing, just diffrent input layout.
-	// i don't really want to make a array the size of num vertex formats.
-	// since i don't know a hardware shaders vertex format till post compile.
-	// unless i had some sort of callback.
 	XHWShader* pVertexShader;
 	XHWShader* pPixelShader;
 	XHWShader* pGeoShader;
