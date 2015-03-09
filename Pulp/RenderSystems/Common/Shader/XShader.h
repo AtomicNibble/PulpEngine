@@ -246,20 +246,53 @@ protected:
 	core::Array<Technique> techniques;
 };
 
+struct XShaderTechniqueHW
+{
+	XShaderTechniqueHW() {
+		core::zero_this(this);
+	}
+
+	void release(void)
+	{
+		pVertexShader->release();
+		pPixelShader->release();
+		pGeoShader->release();
+	}
+
+public:
+	XHWShader* pVertexShader;
+	XHWShader* pPixelShader;
+	XHWShader* pGeoShader;
+};
+
 
 struct XShaderTechnique
 {
+	static const size_t TECH_MAX_SUB = 6;
+
 	typedef core::Array<core::string> CompileFlagList;
+	typedef core::FixedArray<XShaderTechniqueHW, TECH_MAX_SUB> TechHWList;
 
 	XShaderTechnique() :
-		pVertexShader(nullptr),
-		pPixelShader(nullptr),
-		pGeoShader(nullptr),
+		pCurHwTech(nullptr),
 		compileFlags(g_rendererArena)
 	{}
 
 	XShaderTechnique& operator=(const ShaderSourceFile::Technique& srcTech);
 
+	void release(void) {
+		TechHWList::iterator it;
+		for (it = hwTechs.begin(); it != hwTechs.end(); ++it) {
+			it->release();
+		}
+	}
+
+	void append(const XShaderTechniqueHW& hwTech) {
+		hwTechs.append(hwTech);
+		pCurHwTech = hwTechs.end() - 1;
+	}
+
+public:
 	core::string name;
 	core::StrHash nameHash;
 	render::StateFlag state;
@@ -268,9 +301,8 @@ struct XShaderTechnique
 	BlendInfo src;
 	BlendInfo dst;
 
-	XHWShader* pVertexShader;
-	XHWShader* pPixelShader;
-	XHWShader* pGeoShader;
+	XShaderTechniqueHW* pCurHwTech;
+	TechHWList hwTechs;
 
 	// leave at end, not accesed much.
 	CompileFlagList compileFlags;

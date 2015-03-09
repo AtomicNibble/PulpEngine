@@ -73,10 +73,16 @@ bool XShader::FXBeginPass(uint32 uiPass)
 
 	// need to be able to pick a tech from what we want.
 	XShaderTechnique* pTech = rd->m_State.pCurShaderTech;
+	XShaderTechniqueHW* pHwTech = pTech->pCurHwTech;
 
-	XHWShader_Dx10* pVS = (XHWShader_Dx10*)pTech->pVertexShader;
-	XHWShader_Dx10* pPS = (XHWShader_Dx10*)pTech->pPixelShader;
-	XHWShader_Dx10* pGS = (XHWShader_Dx10*)pTech->pGeoShader;
+	if (!pHwTech) {
+		X_ERROR("Shader", "tech hW is null");
+		return false;
+	}
+
+	XHWShader_Dx10* pVS = (XHWShader_Dx10*)pHwTech->pVertexShader;
+	XHWShader_Dx10* pPS = (XHWShader_Dx10*)pHwTech->pPixelShader;
+	XHWShader_Dx10* pGS = (XHWShader_Dx10*)pHwTech->pGeoShader;
 
 	if (!pVS || !pPS)
 	{
@@ -88,14 +94,12 @@ bool XShader::FXBeginPass(uint32 uiPass)
 	if (pPS)
 	{
 		pPS->bind();
-	//	pPS->setParametersPI(NULL, NULL);
 	}
 
 	// Vertex-shader
 	if (pVS)
 	{
 		pVS->bind();
-	//	pVS->setParametersPI(NULL, rd->m_RP.m_pShader);
 	}
 
 	// Geometry-shader
@@ -153,7 +157,14 @@ bool XShader::FXSetVSFloat(const core::StrHash& NameParam,
 	}
 
 	XShaderTechnique* pTech = rd->m_State.pCurShaderTech;
-	XHWShader_Dx10* pVS = (XHWShader_Dx10*)pTech->pVertexShader;
+	XShaderTechniqueHW* pHwTech = pTech->pCurHwTech;
+
+	if (!pHwTech) {
+		X_ERROR("Shader", "tech hW is null");
+		return false;
+	}
+
+	XHWShader_Dx10* pVS = (XHWShader_Dx10*)pHwTech->pVertexShader;
 
 	if (!pVS)
 		return false;

@@ -204,6 +204,15 @@ XShaderTechnique& XShaderTechnique::operator=(const ShaderSourceFile::Technique&
 	state = srcTech.state;
 	// Cullmode
 	cullMode = srcTech.cullMode;
+
+	// blend info
+	src = srcTech.src;
+	dst = srcTech.dst;
+
+	// hw tech
+//	pCurHwTech = srcTech.pCurHwTech;
+//	hwTechs = srcTech.hwTechs;
+
 	// compileflags
 	compileFlags = srcTech.compileFlags;
 
@@ -229,8 +238,7 @@ XShader::~XShader()
 	numTecs = techs.size();
 	for (i = 0; i < numTecs; i++)
 	{
-		techs[i].pPixelShader->release();
-		techs[i].pVertexShader->release();
+		techs[i].release();
 	}
 }
 
@@ -422,11 +430,11 @@ XShader* XShaderManager::reloadShader(const char* name)
 
 					// create the hardware shaders.
 					// dose nothing if already loaded.
-					tech.pVertexShader = XHWShader::forName(name, srcTech.vertex_func,
+					tech.pCurHwTech->pVertexShader = XHWShader::forName(name, srcTech.vertex_func,
 						source->pHlslFile->fileName.c_str(), srcTech.compileFlags, 
 						ShaderType::Vertex, ILFlag, source->pHlslFile->sourceCrc32);
 
-					tech.pPixelShader = XHWShader::forName(name, srcTech.pixel_func,
+					tech.pCurHwTech->pPixelShader = XHWShader::forName(name, srcTech.pixel_func,
 						source->pHlslFile->fileName.c_str(), srcTech.compileFlags, 
 						ShaderType::Pixel, ILFlag, source->pHlslFile->sourceCrc32);
 				}
@@ -447,19 +455,20 @@ XShader* XShaderManager::reloadShader(const char* name)
 
 						// these have not changed.
 						// it's safe to pass the pointers.
-						const char* vertEntry = tech.pVertexShader->getEntryPoint();
-						const char* pixelEntry = tech.pPixelShader->getEntryPoint();
+
+						const char* vertEntry = tech.pCurHwTech->pVertexShader->getEntryPoint();
+						const char* pixelEntry = tech.pCurHwTech->pPixelShader->getEntryPoint();
 
 						Flags<ILFlag> ILFlag;
-
-						tech.pVertexShader = XHWShader::forName(name, vertEntry,
+						
+						tech.pCurHwTech->pVertexShader = XHWShader::forName(name, vertEntry,
 							source->pHlslFile->fileName.c_str(), tech.compileFlags,
 							ShaderType::Vertex, ILFlag, source->pHlslFile->sourceCrc32);
 
-						tech.pPixelShader = XHWShader::forName(name, pixelEntry,
+						tech.pCurHwTech->pPixelShader = XHWShader::forName(name, pixelEntry,
 							source->pHlslFile->fileName.c_str(), tech.compileFlags, 
 							ShaderType::Pixel, ILFlag, source->pHlslFile->sourceCrc32);
-
+						
 					}
 				}
 			}
@@ -488,6 +497,7 @@ XShader* XShaderManager::reloadShader(const char* name)
 
 							// these have not changed.
 							// it's safe to pass the pointers.
+							/*
 							const char* vertEntry = tech.pVertexShader->getEntryPoint();
 							const char* pixelEntry = tech.pPixelShader->getEntryPoint();
 
@@ -501,7 +511,7 @@ XShader* XShaderManager::reloadShader(const char* name)
 							tech.pPixelShader = XHWShader::forName(name, pixelEntry,
 								source->pHlslFile->fileName.c_str(), tech.compileFlags, 
 								ShaderType::Pixel, ILFlag, source->pHlslFile->sourceCrc32);
-
+							*/
 						}
 
 					}
@@ -648,19 +658,22 @@ XShader* XShaderManager::loadShader(const char* name)
 		{
 			XShaderTechnique& tech = shader->techs[i];
 			ShaderSourceFile::Technique& srcTech = source->techniques[i];
+			XShaderTechniqueHW hwTech;
 
 			tech = srcTech;
 
 			Flags<ILFlag> ILFlag;
-
+			
 			// create the hardware shaders.
-			tech.pVertexShader = XHWShader::forName(name, srcTech.vertex_func,
+			hwTech.pVertexShader = XHWShader::forName(name, srcTech.vertex_func,
 				source->pHlslFile->fileName.c_str(), tech.compileFlags,
 				ShaderType::Vertex, ILFlag, source->pHlslFile->sourceCrc32);
 
-			tech.pPixelShader = XHWShader::forName(name, srcTech.pixel_func,
+			hwTech.pPixelShader = XHWShader::forName(name, srcTech.pixel_func,
 				source->pHlslFile->fileName.c_str(), tech.compileFlags,
 				ShaderType::Pixel, ILFlag, source->pHlslFile->sourceCrc32);
+			
+			tech.append(hwTech);
 		}
 
 		X_DELETE(source,g_rendererArena);
