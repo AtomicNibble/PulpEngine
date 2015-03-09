@@ -66,7 +66,7 @@ struct Vertex_P3F_T2S_C4B_N10 : public Vertex_P3F_T2S_C4B
 
 struct Vertex_P3F_T2S_C4B_N10_TB10 : public Vertex_P3F_T2S_C4B
 {
-	uint32_t		normal; // 10|10|10|2 normals
+	compressedVec3	normal; // 10|10|10|2 normals
 	compressedVec3	tangent;
 	compressedVec3	binormal;
 }; // 
