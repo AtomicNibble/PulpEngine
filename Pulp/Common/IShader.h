@@ -89,6 +89,8 @@ struct ShaderParamFreq
 X_DECLARE_ENUM(ShaderType)(UnKnown, Vertex, Pixel, Geometry);
 X_DECLARE_ENUM(ShaderTextureIdx)(DIFFUSE, BUMP, SPEC);
 
+X_DECLARE_FLAGS(ILFlag)(Normal, BiNormal, Color);
+X_DECLARE_FLAGS(TechFlag)(Color, Textured, Skinned, Instanced);
 
 // a shader can have flags
 // Eg:

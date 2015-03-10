@@ -256,7 +256,7 @@ namespace
 
 
 XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
-	const char* sourceFile, const MacroList& macros,
+	const char* sourceFile, const Flags<TechFlag>& techFlags,
 	ShaderType::Enum type, Flags<ILFlag> ILFlags, uint32_t sourceCrc)
 {
 	X_ASSERT_NOT_NULL(pHWshaders);
@@ -270,19 +270,11 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	name.appendFmt("%s@%s", shader_name, entry);
 
 	// macros are now part of the name.
-	if (macros.isNotEmpty())
-	{
-		for (auto const &it : macros)
-		{
-			name.appendFmt("_%s", it);
-		}
-	}
+	name.appendFmt("_%x", techFlags.ToInt());
+	
 	// input layout flags are also part of the name.
-	if(ILFlags.IsAnySet())
-	{
-		// append the 32bit int.
-		name.appendFmt("_%x", ILFlags.ToInt());
-	}
+	name.appendFmt("_%x", ILFlags.ToInt());
+
 
 #if X_DEBUG
 	X_LOG1("Shader", "HWS for name: \"%s\"", name.c_str());
@@ -323,7 +315,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 		pShader->sourceCrc32 = sourceCrc;
 
 		// save macros
-		pShader->macros_ = macros;
+		pShader->techFlags = techFlags;
 
 		// temp
 		pShader->activate();
@@ -417,8 +409,7 @@ XHWShader_Dx10::XHWShader_Dx10() :
 	status_(ShaderStatus::NotCompiled),
 	pBlob_(nullptr),
 	pHWHandle_(nullptr),
-	bindVars_(g_rendererArena),
-	macros_(g_rendererArena)
+	bindVars_(g_rendererArena)
 {
 	core::zero_object(maxVecs_);
 
@@ -506,30 +497,33 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 	// allow 16 flags.
 	D3D_SHADER_MACRO Shader_Macros[17] = { NULL };
 	core::string names[16];
-
-	if (macros_.size() > 16)
+	
+	// i turn all set flags into strings.
+	if (techFlags.IsAnySet())
 	{
-		X_ERROR("Shader", "too many macro's for shader: %s", this->name.c_str());
-		return false;
-	}
+		uint32_t numFlags = core::bitUtil::CountBits(techFlags.ToInt());
 
-	for (size_t i = 0; i < macros_.size(); i++)
-	{
-		// we "X_" prefix and upper case.
-		core::string& name = names[i];
-		name = "X_";
-		name += macros_[i];
-		name.toUpper();
-		// set the pointer.
-		Shader_Macros[i].Name = name.c_str();
-		Shader_Macros[i].Definition = "1";
-	}
+		for (uint32_t i = 1; i < TechFlag::FLAGS_COUNT; i++)
+		{
+			if (techFlags.IsSet((TechFlag::Enum)i))
+			{
+				// we "X_" prefix and upper case.
+				core::string& name = names[i];
+				name = "X_";
+				name += TechFlag::ToString(i);
+				name.toUpper();
+				// set the pointer.
+				Shader_Macros[i].Name = name.c_str();
+				Shader_Macros[i].Definition = "1";
+			}
+		}
 
-	// log the macros
-	for (size_t i = 0; i < macros_.size(); i++)
-	{
-		X_LOG1("Shader", "Macro(%i): name: %s value: %s", 
-			i, Shader_Macros[i].Name, Shader_Macros[i].Definition);
+		// log the macros
+		for (size_t i = 0; i < numFlags; i++)
+		{
+			X_LOG1("Shader", "Macro(%i): name: %s value: %s",
+				i, Shader_Macros[i].Name, Shader_Macros[i].Definition);
+		}
 	}
 
 	ID3DBlob* error;
@@ -552,22 +546,28 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 
 	if (FAILED(hr) || error || !pBlob_)
 	{
-		const char* err = (const char*)error->GetBufferPointer();
-		
-		core::StackString<4096> filterd(err, err + strlen(err));
+		if (error)
+		{
+			const char* err = (const char*)error->GetBufferPointer();
 
-		// skip file path.
-		err = filterd.find(this->sourceFileName);
+			core::StackString<4096> filterd(err, err + strlen(err));
 
-		if (err) {
+			// skip file path.
+			err = filterd.find(this->sourceFileName);
 
-			core::StackString512 path(filterd.begin(), err);
-		
-			filterd.replaceAll(path.c_str(), "");
+			if (err) {
+				core::StackString512 path(filterd.begin(), err);
+				filterd.replaceAll(path.c_str(), "");
+			}
+
+			X_ERROR("Shader", "Failed to compile(%x): %s", hr, filterd.c_str());
+		}
+		else
+		{
+			X_ERROR("Shader", "Failed to compile: %x", hr);
+
 		}
 
-
-		X_ERROR("Shader", "Failed to compile: %s", filterd.c_str());
 		return false;
 	}
 

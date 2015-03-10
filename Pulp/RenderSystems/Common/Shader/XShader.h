@@ -57,7 +57,6 @@ X_DECLARE_FLAGS(TechniquePrams) (NAME, VERTEX_FNC, PIXEL_FNC);
 
 // in the shader name space so it's ok to call just: PrePro
 X_DECLARE_ENUM(PreProType)(Include, Define, Undef, If, IfDef, IfNDef, Else, EndIF);
-X_DECLARE_FLAGS(ILFlag)(Normal, BiNormal, Color);
 
 
 class XShaderResources : public IRenderShaderResources
@@ -119,12 +118,10 @@ class XShader;
 class XHWShader : public core::XBaseAsset
 {
 public:
-	typedef core::Array<core::string> MacroList;
-
 	XHWShader();
 
 	static XHWShader* forName(const char* shader_name, const char* entry,
-		const char* sourceFile, const MacroList& macros,
+		const char* sourceFile, const Flags<TechFlag>& techFlag,
 		ShaderType::Enum type, Flags<ILFlag> ILFlag, uint32_t sourceCrc);
 
 	static const char* getProfileFromType(ShaderType::Enum type);
@@ -150,6 +147,8 @@ protected:
 	core::string entryPoint;
 	uint32_t sourceCrc32; // the crc of the source this was compiled from.
 
+	Flags<TechFlag> techFlags;
+
 	// set for all shader types.
 	VertexFormat::Enum vertexFmt; 
 	ShaderType::Enum type; // V / P / G
@@ -161,6 +160,12 @@ struct InputLayoutEntry
 {
 	const char* name;
 	ILFlag::Enum flag;
+};
+
+struct TechFlagEntry
+{
+	const char* name;
+	TechFlag::Enum flag;
 };
 
 struct PreProEntry
@@ -212,8 +217,6 @@ struct ShaderSourceFile
 	{
 		Technique();
 
-		typedef core::Array<core::string> CompileFlagList;
-
 		core::string name;
 		core::string vertex_func;
 		core::string pixel_func;
@@ -226,8 +229,7 @@ struct ShaderSourceFile
 
 		render::StateFlag state;
 		Flags<TechniquePrams> flags;
-
-		CompileFlagList compileFlags;
+		Flags<TechFlag> techFlags;
 
 		bool parse(core::XLexer& lex);
 		bool processName(void);
@@ -260,6 +262,9 @@ struct XShaderTechniqueHW
 	}
 
 public:
+	Flags<TechFlag> techFlags;
+	Flags<ILFlag> ILFlags;
+
 	XHWShader* pVertexShader;
 	XHWShader* pPixelShader;
 	XHWShader* pGeoShader;
@@ -270,12 +275,10 @@ struct XShaderTechnique
 {
 	static const size_t TECH_MAX_SUB = 6;
 
-	typedef core::Array<core::string> CompileFlagList;
 	typedef core::FixedArray<XShaderTechniqueHW, TECH_MAX_SUB> TechHWList;
 
 	XShaderTechnique() :
-		pCurHwTech(nullptr),
-		compileFlags(g_rendererArena)
+		pCurHwTech(nullptr)
 	{}
 
 	XShaderTechnique& operator=(const ShaderSourceFile::Technique& srcTech);
@@ -292,6 +295,10 @@ struct XShaderTechnique
 		pCurHwTech = hwTechs.end() - 1;
 	}
 
+	void resetCurHWTech(void) {
+		pCurHwTech = hwTechs.begin();
+	}
+
 public:
 	core::string name;
 	core::StrHash nameHash;
@@ -304,8 +311,7 @@ public:
 	XShaderTechniqueHW* pCurHwTech;
 	TechHWList hwTechs;
 
-	// leave at end, not accesed much.
-	CompileFlagList compileFlags;
+	Flags<TechFlag> techFlags;
 };
 
 class XShader : public IShader, public core::XBaseAsset

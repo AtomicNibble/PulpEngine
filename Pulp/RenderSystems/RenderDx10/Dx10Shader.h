@@ -520,7 +520,6 @@ private:
 	void* pHWHandle_;
 
 	core::Array<XShaderParam> bindVars_;
-	MacroList macros_;
 	int maxVecs_[3];
 
 protected:

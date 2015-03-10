@@ -343,7 +343,16 @@ bool DX11XRender::setGUIShader(bool textured)
 
 	if (!pSh)
 		return false;
+#if 1
+	// for a tech we can require certain flags like:
+	// color, texture.
+	// we also check the current vertext layout.
+	// and match it with a input latout.
 
+	core::StrHash tech("Fill");
+	if (!pSh->FXSetTechnique(tech))
+		return false;
+#else
 	if (textured)
 	{
 		core::StrHash tech("Fill#Texture");
@@ -356,6 +365,7 @@ bool DX11XRender::setGUIShader(bool textured)
 		if (!pSh->FXSetTechnique(tech))
 			return false;
 	}
+#endif 
 
 	if (!pSh->FXBegin(&pass, 0))
 		return false;

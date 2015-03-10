@@ -69,6 +69,28 @@ namespace
 		return false;
 	}
 
+	TechFlagEntry g_TechFlags[] = {
+		{ "Color", TechFlag::Color },
+		{ "Textured", TechFlag::Textured },
+		{ "Skinned", TechFlag::Skinned },
+		{ "Instanced", TechFlag::Instanced },
+	};
+
+	bool TechFlagFromStr(const char* pStr, Flags<TechFlag>& flagOut)
+	{
+		const size_t num = sizeof(g_TechFlags) / sizeof(const char*);
+		size_t i;
+		for (i = 0; i < num; i++)
+		{
+			if (strUtil::IsEqualCaseInsen(pStr, g_TechFlags[i].name))
+			{
+				flagOut.Set(g_TechFlags[i].flag);
+				return true;
+			}
+		}
+		return false;
+	}
+
 	PreProEntry g_ProPros[] =
 	{
 		{ "include", PreProType::Include },
@@ -214,7 +236,7 @@ XShaderTechnique& XShaderTechnique::operator=(const ShaderSourceFile::Technique&
 //	hwTechs = srcTech.hwTechs;
 
 	// compileflags
-	compileFlags = srcTech.compileFlags;
+	techFlags = srcTech.techFlags;
 
 	return *this;
 }
@@ -430,13 +452,13 @@ XShader* XShaderManager::reloadShader(const char* name)
 
 					// create the hardware shaders.
 					// dose nothing if already loaded.
-					tech.pCurHwTech->pVertexShader = XHWShader::forName(name, srcTech.vertex_func,
-						source->pHlslFile->fileName.c_str(), srcTech.compileFlags, 
-						ShaderType::Vertex, ILFlag, source->pHlslFile->sourceCrc32);
+	//				tech.pCurHwTech->pVertexShader = XHWShader::forName(name, srcTech.vertex_func,
+	//					source->pHlslFile->fileName.c_str(), srcTech.compileFlags, 
+	//					ShaderType::Vertex, ILFlag, source->pHlslFile->sourceCrc32);
 
-					tech.pCurHwTech->pPixelShader = XHWShader::forName(name, srcTech.pixel_func,
-						source->pHlslFile->fileName.c_str(), srcTech.compileFlags, 
-						ShaderType::Pixel, ILFlag, source->pHlslFile->sourceCrc32);
+	//				tech.pCurHwTech->pPixelShader = XHWShader::forName(name, srcTech.pixel_func,
+	//					source->pHlslFile->fileName.c_str(), srcTech.compileFlags, 
+	//					ShaderType::Pixel, ILFlag, source->pHlslFile->sourceCrc32);
 				}
 			}
 			else if (shader->hlslSourceCrc32 != source->hlslSourceCrc32)
@@ -461,13 +483,13 @@ XShader* XShaderManager::reloadShader(const char* name)
 
 						Flags<ILFlag> ILFlag;
 						
-						tech.pCurHwTech->pVertexShader = XHWShader::forName(name, vertEntry,
-							source->pHlslFile->fileName.c_str(), tech.compileFlags,
-							ShaderType::Vertex, ILFlag, source->pHlslFile->sourceCrc32);
+	//					tech.pCurHwTech->pVertexShader = XHWShader::forName(name, vertEntry,
+	//						source->pHlslFile->fileName.c_str(), tech.compileFlags,
+	//						ShaderType::Vertex, ILFlag, source->pHlslFile->sourceCrc32);
 
-						tech.pCurHwTech->pPixelShader = XHWShader::forName(name, pixelEntry,
-							source->pHlslFile->fileName.c_str(), tech.compileFlags, 
-							ShaderType::Pixel, ILFlag, source->pHlslFile->sourceCrc32);
+	//					tech.pCurHwTech->pPixelShader = XHWShader::forName(name, pixelEntry,
+	//						source->pHlslFile->fileName.c_str(), tech.compileFlags, 
+	//						ShaderType::Pixel, ILFlag, source->pHlslFile->sourceCrc32);
 						
 					}
 				}
@@ -653,27 +675,65 @@ XShader* XShaderManager::loadShader(const char* name)
 		// I might use only the HLSL crc, do .shader changes matter?
 		// for now use hlsl + .shader
 		// uint32_t crc = source->pHlslFile->sourceCrc32;
+		Flags<TechFlag> techFlags;
+		Flags<ILFlag> ILFlags;
+		Flags<ILFlag> ILFlagSrc = source->pHlslFile->ILFlags;
 
 		for (i = 0; i < numTecs; i++)
 		{
 			XShaderTechnique& tech = shader->techs[i];
 			ShaderSourceFile::Technique& srcTech = source->techniques[i];
-			XShaderTechniqueHW hwTech;
-
 			tech = srcTech;
 
-			Flags<ILFlag> ILFlag;
-			
-			// create the hardware shaders.
-			hwTech.pVertexShader = XHWShader::forName(name, srcTech.vertex_func,
-				source->pHlslFile->fileName.c_str(), tech.compileFlags,
-				ShaderType::Vertex, ILFlag, source->pHlslFile->sourceCrc32);
+			// for every input layout we compile all the techFlags 
+			// plus one without flags passed.
+			uint32_t numILFlags = core::bitUtil::CountBits(ILFlagSrc.ToInt());
+			uint32_t numTechFlags = core::bitUtil::CountBits(tech.techFlags.ToInt());
+			uint32_t i, x, flagIdx = 1, techFlagIdx = 1;
+			for (i = 0; i < numILFlags + 1; i++)
+			{
+				techFlags.Clear();
+				techFlagIdx = 1;
 
-			hwTech.pPixelShader = XHWShader::forName(name, srcTech.pixel_func,
-				source->pHlslFile->fileName.c_str(), tech.compileFlags,
-				ShaderType::Pixel, ILFlag, source->pHlslFile->sourceCrc32);
+				for (x = 0; x < numTechFlags + 1; x++)
+				{
+					XShaderTechniqueHW hwTech;
+
+					// create the hardware shaders.
+					hwTech.pVertexShader = XHWShader::forName(name, srcTech.vertex_func,
+						source->pHlslFile->fileName.c_str(), techFlags,
+						ShaderType::Vertex, ILFlags, source->pHlslFile->sourceCrc32);
+
+					hwTech.pPixelShader = XHWShader::forName(name, srcTech.pixel_func,
+						source->pHlslFile->fileName.c_str(), techFlags,
+						ShaderType::Pixel, ILFlags, source->pHlslFile->sourceCrc32);
+
+					hwTech.techFlags = techFlags;
+					hwTech.ILFlags = ILFlags;
+					tech.append(hwTech);
+
+					// add tech flag
+					if (tech.techFlags.IsAnySet() && techFlags.ToInt() != tech.techFlags.ToInt()) {
+						while (!tech.techFlags.IsSet((TechFlag::Enum)techFlagIdx)) {
+							techFlagIdx <<= 1;
+						}
+						techFlags.Set((TechFlag::Enum)techFlagIdx);
+						techFlagIdx <<= 1;
+					}
+				}
+
+				// add in the next flag.
+				if (ILFlagSrc.IsAnySet() && ILFlagSrc.ToInt() != ILFlags.ToInt()) {
+					while (!ILFlagSrc.IsSet((ILFlag::Enum)flagIdx)) {
+						flagIdx <<= 1;
+					}
+					ILFlags.Set((ILFlag::Enum)flagIdx);
+					flagIdx <<= 1;
+				}
+			}
 			
-			tech.append(hwTech);
+
+			tech.resetCurHWTech();
 		}
 
 		X_DELETE(source,g_rendererArena);
@@ -746,10 +806,8 @@ bool BlendInfo::ParseBlendInfo(const char* name,
 	return true;
 }
 
-ShaderSourceFile::Technique::Technique() :
-	compileFlags(g_rendererArena)
+ShaderSourceFile::Technique::Technique()
 {
-
 }
 
 bool ShaderSourceFile::Technique::parse(core::XLexer& lex)
@@ -987,7 +1045,9 @@ bool ShaderSourceFile::Technique::processName(void)
 			return false;
 		}
 
-		core::StackString512 flags(pBrace + 1, pCloseBrace - 1);
+		core::StackString512 flags(pBrace + 1, pCloseBrace);
+		core::StackString512 temp;
+
 		if (flags.isNotEmpty())
 		{
 			core::StringTokenizer tokens(flags.begin(), flags.end(), ',');
@@ -995,7 +1055,12 @@ bool ShaderSourceFile::Technique::processName(void)
 
 			while (tokens.ExtractToken(flagName))
 			{
-				compileFlags.append(core::string(flagName.GetStart(), flagName.GetEnd()));
+				// valid tech flag?
+				temp.set(flagName.GetStart(), flagName.GetEnd());
+				if (!TechFlagFromStr(temp.c_str(), techFlags))
+				{
+					X_WARNING("Shader", "not a valid tech flag: %s", temp.c_str());
+				}
 			}
 		}
 
@@ -1090,33 +1155,8 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 							return nullptr;
 						}
 
-						if (tech.compileFlags.isNotEmpty())
-						{
-							// we make tech's for each flag.
-							ShaderSourceFile::Technique::CompileFlagList flags(tech.compileFlags);
-							
-							// clear them.
-							tech.compileFlags.free();
-							
-							for (auto const &it : flags)
-							{
-								ShaderSourceFile::Technique newTech(tech);
 
-								newTech.name += '#';
-								newTech.name += it;
-								newTech.compileFlags.append(it);
-
-								// apend it.
-								pShaderSource->techniques.append(newTech);
-							}
-
-							// we also compile one without any flags that has name without flags.
-							pShaderSource->techniques.append(tech);
-						}
-						else
-						{
-							pShaderSource->techniques.append(tech);
-						}
+						pShaderSource->techniques.append(tech);
 					}
 				}
 
