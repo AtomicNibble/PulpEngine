@@ -64,7 +64,7 @@ float4 guiPS(PS_INPUT input) : SV_TARGET
 {
     float4	resultColor;
     
-#if X_TEXTURE
+#if X_TEXTURED
     SampleTexture(input.texCoord, input.color, resultColor);
 #else
    resultColor =  input.color;
@@ -78,7 +78,7 @@ float4 AlphaTestPS(PS_INPUT input) : SV_TARGET
 {
     float4 resultColor;
     
-#if X_TEXTURE
+#if X_TEXTURED
     SampleTexture(input.texCoord, input.color, resultColor);
 #else
    resultColor =  input.color;
