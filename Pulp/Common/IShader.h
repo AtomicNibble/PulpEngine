@@ -92,6 +92,8 @@ X_DECLARE_ENUM(ShaderTextureIdx)(DIFFUSE, BUMP, SPEC);
 X_DECLARE_FLAGS(ILFlag)(Normal, BiNormal, Color);
 X_DECLARE_FLAGS(TechFlag)(Color, Textured, Skinned, Instanced);
 
+typedef Flags<TechFlag> TechFlags;
+
 // a shader can have flags
 // Eg:
 //	"Fill(Textured)"

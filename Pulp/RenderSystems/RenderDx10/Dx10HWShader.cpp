@@ -502,26 +502,29 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 	if (techFlags.IsAnySet())
 	{
 		uint32_t numFlags = core::bitUtil::CountBits(techFlags.ToInt());
+		uint32_t macroIdx = 0;
 
 		for (uint32_t i = 1; i < TechFlag::FLAGS_COUNT; i++)
 		{
-			if (techFlags.IsSet((TechFlag::Enum)i))
+			uint32_t flag = (1 << i);
+			if (techFlags.IsSet((TechFlag::Enum)flag))
 			{
 				// we "X_" prefix and upper case.
-				core::string& name = names[i];
+				core::string& name = names[macroIdx];
 				name = "X_";
-				name += TechFlag::ToString(i);
+				name += TechFlag::ToString(flag);
 				name.toUpper();
 				// set the pointer.
-				Shader_Macros[i].Name = name.c_str();
-				Shader_Macros[i].Definition = "1";
+				Shader_Macros[macroIdx].Name = name.c_str();
+				Shader_Macros[macroIdx].Definition = "1";
+				macroIdx++;
 			}
 		}
 
 		// log the macros
 		for (size_t i = 0; i < numFlags; i++)
 		{
-			X_LOG1("Shader", "Macro(%i): name: %s value: %s",
+			X_LOG0("Shader", "Macro(%i): name: \"%s\" value: \"%s\"",
 				i, Shader_Macros[i].Name, Shader_Macros[i].Definition);
 		}
 	}

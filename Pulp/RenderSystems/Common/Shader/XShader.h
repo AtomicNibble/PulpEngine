@@ -135,9 +135,6 @@ public:
 	X_INLINE const char* getEntryPoint(void) const {
 		return entryPoint.c_str();
 	}
-	X_INLINE const VertexFormat::Enum getVertexFmt(void) const {
-		return vertexFmt;
-	}
 protected:
 	static render::XRenderResourceContainer* pHWshaders;
 
@@ -150,7 +147,6 @@ protected:
 	Flags<TechFlag> techFlags;
 
 	// set for all shader types.
-	VertexFormat::Enum vertexFmt; 
 	ShaderType::Enum type; // V / P / G
 	XShader* pShader;
 };
@@ -330,8 +326,8 @@ public:
 	virtual VertexFormat::Enum getVertexFmt() X_OVERRIDE{ return vertexFmt; }
 
 	// D3D Effects interface
-	bool FXSetTechnique(const char* name);
-	bool FXSetTechnique(const core::StrHash& name);
+	bool FXSetTechnique(const char* name, const TechFlags flag = TechFlags());
+	bool FXSetTechnique(const core::StrHash& name, const TechFlags flag = TechFlags());
 	bool FXBegin(uint32 *uiPassCount, uint32 nFlags);
 	bool FXBeginPass(uint32 uiPass);
 	bool FXCommit(const uint32 nFlags);

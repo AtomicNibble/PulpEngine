@@ -15,16 +15,16 @@ X_NAMESPACE_BEGIN(shader)
 
 
 // D3D Effects interface
-bool XShader::FXSetTechnique(const char* name)
+bool XShader::FXSetTechnique(const char* name, const TechFlags flag)
 {
 	X_ASSERT_NOT_NULL(name);
 
 	// TODO beat the living shit out of any code still using this :D 
 
-	return FXSetTechnique(core::StrHash(name));
+	return FXSetTechnique(core::StrHash(name), flag);
 }
 
-bool XShader::FXSetTechnique(const core::StrHash& name)
+bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 {
 	size_t i;
 	for (i = 0; i< techs.size(); i++)
@@ -33,9 +33,41 @@ bool XShader::FXSetTechnique(const core::StrHash& name)
 		{
 			render::DX11XRender* rd = &render::g_Dx11D3D;
 
+			XShaderTechnique& tech = techs[i];
+
 			rd->m_State.pCurShader = this;
-			rd->m_State.pCurShaderTech = &techs[i];
+			rd->m_State.pCurShaderTech = &tech;
 			rd->m_State.CurShaderTechIdx = (int32)i;
+
+			if (!flags.IsAnySet())
+			{
+				tech.resetCurHWTech();
+			}
+			// work out which HW tech to used based on the flags :D !
+			else if (tech.hwTechs.size() > 1)
+			{
+				// ok so for every we have ones for all flags.
+				// plus input layouts.
+				for (auto& it : tech.hwTechs)
+				{
+					if (it.techFlags == flags)
+					{
+						tech.pCurHwTech = &it;
+						return true;
+					}
+				}
+
+				tech.resetCurHWTech();
+			}
+#if X_DEBUG
+			else if (tech.hwTechs.isEmpty())
+			{
+				X_ERROR("Shader", "tech has no hw techs");
+				return false;
+			}
+#endif // !X_DEBUG
+
+
 			return true;
 		}
 	}
@@ -343,7 +375,7 @@ bool DX11XRender::setGUIShader(bool textured)
 
 	if (!pSh)
 		return false;
-#if 1
+#if 0
 	// for a tech we can require certain flags like:
 	// color, texture.
 	// we also check the current vertext layout.
@@ -355,13 +387,13 @@ bool DX11XRender::setGUIShader(bool textured)
 #else
 	if (textured)
 	{
-		core::StrHash tech("Fill#Texture");
-		if (!pSh->FXSetTechnique(tech))
+		core::StrHash tech("Fill");
+		if (!pSh->FXSetTechnique(tech, TechFlag::Textured))
 			return false;
 	}
 	else
 	{
-		core::StrHash tech("Fill#Color");
+		core::StrHash tech("Fill");
 		if (!pSh->FXSetTechnique(tech))
 			return false;
 	}
