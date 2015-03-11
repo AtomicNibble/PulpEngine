@@ -121,7 +121,17 @@ const char* Flags<T>::ToString(Description& description) const
 	return description;
 }
 
+template <class T>
+inline bool Flags<T>::operator==(const Flags other) const
+{
+	return flags_ == other.flags_;
+}
 
+template <class T>
+inline bool Flags<T>::operator!=(const Flags other) const
+{
+	return flags_ != other.flags_;
+}
 
  ///=======================================================
 

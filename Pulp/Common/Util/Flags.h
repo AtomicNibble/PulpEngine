@@ -180,6 +180,10 @@ public:
 	/// human-readable string, and returns a pointer to the description string.
 	const char* ToString(Description& description) const;
 
+	// compare
+	inline bool operator==(const Flags other) const;
+	inline bool operator!=(const Flags other) const;
+
 private:
 	union {
 		uint32_t flags_;
