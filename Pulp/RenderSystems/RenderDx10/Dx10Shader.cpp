@@ -53,6 +53,44 @@ namespace
 				}
 		}
 
+		ILFlags IlFlagsForVertexFormat(const InputLayoutFormat::Enum fmt)
+		{
+				switch(fmt)
+				{
+					case VertexFormat::P3F_T3F:
+								return ILFlag::PosUV;
+					case VertexFormat::P3F_T2S:
+								return ILFlag::PosUV;
+
+					case VertexFormat::P3F_T2S_C4B:
+								return ILFlag::PosUV | ILFlag::Color;
+					case VertexFormat::P3F_T2S_C4B_N3F:
+								return ILFlag::PosUV | ILFlag::Color | ILFlag::Normal;
+					case VertexFormat::P3F_T2S_C4B_N3F_TB3F:
+								return ILFlag::PosUV | ILFlag::Color | ILFlag::Normal | ILFlag::BiNornmal;
+
+					case VertexFormat::P3F_T2S_C4B_N10:
+								return ILFlag::PosUV | ILFlag::Color | ILFlag::Normal;
+					case VertexFormat::P3F_T2S_C4B_N10_TB10:
+								return ILFlag::PosUV | ILFlag::Color | ILFlag::Normal | ILFlag::BiNormal;
+
+					case VertexFormat::P3F_T2F_C4B:
+								return ILFlag::PosUV | ILFlag::Color;
+
+					case VertexFormat::P3F_T4F_C4B_N3F:
+								return ILFlag::PosUV | ILFlag::Color | ILFlag::Normal;
+
+#if X_DEBUG
+					default:
+					X_ASSERT_UNREACHABLE();
+					break;
+#else
+					X_NO_SWITCH_DEFAULT;
+#endif // !X_DEBUG
+				}			
+		}
+
+
 } // namespace
 
 
@@ -85,7 +123,12 @@ bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 			// if we have any shader that can support this vertex layout.
 			// i will store aoll HW techs contiguosly.
 			// so bail out early is possible.
-			InputLayoutFormat IlFmt = ILfromVertexForamt(rd->m_State.CurrentVertexFmt);
+			// for a tech i know what the flags are.
+			// so if i can turn currently vertex format into flags.
+			// i would be able to know if such a format is possible.
+			// i'll make a lookup.
+
+			ILFlags VrtFmtIlFlas = IlFlagsForVertexFormat((rd->m_State.CurrentVertexFmt);
 
 
 			if (!flags.IsAnySet())
@@ -99,10 +142,13 @@ bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 				// plus input layouts.
 				for (auto& it : tech.hwTechs)
 				{
-					if (it.techFlags == flags)
-					{
-						tech.pCurHwTech = &it;
-						return true;
+					 if(it.IlFlags == VrtFmtIlFlas)
+					 {
+						if (it.techFlags == flags)
+						{
+							tech.pCurHwTech = &it;
+							return true;
+						}
 					}
 				}
 
