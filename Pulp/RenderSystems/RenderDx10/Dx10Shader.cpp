@@ -13,6 +13,48 @@ X_NAMESPACE_BEGIN(shader)
 
 // ===================== XShader ===========================
 
+namespace
+{
+
+		InputLayoutFormat ILfromVertexForamt(const VertexFormat& fmt)
+		{
+				switch(fmt)
+				{
+					case VertexFormat::P3F_T3F:
+								return InputLayoutFormat::POS_UV;
+					case VertexFormat::P3F_T2S:
+								return InputLayoutFormat::POS_UV;
+
+					case VertexFormat::P3F_T2S_C4B:
+								return InputLayoutFormat::POS_UV_COL;
+					case VertexFormat::P3F_T2S_C4B_N3F:
+								return InputLayoutFormat::POS_UV_COL_NORM;
+					case VertexFormat::P3F_T2S_C4B_N3F_TB3F:
+								return InputLayoutFormat::POS_UV_COL_NORM_TAN_BI;
+
+					case VertexFormat::P3F_T2S_C4B_N10:
+								return InputLayoutFormat::POS_UV_COL_NORM;
+					case VertexFormat::P3F_T2S_C4B_N10_TB10:
+								return InputLayoutFormat::POS_UV_COL_NORM_TAN_BI;
+
+					case VertexFormat::P3F_T2F_C4B:
+								return InputLayoutFormat::POS_UV_COL;
+
+					case VertexFormat::P3F_T4F_C4B_N3F:
+								return InputLayoutFormat::POS_UV2_COL_NORM;
+
+#if X_DEBUG
+					default:
+					X_ASSERT_UNREACHABLE();
+					break;
+#else
+					X_NO_SWITCH_DEFAULT;
+#endif // !X_DEBUG
+				}
+		}
+
+} // namespace
+
 
 // D3D Effects interface
 bool XShader::FXSetTechnique(const char* name, const TechFlags flag)
