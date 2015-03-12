@@ -164,7 +164,8 @@ public:
 	// GPU layouts.
 	ID3D11InputLayout* vertexLayoutCache[shader::VertexFormat::Num];
 	ID3D11InputLayout* pCurrentVertexFmt;
-
+	shader::VertexFormat::Enum CurrentVertexFmt;
+	
 
 	StateFlag currentState;
 	CullMode::Enum cullMode;

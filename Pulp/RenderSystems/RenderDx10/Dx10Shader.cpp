@@ -16,7 +16,7 @@ X_NAMESPACE_BEGIN(shader)
 namespace
 {
 
-		InputLayoutFormat ILfromVertexForamt(const VertexFormat& fmt)
+		InputLayoutFormat ILfromVertexForamt(const VertexFormat::Enum& fmt)
 		{
 				switch(fmt)
 				{
@@ -80,6 +80,13 @@ bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 			rd->m_State.pCurShader = this;
 			rd->m_State.pCurShaderTech = &tech;
 			rd->m_State.CurShaderTechIdx = (int32)i;
+
+			// we get the current vertex format and work out
+			// if we have any shader that can support this vertex layout.
+			// i will store aoll HW techs contiguosly.
+			// so bail out early is possible.
+			InputLayoutFormat IlFmt = ILfromVertexForamt(rd->m_State.CurrentVertexFmt);
+
 
 			if (!flags.IsAnySet())
 			{
