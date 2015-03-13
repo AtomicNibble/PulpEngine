@@ -135,6 +135,9 @@ public:
 	X_INLINE const char* getEntryPoint(void) const {
 		return entryPoint.c_str();
 	}
+	X_INLINE InputLayoutFormat::Enum getILFormat(void) const {
+		return IlFmt_;
+	}
 protected:
 	static render::XRenderResourceContainer* pHWshaders;
 
@@ -144,11 +147,11 @@ protected:
 	core::string entryPoint;
 	uint32_t sourceCrc32; // the crc of the source this was compiled from.
 
-	Flags<TechFlag> techFlags;
+	TechFlags techFlags;
 
 	// set for all shader types.
 	ShaderType::Enum type; // V / P / G
-	XShader* pShader;
+	InputLayoutFormat::Enum IlFmt_;
 };
 
 
@@ -260,6 +263,7 @@ struct XShaderTechniqueHW
 public:
 	Flags<TechFlag> techFlags;
 	Flags<ILFlag> ILFlags;
+	InputLayoutFormat::Enum IlFmt;
 
 	XHWShader* pVertexShader;
 	XHWShader* pPixelShader;

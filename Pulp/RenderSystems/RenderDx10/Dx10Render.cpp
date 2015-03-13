@@ -42,7 +42,7 @@ DX11XRender::~DX11XRender()
 void DX11XRender::SetArenas(core::MemoryArenaBase* arena)
 {
 	X_ASSERT_NOT_NULL(arena);
-	int i;
+//	int i;
 
 	XRender::SetArenas(arena);
 
@@ -50,8 +50,8 @@ void DX11XRender::SetArenas(core::MemoryArenaBase* arena)
 	m_RasterStates.setArena(arena);
 	m_DepthStates.setArena(arena);
 
-	for (i = 0; i < shader::VertexFormat::Num; i++)
-		m_State.vertexLayoutDescriptions[i].setArena(arena);
+//	for (i = 0; i < shader::VertexFormat::Num; i++)
+//		m_State.vertexLayoutDescriptions[i].setArena(arena);
 
 }
 
@@ -1101,7 +1101,7 @@ HRESULT DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFm
 			X_ERROR("Render", "CurrentShader: %s", pShaderName);
 			X_ERROR("Render", "Layout:");
 			X_LOG_BULLET;
-			RenderState::XVertexLayout::ConstIterator it;
+			RenderState::XVertexLayout::const_iterator it;
 			for ( it = layout.begin(); it != layout.end(); ++it)
 			{
 				X_LOG0("Layout", "\"%s(%i)\" ByteOffset: %i Slot: %i", 
@@ -1126,6 +1126,7 @@ HRESULT DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFm
 	if (m_State.pCurrentVertexFmt != pLayout)
 	{
 		m_State.pCurrentVertexFmt = pLayout;
+		m_State.CurrentVertexFmt = vertexFmt;
 		m_deviceContext->IASetInputLayout(pLayout);
 	}
 

@@ -16,74 +16,74 @@ X_NAMESPACE_BEGIN(shader)
 namespace
 {
 
-		InputLayoutFormat ILfromVertexForamt(const VertexFormat::Enum& fmt)
+		InputLayoutFormat::Enum ILfromVertexFormat(const VertexFormat::Enum fmt)
 		{
-				switch(fmt)
-				{
-					case VertexFormat::P3F_T3F:
-								return InputLayoutFormat::POS_UV;
-					case VertexFormat::P3F_T2S:
-								return InputLayoutFormat::POS_UV;
+			switch (fmt)
+			{
+				case VertexFormat::P3F_T3F:
+					return InputLayoutFormat::POS_UV;
+				case VertexFormat::P3F_T2S:
+					return InputLayoutFormat::POS_UV;
 
-					case VertexFormat::P3F_T2S_C4B:
-								return InputLayoutFormat::POS_UV_COL;
-					case VertexFormat::P3F_T2S_C4B_N3F:
-								return InputLayoutFormat::POS_UV_COL_NORM;
-					case VertexFormat::P3F_T2S_C4B_N3F_TB3F:
-								return InputLayoutFormat::POS_UV_COL_NORM_TAN_BI;
+				case VertexFormat::P3F_T2S_C4B:
+					return InputLayoutFormat::POS_UV_COL;
+				case VertexFormat::P3F_T2S_C4B_N3F:
+					return InputLayoutFormat::POS_UV_COL_NORM;
+				case VertexFormat::P3F_T2S_C4B_N3F_TB3F:
+					return InputLayoutFormat::POS_UV_COL_NORM_TAN_BI;
 
-					case VertexFormat::P3F_T2S_C4B_N10:
-								return InputLayoutFormat::POS_UV_COL_NORM;
-					case VertexFormat::P3F_T2S_C4B_N10_TB10:
-								return InputLayoutFormat::POS_UV_COL_NORM_TAN_BI;
+				case VertexFormat::P3F_T2S_C4B_N10:
+					return InputLayoutFormat::POS_UV_COL_NORM;
+				case VertexFormat::P3F_T2S_C4B_N10_TB10:
+					return InputLayoutFormat::POS_UV_COL_NORM_TAN_BI;
 
-					case VertexFormat::P3F_T2F_C4B:
-								return InputLayoutFormat::POS_UV_COL;
+				case VertexFormat::P3F_T2F_C4B:
+					return InputLayoutFormat::POS_UV_COL;
 
-					case VertexFormat::P3F_T4F_C4B_N3F:
-								return InputLayoutFormat::POS_UV2_COL_NORM;
+				case VertexFormat::P3F_T4F_C4B_N3F:
+					return InputLayoutFormat::POS_UV2_COL_NORM;
 
 #if X_DEBUG
-					default:
+				default:
 					X_ASSERT_UNREACHABLE();
-					break;
+					return InputLayoutFormat::POS_UV;
 #else
 					X_NO_SWITCH_DEFAULT;
 #endif // !X_DEBUG
 				}
 		}
 
-		ILFlags IlFlagsForVertexFormat(const InputLayoutFormat::Enum fmt)
+		ILFlags IlFlagsForVertexFormat(const VertexFormat::Enum fmt)
 		{
-				switch(fmt)
-				{
-					case VertexFormat::P3F_T3F:
-								return ILFlag::PosUV;
-					case VertexFormat::P3F_T2S:
-								return ILFlag::PosUV;
+			switch (fmt)
+			{
+				case VertexFormat::P3F_T3F:
+					return ILFlags();
+				case VertexFormat::P3F_T2S:
+					return ILFlags();
 
-					case VertexFormat::P3F_T2S_C4B:
-								return ILFlag::PosUV | ILFlag::Color;
-					case VertexFormat::P3F_T2S_C4B_N3F:
-								return ILFlag::PosUV | ILFlag::Color | ILFlag::Normal;
-					case VertexFormat::P3F_T2S_C4B_N3F_TB3F:
-								return ILFlag::PosUV | ILFlag::Color | ILFlag::Normal | ILFlag::BiNornmal;
+				case VertexFormat::P3F_T2S_C4B:
+					return ILFlag::Color;
+				case VertexFormat::P3F_T2S_C4B_N3F:
+					return ILFlag::Color | ILFlag::Normal;
+				case VertexFormat::P3F_T2S_C4B_N3F_TB3F:
+					return ILFlag::Color | ILFlag::Normal | ILFlag::BiNormal;
 
-					case VertexFormat::P3F_T2S_C4B_N10:
-								return ILFlag::PosUV | ILFlag::Color | ILFlag::Normal;
-					case VertexFormat::P3F_T2S_C4B_N10_TB10:
-								return ILFlag::PosUV | ILFlag::Color | ILFlag::Normal | ILFlag::BiNormal;
+				case VertexFormat::P3F_T2S_C4B_N10:
+					return ILFlag::Color | ILFlag::Normal;
+				case VertexFormat::P3F_T2S_C4B_N10_TB10:
+					return ILFlag::Color | ILFlag::Normal | ILFlag::BiNormal;
 
-					case VertexFormat::P3F_T2F_C4B:
-								return ILFlag::PosUV | ILFlag::Color;
+				case VertexFormat::P3F_T2F_C4B:
+					return ILFlag::Color;
 
-					case VertexFormat::P3F_T4F_C4B_N3F:
-								return ILFlag::PosUV | ILFlag::Color | ILFlag::Normal;
+				case VertexFormat::P3F_T4F_C4B_N3F:
+					return ILFlag::Color | ILFlag::Normal;
 
 #if X_DEBUG
-					default:
+				default:
 					X_ASSERT_UNREACHABLE();
-					break;
+					return ILFlags();
 #else
 					X_NO_SWITCH_DEFAULT;
 #endif // !X_DEBUG
@@ -119,36 +119,18 @@ bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 			rd->m_State.pCurShaderTech = &tech;
 			rd->m_State.CurShaderTechIdx = (int32)i;
 
-			// we get the current vertex format and work out
-			// if we have any shader that can support this vertex layout.
-			// i will store aoll HW techs contiguosly.
-			// so bail out early is possible.
-			// for a tech i know what the flags are.
-			// so if i can turn currently vertex format into flags.
-			// i would be able to know if such a format is possible.
-			// i'll make a lookup.
 
-			ILFlags VrtFmtIlFlas = IlFlagsForVertexFormat((rd->m_State.CurrentVertexFmt);
-
-
-			if (!flags.IsAnySet())
-			{
-				tech.resetCurHWTech();
-			}
 			// work out which HW tech to used based on the flags :D !
-			else if (tech.hwTechs.size() > 1)
+			if (tech.hwTechs.size() > 1)
 			{
 				// ok so for every we have ones for all flags.
 				// plus input layouts.
 				for (auto& it : tech.hwTechs)
 				{
-					 if(it.IlFlags == VrtFmtIlFlas)
-					 {
-						if (it.techFlags == flags)
-						{
-							tech.pCurHwTech = &it;
-							return true;
-						}
+					if (it.techFlags == flags)
+					{
+						tech.pCurHwTech = &it;
+						return true;
 					}
 				}
 
@@ -161,7 +143,10 @@ bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 				return false;
 			}
 #endif // !X_DEBUG
-
+			else
+			{
+				tech.resetCurHWTech();
+			}
 
 			return true;
 		}
@@ -470,6 +455,7 @@ bool DX11XRender::setGUIShader(bool textured)
 
 	if (!pSh)
 		return false;
+
 #if 0
 	// for a tech we can require certain flags like:
 	// color, texture.

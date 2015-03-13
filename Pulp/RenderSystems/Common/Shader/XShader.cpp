@@ -710,6 +710,7 @@ XShader* XShaderManager::loadShader(const char* name)
 
 					hwTech.techFlags = techFlags;
 					hwTech.ILFlags = ILFlags;
+					hwTech.IlFmt = hwTech.pVertexShader->getILFormat();
 					tech.append(hwTech);
 
 					// add tech flag

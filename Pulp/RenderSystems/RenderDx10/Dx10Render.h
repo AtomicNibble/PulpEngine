@@ -117,24 +117,13 @@ class RenderState
 public:
 	static const int MAX_VERTEX_STREAMS = 8;
 
-	RenderState() :
-		vertexLayoutDescriptions({ 
-			g_rendererArena, 
-			g_rendererArena,
-			g_rendererArena,
-			g_rendererArena,
-			g_rendererArena,
-			g_rendererArena,
-			g_rendererArena,
-			g_rendererArena,
-			g_rendererArena 
-		}
-	)
+	RenderState()
 	{
 		pIndexStream = nullptr;
 
 		core::zero_object(vertexLayoutCache);
 		pCurrentVertexFmt = nullptr;
+		CurrentVertexFmt = shader::VertexFormat::P3F_T2S;
 
 		pCurShader = nullptr;
 		pCurShaderTech = nullptr;
@@ -155,7 +144,7 @@ public:
 	ID3D11Buffer* pIndexStream;
 
 	// vertex format cache.
-	typedef core::Array<D3D11_INPUT_ELEMENT_DESC> XVertexLayout;
+	typedef core::FixedArray<D3D11_INPUT_ELEMENT_DESC, 12> XVertexLayout;
 
 	// Layouts used for creating device layouts.
 	// XVertexLayout vertexLayoutDescriptions[shader::VertexFormat::Num];
