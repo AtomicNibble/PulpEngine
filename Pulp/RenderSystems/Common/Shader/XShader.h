@@ -138,6 +138,17 @@ public:
 	X_INLINE InputLayoutFormat::Enum getILFormat(void) const {
 		return IlFmt_;
 	}
+
+
+	X_INLINE uint32_t getNumRenderTargets(void) const {
+		return numRenderTargets_;
+	}
+	X_INLINE uint32_t getNumSamples(void) const {
+		return numSamples_;
+	}
+	X_INLINE uint32_t getNumConstantBuffers(void) const {
+		return numConstBuffers_;
+	}
 protected:
 	static render::XRenderResourceContainer* pHWshaders;
 
@@ -153,11 +164,10 @@ protected:
 	// POS_UV_COL_NOR
 	InputLayoutFormat::Enum IlFmt_;
 
-	// detailed info.
+	// save info from shader reflection.
 	uint32_t numRenderTargets_;
 	uint32_t numSamples_;
 	uint32_t numConstBuffers_;
-
 };
 
 
