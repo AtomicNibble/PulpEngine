@@ -7,8 +7,12 @@ render::XRenderResourceContainer* XHWShader::pHWshaders = nullptr;
 
 
 XHWShader::XHWShader() :
+	sourceCrc32(0),
 	type(ShaderType::UnKnown),
-	sourceCrc32(0)
+	IlFmt_(InputLayoutFormat::POS_UV),
+	numRenderTargets_(0),
+	numSamples_(0),
+	numConstBuffers_(0),
 {
 
 }

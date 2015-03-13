@@ -141,17 +141,23 @@ public:
 protected:
 	static render::XRenderResourceContainer* pHWshaders;
 
-
 	core::string name;
 	core::string sourceFileName;
 	core::string entryPoint;
 	uint32_t sourceCrc32; // the crc of the source this was compiled from.
 
+	// color, textured, skinned, instanced
 	TechFlags techFlags;
-
-	// set for all shader types.
-	ShaderType::Enum type; // V / P / G
+	// Vert / Pixel / Hull / Geo
+	ShaderType::Enum type; 
+	// POS_UV_COL_NOR
 	InputLayoutFormat::Enum IlFmt_;
+
+	// detailed info.
+	uint32_t numRenderTargets_;
+	uint32_t numSamples_;
+	uint32_t numConstBuffers_;
+
 };
 
 
@@ -267,7 +273,7 @@ public:
 
 	XHWShader* pVertexShader;
 	XHWShader* pPixelShader;
-	XHWShader* pGeoShader;
+	XHWShader* pGeoShader;n
 };
 
 
