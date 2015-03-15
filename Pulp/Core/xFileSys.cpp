@@ -504,7 +504,26 @@ bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) c
 	X_ASSERT_NOT_NULL(path);
 
 	DWORD dwAttrib = GetFileAttributes(path);
-	return (dwAttrib != INVALID_FILE_ATTRIBUTES && (dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+
+	if (dwAttrib != INVALID_FILE_ATTRIBUTES) // make sure we did not fail for some shit, like permissions
+	{
+		if ((dwAttrib & FILE_ATTRIBUTE_DIRECTORY))
+		{
+			// found
+			return true;
+		}
+
+		X_ERROR("Dir", "DirectoryExists check was ran on a File");
+		return false; 
+	}
+
+	if (lastError::Get() != ERROR_PATH_NOT_FOUND)
+	{
+		lastError::Description Dsc;
+		X_ERROR("Dir", "DirectoryExists failed. Error: %s", lastError::ToString(Dsc));
+	}
+
+	return false;
 }
 
 
