@@ -470,6 +470,10 @@ bool XHWShader_Dx10::loadFromCache()
 	if (bin_.loadShader(dest.c_str(), this->sourceCrc32, this))
 	{
 		X_LOG0("Shader", "shader loaded from cache: \"%s\"", name.c_str());
+
+		// add them.
+		addGlobalParams(bindVars_, this->type_);
+
 		return true;
 	}
 
@@ -990,6 +994,7 @@ bool XHWShader_Dx10::activate()
 			{
 				// reflection not required for cache loaded.
 				status_ = ShaderStatus::ReadyToRock;
+				return true;
 			}
 			else
 			{
@@ -1011,9 +1016,12 @@ bool XHWShader_Dx10::activate()
 			{
 				status_ = ShaderStatus::ReadyToRock;
 				saveToCache();
+				return true;
 			}
 		}
 
+		X_LOG0_EVERY_N(10, "Shader", "Failed to activate shader: \"%s\"", getName());
+		return false;
 	}
 	return true;
 }

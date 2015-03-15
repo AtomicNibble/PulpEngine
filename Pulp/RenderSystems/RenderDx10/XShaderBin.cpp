@@ -101,8 +101,13 @@ bool XShaderBin::loadShader(const char* path, uint32_t sourceCRC, XHWShader_Dx10
 	X_ASSERT_NOT_NULL(path);
 	X_ASSERT_NOT_NULL(pShader);
 
-	ID3DBlob* pBlob = nullptr;
+	if (!gEnv->pFileSys->fileExists(path)) {
+		X_LOG1("Shader", "no cache exsits for: \"%s\"", path);
+		return false;
+	}
 
+
+	ID3DBlob* pBlob = nullptr;
 	XShaderBinHeader hdr;
 	core::zero_object(hdr);
 
