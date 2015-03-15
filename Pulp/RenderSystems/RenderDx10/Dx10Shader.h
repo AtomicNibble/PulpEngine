@@ -82,56 +82,6 @@ public:
 };
 
 
-/*
-struct XShaderParamBind
-{
-	core::string		name;
-	Flags<ParamFlags>	flags;
-	ParamType::Enum		type;
-	short				bind;
-	short				constBufferSlot;
-	int					numParameters;
-
-	XShaderParamBind()
-	{		
-		bind = -2;
-		constBufferSlot = 0;
-		numParameters = 1;
-	}
-	XShaderParamBind(const XShaderParamBind& sb)
-	{
-		name = sb.name;
-		bind = sb.bind;
-		constBufferSlot = sb.constBufferSlot;
-		numParameters = sb.numParameters;
-		flags = sb.flags;
-		type = sb.type;
-	}
-	XShaderParamBind& operator = (const XShaderParamBind& sb)
-	{
-		this->~XShaderParamBind();
-		new(this) XShaderParamBind(sb);
-		return *this;
-	}
-	
-};
-
-struct XShaderParam : public XShaderParamBind
-{
-	ParamType::Enum paramType[4]; // 8bits each
-
-	union
-	{
-		uint32_t int32[4];
-		float32_t f32[4];
-	};
-
-	XShaderParam() {
-		memset(paramType, ParamType::Unknown, sizeof(paramType));
-	}
-};
-
-*/
 struct XShaderParam
 {
 	core::string		name;
