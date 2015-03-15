@@ -513,11 +513,11 @@ bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) c
 			return true;
 		}
 
-		X_ERROR("Dir", "DirectoryExists check was ran on a File");
+		X_ERROR("Dir", "DirectoryExists check was ran on a File: \"%s\"", path);
 		return false; 
 	}
 
-	if (lastError::Get() != ERROR_PATH_NOT_FOUND)
+	if (lastError::Get() != INVALID_FILE_ATTRIBUTES)
 	{
 		lastError::Description Dsc;
 		X_ERROR("Dir", "DirectoryExists failed. Error: %s", lastError::ToString(Dsc));
@@ -526,6 +526,27 @@ bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) c
 	return false;
 }
 
+bool xFileSys::isDirectory(pathType path, VirtualDirectory::Enum location) const
+{
+	X_ASSERT_NOT_NULL(path);
+
+	DWORD dwAttrib = GetFileAttributes(path);
+
+	if (dwAttrib != INVALID_FILE_ATTRIBUTES) {
+		if ((dwAttrib & FILE_ATTRIBUTE_DIRECTORY)) {
+			return true;
+		}
+		return false;
+	}
+
+	if (lastError::Get() != INVALID_FILE_ATTRIBUTES)
+	{
+		lastError::Description Dsc;
+		X_ERROR("Dir", "isDirectory failed. Error: %s", lastError::ToString(Dsc));
+	}
+
+	return false;
+}
 
 // --------------------------------------------------
 

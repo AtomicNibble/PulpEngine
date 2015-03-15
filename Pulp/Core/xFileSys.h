@@ -104,6 +104,9 @@ public:
 	virtual bool fileExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
 	virtual bool directoryExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
 
+	// does not error, when it's a file or not exsist.
+	virtual bool isDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+
 	// settings baby
 	const XFileSysVars* getVars() const { return &vars_; }
 
