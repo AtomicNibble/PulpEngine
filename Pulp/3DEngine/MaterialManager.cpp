@@ -441,7 +441,7 @@ IMaterial* XMaterialManager::loadMaterial(const char* MtlName)
 	if((pExt = core::strUtil::FileExtension(MtlName)))
 	{
 		// engine should not make requests for materials with a extensiob
-		X_ERROR("MtlMan", "invalid mtl name extension was included: %s",
+		X_ERROR("MtlMan", "Invalid mtl name extension was included: %s",
 			pExt);
 		return getDefaultMaterial();
 
@@ -463,7 +463,7 @@ IMaterial* XMaterialManager::loadMaterial(const char* MtlName)
 		return iMat;
 	}
 
-	X_ERROR("MatMan", "failed to find material: %s", MtlName);
+	X_ERROR("MatMan", "Failed to find material: %s", MtlName);
 	return getDefaultMaterial();
 }
 
