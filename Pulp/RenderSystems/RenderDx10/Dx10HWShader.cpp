@@ -1376,8 +1376,6 @@ void XHWShader_Dx10::CreateInputLayoutTree(void)
 	uvBase.AddChild(uv).
 		AddChild(col).
 		AddChild(nor, InputLayoutFormat::POS_UV2_COL_NORM);
-//		AddChild(tan, InputLayoutFormat::POS_UV2_COL_NORM_TAN).
-//		AddChild(bin, InputLayoutFormat::POS_UV2_COL_NORM_TAN_BI);
 
 	ILTree_ = blank;
 }
