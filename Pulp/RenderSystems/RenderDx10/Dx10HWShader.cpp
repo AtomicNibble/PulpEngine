@@ -683,6 +683,7 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 	X_LOG0("Shader", "ConstantBuffers: %i", shaderDesc.ConstantBuffers);
 	X_LOG0("Shader", "BoundResources: %i", shaderDesc.BoundResources);
 	X_LOG0("Shader", "InputParameters: %i", shaderDesc.InputParameters);
+	X_LOG0("Shader", "OutputParameters: %i", shaderDesc.OutputParameters);
 
 	for (n = 0; n<shaderDesc.ConstantBuffers; n++)
 	{
@@ -841,6 +842,8 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 		if (!(pB->bind & SHADER_BIND_SAMPLER))
 			continue;
 
+		numSamplers_++;
+
 		// find it's sampler
 		for (n = 0; n < shaderDesc.BoundResources; n++)
 		{
@@ -923,6 +926,17 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 
 		IlFmt_ = fmt;
 	}
+	else if (type == ShaderType::Pixel)
+	{
+		D3D11_SIGNATURE_PARAMETER_DESC OutputDsc;
+
+		for (n = 0; n < shaderDesc.OutputParameters; n++)
+		{
+			pShaderReflection->GetOutputParameterDesc(n, &OutputDsc);
+
+		}
+	}
+
 
 	X_LOG_BULLET;
 	for (i = 0; i < BindVars.size(); i++)
@@ -937,6 +951,13 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 
 	// shader has a copy!
 	bindVars_ = BindVars;
+
+	// save some data.
+	if (type == ShaderType::Pixel) {
+		numRenderTargets_ = shaderDesc.OutputParameters;
+	}
+	numConstBuffers_ = shaderDesc.ConstantBuffers;
+	numInputParams_ = shaderDesc.InputParameters;
 
 	return true;
 }
@@ -1352,11 +1373,11 @@ void XHWShader_Dx10::CreateInputLayoutTree(void)
 		AddChild(bin, InputLayoutFormat::POS_UV_COL_NORM_TAN_BI);
 
 	// double text coords.
-	uvBase.AddChild(uv, InputLayoutFormat::POS_UV2).
-		AddChild(col, InputLayoutFormat::POS_UV2_COL).
-		AddChild(nor, InputLayoutFormat::POS_UV2_COL_NORM).
-		AddChild(tan, InputLayoutFormat::POS_UV2_COL_NORM_TAN).
-		AddChild(bin, InputLayoutFormat::POS_UV2_COL_NORM_TAN_BI);
+	uvBase.AddChild(uv).
+		AddChild(col).
+		AddChild(nor, InputLayoutFormat::POS_UV2_COL_NORM);
+//		AddChild(tan, InputLayoutFormat::POS_UV2_COL_NORM_TAN).
+//		AddChild(bin, InputLayoutFormat::POS_UV2_COL_NORM_TAN_BI);
 
 	ILTree_ = blank;
 }

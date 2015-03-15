@@ -57,6 +57,7 @@ bool XShaderBin::saveShader(const char* path, uint32_t sourceCRC, uint32_t flags
 bool XShaderBin::loadShader(const char* path, uint32_t sourceCRC, ID3DBlob** pBlob)
 {
 	X_ASSERT_NOT_NULL(path);
+	X_ASSERT_NOT_NULL(pBlob);
 
 	XShaderBinHeader hdr;
 	core::zero_object(hdr);

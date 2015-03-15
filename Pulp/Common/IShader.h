@@ -206,6 +206,9 @@ X_DECLARE_ENUM(InputLayoutFormat)(
 );
 
 
+extern InputLayoutFormat::Enum ILfromVertexFormat(const VertexFormat::Enum fmt);
+extern ILFlags IlFlagsForVertexFormat(const VertexFormat::Enum fmt);
+
 struct TextureAddressMode
 {
 	enum Enum

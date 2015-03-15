@@ -1066,7 +1066,8 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 
 HRESULT DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFmt)
 {
-	ID3D11InputLayout* pLayout;
+	ID3D11InputLayout* pLayout = nullptr;
+	ID3DBlob* pBlob = nullptr;
 	HRESULT hr;
 
 	if (m_State.vertexLayoutCache[vertexFmt] == nullptr)
@@ -1080,6 +1081,43 @@ HRESULT DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFm
 		}
 
 		// need the current shaders byte code / length.
+		// lets not require a Hardware shader bet set.
+		// only a current tech.
+#if 1
+		if (!m_State.pCurShader || !m_State.pCurShaderTech) {
+			X_ERROR("Render", "Failed to set input layout no shader currently set.");
+			return (HRESULT)-1;
+		}
+
+		// get the required ILfmt for the vertex fmt.
+		shader::InputLayoutFormat::Enum requiredIlFmt = shader::ILfromVertexFormat(vertexFmt);
+		// get the tech
+		shader::XShaderTechnique* pTech = m_State.pCurShaderTech;
+		// find one that fits.
+		for (auto& it : pTech->hwTechs)
+		{
+			if(it.IlFmt == requiredIlFmt) 
+			{
+				shader::XHWShader_Dx10* pVs;
+				if (!it.pVertexShader) {
+					X_ERROR("Render", "Failed to set input layout, tech VS is null");
+					return (HRESULT)-1;
+				}
+
+				pVs = reinterpret_cast<shader::XHWShader_Dx10*>(it.pVertexShader);
+
+				// make sure it's compiled.
+				if (!pVs->activate()) {
+					X_ERROR("Render", "Failed to set input layout, VS failed to compile");
+					return (HRESULT)-1;
+				}
+
+				pBlob = pVs->getshaderBlob();
+				break;
+			}
+		}
+
+#else
 		if (!shader::XHWShader_Dx10::pCurVS_)
 		{
 			X_ERROR("Render", "Failed to set input layout no shader currently set.");
@@ -1087,6 +1125,7 @@ HRESULT DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFm
 		}
 
 		ID3DBlob* pBlob = shader::XHWShader_Dx10::pCurVS_->getshaderBlob();
+#endif
 
 		if (FAILED(hr = m_device->CreateInputLayout(
 				layout.ptr(),

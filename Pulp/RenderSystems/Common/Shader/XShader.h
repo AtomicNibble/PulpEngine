@@ -143,8 +143,8 @@ public:
 	X_INLINE uint32_t getNumRenderTargets(void) const {
 		return numRenderTargets_;
 	}
-	X_INLINE uint32_t getNumSamples(void) const {
-		return numSamples_;
+	X_INLINE uint32_t getNumSamplers(void) const {
+		return numSamplers_;
 	}
 	X_INLINE uint32_t getNumConstantBuffers(void) const {
 		return numConstBuffers_;
@@ -166,8 +166,9 @@ protected:
 
 	// save info from shader reflection.
 	uint32_t numRenderTargets_;
-	uint32_t numSamples_;
+	uint32_t numSamplers_;
 	uint32_t numConstBuffers_;
+	uint32_t numInputParams_;
 };
 
 
@@ -263,6 +264,7 @@ protected:
 	core::Array<Technique> techniques;
 };
 
+
 struct XShaderTechniqueHW
 {
 	XShaderTechniqueHW() {
@@ -283,7 +285,7 @@ public:
 
 	XHWShader* pVertexShader;
 	XHWShader* pPixelShader;
-	XHWShader* pGeoShader;n
+	XHWShader* pGeoShader;
 };
 
 
