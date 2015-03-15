@@ -13,7 +13,7 @@ shader
 	techniques
 	{
 		{
-			name 		"Solid"
+			name 							"Solid"
 			vertex_shader   	"BasicVS"
 			pixel_shader    	"SolidPS"	
 			src_blend_color  	src_alpha
@@ -25,7 +25,7 @@ shader
 			depth_write        false
 		}		
 		{
-			name 		"Texture"
+			name 							"Texture"
 			vertex_shader   	"BasicVS"
 			pixel_shader    	"TexturePS"		
 			src_blend_color  	src_alpha
