@@ -9,10 +9,11 @@
 X_NAMESPACE_BEGIN(shader)
 
 static const uint32_t X_SHADER_BIN_FOURCC = X_TAG('X','S','C','B');
-static const uint32_t X_SHADER_BIN_VERSION = 2; // change this to force all shaders to be recompiled.
+static const uint32_t X_SHADER_BIN_VERSION = 3; // change this to force all shaders to be recompiled.
 
 
 class XHWShader;
+class XHWShader_Dx10;
 
 struct XShaderBinHeader
 {
@@ -21,9 +22,20 @@ struct XShaderBinHeader
 	uint8_t unused[3];
 	uint32_t crc32;
 	uint32_t sourceCRC32;
-	uint32_t length;
+	uint32_t blobLength;
 	uint32_t compileFlags;
 	core::dateTimeStampSmall modifed;
+
+	// i now save reflection info.
+	uint32_t numBindVars;
+	uint32_t numSamplers;
+	uint32_t numConstBuffers;
+	uint32_t numInputParams;
+	uint32_t numRenderTargets;
+
+	TechFlags techFlags;
+	ShaderType::Enum type;
+	InputLayoutFormat::Enum ILFmt;
 
 	X_INLINE const bool isValid(void) const {
 		return forcc == X_SHADER_BIN_FOURCC;
@@ -38,8 +50,8 @@ public:
 	~XShaderBin();
 
 
-	bool saveShader(const char* path, uint32_t sourceCRC, uint32_t compileFlags, const char* pData, uint32_t len);
-	bool loadShader(const char* path, uint32_t sourceCRC, ID3DBlob** pBlob);
+	bool saveShader(const char* path, uint32_t sourceCRC, const XHWShader_Dx10* pShader);
+	bool loadShader(const char* path, uint32_t sourceCRC, XHWShader_Dx10* pShader);
 
 };
 
