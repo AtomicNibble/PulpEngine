@@ -400,6 +400,27 @@ public:
 	}
 #endif
 
+	template <typename T>
+	inline uint32_t read(T& object) {
+		return read(&object, sizeof(T));
+	}
+
+	template <typename T>
+	inline uint32_t readObj(T& object) {
+		return read(&object, sizeof(T));
+	}
+
+	template <typename T>
+	inline uint32_t readObjs(T* objects, uint32_t num) {
+		return read(objects, sizeof(T)* num) / sizeof(T);
+	}
+
+
+	inline uint32_t readString(core::string& str) {
+		return pFile_->readString(str);
+	}
+
+
 #if X_64
 	inline uint32_t write(const void* pBuf, size_t Len) {
 		X_ASSERT_NOT_NULL(pFile_);
@@ -411,27 +432,14 @@ public:
 		return pFile_->write(pBuf, Len);
 	}
 
-
-	inline void seek(size_t position, SeekMode::Enum origin) {
-		X_ASSERT_NOT_NULL(pFile_);
-		pFile_->seek(position, origin);
-	}	
-
-	inline size_t tell(void) const {
-		X_ASSERT_NOT_NULL(pFile_);
-		return pFile_->tell();		
+	inline uint32_t writeString(core::string& str) {
+		return pFile_->writeString(str);
 	}
-
-
-
-	template <typename T>
-	inline uint32_t readObj(T& object) {
-		return read(&object, sizeof(T));
+	inline uint32_t writeString(const char* str) {
+		return pFile_->writeString(str);
 	}
-
-	template <typename T>
-	inline uint32_t readObjs(T* objects, uint32_t num) {
-		return read(objects, sizeof(T)* num) / sizeof(T);
+	inline uint32_t writeString(const char* str, uint32_t Length) {
+		return pFile_->writeString(str, Length);
 	}
 
 	template <typename T>
@@ -444,12 +452,10 @@ public:
 		return write(objects, sizeof(T)* num) / sizeof(T);
 	}
 
-
 	template <typename T>
 	inline uint32_t write(const T& object) {
 		return write(&object, sizeof(T));
 	}
-
 
 	uint32_t printf(const char *fmt, ...) {
 		char buf[2048];
@@ -464,6 +470,15 @@ public:
 		return write(buf, length);
 	}
 
+	inline void seek(size_t position, SeekMode::Enum origin) {
+		X_ASSERT_NOT_NULL(pFile_);
+		pFile_->seek(position, origin);
+	}
+
+	inline size_t tell(void) const {
+		X_ASSERT_NOT_NULL(pFile_);
+		return pFile_->tell();
+	}
 
 	inline size_t remainingBytes(void) const {
 		X_ASSERT_NOT_NULL(pFile_);
