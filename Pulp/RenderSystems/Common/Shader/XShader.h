@@ -283,9 +283,9 @@ struct XShaderTechniqueHW
 
 	void release(void)
 	{
-		pVertexShader->release();
-		pPixelShader->release();
-		pGeoShader->release();
+		core::SafeRelease(pVertexShader);
+		core::SafeRelease(pPixelShader);
+		core::SafeRelease(pGeoShader);
 	}
 
 public:

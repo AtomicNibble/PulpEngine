@@ -1416,9 +1416,9 @@ void XHWShader_Dx10::CreateInputLayoutTree(void)
 
 void XHWShader_Dx10::FreeInputLayoutTree(void)
 {
+	// need to kill this.
 
-
-
+	ILTree_.free();
 }
 
 

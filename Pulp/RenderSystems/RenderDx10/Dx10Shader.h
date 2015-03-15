@@ -138,6 +138,14 @@ struct ILTreeNode
 		this->fmt = InputLayoutFormat::Invalid;
 	}
 
+	~ILTreeNode() {
+		free();
+	}
+
+	void free(void) {
+		children.free();
+	}
+
 	ILTreeNode& AddChild(ILTreeNode& node, 
 		InputLayoutFormat::Enum fmt = InputLayoutFormat::Invalid) 
 	{
