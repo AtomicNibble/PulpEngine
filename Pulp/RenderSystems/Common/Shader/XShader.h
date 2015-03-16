@@ -127,13 +127,13 @@ public:
 	static const char* getProfileFromType(ShaderType::Enum type);
 
 	X_INLINE const char* getName(void) const {
-		return name.c_str();
+		return name_.c_str();
 	}
 	X_INLINE const char* getSourceFileName(void) const {
-		return sourceFileName.c_str();
+		return sourceFileName_.c_str();
 	}
 	X_INLINE const char* getEntryPoint(void) const {
-		return entryPoint.c_str();
+		return entryPoint_.c_str();
 	}
 
 
@@ -162,10 +162,10 @@ public:
 protected:
 	static render::XRenderResourceContainer* pHWshaders;
 
-	core::string name;
-	core::string sourceFileName;
-	core::string entryPoint;
-	uint32_t sourceCrc32; // the crc of the source this was compiled from.
+	core::string name_;
+	core::string sourceFileName_;
+	core::string entryPoint_;
+	uint32_t sourceCrc32_; // the crc of the source this was compiled from.
 
 	// color, textured, skinned, instanced
 	TechFlags techFlags_;

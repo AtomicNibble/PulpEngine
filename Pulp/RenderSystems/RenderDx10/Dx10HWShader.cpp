@@ -286,12 +286,12 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	{
 		pShader->addRef();
 
-		if (pShader->sourceCrc32 != sourceCrc)
+		if (pShader->sourceCrc32_ != sourceCrc)
 		{
 			// shieeet, the shader needs updating.
 			// we have to relase the old one and set it up fresh.
 			pShader->releaseHW(); 
-			pShader->sourceCrc32 = sourceCrc;
+			pShader->sourceCrc32_ = sourceCrc;
 			pShader->setStatus(ShaderStatus::NotCompiled);
 
 			// remove the cache file, to save a file load / crc check.
@@ -308,11 +308,11 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	else
 	{
 		pShader = X_NEW_ALIGNED(XHWShader_Dx10,g_rendererArena,"HWShader", X_ALIGN_OF(XHWShader_Dx10));
-		pShader->name = name.c_str();
+		pShader->name_ = name.c_str();
 		pShader->type_ = type;
-		pShader->sourceFileName = sourceFile;
-		pShader->entryPoint = entry;
-		pShader->sourceCrc32 = sourceCrc;
+		pShader->sourceFileName_ = sourceFile;
+		pShader->entryPoint_ = entry;
+		pShader->sourceCrc32_ = sourceCrc;
 
 		// save macros
 		pShader->techFlags_ = techFlags;
@@ -383,7 +383,7 @@ void XHWShader_Dx10::FreeHWShaders()
 		if (!pShader)
 			continue;
 
-		X_WARNING("HWShaders", "\"%s\" was not deleted", pShader->name.c_str());
+		X_WARNING("HWShaders", "\"%s\" was not deleted", pShader->name_.c_str());
 
 		pShader->release();
 	}
@@ -418,10 +418,10 @@ XHWShader_Dx10::XHWShader_Dx10() :
 void XHWShader_Dx10::getShaderCompilePaths(core::Path& src, core::Path& dest)
 {
 	src.clear();
-	src.appendFmt("shaders/temp/%s.merged", sourceFileName.c_str());
+	src.appendFmt("shaders/temp/%s.merged", sourceFileName_.c_str());
 
 	dest.clear();
-	dest.appendFmt("shaders/compiled/%s.fxcb", name.c_str());
+	dest.appendFmt("shaders/compiled/%s.fxcb", name_.c_str());
 
 	// make sure the directory is created.
 	gEnv->pFileSys->createDirectoryTree(src.c_str());
@@ -431,7 +431,7 @@ void XHWShader_Dx10::getShaderCompilePaths(core::Path& src, core::Path& dest)
 void XHWShader_Dx10::getShaderCompileDest(core::Path& dest)
 {
 	dest.clear();
-	dest.appendFmt("shaders/compiled/%s.fxcb", name.c_str());
+	dest.appendFmt("shaders/compiled/%s.fxcb", name_.c_str());
 
 	// make sure the directory is created.
 	gEnv->pFileSys->createDirectoryTree(dest.c_str());
@@ -444,7 +444,7 @@ bool XHWShader_Dx10::saveToCache(void)
 	getShaderCompileDest(dest);
 
 	// write the compiled version.
-	if (bin_.saveShader(dest.c_str(), sourceCrc32, this))
+	if (bin_.saveShader(dest.c_str(), sourceCrc32_, this))
 	{
 		X_LOG1("Shader", "saved shader to cache file: \"%s\"", dest.c_str());
 	}
@@ -467,9 +467,9 @@ bool XHWShader_Dx10::loadFromCache()
 	getShaderCompileDest(dest);
 
 	// we should check if a compiled version already exsists!
-	if (bin_.loadShader(dest.c_str(), this->sourceCrc32, this))
+	if (bin_.loadShader(dest.c_str(), sourceCrc32_, this))
 	{
-		X_LOG0("Shader", "shader loaded from cache: \"%s\"", name.c_str());
+		X_LOG0("Shader", "shader loaded from cache: \"%s\"", name_.c_str());
 
 		// add them.
 		addGlobalParams(bindVars_, this->type_);
@@ -492,7 +492,7 @@ bool XHWShader_Dx10::loadFromSource()
 	XShaderManager* pShaderMan = &render::gRenDev->m_ShaderMan;
 
 	// we need to get the whole file :D
-	if (!pShaderMan->sourceToString(source, this->sourceFileName))
+	if (!pShaderMan->sourceToString(source, this->sourceFileName_))
 	{
 		X_ERROR("Shader", "failed to get source for compiling");
 		return false;
@@ -507,7 +507,7 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 	HRESULT hr;
 	XShaderManager* pShaderMan;
 
-	X_LOG0("Shader", "Compiling shader: \"%s\"", name.c_str());
+	X_LOG0("Shader", "Compiling shader: \"%s\"", name_.c_str());
 
 	pShaderMan = &render::gRenDev->m_ShaderMan;
 	D3DCompileflags_ = 0;
@@ -558,10 +558,10 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 	hr = D3DCompile(
 		source,
 		source.length(),
-		this->sourceFileName,
+		this->sourceFileName_,
 		Shader_Macros, // pDefines
 		NULL, // pInclude
-		this->entryPoint,
+		this->entryPoint_,
 		getProfileFromType(type_),
 		D3DCompileflags_, // Flags
 		0, // Flags2
@@ -578,7 +578,7 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 			core::StackString<4096> filterd(err, err + strlen(err));
 
 			// skip file path.
-			err = filterd.find(this->sourceFileName);
+			err = filterd.find(this->sourceFileName_);
 
 			if (err) {
 				core::StackString512 path(filterd.begin(), err);
@@ -629,11 +629,11 @@ bool XHWShader_Dx10::uploadtoHW()
 
 		// compiled out in debug
 		if (this->type_ == ShaderType::Vertex)
-			render::D3DDebug::SetDebugObjectName(reinterpret_cast<ID3D11VertexShader*>(pHWHandle_), this->entryPoint);
+			render::D3DDebug::SetDebugObjectName(reinterpret_cast<ID3D11VertexShader*>(pHWHandle_), this->entryPoint_);
 		else if (this->type_ == ShaderType::Pixel)
-			render::D3DDebug::SetDebugObjectName(reinterpret_cast<ID3D11PixelShader*>(pHWHandle_), this->entryPoint);
+			render::D3DDebug::SetDebugObjectName(reinterpret_cast<ID3D11PixelShader*>(pHWHandle_), this->entryPoint_);
 		else if (this->type_ == ShaderType::Geometry)
-			render::D3DDebug::SetDebugObjectName(reinterpret_cast<ID3D11GeometryShader*>(pHWHandle_), this->entryPoint);
+			render::D3DDebug::SetDebugObjectName(reinterpret_cast<ID3D11GeometryShader*>(pHWHandle_), this->entryPoint_);
 		// ~
 
 		status_ = ShaderStatus::UploadedToHW;
@@ -689,7 +689,7 @@ bool XHWShader_Dx10::reflectShader(void)
 
 	if (FAILED(D3DReflect(pBuf, nSize, IID_ID3D11ShaderReflection, (void **)&pShaderReflection)))
 	{
-		X_ERROR("Shader", "failed to reflect shader: %s", this->name.c_str());
+		X_ERROR("Shader", "failed to reflect shader: %s", name_.c_str());
 		return false;
 	}
 
