@@ -57,7 +57,12 @@ class Thread
 		};
 	};
 
+	X_DECLARE_FLAGS(CpuCore)(CORE0,CORE1,CORE2,
+		CORE3,CORE4,CORE5,CORE6,CORE7
+	);
+
 public:
+	typedef Flags<CpuCore> AffinityFlags;
 	typedef uint32_t ReturnValue;
 	typedef traits::Function<ReturnValue(const Thread&)> Function;
 
@@ -77,11 +82,13 @@ public:
 	bool ShouldRun(void) const volatile;
 	bool HasFinished(void) const volatile;
 
-	void setData(void* pData) {
+	bool SetThreadAffinity(const AffinityFlags flags);
+
+	X_INLINE void setData(void* pData) {
 		pData_ = pData;
 	}
 
-	void* getData() const {
+	X_INLINE void* getData() const {
 		return pData_;
 	}
 
@@ -89,10 +96,10 @@ public:
 	static void Yield(void);
 
 private:
-	static unsigned int __stdcall ThreadFunction_(void* threadInstance);
+	static uint32_t __stdcall ThreadFunction_(void* threadInstance);
 
 	HANDLE handle_;
-	unsigned int id_;
+	uint32_t id_;
 	Function::Pointer function_;
 	State::Enum state_;
 	void* pData_;

@@ -83,6 +83,21 @@ bool Thread::HasFinished(void) const volatile
 	return state_ == State::FINISHED;
 }
 
+
+bool Thread::SetThreadAffinity(const AffinityFlags flags)
+{
+	DWORD_PTR mask = flags.ToInt();
+
+	if (SetThreadAffinityMask(handle_, mask) == 0)
+	{
+		lastError::Description Dsc;
+		X_ERROR("Failed to set thread affinity. Error: %s", lastError::ToString(Dsc));
+		return false;
+	}
+
+	return true;
+}
+
 // static
 void Thread::Sleep(uint32_t milliSeconds)
 {
@@ -95,11 +110,11 @@ void Thread::Yield(void)
 	SwitchToThread();
 }
 
-unsigned int __stdcall Thread::ThreadFunction_(void* threadInstance)
+uint32_t __stdcall Thread::ThreadFunction_(void* threadInstance)
 {
 	Thread* pThis = (Thread*)threadInstance;
 
-	unsigned int ret = pThis->function_(*pThis);
+	uint32_t ret = pThis->function_(*pThis);
 	pThis->state_ = State::FINISHED;
 	return ret;
 }
