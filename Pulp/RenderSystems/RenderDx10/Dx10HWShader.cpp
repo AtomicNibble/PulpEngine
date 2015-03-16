@@ -1007,6 +1007,7 @@ bool XHWShader_Dx10::activate()
 			// we need to set this shader as broken.
 			// instead of trying to compile it all the time.
 			status_ = ShaderStatus::FailedToCompile;
+			X_LOG0("Shader", "Failed to activate shader: \"%s\"", getName());
 			return false;
 		}
 
