@@ -33,6 +33,12 @@
     <Filter Include="Source Files\win32">
       <UniqueIdentifier>{9cb22ff1-6acd-4535-a134-eda65a43bf03}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Scheduler">
+      <UniqueIdentifier>{a1311543-62ae-4fd1-a483-c4a0b9fed607}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scheduler">
+      <UniqueIdentifier>{c0c6f97f-4828-407e-9955-ae02a257d073}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -110,6 +116,9 @@
     <ClInclude Include="win32\SystemTimer.h">
       <Filter>Header Files\win32</Filter>
     </ClInclude>
+    <ClInclude Include="Scheduler\Scheduler.h">
+      <Filter>Header Files\Scheduler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -174,6 +183,9 @@
     </ClCompile>
     <ClCompile Include="DiskFile.cpp">
       <Filter>FileSys</Filter>
+    </ClCompile>
+    <ClCompile Include="Scheduler\Scheduler.cpp">
+      <Filter>Source Files\Scheduler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -354,6 +354,7 @@
     <ClInclude Include="Log.h" />
     <ClInclude Include="NullImplementation\NullInput.h" />
     <ClInclude Include="OsFile.h" />
+    <ClInclude Include="Scheduler\Scheduler.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SystemTimer.h" />
     <ClInclude Include="Timer.h" />
@@ -378,6 +379,7 @@
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="GoatFactoryRegistryImpl.cpp" />
     <ClCompile Include="Log.cpp" />
+    <ClCompile Include="Scheduler\Scheduler.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>
