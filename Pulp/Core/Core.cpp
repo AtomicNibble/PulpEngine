@@ -457,9 +457,9 @@ void XCore::OnFatalError(const char* format, va_list args)
 
 void Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd)
 {
-	XCore* pConsole = (XCore*)gEnv->pCore;
+	XCore* pCore = (XCore*)gEnv->pCore;
 
-	pConsole->HotReloadListExts();
+	pCore->HotReloadListExts();
 }
 
 

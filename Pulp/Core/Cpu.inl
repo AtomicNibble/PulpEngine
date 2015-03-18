@@ -11,12 +11,12 @@ X_INLINE const char* CpuInfo::GetCpuVendor(void) const
 	return cpuVendor_;
 }
 
-X_INLINE unsigned int CpuInfo::GetCoreCount(void) const
+X_INLINE uint32_t CpuInfo::GetCoreCount(void) const
 {
 	return coreCount_;
 }
 
-X_INLINE unsigned int CpuInfo::GetLogicalProcessorCount(void) const
+X_INLINE uint32_t CpuInfo::GetLogicalProcessorCount(void) const
 {
 	return logicalProcessorCount_;
 }
@@ -41,17 +41,17 @@ X_INLINE const CpuInfo::CpuID::InfoEx1& CpuInfo::GetExtendedInfoType1(void) cons
 	return infoEx1_;
 }
 
-X_INLINE unsigned int CpuInfo::GetL1CacheCount(void) const
+X_INLINE uint32_t CpuInfo::GetL1CacheCount(void) const
 {
 	return cacheCount_[0];
 }
 
-X_INLINE unsigned int CpuInfo::GetL2CacheCount(void) const
+X_INLINE uint32_t CpuInfo::GetL2CacheCount(void) const
 {
 	return cacheCount_[1];
 }
 
-X_INLINE unsigned int CpuInfo::GetL3CacheCount(void) const
+X_INLINE uint32_t CpuInfo::GetL3CacheCount(void) const
 {
 	return cacheCount_[2];
 }

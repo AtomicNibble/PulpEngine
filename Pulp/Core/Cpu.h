@@ -266,10 +266,10 @@ public:
 	X_INLINE const char* GetCpuVendor(void) const;
 
 	/// Returns the number of available cores.
-	X_INLINE unsigned int GetCoreCount(void) const;
+	X_INLINE uint32_t GetCoreCount(void) const;
 
 	/// Returns the number of logical processors.
-	X_INLINE unsigned int GetLogicalProcessorCount(void) const;
+	X_INLINE uint32_t GetLogicalProcessorCount(void) const;
 
 	/// Returns general CPU information.
 	X_INLINE const CpuID::Info0& GetInfoType0(void) const;
@@ -284,13 +284,13 @@ public:
 	X_INLINE const CpuID::InfoEx1& GetExtendedInfoType1(void) const;
 
 	/// Returns the number of L1 caches present.
-	X_INLINE unsigned int GetL1CacheCount(void) const;
+	X_INLINE uint32_t GetL1CacheCount(void) const;
 
 	/// Returns the number of L2 caches present.
-	X_INLINE unsigned int GetL2CacheCount(void) const;
+	X_INLINE uint32_t GetL2CacheCount(void) const;
 
 	/// Returns the number of L3 caches present.
-	X_INLINE unsigned int GetL3CacheCount(void) const;
+	X_INLINE uint32_t GetL3CacheCount(void) const;
 
 	/// Returns the i-th L1 cache info.
 	X_INLINE const CacheInfo& GetL1CacheInfo(unsigned int i) const;
