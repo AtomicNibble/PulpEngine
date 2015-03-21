@@ -940,6 +940,9 @@
     <ClInclude Include="Encryption\Salsa20.h">
       <Filter>Headers\Encryption</Filter>
     </ClInclude>
+    <ClInclude Include="String\Base64.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1416,6 +1419,9 @@
     </ClCompile>
     <ClCompile Include="Encryption\Salsa20.cpp">
       <Filter>SourceFiles\Encryption</Filter>
+    </ClCompile>
+    <ClCompile Include="String\Base64.cpp">
+      <Filter>SourceFiles\String</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
