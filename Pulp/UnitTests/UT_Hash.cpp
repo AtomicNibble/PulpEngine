@@ -8,7 +8,7 @@
 #include <Hashing\MurmurHash.h>
 #include <Hashing\sha1.h>
 #include <Hashing\MD5.h>
-
+#include "Hashing\Adler32.h"
 
 X_USING_NAMESPACE;
 
@@ -99,4 +99,13 @@ TEST(Hash, SHA1)
 
 	EXPECT_EQ(expected, val);
 	EXPECT_STREQ("3df4d52ed7c6385daaf229e322d4043ffe925ee2", str);
+}
+
+TEST(Hash, Adler32)
+{
+	Hash::Adler32Val val;
+
+	val = Adler32("hello, can you fart in a cart?");
+
+	EXPECT_EQ(val, 0xa3050a5e);
 }

@@ -105,9 +105,11 @@
     <ClInclude Include="Extension\IGoatFactoryRegistry.h" />
     <ClInclude Include="Extension\IGoatFactoryRegistryImpl.h" />
     <ClInclude Include="Extension\XExtensionMacros.h" />
+    <ClInclude Include="Hashing\Adler32.h" />
     <ClInclude Include="Hashing\crc32.h" />
     <ClInclude Include="Hashing\Fnva1Hash.h" />
     <ClInclude Include="Hashing\crc32.inl" />
+    <ClInclude Include="Hashing\MD5.h" />
     <ClInclude Include="Hashing\MurmurHash.h" />
     <ClInclude Include="Hashing\sha1.h" />
     <ClInclude Include="IAnimation.h" />
@@ -473,6 +475,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Hashing\Adler32.cpp" />
     <ClCompile Include="Hashing\Crc32.cpp" />
     <ClCompile Include="Hashing\Fnva1Hash.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
@@ -482,6 +485,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Hashing\MD5.cpp" />
     <ClCompile Include="Hashing\MurmurHash.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>

@@ -925,6 +925,12 @@
     <ClInclude Include="String\XParser.h">
       <Filter>Headers\String</Filter>
     </ClInclude>
+    <ClInclude Include="Hashing\MD5.h">
+      <Filter>Headers\Hashing</Filter>
+    </ClInclude>
+    <ClInclude Include="Hashing\Adler32.h">
+      <Filter>Headers\Hashing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1392,6 +1398,12 @@
     </ClCompile>
     <ClCompile Include="String\XParser.cpp">
       <Filter>SourceFiles\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Hashing\MD5.cpp">
+      <Filter>SourceFiles\Hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="Hashing\Adler32.cpp">
+      <Filter>SourceFiles\Hashing</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
