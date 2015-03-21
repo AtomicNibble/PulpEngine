@@ -134,11 +134,14 @@ ThreadAbstract::~ThreadAbstract()
 	thread_.Destroy();
 }
 
+void ThreadAbstract::Create(const char* name, uint32_t stackSize)
+{
+	thread_.Create(name ? name : "AbstractThread", stackSize);
+	thread_.setData(this);
+}
 
 void ThreadAbstract::Start(void)
 {
-	thread_.Create("AbstractThread");
-	thread_.setData(this);
 	thread_.Start(ThreadFunc);
 }
 
