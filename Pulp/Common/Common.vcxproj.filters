@@ -169,6 +169,12 @@
     <Filter Include="SourceFiles\Containers">
       <UniqueIdentifier>{c7bb6186-46aa-4b85-8f65-a7a67ea958aa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headers\Encryption">
+      <UniqueIdentifier>{64abb8ac-59fa-457f-9047-d271664f4d1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Encryption">
+      <UniqueIdentifier>{42602cbe-b9c6-4b92-b686-489a918eb1c0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -931,6 +937,9 @@
     <ClInclude Include="Hashing\Adler32.h">
       <Filter>Headers\Hashing</Filter>
     </ClInclude>
+    <ClInclude Include="Encryption\Salsa20.h">
+      <Filter>Headers\Encryption</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1404,6 +1413,9 @@
     </ClCompile>
     <ClCompile Include="Hashing\Adler32.cpp">
       <Filter>SourceFiles\Hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="Encryption\Salsa20.cpp">
+      <Filter>SourceFiles\Encryption</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

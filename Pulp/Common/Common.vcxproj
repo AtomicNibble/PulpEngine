@@ -97,6 +97,7 @@
     <ClInclude Include="Debugging\win32\MiniDump.h" />
     <ClInclude Include="Debugging\win32\PureVirtualFunctionCallHandler.h" />
     <ClInclude Include="Debugging\win32\SymbolResolution.h" />
+    <ClInclude Include="Encryption\Salsa20.h" />
     <ClInclude Include="EngineCommon.h" />
     <ClInclude Include="Extension\FactoryRegNode.h" />
     <ClInclude Include="Extension\GoatCreateClass.h" />
@@ -462,6 +463,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Encryption\Salsa20.cpp" />
     <ClCompile Include="EngineCommon.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Create</PrecompiledHeader>
