@@ -8,10 +8,9 @@ namespace Encryption
 {
 
 
-	Salsa20::Salsa20(const uint8_t* key)
+	Salsa20::Salsa20(void)
 	{
 		core::zero_object(vector_);
-		setKey(key);
 	}
 
 	Salsa20::~Salsa20()
@@ -142,6 +141,30 @@ namespace Encryption
 			for (size_t i = 0; i < numBytesToProcess; ++i, --numBytes)
 				*(output++) = keyStream[i] ^ *(input++);
 		}
+	}
+
+	//----------------------------------------------------------------------------------
+	uint32_t Salsa20::rotate(uint32_t value, uint32_t numBits)
+	{
+		return (value << numBits) | (value >> (32 - numBits));
+	}
+
+	//----------------------------------------------------------------------------------
+	void Salsa20::convert(uint32_t value, uint8_t* array)
+	{
+		array[0] = static_cast<uint8_t>((value >> 0) & 0xFF);
+		array[1] = static_cast<uint8_t>((value >> 8) & 0xFF);
+		array[2] = static_cast<uint8_t>((value >> 16) & 0xFF);
+		array[3] = static_cast<uint8_t>((value >> 24) & 0xFF);
+	}
+
+	//----------------------------------------------------------------------------------
+	uint32_t Salsa20::convert(const uint8_t* array)
+	{
+		return ((static_cast<uint32_t>(array[0]) << 0) |
+			(static_cast<uint32_t>(array[1]) << 8) |
+			(static_cast<uint32_t>(array[2]) << 16) |
+			(static_cast<uint32_t>(array[3]) << 24));
 	}
 
 

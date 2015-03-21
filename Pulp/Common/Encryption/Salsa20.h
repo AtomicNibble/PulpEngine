@@ -19,7 +19,10 @@ namespace Encryption
 			IV_SIZE = 8
 		};
 
-		Salsa20(const uint8_t* key);
+		typedef uint8_t Key[KEY_SIZE];
+		typedef uint8_t Iv[IV_SIZE];
+
+		Salsa20(void);
 		Salsa20(const Salsa20&);
 		~Salsa20();
 		Salsa20& operator=(const Salsa20&);
@@ -31,9 +34,9 @@ namespace Encryption
 		void processBytes(const uint8_t* input, uint8_t* output, size_t numBytes);
 
 	private:
-		inline uint32_t rotate(uint32_t value, uint32_t numBits);
-		inline void convert(uint32_t value, uint8_t* array);
-		inline uint32_t convert(const uint8_t* array);
+		uint32_t rotate(uint32_t value, uint32_t numBits);
+		void convert(uint32_t value, uint8_t* array);
+		uint32_t convert(const uint8_t* array);
 
 		uint32_t vector_[VECTOR_SIZE];
 	};
