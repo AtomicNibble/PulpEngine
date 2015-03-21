@@ -7,6 +7,7 @@
 #include <Hashing\Fnva1Hash.h>
 #include <Hashing\MurmurHash.h>
 #include <Hashing\sha1.h>
+#include <Hashing\MD5.h>
 
 
 X_USING_NAMESPACE;
@@ -57,22 +58,44 @@ TEST(Hash, Murmur) {
 }
 
 
-TEST(Hash, Sha1)
+TEST(Hash, MD5)
 {
-	Hash::Sha1Hash val, expected;
-	Hash::Sha1Hash::TextValue str;
+	Hash::MD5Digest val, expected;
+	Hash::MD5Digest::String str;
 
-	expected.H[0] = 0x3df4d52e;
-	expected.H[1] = 0xd7c6385d;
-	expected.H[2] = 0xaaf229e3;
-	expected.H[3] = 0x22d4043f;
-	expected.H[4] = 0xfe925ee2;
+	expected.data[0] = 0x3df4d52e;
+	expected.data[1] = 0xd7c6385d;
+	expected.data[2] = 0xaaf229e3;
+	expected.data[3] = 0x22d4043f;
 
-	Hash::Sha1Init(val);
-	Hash::Sha1Update(val, "hash me baby!", 13);
-	Hash::Sha1Final(val);
+	Hash::MD5 md5;
+	md5.Init();
+	md5.update("tickle my pickle");
+	val = md5.finalize();
 
-	Hash::Sha1ToString(val, str);
+	val.ToString(str);
+
+	EXPECT_EQ(expected, val);
+	EXPECT_STREQ("05ed0703545b09bb129c0ec6781e92cf", str);
+}
+
+TEST(Hash, SHA1)
+{
+	Hash::SHA1Digest val, expected;
+	Hash::SHA1Digest::String str;
+
+	expected.data[0] = 0x3df4d52e;
+	expected.data[1] = 0xd7c6385d;
+	expected.data[2] = 0xaaf229e3;
+	expected.data[3] = 0x22d4043f;
+	expected.data[4] = 0xfe925ee2;
+
+	Hash::SHA1 sha1;
+	sha1.Init();
+	sha1.update("hash me baby!");
+	val = sha1.finalize();
+
+	val.ToString(str);
 
 	EXPECT_EQ(expected, val);
 	EXPECT_STREQ("3df4d52ed7c6385daaf229e322d4043ffe925ee2", str);
