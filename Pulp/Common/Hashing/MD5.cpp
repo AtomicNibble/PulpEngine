@@ -95,7 +95,7 @@ const char* MD5Digest::ToString(String& buf) const
 		buf[(hashByte << 1) + 1] = hexDigits[pBytes[hashByte] & 0xf];
 	}
 
-	buf[40] = 0;
+	buf[32] = 0;
 	return buf;
 }
 
