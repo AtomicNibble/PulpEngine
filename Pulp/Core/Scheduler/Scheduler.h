@@ -3,6 +3,8 @@
 #ifndef X_SCHEDULER_H_
 #define X_SCHEDULER_H_
 
+#include "Time\TimeVal.h"
+
 #include "Threading\Thread.h"
 
 X_NAMESPACE_BEGIN(core)
@@ -39,20 +41,43 @@ guess a fibere will have to get the job then run it in the context of the fibre.
 
 */
 
-class SJob
+
+typedef void(*Job)(void* pParam);
+
+
+X_DECLARE_ENUM(JobPriority)(LOW,NORMAL,HIGH);
+
+
+struct ThreadStats
+{
+	ThreadStats() : numExecJobs(0) {}
+
+	uint64_t numExecJobs;		// jobs execuced
+	TimeVal waitTime;			// time spent waiting
+	TimeVal threadExecTime;		// time spent executing jobs
+	TimeVal threadTotalTime;	// total time.
+};
+
+
+class JobThread : public ThreadAbstract
 {
 public:
+	JobThread();
+	~JobThread();
 
+	virtual Thread::ReturnValue ThreadRun(const Thread& thread) X_FINAL;
 
 private:
 
 };
 
-
 class Scheduler
 {
 	static const uint32_t HW_THREAD_MAX = 6; // max even if hardware supports more.
 	static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
+
+//	static const uint32_t NUM_FIBRES = 128;
+//	static const uint32_t FIBRE_STACK_SIZE = 64 * 1024;
 
 public:
 	Scheduler();
@@ -61,12 +86,11 @@ public:
 	void StartThreads(void);
 	void ShutDown(void);
 
-	void addJob(SJob& job);
 
 private:
 	uint32_t numThreads_; // num created.
 
-	Thread threads_[HW_THREAD_MAX];
+	JobThread threads_[HW_THREAD_MAX];
 };
 
 
