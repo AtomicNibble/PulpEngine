@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(core)
 
 X_ALIGNED_SYMBOL(class Crc32, 128)
 {
-	static const uint32_t CRC32_POLY_NORMAL = 0x04C11DB7;
+	static const uint32_t CRC32_POLY_NORMAL = 0xEDB88320;
 	static const uint32_t CRC32_INIT_VALUE = 0xffffffffL;
 	static const uint32_t CRC32_XOR_VALUE = 0xffffffffL;
 
