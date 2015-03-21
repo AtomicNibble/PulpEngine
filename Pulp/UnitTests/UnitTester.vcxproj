@@ -400,7 +400,9 @@
   <ItemGroup>
     <ClCompile Include="EngineApp.cpp" />
     <ClCompile Include="UT_AssertChecker.cpp" />
+    <ClCompile Include="UT_Base64.cpp" />
     <ClCompile Include="UT_C_LinkedList.cpp" />
+    <ClCompile Include="UT_Encryption.cpp" />
     <ClCompile Include="UT_F_ReadWrite.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

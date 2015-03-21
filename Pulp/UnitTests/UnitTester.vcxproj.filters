@@ -235,6 +235,12 @@
     <ClCompile Include="UT_AssertChecker.cpp">
       <Filter>Source Files\tests\Debugging</Filter>
     </ClCompile>
+    <ClCompile Include="UT_Encryption.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Base64.cpp">
+      <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">
