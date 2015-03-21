@@ -184,7 +184,7 @@ uint32_t Crc32::UpdateLowerCase(const char* text, size_t size, uint32_t& crcvalu
 
 	while (len && !core::pointerUtil::IsAligned(buf8, 8, 0))
 	{
-		crc = (crc >> 8) ^ crc32_table[0][(crc & 0xFF) ^ *buf8++];
+		crc = (crc >> 8) ^ crc32_table[0][(crc & 0xFF) ^ ToLower(*buf8++)];
 		len--;
 	}
 
@@ -210,7 +210,7 @@ uint32_t Crc32::UpdateLowerCase(const char* text, size_t size, uint32_t& crcvalu
 		buf8 = reinterpret_cast<const uint8_t*>(buf32);
 		while (len--)
 		{
-			crc = (crc >> 8) ^ crc32_table[0][(crc & 0xFF) ^ *buf8++];
+			crc = (crc >> 8) ^ crc32_table[0][(crc & 0xFF) ^ ToLower(*buf8++)];
 		}
 	}
 
