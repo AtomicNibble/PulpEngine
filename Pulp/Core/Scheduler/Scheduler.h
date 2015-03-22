@@ -68,7 +68,7 @@ public:
 	virtual Thread::ReturnValue ThreadRun(const Thread& thread) X_FINAL;
 
 private:
-
+	ThreadStats stats_;
 };
 
 class Scheduler
@@ -76,8 +76,6 @@ class Scheduler
 	static const uint32_t HW_THREAD_MAX = 6; // max even if hardware supports more.
 	static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
 
-//	static const uint32_t NUM_FIBRES = 128;
-//	static const uint32_t FIBRE_STACK_SIZE = 64 * 1024;
 
 public:
 	Scheduler();

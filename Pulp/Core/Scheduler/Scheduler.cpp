@@ -21,7 +21,14 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 {
 	X_UNUSED(thread);
 
-	return 0;
+	while (thread.ShouldRun())
+	{
+
+
+
+	}
+
+	return Thread::ReturnValue(0);
 }
 
 
