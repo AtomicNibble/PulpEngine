@@ -48,6 +48,22 @@ typedef void(*Job)(void* pParam);
 X_DECLARE_ENUM(JobPriority)(LOW,NORMAL,HIGH);
 
 
+struct Jobdata
+{
+	Job pJobRun;
+	void *pData;
+
+	// batch offset and index.
+	uint32_t batchOffset;
+	uint32_t batchNum;
+
+	// i will try and thing where else to stoe the dependent data.
+	// other wise i will need a variable sized array here.
+
+	// which will be empty most 98% of the time.
+};
+
+
 struct ThreadStats
 {
 	ThreadStats() : numExecJobs(0) {}
