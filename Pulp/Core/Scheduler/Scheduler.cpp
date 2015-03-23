@@ -23,6 +23,18 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 
 	while (thread.ShouldRun())
 	{
+			// check for any new job lists that need to be copy to local thread stack.
+
+
+			// go throught all the lcoal lists and find one with highest priority.
+
+
+
+			// see if we should run one or multipe jobs in the context of this thread.
+
+
+			// check the result of the job that was run.
+
 
 
 

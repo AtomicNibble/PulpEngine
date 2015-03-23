@@ -57,10 +57,12 @@ struct Jobdata
 	uint32_t batchOffset;
 	uint32_t batchNum;
 
-	// i will try and thing where else to stoe the dependent data.
-	// other wise i will need a variable sized array here.
-
-	// which will be empty most 98% of the time.
+	// jobs can't wait for other jobs.
+	// only lsits can wait for other lists.
+	// this means we only store wait info once for the whole lists.
+	// creating minimal overhead on jobs that don't wait.
+	// at the cost of just having jobs that depnd on each other be in diffrent lists.
+	// which is fine with me.
 };
 
 
