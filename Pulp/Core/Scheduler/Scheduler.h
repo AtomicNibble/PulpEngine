@@ -6,6 +6,8 @@
 #include "Time\TimeVal.h"
 
 #include "Threading\Thread.h"
+#include "Threading\AtomicInt.h"
+
 
 X_NAMESPACE_BEGIN(core)
 
@@ -45,7 +47,38 @@ guess a fibere will have to get the job then run it in the context of the fibre.
 typedef void(*Job)(void* pParam);
 
 
-X_DECLARE_ENUM(JobPriority)(LOW,NORMAL,HIGH);
+X_DECLARE_ENUM(JobListPriority)(LOW,NORMAL,HIGH);
+
+static const uint32_t HW_THREAD_MAX = 6; // max even if hardware supports more.
+static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
+
+
+struct ThreadStats
+{
+	ThreadStats() : numExecJobs(0) {}
+
+	uint64_t numExecJobs;			// jobs execuced
+	TimeVal waitTime;					// time spent waiting
+	TimeVal threadExecTime;		// time spent executing jobs
+	TimeVal threadTotalTime;	// total time.
+};
+
+
+struct JobListStats
+{
+	JobListStats() {
+	}
+
+	TimeVal submitTime;				// time lists was submitted
+	TimeVal startTime;				// time lists was first picked
+	TimeVal waitTime;					// time list spent waiting
+	TimeVal endTime;					// time at which all the jobs are done.
+	// stats for each thread, since the jobs will run in multipl threads
+	// this just gives a break down of how much time each thread spent.
+	TimeVal threadExecTime[HW_THREAD_MAX];		// time exec job code
+	TimeVal threadTotalTime[HW_THREAD_MAX];		// total time.
+};
+
 
 
 struct Jobdata
@@ -56,25 +89,29 @@ struct Jobdata
 	// batch offset and index.
 	uint32_t batchOffset;
 	uint32_t batchNum;
-
-	// jobs can't wait for other jobs.
-	// only lsits can wait for other lists.
-	// this means we only store wait info once for the whole lists.
-	// creating minimal overhead on jobs that don't wait.
-	// at the cost of just having jobs that depnd on each other be in diffrent lists.
-	// which is fine with me.
 };
 
 
-struct ThreadStats
+class JobList
 {
-	ThreadStats() : numExecJobs(0) {}
+public:
 
-	uint64_t numExecJobs;		// jobs execuced
-	TimeVal waitTime;			// time spent waiting
-	TimeVal threadExecTime;		// time spent executing jobs
-	TimeVal threadTotalTime;	// total time.
+		void AddJob(pJobRun jop, void* pData);
+
+
+private:
+	bool isDone_;
+	bool _pad[3];
+
+	JobListPriority::Enum priority_;
+
+	core::Array<JobData> jobs_;
+	core::AtomicInt currentJob_;
+	core::AtomicInt fetchLock_;
+
+	JobListStats stats_;
 };
+
 
 
 class JobThread : public ThreadAbstract
@@ -91,10 +128,6 @@ private:
 
 class Scheduler
 {
-	static const uint32_t HW_THREAD_MAX = 6; // max even if hardware supports more.
-	static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
-
-
 public:
 	Scheduler();
 	~Scheduler();
