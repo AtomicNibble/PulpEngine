@@ -7,6 +7,66 @@
 
 X_NAMESPACE_BEGIN(core)
 
+
+JobList::JobList() :
+	isDone_(false),
+	isSubmit_(false),
+	jobs_(g_coreArena),
+	currentJob_(0),
+	fetchLock_(0)
+{
+
+}
+
+void JobList::AddJob(Job job, void* pData)
+{
+	JobData data;
+	data.pJobRun = job;
+	data.pData = pData;
+	data.batchOffset = 0;
+	data.batchNum = 1;
+
+	jobs_.append(data);
+}
+
+void JobList::Wait(void)
+{
+	if (jobs_.isNotEmpty()) 
+	{
+	
+	}
+	isDone_ = true;
+}
+
+bool JobList::TryWait(void)
+{
+	if (jobs_.isEmpty()) {
+		Wait();
+		return true;
+	}
+	return false;
+
+}
+
+bool JobList::IsSubmitted(void) const
+{
+	return isSubmit_;
+}
+
+bool JobList::IsDone(void) const
+{
+	return isDone_;
+}
+
+void JobList::SetPriority(JobListPriority::Enum priority)
+{
+	priority_ = priority;
+}
+
+
+// ----------------------------------
+
+
 JobThread::JobThread()
 {
 
@@ -98,6 +158,11 @@ void Scheduler::ShutDown(void)
 }
 
 
+void Scheduler::SubMitList(JobList* pList, JobList* pWaitFor)
+{
+	X_ASSERT_NOT_NULL(pList);
+
+}
 
 
 X_NAMESPACE_END

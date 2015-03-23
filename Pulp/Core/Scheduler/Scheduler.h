@@ -6,9 +6,11 @@
 #include "Time\TimeVal.h"
 
 #include "Containers\Array.h"
+#include "Containers\FixedRingBuffer.h"
 
 #include "Threading\Thread.h"
 #include "Threading\AtomicInt.h"
+#include "Threading\CriticalSection.h"
 
 
 X_NAMESPACE_BEGIN(core)
@@ -21,6 +23,7 @@ X_DECLARE_ENUM(JobListPriority)(LOW,NORMAL,HIGH);
 
 static const uint32_t HW_THREAD_MAX = 6; // max even if hardware supports more.
 static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
+static const uint32_t MAX_JOB_LISTS = 32;
 
 
 struct ThreadStats
@@ -65,13 +68,21 @@ struct JobData
 class JobList
 {
 public:
+	JobList();
 
-	void AddJob(Job jop, void* pData);
+	void AddJob(Job job, void* pData);
 
+	void Wait(void);
+	bool TryWait(void);
+	bool IsSubmitted(void) const;
+	bool IsDone(void) const;
+
+	void SetPriority(JobListPriority::Enum priority);
 
 private:
 	bool isDone_;
-	bool _pad[3];
+	bool isSubmit_;
+	bool _pad[2];
 
 	JobListPriority::Enum priority_;
 
@@ -96,6 +107,7 @@ private:
 	ThreadStats stats_;
 };
 
+
 class Scheduler
 {
 public:
@@ -105,11 +117,14 @@ public:
 	void StartThreads(void);
 	void ShutDown(void);
 
+	void SubMitList(JobList* pList, JobList* pWaitFor = nullptr);
 
 private:
 	uint32_t numThreads_; // num created.
-
 	JobThread threads_[HW_THREAD_MAX];
+
+	core::FixedRingBuffer<JobList, 32> jobLists_;
+	core::CriticalSection addJobListCrit_;
 };
 
 
