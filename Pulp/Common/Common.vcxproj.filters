@@ -73,9 +73,6 @@
     <Filter Include="Headers\String">
       <UniqueIdentifier>{e4ceb261-482d-456e-9e4c-686b2d7b82a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Headers\Timer">
-      <UniqueIdentifier>{3eaf8db3-d000-4514-9c7d-87ca1fc913d1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Headers\Util">
       <UniqueIdentifier>{c47de0f9-49fe-49c1-bc2c-3b73ea9c199f}</UniqueIdentifier>
     </Filter>
@@ -327,9 +324,6 @@
     </ClInclude>
     <ClInclude Include="ITimer.h">
       <Filter>Interfaces_h</Filter>
-    </ClInclude>
-    <ClInclude Include="TimeVal.h">
-      <Filter>Headers\Timer</Filter>
     </ClInclude>
     <ClInclude Include="IConsole.h">
       <Filter>Interfaces_h</Filter>
@@ -942,6 +936,9 @@
     </ClInclude>
     <ClInclude Include="String\Base64.h">
       <Filter>Headers\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\TimeVal.h">
+      <Filter>Headers\Time</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
