@@ -116,7 +116,7 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 
 //		TimeVal jobStart = 0;
 
-		job.pJobRun(job.pData);
+		job.pJobRun(job.pData, job.batchOffset, job.batchNum);
 		job.done = true;
 
 //		TimeVal jobEnd = 0;
@@ -220,7 +220,7 @@ void Scheduler::StartThreads(void)
 	ICore* pCore = (ICore*)gEnv->pCore;
 	CpuInfo* pCpu = pCore->GetCPUInfo();
 
-	uint32_t numCores = pCpu->GetLogicalProcessorCount();
+	uint32_t numCores = pCpu->GetCoreCount();
 	numThreads_ = core::Max(core::Min(HW_THREAD_MAX, numCores - HW_THREAD_NUM_DELTA), 1u);
 
 	X_LOG0("Scheduler", "Creating %i threads", numThreads_);
