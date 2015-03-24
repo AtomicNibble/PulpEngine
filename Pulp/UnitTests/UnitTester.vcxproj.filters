@@ -33,6 +33,9 @@
     <Filter Include="Source Files\tests\Containers">
       <UniqueIdentifier>{a4f41d7e-fe8f-4a00-a1b0-e5b88804aa3c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\tests\Threading">
+      <UniqueIdentifier>{f1237d97-6e11-4d50-a0e3-13d8dc680b1e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -68,9 +71,6 @@
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="UT_Hash.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_Thread.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="UT_Pointer.cpp">
@@ -240,6 +240,12 @@
     </ClCompile>
     <ClCompile Include="UT_Base64.cpp">
       <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Thread.cpp">
+      <Filter>Source Files\tests\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Scheduler.cpp">
+      <Filter>Source Files\tests\Threading</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
