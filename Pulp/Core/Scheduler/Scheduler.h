@@ -23,7 +23,7 @@ X_DECLARE_ENUM(JobListPriority)(LOW,NORMAL,HIGH);
 
 static const uint32_t HW_THREAD_MAX = 6; // max even if hardware supports more.
 static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
-static const uint32_t MAX_JOB_LISTS = 32;
+static const uint32_t MAX_JOB_LISTS = 64;
 
 
 struct ThreadStats
@@ -31,6 +31,7 @@ struct ThreadStats
 	ThreadStats() : numExecJobs(0) {}
 
 	uint64_t numExecJobs;			// jobs execuced
+	TimeVal startTime;				// time lists was first picked
 	TimeVal waitTime;					// time spent waiting
 	TimeVal threadExecTime;		// time spent executing jobs
 	TimeVal threadTotalTime;	// total time.
@@ -117,7 +118,7 @@ public:
 	void StartThreads(void);
 	void ShutDown(void);
 
-	void SubMitList(JobList* pList, JobList* pWaitFor = nullptr);
+	void SubmitJobList(JobList* pList, JobList* pWaitFor = nullptr);
 
 private:
 	uint32_t numThreads_; // num created.

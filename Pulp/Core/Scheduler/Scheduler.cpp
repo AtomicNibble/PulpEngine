@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "Scheduler.h"
 
-
 #include "Cpu.h"
 #include "Core.h"
+
+#include "SystemTimer.h"
 
 X_NAMESPACE_BEGIN(core)
 
@@ -80,6 +81,8 @@ JobThread::~JobThread()
 Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 {
 	X_UNUSED(thread);
+
+	stats_.startTime = SysTimer::Get();
 
 	while (thread.ShouldRun())
 	{
@@ -158,7 +161,7 @@ void Scheduler::ShutDown(void)
 }
 
 
-void Scheduler::SubMitList(JobList* pList, JobList* pWaitFor)
+void Scheduler::SubmitJobList(JobList* pList, JobList* pWaitFor)
 {
 	X_ASSERT_NOT_NULL(pList);
 
