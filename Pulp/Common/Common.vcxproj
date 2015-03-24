@@ -261,6 +261,7 @@
     <ClInclude Include="Threading\AtomicInt.h" />
     <ClInclude Include="Threading\ConditionVariable.h" />
     <ClInclude Include="Threading\CriticalSection.h" />
+    <ClInclude Include="Threading\Scheduler.h" />
     <ClInclude Include="Threading\Semaphore.h" />
     <ClInclude Include="Threading\Spinlock.h" />
     <ClInclude Include="Threading\Thread.h" />
@@ -277,6 +278,7 @@
     <ClInclude Include="Types.h" />
     <ClInclude Include="Util\BitUtil.h" />
     <ClInclude Include="Util\ClassMacros.h" />
+    <ClInclude Include="Util\Cpu.h" />
     <ClInclude Include="Util\Delegate.h" />
     <ClInclude Include="Util\EndianUtil.h" />
     <ClInclude Include="Util\EnumMacros.h" />
@@ -303,7 +305,6 @@
   <ItemGroup>
     <None Include="Casts\safe_static_cast.inl" />
     <None Include="Casts\union_cast.inl" />
-    <None Include="ClassDiagram.cd" />
     <None Include="Containers\BitStream.inl" />
     <None Include="Containers\ByteStream.inl" />
     <None Include="Containers\ByteStreamFifo.inl" />
@@ -372,6 +373,7 @@
     <None Include="Threading\Spinlock.inl" />
     <None Include="Threading\ThreadLocalStorage.inl" />
     <None Include="Util\BitUtil.inl" />
+    <None Include="Util\Cpu.inl" />
     <None Include="Util\EndianUtil.inl" />
     <None Include="Util\Flags.inl" />
     <None Include="Util\Pointer64.inl" />
@@ -674,6 +676,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Threading\Scheduler.cpp" />
     <ClCompile Include="Threading\Thread.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
@@ -684,6 +687,7 @@
     <ClCompile Include="Time\CompressedStamps.cpp" />
     <ClCompile Include="Time\DateStamp.cpp" />
     <ClCompile Include="Time\TimeStamp.cpp" />
+    <ClCompile Include="Util\Cpu.cpp" />
     <ClCompile Include="Util\win32\LastError.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>

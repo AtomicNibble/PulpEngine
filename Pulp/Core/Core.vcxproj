@@ -346,7 +346,6 @@
     <ClInclude Include="ConsoleVariable.h" />
     <ClInclude Include="Core.h" />
     <ClInclude Include="CoreEventDispatcher.h" />
-    <ClInclude Include="Cpu.h" />
     <ClInclude Include="DiskFile.h" />
     <ClInclude Include="DiskFileAsync.h" />
     <ClInclude Include="FileSysVars.h" />
@@ -354,7 +353,6 @@
     <ClInclude Include="Log.h" />
     <ClInclude Include="NullImplementation\NullInput.h" />
     <ClInclude Include="OsFile.h" />
-    <ClInclude Include="Scheduler\Scheduler.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SystemTimer.h" />
     <ClInclude Include="Timer.h" />
@@ -373,13 +371,11 @@
     <ClCompile Include="CoreEventDispatcher.cpp" />
     <ClCompile Include="CoreInit.cpp" />
     <ClCompile Include="CoreRender.cpp" />
-    <ClCompile Include="Cpu.cpp" />
     <ClCompile Include="DiskFile.cpp" />
     <ClCompile Include="DiskFileAsync.cpp" />
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="GoatFactoryRegistryImpl.cpp" />
     <ClCompile Include="Log.cpp" />
-    <ClCompile Include="Scheduler\Scheduler.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>
@@ -403,7 +399,6 @@
     <ClCompile Include="XProfileRender.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Cpu.inl" />
     <None Include="win32\SystemTimer.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

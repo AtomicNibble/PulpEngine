@@ -53,9 +53,6 @@
     <ClInclude Include="Timer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Cpu.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="Console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -116,9 +113,6 @@
     <ClInclude Include="win32\SystemTimer.h">
       <Filter>Header Files\win32</Filter>
     </ClInclude>
-    <ClInclude Include="Scheduler\Scheduler.h">
-      <Filter>Header Files\Scheduler</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -134,9 +128,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Timer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Cpu.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Console.cpp">
@@ -184,14 +175,8 @@
     <ClCompile Include="DiskFile.cpp">
       <Filter>FileSys</Filter>
     </ClCompile>
-    <ClCompile Include="Scheduler\Scheduler.cpp">
-      <Filter>Source Files\Scheduler</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Cpu.inl">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="win32\SystemTimer.inl">
       <Filter>Header Files\win32</Filter>
     </None>

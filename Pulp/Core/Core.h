@@ -7,7 +7,7 @@
 #include <IConsole.h>
 
 #include "Timer.h"
-#include "Cpu.h"
+#include "Util\Cpu.h"
 #include "XProfile.h"
 
 #include "Util\SourceInfo.h"
@@ -127,6 +127,7 @@ public:
 	ICoreEventDispatcher* GetCoreEventDispatcher() X_OVERRIDE{ return pEventDispatcher_; }
 	core::ILog			*GetILog() X_OVERRIDE{ return env_.pLog; };
 	core::Crc32			*GetCrc32() X_OVERRIDE;
+	core::CpuInfo*	GetCPUInfo() X_OVERRIDE { return pCpuInfo_; };
 
 
 	core::xWindow* GetGameWindow() X_OVERRIDE { return pWindow_; }
@@ -141,7 +142,6 @@ public:
 	static core::MallocFreeAllocator malloc_;
 
 public:
-	core::CpuInfo* GetCPUInfo() { return pCpuInfo_; };
 
 
 	virtual void RegisterAssertHandler(IAssertHandler* errorHandler) X_OVERRIDE;

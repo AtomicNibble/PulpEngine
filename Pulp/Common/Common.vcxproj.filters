@@ -172,6 +172,9 @@
     <Filter Include="SourceFiles\Encryption">
       <UniqueIdentifier>{42602cbe-b9c6-4b92-b686-489a918eb1c0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SourceFiles\Util">
+      <UniqueIdentifier>{463d16f4-67d2-4249-b7b2-028b836c9f32}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -940,6 +943,12 @@
     <ClInclude Include="Time\TimeVal.h">
       <Filter>Headers\Time</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\Scheduler.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Cpu.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1173,7 +1182,6 @@
     <None Include="Math\XWinding.inl">
       <Filter>Headers\Math</Filter>
     </None>
-    <None Include="ClassDiagram.cd" />
     <None Include="Containers\HashIndex.inl">
       <Filter>Headers\Containers</Filter>
     </None>
@@ -1182,6 +1190,9 @@
     </None>
     <None Include="String\StrRef.inl">
       <Filter>Headers\String</Filter>
+    </None>
+    <None Include="Util\Cpu.inl">
+      <Filter>Headers\Util</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1419,6 +1430,12 @@
     </ClCompile>
     <ClCompile Include="String\Base64.cpp">
       <Filter>SourceFiles\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\Scheduler.cpp">
+      <Filter>SourceFiles\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Cpu.cpp">
+      <Filter>SourceFiles\Util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
