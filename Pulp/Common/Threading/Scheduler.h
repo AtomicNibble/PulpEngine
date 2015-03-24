@@ -17,7 +17,7 @@
 X_NAMESPACE_BEGIN(core)
 
 
-typedef void(*Job)(void* pParam, uint32_t batchOffset, uint32_t batchNum);
+typedef void(*Job)(void* pParam, uint32_t batchOffset, uint32_t batchNum, uint32_t workerIdx);
 
 
 X_DECLARE_ENUM(JobListPriority)(NONE,LOW,NORMAL,HIGH);

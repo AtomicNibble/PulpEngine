@@ -116,7 +116,11 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 
 //		TimeVal jobStart = 0;
 
-		job.pJobRun(job.pData, job.batchOffset, job.batchNum);
+		job.pJobRun(job.pData, 
+			job.batchOffset, 
+			job.batchNum,
+			threadIdx);
+
 		job.done = true;
 
 //		TimeVal jobEnd = 0;
@@ -184,6 +188,11 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 			}
 		}
 
+		if (jobStates.size() == 0) {
+			Sleep(200);
+			continue;
+		}
+
 		JobListThreadState& currentJobList = jobStates.peek();
 
 		currentJobList.jobList->RunJobs(threadIdx_, currentJobList);
@@ -230,6 +239,7 @@ void Scheduler::StartThreads(void)
 	{
 		core::StackString<64> name;
 		name.appendFmt("Worker_%i", i);
+		threads_[i].setThreadIdx(i);
 		threads_[i].Create(name.c_str()); // default stack size.
 		threads_[i].Start();
 	}
@@ -252,7 +262,9 @@ void Scheduler::ShutDown(void)
 void Scheduler::SubmitJobList(JobList* pList, JobList* pWaitFor)
 {
 	X_ASSERT_NOT_NULL(pList);
-
+	for (uint32_t i = 0; i < numThreads_; i++) {
+		threads_[i].AddJobList(pList);
+	}
 }
 
 
