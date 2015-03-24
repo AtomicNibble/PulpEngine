@@ -262,6 +262,9 @@ void Scheduler::ShutDown(void)
 void Scheduler::SubmitJobList(JobList* pList, JobList* pWaitFor)
 {
 	X_ASSERT_NOT_NULL(pList);
+
+	core::CriticalSection::ScopedLock lock(addJobListCrit_);
+
 	for (uint32_t i = 0; i < numThreads_; i++) {
 		threads_[i].AddJobList(pList);
 	}
