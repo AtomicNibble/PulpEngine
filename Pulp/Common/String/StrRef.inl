@@ -206,7 +206,7 @@ void StringRef<CharT>::reserve(size_type size)
 	{
 		XStrHeader* pOldData = header();
 		Allocate(size);
-		_copy(str_, pOldData->GetChars(), pOldData->length);
+		_copy(str_, pOldData->getChars(), pOldData->length);
 		header()->length = pOldData->length;
 		str_[pOldData->length] = 0;
 		freeData(pOldData);

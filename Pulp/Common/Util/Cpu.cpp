@@ -1,4 +1,4 @@
-#include "stdafx.h"
+#include "EngineCommon.h"
 
 #include "Cpu.h"
 #include <Util\BitUtil.h>

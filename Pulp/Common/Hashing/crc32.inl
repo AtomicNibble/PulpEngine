@@ -7,68 +7,51 @@ inline Crc32::Crc32()
 
 inline uint32_t Crc32::GetCRC32(const char *text) const
 {
-	int len = (int)strlen(text);
-	return GetCRC32(text, len, CRC32_INIT_VALUE);
+	size_t len = strlen(text);
+	return GetCRC32(text, len);
 }
 
-inline uint32_t Crc32::GetCRC32(const char *data, int size) const
+inline uint32_t Crc32::GetCRC32(const char *data, size_t size) const
 {
-	return get_CRC32(data, size, CRC32_INIT_VALUE);
-}
-
-inline uint32_t Crc32::GetCRC32(const char *data, int size, uint32_t uCRC) const
-{
-	return get_CRC32(data, size, uCRC);
+	uint32_t crc = Begin();
+	Update(data,size, crc);
+	return Finish(crc);
 }
 
 
 inline uint32_t Crc32::GetCRC32Lowercase(const char *text) const
 {
-	int len = (int)strlen(text);
-	return GetCRC32Lowercase(text, len, CRC32_INIT_VALUE);
+	size_t len = strlen(text);
+	return GetCRC32Lowercase(text, len);
 }
 
-inline uint32_t Crc32::GetCRC32Lowercase(const char *data, int size, uint32_t uCRC) const
+inline uint32_t Crc32::GetCRC32Lowercase(const char *data, size_t size) const
 {
-	return get_CRC32Lowercase(data, size, uCRC);
+	uint32_t crc = Begin();
+	UpdateLowerCase(data, size, crc);
+	return Finish(crc);
 }
 
-inline uint32_t Crc32::get_CRC32Lowercase(const char *data, int size, uint32_t crcvalue) const
-{
-	int32_t len;
-	uint8_t* buffer;
-
-	// Get the length. 
-	len = size;
-	buffer = (uint8_t*)data;
-
-	while (len--)
-	{
-		uint8_t c = *buffer++;
-		crcvalue = (crcvalue >> 8) ^ crc32_table[(crcvalue & 0xFF) ^ ToLower(c)];
-	}
-
-	return FinishChecksum(crcvalue);
+inline uint32_t Crc32::Begin(void) const {
+	return CRC32_INIT_VALUE;
 }
 
-inline uint32_t Crc32::get_CRC32(const char *data, int size, uint32_t crcvalue) const
-{
-	int len;
-	uint8_t* buffer;
-	uint32_t crc = crcvalue;
-
-	len = size;
-	buffer = (uint8_t*)data;
-
-	while (len--)
-		crc = (crc >> 8) ^ crc32_table[(crc & 0xFF) ^ *buffer++];
-
-	return FinishChecksum(crc);
-}
-
-
-inline uint32_t Crc32::FinishChecksum(uint32_t crcvalue)  {
+inline uint32_t Crc32::Finish(uint32_t crcvalue) const {
 	return crcvalue ^ CRC32_XOR_VALUE;
+}
+
+inline uint32_t Crc32::ToLower(uint32_t c) {
+	union {
+		uint8_t as_bytes[4];
+		uint32_t as_int32;
+	};
+
+	as_int32 = c;
+	as_bytes[0] = ToLower(as_bytes[0]);
+	as_bytes[1] = ToLower(as_bytes[1]);
+	as_bytes[2] = ToLower(as_bytes[2]);
+	as_bytes[3] = ToLower(as_bytes[3]);
+	return as_int32;
 }
 
 inline uint8_t Crc32::ToLower(uint8_t c) {

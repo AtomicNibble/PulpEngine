@@ -73,9 +73,6 @@
     <Filter Include="Headers\String">
       <UniqueIdentifier>{e4ceb261-482d-456e-9e4c-686b2d7b82a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Headers\Timer">
-      <UniqueIdentifier>{3eaf8db3-d000-4514-9c7d-87ca1fc913d1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Headers\Util">
       <UniqueIdentifier>{c47de0f9-49fe-49c1-bc2c-3b73ea9c199f}</UniqueIdentifier>
     </Filter>
@@ -168,6 +165,21 @@
     </Filter>
     <Filter Include="SourceFiles\Containers">
       <UniqueIdentifier>{c7bb6186-46aa-4b85-8f65-a7a67ea958aa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Encryption">
+      <UniqueIdentifier>{64abb8ac-59fa-457f-9047-d271664f4d1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Encryption">
+      <UniqueIdentifier>{42602cbe-b9c6-4b92-b686-489a918eb1c0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Util">
+      <UniqueIdentifier>{463d16f4-67d2-4249-b7b2-028b836c9f32}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Threading\win32">
+      <UniqueIdentifier>{d0723535-8852-4894-8deb-9aae369b52ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Threading\win32">
+      <UniqueIdentifier>{2f50a8d2-8d91-43dd-b223-9abe1833821b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -321,9 +333,6 @@
     </ClInclude>
     <ClInclude Include="ITimer.h">
       <Filter>Interfaces_h</Filter>
-    </ClInclude>
-    <ClInclude Include="TimeVal.h">
-      <Filter>Headers\Timer</Filter>
     </ClInclude>
     <ClInclude Include="IConsole.h">
       <Filter>Interfaces_h</Filter>
@@ -925,6 +934,33 @@
     <ClInclude Include="String\XParser.h">
       <Filter>Headers\String</Filter>
     </ClInclude>
+    <ClInclude Include="Hashing\MD5.h">
+      <Filter>Headers\Hashing</Filter>
+    </ClInclude>
+    <ClInclude Include="Hashing\Adler32.h">
+      <Filter>Headers\Hashing</Filter>
+    </ClInclude>
+    <ClInclude Include="Encryption\Salsa20.h">
+      <Filter>Headers\Encryption</Filter>
+    </ClInclude>
+    <ClInclude Include="String\Base64.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\TimeVal.h">
+      <Filter>Headers\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\Scheduler.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Cpu.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\Signal.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\win32\Signal.h">
+      <Filter>Headers\Threading\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1158,7 +1194,6 @@
     <None Include="Math\XWinding.inl">
       <Filter>Headers\Math</Filter>
     </None>
-    <None Include="ClassDiagram.cd" />
     <None Include="Containers\HashIndex.inl">
       <Filter>Headers\Containers</Filter>
     </None>
@@ -1167,6 +1202,9 @@
     </None>
     <None Include="String\StrRef.inl">
       <Filter>Headers\String</Filter>
+    </None>
+    <None Include="Util\Cpu.inl">
+      <Filter>Headers\Util</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1392,6 +1430,27 @@
     </ClCompile>
     <ClCompile Include="String\XParser.cpp">
       <Filter>SourceFiles\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Hashing\MD5.cpp">
+      <Filter>SourceFiles\Hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="Hashing\Adler32.cpp">
+      <Filter>SourceFiles\Hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="Encryption\Salsa20.cpp">
+      <Filter>SourceFiles\Encryption</Filter>
+    </ClCompile>
+    <ClCompile Include="String\Base64.cpp">
+      <Filter>SourceFiles\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\Scheduler.cpp">
+      <Filter>SourceFiles\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Cpu.cpp">
+      <Filter>SourceFiles\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\win32\Signal.cpp">
+      <Filter>SourceFiles\Threading\win32</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

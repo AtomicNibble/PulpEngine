@@ -33,6 +33,15 @@
     <Filter Include="Source Files\tests\Containers">
       <UniqueIdentifier>{a4f41d7e-fe8f-4a00-a1b0-e5b88804aa3c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\tests\Threading">
+      <UniqueIdentifier>{f1237d97-6e11-4d50-a0e3-13d8dc680b1e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Profile">
+      <UniqueIdentifier>{62a06b7d-9bb8-421c-bc09-6bb7bef4e46f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Profile">
+      <UniqueIdentifier>{0003acaa-34dd-447a-90ed-776768eab72f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -53,6 +62,9 @@
     <ClInclude Include="UT_AssertChecker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Profiler.h">
+      <Filter>Header Files\Profile</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -68,9 +80,6 @@
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="UT_Hash.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_Thread.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="UT_Pointer.cpp">
@@ -234,6 +243,21 @@
     </ClCompile>
     <ClCompile Include="UT_AssertChecker.cpp">
       <Filter>Source Files\tests\Debugging</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Encryption.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Base64.cpp">
+      <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Thread.cpp">
+      <Filter>Source Files\tests\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Scheduler.cpp">
+      <Filter>Source Files\tests\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Profiler.cpp">
+      <Filter>Source Files\Profile</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -8,39 +8,43 @@ X_NAMESPACE_BEGIN(core)
 
 X_ALIGNED_SYMBOL(class Crc32, 128)
 {
-	static const uint32_t CRC32_POLY_NORMAL = 0x04C11DB7;
+	static const uint32_t CRC32_POLY_NORMAL = 0xEDB88320;
 	static const uint32_t CRC32_INIT_VALUE = 0xffffffffL;
 	static const uint32_t CRC32_XOR_VALUE = 0xffffffffL;
 
 public:
 	Crc32();
 
-	void InitTable() {
-		if (!tableInit_) 
-			build_table();
+	void InitTable(void) {
+		if (!tableInit_) {
+			buildTable();
+		}
 	}
 
 	uint32_t Combine(const uint32_t lhs, const uint32_t rhs, const uint32_t rhs_length) const;
 
 	uint32_t GetCRC32(const char* text) const;
-	uint32_t GetCRC32(const char* data, int size) const;
-	uint32_t GetCRC32(const char* data, int size, uint32_t uCRC) const;
+	uint32_t GetCRC32(const char* data, size_t size) const;
 
+	// gets the crc32 as if all the text was lowercase.
 	uint32_t GetCRC32Lowercase(const char* text) const;
-	uint32_t GetCRC32Lowercase(const char* data, int size, uint32_t uCRC) const;
+	uint32_t GetCRC32Lowercase(const char* text, size_t len) const;
+
+	// api for making a crc out of multiple buffers.
+	uint32_t Begin(void) const;
+	uint32_t Finish(uint32_t crc) const;
+	uint32_t Update(const void* data, size_t size, uint32_t& crcvalue) const;
+	uint32_t UpdateLowerCase(const char* text, size_t size, uint32_t& crcvalue) const;
 
 private:
-	void build_table();
+	void buildTable(void);
 
-	uint32_t get_CRC32(const char *data, int size, uint32_t uCRC) const;
-	uint32_t get_CRC32Lowercase(const char *data, int size, uint32_t uCRC) const;
-
-	static inline uint32_t FinishChecksum(uint32_t crcvalue);
+	static inline uint32_t ToLower(uint32_t c);
 	static inline uint8_t ToLower(uint8_t c);
 	static inline uint32_t Reflect(uint32_t iReflect, const char cChar);
 
 private:
-	uint32_t crc32_table[0x100];
+	uint32_t crc32_table[8][0x100];
 	bool tableInit_;
 };
 

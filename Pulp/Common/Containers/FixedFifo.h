@@ -7,7 +7,7 @@
 X_NAMESPACE_BEGIN(core)
 
 template<typename T, size_t N>
-class Fifo;
+class FixedFifo;
 
 template<typename T, size_t N>
 struct _FixedFifoIterator;

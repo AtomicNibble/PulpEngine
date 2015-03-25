@@ -97,6 +97,7 @@
     <ClInclude Include="Debugging\win32\MiniDump.h" />
     <ClInclude Include="Debugging\win32\PureVirtualFunctionCallHandler.h" />
     <ClInclude Include="Debugging\win32\SymbolResolution.h" />
+    <ClInclude Include="Encryption\Salsa20.h" />
     <ClInclude Include="EngineCommon.h" />
     <ClInclude Include="Extension\FactoryRegNode.h" />
     <ClInclude Include="Extension\GoatCreateClass.h" />
@@ -105,9 +106,11 @@
     <ClInclude Include="Extension\IGoatFactoryRegistry.h" />
     <ClInclude Include="Extension\IGoatFactoryRegistryImpl.h" />
     <ClInclude Include="Extension\XExtensionMacros.h" />
+    <ClInclude Include="Hashing\Adler32.h" />
     <ClInclude Include="Hashing\crc32.h" />
     <ClInclude Include="Hashing\Fnva1Hash.h" />
     <ClInclude Include="Hashing\crc32.inl" />
+    <ClInclude Include="Hashing\MD5.h" />
     <ClInclude Include="Hashing\MurmurHash.h" />
     <ClInclude Include="Hashing\sha1.h" />
     <ClInclude Include="IAnimation.h" />
@@ -241,6 +244,7 @@
     <ClInclude Include="Random\MultiplyWithCarry.h" />
     <ClInclude Include="Random\XorShift.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="String\Base64.h" />
     <ClInclude Include="String\HumanSize.h" />
     <ClInclude Include="String\Lexer.h" />
     <ClInclude Include="String\StackString.h" />
@@ -257,14 +261,17 @@
     <ClInclude Include="Threading\AtomicInt.h" />
     <ClInclude Include="Threading\ConditionVariable.h" />
     <ClInclude Include="Threading\CriticalSection.h" />
+    <ClInclude Include="Threading\Scheduler.h" />
     <ClInclude Include="Threading\Semaphore.h" />
+    <ClInclude Include="Threading\Signal.h" />
     <ClInclude Include="Threading\Spinlock.h" />
     <ClInclude Include="Threading\Thread.h" />
     <ClInclude Include="Threading\ThreadLocalStorage.h" />
-    <ClInclude Include="TimeVal.h" />
+    <ClInclude Include="Threading\win32\Signal.h" />
     <ClInclude Include="Time\CompressedStamps.h" />
     <ClInclude Include="Time\DateStamp.h" />
     <ClInclude Include="Time\TimeStamp.h" />
+    <ClInclude Include="Time\TimeVal.h" />
     <ClInclude Include="Traits\FunctionSignatureTraits.h" />
     <ClInclude Include="Traits\FunctionTraits.h" />
     <ClInclude Include="Traits\MemberFunctionTraits.h" />
@@ -273,6 +280,7 @@
     <ClInclude Include="Types.h" />
     <ClInclude Include="Util\BitUtil.h" />
     <ClInclude Include="Util\ClassMacros.h" />
+    <ClInclude Include="Util\Cpu.h" />
     <ClInclude Include="Util\Delegate.h" />
     <ClInclude Include="Util\EndianUtil.h" />
     <ClInclude Include="Util\EnumMacros.h" />
@@ -299,7 +307,6 @@
   <ItemGroup>
     <None Include="Casts\safe_static_cast.inl" />
     <None Include="Casts\union_cast.inl" />
-    <None Include="ClassDiagram.cd" />
     <None Include="Containers\BitStream.inl" />
     <None Include="Containers\ByteStream.inl" />
     <None Include="Containers\ByteStreamFifo.inl" />
@@ -368,6 +375,7 @@
     <None Include="Threading\Spinlock.inl" />
     <None Include="Threading\ThreadLocalStorage.inl" />
     <None Include="Util\BitUtil.inl" />
+    <None Include="Util\Cpu.inl" />
     <None Include="Util\EndianUtil.inl" />
     <None Include="Util\Flags.inl" />
     <None Include="Util\Pointer64.inl" />
@@ -460,6 +468,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Encryption\Salsa20.cpp" />
     <ClCompile Include="EngineCommon.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Create</PrecompiledHeader>
@@ -473,6 +482,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Hashing\Adler32.cpp" />
     <ClCompile Include="Hashing\Crc32.cpp" />
     <ClCompile Include="Hashing\Fnva1Hash.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
@@ -482,6 +492,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Hashing\MD5.cpp" />
     <ClCompile Include="Hashing\MurmurHash.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
@@ -632,6 +643,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="String\Base64.cpp" />
     <ClCompile Include="String\HumanSize.cpp" />
     <ClCompile Include="String\Lexer.cpp" />
     <ClCompile Include="String\StringTokenizer.cpp">
@@ -666,6 +678,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Threading\Scheduler.cpp" />
     <ClCompile Include="Threading\Thread.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
@@ -673,9 +686,11 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Threading\win32\Signal.cpp" />
     <ClCompile Include="Time\CompressedStamps.cpp" />
     <ClCompile Include="Time\DateStamp.cpp" />
     <ClCompile Include="Time\TimeStamp.cpp" />
+    <ClCompile Include="Util\Cpu.cpp" />
     <ClCompile Include="Util\win32\LastError.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>

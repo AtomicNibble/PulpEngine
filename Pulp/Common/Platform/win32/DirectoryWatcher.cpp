@@ -169,7 +169,7 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 				bool is_directory = false;
 
 				if (pInfo->Action != FILE_ACTION_REMOVED)
-					is_directory = gEnv->pFileSys->directoryExists(path.c_str());
+					is_directory = gEnv->pFileSys->isDirectory(path.c_str());
 
 				if (is_directory)
 				{

@@ -1,6 +1,8 @@
 #include <EngineCommon.h>
 #include "crc32.h"
 
+#include "Util\PointerUtil.h"
+
 namespace
 {
 	static const uint32_t GF2_DIM = 32;
@@ -95,42 +97,127 @@ uint32_t Crc32::Combine(const uint32_t lhs, const uint32_t rhs,
 }
 
 
-void Crc32::build_table()
+void Crc32::buildTable(void)
 {
-	// I could change this poly if i didnt want my crc to match
-	// a standard crc32
-	uint32_t uPolynomial = CRC32_POLY_NORMAL;
-	//	uint32_t uCrc;
-
-	//	int i, j;
-	/*
-	for (i = 0; i < 256; i++) {
-	uCrc = i;
-	for (j = 8; j > 0; j--) {
-	if (uCrc & 1)
-	uCrc = (uCrc >> 1) ^ uPolynomial;
-	else
-	uCrc >>= 1;
-	}
-	crc32_table[i] = uCrc;
-	}*/
-	core::zero_object(crc32_table);
-
-	for (int iCodes = 0; iCodes <= 0xFF; iCodes++)
+	uint32_t i, j;
+	for (i = 0; i <= 0xFF; i++)
 	{
-		crc32_table[iCodes] = Reflect(iCodes, 8) << 24;
-
-		for (int iPos = 0; iPos < 8; iPos++)
-		{
-			crc32_table[iCodes] = (crc32_table[iCodes] << 1)
-				^ ((crc32_table[iCodes] & (1 << 31)) ? uPolynomial : 0);
-		}
-
-		crc32_table[iCodes] = Reflect(crc32_table[iCodes], 32);
+		uint32_t crc = i;
+		for (j = 0; j < 8; j++)
+			crc = (crc >> 1) ^ ((crc & 1) * CRC32_POLY_NORMAL);
+		crc32_table[0][i] = crc;
+	}
+	for (i = 0; i <= 0xFF; i++)
+	{
+		// for Slicing-by-4 and Slicing-by-8
+		crc32_table[1][i] = (crc32_table[0][i] >> 8) ^ crc32_table[0][crc32_table[0][i] & 0xFF];
+		crc32_table[2][i] = (crc32_table[1][i] >> 8) ^ crc32_table[0][crc32_table[1][i] & 0xFF];
+		crc32_table[3][i] = (crc32_table[2][i] >> 8) ^ crc32_table[0][crc32_table[2][i] & 0xFF];
+		// only Slicing-by-8
+		crc32_table[4][i] = (crc32_table[3][i] >> 8) ^ crc32_table[0][crc32_table[3][i] & 0xFF];
+		crc32_table[5][i] = (crc32_table[4][i] >> 8) ^ crc32_table[0][crc32_table[4][i] & 0xFF];
+		crc32_table[6][i] = (crc32_table[5][i] >> 8) ^ crc32_table[0][crc32_table[5][i] & 0xFF];
+		crc32_table[7][i] = (crc32_table[6][i] >> 8) ^ crc32_table[0][crc32_table[6][i] & 0xFF];
 	}
 
 	tableInit_ = true;
 }
+
+
+
+
+uint32_t Crc32::Update(const void* data, size_t size, uint32_t& crcvalue) const
+{
+	size_t len;
+	const uint8_t* buf8;
+	const uint32_t* buf32;
+	uint32_t crc = crcvalue;
+
+	len = size;
+	buf8 = reinterpret_cast<const uint8_t*>(data);
+
+	while (len && !core::pointerUtil::IsAligned(buf8, 8, 0))
+	{
+		crc = (crc >> 8) ^ crc32_table[0][(crc & 0xFF) ^ *buf8++];
+		len--;
+	}
+
+	buf32 = reinterpret_cast<const uint32_t*>(buf8);
+
+	while (len >= 8)
+	{
+		uint32_t one = *buf32++ ^ crc;
+		uint32_t two = *buf32++;
+		crc = crc32_table[7][one & 0xFF] ^
+			crc32_table[6][(one >> 8) & 0xFF] ^
+			crc32_table[5][(one >> 16) & 0xFF] ^
+			crc32_table[4][one >> 24] ^
+			crc32_table[3][two & 0xFF] ^
+			crc32_table[2][(two >> 8) & 0xFF] ^
+			crc32_table[1][(two >> 16) & 0xFF] ^
+			crc32_table[0][two >> 24];
+		len -= 8;
+	}
+
+	if (len)
+	{
+		buf8 = reinterpret_cast<const uint8_t*>(buf32);
+		while (len--)
+		{
+			crc = (crc >> 8) ^ crc32_table[0][(crc & 0xFF) ^ *buf8++];
+		}
+	}
+
+	crcvalue = crc;
+	return crcvalue;
+}
+
+uint32_t Crc32::UpdateLowerCase(const char* text, size_t size, uint32_t& crcvalue) const
+{
+	size_t len;
+	const uint8_t* buf8;
+	const uint32_t* buf32;
+	uint32_t crc = crcvalue;
+
+	len = size;
+	buf8 = reinterpret_cast<const uint8_t*>(text);
+
+	while (len && !core::pointerUtil::IsAligned(buf8, 8, 0))
+	{
+		crc = (crc >> 8) ^ crc32_table[0][(crc & 0xFF) ^ ToLower(*buf8++)];
+		len--;
+	}
+
+	buf32 = reinterpret_cast<const uint32_t*>(buf8);
+
+	while (len >= 8)
+	{
+		uint32_t one = ToLower(*buf32++ ^ crc);
+		uint32_t two = ToLower(*buf32++);
+		crc = crc32_table[7][one & 0xFF] ^
+			crc32_table[6][(one >> 8) & 0xFF] ^
+			crc32_table[5][(one >> 16) & 0xFF] ^
+			crc32_table[4][one >> 24] ^
+			crc32_table[3][two & 0xFF] ^
+			crc32_table[2][(two >> 8) & 0xFF] ^
+			crc32_table[1][(two >> 16) & 0xFF] ^
+			crc32_table[0][two >> 24];
+		len -= 8;
+	}
+
+	if (len)
+	{
+		buf8 = reinterpret_cast<const uint8_t*>(buf32);
+		while (len--)
+		{
+			crc = (crc >> 8) ^ crc32_table[0][(crc & 0xFF) ^ ToLower(*buf8++)];
+		}
+	}
+
+	crcvalue = crc;
+	return crcvalue;
+}
+
 
 
 X_NAMESPACE_END

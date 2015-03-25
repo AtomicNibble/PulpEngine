@@ -18,7 +18,8 @@ struct ShaderStatus
 	enum Enum
 	{
 		NotCompiled,
-		ReadyToRock,
+		UploadedToHW, // reflection is required now, this is when uploaded to gpu
+		ReadyToRock,	// this is set after successful reflection.
 		FailedToCompile
 	};
 };
@@ -82,56 +83,6 @@ public:
 };
 
 
-/*
-struct XShaderParamBind
-{
-	core::string		name;
-	Flags<ParamFlags>	flags;
-	ParamType::Enum		type;
-	short				bind;
-	short				constBufferSlot;
-	int					numParameters;
-
-	XShaderParamBind()
-	{		
-		bind = -2;
-		constBufferSlot = 0;
-		numParameters = 1;
-	}
-	XShaderParamBind(const XShaderParamBind& sb)
-	{
-		name = sb.name;
-		bind = sb.bind;
-		constBufferSlot = sb.constBufferSlot;
-		numParameters = sb.numParameters;
-		flags = sb.flags;
-		type = sb.type;
-	}
-	XShaderParamBind& operator = (const XShaderParamBind& sb)
-	{
-		this->~XShaderParamBind();
-		new(this) XShaderParamBind(sb);
-		return *this;
-	}
-	
-};
-
-struct XShaderParam : public XShaderParamBind
-{
-	ParamType::Enum paramType[4]; // 8bits each
-
-	union
-	{
-		uint32_t int32[4];
-		float32_t f32[4];
-	};
-
-	XShaderParam() {
-		memset(paramType, ParamType::Unknown, sizeof(paramType));
-	}
-};
-
-*/
 struct XShaderParam
 {
 	core::string		name;
@@ -187,6 +138,14 @@ struct ILTreeNode
 		this->fmt = InputLayoutFormat::Invalid;
 	}
 
+	~ILTreeNode() {
+		free();
+	}
+
+	void free(void) {
+		children.free();
+	}
+
 	ILTreeNode& AddChild(ILTreeNode& node, 
 		InputLayoutFormat::Enum fmt = InputLayoutFormat::Invalid) 
 	{
@@ -239,6 +198,7 @@ private:
 class XHWShader_Dx10 : public XHWShader
 {
 	friend class XHWShader;
+	friend class XShaderBin;
 public:
 	XHWShader_Dx10();
 
@@ -251,11 +211,11 @@ public:
 	// binds the shader to gpu ()
 	X_INLINE bool bind()
 	{
-		if (this->type == ShaderType::Vertex)
+		if (this->type_ == ShaderType::Vertex)
 			return bindVS();
-		if (this->type == ShaderType::Pixel)
+		if (this->type_ == ShaderType::Pixel)
 			return bindPS();
-		if (this->type == ShaderType::Geometry)
+		if (this->type_ == ShaderType::Geometry)
 			return bindGS();
 		X_ASSERT_UNREACHABLE();
 		return false;
@@ -300,9 +260,10 @@ private:
 	void getShaderCompileDest(core::Path& dest);
 	bool compileFromSource(core::string& source);
 
-	bool uploadtoHW();
+	bool uploadtoHW(void);
 
-	bool createInputLayout(ID3D11InputLayout** pInputLayout);
+	bool reflectShader(void);
+	bool saveToCache(void);
 
 private:
 	bool bindVS();
@@ -319,11 +280,11 @@ private:
 		ID3D11DeviceContext* pDevice = render::g_Dx11D3D.DxDeviceContext();
 		if (isValid())
 		{
-			if (this->type == ShaderType::Vertex)
+			if (this->type_ == ShaderType::Vertex)
 				pDevice->VSSetShader((ID3D11VertexShader*)pHWHandle_, NULL, 0);
-			else if(this->type == ShaderType::Pixel)
+			else if (this->type_ == ShaderType::Pixel)
 				pDevice->PSSetShader((ID3D11PixelShader*)pHWHandle_, NULL, 0);
-			else if(this->type == ShaderType::Geometry)
+			else if(this->type_ == ShaderType::Geometry)
 				pDevice->GSSetShader((ID3D11GeometryShader*)pHWHandle_, NULL, 0);
 			else
 			{
@@ -513,6 +474,7 @@ public:
 		X_ASSERT_NOT_NULL(pBlob_);
 		return pBlob_;
 	}
+
 private:
 	ShaderStatus::Enum status_;
 	ID3DBlob* pBlob_;
@@ -521,7 +483,25 @@ private:
 	core::Array<XShaderParam> bindVars_;
 	int maxVecs_[3];
 
+	// the flags it was compiled with: DEBUG | OPT_LEVEL1 etc.
+	uint32_t D3DCompileflags_;
+
 protected:
+
+	const core::Array<XShaderParam>& getBindVars(void) const {
+		return bindVars_;
+	}
+	void setBindVars(core::Array<XShaderParam>& vars) {
+		bindVars_ = vars;
+	}
+
+	uint32_t getD3DCompileFlags(void) const {
+		return D3DCompileflags_;
+	}
+
+	void setBlob(ID3DBlob* pBlob) {
+		pBlob_ = pBlob;
+	}
 
 	void setStatus(ShaderStatus::Enum status) {
 		status_ = status;

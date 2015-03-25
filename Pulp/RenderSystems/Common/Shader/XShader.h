@@ -127,18 +127,25 @@ public:
 	static const char* getProfileFromType(ShaderType::Enum type);
 
 	X_INLINE const char* getName(void) const {
-		return name.c_str();
+		return name_.c_str();
 	}
 	X_INLINE const char* getSourceFileName(void) const {
-		return sourceFileName.c_str();
+		return sourceFileName_.c_str();
 	}
 	X_INLINE const char* getEntryPoint(void) const {
-		return entryPoint.c_str();
+		return entryPoint_.c_str();
+	}
+
+
+	X_INLINE TechFlags getTechFlags(void) const {
+		return techFlags_;
+	}
+	X_INLINE ShaderType::Enum getType(void) const {
+		return type_;
 	}
 	X_INLINE InputLayoutFormat::Enum getILFormat(void) const {
 		return IlFmt_;
 	}
-
 
 	X_INLINE uint32_t getNumRenderTargets(void) const {
 		return numRenderTargets_;
@@ -149,18 +156,21 @@ public:
 	X_INLINE uint32_t getNumConstantBuffers(void) const {
 		return numConstBuffers_;
 	}
+	X_INLINE uint32_t getNumInputParams(void) const {
+		return numInputParams_;
+	}
 protected:
 	static render::XRenderResourceContainer* pHWshaders;
 
-	core::string name;
-	core::string sourceFileName;
-	core::string entryPoint;
-	uint32_t sourceCrc32; // the crc of the source this was compiled from.
+	core::string name_;
+	core::string sourceFileName_;
+	core::string entryPoint_;
+	uint32_t sourceCrc32_; // the crc of the source this was compiled from.
 
 	// color, textured, skinned, instanced
-	TechFlags techFlags;
+	TechFlags techFlags_;
 	// Vert / Pixel / Hull / Geo
-	ShaderType::Enum type; 
+	ShaderType::Enum type_; 
 	// POS_UV_COL_NOR
 	InputLayoutFormat::Enum IlFmt_;
 
@@ -273,9 +283,9 @@ struct XShaderTechniqueHW
 
 	void release(void)
 	{
-		pVertexShader->release();
-		pPixelShader->release();
-		pGeoShader->release();
+		core::SafeRelease(pVertexShader);
+		core::SafeRelease(pPixelShader);
+		core::SafeRelease(pGeoShader);
 	}
 
 public:

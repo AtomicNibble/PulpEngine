@@ -713,7 +713,7 @@ void XTexture::shutDown(void)
 {
 	X_LOG0("Textures", "Shutting down");
 	X_ASSERT_NOT_NULL(s_pTextures);
-
+	X_LOG_BULLET;
 
 	gEnv->pHotReload->addfileType(nullptr, "ci");
 	gEnv->pHotReload->addfileType(nullptr, "dds");

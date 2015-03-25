@@ -8,31 +8,70 @@ X_NAMESPACE_BEGIN(core)
 
 namespace Hash
 {
-	struct Sha1Hash
+
+	struct SHA1Digest
 	{
-		typedef char TextValue[41];
+		typedef char String[41];
+	public:
+		SHA1Digest();
 
-		UINT64   nTotal;
-		UINT32   H[5];
-		UINT8    block[64];
-		size_t   nblock;
+		const char* ToString(String& buf) const;
 
-		bool operator==(const Sha1Hash& oth) const {
-			return memcmp(H, &oth.H, 20) == 0;
+		X_INLINE bool operator ==(const SHA1Digest& oth) const {
+			return memcmp(data, oth.data, sizeof(data)) == 0;
 		}
-
-		bool operator!=(const Sha1Hash& oth) const {
+		X_INLINE bool operator !=(const SHA1Digest& oth) const {
 			return !(*this == oth);
 		}
+		void Clear(void) {
+			zero_this(this);
+		}
+
+		union {
+			uint8_t bytes[20];
+			uint32_t data[5];
+		};
 	};
 
+	class SHA1
+	{
+	public:
+		SHA1();
+		~SHA1();
 
-	void Sha1Init(Sha1Hash& hash);
-	void Sha1Update(Sha1Hash& hash, const void *data, size_t n);
-	void Sha1Final(Sha1Hash& hash);
-	void Sha1ToString(const Sha1Hash& hash, Sha1Hash::TextValue& hexstring);
-}
+		void Init();
+		void reset(void);
+		void update(const void* buf, size_t length);
+		void update(const char* str);
 
+		template<typename T>
+		void update(const T& obj) {
+			update(reinterpret_cast<const void*>(&obj), sizeof(T));
+		}
+
+		SHA1Digest finalize(void);
+
+	private:
+		static const uint32_t DIGEST_INTS = 5;
+		static const uint32_t BLOCK_INTS = 16;
+		static const uint32_t BLOCK_BYTES = BLOCK_INTS * 4;
+
+	private:
+		void transform(const uint8_t* pBuffer);
+
+		uint8_t buffer[BLOCK_BYTES];
+
+		union
+		{
+			uint8_t c[BLOCK_BYTES];
+			uint32_t l[BLOCK_INTS];
+		} block;
+
+		uint32_t digest[DIGEST_INTS];
+		size_t numBytes;
+	};
+
+} // namespace Hash
 
 X_NAMESPACE_END
 

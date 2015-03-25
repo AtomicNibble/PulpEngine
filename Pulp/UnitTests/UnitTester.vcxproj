@@ -391,6 +391,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="EngineApp.h" />
+    <ClInclude Include="Profiler.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="test_resource.h" />
@@ -399,8 +400,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EngineApp.cpp" />
+    <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="UT_AssertChecker.cpp" />
+    <ClCompile Include="UT_Base64.cpp" />
     <ClCompile Include="UT_C_LinkedList.cpp" />
+    <ClCompile Include="UT_Encryption.cpp" />
     <ClCompile Include="UT_F_ReadWrite.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -462,6 +466,7 @@
     <ClCompile Include="UT_M_Winding.cpp" />
     <ClCompile Include="UT_Pointer.cpp" />
     <ClCompile Include="UT_Random.cpp" />
+    <ClCompile Include="UT_Scheduler.cpp" />
     <ClCompile Include="UT_StringRef.cpp" />
     <ClCompile Include="UT_StringTable.cpp" />
     <ClCompile Include="UT_StringUtil.cpp" />

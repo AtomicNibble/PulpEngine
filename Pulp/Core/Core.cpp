@@ -148,12 +148,6 @@ void XCore::ShutDown()
 		core::Mem::DeleteAndNull(pCpuInfo_, g_coreArena);
 	}
 
-	if (env_.pInput)
-	{
-		env_.pInput->ShutDown();
-		core::SafeRelease(env_.pInput);
-	}
-
 	if (env_.pFileSys)
 	{
 		env_.pFileSys->ShutDown();
@@ -166,6 +160,14 @@ void XCore::ShutDown()
 		env_.p3DEngine->ShutDown();
 		core::SafeRelease(env_.p3DEngine);
 	}
+
+	// needs to be done after engine, since it has input listners.
+	if (env_.pInput)
+	{
+		env_.pInput->ShutDown();
+		core::SafeRelease(env_.pInput);
+	}
+
 
 	if (env_.pRender)
 	{
@@ -455,9 +457,9 @@ void XCore::OnFatalError(const char* format, va_list args)
 
 void Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd)
 {
-	XCore* pConsole = (XCore*)gEnv->pCore;
+	XCore* pCore = (XCore*)gEnv->pCore;
 
-	pConsole->HotReloadListExts();
+	pCore->HotReloadListExts();
 }
 
 

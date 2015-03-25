@@ -286,12 +286,12 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	{
 		pShader->addRef();
 
-		if (pShader->sourceCrc32 != sourceCrc)
+		if (pShader->sourceCrc32_ != sourceCrc)
 		{
 			// shieeet, the shader needs updating.
 			// we have to relase the old one and set it up fresh.
 			pShader->releaseHW(); 
-			pShader->sourceCrc32 = sourceCrc;
+			pShader->sourceCrc32_ = sourceCrc;
 			pShader->setStatus(ShaderStatus::NotCompiled);
 
 			// remove the cache file, to save a file load / crc check.
@@ -308,14 +308,14 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	else
 	{
 		pShader = X_NEW_ALIGNED(XHWShader_Dx10,g_rendererArena,"HWShader", X_ALIGN_OF(XHWShader_Dx10));
-		pShader->name = name.c_str();
-		pShader->type = type;
-		pShader->sourceFileName = sourceFile;
-		pShader->entryPoint = entry;
-		pShader->sourceCrc32 = sourceCrc;
+		pShader->name_ = name.c_str();
+		pShader->type_ = type;
+		pShader->sourceFileName_ = sourceFile;
+		pShader->entryPoint_ = entry;
+		pShader->sourceCrc32_ = sourceCrc;
 
 		// save macros
-		pShader->techFlags = techFlags;
+		pShader->techFlags_ = techFlags;
 
 		// temp
 		pShader->activate();
@@ -383,7 +383,7 @@ void XHWShader_Dx10::FreeHWShaders()
 		if (!pShader)
 			continue;
 
-		X_WARNING("HWShaders", "\"%s\" was not deleted", pShader->name.c_str());
+		X_WARNING("HWShaders", "\"%s\" was not deleted", pShader->name_.c_str());
 
 		pShader->release();
 	}
@@ -418,10 +418,10 @@ XHWShader_Dx10::XHWShader_Dx10() :
 void XHWShader_Dx10::getShaderCompilePaths(core::Path& src, core::Path& dest)
 {
 	src.clear();
-	src.appendFmt("shaders/temp/%s.merged", sourceFileName.c_str());
+	src.appendFmt("shaders/temp/%s.merged", sourceFileName_.c_str());
 
 	dest.clear();
-	dest.appendFmt("shaders/compiled/%s.fxcb", name.c_str());
+	dest.appendFmt("shaders/compiled/%s.fxcb", name_.c_str());
 
 	// make sure the directory is created.
 	gEnv->pFileSys->createDirectoryTree(src.c_str());
@@ -431,30 +431,55 @@ void XHWShader_Dx10::getShaderCompilePaths(core::Path& src, core::Path& dest)
 void XHWShader_Dx10::getShaderCompileDest(core::Path& dest)
 {
 	dest.clear();
-	dest.appendFmt("shaders/compiled/%s.fxcb", name.c_str());
+	dest.appendFmt("shaders/compiled/%s.fxcb", name_.c_str());
 
 	// make sure the directory is created.
 	gEnv->pFileSys->createDirectoryTree(dest.c_str());
 }
 
 
+bool XHWShader_Dx10::saveToCache(void)
+{
+	core::Path dest;
+	getShaderCompileDest(dest);
+
+	// write the compiled version.
+	if (bin_.saveShader(dest.c_str(), sourceCrc32_, this))
+	{
+		X_LOG1("Shader", "saved shader to cache file: \"%s\"", dest.c_str());
+	}
+	else
+	{
+		X_ERROR("Shader", "failed to save shader to cache");
+		return false;
+	}
+
+	return true;
+}
+
+
 bool XHWShader_Dx10::loadFromCache()
 {
-	core::Path src, dest;
+	core::Path dest;
 
 	XShaderManager* pShaderMan = &render::gRenDev->m_ShaderMan;
 
-	getShaderCompilePaths(src, dest);
+	getShaderCompileDest(dest);
 
 	// we should check if a compiled version already exsists!
-	if (bin_.loadShader(dest.c_str(), this->sourceCrc32, &pBlob_))
+	if (bin_.loadShader(dest.c_str(), sourceCrc32_, this))
 	{
-		X_LOG0("Shader", "shader loaded from cache: \"%s\"", name.c_str());
+		X_LOG0("Shader", "shader loaded from cache: \"%s\"", name_.c_str());
+
+		// add them.
+		addGlobalParams(bindVars_, this->type_);
+
 		return true;
 	}
 
 	return false;
 }
+
 
 bool XHWShader_Dx10::loadFromSource()
 {
@@ -467,7 +492,7 @@ bool XHWShader_Dx10::loadFromSource()
 	XShaderManager* pShaderMan = &render::gRenDev->m_ShaderMan;
 
 	// we need to get the whole file :D
-	if (!pShaderMan->sourceToString(source, this->sourceFileName))
+	if (!pShaderMan->sourceToString(source, this->sourceFileName_))
 	{
 		X_ERROR("Shader", "failed to get source for compiling");
 		return false;
@@ -476,22 +501,19 @@ bool XHWShader_Dx10::loadFromSource()
 	return compileFromSource(source);
 }
 
+
 bool XHWShader_Dx10::compileFromSource(core::string& source)
 {
-	core::Path dest;
 	HRESULT hr;
-	UINT flags;
 	XShaderManager* pShaderMan;
 
-	X_LOG0("Shader", "Compiling shader: \"%s\"", name.c_str());
-
-	getShaderCompileDest(dest);
+	X_LOG0("Shader", "Compiling shader: \"%s\"", name_.c_str());
 
 	pShaderMan = &render::gRenDev->m_ShaderMan;
-	flags = 0;
+	D3DCompileflags_ = 0;
 
 #if X_DEBUG // todo make this a cvar
-	flags |= D3DCOMPILE_OPTIMIZATION_LEVEL0 | D3DCOMPILE_DEBUG;
+	D3DCompileflags_ |= D3DCOMPILE_OPTIMIZATION_LEVEL0 | D3DCOMPILE_DEBUG;
 #endif // !X_DEBUG
 
 	// allow 16 flags.
@@ -499,15 +521,15 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 	core::string names[16];
 	
 	// i turn all set flags into strings.
-	if (techFlags.IsAnySet())
+	if (techFlags_.IsAnySet())
 	{
-		uint32_t numFlags = core::bitUtil::CountBits(techFlags.ToInt());
+		uint32_t numFlags = core::bitUtil::CountBits(techFlags_.ToInt());
 		uint32_t macroIdx = 0;
 
 		for (uint32_t i = 1; i < TechFlag::FLAGS_COUNT; i++)
 		{
 			uint32_t flag = (1 << i);
-			if (techFlags.IsSet((TechFlag::Enum)flag))
+			if (techFlags_.IsSet((TechFlag::Enum)flag))
 			{
 				// we "X_" prefix and upper case.
 				core::string& name = names[macroIdx];
@@ -536,12 +558,12 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 	hr = D3DCompile(
 		source,
 		source.length(),
-		this->sourceFileName,
+		this->sourceFileName_,
 		Shader_Macros, // pDefines
 		NULL, // pInclude
-		this->entryPoint,
-		getProfileFromType(type),
-		flags, // Flags
+		this->entryPoint_,
+		getProfileFromType(type_),
+		D3DCompileflags_, // Flags
 		0, // Flags2
 		&pBlob_,
 		&error
@@ -556,7 +578,7 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 			core::StackString<4096> filterd(err, err + strlen(err));
 
 			// skip file path.
-			err = filterd.find(this->sourceFileName);
+			err = filterd.find(this->sourceFileName_);
 
 			if (err) {
 				core::StackString512 path(filterd.begin(), err);
@@ -578,11 +600,6 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 
 	X_LOG0("Shader", "Compile complete: %.3fms", elapsed);
 
-	// write the compiled version.
-	bin_.saveShader(dest.c_str(), this->sourceCrc32, flags,
-		(const char*)pBlob_->GetBufferPointer(), (uint32_t)pBlob_->GetBufferSize()
-		);
-
 	return true;
 }
 
@@ -596,11 +613,11 @@ bool XHWShader_Dx10::uploadtoHW()
 
 	pDevice = render::g_Dx11D3D.DxDevice();
 
-	if (this->type == ShaderType::Vertex)
+	if (this->type_ == ShaderType::Vertex)
 		hr = pDevice->CreateVertexShader(pBuf, nSize, NULL, reinterpret_cast<ID3D11VertexShader**>(&pHWHandle_));
-	else if (this->type == ShaderType::Pixel)
+	else if (this->type_ == ShaderType::Pixel)
 		hr = pDevice->CreatePixelShader(pBuf, nSize, NULL, reinterpret_cast<ID3D11PixelShader**>(&pHWHandle_));
-	else if(this->type == ShaderType::Geometry)
+	else if (this->type_ == ShaderType::Geometry)
 		hr = pDevice->CreateGeometryShader(pBuf, nSize, NULL, reinterpret_cast<ID3D11GeometryShader**>(&pHWHandle_));
 	else
 	{
@@ -611,15 +628,15 @@ bool XHWShader_Dx10::uploadtoHW()
 	if (SUCCEEDED(hr)) {
 
 		// compiled out in debug
-		if (this->type == ShaderType::Vertex)
-			render::D3DDebug::SetDebugObjectName(reinterpret_cast<ID3D11VertexShader*>(pHWHandle_), this->entryPoint);
-		else if (this->type == ShaderType::Pixel)
-			render::D3DDebug::SetDebugObjectName(reinterpret_cast<ID3D11PixelShader*>(pHWHandle_), this->entryPoint);
-		else if (this->type == ShaderType::Geometry)
-			render::D3DDebug::SetDebugObjectName(reinterpret_cast<ID3D11GeometryShader*>(pHWHandle_), this->entryPoint);
+		if (this->type_ == ShaderType::Vertex)
+			render::D3DDebug::SetDebugObjectName(reinterpret_cast<ID3D11VertexShader*>(pHWHandle_), this->entryPoint_);
+		else if (this->type_ == ShaderType::Pixel)
+			render::D3DDebug::SetDebugObjectName(reinterpret_cast<ID3D11PixelShader*>(pHWHandle_), this->entryPoint_);
+		else if (this->type_ == ShaderType::Geometry)
+			render::D3DDebug::SetDebugObjectName(reinterpret_cast<ID3D11GeometryShader*>(pHWHandle_), this->entryPoint_);
 		// ~
 
-		status_ = ShaderStatus::ReadyToRock;
+		status_ = ShaderStatus::UploadedToHW;
 		return true;
 	}
 	return  false;
@@ -655,7 +672,7 @@ Flags<ParamFlags> VarTypeToFlags(const D3D11_SHADER_TYPE_DESC& CDesc)
 	return f;
 }
 
-bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
+bool XHWShader_Dx10::reflectShader(void)
 {
 	ID3D11Device* pDevice;
 	ID3D11ShaderReflection* pShaderReflection;
@@ -672,7 +689,7 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 
 	if (FAILED(D3DReflect(pBuf, nSize, IID_ID3D11ShaderReflection, (void **)&pShaderReflection)))
 	{
-		X_ERROR("Shader", "failed to reflect shader: %s", this->name.c_str());
+		X_ERROR("Shader", "failed to reflect shader: %s", name_.c_str());
 		return false;
 	}
 
@@ -897,7 +914,7 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 			maxVecs_[pB->constBufferSlot] = core::Max(pB->bind + pB->numParameters, maxVecs_[pB->constBufferSlot]);
 	}
 
-	if (this->type == ShaderType::Vertex)
+	if (this->type_ == ShaderType::Vertex)
 	{
 		const ILTreeNode* pILnode = &this->ILTree_;
 		D3D11_SIGNATURE_PARAMETER_DESC InputDsc;
@@ -926,7 +943,7 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 
 		IlFmt_ = fmt;
 	}
-	else if (type == ShaderType::Pixel)
+	else if (type_ == ShaderType::Pixel)
 	{
 		D3D11_SIGNATURE_PARAMETER_DESC OutputDsc;
 
@@ -947,13 +964,13 @@ bool XHWShader_Dx10::createInputLayout(ID3D11InputLayout** pInputLayout)
 	pShaderReflection->Release();
 
 	// add them.
-	addGlobalParams(BindVars, this->type);
+	addGlobalParams(BindVars, this->type_);
 
 	// shader has a copy!
 	bindVars_ = BindVars;
 
 	// save some data.
-	if (type == ShaderType::Pixel) {
+	if (type_ == ShaderType::Pixel) {
 		numRenderTargets_ = shaderDesc.OutputParameters;
 	}
 	numConstBuffers_ = shaderDesc.ConstantBuffers;
@@ -971,24 +988,41 @@ bool XHWShader_Dx10::activate()
 		if (FailedtoCompile())
 			return false;
 
-		if (!loadFromCache())
+		if (loadFromCache())
 		{
-			if (!loadFromSource())
+			if (uploadtoHW())
 			{
-				// we need to set this shader as broken.
-				// instead of trying to compile it all the time.
-				status_ = ShaderStatus::FailedToCompile;
-				return false;
+				// reflection not required for cache loaded.
+				status_ = ShaderStatus::ReadyToRock;
+				return true;
+			}
+			else
+			{
+				// fall throught and load from source.
 			}
 		}
 
-		ID3D11InputLayout* pInputLayout;
+		if (!loadFromSource())
+		{
+			// we need to set this shader as broken.
+			// instead of trying to compile it all the time.
+			status_ = ShaderStatus::FailedToCompile;
+			X_LOG0("Shader", "Failed to activate shader: \"%s\"", getName());
+			return false;
+		}
 
 		if (uploadtoHW())
 		{
-			createInputLayout(&pInputLayout);
+			if (reflectShader())
+			{
+				status_ = ShaderStatus::ReadyToRock;
+				saveToCache();
+				return true;
+			}
 		}
 
+		X_LOG0_EVERY_N(10, "Shader", "Failed to activate shader: \"%s\"", getName());
+		return false;
 	}
 	return true;
 }
@@ -1010,7 +1044,7 @@ const int XHWShader_Dx10::release()
 const int XHWShader_Dx10::releaseHW(void)
 {
 	ShaderStatus::Enum status = this->status_;
-	ShaderType::Enum type = this->type;
+	ShaderType::Enum type = this->type_;
 	void* pHandle = pHWHandle_;
 
 	ID3D11DeviceContext* pDevice = render::g_Dx11D3D.DxDeviceContext();
@@ -1376,8 +1410,6 @@ void XHWShader_Dx10::CreateInputLayoutTree(void)
 	uvBase.AddChild(uv).
 		AddChild(col).
 		AddChild(nor, InputLayoutFormat::POS_UV2_COL_NORM);
-//		AddChild(tan, InputLayoutFormat::POS_UV2_COL_NORM_TAN).
-//		AddChild(bin, InputLayoutFormat::POS_UV2_COL_NORM_TAN_BI);
 
 	ILTree_ = blank;
 }
@@ -1385,9 +1417,9 @@ void XHWShader_Dx10::CreateInputLayoutTree(void)
 
 void XHWShader_Dx10::FreeInputLayoutTree(void)
 {
+	// need to kill this.
 
-
-
+	ILTree_.free();
 }
 
 

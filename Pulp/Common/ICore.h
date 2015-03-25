@@ -31,6 +31,7 @@ struct IConsole;
 struct IFileSys;
 class XProfileScope;
 class Crc32;
+class CpuInfo;
 class Console;
 class xWindow;
 class MallocFreeAllocator;
@@ -291,6 +292,7 @@ struct ICore
 	virtual ICoreEventDispatcher* GetCoreEventDispatcher() X_ABSTRACT;
 
 	virtual core::Crc32			*GetCrc32() X_ABSTRACT;
+	virtual core::CpuInfo		*GetCPUInfo() X_ABSTRACT;
 
 	virtual core::xWindow* GetGameWindow() X_ABSTRACT;
 

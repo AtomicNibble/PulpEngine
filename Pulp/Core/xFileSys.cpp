@@ -471,24 +471,29 @@ bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 	Path buf;
 	createOSPath(gameDir_, path, buf);
 
-
 	DWORD dwAttrib = GetFileAttributes(buf.c_str());
 
 	if (dwAttrib != INVALID_FILE_ATTRIBUTES) // make sure we did not fail for some shit, like permissions
 	{
 		if (dwAttrib & FILE_ATTRIBUTE_DIRECTORY) // herp derp.
 		{
-			X_ERROR("Dir", "fileExsits check was ran on a directory");
+			X_ERROR("Dir", "FileExsits check was ran on a directory");
 			return false;
 		}
 
 		return true; // hi there Mr File
 	}
 
-	if (lastError::Get() != ERROR_FILE_NOT_FOUND)
+	// This means we checked for a file in a directory that don't exsists.
+	if (lastError::Get() == ERROR_PATH_NOT_FOUND)
+	{
+		X_LOG2("Dir", "FileExsits failed, the target directory does not exsist: \"%s\"", 
+			buf.c_str());
+	}
+	else if (lastError::Get() != ERROR_FILE_NOT_FOUND)
 	{
 		lastError::Description Dsc;
-		X_ERROR("Dir", "fileExsits failed. Error: %s", lastError::ToString(Dsc));
+		X_ERROR("Dir", "FileExsits failed. Error: %s", lastError::ToString(Dsc));
 	}
 
 	return false;
@@ -499,9 +504,49 @@ bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) c
 	X_ASSERT_NOT_NULL(path);
 
 	DWORD dwAttrib = GetFileAttributes(path);
-	return (dwAttrib != INVALID_FILE_ATTRIBUTES && (dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
+
+	if (dwAttrib != INVALID_FILE_ATTRIBUTES) // make sure we did not fail for some shit, like permissions
+	{
+		if ((dwAttrib & FILE_ATTRIBUTE_DIRECTORY))
+		{
+			// found
+			return true;
+		}
+
+		X_ERROR("Dir", "DirectoryExists check was ran on a File: \"%s\"", path);
+		return false; 
+	}
+
+	if (lastError::Get() != INVALID_FILE_ATTRIBUTES)
+	{
+		lastError::Description Dsc;
+		X_ERROR("Dir", "DirectoryExists failed. Error: %s", lastError::ToString(Dsc));
+	}
+
+	return false;
 }
 
+bool xFileSys::isDirectory(pathType path, VirtualDirectory::Enum location) const
+{
+	X_ASSERT_NOT_NULL(path);
+
+	DWORD dwAttrib = GetFileAttributes(path);
+
+	if (dwAttrib != INVALID_FILE_ATTRIBUTES) {
+		if ((dwAttrib & FILE_ATTRIBUTE_DIRECTORY)) {
+			return true;
+		}
+		return false;
+	}
+
+	if (lastError::Get() != INVALID_FILE_ATTRIBUTES)
+	{
+		lastError::Description Dsc;
+		X_ERROR("Dir", "isDirectory failed. Error: %s", lastError::ToString(Dsc));
+	}
+
+	return false;
+}
 
 // --------------------------------------------------
 

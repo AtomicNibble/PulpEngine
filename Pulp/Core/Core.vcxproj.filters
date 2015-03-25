@@ -33,6 +33,12 @@
     <Filter Include="Source Files\win32">
       <UniqueIdentifier>{9cb22ff1-6acd-4535-a134-eda65a43bf03}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Scheduler">
+      <UniqueIdentifier>{a1311543-62ae-4fd1-a483-c4a0b9fed607}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Scheduler">
+      <UniqueIdentifier>{c0c6f97f-4828-407e-9955-ae02a257d073}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -45,9 +51,6 @@
       <Filter>NullImplementation</Filter>
     </ClInclude>
     <ClInclude Include="Timer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Cpu.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Console.h">
@@ -127,9 +130,6 @@
     <ClCompile Include="Timer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Cpu.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -177,9 +177,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Cpu.inl">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="win32\SystemTimer.inl">
       <Filter>Header Files\win32</Filter>
     </None>
