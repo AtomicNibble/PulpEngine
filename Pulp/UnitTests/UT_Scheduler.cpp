@@ -13,8 +13,8 @@ void TestJob(void* pParam, uint32_t batchOffset, uint32_t batchNum, uint32_t wor
 {
 	uint32_t idx = reinterpret_cast<uint32_t>(pParam);
 
-	X_LOG0("TestJob", "job idx: %i Worker: %i", idx, workerIdx);
-	Sleep(150 + rand() % 5);
+//	X_LOG0("TestJob", "job idx: %i Worker: %i", idx, workerIdx);
+	Sleep(10);
 }
 
 
@@ -37,6 +37,5 @@ TEST(Threading, Scheduler)
 		jobs.Wait();
 	}
 
-	::Sleep(60000);
 	jobSys.ShutDown();
 }
