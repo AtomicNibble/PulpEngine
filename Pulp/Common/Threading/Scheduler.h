@@ -28,6 +28,7 @@ static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
 static const uint32_t MAX_JOB_LISTS = 64;
 
 class JobList;
+class Scheduler;
 
 struct ThreadStats
 {
@@ -92,6 +93,7 @@ public:
 	X_DECLARE_FLAGS(RunFlag)(OK,PROGRESS,DONE,STALLED);
 	typedef Flags<RunFlag> RunFlags;
 
+	friend class Scheduler;
 public:
 	JobList();
 
@@ -105,11 +107,13 @@ public:
 	void SetPriority(JobListPriority::Enum priority);
 	JobListPriority::Enum getPriority(void) const;
 
-
 	RunFlags RunJobs(uint32_t threadIdx, JobListThreadState& state);
 
 private:
 	RunFlags RunJobsInternal(uint32_t threadIdx, JobListThreadState& state);
+
+protected:
+	void PreSubmit(void);
 
 private:
 	bool isDone_;
@@ -119,6 +123,7 @@ private:
 	JobListPriority::Enum priority_;
 
 	core::Array<JobData> jobs_;
+	core::AtomicInt syncCount_;
 	core::AtomicInt currentJob_;
 	core::AtomicInt fetchLock_;
 	core::AtomicInt numThreadsExecuting_;

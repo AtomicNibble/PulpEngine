@@ -16,6 +16,7 @@ JobList::JobList() :
 	isSubmit_(false),
 	priority_(JobListPriority::NORMAL),
 	jobs_(gEnv->pArena),
+	syncCount_(0),
 	currentJob_(0),
 	fetchLock_(0),
 	numThreadsExecuting_(0)
@@ -38,6 +39,10 @@ void JobList::Wait(void)
 {
 	if (jobs_.isNotEmpty()) 
 	{
+		while (syncCount_ > 0) {
+			SwitchToThread();
+		}
+
 		while (numThreadsExecuting_ > 0) {
 			SwitchToThread();
 		}
@@ -128,6 +133,7 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 //		TimeVal jobEnd = 0;
 	//	stats_.threadExecTime[threadIdx] += jobEnd - jobStart;
 
+		--syncCount_;
 	}
 
 	if ((state.nextJobIndex+1) == jobs_.size()) {
@@ -135,6 +141,11 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 	}
 
 	return RunFlag::OK;
+}
+
+void JobList::PreSubmit(void)
+{
+	syncCount_ = safe_static_cast<int32_t, size_t>(jobs_.size());
 }
 
 // ----------------------------------
@@ -303,6 +314,8 @@ void Scheduler::SubmitJobList(JobList* pList, JobList* pWaitFor)
 	X_ASSERT_NOT_NULL(pList);
 
 	core::CriticalSection::ScopedLock lock(addJobListCrit_);
+
+	pList->PreSubmit();
 
 	for (uint32_t i = 0; i < numThreads_; i++) {
 		threads_[i].AddJobList(pList);
