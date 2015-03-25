@@ -263,9 +263,11 @@
     <ClInclude Include="Threading\CriticalSection.h" />
     <ClInclude Include="Threading\Scheduler.h" />
     <ClInclude Include="Threading\Semaphore.h" />
+    <ClInclude Include="Threading\Signal.h" />
     <ClInclude Include="Threading\Spinlock.h" />
     <ClInclude Include="Threading\Thread.h" />
     <ClInclude Include="Threading\ThreadLocalStorage.h" />
+    <ClInclude Include="Threading\win32\Signal.h" />
     <ClInclude Include="Time\CompressedStamps.h" />
     <ClInclude Include="Time\DateStamp.h" />
     <ClInclude Include="Time\TimeStamp.h" />
@@ -684,6 +686,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="Threading\win32\Signal.cpp" />
     <ClCompile Include="Time\CompressedStamps.cpp" />
     <ClCompile Include="Time\DateStamp.cpp" />
     <ClCompile Include="Time\TimeStamp.cpp" />

@@ -175,6 +175,12 @@
     <Filter Include="SourceFiles\Util">
       <UniqueIdentifier>{463d16f4-67d2-4249-b7b2-028b836c9f32}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headers\Threading\win32">
+      <UniqueIdentifier>{d0723535-8852-4894-8deb-9aae369b52ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Threading\win32">
+      <UniqueIdentifier>{2f50a8d2-8d91-43dd-b223-9abe1833821b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -949,6 +955,12 @@
     <ClInclude Include="Util\Cpu.h">
       <Filter>Headers\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\Signal.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\win32\Signal.h">
+      <Filter>Headers\Threading\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1436,6 +1448,9 @@
     </ClCompile>
     <ClCompile Include="Util\Cpu.cpp">
       <Filter>SourceFiles\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\win32\Signal.cpp">
+      <Filter>SourceFiles\Threading\win32</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
