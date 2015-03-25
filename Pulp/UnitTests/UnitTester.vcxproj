@@ -391,6 +391,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="EngineApp.h" />
+    <ClInclude Include="Profiler.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="test_resource.h" />
@@ -399,6 +400,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="EngineApp.cpp" />
+    <ClCompile Include="Profiler.cpp" />
     <ClCompile Include="UT_AssertChecker.cpp" />
     <ClCompile Include="UT_Base64.cpp" />
     <ClCompile Include="UT_C_LinkedList.cpp" />
