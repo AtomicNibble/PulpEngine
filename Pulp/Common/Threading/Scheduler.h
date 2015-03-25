@@ -10,6 +10,7 @@
 #include "Containers\FixedFifo.h"
 
 #include "Threading\Thread.h"
+#include "Threading\Signal.h"
 #include "Threading\AtomicInt.h"
 #include "Threading\CriticalSection.h"
 
@@ -135,9 +136,18 @@ public:
 	void setThreadIdx(uint32_t idx);
 	void AddJobList(JobList* pJobList);
 
+	void SignalWork(void);
+
+protected:
 	virtual Thread::ReturnValue ThreadRun(const Thread& thread) X_FINAL;
+	Thread::ReturnValue ThreadRunInternal(const Thread& thread);
 
 private:
+	core::Signal signalMoreWorkToDo_;
+	core::CriticalSection signalCritical_;
+	volatile bool moreWorkToDo_;
+
+
 	ThreadStats stats_;
 
 	core::FixedArray<JobList*, 32> jobLists_;

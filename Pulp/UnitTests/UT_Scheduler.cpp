@@ -4,6 +4,8 @@
 
 #include "gtest/gtest.h"
 
+#include "Profiler.h"
+
 X_USING_NAMESPACE;
 
 
@@ -12,7 +14,7 @@ void TestJob(void* pParam, uint32_t batchOffset, uint32_t batchNum, uint32_t wor
 	uint32_t idx = reinterpret_cast<uint32_t>(pParam);
 
 	X_LOG0("TestJob", "job idx: %i Worker: %i", idx, workerIdx);
-	Sleep(150);
+	Sleep(150 + rand() % 5);
 }
 
 
@@ -24,12 +26,13 @@ TEST(Threading, Scheduler)
 	jobSys.StartThreads();
 
 	{
+		UnitTests::ScopeProfiler profile("Scheduler");
+
 		for (size_t i = 0; i < 100; i++) {
 			jobs.AddJob(TestJob, (void*)i);
 		}
 
 		jobSys.SubmitJobList(&jobs);
-
 
 		jobs.Wait();
 	}

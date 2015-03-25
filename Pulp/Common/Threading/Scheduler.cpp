@@ -38,7 +38,9 @@ void JobList::Wait(void)
 {
 	if (jobs_.isNotEmpty()) 
 	{
-	
+		while (numThreadsExecuting_ > 0) {
+			SwitchToThread();
+		}
 	}
 	isDone_ = true;
 }
@@ -140,6 +142,8 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 
 JobThread::JobThread()
 {
+	moreWorkToDo_ = false;
+
 	firstJobList_ = 0;
 	lastJobList_ = 0;
 	threadIdx_ = 0;
@@ -164,10 +168,46 @@ void JobThread::AddJobList(JobList* pJobList)
 	lastJobList_++;
 }
 
+void JobThread::SignalWork(void)
+{
+	core::CriticalSection::ScopedLock lock(signalCritical_);
+	moreWorkToDo_ = true;
+	signalMoreWorkToDo_.raise();
+}
+
 Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 {
-	X_UNUSED(thread);
+	Thread::ReturnValue retVal = Thread::ReturnValue(0);
 
+	while (true)
+	{
+		{
+			signalCritical_.Enter();
+
+			if (moreWorkToDo_)
+			{
+				signalMoreWorkToDo_.clear();
+				signalCritical_.Leave();
+			}
+			else
+			{
+				signalCritical_.Leave();
+				signalMoreWorkToDo_.wait();
+			}
+		}
+
+		if (!thread.ShouldRun()) {
+			break;
+		}
+
+		retVal = ThreadRunInternal(thread);
+	}
+	return retVal;
+}
+
+Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
+{
+	X_UNUSED(thread);
 	typedef core::FixedFifo<JobListThreadState, MAX_JOB_LISTS> JobStateFiFo;
 
 	JobStateFiFo jobStates;
@@ -189,8 +229,7 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 		}
 
 		if (jobStates.size() == 0) {
-			Sleep(200);
-			continue;
+			break;
 		}
 
 		JobListThreadState& currentJobList = jobStates.peek();
@@ -267,6 +306,7 @@ void Scheduler::SubmitJobList(JobList* pList, JobList* pWaitFor)
 
 	for (uint32_t i = 0; i < numThreads_; i++) {
 		threads_[i].AddJobList(pList);
+		threads_[i].SignalWork();
 	}
 }
 
