@@ -152,6 +152,13 @@ TimeVal XTimer::GetAsyncTime(void) const
 	return TimeVal(now);
 }
 
+TimeVal XTimer::GetTimeReal(void) const
+{
+	int64 now = SysTimer::Get();
+
+	return TimeVal(now);
+}
+
 float XTimer::GetAsyncCurTime(void)
 {
 	int64 now = SysTimer::Get();

@@ -40,6 +40,10 @@ public:
 
 	// gets the time right now.
 	virtual TimeVal GetAsyncTime(void) const X_FINAL;
+
+	// returns the time unscaled.
+	virtual TimeVal GetTimeReal(void) const X_FINAL;
+
 	// gets the time right now as seconds.
 	virtual float GetAsyncCurTime(void) X_FINAL;
 
