@@ -249,6 +249,7 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 {
 	JobStateFiFo jobStates;
+	JobList::RunFlags jobResult;
 
 	while (thread.ShouldRun())
 	{
@@ -276,10 +277,20 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 
 		JobListThreadState& currentJobList = jobStates.peek();
 
-		currentJobList.jobList->RunJobs(threadIdx_, currentJobList);
+		jobResult = currentJobList.jobList->RunJobs(threadIdx_, currentJobList);
 
+		if(jobResult.isSet(RunFlag::STALLED))
+		{
+			// we stalled :()
+			// try find another job list to work on with simular priority.
+			
+		}
+		if(jobResult.isSet(RunFlag::DONE))
+		{
+			// no more work for me!
 
-	}
+		}		
+	} 
 
 	return Thread::ReturnValue(0);
 }
