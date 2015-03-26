@@ -19,9 +19,16 @@ JobList::JobList() :
 	syncCount_(0),
 	currentJob_(0),
 	fetchLock_(0),
-	numThreadsExecuting_(0)
+	numThreadsExecuting_(0),
+	pTimer_(nullptr)
 {
+	// set the timer val.
+	// job lists should only be created once the core has been setup.
+	// menaing timer is set.
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pTimer);
 
+	pTimer_ = gEnv->pTimer;
 }
 
 void JobList::AddJob(Job job, void* pData)
@@ -83,7 +90,7 @@ JobListPriority::Enum JobList::getPriority(void) const
 
 JobList::RunFlags JobList::RunJobs(uint32_t threadIdx, JobListThreadState& state)
 {
-//	TimeVal start = TimeVal();
+  TimeVal start = GetTimeReal();
 	JobList::RunFlag res;
 
 	++numThreadsExecuting_;
@@ -92,7 +99,7 @@ JobList::RunFlags JobList::RunJobs(uint32_t threadIdx, JobListThreadState& state
 
 	--numThreadsExecuting_;
 
-//	stats_.threadTotalTime[threadIdx] += (TimeVal() - start);
+	stats_.threadTotalTime[threadIdx] += (GetTimeReal() - start);
 
 	return RunFlag::OK;
 }
@@ -121,7 +128,7 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 	{
 		JobData& job = jobs_[state.nextJobIndex];
 
-//		TimeVal jobStart = 0;
+		TimeVal jobStart = GetTimeReal();
 
 		job.pJobRun(job.pData, 
 			job.batchOffset, 
@@ -130,8 +137,8 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 
 		job.done = true;
 
-//		TimeVal jobEnd = 0;
-	//	stats_.threadExecTime[threadIdx] += jobEnd - jobStart;
+		TimeVal jobEnd = GetTimeReal();
+		stats_.threadExecTime[threadIdx] += jobEnd - jobStart;
 
 		--syncCount_;
 	}
@@ -148,6 +155,10 @@ void JobList::PreSubmit(void)
 	syncCount_ = safe_static_cast<int32_t, size_t>(jobs_.size());
 }
 
+TimeVal JobList::(void) const
+{
+		return pTimer_->GetTimeReal();
+}
 // ----------------------------------
 
 
@@ -218,9 +229,6 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 
 Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 {
-	X_UNUSED(thread);
-	typedef core::FixedFifo<JobListThreadState, MAX_JOB_LISTS> JobStateFiFo;
-
 	JobStateFiFo jobStates;
 
 	while (thread.ShouldRun())

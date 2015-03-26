@@ -115,6 +115,8 @@ private:
 protected:
 	void PreSubmit(void);
 
+	TimeVal GetTimeReal(void) const;
+
 private:
 	bool isDone_;
 	bool isSubmit_;
@@ -128,12 +130,16 @@ private:
 	core::AtomicInt fetchLock_;
 	core::AtomicInt numThreadsExecuting_;
 	
+	// keep a copy of the timer interface.
+	core::ITimer* pTimer_;
+
 	JobListStats stats_;
 };
 
 
 class JobThread : public ThreadAbstract
 {
+	typedef core::FixedFifo<JobListThreadState, MAX_JOB_LISTS> JobStateFiFo;
 public:
 	JobThread();
 	~JobThread();
