@@ -46,12 +46,31 @@ void JobList::Wait(void)
 {
 	if (jobs_.isNotEmpty()) 
 	{
+		// check it was submitted
+		if(!IsSubmitted()) {
+			X_WARNING("JobList", "wait was called on a list that was never submitted");
+			return;
+		}
+
+		TimVal waitStart = GetTimeReal();
+		bool waited = false;
+
 		while (syncCount_ > 0) {
 			SwitchToThread();
+			waited = true;
 		}
 
 		while (numThreadsExecuting_ > 0) {
 			SwitchToThread();
+			waited = true;
+		}
+
+		if(waited) {
+			stats_.waitTime = GetTimeReal() - waitStart;
+		} else {
+			// if some goat calls wait twice it will set it to zero.
+			// if first time it's already goingto be zero.
+			stats_.waitTime = 0;
 		}
 	}
 	isDone_ = true;
