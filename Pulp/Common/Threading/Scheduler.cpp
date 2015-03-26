@@ -78,7 +78,7 @@ void JobList::Wait(void)
 
 bool JobList::TryWait(void)
 {
-	if (jobs_.isEmpty()) {
+	if (jobs_.isEmpty() || syncCount_ <= 0) {
 		Wait();
 		return true;
 	}
