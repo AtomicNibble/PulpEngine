@@ -120,7 +120,7 @@ JobList::RunFlags JobList::RunJobs(uint32_t threadIdx, JobListThreadState& state
 
 	stats_.threadTotalTime[threadIdx] += (GetTimeReal() - start);
 
-	return RunFlag::OK;
+	return res;
 }
 
 JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadState& state)
