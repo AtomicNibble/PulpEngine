@@ -5,6 +5,7 @@
 #include "Util\Cpu.h"
 
 #include "ICore.h"
+#include "ITimer.h"
 
 // #include "SystemTimer.h"
 
@@ -52,7 +53,7 @@ void JobList::Wait(void)
 			return;
 		}
 
-		TimVal waitStart = GetTimeReal();
+		TimeVal waitStart = GetTimeReal();
 		bool waited = false;
 
 		while (syncCount_ > 0) {
@@ -70,7 +71,7 @@ void JobList::Wait(void)
 		} else {
 			// if some goat calls wait twice it will set it to zero.
 			// if first time it's already goingto be zero.
-			stats_.waitTime = 0;
+			stats_.waitTime = TimeVal(0ll);
 		}
 	}
 	isDone_ = true;
@@ -109,8 +110,8 @@ JobListPriority::Enum JobList::getPriority(void) const
 
 JobList::RunFlags JobList::RunJobs(uint32_t threadIdx, JobListThreadState& state)
 {
-  TimeVal start = GetTimeReal();
-	JobList::RunFlag res;
+	TimeVal start = GetTimeReal();
+	JobList::RunFlags res;
 
 	++numThreadsExecuting_;
 
@@ -174,9 +175,9 @@ void JobList::PreSubmit(void)
 	syncCount_ = safe_static_cast<int32_t, size_t>(jobs_.size());
 }
 
-TimeVal JobList::(void) const
+TimeVal JobList::GetTimeReal(void) const
 {
-		return pTimer_->GetTimeReal();
+	return pTimer_->GetTimeReal();
 }
 // ----------------------------------
 
@@ -279,13 +280,13 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 
 		jobResult = currentJobList.jobList->RunJobs(threadIdx_, currentJobList);
 
-		if(jobResult.isSet(RunFlag::STALLED))
+		if (jobResult.IsSet(JobList::RunFlag::STALLED))
 		{
 			// we stalled :()
 			// try find another job list to work on with simular priority.
 			
 		}
-		if(jobResult.isSet(RunFlag::DONE))
+		if (jobResult.IsSet(JobList::RunFlag::DONE))
 		{
 			// no more work for me!
 
