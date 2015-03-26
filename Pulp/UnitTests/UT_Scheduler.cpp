@@ -33,18 +33,18 @@ TEST(Threading, Scheduler)
 				core::JobList& jobs = jobLists[j];
 
 				for (size_t i = 0; i < 100; i++) {
-					jobs.AddJob(TestJob, (void*)i + (j* 1000));
+					jobs.AddJob(TestJob, (void*)(i + (j* 1000)));
 				}
 
 				// set a priority.
 				if(j == 1) {
-					jobs.SetPriority(JobListPriority::HIGH);
+					jobs.SetPriority(core::JobListPriority::HIGH);
 				}
 				if(j == 2) {
-					jobs.SetPriority(JobListPriority::NONE);
+					jobs.SetPriority(core::JobListPriority::NONE);
 				}
 				if(j == 3) {
-					jobs.SetPriority(JobListPriority::LOW);
+					jobs.SetPriority(core::JobListPriority::LOW);
 				}
 
 			}
