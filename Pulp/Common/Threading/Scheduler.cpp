@@ -253,14 +253,14 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 	while (thread.ShouldRun())
 	{
 		// can we fit any more jobs in the local stack.
-		if (jobStates.size() < MAX_JOB_LISTS)
+		if (jobStates.size() < jobStates.capacity())
 		{
 			// if this is above zero we have one or more job lists waiting.
 			if (firstJobList_ < lastJobList_)
 			{
 				JobListThreadState state;
 
-				state.jobList = jobLists_[firstJobList_ & (MAX_JOB_LISTS - 1)];
+				state.jobList = jobLists_[firstJobList_ & (jobStates.capacity() - 1)];
 
 				jobStates.push(state);
 			}
@@ -269,6 +269,10 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 		if (jobStates.size() == 0) {
 			break;
 		}
+
+		// this need to pick a job lists with the most priority.
+		// i think i will make a stack based container that is priority based,
+
 
 		JobListThreadState& currentJobList = jobStates.peek();
 
