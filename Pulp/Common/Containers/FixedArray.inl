@@ -71,7 +71,7 @@ inline void FixedArray<T, N>::clear(void)
 template<typename T, size_t N>
 typename FixedArray<T, N>::size_type FixedArray<T, N>::append(const T& obj)
 {
-	X_ASSERT(size_ < N, "Fixed size stack is full")(N, size_);
+	X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
 
 	Mem::Construct(&array_[size_], obj);
 
@@ -116,12 +116,13 @@ bool FixedArray<T, N>::removeIndex(size_type idx)
 {
 	if (idx < size() && isNotEmpty())
 	{
+		size_--; // remove first so we don't try access it.
+
 		// shift them down.
 		size_type i, num;
-		for (i = idx, num = (size() -1); i < num; i++)
+		for (i = idx, num = size_; i < num; i++)
 			array_[i] = array_[i + 1];
 
-		size_--; // remove.
 		Mem::Destruct(array_ + size_);
 		return true;
 	}
