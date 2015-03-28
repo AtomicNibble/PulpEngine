@@ -32,6 +32,16 @@ JobList::JobList() :
 	pTimer_ = gEnv->pTimer;
 }
 
+void JobList::Clear(void)
+{
+	isDone_ = false;
+	isSubmit_ = false;
+	syncCount_ = 0;
+	currentJob_ = 0;
+	fetchLock_ = 0;
+	numThreadsExecuting_ = 0;
+}
+
 void JobList::AddJob(Job job, void* pData)
 {
 	JobData data;
@@ -75,6 +85,8 @@ void JobList::Wait(void)
 			// if first time it's already goingto be zero.
 			stats_.waitTime = TimeVal(0ll);
 		}
+
+		Clear();
 	}
 	isDone_ = true;
 }
@@ -206,7 +218,12 @@ void JobThread::setThreadIdx(uint32_t idx)
 void JobThread::AddJobList(JobList* pJobList)
 {
 	X_ASSERT_NOT_NULL(pJobList);
-	jobLists_.append(pJobList);
+
+	while (jobLists_.size() == jobLists_.capacity()) {
+		SwitchToThread();
+	}
+
+	jobLists_.push(pJobList);
 
 	// tells the thread a joblist needs to be eaten.
 	lastJobList_++;
@@ -264,16 +281,17 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 		// can we fit any more jobs in the local stack.
 		if (jobStates.size() < jobStates.capacity())
 		{
-			// if this is above zero we have one or more job lists waiting.
-			if (firstJobList_ < lastJobList_)
+			// any to add?
+			if (jobLists_.IsNotEmpty())
 			{
 				JobListThreadState state;
 
-				state.jobList = jobLists_[firstJobList_ & (jobStates.capacity() - 1)];
+				state.jobList = jobLists_.peek();
 
 				firstJobList_++;
 
 				jobStates.append(state);
+				jobLists_.pop();
 			}
 		}
 

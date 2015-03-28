@@ -118,6 +118,7 @@ private:
 
 protected:
 	void PreSubmit(void);
+	void Clear(void);
 
 	TimeVal GetTimeReal(void) const;
 
@@ -165,7 +166,7 @@ private:
 
 	ThreadStats stats_;
 
-	core::FixedArray<JobList*, 32> jobLists_;
+	core::FixedFifo<JobList*, 32> jobLists_;
 
 	uint32_t firstJobList_;			
 	uint32_t lastJobList_;
