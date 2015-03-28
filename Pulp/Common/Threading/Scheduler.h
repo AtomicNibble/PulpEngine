@@ -168,8 +168,6 @@ private:
 
 	core::FixedFifo<JobList*, 32> jobLists_;
 
-	uint32_t firstJobList_;			
-	uint32_t lastJobList_;
 	uint32_t threadIdx_;
 };
 

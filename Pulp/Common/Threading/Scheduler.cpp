@@ -200,8 +200,6 @@ JobThread::JobThread()
 {
 	moreWorkToDo_ = false;
 
-	firstJobList_ = 0;
-	lastJobList_ = 0;
 	threadIdx_ = 0;
 }
 
@@ -224,9 +222,6 @@ void JobThread::AddJobList(JobList* pJobList)
 	}
 
 	jobLists_.push(pJobList);
-
-	// tells the thread a joblist needs to be eaten.
-	lastJobList_++;
 }
 
 void JobThread::SignalWork(void)
@@ -287,8 +282,6 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 				JobListThreadState state;
 
 				state.jobList = jobLists_.peek();
-
-				firstJobList_++;
 
 				jobStates.append(state);
 				jobLists_.pop();
