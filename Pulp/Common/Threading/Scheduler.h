@@ -81,6 +81,10 @@ struct JobListThreadState
 	lastJobIndex(0),
 	nextJobIndex(-1) {}
 
+	~JobListThreadState() {
+		jobList = nullptr;
+	}
+
 	JobList* jobList;
 	int	lastJobIndex;
 	int	nextJobIndex;
@@ -139,7 +143,7 @@ private:
 
 class JobThread : public ThreadAbstract
 {
-	typedef core::FixedFifo<JobListThreadState, MAX_JOB_LISTS> JobStateFiFo;
+	typedef core::FixedArray<JobListThreadState, MAX_JOB_LISTS> JobStateList;
 public:
 	JobThread();
 	~JobThread();

@@ -47,11 +47,13 @@ void JobList::Wait(void)
 {
 	if (jobs_.isNotEmpty()) 
 	{
+#if 0
 		// check it was submitted
 		if(!IsSubmitted()) {
 			X_WARNING("JobList", "wait was called on a list that was never submitted");
 			return;
 		}
+#endif 
 
 		TimeVal waitStart = GetTimeReal();
 		bool waited = false;
@@ -249,8 +251,13 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 
 Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 {
-	JobStateFiFo jobStates;
+	static const size_t InvalidJobIdx = static_cast<size_t>(-1);
+
+	JobStateList jobStates;
 	JobList::RunFlags jobResult;
+	JobListPriority::Enum priority;
+	size_t currentJobListIdx;
+	size_t lastStalledJobList = InvalidJobIdx;
 
 	while (thread.ShouldRun())
 	{
@@ -264,33 +271,63 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 
 				state.jobList = jobLists_[firstJobList_ & (jobStates.capacity() - 1)];
 
-				jobStates.push(state);
+				firstJobList_++;
+
+				jobStates.append(state);
 			}
 		}
 
-		if (jobStates.size() == 0) {
+		if (jobStates.isEmpty()) {
 			break;
 		}
 
-		// this need to pick a job lists with the most priority.
-		// i think i will make a stack based container that is priority based,
+		currentJobListIdx = 0;
+		priority = JobListPriority::NONE;
 
+		if (lastStalledJobList == InvalidJobIdx)
+		{
+			// pick a job list with the most priority.
+			for (size_t i = 0; i < jobStates.size(); i++) {
+				if (jobStates[i].jobList->getPriority() > priority) {
+					priority = jobStates[i].jobList->getPriority();
+					currentJobListIdx = i;
+				}
+			}
+		}
+		else
+		{
+			// find a job with equal or higher priorty as the stall.
+			JobListThreadState& stalledList = jobStates[lastStalledJobList];
+			priority = stalledList.jobList->getPriority();
+			currentJobListIdx = lastStalledJobList;
 
-		JobListThreadState& currentJobList = jobStates.peek();
+			for (size_t i = 0; i < jobStates.size(); i++) {
+				if (i != lastStalledJobList && jobStates[i].jobList->getPriority() > priority) {
+					priority = jobStates[i].jobList->getPriority();
+					currentJobListIdx = i;
+				}
+			}
+		}
+
+		JobListThreadState& currentJobList = jobStates[currentJobListIdx];
 
 		jobResult = currentJobList.jobList->RunJobs(threadIdx_, currentJobList);
 
 		if (jobResult.IsSet(JobList::RunFlag::STALLED))
 		{
 			// we stalled :()
-			// try find another job list to work on with simular priority.
-			
+			lastStalledJobList = currentJobListIdx;		
 		}
 		if (jobResult.IsSet(JobList::RunFlag::DONE))
 		{
 			// no more work for me!
-
+			jobStates.removeIndex(currentJobListIdx);
+			lastStalledJobList = InvalidJobIdx; // reset stall idx.
 		}		
+		else
+		{
+			lastStalledJobList = InvalidJobIdx;
+		}
 	} 
 
 	return Thread::ReturnValue(0);
