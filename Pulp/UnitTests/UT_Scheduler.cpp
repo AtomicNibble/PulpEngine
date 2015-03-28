@@ -53,7 +53,7 @@ TEST(Threading, Scheduler)
 			}
 		}
 
-		for (size_t i = 0; i < 0x100000; i++)
+		for (size_t i = 0; i < 0x100; i++)
 		{
 			for (size_t j = 0; j < 4; j++)
 			{
