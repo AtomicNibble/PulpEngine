@@ -4,6 +4,9 @@
 #include "LoggerFullFormatPolicy.h"
 #include <stdio.h>
 
+#include "Time\DateStamp.h"
+#include "Time\TimeStamp.h"
+
 X_NAMESPACE_BEGIN(core)
 
 
@@ -26,7 +29,18 @@ uint32_t LoggerFullFormatPolicy::Format(LoggerBase::Line& line, const char* inde
 {
 	int bytesWritten; 
 
-	bytesWritten = _snprintf_s( line, _TRUNCATE, "[date time] %s(%d): [%s:%s] %s", 
+
+	DateStamp::Description DateStr;
+	DateStamp date = DateStamp::GetSystemDate();
+	date.ToString(DateStr);
+
+	TimeStamp::Description TimeStr;
+	TimeStamp time = TimeStamp::GetSystemTime();
+	time.ToString(TimeStr);
+
+
+	bytesWritten = _snprintf_s( line, _TRUNCATE, "[%s %s] %s(%d): [%s:%s] %s", 
+		DateStr, TimeStr,
 		sourceInfo.file_, sourceInfo.line_, sourceInfo.module_, channel,
 	//	type, verbosity, 
 		indentation );
