@@ -78,7 +78,6 @@ XCore::XCore() :
 	env_.profilerEnabled_ = false;
 
 
-
 	dirWatcher_.registerListener(this);
 }
 
@@ -107,6 +106,7 @@ void XCore::ShutDown()
 {
 	X_LOG0("Core", "Shutting down");
 
+	jobScheduler_.ShutDown();
 	dirWatcher_.ShutDown();
 
 	if (env_.pConsole)
