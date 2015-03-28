@@ -1369,12 +1369,11 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 		while (lexer.SkipUntilString("#"))
 		{
 			fileName.clear();
+			PrePro prepro;
 
 			if (lexer.ReadTokenOnLine(token))
 			{
 				// check if it's a valid prepro type.
-				PrePro prepro;
-
 				if (PreProFromStr(token, prepro.type))
 				{
 					if (prepro.type == PreProType::Include)
@@ -1387,6 +1386,49 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 							fileName.set(token.begin(), token.end());
 							memset((char*)start, ' ', (token.end() - start) + 1);
 						}
+
+						// you silly hoe!
+						if (fileName.isEmpty())
+						{
+							X_WARNING("Shader", "invalid #include in: \"%s\" line: %i", file->name.c_str(), token.line);
+							return;
+						}
+
+						// all source names tolower for reload reasons.
+						fileName.toLower();
+
+						// load it PLZ.
+						SourceFile* childFile = loadRawSourceFile(fileName.c_str(), reload);
+						if (childFile)
+						{
+							// is this file already included in the tree?
+							if (std::find(includedFiles.begin(), includedFiles.end(), childFile)
+								== includedFiles.end())
+							{
+								// check if for includes.
+								ParseIncludesAndPrePro_r(childFile, includedFiles);
+
+								// add the include files crc to this one.
+								// only after parsing for child includes so that
+								// they are included.
+								file->sourceCrc32 = pCrc32->Combine(file->sourceCrc32,
+									childFile->sourceCrc32,
+									safe_static_cast<uint32_t, size_t>(childFile->fileData.length()));
+
+
+								includedFiles.append(childFile);
+							}
+							else
+							{
+								X_ERROR("Shader", "Recursive file #include for: \"%s\" in shader \"%s\" line: %i", fileName.c_str(), file->name.c_str(), token.line);
+							}
+						}
+						else
+						{
+							X_WARNING("Shader", "File not found: \"%s\"", fileName.c_str());
+						}
+
+
 					}
 					else
 					{
@@ -1428,46 +1470,6 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 				}
 			}
 
-			// you silly hoe!
-			if (fileName.isEmpty())
-			{
-				X_WARNING("Shader", "invalid #include in: \"%s\" line: %i", file->name.c_str(), token.line);
-				return;
-			}
-		
-			// all source names tolower for reload reasons.
-			fileName.toLower();
-
-			// load it PLZ.
-			SourceFile* childFile = loadRawSourceFile(fileName.c_str(), reload);
-			if (childFile)
-			{
-				// is this file already included in the tree?
-				if (std::find(includedFiles.begin(), includedFiles.end(), childFile)
-					== includedFiles.end())
-				{
-					// check if for includes.
-					ParseIncludesAndPrePro_r(childFile, includedFiles);
-					
-					// add the include files crc to this one.
-					// only after parsing for child includes so that
-					// they are included.
-					file->sourceCrc32 = pCrc32->Combine(file->sourceCrc32, 
-						childFile->sourceCrc32, 
-						safe_static_cast<uint32_t, size_t>(childFile->fileData.length()));
-
-
-					includedFiles.append(childFile);
-				}
-				else
-				{
-					X_ERROR("Shader", "Recursive file #include for: \"%s\" in shader \"%s\" line: %i", fileName.c_str(), file->name.c_str(), token.line);
-				}
-			}
-			else
-			{
-				X_WARNING("Shader", "File not found: \"%s\"", fileName.c_str());
-			}
 		}
 
 	}
