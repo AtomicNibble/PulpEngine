@@ -162,7 +162,7 @@ private:
 
 	ThreadStats stats_;
 
-	core::FixedFifo<JobList*, 32> jobLists_;
+	core::FixedFifo<JobList*, MAX_JOB_LISTS> jobLists_;
 
 	uint32_t threadIdx_;
 };
@@ -183,7 +183,6 @@ private:
 	uint32_t numThreads_; // num created.
 	JobThread threads_[HW_THREAD_MAX];
 
-	core::FixedRingBuffer<JobList, 32> jobLists_;
 	core::CriticalSection addJobListCrit_;
 };
 

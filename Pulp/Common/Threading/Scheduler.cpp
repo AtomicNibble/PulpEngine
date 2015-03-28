@@ -144,7 +144,6 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 		stats_.startTime = GetTimeReal();
 	}
 
-
 	if ((++fetchLock_) == 1)
 	{
 		// grab a new job
@@ -397,6 +396,8 @@ void Scheduler::StartThreads(void)
 
 void Scheduler::ShutDown(void)
 {
+	X_LOG0("Scheduler", "Shuting down");
+
 	uint32_t i;
 
 	for (i = 0; i < numThreads_; i++) {
