@@ -151,10 +151,11 @@ public:
 	virtual ~XConsole();
 
 	virtual void Startup(ICore* pCore) X_FINAL;
-	virtual void ShutDown() X_FINAL;
-	virtual void freeRenderResources() X_FINAL;
+	virtual void ShutDown(void) X_FINAL;
+	virtual void unregisterInputListener(void) X_FINAL;
+	virtual void freeRenderResources(void) X_FINAL;
 
-	virtual void Draw() X_FINAL;
+	virtual void Draw(void) X_FINAL;
 
 	// input callbacks
 	virtual bool OnInputEvent(const input::InputEvent& event) X_FINAL;

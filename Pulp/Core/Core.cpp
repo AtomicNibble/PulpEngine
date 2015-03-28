@@ -161,6 +161,12 @@ void XCore::ShutDown()
 		core::SafeRelease(env_.p3DEngine);
 	}
 
+	// free any listners here.
+	if (env_.pConsole)
+	{
+		env_.pConsole->unregisterInputListener();
+	}
+
 	// needs to be done after engine, since it has input listners.
 	if (env_.pInput)
 	{
