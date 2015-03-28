@@ -96,6 +96,10 @@ public:
 	X_INLINE size_type capacity(void) const;
 
 
+	X_INLINE bool IsEmpty(void) const;
+	X_INLINE bool IsNotEmpty(void) const;
+
+
 	// STL iterators.
 	iterator begin(void);
 	iterator end(void);
