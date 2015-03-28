@@ -149,6 +149,7 @@ public:
 	void AddJobList(JobList* pJobList);
 
 	void SignalWork(void);
+	void Stop(void);
 
 protected:
 	virtual Thread::ReturnValue ThreadRun(const Thread& thread) X_FINAL;

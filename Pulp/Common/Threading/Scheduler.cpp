@@ -236,6 +236,12 @@ void JobThread::SignalWork(void)
 	signalMoreWorkToDo_.raise();
 }
 
+void JobThread::Stop(void)
+{
+	ThreadAbstract::Stop();
+	SignalWork();
+}
+
 Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 {
 	Thread::ReturnValue retVal = Thread::ReturnValue(0);
