@@ -64,6 +64,26 @@ TYPED_TEST(FixedArrayTest, BuiltInType)
 	{
 		EXPECT_EQ(TypeParam(5), *it);
 	}
+
+	TypeParam val = TypeParam(0);
+	for (FixedArray<TypeParam, 32>::iterator it = array.begin(); it != array.end(); ++it)
+	{
+		*it = val;
+		val++;
+	}
+
+
+	// remove
+	array.removeIndex(3);
+	array.removeIndex(20);
+	array.remove(array.begin() + 15);
+
+	ASSERT_EQ(32, array.capacity());
+	ASSERT_EQ(29, array.size());
+
+	// should of moved down.
+	EXPECT_EQ(4, array[3]);
+
 }
 
 TYPED_TEST(FixedArrayTest, UserType)
@@ -88,4 +108,12 @@ TYPED_TEST(FixedArrayTest, UserType)
 	{
 		EXPECT_EQ(5, it->val());
 	}
+
+	// remove
+	array.removeIndex(3);
+	array.removeIndex(20);
+	array.remove(array.begin() + 15);
+
+	ASSERT_EQ(32, array.capacity());
+	ASSERT_EQ(29, array.size());
 }

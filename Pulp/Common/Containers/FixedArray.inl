@@ -111,6 +111,29 @@ typename FixedArray<T, N>::iterator FixedArray<T, N>::insert(iterator position, 
 	return position;
 }
 
+template<typename T, size_t N>
+bool FixedArray<T, N>::removeIndex(size_type idx)
+{
+	if (idx < size() && isNotEmpty())
+	{
+		// shift them down.
+		size_type i, num;
+		for (i = idx, num = (size() -1); i < num; i++)
+			array_[i] = array_[i + 1];
+
+		size_--; // remove.
+		Mem::Destruct(array_ + size_);
+		return true;
+	}
+	return false;
+}
+
+template<typename T, size_t N>
+bool FixedArray<T, N>::remove(iterator position)
+{
+	size_type idx = position - begin();
+	return removeIndex(idx);
+}
 
 // any iterms in the array
 template<typename T, size_t N>
@@ -118,6 +141,13 @@ bool FixedArray<T, N>::isEmpty(void) const
 {
 	return size_ == 0;
 }
+
+template<typename T, size_t N>
+bool FixedArray<T, N>::isNotEmpty(void) const
+{
+	return size_ > 0;
+}
+
 
 
 template<typename T, size_t N>

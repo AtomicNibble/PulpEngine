@@ -39,8 +39,13 @@ public:
 
 	inline iterator insert(iterator position, const T& val);
 
+	bool removeIndex(size_type idx);
+
+	bool remove(iterator position);
+
 	// any iterms in the array
 	inline bool isEmpty(void) const;
+	inline bool isNotEmpty(void) const;
 
 	inline size_type size(void) const;
 	// returns number of elements allocated for
