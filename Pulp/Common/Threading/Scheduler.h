@@ -32,13 +32,9 @@ class Scheduler;
 
 struct ThreadStats
 {
-	ThreadStats() : numExecJobs(0) {}
+	ThreadStats() : numExecLists(0) {}
 
-	uint64_t numExecJobs;			// jobs execuced
-	TimeVal startTime;				// time lists was first picked
-	TimeVal waitTime;					// time spent waiting
-	TimeVal threadExecTime;		// time spent executing jobs
-	TimeVal threadTotalTime;	// total time.
+	uint64_t numExecLists;	// jobs lists execuced
 };
 
 
@@ -118,6 +114,7 @@ private:
 
 protected:
 	void PreSubmit(void);
+	void Clear(void);
 
 	TimeVal GetTimeReal(void) const;
 
@@ -152,6 +149,7 @@ public:
 	void AddJobList(JobList* pJobList);
 
 	void SignalWork(void);
+	void Stop(void);
 
 protected:
 	virtual Thread::ReturnValue ThreadRun(const Thread& thread) X_FINAL;
@@ -165,10 +163,8 @@ private:
 
 	ThreadStats stats_;
 
-	core::FixedArray<JobList*, 32> jobLists_;
+	core::FixedFifo<JobList*, MAX_JOB_LISTS> jobLists_;
 
-	uint32_t firstJobList_;			
-	uint32_t lastJobList_;
 	uint32_t threadIdx_;
 };
 
@@ -188,7 +184,6 @@ private:
 	uint32_t numThreads_; // num created.
 	JobThread threads_[HW_THREAD_MAX];
 
-	core::FixedRingBuffer<JobList, 32> jobLists_;
 	core::CriticalSection addJobListCrit_;
 };
 

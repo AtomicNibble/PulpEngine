@@ -25,6 +25,8 @@
 #include "Platform\DirectoryWatcher.h"
 #include "IDirectoryWatcher.h"
 
+#include "Threading\Scheduler.h"
+
 #include "Containers\HashMap.h"
 
 #include "Memory\AllocationPolicies\GrowingGenericAllocator.h"
@@ -227,6 +229,8 @@ private:
 
 	hotReloadMap					hotReloadExtMap_;
 	// ~Hotreload
+
+	core::Scheduler					jobScheduler_;
 
 	WIN_HWND		hWnd_;
 	WIN_HINSTANCE	hInst_;

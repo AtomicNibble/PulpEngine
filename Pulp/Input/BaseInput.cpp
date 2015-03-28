@@ -65,12 +65,24 @@ void XBaseInput::ShutDown()
 
 	gEnv->pCore->GetCoreEventDispatcher()->RemoveListener(this);
 
-
 	for (TInputDevices::Iterator i = Devices_.begin(); i != Devices_.end(); ++i)
 		(*i)->ShutDown();
 
 	std::for_each(Devices_.begin(), Devices_.end(), delete_ptr());
 	Devices_.clear();
+
+
+	if (!Listners_.empty())
+	{
+		X_WARNING("InputSys", "%i listners still registered", Listners_.size());
+	}
+	if (!consoleListeners_.empty())
+	{
+		X_WARNING("InputSys", "%i console listners still registered", consoleListeners_.size());
+	}
+
+	Listners_.clear();
+	consoleListeners_.clear();
 }
 
 

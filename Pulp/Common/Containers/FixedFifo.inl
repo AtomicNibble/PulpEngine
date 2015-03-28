@@ -83,6 +83,18 @@ typename FixedFifo<T, N>::size_type FixedFifo<T, N>::capacity(void) const
 	return end_ - array_;
 }
 
+template<typename T, size_t N>
+bool FixedFifo<T, N>::IsEmpty(void) const
+{
+	return num_ == 0;
+}
+
+template<typename T, size_t N>
+bool FixedFifo<T, N>::IsNotEmpty(void) const
+{
+	return num_ > 0;
+}
+
 
 // STL iterators.
 template<typename T, size_t N>

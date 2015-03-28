@@ -32,6 +32,16 @@ JobList::JobList() :
 	pTimer_ = gEnv->pTimer;
 }
 
+void JobList::Clear(void)
+{
+	isDone_ = false;
+	isSubmit_ = false;
+	syncCount_ = 0;
+	currentJob_ = 0;
+	fetchLock_ = 0;
+	numThreadsExecuting_ = 0;
+}
+
 void JobList::AddJob(Job job, void* pData)
 {
 	JobData data;
@@ -75,6 +85,8 @@ void JobList::Wait(void)
 			// if first time it's already goingto be zero.
 			stats_.waitTime = TimeVal(0ll);
 		}
+
+		Clear();
 	}
 	isDone_ = true;
 }
@@ -128,6 +140,9 @@ JobList::RunFlags JobList::RunJobs(uint32_t threadIdx, JobListThreadState& state
 
 JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadState& state)
 {
+	if (stats_.startTime.GetValue() == 0) {
+		stats_.startTime = GetTimeReal();
+	}
 
 	if ((++fetchLock_) == 1)
 	{
@@ -166,6 +181,7 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 	}
 
 	if ((state.nextJobIndex+1) == jobs_.size()) {
+		stats_.endTime = GetTimeReal();
 		return RunFlag::DONE;
 	}
 
@@ -174,6 +190,7 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 
 void JobList::PreSubmit(void)
 {
+	stats_.submitTime = GetTimeReal();
 	syncCount_ = safe_static_cast<int32_t, size_t>(jobs_.size());
 }
 
@@ -188,8 +205,6 @@ JobThread::JobThread()
 {
 	moreWorkToDo_ = false;
 
-	firstJobList_ = 0;
-	lastJobList_ = 0;
 	threadIdx_ = 0;
 }
 
@@ -206,10 +221,12 @@ void JobThread::setThreadIdx(uint32_t idx)
 void JobThread::AddJobList(JobList* pJobList)
 {
 	X_ASSERT_NOT_NULL(pJobList);
-	jobLists_.append(pJobList);
 
-	// tells the thread a joblist needs to be eaten.
-	lastJobList_++;
+	while (jobLists_.size() == jobLists_.capacity()) {
+		SwitchToThread();
+	}
+
+	jobLists_.push(pJobList);
 }
 
 void JobThread::SignalWork(void)
@@ -217,6 +234,12 @@ void JobThread::SignalWork(void)
 	core::CriticalSection::ScopedLock lock(signalCritical_);
 	moreWorkToDo_ = true;
 	signalMoreWorkToDo_.raise();
+}
+
+void JobThread::Stop(void)
+{
+	ThreadAbstract::Stop();
+	SignalWork();
 }
 
 Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
@@ -264,16 +287,15 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 		// can we fit any more jobs in the local stack.
 		if (jobStates.size() < jobStates.capacity())
 		{
-			// if this is above zero we have one or more job lists waiting.
-			if (firstJobList_ < lastJobList_)
+			// any to add?
+			if (jobLists_.IsNotEmpty())
 			{
 				JobListThreadState state;
 
-				state.jobList = jobLists_[firstJobList_ & (jobStates.capacity() - 1)];
-
-				firstJobList_++;
+				state.jobList = jobLists_.peek();
 
 				jobStates.append(state);
+				jobLists_.pop();
 			}
 		}
 
@@ -323,6 +345,8 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 			// no more work for me!
 			jobStates.removeIndex(currentJobListIdx);
 			lastStalledJobList = InvalidJobIdx; // reset stall idx.
+
+			stats_.numExecLists++;
 		}		
 		else
 		{
@@ -378,6 +402,8 @@ void Scheduler::StartThreads(void)
 
 void Scheduler::ShutDown(void)
 {
+	X_LOG0("Scheduler", "Shuting down");
+
 	uint32_t i;
 
 	for (i = 0; i < numThreads_; i++) {

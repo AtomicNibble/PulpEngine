@@ -215,6 +215,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	if (!time_.Init(this))
 		return false;
 
+	// #------------------------- JOB SYSTEM ------------------------
+	jobScheduler_.StartThreads();
+
+
 	// #------------------------- ProfileSys ---------------------------
 	profileSys_.Init(this);
 
