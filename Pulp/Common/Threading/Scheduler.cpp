@@ -5,6 +5,7 @@
 #include "Util\Cpu.h"
 
 #include "ICore.h"
+#include "ITimer.h"
 
 // #include "SystemTimer.h"
 
@@ -16,11 +17,19 @@ JobList::JobList() :
 	isSubmit_(false),
 	priority_(JobListPriority::NORMAL),
 	jobs_(gEnv->pArena),
+	syncCount_(0),
 	currentJob_(0),
 	fetchLock_(0),
-	numThreadsExecuting_(0)
+	numThreadsExecuting_(0),
+	pTimer_(nullptr)
 {
+	// set the timer val.
+	// job lists should only be created once the core has been setup.
+	// menaing timer is set.
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pTimer);
 
+	pTimer_ = gEnv->pTimer;
 }
 
 void JobList::AddJob(Job job, void* pData)
@@ -38,8 +47,33 @@ void JobList::Wait(void)
 {
 	if (jobs_.isNotEmpty()) 
 	{
+#if 0
+		// check it was submitted
+		if(!IsSubmitted()) {
+			X_WARNING("JobList", "wait was called on a list that was never submitted");
+			return;
+		}
+#endif 
+
+		TimeVal waitStart = GetTimeReal();
+		bool waited = false;
+
+		while (syncCount_ > 0) {
+			SwitchToThread();
+			waited = true;
+		}
+
 		while (numThreadsExecuting_ > 0) {
 			SwitchToThread();
+			waited = true;
+		}
+
+		if(waited) {
+			stats_.waitTime = GetTimeReal() - waitStart;
+		} else {
+			// if some goat calls wait twice it will set it to zero.
+			// if first time it's already goingto be zero.
+			stats_.waitTime = TimeVal(0ll);
 		}
 	}
 	isDone_ = true;
@@ -47,7 +81,7 @@ void JobList::Wait(void)
 
 bool JobList::TryWait(void)
 {
-	if (jobs_.isEmpty()) {
+	if (jobs_.isEmpty() || syncCount_ <= 0) {
 		Wait();
 		return true;
 	}
@@ -78,8 +112,8 @@ JobListPriority::Enum JobList::getPriority(void) const
 
 JobList::RunFlags JobList::RunJobs(uint32_t threadIdx, JobListThreadState& state)
 {
-//	TimeVal start = TimeVal();
-	JobList::RunFlag res;
+	TimeVal start = GetTimeReal();
+	JobList::RunFlags res;
 
 	++numThreadsExecuting_;
 
@@ -87,9 +121,9 @@ JobList::RunFlags JobList::RunJobs(uint32_t threadIdx, JobListThreadState& state
 
 	--numThreadsExecuting_;
 
-//	stats_.threadTotalTime[threadIdx] += (TimeVal() - start);
+	stats_.threadTotalTime[threadIdx] += (GetTimeReal() - start);
 
-	return RunFlag::OK;
+	return res;
 }
 
 JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadState& state)
@@ -116,7 +150,7 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 	{
 		JobData& job = jobs_[state.nextJobIndex];
 
-//		TimeVal jobStart = 0;
+		TimeVal jobStart = GetTimeReal();
 
 		job.pJobRun(job.pData, 
 			job.batchOffset, 
@@ -125,9 +159,10 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 
 		job.done = true;
 
-//		TimeVal jobEnd = 0;
-	//	stats_.threadExecTime[threadIdx] += jobEnd - jobStart;
+		TimeVal jobEnd = GetTimeReal();
+		stats_.threadExecTime[threadIdx] += jobEnd - jobStart;
 
+		--syncCount_;
 	}
 
 	if ((state.nextJobIndex+1) == jobs_.size()) {
@@ -137,6 +172,15 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 	return RunFlag::OK;
 }
 
+void JobList::PreSubmit(void)
+{
+	syncCount_ = safe_static_cast<int32_t, size_t>(jobs_.size());
+}
+
+TimeVal JobList::GetTimeReal(void) const
+{
+	return pTimer_->GetTimeReal();
+}
 // ----------------------------------
 
 
@@ -207,37 +251,84 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 
 Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 {
-	X_UNUSED(thread);
-	typedef core::FixedFifo<JobListThreadState, MAX_JOB_LISTS> JobStateFiFo;
+	static const size_t InvalidJobIdx = static_cast<size_t>(-1);
 
-	JobStateFiFo jobStates;
+	JobStateList jobStates;
+	JobList::RunFlags jobResult;
+	JobListPriority::Enum priority;
+	size_t currentJobListIdx;
+	size_t lastStalledJobList = InvalidJobIdx;
 
 	while (thread.ShouldRun())
 	{
 		// can we fit any more jobs in the local stack.
-		if (jobStates.size() < MAX_JOB_LISTS)
+		if (jobStates.size() < jobStates.capacity())
 		{
 			// if this is above zero we have one or more job lists waiting.
 			if (firstJobList_ < lastJobList_)
 			{
 				JobListThreadState state;
 
-				state.jobList = jobLists_[firstJobList_ & (MAX_JOB_LISTS - 1)];
+				state.jobList = jobLists_[firstJobList_ & (jobStates.capacity() - 1)];
 
-				jobStates.push(state);
+				firstJobList_++;
+
+				jobStates.append(state);
 			}
 		}
 
-		if (jobStates.size() == 0) {
+		if (jobStates.isEmpty()) {
 			break;
 		}
 
-		JobListThreadState& currentJobList = jobStates.peek();
+		currentJobListIdx = 0;
+		priority = JobListPriority::NONE;
 
-		currentJobList.jobList->RunJobs(threadIdx_, currentJobList);
+		if (lastStalledJobList == InvalidJobIdx)
+		{
+			// pick a job list with the most priority.
+			for (size_t i = 0; i < jobStates.size(); i++) {
+				if (jobStates[i].jobList->getPriority() > priority) {
+					priority = jobStates[i].jobList->getPriority();
+					currentJobListIdx = i;
+				}
+			}
+		}
+		else
+		{
+			// find a job with equal or higher priorty as the stall.
+			JobListThreadState& stalledList = jobStates[lastStalledJobList];
+			priority = stalledList.jobList->getPriority();
+			currentJobListIdx = lastStalledJobList;
 
+			for (size_t i = 0; i < jobStates.size(); i++) {
+				if (i != lastStalledJobList && jobStates[i].jobList->getPriority() > priority) {
+					priority = jobStates[i].jobList->getPriority();
+					currentJobListIdx = i;
+				}
+			}
+		}
 
-	}
+		JobListThreadState& currentJobList = jobStates[currentJobListIdx];
+
+		jobResult = currentJobList.jobList->RunJobs(threadIdx_, currentJobList);
+
+		if (jobResult.IsSet(JobList::RunFlag::STALLED))
+		{
+			// we stalled :()
+			lastStalledJobList = currentJobListIdx;		
+		}
+		if (jobResult.IsSet(JobList::RunFlag::DONE))
+		{
+			// no more work for me!
+			jobStates.removeIndex(currentJobListIdx);
+			lastStalledJobList = InvalidJobIdx; // reset stall idx.
+		}		
+		else
+		{
+			lastStalledJobList = InvalidJobIdx;
+		}
+	} 
 
 	return Thread::ReturnValue(0);
 }
@@ -303,6 +394,8 @@ void Scheduler::SubmitJobList(JobList* pList, JobList* pWaitFor)
 	X_ASSERT_NOT_NULL(pList);
 
 	core::CriticalSection::ScopedLock lock(addJobListCrit_);
+
+	pList->PreSubmit();
 
 	for (uint32_t i = 0; i < numThreads_; i++) {
 		threads_[i].AddJobList(pList);

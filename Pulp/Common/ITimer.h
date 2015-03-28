@@ -33,6 +33,10 @@ struct ITimer
 
 	// returns the absolute time right now
 	virtual TimeVal GetAsyncTime(void) const X_ABSTRACT;
+
+	// returns the time unscaled.
+	virtual TimeVal GetTimeReal(void) const X_ABSTRACT;
+
 	// returns the absolute time as seconds
 	virtual float GetAsyncCurTime(void) X_ABSTRACT;
 
