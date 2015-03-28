@@ -140,6 +140,10 @@ JobList::RunFlags JobList::RunJobs(uint32_t threadIdx, JobListThreadState& state
 
 JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadState& state)
 {
+	if (stats_.startTime.GetValue() == 0) {
+		stats_.startTime = GetTimeReal();
+	}
+
 
 	if ((++fetchLock_) == 1)
 	{
@@ -178,6 +182,7 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 	}
 
 	if ((state.nextJobIndex+1) == jobs_.size()) {
+		stats_.endTime = GetTimeReal();
 		return RunFlag::DONE;
 	}
 
@@ -186,6 +191,7 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 
 void JobList::PreSubmit(void)
 {
+	stats_.submitTime = GetTimeReal();
 	syncCount_ = safe_static_cast<int32_t, size_t>(jobs_.size());
 }
 
@@ -334,6 +340,8 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 			// no more work for me!
 			jobStates.removeIndex(currentJobListIdx);
 			lastStalledJobList = InvalidJobIdx; // reset stall idx.
+
+			stats_.numExecLists++;
 		}		
 		else
 		{

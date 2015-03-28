@@ -32,13 +32,9 @@ class Scheduler;
 
 struct ThreadStats
 {
-	ThreadStats() : numExecJobs(0) {}
+	ThreadStats() : numExecLists(0) {}
 
-	uint64_t numExecJobs;			// jobs execuced
-	TimeVal startTime;				// time lists was first picked
-	TimeVal waitTime;					// time spent waiting
-	TimeVal threadExecTime;		// time spent executing jobs
-	TimeVal threadTotalTime;	// total time.
+	uint64_t numExecLists;	// jobs lists execuced
 };
 
 
