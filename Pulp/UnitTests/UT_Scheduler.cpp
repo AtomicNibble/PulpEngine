@@ -40,10 +40,7 @@ TEST(Threading, Scheduler)
 				if(j == 1) {
 					jobs.SetPriority(core::JobListPriority::HIGH);
 				}
-				if(j == 2) {
-					jobs.SetPriority(core::JobListPriority::NONE);
-				}
-				if(j == 3) {
+				if(j == 0) {
 					jobs.SetPriority(core::JobListPriority::LOW);
 				}
 
