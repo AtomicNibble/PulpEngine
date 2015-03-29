@@ -15,6 +15,8 @@ struct IGame
 	virtual bool ShutDown(void) X_ABSTRACT;
 	virtual bool Update(void) X_ABSTRACT;
 
+	virtual void release(void) X_ABSTRACT;
+
 
 };
 

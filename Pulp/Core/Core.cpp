@@ -108,6 +108,13 @@ void XCore::ShutDown()
 
 	jobScheduler_.ShutDown();
 	dirWatcher_.ShutDown();
+	
+
+	if (env_.pGame)
+	{
+		env_.pGame->ShutDown();
+		core::SafeRelease(env_.pGame);
+	}
 
 	if (env_.pConsole)
 	{
