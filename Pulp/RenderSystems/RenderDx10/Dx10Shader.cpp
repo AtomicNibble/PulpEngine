@@ -377,7 +377,7 @@ bool DX11XRender::SetSkyboxShader()
 	return true;
 }
 
-bool DX11XRender::SetFFE(bool textured)
+bool DX11XRender::SetFFE(shader::VertexFormat::Enum vertFmt, bool textured)
 {
 	using namespace shader;
 
@@ -402,6 +402,9 @@ bool DX11XRender::SetFFE(bool textured)
 			return false;
 	}
 
+	if (FAILED(FX_SetVertexDeclaration(vertFmt)))
+		return false;
+
 	if(!pSh->FXBegin(&pass, 0))
 		return false;
 
@@ -424,6 +427,9 @@ bool DX11XRender::SetFontShader()
 
 	core::StrHash tech("Font");
 	if (!pSh->FXSetTechnique(tech))
+		return false;
+
+	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
 		return false;
 
 	if (!pSh->FXBegin(&pass, 0))

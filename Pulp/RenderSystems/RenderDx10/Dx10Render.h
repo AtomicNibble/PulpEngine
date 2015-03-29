@@ -238,7 +238,7 @@ public:
 
 	virtual bool SetWorldShader(void) X_FINAL;
 	virtual bool SetSkyboxShader(void);
-	virtual bool SetFFE(bool textured = false);
+	virtual bool SetFFE(shader::VertexFormat::Enum vertFmt, bool textured = false);
 	virtual bool SetFontShader();
 	virtual bool SetZPass();
 	virtual bool setGUIShader(bool textured = false) X_FINAL;
