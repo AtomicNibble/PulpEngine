@@ -369,7 +369,8 @@ struct Area
 	int32_t numPortals; // te number of portals leading out the area
 	core::Pointer64<Portal> pPortals;
 	
-	AABB bounds; // 0x28
+	AABB boundingBox;
+	Sphere boundingSphere;
 };
 
 // ============ File Structure stuff =========
@@ -412,7 +413,7 @@ X_ENSURE_SIZE(Brush, 12);
 X_ENSURE_SIZE(Leaf, 0x30);
 X_ENSURE_SIZE(Node, 0x24);
 // X_ENSURE_SIZE(Portal, 0x28);
-X_ENSURE_SIZE(Area, 0x28);
+X_ENSURE_SIZE(Area, 0x28 + 0xC);
 
 
 X_ENSURE_SIZE(FileLump, 8);
