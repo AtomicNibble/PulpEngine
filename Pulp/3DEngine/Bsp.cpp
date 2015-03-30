@@ -11,39 +11,8 @@ X_NAMESPACE_BEGIN(bsp)
 
 namespace
 {
-	template<typename T>
-	bool LoadLump(core::XFileMemScoped& file, const FileLump& lump, core::Array<T>& vec)
-	{
-		uint32_t num = lump.size / sizeof(T);
 
-		// check lump size is valid.
-		if ((num * sizeof(T)) != lump.size)
-			return false;
 
-		// a lump must have some sort of offset.
-		if (lump.offset == 0)
-			return false;
-
-		vec.resize(num);
-
-		// seek if needed.
-		file->seek(lump.offset, core::SeekMode::SET);
-		return file->read(vec.ptr(), lump.size) == lump.size;
-	}
-
-	template<typename T>
-	bool IsBelowLimit(const FileHeader& hdr, LumpType::Enum type, uint32_t max)
-	{
-		uint32_t num = 0; // hdr.lumps[type].size / sizeof(T);
-
-		if (num > max) 
-		{
-			X_ERROR("Bsp", "too many %s: %i max: %i",
-				LumpType::ToString(type), num, max);
-			return false;
-		}
-		return true;
-	}
 
 }
 
