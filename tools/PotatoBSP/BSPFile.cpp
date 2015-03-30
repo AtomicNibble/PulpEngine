@@ -6,8 +6,6 @@
 
 #include <Hashing\crc32.h>
 
-// X_NAMESPACE_BEGIN(bsp)
-
 X_USING_NAMESPACE;
 
 using namespace bsp;
@@ -15,17 +13,6 @@ using namespace bsp;
 namespace
 {
 
-	template<typename T>
-	void SaveLump(core::XFile* file, bsp::FileLump& lump, const core::Array<T>& vec)
-	{
-		uint32_t len = safe_static_cast<uint32_t, size_t>(vec.size() * sizeof(T));
-
-		lump.offset = safe_static_cast<uint32_t,size_t>(file->tell());
-		lump.size = len;
-
-		if (file->write(vec.ptr(), len) != len)
-			core::zero_object(lump);
-	}
 
 	void WriteAreaModel(core::XFile* file, AreaModel const* pModel)
 	{
@@ -67,12 +54,6 @@ bool BSPBuilder::save(const char* name)
 	{
 		file->writeObj(hdr);
 
-	//	SaveLump<Area>(file, hdr.lumps[LumpType::Areas], data_.areas);
-	//	SaveLump<Surface>(file, hdr.lumps[LumpType::Surfaces], data_.surfaces);
-	//	SaveLump<Vertex>(file, hdr.lumps[LumpType::Verts], data_.verts);
-	//	SaveLump<Index>(file, hdr.lumps[LumpType::Indexes], data_.indexes);
-
-
 		for (i = 0; i < areaModels.size(); i++)
 		{
 			AreaModel* pModel = areaModels[i];
@@ -83,8 +64,8 @@ bool BSPBuilder::save(const char* name)
 
 		// update FourcCC to mark this bsp as valid.
 		hdr.fourCC = BSP_FOURCC;
-		hdr.numAreaModels = safe_static_cast<uint32_t,size_t>(areaModels.size());
-		// we crc32 just the lumps.
+		hdr.numAreas = safe_static_cast<uint32_t,size_t>(areaModels.size());
+		// crc the header
 		hdr.datacrc32 = crc.GetCRC32((const char*)&hdr, sizeof(hdr));
 		hdr.datasize = safe_static_cast<uint32_t, size_t>(file->tell() - sizeof(hdr));
 		file->seek(0, core::SeekMode::SET);
