@@ -204,6 +204,15 @@ X_NAMESPACE_BEGIN(bsp)
 //
 //	Each area in the map is considered to be a model with x surfaces.
 //	
+//	Since each area is classed as a model the XModels in the level format are all that are needed to render
+//	the whole map.
+//	
+//	But we store other information that is used for collision and working out where you are in the level.
+//	this information is laos used to tell you what area these models are in.
+//
+//	So once we found out what area we are located in, we add the area for rendering.
+//  
+//
 //
 //
 
@@ -363,10 +372,27 @@ struct Portal
 //	Portal*		pNext;		
 };
 
+
+struct Entity
+{
+		Vec3f pos;
+
+};
+
+
+struct StaticModel : public Entity
+{
+		uint16_t modelNameIdx; // string table.
+
+		core::Pointer64<<model::IRenderMesh> pRenderMesh;
+};
+
 struct Area
 {
 	int32_t areaNum;
 	int32_t numPortals; // te number of portals leading out the area
+	int32_t numStaticModels;
+
 	core::Pointer64<Portal> pPortals;
 	
 	AABB boundingBox;
@@ -390,7 +416,7 @@ struct FileHeader
 	uint32_t datacrc32;
 	uint32_t datasize;
 	// the number of area;s in the level file.
-	uint32_t numAreaModels;
+	uint32_t numAreas;
 
 	const bool isValid(void) const {
 		return fourCC == BSP_FOURCC;

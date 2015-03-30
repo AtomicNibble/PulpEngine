@@ -29,6 +29,9 @@ public:
 
 private:
 
+	uint32_t numAreas_;
+
+
 	struct AreaModel
 	{
 		AreaModel() {

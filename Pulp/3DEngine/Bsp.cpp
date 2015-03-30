@@ -48,6 +48,7 @@ namespace
 }
 
 Bsp::Bsp() :
+	numAreas_(0),
 	areaModels_(g_3dEngineArena)
 {
 	pFileData_ = nullptr;
@@ -131,6 +132,16 @@ bool Bsp::LoadFromFile(const char* filename)
 			return false;
 		}
 
+		// require atleast one area.
+		if(hdr.numAreas < 1)
+		{
+			X_ERROR("Bsp", "Level file has no areas");
+			return false;
+		}
+
+		// copy some stuff.
+		numAreas_ = hdr.numAreas;
+
 
 		pFileData_ = X_NEW_ARRAY(uint8_t, hdr.datasize, g_3dEngineArena, "LevelBuffer");
 		
@@ -149,8 +160,8 @@ bool Bsp::LoadFromFile(const char* filename)
 		core::MemCursor<uint8_t> cursor(pFileData_, hdr.datasize);
 		uint32_t x, numSub;
 
-		areaModels_.reserve(hdr.numAreaModels);
-		for (uint32_t i = 0; i < hdr.numAreaModels; i++)
+		areaModels_.reserve(hdr.numAreas);
+		for (uint32_t i = 0; i < hdr.numAreas; i++)
 		{
 			model::MeshHeader* pMesh = cursor.getSeekPtr<model::MeshHeader>();		
 			numSub = pMesh->numSubMeshes;
