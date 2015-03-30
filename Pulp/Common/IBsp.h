@@ -263,8 +263,8 @@ class XWinding;
 X_DECLARE_FLAGS(MatContentFlags)(SOLID, WATER, PLAYER_CLIP, MONSTER_CLIP, TRIGGER, NO_FALL_DMG, DETAIL, STRUCTURAL, ORIGIN);
 X_DECLARE_FLAGS(MatSurfaceFlags)(NO_DRAW, LADDER);
 
-// may add more as i make them.
-X_DECLARE_ENUM(LumpType)(Entities, Materials, Planes, Verts, Indexes, Brushes, BrushSides, Surfaces, Nodes, Leafs, Areas, Portals);
+// this is the flags for the file header, which tells you what option stuff is inside the file.
+X_DECLARE_FLAGS(LevelFileFlags)(OCT_TREE);
 X_DECLARE_ENUM(SurfaceType)(Invalid, Plane, Patch);
 
 typedef Flags<MatContentFlags> MatContentFlag;
@@ -279,6 +279,7 @@ typedef Flags<MatSurfaceFlags> MatSurfaceFlag;
 //	so the entry in the map manger we just be updated.
 struct Material
 {
+	// move this to a string table.
 	core::StackString<MAP_MAX_MATERIAL_LEN> Name;
 	MatSurfaceFlag		surfaceFlag;
 	MatContentFlag		contentFlag;
@@ -365,23 +366,13 @@ struct Portal
 struct Area
 {
 	int32_t areaNum;
-	int32_t numPortals;
+	int32_t numPortals; // te number of portals leading out the area
 	core::Pointer64<Portal> pPortals;
 	
 	AABB bounds; // 0x28
 };
 
 // ============ File Structure stuff =========
-
-struct FileLump
-{
-	uint32_t offset; // no 4gb+ bsp's for you!
-	uint32_t size;
-
-	const bool isValid(void) const {
-		return offset > 0 && size > 0;
-	}
-};
 
 
 struct FileHeader
@@ -390,15 +381,15 @@ struct FileHeader
 	uint8_t  version;
 	uint8_t  blank[3];
 
+	Flags<LevelFileFlags> flags;
+
 	core::dateTimeStampSmall modified; // 4
 
 	// crc32 is just the header data
 	uint32_t datacrc32;
-
 	uint32_t datasize;
+	// the number of area;s in the level file.
 	uint32_t numAreaModels;
-
-//	FileLump lumps[LumpType::ENUM_COUNT];
 
 	const bool isValid(void) const {
 		return fourCC == BSP_FOURCC;
