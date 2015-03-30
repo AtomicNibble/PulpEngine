@@ -366,6 +366,7 @@
     <None Include="String\Path.inl" />
     <None Include="String\StringHash.inl" />
     <None Include="String\StringRange.inl" />
+    <None Include="String\StringTable.inl" />
     <None Include="String\StringUtil.inl" />
     <None Include="String\StrRef.inl" />
     <None Include="Threading\Atomic.inl" />
