@@ -48,7 +48,6 @@ namespace
 }
 
 Bsp::Bsp() :
-	data_(g_3dEngineArena),
 	areaModels_(g_3dEngineArena)
 {
 	pFileData_ = nullptr;
@@ -197,53 +196,6 @@ bool Bsp::LoadFromFile(const char* filename)
 			X_WARNING("Bsp", "potential read error, cursor is not at end");
 		}
 
-		// make some render meshes.
-
-		
-
-#if 0
-
-		//	areaModels_.resize(hdr.numAreaModels);
-		for (uint32_t i = 0; i < hdr.numAreaModels; i++)
-		{
-			//	file->readObj(areaModels_[i]);
-		}
-
-		// do some limit checking.
-		// no pesky bsp's !
-		bool belowLimits = true;
-		belowLimits &= IsBelowLimit<Vertex>(hdr, LumpType::Materials, MAP_MAX_MATERIALs);
-		belowLimits &= IsBelowLimit<Vertex>(hdr, LumpType::Planes, MAP_MAX_PLANES);
-		belowLimits &= IsBelowLimit<Vertex>(hdr, LumpType::Verts, MAP_MAX_VERTS);
-		belowLimits &= IsBelowLimit<Index>(hdr, LumpType::Indexes, MAP_MAX_INDEXES);
-		belowLimits &= IsBelowLimit<Brush>(hdr, LumpType::Brushes, MAP_MAX_BRUSHES);
-		belowLimits &= IsBelowLimit<BrushSide>(hdr, LumpType::BrushSides, MAP_MAX_BRUSHSIDES);
-		belowLimits &= IsBelowLimit<Surface>(hdr, LumpType::Surfaces, MAP_MAX_SURFACES);
-		belowLimits &= IsBelowLimit<Node>(hdr, LumpType::Nodes, MAP_MAX_NODES);
-		belowLimits &= IsBelowLimit<Leaf>(hdr, LumpType::Leafs, MAP_MAX_LEAFS);
-		belowLimits &= IsBelowLimit<Area>(hdr, LumpType::Areas, MAP_MAX_AREAS);
-		belowLimits &= IsBelowLimit<uint8_t>(hdr, LumpType::Portals, MAP_MAX_PORTALS);
-
-
-		if (belowLimits == false)
-		{
-			X_ERROR("Bsp", "%s exceeds level limits.", path.fileName());
-			return false;
-		}
-
-		// time to load some data.
-		LumpsLoaded = true;
-//		LumpsLoaded &= LoadLump<Surface>(file, hdr.lumps[LumpType::Surfaces], data_.surfaces);
-//		LumpsLoaded &= LoadLump<Vertex>(file, hdr.lumps[LumpType::Verts], data_.verts);
-//		LumpsLoaded &= LoadLump<Index>(file, hdr.lumps[LumpType::Indexes], data_.indexes);
-//		LumpsLoaded &= LoadLump<Area>(file, hdr.lumps[LumpType::Areas], data_.areas);
-
-		if (LumpsLoaded == false)
-		{
-			X_ERROR("Bsp", "Failed to load lumps from: %s", path.fileName());
-			return false;
-		}
-#endif
 
 		file.close(); // not needed but makes my nipples more perky.
 		return true;
