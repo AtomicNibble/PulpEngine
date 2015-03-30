@@ -9,6 +9,8 @@
 
 #include <Util\Pointer64.h>
 
+#include <IRenderMesh.h>
+
 X_NAMESPACE_BEGIN(bsp)
 
 
@@ -384,7 +386,7 @@ struct StaticModel : public Entity
 {
 	uint16_t modelNameIdx; // string table.
 
-	core::Pointer64 << model::IRenderMesh > pRenderMesh;
+	core::Pointer64<model::IRenderMesh > pRenderMesh;
 };
 
 struct Area
@@ -439,11 +441,8 @@ X_ENSURE_SIZE(Brush, 12);
 X_ENSURE_SIZE(Leaf, 0x30);
 X_ENSURE_SIZE(Node, 0x24);
 // X_ENSURE_SIZE(Portal, 0x28);
-X_ENSURE_SIZE(Area, 0x28 + 0xC);
+X_ENSURE_SIZE(Area, 0x28 + 0xC + 12);
 
-
-X_ENSURE_SIZE(FileLump, 8);
-// X_ENSURE_SIZE(FileHeader, (16 + (8 * LumpType::ENUM_COUNT)));
 
 X_NAMESPACE_END
 
