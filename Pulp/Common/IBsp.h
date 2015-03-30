@@ -365,26 +365,26 @@ struct Portal
 {
 	int32_t		areaTo;		// the area this portal leads to.
 	XWinding*	pWinding;	// winding points have counter clockwise ordering seen this area
-							// should i add seralise support to winding?
-							// or i could have a diffrent portal structure for the file.
+	// should i add seralise support to winding?
+	// or i could have a diffrent portal structure for the file.
 
 	Planef		plane;		// view must be on the positive side of the plane to cross
-//	Portal*		pNext;		
+	//	Portal*		pNext;		
 };
 
 
 struct Entity
 {
-		Vec3f pos;
+	Vec3f pos;
 
 };
 
 
 struct StaticModel : public Entity
 {
-		uint16_t modelNameIdx; // string table.
+	uint16_t modelNameIdx; // string table.
 
-		core::Pointer64<<model::IRenderMesh> pRenderMesh;
+	core::Pointer64 << model::IRenderMesh > pRenderMesh;
 };
 
 struct Area
