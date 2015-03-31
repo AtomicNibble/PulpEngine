@@ -18,7 +18,7 @@
 #include "../RenderSystems/Common/Textures/TextureLoaderPNG.h"
 #include "../RenderSystems/Common/Textures/XTextureFile.h"
 
-X_LINK_LIB("engine_RenderDx10")
+// X_LINK_LIB("engine_RenderDx10")
 
 
 X_USING_NAMESPACE;
@@ -37,7 +37,10 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path path)
 
 	core::XFileScoped file;
 	
-	if (file.openFile(path.c_str(), mode))
+	core::Path testFolder("test_resources/images/");
+	testFolder /= path;
+
+	if (file.openFile(testFolder.c_str(), mode))
 	{
 		T loader;
 
