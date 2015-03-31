@@ -9,6 +9,15 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{ef454a78-fa98-46c8-a16b-d4d00518f9ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Textures">
+      <UniqueIdentifier>{78667c37-9ade-47fe-9942-f5cac5eb7d59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common\Textures\Loaders">
+      <UniqueIdentifier>{57412825-308a-4dc0-9d0a-25bf99e25de4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -16,6 +25,27 @@
     </ClInclude>
     <ClInclude Include="RenderNull.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Textures\TextureLoaderCI.h">
+      <Filter>Common\Textures\Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Textures\TextureLoaderDDS.h">
+      <Filter>Common\Textures\Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Textures\TextureLoaderJPG.h">
+      <Filter>Common\Textures\Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Textures\TextureLoaderPNG.h">
+      <Filter>Common\Textures\Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Textures\TextureLoaderPSD.h">
+      <Filter>Common\Textures\Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Textures\TextureLoaderTGA.h">
+      <Filter>Common\Textures\Loaders</Filter>
+    </ClInclude>
+    <ClInclude Include="..\Common\Textures\XTextureFile.h">
+      <Filter>Common\Textures</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -27,6 +57,27 @@
     </ClCompile>
     <ClCompile Include="RenderNullLink.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Textures\TextureLoaderCI.cpp">
+      <Filter>Common\Textures\Loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Textures\TextureLoaderDDS.cpp">
+      <Filter>Common\Textures\Loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Textures\TextureLoaderJPG.cpp">
+      <Filter>Common\Textures\Loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Textures\TextureLoaderPNG.cpp">
+      <Filter>Common\Textures\Loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Textures\TextureLoaderPSD.cpp">
+      <Filter>Common\Textures\Loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Textures\TextureLoaderTGA.cpp">
+      <Filter>Common\Textures\Loaders</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Textures\XTextureFile.cpp">
+      <Filter>Common\Textures</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
