@@ -363,6 +363,7 @@
     <None Include="Platform\win32\Window.inl" />
     <None Include="Random\MultiplyWithCarry.inl" />
     <None Include="Random\XorShift.inl" />
+    <None Include="String\GrowingStringTable.inl" />
     <None Include="String\StackString.inl" />
     <None Include="String\Path.inl" />
     <None Include="String\StringHash.inl" />

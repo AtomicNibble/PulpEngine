@@ -9,7 +9,9 @@
 
 X_NAMESPACE_BEGIN(core)
 
-template<typename IdType>
+// valid IdTypes: uint16_t, uint32_t
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
 class GrowingStringTable
 {
 	X_PRAGMA(pack(push, 4))
@@ -21,13 +23,12 @@ class GrowingStringTable
 	X_PRAGMA(pack(pop))
 
 public:
-	typedef IdType Id;
-	static IdType InvalidId = (IdType)-1;
+	typedef IdType IdType;
+	static const IdType InvalidId = (IdType)-1;
 
 	GrowingStringTable(core::MemoryArenaBase* arena);
 	~GrowingStringTable();
 
-	void setSize(size_t blockGranularity, size_t BlockSize, size_t Alignment);
 	void free(void);
 
 	X_INLINE IdType addString(const char* str);
@@ -37,18 +38,18 @@ public:
 
 	X_INLINE size_t numStrings(void) const;
 	X_INLINE size_t wastedBytes(void) const;
+	X_INLINE size_t allocatedBytes(void) const;
 
 private:
 	void ensureFreeBlocks(size_t numBlocks);
-
-	Header_t* getCurrentAlignedHeader();
+	Header_t* getCurrentAlignedHeader(void);
 
 private:
-	size_t CurrentBlock_;
-	size_t currentBlockSpace_;
-	size_t blockGranularity_; // how many blocks we grow by.
-	size_t BlockSize_;	// the size of each block.
-	size_t Alignment_; // pointers return are aligned to this.
+	X_NO_COPY(GrowingStringTable);
+	X_NO_ASSIGN(GrowingStringTable);
+
+	IdType CurrentBlock_;
+	IdType currentBlockSpace_;
 
 	// stats
 	size_t NumStrings_;
@@ -58,11 +59,8 @@ private:
 	core::MemoryArenaBase* arena_;
 };
 
-template<typename IdType>
-IdType GrowingStringTable<IdType>::addString(const char* str)
-{
-	return addString(str, strlen(str));
-}
+
+#include "GrowingStringTable.inl"
 
 X_NAMESPACE_END
 
