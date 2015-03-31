@@ -52,7 +52,7 @@ IdType StringTable<NumBlocks, BlockSize, Alignment, IdType>::addString(const cha
 template<int NumBlocks, int BlockSize, int Alignment, typename IdType>
 const char* StringTable<NumBlocks, BlockSize, Alignment, IdType>::getString(IdType ID) const
 {
-	X_ASSERT(ID < MaxBlocks_, "Strid out of range")(ID);
+	X_ASSERT(ID < MaxBlocks_, "String out of range")(ID);
 	return reinterpret_cast<const char*>(&Buffer_[4 + (BlockSize * ID) + sizeof(Header_t)]);
 }
 
@@ -114,7 +114,7 @@ void StringTableUnique<NumBlocks, BlockSize, Alignment, IdType>::AddStringToTrie
 	int c;
 	while ((c = *Txt++)) {
 		if (node->chars[c] == nullptr) {
-			node->chars[c] = new Node;
+			node->chars[c] = new Node; // TODO: use a arena!!
 			NumNodes_++;
 		}
 		node = node->chars[c];

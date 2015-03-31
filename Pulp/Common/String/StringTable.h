@@ -70,6 +70,8 @@ protected:
 /// 
 /// Very useful for joint names since there will be many models with simular bone names.
 ///
+/// Typically used in tools, at runtime duplicated should of already been removed.
+///
 /// InsertUnique() is O(log n)
 template<int NumBlocks, int BlockSize, int Alignment, typename IdType>
 class StringTableUnique :
