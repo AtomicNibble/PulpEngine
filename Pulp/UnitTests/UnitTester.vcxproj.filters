@@ -259,6 +259,9 @@
     <ClCompile Include="Profiler.cpp">
       <Filter>Source Files\Profile</Filter>
     </ClCompile>
+    <ClCompile Include="UT_GrowingStringTable.cpp">
+      <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">

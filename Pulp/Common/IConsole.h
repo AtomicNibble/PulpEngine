@@ -66,6 +66,7 @@ struct IConsole
 
 	virtual void Startup(ICore* pCore) X_ABSTRACT;
 	virtual void ShutDown() X_ABSTRACT;
+	virtual void unregisterInputListener(void) X_ABSTRACT;
 	virtual void freeRenderResources() X_ABSTRACT;
 
 	virtual void Draw() X_ABSTRACT;

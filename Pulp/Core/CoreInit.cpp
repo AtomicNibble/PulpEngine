@@ -124,6 +124,7 @@ bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassNa
 	else
 	{
 		X_ERROR("Core", "failed to find interface: %s -> %s", dllName, moduleClassName);
+		return false;
 	}
 
 	moduleInterfaces_.append(pModule);
@@ -273,7 +274,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 
 	// #------------------------- Renderer -------------------------
-	if (!startupParams.isCoreOnly()) {
+	if (!startupParams.isCoreOnly() || startupParams.bTesting) {
 		if (!InitRenderSys(startupParams))
 			return false;
 	}

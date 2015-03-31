@@ -9,6 +9,8 @@
 
 #include <Util\Pointer64.h>
 
+#include <IRenderMesh.h>
+
 X_NAMESPACE_BEGIN(bsp)
 
 
@@ -204,6 +206,15 @@ X_NAMESPACE_BEGIN(bsp)
 //
 //	Each area in the map is considered to be a model with x surfaces.
 //	
+//	Since each area is classed as a model the XModels in the level format are all that are needed to render
+//	the whole map.
+//	
+//	But we store other information that is used for collision and working out where you are in the level.
+//	this information is laos used to tell you what area these models are in.
+//
+//	So once we found out what area we are located in, we add the area for rendering.
+//  
+//
 //
 //
 
@@ -263,8 +274,8 @@ class XWinding;
 X_DECLARE_FLAGS(MatContentFlags)(SOLID, WATER, PLAYER_CLIP, MONSTER_CLIP, TRIGGER, NO_FALL_DMG, DETAIL, STRUCTURAL, ORIGIN);
 X_DECLARE_FLAGS(MatSurfaceFlags)(NO_DRAW, LADDER);
 
-// may add more as i make them.
-X_DECLARE_ENUM(LumpType)(Entities, Materials, Planes, Verts, Indexes, Brushes, BrushSides, Surfaces, Nodes, Leafs, Areas, Portals);
+// this is the flags for the file header, which tells you what option stuff is inside the file.
+X_DECLARE_FLAGS(LevelFileFlags)(OCT_TREE);
 X_DECLARE_ENUM(SurfaceType)(Invalid, Plane, Patch);
 
 typedef Flags<MatContentFlags> MatContentFlag;
@@ -279,6 +290,7 @@ typedef Flags<MatSurfaceFlags> MatSurfaceFlag;
 //	so the entry in the map manger we just be updated.
 struct Material
 {
+	// move this to a string table.
 	core::StackString<MAP_MAX_MATERIAL_LEN> Name;
 	MatSurfaceFlag		surfaceFlag;
 	MatContentFlag		contentFlag;
@@ -355,33 +367,41 @@ struct Portal
 {
 	int32_t		areaTo;		// the area this portal leads to.
 	XWinding*	pWinding;	// winding points have counter clockwise ordering seen this area
-							// should i add seralise support to winding?
-							// or i could have a diffrent portal structure for the file.
+	// should i add seralise support to winding?
+	// or i could have a diffrent portal structure for the file.
 
 	Planef		plane;		// view must be on the positive side of the plane to cross
-//	Portal*		pNext;		
+	//	Portal*		pNext;		
+};
+
+
+struct Entity
+{
+	Vec3f pos;
+
+};
+
+
+struct StaticModel : public Entity
+{
+	uint16_t modelNameIdx; // string table.
+
+	core::Pointer64<model::IRenderMesh > pRenderMesh;
 };
 
 struct Area
 {
 	int32_t areaNum;
-	int32_t numPortals;
+	int32_t numPortals; // te number of portals leading out the area
+	int32_t numStaticModels;
+
 	core::Pointer64<Portal> pPortals;
 	
-	AABB bounds; // 0x28
+	AABB boundingBox;
+	Sphere boundingSphere;
 };
 
 // ============ File Structure stuff =========
-
-struct FileLump
-{
-	uint32_t offset; // no 4gb+ bsp's for you!
-	uint32_t size;
-
-	const bool isValid(void) const {
-		return offset > 0 && size > 0;
-	}
-};
 
 
 struct FileHeader
@@ -390,15 +410,15 @@ struct FileHeader
 	uint8_t  version;
 	uint8_t  blank[3];
 
+	Flags<LevelFileFlags> flags;
+
 	core::dateTimeStampSmall modified; // 4
 
 	// crc32 is just the header data
 	uint32_t datacrc32;
-
 	uint32_t datasize;
-	uint32_t numAreaModels;
-
-//	FileLump lumps[LumpType::ENUM_COUNT];
+	// the number of area;s in the level file.
+	uint32_t numAreas;
 
 	const bool isValid(void) const {
 		return fourCC == BSP_FOURCC;
@@ -421,11 +441,8 @@ X_ENSURE_SIZE(Brush, 12);
 X_ENSURE_SIZE(Leaf, 0x30);
 X_ENSURE_SIZE(Node, 0x24);
 // X_ENSURE_SIZE(Portal, 0x28);
-X_ENSURE_SIZE(Area, 0x28);
+X_ENSURE_SIZE(Area, 0x28 + 0xC + 12);
 
-
-X_ENSURE_SIZE(FileLump, 8);
-// X_ENSURE_SIZE(FileHeader, (16 + (8 * LumpType::ENUM_COUNT)));
 
 X_NAMESPACE_END
 

@@ -25,6 +25,7 @@ public:
 	bool Init(void) X_FINAL;
 	bool ShutDown(void) X_FINAL;
 	bool Update(void) X_FINAL;
+	void release(void) X_FINAL;
 	// ~IGame
 
 	// IInputEventListner

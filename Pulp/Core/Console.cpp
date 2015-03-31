@@ -610,15 +610,13 @@ void XConsole::Startup(ICore* pCore)
 	pCore->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
 }
 
-void XConsole::ShutDown()
+void XConsole::ShutDown(void)
 {
 	X_LOG0("Console", "Shutting Down");
 
-
 	pCore_->GetHotReloadMan()->addfileType(nullptr, CONFIG_FILE_EXTENSION);
 	pCore_->GetILog()->RemoveLogger(&logger_);
-	pInput_->RemoveConsoleEventListener(this);
-
+	unregisterInputListener();
 
 	// clear up vars.
 	if (!VarMap_.empty())
@@ -630,7 +628,15 @@ void XConsole::ShutDown()
 	}
 }
 
-void XConsole::freeRenderResources()
+void XConsole::unregisterInputListener(void)
+{
+	pInput_ = gEnv->pInput;
+	if (pInput_) {
+		pInput_->RemoveConsoleEventListener(this);
+	}
+}
+
+void XConsole::freeRenderResources(void)
 {
 	if (pRender_)
 	{
@@ -2299,17 +2305,22 @@ void XConsoleNULL::Startup(ICore* pCore)
 
 }
 
-void XConsoleNULL::ShutDown()
+void XConsoleNULL::ShutDown(void)
 {
 
 }
 
-void XConsoleNULL::freeRenderResources()
+void XConsoleNULL::unregisterInputListener(void)
 {
 
 }
 
-void XConsoleNULL::Draw()
+void XConsoleNULL::freeRenderResources(void)
+{
+
+}
+
+void XConsoleNULL::Draw(void)
 {
 
 }

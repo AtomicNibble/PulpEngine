@@ -432,6 +432,7 @@
     <ClCompile Include="UT_C_HashMap.cpp" />
     <ClCompile Include="UT_C_Stack.cpp" />
     <ClCompile Include="UT_Flags.cpp" />
+    <ClCompile Include="UT_GrowingStringTable.cpp" />
     <ClCompile Include="UT_Hash.cpp" />
     <ClCompile Include="UT_Lexer.cpp" />
     <ClCompile Include="UT_MemoryCursor.cpp" />

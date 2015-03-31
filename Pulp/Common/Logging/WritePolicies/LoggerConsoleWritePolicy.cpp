@@ -62,6 +62,19 @@ namespace {
 
 	};
 
+	unsigned __int16 COLOR_CODE_TABLE[10] = {
+		MakeColor(COL_BLACK, COL_GRAY),
+		MakeColor(COL_RED, COL_GRAY),
+		MakeColor(COL_YELLOW, COL_GRAY),
+		MakeColor(COL_BLUE, COL_GRAY),
+		MakeColor(COL_BLUE_LIGHT, COL_GRAY),
+		MakeColor(COL_LIGHTPINK, COL_GRAY),
+		MakeColor(COL_ORANGE, COL_GRAY),
+		MakeColor(COL_WHITE, COL_GRAY),
+		MakeColor(COL_GREEN, COL_GRAY),
+		MakeColor(COL_GREEN, COL_GRAY),
+	};
+
 }
 
 
@@ -125,9 +138,15 @@ namespace {
 		DWORD NumberOfCharsWritten;
 		DWORD SectionSize = 0;
 		bool isString = false;
+		bool hasCoolorCode = false;
 		const char *pOem;
 
 		CharToOem( asciiMsg, oemMsg );	
+
+		// has a ^?
+		if (core::strUtil::Find(asciiMsg, asciiMsg + length, '^')) {
+			hasCoolorCode = true;
+		}
 
 		pOem = oemMsg;
 		msgEnd = (unsigned int)&oemMsg[length];
@@ -145,12 +164,62 @@ namespace {
 					NumberOfCharsWritten = 0;
 					WriteConsoleA( console, pOem, SectionSize, &NumberOfCharsWritten, 0);
 
+					SetConsoleTextAttribute(console, color);
+
 					length -= SectionSize;
 					pOem = (char *)pOem + SectionSize;
 					SectionSize = 0;
 				}
 
 
+#if 1
+				if (colorizeExtended)
+				{
+					char curChar = *(pOem + SectionSize);
+					if (hasCoolorCode && curChar == '^' && SectionSize < length)
+					{
+						char colChar = *(pOem + SectionSize + 1);
+						if (core::strUtil::IsDigit(colChar))
+						{
+							int colorIndex = colChar - '0';
+
+							// we draw anything then change color.
+							NumberOfCharsWritten = 0;
+							WriteConsoleA(console, pOem, SectionSize, &NumberOfCharsWritten, 0);
+
+							SetConsoleTextAttribute(console, COLOR_CODE_TABLE[colorIndex]);
+
+							SectionSize += 2;
+
+							length -= SectionSize;
+							pOem = (char *)pOem + SectionSize;
+							SectionSize = 0;
+						}
+					}
+					else if (!hasCoolorCode && curChar == '\"')
+					{
+						// still make text green.
+						if (isString)
+						{
+							++SectionSize;
+							SetConsoleTextAttribute( console, STRING_COLOR );
+						}
+						else
+						{
+							SetConsoleTextAttribute( console, color );
+						}	
+
+						NumberOfCharsWritten = 0;
+						WriteConsoleA( console, pOem, SectionSize, &NumberOfCharsWritten, 0 );
+
+						length -= SectionSize;
+						pOem = (char *)pOem + SectionSize;
+						SectionSize = 0;
+
+						isString = (isString == 0);
+					}
+				}
+#else
 				if ( colorizeExtended && *(pOem + SectionSize) == '\"' )
 				{
 					if ( isString )
@@ -172,6 +241,7 @@ namespace {
 
 					isString = (isString == 0);
 				}
+#endif
 
 				++SectionSize;
 			}

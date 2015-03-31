@@ -157,3 +157,6 @@ $RECYCLE.BIN/
 *.guib
 /game_folder/shaders/compiled
 /game_folder/shaders/temp
+
+# compiled level files
+*.level

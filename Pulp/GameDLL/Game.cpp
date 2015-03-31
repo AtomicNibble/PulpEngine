@@ -82,6 +82,10 @@ bool XGame::Update(void)
 	return true;
 }
 
+void XGame::release(void)
+{
+	X_DELETE(this, g_gameArena);
+}
 
 bool XGame::OnInputEvent(const input::InputEvent& event)
 {

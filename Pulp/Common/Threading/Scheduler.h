@@ -181,7 +181,7 @@ public:
 	void SubmitJobList(JobList* pList, JobList* pWaitFor = nullptr);
 
 private:
-	uint32_t numThreads_; // num created.
+	int32_t numThreads_; // num created.
 	JobThread threads_[HW_THREAD_MAX];
 
 	core::CriticalSection addJobListCrit_;

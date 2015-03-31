@@ -753,7 +753,7 @@ namespace DDS
 
 
 		// load the image data.
-		XTextureFile* img = X_NEW_ALIGNED(XTextureFile, g_rendererArena, "TextureFile", 8);
+		XTextureFile* img = X_NEW(XTextureFile, g_rendererArena, "TextureFile");
 		TextureFlags flags;
 
 		if (pixel_util::has_alpha(format))

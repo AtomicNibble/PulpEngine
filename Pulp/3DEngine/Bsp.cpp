@@ -11,44 +11,13 @@ X_NAMESPACE_BEGIN(bsp)
 
 namespace
 {
-	template<typename T>
-	bool LoadLump(core::XFileMemScoped& file, const FileLump& lump, core::Array<T>& vec)
-	{
-		uint32_t num = lump.size / sizeof(T);
 
-		// check lump size is valid.
-		if ((num * sizeof(T)) != lump.size)
-			return false;
 
-		// a lump must have some sort of offset.
-		if (lump.offset == 0)
-			return false;
-
-		vec.resize(num);
-
-		// seek if needed.
-		file->seek(lump.offset, core::SeekMode::SET);
-		return file->read(vec.ptr(), lump.size) == lump.size;
-	}
-
-	template<typename T>
-	bool IsBelowLimit(const FileHeader& hdr, LumpType::Enum type, uint32_t max)
-	{
-		uint32_t num = 0; // hdr.lumps[type].size / sizeof(T);
-
-		if (num > max) 
-		{
-			X_ERROR("Bsp", "too many %s: %i max: %i",
-				LumpType::ToString(type), num, max);
-			return false;
-		}
-		return true;
-	}
 
 }
 
 Bsp::Bsp() :
-	data_(g_3dEngineArena),
+	numAreas_(0),
 	areaModels_(g_3dEngineArena)
 {
 	pFileData_ = nullptr;
@@ -132,6 +101,16 @@ bool Bsp::LoadFromFile(const char* filename)
 			return false;
 		}
 
+		// require atleast one area.
+		if(hdr.numAreas < 1)
+		{
+			X_ERROR("Bsp", "Level file has no areas");
+			return false;
+		}
+
+		// copy some stuff.
+		numAreas_ = hdr.numAreas;
+
 
 		pFileData_ = X_NEW_ARRAY(uint8_t, hdr.datasize, g_3dEngineArena, "LevelBuffer");
 		
@@ -150,8 +129,8 @@ bool Bsp::LoadFromFile(const char* filename)
 		core::MemCursor<uint8_t> cursor(pFileData_, hdr.datasize);
 		uint32_t x, numSub;
 
-		areaModels_.reserve(hdr.numAreaModels);
-		for (uint32_t i = 0; i < hdr.numAreaModels; i++)
+		areaModels_.reserve(hdr.numAreas);
+		for (uint32_t i = 0; i < hdr.numAreas; i++)
 		{
 			model::MeshHeader* pMesh = cursor.getSeekPtr<model::MeshHeader>();		
 			numSub = pMesh->numSubMeshes;
@@ -197,53 +176,6 @@ bool Bsp::LoadFromFile(const char* filename)
 			X_WARNING("Bsp", "potential read error, cursor is not at end");
 		}
 
-		// make some render meshes.
-
-		
-
-#if 0
-
-		//	areaModels_.resize(hdr.numAreaModels);
-		for (uint32_t i = 0; i < hdr.numAreaModels; i++)
-		{
-			//	file->readObj(areaModels_[i]);
-		}
-
-		// do some limit checking.
-		// no pesky bsp's !
-		bool belowLimits = true;
-		belowLimits &= IsBelowLimit<Vertex>(hdr, LumpType::Materials, MAP_MAX_MATERIALs);
-		belowLimits &= IsBelowLimit<Vertex>(hdr, LumpType::Planes, MAP_MAX_PLANES);
-		belowLimits &= IsBelowLimit<Vertex>(hdr, LumpType::Verts, MAP_MAX_VERTS);
-		belowLimits &= IsBelowLimit<Index>(hdr, LumpType::Indexes, MAP_MAX_INDEXES);
-		belowLimits &= IsBelowLimit<Brush>(hdr, LumpType::Brushes, MAP_MAX_BRUSHES);
-		belowLimits &= IsBelowLimit<BrushSide>(hdr, LumpType::BrushSides, MAP_MAX_BRUSHSIDES);
-		belowLimits &= IsBelowLimit<Surface>(hdr, LumpType::Surfaces, MAP_MAX_SURFACES);
-		belowLimits &= IsBelowLimit<Node>(hdr, LumpType::Nodes, MAP_MAX_NODES);
-		belowLimits &= IsBelowLimit<Leaf>(hdr, LumpType::Leafs, MAP_MAX_LEAFS);
-		belowLimits &= IsBelowLimit<Area>(hdr, LumpType::Areas, MAP_MAX_AREAS);
-		belowLimits &= IsBelowLimit<uint8_t>(hdr, LumpType::Portals, MAP_MAX_PORTALS);
-
-
-		if (belowLimits == false)
-		{
-			X_ERROR("Bsp", "%s exceeds level limits.", path.fileName());
-			return false;
-		}
-
-		// time to load some data.
-		LumpsLoaded = true;
-//		LumpsLoaded &= LoadLump<Surface>(file, hdr.lumps[LumpType::Surfaces], data_.surfaces);
-//		LumpsLoaded &= LoadLump<Vertex>(file, hdr.lumps[LumpType::Verts], data_.verts);
-//		LumpsLoaded &= LoadLump<Index>(file, hdr.lumps[LumpType::Indexes], data_.indexes);
-//		LumpsLoaded &= LoadLump<Area>(file, hdr.lumps[LumpType::Areas], data_.areas);
-
-		if (LumpsLoaded == false)
-		{
-			X_ERROR("Bsp", "Failed to load lumps from: %s", path.fileName());
-			return false;
-		}
-#endif
 
 		file.close(); // not needed but makes my nipples more perky.
 		return true;

@@ -14,22 +14,6 @@ struct IRenderMesh;
 
 X_NAMESPACE_BEGIN(bsp)
 
-struct BSPData
-{
-	BSPData(core::MemoryArenaBase* arena) :
-	areas(arena),
-	surfaces(arena),
-	verts(arena),
-	indexes(arena)
-	{}
-
-	core::Array<bsp::Area> areas;
-	core::Array<bsp::Surface> surfaces;
-	core::Array<bsp::Vertex> verts;
-	core::Array<bsp::Index> indexes;
-};
-
-
 
 class Bsp
 {
@@ -44,7 +28,8 @@ public:
 
 
 private:
-	BSPData data_;
+
+	uint32_t numAreas_;
 
 
 	struct AreaModel

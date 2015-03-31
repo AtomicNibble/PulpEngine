@@ -473,7 +473,7 @@ void DX11XRender::DrawQuad(float x, float y, float z, float width, float height,
 void DX11XRender::DrawQuad(float x, float y, float z, float width, float height, const Color& col)
 {
 	SetCullMode(CullMode::NONE);
-	SetFFE(false);
+	SetFFE(shader::VertexFormat::P3F_T2F_C4B, false);
 
 	float fx = x;
 	float fy = y;
@@ -509,9 +509,6 @@ void DX11XRender::DrawQuad(float x, float y, float z, float width, float height,
 
 	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
 	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
-
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
-		return;
 
 	// Render the two triangles from the data stream
 	FX_DrawPrimitive(PrimitiveType::TriangleStrip, nOffs, 4);

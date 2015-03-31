@@ -961,6 +961,9 @@
     <ClInclude Include="Threading\win32\Signal.h">
       <Filter>Headers\Threading\win32</Filter>
     </ClInclude>
+    <ClInclude Include="String\GrowingStringTable.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1205,6 +1208,12 @@
     </None>
     <None Include="Util\Cpu.inl">
       <Filter>Headers\Util</Filter>
+    </None>
+    <None Include="String\StringTable.inl">
+      <Filter>Headers\String</Filter>
+    </None>
+    <None Include="String\GrowingStringTable.inl">
+      <Filter>Headers\String</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1451,6 +1460,9 @@
     </ClCompile>
     <ClCompile Include="Threading\win32\Signal.cpp">
       <Filter>SourceFiles\Threading\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="String\GrowingStringTable.cpp">
+      <Filter>SourceFiles\String</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

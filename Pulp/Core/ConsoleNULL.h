@@ -18,11 +18,12 @@ public:
 	virtual ~XConsoleNULL() X_FINAL;
 
 	virtual void Startup(ICore* pCore) X_FINAL;
-	virtual void ShutDown() X_FINAL;
-	virtual void freeRenderResources() X_FINAL;
+	virtual void ShutDown(void) X_FINAL;
+	virtual void unregisterInputListener(void) X_FINAL;
+	virtual void freeRenderResources(void) X_FINAL;
 
 
-	virtual void Draw() X_FINAL;
+	virtual void Draw(void) X_FINAL;
 
 	virtual ICVar* RegisterString(const char* Name, const char* Value, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
 	virtual ICVar* RegisterInt(const char* Name, int Value, int Min, int Max, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;

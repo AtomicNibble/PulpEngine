@@ -245,6 +245,7 @@
     <ClInclude Include="Random\XorShift.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="String\Base64.h" />
+    <ClInclude Include="String\GrowingStringTable.h" />
     <ClInclude Include="String\HumanSize.h" />
     <ClInclude Include="String\Lexer.h" />
     <ClInclude Include="String\StackString.h" />
@@ -362,10 +363,12 @@
     <None Include="Platform\win32\Window.inl" />
     <None Include="Random\MultiplyWithCarry.inl" />
     <None Include="Random\XorShift.inl" />
+    <None Include="String\GrowingStringTable.inl" />
     <None Include="String\StackString.inl" />
     <None Include="String\Path.inl" />
     <None Include="String\StringHash.inl" />
     <None Include="String\StringRange.inl" />
+    <None Include="String\StringTable.inl" />
     <None Include="String\StringUtil.inl" />
     <None Include="String\StrRef.inl" />
     <None Include="Threading\Atomic.inl" />
@@ -644,6 +647,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="String\Base64.cpp" />
+    <ClCompile Include="String\GrowingStringTable.cpp" />
     <ClCompile Include="String\HumanSize.cpp" />
     <ClCompile Include="String\Lexer.cpp" />
     <ClCompile Include="String\StringTokenizer.cpp">

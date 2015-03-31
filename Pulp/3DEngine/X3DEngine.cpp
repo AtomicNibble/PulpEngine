@@ -59,25 +59,8 @@ bool X3DEngine::Init()
 	pGuiManger_ = &guisMan_;
 
 	guisMan_.Init();
-	gui = guisMan_.loadGui("test");
-
-	
-	// load a lvl lol.
-//	map.LoadFromFile("killzone"); // mmmmm
-//	map.LoadFromFile("box"); // mmmmm
-
-		pTex = pRender_->LoadTexture("textures/berlin_floors_rock_tile2_c.dds",
-			texture::TextureFlags::DONT_STREAM);
-		pTex1 = pRender_->LoadTexture("textures/model_test.dds",
-			texture::TextureFlags::DONT_STREAM);
 
 
-		pTexSky = pRender_->LoadTexture("textures/skybox_sky.dds",
-			texture::TextureFlags::DONT_STREAM);
-
-
-
-	LoadModel();
 	return false;
 }
 
@@ -134,8 +117,11 @@ void X3DEngine::Update(void)
 
 }
 
+
+
 void X3DEngine::LoadModel(void)
 {
+/*
 	model::ModelLoader loader;
 
 	pMesh = nullptr;
@@ -162,6 +148,7 @@ void X3DEngine::LoadModel(void)
 
 		pSkybox->uploadToGpu();
 	}
+*/
 }
 
 

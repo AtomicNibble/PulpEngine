@@ -6,6 +6,7 @@
 
 #include "ICore.h"
 #include "ITimer.h"
+#include "IConsole.h"
 
 // #include "SystemTimer.h"
 
@@ -378,17 +379,24 @@ void Scheduler::StartThreads(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pCore);
+	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
 	// get the num HW threads
 	ICore* pCore = (ICore*)gEnv->pCore;
 	CpuInfo* pCpu = pCore->GetCPUInfo();
 
-	uint32_t numCores = pCpu->GetCoreCount();
+	int32_t numCores = pCpu->GetCoreCount();
 	numThreads_ = core::Max(core::Min(HW_THREAD_MAX, numCores - HW_THREAD_NUM_DELTA), 1u);
+
+	// create a var.
+	ADD_CVAR_REF("scheduler_numThreads", numThreads_, numThreads_, 1,
+		HW_THREAD_MAX, core::VarFlag::SYSTEM,
+		"The number of threads used by the job scheduler");
+
 
 	X_LOG0("Scheduler", "Creating %i threads", numThreads_);
 
-	uint32_t i;
+	int32_t i;
 	for (i = 0; i < numThreads_; i++)
 	{
 		core::StackString<64> name;
@@ -404,7 +412,7 @@ void Scheduler::ShutDown(void)
 {
 	X_LOG0("Scheduler", "Shuting down");
 
-	uint32_t i;
+	int32_t i;
 
 	for (i = 0; i < numThreads_; i++) {
 		threads_[i].Stop(); 
@@ -423,7 +431,7 @@ void Scheduler::SubmitJobList(JobList* pList, JobList* pWaitFor)
 
 	pList->PreSubmit();
 
-	for (uint32_t i = 0; i < numThreads_; i++) {
+	for (int32_t i = 0; i < numThreads_; i++) {
 		threads_[i].AddJobList(pList);
 		threads_[i].SignalWork();
 	}
