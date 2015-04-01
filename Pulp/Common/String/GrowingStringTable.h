@@ -25,6 +25,11 @@ class GrowingStringTable
 public:
 	typedef IdType IdType;
 	static const IdType InvalidId = (IdType)-1;
+	// copy's of the tmeplate values.
+	static const size_t ALIGNMENT = Alignment;
+	static const size_t BLOCK_SIZE = Blocksize;
+	static const size_t BLOCK_GRANULARITY = blockGranularity;
+
 
 	GrowingStringTable(core::MemoryArenaBase* arena);
 	~GrowingStringTable();
