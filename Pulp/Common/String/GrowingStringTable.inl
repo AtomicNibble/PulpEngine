@@ -67,7 +67,19 @@ IdType GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::addSt
 	size_t NumBlocks = (Len + sizeof(Header_t)+BlockSize) / BlockSize;
 
 	// grow if needed.
+	// Note: won't grow past max blocks type can hold.
 	ensureFreeBlocks(NumBlocks);
+
+	// if we have reached make blocks for this id.
+	// then currentBlockSpace_ will stop increasing.
+	// so we check if we have room here.
+	size_t blocksLeft = currentBlockSpace_ - CurrentBlock_;	
+
+	if(blocksLeft < NumBlocks) {
+		X_ERROR("GrowingStringTable", "Reached the limit of id. sizeof(Id) = ", sizeof(IdType));
+		return InvalidId;
+	}
+
 
 	// get header that is aligned after the header.
 	Header_t* pHeader = getCurrentAlignedHeader();
