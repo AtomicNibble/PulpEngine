@@ -27,6 +27,16 @@ GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::~GrowingStri
 }
 
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+void GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::reserve(size_t numBlocks);
+{
+	if(numBlocks > currentBlockSpace_)
+	{
+			ensureFreeBlocks(numblocks - currentBlockSpace_);
+	}
+}
+
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
 void GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::free(void)
 {
 	CurrentBlock_ = 0;

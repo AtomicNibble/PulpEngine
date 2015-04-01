@@ -29,6 +29,7 @@ public:
 	GrowingStringTable(core::MemoryArenaBase* arena);
 	~GrowingStringTable();
 
+	void reserve(size_t numBlocks);
 	void free(void);
 
 	X_INLINE IdType addString(const char* str);
