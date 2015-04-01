@@ -66,20 +66,11 @@ IdType GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::addSt
 	// ensure space for null terminator as we return pointers to this memory.
 	size_t NumBlocks = (Len + sizeof(Header_t)+BlockSize) / BlockSize;
 
-	// grow if needed.
-	// Note: won't grow past max blocks type can hold.
-	ensureFreeBlocks(NumBlocks);
-
-	// if we have reached make blocks for this id.
-	// then currentBlockSpace_ will stop increasing.
-	// so we check if we have room here.
-	size_t blocksLeft = currentBlockSpace_ - CurrentBlock_;	
-
-	if(blocksLeft < NumBlocks) {
+	// grow if needed. returns false if IdType can't represent.
+	if(!requestFreeBlocks(NumBlocks)) {}
 		X_ERROR("GrowingStringTable", "Reached the limit of id. sizeof(Id) = ", sizeof(IdType));
 		return InvalidId;
 	}
-
 
 	// get header that is aligned after the header.
 	Header_t* pHeader = getCurrentAlignedHeader();
@@ -115,8 +106,15 @@ const char* GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::
 }
 
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
-void GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::ensureFreeBlocks(size_t numBlocks)
+bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::requestFreeBlocks(size_t numBlocks)
 {
+	size_t potentialBlocks = MAX_BLOCKS - currentBlockSpace_;
+	// can we evern represent the requested blocks with this type?
+	if(potentialBlocks < numBlocks)
+	{
+		return false;
+	}
+
 	if ((CurrentBlock_ + numBlocks) > currentBlockSpace_)
 	{
 		size_t requiredBytes = buffer_.capacity() + (blockGranularity * BlockSize);
@@ -136,8 +134,13 @@ void GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::ensureF
 		buffer_.setGranularity(blockGranularity * BlockSize);
 
 		// update max blocks.
-		currentBlockSpace_ = safe_static_cast<IdType, size_t>(buffer_.capacity() / BlockSize);
+		currentBlockSpace_ = safe_static_cast<IdType, size_t>(
+			core::Min(MAX_BYTES,buffer_.capacity()) / BlockSize
+		);
+		return true;
 	}
+
+	return true;
 }
 
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>

@@ -29,6 +29,8 @@ public:
 	static const size_t ALIGNMENT = Alignment;
 	static const size_t BLOCK_SIZE = Blocksize;
 	static const size_t BLOCK_GRANULARITY = blockGranularity;
+	static const size_t MAX_BLOCKS = (std::numeric_limits::<IdType>::Max() / BlockSize);
+	static const size_t MAX_BYTES = MAX_BLOCKS * BLOCK_SIZE;
 
 
 	GrowingStringTable(core::MemoryArenaBase* arena);
@@ -47,7 +49,8 @@ public:
 	X_INLINE size_t allocatedBytes(void) const;
 
 private:
-	void ensureFreeBlocks(size_t numBlocks);
+	// request X number of free blocks.
+	bool requestFreeBlocks(size_t numBlocks);
 	Header_t* getCurrentAlignedHeader(void);
 
 private:
