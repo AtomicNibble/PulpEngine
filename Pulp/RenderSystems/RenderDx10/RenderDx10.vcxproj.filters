@@ -101,9 +101,6 @@
     <ClInclude Include="DeviceManager\VidMemManager.h">
       <Filter>DeviceManager</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Input\Win32Input.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\TextDrawList.h">
       <Filter>Common</Filter>
     </ClInclude>
