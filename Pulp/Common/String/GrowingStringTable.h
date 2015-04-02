@@ -24,13 +24,13 @@ class GrowingStringTable
 
 public:
 	typedef IdType IdType;
-	static const IdType InvalidId = (IdType)-1;
+	static const IdType InvalidId = IdType(-1);
 	// copy's of the tmeplate values.
 	static const size_t ALIGNMENT = Alignment;
-	static const size_t BLOCK_SIZE = Blocksize;
+	static const size_t BLOCK_SIZE = BlockSize;
 	static const size_t BLOCK_GRANULARITY = blockGranularity;
-	static const size_t MAX_BLOCKS = (std::numeric_limits::<IdType>::Max() / BlockSize);
-	static const size_t MAX_BYTES = MAX_BLOCKS * BLOCK_SIZE;
+//	static const size_t MAX_BLOCKS = (std::numeric_limits<IdType>::max() / BLOCK_SIZE);
+//	static const size_t MAX_BYTES = MAX_BLOCKS * BLOCK_SIZE;
 
 
 	GrowingStringTable(core::MemoryArenaBase* arena);

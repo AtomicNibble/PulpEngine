@@ -110,6 +110,9 @@ const char* GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
 bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::requestFreeBlocks(size_t numBlocks)
 {
+	static const size_t MAX_BLOCKS = (std::numeric_limits<IdType>::max() / BLOCK_SIZE);
+	static const size_t MAX_BYTES = MAX_BLOCKS * BLOCK_SIZE;
+
 	size_t potentialBlocks = MAX_BLOCKS - currentBlockSpace_;
 	// can we evern represent the requested blocks with this type?
 	if(potentialBlocks < numBlocks)
