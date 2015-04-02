@@ -70,7 +70,7 @@ IdType GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::addSt
 
 	// grow if needed. returns false if IdType can't represent.
 	if(!requestFreeBlocks(NumBlocks)) {
-		X_ERROR("GrowingStringTable", "Reached the limit of id. sizeof(Id) = ", sizeof(IdType));
+		X_ERROR("GrowingStringTable", "Reached the limit of id. sizeof(IdType) = ", sizeof(IdType));
 		return InvalidId;
 	}
 
@@ -112,6 +112,13 @@ bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::request
 {
 	static const size_t MAX_BLOCKS = (std::numeric_limits<IdType>::max() / BLOCK_SIZE);
 	static const size_t MAX_BYTES = MAX_BLOCKS * BLOCK_SIZE;
+
+	size_t freeBlocks = currentBlockSpace_ - CurrentBlock_;
+
+	if (freeBlocks > numBlocks)
+	{
+		return true;
+	}
 
 	size_t potentialBlocks = MAX_BLOCKS - currentBlockSpace_;
 	// can we evern represent the requested blocks with this type?
