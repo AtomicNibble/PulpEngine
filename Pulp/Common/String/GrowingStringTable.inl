@@ -17,6 +17,8 @@ arena_(arena)
 	X_ASSERT(BlockSize >= Alignment, "Block size must be equal or greater than Alignment")(BlockSize, Alignment);
 	// lets also make it a multiple of the alignment.
 	X_ASSERT((BlockSize % Alignment) == 0, "Block size must be multiple of Alignment")(BlockSize, Alignment);
+	// Not stupid alignment.
+	X_ASSERT((Alignment <= 64, "Alignment must be 64 or lower")(Alignment);
 
 }
 
