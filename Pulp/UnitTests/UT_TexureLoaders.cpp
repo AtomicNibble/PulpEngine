@@ -56,11 +56,15 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path path)
 				const bool isValid = loaded->isValid();
 
 				EXPECT_EQ(fmt, loaded->getFormat());
-
-				if (loaded) {
-					loaded->release();
-					result = true;
+				if (fmt != loaded->getFormat()) {
+					X_ERROR("UT", "ReturnFmt: %s ExpectedFmt: %s Path: %s", 
+						Texturefmt::ToString(loaded->getFormat()),
+						Texturefmt::ToString(fmt),
+						testFolder.c_str());
 				}
+
+				loaded->release();
+				result = true;
 			}
 		}
 	}
@@ -74,15 +78,16 @@ TEST(DDS, ati2)
 	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::ATI2, Path("test_img_load_ati2_nomips.dds")));
 }
 
-TEST(DDS, R8B8G8A8)
+TEST(DDS, A8R8G8B8)
 {
 	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::A8R8G8B8, Path("test_img_load_A8R8G8B8.dds")));
 	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::A8R8G8B8, Path("test_img_load_A8R8G8B8_nomips.dds")));
 }
 
-TEST(DDS, A8B8G8R8)
+TEST(DDS, B8G8R8A8)
 {
-	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::A8R8G8B8, Path("test_img_load_A8B8G8R8.dds")));
+	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::B8G8R8A8, Path("test_img_load_B8G8R8A8.dds")));
+	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::B8G8R8A8, Path("test_img_load_B8G8R8A8_nomips.dds")));
 }
 
 TEST(DDS, R8B8G8)
