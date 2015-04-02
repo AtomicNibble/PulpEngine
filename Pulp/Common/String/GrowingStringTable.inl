@@ -18,7 +18,7 @@ arena_(arena)
 	// lets also make it a multiple of the alignment.
 	X_ASSERT((BlockSize % Alignment) == 0, "Block size must be multiple of Alignment")(BlockSize, Alignment);
 	// Not stupid alignment.
-	X_ASSERT((Alignment <= 64, "Alignment must be 64 or lower")(Alignment);
+	X_ASSERT(Alignment <= 64, "Alignment must be 64 or lower")(Alignment);
 
 }
 
@@ -29,7 +29,7 @@ GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::~GrowingStri
 }
 
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
-void GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::reserve(size_t numBlocks);
+void GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::reserve(size_t numBlocks)
 {
 	if(numBlocks > currentBlockSpace_)
 	{
@@ -69,7 +69,7 @@ IdType GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::addSt
 	size_t NumBlocks = (Len + sizeof(Header_t)+BlockSize) / BlockSize;
 
 	// grow if needed. returns false if IdType can't represent.
-	if(!requestFreeBlocks(NumBlocks)) {}
+	if(!requestFreeBlocks(NumBlocks)) {
 		X_ERROR("GrowingStringTable", "Reached the limit of id. sizeof(Id) = ", sizeof(IdType));
 		return InvalidId;
 	}
