@@ -26,7 +26,7 @@ void TestJob(void* pParam, uint32_t batchOffset, uint32_t batchNum, uint32_t wor
 }
 
 
-TEST(Threading, Scheduler)
+TEST(Threading, DISABLED_Scheduler)
 {
 	core::Scheduler jobSys;
 	core::JobList jobLists[4];
