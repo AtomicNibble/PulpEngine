@@ -77,6 +77,8 @@ TEST(GrowingStringTable, AddOverFlow)
 		bool validId = (id != TableType::InvalidId);
 
 		if(!validId) {
+			EXPECT_EQ(10, i);
+			EXPECT_EQ(10, Table.numStrings());
 			failed = true;
 			break;
 		}
