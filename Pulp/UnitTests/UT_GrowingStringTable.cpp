@@ -9,10 +9,9 @@ X_USING_NAMESPACE;
 using namespace core;
 
 
-
-TEST(GrowingStringTable, Add)
+namespace
 {
-	GrowingStringTable<128, 16, 8, uint16_t> Table(g_arena);
+
 
 	const char* pStrings[10] = {
 		"j_gun",
@@ -26,6 +25,13 @@ TEST(GrowingStringTable, Add)
 		"Meow",
 		"Goat man on the loose!",
 	};
+
+}
+
+
+TEST(GrowingStringTable, Add)
+{
+	GrowingStringTable<128, 16, 8, uint16_t> Table(g_arena);
 
 	size_t i;
 	uint16_t ids[10];
@@ -51,5 +57,100 @@ TEST(GrowingStringTable, Add)
 		EXPECT_STREQ(pStrings[i], pPointers[i]);
 	}
 	
-	int pad = 0;
 }
+
+
+
+TEST(GrowingStringTable, Add)
+{
+	// max out at 256 blocks.
+	// make the blocks small so we max out quicker.
+	typedef GrowingStringTable<128, 4, 4, uint8_t> TableType;
+	TableType Table(g_arena);
+	bool failed = false;
+
+	for (i = 0; i < 20; i++)
+	{
+		ids[i] = Table.addString(pStrings[i % 10]);
+
+		bool validId = (ids[i] != TableType::InvalidId);
+
+		if(!validId) {
+			failed = true;
+			break;
+		}
+	}
+
+	EXPECT_TRUE(failed);
+}
+
+
+TEST(GrowingStringTable, InvalidBlockSize)
+{
+	g_AssetChecker.ExpectAssertion(true);
+
+	typedef GrowingStringTable<128, 0, 4, uint8_t> TableType;
+	TableType Table(g_arena);
+
+	EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
+
+	g_AssetChecker.ExpectAssertion(false);
+}
+
+
+TEST(GrowingStringTable, InvalidBlockSize2)
+{
+	g_AssetChecker.ExpectAssertion(true);
+
+	typedef GrowingStringTable<128, 3, 4, uint8_t> TableType;
+	TableType Table(g_arena);
+
+	EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
+
+	g_AssetChecker.ExpectAssertion(false);
+}
+
+
+TEST(GrowingStringTable, InvalidAlignment)
+{
+	g_AssetChecker.ExpectAssertion(true);
+
+	typedef GrowingStringTable<128, 70, 70, uint8_t> TableType;
+	TableType Table(g_arena);
+
+	EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
+
+	g_AssetChecker.ExpectAssertion(false);
+}
+
+
+TEST(GrowingStringTable, InvalidGran)
+{
+	g_AssetChecker.ExpectAssertion(true);
+
+	typedef GrowingStringTable<0, 4, 4, uint8_t> TableType;
+	TableType Table(g_arena);
+
+	EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
+
+	g_AssetChecker.ExpectAssertion(false);
+}
+
+
+TEST(GrowingStringTable, InvalidType)
+{
+	g_AssetChecker.ExpectAssertion(true);
+
+	typedef GrowingStringTable<128, 4, 4, float> TableType;
+	TableType Table(g_arena);
+
+	EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
+
+	g_AssetChecker.ExpectAssertion(false);
+}
+
+
+
+
+
+
