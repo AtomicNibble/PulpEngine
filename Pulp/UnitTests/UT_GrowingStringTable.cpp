@@ -61,19 +61,20 @@ TEST(GrowingStringTable, Add)
 
 
 
-TEST(GrowingStringTable, Add)
+TEST(GrowingStringTable, AddOverFlow)
 {
 	// max out at 256 blocks.
 	// make the blocks small so we max out quicker.
 	typedef GrowingStringTable<128, 4, 4, uint8_t> TableType;
 	TableType Table(g_arena);
 	bool failed = false;
+	size_t i;
 
 	for (i = 0; i < 20; i++)
 	{
-		ids[i] = Table.addString(pStrings[i % 10]);
+		uint8_t id = Table.addString(pStrings[i % 10]);
 
-		bool validId = (ids[i] != TableType::InvalidId);
+		bool validId = (id != TableType::InvalidId);
 
 		if(!validId) {
 			failed = true;
@@ -87,6 +88,7 @@ TEST(GrowingStringTable, Add)
 
 TEST(GrowingStringTable, InvalidBlockSize)
 {
+	core::debugging::EnableBreakpoints(false);
 	g_AssetChecker.ExpectAssertion(true);
 
 	typedef GrowingStringTable<128, 0, 4, uint8_t> TableType;
@@ -95,11 +97,13 @@ TEST(GrowingStringTable, InvalidBlockSize)
 	EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
 
 	g_AssetChecker.ExpectAssertion(false);
+	core::debugging::EnableBreakpoints(true);
 }
 
 
 TEST(GrowingStringTable, InvalidBlockSize2)
 {
+	core::debugging::EnableBreakpoints(false);
 	g_AssetChecker.ExpectAssertion(true);
 
 	typedef GrowingStringTable<128, 3, 4, uint8_t> TableType;
@@ -108,11 +112,14 @@ TEST(GrowingStringTable, InvalidBlockSize2)
 	EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
 
 	g_AssetChecker.ExpectAssertion(false);
+	core::debugging::EnableBreakpoints(true);
 }
 
 
 TEST(GrowingStringTable, InvalidAlignment)
+
 {
+	core::debugging::EnableBreakpoints(false);
 	g_AssetChecker.ExpectAssertion(true);
 
 	typedef GrowingStringTable<128, 70, 70, uint8_t> TableType;
@@ -121,11 +128,13 @@ TEST(GrowingStringTable, InvalidAlignment)
 	EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
 
 	g_AssetChecker.ExpectAssertion(false);
+	core::debugging::EnableBreakpoints(true);
 }
 
 
 TEST(GrowingStringTable, InvalidGran)
 {
+	core::debugging::EnableBreakpoints(false);
 	g_AssetChecker.ExpectAssertion(true);
 
 	typedef GrowingStringTable<0, 4, 4, uint8_t> TableType;
@@ -134,23 +143,7 @@ TEST(GrowingStringTable, InvalidGran)
 	EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
 
 	g_AssetChecker.ExpectAssertion(false);
+	core::debugging::EnableBreakpoints(true);
 }
-
-
-TEST(GrowingStringTable, InvalidType)
-{
-	g_AssetChecker.ExpectAssertion(true);
-
-	typedef GrowingStringTable<128, 4, 4, float> TableType;
-	TableType Table(g_arena);
-
-	EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
-
-	g_AssetChecker.ExpectAssertion(false);
-}
-
-
-
-
 
 
