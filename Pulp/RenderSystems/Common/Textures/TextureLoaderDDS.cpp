@@ -709,9 +709,13 @@ namespace DDS
 			if (mask_size[0] != 8 || mask_size[1] != 8 ||
 				mask_size[2] != 8 || mask_size[3] != 8)
 			{
-				X_ERROR("DDSLoader", "Invalid mask sizes expected 8. (%i,%i,%i,%i)",
-					mask_size[0], mask_size[1], mask_size[2], mask_size[3]);
-				return nullptr;
+				bool ValidRGB = (mapped_format == Texturefmt::R8G8B8 && mask_size[3] == 0);
+				if (!ValidRGB)
+				{
+					X_ERROR("DDSLoader", "Invalid mask sizes expected 8. (%i,%i,%i,%i)",
+						mask_size[0], mask_size[1], mask_size[2], mask_size[3]);
+					return nullptr;
+				}
 			}
 
 
@@ -724,11 +728,11 @@ namespace DDS
 					// this is BGRA
 					mapped_format = Texturefmt::B8G8R8A8;
 				}
-				else if (mask_ofs[0] != 0 || mask_ofs[1] == 8 || mask_ofs[2] == 16
+				else if (mask_ofs[0] != 0 || mask_ofs[1] != 8 || mask_ofs[2] != 16
 					|| mask_ofs[3] != 24)
 				{
 					// this is not a valid RGBA
-					X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8A8 expected(0,8,16,34) provided(%i,%i,%i,%i)",
+					X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8A8 expected(0,8,16,24) provided(%i,%i,%i,%i)",
 						mask_ofs[0], mask_ofs[1], mask_ofs[2], mask_ofs[3]);
 					return nullptr;
 				}
