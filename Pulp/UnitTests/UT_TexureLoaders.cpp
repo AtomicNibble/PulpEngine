@@ -58,7 +58,7 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path path)
 				EXPECT_EQ(fmt, loaded->getFormat());
 
 				if (loaded) {
-					delete loaded;
+					loaded->release();
 					result = true;
 				}
 			}
