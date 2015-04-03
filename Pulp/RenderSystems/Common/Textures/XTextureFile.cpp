@@ -20,6 +20,12 @@ XTextureFile::~XTextureFile()
 	}
 }
 
+int XTextureFile::release(void)
+{
+	X_DELETE(this, g_rendererArena);
+	return 0;
+}
+
 
 const bool XTextureFile::isValid(void) const
 {

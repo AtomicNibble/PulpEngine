@@ -17,6 +17,8 @@ arena_(arena)
 	X_ASSERT(BlockSize >= Alignment, "Block size must be equal or greater than Alignment")(BlockSize, Alignment);
 	// lets also make it a multiple of the alignment.
 	X_ASSERT((BlockSize % Alignment) == 0, "Block size must be multiple of Alignment")(BlockSize, Alignment);
+	// Not stupid alignment.
+	X_ASSERT(Alignment <= 64, "Alignment must be 64 or lower")(Alignment);
 
 }
 
@@ -25,6 +27,16 @@ GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::~GrowingStri
 {
 	free();
 }
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+void GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::reserve(size_t numBlocks)
+{
+	if(numBlocks > currentBlockSpace_)
+	{
+			ensureFreeBlocks(numblocks - currentBlockSpace_);
+	}
+}
+
 
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
 void GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::free(void)
@@ -56,8 +68,11 @@ IdType GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::addSt
 	// ensure space for null terminator as we return pointers to this memory.
 	size_t NumBlocks = (Len + sizeof(Header_t)+BlockSize) / BlockSize;
 
-	// grow if needed.
-	ensureFreeBlocks(NumBlocks);
+	// grow if needed. returns false if IdType can't represent.
+	if(!requestFreeBlocks(NumBlocks)) {
+		X_ERROR("GrowingStringTable", "Reached the limit of id. sizeof(IdType) = ", sizeof(IdType));
+		return InvalidId;
+	}
 
 	// get header that is aligned after the header.
 	Header_t* pHeader = getCurrentAlignedHeader();
@@ -93,8 +108,25 @@ const char* GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::
 }
 
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
-void GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::ensureFreeBlocks(size_t numBlocks)
+bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::requestFreeBlocks(size_t numBlocks)
 {
+	static const size_t MAX_BLOCKS = (std::numeric_limits<IdType>::max() / BLOCK_SIZE);
+	static const size_t MAX_BYTES = MAX_BLOCKS * BLOCK_SIZE;
+
+	size_t freeBlocks = currentBlockSpace_ - CurrentBlock_;
+
+	if (freeBlocks > numBlocks)
+	{
+		return true;
+	}
+
+	size_t potentialBlocks = MAX_BLOCKS - currentBlockSpace_;
+	// can we evern represent the requested blocks with this type?
+	if(potentialBlocks < numBlocks)
+	{
+		return false;
+	}
+
 	if ((CurrentBlock_ + numBlocks) > currentBlockSpace_)
 	{
 		size_t requiredBytes = buffer_.capacity() + (blockGranularity * BlockSize);
@@ -114,8 +146,13 @@ void GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::ensureF
 		buffer_.setGranularity(blockGranularity * BlockSize);
 
 		// update max blocks.
-		currentBlockSpace_ = safe_static_cast<IdType, size_t>(buffer_.capacity() / BlockSize);
+		currentBlockSpace_ = safe_static_cast<IdType, size_t>(
+			core::Min(MAX_BYTES,buffer_.capacity()) / BlockSize
+		);
+		return true;
 	}
+
+	return true;
 }
 
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
@@ -154,4 +191,95 @@ template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename I
 size_t GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::allocatedBytes(void) const
 {
 	return buffer_.capacity();
+}
+
+
+// --------------------------------------------------------------------
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::
+GrowingStringTableUnique(core::MemoryArenaBase* arena) :
+GrowingStringTable(arena)
+{
+	LongestStr_ = 0;
+	NumNodes_ = 0;
+}
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::~GrowingStringTableUnique()
+{
+	free();
+}
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+void GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::free(void)
+{
+	GrowingStringTable::free();
+
+	searchTree_.free(arena_);
+}
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+IdType GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::addStringUnqiue(const char* Str)
+{
+	size_t len = strlen(Str);
+	return addStringUnqiue(Str, len);
+}
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+IdType GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::addStringUnqiue(const char* Str, size_t Len)
+{
+	IdType id;
+	if (FindString(Str, Len, id))
+		return id;
+
+	// Update longest string
+	LongestStr_ = core::Max(LongestStr_, Len);
+
+	id = addString(Str, Len);
+
+	AddStringToTrie(Str, id); // add to search Trie
+
+	return id;
+}
+
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+void GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::AddStringToTrie(const char* Str, IdType id)
+{
+	Node* node = &searchTree_;
+	const char* Txt = Str;
+	int c;
+	while ((c = *Txt++)) {
+		if (node->chars[c] == nullptr) {
+			node->chars[c] = X_NEW(Node, arena_, "GSTNode"); 
+			NumNodes_++;
+		}
+		node = node->chars[c];
+	}
+	node->id = id;
+	node->sentinel = (void*)!nullptr;
+}
+
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+bool GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::FindString(const char* Str, size_t Len, IdType& id)
+{
+	if (Len > LongestStr_) // we can skip checking for strings longer then any in the table.
+		return false;
+
+	Node* node = &searchTree_;
+	const char* Txt = Str;
+	int c;
+	while ((c = *Txt++)) {
+		if (node->chars[c] == nullptr) {
+			return false;
+		}
+		node = node->chars[c];
+	}
+	if (node->sentinel != nullptr) {
+		id = node->id;
+		return true;
+	}
+	return false;
 }

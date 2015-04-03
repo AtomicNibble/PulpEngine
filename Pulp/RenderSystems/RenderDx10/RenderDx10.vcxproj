@@ -395,7 +395,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\Input\Win32Input.h" />
     <ClInclude Include="..\Common\MatrixStack.h" />
     <ClInclude Include="..\Common\Model\XRenderMesh.h" />
     <ClInclude Include="..\Common\ReaderThread.h" />

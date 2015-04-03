@@ -42,6 +42,9 @@
     <ClInclude Include="InputDeviceWin32.h">
       <Filter>Win32</Filter>
     </ClInclude>
+    <ClInclude Include="Win32Input.h">
+      <Filter>Win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

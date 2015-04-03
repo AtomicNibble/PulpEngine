@@ -340,6 +340,7 @@
     <ClInclude Include="Keyboard.h" />
     <ClInclude Include="Mouse.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Win32Input.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseInput.cpp" />

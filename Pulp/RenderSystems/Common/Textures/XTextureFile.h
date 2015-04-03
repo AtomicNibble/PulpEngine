@@ -57,6 +57,8 @@ struct XTextureFile
 
 
 public:
+	int release(void);
+
 #if X_DEBUG
 	X_INLINE const char* getName(void) const { return pName; }
 #endif // !X_DEBUG

@@ -24,11 +24,19 @@ class GrowingStringTable
 
 public:
 	typedef IdType IdType;
-	static const IdType InvalidId = (IdType)-1;
+	static const IdType InvalidId = IdType(-1);
+	// copy's of the tmeplate values.
+	static const size_t ALIGNMENT = Alignment;
+	static const size_t BLOCK_SIZE = BlockSize;
+	static const size_t BLOCK_GRANULARITY = blockGranularity;
+//	static const size_t MAX_BLOCKS = (std::numeric_limits<IdType>::max() / BLOCK_SIZE);
+//	static const size_t MAX_BYTES = MAX_BLOCKS * BLOCK_SIZE;
+
 
 	GrowingStringTable(core::MemoryArenaBase* arena);
 	~GrowingStringTable();
 
+	void reserve(size_t numBlocks);
 	void free(void);
 
 	X_INLINE IdType addString(const char* str);
@@ -41,7 +49,8 @@ public:
 	X_INLINE size_t allocatedBytes(void) const;
 
 private:
-	void ensureFreeBlocks(size_t numBlocks);
+	// request X number of free blocks.
+	bool requestFreeBlocks(size_t numBlocks);
 	Header_t* getCurrentAlignedHeader(void);
 
 private:
@@ -56,9 +65,61 @@ private:
 	size_t WasteSize_;
 
 	core::Array<uint8_t> buffer_;
+protected:
 	core::MemoryArenaBase* arena_;
 };
 
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+class GrowingStringTableUnique :
+	public GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>
+{
+public:
+	GrowingStringTableUnique(core::MemoryArenaBase* arena);
+	~GrowingStringTableUnique();
+
+	void free(void);
+
+	X_INLINE IdType addStringUnqiue(const char* Str);
+	X_INLINE IdType addStringUnqiue(const char* Str, size_t Len);
+
+private:
+
+	static const size_t CHAR_TRIE_SIZE = 128; // support Ascii set
+
+	typedef struct Node {
+		Node() {
+			core::zero_this(this);
+		}
+		~Node() {
+		}
+
+		void free(core::MemoryArenaBase* arena)
+		{
+			for (size_t i = /*skip sentinel*/ 1; i < CHAR_TRIE_SIZE; i++) {
+				if (chars[i] != nullptr) {
+					chars[i]->free(arena);
+					X_DELETE_AND_NULL(chars[i], arena);
+				}
+			}
+		}
+
+		IdType id;
+		union {
+			void *sentinel;
+			union {
+				Node* chars[CHAR_TRIE_SIZE];
+			};
+		};
+	} Node;
+
+
+	X_INLINE void AddStringToTrie(const char* Str, IdType id);
+	X_INLINE bool FindString(const char* Str, size_t Len, IdType& id);
+
+	size_t LongestStr_;
+	size_t NumNodes_;
+	Node  searchTree_;
+};
 
 #include "GrowingStringTable.inl"
 
