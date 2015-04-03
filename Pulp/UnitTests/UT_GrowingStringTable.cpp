@@ -3,6 +3,7 @@
 #include "gtest/gtest.h"
 
 #include <String\GrowingStringTable.h>
+#include <Memory/AllocationPolicies/StackAllocator.h>
 
 X_USING_NAMESPACE;
 
@@ -11,8 +12,6 @@ using namespace core;
 
 namespace
 {
-
-
 	const char* pStrings[10] = {
 		"j_gun",
 		"tag_flash",
@@ -26,6 +25,28 @@ namespace
 		"Goat man on the loose!",
 	};
 
+	const char* pStringsDuplicates[20] = {
+		"j_gun",
+		"tag_flash",
+		"123456789AB",
+		"j_gun",
+		"this string is quite long baby, show me your blocks.",
+		"how many nippels can you see",
+		"how many nippels can you see",
+		"how many nippels can you see",
+		"how many nippels can you see",
+		"i've fallen over. help",
+		"Click to start the rape",
+		"6p",
+		"123456789AB",
+		"j_gun",
+		"j_gun",
+		"j_gun",
+		"j_gun",
+		"Meow",
+		"Goat man on the loose!",
+		"j_gun",
+	};
 }
 
 
@@ -149,3 +170,52 @@ TEST(GrowingStringTable, InvalidGran)
 }
 
 
+// ==============================================
+
+TEST(GrowingStringTableUnique, Add)
+{
+	MallocFreeAllocator allocator;
+
+	typedef core::MemoryArena<
+		core::MallocFreeAllocator,
+		core::SingleThreadPolicy,
+		core::SimpleBoundsChecking,
+		core::SimpleMemoryTracking,
+		core::SimpleMemoryTagging
+	> StackArena;
+
+	StackArena arena(&allocator, "StingTableArena");
+
+	typedef GrowingStringTableUnique<128, 32, 32, uint16_t> TableType;
+	TableType Table(&arena);
+
+	size_t i;
+	uint16_t ids[20];
+	const char* pPointers[20];
+
+	for (i = 0; i < 20; i++)
+	{
+		ids[i] = Table.addStringUnqiue(pStringsDuplicates[i]);
+
+		bool validId = (ids[i] != TableType::InvalidId);
+
+		ASSERT_TRUE(validId);
+	}
+
+	ASSERT_EQ(Table.numStrings(), 10);
+
+	for (i = 0; i < 20; i++)
+	{
+		pPointers[i] = Table.getString(ids[i]);
+		// check it's aligned
+		EXPECT_TRUE(core::pointerUtil::IsAligned(pPointers[i], 32, 0));
+		// check it's the correct string.
+		EXPECT_STREQ(pStringsDuplicates[i], pPointers[i]);
+	}
+
+	Table.free();
+
+	// check no leaks
+	EXPECT_EQ(0,allocator.getStatistics().m_allocationCount);
+
+}
