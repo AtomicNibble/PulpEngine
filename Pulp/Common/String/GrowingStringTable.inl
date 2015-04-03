@@ -192,3 +192,94 @@ size_t GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::alloc
 {
 	return buffer_.capacity();
 }
+
+
+// --------------------------------------------------------------------
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::
+GrowingStringTableUnique(core::MemoryArenaBase* arena) :
+GrowingStringTable(arena)
+{
+	LongestStr_ = 0;
+	NumNodes_ = 0;
+}
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::~GrowingStringTableUnique()
+{
+	free();
+}
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+void GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::free(void)
+{
+	GrowingStringTable::free();
+
+	searchTree_.free(arena_);
+}
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+IdType GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::addStringUnqiue(const char* Str)
+{
+	size_t len = strlen(Str);
+	return addStringUnqiue(Str, len);
+}
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+IdType GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::addStringUnqiue(const char* Str, size_t Len)
+{
+	IdType id;
+	if (FindString(Str, Len, id))
+		return id;
+
+	// Update longest string
+	LongestStr_ = core::Max(LongestStr_, Len);
+
+	id = addString(Str, Len);
+
+	AddStringToTrie(Str, id); // add to search Trie
+
+	return id;
+}
+
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+void GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::AddStringToTrie(const char* Str, IdType id)
+{
+	Node* node = &searchTree_;
+	const char* Txt = Str;
+	int c;
+	while ((c = *Txt++)) {
+		if (node->chars[c] == nullptr) {
+			node->chars[c] = X_NEW(Node, arena_, "GSTNode"); 
+			NumNodes_++;
+		}
+		node = node->chars[c];
+	}
+	node->id = id;
+	node->sentinel = (void*)!nullptr;
+}
+
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+bool GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::FindString(const char* Str, size_t Len, IdType& id)
+{
+	if (Len > LongestStr_) // we can skip checking for strings longer then any in the table.
+		return false;
+
+	Node* node = &searchTree_;
+	const char* Txt = Str;
+	int c;
+	while ((c = *Txt++)) {
+		if (node->chars[c] == nullptr) {
+			return false;
+		}
+		node = node->chars[c];
+	}
+	if (node->sentinel != nullptr) {
+		id = node->id;
+		return true;
+	}
+	return false;
+}
