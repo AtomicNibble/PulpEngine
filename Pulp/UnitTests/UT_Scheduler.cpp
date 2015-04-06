@@ -8,33 +8,28 @@
 
 #include "Profiler.h"
 
+#include <ITimer.h>
+
 X_USING_NAMESPACE;
 
 core::AtomicInt numJobsRan(0);
+
+X_PRAGMA(optimize("", off))
 
 void TestJob(void* pParam, uint32_t batchOffset, uint32_t batchNum, uint32_t workerIdx)
 {
 	uint32_t idx = reinterpret_cast<uint32_t>(pParam);
 
-//	Sleep(10);
-
 	size_t i, running_total = 23;
-	size_t some_large_number = 0x10000 * (workerIdx+1);
+	size_t some_large_number = 0x10000;
 	for (i = 0; i < some_large_number; i++)
 	{
 		running_total = 37 * running_total + i;
 	}
 
-	if ((idx % 10000 ) == 99) {
-#if SCHEDULER_LOGS
-		X_LOG0("TestJob", "last job: pParam: 0%i worker: 0%x", idx, workerIdx);
-#endif // !SCHEDULER_LOGS
-	}
-
 	++numJobsRan;
-
-//	X_LOG0("TestJob", "job idx: %i Worker: %i result: %p", idx, workerIdx, running_total);
 }
+X_PRAGMA(optimize("", on))
 
 
 TEST(Threading, Scheduler)
@@ -42,6 +37,28 @@ TEST(Threading, Scheduler)
 	core::Scheduler jobSys;
 
 	jobSys.StartThreads();
+
+#if 0 // test how long the singe threaded version took.
+	{
+		core::TimeVal start = gEnv->pTimer->GetTimeReal();
+
+		size_t i;
+		size_t num = 10000;
+		for (i = 0; i < num; i++)
+		{
+			TestJob((void*)i, 0, 1, 0);
+
+			if ((i % 100000) == 0) {
+				X_LOG0("Test", "left: %i", num - i);
+			}
+		}
+
+		core::TimeVal end = gEnv->pTimer->GetTimeReal();
+		core::TimeVal elpased = end - start;
+
+		X_LOG0("Test", "exec time: %f", elpased.GetMilliSeconds());
+	}
+#endif
 
 	{
 		UnitTests::ScopeProfiler profile("Scheduler");
@@ -61,13 +78,14 @@ TEST(Threading, Scheduler)
 
 		core::JobListStats combinedStats;
 
-		for (size_t p = 0; p < 0x4000; p++)
+		core::JobList* jobLists[numLists];
+		for (size_t j = 0; j < numLists; j++)
 		{
-			core::JobList* jobLists[numLists];
-			for (size_t j = 0; j < numLists; j++)
-			{
-				jobLists[j] = X_NEW(core::JobList, &arena, "JobLists")(&arena);
-			}
+			jobLists[j] = X_NEW(core::JobList, &arena, "JobLists")(&arena);
+		}
+
+		for (size_t p = 0; p < 1; p++)
+		{
 
 			for (size_t j = 0; j < numLists; j++)
 			{
@@ -101,16 +119,18 @@ TEST(Threading, Scheduler)
 				jobLists[j]->Wait();
 			}
 
-			jobSys.WaitForThreads();
-
-			for (size_t j = 0; j < numLists; j++)
-			{
-				combinedStats += jobLists[j]->getStats();
-				X_DELETE(jobLists[j], &arena);
-			}
-
-			X_LOG0_EVERY_N(100, "Scheduler", "JobList run number: %i numJobsDone: %i", p, numJobsRan);
+			X_LOG0_EVERY_N(10, "Scheduler", "JobList run number: %i numJobsDone: %i", p, numJobsRan);
 		}
+
+
+		jobSys.WaitForThreads();
+
+		for (size_t j = 0; j < numLists; j++)
+		{
+			combinedStats += jobLists[j]->getStats();
+			X_DELETE(jobLists[j], &arena);
+		}
+
 
 		// print the stats.
 		X_LOG0("Scheduler", "Stats");
@@ -126,7 +146,7 @@ TEST(Threading, Scheduler)
 		}
 	}
 
-	EXPECT_EQ(2560000, numJobsRan);
+	EXPECT_EQ(10000, numJobsRan);
 
 	jobSys.ShutDown();
 }
