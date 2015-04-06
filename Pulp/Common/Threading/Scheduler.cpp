@@ -76,14 +76,14 @@ void JobList::Wait(void)
 		bool waited = false;
 
 		while (syncCount_ > 0) {
-			SwitchToThread();
+			core::Thread::Yield();
 			waited = true;
 		}
 
 		++version_;
 
 		while (numThreadsExecuting_ > 0) {
-			SwitchToThread();
+			core::Thread::Yield();
 			waited = true;
 		}
 
@@ -333,7 +333,7 @@ void JobThread::AddJobList(JobList* pJobList)
 	X_ASSERT_NOT_NULL(pJobList);
 
 	while (lastJobList_ - firstJobList_ >= MAX_JOB_LISTS) {
-		SwitchToThread();
+		core::Thread::Yield();
 	}
 
 	pJobList->OnSubmited();
