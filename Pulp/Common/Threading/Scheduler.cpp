@@ -290,12 +290,8 @@ void JobList::PreSubmit(void)
 	endJob.batchNum = 0;
 	jobs_.append(endJob);
 
-
 	stats_.submitTime = GetTimeReal();
-}
 
-void JobList::OnSubmited(void)
-{
 	isSubmit_ = true;
 	isDone_ = false;
 }
@@ -335,8 +331,6 @@ void JobThread::AddJobList(JobList* pJobList)
 	while (lastJobList_ - firstJobList_ >= MAX_JOB_LISTS) {
 		core::Thread::Yield();
 	}
-
-	pJobList->OnSubmited();
 
 	jobLists_[lastJobList_ & (MAX_JOB_LISTS - 1)].jobList = pJobList;
 	jobLists_[lastJobList_ & (MAX_JOB_LISTS - 1)].version = pJobList->version_;

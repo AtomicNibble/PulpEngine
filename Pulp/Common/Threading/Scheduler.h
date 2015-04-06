@@ -123,7 +123,6 @@ private:
 
 protected:
 	void PreSubmit(void);
-	void OnSubmited(void);
 
 	TimeVal GetTimeReal(void) const;
 
