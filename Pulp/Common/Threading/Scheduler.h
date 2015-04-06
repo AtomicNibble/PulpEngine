@@ -35,6 +35,7 @@ struct ThreadStats
 {
 	ThreadStats() : numExecLists(0) {}
 
+	TimeVal waitforJobTime;
 	uint64_t numExecLists;	// jobs lists execuced
 };
 

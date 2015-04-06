@@ -166,7 +166,6 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 
 	do 
 	{
-
 		// look at all the jobs below the current job.
 		// if it's the job list done job.
 		for (; state.lastJobIndex < currentJob_
@@ -253,7 +252,8 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 			return resFalgs | RunFlag::DONE;
 		}
 
-	} while (!singleJob);
+	}
+	while (!singleJob);
 
 	return resFalgs;
 }
@@ -314,12 +314,10 @@ void JobThread::AddJobList(JobList* pJobList)
 {
 	X_ASSERT_NOT_NULL(pJobList);
 
-//	while (jobLists_.size() == jobLists_.capacity()) {
 	while (lastJobList_ - firstJobList_ >= MAX_JOB_LISTS) {
 		SwitchToThread();
 	}
 
-//	jobLists_.push(pJobList);
 	pJobList->OnSubmited();
 
 	jobLists_[lastJobList_ & (MAX_JOB_LISTS - 1)].jobList = pJobList;
@@ -330,7 +328,6 @@ void JobThread::AddJobList(JobList* pJobList)
 void JobThread::SignalWork(void)
 {
 	core::CriticalSection::ScopedLock lock(signalCritical_);
-//	X_LOG0("Scheduler", "Signal more work");
 	moreWorkToDo_ = true;
 	signalMoreWorkToDo_.raise();
 	signalWorkerDone_.clear();
@@ -366,7 +363,14 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 			{
 				signalWorkerDone_.raise();
 				signalCritical_.Leave();
+
+				TimeVal start = gEnv->pTimer->GetTimeReal();
+
 				signalMoreWorkToDo_.wait();
+
+				TimeVal end = gEnv->pTimer->GetTimeReal();
+
+				stats_.waitforJobTime += (end - start);
 				continue;
 			}
 		}
