@@ -42,26 +42,8 @@ struct ThreadStats
 
 struct JobListStats
 {
-	JobListStats() {
-	}
-
-	JobListStats& operator +=(const JobListStats& oth) {
-		submitTime += oth.submitTime;
-		startTime += oth.startTime;
-		waitTime += oth.waitTime;
-		endTime += oth.endTime;
-
-		size_t i;
-		for (i = 0; i < HW_THREAD_MAX; i++) {
-			threadExecTime[i] += oth.threadExecTime[i];
-			threadTotalTime[i] += oth.threadTotalTime[i];
-		}
-
-		return *this;
-	}
-
-	TimeVal submitTime;				// time lists was submitted
-	TimeVal startTime;				// time lists was first picked
+	TimeVal submitTime;					// time lists was submitted
+	TimeVal startTime;					// time lists was first picked
 	TimeVal waitTime;					// time list spent waiting
 	TimeVal endTime;					// time at which all the jobs are done.
 	// stats for each thread, since the jobs will run in multipl threads
@@ -224,17 +206,25 @@ public:
 	Scheduler();
 	~Scheduler();
 
-	void StartThreads(void);
+	void StartUp(void);
 	void ShutDown(void);
 
 	void SubmitJobList(JobList* pList, JobList* pWaitFor = nullptr);
 	void WaitForThreads(void);
+
+	int32_t numThreads(void) const;
+
+private:
+	void StartThreads(void);
 
 private:
 	int32_t numThreads_; // num created.
 	JobThread threads_[HW_THREAD_MAX];
 
 	core::CriticalSection addJobListCrit_;
+
+public:
+	static int32_t var_LongJobMs;
 };
 
 

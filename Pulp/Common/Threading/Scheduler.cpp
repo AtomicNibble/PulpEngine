@@ -14,6 +14,8 @@ X_NAMESPACE_BEGIN(core)
 
 int32_t JobList::JOB_LIST_DONE = 0x12345678;
 
+int Scheduler::var_LongJobMs = 8;
+
 void JobList::NopJob(void* pParam, uint32_t batchOffset,
 	uint32_t batchNum, uint32_t workerIdx)
 {
@@ -236,6 +238,22 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 
 			job.execTime = elapsed;
 			stats_.threadExecTime[threadIdx] += elapsed;
+
+			if (Scheduler::var_LongJobMs > 0)
+			{
+				if (elapsed.GetMilliSeconds() > Scheduler::var_LongJobMs)
+				{				
+					X_WARNING("Scheduler", "a single job took more than: %gms elapsed: %gms "
+						"pFunc: %p pData: %p batchOffset: %i batchNum: %i", 
+						Scheduler::var_LongJobMs,
+						elapsed.GetMilliSeconds(),
+						job.pJobRun,
+						job.pData,
+						job.batchOffset,
+						job.batchNum
+						);
+				}
+			}
 		}
 
 
@@ -492,9 +510,7 @@ Scheduler::~Scheduler()
 
 }
 
-
-
-void Scheduler::StartThreads(void)
+void Scheduler::StartUp(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pCore);
@@ -512,7 +528,15 @@ void Scheduler::StartThreads(void)
 		HW_THREAD_MAX, core::VarFlag::SYSTEM,
 		"The number of threads used by the job scheduler");
 
+	// register longJob
+	ADD_CVAR_REF("scheduler_longJobMs", var_LongJobMs, var_LongJobMs, 0, 32, core::VarFlag::SYSTEM, "If a single job takes longer than this a warning is printed.\n0 = disabled.");
 
+
+	StartThreads();
+}
+
+void Scheduler::StartThreads(void)
+{
 	X_LOG0("Scheduler", "Creating %i threads", numThreads_);
 
 	int32_t i;
@@ -561,6 +585,11 @@ void Scheduler::WaitForThreads(void)
 	for (int32_t i = 0; i < numThreads_; i++) {
 		threads_[i].WaitForThread();
 	}
+}
+
+int32_t Scheduler::numThreads(void) const
+{
+	return numThreads_;
 }
 
 
