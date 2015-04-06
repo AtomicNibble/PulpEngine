@@ -46,15 +46,17 @@ TEST(FileSys, Write)
 		fileMode::WRITE | fileMode::RECREATE);
 
 	ASSERT_TRUE(NULL != file);
-	
-	test_data block;
-	block.magic = TEST_MAGIC;
-	block.ival = 123456789;
-	block.str.append("tickle my pickle");
+	if (file)
+	{
+		test_data block;
+		block.magic = TEST_MAGIC;
+		block.ival = 123456789;
+		block.str.set("tickle my pickle");
 
-	file->writeObj(block);
+		ASSERT_EQ(sizeof(test_data),file->writeObj(block));
 
-	pFileSys->closeFile(file);
+		pFileSys->closeFile(file);
+	}
 }
 
 TEST(FileSys, Append)
@@ -66,15 +68,17 @@ TEST(FileSys, Append)
 		fileMode::WRITE | fileMode::APPEND);
 
 	ASSERT_TRUE(NULL != file);
+	if (file)
+	{
+		test_data block;
+		block.magic = TEST_MAGIC;
+		block.ival = 123456789;
+		block.str.append("tickle my pickle");
 
-	test_data block;
-	block.magic = TEST_MAGIC;
-	block.ival = 123456789;
-	block.str.append("tickle my pickle");
+		ASSERT_EQ(sizeof(test_data), file->writeObj(block));
 
-	file->writeObj(block);
-
-	pFileSys->closeFile(file);
+		pFileSys->closeFile(file);
+	}
 }
 
 TEST(FileSys, Read)
