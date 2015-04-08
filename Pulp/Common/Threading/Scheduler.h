@@ -118,6 +118,14 @@ public:
 		return stats_;
 	}
 
+	X_INLINE bool CanRun(void) const {
+		if(waitForList_) {
+			if(waitForList_ > 0 )
+				return false;
+		}
+		return true;
+	}
+
 private:
 	RunFlags RunJobsInternal(uint32_t threadIdx, JobListThreadState& state, bool singleJob);
 
@@ -143,7 +151,11 @@ private:
 	core::AtomicInt currentJob_;
 	core::AtomicInt fetchLock_;
 	core::AtomicInt numThreadsExecuting_;
-	core::AtomicInt version_;
+	core::AtomicInt version_
+
+	// points to a jobs done guard.
+
+	core::AtomicInt* waitForList_;
 
 	// keep a copy of the timer interface.
 	core::ITimer* pTimer_;

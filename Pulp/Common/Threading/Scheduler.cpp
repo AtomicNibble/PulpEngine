@@ -36,6 +36,8 @@ JobList::JobList(core::MemoryArenaBase* arena) :
 	numThreadsExecuting_(0),
 	version_(0),
 
+	waitForList_(nullptr),
+
 	pTimer_(nullptr)
 {
 	// set the timer val.
@@ -437,9 +439,12 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 		if (lastStalledJobList == InvalidJobIdx)
 		{
 			// pick a job list with the most priority.
-			for (size_t i = 0; i < jobStates.size(); i++) {
-				if (jobStates[i].jobList->getPriority() > priority) {
-					priority = jobStates[i].jobList->getPriority();
+			for (size_t i = 0; i < jobStates.size(); i++) 
+			{
+				const JobList* pList = jobStates[i].jobList;
+				if (pList->getPriority() > priority && pList->CanRun()) 
+				{
+					priority = pList->getPriority();
 					currentJobListIdx = i;
 				}
 			}
@@ -451,9 +456,12 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 			priority = stalledList.jobList->getPriority();
 			currentJobListIdx = lastStalledJobList;
 
-			for (size_t i = 0; i < jobStates.size(); i++) {
-				if (i != lastStalledJobList && jobStates[i].jobList->getPriority() > priority) {
-					priority = jobStates[i].jobList->getPriority();
+			for (size_t i = 0; i < jobStates.size(); i++) 
+			{
+				const JobList* pList = jobStates[i].jobList;
+				if (i != lastStalledJobList && pList->getPriority() > priority && pList->CanRun()) 
+				{
+					priority = pList->getPriority();
 					currentJobListIdx = i;
 				}
 			}
