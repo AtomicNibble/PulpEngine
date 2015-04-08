@@ -1,0 +1,15 @@
+#pragma once
+
+
+#ifndef X_COMPRESSION_LZMA2_H_
+#define X_COMPRESSION_LZMA2_H_
+
+X_USING_NAMESPACE(core)
+
+
+
+
+
+X_NAMESPACE_END
+
+#endif // !X_COMPRESSION_LZMA2_H_
