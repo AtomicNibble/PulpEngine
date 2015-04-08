@@ -964,6 +964,9 @@
     <ClInclude Include="String\GrowingStringTable.h">
       <Filter>Headers\String</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\win32\Thread.h">
+      <Filter>Headers\Threading\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1310,9 +1313,6 @@
     <ClCompile Include="Platform\win32\Window.cpp">
       <Filter>SourceFiles\Platform\win32</Filter>
     </ClCompile>
-    <ClCompile Include="Threading\Thread.cpp">
-      <Filter>SourceFiles\Threading</Filter>
-    </ClCompile>
     <ClCompile Include="Threading\ConditionVariable.cpp">
       <Filter>SourceFiles\Threading</Filter>
     </ClCompile>
@@ -1463,6 +1463,9 @@
     </ClCompile>
     <ClCompile Include="String\GrowingStringTable.cpp">
       <Filter>SourceFiles\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\win32\Thread.cpp">
+      <Filter>SourceFiles\Threading\win32</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

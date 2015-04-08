@@ -35,41 +35,34 @@ struct TextureType
 	};
 };
 
-struct Texturefmt
-{
-	enum Enum : uint8_t
-	{
-		R8G8B8 = 1, 
-		R8G8B8A8,
-		A8,
-		A8R8G8B8,
+X_DECLARE_ENUM8(Texturefmt) (
+R8G8B8,
+R8G8B8A8,
+A8,
+A8R8G8B8,
 
-		B8G8R8,
-		B8G8R8A8,
+B8G8R8,
+B8G8R8A8,
 
-		ATI2,		// DXN_YX / 3dc
-		ATI2_XY,	// DXN_XY
+ATI2,		// DXN_YX / 3dc
+ATI2_XY,	// DXN_XY
 
-		BC1,		// DXT1
-		BC2,		// DXT3
-		BC3,		// DXT5
-		BC4,
-		BC4_SNORM,
-		BC5,
-		BC5_SNORM,
-		// Dx11
-		BC6,
-		BC7,
+BC1,		// DXT1
+BC2,		// DXT3
+BC3,		// DXT5
+BC4,
+BC4_SNORM,
+BC5,
+BC5_SNORM,
+// Dx11
+BC6,
+BC7,
 
-		R16G16F,
-		R10G10B10A2,
+R16G16F,
+R10G10B10A2,
 
-		UNKNOWN
-	};
-
-//	static Enum fromString(const char* pStr);
-};
-
+UNKNOWN
+);
 
 X_DECLARE_FLAGS(TexFlag)(NOMIPS, LOAD_FAILED, DONT_RESIZE, FORCE_MIPS, ALPHA, NORMAL, DONT_STREAM, TEX_FONT, FILTER_POINT, FILTER_LINEAR, FILTER_BILINEAR, FILTER_TRILINEAR, RENDER_TARGET);
 

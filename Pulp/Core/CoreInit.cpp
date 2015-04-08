@@ -217,7 +217,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		return false;
 
 	// #------------------------- JOB SYSTEM ------------------------
-	jobScheduler_.StartThreads();
+	jobScheduler_.StartUp();
 
 
 	// #------------------------- ProfileSys ---------------------------

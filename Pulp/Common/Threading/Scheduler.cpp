@@ -12,16 +12,30 @@
 
 X_NAMESPACE_BEGIN(core)
 
+int32_t JobList::JOB_LIST_DONE = 0x12345678;
 
-JobList::JobList() :
+int Scheduler::var_LongJobMs = 8;
+
+void JobList::NopJob(void* pParam, uint32_t batchOffset,
+	uint32_t batchNum, uint32_t workerIdx)
+{
+#if SCHEDULER_LOGS
+	X_LOG0("NopJob", "NobJob: pParam: %x workerIdx: %x", pParam, workerIdx);
+#endif // !SCHEDULER_LOGS
+}
+
+
+JobList::JobList(core::MemoryArenaBase* arena) :
 	isDone_(false),
 	isSubmit_(false),
 	priority_(JobListPriority::NORMAL),
-	jobs_(gEnv->pArena),
+	jobs_(arena),
 	syncCount_(0),
 	currentJob_(0),
 	fetchLock_(0),
 	numThreadsExecuting_(0),
+	version_(0),
+
 	pTimer_(nullptr)
 {
 	// set the timer val.
@@ -33,21 +47,13 @@ JobList::JobList() :
 	pTimer_ = gEnv->pTimer;
 }
 
-void JobList::Clear(void)
-{
-	isDone_ = false;
-	isSubmit_ = false;
-	syncCount_ = 0;
-	currentJob_ = 0;
-	fetchLock_ = 0;
-	numThreadsExecuting_ = 0;
-}
 
 void JobList::AddJob(Job job, void* pData)
 {
 	JobData data;
 	data.pJobRun = job;
 	data.pData = pData;
+	data.done = false;
 	data.batchOffset = 0;
 	data.batchNum = 1;
 
@@ -70,12 +76,14 @@ void JobList::Wait(void)
 		bool waited = false;
 
 		while (syncCount_ > 0) {
-			SwitchToThread();
+			core::Thread::Yield();
 			waited = true;
 		}
 
+		++version_;
+
 		while (numThreadsExecuting_ > 0) {
-			SwitchToThread();
+			core::Thread::Yield();
 			waited = true;
 		}
 
@@ -87,8 +95,11 @@ void JobList::Wait(void)
 			stats_.waitTime = TimeVal(0ll);
 		}
 
-		Clear();
+		jobs_.clear();
 	}
+#if SCHEDULER_LOGS
+	X_LOG0("JobList", "is done id: %x", listId_);
+#endif // !SCHEDULER_LOGS
 	isDone_ = true;
 }
 
@@ -123,77 +134,168 @@ JobListPriority::Enum JobList::getPriority(void) const
 }
 
 
-JobList::RunFlags JobList::RunJobs(uint32_t threadIdx, JobListThreadState& state)
+JobList::RunFlags JobList::RunJobs(uint32_t threadIdx, JobListThreadState& state, bool singleJob)
 {
 	TimeVal start = GetTimeReal();
 	JobList::RunFlags res;
 
 	++numThreadsExecuting_;
 
-	res = RunJobsInternal(threadIdx, state);
-
-	--numThreadsExecuting_;
+	res = RunJobsInternal(threadIdx, state, singleJob);
 
 	stats_.threadTotalTime[threadIdx] += (GetTimeReal() - start);
+
+	// do it after we got the time.
+	--numThreadsExecuting_;
 
 	return res;
 }
 
-JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadState& state)
+JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadState& state, bool singleJob)
 {
+	if (state.version != version_) {
+		// trying to run an old version of this list that is already done
+		//	X_LOG0("Joblist", "old version. sate: %i thisVersion: %i currentJob: %i", 
+		//		state.version, version_, currentJob_);
+		return RunFlag::DONE;
+	}
+
 	if (stats_.startTime.GetValue() == 0) {
 		stats_.startTime = GetTimeReal();
 	}
 
-	if ((++fetchLock_) == 1)
+	RunFlags resFalgs = RunFlag::OK;
+
+	do 
 	{
-		// grab a new job
-		state.nextJobIndex = (++currentJob_) - 1;
+		// look at all the jobs below the current job.
+		// if it's the job list done job.
+		for (; state.lastJobIndex < currentJob_
+			&& state.lastJobIndex < jobs_.size(); state.lastJobIndex++)
+		{
+			if (jobs_[state.lastJobIndex].pData == &JOB_LIST_DONE)
+			{
+				if (syncCount_ > 0) {
+					return resFalgs | RunFlag::STALLED;
+				}
+			}
+		}
 
-		--fetchLock_;
-	}
-	else
-	{
-		--fetchLock_;
-		return RunFlag::STALLED;
-	}
+		{
+			if ((++fetchLock_) == 1)
+			{
+				// grab a new job
+				state.nextJobIndex = (++currentJob_) - 1;
 
-	if (state.nextJobIndex >= jobs_.size()) {
-		return RunFlag::DONE;
-	}
+				// run through any remaining signals and syncs (this should rarely iterate more than once)
+				for (; state.lastJobIndex <= state.nextJobIndex &&
+					state.lastJobIndex < jobs_.size(); state.lastJobIndex++) 
+				{
+					if (jobs_[state.lastJobIndex].pData == &JOB_LIST_DONE)
+					{
+						if (syncCount_ > 0) 
+						{
+							// return this job to the list
+							--currentJob_;
+							// release the fetch lock
+							--fetchLock_;
+							// stalled on a synchronization point
+							return resFalgs | RunFlag::STALLED;
+						}
+					}
+				}
 
-	// execute the next job
-	{
-		JobData& job = jobs_[state.nextJobIndex];
+				--fetchLock_;
+			}
+			else
+			{
+				--fetchLock_;
+				return resFalgs | RunFlag::STALLED;
+			}
 
-		TimeVal jobStart = GetTimeReal();
+		}
 
-		job.pJobRun(job.pData, 
-			job.batchOffset, 
-			job.batchNum,
-			threadIdx);
+		// end of the job lists?
+		if (state.nextJobIndex >= jobs_.size()) {
+			return resFalgs | RunFlag::DONE;
+		}
 
-		job.done = true;
+		// execute the next job
+		{
+			JobData& job = jobs_[state.nextJobIndex];
 
-		TimeVal jobEnd = GetTimeReal();
-		stats_.threadExecTime[threadIdx] += jobEnd - jobStart;
+			TimeVal jobStart = GetTimeReal();
+
+			job.pJobRun(job.pData, 
+				job.batchOffset, 
+				job.batchNum,
+				threadIdx);
+
+			job.done = true;
+
+			TimeVal jobEnd = GetTimeReal();
+			TimeVal elapsed = jobEnd - jobStart;
+
+			job.execTime = elapsed;
+			stats_.threadExecTime[threadIdx] += elapsed;
+
+			if (Scheduler::var_LongJobMs > 0)
+			{
+				if (elapsed.GetMilliSeconds() > Scheduler::var_LongJobMs)
+				{				
+					X_WARNING("Scheduler", "a single job took more than: %gms elapsed: %gms "
+						"pFunc: %p pData: %p batchOffset: %i batchNum: %i", 
+						Scheduler::var_LongJobMs,
+						elapsed.GetMilliSeconds(),
+						job.pJobRun,
+						job.pData,
+						job.batchOffset,
+						job.batchNum
+						);
+				}
+			}
+		}
+
+
+		// we made progress
+		resFalgs |= RunFlag::PROGRESS;
 
 		--syncCount_;
-	}
 
-	if ((state.nextJobIndex+1) == jobs_.size()) {
-		stats_.endTime = GetTimeReal();
-		return RunFlag::DONE;
-	}
+		if (syncCount_ == 0) {
+			stats_.endTime = GetTimeReal();
+	#if SCHEDULER_LOGS
+			X_LOG0("JobList", "sync count 0, for id: %x", listId_);
+	#endif // !SCHEDULER_LOGS
+			return resFalgs | RunFlag::DONE;
+		}
 
-	return RunFlag::OK;
+	}
+	while (!singleJob);
+
+	return resFalgs;
 }
+
 
 void JobList::PreSubmit(void)
 {
-	stats_.submitTime = GetTimeReal();
+	currentJob_ = 0;
 	syncCount_ = safe_static_cast<int32_t, size_t>(jobs_.size());
+
+	JobData endJob;
+	endJob.pJobRun = NopJob;
+	endJob.pData = &JOB_LIST_DONE;
+	endJob.done = false;
+	endJob.batchOffset = 0;
+	endJob.batchNum = 0;
+	jobs_.append(endJob);
+
+	stats_.submitTime = GetTimeReal();
+
+	isSubmit_ = true;
+	isDone_ = false;
 }
+
 
 TimeVal JobList::GetTimeReal(void) const
 {
@@ -205,6 +307,9 @@ TimeVal JobList::GetTimeReal(void) const
 JobThread::JobThread()
 {
 	moreWorkToDo_ = false;
+
+	firstJobList_ = 0;
+	lastJobList_ = 0;
 
 	threadIdx_ = 0;
 }
@@ -223,11 +328,13 @@ void JobThread::AddJobList(JobList* pJobList)
 {
 	X_ASSERT_NOT_NULL(pJobList);
 
-	while (jobLists_.size() == jobLists_.capacity()) {
-		SwitchToThread();
+	while (lastJobList_ - firstJobList_ >= MAX_JOB_LISTS) {
+		core::Thread::Yield();
 	}
 
-	jobLists_.push(pJobList);
+	jobLists_[lastJobList_ & (MAX_JOB_LISTS - 1)].jobList = pJobList;
+	jobLists_[lastJobList_ & (MAX_JOB_LISTS - 1)].version = pJobList->version_;
+	lastJobList_++;
 }
 
 void JobThread::SignalWork(void)
@@ -235,12 +342,18 @@ void JobThread::SignalWork(void)
 	core::CriticalSection::ScopedLock lock(signalCritical_);
 	moreWorkToDo_ = true;
 	signalMoreWorkToDo_.raise();
+	signalWorkerDone_.clear();
 }
 
 void JobThread::Stop(void)
 {
 	ThreadAbstract::Stop();
 	SignalWork();
+}
+
+void JobThread::WaitForThread(void)
+{
+	signalWorkerDone_.wait();
 }
 
 Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
@@ -254,13 +367,23 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 
 			if (moreWorkToDo_)
 			{
+				moreWorkToDo_ = false;
 				signalMoreWorkToDo_.clear();
 				signalCritical_.Leave();
 			}
 			else
 			{
+				signalWorkerDone_.raise();
 				signalCritical_.Leave();
+
+				TimeVal start = gEnv->pTimer->GetTimeReal();
+
 				signalMoreWorkToDo_.wait();
+
+				TimeVal end = gEnv->pTimer->GetTimeReal();
+
+				stats_.waitforJobTime += (end - start);
+				continue;
 			}
 		}
 
@@ -270,6 +393,9 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 
 		retVal = ThreadRunInternal(thread);
 	}
+
+	signalWorkerDone_.raise();
+
 	return retVal;
 }
 
@@ -288,15 +414,16 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 		// can we fit any more jobs in the local stack.
 		if (jobStates.size() < jobStates.capacity())
 		{
-			// any to add?
-			if (jobLists_.IsNotEmpty())
+			if (firstJobList_ < lastJobList_) 
 			{
 				JobListThreadState state;
 
-				state.jobList = jobLists_.peek();
+				state.jobList = jobLists_[firstJobList_ & (MAX_JOB_LISTS - 1)].jobList;
+				state.version = jobLists_[firstJobList_ & (MAX_JOB_LISTS - 1)].version;
+
+				firstJobList_++;
 
 				jobStates.append(state);
-				jobLists_.pop();
 			}
 		}
 
@@ -334,7 +461,9 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 
 		JobListThreadState& currentJobList = jobStates[currentJobListIdx];
 
-		jobResult = currentJobList.jobList->RunJobs(threadIdx_, currentJobList);
+		bool singleJob = (priority == JobListPriority::HIGH) ? false : true;
+
+		jobResult = currentJobList.jobList->RunJobs(threadIdx_, currentJobList, singleJob);
 
 		if (jobResult.IsSet(JobList::RunFlag::STALLED))
 		{
@@ -345,6 +474,8 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 		{
 			// no more work for me!
 			jobStates.removeIndex(currentJobListIdx);
+			// done with this job list so remove it from the local list
+
 			lastStalledJobList = InvalidJobIdx; // reset stall idx.
 
 			stats_.numExecLists++;
@@ -373,9 +504,7 @@ Scheduler::~Scheduler()
 
 }
 
-
-
-void Scheduler::StartThreads(void)
+void Scheduler::StartUp(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pCore);
@@ -393,7 +522,15 @@ void Scheduler::StartThreads(void)
 		HW_THREAD_MAX, core::VarFlag::SYSTEM,
 		"The number of threads used by the job scheduler");
 
+	// register longJob
+	ADD_CVAR_REF("scheduler_longJobMs", var_LongJobMs, var_LongJobMs, 0, 32, core::VarFlag::SYSTEM, "If a single job takes longer than this a warning is printed.\n0 = disabled.");
 
+
+	StartThreads();
+}
+
+void Scheduler::StartThreads(void)
+{
 	X_LOG0("Scheduler", "Creating %i threads", numThreads_);
 
 	int32_t i;
@@ -435,6 +572,18 @@ void Scheduler::SubmitJobList(JobList* pList, JobList* pWaitFor)
 		threads_[i].AddJobList(pList);
 		threads_[i].SignalWork();
 	}
+}
+
+void Scheduler::WaitForThreads(void)
+{
+	for (int32_t i = 0; i < numThreads_; i++) {
+		threads_[i].WaitForThread();
+	}
+}
+
+int32_t Scheduler::numThreads(void) const
+{
+	return numThreads_;
 }
 
 

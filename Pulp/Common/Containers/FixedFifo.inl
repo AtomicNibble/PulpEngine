@@ -28,10 +28,10 @@ void FixedFifo<T, N>::push(const T& v)
 
 	++write_;
 
-	num_ = core::Min(++num_, capacity());
-
 	if (write_ == end_)
 		write_ = array_;
+
+	num_ = core::Min(++num_, capacity());
 }
 
 template<typename T, size_t N>
@@ -40,10 +40,11 @@ void FixedFifo<T, N>::pop(void)
 	Mem::Destruct<T>(read_);
 
 	++read_;
-	--num_;
 
 	if (read_ == end_)
 		read_ = array_;
+
+	--num_;
 }
 
 template<typename T, size_t N>

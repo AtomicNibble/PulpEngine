@@ -6,6 +6,9 @@
 #include <Shlwapi.h>
 
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
+#include <Memory\ThreadPolicies\MultiThreadPolicy.h>
+
+#include <Threading\CriticalSection.h>
 
 // Google Test
 #if X_DEBUG == 1
@@ -23,7 +26,7 @@ HINSTANCE g_hInstance = 0;
 
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
-	core::SingleThreadPolicy,
+	core::MultiThreadPolicy<core::CriticalSection>,
 	core::SimpleBoundsChecking,
 //	core::SimpleMemoryTracking,
 	core::NoMemoryTracking,			// allow leaks in the tests.
