@@ -130,7 +130,7 @@ private:
 	RunFlags RunJobsInternal(uint32_t threadIdx, JobListThreadState& state, bool singleJob);
 
 protected:
-	void PreSubmit(void);
+	void PreSubmit(JobList* pWaitFor);
 
 	TimeVal GetTimeReal(void) const;
 
@@ -151,7 +151,7 @@ private:
 	core::AtomicInt currentJob_;
 	core::AtomicInt fetchLock_;
 	core::AtomicInt numThreadsExecuting_;
-	core::AtomicInt version_
+	core::AtomicInt version_;
 
 	core::AtomicInt doneGuard_;
 
