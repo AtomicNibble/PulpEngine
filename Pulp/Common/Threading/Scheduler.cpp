@@ -35,6 +35,7 @@ JobList::JobList(core::MemoryArenaBase* arena) :
 	fetchLock_(0),
 	numThreadsExecuting_(0),
 	version_(0),
+	doneGuard_(0),
 
 	waitForList_(nullptr),
 
@@ -204,6 +205,9 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 							// stalled on a synchronization point
 							return resFalgs | RunFlag::STALLED;
 						}
+
+						// done
+						doneGuard_ = 0;
 					}
 				}
 
@@ -279,10 +283,16 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 }
 
 
-void JobList::PreSubmit(void)
+void JobList::PreSubmit(JobList* pWaitFor)
 {
 	currentJob_ = 0;
 	syncCount_ = safe_static_cast<int32_t, size_t>(jobs_.size());
+
+	if(pWaitFor) {
+			waitForList_ = &pWaitFor->doneGuard_;
+	}
+
+	doneGuard_ = 1;
 
 	JobData endJob;
 	endJob.pJobRun = NopJob;
@@ -574,7 +584,7 @@ void Scheduler::SubmitJobList(JobList* pList, JobList* pWaitFor)
 
 	core::CriticalSection::ScopedLock lock(addJobListCrit_);
 
-	pList->PreSubmit();
+	pList->PreSubmit(pWaitFor);
 
 	for (int32_t i = 0; i < numThreads_; i++) {
 		threads_[i].AddJobList(pList);

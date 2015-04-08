@@ -153,8 +153,9 @@ private:
 	core::AtomicInt numThreadsExecuting_;
 	core::AtomicInt version_
 
-	// points to a jobs done guard.
+	core::AtomicInt doneGuard_;
 
+	// points to a jobs done guard.
 	core::AtomicInt* waitForList_;
 
 	// keep a copy of the timer interface.
