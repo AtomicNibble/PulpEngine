@@ -13,6 +13,7 @@
 X_USING_NAMESPACE;
 
 core::AtomicInt numJobsRan(0);
+core::AtomicInt jobList9Done(0);
 
 X_PRAGMA(optimize("", off))
 
@@ -26,6 +27,18 @@ void TestJob(void* pParam, uint32_t batchOffset, uint32_t batchNum, uint32_t wor
 	{
 		running_total = 37 * running_total + i;
 	}
+
+	size_t jobIdx = idx / 10000;
+
+	if (jobIdx == 9)  {
+		ASSERT_EQ(1, jobList9Done);
+	}
+
+	if (idx == 80999) {
+		jobList9Done = 1;
+	}
+
+//	X_LOG0("TestJob", "jobList idx: %i", jobIdx);
 
 	++numJobsRan;
 }
@@ -93,7 +106,10 @@ TEST(Threading, Scheduler)
 				}
 
 				// set a priority.
-				if ((j % 3) == 0) {
+				if (j == (numLists - 2)) {
+					jobs->SetPriority(core::JobListPriority::LOW);
+				}
+				if ((j % 3) == 0 || j == (numLists - 1)) {
 					jobs->SetPriority(core::JobListPriority::HIGH);
 				}
 				if (j == 0) {
@@ -103,7 +119,10 @@ TEST(Threading, Scheduler)
 
 			for (size_t j = 0; j < numLists; j++)
 			{
-				jobSys.SubmitJobList(jobLists[j]);
+				if (j == (numLists-1))
+					jobSys.SubmitJobList(jobLists[j], jobLists[j-1]);
+				else
+					jobSys.SubmitJobList(jobLists[j]);
 			}
 
 			for (size_t j = 0; j < numLists; j++)
