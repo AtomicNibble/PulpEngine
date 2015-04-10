@@ -72,6 +72,14 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path path)
 	return result;
 }
 
+
+TEST(DDS, BC7)
+{
+//	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::BC7, Path("bc7_froth2_d.dds")));
+	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::BC7, Path("bc7_mainudun01_p.dds")));
+	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::BC7, Path("bc7_softsquar01_p.dds")));
+}
+
 TEST(DDS, ati2)
 {
 	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::ATI2, Path("test_img_load_ati2.dds")));
