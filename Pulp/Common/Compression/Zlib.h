@@ -57,7 +57,7 @@ namespace Compression
 		X_DECLARE_ENUM(InflateResult)(ERROR,OK,DST_BUF_FULL,DONE);
 	public:
 		ZlibInflate(void* pDst, size_t destLen);
-		~ZlibInflate();
+		virtual ~ZlibInflate() X_FINAL;
 
 		InflateResult::Enum Inflate(const void* pCompessedData, size_t len);
 
@@ -65,7 +65,6 @@ namespace Compression
 		const void* pDst_;
 		size_t destLen_;
 	};
-
 
 
 } // namespace Compression
