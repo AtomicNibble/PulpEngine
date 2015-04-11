@@ -36,7 +36,7 @@ namespace Compression
 			void* pDstBuf, size_t destBufLen, size_t& destLenOut, CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
 		static bool inflate(void* pSrcBuf, size_t srcBufLen,
-			void* pDstBuf, size_t destBufLen, CompressLevel::Enum lvl = CompressLevel::NORMAL);
+			void* pDstBuf, size_t destBufLen);
 
 
 	private:

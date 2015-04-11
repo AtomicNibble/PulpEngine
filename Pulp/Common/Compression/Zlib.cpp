@@ -59,22 +59,34 @@ namespace Compression
 			}
 		}
 
-		const char* ZlibErrToStr(int32_t err)
+		static const char* ZlibErrToStr(int32_t err)
 		{
 			switch (err)
 			{
+				case Z_OK:
+					return "no Error";
+				case Z_STREAM_END:
+					return "stream ended";
+				case Z_NEED_DICT:
+					return "need dict";
 				case Z_ERRNO:
-					return "errorNo";
+					return "ERRNO";
 				case Z_STREAM_ERROR:
 					return "stream error";
 				case Z_DATA_ERROR:
-					return "data error(invalid or incomplete)";
+					return "data error";
 				case Z_MEM_ERROR:
-					return "out of memory";
+					return "mem error";
+				case Z_BUF_ERROR:
+					return "buffer error";
 				case Z_VERSION_ERROR:
 					return "version error";
+
+				default:
+					break;
 			}
-			return "<uKn>";
+
+			return "Unknown Error";
 		}
 
 
@@ -169,7 +181,7 @@ namespace Compression
 	}
 
 	bool Zlib::inflate(void* pSrcBuf, size_t srcBufLen, 
-		void* pDstBuf, size_t destBufLen, CompressLevel::Enum lvl)
+		void* pDstBuf, size_t destBufLen)
 	{
 		// required
 		X_ASSERT_NOT_NULL(pSrcBuf);
@@ -177,8 +189,32 @@ namespace Compression
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 
+		z_stream stream;
+		core::zero_object(stream);
 
-		X_ASSERT_NOT_IMPLEMENTED();
+		// cast away the cost since zlib type is not const.
+		// even tho it don't edit the buffer.
+		stream.next_in = reinterpret_cast<uint8_t*>(const_cast<void*>(pSrcBuf));
+		stream.avail_in = safe_static_cast<uint32_t>(srcBufLen);
+
+		stream.next_out = reinterpret_cast<uint8_t*>(pDstBuf);
+		stream.avail_out = safe_static_cast<uint32_t>(destBufLen);
+
+		stream.zalloc = StaticAlloc;
+		stream.zfree = StaticFree;
+		stream.opaque = gEnv->pArena;
+
+		::inflateInit(&stream);
+
+		int res = ::inflate(&stream, Z_SYNC_FLUSH);
+
+		::inflateEnd(&stream);
+
+		if (res != Z_STREAM_END)
+		{
+			X_ERROR("Zlib", "inflate error: %i -> %s", res, ZlibErrToStr(res));
+			return false;
+		}
 
 		return true;
 	}
