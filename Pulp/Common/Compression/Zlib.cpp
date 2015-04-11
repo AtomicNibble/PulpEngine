@@ -256,8 +256,10 @@ namespace Compression
 		if (len == 0)
 			return InflateResult::OK;
 
-		if (stream_->avail_out == 0)
-			return InflateResult::DST_BUF_FULL;
+		if (stream_->avail_out == 0) {
+			X_ERROR("Zlib", "can't infalte any more dest buffer is full");
+			return InflateResult::ERROR;
+		}
 
 		stream_->next_in = reinterpret_cast<uint8_t*>(const_cast<void*>(pCompessedData));
 		stream_->avail_in = safe_static_cast<uint32_t>(len);
@@ -267,7 +269,7 @@ namespace Compression
 
 		uint32_t left = stream_->avail_out;
 
-		if (res == Z_STREAM_END) {
+		if (res == Z_STREAM_END || (left == 0 && res == Z_OK)) {
 			if (left > 0) {
 				X_WARNING("Zlib", "buffer inflate reached stream end"
 					", yet %s spare bytes left in dst buffer", left);
