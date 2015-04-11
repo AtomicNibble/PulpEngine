@@ -5,6 +5,8 @@
 #include <IFileSys.h>
 #include <ITexture.h>
 
+#include "XTextureFile.h"
+
 X_NAMESPACE_BEGIN(texture)
 
 namespace CI
@@ -103,7 +105,7 @@ namespace CI
 		// since image has passed all the required checks to become a CI.
 		// but if someone decides to make a tool that can make CI.
 		// they might try load a larger image, so lets just check dimensions.
-		if (hdr.height < 0 || hdr.height > TEX_MAX_DIMENSIONS || hdr.width < 0 || hdr.width > TEX_MAX_DIMENSIONS)
+		if (hdr.height > TEX_MAX_DIMENSIONS || hdr.width > TEX_MAX_DIMENSIONS)
 		{
 			X_ERROR("TextureCI", "invalid image dimensions. provided: %ix%i max: %ix%i", 
 				hdr.height, hdr.width, TEX_MAX_DIMENSIONS, TEX_MAX_DIMENSIONS);
