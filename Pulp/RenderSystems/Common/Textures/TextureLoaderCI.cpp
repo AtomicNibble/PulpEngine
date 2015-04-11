@@ -107,7 +107,7 @@ namespace CI
 		// Load the data.
 
 
-
+		X_ASSERT_NOT_IMPLEMENTED();
 
 		return nullptr;
 	}
