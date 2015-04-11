@@ -233,14 +233,14 @@ namespace Compression
 	{
 		X_ASSERT_NOT_NULL(stream_);
 
+		stream_->zalloc = StaticAlloc;
+		stream_->zfree = StaticFree;
+		stream_->opaque = gEnv->pArena;
+	
 		::inflateInit(stream_);
 
 		stream_->next_out = reinterpret_cast<uint8_t*>(pDst);
 		stream_->avail_out = safe_static_cast<uint32_t>(destLen);
-
-		stream_->zalloc = StaticAlloc;
-		stream_->zfree = StaticFree;
-		stream_->opaque = gEnv->pArena;
 	}
 
 	ZlibInflate::~ZlibInflate()
@@ -263,7 +263,7 @@ namespace Compression
 		stream_->avail_in = safe_static_cast<uint32_t>(len);
 
 		// inflate it baby.
-		int res = ::inflate(stream_, Z_BLOCK);
+		int res = ::inflate(stream_, Z_SYNC_FLUSH);
 
 		uint32_t left = stream_->avail_out;
 
