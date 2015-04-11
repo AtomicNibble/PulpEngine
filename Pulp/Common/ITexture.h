@@ -22,6 +22,7 @@ static const char* TEX_DEFAULT_BUMP = "core_assets/Textures/$identitynormal.dds"
 static const uint32_t	 TEX_MAX_DIMENSIONS = 4096;
 static const uint32_t	 TEX_MAX_MIPS = 13;
 static const uint32_t	 TEX_MAX_FACES = 6; // cubes (vol's not supported yet)
+static const uint32_t	 TEX_MAX_DEPTH = 1; 
 
 struct TextureType
 {
