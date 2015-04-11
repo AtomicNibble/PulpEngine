@@ -9,18 +9,10 @@
 
 #include <Containers\Array.h>
 
-extern "C" {
-#include "zlib\zlib.h"
-}
+#include <Compression\Zlib.h>
 
 #include "XTextureFile.h"
 
-// link zlib plz.
-#if X_DEBUG
-X_LINK_LIB("zlibstatd");
-#else
-X_LINK_LIB("zlibstat");
-#endif // !X_DEBUG
 
 X_NAMESPACE_BEGIN(texture)
 
@@ -86,36 +78,6 @@ namespace PNG
 			return Texturefmt::UNKNOWN;
 		}
 
-		static const char* zlib_err_str(int z_err)
-		{
-			switch (z_err)
-			{
-			case Z_OK:
-				return "no Error";
-			case Z_STREAM_END:
-				return "stream ended";
-			case Z_NEED_DICT:
-				return "need dict";
-			case Z_ERRNO:
-				return "ERRNO";
-			case Z_STREAM_ERROR:
-				return "stream error";
-			case Z_DATA_ERROR:
-				return "data error";
-			case Z_MEM_ERROR:
-				return "mem error";
-			case Z_BUF_ERROR:
-				return "buffer error";
-			case Z_VERSION_ERROR:
-				return "version error";
-
-			default:
-				break;
-			}
-
-			return "Unknown Error";
-		}
-
 		struct Png_Header
 		{
 			int64_t magic;
@@ -125,20 +87,6 @@ namespace PNG
 			}
 		};
 
-		void* StaticAlloc(void* opaque, uInt items, uInt size)
-		{
-			X_ASSERT_NOT_NULL(opaque);
-
-			return ((core::MallocFreeAllocator*)opaque)->allocate(items * size, 4, 0);
-		}
-
-		void StaticFree(void* opaque, void* address)
-		{
-			X_ASSERT_NOT_NULL(opaque);
-			X_ASSERT_NOT_NULL(address);
-
-			((core::MallocFreeAllocator*)opaque)->free(address);
-		}
 
 		bool LoadChucksIDAT(core::XFile* file, uint32_t length, uint32_t InfaltedSize, uint8_t* inflated_data)
 		{
@@ -147,27 +95,13 @@ namespace PNG
 			core::Array<uint8_t> ZlibData(g_rendererArena);
 			ZlibData.reserve(length);
 
-			bool	 valid = true;
 			uint32_t tagName;
 			uint32_t orig_crc;
-			int32_t  z_result;
 
-			z_stream stream;
-			core::zero_object(stream);
+			using namespace core::Compression;
 
-			core::MallocFreeAllocator allocator;
-
-			stream.next_in = (Bytef*)ZlibData.ptr();
-			stream.avail_in = (uInt)length;
-
-			stream.next_out = (Bytef*)inflated_data;
-			stream.avail_out = (uInt)InfaltedSize;
-
-			stream.zalloc = StaticAlloc;
-			stream.zfree = StaticFree;
-			stream.opaque = &allocator;
-
-			::inflateInit(&stream);
+			ZlibInflate inflater(inflated_data, InfaltedSize);
+			ZlibInflate::InflateResult::Enum zRes;
 
 			do
 			{
@@ -175,43 +109,34 @@ namespace PNG
 				if (file->read(ZlibData.ptr(), length) != length)
 				{
 					X_ERROR("TexturePNG", "failed to reed block of size: %i", length);
-					valid = false;
-					break;
+					return false;
 				}
 
 				// infalte it baby.
-				z_result = inflate(&stream, Z_SYNC_FLUSH);
+				zRes = inflater.Inflate(ZlibData.ptr(), length);
 
-				// should we check 
-				// stream.avail_in == 0 ? to make sure it was all eaten.
-
-				if (z_result != Z_STREAM_END && z_result != Z_OK)
+				if (zRes == ZlibInflate::InflateResult::ERROR)
 				{
-					if (stream.msg != nullptr)
-						X_ERROR("TexturePNG", "zlib error: %s(%i)", stream.msg, z_result);
-					else
-						X_ERROR("TexturePNG", "zlib error: %s", zlib_err_str(z_result));
-					valid = false;
-					break;
+					X_ERROR("TexturePNG", "Zlib error");
+					return false;
 				}
-
 
 				// after block there is a crc32
 				file->readObj(orig_crc);
 
-				size_t left = file->remainingBytes();
+			//	size_t left = file->remainingBytes();
 
 				if (file->readObj(length) != sizeof(length))
 				{
-					valid = false;
-					break; // no more blocks.
+					X_ERROR("TexturePNG", "failed to read tag length");
+					return false;
 				}
 
 				// check for next tag
 				if (file->readObj(tagName) != sizeof(tagName))
 				{
-					valid = false;
-					break; // no more blocks.
+					X_ERROR("TexturePNG", "failed to read tag name");
+					return false;
 				}
 
 				length = core::Endian::swap(length);
@@ -228,20 +153,18 @@ namespace PNG
 					ZlibData.reserve(length);
 				}
 
-				stream.next_in = (Bytef*)ZlibData.ptr();
-				stream.avail_in = (uInt)length;
-
 			} while (tagName == PNG_TAG_IDAT);
 
-
-			// free any allotions the stream made.
-			::inflateEnd(&stream);
+			if (zRes != ZlibInflate::InflateResult::DONE) {
+				X_ERROR("TexturePNG", "Potential zlib error, did not inflate expected amount");
+				return false;
+			}
 
 			if (tagName != PNG_TAG_IEND) {
 				X_WARNING("TexturePNG", "failed to find IEND tag");
 			}
 
-			return valid;
+			return true;
 		}
 	}
 
