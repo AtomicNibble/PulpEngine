@@ -56,9 +56,9 @@ void* MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTr
 	// allocate raw memory
 	as_void = m_allocator->allocate(newSize, alignment, offset + overheadFront);
 
-	const size_t RealAllocSize = m_allocator->getSize( as_void );
-
 	X_ASSERT(as_void != nullptr, "Out of memory. Cannot allocate %d bytes from arena \"%s\".", newSize, m_name)(size, newSize, alignment, offset, overheadFront, overheadBack);
+
+	const size_t RealAllocSize = m_allocator->getSize(as_void);
 
 	// then tell the memory tracker about the allocation
 	m_memoryTracker.OnAllocation(as_void, size, newSize, alignment, offset, ID, typeName, sourceInfo, m_name);
