@@ -14,6 +14,11 @@ namespace CI
 		static const char*		CI_FILE_EXTENSION = ".ci";
 		static const uint32_t	CI_FOURCC = X_TAG('c', 'i', 'm', 'g');
 		static const uint32_t	CI_VERSION = 2;
+		// these are format limits.
+		// global limtis must still be respected when loading.
+		static const uint32_t	CI_MAX_DIMENSIONS = UINT16_MAX;
+		static const uint32_t	CI_MAX_MIPS = UINT8_MAX;
+		static const uint32_t	CI_MAX_FACES = UINT8_MAX;
 
 
 		struct TexureHeader
@@ -49,6 +54,12 @@ namespace CI
 		};
 
 		X_ENSURE_SIZE(TexureHeader, 36);
+
+		// add a static assert here that TEX_MAX_DIMENSIONS is not bigger than what this format
+		// can store.
+		X_ENSURE_LE(TEX_MAX_DIMENSIONS, CI_MAX_DIMENSIONS, "TEX_MAX_DIMENSIONS exceeds what CI image can store");
+		X_ENSURE_LE(TEX_MAX_MIPS, CI_MAX_MIPS, "TEX_MAX_MIPS exceeds what CI image can store");
+		X_ENSURE_LE(TEX_MAX_FACES, CI_MAX_FACES, "TEX_MAX_FACES exceeds what CI image can store");
 	}
 
 	XTexLoaderCI::XTexLoaderCI()
