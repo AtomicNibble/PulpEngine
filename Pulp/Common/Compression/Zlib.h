@@ -4,11 +4,12 @@
 #ifndef X_COMPRESSION_ZLIB_H_
 #define X_COMPRESSION_ZLIB_H_
 
-X_USING_NAMESPACE(core)
+X_NAMESPACE_BEGIN(core)
 
 
 namespace Compression
 {
+
 
 
 

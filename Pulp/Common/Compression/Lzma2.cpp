@@ -2,7 +2,7 @@
 #include "Lzma2.h"
 
 
-X_USING_NAMESPACE(core)
+X_NAMESPACE_BEGIN(core)
 
 namespace Compression
 {
