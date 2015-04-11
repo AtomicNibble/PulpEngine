@@ -475,6 +475,7 @@
     <ClCompile Include="UT_TexureLoaders.cpp" />
     <ClCompile Include="UT_Thread.cpp" />
     <ClCompile Include="UT_TypeTraits.cpp" />
+    <ClCompile Include="UT_Zlib.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc" />
