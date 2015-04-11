@@ -42,6 +42,9 @@
     <Filter Include="Source Files\Profile">
       <UniqueIdentifier>{0003acaa-34dd-447a-90ed-776768eab72f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\tests\Compression">
+      <UniqueIdentifier>{bc40320a-9896-4b2d-a972-5f4b6e2ecf75}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -261,6 +264,9 @@
     </ClCompile>
     <ClCompile Include="UT_GrowingStringTable.cpp">
       <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Zlib.cpp">
+      <Filter>Source Files\tests\Compression</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
