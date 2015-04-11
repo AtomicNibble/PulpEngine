@@ -95,14 +95,21 @@ namespace Compression
 
 	Zlib::Zlib()
 	{
-
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pArena);
+		stream_ = X_NEW(z_stream,gEnv->pArena,"ZlibStream");
+		core::zero_this(stream_);
 	}
 
 	Zlib::~Zlib()
 	{
-
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pArena);
+		X_DELETE_AND_NULL(stream_, gEnv->pArena);
 	}
 
+
+	// -------------------------------------------------------------
 
 	size_t Zlib::requiredDeflateDestBuf(size_t sourceLen)
 	{
@@ -219,6 +226,62 @@ namespace Compression
 		return true;
 	}
 
+	// --------------------------------------
+
+	ZlibInflate::ZlibInflate(void* pDst, size_t destLen) :
+		pDst_(pDst), destLen_(destLen)
+	{
+		X_ASSERT_NOT_NULL(stream_);
+
+		::inflateInit(stream_);
+
+		stream_->next_out = reinterpret_cast<uint8_t*>(pDst);
+		stream_->avail_out = safe_static_cast<uint32_t>(destLen);
+
+		stream_->zalloc = StaticAlloc;
+		stream_->zfree = StaticFree;
+		stream_->opaque = gEnv->pArena;
+	}
+
+	ZlibInflate::~ZlibInflate()
+	{
+		::inflateEnd(stream_);
+	}
+
+
+	ZlibInflate::InflateResult::Enum ZlibInflate::Inflate(const void* pCompessedData, size_t len)
+	{
+		X_ASSERT_NOT_NULL(pCompessedData);
+
+		if (len == 0)
+			return InflateResult::OK;
+
+		if (stream_->avail_out == 0)
+			return InflateResult::DST_BUF_FULL;
+
+		stream_->next_in = reinterpret_cast<uint8_t*>(const_cast<void*>(pCompessedData));
+		stream_->avail_in = safe_static_cast<uint32_t>(len);
+
+		// inflate it baby.
+		int res = ::inflate(stream_, Z_BLOCK);
+
+		uint32_t left = stream_->avail_out;
+
+		if (res == Z_STREAM_END) {
+			if (left > 0) {
+				X_WARNING("Zlib", "buffer inflate reached stream end"
+					", yet %s spare bytes left in dst buffer", left);
+			}
+			return InflateResult::DONE;
+		}
+		
+		if (res != Z_OK) {
+			X_ERROR("Zlib", "inflate error: %i -> %s", res, ZlibErrToStr(res));
+			return InflateResult::ERROR;
+		}
+
+		return InflateResult::OK;
+	}
 
 
 } // namespace Compression

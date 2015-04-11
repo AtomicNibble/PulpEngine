@@ -4,8 +4,11 @@
 #ifndef X_COMPRESSION_ZLIB_H_
 #define X_COMPRESSION_ZLIB_H_
 
-X_NAMESPACE_BEGIN(core)
+extern "C" {
+	struct z_stream_s;
+};
 
+X_NAMESPACE_BEGIN(core)
 
 namespace Compression
 {
@@ -24,11 +27,11 @@ namespace Compression
 			NORMAL, // normal
 			HIGH // best
 			);
-	public:
+	protected:
 		Zlib();
-		~Zlib();
+		virtual ~Zlib();
 
-
+	public:
 		// none buffed single step inflate / deflate.
 		static size_t requiredDeflateDestBuf(size_t sourceLen);
 
@@ -40,8 +43,27 @@ namespace Compression
 
 
 	private:
-	//	z_stream stream;
+		X_NO_COPY(Zlib);
+		X_NO_ASSIGN(Zlib);
+	protected:
+		z_stream_s* stream_;
+	};
 
+
+	// can take one or many inputs and inflate them into dest.
+	struct ZlibInflate : public Zlib
+	{
+	public:
+		X_DECLARE_ENUM(InflateResult)(ERROR,OK,DST_BUF_FULL,DONE);
+	public:
+		ZlibInflate(void* pDst, size_t destLen);
+		~ZlibInflate();
+
+		InflateResult::Enum Inflate(const void* pCompessedData, size_t len);
+
+	private:
+		const void* pDst_;
+		size_t destLen_;
 	};
 
 
