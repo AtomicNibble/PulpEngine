@@ -54,7 +54,7 @@ namespace Compression
 	struct ZlibInflate : public Zlib
 	{
 	public:
-		X_DECLARE_ENUM(InflateResult)(ERROR,OK,DST_BUF_FULL,DONE);
+		X_DECLARE_ENUM(InflateResult)(ERROR,OK,DONE);
 	public:
 		ZlibInflate(void* pDst, size_t destLen);
 		virtual ~ZlibInflate() X_FINAL;
