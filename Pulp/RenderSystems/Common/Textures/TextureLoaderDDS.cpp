@@ -68,10 +68,13 @@ namespace DDS
 		{
 			enum Enum
 			{
+				BC6H_TYPELESS = 94,
+				BC6H_UF16 = 95,
+				BC6H_SF16 = 96,
+
 				BC7_TYPELESS = 97,
 				BC7_UNORM = 98,
 				BC7_UNORM_SRGB = 99,
-
 			};
 		};
 
@@ -91,7 +94,9 @@ namespace DDS
 			DXN_XY,    // inverted relative to standard ATI2, 360's DXN
 			DXN_YX,    // standard ATI2
 
-			BC6,
+			BC6_TYPELESS,
+			BC6_UF16,
+			BC6_SF16,
 
 			BC7_TYPELESS,
 			BC7_UNORM,
@@ -331,7 +336,9 @@ namespace DDS
 				case PIXEL_FMT_DX10_HEADER:
 					switch (dxFmt)
 					{
-						case dxt_format::BC6:
+						case dxt_format::BC6_TYPELESS:
+						case dxt_format::BC6_UF16:
+						case dxt_format::BC6_SF16:
 							X_ASSERT_NOT_IMPLEMENTED();
 							return 0;
 						case dxt_format::BC7_TYPELESS:
@@ -363,7 +370,9 @@ namespace DDS
 				case PIXEL_FMT_DX10_HEADER:
 					switch (dxFmt)
 					{
-						case dxt_format::BC6:
+						case dxt_format::BC6_TYPELESS:
+						case dxt_format::BC6_UF16:
+						case dxt_format::BC6_SF16:
 							return false;
 						case dxt_format::BC7_TYPELESS:
 						case dxt_format::BC7_UNORM:
@@ -412,7 +421,9 @@ namespace DDS
 				case PIXEL_FMT_DX10_HEADER:
 					switch (dxFmt)
 					{
-						case dxt_format::BC6:
+						case dxt_format::BC6_TYPELESS:
+						case dxt_format::BC6_UF16:
+						case dxt_format::BC6_SF16:
 						case dxt_format::BC7_TYPELESS:
 						case dxt_format::BC7_UNORM:
 						case dxt_format::BC7_UNORM_SRGB:
@@ -449,12 +460,19 @@ namespace DDS
 				case PIXEL_FMT_DX10_HEADER:
 					switch (dxFmt)
 					{
-						case dxt_format::BC6:
+						case dxt_format::BC6_TYPELESS:
 							return Texturefmt::BC6;
+						case dxt_format::BC6_UF16:
+							return Texturefmt::BC6_UF16;
+						case dxt_format::BC6_SF16:
+							return Texturefmt::BC6_SF16;
+
 						case dxt_format::BC7_TYPELESS:
-						case dxt_format::BC7_UNORM:
-						case dxt_format::BC7_UNORM_SRGB:
 							return Texturefmt::BC7;
+						case dxt_format::BC7_UNORM:
+							return Texturefmt::BC7_UNORM;
+						case dxt_format::BC7_UNORM_SRGB:
+							return Texturefmt::BC7_UNORM_SRGB;
 					}
 				}
 
@@ -463,7 +481,7 @@ namespace DDS
 
 
 
-			inline unsigned get_data_size(uint32_t width, uint32_t height, uint32_t depth, 
+			inline uint32_t get_data_size(uint32_t width, uint32_t height, uint32_t depth,
 				uint32_t mips, pixel_format fmt, dxt_format dxFmt)
 			{
 				uint32_t size = 0;
@@ -690,6 +708,16 @@ namespace DDS
 
 					switch (dx10Hdr.dxgiFormat)
 					{
+						case dxgiFormat::BC6H_TYPELESS:
+							dxt_fmt = dxt_format::BC6_TYPELESS;
+							break;
+						case dxgiFormat::BC6H_UF16:
+							dxt_fmt = dxt_format::BC7_UNORM;
+							break;
+						case dxgiFormat::BC6H_SF16:
+							dxt_fmt = dxt_format::BC7_UNORM_SRGB;
+							break;
+
 						case dxgiFormat::BC7_TYPELESS:
 							dxt_fmt = dxt_format::BC7_TYPELESS;
 							break;
@@ -705,7 +733,6 @@ namespace DDS
 							return nullptr;
 							break;
 					}
-
 
 					break;		
 
