@@ -6,7 +6,6 @@
 
 X_NAMESPACE_BEGIN(core)
 
-
 namespace Compression
 {
 
