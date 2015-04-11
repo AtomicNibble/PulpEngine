@@ -172,8 +172,17 @@ DXGI_FORMAT XTexture::DCGIFormatFromTexFmt(Texturefmt::Enum fmt)
 
 		case Texturefmt::BC6:
 			return DXGI_FORMAT_BC6H_TYPELESS; // HDR BAbbbbbbbbby!
+		case Texturefmt::BC6_UF16:
+			return DXGI_FORMAT_BC6H_UF16;
+		case Texturefmt::BC6_SF16:
+			return DXGI_FORMAT_BC6H_SF16;
+
 		case Texturefmt::BC7:
+			return DXGI_FORMAT_BC7_TYPELESS;
+		case Texturefmt::BC7_UNORM:
 			return DXGI_FORMAT_BC7_UNORM;
+		case Texturefmt::BC7_UNORM_SRGB:
+			return DXGI_FORMAT_BC7_UNORM_SRGB;
 
 		case Texturefmt::R16G16F:
 			return DXGI_FORMAT_R16G16_FLOAT;
