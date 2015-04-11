@@ -3,6 +3,7 @@
 
 #include <String\StringUtil.h>
 #include <IFileSys.h>
+#include <ITexture.h>
 
 X_NAMESPACE_BEGIN(texture)
 
@@ -23,9 +24,10 @@ namespace CI
 
 			uint32 fourCC;
 			uint8 version;
-			uint8 format;
+			Texturefmt::Enum format;
 			uint8 Mips;
-			uint8 _unused;
+			uint8 Faces;
+
 			TextureFlags Flags;
 
 			union {
@@ -37,6 +39,7 @@ namespace CI
 					Vec2<uint16_t> size;
 				};
 			};
+
 			uint32 DataSize;
 			uint32 __Unused[4]; // room for expansion.
 
