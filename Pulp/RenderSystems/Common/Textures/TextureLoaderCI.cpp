@@ -47,8 +47,9 @@ namespace CI
 				};
 			};
 
-			uint32 DataSize;
-			uint32 __Unused[4]; // room for expansion.
+			uint32 DataSize;	// the size of all the data.
+			uint32 FaceSize;	// face size
+			uint32 __Unused[3]; // room for expansion.
 
 			bool isValid(void) const {
 				return fourCC == CI_FOURCC;
@@ -119,13 +120,60 @@ namespace CI
 			return nullptr;
 		}
 
+		if ((hdr.DataSize % hdr.FaceSize) != 0)
+		{
+			X_ERROR("TextureCI", "data size is not a multiple of facesize");
+			return nullptr;
+		}
+
+		uint8_t* pImgBuf = X_NEW_ARRAY_ALIGNED(uint8_t, hdr.DataSize, g_rendererArena, "CIImgBuffer", 8);
+		uint32_t bytesRead = file->read(pImgBuf, hdr.DataSize);
+
+		if (bytesRead != hdr.DataSize)
+		{
+			X_ERROR("TextureCI", "failed to read image data from CIImage. got: %x wanted: %x bytes",
+				bytesRead, hdr.DataSize);
+
+			X_DELETE_ARRAY(pImgBuf, g_rendererArena);
+			return nullptr;
+		}
+
+		if (file->remainingBytes() != 0)
+		{
+			X_ERROR("TextureCI", "read fail, bytes left in file: %i", file->remainingBytes());
+			return nullptr;
+		}
 
 		// Load the data.
+		XTextureFile* img = X_NEW(XTextureFile, g_rendererArena, "TextureFile");
 
+		// set the info
+		img->setWidth(hdr.width);
+		img->setHeigth(hdr.height);
+		img->setNumMips(hdr.Mips);
+		img->setNumFaces(hdr.Faces); // 1 for 2D 6 for a cube.
+		img->setDepth(1); /// We Don't allow volume texture loading yet.
+		img->setFlags(hdr.Flags);
+		img->setFormat(hdr.format);
 
-		X_ASSERT_NOT_IMPLEMENTED();
+		uint32_t offset = 0;
+		for (uint32_t i = 0; i < hdr.Faces; i++)
+		{
+			img->pFaces[i] = &pImgBuf[offset];
 
-		return nullptr;
+			// add offset.
+			offset += hdr.FaceSize;
+		}
+
+		// check offfset is same as size.
+		if (offset != hdr.DataSize) {
+			X_ERROR("TextureCI", "error setting face pointers, "
+				"img data is not equal to expected face size. Delta: %i",
+				hdr.DataSize - offset);
+			return nullptr;
+		}
+
+		return img;
 	}
 	// ~ITextureLoader
 
