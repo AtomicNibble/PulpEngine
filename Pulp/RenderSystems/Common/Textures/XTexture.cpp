@@ -533,6 +533,19 @@ void XTexture::preProcessImage(XTextureFile* image_data)
 		}
 	}
 
+	if (!image_data->getFlags().IsSet(TexFlag::CI_IMG))
+	{
+		X_LOG0("Texture", "Compiling image to CI: ^5%s", this->FileName.c_str());
+		// TODO...
+		// when we get this we want to compile the image.
+		// we want to make it a background job.
+		// we need the jobs to be done one at a time tho
+		// since if we load 1000 dds images we will rape memory requirements.
+		// well maybe not since there are a limited number of threads.
+
+
+
+	}
 }
 
 
