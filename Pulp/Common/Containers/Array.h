@@ -3,6 +3,9 @@
 #ifndef X_CON_ARRAY_H
 #define X_CON_ARRAY_H
 
+#include <ISerialize.h>
+
+#include "CompileTime\IsPOD.h"
 
 X_NAMESPACE_BEGIN(core)
 
@@ -85,6 +88,11 @@ public:
 	inline ConstIterator begin(void) const;
 	inline Iterator end(void);
 	inline ConstIterator end(void) const;
+
+	// ISerialize
+	virtual bool SSave(XFile* pFile) const X_FINAL;
+	virtual bool SLoad(XFile* pFile) X_FINAL;
+	// ~ISerialize
 
 private:
 	// used to make sure buffer is large enougth.

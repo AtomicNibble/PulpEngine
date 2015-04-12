@@ -393,6 +393,54 @@ inline typename Array<T>::ConstIterator Array<T>::end(void) const
 
 // -----------------------------------------------
 
+// ISerialize
+template<typename T>
+bool Array<T>::SSave(XFile* pFile) const
+{
+	X_ASSERT_NOT_NULL(pFile);
+
+	if (compileTime::IsPOD<T>::Value) {
+		X_ERROR("Array", "Can't save a none POD type to file: %s", typeid(T).name());
+		return false;
+	}
+
+	pFile->writeObj(num_);
+	pFile->writeObj(size_);
+	pFile->writeObj(granularity_);
+	pFile->writeObj(list_, size_);
+	return true;
+}
+
+template<typename T>
+bool Array<T>::SLoad(XFile* pFile)
+{
+	X_ASSERT_NOT_NULL(pFile);
+
+	if (compileTime::IsPOD<T>::Value) {
+		X_ERROR("Array", "Can't load a none POD type from file: %s", typeid(T).name());
+		return false;
+	}
+
+	free();
+	size_type num, size, gran;
+
+	pFile->readObj(num);
+	pFile->readObj(size);
+	pFile->writeObj(gran);
+
+	granularity_ = gran;
+	list_ = Allocate(size);
+	size_ = size;
+
+	pFile->readObj(list_, safe_static_cast<uint32_t,size_t>(size_));
+	return true;
+}
+
+// ~ISerialize
+
+// -----------------------------------------------
+
+
 template<typename T>
 void Array<T>::ensureSize(size_type size)
 {

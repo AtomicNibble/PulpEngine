@@ -194,6 +194,36 @@ size_t GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::alloc
 }
 
 
+// ISerialize
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::SSave(XFile* pFile) const
+{
+	X_ASSERT_NOT_NULL(pFile);
+
+	pFile->writeObj(CurrentBlock_);
+	pFile->writeObj(currentBlockSpace_);
+	pFile->writeObj(NumStrings_);
+	pFile->writeObj(WasteSize_);
+	
+	return buffer_.SSave(pFile);
+}
+
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::SLoad(XFile* pFile)
+{
+	X_ASSERT_NOT_NULL(pFile);
+	free();
+
+	pFile->readObj(CurrentBlock_);
+	pFile->readObj(currentBlockSpace_);
+	pFile->readObj(NumStrings_);
+	pFile->readObj(WasteSize_);
+
+	return buffer_.SLoad(pFile);
+}
+
+// ~ISerialize
+
 // --------------------------------------------------------------------
 
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>

@@ -7,12 +7,14 @@
 
 #include "Containers\Array.h"
 
+#include <ISerialize.h>
+
 X_NAMESPACE_BEGIN(core)
 
 // valid IdTypes: uint16_t, uint32_t
 
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
-class GrowingStringTable
+class GrowingStringTable : public ISerialize
 {
 	X_PRAGMA(pack(push, 4))
 	struct Header_t
@@ -47,6 +49,11 @@ public:
 	X_INLINE size_t numStrings(void) const;
 	X_INLINE size_t wastedBytes(void) const;
 	X_INLINE size_t allocatedBytes(void) const;
+
+	// ISerialize
+	virtual bool SSave(XFile* pFile) const X_FINAL;
+	virtual bool SLoad(XFile* pFile) X_FINAL;
+	// ~ISerialize
 
 private:
 	// request X number of free blocks.
