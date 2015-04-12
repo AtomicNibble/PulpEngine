@@ -172,8 +172,17 @@ DXGI_FORMAT XTexture::DCGIFormatFromTexFmt(Texturefmt::Enum fmt)
 
 		case Texturefmt::BC6:
 			return DXGI_FORMAT_BC6H_TYPELESS; // HDR BAbbbbbbbbby!
+		case Texturefmt::BC6_UF16:
+			return DXGI_FORMAT_BC6H_UF16;
+		case Texturefmt::BC6_SF16:
+			return DXGI_FORMAT_BC6H_SF16;
+
 		case Texturefmt::BC7:
+			return DXGI_FORMAT_BC7_TYPELESS;
+		case Texturefmt::BC7_UNORM:
 			return DXGI_FORMAT_BC7_UNORM;
+		case Texturefmt::BC7_UNORM_SRGB:
+			return DXGI_FORMAT_BC7_UNORM_SRGB;
 
 		case Texturefmt::R16G16F:
 			return DXGI_FORMAT_R16G16_FLOAT;
@@ -226,8 +235,16 @@ Texturefmt::Enum XTexture::TexFmtFromStr(const char* pStr)
 		return Texturefmt::BC5_SNORM;
 	if (core::strUtil::IsEqualCaseInsen("BC6", pStr))
 		return Texturefmt::BC6;
+	if (core::strUtil::IsEqualCaseInsen("BC6_UF16", pStr))
+		return Texturefmt::BC6_UF16;
+	if (core::strUtil::IsEqualCaseInsen("BC6_SF16", pStr))
+		return Texturefmt::BC6_SF16;
 	if (core::strUtil::IsEqualCaseInsen("BC7", pStr))
 		return Texturefmt::BC7;
+	if (core::strUtil::IsEqualCaseInsen("BC7_UNORM", pStr))
+		return Texturefmt::BC7_UNORM;
+	if (core::strUtil::IsEqualCaseInsen("BC7_UNORM_SRGB", pStr))
+		return Texturefmt::BC7_UNORM_SRGB;
 	if (core::strUtil::IsEqualCaseInsen("R16G16F", pStr))
 		return Texturefmt::R16G16F;
 	if (core::strUtil::IsEqualCaseInsen("R10G10B10A2", pStr))
@@ -262,7 +279,11 @@ bool XTexture::is_dxt(Texturefmt::Enum fmt)
 	case Texturefmt::BC5:
 	case Texturefmt::BC5_SNORM:
 	case Texturefmt::BC6:
+	case Texturefmt::BC6_UF16:
+	case Texturefmt::BC6_SF16:
 	case Texturefmt::BC7:
+	case Texturefmt::BC7_UNORM:
+	case Texturefmt::BC7_UNORM_SRGB:
 	case Texturefmt::ATI2:
 	case Texturefmt::ATI2_XY:
 		return true;
@@ -283,7 +304,11 @@ uint32_t XTexture::get_bpp(Texturefmt::Enum fmt)
 	case Texturefmt::BC5:			return 8;
 	case Texturefmt::BC5_SNORM:     return 8;
 	case Texturefmt::BC6:			return 8;
+	case Texturefmt::BC6_UF16:		return 8;
+	case Texturefmt::BC6_SF16:		return 8;
 	case Texturefmt::BC7:			return 8;
+	case Texturefmt::BC7_UNORM:		return 8;
+	case Texturefmt::BC7_UNORM_SRGB:return 8;
 
 	case Texturefmt::ATI2:			return 8;
 	case Texturefmt::ATI2_XY:		return 8;
@@ -319,7 +344,11 @@ uint32_t XTexture::get_dxt_bytes_per_block(Texturefmt::Enum fmt)
 	case Texturefmt::BC5:			return 16;
 	case Texturefmt::BC5_SNORM:     return 16;
 	case Texturefmt::BC6:			return 16;
+	case Texturefmt::BC6_UF16:		return 16;
+	case Texturefmt::BC6_SF16:		return 16;
 	case Texturefmt::BC7:			return 16;
+	case Texturefmt::BC7_UNORM:		return 16;
+	case Texturefmt::BC7_UNORM_SRGB:return 16;
 
 	case Texturefmt::ATI2:			return 16;
 	case Texturefmt::ATI2_XY:       return 16;
@@ -504,6 +533,19 @@ void XTexture::preProcessImage(XTextureFile* image_data)
 		}
 	}
 
+	if (!image_data->getFlags().IsSet(TexFlag::CI_IMG))
+	{
+		X_LOG0("Texture", "Compiling image to CI: ^5%s", this->FileName.c_str());
+		// TODO...
+		// when we get this we want to compile the image.
+		// we want to make it a background job.
+		// we need the jobs to be done one at a time tho
+		// since if we load 1000 dds images we will rape memory requirements.
+		// well maybe not since there are a limited number of threads.
+
+
+
+	}
 }
 
 

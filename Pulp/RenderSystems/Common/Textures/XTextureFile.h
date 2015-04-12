@@ -28,7 +28,9 @@ namespace PSD {
 namespace TGA {
 	class XTexLoaderTGA;
 }
-
+namespace CI {
+	class XTexLoaderCI;
+}
 /*
 
 Vec2<uint16_t>		size;
@@ -52,6 +54,7 @@ struct XTextureFile
 	friend class PNG::XTexLoaderPNG;
 	friend class TGA::XTexLoaderTGA;
 	friend class PSD::XTexLoaderPSD;
+	friend class CI::XTexLoaderCI;
 
 	friend class XTexture;
 

@@ -13,6 +13,7 @@
 X_USING_NAMESPACE;
 
 core::AtomicInt numJobsRan(0);
+core::AtomicInt jobList9Done(0);
 
 X_PRAGMA(optimize("", off))
 
@@ -27,6 +28,18 @@ void TestJob(void* pParam, uint32_t batchOffset, uint32_t batchNum, uint32_t wor
 		running_total = 37 * running_total + i;
 	}
 
+	size_t jobIdx = idx / 10000;
+
+	if (jobIdx == 9)  {
+		ASSERT_EQ(1, jobList9Done);
+	}
+
+	if (idx == 80999) {
+		jobList9Done = 1;
+	}
+
+//	X_LOG0("TestJob", "jobList idx: %i", jobIdx);
+
 	++numJobsRan;
 }
 X_PRAGMA(optimize("", on))
@@ -36,9 +49,9 @@ TEST(Threading, Scheduler)
 {
 	core::Scheduler jobSys;
 
-	jobSys.StartThreads();
+	jobSys.StartUp();
 
-#if 0 // test how long the singe threaded version took.
+	core::TimeVal singleThreadElapse;
 	{
 		core::TimeVal start = gEnv->pTimer->GetTimeReal();
 
@@ -47,22 +60,16 @@ TEST(Threading, Scheduler)
 		for (i = 0; i < num; i++)
 		{
 			TestJob((void*)i, 0, 1, 0);
-
-			if ((i % 100000) == 0) {
-				X_LOG0("Test", "left: %i", num - i);
-			}
 		}
 
 		core::TimeVal end = gEnv->pTimer->GetTimeReal();
-		core::TimeVal elpased = end - start;
+		singleThreadElapse = end - start;
 
-		X_LOG0("Test", "exec time: %f", elpased.GetMilliSeconds());
+		X_LOG0("Scheduler", "Single threaded exec time: %f", singleThreadElapse.GetMilliSeconds());
 	}
-#endif
+
 
 	{
-		UnitTests::ScopeProfiler profile("Scheduler");
-
 		core::MallocFreeAllocator allocator;
 		typedef core::MemoryArena<
 			core::MallocFreeAllocator,
@@ -74,8 +81,9 @@ TEST(Threading, Scheduler)
 
 		StackArena arena(&allocator, "SchedulerArena");
 
-		const size_t numLists = 10;
+		core::TimeVal start = gEnv->pTimer->GetTimeReal();
 
+		const size_t numLists = 10;
 		core::JobListStats combinedStats;
 
 		core::JobList* jobLists[numLists];
@@ -98,7 +106,10 @@ TEST(Threading, Scheduler)
 				}
 
 				// set a priority.
-				if ((j % 3) == 0) {
+				if (j == (numLists - 2)) {
+					jobs->SetPriority(core::JobListPriority::LOW);
+				}
+				if ((j % 3) == 0 || j == (numLists - 1)) {
 					jobs->SetPriority(core::JobListPriority::HIGH);
 				}
 				if (j == 0) {
@@ -108,7 +119,10 @@ TEST(Threading, Scheduler)
 
 			for (size_t j = 0; j < numLists; j++)
 			{
-				jobSys.SubmitJobList(jobLists[j]);
+				if (j == (numLists-1))
+					jobSys.SubmitJobList(jobLists[j], jobLists[j-1]);
+				else
+					jobSys.SubmitJobList(jobLists[j]);
 			}
 
 			for (size_t j = 0; j < numLists; j++)
@@ -127,15 +141,29 @@ TEST(Threading, Scheduler)
 
 		for (size_t j = 0; j < numLists; j++)
 		{
-			combinedStats += jobLists[j]->getStats();
+			const core::JobListStats& stats = jobLists[j]->getStats();
+			combinedStats.waitTime += stats.waitTime;
+			for (size_t x = 0; x < core::HW_THREAD_MAX; x++) {
+				combinedStats.threadExecTime[x] += stats.threadExecTime[x];
+				combinedStats.threadTotalTime[x] += stats.threadTotalTime[x];
+			}
 			X_DELETE(jobLists[j], &arena);
 		}
 
+		core::TimeVal end = gEnv->pTimer->GetTimeReal();
+		core::TimeVal MultiElapsed = end - start;
+
+		// work out percentage.
+		// if it took 5 times less time it is 500%
+		float32_t percentage = static_cast<float32_t>(singleThreadElapse.GetValue()) /
+			static_cast<float32_t>(MultiElapsed.GetValue());
+
+		percentage *= 100;
 
 		// print the stats.
 		X_LOG0("Scheduler", "Stats");
 		X_LOG_BULLET;
-
+		X_LOG0("Scheduler", "Percentage: %g%% scaling: %g%%", percentage, percentage / jobSys.numThreads());
 		X_LOG0("Scheduler", "Total wait time: %f", combinedStats.waitTime.GetMilliSeconds());
 		for (size_t i = 0; i < core::HW_THREAD_MAX; i++) {
 			X_LOG0("Scheduler", "Thread %i Exec: %f Total: %f", 
@@ -146,7 +174,7 @@ TEST(Threading, Scheduler)
 		}
 	}
 
-	EXPECT_EQ(10000, numJobsRan);
+	EXPECT_EQ(20000, numJobsRan);
 
 	jobSys.ShutDown();
 }

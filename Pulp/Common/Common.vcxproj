@@ -53,6 +53,8 @@
     <ClInclude Include="CompileTime\IsPOD.h" />
     <ClInclude Include="CompileTime\IsPointer.h" />
     <ClInclude Include="CompileTime\IsStringLiteral.h" />
+    <ClInclude Include="Compression\Lzma2.h" />
+    <ClInclude Include="Compression\Zlib.h" />
     <ClInclude Include="Configuration.h" />
     <ClInclude Include="ConfigurationWin32.h" />
     <ClInclude Include="Containers\BitStream.h" />
@@ -116,6 +118,7 @@
     <ClInclude Include="IAnimation.h" />
     <ClInclude Include="IAssetPak.h" />
     <ClInclude Include="IBsp.h" />
+    <ClInclude Include="ICi.h" />
     <ClInclude Include="IConsole.h" />
     <ClInclude Include="ICore.h" />
     <ClInclude Include="IDirectoryWatcher.h" />
@@ -134,6 +137,7 @@
     <ClInclude Include="IRenderAux.h" />
     <ClInclude Include="IRenderMesh.h" />
     <ClInclude Include="IScriptSys.h" />
+    <ClInclude Include="ISerialize.h" />
     <ClInclude Include="IShader.h" />
     <ClInclude Include="ISound.h" />
     <ClInclude Include="ITexture.h" />
@@ -269,6 +273,7 @@
     <ClInclude Include="Threading\Thread.h" />
     <ClInclude Include="Threading\ThreadLocalStorage.h" />
     <ClInclude Include="Threading\win32\Signal.h" />
+    <ClInclude Include="Threading\win32\Thread.h" />
     <ClInclude Include="Time\CompressedStamps.h" />
     <ClInclude Include="Time\DateStamp.h" />
     <ClInclude Include="Time\TimeStamp.h" />
@@ -392,6 +397,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Assets\AssetContainer.cpp" />
+    <ClCompile Include="Compression\Lzma2.cpp" />
+    <ClCompile Include="Compression\Zlib.cpp" />
     <ClCompile Include="Containers\HashIndex.cpp" />
     <ClCompile Include="Debugging\Assert.cpp" />
     <ClCompile Include="Debugging\SymbolInfo.cpp">
@@ -683,14 +690,8 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Threading\Scheduler.cpp" />
-    <ClCompile Include="Threading\Thread.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
-    </ClCompile>
     <ClCompile Include="Threading\win32\Signal.cpp" />
+    <ClCompile Include="Threading\win32\Thread.cpp" />
     <ClCompile Include="Time\CompressedStamps.cpp" />
     <ClCompile Include="Time\DateStamp.cpp" />
     <ClCompile Include="Time\TimeStamp.cpp" />

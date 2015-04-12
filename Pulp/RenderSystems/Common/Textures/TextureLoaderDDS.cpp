@@ -58,23 +58,49 @@ namespace DDS
 			PIXEL_FMT_L8 = PIXEL_FMT_FOURCC('L', 'x', 'x', 'x'),
 			PIXEL_FMT_A8 = PIXEL_FMT_FOURCC('x', 'x', 'x', 'A'),
 			PIXEL_FMT_A8L8 = PIXEL_FMT_FOURCC('L', 'x', 'x', 'A'),
-			PIXEL_FMT_A8R8G8B8 = PIXEL_FMT_FOURCC('R', 'G', 'B', 'A')
+			PIXEL_FMT_A8R8G8B8 = PIXEL_FMT_FOURCC('R', 'G', 'B', 'A'),
+
+			PIXEL_FMT_DX10_HEADER = PIXEL_FMT_FOURCC('D', 'X', '1', '0'),
 		};
+
+		// Dx10 Formats
+		struct dxgiFormat
+		{
+			enum Enum
+			{
+				BC6H_TYPELESS = 94,
+				BC6H_UF16 = 95,
+				BC6H_SF16 = 96,
+
+				BC7_TYPELESS = 97,
+				BC7_UNORM = 98,
+				BC7_UNORM_SRGB = 99,
+			};
+		};
+
 
 		enum dxt_format
 		{
-			cDXTInvalid = -1,
+			DXTInvalid = -1,
 
-			// cDXT1/1A must appear first!
-			cDXT1,
-			cDXT1A,
+			// DXT1/1A must appear first!
+			DXT1,
+			DXT1A,
 
-			cDXT3,
-			cDXT5,
-			cDXT5A,
+			DXT3,
+			DXT5,
+			DXT5A,
 
-			cDXN_XY,    // inverted relative to standard ATI2, 360's DXN
-			cDXN_YX     // standard ATI2
+			DXN_XY,    // inverted relative to standard ATI2, 360's DXN
+			DXN_YX,    // standard ATI2
+
+			BC6_TYPELESS,
+			BC6_UF16,
+			BC6_SF16,
+
+			BC7_TYPELESS,
+			BC7_UNORM,
+			BC7_UNORM_SRGB,
 		};
 
 		const unsigned DDSMaxImageDimensions = TEX_MAX_DIMENSIONS;
@@ -189,6 +215,19 @@ namespace DDS
 			char data[128];
 		};
 
+		struct DDS_DX10_header
+		{
+			DDS_DX10_header() {
+				core::zero_this(this);
+			}
+
+			unsigned    dxgiFormat;
+			unsigned	resourceDimension;
+			unsigned    miscFlag;
+			unsigned    arraySize;
+			unsigned    miscFlags2;
+		};
+
 		uint32_t ComputMaxMips(uint32_t Width, uint32_t Height)
 		{
 			uint32_t Biggest = core::Max<uint32_t>(Width, Height);
@@ -230,41 +269,41 @@ namespace DDS
 			{
 				switch (fmt)
 				{
-				case PIXEL_FMT_DXT1:         return cDXT1;
-				case PIXEL_FMT_DXT1A:        return cDXT1A;
-				case PIXEL_FMT_DXT2:         return cDXT3;
-				case PIXEL_FMT_DXT3:         return cDXT3;
-				case PIXEL_FMT_DXT4:         return cDXT5;
-				case PIXEL_FMT_DXT5:         return cDXT5;
-				case PIXEL_FMT_3DC:          return cDXN_YX;
-				case PIXEL_FMT_DXT5A:        return cDXT5A;
-				case PIXEL_FMT_DXN:          return cDXN_XY;
-				case PIXEL_FMT_DXT5_CCxY:    return cDXT5;
-				case PIXEL_FMT_DXT5_xGxR:    return cDXT5;
-				case PIXEL_FMT_DXT5_xGBR:    return cDXT5;
-				case PIXEL_FMT_DXT5_AGBR:    return cDXT5;
+				case PIXEL_FMT_DXT1:         return DXT1;
+				case PIXEL_FMT_DXT1A:        return DXT1A;
+				case PIXEL_FMT_DXT2:         return DXT3;
+				case PIXEL_FMT_DXT3:         return DXT3;
+				case PIXEL_FMT_DXT4:         return DXT5;
+				case PIXEL_FMT_DXT5:         return DXT5;
+				case PIXEL_FMT_3DC:          return DXN_YX;
+				case PIXEL_FMT_DXT5A:        return DXT5A;
+				case PIXEL_FMT_DXN:          return DXN_XY;
+				case PIXEL_FMT_DXT5_CCxY:    return DXT5;
+				case PIXEL_FMT_DXT5_xGxR:    return DXT5;
+				case PIXEL_FMT_DXT5_xGBR:    return DXT5;
+				case PIXEL_FMT_DXT5_AGBR:    return DXT5;
 				default: break;
 				}
-				return cDXTInvalid;
+				return DXTInvalid;
 			}
 
 			inline pixel_format from_dxt_format(dxt_format dxt_fmt)
 			{
 				switch (dxt_fmt)
 				{
-				case cDXT1:
+				case DXT1:
 					return PIXEL_FMT_DXT1;
-				case cDXT1A:
+				case DXT1A:
 					return PIXEL_FMT_DXT1A;
-				case cDXT3:
+				case DXT3:
 					return PIXEL_FMT_DXT3;
-				case cDXT5:
+				case DXT5:
 					return PIXEL_FMT_DXT5;
-				case cDXN_XY:
+				case DXN_XY:
 					return PIXEL_FMT_DXN;
-				case cDXN_YX:
+				case DXN_YX:
 					return PIXEL_FMT_3DC;
-				case cDXT5A:
+				case DXT5A:
 					return PIXEL_FMT_DXT5A;
 				default: break;
 				}
@@ -272,7 +311,7 @@ namespace DDS
 				return PIXEL_FMT_INVALID;
 			}
 
-			inline unsigned get_bpp(pixel_format fmt)
+			inline unsigned get_bpp(pixel_format fmt, dxt_format dxFmt)
 			{
 				switch (fmt)
 				{
@@ -294,13 +333,26 @@ namespace DDS
 				case PIXEL_FMT_DXT5_xGxR: return 8;
 				case PIXEL_FMT_DXT5_xGBR: return 8;
 				case PIXEL_FMT_DXT5_AGBR: return 8;
+				case PIXEL_FMT_DX10_HEADER:
+					switch (dxFmt)
+					{
+						case dxt_format::BC6_TYPELESS:
+						case dxt_format::BC6_UF16:
+						case dxt_format::BC6_SF16:
+							X_ASSERT_NOT_IMPLEMENTED();
+							return 0;
+						case dxt_format::BC7_TYPELESS:
+						case dxt_format::BC7_UNORM:
+						case dxt_format::BC7_UNORM_SRGB:
+							return 8;
+					}
 				default:
 					break;
 				}
 				return 0;
 			};
 
-			inline bool has_alpha(pixel_format fmt)
+			inline bool has_alpha(pixel_format fmt, dxt_format dxFmt)
 			{
 				switch (fmt)
 				{
@@ -315,6 +367,18 @@ namespace DDS
 				case PIXEL_FMT_A8L8:
 				case PIXEL_FMT_DXT5_AGBR:
 					return true;
+				case PIXEL_FMT_DX10_HEADER:
+					switch (dxFmt)
+					{
+						case dxt_format::BC6_TYPELESS:
+						case dxt_format::BC6_UF16:
+						case dxt_format::BC6_SF16:
+							return false;
+						case dxt_format::BC7_TYPELESS:
+						case dxt_format::BC7_UNORM:
+						case dxt_format::BC7_UNORM_SRGB:
+							return true;
+					}
 				default: break;
 				}
 				return false;
@@ -335,7 +399,7 @@ namespace DDS
 				return false;
 			}
 
-			inline unsigned get_dxt_bytes_per_block(pixel_format fmt)
+			inline unsigned get_dxt_bytes_per_block(pixel_format fmt, dxt_format dxFmt)
 			{
 				switch (fmt)
 				{
@@ -353,13 +417,26 @@ namespace DDS
 				case PIXEL_FMT_DXT5_xGxR: return 16;
 				case PIXEL_FMT_DXT5_xGBR: return 16;
 				case PIXEL_FMT_DXT5_AGBR: return 16;
+
+				case PIXEL_FMT_DX10_HEADER:
+					switch (dxFmt)
+					{
+						case dxt_format::BC6_TYPELESS:
+						case dxt_format::BC6_UF16:
+						case dxt_format::BC6_SF16:
+						case dxt_format::BC7_TYPELESS:
+						case dxt_format::BC7_UNORM:
+						case dxt_format::BC7_UNORM_SRGB:
+							return 16;
+					}
+
 				default:
 					break;
 				}
 				return 0;
 			}
 
-			inline Texturefmt::Enum get_text_fnt_from_pixel(pixel_format fmt)
+			inline Texturefmt::Enum get_text_fnt_from_pixel(pixel_format fmt, dxt_format dxFmt)
 			{
 				switch (fmt)
 				{
@@ -379,6 +456,24 @@ namespace DDS
 
 				case PIXEL_FMT_3DC:
 					return Texturefmt::ATI2;
+
+				case PIXEL_FMT_DX10_HEADER:
+					switch (dxFmt)
+					{
+						case dxt_format::BC6_TYPELESS:
+							return Texturefmt::BC6;
+						case dxt_format::BC6_UF16:
+							return Texturefmt::BC6_UF16;
+						case dxt_format::BC6_SF16:
+							return Texturefmt::BC6_SF16;
+
+						case dxt_format::BC7_TYPELESS:
+							return Texturefmt::BC7;
+						case dxt_format::BC7_UNORM:
+							return Texturefmt::BC7_UNORM;
+						case dxt_format::BC7_UNORM_SRGB:
+							return Texturefmt::BC7_UNORM_SRGB;
+					}
 				}
 
 				return Texturefmt::UNKNOWN;
@@ -386,13 +481,14 @@ namespace DDS
 
 
 
-			inline unsigned get_data_size(unsigned width, unsigned height, unsigned depth, unsigned mips, pixel_format fmt)
+			inline uint32_t get_data_size(uint32_t width, uint32_t height, uint32_t depth,
+				uint32_t mips, pixel_format fmt, dxt_format dxFmt)
 			{
-				unsigned size = 0;
-				unsigned i;
+				uint32_t size = 0;
+				uint32_t i;
 
-				const unsigned bits_per_pixel = get_bpp(fmt);
-				const unsigned bytes_per_block = get_dxt_bytes_per_block(fmt);
+				const uint32_t bits_per_pixel = get_bpp(fmt, dxFmt);
+				const uint32_t bytes_per_block = get_dxt_bytes_per_block(fmt, dxFmt);
 				const bool isDXT = is_dxt(fmt);
 
 				for (i = 0; i < mips; i++)
@@ -442,8 +538,9 @@ namespace DDS
 		X_ASSERT_NOT_NULL(file);
 
 		DDS_header hdr;
+		DDS_DX10_header dx10Hdr;
 		uint32_t num_mip_maps, num_faces;
-		dxt_format dxt_fmt = cDXTInvalid;
+		dxt_format dxt_fmt = DXTInvalid;
 		pixel_format format = PIXEL_FMT_INVALID;
 
 		num_mip_maps = 1;
@@ -544,14 +641,14 @@ namespace DDS
 				case PIXEL_FMT_DXT1:
 				{
 					format = PIXEL_FMT_DXT1;
-					dxt_fmt = cDXT1;
+					dxt_fmt = DXT1;
 					break;
 				}
 				case PIXEL_FMT_DXT2:
 				case PIXEL_FMT_DXT3:
 				{
 					format = PIXEL_FMT_DXT3;
-					dxt_fmt = cDXT3;
+					dxt_fmt = DXT3;
 					break;
 				}
 				case PIXEL_FMT_DXT4:
@@ -576,19 +673,19 @@ namespace DDS
 						break;
 					}
 
-					dxt_fmt = cDXT5;
+					dxt_fmt = DXT5;
 					 break;
 				}
 				case PIXEL_FMT_3DC:
 				{
 					if (hdr.sPixelFormat.dwRGBBitCount == PIXEL_FMT_DXN)
 					{
-						dxt_fmt = cDXN_XY;
+						dxt_fmt = DXN_XY;
 						format = PIXEL_FMT_DXN;
 					}
 					else
 					{
-						dxt_fmt = cDXN_YX; // aka ATI2
+						dxt_fmt = DXN_YX; // aka ATI2
 						format = PIXEL_FMT_3DC;
 					}
 					break;
@@ -596,9 +693,49 @@ namespace DDS
 				case PIXEL_FMT_DXT5A:
 				{
 					format = PIXEL_FMT_DXT5A;
-					dxt_fmt = cDXT5A;
+					dxt_fmt = DXT5A;
 					break;
 				}
+
+				case PIXEL_FMT_DX10_HEADER:
+					if (file->readObj(dx10Hdr) != sizeof(dx10Hdr))
+					{
+						X_ERROR("DDSLoader", "Failed to read DX10 Header");
+						return nullptr;
+					}
+
+					format = PIXEL_FMT_DX10_HEADER;
+
+					switch (dx10Hdr.dxgiFormat)
+					{
+						case dxgiFormat::BC6H_TYPELESS:
+							dxt_fmt = dxt_format::BC6_TYPELESS;
+							break;
+						case dxgiFormat::BC6H_UF16:
+							dxt_fmt = dxt_format::BC7_UNORM;
+							break;
+						case dxgiFormat::BC6H_SF16:
+							dxt_fmt = dxt_format::BC7_UNORM_SRGB;
+							break;
+
+						case dxgiFormat::BC7_TYPELESS:
+							dxt_fmt = dxt_format::BC7_TYPELESS;
+							break;
+						case dxgiFormat::BC7_UNORM:
+							dxt_fmt = dxt_format::BC7_UNORM;
+							break;
+						case dxgiFormat::BC7_UNORM_SRGB:
+							dxt_fmt = dxt_format::BC7_UNORM_SRGB;
+							break;
+
+						default:
+							X_ERROR("DDSLoader", "Unsupported DX10 format: 0x%08X", dx10Hdr.dxgiFormat);
+							return nullptr;
+							break;
+					}
+
+					break;		
+
 				default:
 				{				
 					X_ERROR("DDSLoader", "Unsupported DDS FOURCC format: 0x%08X", hdr.sPixelFormat.dwFourCC);	
@@ -654,7 +791,7 @@ namespace DDS
 		uint32_t mask_ofs[4];
 
 		if (hdr.sPixelFormat.dwFlags & DDPF_FOURCC)
-			bits_per_pixel = pixel_util::get_bpp(format);
+			bits_per_pixel = pixel_util::get_bpp(format, dxt_fmt);
 
 		if (hdr.sPixelFormat.dwFlags & DDPF_FOURCC)
 			default_pitch = (((hdr.dwWidth + 3) & ~3) * ((hdr.dwHeight + 3) & ~3) * bits_per_pixel) >> 3;
@@ -693,7 +830,7 @@ namespace DDS
 
 		// map the format
 		Texturefmt::Enum mapped_format = Texturefmt::UNKNOWN;
-		mapped_format = pixel_util::get_text_fnt_from_pixel(format);
+		mapped_format = pixel_util::get_text_fnt_from_pixel(format, dxt_fmt);
 
 		if (mapped_format == Texturefmt::UNKNOWN)
 		{
@@ -760,7 +897,7 @@ namespace DDS
 		XTextureFile* img = X_NEW(XTextureFile, g_rendererArena, "TextureFile");
 		TextureFlags flags;
 
-		if (pixel_util::has_alpha(format))
+		if (pixel_util::has_alpha(format, dxt_fmt))
 			flags.Set(TextureFlags::ALPHA);
 
 		if (pixel_util::is_normal_map(format))
@@ -785,7 +922,7 @@ namespace DDS
 		img->setFormat(mapped_format);
 
 		uint32_t i, bytes_read;
-		uint32_t total_bytes_per_face = pixel_util::get_data_size(hdr.dwWidth, hdr.dwHeight, 1, num_mip_maps, format);
+		uint32_t total_bytes_per_face = pixel_util::get_data_size(hdr.dwWidth, hdr.dwHeight, 1, num_mip_maps, format, dxt_fmt);
 
 		img->setDataSize(total_bytes_per_face);
 

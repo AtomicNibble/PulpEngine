@@ -139,6 +139,7 @@ namespace {
 		DWORD SectionSize = 0;
 		bool isString = false;
 		bool hasCoolorCode = false;
+		bool ColorSet = false;
 		const char *pOem;
 
 		CharToOem( asciiMsg, oemMsg );	
@@ -188,6 +189,8 @@ namespace {
 							WriteConsoleA(console, pOem, SectionSize, &NumberOfCharsWritten, 0);
 
 							SetConsoleTextAttribute(console, COLOR_CODE_TABLE[colorIndex]);
+
+							ColorSet = true;
 
 							SectionSize += 2;
 
@@ -248,7 +251,10 @@ namespace {
 			while ( (unsigned int)pOem < msgEnd );
 		}
 
-		SetConsoleTextAttribute( console, color );
+		if (!ColorSet) {
+			SetConsoleTextAttribute(console, color);
+		}
+
 		msgEnd = 0;
 		WriteConsoleA( console, pOem, length, &msgEnd, 0 );
 

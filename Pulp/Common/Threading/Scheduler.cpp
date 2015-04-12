@@ -14,6 +14,8 @@ X_NAMESPACE_BEGIN(core)
 
 int32_t JobList::JOB_LIST_DONE = 0x12345678;
 
+int Scheduler::var_LongJobMs = 8;
+
 void JobList::NopJob(void* pParam, uint32_t batchOffset,
 	uint32_t batchNum, uint32_t workerIdx)
 {
@@ -33,6 +35,9 @@ JobList::JobList(core::MemoryArenaBase* arena) :
 	fetchLock_(0),
 	numThreadsExecuting_(0),
 	version_(0),
+	doneGuard_(0),
+
+	waitForList_(nullptr),
 
 	pTimer_(nullptr)
 {
@@ -74,14 +79,14 @@ void JobList::Wait(void)
 		bool waited = false;
 
 		while (syncCount_ > 0) {
-			SwitchToThread();
+			core::Thread::Yield();
 			waited = true;
 		}
 
 		++version_;
 
 		while (numThreadsExecuting_ > 0) {
-			SwitchToThread();
+			core::Thread::Yield();
 			waited = true;
 		}
 
@@ -200,6 +205,9 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 							// stalled on a synchronization point
 							return resFalgs | RunFlag::STALLED;
 						}
+
+						// done
+						doneGuard_ = 0;
 					}
 				}
 
@@ -236,6 +244,22 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 
 			job.execTime = elapsed;
 			stats_.threadExecTime[threadIdx] += elapsed;
+
+			if (Scheduler::var_LongJobMs > 0)
+			{
+				if (elapsed.GetMilliSeconds() > Scheduler::var_LongJobMs)
+				{				
+					X_WARNING("Scheduler", "a single job took more than: %ims elapsed: %gms "
+						"pFunc: %p pData: %p batchOffset: %i batchNum: %i", 
+						Scheduler::var_LongJobMs,
+						elapsed.GetMilliSeconds(),
+						job.pJobRun,
+						job.pData,
+						job.batchOffset,
+						job.batchNum
+						);
+				}
+			}
 		}
 
 
@@ -259,10 +283,16 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 }
 
 
-void JobList::PreSubmit(void)
+void JobList::PreSubmit(JobList* pWaitFor)
 {
 	currentJob_ = 0;
 	syncCount_ = safe_static_cast<int32_t, size_t>(jobs_.size());
+
+	if(pWaitFor) {
+			waitForList_ = &pWaitFor->doneGuard_;
+	}
+
+	doneGuard_ = 1;
 
 	JobData endJob;
 	endJob.pJobRun = NopJob;
@@ -272,12 +302,8 @@ void JobList::PreSubmit(void)
 	endJob.batchNum = 0;
 	jobs_.append(endJob);
 
-
 	stats_.submitTime = GetTimeReal();
-}
 
-void JobList::OnSubmited(void)
-{
 	isSubmit_ = true;
 	isDone_ = false;
 }
@@ -315,10 +341,8 @@ void JobThread::AddJobList(JobList* pJobList)
 	X_ASSERT_NOT_NULL(pJobList);
 
 	while (lastJobList_ - firstJobList_ >= MAX_JOB_LISTS) {
-		SwitchToThread();
+		core::Thread::Yield();
 	}
-
-	pJobList->OnSubmited();
 
 	jobLists_[lastJobList_ & (MAX_JOB_LISTS - 1)].jobList = pJobList;
 	jobLists_[lastJobList_ & (MAX_JOB_LISTS - 1)].version = pJobList->version_;
@@ -425,9 +449,12 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 		if (lastStalledJobList == InvalidJobIdx)
 		{
 			// pick a job list with the most priority.
-			for (size_t i = 0; i < jobStates.size(); i++) {
-				if (jobStates[i].jobList->getPriority() > priority) {
-					priority = jobStates[i].jobList->getPriority();
+			for (size_t i = 0; i < jobStates.size(); i++) 
+			{
+				const JobList* pList = jobStates[i].jobList;
+				if (pList->getPriority() > priority && pList->CanRun()) 
+				{
+					priority = pList->getPriority();
 					currentJobListIdx = i;
 				}
 			}
@@ -439,9 +466,12 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 			priority = stalledList.jobList->getPriority();
 			currentJobListIdx = lastStalledJobList;
 
-			for (size_t i = 0; i < jobStates.size(); i++) {
-				if (i != lastStalledJobList && jobStates[i].jobList->getPriority() > priority) {
-					priority = jobStates[i].jobList->getPriority();
+			for (size_t i = 0; i < jobStates.size(); i++) 
+			{
+				const JobList* pList = jobStates[i].jobList;
+				if (i != lastStalledJobList && pList->getPriority() > priority && pList->CanRun()) 
+				{
+					priority = pList->getPriority();
 					currentJobListIdx = i;
 				}
 			}
@@ -492,9 +522,7 @@ Scheduler::~Scheduler()
 
 }
 
-
-
-void Scheduler::StartThreads(void)
+void Scheduler::StartUp(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pCore);
@@ -512,7 +540,15 @@ void Scheduler::StartThreads(void)
 		HW_THREAD_MAX, core::VarFlag::SYSTEM,
 		"The number of threads used by the job scheduler");
 
+	// register longJob
+	ADD_CVAR_REF("scheduler_longJobMs", var_LongJobMs, var_LongJobMs, 0, 32, core::VarFlag::SYSTEM, "If a single job takes longer than this a warning is printed.\n0 = disabled.");
 
+
+	StartThreads();
+}
+
+void Scheduler::StartThreads(void)
+{
 	X_LOG0("Scheduler", "Creating %i threads", numThreads_);
 
 	int32_t i;
@@ -548,7 +584,7 @@ void Scheduler::SubmitJobList(JobList* pList, JobList* pWaitFor)
 
 	core::CriticalSection::ScopedLock lock(addJobListCrit_);
 
-	pList->PreSubmit();
+	pList->PreSubmit(pWaitFor);
 
 	for (int32_t i = 0; i < numThreads_; i++) {
 		threads_[i].AddJobList(pList);
@@ -561,6 +597,11 @@ void Scheduler::WaitForThreads(void)
 	for (int32_t i = 0; i < numThreads_; i++) {
 		threads_[i].WaitForThread();
 	}
+}
+
+int32_t Scheduler::numThreads(void) const
+{
+	return numThreads_;
 }
 
 
