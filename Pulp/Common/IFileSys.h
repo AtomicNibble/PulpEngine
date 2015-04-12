@@ -125,8 +125,8 @@ struct XFile
 	}
 
 	template <typename T>
-	inline uint32_t readObj(T& object, uint32_t num) {
-		return read(&object, sizeof(T) * num);
+	inline uint32_t readObj(T* objects, size_t num) {
+		return read(objects, safe_static_cast<uint32_t, size_t>(sizeof(T)* num));
 	}
 
 	inline uint32_t readString(core::string& str) {
