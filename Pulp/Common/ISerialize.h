@@ -9,7 +9,7 @@ X_NAMESPACE_BEGIN(core)
 
 struct ISerialize
 {
-	virtual bool SSave(XFile* pFile) X_ABSTRACT;
+	virtual bool SSave(XFile* pFile) const X_ABSTRACT;
 	virtual bool SLoad(XFile* pFile) X_ABSTRACT;
 
 protected:
