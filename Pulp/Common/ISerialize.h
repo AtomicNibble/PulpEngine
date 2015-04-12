@@ -3,9 +3,9 @@
 #ifndef X_I_SERIALIZE_H_
 #define X_I_SERIALIZE_H_
 
-X_NAMESPACE_BEGIN(core)
+#include <IFileSys.h>
 
-struct XFile;
+X_NAMESPACE_BEGIN(core)
 
 struct ISerialize
 {
