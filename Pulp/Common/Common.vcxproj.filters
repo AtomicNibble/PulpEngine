@@ -979,6 +979,9 @@
     <ClInclude Include="Compression\Zlib.h">
       <Filter>Headers\Compression</Filter>
     </ClInclude>
+    <ClInclude Include="ICi.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
