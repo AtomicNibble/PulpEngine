@@ -50,10 +50,10 @@ namespace mode
 
 	static DWORD GetCreationDispo(IFileSys::fileModeFlags mode)
 	{
-		if (mode.IsSet(fileMode::READ))
-			return OPEN_EXISTING;
 		if (mode.IsSet(fileMode::RECREATE))
 			return CREATE_ALWAYS;
+		if (mode.IsSet(fileMode::READ))
+			return OPEN_EXISTING;
 		if (mode.IsSet(fileMode::APPEND))
 			return OPEN_EXISTING;
 		if (mode.IsSet(fileMode::WRITE))
