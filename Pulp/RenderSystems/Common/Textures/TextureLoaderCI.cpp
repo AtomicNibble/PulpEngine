@@ -147,13 +147,21 @@ namespace CI
 		// Load the data.
 		XTextureFile* img = X_NEW(XTextureFile, g_rendererArena, "TextureFile");
 
+		// flags
+		TextureFlags flags = hdr.Flags;
+		// tools not required to set this
+		// so just set it here so it's reliable.
+		// since this is the only place it matters.
+		flags.Set(TexFlag::IS_CI_IMG);
+
+
 		// set the info
 		img->setWidth(hdr.width);
 		img->setHeigth(hdr.height);
 		img->setNumMips(hdr.Mips);
 		img->setNumFaces(hdr.Faces); // 1 for 2D 6 for a cube.
 		img->setDepth(1); /// We Don't allow volume texture loading yet.
-		img->setFlags(hdr.Flags);
+		img->setFlags(flags);
 		img->setFormat(hdr.format);
 
 		uint32_t offset = 0;
