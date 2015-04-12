@@ -407,7 +407,7 @@ bool Array<T>::SSave(XFile* pFile) const
 	pFile->writeObj(num_);
 	pFile->writeObj(size_);
 	pFile->writeObj(granularity_);
-	pFile->writeObj(list_, size_);
+	pFile->writeObj(list_, num_);
 	return true;
 }
 
@@ -430,7 +430,7 @@ bool Array<T>::SLoad(XFile* pFile)
 	read += pFile->readObj(gran);
 	if (read != (sizeof(size_type)* 3))
 	{
-		X_ERROR("Array", "failed to size info from file");
+		X_ERROR("Array", "failed to read size info from file");
 		return false;
 	}
 
@@ -439,7 +439,7 @@ bool Array<T>::SLoad(XFile* pFile)
 	num_ = num;
 	size_ = size;
 
-	return pFile->readObj(list_, safe_static_cast<uint32_t, size_t>(num)) == (num * sizeof(T));
+	return pFile->readObj(list_, num_) == (num_ * sizeof(T));
 }
 
 // ~ISerialize
