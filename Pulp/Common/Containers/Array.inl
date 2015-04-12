@@ -426,7 +426,7 @@ bool Array<T>::SLoad(XFile* pFile)
 
 	pFile->readObj(num);
 	pFile->readObj(size);
-	pFile->writeObj(gran);
+	pFile->readObj(gran);
 
 	granularity_ = gran;
 	list_ = Allocate(size);
