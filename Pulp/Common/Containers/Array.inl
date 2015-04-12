@@ -417,23 +417,29 @@ bool Array<T>::SLoad(XFile* pFile)
 	X_ASSERT_NOT_NULL(pFile);
 
 	if (!compileTime::IsPOD<T>::Value) {
-		X_ERROR("Array", "Can't load a none POD type from file: %s", typeid(T).name());
+		X_ERROR("Array", "Can't load a none POD type from file: %s", typeid(T).name()); 
 		return false;
 	}
 
 	free();
-	size_type num, size, gran;
+	size_type read, num, size, gran;
 
-	pFile->readObj(num);
-	pFile->readObj(size);
-	pFile->readObj(gran);
+	read = 0;
+	read += pFile->readObj(num);
+	read += pFile->readObj(size);
+	read += pFile->readObj(gran);
+	if (read != (sizeof(size_type)* 3))
+	{
+		X_ERROR("Array", "failed to size info from file");
+		return false;
+	}
 
 	granularity_ = gran;
 	list_ = Allocate(size);
+	num_ = num;
 	size_ = size;
 
-	pFile->readObj(list_, safe_static_cast<uint32_t,size_t>(size_));
-	return true;
+	return pFile->readObj(list_, safe_static_cast<uint32_t, size_t>(num)) == (num * sizeof(T));
 }
 
 // ~ISerialize
