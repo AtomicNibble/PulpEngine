@@ -103,7 +103,7 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 	XDiskFile* file = nullptr;
 	core::Path real_path;
 
-	if (mode.IsSet(fileMode::READ))
+	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE) )
 	{
 		_finddatai64_t findinfo;
 
