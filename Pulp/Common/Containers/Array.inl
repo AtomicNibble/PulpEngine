@@ -399,7 +399,7 @@ bool Array<T>::SSave(XFile* pFile) const
 {
 	X_ASSERT_NOT_NULL(pFile);
 
-	if (compileTime::IsPOD<T>::Value) {
+	if (!compileTime::IsPOD<T>::Value) {
 		X_ERROR("Array", "Can't save a none POD type to file: %s", typeid(T).name());
 		return false;
 	}
@@ -416,7 +416,7 @@ bool Array<T>::SLoad(XFile* pFile)
 {
 	X_ASSERT_NOT_NULL(pFile);
 
-	if (compileTime::IsPOD<T>::Value) {
+	if (!compileTime::IsPOD<T>::Value) {
 		X_ERROR("Array", "Can't load a none POD type from file: %s", typeid(T).name());
 		return false;
 	}
