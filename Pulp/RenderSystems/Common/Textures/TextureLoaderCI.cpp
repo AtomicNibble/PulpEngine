@@ -152,7 +152,7 @@ namespace CI
 		// tools not required to set this
 		// so just set it here so it's reliable.
 		// since this is the only place it matters.
-		flags.Set(TexFlag::IS_CI_IMG);
+		flags.Set(TexFlag::CI_IMG);
 
 
 		// set the info
