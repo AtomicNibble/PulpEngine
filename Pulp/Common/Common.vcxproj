@@ -303,6 +303,7 @@
     <ClInclude Include="Util\PointerUtil.h" />
     <ClInclude Include="Util\ReferenceCounted.h" />
     <ClInclude Include="Util\ReferenceCountedOwner.h" />
+    <ClInclude Include="Util\ScopedPointer.h" />
     <ClInclude Include="Util\SmartPointer.h" />
     <ClInclude Include="Util\SourceInfo.h" />
     <ClInclude Include="Util\SourceInfoMacros.h" />
