@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "PotatoBSP.h"
+#include "LevelBuilder.h"
 #include "EngineApp.h"
 
 #include <tchar.h>
@@ -46,7 +46,7 @@ X_LINK_LIB("engine_RenderNull")
 
 #endif // !X_LIB
 
-void CompileBSP(core::Path& path);
+void CompileLevel(core::Path& path);
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -60,12 +60,12 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	// compile my anus.
 
 	core::MallocFreeAllocator allocator;
-	UnitTestArena arena(&allocator, "UintTestArena");
+	UnitTestArena arena(&allocator, "LevelBuilderArena");
 
 	g_arena = &arena;
 
 
-	core::Console Console("BSP Compiler");
+	core::Console Console("Level Compiler");
 	Console.SetSize(150, 60, 8000);
 	Console.MoveTo(10, 10);
 
@@ -81,9 +81,9 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 			name.setFileName("killzone.map");
 		//	name.setFileName("box.map");
 			
-			CompileBSP(name);
+			CompileLevel(name);
 
-			X_LOG0("Bsp", "Operation Complete...");
+			X_LOG0("Level", "Operation Complete...");
 		}
 	}
 
@@ -92,7 +92,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 }
 
 
-void CompileBSP(core::Path& path)
+void CompileLevel(core::Path& path)
 {
 	if (core::strUtil::IsEqualCaseInsen("map", path.extension()))
 	{
