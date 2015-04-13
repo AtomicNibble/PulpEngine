@@ -107,6 +107,8 @@ const char* GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::
 	return reinterpret_cast<const char*>(&pStart[(BlockSize * ID) + sizeof(Header_t)]);
 }
 
+X_DISABLE_WARNING(4723);
+
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
 bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::requestFreeBlocks(size_t numBlocks)
 {
@@ -140,7 +142,7 @@ bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::request
 		}
 
 		// add more space.
-		buffer_.reserve(requiredBytes);
+		buffer_.resize(requiredBytes);
 
 		// any grows after don't include alignment.
 		buffer_.setGranularity(blockGranularity * BlockSize);
@@ -151,9 +153,9 @@ bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::request
 		);
 		return true;
 	}
-
 	return true;
 }
+X_ENABLE_WARNING(4723);
 
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
 typename GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::Header_t*
@@ -200,12 +202,15 @@ bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::SSave(X
 {
 	X_ASSERT_NOT_NULL(pFile);
 
+	pFile->writeObj(sizeof(IdType));
+	pFile->writeObj(BlockSize);
 	pFile->writeObj(CurrentBlock_);
 	pFile->writeObj(currentBlockSpace_);
 	pFile->writeObj(NumStrings_);
 	pFile->writeObj(WasteSize_);
 	
-	return buffer_.SSave(pFile);
+	uint32_t numBytes = BlockSize * CurrentBlock_;
+	return pFile->write(buffer_.ptr(), numBytes) == numBytes;
 }
 
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
@@ -214,12 +219,58 @@ bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::SLoad(X
 	X_ASSERT_NOT_NULL(pFile);
 	free();
 
-	pFile->readObj(CurrentBlock_);
-	pFile->readObj(currentBlockSpace_);
-	pFile->readObj(NumStrings_);
-	pFile->readObj(WasteSize_);
+	IdType CurrentBlock, currentBlockSpace;
+	size_t TypeSize, blockSizeCheck, NumStrings;
+	size_t read = 0;
 
-	return buffer_.SLoad(pFile);
+
+	read += pFile->readObj(TypeSize);
+	read += pFile->readObj(blockSizeCheck);
+
+	if (read != (sizeof(size_t)* 2))
+	{
+		X_ERROR("GrowingStringTable", "failed to read info from file");
+		return false;
+	}
+
+	// make sure it was saved with same type of GST
+	if (TypeSize != sizeof(IdType))
+	{
+		X_ERROR("GrowingStringTable", "Tried to read a GrowingStringTable from disk,"
+			" but the type size is invalid. required: %i provided: %i",
+			sizeof(IdType), TypeSize);
+		return false;
+	}
+
+	if (blockSizeCheck != BlockSize)
+	{
+		X_ERROR("GrowingStringTable", "string table on disk has a unmatching BlockSize. "
+			"required: %i provided: %i", BlockSize, blockSizeCheck);
+		return false;
+	}
+	
+	read = pFile->readObj(CurrentBlock);
+	read += pFile->readObj(currentBlockSpace);
+	read += pFile->readObj(NumStrings);
+	read += pFile->readObj(WasteSize_); // ok to read into member.
+
+	if (read != ((sizeof(IdType)* 2) + (sizeof(size_t) * 2)))
+	{
+		X_ERROR("GrowingStringTable", "failed to read info from file");
+		return false;
+	}
+
+	if (!requestFreeBlocks(CurrentBlock))
+	{
+		X_ERROR("", "Failed to acquire required blocks. num: %i", CurrentBlock);
+		return false;
+	}
+
+	CurrentBlock_ = CurrentBlock;
+	NumStrings_ = NumStrings;
+
+	uint32_t numBytes = BlockSize * CurrentBlock_;
+	return pFile->read(buffer_.ptr(), numBytes) == numBytes;
 }
 
 // ~ISerialize
