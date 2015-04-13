@@ -26,6 +26,20 @@ public:
 		X_DELETE(pInstance_, arena_);
 	}
 
+	X_INLINE T& operator* ()
+	{
+		return *pInstance_;
+	}
+
+	X_INLINE T* operator-> ()
+	{
+		return pInstance_;
+	}
+
+	X_INLINE T* get(void) {
+		return pInstance_;
+	}
+
 	X_NO_ASSIGN(ScopedPointer);
 	X_NO_COPY(ScopedPointer);
 private:
@@ -49,6 +63,20 @@ public:
 
 	~ScopedPointer() {
 		X_DELETE_ARRAY(pInstance_, arena_);
+	}
+
+	X_INLINE T& operator* ()
+	{
+		return *pInstance_;
+	}
+
+	X_INLINE T* operator-> ()
+	{
+		return pInstance_;
+	}
+
+	X_INLINE T* get(void) {
+		return pInstance_;
 	}
 
 	X_NO_ASSIGN(ScopedPointer);
