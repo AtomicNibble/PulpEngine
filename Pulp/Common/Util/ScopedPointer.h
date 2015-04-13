@@ -12,6 +12,7 @@ X_NAMESPACE_BEGIN(core)
 template<typename T>
 class ScopedPointer
 {
+	ScopedPointer();
 public:
 	ScopedPointer(T* pInstance, core::MemoryArenaBase* arena) :
 		pInstance_(pInstance),
@@ -25,6 +26,8 @@ public:
 		X_DELETE(pInstance_, arena_);
 	}
 
+	X_NO_ASSIGN(ScopedPointer);
+	X_NO_COPY(ScopedPointer);
 private:
 	T* pInstance_;
 	core::MemoryArenaBase* arena_;
@@ -34,6 +37,7 @@ private:
 template<typename T>
 class ScopedPointer<T[]>
 {
+	ScopedPointer();
 public:
 	ScopedPointer(T* pInstance, core::MemoryArenaBase* arena) :
 		pInstance_(pInstance),
@@ -47,6 +51,8 @@ public:
 		X_DELETE_ARRAY(pInstance_, arena_);
 	}
 
+	X_NO_ASSIGN(ScopedPointer);
+	X_NO_COPY(ScopedPointer);
 private:
 	T* pInstance_;
 	core::MemoryArenaBase* arena_;
