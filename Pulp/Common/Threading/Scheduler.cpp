@@ -247,7 +247,9 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 
 			if (Scheduler::var_LongJobMs > 0)
 			{
-				if (elapsed.GetMilliSeconds() > Scheduler::var_LongJobMs)
+				// we allow jobs with no priority to run as long as they want
+				if (elapsed.GetMilliSeconds() > Scheduler::var_LongJobMs 
+					&& getPriority() != JobListPriority::NONE)
 				{				
 					X_WARNING("Scheduler", "a single job took more than: %ims elapsed: %gms "
 						"pFunc: %p pData: %p batchOffset: %i batchNum: %i", 
