@@ -132,11 +132,11 @@ void CompileLevel(core::Path& path)
 				{
 					if (bsp.save(path.fileName()))
 					{
-						X_LOG0("Bsp", "saved as: \"%s\"", path.fileName());
+						X_LOG0("Level", "saved as: \"%s\"", path.fileName());
 					}
 					else
 					{
-						X_ERROR("Bsp", "Failed to save: \"%s\"", path.fileName());
+						X_ERROR("Level", "Failed to save: \"%s\"", path.fileName());
 					}
 				}
 			}
