@@ -120,9 +120,9 @@ void CompileLevel(core::Path& path)
 			{
 				X_LOG_BULLET;
 				X_LOG0("Map", "Loaded: %.4fms", (end - start).GetMilliSeconds());
-				X_LOG0("Map", "Nun Entities: %i", map.getNumEntities());
-				X_LOG0("Map", "Nun Brushes: %i", map.getNumBrushes());
-				X_LOG0("Map", "Nun Patches: %i", map.getNumPatches());
+				X_LOG0("Map", "Num Entities: %i", map.getNumEntities());
+				X_LOG0("Map", "Num Brushes: %i", map.getNumBrushes());
+				X_LOG0("Map", "Num Patches: %i", map.getNumPatches());
 			}
 
 			// all loaded time to get naked.
