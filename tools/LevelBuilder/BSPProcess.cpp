@@ -203,7 +203,7 @@ namespace
 
 }
 
-bool BSPBuilder::ProcessModels(void)
+bool LvlBuilder::ProcessModels(void)
 {
 	int entityNum;
 	int numEntities = stats_.numEntities;
@@ -235,7 +235,7 @@ bool BSPBuilder::ProcessModels(void)
 
 
 
-bool BSPBuilder::ProcessModel(const LvlEntity& ent)
+bool LvlBuilder::ProcessModel(const LvlEntity& ent)
 {
 	
 
@@ -246,7 +246,7 @@ bool BSPBuilder::ProcessModel(const LvlEntity& ent)
 
 
 
-bool BSPBuilder::ProcessWorldModel(const LvlEntity& ent)
+bool LvlBuilder::ProcessWorldModel(const LvlEntity& ent)
 {
 	X_LOG0("Bsp", "Processing World Entity");
 	AreaModel* pArea;

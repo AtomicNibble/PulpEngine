@@ -432,10 +432,10 @@ struct AreaModel
 
 
 
-class BSPBuilder
+class LvlBuilder
 {
 public:
-	BSPBuilder();
+	LvlBuilder();
 
 	bool LoadFromMap(mapfile::XMapFile* map);
 	bool ProcessModels(void);

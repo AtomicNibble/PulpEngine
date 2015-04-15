@@ -111,7 +111,7 @@ void CompileLevel(core::Path& path)
 	if (pFile = gEnv->pFileSys->openFileMem(path.c_str(), mode))
 	{
 		mapfile::XMapFile map;
-		BSPBuilder bsp;
+		LvlBuilder lvl;
 
 		//	parse the map file.
 		if (map.Parse(pFile->getBufferStart(),pFile->getSize()))
@@ -126,11 +126,11 @@ void CompileLevel(core::Path& path)
 			}
 
 			// all loaded time to get naked.
-			if (bsp.LoadFromMap(&map))
+			if (lvl.LoadFromMap(&map))
 			{
-				if (bsp.ProcessModels())
+				if (lvl.ProcessModels())
 				{
-					if (bsp.save(path.fileName()))
+					if (lvl.save(path.fileName()))
 					{
 						X_LOG0("Level", "saved as: \"%s\"", path.fileName());
 					}
