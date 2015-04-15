@@ -88,7 +88,7 @@ int BSPBuilder::FindFloatPlane(const Planef& plane)
 }
 
 
-bool BSPBuilder::processMapEntity(BspEntity& ent, mapfile::XMapEntity* mapEnt)
+bool BSPBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 {
 	mapfile::XMapPrimitive* prim;
 	int i;
@@ -159,7 +159,7 @@ void ConvertTexMatWithQTexture(Vec3f texMat1[2], Vec3f texMat2[2])
 	texMat2[1][2] = s2 * texMat1[1][2];
 }
 
-bool BSPBuilder::processBrush(BspEntity& ent, mapfile::XMapBrush* mapBrush, int ent_idx)
+bool BSPBuilder::processBrush(LvlEntity& ent, mapfile::XMapBrush* mapBrush, int ent_idx)
 {
 	const mapfile::XMapBrushSide* pMapBrushSide;
 	BspSide*		pSide;
@@ -262,7 +262,7 @@ bool BSPBuilder::processBrush(BspEntity& ent, mapfile::XMapBrush* mapBrush, int 
 
 
 
-bool BSPBuilder::processPatch(BspEntity& ent, mapfile::XMapPatch* mapBrush, int ent_idx)
+bool BSPBuilder::processPatch(LvlEntity& ent, mapfile::XMapPatch* mapBrush, int ent_idx)
 {
 	bspTris*		pTri;
 	int				i;

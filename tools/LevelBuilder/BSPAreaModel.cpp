@@ -36,7 +36,7 @@ bool AreaModel::BelowLimits()
 	return true;
 }
 
-void AreaModel::BeginModel(const BspEntity& ent)
+void AreaModel::BeginModel(const LvlEntity& ent)
 {
 	meshes.setGranularity(4096);
 	verts.setGranularity(4096);
