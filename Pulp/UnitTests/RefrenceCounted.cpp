@@ -16,7 +16,7 @@ namespace
 		struct RefCountedTest : public ReferenceCountedArena<RefCountedTest>
 		{
 		public:
-			static size_t CONSTRUCTOR_COUNT = 0;
+			static size_t CONSTRUCTOR_COUNT;
 
 		public:
 			RefCountedTest() {
@@ -30,7 +30,7 @@ namespace
 
 		};
 
-
+		size_t RefCountedTest::CONSTRUCTOR_COUNT = 0;
 }
 
 
