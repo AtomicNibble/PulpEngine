@@ -16,10 +16,15 @@ namespace
 		struct RefCountedTest : public ReferenceCountedArena<RefCountedTest>
 		{
 		public:
-			RefCountedTest();
-			~RefCountedTest();
+			static size_t CONSTRUCTOR_COUNT = 0;
 
-
+		public:
+			RefCountedTest() {
+				CONSTRUCTOR_COUNT++;
+			}
+			~RefCountedTest() {
+				CONSTRUCTOR_COUNT--;
+			}
 		private:
 
 
@@ -52,5 +57,6 @@ TEST(RefCounted, ArenaObject)
 
 	// back to one.
 
-	
+
 }	
+
