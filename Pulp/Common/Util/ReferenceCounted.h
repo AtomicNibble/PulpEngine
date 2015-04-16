@@ -19,8 +19,8 @@ public:
 	X_INLINE ReferenceCountedArena(void);
 	X_INLINE explicit ReferenceCountedArena(const T& instance);
 
-	X_INLINE uint32_t addReference(void) const;
-	X_INLINE uint32_t removeReference(void) const;
+	X_INLINE uint32_t addReference(void);
+	X_INLINE uint32_t removeReference(void);
 
 	// returns the ref count, used in the UT mainly.
 	X_INLINE uint32_t getRefCount(void) const;

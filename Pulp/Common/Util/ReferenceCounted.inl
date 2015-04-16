@@ -14,14 +14,14 @@ ReferenceCountedArena<T>::ReferenceCountedArena(const T& instance)
 
 
 template <class T>
-uint32_t ReferenceCountedArena<T>::addReference(void) const
+uint32_t ReferenceCountedArena<T>::addReference(void)
 {
 	return ++refCount_;
 }
 
 
 template <class T>
-uint32_t ReferenceCountedArena<T>::removeReference(void) const
+uint32_t ReferenceCountedArena<T>::removeReference(void)
 {
 	return --refCount_;
 }
