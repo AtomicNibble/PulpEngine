@@ -40,6 +40,8 @@ TEST(RefCounted, ArenaObject)
 		// starts with ref count 1.
 		RefCountedTest* obj = X_NEW(RefCountedTest,g_arena, "RefrencedObj"); 
 
+		ASSERT_EQ(1, RefCountedTest::CONSTRUCTOR_COUNT);
+
 		typedef ReferenceCountedOwner<RefCountedTest> OwnerType;
 
 		// saves the instance but keeps ref count at 1.
@@ -60,6 +62,6 @@ TEST(RefCounted, ArenaObject)
 	}
 
 	// should of been deleted.
-
+	ASSERT_EQ(0, RefCountedTest::CONSTRUCTOR_COUNT);
 }	
 
