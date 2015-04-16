@@ -36,27 +36,30 @@ namespace
 
 TEST(RefCounted, ArenaObject)
 {
-	// starts with ref count 1.
-	RefCountedTest* obj = X_NEW(RefCountedTest,g_arena, "RefrencedObj"); 
-
-	typedef ReferenceCountedOwner<RefCountedTest> OwnerType;
-
-	// saves the instance but keeps ref count at 1.
-	OwnerType owner(obj, g_arena);
-
 	{
-		// obj ref count becomes 2
-		OwnerType otherOwner(owner);
+		// starts with ref count 1.
+		RefCountedTest* obj = X_NEW(RefCountedTest,g_arena, "RefrencedObj"); 
+
+		typedef ReferenceCountedOwner<RefCountedTest> OwnerType;
+
+		// saves the instance but keeps ref count at 1.
+		OwnerType owner(obj, g_arena);
+
+		{
+			// obj ref count becomes 2
+			OwnerType otherOwner(owner);
+		}
+
+		// obj ref count down to one
+		{
+			// obj ref count becomes 2
+			OwnerType otherOwner = owner;
+		}
+
+		// back to one.
 	}
 
-	// obj ref count down to one
-	{
-		// obj ref count becomes 2
-		OwnerType otherOwner = owner;
-	}
-
-	// back to one.
-
+	// should of been deleted.
 
 }	
 
