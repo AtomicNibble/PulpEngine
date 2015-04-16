@@ -22,11 +22,10 @@ public:
 	X_INLINE uint32_t addReference(void) const;
 	X_INLINE uint32_t removeReference(void) const;
 
-	X_INLINE T* getInstance(void);
-	X_INLINE const T* getInstance(void) const;
+	// returns the ref count, used in the UT mainly.
+	X_INLINE uint32_t getRefCount(void) const;
 
 private:
-	T instance_;
 	mutable uint32_t refCount_;
 };
 
