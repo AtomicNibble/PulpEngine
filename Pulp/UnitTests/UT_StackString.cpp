@@ -85,3 +85,27 @@ TEST(StackString, AppendFmt)
 	EXPECT_STREQ(" 1337shit_16534", str.c_str());
 
 }
+
+TEST(StackString, Replace)
+{
+	core::StackString<1024> str("tickle my pickle, i love a good tickle. my my");
+
+	EXPECT_EQ(45, str.length());
+
+	str.replace("tickle", "touch");
+	EXPECT_STREQ("touch my pickle, i love a good tickle. my my", str.c_str());
+	EXPECT_EQ(44, str.length());
+
+	str.replace(str.begin() + 15, "my", "goat");
+	EXPECT_STREQ("touch my pickle, i love a good tickle. goat my", str.c_str());
+
+	str.replace('o', 'x');
+	EXPECT_STREQ("txuch my pickle, i love a good tickle. goat my", str.c_str());
+
+	str.replaceAll('o', 'x');
+	EXPECT_STREQ("txuch my pickle, i lxve a gxxd tickle. gxat my", str.c_str());
+
+	str.replaceAll("my", "pie");
+	EXPECT_STREQ("txuch pie pickle, i lxve a gxxd tickle. gxat pie", str.c_str());
+
+}
