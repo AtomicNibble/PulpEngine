@@ -24,8 +24,6 @@
 #include <Util\EndianUtil.h>
 
 #include <Util\SmartPointer.h>
-#include <Util\ReferenceCounted.h>
-#include <Util\ReferenceCountedOwner.h>
 
 
 // preprocessor
