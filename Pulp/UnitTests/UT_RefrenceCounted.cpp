@@ -4,6 +4,7 @@
 
 
 #include <Util\ReferenceCounted.h>
+#include <Util\ReferenceCountedOwner.h>
 
 
 X_USING_NAMESPACE;
