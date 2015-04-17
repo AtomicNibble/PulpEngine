@@ -446,9 +446,9 @@ void StackString<N>::trimRight(const char* pos)
 template <size_t N>
 void StackString<N>::trimRight(char ch)
 {
-	const char* pos = Find(ch);
+	const char* pos = find(ch);
 	if (pos != nullptr)
-		TrimRight(pos);
+		trimRight(pos);
 }
 
 

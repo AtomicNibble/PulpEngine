@@ -109,3 +109,30 @@ TEST(StackString, Replace)
 	EXPECT_STREQ("txuch pie pickle, i lxve a gxxd tickle. gxat pie", str.c_str());
 
 }
+
+TEST(StackString, TrimWhiteSpace)
+{
+	core::StackString<1024> str("   show me your whitespace    ");
+
+	str.trimWhitespace();
+	EXPECT_STREQ("show me your whitespace", str.c_str());
+}
+
+TEST(StackString, trimCharacter)
+{
+	core::StackString<1024> str("--- -----show me your whitespace------");
+
+	str.trimCharacter('-');
+	EXPECT_STREQ(" -----show me your whitespace", str.c_str());
+}
+
+TEST(StackString, trimRight)
+{
+	core::StackString<1024> str("--- -----show me your whitespace------");
+
+	str.trimRight('w');
+	EXPECT_STREQ("--- -----sho", str.c_str());
+
+	str.trimRight(str.c_str() + 10);
+	EXPECT_STREQ("--- -----s", str.c_str());
+}
