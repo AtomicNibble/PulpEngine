@@ -401,13 +401,10 @@
   <ItemGroup>
     <ClCompile Include="EngineApp.cpp" />
     <ClCompile Include="Profiler.cpp" />
-    <ClCompile Include="UT_Adler32.cpp" />
     <ClCompile Include="UT_AssertChecker.cpp" />
     <ClCompile Include="UT_Base64.cpp" />
-    <ClCompile Include="UT_crc32.cpp" />
     <ClCompile Include="UT_C_LinkedList.cpp" />
     <ClCompile Include="UT_Encryption.cpp" />
-    <ClCompile Include="UT_Fnva1Hash.cpp" />
     <ClCompile Include="UT_F_ReadWrite.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -438,7 +435,6 @@
     <ClCompile Include="UT_GrowingStringTable.cpp" />
     <ClCompile Include="UT_Hash.cpp" />
     <ClCompile Include="UT_Lexer.cpp" />
-    <ClCompile Include="UT_MD5.cpp" />
     <ClCompile Include="UT_MemoryCursor.cpp" />
     <ClCompile Include="UT_Mem_GrowingBlockAllocator.cpp" />
     <ClCompile Include="UT_Mem_GrowingGenericAllocator.cpp" />
@@ -450,7 +446,6 @@
     <ClCompile Include="UT_Mem_PoolAllocator.cpp" />
     <ClCompile Include="UT_Mem_Stack.cpp" />
     <ClCompile Include="UT_ModelLoading.cpp" />
-    <ClCompile Include="UT_MurmurHash.cpp" />
     <ClCompile Include="UT_M_Aabb.cpp" />
     <ClCompile Include="UT_M_Color.cpp" />
     <ClCompile Include="UT_M_Half.cpp" />
@@ -476,7 +471,6 @@
     <ClCompile Include="UT_Salsa20.cpp" />
     <ClCompile Include="UT_Scheduler.cpp" />
     <ClCompile Include="UT_ScopedPointer.cpp" />
-    <ClCompile Include="UT_SHA1.cpp" />
     <ClCompile Include="UT_StringRef.cpp" />
     <ClCompile Include="UT_StringTable.cpp" />
     <ClCompile Include="UT_StringUtil.cpp" />

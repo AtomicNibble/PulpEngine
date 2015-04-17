@@ -88,9 +88,6 @@
     <ClCompile Include="UT_Flags.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
-    <ClCompile Include="UT_Hash.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="UT_Pointer.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
@@ -283,22 +280,7 @@
     <ClCompile Include="UT_Salsa20.cpp">
       <Filter>Source Files\tests\Encryption</Filter>
     </ClCompile>
-    <ClCompile Include="UT_Adler32.cpp">
-      <Filter>Source Files\tests\Hashing</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_MD5.cpp">
-      <Filter>Source Files\tests\Hashing</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_SHA1.cpp">
-      <Filter>Source Files\tests\Hashing</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_crc32.cpp">
-      <Filter>Source Files\tests\Hashing</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_MurmurHash.cpp">
-      <Filter>Source Files\tests\Hashing</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_Fnva1Hash.cpp">
+    <ClCompile Include="UT_Hash.cpp">
       <Filter>Source Files\tests\Hashing</Filter>
     </ClCompile>
   </ItemGroup>
