@@ -1,7 +1,7 @@
 
 template <class T>
 ReferenceCountedArena<T>::ReferenceCountedArena(void)
-	: refCount(1)
+	: refCount_(1)
 {
 }
 
