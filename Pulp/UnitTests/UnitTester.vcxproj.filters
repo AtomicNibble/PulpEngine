@@ -280,6 +280,9 @@
     <ClCompile Include="UT_Hash.cpp">
       <Filter>Source Files\tests\Hashing</Filter>
     </ClCompile>
+    <ClCompile Include="UT_StackString.cpp">
+      <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">
