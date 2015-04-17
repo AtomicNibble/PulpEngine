@@ -203,14 +203,14 @@ namespace
 
 }
 
-bool BSPBuilder::ProcessModels(void)
+bool LvlBuilder::ProcessModels(void)
 {
 	int entityNum;
 	int numEntities = stats_.numEntities;
 
 	for (entityNum = 0; entityNum < numEntities; entityNum++)
 	{
-		const BspEntity& entity = entities[entityNum];
+		const LvlEntity& entity = entities[entityNum];
 		if (!entity.pBrushes && !entity.pPatches) {
 			continue;
 		}
@@ -235,7 +235,7 @@ bool BSPBuilder::ProcessModels(void)
 
 
 
-bool BSPBuilder::ProcessModel(const BspEntity& ent)
+bool LvlBuilder::ProcessModel(const LvlEntity& ent)
 {
 	
 
@@ -246,7 +246,7 @@ bool BSPBuilder::ProcessModel(const BspEntity& ent)
 
 
 
-bool BSPBuilder::ProcessWorldModel(const BspEntity& ent)
+bool LvlBuilder::ProcessWorldModel(const LvlEntity& ent)
 {
 	X_LOG0("Bsp", "Processing World Entity");
 	AreaModel* pArea;

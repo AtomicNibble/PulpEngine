@@ -160,3 +160,6 @@ $RECYCLE.BIN/
 
 # compiled level files
 *.level
+
+# unit test data
+/game_folder/*.ut_dat

@@ -70,9 +70,9 @@ extern Settings gSettings;
 // typedef Vec4f textureVectors[2];
 
 
-struct BspEntity
+struct LvlEntity
 {
-	BspEntity();
+	LvlEntity();
 
 	Vec3f				origin;
 
@@ -420,7 +420,7 @@ struct AreaModel
 	AreaModel();
 
 	bool BelowLimits();
-	void BeginModel(const BspEntity& ent);
+	void BeginModel(const LvlEntity& ent);
 	void EndModel();
 
 	core::Array<model::SubMeshHeader> meshes;
@@ -432,10 +432,10 @@ struct AreaModel
 
 
 
-class BSPBuilder
+class LvlBuilder
 {
 public:
-	BSPBuilder();
+	LvlBuilder();
 
 	bool LoadFromMap(mapfile::XMapFile* map);
 	bool ProcessModels(void);
@@ -463,20 +463,20 @@ private:
 
 	int FindFloatPlane(const Planef& plane);
 	
-	bool processMapEntity(BspEntity& ent, mapfile::XMapEntity* mapEnt);
-	bool processBrush(BspEntity& ent, mapfile::XMapBrush* brush, int ent_idx);
-	bool processPatch(BspEntity& ent, mapfile::XMapPatch* brush, int ent_idx);
+	bool processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt);
+	bool processBrush(LvlEntity& ent, mapfile::XMapBrush* brush, int ent_idx);
+	bool processPatch(LvlEntity& ent, mapfile::XMapPatch* brush, int ent_idx);
 
 	bool removeDuplicateBrushPlanes(bspBrush* pBrush);
 
 private:
 
-	bool ProcessModel(const BspEntity& ent);
-	bool ProcessWorldModel(const BspEntity& ent);
+	bool ProcessModel(const LvlEntity& ent);
+	bool ProcessWorldModel(const LvlEntity& ent);
 
 
 private:
-	core::Array<BspEntity>		entities;
+	core::Array<LvlEntity>		entities;
 	core::Array<AreaModel*>		areaModels;
 
 	//	core::Array<bspDrawSurface> drawSurfs_;

@@ -404,7 +404,6 @@
     <ClCompile Include="UT_AssertChecker.cpp" />
     <ClCompile Include="UT_Base64.cpp" />
     <ClCompile Include="UT_C_LinkedList.cpp" />
-    <ClCompile Include="UT_Encryption.cpp" />
     <ClCompile Include="UT_F_ReadWrite.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -467,7 +466,11 @@
     <ClCompile Include="UT_M_Winding.cpp" />
     <ClCompile Include="UT_Pointer.cpp" />
     <ClCompile Include="UT_Random.cpp" />
+    <ClCompile Include="UT_RefrenceCounted.cpp" />
+    <ClCompile Include="UT_Salsa20.cpp" />
     <ClCompile Include="UT_Scheduler.cpp" />
+    <ClCompile Include="UT_ScopedPointer.cpp" />
+    <ClCompile Include="UT_StackString.cpp" />
     <ClCompile Include="UT_StringRef.cpp" />
     <ClCompile Include="UT_StringTable.cpp" />
     <ClCompile Include="UT_StringUtil.cpp" />

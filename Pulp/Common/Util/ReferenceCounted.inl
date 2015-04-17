@@ -1,46 +1,32 @@
 
 template <class T>
 ReferenceCountedArena<T>::ReferenceCountedArena(void)
-	: instance_()
-	, refCount(1)
+	: refCount_(1)
 {
 }
 
 
 template <class T>
 ReferenceCountedArena<T>::ReferenceCountedArena(const T& instance)
-	: instance_(instance)
-	, refCount_(1)
+	: refCount_(1)
 {
 }
 
 
 template <class T>
-uint32_t ReferenceCountedArena<T>::addReference(void) const
+uint32_t ReferenceCountedArena<T>::addReference(void)
 {
 	return ++refCount_;
 }
 
 
 template <class T>
-uint32_t ReferenceCountedArena<T>::removeReference(void) const
+uint32_t ReferenceCountedArena<T>::removeReference(void)
 {
 	return --refCount_;
 }
 
 
-template <class T>
-T* ReferenceCountedArena<T>::getInstance(void)
-{
-	return &instance_;
-}
-
-
-template <class T>
-const T* ReferenceCountedArena<T>::getInstance(void) const
-{
-	return &instance_;
-}
 
 
 // -------------------------------------------------------------

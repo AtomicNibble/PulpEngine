@@ -176,7 +176,7 @@ BrushPlaneSide::Enum bspBrush::BrushMostlyOnSide(const Planef& plane)
 
 // ------------------------------ Entity -----------------------------------
 
-BspEntity::BspEntity()
+LvlEntity::LvlEntity()
 {
 	pBrushes = nullptr;
 	pPatches = nullptr;

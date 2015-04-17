@@ -399,7 +399,7 @@ bool Array<T>::SSave(XFile* pFile) const
 {
 	X_ASSERT_NOT_NULL(pFile);
 
-	if (compileTime::IsPOD<T>::Value) {
+	if (!compileTime::IsPOD<T>::Value) {
 		X_ERROR("Array", "Can't save a none POD type to file: %s", typeid(T).name());
 		return false;
 	}
@@ -407,7 +407,7 @@ bool Array<T>::SSave(XFile* pFile) const
 	pFile->writeObj(num_);
 	pFile->writeObj(size_);
 	pFile->writeObj(granularity_);
-	pFile->writeObj(list_, size_);
+	pFile->writeObj(list_, num_);
 	return true;
 }
 
@@ -416,24 +416,30 @@ bool Array<T>::SLoad(XFile* pFile)
 {
 	X_ASSERT_NOT_NULL(pFile);
 
-	if (compileTime::IsPOD<T>::Value) {
-		X_ERROR("Array", "Can't load a none POD type from file: %s", typeid(T).name());
+	if (!compileTime::IsPOD<T>::Value) {
+		X_ERROR("Array", "Can't load a none POD type from file: %s", typeid(T).name()); 
 		return false;
 	}
 
 	free();
-	size_type num, size, gran;
+	size_type read, num, size, gran;
 
-	pFile->readObj(num);
-	pFile->readObj(size);
-	pFile->writeObj(gran);
+	read = 0;
+	read += pFile->readObj(num);
+	read += pFile->readObj(size);
+	read += pFile->readObj(gran);
+	if (read != (sizeof(size_type)* 3))
+	{
+		X_ERROR("Array", "failed to read size info from file");
+		return false;
+	}
 
 	granularity_ = gran;
 	list_ = Allocate(size);
+	num_ = num;
 	size_ = size;
 
-	pFile->readObj(list_, safe_static_cast<uint32_t,size_t>(size_));
-	return true;
+	return pFile->readObj(list_, num_) == (num_ * sizeof(T));
 }
 
 // ~ISerialize

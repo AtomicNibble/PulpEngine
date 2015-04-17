@@ -25,7 +25,7 @@ namespace
 
 X_USING_NAMESPACE;
 
-BSPBuilder::BSPBuilder() :
+LvlBuilder::LvlBuilder() :
 entities(g_arena),
 areaModels(g_arena),
 data_(g_arena)
@@ -35,7 +35,7 @@ data_(g_arena)
 }
 
 
-bool BSPBuilder::LoadFromMap(mapfile::XMapFile* map)
+bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 {
 	X_ASSERT_NOT_NULL(map);
 
@@ -82,13 +82,13 @@ bool BSPBuilder::LoadFromMap(mapfile::XMapFile* map)
 }
 
 
-int BSPBuilder::FindFloatPlane(const Planef& plane)
+int LvlBuilder::FindFloatPlane(const Planef& plane)
 {
 	return planes.FindPlane(plane, NORMAL_EPSILON, DIST_EPSILON);
 }
 
 
-bool BSPBuilder::processMapEntity(BspEntity& ent, mapfile::XMapEntity* mapEnt)
+bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 {
 	mapfile::XMapPrimitive* prim;
 	int i;
@@ -159,7 +159,7 @@ void ConvertTexMatWithQTexture(Vec3f texMat1[2], Vec3f texMat2[2])
 	texMat2[1][2] = s2 * texMat1[1][2];
 }
 
-bool BSPBuilder::processBrush(BspEntity& ent, mapfile::XMapBrush* mapBrush, int ent_idx)
+bool LvlBuilder::processBrush(LvlEntity& ent, mapfile::XMapBrush* mapBrush, int ent_idx)
 {
 	const mapfile::XMapBrushSide* pMapBrushSide;
 	BspSide*		pSide;
@@ -262,7 +262,7 @@ bool BSPBuilder::processBrush(BspEntity& ent, mapfile::XMapBrush* mapBrush, int 
 
 
 
-bool BSPBuilder::processPatch(BspEntity& ent, mapfile::XMapPatch* mapBrush, int ent_idx)
+bool LvlBuilder::processPatch(LvlEntity& ent, mapfile::XMapPatch* mapBrush, int ent_idx)
 {
 	bspTris*		pTri;
 	int				i;
@@ -309,7 +309,7 @@ bool BSPBuilder::processPatch(BspEntity& ent, mapfile::XMapPatch* mapBrush, int 
 // --------------------------------------------------------------
 
 
-bool BSPBuilder::removeDuplicateBrushPlanes(bspBrush* pBrush)
+bool LvlBuilder::removeDuplicateBrushPlanes(bspBrush* pBrush)
 {
 	int			i, j, k;
 	BspSide*		pSides;
@@ -358,7 +358,7 @@ bool BSPBuilder::removeDuplicateBrushPlanes(bspBrush* pBrush)
 
 // ---------------------- Alocators ------------------------
 
-bspBrush* BSPBuilder::AllocBrush(int numSides)
+bspBrush* LvlBuilder::AllocBrush(int numSides)
 {
 	// allows for allocating objects which allow overrun.
 	const size_t baseSize = sizeof(bspBrush)-(6 * sizeof(BspSide));
@@ -381,7 +381,7 @@ bspBrush* BSPBuilder::AllocBrush(int numSides)
 	return pBrush;
 }
 
-bspBrush* BSPBuilder::CopyBrush(bspBrush* pOth)
+bspBrush* LvlBuilder::CopyBrush(bspBrush* pOth)
 {
 	X_ASSERT_NOT_NULL(pOth);
 
@@ -398,7 +398,7 @@ bspBrush* BSPBuilder::CopyBrush(bspBrush* pOth)
 	return pBrush;
 }
 
-void BSPBuilder::FreeBrush(bspBrush* pBrush)
+void LvlBuilder::FreeBrush(bspBrush* pBrush)
 {
 	X_ASSERT_NOT_NULL(pBrush);
 	uint8_t* pData = reinterpret_cast<uint8_t*>(pBrush);
@@ -417,35 +417,35 @@ void BSPBuilder::FreeBrush(bspBrush* pBrush)
 	X_DELETE_ARRAY(pData, g_arena);
 }
 
-bspFace* BSPBuilder::AllocBspFace(void)
+bspFace* LvlBuilder::AllocBspFace(void)
 {
 	return X_NEW(bspFace,g_arena,"bspFace");
 }
 
-void BSPBuilder::FreeBspFace(bspFace* pFace)
+void LvlBuilder::FreeBspFace(bspFace* pFace)
 {
 	X_DELETE(pFace,g_arena);
 }
 
 
-bspTree* BSPBuilder::AllocTree(void)
+bspTree* LvlBuilder::AllocTree(void)
 {
 	return X_NEW(bspTree, g_arena, "bspTree");
 
 }
 
-void BSPBuilder::FreeTree(bspTree* pTree)
+void LvlBuilder::FreeTree(bspTree* pTree)
 {
 	X_DELETE(pTree, g_arena);
 }
 
 
-bspNode* BSPBuilder::AllocNode(void)
+bspNode* LvlBuilder::AllocNode(void)
 {
 	return X_NEW(bspNode, g_arena, "bspNode");
 }
 
-void BSPBuilder::FreeNode(bspNode* pNode)
+void LvlBuilder::FreeNode(bspNode* pNode)
 {
 	X_DELETE(pNode, g_arena);
 }

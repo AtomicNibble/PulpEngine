@@ -403,6 +403,31 @@ struct Area
 
 // ============ File Structure stuff =========
 
+//
+//  FileHeader
+//		||| String Table |||
+//		||| Area Models |||
+//		||| Materials |||
+//		||| Entites |||
+// 	  ||| BSP Tree |||
+//	  ||| |||
+//
+//
+//		Each area with have a collection of entites.
+//		And also the materials it uses.
+//		Since we will need material info for hte surfaces.
+//		
+//		They will be saved as one long array, but goruped based on area.
+//		So that a area can have a start index and num.
+//
+//		I will work out what todo with the tree later in terms of what i store.
+//
+//
+//		I wthink i'll first make it render the area AABB and glboal AABB
+//		Start to visualise the layout.
+//
+//		THen start adding in the entites etc.
+
 
 struct FileHeader
 {
@@ -417,6 +442,11 @@ struct FileHeader
 	// crc32 is just the header data
 	uint32_t datacrc32;
 	uint32_t datasize;
+
+	// stirng table data.
+	uint32_t numStrings;
+	uint32_t stringDataSize;
+
 	// the number of area;s in the level file.
 	uint32_t numAreas;
 

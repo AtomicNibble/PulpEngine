@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "PotatoBSP.h"
+#include "LevelBuilder.h"
 #include "EngineApp.h"
 
 #include <tchar.h>
@@ -46,7 +46,7 @@ X_LINK_LIB("engine_RenderNull")
 
 #endif // !X_LIB
 
-void CompileBSP(core::Path& path);
+void CompileLevel(core::Path& path);
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -60,12 +60,12 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	// compile my anus.
 
 	core::MallocFreeAllocator allocator;
-	UnitTestArena arena(&allocator, "UintTestArena");
+	UnitTestArena arena(&allocator, "LevelBuilderArena");
 
 	g_arena = &arena;
 
 
-	core::Console Console("BSP Compiler");
+	core::Console Console("Level Compiler");
 	Console.SetSize(150, 60, 8000);
 	Console.MoveTo(10, 10);
 
@@ -79,11 +79,12 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 			name.setFileName("basic - Copy.map");
 			name.setFileName("alcatraz.map");
 			name.setFileName("killzone.map");
-		//	name.setFileName("box.map");
+			name.setFileName("box.map");
+			name.setFileName("test_resources\\maps\\boxmap.map");
 			
-			CompileBSP(name);
+			CompileLevel(name);
 
-			X_LOG0("Bsp", "Operation Complete...");
+			X_LOG0("Level", "Operation Complete...");
 		}
 	}
 
@@ -92,7 +93,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 }
 
 
-void CompileBSP(core::Path& path)
+void CompileLevel(core::Path& path)
 {
 	if (core::strUtil::IsEqualCaseInsen("map", path.extension()))
 	{
@@ -111,7 +112,7 @@ void CompileBSP(core::Path& path)
 	if (pFile = gEnv->pFileSys->openFileMem(path.c_str(), mode))
 	{
 		mapfile::XMapFile map;
-		BSPBuilder bsp;
+		LvlBuilder lvl;
 
 		//	parse the map file.
 		if (map.Parse(pFile->getBufferStart(),pFile->getSize()))
@@ -120,23 +121,23 @@ void CompileBSP(core::Path& path)
 			{
 				X_LOG_BULLET;
 				X_LOG0("Map", "Loaded: %.4fms", (end - start).GetMilliSeconds());
-				X_LOG0("Map", "Nun Entities: %i", map.getNumEntities());
-				X_LOG0("Map", "Nun Brushes: %i", map.getNumBrushes());
-				X_LOG0("Map", "Nun Patches: %i", map.getNumPatches());
+				X_LOG0("Map", "Num Entities: %i", map.getNumEntities());
+				X_LOG0("Map", "Num Brushes: %i", map.getNumBrushes());
+				X_LOG0("Map", "Num Patches: %i", map.getNumPatches());
 			}
 
 			// all loaded time to get naked.
-			if (bsp.LoadFromMap(&map))
+			if (lvl.LoadFromMap(&map))
 			{
-				if (bsp.ProcessModels())
+				if (lvl.ProcessModels())
 				{
-					if (bsp.save(path.fileName()))
+					if (lvl.save(path.fileName()))
 					{
-						X_LOG0("Bsp", "saved as: \"%s\"", path.fileName());
+						X_LOG0("Level", "saved as: \"%s\"", path.fileName());
 					}
 					else
 					{
-						X_ERROR("Bsp", "Failed to save: \"%s\"", path.fileName());
+						X_ERROR("Level", "Failed to save: \"%s\"", path.fileName());
 					}
 				}
 			}

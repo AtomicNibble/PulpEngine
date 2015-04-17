@@ -45,6 +45,12 @@
     <Filter Include="Source Files\tests\Compression">
       <UniqueIdentifier>{bc40320a-9896-4b2d-a972-5f4b6e2ecf75}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\tests\Encryption">
+      <UniqueIdentifier>{70e45780-13b3-4fd6-baf9-c233c7721eee}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\tests\Hashing">
+      <UniqueIdentifier>{b0f34988-bcca-4064-8e8a-965c5979b8f7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -80,9 +86,6 @@
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="UT_Flags.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
-    <ClCompile Include="UT_Hash.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
     <ClCompile Include="UT_Pointer.cpp">
@@ -247,9 +250,6 @@
     <ClCompile Include="UT_AssertChecker.cpp">
       <Filter>Source Files\tests\Debugging</Filter>
     </ClCompile>
-    <ClCompile Include="UT_Encryption.cpp">
-      <Filter>Source Files\tests</Filter>
-    </ClCompile>
     <ClCompile Include="UT_Base64.cpp">
       <Filter>Source Files\tests\String</Filter>
     </ClCompile>
@@ -267,6 +267,21 @@
     </ClCompile>
     <ClCompile Include="UT_Zlib.cpp">
       <Filter>Source Files\tests\Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_ScopedPointer.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_RefrenceCounted.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Salsa20.cpp">
+      <Filter>Source Files\tests\Encryption</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Hash.cpp">
+      <Filter>Source Files\tests\Hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_StackString.cpp">
+      <Filter>Source Files\tests\String</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

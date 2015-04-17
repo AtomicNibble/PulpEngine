@@ -19,9 +19,6 @@
     <Filter Include="Source Files\BSP">
       <UniqueIdentifier>{8372cc90-6ca3-4dc8-9c84-249d54b75926}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\MapFile">
-      <UniqueIdentifier>{adebf7d5-4a0b-4422-84e2-0f1d42c15234}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Util">
       <UniqueIdentifier>{0946935c-ec71-4ac9-8df3-4a02e906d184}</UniqueIdentifier>
     </Filter>
@@ -31,6 +28,9 @@
     <Filter Include="Source Files\Util">
       <UniqueIdentifier>{a77a343c-0d7f-4796-be4d-2a65ae44c311}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\MapFile">
+      <UniqueIdentifier>{adebf7d5-4a0b-4422-84e2-0f1d42c15234}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -39,7 +39,7 @@
     <ClInclude Include="Resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PotatoBSP.h">
+    <ClInclude Include="LevelBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EngineApp.h">
@@ -80,7 +80,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="PotatoBSP.cpp">
+    <ClCompile Include="LevelBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EngineApp.cpp">
@@ -118,7 +118,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="PotatoBSP.rc">
+    <ResourceCompile Include="LevelBuilder.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
@@ -126,7 +126,7 @@
     <Image Include="small.ico">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="PotatoBSP.ico">
+    <Image Include="LevelBuilder.ico">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>

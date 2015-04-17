@@ -27,7 +27,7 @@ namespace
 
 
 
-bool BSPBuilder::save(const char* name)
+bool LvlBuilder::save(const char* name)
 {
 	core::fileModeFlags mode;
 	FileHeader hdr;

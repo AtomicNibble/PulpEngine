@@ -5,6 +5,10 @@
 #include <String\GrowingStringTable.h>
 #include <Memory/AllocationPolicies/StackAllocator.h>
 
+
+#include <String\Path.h>
+
+
 X_USING_NAMESPACE;
 
 using namespace core;
@@ -169,6 +173,72 @@ TEST(GrowingStringTable, InvalidGran)
 	core::debugging::EnableBreakpoints(true);
 }
 
+TEST(GrowingStringTable, Serialize)
+{
+	GrowingStringTable<128, 16, 8, uint16_t> Table(g_arena);
+
+	size_t i;
+	uint16_t ids[10];
+	const char* pPointers[10];
+
+	for (i = 0; i < 10; i++)
+	{
+		ids[i] = Table.addString(pStrings[i]);
+		bool validId = (ids[i] != GrowingStringTable<128, 16, 8, uint16_t>::InvalidId);
+		ASSERT_TRUE(validId);
+	}
+
+	ASSERT_EQ(Table.numStrings(), 10);
+
+	for (i = 0; i < 10; i++)
+	{
+		pPointers[i] = Table.getString(ids[i]);
+		// check it's aligned
+		EXPECT_TRUE(core::pointerUtil::IsAligned(pPointers[i], 8, 0));
+		// check it's the correct string.
+		EXPECT_STREQ(pStrings[i], pPointers[i]);
+	}
+
+	// save to file then read back.
+	ASSERT_TRUE(NULL != gEnv->pFileSys);
+	IFileSys* pFileSys = gEnv->pFileSys;
+
+	core::Path fileName;
+	fileName /= X_ENGINE_NAME;
+	fileName /= "_ut_GrowingStringTable_serialize_Type(";
+	fileName /= "uint16_t";
+	fileName /= ").ut_dat";
+
+	XFile* file = pFileSys->openFile(fileName.c_str(),
+		fileMode::WRITE | fileMode::READ | fileMode::RECREATE | fileMode::RANDOM_ACCESS);
+	ASSERT_TRUE(NULL != file);
+	if (file)
+	{
+		ASSERT_TRUE(Table.SSave(file));
+
+		Table.free();
+		Table.addString("tickle my pickle one more time!.");
+
+		file->seek(0, SeekMode::SET);
+
+		ASSERT_TRUE(Table.SLoad(file));
+
+		// check is valid after the load.
+		ASSERT_EQ(Table.numStrings(), 10);
+
+		for (i = 0; i < 10; i++)
+		{
+			pPointers[i] = Table.getString(ids[i]);
+			// check it's aligned
+			EXPECT_TRUE(core::pointerUtil::IsAligned(pPointers[i], 8, 0));
+			// check it's the correct string.
+			EXPECT_STREQ(pStrings[i], pPointers[i]);
+		}
+
+		ASSERT_EQ(0, file->remainingBytes());
+		pFileSys->closeFile(file);
+	}
+}
 
 // ==============================================
 

@@ -225,7 +225,7 @@
     <ClInclude Include="MapLoader.h" />
     <ClInclude Include="MapTypes.h" />
     <ClInclude Include="PlaneSet.h" />
-    <ClInclude Include="PotatoBSP.h" />
+    <ClInclude Include="LevelBuilder.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
@@ -239,7 +239,7 @@
     <ClCompile Include="HashIndex.cpp" />
     <ClCompile Include="MapLoader.cpp" />
     <ClCompile Include="MapTypes.cpp" />
-    <ClCompile Include="PotatoBSP.cpp" />
+    <ClCompile Include="LevelBuilder.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -252,10 +252,10 @@
     <ClCompile Include="Winding.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="PotatoBSP.rc" />
+    <ResourceCompile Include="LevelBuilder.rc" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="PotatoBSP.ico" />
+    <Image Include="LevelBuilder.ico" />
     <Image Include="small.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
