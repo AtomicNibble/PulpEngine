@@ -136,3 +136,14 @@ TEST(StackString, trimRight)
 	str.trimRight(str.c_str() + 10);
 	EXPECT_STREQ("--- -----s", str.c_str());
 }
+
+
+TEST(StackString, Clear)
+{
+	core::StackString<1024> str("When the goat is in the moat it's blocked");
+
+	str.clear();
+
+	EXPECT_EQ(0, str.length());
+	EXPECT_EQ(1024, str.capacity());
+}
