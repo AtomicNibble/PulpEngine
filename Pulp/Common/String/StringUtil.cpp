@@ -470,6 +470,9 @@ namespace strUtil
 				{
 					if (upperCaseSIMD(*current) != upperCaseSIMD(*currentWhat))
 						break;
+
+					++current;
+					++currentWhat;
 				}
 
 				if (i == (whatLength - 1))
