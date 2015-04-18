@@ -118,6 +118,33 @@ TEST(StackString, TrimWhiteSpace)
 	EXPECT_STREQ("show me your whitespace", str.c_str());
 }
 
+TEST(StackString, TrimWhiteSpaceLeft)
+{
+	core::StackString<1024> str("    show me your whitespace    ");
+
+	core::StackString<1024> str1 = str.trimLeft();
+	EXPECT_STREQ("show me your whitespace    ", str.c_str());
+	EXPECT_STREQ("show me your whitespace    ", str1.c_str());
+}
+
+TEST(StackString, TrimWhiteSpaceRight)
+{
+	core::StackString<1024> str("    show me your whitespace    ");
+
+	core::StackString<1024> str1 = str.trimRight();
+	EXPECT_STREQ("    show me your whitespace", str.c_str());
+	EXPECT_STREQ("    show me your whitespace", str1.c_str());
+}
+
+TEST(StackString, TrimWhiteSpaceLeftRight)
+{
+	core::StackString<1024> str("    show me your whitespace    ");
+
+	core::StackString<1024> str1 = str.trim();
+	EXPECT_STREQ("show me your whitespace", str.c_str());
+	EXPECT_STREQ("show me your whitespace", str1.c_str());
+}
+
 TEST(StackString, trimCharacter)
 {
 	core::StackString<1024> str("--- -----show me your whitespace------");
@@ -138,6 +165,18 @@ TEST(StackString, trimRight)
 }
 
 
+TEST(StackString, stripTrailing)
+{
+	core::StackString<1024> str("--- -----show me your whitespace------");
+
+	str.stripTrailing('e');
+	EXPECT_STREQ("--- -----show me your whitespace------", str.c_str());
+
+	str.stripTrailing('-');
+	EXPECT_STREQ("--- -----show me your whitespace", str.c_str());
+}
+
+
 TEST(StackString, Clear)
 {
 	core::StackString<1024> str("When the goat is in the moat it's blocked");
@@ -146,4 +185,234 @@ TEST(StackString, Clear)
 
 	EXPECT_EQ(0, str.length());
 	EXPECT_EQ(1024, str.capacity());
+}
+
+
+TEST(StackString, isEqual)
+{
+	core::StackString<64> str("goat");
+	core::StackString<64> str1("goAt");
+	core::StackString<64> str2("goat");
+
+	EXPECT_FALSE(str.isEqual(str1.c_str()));
+	EXPECT_FALSE(str.isEqual("gOat"));
+
+	EXPECT_TRUE(str.isEqual(str2.c_str()));
+	EXPECT_TRUE(str.isEqual("goat"));
+}
+
+
+TEST(StackString, findLast)
+{
+	core::StackString<128> str("ooogoogodoghdooogdgoooat");
+
+	const char* pFind = str.findLast('o');
+	EXPECT_TRUE(pFind != nullptr);
+	EXPECT_TRUE(pFind == (str.end() - 3));
+
+	EXPECT_TRUE(str.findLast('x') == nullptr);
+}
+
+TEST(StackString, find)
+{
+	core::StackString<128> str("ooogoogodoghdooogdgoooat");
+
+	const char* pFind = str.find('g');
+	EXPECT_TRUE(pFind != nullptr);
+	EXPECT_TRUE(pFind == (str.begin() + 3));
+
+	EXPECT_TRUE(str.find('x') == nullptr);
+
+	const char* pFind2 = str.find("gooo");
+	EXPECT_TRUE(pFind2 != nullptr);
+	EXPECT_TRUE(pFind2 == (str.begin() + 18));
+}
+
+TEST(StackString, findCaseInsen)
+{
+	core::StackString<128> str("ooogoogodoghdXooogdGoooat");
+
+	const char* pFind = str.findCaseInsen('g');
+	EXPECT_TRUE(pFind != nullptr);
+	EXPECT_TRUE(pFind == (str.begin() + 3));
+
+	EXPECT_TRUE(str.findCaseInsen('x') != nullptr);
+	EXPECT_TRUE(str.findCaseInsen('X') != nullptr);
+	EXPECT_TRUE(str.findCaseInsen('y') == nullptr);
+	EXPECT_TRUE(str.findCaseInsen('Y') == nullptr);
+
+	const char* pFind2 = str.findCaseInsen("Gooo");
+	EXPECT_TRUE(pFind2 != nullptr);
+	EXPECT_TRUE(pFind2 == (str.begin() + 19));
+}
+
+TEST(StackString, operatorEqual)
+{
+	core::StackString<64> str("goat");
+	core::StackString<64> str1("goat");
+	core::StackString<64> str2("goaT");
+
+	EXPECT_TRUE(str == str1);
+	EXPECT_FALSE(str == str2);
+}
+
+TEST(StackString, operatorNotEqual)
+{
+	core::StackString<64> str("goat");
+	core::StackString<64> str1("goat");
+	core::StackString<64> str2("goaT");
+
+	EXPECT_FALSE(str != str1);
+	EXPECT_TRUE(str != str2);
+}
+
+TEST(StackString, operatorAssign)
+{
+	core::StackString<64> str("goat");
+	core::StackString<64> str2("goaT");
+
+	str = str2;
+
+	EXPECT_STREQ("goaT", str.c_str());
+}
+
+TEST(StackString, operatorArray)
+{
+	core::StackString<64> str("goat");
+
+	EXPECT_EQ('g', str[0]);
+	EXPECT_EQ('o', str[1]);
+	EXPECT_EQ('a', str[2]);
+	EXPECT_EQ('t', str[3]);
+
+	// i allow access to null term.
+	EXPECT_EQ('\0', str[4]);
+
+	core::debugging::EnableBreakpoints(false);
+	g_AssetChecker.ExpectAssertion(true);
+
+	// out of range.
+	char val = str[5];
+
+	EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
+
+	g_AssetChecker.ExpectAssertion(false);
+	core::debugging::EnableBreakpoints(true);
+}
+
+TEST(StackString, c_str)
+{
+	core::StackString<64> str("goat");
+	core::StackString<64> str1("");
+	core::StackString<32> str2("thistring is too long for me ee");
+
+	EXPECT_STREQ("goat", str.c_str());
+	EXPECT_STREQ("", str1.c_str());
+	EXPECT_STREQ("thistring is too long for me ee", str2.c_str());
+}
+
+
+TEST(StackString, length)
+{
+	core::StackString<64> str("goat");
+	core::StackString<64> str1("");
+	core::StackString<32> str2("thistring is too long for me ee");
+
+	EXPECT_EQ(4, str.length());
+	EXPECT_EQ(0, str1.length());
+	EXPECT_EQ(31, str2.length());
+}
+
+TEST(StackString, capacity)
+{
+	core::StackString<64> str("goat");
+	core::StackString<64> str1("");
+	core::StackString<32> str2("thistring is too long for me ee");
+
+	EXPECT_EQ(64, str.capacity());
+	EXPECT_EQ(64, str1.capacity());
+	EXPECT_EQ(32, str2.capacity());
+}
+
+TEST(StackString, isEmpty)
+{
+	core::StackString<64> str("goat");
+	core::StackString<64> str1("");
+
+	EXPECT_FALSE(str.isEmpty());
+	EXPECT_TRUE(str1.isEmpty());
+
+	str.clear();
+
+	EXPECT_TRUE(str.isEmpty());
+}
+
+TEST(StackString, isNotEmpty)
+{
+	core::StackString<64> str("goat");
+	core::StackString<64> str1("");
+
+	EXPECT_TRUE(str.isNotEmpty());
+	EXPECT_FALSE(str1.isNotEmpty());
+
+	str.clear();
+
+	EXPECT_FALSE(str.isNotEmpty());
+}
+
+TEST(StackString, toLower)
+{
+	core::StackString<64> str("goat");
+	core::StackString<64> str1("GOATMAN");
+	core::StackString<64> str2("GoaTMaN");
+
+	EXPECT_STREQ("GoaTMaN", str2.c_str());
+
+	str.toLower();
+	str1.toLower();
+	str2.toLower();
+
+	EXPECT_STREQ("goat", str.c_str());
+	EXPECT_STREQ("goatman", str1.c_str());
+	EXPECT_STREQ("goatman", str2.c_str());
+}
+
+TEST(StackString, toUpper)
+{
+	core::StackString<64> str("goat");
+	core::StackString<64> str1("goatMan");
+	core::StackString<64> str2("GoaTMaN");
+
+	EXPECT_STREQ("GoaTMaN", str2.c_str());
+
+	str.toUpper();
+	str1.toUpper();
+	str2.toUpper();
+
+	EXPECT_STREQ("GOAT", str.c_str());
+	EXPECT_STREQ("GOATMAN", str1.c_str());
+	EXPECT_STREQ("GOATMAN", str2.c_str());
+}
+
+
+TEST(StackString, begin)
+{
+	core::StackString<64> str("goat");
+	core::StackString<64> str1("goatMan");
+	core::StackString<64> str2("GoaTMaN");
+
+	EXPECT_STREQ("goat", str.begin());
+	EXPECT_STREQ("goatMan", str1.begin());
+	EXPECT_STREQ("GoaTMaN", str2.begin());
+}
+
+TEST(StackString, end)
+{
+	core::StackString<64> str("goat");
+	core::StackString<64> str1("goatMan");
+	core::StackString<64> str2("GoaTMaN");
+
+	EXPECT_EQ(str.begin() + 4, str.end());
+	EXPECT_EQ(str1.begin() + 7, str1.end());
+	EXPECT_EQ(str2.begin() + 7, str2.end());
 }
