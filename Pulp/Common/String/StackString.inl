@@ -15,7 +15,7 @@ template <size_t N>
 StackString<N>::StackString(const char* const str)
 	: len_(strUtil::strlen(str))
 {
-	X_ASSERT(len_ < N, "String \"%s\" does not fit into StackString of size %d.", str, N)();
+	X_ASSERT(len_ < N, "String(%d) \"%s\" does not fit into StackString of size %d.", len_, str, N)();
 	memcpy(str_, str, len_+1);
 }
 
@@ -446,9 +446,9 @@ void StackString<N>::trimRight(const char* pos)
 template <size_t N>
 void StackString<N>::trimRight(char ch)
 {
-	const char* pos = Find(ch);
+	const char* pos = find(ch);
 	if (pos != nullptr)
-		TrimRight(pos);
+		trimRight(pos);
 }
 
 

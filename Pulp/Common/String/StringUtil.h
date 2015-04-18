@@ -109,6 +109,10 @@ namespace strUtil
 	
 	const char* FindCaseInsensitive(const char* startInclusive, const char* what);
 
+	
+	const char* FindCaseInsensitive(const char* startInclusive, char what);
+
+	const char* FindCaseInsensitive(const char* startInclusive, const char* endExclusive, char what);
 
 
 	/// \brief Finds the first whitespace character in a string, and returns a pointer to it.

@@ -470,6 +470,9 @@ namespace strUtil
 				{
 					if (upperCaseSIMD(*current) != upperCaseSIMD(*currentWhat))
 						break;
+
+					++current;
+					++currentWhat;
 				}
 
 				if (i == (whatLength - 1))
@@ -484,7 +487,33 @@ namespace strUtil
 		}
 
 		return nullptr;
+	}
 
+	const char* FindCaseInsensitive(const char* startInclusive, char what)
+	{
+		return FindCaseInsensitive(startInclusive, startInclusive + strlen(startInclusive), what);
+	}
+
+	const char* FindCaseInsensitive(const char* startInclusive, const char* endExclusive, char what)
+	{
+		size_t len = endExclusive - startInclusive;
+
+		if (len == 0)
+			return nullptr;
+
+		char upperWhat = upperCaseSIMD(what);
+
+		while (startInclusive < endExclusive)
+		{
+			if (upperCaseSIMD(*startInclusive) == upperWhat)
+			{
+				return startInclusive;
+			}
+
+			++startInclusive;
+		}
+
+		return nullptr;
 	}
 
 	const char* workingDir(void)
