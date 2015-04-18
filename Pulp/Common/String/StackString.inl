@@ -15,7 +15,7 @@ template <size_t N>
 StackString<N>::StackString(const char* const str)
 	: len_(strUtil::strlen(str))
 {
-	X_ASSERT(len_ < N, "String \"%s\" does not fit into StackString of size %d.", str, N)();
+	X_ASSERT(len_ < N, "String(%d) \"%s\" does not fit into StackString of size %d.", len_, str, N)();
 	memcpy(str_, str, len_+1);
 }
 
