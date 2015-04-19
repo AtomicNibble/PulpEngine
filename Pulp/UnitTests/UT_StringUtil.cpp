@@ -26,8 +26,23 @@ TEST(StringUtil, Find) {
 	EXPECT_FALSE(findNCI == (str.begin() + 16)); // should not find as case is diffrent
 	EXPECT_TRUE(findCI == (str.begin() + 16));
 	EXPECT_TRUE(fin_fail == nullptr); // should not find as case is diffrent
-
 }
+
+
+TEST(StringUtil, Find2) 
+{
+	// had a bug where find was returning true after only matching 2 chars.
+	// this test checks that is fixed.
+	StackString512 str("my Hell name is bob. Hello jane.");
+
+	const char* find = strUtil::Find(str.begin(), str.end(), "Hello");
+	const char* findCI = strUtil::FindCaseInsensitive(str.begin(), str.end(), "hello");
+
+	// check it was second one.
+	EXPECT_TRUE(find == (str.begin() + 21));
+	EXPECT_TRUE(findCI == (str.begin() + 21));
+}
+
 
 TEST(StringUtil, WhiteSpace) {
 
