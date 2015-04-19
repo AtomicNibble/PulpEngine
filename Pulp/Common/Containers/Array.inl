@@ -259,6 +259,28 @@ X_INLINE typename Array<T>::size_type Array<T>::append(T const& obj) {
 }
 
 template<typename T>
+X_INLINE typename Array<T>::size_type Array<T>::append(const Array<T>& oth) 
+{
+	if (this != &oth)
+	{
+		if ((num_ + oth.num_) > size_) {
+			reserve(num_ + oth.num_);
+		}
+
+		// copy them.
+		size_t i;
+		for (i = 0; i < oth.num_; i++)
+		{
+			Mem::Construct(&list_[num_ + i], oth.list_[i]);
+		}
+
+		num_ += oth.num_;
+	}
+	
+	return num_ - 1;
+}
+
+template<typename T>
 X_INLINE typename Array<T>::size_type Array<T>::push_back(T const& obj) {
 	// if list empty allocate it
 	if (!list_)

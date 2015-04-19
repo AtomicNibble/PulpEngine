@@ -65,6 +65,8 @@ public:
 
 	// append element (same as push_back)
 	size_type append(const T& obj);
+	// add the list
+	size_type append(const Array<T>& oth);
 	// appends a item to the end, resizing if required.
 	size_type push_back(const T& obj);
 
