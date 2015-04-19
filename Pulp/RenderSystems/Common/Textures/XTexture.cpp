@@ -546,7 +546,7 @@ void XTexture::preProcessImage(XTextureFile* image_data)
 		// well maybe not since there are a limited number of threads.
 		core::Path outPath;
 		outPath = "compiled_images/";
-		outPath /= core::strUtil::FileName(FileName.c_str());
+		outPath /= FileName.c_str();
 
 		CI::WriteCIImg(outPath, image_data);
 	}
@@ -897,11 +897,14 @@ bool XTexture::reloadForName(const char* name)
 	core::Path path(name);
 	path.replaceAll('\\','/');
 
+	if (core::strUtil::IsEqualCaseInsen(path.extension(), ".ci")) {
+		return true;
+	}
+
 	XTexture* pTex = (XTexture*)s_pTextures->findAsset(path.c_str());
 
 	if (pTex)
 	{
-
 		return pTex->reload();
 	}
 
