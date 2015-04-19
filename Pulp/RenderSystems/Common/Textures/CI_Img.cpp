@@ -7,6 +7,8 @@
 
 #include "XTextureFile.h"
 
+#include "Hashing\crc32.h"
+
 
 #include "XTexture.h"
 
@@ -28,6 +30,9 @@ namespace CI
 
 		gEnv->pFileSys->createDirectoryTree(path.c_str());
 
+
+		core::Crc32* pCrc = gEnv->pCore->GetCrc32();
+
 		if (file.openFile(path.c_str(), mode))
 		{
 			hdr.fourCC = CI_FOURCC;
@@ -48,6 +53,18 @@ namespace CI
 			hdr.FaceSize = XTexture::get_data_size(image->getWidth(), image->getHeight(),
 				1, hdr.Mips, hdr.format);
 			
+			hdr.crc32 = pCrc->Begin();
+
+			pCrc->Update(&hdr.Flags, sizeof(hdr.Flags), hdr.crc32);
+
+			// crc
+			for (size_t i = 0; i < hdr.Faces; i++)
+			{
+				pCrc->Update(image->pFaces[i], hdr.FaceSize, hdr.crc32);
+			}
+
+			hdr.crc32 = pCrc->Finish(hdr.crc32);
+
 			file.writeObj(hdr);
 
 			// write each face.
