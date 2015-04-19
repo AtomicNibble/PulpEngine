@@ -28,10 +28,14 @@ X_USING_NAMESPACE;
 LvlBuilder::LvlBuilder() :
 entities(g_arena),
 areaModels(g_arena),
-data_(g_arena)
+data_(g_arena),
+
+stringTable_(g_arena),
+areaMeshes_(g_arena)
 {
 	core::zero_object(stats_);
 
+	areaMeshes_.reserve(2048);
 }
 
 

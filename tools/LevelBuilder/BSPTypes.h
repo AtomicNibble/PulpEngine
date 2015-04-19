@@ -8,6 +8,8 @@
 
 #include <Containers\LinkedListIntrusive.h>
 
+#include <String\GrowingStringTable.h>
+
 #include "BSPData.h"
 
 X_NAMESPACE_DECLARE(mapfile,
@@ -441,6 +443,20 @@ struct AreaModel
 	model::MeshHeader model;
 };
 
+struct AreaSubMesh
+{
+	AreaSubMesh() : verts_(g_arena), indexes_(g_arena) {}
+
+	void AddVert(const bsp::Vertex& vert) {
+		verts_.append(vert);
+	}
+
+	uint32_t matNameID;
+
+	// index's for this sub mesh.
+	core::Array<bsp::Vertex> verts_;
+	core::Array<model::Face> indexes_;
+};
 
 
 class LvlBuilder
@@ -485,12 +501,21 @@ private:
 	bool ProcessModel(const LvlEntity& ent);
 	bool ProcessWorldModel(const LvlEntity& ent);
 
+private:
+
+	void AddConetsToAreaModel(AreaModel* pArea);
+	AreaSubMesh* areaMeshForSide(const BspSide& side);
 
 private:
+	typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
+
+
 	core::Array<LvlEntity>		entities;
 	core::Array<AreaModel*>		areaModels;
 
-	//	core::Array<bspDrawSurface> drawSurfs_;
+	core::GrowingStringTableUnique<256, 16, 4, uint32_t> stringTable_;
+
+	AreaMeshMap areaMeshes_;
 
 	BSPData		data_;
 	XPlaneSet	planes;

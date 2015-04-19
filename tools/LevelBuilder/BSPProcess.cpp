@@ -7,19 +7,8 @@
 
 namespace
 {
-	struct AreaSubMesh
-	{
-		AreaSubMesh() : verts_(g_arena), indexes_(g_arena) {}
 
-		void AddVert(const bsp::Vertex& vert) {
-			verts_.append(vert);
-		}
-
-		// index's for this sub mesh.
-		core::Array<bsp::Vertex> verts_;
-		core::Array<model::Face> indexes_;
-	};
-
+/*
 
 	class AreaMeshBuilder
 	{
@@ -28,57 +17,7 @@ namespace
 		AreaMeshBuilder() : areaMeshes_(g_arena) {
 			areaMeshes_.reserve(4096);
 		}
-
-		AreaSubMesh* areaMeshForSide(const BspSide& side)
-		{
-			AreaMeshMap::iterator it = areaMeshes_.find(side.material.name.c_str());
-			if (it != areaMeshes_.end()) {
-				return &it->second;
-			}
-			// add new.
-			AreaSubMesh newMesh;
-			std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes_.insert(AreaMeshMap::value_type(side.material.name.c_str(), newMesh));
-
-			return &newIt.first->second;
-		}
-
-		void AddConetsToAreaModel(AreaModel* pArea)
-		{
-			AreaMeshMap::const_iterator it = areaMeshes_.begin();
-			for (; it != areaMeshes_.end(); ++it)
-			{
-				const AreaSubMesh& aSub = it->second;
-
-				model::SubMeshHeader mesh;
-				mesh.boundingBox.clear();
-
-				core::Array<bsp::Vertex>::ConstIterator vertIt = aSub.verts_.begin();
-				for (; vertIt != aSub.verts_.end(); ++vertIt) {
-					mesh.boundingBox.add(vertIt->pos);
-				}
-
-				mesh.boundingSphere = Sphere(mesh.boundingBox);
-				mesh.numIndexes = safe_static_cast<uint16_t, size_t>(aSub.indexes_.size());
-				mesh.numVerts = safe_static_cast<uint16_t, size_t>(aSub.verts_.size());
-				mesh.startIndex = safe_static_cast<uint32_t, size_t>(pArea->indexes.size());
-				mesh.startVertex = safe_static_cast<uint32_t, size_t>(pArea->verts.size());
-				mesh.streamsFlag = model::StreamType::COLOR | model::StreamType::NORMALS;
-
-
-
-				// add verts / indexs.
-				pArea->indexes.append(aSub.indexes_);
-				pArea->verts.append(aSub.verts_);
-
-				pArea->meshes.append(mesh);
-			}
-		}
-
-	private:
-		AreaMeshMap areaMeshes_;
-	};
-
-
+		*/
 
 
 	// ---------------------------------------------
@@ -269,6 +208,56 @@ namespace
 
 }
 
+
+AreaSubMesh* LvlBuilder::areaMeshForSide(const BspSide& side)
+{
+	AreaMeshMap::iterator it = areaMeshes_.find(side.material.name.c_str());
+	if (it != areaMeshes_.end()) {
+		return &it->second;
+	}
+	// add new.
+	AreaSubMesh newMesh;
+
+	// add mat name to string table.
+	newMesh.matNameID = stringTable_.addStringUnqiue(side.material.name.c_str());
+
+	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes_.insert(AreaMeshMap::value_type(side.material.name.c_str(), newMesh));
+
+	return &newIt.first->second;
+}
+
+void LvlBuilder::AddConetsToAreaModel(AreaModel* pArea)
+{
+	AreaMeshMap::const_iterator it = areaMeshes_.begin();
+	for (; it != areaMeshes_.end(); ++it)
+	{
+		const AreaSubMesh& aSub = it->second;
+
+		model::SubMeshHeader mesh;
+		mesh.boundingBox.clear();
+
+		core::Array<bsp::Vertex>::ConstIterator vertIt = aSub.verts_.begin();
+		for (; vertIt != aSub.verts_.end(); ++vertIt) {
+			mesh.boundingBox.add(vertIt->pos);
+		}
+
+		mesh.boundingSphere = Sphere(mesh.boundingBox);
+		mesh.numIndexes = safe_static_cast<uint16_t, size_t>(aSub.indexes_.size());
+		mesh.numVerts = safe_static_cast<uint16_t, size_t>(aSub.verts_.size());
+		mesh.startIndex = safe_static_cast<uint32_t, size_t>(pArea->indexes.size());
+		mesh.startVertex = safe_static_cast<uint32_t, size_t>(pArea->verts.size());
+		mesh.streamsFlag = model::StreamType::COLOR | model::StreamType::NORMALS;
+
+		mesh.materialName = aSub.matNameID;
+
+		// add verts / indexs.
+		pArea->indexes.append(aSub.indexes_);
+		pArea->verts.append(aSub.verts_);
+
+		pArea->meshes.append(mesh);
+	}
+}
+
 bool LvlBuilder::ProcessModels(void)
 {
 	int entityNum;
@@ -324,7 +313,7 @@ bool LvlBuilder::ProcessWorldModel(const LvlEntity& ent)
 	areaModels.append(pArea);
 	
 	// we build AreaSubMesh, we have one for each material.
-	AreaMeshBuilder meshBuilder;
+	areaMeshes_.clear();
 
 	pBrush = ent.pBrushes;
 
@@ -342,7 +331,7 @@ bool LvlBuilder::ProcessWorldModel(const LvlEntity& ent)
 			int numPoints = w->GetNumPoints();
 
 			// get areaSubMesh for this material.
-			AreaSubMesh* pSubMesh = meshBuilder.areaMeshForSide(side);
+			AreaSubMesh* pSubMesh = areaMeshForSide(side);
 
 			size_t StartVert = pSubMesh->verts_.size();
 
@@ -366,7 +355,7 @@ bool LvlBuilder::ProcessWorldModel(const LvlEntity& ent)
 	}
 
 	// create the meshes.
-	meshBuilder.AddConetsToAreaModel(pArea);
+	AddConetsToAreaModel(pArea);
 
 #if 0
 	pBrush = ent.pBrushes;

@@ -18,9 +18,25 @@ namespace
 	{
 		file->writeObj(pModel->model);
 		file->writeObj(pModel->meshes.ptr(),(pModel->meshes.size()));
-		file->writeObj(pModel->verts.ptr(), (pModel->verts.size()));
-		file->writeObj(pModel->indexes.ptr(), (pModel->indexes.size()));
 
+		// write the streams.
+		core::Array<bsp::Vertex>::ConstIterator it = pModel->verts.begin();
+		core::Array<bsp::Vertex>::ConstIterator end = pModel->verts.end();
+		for (; it != end; ++it) {
+			file->writeObj(it->pos);
+			file->writeObj(it->texcoord);
+		}
+		it = pModel->verts.begin();
+		for (; it != end; ++it) {
+			file->writeObj(it->color);
+		}
+		it = pModel->verts.begin();
+		for (; it != end; ++it) {
+			file->writeObj(it->normal);
+		}
+
+	//	file->writeObj(pModel->verts.ptr(), (pModel->verts.size()));
+		file->writeObj(pModel->indexes.ptr(), (pModel->indexes.size()));
 	}
 }
 
@@ -44,6 +60,8 @@ bool LvlBuilder::save(const char* name)
 	hdr.datacrc32 = 0; 
 	hdr.modified = core::dateTimeStampSmall::systemDateTime();
 
+	hdr.numStrings = safe_static_cast<uint32_t,size_t>(stringTable_.numStrings());
+
 	path.append(name);
 	path.setExtension(bsp::BSP_FILE_EXTENSION);
 
@@ -54,13 +72,15 @@ bool LvlBuilder::save(const char* name)
 	{
 		file->writeObj(hdr);
 
+		// write string table.
+		stringTable_.SSave(file);
+
 		for (i = 0; i < areaModels.size(); i++)
 		{
 			AreaModel* pModel = areaModels[i];
 
 			WriteAreaModel(file, pModel);
 		}
-
 
 
 		// update FourcCC to mark this bsp as valid.
