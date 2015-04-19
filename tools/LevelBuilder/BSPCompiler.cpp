@@ -175,7 +175,11 @@ bool LvlBuilder::processBrush(LvlEntity& ent, mapfile::XMapBrush* mapBrush, int 
 	pBrush->entityNum = stats_.numEntities;
 	pBrush->brushNum = ent_idx;
 	pBrush->numsides = mapBrush->GetNumSides();
-	
+	pBrush->allsidesSameMat = true;
+
+
+	core::StackString<bsp::MAP_MAX_MATERIAL_LEN> lastMatName;
+
 	numSides = mapBrush->GetNumSides();
 	for (i = 0; i < numSides; i++)
 	{
@@ -185,6 +189,20 @@ bool LvlBuilder::processBrush(LvlEntity& ent, mapfile::XMapBrush* mapBrush, int 
 		core::zero_this(pSide);
 
 		pSide->planenum = FindFloatPlane(pMapBrushSide->GetPlane());
+		// material
+		pSide->material.name = pMapBrushSide->material.name;
+		pSide->material.matRepeate = pMapBrushSide->material.matRepeate;
+		pSide->material.rotate = pMapBrushSide->material.rotate;
+		pSide->material.shift = pMapBrushSide->material.shift;
+
+		if (i == 0) {
+			lastMatName = pMapBrushSide->material.name;
+		}
+		else {
+			if (lastMatName != pMapBrushSide->material.name) {
+				pBrush->allsidesSameMat = false;
+			}
+		}
 	}
 
 

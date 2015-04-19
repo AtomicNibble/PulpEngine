@@ -41,11 +41,11 @@ void AreaModel::BeginModel(const LvlEntity& ent)
 	meshes.setGranularity(4096);
 	verts.setGranularity(4096);
 	indexes.setGranularity(4096);
-
 }
 
 void AreaModel::EndModel()
 {
+	model.streamsFlag = model::StreamType::NORMALS | model::StreamType::COLOR;
 	model.numSubMeshes = safe_static_cast<uint32_t, size_t>(meshes.size());
 	model.numVerts = safe_static_cast<uint32_t, size_t>(verts.size());
 	model.numIndexes = safe_static_cast<uint32_t, size_t>(indexes.size() * 3);
@@ -61,6 +61,7 @@ void AreaModel::EndModel()
 	}
 
 	model.boundingBox = bounds;
+	model.boundingSphere = Sphere(bounds);
 
 	X_LOG_BULLET;
 	X_LOG0("AreaModel", "num verts: %i", model.numVerts);

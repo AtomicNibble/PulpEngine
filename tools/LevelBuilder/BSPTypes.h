@@ -85,6 +85,15 @@ struct LvlEntity
 	mapfile::XMapEntity*	mapEntity;		// points to the map data this was made from.
 };
 
+
+struct LvlMaterial
+{
+	core::StackString<bsp::MAP_MAX_MATERIAL_LEN> name;
+	Vec2f				  matRepeate;
+	Vec2f				  shift;
+	float				  rotate;
+};
+
 // a brush side, typically 6.
 struct BspSide
 {
@@ -94,7 +103,7 @@ struct BspSide
 	bool			visible;
 	bool			culled;
 
-//	Vec2f			texVec;
+	LvlMaterial		material;
 
 	XWinding*		pWinding;		// only clipped to the other sides of the brush
 	XWinding*       pVisibleHull;   // convex hull of all visible fragments 
@@ -124,6 +133,8 @@ public:
 	AABB				bounds;
 	bool				opaque;
 	bool				detail;
+	bool				allsidesSameMat; // all the sides use same material.
+	bool				__pad;
 
 	int					numsides;
 	// 6 are members. but if num sides is > 6 then memory directly after

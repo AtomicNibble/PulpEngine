@@ -62,6 +62,7 @@ bool LvlBuilder::save(const char* name)
 		}
 
 
+
 		// update FourcCC to mark this bsp as valid.
 		hdr.fourCC = BSP_FOURCC;
 		hdr.numAreas = safe_static_cast<uint32_t,size_t>(areaModels.size());
