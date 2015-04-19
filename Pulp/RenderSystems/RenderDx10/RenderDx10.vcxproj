@@ -402,6 +402,7 @@
     <ClInclude Include="..\Common\Resources\BaseRenderAsset.h" />
     <ClInclude Include="..\Common\Shader\XShader.h" />
     <ClInclude Include="..\Common\TextDrawList.h" />
+    <ClInclude Include="..\Common\Textures\CI_Img.h" />
     <ClInclude Include="..\Common\Textures\TextureLoaderCI.h" />
     <ClInclude Include="..\Common\Textures\TextureLoaderDDS.h" />
     <ClInclude Include="..\Common\Textures\TextureLoaderJPG.h" />
@@ -431,6 +432,7 @@
     <ClCompile Include="..\Common\Shader\XHWShader.cpp" />
     <ClCompile Include="..\Common\Shader\XShader.cpp" />
     <ClCompile Include="..\Common\TextDrawList.cpp" />
+    <ClCompile Include="..\Common\Textures\CI_Img.cpp" />
     <ClCompile Include="..\Common\Textures\TextureLoaderCI.cpp" />
     <ClCompile Include="..\Common\Textures\TextureLoaderDDS.cpp" />
     <ClCompile Include="..\Common\Textures\TextureLoaderJPG.cpp" />

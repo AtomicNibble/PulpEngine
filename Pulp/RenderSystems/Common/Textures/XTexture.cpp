@@ -8,6 +8,8 @@
 #include "TextureLoaderPSD.h"
 #include "TextureLoaderTGA.h"
 
+#include "CI_Img.h"
+
 #include "Hashing\Fnva1Hash.h"
 #include "Containers\HashMap.h"
 
@@ -542,9 +544,11 @@ void XTexture::preProcessImage(XTextureFile* image_data)
 		// we need the jobs to be done one at a time tho
 		// since if we load 1000 dds images we will rape memory requirements.
 		// well maybe not since there are a limited number of threads.
+		core::Path outPath;
+		outPath = "compiled_images/";
+		outPath /= core::strUtil::FileName(FileName.c_str());
 
-
-
+		CI::WriteCIImg(outPath, image_data);
 	}
 }
 
