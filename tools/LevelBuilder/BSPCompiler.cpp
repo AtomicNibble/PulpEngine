@@ -26,16 +26,16 @@ namespace
 X_USING_NAMESPACE;
 
 LvlBuilder::LvlBuilder() :
-entities(g_arena),
-areaModels(g_arena),
-data_(g_arena),
+entities_(g_arena),
+areas_(g_arena),
 
 stringTable_(g_arena),
-areaMeshes_(g_arena)
+
+data_(g_arena)
+
 {
 	core::zero_object(stats_);
 
-	areaMeshes_.reserve(2048);
 }
 
 
@@ -53,11 +53,11 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 		return false;
 	}
 	
-	entities.resize(map->getNumEntities());
+	entities_.resize(map->getNumEntities());
 
 	for (i = 0; i < map->getNumEntities(); i++)
 	{
-		processMapEntity(entities[i], map->getEntity(i));
+		processMapEntity(entities_[i], map->getEntity(i));
 	}
 
 
@@ -65,15 +65,15 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	mapBounds.clear();
 
 
-	for (pBrush = entities[0].pBrushes; pBrush; pBrush = pBrush->next) {
+	for (pBrush = entities_[0].pBrushes; pBrush; pBrush = pBrush->next) {
 		mapBounds.add(pBrush->bounds);
 	}
 
 	// TODO: add patches to bounds?
 
 
-	X_LOG0("Map", "Total world brush: %i", entities[0].numBrushes);
-	X_LOG0("Map", "Total world patches: %i", entities[0].numBrushes);
+	X_LOG0("Map", "Total world brush: %i", entities_[0].numBrushes);
+	X_LOG0("Map", "Total world patches: %i", entities_[0].numBrushes);
 	X_LOG0("Map", "Total total brush: %i", stats_.numBrushes);
 	X_LOG0("Map", "Total total patches: %i", stats_.numPatches);
 	X_LOG0("Map", "Total entities: %i", stats_.numEntities);

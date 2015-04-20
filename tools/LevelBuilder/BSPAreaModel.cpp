@@ -12,23 +12,23 @@ indexes(g_arena)
 }
 
 
-bool AreaModel::BelowLimits()
+bool AreaModel::BelowLimits(void)
 {
 	if (meshes.size() > bsp::MAP_MAX_MODEL_SURFACES)
 	{
-		X_ERROR("Bsp", "too many surfaces on worldmodel. num: %i max: %i",
+		X_ERROR("Bsp", "too many surfaces on AreaModel. num: %i max: %i",
 			meshes.size(), bsp::MAP_MAX_MODEL_SURFACES);
 		return false;
 	}
 	if (verts.size() > bsp::MAP_MAX_MODEL_VERTS)
 	{
-		X_ERROR("Bsp", "too many verts for worldmodel. num: %i max: %i",
+		X_ERROR("Bsp", "too many verts for AreaModel. num: %i max: %i",
 			verts.size(), bsp::MAP_MAX_MODEL_VERTS);
 		return false;
 	}
 	if (indexes.size() > bsp::MAP_MAX_MODEL_INDEXES)
 	{
-		X_ERROR("Bsp", "too many indexes for worldmodel. num: %i max: %i",
+		X_ERROR("Bsp", "too many indexes for AreaModel. num: %i max: %i",
 			indexes.size(), bsp::MAP_MAX_MODEL_INDEXES);
 		return false;
 	}
@@ -36,14 +36,14 @@ bool AreaModel::BelowLimits()
 	return true;
 }
 
-void AreaModel::BeginModel(const LvlEntity& ent)
+void AreaModel::BeginModel(void)
 {
 	meshes.setGranularity(4096);
 	verts.setGranularity(4096);
 	indexes.setGranularity(4096);
 }
 
-void AreaModel::EndModel()
+void AreaModel::EndModel(void)
 {
 	model.streamsFlag = model::StreamType::NORMALS | model::StreamType::COLOR;
 	model.numSubMeshes = safe_static_cast<uint32_t, size_t>(meshes.size());

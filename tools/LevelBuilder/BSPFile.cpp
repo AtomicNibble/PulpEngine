@@ -76,9 +76,9 @@ bool LvlBuilder::save(const char* name)
 		// write string table.
 		stringTable_.SSave(file);
 
-		for (i = 0; i < areaModels.size(); i++)
+		for (i = 0; i < areas_.size(); i++)
 		{
-			AreaModel* pModel = areaModels[i];
+			AreaModel* pModel = &areas_[i].model;
 
 			WriteAreaModel(file, pModel);
 		}
@@ -86,7 +86,7 @@ bool LvlBuilder::save(const char* name)
 
 		// update FourcCC to mark this bsp as valid.
 		hdr.fourCC = BSP_FOURCC;
-		hdr.numAreas = safe_static_cast<uint32_t,size_t>(areaModels.size());
+		hdr.numAreas = safe_static_cast<uint32_t,size_t>(areas_.size());
 		// crc the header
 		hdr.datacrc32 = crc.GetCRC32((const char*)&hdr, sizeof(hdr));
 		hdr.datasize = safe_static_cast<uint32_t, size_t>(file->tell() - sizeof(hdr));

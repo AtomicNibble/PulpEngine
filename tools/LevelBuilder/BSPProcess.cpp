@@ -209,27 +209,33 @@ namespace
 }
 
 
-AreaSubMesh* LvlBuilder::areaMeshForSide(const BspSide& side)
+AreaSubMesh* LvlArea::MeshForSide(const BspSide& side, StringTableType& stringTable)
 {
-	AreaMeshMap::iterator it = areaMeshes_.find(side.material.name.c_str());
-	if (it != areaMeshes_.end()) {
+	AreaMeshMap::iterator it = areaMeshes.find(side.material.name.c_str());
+	if (it != areaMeshes.end()) {
 		return &it->second;
 	}
 	// add new.
 	AreaSubMesh newMesh;
 
 	// add mat name to string table.
-	newMesh.matNameID = stringTable_.addStringUnqiue(side.material.name.c_str());
+	newMesh.matNameID = stringTable.addStringUnqiue(side.material.name.c_str());
 
-	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes_.insert(AreaMeshMap::value_type(side.material.name.c_str(), newMesh));
-
+	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes.insert(AreaMeshMap::value_type(side.material.name.c_str(), newMesh));
 	return &newIt.first->second;
 }
 
-void LvlBuilder::AddConetsToAreaModel(AreaModel* pArea)
+void LvlArea::AreaBegin(void)
 {
-	AreaMeshMap::const_iterator it = areaMeshes_.begin();
-	for (; it != areaMeshes_.end(); ++it)
+	areaMeshes.clear();
+
+	model.BeginModel();
+}
+
+void LvlArea::AreaEnd(void)
+{
+	AreaMeshMap::const_iterator it = areaMeshes.begin();
+	for (; it != areaMeshes.end(); ++it)
 	{
 		const AreaSubMesh& aSub = it->second;
 
@@ -244,18 +250,21 @@ void LvlBuilder::AddConetsToAreaModel(AreaModel* pArea)
 		mesh.boundingSphere = Sphere(mesh.boundingBox);
 		mesh.numIndexes = safe_static_cast<uint16_t, size_t>(aSub.indexes_.size());
 		mesh.numVerts = safe_static_cast<uint16_t, size_t>(aSub.verts_.size());
-		mesh.startIndex = safe_static_cast<uint32_t, size_t>(pArea->indexes.size());
-		mesh.startVertex = safe_static_cast<uint32_t, size_t>(pArea->verts.size());
+		mesh.startIndex = safe_static_cast<uint32_t, size_t>(model.indexes.size());
+		mesh.startVertex = safe_static_cast<uint32_t, size_t>(model.verts.size());
 		mesh.streamsFlag = model::StreamType::COLOR | model::StreamType::NORMALS;
 
 		mesh.materialName = aSub.matNameID;
 
 		// add verts / indexs.
-		pArea->indexes.append(aSub.indexes_);
-		pArea->verts.append(aSub.verts_);
-
-		pArea->meshes.append(mesh);
+		model.indexes.append(aSub.indexes_);
+		model.verts.append(aSub.verts_);
+		model.meshes.append(mesh);
 	}
+
+	model.EndModel();
+	// not needed anymore.
+	areaMeshes.clear();
 }
 
 bool LvlBuilder::ProcessModels(void)
@@ -265,7 +274,7 @@ bool LvlBuilder::ProcessModels(void)
 
 	for (entityNum = 0; entityNum < numEntities; entityNum++)
 	{
-		const LvlEntity& entity = entities[entityNum];
+		const LvlEntity& entity = entities_[entityNum];
 		if (!entity.pBrushes && !entity.pPatches) {
 			continue;
 		}
@@ -302,21 +311,17 @@ bool LvlBuilder::ProcessModel(const LvlEntity& ent)
 bool LvlBuilder::ProcessWorldModel(const LvlEntity& ent)
 {
 	X_LOG0("Bsp", "Processing World Entity");
-	AreaModel* pArea;
 	bspBrush* pBrush;
 	size_t i;
 	int x, p;
 
-	pArea = X_NEW(AreaModel, g_arena, "AreaModel");
-	pArea->BeginModel(ent);
+	// allocate a area.
+	// we will have multiple area's for world. (none noob map xD)
+	LvlArea& area = areas_.AddOne();
 
-	areaModels.append(pArea);
-	
-	// we build AreaSubMesh, we have one for each material.
-	areaMeshes_.clear();
+	area.AreaBegin();
 
 	pBrush = ent.pBrushes;
-
 	for (i = 0; i < ent.numBrushes; i++)
 	{
 		X_ASSERT_NOT_NULL(pBrush);
@@ -331,7 +336,7 @@ bool LvlBuilder::ProcessWorldModel(const LvlEntity& ent)
 			int numPoints = w->GetNumPoints();
 
 			// get areaSubMesh for this material.
-			AreaSubMesh* pSubMesh = areaMeshForSide(side);
+			AreaSubMesh* pSubMesh = area.MeshForSide(side, stringTable_);
 
 			size_t StartVert = pSubMesh->verts_.size();
 
@@ -355,58 +360,11 @@ bool LvlBuilder::ProcessWorldModel(const LvlEntity& ent)
 	}
 
 	// create the meshes.
-	AddConetsToAreaModel(pArea);
+	area.AreaEnd();
 
-#if 0
-	pBrush = ent.pBrushes;
-
-	for (i = 0; i < ent.numBrushes; i++)
-	{
-		X_ASSERT_NOT_NULL(pBrush);
-
-		for (x = 0; x < pBrush->numsides; x++)
-		{
-			if (!pBrush->sides[x].pWinding)
-				continue;
-
-			const BspSide& side = pBrush->sides[x];
-			const XWinding* w = side.pWinding;
-
-			int numPoints = w->GetNumPoints();
-
-			// work out which mesh this will be added to.
-			// from the material.
-			
-
-
-
-			for (p = 0; p < numPoints; p++)
-			{
-				bsp::Vertex vert;
-				const Vec5f& vec = w->operator[](p);
-
-				vert.pos = vec.asVec3();
-				vert.normal = planes[side.planenum].getNormal();
-				vert.color = Col_White;
-				vert.texcoord[0] = Vec2f(vec.s,vec.t);
-
-				pArea->verts.append(vert);
-			}
-
-			// create some indexes
-			createIndexs(pArea, mesh);
-
-			pArea->meshes.append(mesh);
-		}	
-
-		pBrush = pBrush->next;
-	}
-#endif
-
-	if (!pArea->BelowLimits())
+	if (!area.model.BelowLimits())
 		return false;
 
-	pArea->EndModel();
  	return true;
 }
 

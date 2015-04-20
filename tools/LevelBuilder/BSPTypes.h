@@ -428,13 +428,16 @@ inline void FreeBrush(uBrush_t* brushes)
 
 #endif
 
+
+typedef core::GrowingStringTableUnique<256, 16, 4, uint32_t> StringTableType;
+
 struct AreaModel
 {
 	AreaModel();
 
-	bool BelowLimits();
-	void BeginModel(const LvlEntity& ent);
-	void EndModel();
+	bool BelowLimits(void);
+	void BeginModel(void);
+	void EndModel(void);
 
 	core::Array<model::SubMeshHeader> meshes;
 	core::Array<bsp::Vertex> verts;
@@ -442,6 +445,7 @@ struct AreaModel
 
 	model::MeshHeader model;
 };
+
 
 struct AreaSubMesh
 {
@@ -458,6 +462,38 @@ struct AreaSubMesh
 	core::Array<model::Face> indexes_;
 };
 
+class LvlArea
+{
+	typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
+	typedef core::Array<LvlEntity> AreaEntsArr;
+	typedef core::Array<LvlArea> ConnectAreasArr;
+public:
+
+	LvlArea() : areaMeshes(g_arena), 
+		entities(g_arena), connectedAreas(g_arena) 
+	{
+		areaMeshes.reserve(2048);
+		entities.setGranularity(512);
+
+	}
+
+	void AreaBegin(void);
+	void AreaEnd(void);
+	AreaSubMesh* MeshForSide(const BspSide& side, StringTableType& stringTable);
+
+
+public:
+	// area has one model.
+	AreaModel model;
+
+	AreaMeshMap areaMeshes;
+	AreaEntsArr	entities;
+	ConnectAreasArr connectedAreas;
+
+	// copy of the model values.
+	AABB boundingBox;
+	Sphere boundingSphere;
+};
 
 class LvlBuilder
 {
@@ -502,20 +538,11 @@ private:
 	bool ProcessWorldModel(const LvlEntity& ent);
 
 private:
-
-	void AddConetsToAreaModel(AreaModel* pArea);
-	AreaSubMesh* areaMeshForSide(const BspSide& side);
-
-private:
-	typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
-
-
-	core::Array<LvlEntity>		entities;
-	core::Array<AreaModel*>		areaModels;
+	core::Array<LvlEntity>		entities_;
+	core::Array<LvlArea>		areas_;
 
 	core::GrowingStringTableUnique<256, 16, 4, uint32_t> stringTable_;
 
-	AreaMeshMap areaMeshes_;
 
 	BSPData		data_;
 	XPlaneSet	planes;
