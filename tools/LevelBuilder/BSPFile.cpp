@@ -61,6 +61,7 @@ bool LvlBuilder::save(const char* name)
 	hdr.modified = core::dateTimeStampSmall::systemDateTime();
 
 	hdr.numStrings = safe_static_cast<uint32_t,size_t>(stringTable_.numStrings());
+	hdr.stringDataSize = safe_static_cast<uint32_t, size_t>(stringTable_.bytesUsed());
 
 	path.append(name);
 	path.setExtension(bsp::BSP_FILE_EXTENSION);
