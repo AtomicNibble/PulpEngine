@@ -275,7 +275,7 @@ struct SubMeshHeader
 	uint32_t _pad[8]; // pad to 128
 	
 //	X_NO_COPY(SubMeshHeader);
-	X_NO_ASSIGN(SubMeshHeader);
+//	X_NO_ASSIGN(SubMeshHeader);
 }; // 128
 
 
@@ -329,8 +329,8 @@ struct MeshHeader
 
 	uint32_t __pad[4];
 
-	X_NO_COPY(MeshHeader);
-	X_NO_ASSIGN(MeshHeader);
+//	X_NO_COPY(MeshHeader);
+//	X_NO_ASSIGN(MeshHeader);
 };
 
 
