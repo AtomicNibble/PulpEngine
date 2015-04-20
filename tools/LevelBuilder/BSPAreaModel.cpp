@@ -2,7 +2,6 @@
 #include "BSPTypes.h"
 
 
-
 AreaModel::AreaModel() :
 meshes(g_arena),
 verts(g_arena),
@@ -69,4 +68,82 @@ void AreaModel::EndModel(void)
 	X_LOG0("AreaModel", "num meshes: %i", model.numSubMeshes);
 	X_LOG0("AreaModel", "bounds: (%.0f,%.0f,%.0f) to (%.0f,%.0f,%.0f)", bounds.min[0], bounds.min[1], bounds.min[2],
 		bounds.max[0], bounds.max[1], bounds.max[2]);
+}
+
+
+// ----------------------------
+
+
+LvlArea::LvlArea() :
+areaMeshes(g_arena),
+entities(g_arena), 
+connectedAreas(g_arena),
+cullSections(g_arena)
+{
+	areaMeshes.reserve(2048);
+	entities.setGranularity(512);
+}
+
+void LvlArea::AreaBegin(void)
+{
+	areaMeshes.clear();
+
+	model.BeginModel();
+}
+
+void LvlArea::AreaEnd(void)
+{
+	AreaMeshMap::const_iterator it = areaMeshes.begin();
+	for (; it != areaMeshes.end(); ++it)
+	{
+		const AreaSubMesh& aSub = it->second;
+
+		model::SubMeshHeader mesh;
+		mesh.boundingBox.clear();
+
+		core::Array<bsp::Vertex>::ConstIterator vertIt = aSub.verts_.begin();
+		for (; vertIt != aSub.verts_.end(); ++vertIt) {
+			mesh.boundingBox.add(vertIt->pos);
+		}
+
+		mesh.boundingSphere = Sphere(mesh.boundingBox);
+		mesh.numIndexes = safe_static_cast<uint16_t, size_t>(aSub.indexes_.size());
+		mesh.numVerts = safe_static_cast<uint16_t, size_t>(aSub.verts_.size());
+		mesh.startIndex = safe_static_cast<uint32_t, size_t>(model.indexes.size());
+		mesh.startVertex = safe_static_cast<uint32_t, size_t>(model.verts.size());
+		mesh.streamsFlag = model::StreamType::COLOR | model::StreamType::NORMALS;
+
+		mesh.materialName = aSub.matNameID;
+
+		// add verts / indexs.
+		model.indexes.append(aSub.indexes_);
+		model.verts.append(aSub.verts_);
+		model.meshes.append(mesh);
+	}
+
+	model.EndModel();
+	// not needed anymore.
+	areaMeshes.clear();
+
+	// copy bounds.
+	boundingBox = model.model.boundingBox;
+	boundingSphere = model.model.boundingSphere;
+}
+
+
+
+AreaSubMesh* LvlArea::MeshForSide(const BspSide& side, StringTableType& stringTable)
+{
+	AreaMeshMap::iterator it = areaMeshes.find(X_CONST_STRING(side.material.name.c_str()));
+	if (it != areaMeshes.end()) {
+		return &it->second;
+	}
+	// add new.
+	AreaSubMesh newMesh;
+
+	// add mat name to string table.
+	newMesh.matNameID = stringTable.addStringUnqiue(side.material.name.c_str());
+
+	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes.insert(AreaMeshMap::value_type(side.material.name.c_str(), newMesh));
+	return &newIt.first->second;
 }

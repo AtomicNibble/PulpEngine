@@ -446,7 +446,8 @@ struct AreaModel
 	model::MeshHeader model;
 };
 
-
+// used to build up submeshes.
+// so faces with same materials are grouped into meshes.
 struct AreaSubMesh
 {
 	AreaSubMesh() : verts_(g_arena), indexes_(g_arena) {}
@@ -458,29 +459,24 @@ struct AreaSubMesh
 	uint32_t matNameID;
 
 	// index's for this sub mesh.
+	// merged into AreaModel list at end.
 	core::Array<bsp::Vertex> verts_;
 	core::Array<model::Face> indexes_;
 };
+
 
 class LvlArea
 {
 	typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
 	typedef core::Array<LvlEntity> AreaEntsArr;
 	typedef core::Array<LvlArea> ConnectAreasArr;
+	typedef core::Array<AABB> CullSectionsArr;
 public:
-
-	LvlArea() : areaMeshes(g_arena), 
-		entities(g_arena), connectedAreas(g_arena) 
-	{
-		areaMeshes.reserve(2048);
-		entities.setGranularity(512);
-
-	}
+	LvlArea();
 
 	void AreaBegin(void);
 	void AreaEnd(void);
 	AreaSubMesh* MeshForSide(const BspSide& side, StringTableType& stringTable);
-
 
 public:
 	// area has one model.
@@ -489,6 +485,9 @@ public:
 	AreaMeshMap areaMeshes;
 	AreaEntsArr	entities;
 	ConnectAreasArr connectedAreas;
+	// we split the area up into a optimal avg'd collection of AABB's
+	// which are turned into worker jobs.
+	CullSectionsArr cullSections;
 
 	// copy of the model values.
 	AABB boundingBox;

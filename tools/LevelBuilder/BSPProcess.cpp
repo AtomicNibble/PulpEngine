@@ -209,63 +209,6 @@ namespace
 }
 
 
-AreaSubMesh* LvlArea::MeshForSide(const BspSide& side, StringTableType& stringTable)
-{
-	AreaMeshMap::iterator it = areaMeshes.find(side.material.name.c_str());
-	if (it != areaMeshes.end()) {
-		return &it->second;
-	}
-	// add new.
-	AreaSubMesh newMesh;
-
-	// add mat name to string table.
-	newMesh.matNameID = stringTable.addStringUnqiue(side.material.name.c_str());
-
-	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes.insert(AreaMeshMap::value_type(side.material.name.c_str(), newMesh));
-	return &newIt.first->second;
-}
-
-void LvlArea::AreaBegin(void)
-{
-	areaMeshes.clear();
-
-	model.BeginModel();
-}
-
-void LvlArea::AreaEnd(void)
-{
-	AreaMeshMap::const_iterator it = areaMeshes.begin();
-	for (; it != areaMeshes.end(); ++it)
-	{
-		const AreaSubMesh& aSub = it->second;
-
-		model::SubMeshHeader mesh;
-		mesh.boundingBox.clear();
-
-		core::Array<bsp::Vertex>::ConstIterator vertIt = aSub.verts_.begin();
-		for (; vertIt != aSub.verts_.end(); ++vertIt) {
-			mesh.boundingBox.add(vertIt->pos);
-		}
-
-		mesh.boundingSphere = Sphere(mesh.boundingBox);
-		mesh.numIndexes = safe_static_cast<uint16_t, size_t>(aSub.indexes_.size());
-		mesh.numVerts = safe_static_cast<uint16_t, size_t>(aSub.verts_.size());
-		mesh.startIndex = safe_static_cast<uint32_t, size_t>(model.indexes.size());
-		mesh.startVertex = safe_static_cast<uint32_t, size_t>(model.verts.size());
-		mesh.streamsFlag = model::StreamType::COLOR | model::StreamType::NORMALS;
-
-		mesh.materialName = aSub.matNameID;
-
-		// add verts / indexs.
-		model.indexes.append(aSub.indexes_);
-		model.verts.append(aSub.verts_);
-		model.meshes.append(mesh);
-	}
-
-	model.EndModel();
-	// not needed anymore.
-	areaMeshes.clear();
-}
 
 bool LvlBuilder::ProcessModels(void)
 {
