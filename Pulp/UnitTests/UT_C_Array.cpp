@@ -131,6 +131,57 @@ TYPED_TEST(ArrayTest, Append)
 	EXPECT_EQ(nullptr, list.ptr());
 }
 
+TYPED_TEST(ArrayTest, AppendArr)
+{
+		// we now allow a array of same tpye to be appended.
+	Array<TypeParam> list(g_arena);
+
+	EXPECT_EQ(0, list.size());
+	EXPECT_EQ(0, list.capacity());
+	EXPECT_LT((Array<TypeParam>::size_type)0, list.granularity()); // gran should be above 0.
+
+	EXPECT_EQ(nullptr, list.ptr());
+	
+	for (size_t i = 0; i < 39; i++)
+	{
+		list.append(i * 4);
+	}
+
+	EXPECT_EQ(39, list.size());
+
+	Array<TypeParam> list2(g_arena);
+	list2.append(1337);
+
+	EXPECT_EQ(1, list2.size());
+
+	// apend the list.
+	list.append(list2);
+
+	// now 40
+	EXPECT_EQ(40, list2.size());
+
+	// check the values are correct.
+	EXPECT_EQ(1337,list[0]);
+	for (int i = 1; i < 40; i++)
+	{
+		EXPECT_EQ(i*4,list[i]);
+	}	
+
+	// clear list 1 and make sure list 2 still valid.
+	list.clear();
+
+	EXPECT_EQ(0, list.size());
+	EXPECT_EQ(40, list2.size());
+
+	// check again
+	EXPECT_EQ(1337,list[0]);
+	for (int i = 1; i < 40; i++)
+	{
+		EXPECT_EQ(i*4,list[i]);
+	}	
+}
+
+
 
 TYPED_TEST(ArrayTest, Insert)
 {
