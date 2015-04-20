@@ -49,6 +49,7 @@ public:
 	X_INLINE size_t numStrings(void) const;
 	X_INLINE size_t wastedBytes(void) const;
 	X_INLINE size_t allocatedBytes(void) const;
+	X_INLINE size_t bytesUsed(void) const;
 
 	// ISerialize
 	virtual bool SSave(XFile* pFile) const X_FINAL;

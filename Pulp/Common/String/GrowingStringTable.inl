@@ -195,6 +195,12 @@ size_t GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::alloc
 	return buffer_.capacity();
 }
 
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+size_t GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::blocksUsed(void) const
+{
+	return BlockSize * CurrentBlock_;
+}
+
 
 // ISerialize
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
