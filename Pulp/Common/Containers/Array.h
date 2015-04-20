@@ -63,6 +63,8 @@ public:
 	void reserve(size_type size);
 
 
+	Type& AddOne(void);
+
 	// append element (same as push_back)
 	size_type append(const T& obj);
 	// add the list

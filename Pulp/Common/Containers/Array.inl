@@ -245,6 +245,23 @@ X_INLINE void Array<T>::reserve(size_type __size)
 // ---------------------------------------------------------
 
 template<typename T>
+X_INLINE typename Array<T>::Type& Array<T>::AddOne(void)
+{
+	if (!list_)
+		reserve(granularity_);
+	// grow if needs be.
+	if (num_ == size_)
+		reserve(size_ + granularity_);
+
+	Mem::Construct<T>(&list_[num_]);
+
+	return list_[num_++];
+}
+
+// ---------------------------------------------------------
+
+
+template<typename T>
 X_INLINE typename Array<T>::size_type Array<T>::append(T const& obj) {
 	// if list empty allocate it
 	if ( !list_ ) 
