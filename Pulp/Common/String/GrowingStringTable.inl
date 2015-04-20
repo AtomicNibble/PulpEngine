@@ -196,7 +196,7 @@ size_t GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::alloc
 }
 
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
-size_t GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::blocksUsed(void) const
+size_t GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::bytesUsed(void) const
 {
 	return BlockSize * CurrentBlock_;
 }
