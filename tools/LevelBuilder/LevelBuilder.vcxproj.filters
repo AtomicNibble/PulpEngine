@@ -113,7 +113,7 @@
     <ClCompile Include="BSPProcess.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>
-    <ClCompile Include="BSPAreaModel.cpp">
+    <ClCompile Include="BSPArea.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>
   </ItemGroup>
