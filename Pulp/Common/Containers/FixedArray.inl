@@ -68,7 +68,7 @@ inline void FixedArray<T, N>::clear(void)
 }
 
 // append blank elemtnt and return refrence
-template<typename T>
+template<typename T, size_t N>
 X_INLINE typename FixedArray<T, N>::Type& FixedArray<T, N>::AddOne(void)
 {
 	X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
