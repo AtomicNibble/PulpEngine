@@ -113,7 +113,7 @@ void LvlArea::AreaEnd(void)
 		mesh.startVertex = safe_static_cast<uint32_t, size_t>(model.verts.size());
 		mesh.streamsFlag = model::StreamType::COLOR | model::StreamType::NORMALS;
 
-		mesh.materialName = aSub.matNameID;
+		mesh.materialName = aSub.matNameID_;
 
 		// add verts / indexs.
 		model.indexes.append(aSub.indexes_);
@@ -142,7 +142,7 @@ AreaSubMesh* LvlArea::MeshForSide(const BspSide& side, StringTableType& stringTa
 	AreaSubMesh newMesh;
 
 	// add mat name to string table.
-	newMesh.matNameID = stringTable.addStringUnqiue(side.material.name.c_str());
+	newMesh.matNameID_ = stringTable.addStringUnqiue(side.material.name.c_str());
 
 	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes.insert(AreaMeshMap::value_type(side.material.name.c_str(), newMesh));
 	return &newIt.first->second;

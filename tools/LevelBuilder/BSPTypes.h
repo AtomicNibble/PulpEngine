@@ -273,7 +273,7 @@ struct AreaSubMesh
 		verts_.append(vert);
 	}
 
-	uint32_t matNameID;
+	uint32_t matNameID_;
 
 	// index's for this sub mesh.
 	// merged into AreaModel list at end.
