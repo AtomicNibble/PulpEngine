@@ -268,7 +268,7 @@ bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::SLoad(X
 
 	if (!requestFreeBlocks(CurrentBlock))
 	{
-		X_ERROR("", "Failed to acquire required blocks. num: %i", CurrentBlock);
+		X_ERROR("GrowingStringTable", "Failed to acquire required blocks. num: %i", CurrentBlock);
 		return false;
 	}
 
