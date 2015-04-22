@@ -67,6 +67,17 @@ inline void FixedArray<T, N>::clear(void)
 	size_ = 0;
 }
 
+// append blank elemtnt and return refrence
+template<typename T>
+X_INLINE typename FixedArray<T, N>::Type& FixedArray<T, N>::AddOne(void)
+{
+	X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
+
+	Mem::Construct<T>(&array_[size_]);
+
+	return array_[size_++];
+}
+
 // append element (same as push_back)
 template<typename T, size_t N>
 typename FixedArray<T, N>::size_type FixedArray<T, N>::append(const T& obj)
