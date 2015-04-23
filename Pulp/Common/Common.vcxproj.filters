@@ -988,6 +988,9 @@
     <ClInclude Include="Util\ScopedPointer.h">
       <Filter>Headers\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\JobList.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1473,9 +1476,6 @@
     <ClCompile Include="String\Base64.cpp">
       <Filter>SourceFiles\String</Filter>
     </ClCompile>
-    <ClCompile Include="Threading\Scheduler.cpp">
-      <Filter>SourceFiles\Threading</Filter>
-    </ClCompile>
     <ClCompile Include="Util\Cpu.cpp">
       <Filter>SourceFiles\Util</Filter>
     </ClCompile>
@@ -1493,6 +1493,9 @@
     </ClCompile>
     <ClCompile Include="Compression\Zlib.cpp">
       <Filter>SourceFiles\Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\JobList.cpp">
+      <Filter>SourceFiles\Threading</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

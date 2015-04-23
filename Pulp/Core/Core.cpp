@@ -106,7 +106,6 @@ void XCore::ShutDown()
 {
 	X_LOG0("Core", "Shutting down");
 
-	jobScheduler_.ShutDown();
 	dirWatcher_.ShutDown();
 	
 

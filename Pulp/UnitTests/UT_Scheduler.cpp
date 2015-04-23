@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "Threading\Scheduler.h"
+#include "Threading\JobList.h"
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 #include <Threading\CriticalSection.h>
 
