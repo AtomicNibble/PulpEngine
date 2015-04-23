@@ -256,9 +256,6 @@
     <ClCompile Include="UT_Thread.cpp">
       <Filter>Source Files\tests\Threading</Filter>
     </ClCompile>
-    <ClCompile Include="UT_Scheduler.cpp">
-      <Filter>Source Files\tests\Threading</Filter>
-    </ClCompile>
     <ClCompile Include="Profiler.cpp">
       <Filter>Source Files\Profile</Filter>
     </ClCompile>
@@ -282,6 +279,9 @@
     </ClCompile>
     <ClCompile Include="UT_StackString.cpp">
       <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_JobList.cpp">
+      <Filter>Source Files\tests\Threading</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
