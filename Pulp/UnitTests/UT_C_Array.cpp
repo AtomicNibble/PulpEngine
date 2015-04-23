@@ -144,7 +144,7 @@ TYPED_TEST(ArrayTest, AppendArr)
 	
 	for (size_t i = 0; i < 39; i++)
 	{
-		list.append(i * 4);
+		list.append(static_cast<TypeParam>(i * 4));
 	}
 
 	EXPECT_EQ(39, list.size());
