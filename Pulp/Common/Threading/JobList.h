@@ -29,7 +29,7 @@ static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
 static const uint32_t MAX_JOB_LISTS = 64;
 
 class JobList;
-class Scheduler;
+class jobListRunner;
 
 struct ThreadStats
 {
@@ -97,7 +97,7 @@ public:
 	X_DECLARE_FLAGS(RunFlag)(OK,PROGRESS,DONE,STALLED);
 	typedef Flags<RunFlag> RunFlags;
 
-	friend class Scheduler;
+	friend class jobListRunner;
 	friend class JobThread;
 public:
 	JobList(core::MemoryArenaBase* arena);
@@ -212,11 +212,11 @@ private:
 };
 
 
-class Scheduler
+class jobListRunner
 {
 public:
-	Scheduler();
-	~Scheduler();
+	jobListRunner();
+	~jobListRunner();
 
 	void StartUp(void);
 	void ShutDown(void);
