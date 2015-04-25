@@ -217,7 +217,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		return false;
 
 	// #------------------------- JOB SYSTEM ------------------------
-
+	jobSystem_.StartUp();
 
 	// #------------------------- ProfileSys ---------------------------
 	profileSys_.Init(this);

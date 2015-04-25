@@ -107,7 +107,7 @@ void XCore::ShutDown()
 	X_LOG0("Core", "Shutting down");
 
 	dirWatcher_.ShutDown();
-	
+	jobSystem_.ShutDown();
 
 	if (env_.pGame)
 	{

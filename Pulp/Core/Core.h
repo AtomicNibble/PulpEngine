@@ -29,6 +29,8 @@
 
 #include "Memory\AllocationPolicies\GrowingGenericAllocator.h"
 
+#include "Threading\JobSystem.h"
+
 // #include <vector>
 // #include <map>
 
@@ -227,6 +229,8 @@ private:
 
 	hotReloadMap					hotReloadExtMap_;
 	// ~Hotreload
+
+	core::JobSystem					jobSystem_;
 
 	WIN_HWND		hWnd_;
 	WIN_HINSTANCE	hInst_;
