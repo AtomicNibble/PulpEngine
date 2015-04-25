@@ -28,6 +28,7 @@ JobQue::~JobQue()
 void JobQue::setArena(core::MemoryArenaBase* arena)
 {
 	jobs_.setArena(arena);
+	jobs_.reserve(0x1000);
 }
 
 void JobQue::AddJob(const JobDecl job)
@@ -35,6 +36,15 @@ void JobQue::AddJob(const JobDecl job)
 	core::Spinlock::ScopedLock lock(lock_);
 
 	jobs_.push(job);
+}
+
+void JobQue::AddJobs(JobDecl* pJobs, size_t numJobs)
+{
+	core::Spinlock::ScopedLock lock(lock_);
+
+	for (size_t i = 0; i < numJobs; i++) {
+		jobs_.push(pJobs[i]);
+	}
 }
 
 bool JobQue::tryPop(JobDecl& job)
@@ -166,7 +176,7 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 			TimeVal jobStart = GetTimeReal();
 
 			// run it.
-			job.pJobFunc(job.pParam);
+			job.pJobFunc(job.pParam, threadIdx_);
 
 			TimeVal jobEnd = GetTimeReal();
 			TimeVal elapsed = jobEnd - jobStart;
@@ -180,7 +190,7 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 					&& i != JobPriority::NONE)
 				{
 					X_WARNING("JobSystem", "a single job took more than: %ims elapsed: %gms "
-						"pFunc: %p pData: %p batchOffset: %i batchNum: %i",
+						"pFunc: %p pData: %p",
 						JobSystem::var_LongJobMs,
 						elapsed.GetMilliSeconds(),
 						job.pJobFunc,
@@ -242,6 +252,20 @@ void JobSystem::AddJob(const JobDecl job, JobPriority::Enum priority)
 		threads_[i].SignalWork();
 	}
 }
+
+void JobSystem::AddJobs(JobDecl* pJobs, size_t numJobs, JobPriority::Enum priority)
+{
+	X_ASSERT_NOT_NULL(pJobs);
+
+
+	ques_[priority].AddJobs(pJobs, numJobs);
+
+	// signal
+	for (size_t i = 0; i < numThreads_; i++){
+		threads_[i].SignalWork();
+	}
+}
+
 
 
 bool JobSystem::StartThreads(void)

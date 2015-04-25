@@ -18,10 +18,19 @@
 
 X_NAMESPACE_BEGIN(core)
 
-typedef void(*Job)(void* pParam);
+typedef void(*Job)(void* pParam, uint32_t workerIdx);
 
 struct JobDecl
 {
+	JobDecl() {
+		pJobFunc = nullptr;
+		pParam = nullptr;
+	}
+	JobDecl(Job pJob, void* pParam) {
+		this->pJobFunc = pJob;
+		this->pParam = pParam;
+	}
+
 	Job pJobFunc;
 	void* pParam;
 	TimeVal execTime;
@@ -53,6 +62,7 @@ public:
 	void setArena(core::MemoryArenaBase* arena);
 
 	void AddJob(const JobDecl job);
+	void AddJobs(JobDecl* pJobs, size_t numJobs);
 	bool tryPop(JobDecl& job);
 
 private:
@@ -103,6 +113,7 @@ public:
 	void ShutDown(void);
 
 	void AddJob(const JobDecl job, JobPriority::Enum priority = JobPriority::NORMAL);
+	void AddJobs(JobDecl* pJobs, size_t numJobs, JobPriority::Enum priority = JobPriority::NORMAL);
 
 	int32_t numThreads(void) const;
 
