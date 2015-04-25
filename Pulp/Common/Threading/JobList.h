@@ -17,6 +17,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
+namespace JobList
+{
 
 #define SCHEDULER_LOGS 0
 
@@ -239,6 +241,7 @@ public:
 	static int32_t var_LongJobMs;
 };
 
+} // namespace JobList
 
 X_NAMESPACE_END
 

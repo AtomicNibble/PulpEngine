@@ -12,6 +12,9 @@
 
 X_NAMESPACE_BEGIN(core)
 
+namespace JobList
+{
+
 int32_t JobList::JOB_LIST_DONE = 0x12345678;
 
 int jobListRunner::var_LongJobMs = 8;
@@ -606,5 +609,6 @@ int32_t jobListRunner::numThreads(void) const
 	return numThreads_;
 }
 
+} // namespace JobList
 
 X_NAMESPACE_END

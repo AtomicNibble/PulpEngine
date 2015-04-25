@@ -12,6 +12,8 @@
 
 X_USING_NAMESPACE;
 
+using namespace core::JobList;
+
 core::AtomicInt numJobsRan(0);
 core::AtomicInt jobList9Done(0);
 
@@ -47,7 +49,7 @@ X_PRAGMA(optimize("", on))
 
 TEST(Threading, JobList)
 {
-	core::jobListRunner jobSys;
+	jobListRunner jobSys;
 
 	jobSys.StartUp();
 
@@ -84,12 +86,12 @@ TEST(Threading, JobList)
 		core::TimeVal start = gEnv->pTimer->GetTimeReal();
 
 		const size_t numLists = 10;
-		core::JobListStats combinedStats;
+		JobListStats combinedStats;
 
-		core::JobList* jobLists[numLists];
+		JobList* jobLists[numLists];
 		for (size_t j = 0; j < numLists; j++)
 		{
-			jobLists[j] = X_NEW(core::JobList, &arena, "JobLists")(&arena);
+			jobLists[j] = X_NEW(JobList, &arena, "JobLists")(&arena);
 		}
 
 		for (size_t p = 0; p < 1; p++)
@@ -97,7 +99,7 @@ TEST(Threading, JobList)
 
 			for (size_t j = 0; j < numLists; j++)
 			{
-				core::JobList* jobs = jobLists[j];
+				JobList* jobs = jobLists[j];
 
 				jobs->listId_ = j;
 
@@ -107,13 +109,13 @@ TEST(Threading, JobList)
 
 				// set a priority.
 				if (j == (numLists - 2)) {
-					jobs->SetPriority(core::JobListPriority::LOW);
+					jobs->SetPriority(JobListPriority::LOW);
 				}
 				if ((j % 3) == 0 || j == (numLists - 1)) {
-					jobs->SetPriority(core::JobListPriority::HIGH);
+					jobs->SetPriority(JobListPriority::HIGH);
 				}
 				if (j == 0) {
-					jobs->SetPriority(core::JobListPriority::LOW);
+					jobs->SetPriority(JobListPriority::LOW);
 				}
 			}
 
@@ -141,9 +143,9 @@ TEST(Threading, JobList)
 
 		for (size_t j = 0; j < numLists; j++)
 		{
-			const core::JobListStats& stats = jobLists[j]->getStats();
+			const JobListStats& stats = jobLists[j]->getStats();
 			combinedStats.waitTime += stats.waitTime;
-			for (size_t x = 0; x < core::HW_THREAD_MAX; x++) {
+			for (size_t x = 0; x < HW_THREAD_MAX; x++) {
 				combinedStats.threadExecTime[x] += stats.threadExecTime[x];
 				combinedStats.threadTotalTime[x] += stats.threadTotalTime[x];
 			}
@@ -165,7 +167,7 @@ TEST(Threading, JobList)
 		X_LOG_BULLET;
 		X_LOG0("Scheduler", "Percentage: %g%% scaling: %g%%", percentage, percentage / jobSys.numThreads());
 		X_LOG0("Scheduler", "Total wait time: %f", combinedStats.waitTime.GetMilliSeconds());
-		for (size_t i = 0; i < core::HW_THREAD_MAX; i++) {
+		for (size_t i = 0; i < HW_THREAD_MAX; i++) {
 			X_LOG0("Scheduler", "Thread %i Exec: %f Total: %f", 
 				i,
 				combinedStats.threadExecTime[i].GetMilliSeconds(),
