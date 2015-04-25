@@ -283,6 +283,9 @@
     <ClCompile Include="UT_JobList.cpp">
       <Filter>Source Files\tests\Threading</Filter>
     </ClCompile>
+    <ClCompile Include="UT_JobSystem.cpp">
+      <Filter>Source Files\tests\Threading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">

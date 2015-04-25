@@ -434,6 +434,7 @@
     <ClCompile Include="UT_GrowingStringTable.cpp" />
     <ClCompile Include="UT_Hash.cpp" />
     <ClCompile Include="UT_JobList.cpp" />
+    <ClCompile Include="UT_JobSystem.cpp" />
     <ClCompile Include="UT_Lexer.cpp" />
     <ClCompile Include="UT_MemoryCursor.cpp" />
     <ClCompile Include="UT_Mem_GrowingBlockAllocator.cpp" />
