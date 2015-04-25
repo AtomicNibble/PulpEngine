@@ -267,6 +267,7 @@
     <ClInclude Include="Threading\ConditionVariable.h" />
     <ClInclude Include="Threading\CriticalSection.h" />
     <ClInclude Include="Threading\JobList.h" />
+    <ClInclude Include="Threading\JobSystem.h" />
     <ClInclude Include="Threading\Semaphore.h" />
     <ClInclude Include="Threading\Signal.h" />
     <ClInclude Include="Threading\Spinlock.h" />
@@ -691,6 +692,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Threading\JobList.cpp" />
+    <ClCompile Include="Threading\JobSystem.cpp" />
     <ClCompile Include="Threading\win32\Signal.cpp" />
     <ClCompile Include="Threading\win32\Thread.cpp" />
     <ClCompile Include="Time\CompressedStamps.cpp" />

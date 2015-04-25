@@ -988,6 +988,9 @@
     <ClInclude Include="Threading\JobList.h">
       <Filter>Headers\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\JobSystem.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1492,6 +1495,9 @@
       <Filter>SourceFiles\Compression</Filter>
     </ClCompile>
     <ClCompile Include="Threading\JobList.cpp">
+      <Filter>SourceFiles\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\JobSystem.cpp">
       <Filter>SourceFiles\Threading</Filter>
     </ClCompile>
   </ItemGroup>
