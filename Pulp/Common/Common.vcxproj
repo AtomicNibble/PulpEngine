@@ -267,7 +267,6 @@
     <ClInclude Include="Threading\ConditionVariable.h" />
     <ClInclude Include="Threading\CriticalSection.h" />
     <ClInclude Include="Threading\JobList.h" />
-    <ClInclude Include="Threading\Scheduler.h" />
     <ClInclude Include="Threading\Semaphore.h" />
     <ClInclude Include="Threading\Signal.h" />
     <ClInclude Include="Threading\Spinlock.h" />

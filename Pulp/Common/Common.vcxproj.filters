@@ -955,9 +955,6 @@
     <ClInclude Include="Time\TimeVal.h">
       <Filter>Headers\Time</Filter>
     </ClInclude>
-    <ClInclude Include="Threading\Scheduler.h">
-      <Filter>Headers\Threading</Filter>
-    </ClInclude>
     <ClInclude Include="Util\Cpu.h">
       <Filter>Headers\Util</Filter>
     </ClInclude>
