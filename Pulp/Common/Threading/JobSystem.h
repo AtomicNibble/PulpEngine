@@ -8,7 +8,7 @@
 
 #include "Containers\Array.h"
 #include "Containers\FixedRingBuffer.h"
-#include "Containers\FixedFifo.h"
+#include "Containers\Fifo.h"
 
 #include "Threading\Thread.h"
 #include "Threading\Signal.h"
@@ -24,10 +24,11 @@ struct JobDecl
 {
 	Job pJobFunc;
 	void* pParam;
+	TimeVal execTime;
 };
 
 
-X_DECLARE_ENUM(JobPriority)(NONE, LOW, NORMAL, HIGH);
+X_DECLARE_ENUM(JobPriority)(HIGH, NORMAL, NONE);
 
 static const uint32_t HW_THREAD_MAX = 6; // max even if hardware supports more.
 static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
@@ -42,16 +43,38 @@ struct ThreadStats
 };
 
 
+
+class JobQue
+{
+public:
+	JobQue();
+	~JobQue();
+
+	void setArena(core::MemoryArenaBase* arena);
+
+	void AddJob(const JobDecl job);
+	bool tryPop(JobDecl& job);
+
+private:
+	core::Spinlock lock_;
+	core::Fifo<JobDecl> jobs_;
+};
+
+
 class JobThread : public ThreadAbstract
 {
 public:
 	JobThread();
 	~JobThread();
 
-	void setThreadIdx(uint32_t idx);
+	void init(uint32_t idx, JobQue* ques);
+
 	void SignalWork(void);
 	void Stop(void);
 	void WaitForThread(void);
+
+private:
+	TimeVal GetTimeReal(void) const;
 
 protected:
 	virtual Thread::ReturnValue ThreadRun(const Thread& thread) X_FINAL;
@@ -64,10 +87,11 @@ private:
 	volatile bool moreWorkToDo_;
 
 	ThreadStats stats_;
-
 	uint32_t threadIdx_;
-};
 
+	JobQue* ques_[JobPriority::ENUM_COUNT];
+	core::ITimer* pTimer_;
+};
 
 class JobSystem
 {
@@ -78,7 +102,7 @@ public:
 	bool StartUp(void);
 	void ShutDown(void);
 
-	void AddJob(const JobDecl job);
+	void AddJob(const JobDecl job, JobPriority::Enum priority = JobPriority::NORMAL);
 
 	int32_t numThreads(void) const;
 
@@ -88,7 +112,8 @@ private:
 private:
 	int32_t numThreads_; // num created.
 	JobThread threads_[HW_THREAD_MAX];
-
+	JobQue ques_[JobPriority::ENUM_COUNT];
+public:
 	static int var_LongJobMs;
 };
 

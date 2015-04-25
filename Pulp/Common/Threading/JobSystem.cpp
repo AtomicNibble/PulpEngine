@@ -14,6 +14,42 @@ X_NAMESPACE_BEGIN(core)
 
 int JobSystem::var_LongJobMs = 8;
 
+JobQue::JobQue() :
+jobs_(nullptr)
+{
+
+}
+
+JobQue::~JobQue()
+{
+
+}
+
+void JobQue::setArena(core::MemoryArenaBase* arena)
+{
+	jobs_.setArena(arena);
+}
+
+void JobQue::AddJob(const JobDecl job)
+{
+	core::Spinlock::ScopedLock lock(lock_);
+
+	jobs_.push(job);
+}
+
+bool JobQue::tryPop(JobDecl& job)
+{
+	core::Spinlock::ScopedLock lock(lock_);
+
+	if (jobs_.isEmpty())
+		return false;
+
+	job = jobs_.peek();
+	jobs_.pop();
+	return true;
+}
+
+// -------------------
 
 JobThread::JobThread()
 {
@@ -26,9 +62,16 @@ JobThread::~JobThread()
 
 }
 
-void JobThread::setThreadIdx(uint32_t idx)
+void JobThread::init(uint32_t idx, JobQue* ques)
 {
 	threadIdx_ = idx;
+
+	for (size_t i = 0; i < JobPriority::ENUM_COUNT; i++) {
+		ques_[i] = &ques[i];
+	}
+
+	X_ASSERT_NOT_NULL(gEnv->pTimer);
+	pTimer_ = gEnv->pTimer;
 }
 
 void JobThread::SignalWork(void)
@@ -50,6 +93,10 @@ void JobThread::WaitForThread(void)
 	signalWorkerDone_.wait();
 }
 
+TimeVal JobThread::GetTimeReal(void) const
+{
+	return pTimer_->GetTimeReal();
+}
 
 Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 {
@@ -96,9 +143,52 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 
 Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 {
+	JobDecl job;
+	size_t i;
+
 	while (thread.ShouldRun())
 	{
+		// pop from the ques in order.
+		for(i = 0; i < JobPriority::ENUM_COUNT; i++)
+		{
+			if (ques_[i]->tryPop(job))
+			{
+				break;
+			}
+		}
 
+		// got a job?
+		if (i == JobPriority::ENUM_COUNT) {
+			return Thread::ReturnValue(0);
+		}
+
+		{
+			TimeVal jobStart = GetTimeReal();
+
+			// run it.
+			job.pJobFunc(job.pParam);
+
+			TimeVal jobEnd = GetTimeReal();
+			TimeVal elapsed = jobEnd - jobStart;
+
+			job.execTime = elapsed;
+
+			if (JobSystem::var_LongJobMs > 0)
+			{
+				// we allow jobs with no priority to run as long as they want
+				if (elapsed.GetMilliSeconds() > JobSystem::var_LongJobMs
+					&& i != JobPriority::NONE)
+				{
+					X_WARNING("JobSystem", "a single job took more than: %ims elapsed: %gms "
+						"pFunc: %p pData: %p batchOffset: %i batchNum: %i",
+						JobSystem::var_LongJobMs,
+						elapsed.GetMilliSeconds(),
+						job.pJobFunc,
+						job.pParam
+					);
+				}
+			}
+		}
 	}
 	return Thread::ReturnValue(0);
 }
@@ -107,7 +197,9 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 
 JobSystem::JobSystem() : numThreads_(0)
 {
-
+	for (size_t i = 0; i < JobPriority::ENUM_COUNT; i++) {
+		ques_[i].setArena(gEnv->pArena);
+	}
 }
 
 JobSystem::~JobSystem()
@@ -141,10 +233,14 @@ bool JobSystem::StartUp(void)
 	return StartThreads();
 }
 
-void JobSystem::AddJob(const JobDecl job)
+void JobSystem::AddJob(const JobDecl job, JobPriority::Enum priority)
 {
+	ques_[priority].AddJob(job);
 
-
+	// signal
+	for (size_t i = 0; i < numThreads_; i++){
+		threads_[i].SignalWork();
+	}
 }
 
 
@@ -157,7 +253,7 @@ bool JobSystem::StartThreads(void)
 	{
 		core::StackString<64> name;
 		name.appendFmt("Worker_%i", i);
-		threads_[i].setThreadIdx(i);
+		threads_[i].init(i, ques_);
 		threads_[i].Create(name.c_str()); // default stack size.
 		threads_[i].Start();
 	}
