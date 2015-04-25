@@ -158,27 +158,27 @@ TYPED_TEST(ArrayTest, AppendArr)
 	list.append(list2);
 
 	// now 40
-	EXPECT_EQ(40, list2.size());
+	EXPECT_EQ(40, list.size());
 
 	// check the values are correct.
-	EXPECT_EQ(1337,list[0]);
-	for (int i = 1; i < 40; i++)
+	EXPECT_EQ(1337,list[39]);
+	for (int i = 0; i < 39; i++)
 	{
 		EXPECT_EQ(i*4,list[i]);
 	}	
 
 	// clear list 1 and make sure list 2 still valid.
-	list.clear();
+	list2.clear();
 
-	EXPECT_EQ(0, list.size());
-	EXPECT_EQ(40, list2.size());
+	EXPECT_EQ(0, list2.size());
+	EXPECT_EQ(40, list.size());
 
 	// check again
-	EXPECT_EQ(1337,list[0]);
-	for (int i = 1; i < 40; i++)
+	EXPECT_EQ(1337, list[39]);
+	for (int i = 0; i < 39; i++)
 	{
-		EXPECT_EQ(i*4,list[i]);
-	}	
+		EXPECT_EQ(i * 4, list[i]);
+	}
 }
 
 
