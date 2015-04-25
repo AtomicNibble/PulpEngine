@@ -54,8 +54,9 @@ TEST(Threading, JobSystem)
 	jobSys.AddJobs(jobs, 0x80, JobPriority::NORMAL);
 	jobSys.AddJobs(&jobs[0x80], 0x80, JobPriority::HIGH);
 
-	EXPECT_EQ(0x100, numJobsRan);
+	jobSys.waitForAllJobs();
 
+	EXPECT_EQ(0x100, numJobsRan);
 
 	jobSys.ShutDown();
 }

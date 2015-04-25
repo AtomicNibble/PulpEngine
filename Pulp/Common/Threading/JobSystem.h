@@ -65,6 +65,8 @@ public:
 	void AddJobs(JobDecl* pJobs, size_t numJobs);
 	bool tryPop(JobDecl& job);
 
+	size_t numJobs(void) const;
+
 private:
 	core::Spinlock lock_;
 	core::Fifo<JobDecl> jobs_;
@@ -115,8 +117,9 @@ public:
 	void AddJob(const JobDecl job, JobPriority::Enum priority = JobPriority::NORMAL);
 	void AddJobs(JobDecl* pJobs, size_t numJobs, JobPriority::Enum priority = JobPriority::NORMAL);
 
-	int32_t numThreads(void) const;
+	void waitForAllJobs(void);
 
+	int32_t numThreads(void) const;
 private:
 	bool StartThreads(void);
 

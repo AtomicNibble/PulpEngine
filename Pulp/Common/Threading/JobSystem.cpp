@@ -59,6 +59,12 @@ bool JobQue::tryPop(JobDecl& job)
 	return true;
 }
 
+size_t JobQue::numJobs(void) const
+{
+	// any point locking for this?
+	return jobs_.size();
+}
+
 // -------------------
 
 JobThread::JobThread()
@@ -257,7 +263,6 @@ void JobSystem::AddJobs(JobDecl* pJobs, size_t numJobs, JobPriority::Enum priori
 {
 	X_ASSERT_NOT_NULL(pJobs);
 
-
 	ques_[priority].AddJobs(pJobs, numJobs);
 
 	// signal
@@ -266,7 +271,19 @@ void JobSystem::AddJobs(JobDecl* pJobs, size_t numJobs, JobPriority::Enum priori
 	}
 }
 
+void JobSystem::waitForAllJobs(void)
+{
+	size_t i;
+	for (i = 0; i < JobPriority::ENUM_COUNT; i++) {
+		while (ques_[i].numJobs() > 0) {
+			core::Thread::Yield();
+		}
+	}
 
+	for (i = 0; i < numThreads_; i++) {
+		threads_[i].WaitForThread();
+	}
+}
 
 bool JobSystem::StartThreads(void)
 {
