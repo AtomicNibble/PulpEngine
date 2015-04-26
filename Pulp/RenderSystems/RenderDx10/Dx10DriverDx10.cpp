@@ -16,7 +16,7 @@ X_USING_NAMESPACE;
 #include <Memory\MemoryTrackingPolicies\FullMemoryTracking.h>
 #include <Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.h>
 #include <Memory\AllocationPolicies\GrowingBlockAllocator.h>
-
+#include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
@@ -30,7 +30,7 @@ typedef core::MemoryArena<
 
 typedef core::MemoryArena<
 	core::GrowingBlockAllocator,
-	core::SingleThreadPolicy,
+	core::MultiThreadPolicy<core::CriticalSection>,
 	core::SimpleBoundsChecking,
 	core::SimpleMemoryTracking,
 	core::SimpleMemoryTagging
