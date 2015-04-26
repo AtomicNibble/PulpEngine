@@ -9,13 +9,50 @@
 
 #include "Hashing\crc32.h"
 
-
 #include "XTexture.h"
+
+#include "Threading\JobSystem.h"
+#include "Util\ReferenceCountedOwner.h"
 
 X_NAMESPACE_BEGIN(texture)
 
 namespace CI
 {
+	namespace
+	{
+		struct JobData
+		{
+			JobData(core::Path& path_, XTextureFile* image_, core::MemoryArenaBase* arena_) :
+			path(path_), image(image_, arena_), arena(arena_) {}
+
+			void release(void) {
+				X_DELETE(this, arena);
+			}
+
+			core::Path path;
+			core::ReferenceCountedOwner<XTextureFile> image;
+			core::MemoryArenaBase* arena;
+		};
+
+		X_DECLARE_JOB_ENTRY(WriteCIJob)
+		{
+			JobData* pData = reinterpret_cast<JobData*>(pParam);
+
+			WriteCIImg(pData->path, pData->image.instance());
+
+			pData->release();
+		}
+
+	} // namespace
+
+	bool WriteCIImgAsync(core::Path& path, XTextureFile* image, core::MemoryArenaBase* arena)
+	{
+		JobData* pData = X_NEW(JobData, arena, "CIJobData")(path, image, arena);
+
+		core::JobDecl job(WriteCIJob, pData);
+		gEnv->pJobSys->AddJob(job);
+		return true;
+	}
 
 	bool WriteCIImg(core::Path& path, XTextureFile* image)
 	{
