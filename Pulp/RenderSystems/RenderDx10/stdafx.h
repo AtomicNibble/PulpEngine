@@ -33,6 +33,7 @@ X_ENABLE_WARNING(4005)
 
 
 extern core::MemoryArenaBase* g_rendererArena;
+extern core::MemoryArenaBase* g_textureArena;
 
 
 
