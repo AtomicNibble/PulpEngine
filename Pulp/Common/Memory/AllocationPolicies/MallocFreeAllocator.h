@@ -14,7 +14,7 @@ X_NAMESPACE_BEGIN(core)
 ///
 /// The allocation scheme employed by this class is that of a general purpose allocator. Internally, the class uses
 /// \c malloc and \c free provided by the C runtime. The implementation serves as a wrapper around \c malloc
-/// and \c free which can be used in conjunction with the memory arena system. This enables users to use Molecule's
+/// and \c free which can be used in conjunction with the memory arena system. This enables users to use Potato
 /// memory facilities like memory tracking and bounds checking with the platform's built-in allocator. Furthermore,
 /// the allocator respects all alignment requirements, which is not supported by ordinary \c malloc.
 /// \remark Statistics gathering can be enabled/disabled via the preprocessor option \ref X_ENABLE_MEMORY_ALLOCATOR_STATISTICS.
