@@ -57,6 +57,7 @@ render::IRender* CreateRender(ICore *pCore)
 
 
 	g_rendererArena = X_NEW(RendererArena, gEnv->pArena, "RendererArena")(&g_RenderAlloc, "RendererArena");
+	g_textureDataArena = X_NEW(TextureArena, gEnv->pArena, "TextureArena")(&g_TextureDataAlloc, "TextureArena");
 
 	render::IRender* pRender = &render::g_NullRender;
 
@@ -93,6 +94,7 @@ class XEngineModule_Render : public IEngineModule
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 
 		X_DELETE(g_rendererArena, gEnv->pArena);
+		X_DELETE(g_textureDataArena, gEnv->pArena);
 
 		return true;
 	}
