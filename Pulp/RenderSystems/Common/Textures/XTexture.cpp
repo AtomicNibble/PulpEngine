@@ -542,7 +542,7 @@ void XTexture::preProcessImage(XTextureFile* image_data)
 		outPath = "compiled_images/";
 		outPath /= FileName.c_str();
 
-		CI::WriteCIImgAsync(outPath, image_data, g_rendererArena);
+		CI::WriteCIImgAsync(outPath, image_data, g_textureDataArena);
 	}
 }
 
