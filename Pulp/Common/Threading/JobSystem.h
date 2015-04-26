@@ -4,7 +4,8 @@
 #ifndef X_THREAD_JOB_SYS_H_
 #define X_THREAD_JOB_SYS_H_
 
-#include "Time\TimeVal.h"
+#include "IJobSystem.h"
+
 
 #include "Containers\Array.h"
 #include "Containers\FixedRingBuffer.h"
@@ -18,26 +19,6 @@
 
 X_NAMESPACE_BEGIN(core)
 
-typedef void(*Job)(void* pParam, uint32_t workerIdx);
-
-struct JobDecl
-{
-	JobDecl() {
-		pJobFunc = nullptr;
-		pParam = nullptr;
-	}
-	JobDecl(Job pJob, void* pParam) {
-		this->pJobFunc = pJob;
-		this->pParam = pParam;
-	}
-
-	Job pJobFunc;
-	void* pParam;
-	TimeVal execTime;
-};
-
-
-X_DECLARE_ENUM(JobPriority)(HIGH, NORMAL, NONE);
 
 static const uint32_t HW_THREAD_MAX = 6; // max even if hardware supports more.
 static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
@@ -50,8 +31,6 @@ struct ThreadStats
 	TimeVal waitforJobTime;
 	uint64_t numExecLists;	// jobs lists execuced
 };
-
-
 
 class JobQue
 {
@@ -105,21 +84,21 @@ private:
 	core::ITimer* pTimer_;
 };
 
-class JobSystem
+class JobSystem : public IJobSystem
 {
 public:
 	JobSystem();
-	~JobSystem();
+	~JobSystem() X_FINAL;
 
-	bool StartUp(void);
-	void ShutDown(void);
+	bool StartUp(void) X_FINAL;
+	void ShutDown(void) X_FINAL;
 
-	void AddJob(const JobDecl job, JobPriority::Enum priority = JobPriority::NORMAL);
-	void AddJobs(JobDecl* pJobs, size_t numJobs, JobPriority::Enum priority = JobPriority::NORMAL);
+	void AddJob(const JobDecl job, JobPriority::Enum priority = JobPriority::NORMAL) X_FINAL;
+	void AddJobs(JobDecl* pJobs, size_t numJobs, JobPriority::Enum priority = JobPriority::NORMAL) X_FINAL;
 
-	void waitForAllJobs(void);
+	void waitForAllJobs(void) X_FINAL;
 
-	int32_t numThreads(void) const;
+	int32_t numThreads(void) const X_FINAL;
 private:
 	bool StartThreads(void);
 
