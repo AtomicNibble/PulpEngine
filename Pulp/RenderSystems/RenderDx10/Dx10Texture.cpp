@@ -77,8 +77,8 @@ bool XTexture::RT_CreateDeviceTexture(XTextureFile* image_data)
 
 	// we only delete on true.
 	// caller decides what todo on fail.
-	if (!image_data->dontDelete())
-		X_DELETE(image_data, g_rendererArena);
+//	if (!image_data->dontDelete())
+//		X_DELETE(image_data, g_rendererArena);
 
 
 	D3DDebug::SetDebugObjectName(pSRView, this->FileName);
