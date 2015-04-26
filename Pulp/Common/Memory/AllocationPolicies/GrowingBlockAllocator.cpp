@@ -52,7 +52,7 @@ void* GrowingBlockAllocator::allocate( size_t originalSize, size_t alignment, si
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 		m_statistics.m_allocationCount++;
 		m_statistics.m_internalOverhead += sizeof( BlockHeader );
-		m_statistics.m_wasteAlignment += safe_static_cast<uint32_t>( (uint32_t)as_void - (uint32_t)pMem );
+		m_statistics.m_wasteAlignment += safe_static_cast<size_t>((uintptr_t)as_void - (uintptr_t)pMem);
 
 		mallinfo info = mspace_mallinfo( m_memorySpace );
 

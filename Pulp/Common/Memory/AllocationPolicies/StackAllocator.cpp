@@ -57,7 +57,7 @@ void* StackAllocator::allocate( size_t size, size_t alignment, size_t align_offs
 	m_statistics.m_allocationCount++;
 	m_statistics.m_internalOverhead += sizeof( BlockHeader );
 	m_statistics.m_physicalMemoryUsed += size + (m_current - old_current);
-	m_statistics.m_wasteAlignment += safe_static_cast<uint32_t>( ((uint32_t)m_current - (uint32_t)m_start) - allocationOffset );
+	m_statistics.m_wasteAlignment += safe_static_cast<size_t>(((uintptr_t)m_current - (uintptr_t)m_start) - allocationOffset);
 
 	m_statistics.m_wasteAlignmentMax = Max( m_statistics.m_wasteAlignment, m_statistics.m_wasteAlignmentMax );
 	m_statistics.m_allocationCountMax = Max( m_statistics.m_allocationCount, m_statistics.m_allocationCountMax );
