@@ -8,6 +8,18 @@
 namespace
 {
 
+/*
+
+	class AreaMeshBuilder
+	{
+		typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
+	public:
+		AreaMeshBuilder() : areaMeshes_(g_arena) {
+			areaMeshes_.reserve(4096);
+		}
+		*/
+
+
 	// ---------------------------------------------
 	static const size_t MAX_INDEXES = 1024;
 
@@ -33,19 +45,17 @@ namespace
 	}
 
 
-	bool FanFaceSurface(AreaModel* pArea, model::SubMeshHeader& mesh)
+	bool FanFaceSurface(int numVerts, size_t StartVert, AreaSubMesh* pSubmesh)
 	{
 		int i, j;
 		bsp::Vertex *verts, *centroid, *dv;
 		float iv;
 
-		int numVerts = mesh.numVerts;
+		verts = &pSubmesh->verts_[StartVert];
 
-		verts = &pArea->verts[mesh.startVertex];
+		pSubmesh->verts_.insert(bsp::Vertex(), StartVert);
 
-		pArea->verts.insert(bsp::Vertex(), mesh.startVertex);
-
-		centroid = &pArea->verts[mesh.startVertex];
+		centroid = &pSubmesh->verts_[StartVert];
 		// add up the drawverts to create a centroid 
   		for (i = 1, dv = &verts[1]; i < (numVerts + 1); i++, dv++)
 		{
@@ -54,7 +64,7 @@ namespace
 			for (j = 0; j < 4; j++)
 			{
 				if (j < 2) {
-			//		centroid->st[j] += dv->st[j];
+					centroid->texcoord[j] += dv->texcoord[j];
 				}
 			}
 		}
@@ -63,50 +73,46 @@ namespace
 		iv = 1.0f / numVerts;
 		centroid->pos *= iv;
 		centroid->normal.normalize();
-	//	if (centroid->normal.normalize() <= 0) {
-	//		VectorCopy(verts[1].normal, centroid->normal);
-	//	}
+
 		for (j = 0; j < 4; j++)
 		{
 			if (j < 2) {
-	//			centroid->st[j] *= iv;
+				centroid->texcoord[j] *= iv;
 			}
 		}
 
 		// add to vert count 
-		mesh.numVerts++;
+	//	mesh.numVerts++;
 
 		// fill indexes in triangle fan order 
-		mesh.numIndexes = 0;
-		for (i = 1; i < mesh.numVerts; i++)
+	//	mesh.numIndexes = 0;
+		for (i = 1; i < numVerts; i++)
 		{
 			model::Face face;
 			face.x = 0;
 			face.y = i;
-			face.z = (i + 1) % mesh.numVerts;
+			face.z = (i + 1) % numVerts;
 			face.z = face.z ? face.z : 1;
 
-			pArea->indexes.append(face);
+			pSubmesh->indexes_.append(face);
 		}
 
 		return true;
 	}
 
 
-	bool createIndexs(AreaModel* pArea, model::SubMeshHeader& mesh)
+	bool createIndexs(int numVerts, size_t StartVert, AreaSubMesh* pSubmesh)
 	{
-		X_ASSERT_NOT_NULL(pArea);
+		X_ASSERT_NOT_NULL(pSubmesh);
 
 		int least;
 		int i, r, ni;
 		int rotate;
 		int numIndexes;
-		int numVerts;
 		bsp::Vertex* pVerts;
 		core::FixedArray<model::Face, 1024> indexes;
 
-		numVerts = mesh.numVerts;
-		pVerts = &pArea->verts[mesh.startVertex];
+		pVerts = &pSubmesh->verts_[StartVert];
 
 		X_ASSERT_NOT_NULL(pVerts);
 
@@ -119,8 +125,7 @@ namespace
 		// is this a simple triangle? 
 		if (numVerts == 3)
 		{
-			pArea->indexes.append(model::Face(0, 1, 2));
-			mesh.numIndexes = 3;
+			pSubmesh->indexes_.append(model::Face(0, 1, 2));
 			return true;
 		}
 		else
@@ -134,6 +139,7 @@ namespace
 			{
 				X_ERROR("Meta", "MAX_INDEXES exceeded for surface (%d > %d) (%d verts)",
 					numIndexes, indexes.capacity(), numVerts);
+				return false;
 			}
 
 			// try all possible orderings of the points looking for a non-degenerate strip order 
@@ -185,7 +191,7 @@ namespace
 			// if any triangle in the strip is degenerate, render from a centered fan point instead 
 			if ((indexes.size() * 3) < numIndexes)
 			{
-				return FanFaceSurface(pArea, mesh);
+				return FanFaceSurface(numVerts, StartVert, pSubmesh);
 			}
 		}
 
@@ -193,15 +199,16 @@ namespace
 
 		for (; it != indexes.end(); ++it)
 		{
-			pArea->indexes.append(*it);
+			pSubmesh->indexes_.append(*it);
 		}
 
-		mesh.numIndexes = safe_static_cast<uint32_t,size_t>(indexes.size() * 3);
 		return true;
 	}
 
 
 }
+
+
 
 bool LvlBuilder::ProcessModels(void)
 {
@@ -210,7 +217,7 @@ bool LvlBuilder::ProcessModels(void)
 
 	for (entityNum = 0; entityNum < numEntities; entityNum++)
 	{
-		const LvlEntity& entity = entities[entityNum];
+		const LvlEntity& entity = entities_[entityNum];
 		if (!entity.pBrushes && !entity.pPatches) {
 			continue;
 		}
@@ -244,75 +251,62 @@ bool LvlBuilder::ProcessModel(const LvlEntity& ent)
 }
 
 
-
-
 bool LvlBuilder::ProcessWorldModel(const LvlEntity& ent)
 {
 	X_LOG0("Bsp", "Processing World Entity");
-	AreaModel* pArea;
 	bspBrush* pBrush;
 	size_t i;
 	int x, p;
 
-	pArea = X_NEW(AreaModel, g_arena, "AreaModel");
-	pArea->BeginModel(ent);
+	// allocate a area.
+	// we will have multiple area's for world. (none noob map xD)
+	LvlArea& area = areas_.AddOne();
 
-	areaModels.append(pArea);
-	
-	// Split the map via portals.
-	// each area is then turned into a model.
-	// Each brush is made into a subMesh.
-	// and the verts + indexes added to the models buffer.
+	area.AreaBegin();
 
 	pBrush = ent.pBrushes;
-
 	for (i = 0; i < ent.numBrushes; i++)
 	{
 		X_ASSERT_NOT_NULL(pBrush);
+
 		for (x = 0; x < pBrush->numsides; x++)
 		{
 			if (!pBrush->sides[x].pWinding)
 				continue;
 
-			model::SubMeshHeader mesh;
-
-			mesh.boundingBox = pBrush->bounds;
-			mesh.boundingSphere = Sphere(pBrush->bounds);
-			mesh.startVertex = safe_static_cast<uint32_t, size_t>(pArea->verts.size());
-			mesh.startIndex = safe_static_cast<uint32_t, size_t>(pArea->indexes.size() * 3);
-
 			const BspSide& side = pBrush->sides[x];
 			const XWinding* w = side.pWinding;
-
 			int numPoints = w->GetNumPoints();
+
+			// get areaSubMesh for this material.
+			AreaSubMesh* pSubMesh = area.MeshForSide(side, stringTable_);
+
+			size_t StartVert = pSubMesh->verts_.size();
+
 			for (p = 0; p < numPoints; p++)
 			{
 				bsp::Vertex vert;
-				const Vec5f& vec = w->operator[](p);;
+				const Vec5f& vec = w->operator[](p);
 
 				vert.pos = vec.asVec3();
 				vert.normal = planes[side.planenum].getNormal();
 				vert.color = Col_White;
-				vert.texcoord[0] = Vec2f(vec.s,vec.t);
+				vert.texcoord[0] = Vec2f(vec.s, vec.t);
 
-				pArea->verts.append(vert);
+				pSubMesh->AddVert(vert);
 			}
-
-			mesh.numVerts = numPoints;
-
+		
 			// create some indexes
-			createIndexs(pArea, mesh);
-
-			pArea->meshes.append(mesh);
-		}	
-
+			createIndexs(numPoints, StartVert, pSubMesh);
+		}
 		pBrush = pBrush->next;
 	}
-	
-	if (!pArea->BelowLimits())
-		return false;
 
-	pArea->EndModel();
+	// create the meshes.
+	area.AreaEnd();
+
+	if (!area.model.BelowLimits())
+		return false;
 
  	return true;
 }

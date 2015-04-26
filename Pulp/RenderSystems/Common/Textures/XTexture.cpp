@@ -8,8 +8,11 @@
 #include "TextureLoaderPSD.h"
 #include "TextureLoaderTGA.h"
 
+#include "CI_Img.h"
+
 #include "Hashing\Fnva1Hash.h"
 #include "Containers\HashMap.h"
+#include "Util\ReferenceCountedOwner.h"
 
 #include "IFileSys.h"
 #include "XTextureFile.h"
@@ -443,13 +446,11 @@ bool XTexture::LoadFromFile(const char* path_)
 
 	if (image_data)
 	{
+		core::ReferenceCountedOwner<XTextureFile> refCounted(image_data, g_textureDataArena);
+
 		if (image_data->isValid())
 		{
 			bRes = createTexture(image_data);
-		}
-
-		if (!bRes) {
-			X_DELETE( image_data, g_rendererArena);
 		}
 	}
 
@@ -536,15 +537,12 @@ void XTexture::preProcessImage(XTextureFile* image_data)
 	if (!image_data->getFlags().IsSet(TexFlag::CI_IMG))
 	{
 		X_LOG0("Texture", "Compiling image to CI: ^5%s", this->FileName.c_str());
-		// TODO...
-		// when we get this we want to compile the image.
-		// we want to make it a background job.
-		// we need the jobs to be done one at a time tho
-		// since if we load 1000 dds images we will rape memory requirements.
-		// well maybe not since there are a limited number of threads.
 
+		core::Path outPath;
+		outPath = "compiled_images/";
+		outPath /= FileName.c_str();
 
-
+		CI::WriteCIImgAsync(outPath, image_data, g_textureDataArena);
 	}
 }
 
@@ -893,11 +891,14 @@ bool XTexture::reloadForName(const char* name)
 	core::Path path(name);
 	path.replaceAll('\\','/');
 
+	if (core::strUtil::IsEqualCaseInsen(path.extension(), ".ci")) {
+		return true;
+	}
+
 	XTexture* pTex = (XTexture*)s_pTextures->findAsset(path.c_str());
 
 	if (pTex)
 	{
-
 		return pTex->reload();
 	}
 

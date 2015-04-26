@@ -217,11 +217,11 @@ namespace JPG
 		}
 
 		// create the img obj.
-		XTextureFile* img = X_NEW_ALIGNED(XTextureFile,g_rendererArena,"TextureFile",8);
+		XTextureFile* img = X_NEW_ALIGNED(XTextureFile, g_textureDataArena, "TextureFile", 8);
 		TextureFlags flags;
 		flags.Set(TextureFlags::NOMIPS);
 
-		img->pFaces[0] = X_NEW_ARRAY_ALIGNED(uint8_t,inflated_size,g_rendererArena,"JpgFaceBuffer",8);
+		img->pFaces[0] = X_NEW_ARRAY_ALIGNED(uint8_t, inflated_size, g_textureDataArena, "JpgFaceBuffer", 8);
 		img->setNumFaces(1);
 		img->setNumMips(1);
 		img->setDepth(1);

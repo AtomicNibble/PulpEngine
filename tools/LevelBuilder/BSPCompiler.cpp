@@ -26,9 +26,13 @@ namespace
 X_USING_NAMESPACE;
 
 LvlBuilder::LvlBuilder() :
-entities(g_arena),
-areaModels(g_arena),
+entities_(g_arena),
+areas_(g_arena),
+
+stringTable_(g_arena),
+
 data_(g_arena)
+
 {
 	core::zero_object(stats_);
 
@@ -49,11 +53,11 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 		return false;
 	}
 	
-	entities.resize(map->getNumEntities());
+	entities_.resize(map->getNumEntities());
 
 	for (i = 0; i < map->getNumEntities(); i++)
 	{
-		processMapEntity(entities[i], map->getEntity(i));
+		processMapEntity(entities_[i], map->getEntity(i));
 	}
 
 
@@ -61,15 +65,15 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	mapBounds.clear();
 
 
-	for (pBrush = entities[0].pBrushes; pBrush; pBrush = pBrush->next) {
+	for (pBrush = entities_[0].pBrushes; pBrush; pBrush = pBrush->next) {
 		mapBounds.add(pBrush->bounds);
 	}
 
 	// TODO: add patches to bounds?
 
 
-	X_LOG0("Map", "Total world brush: %i", entities[0].numBrushes);
-	X_LOG0("Map", "Total world patches: %i", entities[0].numBrushes);
+	X_LOG0("Map", "Total world brush: %i", entities_[0].numBrushes);
+	X_LOG0("Map", "Total world patches: %i", entities_[0].numBrushes);
 	X_LOG0("Map", "Total total brush: %i", stats_.numBrushes);
 	X_LOG0("Map", "Total total patches: %i", stats_.numPatches);
 	X_LOG0("Map", "Total entities: %i", stats_.numEntities);
@@ -175,7 +179,11 @@ bool LvlBuilder::processBrush(LvlEntity& ent, mapfile::XMapBrush* mapBrush, int 
 	pBrush->entityNum = stats_.numEntities;
 	pBrush->brushNum = ent_idx;
 	pBrush->numsides = mapBrush->GetNumSides();
-	
+	pBrush->allsidesSameMat = true;
+
+
+	core::StackString<bsp::MAP_MAX_MATERIAL_LEN> lastMatName;
+
 	numSides = mapBrush->GetNumSides();
 	for (i = 0; i < numSides; i++)
 	{
@@ -185,6 +193,20 @@ bool LvlBuilder::processBrush(LvlEntity& ent, mapfile::XMapBrush* mapBrush, int 
 		core::zero_this(pSide);
 
 		pSide->planenum = FindFloatPlane(pMapBrushSide->GetPlane());
+		// material
+		pSide->material.name = pMapBrushSide->material.name;
+		pSide->material.matRepeate = pMapBrushSide->material.matRepeate;
+		pSide->material.rotate = pMapBrushSide->material.rotate;
+		pSide->material.shift = pMapBrushSide->material.shift;
+
+		if (i == 0) {
+			lastMatName = pMapBrushSide->material.name;
+		}
+		else {
+			if (lastMatName != pMapBrushSide->material.name) {
+				pBrush->allsidesSameMat = false;
+			}
+		}
 	}
 
 

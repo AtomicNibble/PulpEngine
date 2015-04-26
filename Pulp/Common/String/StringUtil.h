@@ -23,8 +23,8 @@ namespace strUtil
 
 	const char* bytesToHumanString(size_t numBytes);
 
-
-	const char* workingDir(void);
+	typedef char WorkingDirStr[512];
+	const char* workingDir(WorkingDirStr& buf);
 
 	inline uint32_t strlen(const char* str);
 

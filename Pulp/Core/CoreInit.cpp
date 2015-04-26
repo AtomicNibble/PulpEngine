@@ -19,6 +19,7 @@
 #include <IFont.h>
 #include <IFileSys.h>
 #include <IGame.h>
+#include <IJobSystem.h>
 
 #include <Extension\IGoatClass.h>
 #include <Extension\IGoatFactory.h>
@@ -217,8 +218,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		return false;
 
 	// #------------------------- JOB SYSTEM ------------------------
-	jobScheduler_.StartUp();
-
+	if (env_.pJobSys) {
+		env_.pJobSys->StartUp();
+	}
 
 	// #------------------------- ProfileSys ---------------------------
 	profileSys_.Init(this);

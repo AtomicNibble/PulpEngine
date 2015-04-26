@@ -13,7 +13,7 @@ X_NAMESPACE_BEGIN(core)
 /// \details This class implements the concepts of an allocation policy as expected by the MemoryArena class.
 ///
 /// The allocation scheme employed by this class is that of a general purpose allocator. Internally, the class uses
-/// an implementation of \c dlmalloc. This allocator is part of Molecule's custom generic allocator, and is mostly
+/// an implementation of \c dlmalloc. This allocator is part of Potato's custom generic allocator, and is mostly
 /// intended to be used as an allocator for large blocks. In the context of the general purpose allocator, all allocations
 /// which are greater than 256 bytes are considered to be "large", and all other allocations are normally being taken
 /// care of by the micro allocator.

@@ -27,6 +27,9 @@ public:
 	X_INLINE T* operator->(void);
 	X_INLINE const T* operator->(void) const;
 
+	X_INLINE T* instance(void);
+	X_INLINE const T* instance(void) const;
+
 private:
 	T* instance_;
 	MemoryArenaBase* arena_;

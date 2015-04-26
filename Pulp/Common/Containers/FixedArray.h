@@ -32,6 +32,8 @@ public:
 	// clear the list, no memory free
 	inline void clear(void);
 
+	inline Type& AddOne(void);
+
 	// append element (same as push_back)
 	inline size_type append(const T& obj);
 	// appends a item to the end, resizing if required.

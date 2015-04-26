@@ -41,7 +41,8 @@ struct CITexureHeader
 
 	uint32 DataSize;	// the size of all the data.
 	uint32 FaceSize;	// face size
-	uint32 __Unused[3]; // room for expansion.
+	uint32 crc32; // data + flags.
+	uint32 __Unused[2]; // room for expansion.
 
 	bool isValid(void) const {
 		return fourCC == CI_FOURCC;

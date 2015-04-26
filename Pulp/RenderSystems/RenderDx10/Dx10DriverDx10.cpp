@@ -15,6 +15,8 @@ X_USING_NAMESPACE;
 
 #include <Memory\MemoryTrackingPolicies\FullMemoryTracking.h>
 #include <Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.h>
+#include <Memory\AllocationPolicies\GrowingBlockAllocator.h>
+#include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
@@ -26,15 +28,23 @@ typedef core::MemoryArena<
 	core::SimpleMemoryTagging
 > RendererArena;
 
-
+typedef core::MemoryArena<
+	core::GrowingBlockAllocator,
+	core::MultiThreadPolicy<core::CriticalSection>,
+	core::SimpleBoundsChecking,
+	core::SimpleMemoryTracking,
+	core::SimpleMemoryTagging
+> TextureArena;
 
 // the allocator dose not check for leaks so it
 // dose not need to go out of scope.
 namespace {
 	core::MallocFreeAllocator g_RenderAlloc;
+	core::GrowingBlockAllocator g_TextureDataAlloc;
 }
 
 core::MemoryArenaBase* g_rendererArena = nullptr;
+core::MemoryArenaBase* g_textureDataArena = nullptr;
 
 
 extern "C" DLL_EXPORT render::IRender* CreateRender(ICore *pCore)
@@ -47,6 +57,7 @@ extern "C" DLL_EXPORT render::IRender* CreateRender(ICore *pCore)
 
 
 	g_rendererArena = X_NEW_ALIGNED(RendererArena, gEnv->pArena, "RendererArena", 8)(&g_RenderAlloc, "RendererArena");
+	g_textureDataArena = X_NEW(TextureArena, gEnv->pArena, "TextureArena")(&g_TextureDataAlloc, "TextureArena");
 
 	render::IRender* pRender = &render::g_Dx11D3D;
 
@@ -83,6 +94,7 @@ class XEngineModule_Render : public IEngineModule
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 
 		X_DELETE(g_rendererArena, gEnv->pArena);
+		X_DELETE(g_textureDataArena, gEnv->pArena);
 
 		return true;
 	}

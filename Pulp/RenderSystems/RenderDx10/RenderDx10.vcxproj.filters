@@ -110,6 +110,9 @@
     <ClInclude Include="..\Common\RenderAux.h">
       <Filter>Common</Filter>
     </ClInclude>
+    <ClInclude Include="..\Common\Textures\CI_Img.h">
+      <Filter>Common\Textures</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -206,6 +209,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Textures\XTextureFile.cpp">
+      <Filter>Common\Textures</Filter>
+    </ClCompile>
+    <ClCompile Include="..\Common\Textures\CI_Img.cpp">
       <Filter>Common\Textures</Filter>
     </ClCompile>
   </ItemGroup>

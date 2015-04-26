@@ -109,14 +109,14 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 	}
 
 	// load the data.
-	XTextureFile* img = X_NEW_ALIGNED(XTextureFile, g_rendererArena, "TextureFile", 8);
+	XTextureFile* img = X_NEW_ALIGNED(XTextureFile, g_textureDataArena, "TextureFile", 8);
 	TextureFlags flags;
 	flags.Set(TextureFlags::NOMIPS);
 	flags.Set(TextureFlags::ALPHA);
 
 	uint32_t DataSize = hdr.Width * hdr.Height * (hdr.PixelDepth / 8);
 
-	img->pFaces[0] = X_NEW_ARRAY_ALIGNED(uint8_t,DataSize,g_rendererArena,"TgaFaceBuffer",8);
+	img->pFaces[0] = X_NEW_ARRAY_ALIGNED(uint8_t, DataSize, g_textureDataArena, "TgaFaceBuffer", 8);
 	img->setDataSize(DataSize);
 	img->setWidth(hdr.Width);
 	img->setHeigth(hdr.Height);
@@ -147,7 +147,7 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 		X_ERROR("TextureTGA", "failed to read image data from. requested: %i bytes recivied: %i bytes",
 			DataSize, bytes_read);
 
-		X_DELETE(img,g_rendererArena);
+		X_DELETE(img, g_textureDataArena);
 		img = nullptr;
 	}
 

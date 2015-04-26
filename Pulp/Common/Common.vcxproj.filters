@@ -955,9 +955,6 @@
     <ClInclude Include="Time\TimeVal.h">
       <Filter>Headers\Time</Filter>
     </ClInclude>
-    <ClInclude Include="Threading\Scheduler.h">
-      <Filter>Headers\Threading</Filter>
-    </ClInclude>
     <ClInclude Include="Util\Cpu.h">
       <Filter>Headers\Util</Filter>
     </ClInclude>
@@ -987,6 +984,15 @@
     </ClInclude>
     <ClInclude Include="Util\ScopedPointer.h">
       <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\JobList.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\JobSystem.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="IJobSystem.h">
+      <Filter>Interfaces_h</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -1473,9 +1479,6 @@
     <ClCompile Include="String\Base64.cpp">
       <Filter>SourceFiles\String</Filter>
     </ClCompile>
-    <ClCompile Include="Threading\Scheduler.cpp">
-      <Filter>SourceFiles\Threading</Filter>
-    </ClCompile>
     <ClCompile Include="Util\Cpu.cpp">
       <Filter>SourceFiles\Util</Filter>
     </ClCompile>
@@ -1493,6 +1496,12 @@
     </ClCompile>
     <ClCompile Include="Compression\Zlib.cpp">
       <Filter>SourceFiles\Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\JobList.cpp">
+      <Filter>SourceFiles\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\JobSystem.cpp">
+      <Filter>SourceFiles\Threading</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

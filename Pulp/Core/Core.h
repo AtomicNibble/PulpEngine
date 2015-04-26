@@ -25,11 +25,11 @@
 #include "Platform\DirectoryWatcher.h"
 #include "IDirectoryWatcher.h"
 
-#include "Threading\Scheduler.h"
-
 #include "Containers\HashMap.h"
 
 #include "Memory\AllocationPolicies\GrowingGenericAllocator.h"
+
+#include "Threading\JobSystem.h"
 
 // #include <vector>
 // #include <map>
@@ -122,6 +122,7 @@ public:
 	script::IScriptSys  *GetISscriptSys() X_OVERRIDE{ return env_.pScriptSys; }
 	render::IRender		*GetIRender() X_OVERRIDE{ return env_.pRender; }
 	font::IXFontSys		*GetIFontSys() X_OVERRIDE{ return env_.pFont; }
+	core::IJobSystem	*GetJobSystem() X_OVERRIDE{ return env_.pJobSys; }
 	core::IProfileSys	*GetIProfileSys() X_OVERRIDE{ return &profileSys_; }
 	core::IXDirectoryWatcher *GetDirWatcher() X_OVERRIDE{ return env_.pDirWatcher; }
 	core::IXHotReloadManager*   GetHotReloadMan() X_OVERRIDE{ return this; };
@@ -230,7 +231,6 @@ private:
 	hotReloadMap					hotReloadExtMap_;
 	// ~Hotreload
 
-	core::Scheduler					jobScheduler_;
 
 	WIN_HWND		hWnd_;
 	WIN_HINSTANCE	hInst_;

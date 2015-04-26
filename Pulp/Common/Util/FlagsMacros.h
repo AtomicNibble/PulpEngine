@@ -28,7 +28,7 @@
 /// \ingroup Util
 /// \brief A macro that declares a struct to be used in conjunction with the Flags template class.
 /// \details This macro can be used instead of manually implementing all parts of a struct as required by the Flags class.
-/// The macro relies on Molecule's preprocessor utilities, and expects the following simple syntax:
+/// The macro relies on Potato's preprocessor utilities, and expects the following simple syntax:
 /// \code
 ///   X_DECLARE_FLAGS(name)(comma-separated list of flag values);
 /// \endcode

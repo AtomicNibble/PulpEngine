@@ -516,14 +516,12 @@ namespace strUtil
 		return nullptr;
 	}
 
-	const char* workingDir(void)
+	const char* workingDir(WorkingDirStr& buf)
 	{
-		static char buff[MAX_PATH];
+		_getcwd(buf, sizeof(buf)-1);
+		buf[MAX_PATH - 1] = 0;
 
-		_getcwd(buff, sizeof(buff)-1);
-		buff[MAX_PATH - 1] = 0;
-
-		return buff;
+		return buf;
 	}
 
 	bool HasFileExtension(const char* path)

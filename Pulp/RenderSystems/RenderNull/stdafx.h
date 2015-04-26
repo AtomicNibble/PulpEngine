@@ -9,4 +9,5 @@
 
 
 
-extern core::MemoryArenaBase* g_rendererArena;
+extern core::MemoryArenaBase* g_rendererArena; 
+extern core::MemoryArenaBase* g_textureDataArena;

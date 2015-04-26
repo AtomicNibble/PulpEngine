@@ -16,6 +16,8 @@ X_USING_NAMESPACE;
 
 #include <Memory\MemoryTrackingPolicies\FullMemoryTracking.h>
 #include <Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.h>
+#include <Memory\AllocationPolicies\GrowingBlockAllocator.h>
+#include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
@@ -26,15 +28,24 @@ typedef core::MemoryArena<
 > RendererArena;
 
 
+typedef core::MemoryArena<
+	core::GrowingBlockAllocator,
+	core::MultiThreadPolicy<core::CriticalSection>,
+	core::SimpleBoundsChecking,
+	core::SimpleMemoryTracking,
+	core::SimpleMemoryTagging
+> TextureArena;
 
 // the allocator dose not check for leaks so it
 // dose not need to go out of scope.
 namespace {
 	core::MallocFreeAllocator g_RenderAlloc;
+	core::GrowingBlockAllocator g_TextureDataAlloc;
+
 }
 
 core::MemoryArenaBase* g_rendererArena = nullptr;
-
+core::MemoryArenaBase* g_textureDataArena = nullptr;
 
 
 render::IRender* CreateRender(ICore *pCore)

@@ -1,5 +1,5 @@
 #include <EngineCommon.h>
-#include "Scheduler.h"
+#include "JobList.h"
 
 #include "String\StackString.h"
 #include "Util\Cpu.h"
@@ -12,9 +12,12 @@
 
 X_NAMESPACE_BEGIN(core)
 
+namespace JobList
+{
+
 int32_t JobList::JOB_LIST_DONE = 0x12345678;
 
-int Scheduler::var_LongJobMs = 8;
+int jobListRunner::var_LongJobMs = 8;
 
 void JobList::NopJob(void* pParam, uint32_t batchOffset,
 	uint32_t batchNum, uint32_t workerIdx)
@@ -245,15 +248,15 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 			job.execTime = elapsed;
 			stats_.threadExecTime[threadIdx] += elapsed;
 
-			if (Scheduler::var_LongJobMs > 0)
+			if (jobListRunner::var_LongJobMs > 0)
 			{
 				// we allow jobs with no priority to run as long as they want
-				if (elapsed.GetMilliSeconds() > Scheduler::var_LongJobMs 
+				if (elapsed.GetMilliSeconds() > jobListRunner::var_LongJobMs 
 					&& getPriority() != JobListPriority::NONE)
 				{				
-					X_WARNING("Scheduler", "a single job took more than: %ims elapsed: %gms "
+					X_WARNING("jobListRunner", "a single job took more than: %ims elapsed: %gms "
 						"pFunc: %p pData: %p batchOffset: %i batchNum: %i", 
-						Scheduler::var_LongJobMs,
+						jobListRunner::var_LongJobMs,
 						elapsed.GetMilliSeconds(),
 						job.pJobRun,
 						job.pData,
@@ -512,19 +515,19 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 
 // ----------------------------------
 
-Scheduler::Scheduler() :
+jobListRunner::jobListRunner() :
 numThreads_(0)
 {
 
 }
 
 
-Scheduler::~Scheduler()
+jobListRunner::~jobListRunner()
 {
 
 }
 
-void Scheduler::StartUp(void)
+void jobListRunner::StartUp(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pCore);
@@ -549,9 +552,9 @@ void Scheduler::StartUp(void)
 	StartThreads();
 }
 
-void Scheduler::StartThreads(void)
+void jobListRunner::StartThreads(void)
 {
-	X_LOG0("Scheduler", "Creating %i threads", numThreads_);
+	X_LOG0("jobListRunner", "Creating %i threads", numThreads_);
 
 	int32_t i;
 	for (i = 0; i < numThreads_; i++)
@@ -565,9 +568,9 @@ void Scheduler::StartThreads(void)
 
 }
 
-void Scheduler::ShutDown(void)
+void jobListRunner::ShutDown(void)
 {
-	X_LOG0("Scheduler", "Shuting down");
+	X_LOG0("jobListRunner", "Shuting down");
 
 	int32_t i;
 
@@ -580,7 +583,7 @@ void Scheduler::ShutDown(void)
 }
 
 
-void Scheduler::SubmitJobList(JobList* pList, JobList* pWaitFor)
+void jobListRunner::SubmitJobList(JobList* pList, JobList* pWaitFor)
 {
 	X_ASSERT_NOT_NULL(pList);
 
@@ -594,17 +597,18 @@ void Scheduler::SubmitJobList(JobList* pList, JobList* pWaitFor)
 	}
 }
 
-void Scheduler::WaitForThreads(void)
+void jobListRunner::WaitForThreads(void)
 {
 	for (int32_t i = 0; i < numThreads_; i++) {
 		threads_[i].WaitForThread();
 	}
 }
 
-int32_t Scheduler::numThreads(void) const
+int32_t jobListRunner::numThreads(void) const
 {
 	return numThreads_;
 }
 
+} // namespace JobList
 
 X_NAMESPACE_END

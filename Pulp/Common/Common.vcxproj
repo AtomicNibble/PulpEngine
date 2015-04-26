@@ -128,6 +128,7 @@
     <ClInclude Include="IGame.h" />
     <ClInclude Include="IGui.h" />
     <ClInclude Include="IInput.h" />
+    <ClInclude Include="IJobSystem.h" />
     <ClInclude Include="ILog.h" />
     <ClInclude Include="IMaterial.h" />
     <ClInclude Include="IModel.h" />
@@ -266,7 +267,8 @@
     <ClInclude Include="Threading\AtomicInt.h" />
     <ClInclude Include="Threading\ConditionVariable.h" />
     <ClInclude Include="Threading\CriticalSection.h" />
-    <ClInclude Include="Threading\Scheduler.h" />
+    <ClInclude Include="Threading\JobList.h" />
+    <ClInclude Include="Threading\JobSystem.h" />
     <ClInclude Include="Threading\Semaphore.h" />
     <ClInclude Include="Threading\Signal.h" />
     <ClInclude Include="Threading\Spinlock.h" />
@@ -690,7 +692,8 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="Threading\Scheduler.cpp" />
+    <ClCompile Include="Threading\JobList.cpp" />
+    <ClCompile Include="Threading\JobSystem.cpp" />
     <ClCompile Include="Threading\win32\Signal.cpp" />
     <ClCompile Include="Threading\win32\Thread.cpp" />
     <ClCompile Include="Time\CompressedStamps.cpp" />

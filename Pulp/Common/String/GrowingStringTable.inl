@@ -195,6 +195,12 @@ size_t GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::alloc
 	return buffer_.capacity();
 }
 
+template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
+size_t GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::bytesUsed(void) const
+{
+	return BlockSize * CurrentBlock_;
+}
+
 
 // ISerialize
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
@@ -262,7 +268,7 @@ bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::SLoad(X
 
 	if (!requestFreeBlocks(CurrentBlock))
 	{
-		X_ERROR("", "Failed to acquire required blocks. num: %i", CurrentBlock);
+		X_ERROR("GrowingStringTable", "Failed to acquire required blocks. num: %i", CurrentBlock);
 		return false;
 	}
 

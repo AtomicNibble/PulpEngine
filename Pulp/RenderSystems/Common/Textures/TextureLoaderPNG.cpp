@@ -92,7 +92,7 @@ namespace PNG
 		{
 			X_ASSERT_NOT_NULL(file);
 
-			core::Array<uint8_t> ZlibData(g_rendererArena);
+			core::Array<uint8_t> ZlibData(g_textureDataArena);
 			ZlibData.reserve(length);
 
 			uint32_t tagName;
@@ -295,19 +295,19 @@ namespace PNG
 		// ok so the length is the size of the compreseed block we need to read.
 		// it is possible to have multiple IDAT blocks.
 		uint32_t inflated_size = (width * height * bpp);
-		uint8_t* inflated_data = X_NEW_ARRAY_ALIGNED(uint8_t,inflated_size,g_rendererArena,"PngFaceBuffer",8);
+		uint8_t* inflated_data = X_NEW_ARRAY_ALIGNED(uint8_t, inflated_size, g_textureDataArena, "PngFaceBuffer", 8);
 
 
 		if (!LoadChucksIDAT(file, length, inflated_size, inflated_data))
 		{
 			X_ERROR("TexturePNG", "failed to load PNG chunks");
-			X_DELETE_ARRAY( inflated_data, g_rendererArena);
+			X_DELETE_ARRAY(inflated_data, g_textureDataArena);
 			return nullptr;
 		}
 
 		// inflated_data is the uncompressed image data.
 		// make img info.
-		XTextureFile* img = X_NEW_ALIGNED(XTextureFile, g_rendererArena, "TextureFile", 8);
+		XTextureFile* img = X_NEW_ALIGNED(XTextureFile, g_textureDataArena, "TextureFile", 8);
 		TextureFlags flags;
 		flags.Set(TextureFlags::NOMIPS);
 
