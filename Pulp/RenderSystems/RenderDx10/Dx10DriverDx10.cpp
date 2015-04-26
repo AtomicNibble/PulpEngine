@@ -40,11 +40,11 @@ typedef core::MemoryArena<
 // dose not need to go out of scope.
 namespace {
 	core::MallocFreeAllocator g_RenderAlloc;
-	core::GrowingBlockAllocator g_TextureAlloc;
+	core::GrowingBlockAllocator g_TextureDataAlloc;
 }
 
 core::MemoryArenaBase* g_rendererArena = nullptr;
-core::MemoryArenaBase* g_textureArena = nullptr;
+core::MemoryArenaBase* g_textureDataArena = nullptr;
 
 
 extern "C" DLL_EXPORT render::IRender* CreateRender(ICore *pCore)
@@ -57,7 +57,7 @@ extern "C" DLL_EXPORT render::IRender* CreateRender(ICore *pCore)
 
 
 	g_rendererArena = X_NEW_ALIGNED(RendererArena, gEnv->pArena, "RendererArena", 8)(&g_RenderAlloc, "RendererArena");
-	g_textureArena = X_NEW(TextureArena, gEnv->pArena, "TextureArena")(&g_TextureAlloc, "TextureArena");
+	g_textureDataArena = X_NEW(TextureArena, gEnv->pArena, "TextureArena")(&g_TextureDataAlloc, "TextureArena");
 
 	render::IRender* pRender = &render::g_Dx11D3D;
 
@@ -94,7 +94,7 @@ class XEngineModule_Render : public IEngineModule
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 
 		X_DELETE(g_rendererArena, gEnv->pArena);
-		X_DELETE(g_textureArena, gEnv->pArena);
+		X_DELETE(g_textureDataArena, gEnv->pArena);
 
 		return true;
 	}
