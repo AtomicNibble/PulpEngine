@@ -77,6 +77,7 @@ XCore::XCore() :
 	env_.dedicated_ = false;
 	env_.profilerEnabled_ = false;
 
+	env_.pJobSys = X_NEW(core::JobSystem, g_coreArena, "JobSystem");
 
 	dirWatcher_.registerListener(this);
 }
@@ -107,7 +108,12 @@ void XCore::ShutDown()
 	X_LOG0("Core", "Shutting down");
 
 	dirWatcher_.ShutDown();
-	jobSystem_.ShutDown();
+
+	if (env_.pJobSys)
+	{
+		env_.pJobSys->ShutDown();
+		core::Mem::DeleteAndNull(env_.pJobSys, g_coreArena);
+	}
 
 	if (env_.pGame)
 	{

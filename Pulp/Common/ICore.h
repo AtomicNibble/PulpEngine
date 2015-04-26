@@ -29,6 +29,7 @@ struct ITimer;
 struct SourceInfo; 
 struct IConsole; 
 struct IFileSys;
+struct IJobSystem;
 class XProfileScope;
 class Crc32;
 class CpuInfo;
@@ -213,6 +214,7 @@ struct SCoreGlobals
 	render::IRender*			pRender;
 	engine::I3DEngine*			p3DEngine;
 	game::IGame*				pGame;
+	core::IJobSystem*			pJobSys;
 
 	core::IXDirectoryWatcher*   pDirWatcher;
 	core::IXHotReloadManager*   pHotReload;
@@ -283,6 +285,7 @@ struct ICore
 	virtual script::IScriptSys  *GetISscriptSys() X_ABSTRACT;
 	virtual render::IRender		*GetIRender() X_ABSTRACT;
 	virtual font::IXFontSys		*GetIFontSys() X_ABSTRACT;
+	virtual core::IJobSystem	*GetJobSystem() X_ABSTRACT;
 
 	virtual core::IProfileSys	*GetIProfileSys() X_ABSTRACT;
 	virtual core::ILog			*GetILog() X_ABSTRACT;
@@ -295,6 +298,7 @@ struct ICore
 	virtual core::CpuInfo		*GetCPUInfo() X_ABSTRACT;
 
 	virtual core::xWindow* GetGameWindow() X_ABSTRACT;
+
 
 	// ~Assert
 	virtual void RegisterAssertHandler(IAssertHandler* errorHandler) X_ABSTRACT;
