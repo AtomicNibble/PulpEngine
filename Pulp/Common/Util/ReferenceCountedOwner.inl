@@ -4,6 +4,7 @@ ReferenceCountedOwner<T>::ReferenceCountedOwner(T* instance, MemoryArenaBase* ar
 	: instance_(instance)
 	, arena_(arena)
 {
+	instance_->addReference();
 }
 
 
@@ -51,6 +52,18 @@ T* ReferenceCountedOwner<T>::operator->(void)
 
 template <class T>
 const T* ReferenceCountedOwner<T>::operator->(void) const
+{
+	return instance_;
+}
+
+template <class T>
+T* ReferenceCountedOwner<T>::instance(void)
+{
+	return instance_;
+}
+
+template <class T>
+const T* ReferenceCountedOwner<T>::instance(void) const
 {
 	return instance_;
 }
