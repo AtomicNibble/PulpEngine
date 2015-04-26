@@ -213,9 +213,7 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 
 JobSystem::JobSystem() : numThreads_(0)
 {
-	for (size_t i = 0; i < JobPriority::ENUM_COUNT; i++) {
-		ques_[i].setArena(gEnv->pArena);
-	}
+
 }
 
 JobSystem::~JobSystem()
@@ -228,8 +226,13 @@ JobSystem::~JobSystem()
 bool JobSystem::StartUp(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pArena);
 	X_ASSERT_NOT_NULL(gEnv->pCore);
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
+
+	for (size_t i = 0; i < JobPriority::ENUM_COUNT; i++) {
+		ques_[i].setArena(gEnv->pArena);
+	}
 
 	// get the num HW threads
 	ICore* pCore = (ICore*)gEnv->pCore;
@@ -283,6 +286,11 @@ void JobSystem::waitForAllJobs(void)
 	for (i = 0; i < numThreads_; i++) {
 		threads_[i].WaitForThread();
 	}
+}
+
+int32_t JobSystem::numThreads(void) const
+{
+	return numThreads_;
 }
 
 bool JobSystem::StartThreads(void)
