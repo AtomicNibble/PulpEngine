@@ -25,7 +25,7 @@ namespace
 			running_total = 37 * running_total + i;
 		}
 
-		X_LOG0("TestJob", "job idx: %i threadIdx: %i", idx, workerIdx);
+		// X_LOG0("TestJob", "job idx: %i threadIdx: %i", idx, workerIdx);
 
 		++numJobsRan;
 	}
