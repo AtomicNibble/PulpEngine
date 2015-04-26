@@ -9,6 +9,7 @@
 
 #include <set>
 
+#include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 #include <Memory\AllocationPolicies\PoolAllocator.h>
 #include <Memory\HeapArea.h>
 
@@ -41,11 +42,18 @@ struct search_s
 
 struct XFindData;
 
-typedef core::MemoryArena<core::PoolAllocator, core::SingleThreadPolicy,
-	core::SimpleBoundsChecking, core::SimpleMemoryTracking,
+typedef core::MemoryArena<
+	core::PoolAllocator, 
+	core::MultiThreadPolicy<core::Spinlock>,
+	core::SimpleBoundsChecking, 
+	core::SimpleMemoryTracking,
 	core::SimpleMemoryTagging> FilePoolArena;
-typedef core::MemoryArena<core::MallocFreeAllocator, core::SingleThreadPolicy,
-	core::SimpleBoundsChecking, core::SimpleMemoryTracking,
+
+typedef core::MemoryArena<
+	core::MallocFreeAllocator,
+	core::MultiThreadPolicy<core::Spinlock>,
+	core::SimpleBoundsChecking,
+	core::SimpleMemoryTracking,
 	core::SimpleMemoryTagging> MemfileArena;
 
 
