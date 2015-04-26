@@ -40,6 +40,8 @@ namespace CI
 
 			WriteCIImg(pData->path, pData->image.instance());
 
+			X_LOG2("Ci", "created: ^5%s", pData->path.c_str());
+
 			pData->release();
 		}
 
@@ -50,7 +52,7 @@ namespace CI
 		JobData* pData = X_NEW(JobData, arena, "CIJobData")(path, image, arena);
 
 		core::JobDecl job(WriteCIJob, pData);
-		gEnv->pJobSys->AddJob(job);
+		gEnv->pJobSys->AddJob(job, core::JobPriority::NONE);
 		return true;
 	}
 
