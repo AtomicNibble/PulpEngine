@@ -15,8 +15,9 @@ XTextureFile::~XTextureFile()
 {
 	for (int i = 0; i < 6; i++) {
 		X_ASSERT(!(i > numFaces && pFaces[i]), "memory set on face out of range")(numFaces);
-		if (!dontDelete())
-			X_DELETE_ARRAY(pFaces[i], g_rendererArena);
+		if (!dontDelete()) {
+			X_DELETE_ARRAY(pFaces[i], g_textureDataArena);
+		}
 	}
 }
 
@@ -37,7 +38,7 @@ void XTextureFile::freeTextureFile(XTextureFile* image_file)
 {
 	X_ASSERT_NOT_NULL(image_file);
 
-	X_DELETE(image_file, g_rendererArena);
+	X_DELETE(image_file, g_textureDataArena);
 }
 
 X_NAMESPACE_END

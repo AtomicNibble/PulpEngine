@@ -82,7 +82,7 @@ namespace CI
 			return nullptr;
 		}
 
-		uint8_t* pImgBuf = X_NEW_ARRAY_ALIGNED(uint8_t, hdr.DataSize, g_rendererArena, "CIImgBuffer", 8);
+		uint8_t* pImgBuf = X_NEW_ARRAY_ALIGNED(uint8_t, hdr.DataSize, g_textureDataArena, "CIImgBuffer", 8);
 		uint32_t bytesRead = file->read(pImgBuf, hdr.DataSize);
 
 		if (bytesRead != hdr.DataSize)
@@ -90,7 +90,7 @@ namespace CI
 			X_ERROR("TextureCI", "failed to read image data from CIImage. got: %x wanted: %x bytes",
 				bytesRead, hdr.DataSize);
 
-			X_DELETE_ARRAY(pImgBuf, g_rendererArena);
+			X_DELETE_ARRAY(pImgBuf, g_textureDataArena);
 			return nullptr;
 		}
 
@@ -101,7 +101,7 @@ namespace CI
 		}
 
 		// Load the data.
-		XTextureFile* img = X_NEW(XTextureFile, g_rendererArena, "TextureFile");
+		XTextureFile* img = X_NEW(XTextureFile, g_textureDataArena, "TextureFile");
 
 		// flags
 		TextureFlags flags = hdr.Flags;

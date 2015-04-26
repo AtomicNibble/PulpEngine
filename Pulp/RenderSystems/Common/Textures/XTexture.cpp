@@ -446,7 +446,7 @@ bool XTexture::LoadFromFile(const char* path_)
 
 	if (image_data)
 	{
-		core::ReferenceCountedOwner<XTextureFile> refCounted(image_data, g_rendererArena);
+		core::ReferenceCountedOwner<XTextureFile> refCounted(image_data, g_textureDataArena);
 
 		if (image_data->isValid())
 		{
@@ -542,7 +542,7 @@ void XTexture::preProcessImage(XTextureFile* image_data)
 		outPath = "compiled_images/";
 		outPath /= FileName.c_str();
 
-	//	CI::WriteCIImgAsync(outPath, image_data, g_rendererArena);
+		CI::WriteCIImgAsync(outPath, image_data, g_rendererArena);
 	}
 }
 

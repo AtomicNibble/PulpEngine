@@ -107,9 +107,9 @@ namespace PSD
 			When PackBits data is decompressed, the result should be interpreted as per com-pression
 			type 1 (no compression).
 			*/
-
-			uint8_t* tmpData = X_NEW_ARRAY_ALIGNED(uint8_t, header.width * header.height, g_rendererArena, "PsdTmpbuf", 8);
-			uint16_t* rleCount = X_NEW_ARRAY_ALIGNED(uint16_t, header.width * header.channels, g_rendererArena, "PsdTmpRowbuf", 8);
+			
+			uint8_t* tmpData = X_NEW_ARRAY_ALIGNED(uint8_t, header.width * header.height, g_textureDataArena, "PsdTmpbuf", 8);
+			uint16_t* rleCount = X_NEW_ARRAY_ALIGNED(uint16_t, header.width * header.channels, g_textureDataArena, "PsdTmpRowbuf", 8);
 
 			int32_t size = 0;
 
@@ -117,8 +117,8 @@ namespace PSD
 			{
 				if (!file->read(&rleCount[y], sizeof(int16_t)))
 				{
-					X_DELETE_ARRAY(tmpData,g_rendererArena);
-					X_DELETE_ARRAY(rleCount,g_rendererArena);
+					X_DELETE_ARRAY(tmpData, g_textureDataArena);
+					X_DELETE_ARRAY(rleCount, g_textureDataArena);
 
 					X_ERROR("TexturePSD", "failed to read rle rows");
 					// os::Printer::log("Error reading rle rows\n", file->getFileName(), ELL_ERROR);
@@ -132,12 +132,12 @@ namespace PSD
 				size += rleCount[y];
 			}
 
-			int8_t* buf = X_NEW_ARRAY_ALIGNED( int8_t,size,g_rendererArena,"PsdTmpBuf",8);
+			int8_t* buf = X_NEW_ARRAY_ALIGNED(int8_t, size, g_textureDataArena, "PsdTmpBuf", 8);
 			if (!file->read(buf, size))
 			{
-				X_DELETE_ARRAY(tmpData, g_rendererArena);
-				X_DELETE_ARRAY(rleCount, g_rendererArena);
-				X_DELETE_ARRAY(buf, g_rendererArena);
+				X_DELETE_ARRAY(tmpData, g_textureDataArena);
+				X_DELETE_ARRAY(rleCount, g_textureDataArena);
+				X_DELETE_ARRAY(buf, g_textureDataArena);
 
 				X_ERROR("TexturePSD", "failed to read rle rows");
 				// 	os::Printer::log("Error reading rle rows\n", file->getFileName(), ELL_ERROR);
@@ -209,9 +209,9 @@ namespace PSD
 				}
 			}
 
-			X_DELETE_ARRAY(tmpData, g_rendererArena);
-			X_DELETE_ARRAY(rleCount, g_rendererArena);
-			X_DELETE_ARRAY(buf, g_rendererArena);
+			X_DELETE_ARRAY(tmpData, g_textureDataArena);
+			X_DELETE_ARRAY(rleCount, g_textureDataArena);
+			X_DELETE_ARRAY(buf, g_textureDataArena);
 
 			return true;
 		}
@@ -219,7 +219,7 @@ namespace PSD
 
 		bool readRawImageData(core::XFile* file, const PsdHeader& header, uint32_t* imageData)
 		{
-			uint8_t* tmpData = X_NEW_ARRAY_ALIGNED(uint8_t,header.width * header.height,g_rendererArena,"PsdTempBuf",8);
+			uint8_t* tmpData = X_NEW_ARRAY_ALIGNED(uint8_t, header.width * header.height, g_textureDataArena, "PsdTempBuf", 8);
 
 			for (int32_t channel = 0; channel<header.channels && channel < 3; ++channel)
 			{
@@ -246,7 +246,7 @@ namespace PSD
 				}
 			}
 
-			X_DELETE_ARRAY(tmpData,g_rendererArena);
+			X_DELETE_ARRAY(tmpData, g_textureDataArena);
 			return true;
 		}
 
@@ -332,9 +332,9 @@ namespace PSD
 			return nullptr;
 		}
 
-		XTextureFile* img = X_NEW_ALIGNED(XTextureFile, g_rendererArena, "TextureFile", 8);
+		XTextureFile* img = X_NEW_ALIGNED(XTextureFile, g_textureDataArena, "TextureFile", 8);
 		TextureFlags flags;
-		img->pFaces[0] = X_NEW_ARRAY_ALIGNED(uint8_t,hdr.width * hdr.height * 4,g_rendererArena,"PsdFaceBuffer",8);
+		img->pFaces[0] = X_NEW_ARRAY_ALIGNED(uint8_t, hdr.width * hdr.height * 4, g_textureDataArena, "PsdFaceBuffer", 8);
 
 
 		flags.Set(TextureFlags::NOMIPS);
@@ -375,7 +375,7 @@ namespace PSD
 		}
 		else
 		{
-			X_DELETE(img,g_rendererArena);
+			X_DELETE(img, g_textureDataArena);
 		}
 
 		return nullptr;

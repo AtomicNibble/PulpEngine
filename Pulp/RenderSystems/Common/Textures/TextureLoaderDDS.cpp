@@ -894,7 +894,7 @@ namespace DDS
 
 
 		// load the image data.
-		XTextureFile* img = X_NEW(XTextureFile, g_rendererArena, "TextureFile");
+		XTextureFile* img = X_NEW(XTextureFile, g_textureDataArena, "TextureFile");
 		TextureFlags flags;
 
 		if (pixel_util::has_alpha(format, dxt_fmt))
@@ -930,7 +930,7 @@ namespace DDS
 		// no idear if allocating then reading has any benfits for cube maps.
 		for (i = 0; i < num_faces; i++)
 		{
-			img->pFaces[i] = X_NEW_ARRAY_ALIGNED(uint8_t,total_bytes_per_face,g_rendererArena,"DDSFaceBuffer", 8);
+			img->pFaces[i] = X_NEW_ARRAY_ALIGNED(uint8_t, total_bytes_per_face, g_textureDataArena, "DDSFaceBuffer", 8);
 
 			bytes_read = file->read(img->pFaces[i], total_bytes_per_face);
 
@@ -939,7 +939,7 @@ namespace DDS
 				X_ERROR("DDSLoader", "failed to read all mips. requested: %i bytes got: %i bytes", 
 					total_bytes_per_face, bytes_read);
 
-				X_DELETE(img,g_rendererArena);
+				X_DELETE(img, g_textureDataArena);
 				return nullptr;
 			}
 
