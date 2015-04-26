@@ -63,7 +63,7 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path path)
 						testFolder.c_str());
 				}
 
-				loaded->release();
+				texture::XTextureFile::freeTextureFile(loaded);
 				result = true;
 			}
 		}

@@ -4,6 +4,8 @@
 #ifndef _X_TEXTURE_FILE_H_
 #define _X_TEXTURE_FILE_H_
 
+#include "Util\ReferenceCounted.h"
+
 X_NAMESPACE_BEGIN(texture)
 
 
@@ -44,7 +46,7 @@ uint8_t				numFaces;  // Cube maps aka 6 faces.
 
 */
 
-struct XTextureFile
+struct XTextureFile : public core::ReferenceCountedArena<XTextureFile>
 {
 	XTextureFile();
 	~XTextureFile();
@@ -60,7 +62,6 @@ struct XTextureFile
 
 
 public:
-	int release(void);
 
 #if X_DEBUG
 	X_INLINE const char* getName(void) const { return pName; }
@@ -95,6 +96,10 @@ public:
 
 	// the data, 6 for cube maps :)
 	uint8_t* pFaces[6];
+
+public:
+	// used by UT.
+	static void freeTextureFile(XTextureFile* image_file);
 
 	// we have setters, for the loaders.
 protected:
