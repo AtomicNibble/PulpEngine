@@ -128,6 +128,7 @@
     <ClInclude Include="IGame.h" />
     <ClInclude Include="IGui.h" />
     <ClInclude Include="IInput.h" />
+    <ClInclude Include="IJobSystem.h" />
     <ClInclude Include="ILog.h" />
     <ClInclude Include="IMaterial.h" />
     <ClInclude Include="IModel.h" />

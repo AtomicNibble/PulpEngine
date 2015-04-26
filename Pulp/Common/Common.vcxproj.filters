@@ -991,6 +991,9 @@
     <ClInclude Include="Threading\JobSystem.h">
       <Filter>Headers\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="IJobSystem.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
