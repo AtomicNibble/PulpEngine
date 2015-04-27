@@ -3,6 +3,7 @@
 #ifndef X_TEXTURE_CI_H_
 #define X_TEXTURE_CI_H_
 
+#include "Util\ReferenceCountedOwner.h"
 
 X_NAMESPACE_BEGIN(texture)
 

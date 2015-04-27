@@ -23,7 +23,7 @@ namespace CI
 		struct JobData
 		{
 			JobData(core::Path& path_, core::ReferenceCountedOwner<XTextureFile>& image_, core::MemoryArenaBase* arena_) :
-			path(path_), image(image_, arena_), arena(arena_) {}
+			path(path_), image(image_), arena(arena_) {}
 
 			void release(void) {
 				X_DELETE(this, arena);
