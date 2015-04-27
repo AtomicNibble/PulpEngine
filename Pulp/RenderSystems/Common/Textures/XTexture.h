@@ -100,7 +100,7 @@ public:
 
 	bool Load();
 	bool LoadFromFile(const char* path);
-	bool createTexture(core::ReferenceCountedOwner<XTextureFile>& image_data);
+	bool createTexture(XTextureFile* image_data);
 	void preProcessImage(core::ReferenceCountedOwner<XTextureFile>& image_data);
 
 public:
