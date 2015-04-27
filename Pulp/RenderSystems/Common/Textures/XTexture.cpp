@@ -446,46 +446,51 @@ bool XTexture::LoadFromFile(const char* path_)
 
 	if (image_data)
 	{
-		core::ReferenceCountedOwner<XTextureFile> refCounted(image_data, g_textureDataArena);
-
-		if (image_data->isValid())
-		{
-			bRes = createTexture(image_data);
-		}
+		bRes = createTexture(image_data);
 	}
 
 	return bRes;
 }
 
 
-bool XTexture::createTexture(XTextureFile* image_data)
+bool XTexture::createTexture(XTextureFile* pImagedata)
 {
-	if (image_data->getType() == TextureType::TCube)
+	core::ReferenceCountedOwner<XTextureFile> image_data(pImagedata, g_textureDataArena);
+	bool res = false;
 	{
-		if (image_data->getNumMips() != 1)
-		{
-			X_ERROR("Texture", "cubemaps with mips are not supported.");
+		if (!image_data->isValid()) {
+
 			return false;
 		}
+
+		if (image_data->getType() == TextureType::TCube)
+		{
+			if (image_data->getNumMips() != 1)
+			{
+				X_ERROR("Texture", "cubemaps with mips are not supported.");
+				return false;
+			}
+		}
+
+
+		this->numFaces = image_data->getNumFaces();
+		this->numMips = image_data->getNumMips();
+		this->depth = image_data->getDepth();
+		this->format = image_data->getFormat();
+		this->type = image_data->getType();
+		this->dimensions = image_data->getSize();
+		this->datasize = image_data->getDataSize();
+		this->flags |= image_data->getFlags();
+
+		preProcessImage(image_data);
+
+		res = createDeviceTexture(image_data);
 	}
-
-
-	this->numFaces = image_data->getNumFaces();
-	this->numMips = image_data->getNumMips();
-	this->depth = image_data->getDepth();
-	this->format = image_data->getFormat();
-	this->type = image_data->getType();
-	this->dimensions = image_data->getSize();
-	this->datasize = image_data->getDataSize();
-	this->flags |= image_data->getFlags();
-
-	preProcessImage(image_data);
-
-	return createDeviceTexture(image_data);
+	return res;
 }
 
 
-void XTexture::preProcessImage(XTextureFile* image_data)
+void XTexture::preProcessImage(core::ReferenceCountedOwner<XTextureFile>& image_data)
 {
 	// check if we need to change the format or make it power of 2.
 	if (image_data->pFaces[0] == nullptr)
@@ -604,6 +609,7 @@ XTexture* XTexture::Create2DTexture(const char* name, const Vec2i& size, int num
 	file.type = TextureType::T2D;
 	file.datasize = get_data_size(size[0], size[1], 1, numMips, textureFmt);
 	file.bDontDelete = true;
+	file.addReference();
 
 	if (file.isValid())
 		pTex->createTexture(&file);
@@ -637,6 +643,7 @@ XTexture* XTexture::CreateRenderTarget(const char* name, uint32_t width, uint32_
 	file.type = type;
 	file.datasize = get_data_size(size[0], size[1], 1, 1, fmt);
 	file.bDontDelete = true;
+	file.addReference();
 
 	if (file.isValid())
 		pTex->createTexture(&file);

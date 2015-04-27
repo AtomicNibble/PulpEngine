@@ -64,7 +64,7 @@ void* MallocFreeAllocator::allocate(size_t Origsize, size_t alignment, size_t of
 		m_statistics.m_physicalMemoryAllocated += size;
 		m_statistics.m_physicalMemoryUsed += size;
 		m_statistics.m_internalOverhead += SIZE_OF_HEADER;
-		m_statistics.m_wasteAlignment += safe_static_cast<uint32_t>( (uint)as_byte - (uint)pMem ) - SIZE_OF_HEADER;
+		m_statistics.m_wasteAlignment += safe_static_cast<size_t>((uintptr_t)as_byte - (uintptr_t)pMem) - SIZE_OF_HEADER;
 
 
 		m_statistics.m_allocationCountMax = Max( m_statistics.m_allocationCount, m_statistics.m_allocationCountMax );
@@ -97,7 +97,7 @@ void MallocFreeAllocator::free(void* ptr)
 
 	
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	size_t AlignmentWaste = safe_static_cast<uint32_t>( (uint)ptr - (uint)as_header->m_originalAllocation ) - SIZE_OF_HEADER;
+	size_t AlignmentWaste = safe_static_cast<size_t>((uintptr_t)ptr - (uintptr_t)as_header->m_originalAllocation) - SIZE_OF_HEADER;
 	size_t Size = as_header->m_AllocationSize;
 
 	m_statistics.m_allocationCount--;

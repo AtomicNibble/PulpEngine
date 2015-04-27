@@ -10,7 +10,7 @@ X_NAMESPACE_BEGIN(core)
 XOsFileAsyncOperation::XOsFileAsyncOperation(HANDLE hFile) :
 hFile_(hFile)
 {
-
+	core::zero_object(overlapped_);
 }
 
 

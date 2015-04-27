@@ -4,7 +4,15 @@ ReferenceCountedOwner<T>::ReferenceCountedOwner(T* instance, MemoryArenaBase* ar
 	: instance_(instance)
 	, arena_(arena)
 {
-	instance_->addReference();
+	// makes the refrence counting not work correct.
+	// a instance should start with ref count of 1.
+	// so doing this makes it 2, making the UnitTests fail.
+	// blame commit: bd324b210cb7a23f7903590e1b2f7be3d860c37d
+	// Reason this was added:
+	// I added this before so that you could create multiple instances of CountedOwer and it would
+	// increase the ref count yet i could still pass the pointer around.
+	// 
+	//instance_->addReference();
 }
 
 

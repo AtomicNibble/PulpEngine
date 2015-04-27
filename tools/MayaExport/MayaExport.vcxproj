@@ -80,27 +80,27 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files (x86)\Autodesk\Maya2011\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\Autodesk\Maya2011\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(solutiondir)..\3rdparty\source\maya\Maya2012;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
     <TargetExt>.mll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files\Autodesk\Maya2012\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\Autodesk\Maya2012\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(solutiondir)..\3rdparty\source\maya\Maya2012;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
     <TargetExt>.mll</TargetExt>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
     <TargetExt>.mll</TargetExt>
-    <IncludePath>C:\Program Files (x86)\Autodesk\Maya2011\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files (x86)\Autodesk\Maya2011\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(solutiondir)..\3rdparty\source\maya\Maya2012;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetExt>.mll</TargetExt>
-    <LibraryPath>C:\Program Files\Autodesk\Maya2012\lib;$(LibraryPath)</LibraryPath>
-    <IncludePath>C:\Program Files\Autodesk\Maya2012\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(LibraryPath)</LibraryPath>
+    <IncludePath>$(solutiondir)..\3rdparty\source\maya\Maya2012;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -116,7 +116,6 @@
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "C:\Users\Tom\Documents\Visual Studio 2013\Projects\WinEngine\build\Win32\Debug\engine_MayaExport.mll" "C:\Users\Tom\Documents\maya\2011\plug-ins\engine_MayaExport.mll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -133,7 +132,6 @@
       <AdditionalDependencies>Foundation.lib;OpenMaya.lib;OpenMayaUI.lib;OpenMayaAnim.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PostBuildEvent>
-      <Command>copy "$(TargetPath)" "C:\Users\Tom\Documents\maya\2011\plug-ins\engine_MayaExport.mll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -153,7 +151,6 @@
       <OptimizeReferences>true</OptimizeReferences>
     </Link>
     <PostBuildEvent>
-      <Command>copy "C:\Users\Tom\Documents\Visual Studio 2013\Projects\WinEngine\build\Win32\Release\engine_MayaExport.mll" "C:\Users\Tom\Documents\maya\2011\plug-ins\engine_MayaExport.mll"</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

@@ -5,6 +5,7 @@
 #define _X_TEXTURE_H_
 
 #include <Util\PointerUtil.h>
+#include <Util\ReferenceCountedOwner.h>
 #include <Threading\AtomicInt.h>
 #include "String\StrRef.h"
 
@@ -100,11 +101,11 @@ public:
 	bool Load();
 	bool LoadFromFile(const char* path);
 	bool createTexture(XTextureFile* image_data);
-	void preProcessImage(XTextureFile* image_data);
+	void preProcessImage(core::ReferenceCountedOwner<XTextureFile>& image_data);
 
 public:
 	// Defined in the Render specific code.
-	bool createDeviceTexture(XTextureFile* image_data);
+	bool createDeviceTexture(core::ReferenceCountedOwner<XTextureFile>& image_data);
 	bool RT_CreateDeviceTexture(XTextureFile* image_data);
 	bool RT_ReleaseDevice(void);
 	bool ReleaseDeviceTexture(void);

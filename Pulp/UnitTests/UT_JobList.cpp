@@ -67,7 +67,7 @@ TEST(Threading, JobList)
 		core::TimeVal end = gEnv->pTimer->GetTimeReal();
 		singleThreadElapse = end - start;
 
-		X_LOG0("Scheduler", "Single threaded exec time: %f", singleThreadElapse.GetMilliSeconds());
+		X_LOG0("jobListRunner", "Single threaded exec time: %f", singleThreadElapse.GetMilliSeconds());
 	}
 
 
@@ -81,7 +81,7 @@ TEST(Threading, JobList)
 			core::SimpleMemoryTagging
 		> StackArena;
 
-		StackArena arena(&allocator, "SchedulerArena");
+		StackArena arena(&allocator, "jobListRunnerArena");
 
 		core::TimeVal start = gEnv->pTimer->GetTimeReal();
 
@@ -130,12 +130,12 @@ TEST(Threading, JobList)
 			for (size_t j = 0; j < numLists; j++)
 			{
 #if SCHEDULER_LOGS
-				X_LOG0("Scheduler", "wait for list: %i", j);
+				X_LOG0("jobListRunner", "wait for list: %i", j);
 #endif // !SCHEDULER_LOGS
 				jobLists[j]->Wait();
 			}
 
-			X_LOG0_EVERY_N(10, "Scheduler", "JobList run number: %i numJobsDone: %i", p, numJobsRan);
+			X_LOG0_EVERY_N(10, "jobListRunner", "JobList run number: %i numJobsDone: %i", p, numJobsRan);
 		}
 
 
@@ -163,12 +163,12 @@ TEST(Threading, JobList)
 		percentage *= 100;
 
 		// print the stats.
-		X_LOG0("Scheduler", "Stats");
+		X_LOG0("jobListRunner", "Stats");
 		X_LOG_BULLET;
-		X_LOG0("Scheduler", "Percentage: %g%% scaling: %g%%", percentage, percentage / jobSys.numThreads());
-		X_LOG0("Scheduler", "Total wait time: %f", combinedStats.waitTime.GetMilliSeconds());
+		X_LOG0("jobListRunner", "Percentage: %g%% scaling: %g%%", percentage, percentage / jobSys.numThreads());
+		X_LOG0("jobListRunner", "Total wait time: %f", combinedStats.waitTime.GetMilliSeconds());
 		for (size_t i = 0; i < HW_THREAD_MAX; i++) {
-			X_LOG0("Scheduler", "Thread %i Exec: %f Total: %f", 
+			X_LOG0("jobListRunner", "Thread %i Exec: %f Total: %f", 
 				i,
 				combinedStats.threadExecTime[i].GetMilliSeconds(),
 				combinedStats.threadTotalTime[i].GetMilliSeconds()

@@ -165,6 +165,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 	X_ASSERT_NOT_NULL(path);
 
 	XDiskFileAsync* pFile = nullptr;
+	core::Path real_path;
 
 	if (mode.IsSet(fileMode::READ))
 	{
@@ -173,7 +174,6 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 		XFindData FindData(path, this);
 		if (FindData.findnext(&findinfo))
 		{
-			core::Path real_path;
 			FindData.getOSPath(real_path, &findinfo);
 
 			// TODO: pool allocations.
@@ -193,9 +193,19 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 	}
 	else
 	{
-		X_ASSERT_NOT_IMPLEMENTED();
+		if (location == VirtualDirectory::GAME)
+			createOSPath(gameDir_, path, real_path);
+		else
+		{
+			X_ASSERT_NOT_IMPLEMENTED();
+		}
 
-	
+		pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode);
+
+		if (!pFile->valid()) {
+			closeFileAsync(pFile);
+			pFile = nullptr;
+		}
 	}
 
 	return pFile;

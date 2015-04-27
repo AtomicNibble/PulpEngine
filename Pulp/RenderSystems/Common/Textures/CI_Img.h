@@ -3,13 +3,14 @@
 #ifndef X_TEXTURE_CI_H_
 #define X_TEXTURE_CI_H_
 
+#include "Util\ReferenceCountedOwner.h"
 
 X_NAMESPACE_BEGIN(texture)
 
 namespace CI
 {
 
-	bool WriteCIImgAsync(core::Path& path, XTextureFile* image, core::MemoryArenaBase* arena);
+	bool WriteCIImgAsync(core::Path& path, core::ReferenceCountedOwner<XTextureFile>& image, core::MemoryArenaBase* arena);
 	bool WriteCIImg(core::Path& path, XTextureFile* image);
 
 } // namespace CI

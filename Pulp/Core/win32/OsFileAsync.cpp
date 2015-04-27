@@ -56,7 +56,8 @@ mode_(mode)
 
 OsFileAsync::~OsFileAsync(void)
 {
-
+	if (valid())
+		CloseHandle(file_);
 }
 
 XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, uint32_t length, uint32_t position)
@@ -66,16 +67,14 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, uint32_t length, uin
 	if (::ReadFile(file_, pBuffer, length, nullptr, op.getOverlapped()))
 	{
 
-
 	}
-	else
+	else if (lastError::Get() != ERROR_IO_PENDING)
 	{
 		lastError::Description dsc;
 		X_ERROR("AsyncFile", "Failed to read %d bytes, position: %d from a file. Error: %s",
 			length, position, lastError::ToString(dsc));
 
 	}
-
 
 	return op;
 }
@@ -84,6 +83,17 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, uint32_t leng
 {
 	XOsFileAsyncOperation op(file_);
 
+	if (::WriteFile(file_, pBuffer, length, nullptr, op.getOverlapped()))
+	{
+
+	}
+	else if (lastError::Get() != ERROR_IO_PENDING)
+	{
+		lastError::Description dsc;
+		X_ERROR("AsyncFile", "Failed to write %d bytes, position: %d to a file. Error: %s",
+			length, position, lastError::ToString(dsc));
+
+	}
 
 	return op;
 }
