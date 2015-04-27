@@ -11,7 +11,7 @@
 
 
 #include <D3Dcompiler.h>
-#include <D3DX9Shader.h>
+#include <../../3rdparty/source/directx/D3DX9Shader.h>
 
 X_LINK_LIB("d3dcompiler")
 X_LINK_LIB("dxguid")

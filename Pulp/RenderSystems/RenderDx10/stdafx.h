@@ -14,12 +14,12 @@ X_DISABLE_WARNING(4005)
 // #include <d3dx10.h>
 
 #if X_DEBUG // needed for the debug api.
- #include <D3D11.h>
- #include <D3Dx11.h>
+#include <../../3rdparty/source/directx/D3D11.h>
+#include <../../3rdparty/source/directx/D3Dx11.h>
 #endif
 
-#include <D3D11.h>
-#include <d3dx10.h>
+#include <../../3rdparty/source/directx/D3D11.h>
+#include <../../3rdparty/source/directx/d3dx10.h>
 
 X_ENABLE_WARNING(4005)
 
