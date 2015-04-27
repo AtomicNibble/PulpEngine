@@ -448,9 +448,9 @@ bool XTexture::LoadFromFile(const char* path_)
 	{
 		core::ReferenceCountedOwner<XTextureFile> refCounted(image_data, g_textureDataArena);
 
-		if (image_data->isValid())
+		if (refCounted->isValid())
 		{
-			bRes = createTexture(image_data);
+			bRes = createTexture(refCounted);
 		}
 	}
 
@@ -458,7 +458,7 @@ bool XTexture::LoadFromFile(const char* path_)
 }
 
 
-bool XTexture::createTexture(XTextureFile* image_data)
+bool XTexture::createTexture(core::ReferenceCountedOwner<XTextureFile>& image_data)
 {
 	if (image_data->getType() == TextureType::TCube)
 	{
@@ -485,7 +485,7 @@ bool XTexture::createTexture(XTextureFile* image_data)
 }
 
 
-void XTexture::preProcessImage(XTextureFile* image_data)
+void XTexture::preProcessImage(core::ReferenceCountedOwner<XTextureFile>&  image_data)
 {
 	// check if we need to change the format or make it power of 2.
 	if (image_data->pFaces[0] == nullptr)
