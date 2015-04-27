@@ -97,7 +97,7 @@ void MallocFreeAllocator::free(void* ptr)
 
 	
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	size_t AlignmentWaste = safe_static_cast<uint32_t>( (uint)ptr - (uint)as_header->m_originalAllocation ) - SIZE_OF_HEADER;
+	size_t AlignmentWaste = safe_static_cast<size_t>((uintptr_t)ptr - (uintptr_t)as_header->m_originalAllocation) - SIZE_OF_HEADER;
 	size_t Size = as_header->m_AllocationSize;
 
 	m_statistics.m_allocationCount--;

@@ -20,7 +20,7 @@ StackAllocator::StackAllocator(void* start, void* end) :
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	zero_this( &m_statistics );
 
-	int Len = safe_static_cast<UINT,int>( (UINT)end - (UINT)start );
+	size_t Len = safe_static_cast<size_t, uintptr_t>((uintptr_t)end - (uintptr_t)start);
 
 	m_statistics.m_type = "Stack";
 	m_statistics.m_virtualMemoryReserved = Len;
