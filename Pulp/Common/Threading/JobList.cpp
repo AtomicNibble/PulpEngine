@@ -177,7 +177,7 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 		// look at all the jobs below the current job.
 		// if it's the job list done job.
 		for (; state.lastJobIndex < currentJob_
-			&& state.lastJobIndex < jobs_.size(); state.lastJobIndex++)
+			&& state.lastJobIndex < safe_static_cast<int,size_t>(jobs_.size()); state.lastJobIndex++)
 		{
 			if (jobs_[state.lastJobIndex].pData == &JOB_LIST_DONE)
 			{
@@ -195,7 +195,7 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 
 				// run through any remaining signals and syncs (this should rarely iterate more than once)
 				for (; state.lastJobIndex <= state.nextJobIndex &&
-					state.lastJobIndex < jobs_.size(); state.lastJobIndex++) 
+					state.lastJobIndex < safe_static_cast<int,size_t>(jobs_.size()); state.lastJobIndex++) 
 				{
 					if (jobs_[state.lastJobIndex].pData == &JOB_LIST_DONE)
 					{
@@ -225,7 +225,7 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 		}
 
 		// end of the job lists?
-		if (state.nextJobIndex >= jobs_.size()) {
+		if (state.nextJobIndex >= safe_static_cast<int,size_t>(jobs_.size())) {
 			return resFalgs | RunFlag::DONE;
 		}
 

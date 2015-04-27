@@ -257,7 +257,7 @@ void JobSystem::AddJob(const JobDecl job, JobPriority::Enum priority)
 	ques_[priority].AddJob(job);
 
 	// signal
-	for (size_t i = 0; i < numThreads_; i++){
+	for (int32_t i = 0; i < numThreads_; i++){
 		threads_[i].SignalWork();
 	}
 }
@@ -269,14 +269,14 @@ void JobSystem::AddJobs(JobDecl* pJobs, size_t numJobs, JobPriority::Enum priori
 	ques_[priority].AddJobs(pJobs, numJobs);
 
 	// signal
-	for (size_t i = 0; i < numThreads_; i++){
+	for (int32_t i = 0; i < numThreads_; i++){
 		threads_[i].SignalWork();
 	}
 }
 
 void JobSystem::waitForAllJobs(void)
 {
-	size_t i;
+	int32_t i;
 	for (i = 0; i < JobPriority::ENUM_COUNT; i++) {
 		while (ques_[i].numJobs() > 0) {
 			core::Thread::Yield();
