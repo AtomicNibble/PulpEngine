@@ -134,7 +134,7 @@ namespace {
 	{
 		char oemMsg[sizeof(LoggerBase::Line)];
 
-		DWORD msgEnd;
+		size_t msgEnd;
 		DWORD NumberOfCharsWritten;
 		DWORD SectionSize = 0;
 		bool isString = false;
@@ -150,7 +150,7 @@ namespace {
 		}
 
 		pOem = oemMsg;
-		msgEnd = (unsigned int)&oemMsg[length];
+		msgEnd = reinterpret_cast<size_t>(&oemMsg[length]);
 		if ( oemMsg < &oemMsg[length] )
 		{
 			do
@@ -248,7 +248,7 @@ namespace {
 
 				++SectionSize;
 			}
-			while ( (unsigned int)pOem < msgEnd );
+			while ( reinterpret_cast<size_t>(pOem) < msgEnd );
 		}
 
 		if (!ColorSet) {
@@ -256,7 +256,8 @@ namespace {
 		}
 
 		msgEnd = 0;
-		WriteConsoleA( console, pOem, length, &msgEnd, 0 );
+		DWORD zeroEnd = 0;
+		WriteConsoleA(console, pOem, length, &zeroEnd, 0);
 
 		// reset
 		SetConsoleTextAttribute(console, LOG_COLOR);
