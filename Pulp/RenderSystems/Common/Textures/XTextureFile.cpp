@@ -6,7 +6,14 @@ X_NAMESPACE_BEGIN(texture)
 
 XTextureFile::XTextureFile() 
 {
-	core::zero_this(this);
+	core::zero_object(pFaces);
+	
+	pName = nullptr;
+	datasize = 0; 
+	numMips = 0;
+	depth = 0;	
+	numFaces = 0;  
+	bDontDelete = false;
 
 	format = Texturefmt::UNKNOWN;
 	type = TextureType::UNKNOWN;
