@@ -68,7 +68,7 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, uint32_t length, uin
 	{
 
 	}
-	else
+	else if (lastError::Get() != ERROR_IO_PENDING)
 	{
 		lastError::Description dsc;
 		X_ERROR("AsyncFile", "Failed to read %d bytes, position: %d from a file. Error: %s",
@@ -87,7 +87,7 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, uint32_t leng
 	{
 
 	}
-	else
+	else if (lastError::Get() != ERROR_IO_PENDING)
 	{
 		lastError::Description dsc;
 		X_ERROR("AsyncFile", "Failed to write %d bytes, position: %d to a file. Error: %s",
