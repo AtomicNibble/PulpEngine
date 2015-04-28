@@ -42,7 +42,7 @@ TEST(FileSys, Write)
 	ASSERT_TRUE(NULL != gEnv->pFileSys);
 	IFileSys* pFileSys = gEnv->pFileSys;
 
-	XFile* file = pFileSys->openFile(X_ENGINE_NAME"_filesys_ut_data.dat", 
+	XFile* file = pFileSys->openFile(X_ENGINE_NAME"_filesys_ut_data.ut_dat", 
 		fileMode::WRITE | fileMode::RECREATE);
 
 	ASSERT_TRUE(NULL != file);
@@ -64,7 +64,7 @@ TEST(FileSys, Append)
 	ASSERT_TRUE(NULL != gEnv->pFileSys);
 	IFileSys* pFileSys = gEnv->pFileSys;
 
-	XFile* file = pFileSys->openFile(X_ENGINE_NAME"_filesys_ut_data.dat",
+	XFile* file = pFileSys->openFile(X_ENGINE_NAME"_filesys_ut_data.ut_dat",
 		fileMode::WRITE | fileMode::APPEND);
 
 	ASSERT_TRUE(NULL != file);
@@ -86,7 +86,7 @@ TEST(FileSys, Read)
 	ASSERT_TRUE(NULL != gEnv->pFileSys);
 	IFileSys* pFileSys = gEnv->pFileSys;
 
-	XFile* file = pFileSys->openFile(X_ENGINE_NAME"_filesys_ut_data.dat",
+	XFile* file = pFileSys->openFile(X_ENGINE_NAME"_filesys_ut_data.ut_dat",
 		fileMode::READ);
 
 	ASSERT_TRUE(NULL != file);
@@ -111,7 +111,7 @@ TEST(FileSys, Async)
 	ASSERT_TRUE(NULL != gEnv->pFileSys);
 	IFileSys* pFileSys = gEnv->pFileSys;
 
-	XFileAsync* file = pFileSys->openFileAsync(X_ENGINE_NAME"_filesys_ut_async_data.dat",
+	XFileAsync* file = pFileSys->openFileAsync(X_ENGINE_NAME"_filesys_ut_async_data.ut_dat",
 		fileMode::WRITE | fileMode::RANDOM_ACCESS | fileMode::RECREATE);
 
 	ASSERT_TRUE(NULL != file);
@@ -162,7 +162,7 @@ TEST(FileSys, FileUtil)
 	ASSERT_TRUE(NULL != gEnv->pFileSys);
 	IFileSys* pFileSys = gEnv->pFileSys;
 
-	EXPECT_TRUE(pFileSys->fileExists(X_ENGINE_NAME"_filesys_ut_data.dat"));
-	EXPECT_TRUE(pFileSys->deleteFile(X_ENGINE_NAME"_filesys_ut_data.dat"));
-	EXPECT_TRUE(pFileSys->deleteFile(X_ENGINE_NAME"_filesys_ut_async_data.dat"));
+	EXPECT_TRUE(pFileSys->fileExists(X_ENGINE_NAME"_filesys_ut_data.ut_dat"));
+	EXPECT_TRUE(pFileSys->deleteFile(X_ENGINE_NAME"_filesys_ut_data.ut_dat"));
+	EXPECT_TRUE(pFileSys->deleteFile(X_ENGINE_NAME"_filesys_ut_async_data.ut_dat"));
 }
