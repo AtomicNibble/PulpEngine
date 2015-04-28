@@ -108,6 +108,7 @@ struct XFileAsync
 	// always returns total bytes.
 	// you can't seek.
 	virtual size_t remainingBytes(void) const X_ABSTRACT;
+	virtual void setSize(size_t numBytes) X_ABSTRACT;
 };
 
 
@@ -178,6 +179,7 @@ struct XFile
 
 	virtual size_t remainingBytes(void) const X_ABSTRACT;
 	virtual size_t tell(void) const X_ABSTRACT;
+	virtual void setSize(size_t numBytes) X_ABSTRACT;
 };
 
 struct XFileMem : public XFile
@@ -227,6 +229,10 @@ struct XFileMem : public XFile
 	}
 	virtual size_t tell(void) const X_FINAL{
 		return current_ - begin_;
+	}
+	virtual void setSize(size_t numBytes) X_FINAL{
+		X_UNUSED(numBytes);
+		X_ASSERT_UNREACHABLE();
 	}
 
 	inline char* getBufferStart(void) { return begin_; }

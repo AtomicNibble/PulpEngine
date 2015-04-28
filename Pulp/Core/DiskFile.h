@@ -25,6 +25,7 @@ public:
 	virtual void seek(size_t position, SeekMode::Enum origin) X_OVERRIDE;
 	virtual size_t remainingBytes(void) const X_OVERRIDE;
 	virtual size_t tell(void) const X_OVERRIDE;
+	virtual void setSize(size_t numBytes) X_OVERRIDE;
 
 private:
 

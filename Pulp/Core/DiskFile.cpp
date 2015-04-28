@@ -41,6 +41,12 @@ size_t XDiskFile::tell(void) const
 	return file_.tell();
 }
 
+void XDiskFile::setSize(size_t numBytes)
+{
+	file_.setSize(numBytes);
+}
+
+
 
 
 X_NAMESPACE_END

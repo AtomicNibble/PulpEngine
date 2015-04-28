@@ -19,10 +19,14 @@ struct OsFileAsync
 
 	size_t tell(void) const;
 	size_t remainingBytes(void) const;
+	void setSize(size_t numBytes);
 
 	bool valid(void) const;
 
 	static XFileStats& fileStats(void);
+
+private:
+	void seek(size_t position, IFileSys::SeekMode::Enum origin);
 
 private:
 	IFileSys::fileModeFlags mode_;

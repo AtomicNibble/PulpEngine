@@ -43,6 +43,10 @@ size_t XDiskFileAsync::remainingBytes(void) const
 	return file_.remainingBytes();
 }
 
+void XDiskFileAsync::setSize(size_t numBytes)
+{
+	return file_.setSize(numBytes);
+}
 
 
 

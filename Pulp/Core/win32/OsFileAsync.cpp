@@ -143,6 +143,21 @@ size_t OsFileAsync::remainingBytes(void) const
 #endif
 }
 
+void OsFileAsync::setSize(size_t numBytes)
+{
+	size_t currentPos = tell();
+
+	seek(numBytes, SeekMode::SET);
+
+	if (!::SetEndOfFile(file_))
+	{
+		lastError::Description dsc;
+		X_ERROR("File", "Failed to setSize: %Iu. Error: %s", numBytes, lastError::ToString(dsc));
+	}
+
+	seek(currentPos, SeekMode::SET);
+}
+
 bool OsFileAsync::valid(void) const
 {
 	return (file_ != INVALID_HANDLE_VALUE);
@@ -159,5 +174,27 @@ XFileStats& OsFileAsync::fileStats(void)
 #endif // !X_ENABLE_FILE_STATS
 }
 
+void OsFileAsync::seek(size_t position, IFileSys::SeekMode::Enum origin)
+{
+	// is this condition correct?
+	if (!mode_.IsSet(fileMode::RANDOM_ACCESS) && !mode_.IsSet(fileMode::APPEND)) {
+		IFileSys::fileModeFlags::Description Dsc;
+		X_ERROR("File", "can't seek in file, requires random access. Flags: %s", mode_.ToString(Dsc));
+		return;
+	}
+
+#if X_ENABLE_FILE_STATS
+	s_stats.NumSeeks++;
+#endif // !X_ENABLE_FILE_STATS
+
+	LARGE_INTEGER move;
+	move.QuadPart = position;
+
+	if (!SetFilePointerEx(file_, move, 0, mode::GetSeekValue(origin)))
+	{
+		lastError::Description dsc;
+		X_ERROR("File", "Failed to seek to position %d, mode %d. Error: %s", position, origin, lastError::ToString(dsc));
+	}
+}
 
 X_NAMESPACE_END
