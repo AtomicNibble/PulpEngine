@@ -167,7 +167,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 	XDiskFileAsync* pFile = nullptr;
 	core::Path real_path;
 
-	if (mode.IsSet(fileMode::READ))
+	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE))
 	{
 		_finddatai64_t findinfo;
 
