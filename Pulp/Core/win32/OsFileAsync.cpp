@@ -83,6 +83,13 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, uint32_t leng
 {
 	XOsFileAsyncOperation op(file_);
 
+	LPOVERLAPPED pOverlapped = op.getOverlapped();
+	LARGE_INTEGER large;
+	large.QuadPart = position;
+
+	pOverlapped->Offset = large.LowPart;
+	pOverlapped->OffsetHigh = large.HighPart;
+
 	if (::WriteFile(file_, pBuffer, length, nullptr, op.getOverlapped()))
 	{
 

@@ -25,7 +25,6 @@ XFileAsyncOperation XDiskFileAsync::readAsync(void* pBuffer, uint32_t length, ui
 XFileAsyncOperation XDiskFileAsync::writeAsync(const void* pBuffer, uint32_t length, uint32_t position)
 {
 	return XFileAsyncOperation(file_.writeAsync(pBuffer, length, position), pBuffer);
-
 }
 
 // Waits until the asynchronous operation has finished, and returns the number of transferred bytes.
