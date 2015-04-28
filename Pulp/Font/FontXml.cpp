@@ -268,6 +268,17 @@ bool XFFont::loadFont()
 
 		X_DELETE_ARRAY(pText, g_fontArena);
 	}
+	else
+	{
+		X_ERROR("Font", "failed to load font file: %s", path.c_str());
+		return false;
+	}
+
+	if (sourceName.isEmpty())
+	{
+		X_ERROR("Font", "Font source file is emtpy for: %s", path.c_str());
+		return false;
+	}
 
 	if (sourceName_ == sourceName) 
 		return true;
