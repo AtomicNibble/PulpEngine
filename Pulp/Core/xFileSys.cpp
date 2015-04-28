@@ -245,7 +245,7 @@ XFileMem* xFileSys::openFileMem(pathType path, fileModeFlags mode)
 
 				if (file.read(pBuf, size) == size)
 				{
-					pFile = X_NEW(XFileMem, &filePoolArena_, "Memile")(pBuf, pBuf + size, &memFileArena_);
+					pFile = X_NEW(XFileMem, &filePoolArena_, "MemFile")(pBuf, pBuf + size, &memFileArena_);
 
 				}
 				else
