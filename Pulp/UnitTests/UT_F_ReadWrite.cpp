@@ -112,19 +112,35 @@ TEST(FileSys, Async)
 	IFileSys* pFileSys = gEnv->pFileSys;
 
 	XFileAsync* file = pFileSys->openFileAsync(X_ENGINE_NAME"_filesys_ut_async_data.ut_dat",
-		fileMode::WRITE | fileMode::RANDOM_ACCESS | fileMode::RECREATE);
+		fileMode::WRITE | fileMode::READ | fileMode::RANDOM_ACCESS | fileMode::RECREATE);
 
 	ASSERT_TRUE(NULL != file);
 
-	char Buf[256];
+	char Buf[512], Buf2[512];
 	memset(Buf, 1, 128);
 	memset(&Buf[128], 0xff, 128);
+	memset(&Buf[256], 0xa, 128);
+	memset(&Buf[256 + 128], 0x78, 128);
 
-	core::XFileAsyncOperation write1 = file->writeAsync(Buf, sizeof(Buf), 0);
-	core::XFileAsyncOperation write2 = file->writeAsync(Buf, sizeof(Buf), 256);
+	core::zero_object(Buf2);
+
+	file->setSize(512);
+
+	core::XFileAsyncOperation write1 = file->writeAsync(Buf, 256, 0);
+	core::XFileAsyncOperation write2 = file->writeAsync(&Buf[256], 256, 256);
 
 	write1.waitUntilFinished();
 	write2.waitUntilFinished();
+
+	core::XFileAsyncOperation read1 = file->readAsync(Buf2, 256, 0);
+	core::XFileAsyncOperation read2 = file->readAsync(&Buf2[256], 256, 256);
+
+	read2.waitUntilFinished();
+	read1.waitUntilFinished();
+
+	// check if same.
+	EXPECT_EQ(0, memcmp(Buf, Buf2, 256));
+	EXPECT_EQ(0, memcmp(&Buf[256], &Buf2[256], 256));
 
 	pFileSys->closeFileAsync(file);
 }
