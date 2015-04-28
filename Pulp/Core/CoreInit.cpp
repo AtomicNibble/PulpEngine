@@ -204,7 +204,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	}
 
 	// Load the default config.
-	env_.pConsole->LoadConfig("default.cfg");
+	if (!env_.pConsole->LoadConfig("default.cfg")) {
+		return false;
+	}
 
 	// #------------------------- CPU Info ----------------------
 	pCpuInfo_ = X_NEW( core::CpuInfo, g_coreArena, "CpuInfo");

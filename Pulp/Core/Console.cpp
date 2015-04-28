@@ -614,8 +614,12 @@ void XConsole::ShutDown(void)
 {
 	X_LOG0("Console", "Shutting Down");
 
-	pCore_->GetHotReloadMan()->addfileType(nullptr, CONFIG_FILE_EXTENSION);
-	pCore_->GetILog()->RemoveLogger(&logger_);
+	// check if core failed to init.
+	if (pCore_)
+	{
+		pCore_->GetHotReloadMan()->addfileType(nullptr, CONFIG_FILE_EXTENSION);
+		pCore_->GetILog()->RemoveLogger(&logger_);
+	}
 	unregisterInputListener();
 
 	// clear up vars.
@@ -1266,7 +1270,7 @@ void XConsole::Exec(const char* command, const bool DeferExecution)
 	}
 }
 
-void XConsole::LoadConfig(const char* fileName)
+bool XConsole::LoadConfig(const char* fileName)
 {
 	core::Path path;
 
@@ -1344,13 +1348,13 @@ void XConsole::LoadConfig(const char* fileName)
 
 			X_DELETE_ARRAY(pData, g_coreArena);
 		}
-
-	//	X_LOG2("Config", "Loading complete..");
 	}
 	else
 	{
 		X_ERROR("Config", "failed to load: \"%s\"", path.c_str());
+		return false;
 	}
+	return true;
 }
 
 // IXHotReload
@@ -2459,10 +2463,10 @@ void XConsoleNULL::Exec(const char* command, const bool DeferExecution)
 }
 
 
-void XConsoleNULL::LoadConfig(const char* fileName)
+bool XConsoleNULL::LoadConfig(const char* fileName)
 {
 	X_UNUSED(fileName);
-
+	return true;
 }
 
 /*

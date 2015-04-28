@@ -98,7 +98,7 @@ struct IConsole
 	virtual void Exec(const char* command, const bool DeferExecution = false) X_ABSTRACT;
 
 //	virtual void ConfigExec(const char* command) X_ABSTRACT;
-	virtual void LoadConfig(const char* fileName) X_ABSTRACT;
+	virtual bool LoadConfig(const char* fileName) X_ABSTRACT;
 
 	virtual void OnFrameBegin() X_ABSTRACT;
 
