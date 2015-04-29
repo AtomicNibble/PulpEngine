@@ -2215,9 +2215,8 @@ void XConsole::ListCommands(const char* searchPatten)
 
 	sortCmdsByName(sorted_cmds);
 
-
-	X_LOG0("Console", "------------ ^8Commands(%i)^7 ------------", sorted_cmds.size());
 	X_LOG_BULLET;
+	X_LOG0("Console", "------------ ^8Commands(%i)^7 ------------", sorted_cmds.size());
 
 	core::Array<ConsoleCommand*>::ConstIterator it = sorted_cmds.begin();
 	for (; it != sorted_cmds.end(); ++it)
@@ -2255,8 +2254,8 @@ void XConsole::ListVariables(const char* searchPatten)
 
 	sortVarsByName(sorted_vars);
 
-	X_LOG0("Console", "-------------- ^8Vars(%i)^7 --------------", sorted_vars.size());
 	X_LOG_BULLET;
+	X_LOG0("Console", "-------------- ^8Vars(%i)^7 --------------", sorted_vars.size());
 
 	core::Array<ICVar*>::ConstIterator it = sorted_vars.begin();
 	for (; it != sorted_vars.end(); ++it)
