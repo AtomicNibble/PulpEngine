@@ -76,7 +76,7 @@ public:
 	xFileSys();
 	~xFileSys() X_FINAL;
 
-	void Init() X_FINAL;
+	bool Init() X_FINAL;
 	void ShutDown() X_FINAL;
 
 	// Open / Close
@@ -92,7 +92,7 @@ public:
 	void closeFileMem(XFileMem* file) X_FINAL;
 
 	// folders
-	void setGameDir(pathType path) X_FINAL;
+	bool setGameDir(pathType path) X_FINAL;
 	void addModDir(pathType path) X_FINAL;
 
 	// Find util

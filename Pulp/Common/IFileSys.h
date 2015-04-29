@@ -270,12 +270,12 @@ struct IFileSys
 
 	virtual ~IFileSys(){}
 
-	virtual void Init() X_ABSTRACT;
+	virtual bool Init() X_ABSTRACT;
 	virtual void ShutDown() X_ABSTRACT;
 
 	// folders - there is only one game dirtory.
 	// but other folders can be added with 'addModDir' to add to the virtual directory.
-	virtual void setGameDir(pathType path) X_ABSTRACT;
+	virtual bool setGameDir(pathType path) X_ABSTRACT;
 	virtual void addModDir(pathType path) X_ABSTRACT;
 
 	// Open Files

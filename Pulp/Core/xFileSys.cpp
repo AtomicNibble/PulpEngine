@@ -68,12 +68,12 @@ xFileSys::~xFileSys()
 }
 
 
-void xFileSys::Init()
+bool xFileSys::Init()
 {
 	X_LOG0("FileSys", "Starting Filesys..");
 
 	// TODO: yup.
-	setGameDir("C:\\Users\\Tom\\Documents\\Visual Studio 2013\\Projects\\WinEngine\\code\\game_folder");
+	return setGameDir("C:\\Users\\Tom\\Documents\\Visual Studio 2013\\Projects\\WinEngine\\potatoengine\\game_folder");
 }
 
 void xFileSys::ShutDown()
@@ -282,9 +282,15 @@ void xFileSys::closeFileMem(XFileMem* file)
 
 // --------------------- folders ---------------------
 
-void xFileSys::setGameDir(pathType path)
+bool xFileSys::setGameDir(pathType path)
 {
 	X_ASSERT(gameDir_ == nullptr, "can only set one game directoy")(path,gameDir_);
+
+	// check if the irectory is even valid.
+	if (!this->directoryExists(path)) {
+		X_ERROR("FileSys", "Faled to set game drectory the directory does not exsists: \"%s\"", path);
+		return false;
+	}
 
 	addModDir(path);
 	X_ASSERT_NOT_NULL(searchPaths_);
@@ -293,6 +299,7 @@ void xFileSys::setGameDir(pathType path)
 
 	// add hotreload dir.
 	gEnv->pDirWatcher->addDirectory(path);
+	return true;
 }
 
 void xFileSys::addModDir(pathType path)
