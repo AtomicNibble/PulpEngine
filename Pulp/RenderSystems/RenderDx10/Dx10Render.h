@@ -402,7 +402,7 @@ private:
 
 
 	virtual void SetArenas(core::MemoryArenaBase* arena) X_OVERRIDE;
-	void OnPostCreateDevice(void);
+	bool OnPostCreateDevice(void);
 	void InitResources(void);
 	void InitDynamicBuffers(void);
 	void InitVertexLayoutDescriptions(void);
