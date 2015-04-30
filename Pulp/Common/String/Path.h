@@ -49,6 +49,7 @@ public:
 	inline void replaceSeprators(void);
 	inline void removeFileName(void);
 	inline void removeExtension(void);
+	inline void removeTrailingSlash(void);
 
 	inline bool isAbsolute(void) const;
 
