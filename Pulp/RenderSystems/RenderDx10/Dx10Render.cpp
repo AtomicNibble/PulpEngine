@@ -347,7 +347,9 @@ bool DX11XRender::Init(HWND hWnd,
 	fieldOfView = (float)D3DX_PI / 4.0f;
 	screenAspect = (float)screenWidth / (float)screenHeight;
 
-	OnPostCreateDevice();
+	if (!OnPostCreateDevice()) {
+		return false;
+	}
 
 #if X_DEBUG
 	if (SUCCEEDED(m_device->QueryInterface(__uuidof(ID3D11Debug), (void**)&m_d3dDebug)))
@@ -463,11 +465,13 @@ void DX11XRender::ShutDown()
 
 }
 
-void DX11XRender::OnPostCreateDevice(void)
+bool DX11XRender::OnPostCreateDevice(void)
 {
 	shader::XHWShader_Dx10::Init();
 
-	m_ShaderMan.Init();
+	if (!m_ShaderMan.Init()) {
+		return false;
+	}
 
 	FX_Init();
 
@@ -478,6 +482,7 @@ void DX11XRender::OnPostCreateDevice(void)
 
 	m_AuxGeo_ = X_NEW(XRenderAuxImp, g_rendererArena, "AuxGeo")(*this);
 	m_AuxGeo_->RestoreDeviceObjects();
+	return true;
 }
 
 void DX11XRender::InitResources(void)
