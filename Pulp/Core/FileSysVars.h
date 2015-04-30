@@ -6,10 +6,10 @@
 
 struct XFileSysVars
 {
-	bool debug;
+	int32_t debug;
 
 	XFileSysVars() :
-		debug(false)
+		debug(0)
 	{}
 };
 
