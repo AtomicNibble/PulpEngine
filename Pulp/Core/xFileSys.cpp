@@ -428,7 +428,7 @@ bool xFileSys::createDirectory(pathType path, VirtualDirectory::Enum location) c
 	if (!::CreateDirectoryA(buf.c_str(), NULL) && lastError::Get() != ERROR_ALREADY_EXISTS)
 	{
 		lastError::Description Dsc;
-		X_ERROR("xDir", "Failed to create directory. Error: %s", lastError::ToString(Dsc));
+		X_ERROR("FileSys", "Failed to create directory. Error: %s", lastError::ToString(Dsc));
 		return false;
 	}
 
@@ -499,7 +499,7 @@ bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 	{
 		if (dwAttrib & FILE_ATTRIBUTE_DIRECTORY) // herp derp.
 		{
-			X_ERROR("Dir", "FileExsits check was ran on a directory");
+			X_ERROR("FileSys", "FileExsits check was ran on a directory");
 			return false;
 		}
 
@@ -509,13 +509,13 @@ bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 	// This means we checked for a file in a directory that don't exsists.
 	if (lastError::Get() == ERROR_PATH_NOT_FOUND)
 	{
-		X_LOG2("Dir", "FileExsits failed, the target directory does not exsist: \"%s\"", 
+		X_LOG2("FileSys", "FileExsits failed, the target directory does not exsist: \"%s\"", 
 			buf.c_str());
 	}
 	else if (lastError::Get() != ERROR_FILE_NOT_FOUND)
 	{
 		lastError::Description Dsc;
-		X_ERROR("Dir", "FileExsits failed. Error: %s", lastError::ToString(Dsc));
+		X_ERROR("FileSys", "FileExsits failed. Error: %s", lastError::ToString(Dsc));
 	}
 
 	return false;
@@ -535,14 +535,14 @@ bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) c
 			return true;
 		}
 
-		X_ERROR("Dir", "DirectoryExists check was ran on a File: \"%s\"", path);
+		X_ERROR("FileSys", "DirectoryExists check was ran on a File: \"%s\"", path);
 		return false; 
 	}
 
 	if (lastError::Get() != ERROR_PATH_NOT_FOUND && lastError::Get() != ERROR_FILE_NOT_FOUND)
 	{
 		lastError::Description Dsc;
-		X_ERROR("Dir", "DirectoryExists failed. Error: %s", lastError::ToString(Dsc));
+		X_ERROR("FileSys", "DirectoryExists failed. Error: %s", lastError::ToString(Dsc));
 	}
 
 	return false;
@@ -564,7 +564,7 @@ bool xFileSys::isDirectory(pathType path, VirtualDirectory::Enum location) const
 	if (lastError::Get() != INVALID_FILE_ATTRIBUTES)
 	{
 		lastError::Description Dsc;
-		X_ERROR("Dir", "isDirectory failed. Error: %s", lastError::ToString(Dsc));
+		X_ERROR("FileSys", "isDirectory failed. Error: %s", lastError::ToString(Dsc));
 	}
 
 	return false;
