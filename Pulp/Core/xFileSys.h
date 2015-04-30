@@ -76,8 +76,9 @@ public:
 	xFileSys();
 	~xFileSys() X_FINAL;
 
-	bool Init() X_FINAL;
-	void ShutDown() X_FINAL;
+	bool Init(void) X_FINAL;
+	void ShutDown(void) X_FINAL;
+	void CreateVars(void) X_FINAL;
 
 	// Open / Close
 	XFile* openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;

@@ -203,6 +203,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		env_.pConsole->ShutDown();
 	}
 
+	// register filesystemvars.
+	env_.pFileSys->CreateVars();
+
 	// Load the default config.
 	if (!env_.pConsole->LoadConfig("default.cfg")) {
 		return false;

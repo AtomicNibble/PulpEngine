@@ -72,10 +72,6 @@ xFileSys::~xFileSys()
 bool xFileSys::Init()
 {
 	X_LOG0("FileSys", "Starting Filesys..");
-	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->pConsole);
-
-	ADD_CVAR_REF("filesys_debug", vars_.debug, 0, 0, 1, core::VarFlag::SYSTEM, "Filesystem debug. 0=off 1=on" );
 
 	// TODO: yup.
 	return setGameDir("C:\\Users\\Tom\\Documents\\Visual Studio 2013\\Projects\\WinEngine\\code\\game_folder");
@@ -94,10 +90,15 @@ void xFileSys::ShutDown()
 			X_DELETE(cur->pak, g_coreArena);
 		X_DELETE(cur, g_coreArena);
 	}
-
-
 }
 
+void xFileSys::CreateVars(void)
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pConsole);
+
+	ADD_CVAR_REF("filesys_debug", vars_.debug, 0, 0, 1, core::VarFlag::SYSTEM, "Filesystem debug. 0=off 1=on");
+}
 
 // --------------------- Open / Close ---------------------
 
