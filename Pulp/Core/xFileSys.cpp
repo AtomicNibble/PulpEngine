@@ -534,7 +534,7 @@ bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) c
 		return false; 
 	}
 
-	if (lastError::Get() != ERROR_PATH_NOT_FOUND)
+	if (lastError::Get() != ERROR_PATH_NOT_FOUND && lastError::Get() != ERROR_FILE_NOT_FOUND)
 	{
 		lastError::Description Dsc;
 		X_ERROR("Dir", "DirectoryExists failed. Error: %s", lastError::ToString(Dsc));
