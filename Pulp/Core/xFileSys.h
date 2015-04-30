@@ -127,7 +127,7 @@ private:
 	const char* createOSPath(directory_s* dir, pathType path, Path& buffer) const;
 	bool isAbsolute(pathType path) const;
 
-
+	bool isDebug(void) const;
 
 private:
 #if X_DEBUG == 1

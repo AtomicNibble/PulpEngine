@@ -8,6 +8,7 @@
 
 #include <direct.h>
 #include <io.h>
+#include <IConsole.h>
 
 #include <Shellapi.h>
 
@@ -71,9 +72,13 @@ xFileSys::~xFileSys()
 bool xFileSys::Init()
 {
 	X_LOG0("FileSys", "Starting Filesys..");
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pConsole);
+
+	ADD_CVAR_REF("filesys_debug", vars_.debug, 0, 0, 1, core::VarFlag::SYSTEM, "Filesystem debug. 0=off 1=on" );
 
 	// TODO: yup.
-	return setGameDir("C:\\Users\\Tom\\Documents\\Visual Studio 2013\\Projects\\WinEngine\\potatoengine\\game_folder");
+	return setGameDir("C:\\Users\\Tom\\Documents\\Visual Studio 2013\\Projects\\WinEngine\\code\\game_folder");
 }
 
 void xFileSys::ShutDown()
@@ -594,6 +599,11 @@ bool xFileSys::isAbsolute(pathType path) const
 	return	path[0] == NATIVE_SLASH ||
 			path[0] == NON_NATIVE_SLASH ||
 			path[1] == ':';
+}
+
+bool xFileSys::isDebug(void) const
+{
+	return vars_.debug != 0;
 }
 
 // ----------------------- stats ---------------------------
