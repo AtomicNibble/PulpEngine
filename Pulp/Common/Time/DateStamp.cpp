@@ -22,7 +22,7 @@ DateStamp::DateStamp(unsigned short year, unsigned char month, unsigned char day
 {
 	// validate it.
 	
-	X_ASSERT( day >= 1 && day < DaysInMonth( month ), "Day is not valid for month: %i, max is: ", month, DaysInMonth( month ) )( day );
+	X_ASSERT( day >= 1 && day <= DaysInMonth( month ), "Day is not valid for month: %i, max is: ", month, DaysInMonth( month ) )( day );
 	X_ASSERT( month >= 1 && month <= 12, "Month is not valid")( month );
 	X_ASSERT( year >= g_MinYear && year <= g_MinYear + 1000, "Year is not valid")( year );
 
