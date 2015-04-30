@@ -318,7 +318,7 @@ bool xFileSys::setGameDir(pathType path)
 void xFileSys::addModDir(pathType path)
 {
 	if (isDebug()) {
-		X_LOG0("FileSys", "addModDir: \"%s\"", path.c_str());
+		X_LOG0("FileSys", "addModDir: \"%s\"", path);
 	}
 
 	// at it to virtual file system.
