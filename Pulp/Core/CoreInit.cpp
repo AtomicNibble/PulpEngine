@@ -485,8 +485,10 @@ bool XCore::Init3DEngine(const SCoreInitParams& initParams)
 		return false;
 
 	if (env_.p3DEngine) {
-
-		env_.p3DEngine->Init();
+		if (!env_.p3DEngine->Init()) {
+			X_ERROR("Core", "Failed to init 3DENninge");
+			return false;
+		}
 	}
 
 	return env_.p3DEngine != nullptr;
@@ -498,7 +500,10 @@ bool XCore::InitGameDll(const SCoreInitParams& initParams)
 		return false;
 
 	if (env_.pGame) {
-		env_.pGame->Init();
+		if (!env_.pGame->Init()) {
+			X_ERROR("Core", "Failed to init Game");
+			return false;
+		}
 	}
 
 	return env_.pGame != nullptr;
