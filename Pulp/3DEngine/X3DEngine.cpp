@@ -73,7 +73,7 @@ bool X3DEngine::Init()
 	RegisterCmds();
 
 	guisMan_.Init();
-	return false;
+	return true;
 }
 
 void X3DEngine::ShutDown()
