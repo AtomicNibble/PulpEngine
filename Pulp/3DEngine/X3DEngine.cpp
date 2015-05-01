@@ -36,6 +36,20 @@ texture::ITexture* pTexSky = nullptr;
 
 gui::IGui* gui = nullptr;
 
+// Commands
+
+void Command_Map(core::IConsoleCmdArgs* Cmd)
+{
+
+}
+
+void Command_DevMap(core::IConsoleCmdArgs* Cmd)
+{
+
+}
+
+// ~Commands
+
 bool X3DEngine::Init()
 {
 	X_ASSERT_NOT_NULL(gEnv);
@@ -52,15 +66,13 @@ bool X3DEngine::Init()
 	pConsole_ = gEnv->pConsole;
 
 	pRender_ = gEnv->pRender;
-
 	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager");
 	pMaterialManager_->Init();
-
 	pGuiManger_ = &guisMan_;
 
+	RegisterCmds();
+
 	guisMan_.Init();
-
-
 	return false;
 }
 
@@ -117,39 +129,16 @@ void X3DEngine::Update(void)
 
 }
 
+// =======================================
 
-
-void X3DEngine::LoadModel(void)
+void X3DEngine::RegisterCmds(void)
 {
-/*
-	model::ModelLoader loader;
+	ADD_COMMAND("map", Command_Map, core::VarFlag::SYSTEM, "Loads a map");
+	ADD_COMMAND("devmap", Command_DevMap, core::VarFlag::SYSTEM, "Loads a map in developer mode");
 
-	pMesh = nullptr;
-	pSkybox = nullptr;
 
-	if (loader.LoadModel(model, "models/player.model"))
-	{
-		pMesh = gEnv->pRender->createRenderMesh(
-			(model::MeshHeader*)&model.getLod(0),
-			shader::VertexFormat::P3F_T2S,
-			model.getName()
-			);
-
-		pMesh->uploadToGpu();
-	}
-
-	if (loader.LoadModel(modelSky, "models/skybox_sea.model"))
-	{
-		pSkybox = gEnv->pRender->createRenderMesh(
-			(model::MeshHeader*)&modelSky.getLod(0),
-			shader::VertexFormat::P3F_T2S,
-			modelSky.getName()
-			);
-
-		pSkybox->uploadToGpu();
-	}
-*/
 }
+
 
 
 

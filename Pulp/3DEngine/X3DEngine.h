@@ -15,6 +15,9 @@
 X_NAMESPACE_BEGIN(engine)
 
 
+
+
+
 struct X3DEngine : public I3DEngine, public XEngineBase
 {
 
@@ -23,14 +26,21 @@ struct X3DEngine : public I3DEngine, public XEngineBase
 	virtual int release(void) X_OVERRIDE;
 
 	virtual void OnFrameBegin(void) X_OVERRIDE;
-
 	virtual void Update(void) X_OVERRIDE;
 
-	virtual void LoadModel(void) X_OVERRIDE;
+private:
 
+	void RegisterCmds(void);
 
 
 private:
+	// vars / cmds
+	friend void Command_Map(core::IConsoleCmdArgs* Cmd);
+	friend void Command_DevMap(core::IConsoleCmdArgs* Cmd);
+
+
+	//~
+
 	gui::XGuiManager guisMan_;
 
 	bsp::Bsp map;
