@@ -245,9 +245,9 @@ static const uint32_t	 MAP_MAX_AREAS = 0x100;
 static const uint32_t	 MAP_MAX_PORTALS = 0x100;
 static const uint32_t	 MAP_MAX_SURFACES = 65536 * 2;		
 static const uint32_t	 MAP_MAX_MODELS = 0x400;			// a model is a 'area'.
-static const uint32_t	 MAP_MAX_MODEL_SURFACES = 65536 * 2;	// the maximum surfaces a map model can have.
-static const uint32_t	 MAP_MAX_MODEL_VERTS = 65536 * 8;		// the maximum verts a map model can have.
-static const uint32_t	 MAP_MAX_MODEL_INDEXES = 65536 * 8;		// the maximum indexes a map model can have.
+static const uint32_t	 MAP_MAX_MODEL_SURFACES = 65536 * 2;// the maximum surfaces a map model can have.
+static const uint32_t	 MAP_MAX_MODEL_VERTS = 65536;		// the maximum verts a map model can have.
+static const uint32_t	 MAP_MAX_MODEL_INDEXES = 65536;		// the maximum indexes a map model can have.
 static const uint32_t	 MAP_MAX_MATERIALs = 0x800;		
 
 // Should be checked in compiler.
