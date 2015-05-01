@@ -29,8 +29,10 @@ struct X3DEngine : public I3DEngine, public XEngineBase
 	virtual void Update(void) X_OVERRIDE;
 
 private:
-
 	void RegisterCmds(void);
+
+	void LoadMap(const char* mapName);
+	void LoadDevMap(const char* mapName);
 
 
 private:

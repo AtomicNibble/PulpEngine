@@ -40,12 +40,40 @@ gui::IGui* gui = nullptr;
 
 void Command_Map(core::IConsoleCmdArgs* Cmd)
 {
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->p3DEngine);
 
+	if (Cmd->GetArgCount() != 2)
+	{
+		X_WARNING("3DEngine", "map <mapname>");
+		return;
+	}
+
+	const char* mapName = Cmd->GetArg(1);
+
+	X_LOG0("3DEngine", "Loading level: %s", mapName);
+
+	X3DEngine* p3DEngine = reinterpret_cast<X3DEngine*>(gEnv->p3DEngine);
+	p3DEngine->LoadMap(mapName);
 }
 
 void Command_DevMap(core::IConsoleCmdArgs* Cmd)
 {
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->p3DEngine);
 
+	if (Cmd->GetArgCount() != 2)
+	{
+		X_WARNING("3DEngine", "devmap <mapname>");
+		return;
+	}
+
+	const char* mapName = Cmd->GetArg(1);
+
+	X_LOG0("3DEngine", "Loading level(dev mode): %s", mapName);
+
+	X3DEngine* p3DEngine = reinterpret_cast<X3DEngine*>(gEnv->p3DEngine);
+	p3DEngine->LoadDevMap(mapName);
 }
 
 // ~Commands
@@ -140,7 +168,23 @@ void X3DEngine::RegisterCmds(void)
 }
 
 
+void X3DEngine::LoadMap(const char* mapName)
+{
+	X_ASSERT_NOT_NULL(mapName);
 
+	// dispatch read events etc.
+
+}
+
+void X3DEngine::LoadDevMap(const char* mapName)
+{
+	X_ASSERT_NOT_NULL(mapName);
+
+	// this should not really duplicate anything.
+	// set some vars then just load the map normaly tbh.
+
+	LoadMap(mapName);
+}
 
 
 X_NAMESPACE_END
