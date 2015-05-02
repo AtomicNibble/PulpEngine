@@ -218,7 +218,7 @@ X_NAMESPACE_BEGIN(level)
 //
 //
 
-static const uint32_t	 LVL_VERSION = 10; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
+static const uint32_t	 LVL_VERSION = 11; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
 static const uint32_t	 LVL_FOURCC = X_TAG('x', 'l', 'v', 'l');
 static const uint32_t	 LVL_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r'); // if a file falid to write the final header, this will be it's FourCC
 // feels kinda wrong to call it a '.bsp', since it's otherthings as well. 
@@ -439,6 +439,9 @@ struct FileHeader
 
 	core::dateTimeStampSmall modified; // 4
 
+	// string + data.
+	uint32_t totalDataSize;
+
 	// crc32 is just the header data
 	uint32_t datacrc32;
 	uint32_t datasize;
@@ -473,6 +476,8 @@ X_ENSURE_SIZE(Node, 0x24);
 // X_ENSURE_SIZE(Portal, 0x28);
 X_ENSURE_SIZE(Area, 0x28 + 0xC + 12);
 
+// check file structure sizes also.
+X_ENSURE_SIZE(FileHeader, 40);
 
 X_NAMESPACE_END
 
