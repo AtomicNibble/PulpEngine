@@ -4,6 +4,7 @@
 #include <IFileSys.h>
 #include <IRender.h>
 #include <IRenderMesh.h>
+#include <ITimer.h>
 
 #include <Memory\MemCursor.h>
 
@@ -21,6 +22,8 @@ Level::Level() :
 	areaModels_(g_3dEngineArena)
 {
 	pFileData_ = nullptr;
+
+	core::zero_object(fileHdr_);
 }
 
 Level::~Level()
@@ -48,8 +51,24 @@ bool Level::render(void)
 }
 
 
-bool Level::Load(const char* filename)
+bool Level::Load(const char* mapName)
 {
+	// does the other level file exsist?
+	core::Path levelFile(mapName);
+	levelFile.setExtension(level::LVL_FILE_EXTENSION);
+
+	if (!gEnv->pFileSys->fileExists(levelFile.c_str())) {
+		X_ERROR("Level", "could not find level file: \"%s\"",
+			levelFile.c_str());
+		return false;
+	}
+
+	X_LOG0("3DEngine", "Loading level: %s", mapName);
+	loadStats_ = LoadStats();
+	loadStats_.startTime = gEnv->pTimer->GetTimeReal();
+
+	// dispatch a read request for the header.
+	core::zero_object(fileHdr_);
 
 
 

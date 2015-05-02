@@ -51,8 +51,6 @@ void Command_Map(core::IConsoleCmdArgs* Cmd)
 
 	const char* mapName = Cmd->GetArg(1);
 
-	X_LOG0("3DEngine", "Loading level: %s", mapName);
-
 	X3DEngine* p3DEngine = reinterpret_cast<X3DEngine*>(gEnv->p3DEngine);
 	p3DEngine->LoadMap(mapName);
 }
@@ -69,8 +67,6 @@ void Command_DevMap(core::IConsoleCmdArgs* Cmd)
 	}
 
 	const char* mapName = Cmd->GetArg(1);
-
-	X_LOG0("3DEngine", "Loading level(dev mode): %s", mapName);
 
 	X3DEngine* p3DEngine = reinterpret_cast<X3DEngine*>(gEnv->p3DEngine);
 	p3DEngine->LoadDevMap(mapName);
@@ -171,9 +167,6 @@ void X3DEngine::RegisterCmds(void)
 void X3DEngine::LoadMap(const char* mapName)
 {
 	X_ASSERT_NOT_NULL(mapName);
-
-	// clear a exsisting level.
-	level_.free();
 
 	level_.Load(mapName);
 }

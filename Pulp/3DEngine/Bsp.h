@@ -4,7 +4,8 @@
 #define X_BSP_LOADER_H_
 
 #include <Ilevel.h>
-// #include <IModel.h>
+#include <Time\TimeVal.h>
+
 
 X_NAMESPACE_DECLARE(model,
 struct MeshHeader;
@@ -15,6 +16,12 @@ struct IRenderMesh;
 X_NAMESPACE_BEGIN(level)
 
 
+struct LoadStats
+{
+	core::TimeVal startTime;
+	core::TimeVal endTime;
+};
+
 class Level
 {
 public:
@@ -24,7 +31,7 @@ public:
 	void free(void);
 	bool render(void);
 
-	bool Load(const char* filename);
+	bool Load(const char* mapName);
 
 
 private:
@@ -44,8 +51,12 @@ private:
 	};
 
 	core::Array<AreaModel> areaModels_;
-
 	uint8_t* pFileData_;
+
+private:
+	FileHeader fileHdr_;
+
+	LoadStats loadStats_;
 };
 
 
