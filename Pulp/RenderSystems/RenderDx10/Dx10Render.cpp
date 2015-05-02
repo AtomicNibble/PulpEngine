@@ -790,6 +790,7 @@ bool DX11XRender::Create2DTexture(texture::XTextureFile* img_data, texture::XDev
 	ID3D11Texture2D* pTexture2D;
 
 	core::zero_object(Desc);
+	core::zero_object(SubResource);
 
 	uint32 nBindFlags = D3D11_BIND_SHADER_RESOURCE;
 	uint32 nMiscFlags = 0;
