@@ -124,20 +124,11 @@ void X3DEngine::OnFrameBegin(void)
 {
 	X_PROFILE_BEGIN("3DFrameBegin", core::ProfileSubSys::ENGINE3D);
 
-//	pRender_->SetTexture(pTex1->getTexID());
+	level_.update();
+	if (level_.canRender()) {
+		level_.render();
+	}
 
-//	if (pMesh)
-//		pMesh->render();
-
-//	pRender_->SetTexture(pTex->getTexID());
-
-
-//	pRender_->DefferedBegin();
-
-//	map.render();
-
-//	pRender_->DefferedEnd();
-//	pRender_->s
 
 	// draw me some gui baby
 	if (gui) {
