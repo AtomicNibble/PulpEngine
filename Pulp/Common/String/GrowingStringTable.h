@@ -19,7 +19,7 @@ class GrowingStringTable : public ISerialize
 	X_PRAGMA(pack(push, 4))
 	struct Header_t
 	{
-		const uint8_t HEADER_MAGIC = 0xAF;
+		static const uint8_t HEADER_MAGIC = 0xAF;
 
 		uint8_t magic;
 		uint8_t pad[2]; // i use these later
@@ -58,6 +58,7 @@ public:
 	virtual bool SSave(XFile* pFile) const X_FINAL;
 	virtual bool SLoad(XFile* pFile) X_FINAL;
 	// ~ISerialize
+
 
 private:
 	// request X number of free blocks.
