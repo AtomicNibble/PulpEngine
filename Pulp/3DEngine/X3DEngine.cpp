@@ -172,8 +172,10 @@ void X3DEngine::LoadMap(const char* mapName)
 {
 	X_ASSERT_NOT_NULL(mapName);
 
-	// dispatch read events etc.
+	// clear a exsisting level.
+	level_.free();
 
+	level_.Load(mapName);
 }
 
 void X3DEngine::LoadDevMap(const char* mapName)

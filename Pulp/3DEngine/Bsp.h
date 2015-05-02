@@ -24,7 +24,7 @@ public:
 	void free(void);
 	bool render(void);
 
-	bool LoadFromFile(const char* filename);
+	bool Load(const char* filename);
 
 
 private:

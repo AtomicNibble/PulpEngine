@@ -48,6 +48,15 @@ bool Level::render(void)
 }
 
 
+bool Level::Load(const char* filename)
+{
+
+
+
+	return true;
+}
+
+#if 0
 bool Level::LoadFromFile(const char* filename)
 {
 	X_ASSERT_NOT_NULL(filename);
@@ -183,6 +192,6 @@ bool Level::LoadFromFile(const char* filename)
 
 	return false;
 }
-
+#endif
 
 X_NAMESPACE_END
