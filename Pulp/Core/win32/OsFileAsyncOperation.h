@@ -16,13 +16,11 @@ struct XOsFileAsyncOperation
 
 	};
 
-//	typedef core::ReferenceCounted<OVERLAPPED> ReferenceCountedOverlapped;
 
 public:
-
 	XOsFileAsyncOperation(MemoryArenaBase* arena, HANDLE hFile, size_t position);
 
-	bool hasFinished(void) const;
+	bool hasFinished(uint32_t* pNumBytes = nullptr) const;
 
 	// Waits until the asynchronous operation has finished
 	// returns the number of transferred bytes.

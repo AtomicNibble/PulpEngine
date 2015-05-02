@@ -6,7 +6,6 @@
 
 X_NAMESPACE_BEGIN(core)
 
-
 XOsFileAsyncOperation::XOsFileAsyncOperation(MemoryArenaBase* arena, HANDLE hFile, size_t position) :
 hFile_(hFile),
 overlapped_(X_NEW(ReferenceCountedOverlapped, arena, "OVERLAPPED"), arena)
@@ -22,11 +21,15 @@ overlapped_(X_NEW(ReferenceCountedOverlapped, arena, "OVERLAPPED"), arena)
 }
 
 
-bool XOsFileAsyncOperation::hasFinished(void) const
+bool XOsFileAsyncOperation::hasFinished(uint32_t* pNumBytes) const
 {
 	DWORD bytesTransferred = 0;
-	if (::GetOverlappedResult(hFile_, overlapped_.instance(), &bytesTransferred, false))
+	if (::GetOverlappedResult(hFile_, overlapped_.instance(), &bytesTransferred, false)) {
+		if (pNumBytes) {
+			*pNumBytes = static_cast<uint32_t>(bytesTransferred);
+		}
 		return true;
+	}
 	else if (core::lastError::Get() == ERROR_IO_INCOMPLETE)
 	{
 		return false;
@@ -46,10 +49,8 @@ uint32_t XOsFileAsyncOperation::waitUntilFinished(void) const
 {
 	// same as above but with bWait = true;
 	DWORD bytesTransferred = 0;
-	
 	if (::GetOverlappedResult(hFile_, overlapped_.instance(), &bytesTransferred, true))
 	{
-
 		return safe_static_cast<uint32_t, DWORD>(bytesTransferred);
 	}
 	else

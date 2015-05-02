@@ -38,7 +38,6 @@ struct XFileAsyncOperation
 	inline XFileAsyncOperation(const XOsFileAsyncOperation& operation, void* pBuffer) :
 		operation_(operation),
 		pReadBuffer_(pBuffer),
-	//	pFileData_(nullptr),
 		isReadOperation_(true)
 	{
 
@@ -46,15 +45,14 @@ struct XFileAsyncOperation
 	inline XFileAsyncOperation(const XOsFileAsyncOperation& operation, const void* pBuffer) :
 		operation_(operation),
 		pWriteBuffer_(pBuffer),
-	//	pFileData_(nullptr),
 		isReadOperation_(false)
 	{
 
 	}
 
 
-	inline bool hasFinished(void) const {
-		return operation_.hasFinished();
+	inline bool hasFinished(uint32_t* pNumBytes = nullptr) const {
+		return operation_.hasFinished(pNumBytes);
 	}
 	inline uint32_t waitUntilFinished(void) const {
 		return operation_.waitUntilFinished();
