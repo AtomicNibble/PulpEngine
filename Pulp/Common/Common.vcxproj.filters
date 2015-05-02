@@ -1485,9 +1485,6 @@
     <ClCompile Include="Threading\win32\Signal.cpp">
       <Filter>SourceFiles\Threading\win32</Filter>
     </ClCompile>
-    <ClCompile Include="String\GrowingStringTable.cpp">
-      <Filter>SourceFiles\String</Filter>
-    </ClCompile>
     <ClCompile Include="Threading\win32\Thread.cpp">
       <Filter>SourceFiles\Threading\win32</Filter>
     </ClCompile>
