@@ -5,19 +5,14 @@
 
 X_NAMESPACE_BEGIN(core)
 
-//
-// a refrence counter object for use with arena
-//
-// I should really use this for everything no?
-//
-//
-//
+// ReferenceCountedInstance can be used to keep one copy of a instance so that the memory address
+// does not change if when the owner does.
 template <class T>
-class ReferenceCountedArena
+class ReferenceCountedInstance
 {
 public:
-	X_INLINE ReferenceCountedArena(void);
-	X_INLINE explicit ReferenceCountedArena(const T& instance);
+	X_INLINE ReferenceCountedInstance(void);
+	X_INLINE explicit ReferenceCountedInstance(const T& instance);
 
 	X_INLINE uint32_t addReference(void);
 	X_INLINE uint32_t removeReference(void);
@@ -25,20 +20,26 @@ public:
 	// returns the ref count, used in the UT mainly.
 	X_INLINE uint32_t getRefCount(void) const;
 
+
+	X_INLINE T* instance(void);
+	X_INLINE const T* instance(void) const;
 private:
+	T instance_;
 	mutable uint32_t refCount_;
 };
 
 
-template<typename T>
+// this can be used to inhert a instance
+// to give it refrence counting 
+template <class T>
 class ReferenceCounted
 {
 public:
-	X_INLINE ReferenceCounted();
-	X_INLINE virtual ~ReferenceCounted();
+	X_INLINE ReferenceCounted(void);
 
-	X_INLINE void addRef(void);
-	X_INLINE uint32_t release(void);
+	X_INLINE uint32_t addReference(void);
+	X_INLINE uint32_t removeReference(void);
+	X_INLINE uint32_t getRefCount(void) const;
 
 private:
 	mutable uint32_t refCount_;

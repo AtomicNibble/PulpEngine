@@ -1,58 +1,70 @@
 
 template <class T>
-ReferenceCountedArena<T>::ReferenceCountedArena(void)
-	: refCount_(1)
+ReferenceCountedInstance<T>::ReferenceCountedInstance(void)
+	: instance_(),
+	refCount_(1)
 {
 }
 
 
 template <class T>
-ReferenceCountedArena<T>::ReferenceCountedArena(const T& instance)
-	: refCount_(1)
+ReferenceCountedInstance<T>::ReferenceCountedInstance(const T& instance)
+	: instance_(instance),
+	refCount_(1)
 {
 }
 
 
 template <class T>
-uint32_t ReferenceCountedArena<T>::addReference(void)
+uint32_t ReferenceCountedInstance<T>::addReference(void)
 {
 	return ++refCount_;
 }
 
 
 template <class T>
-uint32_t ReferenceCountedArena<T>::removeReference(void)
+uint32_t ReferenceCountedInstance<T>::removeReference(void)
 {
 	return --refCount_;
 }
 
 
-
-
-// -------------------------------------------------------------
-// -------------------------------------------------------------
-
-template<typename T>
-ReferenceCounted<T>::ReferenceCounted() :
-refCount_(0)
+template <class T>
+T* ReferenceCountedInstance<T>::instance(void)
 {
-
+	return &instance_;
 }
 
-template<typename T>
-ReferenceCounted<T>::~ReferenceCounted()
+template <class T>
+const T* ReferenceCountedInstance<T>::instance(void) const
 {
-	X_ASSERT(refCount_ == 0, "refcounted object refe count is not zero")(refCount_);
+	return &instance_;
 }
 
-template<typename T>
-void ReferenceCounted<T>::addRef(void)
+
+// ======================================
+
+
+template <class T>
+ReferenceCounted<T>::ReferenceCounted(void) :
+	refCount_(1)
 {
-	refCount_++;
 }
 
-template<typename T>
-uint32_t ReferenceCounted<T>::release(void)
+template <class T>
+X_INLINE uint32_t ReferenceCounted<T>::addReference(void)
+{
+	return ++refCount_;
+}
+	
+template <class T>	
+X_INLINE uint32_t ReferenceCounted<T>::removeReference(void)
 {
 	return --refCount_;
+}
+
+template <class T>
+X_INLINE uint32_t ReferenceCounted<T>::getRefCount(void) const
+{
+	return refCount_;
 }

@@ -3,14 +3,25 @@
 #ifndef _X_FILE_SYSTEM_OSFILE_ASYNC_OPERATION_H_
 #define _X_FILE_SYSTEM_OSFILE_ASYNC_OPERATION_H_
 
+#include "Util\ReferenceCounted.h"
+#include "Util\ReferenceCountedOwner.h"
 
 X_NAMESPACE_BEGIN(core)
 
 struct XOsFileAsyncOperation
 {
-	XOsFileAsyncOperation(HANDLE hFile);
+	struct ReferenceCountedOverlapped : public OVERLAPPED, public
+		core::ReferenceCounted<ReferenceCountedOverlapped>
+	{
+
+	};
+
+//	typedef core::ReferenceCounted<OVERLAPPED> ReferenceCountedOverlapped;
 
 public:
+
+	XOsFileAsyncOperation(MemoryArenaBase* arena, HANDLE hFile, size_t position);
+
 	bool hasFinished(void) const;
 
 	// Waits until the asynchronous operation has finished
@@ -21,14 +32,14 @@ public:
 
 
 	X_INLINE OVERLAPPED* getOverlapped(void) {
-		return &overlapped_;
+		return overlapped_.instance();
 	}
 	X_INLINE const OVERLAPPED* getOverlapped(void) const {
-		return &overlapped_;
+		return overlapped_.instance();
 	}
 private:
 	HANDLE hFile_;
-	OVERLAPPED overlapped_;
+	mutable ReferenceCountedOwner<ReferenceCountedOverlapped> overlapped_;
 };
 
 
