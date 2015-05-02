@@ -913,9 +913,6 @@
     <ClInclude Include="Math\XWinding.h">
       <Filter>Headers\Math</Filter>
     </ClInclude>
-    <ClInclude Include="IBsp.h">
-      <Filter>Interfaces_h</Filter>
-    </ClInclude>
     <ClInclude Include="Util\FloatIEEEUtil.h">
       <Filter>Headers\Util</Filter>
     </ClInclude>
@@ -992,6 +989,9 @@
       <Filter>Headers\Threading</Filter>
     </ClInclude>
     <ClInclude Include="IJobSystem.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="ILevel.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
   </ItemGroup>
