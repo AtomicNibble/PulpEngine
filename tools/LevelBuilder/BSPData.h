@@ -3,7 +3,7 @@
 #ifndef X_BSP_DATA_H_
 #define X_BSP_DATA_H_
 
-#include <IBsp.h>
+#include <Ilevel.h>
 
 
 struct BSPData

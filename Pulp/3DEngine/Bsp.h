@@ -3,7 +3,7 @@
 #ifndef X_BSP_LOADER_H_
 #define X_BSP_LOADER_H_
 
-#include <IBsp.h>
+#include <Ilevel.h>
 // #include <IModel.h>
 
 X_NAMESPACE_DECLARE(model,

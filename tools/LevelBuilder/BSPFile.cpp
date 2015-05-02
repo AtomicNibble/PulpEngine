@@ -2,7 +2,7 @@
 #include "BSPTypes.h"
 #include <IFileSys.h>
 
-#include <IBsp.h>
+#include <Ilevel.h>
 
 #include <Hashing\crc32.h>
 
