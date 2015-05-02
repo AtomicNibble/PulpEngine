@@ -10,20 +10,35 @@
 
 X_NAMESPACE_BEGIN(level)
 
-namespace
+AsyncLoadData::~AsyncLoadData()
 {
-
-
-
+	// cancel the read request
+	AsyncOp_.cancel();
+	// close file.
+	gEnv->pFileSys->closeFileAsync(pFile_);
 }
 
+// --------------------------------
+
 Level::Level() :
-	numAreas_(0),
-	areaModels_(g_3dEngineArena)
+areaModels_(g_3dEngineArena)
 {
+	canRender_ = false;
+
 	pFileData_ = nullptr;
+	pAsyncLoadData_ = nullptr;
+
+	pTimer_ = nullptr;
+	pFileSys_ = nullptr;
 
 	core::zero_object(fileHdr_);
+
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pTimer);
+	X_ASSERT_NOT_NULL(gEnv->pFileSys);
+
+	pTimer_ = gEnv->pTimer;
+	pFileSys_ = gEnv->pFileSys;
 }
 
 Level::~Level()
@@ -31,16 +46,55 @@ Level::~Level()
 	free();
 }
 
+void Level::update(void)
+{
+	// are we trying to read?
+	if (pAsyncLoadData_)
+	{
+		uint32_t numbytes = 0;
+
+		if (pAsyncLoadData_->AsyncOp_.hasFinished(&numbytes))
+		{
+			if (!pAsyncLoadData_->headerLoaded_)
+			{
+				pAsyncLoadData_->headerLoaded_ = true;
+				ProcessHeader(numbytes);
+			}
+			else
+			{
+				// the data is loaded.
+				ProcessData(numbytes);
+			}
+		}
+	}
+}
+
 void Level::free(void)
 {
+	canRender_ = false;
+
+	areaModels_.free();
+
 	if (pFileData_) {
 		X_DELETE_ARRAY(pFileData_, g_3dEngineArena);
 		pFileData_ = nullptr;
 	}
+
+	if (pAsyncLoadData_) {
+		X_DELETE_AND_NULL(pAsyncLoadData_, g_3dEngineArena);
+	}
+}
+
+bool Level::canRender(void)
+{
+	return canRender_;
 }
 
 bool Level::render(void)
 {
+	if (!canRender())
+		return false;
+
 	core::Array<AreaModel>::ConstIterator it = areaModels_.begin();
 	for (; it != areaModels_.end(); ++it)
 	{
@@ -54,23 +108,154 @@ bool Level::render(void)
 bool Level::Load(const char* mapName)
 {
 	// does the other level file exsist?
-	core::Path levelFile(mapName);
-	levelFile.setExtension(level::LVL_FILE_EXTENSION);
+	path_.set(mapName);
+	path_.setExtension(level::LVL_FILE_EXTENSION);
 
-	if (!gEnv->pFileSys->fileExists(levelFile.c_str())) {
+	if (!gEnv->pFileSys->fileExists(path_.c_str())) {
 		X_ERROR("Level", "could not find level file: \"%s\"",
-			levelFile.c_str());
+			path_.c_str());
 		return false;
 	}
 
-	X_LOG0("3DEngine", "Loading level: %s", mapName);
-	loadStats_ = LoadStats();
-	loadStats_.startTime = gEnv->pTimer->GetTimeReal();
+	// free it :)
+	free();
 
-	// dispatch a read request for the header.
+	X_LOG0("Level", "Loading level: %s", mapName);
+	loadStats_ = LoadStats();
+	loadStats_.startTime = pTimer_->GetTimeReal();
+
+	// clear it.
 	core::zero_object(fileHdr_);
 
+	core::fileModeFlags mode = core::fileMode::READ;
+	core::XFileAsync* pFile = pFileSys_->openFileAsync(path_.c_str(), mode);
+	if (!pFile) {
+		return false;
+	}
 
+	core::XFileAsyncOperation HeaderOp = pFile->readAsync(&fileHdr_, sizeof(fileHdr_), 0);
+
+	pAsyncLoadData_ = X_NEW(AsyncLoadData, g_3dEngineArena, "LevelLoadHandles")(pFile, HeaderOp);
+	return true;
+}
+
+bool Level::ProcessHeader(uint32_t bytesRead)
+{
+	if (bytesRead != sizeof(fileHdr_)) {
+		X_ERROR("Level", "failed to read header file: %s", path_.fileName());
+
+		return false;
+	}
+
+	// is this header valid m'lady?
+	if (!fileHdr_.isValid())
+	{
+		// this header is not valid :Z
+		if (fileHdr_.fourCC == LVL_FOURCC_INVALID)
+		{
+			X_ERROR("Level", "%s file is corrupt, please re-compile.", path_.fileName());
+			return false;
+		}
+	
+		X_ERROR("Level", "%s is not a valid level", path_.fileName());
+		return false;
+	}
+
+	if (fileHdr_.version != LVL_VERSION)
+	{
+		X_ERROR("Level", "%s has a invalid version. provided: %i required: %i",
+			path_.fileName(), fileHdr_.version, LVL_VERSION);
+		return false;
+	}
+
+	if (fileHdr_.datasize <= 0)
+	{
+		X_ERROR("Level", "level file is empty");
+		return false;
+	}
+
+	// require atleast one area.
+	if (fileHdr_.numAreas < 1)
+	{
+		X_ERROR("Level", "Level file has no areas");
+		return false;
+	}
+
+	// allocate the file data.
+	pFileData_ = X_NEW_ARRAY(uint8_t, fileHdr_.datasize, g_3dEngineArena, "LevelBuffer");
+	
+	pAsyncLoadData_->AsyncOp_ = pAsyncLoadData_->pFile_->readAsync(pFileData_, 
+		fileHdr_.datasize, sizeof(fileHdr_));
+
+	return true;
+}
+
+bool Level::ProcessData(uint32_t bytesRead)
+{
+	if (bytesRead != fileHdr_.datasize) {
+		X_ERROR("Bsp", "failed to read level file. read: %i of %i",
+			bytesRead, fileHdr_.datasize);
+		return false;
+	}
+
+	core::StackString<64> meshName;
+	core::MemCursor<uint8_t> cursor(pFileData_, fileHdr_.datasize);
+	uint32_t x, numSub;
+
+	areaModels_.reserve(fileHdr_.numAreas);
+	for (uint32_t i = 0; i < fileHdr_.numAreas; i++)
+	{
+		model::MeshHeader* pMesh = cursor.getSeekPtr<model::MeshHeader>();
+		numSub = pMesh->numSubMeshes;
+
+		X_ASSERT(numSub > 0, "a areamodel can't have zero meshes")(numSub);
+
+		// set meshHeads verts and faces.
+		pMesh->subMeshHeads = cursor.postSeekPtr<model::SubMeshHeader>(numSub);
+
+		// verts
+		for (x = 0; x < numSub; x++)
+		{
+			model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
+			pSubMesh->verts = cursor.postSeekPtr<level::Vertex>(pSubMesh->numVerts);;
+		}
+
+		// indexs
+		for (x = 0; x < numSub; x++)
+		{
+			model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
+			pSubMesh->indexes = cursor.postSeekPtr<model::Index>(pSubMesh->numIndexes);
+		}
+
+		// set the mesh head pointers.
+		pMesh->streams[VertexStream::VERT] = pMesh->subMeshHeads[0]->verts;
+		pMesh->indexes = pMesh->subMeshHeads[0]->indexes;
+
+		meshName.clear();
+		meshName.appendFmt("$area_mesh%i", i);
+
+		AreaModel area;
+		area.pMesh = pMesh;
+		area.pRenderMesh = gEnv->pRender->createRenderMesh(pMesh,
+			shader::VertexFormat::P3F_T4F_C4B_N3F, meshName.c_str());
+		area.pRenderMesh->uploadToGpu();
+
+		areaModels_.append(area);
+	}
+
+	if (!cursor.isEof())
+	{
+		X_WARNING("Level", "potential read error, cursor is not at end");
+	}
+
+	// clean up.
+	X_DELETE_AND_NULL(pAsyncLoadData_, g_3dEngineArena);
+
+	// stats.
+	loadStats_.elapse = pTimer_->GetTimeReal() - loadStats_.startTime;
+
+	// safe to render?
+	canRender_ = true;
 
 	return true;
 }

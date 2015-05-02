@@ -19,7 +19,33 @@ X_NAMESPACE_BEGIN(level)
 struct LoadStats
 {
 	core::TimeVal startTime;
-	core::TimeVal endTime;
+	core::TimeVal elapse;
+};
+
+struct AsyncLoadData
+{
+	AsyncLoadData(core::XFileAsync* pFile, core::XFileAsyncOperation AsyncOp) :
+	headerLoaded_(false),
+	pFile_(pFile), 
+	AsyncOp_(AsyncOp)
+	{}
+
+	~AsyncLoadData();
+
+	bool headerLoaded_;
+	core::XFileAsync* pFile_;
+	core::XFileAsyncOperation AsyncOp_;
+};
+
+struct AreaModel
+{
+	AreaModel() {
+		pMesh = nullptr;
+		pRenderMesh = nullptr;
+	}
+
+	model::MeshHeader* pMesh;
+	model::IRenderMesh* pRenderMesh;
 };
 
 class Level
@@ -28,35 +54,34 @@ public:
 	Level();
 	~Level();
 
+	void update(void);
+
 	void free(void);
+	bool canRender(void);
 	bool render(void);
 
 	bool Load(const char* mapName);
 
+private:
+	bool ProcessHeader(uint32_t bytesRead);
+	bool ProcessData(uint32_t bytesRead);
 
 private:
-
-	uint32_t numAreas_;
-
-
-	struct AreaModel
-	{
-		AreaModel() {
-			pMesh = nullptr;
-			pRenderMesh = nullptr;
-		}
-
-		model::MeshHeader* pMesh;
-		model::IRenderMesh* pRenderMesh;
-	};
-
 	core::Array<AreaModel> areaModels_;
 	uint8_t* pFileData_;
 
-private:
-	FileHeader fileHdr_;
+	bool canRender_;
+	bool _pad[3];
 
+private:
+	core::Path path_;
+	FileHeader fileHdr_;
 	LoadStats loadStats_;
+	AsyncLoadData* pAsyncLoadData_;
+
+private:
+	core::ITimer* pTimer_;
+	core::IFileSys* pFileSys_;
 };
 
 
