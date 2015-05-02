@@ -77,6 +77,9 @@ IdType GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::addSt
 	// get header that is aligned after the header.
 	Header_t* pHeader = getCurrentAlignedHeader();
 
+	// set magic.
+	pHeader->magic = Header_t::HEADER_MAGIC;
+
 	// set length
 	pHeader->Length = safe_static_cast<uint8_t, size_t>(Len);
 
