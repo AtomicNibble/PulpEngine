@@ -7,7 +7,7 @@
 
 #include <Memory\MemCursor.h>
 
-X_NAMESPACE_BEGIN(bsp)
+X_NAMESPACE_BEGIN(level)
 
 namespace
 {
@@ -16,19 +16,19 @@ namespace
 
 }
 
-Bsp::Bsp() :
+Level::Level() :
 	numAreas_(0),
 	areaModels_(g_3dEngineArena)
 {
 	pFileData_ = nullptr;
 }
 
-Bsp::~Bsp()
+Level::~Level()
 {
 	free();
 }
 
-void Bsp::free(void)
+void Level::free(void)
 {
 	if (pFileData_) {
 		X_DELETE_ARRAY(pFileData_, g_3dEngineArena);
@@ -36,7 +36,7 @@ void Bsp::free(void)
 	}
 }
 
-bool Bsp::render(void)
+bool Level::render(void)
 {
 	core::Array<AreaModel>::ConstIterator it = areaModels_.begin();
 	for (; it != areaModels_.end(); ++it)
@@ -48,7 +48,7 @@ bool Bsp::render(void)
 }
 
 
-bool Bsp::LoadFromFile(const char* filename)
+bool Level::LoadFromFile(const char* filename)
 {
 	X_ASSERT_NOT_NULL(filename);
 
@@ -63,7 +63,7 @@ bool Bsp::LoadFromFile(const char* filename)
 	core::zero_object(hdr);
 
 	path.append(filename);
-	path.setExtension(bsp::BSP_FILE_EXTENSION);
+	path.setExtension(level::LVL_FILE_EXTENSION);
 
 	LumpsLoaded = false;
 
@@ -76,7 +76,7 @@ bool Bsp::LoadFromFile(const char* filename)
 		if (!hdr.isValid())
 		{
 			// this header is not valid :Z
-			if (hdr.fourCC == BSP_FOURCC_INVALID)
+			if (hdr.fourCC == LVL_FOURCC_INVALID)
 			{
 				X_ERROR("Bsp", "%s file is corrupt, please re-compile.", path.fileName());
 			}
@@ -88,10 +88,10 @@ bool Bsp::LoadFromFile(const char* filename)
 			return false;
 		}
 
-		if (hdr.version != BSP_VERSION)
+		if (hdr.version != LVL_VERSION)
 		{
 			X_ERROR("Bsp", "%s has a invalid version. provided: %i required: %i",
-				path.fileName(), hdr.version, BSP_VERSION);
+				path.fileName(), hdr.version, LVL_VERSION);
 			return false;
 		}
 
@@ -144,7 +144,7 @@ bool Bsp::LoadFromFile(const char* filename)
 			for (x = 0; x < numSub; x++)
 			{
 				model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
-				pSubMesh->verts = cursor.postSeekPtr<bsp::Vertex>(pSubMesh->numVerts);;
+				pSubMesh->verts = cursor.postSeekPtr<level::Vertex>(pSubMesh->numVerts);;
 			}
 
 			// indexs

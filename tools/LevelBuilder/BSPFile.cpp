@@ -8,7 +8,7 @@
 
 X_USING_NAMESPACE;
 
-using namespace bsp;
+using namespace level;
 
 namespace
 {
@@ -20,8 +20,8 @@ namespace
 		file->writeObj(pModel->meshes.ptr(),(pModel->meshes.size()));
 
 		// write the streams.
-		core::Array<bsp::Vertex>::ConstIterator it = pModel->verts.begin();
-		core::Array<bsp::Vertex>::ConstIterator end = pModel->verts.end();
+		core::Array<level::Vertex>::ConstIterator it = pModel->verts.begin();
+		core::Array<level::Vertex>::ConstIterator end = pModel->verts.end();
 		for (; it != end; ++it) {
 			file->writeObj(it->pos);
 			file->writeObj(it->texcoord);
@@ -55,8 +55,8 @@ bool LvlBuilder::save(const char* name)
 	mode.Set(core::fileMode::RANDOM_ACCESS); // we do a seek.
 
 	core::zero_object(hdr);
-	hdr.fourCC = BSP_FOURCC_INVALID;
-	hdr.version = BSP_VERSION;
+	hdr.fourCC = LVL_FOURCC_INVALID;
+	hdr.version = LVL_VERSION;
 	hdr.datacrc32 = 0; 
 	hdr.modified = core::dateTimeStampSmall::systemDateTime();
 
@@ -64,7 +64,7 @@ bool LvlBuilder::save(const char* name)
 	hdr.stringDataSize = safe_static_cast<uint32_t, size_t>(stringTable_.bytesUsed());
 
 	path.append(name);
-	path.setExtension(bsp::BSP_FILE_EXTENSION);
+	path.setExtension(level::LVL_FILE_EXTENSION);
 
 	core::Crc32 crc;
 
@@ -85,7 +85,7 @@ bool LvlBuilder::save(const char* name)
 
 
 		// update FourcCC to mark this bsp as valid.
-		hdr.fourCC = BSP_FOURCC;
+		hdr.fourCC = LVL_FOURCC;
 		hdr.numAreas = safe_static_cast<uint32_t,size_t>(areas_.size());
 		// crc the header
 		hdr.datacrc32 = crc.GetCRC32((const char*)&hdr, sizeof(hdr));

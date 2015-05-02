@@ -80,7 +80,7 @@ bool bspBrush::boundBrush(const XPlaneSet& planes)
 	}
 
 	for (i = 0; i < 3; i++) {
-		if (bounds.min[i] < bsp::MIN_WORLD_COORD || bounds.max[i] > bsp::MAX_WORLD_COORD
+		if (bounds.min[i] < level::MIN_WORLD_COORD || bounds.max[i] > level::MAX_WORLD_COORD
 			|| bounds.min[i] >= bounds.max[i])
 		{
 			// calculate a pos.

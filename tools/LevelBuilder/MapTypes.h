@@ -43,7 +43,7 @@ public:
 
 	struct MaterialInfo
 	{
-		core::StackString<bsp::MAP_MAX_MATERIAL_LEN> name;
+		core::StackString<level::MAP_MAX_MATERIAL_LEN> name;
 		Vec2f				  matRepeate;
 		Vec2f				  shift;
 		float				  rotate;

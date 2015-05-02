@@ -45,7 +45,9 @@ private:
 
 	gui::XGuiManager guisMan_;
 
-	bsp::Bsp map;
+	level::Level level_;
+
+
 	model::XModel model, modelSky;
 	model::IRenderMesh* pMesh;
 	model::IRenderMesh* pSkybox;

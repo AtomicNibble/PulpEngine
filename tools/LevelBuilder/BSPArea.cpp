@@ -13,22 +13,22 @@ indexes(g_arena)
 
 bool AreaModel::BelowLimits(void)
 {
-	if (meshes.size() > bsp::MAP_MAX_MODEL_SURFACES)
+	if (meshes.size() > level::MAP_MAX_MODEL_SURFACES)
 	{
 		X_ERROR("Bsp", "too many surfaces on AreaModel. num: %i max: %i",
-			meshes.size(), bsp::MAP_MAX_MODEL_SURFACES);
+			meshes.size(), level::MAP_MAX_MODEL_SURFACES);
 		return false;
 	}
-	if (verts.size() > bsp::MAP_MAX_MODEL_VERTS)
+	if (verts.size() > level::MAP_MAX_MODEL_VERTS)
 	{
 		X_ERROR("Bsp", "too many verts for AreaModel. num: %i max: %i",
-			verts.size(), bsp::MAP_MAX_MODEL_VERTS);
+			verts.size(), level::MAP_MAX_MODEL_VERTS);
 		return false;
 	}
-	if (indexes.size() > bsp::MAP_MAX_MODEL_INDEXES)
+	if (indexes.size() > level::MAP_MAX_MODEL_INDEXES)
 	{
 		X_ERROR("Bsp", "too many indexes for AreaModel. num: %i max: %i",
-			indexes.size(), bsp::MAP_MAX_MODEL_INDEXES);
+			indexes.size(), level::MAP_MAX_MODEL_INDEXES);
 		return false;
 	}
 
@@ -101,7 +101,7 @@ void LvlArea::AreaEnd(void)
 		model::SubMeshHeader mesh;
 		mesh.boundingBox.clear();
 
-		core::Array<bsp::Vertex>::ConstIterator vertIt = aSub.verts_.begin();
+		core::Array<level::Vertex>::ConstIterator vertIt = aSub.verts_.begin();
 		for (; vertIt != aSub.verts_.end(); ++vertIt) {
 			mesh.boundingBox.add(vertIt->pos);
 		}

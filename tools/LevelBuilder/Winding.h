@@ -244,7 +244,7 @@ X_INLINE bool XWinding::IsHuge(void) const
 
 	for (i = 0; i < numPoints; i++) {
 		for (j = 0; j < 3; j++) {
-			if (p[i][j] <= bsp::MIN_WORLD_COORD || p[i][j] >= bsp::MAX_WORLD_COORD) {
+			if (p[i][j] <= level::MIN_WORLD_COORD || p[i][j] >= level::MAX_WORLD_COORD) {
 				return true;
 			}
 		}

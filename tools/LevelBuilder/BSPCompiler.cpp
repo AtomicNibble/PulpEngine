@@ -182,7 +182,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent, mapfile::XMapBrush* mapBrush, int 
 	pBrush->allsidesSameMat = true;
 
 
-	core::StackString<bsp::MAP_MAX_MATERIAL_LEN> lastMatName;
+	core::StackString<level::MAP_MAX_MATERIAL_LEN> lastMatName;
 
 	numSides = mapBrush->GetNumSides();
 	for (i = 0; i < numSides; i++)

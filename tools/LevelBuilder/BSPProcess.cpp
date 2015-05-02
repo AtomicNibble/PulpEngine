@@ -25,7 +25,7 @@ namespace
 
 #define TINY_AREA   1.0f
 
-	bool IsTriangleDegenerate(bsp::Vertex* points, const model::Face& face)
+	bool IsTriangleDegenerate(level::Vertex* points, const model::Face& face)
 	{
 		Vec3f v1, v2, v3;
 		float d;
@@ -48,12 +48,12 @@ namespace
 	bool FanFaceSurface(int numVerts, size_t StartVert, AreaSubMesh* pSubmesh)
 	{
 		int i, j;
-		bsp::Vertex *verts, *centroid, *dv;
+		level::Vertex *verts, *centroid, *dv;
 		float iv;
 
 		verts = &pSubmesh->verts_[StartVert];
 
-		pSubmesh->verts_.insert(bsp::Vertex(), StartVert);
+		pSubmesh->verts_.insert(level::Vertex(), StartVert);
 
 		centroid = &pSubmesh->verts_[StartVert];
 		// add up the drawverts to create a centroid 
@@ -109,7 +109,7 @@ namespace
 		int i, r, ni;
 		int rotate;
 		int numIndexes;
-		bsp::Vertex* pVerts;
+		level::Vertex* pVerts;
 		core::FixedArray<model::Face, 1024> indexes;
 
 		pVerts = &pSubmesh->verts_[StartVert];
@@ -285,7 +285,7 @@ bool LvlBuilder::ProcessWorldModel(const LvlEntity& ent)
 
 			for (p = 0; p < numPoints; p++)
 			{
-				bsp::Vertex vert;
+				level::Vertex vert;
 				const Vec5f& vec = w->operator[](p);
 
 				vert.pos = vec.asVec3();

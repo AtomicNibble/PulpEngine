@@ -90,7 +90,7 @@ struct LvlEntity
 
 struct LvlMaterial
 {
-	core::StackString<bsp::MAP_MAX_MATERIAL_LEN> name;
+	core::StackString<level::MAP_MAX_MATERIAL_LEN> name;
 	Vec2f				  matRepeate;
 	Vec2f				  shift;
 	float				  rotate;
@@ -223,7 +223,7 @@ struct bspDrawSurface
 
 	// verts
 	int numVerts;                           
-	bsp::Vertex* pVerts;
+	level::Vertex* pVerts;
 	// indexes
 	int numIndexes;
 	int* pIndexes;
@@ -257,7 +257,7 @@ struct AreaModel
 	void EndModel(void);
 
 	core::Array<model::SubMeshHeader> meshes;
-	core::Array<bsp::Vertex> verts;
+	core::Array<level::Vertex> verts;
 	core::Array<model::Face> indexes;
 
 	model::MeshHeader model;
@@ -269,7 +269,7 @@ struct AreaSubMesh
 {
 	AreaSubMesh() : verts_(g_arena), indexes_(g_arena) {}
 
-	void AddVert(const bsp::Vertex& vert) {
+	void AddVert(const level::Vertex& vert) {
 		verts_.append(vert);
 	}
 
@@ -277,7 +277,7 @@ struct AreaSubMesh
 
 	// index's for this sub mesh.
 	// merged into AreaModel list at end.
-	core::Array<bsp::Vertex> verts_;
+	core::Array<level::Vertex> verts_;
 	core::Array<model::Face> indexes_;
 };
 

@@ -12,14 +12,14 @@ struct IRenderMesh;
 )
 
 
-X_NAMESPACE_BEGIN(bsp)
+X_NAMESPACE_BEGIN(level)
 
 
-class Bsp
+class Level
 {
 public:
-	Bsp();
-	~Bsp();
+	Level();
+	~Level();
 
 	void free(void);
 	bool render(void);

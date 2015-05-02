@@ -78,8 +78,8 @@ void XWinding::BaseForPlane(const Vec3f &normal, const float dist)
 
 	NormalVectors(normal, vup, vright);
 
-	vup *= bsp::MAX_WORLD_SIZE;
-	vright *= bsp::MAX_WORLD_SIZE;
+	vup *= level::MAX_WORLD_SIZE;
+	vright *= level::MAX_WORLD_SIZE;
 
 	EnsureAlloced(4);
 	numPoints = 4;

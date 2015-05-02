@@ -11,7 +11,7 @@
 
 #include <IRenderMesh.h>
 
-X_NAMESPACE_BEGIN(bsp)
+X_NAMESPACE_BEGIN(level)
 
 
 //
@@ -218,12 +218,12 @@ X_NAMESPACE_BEGIN(bsp)
 //
 //
 
-static const uint32_t	 BSP_VERSION = 10; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
-static const uint32_t	 BSP_FOURCC = X_TAG('x', 'l', 'v', 'l');
-static const uint32_t	 BSP_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r'); // if a file falid to write the final header, this will be it's FourCC
+static const uint32_t	 LVL_VERSION = 10; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
+static const uint32_t	 LVL_FOURCC = X_TAG('x', 'l', 'v', 'l');
+static const uint32_t	 LVL_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r'); // if a file falid to write the final header, this will be it's FourCC
 // feels kinda wrong to call it a '.bsp', since it's otherthings as well. 
 // '.level' is more pleasing to me and more importantly the BushMaster of Christmas Island(Southeast Asia).
-static const char*		 BSP_FILE_EXTENSION = ".level"; // ".bsp";
+static const char*		 LVL_FILE_EXTENSION = ".level"; // ".bsp";
 
 // a level can not exceed this size.
 static const int32_t	 MAX_WORLD_COORD = (128 * 1024);
@@ -451,7 +451,7 @@ struct FileHeader
 	uint32_t numAreas;
 
 	const bool isValid(void) const {
-		return fourCC == BSP_FOURCC;
+		return fourCC == LVL_FOURCC;
 	}
 };
 
