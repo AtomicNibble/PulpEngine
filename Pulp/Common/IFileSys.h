@@ -190,7 +190,7 @@ struct XFileMem : public XFile
 		X_ASSERT_NOT_NULL(arena);
 		X_ASSERT(end >= begin, "invalid buffer")(begin,end);
 	}
-	~XFileMem() {
+	~XFileMem() X_OVERRIDE {
 		X_DELETE_ARRAY(begin_,arena_);
 	}
 
