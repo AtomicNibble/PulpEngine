@@ -109,15 +109,20 @@ void LvlArea::AreaEnd(void)
 		mesh.boundingSphere = Sphere(mesh.boundingBox);
 		mesh.numIndexes = safe_static_cast<uint16_t, size_t>(aSub.faces_.size() * 3);
 		mesh.numVerts = safe_static_cast<uint16_t, size_t>(aSub.verts_.size());
-		mesh.startIndex = safe_static_cast<uint32_t, size_t>(model.faces.size());
+		mesh.startIndex = safe_static_cast<uint32_t, size_t>(model.faces.size()  * 3);
 		mesh.startVertex = safe_static_cast<uint32_t, size_t>(model.verts.size());
 		mesh.streamsFlag = model::StreamType::COLOR | model::StreamType::NORMALS;
 
 		mesh.materialName = aSub.matNameID_;
+		
+		X_LOG0("SubMesh", "Mat: ^3%s^7 verts: %i indexs: %i", 
+			aSub.matName_.c_str(), mesh.numVerts, mesh.numIndexes);
 
-		// add verts / indexs.
+		// faces
 		model.faces.append(aSub.faces_);
+		// add verts
 		model.verts.append(aSub.verts_);
+		// add the mesh
 		model.meshes.append(mesh);
 	}
 
@@ -143,6 +148,7 @@ AreaSubMesh* LvlArea::MeshForSide(const BspSide& side, StringTableType& stringTa
 
 	// add mat name to string table.
 	newMesh.matNameID_ = stringTable.addStringUnqiue(side.material.name.c_str());
+	newMesh.matName_ = side.material.name;
 
 	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes.insert(AreaMeshMap::value_type(side.material.name.c_str(), newMesh));
 	return &newIt.first->second;
