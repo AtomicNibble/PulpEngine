@@ -268,6 +268,8 @@ bool Level::ProcessData(uint32_t bytesRead)
 	}
 
 	// clean up.
+	pFileSys_->closeFileAsync(pAsyncLoadData_->pFile_);
+
 	X_DELETE_AND_NULL(pAsyncLoadData_, g_3dEngineArena);
 
 	// stats.
