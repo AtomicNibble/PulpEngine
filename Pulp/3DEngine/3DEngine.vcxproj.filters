@@ -15,9 +15,6 @@
     <ClCompile Include="X3DEngine.cpp">
       <Filter>Engine</Filter>
     </ClCompile>
-    <ClCompile Include="Bsp.cpp">
-      <Filter>Level</Filter>
-    </ClCompile>
     <ClCompile Include="Gui\XWindow.cpp">
       <Filter>Gui</Filter>
     </ClCompile>
@@ -39,6 +36,9 @@
     <ClCompile Include="Gui\GuiScript.cpp">
       <Filter>Gui</Filter>
     </ClCompile>
+    <ClCompile Include="Level.cpp">
+      <Filter>Level</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
@@ -58,9 +58,6 @@
       <Filter>Engine</Filter>
     </ClInclude>
     <ClInclude Include="EngineBase.h" />
-    <ClInclude Include="Bsp.h">
-      <Filter>Level</Filter>
-    </ClInclude>
     <ClInclude Include="Gui\XWindow.h">
       <Filter>Gui</Filter>
     </ClInclude>
@@ -81,6 +78,9 @@
     </ClInclude>
     <ClInclude Include="Gui\GuiScript.h">
       <Filter>Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.h">
+      <Filter>Level</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

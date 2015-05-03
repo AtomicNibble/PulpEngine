@@ -366,7 +366,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Bsp.h" />
     <ClInclude Include="EngineBase.h" />
     <ClInclude Include="Gui\Gui.h" />
     <ClInclude Include="Gui\GuiManger.h" />
@@ -375,6 +374,7 @@
     <ClInclude Include="Gui\SimpleWindow.h" />
     <ClInclude Include="Gui\WinVar.h" />
     <ClInclude Include="Gui\XWindow.h" />
+    <ClInclude Include="Level.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialManager.h" />
     <ClInclude Include="ModelLoader.h" />
@@ -383,7 +383,6 @@
     <ClInclude Include="XModel.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Bsp.cpp" />
     <ClCompile Include="Gui\Gui.cpp" />
     <ClCompile Include="Gui\GuiManger.cpp" />
     <ClCompile Include="Gui\GuiScript.cpp" />
@@ -391,6 +390,7 @@
     <ClCompile Include="Gui\SimpleWindow.cpp" />
     <ClCompile Include="Gui\WinVar.cpp" />
     <ClCompile Include="Gui\XWindow.cpp" />
+    <ClCompile Include="Level.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
