@@ -1,127 +1,11 @@
 iwmap 4
 "000_Global" flags  active
-"The Map" flags 
+"The Map" flags expanded 
+"roof" flags 
 // entity 0
 {
 "classname" "worldspawn"
 // brush 0
-{
- ( -200 -128 128 ) ( -200 120 128 ) ( 184 120 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 184 -120 120 ) ( -184 -120 120 ) ( -192 -128 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 184 120 120 ) ( 184 -128 120 ) ( 192 -128 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -184 112 120 ) ( 184 112 120 ) ( 192 120 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -184 -128 120 ) ( -184 120 120 ) ( -192 120 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 184 112 120 ) ( -184 112 120 ) ( -184 -120 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
-}
-// brush 1
-{
- ( 192 120 0 ) ( -192 120 0 ) ( -192 -128 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -192 -128 0 ) ( -192 -120 8 ) ( 184 -120 8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 184 -120 8 ) ( 184 112 8 ) ( 192 120 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 192 112 8 ) ( -192 112 8 ) ( -192 120 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -184 112 8 ) ( -184 -120 8 ) ( -192 -128 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -184 -120 8 ) ( -184 112 8 ) ( 184 112 8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
-}
-// brush 2
-{
- ( 192 -120 8 ) ( -192 -120 8 ) ( -192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -192 -120 120 ) ( 192 -120 120 ) ( 192 -128 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -192 -128 8 ) ( 192 -128 8 ) ( 192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 184 -120 120 ) ( 184 -120 8 ) ( 192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -184 -120 8 ) ( -184 -120 120 ) ( -192 -128 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -184 -120 120 ) ( -184 -120 8 ) ( 184 -120 8 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
-}
-// brush 3
-{
- ( -184 -128 8 ) ( -184 120 8 ) ( -192 120 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -184 120 120 ) ( -184 -128 120 ) ( -192 -128 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -184 -120 120 ) ( -184 -120 8 ) ( -192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -184 112 8 ) ( -184 112 120 ) ( -192 120 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -192 120 8 ) ( -192 -128 8 ) ( -192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -184 -120 8 ) ( -184 -120 120 ) ( -184 112 120 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
-}
-// brush 4
-{
- ( 184 112 8 ) ( 184 -128 8 ) ( 192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 184 -128 120 ) ( 184 112 120 ) ( 192 120 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -192 -128 8 ) ( 192 -128 8 ) ( 192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 192 -128 8 ) ( 192 120 8 ) ( 192 120 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 184 112 128 ) ( 184 112 0 ) ( 192 120 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 184 -128 8 ) ( 184 112 8 ) ( 184 112 120 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
-}
-// brush 5
-{
- ( 8 0 8 ) ( 0 0 8 ) ( 0 -120 8 ) berlin_roofs_brick_slate3_wet 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 0 -120 120 ) ( 0 0 120 ) ( 8 0 120 ) berlin_roofs_brick_slate3_wet 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 0 -120 128 ) ( 8 -120 128 ) ( 8 -120 0 ) berlin_roofs_brick_slate3_wet 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 8 -120 128 ) ( 8 0 128 ) ( 8 0 0 ) berlin_roofs_brick_slate3_wet 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 8 0 128 ) ( 0 0 128 ) ( 0 0 0 ) berlin_roofs_brick_slate3_wet 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 0 0 128 ) ( 0 -120 128 ) ( 0 -120 0 ) berlin_roofs_brick_slate3_wet 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
-}
-// brush 6
-{
- ( -192 112 8 ) ( 184 112 8 ) ( 192 120 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 184 112 120 ) ( -192 112 120 ) ( -192 120 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 184 112 0 ) ( 184 112 128 ) ( 192 120 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 192 120 8 ) ( -192 120 8 ) ( -192 120 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 184 112 8 ) ( -192 112 8 ) ( -192 112 120 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 128 0 72 ) ( 128 0 32 ) ( 128 32 72 ) berlin_roof_brick_tile 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
-}
-// brush 7
-{
- ( 128 120 0 ) ( 64 120 0 ) ( 64 112 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 64 112 8 ) ( 64 120 8 ) ( 128 120 8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 64 112 8 ) ( 128 112 8 ) ( 128 112 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
- ( 128 112 8 ) ( 128 120 8 ) ( 128 120 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
- ( 128 256 0 ) ( 64 256 0 ) ( 64 256 -8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
- ( 64 120 8 ) ( 64 112 8 ) ( 64 112 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
-}
-// brush 8
-{
- ( 64 112 120 ) ( 128 112 120 ) ( 128 256 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 64 120 128 ) ( 64 128 128 ) ( 128 128 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 128 112 120 ) ( 64 112 120 ) ( 64 120 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 128 112 128 ) ( 128 120 128 ) ( 128 120 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 128 256 120 ) ( 64 256 120 ) ( 64 256 112 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 64 120 128 ) ( 64 112 128 ) ( 64 112 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
-}
-// brush 9
-{
- ( 128 448 120 ) ( 64 448 120 ) ( 64 312 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 8 0 0
- ( 64 256 128 ) ( 64 392 128 ) ( 128 392 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 8 0 0
- ( 64 256 128 ) ( 128 256 128 ) ( 128 256 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
- ( 256 256 128 ) ( 256 392 128 ) ( 256 392 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 -8 -8 0 0
- ( 128 448 128 ) ( 64 448 128 ) ( 64 448 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
- ( -64 376 128 ) ( -64 240 128 ) ( -64 240 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 -8 -8 0 0
-}
-// brush 10
-{
- ( 128 456 -8 ) ( 64 456 -8 ) ( 64 320 -8 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 56 264 128 ) ( 56 400 128 ) ( 120 400 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 64 448 0 ) ( 128 448 0 ) ( 128 448 -32 ) berlin_ceilings_metal 128 128 0 120 0 0 lightmap_gray 16384 16384 0 120 0 0
- ( 256 264 0 ) ( 256 400 0 ) ( 256 400 -32 ) berlin_ceilings_metal 128 128 0 120 0 0 lightmap_gray 16384 16384 0 120 0 0
- ( 128 456 0 ) ( 64 456 0 ) ( 64 456 -32 ) berlin_ceilings_metal 128 128 0 120 0 0 lightmap_gray 16384 16384 0 120 0 0
- ( -64 384 0 ) ( -64 248 0 ) ( -64 248 -32 ) berlin_ceilings_metal 128 128 0 120 0 0 lightmap_gray 16384 16384 0 120 0 0
-}
-// brush 11
-{
- ( 264 264 -8 ) ( 264 328 -8 ) ( 128 328 -8 ) berlin_ceilings_metal 128 128 -392 192 -90 0 lightmap_gray 16384 16384 -392 192 -90 0
- ( 72 336 128 ) ( 208 336 128 ) ( 208 272 128 ) berlin_ceilings_metal 128 128 -392 192 -90 0 lightmap_gray 16384 16384 -392 192 -90 0
- ( 256 328 0 ) ( 256 264 0 ) ( 256 264 -32 ) berlin_ceilings_metal 128 -128 -392 -120 180 0 lightmap_gray 16384 -16384 -392 -120 180 0
- ( 72 256 0 ) ( 208 256 0 ) ( 208 256 -32 ) berlin_ceilings_metal 128 128 -192 120 0 0 lightmap_gray 16384 16384 -192 120 0 0
- ( 264 424 0 ) ( 264 488 0 ) ( 264 488 -32 ) berlin_ceilings_metal 128 -128 -392 -120 180 0 lightmap_gray 16384 -16384 -392 -120 180 0
- ( 192 456 0 ) ( 56 456 0 ) ( 56 456 -32 ) berlin_ceilings_metal 128 128 -192 120 0 0 lightmap_gray 16384 16384 -192 120 0 0
-}
-// brush 12
-{
- ( -64 264 -8 ) ( -64 328 -8 ) ( -200 328 -8 ) berlin_ceilings_metal 128 128 -392 520 -90 0 lightmap_gray 16384 16384 -392 520 -90 0
- ( -256 336 128 ) ( -120 336 128 ) ( -120 272 128 ) berlin_ceilings_metal 128 128 -392 520 -90 0 lightmap_gray 16384 16384 -392 520 -90 0
- ( -72 328 0 ) ( -72 264 0 ) ( -72 264 -32 ) berlin_ceilings_metal 128 -128 -392 -120 180 0 lightmap_gray 16384 -16384 -392 -120 180 0
- ( -248 320 0 ) ( -112 320 0 ) ( -112 320 -32 ) berlin_ceilings_metal 128 128 -520 120 0 0 lightmap_gray 16384 16384 -520 120 0 0
- ( -64 424 0 ) ( -64 488 0 ) ( -64 488 -32 ) berlin_ceilings_metal 128 -128 -392 -120 180 0 lightmap_gray 16384 -16384 -392 -120 180 0
- ( -136 456 0 ) ( -272 456 0 ) ( -272 456 -32 ) berlin_ceilings_metal 128 128 -520 120 0 0 lightmap_gray 16384 16384 -520 120 0 0
-}
-// brush 13
 {
  ( -64 248 -8 ) ( 0 248 -8 ) ( 0 384 -8 ) berlin_ceilings_metal 128 128 -64 704 180 0 lightmap_gray 16384 16384 -64 704 180 0
  ( 8 440 128 ) ( 8 304 128 ) ( -56 304 128 ) berlin_ceilings_metal 128 128 -64 704 180 0 lightmap_gray 16384 16384 -64 704 180 0
@@ -130,7 +14,25 @@ iwmap 4
  ( 24 248 0 ) ( 88 248 0 ) ( 88 248 -32 ) berlin_ceilings_metal 128 -128 -64 -120 -180 0 lightmap_gray 16384 -16384 -64 -120 -180 0
  ( 56 320 0 ) ( 56 456 0 ) ( 56 456 -32 ) berlin_ceilings_metal 128 -128 -704 -120 180 0 lightmap_gray 16384 -16384 -704 -120 180 0
 }
-// brush 14
+// brush 1
+{
+ ( 64 120 0 ) ( 0 120 0 ) ( 0 112 0 ) berlin_ceilings_metal 128 128 -64 0 0 0 lightmap_gray 16384 16384 -64 0 0 0
+ ( -8 112 128 ) ( -8 120 128 ) ( 56 120 128 ) berlin_ceilings_metal 128 128 -64 0 0 0 lightmap_gray 16384 16384 -64 0 0 0
+ ( -8 120 8 ) ( 56 120 8 ) ( 56 120 0 ) berlin_ceilings_metal 128 128 -64 120 0 0 lightmap_gray 16384 16384 -64 120 0 0
+ ( 64 112 8 ) ( 64 120 8 ) ( 64 120 0 ) berlin_ceilings_metal 128 128 0 120 0 0 lightmap_gray 16384 16384 0 120 0 0
+ ( 64 256 0 ) ( 0 256 0 ) ( 0 256 -8 ) berlin_ceilings_metal 128 128 -64 120 0 0 lightmap_gray 16384 16384 -64 120 0 0
+ ( 56 112 8 ) ( 56 104 8 ) ( 56 104 0 ) berlin_ceilings_metal 128 128 0 120 0 0 lightmap_gray 16384 16384 0 120 0 0
+}
+// brush 2
+{
+ ( 264 264 -8 ) ( 264 328 -8 ) ( 128 328 -8 ) berlin_ceilings_metal 128 128 -392 192 -90 0 lightmap_gray 16384 16384 -392 192 -90 0
+ ( 72 336 128 ) ( 208 336 128 ) ( 208 272 128 ) berlin_ceilings_metal 128 128 -392 192 -90 0 lightmap_gray 16384 16384 -392 192 -90 0
+ ( 256 328 0 ) ( 256 264 0 ) ( 256 264 -32 ) berlin_ceilings_metal 128 -128 -392 -120 180 0 lightmap_gray 16384 -16384 -392 -120 180 0
+ ( 72 256 0 ) ( 208 256 0 ) ( 208 256 -32 ) berlin_ceilings_metal 128 128 -192 120 0 0 lightmap_gray 16384 16384 -192 120 0 0
+ ( 264 424 0 ) ( 264 488 0 ) ( 264 488 -32 ) berlin_ceilings_metal 128 -128 -392 -120 180 0 lightmap_gray 16384 -16384 -392 -120 180 0
+ ( 192 456 0 ) ( 56 456 0 ) ( 56 456 -32 ) berlin_ceilings_metal 128 128 -192 120 0 0 lightmap_gray 16384 16384 -192 120 0 0
+}
+// brush 3
 {
  ( 144 248 -8 ) ( 208 248 -8 ) ( 208 384 -8 ) berlin_ceilings_metal 128 128 -272 704 180 0 lightmap_gray 16384 16384 -272 704 180 0
  ( 216 440 128 ) ( 216 304 128 ) ( 152 304 128 ) berlin_ceilings_metal 128 128 -272 704 -180 0 lightmap_gray 16384 16384 -272 704 -180 0
@@ -139,142 +41,7 @@ iwmap 4
  ( 232 248 0 ) ( 296 248 0 ) ( 296 248 -32 ) berlin_ceilings_metal 128 -128 -272 -120 180 0 lightmap_gray 16384 -16384 -272 -120 180 0
  ( 264 320 0 ) ( 264 456 0 ) ( 264 456 -32 ) berlin_ceilings_metal 128 -128 -704 -120 180 0 lightmap_gray 16384 -16384 -704 -120 180 0
 }
-// brush 15
-{
- ( 128 448 -8 ) ( 64 448 -8 ) ( 64 312 -8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 8 0 0
- ( 64 256 0 ) ( 64 392 0 ) ( 128 392 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 8 0 0
- ( 64 256 0 ) ( 128 256 0 ) ( 128 256 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
- ( 256 256 0 ) ( 256 392 0 ) ( 256 392 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 -8 120 0 0
- ( 128 448 0 ) ( 64 448 0 ) ( 64 448 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
- ( -64 376 0 ) ( -64 240 0 ) ( -64 240 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 -8 120 0 0
-}
-// brush 16
-{
- ( 144 256 0 ) ( 144 272 0 ) ( 48 272 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
- ( 64 256 8 ) ( 64 264 8 ) ( 128 264 8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
- ( 64 256 8 ) ( 128 256 8 ) ( 128 256 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
- ( 144 272 0 ) ( 144 256 0 ) ( 128 256 8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 8 120 0 0
- ( 64 272 0 ) ( 128 272 0 ) ( 128 264 8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
- ( 48 256 0 ) ( 48 272 0 ) ( 64 264 8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 8 120 0 0
-}
-// brush 17
-{
- ( -192 320 -8 ) ( -128 320 -8 ) ( -128 456 -8 ) berlin_ceilings_metal 128 128 64 776 -180 0 lightmap_gray 16384 16383.992 64 776 -180 0
- ( -120 512 128 ) ( -120 376 128 ) ( -184 376 128 ) berlin_ceilings_metal 128 128 64 776 180 0 lightmap_gray 16384 16384 64 776 180 0
- ( -128 328 0 ) ( -192 328 0 ) ( -192 328 -32 ) berlin_ceilings_metal 128 -128 64 -120 180 0 lightmap_gray 16384 -16384 64 -120 180 0
- ( -120 488 0 ) ( -120 352 0 ) ( -120 352 -32 ) berlin_ceilings_metal 128 -128 -776 -120 180 0 lightmap_gray 16383.992 -16384 -776 -120 180 0
- ( -104 320 0 ) ( -40 320 0 ) ( -40 320 -32 ) berlin_ceilings_metal 128 -128 64 -120 180 0 lightmap_gray 16384 -16384 64 -120 180 0
- ( -72 392 0 ) ( -72 528 0 ) ( -72 528 -32 ) berlin_ceilings_metal 128 -128 -776 -120 180 0 lightmap_gray 16384 -16384 -776 -120 180 0
-}
-// brush 18
-{
- ( -200 368 -8 ) ( -200 304 -8 ) ( -64 304 -8 ) berlin_ceilings_metal 128 128 240 256 90 0 lightmap_gray 16384 16384 240 256 90 0
- ( -8 296 128 ) ( -144 296 128 ) ( -144 360 128 ) berlin_ceilings_metal 128 128 240 256 90 0 lightmap_gray 16384 16384 240 256 90 0
- ( -192 304 0 ) ( -192 368 0 ) ( -192 368 -32 ) berlin_ceilings_metal 128 128 240 120 0 0 lightmap_gray 16384 16384 240 120 0 0
- ( -40 512 0 ) ( -176 512 0 ) ( -176 512 -32 ) berlin_ceilings_metal 128 -128 -256 -120 180 0 lightmap_gray 16383.973 -16384 -256 -120 180 0
- ( -200 280 0 ) ( -200 216 0 ) ( -200 216 -32 ) berlin_ceilings_metal 128 128 240 120 0 0 lightmap_gray 16384 16384 240 120 0 0
- ( -128 248 0 ) ( 8 248 0 ) ( 8 248 -32 ) berlin_ceilings_metal 128 -128 -256 -120 180 0 lightmap_gray 16384 -16384 -256 -120 180 0
-}
-// brush 19
-{
- ( -128 368 -8 ) ( -128 304 -8 ) ( 8 304 -8 ) berlin_ceilings_metal 128 128 240 328 90 0 lightmap_gray 16384 16384 240 328 90 0
- ( 64 296 128 ) ( -72 296 128 ) ( -72 360 128 ) berlin_ceilings_metal 128 128 240 328 90 0 lightmap_gray 16384 16384 240 328 90 0
- ( -120 376 0 ) ( -120 440 0 ) ( -120 440 -32 ) berlin_ceilings_metal 128 128 240 120 0 0 lightmap_gray 16384 16384 240 120 0 0
- ( 24 704 0 ) ( -112 704 0 ) ( -112 704 -32 ) berlin_ceilings_metal 128 -128 -328 -120 180 0 lightmap_gray 16383.965 -16384 -328 -120 180 0
- ( -128 280 0 ) ( -128 216 0 ) ( -128 216 -32 ) berlin_ceilings_metal 128 128 240 120 0 0 lightmap_gray 16384 16384 240 120 0 0
- ( -56 320 0 ) ( 80 320 0 ) ( 80 320 -32 ) berlin_ceilings_metal 128 -128 -328 -120 180 0 lightmap_gray 16384 -16384 -328 -120 180 0
-}
-// brush 20
-{
- ( -192 368 -8 ) ( -192 304 -8 ) ( -56 304 -8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 240 264 90 0
- ( 16 296 0 ) ( -120 296 0 ) ( -120 360 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 240 264 90 0
- ( -128 304 0 ) ( -128 368 0 ) ( -128 368 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 240 120 0 0
- ( -32 512 0 ) ( -168 512 0 ) ( -168 512 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16383.965 -16384 -264 -120 180 0
- ( -192 256 128 ) ( -192 256 -8 ) ( -192 512 -8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 240 120 0 0
- ( -192 256 -8 ) ( -192 256 128 ) ( -128 320 128 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 -16384 -264 -120 180 0
-}
-// brush 21
-{
- ( -16 320 -8 ) ( -80 320 -8 ) ( -80 184 -8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 136 0 0
- ( -88 112 0 ) ( -88 248 0 ) ( -24 248 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 136 0 0
- ( -192 256 -8 ) ( -192 256 0 ) ( 128 256 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 120 0 0
- ( -64 152 0 ) ( -64 288 0 ) ( -64 288 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16383.969 16384 -136 120 0 0
- ( -128 320 128 ) ( -128 320 -8 ) ( 128 320 -8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 120 0 0
- ( -192 256 0 ) ( -192 256 -8 ) ( -128 320 -8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 312 120 0 0
-}
-// brush 22
-{
- ( -192 368 120 ) ( -192 304 120 ) ( -56 304 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 240 264 90 0
- ( 16 296 128 ) ( -120 296 128 ) ( -120 360 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 240 264 90 0
- ( -128 304 128 ) ( -128 368 128 ) ( -128 368 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 240 -8 0 0
- ( -32 512 128 ) ( -168 512 128 ) ( -168 512 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16383.965 -16384 -264 8 -180 0
- ( -192 256 256 ) ( -192 256 120 ) ( -192 512 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 240 -8 0 0
- ( -192 256 120 ) ( -192 256 256 ) ( -128 320 256 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 -264 8 180 0
-}
-// brush 23
-{
- ( -16 320 120 ) ( -80 320 120 ) ( -80 184 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 136 0 0
- ( -88 112 128 ) ( -88 248 128 ) ( -24 248 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 136 0 0
- ( -192 256 120 ) ( -192 256 128 ) ( 128 256 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 -8 0 0
- ( -64 152 128 ) ( -64 288 128 ) ( -64 288 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16383.971 16384 -136 -8 0 0
- ( -128 320 256 ) ( -128 320 120 ) ( 128 320 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 -8 0 0
- ( -192 256 128 ) ( -192 256 120 ) ( -128 320 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 312 -8 0 0
-}
-// brush 24
-{
- ( -192 536 -8 ) ( -192 472 -8 ) ( -56 472 -8 ) berlin_floors_concrete_tile4 128 128 0 -168 0 0 lightmap_gray 16384 16384 408 264 90 0
- ( 16 464 0 ) ( -120 464 0 ) ( -120 528 0 ) berlin_floors_concrete_tile4 128 128 0 -168 0 0 lightmap_gray 16384 16384 408 264 90 0
- ( -128 368 -8 ) ( -128 368 0 ) ( -128 624 0 ) berlin_floors_concrete_tile4 128 128 168 0 0 0 lightmap_gray 16383.986 16384 408 120 0 0
- ( -24 704 0 ) ( -160 704 0 ) ( -160 704 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16383.965 -16384 -264 -120 180 0
- ( -384 432 128 ) ( -384 432 -8 ) ( -384 688 -8 ) berlin_floors_concrete_tile4 128 128 168 0 0 0 lightmap_gray 16384 16384 408 120 0 0
- ( -128 512 0 ) ( -128 512 -8 ) ( -192 512 -8 ) berlin_floors_concrete_tile4 128 128 168 0 0 0 lightmap_gray 16384 -16384 -432 -120 180 0
-}
-// brush 25
-{
- ( -344 512 -8 ) ( -408 512 -8 ) ( -408 376 -8 ) berlin_ceilings_metal 128 128 -472 -56 0 0 lightmap_gray 16383.984 16384 -472 -56 0 0
- ( -416 320 128 ) ( -416 456 128 ) ( -352 456 128 ) berlin_ceilings_metal 128 128 -472 -56 0 0 lightmap_gray 16384 16384 -472 -56 0 0
- ( -408 504 0 ) ( -344 504 0 ) ( -344 504 -32 ) berlin_ceilings_metal 128 128 -472 120 0 0 lightmap_gray 16383.953 16384 -472 120 0 0
- ( -200 352 0 ) ( -200 488 0 ) ( -200 488 -32 ) berlin_ceilings_metal 128 128 56 120 0 0 lightmap_gray 16383.961 16384 56 120 0 0
- ( -352 512 0 ) ( -416 512 0 ) ( -416 512 -32 ) berlin_ceilings_metal 128 128 -472 120 0 0 lightmap_gray 16384 16384 -472 120 0 0
- ( -384 440 0 ) ( -384 304 0 ) ( -384 304 -32 ) berlin_ceilings_metal 128 128 56 120 0 0 lightmap_gray 16384 16384 56 120 0 0
-}
-// brush 26
-{
- ( -384 648 -8 ) ( -384 712 -8 ) ( -520 712 -8 ) berlin_ceilings_metal 128 128 -776 840 -90 0 lightmap_gray 16384.027 16384 -776 840 -90 0
- ( -576 720 128 ) ( -440 720 128 ) ( -440 656 128 ) berlin_ceilings_metal 128 128 -776 840 -90 0 lightmap_gray 16384 16384 -776 840 -90 0
- ( -392 728 0 ) ( -392 664 0 ) ( -392 664 -32 ) berlin_ceilings_metal 128 -128 -776 -120 180 0 lightmap_gray 16383.947 -16384 -776 -120 180 0
- ( -544 504 0 ) ( -408 504 0 ) ( -408 504 -32 ) berlin_ceilings_metal 128 128 -840 120 0 0 lightmap_gray 16383.959 16384 -840 120 0 0
- ( -384 656 0 ) ( -384 720 0 ) ( -384 720 -32 ) berlin_ceilings_metal 128 -128 -776 -120 180 0 lightmap_gray 16384.016 -16384 -776 -120 180 0
- ( -456 704 0 ) ( -592 704 0 ) ( -592 704 -32 ) berlin_ceilings_metal 128 128 -840 120 0 0 lightmap_gray 16384 16384 -840 120 0 0
-}
-// brush 27
-{
- ( -248 704 -8 ) ( -184 704 -8 ) ( -184 840 -8 ) berlin_ceilings_metal 128 128 120 1160 -180 0 lightmap_gray 16384.059 16384 120 1160 -180 0
- ( -176 896 128 ) ( -176 760 128 ) ( -240 760 128 ) berlin_ceilings_metal 128 128 120 1160 180 0 lightmap_gray 16384 16383.973 120 1160 180 0
- ( -168 712 0 ) ( -232 712 0 ) ( -232 712 -32 ) berlin_ceilings_metal 128 -128 120 -120 180 0 lightmap_gray 16383.959 -16384 120 -120 180 0
- ( -392 864 0 ) ( -392 728 0 ) ( -392 728 -32 ) berlin_ceilings_metal 128 -128 -1160 -120 180 0 lightmap_gray 16383.99 -16384 -1160 -120 180 0
- ( -240 704 0 ) ( -176 704 0 ) ( -176 704 -32 ) berlin_ceilings_metal 128 -128 120 -120 180 0 lightmap_gray 16384.047 -16384 120 -120 180 0
- ( -120 768 0 ) ( -120 904 0 ) ( -120 904 -32 ) berlin_ceilings_metal 128 -128 -1160 -120 180 0 lightmap_gray 16384 -16384 -1160 -120 180 0
-}
-// brush 28
-{
- ( -192 560 120 ) ( -192 496 120 ) ( -56 496 120 ) atoll_ship_metal_rust1 128 128 0 -192 0 0 lightmap_gray 16384 16384 432 264 90 0
- ( 16 488 128 ) ( -120 488 128 ) ( -120 552 128 ) atoll_ship_metal_rust1 128 128 0 -192 0 0 lightmap_gray 16384 16384 432 264 90 0
- ( -128 496 128 ) ( -128 560 128 ) ( -128 560 96 ) atoll_ship_metal_rust1 128 128 192 0 0 0 lightmap_gray 16384 16384 432 -8 0 0
- ( -32 704 128 ) ( -168 704 128 ) ( -168 704 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16383.965 -16384 -264 8 -180 0
- ( -384 496 128 ) ( -384 496 120 ) ( -384 688 120 ) atoll_ship_metal_rust1 128 128 192 0 0 0 lightmap_gray 16384 16384 432 -8 0 0
- ( -192 512 120 ) ( -192 512 128 ) ( -128 512 128 ) atoll_ship_metal_rust1 128 128 192 0 0 0 lightmap_gray 16383.99 -16384 -456 8 180 0
-}
-// brush 29
-{
- ( -192 112 8 ) ( 184 112 8 ) ( 192 120 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 184 112 120 ) ( -192 112 120 ) ( -192 120 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 56 120 0 ) ( 56 120 128 ) ( -192 120 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( -192 120 8 ) ( -192 -128 8 ) ( -192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 184 112 8 ) ( -192 112 8 ) ( -192 112 120 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
- ( 64 120 128 ) ( 64 120 0 ) ( 64 112 8 ) berlin_roof_brick_tile 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
-}
-// brush 30
+// brush 4
 {
  ( 136 120 0 ) ( 72 120 0 ) ( 72 112 0 ) berlin_ceilings_metal 128 128 8 0 0 0 lightmap_gray 16384 16384 8 0 0 0
  ( 64 112 128 ) ( 64 120 128 ) ( 128 120 128 ) berlin_ceilings_metal 128 128 8 0 0 0 lightmap_gray 16384 16384 8 0 0 0
@@ -283,14 +50,263 @@ iwmap 4
  ( 136 256 0 ) ( 72 256 0 ) ( 72 256 -8 ) berlin_ceilings_metal 128 128 8 120 0 0 lightmap_gray 16384 16384 8 120 0 0
  ( 128 112 8 ) ( 128 104 8 ) ( 128 104 0 ) berlin_ceilings_metal 128 128 0 120 0 0 lightmap_gray 16384 16384 0 120 0 0
 }
+// brush 5
+{
+ ( -184 -128 8 ) ( -184 120 8 ) ( -192 120 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -184 120 120 ) ( -184 -128 120 ) ( -192 -128 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -184 -120 120 ) ( -184 -120 8 ) ( -192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -184 112 8 ) ( -184 112 120 ) ( -192 120 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -192 120 8 ) ( -192 -128 8 ) ( -192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -184 -120 8 ) ( -184 -120 120 ) ( -184 112 120 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+// brush 6
+{
+ ( 192 -120 8 ) ( -192 -120 8 ) ( -192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -192 -120 120 ) ( 192 -120 120 ) ( 192 -128 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -192 -128 8 ) ( 192 -128 8 ) ( 192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 184 -120 120 ) ( 184 -120 8 ) ( 192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -184 -120 8 ) ( -184 -120 120 ) ( -192 -128 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -184 -120 120 ) ( -184 -120 8 ) ( 184 -120 8 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+// brush 7
+{
+ ( 128 456 -8 ) ( 64 456 -8 ) ( 64 320 -8 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 56 264 128 ) ( 56 400 128 ) ( 120 400 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 64 448 0 ) ( 128 448 0 ) ( 128 448 -32 ) berlin_ceilings_metal 128 128 0 120 0 0 lightmap_gray 16384 16384 0 120 0 0
+ ( 256 264 0 ) ( 256 400 0 ) ( 256 400 -32 ) berlin_ceilings_metal 128 128 0 120 0 0 lightmap_gray 16384 16384 0 120 0 0
+ ( 128 456 0 ) ( 64 456 0 ) ( 64 456 -32 ) berlin_ceilings_metal 128 128 0 120 0 0 lightmap_gray 16384 16384 0 120 0 0
+ ( -64 384 0 ) ( -64 248 0 ) ( -64 248 -32 ) berlin_ceilings_metal 128 128 0 120 0 0 lightmap_gray 16384 16384 0 120 0 0
+}
+// brush 8
+{
+ ( -64 264 -8 ) ( -64 328 -8 ) ( -200 328 -8 ) berlin_ceilings_metal 128 128 -392 520 -90 0 lightmap_gray 16384 16384 -392 520 -90 0
+ ( -256 336 128 ) ( -120 336 128 ) ( -120 272 128 ) berlin_ceilings_metal 128 128 -392 520 -90 0 lightmap_gray 16384 16384 -392 520 -90 0
+ ( -72 328 0 ) ( -72 264 0 ) ( -72 264 -32 ) berlin_ceilings_metal 128 -128 -392 -120 180 0 lightmap_gray 16384 -16384 -392 -120 180 0
+ ( -248 320 0 ) ( -112 320 0 ) ( -112 320 -32 ) berlin_ceilings_metal 128 128 -520 120 0 0 lightmap_gray 16384 16384 -520 120 0 0
+ ( -64 424 0 ) ( -64 488 0 ) ( -64 488 -32 ) berlin_ceilings_metal 128 -128 -392 -120 180 0 lightmap_gray 16384 -16384 -392 -120 180 0
+ ( -136 456 0 ) ( -272 456 0 ) ( -272 456 -32 ) berlin_ceilings_metal 128 128 -520 120 0 0 lightmap_gray 16384 16384 -520 120 0 0
+}
+// brush 9
+{
+ ( -192 320 -8 ) ( -128 320 -8 ) ( -128 456 -8 ) berlin_ceilings_metal 128 128 64 776 -180 0 lightmap_gray 16384 16383.992 64 776 -180 0
+ ( -120 512 128 ) ( -120 376 128 ) ( -184 376 128 ) berlin_ceilings_metal 128 128 64 776 180 0 lightmap_gray 16384 16384 64 776 180 0
+ ( -128 328 0 ) ( -192 328 0 ) ( -192 328 -32 ) berlin_ceilings_metal 128 -128 64 -120 180 0 lightmap_gray 16384 -16384 64 -120 180 0
+ ( -120 488 0 ) ( -120 352 0 ) ( -120 352 -32 ) berlin_ceilings_metal 128 -128 -776 -120 180 0 lightmap_gray 16383.992 -16384 -776 -120 180 0
+ ( -104 320 0 ) ( -40 320 0 ) ( -40 320 -32 ) berlin_ceilings_metal 128 -128 64 -120 180 0 lightmap_gray 16384 -16384 64 -120 180 0
+ ( -72 392 0 ) ( -72 528 0 ) ( -72 528 -32 ) berlin_ceilings_metal 128 -128 -776 -120 180 0 lightmap_gray 16384 -16384 -776 -120 180 0
+}
+// brush 10
+{
+ ( 128 120 0 ) ( 64 120 0 ) ( 64 112 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 64 112 8 ) ( 64 120 8 ) ( 128 120 8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 64 112 8 ) ( 128 112 8 ) ( 128 112 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
+ ( 128 112 8 ) ( 128 120 8 ) ( 128 120 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
+ ( 128 256 0 ) ( 64 256 0 ) ( 64 256 -8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
+ ( 64 120 8 ) ( 64 112 8 ) ( 64 112 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
+}
+// brush 11
+{
+ ( 144 256 0 ) ( 144 272 0 ) ( 48 272 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( 64 256 8 ) ( 64 264 8 ) ( 128 264 8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( 64 256 8 ) ( 128 256 8 ) ( 128 256 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
+ ( 144 272 0 ) ( 144 256 0 ) ( 128 256 8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 8 120 0 0
+ ( 64 272 0 ) ( 128 272 0 ) ( 128 264 8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
+ ( 48 256 0 ) ( 48 272 0 ) ( 64 264 8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 8 120 0 0
+}
+// brush 12
+{
+ ( 128 448 -8 ) ( 64 448 -8 ) ( 64 312 -8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 8 0 0
+ ( 64 256 0 ) ( 64 392 0 ) ( 128 392 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 8 0 0
+ ( 64 256 0 ) ( 128 256 0 ) ( 128 256 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
+ ( 256 256 0 ) ( 256 392 0 ) ( 256 392 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 -8 120 0 0
+ ( 128 448 0 ) ( 64 448 0 ) ( 64 448 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 120 0 0
+ ( -64 376 0 ) ( -64 240 0 ) ( -64 240 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 -8 120 0 0
+}
+// brush 13
+{
+ ( -16 320 -8 ) ( -80 320 -8 ) ( -80 184 -8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 136 0 0
+ ( -88 112 0 ) ( -88 248 0 ) ( -24 248 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 136 0 0
+ ( -192 256 -8 ) ( -192 256 0 ) ( 128 256 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 120 0 0
+ ( -64 152 0 ) ( -64 288 0 ) ( -64 288 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16383.969 16384 -136 120 0 0
+ ( -128 320 128 ) ( -128 320 -8 ) ( 128 320 -8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 120 0 0
+ ( -192 256 0 ) ( -192 256 -8 ) ( -128 320 -8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 312 120 0 0
+}
+// brush 14
+{
+ ( 8 0 8 ) ( 0 0 8 ) ( 0 -120 8 ) berlin_roofs_brick_slate3_wet 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 0 -120 120 ) ( 0 0 120 ) ( 8 0 120 ) berlin_roofs_brick_slate3_wet 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 0 -120 128 ) ( 8 -120 128 ) ( 8 -120 0 ) berlin_roofs_brick_slate3_wet 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 8 -120 128 ) ( 8 0 128 ) ( 8 0 0 ) berlin_roofs_brick_slate3_wet 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 8 0 128 ) ( 0 0 128 ) ( 0 0 0 ) berlin_roofs_brick_slate3_wet 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 0 0 128 ) ( 0 -120 128 ) ( 0 -120 0 ) berlin_roofs_brick_slate3_wet 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+// brush 15
+{
+ ( -192 536 -8 ) ( -192 472 -8 ) ( -56 472 -8 ) berlin_floors_concrete_tile4 128 128 0 -168 0 0 lightmap_gray 16384 16384 408 264 90 0
+ ( 16 464 0 ) ( -120 464 0 ) ( -120 528 0 ) berlin_floors_concrete_tile4 128 128 0 -168 0 0 lightmap_gray 16384 16384 408 264 90 0
+ ( -128 368 -8 ) ( -128 368 0 ) ( -128 624 0 ) berlin_floors_concrete_tile4 128 128 168 0 0 0 lightmap_gray 16383.986 16384 408 120 0 0
+ ( -24 704 0 ) ( -160 704 0 ) ( -160 704 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16383.965 -16384 -264 -120 180 0
+ ( -384 432 128 ) ( -384 432 -8 ) ( -384 688 -8 ) berlin_floors_concrete_tile4 128 128 168 0 0 0 lightmap_gray 16384 16384 408 120 0 0
+ ( -128 512 0 ) ( -128 512 -8 ) ( -192 512 -8 ) berlin_floors_concrete_tile4 128 128 168 0 0 0 lightmap_gray 16384 -16384 -432 -120 180 0
+}
+// brush 16
+{
+ ( -192 368 -8 ) ( -192 304 -8 ) ( -56 304 -8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 240 264 90 0
+ ( 16 296 0 ) ( -120 296 0 ) ( -120 360 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 240 264 90 0
+ ( -128 304 0 ) ( -128 368 0 ) ( -128 368 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 240 120 0 0
+ ( -32 512 0 ) ( -168 512 0 ) ( -168 512 -32 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16383.965 -16384 -264 -120 180 0
+ ( -192 256 128 ) ( -192 256 -8 ) ( -192 512 -8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 240 120 0 0
+ ( -192 256 -8 ) ( -192 256 128 ) ( -128 320 128 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 -16384 -264 -120 180 0
+}
+// brush 17
+{
+ ( -200 368 -8 ) ( -200 304 -8 ) ( -64 304 -8 ) berlin_ceilings_metal 128 128 240 256 90 0 lightmap_gray 16384 16384 240 256 90 0
+ ( -8 296 128 ) ( -144 296 128 ) ( -144 360 128 ) berlin_ceilings_metal 128 128 240 256 90 0 lightmap_gray 16384 16384 240 256 90 0
+ ( -192 304 0 ) ( -192 368 0 ) ( -192 368 -32 ) berlin_ceilings_metal 128 128 240 120 0 0 lightmap_gray 16384 16384 240 120 0 0
+ ( -40 512 0 ) ( -176 512 0 ) ( -176 512 -32 ) berlin_ceilings_metal 128 -128 -256 -120 180 0 lightmap_gray 16383.973 -16384 -256 -120 180 0
+ ( -200 280 0 ) ( -200 216 0 ) ( -200 216 -32 ) berlin_ceilings_metal 128 128 240 120 0 0 lightmap_gray 16384 16384 240 120 0 0
+ ( -128 248 0 ) ( 8 248 0 ) ( 8 248 -32 ) berlin_ceilings_metal 128 -128 -256 -120 180 0 lightmap_gray 16384 -16384 -256 -120 180 0
+}
+// brush 18
+{
+ ( -344 512 -8 ) ( -408 512 -8 ) ( -408 376 -8 ) berlin_ceilings_metal 128 128 -472 -56 0 0 lightmap_gray 16383.984 16384 -472 -56 0 0
+ ( -416 320 128 ) ( -416 456 128 ) ( -352 456 128 ) berlin_ceilings_metal 128 128 -472 -56 0 0 lightmap_gray 16384 16384 -472 -56 0 0
+ ( -408 504 0 ) ( -344 504 0 ) ( -344 504 -32 ) berlin_ceilings_metal 128 128 -472 120 0 0 lightmap_gray 16383.953 16384 -472 120 0 0
+ ( -200 352 0 ) ( -200 488 0 ) ( -200 488 -32 ) berlin_ceilings_metal 128 128 56 120 0 0 lightmap_gray 16383.961 16384 56 120 0 0
+ ( -352 512 0 ) ( -416 512 0 ) ( -416 512 -32 ) berlin_ceilings_metal 128 128 -472 120 0 0 lightmap_gray 16384 16384 -472 120 0 0
+ ( -384 440 0 ) ( -384 304 0 ) ( -384 304 -32 ) berlin_ceilings_metal 128 128 56 120 0 0 lightmap_gray 16384 16384 56 120 0 0
+}
+// brush 19
+{
+ ( -384 648 -8 ) ( -384 712 -8 ) ( -520 712 -8 ) berlin_ceilings_metal 128 128 -776 840 -90 0 lightmap_gray 16384.027 16384 -776 840 -90 0
+ ( -576 720 128 ) ( -440 720 128 ) ( -440 656 128 ) berlin_ceilings_metal 128 128 -776 840 -90 0 lightmap_gray 16384 16384 -776 840 -90 0
+ ( -392 728 0 ) ( -392 664 0 ) ( -392 664 -32 ) berlin_ceilings_metal 128 -128 -776 -120 180 0 lightmap_gray 16383.947 -16384 -776 -120 180 0
+ ( -544 504 0 ) ( -408 504 0 ) ( -408 504 -32 ) berlin_ceilings_metal 128 128 -840 120 0 0 lightmap_gray 16383.959 16384 -840 120 0 0
+ ( -384 656 0 ) ( -384 720 0 ) ( -384 720 -32 ) berlin_ceilings_metal 128 -128 -776 -120 180 0 lightmap_gray 16384.016 -16384 -776 -120 180 0
+ ( -456 704 0 ) ( -592 704 0 ) ( -592 704 -32 ) berlin_ceilings_metal 128 128 -840 120 0 0 lightmap_gray 16384 16384 -840 120 0 0
+}
+// brush 20
+{
+ ( -248 704 -8 ) ( -184 704 -8 ) ( -184 840 -8 ) berlin_ceilings_metal 128 128 120 1160 -180 0 lightmap_gray 16384.059 16384 120 1160 -180 0
+ ( -176 896 128 ) ( -176 760 128 ) ( -240 760 128 ) berlin_ceilings_metal 128 128 120 1160 180 0 lightmap_gray 16384 16383.973 120 1160 180 0
+ ( -168 712 0 ) ( -232 712 0 ) ( -232 712 -32 ) berlin_ceilings_metal 128 -128 120 -120 180 0 lightmap_gray 16383.959 -16384 120 -120 180 0
+ ( -392 864 0 ) ( -392 728 0 ) ( -392 728 -32 ) berlin_ceilings_metal 128 -128 -1160 -120 180 0 lightmap_gray 16383.99 -16384 -1160 -120 180 0
+ ( -240 704 0 ) ( -176 704 0 ) ( -176 704 -32 ) berlin_ceilings_metal 128 -128 120 -120 180 0 lightmap_gray 16384.047 -16384 120 -120 180 0
+ ( -120 768 0 ) ( -120 904 0 ) ( -120 904 -32 ) berlin_ceilings_metal 128 -128 -1160 -120 180 0 lightmap_gray 16384 -16384 -1160 -120 180 0
+}
+// brush 21
+{
+ ( -128 368 -8 ) ( -128 304 -8 ) ( 8 304 -8 ) berlin_ceilings_metal 128 128 240 328 90 0 lightmap_gray 16384 16384 240 328 90 0
+ ( 64 296 128 ) ( -72 296 128 ) ( -72 360 128 ) berlin_ceilings_metal 128 128 240 328 90 0 lightmap_gray 16384 16384 240 328 90 0
+ ( -120 376 0 ) ( -120 440 0 ) ( -120 440 -32 ) berlin_ceilings_metal 128 128 240 120 0 0 lightmap_gray 16384 16384 240 120 0 0
+ ( 24 704 0 ) ( -112 704 0 ) ( -112 704 -32 ) berlin_ceilings_metal 128 -128 -328 -120 180 0 lightmap_gray 16383.965 -16384 -328 -120 180 0
+ ( -128 280 0 ) ( -128 216 0 ) ( -128 216 -32 ) berlin_ceilings_metal 128 128 240 120 0 0 lightmap_gray 16384 16384 240 120 0 0
+ ( -56 320 0 ) ( 80 320 0 ) ( 80 320 -32 ) berlin_ceilings_metal 128 -128 -328 -120 180 0 lightmap_gray 16384 -16384 -328 -120 180 0
+}
+// brush 22
+{
+ ( 192 120 0 ) ( -192 120 0 ) ( -192 -128 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -192 -128 0 ) ( -192 -120 8 ) ( 184 -120 8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 184 -120 8 ) ( 184 112 8 ) ( 192 120 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 192 112 8 ) ( -192 112 8 ) ( -192 120 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -184 112 8 ) ( -184 -120 8 ) ( -192 -128 0 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -184 -120 8 ) ( -184 112 8 ) ( 184 112 8 ) berlin_floors_concrete_tile4 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+// brush 23
+{
+ ( -192 112 8 ) ( 184 112 8 ) ( 192 120 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 184 112 120 ) ( -192 112 120 ) ( -192 120 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 56 120 0 ) ( 56 120 128 ) ( -192 120 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -192 120 8 ) ( -192 -128 8 ) ( -192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 184 112 8 ) ( -192 112 8 ) ( -192 112 120 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 64 120 128 ) ( 64 120 0 ) ( 64 112 8 ) berlin_roof_brick_tile 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+// brush 24
+{
+layer "roof"
+ ( -200 -128 128 ) ( -200 120 128 ) ( 184 120 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 184 -120 120 ) ( -184 -120 120 ) ( -192 -128 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 184 120 120 ) ( 184 -128 120 ) ( 192 -128 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -184 112 120 ) ( 184 112 120 ) ( 192 120 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -184 -128 120 ) ( -184 120 120 ) ( -192 120 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 184 112 120 ) ( -184 112 120 ) ( -184 -120 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+// brush 25
+{
+layer "roof"
+ ( 64 112 120 ) ( 128 112 120 ) ( 128 256 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 64 120 128 ) ( 64 128 128 ) ( 128 128 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 128 112 120 ) ( 64 112 120 ) ( 64 120 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 128 112 128 ) ( 128 120 128 ) ( 128 120 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 128 256 120 ) ( 64 256 120 ) ( 64 256 112 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 64 120 128 ) ( 64 112 128 ) ( 64 112 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+// brush 26
+{
+layer "roof"
+ ( 128 448 120 ) ( 64 448 120 ) ( 64 312 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 8 0 0
+ ( 64 256 128 ) ( 64 392 128 ) ( 128 392 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 8 0 0
+ ( 64 256 128 ) ( 128 256 128 ) ( 128 256 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( 256 256 128 ) ( 256 392 128 ) ( 256 392 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 -8 -8 0 0
+ ( 128 448 128 ) ( 64 448 128 ) ( 64 448 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( -64 376 128 ) ( -64 240 128 ) ( -64 240 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 -8 -8 0 0
+}
+// brush 27
+{
+layer "roof"
+ ( -192 368 120 ) ( -192 304 120 ) ( -56 304 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 240 264 90 0
+ ( 16 296 128 ) ( -120 296 128 ) ( -120 360 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 240 264 90 0
+ ( -128 304 128 ) ( -128 368 128 ) ( -128 368 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 240 -8 0 0
+ ( -32 512 128 ) ( -168 512 128 ) ( -168 512 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16383.965 -16384 -264 8 -180 0
+ ( -192 256 256 ) ( -192 256 120 ) ( -192 512 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 240 -8 0 0
+ ( -192 256 120 ) ( -192 256 256 ) ( -128 320 256 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 -16384 -264 8 180 0
+}
+// brush 28
+{
+layer "roof"
+ ( -16 320 120 ) ( -80 320 120 ) ( -80 184 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 136 0 0
+ ( -88 112 128 ) ( -88 248 128 ) ( -24 248 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 136 0 0
+ ( -192 256 120 ) ( -192 256 128 ) ( 128 256 128 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 -8 0 0
+ ( -64 152 128 ) ( -64 288 128 ) ( -64 288 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16383.971 16384 -136 -8 0 0
+ ( -128 320 256 ) ( -128 320 120 ) ( 128 320 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 -144 -8 0 0
+ ( -192 256 128 ) ( -192 256 120 ) ( -128 320 120 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 312 -8 0 0
+}
+// brush 29
+{
+layer "roof"
+ ( -192 560 120 ) ( -192 496 120 ) ( -56 496 120 ) atoll_ship_metal_rust1 128 128 0 -192 0 0 lightmap_gray 16384 16384 432 264 90 0
+ ( 16 488 128 ) ( -120 488 128 ) ( -120 552 128 ) atoll_ship_metal_rust1 128 128 0 -192 0 0 lightmap_gray 16384 16384 432 264 90 0
+ ( -128 496 128 ) ( -128 560 128 ) ( -128 560 96 ) atoll_ship_metal_rust1 128 128 192 0 0 0 lightmap_gray 16384 16384 432 -8 0 0
+ ( -32 704 128 ) ( -168 704 128 ) ( -168 704 96 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16383.965 -16384 -264 8 -180 0
+ ( -384 496 128 ) ( -384 496 120 ) ( -384 688 120 ) atoll_ship_metal_rust1 128 128 192 0 0 0 lightmap_gray 16384 16384 432 -8 0 0
+ ( -192 512 120 ) ( -192 512 128 ) ( -128 512 128 ) atoll_ship_metal_rust1 128 128 192 0 0 0 lightmap_gray 16383.99 -16384 -456 8 180 0
+}
+// brush 30
+{
+ ( -192 112 8 ) ( 184 112 8 ) ( 192 120 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 184 112 120 ) ( -192 112 120 ) ( -192 120 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 184 112 0 ) ( 184 112 128 ) ( 192 120 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 192 120 8 ) ( -192 120 8 ) ( -192 120 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 184 112 8 ) ( -192 112 8 ) ( -192 112 120 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 128 0 72 ) ( 128 0 32 ) ( 128 32 72 ) berlin_roof_brick_tile 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
 // brush 31
 {
- ( 64 120 0 ) ( 0 120 0 ) ( 0 112 0 ) berlin_ceilings_metal 128 128 -64 0 0 0 lightmap_gray 16384 16384 -64 0 0 0
- ( -8 112 128 ) ( -8 120 128 ) ( 56 120 128 ) berlin_ceilings_metal 128 128 -64 0 0 0 lightmap_gray 16384 16384 -64 0 0 0
- ( -8 120 8 ) ( 56 120 8 ) ( 56 120 0 ) berlin_ceilings_metal 128 128 -64 120 0 0 lightmap_gray 16384 16384 -64 120 0 0
- ( 64 112 8 ) ( 64 120 8 ) ( 64 120 0 ) berlin_ceilings_metal 128 128 0 120 0 0 lightmap_gray 16384 16384 0 120 0 0
- ( 64 256 0 ) ( 0 256 0 ) ( 0 256 -8 ) berlin_ceilings_metal 128 128 -64 120 0 0 lightmap_gray 16384 16384 -64 120 0 0
- ( 56 112 8 ) ( 56 104 8 ) ( 56 104 0 ) berlin_ceilings_metal 128 128 0 120 0 0 lightmap_gray 16384 16384 0 120 0 0
+ ( 184 112 8 ) ( 184 -128 8 ) ( 192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 184 -128 120 ) ( 184 112 120 ) ( 192 120 128 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -192 -128 8 ) ( 192 -128 8 ) ( 192 -128 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 192 -128 8 ) ( 192 120 8 ) ( 192 120 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 184 112 128 ) ( 184 112 0 ) ( 192 120 0 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 184 -128 8 ) ( 184 112 8 ) ( 184 112 120 ) berlin_ceilings_metal 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+// brush 32
+{
+ ( 240 -56 8 ) ( 168 -56 8 ) ( 168 -96 8 ) berlin_floors_concrete_tile4 128 128 32 8 0 0 lightmap_gray 16384 16384 56 8 0 0
+ ( 96 -96 64 ) ( 96 -56 64 ) ( 168 -56 64 ) berlin_floors_concrete_tile4 128 128 32 8 0 0 lightmap_gray 16384 16384 56 8 0 0
+ ( 104 -96 -24 ) ( 176 -96 -24 ) ( 176 -96 -32 ) berlin_floors_concrete_tile4 128 128 32 40 0 0 lightmap_gray 16384 16384 56 32 0 0
+ ( 184 -96 -32 ) ( 184 -56 -32 ) ( 184 -56 -40 ) berlin_floors_concrete_tile4 128 128 -8 40 0 0 lightmap_gray 16384 16384 -8 32 0 0
+ ( 176 -56 -24 ) ( 104 -56 -24 ) ( 104 -56 -32 ) berlin_floors_concrete_tile4 128 128 32 40 0 0 lightmap_gray 16384 16384 56 32 0 0
+ ( 176 -56 -24 ) ( 176 -96 -24 ) ( 176 -96 -32 ) berlin_floors_rock_cobble3 128 128 0 0 0 0 lightmap_gray 16384 16384 -8 32 0 0
 }
 }
 // entity 1
