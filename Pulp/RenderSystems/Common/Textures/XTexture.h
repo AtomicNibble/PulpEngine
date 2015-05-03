@@ -149,6 +149,8 @@ public:
 
 
 private:
+	static int s_Var_SaveToCI;
+
 	static render::XRenderResourceContainer*	s_pTextures;
 
 	static bool								s_DefaultTexturesLoaded;
