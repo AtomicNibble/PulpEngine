@@ -273,6 +273,7 @@ struct AreaSubMesh
 		verts_.append(vert);
 	}
 
+	core::StackString<level::MAP_MAX_MATERIAL_LEN> matName_;
 	uint32_t matNameID_;
 
 	// index's for this sub mesh.
