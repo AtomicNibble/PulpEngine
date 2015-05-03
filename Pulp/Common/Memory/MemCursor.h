@@ -74,6 +74,12 @@ public:
 		return offset >= size_;
 	}
 
+	size_t numBytesRemaning(void) const {
+		size_t offset = ((BYTE*)pPointer_ - (BYTE*)pStart_);
+		return size_ - offset;
+
+	}
+
 	void SeekBytes(int32_t num) {
 		Seek<BYTE>(num);
 	}
