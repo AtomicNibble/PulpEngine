@@ -6,6 +6,7 @@
 #include <Ilevel.h>
 #include <Time\TimeVal.h>
 
+#include "String\GrowingStringTable.h"
 
 X_NAMESPACE_DECLARE(model,
 struct MeshHeader;
@@ -26,12 +27,14 @@ struct AsyncLoadData
 {
 	AsyncLoadData(core::XFileAsync* pFile, core::XFileAsyncOperation AsyncOp) :
 	headerLoaded_(false),
+	waitingForIo_(false),
 	pFile_(pFile), 
 	AsyncOp_(AsyncOp)
 	{}
 
 	~AsyncLoadData();
 
+	bool waitingForIo_;
 	bool headerLoaded_;
 	core::XFileAsync* pFile_;
 	core::XFileAsyncOperation AsyncOp_;
@@ -67,6 +70,8 @@ private:
 	bool ProcessData(uint32_t bytesRead);
 
 private:
+	core::GrowingStringTableUnique<256, 16, 4, uint32_t> stringTable_;
+
 	core::Array<AreaModel> areaModels_;
 	uint8_t* pFileData_;
 

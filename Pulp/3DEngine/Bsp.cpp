@@ -12,16 +12,13 @@ X_NAMESPACE_BEGIN(level)
 
 AsyncLoadData::~AsyncLoadData()
 {
-	// cancel the read request
-	AsyncOp_.cancel();
-	// close file.
-	gEnv->pFileSys->closeFileAsync(pFile_);
 }
 
 // --------------------------------
 
 Level::Level() :
-areaModels_(g_3dEngineArena)
+areaModels_(g_3dEngineArena),
+stringTable_(g_3dEngineArena)
 {
 	canRender_ = false;
 
@@ -49,12 +46,14 @@ Level::~Level()
 void Level::update(void)
 {
 	// are we trying to read?
-	if (pAsyncLoadData_)
+	if (pAsyncLoadData_ && pAsyncLoadData_->waitingForIo_)
 	{
 		uint32_t numbytes = 0;
 
 		if (pAsyncLoadData_->AsyncOp_.hasFinished(&numbytes))
 		{
+			pAsyncLoadData_->waitingForIo_ = false;
+
 			if (!pAsyncLoadData_->headerLoaded_)
 			{
 				pAsyncLoadData_->headerLoaded_ = true;
@@ -80,7 +79,16 @@ void Level::free(void)
 		pFileData_ = nullptr;
 	}
 
-	if (pAsyncLoadData_) {
+	if (pAsyncLoadData_) 
+	{
+		if (pAsyncLoadData_->waitingForIo_)
+		{
+			// cancel the read request
+			pAsyncLoadData_->AsyncOp_.cancel();
+			// close file.
+			gEnv->pFileSys->closeFileAsync(pAsyncLoadData_->pFile_);
+		}
+
 		X_DELETE_AND_NULL(pAsyncLoadData_, g_3dEngineArena);
 	}
 }
@@ -136,6 +144,7 @@ bool Level::Load(const char* mapName)
 	core::XFileAsyncOperation HeaderOp = pFile->readAsync(&fileHdr_, sizeof(fileHdr_), 0);
 
 	pAsyncLoadData_ = X_NEW(AsyncLoadData, g_3dEngineArena, "LevelLoadHandles")(pFile, HeaderOp);
+	pAsyncLoadData_->waitingForIo_ = true;
 	return true;
 }
 
@@ -182,24 +191,27 @@ bool Level::ProcessHeader(uint32_t bytesRead)
 	}
 
 	// allocate the file data.
-	pFileData_ = X_NEW_ARRAY(uint8_t, fileHdr_.datasize, g_3dEngineArena, "LevelBuffer");
+	pFileData_ = X_NEW_ARRAY(uint8_t, fileHdr_.totalDataSize, g_3dEngineArena, "LevelBuffer");
 	
 	pAsyncLoadData_->AsyncOp_ = pAsyncLoadData_->pFile_->readAsync(pFileData_, 
-		fileHdr_.datasize, sizeof(fileHdr_));
+		fileHdr_.totalDataSize, sizeof(fileHdr_));
 
+	pAsyncLoadData_->waitingForIo_ = true;
 	return true;
 }
 
 bool Level::ProcessData(uint32_t bytesRead)
 {
-	if (bytesRead != fileHdr_.datasize) {
+	if (bytesRead != fileHdr_.totalDataSize) {
 		X_ERROR("Bsp", "failed to read level file. read: %i of %i",
-			bytesRead, fileHdr_.datasize);
+			bytesRead, fileHdr_.totalDataSize);
 		return false;
 	}
 
+	// read string table.
+
 	core::StackString<64> meshName;
-	core::MemCursor<uint8_t> cursor(pFileData_, fileHdr_.datasize);
+	core::MemCursor<uint8_t> cursor(pFileData_ + fileHdr_.stringDataSize, fileHdr_.datasize);
 	uint32_t x, numSub;
 
 	areaModels_.reserve(fileHdr_.numAreas);
@@ -214,10 +226,17 @@ bool Level::ProcessData(uint32_t bytesRead)
 		pMesh->subMeshHeads = cursor.postSeekPtr<model::SubMeshHeader>(numSub);
 
 		// verts
+		pMesh->streams[VertexStream::VERT] = cursor.postSeekPtr<uint8_t>(pMesh->numVerts * 
+			((sizeof(Vec2f)*2) + sizeof(Vec3f)));
+		pMesh->streams[VertexStream::COLOR] = cursor.postSeekPtr<Color8u>(pMesh->numVerts);
+		pMesh->streams[VertexStream::NORMALS] = cursor.postSeekPtr<Vec3f>(pMesh->numVerts);
+
 		for (x = 0; x < numSub; x++)
 		{
 			model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
-			pSubMesh->verts = cursor.postSeekPtr<level::Vertex>(pSubMesh->numVerts);;
+			pSubMesh->streams[VertexStream::VERT] = pMesh->streams[VertexStream::VERT];
+			pSubMesh->streams[VertexStream::COLOR] = pMesh->streams[VertexStream::COLOR];
+			pSubMesh->streams[VertexStream::NORMALS] = pMesh->streams[VertexStream::NORMALS];
 		}
 
 		// indexs
@@ -228,7 +247,6 @@ bool Level::ProcessData(uint32_t bytesRead)
 		}
 
 		// set the mesh head pointers.
-		pMesh->streams[VertexStream::VERT] = pMesh->subMeshHeads[0]->verts;
 		pMesh->indexes = pMesh->subMeshHeads[0]->indexes;
 
 		meshName.clear();
@@ -245,7 +263,8 @@ bool Level::ProcessData(uint32_t bytesRead)
 
 	if (!cursor.isEof())
 	{
-		X_WARNING("Level", "potential read error, cursor is not at end");
+		X_WARNING("Level", "potential read error, cursor is not at end. bytes left: %i",
+			cursor.numBytesRemaning());
 	}
 
 	// clean up.
