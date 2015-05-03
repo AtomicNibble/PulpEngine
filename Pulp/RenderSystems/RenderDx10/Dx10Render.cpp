@@ -1020,10 +1020,19 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 			elem_uv3232.AlignedByteOffset = 12;
 			layout.append(elem_uv3232);
 
-			elem_col8888.AlignedByteOffset = 20;
+			// two of them
+			elem_uv3232.AlignedByteOffset = 20;
+			elem_uv3232.SemanticIndex = 1;
+			layout.append(elem_uv3232);
+			elem_uv3232.SemanticIndex = 0;
+
+			// byte offset is zero since diffrent stream.
+			elem_col8888.AlignedByteOffset = 0;
+			elem_col8888.InputSlot = 1;
 			layout.append(elem_col8888);
 
-			elem_nor323232.AlignedByteOffset = 24;
+			elem_nor323232.AlignedByteOffset = 0;
+			elem_col8888.InputSlot = 2;
 			layout.append(elem_nor323232); 
 		}
 	
@@ -1121,6 +1130,13 @@ HRESULT DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFm
 				pBlob = pVs->getshaderBlob();
 				break;
 			}
+		}
+
+		if(!pBlob)
+		{
+			X_ERROR("Render", "Failed to set input layout shader does not support input layout: %s",
+				shader::InputLayoutFormat::ToString(requiredIlFmt));
+			return (HRESULT)-1;
 		}
 
 #else
