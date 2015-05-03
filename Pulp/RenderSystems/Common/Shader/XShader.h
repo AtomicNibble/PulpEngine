@@ -447,7 +447,8 @@ public:
 	static XShader* m_Gui;
 	static XShader* m_DefferedShader;
 	static XShader* m_DefferedShaderVis;
-	
+
+	static XShader* m_WordShader;
 };
 
 X_NAMESPACE_END

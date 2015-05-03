@@ -206,6 +206,7 @@ XShader* XShaderManager::m_Font = nullptr;
 XShader* XShaderManager::m_Gui = nullptr;
 XShader* XShaderManager::m_DefferedShader = nullptr;
 XShader* XShaderManager::m_DefferedShaderVis = nullptr;
+XShader* XShaderManager::m_WordShader = nullptr;
 
 
 XShaderManager::XShaderManager() : 
@@ -637,6 +638,10 @@ bool XShaderManager::loadCoreShaders(void)
 		return false;
 	}
 
+	if (!(m_WordShader = forName("World"))){
+		X_ERROR("Shader", "Failed to load World shader");
+		return false;
+	}
 	return true;
 }
 
@@ -658,6 +663,9 @@ bool XShaderManager::freeCoreShaders(void)
 		m_DefferedShader->release();
 	if (m_DefferedShaderVis)
 		m_DefferedShaderVis->release();
+
+	if (m_WordShader)
+		m_WordShader->release();
 
 	return true;
 }
