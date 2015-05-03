@@ -733,6 +733,11 @@ int XTexture::getTexStateId(const shader::XTexState& TS)
 	return safe_static_cast<int,size_t>(i);
 }
 
+void XTexture::applyDefault(void)
+{
+	s_pTexDefault->apply(0);
+	s_pTexDefaultBump->apply(1);
+}
 
 void XTexture::init(void)
 {
