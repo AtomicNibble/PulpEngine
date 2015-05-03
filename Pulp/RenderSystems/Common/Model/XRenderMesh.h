@@ -7,6 +7,7 @@
 
 #include <Assets\AssertContainer.h>
 #include <Math\VertexFormats.h>
+#include <Util\ReferenceCounted.h>
 
 #include <IRenderMesh.h>
 
@@ -74,7 +75,7 @@ struct XMeshSurface
 //	
 //
 //
-class XRenderMesh : public IRenderMesh, public core::XBaseAsset
+class XRenderMesh : public IRenderMesh, public core::ReferenceCounted<XRenderMesh>
 {
 public:
 	XRenderMesh();
@@ -84,14 +85,12 @@ public:
 	// IRenderModel
 
 	virtual const int addRef(void) X_OVERRIDE{
-		return XBaseAsset::addRef();
+		return this->addReference();
 	}
 	virtual const int release(void) X_OVERRIDE{
-		const int refs = XBaseAsset::release();
+		const int refs = this->removeReference();
 		if (refs == 0) {
-
-			X_ASSERT_NOT_IMPLEMENTED();
-
+			X_DELETE(this, g_rendererArena);
 		}
 		return refs;
 	}
