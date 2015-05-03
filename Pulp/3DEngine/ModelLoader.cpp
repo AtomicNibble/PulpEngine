@@ -132,7 +132,7 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 		SubMeshHeader* meshHeads = lod.subMeshHeads;
 
 		// verts (always provided)
-		lod.streams[VertexStream::VERT] = cursor.postSeekPtr<VertexColor>(lod.numVerts);
+		lod.streams[VertexStream::VERT] = cursor.postSeekPtr<Vertex>(lod.numVerts);
 
 		// color
 		if (lod.streamsFlag.IsSet(StreamType::COLOR)) {
@@ -150,40 +150,20 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 		}
 
 		// now set the sub mesh pointers.
-		for (x = 0; x < lod.numSubMeshes; x++)
 		{
-			SubMeshHeader& mesh = meshHeads[x];
-
-		//	mesh.streams[VertexStream::VERT] = lod.streams[VertexStream::TANGENT_BI];
+			for (x = 0; x < lod.numSubMeshes; x++)
+			{
+				SubMeshHeader& mesh = meshHeads[x];
+				// when model is created the submesh streams have the byte offsets set.
+				// so that we can just app the base address to fix them up.
+				mesh.streams[VertexStream::VERT] += lod.streams[VertexStream::VERT];
+				mesh.streams[VertexStream::COLOR] += lod.streams[VertexStream::COLOR];
+				mesh.streams[VertexStream::NORMALS] += lod.streams[VertexStream::NORMALS];
+				mesh.streams[VertexStream::TANGENT_BI] += lod.streams[VertexStream::TANGENT_BI];
+			}
 		}
 
-#if 0
-		for (x = 0; x < lod.numSubMeshes; x++)
-		{
-			SubMeshHeader& mesh = meshHeads[x];
-			mesh.streams[VertexStream::VERT] = cursor.postSeekPtr<Vertex>(mesh.numVerts);
-		}
-
-		// color
-		if (lod.streamsFlag.IsSet(StreamType::COLOR))
-		{
-			lod.streams[VertexStream::COLOR] = cursor.postSeekPtr<VertexColor>(lod.numVerts);
-		}
-
-		// normals
-		if (lod.streamsFlag.IsSet(StreamType::NORMALS))
-		{
-			lod.streams[VertexStream::NORMALS] = cursor.postSeekPtr<VertexNormal>(lod.numVerts);
-		}
-
-		// tangents bi-normals
-		if (lod.streamsFlag.IsSet(StreamType::TANGENT_BI))
-		{
-			lod.streams[VertexStream::TANGENT_BI] = cursor.postSeekPtr<VertexTangentBi>(lod.numVerts);
-		}
-#endif
-
-		// Faces
+		// indexes
 		for (x = 0; x < lod.numSubMeshes; x++)
 		{
 			SubMeshHeader& mesh = meshHeads[x];
