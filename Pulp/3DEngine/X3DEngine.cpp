@@ -82,14 +82,18 @@ bool X3DEngine::Init()
 	X_ASSERT_NOT_NULL(gEnv->pFileSys);
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 	X_ASSERT_NOT_NULL(gEnv->pRender);
+	X_ASSERT_NOT_NULL(gEnv->pHotReload);
 
 	pCore_ = gEnv->pCore;
-
 	pTimer_ = gEnv->pTimer;
 	pFileSys_ = gEnv->pFileSys;
 	pConsole_ = gEnv->pConsole;
-
 	pRender_ = gEnv->pRender;
+
+	// register some file types.
+	gEnv->pHotReload->addfileType(this, "level");
+	gEnv->pHotReload->addfileType(this, "map");
+
 	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager");
 	pMaterialManager_->Init();
 	pGuiManger_ = &guisMan_;
@@ -97,12 +101,17 @@ bool X3DEngine::Init()
 	RegisterCmds();
 
 	guisMan_.Init();
+
+	level_.Load("box2");
 	return true;
 }
 
 void X3DEngine::ShutDown()
 {
 	X_LOG0("3DEngine", "Shutting Down");
+
+	gEnv->pHotReload->addfileType(nullptr, "level");
+	gEnv->pHotReload->addfileType(nullptr, "map");
 
 	guisMan_.Shutdown();
 
@@ -142,6 +151,16 @@ void X3DEngine::Update(void)
 	X_PROFILE_BEGIN("3DUpdate", core::ProfileSubSys::ENGINE3D);
 
 
+}
+
+bool X3DEngine::OnFileChange(const char* name)
+{
+	X_ASSERT_NOT_NULL(name);
+
+	// do nothing for now.
+
+
+	return true;
 }
 
 // =======================================

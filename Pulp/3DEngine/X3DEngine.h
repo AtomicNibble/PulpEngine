@@ -18,7 +18,7 @@ X_NAMESPACE_BEGIN(engine)
 
 
 
-struct X3DEngine : public I3DEngine, public XEngineBase
+struct X3DEngine : public I3DEngine, public XEngineBase, public core::IXHotReload
 {
 
 	virtual bool Init(void) X_OVERRIDE;
@@ -27,6 +27,11 @@ struct X3DEngine : public I3DEngine, public XEngineBase
 
 	virtual void OnFrameBegin(void) X_OVERRIDE;
 	virtual void Update(void) X_OVERRIDE;
+
+
+	// IXHotReload
+	virtual bool OnFileChange(const char* name) X_FINAL;
+	// ~IXHotReload
 
 private:
 	void RegisterCmds(void);
