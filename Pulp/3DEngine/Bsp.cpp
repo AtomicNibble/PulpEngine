@@ -72,6 +72,13 @@ void Level::free(void)
 {
 	canRender_ = false;
 
+	// clear render mesh.
+	core::Array<AreaModel>::ConstIterator it = areaModels_.begin();
+	for (; it != areaModels_.end(); ++it)
+	{
+		it->pRenderMesh->release();
+	}
+
 	areaModels_.free();
 
 	if (pFileData_) {
