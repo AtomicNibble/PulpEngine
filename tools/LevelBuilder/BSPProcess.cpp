@@ -94,7 +94,7 @@ namespace
 			face.z = (i + 1) % numVerts;
 			face.z = face.z ? face.z : 1;
 
-			pSubmesh->indexes_.append(face);
+			pSubmesh->faces_.append(face);
 		}
 
 		return true;
@@ -125,7 +125,7 @@ namespace
 		// is this a simple triangle? 
 		if (numVerts == 3)
 		{
-			pSubmesh->indexes_.append(model::Face(0, 1, 2));
+			pSubmesh->faces_.append(model::Face(0, 1, 2));
 			return true;
 		}
 		else
@@ -197,9 +197,15 @@ namespace
 
 		core::FixedArray<model::Face, 1024>::const_iterator it = indexes.begin();
 
+		model::Index offset = safe_static_cast<model::Index, size_t>(StartVert);
+
 		for (; it != indexes.end(); ++it)
 		{
-			pSubmesh->indexes_.append(*it);
+			model::Face face = *it;
+
+			face += model::Face(offset, offset, offset);
+
+			pSubmesh->faces_.append(face);
 		}
 
 		return true;

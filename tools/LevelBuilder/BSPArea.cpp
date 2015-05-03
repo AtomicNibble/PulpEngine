@@ -5,7 +5,7 @@
 AreaModel::AreaModel() :
 meshes(g_arena),
 verts(g_arena),
-indexes(g_arena)
+faces(g_arena)
 {
 
 }
@@ -25,10 +25,10 @@ bool AreaModel::BelowLimits(void)
 			verts.size(), level::MAP_MAX_MODEL_VERTS);
 		return false;
 	}
-	if (indexes.size() > level::MAP_MAX_MODEL_INDEXES)
+	if ((faces.size()*3) > level::MAP_MAX_MODEL_INDEXES)
 	{
 		X_ERROR("Bsp", "too many indexes for AreaModel. num: %i max: %i",
-			indexes.size(), level::MAP_MAX_MODEL_INDEXES);
+			faces.size() * 3, level::MAP_MAX_MODEL_INDEXES);
 		return false;
 	}
 
@@ -39,7 +39,7 @@ void AreaModel::BeginModel(void)
 {
 	meshes.setGranularity(4096);
 	verts.setGranularity(4096);
-	indexes.setGranularity(4096);
+	faces.setGranularity(4096);
 }
 
 void AreaModel::EndModel(void)
@@ -47,7 +47,7 @@ void AreaModel::EndModel(void)
 	model.streamsFlag = model::StreamType::NORMALS | model::StreamType::COLOR;
 	model.numSubMeshes = safe_static_cast<uint32_t, size_t>(meshes.size());
 	model.numVerts = safe_static_cast<uint32_t, size_t>(verts.size());
-	model.numIndexes = safe_static_cast<uint32_t, size_t>(indexes.size() * 3);
+	model.numIndexes = safe_static_cast<uint32_t, size_t>(faces.size() * 3);
 
 	// build bounds for all the meshes.
 	// this could be done in parrell.
@@ -107,16 +107,16 @@ void LvlArea::AreaEnd(void)
 		}
 
 		mesh.boundingSphere = Sphere(mesh.boundingBox);
-		mesh.numIndexes = safe_static_cast<uint16_t, size_t>(aSub.indexes_.size());
+		mesh.numIndexes = safe_static_cast<uint16_t, size_t>(aSub.faces_.size() * 3);
 		mesh.numVerts = safe_static_cast<uint16_t, size_t>(aSub.verts_.size());
-		mesh.startIndex = safe_static_cast<uint32_t, size_t>(model.indexes.size());
+		mesh.startIndex = safe_static_cast<uint32_t, size_t>(model.faces.size());
 		mesh.startVertex = safe_static_cast<uint32_t, size_t>(model.verts.size());
 		mesh.streamsFlag = model::StreamType::COLOR | model::StreamType::NORMALS;
 
 		mesh.materialName = aSub.matNameID_;
 
 		// add verts / indexs.
-		model.indexes.append(aSub.indexes_);
+		model.faces.append(aSub.faces_);
 		model.verts.append(aSub.verts_);
 		model.meshes.append(mesh);
 	}

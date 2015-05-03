@@ -258,7 +258,7 @@ struct AreaModel
 
 	core::Array<model::SubMeshHeader> meshes;
 	core::Array<level::Vertex> verts;
-	core::Array<model::Face> indexes;
+	core::Array<model::Face> faces;
 
 	model::MeshHeader model;
 };
@@ -267,7 +267,7 @@ struct AreaModel
 // so faces with same materials are grouped into meshes.
 struct AreaSubMesh
 {
-	AreaSubMesh() : verts_(g_arena), indexes_(g_arena) {}
+	AreaSubMesh() : verts_(g_arena), faces_(g_arena) {}
 
 	void AddVert(const level::Vertex& vert) {
 		verts_.append(vert);
@@ -278,7 +278,7 @@ struct AreaSubMesh
 	// index's for this sub mesh.
 	// merged into AreaModel list at end.
 	core::Array<level::Vertex> verts_;
-	core::Array<model::Face> indexes_;
+	core::Array<model::Face> faces_;
 };
 
 
