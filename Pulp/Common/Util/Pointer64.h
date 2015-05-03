@@ -18,9 +18,10 @@ public:
 	X_INLINE Pointer64& operator = (T* p);
 	X_INLINE operator T*() const;
 
+	X_INLINE Pointer64& operator +=(const Pointer64& oth);
+
 	template<typename Type>
 	X_INLINE Type* as() const;
-
 
 	X_INLINE const T* operator[](int i) const;
 	X_INLINE T* operator[](int i);
