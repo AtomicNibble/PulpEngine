@@ -234,12 +234,12 @@ bool Level::ProcessData(uint32_t bytesRead)
 		for (x = 0; x < numSub; x++)
 		{
 			model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
-			pSubMesh->streams[VertexStream::VERT] = pMesh->streams[VertexStream::VERT];
-			pSubMesh->streams[VertexStream::COLOR] = pMesh->streams[VertexStream::COLOR];
-			pSubMesh->streams[VertexStream::NORMALS] = pMesh->streams[VertexStream::NORMALS];
+			pSubMesh->streams[VertexStream::VERT] += pMesh->streams[VertexStream::VERT];
+			pSubMesh->streams[VertexStream::COLOR] += pMesh->streams[VertexStream::COLOR];
+			pSubMesh->streams[VertexStream::NORMALS] += pMesh->streams[VertexStream::NORMALS];
 		}
 
-		// indexs
+		// indexes
 		for (x = 0; x < numSub; x++)
 		{
 			model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
@@ -275,6 +275,10 @@ bool Level::ProcessData(uint32_t bytesRead)
 
 	// safe to render?
 	canRender_ = true;
+
+	X_LOG0("Level", "%s loaded in %gms", 
+		path_.fileName(),
+		loadStats_.elapse.GetMilliSeconds());
 
 	return true;
 }
