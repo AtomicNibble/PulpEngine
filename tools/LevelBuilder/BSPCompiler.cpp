@@ -230,7 +230,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent, mapfile::XMapBrush* mapBrush, int 
 
 	Vec3f coords[2];
 	Vec2f out;
-	Vec2f size(512, 512);
+	Vec2f size(128, 128);
 
 	coords[0][0] = 1.0f;
 	coords[1][1] = 1.0f;
