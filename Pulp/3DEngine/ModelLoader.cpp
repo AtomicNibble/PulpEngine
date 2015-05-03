@@ -131,11 +131,37 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 		// Verts, Faces, Binddata
 		SubMeshHeader* meshHeads = lod.subMeshHeads;
 
-		// verts
+		// verts (always provided)
+		lod.streams[VertexStream::VERT] = cursor.postSeekPtr<VertexColor>(lod.numVerts);
+
+		// color
+		if (lod.streamsFlag.IsSet(StreamType::COLOR)) {
+			lod.streams[VertexStream::COLOR] = cursor.postSeekPtr<VertexColor>(lod.numVerts);
+		}
+
+		// normals
+		if (lod.streamsFlag.IsSet(StreamType::NORMALS)) {
+			lod.streams[VertexStream::NORMALS] = cursor.postSeekPtr<VertexNormal>(lod.numVerts);
+		}
+
+		// tangents bi-normals
+		if (lod.streamsFlag.IsSet(StreamType::TANGENT_BI)) {
+			lod.streams[VertexStream::TANGENT_BI] = cursor.postSeekPtr<VertexTangentBi>(lod.numVerts);
+		}
+
+		// now set the sub mesh pointers.
 		for (x = 0; x < lod.numSubMeshes; x++)
 		{
 			SubMeshHeader& mesh = meshHeads[x];
-			mesh.verts = cursor.postSeekPtr<Vertex>(mesh.numVerts);
+
+		//	mesh.streams[VertexStream::VERT] = lod.streams[VertexStream::TANGENT_BI];
+		}
+
+#if 0
+		for (x = 0; x < lod.numSubMeshes; x++)
+		{
+			SubMeshHeader& mesh = meshHeads[x];
+			mesh.streams[VertexStream::VERT] = cursor.postSeekPtr<Vertex>(mesh.numVerts);
 		}
 
 		// color
@@ -155,6 +181,7 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 		{
 			lod.streams[VertexStream::TANGENT_BI] = cursor.postSeekPtr<VertexTangentBi>(lod.numVerts);
 		}
+#endif
 
 		// Faces
 		for (x = 0; x < lod.numSubMeshes; x++)
@@ -175,7 +202,6 @@ bool ModelLoader::LoadModel(XModel& model, XFile* file)
 
 		// index 0 is always valid, since a valid lod must
 		// have a mesh.
-		lod.streams[VertexStream::VERT] = meshHeads[0].verts;
 		lod.indexes = meshHeads[0].indexes;
 	}
 
