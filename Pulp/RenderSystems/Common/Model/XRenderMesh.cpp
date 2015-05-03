@@ -48,13 +48,20 @@ bool XRenderMesh::uploadToGpu(void)
 	X_ASSERT((int32)vertexFmt_ != -1, "vertex format has not been set")(vertexFmt_);
 	using namespace render;
 
-	uint32_t ibSize, vbSize;
+	uint32_t ibSize;
 
 	ibSize = pMesh_->numIndexes * sizeof(model::Index);
-	vbSize = pMesh_->numVerts * DX11XRender::vertexFormatStride[vertexFmt_];
+//	vbSize = pMesh_->numVerts * DX11XRender::vertexFormatStride[vertexFmt_];
+	uint32_t numVerts = pMesh_->numVerts;
 
 	indexStream_.BufId = g_Dx11D3D.VidMemMng()->CreateIB(ibSize, pMesh_->indexes);
-	vertexStreams_[VertexStream::VERT].BufId = g_Dx11D3D.VidMemMng()->CreateVB(vbSize, pMesh_->streams[VertexStream::VERT]);
+
+	vertexStreams_[VertexStream::VERT].BufId = g_Dx11D3D.VidMemMng()->CreateVB(numVerts * ((sizeof(Vec2f)* 2) + sizeof(Vec3f)),
+		pMesh_->streams[VertexStream::VERT]);
+	vertexStreams_[VertexStream::COLOR].BufId = g_Dx11D3D.VidMemMng()->CreateVB(numVerts * sizeof(Color8u),
+		pMesh_->streams[VertexStream::COLOR]);
+	vertexStreams_[VertexStream::NORMALS].BufId = g_Dx11D3D.VidMemMng()->CreateVB(numVerts * sizeof(Vec3f),
+		pMesh_->streams[VertexStream::NORMALS]);
 
 	return canRender();
 }
@@ -67,11 +74,6 @@ bool XRenderMesh::render(void)
 	if (!canRender())
 		return false;
 
-	IRenderAux* pAux = g_Dx11D3D.GetIRenderAuxGeo();
-
-	pAux->setRenderFlags(render::AuxGeom_Defaults::Def3DRenderflags);
-
-	
 	g_Dx11D3D.SetWorldShader();
 
 	g_Dx11D3D.FX_SetVertexDeclaration(vertexFmt_);
@@ -80,9 +82,23 @@ bool XRenderMesh::render(void)
 	g_Dx11D3D.FX_SetVStream(
 		vertexStreams_[VertexStream::VERT].BufId,
 		VertexStream::VERT, 
-		DX11XRender::vertexFormatStride[vertexFmt_],
+		((sizeof(Vec2f)* 2) + sizeof(Vec3f)),
 		0
 	);
+
+	g_Dx11D3D.FX_SetVStream(
+		vertexStreams_[VertexStream::COLOR].BufId,
+		VertexStream::COLOR,
+		sizeof(Color8u),
+		0
+	);
+
+	g_Dx11D3D.FX_SetVStream(
+		vertexStreams_[VertexStream::NORMALS].BufId,
+		VertexStream::NORMALS,
+		sizeof(Vec3f),
+		0
+		);
 
 	uint32_t i, num;
 	num = pMesh_->numSubMeshes;
@@ -90,12 +106,6 @@ bool XRenderMesh::render(void)
 	for (i = 0; i < num; i++)
 	{
 		const model::SubMeshHeader* mesh = pMesh_->subMeshHeads[i];
-
-		if (mesh->numVerts == 69)
-		{
-	//		g_Dx11D3D.SetSkyboxShader();
-		}
-
 
 		g_Dx11D3D.FX_DrawIndexPrimitive(
 			PrimitiveType::TriangleList,
