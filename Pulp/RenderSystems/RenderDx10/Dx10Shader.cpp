@@ -43,6 +43,9 @@ InputLayoutFormat::Enum ILfromVertexFormat(const VertexFormat::Enum fmt)
 		case VertexFormat::P3F_T4F_C4B_N3F:
 			return InputLayoutFormat::POS_UV2_COL_NORM;
 
+		case VertexFormat::Num:
+			X_ASSERT_UNREACHABLE();
+			return InputLayoutFormat::Invalid;
 #if X_DEBUG
 		default:
 			X_ASSERT_UNREACHABLE();
@@ -51,6 +54,7 @@ InputLayoutFormat::Enum ILfromVertexFormat(const VertexFormat::Enum fmt)
 			X_NO_SWITCH_DEFAULT;
 #endif // !X_DEBUG
 	}
+	return InputLayoutFormat::Invalid;
 }
 
 ILFlags IlFlagsForVertexFormat(const VertexFormat::Enum fmt)
