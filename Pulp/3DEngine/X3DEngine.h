@@ -5,7 +5,7 @@
 
 #include "I3DEngine.h"
 #include "EngineBase.h"
-#include "Bsp.h"
+#include "Level.h"
 
 #include <IModel.h>
 #include <IRenderMesh.h>
