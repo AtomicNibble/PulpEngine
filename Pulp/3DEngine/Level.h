@@ -55,7 +55,10 @@ class Level
 {
 public:
 	Level();
-	~Level();
+	~Level();	
+
+	static bool Init(void);
+	static void ShutDown(void);
 
 	void update(void);
 
@@ -87,6 +90,10 @@ private:
 private:
 	core::ITimer* pTimer_;
 	core::IFileSys* pFileSys_;
+
+private:
+	// vars
+	static int s_var_drawAreaBounds_;
 };
 
 

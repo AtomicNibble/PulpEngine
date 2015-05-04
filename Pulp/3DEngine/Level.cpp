@@ -5,14 +5,22 @@
 #include <IRender.h>
 #include <IRenderMesh.h>
 #include <ITimer.h>
+#include <IConsole.h>
 
 #include <Memory\MemCursor.h>
+
+#include <IRenderAux.h>
 
 X_NAMESPACE_BEGIN(level)
 
 AsyncLoadData::~AsyncLoadData()
 {
 }
+
+// --------------------------------
+
+int Level::s_var_drawAreaBounds_ = 0;
+
 
 // --------------------------------
 
@@ -41,6 +49,24 @@ stringTable_(g_3dEngineArena)
 Level::~Level()
 {
 	free();
+}
+
+bool Level::Init(void)
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pConsole);
+
+	ADD_CVAR_REF("level_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 1, core::VarFlag::SYSTEM,
+		"Draws bounding box around each level area");
+
+
+	return true;
+}
+
+void Level::ShutDown(void)
+{
+
+
 }
 
 void Level::update(void)
@@ -114,6 +140,20 @@ bool Level::render(void)
 	for (; it != areaModels_.end(); ++it)
 	{
 		it->pRenderMesh->render();
+	}
+
+	if (s_var_drawAreaBounds_)
+	{
+		render::IRenderAux* pAux = gEnv->pRender->GetIRenderAuxGeo();
+
+		pAux->setRenderFlags(render::AuxGeom_Mode2D3D::Mode3D);
+
+		it = areaModels_.begin();
+		for (; it != areaModels_.end(); ++it)
+		{
+			Vec3f pos = Vec3f::zero();
+			pAux->drawAABB(it->pMesh->boundingBox,pos, false, Col_Red);
+		}
 	}
 
 	return true;
