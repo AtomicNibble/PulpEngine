@@ -399,6 +399,9 @@ private:
 		D3D11_BUFFER_DESC bd;
 		HRESULT hr = S_OK;
 
+		if (maxVectors == 0)
+			return false;
+
 		// buffer already created?
 		if (pConstBuffData_[shaderType][bufType])
 			return true;
