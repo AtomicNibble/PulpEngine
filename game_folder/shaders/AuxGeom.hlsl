@@ -15,8 +15,8 @@ cbuffer ObjectConstants  : register(cb1)
 struct VS_INPUT
 {
     float3 osPosition           	: POSITION;
-    float4 color                	: COLOR0;
     float2 tex 			: TEXCOORD0; // not used, but added so vertex layout can be shared.
+    float4 color                	: COLOR0;
 };
 
 struct VS_INPUT_OBJ
