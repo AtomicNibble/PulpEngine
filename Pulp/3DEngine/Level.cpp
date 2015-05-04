@@ -146,7 +146,7 @@ bool Level::render(void)
 	{
 		render::IRenderAux* pAux = gEnv->pRender->GetIRenderAuxGeo();
 
-		pAux->setRenderFlags(render::AuxGeom_Mode2D3D::Mode3D);
+		pAux->setRenderFlags(render::AuxGeom_Defaults::Def3DRenderflags);
 
 		it = areaModels_.begin();
 		for (; it != areaModels_.end(); ++it)
