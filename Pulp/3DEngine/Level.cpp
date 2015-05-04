@@ -56,7 +56,7 @@ bool Level::Init(void)
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
-	ADD_CVAR_REF("level_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 1, core::VarFlag::SYSTEM,
+	ADD_CVAR_REF("lvl_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 1, core::VarFlag::SYSTEM,
 		"Draws bounding box around each level area");
 
 
