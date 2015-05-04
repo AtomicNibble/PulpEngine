@@ -490,6 +490,9 @@ private:
 	uint32_t D3DCompileflags_;
 
 protected:
+	void setMaxVecs(int maxVecs[3]) {
+		memcpy(maxVecs_, maxVecs, sizeof(maxVecs_));
+	}
 
 	const core::Array<XShaderParam>& getBindVars(void) const {
 		return bindVars_;
