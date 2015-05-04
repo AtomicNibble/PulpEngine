@@ -6,6 +6,7 @@
 #include "Util\LastError.h"
 
 #include <ICore.h>
+#include <IConsole.h>
 
 // #include "resource.h"
 
@@ -43,14 +44,15 @@ namespace
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 
+	Recti Convert(const RECT& r)
+	{
+		return Recti(r.left, r.top, r.right, r.bottom);
+	}
 
-}
+} // namespace
 
-Recti Convert(const RECT& r)
-{
-	return Recti(r.left, r.top, r.right, r.bottom);
-}
 
+int32_t xWindow::s_var_windowDebug = 0;
 
 uint32_t xWindow::s_numwindows = 0;
 
@@ -94,14 +96,6 @@ void xWindow::UnRegisterClass(void)
 
 /// --------------------------------------------------------------------------------------------------------
 
-/* 
-xWindow::xWindow(const char* const Title, int x, int y, int width, int height, Mode::Enum mode) : m_NumMsgs(0), m_InputCheck(FALSE)
-	, pFrame_( nullptr )
-{
-	CreateWindow(Title, x, y, width, height, mode);
-}
-*/
-
 xWindow::xWindow() : 
 numMsgs_(0),
 hideClientCursor_(FALSE),
@@ -121,6 +115,15 @@ xWindow::~xWindow(void)
 
 /// --------------------------------------------------------------------------------------------------------
 
+void xWindow::RegisterVars(void)
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pConsole);
+
+
+	ADD_CVAR_REF("win_debug", s_var_windowDebug, 0, 0, 1, core::VarFlag::SYSTEM, 
+		"Window debug. 0=disable, 1=enable.");
+}
 
 xWindow::Notification::Enum xWindow::PumpMessages(void) const
 {

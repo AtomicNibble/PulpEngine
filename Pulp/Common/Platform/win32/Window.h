@@ -47,8 +47,9 @@ public:
 	xWindow();
 	~xWindow(void);
 
-	bool Create(const char* const Title, int x, int y, int width, int height, Mode::Enum mode);
+	static void RegisterVars(void);
 
+	bool Create(const char* const Title, int x, int y, int width, int height, Mode::Enum mode);
 
 	Notification::Enum PumpMessages(void) const;
 
@@ -101,6 +102,10 @@ private:
 	static void RegisterClass();
 	static void UnRegisterClass();
 
+	X_INLINE static bool isDebugEnable(void) {
+		return s_var_windowDebug != 0;
+	}
+
 protected:
 	mutable uint32_t numMsgs_;
 	HWND window_;
@@ -109,6 +114,7 @@ protected:
 	xFrame* pFrame_;
 
 	static uint32_t s_numwindows;
+	static int32_t s_var_windowDebug;
 };
 
 #include "Window.inl"
