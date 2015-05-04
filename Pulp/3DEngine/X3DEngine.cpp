@@ -102,6 +102,8 @@ bool X3DEngine::Init()
 
 	guisMan_.Init();
 
+	level::Level::Init();
+
 	level_.Load("box2");
 	return true;
 }
@@ -120,6 +122,7 @@ void X3DEngine::ShutDown()
 		X_DELETE(pMaterialManager_, g_3dEngineArena);
 	}
 
+	level::Level::ShutDown();
 }
 
 int X3DEngine::release(void)
