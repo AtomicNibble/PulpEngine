@@ -102,9 +102,7 @@ private:
 	static void RegisterClass();
 	static void UnRegisterClass();
 
-	X_INLINE static bool isDebugEnable(void) {
-		return s_var_windowDebug != 0;
-	}
+	X_INLINE static bool isDebugEnable(void);
 
 protected:
 	mutable uint32_t numMsgs_;

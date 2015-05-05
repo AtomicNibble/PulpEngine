@@ -82,3 +82,8 @@ X_INLINE const uint32_t xWindow::GetNumMsgsClear(void) const
 	numMsgs_ = 0;
 	return ret;
 }
+
+
+X_INLINE bool xWindow::isDebugEnable(void) {
+	return s_var_windowDebug != 0;
+}
