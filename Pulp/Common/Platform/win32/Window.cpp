@@ -128,6 +128,7 @@ void xWindow::RegisterVars(void)
 xWindow::Notification::Enum xWindow::PumpMessages(void) const
 {
 	MSG msg;
+	uint32_t msgNumStart = numMsgs_;
 
 	// need two for WM_INPUT goat shiz.
 	while (PeekMessage(&msg, NULL, 0, WM_INPUT - 1, PM_REMOVE))
@@ -152,6 +153,10 @@ xWindow::Notification::Enum xWindow::PumpMessages(void) const
 		DispatchMessage(&msg); 
 	}
 
+	if (isDebugEnable()) {
+		uint32_t pumpDelta = numMsgs_ - msgNumStart;
+		X_LOG0("Window", "num messgaes pumped: %i total: %i", pumpDelta, numMsgs_);
+	}
 	return Notification::NONE;
 }
 
