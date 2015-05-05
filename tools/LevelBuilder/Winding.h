@@ -12,7 +12,17 @@ static const float ON_EPSILON = 0.1f;
 #define	SIDE_CROSS					3
 */
 
-#define _alloca16( x )				((void *)((((uintptr_t)_alloca( (x)+15 )) + 15) & ~15))
+// #define _alloca16( x )				((void *)((((uintptr_t)_alloca( (x)+15 )) + 15) & ~15))
+// make a type safe tmepalted version?
+template<typename T>
+T* Alloca16(size_t num) 
+{
+	void* pData = _alloca(num + 15);
+	// align.
+	pData = core::pointerUtil::AlignTop(pData,16);
+	return reinterpret_cast<T*>(pData);
+}
+
 
 #define	MAX_POINTS_ON_WINDING	64
 

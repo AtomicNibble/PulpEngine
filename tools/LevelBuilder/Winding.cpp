@@ -491,7 +491,7 @@ XWinding* XWinding::Clip(const Planef &plane, const float epsilon, const bool ke
 
 	maxpts = numPoints + 4;		// cant use counts[0]+2 because of fp grouping errors
 
-	newPoints = (Vec5f *)_alloca16(maxpts * sizeof(Vec5f));
+	newPoints = Alloca16<Vec5f>(maxpts * sizeof(Vec5f));
 	newNumPoints = 0;
 
 	for (i = 0; i < numPoints; i++) {
