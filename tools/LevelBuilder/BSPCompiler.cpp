@@ -208,6 +208,23 @@ bool LvlBuilder::processBrush(LvlEntity& ent, mapfile::XMapBrush* mapBrush, int 
 			}
 		}
 	}
+	
+	// opaque by default
+	pBrush->opaque = true;
+
+	// for now all sides must be portal
+	if (pBrush->allsidesSameMat)
+	{
+		if (lastMatName.isEqual("portal"))
+		{
+			pBrush->opaque = false;
+			stats_.numAreaPortals++;
+
+			FreeBrush(pBrush);
+			ent.numBrushes--;
+			return false;
+		}
+	}
 
 
 	if (!removeDuplicateBrushPlanes(pBrush)) {
@@ -217,8 +234,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent, mapfile::XMapBrush* mapBrush, int 
 	}
 
 
-	// For now everything is opaque REKT
-	pBrush->opaque = true;
+
 
 	// create windings for sides + bounds for brush
 	if (!pBrush->createBrushWindings(planes)) {
