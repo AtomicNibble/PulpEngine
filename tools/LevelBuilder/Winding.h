@@ -12,7 +12,7 @@ static const float ON_EPSILON = 0.1f;
 #define	SIDE_CROSS					3
 */
 
-#define _alloca16( x )				((void *)((((int)_alloca( (x)+15 )) + 15) & ~15))
+#define _alloca16( x )				((void *)((((uintptr_t)_alloca( (x)+15 )) + 15) & ~15))
 
 #define	MAX_POINTS_ON_WINDING	64
 
