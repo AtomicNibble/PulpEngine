@@ -174,6 +174,9 @@ struct XFile
 		return write(buf, length);
 	}
 
+	virtual inline bool isEof(void) const {
+		return remainingBytes() == 0;
+	}
 
 	virtual size_t remainingBytes(void) const X_ABSTRACT;
 	virtual size_t tell(void) const X_ABSTRACT;
@@ -247,6 +250,10 @@ struct XFileMem : public XFile
 		return arena_;
 	}
 
+	inline bool isEof(void) const X_FINAL{
+		return remainingBytes() == 0;
+	}
+
 private:
 	core::MemoryArenaBase* arena_;
 	char* begin_;
@@ -258,7 +265,7 @@ private:
 
 struct XFileBuf : public XFile
 {
-	XFileBuf(char* begin, char* end) :
+	XFileBuf(uint8_t* begin, uint8_t* end) :
 	begin_(begin), current_(begin), end_(end)
 	{
 		X_ASSERT_NOT_NULL(begin);
@@ -307,20 +314,24 @@ struct XFileBuf : public XFile
 		X_ASSERT_UNREACHABLE();
 	}
 
-	inline char* getBufferStart(void) { return begin_; }
-	inline const char* getBufferStart(void) const { return begin_; }
+	inline uint8_t* getBufferStart(void) { return begin_; }
+	inline const uint8_t* getBufferStart(void) const { return begin_; }
 
-	inline char* getBufferEnd(void) { return end_; }
-	inline const char* getBufferEnd(void) const { return end_; }
+	inline uint8_t* getBufferEnd(void) { return end_; }
+	inline const uint8_t* getBufferEnd(void) const { return end_; }
 
 	inline size_t getSize(void) const {
 		return end_ - begin_;
 	}
 
+	inline bool isEof(void) const X_FINAL{
+		return remainingBytes() == 0;
+	}
+
 private:
-	char* begin_;
-	char* current_;
-	char* end_;
+	uint8_t* begin_;
+	uint8_t* current_;
+	uint8_t* end_;
 };
 
 
