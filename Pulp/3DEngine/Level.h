@@ -73,7 +73,7 @@ private:
 	bool ProcessData(uint32_t bytesRead);
 
 private:
-	core::GrowingStringTableUnique<256, 16, 4, uint32_t> stringTable_;
+	core::GrowingStringTable<256, 16, 4, uint32_t> stringTable_;
 
 	core::Array<AreaModel> areaModels_;
 	uint8_t* pFileData_;
