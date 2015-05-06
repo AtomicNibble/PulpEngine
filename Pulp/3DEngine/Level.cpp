@@ -250,12 +250,25 @@ bool Level::ProcessHeader(uint32_t bytesRead)
 bool Level::ProcessData(uint32_t bytesRead)
 {
 	if (bytesRead != fileHdr_.totalDataSize) {
-		X_ERROR("Bsp", "failed to read level file. read: %i of %i",
+		X_ERROR("Level", "failed to read level file. read: %i of %i",
 			bytesRead, fileHdr_.totalDataSize);
 		return false;
 	}
 
 	// read string table.
+	core::XFileBuf file(pFileData_, pFileData_ + fileHdr_.stringDataSize);
+
+	if (!stringTable_.SLoad(&file))
+	{
+		X_ERROR("Level", "Failed to load string table.");
+		return false;
+	}
+
+	if (!file.isEof())
+	{
+		X_ERROR("Level", "Failed to fully parse sting table.");
+		return false;
+	}
 
 	core::StackString<64> meshName;
 	core::MemCursor<uint8_t> cursor(pFileData_ + fileHdr_.stringDataSize, fileHdr_.datasize);
