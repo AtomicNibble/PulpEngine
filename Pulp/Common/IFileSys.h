@@ -256,6 +256,74 @@ private:
 
 
 
+struct XFileBuf : public XFile
+{
+	XFileBuf(char* begin, char* end) :
+	begin_(begin), current_(begin), end_(end)
+	{
+		X_ASSERT_NOT_NULL(begin);
+		X_ASSERT_NOT_NULL(end);
+		X_ASSERT(end >= begin, "invalid buffer")(begin, end);
+	}
+	~XFileBuf() X_OVERRIDE{
+	}
+
+	virtual uint32_t read(void* pBuf, uint32_t Len) X_FINAL{
+		size_t size = core::Min<size_t>(Len, remainingBytes());
+
+		memcpy(pBuf, current_, size);
+		current_ += size;
+
+		return safe_static_cast<uint32_t, size_t>(size);
+	}
+
+	virtual uint32_t write(const void* pBuf, uint32_t Len) X_FINAL{
+		X_ASSERT_NOT_IMPLEMENTED();
+		return 0;
+	}
+
+	virtual void seek(size_t position, SeekMode::Enum origin) X_FINAL{
+		switch (origin)
+		{
+			case SeekMode::CUR:
+				current_ += core::Min<size_t>(position, remainingBytes());
+				break;
+			case SeekMode::SET:
+				current_ = begin_ + core::Min<size_t>(position, getSize());
+				break;
+			case SeekMode::END:
+				X_ASSERT_NOT_IMPLEMENTED();
+				break;
+		}
+	}
+	virtual size_t remainingBytes(void) const X_FINAL{
+		return end_ - current_;
+	}
+	virtual size_t tell(void) const X_FINAL{
+		return current_ - begin_;
+	}
+	virtual void setSize(size_t numBytes) X_FINAL{
+		X_UNUSED(numBytes);
+		X_ASSERT_UNREACHABLE();
+	}
+
+	inline char* getBufferStart(void) { return begin_; }
+	inline const char* getBufferStart(void) const { return begin_; }
+
+	inline char* getBufferEnd(void) { return end_; }
+	inline const char* getBufferEnd(void) const { return end_; }
+
+	inline size_t getSize(void) const {
+		return end_ - begin_;
+	}
+
+private:
+	char* begin_;
+	char* current_;
+	char* end_;
+};
+
+
 struct IFileSys
 {
 	typedef fileMode fileMode;
