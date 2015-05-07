@@ -5,6 +5,8 @@
 
 #include "DeviceManager\VidMemManager.h"
 
+#include "../Textures/XTexture.h"
+
 X_NAMESPACE_BEGIN(model)
 
 
@@ -166,6 +168,19 @@ bool XRenderMesh::render(void)
 	for (i = 0; i < num; i++)
 	{
 		const model::SubMeshHeader* mesh = pMesh_->subMeshHeads[i];
+
+		engine::IMaterial* pMat = mesh->pMat;
+		shader::XShaderItem& shaderItem = pMat->getShaderItem();
+
+		if (shaderItem.pResources_)
+		{
+			shader::XTextureResource* pTextRes = shaderItem.pResources_->getTexture(shader::ShaderTextureIdx::DIFFUSE);
+			if (pTextRes)
+			{
+				texture::TexID id = pTextRes->pITex->getTexID();
+				texture::XTexture::applyFromId(0, id, 0);
+			}
+		}
 
 		g_Dx11D3D.FX_DrawIndexPrimitive(
 			PrimitiveType::TriangleList,
