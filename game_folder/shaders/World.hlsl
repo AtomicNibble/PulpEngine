@@ -53,7 +53,6 @@ PS_OUTPUT SolidPS(PS_INPUT input)
     PS_OUTPUT output;   
     float4 textureCol = baseMap.Sample(baseMapSampler, input.texCoord);
     output.color = input.color * textureCol;
-     output.color.a = 0.8;
     return output;
 }
 
