@@ -530,6 +530,10 @@ IMaterial* XMaterialManager::loadMaterialXML(const char* MtlName)
 	path.setFileName(MtlName);
 	path.setExtension(MTL_FILE_EXTENSION);
 
+	if (!pFileSys_->fileExists(path.c_str())) {
+		return pMat;
+	}
+
 	if (file.openFile(path.c_str(), core::fileMode::READ))
 	{
 		length = file.remainingBytes();
@@ -582,6 +586,10 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 	path /= "materials/";
 	path.setFileName(MtlName);
 	path.setExtension(MTL_B_FILE_EXTENSION);
+
+	if (!pFileSys_->fileExists(path.c_str())) {
+		return pMat;
+	}
 
 	if (file.openFile(path.c_str(), core::fileMode::READ))
 	{
