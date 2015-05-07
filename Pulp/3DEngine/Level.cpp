@@ -306,6 +306,14 @@ bool Level::ProcessData(uint32_t bytesRead)
 			pSubMesh->indexes = cursor.postSeekPtr<model::Index>(pSubMesh->numIndexes);
 		}
 
+		// mat names
+		for (x = 0; x < numSub; x++)
+		{
+			model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
+			uint32_t matID = reinterpret_cast<uint32_t>(pSubMesh->materialName.as<uint32_t>());
+			pSubMesh->materialName = stringTable_.getString(matID);
+		}
+
 		// set the mesh head pointers.
 		pMesh->indexes = pMesh->subMeshHeads[0]->indexes;
 
