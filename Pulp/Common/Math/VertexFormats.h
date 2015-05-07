@@ -81,10 +81,14 @@ struct Vertex_P3F_T2F_C4B
 }; // 16
 
 
-struct Vertex_P3F_T4F_C4B_N3F
+struct Vertex_P3F_T4F
 {
 	Vec3f		pos;	// 12
 	Vec2f		texcoord[2];	// Vertex texture coordinates. 0 = surface, 1 = lightmap.
+};
+
+struct Vertex_P3F_T4F_C4B_N3F : public Vertex_P3F_T4F
+{
 	Color8u		color;
 	Vec3f		normal;
 };
