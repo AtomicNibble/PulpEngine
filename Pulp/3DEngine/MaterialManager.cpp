@@ -526,7 +526,7 @@ IMaterial* XMaterialManager::loadMaterialXML(const char* MtlName)
 	size_t length;
 	XMaterial* pMat = nullptr;
 
-	path /= "core_assets/materials/";
+	path /= "materials/";
 	path.setFileName(MtlName);
 	path.setExtension(MTL_FILE_EXTENSION);
 
@@ -579,7 +579,7 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 	XMaterial* pMat = nullptr;
 	uint32_t i;
 
-	path /= "core_assets/materials/";
+	path /= "materials/";
 	path.setFileName(MtlName);
 	path.setExtension(MTL_B_FILE_EXTENSION);
 
