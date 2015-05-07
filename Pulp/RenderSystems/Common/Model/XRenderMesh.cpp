@@ -8,6 +8,15 @@
 X_NAMESPACE_BEGIN(model)
 
 
+XMeshDevBuf::XMeshDevBuf() : BufId(render::VidMemManager::null_id), stride(0) {}
+
+
+bool XMeshDevBuf::isValid(void) const 
+{
+	return BufId != render::VidMemManager::null_id;
+}
+
+
 XRenderMesh::XRenderMesh()
 {
 	pMesh_ = nullptr;
@@ -42,26 +51,52 @@ bool XRenderMesh::canRender(void)
 		vertexStreams_[VertexStream::VERT].BufId != VidMemManager::null_id;
 }
 
+// DX11XRender::vertexFormatStride[vertexFmt_],
+
 bool XRenderMesh::uploadToGpu(void)
 {
 	X_ASSERT_NOT_NULL(pMesh_);
 	X_ASSERT((int32)vertexFmt_ != -1, "vertex format has not been set")(vertexFmt_);
 	using namespace render;
 
-	uint32_t ibSize;
-
-	ibSize = pMesh_->numIndexes * sizeof(model::Index);
-//	vbSize = pMesh_->numVerts * DX11XRender::vertexFormatStride[vertexFmt_];
+	uint32_t ibSize = pMesh_->numIndexes * sizeof(model::Index);
 	uint32_t numVerts = pMesh_->numVerts;
+
+	uint32_t baseVertStride = DX11XRender::vertexSteamStride[VertexStream::VERT][vertexFmt_];
+	uint32_t ColorStride = DX11XRender::vertexSteamStride[VertexStream::COLOR][vertexFmt_];
+	uint32_t normalStride = DX11XRender::vertexSteamStride[VertexStream::NORMALS][vertexFmt_];
+	uint32_t tanBiStride = DX11XRender::vertexSteamStride[VertexStream::TANGENT_BI][vertexFmt_];
 
 	indexStream_.BufId = g_Dx11D3D.VidMemMng()->CreateIB(ibSize, pMesh_->indexes);
 
-	vertexStreams_[VertexStream::VERT].BufId = g_Dx11D3D.VidMemMng()->CreateVB(numVerts * ((sizeof(Vec2f)* 2) + sizeof(Vec3f)),
-		pMesh_->streams[VertexStream::VERT]);
-	vertexStreams_[VertexStream::COLOR].BufId = g_Dx11D3D.VidMemMng()->CreateVB(numVerts * sizeof(Color8u),
-		pMesh_->streams[VertexStream::COLOR]);
-	vertexStreams_[VertexStream::NORMALS].BufId = g_Dx11D3D.VidMemMng()->CreateVB(numVerts * sizeof(Vec3f),
-		pMesh_->streams[VertexStream::NORMALS]);
+	if (baseVertStride > 0)
+	{
+		vertexStreams_[VertexStream::VERT].BufId = g_Dx11D3D.VidMemMng()->CreateVB(baseVertStride * numVerts, 
+			pMesh_->streams[VertexStream::VERT]);
+
+		vertexStreams_[VertexStream::VERT].stride = baseVertStride;
+	}
+	if (ColorStride > 0)
+	{
+		vertexStreams_[VertexStream::COLOR].BufId = g_Dx11D3D.VidMemMng()->CreateVB(ColorStride * numVerts,
+			pMesh_->streams[VertexStream::COLOR]);
+		
+		vertexStreams_[VertexStream::COLOR].stride = ColorStride;
+	}
+	if (normalStride > 0)
+	{
+		vertexStreams_[VertexStream::NORMALS].BufId = g_Dx11D3D.VidMemMng()->CreateVB(normalStride * numVerts,
+			pMesh_->streams[VertexStream::NORMALS]);
+
+		vertexStreams_[VertexStream::NORMALS].stride = normalStride;
+	}
+	if (tanBiStride > 0)
+	{
+		vertexStreams_[VertexStream::TANGENT_BI].BufId = g_Dx11D3D.VidMemMng()->CreateVB(tanBiStride * numVerts,
+			pMesh_->streams[VertexStream::TANGENT_BI]);
+
+		vertexStreams_[VertexStream::TANGENT_BI].stride = tanBiStride;
+	}
 
 	return canRender();
 }
@@ -79,26 +114,51 @@ bool XRenderMesh::render(void)
 	g_Dx11D3D.FX_SetVertexDeclaration(vertexFmt_);
 	g_Dx11D3D.FX_SetIStream(indexStream_.BufId);
 
+
+	XMeshDevBuf& verts = vertexStreams_[VertexStream::VERT];
+	XMeshDevBuf& color = vertexStreams_[VertexStream::COLOR];
+	XMeshDevBuf& normals = vertexStreams_[VertexStream::NORMALS];
+	XMeshDevBuf& tanBi = vertexStreams_[VertexStream::TANGENT_BI];
+
+	if (!verts.isValid()){
+		return false;
+	}
+
 	g_Dx11D3D.FX_SetVStream(
-		vertexStreams_[VertexStream::VERT].BufId,
+		verts.BufId,
 		VertexStream::VERT, 
-		((sizeof(Vec2f)* 2) + sizeof(Vec3f)),
+		verts.stride,
 		0
 	);
 
-	g_Dx11D3D.FX_SetVStream(
-		vertexStreams_[VertexStream::COLOR].BufId,
-		VertexStream::COLOR,
-		sizeof(Color8u),
-		0
-	);
-
-	g_Dx11D3D.FX_SetVStream(
-		vertexStreams_[VertexStream::NORMALS].BufId,
-		VertexStream::NORMALS,
-		sizeof(Vec3f),
-		0
+	if (color.isValid())
+	{
+		g_Dx11D3D.FX_SetVStream(
+			color.BufId,
+			VertexStream::COLOR,
+			color.stride,
+			0
 		);
+	}
+	if (normals.isValid())
+	{
+		g_Dx11D3D.FX_SetVStream(
+			normals.BufId,
+			VertexStream::NORMALS,
+			normals.stride,
+			0
+		);
+	}
+	if (tanBi.isValid())
+	{
+		g_Dx11D3D.FX_SetVStream(
+			tanBi.BufId,
+			VertexStream::TANGENT_BI,
+			tanBi.stride,
+			0
+		);
+	}
+
 
 	uint32_t i, num;
 	num = pMesh_->numSubMeshes;
@@ -112,9 +172,8 @@ bool XRenderMesh::render(void)
 			mesh->numIndexes,
 			mesh->startIndex,
 			mesh->startVertex
-			);
+		);
 	}
-
 
 	return true;
 }

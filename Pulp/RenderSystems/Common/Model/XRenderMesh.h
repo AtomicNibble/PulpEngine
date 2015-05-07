@@ -37,14 +37,13 @@ X_NAMESPACE_BEGIN(model)
 
 struct XMeshDevBuf
 {
-	XMeshDevBuf() : pDevBuf(nullptr), BufId(0) {}
+	XMeshDevBuf();
 
-	X_INLINE bool isValid(void) const {
-		return pDevBuf != nullptr;
-	}
+	bool isValid(void) const;
 
-	void* pDevBuf;
+//	void* pDevBuf;
 	uint32_t BufId;
+	uint32_t stride;
 };
 
 
