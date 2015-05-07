@@ -3,6 +3,8 @@
 #ifndef X_BSP_LOADER_H_
 #define X_BSP_LOADER_H_
 
+#include "EngineBase.h"
+
 #include <Ilevel.h>
 #include <Time\TimeVal.h>
 
@@ -51,7 +53,7 @@ struct AreaModel
 	model::IRenderMesh* pRenderMesh;
 };
 
-class Level
+class Level : public engine::XEngineBase
 {
 public:
 	Level();

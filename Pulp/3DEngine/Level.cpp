@@ -314,6 +314,14 @@ bool Level::ProcessData(uint32_t bytesRead)
 			pSubMesh->materialName = stringTable_.getString(matID);
 		}
 
+		// load materials
+		for (x = 0; x < numSub; x++)
+		{
+			model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
+		
+			pSubMesh->pMat = pMaterialManager_->loadMaterial(pSubMesh->materialName);
+		}
+
 		// set the mesh head pointers.
 		pMesh->indexes = pMesh->subMeshHeads[0]->indexes;
 
