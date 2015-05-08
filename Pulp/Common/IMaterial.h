@@ -16,7 +16,16 @@ static const char*		 MTL_B_FILE_EXTENSION = "mtlb";
 static const char*		 MTL_FILE_EXTENSION = "mtl";
 
 
-X_DECLARE_FLAGS(MaterialFlag)(TWO_SIDED, WIRE, ADDITIVE, NOSHADOW, NOLIGHTING, NODRAW, UI);
+X_DECLARE_FLAGS(MaterialFlag)(
+	TWO_SIDED, 
+	WIRE,
+	ADDITIVE, 
+	NOSHADOW,
+	NOLIGHTING, 
+	NODRAW, 
+	UI,
+	PORTAL
+	);
 
 typedef Flags<MaterialFlag> MaterialFlags;
 
