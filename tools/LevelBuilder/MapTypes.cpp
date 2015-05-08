@@ -16,7 +16,8 @@ X_NAMESPACE_BEGIN(mapfile)
 
 void XMapPatch::GenerateEdgeIndexes(void)
 {
-	int i, j, i0, i1, i2, s, v0, v1, edgeNum;
+	size_t i, j;
+	int i0, i1, i2, s, v0, v1, edgeNum;
 	int *index, *vertexEdges, *edgeChain;
 	surfaceEdge_t e[3];
 

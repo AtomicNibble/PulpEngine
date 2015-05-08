@@ -108,7 +108,7 @@ namespace
 		int least;
 		int i, r, ni;
 		int rotate;
-		int numIndexes;
+		size_t numIndexes;
 		level::Vertex* pVerts;
 		core::FixedArray<model::Face, 1024> indexes;
 
