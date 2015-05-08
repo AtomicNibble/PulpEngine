@@ -172,6 +172,12 @@ bool XRenderMesh::render(void)
 		engine::IMaterial* pMat = mesh->pMat;
 		shader::XShaderItem& shaderItem = pMat->getShaderItem();
 
+		engine::MaterialFlags flags = pMat->getFlags();
+		if (flags.IsSet(engine::MaterialFlag::NODRAW))
+		{
+			continue;
+		}
+
 		if (shaderItem.pResources_)
 		{
 			shader::XTextureResource* pTextRes = shaderItem.pResources_->getTexture(shader::ShaderTextureIdx::DIFFUSE);
