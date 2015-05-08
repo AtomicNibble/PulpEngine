@@ -1,4 +1,4 @@
-<material name="" flags="160" SurfaceType="none">
+<material name="" flags="128" SurfaceType="none">
 	<textures>
 		<texture type="albedo" image_name="core_assets/Textures/portal.dds" />
 	</textures>
