@@ -73,7 +73,7 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 
 
 	X_LOG0("Map", "Total world brush: %i", entities_[0].numBrushes);
-	X_LOG0("Map", "Total world patches: %i", entities_[0].numBrushes);
+	X_LOG0("Map", "Total world patches: %i", entities_[0].numPatches);
 	X_LOG0("Map", "Total total brush: %i", stats_.numBrushes);
 	X_LOG0("Map", "Total total patches: %i", stats_.numPatches);
 	X_LOG0("Map", "Total entities: %i", stats_.numEntities);
