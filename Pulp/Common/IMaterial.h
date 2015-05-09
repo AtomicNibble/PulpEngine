@@ -17,14 +17,14 @@ static const char*		 MTL_FILE_EXTENSION = "mtl";
 
 
 X_DECLARE_FLAGS(MaterialFlag)(
-	TWO_SIDED, 
-	WIRE,
-	ADDITIVE, 
-	NOSHADOW,
-	NOLIGHTING, 
-	NODRAW, 
-	UI,
-	PORTAL
+	TWO_SIDED, // 1
+	WIRE,	   // 2
+	ADDITIVE,  // 4
+	NOSHADOW,  // 8
+	NOLIGHTING, // 16
+	NODRAW,   // 32
+	UI,	//64
+	PORTAL//128
 	);
 
 typedef Flags<MaterialFlag> MaterialFlags;
