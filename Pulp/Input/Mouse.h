@@ -26,7 +26,7 @@ public:
 	}
 	// ~IInputDevice
 
-	void ProcessInput(RAWINPUT& input);
+	void ProcessInput(const RAWINPUTHEADER& header, const uint8_t* pData);
 
 private:
 	void PostEvent(InputSymbol* pSymbol);
@@ -35,7 +35,7 @@ private:
 	void OnButtonDown(KeyId::Enum id);
 	void OnButtonUP(KeyId::Enum id);
 
-	void ProcessMouseData(RAWMOUSE& mouse);
+	void ProcessMouseData(const RAWMOUSE& mouse);
 
 	InputSymbol* GetSymbol(KeyId::Enum id)
 	{
