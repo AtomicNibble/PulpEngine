@@ -38,16 +38,21 @@ bool XWinInput::Init(void)
 
 	// work out if WOW64.
 	if (!::IsWow64Process(::GetCurrentProcess(), &isWow64_)) {
-
+		core::lastError::Description Dsc;
+		X_ERROR("Input", "Wow64 check failed. Error: %s", core::lastError::ToString(Dsc));
 		return false;
 	}
 
 	// o baby!
-	if (!AddInputDevice(X_NEW_ALIGNED(XKeyboard,g_InputArena,"Keyboard",8)(*this))) 
+	if (!AddInputDevice(X_NEW_ALIGNED(XKeyboard, g_InputArena, "Keyboard", 8)(*this))) {
+		X_ERROR("Input", "Failed to add keyboard input device");
 		return false;
+	}
 
-	if (!AddInputDevice(X_NEW_ALIGNED(XMouse, g_InputArena, "Mouse", 8)(*this)))
+	if (!AddInputDevice(X_NEW_ALIGNED(XMouse, g_InputArena, "Mouse", 8)(*this))) {
+		X_ERROR("Input", "Failed to add mouse input device");
 		return false;
+	}
 
 	ClearKeyState();
 	return true;
