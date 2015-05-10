@@ -2,7 +2,7 @@
 
 #include <EngineCommon.h>
 
-
+#include "resource.h"
 
 #include <String\StackString.h>
 #include <String\Path.h>
@@ -27,9 +27,10 @@ X_USING_NAMESPACE;
 
 using namespace std;
 
-
+#include "Settings.h"
 #include "Winding.h"
 #include "PlaneSet.h"
 #include "VertexFmt.h"
+
 
 extern core::MemoryArenaBase* g_arena;

@@ -118,7 +118,7 @@ namespace
 
 		if (numVerts == 0)
 		{
-			X_WARNING("Bsp", "submesh has zero verts");
+			X_WARNING("Lvl", "submesh has zero verts");
 			return false;
 		}
 
@@ -223,7 +223,7 @@ bool LvlBuilder::ProcessModels(void)
 
 	for (entityNum = 0; entityNum < numEntities; entityNum++)
 	{
-		const LvlEntity& entity = entities_[entityNum];
+		LvlEntity& entity = entities_[entityNum];
 		if (!entity.pBrushes && !entity.pPatches) {
 			continue;
 		}
@@ -248,7 +248,7 @@ bool LvlBuilder::ProcessModels(void)
 
 
 
-bool LvlBuilder::ProcessModel(const LvlEntity& ent)
+bool LvlBuilder::ProcessModel(LvlEntity& ent)
 {
 	
 
@@ -257,12 +257,42 @@ bool LvlBuilder::ProcessModel(const LvlEntity& ent)
 }
 
 
-bool LvlBuilder::ProcessWorldModel(const LvlEntity& ent)
+void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 {
-	X_LOG0("Bsp", "Processing World Entity");
+	X_LOG0("Lvl", "Processing World Entity");
+	bspBrush* pBrush;
+	size_t i;
+	int x;
+
+	bspFace* pFaces = nullptr;;
+
+	pBrush = ent.pBrushes;
+	for (i = 0; i < ent.numBrushes; i++)
+	{
+		X_ASSERT_NOT_NULL(pBrush);
+
+//		if (pBrush->opaque && )
+
+		for (x = 0; x < pBrush->numsides; x++)
+		{
+			if (!pBrush->sides[x].pWinding)
+				continue;
+
+
+		}
+	}
+}
+
+bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
+{
+	X_LOG0("Lvl", "Processing World Entity");
 	bspBrush* pBrush;
 	size_t i;
 	int x, p;
+
+	// make structural face list.
+	MakeStructuralFaceList(ent);
+
 
 	// allocate a area.
 	// we will have multiple area's for world. (none noob map xD)

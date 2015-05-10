@@ -1,51 +1,73 @@
 #include "stdafx.h"
-#include "BSPTypes.h"
+#include "LvlTypes.h"
 
-bspBrush::bspBrush()
+
+LvlBrushSide::LvlBrushSide() : 
+planenum(0), 
+visible(true),
+culled(false),
+pWinding(nullptr), 
+pVisibleHull(nullptr)
 {
-	core::zero_this(this);
+
 }
 
-bspBrush::bspBrush(const bspBrush& oth)
+
+LvlEntity::LvlEntity() :
+brushes(g_arena)
 {
+	mapEntity = nullptr;
+}
 
-	next = oth.next;
+// ==========================================
 
+
+LvlBrush::LvlBrush() :
+sides(g_arena)
+{
+	entityNum = -1;
+	brushNum = -1;
+
+	bounds.clear();
+
+	opaque = true;
+	allsidesSameMat = true;
+}
+
+LvlBrush::LvlBrush(const LvlBrush& oth) :
+sides(g_arena)
+{
 	// used for poviding helpful error msg's
 	entityNum = oth.entityNum;
 	brushNum = oth.brushNum;
 
 	bounds = oth.bounds;
 	opaque = oth.opaque;
-//	detail = oth.detail;
+	//	detail = oth.detail;
 
-	numsides = oth.numsides;
+	sides.resize(oth.sides.size());
 
-	// copy windinds.
-	for (int i = 0; i < numsides; i++)
+	// cop sides
+	for (int i = 0; i < oth.sides.size(); i++)
 	{
 		sides[i] = oth.sides[i];
-
-		if (oth.sides[i].pWinding)
-			sides[i].pWinding = oth.sides[i].pWinding->Copy();
 	}
-
 }
 
-bool bspBrush::createBrushWindings(const XPlaneSet& planes)
+bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 {
-	int			i, j;
+	size_t	i, j;
 	XWinding	*w;
 	const Planef*		pPlane;
-	BspSide*	pSide;
+	LvlBrushSide*	pSide;
 
-	for (i = 0; i < numsides; i++)
+	for (i = 0; i < sides.size(); i++)
 	{
 		pSide = &sides[i];
 		pPlane = &planes[pSide->planenum];
 		w = new XWinding(*pPlane);
 
-		for (j = 0; j < numsides && w; j++)
+		for (j = 0; j < sides.size() && w; j++)
 		{
 			if (i == j) {
 				continue;
@@ -55,12 +77,6 @@ bool bspBrush::createBrushWindings(const XPlaneSet& planes)
 			}
 
 			w = w->Clip(planes[sides[j].planenum ^ 1], 0.01f);
-
-			if (w) {
-				AABB temp;
-				w->GetAABB(temp);
-				int pad = 0;
-			}
 		}
 		if (pSide->pWinding) {
 			delete pSide->pWinding;
@@ -71,17 +87,13 @@ bool bspBrush::createBrushWindings(const XPlaneSet& planes)
 	return boundBrush(planes);
 }
 
-bool bspBrush::boundBrush(const XPlaneSet& planes)
+bool LvlBrush::boundBrush(const XPlaneSet& planes)
 {
-	int			i, j;
+	size_t		i, j;
 	XWinding	*w;
 
-	if (0x0000005f == brushNum) {
-		int goat = 0;
-	}
-
 	bounds.clear();
-	for (i = 0; i < numsides; i++) {
+	for (i = 0; i < sides.size(); i++) {
 		w = sides[i].pWinding;
 		if (!w)
 			continue;
@@ -89,17 +101,19 @@ bool bspBrush::boundBrush(const XPlaneSet& planes)
 			bounds.add((*w)[j].asVec3());
 	}
 
-	for (i = 0; i < 3; i++) {
+	for (i = 0; i < 3; i++) 
+	{
 		if (bounds.min[i] < level::MIN_WORLD_COORD || bounds.max[i] > level::MAX_WORLD_COORD
 			|| bounds.min[i] >= bounds.max[i])
 		{
 			// calculate a pos.
 			Planef::Description Dsc;
 			const Planef* plane = nullptr;
-			if (numsides > 0)
+			if (sides.size() > 0) {
 				plane = &planes[sides[0].planenum];
+			}
 
-			X_WARNING("Brush", "Entity %i, Brush %i, Sides %i: failed to calculate brush bounds (%s)",
+			X_WARNING("LvlBrush", "Entity %i, Brush %i, Sides %i: failed to calculate brush bounds (%s)",
 				entityNum, brushNum, numsides, plane ? plane->toString(Dsc) : "");
 			return false;
 		}
@@ -109,32 +123,30 @@ bool bspBrush::boundBrush(const XPlaneSet& planes)
 }
 
 
-float bspBrush::Volume(const XPlaneSet& planes)
+float LvlBrush::Volume(const XPlaneSet& planes)
 {
 	int			i;
-	XWinding	*w;
+	XWinding*	w;
 	Vec3f		corner;
 	float		d, area, volume;
-	const Planef		*plane;
-
+	const Planef* plane;
 
 	// grab the first valid point as the corner
-
 	w = nullptr;
-	for (i = 0; i < numsides; i++) {
+	for (i = 0; i < sides.size(); i++) {
 		w = sides[i].pWinding;
 		if (w)
 			break;
 	}
 	if (!w) {
-		return 0;
+		return 0.f;
 	}
 
 	corner = (*w)[0].asVec3();
 
 	// make tetrahedrons to all other faces
 	volume = 0;
-	for (; i < numsides; i++)
+	for (; i < sides.size(); i++)
 	{
 		w = sides[i].pWinding;
 		if (!w)
@@ -150,21 +162,22 @@ float bspBrush::Volume(const XPlaneSet& planes)
 }
 
 
-BrushPlaneSide::Enum bspBrush::BrushMostlyOnSide(const Planef& plane)
+BrushPlaneSide::Enum LvlBrush::BrushMostlyOnSide(const Planef& plane)
 {
 	int			i, j;
-	XWinding	*w;
+	XWinding*	w;
 	float		d, max;
 	BrushPlaneSide::Enum side;
 
 	max = 0;
 	side = BrushPlaneSide::FRONT;
-	for (i = 0; i < numsides; i++) 
+	for (i = 0; i < sides.size(); i++)
 	{
 		w = sides[i].pWinding;
 
-		if (!w)
+		if (!w) {
 			continue;
+		}
 
 		for (j = 0; j < w->GetNumPoints(); j++)
 		{
@@ -182,33 +195,4 @@ BrushPlaneSide::Enum bspBrush::BrushMostlyOnSide(const Planef& plane)
 		}
 	}
 	return side;
-}
-
-
-// ------------------------------ Tris -----------------------------------
-
-bspTris::bspTris()
-{
-	next = nullptr;
-}
-
-// ------------------------------ Face -----------------------------------
-
-bspFace::bspFace()
-{
-	core::zero_this(this);
-}
-
-// ------------------------------ Node -----------------------------------
-
-bspNode::bspNode()
-{
-	core::zero_this(this);
-}
-
-// ------------------------------ Tree -----------------------------------
-
-bspTree::bspTree()
-{
-	core::zero_this(this);
 }

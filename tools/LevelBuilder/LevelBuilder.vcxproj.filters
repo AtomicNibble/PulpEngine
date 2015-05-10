@@ -31,15 +31,18 @@
     <Filter Include="Header Files\MapFile">
       <UniqueIdentifier>{adebf7d5-4a0b-4422-84e2-0f1d42c15234}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Lvl">
+      <UniqueIdentifier>{abd30faf-34f6-42cc-aef2-4d5a59b50e67}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Lvl">
+      <UniqueIdentifier>{fd5d5c94-d721-412a-a874-ec65bbbddc53}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="LevelBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="EngineApp.h">
@@ -74,6 +77,15 @@
     </ClInclude>
     <ClInclude Include="BSPData.h">
       <Filter>Header Files\BSP</Filter>
+    </ClInclude>
+    <ClInclude Include="LvlTypes.h">
+      <Filter>Header Files\Lvl</Filter>
+    </ClInclude>
+    <ClInclude Include="LevelBuilder.h">
+      <Filter>Header Files\Lvl</Filter>
+    </ClInclude>
+    <ClInclude Include="Settings.h">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -115,6 +127,15 @@
     </ClCompile>
     <ClCompile Include="BSPArea.cpp">
       <Filter>Source Files\BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="LvlTypes.cpp">
+      <Filter>Source Files\Lvl</Filter>
+    </ClCompile>
+    <ClCompile Include="LvlBuilder.cpp">
+      <Filter>Source Files\Lvl</Filter>
+    </ClCompile>
+    <ClCompile Include="Settings.cpp">
+      <Filter>Source Files\Util</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

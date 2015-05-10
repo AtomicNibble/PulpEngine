@@ -82,6 +82,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 			name.setFileName("box.map");
 			name.setFileName("test_resources\\maps\\boxmap.map");
 			name.setFileName("box2.map");
+			name.setFileName("box3.map");
 			
 			CompileLevel(name);
 
