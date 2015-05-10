@@ -398,9 +398,9 @@ void XWindow::SetupFromState(void)
 	if (style_ == WindowStyle::SHADER) {
 		pBackgroundMat_ = pMaterialManager_->loadMaterial(background_.c_str());
 	
-		engine::MaterialFlags flags = pBackgroundMat_->getFlags();
+		engine::MaterialType::Enum type = pBackgroundMat_->getType();
 #if 1	
-		if (!flags.IsSet(engine::MaterialFlag::UI)) {
+		if (type != engine::MaterialType::UI) {
 			X_WARNING("Gui", "Material %s is not a GUI material", background_.c_str());
 			pBackgroundMat_ = pMaterialManager_->getDefaultMaterial();
 		}
