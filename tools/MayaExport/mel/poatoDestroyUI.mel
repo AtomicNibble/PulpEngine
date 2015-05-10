@@ -1,0 +1,24 @@
+// ==========================
+// Potato - Model Exporter (UIScript) 
+// Version: 1.0
+// site: tom-crowley.co.uk
+// Copyright: Tom Crowley 2014
+// ==========================
+
+global proc potato_DestoryExportWindow( string $name )
+{
+	if (`window -exists $name`)
+		deleteUI $name;
+}
+
+global proc DestoryMenu()
+{
+    if(`menu -exists PotatoToolsMenu`)
+      deleteUI -menu PotatoToolsMenu;
+}
+
+global proc poatoDestroyUI()
+{
+	DestoryMenu();
+	potato_DestoryExportWindow("potato_ExportWindow");
+}
