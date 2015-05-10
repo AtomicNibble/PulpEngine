@@ -137,6 +137,15 @@ struct IMaterial
 	virtual MaterialCullType::Enum getCullType() const X_ABSTRACT;
 	virtual void setCullType(MaterialCullType::Enum type) X_ABSTRACT;
 
+	virtual MaterialTexRepeat::Enum getTexRepeat(void) const X_ABSTRACT;
+	virtual void setTexRepeat(MaterialTexRepeat::Enum texRepeat) X_ABSTRACT;
+
+	virtual MaterialPolygonOffset::Enum getPolyOffsetType(void) const X_ABSTRACT;
+	virtual void setPolyOffsetType(MaterialPolygonOffset::Enum polyOffsetType) X_ABSTRACT;
+
+	virtual MaterialFilterType::Enum getFilterType(void) const X_ABSTRACT;
+	virtual void setFilterType(MaterialFilterType::Enum filterType) X_ABSTRACT;
+
 	virtual MaterialType::Enum getType(void) const X_ABSTRACT;
 	virtual void setType(MaterialType::Enum type) X_ABSTRACT;
 

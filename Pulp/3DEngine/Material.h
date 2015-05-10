@@ -48,9 +48,17 @@ public:
 	virtual MaterialCullType::Enum getCullType() const X_OVERRIDE;
 	virtual void setCullType(MaterialCullType::Enum type) X_OVERRIDE;
 
+	virtual MaterialTexRepeat::Enum getTexRepeat(void) const X_OVERRIDE;
+	virtual void setTexRepeat(MaterialTexRepeat::Enum texRepeat) X_OVERRIDE;
+
+	virtual MaterialPolygonOffset::Enum getPolyOffsetType(void) const X_OVERRIDE;
+	virtual void setPolyOffsetType(MaterialPolygonOffset::Enum polyOffsetType) X_OVERRIDE;
+
+	virtual MaterialFilterType::Enum getFilterType(void) const X_OVERRIDE;
+	virtual void setFilterType(MaterialFilterType::Enum filterType) X_OVERRIDE;
+
 	virtual MaterialType::Enum getType(void) const X_OVERRIDE;
 	virtual void setType(MaterialType::Enum type) X_OVERRIDE;
-
 
 	virtual void setShaderItem(shader::XShaderItem& item) X_OVERRIDE;
 	virtual shader::XShaderItem& getShaderItem(void) X_OVERRIDE{ return shaderItem_; }
@@ -69,6 +77,10 @@ protected:
 	MaterialFlags			flags_;
 	MaterialSurType::Enum	MatSurfaceType_;
 	MaterialCullType::Enum	CullType_;
+
+	MaterialTexRepeat::Enum texRepeat_;
+	MaterialPolygonOffset::Enum polyOffsetType_;
+	MaterialFilterType::Enum filterType_;
 	MaterialType::Enum		MatType_;
 
 	shader::XShaderItem     shaderItem_;

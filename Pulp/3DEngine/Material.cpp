@@ -89,6 +89,37 @@ void XMaterial::setCullType(MaterialCullType::Enum type)
 	CullType_ = type;
 }
 
+
+MaterialTexRepeat::Enum XMaterial::getTexRepeat(void) const
+{
+	return texRepeat_;
+}
+
+void XMaterial::setTexRepeat(MaterialTexRepeat::Enum texRepeat)
+{
+	texRepeat_ = texRepeat;
+}
+
+MaterialPolygonOffset::Enum XMaterial::getPolyOffsetType(void) const
+{
+	return polyOffsetType_;
+}
+
+void XMaterial::setPolyOffsetType(MaterialPolygonOffset::Enum polyOffsetType)
+{
+	polyOffsetType_ = polyOffsetType;
+}
+
+MaterialFilterType::Enum XMaterial::getFilterType(void) const
+{
+	return filterType_;
+}
+
+void XMaterial::setFilterType(MaterialFilterType::Enum filterType)
+{
+	filterType_ = filterType;
+}
+
 MaterialType::Enum XMaterial::getType(void) const
 {
 	return MatType_;
