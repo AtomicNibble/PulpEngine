@@ -16,61 +16,96 @@ static const char*		 MTL_B_FILE_EXTENSION = "mtlb";
 static const char*		 MTL_FILE_EXTENSION = "mtl";
 
 
+static const float POLY_DECAL_OFFSET = 0.05f;
+static const float POLY_WEAPON_IMPACT_OFFSET = 0.1f;
+
 X_DECLARE_FLAGS(MaterialFlag)(
-	TWO_SIDED, // 1
-	WIRE,	   // 2
-	ADDITIVE,  // 4
-	NOSHADOW,  // 8
-	NOLIGHTING, // 16
-	NODRAW,   // 32
-	UI,	//64
-	PORTAL//128
-	);
+	NODRAW,			// not visable
+	EDITOR_VISABLE, // makes nodraw visable in editor modes.
+
+	SOLID,			// eye/view can't be in a solid
+
+	STRUCTURAL,		// collision, used to buold area's also.
+	DETAIL,			// no collision
+
+	PORTAL,			// for creating render cells
+
+	PLAYER_CLIP,	// players can't go through this
+	AI_CLIP,		// AI can't go throught this
+
+	NO_FALL_DMG,	// no dmg given on fall
+	NO_IMPACT,		// impacts not shown
+	NO_PENNETRATE	// bullets can't pass through.
+);
+
+// the type of material it is, changes nothing really currently.
+X_DECLARE_ENUM8(MaterialType)(
+	UI,
+	WORLD,
+	MODEL,
+	TOOL
+);
+
+// offset types.
+X_DECLARE_ENUM8(MaterialPolygonOffset)(
+	NONE,
+	STATIC_DECAL,
+	WEAPON_IMPACT
+);
+
+X_DECLARE_ENUM8(MaterialFilterType)(
+	LINEAR,
+	BILINEAR_X2,
+	BILINEAR_X4,
+	TRILINEAR_X2,
+	TRILINEAR_X4
+);
+
+X_DECLARE_ENUM8(MaterialTexRepeat)(
+	NO_TILE,
+	TILE_BOTH,
+	TILE_HOZ,
+	TILE_VERT
+);
+
+X_DECLARE_ENUM8(MaterialSurType)(
+	NONE,
+
+	BRICK,
+	CONCRETE,
+	CLOTH,
+
+	FLESH,
+
+	GLASS,
+	GRASS,
+	GRAVEL,
+
+	ICE,
+
+	METAL,
+	MUD,
+
+	PLASTIC,
+	PAPER,
+	ROCK,
+
+	SNOW,
+	SAND,
+
+	WOOD,
+	WATER
+);
+
+X_DECLARE_ENUM8(MaterialCullType)(
+	FRONT_SIDED,
+	BACK_SIDED,
+	TWO_SIDED
+);
 
 typedef Flags<MaterialFlag> MaterialFlags;
 
-struct MaterialSurType
-{
-	enum Enum : uint8_t
-	{
-		NONE = 1,
 
-		BRICK,
-		CONCRETE,
-		CLOTH,
-
-		FLESH,
-
-		GLASS,
-		GRASS,
-		GRAVEL,
-
-		ICE,
-
-		METAL,
-		MUD,
-
-		PLASTIC,
-		PAPER,
-		ROCK,
-
-		SNOW,
-		SAND,
-
-		WOOD,
-		WATER,
-	};
-};
-
-struct MaterialCullType
-{
-	enum Enum : uint8_t
-	{
-		FRONT_SIDED,
-		BACK_SIDED,
-		TWO_SIDED
-	};
-};
 
 /*
 what o do for the shader input system that i need todo for my engine.
@@ -102,6 +137,9 @@ struct IMaterial
 	virtual MaterialCullType::Enum getCullType() const X_ABSTRACT;
 	virtual void setCullType(MaterialCullType::Enum type) X_ABSTRACT;
 
+	virtual MaterialType::Enum getType(void) const X_ABSTRACT;
+	virtual void setType(MaterialType::Enum type) X_ABSTRACT;
+
 	virtual void setShaderItem(shader::XShaderItem& item) X_ABSTRACT;
 	virtual shader::XShaderItem& getShaderItem(void) X_ABSTRACT;
 
@@ -120,6 +158,12 @@ struct MaterialHeader
 	uint8 numTextures;
 	MaterialCullType::Enum cullType;
 	MaterialSurType::Enum type;
+	// 4
+	MaterialTexRepeat::Enum texRepeat;
+	MaterialPolygonOffset::Enum polyOffsetType;
+	MaterialFilterType::Enum filterType;
+	MaterialType::Enum matType;
+
 
 	Color diffuse;
 	Color specular;
@@ -142,7 +186,13 @@ struct MaterialTexture
 
 X_ENSURE_SIZE(MaterialCullType::Enum, 1);
 X_ENSURE_SIZE(MaterialSurType::Enum, 1);
-X_ENSURE_SIZE(MaterialHeader, 64);
+
+X_ENSURE_SIZE(MaterialTexRepeat::Enum, 1);
+X_ENSURE_SIZE(MaterialPolygonOffset::Enum, 1);
+X_ENSURE_SIZE(MaterialFilterType::Enum, 1);
+X_ENSURE_SIZE(MaterialType::Enum, 1);
+
+X_ENSURE_SIZE(MaterialHeader, 68);
 
 
 struct IMaterialManagerListener
