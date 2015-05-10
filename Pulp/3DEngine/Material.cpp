@@ -89,6 +89,17 @@ void XMaterial::setCullType(MaterialCullType::Enum type)
 	CullType_ = type;
 }
 
+MaterialType::Enum XMaterial::getType(void) const
+{
+	return MatType_;
+}
+
+void XMaterial::setType(MaterialType::Enum type)
+{
+	MatType_ = type;
+}
+
+
 void XMaterial::setShaderItem(shader::XShaderItem& item)
 {
 	core::SafeRelease(shaderItem_.pShader_);
