@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "BSPTypes.h"
+#include "LvlTypes.h"
 
 
 AreaModel::AreaModel() :
@@ -137,9 +137,9 @@ void LvlArea::AreaEnd(void)
 
 
 
-AreaSubMesh* LvlArea::MeshForSide(const BspSide& side, StringTableType& stringTable)
+AreaSubMesh* LvlArea::MeshForSide(const LvlBrushSide& side, StringTableType& stringTable)
 {
-	AreaMeshMap::iterator it = areaMeshes.find(X_CONST_STRING(side.material.name.c_str()));
+	AreaMeshMap::iterator it = areaMeshes.find(X_CONST_STRING(side.matInfo.name.c_str()));
 	if (it != areaMeshes.end()) {
 		return &it->second;
 	}
@@ -147,9 +147,12 @@ AreaSubMesh* LvlArea::MeshForSide(const BspSide& side, StringTableType& stringTa
 	AreaSubMesh newMesh;
 
 	// add mat name to string table.
-	newMesh.matNameID_ = stringTable.addStringUnqiue(side.material.name.c_str());
-	newMesh.matName_ = side.material.name;
+	newMesh.matNameID_ = stringTable.addStringUnqiue(side.matInfo.name.c_str());
+	newMesh.matName_ = side.matInfo.name;
 
-	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes.insert(AreaMeshMap::value_type(side.material.name.c_str(), newMesh));
+	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes.insert(
+		AreaMeshMap::value_type(side.matInfo.name.c_str(), newMesh)
+	)
+	;
 	return &newIt.first->second;
 }

@@ -247,7 +247,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BSPArea.cpp" />
+    <ClCompile Include="AreaModel.cpp" />
     <ClCompile Include="BSPFile.cpp" />
     <ClCompile Include="BSPProcess.cpp" />
     <ClCompile Include="BSPCompiler.cpp" />
