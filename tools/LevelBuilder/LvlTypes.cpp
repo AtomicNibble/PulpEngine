@@ -73,8 +73,17 @@ LvlBrushSide& LvlBrushSide::operator = (const LvlBrushSide& oth)
 
 // ==========================================
 
+LvlTris::LvlTris()
+{
+	pMaterial = nullptr;
+}
+
+// ==========================================
+
 LvlEntity::LvlEntity() :
-brushes(g_arena)
+brushes(g_arena),
+patches(g_arena),
+bspFaces(g_arena)
 {
 	mapEntity = nullptr;
 }
@@ -116,10 +125,10 @@ sides(g_arena)
 
 bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 {
-	size_t	i, j;
-	XWinding	*w;
-	const Planef*		pPlane;
-	LvlBrushSide*	pSide;
+	size_t i, j;
+	XWinding* w;
+	const Planef* pPlane;
+	LvlBrushSide* pSide;
 
 	for (i = 0; i < sides.size(); i++)
 	{

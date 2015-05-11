@@ -6,8 +6,9 @@
 
 #include <IModel.h>
 #include <IMaterial.h>
-
 #include <String\GrowingStringTable.h>
+
+#include "BSPTypes.h"
 
 #define PLANENUM_LEAF           -1
 
@@ -93,22 +94,31 @@ public:
 };
 
 
+
+struct LvlTris
+{
+	LvlTris();
+
+	engine::IMaterial*	  pMaterial;
+
+	xVert verts[3];
+};
+
+
 struct LvlEntity
 {
 	typedef core::Array<LvlBrush> LvlBrushArr;
+	typedef core::Array<LvlTris> TrisArr;
+	typedef core::Array<bspFace> BspFaceArr;
 public:
 	LvlEntity();
 
-	Vec3f				origin;
-
-//	struct bspBrush*	pBrushes;
-//	struct bspTris*		pPatches;
-//	struct bspFace*		pFaces;
-
-//	size_t	numBrushes;
-//	size_t  numPatches;
+	Vec3f origin;
 
 	LvlBrushArr brushes;
+	TrisArr patches;
+	// bsp data.
+	BspFaceArr bspFaces;
 
 	mapfile::XMapEntity*	mapEntity;		// points to the map data this was made from.
 };
