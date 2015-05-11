@@ -67,11 +67,6 @@ namespace
 			}
 		}
 
-		// add to vert count 
-	//	mesh.numVerts++;
-
-		// fill indexes in triangle fan order 
-	//	mesh.numIndexes = 0;
 		for (i = 1; i < numVerts; i++)
 		{
 			model::Face face;
@@ -245,40 +240,84 @@ bool LvlBuilder::ProcessModel(LvlEntity& ent)
 void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "Processing World Entity");
-#if 0
-	bspBrush* pBrush;
-	size_t i;
-	int x;
+	size_t i, x;
 
-	bspFace* pFaces = nullptr;;
-
-	pBrush = ent.pBrushes;
-	for (i = 0; i < ent.numBrushes; i++)
+	for (i = 0; i < ent.brushes.size(); i++)
 	{
-		X_ASSERT_NOT_NULL(pBrush);
+		LvlBrush& brush = ent.brushes[i];
 
-//		if (pBrush->opaque && )
-
-		for (x = 0; x < pBrush->numsides; x++)
+		if (!brush.opaque)
 		{
-			if (!pBrush->sides[x].pWinding)
+			// if it's not opaque and none of the sides are portals it can't be structual.
+			if (!brush.combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL))
+			{
 				continue;
+			}
+		}
 
+		for (x = 0; x < brush.sides.size(); x++)
+		{
+			LvlBrushSide& side = brush.sides[x];
+
+			if (!side.pWinding) {
+				continue;
+			}
+
+			// if combined flags are portal, check what this side is.
+			if (brush.combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL))
+			{
+				engine::IMaterial* pMaterial = side.matInfo.pMaterial;
+				X_ASSERT_NOT_NULL(pMaterial);
+
+				engine::MaterialFlags flags = pMaterial->getFlags();
+
+				if (!flags.IsSet(engine::MaterialFlag::PORTAL))
+				{
+					continue;
+				}
+			}
+
+			bspFace& face = ent.bspFaces.AddOne();
+			face.planenum = side.planenum & ~1;
+			face.w = side.pWinding->Copy();
 		}
 	}
-#endif
+}
+
+void LvlBuilder::calculateLvlBounds(void)
+{
+	mapBounds.clear();
+
+	// bound me baby
+	LvlEntsArr::ConstIterator it = entities_.begin();
+	for (; it != entities_.end(); ++it) 
+	{
+		LvlEntity::LvlBrushArr::ConstIterator bIt = it->brushes.begin();
+		LvlEntity::LvlBrushArr::ConstIterator bEnd = it->brushes.end();
+		for (; bIt != bEnd; ++bIt)
+		{
+			const LvlBrush& brush = *bIt;
+
+			mapBounds.add(brush.bounds);
+		}
+	}
 }
 
 bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "Processing World Entity");
+
+	// make structural face list.
+	MakeStructuralFaceList(ent);
+
+	int goat = 0;
+
 #if 0
 	bspBrush* pBrush;
 	size_t i;
 	int x, p;
 
-	// make structural face list.
-	MakeStructuralFaceList(ent);
+
 
 
 	// allocate a area.

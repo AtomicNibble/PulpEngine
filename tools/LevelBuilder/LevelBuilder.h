@@ -8,6 +8,8 @@
 
 class LvlBuilder
 {
+	typedef core::Array<LvlEntity> LvlEntsArr;
+	typedef core::Array<LvlArea> LvlAreaArr;
 public:
 	LvlBuilder();
 
@@ -27,13 +29,14 @@ private:
 
 private:
 	void MakeStructuralFaceList(LvlEntity& ent);
-
+	void calculateLvlBounds(void);
+		
 	bool ProcessModel(LvlEntity& ent);
 	bool ProcessWorldModel(LvlEntity& ent);
 
 private:
-	core::Array<LvlEntity>		entities_;
-	core::Array<LvlArea>		areas_;
+	LvlEntsArr	entities_;
+	LvlAreaArr	areas_;
 
 	core::GrowingStringTableUnique<256, 16, 4, uint32_t> stringTable_;
 
