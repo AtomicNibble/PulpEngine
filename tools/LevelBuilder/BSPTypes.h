@@ -15,24 +15,17 @@ class XMapPatch;
 );
 
 
-struct bspTris
-{
-	bspTris();
-
-	bspTris*			next;
-	xVert				v[3];
-};
 
 struct bspFace
 {
 	bspFace();
 
-	struct bspFace*		next;
+	int	planenum;
+	bool portal;			
+	bool checked;	
+	bool _pad[2];
 
-	int					planenum;
-	bool				portal;			
-	bool				checked;		
-	XWinding*			w;
+	XWinding* w;
 };
 
 

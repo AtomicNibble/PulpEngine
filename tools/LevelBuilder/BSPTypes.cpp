@@ -1,18 +1,16 @@
 #include "stdafx.h"
 #include "BSPTypes.h"
 
-// ------------------------------ Tris -----------------------------------
-
-bspTris::bspTris()
-{
-	next = nullptr;
-}
 
 // ------------------------------ Face -----------------------------------
 
 bspFace::bspFace()
 {
-	core::zero_this(this);
+	planenum = -1;
+	portal = false;
+	checked = false;
+
+	w = nullptr;
 }
 
 // ------------------------------ Node -----------------------------------
