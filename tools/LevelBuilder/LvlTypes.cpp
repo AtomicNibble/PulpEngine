@@ -48,7 +48,7 @@ sides(g_arena)
 	sides.resize(oth.sides.size());
 
 	// cop sides
-	for (int i = 0; i < oth.sides.size(); i++)
+	for (size_t i = 0; i < oth.sides.size(); i++)
 	{
 		sides[i] = oth.sides[i];
 	}
@@ -89,16 +89,20 @@ bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 
 bool LvlBrush::boundBrush(const XPlaneSet& planes)
 {
-	size_t		i, j;
-	XWinding	*w;
+	size_t i;
+	int32_t j;
+	XWinding* w;
 
 	bounds.clear();
-	for (i = 0; i < sides.size(); i++) {
+	for (i = 0; i < sides.size(); i++)
+	{
 		w = sides[i].pWinding;
-		if (!w)
+		if (!w) {
 			continue;
-		for (j = 0; j < w->GetNumPoints(); j++)
+		}
+		for (j = 0; j < w->GetNumPoints(); j++) {
 			bounds.add((*w)[j].asVec3());
+		}
 	}
 
 	for (i = 0; i < 3; i++) 
@@ -113,8 +117,9 @@ bool LvlBrush::boundBrush(const XPlaneSet& planes)
 				plane = &planes[sides[0].planenum];
 			}
 
-			X_WARNING("LvlBrush", "Entity %i, Brush %i, Sides %i: failed to calculate brush bounds (%s)",
-				entityNum, brushNum, numsides, plane ? plane->toString(Dsc) : "");
+			X_WARNING("LvlBrush", "Entity %i, Brush %i, Sides %i: failed "
+				"to calculate brush bounds (%s)",
+				entityNum, brushNum, sides.size(), plane ? plane->toString(Dsc) : "");
 			return false;
 		}
 	}
@@ -125,18 +130,19 @@ bool LvlBrush::boundBrush(const XPlaneSet& planes)
 
 float LvlBrush::Volume(const XPlaneSet& planes)
 {
-	int			i;
-	XWinding*	w;
-	Vec3f		corner;
-	float		d, area, volume;
+	size_t i;
+	XWinding* w;
+	Vec3f corner;
+	float d, area, volume;
 	const Planef* plane;
 
 	// grab the first valid point as the corner
 	w = nullptr;
 	for (i = 0; i < sides.size(); i++) {
 		w = sides[i].pWinding;
-		if (w)
+		if (w) {
 			break;
+		}
 	}
 	if (!w) {
 		return 0.f;
@@ -149,8 +155,9 @@ float LvlBrush::Volume(const XPlaneSet& planes)
 	for (; i < sides.size(); i++)
 	{
 		w = sides[i].pWinding;
-		if (!w)
+		if (!w) {
 			continue;
+		}
 		plane = &planes[sides[i].planenum];
 		d = -plane->distance(corner);
 		area = w->GetArea();
@@ -164,9 +171,10 @@ float LvlBrush::Volume(const XPlaneSet& planes)
 
 BrushPlaneSide::Enum LvlBrush::BrushMostlyOnSide(const Planef& plane)
 {
-	int			i, j;
-	XWinding*	w;
-	float		d, max;
+	size_t i;
+	int32_t j;
+	XWinding* w;
+	float d, max;
 	BrushPlaneSide::Enum side;
 
 	max = 0;
