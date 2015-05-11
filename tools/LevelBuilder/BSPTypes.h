@@ -15,56 +15,6 @@ class XMapPatch;
 );
 
 
-
-
-
-// a brush side, typically 6.
-struct BspSide
-{
-	BspSide() : planenum(0), pWinding(nullptr), pVisibleHull(nullptr) {}
-
-	int				planenum;
-	bool			visible;
-	bool			culled;
-
-	LvlMaterial		material;
-
-	XWinding*		pWinding;		// only clipped to the other sides of the brush
-	XWinding*       pVisibleHull;   // convex hull of all visible fragments 
-};
-
-
-struct bspBrush
-{
-	bspBrush();
-	bspBrush(const bspBrush& oth);
-
-
-	bool createBrushWindings(const XPlaneSet& planes);
-	bool boundBrush(const XPlaneSet& planes);
-	float Volume(const XPlaneSet& planes);
-	
-	BrushPlaneSide::Enum BrushMostlyOnSide(const Planef& plane);
-
-
-public:
-	struct bspBrush*	next;
-
-	// used for poviding helpful error msg's
-	int					entityNum;
-	int					brushNum;
-
-	AABB				bounds;
-	bool				opaque;
-	bool				allsidesSameMat; // all the sides use same material.
-	bool				__pad[2];
-
-	int					numsides;
-	// 6 are members. but if num sides is > 6 then memory directly after
-	// is valid BspSide structures.
-	BspSide				sides[6]; 
-};
-
 struct bspTris
 {
 	bspTris();
@@ -97,7 +47,7 @@ struct bspNode
 
 
 	// nodes only 
-	BspSide*			side;          // the side that created the node 
+//	BspSide*			side;          // the side that created the node 
 	struct bspNode*     children[2];
 	int					tinyportals;
 
@@ -111,7 +61,7 @@ struct bspNode
 	int area;                       // for areaportals 
 
 
-	bspBrush             *brushlist;     // fragments of all brushes in this leaf 
+//	bspBrush             *brushlist;     // fragments of all brushes in this leaf 
 //	drawSurfRef_t       *drawSurfReferences;
 
 	int occupied;                       // 1 or greater can reach entity 
@@ -137,7 +87,7 @@ struct bspDrawSurface
 	DrawSurfaceType::Enum type;
 
 
-	bspBrush             *mapBrush;
+//	bspBrush             *mapBrush;
 //	parseMesh_t         *mapMesh;
 //	sideRef_t           *sideRef;
 
