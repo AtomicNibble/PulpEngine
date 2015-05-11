@@ -68,7 +68,7 @@ public:
 	XMapBrush(void) : XMapPrimitive(PrimType::BRUSH), sides(g_arena) { sides.reserve(6); }
 	~XMapBrush(void) X_OVERRIDE {}
 
-	int					GetNumSides(void) const { return (int)sides.size(); }
+	int					GetNumSides(void) const { return safe_static_cast<int,size_t>(sides.size()); }
 	void				AddSide(XMapBrushSide *side) { sides.push_back(side); }
 	XMapBrushSide*		GetSide(int i) const { return sides[i]; }
 	uint32_t			GetGeometryCRC(void) const;
