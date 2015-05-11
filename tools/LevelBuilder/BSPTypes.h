@@ -33,31 +33,23 @@ struct bspNode
 {
 	bspNode();
 
-	struct bspNode*		parent;
+	int32_t	planenum;			// -1 = leaf node 
 
-	int					planenum;                   // -1 = leaf node 
-	AABB				bounds;
+	struct bspNode*	parent;
+	struct bspNode* children[2];
 
-
-	// nodes only 
-//	BspSide*			side;          // the side that created the node 
-	struct bspNode*     children[2];
-	int					tinyportals;
-
+	int32_t	tinyportals;
 
 	// leafs only 
-	bool opaque;                    // view can never be inside 
+	bool opaque;            // view can never be inside 
 	bool areaportal;
 	bool _pad[2];
 
-	int cluster;                   // for portalfile writing 
-	int area;                       // for areaportals 
+	int32_t cluster;        // for portalfile writing 
+	int32_t area;			// for areaportals 
+	int32_t occupied;		// 1 or greater can reach entity 
 
-
-//	bspBrush             *brushlist;     // fragments of all brushes in this leaf 
-//	drawSurfRef_t       *drawSurfReferences;
-
-	int occupied;                       // 1 or greater can reach entity 
+	AABB bounds;
 };
 
 

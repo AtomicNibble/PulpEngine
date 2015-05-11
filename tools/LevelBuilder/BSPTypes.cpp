@@ -17,12 +17,25 @@ bspFace::bspFace()
 
 bspNode::bspNode()
 {
-	core::zero_this(this);
+	planenum = -1;
+
+	parent = nullptr;
+	children[0] = nullptr;
+	children[1] = nullptr;
+
+	tinyportals = 0;
+
+	opaque = true;
+	areaportal = false;
+
+	cluster = -1;
+	area = -1;
+	occupied = -1;
 }
 
 // ------------------------------ Tree -----------------------------------
 
 bspTree::bspTree()
 {
-	core::zero_this(this);
+	headnode = nullptr;
 }
