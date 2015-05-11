@@ -249,7 +249,7 @@
   <ItemGroup>
     <ClCompile Include="AreaModel.cpp" />
     <ClCompile Include="BSPFile.cpp" />
-    <ClCompile Include="BSPProcess.cpp" />
+    <ClCompile Include="LvlProcess.cpp" />
     <ClCompile Include="BSPCompiler.cpp" />
     <ClCompile Include="BSPTypes.cpp" />
     <ClCompile Include="EngineApp.cpp" />

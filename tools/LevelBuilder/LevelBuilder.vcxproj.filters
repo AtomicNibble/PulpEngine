@@ -122,9 +122,6 @@
     <ClCompile Include="BSPTypes.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>
-    <ClCompile Include="BSPProcess.cpp">
-      <Filter>Source Files\BSP</Filter>
-    </ClCompile>
     <ClCompile Include="LvlTypes.cpp">
       <Filter>Source Files\Lvl</Filter>
     </ClCompile>
@@ -135,6 +132,9 @@
       <Filter>Source Files\Util</Filter>
     </ClCompile>
     <ClCompile Include="AreaModel.cpp">
+      <Filter>Source Files\Lvl</Filter>
+    </ClCompile>
+    <ClCompile Include="LvlProcess.cpp">
       <Filter>Source Files\Lvl</Filter>
     </ClCompile>
   </ItemGroup>

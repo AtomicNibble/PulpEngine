@@ -1,29 +1,15 @@
 #include "stdafx.h"
-#include "BSPTypes.h"
+#include "LevelBuilder.h"
 
 #include <Containers\FixedArray.h>
-
 #include <IModel.h>
 
 namespace
 {
-
-/*
-
-	class AreaMeshBuilder
-	{
-		typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
-	public:
-		AreaMeshBuilder() : areaMeshes_(g_arena) {
-			areaMeshes_.reserve(4096);
-		}
-		*/
-
-
 	// ---------------------------------------------
 	static const size_t MAX_INDEXES = 1024;
 
-#define TINY_AREA   1.0f
+	#define TINY_AREA   1.0f
 
 	bool IsTriangleDegenerate(level::Vertex* points, const model::Face& face)
 	{
@@ -218,21 +204,20 @@ namespace
 
 bool LvlBuilder::ProcessModels(void)
 {
-	int entityNum;
-	int numEntities = stats_.numEntities;
+	size_t i, numEnts = entities_.size();
 
-	for (entityNum = 0; entityNum < numEntities; entityNum++)
+	for (i = 0; i < numEnts; i++)
 	{
-		LvlEntity& entity = entities_[entityNum];
-		if (!entity.pBrushes && !entity.pPatches) {
+		LvlEntity& entity = entities_[i];
+		if (entity.brushes.isEmpty()) {
 			continue;
 		}
 
-		X_LOG0("Entity", "----------- entity %i -----------", entityNum);
+		X_LOG0("Entity", "----------- entity %i -----------", i);
 
-		// if we leaked, stop without any more processing
-		if (entityNum == 0)
+		if (i == 0)
 		{
+			// return false if leak.
 			if (!ProcessWorldModel(entity))
 				return false;
 		}
@@ -260,6 +245,7 @@ bool LvlBuilder::ProcessModel(LvlEntity& ent)
 void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "Processing World Entity");
+#if 0
 	bspBrush* pBrush;
 	size_t i;
 	int x;
@@ -278,14 +264,15 @@ void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 			if (!pBrush->sides[x].pWinding)
 				continue;
 
-
 		}
 	}
+#endif
 }
 
 bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "Processing World Entity");
+#if 0
 	bspBrush* pBrush;
 	size_t i;
 	int x, p;
@@ -343,7 +330,7 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 
 	if (!area.model.BelowLimits())
 		return false;
-
+#endif
  	return true;
 }
 
