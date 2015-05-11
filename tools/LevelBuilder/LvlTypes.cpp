@@ -2,6 +2,14 @@
 #include "LvlTypes.h"
 
 
+LvlMaterial::LvlMaterial()
+{
+	rotate = 0.f;
+	pMaterial = nullptr;
+}
+
+// ==========================================
+
 LvlBrushSide::LvlBrushSide() : 
 planenum(0), 
 visible(true),
@@ -12,6 +20,58 @@ pVisibleHull(nullptr)
 
 }
 
+LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth)
+{
+	planenum = oth.planenum;
+
+	visible = oth.visible;
+	culled = oth.culled;
+
+	matInfo = oth.matInfo;
+
+	// null them first.
+	pWinding = nullptr;
+	pVisibleHull = nullptr;
+
+	if (oth.pWinding){
+		pWinding = oth.pWinding->Copy();
+	}
+	if (oth.pVisibleHull){
+		pVisibleHull = oth.pVisibleHull->Copy();
+	}
+}
+
+LvlBrushSide& LvlBrushSide::operator = (const LvlBrushSide& oth)
+{
+	// nned to delete them if set.
+	if (pWinding) {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+	if (pVisibleHull) {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	planenum = oth.planenum;
+
+	visible = oth.visible;
+	culled = oth.culled;
+
+	matInfo = oth.matInfo;
+
+	// null them first.
+	pWinding = nullptr;
+	pVisibleHull = nullptr;
+
+	if (oth.pWinding){
+		pWinding = oth.pWinding->Copy();
+	}
+	if (oth.pVisibleHull){
+		pVisibleHull = oth.pVisibleHull->Copy();
+	}
+	return *this;
+}
+
+// ==========================================
 
 LvlEntity::LvlEntity() :
 brushes(g_arena)
