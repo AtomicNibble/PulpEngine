@@ -1,29 +1,15 @@
 #include "stdafx.h"
-#include "BSPTypes.h"
+#include "LevelBuilder.h"
 
 #include <Containers\FixedArray.h>
-
 #include <IModel.h>
 
 namespace
 {
-
-/*
-
-	class AreaMeshBuilder
-	{
-		typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
-	public:
-		AreaMeshBuilder() : areaMeshes_(g_arena) {
-			areaMeshes_.reserve(4096);
-		}
-		*/
-
-
 	// ---------------------------------------------
 	static const size_t MAX_INDEXES = 1024;
 
-#define TINY_AREA   1.0f
+	#define TINY_AREA   1.0f
 
 	bool IsTriangleDegenerate(level::Vertex* points, const model::Face& face)
 	{
@@ -81,11 +67,6 @@ namespace
 			}
 		}
 
-		// add to vert count 
-	//	mesh.numVerts++;
-
-		// fill indexes in triangle fan order 
-	//	mesh.numIndexes = 0;
 		for (i = 1; i < numVerts; i++)
 		{
 			model::Face face;
@@ -118,7 +99,7 @@ namespace
 
 		if (numVerts == 0)
 		{
-			X_WARNING("Bsp", "submesh has zero verts");
+			X_WARNING("Lvl", "submesh has zero verts");
 			return false;
 		}
 
@@ -218,21 +199,20 @@ namespace
 
 bool LvlBuilder::ProcessModels(void)
 {
-	int entityNum;
-	int numEntities = stats_.numEntities;
+	size_t i, numEnts = entities_.size();
 
-	for (entityNum = 0; entityNum < numEntities; entityNum++)
+	for (i = 0; i < numEnts; i++)
 	{
-		const LvlEntity& entity = entities_[entityNum];
-		if (!entity.pBrushes && !entity.pPatches) {
+		LvlEntity& entity = entities_[i];
+		if (entity.brushes.isEmpty()) {
 			continue;
 		}
 
-		X_LOG0("Entity", "----------- entity %i -----------", entityNum);
+		X_LOG0("Entity", "----------- entity %i -----------", i);
 
-		// if we leaked, stop without any more processing
-		if (entityNum == 0)
+		if (i == 0)
 		{
+			// return false if leak.
 			if (!ProcessWorldModel(entity))
 				return false;
 		}
@@ -248,7 +228,7 @@ bool LvlBuilder::ProcessModels(void)
 
 
 
-bool LvlBuilder::ProcessModel(const LvlEntity& ent)
+bool LvlBuilder::ProcessModel(LvlEntity& ent)
 {
 	
 
@@ -257,12 +237,88 @@ bool LvlBuilder::ProcessModel(const LvlEntity& ent)
 }
 
 
-bool LvlBuilder::ProcessWorldModel(const LvlEntity& ent)
+void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 {
-	X_LOG0("Bsp", "Processing World Entity");
+	X_LOG0("Lvl", "Processing World Entity");
+	size_t i, x;
+
+	for (i = 0; i < ent.brushes.size(); i++)
+	{
+		LvlBrush& brush = ent.brushes[i];
+
+		if (!brush.opaque)
+		{
+			// if it's not opaque and none of the sides are portals it can't be structual.
+			if (!brush.combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL))
+			{
+				continue;
+			}
+		}
+
+		for (x = 0; x < brush.sides.size(); x++)
+		{
+			LvlBrushSide& side = brush.sides[x];
+
+			if (!side.pWinding) {
+				continue;
+			}
+
+			// if combined flags are portal, check what this side is.
+			if (brush.combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL))
+			{
+				engine::IMaterial* pMaterial = side.matInfo.pMaterial;
+				X_ASSERT_NOT_NULL(pMaterial);
+
+				engine::MaterialFlags flags = pMaterial->getFlags();
+
+				if (!flags.IsSet(engine::MaterialFlag::PORTAL))
+				{
+					continue;
+				}
+			}
+
+			bspFace& face = ent.bspFaces.AddOne();
+			face.planenum = side.planenum & ~1;
+			face.w = side.pWinding->Copy();
+		}
+	}
+}
+
+void LvlBuilder::calculateLvlBounds(void)
+{
+	mapBounds.clear();
+
+	// bound me baby
+	LvlEntsArr::ConstIterator it = entities_.begin();
+	for (; it != entities_.end(); ++it) 
+	{
+		LvlEntity::LvlBrushArr::ConstIterator bIt = it->brushes.begin();
+		LvlEntity::LvlBrushArr::ConstIterator bEnd = it->brushes.end();
+		for (; bIt != bEnd; ++bIt)
+		{
+			const LvlBrush& brush = *bIt;
+
+			mapBounds.add(brush.bounds);
+		}
+	}
+}
+
+bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
+{
+	X_LOG0("Lvl", "Processing World Entity");
+
+	// make structural face list.
+	MakeStructuralFaceList(ent);
+
+	int goat = 0;
+
+#if 0
 	bspBrush* pBrush;
 	size_t i;
 	int x, p;
+
+
+
 
 	// allocate a area.
 	// we will have multiple area's for world. (none noob map xD)
@@ -313,7 +369,7 @@ bool LvlBuilder::ProcessWorldModel(const LvlEntity& ent)
 
 	if (!area.model.BelowLimits())
 		return false;
-
+#endif
  	return true;
 }
 

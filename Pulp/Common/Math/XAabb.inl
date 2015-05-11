@@ -2,7 +2,7 @@
 
 X_INLINE AABB::AABB()
 {
-
+	clear();
 }
 
 X_INLINE AABB::AABB(float radius)

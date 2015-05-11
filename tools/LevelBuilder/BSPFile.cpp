@@ -1,7 +1,8 @@
 #include "stdafx.h"
-#include "BSPTypes.h"
-#include <IFileSys.h>
 
+#include "LevelBuilder.h"
+
+#include <IFileSys.h>
 #include <Ilevel.h>
 
 #include <Hashing\crc32.h>
