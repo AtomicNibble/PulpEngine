@@ -8,7 +8,8 @@
 #include <IMaterial.h>
 
 #include <String\GrowingStringTable.h>
-#include "LevelBuilder.h"
+
+#define PLANENUM_LEAF           -1
 
 X_NAMESPACE_DECLARE(mapfile,
 class XMapFile;
@@ -16,10 +17,6 @@ class XMapEntity;
 class XMapBrush;
 class XMapPatch;
 );
-
-
-#define PLANENUM_LEAF           -1
-
 
 struct BrushPlaneSide
 {

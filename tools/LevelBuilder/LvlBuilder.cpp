@@ -5,7 +5,6 @@
 #include "MapLoader.h"
 
 
-
 namespace
 {
 	static const float NORMAL_EPSILON = 0.00001f;
@@ -297,7 +296,7 @@ bool LvlBuilder::processPatch(LvlEntity& ent,
 
 bool LvlBuilder::removeDuplicateBrushPlanes(LvlBrush& brush)
 {
-	size_t	i, j, k;
+	size_t i, j;
 
 	for (i = 1; i < brush.sides.size(); i++)
 	{
