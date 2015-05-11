@@ -70,7 +70,7 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	int32_t i;
 
 	if (map->getNumEntities() == 0) {
-		X_WARNING("Bsp", "Map has zero entites, atleast one is required");
+		X_WARNING("Lvl", "Map has zero entites, atleast one is required");
 		return false;
 	}
 
@@ -79,6 +79,9 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	{
 		processMapEntity(entities_[i], map->getEntity(i));
 	}
+
+	// calculate bouds.
+	calculateLvlBounds();
 
 
 	X_LOG0("Map", "Total world brush: %i", entities_[0].brushes.size());
@@ -177,8 +180,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 		}
 	}
 
-	if (!removeDuplicateBrushPlanes(brush))
-	{
+	if (!removeDuplicateBrushPlanes(brush)) {
 		return false;
 	}
 
@@ -245,10 +247,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 bool LvlBuilder::processPatch(LvlEntity& ent, 
 	mapfile::XMapPatch* mapBrush, int ent_idx)
 {
-#if 0
-	bspTris*		pTri;
-	int				i;
-
+	int i;
 
 	if (gSettings.noPatches) { // are these goat meshes even allowed O_0 ?
 		return false;
@@ -259,31 +258,20 @@ bool LvlBuilder::processPatch(LvlEntity& ent,
 		return false;
 	}
 
-	stats_.numPatches++;
-	ent.numPatches++;
-
 	mapBrush->Subdivide(DEFAULT_CURVE_MAX_ERROR, DEFAULT_CURVE_MAX_ERROR, DEFAULT_CURVE_MAX_LENGTH, true);
 
 	// create a Primative
-
-	// Add the primative.
-	pTri = X_NEW_ARRAY(bspTris, mapBrush->GetNumIndexes(), g_arena, "PatchTris");
-
-	// Add to linked list.
-	pTri->next = ent.pPatches;
-	ent.pPatches = pTri;
-
-
 	for (i = 0; i < mapBrush->GetNumIndexes(); i += 3)
 	{
-		pTri->v[2] = (*mapBrush)[mapBrush->GetIndexes()[i + 0]];
-		pTri->v[1] = (*mapBrush)[mapBrush->GetIndexes()[i + 2]];
-		pTri->v[0] = (*mapBrush)[mapBrush->GetIndexes()[i + 1]];
-		//	tri->material = material;
-		//	tri->next = prim->tris;
-		//	prim->tris = tri;
+		LvlTris& tri = ent.patches.AddOne();
+
+		tri.verts[2] = (*mapBrush)[mapBrush->GetIndexes()[i + 0]];
+		tri.verts[1] = (*mapBrush)[mapBrush->GetIndexes()[i + 2]];
+		tri.verts[0] = (*mapBrush)[mapBrush->GetIndexes()[i + 1]];
 	}
-#endif
+
+	// stats
+	stats_.numPatches++;
 	return true;
 }
 
@@ -319,7 +307,7 @@ bool LvlBuilder::removeDuplicateBrushPlanes(LvlBrush& brush)
 		// check for duplication and mirroring
 		for (j = 0; j < i; j++) 
 		{
-			if (side.planenum == brush.sides[i].planenum)
+			if (side.planenum == brush.sides[j].planenum)
 			{
 				X_WARNING("Brush", "Entity %i, Brush %i, Sides %i: "
 					"duplicate plane(%i,%i)", 
