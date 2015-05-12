@@ -309,8 +309,8 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 
 	// make structural face list.
 	MakeStructuralFaceList(ent);
-
-	int goat = 0;
+	BuildBSPFace(ent);
+	
 
 #if 0
 	bspBrush* pBrush;
