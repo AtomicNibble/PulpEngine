@@ -119,6 +119,7 @@ public:
 	TrisArr patches;
 	// bsp data.
 	BspFaceArr bspFaces;
+	bspTree bspTree;
 
 	mapfile::XMapEntity*	mapEntity;		// points to the map data this was made from.
 };
