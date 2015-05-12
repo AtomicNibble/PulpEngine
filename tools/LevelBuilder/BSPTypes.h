@@ -57,9 +57,9 @@ struct bspTree
 {
 	bspTree();
 
-	bspNode*	headnode;
-	bspNode		outside_node;
-	AABB		bounds;
+	bspNode* headnode;
+	bspNode	outside_node;
+	AABB bounds;
 };
 
 
