@@ -116,9 +116,6 @@
     <ClCompile Include="MapTypes.cpp">
       <Filter>Source Files\MapFile</Filter>
     </ClCompile>
-    <ClCompile Include="BSPCompiler.cpp">
-      <Filter>Source Files\BSP</Filter>
-    </ClCompile>
     <ClCompile Include="BSPTypes.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>
@@ -136,6 +133,9 @@
     </ClCompile>
     <ClCompile Include="LvlProcess.cpp">
       <Filter>Source Files\Lvl</Filter>
+    </ClCompile>
+    <ClCompile Include="BSPFace.cpp">
+      <Filter>Source Files\BSP</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
