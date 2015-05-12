@@ -2,8 +2,10 @@
 #include "LevelBuilder.h"
 
 
-void LvlBuilder::BuildBSPFace(LvlEntity& ent)
+void LvlBuilder::FacesToBSP(LvlEntity& ent)
 {
+	X_LOG0("Bsp", "Building face list");
+
 	bspTree& root = ent.bspTree;
 	root.bounds.clear();
 	root.headnode = X_NEW(bspNode, g_arena, "BspNode");
@@ -21,6 +23,7 @@ void LvlBuilder::BuildBSPFace(LvlEntity& ent)
 			root.bounds.add(winding[i].asVec3());
 		}
 	}
+
 
 
 }

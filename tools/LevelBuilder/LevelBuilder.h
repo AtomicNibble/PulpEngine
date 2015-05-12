@@ -29,7 +29,7 @@ private:
 
 private:
 	void MakeStructuralFaceList(LvlEntity& ent);
-	void BuildBSPFace(LvlEntity& ent);
+	void FacesToBSP(LvlEntity& ent);
 	void calculateLvlBounds(void);
 		
 	bool ProcessModel(LvlEntity& ent);
