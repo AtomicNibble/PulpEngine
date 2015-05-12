@@ -36,6 +36,10 @@ private:
 	bool ProcessWorldModel(LvlEntity& ent);
 
 private:
+	int SelectSplitPlaneNum(bspNode* node, LvlEntity::BspFaceArr& faces);
+	void BuildFaceTree_r(bspNode* node, LvlEntity::BspFaceArr& faces);
+
+private:
 	LvlEntsArr	entities_;
 	LvlAreaArr	areas_;
 
