@@ -82,12 +82,19 @@ LvlTris::LvlTris()
 
 LvlEntity::LvlEntity() :
 brushes(g_arena),
-patches(g_arena),
-bspFaces(g_arena)
+patches(g_arena)
 {
+	bspFaces = nullptr;
 	mapEntity = nullptr;
 }
 
+LvlEntity::~LvlEntity()
+{
+	if (bspFaces) {
+		X_ASSERT_NOT_IMPLEMENTED();
+//		X_DELETE(bspFaces, g_arena);
+	}
+}
 // ==========================================
 
 

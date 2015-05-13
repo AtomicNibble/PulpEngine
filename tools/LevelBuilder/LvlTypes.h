@@ -109,16 +109,18 @@ struct LvlEntity
 {
 	typedef core::Array<LvlBrush> LvlBrushArr;
 	typedef core::Array<LvlTris> TrisArr;
-	typedef core::Array<bspFace> BspFaceArr;
+//	typedef core::Array<bspFace> BspFaceArr;
 public:
 	LvlEntity();
+	~LvlEntity();
 
 	Vec3f origin;
 
 	LvlBrushArr brushes;
 	TrisArr patches;
 	// bsp data.
-	BspFaceArr bspFaces;
+	bspFace* bspFaces;
+
 	bspTree bspTree;
 
 	mapfile::XMapEntity*	mapEntity;		// points to the map data this was made from.
