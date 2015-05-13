@@ -277,9 +277,15 @@ void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 				}
 			}
 
-			bspFace& face = ent.bspFaces.AddOne();
-			face.planenum = side.planenum & ~1;
-			face.w = side.pWinding->Copy();
+			bspFace* pFace = X_NEW(bspFace, g_arena, "BspFace");
+			pFace->planenum = side.planenum & ~1;
+			pFace->w = side.pWinding->Copy();
+
+			pFace->pNext = ent.bspFaces;
+			ent.bspFaces = pFace;
+//			bspFace& face = ent.bspFaces.AddOne();
+//			face.planenum = side.planenum & ~1;
+//			face.w = side.pWinding->Copy();
 		}
 	}
 }
