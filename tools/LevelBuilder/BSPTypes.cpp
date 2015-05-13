@@ -6,6 +6,8 @@
 
 bspFace::bspFace()
 {
+	pNext = nullptr;
+
 	planenum = -1;
 	portal = false;
 	checked = false;

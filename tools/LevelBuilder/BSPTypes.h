@@ -20,6 +20,8 @@ struct bspFace
 {
 	bspFace();
 
+	struct bspFace* pNext;
+
 	int	planenum;
 	bool portal;			
 	bool checked;	
