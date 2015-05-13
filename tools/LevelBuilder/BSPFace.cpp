@@ -9,7 +9,7 @@ namespace
 }
 
 
-int LvlBuilder::SelectSplitPlaneNum(bspNode* node, LvlEntity::BspFaceArr& faces)
+int LvlBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 {
 	Vec3f halfSize = node->bounds.halfVec();
 	size_t axis;
@@ -54,16 +54,17 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, LvlEntity::BspFaceArr& faces)
 	bool havePortals;
 	size_t bestValue;
 	bspFace* bestSplit;
+	bspFace* pFace, *pFace2;
 
 	bestValue = -999999;
 	havePortals = false;
 
+	int32_t splits, facing, front, back;
+	Planeside::Enum side;
 
-	LvlEntity::BspFaceArr::Iterator it2, it = faces.begin();
-
-	for (; it != faces.end(); ++it)
+	for (pFace = faces; pFace; pFace = pFace->pNext)
 	{
-		bspFace& face = *it;
+		bspFace& face = *pFace;
 
 		face.checked = false;
 		if (face.portal) {
@@ -72,9 +73,9 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, LvlEntity::BspFaceArr& faces)
 		}
 	}
 
-	for (; it != faces.end(); ++it)
+	for (pFace = faces; pFace; pFace = pFace->pNext)
 	{
-		bspFace& face = *it;
+		bspFace& face = *pFace;
 
 		if (face.checked) {
 			continue;
@@ -87,19 +88,14 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, LvlEntity::BspFaceArr& faces)
 		}
 
 		plane = planes[face.planenum];
-
-
-		int32_t splits, facing, front, back;
 		splits = 0;
 		facing = 0;
 		front = 0;
 		back = 0;
 
-
-		it2 = faces.begin();
-		for (; it2 != faces.end(); ++it2)
+		for (pFace2 = faces; pFace2; pFace2 = pFace2->pNext)
 		{
-			bspFace& checkFace = *it;
+			bspFace& checkFace = *pFace2;
 
 			if (face.planenum == checkFace.planenum) 
 			{
@@ -108,7 +104,7 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, LvlEntity::BspFaceArr& faces)
 				continue;
 			}
 			// get plane side.
-			Planeside::Enum side = checkFace.w->PlaneSide(plane);
+			side = checkFace.w->PlaneSide(plane);
 			if (side == Planeside::CROSS)
 			{
 				splits++;
@@ -127,7 +123,7 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, LvlEntity::BspFaceArr& faces)
 
 		if (value > bestValue) {
 			bestValue = value;
-			bestSplit = &face;
+			bestSplit = pFace;
 		}
 
 	}
@@ -141,7 +137,7 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, LvlEntity::BspFaceArr& faces)
 
 
 
-void LvlBuilder::BuildFaceTree_r(bspNode* node, LvlEntity::BspFaceArr& faces)
+void LvlBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 {
 	int splitPlaneNum = SelectSplitPlaneNum(node, faces);
 
@@ -151,7 +147,13 @@ void LvlBuilder::BuildFaceTree_r(bspNode* node, LvlEntity::BspFaceArr& faces)
 		return;
 	}
 
+	Planeside::Enum side;
+
+	XWinding* frontWinding;
+	XWinding* backWinding;
+
 	bspFace* childLists[2];
+	bspFace* pNext, *pNewFace, *pFace;
 
 	// partition the list
 	node->planenum = splitPlaneNum;
@@ -159,44 +161,72 @@ void LvlBuilder::BuildFaceTree_r(bspNode* node, LvlEntity::BspFaceArr& faces)
 	childLists[0] = nullptr;
 	childLists[1] = nullptr;
 
-
-	LvlEntity::BspFaceArr::Iterator it = faces.begin();
-	for (; it != faces.end(); ++it)
+	for (pFace = faces; pFace; pFace = pNext)
 	{
-		bspFace& face = *it;
+		pNext = pFace->pNext;
+
+		bspFace& face = *pFace;
 
 		if (face.planenum == node->planenum) 
 		{
-		//	FreeBspFace(split);
+			X_DELETE(pFace, g_arena);
 			continue;
 		}
 
-		Planeside::Enum side = face.w->PlaneSide(plane);
+		side = face.w->PlaneSide(plane);
 		if (side == Planeside::CROSS) 
 		{
-			XWinding* frontWinding;
-			XWinding* backWinding;
-
 			face.w->Split(plane, 0.1f, &frontWinding, &backWinding);
-			if (frontWinding) {
-
-
+			if (frontWinding) 
+			{
+				pNewFace = X_NEW(bspFace, g_arena, "bspFaceFrontWind");
+				pNewFace->w = frontWinding;
+				pNewFace->pNext = childLists[0];
+				pNewFace->planenum = pFace->planenum;
+				childLists[0] = pNewFace;
 			}
-			if (backWinding) {
-
-
+			if (backWinding)
+			{
+				pNewFace = X_NEW(bspFace, g_arena, "bspFaceBackWind");
+				pNewFace->w = backWinding;
+				pNewFace->pNext = childLists[1];
+				pNewFace->planenum = pFace->planenum;
+				childLists[1] = pNewFace;
 			}
+			X_DELETE(pFace, g_arena);
 		}
 		else if (side == Planeside::FRONT)
 		{
-		//	side->next = childLists[0];
-		//	childLists[0] = split;
+			pFace->pNext = childLists[0];
+			childLists[0] = pFace;
 		}
 		else if (side == Planeside::BACK)
 		{
-		//	split->next = childLists[1];
-		//	childLists[1] = split;
+			pFace->pNext = childLists[1];
+			childLists[1] = pFace;
 		}
+	}
+
+	size_t i;
+	for (i = 0; i < 2; i++) {
+		node->children[i] = X_NEW(bspNode, g_arena, "bspNode");
+		node->children[i]->parent = node;
+		node->children[i]->bounds = node->bounds;
+	}
+
+	// split the bounds if we have a nice axial plane
+	for (i = 0; i < 3; i++) 
+	{
+		if (math<float>::abs(plane[i] - 1.f) < 0.001f) 
+		{
+			node->children[0]->bounds.min[i] = plane.getDistance();
+			node->children[1]->bounds.max[i] = plane.getDistance();
+			break;
+		}
+	}
+
+	for (i = 0; i < 2; i++) {
+		BuildFaceTree_r(node->children[i], childLists[i]);
 	}
 }
 
@@ -208,12 +238,10 @@ void LvlBuilder::FacesToBSP(LvlEntity& ent)
 	root.bounds.clear();
 	root.headnode = X_NEW(bspNode, g_arena, "BspNode");
 	
-	// add the windows to the bounds.
-	LvlEntity::BspFaceArr::ConstIterator it = ent.bspFaces.begin();
-	LvlEntity::BspFaceArr::ConstIterator end = ent.bspFaces.end();
-	for (; it != end; ++it)
+	bspFace* pFace = ent.bspFaces;
+	for (; pFace; pFace = pFace->pNext)
 	{
-		const bspFace& face = *it;
+		const bspFace& face = *pFace;
 		const XWinding& winding = *face.w;
 
 		for (int32_t i = 0; i < winding.GetNumPoints(); i++)
