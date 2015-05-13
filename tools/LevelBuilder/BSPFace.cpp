@@ -160,7 +160,7 @@ void LvlBuilder::BuildFaceTree_r(bspNode* node, LvlEntity::BspFaceArr& faces)
 	childLists[1] = nullptr;
 
 
-	LvlEntity::BspFaceArr::Iterator it2, it = faces.begin();
+	LvlEntity::BspFaceArr::Iterator it = faces.begin();
 	for (; it != faces.end(); ++it)
 	{
 		bspFace& face = *it;
