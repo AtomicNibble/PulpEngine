@@ -37,7 +37,7 @@ private:
 
 private:
 	int SelectSplitPlaneNum(bspNode* node, bspFace* faces);
-	void BuildFaceTree_r(bspNode* node, bspFace* faces);
+	void BuildFaceTree_r(bspNode* node, bspFace* faces, size_t& numLeafs);
 
 private:
 	LvlEntsArr	entities_;

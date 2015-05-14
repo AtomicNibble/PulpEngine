@@ -40,7 +40,7 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 			{
 				plane[0] = plane[1] = plane[2] = 0.0f;
 				plane[axis] = 1.0f;
-				plane.setDistance(-dist);
+				plane.setDistance(dist);
 				planeNum = FindFloatPlane(plane);
 				return planeNum;
 			}
@@ -137,13 +137,14 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 
 
 
-void LvlBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
+void LvlBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces, size_t& numLeafs)
 {
 	int splitPlaneNum = SelectSplitPlaneNum(node, faces);
 
 	// if we don't have any more faces, this is a node
 	if (splitPlaneNum == -1) {
 		node->planenum = PLANENUM_LEAF;
+		numLeafs++;
 		return;
 	}
 
@@ -226,7 +227,7 @@ void LvlBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 	}
 
 	for (i = 0; i < 2; i++) {
-		BuildFaceTree_r(node->children[i], childLists[i]);
+		BuildFaceTree_r(node->children[i], childLists[i], numLeafs);
 	}
 }
 
@@ -253,7 +254,9 @@ void LvlBuilder::FacesToBSP(LvlEntity& ent)
 	// copy bounds.
 	root.headnode->bounds = root.bounds;
 
+	size_t numLeafs = 0;
 
-	BuildFaceTree_r(root.headnode, ent.bspFaces);
+	BuildFaceTree_r(root.headnode, ent.bspFaces, numLeafs);
 
+	X_LOG0("Bsp", "num leafs: %i", numLeafs);
 }
