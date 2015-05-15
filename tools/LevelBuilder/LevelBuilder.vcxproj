@@ -232,6 +232,7 @@
     <ClInclude Include="BSPData.h" />
     <ClInclude Include="BSPTypes.h" />
     <ClInclude Include="EngineApp.h" />
+    <ClInclude Include="Globals.h" />
     <ClInclude Include="HashIndex.h" />
     <ClInclude Include="LvlTypes.h" />
     <ClInclude Include="Settings.h" />
