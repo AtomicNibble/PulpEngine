@@ -428,7 +428,6 @@ int XWinding::Split(const Planef& plane, const float epsilon, XWinding **front, 
 	}
 
 	if (f->numPoints > maxpts || b->numPoints > maxpts) {
-		//	idLib::common->FatalError("idWinding::Split: points exceeded estimate.");
 		X_WARNING("XWinding", "points exceeded estimate");
 	}
 
