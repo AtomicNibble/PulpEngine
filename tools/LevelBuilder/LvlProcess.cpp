@@ -280,12 +280,8 @@ void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 			bspFace* pFace = X_NEW(bspFace, g_arena, "BspFace");
 			pFace->planenum = side.planenum & ~1;
 			pFace->w = side.pWinding->Copy();
-
 			pFace->pNext = ent.bspFaces;
 			ent.bspFaces = pFace;
-//			bspFace& face = ent.bspFaces.AddOne();
-//			face.planenum = side.planenum & ~1;
-//			face.w = side.pWinding->Copy();
 		}
 	}
 }
@@ -314,9 +310,15 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	X_LOG0("Lvl", "Processing World Entity");
 
 	// make structural face list.
+	// which is the planes and windings of all the structual faces.
+	// Portals become part of this.
 	MakeStructuralFaceList(ent);
+	// we create a tree from the FaceList
+	// this is done by spliting the nodes multiple time.
+	// we end up with a binary tree.
 	FacesToBSP(ent);
-	
+	// 
+
 
 #if 0
 	bspBrush* pBrush;
