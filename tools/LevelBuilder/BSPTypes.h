@@ -30,9 +30,12 @@ struct bspFace
 	XWinding* w;
 };
 
-
+struct bspTree;
 struct bspNode
 {
+	friend struct bspTree;
+
+public:
 	bspNode();
 
 	int32_t	planenum;			// -1 = leaf node 
@@ -52,6 +55,9 @@ struct bspNode
 	int32_t occupied;		// 1 or greater can reach entity 
 
 	AABB bounds;
+
+protected:
+	void TreePrint_r(const XPlaneSet& planes, size_t depth) const;
 };
 
 
@@ -59,6 +65,8 @@ struct bspTree
 {
 	bspTree();
 
+	void Print(const XPlaneSet& planes) const;
+public:
 	bspNode* headnode;
 	bspNode	outside_node;
 	AABB bounds;
