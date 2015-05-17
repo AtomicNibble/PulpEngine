@@ -40,6 +40,9 @@ private:
 	void BuildFaceTree_r(bspNode* node, bspFace* faces, size_t& numLeafs);
 
 private:
+	void MakeTreePortals(LvlEntity& ent);
+
+private:
 	LvlEntsArr	entities_;
 	LvlAreaArr	areas_;
 
