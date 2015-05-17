@@ -115,7 +115,7 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 	for (x = 0; x < width; x++)
 	{
 		if (!src.ExpectTokenString("(")) {
-			delete patch;
+			X_DELETE(patch, arena);
 			return nullptr;
 		}
 
@@ -125,7 +125,7 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 
 			// each line has a -v and a -t
 			if (!src.ExpectTokenString("v")) {
-				delete patch;
+				X_DELETE(patch, arena);
 				return nullptr;
 			}
 
@@ -136,7 +136,7 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 			// we can have a color here.
 			if (!src.ReadToken(token)) {
 				src.Error("XMapPatch::Parse: unexpected EOF");
-				delete patch;
+				X_DELETE(patch, arena);
 				return false;
 			}
 
@@ -153,14 +153,14 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 				vert.color[3] = safe_static_cast<uint8, int>(c[3]);
 
 				if (!src.ExpectTokenString("t")) {
-					delete patch;
+					X_DELETE(patch, arena);
 					return nullptr;
 				}
 			}
 			else if (!token.isEqual("t"))
 			{
 				src.Error("XMapPatch::Parse: expected t");
-				delete patch;
+				X_DELETE(patch, arena);
 				return false;
 			}
 			else
@@ -183,7 +183,7 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 		}
 
 		if (!src.ExpectTokenString(")")) {
-			delete patch;
+			X_DELETE(patch, arena);
 			return nullptr;
 		}
 	}
@@ -198,7 +198,7 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 		}
 	}
 
-	delete patch;
+	X_DELETE(patch, arena);
 	return nullptr;
 }
 
