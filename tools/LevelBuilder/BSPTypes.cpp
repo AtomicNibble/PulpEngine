@@ -15,6 +15,16 @@ bspFace::bspFace()
 	w = nullptr;
 }
 
+// ------------------------------ Portal -----------------------------------
+
+bspPortal::bspPortal()
+{
+	onNode = nullptr;
+	core::zero_object(nodes);
+	core::zero_object(next);
+	pWinding = nullptr;
+}
+
 // ------------------------------ Node -----------------------------------
 
 bspNode::bspNode()
@@ -24,6 +34,7 @@ bspNode::bspNode()
 	parent = nullptr;
 	children[0] = nullptr;
 	children[1] = nullptr;
+	portals = nullptr;
 
 	tinyportals = 0;
 
@@ -42,7 +53,7 @@ void bspNode::TreePrint_r(const XPlaneSet& planes, size_t depth) const
 	// is this a leaf node.
 	if (this->planenum == PLANENUM_LEAF)
 	{
-
+		X_LOG0("bspNode", "LEAF");
 		return;
 	}
 

@@ -31,6 +31,19 @@ struct bspFace
 };
 
 struct bspTree;
+struct bspNode;
+
+struct bspPortal
+{
+	bspPortal();
+
+	Planef plane;
+	bspNode* onNode;
+	bspNode* nodes[2];
+	XWinding* pWinding;
+	bspPortal* next[2];
+};
+
 struct bspNode
 {
 	friend struct bspTree;
@@ -42,6 +55,7 @@ public:
 
 	struct bspNode*	parent;
 	struct bspNode* children[2];
+	struct bspPortal* portals;
 
 	int32_t	tinyportals;
 
@@ -80,12 +94,6 @@ X_DECLARE_ENUM(DrawSurfaceType)(FACE,DECAL,PATCH);
 struct bspDrawSurface
 {
 	DrawSurfaceType::Enum type;
-
-
-//	bspBrush             *mapBrush;
-//	parseMesh_t         *mapMesh;
-//	sideRef_t           *sideRef;
-
 
 	// verts
 	int numVerts;                           
