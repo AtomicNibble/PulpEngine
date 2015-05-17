@@ -6,5 +6,7 @@
 
 static const int PLANENUM_LEAF = -1;
 
+static const float ON_EPSILON = 0.1f;
+
 
 #endif // !LVL_BUILDER_GLOBALS_H_
