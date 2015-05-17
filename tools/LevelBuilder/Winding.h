@@ -3,7 +3,6 @@
 #ifndef X_WINDING_H_
 #define X_WINDING_H_
 
-static const float ON_EPSILON = 0.1f;
 
 /*
 #define	SIDE_FRONT					0
@@ -25,7 +24,6 @@ T* Alloca16(size_t num)
 
 
 #define	MAX_POINTS_ON_WINDING	64
-
 #define	EDGE_LENGTH		0.2f
 
 class XWinding
@@ -89,16 +87,7 @@ public:
 		return 0.5f * cross.length();
 	}
 
-	XWinding* ReverseWinding()
-	{
-		XWinding* c = new XWinding;
-		c->EnsureAlloced(numPoints);
-
-		for (int i = 0; i < numPoints; i++)
-			c->p[i] = p[numPoints - 1 - i];
-
-		return c;
-	}
+	XWinding* ReverseWinding(void);
 
 protected:
 	int				numPoints;				// number of points
