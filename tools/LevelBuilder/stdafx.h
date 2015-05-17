@@ -27,6 +27,7 @@ X_USING_NAMESPACE;
 
 using namespace std;
 
+#include "Globals.h"
 #include "Settings.h"
 #include "Winding.h"
 #include "PlaneSet.h"
@@ -34,3 +35,4 @@ using namespace std;
 
 
 extern core::MemoryArenaBase* g_arena;
+extern core::MemoryArenaBase* g_bspFaceAllocator;
