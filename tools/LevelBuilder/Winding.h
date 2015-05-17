@@ -11,7 +11,6 @@
 #define	SIDE_CROSS					3
 */
 
-// #define _alloca16( x )				((void *)((((uintptr_t)_alloca( (x)+15 )) + 15) & ~15))
 // make a type safe tmepalted version?
 template<typename T>
 T* Alloca16(size_t num) 
@@ -46,6 +45,7 @@ public:
 	int				GetNumPoints(void) const;
 	void			SetNumPoints(int n);
 	virtual void	Clear(void);
+	void			Print(void) const;
 
 	// huge winding for plane, the points go counter clockwise when facing the front of the plane
 	void			BaseForPlane(const Vec3f &normal, const float dist);

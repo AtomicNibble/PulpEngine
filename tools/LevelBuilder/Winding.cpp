@@ -28,47 +28,67 @@ bool XWinding::ReAllocate(int n, bool keep)
 }
 
 // -----------------------------
+namespace
+{
 #define IEEE_FLT_MANTISSA_BITS		23
 #define IEEE_FLT_EXPONENT_BITS		8
 #define IEEE_FLT_EXPONENT_BIAS		127
 #define IEEE_FLT_SIGN_BIT           31
 
 
-const int SMALLEST_NON_DENORMAL = 1 << IEEE_FLT_MANTISSA_BITS;
-const int NAN_VALUE = 0x7f800000;
-const float FLT_SMALLEST_NON_DENORMAL = *reinterpret_cast< const float * >(&SMALLEST_NON_DENORMAL);
+	const int SMALLEST_NON_DENORMAL = 1 << IEEE_FLT_MANTISSA_BITS;
+	const int NAN_VALUE = 0x7f800000;
+	const float FLT_SMALLEST_NON_DENORMAL = *reinterpret_cast<const float *>(&SMALLEST_NON_DENORMAL);
 
+	X_DISABLE_WARNING(4756)
 
-X_DISABLE_WARNING(4756)
-
-float InvSqrt(float x) 
-{
-	return (x > FLT_SMALLEST_NON_DENORMAL) ? sqrtf(1.0f / x) : INFINITY;
-}
-
-X_ENABLE_WARNING(4756)
-
-void NormalVectors(const Vec3f& vec, Vec3f &left, Vec3f &down)
-{
-	float d;
-
-	d = vec.x * vec.x + vec.y * vec.y;
-	if (!d) {
-		left[0] = 1;
-		left[1] = 0;
-		left[2] = 0;
+		float InvSqrt(float x)
+	{
+		return (x > FLT_SMALLEST_NON_DENORMAL) ? sqrtf(1.0f / x) : INFINITY;
 	}
-	else {
-		d = InvSqrt(d);
-		left[0] = -vec.y * d;
-		left[1] = vec.x * d;
-		left[2] = 0;
-	}
-	down = left.cross(vec);
-}
 
-#if 0
-#else
+	X_ENABLE_WARNING(4756)
+
+		void NormalVectors(const Vec3f& vec, Vec3f &left, Vec3f &down)
+	{
+		float d;
+
+		d = vec.x * vec.x + vec.y * vec.y;
+		if (!d) {
+			left[0] = 1;
+			left[1] = 0;
+			left[2] = 0;
+		}
+		else {
+			d = InvSqrt(d);
+			left[0] = -vec.y * d;
+			left[1] = vec.x * d;
+			left[2] = 0;
+		}
+		down = left.cross(vec);
+	}
+
+} // namespace
+
+
+void XWinding::Print(void) const
+{
+	// print the bounds.
+	AABB bounds;
+	GetAABB(bounds);
+
+	const Vec3f& min = bounds.min;
+	const Vec3f& max = bounds.max;
+	X_LOG0("Winding", "min: (%g,%g,%g)", min[0], min[1], min[2]);
+	X_LOG0("Winding", "max: (%g,%g,%g)", max[0], max[1], max[2]);
+	X_LOG0("Winding", "NumPoints: ", numPoints);
+	for (int i = 0; i < numPoints; i++)
+	{
+		const Vec5f& pl = p[i];
+		X_LOG0("Winging", "P(%i): (%g,%g,%g) (%g,%g)", i, 
+			pl[0], pl[1], pl[2], pl[3], pl[4]);
+	}
+}
 
 void XWinding::BaseForPlane(const Vec3f &normal, const float dist)
 {
@@ -93,7 +113,7 @@ void XWinding::BaseForPlane(const Vec3f &normal, const float dist)
 //	memcpy(temp, p, sizeof(temp));
 }
 
-#endif 
+//#endif 
 
 void XWinding::BaseForPlane(const Planef &plane)
 {
