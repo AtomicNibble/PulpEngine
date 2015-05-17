@@ -141,7 +141,7 @@ bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 	{
 		pSide = &sides[i];
 		pPlane = &planes[pSide->planenum];
-		w = new XWinding(*pPlane);
+		w = X_NEW(XWinding,g_arena, "BrushWinding")(*pPlane);
 
 		for (j = 0; j < sides.size() && w; j++)
 		{
@@ -155,7 +155,7 @@ bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 			w = w->Clip(planes[sides[j].planenum ^ 1], 0.01f);
 		}
 		if (pSide->pWinding) {
-			delete pSide->pWinding;
+			X_DELETE(pSide->pWinding, g_arena);
 		}
 		pSide->pWinding = w;
 	}
