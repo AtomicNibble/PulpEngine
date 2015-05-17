@@ -79,9 +79,11 @@ void XWinding::Print(void) const
 
 	const Vec3f& min = bounds.min;
 	const Vec3f& max = bounds.max;
+	X_LOG0("Winding", "Printing values:");
+	X_LOG_BULLET;
 	X_LOG0("Winding", "min: (%g,%g,%g)", min[0], min[1], min[2]);
 	X_LOG0("Winding", "max: (%g,%g,%g)", max[0], max[1], max[2]);
-	X_LOG0("Winding", "NumPoints: ", numPoints);
+	X_LOG0("Winding", "NumPoints: %i", numPoints);
 	for (int i = 0; i < numPoints; i++)
 	{
 		const Vec5f& pl = p[i];
