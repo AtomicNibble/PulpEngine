@@ -317,8 +317,13 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	// this is done by spliting the nodes multiple time.
 	// we end up with a binary tree.
 	FacesToBSP(ent);
-	// 
 
+	// next we want to make a portal that covers the whole map.
+	// this is the outside_node of the bspTree
+	MakeTreePortals(ent);
+
+
+	int goat = 0;
 
 #if 0
 	bspBrush* pBrush;
