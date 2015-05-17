@@ -251,6 +251,7 @@
     <ClCompile Include="AreaModel.cpp" />
     <ClCompile Include="BSPFace.cpp" />
     <ClCompile Include="BSPFile.cpp" />
+    <ClCompile Include="BSPPortals.cpp" />
     <ClCompile Include="LvlProcess.cpp" />
     <ClCompile Include="BSPTypes.cpp" />
     <ClCompile Include="EngineApp.cpp" />

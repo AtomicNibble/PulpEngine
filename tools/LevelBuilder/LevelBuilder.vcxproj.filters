@@ -140,6 +140,9 @@
     <ClCompile Include="BSPFace.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>
+    <ClCompile Include="BSPPortals.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LevelBuilder.rc">
