@@ -10,7 +10,6 @@
 
 #include "BSPTypes.h"
 
-#define PLANENUM_LEAF           -1
 
 X_NAMESPACE_DECLARE(mapfile,
 class XMapFile;
