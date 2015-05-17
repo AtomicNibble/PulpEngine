@@ -351,8 +351,8 @@ int XWinding::Split(const Planef& plane, const float epsilon, XWinding **front, 
 
 	maxpts = numPoints + 4;	// cant use counts[0]+2 because of fp grouping errors
 
-	*front = f = new XWinding(maxpts);
-	*back = b = new XWinding(maxpts);
+	*front = f = X_NEW(XWinding, g_arena, "fronWinding")(maxpts);
+	*back = b = X_NEW(XWinding, g_arena, "BackWinding")(maxpts);
 
 	for (i = 0; i < numPoints; i++) {
 		p1 = &p[i];
@@ -480,7 +480,8 @@ XWinding* XWinding::Clip(const Planef &plane, const float epsilon, const bool ke
 	}
 	// if nothing at the front of the clipping plane
 	if (!counts[Planeside::FRONT]) {
-		delete this;
+		X_DELETE(this,g_arena);
+//		delete this;
 		return nullptr;
 	}
 	// if nothing at the back of the clipping plane
@@ -559,7 +560,7 @@ XWinding *XWinding::Copy(void) const
 {
 	XWinding *w;
 
-	w = new XWinding(numPoints);
+	w = X_NEW(XWinding, g_arena, "WindingCopy")(numPoints);
 	w->numPoints = numPoints;
 	memcpy(w->p, p, numPoints * sizeof(p[0]));
 	return w;
@@ -777,4 +778,17 @@ void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const fl
 	}
 	numPoints = numHullPoints;
 	memcpy(p, hullPoints, numHullPoints * sizeof(Vec3f));
+}
+
+
+
+XWinding* XWinding::ReverseWinding(void)
+{
+	XWinding* c = X_NEW(XWinding, g_arena, "ReverseWinding");
+	c->EnsureAlloced(numPoints);
+
+	for (int i = 0; i < numPoints; i++)
+		c->p[i] = p[numPoints - 1 - i];
+
+	return c;
 }
