@@ -481,7 +481,6 @@ XWinding* XWinding::Clip(const Planef &plane, const float epsilon, const bool ke
 	// if nothing at the front of the clipping plane
 	if (!counts[Planeside::FRONT]) {
 		X_DELETE(this,g_arena);
-//		delete this;
 		return nullptr;
 	}
 	// if nothing at the back of the clipping plane
