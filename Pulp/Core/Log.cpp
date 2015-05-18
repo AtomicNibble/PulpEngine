@@ -8,15 +8,24 @@ X_NAMESPACE_BEGIN(core)
 
 namespace {
 
-	const char *const INDENTATION_STRINGS[7] = {
+	const char *const INDENTATION_STRINGS[16] = {
 
 		"| ",
 		"|    ",
 		"|      ",
 		"|        ",
 		"|          ",
-		"|            ",
-		"|              "
+		"|			  ",
+		"|              ",
+		"|                ",
+		"|                  ",
+		"|                    ",
+		"|                      ",
+		"|                        ",
+		"|                          ",
+		"|                            ",
+		"|                              ",
+		"|                                "
 
 	};
 }
@@ -95,7 +104,7 @@ const char* XLog::GetIndentation(void)
 {
 	const char *result;
 
-	if (logVerbosity_ < 7)
+	if (logVerbosity_ < 16)
 		result = INDENTATION_STRINGS[logVerbosity_];
 	else
 		result = "|              ";
