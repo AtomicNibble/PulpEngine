@@ -107,7 +107,7 @@ const char* XLog::GetIndentation(void)
 	if (logVerbosity_ < 16)
 		result = INDENTATION_STRINGS[logVerbosity_];
 	else
-		result = "|              ";
+		result = 		"|                                  ";
 	return result;
 }
 
