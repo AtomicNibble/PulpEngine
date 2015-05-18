@@ -99,12 +99,86 @@ namespace
 #endif // !X_DEBUG
 	}
 
-}
+	void CalcNodeBounds(bspNode* node)
+	{
+		bspPortal* p;
+		int	s, i;
 
+		// calc mins/maxs for both leafs and nodes
+		node->bounds.clear();
+		for (p = node->portals; p; p = p->next[s]) {
+			s = (p->nodes[1] == node);
+			for (i = 0; i < p->pWinding->GetNumPoints(); i++) 
+			{
+				const Vec5f& point = (*p->pWinding)[i];
+				node->bounds.add(point.asVec3());
+			}
+		}
+	}
+
+	#define	BASE_WINDING_EPSILON	0.001f
+	#define	SPLIT_WINDING_EPSILON	0.001f
+
+	XWinding* BaseWindingForNode(XPlaneSet& planes, bspNode* node)
+	{
+		XWinding	*w;
+		bspNode		*n;
+
+		w = X_NEW(XWinding, g_arena, "WindingForNode")(planes[node->planenum]);
+
+		// clip by all the parents
+		for (n = node->parent; n && w;) {
+			Planef &plane = planes[n->planenum];
+
+			if (n->children[0] == node) {
+				// take front
+				w = w->Clip(plane, BASE_WINDING_EPSILON);
+			}
+			else {
+				// take back
+				Planef	back = -plane;
+				w = w->Clip(back, BASE_WINDING_EPSILON);
+			}
+			node = n;
+			n = n->parent;
+		}
+
+		return w;
+	}
+
+} // namespace
+
+
+void MakeTreePortals_r(bspNode* node)
+{
+	int i;
+
+	CalcNodeBounds(node);
+
+	if (node->bounds.isEmpty()) {
+		X_WARNING("Portal","node without a volume");
+	}
+
+	for (i = 0; i < 3; i++) {
+		if (node->bounds.min[i] < level::MIN_WORLD_COORD ||
+			node->bounds.max[i] > level::MAX_WORLD_COORD) {
+			X_WARNING("Portal","node with unbounded volume");
+			break;
+		}
+	}
+	if (node->planenum == PLANENUM_LEAF) {
+		return;
+	}
+
+	//MakeNodePortal(node);
+	//SplitNodePortals(node);
+
+	MakeTreePortals_r(node->children[0]);
+	MakeTreePortals_r(node->children[1]);
+}
 
 void LvlBuilder::MakeTreePortals(LvlEntity& ent)
 {
 	MakeHeadnodePortals(ent.bspTree);
-
-
+	MakeTreePortals_r(ent.bspTree.headnode);
 }
