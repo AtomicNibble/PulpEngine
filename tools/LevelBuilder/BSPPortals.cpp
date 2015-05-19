@@ -146,10 +146,197 @@ namespace
 		return w;
 	}
 
+	void MakeNodePortal(XPlaneSet& planes, bspNode* node)
+	{
+		bspPortal	*new_portal, *p;
+		XWinding	*w;
+		Vec3f		normal;
+		int			side;
+
+		w = BaseWindingForNode(planes, node);
+
+		// clip the portal by all the other portals in the node
+		for (p = node->portals; p && w; p = p->next[side])
+		{
+			Planef	plane;
+
+			if (p->nodes[0] == node)
+			{
+				side = 0;
+				plane = p->plane;
+			}
+			else if (p->nodes[1] == node)
+			{
+				side = 1;
+				plane = -p->plane;
+			}
+			else {
+				//	common->Error("CutNodePortals_r: mislinked portal");
+				side = 0;	// quiet a compiler warning
+			}
+
+			w = w->Clip(plane, CLIP_EPSILON);
+		}
+
+		if (!w)
+		{
+			return;
+		}
+
+		if (w->IsTiny())
+		{
+			//	c_tinyportals++;
+			X_DELETE(w, g_arena);
+			return;
+		}
+
+		new_portal = X_NEW(bspPortal, g_arena, "Portal");
+		new_portal->plane = planes[node->planenum];
+		new_portal->onNode = node;
+		new_portal->pWinding = w;
+		AddPortalToNodes(new_portal, node->children[0], node->children[1]);
+	}
+
+
+	void RemovePortalFromNode(bspPortal* portal, bspNode* l)
+	{
+		bspPortal	**pp, *t;
+
+		// remove reference to the current portal
+		pp = &l->portals;
+		while (1)
+		{
+			t = *pp;
+
+			if (!t) {
+				X_ERROR("Portal", "RemovePortalFromNode: portal not in leaf");
+			}
+
+			if (t == portal) {
+				break;
+			}
+
+			if (t->nodes[0] == l)
+				pp = &t->next[0];
+			else if (t->nodes[1] == l)
+				pp = &t->next[1];
+			else {
+				X_ERROR("Portal", "RemovePortalFromNode: portal not bounding leaf");
+			}
+		}
+
+		if (portal->nodes[0] == l) {
+			*pp = portal->next[0];
+			portal->nodes[0] = nullptr;
+		}
+		else if (portal->nodes[1] == l) {
+			*pp = portal->next[1];
+			portal->nodes[1] = nullptr;
+		}
+		else {
+			X_ERROR("Portal", "RemovePortalFromNode: mislinked");
+		}
+	}
+
+
+	void SplitNodePortals(XPlaneSet& planes, bspNode* node)
+	{
+		bspPortal	*p, *next_portal, *new_portal;
+		bspNode		*f, *b, *other_node;
+		int			side;
+		Planef		*plane;
+		XWinding	*frontwinding, *backwinding;
+
+		plane = &planes[node->planenum];
+		f = node->children[0];
+		b = node->children[1];
+
+		for (p = node->portals; p; p = next_portal) 
+		{
+			if (p->nodes[0] == node) {
+				side = 0;
+			}
+			else if (p->nodes[1] == node) {
+				side = 1;
+			}
+			else {
+				X_ERROR("Portla", "SplitNodePortals: mislinked portal");
+				side = 0;	// quiet a compiler warning
+			}
+			next_portal = p->next[side];
+
+			other_node = p->nodes[!side];
+
+			RemovePortalFromNode(p, p->nodes[0]);
+			RemovePortalFromNode(p, p->nodes[1]);
+
+			//
+			// cut the portal into two portals, one on each side of the cut plane
+			//
+			p->pWinding->Split(*plane, SPLIT_WINDING_EPSILON, &frontwinding, &backwinding);
+
+			if (frontwinding && frontwinding->IsTiny())
+			{
+				X_DELETE_AND_NULL( frontwinding, g_arena);
+			//	c_tinyportals++;
+			}
+
+			if (backwinding && backwinding->IsTiny())
+			{
+				X_DELETE_AND_NULL(backwinding, g_arena);
+			//	c_tinyportals++;
+			}
+
+			if (!frontwinding && !backwinding)
+			{	// tiny windings on both sides
+				continue;
+			}
+
+			if (!frontwinding)
+			{
+				X_DELETE_AND_NULL(backwinding, g_arena);
+				if (side == 0)
+					AddPortalToNodes(p, b, other_node);
+				else
+					AddPortalToNodes(p, other_node, b);
+				continue;
+			}
+			if (!backwinding)
+			{
+				X_DELETE_AND_NULL(frontwinding, g_arena);
+				if (side == 0)
+					AddPortalToNodes(p, f, other_node);
+				else
+					AddPortalToNodes(p, other_node, f);
+				continue;
+			}
+
+			// the winding is split
+			new_portal = X_NEW(bspPortal, g_arena, "Portal");
+			*new_portal = *p;
+			new_portal->pWinding = backwinding;
+			X_DELETE(p->pWinding, g_arena);
+			p->pWinding = frontwinding;
+
+			if (side == 0)
+			{
+				AddPortalToNodes(p, f, other_node);
+				AddPortalToNodes(new_portal, b, other_node);
+			}
+			else
+			{
+				AddPortalToNodes(p, other_node, f);
+				AddPortalToNodes(new_portal, other_node, b);
+			}
+		}
+
+		node->portals = nullptr;
+	}
+
 } // namespace
 
 
-void MakeTreePortals_r(bspNode* node)
+void LvlBuilder::MakeTreePortals_r(bspNode* node)
 {
 	int i;
 
@@ -170,8 +357,8 @@ void MakeTreePortals_r(bspNode* node)
 		return;
 	}
 
-	//MakeNodePortal(node);
-	//SplitNodePortals(node);
+	MakeNodePortal(planes, node);
+	SplitNodePortals(planes, node);
 
 	MakeTreePortals_r(node->children[0]);
 	MakeTreePortals_r(node->children[1]);
@@ -181,4 +368,5 @@ void LvlBuilder::MakeTreePortals(LvlEntity& ent)
 {
 	MakeHeadnodePortals(ent.bspTree);
 	MakeTreePortals_r(ent.bspTree.headnode);
+	int break_me = 0;
 }
