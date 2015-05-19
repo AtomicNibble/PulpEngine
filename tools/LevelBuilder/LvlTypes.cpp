@@ -245,7 +245,7 @@ float LvlBrush::Volume(const XPlaneSet& planes)
 }
 
 
-BrushPlaneSide::Enum LvlBrush::BrushMostlyOnSide(const Planef& plane)
+BrushPlaneSide::Enum LvlBrush::BrushMostlyOnSide(const Planef& plane) const
 {
 	size_t i;
 	int32_t j;

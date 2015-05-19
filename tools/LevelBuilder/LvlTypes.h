@@ -70,7 +70,7 @@ struct LvlBrush
 	bool boundBrush(const XPlaneSet& planes);
 	float Volume(const XPlaneSet& planes);
 
-	BrushPlaneSide::Enum BrushMostlyOnSide(const Planef& plane);
+	BrushPlaneSide::Enum BrushMostlyOnSide(const Planef& plane) const;
 
 public:
 	typedef core::Array<LvlBrushSide> SidesArr;
