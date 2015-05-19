@@ -38,6 +38,9 @@ int LvlBuilder::FilterBrushIntoTree_r(LvlBrush* b, bspNode* node)
 	LvlBrush		*front, *back;
 	int				c;
 
+	front = nullptr;
+	back = nullptr;
+
 	if (!b) {
 		return 0;
 	}
@@ -47,6 +50,7 @@ int LvlBuilder::FilterBrushIntoTree_r(LvlBrush* b, bspNode* node)
 	{
 	//	b->next = node->brushlist;
 	//	node->brushlist = b;
+		node->brushes.append(b);
 
 		// classify the leaf by the structural brush
 		if (b->opaque) {
@@ -99,13 +103,13 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	if (d_front < 0.1)
 	{	
 		// only on back
-		*back = brush;
+		*back = X_NEW(LvlBrush, g_arena, "BackBrush")(*brush);
 		return;
 	}
 	if (d_back > -0.1) 
 	{	
 		// only on front
-		*front = brush;
+		*front = X_NEW(LvlBrush, g_arena, "FrontBrush")(*brush);
 		return;
 	}
 
@@ -123,9 +127,9 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 
 		side = brush->BrushMostlyOnSide(plane);
 		if (side == BrushPlaneSide::FRONT)
-			*front = brush;
+			*front = X_NEW(LvlBrush, g_arena, "FrontBrush")(*brush);
 		if (side == BrushPlaneSide::BACK)
-			*back = brush;
+			*back = X_NEW(LvlBrush, g_arena, "BackBrush")(*brush);
 		return;
 	}
 
@@ -179,5 +183,60 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 		}
 	}
 
+	if (!(b[0] && b[1]))
+	{
+		if (!b[0] && !b[1]) {
+			X_LOG0("bspBrush", "split removed brush");
+		}
+		else {
+			X_LOG0("bspBrush", "split not on both sides");
+		}
 
+		if (b[0])
+		{
+			X_DELETE_AND_NULL(b[0], g_arena);
+			*front = X_NEW(LvlBrush, g_arena, "FrontBrush")(*brush);
+		}
+		if (b[1])
+		{
+			X_DELETE_AND_NULL(b[1], g_arena);
+			*back = X_NEW(LvlBrush, g_arena, "BackBrush")(*brush);
+		}
+		return;
+	}
+
+	// add the midwinding to both sides
+	for (i = 0; i<2; i++)
+	{
+		cs = &b[i]->sides.AddOne();
+
+		cs->planenum = planenum ^ i ^ 1;
+	//	cs->material = NULL;
+
+		if (i == 0) {
+			cs->pWinding = midwinding->Copy();
+		}
+		else {
+			cs->pWinding = midwinding;
+		}
+	}
+
+	{
+		float	v1;
+		int		i;
+
+		for (i = 0; i<2; i++)
+		{
+			v1 = b[i]->Volume(planes);
+			if (v1 < 1.0)
+			{
+				X_DELETE_AND_NULL(b[i], g_arena);
+				b[i] = NULL;
+				X_WARNING("LvlBrush", "SplitBrush: tiny volume after clip");
+			}
+		}
+	}
+
+	*front = b[0];
+	*back = b[1];
 }
