@@ -322,6 +322,10 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	// this is the outside_node of the bspTree
 	MakeTreePortals(ent);
 
+	// Mark the leafs as opaque and areaportals and put brush
+	// fragments in each leaf so portal surfaces can be matched
+	// to materials
+	FilterBrushesIntoTree(ent);
 
 	int goat = 0;
 
