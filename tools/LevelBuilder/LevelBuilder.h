@@ -41,6 +41,11 @@ private:
 
 private:
 	void MakeTreePortals(LvlEntity& ent);
+	void MakeTreePortals_r(bspNode* node);
+
+	void FilterBrushesIntoTree(LvlEntity& ent);
+	int FilterBrushIntoTree_r(LvlBrush* b, bspNode* node);
+	void SplitBrush(LvlBrush* brush, int32_t planenum, LvlBrush** front, LvlBrush** back);
 
 private:
 	LvlEntsArr	entities_;
