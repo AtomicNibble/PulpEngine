@@ -232,7 +232,6 @@ void LvlBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces, size_t& numLeafs
 	}
 }
 
-
 void LvlBuilder::FacesToBSP(LvlEntity& ent)
 {
 	X_LOG0("Bsp", "Building face list");
@@ -262,4 +261,3 @@ void LvlBuilder::FacesToBSP(LvlEntity& ent)
 
 	X_LOG0("Bsp", "num leafs: %i", numLeafs);
 }
-
