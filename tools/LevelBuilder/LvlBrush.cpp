@@ -70,13 +70,13 @@ int LvlBuilder::FilterBrushIntoTree_r(LvlBrush* b, bspNode* node)
 void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	LvlBrush** front, LvlBrush** back)
 {
-	LvlBrush	*b[2];
+	LvlBrush		*b[2];
 	size_t			i, j;
-	XWinding	*w, *cw[2], *midwinding;
-	LvlBrushSide		*s, *cs;
-	float		d, d_front, d_back;
+	XWinding		*w, *cw[2], *midwinding;
+	LvlBrushSide	*s, *cs;
+	float			d, d_front, d_back;
 
-	*front = *back = NULL;
+	*front = *back = nullptr;
 	Planef &plane = planes[planenum];
 
 	// check all points
@@ -87,7 +87,8 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 		if (!w) {
 			continue;
 		}
-		for (j = 0; j < w->GetNumPoints(); j++) {
+		for (j = 0; j < static_cast<size_t>(w->GetNumPoints()); j++) 
+		{
 			d = plane.distance((*w)[j].asVec3());
 			if (d > 0 && d > d_front)
 				d_front = d;
@@ -95,13 +96,15 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 				d_back = d;
 		}
 	}
-	if (d_front < 0.1) // PLANESIDE_EPSILON)
-	{	// only on back
+	if (d_front < 0.1)
+	{	
+		// only on back
 		*back = brush;
 		return;
 	}
-	if (d_back > -0.1) // PLANESIDE_EPSILON)
-	{	// only on front
+	if (d_back > -0.1) 
+	{	
+		// only on front
 		*front = brush;
 		return;
 	}
@@ -110,7 +113,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	w = X_NEW(XWinding, g_arena, "Winding")(plane);
 	for (i = 0; i < brush->sides.size() && w; i++) {
 		Planef &plane2 = planes[brush->sides[i].planenum ^ 1];
-		w = w->Clip(plane2, 0); // PLANESIDE_EPSILON);
+		w = w->Clip(plane2, 0); 
 	}
 
 	if (!w || w->IsTiny()) 
@@ -127,15 +130,15 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	}
 
 	if (w->IsHuge()) {
-	//	common->Printf("WARNING: huge winding\n");
+		X_WARNING("LvlBrush", "SplitBrush: huge winding");
 	}
 
 	midwinding = w;
 
 	// split it for real
-
 	for (i = 0; i < 2; i++) {
 		b[i] = X_NEW(LvlBrush,g_arena, "Brush")(*brush);
+		b[i]->sides.clear();
 	//	b[i]->next = NULL;
 	//	b[i]->original = brush->original;
 	}
@@ -149,7 +152,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 			continue;
 		}
 
-		w->Split(plane, 0 /*PLANESIDE_EPSILON*/, &cw[0], &cw[1]);
+		w->Split(plane, 0, &cw[0], &cw[1]);
 
 		for (j = 0; j < 2; j++) 
 		{
@@ -157,8 +160,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 				continue;
 			}
 
-	//		cs = &b[j]->sides[b[j]->numsides];
-	//		b[j]->numsides++;
+			cs = &b[j]->sides.AddOne();
 			*cs = *s;
 			cs->pWinding = cw[j];
 		}
@@ -167,9 +169,9 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	// see if we have valid polygons on both sides
 	for (i = 0; i<2; i++)
 	{
-	//	if (!BoundBrush(b[i])) {
-	//		break;
-	//	}
+		if (!b[i]->boundBrush(planes)) {
+			break;
+		}
 
 		if (b[i]->sides.size() < 3)
 		{
