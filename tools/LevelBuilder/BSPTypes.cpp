@@ -27,7 +27,8 @@ bspPortal::bspPortal()
 
 // ------------------------------ Node -----------------------------------
 
-bspNode::bspNode()
+bspNode::bspNode() :
+brushes(g_arena)
 {
 	planenum = -1;
 

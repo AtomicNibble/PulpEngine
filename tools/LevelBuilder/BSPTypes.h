@@ -14,7 +14,7 @@ class XMapBrush;
 class XMapPatch;
 );
 
-
+struct LvlBrush;
 
 struct bspFace
 {
@@ -48,6 +48,8 @@ struct bspNode
 {
 	friend struct bspTree;
 
+	typedef core::Array<LvlBrush*> lvlBrushArr;
+
 public:
 	bspNode();
 
@@ -67,6 +69,8 @@ public:
 	int32_t cluster;        // for portalfile writing 
 	int32_t area;			// for areaportals 
 	int32_t occupied;		// 1 or greater can reach entity 
+
+	lvlBrushArr brushes;
 
 	AABB bounds;
 
