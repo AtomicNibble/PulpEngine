@@ -108,7 +108,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 
 	// create a new winding from the split plane
 	w = X_NEW(XWinding, g_arena, "Winding")(plane);
-	for (i = 0; i < brush->numsides && w; i++) {
+	for (i = 0; i < brush->sides.size() && w; i++) {
 		Planef &plane2 = planes[brush->sides[i].planenum ^ 1];
 		w = w->Clip(plane2, 0); // PLANESIDE_EPSILON);
 	}
@@ -116,12 +116,12 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	if (!w || w->IsTiny()) 
 	{
 		// the brush isn't really split
-		int		side;
+		BrushPlaneSide::Enum side;
 
-		side = BrushMostlyOnSide(brush, plane);
-		if (side == PSIDE_FRONT)
+		side = brush->BrushMostlyOnSide(plane);
+		if (side == BrushPlaneSide::FRONT)
 			*front = brush;
-		if (side == PSIDE_BACK)
+		if (side == BrushPlaneSide::BACK)
 			*back = brush;
 		return;
 	}
