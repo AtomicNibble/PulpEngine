@@ -218,7 +218,8 @@ void LvlBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces, size_t& numLeafs
 	// split the bounds if we have a nice axial plane
 	for (i = 0; i < 3; i++) 
 	{
-		if (math<float>::abs(plane[i] - 1.f) < 0.001f) 
+		float val = math<float>::abs(plane[i] - 1.f);
+		if (val < 0.001f) 
 		{
 			node->children[0]->bounds.min[i] = plane.getDistance();
 			node->children[1]->bounds.max[i] = plane.getDistance();
@@ -230,6 +231,7 @@ void LvlBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces, size_t& numLeafs
 		BuildFaceTree_r(node->children[i], childLists[i], numLeafs);
 	}
 }
+
 
 void LvlBuilder::FacesToBSP(LvlEntity& ent)
 {
@@ -260,3 +262,4 @@ void LvlBuilder::FacesToBSP(LvlEntity& ent)
 
 	X_LOG0("Bsp", "num leafs: %i", numLeafs);
 }
+
