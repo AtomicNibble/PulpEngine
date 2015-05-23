@@ -153,7 +153,6 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 	brush.entityNum = stats_.numEntities;
 	brush.brushNum = ent_idx;
 
-	core::StackString<level::MAP_MAX_MATERIAL_LEN> lastMatName;
 
 	numSides = mapBrush->GetNumSides();
 	for (i = 0; i < numSides; i++)
@@ -167,22 +166,13 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 		side.matInfo.matRepeate = pMapBrushSide->material.matRepeate;
 		side.matInfo.rotate = pMapBrushSide->material.rotate;
 		side.matInfo.shift = pMapBrushSide->material.shift;
-
-		// see if mat names the same.
-		if (i == 0)
-		{
-			lastMatName = pMapBrushSide->material.name;
-		}
-		else
-		{
-			if (lastMatName != pMapBrushSide->material.name) 
-			{
-				brush.allsidesSameMat = false;
-			}
-		}
 	}
 
 	if (!removeDuplicateBrushPlanes(brush)) {
+		return false;
+	}
+
+	if (!brush.calculateContents()) {
 		return false;
 	}
 
