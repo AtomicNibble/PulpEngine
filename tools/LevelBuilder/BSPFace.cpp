@@ -22,6 +22,9 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 	{
 		if (halfSize[axis] > BLOCK_SIZE) 
 		{
+			// if the box is more than double the block size.
+			// then get the middle of the axis and divide by block size
+			// to work out how many blocks we can fit.
 			float middleAxis = (node->bounds.min[axis] + halfSize[axis]);
 			middleAxis /= BLOCK_SIZE;
 
@@ -29,15 +32,23 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 		}
 		else 
 		{
+			// if two blocks don't fit inside the box.
+			// then we see how many fits inside a half.
+			// and round it up to atleast one.
 			float minScaled = node->bounds.min[axis] / BLOCK_SIZE;
 
 			dist = BLOCK_SIZE * (math<float>::floor(minScaled) + 1.0f);
 		}
 
+		// the resulting distance is always a multiple of BLOCK_SIZE
+		// and atleast 1.
+
+		// does the distance end inside the axis bounds?
 		if (dist > (node->bounds.min[axis] + 1.0f))
 		{
 			if (dist < (node->bounds.max[axis] - 1.0f))
 			{
+				// create a plane on this axis with this distance
 				plane[0] = plane[1] = plane[2] = 0.0f;
 				plane[axis] = 1.0f;
 				plane.setDistance(dist);
@@ -119,6 +130,8 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 			}
 		}
 
+		// the best one is most facing and least
+		// cross planes (splits)
 		size_t value = 5 * facing - 5 * splits;
 
 		if (value > bestValue) {
@@ -135,7 +148,15 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 	return bestSplit->planenum;
 }
 
-
+size_t CountFaceList(bspFace* faces)
+{
+	size_t num = 0;
+	bspFace* pFace;
+	for (pFace = faces; pFace; pFace = pFace->pNext) {
+		num++;
+	}
+	return num;
+}
 
 void LvlBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces, size_t& numLeafs)
 {
@@ -207,6 +228,18 @@ void LvlBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces, size_t& numLeafs
 			childLists[1] = pFace;
 		}
 	}
+
+	// count the child lists.
+	size_t numFrontChildren = CountFaceList(childLists[0]);
+	size_t numBackChildren = CountFaceList(childLists[1]);
+
+#if 0
+	static size_t num = 0;
+	X_LOG0("BspTree", "call num: %i", num++);
+	X_LOG_BULLET;
+	X_LOG0("BspTree", "num Front: %i", numFrontChildren);
+	X_LOG0("BspTree", "num Back: %i", numBackChildren);
+#endif
 
 	size_t i;
 	for (i = 0; i < 2; i++) {
