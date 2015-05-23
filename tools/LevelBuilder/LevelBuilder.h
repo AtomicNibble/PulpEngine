@@ -10,6 +10,8 @@ class LvlBuilder
 {
 	typedef core::Array<LvlEntity> LvlEntsArr;
 	typedef core::Array<LvlArea> LvlAreaArr;
+
+	typedef core::Array<mapfile::XMapEntity*> MapEntArr;
 public:
 	LvlBuilder();
 
@@ -48,6 +50,10 @@ private:
 	void SplitBrush(LvlBrush* brush, int32_t planenum, LvlBrush** front, LvlBrush** back);
 
 private:
+	bool FloodEntities(LvlEntity& ent);
+	bool PlaceOccupant(bspNode* node, LvlEntity& ent);
+
+private:
 	LvlEntsArr	entities_;
 	LvlAreaArr	areas_;
 
@@ -57,6 +63,8 @@ private:
 	XPlaneSet	planes;
 	AABB		mapBounds;
 	Vec3f		blockSize_;
+	
+	mapfile::XMapFile* map_;
 
 	struct Stats
 	{

@@ -69,6 +69,8 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	X_ASSERT_NOT_NULL(map);
 	int32_t i;
 
+	map_ = map;
+
 	if (map->getNumEntities() == 0) {
 		X_WARNING("Lvl", "Map has zero entites, atleast one is required");
 		return false;
