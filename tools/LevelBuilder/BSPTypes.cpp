@@ -30,7 +30,7 @@ bspPortal::bspPortal()
 bspNode::bspNode() :
 brushes(g_arena)
 {
-	planenum = -1;
+	planenum = 0;
 
 	parent = nullptr;
 	children[0] = nullptr;
@@ -39,28 +39,35 @@ brushes(g_arena)
 
 	tinyportals = 0;
 
-	opaque = true;
+	opaque = false;
 	areaportal = false;
 
-	cluster = -1;
-	area = -1;
-	occupied = -1;
+	cluster = 0;
+	area = 0;
+	occupied = 0;
 }
 
 void bspNode::TreePrint_r(const XPlaneSet& planes, size_t depth) const
 {
+	X_LOG0("bspNode", "==========================");
 	X_LOG0("bspNode", "Depth: %i", depth);
 
 	// is this a leaf node.
 	if (this->planenum == PLANENUM_LEAF)
 	{
 		X_LOG0("bspNode", "LEAF");
+		X_LOG0("bspNode", "==========================");
 		return;
 	}
 
 	// print the plane.
 	const Planef& plane = planes[this->planenum];
 	const Vec3f& Pn = plane.getNormal();
+
+	X_LOG0("bspNode", "Opaque: %i", this->opaque);
+	X_LOG0("bspNode", "Occupied: %i", this->occupied);
+	X_LOG0("bspNode", "Area: %i", this->area);
+	X_LOG0("bspNode", "tinyportals: %i", this->tinyportals);
 
 	X_LOG0("bspNode", "PlaneNum: %i Plane: (%g,%g,%g) %g",
 		this->planenum, Pn[0], Pn[1], Pn[2], plane.getDistance());
@@ -71,6 +78,9 @@ void bspNode::TreePrint_r(const XPlaneSet& planes, size_t depth) const
 
 	// print the children.	
 	depth++;
+
+	X_LOG0("bspNode", "==========================");
+
 
 	children[0]->TreePrint_r(planes, depth);
 	children[1]->TreePrint_r(planes, depth);
