@@ -106,7 +106,7 @@ sides(g_arena)
 
 	bounds.clear();
 
-	opaque = true;
+	opaque = false;
 	allsidesSameMat = true;
 }
 
@@ -197,6 +197,45 @@ bool LvlBrush::boundBrush(const XPlaneSet& planes)
 				"to calculate brush bounds (%s)",
 				entityNum, brushNum, sides.size(), plane ? plane->toString(Dsc) : "");
 			return false;
+		}
+	}
+
+	return true;
+}
+
+bool LvlBrush::calculateContents(void)
+{
+	core::StackString<level::MAP_MAX_MATERIAL_LEN> MatName;
+	SidesArr::ConstIterator it;
+
+	if (sides.isEmpty()) {
+		return false;
+	}
+
+	MatName = sides[0].matInfo.name;
+
+	// a brush is only opaque if all sides are opaque
+	opaque = true;
+	allsidesSameMat = true;
+
+	combinedMatFlags.Clear();
+
+	for (it = sides.begin(); it != sides.end(); ++it)
+	{
+		const LvlBrushSide& side = *it;
+
+		if (!side.matInfo.pMaterial) {
+			X_ERROR("Brush", "material not found for brush side. ent: %i brush: %i",
+				entityNum, brushNum);
+			return false;
+		}
+
+		engine::IMaterial* pMat = side.matInfo.pMaterial;
+
+		combinedMatFlags |= pMat->getFlags();
+
+		if (MatName != side.matInfo.name) {
+			allsidesSameMat = false;
 		}
 	}
 

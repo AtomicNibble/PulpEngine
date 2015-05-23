@@ -68,6 +68,7 @@ struct LvlBrush
 
 	bool createBrushWindings(const XPlaneSet& planes);
 	bool boundBrush(const XPlaneSet& planes);
+	bool calculateContents(void);
 	float Volume(const XPlaneSet& planes);
 
 	BrushPlaneSide::Enum BrushMostlyOnSide(const Planef& plane) const;
