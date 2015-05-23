@@ -344,7 +344,7 @@ int XWinding::Split(const Planef& plane, const float epsilon, XWinding **front, 
 	sides[i] = sides[0];
 	dists[i] = dists[0];
 
-	*front = *back = NULL;
+	*front = *back = nullptr;
 
 	// if coplanar, put on the front side if the normals match
 	if (!counts[Planeside::FRONT] && !counts[Planeside::BACK]) {
