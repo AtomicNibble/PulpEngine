@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "LevelBuilder.h"
 
+#include "MapLoader.h"
+
 namespace
 {
 	#define	SIDESPACE	8
@@ -180,6 +182,7 @@ namespace
 
 		if (!w)
 		{
+			X_WARNING("Portal","Winding is empty");
 			return;
 		}
 
@@ -370,3 +373,104 @@ void LvlBuilder::MakeTreePortals(LvlEntity& ent)
 	MakeTreePortals_r(ent.bspTree.headnode);
 	int break_me = 0;
 }
+
+
+
+void FloodPortals_r(bspNode *node, int32_t dist) 
+{
+	bspPortal	*p;
+	int			s;
+
+	if (node->occupied) {
+		return;
+	}
+
+	if (node->opaque) {
+		return;
+	}
+
+	// c_floodedleafs++;
+	node->occupied = dist;
+
+	for (p = node->portals; p; p = p->next[s]) {
+		s = (p->nodes[1] == node);
+		FloodPortals_r(p->nodes[!s], dist + 1);
+	}
+}
+
+
+bool LvlBuilder::PlaceOccupant(bspNode* headnode, LvlEntity& ent)
+{
+	X_ASSERT_NOT_NULL(headnode);
+	bspNode* node;
+	float	d;
+
+	const Vec3f& origin = ent.origin;
+
+	// find the leaf to start in
+	node = headnode;
+	while (node->planenum != PLANENUM_LEAF)
+	{
+		const Planef& plane = planes[node->planenum];
+		d = plane.distance(origin);
+		if (d >= 0.0f) {
+			node = node->children[0];
+		}
+		else {
+			node = node->children[1];
+		}
+	}
+
+	if (node->opaque) {
+		return false;
+	}
+
+	// node->occupant = occupant;
+	FloodPortals_r(node, 1);
+
+	return true;
+}
+
+bool LvlBuilder::FloodEntities(LvlEntity& ent)
+{
+	bspNode* headnode;
+	bspTree* tree;
+	bool inside;
+	int32_t i;
+
+	tree = &ent.bspTree;
+	headnode = tree->headnode;
+	inside = false;
+
+	// not occupied yet.
+	tree->outside_node.occupied = 0;
+
+	// iterate the map ents.
+	for (i = 0; i < map_->getNumEntities(); i++)
+	{
+		mapfile::XMapEntity* mapEnt = map_->getEntity(i);
+		LvlEntity& lvlEnt = entities_[i];
+
+		mapfile::XMapEntity::PairIt it = mapEnt->epairs.find("origin");
+		if (it == mapEnt->epairs.end()){
+			continue;
+		}
+
+
+		if (PlaceOccupant(headnode, lvlEnt)) {
+			inside = true;
+		}
+
+		// check if the outside nodes has been occupied.
+		if (tree->outside_node.occupied) 
+		{
+
+
+		}
+
+	}
+
+
+	return true;
+}
+
