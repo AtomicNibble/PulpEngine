@@ -43,7 +43,8 @@ X_DECLARE_ENUM8(MaterialType)(
 	UI,
 	WORLD,
 	MODEL,
-	TOOL
+	TOOL,
+	UNKNOWN
 );
 
 // offset types.
@@ -172,7 +173,6 @@ struct MaterialHeader
 	MaterialPolygonOffset::Enum polyOffsetType;
 	MaterialFilterType::Enum filterType;
 	MaterialType::Enum matType;
-
 
 	Color diffuse;
 	Color specular;
