@@ -7,6 +7,8 @@ namespace
 {
 	#define	SIDESPACE	8
 
+	size_t c_tinyportals = 0;
+
 	void AddPortalToNodes(bspPortal* p, bspNode* front, bspNode* back) 
 	{
 		X_ASSERT_NOT_NULL(p);
@@ -173,7 +175,7 @@ namespace
 				plane = -p->plane;
 			}
 			else {
-				//	common->Error("CutNodePortals_r: mislinked portal");
+				X_ERROR("Portal", "CutNodePortals_r: mislinked portal");
 				side = 0;	// quiet a compiler warning
 			}
 
@@ -188,7 +190,7 @@ namespace
 
 		if (w->IsTiny())
 		{
-			//	c_tinyportals++;
+			c_tinyportals++;
 			X_DELETE(w, g_arena);
 			return;
 		}
@@ -281,13 +283,13 @@ namespace
 			if (frontwinding && frontwinding->IsTiny())
 			{
 				X_DELETE_AND_NULL( frontwinding, g_arena);
-			//	c_tinyportals++;
+				c_tinyportals++;
 			}
 
 			if (backwinding && backwinding->IsTiny())
 			{
 				X_DELETE_AND_NULL(backwinding, g_arena);
-			//	c_tinyportals++;
+				c_tinyportals++;
 			}
 
 			if (!frontwinding && !backwinding)
@@ -375,6 +377,7 @@ void LvlBuilder::MakeTreePortals(LvlEntity& ent)
 }
 
 
+size_t c_floodedleafs = 0;
 
 void FloodPortals_r(bspNode *node, int32_t dist) 
 {
@@ -389,7 +392,7 @@ void FloodPortals_r(bspNode *node, int32_t dist)
 		return;
 	}
 
-	// c_floodedleafs++;
+	c_floodedleafs++;
 	node->occupied = dist;
 
 	for (p = node->portals; p; p = p->next[s]) {
@@ -431,6 +434,8 @@ bool LvlBuilder::PlaceOccupant(bspNode* headnode, LvlEntity& ent)
 	return true;
 }
 
+
+
 bool LvlBuilder::FloodEntities(LvlEntity& ent)
 {
 	bspNode* headnode;
@@ -442,8 +447,12 @@ bool LvlBuilder::FloodEntities(LvlEntity& ent)
 	headnode = tree->headnode;
 	inside = false;
 
+	c_floodedleafs = 0;
+
 	// not occupied yet.
 	tree->outside_node.occupied = 0;
+
+	tree->Print(planes);
 
 	// iterate the map ents.
 	for (i = 0; i < map_->getNumEntities(); i++)
@@ -464,13 +473,29 @@ bool LvlBuilder::FloodEntities(LvlEntity& ent)
 		// check if the outside nodes has been occupied.
 		if (tree->outside_node.occupied) 
 		{
-
+			X_ERROR("Lvl", "Leak detected!");
+			X_ERROR("Lvl", "Entity: %i", i);
+			X_ERROR("Lvl", "origin: %g %g %g", 
+				lvlEnt.origin.x,
+				lvlEnt.origin.y, 
+				lvlEnt.origin.z);
 
 		}
 
 	}
 
+	X_LOG0("Lvl","%5i flooded leafs", c_floodedleafs);
 
-	return true;
+
+	if (!inside)
+	{
+		X_ERROR("Lvl", "no entities in open -- no filling");
+	}
+	else if (tree->outside_node.occupied)
+	{
+		X_ERROR("Lvl", "entity reached from outside -- no filling");
+	}
+
+	return (bool)(inside && !tree->outside_node.occupied);
 }
 
