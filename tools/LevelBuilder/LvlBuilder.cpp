@@ -61,6 +61,8 @@ areas_(g_arena),
 stringTable_(g_arena)
 {
 	core::zero_object(stats_);
+
+	matMan_.Init();
 }
 
 
@@ -166,18 +168,24 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 		side.matInfo.matRepeate = pMapBrushSide->material.matRepeate;
 		side.matInfo.rotate = pMapBrushSide->material.rotate;
 		side.matInfo.shift = pMapBrushSide->material.shift;
+
+		// load the material.
+		side.matInfo.pMaterial = matMan_.loadMaterial(pMapBrushSide->material.name.c_str());
 	}
 
 	if (!removeDuplicateBrushPlanes(brush)) {
+		X_ERROR("Brush", "Failed to remove duplicate planes");
 		return false;
 	}
 
 	if (!brush.calculateContents()) {
+		X_ERROR("Brush", "Failed to calculate brush contents");
 		return false;
 	}
 
 	// create windings for sides + bounds for brush
 	if (!brush.createBrushWindings(planes)) {
+		X_ERROR("Brush", "Failed to create windings for brush");
 		return false;
 	}
 

@@ -3,7 +3,7 @@
 #ifndef X_LVL_BUILDER_H_
 #define X_LVL_BUILDER_H_
 
-
+#include "MaterialManager.h"
 #include "LvlTypes.h"
 
 class LvlBuilder
@@ -65,6 +65,8 @@ private:
 	Vec3f		blockSize_;
 	
 	mapfile::XMapFile* map_;
+
+	lvl::MatManager matMan_;
 
 	struct Stats
 	{
