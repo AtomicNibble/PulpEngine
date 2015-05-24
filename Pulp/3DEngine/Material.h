@@ -11,6 +11,15 @@
 
 #include "EngineBase.h"
 
+
+X_NAMESPACE_DECLARE(core,
+	namespace xml {
+		namespace rapidxml {
+			template<class Ch> class xml_node;
+		}
+	}
+)
+
 X_NAMESPACE_BEGIN(engine)
 
 class XMaterialManager;
@@ -66,6 +75,7 @@ public:
 	virtual bool isDefault() const X_OVERRIDE;
 
 
+	static bool ProcessMaterialXML(XMaterial* pMaterial, core::xml::rapidxml::xml_node<char>* node);
 
 protected:
 	friend class XMaterialManager;
