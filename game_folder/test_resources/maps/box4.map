@@ -1870,6 +1870,6 @@ layer "roof"
 }
 // entity 5
 {
-"classname" "info_player_start"
+"classname" "script_origin"
 "origin" "-416.0 48.0 48.0"
 }
