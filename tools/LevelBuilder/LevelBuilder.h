@@ -53,6 +53,8 @@ private:
 	bool FloodEntities(LvlEntity& ent);
 	bool PlaceOccupant(bspNode* node, LvlEntity& ent);
 
+	bool FillOutside(LvlEntity& ent);
+	
 private:
 	LvlEntsArr	entities_;
 	LvlAreaArr	areas_;

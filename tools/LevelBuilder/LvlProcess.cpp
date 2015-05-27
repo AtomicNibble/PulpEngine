@@ -327,6 +327,15 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	// to materials
 	FilterBrushesIntoTree(ent);
 
+
+	if (!FloodEntities(ent))
+	{
+		X_ERROR("Lvl", "map leaked");
+		return false;
+	}
+
+	FillOutside(ent);
+
 	int goat = 0;
 
 #if 0

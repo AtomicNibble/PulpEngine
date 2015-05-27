@@ -62,7 +62,17 @@ int LvlBuilder::FilterBrushIntoTree_r(LvlBrush* b, bspNode* node)
 
 	// split it by the node plane
 	SplitBrush(b, node->planenum, &front, &back);
-	X_DELETE(b, g_arena);
+
+	if (front && front->sides.size() < 6)
+	{
+		int goat = 0;
+	}
+	if (back && back->sides.size() < 6)
+	{
+		int goat = 0;
+	}
+
+	X_DELETE_AND_NULL(b, g_arena);
 
 	c = 0;
 	c += FilterBrushIntoTree_r(front, node->children[0]);
@@ -82,6 +92,11 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 
 	*front = *back = nullptr;
 	Planef &plane = planes[planenum];
+
+	if (brush->sides.size() < 6)
+	{
+		int goat = 0;
+	}
 
 	// check all points
 	d_front = d_back = 0;
@@ -135,9 +150,17 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 
 	if (w->IsHuge()) {
 		X_WARNING("LvlBrush", "SplitBrush: huge winding");
+		w->Print();
 	}
 
 	midwinding = w;
+
+	static int goat = 0;
+	goat++;
+
+	if (goat == 15) {
+		int xamel = 0;
+	}
 
 	// split it for real
 	for (i = 0; i < 2; i++) {

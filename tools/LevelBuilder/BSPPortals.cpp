@@ -452,7 +452,7 @@ bool LvlBuilder::FloodEntities(LvlEntity& ent)
 	// not occupied yet.
 	tree->outside_node.occupied = 0;
 
-	tree->Print(planes);
+//	tree->Print(planes);
 
 	// iterate the map ents.
 	for (i = 0; i < map_->getNumEntities(); i++)
@@ -499,3 +499,47 @@ bool LvlBuilder::FloodEntities(LvlEntity& ent)
 	return (bool)(inside && !tree->outside_node.occupied);
 }
 
+
+static	int		c_outside;
+static	int		c_inside;
+static	int		c_solid;
+
+void FillOutside_r(bspNode* node)
+{
+	if (node->planenum != PLANENUM_LEAF)
+	{
+		FillOutside_r(node->children[0]);
+		FillOutside_r(node->children[1]);
+		return;
+	}
+
+	if (!node->occupied) {
+		if (!node->opaque) {
+			c_outside++;
+			node->opaque = true;
+		}
+		else {
+			c_solid++;
+		}
+	}
+	else {
+		c_inside++;
+	}
+
+}
+
+
+
+bool LvlBuilder::FillOutside(LvlEntity& ent)
+{
+	c_outside = 0;
+	c_inside = 0;
+	c_solid = 0;
+	X_LOG0("Lvl", "--- FillOutside ---");
+	FillOutside_r(ent.bspTree.headnode);
+	X_LOG0("Lvl", "%5i solid leafs", c_solid);
+	X_LOG0("Lvl", "%5i leafs filled", c_outside);
+	X_LOG0("Lvl", "%5i inside leafs", c_inside);
+
+	return true;
+}
