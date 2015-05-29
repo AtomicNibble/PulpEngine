@@ -239,7 +239,8 @@ bool XMaterial::ProcessMaterialXML(XMaterial* pMaterial,
 		}
 		else
 		{
-			X_WARNING("Mtl", "unkown attribute: %s on material node", begin);
+			const char* pName = pMaterial->getName();
+			X_WARNING("Mtl", "%s -> unkown attribute: '%s' on material node.", pName, begin);
 		}
 	}
 
