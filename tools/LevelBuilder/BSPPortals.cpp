@@ -188,6 +188,10 @@ namespace
 			return;
 		}
 
+#if X_DEBUG
+		w->Print();
+#endif // X_DEBUG
+
 		if (w->IsTiny())
 		{
 			c_tinyportals++;
@@ -252,12 +256,18 @@ namespace
 		Planef		*plane;
 		XWinding	*frontwinding, *backwinding;
 
+		// get the plane for this node.
 		plane = &planes[node->planenum];
+		// front and back nodes of this node that we are going to split.
 		f = node->children[0];
 		b = node->children[1];
 
 		for (p = node->portals; p; p = next_portal) 
 		{
+			// a portal is linked to two nodes.
+			// a node can have many portals.
+			// if we are to the left of the portal.
+			// the node is on the right.
 			if (p->nodes[0] == node) {
 				side = 0;
 			}
@@ -268,16 +278,19 @@ namespace
 				X_ERROR("Portla", "SplitNodePortals: mislinked portal");
 				side = 0;	// quiet a compiler warning
 			}
-			next_portal = p->next[side];
 
+			// the next portal, on the same side.
+			next_portal = p->next[side];
+			// this is the node on the opposite size.
 			other_node = p->nodes[!side];
 
+			// remove the portals from the nodes linked.
+			// list ready for when we added the new split nodes.
 			RemovePortalFromNode(p, p->nodes[0]);
 			RemovePortalFromNode(p, p->nodes[1]);
 
-			//
 			// cut the portal into two portals, one on each side of the cut plane
-			//
+			// this means that the 
 			p->pWinding->Split(*plane, SPLIT_WINDING_EPSILON, &frontwinding, &backwinding);
 
 			if (frontwinding && frontwinding->IsTiny())
@@ -293,7 +306,8 @@ namespace
 			}
 
 			if (!frontwinding && !backwinding)
-			{	// tiny windings on both sides
+			{	
+				// tiny windings on both sides
 				continue;
 			}
 
@@ -317,9 +331,12 @@ namespace
 			}
 
 			// the winding is split
+			// means the protal span across the current binary tree node more than the elipson.
+			// so make a new portal
 			new_portal = X_NEW(bspPortal, g_arena, "Portal");
 			*new_portal = *p;
 			new_portal->pWinding = backwinding;
+			// delete the portals old winding and assing the new one.
 			X_DELETE(p->pWinding, g_arena);
 			p->pWinding = frontwinding;
 
