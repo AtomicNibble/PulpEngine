@@ -63,7 +63,7 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 	// select from them, otherwise select from
 	// all faces
 	bool havePortals;
-	size_t bestValue;
+	int32 bestValue;
 	bspFace* bestSplit;
 	bspFace* pFace, *pFace2;
 
@@ -132,7 +132,7 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 
 		// the best one is most facing and least
 		// cross planes (splits)
-		size_t value = 5 * facing - 5 * splits;
+		int32 value = 5 * facing - 5 * splits;
 
 		if (value > bestValue) {
 			bestValue = value;
