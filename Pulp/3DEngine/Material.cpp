@@ -78,6 +78,9 @@ namespace
 		const char* pBegin = str;
 		const char* pEnd = str + core::strUtil::strlen(str);
 
+		if (core::strUtil::IsEqual(pBegin, pEnd, "none")) {
+			return MaterialSurType::NONE;
+		}
 		if (core::strUtil::IsEqual(pBegin, pEnd, "brick")) {
 			return MaterialSurType::BRICK;
 		}
