@@ -59,14 +59,79 @@ namespace
 			return MaterialType::WORLD;
 		}
 		if (core::strUtil::IsEqual(pBegin, pEnd, "ui")) {
-			return MaterialType::UI
+			return MaterialType::UI;
 		}
 		if (core::strUtil::IsEqual(pBegin, pEnd, "model")) {
 			return MaterialType::MODEL;
 		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "tool")) {
+			return MaterialType::TOOL;
+		}
 
 		X_ERROR("Mtl", "Unkown material type: '%s' (case-sen)", str);
 		return MaterialType::UNKNOWN;
+	}
+
+	MaterialSurType::Enum SurfaceTypeFromStr(const char* str)
+	{
+		// case sensitive for this one
+		const char* pBegin = str;
+		const char* pEnd = str + core::strUtil::strlen(str);
+
+		if (core::strUtil::IsEqual(pBegin, pEnd, "brick")) {
+			return MaterialSurType::BRICK;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "concrete")) {
+			return MaterialSurType::CONCRETE;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "cloth")) {
+			return MaterialSurType::CLOTH;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "flesh")) {
+			return MaterialSurType::FLESH;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "glass")) {
+			return MaterialSurType::GLASS;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "grass")) {
+			return MaterialSurType::GRASS;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "gravel")) {
+			return MaterialSurType::GRAVEL;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "ice")) {
+			return MaterialSurType::ICE;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "metal")) {
+			return MaterialSurType::METAL;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "mud")) {
+			return MaterialSurType::MUD;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "plastic")) {
+			return MaterialSurType::PLASTIC;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "paper")) {
+			return MaterialSurType::PAPER;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "rock")) {
+			return MaterialSurType::ROCK;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "snow")) {
+			return MaterialSurType::SNOW;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "sand")) {
+			return MaterialSurType::SAND;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "wood")) {
+			return MaterialSurType::WOOD;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "water")) {
+			return MaterialSurType::WATER;
+		}
+
+		X_ERROR("Mtl", "Unkown material surface type: '%s' (case-sen)", str);
+		return MaterialSurType::NONE;
 	}
 
 } // namespace
@@ -255,14 +320,14 @@ bool XMaterial::ProcessMaterialXML(XMaterial* pMaterial,
 		{
 			flags.Set(MtlXmlFlags::SURFACETYPE);
 			// this needs fixing since we get strings not numbers here.
-			MaterialSurType::Enum type = core::strUtil::StringToInt<MaterialSurType::Enum>(attr->value());
+			MaterialSurType::Enum type = SurfaceTypeFromStr(attr->value());
 			pMaterial->setSurfaceType(type);
 		}
 		else if (core::strUtil::IsEqual(begin, end, "MaterialType"))
 		{
 			// make sure the name is a valid material type.
-			MaterialType::UNKNOWN;
-
+			MaterialType::Enum type = MatTypeFromStr(attr->value());
+			pMaterial->setType(type);
 		}
 		else
 		{
