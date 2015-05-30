@@ -81,7 +81,10 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	entities_.resize(map->getNumEntities());
 	for (i = 0; i < map->getNumEntities(); i++)
 	{
-		processMapEntity(entities_[i], map->getEntity(i));
+		if (!processMapEntity(entities_[i], map->getEntity(i))) {
+			X_ERROR("Lvl", "Failed to process entity: %i", i);
+			return false;
+		}
 	}
 
 	// calculate bouds.
@@ -124,10 +127,16 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 		prim = mapEnt->GetPrimitive(i);
 
 		if (prim->getType() == PrimType::BRUSH)	{
-			processBrush(ent, static_cast<mapfile::XMapBrush*>(prim), i);
+			if (!processBrush(ent, static_cast<mapfile::XMapBrush*>(prim), i)) {
+				X_ERROR("Lvl", "failed to process brush: %i", i);
+				return false;
+			}
 		}
 		else if (prim->getType() == PrimType::PATCH) {
-			processPatch(ent, static_cast<mapfile::XMapPatch*>(prim), i);
+			if (!processPatch(ent, static_cast<mapfile::XMapPatch*>(prim), i)) {
+				X_ERROR("Lvl", "failed to process patch: %i", i);
+				return false;
+			}
 		}
 	}
 
@@ -171,6 +180,9 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 		// load the material.
 		side.matInfo.pMaterial = matMan_.loadMaterial(pMapBrushSide->material.name.c_str());
+		if (!side.matInfo.pMaterial) {
+			return false;
+		}
 	}
 
 	if (!removeDuplicateBrushPlanes(brush)) {
