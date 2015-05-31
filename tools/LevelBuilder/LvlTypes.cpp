@@ -99,6 +99,7 @@ LvlEntity::~LvlEntity()
 
 
 LvlBrush::LvlBrush() :
+pOriginal(nullptr),
 sides(g_arena)
 {
 	entityNum = -1;

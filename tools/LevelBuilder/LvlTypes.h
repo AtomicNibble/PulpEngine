@@ -76,6 +76,8 @@ struct LvlBrush
 public:
 	typedef core::Array<LvlBrushSide> SidesArr;
 
+	struct Lvlbrush* pOriginal;
+
 	AABB bounds;
 
 	int32_t	entityNum;
