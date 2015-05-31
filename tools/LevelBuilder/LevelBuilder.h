@@ -54,7 +54,13 @@ private:
 	bool PlaceOccupant(bspNode* node, LvlEntity& ent);
 
 	bool FillOutside(LvlEntity& ent);
-	
+
+	bool ClipSidesByTree(LvlEntity& ent);
+	void ClipSideByTree_r(XWinding* w, LvlBrushSide& side, bspNode *node);
+
+	bool FloodAreas(LvlEntity& ent);
+	void FindAreas_r(bspNode *node, size_t& numAreas);
+
 private:
 	LvlEntsArr	entities_;
 	LvlAreaArr	areas_;
