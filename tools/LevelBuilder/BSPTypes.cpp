@@ -43,7 +43,7 @@ brushes(g_arena)
 	areaportal = false;
 
 	cluster = 0;
-	area = 0;
+	area = -1;
 	occupied = 0;
 }
 
