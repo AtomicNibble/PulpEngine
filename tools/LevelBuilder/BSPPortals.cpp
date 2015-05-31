@@ -275,7 +275,7 @@ namespace
 				side = 1;
 			}
 			else {
-				X_ERROR("Portla", "SplitNodePortals: mislinked portal");
+				X_ERROR("Portal", "SplitNodePortals: mislinked portal");
 				side = 0;	// quiet a compiler warning
 			}
 
@@ -295,7 +295,7 @@ namespace
 
 			if (frontwinding && frontwinding->IsTiny())
 			{
-				X_DELETE_AND_NULL( frontwinding, g_arena);
+				X_DELETE_AND_NULL(frontwinding, g_arena);
 				c_tinyportals++;
 			}
 
@@ -310,6 +310,19 @@ namespace
 				// tiny windings on both sides
 				continue;
 			}
+
+#if X_DEBUG && 0
+			if (frontwinding)
+			{
+				X_LOG0("Portal", "Split node front winding:");
+				frontwinding->Print();
+			}
+			if (backwinding)
+			{
+				X_LOG0("Portal", "Split node back winding:");
+				backwinding->Print();
+			}
+#endif // !X_DEBUG
 
 			if (!frontwinding)
 			{
@@ -530,7 +543,10 @@ void FillOutside_r(bspNode* node)
 		return;
 	}
 
-	if (!node->occupied) {
+	// is this node occupied?
+	if (!node->occupied) 
+	{
+		// if the node is not opaque it must be outside, otherwise it's a solid.
 		if (!node->opaque) {
 			c_outside++;
 			node->opaque = true;
