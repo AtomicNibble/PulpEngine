@@ -35,7 +35,7 @@ struct LvlMaterial
 {
 	LvlMaterial();
 
-	const engine::MaterialFlags GetFlags(void) const;
+	const engine::MaterialFlags getFlags(void) const;
 
 public:
 	core::StackString<level::MAP_MAX_MATERIAL_LEN> name;
