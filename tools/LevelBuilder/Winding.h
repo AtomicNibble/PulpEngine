@@ -206,7 +206,7 @@ X_INLINE void XWinding::SetNumPoints(int n)
 X_INLINE void XWinding::Clear(void)
 {
 	numPoints = 0;
-	delete[] p;
+	X_DELETE_ARRAY(p);
 	p = nullptr;
 }
 

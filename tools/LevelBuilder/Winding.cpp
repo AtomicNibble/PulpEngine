@@ -16,12 +16,12 @@ bool XWinding::ReAllocate(int n, bool keep)
 
 	oldP = p;
 	n = (n + 3) & ~3;	// align up to multiple of four
-	p = new Vec5f[n];
+	p = X_NEW_ARRAY(Vec5f,n,g_arena,"WindingPoints");
 	if (oldP) {
 		if (keep) {
 			memcpy(p, oldP, numPoints * sizeof(p[0]));
 		}
-		delete[] oldP;
+		X_DELETE_ARRAY(oldP);
 	}
 	allocedSize = n;
 	return true;
