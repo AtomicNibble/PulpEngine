@@ -159,8 +159,7 @@ X_INLINE XWinding::XWinding(const XWinding &winding)
 
 X_INLINE XWinding::~XWinding(void)
 {
-	delete[] p;
-	p = nullptr;
+	Clear();
 }
 
 // -------------------------------------
