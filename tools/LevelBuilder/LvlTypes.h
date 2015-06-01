@@ -106,11 +106,20 @@ struct LvlTris
 	xVert verts[3];
 };
 
+struct LvlInterPortal
+{
+	LvlInterPortal();
+
+	int32_t area0;
+	int32_t area1;
+	LvlBrushSide* pSide;
+};
 
 struct LvlEntity
 {
 	typedef core::Array<LvlBrush> LvlBrushArr;
 	typedef core::Array<LvlTris> TrisArr;
+	typedef core::Array<LvlInterPortal> LvlInterPortalArr;
 //	typedef core::Array<bspFace> BspFaceArr;
 public:
 	LvlEntity();
@@ -120,6 +129,7 @@ public:
 
 	LvlBrushArr brushes;
 	TrisArr patches;
+	LvlInterPortalArr interPortals;
 	// bsp data.
 	bspFace* bspFaces;
 	bspTree bspTree;

@@ -80,9 +80,19 @@ LvlTris::LvlTris()
 
 // ==========================================
 
+LvlInterPortal::LvlInterPortal()
+{
+	area0 = -1;
+	area1 = -1;
+	pSide = nullptr;
+}
+
+// ==========================================
+
 LvlEntity::LvlEntity() :
 brushes(g_arena),
 patches(g_arena),
+interPortals(g_arena),
 numAreas(0)
 {
 	bspFaces = nullptr;
