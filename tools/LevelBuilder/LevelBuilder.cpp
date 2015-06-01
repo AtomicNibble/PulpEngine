@@ -15,6 +15,8 @@
 #include <ModuleExports.h>
 
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
+#include <Memory\AllocationPolicies\GrowingPoolAllocator.h>
+#include <Memory\VirtualMem.h>
 
 HINSTANCE g_hInstance = 0;
 
@@ -31,6 +33,15 @@ typedef core::MemoryArena<
 	core::NoMemoryTracking,			// allow leaks in the tests.
 	core::SimpleMemoryTagging
 > LvlBuilderArena;
+
+typedef core::MemoryArena<
+	core::GrowingPoolAllocator,
+	core::SingleThreadPolicy,
+	core::SimpleBoundsChecking,
+	//	core::SimpleMemoryTracking,
+	core::NoMemoryTracking,			// allow leaks in the tests.
+	core::SimpleMemoryTagging
+> PoolArena;
 
 
 #ifdef X_LIB
@@ -66,6 +77,33 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	LvlBuilderArena arena(&allocator, "LevelBuilderArena");
 
 	g_arena = &arena;
+
+	// init the pool allocators.
+	core::GrowingPoolAllocator bspFaceAllocator(
+		sizeof(bspFace) * (1 << 20),
+		core::VirtualMem::GetPageSize() * 64, 
+		0,
+		sizeof(bspFace),
+		X_ALIGN_OF(bspFace),
+		0
+	);
+
+	PoolArena bspFaceArena(&bspFaceAllocator, "bspFaceArena");
+
+	core::GrowingPoolAllocator bspNodeAllocator(
+		sizeof(bspNode) * (1 << 20),
+		core::VirtualMem::GetPageSize() * 64,
+		0,
+		sizeof(bspNode),
+		X_ALIGN_OF(bspNode),
+		0
+	);
+
+	PoolArena bspNodeArena(&bspNodeAllocator, "bspNodeAllocator");
+
+	// set the pointers.
+	g_bspFaceAllocator = &bspFaceArena;
+	g_bspNodeAllocator = &bspNodeArena;
 
 
 	core::Console Console("Level Compiler");
