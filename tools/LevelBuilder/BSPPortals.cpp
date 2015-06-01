@@ -830,9 +830,43 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 		}
 
 		// see if we have crated this inter area portals before.
+		LvlInterPortalArr::ConstIterator it = interPortals.begin();
+		for (; it != interPortals.end(); ++it)
+		{
+			const LvlInterPortal& iap = *it;
+			// same side instance?
+			if (pBSide == iap.pSide) 
+			{
+				// area match?
+				if(p->nodes[0]->area == iap.area0 && p->nodes[1]->area == iap.area1) {
+					break;
+				}
+				// what about other direction?
+				if (p->nodes[1]->area == iap.area0 && p->nodes[0]->area == iap.area1) {
+					break;
+				}
 
+			}
+		}
 
+		// did we find a match?
+		if (it != interPortals.end()) {
+			continue; 
+		}
 
+		// add a new one.
+		LvlInterPortal& iap = interPortals.AddOne();
+		
+		if (pBSide->planenum == p->onNode->planenum) {
+			iap.area0 = p->nodes[0]->area;
+			iap.area1 = p->nodes[1]->area;
+		}
+		else {
+			iap.area0 = p->nodes[1]->area;
+			iap.area1 = p->nodes[0]->area;
+		}
+		iap.pSide = pBSide;
+	
 	}
 	return true;
 }
