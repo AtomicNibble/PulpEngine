@@ -54,7 +54,7 @@ namespace
 			bounds.min[i] = tree.bounds.min[i] - SIDESPACE;
 			bounds.max[i] = tree.bounds.max[i] + SIDESPACE;
 			if (bounds.min[i] >= bounds.max[i]) {
-				X_ERROR("Bsp", "Backward tree volume");
+				X_FATAL("Bsp", "Backward tree volume");
 			}
 		}
 
