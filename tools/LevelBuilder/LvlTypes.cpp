@@ -132,13 +132,18 @@ sides(g_arena)
 LvlBrush::LvlBrush(const LvlBrush& oth) :
 sides(g_arena)
 {
+	pOriginal = oth.pOriginal;
+
 	// used for poviding helpful error msg's
 	entityNum = oth.entityNum;
 	brushNum = oth.brushNum;
 
 	bounds = oth.bounds;
 	opaque = oth.opaque;
+	allsidesSameMat = oth.allsidesSameMat;
 	//	detail = oth.detail;
+
+	combinedMatFlags = oth.combinedMatFlags;
 
 	sides.resize(oth.sides.size());
 
