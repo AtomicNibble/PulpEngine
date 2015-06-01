@@ -424,13 +424,8 @@ namespace
 					}
 
 					// portal?
-					{
-						engine::IMaterial* pMaterial = side.matInfo.pMaterial;
-						X_ASSERT_NOT_NULL(pMaterial);
-
-						if (!pMaterial->getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
-							continue;
-						}
+					if (!side.matInfo.getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
+						continue;
 					}
 
 					if ((side.planenum & ~1) != (p->onNode->planenum & ~1)) {
@@ -452,13 +447,8 @@ namespace
 						}
 
 						// portal side?
-						{
-							engine::IMaterial* pMaterial = s2->matInfo.pMaterial;
-							X_ASSERT_NOT_NULL(pMaterial);
-
-							if (!pMaterial->getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
-								continue;
-							}
+						if (!s2->matInfo.getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
+							continue;
 						}
 
 						Vec3f center = s2->pVisibleHull->GetCenter();

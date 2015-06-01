@@ -266,10 +266,7 @@ void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 			// if combined flags are portal, check what this side is.
 			if (brush.combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL))
 			{
-				engine::IMaterial* pMaterial = side.matInfo.pMaterial;
-				X_ASSERT_NOT_NULL(pMaterial);
-
-				engine::MaterialFlags flags = pMaterial->getFlags();
+				engine::MaterialFlags flags = side.matInfo.getFlags();
 
 				if (!flags.IsSet(engine::MaterialFlag::PORTAL))
 				{
