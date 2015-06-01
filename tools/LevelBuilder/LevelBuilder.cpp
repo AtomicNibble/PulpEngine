@@ -19,6 +19,9 @@
 HINSTANCE g_hInstance = 0;
 
 core::MemoryArenaBase* g_arena = nullptr;
+core::MemoryArenaBase* g_bspFaceAllocator = nullptr;
+core::MemoryArenaBase* g_bspNodeAllocator = nullptr;
+
 
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
