@@ -77,7 +77,6 @@ void AreaModel::EndModel(void)
 LvlArea::LvlArea() :
 areaMeshes(g_arena),
 entities(g_arena), 
-connectedAreas(g_arena),
 cullSections(g_arena)
 {
 	areaMeshes.reserve(2048);

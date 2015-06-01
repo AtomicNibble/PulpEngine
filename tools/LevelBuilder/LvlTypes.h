@@ -183,7 +183,6 @@ class LvlArea
 {
 	typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
 	typedef core::Array<LvlEntity> AreaEntsArr;
-	typedef core::Array<LvlArea> ConnectAreasArr;
 	typedef core::Array<AABB> CullSectionsArr;
 public:
 	LvlArea();
@@ -198,7 +197,6 @@ public:
 
 	AreaMeshMap areaMeshes;
 	AreaEntsArr	entities;
-	ConnectAreasArr connectedAreas;
 	// we split the area up into a optimal avg'd collection of AABB's
 	// which are turned into worker jobs.
 	CullSectionsArr cullSections;
