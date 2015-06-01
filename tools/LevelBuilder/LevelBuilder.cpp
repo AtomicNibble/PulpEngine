@@ -30,7 +30,7 @@ typedef core::MemoryArena<
 	//	core::SimpleMemoryTracking,
 	core::NoMemoryTracking,			// allow leaks in the tests.
 	core::SimpleMemoryTagging
-> UnitTestArena;
+> LvlBuilderArena;
 
 
 #ifdef X_LIB
@@ -63,7 +63,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	// compile my anus.
 
 	core::MallocFreeAllocator allocator;
-	UnitTestArena arena(&allocator, "LevelBuilderArena");
+	LvlBuilderArena arena(&allocator, "LevelBuilderArena");
 
 	g_arena = &arena;
 
