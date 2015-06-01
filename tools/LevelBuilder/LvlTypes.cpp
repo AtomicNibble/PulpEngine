@@ -9,7 +9,7 @@ LvlMaterial::LvlMaterial()
 }
 
 
-const engine::MaterialFlags LvlMaterial::GetFlags(void) const
+const engine::MaterialFlags LvlMaterial::getFlags(void) const
 {
 	X_ASSERT_NOT_NULL(pMaterial);
 	return pMaterial->getFlags();
