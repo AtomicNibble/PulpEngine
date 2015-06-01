@@ -239,7 +239,7 @@ bool LvlBuilder::ProcessModel(LvlEntity& ent)
 
 void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 {
-	X_LOG0("Lvl", "Processing World Entity");
+	X_LOG0("Lvl", "MakeStructuralFaceList");
 	size_t i, x;
 
 	for (i = 0; i < ent.brushes.size(); i++)
