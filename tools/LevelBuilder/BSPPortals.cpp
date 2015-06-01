@@ -8,6 +8,7 @@ namespace
 	#define	SIDESPACE	8
 
 	size_t c_tinyportals = 0;
+	size_t c_floodedleafs = 0;
 
 	void AddPortalToNodes(bspPortal* p, bspNode* front, bspNode* back) 
 	{
@@ -504,7 +505,6 @@ void LvlBuilder::MakeTreePortals(LvlEntity& ent)
 }
 
 
-size_t c_floodedleafs = 0;
 
 void FloodPortals_r(bspNode *node, int32_t dist) 
 {
@@ -627,9 +627,9 @@ bool LvlBuilder::FloodEntities(LvlEntity& ent)
 }
 
 
-static	int		c_outside;
-static	int		c_inside;
-static	int		c_solid;
+static	size_t		c_outside;
+static	size_t		c_inside;
+static	size_t		c_solid;
 
 void FillOutside_r(bspNode* node)
 {
@@ -678,8 +678,9 @@ bool LvlBuilder::FillOutside(LvlEntity& ent)
 
 void FloodAreas_r(bspNode *node, size_t area, size_t& areaFloods)
 {
-	bspPortal	*p;
-	int			s;
+	bspPortal* p;
+	bspNode* other;
+	int	s;
 
 	if (node->area != -1) {
 		return;	// allready got it
@@ -693,8 +694,6 @@ void FloodAreas_r(bspNode *node, size_t area, size_t& areaFloods)
 
 	for (p = node->portals; p; p = p->next[s])
 	{
-		bspNode	*other;
-
 		s = (p->nodes[1] == node);
 		other = p->nodes[!s];
 
@@ -787,11 +786,10 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 	bspPortal* p = nullptr;
 	LvlBrushSide* pBSide = nullptr;
 	XWinding* w = nullptr;
+	bspNode* pOther = nullptr;
 
 	for (p = node->portals; p; p = p->next[s])
 	{
-		bspNode* pOther;
-
 		s = (p->nodes[1] == node);
 		pOther = p->nodes[!s];
 
