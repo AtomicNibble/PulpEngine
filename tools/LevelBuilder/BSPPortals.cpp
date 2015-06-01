@@ -744,17 +744,43 @@ void LvlBuilder::FindAreas_r(bspNode* node, size_t& numAreas)
 	numAreas++;
 }
 
+bool CheckAreas_r(bspNode* node)
+{
+	if (node->planenum != PLANENUM_LEAF) 
+	{
+		if (!CheckAreas_r(node->children[0]))
+			return false;
+		if (!CheckAreas_r(node->children[1]))
+			return false;
+
+		return true;
+	}
+
+	if (!node->opaque && node->area < 0) {
+		X_ERROR("Portal", "node has a invalid area: %i", node->area);
+		return false;
+	}
+
+	return true;
+}
+
+
 bool LvlBuilder::FloodAreas(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "--- FloodAreas ---");
 
 	size_t numAreas = 0;
-
+	// find how many we have.
 	FindAreas_r(ent.bspTree.headnode, numAreas);
 
 	X_LOG0("Lvl", "%5i areas", numAreas);
 
 	ent.numAreas = numAreas;
 
+	// check we not missed.
+	if (!CheckAreas_r(ent.bspTree.headnode))
+		return false;
+
 	return true;
 }
+
