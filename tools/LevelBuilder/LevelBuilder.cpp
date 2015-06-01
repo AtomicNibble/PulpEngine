@@ -84,6 +84,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 			name.setFileName("box2.map");
 			name.setFileName("box3.map");
 			name.setFileName("box4.map");
+			name.setFileName("boxmap.map");
 			
 			CompileLevel(name);
 
@@ -136,7 +137,8 @@ void CompileLevel(core::Path& path)
 				{
 					if (lvl.save(path.fileName()))
 					{
-						X_LOG0("Level", "saved as: \"%s\"", path.fileName());
+						X_LOG0("Level", "Success.");
+					//	X_LOG0("Level", "saved as: \"%s\"", path.fileName());
 					}
 					else
 					{
