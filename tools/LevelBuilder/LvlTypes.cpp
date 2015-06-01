@@ -8,6 +8,13 @@ LvlMaterial::LvlMaterial()
 	pMaterial = nullptr;
 }
 
+
+const engine::MaterialFlags LvlMaterial::GetFlags(void) const
+{
+	X_ASSERT_NOT_NULL(pMaterial);
+	return pMaterial->getFlags();
+}
+
 // ==========================================
 
 LvlBrushSide::LvlBrushSide() : 

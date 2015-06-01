@@ -35,6 +35,9 @@ struct LvlMaterial
 {
 	LvlMaterial();
 
+	const engine::MaterialFlags GetFlags(void) const;
+
+public:
 	core::StackString<level::MAP_MAX_MATERIAL_LEN> name;
 	Vec2f				  matRepeate;
 	Vec2f				  shift;
@@ -120,7 +123,6 @@ struct LvlEntity
 	typedef core::Array<LvlBrush> LvlBrushArr;
 	typedef core::Array<LvlTris> TrisArr;
 	typedef core::Array<LvlInterPortal> LvlInterPortalArr;
-//	typedef core::Array<bspFace> BspFaceArr;
 public:
 	LvlEntity();
 	~LvlEntity();
