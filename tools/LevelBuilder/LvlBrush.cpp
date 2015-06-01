@@ -166,8 +166,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	for (i = 0; i < 2; i++) {
 		b[i] = X_NEW(LvlBrush,g_arena, "Brush")(*brush);
 		b[i]->sides.clear();
-	//	b[i]->next = NULL;
-	//	b[i]->original = brush->original;
+		b[i]->pOriginal = brush->pOriginal;
 	}
 
 	// split all the current windings
