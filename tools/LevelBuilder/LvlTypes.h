@@ -76,7 +76,7 @@ struct LvlBrush
 public:
 	typedef core::Array<LvlBrushSide> SidesArr;
 
-	struct Lvlbrush* pOriginal;
+	struct LvlBrush* pOriginal;
 
 	AABB bounds;
 
