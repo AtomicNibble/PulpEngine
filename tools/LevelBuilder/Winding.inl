@@ -45,8 +45,12 @@ X_INLINE XWinding::XWinding(const Planef &plane)
 	BaseForPlane(plane);
 }
 
-X_INLINE XWinding::XWinding(const XWinding &winding)
+X_INLINE XWinding::XWinding(const XWinding &winding) 
 {
+	// must be init before calling EnsureAlloced.
+	numPoints = allocedSize = 0;
+	p = nullptr;
+
 	int i;
 	if (!EnsureAlloced(winding.GetNumPoints())) {
 		numPoints = 0;
