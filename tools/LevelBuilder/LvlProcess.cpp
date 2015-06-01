@@ -429,7 +429,7 @@ LvlBrushSide* FindSideForPortal(bspPortal* p)
 	size_t			i, x, j, k;
 	bspNode			*node;
 	LvlBrush		*b, *orig;
-	LvlBrushSide	*s, *s2;
+	LvlBrushSide	*s2;
 
 	// scan both bordering nodes brush lists for a portal brush
 	// that shares the plane
@@ -445,6 +445,8 @@ LvlBrushSide* FindSideForPortal(bspPortal* p)
 			if (!b->combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL)) {
 				continue;
 			}
+
+			orig = b->pOriginal;
 
 			// iterate the sides to find the portals.
 			// b->sides
@@ -502,7 +504,7 @@ LvlBrushSide* FindSideForPortal(bspPortal* p)
 
 					X_DELETE_AND_NULL( s2->pVisibleHull, g_arena);
 				}
-				return s;
+				return &side;
 			}
 		}
 	}
@@ -563,10 +565,15 @@ void LvlBuilder::FindAreas_r(bspNode* node, size_t& numAreas)
 	size_t areaFloods = 0;
 	FloodAreas_r(node, numAreas, areaFloods);
 
-	X_LOG0("Lvl", "area %i has %i leafs\n", numAreas, areaFloods);
+	X_LOG0("Lvl", "area %i has %i leafs", numAreas, areaFloods);
 	numAreas++;
 }
 
+bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
+{
+
+	return true;
+}
 
 bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 {
@@ -605,7 +612,14 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	// because the visible hull is used as the portal
 	ClipSidesByTree(ent); 
 
+	// determine areas before clipping tris into the
+	// tree, so tris will never cross area boundaries
+	FloodAreas(ent);
 
+	// we now have a BSP tree with solid and non-solid leafs marked with areas
+	// all primitives will now be clipped into this, throwing away
+	// fragments in the solid areas
+	PutPrimitivesInAreas(ent);
 
 	int goat = 0;
 

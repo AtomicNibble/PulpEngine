@@ -61,6 +61,8 @@ private:
 	bool FloodAreas(LvlEntity& ent);
 	void FindAreas_r(bspNode *node, size_t& numAreas);
 
+	bool PutPrimitivesInAreas(LvlEntity& ent);
+	
 private:
 	LvlEntsArr	entities_;
 	LvlAreaArr	areas_;
