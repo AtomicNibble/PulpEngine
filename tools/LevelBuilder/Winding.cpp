@@ -1,6 +1,12 @@
 #include "stdafx.h"
 #include "Winding.h"
 
+void XWinding::Clear(void)
+{
+	numPoints = 0;
+	X_DELETE_ARRAY(p, g_arena);
+	p = nullptr;
+}
 
 bool XWinding::EnsureAlloced(int n, bool keep)
 {
@@ -21,7 +27,7 @@ bool XWinding::ReAllocate(int n, bool keep)
 		if (keep) {
 			memcpy(p, oldP, numPoints * sizeof(p[0]));
 		}
-		X_DELETE_ARRAY(oldP);
+		X_DELETE_ARRAY(oldP, g_arena);
 	}
 	allocedSize = n;
 	return true;

@@ -172,4 +172,9 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Winding.inl">
+      <Filter>Header Files\Util</Filter>
+    </None>
+  </ItemGroup>
 </Project>
