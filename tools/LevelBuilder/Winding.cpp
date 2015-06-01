@@ -241,6 +241,8 @@ void XWinding::GetAABB(AABB& bounds) const
 
 float XWinding::PlaneDistance(const Planef &plane) const
 {
+	X_ASSERT_NOT_IMPLEMENTED();
+
 	/*	int		i;
 	float	d, min, max;
 
