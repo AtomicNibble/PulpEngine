@@ -581,12 +581,7 @@ XWinding* XWinding::Clip(const Planef &plane, const float epsilon, const bool ke
 
 XWinding *XWinding::Copy(void) const
 {
-	XWinding *w;
-
-	w = X_NEW(XWinding, g_arena, "WindingCopy")(numPoints);
-	w->numPoints = numPoints;
-	memcpy(w->p, p, numPoints * sizeof(p[0]));
-	return w;
+	return X_NEW(XWinding, g_arena, "WindingCopy")(numPoints);
 }
 
 
