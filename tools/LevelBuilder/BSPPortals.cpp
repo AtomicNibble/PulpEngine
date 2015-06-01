@@ -368,6 +368,113 @@ namespace
 		node->portals = nullptr;
 	}
 
+
+	bool Portal_Passable(bspPortal  *p)
+	{
+		if (!p->onNode) {
+			return false;	// to global outsideleaf
+		}
+
+		if (p->nodes[0]->planenum != PLANENUM_LEAF
+			|| p->nodes[1]->planenum != PLANENUM_LEAF)
+		{
+			X_ERROR("lvl", "Portal_EntityFlood: not a leaf");
+		}
+
+		if (!p->nodes[0]->opaque && !p->nodes[1]->opaque) {
+			return true;
+		}
+
+		return false;
+	}
+
+	LvlBrushSide* FindSideForPortal(bspPortal* p)
+	{
+		size_t			i, x, j, k;
+		bspNode			*node;
+		LvlBrush		*b, *orig;
+		LvlBrushSide	*s2;
+
+		// scan both bordering nodes brush lists for a portal brush
+		// that shares the plane
+		for (i = 0; i < 2; i++)
+		{
+			node = p->nodes[i];
+			node->brushes.size();
+			for (x = 0; x < node->brushes.size(); x++)
+			{
+				b = node->brushes[x];
+
+				// do we have a side with a portal?
+				if (!b->combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL)) {
+					continue;
+				}
+
+				orig = b->pOriginal;
+
+				// iterate the sides to find the portals.
+				// b->sides
+				for (j = 0; j < b->sides.size(); j++)
+				{
+					LvlBrushSide& side = b->sides[j];
+
+					// must be visable.
+					if (!side.pVisibleHull) {
+						continue;
+					}
+
+					// portal?
+					{
+						engine::IMaterial* pMaterial = side.matInfo.pMaterial;
+						X_ASSERT_NOT_NULL(pMaterial);
+
+						if (!pMaterial->getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
+							continue;
+						}
+					}
+
+					if ((side.planenum & ~1) != (p->onNode->planenum & ~1)) {
+						continue;
+					}
+
+					// remove the visible hull from any other portal sides of this portal brush
+					for (k = 0; k < b->sides.size(); k++)
+					{
+						// skip self
+						if (k == j) {
+							continue;
+						}
+
+						s2 = &orig->sides[k];
+
+						if (s2->pVisibleHull == nullptr) {
+							continue;
+						}
+
+						// portal side?
+						{
+							engine::IMaterial* pMaterial = s2->matInfo.pMaterial;
+							X_ASSERT_NOT_NULL(pMaterial);
+
+							if (!pMaterial->getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
+								continue;
+							}
+						}
+
+						Vec3f center = s2->pVisibleHull->GetCenter();
+
+						X_WARNING("Portal", "brush has multiple area portal sides at (%g,%g,%g)",
+							center[0], center[1], center[2]);
+
+						X_DELETE_AND_NULL(s2->pVisibleHull, g_arena);
+					}
+					return &side;
+				}
+			}
+		}
+		return nullptr;
+	}
+
 } // namespace
 
 
@@ -575,4 +682,80 @@ bool LvlBuilder::FillOutside(LvlEntity& ent)
 	X_LOG0("Lvl", "%5i inside leafs", c_inside);
 
 	return true;
+}
+
+/// ===========================================
+
+bool LvlBuilder::FloodAreas(LvlEntity& ent)
+{
+	X_LOG0("Lvl", "--- FloodAreas ---");
+
+	size_t numAreas = 0;
+
+	FindAreas_r(ent.bspTree.headnode, numAreas);
+
+	X_LOG0("Lvl", "%5i areas", numAreas);
+
+	ent.numAreas = numAreas;
+
+	return true;
+}
+
+
+void FloodAreas_r(bspNode *node, size_t area, size_t& areaFloods)
+{
+	bspPortal	*p;
+	int			s;
+
+	if (node->area != -1) {
+		return;	// allready got it
+	}
+	if (node->opaque) {
+		return;
+	}
+
+	areaFloods++;
+	node->area = area;
+
+	for (p = node->portals; p; p = p->next[s])
+	{
+		bspNode	*other;
+
+		s = (p->nodes[1] == node);
+		other = p->nodes[!s];
+
+		if (!Portal_Passable(p)) {
+			continue;
+		}
+
+		// can't flood through an area portal
+		if (FindSideForPortal(p)) {
+			continue;
+		}
+
+		FloodAreas_r(other, area, areaFloods);
+	}
+}
+
+void LvlBuilder::FindAreas_r(bspNode* node, size_t& numAreas)
+{
+	if (node->planenum != PLANENUM_LEAF) {
+		FindAreas_r(node->children[0], numAreas);
+		FindAreas_r(node->children[1], numAreas);
+		return;
+	}
+
+	if (node->opaque) {
+		return;
+	}
+
+	if (node->area != -1) {
+		return;	// allready got it
+	}
+
+	size_t areaFloods = 0;
+	FloodAreas_r(node, numAreas, areaFloods);
+
+	X_LOG0("Lvl", "area %i has %i leafs", numAreas, areaFloods);
+	numAreas++;
 }
