@@ -231,11 +231,7 @@ X_INLINE bool XWinding::IsTiny(void) const
 	return true;
 }
 
-/*
-=============
-idWinding::IsHuge
-=============
-*/
+
 X_INLINE bool XWinding::IsHuge(void) const
 {
 	int i, j;
