@@ -765,6 +765,79 @@ bool CheckAreas_r(bspNode* node)
 }
 
 
+bool LvlEntity::FindInterAreaPortals(void)
+{
+	if (!bspTree.headnode) {
+		X_ERROR("LvlEnt", "Can't find inter area portal information. tree is invalid.");
+		return false;
+	}
+
+	return FindInterAreaPortals_r(bspTree.headnode);
+}
+
+bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
+{
+	if (node->planenum != PLANENUM_LEAF)
+	{
+		if (!FindInterAreaPortals_r(node->children[0]))
+			return false;
+		if (!FindInterAreaPortals_r(node->children[1]))
+			return false;
+
+		return true;
+	}
+
+	// skip opaque.
+	if (node->opaque) {
+		return true;
+	}
+
+	// iterate the nodes portals.
+	size_t s;
+	bspPortal* p = nullptr;
+	LvlBrushSide* pBSide = nullptr;
+	XWinding* w = nullptr;
+
+	for (p = node->portals; p; p = p->next[s])
+	{
+		bspNode* pOther;
+
+		s = (p->nodes[1] == node);
+		pOther = p->nodes[!s];
+
+		if (pOther->opaque) {
+			continue;
+		}
+
+		// only report areas going from lower number to higher number
+		// so we don't report the portal twice
+		if (pOther->area <= node->area) {
+			continue;
+		}
+
+		pBSide = FindSideForPortal(p);
+		if (!pBSide)
+		{
+			Vec3f center = p->pWinding->GetCenter();
+			X_ERROR("LvlEnt", "Failed to find portal side for inter info at: (%g,%g,%g)",
+				center[0], center[1], center[2]);
+			return false;
+		}
+
+		w = pBSide->pVisibleHull;
+		if (!w) {
+			continue;
+		}
+
+		// see if we have crated this inter area portals before.
+
+
+
+	}
+	return true;
+}
+
+
 bool LvlBuilder::FloodAreas(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "--- FloodAreas ---");
@@ -780,6 +853,18 @@ bool LvlBuilder::FloodAreas(LvlEntity& ent)
 	// check we not missed.
 	if (!CheckAreas_r(ent.bspTree.headnode))
 		return false;
+
+	// skip inter area portals if only one?
+	if (numAreas < 2) {
+		X_LOG0("Portal", "Skipping inter portals. less than two area's");
+		return true;
+	}
+
+	// we want to create inter area portals now.
+	if (!ent.FindInterAreaPortals()) {
+		X_ERROR("Portal", "Failed to calculate the inter area portal info.");
+		return false;
+	}
 
 	return true;
 }

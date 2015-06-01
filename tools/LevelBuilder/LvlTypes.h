@@ -125,6 +125,10 @@ public:
 	LvlEntity();
 	~LvlEntity();
 
+	bool FindInterAreaPortals(void);
+	bool FindInterAreaPortals_r(bspNode* node);
+
+public:
 	Vec3f origin;
 
 	LvlBrushArr brushes;
