@@ -73,65 +73,71 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	g_hInstance = hInstance;
 	// compile my anus.
 
-	core::MallocFreeAllocator allocator;
-	LvlBuilderArena arena(&allocator, "LevelBuilderArena");
-
-	g_arena = &arena;
-
-	// init the pool allocators.
-	core::GrowingPoolAllocator bspFaceAllocator(
-		sizeof(bspFace) * (1 << 20),
-		core::VirtualMem::GetPageSize() * 64, 
-		0,
-		sizeof(bspFace),
-		X_ALIGN_OF(bspFace),
-		0
-	);
-
-	PoolArena bspFaceArena(&bspFaceAllocator, "bspFaceArena");
-
-	core::GrowingPoolAllocator bspNodeAllocator(
-		sizeof(bspNode) * (1 << 20),
-		core::VirtualMem::GetPageSize() * 64,
-		0,
-		sizeof(bspNode),
-		X_ALIGN_OF(bspNode),
-		0
-	);
-
-	PoolArena bspNodeArena(&bspNodeAllocator, "bspNodeAllocator");
-
-	// set the pointers.
-	g_bspFaceAllocator = &bspFaceArena;
-	g_bspNodeAllocator = &bspNodeArena;
-
-
-	core::Console Console("Level Compiler");
-	Console.SetSize(150, 60, 8000);
-	Console.MoveTo(10, 10);
-
 	{
-		EngineApp engine;
+		core::MallocFreeAllocator allocator;
+		LvlBuilderArena arena(&allocator, "LevelBuilderArena");
 
-		// we need the engine for Assets, Logging, Profiling, FileSystem.
-		if (engine.Init(lpCmdLine, Console))
+		g_arena = &arena;
+
+		// init the pool allocators.
+		core::GrowingPoolAllocator bspFaceAllocator(
+			sizeof(bspFace)* (1 << 20),
+			core::VirtualMem::GetPageSize() * 64,
+			0,
+			sizeof(bspFace),
+			X_ALIGN_OF(bspFace),
+			0
+			);
+
+		PoolArena bspFaceArena(&bspFaceAllocator, "bspFaceArena");
+
+		core::GrowingPoolAllocator bspNodeAllocator(
+			sizeof(bspNode)* (1 << 20),
+			core::VirtualMem::GetPageSize() * 64,
+			0,
+			sizeof(bspNode),
+			X_ALIGN_OF(bspNode),
+			0
+			);
+
+		PoolArena bspNodeArena(&bspNodeAllocator, "bspNodeAllocator");
+
+		// set the pointers.
+		g_bspFaceAllocator = &bspFaceArena;
+		g_bspNodeAllocator = &bspNodeArena;
+
+
+		core::Console Console("Level Compiler");
+		Console.SetSize(150, 60, 8000);
+		Console.MoveTo(10, 10);
+
 		{
-			core::Path name;
-			name.setFileName("basic - Copy.map");
-			name.setFileName("alcatraz.map");
-			name.setFileName("killzone.map");
-			name.setFileName("box.map");
-			name.setFileName("test_resources\\maps\\boxmap.map");
-			name.setFileName("box2.map");
-			name.setFileName("box3.map");
-			name.setFileName("box4.map");
-			name.setFileName("boxmap.map");
-			
-			CompileLevel(name);
+			EngineApp engine;
 
-			X_LOG0("Level", "Operation Complete...");
+			// we need the engine for Assets, Logging, Profiling, FileSystem.
+			if (engine.Init(lpCmdLine, Console))
+			{
+				core::Path name;
+				name.setFileName("basic - Copy.map");
+				name.setFileName("alcatraz.map");
+				name.setFileName("killzone.map");
+				name.setFileName("box.map");
+				name.setFileName("test_resources\\maps\\boxmap.map");
+				name.setFileName("box2.map");
+				name.setFileName("box3.map");
+				name.setFileName("box4.map");
+				name.setFileName("boxmap.map");
+
+				CompileLevel(name);
+
+				X_LOG0("Level", "Operation Complete...");
+			}
 		}
 	}
+
+	g_arena = nullptr;
+	g_bspFaceAllocator = nullptr;
+	g_bspNodeAllocator = nullptr;
 
 //	system("PAUSE");
 	return 0;
