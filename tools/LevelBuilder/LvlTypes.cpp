@@ -82,7 +82,8 @@ LvlTris::LvlTris()
 
 LvlEntity::LvlEntity() :
 brushes(g_arena),
-patches(g_arena)
+patches(g_arena),
+numAreas(0)
 {
 	bspFaces = nullptr;
 	mapEntity = nullptr;

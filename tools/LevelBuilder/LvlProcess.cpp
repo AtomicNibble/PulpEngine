@@ -388,11 +388,13 @@ bool LvlBuilder::FloodAreas(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "--- FloodAreas ---");
 
-	size_t areas = 0;
+	size_t numAreas = 0;
 
-	FindAreas_r(ent.bspTree.headnode, areas);
+	FindAreas_r(ent.bspTree.headnode, numAreas);
 
-	X_LOG0("Lvl", "%5i areas", areas);
+	X_LOG0("Lvl", "%5i areas", numAreas);
+
+	ent.numAreas = numAreas;
 
 	return true;
 }
