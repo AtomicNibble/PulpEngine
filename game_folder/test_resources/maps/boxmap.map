@@ -82,8 +82,3 @@ iwmap 4
 "origin" "-72.0 64.0 64.0"
 "classname" "info_player_start"
 }
-// entity 2
-{
-"origin" "-48.0 208.0 64.0"
-"classname" "info_player_start"
-}
