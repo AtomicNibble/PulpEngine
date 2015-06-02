@@ -263,11 +263,11 @@ void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 				continue;
 			}
 
+			engine::MaterialFlags flags = side.matInfo.getFlags();
+
 			// if combined flags are portal, check what this side is.
 			if (brush.combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL))
 			{
-				engine::MaterialFlags flags = side.matInfo.getFlags();
-
 				if (!flags.IsSet(engine::MaterialFlag::PORTAL))
 				{
 					continue;
@@ -278,6 +278,11 @@ void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 			pFace->planenum = side.planenum & ~1;
 			pFace->w = side.pWinding->Copy();
 			pFace->pNext = ent.bspFaces;
+
+			if (flags.IsSet(engine::MaterialFlag::PORTAL)) {
+				pFace->portal = true;
+			}
+
 			ent.bspFaces = pFace;
 		}
 	}
