@@ -53,11 +53,13 @@ struct bspNode
 public:
 	bspNode();
 
-	int32_t	planenum;			// -1 = leaf node 
-
+	// leafs and nodes
+	int32_t			planenum;			// -1 = leaf node 
 	struct bspNode*	parent;
-	struct bspNode* children[2];
+	AABB			bounds;
 
+	// nodes only
+	struct bspNode* children[2];
 
 	// leafs only 
 	struct bspPortal* portals;
@@ -70,7 +72,6 @@ public:
 
 	lvlBrushArr brushes;
 
-	AABB bounds;
 
 protected:
 	void TreePrint_r(const XPlaneSet& planes, size_t depth) const;
