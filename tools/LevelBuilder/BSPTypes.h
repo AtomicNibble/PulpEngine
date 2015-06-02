@@ -57,15 +57,14 @@ public:
 
 	struct bspNode*	parent;
 	struct bspNode* children[2];
-	struct bspPortal* portals;
 
-	int32_t	tinyportals;
 
 	// leafs only 
+	struct bspPortal* portals;
+
 	bool opaque;            // view can never be inside 
 	bool _pad[3];
 
-	int32_t cluster;        // for portalfile writing 
 	int32_t area;			// for areaportals 
 	int32_t occupied;		// 1 or greater can reach entity 
 

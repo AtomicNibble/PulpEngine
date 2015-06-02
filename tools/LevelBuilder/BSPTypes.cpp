@@ -37,11 +37,8 @@ brushes(g_arena)
 	children[1] = nullptr;
 	portals = nullptr;
 
-	tinyportals = 0;
-
 	opaque = false;
 
-	cluster = 0;
 	area = -1;
 	occupied = 0;
 }
@@ -66,7 +63,7 @@ void bspNode::TreePrint_r(const XPlaneSet& planes, size_t depth) const
 	X_LOG0("bspNode", "Opaque: %i", this->opaque);
 	X_LOG0("bspNode", "Occupied: %i", this->occupied);
 	X_LOG0("bspNode", "Area: %i", this->area);
-	X_LOG0("bspNode", "tinyportals: %i", this->tinyportals);
+//	X_LOG0("bspNode", "tinyportals: %i", this->tinyportals);
 
 	X_LOG0("bspNode", "PlaneNum: %i Plane: (%g,%g,%g) %g",
 		this->planenum, Pn[0], Pn[1], Pn[2], plane.getDistance());
