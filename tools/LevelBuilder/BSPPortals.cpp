@@ -853,8 +853,10 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 			iap.area0 = p->nodes[1]->area;
 			iap.area1 = p->nodes[0]->area;
 		}
+
+		X_LOG0("Portal", "inter connection: %i <-> %i",
+			iap.area0, iap.area1);
 		iap.pSide = pBSide;
-	
 	}
 	return true;
 }
