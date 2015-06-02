@@ -565,6 +565,8 @@ bool LvlBuilder::PlaceOccupant(bspNode* headnode, LvlEntity& ent)
 
 bool LvlBuilder::FloodEntities(LvlEntity& ent)
 {
+	X_LOG0("Lvl", "--- FloodEntities ---");
+
 	bspNode* headnode;
 	bspTree* tree;
 	bool inside;
