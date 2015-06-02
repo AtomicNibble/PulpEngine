@@ -134,6 +134,10 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 		// cross planes (splits)
 		int32 value = 5 * facing - 5 * splits;
 
+		if (PlaneType::isTrueAxial(plane.getType())) {
+			value += 5;
+		}
+
 		if (value > bestValue) {
 			bestValue = value;
 			bestSplit = pFace;
@@ -198,7 +202,7 @@ void LvlBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces, size_t& numLeafs
 		side = face.w->PlaneSide(plane);
 		if (side == Planeside::CROSS) 
 		{
-			face.w->Split(plane, 0.1f, &frontWinding, &backWinding);
+			face.w->Split(plane, CLIP_EPSILON * 2, &frontWinding, &backWinding);
 			if (frontWinding) 
 			{
 				pNewFace = X_NEW(bspFace, g_arena, "bspFaceFrontWind");
