@@ -63,8 +63,7 @@ public:
 
 	// leafs only 
 	bool opaque;            // view can never be inside 
-	bool areaportal;
-	bool _pad[2];
+	bool _pad[3];
 
 	int32_t cluster;        // for portalfile writing 
 	int32_t area;			// for areaportals 

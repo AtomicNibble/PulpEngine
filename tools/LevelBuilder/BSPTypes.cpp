@@ -40,7 +40,6 @@ brushes(g_arena)
 	tinyportals = 0;
 
 	opaque = false;
-	areaportal = false;
 
 	cluster = 0;
 	area = -1;
