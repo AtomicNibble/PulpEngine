@@ -273,9 +273,14 @@ void LvlBuilder::FacesToBSP(LvlEntity& ent)
 	root.bounds.clear();
 	root.headnode = X_NEW(bspNode, g_arena, "BspNode");
 	
+	size_t numLeafs = 0;
+	size_t numFaces = 0;
+
 	bspFace* pFace = ent.bspFaces;
 	for (; pFace; pFace = pFace->pNext)
 	{
+		numFaces++;
+
 		const bspFace& face = *pFace;
 		const XWinding& winding = *face.w;
 
@@ -285,10 +290,10 @@ void LvlBuilder::FacesToBSP(LvlEntity& ent)
 		}
 	}
 
+	X_LOG0("Bsp", "num faces: %i", numFaces);
+
 	// copy bounds.
 	root.headnode->bounds = root.bounds;
-
-	size_t numLeafs = 0;
 
 	BuildFaceTree_r(root.headnode, ent.bspFaces, numLeafs);
 
