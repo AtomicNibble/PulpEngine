@@ -67,9 +67,23 @@ iwmap 4
  ( -208 256 144 ) ( -256 256 144 ) ( -256 256 136 ) caulk 64 64 0 -8 0 0 lightmap_gray 16384 16384 0 -8 0 0
  ( -256 256 144 ) ( -256 248 144 ) ( -256 248 136 ) caulk 64 64 0 -8 0 0 lightmap_gray 16384 16384 0 -8 0 0
 }
+// brush 7
+{
+ ( -136 136 8 ) ( -248 136 8 ) ( -248 128 8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -248 128 136 ) ( -248 136 136 ) ( -136 136 136 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -248 128 8 ) ( -136 128 8 ) ( -136 128 0 ) portal 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -136 128 8 ) ( -136 136 8 ) ( -136 136 0 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -136 136 8 ) ( -248 136 8 ) ( -248 136 0 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( -248 136 8 ) ( -248 128 8 ) ( -248 128 0 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
 }
 // entity 1
 {
 "origin" "-72.0 64.0 64.0"
+"classname" "info_player_start"
+}
+// entity 2
+{
+"origin" "-48.0 208.0 64.0"
 "classname" "info_player_start"
 }
