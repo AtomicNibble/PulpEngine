@@ -201,6 +201,11 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 		return false;
 	}
 
+	// check if we have a portal.
+	if (brush.combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL)) {
+		stats_.numAreaPortals++;
+	}
+
 
 	Vec3f coords[2];
 	Vec2f out;
