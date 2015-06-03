@@ -240,9 +240,16 @@ bool LvlBuilder::ProcessModel(LvlEntity& ent)
 void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "MakeStructuralFaceList");
+#if 1
 	size_t i, x;
 
 	for (i = 0; i < ent.brushes.size(); i++)
+#else
+	size_t x;
+	int32_t i;
+
+	for (i = ent.brushes.size()-1; i >= 0; i--)
+#endif
 	{
 		LvlBrush& brush = ent.brushes[i];
 
@@ -371,10 +378,7 @@ bool LvlBuilder::ClipSidesByTree(LvlEntity& ent)
 				continue;
 			}
 
-			if (side.pVisibleHull) {
-				X_ERROR("Lvl","Visable hull already set");
-				return false;
-			}
+			side.pVisibleHull = nullptr;
 
 			XWinding* w = side.pWinding->Copy();
 
