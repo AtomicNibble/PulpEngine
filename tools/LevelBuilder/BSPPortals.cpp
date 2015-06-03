@@ -417,7 +417,7 @@ namespace
 				// b->sides
 				for (j = 0; j < b->sides.size(); j++)
 				{
-					LvlBrushSide& side = b->sides[j];
+					LvlBrushSide& side = orig->sides[j];
 
 					// must be visable.
 					if (!side.pVisibleHull) {
@@ -584,7 +584,7 @@ bool LvlBuilder::FloodEntities(LvlEntity& ent)
 //	tree->Print(planes);
 
 	// iterate the map ents.
-	for (i = 0; i < map_->getNumEntities(); i++)
+	for (i = 1; i < map_->getNumEntities(); i++)
 	{
 		mapfile::XMapEntity* mapEnt = map_->getEntity(i);
 		LvlEntity& lvlEnt = entities_[i];
