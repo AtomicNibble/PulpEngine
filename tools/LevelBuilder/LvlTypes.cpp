@@ -154,6 +154,33 @@ sides(g_arena)
 	}
 }
 
+LvlBrush& LvlBrush::operator = (const LvlBrush& oth)
+{
+	pOriginal = oth.pOriginal;
+
+	// used for poviding helpful error msg's
+	entityNum = oth.entityNum;
+	brushNum = oth.brushNum;
+
+	bounds = oth.bounds;
+	opaque = oth.opaque;
+	allsidesSameMat = oth.allsidesSameMat;
+	//	detail = oth.detail;
+
+	combinedMatFlags = oth.combinedMatFlags;
+
+	sides.clear();
+	sides.resize(oth.sides.size());
+
+	// cop sides
+	for (size_t i = 0; i < oth.sides.size(); i++)
+	{
+		sides[i] = oth.sides[i];
+	}
+
+	return *this;
+}
+
 bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 {
 	size_t i, j;
@@ -257,6 +284,10 @@ bool LvlBrush::calculateContents(void)
 		engine::IMaterial* pMat = side.matInfo.pMaterial;
 
 		combinedMatFlags |= pMat->getFlags();
+
+		if (pMat->getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
+			opaque = false;
+		}
 
 		if (MatName != side.matInfo.name) {
 			allsidesSameMat = false;

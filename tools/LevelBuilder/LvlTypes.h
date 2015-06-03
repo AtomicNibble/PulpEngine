@@ -69,6 +69,8 @@ struct LvlBrush
 	LvlBrush();
 	LvlBrush(const LvlBrush& oth);
 
+	LvlBrush& operator=(const LvlBrush& oth);
+
 	bool createBrushWindings(const XPlaneSet& planes);
 	bool boundBrush(const XPlaneSet& planes);
 	bool calculateContents(void);
