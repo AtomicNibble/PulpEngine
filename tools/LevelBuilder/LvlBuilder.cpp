@@ -160,7 +160,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 	int32_t		i, numSides;
 
 
-	LvlBrush brush;
+	LvlBrush& brush = ent.brushes.AddOne();
 	brush.entityNum = stats_.numEntities;
 	brush.brushNum = ent_idx;
 
@@ -200,6 +200,9 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 		X_ERROR("Brush", "Failed to create windings for brush");
 		return false;
 	}
+
+	// set original.
+	brush.pOriginal = &brush;
 
 	// check if we have a portal.
 	if (brush.combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL)) {
@@ -253,8 +256,6 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 	// stats.
 	stats_.numBrushes++;
-	// add to end.
-	ent.brushes.append(brush);
 
 	return true;
 }
