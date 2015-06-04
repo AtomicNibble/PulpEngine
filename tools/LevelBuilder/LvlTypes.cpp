@@ -101,9 +101,16 @@ numAreas(0)
 
 LvlEntity::~LvlEntity()
 {
-	if (bspFaces) {
-		X_ASSERT_NOT_IMPLEMENTED();
-//		X_DELETE(bspFaces, g_arena);
+	if (bspFaces)
+	{
+		// it's a linked list of nodes.
+		bspFace* pFace = bspFaces;
+		bspFace* pNext = nullptr;
+		for (; pFace; pFace = pNext)
+		{
+			pNext = pFace->pNext;
+			X_DELETE(pFace, g_arena);
+		}
 	}
 }
 // ==========================================
