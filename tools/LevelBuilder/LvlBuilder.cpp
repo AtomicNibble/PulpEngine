@@ -97,7 +97,7 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	X_LOG0("Map", "Total total patches: %i", stats_.numPatches);
 	X_LOG0("Map", "Total entities: %i", stats_.numEntities);
 	X_LOG0("Map", "Total planes: %i", this->planes.size());
-	X_LOG0("Map", "Total areapotrals: %i", stats_.numAreaPortals);
+	X_LOG0("Map", "Total areaPortals: %i", stats_.numAreaPortals);
 	X_LOG0("Map", "Size: (%.0f,%.0f,%.0f) to (%.0f,%.0f,%.0f)", 
 		mapBounds.min[0], mapBounds.min[1], mapBounds.min[2],
 		mapBounds.max[0], mapBounds.max[1], mapBounds.max[2]);
@@ -160,7 +160,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 	int32_t		i, numSides;
 
 
-	LvlBrush brush;
+	LvlBrush& brush = ent.brushes.AddOne();
 	brush.entityNum = stats_.numEntities;
 	brush.brushNum = ent_idx;
 
@@ -199,6 +199,14 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 	if (!brush.createBrushWindings(planes)) {
 		X_ERROR("Brush", "Failed to create windings for brush");
 		return false;
+	}
+
+	// set original.
+	brush.pOriginal = &brush;
+
+	// check if we have a portal.
+	if (brush.combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL)) {
+		stats_.numAreaPortals++;
 	}
 
 
@@ -248,8 +256,6 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 	// stats.
 	stats_.numBrushes++;
-	// add to end.
-	ent.brushes.append(brush);
 
 	return true;
 }

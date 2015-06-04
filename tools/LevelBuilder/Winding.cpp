@@ -1,6 +1,12 @@
 #include "stdafx.h"
 #include "Winding.h"
 
+void XWinding::Clear(void)
+{
+	numPoints = 0;
+	X_DELETE_ARRAY(p, g_arena);
+	p = nullptr;
+}
 
 bool XWinding::EnsureAlloced(int n, bool keep)
 {
@@ -16,12 +22,12 @@ bool XWinding::ReAllocate(int n, bool keep)
 
 	oldP = p;
 	n = (n + 3) & ~3;	// align up to multiple of four
-	p = new Vec5f[n];
+	p = X_NEW_ARRAY(Vec5f,n,g_arena,"WindingPoints");
 	if (oldP) {
 		if (keep) {
 			memcpy(p, oldP, numPoints * sizeof(p[0]));
 		}
-		delete[] oldP;
+		X_DELETE_ARRAY(oldP, g_arena);
 	}
 	allocedSize = n;
 	return true;
@@ -241,6 +247,8 @@ void XWinding::GetAABB(AABB& bounds) const
 
 float XWinding::PlaneDistance(const Planef &plane) const
 {
+	X_ASSERT_NOT_IMPLEMENTED();
+
 	/*	int		i;
 	float	d, min, max;
 
@@ -579,12 +587,7 @@ XWinding* XWinding::Clip(const Planef &plane, const float epsilon, const bool ke
 
 XWinding *XWinding::Copy(void) const
 {
-	XWinding *w;
-
-	w = X_NEW(XWinding, g_arena, "WindingCopy")(numPoints);
-	w->numPoints = numPoints;
-	memcpy(w->p, p, numPoints * sizeof(p[0]));
-	return w;
+	return X_NEW(XWinding, g_arena, "WindingCopy")(*this);
 }
 
 

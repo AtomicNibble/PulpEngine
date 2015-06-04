@@ -8,6 +8,7 @@ namespace
 	#define	SIDESPACE	8
 
 	size_t c_tinyportals = 0;
+	size_t c_floodedleafs = 0;
 
 	void AddPortalToNodes(bspPortal* p, bspNode* front, bspNode* back) 
 	{
@@ -53,7 +54,7 @@ namespace
 			bounds.min[i] = tree.bounds.min[i] - SIDESPACE;
 			bounds.max[i] = tree.bounds.max[i] + SIDESPACE;
 			if (bounds.min[i] >= bounds.max[i]) {
-				X_ERROR("Bsp", "Backward tree volume");
+				X_FATAL("Bsp", "Backward tree volume");
 			}
 		}
 
@@ -416,7 +417,7 @@ namespace
 				// b->sides
 				for (j = 0; j < b->sides.size(); j++)
 				{
-					LvlBrushSide& side = b->sides[j];
+					LvlBrushSide& side = orig->sides[j];
 
 					// must be visable.
 					if (!side.pVisibleHull) {
@@ -424,13 +425,8 @@ namespace
 					}
 
 					// portal?
-					{
-						engine::IMaterial* pMaterial = side.matInfo.pMaterial;
-						X_ASSERT_NOT_NULL(pMaterial);
-
-						if (!pMaterial->getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
-							continue;
-						}
+					if (!side.matInfo.getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
+						continue;
 					}
 
 					if ((side.planenum & ~1) != (p->onNode->planenum & ~1)) {
@@ -452,13 +448,8 @@ namespace
 						}
 
 						// portal side?
-						{
-							engine::IMaterial* pMaterial = s2->matInfo.pMaterial;
-							X_ASSERT_NOT_NULL(pMaterial);
-
-							if (!pMaterial->getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
-								continue;
-							}
+						if (!s2->matInfo.getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
+							continue;
 						}
 
 						Vec3f center = s2->pVisibleHull->GetCenter();
@@ -514,7 +505,6 @@ void LvlBuilder::MakeTreePortals(LvlEntity& ent)
 }
 
 
-size_t c_floodedleafs = 0;
 
 void FloodPortals_r(bspNode *node, int32_t dist) 
 {
@@ -575,6 +565,8 @@ bool LvlBuilder::PlaceOccupant(bspNode* headnode, LvlEntity& ent)
 
 bool LvlBuilder::FloodEntities(LvlEntity& ent)
 {
+	X_LOG0("Lvl", "--- FloodEntities ---");
+
 	bspNode* headnode;
 	bspTree* tree;
 	bool inside;
@@ -592,7 +584,7 @@ bool LvlBuilder::FloodEntities(LvlEntity& ent)
 //	tree->Print(planes);
 
 	// iterate the map ents.
-	for (i = 0; i < map_->getNumEntities(); i++)
+	for (i = 1; i < map_->getNumEntities(); i++)
 	{
 		mapfile::XMapEntity* mapEnt = map_->getEntity(i);
 		LvlEntity& lvlEnt = entities_[i];
@@ -637,9 +629,9 @@ bool LvlBuilder::FloodEntities(LvlEntity& ent)
 }
 
 
-static	int		c_outside;
-static	int		c_inside;
-static	int		c_solid;
+static	size_t		c_outside;
+static	size_t		c_inside;
+static	size_t		c_solid;
 
 void FillOutside_r(bspNode* node)
 {
@@ -688,8 +680,9 @@ bool LvlBuilder::FillOutside(LvlEntity& ent)
 
 void FloodAreas_r(bspNode *node, size_t area, size_t& areaFloods)
 {
-	bspPortal	*p;
-	int			s;
+	bspPortal* p;
+	bspNode* other;
+	int	s;
 
 	if (node->area != -1) {
 		return;	// allready got it
@@ -703,8 +696,6 @@ void FloodAreas_r(bspNode *node, size_t area, size_t& areaFloods)
 
 	for (p = node->portals; p; p = p->next[s])
 	{
-		bspNode	*other;
-
 		s = (p->nodes[1] == node);
 		other = p->nodes[!s];
 
@@ -797,11 +788,10 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 	bspPortal* p = nullptr;
 	LvlBrushSide* pBSide = nullptr;
 	XWinding* w = nullptr;
+	bspNode* pOther = nullptr;
 
 	for (p = node->portals; p; p = p->next[s])
 	{
-		bspNode* pOther;
-
 		s = (p->nodes[1] == node);
 		pOther = p->nodes[!s];
 
@@ -865,8 +855,10 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 			iap.area0 = p->nodes[1]->area;
 			iap.area1 = p->nodes[0]->area;
 		}
+
+		X_LOG0("Portal", "inter connection: %i <-> %i",
+			iap.area0, iap.area1);
 		iap.pSide = pBSide;
-	
 	}
 	return true;
 }

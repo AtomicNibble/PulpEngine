@@ -134,6 +134,10 @@ int LvlBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 		// cross planes (splits)
 		int32 value = 5 * facing - 5 * splits;
 
+		if (PlaneType::isTrueAxial(plane.getType())) {
+			value += 5;
+		}
+
 		if (value > bestValue) {
 			bestValue = value;
 			bestSplit = pFace;
@@ -198,7 +202,7 @@ void LvlBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces, size_t& numLeafs
 		side = face.w->PlaneSide(plane);
 		if (side == Planeside::CROSS) 
 		{
-			face.w->Split(plane, 0.1f, &frontWinding, &backWinding);
+			face.w->Split(plane, CLIP_EPSILON * 2, &frontWinding, &backWinding);
 			if (frontWinding) 
 			{
 				pNewFace = X_NEW(bspFace, g_arena, "bspFaceFrontWind");
@@ -273,9 +277,14 @@ void LvlBuilder::FacesToBSP(LvlEntity& ent)
 	root.bounds.clear();
 	root.headnode = X_NEW(bspNode, g_arena, "BspNode");
 	
+	size_t numLeafs = 0;
+	size_t numFaces = 0;
+
 	bspFace* pFace = ent.bspFaces;
 	for (; pFace; pFace = pFace->pNext)
 	{
+		numFaces++;
+
 		const bspFace& face = *pFace;
 		const XWinding& winding = *face.w;
 
@@ -285,12 +294,14 @@ void LvlBuilder::FacesToBSP(LvlEntity& ent)
 		}
 	}
 
+	X_LOG0("Bsp", "num faces: %i", numFaces);
+
 	// copy bounds.
 	root.headnode->bounds = root.bounds;
 
-	size_t numLeafs = 0;
-
 	BuildFaceTree_r(root.headnode, ent.bspFaces, numLeafs);
+
+	ent.bspFaces = nullptr;
 
 	X_LOG0("Bsp", "num leafs: %i", numLeafs);
 }

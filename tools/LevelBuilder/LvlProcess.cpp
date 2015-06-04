@@ -239,10 +239,17 @@ bool LvlBuilder::ProcessModel(LvlEntity& ent)
 
 void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 {
-	X_LOG0("Lvl", "Processing World Entity");
+	X_LOG0("Lvl", "MakeStructuralFaceList");
+#if 1
 	size_t i, x;
 
 	for (i = 0; i < ent.brushes.size(); i++)
+#else
+	size_t x;
+	int32_t i;
+
+	for (i = ent.brushes.size()-1; i >= 0; i--)
+#endif
 	{
 		LvlBrush& brush = ent.brushes[i];
 
@@ -263,14 +270,11 @@ void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 				continue;
 			}
 
+			engine::MaterialFlags flags = side.matInfo.getFlags();
+
 			// if combined flags are portal, check what this side is.
 			if (brush.combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL))
 			{
-				engine::IMaterial* pMaterial = side.matInfo.pMaterial;
-				X_ASSERT_NOT_NULL(pMaterial);
-
-				engine::MaterialFlags flags = pMaterial->getFlags();
-
 				if (!flags.IsSet(engine::MaterialFlag::PORTAL))
 				{
 					continue;
@@ -281,6 +285,11 @@ void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 			pFace->planenum = side.planenum & ~1;
 			pFace->w = side.pWinding->Copy();
 			pFace->pNext = ent.bspFaces;
+
+			if (flags.IsSet(engine::MaterialFlag::PORTAL)) {
+				pFace->portal = true;
+			}
+
 			ent.bspFaces = pFace;
 		}
 	}
@@ -369,10 +378,7 @@ bool LvlBuilder::ClipSidesByTree(LvlEntity& ent)
 				continue;
 			}
 
-			if (side.pVisibleHull) {
-				X_ERROR("Lvl","Visable hull already set");
-				return false;
-			}
+			side.pVisibleHull = nullptr;
 
 			XWinding* w = side.pWinding->Copy();
 
@@ -439,64 +445,6 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 
 	int goat = 0;
 
-#if 0
-	bspBrush* pBrush;
-	size_t i;
-	int x, p;
-
-
-
-
-	// allocate a area.
-	// we will have multiple area's for world. (none noob map xD)
-	LvlArea& area = areas_.AddOne();
-
-	area.AreaBegin();
-
-	pBrush = ent.pBrushes;
-	for (i = 0; i < ent.numBrushes; i++)
-	{
-		X_ASSERT_NOT_NULL(pBrush);
-
-		for (x = 0; x < pBrush->numsides; x++)
-		{
-			if (!pBrush->sides[x].pWinding)
-				continue;
-
-			const BspSide& side = pBrush->sides[x];
-			const XWinding* w = side.pWinding;
-			int numPoints = w->GetNumPoints();
-
-			// get areaSubMesh for this material.
-			AreaSubMesh* pSubMesh = area.MeshForSide(side, stringTable_);
-
-			size_t StartVert = pSubMesh->verts_.size();
-
-			for (p = 0; p < numPoints; p++)
-			{
-				level::Vertex vert;
-				const Vec5f& vec = w->operator[](p);
-
-				vert.pos = vec.asVec3();
-				vert.normal = planes[side.planenum].getNormal();
-				vert.color = Col_White;
-				vert.texcoord[0] = Vec2f(vec.s, vec.t);
-
-				pSubMesh->AddVert(vert);
-			}
-		
-			// create some indexes
-			createIndexs(numPoints, StartVert, pSubMesh);
-		}
-		pBrush = pBrush->next;
-	}
-
-	// create the meshes.
-	area.AreaEnd();
-
-	if (!area.model.BelowLimits())
-		return false;
-#endif
  	return true;
 }
 

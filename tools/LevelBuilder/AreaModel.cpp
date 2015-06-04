@@ -15,19 +15,19 @@ bool AreaModel::BelowLimits(void)
 {
 	if (meshes.size() > level::MAP_MAX_MODEL_SURFACES)
 	{
-		X_ERROR("Bsp", "too many surfaces on AreaModel. num: %i max: %i",
+		X_ERROR("AreaModel", "too many surfaces on AreaModel. num: %i max: %i",
 			meshes.size(), level::MAP_MAX_MODEL_SURFACES);
 		return false;
 	}
 	if (verts.size() > level::MAP_MAX_MODEL_VERTS)
 	{
-		X_ERROR("Bsp", "too many verts for AreaModel. num: %i max: %i",
+		X_ERROR("AreaModel", "too many verts for AreaModel. num: %i max: %i",
 			verts.size(), level::MAP_MAX_MODEL_VERTS);
 		return false;
 	}
 	if ((faces.size()*3) > level::MAP_MAX_MODEL_INDEXES)
 	{
-		X_ERROR("Bsp", "too many indexes for AreaModel. num: %i max: %i",
+		X_ERROR("AreaModel", "too many indexes for AreaModel. num: %i max: %i",
 			faces.size() * 3, level::MAP_MAX_MODEL_INDEXES);
 		return false;
 	}
@@ -77,7 +77,6 @@ void AreaModel::EndModel(void)
 LvlArea::LvlArea() :
 areaMeshes(g_arena),
 entities(g_arena), 
-connectedAreas(g_arena),
 cullSections(g_arena)
 {
 	areaMeshes.reserve(2048);
@@ -152,7 +151,7 @@ AreaSubMesh* LvlArea::MeshForSide(const LvlBrushSide& side, StringTableType& str
 
 	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes.insert(
 		AreaMeshMap::value_type(side.matInfo.name.c_str(), newMesh)
-	)
-	;
+	);
+
 	return &newIt.first->second;
 }

@@ -35,4 +35,6 @@ using namespace std;
 
 
 extern core::MemoryArenaBase* g_arena;
+// could combine these two, but be quite a bit of waste for faces.
 extern core::MemoryArenaBase* g_bspFaceAllocator;
+extern core::MemoryArenaBase* g_bspNodeAllocator;

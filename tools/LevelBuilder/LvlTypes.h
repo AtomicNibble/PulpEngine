@@ -35,6 +35,9 @@ struct LvlMaterial
 {
 	LvlMaterial();
 
+	const engine::MaterialFlags getFlags(void) const;
+
+public:
 	core::StackString<level::MAP_MAX_MATERIAL_LEN> name;
 	Vec2f				  matRepeate;
 	Vec2f				  shift;
@@ -65,6 +68,8 @@ struct LvlBrush
 {
 	LvlBrush();
 	LvlBrush(const LvlBrush& oth);
+
+	LvlBrush& operator=(const LvlBrush& oth);
 
 	bool createBrushWindings(const XPlaneSet& planes);
 	bool boundBrush(const XPlaneSet& planes);
@@ -120,7 +125,6 @@ struct LvlEntity
 	typedef core::Array<LvlBrush> LvlBrushArr;
 	typedef core::Array<LvlTris> TrisArr;
 	typedef core::Array<LvlInterPortal> LvlInterPortalArr;
-//	typedef core::Array<bspFace> BspFaceArr;
 public:
 	LvlEntity();
 	~LvlEntity();
@@ -183,7 +187,6 @@ class LvlArea
 {
 	typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
 	typedef core::Array<LvlEntity> AreaEntsArr;
-	typedef core::Array<LvlArea> ConnectAreasArr;
 	typedef core::Array<AABB> CullSectionsArr;
 public:
 	LvlArea();
@@ -198,7 +201,6 @@ public:
 
 	AreaMeshMap areaMeshes;
 	AreaEntsArr	entities;
-	ConnectAreasArr connectedAreas;
 	// we split the area up into a optimal avg'd collection of AABB's
 	// which are turned into worker jobs.
 	CullSectionsArr cullSections;

@@ -53,26 +53,25 @@ struct bspNode
 public:
 	bspNode();
 
-	int32_t	planenum;			// -1 = leaf node 
-
+	// leafs and nodes
+	int32_t			planenum;			// -1 = leaf node 
 	struct bspNode*	parent;
-	struct bspNode* children[2];
-	struct bspPortal* portals;
+	AABB			bounds;
 
-	int32_t	tinyportals;
+	// nodes only
+	struct bspNode* children[2];
 
 	// leafs only 
-	bool opaque;            // view can never be inside 
-	bool areaportal;
-	bool _pad[2];
+	struct bspPortal* portals;
 
-	int32_t cluster;        // for portalfile writing 
+	bool opaque;            // view can never be inside 
+	bool _pad[3];
+
 	int32_t area;			// for areaportals 
 	int32_t occupied;		// 1 or greater can reach entity 
 
 	lvlBrushArr brushes;
 
-	AABB bounds;
 
 protected:
 	void TreePrint_r(const XPlaneSet& planes, size_t depth) const;
