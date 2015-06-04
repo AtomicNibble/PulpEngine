@@ -1031,6 +1031,78 @@ void bspPortal::RemoveFromNode(bspNode* pNode)
 
 const LvlBrushSide* bspPortal::FindAreaPortalSide(void) const
 {
+	size_t			i, x, j, k;
+	bspNode			*node;
+	LvlBrush		*b, *orig;
+	LvlBrushSide	*s2;
+
+	// scan both bordering nodes brush lists for a portal brush
+	// that shares the plane
+	for (i = 0; i < 2; i++)
+	{
+		node = nodes[i];
+		node->brushes.size();
+		for (x = 0; x < node->brushes.size(); x++)
+		{
+			b = node->brushes[x];
+
+			// do we have a side with a portal?
+			if (!b->combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL)) {
+				continue;
+			}
+
+			orig = b->pOriginal;
+
+			// iterate the sides to find the portals.
+			// b->sides
+			for (j = 0; j < b->sides.size(); j++)
+			{
+				LvlBrushSide& side = orig->sides[j];
+
+				// must be visable.
+				if (!side.pVisibleHull) {
+					continue;
+				}
+
+				// portal?
+				if (!side.matInfo.getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
+					continue;
+				}
+
+				if ((side.planenum & ~1) != (onNode->planenum & ~1)) {
+					continue;
+				}
+
+				// remove the visible hull from any other portal sides of this portal brush
+				for (k = 0; k < b->sides.size(); k++)
+				{
+					// skip self
+					if (k == j) {
+						continue;
+					}
+
+					s2 = &orig->sides[k];
+
+					if (s2->pVisibleHull == nullptr) {
+						continue;
+					}
+
+					// portal side?
+					if (!s2->matInfo.getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
+						continue;
+					}
+
+					Vec3f center = s2->pVisibleHull->GetCenter();
+
+					X_WARNING("Portal", "brush has multiple area portal sides at (%g,%g,%g)",
+						center[0], center[1], center[2]);
+
+					X_DELETE_AND_NULL(s2->pVisibleHull, g_arena);
+				}
+				return &side;
+			}
+		}
+	}
 	return nullptr;
 }
 
