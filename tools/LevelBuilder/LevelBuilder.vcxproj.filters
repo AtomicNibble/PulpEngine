@@ -99,6 +99,9 @@
     <ClInclude Include="MaterialManager.h">
       <Filter>Header Files\Material</Filter>
     </ClInclude>
+    <ClInclude Include="FaceTreeBuilder.h">
+      <Filter>Header Files\BSP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -160,6 +163,12 @@
     </ClCompile>
     <ClCompile Include="LvlEntity.cpp">
       <Filter>Source Files\Lvl</Filter>
+    </ClCompile>
+    <ClCompile Include="bspNode.cpp">
+      <Filter>Source Files\Lvl</Filter>
+    </ClCompile>
+    <ClCompile Include="FaceTreeBuilder.cpp">
+      <Filter>Source Files\BSP</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -8,9 +8,6 @@
 
 class LvlBuilder
 {
-	typedef core::Array<LvlEntity> LvlEntsArr;
-	typedef core::Array<LvlArea> LvlAreaArr;
-
 	typedef core::Array<mapfile::XMapEntity*> MapEntArr;
 public:
 	LvlBuilder();

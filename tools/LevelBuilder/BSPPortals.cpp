@@ -121,8 +121,6 @@ namespace
 		}
 	}
 
-	#define	BASE_WINDING_EPSILON	0.001f
-	#define	SPLIT_WINDING_EPSILON	0.001f
 
 	XWinding* BaseWindingForNode(XPlaneSet& planes, bspNode* node)
 	{
@@ -756,112 +754,7 @@ bool CheckAreas_r(bspNode* node)
 }
 
 
-bool LvlEntity::FindInterAreaPortals(void)
-{
-	if (!bspTree.headnode) {
-		X_ERROR("LvlEnt", "Can't find inter area portal information. tree is invalid.");
-		return false;
-	}
 
-	return FindInterAreaPortals_r(bspTree.headnode);
-}
-
-bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
-{
-	if (node->planenum != PLANENUM_LEAF)
-	{
-		if (!FindInterAreaPortals_r(node->children[0]))
-			return false;
-		if (!FindInterAreaPortals_r(node->children[1]))
-			return false;
-
-		return true;
-	}
-
-	// skip opaque.
-	if (node->opaque) {
-		return true;
-	}
-
-	// iterate the nodes portals.
-	size_t s;
-	bspPortal* p = nullptr;
-	LvlBrushSide* pBSide = nullptr;
-	XWinding* w = nullptr;
-	bspNode* pOther = nullptr;
-
-	for (p = node->portals; p; p = p->next[s])
-	{
-		s = (p->nodes[1] == node);
-		pOther = p->nodes[!s];
-
-		if (pOther->opaque) {
-			continue;
-		}
-
-		// only report areas going from lower number to higher number
-		// so we don't report the portal twice
-		if (pOther->area <= node->area) {
-			continue;
-		}
-
-		pBSide = FindSideForPortal(p);
-		if (!pBSide)
-		{
-			Vec3f center = p->pWinding->GetCenter();
-			X_ERROR("LvlEnt", "Failed to find portal side for inter info at: (%g,%g,%g)",
-				center[0], center[1], center[2]);
-			return false;
-		}
-
-		w = pBSide->pVisibleHull;
-		if (!w) {
-			continue;
-		}
-
-		// see if we have crated this inter area portals before.
-		LvlInterPortalArr::ConstIterator it = interPortals.begin();
-		for (; it != interPortals.end(); ++it)
-		{
-			const LvlInterPortal& iap = *it;
-			// same side instance?
-			if (pBSide == iap.pSide) 
-			{
-				// area match?
-				if(p->nodes[0]->area == iap.area0 && p->nodes[1]->area == iap.area1) {
-					break;
-				}
-				// what about other direction?
-				if (p->nodes[1]->area == iap.area0 && p->nodes[0]->area == iap.area1) {
-					break;
-				}
-
-			}
-		}
-
-		// did we find a match?
-		if (it != interPortals.end()) {
-			continue; 
-		}
-
-		// add a new one.
-		LvlInterPortal& iap = interPortals.AddOne();
-		
-		if (pBSide->planenum == p->onNode->planenum) {
-			iap.area0 = p->nodes[0]->area;
-			iap.area1 = p->nodes[1]->area;
-		}
-		else {
-			iap.area0 = p->nodes[1]->area;
-			iap.area1 = p->nodes[0]->area;
-		}
-
-		X_LOG0("Portal", "inter connection: %i <-> %i",
-			iap.area0, iap.area1);
-		iap.pSide = pBSide;
-	}
-	return true;
-}
 
 
 bool LvlBuilder::FloodAreas(LvlEntity& ent)
@@ -895,3 +788,273 @@ bool LvlBuilder::FloodAreas(LvlEntity& ent)
 	return true;
 }
 
+
+// =============================================================================
+
+void bspPortal::MakeNodePortal(XPlaneSet& planeSet, bspNode* node)
+{
+	bspPortal	*new_portal, *p;
+	XWinding	*w;
+	Vec3f		normal;
+	int			side;
+
+	w = BaseWindingForNode(planeSet, node);
+
+	// clip the portal by all the other portals in the node
+	for (p = node->portals; p && w; p = p->next[side])
+	{
+		Planef	plane;
+
+		if (p->nodes[0] == node)
+		{
+			side = 0;
+			plane = p->plane;
+		}
+		else if (p->nodes[1] == node)
+		{
+			side = 1;
+			plane = -p->plane;
+		}
+		else {
+			X_ERROR("Portal", "CutNodePortals_r: mislinked portal");
+			side = 0;	// quiet a compiler warning
+		}
+
+		w = w->Clip(plane, CLIP_EPSILON);
+	}
+
+	if (!w)
+	{
+		X_WARNING("Portal", "Winding is empty");
+		return;
+	}
+
+#if X_DEBUG
+	w->Print();
+#endif // X_DEBUG
+
+	if (w->IsTiny())
+	{
+		c_tinyportals++;
+		X_DELETE(w, g_arena);
+		return;
+	}
+
+	new_portal = X_NEW(bspPortal, g_arena, "Portal");
+	new_portal->plane = planeSet[node->planenum];
+	new_portal->onNode = node;
+	new_portal->pWinding = w;
+	new_portal->AddToNodes(node->children[0], node->children[1]);
+}
+
+
+
+bool bspPortal::MakeTreePortals(XPlaneSet& planeSet, LvlEntity* pEnt)
+{
+	X_ASSERT_NOT_NULL(pEnt);
+	X_ASSERT_NOT_NULL(pEnt->bspTree.headnode);
+
+	MakeHeadnodePortals(pEnt->bspTree);
+	pEnt->bspTree.headnode->MakeTreePortals_r(planeSet);
+	return true;
+}
+
+void bspPortal::MakeTreePortals_r(XPlaneSet& planeSet, bspNode* pNode)
+{
+	X_ASSERT_NOT_NULL(pNode);
+	size_t i;
+
+	pNode->CalcNodeBounds();
+
+	if (pNode->bounds.isEmpty()) {
+		X_WARNING("Portal", "node without a volume");
+	}
+
+	for (i = 0; i < 3; i++) 
+	{
+		if (pNode->bounds.min[i] < level::MIN_WORLD_COORD ||
+			pNode->bounds.max[i] > level::MAX_WORLD_COORD) 
+		{
+			X_WARNING("Portal", "node with unbounded volume");
+			break;
+		}
+	}
+
+	if (pNode->planenum == PLANENUM_LEAF) {
+		return;
+	}
+
+	MakeNodePortal(planeSet, pNode);
+	SplitNodePortals(planeSet, pNode);
+
+	MakeTreePortals_r(planeSet, pNode->children[0]);
+	MakeTreePortals_r(planeSet, pNode->children[1]);
+}
+
+void bspPortal::MakeHeadnodePortals(bspTree& tree)
+{
+	AABB	bounds;
+	int		i, j, n;
+	Planef	bplanes[6], *pl;
+	bspNode* node;
+	bspPortal *p, *portals[6];
+
+
+	node = tree.headnode;
+
+	tree.outside_node.planenum = PLANENUM_LEAF;
+	//		tree->outside_node.brushlist = NULL;
+	tree.outside_node.portals = nullptr;
+	tree.outside_node.opaque = false;
+
+	// if no nodes, don't go any farther
+	if (node->planenum == PLANENUM_LEAF) {
+		return;
+	}
+
+	// pad with some space so there will never be null volume leafs
+	for (i = 0; i<3; i++) {
+		bounds.min[i] = tree.bounds.min[i] - SIDESPACE;
+		bounds.max[i] = tree.bounds.max[i] + SIDESPACE;
+		if (bounds.min[i] >= bounds.max[i]) {
+			X_FATAL("BspPortal", "Backward tree volume");
+		}
+	}
+
+	for (i = 0; i<3; i++) {
+		for (j = 0; j<2; j++) {
+			n = j * 3 + i;
+
+			p = X_NEW(bspPortal, g_arena, "bspHeadPortal");
+			portals[n] = p;
+
+			pl = &bplanes[n];
+			memset(pl, 0, sizeof(*pl));
+
+			if (j) {
+				(*pl)[i] = -1;
+				(*pl).setDistance(-bounds.max[i]);
+			}
+			else {
+				(*pl)[i] = 1;
+				(*pl).setDistance(bounds.min[i]);
+			}
+
+			p->plane = *pl;
+			p->pWinding = X_NEW(XWinding, g_arena, "bspPortalWinding")(*pl);
+
+			AddPortalToNodes(p, node, &tree.outside_node);
+		}
+	}
+
+	// clip the basewindings by all the other planes
+	for (i = 0; i<6; i++)
+	{
+		for (j = 0; j<6; j++) 
+		{
+			if (j == i) {
+				continue;
+			}
+			portals[i]->pWinding = portals[i]->pWinding->Clip(bplanes[j], ON_EPSILON);
+		}
+	}
+
+#if X_DEBUG
+	X_LOG0("BspPortal", "Head node windings");
+	// print the head nodes portal bounds.
+	for (i = 0; i<6; i++) {
+		portals[i]->pWinding->Print();
+	}
+#endif // !X_DEBUG
+}
+
+
+void bspPortal::AddToNodes(bspNode* pFront, bspNode* pBack)
+{
+	X_ASSERT_NOT_NULL(this);
+
+	if (nodes[0] || nodes[1])
+	{
+		X_ERROR("Portal", "Node already included");
+	}
+
+	nodes[0] = pFront;
+	next[0] = pFront->portals;
+	pFront->portals = this;
+
+	nodes[1] = pBack;
+	next[1] = pBack->portals;
+	pBack->portals = this;
+}
+
+void bspPortal::RemoveFromNode(bspNode* pNode)
+{
+	bspPortal* pPortal = this;
+	bspPortal	**pp, *t;
+
+	// remove reference to the current portal
+	pp = &pNode->portals;
+
+	while (1)
+	{
+		t = *pp;
+
+		if (!t) {
+			X_ERROR("Portal", "RemovePortalFromNode: portal not in leaf");
+		}
+
+		if (t == pPortal) {
+			break;
+		}
+
+		if (t->nodes[0] == pNode)
+			pp = &t->next[0];
+		else if (t->nodes[1] == pNode)
+			pp = &t->next[1];
+		else {
+			X_ERROR("Portal", "RemovePortalFromNode: portal not bounding leaf");
+		}
+	}
+
+	if (pPortal->nodes[0] == pNode) {
+		*pp = pPortal->next[0];
+		pPortal->nodes[0] = nullptr;
+	}
+	else if (pPortal->nodes[1] == pNode) {
+		*pp = pPortal->next[1];
+		pPortal->nodes[1] = nullptr;
+	}
+	else {
+		X_ERROR("Portal", "RemovePortalFromNode: mislinked");
+	}
+}
+
+const LvlBrushSide* bspPortal::FindAreaPortalSide(void) const
+{
+	return nullptr;
+}
+
+bool bspPortal::HasAreaPortalSide(void) const
+{
+	return FindAreaPortalSide() != nullptr;
+}
+
+
+bool bspPortal::PortalPassable(void) const
+{
+	if (!onNode) {
+		return false;	// to global outsideleaf
+	}
+
+	if (nodes[0]->planenum != PLANENUM_LEAF
+		|| nodes[1]->planenum != PLANENUM_LEAF)
+	{
+		X_ERROR("bspPortal", "not a leaf");
+	}
+
+	if (!nodes[0]->opaque && !nodes[1]->opaque) {
+		return true;
+	}
+
+	return false;
+}

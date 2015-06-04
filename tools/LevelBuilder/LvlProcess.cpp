@@ -475,6 +475,28 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "Processing World Entity");
 
+#if 1
+	ent.MakeStructuralFaceList();
+
+	ent.FacesToBSP(planes);
+
+	ent.MakeTreePortals(planes);
+
+	ent.FilterBrushesIntoTree(planes);
+
+	if (!ent.FloodEntities(planes, entities_, map_)) {
+		X_ERROR("LvlEntity", "leaked");
+		return false;
+	}
+
+	ent.FillOutside();
+
+	ent.ClipSidesByTree(planes);
+
+	ent.FloodAreas();
+
+#else
+
 	// make structural face list.
 	// which is the planes and windings of all the structual faces.
 	// Portals become part of this.
@@ -516,7 +538,7 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	// all primitives will now be clipped into this, throwing away
 	// fragments in the solid areas
 	PutPrimitivesInAreas(ent);
-
+#endif
 	int goat = 0;
 
  	return true;

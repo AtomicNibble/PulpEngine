@@ -18,6 +18,18 @@ struct LvlBrush;
 struct LvlBrushSide;
 struct LvlEntity;
 
+struct FillStats
+{
+	FillStats();
+
+	void print(void) const;
+
+	size_t numOutside;
+	size_t numInside;
+	size_t numSolid;
+};
+
+
 struct bspFace
 {
 	bspFace();
@@ -39,19 +51,23 @@ struct bspPortal
 {
 	bspPortal();
 
-	static bool MakeTreePortals(LvlEntity* ent);
+	static void MakeNodePortal(XPlaneSet& planeSet, bspNode* pNode);
+	static bool MakeTreePortals(XPlaneSet& planeSet, LvlEntity* ent);
 
-private:
-	static void MakeTreePortals_r(bspNode* node);
-	static void MakeHeadnodePortals(bspTree& tree);
 
 	// adds the portal to the nodes.
-	void AddToNodes(bspNode* front, bspNode* back);
-	void RemoveFromNode(bspNode* l);
+	void AddToNodes(bspNode* pFront, bspNode* pBack);
+	void RemoveFromNode(bspNode* pNode);
 
 	// looks for a side on the portal that is a area portal.
 	const LvlBrushSide* FindAreaPortalSide(void) const;
 	bool HasAreaPortalSide(void) const;
+
+	bool PortalPassable(void) const;
+
+private:
+	static void MakeTreePortals_r(XPlaneSet& planeSet, bspNode* pNode);
+	static void MakeHeadnodePortals(bspTree& tree);
 
 public:
 	Planef plane;
@@ -60,6 +76,7 @@ public:
 	XWinding* pWinding;
 	bspPortal* next[2];
 };
+
 
 struct bspNode
 {
@@ -71,8 +88,20 @@ public:
 	bspNode();
 
 	void CalcNodeBounds(void);
-
 	XWinding* GetBaseWinding(XPlaneSet& planeSet);
+	void MakeTreePortals_r(XPlaneSet& planeSet);
+	void FloodPortals_r(int32_t dist, size_t& floodedNum);
+
+	void SplitPortals(XPlaneSet& planes);
+
+	void FillOutside_r(FillStats& stats);
+
+	void ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& side);
+
+	void FindAreas_r(size_t& numAreas);
+	void FloodAreas_r(size_t area, size_t& areaFloods);
+
+	bool CheckAreas_r(void);
 
 public:
 	// leafs and nodes

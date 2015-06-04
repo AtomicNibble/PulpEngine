@@ -7,12 +7,6 @@
 
 namespace
 {
-	static const float NORMAL_EPSILON = 0.00001f;
-	static const float DIST_EPSILON = 0.01f;
-
-	const float DEFAULT_CURVE_MAX_ERROR = 4.0f;
-	const float DEFAULT_CURVE_MAX_LENGTH = -1.0f;
-
 
 	static void ComputeAxisBase(Vec3f normal, Vec3f& texS, Vec3f& texT)
 	{
@@ -107,7 +101,7 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 
 int32_t LvlBuilder::FindFloatPlane(const Planef& plane)
 {
-	return planes.FindPlane(plane, NORMAL_EPSILON, DIST_EPSILON);
+	return planes.FindPlane(plane, PLANE_NORMAL_EPSILON, PLANE_DIST_EPSILON);
 }
 
 bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)

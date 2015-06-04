@@ -2,6 +2,19 @@
 #include "BSPTypes.h"
 
 
+FillStats::FillStats()
+{
+	core::zero_this(this);
+}
+
+
+void FillStats::print(void) const
+{
+	X_LOG0("FillStats", "%5i solid leafs", numSolid);
+	X_LOG0("FillStats", "%5i leafs filled", numOutside);
+	X_LOG0("FillStats", "%5i inside leafs", numInside);
+}
+
 // ------------------------------ Face -----------------------------------
 
 bspFace::bspFace()
