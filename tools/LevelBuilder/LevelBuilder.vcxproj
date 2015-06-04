@@ -254,6 +254,7 @@
     <ClCompile Include="BSPFile.cpp" />
     <ClCompile Include="BSPPortals.cpp" />
     <ClCompile Include="LvlBrush.cpp" />
+    <ClCompile Include="LvlEntity.cpp" />
     <ClCompile Include="LvlProcess.cpp" />
     <ClCompile Include="BSPTypes.cpp" />
     <ClCompile Include="EngineApp.cpp" />

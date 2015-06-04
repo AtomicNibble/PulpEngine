@@ -158,6 +158,9 @@
     <ClCompile Include="MaterialManager.cpp">
       <Filter>Source Files\Material</Filter>
     </ClCompile>
+    <ClCompile Include="LvlEntity.cpp">
+      <Filter>Source Files\Lvl</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LevelBuilder.rc">

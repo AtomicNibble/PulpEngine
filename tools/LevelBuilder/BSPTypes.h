@@ -15,6 +15,8 @@ class XMapPatch;
 );
 
 struct LvlBrush;
+struct LvlBrushSide;
+struct LvlEntity;
 
 struct bspFace
 {
@@ -37,6 +39,21 @@ struct bspPortal
 {
 	bspPortal();
 
+	static bool MakeTreePortals(LvlEntity* ent);
+
+private:
+	static void MakeTreePortals_r(bspNode* node);
+	static void MakeHeadnodePortals(bspTree& tree);
+
+	// adds the portal to the nodes.
+	void AddToNodes(bspNode* front, bspNode* back);
+	void RemoveFromNode(bspNode* l);
+
+	// looks for a side on the portal that is a area portal.
+	const LvlBrushSide* FindAreaPortalSide(void) const;
+	bool HasAreaPortalSide(void) const;
+
+public:
 	Planef plane;
 	bspNode* onNode;
 	bspNode* nodes[2];
@@ -53,6 +70,11 @@ struct bspNode
 public:
 	bspNode();
 
+	void CalcNodeBounds(void);
+
+	XWinding* GetBaseWinding(XPlaneSet& planeSet);
+
+public:
 	// leafs and nodes
 	int32_t			planenum;			// -1 = leaf node 
 	struct bspNode*	parent;

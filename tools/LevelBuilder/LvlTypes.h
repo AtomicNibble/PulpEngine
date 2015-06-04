@@ -79,6 +79,10 @@ struct LvlBrush
 	BrushPlaneSide::Enum BrushMostlyOnSide(const Planef& plane) const;
 
 public:
+	static int FilterBrushIntoTree_r(LvlBrush* b, bspNode* node);
+
+
+public:
 	typedef core::Array<LvlBrushSide> SidesArr;
 
 	struct LvlBrush* pOriginal;
@@ -131,6 +135,20 @@ public:
 
 	bool FindInterAreaPortals(void);
 	bool FindInterAreaPortals_r(bspNode* node);
+
+	bool Process(XPlaneSet& planeSet);
+
+private:
+
+	bool MakeStructuralFaceList(void);
+	bool FacesToBSP(void);
+
+	bool MakeTreePortals(void);
+
+	bool FilterBrushesIntoTree(void);
+
+	bool FloodEntities(void);
+	bool PlaceOccupant(bspNode* node);
 
 public:
 	Vec3f origin;
