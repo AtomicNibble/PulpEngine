@@ -440,12 +440,13 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 	}
 
 	// now we add the side to the area index of the node.
-
 	
 }
 
 bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 {
+	X_LOG0("Lvl", "--- PutPrimitivesInAreas ---");
+
 	// ok now we must create the areas and place the primatives into each area.
 	// clip into non-solid leafs and divide between areas.
 	size_t i, j;
