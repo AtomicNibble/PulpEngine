@@ -61,8 +61,12 @@ private:
 	bool FloodAreas(LvlEntity& ent);
 	void FindAreas_r(bspNode *node, size_t& numAreas);
 
+private:
 	bool PutPrimitivesInAreas(LvlEntity& ent);
 	
+	void PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
+		LvlBrushSide& side, bspNode* pNode);
+
 private:
 	LvlEntsArr	entities_;
 	LvlAreaArr	areas_;

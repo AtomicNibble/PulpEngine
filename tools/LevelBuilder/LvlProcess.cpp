@@ -391,9 +391,82 @@ bool LvlBuilder::ClipSidesByTree(LvlEntity& ent)
 }
 
 
+void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
+	LvlBrushSide& side, bspNode* pNode)
+{
+	X_ASSERT_NOT_NULL(pNode);
+	XWinding *front, *back;
+
+
+	if (!pWinding) {
+		return;
+	}
+
+	if (pNode->planenum != PLANENUM_LEAF)
+	{
+		if (side.planenum == pNode->planenum) {
+			PutWindingIntoAreas_r(ent, pWinding, side, pNode->children[0]);
+			return;
+		}
+		if (side.planenum == (pNode->planenum ^ 1)) {
+			PutWindingIntoAreas_r(ent, pWinding, side, pNode->children[1]);
+			return;
+		}
+
+		pWinding->Split(planes[pNode->planenum], 
+			ON_EPSILON, &front, &back);
+
+		PutWindingIntoAreas_r(ent, front, side, pNode->children[0]);
+		if (front) {
+			X_DELETE(front, g_arena);
+		}
+
+		PutWindingIntoAreas_r(ent, back, side, pNode->children[1]);
+		if (back) {
+			X_DELETE(back, g_arena);
+		}
+
+		return;
+	}
+
+	// if opaque leaf, don't add
+	if (pNode->opaque) {
+		return;
+	}
+
+	// valid area?
+	if (pNode->area == -1) {
+		return;
+	}
+
+	// now we add the side to the area index of the node.
+
+	
+}
+
 bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 {
+	// ok now we must create the areas and place the primatives into each area.
+	// clip into non-solid leafs and divide between areas.
+	size_t i, j;
 
+	for (i = 0; i < ent.brushes.size(); i++)
+	{
+		LvlBrush& brush = ent.brushes[i];
+		// for each side that's visable.
+		
+		for (j = 0; j < brush.sides.size(); j++)
+		{ 
+			LvlBrushSide& side = brush.sides[j];
+		
+			if (!side.pVisibleHull) {
+				continue;
+			}
+
+			PutWindingIntoAreas_r(ent, side.pVisibleHull, side, ent.bspTree.headnode);
+		}
+	}
+	
 	return true;
 }
 
