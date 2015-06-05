@@ -399,13 +399,12 @@ bool LvlEntity::FloodAreas(void)
 {
 	X_LOG0("Lvl", "--- FloodAreas ---");
 
-	size_t numAreas = 0;
+	numAreas = 0;
 	// find how many we have.
 	bspTree.headnode->FindAreas_r(numAreas);
 
 	X_LOG0("Lvl", "%5i areas", numAreas);
 
-	numAreas = numAreas;
 
 	// check we not missed.
 	if (!bspTree.headnode->CheckAreas_r())
