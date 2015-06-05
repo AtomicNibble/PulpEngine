@@ -149,7 +149,7 @@ void bspNode::SplitPortals(XPlaneSet& planes)
 
 		// remove the portals from the nodes linked.
 		// list ready for when we added the new split nodes.
-		p->RemoveFromNode( p->nodes[0]);
+		p->RemoveFromNode(p->nodes[0]);
 		p->RemoveFromNode(p->nodes[1]);
 
 		// cut the portal into two portals, one on each side of the cut plane
@@ -351,7 +351,7 @@ bool bspNode::CheckAreas_r(void)
 	{
 		if (!children[0]->CheckAreas_r())
 			return false;
-		if (!children[0]->CheckAreas_r())
+		if (!children[1]->CheckAreas_r())
 			return false;
 
 		return true;
