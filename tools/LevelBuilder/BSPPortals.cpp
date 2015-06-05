@@ -1055,7 +1055,7 @@ const LvlBrushSide* bspPortal::FindAreaPortalSide(void) const
 
 			// iterate the sides to find the portals.
 			// b->sides
-			for (j = 0; j < b->sides.size(); j++)
+			for (j = 0; j < orig->sides.size(); j++)
 			{
 				LvlBrushSide& side = orig->sides[j];
 
