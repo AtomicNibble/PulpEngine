@@ -115,6 +115,9 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 	// the map ent this LvlEnt is made from.
 	ent.mapEntity = mapEnt;
 
+	// ensure we never resize, otherwise originals pointers fuck up.
+	ent.brushes.reserve(mapEnt->GetNumPrimitives());
+
 	// we process brushes / patches diffrent.
 	for (i = 0; i < mapEnt->GetNumPrimitives(); i++)
 	{
