@@ -99,7 +99,7 @@ public:
 	void ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& side);
 
 	void FindAreas_r(size_t& numAreas);
-	void FloodAreas_r(size_t area, size_t& areaFloods);
+	void FloodAreas_r(size_t areaNum, size_t& areaFloods);
 
 	bool CheckAreas_r(void);
 
