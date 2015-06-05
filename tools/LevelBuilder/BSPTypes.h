@@ -145,34 +145,6 @@ public:
 X_DECLARE_ENUM(DrawSurfaceType)(FACE,DECAL,PATCH);
 
 
-struct bspDrawSurface
-{
-	DrawSurfaceType::Enum type;
-
-	// verts
-	int numVerts;                           
-	level::Vertex* pVerts;
-	// indexes
-	int numIndexes;
-	int* pIndexes;
-
-
-	// texture coordinate range monitoring for hardware with limited
-	// texcoord precision (in texel space) 
-	float bias[ 2 ];
-	int texMins[ 2 ], texMaxs[ 2 ], texRange[ 2 ];
-
-	AABB bounds;
-
-	int entityNum;
-	int surfaceNum;
-	int outputNum;
-	int planeNum;
-
-	bool planar;
-};
-
-
 
 
 
