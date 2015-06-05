@@ -311,7 +311,7 @@ void bspNode::FindAreas_r(size_t& numAreas)
 
 }
 
-void bspNode::FloodAreas_r(size_t area, size_t& areaFloods)
+void bspNode::FloodAreas_r(size_t areaNum, size_t& areaFloods)
 {
 	bspPortal* p;
 	bspNode* other;
@@ -325,7 +325,7 @@ void bspNode::FloodAreas_r(size_t area, size_t& areaFloods)
 	}
 
 	areaFloods++;
-	area = area;
+	area = areaNum;
 
 	for (p = portals; p; p = p->next[s])
 	{
@@ -341,7 +341,7 @@ void bspNode::FloodAreas_r(size_t area, size_t& areaFloods)
 			continue;
 		}
 
-		other->FloodAreas_r(area, areaFloods);
+		other->FloodAreas_r(areaNum, areaFloods);
 	}
 }
 
