@@ -164,10 +164,10 @@
     <ClCompile Include="LvlEntity.cpp">
       <Filter>Source Files\Lvl</Filter>
     </ClCompile>
-    <ClCompile Include="bspNode.cpp">
-      <Filter>Source Files\Lvl</Filter>
-    </ClCompile>
     <ClCompile Include="FaceTreeBuilder.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="bspNode.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>
   </ItemGroup>
