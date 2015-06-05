@@ -230,7 +230,7 @@ bool LvlBuilder::ProcessModels(void)
 
 bool LvlBuilder::ProcessModel(LvlEntity& ent)
 {
-	
+	X_ASSERT_NOT_IMPLEMENTED();
 
 
 	return true;
