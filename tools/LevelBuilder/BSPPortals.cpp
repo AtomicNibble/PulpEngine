@@ -187,7 +187,7 @@ namespace
 			return;
 		}
 
-#if X_DEBUG
+#if X_DEBUG && 0
 		w->Print();
 #endif // X_DEBUG
 
@@ -829,7 +829,7 @@ void bspPortal::MakeNodePortal(XPlaneSet& planeSet, bspNode* node)
 		return;
 	}
 
-#if X_DEBUG
+#if X_DEBUG && 0
 	w->Print();
 #endif // X_DEBUG
 
