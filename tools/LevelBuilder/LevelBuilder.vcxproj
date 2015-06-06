@@ -232,8 +232,11 @@
     <ClInclude Include="BSPData.h" />
     <ClInclude Include="BSPTypes.h" />
     <ClInclude Include="EngineApp.h" />
+    <ClInclude Include="FaceTreeBuilder.h" />
+    <ClInclude Include="Globals.h" />
     <ClInclude Include="HashIndex.h" />
     <ClInclude Include="LvlTypes.h" />
+    <ClInclude Include="MaterialManager.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="StringPair.h" />
     <ClInclude Include="TriTools.h" />
@@ -248,9 +251,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AreaModel.cpp" />
+    <ClCompile Include="BSPFace.cpp" />
     <ClCompile Include="BSPFile.cpp" />
+    <ClCompile Include="bspNode.cpp" />
+    <ClCompile Include="BSPPortals.cpp" />
+    <ClCompile Include="FaceTreeBuilder.cpp" />
+    <ClCompile Include="LvlBrush.cpp" />
+    <ClCompile Include="LvlEntity.cpp" />
     <ClCompile Include="LvlProcess.cpp" />
-    <ClCompile Include="BSPCompiler.cpp" />
     <ClCompile Include="BSPTypes.cpp" />
     <ClCompile Include="EngineApp.cpp" />
     <ClCompile Include="HashIndex.cpp" />
@@ -259,6 +267,7 @@
     <ClCompile Include="MapLoader.cpp" />
     <ClCompile Include="MapTypes.cpp" />
     <ClCompile Include="LevelBuilder.cpp" />
+    <ClCompile Include="MaterialManager.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -277,6 +286,9 @@
   <ItemGroup>
     <Image Include="LevelBuilder.ico" />
     <Image Include="small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Winding.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

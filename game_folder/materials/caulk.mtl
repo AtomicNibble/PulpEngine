@@ -1,4 +1,4 @@
-<material name="" flags="32" SurfaceType="none">
+<material name="" flags="11" SurfaceType="none" MaterialType="world">
 	<textures>
 		<texture type="albedo" image_name="textures/test/caulk.dds" />
 	</textures>

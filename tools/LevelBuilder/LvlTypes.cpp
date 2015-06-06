@@ -8,6 +8,13 @@ LvlMaterial::LvlMaterial()
 	pMaterial = nullptr;
 }
 
+
+const engine::MaterialFlags LvlMaterial::getFlags(void) const
+{
+	X_ASSERT_NOT_NULL(pMaterial);
+	return pMaterial->getFlags();
+}
+
 // ==========================================
 
 LvlBrushSide::LvlBrushSide() : 
@@ -80,18 +87,44 @@ LvlTris::LvlTris()
 
 // ==========================================
 
-LvlEntity::LvlEntity() :
-brushes(g_arena),
-patches(g_arena),
-bspFaces(g_arena)
+LvlInterPortal::LvlInterPortal()
 {
-	mapEntity = nullptr;
+	area0 = -1;
+	area1 = -1;
+	pSide = nullptr;
 }
 
 // ==========================================
 
+LvlEntity::LvlEntity() :
+brushes(g_arena),
+patches(g_arena),
+interPortals(g_arena),
+numAreas(0)
+{
+	bspFaces = nullptr;
+	mapEntity = nullptr;
+}
+
+LvlEntity::~LvlEntity()
+{
+	if (bspFaces)
+	{
+		// it's a linked list of nodes.
+		bspFace* pFace = bspFaces;
+		bspFace* pNext = nullptr;
+		for (; pFace; pFace = pNext)
+		{
+			pNext = pFace->pNext;
+			X_DELETE(pFace, g_arena);
+		}
+	}
+}
+// ==========================================
+
 
 LvlBrush::LvlBrush() :
+pOriginal(nullptr),
 sides(g_arena)
 {
 	entityNum = -1;
@@ -99,20 +132,25 @@ sides(g_arena)
 
 	bounds.clear();
 
-	opaque = true;
+	opaque = false;
 	allsidesSameMat = true;
 }
 
 LvlBrush::LvlBrush(const LvlBrush& oth) :
 sides(g_arena)
 {
+	pOriginal = oth.pOriginal;
+
 	// used for poviding helpful error msg's
 	entityNum = oth.entityNum;
 	brushNum = oth.brushNum;
 
 	bounds = oth.bounds;
 	opaque = oth.opaque;
+	allsidesSameMat = oth.allsidesSameMat;
 	//	detail = oth.detail;
+
+	combinedMatFlags = oth.combinedMatFlags;
 
 	sides.resize(oth.sides.size());
 
@@ -121,6 +159,33 @@ sides(g_arena)
 	{
 		sides[i] = oth.sides[i];
 	}
+}
+
+LvlBrush& LvlBrush::operator = (const LvlBrush& oth)
+{
+	pOriginal = oth.pOriginal;
+
+	// used for poviding helpful error msg's
+	entityNum = oth.entityNum;
+	brushNum = oth.brushNum;
+
+	bounds = oth.bounds;
+	opaque = oth.opaque;
+	allsidesSameMat = oth.allsidesSameMat;
+	//	detail = oth.detail;
+
+	combinedMatFlags = oth.combinedMatFlags;
+
+	sides.clear();
+	sides.resize(oth.sides.size());
+
+	// cop sides
+	for (size_t i = 0; i < oth.sides.size(); i++)
+	{
+		sides[i] = oth.sides[i];
+	}
+
+	return *this;
 }
 
 bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
@@ -134,7 +199,7 @@ bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 	{
 		pSide = &sides[i];
 		pPlane = &planes[pSide->planenum];
-		w = new XWinding(*pPlane);
+		w = X_NEW(XWinding,g_arena, "BrushWinding")(*pPlane);
 
 		for (j = 0; j < sides.size() && w; j++)
 		{
@@ -148,7 +213,7 @@ bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 			w = w->Clip(planes[sides[j].planenum ^ 1], 0.01f);
 		}
 		if (pSide->pWinding) {
-			delete pSide->pWinding;
+			X_DELETE(pSide->pWinding, g_arena);
 		}
 		pSide->pWinding = w;
 	}
@@ -190,6 +255,49 @@ bool LvlBrush::boundBrush(const XPlaneSet& planes)
 				"to calculate brush bounds (%s)",
 				entityNum, brushNum, sides.size(), plane ? plane->toString(Dsc) : "");
 			return false;
+		}
+	}
+
+	return true;
+}
+
+bool LvlBrush::calculateContents(void)
+{
+	core::StackString<level::MAP_MAX_MATERIAL_LEN> MatName;
+	SidesArr::ConstIterator it;
+
+	if (sides.isEmpty()) {
+		return false;
+	}
+
+	MatName = sides[0].matInfo.name;
+
+	// a brush is only opaque if all sides are opaque
+	opaque = true;
+	allsidesSameMat = true;
+
+	combinedMatFlags.Clear();
+
+	for (it = sides.begin(); it != sides.end(); ++it)
+	{
+		const LvlBrushSide& side = *it;
+
+		if (!side.matInfo.pMaterial) {
+			X_ERROR("Brush", "material not found for brush side. ent: %i brush: %i",
+				entityNum, brushNum);
+			return false;
+		}
+
+		engine::IMaterial* pMat = side.matInfo.pMaterial;
+
+		combinedMatFlags |= pMat->getFlags();
+
+		if (pMat->getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
+			opaque = false;
+		}
+
+		if (MatName != side.matInfo.name) {
+			allsidesSameMat = false;
 		}
 	}
 
@@ -238,7 +346,7 @@ float LvlBrush::Volume(const XPlaneSet& planes)
 }
 
 
-BrushPlaneSide::Enum LvlBrush::BrushMostlyOnSide(const Planef& plane)
+BrushPlaneSide::Enum LvlBrush::BrushMostlyOnSide(const Planef& plane) const
 {
 	size_t i;
 	int32_t j;

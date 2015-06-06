@@ -230,7 +230,7 @@ bool LvlBuilder::ProcessModels(void)
 
 bool LvlBuilder::ProcessModel(LvlEntity& ent)
 {
-	
+	X_ASSERT_NOT_IMPLEMENTED();
 
 
 	return true;
@@ -239,10 +239,17 @@ bool LvlBuilder::ProcessModel(LvlEntity& ent)
 
 void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 {
-	X_LOG0("Lvl", "Processing World Entity");
+	X_LOG0("Lvl", "MakeStructuralFaceList");
+#if 1
 	size_t i, x;
 
 	for (i = 0; i < ent.brushes.size(); i++)
+#else
+	size_t x;
+	int32_t i;
+
+	for (i = ent.brushes.size()-1; i >= 0; i--)
+#endif
 	{
 		LvlBrush& brush = ent.brushes[i];
 
@@ -263,23 +270,27 @@ void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
 				continue;
 			}
 
+			engine::MaterialFlags flags = side.matInfo.getFlags();
+
 			// if combined flags are portal, check what this side is.
 			if (brush.combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL))
 			{
-				engine::IMaterial* pMaterial = side.matInfo.pMaterial;
-				X_ASSERT_NOT_NULL(pMaterial);
-
-				engine::MaterialFlags flags = pMaterial->getFlags();
-
 				if (!flags.IsSet(engine::MaterialFlag::PORTAL))
 				{
 					continue;
 				}
 			}
 
-			bspFace& face = ent.bspFaces.AddOne();
-			face.planenum = side.planenum & ~1;
-			face.w = side.pWinding->Copy();
+			bspFace* pFace = X_NEW(bspFace, g_arena, "BspFace");
+			pFace->planenum = side.planenum & ~1;
+			pFace->w = side.pWinding->Copy();
+			pFace->pNext = ent.bspFaces;
+
+			if (flags.IsSet(engine::MaterialFlag::PORTAL)) {
+				pFace->portal = true;
+			}
+
+			ent.bspFaces = pFace;
 		}
 	}
 }
@@ -303,73 +314,290 @@ void LvlBuilder::calculateLvlBounds(void)
 	}
 }
 
+
+void LvlBuilder::ClipSideByTree_r(XWinding* w, LvlBrushSide& side, bspNode *node)
+{
+	XWinding		*front, *back;
+
+	if (!w) {
+		return;
+	}
+
+	if (node->planenum != PLANENUM_LEAF)
+	{
+		if (side.planenum == node->planenum) {
+			ClipSideByTree_r(w, side, node->children[0]);
+			return;
+		}
+		if (side.planenum == (node->planenum ^ 1)) {
+			ClipSideByTree_r(w, side, node->children[1]);
+			return;
+		}
+
+		w->Split(planes[node->planenum], ON_EPSILON, &front, &back);
+	
+		X_DELETE(w, g_arena);
+
+		ClipSideByTree_r(front, side, node->children[0]);
+		ClipSideByTree_r(back, side, node->children[1]);
+
+		return;
+	}
+
+	// if opaque leaf, don't add
+	if (!node->opaque) {
+		if (!side.pVisibleHull) {
+			side.pVisibleHull = w->Copy();
+		}
+		else {
+			side.pVisibleHull->AddToConvexHull(w, planes[side.planenum].getNormal());
+		}
+	}
+
+	X_DELETE(w, g_arena);
+	return;
+
+
+}
+
+bool LvlBuilder::ClipSidesByTree(LvlEntity& ent)
+{
+	X_LOG0("Lvl", "--- ClipSidesByTree ---");
+
+	size_t i, x;
+
+	for (i = 0; i < ent.brushes.size(); i++)
+	{
+		LvlBrush& brush = ent.brushes[i];
+
+		for (x = 0; x < brush.sides.size(); x++)
+		{
+			LvlBrushSide& side = brush.sides[x];
+
+			if (!side.pWinding) {
+				continue;
+			}
+
+			side.pVisibleHull = nullptr;
+
+			XWinding* w = side.pWinding->Copy();
+
+			ClipSideByTree_r(w, side, ent.bspTree.headnode);
+
+		}
+	}
+
+	return true;
+}
+
+
+void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
+	LvlBrushSide& side, bspNode* pNode)
+{
+	X_ASSERT_NOT_NULL(pNode);
+	XWinding *front, *back;
+
+
+	if (!pWinding) {
+		return;
+	}
+
+	if (pNode->planenum != PLANENUM_LEAF)
+	{
+		if (side.planenum == pNode->planenum) {
+			PutWindingIntoAreas_r(ent, pWinding, side, pNode->children[0]);
+			return;
+		}
+		if (side.planenum == (pNode->planenum ^ 1)) {
+			PutWindingIntoAreas_r(ent, pWinding, side, pNode->children[1]);
+			return;
+		}
+
+		pWinding->Split(planes[pNode->planenum], 
+			ON_EPSILON, &front, &back);
+
+		PutWindingIntoAreas_r(ent, front, side, pNode->children[0]);
+		if (front) {
+			X_DELETE(front, g_arena);
+		}
+
+		PutWindingIntoAreas_r(ent, back, side, pNode->children[1]);
+		if (back) {
+			X_DELETE(back, g_arena);
+		}
+
+		return;
+	}
+
+	// if opaque leaf, don't add
+	if (pNode->opaque) {
+		return;
+	}
+
+	// valid area?
+	if (pNode->area == -1) {
+		return;
+	}
+
+	// skip null materials
+	if (!side.matInfo.pMaterial) {
+		X_WARNING("Lvl", "side without a material");
+		return;
+	}
+
+	// skip none visable materials.
+	if (!side.matInfo.pMaterial->isDrawn()) {
+		X_LOG1("Lvl", "Skipping visible face, material not drawn: \"%s\"",
+			side.matInfo.name.c_str());
+		return;
+	}
+
+
+	// now we add the side to the area index of the node.
+	LvlArea& area = areas_[pNode->area];
+
+	// get areaSubMesh for this material.
+	AreaSubMesh* pSubMesh = area.MeshForSide(side, stringTable_);
+
+	size_t StartVert = pSubMesh->verts_.size();
+
+	int p, numPoints = pWinding->GetNumPoints();
+
+	for (p = 0; p < numPoints; p++)
+	{
+		level::Vertex vert;
+		const Vec5f& vec = pWinding->operator[](p);
+
+		vert.pos = vec.asVec3();
+		vert.normal = planes[side.planenum].getNormal();
+		vert.color = Col_White;
+		vert.texcoord[0] = Vec2f(vec.s, vec.t);
+
+		pSubMesh->AddVert(vert);
+	}
+
+	// create some indexes
+	createIndexs(numPoints, StartVert, pSubMesh);
+
+	int goat = 0;
+}
+
+
+
+bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
+{
+	X_LOG0("Lvl", "--- PutPrimitivesInAreas ---");
+
+	// ok now we must create the areas and place the primatives into each area.
+	// clip into non-solid leafs and divide between areas.
+	size_t i, j;
+
+	areas_.resize(ent.numAreas);
+	for (i = 0; i < areas_.size(); i++){
+		areas_[i].AreaBegin();
+	}
+
+	for (i = 0; i < ent.brushes.size(); i++)
+	{
+		LvlBrush& brush = ent.brushes[i];
+		// for each side that's visable.
+		
+		for (j = 0; j < brush.sides.size(); j++)
+		{ 
+			LvlBrushSide& side = brush.sides[j];
+		
+			if (!side.pVisibleHull) {
+				continue;
+			}
+
+			PutWindingIntoAreas_r(ent, side.pVisibleHull, side, ent.bspTree.headnode);
+		}
+	}
+	
+	for (i = 0; i < areas_.size(); i++){
+		areas_[i].AreaEnd();
+
+		if (!areas_[i].model.BelowLimits()) {
+			X_ERROR("Lvl","Area %i exceeds the limits", i);
+			return false;
+		}
+	}
+
+	return true;
+}
+
 bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "Processing World Entity");
 
-	// make structural face list.
-	MakeStructuralFaceList(ent);
+#if 1
+	ent.MakeStructuralFaceList();
 
-	int goat = 0;
+	ent.FacesToBSP(planes);
 
-#if 0
-	bspBrush* pBrush;
-	size_t i;
-	int x, p;
+	ent.MakeTreePortals(planes);
 
+	ent.FilterBrushesIntoTree(planes);
 
-
-
-	// allocate a area.
-	// we will have multiple area's for world. (none noob map xD)
-	LvlArea& area = areas_.AddOne();
-
-	area.AreaBegin();
-
-	pBrush = ent.pBrushes;
-	for (i = 0; i < ent.numBrushes; i++)
-	{
-		X_ASSERT_NOT_NULL(pBrush);
-
-		for (x = 0; x < pBrush->numsides; x++)
-		{
-			if (!pBrush->sides[x].pWinding)
-				continue;
-
-			const BspSide& side = pBrush->sides[x];
-			const XWinding* w = side.pWinding;
-			int numPoints = w->GetNumPoints();
-
-			// get areaSubMesh for this material.
-			AreaSubMesh* pSubMesh = area.MeshForSide(side, stringTable_);
-
-			size_t StartVert = pSubMesh->verts_.size();
-
-			for (p = 0; p < numPoints; p++)
-			{
-				level::Vertex vert;
-				const Vec5f& vec = w->operator[](p);
-
-				vert.pos = vec.asVec3();
-				vert.normal = planes[side.planenum].getNormal();
-				vert.color = Col_White;
-				vert.texcoord[0] = Vec2f(vec.s, vec.t);
-
-				pSubMesh->AddVert(vert);
-			}
-		
-			// create some indexes
-			createIndexs(numPoints, StartVert, pSubMesh);
-		}
-		pBrush = pBrush->next;
+	if (!ent.FloodEntities(planes, entities_, map_)) {
+		X_ERROR("LvlEntity", "leaked");
+		return false;
 	}
 
-	// create the meshes.
-	area.AreaEnd();
+	ent.FillOutside();
 
-	if (!area.model.BelowLimits())
+	ent.ClipSidesByTree(planes);
+
+	ent.FloodAreas();
+
+	PutPrimitivesInAreas(ent);
+
+#else
+
+	// make structural face list.
+	// which is the planes and windings of all the structual faces.
+	// Portals become part of this.
+	MakeStructuralFaceList(ent);
+	// we create a tree from the FaceList
+	// this is done by spliting the nodes multiple time.
+	// we end up with a binary tree.
+	FacesToBSP(ent);
+
+	// next we want to make a portal that covers the whole map.
+	// this is the outside_node of the bspTree
+	MakeTreePortals(ent);
+
+	// Mark the leafs as opaque and areaportals and put brush
+	// fragments in each leaf so portal surfaces can be matched
+	// to materials
+	FilterBrushesIntoTree(ent);
+
+
+	if (!FloodEntities(ent))
+	{
+		X_ERROR("Lvl", "map leaked");
 		return false;
+	}
+
+	FillOutside(ent);
+
+
+	// get minimum convex hulls for each visible side
+	// this must be done before creating area portals,
+	// because the visible hull is used as the portal
+	ClipSidesByTree(ent); 
+
+	// determine areas before clipping tris into the
+	// tree, so tris will never cross area boundaries
+	FloodAreas(ent);
+
+	// we now have a BSP tree with solid and non-solid leafs marked with areas
+	// all primitives will now be clipped into this, throwing away
+	// fragments in the solid areas
+	PutPrimitivesInAreas(ent);
 #endif
+	int goat = 0;
+
  	return true;
 }
 

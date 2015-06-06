@@ -10,7 +10,6 @@
 
 #include "BSPTypes.h"
 
-#define PLANENUM_LEAF           -1
 
 X_NAMESPACE_DECLARE(mapfile,
 class XMapFile;
@@ -36,6 +35,9 @@ struct LvlMaterial
 {
 	LvlMaterial();
 
+	const engine::MaterialFlags getFlags(void) const;
+
+public:
 	core::StackString<level::MAP_MAX_MATERIAL_LEN> name;
 	Vec2f				  matRepeate;
 	Vec2f				  shift;
@@ -67,14 +69,23 @@ struct LvlBrush
 	LvlBrush();
 	LvlBrush(const LvlBrush& oth);
 
+	LvlBrush& operator=(const LvlBrush& oth);
+
 	bool createBrushWindings(const XPlaneSet& planes);
 	bool boundBrush(const XPlaneSet& planes);
+	bool calculateContents(void);
 	float Volume(const XPlaneSet& planes);
 
-	BrushPlaneSide::Enum BrushMostlyOnSide(const Planef& plane);
+	BrushPlaneSide::Enum BrushMostlyOnSide(const Planef& plane) const;
+
+	size_t FilterBrushIntoTree_r(XPlaneSet& planes, bspNode* node);
+
+	void Split(XPlaneSet& planes, int32_t planenum, LvlBrush*& pFront, LvlBrush*& pBack);
 
 public:
 	typedef core::Array<LvlBrushSide> SidesArr;
+
+	struct LvlBrush* pOriginal;
 
 	AABB bounds;
 
@@ -104,21 +115,57 @@ struct LvlTris
 	xVert verts[3];
 };
 
+struct LvlInterPortal
+{
+	LvlInterPortal();
+
+	int32_t area0;
+	int32_t area1;
+	const LvlBrushSide* pSide;
+};
 
 struct LvlEntity
 {
 	typedef core::Array<LvlBrush> LvlBrushArr;
 	typedef core::Array<LvlTris> TrisArr;
-	typedef core::Array<bspFace> BspFaceArr;
+	typedef core::Array<LvlInterPortal> LvlInterPortalArr;
 public:
 	LvlEntity();
+	~LvlEntity();
 
+	bool FindInterAreaPortals(void);
+	bool FindInterAreaPortals_r(bspNode* node);
+
+
+	bool MakeStructuralFaceList(void);
+	bool FacesToBSP(XPlaneSet& planeSet);
+	bool MakeTreePortals(XPlaneSet& planeSet);
+	bool FilterBrushesIntoTree(XPlaneSet& planeSet);
+	bool FloodEntities(XPlaneSet& planeSet, core::Array<LvlEntity>& ents, mapfile::XMapFile* pMap);
+	bool FillOutside(void);
+	bool ClipSidesByTree(XPlaneSet& planeSet);
+	bool FloodAreas(void);
+
+private:
+
+	bool PlaceOccupant(XPlaneSet& planeSet, bspNode* node, size_t& floodedNum);
+
+	void ClipSideByTree_r(XWinding* w, LvlBrushSide& side, bspNode *node);
+	void FindAreas_r(bspNode *node, size_t& numAreas);
+
+	static bool CheckAreas_r(bspNode* pNode);
+
+public:
 	Vec3f origin;
 
 	LvlBrushArr brushes;
 	TrisArr patches;
+	LvlInterPortalArr interPortals;
 	// bsp data.
-	BspFaceArr bspFaces;
+	bspFace* bspFaces;
+	bspTree bspTree;
+
+	size_t numAreas;
 
 	mapfile::XMapEntity*	mapEntity;		// points to the map data this was made from.
 };
@@ -163,7 +210,6 @@ class LvlArea
 {
 	typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
 	typedef core::Array<LvlEntity> AreaEntsArr;
-	typedef core::Array<LvlArea> ConnectAreasArr;
 	typedef core::Array<AABB> CullSectionsArr;
 public:
 	LvlArea();
@@ -178,7 +224,6 @@ public:
 
 	AreaMeshMap areaMeshes;
 	AreaEntsArr	entities;
-	ConnectAreasArr connectedAreas;
 	// we split the area up into a optimal avg'd collection of AABB's
 	// which are turned into worker jobs.
 	CullSectionsArr cullSections;
@@ -189,6 +234,7 @@ public:
 };
 
 
-
+typedef core::Array<LvlEntity> LvlEntsArr;
+typedef core::Array<LvlArea> LvlAreaArr;
 
 #endif // !X_LVL_TYPES_H_

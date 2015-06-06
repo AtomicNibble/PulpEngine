@@ -3,13 +3,12 @@
 #ifndef X_LVL_BUILDER_H_
 #define X_LVL_BUILDER_H_
 
-
+#include "MaterialManager.h"
 #include "LvlTypes.h"
 
 class LvlBuilder
 {
-	typedef core::Array<LvlEntity> LvlEntsArr;
-	typedef core::Array<LvlArea> LvlAreaArr;
+	typedef core::Array<mapfile::XMapEntity*> MapEntArr;
 public:
 	LvlBuilder();
 
@@ -29,10 +28,41 @@ private:
 
 private:
 	void MakeStructuralFaceList(LvlEntity& ent);
+	void FacesToBSP(LvlEntity& ent);
 	void calculateLvlBounds(void);
 		
 	bool ProcessModel(LvlEntity& ent);
 	bool ProcessWorldModel(LvlEntity& ent);
+
+private:
+	int SelectSplitPlaneNum(bspNode* node, bspFace* faces);
+	void BuildFaceTree_r(bspNode* node, bspFace* faces, size_t& numLeafs);
+
+private:
+	void MakeTreePortals(LvlEntity& ent);
+	void MakeTreePortals_r(bspNode* node);
+
+	void FilterBrushesIntoTree(LvlEntity& ent);
+	int FilterBrushIntoTree_r(LvlBrush* b, bspNode* node);
+	void SplitBrush(LvlBrush* brush, int32_t planenum, LvlBrush** front, LvlBrush** back);
+
+private:
+	bool FloodEntities(LvlEntity& ent);
+	bool PlaceOccupant(bspNode* node, LvlEntity& ent);
+
+	bool FillOutside(LvlEntity& ent);
+
+	bool ClipSidesByTree(LvlEntity& ent);
+	void ClipSideByTree_r(XWinding* w, LvlBrushSide& side, bspNode *node);
+
+	bool FloodAreas(LvlEntity& ent);
+	void FindAreas_r(bspNode *node, size_t& numAreas);
+
+private:
+	bool PutPrimitivesInAreas(LvlEntity& ent);
+	
+	void PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
+		LvlBrushSide& side, bspNode* pNode);
 
 private:
 	LvlEntsArr	entities_;
@@ -44,6 +74,10 @@ private:
 	XPlaneSet	planes;
 	AABB		mapBounds;
 	Vec3f		blockSize_;
+	
+	mapfile::XMapFile* map_;
+
+	lvl::MatManager matMan_;
 
 	struct Stats
 	{

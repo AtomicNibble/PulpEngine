@@ -37,6 +37,12 @@
     <Filter Include="Source Files\Lvl">
       <UniqueIdentifier>{fd5d5c94-d721-412a-a874-ec65bbbddc53}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Material">
+      <UniqueIdentifier>{9ced5eae-da07-4900-bcfe-f42eb1b3c660}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Material">
+      <UniqueIdentifier>{d7808d51-1c4d-4c29-bab8-5f1d00d8aee7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -87,6 +93,15 @@
     <ClInclude Include="Settings.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Globals.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialManager.h">
+      <Filter>Header Files\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="FaceTreeBuilder.h">
+      <Filter>Header Files\BSP</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -116,9 +131,6 @@
     <ClCompile Include="MapTypes.cpp">
       <Filter>Source Files\MapFile</Filter>
     </ClCompile>
-    <ClCompile Include="BSPCompiler.cpp">
-      <Filter>Source Files\BSP</Filter>
-    </ClCompile>
     <ClCompile Include="BSPTypes.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>
@@ -137,6 +149,27 @@
     <ClCompile Include="LvlProcess.cpp">
       <Filter>Source Files\Lvl</Filter>
     </ClCompile>
+    <ClCompile Include="BSPFace.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="BSPPortals.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="LvlBrush.cpp">
+      <Filter>Source Files\Lvl</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialManager.cpp">
+      <Filter>Source Files\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="LvlEntity.cpp">
+      <Filter>Source Files\Lvl</Filter>
+    </ClCompile>
+    <ClCompile Include="FaceTreeBuilder.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
+    <ClCompile Include="bspNode.cpp">
+      <Filter>Source Files\BSP</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LevelBuilder.rc">
@@ -150,5 +183,10 @@
     <Image Include="LevelBuilder.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Winding.inl">
+      <Filter>Header Files\Util</Filter>
+    </None>
   </ItemGroup>
 </Project>

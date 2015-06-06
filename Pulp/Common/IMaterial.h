@@ -20,22 +20,22 @@ static const float POLY_DECAL_OFFSET = 0.05f;
 static const float POLY_WEAPON_IMPACT_OFFSET = 0.1f;
 
 X_DECLARE_FLAGS(MaterialFlag)(
-	NODRAW,			// not visable
-	EDITOR_VISABLE, // makes nodraw visable in editor modes.
+	NODRAW,			// 1 not visable
+	EDITOR_VISABLE, // 2 makes nodraw visable in editor modes.
 
-	SOLID,			// eye/view can't be in a solid
+	SOLID,			// 4 eye/view can't be in a solid
 
-	STRUCTURAL,		// collision, used to buold area's also.
-	DETAIL,			// no collision
+	STRUCTURAL,		// 8 collision, used to buold area's also.
+	DETAIL,			// 16 no collision
 
-	PORTAL,			// for creating render cells
+	PORTAL,			// 32 for creating render cells
 
-	PLAYER_CLIP,	// players can't go through this
-	AI_CLIP,		// AI can't go throught this
+	PLAYER_CLIP,	// 64 players can't go through this
+	AI_CLIP,		// 128 AI can't go throught this
 
-	NO_FALL_DMG,	// no dmg given on fall
-	NO_IMPACT,		// impacts not shown
-	NO_PENNETRATE	// bullets can't pass through.
+	NO_FALL_DMG,	// 256 no dmg given on fall
+	NO_IMPACT,		// 512 impacts not shown
+	NO_PENNETRATE	// 1024 bullets can't pass through.
 );
 
 // the type of material it is, changes nothing really currently.
@@ -43,8 +43,18 @@ X_DECLARE_ENUM8(MaterialType)(
 	UI,
 	WORLD,
 	MODEL,
-	TOOL
+	TOOL,
+	UNKNOWN
 );
+
+/*
+X_DECLARE_ENUM8(MaterialCoverage)(
+	BAD,
+	OPAQUE,			// completely fills the triangle, will have black drawn on fillDepthBuffer
+	PERFORATED,		// may have alpha tested holes
+	TRANSLUCENT		// blended with background
+);
+*/
 
 // offset types.
 X_DECLARE_ENUM8(MaterialPolygonOffset)(
@@ -154,6 +164,10 @@ struct IMaterial
 
 	virtual bool isDefault() const X_ABSTRACT;
 
+	// util.
+	X_INLINE bool isDrawn(void) const {
+		return !getFlags().IsSet(MaterialFlag::NODRAW);
+	}
 };
 
 
@@ -172,7 +186,6 @@ struct MaterialHeader
 	MaterialPolygonOffset::Enum polyOffsetType;
 	MaterialFilterType::Enum filterType;
 	MaterialType::Enum matType;
-
 
 	Color diffuse;
 	Color specular;

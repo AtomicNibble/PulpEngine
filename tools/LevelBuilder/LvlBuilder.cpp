@@ -7,12 +7,6 @@
 
 namespace
 {
-	static const float NORMAL_EPSILON = 0.00001f;
-	static const float DIST_EPSILON = 0.01f;
-
-	const float DEFAULT_CURVE_MAX_ERROR = 4.0f;
-	const float DEFAULT_CURVE_MAX_LENGTH = -1.0f;
-
 
 	static void ComputeAxisBase(Vec3f normal, Vec3f& texS, Vec3f& texT)
 	{
@@ -61,6 +55,8 @@ areas_(g_arena),
 stringTable_(g_arena)
 {
 	core::zero_object(stats_);
+
+	matMan_.Init();
 }
 
 
@@ -69,15 +65,20 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	X_ASSERT_NOT_NULL(map);
 	int32_t i;
 
+	map_ = map;
+
 	if (map->getNumEntities() == 0) {
-		X_WARNING("Lvl", "Map has zero entites, atleast one is required");
+		X_ERROR("Lvl", "Map has zero entites, atleast one is required");
 		return false;
 	}
 
 	entities_.resize(map->getNumEntities());
 	for (i = 0; i < map->getNumEntities(); i++)
 	{
-		processMapEntity(entities_[i], map->getEntity(i));
+		if (!processMapEntity(entities_[i], map->getEntity(i))) {
+			X_ERROR("Lvl", "Failed to process entity: %i", i);
+			return false;
+		}
 	}
 
 	// calculate bouds.
@@ -90,7 +91,7 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	X_LOG0("Map", "Total total patches: %i", stats_.numPatches);
 	X_LOG0("Map", "Total entities: %i", stats_.numEntities);
 	X_LOG0("Map", "Total planes: %i", this->planes.size());
-	X_LOG0("Map", "Total areapotrals: %i", stats_.numAreaPortals);
+	X_LOG0("Map", "Total areaPortals: %i", stats_.numAreaPortals);
 	X_LOG0("Map", "Size: (%.0f,%.0f,%.0f) to (%.0f,%.0f,%.0f)", 
 		mapBounds.min[0], mapBounds.min[1], mapBounds.min[2],
 		mapBounds.max[0], mapBounds.max[1], mapBounds.max[2]);
@@ -100,7 +101,7 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 
 int32_t LvlBuilder::FindFloatPlane(const Planef& plane)
 {
-	return planes.FindPlane(plane, NORMAL_EPSILON, DIST_EPSILON);
+	return planes.FindPlane(plane, PLANE_NORMAL_EPSILON, PLANE_DIST_EPSILON);
 }
 
 bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
@@ -114,16 +115,25 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 	// the map ent this LvlEnt is made from.
 	ent.mapEntity = mapEnt;
 
+	// ensure we never resize, otherwise originals pointers fuck up.
+	ent.brushes.reserve(mapEnt->GetNumPrimitives());
+
 	// we process brushes / patches diffrent.
 	for (i = 0; i < mapEnt->GetNumPrimitives(); i++)
 	{
 		prim = mapEnt->GetPrimitive(i);
 
 		if (prim->getType() == PrimType::BRUSH)	{
-			processBrush(ent, static_cast<mapfile::XMapBrush*>(prim), i);
+			if (!processBrush(ent, static_cast<mapfile::XMapBrush*>(prim), i)) {
+				X_ERROR("Lvl", "failed to process brush: %i", i);
+				return false;
+			}
 		}
 		else if (prim->getType() == PrimType::PATCH) {
-			processPatch(ent, static_cast<mapfile::XMapPatch*>(prim), i);
+			if (!processPatch(ent, static_cast<mapfile::XMapPatch*>(prim), i)) {
+				X_ERROR("Lvl", "failed to process patch: %i", i);
+				return false;
+			}
 		}
 	}
 
@@ -147,11 +157,10 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 	int32_t		i, numSides;
 
 
-	LvlBrush brush;
+	LvlBrush& brush = ent.brushes.AddOne();
 	brush.entityNum = stats_.numEntities;
 	brush.brushNum = ent_idx;
 
-	core::StackString<level::MAP_MAX_MATERIAL_LEN> lastMatName;
 
 	numSides = mapBrush->GetNumSides();
 	for (i = 0; i < numSides; i++)
@@ -166,27 +175,35 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 		side.matInfo.rotate = pMapBrushSide->material.rotate;
 		side.matInfo.shift = pMapBrushSide->material.shift;
 
-		// see if mat names the same.
-		if (i == 0)
-		{
-			lastMatName = pMapBrushSide->material.name;
-		}
-		else
-		{
-			if (lastMatName != pMapBrushSide->material.name) 
-			{
-				brush.allsidesSameMat = false;
-			}
+		// load the material.
+		side.matInfo.pMaterial = matMan_.loadMaterial(pMapBrushSide->material.name.c_str());
+		if (!side.matInfo.pMaterial) {
+			return false;
 		}
 	}
 
 	if (!removeDuplicateBrushPlanes(brush)) {
+		X_ERROR("Brush", "Failed to remove duplicate planes");
+		return false;
+	}
+
+	if (!brush.calculateContents()) {
+		X_ERROR("Brush", "Failed to calculate brush contents");
 		return false;
 	}
 
 	// create windings for sides + bounds for brush
 	if (!brush.createBrushWindings(planes)) {
+		X_ERROR("Brush", "Failed to create windings for brush");
 		return false;
+	}
+
+	// set original.
+	brush.pOriginal = &brush;
+
+	// check if we have a portal.
+	if (brush.combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL)) {
+		stats_.numAreaPortals++;
 	}
 
 
@@ -236,8 +253,6 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 	// stats.
 	stats_.numBrushes++;
-	// add to end.
-	ent.brushes.append(brush);
 
 	return true;
 }

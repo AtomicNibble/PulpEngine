@@ -27,6 +27,7 @@ X_USING_NAMESPACE;
 
 using namespace std;
 
+#include "Globals.h"
 #include "Settings.h"
 #include "Winding.h"
 #include "PlaneSet.h"
@@ -34,3 +35,6 @@ using namespace std;
 
 
 extern core::MemoryArenaBase* g_arena;
+// could combine these two, but be quite a bit of waste for faces.
+extern core::MemoryArenaBase* g_bspFaceAllocator;
+extern core::MemoryArenaBase* g_bspNodeAllocator;
