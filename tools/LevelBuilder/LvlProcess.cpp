@@ -446,73 +446,42 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "Processing World Entity");
 
-#if 1
+	// make structural face list.
+	// which is the planes and windings of all the structual faces.
+	// Portals become part of this.
 	ent.MakeStructuralFaceList();
-
+	// we create a tree from the FaceList
+	// this is done by spliting the nodes multiple time.
+	// we end up with a binary tree.
 	ent.FacesToBSP(planes);
-
+	// next we want to make a portal that covers the whole map.
+	// this is the outside_node of the bspTree
 	ent.MakeTreePortals(planes);
-
+	// Mark the leafs as opaque and areaportals and put brush
+	// fragments in each leaf so portal surfaces can be matched
+	// to materials
 	ent.FilterBrushesIntoTree(planes);
 
+	// take the entities and use them to floor the node portals.
+	// so that all inside leafs are marked.
 	if (!ent.FloodEntities(planes, entities_, map_)) {
 		X_ERROR("LvlEntity", "leaked");
 		return false;
 	}
-
+	// anything that is not inside or opaque must
+	// be none visable / outside.
 	ent.FillOutside();
-
-	ent.ClipSidesByTree(planes);
-
-	ent.FloodAreas();
-
-	PutPrimitivesInAreas(ent);
-
-#else
-
-	// make structural face list.
-	// which is the planes and windings of all the structual faces.
-	// Portals become part of this.
-	MakeStructuralFaceList(ent);
-	// we create a tree from the FaceList
-	// this is done by spliting the nodes multiple time.
-	// we end up with a binary tree.
-	FacesToBSP(ent);
-
-	// next we want to make a portal that covers the whole map.
-	// this is the outside_node of the bspTree
-	MakeTreePortals(ent);
-
-	// Mark the leafs as opaque and areaportals and put brush
-	// fragments in each leaf so portal surfaces can be matched
-	// to materials
-	FilterBrushesIntoTree(ent);
-
-
-	if (!FloodEntities(ent))
-	{
-		X_ERROR("Lvl", "map leaked");
-		return false;
-	}
-
-	FillOutside(ent);
-
-
 	// get minimum convex hulls for each visible side
 	// this must be done before creating area portals,
 	// because the visible hull is used as the portal
-	ClipSidesByTree(ent); 
-
+	ent.ClipSidesByTree(planes);
 	// determine areas before clipping tris into the
 	// tree, so tris will never cross area boundaries
-	FloodAreas(ent);
-
+	ent.FloodAreas();
 	// we now have a BSP tree with solid and non-solid leafs marked with areas
 	// all primitives will now be clipped into this, throwing away
 	// fragments in the solid areas
 	PutPrimitivesInAreas(ent);
-#endif
-	int goat = 0;
 
  	return true;
 }
