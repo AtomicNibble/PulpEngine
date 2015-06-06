@@ -50,7 +50,22 @@ void MatManager::Init(void)
 
 void MatManager::ShutDown(void)
 {
+	// clear everything up.
 
+	core::XResourceContainer::ResourceItor it = materials_.begin();
+	for (; it != materials_.end();)
+	{
+		engine::XMaterial * pMat = (engine::XMaterial *)it->second;
+
+		++it;
+
+		if (!pMat)
+			continue;
+
+		X_DELETE(pMat, g_arena);
+	//	while (pMat->release() > 0) {
+	//	}
+	}
 }
 
 engine::IMaterial* MatManager::createMaterial(const char* MtlName)
