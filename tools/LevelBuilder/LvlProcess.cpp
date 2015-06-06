@@ -440,8 +440,15 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 	}
 
 	// now we add the side to the area index of the node.
-	
+	LvlArea& area = areas_[pNode->area];
+
+
+
+
+	int goat = 0;
 }
+
+
 
 bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 {
@@ -450,6 +457,8 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 	// ok now we must create the areas and place the primatives into each area.
 	// clip into non-solid leafs and divide between areas.
 	size_t i, j;
+
+	areas_.resize(ent.numAreas);
 
 	for (i = 0; i < ent.brushes.size(); i++)
 	{
@@ -494,6 +503,8 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	ent.ClipSidesByTree(planes);
 
 	ent.FloodAreas();
+
+	PutPrimitivesInAreas(ent);
 
 #else
 
