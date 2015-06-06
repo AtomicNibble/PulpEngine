@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "LevelBuilder.h"
+#include "LvlBuilder.h"
 
 #include <Containers\FixedArray.h>
 #include <IModel.h>
@@ -384,6 +384,13 @@ bool LvlBuilder::ClipSidesByTree(LvlEntity& ent)
 
 			ClipSideByTree_r(w, side, ent.bspTree.headnode);
 
+#if 0
+			if (side.pVisibleHull) 
+			{
+				X_DELETE(side.pVisibleHull, g_arena);
+				side.pVisibleHull = side.pWinding->Copy();
+			}
+#endif
 		}
 	}
 
@@ -461,8 +468,10 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 
 	size_t StartVert = pSubMesh->verts_.size();
 
-	int p, numPoints = pWinding->GetNumPoints();
+	int numPoints = pWinding->GetNumPoints();
 
+#if 1
+	int p;
 	for (p = 0; p < numPoints; p++)
 	{
 		level::Vertex vert;
@@ -475,9 +484,58 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 
 		pSubMesh->AddVert(vert);
 	}
-
 	// create some indexes
 	createIndexs(numPoints, StartVert, pSubMesh);
+
+#else
+
+	const XWinding* w = pWinding;
+	int i, j;
+
+	model::Index offset = safe_static_cast<model::Index, size_t>(StartVert);
+
+	for (i = 2; i < numPoints; i++)
+	{
+		for (j = 0; j < 3; j++)
+		{
+			level::Vertex vert;
+
+			if (j == 0) {
+				const Vec5f vec = (*w)[0];
+				vert.pos = vec.asVec3();
+				vert.texcoord[0] = Vec2f(vec.s, vec.t);
+			}
+			else if (j == 1) {
+				const Vec5f vec = (*w)[i - 1];
+				vert.pos = vec.asVec3();
+				vert.texcoord[0] = Vec2f(vec.s, vec.t);
+			}
+			else
+			{
+				const Vec5f vec = (*w)[i];
+				vert.pos = vec.asVec3();
+				vert.texcoord[0] = Vec2f(vec.s, vec.t);
+			}
+
+			// copy normal
+			vert.normal = planes[side.planenum].getNormal();
+			vert.color = Col_White;
+
+			pSubMesh->AddVert(vert);
+		}
+
+		model::Face face(0,1,2);
+
+		face += model::Face(offset, offset, offset);
+
+		model::Index localOffset = safe_static_cast<model::Index, size_t>((i - 2) * 3);
+
+		face += model::Face(localOffset, localOffset, localOffset);
+
+		pSubMesh->faces_.append(face);
+	}
+#endif
+
 
 	int goat = 0;
 }
