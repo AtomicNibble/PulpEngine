@@ -516,6 +516,11 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 	
 	for (i = 0; i < areas_.size(); i++){
 		areas_[i].AreaEnd();
+
+		if (!areas_[i].model.BelowLimits()) {
+			X_ERROR("Lvl","Area %i exceeds the limits", i);
+			return false;
+		}
 	}
 
 	return true;
