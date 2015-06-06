@@ -625,7 +625,8 @@ void XWinding::AddToConvexHull(const XWinding *winding, const Vec3f &normal, con
 	hullDirs = (Vec3f *)_alloca(maxPts * sizeof(Vec3f));
 	hullSide = (bool *)_alloca(maxPts * sizeof(bool));
 
-	for (i = 0; i < winding->numPoints; i++) {
+	for (i = 0; i < winding->numPoints; i++) 
+	{
 		const Vec5f &p1 = winding->p[i];
 
 		// calculate hull edge vectors
@@ -681,8 +682,9 @@ void XWinding::AddToConvexHull(const XWinding *winding, const Vec3f &normal, con
 		}
 
 		this->numPoints = numNewHullPoints;
-		memcpy(this->p, newHullPoints, numNewHullPoints * sizeof(Vec3f));
+		memcpy(this->p, newHullPoints, numNewHullPoints * sizeof(Vec5f));
 	}
+
 }
 
 /*
