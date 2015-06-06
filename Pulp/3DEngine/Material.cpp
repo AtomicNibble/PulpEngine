@@ -175,8 +175,9 @@ void XMaterial::ShutDown(void)
 	core::SafeRelease(shaderItem_.pResources_);
 
 	// free my nipples!
-	((XMaterialManager*)getMaterialManager())->unregister(this);
-
+	if (getMaterialManager()) {
+		((XMaterialManager*)getMaterialManager())->unregister(this);
+	}
 }
 
 // XBaseAsset
