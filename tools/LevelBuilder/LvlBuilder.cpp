@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "LevelBuilder.h"
+#include "LvlBuilder.h"
 
 #include "MapTypes.h"
 #include "MapLoader.h"
@@ -58,6 +58,12 @@ stringTable_(g_arena)
 
 	matMan_.Init();
 }
+
+LvlBuilder::~LvlBuilder()
+{
+	matMan_.ShutDown();
+}
+
 
 
 bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)

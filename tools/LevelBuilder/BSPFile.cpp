@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "LevelBuilder.h"
+#include "LvlBuilder.h"
 
 #include <IFileSys.h>
 #include <Ilevel.h>

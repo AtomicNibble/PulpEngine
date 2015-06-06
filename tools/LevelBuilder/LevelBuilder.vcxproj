@@ -245,7 +245,7 @@
     <ClInclude Include="MapLoader.h" />
     <ClInclude Include="MapTypes.h" />
     <ClInclude Include="PlaneSet.h" />
-    <ClInclude Include="LevelBuilder.h" />
+    <ClInclude Include="LvlBuilder.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>

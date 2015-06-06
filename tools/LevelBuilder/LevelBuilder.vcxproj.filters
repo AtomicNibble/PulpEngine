@@ -87,9 +87,6 @@
     <ClInclude Include="LvlTypes.h">
       <Filter>Header Files\Lvl</Filter>
     </ClInclude>
-    <ClInclude Include="LevelBuilder.h">
-      <Filter>Header Files\Lvl</Filter>
-    </ClInclude>
     <ClInclude Include="Settings.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
@@ -101,6 +98,9 @@
     </ClInclude>
     <ClInclude Include="FaceTreeBuilder.h">
       <Filter>Header Files\BSP</Filter>
+    </ClInclude>
+    <ClInclude Include="LvlBuilder.h">
+      <Filter>Header Files\Lvl</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

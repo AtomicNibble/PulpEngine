@@ -11,6 +11,7 @@ class LvlBuilder
 	typedef core::Array<mapfile::XMapEntity*> MapEntArr;
 public:
 	LvlBuilder();
+	~LvlBuilder();
 
 	bool LoadFromMap(mapfile::XMapFile* map);
 	bool ProcessModels(void);
