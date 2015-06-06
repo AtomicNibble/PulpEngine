@@ -164,6 +164,10 @@ struct IMaterial
 
 	virtual bool isDefault() const X_ABSTRACT;
 
+	// util.
+	X_INLINE bool isDrawn(void) const {
+		return !getFlags().IsSet(MaterialFlag::NODRAW);
+	}
 };
 
 
