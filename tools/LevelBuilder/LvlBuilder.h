@@ -27,11 +27,9 @@ private:
 
 	bool removeDuplicateBrushPlanes(LvlBrush& pBrush);
 
-private:
-	void MakeStructuralFaceList(LvlEntity& ent);
-	void FacesToBSP(LvlEntity& ent);
+private:	
 	void calculateLvlBounds(void);
-		
+
 	bool ProcessModel(LvlEntity& ent);
 	bool ProcessWorldModel(LvlEntity& ent);
 
@@ -40,24 +38,7 @@ private:
 	void BuildFaceTree_r(bspNode* node, bspFace* faces, size_t& numLeafs);
 
 private:
-	void MakeTreePortals(LvlEntity& ent);
-	void MakeTreePortals_r(bspNode* node);
-
-	void FilterBrushesIntoTree(LvlEntity& ent);
-	int FilterBrushIntoTree_r(LvlBrush* b, bspNode* node);
 	void SplitBrush(LvlBrush* brush, int32_t planenum, LvlBrush** front, LvlBrush** back);
-
-private:
-	bool FloodEntities(LvlEntity& ent);
-	bool PlaceOccupant(bspNode* node, LvlEntity& ent);
-
-	bool FillOutside(LvlEntity& ent);
-
-	bool ClipSidesByTree(LvlEntity& ent);
-	void ClipSideByTree_r(XWinding* w, LvlBrushSide& side, bspNode *node);
-
-	bool FloodAreas(LvlEntity& ent);
-	void FindAreas_r(bspNode *node, size_t& numAreas);
 
 private:
 	bool PutPrimitivesInAreas(LvlEntity& ent);
