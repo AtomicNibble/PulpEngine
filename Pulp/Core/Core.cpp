@@ -160,6 +160,12 @@ void XCore::ShutDown()
 		core::Mem::DeleteAndNull(pCpuInfo_, g_coreArena);
 	}
 
+	if (env_.p3DEngine)
+	{
+		env_.p3DEngine->ShutDown();
+		core::SafeRelease(env_.p3DEngine);
+	}
+
 	if (env_.pFileSys)
 	{
 		env_.pFileSys->ShutDown();
@@ -167,11 +173,6 @@ void XCore::ShutDown()
 
 	}
 
-	if (env_.p3DEngine)
-	{
-		env_.p3DEngine->ShutDown();
-		core::SafeRelease(env_.p3DEngine);
-	}
 
 	// free any listners here.
 	if (env_.pConsole)

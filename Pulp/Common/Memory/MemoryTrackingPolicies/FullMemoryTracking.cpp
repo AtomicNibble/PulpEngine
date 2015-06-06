@@ -52,6 +52,12 @@ FullMemoryTracking::~FullMemoryTracking(void)
 
 		X_ASSERT(numAllocations_ == 0, "Memory leaks detected.")(numAllocations_);
 
+		if (!gEnv) {
+			return;
+		}
+		if (!gEnv->pLog) {
+			return;
+		}
 
 		while (1)
 		{

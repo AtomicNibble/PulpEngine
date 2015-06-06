@@ -54,9 +54,10 @@ namespace Compression
 					X_ASSERT_UNREACHABLE();
 					return Z_DEFAULT_COMPRESSION;
 #else
-					X_NO_SWITCH_DEFAULT();
+					X_NO_SWITCH_DEFAULT;
 #endif
 			}
+			return 0;
 		}
 
 		static const char* ZlibErrToStr(int32_t err)

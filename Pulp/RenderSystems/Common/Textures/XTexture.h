@@ -88,12 +88,15 @@ public:
 	static int getTexStateId(const shader::XTexState& TS);
 	static bool setDefaultFilterMode(shader::FilterMode::Enum filter);
 
+	static void applyDefault(void);
+
 	static void applyFromId(int texUnit, TexID tex_id, int state_id) {
 		XTexture* pTex = getByID(tex_id);
 		X_ASSERT_NOT_NULL(pTex);
 
 		pTex->apply(texUnit, state_id);
 	}
+
 
 	static bool reloadForName(const char* name);
 	bool reload(void);
@@ -146,6 +149,8 @@ public:
 
 
 private:
+	static int s_Var_SaveToCI;
+
 	static render::XRenderResourceContainer*	s_pTextures;
 
 	static bool								s_DefaultTexturesLoaded;

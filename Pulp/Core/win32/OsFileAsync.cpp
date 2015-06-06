@@ -60,9 +60,16 @@ OsFileAsync::~OsFileAsync(void)
 		CloseHandle(file_);
 }
 
-XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, uint32_t length, uint32_t position)
+XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, uint32_t length, size_t position)
 {
-	XOsFileAsyncOperation op(file_);
+	XOsFileAsyncOperation op(gEnv->pArena, file_, position);
+
+	LPOVERLAPPED pOverlapped = op.getOverlapped();
+	LARGE_INTEGER large;
+	large.QuadPart = position;
+
+	pOverlapped->Offset = large.LowPart;
+	pOverlapped->OffsetHigh = large.HighPart;
 
 	if (::ReadFile(file_, pBuffer, length, nullptr, op.getOverlapped()))
 	{
@@ -79,9 +86,9 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, uint32_t length, uin
 	return op;
 }
 
-XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, uint32_t length, uint32_t position)
+XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, uint32_t length, size_t position)
 {
-	XOsFileAsyncOperation op(file_);
+	XOsFileAsyncOperation op(gEnv->pArena, file_, position);
 
 	if (::WriteFile(file_, pBuffer, length, nullptr, op.getOverlapped()))
 	{
@@ -111,7 +118,7 @@ size_t OsFileAsync::tell(void) const
 	if (!SetFilePointerEx(file_, Move, &current, FILE_CURRENT))
 	{
 		lastError::Description dsc;
-		X_ERROR("File", "Failed to tell() file. Error: %s", lastError::ToString(dsc));
+		X_ERROR("AsyncFile", "Failed to tell() file. Error: %s", lastError::ToString(dsc));
 	}
 
 #if X_64 == 1
@@ -132,7 +139,7 @@ size_t OsFileAsync::remainingBytes(void) const
 	if (!GetFileInformationByHandle(file_, &info))
 	{
 		lastError::Description dsc;
-		X_ERROR("File", "Can't Get file information. Error: %s", lastError::ToString(dsc));
+		X_ERROR("AsyncFile", "Can't Get file information. Error: %s", lastError::ToString(dsc));
 	}
 
 #if X_64 == 1
@@ -141,6 +148,21 @@ size_t OsFileAsync::remainingBytes(void) const
 	X_ASSERT(info.nFileSizeHigh == 0, "tell was called on a file larger than 1 << 32 not supported in 32bit build")(info.nFileSizeHigh);
 	return info.nFileSizeLow - tell();
 #endif
+}
+
+void OsFileAsync::setSize(size_t numBytes)
+{
+	size_t currentPos = tell();
+
+	seek(numBytes, SeekMode::SET);
+
+	if (!::SetEndOfFile(file_))
+	{
+		lastError::Description dsc;
+		X_ERROR("AsyncFile", "Failed to setSize: %Iu. Error: %s", numBytes, lastError::ToString(dsc));
+	}
+
+	seek(currentPos, SeekMode::SET);
 }
 
 bool OsFileAsync::valid(void) const
@@ -159,5 +181,27 @@ XFileStats& OsFileAsync::fileStats(void)
 #endif // !X_ENABLE_FILE_STATS
 }
 
+void OsFileAsync::seek(size_t position, IFileSys::SeekMode::Enum origin)
+{
+	// is this condition correct?
+	if (!mode_.IsSet(fileMode::RANDOM_ACCESS) && !mode_.IsSet(fileMode::APPEND)) {
+		IFileSys::fileModeFlags::Description Dsc;
+		X_ERROR("AsyncFile", "can't seek in file, requires random access. Flags: %s", mode_.ToString(Dsc));
+		return;
+	}
+
+#if X_ENABLE_FILE_STATS
+	s_stats.NumSeeks++;
+#endif // !X_ENABLE_FILE_STATS
+
+	LARGE_INTEGER move;
+	move.QuadPart = position;
+
+	if (!SetFilePointerEx(file_, move, 0, mode::GetSeekValue(origin)))
+	{
+		lastError::Description dsc;
+		X_ERROR("AsyncFile", "Failed to seek to position %d, mode %d. Error: %s", position, origin, lastError::ToString(dsc));
+	}
+}
 
 X_NAMESPACE_END

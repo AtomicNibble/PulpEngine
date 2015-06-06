@@ -20,6 +20,7 @@ struct OsFile
 
 	size_t tell(void) const;
 	size_t remainingBytes(void) const;
+	void setSize(size_t numBytes);
 
 	bool valid(void) const;
 

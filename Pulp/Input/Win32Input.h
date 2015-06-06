@@ -39,6 +39,7 @@ private:
 
 
 private:
+	BOOL					isWow64_;
 	HWND					m_hwnd;
 	WNDPROC					m_prevWndProc;
 	static XWinInput*		This;

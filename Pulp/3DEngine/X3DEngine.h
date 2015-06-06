@@ -5,7 +5,7 @@
 
 #include "I3DEngine.h"
 #include "EngineBase.h"
-#include "Bsp.h"
+#include "Level.h"
 
 #include <IModel.h>
 #include <IRenderMesh.h>
@@ -15,7 +15,10 @@
 X_NAMESPACE_BEGIN(engine)
 
 
-struct X3DEngine : public I3DEngine, public XEngineBase
+
+
+
+struct X3DEngine : public I3DEngine, public XEngineBase, public core::IXHotReload
 {
 
 	virtual bool Init(void) X_OVERRIDE;
@@ -23,17 +26,33 @@ struct X3DEngine : public I3DEngine, public XEngineBase
 	virtual int release(void) X_OVERRIDE;
 
 	virtual void OnFrameBegin(void) X_OVERRIDE;
-
 	virtual void Update(void) X_OVERRIDE;
 
-	virtual void LoadModel(void) X_OVERRIDE;
 
+	// IXHotReload
+	virtual bool OnFileChange(const char* name) X_FINAL;
+	// ~IXHotReload
+
+private:
+	void RegisterCmds(void);
+
+	void LoadMap(const char* mapName);
+	void LoadDevMap(const char* mapName);
 
 
 private:
+	// vars / cmds
+	friend void Command_Map(core::IConsoleCmdArgs* Cmd);
+	friend void Command_DevMap(core::IConsoleCmdArgs* Cmd);
+
+
+	//~
+
 	gui::XGuiManager guisMan_;
 
-	bsp::Bsp map;
+	level::Level level_;
+
+
 	model::XModel model, modelSky;
 	model::IRenderMesh* pMesh;
 	model::IRenderMesh* pSkybox;

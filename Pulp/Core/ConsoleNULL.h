@@ -51,7 +51,7 @@ public:
 	virtual void Exec(const char* command, const bool DeferExecution) X_FINAL;
 
 //	virtual void ConfigExec(const char* command) X_FINAL;
-	virtual void LoadConfig(const char* fileName) X_FINAL;
+	virtual bool LoadConfig(const char* fileName) X_FINAL;
 
 	void OnFrameBegin() X_FINAL;
 

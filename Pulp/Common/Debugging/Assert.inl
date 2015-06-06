@@ -33,7 +33,12 @@ void Assert::Dispatch( const SourceInfo& sourceInfo, const char* format, const c
 	if (gEnv) {
 		if (gEnv->pLog)
 			gEnv->pLog->AssertVariable(sourceInfo, format, name, value);
-		gEnv->pCore->OnAssertVariable(sourceInfo);
+		if (gEnv->pCore)
+			gEnv->pCore->OnAssertVariable(sourceInfo);
+		else
+		{
+			X_BREAKPOINT;
+		}
 	}
 //	logDispatch::AssertVariable(sourceInfo, format, name, value);
 //	assertionDispatch::AssertVariable(sourceInfo);

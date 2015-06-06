@@ -140,6 +140,7 @@ bool XShaderBin::loadShader(const char* path, uint32_t sourceCRC, XHWShader_Dx10
 
 			core::Array<XShaderParam> bindvars(g_rendererArena);
 			bindvars.reserve(hdr.numBindVars);
+			int maxVecs[3] = { 0 };
 
 			// load bind vars.
 			uint32_t i;
@@ -158,6 +159,19 @@ bool XShaderBin::loadShader(const char* path, uint32_t sourceCRC, XHWShader_Dx10
 				bindvars.append(bind);
 			}
 
+			for (i = 0; i < bindvars.size(); i++)
+			{
+				XShaderParam* pB = &bindvars[i];
+				const char *param = pB->name.c_str();
+
+				// set max slots
+				if (pB->constBufferSlot < 3)
+				{
+					maxVecs[pB->constBufferSlot] = core::Max(pB->bind +
+						pB->numParameters, maxVecs[pB->constBufferSlot]);
+				}
+			}
+
 			// load the shader blob.
 			if (SUCCEEDED(D3DCreateBlob(hdr.blobLength, &pBlob)))
 			{
@@ -167,7 +181,7 @@ bool XShaderBin::loadShader(const char* path, uint32_t sourceCRC, XHWShader_Dx10
 					// set the values.
 					pShader->setBlob(pBlob);
 					pShader->setBindVars(bindvars);
-
+					pShader->setMaxVecs(maxVecs);
 
 					pShader->numSamplers_ = hdr.numSamplers;
 					pShader->numConstBuffers_ = hdr.numConstBuffers;

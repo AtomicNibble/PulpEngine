@@ -36,12 +36,65 @@ uint32_t XRender::vertexFormatStride[shader::VertexFormat::Num] =
 	sizeof(Vertex_P3F_T2S_C4B_N3F),			// P3F_T2S_C4B_N3F
 	sizeof(Vertex_P3F_T2S_C4B_N3F_TB3F),	// P3F_T2S_C4B_N3F_TB3F
 
-	sizeof(Vertex_P3F_T2S_C4B_N10),
-	sizeof(Vertex_P3F_T2S_C4B_N10_TB10),
+	sizeof(Vertex_P3F_T2S_C4B_N10),			// P3F_T2S_C4B_N10
+	sizeof(Vertex_P3F_T2S_C4B_N10_TB10),	// P3F_T2S_C4B_N10_TB10
 
 	sizeof(Vertex_P3F_T2F_C4B),				// P3F_T2F_C4B
 
 	sizeof(Vertex_P3F_T4F_C4B_N3F),			// P3F_T4F_C4B_N3F
+};
+
+
+uint32_t XRender::vertexSteamStride[VertexStream::ENUM_COUNT][shader::VertexFormat::Num] =
+{
+	// base vert stream
+	{ 
+		sizeof(Vertex_P3F_T3F), // large uv's
+		sizeof(Vertex_P3F_T2S), 
+		sizeof(Vertex_P3F_T2S), 
+		sizeof(Vertex_P3F_T2S), 
+		sizeof(Vertex_P3F_T2S), 
+		sizeof(Vertex_P3F_T2S),
+		sizeof(Vertex_P3F_T2S),
+		sizeof(Vertex_P3F_T2S),
+		sizeof(Vertex_P3F_T4F),
+	},
+	// color
+	{ 
+		0, // no color
+		0,
+		sizeof(Color8u),
+		sizeof(Color8u),
+		sizeof(Color8u),
+		sizeof(Color8u),
+		sizeof(Color8u),
+		sizeof(Color8u),
+		sizeof(Color8u),
+	},
+	// Normals
+	{ 
+		0, 
+		0, 
+		0, 
+		sizeof(Vec3f),
+		sizeof(Vec3f),
+		sizeof(compressedVec3),
+		sizeof(compressedVec3),  
+		0, 
+		sizeof(Vec3f)
+	},
+	// Tangent Binormals
+	{
+		0, 
+		0, 
+		0, 
+		0, 
+		sizeof(Vertex_Tangents_BiNorm),
+		0, 
+		sizeof(Vertex_Tangents_BiNorm),
+		0,
+		0 
+	},
 };
 
 

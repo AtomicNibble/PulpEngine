@@ -145,6 +145,12 @@ inline void Path::removeExtension(void)
 	setExtension("");
 }
 
+inline void Path::removeTrailingSlash(void)
+{
+	replaceSeprators();
+	stripTrailing(NATIVE_SLASH);
+}
+
 inline bool Path::isAbsolute(void) const
 {
 	return	str_[0] == NATIVE_SLASH ||

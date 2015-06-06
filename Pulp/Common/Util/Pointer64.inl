@@ -27,6 +27,20 @@ Pointer64<T>::operator T*() const
 }
 
 template<typename T>
+Pointer64<T>& Pointer64<T>::operator +=(const Pointer64<T>& oth)
+{
+	raw_ = (uint64_t)(((T*)raw_) + ((T*)oth.raw_));
+	return *this;
+}
+
+template<>
+Pointer64<void>& Pointer64<void>::operator +=(const Pointer64<void>& oth)
+{
+	raw_ = raw_ + oth.raw_;
+	return *this;
+}
+
+template<typename T>
 template<typename Type>
 Type* Pointer64<T>::as() const
 {

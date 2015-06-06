@@ -20,6 +20,8 @@
 #include "../ReaderThread.h"
 #include "../XRender.h"
 
+#include <IConsole.h>
+
 X_NAMESPACE_BEGIN(texture)
 
 // temp just so they link.
@@ -68,6 +70,9 @@ namespace {
 
 	ImgHotReload g_ImgHotReload;
 }
+
+
+int XTexture::s_Var_SaveToCI = 0;
 
 render::XRenderResourceContainer*		XTexture::s_pTextures = nullptr;
 
@@ -539,7 +544,7 @@ void XTexture::preProcessImage(core::ReferenceCountedOwner<XTextureFile>& image_
 		}
 	}
 
-	if (!image_data->getFlags().IsSet(TexFlag::CI_IMG))
+	if (s_Var_SaveToCI == 1 && !image_data->getFlags().IsSet(TexFlag::CI_IMG))
 	{
 		X_LOG0("Texture", "Compiling image to CI: ^5%s", this->FileName.c_str());
 
@@ -733,9 +738,20 @@ int XTexture::getTexStateId(const shader::XTexState& TS)
 	return safe_static_cast<int,size_t>(i);
 }
 
+void XTexture::applyDefault(void)
+{
+	s_pTexDefault->apply(0);
+	s_pTexDefaultBump->apply(1);
+}
 
 void XTexture::init(void)
 {
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pConsole);
+
+	ADD_CVAR_REF("image_autoConvert", s_Var_SaveToCI, 0, 0, 1, core::VarFlag::SYSTEM, 
+		"Save unconverted images as ci automatically.");
+
 	s_pTextures = X_NEW_ALIGNED(render::XRenderResourceContainer, g_rendererArena, 
 		"TexturesRes", X_ALIGN_OF(render::XRenderResourceContainer))(g_rendererArena, 4096);
 

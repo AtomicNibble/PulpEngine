@@ -2,7 +2,7 @@
 
 #include <EngineCommon.h>
 
-
+#include "resource.h"
 
 #include <String\StackString.h>
 #include <String\Path.h>
@@ -17,7 +17,7 @@
 #include "StringPair.h"
 
 
-#include <IBsp.h>
+#include <Ilevel.h>
 
 X_USING_NAMESPACE;
 
@@ -27,9 +27,14 @@ X_USING_NAMESPACE;
 
 using namespace std;
 
-
+#include "Globals.h"
+#include "Settings.h"
 #include "Winding.h"
 #include "PlaneSet.h"
 #include "VertexFmt.h"
 
+
 extern core::MemoryArenaBase* g_arena;
+// could combine these two, but be quite a bit of waste for faces.
+extern core::MemoryArenaBase* g_bspFaceAllocator;
+extern core::MemoryArenaBase* g_bspNodeAllocator;

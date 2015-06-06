@@ -18,6 +18,7 @@ XWinInput* XWinInput::This = 0;
 
 XWinInput::XWinInput(ICore *pSystem, HWND hwnd) : XBaseInput()
 {
+	isWow64_ = FALSE;
 	m_hwnd = hwnd;
 	m_prevWndProc = 0;
 	This = this;
@@ -35,12 +36,23 @@ bool XWinInput::Init(void)
 {
 	XBaseInput::Init();
 
-	// o baby!
-	if (!AddInputDevice(X_NEW_ALIGNED(XKeyboard,g_InputArena,"Keyboard",8)(*this))) 
+	// work out if WOW64.
+	if (!::IsWow64Process(::GetCurrentProcess(), &isWow64_)) {
+		core::lastError::Description Dsc;
+		X_ERROR("Input", "Wow64 check failed. Error: %s", core::lastError::ToString(Dsc));
 		return false;
+	}
 
-	if (!AddInputDevice(X_NEW_ALIGNED(XMouse, g_InputArena, "Mouse", 8)(*this)))
+	// o baby!
+	if (!AddInputDevice(X_NEW_ALIGNED(XKeyboard, g_InputArena, "Keyboard", 8)(*this))) {
+		X_ERROR("Input", "Failed to add keyboard input device");
 		return false;
+	}
+
+	if (!AddInputDevice(X_NEW_ALIGNED(XMouse, g_InputArena, "Mouse", 8)(*this))) {
+		X_ERROR("Input", "Failed to add mouse input device");
+		return false;
+	}
 
 	ClearKeyState();
 	return true;
@@ -67,15 +79,18 @@ void XWinInput::Update(bool bFocus)
 	hasFocus_ = bFocus;
 
 	const size_t BufSize = 0x80;
+	const size_t HeaderSize = sizeof(RAWINPUTHEADER);
 
 	RAWINPUT X_ALIGNED_SYMBOL(input[BufSize], 8);
 	PRAWINPUT pInput = input;
-	UINT size = sizeof(input);
+	UINT size;
 	UINT num;
 
 	for (;;)
 	{
-		num = GetRawInputBuffer(input, &size, sizeof(RAWINPUTHEADER));
+		size = sizeof(input);
+
+		num = GetRawInputBuffer(input, &size, HeaderSize);
 
 		if (num == 0)
 			break;
@@ -93,18 +108,26 @@ void XWinInput::Update(bool bFocus)
 		}
 
 		PRAWINPUT rawInput = input;
+
 		for (UINT i = 0; i < num; ++i)
 		{
+			const uint8_t* pData = reinterpret_cast<const uint8_t*>(&rawInput->data);
+			// needs to be 16 + 8 aligned.
+			if (isWow64_) {
+				pData += 8;
+			}
+
 			for (TInputDevices::Iterator i = Devices_.begin(); i != Devices_.end(); ++i)
 			{
 				XInputDeviceWin32* pDevice = (XInputDeviceWin32*)(*i);
 				if (pDevice->IsEnabled())
-					pDevice->ProcessInput(*rawInput);
+				{
+					pDevice->ProcessInput(rawInput->header, pData);
+				}
 			}
 
 			rawInput = NEXTRAWINPUTBLOCK(rawInput);
 		}
-
 		// to clean the buffer
 		// DefRawInputProc(&pInput, num, sizeof(RAWINPUTHEADER));
 	}

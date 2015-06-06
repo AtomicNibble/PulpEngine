@@ -8,6 +8,9 @@
 #include "../Common/XRender.h"
 #include "Dx10Render.h"
 
+
+#include "../Common/Textures/XTexture.h"
+
 X_NAMESPACE_BEGIN(shader)
 
 
@@ -40,6 +43,9 @@ InputLayoutFormat::Enum ILfromVertexFormat(const VertexFormat::Enum fmt)
 		case VertexFormat::P3F_T4F_C4B_N3F:
 			return InputLayoutFormat::POS_UV2_COL_NORM;
 
+		case VertexFormat::Num:
+			X_ASSERT_UNREACHABLE();
+			return InputLayoutFormat::Invalid;
 #if X_DEBUG
 		default:
 			X_ASSERT_UNREACHABLE();
@@ -48,6 +54,7 @@ InputLayoutFormat::Enum ILfromVertexFormat(const VertexFormat::Enum fmt)
 			X_NO_SWITCH_DEFAULT;
 #endif // !X_DEBUG
 	}
+	return InputLayoutFormat::Invalid;
 }
 
 ILFlags IlFlagsForVertexFormat(const VertexFormat::Enum fmt)
@@ -331,15 +338,21 @@ bool DX11XRender::SetWorldShader()
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_FixedFunction;
+	XShader* pSh = XShaderManager::m_WordShader;
 	uint32_t pass;
+
+
+	texture::XTexture::applyDefault();
 
 	if (!pSh)
 		return false;
 
-	core::StrHash tech("SolidTestWorld");
+	core::StrHash tech("Solid");
 
 	if (!pSh->FXSetTechnique(tech))
+		return false;
+
+	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T4F_C4B_N3F)))
 		return false;
 
 	if (!pSh->FXBegin(&pass, 0))

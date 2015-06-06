@@ -1,14 +1,15 @@
 #include "stdafx.h"
-#include "BSPTypes.h"
-#include <IFileSys.h>
 
-#include <IBsp.h>
+#include "LvlBuilder.h"
+
+#include <IFileSys.h>
+#include <Ilevel.h>
 
 #include <Hashing\crc32.h>
 
 X_USING_NAMESPACE;
 
-using namespace bsp;
+using namespace level;
 
 namespace
 {
@@ -20,8 +21,8 @@ namespace
 		file->writeObj(pModel->meshes.ptr(),(pModel->meshes.size()));
 
 		// write the streams.
-		core::Array<bsp::Vertex>::ConstIterator it = pModel->verts.begin();
-		core::Array<bsp::Vertex>::ConstIterator end = pModel->verts.end();
+		core::Array<level::Vertex>::ConstIterator it = pModel->verts.begin();
+		core::Array<level::Vertex>::ConstIterator end = pModel->verts.end();
 		for (; it != end; ++it) {
 			file->writeObj(it->pos);
 			file->writeObj(it->texcoord);
@@ -36,7 +37,7 @@ namespace
 		}
 
 	//	file->writeObj(pModel->verts.ptr(), (pModel->verts.size()));
-		file->writeObj(pModel->indexes.ptr(), (pModel->indexes.size()));
+		file->writeObj(pModel->faces.ptr(), (pModel->faces.size()));
 	}
 }
 
@@ -55,16 +56,15 @@ bool LvlBuilder::save(const char* name)
 	mode.Set(core::fileMode::RANDOM_ACCESS); // we do a seek.
 
 	core::zero_object(hdr);
-	hdr.fourCC = BSP_FOURCC_INVALID;
-	hdr.version = BSP_VERSION;
+	hdr.fourCC = LVL_FOURCC_INVALID;
+	hdr.version = LVL_VERSION;
 	hdr.datacrc32 = 0; 
 	hdr.modified = core::dateTimeStampSmall::systemDateTime();
 
 	hdr.numStrings = safe_static_cast<uint32_t,size_t>(stringTable_.numStrings());
-	hdr.stringDataSize = safe_static_cast<uint32_t, size_t>(stringTable_.bytesUsed());
 
 	path.append(name);
-	path.setExtension(bsp::BSP_FILE_EXTENSION);
+	path.setExtension(level::LVL_FILE_EXTENSION);
 
 	core::Crc32 crc;
 
@@ -73,8 +73,12 @@ bool LvlBuilder::save(const char* name)
 	{
 		file->writeObj(hdr);
 
+		size_t stringTableStart = file->tell();
+
 		// write string table.
 		stringTable_.SSave(file);
+
+		size_t stringTableEnd = file->tell();
 
 		for (i = 0; i < areas_.size(); i++)
 		{
@@ -83,13 +87,23 @@ bool LvlBuilder::save(const char* name)
 			WriteAreaModel(file, pModel);
 		}
 
+		size_t dataEnd = file->tell();
+
 
 		// update FourcCC to mark this bsp as valid.
-		hdr.fourCC = BSP_FOURCC;
+		hdr.fourCC = LVL_FOURCC;
 		hdr.numAreas = safe_static_cast<uint32_t,size_t>(areas_.size());
 		// crc the header
 		hdr.datacrc32 = crc.GetCRC32((const char*)&hdr, sizeof(hdr));
-		hdr.datasize = safe_static_cast<uint32_t, size_t>(file->tell() - sizeof(hdr));
+
+
+		hdr.stringDataSize = safe_static_cast<uint32_t, size_t>(
+			stringTableEnd - stringTableStart);
+		hdr.datasize = safe_static_cast<uint32_t, size_t>(dataEnd -
+			stringTableEnd);
+
+		hdr.totalDataSize = hdr.stringDataSize + hdr.datasize;
+
 		file->seek(0, core::SeekMode::SET);
 		file->writeObj(hdr);
 

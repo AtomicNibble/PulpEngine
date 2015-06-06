@@ -36,7 +36,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -49,7 +49,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -63,7 +63,7 @@
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>Unicode</CharacterSet>
+    <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Super|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -77,6 +77,10 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\solutions\_engine.props" />
+    <Import Project="..\..\solutions\_engine_debughelp.props" />
+    <Import Project="..\..\solutions\_engine_win32_debug.props" />
+    <Import Project="..\..\solutions\_engine_link_common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -87,6 +91,10 @@
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\solutions\_engine.props" />
+    <Import Project="..\..\solutions\_engine_debughelp.props" />
+    <Import Project="..\..\solutions\_engine_win32_release.props" />
+    <Import Project="..\..\solutions\_engine_link_common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -97,6 +105,9 @@
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="..\..\solutions\_engine.props" />
+    <Import Project="..\..\solutions\_engine_win32_super.props" />
+    <Import Project="..\..\solutions\_engine_link_common.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -129,6 +140,8 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\Pulp\Common;$(ProjectDir);</AdditionalIncludeDirectories>
+      <MinimalRebuild>false</MinimalRebuild>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -157,6 +170,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\Pulp\Common;$(ProjectDir);</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -189,6 +203,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\Pulp\Common;$(ProjectDir);</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -217,7 +232,12 @@
     <ClInclude Include="BSPData.h" />
     <ClInclude Include="BSPTypes.h" />
     <ClInclude Include="EngineApp.h" />
+    <ClInclude Include="FaceTreeBuilder.h" />
+    <ClInclude Include="Globals.h" />
     <ClInclude Include="HashIndex.h" />
+    <ClInclude Include="LvlTypes.h" />
+    <ClInclude Include="MaterialManager.h" />
+    <ClInclude Include="Settings.h" />
     <ClInclude Include="StringPair.h" />
     <ClInclude Include="TriTools.h" />
     <ClInclude Include="VertexFmt.h" />
@@ -225,21 +245,30 @@
     <ClInclude Include="MapLoader.h" />
     <ClInclude Include="MapTypes.h" />
     <ClInclude Include="PlaneSet.h" />
-    <ClInclude Include="LevelBuilder.h" />
+    <ClInclude Include="LvlBuilder.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BSPArea.cpp" />
+    <ClCompile Include="AreaModel.cpp" />
+    <ClCompile Include="BSPFace.cpp" />
     <ClCompile Include="BSPFile.cpp" />
-    <ClCompile Include="BSPProcess.cpp" />
-    <ClCompile Include="BSPCompiler.cpp" />
+    <ClCompile Include="bspNode.cpp" />
+    <ClCompile Include="BSPPortals.cpp" />
+    <ClCompile Include="FaceTreeBuilder.cpp" />
+    <ClCompile Include="LvlBrush.cpp" />
+    <ClCompile Include="LvlEntity.cpp" />
+    <ClCompile Include="LvlProcess.cpp" />
     <ClCompile Include="BSPTypes.cpp" />
     <ClCompile Include="EngineApp.cpp" />
     <ClCompile Include="HashIndex.cpp" />
+    <ClCompile Include="LvlBuilder.cpp" />
+    <ClCompile Include="LvlTypes.cpp" />
     <ClCompile Include="MapLoader.cpp" />
     <ClCompile Include="MapTypes.cpp" />
     <ClCompile Include="LevelBuilder.cpp" />
+    <ClCompile Include="MaterialManager.cpp" />
+    <ClCompile Include="Settings.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -257,6 +286,9 @@
   <ItemGroup>
     <Image Include="LevelBuilder.ico" />
     <Image Include="small.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Winding.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

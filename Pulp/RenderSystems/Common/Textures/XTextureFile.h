@@ -46,7 +46,7 @@ uint8_t				numFaces;  // Cube maps aka 6 faces.
 
 */
 
-struct XTextureFile : public core::ReferenceCountedArena<XTextureFile>
+struct XTextureFile : public core::ReferenceCounted<XTextureFile>
 {
 	XTextureFile();
 	~XTextureFile();

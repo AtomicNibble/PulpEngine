@@ -7,8 +7,11 @@ X_NAMESPACE_BEGIN(texture)
 XTextureFile::XTextureFile() 
 {
 	core::zero_object(pFaces);
-	
+
+#if X_DEBUG
 	pName = nullptr;
+#endif //!X_DEBUG
+
 	datasize = 0; 
 	numMips = 0;
 	depth = 0;	

@@ -1,6 +1,12 @@
 #include "stdafx.h"
 #include "Winding.h"
 
+void XWinding::Clear(void)
+{
+	numPoints = 0;
+	X_DELETE_ARRAY(p, g_arena);
+	p = nullptr;
+}
 
 bool XWinding::EnsureAlloced(int n, bool keep)
 {
@@ -16,59 +22,81 @@ bool XWinding::ReAllocate(int n, bool keep)
 
 	oldP = p;
 	n = (n + 3) & ~3;	// align up to multiple of four
-	p = new Vec5f[n];
+	p = X_NEW_ARRAY(Vec5f,n,g_arena,"WindingPoints");
 	if (oldP) {
 		if (keep) {
 			memcpy(p, oldP, numPoints * sizeof(p[0]));
 		}
-		delete[] oldP;
+		X_DELETE_ARRAY(oldP, g_arena);
 	}
 	allocedSize = n;
 	return true;
 }
 
 // -----------------------------
+namespace
+{
 #define IEEE_FLT_MANTISSA_BITS		23
 #define IEEE_FLT_EXPONENT_BITS		8
 #define IEEE_FLT_EXPONENT_BIAS		127
 #define IEEE_FLT_SIGN_BIT           31
 
 
-const int SMALLEST_NON_DENORMAL = 1 << IEEE_FLT_MANTISSA_BITS;
-const int NAN_VALUE = 0x7f800000;
-const float FLT_SMALLEST_NON_DENORMAL = *reinterpret_cast< const float * >(&SMALLEST_NON_DENORMAL);
+	const int SMALLEST_NON_DENORMAL = 1 << IEEE_FLT_MANTISSA_BITS;
+	const int NAN_VALUE = 0x7f800000;
+	const float FLT_SMALLEST_NON_DENORMAL = *reinterpret_cast<const float *>(&SMALLEST_NON_DENORMAL);
 
+	X_DISABLE_WARNING(4756)
 
-X_DISABLE_WARNING(4756)
-
-float InvSqrt(float x) 
-{
-	return (x > FLT_SMALLEST_NON_DENORMAL) ? sqrtf(1.0f / x) : INFINITY;
-}
-
-X_ENABLE_WARNING(4756)
-
-void NormalVectors(const Vec3f& vec, Vec3f &left, Vec3f &down)
-{
-	float d;
-
-	d = vec.x * vec.x + vec.y * vec.y;
-	if (!d) {
-		left[0] = 1;
-		left[1] = 0;
-		left[2] = 0;
+		float InvSqrt(float x)
+	{
+		return (x > FLT_SMALLEST_NON_DENORMAL) ? sqrtf(1.0f / x) : INFINITY;
 	}
-	else {
-		d = InvSqrt(d);
-		left[0] = -vec.y * d;
-		left[1] = vec.x * d;
-		left[2] = 0;
-	}
-	down = left.cross(vec);
-}
 
-#if 0
-#else
+	X_ENABLE_WARNING(4756)
+
+		void NormalVectors(const Vec3f& vec, Vec3f &left, Vec3f &down)
+	{
+		float d;
+
+		d = vec.x * vec.x + vec.y * vec.y;
+		if (!d) {
+			left[0] = 1;
+			left[1] = 0;
+			left[2] = 0;
+		}
+		else {
+			d = InvSqrt(d);
+			left[0] = -vec.y * d;
+			left[1] = vec.x * d;
+			left[2] = 0;
+		}
+		down = left.cross(vec);
+	}
+
+} // namespace
+
+
+void XWinding::Print(void) const
+{
+	// print the bounds.
+	AABB bounds;
+	GetAABB(bounds);
+
+	const Vec3f& min = bounds.min;
+	const Vec3f& max = bounds.max;
+	X_LOG0("Winding", "Printing values:");
+	X_LOG_BULLET;
+	X_LOG0("Winding", "min: (%g,%g,%g)", min[0], min[1], min[2]);
+	X_LOG0("Winding", "max: (%g,%g,%g)", max[0], max[1], max[2]);
+	X_LOG0("Winding", "NumPoints: %i", numPoints);
+	for (int i = 0; i < numPoints; i++)
+	{
+		const Vec5f& pl = p[i];
+		X_LOG0("Winging", "P(%i): (%g,%g,%g) (%g,%g)", i, 
+			pl[0], pl[1], pl[2], pl[3], pl[4]);
+	}
+}
 
 void XWinding::BaseForPlane(const Vec3f &normal, const float dist)
 {
@@ -78,8 +106,8 @@ void XWinding::BaseForPlane(const Vec3f &normal, const float dist)
 
 	NormalVectors(normal, vup, vright);
 
-	vup *= bsp::MAX_WORLD_SIZE;
-	vright *= bsp::MAX_WORLD_SIZE;
+	vup *= level::MAX_WORLD_SIZE;
+	vright *= level::MAX_WORLD_SIZE;
 
 	EnsureAlloced(4);
 	numPoints = 4;
@@ -93,7 +121,7 @@ void XWinding::BaseForPlane(const Vec3f &normal, const float dist)
 //	memcpy(temp, p, sizeof(temp));
 }
 
-#endif 
+//#endif 
 
 void XWinding::BaseForPlane(const Planef &plane)
 {
@@ -219,6 +247,8 @@ void XWinding::GetAABB(AABB& bounds) const
 
 float XWinding::PlaneDistance(const Planef &plane) const
 {
+	X_ASSERT_NOT_IMPLEMENTED();
+
 	/*	int		i;
 	float	d, min, max;
 
@@ -322,7 +352,7 @@ int XWinding::Split(const Planef& plane, const float epsilon, XWinding **front, 
 	sides[i] = sides[0];
 	dists[i] = dists[0];
 
-	*front = *back = NULL;
+	*front = *back = nullptr;
 
 	// if coplanar, put on the front side if the normals match
 	if (!counts[Planeside::FRONT] && !counts[Planeside::BACK]) {
@@ -351,8 +381,8 @@ int XWinding::Split(const Planef& plane, const float epsilon, XWinding **front, 
 
 	maxpts = numPoints + 4;	// cant use counts[0]+2 because of fp grouping errors
 
-	*front = f = new XWinding(maxpts);
-	*back = b = new XWinding(maxpts);
+	*front = f = X_NEW(XWinding, g_arena, "fronWinding")(maxpts);
+	*back = b = X_NEW(XWinding, g_arena, "BackWinding")(maxpts);
 
 	for (i = 0; i < numPoints; i++) {
 		p1 = &p[i];
@@ -428,7 +458,6 @@ int XWinding::Split(const Planef& plane, const float epsilon, XWinding **front, 
 	}
 
 	if (f->numPoints > maxpts || b->numPoints > maxpts) {
-		//	idLib::common->FatalError("idWinding::Split: points exceeded estimate.");
 		X_WARNING("XWinding", "points exceeded estimate");
 	}
 
@@ -481,7 +510,7 @@ XWinding* XWinding::Clip(const Planef &plane, const float epsilon, const bool ke
 	}
 	// if nothing at the front of the clipping plane
 	if (!counts[Planeside::FRONT]) {
-		delete this;
+		X_DELETE(this,g_arena);
 		return nullptr;
 	}
 	// if nothing at the back of the clipping plane
@@ -491,7 +520,7 @@ XWinding* XWinding::Clip(const Planef &plane, const float epsilon, const bool ke
 
 	maxpts = numPoints + 4;		// cant use counts[0]+2 because of fp grouping errors
 
-	newPoints = (Vec5f *)_alloca16(maxpts * sizeof(Vec5f));
+	newPoints = Alloca16<Vec5f>(maxpts * sizeof(Vec5f));
 	newNumPoints = 0;
 
 	for (i = 0; i < numPoints; i++) {
@@ -558,12 +587,7 @@ XWinding* XWinding::Clip(const Planef &plane, const float epsilon, const bool ke
 
 XWinding *XWinding::Copy(void) const
 {
-	XWinding *w;
-
-	w = new XWinding(numPoints);
-	w->numPoints = numPoints;
-	memcpy(w->p, p, numPoints * sizeof(p[0]));
-	return w;
+	return X_NEW(XWinding, g_arena, "WindingCopy")(*this);
 }
 
 
@@ -601,7 +625,8 @@ void XWinding::AddToConvexHull(const XWinding *winding, const Vec3f &normal, con
 	hullDirs = (Vec3f *)_alloca(maxPts * sizeof(Vec3f));
 	hullSide = (bool *)_alloca(maxPts * sizeof(bool));
 
-	for (i = 0; i < winding->numPoints; i++) {
+	for (i = 0; i < winding->numPoints; i++) 
+	{
 		const Vec5f &p1 = winding->p[i];
 
 		// calculate hull edge vectors
@@ -657,8 +682,9 @@ void XWinding::AddToConvexHull(const XWinding *winding, const Vec3f &normal, con
 		}
 
 		this->numPoints = numNewHullPoints;
-		memcpy(this->p, newHullPoints, numNewHullPoints * sizeof(Vec3f));
+		memcpy(this->p, newHullPoints, numNewHullPoints * sizeof(Vec5f));
 	}
+
 }
 
 /*
@@ -778,4 +804,17 @@ void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const fl
 	}
 	numPoints = numHullPoints;
 	memcpy(p, hullPoints, numHullPoints * sizeof(Vec3f));
+}
+
+
+
+XWinding* XWinding::ReverseWinding(void)
+{
+	XWinding* c = X_NEW(XWinding, g_arena, "ReverseWinding");
+	c->EnsureAlloced(numPoints);
+
+	for (int i = 0; i < numPoints; i++)
+		c->p[i] = p[numPoints - 1 - i];
+
+	return c;
 }

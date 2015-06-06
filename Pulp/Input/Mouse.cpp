@@ -102,11 +102,12 @@ void XMouse::Update(bool bFocus)
 	X_ASSERT_UNREACHABLE();
 }
 
-void XMouse::ProcessInput(RAWINPUT& input)
+void XMouse::ProcessInput(const RAWINPUTHEADER& header, const uint8_t* pData)
 {
-	if (input.header.dwType == RIM_TYPEMOUSE)
+	if (header.dwType == RIM_TYPEMOUSE)
 	{
-		ProcessMouseData(input.data.mouse);
+		const RAWMOUSE* pMouse = reinterpret_cast<const RAWMOUSE*>(pData);
+		ProcessMouseData(*pMouse);
 	}
 }
 
@@ -172,7 +173,7 @@ void XMouse::OnButtonUP(KeyId::Enum id)
 	PostEvent(pSymbol);
 }
 
-void XMouse::ProcessMouseData(RAWMOUSE& mouse)
+void XMouse::ProcessMouseData(const RAWMOUSE& mouse)
 {
 
 	// i think i can get all info from raw input tbh.

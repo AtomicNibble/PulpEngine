@@ -16,13 +16,14 @@ X_NAMESPACE_BEGIN(mapfile)
 
 void XMapPatch::GenerateEdgeIndexes(void)
 {
-	int i, j, i0, i1, i2, s, v0, v1, edgeNum;
+	int i, j;
+	int i0, i1, i2, s, v0, v1, edgeNum;
 	int *index, *vertexEdges, *edgeChain;
 	surfaceEdge_t e[3];
 
-	vertexEdges = (int *)_alloca16(verts.size() * sizeof(int));
+	vertexEdges = Alloca16<int>(verts.size() * sizeof(int));
 	memset(vertexEdges, -1, verts.size() * sizeof(int));
-	edgeChain = (int *)_alloca16(indexes.size() * sizeof(int));
+	edgeChain = Alloca16<int>(indexes.size() * sizeof(int));
 
 	edgeIndexes.resize(indexes.size());
 
@@ -32,7 +33,7 @@ void XMapPatch::GenerateEdgeIndexes(void)
 	e[0].verts[0] = e[0].verts[1] = e[0].tris[0] = e[0].tris[1] = 0;
 	edges.push_back(e[0]);
 
-	for (i = 0; i < indexes.size(); i += 3) 
+	for (i = 0; i < safe_static_cast<int,size_t>(indexes.size()); i += 3) 
 	{
 		index = indexes.ptr() + i;
 		// vertex numbers

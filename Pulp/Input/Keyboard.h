@@ -27,7 +27,7 @@ public:
 	}
 	// ~IInputDevice
 
-	void ProcessInput(RAWINPUT& input);
+	void ProcessInput(const RAWINPUTHEADER& header, const uint8_t* pData);
 
 private:
 	void initAsciiCache();
@@ -35,7 +35,7 @@ private:
 	char Event2Char(const InputEvent& event);
 	inline bool IsCHAR(const InputEvent& event);
 
-	void ProcessKeyboardData(RAWKEYBOARD&);
+	void ProcessKeyboardData(const RAWKEYBOARD&);
 
 	struct AsciiVal
 	{

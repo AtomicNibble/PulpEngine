@@ -100,9 +100,9 @@ private:
 #include "LinkedListIntrusive.inl"
 
 
-#define INTRUSIVE_LIST_DECLARE(T, link) XListIntrusiveDeclare<T, offsetof(T, link)>
-#define INTRUSIVE_LIST_LINK(T) XLinkIntrusive<T>
-#define INTRUSIVE_LIST_PTR(T) XListIntrusive<T> *
+#define INTRUSIVE_LIST_DECLARE(T, link) core::XListIntrusiveDeclare<T, offsetof(T, link)>
+#define INTRUSIVE_LIST_LINK(T) core::XLinkIntrusive<T>
+#define INTRUSIVE_LIST_PTR(T) core::XListIntrusive<T> *
 
 // goaty little wrapper so can use default constructor.
 template<class T, size_t offset>

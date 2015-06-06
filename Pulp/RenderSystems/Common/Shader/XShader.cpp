@@ -206,6 +206,7 @@ XShader* XShaderManager::m_Font = nullptr;
 XShader* XShaderManager::m_Gui = nullptr;
 XShader* XShaderManager::m_DefferedShader = nullptr;
 XShader* XShaderManager::m_DefferedShaderVis = nullptr;
+XShader* XShaderManager::m_WordShader = nullptr;
 
 
 XShaderManager::XShaderManager() : 
@@ -319,7 +320,8 @@ bool XShaderManager::Init(void)
 
 	texture::XTexture::init();
 
-	loadCoreShaders();
+	if (!loadCoreShaders())
+		return false;
 
 	// hotreload support.
 	gEnv->pHotReload->addfileType(this, "hlsl");
@@ -336,6 +338,8 @@ bool XShaderManager::Init(void)
 bool XShaderManager::Shutdown(void)
 {
 	X_LOG0("ShadersManager", "Shutting down");
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pHotReload);
 
 	gEnv->pHotReload->addfileType(nullptr, "hlsl");
 	gEnv->pHotReload->addfileType(nullptr, "inc");
@@ -612,13 +616,32 @@ XShader* XShaderManager::reloadShader(const char* name)
 bool XShaderManager::loadCoreShaders(void)
 {
 	m_DefaultShader = createShader("default");
-//	m_DebugShader = forName("gui");
-	m_FixedFunction = forName("ffe");
-	m_Font = forName("font");
-	m_Gui = forName("gui");
-	m_DefferedShader = forName("deffered");
-	m_DefferedShaderVis = forName("defferedVis");
 
+	if (!(m_FixedFunction = forName("ffe"))) {
+		X_ERROR("Shader", "Failed to load ffe shader");
+		return false;
+	}
+	if (!(m_Font = forName("font"))){
+		X_ERROR("Shader", "Failed to load font shader");
+		return false;
+	}
+	if (!(m_Gui = forName("gui"))){
+		X_ERROR("Shader", "Failed to load gui shader");
+		return false;
+	}
+	if (!(m_DefferedShader = forName("deffered"))){
+		X_ERROR("Shader", "Failed to load deffered shader");
+		return false;
+	}
+	if (!(m_DefferedShaderVis = forName("defferedVis"))){
+		X_ERROR("Shader", "Failed to load defferedVis shader");
+		return false;
+	}
+
+	if (!(m_WordShader = forName("World"))){
+		X_ERROR("Shader", "Failed to load World shader");
+		return false;
+	}
 	return true;
 }
 
@@ -640,6 +663,9 @@ bool XShaderManager::freeCoreShaders(void)
 		m_DefferedShader->release();
 	if (m_DefferedShaderVis)
 		m_DefferedShaderVis->release();
+
+	if (m_WordShader)
+		m_WordShader->release();
 
 	return true;
 }

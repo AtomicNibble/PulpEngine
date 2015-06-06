@@ -347,7 +347,9 @@ bool DX11XRender::Init(HWND hWnd,
 	fieldOfView = (float)D3DX_PI / 4.0f;
 	screenAspect = (float)screenWidth / (float)screenHeight;
 
-	OnPostCreateDevice();
+	if (!OnPostCreateDevice()) {
+		return false;
+	}
 
 #if X_DEBUG
 	if (SUCCEEDED(m_device->QueryInterface(__uuidof(ID3D11Debug), (void**)&m_d3dDebug)))
@@ -463,11 +465,13 @@ void DX11XRender::ShutDown()
 
 }
 
-void DX11XRender::OnPostCreateDevice(void)
+bool DX11XRender::OnPostCreateDevice(void)
 {
 	shader::XHWShader_Dx10::Init();
 
-	m_ShaderMan.Init();
+	if (!m_ShaderMan.Init()) {
+		return false;
+	}
 
 	FX_Init();
 
@@ -478,6 +482,7 @@ void DX11XRender::OnPostCreateDevice(void)
 
 	m_AuxGeo_ = X_NEW(XRenderAuxImp, g_rendererArena, "AuxGeo")(*this);
 	m_AuxGeo_->RestoreDeviceObjects();
+	return true;
 }
 
 void DX11XRender::InitResources(void)
@@ -785,6 +790,7 @@ bool DX11XRender::Create2DTexture(texture::XTextureFile* img_data, texture::XDev
 	ID3D11Texture2D* pTexture2D;
 
 	core::zero_object(Desc);
+	core::zero_object(SubResource);
 
 	uint32 nBindFlags = D3D11_BIND_SHADER_RESOURCE;
 	uint32 nMiscFlags = 0;
@@ -1014,10 +1020,19 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 			elem_uv3232.AlignedByteOffset = 12;
 			layout.append(elem_uv3232);
 
-			elem_col8888.AlignedByteOffset = 20;
+			// two of them
+			elem_uv3232.AlignedByteOffset = 20;
+			elem_uv3232.SemanticIndex = 1;
+			layout.append(elem_uv3232);
+			elem_uv3232.SemanticIndex = 0;
+
+			// byte offset is zero since diffrent stream.
+			elem_col8888.AlignedByteOffset = 0;
+			elem_col8888.InputSlot = 1;
 			layout.append(elem_col8888);
 
-			elem_nor323232.AlignedByteOffset = 24;
+			elem_nor323232.AlignedByteOffset = 0;
+			elem_col8888.InputSlot = 2;
 			layout.append(elem_nor323232); 
 		}
 	
@@ -1115,6 +1130,13 @@ HRESULT DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFm
 				pBlob = pVs->getshaderBlob();
 				break;
 			}
+		}
+
+		if(!pBlob)
+		{
+			X_ERROR("Render", "Failed to set input layout shader does not support input layout: %s",
+				shader::InputLayoutFormat::ToString(requiredIlFmt));
+			return (HRESULT)-1;
 		}
 
 #else

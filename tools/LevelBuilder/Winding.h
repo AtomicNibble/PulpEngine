@@ -3,7 +3,6 @@
 #ifndef X_WINDING_H_
 #define X_WINDING_H_
 
-static const float ON_EPSILON = 0.1f;
 
 /*
 #define	SIDE_FRONT					0
@@ -12,10 +11,18 @@ static const float ON_EPSILON = 0.1f;
 #define	SIDE_CROSS					3
 */
 
-#define _alloca16( x )				((void *)((((int)_alloca( (x)+15 )) + 15) & ~15))
+// make a type safe tmepalted version?
+template<typename T>
+T* Alloca16(size_t num) 
+{
+	void* pData = _alloca(num + 15);
+	// align.
+	pData = core::pointerUtil::AlignTop(pData,16);
+	return reinterpret_cast<T*>(pData);
+}
+
 
 #define	MAX_POINTS_ON_WINDING	64
-
 #define	EDGE_LENGTH		0.2f
 
 class XWinding
@@ -38,6 +45,7 @@ public:
 	int				GetNumPoints(void) const;
 	void			SetNumPoints(int n);
 	virtual void	Clear(void);
+	void			Print(void) const;
 
 	// huge winding for plane, the points go counter clockwise when facing the front of the plane
 	void			BaseForPlane(const Vec3f &normal, const float dist);
@@ -79,16 +87,7 @@ public:
 		return 0.5f * cross.length();
 	}
 
-	XWinding* ReverseWinding()
-	{
-		XWinding* c = new XWinding;
-		c->EnsureAlloced(numPoints);
-
-		for (int i = 0; i < numPoints; i++)
-			c->p[i] = p[numPoints - 1 - i];
-
-		return c;
-	}
+	XWinding* ReverseWinding(void);
 
 protected:
 	int				numPoints;				// number of points
@@ -100,158 +99,6 @@ protected:
 };
 
 
-X_INLINE XWinding::XWinding(void)
-{
-	numPoints = allocedSize = 0;
-	p = nullptr;
-}
-
-X_INLINE XWinding::XWinding(const int n)
-{
-	numPoints = allocedSize = 0;
-	p = nullptr;
-	EnsureAlloced(n);
-}
-
-X_INLINE XWinding::XWinding(const Vec3f *verts, const int n)
-{
-	int i;
-
-	numPoints = allocedSize = 0;
-	p = nullptr;
-	if (!EnsureAlloced(n)) {
-		numPoints = 0;
-		return;
-	}
-	for (i = 0; i < n; i++)
-	{
-		p[i].asVec3() = verts[i];
-		p[i].s = p[i].t = 0.0f;
-	}
-	numPoints = n;
-}
-
-X_INLINE XWinding::XWinding(const Vec3f &normal, const float dist)
-{
-	numPoints = allocedSize = 0;
-	p = nullptr;
-	BaseForPlane(normal, dist);
-}
-
-X_INLINE XWinding::XWinding(const Planef &plane)
-{
-	numPoints = allocedSize = 0;
-	p = nullptr;
-	BaseForPlane(plane);
-}
-
-X_INLINE XWinding::XWinding(const XWinding &winding)
-{
-	int i;
-	if (!EnsureAlloced(winding.GetNumPoints())) {
-		numPoints = 0;
-		return;
-	}
-	for (i = 0; i < winding.GetNumPoints(); i++) {
-		p[i] = winding[i];
-	}
-	numPoints = winding.GetNumPoints();
-}
-
-X_INLINE XWinding::~XWinding(void)
-{
-	delete[] p;
-	p = nullptr;
-}
-
-// -------------------------------------
-
-X_INLINE XWinding& XWinding::operator=(const XWinding &winding)
-{
-	int i;
-
-	if (!EnsureAlloced(winding.numPoints)) {
-		numPoints = 0;
-		return *this;
-	}
-	for (i = 0; i < winding.numPoints; i++) {
-		p[i] = winding.p[i];
-	}
-	numPoints = winding.numPoints;
-	return *this;
-}
-
-X_INLINE const Vec5f& XWinding::operator[](const int index) const
-{
-	return p[index];
-}
-
-X_INLINE Vec5f& XWinding::operator[](const int index)
-{
-	return p[index];
-}
-
-// number of points on winding
-X_INLINE int XWinding::GetNumPoints(void) const
-{
-	return numPoints;
-}
-
-X_INLINE void XWinding::SetNumPoints(int n)
-{
-	if (!EnsureAlloced(n, true)) {
-		return;
-	}
-	numPoints = n;
-}
-
-X_INLINE void XWinding::Clear(void)
-{
-	numPoints = 0;
-	delete[] p;
-	p = nullptr;
-}
-
-
-X_INLINE bool XWinding::IsTiny(void) const
-{
-	int		i;
-	float	len;
-	Vec3f	delta;
-	int		edges;
-
-	edges = 0;
-	for (i = 0; i < numPoints; i++) {
-		delta = p[(i + 1) % numPoints].xyz() - p[i].xyz();
-		len = delta.length();
-		if (len > EDGE_LENGTH) {
-			if (++edges == 3) {
-				return false;
-			}
-		}
-	}
-	return true;
-}
-
-/*
-=============
-idWinding::IsHuge
-=============
-*/
-X_INLINE bool XWinding::IsHuge(void) const
-{
-	int i, j;
-
-	for (i = 0; i < numPoints; i++) {
-		for (j = 0; j < 3; j++) {
-			if (p[i][j] <= bsp::MIN_WORLD_COORD || p[i][j] >= bsp::MAX_WORLD_COORD) {
-				return true;
-			}
-		}
-	}
-	return false;
-}
-
-
+#include "Winding.inl"
 
 #endif // X_WINDING_H_

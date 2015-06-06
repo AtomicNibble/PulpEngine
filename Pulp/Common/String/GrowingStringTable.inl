@@ -77,6 +77,9 @@ IdType GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::addSt
 	// get header that is aligned after the header.
 	Header_t* pHeader = getCurrentAlignedHeader();
 
+	// set magic.
+	pHeader->magic = Header_t::HEADER_MAGIC;
+
 	// set length
 	pHeader->Length = safe_static_cast<uint8_t, size_t>(Len);
 
@@ -208,12 +211,20 @@ bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::SSave(X
 {
 	X_ASSERT_NOT_NULL(pFile);
 
-	pFile->writeObj(sizeof(IdType));
-	pFile->writeObj(BlockSize);
+	uint32_t typeSize = safe_static_cast<uint32_t, size_t>(sizeof(IdType));
+	uint32_t BlockSize32 = safe_static_cast<uint32_t, size_t>(BlockSize);
+	uint32_t NumStrings32 = safe_static_cast<uint32_t, size_t>(NumStrings_);
+	uint32_t WasteSize32 = safe_static_cast<uint32_t, size_t>(WasteSize_);
+
+	pFile->writeObj(typeSize);
+	pFile->writeObj(BlockSize32);
+
+	// these are size of the type.
 	pFile->writeObj(CurrentBlock_);
 	pFile->writeObj(currentBlockSpace_);
-	pFile->writeObj(NumStrings_);
-	pFile->writeObj(WasteSize_);
+
+	pFile->writeObj(NumStrings32);
+	pFile->writeObj(WasteSize32);
 	
 	uint32_t numBytes = BlockSize * CurrentBlock_;
 	return pFile->write(buffer_.ptr(), numBytes) == numBytes;
@@ -226,14 +237,14 @@ bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::SLoad(X
 	free();
 
 	IdType CurrentBlock, currentBlockSpace;
-	size_t TypeSize, blockSizeCheck, NumStrings;
+	uint32_t TypeSize, blockSizeCheck, NumStrings, WasteSize;
 	size_t read = 0;
 
 
 	read += pFile->readObj(TypeSize);
 	read += pFile->readObj(blockSizeCheck);
 
-	if (read != (sizeof(size_t)* 2))
+	if (read != (sizeof(uint32_t)* 2))
 	{
 		X_ERROR("GrowingStringTable", "failed to read info from file");
 		return false;
@@ -258,9 +269,9 @@ bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::SLoad(X
 	read = pFile->readObj(CurrentBlock);
 	read += pFile->readObj(currentBlockSpace);
 	read += pFile->readObj(NumStrings);
-	read += pFile->readObj(WasteSize_); // ok to read into member.
+	read += pFile->readObj(WasteSize); // ok to read into member.
 
-	if (read != ((sizeof(IdType)* 2) + (sizeof(size_t) * 2)))
+	if (read != ((sizeof(IdType)* 2) + (sizeof(uint32_t) * 2)))
 	{
 		X_ERROR("GrowingStringTable", "failed to read info from file");
 		return false;
@@ -274,6 +285,7 @@ bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::SLoad(X
 
 	CurrentBlock_ = CurrentBlock;
 	NumStrings_ = NumStrings;
+	WasteSize_ = WasteSize;
 
 	uint32_t numBytes = BlockSize * CurrentBlock_;
 	return pFile->read(buffer_.ptr(), numBytes) == numBytes;

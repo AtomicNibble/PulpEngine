@@ -254,7 +254,7 @@ struct SubMeshHeader
 	uint32_t startIndex; // 8
 
 	// needs to be void, since we have diffrent vertex formats.
-	core::Pointer64<void>		verts; // 8
+	core::Pointer64<void>		streams[VertexStream::ENUM_COUNT]; // 8
 	core::Pointer64<Index>		indexes; // 8
 
 
@@ -272,7 +272,7 @@ struct SubMeshHeader
 	AABB boundingBox;
 	Sphere boundingSphere;
 
-	uint32_t _pad[8]; // pad to 128
+	uint32_t _pad[1]; // pad to 128
 	
 //	X_NO_COPY(SubMeshHeader);
 //	X_NO_ASSIGN(SubMeshHeader);

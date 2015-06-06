@@ -203,8 +203,16 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		env_.pConsole->ShutDown();
 	}
 
+	// register filesystemvars.
+	env_.pFileSys->CreateVars();
+
+	// regeister window vars.
+	core::xWindow::RegisterVars();
+
 	// Load the default config.
-	env_.pConsole->LoadConfig("default.cfg");
+	if (!env_.pConsole->LoadConfig("default.cfg")) {
+		return false;
+	}
 
 	// #------------------------- CPU Info ----------------------
 	pCpuInfo_ = X_NEW( core::CpuInfo, g_coreArena, "CpuInfo");
@@ -311,7 +319,10 @@ bool XCore::InitFileSys(const SCoreInitParams &initParams)
 	env_.pFileSys = X_NEW_ALIGNED( core::xFileSys, g_coreArena, "FileSys", 8);
 
 	if (env_.pFileSys) {
-		env_.pFileSys->Init();
+		if (!env_.pFileSys->Init()) {
+			X_ERROR("Core", "Failed to init filesystem");
+			return false;
+		}
 	}
 
 	return env_.pFileSys != nullptr;
@@ -461,7 +472,10 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 		uint32_t width = pWindow_->GetClientWidth();
 		uint32_t height = pWindow_->GetClientHeight();
 
-		env_.pRender->Init(hWnd, width, height);
+		if (!env_.pRender->Init(hWnd, width, height)) {
+			X_ERROR("Core", "Failed to init render system");
+			return false;
+		}
 	}
 
 	return true;
@@ -474,8 +488,10 @@ bool XCore::Init3DEngine(const SCoreInitParams& initParams)
 		return false;
 
 	if (env_.p3DEngine) {
-
-		env_.p3DEngine->Init();
+		if (!env_.p3DEngine->Init()) {
+			X_ERROR("Core", "Failed to init 3DENninge");
+			return false;
+		}
 	}
 
 	return env_.p3DEngine != nullptr;
@@ -487,7 +503,10 @@ bool XCore::InitGameDll(const SCoreInitParams& initParams)
 		return false;
 
 	if (env_.pGame) {
-		env_.pGame->Init();
+		if (!env_.pGame->Init()) {
+			X_ERROR("Core", "Failed to init Game");
+			return false;
+		}
 	}
 
 	return env_.pGame != nullptr;

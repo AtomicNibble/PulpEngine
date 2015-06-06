@@ -76,8 +76,9 @@ public:
 	xFileSys();
 	~xFileSys() X_FINAL;
 
-	void Init() X_FINAL;
-	void ShutDown() X_FINAL;
+	bool Init(void) X_FINAL;
+	void ShutDown(void) X_FINAL;
+	void CreateVars(void) X_FINAL;
 
 	// Open / Close
 	XFile* openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;
@@ -92,7 +93,7 @@ public:
 	void closeFileMem(XFileMem* file) X_FINAL;
 
 	// folders
-	void setGameDir(pathType path) X_FINAL;
+	bool setGameDir(pathType path) X_FINAL;
 	void addModDir(pathType path) X_FINAL;
 
 	// Find util
@@ -127,7 +128,7 @@ private:
 	const char* createOSPath(directory_s* dir, pathType path, Path& buffer) const;
 	bool isAbsolute(pathType path) const;
 
-
+	bool isDebug(void) const;
 
 private:
 #if X_DEBUG == 1

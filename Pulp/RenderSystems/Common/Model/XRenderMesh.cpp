@@ -5,7 +5,18 @@
 
 #include "DeviceManager\VidMemManager.h"
 
+#include "../Textures/XTexture.h"
+
 X_NAMESPACE_BEGIN(model)
+
+
+XMeshDevBuf::XMeshDevBuf() : BufId(render::VidMemManager::null_id), stride(0) {}
+
+
+bool XMeshDevBuf::isValid(void) const 
+{
+	return BufId != render::VidMemManager::null_id;
+}
 
 
 XRenderMesh::XRenderMesh()
@@ -42,19 +53,52 @@ bool XRenderMesh::canRender(void)
 		vertexStreams_[VertexStream::VERT].BufId != VidMemManager::null_id;
 }
 
+// DX11XRender::vertexFormatStride[vertexFmt_],
+
 bool XRenderMesh::uploadToGpu(void)
 {
 	X_ASSERT_NOT_NULL(pMesh_);
 	X_ASSERT((int32)vertexFmt_ != -1, "vertex format has not been set")(vertexFmt_);
 	using namespace render;
 
-	uint32_t ibSize, vbSize;
+	uint32_t ibSize = pMesh_->numIndexes * sizeof(model::Index);
+	uint32_t numVerts = pMesh_->numVerts;
 
-	ibSize = pMesh_->numIndexes * sizeof(model::Index);
-	vbSize = pMesh_->numVerts * DX11XRender::vertexFormatStride[vertexFmt_];
+	uint32_t baseVertStride = DX11XRender::vertexSteamStride[VertexStream::VERT][vertexFmt_];
+	uint32_t ColorStride = DX11XRender::vertexSteamStride[VertexStream::COLOR][vertexFmt_];
+	uint32_t normalStride = DX11XRender::vertexSteamStride[VertexStream::NORMALS][vertexFmt_];
+	uint32_t tanBiStride = DX11XRender::vertexSteamStride[VertexStream::TANGENT_BI][vertexFmt_];
 
 	indexStream_.BufId = g_Dx11D3D.VidMemMng()->CreateIB(ibSize, pMesh_->indexes);
-	vertexStreams_[VertexStream::VERT].BufId = g_Dx11D3D.VidMemMng()->CreateVB(vbSize, pMesh_->streams[VertexStream::VERT]);
+
+	if (baseVertStride > 0)
+	{
+		vertexStreams_[VertexStream::VERT].BufId = g_Dx11D3D.VidMemMng()->CreateVB(baseVertStride * numVerts, 
+			pMesh_->streams[VertexStream::VERT]);
+
+		vertexStreams_[VertexStream::VERT].stride = baseVertStride;
+	}
+	if (ColorStride > 0)
+	{
+		vertexStreams_[VertexStream::COLOR].BufId = g_Dx11D3D.VidMemMng()->CreateVB(ColorStride * numVerts,
+			pMesh_->streams[VertexStream::COLOR]);
+		
+		vertexStreams_[VertexStream::COLOR].stride = ColorStride;
+	}
+	if (normalStride > 0)
+	{
+		vertexStreams_[VertexStream::NORMALS].BufId = g_Dx11D3D.VidMemMng()->CreateVB(normalStride * numVerts,
+			pMesh_->streams[VertexStream::NORMALS]);
+
+		vertexStreams_[VertexStream::NORMALS].stride = normalStride;
+	}
+	if (tanBiStride > 0)
+	{
+		vertexStreams_[VertexStream::TANGENT_BI].BufId = g_Dx11D3D.VidMemMng()->CreateVB(tanBiStride * numVerts,
+			pMesh_->streams[VertexStream::TANGENT_BI]);
+
+		vertexStreams_[VertexStream::TANGENT_BI].stride = tanBiStride;
+	}
 
 	return canRender();
 }
@@ -67,22 +111,56 @@ bool XRenderMesh::render(void)
 	if (!canRender())
 		return false;
 
-	IRenderAux* pAux = g_Dx11D3D.GetIRenderAuxGeo();
-
-	pAux->setRenderFlags(render::AuxGeom_Defaults::Def3DRenderflags);
-
-	
 	g_Dx11D3D.SetWorldShader();
 
 	g_Dx11D3D.FX_SetVertexDeclaration(vertexFmt_);
 	g_Dx11D3D.FX_SetIStream(indexStream_.BufId);
 
+
+	XMeshDevBuf& verts = vertexStreams_[VertexStream::VERT];
+	XMeshDevBuf& color = vertexStreams_[VertexStream::COLOR];
+	XMeshDevBuf& normals = vertexStreams_[VertexStream::NORMALS];
+	XMeshDevBuf& tanBi = vertexStreams_[VertexStream::TANGENT_BI];
+
+	if (!verts.isValid()){
+		return false;
+	}
+
 	g_Dx11D3D.FX_SetVStream(
-		vertexStreams_[VertexStream::VERT].BufId,
+		verts.BufId,
 		VertexStream::VERT, 
-		DX11XRender::vertexFormatStride[vertexFmt_],
+		verts.stride,
 		0
 	);
+
+	if (color.isValid())
+	{
+		g_Dx11D3D.FX_SetVStream(
+			color.BufId,
+			VertexStream::COLOR,
+			color.stride,
+			0
+		);
+	}
+	if (normals.isValid())
+	{
+		g_Dx11D3D.FX_SetVStream(
+			normals.BufId,
+			VertexStream::NORMALS,
+			normals.stride,
+			0
+		);
+	}
+	if (tanBi.isValid())
+	{
+		g_Dx11D3D.FX_SetVStream(
+			tanBi.BufId,
+			VertexStream::TANGENT_BI,
+			tanBi.stride,
+			0
+		);
+	}
+
 
 	uint32_t i, num;
 	num = pMesh_->numSubMeshes;
@@ -91,20 +169,32 @@ bool XRenderMesh::render(void)
 	{
 		const model::SubMeshHeader* mesh = pMesh_->subMeshHeads[i];
 
-		if (mesh->numVerts == 69)
+		engine::IMaterial* pMat = mesh->pMat;
+		shader::XShaderItem& shaderItem = pMat->getShaderItem();
+
+		engine::MaterialFlags flags = pMat->getFlags();
+		if (flags.IsSet(engine::MaterialFlag::NODRAW))
 		{
-	//		g_Dx11D3D.SetSkyboxShader();
+			continue;
 		}
 
+		if (shaderItem.pResources_)
+		{
+			shader::XTextureResource* pTextRes = shaderItem.pResources_->getTexture(shader::ShaderTextureIdx::DIFFUSE);
+			if (pTextRes)
+			{
+				texture::TexID id = pTextRes->pITex->getTexID();
+				texture::XTexture::applyFromId(0, id, 0);
+			}
+		}
 
 		g_Dx11D3D.FX_DrawIndexPrimitive(
 			PrimitiveType::TriangleList,
 			mesh->numIndexes,
 			mesh->startIndex,
 			mesh->startVertex
-			);
+		);
 	}
-
 
 	return true;
 }

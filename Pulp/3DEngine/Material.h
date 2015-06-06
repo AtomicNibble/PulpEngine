@@ -11,6 +11,15 @@
 
 #include "EngineBase.h"
 
+
+X_NAMESPACE_DECLARE(core,
+	namespace xml {
+		namespace rapidxml {
+			template<class Ch> class xml_node;
+		}
+	}
+)
+
 X_NAMESPACE_BEGIN(engine)
 
 class XMaterialManager;
@@ -48,12 +57,25 @@ public:
 	virtual MaterialCullType::Enum getCullType() const X_OVERRIDE;
 	virtual void setCullType(MaterialCullType::Enum type) X_OVERRIDE;
 
+	virtual MaterialTexRepeat::Enum getTexRepeat(void) const X_OVERRIDE;
+	virtual void setTexRepeat(MaterialTexRepeat::Enum texRepeat) X_OVERRIDE;
+
+	virtual MaterialPolygonOffset::Enum getPolyOffsetType(void) const X_OVERRIDE;
+	virtual void setPolyOffsetType(MaterialPolygonOffset::Enum polyOffsetType) X_OVERRIDE;
+
+	virtual MaterialFilterType::Enum getFilterType(void) const X_OVERRIDE;
+	virtual void setFilterType(MaterialFilterType::Enum filterType) X_OVERRIDE;
+
+	virtual MaterialType::Enum getType(void) const X_OVERRIDE;
+	virtual void setType(MaterialType::Enum type) X_OVERRIDE;
+
 	virtual void setShaderItem(shader::XShaderItem& item) X_OVERRIDE;
 	virtual shader::XShaderItem& getShaderItem(void) X_OVERRIDE{ return shaderItem_; }
 
 	virtual bool isDefault() const X_OVERRIDE;
 
 
+	static bool ProcessMaterialXML(XMaterial* pMaterial, core::xml::rapidxml::xml_node<char>* node);
 
 protected:
 	friend class XMaterialManager;
@@ -65,6 +87,11 @@ protected:
 	MaterialFlags			flags_;
 	MaterialSurType::Enum	MatSurfaceType_;
 	MaterialCullType::Enum	CullType_;
+
+	MaterialTexRepeat::Enum texRepeat_;
+	MaterialPolygonOffset::Enum polyOffsetType_;
+	MaterialFilterType::Enum filterType_;
+	MaterialType::Enum		MatType_;
 
 	shader::XShaderItem     shaderItem_;
 

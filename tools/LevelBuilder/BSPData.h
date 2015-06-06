@@ -3,7 +3,7 @@
 #ifndef X_BSP_DATA_H_
 #define X_BSP_DATA_H_
 
-#include <IBsp.h>
+#include <Ilevel.h>
 
 
 struct BSPData
@@ -15,10 +15,10 @@ struct BSPData
 	indexes(arena)
 	{}
 
-	core::Array<bsp::Area> areas;
-	core::Array<bsp::Surface> surfaces;
-	core::Array<bsp::Vertex> verts;
-	core::Array<bsp::Index> indexes;
+	core::Array<level::Area> areas;
+	core::Array<level::Surface> surfaces;
+	core::Array<level::Vertex> verts;
+	core::Array<level::Index> indexes;
 };
 
 #endif // !X_BSP_DATA_H_

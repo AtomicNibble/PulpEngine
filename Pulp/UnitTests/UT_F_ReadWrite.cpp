@@ -42,7 +42,7 @@ TEST(FileSys, Write)
 	ASSERT_TRUE(NULL != gEnv->pFileSys);
 	IFileSys* pFileSys = gEnv->pFileSys;
 
-	XFile* file = pFileSys->openFile(X_ENGINE_NAME"_filesys_ut_data.dat", 
+	XFile* file = pFileSys->openFile(X_ENGINE_NAME"_filesys_ut_data.ut_dat", 
 		fileMode::WRITE | fileMode::RECREATE);
 
 	ASSERT_TRUE(NULL != file);
@@ -64,7 +64,7 @@ TEST(FileSys, Append)
 	ASSERT_TRUE(NULL != gEnv->pFileSys);
 	IFileSys* pFileSys = gEnv->pFileSys;
 
-	XFile* file = pFileSys->openFile(X_ENGINE_NAME"_filesys_ut_data.dat",
+	XFile* file = pFileSys->openFile(X_ENGINE_NAME"_filesys_ut_data.ut_dat",
 		fileMode::WRITE | fileMode::APPEND);
 
 	ASSERT_TRUE(NULL != file);
@@ -86,7 +86,7 @@ TEST(FileSys, Read)
 	ASSERT_TRUE(NULL != gEnv->pFileSys);
 	IFileSys* pFileSys = gEnv->pFileSys;
 
-	XFile* file = pFileSys->openFile(X_ENGINE_NAME"_filesys_ut_data.dat",
+	XFile* file = pFileSys->openFile(X_ENGINE_NAME"_filesys_ut_data.ut_dat",
 		fileMode::READ);
 
 	ASSERT_TRUE(NULL != file);
@@ -111,20 +111,36 @@ TEST(FileSys, Async)
 	ASSERT_TRUE(NULL != gEnv->pFileSys);
 	IFileSys* pFileSys = gEnv->pFileSys;
 
-	XFileAsync* file = pFileSys->openFileAsync(X_ENGINE_NAME"_filesys_ut_async_data.dat",
-		fileMode::WRITE | fileMode::RANDOM_ACCESS | fileMode::RECREATE);
+	XFileAsync* file = pFileSys->openFileAsync(X_ENGINE_NAME"_filesys_ut_async_data.ut_dat",
+		fileMode::WRITE | fileMode::READ | fileMode::RANDOM_ACCESS | fileMode::RECREATE);
 
 	ASSERT_TRUE(NULL != file);
 
-	char Buf[256];
+	char Buf[512], Buf2[512];
 	memset(Buf, 1, 128);
 	memset(&Buf[128], 0xff, 128);
+	memset(&Buf[256], 0xa, 128);
+	memset(&Buf[256 + 128], 0x78, 128);
 
-	core::XFileAsyncOperation write1 = file->writeAsync(Buf, sizeof(Buf), 0);
-	core::XFileAsyncOperation write2 = file->writeAsync(Buf, sizeof(Buf), 256);
+	core::zero_object(Buf2);
+
+	file->setSize(512);
+
+	core::XFileAsyncOperation write1 = file->writeAsync(Buf, 256, 0);
+	core::XFileAsyncOperation write2 = file->writeAsync(&Buf[256], 256, 256);
 
 	write1.waitUntilFinished();
 	write2.waitUntilFinished();
+
+	core::XFileAsyncOperation read1 = file->readAsync(Buf2, 256, 0);
+	core::XFileAsyncOperation read2 = file->readAsync(&Buf2[256], 256, 256);
+
+	read2.waitUntilFinished();
+	read1.waitUntilFinished();
+
+	// check if same.
+	EXPECT_EQ(0, memcmp(Buf, Buf2, 256));
+	EXPECT_EQ(0, memcmp(&Buf[256], &Buf2[256], 256));
 
 	pFileSys->closeFileAsync(file);
 }
@@ -162,7 +178,7 @@ TEST(FileSys, FileUtil)
 	ASSERT_TRUE(NULL != gEnv->pFileSys);
 	IFileSys* pFileSys = gEnv->pFileSys;
 
-	EXPECT_TRUE(pFileSys->fileExists(X_ENGINE_NAME"_filesys_ut_data.dat"));
-	EXPECT_TRUE(pFileSys->deleteFile(X_ENGINE_NAME"_filesys_ut_data.dat"));
-	EXPECT_TRUE(pFileSys->deleteFile(X_ENGINE_NAME"_filesys_ut_async_data.dat"));
+	EXPECT_TRUE(pFileSys->fileExists(X_ENGINE_NAME"_filesys_ut_data.ut_dat"));
+	EXPECT_TRUE(pFileSys->deleteFile(X_ENGINE_NAME"_filesys_ut_data.ut_dat"));
+	EXPECT_TRUE(pFileSys->deleteFile(X_ENGINE_NAME"_filesys_ut_async_data.ut_dat"));
 }

@@ -34,6 +34,8 @@ public:
 	
 	size_t remainingBytes(void) const X_FINAL;
 
+	void setSize(size_t numBytes) X_FINAL;
+
 private:
 
 	OsFileAsync file_;

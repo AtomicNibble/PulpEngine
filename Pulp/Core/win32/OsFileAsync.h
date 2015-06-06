@@ -14,15 +14,19 @@ struct OsFileAsync
 	OsFileAsync(const char* path, IFileSys::fileModeFlags mode);
 	~OsFileAsync(void);
 
-	XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, uint32_t length, uint32_t position);
-	XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, uint32_t length, uint32_t position);
+	XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, uint32_t length, size_t position);
+	XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, uint32_t length, size_t position);
 
 	size_t tell(void) const;
 	size_t remainingBytes(void) const;
+	void setSize(size_t numBytes);
 
 	bool valid(void) const;
 
 	static XFileStats& fileStats(void);
+
+private:
+	void seek(size_t position, IFileSys::SeekMode::Enum origin);
 
 private:
 	IFileSys::fileModeFlags mode_;

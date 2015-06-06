@@ -8,6 +8,7 @@
 
 #include <direct.h>
 #include <io.h>
+#include <IConsole.h>
 
 #include <Shellapi.h>
 
@@ -68,12 +69,12 @@ xFileSys::~xFileSys()
 }
 
 
-void xFileSys::Init()
+bool xFileSys::Init()
 {
 	X_LOG0("FileSys", "Starting Filesys..");
 
 	// TODO: yup.
-	setGameDir("C:\\Users\\Tom\\Documents\\Visual Studio 2013\\Projects\\WinEngine\\code\\game_folder");
+	return setGameDir("C:\\Users\\Tom\\Documents\\Visual Studio 2013\\Projects\\WinEngine\\code\\game_folder");
 }
 
 void xFileSys::ShutDown()
@@ -89,10 +90,15 @@ void xFileSys::ShutDown()
 			X_DELETE(cur->pak, g_coreArena);
 		X_DELETE(cur, g_coreArena);
 	}
-
-
 }
 
+void xFileSys::CreateVars(void)
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pConsole);
+
+	ADD_CVAR_REF("filesys_debug", vars_.debug, 0, 0, 1, core::VarFlag::SYSTEM, "Filesystem debug. 0=off 1=on");
+}
 
 // --------------------- Open / Close ---------------------
 
@@ -111,6 +117,10 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 		if (FindData.findnext(&findinfo))
 		{
 			FindData.getOSPath(real_path, &findinfo);
+
+			if (isDebug()) {
+				X_LOG0("FileSys", "openFile: \"%s\"", real_path.c_str());
+			}
 
 			// TODO: pool allocations.
 			file = X_NEW(XDiskFile, &filePoolArena_, "DiskFile")(real_path.c_str(), mode);
@@ -135,6 +145,10 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 		else
 		{
 			X_ASSERT_NOT_IMPLEMENTED();
+		}
+
+		if (isDebug()) {
+			X_LOG0("FileSys", "openFile: \"%s\"", real_path.c_str());
 		}
 
 		file = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path.c_str(), mode);
@@ -167,7 +181,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 	XDiskFileAsync* pFile = nullptr;
 	core::Path real_path;
 
-	if (mode.IsSet(fileMode::READ))
+	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE))
 	{
 		_finddatai64_t findinfo;
 
@@ -245,7 +259,7 @@ XFileMem* xFileSys::openFileMem(pathType path, fileModeFlags mode)
 
 				if (file.read(pBuf, size) == size)
 				{
-					pFile = X_NEW(XFileMem, &filePoolArena_, "Memile")(pBuf, pBuf + size, &memFileArena_);
+					pFile = X_NEW(XFileMem, &filePoolArena_, "MemFile")(pBuf, pBuf + size, &memFileArena_);
 
 				}
 				else
@@ -282,9 +296,15 @@ void xFileSys::closeFileMem(XFileMem* file)
 
 // --------------------- folders ---------------------
 
-void xFileSys::setGameDir(pathType path)
+bool xFileSys::setGameDir(pathType path)
 {
 	X_ASSERT(gameDir_ == nullptr, "can only set one game directoy")(path,gameDir_);
+
+	// check if the irectory is even valid.
+	if (!this->directoryExists(path)) {
+		X_ERROR("FileSys", "Faled to set game drectory the directory does not exsists: \"%s\"", path);
+		return false;
+	}
 
 	addModDir(path);
 	X_ASSERT_NOT_NULL(searchPaths_);
@@ -293,10 +313,15 @@ void xFileSys::setGameDir(pathType path)
 
 	// add hotreload dir.
 	gEnv->pDirWatcher->addDirectory(path);
+	return true;
 }
 
 void xFileSys::addModDir(pathType path)
 {
+	if (isDebug()) {
+		X_LOG0("FileSys", "addModDir: \"%s\"", path);
+	}
+
 	// at it to virtual file system.
 	search_s* search = X_NEW( search_s, g_coreArena, "FileSysSearch");
 	search->dir = X_NEW( directory_s, g_coreArena, "FileSysDir");
@@ -374,6 +399,10 @@ bool xFileSys::deleteFile(pathType path, VirtualDirectory::Enum location) const
 	Path buf;
 	createOSPath(gameDir_, path, buf);
 
+	if (isDebug()) {
+		X_LOG0("FileSys", "deleteFile: \"%s\"", buf.c_str());
+	}
+
 	return ::DeleteFile(buf.c_str()) == TRUE;
 }
 
@@ -383,6 +412,10 @@ bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 	core::zero_object(temp); // ensure 2 null bytes at end.
 
 	createOSPath(gameDir_, path, temp);
+
+	if (isDebug()) {
+		X_LOG0("FileSys", "deleteDirectory: \"%s\"", temp.c_str());
+	}
 
 	SHFILEOPSTRUCT file_op = {
 		NULL,
@@ -413,10 +446,14 @@ bool xFileSys::createDirectory(pathType path, VirtualDirectory::Enum location) c
 	Path buf;
 	createOSPath(gameDir_, path, buf);
 
+	if (isDebug()) {
+		X_LOG0("FileSys", "createDirectory: \"%s\"", buf.c_str());
+	}
+
 	if (!::CreateDirectoryA(buf.c_str(), NULL) && lastError::Get() != ERROR_ALREADY_EXISTS)
 	{
 		lastError::Description Dsc;
-		X_ERROR("xDir", "Failed to create directory. Error: %s", lastError::ToString(Dsc));
+		X_ERROR("FileSys", "Failed to create directory. Error: %s", lastError::ToString(Dsc));
 		return false;
 	}
 
@@ -432,6 +469,9 @@ bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum locati
 
 	createOSPath(gameDir_, _path, buf);
 
+	if (isDebug()) {
+		X_LOG0("FileSys", "CreateDirectoryTree: \"%s\"", buf.c_str());
+	}
 
 	// c:\\dir\\goat\\win\\bin
 	Path Path("");
@@ -481,13 +521,17 @@ bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 	Path buf;
 	createOSPath(gameDir_, path, buf);
 
+	if (isDebug()) {
+		X_LOG0("FileSys", "fileExists: \"%s\"", buf.c_str());
+	}
+
 	DWORD dwAttrib = GetFileAttributes(buf.c_str());
 
 	if (dwAttrib != INVALID_FILE_ATTRIBUTES) // make sure we did not fail for some shit, like permissions
 	{
 		if (dwAttrib & FILE_ATTRIBUTE_DIRECTORY) // herp derp.
 		{
-			X_ERROR("Dir", "FileExsits check was ran on a directory");
+			X_ERROR("FileSys", "FileExsits check was ran on a directory");
 			return false;
 		}
 
@@ -497,13 +541,13 @@ bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 	// This means we checked for a file in a directory that don't exsists.
 	if (lastError::Get() == ERROR_PATH_NOT_FOUND)
 	{
-		X_LOG2("Dir", "FileExsits failed, the target directory does not exsist: \"%s\"", 
+		X_LOG2("FileSys", "FileExsits failed, the target directory does not exsist: \"%s\"", 
 			buf.c_str());
 	}
 	else if (lastError::Get() != ERROR_FILE_NOT_FOUND)
 	{
 		lastError::Description Dsc;
-		X_ERROR("Dir", "FileExsits failed. Error: %s", lastError::ToString(Dsc));
+		X_ERROR("FileSys", "FileExsits failed. Error: %s", lastError::ToString(Dsc));
 	}
 
 	return false;
@@ -512,6 +556,10 @@ bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
+
+	if (isDebug()) {
+		X_LOG0("FileSys", "directoryExists: \"%s\"", path);
+	}
 
 	DWORD dwAttrib = GetFileAttributes(path);
 
@@ -523,14 +571,14 @@ bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) c
 			return true;
 		}
 
-		X_ERROR("Dir", "DirectoryExists check was ran on a File: \"%s\"", path);
+		X_ERROR("FileSys", "DirectoryExists check was ran on a File: \"%s\"", path);
 		return false; 
 	}
 
-	if (lastError::Get() != INVALID_FILE_ATTRIBUTES)
+	if (lastError::Get() != ERROR_PATH_NOT_FOUND && lastError::Get() != ERROR_FILE_NOT_FOUND)
 	{
 		lastError::Description Dsc;
-		X_ERROR("Dir", "DirectoryExists failed. Error: %s", lastError::ToString(Dsc));
+		X_ERROR("FileSys", "DirectoryExists failed. Error: %s", lastError::ToString(Dsc));
 	}
 
 	return false;
@@ -539,6 +587,10 @@ bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) c
 bool xFileSys::isDirectory(pathType path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
+
+	if (isDebug()) {
+		X_LOG0("FileSys", "isDirectory: \"%s\"", path);
+	} 
 
 	DWORD dwAttrib = GetFileAttributes(path);
 
@@ -552,7 +604,7 @@ bool xFileSys::isDirectory(pathType path, VirtualDirectory::Enum location) const
 	if (lastError::Get() != INVALID_FILE_ATTRIBUTES)
 	{
 		lastError::Description Dsc;
-		X_ERROR("Dir", "isDirectory failed. Error: %s", lastError::ToString(Dsc));
+		X_ERROR("FileSys", "isDirectory failed. Error: %s", lastError::ToString(Dsc));
 	}
 
 	return false;
@@ -587,6 +639,11 @@ bool xFileSys::isAbsolute(pathType path) const
 	return	path[0] == NATIVE_SLASH ||
 			path[0] == NON_NATIVE_SLASH ||
 			path[1] == ':';
+}
+
+bool xFileSys::isDebug(void) const
+{
+	return vars_.debug != 0;
 }
 
 // ----------------------- stats ---------------------------

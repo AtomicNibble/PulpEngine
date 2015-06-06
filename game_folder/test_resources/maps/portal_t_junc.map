@@ -1,0 +1,88 @@
+iwmap 4
+"000_Global" flags  active
+"The Map" flags 
+// entity 0
+{
+"classname" "worldspawn"
+// brush 0
+{
+ ( 256 192 -8 ) ( 0 192 -8 ) ( 0 0 -8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+ ( 8 0 0 ) ( 8 192 0 ) ( 264 192 0 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+ ( 0 0 96 ) ( 256 0 96 ) ( 256 0 -8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+ ( 384 -48 96 ) ( 384 144 96 ) ( 384 144 -8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 248 256 96 ) ( -8 256 96 ) ( -8 256 -8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+ ( 0 192 96 ) ( 0 0 96 ) ( 0 0 -8 ) atoll_ship_metal_rust1 128 128 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+// brush 1
+{
+ ( -8 8 128 ) ( -8 256 128 ) ( 376 256 128 ) portal 64 64 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( 0 0 0 ) ( 384 0 0 ) ( 384 0 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 384 8 0 ) ( 384 256 0 ) ( 384 256 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+ ( 384 256 0 ) ( 0 256 0 ) ( 0 256 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 0 256 0 ) ( 0 8 0 ) ( 0 8 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+ ( -8 256 120 ) ( -8 8 120 ) ( 376 256 120 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+}
+// brush 2
+{
+ ( 384 256 0 ) ( 0 256 0 ) ( 0 8 0 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( -8 8 128 ) ( -8 256 128 ) ( 376 256 128 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( 0 0 0 ) ( 384 0 0 ) ( 384 0 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 384 8 0 ) ( 384 256 0 ) ( 384 256 -8 ) portal 64 64 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+ ( 384 256 0 ) ( 0 256 0 ) ( 0 256 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 376 256 0 ) ( 376 8 0 ) ( 376 256 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+}
+// brush 3
+{
+ ( 384 256 0 ) ( 0 256 0 ) ( 0 8 0 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( 8 256 128 ) ( 8 0 128 ) ( 0 0 128 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( 0 0 0 ) ( 384 0 0 ) ( 384 0 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 384 256 0 ) ( 0 256 0 ) ( 0 256 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 0 256 0 ) ( 0 8 0 ) ( 0 8 -8 ) portal 64 64 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+ ( 8 0 128 ) ( 8 256 128 ) ( 8 256 0 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+}
+// brush 4
+{
+ ( 200 264 0 ) ( -184 264 0 ) ( -184 16 0 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 -184 -8 0 0
+ ( -192 8 128 ) ( -192 256 128 ) ( 192 256 128 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 -184 -8 0 0
+ ( -176 0 0 ) ( 208 0 0 ) ( 208 0 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 -184 0 0 0
+ ( 200 0 0 ) ( 200 248 0 ) ( 200 248 -8 ) portal 64 64 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+ ( 200 256 0 ) ( -184 256 0 ) ( -184 256 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 -184 0 0 0
+ ( 192 256 0 ) ( 192 8 0 ) ( 192 256 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+}
+// brush 5
+{
+ ( 384 256 0 ) ( 0 256 0 ) ( 0 8 0 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( 0 8 128 ) ( 384 8 128 ) ( 384 0 128 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( 0 0 0 ) ( 384 0 0 ) ( 384 0 -8 ) portal 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 0 256 0 ) ( 0 8 0 ) ( 0 8 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+ ( 384 8 128 ) ( 0 8 128 ) ( 0 8 0 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 200 8 128 ) ( 200 0 128 ) ( 200 0 160 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+// brush 6
+{
+ ( 384 256 0 ) ( 0 256 0 ) ( 0 8 0 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( 0 8 128 ) ( 384 8 128 ) ( 384 0 128 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( 0 0 0 ) ( 384 0 0 ) ( 384 0 -8 ) portal 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 384 8 0 ) ( 384 256 0 ) ( 384 256 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+ ( 440 8 128 ) ( 56 8 128 ) ( 56 8 0 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 200 -8 128 ) ( 200 0 128 ) ( 200 -8 160 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+// brush 7
+{
+ ( 384 256 0 ) ( 0 256 0 ) ( 0 8 0 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( -8 8 128 ) ( -8 256 128 ) ( 376 256 128 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( 384 256 0 ) ( 0 256 0 ) ( 0 256 -8 ) portal 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 0 256 0 ) ( 0 8 0 ) ( 0 8 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+ ( 0 248 0 ) ( 384 248 0 ) ( 0 248 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 200 256 128 ) ( 200 248 128 ) ( 200 256 160 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+// brush 8
+{
+ ( 384 256 0 ) ( 0 256 0 ) ( 0 8 0 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( -8 8 128 ) ( -8 256 128 ) ( 376 256 128 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 -8 0 0
+ ( 384 8 0 ) ( 384 256 0 ) ( 384 256 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 8 0 0 0
+ ( 384 256 0 ) ( 0 256 0 ) ( 0 256 -8 ) portal 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 0 248 0 ) ( 384 248 0 ) ( 0 248 -8 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+ ( 200 240 128 ) ( 200 248 128 ) ( 200 248 160 ) portal_nodraw 64 64 0 0 0 0 lightmap_gray 16384 16384 0 0 0 0
+}
+}

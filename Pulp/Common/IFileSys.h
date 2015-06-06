@@ -38,7 +38,6 @@ struct XFileAsyncOperation
 	inline XFileAsyncOperation(const XOsFileAsyncOperation& operation, void* pBuffer) :
 		operation_(operation),
 		pReadBuffer_(pBuffer),
-	//	pFileData_(nullptr),
 		isReadOperation_(true)
 	{
 
@@ -46,15 +45,14 @@ struct XFileAsyncOperation
 	inline XFileAsyncOperation(const XOsFileAsyncOperation& operation, const void* pBuffer) :
 		operation_(operation),
 		pWriteBuffer_(pBuffer),
-	//	pFileData_(nullptr),
 		isReadOperation_(false)
 	{
 
 	}
 
 
-	inline bool hasFinished(void) const {
-		return operation_.hasFinished();
+	inline bool hasFinished(uint32_t* pNumBytes = nullptr) const {
+		return operation_.hasFinished(pNumBytes);
 	}
 	inline uint32_t waitUntilFinished(void) const {
 		return operation_.waitUntilFinished();
@@ -108,6 +106,7 @@ struct XFileAsync
 	// always returns total bytes.
 	// you can't seek.
 	virtual size_t remainingBytes(void) const X_ABSTRACT;
+	virtual void setSize(size_t numBytes) X_ABSTRACT;
 };
 
 
@@ -175,9 +174,13 @@ struct XFile
 		return write(buf, length);
 	}
 
+	virtual inline bool isEof(void) const {
+		return remainingBytes() == 0;
+	}
 
 	virtual size_t remainingBytes(void) const X_ABSTRACT;
 	virtual size_t tell(void) const X_ABSTRACT;
+	virtual void setSize(size_t numBytes) X_ABSTRACT;
 };
 
 struct XFileMem : public XFile
@@ -190,7 +193,7 @@ struct XFileMem : public XFile
 		X_ASSERT_NOT_NULL(arena);
 		X_ASSERT(end >= begin, "invalid buffer")(begin,end);
 	}
-	~XFileMem() {
+	~XFileMem() X_OVERRIDE {
 		X_DELETE_ARRAY(begin_,arena_);
 	}
 
@@ -228,6 +231,10 @@ struct XFileMem : public XFile
 	virtual size_t tell(void) const X_FINAL{
 		return current_ - begin_;
 	}
+	virtual void setSize(size_t numBytes) X_FINAL{
+		X_UNUSED(numBytes);
+		X_ASSERT_UNREACHABLE();
+	}
 
 	inline char* getBufferStart(void) { return begin_; }
 	inline const char* getBufferStart(void) const { return begin_; }
@@ -243,6 +250,10 @@ struct XFileMem : public XFile
 		return arena_;
 	}
 
+	inline bool isEof(void) const X_FINAL{
+		return remainingBytes() == 0;
+	}
+
 private:
 	core::MemoryArenaBase* arena_;
 	char* begin_;
@@ -250,6 +261,78 @@ private:
 	char* end_;
 };
 
+
+
+struct XFileBuf : public XFile
+{
+	XFileBuf(uint8_t* begin, uint8_t* end) :
+	begin_(begin), current_(begin), end_(end)
+	{
+		X_ASSERT_NOT_NULL(begin);
+		X_ASSERT_NOT_NULL(end);
+		X_ASSERT(end >= begin, "invalid buffer")(begin, end);
+	}
+	~XFileBuf() X_OVERRIDE{
+	}
+
+	virtual uint32_t read(void* pBuf, uint32_t Len) X_FINAL{
+		size_t size = core::Min<size_t>(Len, remainingBytes());
+
+		memcpy(pBuf, current_, size);
+		current_ += size;
+
+		return safe_static_cast<uint32_t, size_t>(size);
+	}
+
+	virtual uint32_t write(const void* pBuf, uint32_t Len) X_FINAL{
+		X_ASSERT_NOT_IMPLEMENTED();
+		return 0;
+	}
+
+	virtual void seek(size_t position, SeekMode::Enum origin) X_FINAL{
+		switch (origin)
+		{
+			case SeekMode::CUR:
+				current_ += core::Min<size_t>(position, remainingBytes());
+				break;
+			case SeekMode::SET:
+				current_ = begin_ + core::Min<size_t>(position, getSize());
+				break;
+			case SeekMode::END:
+				X_ASSERT_NOT_IMPLEMENTED();
+				break;
+		}
+	}
+	virtual size_t remainingBytes(void) const X_FINAL{
+		return end_ - current_;
+	}
+	virtual size_t tell(void) const X_FINAL{
+		return current_ - begin_;
+	}
+	virtual void setSize(size_t numBytes) X_FINAL{
+		X_UNUSED(numBytes);
+		X_ASSERT_UNREACHABLE();
+	}
+
+	inline uint8_t* getBufferStart(void) { return begin_; }
+	inline const uint8_t* getBufferStart(void) const { return begin_; }
+
+	inline uint8_t* getBufferEnd(void) { return end_; }
+	inline const uint8_t* getBufferEnd(void) const { return end_; }
+
+	inline size_t getSize(void) const {
+		return end_ - begin_;
+	}
+
+	inline bool isEof(void) const X_FINAL{
+		return remainingBytes() == 0;
+	}
+
+private:
+	uint8_t* begin_;
+	uint8_t* current_;
+	uint8_t* end_;
+};
 
 
 struct IFileSys
@@ -264,12 +347,13 @@ struct IFileSys
 
 	virtual ~IFileSys(){}
 
-	virtual void Init() X_ABSTRACT;
-	virtual void ShutDown() X_ABSTRACT;
+	virtual bool Init(void) X_ABSTRACT;
+	virtual void ShutDown(void) X_ABSTRACT;
+	virtual void CreateVars(void) X_ABSTRACT;
 
 	// folders - there is only one game dirtory.
 	// but other folders can be added with 'addModDir' to add to the virtual directory.
-	virtual void setGameDir(pathType path) X_ABSTRACT;
+	virtual bool setGameDir(pathType path) X_ABSTRACT;
 	virtual void addModDir(pathType path) X_ABSTRACT;
 
 	// Open Files

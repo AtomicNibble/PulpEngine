@@ -117,7 +117,6 @@
     <ClInclude Include="Hashing\sha1.h" />
     <ClInclude Include="IAnimation.h" />
     <ClInclude Include="IAssetPak.h" />
-    <ClInclude Include="IBsp.h" />
     <ClInclude Include="ICi.h" />
     <ClInclude Include="IConsole.h" />
     <ClInclude Include="ICore.h" />
@@ -129,6 +128,7 @@
     <ClInclude Include="IGui.h" />
     <ClInclude Include="IInput.h" />
     <ClInclude Include="IJobSystem.h" />
+    <ClInclude Include="ILevel.h" />
     <ClInclude Include="ILog.h" />
     <ClInclude Include="IMaterial.h" />
     <ClInclude Include="IModel.h" />
@@ -657,7 +657,6 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="String\Base64.cpp" />
-    <ClCompile Include="String\GrowingStringTable.cpp" />
     <ClCompile Include="String\HumanSize.cpp" />
     <ClCompile Include="String\Lexer.cpp" />
     <ClCompile Include="String\StringTokenizer.cpp">

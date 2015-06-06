@@ -70,11 +70,13 @@ namespace {
 
 };
 
-
-Console::Console(const char* title)
+Console::Console(const char* title) :
+m_stdout(nullptr),
+m_stdin(nullptr),
+m_stderr(nullptr)
 {
-	int hConHandle;
-	HANDLE lStdHandle;
+//	int hConHandle;
+//	HANDLE lStdHandle;
 
 	lastError::Description Dsc;
 
@@ -110,7 +112,7 @@ Console::Console(const char* title)
 		return;
 	}
 
-
+	/*
 	lStdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
 	m_stdout = _fdopen( hConHandle, "w" );
@@ -129,10 +131,10 @@ Console::Console(const char* title)
 	m_stderr = _fdopen( hConHandle, "w" );
 	*stderr = *m_stderr;
 //	setvbuf( stderr, NULL, _IONBF, 0 );
-	
+	*/
 	SetTitle( title );
 
-	std::ios::sync_with_stdio();
+//	std::ios::sync_with_stdio();
 }
 
 /// Frees all resources.
@@ -140,15 +142,18 @@ Console::~Console(void)
 {
 	lastError::Description Dsc;
 
-	if( fclose( m_stdout ) == EOF )
-		X_ERROR( "Console", "Cannot close stdout handle. Error: %s", lastError::ToString( Dsc ) );
-
-	if( fclose( m_stdin ) == EOF )
-		X_ERROR( "Console", "Cannot close stdin handle. Error: %s", lastError::ToString( Dsc ) );
-
-	if( fclose( m_stderr ) == EOF )
-		X_ERROR( "Console", "Cannot close stderr handle. Error: %s", lastError::ToString( Dsc ) );
-
+	if (m_stdout) {
+		if (fclose(m_stdout) == EOF)
+			X_ERROR("Console", "Cannot close stdout handle. Error: %s", lastError::ToString(Dsc));
+	}
+	if (m_stdout) {
+		if (fclose(m_stdin) == EOF)
+			X_ERROR("Console", "Cannot close stdin handle. Error: %s", lastError::ToString(Dsc));
+	}
+	if (m_stdout) {
+		if (fclose(m_stderr) == EOF)
+			X_ERROR("Console", "Cannot close stderr handle. Error: %s", lastError::ToString(Dsc));
+	}
 
 	if( !FreeConsole() )
 	{

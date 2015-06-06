@@ -350,15 +350,16 @@ void XKeyboard::Update(bool bFocus)
 	X_ASSERT_UNREACHABLE();
 }
 
-void XKeyboard::ProcessInput(RAWINPUT& input)
+void XKeyboard::ProcessInput(const RAWINPUTHEADER& header, const uint8_t* pData)
 {
-	if (input.header.dwType == RIM_TYPEKEYBOARD)
+	if (header.dwType == RIM_TYPEKEYBOARD)
 	{
-		ProcessKeyboardData(input.data.keyboard);
+		const RAWKEYBOARD* pKeyboard = reinterpret_cast<const RAWKEYBOARD*>(pData);
+		ProcessKeyboardData(*pKeyboard);
 	}
 }
 
-void XKeyboard::ProcessKeyboardData(RAWKEYBOARD& RawKb)
+void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb)
 {
 	IInput& input = GetIInput();
 

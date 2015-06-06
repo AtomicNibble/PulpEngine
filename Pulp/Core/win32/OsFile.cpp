@@ -183,6 +183,20 @@ size_t OsFile::remainingBytes(void) const
 #endif
 }
 
+void OsFile::setSize(size_t numBytes)
+{
+	size_t currentPos = tell();
+
+	seek(numBytes, SeekMode::SET);
+
+	if (!::SetEndOfFile(file_))
+	{
+		lastError::Description dsc;
+		X_ERROR("File", "Failed to setSize: %Iu. Error: %s", numBytes, lastError::ToString(dsc));
+	}
+
+	seek(currentPos, SeekMode::SET);
+}
 
 bool OsFile::valid(void) const
 {

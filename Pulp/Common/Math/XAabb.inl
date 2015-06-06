@@ -2,7 +2,7 @@
 
 X_INLINE AABB::AABB()
 {
-
+	clear();
 }
 
 X_INLINE AABB::AABB(float radius)
@@ -76,7 +76,13 @@ X_INLINE Vec3f AABB::size() const
 {
 	return (max - min);
 }
-	// the size of the box.
+
+X_INLINE Vec3f AABB::halfVec() const
+{
+	return size() * 0.5f;
+}
+
+// the size of the box.
 X_INLINE float AABB::radius() const
 {
 	return min.distance(max) * 0.5f; // 1/2 it for radius

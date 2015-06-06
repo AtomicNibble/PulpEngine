@@ -36,6 +36,44 @@ texture::ITexture* pTexSky = nullptr;
 
 gui::IGui* gui = nullptr;
 
+// Commands
+
+void Command_Map(core::IConsoleCmdArgs* Cmd)
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->p3DEngine);
+
+	if (Cmd->GetArgCount() != 2)
+	{
+		X_WARNING("3DEngine", "map <mapname>");
+		return;
+	}
+
+	const char* mapName = Cmd->GetArg(1);
+
+	X3DEngine* p3DEngine = reinterpret_cast<X3DEngine*>(gEnv->p3DEngine);
+	p3DEngine->LoadMap(mapName);
+}
+
+void Command_DevMap(core::IConsoleCmdArgs* Cmd)
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->p3DEngine);
+
+	if (Cmd->GetArgCount() != 2)
+	{
+		X_WARNING("3DEngine", "devmap <mapname>");
+		return;
+	}
+
+	const char* mapName = Cmd->GetArg(1);
+
+	X3DEngine* p3DEngine = reinterpret_cast<X3DEngine*>(gEnv->p3DEngine);
+	p3DEngine->LoadDevMap(mapName);
+}
+
+// ~Commands
+
 bool X3DEngine::Init()
 {
 	X_ASSERT_NOT_NULL(gEnv);
@@ -44,29 +82,38 @@ bool X3DEngine::Init()
 	X_ASSERT_NOT_NULL(gEnv->pFileSys);
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 	X_ASSERT_NOT_NULL(gEnv->pRender);
+	X_ASSERT_NOT_NULL(gEnv->pHotReload);
 
 	pCore_ = gEnv->pCore;
-
 	pTimer_ = gEnv->pTimer;
 	pFileSys_ = gEnv->pFileSys;
 	pConsole_ = gEnv->pConsole;
-
 	pRender_ = gEnv->pRender;
+
+	// register some file types.
+	gEnv->pHotReload->addfileType(this, "level");
+	gEnv->pHotReload->addfileType(this, "map");
 
 	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager");
 	pMaterialManager_->Init();
-
 	pGuiManger_ = &guisMan_;
+
+	RegisterCmds();
 
 	guisMan_.Init();
 
+	level::Level::Init();
 
-	return false;
+	level_.Load("box2");
+	return true;
 }
 
 void X3DEngine::ShutDown()
 {
 	X_LOG0("3DEngine", "Shutting Down");
+
+	gEnv->pHotReload->addfileType(nullptr, "level");
+	gEnv->pHotReload->addfileType(nullptr, "map");
 
 	guisMan_.Shutdown();
 
@@ -75,6 +122,7 @@ void X3DEngine::ShutDown()
 		X_DELETE(pMaterialManager_, g_3dEngineArena);
 	}
 
+	level::Level::ShutDown();
 }
 
 int X3DEngine::release(void)
@@ -88,20 +136,11 @@ void X3DEngine::OnFrameBegin(void)
 {
 	X_PROFILE_BEGIN("3DFrameBegin", core::ProfileSubSys::ENGINE3D);
 
-//	pRender_->SetTexture(pTex1->getTexID());
+	level_.update();
+	if (level_.canRender()) {
+		level_.render();
+	}
 
-//	if (pMesh)
-//		pMesh->render();
-
-//	pRender_->SetTexture(pTex->getTexID());
-
-
-//	pRender_->DefferedBegin();
-
-//	map.render();
-
-//	pRender_->DefferedEnd();
-//	pRender_->s
 
 	// draw me some gui baby
 	if (gui) {
@@ -117,41 +156,43 @@ void X3DEngine::Update(void)
 
 }
 
-
-
-void X3DEngine::LoadModel(void)
+bool X3DEngine::OnFileChange(const char* name)
 {
-/*
-	model::ModelLoader loader;
+	X_ASSERT_NOT_NULL(name);
 
-	pMesh = nullptr;
-	pSkybox = nullptr;
+	// do nothing for now.
 
-	if (loader.LoadModel(model, "models/player.model"))
-	{
-		pMesh = gEnv->pRender->createRenderMesh(
-			(model::MeshHeader*)&model.getLod(0),
-			shader::VertexFormat::P3F_T2S,
-			model.getName()
-			);
 
-		pMesh->uploadToGpu();
-	}
+	return true;
+}
 
-	if (loader.LoadModel(modelSky, "models/skybox_sea.model"))
-	{
-		pSkybox = gEnv->pRender->createRenderMesh(
-			(model::MeshHeader*)&modelSky.getLod(0),
-			shader::VertexFormat::P3F_T2S,
-			modelSky.getName()
-			);
+// =======================================
 
-		pSkybox->uploadToGpu();
-	}
-*/
+void X3DEngine::RegisterCmds(void)
+{
+	ADD_COMMAND("map", Command_Map, core::VarFlag::SYSTEM, "Loads a map");
+	ADD_COMMAND("devmap", Command_DevMap, core::VarFlag::SYSTEM, "Loads a map in developer mode");
+
+
 }
 
 
+void X3DEngine::LoadMap(const char* mapName)
+{
+	X_ASSERT_NOT_NULL(mapName);
+
+	level_.Load(mapName);
+}
+
+void X3DEngine::LoadDevMap(const char* mapName)
+{
+	X_ASSERT_NOT_NULL(mapName);
+
+	// this should not really duplicate anything.
+	// set some vars then just load the map normaly tbh.
+
+	LoadMap(mapName);
+}
 
 
 X_NAMESPACE_END

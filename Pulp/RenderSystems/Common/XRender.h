@@ -256,6 +256,7 @@ public:
 
 
 	static uint32_t vertexFormatStride[shader::VertexFormat::Num];
+	static uint32_t vertexSteamStride[VertexStream::ENUM_COUNT][shader::VertexFormat::Num];
 protected:
 
 	virtual void SetArenas(core::MemoryArenaBase* arena);

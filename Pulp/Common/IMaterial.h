@@ -10,58 +10,112 @@ X_NAMESPACE_BEGIN(engine)
 
 
 static const uint32_t	 MTL_MATERIAL_MAX_LEN = 64;
-static const uint32_t	 MTL_B_VERSION = 1;
+static const uint32_t	 MTL_B_VERSION = 2;
 static const uint32_t	 MTL_B_FOURCC = X_TAG('m', 't', 'l', 'b');
 static const char*		 MTL_B_FILE_EXTENSION = "mtlb";
 static const char*		 MTL_FILE_EXTENSION = "mtl";
 
 
-X_DECLARE_FLAGS(MaterialFlag)(TWO_SIDED, WIRE, ADDITIVE, NOSHADOW, NOLIGHTING, NODRAW, UI);
+static const float POLY_DECAL_OFFSET = 0.05f;
+static const float POLY_WEAPON_IMPACT_OFFSET = 0.1f;
+
+X_DECLARE_FLAGS(MaterialFlag)(
+	NODRAW,			// 1 not visable
+	EDITOR_VISABLE, // 2 makes nodraw visable in editor modes.
+
+	SOLID,			// 4 eye/view can't be in a solid
+
+	STRUCTURAL,		// 8 collision, used to buold area's also.
+	DETAIL,			// 16 no collision
+
+	PORTAL,			// 32 for creating render cells
+
+	PLAYER_CLIP,	// 64 players can't go through this
+	AI_CLIP,		// 128 AI can't go throught this
+
+	NO_FALL_DMG,	// 256 no dmg given on fall
+	NO_IMPACT,		// 512 impacts not shown
+	NO_PENNETRATE	// 1024 bullets can't pass through.
+);
+
+// the type of material it is, changes nothing really currently.
+X_DECLARE_ENUM8(MaterialType)(
+	UI,
+	WORLD,
+	MODEL,
+	TOOL,
+	UNKNOWN
+);
+
+/*
+X_DECLARE_ENUM8(MaterialCoverage)(
+	BAD,
+	OPAQUE,			// completely fills the triangle, will have black drawn on fillDepthBuffer
+	PERFORATED,		// may have alpha tested holes
+	TRANSLUCENT		// blended with background
+);
+*/
+
+// offset types.
+X_DECLARE_ENUM8(MaterialPolygonOffset)(
+	NONE,
+	STATIC_DECAL,
+	WEAPON_IMPACT
+);
+
+X_DECLARE_ENUM8(MaterialFilterType)(
+	LINEAR,
+	BILINEAR_X2,
+	BILINEAR_X4,
+	TRILINEAR_X2,
+	TRILINEAR_X4
+);
+
+X_DECLARE_ENUM8(MaterialTexRepeat)(
+	NO_TILE,
+	TILE_BOTH,
+	TILE_HOZ,
+	TILE_VERT
+);
+
+X_DECLARE_ENUM8(MaterialSurType)(
+	NONE,
+
+	BRICK,
+	CONCRETE,
+	CLOTH,
+
+	FLESH,
+
+	GLASS,
+	GRASS,
+	GRAVEL,
+
+	ICE,
+
+	METAL,
+	MUD,
+
+	PLASTIC,
+	PAPER,
+	ROCK,
+
+	SNOW,
+	SAND,
+
+	WOOD,
+	WATER
+);
+
+X_DECLARE_ENUM8(MaterialCullType)(
+	FRONT_SIDED,
+	BACK_SIDED,
+	TWO_SIDED
+);
 
 typedef Flags<MaterialFlag> MaterialFlags;
 
-struct MaterialSurType
-{
-	enum Enum : uint8_t
-	{
-		NONE = 1,
 
-		BRICK,
-		CONCRETE,
-		CLOTH,
-
-		FLESH,
-
-		GLASS,
-		GRASS,
-		GRAVEL,
-
-		ICE,
-
-		METAL,
-		MUD,
-
-		PLASTIC,
-		PAPER,
-		ROCK,
-
-		SNOW,
-		SAND,
-
-		WOOD,
-		WATER,
-	};
-};
-
-struct MaterialCullType
-{
-	enum Enum : uint8_t
-	{
-		FRONT_SIDED,
-		BACK_SIDED,
-		TWO_SIDED
-	};
-};
 
 /*
 what o do for the shader input system that i need todo for my engine.
@@ -93,11 +147,27 @@ struct IMaterial
 	virtual MaterialCullType::Enum getCullType() const X_ABSTRACT;
 	virtual void setCullType(MaterialCullType::Enum type) X_ABSTRACT;
 
+	virtual MaterialTexRepeat::Enum getTexRepeat(void) const X_ABSTRACT;
+	virtual void setTexRepeat(MaterialTexRepeat::Enum texRepeat) X_ABSTRACT;
+
+	virtual MaterialPolygonOffset::Enum getPolyOffsetType(void) const X_ABSTRACT;
+	virtual void setPolyOffsetType(MaterialPolygonOffset::Enum polyOffsetType) X_ABSTRACT;
+
+	virtual MaterialFilterType::Enum getFilterType(void) const X_ABSTRACT;
+	virtual void setFilterType(MaterialFilterType::Enum filterType) X_ABSTRACT;
+
+	virtual MaterialType::Enum getType(void) const X_ABSTRACT;
+	virtual void setType(MaterialType::Enum type) X_ABSTRACT;
+
 	virtual void setShaderItem(shader::XShaderItem& item) X_ABSTRACT;
 	virtual shader::XShaderItem& getShaderItem(void) X_ABSTRACT;
 
 	virtual bool isDefault() const X_ABSTRACT;
 
+	// util.
+	X_INLINE bool isDrawn(void) const {
+		return !getFlags().IsSet(MaterialFlag::NODRAW);
+	}
 };
 
 
@@ -111,6 +181,11 @@ struct MaterialHeader
 	uint8 numTextures;
 	MaterialCullType::Enum cullType;
 	MaterialSurType::Enum type;
+	// 4
+	MaterialTexRepeat::Enum texRepeat;
+	MaterialPolygonOffset::Enum polyOffsetType;
+	MaterialFilterType::Enum filterType;
+	MaterialType::Enum matType;
 
 	Color diffuse;
 	Color specular;
@@ -133,7 +208,13 @@ struct MaterialTexture
 
 X_ENSURE_SIZE(MaterialCullType::Enum, 1);
 X_ENSURE_SIZE(MaterialSurType::Enum, 1);
-X_ENSURE_SIZE(MaterialHeader, 64);
+
+X_ENSURE_SIZE(MaterialTexRepeat::Enum, 1);
+X_ENSURE_SIZE(MaterialPolygonOffset::Enum, 1);
+X_ENSURE_SIZE(MaterialFilterType::Enum, 1);
+X_ENSURE_SIZE(MaterialType::Enum, 1);
+
+X_ENSURE_SIZE(MaterialHeader, 68);
 
 
 struct IMaterialManagerListener

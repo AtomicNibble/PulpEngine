@@ -21,7 +21,6 @@ struct I3DEngine
 
 
 
-	virtual void LoadModel(void) X_ABSTRACT;
 };
 
 

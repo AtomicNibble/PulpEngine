@@ -48,9 +48,9 @@ bool XCoreEventDispatcher::RemoveListener(ICoreEventListener* pListener)
 
 void XCoreEventDispatcher::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {
-	if (g_coreVars.core_event_debug)
+	if (g_coreVars.core_event_debug) {
 		X_LOG0("CoreEvent", "---- CoreEvent: %s ----", CoreEvent::toString(event));
-
+	}
 
 	Listners::iterator it = Listners_.begin();
 	for (; it != Listners_.end(); ++it)
