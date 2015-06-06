@@ -439,11 +439,45 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 		return;
 	}
 
+	// skip null materials
+	if (!side.matInfo.pMaterial) {
+		X_WARNING("Lvl", "side without a material");
+		return;
+	}
+
+	// skip none visable materials.
+	if (!side.matInfo.pMaterial->isDrawn()) {
+		X_LOG1("Lvl", "Skipping visible face, material not drawn: \"%s\"",
+			side.matInfo.name.c_str());
+		return;
+	}
+
+
 	// now we add the side to the area index of the node.
 	LvlArea& area = areas_[pNode->area];
 
+	// get areaSubMesh for this material.
+	AreaSubMesh* pSubMesh = area.MeshForSide(side, stringTable_);
 
+	size_t StartVert = pSubMesh->verts_.size();
 
+	int p, numPoints = pWinding->GetNumPoints();
+
+	for (p = 0; p < numPoints; p++)
+	{
+		level::Vertex vert;
+		const Vec5f& vec = pWinding->operator[](p);
+
+		vert.pos = vec.asVec3();
+		vert.normal = planes[side.planenum].getNormal();
+		vert.color = Col_White;
+		vert.texcoord[0] = Vec2f(vec.s, vec.t);
+
+		pSubMesh->AddVert(vert);
+	}
+
+	// create some indexes
+	createIndexs(numPoints, StartVert, pSubMesh);
 
 	int goat = 0;
 }
@@ -459,6 +493,9 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 	size_t i, j;
 
 	areas_.resize(ent.numAreas);
+	for (i = 0; i < areas_.size(); i++){
+		areas_[i].AreaBegin();
+	}
 
 	for (i = 0; i < ent.brushes.size(); i++)
 	{
@@ -477,6 +514,10 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 		}
 	}
 	
+	for (i = 0; i < areas_.size(); i++){
+		areas_[i].AreaEnd();
+	}
+
 	return true;
 }
 
