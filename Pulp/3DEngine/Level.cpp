@@ -20,6 +20,7 @@ AsyncLoadData::~AsyncLoadData()
 // --------------------------------
 
 int Level::s_var_drawAreaBounds_ = 0;
+int Level::s_var_drawArea_ = -1;
 
 
 // --------------------------------
@@ -58,7 +59,11 @@ bool Level::Init(void)
 
 	ADD_CVAR_REF("lvl_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 1, core::VarFlag::SYSTEM,
 		"Draws bounding box around each level area");
+		
+	ADD_CVAR_REF("lvl_drawArea", s_var_drawArea_, -1, -1, level::MAP_MAX_AREAS, core::VarFlag::SYSTEM,
+		"Draws the selected area index. -1 = disable");
 
+	
 
 	return true;
 }
@@ -137,9 +142,17 @@ bool Level::render(void)
 		return false;
 
 	core::Array<AreaModel>::ConstIterator it = areaModels_.begin();
-	for (; it != areaModels_.end(); ++it)
+
+	if (s_var_drawArea_ == -1)
 	{
-		it->pRenderMesh->render();
+		for (; it != areaModels_.end(); ++it)
+		{
+			it->pRenderMesh->render();
+		}
+	}
+	else if (s_var_drawArea_ < safe_static_cast<int,size_t>(areaModels_.size()))
+	{
+		areaModels_[s_var_drawArea_].pRenderMesh->render();
 	}
 
 	if (s_var_drawAreaBounds_)
