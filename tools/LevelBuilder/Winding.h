@@ -3,6 +3,7 @@
 #ifndef X_WINDING_H_
 #define X_WINDING_H_
 
+#include <ISerialize.h>
 
 /*
 #define	SIDE_FRONT					0
@@ -25,7 +26,7 @@ T* Alloca16(size_t num)
 #define	MAX_POINTS_ON_WINDING	64
 #define	EDGE_LENGTH		0.2f
 
-class XWinding
+class XWinding : public core::ISerialize
 {
 public:
 	XWinding(void);
@@ -88,6 +89,12 @@ public:
 	}
 
 	XWinding* ReverseWinding(void);
+
+	// ISerialize
+	virtual bool SSave(core::XFile* pFile) const X_FINAL;
+	virtual bool SLoad(core::XFile* pFile) X_FINAL;
+	// ~ISerialize
+
 
 protected:
 	int				numPoints;				// number of points

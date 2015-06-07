@@ -818,3 +818,66 @@ XWinding* XWinding::ReverseWinding(void)
 
 	return c;
 }
+
+
+
+// ISerialize
+bool XWinding::SSave(core::XFile* pFile) const
+{
+	X_ASSERT_NOT_NULL(pFile);
+
+	uint32_t i, num = safe_static_cast<uint32_t, size_t>(numPoints);
+
+	if (!pFile->writeObj(num)) {
+		X_ERROR("Winding", "Failed to save winding to file");
+		return false;
+	}
+
+	for (i = 0; i < num; i++)
+	{
+		// save each point.
+		const Vec5f& point = p[i];
+
+		if (!pFile->writeObj(point)) {
+			X_ERROR("Winding", "Failed to save winding to file");
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool XWinding::SLoad(core::XFile* pFile)
+{
+	X_ASSERT_NOT_NULL(pFile);
+
+	uint32_t i, num;
+
+	if (!pFile->readObj(num)) {
+		X_ERROR("Winding", "Failed to load winding from file");
+		return false;
+	}
+
+	if (!EnsureAlloced(num, false)) {
+		X_ERROR("Winding", "Failed to allocate %i points for file winding", num);
+		return false;
+	}
+
+	for (i = 0; i < num; i++)
+	{
+		// save each point.
+		Vec5f& point = p[i];
+
+		if (!pFile->readObj(point)) {
+			X_ERROR("Winding", "Failed to load winding point from file");
+			this->Clear();
+			return false;
+		}
+	}
+
+	numPoints = num;
+	return true;
+}
+// ~ISerialize
+
+
