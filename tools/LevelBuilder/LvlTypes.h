@@ -237,4 +237,18 @@ public:
 typedef core::Array<LvlEntity> LvlEntsArr;
 typedef core::Array<LvlArea> LvlAreaArr;
 
+struct LvlStats
+{
+	LvlStats()  {
+		core::zero_this(this);
+	}
+	int32_t	numEntities;
+	int32_t	numPatches;
+	int32_t	numBrushes;
+	int32_t	numAreaPortals;
+	int32_t	numFaceLeafs;
+};
+
+
+
 #endif // !X_LVL_TYPES_H_

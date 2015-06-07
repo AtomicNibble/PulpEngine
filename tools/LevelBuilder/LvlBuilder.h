@@ -61,21 +61,8 @@ private:
 
 	lvl::MatManager matMan_;
 
-	struct Stats
-	{
-		Stats()  {
-			core::zero_this(this);
-		}
-		int32_t	numEntities;
-		int32_t	numPatches;
-		int32_t	numBrushes;
-		int32_t	numAreaPortals;
-		int32_t	numFaceLeafs;
-	};
-
-	Stats stats_;
+	LvlStats stats_;
 };
-
 
 
 #endif // !X_LVL_BUILDER_H_
