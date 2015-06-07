@@ -252,7 +252,7 @@
   <ItemGroup>
     <ClCompile Include="AreaModel.cpp" />
     <ClCompile Include="BSPFace.cpp" />
-    <ClCompile Include="BSPFile.cpp" />
+    <ClCompile Include="LvlFile.cpp" />
     <ClCompile Include="bspNode.cpp" />
     <ClCompile Include="BSPPortals.cpp" />
     <ClCompile Include="FaceTreeBuilder.cpp" />
