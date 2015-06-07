@@ -44,14 +44,14 @@ bspNode::bspNode() :
 brushes(g_arena)
 {
 	planenum = 0;
-
 	parent = nullptr;
+
 	children[0] = nullptr;
 	children[1] = nullptr;
+	nodeNumber = 0;
+
 	portals = nullptr;
-
 	opaque = false;
-
 	area = -1;
 	occupied = 0;
 }

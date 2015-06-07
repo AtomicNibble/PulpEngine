@@ -111,6 +111,7 @@ public:
 
 	// nodes only
 	struct bspNode* children[2];
+	int32_t			nodeNumber; // set on save.
 
 	// leafs only 
 	struct bspPortal* portals;
