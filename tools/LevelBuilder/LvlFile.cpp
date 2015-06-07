@@ -13,8 +13,6 @@ using namespace level;
 
 namespace
 {
-
-
 	void WriteAreaModel(core::XFile* file, AreaModel const* pModel)
 	{
 		file->writeObj(pModel->model);
@@ -39,8 +37,24 @@ namespace
 	//	file->writeObj(pModel->verts.ptr(), (pModel->verts.size()));
 		file->writeObj(pModel->faces.ptr(), (pModel->faces.size()));
 	}
-}
 
+
+	struct ScopedNodeInfo
+	{
+		ScopedNodeInfo(FileNode& node, core::XFile* pFile) :
+		node_(node), pFile_(pFile) {
+			X_ASSERT_NOT_NULL(pFile);
+			node.offset = pFile->tell();
+		}
+		~ScopedNodeInfo() {
+			node_.size = pFile_->tell() - node_.offset;
+		}
+
+		FileNode& node_;
+		core::XFile* pFile_;
+	};
+
+}
 
 
 
@@ -50,6 +64,11 @@ bool LvlBuilder::save(const char* name)
 	FileHeader hdr;
 	core::Path path;
 	size_t i;
+
+	if (entities_.isEmpty()) {
+		X_ERROR("Lvl", "Failed to save lvl file has zero entities");
+		return false;
+	}
 
 	mode.Set(core::fileMode::WRITE);
 	mode.Set(core::fileMode::RECREATE);
@@ -67,27 +86,65 @@ bool LvlBuilder::save(const char* name)
 	path.setExtension(level::LVL_FILE_EXTENSION);
 
 	core::Crc32 crc;
-
 	core::XFile* file = gEnv->pFileSys->openFile(path.c_str(), mode);
 	if (file)
 	{
 		file->writeObj(hdr);
 
-		size_t stringTableStart = file->tell();
+		LvlEntity& worldEnt = entities_[0];
 
-		// write string table.
-		stringTable_.SSave(file);
-
-		size_t stringTableEnd = file->tell();
-
-		for (i = 0; i < areas_.size(); i++)
+		// string table
 		{
-			AreaModel* pModel = &areas_[i].model;
+			ScopedNodeInfo node(hdr.nodes[FileNodes::STRING_TABLE], file);
+			if (!stringTable_.SSave(file)) {
+				X_ERROR("Lvl", "Failed to save string table");
+				return false;
+			}
+		}
+		// areas
+		{
+			ScopedNodeInfo node(hdr.nodes[FileNodes::AREAS], file);
 
-			WriteAreaModel(file, pModel);
+			for (i = 0; i < areas_.size(); i++)
+			{
+				AreaModel* pModel = &areas_[i].model;
+
+				WriteAreaModel(file, pModel);
+			}
+		}
+		// area portals
+		if (worldEnt.interPortals.isNotEmpty())
+		{
+			ScopedNodeInfo node(hdr.nodes[FileNodes::AREA_PORTALS], file);
+
+			hdr.numinterAreaPortals = safe_static_cast<uint32_t, size_t>(
+				worldEnt.interPortals.size());
+
+			// need to write the area's 
+			// and the winding.
+			for (const auto& iap : worldEnt.interPortals)
+			{
+				file->writeObj(iap.area0);
+				file->writeObj(iap.area1);
+
+				X_ASSERT_NOT_NULL(iap.pSide);
+				X_ASSERT_NOT_NULL(iap.pSide->pWinding);
+
+				const XWinding* pWind = iap.pSide->pWinding;
+
+				if (!pWind->SSave(file)) {
+					X_ERROR("Lvl", "Failed to save inter portal info");
+					return false;
+				}
+			}
+
 		}
 
-		size_t dataEnd = file->tell();
+		// bsp tree
+		{
+
+
+		}
 
 
 		// update FourcCC to mark this bsp as valid.
@@ -96,13 +153,10 @@ bool LvlBuilder::save(const char* name)
 		// crc the header
 		hdr.datacrc32 = crc.GetCRC32((const char*)&hdr, sizeof(hdr));
 
-
-		hdr.stringDataSize = safe_static_cast<uint32_t, size_t>(
-			stringTableEnd - stringTableStart);
-		hdr.datasize = safe_static_cast<uint32_t, size_t>(dataEnd -
-			stringTableEnd);
-
-		hdr.totalDataSize = hdr.stringDataSize + hdr.datasize;
+		for (uint32_t i = 0; i < FileNodes::ENUM_COUNT; i++)
+		{
+			hdr.totalDataSize = hdr.nodes[i].size;
+		}
 
 		file->seek(0, core::SeekMode::SET);
 		file->writeObj(hdr);
