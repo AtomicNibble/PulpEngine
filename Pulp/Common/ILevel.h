@@ -11,8 +11,13 @@
 
 #include <IRenderMesh.h>
 
-X_NAMESPACE_BEGIN(level)
 
+// forward Decs.
+class XWinding;
+// ~forward Decs.
+
+
+X_NAMESPACE_BEGIN(level)
 
 //
 // Some Refrences: (in no order)
@@ -218,7 +223,7 @@ X_NAMESPACE_BEGIN(level)
 //
 //
 
-static const uint32_t	 LVL_VERSION = 11; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
+static const uint32_t	 LVL_VERSION = 12; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
 static const uint32_t	 LVL_FOURCC = X_TAG('x', 'l', 'v', 'l');
 static const uint32_t	 LVL_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r'); // if a file falid to write the final header, this will be it's FourCC
 // feels kinda wrong to call it a '.bsp', since it's otherthings as well. 
@@ -264,11 +269,6 @@ static const uint32_t	 MAX_VALUE_LENGTH = 256;		// KVP: value
 // show me the light, o holy one.
 static const uint32_t	 LIGHT_MAP_WIDTH = 128;
 static const uint32_t	 LIGHT_MAP_HEIGHT = 128;
-
-
-// forward Decs.
-class XWinding;
-// ~forward Decs.
 
 
 X_DECLARE_FLAGS(MatContentFlags)(SOLID, WATER, PLAYER_CLIP, MONSTER_CLIP, TRIGGER, NO_FALL_DMG, DETAIL, STRUCTURAL, ORIGIN);
@@ -428,6 +428,27 @@ struct Area
 //
 //		THen start adding in the entites etc.
 
+X_DECLARE_ENUM(FileNodes) (
+	STRING_TABLE,
+	AREAS,
+	AREA_PORTALS, 
+	BSP_TREE
+);
+
+
+struct FileNode
+{
+	FileNode() {
+		core::zero_this(this);
+	}
+
+	X_INLINE bool isSet(void) const {
+		return size > 0;
+	}
+
+	uint32_t size;
+	uint32_t offset;
+};
 
 struct FileHeader
 {
@@ -439,22 +460,30 @@ struct FileHeader
 
 	core::dateTimeStampSmall modified; // 4
 
-	// string + data.
+	// size of all nodes
 	uint32_t totalDataSize;
 
 	// crc32 is just the header data
 	uint32_t datacrc32;
-	uint32_t datasize;
 
 	// stirng table data.
 	uint32_t numStrings;
-	uint32_t stringDataSize;
 
 	// the number of area;s in the level file.
 	uint32_t numAreas;
+	uint32_t numinterAreaPortals;
+
+
+	FileNode nodes[FileNodes::ENUM_COUNT];
 
 	const bool isValid(void) const {
 		return fourCC == LVL_FOURCC;
+	}
+
+	core::XFileBuf FileBufForNode(uint8_t* pData, FileNodes::Enum node) const
+	{
+		uint8_t* pBegin = pData + nodes[node].offset;
+		return core::XFileBuf(pBegin, pBegin + nodes[node].size);
 	}
 };
 
@@ -477,7 +506,8 @@ X_ENSURE_SIZE(Node, 0x24);
 X_ENSURE_SIZE(Area, 0x28 + 0xC + 12);
 
 // check file structure sizes also.
-X_ENSURE_SIZE(FileHeader, 40);
+X_ENSURE_SIZE(FileNode, 8);
+X_ENSURE_SIZE(FileHeader, 36 + (sizeof(FileNode)* FileNodes::ENUM_COUNT));
 
 X_NAMESPACE_END
 
