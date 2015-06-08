@@ -433,6 +433,43 @@ void bspNode::FreeTree_r(void)
 	X_DELETE(this, g_arena);
 }
 
+void bspNode::WriteNodes_r(XPlaneSet& planes, core::XFile* pFile)
+{
+	int32_t childIds[2];
+	size_t i;
+
+	if (planenum == PLANENUM_LEAF) {
+		X_WARNING("bspNode", "Got a leaf plane while writing nodes.");
+		return;
+	}
+
+	for (i = 0; i < 2; i++)
+	{
+		if (children[i]->planenum == PLANENUM_LEAF) {
+			childIds[i] = -1 - children[i]->area;
+		}
+		else {
+			childIds[i] = children[i]->nodeNumber;
+		}
+	}
+
+	// get the plane.
+	const Planef& plane = planes[planenum];
+
+	// write the node number.
+	pFile->writeObj(this->nodeNumber);
+	pFile->writeObj(plane);
+	pFile->writeObj(childIds);
+
+	// process the children, if they are not leafs.
+	if (childIds[0] > 0) {
+		children[0]->WriteNodes_r(planes, pFile);
+	}
+	if (childIds[1] > 0) {
+		children[1]->WriteNodes_r(planes, pFile);
+	}
+}
+
 int32_t bspNode::NumberNodes_r(bspNode* pNode, int32_t nextNumber)
 {
 	X_ASSERT_NOT_NULL(pNode);

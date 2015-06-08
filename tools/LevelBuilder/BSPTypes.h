@@ -108,6 +108,9 @@ public:
 	void FreeTreePortals_r(void);
 	void FreeTree_r(void);
 
+	void WriteNodes_r(XPlaneSet& planes, core::XFile* pFile);
+
+public:
 	// give each node a number.
 	static int NumberNodes_r(bspNode* pNode, int32_t nextNumber);
 
