@@ -483,6 +483,10 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	// fragments in the solid areas
 	PutPrimitivesInAreas(ent);
 
+	// prune the nodes, so that we only have one leaf per a area.
+	// we also number the nodes at this point also.
+	ent.PruneNodes();
+
  	return true;
 }
 
