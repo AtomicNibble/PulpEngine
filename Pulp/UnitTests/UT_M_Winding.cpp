@@ -15,7 +15,7 @@ TEST(Winding, Constructor)
 	AABB aabb, emtpy;
 
 	emtpy.clear();
-	base.getBoundingBox(aabb);
+	base.GetAABB(aabb);
 
 	EXPECT_EQ(0, base.getNumPoints());
 	EXPECT_EQ(0, base.getArea());
@@ -32,7 +32,7 @@ TEST(Winding, ConstructorNum)
 	AABB aabb, emtpy;
 
 	emtpy.clear();
-	base.getBoundingBox(aabb);
+	base.GetAABB(aabb);
 
 	EXPECT_EQ(0, base.getNumPoints());
 	EXPECT_EQ(16, base.getAllocatedSize());
@@ -67,7 +67,7 @@ TEST(Winding, ConstructorVerts)
 	AABB aabb, emtpy;
 
 	emtpy.clear();
-	base.getBoundingBox(aabb);
+	base.GetAABB(aabb);
 
 	// 20 units height.
 	// 10x10 L + D
@@ -106,7 +106,7 @@ TEST(Winding, ConstructorPlane)
 
 	// we should have a huge ass plane, size of max world.
 	// represented by 4 points.
-	base.getBoundingBox(aabb);
+	base.GetAABB(aabb);
 	base.getPlane(plane_out);
 
 
@@ -133,7 +133,7 @@ TEST(Winding, ConstructorPlane)
 
 	for (int i = 0; i < 4; i++)
 	{
-		EXPECT_EQ(points[i], base[i]);
+		EXPECT_EQ(points[i], base[i].asVec3());
 	}
 }
 
@@ -146,7 +146,7 @@ TEST(Winding, ConstructorPlane2)
 
 	// we should have a huge ass plane, size of max world.
 	// represented by 4 points.
-	base.getBoundingBox(aabb);
+	base.GetAABB(aabb);
 	base.getPlane(plane_out);
 
 
@@ -173,7 +173,7 @@ TEST(Winding, ConstructorPlane2)
 
 	for (int i = 0; i < 4; i++)
 	{
-		EXPECT_EQ(points[i], base[i]);
+		EXPECT_EQ(points[i], base[i].asVec3());
 	}
 }
 
@@ -191,7 +191,7 @@ TEST(Winding, ConstructorSelf)
 
 	// we should have a huge ass plane, size of max world.
 	// represented by 4 points.
-	base.getBoundingBox(aabb);
+	base.GetAABB(aabb);
 	base.getPlane(plane_out);
 
 
@@ -218,7 +218,7 @@ TEST(Winding, ConstructorSelf)
 
 	for (int i = 0; i < 4; i++)
 	{
-		EXPECT_EQ(points[i], base[i]);
+		EXPECT_EQ(points[i], base[i].asVec3());
 	}
 }
 
