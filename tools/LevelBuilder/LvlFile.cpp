@@ -155,7 +155,7 @@ bool LvlBuilder::save(const char* name)
 
 		for (uint32_t i = 0; i < FileNodes::ENUM_COUNT; i++)
 		{
-			hdr.totalDataSize = hdr.nodes[i].size;
+			hdr.totalDataSize += hdr.nodes[i].size;
 		}
 
 		file->seek(0, core::SeekMode::SET);
