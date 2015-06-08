@@ -275,7 +275,7 @@ X_DECLARE_FLAGS(MatContentFlags)(SOLID, WATER, PLAYER_CLIP, MONSTER_CLIP, TRIGGE
 X_DECLARE_FLAGS(MatSurfaceFlags)(NO_DRAW, LADDER);
 
 // this is the flags for the file header, which tells you what option stuff is inside the file.
-X_DECLARE_FLAGS(LevelFileFlags)(OCT_TREE);
+X_DECLARE_FLAGS(LevelFileFlags)(INTER_AREA_INFO, BSP_TREE, OCT_TREE);
 X_DECLARE_ENUM(SurfaceType)(Invalid, Plane, Patch);
 
 typedef Flags<MatContentFlags> MatContentFlag;
