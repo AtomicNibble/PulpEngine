@@ -214,7 +214,7 @@ bool XShader::FXBeginPass(uint32 uiPass)
 		{
 			// humm potentially the correct input will be set later.
 			// i will warm and fix any code that sets it after tho.
-			X_WARNING("Shader", "could not find a hardware tech that fits the current vertexFmt");
+		//	X_WARNING("Shader", "could not find a hardware tech that fits the current vertexFmt");
 		}
 	}
 

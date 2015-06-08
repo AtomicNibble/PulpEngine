@@ -7,27 +7,27 @@ X_INLINE XWinding& XWinding::operator = (const XWinding& winding)
 {
 	int i;
 
-	if (!EnsureAlloced(winding.numPoints)) {
-		numPoints = 0;
+	if (!EnsureAlloced(winding.numPoints_)) {
+		numPoints_ = 0;
 		return *this;
 	}
-	for (i = 0; i < winding.numPoints; i++) {
-		p[i] = winding.p[i];
+	for (i = 0; i < winding.numPoints_; i++) {
+		pPoints_[i] = winding.pPoints_[i];
 	}
-	numPoints = winding.numPoints;
+	numPoints_ = winding.numPoints_;
 	return *this;
 }
 
-X_INLINE const Vec3f& XWinding::operator[](const int idx) const
+X_INLINE const Vec5f& XWinding::operator[](const int idx) const
 {
-	X_ASSERT(idx < numPoints && idx >= 0, "index out of range")(idx, getNumPoints());
-	return p[idx];
+	X_ASSERT(idx < numPoints_ && idx >= 0, "index out of range")(idx, getNumPoints());
+	return pPoints_[idx];
 }
 
-X_INLINE Vec3f&	XWinding::operator[](const int idx)
+X_INLINE Vec5f&	XWinding::operator[](const int idx)
 {
-	X_ASSERT(idx < numPoints && idx >= 0,"index out of range")(idx,getNumPoints());
-	return p[idx];
+	X_ASSERT(idx < numPoints_ && idx >= 0, "index out of range")(idx, getNumPoints());
+	return pPoints_[idx];
 }
 
 
@@ -40,21 +40,21 @@ X_INLINE XWinding&XWinding::operator+=(const Vec3f& v)
 
 X_INLINE void XWinding::addPoint(const Vec3f& v)
 {
-	if (!EnsureAlloced(numPoints + 1, true)) {
+	if (!EnsureAlloced(numPoints_ + 1, true)) {
 		return;
 	}
-	p[numPoints] = v;
-	numPoints++;
+	pPoints_[numPoints_] = v;
+	numPoints_++;
 }
 
 
 X_INLINE int XWinding::getNumPoints(void) const
 {
-	return numPoints;
+	return numPoints_;
 }
 
 X_INLINE int XWinding::getAllocatedSize(void) const
 {
-	return allocedSize;
+	return allocedSize_;
 }
 

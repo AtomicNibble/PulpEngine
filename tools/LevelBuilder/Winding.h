@@ -3,6 +3,10 @@
 #ifndef X_WINDING_H_
 #define X_WINDING_H_
 
+#include "Math\XWinding.h"
+
+#if 0
+
 #include <ISerialize.h>
 
 /*
@@ -60,7 +64,7 @@ public:
 	void			GetAABB(AABB& bounds) const;
 
 	float			PlaneDistance(const Planef &plane) const;
-	Planeside::Enum PlaneSide(const Planef &plane, const float epsilon = ON_EPSILON) const;
+	PlaneSide::Enum PlaneSide(const Planef &plane, const float epsilon = ON_EPSILON) const;
 
 	int				Split(const Planef &plane, const float epsilon, XWinding **front, XWinding **back) const;
 	// returns the winding fragment at the front of the clipping plane,
@@ -107,5 +111,7 @@ protected:
 
 
 #include "Winding.inl"
+
+#endif
 
 #endif // X_WINDING_H_

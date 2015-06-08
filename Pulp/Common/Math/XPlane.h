@@ -25,16 +25,8 @@
 //
 //
 
-struct Planeside
-{
-	enum Enum
-	{
-		FRONT,
-		BACK,
-		ON,
-		CROSS
-	};
-};
+
+X_DECLARE_ENUM(PlaneSide)(FRONT, BACK, ON, CROSS);
 
 struct PlaneType
 {
@@ -126,7 +118,7 @@ public:
 		return Normal_.dot(oth.Normal_);
 	}
 
-	X_INLINE Planeside::Enum	side(const Vec3<T>& v, const float epsilon) const
+	X_INLINE PlaneSide::Enum	side(const Vec3<T>& v, const float epsilon) const
 	{
 		float dist = distance(v);
 		if (dist > epsilon) {

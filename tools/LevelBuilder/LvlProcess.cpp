@@ -326,7 +326,7 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 
 	size_t StartVert = pSubMesh->verts_.size();
 
-	int numPoints = pWinding->GetNumPoints();
+	int numPoints = pWinding->getNumPoints();
 
 #if 1
 	int p;

@@ -238,7 +238,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 		ComputeAxisBase(pMapBrushSide->GetPlane().getNormal(), texX, texY);
 
-		for (int j = 0; j < w->GetNumPoints(); j++)
+		for (int j = 0; j < w->getNumPoints(); j++)
 		{
 			// gets me position from 0,0 from 2d plane.
 			Vec5f& point = w->operator[](j);

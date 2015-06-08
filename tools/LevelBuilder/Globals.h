@@ -23,5 +23,14 @@ static const float PLANE_DIST_EPSILON = 0.01f;
 static const float DEFAULT_CURVE_MAX_ERROR = 4.0f;
 static const float DEFAULT_CURVE_MAX_LENGTH = -1.0f;
 
+template<typename T>
+T* Alloca16(size_t num)
+{
+	void* pData = _alloca(num + 15);
+	// align.
+	pData = core::pointerUtil::AlignTop(pData, 16);
+	return reinterpret_cast<T*>(pData);
+}
+
 
 #endif // !LVL_BUILDER_GLOBALS_H_

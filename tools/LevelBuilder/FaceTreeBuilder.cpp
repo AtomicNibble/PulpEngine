@@ -37,7 +37,7 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 	}
 
 	size_t i;
-	Planeside::Enum side;
+	PlaneSide::Enum side;
 
 	XWinding* frontWinding;
 	XWinding* backWinding;
@@ -63,8 +63,8 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 			continue;
 		}
 
-		side = face.w->PlaneSide(plane);
-		if (side == Planeside::CROSS)
+		side = face.w->planeSide(plane);
+		if (side == PlaneSide::CROSS)
 		{
 			face.w->Split(plane, CLIP_EPSILON * 2, &frontWinding, &backWinding);
 			if (frontWinding)
@@ -85,12 +85,12 @@ void FaceTreeBuilder::BuildFaceTree_r(bspNode* node, bspFace* faces)
 			}
 			X_DELETE(pFace, g_arena);
 		}
-		else if (side == Planeside::FRONT)
+		else if (side == PlaneSide::FRONT)
 		{
 			pFace->pNext = childLists[0];
 			childLists[0] = pFace;
 		}
-		else if (side == Planeside::BACK)
+		else if (side == PlaneSide::BACK)
 		{
 			pFace->pNext = childLists[1];
 			childLists[1] = pFace;
@@ -183,7 +183,7 @@ int32_t FaceTreeBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 	havePortals = false;
 
 	int32_t splits, facing, front, back;
-	Planeside::Enum side;
+	PlaneSide::Enum side;
 
 	for (pFace = faces; pFace; pFace = pFace->pNext)
 	{
@@ -227,16 +227,16 @@ int32_t FaceTreeBuilder::SelectSplitPlaneNum(bspNode* node, bspFace* faces)
 				continue;
 			}
 			// get plane side.
-			side = checkFace.w->PlaneSide(plane);
-			if (side == Planeside::CROSS)
+			side = checkFace.w->planeSide(plane);
+			if (side == PlaneSide::CROSS)
 			{
 				splits++;
 			}
-			else if (side == Planeside::BACK)
+			else if (side == PlaneSide::BACK)
 			{
 				back++;
 			}
-			else if (side == Planeside::FRONT)
+			else if (side == PlaneSide::FRONT)
 			{
 				front++;
 			}

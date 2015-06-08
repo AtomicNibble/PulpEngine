@@ -47,7 +47,7 @@ void bspNode::CalcNodeBounds(void)
 	{
 		s = (p->nodes[1] == this);
 
-		for (i = 0; i < p->pWinding->GetNumPoints(); i++)
+		for (i = 0; i < p->pWinding->getNumPoints(); i++)
 		{
 			const Vec5f& point = (*p->pWinding)[i];
 			bounds.add(point.asVec3());
@@ -72,13 +72,13 @@ XWinding* bspNode::GetBaseWinding(XPlaneSet& planeSet)
 		if (n->children[0] == pNode) 
 		{
 			// take front
-			w = w->Clip(plane, BASE_WINDING_EPSILON);
+			w = w->clip(plane, BASE_WINDING_EPSILON);
 		}
 		else 
 		{
 			// take back
 			Planef	back = -plane;
-			w = w->Clip(back, BASE_WINDING_EPSILON);
+			w = w->clip(back, BASE_WINDING_EPSILON);
 		}
 		pNode = n;
 		n = n->parent;
@@ -156,12 +156,12 @@ void bspNode::SplitPortals(XPlaneSet& planes)
 		// this means that the 
 		p->pWinding->Split(*plane, SPLIT_WINDING_EPSILON, &frontwinding, &backwinding);
 
-		if (frontwinding && frontwinding->IsTiny())
+		if (frontwinding && frontwinding->isTiny())
 		{
 			X_DELETE_AND_NULL(frontwinding, g_arena);
 		}
 
-		if (backwinding && backwinding->IsTiny())
+		if (backwinding && backwinding->isTiny())
 		{
 			X_DELETE_AND_NULL(backwinding, g_arena);
 		}

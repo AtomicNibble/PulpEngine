@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "Winding.h"
 
+#if 0
+
 void XWinding::Clear(void)
 {
 	numPoints = 0;
@@ -881,3 +883,4 @@ bool XWinding::SLoad(core::XFile* pFile)
 // ~ISerialize
 
 
+#endif

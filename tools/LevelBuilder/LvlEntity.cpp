@@ -62,7 +62,7 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 		pBSide = p->FindAreaPortalSide();
 		if (!pBSide)
 		{
-			Vec3f center = p->pWinding->GetCenter();
+			Vec3f center = p->pWinding->getCenter();
 			X_ERROR("LvlEnt", "Failed to find portal side for inter info at: (%g,%g,%g)",
 				center[0], center[1], center[2]);
 			return false;
@@ -203,7 +203,7 @@ bool LvlEntity::FacesToBSP(XPlaneSet& planeSet)
 		const bspFace& face = *pFace;
 		const XWinding& winding = *face.w;
 
-		for (int32_t i = 0; i < winding.GetNumPoints(); i++)
+		for (int32_t i = 0; i < winding.getNumPoints(); i++)
 		{
 			root.bounds.add(winding[i].asVec3());
 		}

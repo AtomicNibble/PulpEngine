@@ -210,7 +210,7 @@ bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 				continue;		// back side clipaway
 			}
 
-			w = w->Clip(planes[sides[j].planenum ^ 1], 0.01f);
+			w = w->clip(planes[sides[j].planenum ^ 1], 0.01f);
 		}
 		if (pSide->pWinding) {
 			X_DELETE(pSide->pWinding, g_arena);
@@ -234,7 +234,7 @@ bool LvlBrush::boundBrush(const XPlaneSet& planes)
 		if (!w) {
 			continue;
 		}
-		for (j = 0; j < w->GetNumPoints(); j++) {
+		for (j = 0; j < w->getNumPoints(); j++) {
 			bounds.add((*w)[j].asVec3());
 		}
 	}
@@ -337,7 +337,7 @@ float LvlBrush::Volume(const XPlaneSet& planes)
 		}
 		plane = &planes[sides[i].planenum];
 		d = -plane->distance(corner);
-		area = w->GetArea();
+		area = w->getArea();
 		volume += d * area;
 	}
 
@@ -364,7 +364,7 @@ BrushPlaneSide::Enum LvlBrush::BrushMostlyOnSide(const Planef& plane) const
 			continue;
 		}
 
-		for (j = 0; j < w->GetNumPoints(); j++)
+		for (j = 0; j < w->getNumPoints(); j++)
 		{
 			d = plane.distance((*w)[j].asVec3());
 			if (d > max)

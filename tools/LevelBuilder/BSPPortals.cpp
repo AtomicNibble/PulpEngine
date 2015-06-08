@@ -20,12 +20,12 @@ namespace
 
 			if (n->children[0] == node) {
 				// take front
-				w = w->Clip(plane, BASE_WINDING_EPSILON);
+				w = w->clip(plane, BASE_WINDING_EPSILON);
 			}
 			else {
 				// take back
 				Planef	back = -plane;
-				w = w->Clip(back, BASE_WINDING_EPSILON);
+				w = w->clip(back, BASE_WINDING_EPSILON);
 			}
 			node = n;
 			n = n->parent;
@@ -69,7 +69,7 @@ void bspPortal::MakeNodePortal(XPlaneSet& planeSet, bspNode* node)
 			side = 0;	// quiet a compiler warning
 		}
 
-		w = w->Clip(plane, CLIP_EPSILON);
+		w = w->clip(plane, CLIP_EPSILON);
 	}
 
 	if (!w)
@@ -82,7 +82,7 @@ void bspPortal::MakeNodePortal(XPlaneSet& planeSet, bspNode* node)
 	w->Print();
 #endif // X_DEBUG
 
-	if (w->IsTiny())
+	if (w->isTiny())
 	{
 		X_DELETE(w, g_arena);
 		return;
@@ -170,7 +170,7 @@ void bspPortal::MakeHeadnodePortals(bspTree& tree)
 			if (j == i) {
 				continue;
 			}
-			portals[i]->pWinding = portals[i]->pWinding->Clip(bplanes[j], ON_EPSILON);
+			portals[i]->pWinding = portals[i]->pWinding->clip(bplanes[j], ON_EPSILON);
 		}
 	}
 
@@ -178,7 +178,7 @@ void bspPortal::MakeHeadnodePortals(bspTree& tree)
 	X_LOG0("BspPortal", "Head node windings");
 	// print the head nodes portal bounds.
 	for (i = 0; i<6; i++) {
-		portals[i]->pWinding->Print();
+		portals[i]->pWinding->print();
 	}
 #endif // !X_DEBUG
 }
@@ -307,7 +307,7 @@ const LvlBrushSide* bspPortal::FindAreaPortalSide(void) const
 						continue;
 					}
 
-					Vec3f center = s2->pVisibleHull->GetCenter();
+					Vec3f center = s2->pVisibleHull->getCenter();
 
 					X_WARNING("Portal", "brush has multiple area portal sides at (%g,%g,%g)",
 						center[0], center[1], center[2]);

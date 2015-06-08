@@ -841,7 +841,7 @@ public:
 	Vec5() : x(0), y(0), z(0), s(0), t(0) {}
 	Vec5(T X, T Y, T Z, T S = 0, T t = 0) : x(X), y(Y), z(Z), s(S), t(t) {}
 	Vec5(const Vec5<T>& src) : x(src.x), y(src.y), z(src.z), s(src.s), t(src.t) {}
-//	explicit Vec5(const Vec3<T>& src) : x(src.x), y(src.y), z(src.z), s(0), t(0) {}
+	explicit Vec5(const Vec3<T>& src) : x(src.x), y(src.y), z(src.z), s(0), t(0) {}
 	explicit Vec5(const T* pSrc) : x(pSrc[0]), y(pSrc[1]), z(pSrc[2]), s(pSrc[3]), t(pSrc[4]) {}
 
 	X_INLINE void set(T X, T Y, T Z, T S, T _T) {
