@@ -217,9 +217,6 @@ void XRenderAuxImp::RT_Flush(const XAuxGeomCBRawDataPackaged& data, size_t begin
 				}
 			}
 
-			// adjust render states based on current render flags
-			AdjustRenderStates(curRenderFlags);
-
 			// prepare thick lines
 			if (XRenderAux::PrimType::TriList == primType && XRenderAux::IsThickLine(curRenderFlags))
 			{
@@ -1013,6 +1010,10 @@ void XRenderAuxImp::SetShader(const XAuxGeomRenderFlags& renderFlags)
 			pAuxGeomShader_->FXBegin(&passes, 0);
 			pAuxGeomShader_->FXBeginPass(0);
 
+			// override the shaders states.
+			// adjust render states based on current render flags
+			AdjustRenderStates(renderFlags);
+
 
 			core::StrHash name("matViewProj");
 			Matrix44f matViewProjT;
@@ -1125,6 +1126,7 @@ void XRenderAuxImp::AdjustRenderStates(const XAuxGeomRenderFlags& renderFlags)
 	{
 		case AuxGeom_DepthWrite::DepthWriteOff:
 		{
+			state = (state & ~States::DEPTHWRITE);
 			break;
 		}
 		case AuxGeom_DepthWrite::DepthWriteOn:
