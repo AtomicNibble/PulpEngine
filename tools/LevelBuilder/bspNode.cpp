@@ -364,3 +364,87 @@ bool bspNode::CheckAreas_r(void)
 
 	return true;
 }
+
+
+int32_t	bspNode::PruneNodes_r(void)
+{
+	int32_t	a1, a2;
+
+	if (planenum == PLANENUM_LEAF) {
+		return area;
+	}
+
+	a1 = children[0]->PruneNodes_r();
+	a2 = children[1]->PruneNodes_r();
+
+	if (a1 != a2 || a1 == PLANENUM_AREA_DIFF) {
+		return PLANENUM_AREA_DIFF;
+	}
+
+	// free all the nodes below this point
+	children[0]->FreeTreePortals_r();
+	children[1]->FreeTreePortals_r();
+	children[0]->FreeTree_r();
+	children[1]->FreeTree_r();
+
+	// change this node to a leaf
+	planenum = PLANENUM_LEAF;
+	area = a1;
+
+	return a1;
+}
+
+void bspNode::FreeTreePortals_r(void)
+{
+	// free all the portals.
+	bspPortal *p, *nextp;
+	int32_t s;
+
+	// free children
+	if (planenum != PLANENUM_LEAF)
+	{
+		children[0]->FreeTreePortals_r();
+		children[1]->FreeTreePortals_r();
+	}
+
+	// free portals
+	for (p = portals; p; p = nextp)
+	{
+		s = (p->nodes[1] == this);
+		nextp = p->next[s];
+
+		p->RemoveFromNode(p->nodes[!s]);
+		X_DELETE(p, g_arena);
+	}
+	
+	portals = nullptr;
+}
+
+void bspNode::FreeTree_r(void)
+{
+	// free all the sub nodes and self.
+	// free children
+	if (planenum != PLANENUM_LEAF)
+	{
+		children[0]->FreeTree_r();
+		children[1]->FreeTree_r();
+	}
+
+	X_DELETE(this, g_arena);
+}
+
+int32_t bspNode::NumberNodes_r(bspNode* pNode, int32_t nextNumber)
+{
+	X_ASSERT_NOT_NULL(pNode);
+
+	if (pNode->planenum == PLANENUM_LEAF) {
+		return nextNumber;
+	}
+
+	pNode->nodeNumber = nextNumber;
+	nextNumber++;
+	nextNumber = NumberNodes_r(pNode->children[0], nextNumber);
+	nextNumber = NumberNodes_r(pNode->children[1], nextNumber);
+
+	return nextNumber;
+}

@@ -103,6 +103,14 @@ public:
 
 	bool CheckAreas_r(void);
 
+	int32_t	PruneNodes_r(void);
+
+	void FreeTreePortals_r(void);
+	void FreeTree_r(void);
+
+	// give each node a number.
+	static int NumberNodes_r(bspNode* pNode, int32_t nextNumber);
+
 public:
 	// leafs and nodes
 	int32_t			planenum;			// -1 = leaf node 
