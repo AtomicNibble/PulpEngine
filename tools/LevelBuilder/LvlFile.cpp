@@ -45,9 +45,11 @@ namespace
 		node_(node), pFile_(pFile) {
 			X_ASSERT_NOT_NULL(pFile);
 			node.offset = pFile->tell();
+			node.offset -= sizeof(FileHeader);
 		}
 		~ScopedNodeInfo() {
 			node_.size = pFile_->tell() - node_.offset;
+			node_.size -= sizeof(FileHeader);
 		}
 
 		FileNode& node_;
