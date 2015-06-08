@@ -145,7 +145,8 @@ public:
 	bool FillOutside(void);
 	bool ClipSidesByTree(XPlaneSet& planeSet);
 	bool FloodAreas(void);
-
+	bool PruneNodes(void);
+	
 private:
 
 	bool PlaceOccupant(XPlaneSet& planeSet, bspNode* node, size_t& floodedNum);

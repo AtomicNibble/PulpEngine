@@ -359,7 +359,7 @@ bool LvlEntity::FillOutside(void)
 {
 	FillStats stats;
 
-	X_LOG0("Lvl", "--- FillOutside ---");
+	X_LOG0("LvlEntity", "--- FillOutside ---");
 	bspTree.headnode->FillOutside_r(stats);
 
 	stats.print();
@@ -368,7 +368,7 @@ bool LvlEntity::FillOutside(void)
 
 bool LvlEntity::ClipSidesByTree(XPlaneSet& planeSet)
 {
-	X_LOG0("Lvl", "--- ClipSidesByTree ---");
+	X_LOG0("LvlEntity", "--- ClipSidesByTree ---");
 
 	size_t i, x;
 
@@ -397,13 +397,13 @@ bool LvlEntity::ClipSidesByTree(XPlaneSet& planeSet)
 
 bool LvlEntity::FloodAreas(void)
 {
-	X_LOG0("Lvl", "--- FloodAreas ---");
+	X_LOG0("LvlEntity", "--- FloodAreas ---");
 
 	numAreas = 0;
 	// find how many we have.
 	bspTree.headnode->FindAreas_r(numAreas);
 
-	X_LOG0("Lvl", "%5i areas", numAreas);
+	X_LOG0("LvlEntity", "%5i areas", numAreas);
 
 
 	// check we not missed.
@@ -412,13 +412,13 @@ bool LvlEntity::FloodAreas(void)
 
 	// skip inter area portals if only one?
 	if (numAreas < 2) {
-		X_LOG0("Portal", "Skipping inter portals. less than two area's");
+		X_LOG0("LvlEntity", "Skipping inter portals. less than two area's");
 		return true;
 	}
 
 	// we want to create inter area portals now.
 	if (!FindInterAreaPortals()) {
-		X_ERROR("Portal", "Failed to calculate the inter area portal info.");
+		X_ERROR("LvlEntity", "Failed to calculate the inter area portal info.");
 		return false;
 	}
 
@@ -426,4 +426,21 @@ bool LvlEntity::FloodAreas(void)
 }
 
 
+bool LvlEntity::PruneNodes(void)
+{
+	X_LOG0("LvlEntity", "--- PruneNodes ---");
+	
+	if (!bspTree.headnode) {
+		X_ERROR("LvlEntity", "Failed to prineNodes the tree is invalid.");
+		return false;
+	}
+
+	bspTree.headnode->PruneNodes_r();
+
+
+
+	bspNode::NumberNodes_r(bspTree.headnode, 0);
+
+	return true;
+}
 
