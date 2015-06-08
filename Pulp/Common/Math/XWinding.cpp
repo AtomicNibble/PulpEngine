@@ -674,7 +674,7 @@ XWinding* XWinding::clip(const Planef &plane, const float epsilon, const bool ke
 }
 
 
-XWinding *XWinding::Copy(void) const
+XWinding* XWinding::Copy(void) const
 {
 	return X_NEW(XWinding, gEnv->pArena, "WindingCopy")(*this);
 }
