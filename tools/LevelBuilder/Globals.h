@@ -5,6 +5,8 @@
 #define LVL_BUILDER_GLOBALS_H_
 
 static const int PLANENUM_LEAF = -1;
+static const int PLANENUM_AREA_DIFF = -2;
+
 
 static const float ON_EPSILON = 0.1f;
 static const float CLIP_EPSILON = 0.1f;
