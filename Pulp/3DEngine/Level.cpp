@@ -9,6 +9,8 @@
 
 #include <Memory\MemCursor.h>
 
+#include <Math\XWinding.h>
+
 #include <IRenderAux.h>
 
 X_NAMESPACE_BEGIN(level)
@@ -20,6 +22,7 @@ AsyncLoadData::~AsyncLoadData()
 // --------------------------------
 
 int Level::s_var_drawAreaBounds_ = 0;
+int Level::s_var_drawPortals_ = 0;
 int Level::s_var_drawArea_ = -1;
 
 
@@ -60,7 +63,10 @@ bool Level::Init(void)
 
 	ADD_CVAR_REF("lvl_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 1, core::VarFlag::SYSTEM,
 		"Draws bounding box around each level area");
-		
+
+	ADD_CVAR_REF("lvl_drawPortals", s_var_drawPortals_, 0, 0, 4, core::VarFlag::SYSTEM,
+		"Draws the inter area portals. 0=off 1=solid 2=wire 3=solid_dt 4=wire_dt");
+
 	ADD_CVAR_REF("lvl_drawArea", s_var_drawArea_, -1, -1, level::MAP_MAX_AREAS, core::VarFlag::SYSTEM,
 		"Draws the selected area index. -1 = disable");
 
@@ -167,6 +173,46 @@ bool Level::render(void)
 		{
 			Vec3f pos = Vec3f::zero();
 			pAux->drawAABB(it->pMesh->boundingBox,pos, false, Col_Red);
+		}
+	}
+
+	if (s_var_drawPortals_ > 0)
+	{
+		using namespace render;
+
+		IRenderAux* pAux = gEnv->pRender->GetIRenderAuxGeo();
+		XAuxGeomRenderFlags flags = AuxGeom_Defaults::Def3DRenderflags;
+
+		// 0=off 1=solid 2=wire 3=solid_dt 4=wire_dt
+		flags.SetAlphaBlendMode(AuxGeom_AlphaBlendMode::AlphaBlended);
+
+		if (s_var_drawPortals_ == 2 || s_var_drawPortals_ == 4)
+		{
+			flags.SetFillMode(AuxGeom_FillMode::FillModeWireframe);
+		}
+
+		if (s_var_drawPortals_ == 3 || s_var_drawPortals_ == 4)
+		{
+			flags.SetDepthWriteFlag(AuxGeom_DepthWrite::DepthWriteOn);
+			flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOn);
+		}
+		else
+		{
+			flags.SetDepthWriteFlag(AuxGeom_DepthWrite::DepthWriteOff);
+			flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOff);
+		}
+
+		pAux->setRenderFlags(flags);
+
+		// draw portals.
+		for (const auto& p : portals_)
+		{
+			AABB box;
+			p.pWinding->GetAABB(box);
+
+			pAux->drawAABB(
+				box, Vec3f::zero(), true, Colorf(0.f,0.f,1.f,0.5f)
+			);
 		}
 	}
 
@@ -369,13 +415,37 @@ bool Level::ProcessData(uint32_t bytesRead)
 	// area Portals
 	if (fileHdr_.numinterAreaPortals > 0)
 	{
+		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_PORTALS);
+
+
 		// 2 ints for the area numbers followed by a winding.
 		uint32_t i, numIaps = fileHdr_.numinterAreaPortals;
 
 		for (i = 0; i < numIaps; i++)
-		{
-			Portal& p = portals_.AddOne();
-			
+		{		
+			XWinding* pWinding = X_NEW(XWinding, g_3dEngineArena, "AreaPortalWinding");
+			int32_t a1, a2;
+
+			file.readObj(a1);
+			file.readObj(a2);
+
+			if (!pWinding->SLoad(&file)) {
+				X_ERROR("Level", "Failed to load area windings");
+				return false;
+			}
+
+			Portal& p1 = portals_.AddOne();
+
+			pWinding->getPlane(p1.plane);
+			p1.pWinding = pWinding;
+			p1.areaTo = a2;
+
+			Portal& p2 = portals_.AddOne();
+
+			p2.pWinding = pWinding->ReverseWinding();
+			p2.pWinding->getPlane(p2.plane);
+			p2.areaTo = a1;
+
 		}
 	}
 	else
