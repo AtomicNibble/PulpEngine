@@ -55,6 +55,9 @@ struct AreaModel
 
 class Level : public engine::XEngineBase
 {
+	typedef core::Array<AreaModel> AreaModelArr;
+	typedef core::Array<Portal> PortalArr;
+
 public:
 	Level();
 	~Level();	
@@ -77,7 +80,9 @@ private:
 private:
 	core::GrowingStringTable<256, 16, 4, uint32_t> stringTable_;
 
-	core::Array<AreaModel> areaModels_;
+	AreaModelArr areaModels_;
+	PortalArr portals_;
+
 	uint8_t* pFileData_;
 
 	bool canRender_;

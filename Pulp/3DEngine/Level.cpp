@@ -27,7 +27,8 @@ int Level::s_var_drawArea_ = -1;
 
 Level::Level() :
 areaModels_(g_3dEngineArena),
-stringTable_(g_3dEngineArena)
+stringTable_(g_3dEngineArena),
+portals_(g_3dEngineArena)
 {
 	canRender_ = false;
 
@@ -365,7 +366,22 @@ bool Level::ProcessData(uint32_t bytesRead)
 		}
 	}
 
+	// area Portals
+	if (fileHdr_.numinterAreaPortals > 0)
+	{
+		// 2 ints for the area numbers followed by a winding.
+		uint32_t i, numIaps = fileHdr_.numinterAreaPortals;
 
+		for (i = 0; i < numIaps; i++)
+		{
+			Portal& p = portals_.AddOne();
+			
+		}
+	}
+	else
+	{
+		X_WARNING("Level","Level has no inter area portals.");
+	}
 
 
 	// clean up.
