@@ -149,7 +149,7 @@ bool LvlBuilder::save(const char* name)
 		{
 			ScopedNodeInfo node(hdr.nodes[FileNodes::BSP_TREE], file);
 
-			hdr.flags.Set(LevelFileFlags::INTER_AREA_INFO);
+			hdr.flags.Set(LevelFileFlags::BSP_TREE);
 
 			// need to write out all the nodes.
 			// for none leaf nodes we will write the nodes number.
