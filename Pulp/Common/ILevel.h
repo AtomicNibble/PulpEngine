@@ -305,63 +305,7 @@ typedef int Index;
 // plane type for BSP.
 typedef Planef Plane;
 
-// a surface which can be a plane or a patch.
-// a plane also uses indexes.
-struct Surface
-{
-	int32_t				materialIdx;
-	SurfaceType::Enum	surfaceType; // 8
 
-	int32_t				vertexStartIdx;
-	int32_t				numVerts;	// 16
-
-	int32_t				indexStartIdx;
-	int32_t				numIndexes;	// 24
-
-	int32_t				lightMapNum;
-	Vec2<int32_t>		lightMapPos;
-	Vec2<int32_t>		lightMapDimensions;
-
-	// only set for patches.
-	Vec2<int32_t>		patchSize;	// 44
-}; 
-
-
-// Used for collision detection, not rendering.
-struct BrushSide
-{
-	int32_t planeIdx;
-	int32_t shaderNum;
-};
-
-struct Brush
-{
-	int32_t	firstSide;
-	int32_t	numSides;
-	int32_t	shaderNum;
-};
-
-struct Leaf
-{
-	int32_t cluster;	//cluster index for visdata
-	int32_t area;		// areaportal area
-
-	AABB bounds; // 0x20
-
-	int32_t leafFaceStartIdx;	// first index in leafFaces array
-	int32_t numFaces;	
-	int32_t leafBrushStartIdx;	// first index into leaf brushes array
-	int32_t numBrushes;	// 0x30
-};
-
-
-struct Node
-{
-	int32_t planeIdx;
-	// child nodes,  negative numbers are 'struct Leaf' not nodes.
-	int32_t front, back;
-	AABB bounds; // 0x24
-};
 
 struct Portal
 {
@@ -395,8 +339,9 @@ struct Area
 	int32_t numPortals; // te number of portals leading out the area
 	int32_t numStaticModels;
 
-	core::Pointer64<Portal> pPortals;
-	
+	model::MeshHeader* pMesh;
+	model::IRenderMesh* pRenderMesh;
+
 	AABB boundingBox;
 	Sphere boundingSphere;
 };
@@ -495,13 +440,6 @@ X_ENSURE_SIZE(Vertex, 44);
 X_ENSURE_SIZE(Index, 4);
 X_ENSURE_SIZE(Plane, 16);
 
-X_ENSURE_SIZE(Surface, 0x34);
-
-X_ENSURE_SIZE(BrushSide, 8);
-X_ENSURE_SIZE(Brush, 12);
-
-X_ENSURE_SIZE(Leaf, 0x30);
-X_ENSURE_SIZE(Node, 0x24);
 // X_ENSURE_SIZE(Portal, 0x28);
 X_ENSURE_SIZE(Area, 0x28 + 0xC + 12);
 
