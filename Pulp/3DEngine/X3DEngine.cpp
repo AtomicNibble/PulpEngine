@@ -104,7 +104,8 @@ bool X3DEngine::Init()
 
 	level::Level::Init();
 
-	level_.Load("box2");
+//	level_.Load("boxmap");
+	level_.Load("portal_test");
 	return true;
 }
 
