@@ -81,9 +81,6 @@
     <ClInclude Include="VertexFmt.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="BSPData.h">
-      <Filter>Header Files\BSP</Filter>
-    </ClInclude>
     <ClInclude Include="LvlTypes.h">
       <Filter>Header Files\Lvl</Filter>
     </ClInclude>
