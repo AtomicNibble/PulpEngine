@@ -5,7 +5,6 @@
 #define X_BSP_TYPES_H_
 
 #include <Containers\LinkedListIntrusive.h>
-#include "BSPData.h"
 
 X_NAMESPACE_DECLARE(mapfile,
 class XMapFile;
