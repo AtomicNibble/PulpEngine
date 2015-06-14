@@ -67,7 +67,7 @@ struct AreaPortal
 public:
 	int32_t		areaTo;		// the area this portal leads to.
 	XWinding*	pWinding;	// winding points have counter clockwise ordering seen this area
-	Planef		plane;		// view must be on the positive side of the plane to cross		
+	Planef		plane;		// view must be on the positive side of the plane to cross	
 };
 
 
@@ -77,13 +77,33 @@ struct Area
 	~Area();
 
 public:
+	typedef core::Array<AreaPortal> AreaPortalArr;
+
 	int32_t areaNum;
 	// points the the area's mesh header.
 	model::MeshHeader* pMesh;
 	// the render mesh for the area's model.
 	model::IRenderMesh* pRenderMesh;
 	// portals leading out this area.
-	core::Array<AreaPortal> portals;
+	AreaPortalArr portals;
+
+	// used to check if it's visable this frame.
+	size_t frameID;
+};
+
+struct PortalStack 
+{
+	static const int MAX_PORTAL_PLANES = 20;
+public:
+	PortalStack();
+
+public:
+	const AreaPortal* pPortal;
+	const struct PortalStack* pNext;
+
+	Rectf rect;
+	size_t numPortalPlanes;
+	Planef portalPlanes[MAX_PORTAL_PLANES + 1];
 };
 
 
@@ -107,6 +127,8 @@ public:
 
 	bool Load(const char* mapName);
 
+	void DrawPortalDebug(void) const;
+
 public:
 	// util
 	size_t NumAreas(void) const;
@@ -114,6 +136,14 @@ public:
 
 	bool IsPointInAnyArea(const Vec3f& pos) const;
 	bool IsPointInAnyArea(const Vec3f& pos, int32_t& areaOut) const;
+
+	void FlowViewThroughPortals(const int32_t areaNum, const Vec3f origin, 
+		size_t numPlanes, const Planef* pPlanes);
+
+	void FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum,
+		const PortalStack* ps);
+
+	void AddAreaRefs(int32_t areaNum, const PortalStack* ps);
 
 
 private:
@@ -130,6 +160,8 @@ private:
 	AreaNodeArr areaNodes_;
 
 private:
+	size_t frameID_; // inc'd each frame.
+
 	// pointer to the file data.
 	// kept valid while lvl is loaded since mesh headers point to it.
 	uint8_t* pFileData_;
@@ -152,6 +184,7 @@ private:
 	static int s_var_drawAreaBounds_;
 	static int s_var_drawPortals_;
 	static int s_var_drawArea_;
+	static int s_var_drawCurrentAreaOnly_;
 };
 
 
