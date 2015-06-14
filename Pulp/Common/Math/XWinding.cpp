@@ -11,14 +11,18 @@ namespace
 	static const int MIN_WORLD_COORD = (-128 * 1024);
 	static const int MAX_WORLD_SIZE = (MAX_WORLD_COORD - MIN_WORLD_COORD);
 
+#if 1
+	#define alloca16(numBytes) ((void *)((((int)_alloca( (numBytes)+15 )) + 15) & ~15))
+#else
 	template<typename T>
-	T* Alloca16(size_t num)
+	X_INLINE T* Alloca16(size_t num)
 	{
 		void* pData = _alloca(num + 15);
 		// align.
 		pData = core::pointerUtil::AlignTop(pData, 16);
 		return reinterpret_cast<T*>(pData);
 	}
+#endif
 
 	X_DISABLE_WARNING(4756)
 
@@ -492,7 +496,7 @@ bool XWinding::clipInPlace(const Planef& plane, const float epsilon, const bool 
 
 	maxpts = numPoints_ + 4;		// cant use counts[0]+2 because of fp grouping errors
 
-	newPoints = Alloca16<Vec5f>(maxpts * sizeof(Vec5f));
+	newPoints = reinterpret_cast<Vec5f*>(alloca16(maxpts * sizeof(Vec5f)));
 	newNumPoints = 0;
 
 	for (i = 0; i < numPoints_; i++) 
@@ -547,7 +551,7 @@ bool XWinding::clipInPlace(const Planef& plane, const float epsilon, const bool 
 	}
 
 	if (!EnsureAlloced(newNumPoints, false)) {
-		return true;
+		return false;
 	}
 
 	numPoints_ = newNumPoints;
@@ -608,7 +612,7 @@ XWinding* XWinding::clip(const Planef &plane, const float epsilon, const bool ke
 
 	maxpts = numPoints_ + 4;		// cant use counts[0]+2 because of fp grouping errors
 
-	newPoints = Alloca16<Vec5f>(maxpts * sizeof(Vec5f));
+	newPoints = reinterpret_cast<Vec5f*>(alloca16(maxpts * sizeof(Vec5f)));
 	newNumPoints = 0;
 
 	for (i = 0; i < numPoints_; i++) {
@@ -860,9 +864,9 @@ void XWinding::AddToConvexHull(const XWinding *winding, const Vec3f &normal, con
 		return;
 	}
 
-	newHullPoints = (Vec5f *)_alloca(maxPts * sizeof(Vec5f));
-	hullDirs = (Vec3f *)_alloca(maxPts * sizeof(Vec3f));
-	hullSide = (bool *)_alloca(maxPts * sizeof(bool));
+	newHullPoints = (Vec5f *)alloca16(maxPts * sizeof(Vec5f));
+	hullDirs = (Vec3f *)alloca16(maxPts * sizeof(Vec3f));
+	hullSide = (bool *)alloca16(maxPts * sizeof(bool));
 
 	for (i = 0; i < winding->numPoints_; i++)
 	{
@@ -977,8 +981,8 @@ void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const fl
 		}
 	}
 
-	hullDirs = (Vec3f *)_alloca(numPoints_ * sizeof(Vec3f));
-	hullSide = (bool *)_alloca(numPoints_ * sizeof(bool));
+	hullDirs = (Vec3f *)alloca16(numPoints_ * sizeof(Vec3f));
+	hullSide = (bool *)alloca16(numPoints_ * sizeof(bool));
 
 	// calculate hull edge vectors
 	for (j = 0; j < numPoints_; j++) {
@@ -1017,7 +1021,7 @@ void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const fl
 		return;
 	}
 
-	hullPoints = Alloca16<Vec5f>((numPoints_ + 1) * sizeof(Vec5f));
+	hullPoints = reinterpret_cast<Vec5f*>(alloca16((numPoints_ + 1) * sizeof(Vec5f)));
 
 	// insert the point here
 	hullPoints[0] = point;
@@ -1038,37 +1042,6 @@ void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const fl
 	}
 	numPoints_ = numHullPoints;
 	memcpy(pPoints_, hullPoints, numHullPoints * sizeof(Vec3f));
-}
-
-
-// ----------------------------------------------------------------------
-
-
-bool XWinding::EnsureAlloced(int n, bool keep)
-{
-	if (n > allocedSize_) {
-		return ReAllocate(n, keep);
-	}
-	return true;
-}
-
-bool XWinding::ReAllocate(int n, bool keep)
-{
-	Vec5f* oldP;
-
-	oldP = pPoints_;
-
-	n = core::bitUtil::RoundUpToMultiple(n, 4);
-
-	pPoints_ = new Vec5f[n];
-	if (oldP) {
-		if (keep) {
-			memcpy(pPoints_, oldP, numPoints_ * sizeof(pPoints_[0]));
-		}
-		delete[] oldP;
-	}
-	allocedSize_ = n;
-	return true;
 }
 
 // ----------------------------------------------------------------------

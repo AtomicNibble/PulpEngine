@@ -58,3 +58,31 @@ X_INLINE int XWinding::getAllocatedSize(void) const
 	return allocedSize_;
 }
 
+
+
+X_INLINE bool XWinding::EnsureAlloced(int n, bool keep)
+{
+	if (n > allocedSize_) {
+		return ReAllocate(n, keep);
+	}
+	return true;
+}
+
+X_INLINE bool XWinding::ReAllocate(int n, bool keep)
+{
+	Vec5f* oldP;
+
+	oldP = pPoints_;
+
+	n = core::bitUtil::RoundUpToMultiple(n, 4);
+
+	pPoints_ = new Vec5f[n];
+	if (oldP) {
+		if (keep) {
+			memcpy(pPoints_, oldP, numPoints_ * sizeof(pPoints_[0]));
+		}
+		delete[] oldP;
+	}
+	allocedSize_ = n;
+	return true;
+}

@@ -89,8 +89,9 @@ public:
 
 
 private:
-	bool EnsureAlloced(int32_t num, bool keep = false);
-	bool ReAllocate(int32_t num, bool keep = false);
+	// must be inlined to not fuck up alloca
+	X_INLINE bool EnsureAlloced(int32_t num, bool keep = false);
+	X_INLINE bool ReAllocate(int32_t num, bool keep = false);
 
 private:
 	Vec5f*	pPoints_;
