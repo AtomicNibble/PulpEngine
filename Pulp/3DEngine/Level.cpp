@@ -621,6 +621,71 @@ int32_t Level::CommonChildrenArea_r(AreaNode* pAreaNode)
 	return common;
 }
 
+
+size_t Level::NumAreas(void) const
+{
+	return areas_.size();
+}
+
+size_t Level::NumPortalsInArea(int32_t areaNum) const
+{
+	X_ASSERT((areaNum >= 0 && areaNum < safe_static_cast<int32_t,size_t>(NumAreas())),
+		"areaNum out of range")(areaNum, NumAreas());
+
+	return areas_[areaNum].portals.size();
+}
+
+bool Level::IsPointInAnyArea(const Vec3f& pos) const
+{
+	int32_t areaOut;
+	return IsPointInAnyArea(pos, areaOut);
+}
+
+bool Level::IsPointInAnyArea(const Vec3f& pos, int32_t& areaOut) const
+{
+	if (areaNodes_.isEmpty()) {
+		areaOut = -1;
+		return false;
+	}
+
+	const AreaNode* pNode = &areaNodes_[0];
+	int32_t nodeNum;
+
+	while (1)
+	{
+		float dis = pNode->plane.distance(pos);
+
+		if (dis > 0.f) {
+			nodeNum = pNode->children[0];
+		}
+		else {
+			nodeNum = pNode->children[1];
+		}
+		if (nodeNum == 0) {
+			areaOut = -1; // in solid
+			return false;
+		}
+		
+		if (nodeNum < 0) 
+		{
+			nodeNum = (-1 - nodeNum);
+
+			if (nodeNum >= safe_static_cast<int32_t,size_t>(areaNodes_.size())) {
+				X_ERROR("Level", "area out of range, when finding point for area");
+			}
+
+			areaOut = nodeNum;
+			return true;
+		}
+
+		pNode = &areaNodes_[nodeNum]; 
+	}
+
+	areaOut = -1;
+	return false;
+}
+
+
 #if 0
 bool Level::LoadFromFile(const char* filename)
 {
