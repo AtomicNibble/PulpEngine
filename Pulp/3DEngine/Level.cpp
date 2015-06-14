@@ -69,6 +69,7 @@ PortalStack::PortalStack()
 
 // --------------------------------
 
+int Level::s_var_usePortals_ = 1;
 int Level::s_var_drawAreaBounds_ = 0;
 int Level::s_var_drawPortals_ = 0;
 int Level::s_var_drawArea_ = -1;
@@ -111,6 +112,9 @@ bool Level::Init(void)
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
+	ADD_CVAR_REF("lvl_usePortals", s_var_usePortals_, 1, 0, 1,
+		core::VarFlag::SYSTEM, "Use area portals when rendering the level.");
+	
 	ADD_CVAR_REF("lvl_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 1,
 		core::VarFlag::SYSTEM, "Draws bounding box around each level area");
 
@@ -237,7 +241,8 @@ bool Level::render(void)
 	if (s_var_drawArea_ == -1)
 	{
 		// if we are outside world draw all.
-		if (camArea == -1)
+		// or usePortals is off.
+		if (camArea == -1 || s_var_usePortals_ == 0)
 		{
 			for (; it != areas_.end(); ++it)
 			{

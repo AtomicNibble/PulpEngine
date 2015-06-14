@@ -181,6 +181,7 @@ private:
 
 private:
 	// vars
+	static int s_var_usePortals_;
 	static int s_var_drawAreaBounds_;
 	static int s_var_drawPortals_;
 	static int s_var_drawArea_;
