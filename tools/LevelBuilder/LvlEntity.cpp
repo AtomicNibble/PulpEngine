@@ -435,12 +435,15 @@ bool LvlEntity::PruneNodes(void)
 		return false;
 	}
 
+	int32_t prePrune = bspTree.headnode->NumChildNodes();
+
 	bspTree.headnode->PruneNodes_r();
 
+	int32_t postPrune = bspTree.headnode->NumChildNodes();
 
 
-	bspNode::NumberNodes_r(bspTree.headnode, 0);
-
+	X_LOG0("LvlEntity", "prePrune: %i", prePrune);
+	X_LOG0("LvlEntity", "postPrune: %i", postPrune);
 	return true;
 }
 
