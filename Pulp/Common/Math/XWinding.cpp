@@ -462,11 +462,9 @@ bool XWinding::clipInPlace(const Planef& plane, const float epsilon, const bool 
 	{
 		dists[i] = dot = plane.distance(pPoints_[i].asVec3());
 		if (dot > epsilon) {
-		//	sides[i] = PlaneSide::FRONT;
 			sides[i] = PlaneSide::FRONT;
 		}
 		else if (dot < -epsilon) {
-		//	sides[i] = PlaneSide::BACK;
 			sides[i] = PlaneSide::BACK;
 		}
 		else {
@@ -554,7 +552,6 @@ bool XWinding::clipInPlace(const Planef& plane, const float epsilon, const bool 
 
 	numPoints_ = newNumPoints;
 	memcpy(pPoints_, newPoints, newNumPoints * sizeof(Vec5f));
-
 	return true;
 }
 
@@ -688,7 +685,7 @@ XWinding* XWinding::ReverseWinding(void)
 	for (int i = 0; i < numPoints_; i++) {
 		c->pPoints_[i] = pPoints_[numPoints_ - 1 - i];
 	}
-
+	c->numPoints_ = numPoints_;
 	return c;
 }
 
