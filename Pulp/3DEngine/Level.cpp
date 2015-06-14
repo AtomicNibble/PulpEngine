@@ -276,8 +276,6 @@ bool Level::render(void)
 	}
 
 	DrawPortalDebug();
-
-
 	return true;
 }
 
