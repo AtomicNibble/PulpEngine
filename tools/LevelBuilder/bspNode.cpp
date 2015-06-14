@@ -394,6 +394,11 @@ int32_t	bspNode::PruneNodes_r(void)
 	return a1;
 }
 
+int32_t bspNode::NumChildNodes(void)
+{
+	return NumChildNodes_r(this);
+}
+
 void bspNode::FreeTreePortals_r(void)
 {
 	// free all the portals.
@@ -456,8 +461,6 @@ void bspNode::WriteNodes_r(XPlaneSet& planes, core::XFile* pFile)
 	// get the plane.
 	const Planef& plane = planes[planenum];
 
-	// write the node number.
-	pFile->writeObj(this->nodeNumber);
 	pFile->writeObj(plane);
 	pFile->writeObj(childIds);
 
@@ -484,4 +487,23 @@ int32_t bspNode::NumberNodes_r(bspNode* pNode, int32_t nextNumber)
 	nextNumber = NumberNodes_r(pNode->children[1], nextNumber);
 
 	return nextNumber;
+}
+
+
+int32_t bspNode::NumChildNodes_r(bspNode* pNode)
+{
+	X_ASSERT_NOT_NULL(pNode);
+	// leaf don't count.
+	if (pNode->planenum == PLANENUM_LEAF) {
+		return 0;
+	}
+
+	int32_t num = 1;
+
+	if (pNode->children[0])
+		num += NumChildNodes_r(pNode->children[0]);
+	if (pNode->children[1])
+		num += NumChildNodes_r(pNode->children[1]);
+
+	return num;
 }
