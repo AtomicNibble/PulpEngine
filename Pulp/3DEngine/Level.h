@@ -42,21 +42,55 @@ struct AsyncLoadData
 	core::XFileAsyncOperation AsyncOp_;
 };
 
-struct AreaModel
-{
-	AreaModel() {
-		pMesh = nullptr;
-		pRenderMesh = nullptr;
-	}
 
-	model::MeshHeader* pMesh;
-	model::IRenderMesh* pRenderMesh;
+struct AreaNode 
+{
+	static const int32_t CHILDREN_HAVE_MULTIPLE_AREAS = -2;
+	static const int32_t AREANUM_SOLID = -1;
+
+public:
+	AreaNode();
+
+public:
+	Planef	plane;
+	// negative numbers are (-1 - areaNumber), 0 = solid
+	int32_t	children[2];
+	int32_t commonChildrenArea;
 };
+
+
+struct AreaPortal
+{
+	AreaPortal();
+	~AreaPortal();
+
+public:
+	int32_t		areaTo;		// the area this portal leads to.
+	XWinding*	pWinding;	// winding points have counter clockwise ordering seen this area
+	Planef		plane;		// view must be on the positive side of the plane to cross		
+};
+
+
+struct Area
+{
+	Area();
+	~Area();
+
+public:
+	int32_t areaNum;
+	// points the the area's mesh header.
+	model::MeshHeader* pMesh;
+	// the render mesh for the area's model.
+	model::IRenderMesh* pRenderMesh;
+	// portals leading out this area.
+	core::Array<AreaPortal> portals;
+};
+
 
 class Level : public engine::XEngineBase
 {
-	typedef core::Array<AreaModel> AreaModelArr;
-	typedef core::Array<Portal> PortalArr;
+	typedef core::Array<Area> AreaArr;
+	typedef core::Array<AreaNode> AreaNodeArr;
 
 public:
 	Level();
@@ -73,16 +107,31 @@ public:
 
 	bool Load(const char* mapName);
 
+public:
+	// util
+	size_t NumAreas(void) const;
+	size_t NumPortalsInArea(int32_t areaNum) const;
+
+	bool IsPointInAnyArea(const Vec3f& pos) const;
+	bool IsPointInAnyArea(const Vec3f& pos, int32_t& areaOut) const;
+
+
 private:
 	bool ProcessHeader(uint32_t bytesRead);
 	bool ProcessData(uint32_t bytesRead);
 
 private:
+	int32_t CommonChildrenArea_r(AreaNode* pAreaNode);
+
+private:
 	core::GrowingStringTable<256, 16, 4, uint32_t> stringTable_;
 
-	AreaModelArr areaModels_;
-	PortalArr portals_;
+	AreaArr areas_;
+	AreaNodeArr areaNodes_;
 
+private:
+	// pointer to the file data.
+	// kept valid while lvl is loaded since mesh headers point to it.
 	uint8_t* pFileData_;
 
 	bool canRender_;

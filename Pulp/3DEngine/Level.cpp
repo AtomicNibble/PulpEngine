@@ -21,17 +21,55 @@ AsyncLoadData::~AsyncLoadData()
 
 // --------------------------------
 
+AreaNode::AreaNode()
+{
+	children[0] = -1;
+	children[1] = -1;
+	commonChildrenArea = -1;
+}
+
+
+AreaPortal::AreaPortal()
+{
+	areaTo = -1;
+	pWinding = nullptr;
+}
+
+AreaPortal::~AreaPortal()
+{
+	if (pWinding) {
+		X_DELETE(pWinding, g_3dEngineArena);
+	}
+}
+
+Area::Area() : portals(g_3dEngineArena)
+{
+	areaNum = -1;
+	pMesh = nullptr;
+	pRenderMesh = nullptr;
+}
+
+Area::~Area()
+{
+	pMesh = nullptr; // Area() don't own the memory.
+
+	if (pRenderMesh) {
+		pRenderMesh->release();
+	}
+}
+
+// --------------------------------
+
 int Level::s_var_drawAreaBounds_ = 0;
 int Level::s_var_drawPortals_ = 0;
 int Level::s_var_drawArea_ = -1;
 
-
 // --------------------------------
 
 Level::Level() :
-areaModels_(g_3dEngineArena),
-stringTable_(g_3dEngineArena),
-portals_(g_3dEngineArena)
+areas_(g_3dEngineArena),
+areaNodes_(g_3dEngineArena),
+stringTable_(g_3dEngineArena)
 {
 	canRender_ = false;
 
@@ -110,6 +148,7 @@ void Level::free(void)
 {
 	canRender_ = false;
 
+#if 0
 	// clear render mesh.
 	core::Array<AreaModel>::ConstIterator it = areaModels_.begin();
 	for (; it != areaModels_.end(); ++it)
@@ -118,6 +157,10 @@ void Level::free(void)
 	}
 
 	areaModels_.free();
+#endif
+
+	areas_.free();
+	areaNodes_.free();
 
 	if (pFileData_) {
 		X_DELETE_ARRAY(pFileData_, g_3dEngineArena);
@@ -148,6 +191,22 @@ bool Level::render(void)
 	if (!canRender())
 		return false;
 
+	AreaArr::ConstIterator it = areas_.begin();
+
+	if (s_var_drawArea_ == -1)
+	{
+		for (; it != areas_.end(); ++it)
+		{
+			it->pRenderMesh->render();
+		}
+	}
+	else if (s_var_drawArea_ < safe_static_cast<int, size_t>(areas_.size()))
+	{
+		areas_[s_var_drawArea_].pRenderMesh->render();
+	}
+
+
+#if 0
 	core::Array<AreaModel>::ConstIterator it = areaModels_.begin();
 
 	if (s_var_drawArea_ == -1)
@@ -215,6 +274,7 @@ bool Level::render(void)
 			);
 		}
 	}
+#endif
 
 	return true;
 }
@@ -335,6 +395,8 @@ bool Level::ProcessData(uint32_t bytesRead)
 		}
 	}
 
+	areas_.resize(fileHdr_.numAreas);
+
 	// area data.
 	{
 		core::StackString<64> meshName;
@@ -342,9 +404,7 @@ bool Level::ProcessData(uint32_t bytesRead)
 			fileHdr_.nodes[FileNodes::AREAS].size);
 		uint32_t x, numSub;
 
-
-		areaModels_.reserve(fileHdr_.numAreas);
-		for (uint32_t i = 0; i < fileHdr_.numAreas; i++)
+		for (int32_t i = 0; i < fileHdr_.numAreas; i++)
 		{
 			model::MeshHeader* pMesh = cursor.getSeekPtr<model::MeshHeader>();
 			numSub = pMesh->numSubMeshes;
@@ -397,13 +457,15 @@ bool Level::ProcessData(uint32_t bytesRead)
 			meshName.clear();
 			meshName.appendFmt("$area_mesh%i", i);
 
-			AreaModel area;
+			// update area info.
+			Area& area = areas_[i];
+			area.areaNum = i;
 			area.pMesh = pMesh;
 			area.pRenderMesh = gEnv->pRender->createRenderMesh(pMesh,
 				shader::VertexFormat::P3F_T4F_C4B_N3F, meshName.c_str());
+		
+			// upload to gpu now.
 			area.pRenderMesh->uploadToGpu();
-
-			areaModels_.append(area);
 		}
 
 		if (!cursor.isEof()) {
@@ -417,41 +479,95 @@ bool Level::ProcessData(uint32_t bytesRead)
 	{
 		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_PORTALS);
 
-
 		// 2 ints for the area numbers followed by a winding.
 		uint32_t i, numIaps = fileHdr_.numinterAreaPortals;
 
 		for (i = 0; i < numIaps; i++)
 		{		
-			XWinding* pWinding = X_NEW(XWinding, g_3dEngineArena, "AreaPortalWinding");
 			int32_t a1, a2;
 
 			file.readObj(a1);
 			file.readObj(a2);
 
-			if (!pWinding->SLoad(&file)) {
-				X_ERROR("Level", "Failed to load area windings");
+			// check the area numbers are valid.
+			if (a1 < 0 || a1 > fileHdr_.numAreas) {
+				X_ERROR("Level","Invalid interarea area: %i valid-range(0,%i)",
+					a1,fileHdr_.numAreas);
+				return false;
+			}
+			if (a2 < 0 || a2 > fileHdr_.numAreas) {
+				X_ERROR("Level", "Invalid interarea area: %i valid-range(0,%i)",
+					a2, fileHdr_.numAreas);
 				return false;
 			}
 
-			Portal& p1 = portals_.AddOne();
+			XWinding* pWinding = X_NEW(XWinding, g_3dEngineArena, "AreaPortalWinding");
+			if (!pWinding->SLoad(&file)) {
+				X_ERROR("Level", "Failed to load area windings");
+				X_DELETE(pWinding, g_3dEngineArena);
+				return false;
+			}
 
+			// add to areas
+			Area& area1 = areas_[a1];
+			Area& area2 = areas_[a2];
+
+			AreaPortal& p1 = area1.portals.AddOne();
+			AreaPortal& p2 = area2.portals.AddOne();
+
+			// get p1's plane from the winding.
 			pWinding->getPlane(p1.plane);
 			p1.pWinding = pWinding;
 			p1.areaTo = a2;
 
-			Portal& p2 = portals_.AddOne();
-
 			p2.pWinding = pWinding->ReverseWinding();
+			// p2's plane is made from the reverse winding.
 			p2.pWinding->getPlane(p2.plane);
 			p2.areaTo = a1;
+		}
 
+		if (!file.isEof()) {
+			X_WARNING("Level", "potential read error, "
+				"failed to process all bytes for node %i. bytes left: %i",
+				FileNodes::AREA_PORTALS, file.remainingBytes());
 		}
 	}
 	else
 	{
 		X_WARNING("Level","Level has no inter area portals.");
 	}
+
+	// nodes
+	if (fileHdr_.flags.IsSet(LevelFileFlags::BSP_TREE))
+	{
+		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::BSP_TREE);
+
+		areaNodes_.resize(fileHdr_.numNodes);
+
+		// we read: nodeNumber, plane, childid's
+		int32_t i;
+
+		for (i = 0; i < fileHdr_.numNodes; i++)
+		{
+			AreaNode& node = areaNodes_[i];
+
+			file.readObj(node.plane);
+			file.readObj(node.children);
+		}
+
+		if (!file.isEof()) {
+			X_WARNING("Level", "potential read error, "
+				"failed to process all bytes for node %i. bytes left: %i",
+				FileNodes::BSP_TREE, file.remainingBytes());
+		}
+	}
+	else
+	{
+		X_WARNING("Level", "Level has no area tree.");
+	}
+
+	// 
+	CommonChildrenArea_r(&areaNodes_[0]);
 
 
 	// clean up.
@@ -470,6 +586,39 @@ bool Level::ProcessData(uint32_t bytesRead)
 		loadStats_.elapse.GetMilliSeconds());
 
 	return true;
+}
+
+int32_t Level::CommonChildrenArea_r(AreaNode* pAreaNode)
+{
+	int32_t	nums[2];
+
+	for ( int i = 0 ; i < 2 ; i++ )
+	{
+		if (pAreaNode->children[i] <= 0) {
+			nums[i] = -1 - pAreaNode->children[i];
+		} else {
+			nums[i] = CommonChildrenArea_r(&areaNodes_[pAreaNode->children[i]]);
+		}
+	}
+
+	// solid nodes will match any area
+	if (nums[0] == AreaNode::AREANUM_SOLID) {
+		nums[0] = nums[1];
+	}
+	if (nums[1] == AreaNode::AREANUM_SOLID) {
+		nums[1] = nums[0];
+	}
+
+	int32_t	common;
+	if ( nums[0] == nums[1] ) {
+		common = nums[0];
+	} else {
+		common = AreaNode::CHILDREN_HAVE_MULTIPLE_AREAS;
+	}
+
+	pAreaNode->commonChildrenArea = common;
+
+	return common;
 }
 
 #if 0
