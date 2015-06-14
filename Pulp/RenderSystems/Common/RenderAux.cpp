@@ -262,6 +262,9 @@ void XRenderAux::drawTriangle(Vec3f* points, uint32_t numPoints, const Color8u& 
 
 void XRenderAux::drawTriangle(Vec3f* points, uint32_t numPoints, Color8u* pCol)
 {
+	if (numPoints == 0)
+		return;
+
 	XAuxVertex* pVertices = nullptr;
 	AddPrimitive(pVertices, numPoints, CreateTriangleRenderFlags(false));
 
