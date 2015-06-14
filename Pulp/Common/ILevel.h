@@ -307,24 +307,12 @@ typedef Planef Plane;
 
 
 
-struct Portal
-{
-	int32_t		areaTo;		// the area this portal leads to.
-	XWinding*	pWinding;	// winding points have counter clockwise ordering seen this area
-	// should i add seralise support to winding?
-	// or i could have a diffrent portal structure for the file.
-
-	Planef		plane;		// view must be on the positive side of the plane to cross
-	//	Portal*		pNext;		
-};
-
-
+#if 0
 struct Entity
 {
 	Vec3f pos;
 
 };
-
 
 struct StaticModel : public Entity
 {
@@ -332,19 +320,9 @@ struct StaticModel : public Entity
 
 	core::Pointer64<model::IRenderMesh > pRenderMesh;
 };
+#endif
 
-struct Area
-{
-	int32_t areaNum;
-	int32_t numPortals; // te number of portals leading out the area
-	int32_t numStaticModels;
 
-	model::MeshHeader* pMesh;
-	model::IRenderMesh* pRenderMesh;
-
-	AABB boundingBox;
-	Sphere boundingSphere;
-};
 
 // ============ File Structure stuff =========
 
@@ -415,8 +393,9 @@ struct FileHeader
 	uint32_t numStrings;
 
 	// the number of area;s in the level file.
-	uint32_t numAreas;
-	uint32_t numinterAreaPortals;
+	int32_t numAreas;
+	int32_t numinterAreaPortals;
+	int32_t numNodes;
 
 
 	FileNode nodes[FileNodes::ENUM_COUNT];
@@ -434,18 +413,19 @@ struct FileHeader
 
 
 // my nipples don't mess around.
-X_ENSURE_SIZE(Material, 76);
+//X_ENSURE_SIZE(Material, 76);
 
-X_ENSURE_SIZE(Vertex, 44);
-X_ENSURE_SIZE(Index, 4);
-X_ENSURE_SIZE(Plane, 16);
+//X_ENSURE_SIZE(Vertex, 44);
+//X_ENSURE_SIZE(Index, 4);
+//X_ENSURE_SIZE(Plane, 16);
 
 // X_ENSURE_SIZE(Portal, 0x28);
-X_ENSURE_SIZE(Area, 0x28 + 0xC + 12);
+//X_ENSURE_SIZE(Area, 0x28 + 0xC + 12);
+
 
 // check file structure sizes also.
 X_ENSURE_SIZE(FileNode, 8);
-X_ENSURE_SIZE(FileHeader, 36 + (sizeof(FileNode)* FileNodes::ENUM_COUNT));
+X_ENSURE_SIZE(FileHeader, 40 + (sizeof(FileNode)* FileNodes::ENUM_COUNT));
 
 X_NAMESPACE_END
 
