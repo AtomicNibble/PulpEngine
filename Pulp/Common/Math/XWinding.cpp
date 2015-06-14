@@ -324,7 +324,7 @@ void XWinding::getPlane(Planef& plane) const
 	center = getCenter();
 	v1 = pPoints_[0].asVec3() - center;
 	v2 = pPoints_[1].asVec3() - center;
-	plane.setNormal(v2.cross(v1));
+	plane.setNormal(v2.cross(v1).normalized());
 	plane.setDistance(plane.getNormal() * pPoints_[0].asVec3());
 }
 
