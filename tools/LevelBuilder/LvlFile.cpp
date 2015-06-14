@@ -151,6 +151,15 @@ bool LvlBuilder::save(const char* name)
 
 			hdr.flags.Set(LevelFileFlags::BSP_TREE);
 
+			int32_t numNodes = bspNode::NumberNodes_r(worldEnt.bspTree.headnode, 0);
+#if X_DEBUG
+			int32_t postPrune = worldEnt.bspTree.headnode->NumChildNodes();
+			X_ASSERT(numNodes == postPrune, "Invalid node couts. prunt and num don't match")(numNodes, postPrune);
+#endif
+
+			// set the header value.
+			hdr.numNodes = numNodes;
+
 			// need to write out all the nodes.
 			// for none leaf nodes we will write the nodes number.
 			// for leafs nodes we write the children as the area number but negative.
