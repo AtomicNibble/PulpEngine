@@ -744,16 +744,16 @@ void DX11XRender::RT_SetCameraInfo(void)
 
 void DX11XRender::SetCamera(const XCamera& cam)
 {
-	float ProjectionRatio = cam.GetProjectionRatio();
-	float fov = cam.GetFov();
+	float ProjectionRatio = cam.getProjectionRatio();
+	float fov = cam.getFov();
 
 //	float wT = math<float>::tan(fov*0.5f)*cam.GetNearPlane();
 //	float wB = -wT;
 //	float wR = wT * ProjectionRatio;
 //	float wL = -wR;
 
-	Matrix34f m = cam.GetMatrix();
-	Vec3f vEye = cam.GetPosition();
+	Matrix34f m = cam.getMatrix();
+	Vec3f vEye = cam.getPosition();
 	Vec3f vAt = vEye + Vec3f(m.m01, m.m11, m.m21);
 	Vec3f vUp = Vec3f(m.m02, m.m12, m.m22);
 //	Vec3f vUp = Vec3f(0,0,1);

@@ -32,7 +32,7 @@ namespace{
 	static bool ClipLine(Vec3f* v, Color8u* c)
 	{
 		// get near plane to perform clipping	
-		Planef nearPlane = gRenDev->GetCamera().GetFrustumPlane(FrustumPlanes::NEAR);
+		Planef nearPlane = gRenDev->GetCamera().getFrustumPlane(FrustumPlane::NEAR);
 
 
 		// get clipping flags

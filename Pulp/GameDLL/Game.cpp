@@ -74,8 +74,8 @@ bool XGame::Update(void)
 
 
 
-	cam_.SetAngles(cameraAngle_);
-	cam_.SetPosition(cameraPos_);
+	cam_.setAngles(cameraAngle_);
+	cam_.setPosition(cameraPos_);
 
 	pRender_->SetCamera(cam_);
 

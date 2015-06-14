@@ -145,7 +145,7 @@ namespace
 
 	X_INLINE void getCameraPos(render::DX11XRender* r)
 	{
-		Vec3f pos(r->GetCamera().GetPosition());
+		Vec3f pos(r->GetCamera().getPosition());
 
 		vecTemp[0] = pos;
 	}
