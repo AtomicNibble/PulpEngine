@@ -7,6 +7,7 @@
 //
 
 #include "XSphere.h"
+#include "XPlane.h"
 
 class AABB
 {
@@ -86,6 +87,9 @@ public:
 	// returns the distance to a point from the box.
 	X_INLINE float distance(const Vec3f& v) const;
 	X_INLINE float distanceSqr(const Vec3f& v) const;
+
+	template<typename T>
+	X_INLINE PlaneSide::Enum planeSide(const Plane<T>& plane, const float epsilon = 0.1f) const;
 };
 
 

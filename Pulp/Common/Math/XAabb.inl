@@ -196,3 +196,28 @@ X_INLINE float AABB::distanceSqr(const Vec3f& v) const
 	Near.checkMin(max);
 	return Near.distanceSquared(v);
 }
+
+
+template<typename T>
+X_INLINE PlaneSide::Enum AABB::planeSide(const Plane<T>& plane, const float epsilon) const
+{
+	float d1, d2;
+
+	Vec3f center = this->center();
+	Vec3f half = this->halfVec();
+
+	// get the distance from the center.
+	d1 = plane.distance(center);
+
+	// next we get the dot product of the half vec against planes normal.
+	d2 = half.dot(plane.getNormal());
+
+	// check what side we are on.
+	if (d1 - d2 > epsilon) {
+		return PlaneSide::FRONT;
+	}
+	if (d1 + d2 > -epsilon) {
+		return PlaneSide::BACK;
+	}
+	return PlaneSide::CROSS;
+}
