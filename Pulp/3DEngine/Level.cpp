@@ -459,7 +459,81 @@ bool Level::IsPointInAnyArea(const Vec3f& pos, int32_t& areaOut) const
 	return false;
 }
 
+size_t Level::BoundsInAreas(const AABB& bounds, int32_t* pAreasOut, size_t maxAreas) const
+{
+	size_t numAreas = 0;
 
+	if (bounds.isEmpty()) {
+		X_WARNING("Level","Bounds to areas called with a empty bounds");
+		return 0;
+	}
+
+	if (maxAreas < 1) {
+		X_WARNING("Level","Bounds to areas called with maxarea count of zero");
+		return 0;
+	}
+
+	// must be valid here.
+	X_ASSERT_NOT_NULL(pAreasOut);
+
+	BoundsInAreas_r(0, bounds, numAreas, pAreasOut, maxAreas);
+
+	return numAreas;
+}
+
+
+void Level::BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numAreasOut,
+	int32_t* pAreasOut, size_t maxAreas) const
+{
+	X_ASSERT_NOT_NULL(pAreasOut);
+
+	// work out all the areas this bounds intersects with.
+
+	size_t i;
+
+	do 
+	{
+		if (nodeNum < 0) 
+		{
+			nodeNum = -1 - nodeNum;
+
+			for (i = 0; i < numAreasOut; i++) {
+				if (pAreasOut[i] == nodeNum) {
+					break;
+				}
+			}
+			if (i >= numAreasOut && numAreasOut < maxAreas) {
+				pAreasOut[numAreasOut++] = nodeNum;
+			}
+
+			return;
+		}
+
+		const AreaNode& node = areaNodes_[nodeNum];
+
+		PlaneSide::Enum side = bounds.planeSide(node.plane);
+
+		if (side == PlaneSide::FRONT) {
+			nodeNum = node.children[0];
+		}
+		else if (side == PlaneSide::BACK) {
+			nodeNum = node.children[1];
+		}
+		else 
+		{
+			if (node.children[1] != 0) 
+			{
+				BoundsInAreas_r(node.children[1], bounds, numAreasOut, pAreasOut, maxAreas);
+				if (numAreasOut >= maxAreas) {
+					return;
+				}
+			}
+			nodeNum = node.children[0];
+		}
+
+	} while (nodeNum != 0);
+
+}
 
 
 X_NAMESPACE_END

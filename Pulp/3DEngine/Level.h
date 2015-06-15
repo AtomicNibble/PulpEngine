@@ -137,7 +137,13 @@ public:
 	bool IsPointInAnyArea(const Vec3f& pos) const;
 	bool IsPointInAnyArea(const Vec3f& pos, int32_t& areaOut) const;
 
+	size_t BoundsInAreas(const AABB& bounds, int32_t* pAreasOut, size_t maxAreas) const;
+
+
 private:
+	void BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numAreasOut,
+		int32_t* pAreasOut, size_t maxAreas) const;
+
 
 	void FlowViewThroughPortals(const int32_t areaNum, const Vec3f origin, 
 		size_t numPlanes, const Planef* pPlanes);
