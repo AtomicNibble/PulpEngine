@@ -560,7 +560,7 @@ bool XWinding::clipInPlace(const Planef& plane, const float epsilon, const bool 
 }
 
 
-XWinding* XWinding::clip(const Planef &plane, const float epsilon, const bool keepOn)
+bool XWinding::clip(const Planef &plane, const float epsilon, const bool keepOn)
 {
 	Vec5f*		newPoints;
 	int			newNumPoints;
@@ -598,16 +598,16 @@ XWinding* XWinding::clip(const Planef &plane, const float epsilon, const bool ke
 
 	// if the winding is on the plane and we should keep it
 	if (keepOn && !counts[PlaneSide::FRONT] && !counts[PlaneSide::BACK]) {
-		return this;
+		return true;
 	}
 	// if nothing at the front of the clipping plane
 	if (!counts[PlaneSide::FRONT]) {
-		delete this;
-		return NULL;
+		this->clear();
+		return false;
 	}
 	// if nothing at the back of the clipping plane
 	if (!counts[PlaneSide::BACK]) {
-		return this;
+		return true;
 	}
 
 	maxpts = numPoints_ + 4;		// cant use counts[0]+2 because of fp grouping errors
@@ -619,7 +619,7 @@ XWinding* XWinding::clip(const Planef &plane, const float epsilon, const bool ke
 		p1 = &pPoints_[i];
 
 		if (newNumPoints + 1 > maxpts) {
-			return this;		// can't split -- fall back to original
+			return true;		// can't split -- fall back to original
 		}
 
 		if (sides[i] == PlaneSide::ON) {
@@ -638,7 +638,7 @@ XWinding* XWinding::clip(const Planef &plane, const float epsilon, const bool ke
 		}
 
 		if (newNumPoints + 1 > maxpts) {
-			return this;		// can't split -- fall back to original
+			return true;		// can't split -- fall back to original
 		}
 
 		// generate a split point
@@ -666,12 +666,12 @@ XWinding* XWinding::clip(const Planef &plane, const float epsilon, const bool ke
 	}
 
 	if (!EnsureAlloced(newNumPoints, false)) {
-		return this;
+		return false;
 	}
 
 	numPoints_ = newNumPoints;
 	memcpy(pPoints_, newPoints, newNumPoints * sizeof(Vec5f));
-	return this;
+	return true;
 }
 
 

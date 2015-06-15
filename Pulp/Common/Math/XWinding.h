@@ -72,7 +72,8 @@ public:
 	// if there is nothing at the front the number of points is set to zero
 	bool clipInPlace(const Planef& plane, const float epsilon = EPSILON, const bool keepOn = false);
 
-	XWinding* clip(const Planef& plane, const float epsilon = EPSILON, const bool keepOn = false);
+	// returns false if invalid.
+	bool clip(const Planef& plane, const float epsilon = EPSILON, const bool keepOn = false);
 	XWinding* Copy(void) const;
 	XWinding* ReverseWinding(void);
 

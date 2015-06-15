@@ -72,13 +72,17 @@ XWinding* bspNode::GetBaseWinding(XPlaneSet& planeSet)
 		if (n->children[0] == pNode) 
 		{
 			// take front
-			w = w->clip(plane, BASE_WINDING_EPSILON);
+			if (!w->clip(plane, BASE_WINDING_EPSILON)) {
+				X_DELETE_AND_NULL(w, g_arena);
+			}
 		}
 		else 
 		{
 			// take back
 			Planef	back = -plane;
-			w = w->clip(back, BASE_WINDING_EPSILON);
+			if(!w->clip(back, BASE_WINDING_EPSILON)) {
+				X_DELETE_AND_NULL(w, g_arena);
+			}
 		}
 		pNode = n;
 		n = n->parent;

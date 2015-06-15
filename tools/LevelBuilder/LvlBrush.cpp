@@ -56,7 +56,9 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	w = X_NEW(XWinding, g_arena, "Winding")(plane);
 	for (i = 0; i < brush->sides.size() && w; i++) {
 		Planef &plane2 = planes[brush->sides[i].planenum ^ 1];
-		w = w->clip(plane2, 0); 
+		if (!w->clip(plane2, 0)) {
+			X_DELETE_AND_NULL(w, g_arena);
+		}
 	}
 
 	if (!w || w->isTiny()) 
@@ -282,7 +284,9 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum,
 	for (i = 0; i < sides.size() && w; i++) 
 	{
 		Planef &plane2 = planes[sides[i].planenum ^ 1];
-		w = w->clip(plane2, 0);
+		if(!w->clip(plane2, 0)) {
+			X_DELETE_AND_NULL(w, g_arena);
+		}
 	}
 
 	if (!w || w->isTiny())

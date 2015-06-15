@@ -210,7 +210,9 @@ bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 				continue;		// back side clipaway
 			}
 
-			w = w->clip(planes[sides[j].planenum ^ 1], 0.01f);
+			if(!w->clip(planes[sides[j].planenum ^ 1], 0.01f)) {
+				X_DELETE_AND_NULL(w, g_arena);
+			}
 		}
 		if (pSide->pWinding) {
 			X_DELETE(pSide->pWinding, g_arena);

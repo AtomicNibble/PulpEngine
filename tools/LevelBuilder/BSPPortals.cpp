@@ -6,33 +6,6 @@
 namespace
 {
 	#define	SIDESPACE	8
-	
-	XWinding* BaseWindingForNode(XPlaneSet& planes, bspNode* node)
-	{
-		XWinding	*w;
-		bspNode		*n;
-
-		w = X_NEW(XWinding, g_arena, "WindingForNode")(planes[node->planenum]);
-
-		// clip by all the parents
-		for (n = node->parent; n && w;) {
-			Planef &plane = planes[n->planenum];
-
-			if (n->children[0] == node) {
-				// take front
-				w = w->clip(plane, BASE_WINDING_EPSILON);
-			}
-			else {
-				// take back
-				Planef	back = -plane;
-				w = w->clip(back, BASE_WINDING_EPSILON);
-			}
-			node = n;
-			n = n->parent;
-		}
-
-		return w;
-	}
 
 
 } // namespace
@@ -47,7 +20,7 @@ void bspPortal::MakeNodePortal(XPlaneSet& planeSet, bspNode* node)
 	Vec3f		normal;
 	int			side;
 
-	w = BaseWindingForNode(planeSet, node);
+	w = node->GetBaseWinding(planeSet);
 
 	// clip the portal by all the other portals in the node
 	for (p = node->portals; p && w; p = p->next[side])
@@ -69,7 +42,9 @@ void bspPortal::MakeNodePortal(XPlaneSet& planeSet, bspNode* node)
 			side = 0;	// quiet a compiler warning
 		}
 
-		w = w->clip(plane, CLIP_EPSILON);
+		if (!w->clip(plane, CLIP_EPSILON)) {
+			X_DELETE_AND_NULL(w, g_arena);
+		}
 	}
 
 	if (!w)
@@ -170,7 +145,9 @@ void bspPortal::MakeHeadnodePortals(bspTree& tree)
 			if (j == i) {
 				continue;
 			}
-			portals[i]->pWinding = portals[i]->pWinding->clip(bplanes[j], ON_EPSILON);
+			if(!portals[i]->pWinding->clip(bplanes[j], ON_EPSILON)){
+				X_DELETE_AND_NULL(portals[i]->pWinding, g_arena);
+			}
 		}
 	}
 
