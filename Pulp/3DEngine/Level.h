@@ -137,6 +137,8 @@ public:
 	bool IsPointInAnyArea(const Vec3f& pos) const;
 	bool IsPointInAnyArea(const Vec3f& pos, int32_t& areaOut) const;
 
+private:
+
 	void FlowViewThroughPortals(const int32_t areaNum, const Vec3f origin, 
 		size_t numPlanes, const Planef* pPlanes);
 
@@ -144,7 +146,6 @@ public:
 		const PortalStack* ps);
 
 	void AddAreaRefs(int32_t areaNum, const PortalStack* ps);
-
 
 private:
 	bool ProcessHeader(uint32_t bytesRead);
