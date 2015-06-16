@@ -38,7 +38,7 @@ void bspPortal::MakeNodePortal(XPlaneSet& planeSet, bspNode* node)
 			plane = -p->plane;
 		}
 		else {
-			X_ERROR("Portal", "CutNodePortals_r: mislinked portal");
+			X_ERROR("BspPortal", "CutNodePortals_r: mislinked portal");
 			side = 0;	// quiet a compiler warning
 		}
 
@@ -49,7 +49,7 @@ void bspPortal::MakeNodePortal(XPlaneSet& planeSet, bspNode* node)
 
 	if (!w)
 	{
-		X_WARNING("Portal", "Winding is empty");
+		X_WARNING("BspPortal", "Winding is empty");
 		return;
 	}
 
@@ -167,7 +167,7 @@ void bspPortal::AddToNodes(bspNode* pFront, bspNode* pBack)
 
 	if (nodes[0] || nodes[1])
 	{
-		X_ERROR("Portal", "Node already included");
+		X_ERROR("BspPortal", "Node already included");
 	}
 
 	nodes[0] = pFront;
@@ -192,7 +192,7 @@ void bspPortal::RemoveFromNode(bspNode* pNode)
 		t = *pp;
 
 		if (!t) {
-			X_ERROR("Portal", "RemovePortalFromNode: portal not in leaf");
+			X_ERROR("BspPortal", "RemovePortalFromNode: portal not in leaf");
 		}
 
 		if (t == pPortal) {
@@ -204,7 +204,7 @@ void bspPortal::RemoveFromNode(bspNode* pNode)
 		else if (t->nodes[1] == pNode)
 			pp = &t->next[1];
 		else {
-			X_ERROR("Portal", "RemovePortalFromNode: portal not bounding leaf");
+			X_ERROR("BspPortal", "RemovePortalFromNode: portal not bounding leaf");
 		}
 	}
 
@@ -286,7 +286,7 @@ const LvlBrushSide* bspPortal::FindAreaPortalSide(void) const
 
 					Vec3f center = s2->pVisibleHull->getCenter();
 
-					X_WARNING("Portal", "brush has multiple area portal sides at (%g,%g,%g)",
+					X_WARNING("BspPortal", "brush has multiple area portal sides at (%g,%g,%g)",
 						center[0], center[1], center[2]);
 
 					X_DELETE_AND_NULL(s2->pVisibleHull, g_arena);
