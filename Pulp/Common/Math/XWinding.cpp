@@ -213,7 +213,7 @@ void XWinding::print(void) const
 	for (int i = 0; i < numPoints_; i++)
 	{
 		const Vec5f& pl = pPoints_[i];
-		X_LOG0("Winging", "P(%i): (%g,%g,%g) (%g,%g)", i,
+		X_LOG0("Winding", "P(%i): (%g,%g,%g) (%g,%g)", i,
 			pl[0], pl[1], pl[2], pl[3], pl[4]);
 	}
 }
