@@ -328,7 +328,7 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 
 	int numPoints = pWinding->getNumPoints();
 
-#if 1
+#if 0
 	int p;
 	for (p = 0; p < numPoints; p++)
 	{
