@@ -354,7 +354,8 @@ struct StaticModel : public Entity
 X_DECLARE_ENUM(FileNodes) (
 	STRING_TABLE,
 	AREAS,
-	AREA_PORTALS, 
+	AREA_PORTALS,
+	AREA_PORTALS_DEBUG_DATA, // contains calculated triangles.
 	BSP_TREE
 );
 
