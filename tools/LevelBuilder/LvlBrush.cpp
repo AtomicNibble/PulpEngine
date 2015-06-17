@@ -104,7 +104,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 			continue;
 		}
 
-		w->Split(plane, 0, &cw[0], &cw[1]);
+		w->Split(plane, 0, &cw[0], &cw[1], g_arena);
 
 		for (j = 0; j < 2; j++) 
 		{
@@ -162,7 +162,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	//	cs->material = NULL;
 
 		if (i == 0) {
-			cs->pWinding = midwinding->Copy();
+			cs->pWinding = midwinding->Copy(g_arena);
 		}
 		else {
 			cs->pWinding = midwinding;
@@ -325,7 +325,7 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum,
 			continue;
 		}
 
-		w->Split(plane, 0, &cw[0], &cw[1]);
+		w->Split(plane, 0, &cw[0], &cw[1], g_arena);
 
 		for (j = 0; j < 2; j++)
 		{
@@ -383,7 +383,7 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum,
 		//	cs->material = NULL;
 
 		if (i == 0) {
-			cs->pWinding = midwinding->Copy();
+			cs->pWinding = midwinding->Copy(g_arena);
 		}
 		else {
 			cs->pWinding = midwinding;

@@ -158,7 +158,8 @@ void bspNode::SplitPortals(XPlaneSet& planes)
 
 		// cut the portal into two portals, one on each side of the cut plane
 		// this means that the 
-		p->pWinding->Split(*plane, SPLIT_WINDING_EPSILON, &frontwinding, &backwinding);
+		p->pWinding->Split(*plane, SPLIT_WINDING_EPSILON, 
+			&frontwinding, &backwinding, g_arena);
 
 		if (frontwinding && frontwinding->isTiny())
 		{
@@ -266,7 +267,7 @@ void bspNode::ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& sid
 			return;
 		}
 
-		w->Split(planes[planenum], ON_EPSILON, &front, &back);
+		w->Split(planes[planenum], ON_EPSILON, &front, &back, g_arena);
 
 		X_DELETE(w, g_arena);
 
@@ -280,7 +281,7 @@ void bspNode::ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& sid
 	if (!opaque)
 	{
 		if (!side.pVisibleHull) {
-			side.pVisibleHull = w->Copy();
+			side.pVisibleHull = w->Copy(g_arena);
 		}
 		else {
 			side.pVisibleHull->AddToConvexHull(w, planes[side.planenum].getNormal());

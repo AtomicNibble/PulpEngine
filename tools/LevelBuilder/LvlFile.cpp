@@ -196,29 +196,18 @@ bool LvlBuilder::save(const char* name)
 				X_ASSERT_NOT_NULL(iap.pSide->pWinding);
 
 				const XWinding* pWind = iap.pSide->pWinding;
-				const XWinding* pWindRev = pWind->ReverseWinding();
+				XWinding* pWindRev = pWind->ReverseWinding(g_arena);
 
 				if (!SavePortalWinding(pWind, file) ||
 					!SavePortalWinding(pWindRev, file))
 				{
 					X_ERROR("Lvl", "Failed to save inter portal info");
+					X_DELETE(pWindRev, g_arena);
 					return false;
 				}
-#if 0
-				{
-					// we set this flag if we write this data.
 
-					WindingToTri(pWind, verts);
-
-					file->writeObj(safe_static_cast<uint32_t, size_t>(verts.size()));
-					if (!file->writeObj(verts.ptr(), verts.size())) {
-						X_ERROR("Lvl", "Failed to save inter portal info");
-						return false;
-					}
-				}
-#endif
+				X_DELETE(pWindRev, g_arena);
 			}
-
 		}
 
 		// bsp tree

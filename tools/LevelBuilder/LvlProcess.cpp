@@ -279,7 +279,7 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 		}
 
 		pWinding->Split(planes[pNode->planenum], 
-			ON_EPSILON, &front, &back);
+			ON_EPSILON, &front, &back, g_arena);
 
 		PutWindingIntoAreas_r(ent, front, side, pNode->children[0]);
 		if (front) {

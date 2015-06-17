@@ -41,10 +41,10 @@ LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth)
 	pVisibleHull = nullptr;
 
 	if (oth.pWinding){
-		pWinding = oth.pWinding->Copy();
+		pWinding = oth.pWinding->Copy(g_arena);
 	}
 	if (oth.pVisibleHull){
-		pVisibleHull = oth.pVisibleHull->Copy();
+		pVisibleHull = oth.pVisibleHull->Copy(g_arena);
 	}
 }
 
@@ -70,10 +70,10 @@ LvlBrushSide& LvlBrushSide::operator = (const LvlBrushSide& oth)
 	pVisibleHull = nullptr;
 
 	if (oth.pWinding){
-		pWinding = oth.pWinding->Copy();
+		pWinding = oth.pWinding->Copy(g_arena);
 	}
 	if (oth.pVisibleHull){
-		pVisibleHull = oth.pVisibleHull->Copy();
+		pVisibleHull = oth.pVisibleHull->Copy(g_arena);
 	}
 	return *this;
 }
