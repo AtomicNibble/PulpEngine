@@ -681,7 +681,7 @@ XWinding* XWinding::Copy(void) const
 }
 
 
-XWinding* XWinding::ReverseWinding(void)
+XWinding* XWinding::ReverseWinding(void) const
 {
 	XWinding* c = X_NEW(XWinding, gEnv->pArena, "ReverseWinding");
 	c->EnsureAlloced(numPoints_);

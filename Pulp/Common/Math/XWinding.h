@@ -75,7 +75,7 @@ public:
 	// returns false if invalid.
 	bool clip(const Planef& plane, const float epsilon = EPSILON, const bool keepOn = false);
 	XWinding* Copy(void) const;
-	XWinding* ReverseWinding(void);
+	XWinding* ReverseWinding(void) const;
 
 	int Split(const Planef &plane, const float epsilon, XWinding **front, XWinding **back) const;
 
