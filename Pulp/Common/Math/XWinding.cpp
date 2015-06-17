@@ -675,15 +675,19 @@ bool XWinding::clip(const Planef &plane, const float epsilon, const bool keepOn)
 }
 
 
-XWinding* XWinding::Copy(void) const
+XWinding* XWinding::Copy(core::MemoryArenaBase* arena) const
 {
-	return X_NEW(XWinding, gEnv->pArena, "WindingCopy")(*this);
+	X_ASSERT_NOT_NULL(arena);
+
+	return X_NEW(XWinding, arena, "WindingCopy")(*this);
 }
 
 
-XWinding* XWinding::ReverseWinding(void) const
+XWinding* XWinding::ReverseWinding(core::MemoryArenaBase* arena) const
 {
-	XWinding* c = X_NEW(XWinding, gEnv->pArena, "ReverseWinding");
+	X_ASSERT_NOT_NULL(arena);
+
+	XWinding* c = X_NEW(XWinding, arena, "ReverseWinding");
 	c->EnsureAlloced(numPoints_);
 
 	for (int i = 0; i < numPoints_; i++) {
@@ -694,8 +698,11 @@ XWinding* XWinding::ReverseWinding(void) const
 }
 
 
-int XWinding::Split(const Planef& plane, const float epsilon, XWinding **front, XWinding **back) const
+int XWinding::Split(const Planef& plane, const float epsilon, 
+	XWinding **front, XWinding **back, core::MemoryArenaBase* arena) const
 {
+	X_ASSERT_NOT_NULL(arena);
+
 	int				counts[3];
 	float			dot;
 	int				i, j;
@@ -756,8 +763,8 @@ int XWinding::Split(const Planef& plane, const float epsilon, XWinding **front, 
 
 	maxpts = numPoints_ + 4;	// cant use counts[0]+2 because of fp grouping errors
 
-	*front = f = X_NEW(XWinding, gEnv->pArena, "fronWinding")(maxpts);
-	*back = b = X_NEW(XWinding, gEnv->pArena, "BackWinding")(maxpts);
+	*front = f = X_NEW(XWinding, arena, "fronWinding")(maxpts);
+	*back = b = X_NEW(XWinding, arena, "BackWinding")(maxpts);
 
 	for (i = 0; i < numPoints_; i++) {
 		p1 = &pPoints_[i];

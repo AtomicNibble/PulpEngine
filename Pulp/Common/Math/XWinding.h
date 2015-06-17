@@ -74,10 +74,11 @@ public:
 
 	// returns false if invalid.
 	bool clip(const Planef& plane, const float epsilon = EPSILON, const bool keepOn = false);
-	XWinding* Copy(void) const;
-	XWinding* ReverseWinding(void) const;
+	XWinding* Copy(core::MemoryArenaBase* arena) const;
+	XWinding* ReverseWinding(core::MemoryArenaBase* arena) const;
 
-	int Split(const Planef &plane, const float epsilon, XWinding **front, XWinding **back) const;
+	int Split(const Planef &plane, const float epsilon, 
+		XWinding **front, XWinding **back, core::MemoryArenaBase* arena) const;
 
 
 	void AddToConvexHull(const XWinding *winding, const Vec3f& normal, const float epsilon = EPSILON);
