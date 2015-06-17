@@ -246,7 +246,7 @@ void XRenderAux::drawTriangle(const Vec3f& v0, const Color8u& col0,
 }
 
 
-void XRenderAux::drawTriangle(Vec3f* points, uint32_t numPoints, const Color8u& c0)
+void XRenderAux::drawTriangle(const Vec3f* points, uint32_t numPoints, const Color8u& c0)
 {
 	XAuxVertex* pVertices = nullptr;
 	AddPrimitive(pVertices, numPoints, CreateTriangleRenderFlags(false));
@@ -260,7 +260,7 @@ void XRenderAux::drawTriangle(Vec3f* points, uint32_t numPoints, const Color8u& 
 	}
 }
 
-void XRenderAux::drawTriangle(Vec3f* points, uint32_t numPoints, Color8u* pCol)
+void XRenderAux::drawTriangle(const Vec3f* points, uint32_t numPoints, const Color8u* pCol)
 {
 	if (numPoints == 0)
 		return;
@@ -276,8 +276,8 @@ void XRenderAux::drawTriangle(Vec3f* points, uint32_t numPoints, Color8u* pCol)
 	}
 }
 
-void XRenderAux::drawTriangle(Vec3f* points, uint32_t numPoints, uint16_t* indices,
-	uint32_t numIndices, const Color8u& col)
+void XRenderAux::drawTriangle(const Vec3f* points, uint32_t numPoints, 
+	const uint16_t* indices, uint32_t numIndices, const Color8u& col)
 {
 	XAuxVertex* pVertices = nullptr;
 	uint16* pIndices = nullptr;
@@ -295,8 +295,8 @@ void XRenderAux::drawTriangle(Vec3f* points, uint32_t numPoints, uint16_t* indic
 	memcpy(pIndices, indices, sizeof(uint16_t)* numIndices);
 }
 
-void XRenderAux::drawTriangle(Vec3f* points, uint32_t numPoints, uint16_t* indices,
-	uint32_t numIndices, Color8u* pCol)
+void XRenderAux::drawTriangle(const Vec3f* points, uint32_t numPoints, 
+	const uint16_t* indices, uint32_t numIndices, const Color8u* pCol)
 {
 	XAuxVertex* pVertices = nullptr;
 	uint16* pIndices = nullptr;

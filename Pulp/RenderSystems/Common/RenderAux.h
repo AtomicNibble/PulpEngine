@@ -49,13 +49,13 @@ public:
 	void drawTriangle(const Vec3f& v0, const Color8u& c0, const Vec3f& v1, const Color8u& c1,
 		const Vec3f& v2, const Color8u& c2) X_OVERRIDE;
 
-	void drawTriangle(Vec3f* points, uint32_t numPoints, const Color8u& c0) X_OVERRIDE;
-	void drawTriangle(Vec3f* points, uint32_t numPoints, Color8u* pCol) X_OVERRIDE;
+	void drawTriangle(const Vec3f* points, uint32_t numPoints, const Color8u& c0) X_OVERRIDE;
+	void drawTriangle(const Vec3f* points, uint32_t numPoints, const Color8u* pCol) X_OVERRIDE;
 
-	void drawTriangle(Vec3f* points, uint32_t numPoints, uint16_t* indices,
+	void drawTriangle(const Vec3f* points, uint32_t numPoints, const uint16_t* indices,
 		uint32_t numIndices, const Color8u& c0) X_OVERRIDE;
-	void drawTriangle(Vec3f* points, uint32_t numPoints, uint16_t* indices,
-		uint32_t numIndices, Color8u* pCol) X_OVERRIDE;
+	void drawTriangle(const Vec3f* points, uint32_t numPoints, const uint16_t* indices,
+		uint32_t numIndices, const Color8u* pCol) X_OVERRIDE;
 
 	// AABB
 	void drawAABB(const AABB& aabb, const Vec3f& pos, bool solid, const Color8u& col) X_OVERRIDE;
