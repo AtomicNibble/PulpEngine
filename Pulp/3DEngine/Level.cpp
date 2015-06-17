@@ -8,7 +8,6 @@
 
 #include <Math\XWinding.h>
 
-#include <IRenderAux.h>
 
 X_NAMESPACE_BEGIN(level)
 
@@ -282,91 +281,6 @@ bool Level::render(void)
 
 	DrawPortalDebug();
 	return true;
-}
-
-void Level::DrawPortalDebug(void) const
-{
-	using namespace render;
-
-	if (s_var_drawPortals_ > 0)
-	{
-		IRenderAux* pAux = gEnv->pRender->GetIRenderAuxGeo();
-		XAuxGeomRenderFlags flags = AuxGeom_Defaults::Def3DRenderflags;
-
-		// 0=off 1=solid 2=wire 3=solid_dt 4=wire_dt
-		flags.SetAlphaBlendMode(AuxGeom_AlphaBlendMode::AlphaBlended);
-
-		if (s_var_drawPortals_ == 2 || s_var_drawPortals_ == 4)
-		{
-			flags.SetFillMode(AuxGeom_FillMode::FillModeWireframe);
-		}
-
-		if (s_var_drawPortals_ == 3 || s_var_drawPortals_ == 4)
-		{
-			flags.SetDepthWriteFlag(AuxGeom_DepthWrite::DepthWriteOn);
-			flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOn);
-		}
-		else
-		{
-			flags.SetDepthWriteFlag(AuxGeom_DepthWrite::DepthWriteOff);
-			flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOff);
-		}
-
-		pAux->setRenderFlags(flags);
-
-
-		// draw the portals.
-		AreaArr::ConstIterator areaIt = areas_.begin();
-		for (; areaIt != areas_.end(); ++areaIt)
-		{
-			if (areaIt->frameID != frameID_) {
-				continue;
-			}
-
-			Area::AreaPortalArr::ConstIterator apIt = areaIt->portals.begin();
-			for (; apIt != areaIt->portals.end(); ++apIt)
-			{
-				const AreaPortal& portal = *apIt;
-
-#if 0
-				Vec3f points[20];
-				Color8u colors[20];
-
-				int32_t numPoints = portal.pWinding->getNumPoints();
-				for (int32_t x = 0; x < numPoints; x++)
-				{
-					points[x] = (*portal.pWinding)[x].asVec3();
-
-					if (areas_[portal.areaTo].frameID == frameID_) {
-						colors[x] = Colorf(0.f, 1.f, 0.f, 0.3f); // visible col.
-					}
-					else {
-						colors[x] = Colorf(1.f, 0.f, 0.f, 0.3f); // visible col.
-					}
-				}
-
-				pAux->drawTriangle(points, numPoints, colors);
-#else
-
-				AABB box;
-				portal.pWinding->GetAABB(box);
-				
-				if (areas_[portal.areaTo].frameID == frameID_)
-				{
-					pAux->drawAABB(
-						box, Vec3f::zero(), true, Colorf(0.f, 1.f, 0.f, 0.45f)
-					);
-				}
-				else
-				{
-					pAux->drawAABB(
-						box, Vec3f::zero(), true, Colorf(1.f, 0.f, 0.f, 1.f)
-					);
-				}
-#endif
-			}
-		}
-	}
 }
 
 
