@@ -102,7 +102,36 @@ bool Level::ProcessHeader(uint32_t bytesRead)
 }
 
 
+bool ProcessIAP(core::XFileBuf& file, Area& area, int32_t areaTo)
+{
+	AreaPortal& p = area.portals.AddOne();
+	p.pWinding = X_NEW(XWinding, g_3dEngineArena, "AreaPortalWinding");
+	p.areaTo = areaTo;
+	if (!p.pWinding->SLoad(&file)) {
+		X_ERROR("Level", "Failed to load iap winding");
+		X_DELETE(p.pWinding, g_3dEngineArena);
+		return false;
+	}
 
+	file.readObj(p.plane);
+
+	// read debugVerts.
+	uint32_t numVerts;
+	if (!file.readObj(numVerts)) {
+		X_ERROR("Level", "Failed to load iap dv's");
+		return false;
+	}
+
+	p.debugVerts.resize(numVerts);
+
+	// read them.
+	if (!file.readObj(p.debugVerts.ptr(), numVerts)) {
+
+		return false;
+	}
+
+	return true;
+}
 
 bool Level::ProcessData(uint32_t bytesRead)
 {
@@ -235,17 +264,13 @@ bool Level::ProcessData(uint32_t bytesRead)
 				return false;
 			}
 
-			XWinding* pWinding = X_NEW(XWinding, g_3dEngineArena, "AreaPortalWinding");
-			if (!pWinding->SLoad(&file)) {
-				X_ERROR("Level", "Failed to load area windings");
-				X_DELETE(pWinding, g_3dEngineArena);
-				return false;
-			}
-
 			// add to areas
 			Area& area1 = areas_[a1];
 			Area& area2 = areas_[a2];
 
+			ProcessIAP(file, area1, a2);
+			ProcessIAP(file, area2, a1);
+#if 0
 			AreaPortal& p1 = area1.portals.AddOne();
 			AreaPortal& p2 = area2.portals.AddOne();
 
@@ -258,6 +283,7 @@ bool Level::ProcessData(uint32_t bytesRead)
 			// p2's plane is made from the reverse winding.
 			p2.pWinding->getPlane(p2.plane);
 			p2.areaTo = a1;
+#endif
 		}
 
 		if (!file.isEof()) {

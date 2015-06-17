@@ -275,7 +275,7 @@ X_DECLARE_FLAGS(MatContentFlags)(SOLID, WATER, PLAYER_CLIP, MONSTER_CLIP, TRIGGE
 X_DECLARE_FLAGS(MatSurfaceFlags)(NO_DRAW, LADDER);
 
 // this is the flags for the file header, which tells you what option stuff is inside the file.
-X_DECLARE_FLAGS(LevelFileFlags)(INTER_AREA_INFO, BSP_TREE, OCT_TREE);
+X_DECLARE_FLAGS(LevelFileFlags)(INTER_AREA_INFO, BSP_TREE, OCT_TREE, DEBUG_PORTAL_DATA);
 X_DECLARE_ENUM(SurfaceType)(Invalid, Plane, Patch);
 
 typedef Flags<MatContentFlags> MatContentFlag;
@@ -304,8 +304,6 @@ typedef int Index;
 
 // plane type for BSP.
 typedef Planef Plane;
-
-
 
 #if 0
 struct Entity
@@ -355,10 +353,8 @@ X_DECLARE_ENUM(FileNodes) (
 	STRING_TABLE,
 	AREAS,
 	AREA_PORTALS,
-	AREA_PORTALS_DEBUG_DATA, // contains calculated triangles.
 	BSP_TREE
 );
-
 
 struct FileNode
 {

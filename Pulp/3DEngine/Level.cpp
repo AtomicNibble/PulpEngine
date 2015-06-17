@@ -26,7 +26,7 @@ AreaNode::AreaNode()
 
 // --------------------------------
 
-AreaPortal::AreaPortal()
+AreaPortal::AreaPortal() : debugVerts(g_3dEngineArena)
 {
 	areaTo = -1;
 	pWinding = nullptr;

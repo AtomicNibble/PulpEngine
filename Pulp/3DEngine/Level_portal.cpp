@@ -222,25 +222,19 @@ void Level::DrawPortalDebug(void) const
 			{
 				const AreaPortal& portal = *apIt;
 
-#if 0
-				Vec3f points[20];
-				Color8u colors[20];
-
-				int32_t numPoints = portal.pWinding->getNumPoints();
-				for (int32_t x = 0; x < numPoints; x++)
+#if 1
+				if (areas_[portal.areaTo].frameID == frameID_)
 				{
-					points[x] = (*portal.pWinding)[x].asVec3();
-
-					if (areas_[portal.areaTo].frameID == frameID_) {
-						colors[x] = Colorf(0.f, 1.f, 0.f, 0.3f); // visible col.
-					}
-					else {
-						colors[x] = Colorf(1.f, 0.f, 0.f, 0.3f); // visible col.
-					}
+					pAux->drawTriangle(portal.debugVerts.ptr(),
+						portal.debugVerts.size(), Colorf(0.f, 1.f, 0.f, 0.35f));
 				}
-
-				pAux->drawTriangle(points, numPoints, colors);
+				else
+				{
+					pAux->drawTriangle(portal.debugVerts.ptr(),
+						portal.debugVerts.size(), Colorf(1.f, 0.f, 0.f, 0.3f));
+				}
 #else
+		
 
 				AABB box;
 				portal.pWinding->GetAABB(box);
