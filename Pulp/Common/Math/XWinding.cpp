@@ -742,22 +742,22 @@ int XWinding::Split(const Planef& plane, const float epsilon,
 
 		getPlane(windingPlane);
 		if (windingPlane.getNormal() * plane.getNormal() > 0.0f) {
-			*front = Copy();
+			*front = Copy(arena);
 			return PlaneSide::FRONT;
 		}
 		else {
-			*back = Copy();
+			*back = Copy(arena);
 			return PlaneSide::BACK;
 		}
 	}
 	// if nothing at the front of the clipping plane
 	if (!counts[PlaneSide::FRONT]) {
-		*back = Copy();
+		*back = Copy(arena);
 		return PlaneSide::BACK;
 	}
 	// if nothing at the back of the clipping plane
 	if (!counts[PlaneSide::BACK]) {
-		*front = Copy();
+		*front = Copy(arena);
 		return PlaneSide::FRONT;
 	}
 
