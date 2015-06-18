@@ -89,8 +89,8 @@ void Level::FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum,
 			continue;	// already in stack
 		}
 
-		X_LOG0_EVERY_N(24, "Level", "distance from area %i plane: %f",
-			portal.areaTo, dis);
+	//	X_LOG0_EVERY_N(24, "Level", "distance from area %i plane: %f",
+	//		portal.areaTo, dis);
 
 		// if we are very close to the portal surface, don't bother clipping
 		// it, which tends to give epsilon problems that make the area vanish
