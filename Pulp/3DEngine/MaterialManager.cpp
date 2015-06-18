@@ -7,6 +7,7 @@
 #include <IShader.h>
 #include <IRender.h>
 #include <IConsole.h>
+#include <ITexture.h>
 
 #include <String\Xml.h>
 #include <String\Path.h>
@@ -203,6 +204,11 @@ namespace {
 			X_WARNING("Mtl", "material has no albedo texture defined");
 		}
 
+		if (input.textures[shader::ShaderTextureIdx::BUMP].name.isEmpty()) {
+			X_WARNING("Mtl", "material has no bump map assigning identity");
+			input.textures[shader::ShaderTextureIdx::BUMP].name = texture::TEX_DEFAULT_BUMP;
+
+		}
 
 		// Ok now params!
 		params = node->first_node("Params", 6, false);
