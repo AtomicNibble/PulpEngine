@@ -128,6 +128,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 				name.setFileName("box4.map");
 				name.setFileName("boxmap.map");
 				name.setFileName("portal_test.map");
+				name.setFileName("entity_test.map");
 				
 				CompileLevel(name);
 
