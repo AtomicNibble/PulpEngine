@@ -118,17 +118,17 @@ public:
 		return Normal_.dot(oth.Normal_);
 	}
 
-	X_INLINE PlaneSide::Enum	side(const Vec3<T>& v, const float epsilon) const
+	X_INLINE PlaneSide::Enum side(const Vec3<T>& v, const float epsilon) const
 	{
 		float dist = distance(v);
 		if (dist > epsilon) {
-			return Planeside::FRONT;
+			return PlaneSide::FRONT;
 		}
 		else if (dist < -epsilon) {
-			return Planeside::BACK;
+			return PlaneSide::BACK;
 		}
 		
-		return Planeside::ON;
+		return PlaneSide::ON;
 	}
 
 	PlaneType::Enum getType(void) const
