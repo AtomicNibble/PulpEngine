@@ -386,6 +386,7 @@ void PotatoOptions::reset(void)
 	jointThreshold_ = JOINT_WEIGHT_THRESHOLD;
 	exportMode_ = EXPORT_INPUT;
 	lodInfo_.clear();
+	lodInfo_.setArena(&g_arena);
 
 //	weightsDropped_ = false;
 }
@@ -1982,7 +1983,7 @@ MStatus PotatoExporter::convert()
 	MayaPrintMsg(""); // new line
 
 	// name length check
-	if (g_options.filePath_.length() > model::MODEL_MAX_NAME_LENGTH)
+	if (strlen(g_options.filePath_.fileName()) > model::MODEL_MAX_NAME_LENGTH)
 	{
 		MayaPrintError("Model name is too long. MAX: %i, provided: %i",
 			model::MODEL_MAX_NAME_LENGTH, g_options.filePath_.length());
