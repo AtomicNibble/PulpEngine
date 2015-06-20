@@ -232,6 +232,15 @@ bool LvlBuilder::save(const char* name)
 			worldEnt.bspTree.headnode->WriteNodes_r(planes,file);
 		}
 
+		// write each areas static models.
+		{
+			ScopedNodeInfo node(hdr.nodes[FileNodes::STATIC_MODELS], file);
+
+
+
+
+		}
+
 		// update FourcCC to mark this bsp as valid.
 		hdr.fourCC = LVL_FOURCC;
 		hdr.numAreas = safe_static_cast<uint32_t,size_t>(areas_.size());

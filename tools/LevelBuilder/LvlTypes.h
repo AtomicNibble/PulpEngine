@@ -146,7 +146,9 @@ public:
 	bool ClipSidesByTree(XPlaneSet& planeSet);
 	bool FloodAreas(void);
 	bool PruneNodes(void);
-	
+
+	bool PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents, mapfile::XMapFile* pMap);
+
 private:
 
 	bool PlaceOccupant(XPlaneSet& planeSet, bspNode* node, size_t& floodedNum);
@@ -210,7 +212,7 @@ struct AreaSubMesh
 class LvlArea
 {
 	typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
-	typedef core::Array<LvlEntity> AreaEntsArr;
+	typedef core::Array<LvlEntity*> AreaEntsArr;
 	typedef core::Array<AABB> CullSectionsArr;
 public:
 	LvlArea();

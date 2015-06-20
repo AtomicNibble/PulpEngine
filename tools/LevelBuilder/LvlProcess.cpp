@@ -487,6 +487,8 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	// we also number the nodes at this point also.
 	ent.PruneNodes();
 
+	// work out which ents belong to which area.
+	ent.PutEntsInAreas(planes, entities_, map_);
  	return true;
 }
 

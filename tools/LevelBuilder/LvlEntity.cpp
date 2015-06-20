@@ -447,3 +447,84 @@ bool LvlEntity::PruneNodes(void)
 	return true;
 }
 
+void AreaForOrigin_r(XPlaneSet& planeSet, const AABB& bounds, bspNode* pNode)
+{
+	X_ASSERT_NOT_NULL(pNode);
+
+	if (pNode->planenum != PLANENUM_LEAF)
+	{
+		Planef& plane = planeSet[pNode->planenum];
+
+		PlaneSide::Enum side = bounds.planeSide(plane);
+		if (side == PlaneSide::FRONT) {
+			AreaForOrigin_r(planeSet, bounds, pNode->children[0]);
+			return;
+		}
+		else if (side == PlaneSide::BACK) {
+			AreaForOrigin_r(planeSet, bounds, pNode->children[1]);
+			return;
+		}
+		else
+		{
+			if (pNode->children[1]) 
+			{
+				AreaForOrigin_r(planeSet, bounds, pNode->children[1]);
+			}
+
+			if (pNode->area == -1) 
+			{
+				X_ERROR("LevelEnt", "INvalid node for area when trying to find area for origin");
+				return;
+			}
+
+			// add, but we must know if we added that area before.
+
+
+		}
+	}
+}
+
+
+bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents,
+	mapfile::XMapFile* pMap)
+{
+	X_ASSERT_NOT_NULL(pMap);
+	int32_t i;
+
+	LvlEntity& world = ents[0];
+
+	// iterate the map ents.
+	for (i = 1; i < pMap->getNumEntities(); i++)
+	{
+		mapfile::XMapEntity* mapEnt = pMap->getEntity(i);
+		LvlEntity& lvlEnt = ents[i];
+
+		// for now just add the static models ents to world ent.
+		{
+			mapfile::XMapEntity::PairIt it = mapEnt->epairs.find("classname");
+			if (it == mapEnt->epairs.end()) {
+				continue;
+			}
+			core::string className = it->second;
+			if (className != X_CONST_STRING("misc_model")) {
+				continue;
+			}
+		}
+
+		// we want to find out what areas the bounds of this model
+		// are in, then add a refrence for that model to both areas.
+		// Since we will need to draw the model if either of the area's are active.
+		// i will want to store the model in both of the area's indivudual lists.
+		// at runtime I will use frame id's to work out what has already been drawn each frame.
+
+
+		// this dose mean i need to know the bounds of the model.
+		// meaning i must load it.
+		AABB bounds;
+		bounds.add(lvlEnt.origin);
+		AreaForOrigin_r(planeSet, bounds, bspTree.headnode);
+
+	}
+	return true;
+}
+
