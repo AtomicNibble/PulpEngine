@@ -110,6 +110,22 @@ public:
 
 	void WriteNodes_r(XPlaneSet& planes, core::XFile* pFile);
 
+	X_INLINE bool AreaSet(void) const {
+		return area != -1;
+	}
+
+	X_INLINE bool IsLeaf(void) const {
+		return planenum == PLANENUM_LEAF;
+	}
+
+	X_INLINE bool IsAreaLeaf(void) const {
+		return IsLeaf() && AreaSet();
+	}
+	X_INLINE bool IsSolidLeaf(void) const {
+		return IsLeaf() && !AreaSet();
+	}
+
+
 public:
 	// give each node a number.
 	static int32_t NumberNodes_r(bspNode* pNode, int32_t nextNumber);
