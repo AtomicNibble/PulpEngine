@@ -456,7 +456,7 @@ void bspNode::WriteNodes_r(XPlaneSet& planes, core::XFile* pFile)
 	for (i = 0; i < 2; i++)
 	{
 		if (children[i]->planenum == PLANENUM_LEAF) {
-			childIds[i] = -1 - children[i]->area;
+			childIds[i] = -1 - children[i]->area; // leafs with area -1 get child of 0
 		}
 		else {
 			childIds[i] = children[i]->nodeNumber;

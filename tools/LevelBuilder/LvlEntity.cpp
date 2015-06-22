@@ -440,48 +440,56 @@ bool LvlEntity::PruneNodes(void)
 	bspTree.headnode->PruneNodes_r();
 
 	int32_t postPrune = bspTree.headnode->NumChildNodes();
+	int32_t numNodes = bspNode::NumberNodes_r(bspTree.headnode, 0);
 
+#if X_DEBUG
+	X_ASSERT(numNodes == postPrune, "Invalid node couts. prunt and num don't match")(numNodes, postPrune);
+#endif
 
 	X_LOG0("LvlEntity", "prePrune: %i", prePrune);
 	X_LOG0("LvlEntity", "postPrune: %i", postPrune);
+	X_LOG0("LvlEntity", "numNodes: %i", numNodes);
 	return true;
 }
 
 void AreaForOrigin_r(XPlaneSet& planeSet, const AABB& bounds, bspNode* pNode)
 {
 	X_ASSERT_NOT_NULL(pNode);
+	bspNode* pCurNode = pNode;
 
-	if (pNode->planenum != PLANENUM_LEAF)
+	// i need to go down the tree untill i hit a leaf with a area.
+	// when we cross a node we go down both paths so that we detech multiple intersections.
+
+	do
 	{
-		Planef& plane = planeSet[pNode->planenum];
-
-		PlaneSide::Enum side = bounds.planeSide(plane);
-		if (side == PlaneSide::FRONT) {
-			AreaForOrigin_r(planeSet, bounds, pNode->children[0]);
+		if (pCurNode->IsLeaf() && pCurNode->area != -1)
+		{
+			X_LOG0("Test","Area: %i (%g,%g,%g)", pCurNode->area, 
+				bounds.min[0], bounds.min[1], bounds.min[2]);
 			return;
 		}
+
+		const Planef& plane = planeSet[pCurNode->planenum];
+		PlaneSide::Enum side = bounds.planeSide(plane);
+
+		if (side == PlaneSide::FRONT) {
+			pCurNode = pCurNode->children[0];
+		}
 		else if (side == PlaneSide::BACK) {
-			AreaForOrigin_r(planeSet, bounds, pNode->children[1]);
-			return;
+			pCurNode = pCurNode->children[1];
 		}
 		else
 		{
-			if (pNode->children[1]) 
-			{
-				AreaForOrigin_r(planeSet, bounds, pNode->children[1]);
+			// travel down both paths.
+			if (!(pCurNode->children[1]->IsLeaf() && pCurNode->children[1]->area == -1)) {
+				AreaForOrigin_r(planeSet, bounds, pCurNode->children[1]);
 			}
 
-			if (pNode->area == -1) 
-			{
-				X_ERROR("LevelEnt", "INvalid node for area when trying to find area for origin");
-				return;
-			}
-
-			// add, but we must know if we added that area before.
-
-
+			pCurNode = pCurNode->children[0];
 		}
-	}
+
+	} while (!(pCurNode->IsLeaf() && pCurNode->area == -1));
+
 }
 
 
@@ -520,6 +528,7 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 
 		// this dose mean i need to know the bounds of the model.
 		// meaning i must load it.
+		X_LOG0("Entity", "Finding areas for ent: %i", i);
 		AABB bounds;
 		bounds.add(lvlEnt.origin);
 		AreaForOrigin_r(planeSet, bounds, bspTree.headnode);
