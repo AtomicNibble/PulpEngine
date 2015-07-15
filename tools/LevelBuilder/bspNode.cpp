@@ -392,6 +392,8 @@ int32_t	bspNode::PruneNodes_r(void)
 	children[0]->FreeTree_r();
 	children[1]->FreeTree_r();
 
+	core::zero_object(children);
+
 	// change this node to a leaf
 	planenum = PLANENUM_LEAF;
 	area = a1;
