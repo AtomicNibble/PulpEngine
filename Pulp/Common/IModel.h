@@ -430,7 +430,7 @@ struct ModelHeader // File header.
 
 	// do i need this?
 	// the lods store one for each mesh so kinda redundant.
-//	AABB boundingBox;
+	AABB boundingBox;
 
 	LODHeader lodInfo[MODEL_MAX_LODS];
 
@@ -452,7 +452,7 @@ X_ENSURE_SIZE(Face, 6);
 X_ENSURE_SIZE(SubMeshHeader, 128);
 X_ENSURE_SIZE(MeshHeader, 128);
 X_ENSURE_SIZE(LODHeader, sizeof(MeshHeader)+8);
-X_ENSURE_SIZE(ModelHeader, (sizeof(LODHeader)*MODEL_MAX_LODS) + (48 - 24));
+X_ENSURE_SIZE(ModelHeader, (sizeof(LODHeader)*MODEL_MAX_LODS) + 48);
 
 
 
