@@ -236,6 +236,7 @@
     <ClInclude Include="HashIndex.h" />
     <ClInclude Include="LvlTypes.h" />
     <ClInclude Include="MaterialManager.h" />
+    <ClInclude Include="ModelInfo.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="StringPair.h" />
     <ClInclude Include="TriTools.h" />
@@ -267,6 +268,7 @@
     <ClCompile Include="MapTypes.cpp" />
     <ClCompile Include="LevelBuilder.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
+    <ClCompile Include="ModelInfo.cpp" />
     <ClCompile Include="Settings.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
