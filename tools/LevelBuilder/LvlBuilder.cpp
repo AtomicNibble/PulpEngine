@@ -73,6 +73,11 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 
 	map_ = map;
 
+	// first we need to load the AABB of the default model.
+	if (!LoadDefaultModel()) {
+		return false;
+	}
+
 	if (map->getNumEntities() == 0) {
 		X_ERROR("Lvl", "Map has zero entites, atleast one is required");
 		return false;
