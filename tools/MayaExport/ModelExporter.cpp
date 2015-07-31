@@ -1591,6 +1591,15 @@ bool MayaModel::save(const char *filename)
 			meshHeadOffsets += lod.numSubMeshes * sizeof(model::MeshHeader);
 		}
 
+		// create combined bounding box.
+		header.boundingBox.clear();
+		for (i = 0; i < numLods; i++)
+		{
+			model::LODHeader& lod = header.lodInfo[i];
+
+			header.boundingBox.add(lod.boundingBox);
+		}
+
 	//	const size_t temp = sizeof(header);
 
 		fwrite(&header, sizeof(header), 1, f);
