@@ -84,7 +84,7 @@ X_NAMESPACE_BEGIN(model)
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
 #define X_MODEL_MTL_LOWER_CASE_NAMES 1
 
-static const uint32_t	 MODEL_VERSION = 9;
+static const uint32_t	 MODEL_VERSION = 10;
 static const uint32_t	 MODEL_MAX_BONES = 255;
 static const uint32_t	 MODEL_MAX_BONE_NAME_LENGTH = 64;
 static const uint32_t	 MODEL_MAX_MESH = 64;
