@@ -22,8 +22,8 @@ namespace ModelInfo
 		if (file.openFile(path.c_str(), mode))
 		{
 			model::ModelHeader hdr;
-
-			if (file.readObj(hdr) == sizeof(hdr))
+		
+			if (file.readObj(hdr) != sizeof(hdr))
 			{
 				X_ERROR("ModelInfo", "Failed to read model header");
 				return false;
