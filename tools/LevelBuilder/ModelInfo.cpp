@@ -33,7 +33,9 @@ namespace ModelInfo
 
 			if (!hdr.isValid())
 			{
-				X_ERROR("ModleInfo", "model info is not valid");
+				X_ERROR("ModleInfo", "model hdr is not valid."
+					" provided version: %i required: %i",
+					hdr.version, model::MODEL_VERSION);
 				return false;
 			}
 
