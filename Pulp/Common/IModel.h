@@ -434,6 +434,7 @@ struct ModelHeader // File header.
 
 	LODHeader lodInfo[MODEL_MAX_LODS];
 
+	// definitions in 3DEngine::ModelLoader.cpp
 	bool isValid(void) const;
 };
 
