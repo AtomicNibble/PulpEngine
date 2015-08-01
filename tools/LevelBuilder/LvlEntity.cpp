@@ -459,13 +459,14 @@ void AreaForOrigin_r(XPlaneSet& planeSet, const AABB& bounds, bspNode* pNode)
 
 	// i need to go down the tree untill i hit a leaf with a area.
 	// when we cross a node we go down both paths so that we detech multiple intersections.
-
 	do
 	{
-		if (pCurNode->IsLeaf() && pCurNode->area != -1)
+		if (pCurNode->IsAreaLeaf())
 		{
-			X_LOG0("Test","Area: %i (%g,%g,%g)", pCurNode->area, 
-				bounds.min[0], bounds.min[1], bounds.min[2]);
+			AABB& bb = pCurNode->bounds;
+			X_LOG0("Test","Area: %i (%g,%g,%g) (%g,%g,%g)", pCurNode->area, 
+				bb.min[0], bb.min[1], bb.min[2],
+				bb.max[0], bounds.max[1], bb.max[2]);
 			return;
 		}
 
@@ -481,15 +482,51 @@ void AreaForOrigin_r(XPlaneSet& planeSet, const AABB& bounds, bspNode* pNode)
 		else
 		{
 			// travel down both paths.
-			if (!(pCurNode->children[1]->IsLeaf() && pCurNode->children[1]->area == -1)) {
+			if (!pCurNode->children[1]->IsSolidLeaf()) {
 				AreaForOrigin_r(planeSet, bounds, pCurNode->children[1]);
 			}
 
 			pCurNode = pCurNode->children[0];
 		}
 
-	} while (!(pCurNode->IsLeaf() && pCurNode->area == -1));
+	} while (!pCurNode->IsSolidLeaf());
 
+}
+
+
+bool IsPointInAnyArea(XPlaneSet& planeSet, const Vec3f& pos, int32_t& areaOut, bspNode* pNode)
+{
+	X_ASSERT_NOT_NULL(pNode);
+	bspNode* pCurNode = pNode;
+
+	while (1)
+	{
+		const Planef& plane = planeSet[pCurNode->planenum];
+		float dis = plane.distance(pos);
+
+		if (dis > 0.f) {
+			pCurNode = pCurNode->children[0];
+		}
+		else {
+			pCurNode = pCurNode->children[1];
+		}
+
+		if (pCurNode->IsSolidLeaf() ) {
+			areaOut = -1; // in solid
+			return false;
+		}
+
+		if (pCurNode->IsAreaLeaf())
+		{
+			areaOut = pCurNode->area;
+			X_LOG0("Area","Point (%g,%g,%g) is in area: %i", 
+				pos.x, pos.y, pos.z, pCurNode->area);
+			return true;
+		}
+	}
+
+	areaOut = -1;
+	return false;
 }
 
 
@@ -528,11 +565,14 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 
 		// this dose mean i need to know the bounds of the model.
 		// meaning i must load it.
-		X_LOG0("Entity", "Finding areas for ent: %i", i);
-		AABB bounds;
-		bounds.add(lvlEnt.origin);
-		AreaForOrigin_r(planeSet, bounds, bspTree.headnode);
+		X_LOG0("Entity", "Finding areas for ent: %i origin: (%g,%g,%g)", i,
+			lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
+	//	AABB bounds;
+	//	bounds.add(lvlEnt.origin);
+	//	AreaForOrigin_r(planeSet, bounds, bspTree.headnode);
 
+		int32_t areaOut;
+		IsPointInAnyArea(planeSet, lvlEnt.origin, areaOut, bspTree.headnode);
 	}
 	return true;
 }
