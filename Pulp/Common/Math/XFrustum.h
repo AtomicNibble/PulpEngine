@@ -117,8 +117,8 @@ private:
 	float up_;
 	float invFar_;		// 1.0f / dFar
 	
-	int width_;
-	int height_;
+	uint32_t width_;
+	uint32_t height_;
 	float fov_;
 	float projectionRatio_;
 	float pixelAspectRatio_;
