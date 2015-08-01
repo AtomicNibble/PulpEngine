@@ -60,11 +60,14 @@ namespace PSD
 			case 2:
 				return 0;   // blue
 			case 3:
-				return header.channels == 4 ? 24 : -1;	// ?
+				if (header.channels == 4)
+					return 24;
+				X_ERROR("TexturePSD", "Unknown channel count for channel number 3. count: %i", header.channels);
 			case 4:
 				return 24;  // alpha
 			default:
-				return -1;
+				X_ERROR("TexturePSD", "Unknown channel number: %i", channelNr);
+				return 0;
 			}
 
 			X_ASSERT_UNREACHABLE();
