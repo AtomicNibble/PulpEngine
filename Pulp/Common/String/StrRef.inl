@@ -156,7 +156,7 @@ typename StringRef<CharT>::const_iterator StringRef<CharT>::end(void) const
 template<typename CharT>
 typename StringRef<CharT>::size_type StringRef<CharT>::length(void) const
 {
-	return header()->length;
+	return safe_static_cast<StringRef<CharT>::size_type, StringRef<CharT>::length_type>(header()->length);
 }
 
 // same as length
@@ -170,7 +170,7 @@ typename StringRef<CharT>::size_type StringRef<CharT>::size(void) const
 template<typename CharT>
 typename StringRef<CharT>::size_type StringRef<CharT>::capacity(void) const
 {
-	return header()->allocSize;
+	return safe_static_cast<StringRef<CharT>::size_type, StringRef<CharT>::length_type>(header()->allocSize);
 }
 
 template<typename CharT>
