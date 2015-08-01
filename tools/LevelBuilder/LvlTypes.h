@@ -160,6 +160,8 @@ private:
 
 public:
 	Vec3f origin;
+	Vec3f angle; // euelr
+	AABB bounds; // set for models, only currently.
 
 	LvlBrushArr brushes;
 	TrisArr patches;
