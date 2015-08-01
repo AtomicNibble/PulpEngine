@@ -38,7 +38,7 @@ void Level::FlowViewThroughPortals(const int32_t areaNum, const Vec3f origin,
 	{
 		// outside draw everything.
 		for (i = 0; i < areas_.size(); i++) {
-			AddAreaRefs(i, &ps);
+			AddAreaRefs(safe_static_cast<int32_t>(i), &ps);
 		}
 	}
 	else
