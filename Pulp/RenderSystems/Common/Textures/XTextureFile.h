@@ -73,7 +73,7 @@ public:
 	X_INLINE const int getNumFaces(void) const { return numFaces; }
 	X_INLINE const int getDepth(void) const { return depth; }
 	X_INLINE const int getNumMips(void) const { return numMips; }
-	X_INLINE const int getDataSize(void) const { return datasize; }
+	X_INLINE const uint32_t getDataSize(void) const { return datasize; }
 	X_INLINE TextureFlags getFlags(void) const { return flags; }
 	X_INLINE Texturefmt::Enum getFormat(void) const { return format; }
 	X_INLINE TextureType::Enum getType(void) const { return type; }
@@ -104,8 +104,8 @@ public:
 	// we have setters, for the loaders.
 protected:
 	X_INLINE void setSize(const Vec2<uint16_t> size) { this->size = size; }
-	X_INLINE void setWidth(const int width) { size.x = width; }
-	X_INLINE void setHeigth(const int height) { size.y = height; }
+	X_INLINE void setWidth(const uint16_t width) { size.x = width; }
+	X_INLINE void setHeigth(const uint16_t height) { size.y = height; }
 	X_INLINE void setNumFaces(const int num) { this->numFaces = num; }
 	X_INLINE void setDepth(const int depth) { this->depth = depth; }
 	X_INLINE void setNumMips(const int num) { this->numMips = num; }
