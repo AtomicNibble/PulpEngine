@@ -74,7 +74,7 @@ uint8 BoxSides[0x40 * 8] =
 
 }
 
-void XFrustum::SetFrustum(int nWidth, int nHeight, float32_t FOV, float32_t nearplane,
+void XFrustum::SetFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV, float32_t nearplane,
 	float32_t farpane, float32_t fPixelAspectRatio)
 {
 	X_ASSERT(nearplane>0.001f,"near plane not valid")(nearplane);		//check if near-plane is valid

@@ -36,7 +36,7 @@ class XFrustum
 public:
 	XFrustum();
 
-	void SetFrustum(int nWidth, int nHeight, float32_t FOV, float32_t nearplane,
+	void SetFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV, float32_t nearplane,
 		float32_t farpane, float32_t fPixelAspectRatio);
 
 	// set some data
