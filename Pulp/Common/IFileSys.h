@@ -131,7 +131,6 @@ struct XFile
 	inline uint32_t readString(core::string& str) {
 		// uggh
 		char Char;
-		size_t pos = tell();
 		str.clear();
 		while (read(&Char, 1))
 		{
@@ -226,10 +225,10 @@ struct XFileMem : public XFile
 		}
 	}
 	virtual size_t remainingBytes(void) const X_FINAL{
-		return end_ - current_;
+		return static_cast<size_t>(end_ - current_);
 	}
 	virtual size_t tell(void) const X_FINAL{
-		return current_ - begin_;
+		return static_cast<size_t>(current_ - begin_);
 	}
 	virtual void setSize(size_t numBytes) X_FINAL{
 		X_UNUSED(numBytes);
@@ -304,10 +303,10 @@ struct XFileBuf : public XFile
 		}
 	}
 	virtual size_t remainingBytes(void) const X_FINAL{
-		return end_ - current_;
+		return static_cast<size_t>(end_ - current_);
 	}
 	virtual size_t tell(void) const X_FINAL{
-		return current_ - begin_;
+		return static_cast<size_t>(current_ - begin_);
 	}
 	virtual void setSize(size_t numBytes) X_FINAL{
 		X_UNUSED(numBytes);
@@ -321,7 +320,7 @@ struct XFileBuf : public XFile
 	inline const uint8_t* getBufferEnd(void) const { return end_; }
 
 	inline size_t getSize(void) const {
-		return end_ - begin_;
+		return static_cast<size_t>(end_ - begin_);
 	}
 
 	inline bool isEof(void) const X_FINAL{
