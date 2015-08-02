@@ -106,9 +106,9 @@ protected:
 	X_INLINE void setSize(const Vec2<uint16_t> size) { this->size = size; }
 	X_INLINE void setWidth(const uint16_t width) { size.x = width; }
 	X_INLINE void setHeigth(const uint16_t height) { size.y = height; }
-	X_INLINE void setNumFaces(const int num) { this->numFaces = num; }
-	X_INLINE void setDepth(const int depth) { this->depth = depth; }
-	X_INLINE void setNumMips(const int num) { this->numMips = num; }
+	void setNumFaces(const int num);
+	void setDepth(const int depth);
+	void setNumMips(const int num);
 	X_INLINE void setFlags(TextureFlags	flags) { this->flags = flags; }
 	X_INLINE void setType(TextureType::Enum type) { this->type = type; }
 	X_INLINE void setFormat(Texturefmt::Enum format) { this->format = format; }
