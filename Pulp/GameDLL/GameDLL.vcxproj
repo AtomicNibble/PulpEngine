@@ -301,6 +301,9 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
     </ClCompile>
+    <Link>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+    </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Game.h" />
