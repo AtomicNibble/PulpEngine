@@ -18,6 +18,8 @@ X_LINK_LIB("jpeg");
 
 
 X_NAMESPACE_BEGIN(texture)
+X_DISABLE_WARNING(4611)
+X_DISABLE_WARNING(4324)
 
 namespace JPG
 {
@@ -37,7 +39,7 @@ namespace JPG
 		static void xfile_init_source(j_decompress_ptr cinfo)
 		{
 			jpeg_xfile_src_mgr* src = (jpeg_xfile_src_mgr*)cinfo->src;
-
+			X_UNUSED(src);
 			// files already open since engine filesystem 
 			// will only give back a file object when it's valid and open.
 
@@ -85,9 +87,10 @@ namespace JPG
 
 		static void xfile_term_source(j_decompress_ptr cinfo)
 		{
+			X_UNUSED(cinfo);
 			// we don't close the file handle.
 			// since this reader is called with the open file.
-			// code the calls it is responsible for closing the file.
+			// code that calls it is responsible for closing the file.
 		}
 
 		static void init_file_stream(j_decompress_ptr cinfo, jpeg_xfile_src_mgr* src, core::XFile* file)
@@ -181,8 +184,8 @@ namespace JPG
 		jpeg_start_decompress(&cinfo);
 
 		// check we can load this.
-		if (cinfo.output_height < 0 || cinfo.output_height > TEX_MAX_DIMENSIONS ||
-			cinfo.output_width < 0 || cinfo.output_width > TEX_MAX_DIMENSIONS)
+		if (cinfo.output_height < 1 || cinfo.output_height > TEX_MAX_DIMENSIONS ||
+			cinfo.output_width < 1 || cinfo.output_width > TEX_MAX_DIMENSIONS)
 		{
 			X_ERROR("TextureJPG", "invalid image dimensions. provided: %ix%i max: %ix%i", 
 				cinfo.output_height, cinfo.output_width, TEX_MAX_DIMENSIONS, TEX_MAX_DIMENSIONS);
@@ -228,8 +231,8 @@ namespace JPG
 		img->setFlags(flags);
 		img->setFormat(Texturefmt::R8G8B8);
 		img->setType(TextureType::T2D);
-		img->setHeigth(cinfo.output_height);
-		img->setWidth(cinfo.output_width);
+		img->setHeigth(safe_static_cast<uint16_t, uint32_t>(cinfo.output_height));
+		img->setWidth(safe_static_cast<uint16_t, uint32_t>(cinfo.output_width));
 		img->setDataSize(inflated_size);
 
 		uint8_t* pBuffer = img->pFaces[0];

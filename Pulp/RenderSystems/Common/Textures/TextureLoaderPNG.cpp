@@ -39,9 +39,9 @@ namespace PNG
 			};
 		};
 
-		static int png_get_bpp(uint32_t depth, uint32_t color_type)
+		static uint32_t png_get_bpp(uint32_t depth, uint32_t color_type)
 		{
-			int bpp;
+			uint32_t bpp;
 			switch (color_type)
 			{
 			case PngColorType::GREYSCALE:
@@ -232,7 +232,7 @@ namespace PNG
 		interlace_method = cursor.getSeek<uint8_t>();
 
 
-		if (height < 0 || height > TEX_MAX_DIMENSIONS || width < 0 || width > TEX_MAX_DIMENSIONS)
+		if (height < 1 || height > TEX_MAX_DIMENSIONS || width < 1 || width > TEX_MAX_DIMENSIONS)
 		{
 			X_ERROR("TexturePNG", "invalid image dimensions. provided: %ix%i max: %ix%i", 
 				height, width, TEX_MAX_DIMENSIONS, TEX_MAX_DIMENSIONS);
@@ -322,8 +322,8 @@ namespace PNG
 		img->setDepth(1);
 		img->setFlags(flags);
 		img->setType(TextureType::T2D);
-		img->setHeigth(height);
-		img->setWidth(width);
+		img->setHeigth(safe_static_cast<uint16_t,uint32_t>(height));
+		img->setWidth(safe_static_cast<uint16_t, uint32_t>(width));
 		img->setDataSize(inflated_size);
 
 		return img;

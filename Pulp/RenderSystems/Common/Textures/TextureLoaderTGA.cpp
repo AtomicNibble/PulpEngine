@@ -96,7 +96,7 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 		return nullptr;
 	}
 
-	if (hdr.Height < 0 || hdr.Height > TEX_MAX_DIMENSIONS || hdr.Width < 0 || hdr.Width > TEX_MAX_DIMENSIONS)
+	if (hdr.Height < 1 || hdr.Height > TEX_MAX_DIMENSIONS || hdr.Width < 1 || hdr.Width > TEX_MAX_DIMENSIONS)
 	{
 		X_ERROR("TextureTGA", "invalid image dimensions. provided: %ix%i max: %ix%i", hdr.Height, hdr.Width, TEX_MAX_DIMENSIONS, TEX_MAX_DIMENSIONS);
 		return nullptr;
@@ -118,8 +118,8 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 
 	img->pFaces[0] = X_NEW_ARRAY_ALIGNED(uint8_t, DataSize, g_textureDataArena, "TgaFaceBuffer", 8);
 	img->setDataSize(DataSize);
-	img->setWidth(hdr.Width);
-	img->setHeigth(hdr.Height);
+	img->setWidth(safe_static_cast<uint16_t, uint32_t>(hdr.Width));
+	img->setHeigth(safe_static_cast<uint16_t, uint32_t>(hdr.Height));
 	img->setNumFaces(1);
 	img->setDepth(1);
 	img->setNumMips(1);
