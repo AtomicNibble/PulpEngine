@@ -29,6 +29,7 @@ struct CITexureHeader
 
 	TextureFlags Flags;
 
+	X_DISABLE_WARNING(4201)
 	union {
 		struct {
 			uint16_t width;
@@ -38,6 +39,7 @@ struct CITexureHeader
 			Vec2<uint16_t> size;
 		};
 	};
+	X_ENABLE_WARNING(4201)
 
 	uint32 DataSize;	// the size of all the data.
 	uint32 FaceSize;	// face size
