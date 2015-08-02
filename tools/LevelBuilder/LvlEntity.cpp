@@ -235,9 +235,8 @@ bool LvlEntity::MakeTreePortals(XPlaneSet& planeSet)
 
 bool LvlEntity::FilterBrushesIntoTree(XPlaneSet& planeSet)
 {
-	size_t		numUnique, numClusters;
+	size_t		numUnique, numClusters, r;
 	LvlBrush	*b, *newb;
-	int			r;
 
 	X_LOG0("LvlEntity", "----- FilterBrushesIntoTree -----");
 

@@ -131,7 +131,6 @@ struct XFile
 	inline uint32_t readString(core::string& str) {
 		// uggh
 		char Char;
-		size_t pos = tell();
 		str.clear();
 		while (read(&Char, 1))
 		{
@@ -170,8 +169,11 @@ struct XFile
 		length = vsnprintf(buf, sizeof(buf)-1, fmt, argptr);
 		va_end(argptr);
 
+		if (length < 0) {
+			return 0;
+		}
 
-		return write(buf, length);
+		return write(buf, static_cast<uint32_t>(length));
 	}
 
 	virtual inline bool isEof(void) const {
@@ -207,6 +209,8 @@ struct XFileMem : public XFile
 	}
 
 	virtual uint32_t write(const void* pBuf, uint32_t Len) X_FINAL{
+		X_UNUSED(pBuf);
+		X_UNUSED(Len);
 		X_ASSERT_NOT_IMPLEMENTED();
 		return 0;
 	}
@@ -225,13 +229,13 @@ struct XFileMem : public XFile
 			break;
 		}
 	}
-	virtual size_t remainingBytes(void) const X_FINAL{
-		return end_ - current_;
+	virtual size_t remainingBytes(void) const X_FINAL {
+		return static_cast<size_t>(end_ - current_);
 	}
-	virtual size_t tell(void) const X_FINAL{
-		return current_ - begin_;
+	virtual size_t tell(void) const X_FINAL {
+		return static_cast<size_t>(current_ - begin_);
 	}
-	virtual void setSize(size_t numBytes) X_FINAL{
+	virtual void setSize(size_t numBytes) X_FINAL {
 		X_UNUSED(numBytes);
 		X_ASSERT_UNREACHABLE();
 	}
@@ -243,14 +247,14 @@ struct XFileMem : public XFile
 	inline const char* getBufferEnd(void) const { return end_; }
 
 	inline size_t getSize(void) const {
-		return end_ - begin_;
+		return static_cast<size_t>(end_ - begin_);
 	}
 
 	inline MemoryArenaBase* getMemoryArena(void) {
 		return arena_;
 	}
 
-	inline bool isEof(void) const X_FINAL{
+	inline bool isEof(void) const X_FINAL {
 		return remainingBytes() == 0;
 	}
 
@@ -272,7 +276,7 @@ struct XFileBuf : public XFile
 		X_ASSERT_NOT_NULL(end);
 		X_ASSERT(end >= begin, "invalid buffer")(begin, end);
 	}
-	~XFileBuf() X_OVERRIDE{
+	~XFileBuf() X_OVERRIDE {
 	}
 
 	virtual uint32_t read(void* pBuf, uint32_t Len) X_FINAL{
@@ -284,7 +288,9 @@ struct XFileBuf : public XFile
 		return safe_static_cast<uint32_t, size_t>(size);
 	}
 
-	virtual uint32_t write(const void* pBuf, uint32_t Len) X_FINAL{
+	virtual uint32_t write(const void* pBuf, uint32_t Len) X_FINAL {
+		X_UNUSED(pBuf);
+		X_UNUSED(Len);
 		X_ASSERT_NOT_IMPLEMENTED();
 		return 0;
 	}
@@ -304,10 +310,10 @@ struct XFileBuf : public XFile
 		}
 	}
 	virtual size_t remainingBytes(void) const X_FINAL{
-		return end_ - current_;
+		return static_cast<size_t>(end_ - current_);
 	}
 	virtual size_t tell(void) const X_FINAL{
-		return current_ - begin_;
+		return static_cast<size_t>(current_ - begin_);
 	}
 	virtual void setSize(size_t numBytes) X_FINAL{
 		X_UNUSED(numBytes);
@@ -321,7 +327,7 @@ struct XFileBuf : public XFile
 	inline const uint8_t* getBufferEnd(void) const { return end_; }
 
 	inline size_t getSize(void) const {
-		return end_ - begin_;
+		return static_cast<size_t>(end_ - begin_);
 	}
 
 	inline bool isEof(void) const X_FINAL{
@@ -546,7 +552,7 @@ public:
 
 	uint32_t printf(const char *fmt, ...) {
 		char buf[2048];
-		uint32_t length;
+		int32_t length;
 
 		va_list argptr;
 
@@ -554,7 +560,11 @@ public:
 		length = vsnprintf_s(buf, 2048 - 1, fmt, argptr);
 		va_end(argptr);
 
-		return write(buf, length);
+		if (length < 0) {
+			return 0;
+		}
+
+		return write(buf, safe_static_cast<uint32_t,int32_t>(length));
 	}
 
 	inline void seek(size_t position, SeekMode::Enum origin) {

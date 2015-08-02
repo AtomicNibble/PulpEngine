@@ -49,7 +49,7 @@ namespace PSD
 		X_PRAGMA(pack(pop))
 
 
-		uint16 getShiftFromChannel(int8 channelNr, const PsdHeader& header)
+		uint16 getShiftFromChannel(uint8 channelNr, const PsdHeader& header)
 		{
 			switch (channelNr)
 			{
@@ -60,14 +60,18 @@ namespace PSD
 			case 2:
 				return 0;   // blue
 			case 3:
-				return header.channels == 4 ? 24 : -1;	// ?
+				if (header.channels == 4)
+					return 24;
+				X_ERROR("TexturePSD", "Unknown channel count for channel number 3. count: %i", header.channels);
 			case 4:
 				return 24;  // alpha
 			default:
-				return -1;
+				X_ERROR("TexturePSD", "Unknown channel number: %i", channelNr);
+				break;
 			}
 
 			X_ASSERT_UNREACHABLE();
+			return 0;
 		}
 
 		bool readRLEImageData(core::XFile* file, const PsdHeader& header, uint32_t* imageData)
@@ -108,10 +112,10 @@ namespace PSD
 			type 1 (no compression).
 			*/
 			
-			uint8_t* tmpData = X_NEW_ARRAY_ALIGNED(uint8_t, header.width * header.height, g_textureDataArena, "PsdTmpbuf", 8);
+			int8_t* tmpData = X_NEW_ARRAY_ALIGNED(int8_t, header.width * header.height, g_textureDataArena, "PsdTmpbuf", 8);
 			uint16_t* rleCount = X_NEW_ARRAY_ALIGNED(uint16_t, header.width * header.channels, g_textureDataArena, "PsdTmpRowbuf", 8);
 
-			int32_t size = 0;
+			uint32_t size = 0;
 
 			for (uint32_t y = 0; y<header.height * header.channels; ++y)
 			{
@@ -121,7 +125,6 @@ namespace PSD
 					X_DELETE_ARRAY(rleCount, g_textureDataArena);
 
 					X_ERROR("TexturePSD", "failed to read rle rows");
-					// os::Printer::log("Error reading rle rows\n", file->getFileName(), ELL_ERROR);
 					return false;
 				}
 
@@ -140,7 +143,6 @@ namespace PSD
 				X_DELETE_ARRAY(buf, g_textureDataArena);
 
 				X_ERROR("TexturePSD", "failed to read rle rows");
-				// 	os::Printer::log("Error reading rle rows\n", file->getFileName(), ELL_ERROR);
 				return false;
 			}
 
@@ -148,14 +150,14 @@ namespace PSD
 
 			int8_t rh;
 			uint16_t bytesRead;
-			uint8_t *dest;
+			int8_t *dest;
 			int8_t *pBuf = buf;
 
 			// decompress packbit rle
 
-			for (uint32_t channel = 0; channel<header.channels; channel++)
+			for (uint32_t channel = 0; channel < header.channels; channel++)
 			{
-				for (uint32_t y = 0; y<header.height; ++y, ++rcount)
+				for (uint32_t y = 0; y < header.height; ++y, ++rcount)
 				{
 					bytesRead = 0;
 					dest = &tmpData[y*header.width];
@@ -176,8 +178,7 @@ namespace PSD
 								++dest;
 							}
 						}
-						else
-						if (rh > -128)
+						else if (rh > -128)
 						{
 							rh = -rh + 1;
 
@@ -193,11 +194,11 @@ namespace PSD
 					}
 				}
 
-				uint16_t shift = getShiftFromChannel((uint8_t)channel, header);
+				uint16_t shift = getShiftFromChannel(static_cast<uint8_t>(channel), header);
 
 				if (shift != -1)
 				{
-					uint32_t mask = 0xff << shift;
+					uint32_t mask = 0xffu << static_cast<uint32_t>(shift);
 
 					for (uint32_t x = 0; x<header.width; ++x)
 					for (uint32_t y = 0; y<header.height; ++y)
@@ -223,22 +224,22 @@ namespace PSD
 
 			for (int32_t channel = 0; channel<header.channels && channel < 3; ++channel)
 			{
-				if (!file->read(tmpData, sizeof(uint8_t)* header.width * header.height))
+				if (!file->read(tmpData, sizeof(uint8_t) * header.width * header.height))
 				{
-				//	os::Printer::log("Error reading color channel\n", file->getFileName(), ELL_ERROR);
+					X_ERROR("TexturePSD","failed to read color channel");
 					break;
 				}
 
-				int16_t shift = getShiftFromChannel((int8_t)channel, header);
+				uint16_t shift = getShiftFromChannel(static_cast<uint8_t>(channel), header);
 				if (shift != -1)
 				{
-					uint32_t mask = 0xff << shift;
+					uint32_t mask = 0xffu << static_cast<uint32_t>(shift);
 
 					for (uint32_t x = 0; x<header.width; ++x)
 					{
 						for (uint32_t y = 0; y<header.height; ++y)
 						{
-							int32_t index = x + y*header.width;
+							uint32_t index = x + y * header.width;
 							imageData[index] = ~(~imageData[index] | mask);
 							imageData[index] |= tmpData[index] << shift;
 						}
@@ -249,7 +250,6 @@ namespace PSD
 			X_DELETE_ARRAY(tmpData, g_textureDataArena);
 			return true;
 		}
-
 
 	}
 
@@ -302,7 +302,7 @@ namespace PSD
 			return nullptr;
 		}
 
-		if (hdr.height < 0 || hdr.height > TEX_MAX_DIMENSIONS || hdr.width < 0 || hdr.width > TEX_MAX_DIMENSIONS)
+		if (hdr.height < 1 || hdr.height > TEX_MAX_DIMENSIONS || hdr.width < 1 || hdr.width > TEX_MAX_DIMENSIONS)
 		{
 			X_ERROR("TexturePSD", "invalid image dimensions. provided: %ix%i max: %ix%i", hdr.height, hdr.width, TEX_MAX_DIMENSIONS, TEX_MAX_DIMENSIONS);
 			return nullptr;
@@ -364,8 +364,8 @@ namespace PSD
 			img->setType(TextureType::T2D);
 			img->setFormat(Texturefmt::A8R8G8B8);
 			img->setDataSize(hdr.width * hdr.height * 4);
-			img->setHeigth(hdr.height);
-			img->setWidth(hdr.width);
+			img->setHeigth(safe_static_cast<uint16_t, uint32_t>(hdr.height));
+			img->setWidth(safe_static_cast<uint16_t, uint32_t>(hdr.width));
 			img->setDepth(1);
 			img->setNumMips(1);
 			img->setNumFaces(1);

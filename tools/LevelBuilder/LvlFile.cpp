@@ -104,11 +104,11 @@ namespace
 		ScopedNodeInfo(FileNode& node, core::XFile* pFile) :
 		node_(node), pFile_(pFile) {
 			X_ASSERT_NOT_NULL(pFile);
-			node.offset = pFile->tell();
+			node.offset = safe_static_cast<uint32_t,size_t>(pFile->tell());
 			node.offset -= sizeof(FileHeader);
 		}
 		~ScopedNodeInfo() {
-			node_.size = pFile_->tell() - node_.offset;
+			node_.size = safe_static_cast<uint32_t, size_t>(pFile_->tell() - node_.offset);
 			node_.size -= sizeof(FileHeader);
 		}
 

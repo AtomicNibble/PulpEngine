@@ -38,7 +38,7 @@ void Level::FlowViewThroughPortals(const int32_t areaNum, const Vec3f origin,
 	{
 		// outside draw everything.
 		for (i = 0; i < areas_.size(); i++) {
-			AddAreaRefs(i, &ps);
+			AddAreaRefs(safe_static_cast<int32_t>(i), &ps);
 		}
 	}
 	else
@@ -226,12 +226,12 @@ void Level::DrawPortalDebug(void) const
 				if (areas_[portal.areaTo].frameID == frameID_)
 				{
 					pAux->drawTriangle(portal.debugVerts.ptr(),
-						portal.debugVerts.size(), Colorf(0.f, 1.f, 0.f, 0.35f));
+						static_cast<uint32_t>(portal.debugVerts.size()), Colorf(0.f, 1.f, 0.f, 0.35f));
 				}
 				else
 				{
 					pAux->drawTriangle(portal.debugVerts.ptr(),
-						portal.debugVerts.size(), Colorf(1.f, 0.f, 0.f, 0.3f));
+						static_cast<uint32_t>(portal.debugVerts.size()), Colorf(1.f, 0.f, 0.f, 0.3f));
 				}
 #else
 		

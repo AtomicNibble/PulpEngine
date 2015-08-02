@@ -438,10 +438,12 @@ bool Array<T>::SSave(XFile* pFile) const
 {
 	X_ASSERT_NOT_NULL(pFile);
 
+	X_DISABLE_WARNING(4127)
 	if (!compileTime::IsPOD<T>::Value) {
 		X_ERROR("Array", "Can't save a none POD type to file: %s", typeid(T).name());
 		return false;
 	}
+	X_ENABLE_WARNING(4127)
 
 	pFile->writeObj(num_);
 	pFile->writeObj(size_);
@@ -455,10 +457,12 @@ bool Array<T>::SLoad(XFile* pFile)
 {
 	X_ASSERT_NOT_NULL(pFile);
 
+	X_DISABLE_WARNING(4127)
 	if (!compileTime::IsPOD<T>::Value) {
 		X_ERROR("Array", "Can't load a none POD type from file: %s", typeid(T).name()); 
 		return false;
 	}
+	X_ENABLE_WARNING(4127)
 
 	free();
 	size_type read, num, size, gran;
