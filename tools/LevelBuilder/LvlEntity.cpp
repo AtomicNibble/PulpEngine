@@ -458,8 +458,7 @@ void AreaForOrigin_r(XPlaneSet& planeSet, const AABB& bounds, bspNode* pNode)
 
 	// i need to go down the tree untill i hit a leaf with a area.
 	// when we cross a node we go down both paths so that we detech multiple intersections.
-<<<<<<< Updated upstream
-=======
+
 
 	// how to crorrectly detech what leafs the bounding box resides in?
 	// i will have to go down the tree checking whatside the AABB is for the node.
@@ -467,17 +466,11 @@ void AreaForOrigin_r(XPlaneSet& planeSet, const AABB& bounds, bspNode* pNode)
 	// we are intersecting, so travel down both paths so see what we hit.
 	// when we reach a leaf node that is solid we leave.
 	// if the noe is a lea and has a area we should be inside that area.
->>>>>>> Stashed changes
+
 	do
 	{
 		if (pCurNode->IsAreaLeaf())
 		{
-<<<<<<< Updated upstream
-			AABB& bb = pCurNode->bounds;
-			X_LOG0("Test","Area: %i (%g,%g,%g) (%g,%g,%g)", pCurNode->area, 
-				bb.min[0], bb.min[1], bb.min[2],
-				bb.max[0], bounds.max[1], bb.max[2]);
-=======
 			const AABB& b = pCurNode->bounds;
 			
 			if (b.containsBox(bounds)) {
@@ -485,7 +478,6 @@ void AreaForOrigin_r(XPlaneSet& planeSet, const AABB& bounds, bspNode* pNode)
 					b.min[0], b.min[1], b.min[2],
 					b.max[0], b.max[1], b.max[2]);
 			}
->>>>>>> Stashed changes
 			return;
 		}
 
@@ -594,24 +586,14 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 
 		// this dose mean i need to know the bounds of the model.
 		// meaning i must load it.
-<<<<<<< Updated upstream
+
 		X_LOG0("Entity", "Finding areas for ent: %i origin: (%g,%g,%g)", i,
 			lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
-	//	AABB bounds;
-	//	bounds.add(lvlEnt.origin);
-	//	AreaForOrigin_r(planeSet, bounds, bspTree.headnode);
 
-		int32_t areaOut;
-		IsPointInAnyArea(planeSet, lvlEnt.origin, areaOut, bspTree.headnode);
-=======
-		X_LOG0("Entity", "Finding areas for ent: %i origin (%g,%g,%g)", i,
-			lvlEnt.origin[0], lvlEnt.origin[1], lvlEnt.origin[2]);
 		AABB bounds;
 		bounds.add(lvlEnt.origin);
 		bounds.add(lvlEnt.origin + Vec3f::one());
 		AreaForOrigin_r(planeSet, bounds, bspTree.headnode);
-
->>>>>>> Stashed changes
 	}
 	return true;
 }
