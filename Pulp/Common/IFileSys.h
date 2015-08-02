@@ -545,7 +545,7 @@ public:
 
 	uint32_t printf(const char *fmt, ...) {
 		char buf[2048];
-		uint32_t length;
+		int32_t length;
 
 		va_list argptr;
 
@@ -553,7 +553,11 @@ public:
 		length = vsnprintf_s(buf, 2048 - 1, fmt, argptr);
 		va_end(argptr);
 
-		return write(buf, length);
+		if (length < 0) {
+			return 0;
+		}
+
+		return write(buf, safe_static_cast<uint32_t,int32_t>(length));
 	}
 
 	inline void seek(size_t position, SeekMode::Enum origin) {
