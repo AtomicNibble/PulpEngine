@@ -62,6 +62,9 @@ namespace Compression
 		InflateResult::Enum Inflate(const void* pCompessedData, size_t len);
 
 	private:
+		X_NO_COPY(ZlibInflate);
+		X_NO_ASSIGN(ZlibInflate);
+	private:
 		const void* pDst_;
 		size_t destLen_;
 	};
