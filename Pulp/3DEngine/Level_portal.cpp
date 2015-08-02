@@ -226,12 +226,12 @@ void Level::DrawPortalDebug(void) const
 				if (areas_[portal.areaTo].frameID == frameID_)
 				{
 					pAux->drawTriangle(portal.debugVerts.ptr(),
-						portal.debugVerts.size(), Colorf(0.f, 1.f, 0.f, 0.35f));
+						static_cast<uint32_t>(portal.debugVerts.size()), Colorf(0.f, 1.f, 0.f, 0.35f));
 				}
 				else
 				{
 					pAux->drawTriangle(portal.debugVerts.ptr(),
-						portal.debugVerts.size(), Colorf(1.f, 0.f, 0.f, 0.3f));
+						static_cast<uint32_t>(portal.debugVerts.size()), Colorf(1.f, 0.f, 0.f, 0.3f));
 				}
 #else
 		
