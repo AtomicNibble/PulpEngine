@@ -39,7 +39,7 @@ struct MemoryAllocatorStatistics
 		memset( &m_allocationCount, 0, sizeof( MemoryAllocatorStatistics ) - sizeof( m_type ) );
 	}
 
-	MemoryAllocatorStatistics& operator +=(MemoryAllocatorStatistics& oth) {
+	MemoryAllocatorStatistics& operator +=(const MemoryAllocatorStatistics& oth) {
 
 		m_allocationCount += oth.m_allocationCount;
 		m_allocationCountMax += oth.m_allocationCountMax;
