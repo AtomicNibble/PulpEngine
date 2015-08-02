@@ -24,7 +24,7 @@ public:
 	Array(MemoryArenaBase* arena, size_type size);
 	Array(MemoryArenaBase* arena, size_type size, const T& initialValue);
 	Array(const Array& oth);
-	~Array(void);
+	virtual ~Array(void);
 
 	void setArena(MemoryArenaBase* arena);
 	void setArena(MemoryArenaBase* arena, size_type capacity);
