@@ -93,8 +93,8 @@ public:
 		Distance_ = d / length;
 	}
 
-	X_INLINE T					operator[](int idx) const;
-	X_INLINE T &				operator[](int idx);
+	X_INLINE T					operator[](size_t idx) const;
+	X_INLINE T &				operator[](size_t idx);
 
 	X_INLINE Plane				operator-() const {
 		return Plane(-Normal_, -Distance_);
@@ -186,12 +186,12 @@ private:
 };
 
 template<typename T>
-X_INLINE T Plane<T>::operator[](int idx) const {
+X_INLINE T Plane<T>::operator[](size_t idx) const {
 	return Normal_[idx];
 }
 
 template<typename T>
-X_INLINE T& Plane<T>::operator[](int idx) {
+X_INLINE T& Plane<T>::operator[](size_t idx) {
 	return Normal_[idx];
 }
 
