@@ -330,7 +330,7 @@ void bspNode::FloodAreas_r(size_t areaNum, size_t& areaFloods)
 	}
 
 	areaFloods++;
-	area = areaNum;
+	area = safe_static_cast<int32_t,size_t>(areaNum);
 
 	for (p = portals; p; p = p->next[s])
 	{
