@@ -18,15 +18,15 @@ X_INLINE XWinding& XWinding::operator = (const XWinding& winding)
 	return *this;
 }
 
-X_INLINE const Vec5f& XWinding::operator[](const int idx) const
+X_INLINE const Vec5f& XWinding::operator[](const size_t idx) const
 {
-	X_ASSERT(idx < numPoints_ && idx >= 0, "index out of range")(idx, getNumPoints());
+	X_ASSERT(static_cast<int32_t>(idx) < numPoints_ && idx >= 0, "index out of range")(idx, getNumPoints());
 	return pPoints_[idx];
 }
 
-X_INLINE Vec5f&	XWinding::operator[](const int idx)
+X_INLINE Vec5f&	XWinding::operator[](const size_t idx)
 {
-	X_ASSERT(idx < numPoints_ && idx >= 0, "index out of range")(idx, getNumPoints());
+	X_ASSERT(static_cast<int32_t>(idx) < numPoints_ && idx >= 0, "index out of range")(idx, getNumPoints());
 	return pPoints_[idx];
 }
 
