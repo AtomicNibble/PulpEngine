@@ -158,7 +158,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	{
 		cs = &b[i]->sides.AddOne();
 
-		cs->planenum = planenum ^ i ^ 1;
+		cs->planenum = planenum ^ static_cast<int32>(i) ^ 1;
 	//	cs->material = NULL;
 
 		if (i == 0) {
@@ -379,7 +379,7 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum,
 	{
 		cs = &b[i]->sides.AddOne();
 
-		cs->planenum = planenum ^ i ^ 1;
+		cs->planenum = planenum ^ static_cast<int32_t>(i) ^ 1;
 		//	cs->material = NULL;
 
 		if (i == 0) {
