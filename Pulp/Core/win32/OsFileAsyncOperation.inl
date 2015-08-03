@@ -1,27 +1,23 @@
-#include "stdafx.h"
-#include "OsFileAsyncOperation.h"
+
 
 #include <Util\LastError.h>
 
 
 X_NAMESPACE_BEGIN(core)
 
-XOsFileAsyncOperation::XOsFileAsyncOperation(MemoryArenaBase* arena, HANDLE hFile, size_t position) :
+X_INLINE XOsFileAsyncOperation::XOsFileAsyncOperation(MemoryArenaBase* arena, HANDLE hFile, size_t position) :
 hFile_(hFile),
 overlapped_(X_NEW(ReferenceCountedOverlapped, arena, "OVERLAPPED"), arena)
 {
 	LPOVERLAPPED pOverlapped = overlapped_.instance();
 	core::zero_this(pOverlapped);
 
-	LARGE_INTEGER large;
-	large.QuadPart = position;
-
-	pOverlapped->Offset = large.LowPart;
-	pOverlapped->OffsetHigh = large.HighPart;
+	pOverlapped->Offset = safe_static_cast<DWORD>(position & 0xFFFFFFFF);
+	pOverlapped->OffsetHigh = safe_static_cast<DWORD>(((position >> 32) & 0xFFFFFFFF));
 }
 
 
-bool XOsFileAsyncOperation::hasFinished(uint32_t* pNumBytes) const
+X_INLINE bool XOsFileAsyncOperation::hasFinished(uint32_t* pNumBytes) const
 {
 	DWORD bytesTransferred = 0;
 	if (::GetOverlappedResult(hFile_, overlapped_.instance(), &bytesTransferred, false)) {
@@ -45,7 +41,7 @@ bool XOsFileAsyncOperation::hasFinished(uint32_t* pNumBytes) const
 }
 
 
-uint32_t XOsFileAsyncOperation::waitUntilFinished(void) const
+X_INLINE uint32_t XOsFileAsyncOperation::waitUntilFinished(void) const
 {
 	// same as above but with bWait = true;
 	DWORD bytesTransferred = 0;
@@ -64,7 +60,7 @@ uint32_t XOsFileAsyncOperation::waitUntilFinished(void) const
 	return 0;
 }
 
-void XOsFileAsyncOperation::cancel(void)
+X_INLINE void XOsFileAsyncOperation::cancel(void)
 {
 	DWORD bytesTransferred = 0;
 

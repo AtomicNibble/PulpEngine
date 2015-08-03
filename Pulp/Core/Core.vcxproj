@@ -392,7 +392,9 @@
     <ClCompile Include="ConsoleVariable.cpp" />
     <ClCompile Include="win32\OsFile.cpp" />
     <ClCompile Include="win32\OsFileAsync.cpp" />
-    <ClCompile Include="win32\OsFileAsyncOperation.cpp" />
+    <ClInclude Include="win32\OsFileAsyncOperation.inl">
+      <FileType>CppCode</FileType>
+    </ClInclude>
     <ClCompile Include="win32\SystemTimer.cpp" />
     <ClCompile Include="xFileSys.cpp" />
     <ClCompile Include="XProfile.cpp" />
