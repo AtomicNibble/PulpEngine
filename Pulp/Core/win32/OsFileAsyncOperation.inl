@@ -13,7 +13,11 @@ overlapped_(X_NEW(ReferenceCountedOverlapped, arena, "OVERLAPPED"), arena)
 	core::zero_this(pOverlapped);
 
 	pOverlapped->Offset = safe_static_cast<DWORD>(position & 0xFFFFFFFF);
+#if X_64 == 1
 	pOverlapped->OffsetHigh = safe_static_cast<DWORD>(((position >> 32) & 0xFFFFFFFF));
+#else
+	pOverlapped->OffsetHigh = 0;
+#endif
 }
 
 
