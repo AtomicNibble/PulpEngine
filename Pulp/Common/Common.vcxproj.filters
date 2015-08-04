@@ -994,6 +994,9 @@
     <ClInclude Include="ILevel.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
+    <ClInclude Include="Hashing\SHA512.h">
+      <Filter>Headers\Hashing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1499,6 +1502,9 @@
     </ClCompile>
     <ClCompile Include="Threading\JobSystem.cpp">
       <Filter>SourceFiles\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Hashing\SHA512.cpp">
+      <Filter>SourceFiles\Hashing</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

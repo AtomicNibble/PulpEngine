@@ -115,6 +115,7 @@
     <ClInclude Include="Hashing\MD5.h" />
     <ClInclude Include="Hashing\MurmurHash.h" />
     <ClInclude Include="Hashing\sha1.h" />
+    <ClInclude Include="Hashing\SHA512.h" />
     <ClInclude Include="IAnimation.h" />
     <ClInclude Include="IAssetPak.h" />
     <ClInclude Include="ICi.h" />
@@ -515,6 +516,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Hashing\sha1.cpp" />
+    <ClCompile Include="Hashing\SHA512.cpp" />
     <ClCompile Include="Logging\FilterPolicies\LoggerVerbosityFilterPolicy.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
