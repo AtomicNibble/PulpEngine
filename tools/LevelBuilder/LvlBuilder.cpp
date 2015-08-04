@@ -3,6 +3,7 @@
 
 #include "MapTypes.h"
 #include "MapLoader.h"
+#include "ModelInfo.h"
 
 
 namespace
@@ -72,6 +73,11 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	int32_t i;
 
 	map_ = map;
+
+	// first we need to load the AABB of the default model.
+	if (!LoadDefaultModel()) {
+		return false;
+	}
 
 	if (map->getNumEntities() == 0) {
 		X_ERROR("Lvl", "Map has zero entites, atleast one is required");
@@ -150,6 +156,31 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 		const core::string& value = it->second;
 		sscanf(value.c_str(), "%f %f %f",
 			&ent.origin.x, &ent.origin.y, &ent.origin.z);
+	}
+
+	// check for angles.
+	it = mapEnt->epairs.find("angle");
+	if (it != mapEnt->epairs.end())
+	{
+		const core::string& value = it->second;
+		sscanf(value.c_str(), "%f %f %f",
+			&ent.angle.x, &ent.angle.y, &ent.angle.z);
+	}
+
+	ent.bounds.clear();
+
+	// check if this ent is a model
+	it = mapEnt->epairs.find("model");
+	if (it != mapEnt->epairs.end())
+	{ 
+		core::string& name = it->second;
+		// load the models bounding box.
+		if (!ModelInfo::GetNModelAABB(name, ent.bounds))
+		{
+			X_ERROR("Lvl", "Failed to load model \"%s\" at (%g,%g,%g), using default",
+			name.c_str(), ent.origin.x,ent.origin.y, ent.origin.z);
+			it->second = "default";
+		}
 	}
 
 	return true;

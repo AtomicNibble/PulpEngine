@@ -146,7 +146,9 @@ public:
 	bool ClipSidesByTree(XPlaneSet& planeSet);
 	bool FloodAreas(void);
 	bool PruneNodes(void);
-	
+
+	bool PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents, mapfile::XMapFile* pMap);
+
 private:
 
 	bool PlaceOccupant(XPlaneSet& planeSet, bspNode* node, size_t& floodedNum);
@@ -158,6 +160,8 @@ private:
 
 public:
 	Vec3f origin;
+	Vec3f angle; // euelr
+	AABB bounds; // set for models, only currently.
 
 	LvlBrushArr brushes;
 	TrisArr patches;
@@ -210,7 +214,7 @@ struct AreaSubMesh
 class LvlArea
 {
 	typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
-	typedef core::Array<LvlEntity> AreaEntsArr;
+	typedef core::Array<LvlEntity*> AreaEntsArr;
 	typedef core::Array<AABB> CullSectionsArr;
 public:
 	LvlArea();

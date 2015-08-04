@@ -74,7 +74,7 @@ bool xFileSys::Init()
 	X_LOG0("FileSys", "Starting Filesys..");
 
 	// TODO: yup.
-	return setGameDir("C:\\Users\\Tom\\Documents\\Visual Studio 2013\\Projects\\WinEngine\\code\\game_folder");
+	return setGameDir("C:\\Users\\WinCat\\Documents\\code\\WinCat\\engine\\potatoengine\\game_folder");
 }
 
 void xFileSys::ShutDown()

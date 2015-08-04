@@ -28,6 +28,7 @@ private:
 	bool removeDuplicateBrushPlanes(LvlBrush& pBrush);
 
 private:	
+	bool LoadDefaultModel(void);
 	void calculateLvlBounds(void);
 
 	bool ProcessModel(LvlEntity& ent);
@@ -47,6 +48,8 @@ private:
 		LvlBrushSide& side, bspNode* pNode);
 
 private:
+	AABB defaultModelBounds_;
+
 	LvlEntsArr	entities_;
 	LvlAreaArr	areas_;
 

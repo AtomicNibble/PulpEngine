@@ -217,11 +217,7 @@ bool LvlBuilder::save(const char* name)
 
 			hdr.flags.Set(LevelFileFlags::BSP_TREE);
 
-			int32_t numNodes = bspNode::NumberNodes_r(worldEnt.bspTree.headnode, 0);
-#if X_DEBUG
-			int32_t postPrune = worldEnt.bspTree.headnode->NumChildNodes();
-			X_ASSERT(numNodes == postPrune, "Invalid node couts. prunt and num don't match")(numNodes, postPrune);
-#endif
+			int32_t numNodes = worldEnt.bspTree.headnode->NumChildNodes();
 
 			// set the header value.
 			hdr.numNodes = numNodes;
@@ -230,6 +226,15 @@ bool LvlBuilder::save(const char* name)
 			// for none leaf nodes we will write the nodes number.
 			// for leafs nodes we write the children as the area number but negative.
 			worldEnt.bspTree.headnode->WriteNodes_r(planes,file);
+		}
+
+		// write each areas static models.
+		{
+			ScopedNodeInfo node(hdr.nodes[FileNodes::STATIC_MODELS], file);
+
+
+
+
 		}
 
 		// update FourcCC to mark this bsp as valid.

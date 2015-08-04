@@ -392,6 +392,8 @@ int32_t	bspNode::PruneNodes_r(void)
 	children[0]->FreeTree_r();
 	children[1]->FreeTree_r();
 
+	core::zero_object(children);
+
 	// change this node to a leaf
 	planenum = PLANENUM_LEAF;
 	area = a1;
@@ -456,7 +458,7 @@ void bspNode::WriteNodes_r(XPlaneSet& planes, core::XFile* pFile)
 	for (i = 0; i < 2; i++)
 	{
 		if (children[i]->planenum == PLANENUM_LEAF) {
-			childIds[i] = -1 - children[i]->area;
+			childIds[i] = -1 - children[i]->area; // leafs with area -1 get child of 0
 		}
 		else {
 			childIds[i] = children[i]->nodeNumber;

@@ -386,6 +386,7 @@ void PotatoOptions::reset(void)
 	jointThreshold_ = JOINT_WEIGHT_THRESHOLD;
 	exportMode_ = EXPORT_INPUT;
 	lodInfo_.clear();
+	lodInfo_.setArena(&g_arena);
 
 //	weightsDropped_ = false;
 }
@@ -1590,6 +1591,15 @@ bool MayaModel::save(const char *filename)
 			meshHeadOffsets += lod.numSubMeshes * sizeof(model::MeshHeader);
 		}
 
+		// create combined bounding box.
+		header.boundingBox.clear();
+		for (i = 0; i < numLods; i++)
+		{
+			model::LODHeader& lod = header.lodInfo[i];
+
+			header.boundingBox.add(lod.boundingBox);
+		}
+
 	//	const size_t temp = sizeof(header);
 
 		fwrite(&header, sizeof(header), 1, f);
@@ -1982,7 +1992,7 @@ MStatus PotatoExporter::convert()
 	MayaPrintMsg(""); // new line
 
 	// name length check
-	if (g_options.filePath_.length() > model::MODEL_MAX_NAME_LENGTH)
+	if (strlen(g_options.filePath_.fileName()) > model::MODEL_MAX_NAME_LENGTH)
 	{
 		MayaPrintError("Model name is too long. MAX: %i, provided: %i",
 			model::MODEL_MAX_NAME_LENGTH, g_options.filePath_.length());

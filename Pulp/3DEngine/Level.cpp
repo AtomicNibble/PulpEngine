@@ -407,7 +407,7 @@ void Level::BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numArea
 
 	do 
 	{
-		if (nodeNum < 0) 
+		if (nodeNum < 0) // negative is a area.
 		{
 			nodeNum = -1 - nodeNum;
 
@@ -435,7 +435,7 @@ void Level::BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numArea
 		}
 		else 
 		{
-			if (node.children[1] != 0) 
+			if (node.children[1] != 0) // 0 is leaf without area since a area of -1 - -1 = 0;
 			{
 				BoundsInAreas_r(node.children[1], bounds, numAreasOut, pAreasOut, maxAreas);
 				if (numAreasOut >= maxAreas) {

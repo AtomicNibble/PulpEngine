@@ -324,37 +324,32 @@ struct StaticModel : public Entity
 
 // ============ File Structure stuff =========
 
+// WIP: format is currently been changed.
 //
-//  FileHeader
-//		||| String Table |||
-//		||| Area Models |||
-//		||| Materials |||
-//		||| Entites |||
-// 	  ||| BSP Tree |||
-//	  ||| |||
+// One question:
 //
-//
-//		Each area with have a collection of entites.
-//		And also the materials it uses.
-//		Since we will need material info for hte surfaces.
-//		
-//		They will be saved as one long array, but goruped based on area.
-//		So that a area can have a start index and num.
-//
-//		I will work out what todo with the tree later in terms of what i store.
-//
-//
-//		I wthink i'll first make it render the area AABB and glboal AABB
-//		Start to visualise the layout.
-//
-//		THen start adding in the entites etc.
+//	How do i want to store all the entities.
+//	the problem is that we support many diffrent kvp's for some ent's
+//	so i can't really have a structure that represents that in binary.
+//	so what i was thinking was have static models represented by binary layout
+//	since there will be so many of them compared to other ents.
 
 X_DECLARE_ENUM(FileNodes) (
 	STRING_TABLE,
 	AREAS,
 	AREA_PORTALS,
-	BSP_TREE
+	BSP_TREE,
+	STATIC_MODELS
 );
+
+struct FileStaticModel
+{
+	Vec3f pos;
+	Quatf angle;
+
+	uint16_t modelNameIdx;
+	uint16_t _unused; // might place somthing here, like area id.
+};
 
 struct FileNode
 {
