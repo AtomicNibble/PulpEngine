@@ -20,13 +20,20 @@ namespace strUtil
 	//	extern "C" int x_strcmp(const char* str1, const char* str2);
 	}
 
-
+	
 	const char* bytesToHumanString(size_t numBytes);
 
 	typedef char WorkingDirStr[512];
 	const char* workingDir(WorkingDirStr& buf);
 
 	inline uint32_t strlen(const char* str);
+
+	// return length of string in bytes
+	template<typename T>
+	size_t StringBytes(const T& str);
+	// return length of string in bytes + null term.
+	template<typename T>
+	size_t StringBytesIncNUll(const T& str);
 
 	/// Returns whether or not the given character is a whitespace.
 	inline bool IsWhitespace(char character);

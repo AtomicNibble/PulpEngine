@@ -1,15 +1,70 @@
 #include "EngineCommon.h"
 #include "StringUtil.h"
 #include "Path.h"
+#include "StrRef.h"	
 
 #include <direct.h>
-	
 
 X_NAMESPACE_BEGIN(core)
 
 
 namespace strUtil
 {
+	template<>
+	inline size_t StringBytes(const std::string& str)
+	{
+		return str.length();
+	}
+
+	template<>
+	inline size_t StringBytes(const std::wstring& str)
+	{
+		return str.length() * 2;
+	}
+
+	template<>
+	inline size_t StringBytes<const core::StringRef<char>&>(const core::StringRef<char>& str)
+	{
+		return str.length();
+	}
+
+	template<>
+	inline size_t StringBytes(const core::StringRef<wchar_t>& str)
+	{
+		return str.length() * 2;
+	}
+
+	template<>
+	inline size_t StringBytes(const core::string& str)
+	{
+		return str.length();
+	}
+
+	template<>
+	inline size_t StringBytesIncNUll(const std::string& str)
+	{
+		return str.length() + 1;
+	}
+
+	template<>
+	inline size_t StringBytesIncNUll(const std::wstring& str)
+	{
+		return (str.length() + 1) * 2;
+	}
+
+	template<>
+	inline size_t StringBytesIncNUll(const core::StringRef<char>& str)
+	{
+		return str.length() + 1;
+	}
+
+	template<>
+	inline size_t StringBytesIncNUll(const core::StringRef<wchar_t>& str)
+	{
+		return (str.length() + 1) * 2;
+	}
+
+
 	namespace
 	{
 #define  bswap16	_byteswap_ushort
