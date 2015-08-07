@@ -310,7 +310,7 @@ namespace exceptionHandler
 				X_LOG0( "ExceptionHandler", "Quitting the application." );		
 			}
 
-			MessageBox( GetDesktopWindow(), "Unhandled exception! The program will now close.", X_ENGINE_NAME" Error", MB_TOPMOST | MB_ICONERROR );
+			MessageBoxA( GetDesktopWindow(), "Unhandled exception! The program will now close.", X_ENGINE_NAME" Error", MB_TOPMOST | MB_ICONERROR );
 		}
 
 		return 1;
