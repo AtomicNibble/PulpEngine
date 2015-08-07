@@ -55,6 +55,11 @@ namespace strUtil
 		return Convert(input, output, N);
 	}
 
+	template <size_t N>
+	inline const char* Convert(const char* input, wchar_t(&output)[N])
+	{
+		return Convert(input, output, N  * 2);
+	}
 
 	template <typename T>
 	inline T StringToInt(const char* str)

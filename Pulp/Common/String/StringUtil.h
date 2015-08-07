@@ -50,11 +50,14 @@ namespace strUtil
 	template <size_t N>
 	inline const char* Convert(const wchar_t* input, char (&output)[N]);
 
-	/// Converts a wide-character string into a single-byte character string, and returns the converted string.
-	const char* Convert(const wchar_t* input, char* output, uint32_t outputLength);
+	template <size_t N>
+	inline const char* Convert(const char* input, wchar_t(&output)[N]);
 
 	/// Converts a wide-character string into a single-byte character string, and returns the converted string.
-	const wchar_t* Convert(const char* input, wchar_t* output, uint32_t outputLength);
+	const char* Convert(const wchar_t* input, char* output, uint32_t outputBytes);
+
+	/// Converts a wide-character string into a single-byte character string, and returns the converted string.
+	const wchar_t* Convert(const char* input, wchar_t* output, uint32_t outputBytes);
 
 
 	/// Returns the number of occurrences of a character in a string in the given range.

@@ -244,10 +244,10 @@ namespace strUtil
 		return output;
 	}
 
-	const wchar_t* Convert(const char *input, wchar_t *output, uint32_t outputLength)
+	const wchar_t* Convert(const char *input, wchar_t *output, uint32_t outputBytes)
 	{
 		size_t convertedChars = 0;
-		mbstowcs_s(&convertedChars, output, outputLength, input, _TRUNCATE);
+		mbstowcs_s(&convertedChars, output, outputBytes / 2, input, _TRUNCATE);
 		return output;
 	}
 
