@@ -12,3 +12,6 @@ WinCat (my cat)
 
 License does not expiree
 Cannot modify source-code for any purpose (cannot create derivative works)
+
+
+Copyright (C) 2015 Tom Crowley. All rights reserved.
