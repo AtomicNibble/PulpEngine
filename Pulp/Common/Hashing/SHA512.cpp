@@ -187,28 +187,12 @@ namespace Hash
 		static uint8_t padding[128] = { 0x80, };
 
 		// calculate bits pre pad.
-		uint32_t t;
-		uint8_t bits[16];
-		t = count[0];
-		bits[15] = t; t >>= 8;
-		bits[14] = t; t >>= 8;
-		bits[13] = t; t >>= 8;
-		bits[12] = t;
-		t = count[1];
-		bits[11] = t; t >>= 8;
-		bits[10] = t; t >>= 8;
-		bits[9] = t; t >>= 8;
-		bits[8] = t;
-		t = count[2];
-		bits[7] = t; t >>= 8;
-		bits[6] = t; t >>= 8;
-		bits[5] = t; t >>= 8;
-		bits[4] = t;
-		t = count[3];
-		bits[3] = t; t >>= 8;
-		bits[2] = t; t >>= 8;
-		bits[1] = t; t >>= 8;
-		bits[0] = t;
+		uint32_t bits[4];
+		bits[3] = core::Endian::swap(count[0]);
+		bits[2] = core::Endian::swap(count[1]);
+		bits[1] = core::Endian::swap(count[2]);
+		bits[0] = core::Endian::swap(count[3]);
+
 
 		// sha-1: pad out to 56 mod 64.
 		// sha-512: Pad out to 112 mod 128. 
