@@ -113,6 +113,9 @@
     <ClInclude Include="win32\SystemTimer.h">
       <Filter>Header Files\win32</Filter>
     </ClInclude>
+    <ClInclude Include="win32\OsFileAsyncOperation.inl">
+      <Filter>FileSys\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -171,9 +174,6 @@
     </ClCompile>
     <ClCompile Include="DiskFile.cpp">
       <Filter>FileSys</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\OsFileAsyncOperation.inl">
-      <Filter>FileSys\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
