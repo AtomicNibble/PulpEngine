@@ -104,6 +104,52 @@ TEST(Hash, SHA1)
 	EXPECT_STREQ("3df4d52ed7c6385daaf229e322d4043ffe925ee2", str);
 }
 
+TEST(Hash, SHA1_blank)
+{
+	Hash::SHA1Digest val, expected;
+	Hash::SHA1Digest::String str;
+
+	expected.data[0] = Endian::swap(0xda39a3ee);
+	expected.data[1] = Endian::swap(0x5e6b4b0d);
+	expected.data[2] = Endian::swap(0x3255bfef);
+	expected.data[3] = Endian::swap(0x95601890);
+	expected.data[4] = Endian::swap(0xafd80709);
+
+	Hash::SHA1 sha1;
+	sha1.Init();
+	sha1.update("");
+	val = sha1.finalize();
+
+	val.ToString(str);
+
+	EXPECT_EQ(expected, val);
+	EXPECT_STREQ("da39a3ee5e6b4b0d3255bfef95601890afd80709", str);
+}
+
+TEST(Hash, SHA1_896)
+{
+	Hash::SHA1Digest val, expected;
+	Hash::SHA1Digest::String str;
+
+	expected.data[0] = Endian::swap(0xa49b2446);
+	expected.data[1] = Endian::swap(0xa02c645b);
+	expected.data[2] = Endian::swap(0xf419f995);
+	expected.data[3] = Endian::swap(0xb6709125);
+	expected.data[4] = Endian::swap(0x3a04a259);
+
+	Hash::SHA1 sha1;
+	sha1.Init();
+	sha1.update("abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghij"
+		"klmnhijklmnoijklmnopjklmnopqklmnopqrlmnopqrsmnopqrstnopqrstu");
+	val = sha1.finalize();
+
+	val.ToString(str);
+
+	EXPECT_EQ(expected, val);
+	EXPECT_STREQ("a49b2446a02c645bf419f995b67091253a04a259", str);
+}
+
+
 TEST(Hash, SHA512_blank)
 {
 	Hash::SHA512Digest val, expected;
