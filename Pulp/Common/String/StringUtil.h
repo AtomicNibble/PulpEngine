@@ -51,7 +51,7 @@ namespace strUtil
 	inline const char* Convert(const wchar_t* input, char (&output)[N]);
 
 	template <size_t N>
-	inline const char* Convert(const char* input, wchar_t(&output)[N]);
+	inline const wchar_t* Convert(const char* input, wchar_t(&output)[N]);
 
 	/// Converts a wide-character string into a single-byte character string, and returns the converted string.
 	const char* Convert(const wchar_t* input, char* output, uint32_t outputBytes);

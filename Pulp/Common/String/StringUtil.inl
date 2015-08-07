@@ -56,7 +56,7 @@ namespace strUtil
 	}
 
 	template <size_t N>
-	inline const char* Convert(const char* input, wchar_t(&output)[N])
+	inline const wchar_t* Convert(const char* input, wchar_t(&output)[N])
 	{
 		return Convert(input, output, N  * 2);
 	}
