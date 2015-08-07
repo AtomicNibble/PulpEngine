@@ -121,7 +121,8 @@ X_POP_WARNING_LEVEL
 #define GoatSharedLibrayExtension ".dll"
 #define GoatGetProcAddress(libHandle, procName) ::GetProcAddress((HMODULE)(libHandle), procName)
 #define GoatFreeLibrary(libHandle) ::FreeLibrary((HMODULE)(libHandle))
-#define GoatLoadLibary(libname) ::LoadLibrary(libname);
+#define GoatLoadLibary(libname) ::LoadLibraryA(libname);
+#define GoatLoadLibaryW(libname) ::LoadLibraryW(libname);
 
 #define GoatSleep(ms) ::Sleep(ms)
 

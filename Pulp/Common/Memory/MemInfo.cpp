@@ -28,7 +28,7 @@ bool GetProcessMemInfo(XProcessMemInfo &info)
 	info.TotalPhysicalMemory = mem.ullTotalPhys;
 	info.FreePhysicalMemory = mem.ullAvailPhys;
 
-	static HMODULE hPSAPI = GoatLoadLibary(L"psapi.dll");
+	static HMODULE hPSAPI = GoatLoadLibaryW(L"psapi.dll");
 
 	if (hPSAPI)
 	{
