@@ -17,7 +17,13 @@ namespace Hash
 		SHA512Digest();
 		const char* ToString(String& buf) const;
 
-		void Clear(void) {
+		X_INLINE bool operator ==(const SHA512Digest& oth) const {
+			return memcmp(data, oth.data, sizeof(data)) == 0;
+		}
+		X_INLINE bool operator !=(const SHA512Digest& oth) const {
+			return !(*this == oth);
+		}
+		X_INLINE void Clear(void) {
 			zero_this(this);
 		}
 
