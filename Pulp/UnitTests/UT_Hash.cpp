@@ -184,6 +184,39 @@ TEST(Hash, SHA512_896)
 }
 
 
+TEST(Hash, SHA512_1000000)
+{
+	Hash::SHA512Digest val, expected;
+	Hash::SHA512Digest::String str;
+
+	expected.data[0] = Endian::swap(0xe718483d0ce76964);
+	expected.data[1] = Endian::swap(0x4e2e42c7bc15b463);
+	expected.data[2] = Endian::swap(0x8e1f98b13b204428);
+	expected.data[3] = Endian::swap(0x5632a803afa973eb);
+	expected.data[4] = Endian::swap(0xde0ff244877ea60a);
+	expected.data[5] = Endian::swap(0x4cb0432ce577c31b);
+	expected.data[6] = Endian::swap(0xeb009c5c2c49aa2e);
+	expected.data[7] = Endian::swap(0x4eadb217ad8cc09b);
+
+	Hash::SHA512 sha512;
+	sha512.Init();
+
+	for (size_t i = 0; i < 1000000; i++)
+	{
+		sha512.update("a");
+	}
+
+	val = sha512.finalize();
+
+	val.ToString(str);
+
+	EXPECT_EQ(expected, val);
+	EXPECT_STREQ("e718483d0ce769644e2e42c7bc15b4638e1f98b13b2044285632a803afa973e"
+		"bde0ff244877ea60a4cb0432ce577c31beb009c5c2c49aa2e4eadb217ad8cc09b", str);
+}
+
+
+
 
 TEST(Hash, Adler32)
 {
