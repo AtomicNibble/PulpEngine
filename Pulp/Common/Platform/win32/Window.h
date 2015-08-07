@@ -49,7 +49,7 @@ public:
 
 	static void RegisterVars(void);
 
-	bool Create(const char* const Title, int x, int y, int width, int height, Mode::Enum mode);
+	bool Create(const wchar_t* const Title, int x, int y, int width, int height, Mode::Enum mode);
 
 	Notification::Enum PumpMessages(void) const;
 

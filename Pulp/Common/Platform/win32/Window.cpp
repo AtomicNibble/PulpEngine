@@ -61,9 +61,9 @@ void xWindow::RegisterClass(void)
 	if (!g_ClassRegisterd)
 	{
 		// Register the class
-		WNDCLASSEX wcex;
+		WNDCLASSEXA wcex;
 
-		wcex.cbSize = sizeof(WNDCLASSEX);
+		wcex.cbSize = sizeof(wcex);
 		wcex.style = /*CS_HREDRAW | CS_VREDRAW |*/ CS_DBLCLKS | CS_OWNDC;
 		wcex.lpfnWndProc = PreWndProc;
 		wcex.cbClsExtra = 0;
@@ -76,7 +76,7 @@ void xWindow::RegisterClass(void)
 		wcex.lpszClassName = g_EngineName;
 		wcex.hIconSm = 0;
 
-		RegisterClassEx(&wcex);
+		RegisterClassExA(&wcex);
 
 		g_ClassRegisterd = TRUE;
 	}
@@ -88,7 +88,7 @@ void xWindow::UnRegisterClass(void)
 {
 	s_numwindows--;
 	if (s_numwindows == 0 && g_ClassRegisterd) {
-		UnregisterClass(g_EngineName, GetModuleHandle(NULL));
+		UnregisterClassA(g_EngineName, GetModuleHandle(NULL));
 		g_ClassRegisterd = FALSE;
 	}
 }
@@ -250,9 +250,10 @@ Recti xWindow::GetDesktopRect(void)
 /// --------------------------------------------------------------------------------------------------------
 
 
-bool xWindow::Create(const char* const Title, int x, int y, int width, int height, xWindow::Mode::Enum mode)
+bool xWindow::Create(const wchar_t* const Title, int x, int y, int width, int height, xWindow::Mode::Enum mode)
 {
 	lastError::Description Dsc;
+	wchar_t wTxt[256];
 
 	if( !g_ClassRegisterd ) {
 		X_FATAL( "Window", "You cannot create a window before xlib has been started.", Title, lastError::ToString( Dsc ) );
@@ -274,9 +275,9 @@ bool xWindow::Create(const char* const Title, int x, int y, int width, int heigh
 		height = safe_static_cast<int,LONG>( Rect.bottom - Rect.top );
 	}
 
-	window_ = CreateWindowEx( 
+	window_ = CreateWindowExW( 
 		0, 
-		g_EngineName, 
+		core::strUtil::Convert(g_EngineName, wTxt), 
 		Title, 
 		mode, 
 		x, y, 
@@ -285,7 +286,7 @@ bool xWindow::Create(const char* const Title, int x, int y, int width, int heigh
 		0, 
 		GetModuleHandle( NULL ),
 		this // required for winproc
-		);
+	);
 
 
 	HICON hIcon = NULL; //  LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ENGINE_LOGO));

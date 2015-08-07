@@ -30,7 +30,7 @@ mode_(mode)
 
 
 	// lets open you up.
-	file_ = CreateFile(path, access, share, NULL, dispo, flags, NULL);
+	file_ = CreateFileA(path, access, share, NULL, dispo, flags, NULL);
 
 	if (!valid())
 	{

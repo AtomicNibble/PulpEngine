@@ -26,13 +26,13 @@ public:
 	/// \brief Constructs a console with the given title.
 	/// \details Standard handles like stdout, stdin and stderr will be redirected to the console. Additionally, the
 	/// console will try to set the icon with the resource ID 101.
-	explicit Console(const char* title);
+	explicit Console(const wchar_t* title);
 
 	/// Frees all resources.
 	~Console(void);
 
 	/// Sets the console title.
-	void SetTitle(const char* title);
+	void SetTitle(const wchar_t* title);
 
 	/// \brief Sets the console window size and number of lines stored internally, in character units.
 	void SetSize(unsigned int windowWidth, unsigned int windowHeight, unsigned int numLines);

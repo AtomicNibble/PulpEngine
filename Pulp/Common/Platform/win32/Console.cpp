@@ -70,7 +70,7 @@ namespace {
 
 };
 
-Console::Console(const char* title) :
+Console::Console(const wchar_t* title) :
 m_stdout(nullptr),
 m_stdin(nullptr),
 m_stderr(nullptr)
@@ -163,9 +163,9 @@ Console::~Console(void)
 }
 
 /// Sets the console title.
-void Console::SetTitle(const char* title)
+void Console::SetTitle(const wchar_t* title)
 {
-	SetConsoleTitle( title );
+	SetConsoleTitleW( title );
 }
 
 /// \brief Sets the console window size and number of lines stored internally, in character units.

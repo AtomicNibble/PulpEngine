@@ -259,12 +259,15 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		// create a window
 		pWindow_ = X_NEW(core::xWindow, g_coreArena, "GameWindow");
 
-		if (!pWindow_->Create(
-			X_ENGINE_NAME" Engine "X_CPUSTRING
+		wchar_t titleW[128];
+		const char* pTitle = X_ENGINE_NAME" Engine "X_CPUSTRING
 #if X_SUPER == 0
 			" (fps:0, 0ms) Time: 0(x1)"
 #endif
-			, g_coreVars.win_x_pos, g_coreVars.win_y_pos, 
+		;
+
+		if (!pWindow_->Create(core::strUtil::Convert(pTitle, titleW),
+			g_coreVars.win_x_pos, g_coreVars.win_y_pos, 
 			g_coreVars.win_width, g_coreVars.win_height, core::xWindow::Mode::APPLICATION))
 		{
 			return false;
@@ -347,7 +350,7 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 			if (initParams.pConsoleWnd)
 				pConsole = initParams.pConsoleWnd;
 			else {
-				pConsole = X_NEW( core::Console, g_coreArena, "ExternalConsoleLog")("Engine Log");
+				pConsole = X_NEW( core::Console, g_coreArena, "ExternalConsoleLog")(L"Engine Log");
 				pConsole->SetSize(120, 60, 8000);
 				pConsole->MoveTo(10, 10);
 			}

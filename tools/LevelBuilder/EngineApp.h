@@ -12,7 +12,7 @@ public:
 	EngineApp();
 	~EngineApp();
 
-	bool Init(const char* sInCmdLine, core::Console& Console);
+	bool Init(const wchar_t* sInCmdLine, core::Console& Console);
 
 private:
 

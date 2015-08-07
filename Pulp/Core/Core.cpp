@@ -465,7 +465,7 @@ void XCore::OnFatalError(const char* format, va_list args)
 		core::LoggerBase::Line Line;
 		vsnprintf_s(Line, sizeof(core::LoggerBase::Line), _TRUNCATE, format, args);
 
-		::MessageBox(NULL, Line, X_ENGINE_NAME" Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+		::MessageBoxA(NULL, Line, X_ENGINE_NAME" Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
 	}
 
 	X_BREAKPOINT;

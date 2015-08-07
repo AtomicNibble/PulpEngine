@@ -403,7 +403,7 @@ bool xFileSys::deleteFile(pathType path, VirtualDirectory::Enum location) const
 		X_LOG0("FileSys", "deleteFile: \"%s\"", buf.c_str());
 	}
 
-	return ::DeleteFile(buf.c_str()) == TRUE;
+	return ::DeleteFileA(buf.c_str()) == TRUE;
 }
 
 bool xFileSys::deleteDirectory(pathType path, bool recursive) const
@@ -417,17 +417,19 @@ bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 		X_LOG0("FileSys", "deleteDirectory: \"%s\"", temp.c_str());
 	}
 
+	wchar_t wPath[512];
+
 	SHFILEOPSTRUCT file_op = {
 		NULL,
 		FO_DELETE,
-		temp.c_str(),
-		"",
+		core::strUtil::Convert(temp.c_str(), wPath),
+		L"",
 		FOF_NOCONFIRMATION |
 		FOF_NOERRORUI |
 		FOF_SILENT,
 		false,
 		0,
-		"" };
+		L"" };
 
 	int ret = SHFileOperation(&file_op);
 
@@ -525,7 +527,7 @@ bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 		X_LOG0("FileSys", "fileExists: \"%s\"", buf.c_str());
 	}
 
-	DWORD dwAttrib = GetFileAttributes(buf.c_str());
+	DWORD dwAttrib = GetFileAttributesA(buf.c_str());
 
 	if (dwAttrib != INVALID_FILE_ATTRIBUTES) // make sure we did not fail for some shit, like permissions
 	{
@@ -561,7 +563,7 @@ bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) c
 		X_LOG0("FileSys", "directoryExists: \"%s\"", path);
 	}
 
-	DWORD dwAttrib = GetFileAttributes(path);
+	DWORD dwAttrib = GetFileAttributesA(path);
 
 	if (dwAttrib != INVALID_FILE_ATTRIBUTES) // make sure we did not fail for some shit, like permissions
 	{
@@ -592,7 +594,7 @@ bool xFileSys::isDirectory(pathType path, VirtualDirectory::Enum location) const
 		X_LOG0("FileSys", "isDirectory: \"%s\"", path);
 	} 
 
-	DWORD dwAttrib = GetFileAttributes(path);
+	DWORD dwAttrib = GetFileAttributesA(path);
 
 	if (dwAttrib != INVALID_FILE_ATTRIBUTES) {
 		if ((dwAttrib & FILE_ATTRIBUTE_DIRECTORY)) {

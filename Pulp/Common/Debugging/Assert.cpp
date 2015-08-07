@@ -27,7 +27,10 @@ Assert::Assert( const SourceInfo& sourceInfo, const char* fmt, ... )
 		temp.append("ASSERT: ");
 		temp.appendFmt(fmt, ap);
 
-		::OutputDebugString(temp.c_str());
+		wchar_t wTxt[2048];
+		strUtil::Convert(temp.c_str(), wTxt);
+
+		::OutputDebugStringW(wTxt);
 
 		X_BREAKPOINT;
 #endif

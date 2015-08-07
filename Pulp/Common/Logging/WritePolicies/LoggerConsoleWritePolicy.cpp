@@ -142,7 +142,7 @@ namespace {
 		bool ColorSet = false;
 		const char *pOem;
 
-		CharToOem( asciiMsg, oemMsg );	
+		CharToOemA( asciiMsg, oemMsg );	
 
 		// has a ^?
 		if (core::strUtil::Find(asciiMsg, asciiMsg + length, '^')) {

@@ -287,7 +287,9 @@ void xFrame::Startup(void)
 	g_pen = CreatePen(PS_NULL, 1, RGB(90, 90, 90));
 
 	g_Background = CreateSolidBrush(0x202020);
-	g_font = CreateFont(16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, "Times New Roman");
+	g_font = CreateFontW(16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+		ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, 
+		DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, L"Times New Roman");
 }
 
 void xFrame::Shutdown(void)
@@ -618,7 +620,7 @@ void xFrame::PaintCaption(HWND hWnd, HDC hDC)
 		StackString512 Title;
 
 		int IconPad = 16 + 4;
-		int Len = GetWindowText(hWnd, &Title[0], 512);
+		int Len = GetWindowTextA(hWnd, &Title[0], 512);
 
 		// Title
 		SetBkMode(hDC, TRANSPARENT);	
@@ -655,7 +657,7 @@ void xFrame::PaintCaption(HWND hWnd, HDC hDC)
 		);
 
 
-		DrawTextEx(hDC, &Title[0], Len, &size, DT_END_ELLIPSIS | DT_SINGLELINE, 0);
+		DrawTextExA(hDC, &Title[0], Len, &size, DT_END_ELLIPSIS | DT_SINGLELINE, 0);
 
 		SetBkMode(hDC, OPAQUE);
 	}
