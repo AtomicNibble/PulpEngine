@@ -335,6 +335,7 @@
     <None Include="Debugging\Assert.inl" />
     <None Include="Debugging\SymbolInfo.inl" />
     <None Include="Debugging\win32\CallStack.inl" />
+    <None Include="Hashing\SHA512.inl" />
     <None Include="Logging\FilterPolicies\LoggerNoFilterPolicy.inl" />
     <None Include="Logging\Logger.inl" />
     <None Include="Logging\LoggerBase.inl" />
