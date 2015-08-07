@@ -123,6 +123,7 @@ X_POP_WARNING_LEVEL
 #define GoatFreeLibrary(libHandle) ::FreeLibrary((HMODULE)(libHandle))
 #define GoatLoadLibary(libname) ::LoadLibraryA(libname);
 #define GoatLoadLibaryW(libname) ::LoadLibraryW(libname);
+#define GoatLoadLibaryW(libname) ::LoadLibraryW(libname);
 
 #define GoatSleep(ms) ::Sleep(ms)
 
