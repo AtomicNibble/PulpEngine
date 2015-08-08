@@ -5,6 +5,23 @@
 
 X_NAMESPACE_BEGIN(core)
 
+namespace
+{
+	static const uint8_t base64_chars[65] =
+		"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+		"abcdefghijklmnopqrstuvwxyz"
+		"0123456789+/";
+
+	size_t GetCharIdx(uint8_t c)
+	{
+		for (size_t i = 0; i < sizeof(base64_chars); i++) {
+			if (base64_chars[i] == c) {
+				return i;
+			}
+		}
+		return (size_t)-1;
+	}
+}
 
 uint8 Base64::EncodingAlphabet[64] = { 
 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L',
@@ -169,5 +186,115 @@ core::string Base64::Decode(const core::string& str)
 	return core::string(TempBuf.begin(), TempBuf.end());
 }
 
+
+core::string Base64::EncodeBytes(const uint8_t* pData, size_t len)
+{
+	uint8_t char_array_3[3];
+	uint8_t char_array_4[4];
+
+	core::string ret;
+	core::string::size_type ExpectedLength = (len + 2) / 3 * 4;
+
+	ret.reserve(ExpectedLength);
+
+	size_t i = 0;
+	size_t j = 0;
+
+	while (len--)
+	{
+		char_array_3[i++] = *(pData++);
+		if (i == 3) 
+		{
+			char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
+			char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
+			char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+			char_array_4[3] = char_array_3[2] & 0x3f;
+
+			for (i = 0; (i < 4); i++) {
+				ret += base64_chars[char_array_4[i]];
+			}
+
+			i = 0;
+		}
+	}
+
+	if (i)
+	{
+		for (j = i; j < 3; j++) {
+			char_array_3[j] = '\0';
+		}
+
+		char_array_4[0] = (char_array_3[0] & 0xfc) >> 2;
+		char_array_4[1] = ((char_array_3[0] & 0x03) << 4) + ((char_array_3[1] & 0xf0) >> 4);
+		char_array_4[2] = ((char_array_3[1] & 0x0f) << 2) + ((char_array_3[2] & 0xc0) >> 6);
+		char_array_4[3] = char_array_3[2] & 0x3f;
+
+		for (j = 0; (j < i + 1); j++) {
+			ret += base64_chars[char_array_4[j]];
+		}
+
+		while ((i++ < 3)) {
+			ret += '=';
+		}
+	}
+
+	return ret;
+}
+
+
+
+void Base64::DecodeBytes(core::string& str, core::Array<uint8_t>& out)
+{
+	size_t len = str.size();
+	size_t i = 0;
+	size_t j = 0;
+	size_t in_ = 0;
+	size_t ExpectedLength = (len / 4) * 3;
+	uint8_t char_array_4[4], char_array_3[3];
+
+	out.clear();
+	out.reserve(ExpectedLength);
+
+	while (len-- && (str[in_] != '=') && is_base64(str[in_]))
+	{
+		char_array_4[i++] = str[in_];
+		in_++;
+		if (i == 4)
+		{
+			for (i = 0; i < 4; i++) {
+				char_array_4[i] = GetCharIdx(char_array_4[i]) & 0xFF;
+			}
+
+			char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
+			char_array_3[1] = ((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2);
+			char_array_3[2] = ((char_array_4[2] & 0x3) << 6) + char_array_4[3];
+
+			for (i = 0; (i < 3); i++) {
+				out.append(char_array_3[i]);
+			}
+
+			i = 0;
+		}
+	}
+
+	if (i)
+	{
+		for (j = i; j < 4; j++) {
+			char_array_4[j] = 0;
+		}
+
+		for (j = 0; j < 4; j++) {
+			char_array_4[j] = GetCharIdx(char_array_4[j]) & 0xFF;
+		}
+
+		char_array_3[0] = ((char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4)) & 0xFF;
+		char_array_3[1] = (((char_array_4[1] & 0xf) << 4) + ((char_array_4[2] & 0x3c) >> 2)) & 0xFF;
+		char_array_3[2] = (((char_array_4[2] & 0x3) << 6) + char_array_4[3]) & 0xFF;
+
+		for (j = 0; (j < i - 1); j++) {
+			out.append(char_array_3[j]);
+		}
+	}
+}
 
 X_NAMESPACE_END
