@@ -15,6 +15,16 @@ namespace strUtil
 		return ((character == 32) || ((character >= 9) && (character <= 13)));
 	}
 
+	inline bool IsAlphaNum(char str)
+	{
+		return isalnum(static_cast<int>(str)) != 0;
+	}
+
+	inline bool IsAlphaNum(uint8_t str)
+	{
+		return isalnum(static_cast<int>(str)) != 0;
+	}
+
 	inline bool IsDigit(char character)
 	{
 		return ((character >= '0') && (character <= '9'));
