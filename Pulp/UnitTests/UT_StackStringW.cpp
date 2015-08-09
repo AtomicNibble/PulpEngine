@@ -19,9 +19,9 @@ TEST(StackStringW, Construct)
 	core::StackString<32,wchar_t> str32_u64(123456789123456454ull);
 	core::StackString<32,wchar_t> str32_startEnd(str32_str.begin(), str32_str.end());
 
-//	core::StringRange range(str32_str.begin(), str32_str.end());
+	core::StringRange<wchar_t> range(str32_str.begin(), str32_str.end());
 
-//	core::StackString<32,wchar_t> str32_range(range);
+	core::StackString<32,wchar_t> str32_range(range);
 
 
 	EXPECT_STREQ(L"", str32_empty.c_str());
@@ -34,7 +34,7 @@ TEST(StackStringW, Construct)
 	EXPECT_STREQ(L"123456789123456454", str32_64.c_str());
 	EXPECT_STREQ(L"123456789123456454", str32_u64.c_str());
 	EXPECT_STREQ(L"hello bob", str32_startEnd.c_str());
-//	EXPECT_STREQ(L"hello bob", str32_range.c_str());
+	EXPECT_STREQ(L"hello bob", str32_range.c_str());
 }
 
 
