@@ -88,7 +88,7 @@ TEST(StackStringW, AppendFmt)
 
 TEST(StackStringW, Replace)
 {
-	core::StackString<1024, wchar_t> str("tickle my pickle, i love a good tickle. my my");
+	core::StackString<1024, wchar_t> str(L"tickle my pickle, i love a good tickle. my my");
 
 	EXPECT_EQ(45, str.length());
 
