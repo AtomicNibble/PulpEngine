@@ -12,11 +12,20 @@ StackString<N, TChar>::StackString(void)
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <size_t N, typename TChar>
-StackString<N, TChar>::StackString(const TChar* const str)
+StackString<N, TChar>::StackString(const wchar_t* const str)
+	: len_(strUtil::strlen(str))
+{
+	X_ASSERT_UNREACHABLE();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+template <size_t N, typename TChar>
+StackString<N, TChar>::StackString(const char* const str)
 	: len_(strUtil::strlen(str))
 {
 	X_ASSERT(len_ < N, "String(%d) \"%s\" does not fit into StackString of size %d.", len_, str, N)();
-	memcpy(str_, str, len_+1);
+	memcpy(str_, str, len_ + 1);
 }
 
 

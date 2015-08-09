@@ -376,6 +376,7 @@
     <None Include="String\GrowingStringTable.inl" />
     <None Include="String\StackString.inl" />
     <None Include="String\Path.inl" />
+    <None Include="String\StackStringW.inl" />
     <None Include="String\StringHash.inl" />
     <None Include="String\StringRange.inl" />
     <None Include="String\StringTable.inl" />
