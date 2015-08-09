@@ -141,7 +141,7 @@ m_stderr(nullptr)
 Console::~Console(void)
 {
 	lastError::Description Dsc;
-
+	/*
 	if (m_stdout) {
 		if (fclose(m_stdout) == EOF)
 			X_ERROR("Console", "Cannot close stdout handle. Error: %s", lastError::ToString(Dsc));
@@ -154,7 +154,7 @@ Console::~Console(void)
 		if (fclose(m_stderr) == EOF)
 			X_ERROR("Console", "Cannot close stderr handle. Error: %s", lastError::ToString(Dsc));
 	}
-
+	*/
 	if( !FreeConsole() )
 	{
 		X_ERROR( "Console", "Cannot free console. Error: %s", lastError::ToString( Dsc ) );
