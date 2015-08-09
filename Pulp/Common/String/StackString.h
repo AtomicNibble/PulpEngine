@@ -37,7 +37,8 @@ public:
 	explicit StackString(const StringRange& range);
 
 	explicit StackString(const bool b);
-	explicit StackString(const TChar c);
+	explicit StackString(const char c);
+	explicit StackString(const wchar_t c);
 	explicit StackString(const int i);
 	explicit StackString(const unsigned u);
 	explicit StackString(const float f);
@@ -162,6 +163,7 @@ public:
 	explicit StackString(const StringRange& range);
 
 	explicit StackString(const bool b);
+	explicit StackString(const char c);
 	explicit StackString(const wchar_t c);
 	explicit StackString(const int i);
 	explicit StackString(const unsigned u);

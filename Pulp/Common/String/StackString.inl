@@ -68,16 +68,27 @@ StackString<N, TChar>::StackString(const bool b)
 	str_[1] = '\0';
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+template <size_t N, typename TChar>
+StackString<N, TChar>::StackString(const char c)
+	: len_(1)
+{
+	X_ASSERT(len_ < N, "TChar val does not fit into stackstring of size %d.", len_, N)();
+
+	str_[0] = static_cast<TChar>(c);
+	str_[1] = '\0';
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <size_t N, typename TChar>
-StackString<N, TChar>::StackString(const TChar c)
+StackString<N, TChar>::StackString(const wchar_t c)
 : len_(1)
 {
 	X_ASSERT(len_ < N, "TChar val does not fit into stackstring of size %d.", len_, N)();
 
-	str_[0] = c;
+	str_[0] = static_cast<TChar>(c);
 	str_[1] = '\0';
 }
 

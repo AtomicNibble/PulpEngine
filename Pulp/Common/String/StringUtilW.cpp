@@ -75,7 +75,7 @@ namespace strUtil
 	{
 		size_t Len = endExclusiveS1 - startInclusiveS1;
 
-		return memcmp(startInclusiveS1, startInclusiveS2, Len) == 0;
+		return memcmp(startInclusiveS1, startInclusiveS2, Len * sizeof(wchar_t)) == 0;
 	}
 
 	bool IsEqual(const wchar_t* startInclusiveS1, const wchar_t* endExclusiveS1, const wchar_t* startInclusiveS2, const wchar_t* endExclusiveS2)
@@ -83,7 +83,7 @@ namespace strUtil
 		size_t Len = endExclusiveS1 - startInclusiveS1;
 
 		if (Len == (endExclusiveS2 - startInclusiveS2))
-			return memcmp(startInclusiveS1, startInclusiveS2, Len) == 0;
+			return memcmp(startInclusiveS1, startInclusiveS2, Len * sizeof(wchar_t)) == 0;
 
 		return false;
 	}
