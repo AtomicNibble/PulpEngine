@@ -66,5 +66,9 @@ bool StringTokenizer<TChar>::ExtractToken(StringRange<TChar>& range)
 }
 
 
+template class StringTokenizer<char>;
+template class StringTokenizer<wchar_t>;
+
+
 
 X_NAMESPACE_END
