@@ -42,7 +42,7 @@ public:
 
 	/// \brief Tries to extract the next token, and returns whether a token could be found or not.
 	/// \remark If no token could be extracted, no assumptions should be made about the contents of \a range.
-	bool ExtractToken(StringRange& range);
+	bool ExtractToken(StringRange<char>& range);
 
 private:
 	const char* m_start;

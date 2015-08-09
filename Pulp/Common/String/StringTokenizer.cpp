@@ -20,7 +20,7 @@ StringTokenizer::StringTokenizer(const char* startInclusive, const char* endExcl
 
 /// \brief Tries to extract the next token, and returns whether a token could be found or not.
 /// \remark If no token could be extracted, no assumptions should be made about the contents of \a range.
-bool StringTokenizer::ExtractToken(StringRange& range)
+bool StringTokenizer::ExtractToken(StringRange<char>& range)
 {
 	 bool result = false;
 
@@ -54,7 +54,7 @@ bool StringTokenizer::ExtractToken(StringRange& range)
 		 if ( lastnon != nullptr )
 			 tokenEnd = lastNonWhitespace;
 	
-		 range = StringRange(tokenBegin, tokenEnd);
+		 range = StringRange<char>(tokenBegin, tokenEnd);
 
 		 result = true;
 	 }

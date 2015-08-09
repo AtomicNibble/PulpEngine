@@ -19,7 +19,7 @@ TEST(StackString, Construct)
 	core::StackString<32> str32_u64(123456789123456454ull);
 	core::StackString<32> str32_startEnd(str32_str.begin(), str32_str.end());
 
-	core::StringRange range(str32_str.begin(), str32_str.end());
+	core::StringRange<char> range(str32_str.begin(), str32_str.end());
 
 	core::StackString<32> str32_range(range);
 

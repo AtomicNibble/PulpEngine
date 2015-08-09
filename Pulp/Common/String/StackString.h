@@ -34,7 +34,7 @@ public:
 	explicit StackString(const char* const str);
 
 	/// Constructs a string by copying the given range.
-	explicit StackString(const StringRange& range);
+	explicit StackString(const StringRange<TChar>& range);
 
 	explicit StackString(const bool b);
 	explicit StackString(const char c);
@@ -160,7 +160,7 @@ public:
 	explicit StackString(const char* const str);
 
 	/// Constructs a string by copying the given range.
-	explicit StackString(const StringRange& range);
+	explicit StackString(const StringRange<wchar_t>& range);
 
 	explicit StackString(const bool b);
 	explicit StackString(const char c);

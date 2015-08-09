@@ -34,7 +34,7 @@ StackString<N, TChar>::StackString(const char* const str)
 
 
 template <size_t N, typename TChar>
-StackString<N, TChar>::StackString(const StringRange& range)
+StackString<N, TChar>::StackString(const StringRange<TChar>& range)
 	: len_(safe_static_cast<uint32_t>(range.GetLength()))
 {
 	X_ASSERT(len_ < N, "StringRange does not fit into StackString of size %d.", N)();
