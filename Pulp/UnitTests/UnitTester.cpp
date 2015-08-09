@@ -83,6 +83,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	EngineApp engine;
 
 	core::Console Console(L"Engine Uint Test Log");
+	Console.RedirectSTD();
 	Console.SetSize(150, 60, 8000);
 	Console.MoveTo(10, 10);
 
