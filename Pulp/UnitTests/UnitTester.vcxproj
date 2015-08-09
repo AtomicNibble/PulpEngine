@@ -473,6 +473,7 @@
     <ClCompile Include="UT_Salsa20.cpp" />
     <ClCompile Include="UT_ScopedPointer.cpp" />
     <ClCompile Include="UT_StackString.cpp" />
+    <ClCompile Include="UT_StackStringW.cpp" />
     <ClCompile Include="UT_StringRef.cpp" />
     <ClCompile Include="UT_StringTable.cpp" />
     <ClCompile Include="UT_StringUtil.cpp" />
