@@ -49,7 +49,7 @@ XTexLoaderTGA::~XTexLoaderTGA()
 }
 
 // ITextureLoader
-bool XTexLoaderTGA::canLoadFile(const core::Path& path) const
+bool XTexLoaderTGA::canLoadFile(const core::Path<char>& path) const
 {
 	return  core::strUtil::IsEqual(TGA_FILE_EXTENSION, path.extension());
 }

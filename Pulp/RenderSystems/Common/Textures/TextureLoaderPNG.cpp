@@ -179,7 +179,7 @@ namespace PNG
 	}
 
 	// ITextureLoader
-	bool XTexLoaderPNG::canLoadFile(const core::Path& path) const
+	bool XTexLoaderPNG::canLoadFile(const core::Path<char>& path) const
 	{
 		return  core::strUtil::IsEqual(PNG_FILE_EXTENSION, path.extension());
 	}

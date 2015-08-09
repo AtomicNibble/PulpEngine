@@ -97,7 +97,7 @@ WIN_HMODULE XCore::LoadDLL(const char *dllName)
 
 bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassName, const SCoreInitParams &initParams)
 {
-	core::Path path(dllName);
+	core::Path<char> path(dllName);
 	
 	path.setExtension(".dll");
 

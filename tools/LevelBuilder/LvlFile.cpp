@@ -124,7 +124,7 @@ bool LvlBuilder::save(const char* name)
 {
 	core::fileModeFlags mode;
 	FileHeader hdr;
-	core::Path path;
+	core::Path<char> path;
 	size_t i;
 
 	if (entities_.isEmpty()) {

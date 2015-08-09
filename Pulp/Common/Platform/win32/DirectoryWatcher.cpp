@@ -90,7 +90,7 @@ void XDirectoryWatcher::addDirectory(const char* directory)
 {
 	WatchInfo info;
 
-	info.directoryName = Path(directory);
+	info.directoryName = Path<char>(directory);
 	info.directoryName.replaceSeprators();
 	info.directoryName.ensureSlash();
 
@@ -159,7 +159,7 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 
 
 			// Path
-			core::Path path(info.directoryName);
+			core::Path<char> path(info.directoryName);
 			path.append(filename);
 
 
@@ -284,7 +284,7 @@ void XDirectoryWatcher::tick(void)
 	}
 }
 
-bool XDirectoryWatcher::IsRepeat(const core::Path& path)
+bool XDirectoryWatcher::IsRepeat(const core::Path<char>& path)
 {
 	struct _stat64 st;
 	core::zero_object(st);

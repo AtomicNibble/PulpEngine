@@ -265,7 +265,7 @@ namespace PSD
 
 	// ITextureLoader
 
-	bool XTexLoaderPSD::canLoadFile(const core::Path& path) const
+	bool XTexLoaderPSD::canLoadFile(const core::Path<char>& path) const
 	{
 		return  core::strUtil::IsEqual(PSD_FILE_EXTENSION, path.extension());
 	}

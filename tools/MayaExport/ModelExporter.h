@@ -107,7 +107,7 @@ public:
 public:
 	core::Array<LODExportInfo> lodInfo_;
 
-	core::Path filePath_;
+	core::Path<char> filePath_;
 	float scale_;
 	float jointThreshold_;
 	bool  zeroOrigin_;

@@ -30,7 +30,7 @@ struct XFindData
 		return searchPak(fi);
 	}
 
-	bool getOSPath(core::Path& path, _finddatai64_t* fi)
+	bool getOSPath(core::Path<char>& path, _finddatai64_t* fi)
 	{
 		X_ASSERT_NOT_NULL(fi);
 
@@ -50,7 +50,7 @@ private:
 			// new search dir.
 			wchar_t wPath[MAX_PATH];
 
-			Path temp;
+			Path<char> temp;
 
 			core::zero_object(fdw);
 			core::strUtil::Convert(pFileSys_->createOSPath(dir, path_.c_str(), temp), wPath, MAX_PATH);
@@ -114,8 +114,8 @@ private:
 	}
 
 private:
-	Path			path_;
-	Path			folder_;
+	Path<char>		path_;
+	Path<char>		folder_;
 
 	intptr_t		handle_;
 	_wfinddata64_t	fdw;

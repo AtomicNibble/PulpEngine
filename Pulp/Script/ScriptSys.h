@@ -139,7 +139,7 @@ public:
 private:
 	void InitCommands();
 
-	bool ExecuteFile_Internal(const core::Path& path, bool silent);
+	bool ExecuteFile_Internal(const core::Path<char>& path, bool silent);
 	bool ExecuteBuffer(const char* sBuffer, size_t nSize, const char* Description);
 
 	void TraceScriptError();

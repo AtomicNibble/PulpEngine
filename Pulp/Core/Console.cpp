@@ -1272,7 +1272,7 @@ void XConsole::Exec(const char* command, const bool DeferExecution)
 
 bool XConsole::LoadConfig(const char* fileName)
 {
-	core::Path path;
+	core::Path<char> path;
 
 	path /= "config/";
 	path /= fileName;
@@ -1361,7 +1361,7 @@ bool XConsole::LoadConfig(const char* fileName)
 bool XConsole::OnFileChange(const char* name)
 {
 #if X_ENABLE_CONFIG_HOT_RELOAD
-	core::Path temp(name);
+	core::Path<char> temp(name);
 
 	LoadConfig(temp.fileName());
 #endif // !X_ENABLE_CONFIG_HOT_RELOAD

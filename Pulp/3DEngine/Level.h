@@ -178,7 +178,7 @@ private:
 	bool _pad[3];
 
 private:
-	core::Path path_;
+	core::Path<char> path_;
 	FileHeader fileHdr_;
 	LoadStats loadStats_;
 	AsyncLoadData* pAsyncLoadData_;

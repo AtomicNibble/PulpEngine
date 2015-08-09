@@ -32,7 +32,7 @@ namespace CI
 	}
 
 	// ITextureLoader
-	bool XTexLoaderCI::canLoadFile(const core::Path& path) const
+	bool XTexLoaderCI::canLoadFile(const core::Path<char>& path) const
 	{
 		return  core::strUtil::IsEqual(CI_FILE_EXTENSION, path.extension());
 	}

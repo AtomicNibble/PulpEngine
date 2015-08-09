@@ -22,14 +22,14 @@ namespace CI
 	{
 		struct JobData
 		{
-			JobData(core::Path& path_, core::ReferenceCountedOwner<XTextureFile>& image_, core::MemoryArenaBase* arena_) :
+			JobData(core::Path<char>& path_, core::ReferenceCountedOwner<XTextureFile>& image_, core::MemoryArenaBase* arena_) :
 			path(path_), image(image_), arena(arena_) {}
 
 			void release(void) {
 				X_DELETE(this, arena);
 			}
 
-			core::Path path;
+			core::Path<char> path;
 			core::ReferenceCountedOwner<XTextureFile> image;
 			core::MemoryArenaBase* arena;
 		};
@@ -47,7 +47,7 @@ namespace CI
 
 	} // namespace
 
-	bool WriteCIImgAsync(core::Path& path, core::ReferenceCountedOwner<XTextureFile>& image, core::MemoryArenaBase* arena)
+	bool WriteCIImgAsync(core::Path<char>& path, core::ReferenceCountedOwner<XTextureFile>& image, core::MemoryArenaBase* arena)
 	{
 		JobData* pData = X_NEW(JobData, arena, "CIJobData")(path, image, arena);
 
@@ -56,7 +56,7 @@ namespace CI
 		return true;
 	}
 
-	bool WriteCIImg(core::Path& path, XTextureFile* image)
+	bool WriteCIImg(core::Path<char>& path, XTextureFile* image)
 	{
 		X_ASSERT_NOT_NULL(image);
 		core::XFileScoped file;

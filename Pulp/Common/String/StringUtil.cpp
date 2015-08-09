@@ -174,7 +174,7 @@ namespace strUtil
 		void ReplaceSlashes(const char* path, const char* pathEnd)
 		{
 			replaceAll(path, pathEnd,
-				Path::NON_NATIVE_SLASH, Path::NATIVE_SLASH);
+				Path<char>::NON_NATIVE_SLASH, Path<char>::NATIVE_SLASH);
 		}
 
 
@@ -619,7 +619,7 @@ namespace strUtil
 		// make sure slash is correct.
 		strUtil::ReplaceSlashes(startInclusive, endExclusive);
 
-		const char* res = strUtil::FindLast(startInclusive, endExclusive, Path::NATIVE_SLASH);
+		const char* res = strUtil::FindLast(startInclusive, endExclusive, Path<char>::NATIVE_SLASH);
 
 		if (!res || res == (endExclusive-1))
 			return startInclusive; // might just be file name.

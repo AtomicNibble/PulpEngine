@@ -140,7 +140,7 @@ bool XFont::OnFileChange(const char* name)
 {
 	using namespace core;
 
-	Path path(name);
+	Path<char> path(name);
 	if (strUtil::IsEqual(".font", path.extension()))
 	{
 		path.removeExtension();

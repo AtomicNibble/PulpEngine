@@ -11,7 +11,7 @@ namespace ModelInfo
 
 	bool GetNModelAABB(const core::string& name, AABB& boxOut)
 	{
-		core::Path path;
+		core::Path<char> path;
 		path /= "core_assets/models/";
 		path /= name;
 		path.setExtension(model::MODEL_FILE_EXTENSION);

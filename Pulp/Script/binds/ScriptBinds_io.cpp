@@ -422,7 +422,7 @@ int XBinds_Io::openFile(IFunctionHandler* pH)
 	const char* fileName = nullptr;
 	const char* mode = nullptr;
 	size_t i;
-	core::Path path;
+	core::Path<char> path;
 
 	core::fileModeFlags flags = core::fileMode::READ | fileMode::RANDOM_ACCESS;
 

@@ -28,7 +28,7 @@ struct pak_s
 
 struct directory_s
 {
-	Path path;
+	Path<char> path;
 
 };
 
@@ -125,7 +125,7 @@ public:
 private:
 
 	// Ajust path
-	const char* createOSPath(directory_s* dir, pathType path, Path& buffer) const;
+	const char* createOSPath(directory_s* dir, pathType path, Path<char>& buffer) const;
 	bool isAbsolute(pathType path) const;
 
 	bool isDebug(void) const;

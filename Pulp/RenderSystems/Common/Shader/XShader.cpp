@@ -399,7 +399,7 @@ bool XShaderManager::OnFileChange(const char* name)
 			// how to find the shaders that it uses?
 			// if i have some sort of reffrence hirarcy
 			// i can take any file and know what shaders use it.
-			core::Path temp(name);
+			core::Path<char> temp(name);
 			temp.toLower(); // all source is lower case
 
 			ShaderSourceMap::const_iterator it = Sourcebin.find(temp.fileName());
@@ -422,7 +422,7 @@ bool XShaderManager::OnFileChange(const char* name)
 		}
 		else
 		{
-			core::Path temp(name);
+			core::Path<char> temp(name);
 			temp.setExtension("");
 			temp.toLower();
 
@@ -1292,7 +1292,7 @@ bool XShaderManager::sourceToString(core::string& str, const char* name)
 
 XShader* XShaderManager::forName(const char* name)
 {
-	core::Path temp(name);
+	core::Path<char> temp(name);
 	temp.toLower();
 	return loadShader(temp.c_str());
 }
@@ -1315,7 +1315,7 @@ SourceFile* XShaderManager::loadRawSourceFile(const char* name, bool reload)
 	}
 
 	// fixed relative folder.
-	core::Path path("shaders/");
+	core::Path<char> path("shaders/");
 	path.setFileName(name);
 	if(path.extension() == path.begin())
 		path.setExtension("shader");

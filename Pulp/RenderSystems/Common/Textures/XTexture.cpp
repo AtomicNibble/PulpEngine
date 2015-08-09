@@ -426,7 +426,7 @@ bool XTexture::LoadFromFile(const char* path_)
 	int i;
 	bool bRes;
 	XTextureFile* image_data;
-	core::Path path(path_);
+	core::Path<char> path(path_);
 	core::IFileSys::fileModeFlags mode;
 	mode.Set(core::IFileSys::fileMode::READ);
 	
@@ -548,7 +548,7 @@ void XTexture::preProcessImage(core::ReferenceCountedOwner<XTextureFile>& image_
 	{
 		X_LOG0("Texture", "Compiling image to CI: ^5%s", this->FileName.c_str());
 
-		core::Path outPath;
+		core::Path<char> outPath;
 		outPath = "compiled_images/";
 		outPath /= FileName.c_str();
 
@@ -911,7 +911,7 @@ bool XTexture::reloadForName(const char* name)
 	X_ASSERT_NOT_NULL(name);
 
 	// all asset names need forward slashes, for the hash.
-	core::Path path(name);
+	core::Path<char> path(name);
 	path.replaceAll('\\','/');
 
 	if (core::strUtil::IsEqualCaseInsen(path.extension(), ".ci")) {

@@ -53,7 +53,7 @@ bool XRender::LoadResourceDeffintion(void)
 	core::XFileScoped file;
 	size_t length;
 
-	core::Path path("shaders/render.setup");
+	core::Path<char> path("shaders/render.setup");
 
 	RenderResource res;
 

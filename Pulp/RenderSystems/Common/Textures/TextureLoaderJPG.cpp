@@ -149,7 +149,7 @@ namespace JPG
 	}
 
 	// ITextureLoader
-	bool XTexLoaderJPG::canLoadFile(const core::Path& path) const
+	bool XTexLoaderJPG::canLoadFile(const core::Path<char>& path) const
 	{
 		return  core::strUtil::IsEqual(JPG_FILE_EXTENSION, path.extension());
 	}

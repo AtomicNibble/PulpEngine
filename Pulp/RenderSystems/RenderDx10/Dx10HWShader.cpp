@@ -295,7 +295,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 			pShader->setStatus(ShaderStatus::NotCompiled);
 
 			// remove the cache file, to save a file load / crc check.
-			core::Path path;
+			core::Path<char> path;
 			pShader->getShaderCompileDest(path);
 
 			// delete it!
@@ -415,7 +415,7 @@ XHWShader_Dx10::XHWShader_Dx10() :
 
 }
 
-void XHWShader_Dx10::getShaderCompilePaths(core::Path& src, core::Path& dest)
+void XHWShader_Dx10::getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest)
 {
 	src.clear();
 	src.appendFmt("shaders/temp/%s.merged", sourceFileName_.c_str());
@@ -428,7 +428,7 @@ void XHWShader_Dx10::getShaderCompilePaths(core::Path& src, core::Path& dest)
 	gEnv->pFileSys->createDirectoryTree(dest.c_str());
 }
 
-void XHWShader_Dx10::getShaderCompileDest(core::Path& dest)
+void XHWShader_Dx10::getShaderCompileDest(core::Path<char>& dest)
 {
 	dest.clear();
 	dest.appendFmt("shaders/compiled/%s.fxcb", name_.c_str());
@@ -440,7 +440,7 @@ void XHWShader_Dx10::getShaderCompileDest(core::Path& dest)
 
 bool XHWShader_Dx10::saveToCache(void)
 {
-	core::Path dest;
+	core::Path<char> dest;
 	getShaderCompileDest(dest);
 
 	// write the compiled version.
@@ -460,7 +460,7 @@ bool XHWShader_Dx10::saveToCache(void)
 
 bool XHWShader_Dx10::loadFromCache()
 {
-	core::Path dest;
+	core::Path<char> dest;
 
 	XShaderManager* pShaderMan = &render::gRenDev->m_ShaderMan;
 
@@ -484,7 +484,7 @@ bool XHWShader_Dx10::loadFromCache()
 bool XHWShader_Dx10::loadFromSource()
 {
 	core::XFileScoped file;
-	core::Path src, dest;
+	core::Path<char> src, dest;
 	core::string source;
 
 	getShaderCompilePaths(src, dest);

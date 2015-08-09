@@ -105,7 +105,7 @@ void XFFont::FreeTexture()
 
 bool XFFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 {
-	core::Path path;
+	core::Path<char> path;
 	core::XFileScoped file;
 	uint8_t* pBuffer = nullptr;
 	size_t len = 0;

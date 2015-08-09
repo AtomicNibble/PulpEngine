@@ -569,7 +569,7 @@ namespace DDS
 
 	// ITextureLoader
 
-	bool XTexLoaderDDS::canLoadFile(const core::Path& path) const
+	bool XTexLoaderDDS::canLoadFile(const core::Path<char>& path) const
 	{
 		return core::strUtil::IsEqual(DDS_FILE_EXTENSION, path.extension());
 	}

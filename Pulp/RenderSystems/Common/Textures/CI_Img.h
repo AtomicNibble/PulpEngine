@@ -10,8 +10,8 @@ X_NAMESPACE_BEGIN(texture)
 namespace CI
 {
 
-	bool WriteCIImgAsync(core::Path& path, core::ReferenceCountedOwner<XTextureFile>& image, core::MemoryArenaBase* arena);
-	bool WriteCIImg(core::Path& path, XTextureFile* image);
+	bool WriteCIImgAsync(core::Path<char>& path, core::ReferenceCountedOwner<XTextureFile>& image, core::MemoryArenaBase* arena);
+	bool WriteCIImg(core::Path<char>& path, XTextureFile* image);
 
 } // namespace CI
 

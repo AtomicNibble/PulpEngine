@@ -360,7 +360,7 @@ void XFontTexture::CreateGradientSlot()
 bool XFontTexture::WriteToFile(const char* filename)
 {
 	core::XFileScoped file;
-	core::Path path;
+	core::Path<char> path;
 	BITMAPFILEHEADER pHeader;
 	BITMAPINFOHEADER pInfoHeader;
 

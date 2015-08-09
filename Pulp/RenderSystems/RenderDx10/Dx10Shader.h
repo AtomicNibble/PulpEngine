@@ -256,8 +256,8 @@ public:
 private:
 	bool loadFromSource();
 	bool loadFromCache();
-	void getShaderCompilePaths(core::Path& src, core::Path& dest);
-	void getShaderCompileDest(core::Path& dest);
+	void getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest);
+	void getShaderCompileDest(core::Path<char>& dest);
 	bool compileFromSource(core::string& source);
 
 	bool uploadtoHW(void);

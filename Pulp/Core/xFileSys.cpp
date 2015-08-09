@@ -107,7 +107,7 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 	X_ASSERT_NOT_NULL(path);
 
 	XDiskFile* file = nullptr;
-	core::Path real_path;
+	core::Path<char> real_path;
 
 	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE) )
 	{
@@ -179,7 +179,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 	X_ASSERT_NOT_NULL(path);
 
 	XDiskFileAsync* pFile = nullptr;
-	core::Path real_path;
+	core::Path<char> real_path;
 
 	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE))
 	{
@@ -247,7 +247,7 @@ XFileMem* xFileSys::openFileMem(pathType path, fileModeFlags mode)
 		XFindData FindData(path, this);
 		if (FindData.findnext(&findinfo))
 		{
-			core::Path real_path;
+			core::Path<char> real_path;
 			FindData.getOSPath(real_path, &findinfo);
 
 			OsFile file(real_path.c_str(), mode);
@@ -396,7 +396,7 @@ void xFileSys::findClose(uintptr_t handle)
 
 bool xFileSys::deleteFile(pathType path, VirtualDirectory::Enum location) const
 {
-	Path buf;
+	Path<char> buf;
 	createOSPath(gameDir_, path, buf);
 
 	if (isDebug()) {
@@ -408,7 +408,7 @@ bool xFileSys::deleteFile(pathType path, VirtualDirectory::Enum location) const
 
 bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 {
-	Path temp;
+	Path<char> temp;
 	core::zero_object(temp); // ensure 2 null bytes at end.
 
 	createOSPath(gameDir_, path, temp);
@@ -445,7 +445,7 @@ bool xFileSys::createDirectory(pathType path, VirtualDirectory::Enum location) c
 {
 	X_ASSERT_NOT_NULL(path);
 
-	Path buf;
+	Path<char> buf;
 	createOSPath(gameDir_, path, buf);
 
 	if (isDebug()) {
@@ -467,7 +467,7 @@ bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum locati
 	X_ASSERT_NOT_NULL(_path);
 
 	// we want to just loop and create like a goat.
-	Path buf;
+	Path<char> buf;
 
 	createOSPath(gameDir_, _path, buf);
 
@@ -476,7 +476,7 @@ bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum locati
 	}
 
 	// c:\\dir\\goat\\win\\bin
-	Path Path("");
+	Path<char> Path("");
 
 	const char* Start = buf.begin();
 	const char* End = buf.begin();
@@ -520,7 +520,7 @@ bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
 
-	Path buf;
+	Path<char> buf;
 	createOSPath(gameDir_, path, buf);
 
 	if (isDebug()) {
@@ -616,7 +616,7 @@ bool xFileSys::isDirectory(pathType path, VirtualDirectory::Enum location) const
 
 
 // Ajust path
-const char* xFileSys::createOSPath(directory_s* dir, pathType path, Path& buffer) const
+const char* xFileSys::createOSPath(directory_s* dir, pathType path, Path<char>& buffer) const
 {
 	// is it absolute?
 	if (!isAbsolute(path)) {

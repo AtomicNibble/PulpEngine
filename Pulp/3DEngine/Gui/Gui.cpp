@@ -103,7 +103,7 @@ bool XGui::OnInputEventChar(const input::InputEvent& event)
 
 bool XGui::InitFromFile(const char* name)
 {
-	core::Path path, pathBinary;
+	core::Path<char> path, pathBinary;
 	core::XFileMemScoped file;
 	core::XFileScoped fileBinary;
 	core::fileModeFlags mode;
@@ -265,7 +265,7 @@ bool XGui::ParseTextFile(const char* begin, const char* end)
 
 bool XGui::SaveBinaryVersion(void)
 {
-	core::Path path;
+	core::Path<char> path;
 	core::XFileScoped file;
 	core::fileModeFlags mode;
 	FileHdr hdr;

@@ -60,7 +60,7 @@ X_LINK_LIB("engine_RenderNull")
 
 #endif // !X_LIB
 
-void CompileLevel(core::Path& path);
+void CompileLevel(core::Path<char>& path);
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -117,7 +117,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 			// we need the engine for Assets, Logging, Profiling, FileSystem.
 			if (engine.Init(lpCmdLine, Console))
 			{
-				core::Path name;
+				core::Path<char> name;
 				name.setFileName("basic - Copy.map");
 				name.setFileName("alcatraz.map");
 				name.setFileName("killzone.map");
@@ -146,7 +146,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 }
 
 
-void CompileLevel(core::Path& path)
+void CompileLevel(core::Path<char>& path)
 {
 	if (core::strUtil::IsEqualCaseInsen("map", path.extension()))
 	{

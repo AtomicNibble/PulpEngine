@@ -295,7 +295,7 @@ TYPED_TEST(ArrayTest, Serialize)
 	IFileSys* pFileSys = gEnv->pFileSys;
 
 	const char* TypeName = typeid(TypeParam).name();
-	core::Path fileName;
+	core::Path<char> fileName;
 
 	fileName /= X_ENGINE_NAME;
 	fileName /= "_ut_array_serialize_Type(";

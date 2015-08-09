@@ -50,7 +50,7 @@ private:
 
 private:
 
-	bool IsRepeat(const core::Path& path);
+	bool IsRepeat(const core::Path<char>& path);
 
 	struct Info_t
 	{
@@ -73,7 +73,7 @@ private:
 		}
 
 		OVERLAPPED overlapped;
-		Path directoryName;
+		Path<char> directoryName;
 		HANDLE directory;
 		HANDLE event;
 		char result[4096];

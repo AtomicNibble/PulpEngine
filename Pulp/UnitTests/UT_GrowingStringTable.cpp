@@ -203,7 +203,7 @@ TEST(GrowingStringTable, Serialize)
 	ASSERT_TRUE(NULL != gEnv->pFileSys);
 	IFileSys* pFileSys = gEnv->pFileSys;
 
-	core::Path fileName;
+	core::Path<char> fileName;
 	fileName /= X_ENGINE_NAME;
 	fileName /= "_ut_GrowingStringTable_serialize_Type(";
 	fileName /= "uint16_t";

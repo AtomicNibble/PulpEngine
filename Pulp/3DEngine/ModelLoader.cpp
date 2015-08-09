@@ -24,7 +24,7 @@ ModelLoader::~ModelLoader()
 bool ModelLoader::LoadModel(XModel& model, const char* name)
 {
 	XFileScoped file;
-	core::Path path(name);
+	core::Path<char> path(name);
 	path.setExtension(".model");
 
 	// open the file.

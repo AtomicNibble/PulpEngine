@@ -182,7 +182,7 @@ void XGuiManager::listGuis(const char* wildcardSearch) const
 // IXHotReload
 bool XGuiManager::OnFileChange(const char* name)
 {
-	core::Path path(name);
+	core::Path<char> path(name);
 	XGui* pGui;
 
 	// we don't keep extension for name.

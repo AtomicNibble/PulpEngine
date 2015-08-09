@@ -528,7 +528,7 @@ IMaterial* XMaterialManager::loadMaterialXML(const char* MtlName)
 	X_ASSERT_NOT_NULL(MtlName);
 
 	core::XFileScoped file;
-	core::Path path;
+	core::Path<char> path;
 	size_t length;
 	XMaterial* pMat = nullptr;
 
@@ -584,7 +584,7 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 {
 	X_ASSERT_NOT_NULL(MtlName);
 	core::XFileScoped file;
-	core::Path path;
+	core::Path<char> path;
 	MaterialHeader hdr;
 	XMaterial* pMat = nullptr;
 	uint32_t i;
@@ -650,7 +650,7 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 {
 	X_ASSERT_NOT_NULL(pMat_);
-	core::Path path;
+	core::Path<char> path;
 	XMaterial* pMat;
 	MaterialHeader hdr;
 	uint32_t i, numTex;

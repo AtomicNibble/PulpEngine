@@ -335,7 +335,7 @@ void XScriptSys::Update()
 
 bool XScriptSys::ExecuteFile(const char* FileName, bool silent, bool forceReload)
 {
-	core::Path path(FileName);
+	core::Path<char> path(FileName);
 
 
 	if (path.length() > 0)
@@ -372,7 +372,7 @@ bool XScriptSys::ExecuteFile(const char* FileName, bool silent, bool forceReload
 	return false;
 }
 
-bool XScriptSys::ExecuteFile_Internal(const core::Path& path, bool silent)
+bool XScriptSys::ExecuteFile_Internal(const core::Path<char>& path, bool silent)
 {
 	bool res = false;
 
@@ -1193,7 +1193,7 @@ bool XScriptSys::DumpStateToFile(const char* name)
 {
 	X_LUA_CHECK_STACK(L);
 
-	core::Path path(name);
+	core::Path<char> path(name);
 	path.setExtension(".txt");
 
 	XRecursiveLuaDumpToFile sink(path.c_str());
