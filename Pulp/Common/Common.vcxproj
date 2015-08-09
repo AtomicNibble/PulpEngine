@@ -678,6 +678,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="String\StringUtilW.cpp" />
     <ClCompile Include="String\Xml.cpp" />
     <ClCompile Include="String\XParser.cpp" />
     <ClCompile Include="Threading\ConditionVariable.cpp">

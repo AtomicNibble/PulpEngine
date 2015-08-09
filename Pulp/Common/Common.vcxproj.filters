@@ -1251,6 +1251,9 @@
     <None Include="Hashing\SHA512.inl">
       <Filter>Headers\Hashing</Filter>
     </None>
+    <None Include="String\StackStringW.inl">
+      <Filter>Headers\String</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">
@@ -1508,6 +1511,9 @@
     </ClCompile>
     <ClCompile Include="Hashing\SHA512.cpp">
       <Filter>SourceFiles\Hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="String\StringUtilW.cpp">
+      <Filter>SourceFiles\String</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
