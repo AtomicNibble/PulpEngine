@@ -9,7 +9,9 @@ X_NAMESPACE_BEGIN(core)
 
 /// \brief Constructs a string tokenizer for the given range of characters.
 /// \remark Ownership of the provided arguments stays at the calling site.
-StringTokenizer::StringTokenizer(const char* startInclusive, const char* endExclusive, char delimiter) :
+template<typename TChar>
+StringTokenizer<TChar>::StringTokenizer(const TChar* startInclusive, const TChar* endExclusive,
+	TChar delimiter) :
 	m_start(startInclusive), 
 	m_end(endExclusive), 
 	m_delimiter(delimiter)
@@ -20,15 +22,16 @@ StringTokenizer::StringTokenizer(const char* startInclusive, const char* endExcl
 
 /// \brief Tries to extract the next token, and returns whether a token could be found or not.
 /// \remark If no token could be extracted, no assumptions should be made about the contents of \a range.
-bool StringTokenizer::ExtractToken(StringRange<char>& range)
+template<typename TChar>
+bool StringTokenizer<TChar>::ExtractToken(StringRange<TChar>& range)
 {
 	 bool result = false;
 
-	 const char *lastNonWhitespace; 
-	 const char *nonWhitespace;
-	 const char *tokenEnd; 
-	 const char *tokenBegin; 
-	 const char* lastnon;
+	 const TChar *lastNonWhitespace;
+	 const TChar *nonWhitespace;
+	 const TChar *tokenEnd;
+	 const TChar *tokenBegin;
+	 const TChar* lastnon;
 
 	 if ( m_start < m_end )
 	 {
@@ -54,7 +57,7 @@ bool StringTokenizer::ExtractToken(StringRange<char>& range)
 		 if ( lastnon != nullptr )
 			 tokenEnd = lastNonWhitespace;
 	
-		 range = StringRange<char>(tokenBegin, tokenEnd);
+		 range = StringRange<TChar>(tokenBegin, tokenEnd);
 
 		 result = true;
 	 }
