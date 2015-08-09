@@ -27,6 +27,7 @@ namespace strUtil
 	const char* workingDir(WorkingDirStr& buf);
 
 	inline uint32_t strlen(const char* str);
+	inline uint32_t strlen(const wchar_t* str);
 
 	// return length of string in bytes
 	template<typename T>
