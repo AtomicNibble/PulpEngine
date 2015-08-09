@@ -259,8 +259,8 @@ core::StackString<60> getMeshDisplayName(MString& fullname)
 	typedef core::StackString<60> NameType;
 	core::FixedStack<NameType, 16> Stack;
 
-	core::StringTokenizer tokens(fullname.asChar(), fullname.asChar() + fullname.length(), '|');
-	core::StringRange range(nullptr, nullptr);
+	core::StringTokenizer<char> tokens(fullname.asChar(), fullname.asChar() + fullname.length(), '|');
+	core::StringRange<char> range(nullptr, nullptr);
 
 	while (tokens.ExtractToken(range))
 	{

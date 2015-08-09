@@ -100,7 +100,7 @@ namespace
 		{}
 
 
-		bool extractCommand(core::StringRange& cmd)
+		bool extractCommand(core::StringRange<char>& cmd)
 		{
 			const char* cur = begin_;
 			const char* end = end_;
@@ -120,7 +120,7 @@ namespace
 					case '\0':
 					{
 						// we class this as end of a command.	
-						cmd = StringRange(begin_, cur);
+						cmd = StringRange<char>(begin_, cur);
 						begin_ = cur;
 						return true;
 					}
@@ -131,7 +131,7 @@ namespace
 
 			// got anything?
 			if (begin_ < cur) {
-				cmd = StringRange(begin_, cur);
+				cmd = StringRange<char>(begin_, cur);
 				begin_ = cur;
 				return true;
 			}
@@ -1407,7 +1407,7 @@ void XConsole::ExecuteStringInternal(const char* pCommand, ExecSource::Enum sour
 
 	core::StackString512 name;
 	core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS> value;
-	core::StringRange range(nullptr, nullptr);
+	core::StringRange<char> range(nullptr, nullptr);
 	CommandParser parser(pCommand);
 	const char* pPos;
 

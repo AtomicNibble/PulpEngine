@@ -1116,8 +1116,8 @@ bool ShaderSourceFile::Technique::processName(void)
 
 		if (flags.isNotEmpty())
 		{
-			core::StringTokenizer tokens(flags.begin(), flags.end(), ',');
-			core::StringRange flagName(nullptr, nullptr);
+			core::StringTokenizer<char> tokens(flags.begin(), flags.end(), ',');
+			core::StringRange<char> flagName(nullptr, nullptr);
 
 			while (tokens.ExtractToken(flagName))
 			{
