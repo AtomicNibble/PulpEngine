@@ -12,12 +12,12 @@ X_NAMESPACE_BEGIN(core)
 template<typename TChar>
 StringTokenizer<TChar>::StringTokenizer(const TChar* startInclusive, const TChar* endExclusive,
 	TChar delimiter) :
-	m_start(startInclusive), 
-	m_end(endExclusive), 
-	m_delimiter(delimiter)
+	start_(startInclusive), 
+	end_(endExclusive), 
+	delimiter_(delimiter)
 {
-  while ( *m_start == delimiter && m_start < m_end )
-    ++m_start;
+  while ( *start_ == delimiter && start_ < end_ )
+    ++start_;
 }
 
 /// \brief Tries to extract the next token, and returns whether a token could be found or not.
@@ -33,17 +33,17 @@ bool StringTokenizer<TChar>::ExtractToken(StringRange<TChar>& range)
 	 const TChar *tokenBegin;
 	 const TChar* lastnon;
 
-	 if ( m_start < m_end )
+	 if ( start_ < end_ )
 	 {
-		 tokenBegin = this->m_start;
+		 tokenBegin = this->start_;
 
-		 while ( *this->m_start != this->m_delimiter && this->m_start < this->m_end )
-			 ++this->m_start;
+		 while (*this->start_ != this->delimiter_ && this->start_ < this->end_)
+			 ++this->start_;
 
-		 tokenEnd = this->m_start;
+		 tokenEnd = this->start_;
 
-		 while ( *this->m_start == this->m_delimiter && this->m_start < this->m_end )
-			 ++this->m_start;
+		 while (*this->start_ == this->delimiter_ && this->start_ < this->end_)
+			 ++this->start_;
 
 		 nonWhitespace = strUtil::FindNonWhitespace(tokenBegin, tokenEnd);
 

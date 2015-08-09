@@ -46,9 +46,9 @@ public:
 	bool ExtractToken(StringRange<TChar>& range);
 
 private:
-	const TChar* m_start;
-	const TChar* m_end;
-	TChar m_delimiter;
+	const TChar* start_;
+	const TChar* end_;
+	TChar delimiter_;
 };
 
 X_NAMESPACE_END
