@@ -59,6 +59,9 @@ public:
 	/// Shows/hides the console window.
 	void Show(bool show);
 
+	/// Redirects the std logging (output,error)
+	void RedirectSTD(void);
+
 	/// \brief Returns the native console object.
 	/// \remark For internal use only.
 	inline HANDLE GetNativeConsole(void) const;

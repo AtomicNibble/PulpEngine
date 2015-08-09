@@ -318,5 +318,31 @@ void Console::Show(bool show)
 }
 
 
+void Console::RedirectSTD(void)
+{
+	int hConHandle;
+	HANDLE lStdHandle;
+
+	lStdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
+	m_stdout = _fdopen( hConHandle, "w" );
+	*stdout = *m_stdout;
+	//	setvbuf( stdout, NULL, _IONBF, 0 );
+
+	lStdHandle = GetStdHandle(STD_INPUT_HANDLE);
+	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
+	m_stdin = _fdopen( hConHandle, "r" );
+	*stdin = *m_stdin;
+	//	setvbuf( stdin, NULL, _IONBF, 0 );
+
+
+	lStdHandle = GetStdHandle(STD_ERROR_HANDLE);
+	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
+	m_stderr = _fdopen( hConHandle, "w" );
+	*stderr = *m_stderr;
+	//	setvbuf( stderr, NULL, _IONBF, 0 );
+
+	std::ios::sync_with_stdio();
+}
 
 X_NAMESPACE_END
