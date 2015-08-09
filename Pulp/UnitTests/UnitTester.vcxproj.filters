@@ -289,6 +289,12 @@
     <ClCompile Include="UT_StackStringW.cpp">
       <Filter>Source Files\tests\String</Filter>
     </ClCompile>
+    <ClCompile Include="UT_StringRange.cpp">
+      <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_StringTokenizer.cpp">
+      <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">

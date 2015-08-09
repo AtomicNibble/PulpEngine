@@ -474,8 +474,10 @@
     <ClCompile Include="UT_ScopedPointer.cpp" />
     <ClCompile Include="UT_StackString.cpp" />
     <ClCompile Include="UT_StackStringW.cpp" />
+    <ClCompile Include="UT_StringRange.cpp" />
     <ClCompile Include="UT_StringRef.cpp" />
     <ClCompile Include="UT_StringTable.cpp" />
+    <ClCompile Include="UT_StringTokenizer.cpp" />
     <ClCompile Include="UT_StringUtil.cpp" />
     <ClCompile Include="UT_SymbolRes.cpp" />
     <ClCompile Include="UT_TexureLoaders.cpp" />
