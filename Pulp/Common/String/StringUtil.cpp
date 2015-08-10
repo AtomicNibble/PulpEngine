@@ -345,7 +345,15 @@ namespace strUtil
 		size_t Len = endExclusiveS1 - startInclusiveS1;
 
 		if (Len == (endExclusiveS2 - startInclusiveS2))
-			return _stricmp(startInclusiveS1, startInclusiveS2) == 0;
+		{
+			// need to respect length values.
+			while (Len && (::tolower(*startInclusiveS1) == ::tolower(*startInclusiveS2))) {
+				Len--;
+				startInclusiveS1++;
+				startInclusiveS2++;
+			}
+			return Len == 0;
+		}
 
 		return false;
 	}
