@@ -25,6 +25,8 @@ namespace strUtil
 
 	typedef char WorkingDirStr[512];
 	const char* workingDir(WorkingDirStr& buf);
+	typedef wchar_t WorkingDirStrW[512];
+	const wchar_t* workingDir(WorkingDirStrW& buf);
 
 	uint32_t strlen(const char* str);
 	uint32_t strlen(const wchar_t* str);

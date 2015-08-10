@@ -46,6 +46,14 @@ namespace strUtil
 
 	}
 
+	const wchar_t* workingDir(WorkingDirStrW& buf)
+	{
+		core::zero_object(buf);
+		_wgetcwd(buf, sizeof(buf) - 1);
+
+		return buf;
+	}
+
 	unsigned int Count(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what)
 	{
 		uint i;
