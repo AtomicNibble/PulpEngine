@@ -2,7 +2,10 @@
 
 X_INLINE AABB::AABB()
 {
-	clear();
+	// don't clear otherwise it will have bounds.
+	// clear before adding points etc.
+	// that way it's empty by defauly not huge.
+	// clear();
 }
 
 X_INLINE AABB::AABB(float radius)
