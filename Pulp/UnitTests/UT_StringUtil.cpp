@@ -113,7 +113,7 @@ TEST(StringUtil, IsAlphaNum)
 
 		bool is_alpha_num = is_alpha_low || is_alpha_high || is_num;
 
-		EXPECT_TRUE(strUtil::IsWhitespace(static_cast<char>(c)) == is_alpha_num);
+		EXPECT_TRUE(strUtil::IsAlphaNum(static_cast<char>(c)) == is_alpha_num);
 	}
 }
 
@@ -139,7 +139,7 @@ TEST(StringUtil, IsAlphaNumU)
 
 		bool is_alpha_num = is_alpha_low || is_alpha_high || is_num;
 
-		EXPECT_TRUE(strUtil::IsWhitespaceW(static_cast<uint8_t>(c)) == is_alpha_num);
+		EXPECT_TRUE(strUtil::IsAlphaNum(static_cast<uint8_t>(c)) == is_alpha_num);
 	}
 }
 
@@ -234,13 +234,76 @@ TEST(StringUtil, Equal) {
 	bool equal_3 = strUtil::IsEqual(str.begin(), str1.c_str());
 	bool equal_fail = strUtil::IsEqual(str.begin(), upper.c_str());
 
-	bool equal_CI = strUtil::IsEqualCaseInsen(str.begin(), upper.c_str());
 
 	EXPECT_TRUE(equal_1);
 	EXPECT_TRUE(equal_2);
 	EXPECT_TRUE(equal_3);
-	EXPECT_TRUE(equal_CI);
 	EXPECT_FALSE(equal_fail);
+}
+
+TEST(StringUtil, EqualW) {
+
+	StackStringW512 str(L"Hello jane.");
+	StackStringW512 str1(L"Hello jane.");
+	StackStringW512 upper(L"HELLO JaNe.");
+
+	bool equal_1 = strUtil::IsEqual(str.begin(), str.end(), str1.begin(), str1.end());
+	bool equal_2 = strUtil::IsEqual(str.begin(), str.end(), str1.c_str());
+	bool equal_3 = strUtil::IsEqual(str.begin(), str1.c_str());
+	bool equal_fail = strUtil::IsEqual(str.begin(), upper.c_str());
+
+	EXPECT_TRUE(equal_1);
+	EXPECT_TRUE(equal_2);
+	EXPECT_TRUE(equal_3);
+	EXPECT_FALSE(equal_fail);
+}
+
+TEST(StringUtil, EqualCaseInsen) {
+
+	StackString512 str("Hello jane.");
+	StackString512 str1("Hello jane");
+	StackString512 str2("Hello jane,");
+	StackString512 upper("HELLO JaNe.");
+
+	bool equal_1_true = strUtil::IsEqualCaseInsen(str.begin(), upper.c_str());
+	bool equal_2_false = strUtil::IsEqualCaseInsen(str1.begin(), str1.end(), str2.c_str());
+	bool equal_3_true = strUtil::IsEqualCaseInsen(str.begin(), str.end(), upper.c_str());
+	bool equal_4_true = strUtil::IsEqualCaseInsen(str.begin(), str.end(), upper.c_str(), upper.end());
+	bool equal_5_false = strUtil::IsEqualCaseInsen(str.begin(), str.end(), str2.c_str(), str2.end());
+	bool equal_6_true = strUtil::IsEqualCaseInsen(str.begin(), str.end() - 1, str2.c_str(), str2.end() - 1);
+	bool equal_7_true = strUtil::IsEqualCaseInsen(str.begin(), str.end() - 1, str1.c_str());
+
+	EXPECT_TRUE(equal_1_true);
+	EXPECT_FALSE(equal_2_false);
+	EXPECT_TRUE(equal_3_true);
+	EXPECT_TRUE(equal_4_true);
+	EXPECT_FALSE(equal_5_false);
+	EXPECT_TRUE(equal_6_true);
+	EXPECT_TRUE(equal_7_true);
+}
+
+TEST(StringUtil, EqualCaseInsenW) {
+
+	StackStringW512 str(L"Hello jane.");
+	StackStringW512 str1(L"Hello jane");
+	StackStringW512 str2(L"Hello jane,");
+	StackStringW512 upper(L"HELLO JaNe.");
+
+	bool equal_1_true = strUtil::IsEqualCaseInsen(str.begin(), upper.c_str());
+	bool equal_2_false = strUtil::IsEqualCaseInsen(str1.begin(), str1.end(), str2.c_str());
+	bool equal_3_true = strUtil::IsEqualCaseInsen(str.begin(), str.end(), upper.c_str());
+	bool equal_4_true = strUtil::IsEqualCaseInsen(str.begin(), str.end(), upper.c_str(), upper.end());
+	bool equal_5_false = strUtil::IsEqualCaseInsen(str.begin(), str.end(), str2.c_str(), str2.end());
+	bool equal_6_true = strUtil::IsEqualCaseInsen(str.begin(), str.end() - 1, str2.c_str(), str2.end() - 1);
+	bool equal_7_true = strUtil::IsEqualCaseInsen(str.begin(), str.end() - 1, str1.c_str());
+
+	EXPECT_TRUE(equal_1_true);
+	EXPECT_FALSE(equal_2_false);
+	EXPECT_TRUE(equal_3_true);
+	EXPECT_TRUE(equal_4_true);
+	EXPECT_FALSE(equal_5_false);
+	EXPECT_TRUE(equal_6_true);
+	EXPECT_TRUE(equal_7_true);
 }
 
 
