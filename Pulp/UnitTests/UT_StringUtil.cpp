@@ -12,6 +12,32 @@ X_USING_NAMESPACE;
 using namespace core;
 
 
+TEST(StringUtil, StringBytes) {
+
+	std::string str = "how long is this txt?";
+	std::wstring strW = L"how long is this txt?";
+	core::string cstr = "how long is this txt?"; 
+	core::StringRef<wchar_t> cstrW = L"how long is this txt?";
+
+	EXPECT_EQ(21, strUtil::StringBytes(str));
+	EXPECT_EQ(21 * 2, strUtil::StringBytes(strW));
+	EXPECT_EQ(21, strUtil::StringBytes(cstr));
+	EXPECT_EQ(21 * 2, strUtil::StringBytes(cstrW));
+}
+
+TEST(StringUtil, StringBytesNUll) {
+
+	std::string str = "how long is this txt?";
+	std::wstring strW = L"how long is this txt?";
+	core::string cstr = "how long is this txt?";
+	core::StringRef<wchar_t> cstrW = L"how long is this txt?";
+
+	EXPECT_EQ(22, strUtil::StringBytesIncNull(str));
+	EXPECT_EQ(22 * 2, strUtil::StringBytesIncNull(strW));
+	EXPECT_EQ(22, strUtil::StringBytesIncNull(cstr));
+	EXPECT_EQ(22 * 2, strUtil::StringBytesIncNull(cstrW));
+}
+
 TEST(StringUtil, Find) {
 
 	StackString512 str("my name is bob. Hello jane.");
@@ -61,8 +87,60 @@ TEST(StringUtil, WhiteSpace) {
 			c == 0xd;		// CARRIAGE RETURN(codepoint 13, U + 000D)
 
 		EXPECT_TRUE(strUtil::IsWhitespace(c) == is_White);
+		EXPECT_TRUE(strUtil::IsWhitespaceW(static_cast<wchar_t>(c)) == is_White);
 	}
+}
 
+TEST(StringUtil, IsAlphaNum) 
+{
+	// check every char.
+	const char min = std::numeric_limits<char>::lowest();
+	const char max = std::numeric_limits<char>::max();
+
+	const int a = 'a';
+	const int z = 'z';
+	const int A = 'A';
+	const int Z = 'Z';
+
+	const int num0 = '0';
+	const int num9 = '9';
+
+	for (int c = min; c <= max; ++c)
+	{
+		bool is_alpha_low = c >= a && c <= z;
+		bool is_alpha_high = c >= A && c <= Z;
+		bool is_num = c >= num0 && c <= num9;
+
+		bool is_alpha_num = is_alpha_low || is_alpha_high || is_num;
+
+		EXPECT_TRUE(strUtil::IsWhitespace(static_cast<char>(c)) == is_alpha_num);
+	}
+}
+
+TEST(StringUtil, IsAlphaNumU)
+{
+	// check every char.
+	const char min = std::numeric_limits<uint8_t>::lowest();
+	const char max = std::numeric_limits<uint8_t>::max();
+
+	const int a = 'a';
+	const int z = 'z';
+	const int A = 'A';
+	const int Z = 'Z';
+
+	const int num0 = '0';
+	const int num9 = '9';
+
+	for (int c = min; c <= max; ++c)
+	{
+		bool is_alpha_low = c >= a && c <= z;
+		bool is_alpha_high = c >= A && c <= Z;
+		bool is_num = c >= num0 && c <= num9;
+
+		bool is_alpha_num = is_alpha_low || is_alpha_high || is_num;
+
+		EXPECT_TRUE(strUtil::IsWhitespaceW(static_cast<uint8_t>(c)) == is_alpha_num);
+	}
 }
 
 TEST(StringUtil, Digit) {
@@ -75,6 +153,19 @@ TEST(StringUtil, Digit) {
 	{
 		bool is_Digit = c >= '0' && c <= '9';
 		EXPECT_TRUE(strUtil::IsDigit(c) == is_Digit);
+	}
+}
+
+TEST(StringUtil, DigitW) {
+
+	// check every char.
+	const wchar_t min = std::numeric_limits<wchar_t>::lowest();
+	const wchar_t max = std::numeric_limits<wchar_t>::max();
+
+	for (int c = min; c <= max; c++)
+	{
+		bool is_Digit = c >= '0' && c <= '9';
+		EXPECT_TRUE(strUtil::IsDigitW(static_cast<wchar_t>(c)) == is_Digit);
 	}
 }
 
@@ -95,6 +186,15 @@ TEST(StringUtil, StrLen) {
 	EXPECT_TRUE(strUtil::strlen("hello chiken man") == 16);
 	EXPECT_TRUE(strUtil::strlen("meow meow meow!") == 15);
 	EXPECT_TRUE(strUtil::strlen("potato") == 6);
+
+}
+
+TEST(StringUtil, StrLenW) {
+
+	EXPECT_TRUE(strUtil::strlen(L"6  dig") == 6);
+	EXPECT_TRUE(strUtil::strlen(L"hello chiken man") == 16);
+	EXPECT_TRUE(strUtil::strlen(L"meow meow meow!") == 15);
+	EXPECT_TRUE(strUtil::strlen(L"potato") == 6);
 
 }
 
