@@ -139,7 +139,7 @@ namespace exceptionHandler
 
 		_tagSTACKFRAME64	stackFrame;
 
-		Path filename;
+		Path<char> filename;
 
 		DWORD Code = ExceptionRecord->ExceptionCode;
 
