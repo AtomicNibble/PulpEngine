@@ -224,7 +224,18 @@ namespace strUtil
 			}
 #endif
 		};
-	}
+
+
+		uint32_t upperCaseSIMD(uint32_t x)
+		{
+			uint32_t b = 0x80808080ul | x;
+			uint32_t c = b - 0x61616161ul;
+			uint32_t d = ~(b - 0x7b7b7b7bul);
+			uint32_t e = (c & d) & (~x & 0x80808080ul);
+			return x - (e >> 2);
+		}
+
+	} // namespace
 
 	uint32_t strlen(const char* str)
 	{
@@ -491,15 +502,6 @@ namespace strUtil
 	const char* FindCaseInsensitive(const char* startInclusive, const char* what)
 	{
 		return FindCaseInsensitive(startInclusive, startInclusive + strlen(startInclusive), what, strlen(what));
-	}
-
-	uint32_t upperCaseSIMD(uint32_t x) 
-	{
-		uint32_t b = 0x80808080ul | x;
-		uint32_t c = b - 0x61616161ul;
-		uint32_t d = ~(b - 0x7b7b7b7bul);
-		uint32_t e = (c & d) & (~x & 0x80808080ul);
-		return x - (e >> 2);
 	}
 
 	const char* FindCaseInsensitive(const char* startInclusive, const char* endExclusive, const char* what, size_t whatLength)
