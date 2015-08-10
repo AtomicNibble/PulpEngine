@@ -198,6 +198,20 @@ namespace strUtil
 		return result;
 	}
 
+	/// \brief Finds the first whitespace character in a string, and returns a pointer to it.
+	/// \remark Returns a \c nullptr if no such character could not be found.
+	const wchar_t* FindWhitespace(const wchar_t* startInclusive, const wchar_t* endExclusive)
+	{
+		while (startInclusive < endExclusive)
+		{
+			if (*startInclusive == L' ')
+				return startInclusive;
+			++startInclusive;
+		}
+
+		return nullptr;
+	}
+
 
 	const wchar_t* FindLastWhitespace(const wchar_t* startInclusive, const wchar_t* endExclusive)
 	{
@@ -268,7 +282,39 @@ namespace strUtil
 
 	const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* what, uint32_t whatLength)
 	{
-		return wcsstr(startInclusive, what);
+		size_t len = endExclusive - startInclusive;
+
+		if (whatLength > len)
+			return nullptr;
+
+		while (startInclusive < endExclusive)
+		{
+			if (*startInclusive == *what)
+			{
+				const wchar_t* current = startInclusive + 1;
+				const wchar_t* currentWhat = what + 1;
+				size_t i = 0;
+				for (; i < (whatLength - 1); i++)
+				{
+					if (*current != *currentWhat)
+						break;
+
+					++current;
+					++currentWhat;
+				}
+
+				if (i == (whatLength - 1))
+					return startInclusive;
+			}
+
+			if (len == whatLength) // sub string can't fit anymore.
+				return nullptr;
+
+			--len;
+			++startInclusive;
+		}
+
+		return nullptr;
 	}
 
 	const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* whatStart, const wchar_t* whatEnd)

@@ -416,6 +416,19 @@ namespace strUtil
 		return result;
 	}
 
+	/// \brief Finds the first whitespace character in a string, and returns a pointer to it.
+	/// \remark Returns a \c nullptr if no such character could not be found.
+	const char* FindWhitespace(const char* startInclusive, const char* endExclusive)
+	{
+		while (startInclusive < endExclusive)
+		{
+			if (*startInclusive == ' ')
+				return startInclusive;
+			++startInclusive;
+		}
+
+		return nullptr;
+	}
 
 	const char* FindLastWhitespace(const char* startInclusive, const char* endExclusive)
 	{
@@ -486,6 +499,9 @@ namespace strUtil
 
 	const char* Find(const char* startInclusive, const char* endExclusive, const char* what, uint32_t whatLength)
 	{
+		if (whatLength == 0)
+			return startInclusive;
+
 		// should check how much these aligne ment checks take.
 		// might be best to have a seprate aligned find
 		// for when i know it's aligned, as the global optermisation attempt.
@@ -503,7 +519,44 @@ namespace strUtil
 					return scanstrm(startInclusive, what, whatLength);
 			}
 		}
-		return strstr(startInclusive, what);
+
+		size_t len = endExclusive - startInclusive;
+
+		if (whatLength > len)
+			return nullptr;
+
+		while (startInclusive < endExclusive)
+		{
+			// we check if we have a match.
+			// we need to match the whole string.
+			if (*startInclusive == *what)
+			{
+				// we know the substring fits.
+				// so we just want to know if we have the rest of the substring.
+				const char* current = startInclusive + 1;
+				const char* currentWhat = what + 1;
+				size_t i = 0;
+				for (; i < (whatLength - 1); i++)
+				{
+					if (*current != *currentWhat)
+						break;
+
+					++current;
+					++currentWhat;
+				}
+
+				if (i == (whatLength - 1))
+					return startInclusive;
+			}
+
+			if (len == whatLength) // sub string can't fit anymore.
+				return nullptr;
+
+			--len;
+			++startInclusive;
+		}
+
+		return nullptr;
 	}
 
 	const char* Find(const char* startInclusive, const char* endExclusive, const char* whatStart, const char* whatEnd)
