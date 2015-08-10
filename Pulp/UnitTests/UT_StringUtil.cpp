@@ -47,13 +47,32 @@ TEST(StringUtil, Find) {
 	const char* findNCI = strUtil::Find(str.begin(), str.end(), "hello");
 	const char* findCI = strUtil::FindCaseInsensitive(str.begin(), str.end(), "hello");
 	const char* fin_fail = strUtil::FindCaseInsensitive(str2.begin(), str2.end(), "hello");
+	const char* fin_fail2 = strUtil::FindCaseInsensitive(str2.begin(), str2.begin() + 10, "bob");
 	
 	EXPECT_TRUE(find == (str.begin() + 16));
 	EXPECT_FALSE(findNCI == (str.begin() + 16)); // should not find as case is diffrent
 	EXPECT_TRUE(findCI == (str.begin() + 16));
 	EXPECT_TRUE(fin_fail == nullptr); // should not find as case is diffrent
+	EXPECT_TRUE(fin_fail2 == nullptr); // should not find as end is before null term
 }
 
+TEST(StringUtil, FindW) {
+
+	StackStringW512 str(L"my name is bob. Hello jane.");
+	StackStringW512 str2(L"Hell");
+
+	const wchar_t* find = strUtil::Find(str.begin(), str.end(), L"Hello");
+	const wchar_t* findNCI = strUtil::Find(str.begin(), str.end(), L"hello");
+	const wchar_t* findCI = strUtil::FindCaseInsensitive(str.begin(), str.end(), L"hello");
+	const wchar_t* fin_fail = strUtil::FindCaseInsensitive(str2.begin(), str2.end(), L"hello");
+	const wchar_t* fin_fail2 = strUtil::FindCaseInsensitive(str2.begin(), str2.begin() + 10, L"bob");
+
+	EXPECT_TRUE(find == (str.begin() + 16));
+	EXPECT_FALSE(findNCI == (str.begin() + 16)); // should not find as case is diffrent
+	EXPECT_TRUE(findCI == (str.begin() + 16));
+	EXPECT_TRUE(fin_fail == nullptr); // should not find as case is diffrent
+	EXPECT_TRUE(fin_fail2 == nullptr); // should not find as end is before null term
+}
 
 TEST(StringUtil, Find2) 
 {
@@ -63,6 +82,20 @@ TEST(StringUtil, Find2)
 
 	const char* find = strUtil::Find(str.begin(), str.end(), "Hello");
 	const char* findCI = strUtil::FindCaseInsensitive(str.begin(), str.end(), "hello");
+
+	// check it was second one.
+	EXPECT_TRUE(find == (str.begin() + 21));
+	EXPECT_TRUE(findCI == (str.begin() + 21));
+}
+
+TEST(StringUtil, FindW2)
+{
+	// had a bug where find was returning true after only matching 2 chars.
+	// this test checks that is fixed.
+	StackStringW512 str(L"my Hell name is bob. Hello jane.");
+
+	const wchar_t* find = strUtil::Find(str.begin(), str.end(), L"Hello");
+	const wchar_t* findCI = strUtil::FindCaseInsensitive(str.begin(), str.end(), L"hello");
 
 	// check it was second one.
 	EXPECT_TRUE(find == (str.begin() + 21));
