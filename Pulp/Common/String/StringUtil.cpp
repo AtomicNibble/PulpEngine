@@ -1,7 +1,9 @@
 #include "EngineCommon.h"
 #include "StringUtil.h"
 #include "Path.h"
+
 #include "StrRef.h"	
+#include <string>
 
 #include <direct.h>
 
@@ -58,6 +60,14 @@ namespace strUtil
 		return (str.length() + 1) * 2;
 	}
 
+	static const size_t initerlizer_1 = StringBytes(std::string(""));
+	static const size_t initerlizer_2 = StringBytes(std::wstring(L""));
+	static const size_t initerlizer_3 = StringBytes(core::StringRef<char>(""));
+	static const size_t initerlizer_4 = StringBytes(core::StringRef<wchar_t>(L""));
+	static const size_t initerlizer_5 = StringBytesIncNUll(std::string(""));
+	static const size_t initerlizer_6 = StringBytesIncNUll(std::wstring(L""));
+	static const size_t initerlizer_7 = StringBytesIncNUll(core::StringRef<char>(""));
+	static const size_t initerlizer_8 = StringBytesIncNUll(core::StringRef<wchar_t>(L""));
 
 	namespace
 	{
