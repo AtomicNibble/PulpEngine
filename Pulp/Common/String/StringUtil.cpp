@@ -23,7 +23,7 @@ namespace strUtil
 	}
 
 	template<>
-	inline size_t StringBytes<const core::StringRef<char>&>(const core::StringRef<char>& str)
+	inline size_t StringBytes(const core::StringRef<char>& str)
 	{
 		return str.length();
 	}
@@ -32,12 +32,6 @@ namespace strUtil
 	inline size_t StringBytes(const core::StringRef<wchar_t>& str)
 	{
 		return str.length() * 2;
-	}
-
-	template<>
-	inline size_t StringBytes(const core::string& str)
-	{
-		return str.length();
 	}
 
 	template<>
