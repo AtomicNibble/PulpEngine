@@ -57,8 +57,8 @@ public:
 	inline size_t GetLength(void) const;
 
 private:
-	const TChar* m_start;
-	const TChar* m_end;
+	const TChar* start_;
+	const TChar* end_;
 };
 
 #include "StringRange.inl"
