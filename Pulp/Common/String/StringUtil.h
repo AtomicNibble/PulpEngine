@@ -36,7 +36,7 @@ namespace strUtil
 	size_t StringBytes(const T& str);
 	// return length of string in bytes + null term.
 	template<typename T>
-	size_t StringBytesIncNUll(const T& str);
+	size_t StringBytesIncNull(const T& str);
 
 	/// Returns whether or not the given character is a whitespace.
 	inline bool IsWhitespace(char character);
