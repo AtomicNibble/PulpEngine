@@ -372,6 +372,78 @@ TEST(StringUtil, Float) {
 
 }
 
+TEST(StringUtil, HasFileExtension)
+{
+	EXPECT_TRUE(strUtil::HasFileExtension("tickle_my_pickle~.h"));
+	EXPECT_TRUE(strUtil::HasFileExtension("tickle_my.goat"));
+	EXPECT_FALSE(strUtil::HasFileExtension("tickle_my_pickle~"));
+	EXPECT_FALSE(strUtil::HasFileExtension("tickle_my_pic "));
+	EXPECT_FALSE(strUtil::HasFileExtension("tickle_my_pic ."));
+
+	StackString512 text("slap_a_carrot.goat");
+	EXPECT_TRUE(strUtil::HasFileExtension(text.begin(), text.end()));
+	EXPECT_TRUE(strUtil::HasFileExtension(text.begin(), text.end() - 2));
+	EXPECT_TRUE(strUtil::HasFileExtension(text.begin() + 10, text.end() - 2));
+	EXPECT_FALSE(strUtil::HasFileExtension(text.begin(), text.end() - 5));
+}
+
+TEST(StringUtil, HasFileExtensionW)
+{
+	EXPECT_TRUE(strUtil::HasFileExtension(L"tickle_my_pickle~.h"));
+	EXPECT_TRUE(strUtil::HasFileExtension(L"tickle_my.goat"));
+	EXPECT_FALSE(strUtil::HasFileExtension(L"tickle_my_pickle~"));
+	EXPECT_FALSE(strUtil::HasFileExtension(L"tickle_my_pic "));
+	EXPECT_FALSE(strUtil::HasFileExtension(L"tickle_my_pic ."));
+
+	StackStringW512 text(L"slap_a_carrot.goat");
+	EXPECT_TRUE(strUtil::HasFileExtension(text.begin(), text.end()));
+	EXPECT_TRUE(strUtil::HasFileExtension(text.begin(), text.end() - 2));
+	EXPECT_TRUE(strUtil::HasFileExtension(text.begin() + 10, text.end() - 2));
+	EXPECT_FALSE(strUtil::HasFileExtension(text.begin(), text.end() - 5));
+}
+
+TEST(StringUtil, FileExtension)
+{
+	EXPECT_STREQ("h", strUtil::FileExtension("tickle_my_pickle~.h"));
+	EXPECT_STREQ("chicken", strUtil::FileExtension("tickle_my_.chicken"));
+	EXPECT_STREQ("dots", strUtil::FileExtension("how.many.dots"));
+	EXPECT_EQ(nullptr, strUtil::FileExtension("tickle_my_pic "));
+	EXPECT_EQ(nullptr,strUtil::FileExtension("tickle_my_pic ."));
+
+	StackString512 text("slap_a_carrot.goat");
+
+	EXPECT_STREQ("goat", strUtil::FileExtension(text.begin(), text.end()));
+	EXPECT_EQ(nullptr, strUtil::FileExtension(text.begin(), text.end() - 4));
+
+	StackString512 text1("slap_a_carrot.goat.cat");
+
+	EXPECT_STREQ("cat", strUtil::FileExtension(text1.begin(), text1.end()));
+	EXPECT_STREQ("goat.cat", strUtil::FileExtension(text1.begin(), text1.end() - 4));
+	EXPECT_STREQ("goat.cat", strUtil::FileExtension(text1.begin() + 10, text1.end() - 4));
+	EXPECT_EQ(nullptr, strUtil::FileExtension(text1.begin(), text1.end() - 8));
+}
+
+
+TEST(StringUtil, FileExtensionW)
+{
+	EXPECT_STREQ(L"h", strUtil::FileExtension(L"tickle_my_pickle~.h"));
+	EXPECT_STREQ(L"chicken", strUtil::FileExtension(L"tickle_my_.chicken"));
+	EXPECT_STREQ(L"dots", strUtil::FileExtension(L"how.many.dots"));
+	EXPECT_EQ(nullptr, strUtil::FileExtension(L"tickle_my_pic "));
+	EXPECT_EQ(nullptr, strUtil::FileExtension(L"tickle_my_pic ."));
+
+	StackStringW512 text(L"slap_a_carrot.goat");
+
+	EXPECT_STREQ(L"goat", strUtil::FileExtension(text.begin(), text.end()));
+	EXPECT_EQ(nullptr, strUtil::FileExtension(text.begin(), text.end() - 4));
+
+	StackStringW512 text1(L"slap_a_carrot.goat.cat");
+
+	EXPECT_STREQ(L"cat", strUtil::FileExtension(text1.begin(), text1.end()));
+	EXPECT_STREQ(L"goat.cat", strUtil::FileExtension(text1.begin(), text1.end() - 4));
+	EXPECT_STREQ(L"goat.cat", strUtil::FileExtension(text1.begin() + 10, text1.end() - 4));
+	EXPECT_EQ(nullptr, strUtil::FileExtension(text1.begin(), text1.end() - 8));
+}
 
 TEST(StringUtil, Hash) {
 
