@@ -94,7 +94,7 @@ void Path<TChar>::operator=(const TChar* str)
 {
 	len_ = strUtil::strlen(str);
 	len_ = core::Min<uint32_t>(len_, MAX_PATH);
-	memcpy(str_, str, len_+1);
+	memcpy(str_, str, (len_ + 1) * sizeof(TChar));
 }
 
 // -----------------------------------------------
