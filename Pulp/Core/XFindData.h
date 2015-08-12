@@ -24,7 +24,9 @@ struct XFindData
 		pFileSys_(pFileSys),
 		current_(pFileSys->searchPaths_)
 	{
+		wchar_t pathW[512];
 
+		path_ = strUtil::Convert(path, pathW, sizeof(pathW));
 
 		folder_ = path_;
 		folder_.removeFileName();

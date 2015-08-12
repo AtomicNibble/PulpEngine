@@ -39,7 +39,7 @@ mode_(mode)
 		{
 			X_LOG_BULLET;
 			X_ERROR("AsyncFile", "Failed top open file. Error: %s", lastError::ToString(Dsc));
-			X_ERROR("AsyncFile", "File: %s", path);
+			X_ERROR("AsyncFile", "File: %ls", path);
 			X_ERROR("AsyncFile", "Mode: %s", mode.ToString(DscFlag));
 		}
 	}
