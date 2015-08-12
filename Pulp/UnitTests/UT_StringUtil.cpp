@@ -445,6 +445,65 @@ TEST(StringUtil, FileExtensionW)
 	EXPECT_EQ(nullptr, strUtil::FileExtension(text1.begin(), text1.end() - 8));
 }
 
+TEST(StringUtil, WildCard)
+{
+	EXPECT_TRUE(strUtil::WildCompare("*", "Hello"));
+	EXPECT_TRUE(strUtil::WildCompare("**", "Hello"));
+	EXPECT_TRUE(strUtil::WildCompare("*", "t"));
+	EXPECT_TRUE(strUtil::WildCompare("***", "t"));
+	EXPECT_TRUE(strUtil::WildCompare("*t", "_t"));
+	EXPECT_TRUE(strUtil::WildCompare("*t*", "_t_"));
+	EXPECT_TRUE(strUtil::WildCompare("***Example", "Example"));
+	EXPECT_TRUE(strUtil::WildCompare("***Example", "space Example"));
+	EXPECT_TRUE(strUtil::WildCompare("***Exa*mple", "space Exa_^$^+$^$+^$_mple"));
+	EXPECT_TRUE(strUtil::WildCompare("Same", "Same"));
+	// wild matches empty string since it's 0-N
+	EXPECT_TRUE(strUtil::WildCompare("*", ""));
+
+	EXPECT_FALSE(strUtil::WildCompare("Cow*CatDog*", "Cow Cat Dog"));
+	EXPECT_FALSE(strUtil::WildCompare("LOWER", "lower"));
+	EXPECT_FALSE(strUtil::WildCompare("y*NameIsTom", "MyNameIsTom"));
+
+	// check with offsets
+	// make some that would match without offset and offset.
+//	EXPECT_FALSE(strUtil::WildCompare("Same", "Same", 1));
+//	EXPECT_FALSE(strUtil::WildCompare("*Same*", "pre_Same_", 5));
+
+	// only match if offset
+//	EXPECT_TRUE(strUtil::WildCompare("Same", "offset_Same", 7));
+//	EXPECT_TRUE(strUtil::WildCompare("Goat*", "pre_Goat_extra_chars", 4));
+}
+
+TEST(StringUtil, WildCardW)
+{
+	EXPECT_TRUE(strUtil::WildCompare(L"*", L"Hello"));
+	EXPECT_TRUE(strUtil::WildCompare(L"**", L"Hello"));
+	EXPECT_TRUE(strUtil::WildCompare(L"*", L"t"));
+	EXPECT_TRUE(strUtil::WildCompare(L"***", L"t"));
+	EXPECT_TRUE(strUtil::WildCompare(L"*t", L"_t"));
+	EXPECT_TRUE(strUtil::WildCompare(L"*t*", L"_t_"));
+	EXPECT_TRUE(strUtil::WildCompare(L"***Example", L"Example"));
+	EXPECT_TRUE(strUtil::WildCompare(L"***Example", L"space Example"));
+	EXPECT_TRUE(strUtil::WildCompare(L"***Exa*mple", L"space Exa_^$^+$^$+^$_mple"));
+	EXPECT_TRUE(strUtil::WildCompare(L"Same", L"Same"));
+	// wild matches empty string since it's 0-N
+	EXPECT_TRUE(strUtil::WildCompare(L"*", L""));
+
+	EXPECT_FALSE(strUtil::WildCompare(L"Cow*CatDog*", L"Cow Cat Dog"));
+	EXPECT_FALSE(strUtil::WildCompare(L"LOWER", L"lower"));
+	EXPECT_FALSE(strUtil::WildCompare(L"y*NameIsTom", L"MyNameIsTom"));
+
+	// check with offsets
+	// make some that would match without offset and offset.
+	//	EXPECT_FALSE(strUtil::WildCompare("Same", "Same", 1));
+	//	EXPECT_FALSE(strUtil::WildCompare("*Same*", "pre_Same_", 5));
+
+	// only match if offset
+	//	EXPECT_TRUE(strUtil::WildCompare("Same", "offset_Same", 7));
+	//	EXPECT_TRUE(strUtil::WildCompare("Goat*", "pre_Goat_extra_chars", 4));
+}
+
+
 TEST(StringUtil, Hash) {
 
 	StrHash hash("default.cfg");
