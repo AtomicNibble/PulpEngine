@@ -140,10 +140,16 @@ inline void Path<TChar>::ensureSlash(void)
 	}
 }
 
-template<typename TChar>
-inline void Path<TChar>::replaceSeprators(void)
+template<>
+inline void Path<char>::replaceSeprators(void)
 {
 	replaceAll(NON_NATIVE_SLASH, NATIVE_SLASH);
+}
+
+template<>
+inline void Path<wchar_t>::replaceSeprators(void)
+{
+	replaceAll(NON_NATIVE_SLASH_W, NATIVE_SLASH_W);
 }
 
 template<>
@@ -158,10 +164,16 @@ inline void Path<wchar_t>::removeFileName(void)
 	this->replace(this->fileName(), L"");
 }
 
-template<typename TChar>
-inline void Path<TChar>::removeExtension(void)
+template<>
+inline void Path<char>::removeExtension(void)
 {
 	setExtension("");
+}
+
+template<>
+inline void Path<wchar_t>::removeExtension(void)
+{
+	setExtension(L"");
 }
 
 template<typename TChar>

@@ -16,6 +16,7 @@ struct XFindData
 	{
 		folder_ = path_;
 		folder_.removeFileName();
+		folder_.replaceSeprators();
 		folder_.ensureSlash();
 	}
 
@@ -30,6 +31,7 @@ struct XFindData
 
 		folder_ = path_;
 		folder_.removeFileName();
+		folder_.replaceSeprators();
 		folder_.ensureSlash();
 	}
 
@@ -108,7 +110,7 @@ private:
 		fi->time_create = fdw.time_create;
 		fi->time_write = fdw.time_write;
 		wcscpy_s(fi->name, folder_.c_str());
-		wcscpy_s(fi->name, fdw.name);
+		wcscat_s(fi->name, fdw.name);
 	}
 
 	bool searchPak(_wfinddatai64_t* fi) {

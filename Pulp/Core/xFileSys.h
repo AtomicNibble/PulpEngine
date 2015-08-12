@@ -64,10 +64,13 @@ public:
 #ifdef X_PLATFORM_WIN32
 	static const char NATIVE_SLASH = '\\';
 	static const char NON_NATIVE_SLASH = '/';
-
+	static const wchar_t NATIVE_SLASH_W = L'\\';
+	static const wchar_t NON_NATIVE_SLASH_W = L'/';
 #else
 	static const char NATIVE_SLASH = '/';
 	static const char NON_NATIVE_SLASH = '\\';
+	static const wchar_t NATIVE_SLASH_W = L'/';
+	static const wchar_t NON_NATIVE_SLASH_W = L'\\';
 #endif
 
 

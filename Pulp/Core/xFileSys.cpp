@@ -725,8 +725,8 @@ bool xFileSys::isAbsolute(pathType path) const
 
 bool xFileSys::isAbsolute(pathTypeW path) const
 {
-	return	path[0] == NATIVE_SLASH ||
-		path[0] == NON_NATIVE_SLASH ||
+	return	path[0] == NATIVE_SLASH_W ||
+		path[0] == NON_NATIVE_SLASH_W ||
 		path[1] == L':';
 }
 
