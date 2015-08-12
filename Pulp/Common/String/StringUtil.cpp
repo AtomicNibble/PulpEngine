@@ -502,6 +502,7 @@ namespace strUtil
 		if (whatLength == 0)
 			return startInclusive;
 
+#if 0 
 		// should check how much these aligne ment checks take.
 		// might be best to have a seprate aligned find
 		// for when i know it's aligned, as the global optermisation attempt.
@@ -519,7 +520,7 @@ namespace strUtil
 					return scanstrm(startInclusive, what, whatLength);
 			}
 		}
-
+#endif 
 		size_t len = endExclusive - startInclusive;
 
 		if (whatLength > len)

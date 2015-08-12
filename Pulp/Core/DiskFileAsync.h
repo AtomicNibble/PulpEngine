@@ -15,7 +15,7 @@ X_NAMESPACE_BEGIN(core)
 class XDiskFileAsync : public XFileAsync
 {
 public:
-	XDiskFileAsync(const char* path, IFileSys::fileModeFlags mode);
+	XDiskFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode);
 	~XDiskFileAsync() X_FINAL;
 
 

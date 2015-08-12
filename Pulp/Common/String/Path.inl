@@ -20,7 +20,7 @@ Path<TChar>::Path(const TChar* const str) : StackString<MAX_PATH, TChar>(str)
 template<typename TChar>
 const TChar* Path<TChar>::fileName(void) const
 {
-	const char* res = findLast(NATIVE_SLASH);
+	const TChar* res = findLast(NATIVE_SLASH);
 
 	if (!res || res == end())
 	{
@@ -35,7 +35,7 @@ const TChar* Path<TChar>::fileName(void) const
 template<typename TChar>
 const TChar* Path<TChar>::extension(void) const
 {
-	const char* res = findLast('.');
+	const TChar* res = findLast('.');
 
 	if (!res)
 		return str_;
@@ -82,7 +82,7 @@ void Path<TChar>::setFileName(const TChar* filename)
 	}
 	else 
 	{
-		StackString<MAX_PATH> temp(str_, name); // want the text before filename
+		StackString<MAX_PATH, TChar> temp(str_, name); // want the text before filename
 		temp.append(filename);
 
 		*this = temp.c_str();
@@ -94,7 +94,7 @@ void Path<TChar>::operator=(const TChar* str)
 {
 	len_ = strUtil::strlen(str);
 	len_ = core::Min<uint32_t>(len_, MAX_PATH);
-	memcpy(str_, str, len_+1);
+	memcpy(str_, str, (len_ + 1) * sizeof(TChar));
 }
 
 // -----------------------------------------------
@@ -140,22 +140,40 @@ inline void Path<TChar>::ensureSlash(void)
 	}
 }
 
-template<typename TChar>
-inline void Path<TChar>::replaceSeprators(void)
+template<>
+inline void Path<char>::replaceSeprators(void)
 {
 	replaceAll(NON_NATIVE_SLASH, NATIVE_SLASH);
 }
 
-template<typename TChar>
-inline void Path<TChar>::removeFileName(void)
+template<>
+inline void Path<wchar_t>::replaceSeprators(void)
 {
-	this->replace(this->fileName(),"");
+	replaceAll(NON_NATIVE_SLASH_W, NATIVE_SLASH_W);
 }
 
-template<typename TChar>
-inline void Path<TChar>::removeExtension(void)
+template<>
+inline void Path<char>::removeFileName(void)
+{
+	this->replace(this->fileName(), "");
+}
+
+template<>
+inline void Path<wchar_t>::removeFileName(void)
+{
+	this->replace(this->fileName(), L"");
+}
+
+template<>
+inline void Path<char>::removeExtension(void)
 {
 	setExtension("");
+}
+
+template<>
+inline void Path<wchar_t>::removeExtension(void)
+{
+	setExtension(L"");
 }
 
 template<typename TChar>

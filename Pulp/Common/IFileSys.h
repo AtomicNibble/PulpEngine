@@ -347,7 +347,8 @@ struct IFileSys
 	typedef Flags<fileMode> fileModeFlags;
 	typedef SeekMode SeekMode;
 	typedef const char* pathType;
-	typedef _finddatai64_t findData;
+	typedef const wchar_t* pathTypeW;
+	typedef _wfinddatai64_t findData;
 
 	static const uintptr_t INVALID_HANDLE = (uintptr_t)-1;
 
@@ -359,8 +360,8 @@ struct IFileSys
 
 	// folders - there is only one game dirtory.
 	// but other folders can be added with 'addModDir' to add to the virtual directory.
-	virtual bool setGameDir(pathType path) X_ABSTRACT;
-	virtual void addModDir(pathType path) X_ABSTRACT;
+	virtual bool setGameDir(pathTypeW path) X_ABSTRACT;
+	virtual void addModDir(pathTypeW path) X_ABSTRACT;
 
 	// Open Files
 	virtual XFile* openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_ABSTRACT;
@@ -375,8 +376,8 @@ struct IFileSys
 	virtual void closeFileMem(XFileMem* file) X_ABSTRACT;
 
 	// Find util
-	virtual uintptr_t findFirst(pathType path, _finddatai64_t* findinfo) X_ABSTRACT;
-	virtual bool findnext(uintptr_t handle, _finddatai64_t* findinfo) X_ABSTRACT;
+	virtual uintptr_t findFirst(pathType path, _wfinddatai64_t* findinfo) X_ABSTRACT;
+	virtual bool findnext(uintptr_t handle, _wfinddatai64_t* findinfo) X_ABSTRACT;
 	virtual void findClose(uintptr_t handle) X_ABSTRACT;
 
 	// Delete
@@ -393,6 +394,7 @@ struct IFileSys
 
 	// does not error, when it's a file or not exsist.
 	virtual bool isDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
+	virtual bool isDirectory(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
 
 	// stats
 	virtual XFileStats& getStats(void) const X_ABSTRACT;

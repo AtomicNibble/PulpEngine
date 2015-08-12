@@ -19,7 +19,7 @@ XFileStats OsFile::s_stats = {0};
 #endif // !X_ENABLE_FILE_STATS
 
 
-OsFile::OsFile(const char* path, IFileSys::fileModeFlags mode) :
+OsFile::OsFile(const wchar_t* path, IFileSys::fileModeFlags mode) :
 file_(INVALID_HANDLE_VALUE), 
 mode_(mode)
 {
@@ -30,7 +30,7 @@ mode_(mode)
 
 
 	// lets open you up.
-	file_ = CreateFileA(path, access, share, NULL, dispo, flags, NULL);
+	file_ = CreateFileW(path, access, share, NULL, dispo, flags, NULL);
 
 	if (!valid())
 	{
@@ -39,7 +39,7 @@ mode_(mode)
 		{
 			X_LOG_BULLET;
 			X_ERROR("File", "Failed top open file. Error: %s", lastError::ToString(Dsc));
-			X_ERROR("File", "File: %s", path);
+			X_ERROR("File", "File: %ls", path);
 			X_ERROR("File", "Mode: %s", mode.ToString(DscFlag));
 		}
 	}

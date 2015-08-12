@@ -16,6 +16,9 @@ public:
 	static const TChar NATIVE_SLASH = '\\';
 	static const TChar NON_NATIVE_SLASH = '/';
 
+	static const wchar_t NATIVE_SLASH_W = L'\\';
+	static const wchar_t NON_NATIVE_SLASH_W = L'/';
+
 	// using none native slash on windows dose not work well
 	// since the drive slash must be a native one.
 //	static const TChar NATIVE_SLASH = '/';
@@ -23,6 +26,8 @@ public:
 #else
 	static const TChar NATIVE_SLASH = '/';
 	static const TChar NON_NATIVE_SLASH = '\\';
+	static const wchar_t NATIVE_SLASH_W = L'/';
+	static const wchar_t NON_NATIVE_SLASH_W = L'\\';
 #endif
 
 	inline Path();

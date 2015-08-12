@@ -34,6 +34,7 @@ public:
 	void ShutDown(void);
 
 	void addDirectory(const char* directory) X_OVERRIDE;
+	void addDirectory(const wchar_t* directory) X_OVERRIDE;
 
 	void registerListener(XDirectoryWatcherListener* pListener) X_OVERRIDE;
 	void unregisterListener(XDirectoryWatcherListener* pListener) X_OVERRIDE;
@@ -51,6 +52,7 @@ private:
 private:
 
 	bool IsRepeat(const core::Path<char>& path);
+	bool IsRepeat(const core::Path<wchar_t>& path);
 
 	struct Info_t
 	{
@@ -73,7 +75,7 @@ private:
 		}
 
 		OVERLAPPED overlapped;
-		Path<char> directoryName;
+		Path<wchar_t> directoryName;
 		HANDLE directory;
 		HANDLE event;
 		char result[4096];

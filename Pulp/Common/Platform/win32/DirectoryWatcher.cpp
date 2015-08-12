@@ -88,13 +88,21 @@ void XDirectoryWatcher::ShutDown(void)
 
 void XDirectoryWatcher::addDirectory(const char* directory)
 {
+	wchar_t dirW[1024];
+	strUtil::Convert(directory, dirW, sizeof(dirW));
+
+	addDirectory(dirW);
+}
+
+void XDirectoryWatcher::addDirectory(const wchar_t* directory)
+{
 	WatchInfo info;
 
-	info.directoryName = Path<char>(directory);
+	info.directoryName = Path<wchar_t>(directory);
 	info.directoryName.replaceSeprators();
 	info.directoryName.ensureSlash();
 
-	info.directory = CreateFileA(
+	info.directory = CreateFileW(
 		directory,
 		FILE_SHARE_READ,
 		FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
@@ -102,7 +110,7 @@ void XDirectoryWatcher::addDirectory(const char* directory)
 		OPEN_EXISTING,
 		FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
 		0
-	);
+		);
 
 
 	if (info.directory == INVALID_HANDLE_VALUE)
@@ -111,9 +119,9 @@ void XDirectoryWatcher::addDirectory(const char* directory)
 		X_ERROR("DirectoryWatcher", "Cannot obtain handle for directory \"%s\". Error: %s", core::lastError::ToString(dsc));
 	}
 
-	info.event = CreateEventA(0, 
+	info.event = CreateEventA(0,
 		FALSE, // might try using TRUE see if it helps with duplicate events. 
-		0, 
+		0,
 		0);
 
 	if (info.event == NULL)
@@ -130,7 +138,6 @@ void XDirectoryWatcher::addDirectory(const char* directory)
 	// Watch
 	WatchDirectory(info.directory, info.result, &info.overlapped);
 }
-
 
 void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 {
@@ -150,17 +157,15 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 			// null term. (string is not provided with one.)
 			pInfo->FileName[(pInfo->FileNameLength >> 1)] = '\0';
 
-
 			// multibyte me up.
 			core::strUtil::Convert(pInfo->FileName, filename);
 
 			// null term.
 			filename[(pInfo->FileNameLength >> 1)] = '\0';
 
-
 			// Path
-			core::Path<char> path(info.directoryName);
-			path.append(filename);
+			core::Path<wchar_t> path(info.directoryName);
+			path.append(pInfo->FileName);
 
 
 			if (!path.isEmpty())
@@ -289,6 +294,29 @@ bool XDirectoryWatcher::IsRepeat(const core::Path<char>& path)
 	struct _stat64 st;
 	core::zero_object(st);
 	_stat64(path.c_str(), &st);
+
+	Info_t info(st.st_mtime, st.st_size);
+
+	Fifo<Info_t>::const_iterator it = m_cache.begin();
+
+	for (; it != m_cache.end(); ++it)
+	{
+		if ((*it) == info)
+			return true;
+	}
+
+	if (m_cache.capacity() == m_cache.size())
+		m_cache.pop();
+
+	m_cache.push(info);
+	return false;
+}
+
+bool XDirectoryWatcher::IsRepeat(const core::Path<wchar_t>& path)
+{
+	struct _stat64 st;
+	core::zero_object(st);
+	_wstat64(path.c_str(), &st);
 
 	Info_t info(st.st_mtime, st.st_size);
 
