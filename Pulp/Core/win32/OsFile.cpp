@@ -19,7 +19,7 @@ XFileStats OsFile::s_stats = {0};
 #endif // !X_ENABLE_FILE_STATS
 
 
-OsFile::OsFile(const char* path, IFileSys::fileModeFlags mode) :
+OsFile::OsFile(const wchar_t* path, IFileSys::fileModeFlags mode) :
 file_(INVALID_HANDLE_VALUE), 
 mode_(mode)
 {
@@ -30,7 +30,7 @@ mode_(mode)
 
 
 	// lets open you up.
-	file_ = CreateFileA(path, access, share, NULL, dispo, flags, NULL);
+	file_ = CreateFileW(path, access, share, NULL, dispo, flags, NULL);
 
 	if (!valid())
 	{

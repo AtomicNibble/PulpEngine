@@ -12,7 +12,7 @@ X_NAMESPACE_BEGIN(core)
 class XDiskFile : public XFile
 {
 public:
-	XDiskFile(const char* path, IFileSys::fileModeFlags mode);
+	XDiskFile(const wchar_t* path, IFileSys::fileModeFlags mode);
 	~XDiskFile();
 
 	/// Returns whether the disk file is valid.

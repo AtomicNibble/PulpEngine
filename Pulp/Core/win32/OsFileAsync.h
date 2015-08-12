@@ -11,7 +11,7 @@ X_NAMESPACE_BEGIN(core)
 
 struct OsFileAsync
 {
-	OsFileAsync(const char* path, IFileSys::fileModeFlags mode);
+	OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode);
 	~OsFileAsync(void);
 
 	XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, uint32_t length, size_t position);

@@ -20,7 +20,7 @@ Path<TChar>::Path(const TChar* const str) : StackString<MAX_PATH, TChar>(str)
 template<typename TChar>
 const TChar* Path<TChar>::fileName(void) const
 {
-	const char* res = findLast(NATIVE_SLASH);
+	const TChar* res = findLast(NATIVE_SLASH);
 
 	if (!res || res == end())
 	{
@@ -35,7 +35,7 @@ const TChar* Path<TChar>::fileName(void) const
 template<typename TChar>
 const TChar* Path<TChar>::extension(void) const
 {
-	const char* res = findLast('.');
+	const TChar* res = findLast('.');
 
 	if (!res)
 		return str_;
@@ -146,10 +146,16 @@ inline void Path<TChar>::replaceSeprators(void)
 	replaceAll(NON_NATIVE_SLASH, NATIVE_SLASH);
 }
 
-template<typename TChar>
-inline void Path<TChar>::removeFileName(void)
+template<>
+inline void Path<char>::removeFileName(void)
 {
-	this->replace(this->fileName(),"");
+	this->replace(this->fileName(), "");
+}
+
+template<>
+inline void Path<wchar_t>::removeFileName(void)
+{
+	this->replace(this->fileName(), L"");
 }
 
 template<typename TChar>
