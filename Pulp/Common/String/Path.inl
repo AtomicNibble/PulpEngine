@@ -82,7 +82,7 @@ void Path<TChar>::setFileName(const TChar* filename)
 	}
 	else 
 	{
-		StackString<MAX_PATH> temp(str_, name); // want the text before filename
+		StackString<MAX_PATH, TChar> temp(str_, name); // want the text before filename
 		temp.append(filename);
 
 		*this = temp.c_str();
