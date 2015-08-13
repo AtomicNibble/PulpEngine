@@ -130,63 +130,68 @@ namespace {
 	const unsigned __int16 STRING_COLOR				= MakeColor( COL_GREEN, COL_BLACK ); // COL_GREEN;
 
 
-	void WriteToConsole( HANDLE console, unsigned __int16 color, const char* asciiMsg, unsigned int length, bool colorizeExtended )
+	void WriteToConsole( HANDLE console, unsigned __int16 color, const char* asciiMsg, 
+		unsigned int length, bool colorizeExtended )
 	{
-		char oemMsg[sizeof(LoggerBase::Line)];
+		wchar_t wMsg[sizeof(LoggerBase::Line)];
 
-		size_t msgEnd;
 		DWORD NumberOfCharsWritten;
 		DWORD SectionSize = 0;
 		bool isString = false;
 		bool hasCoolorCode = false;
 		bool ColorSet = false;
-		const char *pOem;
+		const wchar_t *pCur, *pMsgEnd;
 
-		CharToOemA( asciiMsg, oemMsg );	
+		if (length < 1) {
+			return;
+		}
+
+		// CharToOemA( asciiMsg, oemMsg );	
+		strUtil::Convert(asciiMsg, wMsg);
 
 		// has a ^?
-		if (core::strUtil::Find(asciiMsg, asciiMsg + length, '^')) {
+		if (core::strUtil::Find(wMsg, wMsg + length, L'^')) {
 			hasCoolorCode = true;
 		}
 
-		pOem = oemMsg;
-		msgEnd = reinterpret_cast<size_t>(&oemMsg[length]);
-		if ( oemMsg < &oemMsg[length] )
+		pCur = wMsg;
+		pMsgEnd = wMsg + length;
+
+	//	if (wMsg < &wMsg[length])
 		{
 			do
 			{
 				if ( SectionSize >= length )
 					break;
 
-				if ( *(pOem + SectionSize) == '|' )
+				if (*(pCur + SectionSize) == L'|')
 				{
 					SetConsoleTextAttribute( console, CHANNEL_COLOR );
 
 					NumberOfCharsWritten = 0;
-					WriteConsoleA( console, pOem, SectionSize, &NumberOfCharsWritten, 0);
+					WriteConsoleW(console, pCur, SectionSize, &NumberOfCharsWritten, 0);
 
 					SetConsoleTextAttribute(console, color);
 
 					length -= SectionSize;
-					pOem = (char *)pOem + SectionSize;
+					pCur = pCur + SectionSize;
 					SectionSize = 0;
 				}
 
 
-#if 1
 				if (colorizeExtended)
 				{
-					char curChar = *(pOem + SectionSize);
-					if (hasCoolorCode && curChar == '^' && SectionSize < length)
+					wchar_t curChar = *(pCur + SectionSize);
+					if (hasCoolorCode && curChar == L'^' && SectionSize < length)
 					{
-						char colChar = *(pOem + SectionSize + 1);
-						if (core::strUtil::IsDigit(colChar))
+						wchar_t colChar = *(pCur + SectionSize + 1);
+						if (core::strUtil::IsDigitW(colChar))
 						{
-							int colorIndex = colChar - '0';
+							int colorIndex = colChar - L'0';
 
 							// we draw anything then change color.
 							NumberOfCharsWritten = 0;
-							WriteConsoleA(console, pOem, SectionSize, &NumberOfCharsWritten, 0);
+							WriteConsoleW(console, pCur, SectionSize, &NumberOfCharsWritten, 0);
 
 							SetConsoleTextAttribute(console, COLOR_CODE_TABLE[colorIndex]);
 
@@ -195,11 +200,11 @@ namespace {
 							SectionSize += 2;
 
 							length -= SectionSize;
-							pOem = (char *)pOem + SectionSize;
+							pCur = pCur + SectionSize;
 							SectionSize = 0;
 						}
 					}
-					else if (!hasCoolorCode && curChar == '\"')
+					else if (!hasCoolorCode && curChar == L'\"')
 					{
 						// still make text green.
 						if (isString)
@@ -213,51 +218,27 @@ namespace {
 						}	
 
 						NumberOfCharsWritten = 0;
-						WriteConsoleA( console, pOem, SectionSize, &NumberOfCharsWritten, 0 );
+						WriteConsoleW(console, pCur, SectionSize, &NumberOfCharsWritten, 0);
 
 						length -= SectionSize;
-						pOem = (char *)pOem + SectionSize;
+						pCur = pCur + SectionSize;
 						SectionSize = 0;
 
 						isString = (isString == 0);
 					}
 				}
-#else
-				if ( colorizeExtended && *(pOem + SectionSize) == '\"' )
-				{
-					if ( isString )
-					{
-						++SectionSize;
-						SetConsoleTextAttribute( console, STRING_COLOR );
-					}
-					else
-					{
-						SetConsoleTextAttribute( console, color );
-					}	
-
-					NumberOfCharsWritten = 0;
-					WriteConsoleA( console, pOem, SectionSize, &NumberOfCharsWritten, 0 );
-
-					length -= SectionSize;
-					pOem = (char *)pOem + SectionSize;
-					SectionSize = 0;
-
-					isString = (isString == 0);
-				}
-#endif
 
 				++SectionSize;
 			}
-			while ( reinterpret_cast<size_t>(pOem) < msgEnd );
+			while (pCur < pMsgEnd);
 		}
 
 		if (!ColorSet) {
 			SetConsoleTextAttribute(console, color);
 		}
 
-		msgEnd = 0;
 		DWORD zeroEnd = 0;
-		WriteConsoleA(console, pOem, length, &zeroEnd, 0);
+		WriteConsoleW(console, pCur, length, &zeroEnd, 0);
 
 		// reset
 		SetConsoleTextAttribute(console, LOG_COLOR);
