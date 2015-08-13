@@ -295,6 +295,9 @@
     <ClCompile Include="UT_StringTokenizer.cpp">
       <Filter>Source Files\tests\String</Filter>
     </ClCompile>
+    <ClCompile Include="UT_Path.cpp">
+      <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">

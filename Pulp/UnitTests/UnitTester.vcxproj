@@ -467,6 +467,7 @@
     <ClCompile Include="UT_M_Vector.cpp" />
     <ClCompile Include="UT_M_VectorA.cpp" />
     <ClCompile Include="UT_M_Winding.cpp" />
+    <ClCompile Include="UT_Path.cpp" />
     <ClCompile Include="UT_Pointer.cpp" />
     <ClCompile Include="UT_Random.cpp" />
     <ClCompile Include="UT_RefrenceCounted.cpp" />
