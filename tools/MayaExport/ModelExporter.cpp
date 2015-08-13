@@ -1448,7 +1448,7 @@ void MayaModel::calculateBoundingBox(void)
 
 uint32_t MayaModel::calculateTagNameDataSize(void)
 {
-	uint32_t size = 0;
+	size_t size = 0;
 	MayaBone* bone;
 
 	for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next())
@@ -1456,13 +1456,13 @@ uint32_t MayaModel::calculateTagNameDataSize(void)
 		size += bone->name.length() + 1;
 	}
 
-	return size;
+	return safe_static_cast<uint32_t, size_t>(size);
 }
 
 uint32_t MayaModel::calculateMaterialNameDataSize(void)
 {
-	uint32_t size = 0;
-	uint32_t i, x;
+	size_t size = 0;
+	size_t i, x;
 
 	for (i = 0; i < 4; i++) 
 	{
@@ -1473,7 +1473,7 @@ uint32_t MayaModel::calculateMaterialNameDataSize(void)
 		}
 	}
 
-	return size;
+	return safe_static_cast<uint32_t, size_t>(size);
 }
 
 uint32_t MayaModel::calculateSubDataSize(const Flags8<model::StreamType>& streams)
