@@ -280,7 +280,7 @@ namespace strUtil
 	}
 
 
-	const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* what, uint32_t whatLength)
+	const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* what, size_t whatLength)
 	{
 		size_t len = endExclusive - startInclusive;
 
@@ -319,7 +319,7 @@ namespace strUtil
 
 	const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* whatStart, const wchar_t* whatEnd)
 	{
-		return Find(startInclusive, endExclusive, whatStart, safe_static_cast<int, size_t>(whatEnd - whatStart));
+		return Find(startInclusive, endExclusive, whatStart, safe_static_cast<size_t>(whatEnd - whatStart));
 	}
 
 

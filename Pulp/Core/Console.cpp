@@ -2283,7 +2283,7 @@ void XConsole::Paste(void)
 		// insert it at current pos.
 		InputBuffer_.insert(CursorPos_, txt);
 		// add to length
-		CursorPos_ += core::strUtil::strlen(txt);
+		CursorPos_ += safe_static_cast<int32_t, size_t>(core::strUtil::strlen(txt));
 	}
 }
 

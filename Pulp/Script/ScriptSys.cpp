@@ -1064,7 +1064,7 @@ struct XRecursiveLuaDumpToFile : public IRecursiveLuaDump
 
 	char sLevelOffset[1024];
 	char sKeyStr[32];
-	int nSize;
+	size_t nSize;
 
 	const char* GetOffsetStr(int nLevel)
 	{

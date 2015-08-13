@@ -461,7 +461,7 @@ bool XScriptTable::AddFunction(const XUserFunctionDesc& fd)
 	int8 nParamIdOffset = fd.nParamIdOffset;
 	if (fd.function)
 	{
-		int nDataSize = sizeof(fd.function) + funcSig.length() + 1 + 1;
+		size_t nDataSize = sizeof(fd.function) + funcSig.length() + 1 + 1;
 
 		// Store functor in first upvalue.
 		unsigned char* pBuffer = (unsigned char*)lua_newuserdata(L, nDataSize);
@@ -476,8 +476,8 @@ bool XScriptTable::AddFunction(const XUserFunctionDesc& fd)
 	{
 		// user data function.
 		UserDataFunction::Pointer function = fd.pUserDataFunc;
-		int nSize = fd.userDataSize;
-		int nTotalSize = sizeof(function)+sizeof(int)+nSize + funcSig.length() + 1 + 1;
+		size_t nSize = fd.userDataSize;
+		size_t nTotalSize = sizeof(function)+sizeof(int)+nSize + funcSig.length() + 1 + 1;
 
 		// Store functor in first upvalue.
 		unsigned char *pBuffer = (unsigned char*)lua_newuserdata(L, nTotalSize);

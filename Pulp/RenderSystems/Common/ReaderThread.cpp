@@ -190,8 +190,8 @@ void XRenderThread::RC_DrawString(const Vec3f& pos, const char* pStr)
 		return;
 	}
 
-	const uint32_t str_len = core::strUtil::strlen(pStr);
-	const size_t CmdSize = sizeof(Vec3f)+str_len + sizeof(str_len);
+	const size_t str_len = core::strUtil::strlen(pStr);
+	const size_t CmdSize = sizeof(Vec3f) + str_len + sizeof(str_len);
 
 	beginCommand(RenderCommand::DrawString, CmdSize);
 

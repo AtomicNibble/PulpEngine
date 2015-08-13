@@ -497,7 +497,7 @@ namespace strUtil
 	}
 
 
-	const char* Find(const char* startInclusive, const char* endExclusive, const char* what, uint32_t whatLength)
+	const char* Find(const char* startInclusive, const char* endExclusive, const char* what, size_t whatLength)
 	{
 		if (whatLength == 0)
 			return startInclusive;
@@ -562,7 +562,7 @@ namespace strUtil
 
 	const char* Find(const char* startInclusive, const char* endExclusive, const char* whatStart, const char* whatEnd)
 	{
-		return Find(startInclusive, endExclusive, whatStart, safe_static_cast<int, size_t>(whatEnd - whatStart));
+		return Find(startInclusive, endExclusive, whatStart, safe_static_cast<size_t>(whatEnd - whatStart));
 	}
 
 

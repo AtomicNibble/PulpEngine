@@ -8,7 +8,7 @@ Path<TChar>::Path()
 template<typename TChar>
 Path<TChar>::Path(const Path& oth)
 {
-	append(oth.c_str(), (uint32_t)oth.length());
+	append(oth.c_str(), oth.length());
 }
 
 template<typename TChar>
@@ -93,7 +93,7 @@ template<typename TChar>
 void Path<TChar>::operator=(const TChar* str)
 {
 	len_ = strUtil::strlen(str);
-	len_ = core::Min<uint32_t>(len_, MAX_PATH);
+	len_ = core::Min<size_t>(len_, MAX_PATH);
 	memcpy(str_, str, (len_ + 1) * sizeof(TChar));
 }
 
@@ -118,7 +118,7 @@ const Path<TChar> Path<TChar>::operator/(const TChar* str) const
 template<typename TChar>
 const Path<TChar>& Path<TChar>::operator/=(const Path<TChar>& oth)
 {
-	append(oth.c_str(), (uint32_t)oth.length());
+	append(oth.c_str(), oth.length());
 	return *this;
 }
 

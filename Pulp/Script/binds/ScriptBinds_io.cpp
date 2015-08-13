@@ -106,7 +106,8 @@ int XBinds_Io_File::write(IFunctionHandler* pH)
 				case ScriptValueType::STRING:
 			//	pFile->writeString(value.str);
 			// no null term Plz!
-				pFile->write(value.str, core::strUtil::strlen(value.str));
+				pFile->write(value.str, safe_static_cast<uint32_t, size_t>(
+					core::strUtil::strlen(value.str)));
 				break;
 				case ScriptValueType::NUMBER:
 			//	pFile->writeObj(value.number);

@@ -20,7 +20,7 @@ IdType StringTable<NumBlocks, BlockSize, Alignment, IdType>::addString(const cha
 }
 
 template<int NumBlocks, int BlockSize, int Alignment, typename IdType>
-IdType StringTable<NumBlocks, BlockSize, Alignment, IdType>::addString(const char* Str, int Len)
+IdType StringTable<NumBlocks, BlockSize, Alignment, IdType>::addString(const char* Str, size_t Len)
 {
 	X_ASSERT(Len < 255, "string is longer than the 255 max")(Len);
 	X_ASSERT(CurrentBlock_ < MaxBlocks_, "string table is full")(CurrentBlock_, MaxBlocks_);
@@ -28,11 +28,11 @@ IdType StringTable<NumBlocks, BlockSize, Alignment, IdType>::addString(const cha
 	IdType Block = CurrentBlock_;
 
 	// ensure space for null terminator as we return pointers to this memory.
-	int NumBlocks = (Len + sizeof(Header_t)+BlockSize) / BlockSize;
+	size_t NumBlocks = (Len + sizeof(Header_t) + BlockSize) / BlockSize;
 
 	// set the header
 	Header_t* head = Cursor_.getSeekPtr<Header_t>();
-	head->Length = Len;
+	head->Length = safe_static_cast<uint32_t,size_t>(Len);
 
 	// copy the string.
 	memcpy(Cursor_.getPtr<void>(), Str, Len);
@@ -40,11 +40,11 @@ IdType StringTable<NumBlocks, BlockSize, Alignment, IdType>::addString(const cha
 	// ensusre null
 	memset(Cursor_.getPtr<BYTE>() + Len, '\0', 1);
 
-	Cursor_.SeekBytes((NumBlocks * BlockSize) - sizeof(Header_t));
-	CurrentBlock_ += NumBlocks;
+	Cursor_.SeekBytes(safe_static_cast<uint32_t, size_t>((NumBlocks * BlockSize) - sizeof(Header_t)));
+	CurrentBlock_ += safe_static_cast<uint32_t, size_t>(NumBlocks);
 
 	NumStrings_++;
-	WasteSize_ += (NumBlocks * BlockSize) - (Len + sizeof(Header_t)+1);
+	WasteSize_ += (NumBlocks * BlockSize) - (Len + sizeof(Header_t) + 1);
 	return Block;
 }
 
@@ -89,7 +89,7 @@ IdType StringTableUnique<NumBlocks, BlockSize, Alignment, IdType>::addStringUnqi
 
 
 template<int NumBlocks, int BlockSize, int Alignment, typename IdType>
-IdType StringTableUnique<NumBlocks, BlockSize, Alignment, IdType>::addStringUnqiue(const char* Str, int Len)
+IdType StringTableUnique<NumBlocks, BlockSize, Alignment, IdType>::addStringUnqiue(const char* Str, size_t Len)
 {
 	IdType id = 0;
 	if (this->FindString(Str, Len, id))
@@ -125,14 +125,14 @@ void StringTableUnique<NumBlocks, BlockSize, Alignment, IdType>::AddStringToTrie
 
 
 template<int NumBlocks, int BlockSize, int Alignment, typename IdType>
-bool StringTableUnique<NumBlocks, BlockSize, Alignment, IdType>::FindString(const char* Str, int Len, IdType& id)
+bool StringTableUnique<NumBlocks, BlockSize, Alignment, IdType>::FindString(const char* Str, size_t Len, IdType& id)
 {
 	if (Len > LongestStr_) // we can skip checking for strings longer then any in the table.
 		return false;
 
 	Node* node = &searchTree_;
 	const char* Txt = Str;
-	int c;
+	size_t c;
 	while ((c = *Txt++)) {
 		if (node->chars[c] == nullptr) {
 			return false;

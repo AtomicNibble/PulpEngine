@@ -45,7 +45,7 @@ namespace {
 
 	bool strToVec4(const char* pStr, Vec4f& vecOut)
 	{
-		uint32_t len = core::strUtil::strlen(pStr);
+		size_t len = core::strUtil::strlen(pStr);
 		if (len > 128)
 			return false;
 

@@ -31,13 +31,13 @@ void XTextDrawList::addEntry(const Vec3f& vPos, const XDrawTextInfo& ti, const c
 {
 	X_ASSERT_NOT_NULL(pStr);
 
-	uint32_t strLen = core::strUtil::strlen(pStr);
+	size_t strLen = core::strUtil::strlen(pStr);
 
 	TextEntry entry;
 	entry.pos = vPos;
 	entry.color = ti.col;
 	entry.flags = ti.flags;
-	entry.strLen = strLen;
+	entry.strLen = safe_static_cast<uint32_t,size_t>(strLen);
 
 	size_t requiredBytes = core::bitUtil::RoundUpToMultiple(sizeof(TextEntry)+strLen + 1, sizeof(TextEntry*));
 
