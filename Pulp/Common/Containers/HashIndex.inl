@@ -52,19 +52,24 @@ X_INLINE XHashIndex& XHashIndex::operator=(const XHashIndex& oth)
 		if (oth.hashSize_ != hashSize_ || hash_ == INVALID_INDEX)
 		{
 			if (hash_ != INVALID_INDEX) {
-				delete[] hash_;
+			//	delete[] hash_;
+				X_DELETE_ARRAY(hash_, arena_);
 			}
 			hashSize_ = oth.hashSize_;
-			hash_ = new int[hashSize_];
+			// hash_ = new int[hashSize_];
+			hash_ = X_NEW_ARRAY(int, hashSize_, arena_, "HashIndex:Hash");
 		}
 
 		if (oth.indexSize_ != indexSize_ || indexChain_ == INVALID_INDEX)
 		{
 			if (indexChain_ != INVALID_INDEX) {
-				delete[] indexChain_;
+			//	delete[] indexChain_;
+				X_DELETE_ARRAY(indexChain_, arena_);
 			}
 			indexSize_ = oth.indexSize_;
-			indexChain_ = new int[indexSize_];
+		//	indexChain_ = new int[indexSize_];
+			indexChain_ = X_NEW_ARRAY(int, indexSize_, arena_, "HashIndex:Chain");
+
 		}
 
 		memcpy(hash_, oth.hash_, hashSize_ * sizeof(hash_[0]));
