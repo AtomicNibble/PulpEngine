@@ -28,8 +28,8 @@ namespace strUtil
 	typedef wchar_t WorkingDirStrW[512];
 	const wchar_t* workingDir(WorkingDirStrW& buf);
 
-	uint32_t strlen(const char* str);
-	uint32_t strlen(const wchar_t* str);
+	size_t strlen(const char* str);
+	size_t strlen(const wchar_t* str);
 
 	// return length of string in bytes
 	template<typename T>
@@ -122,8 +122,8 @@ namespace strUtil
 
 	/// \brief Finds a string inside a string, and returns a pointer to it.
 	/// \remark Returns a \c nullptr if the string could not be found.
-	const char* Find(const char* startInclusive, const char* endExclusive, const char* what, unsigned whatLength);
-	const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* what, unsigned whatLength);
+	const char* Find(const char* startInclusive, const char* endExclusive, const char* what, size_t whatLength);
+	const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* what, size_t whatLength);
 
 	/// \brief Finds a string inside a string, and returns a pointer to it.
 	/// \remark Returns a \c nullptr if the string could not be found.

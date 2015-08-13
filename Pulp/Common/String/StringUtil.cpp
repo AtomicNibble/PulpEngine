@@ -247,14 +247,14 @@ namespace strUtil
 
 	} // namespace
 
-	uint32_t strlen(const char* str)
+	size_t strlen(const char* str)
 	{
-		return static_cast<uint32_t>(Implementation<sizeof(const char*)>::strlen(str));
+		return static_cast<size_t>(Implementation<sizeof(const char*)>::strlen(str));
 	}
 
-	uint32_t strlen(const wchar_t* str)
+	size_t strlen(const wchar_t* str)
 	{
-		return static_cast<uint32_t>(wcslen(str));
+		return static_cast<size_t>(wcslen(str));
 	}
 
 	const char* Convert(const wchar_t *input, char *output, uint32_t outputLength)
