@@ -167,13 +167,17 @@ inline void Path<wchar_t>::removeFileName(void)
 template<>
 inline void Path<char>::removeExtension(void)
 {
-	setExtension("");
+	if (isNotEmpty()) {
+		setExtension("");
+	}
 }
 
 template<>
 inline void Path<wchar_t>::removeExtension(void)
 {
-	setExtension(L"");
+	if (isNotEmpty()) {
+		setExtension(L"");
+	}
 }
 
 template<typename TChar>
