@@ -261,12 +261,10 @@ template<typename T>
 void Fifo<T>::Delete(T* pData)
 {
 	X_DELETE_ARRAY(pData, arena_);
-//	delete[] pData;
 }
 
 template<typename T>
 T* Fifo<T>::Allocate(size_type num)
 {
 	return X_NEW_ARRAY(T, num, arena_, "Fifo<"X_PP_STRINGIZE(T)">");
-//	return new T[num];
 }
