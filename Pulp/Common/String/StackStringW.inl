@@ -36,7 +36,7 @@ StackString<N, wchar_t>::StackString(const char* const str)
 
 template <size_t N>
 StackString<N, wchar_t>::StackString(const StringRange<wchar_t>& range)
-	: len_(safe_static_cast<uint32_t>(range.GetLength()))
+	: len_(safe_static_cast<size_t>(range.GetLength()))
 {
 	X_ASSERT(len_ < N, "StringRange does not fit into StackString of size %d.", N)();
 
@@ -50,7 +50,7 @@ StackString<N, wchar_t>::StackString(const StringRange<wchar_t>& range)
 // ---------------------------------------------------------------------------------------------------------------------
 template <size_t N>
 StackString<N, wchar_t>::StackString(const wchar_t* const beginInclusive, const wchar_t* const endExclusive)
-	: len_(safe_static_cast<uint32_t>(endExclusive - beginInclusive))
+	: len_(safe_static_cast<size_t>(endExclusive - beginInclusive))
 {
 	X_ASSERT(len_ < N, "String of length %d does not fit into StackString of size %d.", len_, N)();
 	memcpy(str_, beginInclusive, len_ * sizeof(wchar_t));
@@ -126,7 +126,7 @@ StackString<N, wchar_t>::StackString(const float f)
 
 	wchar_t text[64];
 
-	uint32_t l = swprintf_s(text, L"%f", f);
+	size_t l = swprintf_s(text, L"%f", f);
 
 	while (l > 0 && text[l - 1] == L'0')
 		text[--l] = L'\0';
@@ -163,7 +163,7 @@ StackString<N, wchar_t>::StackString(const __int64 u)
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <size_t N>
-void StackString<N, wchar_t>::append(wchar_t ch, unsigned int count)
+void StackString<N, wchar_t>::append(wchar_t ch, size_t count)
 {
 	X_ASSERT(len_ + count < N, "Cannot append %d character. Not enough space left.", count)(len_, N);
 	
@@ -187,7 +187,7 @@ void StackString<N, wchar_t>::append(const wchar_t* str)
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <size_t N>
-void StackString<N, wchar_t>::append(const wchar_t* str, unsigned int count)
+void StackString<N, wchar_t>::append(const wchar_t* str, size_t count)
 {
 	X_ASSERT(len_ + count < N, "Cannot append %d character(s) from string \"%s\". Not enough space left.", count, str)(len_, N);
 	memcpy(str_ + len_, str, count * sizeof(wchar_t));
@@ -201,7 +201,7 @@ void StackString<N, wchar_t>::append(const wchar_t* str, unsigned int count)
 template <size_t N>
 void StackString<N, wchar_t>::append(const wchar_t* str, const wchar_t* end)
 {
-	append(str, safe_static_cast<unsigned int>(end - str));
+	append(str, safe_static_cast<size_t>(end - str));
 }
 
 
@@ -249,7 +249,7 @@ void StackString<N, wchar_t>::appendFmt(const wchar_t* format, va_list args)
 template <size_t N>
 void StackString<N, wchar_t>::set(const wchar_t* str)
 {
-	uint32_t len = core::Min<uint32_t>(N - 1, strUtil::strlen(str));
+	size_t len = core::Min<size_t>(N - 1, strUtil::strlen(str));
 
 	X_ASSERT(len < N, "String of length %d does not fit into StackString of size %d.", len, N)();
 
@@ -262,8 +262,7 @@ void StackString<N, wchar_t>::set(const wchar_t* str)
 template <size_t N>
 void StackString<N, wchar_t>::set(const wchar_t* const beginInclusive, const wchar_t* const endExclusive)
 {
-	uint32_t len = core::Min<uint32_t>(N - 1,
-		safe_static_cast<uint32_t, size_t>(endExclusive - beginInclusive));
+	size_t len = core::Min<size_t>(N - 1, (endExclusive - beginInclusive));
 
 	X_ASSERT(len < N, "String of length %d does not fit into StackString of size %d.", len, N)();
 
@@ -283,7 +282,7 @@ bool StackString<N, wchar_t>::replace(const wchar_t* start, const wchar_t* origi
 	X_ASSERT(start >= begin() && start <= end(), "start dose not point to a section of the string")(start, original, replacement);
 
 	// find the position of the string to replace
-	const uint32_t originalLength = strUtil::strlen(original);
+	const size_t originalLength = strUtil::strlen(original);
 	const wchar_t* pos = strUtil::Find(start, str_ + len_, original, originalLength);
 	if (!pos)
 		return false;
@@ -291,12 +290,12 @@ bool StackString<N, wchar_t>::replace(const wchar_t* start, const wchar_t* origi
 	wchar_t* const replacePos = const_cast<wchar_t*>(pos);
 
 	// adjust the length of our string, assuming that the string has been replaced
-	const uint32_t replacementLength = strUtil::strlen(replacement);
-	const uint32_t newLength = len_ + replacementLength - originalLength;
+	const size_t replacementLength = strUtil::strlen(replacement);
+	const size_t newLength = len_ + replacementLength - originalLength;
 	X_ASSERT(newLength < N, "Cannot replace \"%s\" with \"%s\" in string \"%s\". Not enough space left.", original, replacement, str_)(len_, newLength, N);
 
 	// move characters so that the replacement fits in-between
-	const uint32_t toCopy = safe_static_cast<uint32_t>((str_ + len_) - (replacePos + originalLength));
+	const size_t toCopy = safe_static_cast<size_t>((str_ + len_) - (replacePos + originalLength));
 	memmove(replacePos + replacementLength, replacePos + originalLength, toCopy * sizeof(wchar_t));
 
 	// replace characters
@@ -312,7 +311,7 @@ template <size_t N>
 bool StackString<N, wchar_t>::replace(const wchar_t* original, const wchar_t* replacement)
 {
 	// find the position of the string to replace
-	const uint32_t originalLength = strUtil::strlen(original);
+	const size_t originalLength = strUtil::strlen(original);
 
 	if (originalLength == 0)
 		return true;
@@ -326,12 +325,12 @@ bool StackString<N, wchar_t>::replace(const wchar_t* original, const wchar_t* re
 	wchar_t* const replacePos = const_cast<wchar_t*>(pos);
 
 	// adjust the length of our string, assuming that the string has been replaced
-	const uint32_t replacementLength = strUtil::strlen(replacement);
-	const uint32_t newLength = len_ + replacementLength - originalLength;
+	const size_t replacementLength = strUtil::strlen(replacement);
+	const size_t newLength = len_ + replacementLength - originalLength;
 	X_ASSERT(newLength < N, "Cannot replace \"%s\" with \"%s\" in string \"%s\". Not enough space left.", original, replacement, str_)(len_, newLength, N);
 
 	// move characters so that the replacement fits in-between
-	const uint32_t toCopy = safe_static_cast<uint32_t>((str_ + len_) - (replacePos + originalLength));
+	const size_t toCopy = safe_static_cast<size_t>((str_ + len_) - (replacePos + originalLength));
 	memmove(replacePos + replacementLength, replacePos + originalLength, toCopy * sizeof(wchar_t));
 
 	// replace characters
@@ -361,9 +360,9 @@ bool StackString<N, wchar_t>::replace(const wchar_t original, const wchar_t repl
 }
 
 template <size_t N>
-unsigned int StackString<N, wchar_t>::replaceAll(const wchar_t* original, const wchar_t* replacement)
+size_t StackString<N, wchar_t>::replaceAll(const wchar_t* original, const wchar_t* replacement)
 {
-	for (unsigned int count = 0;; ++count)
+	for (size_t count = 0;; ++count)
 	{
 		if (!replace(original, replacement))
 			return count;
@@ -372,10 +371,10 @@ unsigned int StackString<N, wchar_t>::replaceAll(const wchar_t* original, const 
 
 /// Replaces all occurrences of a character, and returns the number of occurrences replaced.
 template <size_t N>
-unsigned int StackString<N, wchar_t>::replaceAll(const wchar_t original, const wchar_t replacement)
+size_t StackString<N, wchar_t>::replaceAll(const wchar_t original, const wchar_t replacement)
 {
 	// find me baby
-	unsigned int count = 0;
+	size_t count = 0;
 	wchar_t* start = str_;
 	while (start < end()) {
 		if (*start == original) {
@@ -406,14 +405,14 @@ void StackString<N, wchar_t>::trimWhitespace(void)
 	{
 		// there are whitespaces to the left, trim them
 		memmove(str_, pos, len_ * sizeof(wchar_t));
-		len_ -= safe_static_cast<unsigned int>(pos - str_);
+		len_ -= safe_static_cast<size_t>(pos - str_);
 	}
 
 	pos = strUtil::FindLastNonWhitespace(str_, str_ + len_);
 	if (pos && pos < str_ + len_ - 1)
 	{
 		// there are whitespaces to the right, trim them
-		len_ = safe_static_cast<unsigned int>(pos - str_ + 1);
+		len_ = safe_static_cast<size_t>(pos - str_ + 1);
 		str_[len_] = 0;
 	}
 }
@@ -436,14 +435,14 @@ void StackString<N, wchar_t>::trimCharacter(wchar_t character)
 	{
 		// there are given characters to the left, trim them
 		memmove(str_, pos, len_ * sizeof(wchar_t));
-		len_ -= safe_static_cast<unsigned int>(pos - str_);
+		len_ -= safe_static_cast<size_t>(pos - str_);
 	}
 
 	pos = strUtil::FindLastNon(str_, str_ + len_, character);
 	if (pos < str_ + len_ - 1)
 	{
 		// there are given characters to the right, trim them
-		len_ = safe_static_cast<unsigned int>(pos - str_ + 1);
+		len_ = safe_static_cast<size_t>(pos - str_ + 1);
 		str_[len_] = 0;
 	}
 }
@@ -451,7 +450,7 @@ void StackString<N, wchar_t>::trimCharacter(wchar_t character)
 template <size_t N>
 void StackString<N, wchar_t>::stripTrailing(const wchar_t c)
 {
-	uint32_t i;
+	size_t i;
 
 	for (i = len_; i > 0 && str_[i - 1] == c; i--) {
 		str_[i - 1] = L'\0';
@@ -463,7 +462,7 @@ void StackString<N, wchar_t>::stripTrailing(const wchar_t c)
 template <size_t N>
 void StackString<N, wchar_t>::trimRight(const wchar_t* pos)
 {
-	len_ = safe_static_cast<uint32_t>(pos - str_);
+	len_ = safe_static_cast<size_t>(pos - str_);
 	str_[len_] = 0;
 }
 
@@ -503,7 +502,7 @@ StackString<N, wchar_t>& StackString<N, wchar_t>::trimLeft(void)
 
 		str_[NewLength] = L'\0';
 
-		len_ = safe_static_cast<uint32_t, size_t>(NewLength);
+		len_ = NewLength;
 	}
 
 	return *this;
@@ -527,7 +526,7 @@ StackString<N, wchar_t>& StackString<N, wchar_t>::trimRight(void)
 		size_t NewLength = (size_t)(str - str_) + 1;
 		str_[NewLength] = 0;
 
-		len_ = safe_static_cast<uint32_t, size_t>(NewLength);
+		len_ = NewLength;
 	}
 
 	return *this;
@@ -606,7 +605,7 @@ inline StackString<N, wchar_t>& StackString<N, wchar_t>::operator=(const StackSt
 
 
 template <size_t N>
-inline wchar_t& StackString<N, wchar_t>::operator[](uint32_t i)
+inline wchar_t& StackString<N, wchar_t>::operator[](size_t i)
 {
 	// allow access to the null terminator
 	X_ASSERT(i <= len_, "Character %d cannot be accessed. Subscript out of range.", i)(N, str_, len_);
@@ -615,7 +614,7 @@ inline wchar_t& StackString<N, wchar_t>::operator[](uint32_t i)
 
 
 template <size_t N>
-inline const wchar_t& StackString<N, wchar_t>::operator[](uint32_t i) const
+inline const wchar_t& StackString<N, wchar_t>::operator[](size_t i) const
 {
 	// allow access to the null terminator
 	X_ASSERT(i <= len_, "Character %d cannot be accessed. Subscript out of range.", i)(N, str_, len_);
@@ -631,7 +630,7 @@ inline const wchar_t* StackString<N, wchar_t>::c_str(void) const
 
 
 template <size_t N>
-inline uint32_t StackString<N, wchar_t>::length(void) const
+inline size_t StackString<N, wchar_t>::length(void) const
 {
 	return len_;
 }
@@ -651,7 +650,7 @@ inline bool StackString<N, wchar_t>::isNotEmpty(void) const
 template <size_t N>
 inline void StackString<N, wchar_t>::toLower(void)
 {
-	for (unsigned int i = 0; i<len_; ++i)
+	for (size_t i = 0; i<len_; ++i)
 	{
 		str_[i] = safe_static_cast<wchar_t>(tolower(str_[i]));
 	}
@@ -660,7 +659,7 @@ inline void StackString<N, wchar_t>::toLower(void)
 template <size_t N>
 inline void StackString<N, wchar_t>::toUpper(void)
 {
-	for (unsigned int i = 0; i<len_; ++i)
+	for (size_t i = 0; i<len_; ++i)
 	{
 		str_[i] = safe_static_cast<wchar_t>(toupper(str_[i]));
 	}
@@ -679,7 +678,7 @@ inline const wchar_t* StackString<N, wchar_t>::end(void) const
 }
 
 template <size_t N>
-inline uint32_t StackString<N, wchar_t>::capacity(void) const
+inline size_t StackString<N, wchar_t>::capacity(void) const
 {
 	return N;
 }

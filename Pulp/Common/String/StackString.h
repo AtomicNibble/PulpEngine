@@ -49,11 +49,11 @@ public:
 	StackString(const TChar* const beginInclusive, const TChar* const endExclusive);
 
 	/// Appends a character a certain amount of times.
-	void append(TChar ch, unsigned int count);
+	void append(TChar ch, size_t count);
 	/// Appends a string.
 	inline void append(const TChar* str);
 	/// Appends part of another string.
-	void append(const TChar* str, unsigned int count);
+	void append(const TChar* str, size_t count);
 	/// Appends part of another string.
 	inline void append(const TChar* str, const TChar* end);
 	/// Appends a formatted string.
@@ -72,9 +72,9 @@ public:
 	bool replace(const TChar original, const TChar replacement);
 
 	/// Replaces all occurrences of a string, and returns the number of occurrences replaced.
-	unsigned int replaceAll(const TChar* original, const TChar* replacement);
+	size_t replaceAll(const TChar* original, const TChar* replacement);
 	/// Replaces all occurrences of a character, and returns the number of occurrences replaced.
-	unsigned int replaceAll(const TChar original, const TChar replacement);
+	size_t replaceAll(const TChar original, const TChar replacement);
 
 
 	/// Trims all whitespace to the left and right of the string.
@@ -126,13 +126,13 @@ public:
 	inline bool operator!=(const StackString& oth) const;
 	inline StackString& operator=(const StackString& oth);
 
-	inline TChar& operator[](uint32_t i);
-	inline const TChar& operator[](uint32_t i) const;
+	inline TChar& operator[](size_t i);
+	inline const TChar& operator[](size_t i) const;
 
 	inline const TChar* c_str(void) const;
 
-	inline uint32_t length(void) const;
-	inline uint32_t capacity(void) const;
+	inline size_t length(void) const;
+	inline size_t capacity(void) const;
 
 	inline bool isEmpty(void) const;
 	inline bool isNotEmpty(void) const;
@@ -145,7 +145,7 @@ public:
 
 protected:
 	TChar str_[N];
-	uint32_t len_;
+	size_t len_;
 };
 
 template <size_t N>
@@ -175,11 +175,11 @@ public:
 	StackString(const wchar_t* const beginInclusive, const wchar_t* const endExclusive);
 
 	/// Appends a character a certain amount of times.
-	void append(wchar_t ch, unsigned int count);
+	void append(wchar_t ch, size_t count);
 	/// Appends a string.
 	inline void append(const wchar_t* str);
 	/// Appends part of another string.
-	void append(const wchar_t* str, unsigned int count);
+	void append(const wchar_t* str, size_t count);
 	/// Appends part of another string.
 	inline void append(const wchar_t* str, const wchar_t* end);
 	/// Appends a formatted string.
@@ -198,9 +198,9 @@ public:
 	bool replace(const wchar_t original, const wchar_t replacement);
 
 	/// Replaces all occurrences of a string, and returns the number of occurrences replaced.
-	unsigned int replaceAll(const wchar_t* original, const wchar_t* replacement);
+	size_t replaceAll(const wchar_t* original, const wchar_t* replacement);
 	/// Replaces all occurrences of a character, and returns the number of occurrences replaced.
-	unsigned int replaceAll(const wchar_t original, const wchar_t replacement);
+	size_t replaceAll(const wchar_t original, const wchar_t replacement);
 
 
 	/// Trims all whitespace to the left and right of the string.
@@ -252,13 +252,13 @@ public:
 	inline bool operator!=(const StackString& oth) const;
 	inline StackString& operator=(const StackString& oth);
 
-	inline wchar_t& operator[](uint32_t i);
-	inline const wchar_t& operator[](uint32_t i) const;
+	inline wchar_t& operator[](size_t i);
+	inline const wchar_t& operator[](size_t i) const;
 
 	inline const wchar_t* c_str(void) const;
 
-	inline uint32_t length(void) const;
-	inline uint32_t capacity(void) const;
+	inline size_t length(void) const;
+	inline size_t capacity(void) const;
 
 	inline bool isEmpty(void) const;
 	inline bool isNotEmpty(void) const;
@@ -271,7 +271,7 @@ public:
 
 protected:
 	wchar_t str_[N];
-	uint32_t len_;
+	size_t len_;
 };
 
 
