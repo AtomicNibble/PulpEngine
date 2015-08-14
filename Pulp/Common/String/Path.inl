@@ -20,16 +20,26 @@ Path<TChar>::Path(const TChar* const str) : StackString<MAX_PATH, TChar>(str)
 template<typename TChar>
 const TChar* Path<TChar>::fileName(void) const
 {
-	const TChar* res = findLast(NATIVE_SLASH);
-
-	if (!res || res == end())
-	{
-		// check both :Z
-		res = findLast(NON_NATIVE_SLASH);
-		if (!res || res == end())
-			return str_;
+	const TChar* native = findLast(NATIVE_SLASH);
+	// folder//
+	if (native == end() - 1) {
+		return native + 1;
 	}
-	return res + 1;
+
+	const TChar* noneNative = findLast(NON_NATIVE_SLASH);
+
+	if (!native && !noneNative)
+		return str_;
+	if (!noneNative && native)
+		return native + 1;
+	if (noneNative && !native)
+		return noneNative + 1;
+
+
+	// work out which is bigger
+	const TChar* last = core::Max(native, noneNative);
+
+	return last + 1;
 }
 
 template<typename TChar>
