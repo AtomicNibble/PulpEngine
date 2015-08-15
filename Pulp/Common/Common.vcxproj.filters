@@ -616,9 +616,6 @@
     <ClInclude Include="Threading\ConditionVariable.h">
       <Filter>Headers\Threading</Filter>
     </ClInclude>
-    <ClInclude Include="Threading\Semaphore.h">
-      <Filter>Headers\Threading</Filter>
-    </ClInclude>
     <ClInclude Include="Threading\Spinlock.h">
       <Filter>Headers\Threading</Filter>
     </ClInclude>
@@ -1003,6 +1000,12 @@
     <ClInclude Include="Threading\win32\ConditionVariable.h">
       <Filter>Headers\Threading\win32</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\win32\Semaphore.h">
+      <Filter>Headers\Threading\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\Semaphore.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1099,9 +1102,6 @@
       <Filter>Headers\Threading</Filter>
     </None>
     <None Include="Threading\Spinlock.inl">
-      <Filter>Headers\Threading</Filter>
-    </None>
-    <None Include="Threading\Semaphore.inl">
       <Filter>Headers\Threading</Filter>
     </None>
     <None Include="Threading\ThreadLocalStorage.inl">
@@ -1258,6 +1258,9 @@
       <Filter>Headers\String</Filter>
     </None>
     <None Include="Threading\win32\CriticalSection.inl">
+      <Filter>Headers\Threading\win32</Filter>
+    </None>
+    <None Include="Threading\win32\Semaphore.inl">
       <Filter>Headers\Threading\win32</Filter>
     </None>
   </ItemGroup>
