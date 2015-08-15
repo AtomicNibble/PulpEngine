@@ -3,6 +3,7 @@
 
 #include <String\StringUtil.h>
 #include <Util\EndianUtil.h>
+#include <Util\ScopedPointer.h>
 #include <IFileSys.h>
 
 #include "XTextureFile.h"
@@ -115,15 +116,15 @@ namespace PSD
 			int8_t* tmpData = X_NEW_ARRAY_ALIGNED(int8_t, header.width * header.height, g_textureDataArena, "PsdTmpbuf", 8);
 			uint16_t* rleCount = X_NEW_ARRAY_ALIGNED(uint16_t, header.width * header.channels, g_textureDataArena, "PsdTmpRowbuf", 8);
 
+			core::ScopedPointer<int8_t[]> scoped_tmpData(tmpData, g_textureDataArena);
+			core::ScopedPointer<uint16_t[]> scoped_rleCount(rleCount, g_textureDataArena);
+
 			uint32_t size = 0;
 
 			for (uint32_t y = 0; y<header.height * header.channels; ++y)
 			{
 				if (!file->read(&rleCount[y], sizeof(int16_t)))
 				{
-					X_DELETE_ARRAY(tmpData, g_textureDataArena);
-					X_DELETE_ARRAY(rleCount, g_textureDataArena);
-
 					X_ERROR("TexturePSD", "failed to read rle rows");
 					return false;
 				}
@@ -136,12 +137,11 @@ namespace PSD
 			}
 
 			int8_t* buf = X_NEW_ARRAY_ALIGNED(int8_t, size, g_textureDataArena, "PsdTmpBuf", 8);
+
+			core::ScopedPointer<int8_t[]> scoped_buf(buf, g_textureDataArena);
+
 			if (!file->read(buf, size))
 			{
-				X_DELETE_ARRAY(tmpData, g_textureDataArena);
-				X_DELETE_ARRAY(rleCount, g_textureDataArena);
-				X_DELETE_ARRAY(buf, g_textureDataArena);
-
 				X_ERROR("TexturePSD", "failed to read rle rows");
 				return false;
 			}
@@ -210,10 +210,6 @@ namespace PSD
 				}
 			}
 
-			X_DELETE_ARRAY(tmpData, g_textureDataArena);
-			X_DELETE_ARRAY(rleCount, g_textureDataArena);
-			X_DELETE_ARRAY(buf, g_textureDataArena);
-
 			return true;
 		}
 
@@ -221,6 +217,7 @@ namespace PSD
 		bool readRawImageData(core::XFile* file, const PsdHeader& header, uint32_t* imageData)
 		{
 			uint8_t* tmpData = X_NEW_ARRAY_ALIGNED(uint8_t, header.width * header.height, g_textureDataArena, "PsdTempBuf", 8);
+			core::ScopedPointer<uint8_t[]> scoped_tmpData(tmpData, g_textureDataArena);
 
 			for (int32_t channel = 0; channel<header.channels && channel < 3; ++channel)
 			{
@@ -247,7 +244,6 @@ namespace PSD
 				}
 			}
 
-			X_DELETE_ARRAY(tmpData, g_textureDataArena);
 			return true;
 		}
 
