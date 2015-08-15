@@ -112,7 +112,8 @@ struct XShaderParam
 	XShaderParam& operator = (const XShaderParam& sb)
 	{
 		this->~XShaderParam();
-		new(this) XShaderParam(sb);
+		// new(this) XShaderParam(sb);
+		core::Mem::Construct(this, sb);
 		return *this;
 	}
 };

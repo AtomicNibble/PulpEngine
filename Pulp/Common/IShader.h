@@ -8,6 +8,8 @@
 #include <String\StrRef.h>
 #include <Math\XColor.h>
 
+#include <Memory\NewAndDelete.h>
+
 X_NAMESPACE_DECLARE(texture, class XTexture);
 
 #include <ITexture.h>
@@ -276,7 +278,8 @@ struct XTexState
 	X_INLINE XTexState& operator=(const XTexState& src)
 	{
 		this->~XTexState();
-		new(this)XTexState(src);
+		// new(this)XTexState(src);
+		core::Mem::Construct(this, src);
 		return *this;
 	}
 
