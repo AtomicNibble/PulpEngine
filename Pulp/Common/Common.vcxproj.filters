@@ -1006,6 +1006,9 @@
     <ClInclude Include="Threading\Semaphore.h">
       <Filter>Headers\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\win32\ThreadLocalStorage.h">
+      <Filter>Headers\Threading\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1102,9 +1105,6 @@
       <Filter>Headers\Threading</Filter>
     </None>
     <None Include="Threading\Spinlock.inl">
-      <Filter>Headers\Threading</Filter>
-    </None>
-    <None Include="Threading\ThreadLocalStorage.inl">
       <Filter>Headers\Threading</Filter>
     </None>
     <None Include="Debugging\win32\CallStack.inl">
@@ -1261,6 +1261,9 @@
       <Filter>Headers\Threading\win32</Filter>
     </None>
     <None Include="Threading\win32\Semaphore.inl">
+      <Filter>Headers\Threading\win32</Filter>
+    </None>
+    <None Include="Threading\win32\ThreadLocalStorage.inl">
       <Filter>Headers\Threading\win32</Filter>
     </None>
   </ItemGroup>

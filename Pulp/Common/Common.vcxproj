@@ -280,6 +280,7 @@
     <ClInclude Include="Threading\win32\Semaphore.h" />
     <ClInclude Include="Threading\win32\Signal.h" />
     <ClInclude Include="Threading\win32\Thread.h" />
+    <ClInclude Include="Threading\win32\ThreadLocalStorage.h" />
     <ClInclude Include="Time\CompressedStamps.h" />
     <ClInclude Include="Time\DateStamp.h" />
     <ClInclude Include="Time\TimeStamp.h" />
@@ -388,9 +389,9 @@
     <None Include="Threading\Atomic.inl" />
     <None Include="Threading\AtomicInt.inl" />
     <None Include="Threading\Spinlock.inl" />
-    <None Include="Threading\ThreadLocalStorage.inl" />
     <None Include="Threading\win32\CriticalSection.inl" />
     <None Include="Threading\win32\Semaphore.inl" />
+    <None Include="Threading\win32\ThreadLocalStorage.inl" />
     <None Include="Util\BitUtil.inl" />
     <None Include="Util\Cpu.inl" />
     <None Include="Util\EndianUtil.inl" />
