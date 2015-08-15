@@ -274,6 +274,113 @@ TEST(Path, ExtensionW)
 	EXPECT_STREQ(L".good", path.extension());
 }
 
+TEST(Path, setExtension)
+{
+	{
+		core::Path<char> path("why\\do\\goats\\smell.so.good");
+		path.setExtension("");
+		EXPECT_STREQ("why\\do\\goats\\smell.so", path.c_str());
+	}
+	{
+		core::Path<char> path("why\\do\\goats\\");
+		path.setExtension(".cat");
+		EXPECT_STREQ("why\\do\\goats\\.cat", path.c_str());
+	}
+	{
+		core::Path<char> path("why\\do\\goats\\smell.");
+		path.setExtension("sexy");
+		EXPECT_STREQ("why\\do\\goats\\smell.sexy", path.c_str());
+	}
+	{
+		core::Path<char> path("why\\do\\goats\\smell.");
+		path.setExtension(".sexy");
+		EXPECT_STREQ("why\\do\\goats\\smell.sexy", path.c_str());
+	}
+	{
+		core::Path<char> path("why\\do\\goats\\smell.");
+		path.setExtension(".sexy");
+		EXPECT_STREQ("why\\do\\goats\\smell.sexy", path.c_str());
+	}
+}
+
+TEST(Path, setExtensionW)
+{
+	{
+		core::Path<wchar_t> path(L"why\\do\\goats\\smell.so.good");
+		path.setExtension(L"");
+		EXPECT_STREQ(L"why\\do\\goats\\smell.so", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"why\\do\\goats\\");
+		path.setExtension(L".cat");
+		EXPECT_STREQ(L"why\\do\\goats\\.cat", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"why\\do\\goats\\smell.");
+		path.setExtension(L"sexy");
+		EXPECT_STREQ(L"why\\do\\goats\\smell.sexy", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"why\\do\\goats\\smell.");
+		path.setExtension(L".sexy");
+		EXPECT_STREQ(L"why\\do\\goats\\smell.sexy", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"why\\do\\goats\\smell");
+		path.setExtension(L".sexy");
+		EXPECT_STREQ(L"why\\do\\goats\\smell.sexy", path.c_str());
+	}
+}
+
+
+TEST(Path, setFileName)
+{
+	{
+		core::Path<char> path("why\\do\\goats\\smell.so.good");
+		path.setFileName("");
+		EXPECT_STREQ("why\\do\\goats\\", path.c_str());
+	}
+	{
+		core::Path<char> path("why\\do\\goats\\");
+		path.setFileName("fat_cat");
+		EXPECT_STREQ("why\\do\\goats\\fat_cat", path.c_str());
+	}
+	{
+		core::Path<char> path("why\\do\\goats\\smell.");
+		path.setFileName("sezy.pickle");
+		EXPECT_STREQ("why\\do\\goats\\sezy.pickle", path.c_str());
+	}
+	{
+		core::Path<char> path("why\\do\\goats\\smell.");
+		path.setFileName("BigGoat");
+		EXPECT_STREQ("why\\do\\goats\\BigGoat", path.c_str());
+	}
+}
+
+TEST(Path, setFileNameW)
+{
+	{
+		core::Path<wchar_t> path(L"why\\do\\goats\\smell.so.good");
+		path.setFileName(L"");
+		EXPECT_STREQ(L"why\\do\\goats\\", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"why\\do\\goats\\");
+		path.setFileName(L"fat_cat");
+		EXPECT_STREQ(L"why\\do\\goats\\fat_cat", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"why\\do\\goats\\smell.");
+		path.setFileName(L"sezy.pickle");
+		EXPECT_STREQ(L"why\\do\\goats\\sezy.pickle", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"why\\do\\goats\\smell.");
+		path.setFileName(L"BigGoat");
+		EXPECT_STREQ(L"why\\do\\goats\\BigGoat", path.c_str());
+	}
+}
+
 
 TEST(Path, Assign)
 {
@@ -420,6 +527,34 @@ TEST(Path, EncureSlash)
 	}
 }
 
+TEST(Path, EncureSlashW)
+{
+	{
+		core::Path<wchar_t> path(L"c:\\");
+		path.ensureSlash();
+		EXPECT_STREQ(L"c:\\", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat");
+		path.ensureSlash();
+		EXPECT_STREQ(L"c:\\goat\\", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat/");
+		path.ensureSlash();
+		EXPECT_STREQ(L"c:\\goat/\\", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat.");
+		path.ensureSlash();
+		EXPECT_STREQ(L"c:\\goat.\\", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat.ext");
+		path.ensureSlash();
+		EXPECT_STREQ(L"c:\\goat.ext\\", path.c_str());
+	}
+}
 
 TEST(Path, replaceSeprators)
 {
@@ -432,6 +567,20 @@ TEST(Path, replaceSeprators)
 		core::Path<char> path("c:\\pickle/goat");
 		path.replaceSeprators();
 		EXPECT_STREQ("c:\\pickle\\goat", path.c_str());
+	}
+}
+
+TEST(Path, replaceSepratorsW)
+{
+	{
+		core::Path<wchar_t> path(L"c:\\pickle/\\goat\\");
+		path.replaceSeprators();
+		EXPECT_STREQ(L"c:\\pickle\\\\goat\\", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\pickle/goat");
+		path.replaceSeprators();
+		EXPECT_STREQ(L"c:\\pickle\\goat", path.c_str());
 	}
 }
 
@@ -461,5 +610,151 @@ TEST(Path, RemoveFileName)
 		core::Path<char> path("c:\\goat.ext");
 		path.removeFileName();
 		EXPECT_STREQ("c:\\", path.c_str());
+	}
+}
+
+TEST(Path, RemoveFileNameW)
+{
+	{
+		core::Path<wchar_t> path(L"c:\\");
+		path.removeFileName();
+		EXPECT_STREQ(L"c:\\", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat");
+		path.removeFileName();
+		EXPECT_STREQ(L"c:\\", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat/");
+		path.removeFileName();
+		EXPECT_STREQ(L"c:\\goat/", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat.");
+		path.removeFileName();
+		EXPECT_STREQ(L"c:\\", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat.ext");
+		path.removeFileName();
+		EXPECT_STREQ(L"c:\\", path.c_str());
+	}
+}
+
+TEST(Path, RemoveExtension)
+{
+	{
+		core::Path<char> path("c:\\");
+		path.removeExtension();
+		EXPECT_STREQ("c:\\", path.c_str());
+	}
+	{
+		core::Path<char> path("c:\\goat");
+		path.removeExtension();
+		EXPECT_STREQ("c:\\goat", path.c_str());
+	}
+	{
+		core::Path<char> path("c:\\goat/");
+		path.removeExtension();
+		EXPECT_STREQ("c:\\goat/", path.c_str());
+	}
+	{
+		core::Path<char> path("c:\\goat.");
+		path.removeExtension();
+		EXPECT_STREQ("c:\\goat", path.c_str());
+	}
+	{
+		core::Path<char> path("c:\\goat.ext");
+		path.removeExtension();
+		EXPECT_STREQ("c:\\goat", path.c_str());
+	}
+	{
+		core::Path<char> path("c:\\goat.ext.cat");
+		path.removeExtension();
+		EXPECT_STREQ("c:\\goat.ext", path.c_str());
+	}
+}
+
+
+TEST(Path, RemoveExtensionW)
+{
+	{
+		core::Path<wchar_t> path(L"c:\\");
+		path.removeExtension();
+		EXPECT_STREQ(L"c:\\", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat");
+		path.removeExtension();
+		EXPECT_STREQ(L"c:\\goat", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat/");
+		path.removeExtension();
+		EXPECT_STREQ(L"c:\\goat/", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat.");
+		path.removeExtension();
+		EXPECT_STREQ(L"c:\\goat", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat.ext");
+		path.removeExtension();
+		EXPECT_STREQ(L"c:\\goat", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat.ext.cat");
+		path.removeExtension();
+		EXPECT_STREQ(L"c:\\goat.ext", path.c_str());
+	}
+}
+
+TEST(Path, RemoveTrailingSlash)
+{
+	{
+		core::Path<char> path("c:\\");
+		path.removeTrailingSlash();
+		EXPECT_STREQ("c:", path.c_str());
+	}
+	{
+		core::Path<char> path("c:\\goat\\");
+		path.removeTrailingSlash();
+		EXPECT_STREQ("c:\\goat", path.c_str());
+	}
+	{
+		core::Path<char> path("c:\\goat/");
+		path.removeTrailingSlash();
+		EXPECT_STREQ("c:\\goat", path.c_str());
+	}
+	{
+		core::Path<char> path("c:\\goat");
+		path.removeTrailingSlash();
+		EXPECT_STREQ("c:\\goat", path.c_str());
+	}
+}
+
+TEST(Path, RemoveTrailingSlashW)
+{
+	{
+		core::Path<wchar_t> path(L"c:\\");
+		path.removeTrailingSlash();
+		EXPECT_STREQ(L"c:", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat\\");
+		path.removeTrailingSlash();
+		EXPECT_STREQ(L"c:\\goat", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat/");
+		path.removeTrailingSlash();
+		EXPECT_STREQ(L"c:\\goat", path.c_str());
+	}
+	{
+		core::Path<wchar_t> path(L"c:\\goat");
+		path.removeTrailingSlash();
+		EXPECT_STREQ(L"c:\\goat", path.c_str());
 	}
 }
