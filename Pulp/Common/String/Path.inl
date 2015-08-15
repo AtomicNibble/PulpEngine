@@ -59,22 +59,18 @@ void Path<TChar>::setExtension(const TChar* extension)
 	bool has_dot = (extension[0] == '.'); // new extension got a dot?
 	bool is_blank = (extension[0] == '\0'); // 
 
-	if (remove) { // replace making sure dot is kept.
-		// check if the same.
-		if (strUtil::IsEqual(has_dot ? remove : remove + 1, extension))
-			return;
-
-		// replace last.
-		if (is_blank)
-			--remove;
-		replace(remove, ++remove, has_dot ? ++extension : extension);
-		return;
+	if (remove) { 
+		trimRight(remove);
 	}
 
-	if (!has_dot)
-		append('.',1);
-	
-	append(extension);
+	if (!is_blank) 
+	{
+		if (!has_dot) {
+			append('.', 1);
+		}
+
+		append(extension);
+	}
 }
 
 template<typename TChar>
