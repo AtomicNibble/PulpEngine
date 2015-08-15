@@ -521,7 +521,7 @@ bool XMapFile::Parse(core::XFile* file)
 {
 	size_t size = file->remainingBytes();
 
-	core::ScopedPointer<char> pData(X_NEW_ARRAY(char, size, g_arena, "LexTextBuf"), g_arena);
+	core::ScopedPointer<char[]> pData(X_NEW_ARRAY(char, size, g_arena, "LexTextBuf"), g_arena);
 
 	entities.reserve(2048);
 
