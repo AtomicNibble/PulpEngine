@@ -242,7 +242,7 @@ public:
 	~XMapEntity(void);
 
 	size_t					GetNumPrimitives(void) const { return primitives.size(); }
-	XMapPrimitive *			GetPrimitive(int i) const { return primitives[i]; }
+	XMapPrimitive *			GetPrimitive(size_t i) const { return primitives[i]; }
 	void					AddPrimitive(XMapPrimitive *p) { primitives.push_back(p); }
 	unsigned int			GetGeometryCRC(void) const;
 	void					RemovePrimitiveData();
