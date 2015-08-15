@@ -1000,6 +1000,9 @@
     <ClInclude Include="Threading\CriticalSection.h">
       <Filter>Headers\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\win32\ConditionVariable.h">
+      <Filter>Headers\Threading\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1349,9 +1352,6 @@
     <ClCompile Include="Platform\win32\Window.cpp">
       <Filter>SourceFiles\Platform\win32</Filter>
     </ClCompile>
-    <ClCompile Include="Threading\ConditionVariable.cpp">
-      <Filter>SourceFiles\Threading</Filter>
-    </ClCompile>
     <ClCompile Include="Debugging\win32\CallStack.cpp">
       <Filter>SourceFiles\Debugging\win32</Filter>
     </ClCompile>
@@ -1516,6 +1516,9 @@
       <Filter>SourceFiles\String</Filter>
     </ClCompile>
     <ClCompile Include="Threading\win32\CriticalSection.cpp">
+      <Filter>SourceFiles\Threading\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\win32\ConditionVariable.cpp">
       <Filter>SourceFiles\Threading\win32</Filter>
     </ClCompile>
   </ItemGroup>
