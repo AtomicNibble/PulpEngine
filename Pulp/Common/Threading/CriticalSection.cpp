@@ -7,7 +7,7 @@ X_NAMESPACE_BEGIN(core)
 
 CriticalSection::CriticalSection(void)
 {
-	InitializeCriticalSection( &m_cs );
+	InitializeCriticalSection( &cs_ );
 }
 
 /// \brief Initializes the critical section with a certain spin count.
@@ -15,31 +15,31 @@ CriticalSection::CriticalSection(void)
 /// the critical section if spinning was unsuccessful.
 CriticalSection::CriticalSection(unsigned int spinCount)
 {
-	InitializeCriticalSectionAndSpinCount( &m_cs, spinCount );
+	InitializeCriticalSectionAndSpinCount(&cs_, spinCount);
 }
 
 /// Releases OS resources of the critical section.
 CriticalSection::~CriticalSection(void)
 {
-	DeleteCriticalSection( &m_cs );
+	DeleteCriticalSection(&cs_);
 }
 
 /// Enters the critical section.
 void CriticalSection::Enter(void)
 {
-	EnterCriticalSection( &m_cs );
+	EnterCriticalSection(&cs_);
 }
 
 /// Tries to enter the critical section, and returns whether the operation was successful.
 bool CriticalSection::TryEnter(void)
 {
-	return TryEnterCriticalSection( &m_cs ) != 0;
+	return TryEnterCriticalSection(&cs_) != 0;
 }
 
 /// Leaves the critical section.
 void CriticalSection::Leave(void)
 {
-	LeaveCriticalSection( &m_cs );
+	LeaveCriticalSection(&cs_);
 }
 
 
