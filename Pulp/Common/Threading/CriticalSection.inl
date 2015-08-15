@@ -3,14 +3,14 @@
 // ---------------------------------------------------------------------------------------------------------------------
 inline CRITICAL_SECTION* CriticalSection::GetNativeObject(void)
 {
-	return &m_cs;
+	return &cs_;
 }
 
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 inline CriticalSection::ScopedLock::ScopedLock(CriticalSection& criticalSection)
-	: m_cs(criticalSection)
+	: cs_(criticalSection)
 {
 	criticalSection.Enter();
 }
@@ -20,7 +20,7 @@ inline CriticalSection::ScopedLock::ScopedLock(CriticalSection& criticalSection)
 // ---------------------------------------------------------------------------------------------------------------------
 inline CriticalSection::ScopedLock::~ScopedLock(void)
 {
-	m_cs.Leave();
+	cs_.Leave();
 }
 
 

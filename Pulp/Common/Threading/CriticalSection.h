@@ -85,11 +85,11 @@ public:
 		X_NO_COPY(ScopedLock);
 		X_NO_ASSIGN(ScopedLock);
 
-		CriticalSection& m_cs;
+		CriticalSection& cs_;
 	};
 
 private:
-	CRITICAL_SECTION m_cs;
+	CRITICAL_SECTION cs_;
 };
 
 #include "CriticalSection.inl"
