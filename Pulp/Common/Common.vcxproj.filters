@@ -493,9 +493,6 @@
     <ClInclude Include="Logging\Logger.h">
       <Filter>Headers\Logging</Filter>
     </ClInclude>
-    <ClInclude Include="Threading\CriticalSection.h">
-      <Filter>Headers\Threading</Filter>
-    </ClInclude>
     <ClInclude Include="Logging\FilterPolicies\LoggerVerbosityFilterPolicy.h">
       <Filter>Headers\Logging\FilterPolicies</Filter>
     </ClInclude>
@@ -997,6 +994,9 @@
     <ClInclude Include="Hashing\SHA512.h">
       <Filter>Headers\Hashing</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\win32\CriticalSection.h">
+      <Filter>Headers\Threading\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1070,9 +1070,6 @@
     </None>
     <None Include="Logging\Logger.inl">
       <Filter>Headers\Logging</Filter>
-    </None>
-    <None Include="Threading\CriticalSection.inl">
-      <Filter>Headers\Threading</Filter>
     </None>
     <None Include="Debugging\SymbolInfo.inl">
       <Filter>Headers\Debugging</Filter>
@@ -1254,6 +1251,9 @@
     <None Include="String\StackStringW.inl">
       <Filter>Headers\String</Filter>
     </None>
+    <None Include="Threading\win32\CriticalSection.inl">
+      <Filter>Headers\Threading\win32</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">
@@ -1333,9 +1333,6 @@
     </ClCompile>
     <ClCompile Include="Memory\MemInfo.cpp">
       <Filter>SourceFiles\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="Threading\CriticalSection.cpp">
-      <Filter>SourceFiles\Threading</Filter>
     </ClCompile>
     <ClCompile Include="Util\win32\LastError.cpp">
       <Filter>SourceFiles\win32</Filter>
@@ -1514,6 +1511,9 @@
     </ClCompile>
     <ClCompile Include="String\StringUtilW.cpp">
       <Filter>SourceFiles\String</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\win32\CriticalSection.cpp">
+      <Filter>SourceFiles\Threading\win32</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
