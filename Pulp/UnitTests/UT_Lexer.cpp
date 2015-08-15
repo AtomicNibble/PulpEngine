@@ -6,6 +6,8 @@
 #include <String\StrRef.h>
 #include <String\StackString.h>
 
+#include <Util\ScopedPointer.h>
+
 #include <IFileSys.h>
 
 X_USING_NAMESPACE;
@@ -60,7 +62,7 @@ class XMapBrush : public XMapPrimitive
 {
 public:
 	XMapBrush(void) { type = TYPE_BRUSH;  sides.reserve(6); }
-	~XMapBrush(void) { }
+	~XMapBrush(void);
 
 	int						GetNumSides(void) const { return (int)sides.size(); }
 	void					AddSide(XMapBrushSide *side) { sides.push_back(side); }
@@ -73,6 +75,14 @@ public:
 protected:
 	std::vector<XMapBrushSide*> sides;
 };
+
+
+XMapBrush::~XMapBrush(void)
+{
+	for (auto& side : sides) {
+		X_DELETE(side, g_arena);
+	}
+}
 
 class XMapPatch : public XMapPrimitive
 {
@@ -216,7 +226,7 @@ XMapPatch* XMapPatch::Parse(XLexer &src, const Vec3f &origin)
 		if (src.ExpectTokenString("}"))
 		{
 			// valid
-			XMapPatch *patch = new XMapPatch();
+			XMapPatch *patch = X_NEW(XMapPatch, g_arena, "MapPatch");
 			return patch;
 		}
 	}
@@ -228,10 +238,10 @@ class XMapEntity
 {
 
 public:
+	XMapEntity(void);
+	~XMapEntity(void);
 
-	XMapEntity(void) {}
-	~XMapEntity(void) {}
-	int						GetNumPrimitives(void) const { return (int)primitives.size(); }
+	size_t					GetNumPrimitives(void) const { return primitives.size(); }
 	XMapPrimitive *			GetPrimitive(int i) const { return primitives[i]; }
 	void					AddPrimitive(XMapPrimitive *p) { primitives.push_back(p); }
 	unsigned int			GetGeometryCRC(void) const;
@@ -241,9 +251,19 @@ public:
 	static XMapEntity*	Parse(XLexer &src, bool worldSpawn = false);
 private:
 	std::vector<XMapPrimitive*>	primitives;
-
-
 };
+
+XMapEntity::XMapEntity()
+{
+
+}
+
+XMapEntity::~XMapEntity(void)
+{
+	for (auto& prim : primitives) {
+		X_DELETE(prim, g_arena);
+	}
+}
 
 bool XMapBrushSide::ParseMatInfo(XLexer &src, XMapBrushSide::MaterialInfo& info)
 {
@@ -282,13 +302,13 @@ XMapBrush* XMapBrush::Parse(XLexer &src, const Vec3f &origin)
 	XMapBrushSide* side;
 	XMapBrush* brush;
 
-	brush = new XMapBrush();
+	brush = X_NEW(XMapBrush, g_arena, "MapBrush");
 
 	do 
 	{
 		if (!src.ReadToken(token)) {
 			src.Error("MapBrush::Parse: unexpected EOF");
-			delete brush;
+			X_DELETE(brush, g_arena);
 			return nullptr;
 		}
 		if (token.isEqual("}")) {
@@ -305,27 +325,27 @@ XMapBrush* XMapBrush::Parse(XLexer &src, const Vec3f &origin)
 			if (token.type != TT_NAME) {
 				src.Error("MapBrush::Parse: unexpected %.*s, expected '(' or pair key string.", 
 					token.length(), token.begin());
-				delete brush;
+				X_DELETE(brush, g_arena);
 				return nullptr;
 			}
 
 			if (!src.ReadTokenOnLine(token) || (token.type != TT_STRING && token.type != TT_NAME)) {
 				src.Error("MapBrush::Parse: expected pair value string not found.");
-				delete brush;
+				X_DELETE(brush, g_arena);
 				return nullptr;
 			}
 
 			// try to read the next key
 			if (!src.ReadToken(token)) {
 				src.Error("MapBrush::Parse: unexpected EOF");
-				delete brush;
+				X_DELETE(brush, g_arena);
 				return nullptr;
 			}
 
 			if (token.isEqual(";")) {
 				if (!src.ReadToken(token)) {
 					src.Error("MapBrush::Parse: unexpected EOF");
-					delete brush;
+					X_DELETE(brush, g_arena);
 					return nullptr;
 				}
 			}
@@ -334,7 +354,7 @@ XMapBrush* XMapBrush::Parse(XLexer &src, const Vec3f &origin)
 
 		src.UnreadToken(token);
 
-		side = new XMapBrushSide();
+		side = X_NEW(XMapBrushSide, g_arena, "MapBrushSide");
 		brush->sides.push_back(side);
 
 		// read the three point plane definition
@@ -342,7 +362,7 @@ XMapBrush* XMapBrush::Parse(XLexer &src, const Vec3f &origin)
 			!src.Parse1DMatrix(3, &planepts[1][0]) ||
 			!src.Parse1DMatrix(3, &planepts[2][0])) {
 			src.Error("MapBrush::Parse: unable to read brush plane definition.");
-			delete brush;
+			X_DELETE(brush, g_arena);
 			return nullptr;
 		}
 
@@ -383,7 +403,7 @@ XMapEntity*	XMapEntity::Parse(XLexer &src, bool worldSpawn)
 		return nullptr;
 	}
 
-	mapEnt = new XMapEntity();
+	mapEnt = X_NEW( XMapEntity, g_arena, "MapEnt");
 
 	if (worldSpawn) {
 		mapEnt->primitives.reserve(1024);
@@ -471,39 +491,52 @@ XMapEntity*	XMapEntity::Parse(XLexer &src, bool worldSpawn)
 class XMapFile
 {
 public:
-	XMapFile() {}
+	XMapFile();
+	~XMapFile();
 
 	bool Parse(core::XFile* file);
 
-	int	GetNumEntities(void) const { return (int)entities.size(); }
+	size_t GetNumEntities(void) const { return entities.size(); }
 
-	XMapEntity* GetEntity(int i) const { return entities[i]; }
+	XMapEntity* GetEntity(size_t i) const { return entities[i]; }
 
 private:
-	std::vector<XMapEntity *>	entities;
+	std::vector<XMapEntity*> entities;
 
 };
 
+XMapFile::XMapFile()
+{
 
+}
+
+XMapFile::~XMapFile()
+{
+	for (auto& ent : entities) {
+		X_DELETE(ent, g_arena);
+	}
+}
 
 bool XMapFile::Parse(core::XFile* file)
 {
 	size_t size = file->remainingBytes();
 
-	char* pData = new char[size];
+	core::ScopedPointer<char> pData(X_NEW_ARRAY(char, size, g_arena, "LexTextBuf"), g_arena);
 
 	entities.reserve(2048);
 
 	gEnv->pCore->GetIProfileSys()->FrameBegin();
 
 
-	if (file->read(pData, (uint32_t)size) == size)
+	if (file->read(pData.get(), (uint32_t)size) == size)
 	{
-		XLexer lexer(pData, pData + size);
+		XLexer lexer(pData.get(), pData.get() + size);
 		XLexToken token;
 		XMapEntity *mapEnt;
 
-		lexer.setFlags(LexFlag::NOSTRINGCONCAT | LexFlag::NOSTRINGESCAPECHARS | LexFlag::ALLOWPATHNAMES);
+		lexer.setFlags(LexFlag::NOSTRINGCONCAT |
+			LexFlag::NOSTRINGESCAPECHARS | 
+			LexFlag::ALLOWPATHNAMES);
 
 		// we need to parse up untill the first brace.
 		while (lexer.ReadToken(token))
@@ -528,8 +561,6 @@ bool XMapFile::Parse(core::XFile* file)
 
 	gEnv->pCore->GetIProfileSys()->FrameEnd();
 
-
-	delete pData;
 	return true;
 }
 
@@ -548,11 +579,11 @@ TEST(Lexer, Mapfile)
 		EXPECT_TRUE(map.Parse(map_file.GetFile()));
 
 		// work out some info.
-		int num = map.GetNumEntities();
-		int i, x;
+		size_t num = map.GetNumEntities();
+		size_t i, x;
 
-		int num_patch = 0;
-		int num_brush = 0;
+		size_t num_patch = 0;
+		size_t num_brush = 0;
 
 		for (i = 0; i < num; i++)
 		{
