@@ -130,7 +130,8 @@ namespace {
 				shader::ShaderTextureIdx::Enum texId;
 				core::StackString<256> name;
 
-				if (attr = texture->first_attribute("type", 4))
+				attr = texture->first_attribute("type", 4);
+				if (attr)
 				{
 					// check it's a valid type
 					const char* typeBegin = attr->value();
@@ -158,7 +159,8 @@ namespace {
 					continue;
 				}
 
-				if (attr = texture->first_attribute("image_name", 10))
+				attr = texture->first_attribute("image_name", 10);
+				if (attr)
 				{
 					if (attr->value_size() < 2)
 					{
@@ -362,9 +364,10 @@ void XMaterialManager::ShutDown(void)
 bool XMaterialManager::OnFileChange(const char* name)
 {
 	const char* fileExt;		
-	if (fileExt = core::strUtil::FileExtension(name))
-	{
 
+	fileExt = core::strUtil::FileExtension(name);
+	if (fileExt)
+	{
 		if (core::strUtil::IsEqual(MTL_FILE_EXTENSION, fileExt))
 		{
 			X_LOG0("Material", "reload material: \"%s\"", name);
@@ -444,7 +447,8 @@ IMaterial* XMaterialManager::loadMaterial(const char* MtlName)
 	const char* pExt;
 	IMaterial* iMat;
 
-	if((pExt = core::strUtil::FileExtension(MtlName)))
+	pExt = core::strUtil::FileExtension(MtlName);
+	if(pExt)
 	{
 		// engine should not make requests for materials with a extensiob
 		X_ERROR("MtlMan", "Invalid mtl name extension was included: %s",
@@ -454,18 +458,23 @@ IMaterial* XMaterialManager::loadMaterial(const char* MtlName)
 	}
 
 	// try find it.
-	if (iMat = findMaterial(MtlName)){
+	iMat = findMaterial(MtlName);
+
+	if (iMat)
+	{
 		// inc ref count.
 		((XMaterial*)iMat)->addRef();
 		return iMat;
 	}
 
 	// lets look for binary first.
-	if ((iMat = loadMaterialCompiled(MtlName))) {
+	iMat = loadMaterialCompiled(MtlName);
+	if (iMat) {
 		return iMat;
 	}
 
-	if ((iMat = loadMaterialXML(MtlName))) {
+	iMat = loadMaterialXML(MtlName);
+	if (iMat) {
 		return iMat;
 	}
 
@@ -477,7 +486,7 @@ void XMaterialManager::unregister(IMaterial* pMat)
 {
 	X_ASSERT_NOT_NULL(pMat);
 
-	XMaterial* pXMat = (XMaterial*)pMat;
+//	XMaterial* pXMat = (XMaterial*)pMat;
 
 	if (pListner_)
 		pListner_->OnDeleteMaterial(pMat);
@@ -681,7 +690,9 @@ bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 
 	for (i = 0, numTex = 0; i < ShaderTextureIdx::ENUM_COUNT; i++)
 	{
-		if (pTex = pRes->getTexture((ShaderTextureIdx::Enum)i))
+		pTex = pRes->getTexture((ShaderTextureIdx::Enum)i);
+
+		if (pTex)
 		{
 			textures[numTex].name.set(pTex->name);
 			textures[numTex].type = (ShaderTextureIdx::Enum)i;
@@ -689,7 +700,7 @@ bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 		}
 	}
 
-	hdr.numTextures = numTex;
+	hdr.numTextures = safe_static_cast<uint8_t, uint32_t>(numTex);
 
 	X_ASSERT(hdr.isValid(), "invalid header")();
 

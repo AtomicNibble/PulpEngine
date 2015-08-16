@@ -116,6 +116,7 @@ bool XGui::InitFromFile(const char* name)
 
 	mode.Set(core::fileMode::READ);
 
+	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 
 	// already init?
 	if (isDeskTopValid())
@@ -151,8 +152,6 @@ bool XGui::InitFromFile(const char* name)
 	path = "gui\\";
 	path.setFileName(name);
 	path.setExtension(GUI_FILE_EXTENSION);
-
-	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 
 	// first we check if a binary file exsists.
 	if(gEnv->pFileSys->fileExists(pathBinary.c_str()))
@@ -222,7 +221,7 @@ SourceLoad:
 	if(sourceCrc32_ == 0)
 	{
 		sourceCrc32_ = pCrc32->GetCRC32(file->getBufferStart(), 
-			safe_static_cast<int32_t, size_t>(file->getSize()));
+			file->getSize());
 	}
 
 	X_LOG0("Gui", "parsing: \"%s\"", path.c_str());

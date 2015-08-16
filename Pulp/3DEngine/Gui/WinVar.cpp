@@ -18,6 +18,7 @@ XWinVar::~XWinVar()
 void XWinVar::Init(const char* _name, XWindow* win)
 {
 	Set(_name);
+	X_UNUSED(win);
 }
 
 // the file loades.

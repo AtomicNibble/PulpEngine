@@ -81,13 +81,13 @@ X_INLINE ColorT<T>::ColorT(const Vec4f& src) :
 template<typename T>
 X_INLINE void ColorT<T>::set(T _r, T _g, T _b, T _a)
 {
-	r = _r; g = _g; b = _b; r = _r;
+	r = _r; g = _g; b = _b; a = _a;
 }
 
 template<typename T>
 X_INLINE void ColorT<T>::set(const ColorT<T>& rhs)
 {
-	r = rhs.r; g = rhs.g; b = rhs.b; r = rhs.r;
+	r = rhs.r; g = rhs.g; b = rhs.b; a = rhs.a;
 }
 template<typename T>
 X_INLINE ColorT<T>::operator T*()

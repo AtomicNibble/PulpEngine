@@ -140,7 +140,7 @@ void Level::FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum,
 		for (i = 0; i < addPlanes; i++)
 		{
 			j = i + 1;
-			if (j == w.getNumPoints()) {
+			if (safe_static_cast<int,size_t>(j) == w.getNumPoints()) {
 				j = 0;
 			}
 

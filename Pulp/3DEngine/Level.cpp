@@ -339,7 +339,9 @@ bool Level::IsPointInAnyArea(const Vec3f& pos, int32_t& areaOut) const
 	const AreaNode* pNode = &areaNodes_[0];
 	int32_t nodeNum;
 
-	while (1)
+	X_DISABLE_WARNING(4127)
+	while (true)
+	X_ENABLE_WARNING(4127)
 	{
 		float dis = pNode->plane.distance(pos);
 

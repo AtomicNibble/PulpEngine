@@ -108,8 +108,8 @@ IGui* XGuiManager::loadGui(const char* name)
 	X_ASSERT_NOT_NULL(name);
 	XGui* pGui = nullptr;
 
-	pGui = static_cast<XGui*>(findGui(name))
-	if (pGui) {
+	pGui = static_cast<XGui*>(findGui(name));
+	if (!pGui) {
 		return pGui;
 	}
 
@@ -185,12 +185,14 @@ void XGuiManager::listGuis(const char* wildcardSearch) const
 bool XGuiManager::OnFileChange(const char* name)
 {
 	core::Path<char> path(name);
-	XGui* pGui;
+	XGui* pGui = nullptr;
 
 	// we don't keep extension for name.
 	path.removeExtension();
 
-	if (pGui = static_cast<XGui*>(findGui(path.fileName())))
+	pGui = static_cast<XGui*>(findGui(path.fileName()));
+
+	if (pGui)
 	{
 		path = path.fileName();
 

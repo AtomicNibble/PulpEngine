@@ -225,10 +225,7 @@ void XRegisterList::AddReg(const char* name, RegisterType::Enum type, core::XPar
 		{
 			for (int i = 0; i < numRegs; i++)
 			{
-				reg->regs_[i] = win->ParseExpression(lex , NULL);
-			//	if (i < numRegs - 1) {
-			//		src->ExpectTokenString(",");
-			//	}
+				reg->regs_[i] = safe_static_cast<uint16_t,int>(win->ParseExpression(lex , NULL));
 			}
 		}
 
