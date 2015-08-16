@@ -172,6 +172,8 @@ void Level::FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum,
 
 void Level::AddAreaRefs(int32_t areaNum, const PortalStack* ps)
 {
+	X_UNUSED(ps);
+
 	X_ASSERT((areaNum >= 0 && areaNum < safe_static_cast<int32_t, size_t>(NumAreas())),
 		"areaNum out of range")(areaNum, NumAreas());
 

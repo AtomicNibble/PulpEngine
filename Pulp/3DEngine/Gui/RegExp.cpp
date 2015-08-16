@@ -178,6 +178,9 @@ XRegisterList::~XRegisterList()
 void XRegisterList::AddReg(const char* name, RegisterType::Enum type, Vec4f data,
 	XWindow* win, XWinVar* var)
 {
+	X_UNUSED(data);
+	X_UNUSED(win);
+
 	if (FindReg(name) == nullptr)
 	{
 		int numRegs = XRegister::REGCOUNT[type];
