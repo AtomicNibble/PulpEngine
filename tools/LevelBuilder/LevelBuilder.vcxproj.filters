@@ -116,9 +116,6 @@
     <ClCompile Include="Winding.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
-    <ClCompile Include="TriTools.cpp">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
     <ClCompile Include="MapLoader.cpp">
       <Filter>Source Files\MapFile</Filter>
     </ClCompile>
