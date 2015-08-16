@@ -819,6 +819,7 @@ int XWindow::ParseTerm(core::XParser& lex, XWinVar* var, int component)
 	int	a;
 
 	X_UNUSED(var);
+	X_UNUSED(component);
 
 	lex.ReadToken(token);
 
@@ -1170,8 +1171,9 @@ bool XWindow::ParseScript(core::XParser& lex, XGuiScriptList& list )
 		return false;
 	}
 
-
-	while (1)
+	X_DISABLE_WARNING(4127)
+	while (true)
+	X_ENABLE_WARNING(4127)
 	{
 		if (!lex.ReadToken(token)) {
 			return false;
