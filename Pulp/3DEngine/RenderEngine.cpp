@@ -43,6 +43,7 @@ class XEngineModule_3DEngine : public IEngineModule
 	{
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pArena);
+		X_UNUSED(initParams);
 
 		engine::I3DEngine* engine = nullptr;
 
