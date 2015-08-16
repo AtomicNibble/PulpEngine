@@ -46,7 +46,9 @@ ExtendedMemoryTracking::~ExtendedMemoryTracking(void)
 		AllocationTable::const_iterator end = table_.end();
 		size_t Num = 1;
 
-		while(1)
+		X_DISABLE_WARNING(4127)
+		while (true)
+		X_ENABLE_WARNING(4127)
 		{
 			if( it == end )
 				break;
@@ -82,8 +84,13 @@ ExtendedMemoryTracking::~ExtendedMemoryTracking(void)
 
 
 /// Stores the allocation along with additional data in a hash map.
-void ExtendedMemoryTracking::OnAllocation(void* memory, size_t originalSize, size_t internalSize, size_t alignment, size_t offset, const char* ID, const char* typeName, const SourceInfo& sourceInfo, const char* memoryArenaName)
+void ExtendedMemoryTracking::OnAllocation(void* memory, size_t originalSize, size_t internalSize, 
+	size_t alignment, size_t offset, const char* ID, const char* typeName, 
+	const SourceInfo& sourceInfo, const char* memoryArenaName)
 {
+	X_UNUSED(alignment);
+	X_UNUSED(offset);
+
 	numAllocations_++;
 	table_.insert(std::make_pair(memory, AllocationData(originalSize, internalSize, ID, typeName, sourceInfo, memoryArenaName)));
 }

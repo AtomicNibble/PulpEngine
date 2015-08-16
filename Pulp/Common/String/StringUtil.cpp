@@ -98,7 +98,11 @@ namespace strUtil
 				if (load16(tgt - 1) == pair)
 					return tgt - 1;
 			}
-			while (1) {
+
+			X_DISABLE_WARNING(4127)
+			while (true)
+			X_ENABLE_WARNING(4127)
+			{
 				__m128i  x = xmload(tgt);
 				unsigned u = compxm(zero, x);
 				unsigned v = compxm(p0, x) & (compxm(p1, x) >> 1) & ~u & (u - 1);
@@ -132,7 +136,10 @@ namespace strUtil
 				if (u >> f) return  NULL;
 			}
 
-			while (1) {
+			X_DISABLE_WARNING(4127)
+			while (true)
+			X_ENABLE_WARNING(4127)
+			{
 				__m128i  x = xmload(tgt);
 				unsigned u = compxm(zero, x);
 				unsigned v = compxm(p0, x) & (compxm(p1, x) >> 1);
@@ -306,7 +313,7 @@ namespace strUtil
 
 	bool IsEqual(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2, const char* endExclusiveS2)
 	{
-		size_t Len = endExclusiveS1 - startInclusiveS1;
+		ptrdiff_t Len = endExclusiveS1 - startInclusiveS1;
 
 		if (Len == (endExclusiveS2 - startInclusiveS2))
 			return memcmp(startInclusiveS1, startInclusiveS2, Len) == 0;
@@ -327,7 +334,7 @@ namespace strUtil
 	/// Returns whether two strings are equal, checks the length of the 1st range.
 	bool IsEqualCaseInsen(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2)
 	{
-		size_t Len = endExclusiveS1 - startInclusiveS1;
+		ptrdiff_t Len = endExclusiveS1 - startInclusiveS1;
 
 		while (Len && *startInclusiveS2 
 			&& (::tolower(*startInclusiveS1) == ::tolower(*startInclusiveS2)))
@@ -342,7 +349,7 @@ namespace strUtil
 
 	bool IsEqualCaseInsen(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2, const char* endExclusiveS2)
 	{
-		size_t Len = endExclusiveS1 - startInclusiveS1;
+		ptrdiff_t Len = endExclusiveS1 - startInclusiveS1;
 
 		if (Len == (endExclusiveS2 - startInclusiveS2))
 		{
@@ -441,8 +448,11 @@ namespace strUtil
 			// if whitespace return it.
 			if (IsWhitespace(*endExclusive))
 				return endExclusive;
-		} while (1);
-
+		}
+		X_DISABLE_WARNING(4127)
+		while (1);		
+		X_ENABLE_WARNING(4127)
+		
 		return nullptr;
 	}
 
@@ -457,7 +467,10 @@ namespace strUtil
 			// if not whitespace return it.
 			if (!IsWhitespace(*endExclusive))
 				return endExclusive;
-		} while (1);
+		}
+		X_DISABLE_WARNING(4127)
+			while (1);
+		X_ENABLE_WARNING(4127)
 
 		return nullptr;
 	}
@@ -629,7 +642,7 @@ namespace strUtil
 		if (len == 0)
 			return nullptr;
 
-		char upperWhat = upperCaseSIMD(what);
+		uint32_t upperWhat = upperCaseSIMD(what);
 
 		while (startInclusive < endExclusive)
 		{

@@ -1,5 +1,11 @@
 // #include "dlmalloc-2.8.6.h"
 
+
+__pragma(warning(push))
+__pragma(warning(disable:4127))
+__pragma(warning(disable:4702))
+
+
 /*
   This is a version (aka dlmalloc) of malloc/free/realloc written by
   Doug Lea and released to the public domain, as explained at
@@ -6284,3 +6290,6 @@ History:
          structure of old version,  but most details differ.)
 
 */
+
+
+__pragma(warning(pop))

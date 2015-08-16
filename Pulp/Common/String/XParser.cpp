@@ -72,7 +72,9 @@ bool XParser::LoadMemory(const char* startInclusive, const char* endExclusive, c
 
 int	XParser::ReadToken(XLexToken& token)
 {
-	while (1)
+	X_DISABLE_WARNING(4127)
+	while (true)
+	X_ENABLE_WARNING(4127)
 	{
 		if (!ReadSourceToken(token))
 			return false;
@@ -362,7 +364,9 @@ bool XParser::Directive_define(void)
 
 		if (!CheckTokenString(")")) 
 		{
-			while (1) 
+			X_DISABLE_WARNING(4127)
+			while (true)
+			X_ENABLE_WARNING(4127)
 			{
 				if (!ReadLine(token)) {
 					Error("expected define parameter");

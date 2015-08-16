@@ -118,7 +118,9 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 {
 	Thread::ReturnValue retVal = Thread::ReturnValue(0);
 
+X_DISABLE_WARNING(4127)
 	while (true)
+X_ENABLE_WARNING(4127)
 	{
 		{
 			signalCritical_.Enter();

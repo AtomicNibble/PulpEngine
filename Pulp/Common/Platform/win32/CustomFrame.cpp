@@ -487,6 +487,8 @@ void xFrame::NCPaint( HWND hWnd, HDC hDC_, WPARAM wParam )
 	RECT rcClient, rcWind;
 	POINT temp;
 
+	X_UNUSED(wParam);
+
 	GetClientRect(hWnd, &rcClient);
 	GetWindowRect(hWnd,	&rcWind);
 
@@ -612,8 +614,9 @@ void xFrame::PaintCaption(HWND hWnd, HDC hDC)
 
 	LONG CaptionHeight = nCaptionHeight + (m_HasCaption ? nHozBorder : 0);
 
-	DWORD col_dark = color->Pin.Top;
-	DWORD col = color->Pin.Bottom;
+//	DWORD col_dark = color->Pin.Top;
+//	DWORD col = color->Pin.Bottom;
+
 
 	if (m_HasCaption)
 	{
@@ -684,7 +687,9 @@ inline Recti GetButtonPos(int index, int width, BOOL max )
 void xFrame::PaintButtons( HWND hWnd, HDC hDC )
 {
 	int Drawn = 0;
-	lopi(4)
+	X_UNUSED(hWnd);
+
+	for (size_t i = 0; i < 4; i++)
 	{
 		if( m_Buttons[i].Draw )
 		{
@@ -705,7 +710,7 @@ void xFrame::PaintButton( int Idx, FrameButton* but, HDC dc, Recti rec )
 	
 	int Dull = static_cast<int>(but->Focus);
 	
-	HICON Img;
+	HICON Img = NULL;
 	switch( Idx )
 	{
 	case 0: // Exit
@@ -720,6 +725,9 @@ void xFrame::PaintButton( int Idx, FrameButton* but, HDC dc, Recti rec )
 		break;
 	case 3: // min
 		Img = m_But_Min[ Dull ];
+		break;
+	default:
+		X_ASSERT_UNREACHABLE();
 		break;
 	}
 
@@ -809,6 +817,9 @@ void xFrame::NCButtonDown( HWND hwnd, ULONG message, WPARAM wparam, LPARAM lpara
     GetWindowRect(hwnd, &rect);
 
 	Vec2<int32_t> mouse(LOWORD(lparam) - rect.left,HIWORD(lparam) - rect.top);
+
+	X_UNUSED(message);
+	X_UNUSED(wparam);
 
 	int enabled = 0;
 	lopi(4)

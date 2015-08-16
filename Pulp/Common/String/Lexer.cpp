@@ -328,6 +328,10 @@ void XLexer::CreatePunctuationTable(const punctuation_t *punctuations)
 		default_setup = true;
 		i = sizeof(default_punctuations) / sizeof(punctuation_t);
 	}
+	else
+	{
+		i = 0;
+	}
 
 	memset(punctuationtable, 0xFF, 256 * sizeof(int));
 	memset(nextpunctuation, 0xFF, i * sizeof(int));
@@ -686,7 +690,10 @@ int XLexer::ReadTokenOnLine(XLexToken& token)
 
 int XLexer::ReadWhiteSpace(void)
 {
-	while (1) {
+	X_DISABLE_WARNING(4127)
+	while (1)
+	X_ENABLE_WARNING(4127)
+	{
 		// skip white space
 		while (*current_ <= ' ') {
 			if (!*current_) {
@@ -718,7 +725,10 @@ int XLexer::ReadWhiteSpace(void)
 			// comments /* */
 			else if (*(current_ + 1) == '*') {
 				current_++;
-				while (1) {
+				X_DISABLE_WARNING(4127)
+				while (1)
+				X_ENABLE_WARNING(4127)
+				{
 					current_++;
 					if (!*current_) {
 						return 0;
@@ -817,7 +827,7 @@ int XLexer::ReadEscapeCharacter(char *ch) {
 	// step over the escape character or the last digit of the number
 	current_++;
 	// store the escape character
-	*ch = c;
+	*ch = safe_static_cast<char,int>(c);
 	// succesfully read escape character
 	return 1;
 }
@@ -847,7 +857,10 @@ int XLexer::ReadString(XLexToken& token, int quote) {
 
 	token.start_ = current_;
 
-	while (1) {
+	X_DISABLE_WARNING(4127)
+	while (1)
+	X_ENABLE_WARNING(4127)
+	{
 		// if there is an escape character and escape characters are allowed
 		if (*current_ == '\\' && !(flags_.IsSet(LexFlag::NOSTRINGESCAPECHARS))) {
 			if (!ReadEscapeCharacter(&ch)) {
@@ -1029,7 +1042,10 @@ int XLexer::ReadNumber(XLexToken& token) {
 		// decimal integer or floating point number or ip address
 		dot = 0;
 		negative = 0;
-		while (1) {
+		X_DISABLE_WARNING(4127)
+		while (true)
+		X_ENABLE_WARNING(4127)
+		{
 			if (c >= '0' && c <= '9') {
 			}
 			else if (c == '.' ) {

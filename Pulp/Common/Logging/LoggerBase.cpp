@@ -65,37 +65,54 @@ void LoggerBase::AssertVariable(const SourceInfo& sourceInfo,
 void LoggerBase::DoLog(const SourceInfo& sourceInfo, const char* channel,
 	size_t verbosity, const char* format, va_list args)
 {
-
+	X_UNUSED(sourceInfo);
+	X_UNUSED(channel);
+	X_UNUSED(verbosity);
+	X_UNUSED(format);
+	X_UNUSED(args);
 }
 
 void LoggerBase::DoWarning(const SourceInfo& sourceInfo, const char* channel,
 	const char* format, va_list args)
 {
-
+	X_UNUSED(sourceInfo);
+	X_UNUSED(channel);
+	X_UNUSED(format);
+	X_UNUSED(args);
 }
 
 void LoggerBase::DoError(const SourceInfo& sourceInfo, const char* channel,
 	const char* format, va_list args)
 {
-
+	X_UNUSED(sourceInfo);
+	X_UNUSED(channel);
+	X_UNUSED(format);
+	X_UNUSED(args);
 }
 
 void LoggerBase::DoFatal(const SourceInfo& sourceInfo, const char* channel,
 	const char* format, va_list args)
 {
-
+	X_UNUSED(sourceInfo);
+	X_UNUSED(channel);
+	X_UNUSED(format);
+	X_UNUSED(args);
 }
 
 void LoggerBase::DoAssert(const SourceInfo& sourceInfo, const char* format, 
 	va_list args)
 {
-
+	X_UNUSED(sourceInfo);
+	X_UNUSED(format);
+	X_UNUSED(args);
 }
 
 void LoggerBase::DoAssertVariable(const SourceInfo& sourceInfo, 
 	const char* format, va_list args)
 {
-
+	X_UNUSED(sourceInfo);
+	X_UNUSED(format);
+	X_UNUSED(args);
 }
 
 

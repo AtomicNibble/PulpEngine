@@ -22,6 +22,8 @@ Thread::~Thread(void)
 
 void Thread::Create(const char* name, uint32_t stackSize )
 {
+	X_UNUSED(name);
+
 	handle_ = CreateThread(NULL, stackSize, (LPTHREAD_START_ROUTINE)ThreadFunction_, 
 					this, CREATE_SUSPENDED, (LPDWORD)&id_);
 
@@ -30,8 +32,9 @@ void Thread::Create(const char* name, uint32_t stackSize )
 		lastError::Description Dsc;
 		X_ERROR("Thread", "failed to create thread. Erorr: %s", lastError::ToString(Dsc));
 	}
-	else
+	else {
 		state_ = State::READY;
+	}
 }
 
 void Thread::Destroy(void)
@@ -54,8 +57,9 @@ void Thread::Start(Function::Pointer function)
 
 void Thread::Stop(void)
 {
-	if (state_ != State::READY)
+	if (state_ != State::READY) {
 		state_ = State::STOPPING;
+	}
 }
 
 void Thread::Join(void)

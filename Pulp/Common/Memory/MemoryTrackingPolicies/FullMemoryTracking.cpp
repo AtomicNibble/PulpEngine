@@ -59,7 +59,9 @@ FullMemoryTracking::~FullMemoryTracking(void)
 			return;
 		}
 
-		while (1)
+X_DISABLE_WARNING(4127)
+		while (true)
+X_ENABLE_WARNING(4127)
 		{
 			if (it == end)
 				break;
@@ -100,8 +102,13 @@ FullMemoryTracking::~FullMemoryTracking(void)
 
 
 /// Stores the allocation along with additional data and a call stack in a hash map.
-void FullMemoryTracking::OnAllocation(void* memory, size_t originalSize, size_t internalSize, size_t alignment, size_t offset, const char* ID, const char* typeName, const SourceInfo& sourceInfo, const char* memoryArenaName)
+void FullMemoryTracking::OnAllocation(void* memory, size_t originalSize, size_t internalSize, 
+	size_t alignment, size_t offset, const char* ID, const char* typeName,
+	const SourceInfo& sourceInfo, const char* memoryArenaName)
 {
+	X_UNUSED(alignment);
+	X_UNUSED(offset);
+
 	numAllocations_++;
 	table_.insert(std::make_pair(memory, 
 			AllocationData(

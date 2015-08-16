@@ -4,7 +4,7 @@
 #define _TOM_CRC32_H_
 
 X_NAMESPACE_BEGIN(core)
-
+X_DISABLE_WARNING(4324) // warning C4324: structure was padded due to __declspec(align()) 
 
 X_ALIGNED_SYMBOL(class Crc32, 128)
 {
@@ -50,6 +50,7 @@ private:
 
 #include "crc32.inl"
 
+X_ENABLE_WARNING(4324s);
 X_NAMESPACE_END
 
 

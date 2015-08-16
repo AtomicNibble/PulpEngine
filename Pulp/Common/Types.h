@@ -128,6 +128,14 @@ typedef _ULonglong uint_fast64_t;
 typedef _Longlong intmax_t;
 typedef _ULonglong uintmax_t;
 
+#ifndef _PTRDIFF_T_DEFINED
+#ifdef _WIN64
+typedef __int64        ptrdiff_t;
+#else  /* _WIN64 */
+typedef int            ptrdiff_t;
+#endif  /* _WIN64 */
+#define _PTRDIFF_T_DEFINED
+#endif  /* _PTRDIFF_T_DEFINED */
 
 #undef INT8_MIN
 #undef INT8_MAX

@@ -142,7 +142,7 @@ core::string Base64::Decode(const core::string& str)
 	uint32_t PadCount = 0;
 	uint8 DecodedValues[4];
 
-	TempBuf.resize(length);
+	TempBuf.resize(ExpectedLength);
 
 	const char* Source = str.data();
 	char* Dest = TempBuf.begin();

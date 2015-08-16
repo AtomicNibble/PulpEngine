@@ -36,7 +36,7 @@ namespace {
 
 	X_INLINE unsigned __int16 MakeColor( Cols For, Cols Back )
 	{
-		return  For + (Back << 4);
+		return  static_cast<uint16_t>(For + (Back << 4));
 	}
 
 	const unsigned int COLOR_TABLE[16] = { 

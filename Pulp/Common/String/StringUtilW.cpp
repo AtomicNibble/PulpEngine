@@ -88,7 +88,7 @@ namespace strUtil
 
 	bool IsEqual(const wchar_t* startInclusiveS1, const wchar_t* endExclusiveS1, const wchar_t* startInclusiveS2, const wchar_t* endExclusiveS2)
 	{
-		size_t Len = endExclusiveS1 - startInclusiveS1;
+		ptrdiff_t Len = endExclusiveS1 - startInclusiveS1;
 
 		if (Len == (endExclusiveS2 - startInclusiveS2))
 			return memcmp(startInclusiveS1, startInclusiveS2, Len * sizeof(wchar_t)) == 0;
@@ -124,7 +124,7 @@ namespace strUtil
 
 	bool IsEqualCaseInsen(const wchar_t* startInclusiveS1, const wchar_t* endExclusiveS1, const wchar_t* startInclusiveS2, const wchar_t* endExclusiveS2)
 	{
-		size_t Len = endExclusiveS1 - startInclusiveS1;
+		ptrdiff_t Len = endExclusiveS1 - startInclusiveS1;
 
 		if (Len == (endExclusiveS2 - startInclusiveS2))
 		{
@@ -224,7 +224,10 @@ namespace strUtil
 			// if whitespace return it.
 			if (IsWhitespaceW(*endExclusive))
 				return endExclusive;
-		} while (1);
+		} 
+		X_DISABLE_WARNING(4127)
+			while (1);
+		X_ENABLE_WARNING(4127)
 
 		return nullptr;
 	}
@@ -240,7 +243,10 @@ namespace strUtil
 			// if not whitespace return it.
 			if (!IsWhitespaceW(*endExclusive))
 				return endExclusive;
-		} while (1);
+		}
+		X_DISABLE_WARNING(4127)
+			while (1);
+		X_ENABLE_WARNING(4127)
 
 		return nullptr;
 	}
@@ -387,7 +393,7 @@ namespace strUtil
 		if (len == 0)
 			return nullptr;
 
-		wchar_t upperWhat = upperCaseSIMD(what);
+		wchar_t upperWhat = safe_static_cast<wchar_t,uint32_t>(upperCaseSIMD(what));
 
 		while (startInclusive < endExclusive)
 		{

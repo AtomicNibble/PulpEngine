@@ -11,14 +11,21 @@ X_NAMESPACE_BEGIN(core)
 do { \
 	if ((obj).m_Time <  0) \
 		(obj).InternalToMSPM(); \
-} while (0)
+} \
+X_DISABLE_WARNING(4127) \
+while (0) \
+X_ENABLE_WARNING(4127)
 
 // Macro to ensure internal representation is as time components
 #define REPASTIME(obj) \
 do { \
 	if ((obj).m_Time >= 0) \
 		(obj).InternalToTime(); \
-} while (0)
+}  \
+X_DISABLE_WARNING(4127) \
+while (0) \
+X_ENABLE_WARNING(4127) 
+
 
 
 #define BITOFFSETMILLISECOND 0

@@ -27,7 +27,7 @@ bool XResourceContainer::removeAsset(XBaseAsset* pAsset)
 {
 	X_ASSERT_NOT_NULL(pAsset);
 
-	if (list[pAsset->ID_] = pAsset)
+	if (list[pAsset->ID_] == pAsset)
 	{
 		list[pAsset->ID_] = nullptr;
 		hash.erase(pAsset->resourceName_);
