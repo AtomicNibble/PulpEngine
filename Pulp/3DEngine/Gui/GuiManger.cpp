@@ -106,10 +106,12 @@ void XGuiManager::Shutdown(void)
 IGui* XGuiManager::loadGui(const char* name)
 {
 	X_ASSERT_NOT_NULL(name);
-	XGui* pGui;
+	XGui* pGui = nullptr;
 
-	if (pGui = static_cast<XGui*>(findGui(name)))
+	pGui = static_cast<XGui*>(findGui(name))
+	if (pGui) {
 		return pGui;
+	}
 
 	// try load it :|
 	pGui = X_NEW(XGui, g_3dEngineArena, "GuiInterface");
