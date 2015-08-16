@@ -580,7 +580,6 @@ void XWindow::Transition(void)
 			{
 				clear = false;
 				color->Set(data.interp.GetCurrentValue(timeMs));
-				int goat = 0;
 			}
 
 		}
@@ -818,6 +817,8 @@ int XWindow::ParseTerm(core::XParser& lex, XWinVar* var, int component)
 {
 	core::XLexToken token;
 	int	a;
+
+	X_UNUSED(var);
 
 	lex.ReadToken(token);
 
