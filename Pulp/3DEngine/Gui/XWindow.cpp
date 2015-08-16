@@ -841,7 +841,6 @@ int XWindow::ParseTerm(core::XParser& lex, XWinVar* var, int component)
 		{
 			return ExpressionConstant(-(float)token.GetFloatValue());
 		}
-	//	src->Warning("Bad negative number '%s'", token.c_str());
 		return 0;
 	}
 
