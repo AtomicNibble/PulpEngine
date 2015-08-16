@@ -238,7 +238,6 @@
     <ClInclude Include="ModelInfo.h" />
     <ClInclude Include="Settings.h" />
     <ClInclude Include="StringPair.h" />
-    <ClInclude Include="TriTools.h" />
     <ClInclude Include="VertexFmt.h" />
     <ClInclude Include="Winding.h" />
     <ClInclude Include="MapLoader.h" />

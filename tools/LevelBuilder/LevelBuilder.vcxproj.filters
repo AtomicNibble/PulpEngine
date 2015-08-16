@@ -75,9 +75,6 @@
     <ClInclude Include="StringPair.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="TriTools.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="MapLoader.h">
       <Filter>Header Files\MapFile</Filter>
     </ClInclude>
