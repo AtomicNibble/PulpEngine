@@ -1669,14 +1669,14 @@ bool XWindow::OnInputEvent(const input::InputEvent& event)
 
 bool XWindow::OnInputEventChar(const input::InputEvent& event)
 {
-
+	X_UNUSED(event);
 	return false;
 }
 
 
 void XWindow::activate(bool activate)
 {
-
+	X_UNUSED(activate);
 }
 
 void XWindow::gainFocus(void)
