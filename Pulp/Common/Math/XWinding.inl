@@ -73,15 +73,18 @@ X_INLINE bool XWinding::ReAllocate(int n, bool keep)
 	Vec5f* oldP;
 
 	oldP = pPoints_;
-
+	
 	n = core::bitUtil::RoundUpToMultiple(n, 4);
 
-	pPoints_ = new Vec5f[n];
+	// pPoints_ = new Vec5f[n];
+	pPoints_ = X_NEW_ARRAY(Vec5f, n, gEnv->pArena, "WindingRealoc");
+
 	if (oldP) {
 		if (keep) {
 			memcpy(pPoints_, oldP, numPoints_ * sizeof(pPoints_[0]));
 		}
-		delete[] oldP;
+		// delete[] oldP;
+		X_DELETE_ARRAY(oldP, gEnv->pArena);
 	}
 	allocedSize_ = n;
 	return true;

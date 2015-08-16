@@ -192,7 +192,8 @@ void XWinding::clear(void)
 {
 	numPoints_ = 0;
 	allocedSize_ = 0;
-	delete[] pPoints_;
+//	delete[] pPoints_;
+	X_DELETE_ARRAY(pPoints_, gEnv->pArena);
 	pPoints_ = nullptr;
 }
 
