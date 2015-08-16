@@ -623,7 +623,7 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 				
 				for (i = 0; i < Num; i++)
 				{
-					X_ASSERT(texture[i].type < shader::ShaderTextureIdx::ENUM_COUNT, "invalid texture type")();
+					X_ASSERT(texture[i].type < static_cast<int32_t>(shader::ShaderTextureIdx::ENUM_COUNT), "invalid texture type")();
 					input.textures[texture[i].type].name = texture[i].name.c_str();
 				}
 

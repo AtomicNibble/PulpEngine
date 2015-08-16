@@ -174,9 +174,9 @@ void Console::SetSize(unsigned int windowWidth, unsigned int windowHeight, unsig
 	lastError::Description Dsc;
 	CONSOLE_SCREEN_BUFFER_INFO Info;
 
-	WORD width = safe_static_cast<short,uint>(windowWidth);
-	WORD height = safe_static_cast<short,uint>(windowHeight);
-	WORD lines = safe_static_cast<short,uint>(numLines);
+	SHORT width = safe_static_cast<SHORT,uint>(windowWidth);
+	SHORT height = safe_static_cast<SHORT,uint>(windowHeight);
+	SHORT lines = safe_static_cast<SHORT,uint>(numLines);
 
 	if( !GetConsoleScreenBufferInfo( m_console, &Info ) )
 	{
@@ -209,8 +209,8 @@ void Console::SetSize(unsigned int windowWidth, unsigned int windowHeight, unsig
 	// confirm buffer sizes.
 	GetConsoleScreenBufferInfo( m_console, &Info );
 
-	width = Min( width, safe_static_cast<WORD,SHORT>( Info.dwSize.X ) ) - 1;
-	height = Min( height, safe_static_cast<WORD,SHORT>( Info.dwSize.Y ) ) - 1;
+	width = Min( width, static_cast<SHORT>( Info.dwSize.X ) ) - 1;
+	height = Min( height, static_cast<SHORT>( Info.dwSize.Y ) ) - 1;
 	
 	SMALL_RECT windowSize = {
 		0, 

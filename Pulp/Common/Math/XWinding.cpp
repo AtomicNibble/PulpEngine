@@ -230,8 +230,8 @@ void XWinding::baseForPlane(const Vec3f& normal, const float dist)
 
 	NormalVectors(normal, vup, vright);
 
-	vup *= MAX_WORLD_SIZE;
-	vright *= MAX_WORLD_SIZE;
+	vup *= static_cast<float>(MAX_WORLD_SIZE);
+	vright *= static_cast<float>(MAX_WORLD_SIZE);
 
 	EnsureAlloced(4);
 	numPoints_ = 4;
