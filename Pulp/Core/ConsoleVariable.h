@@ -417,15 +417,15 @@ public:
 		OnModified();
 
 		// cap it sally.
+		IntValue_ = i;
+
 		if (IntMin_ <= IntMax_)
 		{
-			if (i < IntMin_)
-				(int)i = IntMin_;
-			else if (i > IntMax_)
-				(int)i = IntMax_;
+			if (IntValue_ < IntMin_)
+				IntValue_ = IntMin_;
+			else if (IntValue_ > IntMax_)
+				IntValue_ = IntMax_;
 		}
-
-		IntValue_ = i;
 
 		if (pChangeFunc_)
 			pChangeFunc_(this); // change callback.	
@@ -601,6 +601,7 @@ public:
 		if (Flags_.IsSet(VarFlag::READONLY))
 			return;
 
+		X_UNUSED(f);
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
@@ -609,6 +610,7 @@ public:
 		if (Flags_.IsSet(VarFlag::READONLY))
 			return;
 
+		X_UNUSED(i);
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
@@ -669,7 +671,7 @@ public:
 	{
 		if (Flags_.IsSet(VarFlag::READONLY))
 			return;
-
+		X_UNUSED(f);
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
@@ -677,7 +679,7 @@ public:
 	{
 		if (Flags_.IsSet(VarFlag::READONLY))
 			return;
-
+		X_UNUSED(i);
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
