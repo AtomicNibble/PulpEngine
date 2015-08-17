@@ -34,6 +34,8 @@ struct XSystemEventListner_Core : public ICoreEventListener
 public:
 	virtual void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_OVERRIDE
 	{
+		X_UNUSED(wparam);
+		X_UNUSED(lparam);
 		switch (event)
 		{
 			case CoreEvent::LEVEL_UNLOAD:
