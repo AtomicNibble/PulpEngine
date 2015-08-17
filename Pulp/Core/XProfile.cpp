@@ -42,9 +42,6 @@ namespace
 			SetThreadPriority(GetCurrentThread(), nPriority);
 			SetPriorityClass(GetCurrentProcess(), dwPriorityClass);
 			
-
-			float64_t test = toMS(elapsed);
-
 			g_cpuspeed = 3200000; //  (elapsed * 100);
 		}
 		// 3200000000
