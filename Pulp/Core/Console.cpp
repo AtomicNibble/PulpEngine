@@ -255,6 +255,8 @@ void Command_Exec(IConsoleCmdArgs* Cmd)
 
 void Command_Help(IConsoleCmdArgs* Cmd)
 {
+	X_UNUSED(Cmd);
+
 	X_LOG0("Console", "------- ^8Help^7 -------");
 	X_LOG_BULLET;
 	X_LOG0("Console", "listcmds: lists avaliable commands");
@@ -292,6 +294,8 @@ void Command_ListDvars(IConsoleCmdArgs* Cmd)
 
 void Command_Exit(IConsoleCmdArgs* Cmd)
 {
+	X_UNUSED(Cmd);
+
 	// we want to exit I guess.
 	// dose this check even make sense?
 	// it might for dedicated server.
@@ -474,6 +478,7 @@ void Command_SetVarArchive(IConsoleCmdArgs* Cmd)
 
 void Command_ConsoleShow(IConsoleCmdArgs* Cmd)
 {
+	X_UNUSED(Cmd);
 	XConsole* pConsole = (XConsole*)gEnv->pConsole;
 
 	pConsole->ShowConsole(XConsole::consoleState::OPEN);
@@ -481,6 +486,7 @@ void Command_ConsoleShow(IConsoleCmdArgs* Cmd)
 
 void Command_ConsoleHide(IConsoleCmdArgs* Cmd)
 {
+	X_UNUSED(Cmd);
 	XConsole* pConsole = (XConsole*)gEnv->pConsole;
 
 	pConsole->ShowConsole(XConsole::consoleState::CLOSED);
@@ -488,6 +494,7 @@ void Command_ConsoleHide(IConsoleCmdArgs* Cmd)
 
 void Command_ConsoleToggle(IConsoleCmdArgs* Cmd)
 {
+	X_UNUSED(Cmd);
 	XConsole* pConsole = (XConsole*)gEnv->pConsole;
 
 	pConsole->ToggleConsole();
@@ -2332,18 +2339,33 @@ void XConsoleNULL::Draw(void)
 ICVar* XConsoleNULL::RegisterString(const char* Name, const char* Value, int Flags, 
 	const char* desc, ConsoleVarFunc pChangeFunc)
 {
+	X_UNUSED(Name);
+	X_UNUSED(Value);
+	X_UNUSED(Flags);
+	X_UNUSED(desc);
+	X_UNUSED(pChangeFunc);
 	return nullptr;
 }
 
 ICVar* XConsoleNULL::RegisterInt(const char* Name, int Value, int Min, int Max, 
 	int Flags, const char* desc, ConsoleVarFunc pChangeFunc)
 {
+	X_UNUSED(Name);
+	X_UNUSED(Value);
+	X_UNUSED(Flags);
+	X_UNUSED(desc);
+	X_UNUSED(pChangeFunc);
 	return nullptr;
 }
 
 ICVar* XConsoleNULL::RegisterFloat(const char* Name, float Value, float Min, float Max,
 	int flags, const char* desc, ConsoleVarFunc pChangeFunc)
 {
+	X_UNUSED(Name);
+	X_UNUSED(Value);
+	X_UNUSED(Flags);
+	X_UNUSED(desc);
+	X_UNUSED(pChangeFunc);
 	return nullptr;
 }
 
@@ -2351,18 +2373,34 @@ ICVar* XConsoleNULL::RegisterFloat(const char* Name, float Value, float Min, flo
 ICVar* XConsoleNULL::ConfigRegisterString(const char* Name, const char* Value, int flags,
 	const char* desc)
 {
+	X_UNUSED(Name);
+	X_UNUSED(Value);
+	X_UNUSED(flags);
+	X_UNUSED(desc);
 	return nullptr;
 }
 
 ICVar* XConsoleNULL::ConfigRegisterInt(const char* Name, int Value, int Min, int Max, 
 	int flags, const char* desc)
 {
+	X_UNUSED(Name);
+	X_UNUSED(Value);
+	X_UNUSED(Min);
+	X_UNUSED(Max);
+	X_UNUSED(flags);
+	X_UNUSED(desc);
 	return nullptr;
 }
 
 ICVar* XConsoleNULL::ConfigRegisterFloat(const char* Name, float Value, float Min, 
 	float Max, int flags, const char* desc)
 {
+	X_UNUSED(Name);
+	X_UNUSED(Value);
+	X_UNUSED(Min);
+	X_UNUSED(Max);
+	X_UNUSED(flags);
+	X_UNUSED(desc);
 	return nullptr;
 }
 
