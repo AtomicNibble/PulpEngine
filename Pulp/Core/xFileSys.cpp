@@ -346,7 +346,7 @@ uintptr_t xFileSys::findFirst(pathType path, _wfinddatai64_t* findinfo)
 
 	if (!pFindData->findnext(findinfo)) {
 		X_DELETE(pFindData, g_coreArena);
-		return -1;
+		return static_cast<uintptr_t>(-1);
 	}
 
 	// i could store this info in a member so that i can check that
@@ -357,7 +357,7 @@ uintptr_t xFileSys::findFirst(pathType path, _wfinddatai64_t* findinfo)
 	findData_.insert(pFindData);
 #endif // !X_DEBUG
 
-	return (intptr_t)pFindData;
+	return reinterpret_cast<uintptr_t>(pFindData);
 }
 
 bool xFileSys::findnext(uintptr_t handle, _wfinddatai64_t* findinfo)
@@ -396,6 +396,8 @@ void xFileSys::findClose(uintptr_t handle)
 
 bool xFileSys::deleteFile(pathType path, VirtualDirectory::Enum location) const
 {
+	X_UNUSED(location);
+
 	Path<wchar_t> buf;
 	createOSPath(gameDir_, path, buf);
 
@@ -417,7 +419,7 @@ bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 		X_LOG0("FileSys", "deleteDirectory: \"%s\"", temp.c_str());
 	}
 
-	SHFILEOPSTRUCT file_op = {
+	SHFILEOPSTRUCTW file_op = {
 		NULL,
 		FO_DELETE,
 		temp.c_str(),
@@ -429,7 +431,7 @@ bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 		0,
 		L"" };
 
-	int ret = SHFileOperation(&file_op);
+	int ret = SHFileOperationW(&file_op);
 
 	X_ERROR_IF(ret != 0, "FileSys", "Failed to delete directory: %ls", path);
 
@@ -442,6 +444,7 @@ bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 bool xFileSys::createDirectory(pathType path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
+	X_UNUSED(location);
 
 	Path<wchar_t> buf;
 	createOSPath(gameDir_, path, buf);
@@ -463,6 +466,7 @@ bool xFileSys::createDirectory(pathType path, VirtualDirectory::Enum location) c
 bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(_path);
+	X_UNUSED(location);
 
 	// we want to just loop and create like a goat.
 	Path<wchar_t> buf;
@@ -517,6 +521,7 @@ bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum locati
 bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
+	X_UNUSED(location);
 
 	Path<wchar_t> buf;
 	createOSPath(gameDir_, path, buf);
@@ -556,6 +561,7 @@ bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
+	X_UNUSED(location);
 
 	if (isDebug()) {
 		X_LOG0("FileSys", "directoryExists: \"%s\"", path);
@@ -587,6 +593,7 @@ bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) c
 bool xFileSys::directoryExists(pathTypeW path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
+	X_UNUSED(location);
 
 	if (isDebug()) {
 		X_LOG0("FileSys", "directoryExists: \"%ls\"", path);
@@ -618,6 +625,7 @@ bool xFileSys::directoryExists(pathTypeW path, VirtualDirectory::Enum location) 
 bool xFileSys::isDirectory(pathType path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
+	X_UNUSED(location);
 
 	if (isDebug()) {
 		X_LOG0("FileSys", "isDirectory: \"%s\"", path);
@@ -644,6 +652,7 @@ bool xFileSys::isDirectory(pathType path, VirtualDirectory::Enum location) const
 bool xFileSys::isDirectory(pathTypeW path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
+	X_UNUSED(location);
 
 	if (isDebug()) {
 		X_LOG0("FileSys", "isDirectory: \"%ls\"", path);
