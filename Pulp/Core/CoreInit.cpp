@@ -533,8 +533,6 @@ void WindowSizeVarChange(core::ICVar* pVar)
 {
 	X_UNUSED(pVar);
 
-	int width = g_coreVars.win_width;
-	int height = g_coreVars.win_height;
 }
 
 
