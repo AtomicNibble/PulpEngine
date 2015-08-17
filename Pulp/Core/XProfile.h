@@ -107,11 +107,11 @@ private:
 	void RenderProfileDataHeader(float& x, float& y, float& width, float& height);
 	void RenderFrameTimes(float x, float y, float width, float height);
 
-	void DrawLabel(float x, float y, const char* pStr, Color& col);
-	void DrawLabel(float x, float y, const char* pStr, Color& col, Flags<render::DrawTextFlags> flags);
+	void DrawLabel(float x, float y, const char* pStr, const Color& col);
+	void DrawLabel(float x, float y, const char* pStr, const Color& col, Flags<render::DrawTextFlags> flags);
 
-	void DrawRect(float x1, float y1, float x2, float y2, Color& col);
-	void DrawRect(Vec4f& rec, Color& col);
+	void DrawRect(float x1, float y1, float x2, float y2, const Color& col);
+	void DrawRect(Vec4f& rec, const Color& col);
 
 
 	void DrawPercentageBlock(float x, float y,

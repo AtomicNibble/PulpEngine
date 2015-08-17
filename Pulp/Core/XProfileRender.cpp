@@ -339,7 +339,7 @@ void XProfileSys::RenderFrameTimes(float x, float y, float width, float height)
 
 
 
-void XProfileSys::DrawLabel(float x, float y, const char* pStr, Color& col)
+void XProfileSys::DrawLabel(float x, float y, const char* pStr, const Color& col)
 {
 	Vec3f pos(x, y, 1);
 	XDrawTextInfo ti;
@@ -348,7 +348,7 @@ void XProfileSys::DrawLabel(float x, float y, const char* pStr, Color& col)
 	pRender_->DrawTextQueued(pos, ti, pStr);
 }
 
-void XProfileSys::DrawLabel(float x, float y, const char* pStr, Color& col, Flags<DrawTextFlags> flags)
+void XProfileSys::DrawLabel(float x, float y, const char* pStr, const Color& col, Flags<DrawTextFlags> flags)
 {
 	Vec3f pos(x,y, 1);
 	XDrawTextInfo ti;
@@ -361,14 +361,21 @@ void XProfileSys::DrawLabel(float x, float y, const char* pStr, Color& col, Flag
 
 
 
-void XProfileSys::DrawRect(float x1, float y1, float x2, float y2, Color& col)
+void XProfileSys::DrawRect(float x1, float y1, float x2, float y2, const Color& col)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
+	X_UNUSED(x1);
+	X_UNUSED(y1);
+	X_UNUSED(x2);
+	X_UNUSED(y2);
+	X_UNUSED(col);
 }
 
-void XProfileSys::DrawRect(Vec4f& rec, Color& col)
+void XProfileSys::DrawRect(Vec4f& rec, const Color& col)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
+	X_UNUSED(rec);
+	X_UNUSED(y1col;
 }
 
 X_NAMESPACE_END
