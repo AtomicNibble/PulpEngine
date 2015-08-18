@@ -47,7 +47,6 @@ bool XGoatFactoryRegistryImpl::GetInsertionPos(IGoatFactory* pFactory,
 		= std::lower_bound(byCName_.begin(), byCName_.end(), searchByCName);
 	if (itForCName != byCName_.end() && !(searchByCName < *itForCName))
 	{
-		int error = 1;
 		return false;
 	}
 
@@ -81,9 +80,8 @@ void XGoatFactoryRegistryImpl::RegisterFactories(const XRegFactoryNode* pFactori
 
 void XGoatFactoryRegistryImpl::UnregisterFactories(const XRegFactoryNode* pFactories)
 {
-	int goat = 0;
-
-	goat = 5;
+	X_UNUSED(pFactories);
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 IGoatFactoryRegistry* XCore::GetFactoryRegistry() const
