@@ -432,7 +432,8 @@ void HashBase<Key, Value, HashFn, EqualKey>::ensureSize(size_type _size)
 template <class Key, class Value, class HashFn, class EqualKey>
 void HashBase<Key, Value, HashFn, EqualKey>::erase(iterator pos)
 {
-
+	X_UNUSED(pos);
+	X_ASSERT_UNREACHABLE();
 }
 
 
