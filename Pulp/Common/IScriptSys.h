@@ -56,7 +56,7 @@ struct ScriptValue
 	ScriptValue(const char*, int) : type_(Type::STRING) {};
 	ScriptValue(IScriptTable*, int);
 	ScriptValue(HSCRIPTFUNCTION, int) : type_(Type::FUNCTION) {};
-	ScriptValue(ScriptHandle value, int) : type_(Type::HANDLE) {};
+	ScriptValue(ScriptHandle value, int) : type_(Type::HANDLE) { X_UNUSED(value); };
 	ScriptValue(const Vec3f&, int) : type_(Type::VECTOR) {};
 	ScriptValue(const SmartScriptTable &value, int);
 
