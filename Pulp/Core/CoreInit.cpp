@@ -319,6 +319,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 bool XCore::InitFileSys(const SCoreInitParams &initParams)
 {
+	X_UNUSED(initParams);
 	env_.pFileSys = X_NEW_ALIGNED( core::xFileSys, g_coreArena, "FileSys", 8);
 
 	if (env_.pFileSys) {
