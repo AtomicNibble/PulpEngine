@@ -7,7 +7,9 @@
 #include <IInput.h>
 #include <ITexture.h>
 
+X_DISABLE_WARNING(4702)
 #include <map>
+
 // #include <string>
 // #include <vector>
 #include <list>
@@ -16,6 +18,8 @@
 #include <functional> 
 #include <cctype>
 #include <locale>
+X_ENABLE_WARNING(4702)
+
 
 #include <String\StrRef.h>
 
