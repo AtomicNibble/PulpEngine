@@ -375,7 +375,7 @@ void XProfileSys::DrawRect(Vec4f& rec, const Color& col)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
 	X_UNUSED(rec);
-	X_UNUSED(y1col;
+	X_UNUSED(col);
 }
 
 X_NAMESPACE_END
