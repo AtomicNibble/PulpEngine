@@ -402,12 +402,14 @@ void Command_Bind(IConsoleCmdArgs* Cmd)
 
 void Command_BindsClear(IConsoleCmdArgs* Cmd)
 {
+	X_UNUSED(Cmd);
 	XConsole* pConsole = (XConsole*)gEnv->pConsole;
 	pConsole->ClearAllBinds();
 }
 
 void Command_BindsList(IConsoleCmdArgs* Cmd)
 {
+	X_UNUSED(Cmd);
 	XConsole* pConsole = (XConsole*)gEnv->pConsole;
 
 	struct PrintBinds : public IKeyBindDumpSink {
@@ -1676,7 +1678,6 @@ void XConsole::DrawBuffer()
 
 		Vec2f pos(10, 5);
 		Vec2f txtwidth = pFont_->GetTextSize(txt, ctx);
-		float fCharWidth = (ctx.GetCharWidth() * ctx.GetCharWidthScale());
 		float fCharHeight = 0.8f * ctx.GetCharHeight();
 		int	  CharHeight = (int)(fCharHeight);
 
@@ -1853,8 +1854,10 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 
 
 		// Autocomplete
-		if (autoCompleteNum_ != results.size())
+		if (autoCompleteNum_ != safe_static_cast<int, size_t>(results.size())) {
 			autoCompleteIdx_ = -1;
+		}
+
 		autoCompleteNum_ = safe_static_cast<int,size_t>(results.size());
 		autoCompleteIdx_ = core::Min(autoCompleteIdx_, autoCompleteNum_ - 1);
 		autoCompleteSelect_ = autoCompleteIdx_ >= 0 ? autoCompleteSelect_ : false;
@@ -1882,7 +1885,6 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 			float ypos = start.y + 30;
 			float width = 200; // min width 
 			float height = 5;
-			float DscWidth = 0;
 	resultsChanged:
 			bool isSingleVar = results.size() == 1 && results[0].var;
 			bool isSingleCmd = results.size() == 1 && !results[0].var;
@@ -2185,6 +2187,7 @@ void XConsole::ResetAutoCompletion(void)
 
 void XConsole::addLineToLog(const char* pStr, uint32_t length)
 {
+	X_UNUSED(length);
 	ConsoleLog_.push_back(pStr);
 
 	int bufferSize = console_buffer_size;
@@ -2352,6 +2355,8 @@ ICVar* XConsoleNULL::RegisterInt(const char* Name, int Value, int Min, int Max,
 {
 	X_UNUSED(Name);
 	X_UNUSED(Value);
+	X_UNUSED(Min);
+	X_UNUSED(Max);
 	X_UNUSED(Flags);
 	X_UNUSED(desc);
 	X_UNUSED(pChangeFunc);
@@ -2363,7 +2368,9 @@ ICVar* XConsoleNULL::RegisterFloat(const char* Name, float Value, float Min, flo
 {
 	X_UNUSED(Name);
 	X_UNUSED(Value);
-	X_UNUSED(Flags);
+	X_UNUSED(Min);
+	X_UNUSED(Max);
+	X_UNUSED(flags);
 	X_UNUSED(desc);
 	X_UNUSED(pChangeFunc);
 	return nullptr;
@@ -2413,6 +2420,8 @@ ICVar* XConsoleNULL::Register(const char* name, float* src, float defaultvalue,
 	X_UNUSED(name);
 	X_UNUSED(src);
 	X_UNUSED(defaultvalue);
+	X_UNUSED(Min);
+	X_UNUSED(Max);
 	X_UNUSED(flags);
 	X_UNUSED(desc);
 	X_UNUSED(pChangeFunc);
@@ -2426,6 +2435,8 @@ ICVar* XConsoleNULL::Register(const char* name, int* src, int defaultvalue,
 	X_UNUSED(name);
 	X_UNUSED(src);
 	X_UNUSED(defaultvalue);
+	X_UNUSED(Min);
+	X_UNUSED(Max);
 	X_UNUSED(flags);
 	X_UNUSED(desc);
 	X_UNUSED(pChangeFunc);
