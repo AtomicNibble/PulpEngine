@@ -116,11 +116,13 @@ struct CoreEvent
 				return "LEVEL_POST_UNLOAD";
 
 			case Enum::USER:
+#if X_DEBUG
 			default:
 				return "";
+#else
+			X_NO_SWITCH_DEFAULT;
+#endif // !X_DEBUG
 		}
-
-		return "";
 	}
 };
 
