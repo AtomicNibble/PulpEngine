@@ -415,6 +415,10 @@ bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 
 	createOSPath(gameDir_, path, temp);
 
+	if (recursive) {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
 	if (isDebug()) {
 		X_LOG0("FileSys", "deleteDirectory: \"%s\"", temp.c_str());
 	}
