@@ -175,6 +175,9 @@
     <ClCompile Include="DiskFile.cpp">
       <Filter>FileSys</Filter>
     </ClCompile>
+    <ClCompile Include="NullImplementation\NullInput.cpp">
+      <Filter>NullImplementation</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="win32\SystemTimer.inl">
