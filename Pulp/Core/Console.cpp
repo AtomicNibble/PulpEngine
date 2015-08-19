@@ -151,16 +151,24 @@ namespace
 // command val, val1, #var_name, string var3,
 void ConsoleCommandArgs::TokenizeString(const char *begin, const char* end)
 {
-	argNum = 0;
-	size_t totalLen = 0;
+	argNum_ = 0;
+	core::zero_object(tokenized_);
 
-	core::zero_object(tokenized);
+	size_t len, totalLen = 0;
+
+	len = static_cast<size_t>(end - begin);
+	if (len < 1) {
+		return;
+	}
+
+	// need to be made use of.
+	X_UNUSED(end);
 
 	const char* start = begin;
 	const char* commandLine = begin;
 	while (char ch = *commandLine++)
 	{
-		if (argNum == MAX_COMMAND_ARGS)
+		if (argNum_ == MAX_COMMAND_ARGS)
 			return;
 
 		switch (ch)
@@ -170,12 +178,12 @@ void ConsoleCommandArgs::TokenizeString(const char *begin, const char* end)
 		{
 			while ((*commandLine++ != ch) && *commandLine); // find end
 
-			argv[argNum] = tokenized + totalLen;
-			argNum++;
+			argv_[argNum_] = tokenized_ + totalLen;
+			argNum_++;
 
 			size_t Len = (commandLine - start) - 2;
 
-			::memcpy(tokenized + totalLen, start + 1, Len);
+			::memcpy(tokenized_ + totalLen, start + 1, Len);
 			totalLen += Len + 1;
 
 			start = commandLine;
@@ -188,8 +196,8 @@ void ConsoleCommandArgs::TokenizeString(const char *begin, const char* end)
 		{
 			if ((*commandLine == ' ') || !*commandLine)
 			{
-				argv[argNum] = tokenized + totalLen;
-				argNum++;
+				argv_[argNum_] = tokenized_ + totalLen;
+				argNum_++;
 
 				if (*start == '#')
 				{
@@ -206,7 +214,7 @@ void ConsoleCommandArgs::TokenizeString(const char *begin, const char* end)
 
 						name.append(var->GetString());
 
-						::memcpy(tokenized + totalLen, name.begin(), name.length());
+						::memcpy(tokenized_ + totalLen, name.begin(), name.length());
 						totalLen += (name.length() + 1);
 						start = commandLine + 1;
 						continue;
@@ -215,15 +223,15 @@ void ConsoleCommandArgs::TokenizeString(const char *begin, const char* end)
 
 				size_t Len = (commandLine - start);
 
-				::memcpy(tokenized + totalLen, start, Len);
+				::memcpy(tokenized_ + totalLen, start, Len);
 				totalLen += (Len + 1);
 
 				start = commandLine + 1;
 			}
 		}
 		break;
-		}
-	}
+		} // switch
+	} // while
 }
 
 //////////////////////////////////////////////////////////////////////////
