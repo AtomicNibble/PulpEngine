@@ -1324,7 +1324,7 @@ bool XConsole::LoadConfig(const char* fileName)
 				const char* pComment;
 
 				// we support // and /* */ so loook for a '/'
-				while (pComment = core::strUtil::Find(begin, end, '/'))
+				while ((pComment = core::strUtil::Find(begin, end, '/')) != nullptr)
 				{
 					// wee need atleast 1 more char.
 					if (pComment >= (end - 1))
@@ -1433,9 +1433,10 @@ void XConsole::ExecuteStringInternal(const char* pCommand, ExecSource::Enum sour
 		// work out name / value
 		pPos = range.Find('=');
 
-		if (pPos)
+		if (pPos) {
 			name.set(range.GetStart(), pPos);
-		else if (pPos = range.Find(' '))
+		}
+		else if ((pPos = range.Find(' ')) != nullptr)
 		{
 			name.set(range.GetStart(), pPos);
 		}

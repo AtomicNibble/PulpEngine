@@ -7,7 +7,9 @@
 
 #include <Containers\HashMap.h>
 
+X_DISABLE_WARNING(4702)
 #include <set>
+X_ENABLE_WARNING(4702)
 
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 #include <Memory\AllocationPolicies\PoolAllocator.h>
