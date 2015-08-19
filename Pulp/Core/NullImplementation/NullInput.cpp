@@ -116,7 +116,7 @@ void XNullInput::SetModifiers(ModifierFlags flags)
 	X_UNUSED(flags);
 }
 
-InputSymbol* DefineSymbol(InputDevice::Enum device, KeyId::Enum id_, const KeyName& name_,
+InputSymbol* XNullInput::DefineSymbol(InputDevice::Enum device, KeyId::Enum id_, const KeyName& name_,
 InputSymbol::Type type_, ModifiersMasks::Enum mod_mask)
 {
 	X_UNUSED(device);
