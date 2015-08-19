@@ -168,60 +168,60 @@ void ConsoleCommandArgs::TokenizeString(const char *begin, const char* end)
 		case '\'':
 		case '\"':
 		{
-					 while ((*commandLine++ != ch) && *commandLine); // find end
+			while ((*commandLine++ != ch) && *commandLine); // find end
 
-					 argv[argNum] = tokenized + totalLen;
-					 argNum++;
+			argv[argNum] = tokenized + totalLen;
+			argNum++;
 
-					 size_t Len = (commandLine - start) - 2;
+			size_t Len = (commandLine - start) - 2;
 
-					 ::memcpy(tokenized + totalLen, start + 1, Len);
-					 totalLen += Len + 1;
+			::memcpy(tokenized + totalLen, start + 1, Len);
+			totalLen += Len + 1;
 
-					 start = commandLine;
-					 break;
+			start = commandLine;
+			break;
 		}
 		case ' ':
 			start = commandLine;
 			break;
 		default:
 		{
-				   if ((*commandLine == ' ') || !*commandLine)
-				   {
-					   argv[argNum] = tokenized + totalLen;
-					   argNum++;
+			if ((*commandLine == ' ') || !*commandLine)
+			{
+				argv[argNum] = tokenized + totalLen;
+				argNum++;
 
-					   if (*start == '#')
-					   {
-						   ++start;
+				if (*start == '#')
+				{
+					++start;
 
-						   core::StackString<256> name(start, commandLine);
+					core::StackString<256> name(start, commandLine);
 
-						   // it's a var name.
-						   ICVar* var = gEnv->pConsole->GetCVar(name.c_str());
+					// it's a var name.
+					ICVar* var = gEnv->pConsole->GetCVar(name.c_str());
 
-						   if (var)
-						   {
-							   name.clear();
+					if (var)
+					{
+						name.clear();
 
-							   name.append(var->GetString());
+						name.append(var->GetString());
 
-							   ::memcpy(tokenized + totalLen, name.begin(), name.length());
-							   totalLen += (name.length() + 1);
-							   start = commandLine + 1;
-							   continue;
-						   }
-					   }
+						::memcpy(tokenized + totalLen, name.begin(), name.length());
+						totalLen += (name.length() + 1);
+						start = commandLine + 1;
+						continue;
+					}
+				}
 
-					   size_t Len = (commandLine - start);
+				size_t Len = (commandLine - start);
 
-					   ::memcpy(tokenized + totalLen, start, Len);
-					   totalLen += (Len + 1);
+				::memcpy(tokenized + totalLen, start, Len);
+				totalLen += (Len + 1);
 
-					   start = commandLine + 1;
-				   }
+				start = commandLine + 1;
+			}
 		}
-			break;
+		break;
 		}
 	}
 }
