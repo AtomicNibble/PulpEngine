@@ -162,7 +162,7 @@ bool XShaderBin::loadShader(const char* path, uint32_t sourceCRC, XHWShader_Dx10
 			for (i = 0; i < bindvars.size(); i++)
 			{
 				XShaderParam* pB = &bindvars[i];
-				const char *param = pB->name.c_str();
+			//	const char *param = pB->name.c_str();
 
 				// set max slots
 				if (pB->constBufferSlot < 3)
