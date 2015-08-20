@@ -358,8 +358,9 @@ bool DX11XRender::Init(HWND hWnd,
 	}
 	// where is my debug interface slut!
 	return false;
-#endif
+#else
 	return true;
+#endif
 }
 
 
