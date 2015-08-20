@@ -109,9 +109,8 @@ namespace
 
 	X_INLINE void getWorldMatrix(render::DX11XRender* r)
 	{
-		D3DXMATRIX* pMatD3D = (D3DXMATRIX*)(&vecTemp[0]);
-
 		X_ASSERT_NOT_IMPLEMENTED();
+		X_UNUSED(r);
 	}
 
 	X_INLINE void getviewMatrix(render::DX11XRender* r)
@@ -882,7 +881,7 @@ bool XHWShader_Dx10::reflectShader(void)
 			// as the texture link them.
 			if (temp.isEqual(pB->name))
 			{
-				pB->constBufferSlot = InputBindDesc.BindPoint;
+				pB->constBufferSlot = safe_static_cast<short,UINT>(InputBindDesc.BindPoint);
 				break;
 			}
 

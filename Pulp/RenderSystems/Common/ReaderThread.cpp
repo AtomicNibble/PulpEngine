@@ -124,6 +124,7 @@ void XRenderThread::process(const core::Thread& t)
 
 void XRenderThread::processLoading(const core::Thread& t)
 {
+	X_DISABLE_WARNING(4127)
 	while (true)
 	{
 		waitFlushCond(t);
@@ -135,8 +136,8 @@ void XRenderThread::processLoading(const core::Thread& t)
 		}
 
 		processCommands();
-
 	}
+	X_ENABLE_WARNING(4127)
 }
 
 
