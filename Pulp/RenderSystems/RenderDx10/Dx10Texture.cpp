@@ -201,15 +201,14 @@ void XTexture::RT_UpdateTextureRegion(byte* data, int nX, int nY, int USize, int
 
 	if (!is_dxt(srcFmt))
 	{
-		int nBPPSrc = get_bpp(srcFmt);
-		int nRowPitch = get_data_size(USize, 1, 1, 1, srcFmt);
+		int rowPitch = get_data_size(USize, 1, 1, 1, srcFmt);
 
 		render::g_Dx11D3D.DxDeviceContext()->UpdateSubresource(
 			DeviceTexture.get2DTexture(),
 			0, 
 			&rc, 
 			data, 
-			nRowPitch, 
+			rowPitch, 
 			0
 		);
 	}
