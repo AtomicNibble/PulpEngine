@@ -45,11 +45,6 @@ void DX11XRender::SetStencilState(StencilState::Value ss)
 
 	StencilState::Value::Face& front = ss.faces[0];
 
-	int test = front.getStencilFuncIdx();
-	int test1 = front.getStencilFailOpIdx();
-	int test2 = front.getStencilZFailOpIdx();
-	int test3 = front.getStencilPassOpIdx();
-
 	depth.Desc.StencilReadMask = D3D11_DEFAULT_STENCIL_READ_MASK;
 	depth.Desc.StencilWriteMask = D3D11_DEFAULT_STENCIL_WRITE_MASK;
 	depth.Desc.FrontFace.StencilFunc = (D3D11_COMPARISON_FUNC)g_StencilFuncLookup[front.getStencilFuncIdx()];
