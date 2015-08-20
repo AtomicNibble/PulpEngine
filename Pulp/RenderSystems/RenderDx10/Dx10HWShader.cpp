@@ -166,16 +166,19 @@ namespace
 	X_INLINE void getCameraFront(render::DX11XRender* r)
 	{
 		X_ASSERT_NOT_IMPLEMENTED();
+		X_UNUSED(r);
 	}
 
 	X_INLINE void getCameraRight(render::DX11XRender* r)
 	{
 		X_ASSERT_NOT_IMPLEMENTED();
+		X_UNUSED(r);
 	}
 
 	X_INLINE void getCameraUp(render::DX11XRender* r)
 	{
 		X_ASSERT_NOT_IMPLEMENTED();
+		X_UNUSED(r);
 	}
 
 
