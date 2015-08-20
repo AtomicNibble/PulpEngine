@@ -161,6 +161,7 @@ bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 
 bool XShader::FXBegin(uint32 *pPassCountOut, uint32 flags)
 {
+	X_UNUSED(flags);
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 
 	if (!rd->m_State.pCurShader || !rd->m_State.pCurShaderTech) {
