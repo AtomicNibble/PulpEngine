@@ -260,9 +260,9 @@ bool XShader::FXBeginPass(uint32 passIdx)
 	return true;
 }
 
-bool XShader::FXCommit(const uint32 nFlags)
+bool XShader::FXCommit(const uint32 flags)
 {
-
+	X_UNUSED(flags);
 	return true;
 }
 
