@@ -196,7 +196,7 @@ void XTexture::RT_UpdateTextureRegion(byte* data, int nX, int nY, int USize, int
 		return;
 	}
 
-	DXGI_FORMAT frmtSrc = (DXGI_FORMAT)DCGIFormatFromTexFmt(srcFmt);
+//	DXGI_FORMAT frmtSrc = (DXGI_FORMAT)DCGIFormatFromTexFmt(srcFmt);
 	D3D11_BOX rc = { nX, nY, 0, nX + USize, nY + VSize, 1 };
 
 	if (!is_dxt(srcFmt))
