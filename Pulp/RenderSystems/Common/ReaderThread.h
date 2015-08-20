@@ -175,6 +175,7 @@ X_INLINE int XRenderThread::getCurrentThreadId(bool bAlwaysCheck)
 X_INLINE void XRenderThread::beginCommand(RenderCommand::Enum RenderCmd, size_t nParamBytes)
 {
 	m_Commands.write(RenderCmd);
+	m_Commands.resize(m_Commands.size()  + nParamBytes);
 }
 
 X_INLINE void XRenderThread::endCommand()
