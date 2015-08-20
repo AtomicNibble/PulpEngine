@@ -5,7 +5,7 @@
 
 X_NAMESPACE_BEGIN(core)
 
-
+X_DISABLE_WARNING(4324)
 X_ALIGNED_SYMBOL(class Crc32, 128)
 {
 	static const uint32_t CRC32_POLY_NORMAL = 0xEDB88320;
@@ -50,6 +50,7 @@ private:
 
 #include "crc32.inl"
 
+X_DISABLE_WARNING(4324)
 X_NAMESPACE_END
 
 
