@@ -40,9 +40,9 @@ void DX11XRender::RT_DrawString(const Vec3f& pos, const char* pStr)
 {
 	X_ASSERT_NOT_NULL(pStr);
 
-
-
-
+	X_ASSERT_NOT_IMPLEMENTED();
+	X_UNUSED(pos);
+	X_UNUSED(pStr);
 }
 
 
