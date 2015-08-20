@@ -20,6 +20,7 @@ X_INLINE uint32_t BufferSize(ID3D11Buffer* pBuffer)
 
 class XRenderAuxImp : public IRenderAuxImpl
 {
+	X_NO_ASSIGN(XRenderAuxImp);
 public:
 	XRenderAuxImp(render::DX11XRender& renderer);
 	~XRenderAuxImp() X_OVERRIDE;
