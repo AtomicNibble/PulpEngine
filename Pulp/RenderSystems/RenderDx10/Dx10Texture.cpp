@@ -195,7 +195,7 @@ void XTexture::RT_UpdateTextureRegion(byte* data, int nX, int nY, int USize, int
 		X_ERROR("Texture", "can't update a none 2d texture");
 		return;
 	}
-
+	
 //	DXGI_FORMAT frmtSrc = (DXGI_FORMAT)DCGIFormatFromTexFmt(srcFmt);
 	D3D11_BOX rc = { nX, nY, 0, nX + USize, nY + VSize, 1 };
 
