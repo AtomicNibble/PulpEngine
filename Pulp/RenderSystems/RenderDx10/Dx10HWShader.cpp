@@ -135,11 +135,13 @@ namespace
 
 	X_INLINE void getTime(render::DX11XRender* r)
 	{
+		X_UNUSED(r);
 		vecTemp[0][0] = 1.f / gEnv->pTimer->GetFrameTime();
 	}
 
 	X_INLINE void getFrameTime(render::DX11XRender* r)
 	{
+		X_UNUSED(r);
 		vecTemp[0][0] = 1.f / gEnv->pTimer->GetFrameTime();
 	}
 
@@ -465,7 +467,7 @@ bool XHWShader_Dx10::loadFromCache()
 {
 	core::Path<char> dest;
 
-	XShaderManager* pShaderMan = &render::gRenDev->m_ShaderMan;
+//	XShaderManager* pShaderMan = &render::gRenDev->m_ShaderMan;
 
 	getShaderCompileDest(dest);
 
@@ -898,7 +900,7 @@ bool XHWShader_Dx10::reflectShader(void)
 	for (i = 0; i < BindVars.size(); i++)
 	{
 		XShaderParam* pB = &BindVars[i];
-		const char *param = pB->name.c_str();
+		 // const char *param = pB->name.c_str();
 		bool bSampler = (pB->bind & SHADER_BIND_SAMPLER) != 0;
 
 		if (!bSampler)
