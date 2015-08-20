@@ -159,7 +159,7 @@ bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 	return false;
 }
 
-bool XShader::FXBegin(uint32 *uiPassCount, uint32 nFlags)
+bool XShader::FXBegin(uint32 *pPassCountOut, uint32 flags)
 {
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 
@@ -168,15 +168,16 @@ bool XShader::FXBegin(uint32 *uiPassCount, uint32 nFlags)
 		return false;
 	}
 
-	if (uiPassCount)
-		*uiPassCount = 1;
+	if (pPassCountOut) {
+		*pPassCountOut = 1;
+	}
 
 	return true;
 }
 
-bool XShader::FXBeginPass(uint32 uiPass)
+bool XShader::FXBeginPass(uint32 passIdx)
 {
-	X_UNUSED(uiPass);
+	X_UNUSED(passIdx);
 
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 	render::RenderState& state = rd->m_State;

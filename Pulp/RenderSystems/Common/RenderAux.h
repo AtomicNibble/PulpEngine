@@ -440,6 +440,7 @@ inline uint8 XRenderAux::GetPointSize(const XAuxGeomRenderFlags& renderFlags)
 
 	if (PrimType::PtList == primType)
 	{
+		// this is not correct.
 		return (renderFlags & AuxGeomPrivateBitMasks::PrivateRenderflagsMask);
 	}
 
