@@ -509,6 +509,8 @@ void DX11XRender::InitDynamicBuffers(void)
 	for (i = 0; i<VertexPool::PoolMax; i++)
 	{
 		int vertSize, numVerts;
+		vertSize = 0;
+		numVerts = 0;
 		switch (i)
 		{
 			case VertexPool::P3F_T2F_C4B:
@@ -519,6 +521,16 @@ void DX11XRender::InitDynamicBuffers(void)
 				numVerts = 32768 / 4;
 				vertSize = sizeof(Vertex_P3F_T2S_C4B);
 				break;
+			default:
+#if X_DEBUG
+				X_ASSERT_UNREACHABLE();
+				break;
+
+#else
+				X_NO_SWITCH_DEFAULT
+					break;
+#endif // !X_DEBUG
+
 		}
 
 		m_DynVB[i].CreateVB(&vidMemMng_, numVerts, vertSize);
