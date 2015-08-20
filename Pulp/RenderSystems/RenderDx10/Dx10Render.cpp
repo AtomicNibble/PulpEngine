@@ -619,10 +619,7 @@ bool DX11XRender::DefferedEnd()
 
 	m_deviceContext->OMSetRenderTargets(3, pViewsReset, m_depthStencilView);
 
-
 	SetCullMode(CullMode::NONE);
-
-	float height = this->getHeightf() - 10;
 
 	core::StrHash albedo("VisualizeAlbedo");
 	core::StrHash normal("VisualizeNormals");
