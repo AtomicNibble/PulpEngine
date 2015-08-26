@@ -326,7 +326,7 @@ namespace
 	};
 
 
-}
+} // namespace
 
 
 
