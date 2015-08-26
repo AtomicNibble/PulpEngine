@@ -81,8 +81,8 @@ namespace CI
 			hdr.Faces = image->getNumFaces();
 			hdr.Flags = image->getFlags();
 
-			hdr.width = image->getWidth();
-			hdr.height = image->getHeight();
+			hdr.width = safe_static_cast<uint16_t,int>(image->getWidth());
+			hdr.height = safe_static_cast<uint16_t, int>(image->getHeight());
 
 			core::zero_object(hdr.__Unused);
 
