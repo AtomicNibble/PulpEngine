@@ -101,6 +101,7 @@ namespace
 
 	X_INLINE void getObjectToWorldMatrix(render::DX11XRender* r)
 	{
+		X_UNUSED(r);
 		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
 
 		pMat->setToIdentity();

@@ -75,13 +75,12 @@ class XEngineModule_Render : public IEngineModule
 	//////////////////////////////////////////////////////////////////////////
 	virtual bool Initialize(SCoreGlobals &env, const SCoreInitParams &initParams) X_OVERRIDE
 	{
+		X_UNUSED(initParams);
 
 		ICore* pCore = env.pCore;
-		render::IRender *pRender = 0;
-
+		render::IRender* pRender = nullptr;
 
 		pRender = CreateRender(pCore);
-
 
 		env.pRender = pRender;
 		return true;

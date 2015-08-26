@@ -1045,7 +1045,6 @@ void XRenderAuxImp::SetShader(const XAuxGeomRenderFlags& renderFlags)
 void XRenderAuxImp::AdjustRenderStates(const XAuxGeomRenderFlags& renderFlags)
 {
 	// init current render states mask
-	uint32 curRenderStates = 0;
 	StateFlag state;
 
 	// mode 2D/3D -- set new transformation matrix
