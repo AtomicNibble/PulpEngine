@@ -624,7 +624,7 @@ void DX11XRender::DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 	float right = rect.getX2();
 	float bottom = rect.getY2();
 	float height = rect.getHeight();
-	float width = rect.getWidth();
+//	float width = rect.getWidth();
 
 	Color8u col8(Col_Coral);
 
