@@ -64,13 +64,29 @@ inline void ByteStream::seek(size_t pos)
 // resizes the object
 inline void ByteStream::resize(size_t size)
 {
-	if (size > capacity()) {
-		Delete(start_); // free any current memory
+	if (size > capacity()) 
+	{
+		// copy of old memory.
+		char* pOld = start_;
+		size_t numBytes = this->size();
 
-		current_ = start_ = Allocate(size);
+		// allocate new
+		start_ = Allocate(size);
+
+		// copy old over.
+		if (pOld)
+		{
+			::memcpy(start_, pOld, numBytes);
+			Delete(pOld); 
+			current_ = start_ + numBytes;
+		}
+		else
+		{
+			current_ = start_;
+		}
+
 		end_ = start_ + size;
 	}
-	reset();
 }
 
 
