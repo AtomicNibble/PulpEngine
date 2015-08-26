@@ -82,6 +82,10 @@ class XEngineModule_Render : public IEngineModule
 
 		pRender = CreateRender(pCore);
 
+		if (!pRender) {
+			return false;
+		}
+
 		env.pRender = pRender;
 		return true;
 	}
