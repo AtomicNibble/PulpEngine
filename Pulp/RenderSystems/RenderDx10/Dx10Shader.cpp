@@ -313,7 +313,7 @@ bool XShader::FXSetVSFloat(const core::StrHash& NameParam,
 	if (!pParam)
 		return false;
 
-	if (pParam->numParameters != numVecs)
+	if (pParam->numParameters != safe_static_cast<int,uint32_t>(numVecs))
 	{
 		X_ERROR("Shader", "invalid paramater size: expected: %i, given: %i", pParam->numParameters,
 			numVecs);
