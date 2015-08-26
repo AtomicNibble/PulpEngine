@@ -298,11 +298,13 @@ const int XShader::release()
 
 void Cmd_ListShaders(core::IConsoleCmdArgs* pArgs)
 {
+	X_UNUSED(pArgs);
 	render::gRenDev->m_ShaderMan.listShaders();
 }
 
 void Cmd_ListShaderSources(core::IConsoleCmdArgs* pArgs)
 {
+	X_UNUSED(pArgs);
 	render::gRenDev->m_ShaderMan.listShaderSources();
 }
 
