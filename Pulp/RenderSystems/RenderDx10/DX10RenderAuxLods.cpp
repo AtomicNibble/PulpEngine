@@ -92,6 +92,7 @@ namespace
 	{
 		// calc required number of vertices/indices/triangles to build a cone for the given parameters
 		uint32 numVertices, numTriangles, numIndices;
+		uint16_t i;
 
 		numVertices = 2 * (sections + 1) + 2;
 		numTriangles = 2 * sections;
@@ -110,7 +111,7 @@ namespace
 
 		// create circle around it
 		float sectionSlice = toRadians(360.0f / (float)sections);
-		for (uint32 i(0); i <= sections; ++i)
+		for (i = 0; i <= sections; ++i)
 		{
 			Vec3f v;
 			v.x = radius * cosf(i * sectionSlice);
@@ -120,7 +121,7 @@ namespace
 		}
 
 		// build faces for end cap 
-		for (uint16 i(0); i < sections; ++i)
+		for (i = 0; i < sections; ++i)
 		{
 			ib.push_back(0);
 			ib.push_back(1 + i);
@@ -130,7 +131,7 @@ namespace
 		// top
 		vb.push_back(XAuxObjVertex(Vec3f(0.0f, height, 0.0f), Vec3f(0.0f, 1.0f, 0.0f)));
 
-		for (uint32 i(0); i <= sections; ++i)
+		for (i = 0; i <= sections; ++i)
 		{
 			Vec3f v;
 			v.x = radius * cosf(i * sectionSlice);
@@ -150,11 +151,11 @@ namespace
 		}
 
 		// build faces
-		for (uint16 i(0); i < sections; ++i)
+		for (i = 0; i < sections; ++i)
 		{
-			ib.push_back(sections + 2);
-			ib.push_back(sections + 3 + i + 1);
-			ib.push_back(sections + 3 + i);
+			ib.push_back(safe_static_cast<uint16_t,uint32_t>(sections + 2));
+			ib.push_back(safe_static_cast<uint16_t, uint32_t>(sections + 3 + i + 1));
+			ib.push_back(safe_static_cast<uint16_t, uint32_t>(sections + 3 + i));
 		}
 	}
 
@@ -185,7 +186,7 @@ namespace
 			vb.push_back(XAuxObjVertex(Vec3f(0.0f, -0.5f * height, 0.0f), Vec3f(0.0f, -1.0f, 0.0f)));
 
 			// create circle around it
-			uint32 i;
+			uint16_t i;
 			for (i=0; i <= sections; ++i)
 			{
 				Vec3f v;
@@ -206,7 +207,7 @@ namespace
 
 		// side
 		{
-			int vIdx = safe_static_cast<int, size_t>(vb.size());
+			uint16_t vIdx = safe_static_cast<uint16_t, size_t>(vb.size());
 
 			uint32 i;
 			for (i=0; i <= sections; ++i)
@@ -236,13 +237,13 @@ namespace
 
 		// top cap
 		{
-			int vIdx = safe_static_cast<int,size_t>(vb.size());
+			uint16_t vIdx = safe_static_cast<uint16_t, size_t>(vb.size());
 
 			// center top vertex
 			vb.push_back(XAuxObjVertex(Vec3f(0.0f, 0.5f * height, 0.0f), Vec3f(0.0f, 1.0f, 0.0f)));
 
 			// create circle around it
-			uint32 i;
+			uint16_t i;
 			for (i=0; i <= sections; ++i)
 			{
 				Vec3f v;
