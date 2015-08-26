@@ -54,7 +54,6 @@ InputLayoutFormat::Enum ILfromVertexFormat(const VertexFormat::Enum fmt)
 			X_NO_SWITCH_DEFAULT;
 #endif // !X_DEBUG
 	}
-	return InputLayoutFormat::Invalid;
 }
 
 ILFlags IlFlagsForVertexFormat(const VertexFormat::Enum fmt)
