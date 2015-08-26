@@ -39,8 +39,9 @@ void XTextDrawList::addEntry(const Vec3f& vPos, const XDrawTextInfo& ti, const c
 	entry.flags = ti.flags;
 	entry.strLen = safe_static_cast<uint32_t,size_t>(strLen);
 
-	size_t requiredBytes = core::bitUtil::RoundUpToMultiple(sizeof(TextEntry)+strLen + 1, sizeof(TextEntry*));
-
+	// round up required bytes to multiple of pointer size.
+	size_t requiredBytes = core::bitUtil::RoundUpToMultiple(sizeof(TextEntry) + strLen + 1,
+		sizeof(TextEntry*));
 
 	data_.write(entry);
 	data_.write(pStr, strLen + 1);
