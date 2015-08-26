@@ -559,7 +559,7 @@ void DX11XRender::DrawLine(const Vec3f& pos1, const Vec3f& pos2)
 
 
 void DX11XRender::DrawLineColor(const Vec3f& pos1, const Color& color1,
-	const Vec3f& pos2, const Color& vColor2)
+	const Vec3f& pos2, const Color& color2)
 {
 //	SetFFE(false);
 
@@ -570,7 +570,7 @@ void DX11XRender::DrawLineColor(const Vec3f& pos1, const Color& color1,
 	Quad[0].pos = pos1;
 	Quad[0].color = color1;
 	Quad[1].pos = pos2;
-	Quad[1].color = color1;
+	Quad[1].color = color2;
 
 	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
 	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
