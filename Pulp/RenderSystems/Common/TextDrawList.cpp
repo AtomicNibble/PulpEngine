@@ -39,11 +39,17 @@ void XTextDrawList::addEntry(const Vec3f& vPos, const XDrawTextInfo& ti, const c
 	entry.flags = ti.flags;
 	entry.strLen = safe_static_cast<uint32_t,size_t>(strLen);
 
-	size_t requiredBytes = core::bitUtil::RoundUpToMultiple(sizeof(TextEntry)+strLen + 1, sizeof(TextEntry*));
-
-
-	data_.write(entry);
-	data_.write(pStr, strLen + 1);
+	// size of entry + NT string
+	size_t requiredBytes = (sizeof(TextEntry) + strLen + 1);
+	if (requiredBytes <= data_.freeSpace())
+	{
+		data_.write(entry);
+		data_.write(pStr, strLen + 1);
+	}
+	else
+	{
+		X_ERROR("TextDrawList", "Ran out of space in data stream for entry: \"%s\"", pStr);
+	}
 }
 
 

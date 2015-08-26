@@ -306,8 +306,6 @@ void XRenderAuxImp::DrawAuxPrimitives(XRenderAux::AuxSortedPushBuffer::const_ite
 {
 	X_ASSERT(XRenderAux::PrimType::PtList == primType || XRenderAux::PrimType::LineList == primType || XRenderAux::PrimType::TriList == primType, "invalid primative type")(primType);
 
-	HRESULT hr = S_OK;
-
 	bool streamsBound = false;
 
 	// bind vertex and index streams and set vertex declaration
@@ -426,8 +424,6 @@ void XRenderAuxImp::DrawAuxIndexedPrimitives(XRenderAux::AuxSortedPushBuffer::co
 	const XRenderAux::PrimType::Enum primType)
 {
 	X_ASSERT(XRenderAux::PrimType::LineListInd == primType || XRenderAux::PrimType::TriListInd == primType, "invalid prim type")(primType);
-
-	HRESULT hr = S_OK;
 
 	bool streamsBound = false;
 
@@ -1049,7 +1045,6 @@ void XRenderAuxImp::SetShader(const XAuxGeomRenderFlags& renderFlags)
 void XRenderAuxImp::AdjustRenderStates(const XAuxGeomRenderFlags& renderFlags)
 {
 	// init current render states mask
-	uint32 curRenderStates = 0;
 	StateFlag state;
 
 	// mode 2D/3D -- set new transformation matrix

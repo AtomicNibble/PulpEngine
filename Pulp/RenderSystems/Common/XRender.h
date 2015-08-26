@@ -269,12 +269,15 @@ public:
 	core::Array<RenderResource> RenderResources_;
 protected:
 
+	// Warning Render object was padded due to alignments.
+	X_DISABLE_WARNING(4324)
+
 	X_ALIGN16_MATRIX44F(ViewMatrix_);
 	X_ALIGN16_MATRIX44F(ProjMatrix_);
 	X_ALIGN16_MATRIX44F(ViewProjMatrix_);
 	X_ALIGN16_MATRIX44F(ViewProjInvMatrix_);
 
-
+	X_ENABLE_WARNING(4324)
 
 	XRenderThread* m_pRt;
 	VidMemManager vidMemMng_;

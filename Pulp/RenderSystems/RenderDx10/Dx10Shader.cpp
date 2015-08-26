@@ -54,7 +54,6 @@ InputLayoutFormat::Enum ILfromVertexFormat(const VertexFormat::Enum fmt)
 			X_NO_SWITCH_DEFAULT;
 #endif // !X_DEBUG
 	}
-	return InputLayoutFormat::Invalid;
 }
 
 ILFlags IlFlagsForVertexFormat(const VertexFormat::Enum fmt)
@@ -159,8 +158,9 @@ bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 	return false;
 }
 
-bool XShader::FXBegin(uint32 *uiPassCount, uint32 nFlags)
+bool XShader::FXBegin(uint32 *pPassCountOut, uint32 flags)
 {
+	X_UNUSED(flags);
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 
 	if (!rd->m_State.pCurShader || !rd->m_State.pCurShaderTech) {
@@ -168,15 +168,16 @@ bool XShader::FXBegin(uint32 *uiPassCount, uint32 nFlags)
 		return false;
 	}
 
-	if (uiPassCount)
-		*uiPassCount = 1;
+	if (pPassCountOut) {
+		*pPassCountOut = 1;
+	}
 
 	return true;
 }
 
-bool XShader::FXBeginPass(uint32 uiPass)
+bool XShader::FXBeginPass(uint32 passIdx)
 {
-	X_UNUSED(uiPass);
+	X_UNUSED(passIdx);
 
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 	render::RenderState& state = rd->m_State;
@@ -258,9 +259,9 @@ bool XShader::FXBeginPass(uint32 uiPass)
 	return true;
 }
 
-bool XShader::FXCommit(const uint32 nFlags)
+bool XShader::FXCommit(const uint32 flags)
 {
-
+	X_UNUSED(flags);
 	return true;
 }
 
@@ -311,7 +312,7 @@ bool XShader::FXSetVSFloat(const core::StrHash& NameParam,
 	if (!pParam)
 		return false;
 
-	if (pParam->numParameters != numVecs)
+	if (pParam->numParameters != safe_static_cast<int,uint32_t>(numVecs))
 	{
 		X_ERROR("Shader", "invalid paramater size: expected: %i, given: %i", pParam->numParameters,
 			numVecs);

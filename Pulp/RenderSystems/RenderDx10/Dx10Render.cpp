@@ -358,8 +358,9 @@ bool DX11XRender::Init(HWND hWnd,
 	}
 	// where is my debug interface slut!
 	return false;
-#endif
+#else
 	return true;
+#endif
 }
 
 
@@ -508,6 +509,8 @@ void DX11XRender::InitDynamicBuffers(void)
 	for (i = 0; i<VertexPool::PoolMax; i++)
 	{
 		int vertSize, numVerts;
+		vertSize = 0;
+		numVerts = 0;
 		switch (i)
 		{
 			case VertexPool::P3F_T2F_C4B:
@@ -518,6 +521,16 @@ void DX11XRender::InitDynamicBuffers(void)
 				numVerts = 32768 / 4;
 				vertSize = sizeof(Vertex_P3F_T2S_C4B);
 				break;
+			default:
+#if X_DEBUG
+				X_ASSERT_UNREACHABLE();
+				break;
+
+#else
+				X_NO_SWITCH_DEFAULT
+					break;
+#endif // !X_DEBUG
+
 		}
 
 		m_DynVB[i].CreateVB(&vidMemMng_, numVerts, vertSize);
@@ -619,10 +632,7 @@ bool DX11XRender::DefferedEnd()
 
 	m_deviceContext->OMSetRenderTargets(3, pViewsReset, m_depthStencilView);
 
-
 	SetCullMode(CullMode::NONE);
-
-	float height = this->getHeightf() - 10;
 
 	core::StrHash albedo("VisualizeAlbedo");
 	core::StrHash normal("VisualizeNormals");
@@ -930,7 +940,7 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 
 	D3D11_INPUT_ELEMENT_DESC elem_pos = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 	D3D11_INPUT_ELEMENT_DESC elem_nor101010 = { "NORMAL", 0, DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
-	D3D11_INPUT_ELEMENT_DESC elem_nor8888 = { "NORMAL", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
+//6	D3D11_INPUT_ELEMENT_DESC elem_nor8888 = { "NORMAL", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 	D3D11_INPUT_ELEMENT_DESC elem_nor323232 = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 	D3D11_INPUT_ELEMENT_DESC elem_col8888 = { "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };
 	D3D11_INPUT_ELEMENT_DESC elem_uv3232 = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 };

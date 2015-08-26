@@ -195,21 +195,20 @@ void XTexture::RT_UpdateTextureRegion(byte* data, int nX, int nY, int USize, int
 		X_ERROR("Texture", "can't update a none 2d texture");
 		return;
 	}
-
-	DXGI_FORMAT frmtSrc = (DXGI_FORMAT)DCGIFormatFromTexFmt(srcFmt);
+	
+//	DXGI_FORMAT frmtSrc = (DXGI_FORMAT)DCGIFormatFromTexFmt(srcFmt);
 	D3D11_BOX rc = { nX, nY, 0, nX + USize, nY + VSize, 1 };
 
 	if (!is_dxt(srcFmt))
 	{
-		int nBPPSrc = get_bpp(srcFmt);
-		int nRowPitch = get_data_size(USize, 1, 1, 1, srcFmt);
+		int rowPitch = get_data_size(USize, 1, 1, 1, srcFmt);
 
 		render::g_Dx11D3D.DxDeviceContext()->UpdateSubresource(
 			DeviceTexture.get2DTexture(),
 			0, 
 			&rc, 
 			data, 
-			nRowPitch, 
+			rowPitch, 
 			0
 		);
 	}

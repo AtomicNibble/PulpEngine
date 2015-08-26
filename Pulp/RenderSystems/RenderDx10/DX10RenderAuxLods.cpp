@@ -326,7 +326,7 @@ namespace
 	};
 
 
-}
+} // namespace
 
 
 
@@ -374,7 +374,6 @@ bool XRenderAuxImp::CreateMesh(XDrawObjMesh& mesh, TMeshFunc meshFunc)
 HRESULT XRenderAuxImp::RestoreDeviceObjects()
 {
 	HRESULT hr = S_OK;
-	ID3D11Device* pDevice = renderer_.DxDevice();
 
 	// release
 	ReleaseDeviceObjects();

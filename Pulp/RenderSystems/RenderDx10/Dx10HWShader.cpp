@@ -101,6 +101,7 @@ namespace
 
 	X_INLINE void getObjectToWorldMatrix(render::DX11XRender* r)
 	{
+		X_UNUSED(r);
 		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
 
 		pMat->setToIdentity();
@@ -109,9 +110,8 @@ namespace
 
 	X_INLINE void getWorldMatrix(render::DX11XRender* r)
 	{
-		D3DXMATRIX* pMatD3D = (D3DXMATRIX*)(&vecTemp[0]);
-
 		X_ASSERT_NOT_IMPLEMENTED();
+		X_UNUSED(r);
 	}
 
 	X_INLINE void getviewMatrix(render::DX11XRender* r)
@@ -135,11 +135,13 @@ namespace
 
 	X_INLINE void getTime(render::DX11XRender* r)
 	{
+		X_UNUSED(r);
 		vecTemp[0][0] = 1.f / gEnv->pTimer->GetFrameTime();
 	}
 
 	X_INLINE void getFrameTime(render::DX11XRender* r)
 	{
+		X_UNUSED(r);
 		vecTemp[0][0] = 1.f / gEnv->pTimer->GetFrameTime();
 	}
 
@@ -166,16 +168,19 @@ namespace
 	X_INLINE void getCameraFront(render::DX11XRender* r)
 	{
 		X_ASSERT_NOT_IMPLEMENTED();
+		X_UNUSED(r);
 	}
 
 	X_INLINE void getCameraRight(render::DX11XRender* r)
 	{
 		X_ASSERT_NOT_IMPLEMENTED();
+		X_UNUSED(r);
 	}
 
 	X_INLINE void getCameraUp(render::DX11XRender* r)
 	{
 		X_ASSERT_NOT_IMPLEMENTED();
+		X_UNUSED(r);
 	}
 
 
@@ -462,7 +467,7 @@ bool XHWShader_Dx10::loadFromCache()
 {
 	core::Path<char> dest;
 
-	XShaderManager* pShaderMan = &render::gRenDev->m_ShaderMan;
+//	XShaderManager* pShaderMan = &render::gRenDev->m_ShaderMan;
 
 	getShaderCompileDest(dest);
 
@@ -877,7 +882,7 @@ bool XHWShader_Dx10::reflectShader(void)
 			// as the texture link them.
 			if (temp.isEqual(pB->name))
 			{
-				pB->constBufferSlot = InputBindDesc.BindPoint;
+				pB->constBufferSlot = safe_static_cast<short,UINT>(InputBindDesc.BindPoint);
 				break;
 			}
 
@@ -895,7 +900,7 @@ bool XHWShader_Dx10::reflectShader(void)
 	for (i = 0; i < BindVars.size(); i++)
 	{
 		XShaderParam* pB = &BindVars[i];
-		const char *param = pB->name.c_str();
+		 // const char *param = pB->name.c_str();
 		bool bSampler = (pB->bind & SHADER_BIND_SAMPLER) != 0;
 
 		if (!bSampler)
@@ -1046,8 +1051,6 @@ const int XHWShader_Dx10::releaseHW(void)
 	ShaderStatus::Enum status = this->status_;
 	ShaderType::Enum type = this->type_;
 	void* pHandle = pHWHandle_;
-
-	ID3D11DeviceContext* pDevice = render::g_Dx11D3D.DxDeviceContext();
 
 	if (status == ShaderStatus::ReadyToRock)
 	{

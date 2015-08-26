@@ -1043,6 +1043,9 @@ void XRenderAux::drawBone(const QuatTransf& rParent, const QuatTransf& rChild, c
 void XRenderAux::drawBone(const Matrix34f& rParent, const Matrix34f& rBone, const Color8u& col)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
+	X_UNUSED(rParent);
+	X_UNUSED(rBone);
+	X_UNUSED(col);
 }
 
 // --------------------------------------------------------------------------
