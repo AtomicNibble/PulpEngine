@@ -1051,8 +1051,6 @@ const int XHWShader_Dx10::releaseHW(void)
 	ShaderType::Enum type = this->type_;
 	void* pHandle = pHWHandle_;
 
-	ID3D11DeviceContext* pDevice = render::g_Dx11D3D.DxDeviceContext();
-
 	if (status == ShaderStatus::ReadyToRock)
 	{
 		if (type == ShaderType::Vertex)
