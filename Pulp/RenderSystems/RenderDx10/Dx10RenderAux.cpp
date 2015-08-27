@@ -207,7 +207,9 @@ void XRenderAuxImp::RT_Flush(const XAuxGeomCBRawDataPackaged& data, size_t begin
 			XRenderAux::PrimType::Enum primType(XRenderAux::GetPrimType(curRenderFlags));
 
 			// find all entries sharing the same render flags
+			X_DISABLE_WARNING(4127)
 			while (true)
+			X_ENABLE_WARNING(4127)
 			{
 				++it;
 				if ((it == itEnd) || ((*it)->renderFlags != curRenderFlags) 
