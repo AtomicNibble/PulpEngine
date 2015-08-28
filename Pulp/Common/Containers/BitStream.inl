@@ -64,13 +64,14 @@ inline void BitStream::seek(size_t pos)
 
 
 // resizes the object
-inline void BitStream::resize(size_t size) 
+inline void BitStream::resize(size_t numBits) 
 {
-	if (size > capacity()) {
+	if (numBits > capacity())
+	{
 		Delete(start_);
 
-		start_ = Allocate(size);
-		capacity_ = size;
+		start_ = Allocate(numBits);
+		capacity_ = numBits;
 		bitIdx_ = 0;
 	}
 }

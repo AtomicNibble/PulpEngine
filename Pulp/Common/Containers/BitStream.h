@@ -28,8 +28,8 @@ public:
 	inline void seek(size_t pos);
 
 
-	// resizes the object
-	inline void resize(size_t size);
+	// resizes the object to holx X bits
+	inline void resize(size_t numBits);
 	// clears the stream setting the cursor back to the start.
 	// no memory is freed
 	inline void reset(void);
