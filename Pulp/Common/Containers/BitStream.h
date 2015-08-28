@@ -52,8 +52,8 @@ private:
 
 	// for easy memory allocation changes later.
 	inline size_t bytesRequired(size_t numBits) const;
-	inline void Delete(char* pData);
-	inline char* Allocate(size_t numbits);
+	inline void Delete(char* pData) const;
+	inline char* Allocate(size_t numbits) const;
 
 	size_t capacity_;
 	size_t bitIdx_;		// the current bit index.

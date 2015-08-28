@@ -146,12 +146,12 @@ inline size_t BitStream::bytesRequired(size_t numBits) const
 }
 
 // for easy memory allocation changes later.
-inline void BitStream::Delete(char* pData)
+inline void BitStream::Delete(char* pData) const
 {
 	X_DELETE_ARRAY(pData,arena_);
 }
 
-inline char* BitStream::Allocate(size_t numbits)
+inline char* BitStream::Allocate(size_t numbits) const
 {
 	size_t numBytes = bytesRequired(numbits);
 
