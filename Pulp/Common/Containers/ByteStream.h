@@ -14,6 +14,7 @@ public:
 	// constructs the stream no memory is allocated.
 	inline ByteStream(MemoryArenaBase* arena);
 	inline ByteStream(MemoryArenaBase* arena, size_t numBytes);
+	inline ~ByteStream();
 
 	// writes the type to the stream.
 	template<typename T>

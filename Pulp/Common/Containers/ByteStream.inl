@@ -20,6 +20,10 @@ ByteStream::ByteStream(MemoryArenaBase* arena, size_t numBytes)
 	resize(numBytes);
 }
 
+ByteStream::~ByteStream()
+{
+	free();
+}
 
 template<typename T>
 inline void ByteStream::write(const T& val)
