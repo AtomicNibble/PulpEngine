@@ -38,7 +38,7 @@ inline void BitStream::write(bool bit)
 }
 
 // removes and returns the top bit off the stream.
-inline bool BitStream::read()
+inline bool BitStream::read(void)
 {
 	X_ASSERT(size() > 0, "can't read bit from stream.")(size());
 
@@ -51,7 +51,7 @@ inline bool BitStream::read()
 }
 
 // returns the top bit but dose not remove it.
-inline bool BitStream::peek() const
+inline bool BitStream::peek(void) const
 {
 	X_ASSERT(size() > 0, "can't peek bit from stream.")(size());
 
@@ -114,25 +114,25 @@ inline void BitStream::free(void)
 
 
 // returns how many bits are currently stored in the stream.
-inline size_t BitStream::size() const
+inline size_t BitStream::size(void) const
 {
 	return bitIdx_;
 }
 
 // returns the capacity
-inline size_t BitStream::capacity() const
+inline size_t BitStream::capacity(void) const
 {
 	return capacity_;
 }
 
 // returns the amount of bits that can be added.
-inline size_t BitStream::freeSpace() const
+inline size_t BitStream::freeSpace(void) const
 {
 	return capacity_ - bitIdx_;
 }
 
 // returns true if the stream is full.
-inline bool BitStream::isEos() const
+inline bool BitStream::isEos(void) const
 {
 	return bitIdx_ == capacity_;
 }

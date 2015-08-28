@@ -22,9 +22,9 @@ public:
 	// writes a bit to the stream
 	inline void write(bool bit);
 	// removes and returns the top bit off the stream.
-	inline bool read();
+	inline bool read(void);
 	// returns the top bit but dose not remove it.
-	inline bool peek() const;
+	inline bool peek(void) const;
 	// sets the absolute bit position in the stream.
 	inline void seek(size_t pos);
 
@@ -38,13 +38,13 @@ public:
 	inline void free(void);
 
 	// returns how many bits are currently stored in the stream.
-	inline size_t size() const;
+	inline size_t size(void) const;
 	// returns how many bits it can store.
-	inline size_t capacity() const;
+	inline size_t capacity(void) const;
 	// returns the amount of bits that can be added.
-	inline size_t freeSpace() const;
+	inline size_t freeSpace(void) const;
 	// returns true if the stream is full.
-	inline bool isEos() const;
+	inline bool isEos(void) const;
 	
 private:
 	X_NO_COPY(BitStream);
