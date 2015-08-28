@@ -13,9 +13,10 @@ class ByteStreamFifo
 public:
 	// constructs the stream no memory is allocated.
 	inline ByteStreamFifo(MemoryArenaBase* arena);
+	inline ByteStreamFifo(MemoryArenaBase* arena, size_t numBytes);
 	inline ~ByteStreamFifo(void);
 
-	inline void setArena(MemoryArenaBase* arena);
+//	inline void setArena(MemoryArenaBase* arena);
 
 	// writes the type to the stream.
 	template<typename T>
@@ -25,14 +26,14 @@ public:
 
 	// reads from the start.
 	template<typename T>
-	inline T read();
+	inline T read(void);
 
 	// returns the current object but dose not remove it.
 	template<typename T>
-	inline T& peek();
+	inline T& peek(void);
 
 	template<typename T>
-	inline const T peek() const;
+	inline const T peek(void) const;
 
 	// sets the absolute position in the stream.
 	inline void seek(size_t pos);
@@ -51,15 +52,15 @@ public:
 
 	inline bool isEmpty(void) const;
 	// returns how many bytes are currently stored in the stream.
-	inline size_t size() const;
+	inline size_t size(void) const;
 	// returns the capacity of the byte stream.
-	inline size_t capacity() const;
+	inline size_t capacity(void) const;
 	// returns the amount of bytes that can be added.
-	inline size_t freeSpace() const;
+	inline size_t freeSpace(void) const;
 	// returns true if the stream is full.
-	inline bool isEos() const;
+	inline bool isEos(void) const;
 
-	inline char* begin() const {
+	inline char* begin(void) const {
 		return start_;
 	}
 
@@ -68,8 +69,8 @@ protected:
 	X_NO_ASSIGN(ByteStreamFifo);
 
 	// for easy memory allocation changes later.
-	inline void Delete(char* pData);
-	inline char* Allocate(size_t num);
+	inline void Delete(char* pData) const;
+	inline char* Allocate(size_t num) const;
 
 	char* read_;
 	char* write_;
