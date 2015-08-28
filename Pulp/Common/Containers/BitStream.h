@@ -50,6 +50,7 @@ private:
 	X_NO_ASSIGN(BitStream);
 
 	// for easy memory allocation changes later.
+	inline size_t bytesRequired(size_t numBits) const;
 	inline void Delete(char* pData);
 	inline char* Allocate(size_t numbits);
 

@@ -68,11 +68,22 @@ inline void BitStream::resize(size_t numBits)
 {
 	if (numBits > capacity())
 	{
-		Delete(start_);
+		// save local copy of old array and it's size.
+		char* pOld = start_;
+		size_t bytesAllocated = bytesRequired(capacity_);
 
+		// allocate the new one.
 		start_ = Allocate(numBits);
+
+		// copy over.
+		if(pOld)
+		{
+			::memcpy(start_,pOld, bytesAllocated);
+			Delete(pOld);
+		}
+
+		// update capacity.		
 		capacity_ = numBits;
-		bitIdx_ = 0;
 	}
 }
 
@@ -117,6 +128,13 @@ inline bool BitStream::isEos() const
 	return bitIdx_ == capacity_;
 }
 
+inline size_t BitStream::bytesRequired(size_t numBits) const
+{
+	// align so that all the bits fit.
+	numBits = bitUtil::RoundUpToMultiple<size_t>(numBits, 8);
+	numBits >>= 3; // to bytes
+	return numBits;
+}
 
 // for easy memory allocation changes later.
 inline void BitStream::Delete(char* pData)
@@ -126,9 +144,7 @@ inline void BitStream::Delete(char* pData)
 
 inline char* BitStream::Allocate(size_t numbits)
 {
-	// align so that all the bits fit.
-	numbits = bitUtil::RoundUpToMultiple<size_t>(numbits, 8);
-	numbits >>= 3; // to bytes
+	size_t numBytes = bytesRequired(numbits);
 
-	return X_NEW_ARRAY(char, numbits, arena_, "BitStream");
+	return X_NEW_ARRAY(char, numBytes, arena_, "BitStream");
 }
