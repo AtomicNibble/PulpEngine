@@ -120,7 +120,6 @@ inline bool BitStream::isEos() const
 // for easy memory allocation changes later.
 inline void BitStream::Delete(char* pData)
 {
-	// ::free((void*)pData);
 	X_DELETE_ARRAY(pData,arena_);
 }
 
@@ -131,5 +130,4 @@ inline char* BitStream::Allocate(size_t numbits)
 	numbits >>= 3; // to bytes
 
 	return X_NEW_ARRAY(char, numbits, arena_, "BitStream");
-	// return (char*)malloc(numbits);
 }
