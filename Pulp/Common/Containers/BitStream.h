@@ -17,6 +17,7 @@ class BitStream
 public:
 	// constructs the stream no memory is allocated.
 	inline BitStream(MemoryArenaBase* arena);
+	inline BitStream(MemoryArenaBase* arena, size_t numBits);
 
 	// writes a bit to the stream
 	inline void write(bool bit);

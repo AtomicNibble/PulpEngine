@@ -6,9 +6,18 @@ start_(0),
 arena_(arena)
 {
 	X_ASSERT_NOT_NULL(arena);
-
-
 }
+
+BitStream::BitStream(MemoryArenaBase* arena, size_t numBits) :
+bitIdx_(0),
+capacity_(0),
+start_(0),
+arena_(arena)
+{
+	X_ASSERT_NOT_NULL(arena);
+	resize(numBits);
+}
+
 
 
 // writes a bit to the stream
