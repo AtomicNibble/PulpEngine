@@ -86,6 +86,7 @@ inline void BitStream::free(void)
 	if (start_) {
 		Delete(start_);
 	}
+	start_ = nullptr;
 	bitIdx_ = capacity_ = 0;
 }
 
