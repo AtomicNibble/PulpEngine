@@ -43,7 +43,7 @@ public:
 	inline void skip(size_t num);
 
 	// resizes the object
-	inline void resize(size_t size);
+	inline void resize(size_t numBytes);
 	// clears the stream setting the write / read back to the start.
 	// no memory is freed
 	inline void reset(void);

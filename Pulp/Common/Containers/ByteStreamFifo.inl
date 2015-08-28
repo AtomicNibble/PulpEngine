@@ -120,13 +120,13 @@ inline void ByteStreamFifo::skip(size_t num)
 }
 
 // resizes the object
-inline void ByteStreamFifo::resize(size_t size)
+inline void ByteStreamFifo::resize(size_t numBytes)
 {
-	if (size > capacity()) {
+	if (numBytes > capacity()) {
 		Delete(start_); // free any current memory
 
-		write_ = read_ = start_ = Allocate(size);
-		end_ = start_ + size;
+		write_ = read_ = start_ = Allocate(numBytes);
+		end_ = start_ + numBytes;
 	}
 	reset();
 }
