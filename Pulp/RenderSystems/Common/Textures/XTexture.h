@@ -26,6 +26,7 @@ struct XTextureFile;
 
 static const size_t TEX_MAX_SLOTS = 8;
 
+X_DISABLE_WARNING(4324)
 class X_ALIGNED_SYMBOL(XTexture, 64) : public ITexture, public core::XBaseAsset
 {
 
@@ -209,6 +210,7 @@ private:
 
 };
 
+X_ENABLE_WARNING(4324)
 // X_ENSURE_SIZE(XTexture, 64);
 
 X_NAMESPACE_END
