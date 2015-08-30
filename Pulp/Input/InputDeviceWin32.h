@@ -20,9 +20,9 @@ public:
 	virtual ~XInputDeviceWin32() X_OVERRIDE;
 
 
-	virtual void Update(bool bFocus)X_OVERRIDE;
+	virtual void Update(bool focus)X_OVERRIDE;
 	virtual void ProcessInput(const RAWINPUTHEADER& header, const uint8_t* pData) X_ABSTRACT;
-	virtual void ShutDown() X_ABSTRACT;
+	virtual void ShutDown(void) X_ABSTRACT;
 
 	// ~IInputDevice
 
