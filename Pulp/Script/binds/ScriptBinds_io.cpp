@@ -282,7 +282,7 @@ int XBinds_Io_File::close(IFunctionHandler* pH)
 int XBinds_Io_File::readNumber(IFunctionHandler* pH, core::XFile* pFile)
 {
 	X_ASSERT_NOT_NULL(pFile);
-
+	X_ASSERT_NOT_IMPLEMENTED();
 
 	return pH->EndFunction();
 }
@@ -290,8 +290,8 @@ int XBinds_Io_File::readNumber(IFunctionHandler* pH, core::XFile* pFile)
 int XBinds_Io_File::readLine(IFunctionHandler* pH, core::XFile* pFile, bool keepEol)
 {
 	X_ASSERT_NOT_NULL(pFile);
-
-
+	X_ASSERT_NOT_IMPLEMENTED();
+	X_UNUSED(keepEol);
 	return pH->EndFunction();
 }
 
