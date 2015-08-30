@@ -70,16 +70,16 @@ namespace hardwareBP
 							switch( reg )
 							{
 							case 0:
-								ct.Dr0 = (DWORD64)address;
+								ct.Dr0 = reinterpret_cast<DWORD64>(address);
 								break;
 							case 1:
-								ct.Dr1 = (DWORD64)address;
+								ct.Dr1 = reinterpret_cast<DWORD64>(address);
 								break;
 							case 2:
-								ct.Dr2 = (DWORD64)address;
+								ct.Dr2 = reinterpret_cast<DWORD64>(address);
 								break;
 							case 3:
-								ct.Dr3 = (DWORD64)address;
+								ct.Dr3 = reinterpret_cast<DWORD64>(address);
 								break;
 
 							default:
