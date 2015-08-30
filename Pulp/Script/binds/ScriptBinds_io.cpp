@@ -215,6 +215,7 @@ int XBinds_Io_File::seek(IFunctionHandler* pH)
 	const char* modeStr;
 	int offset;
 
+	mode = SeekMode::CUR;
 	modeStr = nullptr;
 	offset = 0;
 
@@ -249,8 +250,8 @@ int XBinds_Io_File::seek(IFunctionHandler* pH)
 
 		if (i == numModes)
 		{ 
-			mode = SeekMode::CUR;
 			pScriptSys_->OnScriptError("Unkown file:seek mode: \"%s\" valid modes: cur,set,end", mode);
+			return pH->EndFunction();
 		}
 	}
 
