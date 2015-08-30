@@ -583,6 +583,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb)
 
 		// post it baby.
 		bool processed = input.PostInputEvent(event);
+		X_UNUSED(processed);
 
 		// if it's a char post it again.
 		if (newstate == InputState::PRESSED && IsCHAR(event))
