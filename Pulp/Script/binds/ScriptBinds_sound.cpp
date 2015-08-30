@@ -49,8 +49,11 @@ XBinds_Sound::~XBinds_Sound()
 
 ISound* XBinds_Sound::GetSoundPtr(IFunctionHandler* pH, int index)
 {
-	ScriptValueType::Enum type = pH->GetParamType(index);
+	X_UNUSED(pH);
+	X_UNUSED(index);
 /*
+	ScriptValueType::Enum type = pH->GetParamType(index);
+
 	if (type == svtPointer) // this is a script handle
 	{
 		ScriptHandle soundID;
