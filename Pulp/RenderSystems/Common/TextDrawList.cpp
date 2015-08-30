@@ -6,7 +6,7 @@ X_NAMESPACE_BEGIN(render)
 
 
 
-XTextDrawList::XTextDrawList() :
+XTextDrawList::XTextDrawList(core::MemoryArenaBase* arena) :
 	data_(nullptr)
 {
 
@@ -22,7 +22,7 @@ void XTextDrawList::setArena(core::MemoryArenaBase* arena)
 {
 	X_ASSERT_NOT_NULL(arena);
 
-	data_.setArena(arena);
+//	data_.setArena(arena);
 	data_.resize((sizeof(TextEntry)+200) * 512);
 }
 

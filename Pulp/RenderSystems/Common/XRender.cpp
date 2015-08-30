@@ -103,7 +103,8 @@ XRender::XRender() :
 	pRt_(nullptr),
 	fontIdx_(0),
 	pDefaultFont_(nullptr),
-	RenderResources_(g_rendererArena)
+	RenderResources_(g_rendererArena),
+	textDrawList_(g_rendererArena)
 {
 	// try make sure that the array above is valid.
 #if X_DEBUG
