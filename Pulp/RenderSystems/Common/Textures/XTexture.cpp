@@ -593,7 +593,7 @@ XTexture* XTexture::NewTexture(const char* name, const Vec2i& size,
 	return pTex;
 }
 
-XTexture* XTexture::Create2DTexture(const char* name, const Vec2i& size, int numMips,
+XTexture* XTexture::Create2DTexture(const char* name, const Vec2i& size, size_t numMips,
 	TextureFlags Flags, byte* pData, Texturefmt::Enum textureFmt)
 {
 	X_ASSERT_NOT_NULL(name);
@@ -608,7 +608,7 @@ XTexture* XTexture::Create2DTexture(const char* name, const Vec2i& size, int num
 	file.depth = 1;
 	file.numFaces = 1;
 	file.format = textureFmt;
-	file.numMips = numMips;
+	file.numMips = safe_static_cast<uint8_t,size_t>(numMips);
 	file.flags = Flags;
 	file.size = size;
 	file.type = TextureType::T2D;

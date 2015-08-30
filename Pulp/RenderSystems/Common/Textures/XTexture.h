@@ -134,7 +134,7 @@ public:
 	static XTexture* NewTexture(const char *name, const Vec2i& size, TextureFlags Flags, 
 		Texturefmt::Enum fmt);
 
-	static XTexture* Create2DTexture(const char* name, const Vec2i& size, int nMips, TextureFlags Flags,
+	static XTexture* Create2DTexture(const char* name, const Vec2i& size, size_t numMips, TextureFlags Flags,
 		byte* pData, Texturefmt::Enum fmt);
 
 	static XTexture* CreateRenderTarget(const char* name, uint32_t width, uint32_t height,
