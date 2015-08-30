@@ -40,72 +40,22 @@ class XScriptableBase
 public:
 	typedef IScriptTable::ScriptFunction ScriptFunction;
 
-	XScriptableBase() :
-		pScriptSys_(nullptr)
-	{
+	X_INLINE XScriptableBase();
+	X_INLINE ~XScriptableBase();
 
-	}
+	X_INLINE void Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0);
+	X_INLINE void SetGlobalName(const char* GlobalName);
+	X_INLINE void Delegate(XScriptableBase* pScriptableBase);
 
-	~XScriptableBase()
-	{
-		if (!name_.isEmpty() && pScriptSys_)
-			pScriptSys_->SetGlobalToNull(name_.c_str());
-	
-		core::SafeRelease(pMethodsTable_);
-	}
-
-	void Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0)
-	{
-		pScriptSys_ = pSS;
-		pMethodsTable_ = pSS->CreateTable();
-		pMethodsTable_->addRef();
-		paramIdOffset_ = paramIdOffset;
-	}
-
-
-	void SetGlobalName(const char* GlobalName)
-	{
-		name_.set(GlobalName);
-
-		if (pMethodsTable_)
-			pScriptSys_->SetGlobalValue(name_.c_str(), pMethodsTable_);
-	}
-
-	void Delegate(XScriptableBase* pScriptableBase)
-	{
-		if (pMethodsTable_ && pScriptableBase)
-			pMethodsTable_->Delegate(pScriptableBase->pMethodsTable_);
-	}
-
-	IScriptTable* GetMethodsTable() { return pMethodsTable_; };
+	X_INLINE IScriptTable* GetMethodsTable(void);
 
 protected:
 
-	void RegisterGlobal(const char* Name, float value)
-	{
-		pScriptSys_->SetGlobalValue(Name, value);
-	}
-
-	void RegisterGlobal(const char* Name, int value)
-	{
-		pScriptSys_->SetGlobalValue(Name, value);
-	}
-
+	void RegisterGlobal(const char* Name, float value);
+	void RegisterGlobal(const char* Name, int value);
 
 	void RegisterFunction(const char* funcName,
-		const IScriptTable::ScriptFunction& function)
-	{
-		if (pMethodsTable_)
-		{
-			IScriptTable::XUserFunctionDesc fd;
-			fd.sGlobalName = name_.c_str();
-			fd.sFunctionName = funcName;
-			fd.function = function;
-			fd.nParamIdOffset = paramIdOffset_;
-
-			pMethodsTable_->AddFunction(fd);
-		}
-	}
+		const IScriptTable::ScriptFunction& function);
 
 protected:
 	core::StackString<60> name_;
@@ -113,6 +63,81 @@ protected:
 	IScriptTable* pMethodsTable_;
 	int paramIdOffset_;
 };
+
+
+XScriptableBase::XScriptableBase() :
+	pScriptSys_(nullptr)
+{
+
+}
+
+XScriptableBase::~XScriptableBase()
+{
+	if (!name_.isEmpty() && pScriptSys_) {
+		pScriptSys_->SetGlobalToNull(name_.c_str());
+	}
+	core::SafeRelease(pMethodsTable_);
+}
+
+void XScriptableBase::Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
+{
+	X_UNUSED(pCore);
+	pScriptSys_ = pSS;
+	pMethodsTable_ = pSS->CreateTable();
+	pMethodsTable_->addRef();
+	paramIdOffset_ = paramIdOffset;
+}
+
+
+void XScriptableBase::SetGlobalName(const char* GlobalName)
+{
+	name_.set(GlobalName);
+
+	if (pMethodsTable_) {
+		pScriptSys_->SetGlobalValue(name_.c_str(), pMethodsTable_);
+	}
+}
+
+void XScriptableBase::Delegate(XScriptableBase* pScriptableBase)
+{
+	if (pMethodsTable_ && pScriptableBase) {
+		pMethodsTable_->Delegate(pScriptableBase->pMethodsTable_);
+	}
+}
+
+IScriptTable* XScriptableBase::GetMethodsTable(void)
+{ 
+	return pMethodsTable_; 
+}
+
+
+// ----------------------------------------------------------------
+
+void XScriptableBase::RegisterGlobal(const char* Name, float value)
+{
+	pScriptSys_->SetGlobalValue(Name, value);
+}
+
+void XScriptableBase::RegisterGlobal(const char* Name, int value)
+{
+	pScriptSys_->SetGlobalValue(Name, value);
+}
+
+
+void XScriptableBase::RegisterFunction(const char* funcName,
+	const IScriptTable::ScriptFunction& function)
+{
+	if (pMethodsTable_)
+	{
+		IScriptTable::XUserFunctionDesc fd;
+		fd.sGlobalName = name_.c_str();
+		fd.sFunctionName = funcName;
+		fd.function = function;
+		fd.nParamIdOffset = paramIdOffset_;
+
+		pMethodsTable_->AddFunction(fd);
+	}
+}
 
 
 X_NAMESPACE_END
