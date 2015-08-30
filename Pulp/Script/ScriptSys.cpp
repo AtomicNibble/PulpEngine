@@ -59,7 +59,6 @@ extern "C"
 		int level = 0;
 		while (lua_getstack(L, level++, &ar))
 		{
-			const char* slevel = "";
 			if (level >= max_stack_lvl) {
 				level = max_stack_lvl - 1;
 			}
