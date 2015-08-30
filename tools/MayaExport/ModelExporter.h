@@ -280,7 +280,7 @@ public:
 	MayaModel();
 	~MayaModel();
 
-	void getBindPose(MObject &jointNode, MayaBone *bone, float scale);
+	void getBindPose(const MObject &jointNode, MayaBone *bone, float scale);
 
 	MStatus lodLODs(void);
 	MStatus loadBones(void);

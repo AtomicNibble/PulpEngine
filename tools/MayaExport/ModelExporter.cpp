@@ -254,7 +254,7 @@ bool GetMeshMaterial(MayaMesh* mesh, MDagPath &dagPath)
 }
 
 
-core::StackString<60> getMeshDisplayName(MString& fullname)
+core::StackString<60> getMeshDisplayName(const MString& fullname)
 {
 	typedef core::StackString<60> NameType;
 	core::FixedStack<NameType, 16> Stack;
@@ -771,7 +771,7 @@ MStatus MayaLOD::LoadMeshes(void)
 
 		int numVerts = fnmesh.numVertices(&status);
 		int numPoly = fnmesh.numPolygons(&status);
-		int numNormals = fnmesh.numNormals(&status);
+//		int numNormals = fnmesh.numNormals(&status);
 
 		if (!status) {
 			MayaPrintError("Mesh(%s): failed to get mesh info (%s)", fnmesh.name().asChar(), status.errorString().asChar());
@@ -1174,7 +1174,7 @@ MayaBone *MayaModel::findJointReal(const char *name) {
 
 
 
-void MayaModel::getBindPose(MObject &jointNode, MayaBone *bone, float scale) {
+void MayaModel::getBindPose(const MObject &jointNode, MayaBone *bone, float scale) {
 	MStatus				status;
 	MFnDependencyNode	fnJoint(jointNode);
 	MObject				aBindPose = fnJoint.attribute("bindPose", &status);
@@ -1400,6 +1400,8 @@ void MayaModel::MergeMeshes()
 
 void MayaModel::printStats(PotatoOptions& options)
 {
+	X_UNUSED(options);
+
 	std::cout << "\nModel Info:\n" <<
 		"> Total Lods: " << g_stats.totalLods <<
 		"\n> Total Mesh: " << g_stats.totalMesh <<
@@ -2142,6 +2144,10 @@ ModelExporter::~ModelExporter()
 
 MStatus ModelExporter::writer(const MFileObject& file, const MString& optionsString, FileAccessMode mode)
 {
+	X_UNUSED(file);
+	X_UNUSED(optionsString);
+	X_UNUSED(mode);
+
 //	PotatoOptions options;
 //	options.setcmdArgs(optionsString.asChar());
 //	options.setMode(mode);
