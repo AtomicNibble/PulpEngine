@@ -112,10 +112,9 @@ void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offs
 				memcpy( (char*)pChunkHeaderStart, (char*)chunkHeaderData, chunkHeaderSize);
 			}
 
-			size_t wasteAtFront = CalculateWasteAtFront( pMemoryRegionStart, m_maxAlignment, offset);
-			
 			// update all dat info.
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
+			size_t wasteAtFront = CalculateWasteAtFront(pMemoryRegionStart, m_maxAlignment, offset);
 			size_t memoryRegionSize = safe_static_cast<uint32_t>( (char*)pChunkHeaderStart - (char*)pMemoryRegionStart );
 			size_t elementCount = (memoryRegionSize - wasteAtFront) / m_elementSize;
 
