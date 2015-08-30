@@ -44,9 +44,8 @@ class XEngineModule_Script : public IEngineModule
 	{
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pArena);
-	//	X_ASSERT_NOT_NULL(gEnv->pMalloc);
+		X_UNUSED(initParams);
 
-		ICore* pCore = env.pCore;
 		script::IScriptSys *pScript = nullptr;
 
 		g_ScriptArena = X_NEW_ALIGNED(ScriptArena, gEnv->pArena, "ScriptArena", X_ALIGN_OF(ScriptArena))(&g_ScriptAlloc, "ScriptArena");
