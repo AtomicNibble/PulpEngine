@@ -329,21 +329,21 @@ void XRenderAux::drawAABB(const AABB& aabb, const Vec3f& pos,
 
 		Color8u color(col);
 
-		pVertices[0].pos = Vec3f(aabb.min.x, aabb.min.y, aabb.min.z);
+		pVertices[0].pos = Vec3f(aabb.min.x, aabb.min.y, aabb.min.z) + pos;
 		pVertices[0].color = color;
-		pVertices[1].pos = Vec3f(aabb.min.x, aabb.max.y, aabb.min.z);
+		pVertices[1].pos = Vec3f(aabb.min.x, aabb.max.y, aabb.min.z) + pos;
 		pVertices[1].color = color;
-		pVertices[2].pos = Vec3f(aabb.max.x, aabb.max.y, aabb.min.z);
+		pVertices[2].pos = Vec3f(aabb.max.x, aabb.max.y, aabb.min.z) + pos;
 		pVertices[2].color = color;
-		pVertices[3].pos = Vec3f(aabb.max.x, aabb.min.y, aabb.min.z);
+		pVertices[3].pos = Vec3f(aabb.max.x, aabb.min.y, aabb.min.z) + pos;
 		pVertices[3].color = color;
-		pVertices[4].pos = Vec3f(aabb.min.x, aabb.min.y, aabb.max.z);
+		pVertices[4].pos = Vec3f(aabb.min.x, aabb.min.y, aabb.max.z) + pos;
 		pVertices[4].color = color;
-		pVertices[5].pos = Vec3f(aabb.min.x, aabb.max.y, aabb.max.z);
+		pVertices[5].pos = Vec3f(aabb.min.x, aabb.max.y, aabb.max.z) + pos;
 		pVertices[5].color = color;
-		pVertices[6].pos = Vec3f(aabb.max.x, aabb.max.y, aabb.max.z);
+		pVertices[6].pos = Vec3f(aabb.max.x, aabb.max.y, aabb.max.z) + pos;
 		pVertices[6].color = color;
-		pVertices[7].pos = Vec3f(aabb.max.x, aabb.min.y, aabb.max.z);
+		pVertices[7].pos = Vec3f(aabb.max.x, aabb.min.y, aabb.max.z) + pos;
 		pVertices[7].color = color;
 
 		pIndices[0] = 0; pIndices[1] = 1;
@@ -365,14 +365,14 @@ void XRenderAux::drawAABB(const AABB& aabb, const Vec3f& pos,
 	{
 		AddIndexedPrimitive(pVertices, 24, pIndices, 36, CreateTriangleRenderFlags(true));
 
-		Vec3f xyz(aabb.min.x, aabb.min.y, aabb.min.z);
-		Vec3f xyZ(aabb.min.x, aabb.min.y, aabb.max.z);
-		Vec3f xYz(aabb.min.x, aabb.max.y, aabb.min.z);
-		Vec3f xYZ(aabb.min.x, aabb.max.y, aabb.max.z);
-		Vec3f Xyz(aabb.max.x, aabb.min.y, aabb.min.z);
-		Vec3f XyZ(aabb.max.x, aabb.min.y, aabb.max.z);
-		Vec3f XYz(aabb.max.x, aabb.max.y, aabb.min.z);
-		Vec3f XYZ(aabb.max.x, aabb.max.y, aabb.max.z);
+		Vec3f xyz(Vec3f(aabb.min.x, aabb.min.y, aabb.min.z) + pos);
+		Vec3f xyZ(Vec3f(aabb.min.x, aabb.min.y, aabb.max.z) + pos);
+		Vec3f xYz(Vec3f(aabb.min.x, aabb.max.y, aabb.min.z) + pos);
+		Vec3f xYZ(Vec3f(aabb.min.x, aabb.max.y, aabb.max.z) + pos);
+		Vec3f Xyz(Vec3f(aabb.max.x, aabb.min.y, aabb.min.z) + pos);
+		Vec3f XyZ(Vec3f(aabb.max.x, aabb.min.y, aabb.max.z) + pos);
+		Vec3f XYz(Vec3f(aabb.max.x, aabb.max.y, aabb.min.z) + pos);
+		Vec3f XYZ(Vec3f(aabb.max.x, aabb.max.y, aabb.max.z) + pos);
 
 		Color8u colDown(col * 0.5f);
 
