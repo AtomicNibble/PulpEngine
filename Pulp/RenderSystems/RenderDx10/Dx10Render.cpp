@@ -469,7 +469,7 @@ bool DX11XRender::OnPostCreateDevice(void)
 {
 	shader::XHWShader_Dx10::Init();
 
-	if (!m_ShaderMan.Init()) {
+	if (!ShaderMan_.Init()) {
 		return false;
 	}
 
@@ -714,7 +714,7 @@ void DX11XRender::Set2D(bool enable, float znear, float zfar)
 
 void DX11XRender::SetCameraInfo(void)
 {
-	m_pRt->RT_SetCameraInfo();
+	pRt_->RT_SetCameraInfo();
 }
 
 void DX11XRender::RT_SetCameraInfo(void)

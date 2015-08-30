@@ -100,7 +100,7 @@ uint32_t XRender::vertexSteamStride[VertexStream::ENUM_COUNT][shader::VertexForm
 
 
 XRender::XRender() :
-	m_pRt(nullptr),
+	pRt_(nullptr),
 	fontIdx_(0),
 	pDefaultFont_(nullptr),
 	RenderResources_(g_rendererArena)
@@ -138,8 +138,8 @@ bool XRender::Init(HWND hWnd, uint32_t width, uint32_t height)
 	ViewPort_.set(width,height);
 	ViewPort_.setZ(0.f, 1.f);
 
-	m_pRt = X_NEW_ALIGNED(XRenderThread,g_rendererArena,"renderThread",X_ALIGN_OF(XRenderThread));
-	m_pRt->startRenderThread();
+	pRt_ = X_NEW_ALIGNED(XRenderThread,g_rendererArena,"renderThread",X_ALIGN_OF(XRenderThread));
+	pRt_->startRenderThread();
 
 	vidMemMng_.StartUp();
 
@@ -154,12 +154,12 @@ void XRender::ShutDown()
 {
 	X_LOG0("render", "Shutting down");
 
-	m_pRt->quitRenderThread();
-	m_pRt->quitRenderLoadingThread();
+	pRt_->quitRenderThread();
+	pRt_->quitRenderLoadingThread();
 
 	freeResources();
 
-	X_DELETE(m_pRt, g_rendererArena);
+	X_DELETE(pRt_, g_rendererArena);
 }
 
 void XRender::freeResources()
@@ -168,7 +168,7 @@ void XRender::freeResources()
 
 //	FX_PipelineShutdown();
 
-	m_ShaderMan.Shutdown();
+	ShaderMan_.Shutdown();
 
 	vidMemMng_.ShutDown();
 	textDrawList_.free();
@@ -450,10 +450,10 @@ shader::XShaderItem XRender::LoadShaderItem(shader::XInputShaderResources& res)
 	// we want a shader + texture collection plz!
 	shader::XShaderItem item;
 
-	item.pShader_ = m_ShaderMan.m_FixedFunction;
+	item.pShader_ = ShaderMan_.m_FixedFunction;
 	item.pShader_->addRef();
 	item.technique_ = 2;
-	item.pResources_ = m_ShaderMan.createShaderResources(res);
+	item.pResources_ = ShaderMan_.createShaderResources(res);
 
 	return item;
 }

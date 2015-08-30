@@ -36,7 +36,7 @@ namespace
 
 void DX11XRender::SetState(StateFlag state)
 {
-	m_pRt->RC_SetState(state);
+	pRt_->RC_SetState(state);
 }
 
 void DX11XRender::SetStencilState(StencilState::Value ss)
@@ -76,7 +76,7 @@ void DX11XRender::SetStencilState(StencilState::Value ss)
 
 void DX11XRender::SetCullMode(CullMode::Enum mode)
 {
-	m_pRt->RC_SetCullMode(mode);
+	pRt_->RC_SetCullMode(mode);
 }
 
 void DX11XRender::RT_SetState(StateFlag state)

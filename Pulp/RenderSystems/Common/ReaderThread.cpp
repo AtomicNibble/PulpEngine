@@ -621,8 +621,9 @@ void XRenderThread::waitFlushFinishedCond()
 
 bool XRender::FlushRenderThreadCommands(bool wait)
 {
-	if (wait)
-		m_pRt->flushAndWait();
+	if (wait) {
+		pRt_->flushAndWait();
+	}
 	return true;
 }
 
