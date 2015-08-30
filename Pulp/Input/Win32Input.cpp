@@ -16,8 +16,10 @@ X_NAMESPACE_BEGIN(input)
 
 XWinInput* XWinInput::This = 0;
 
-XWinInput::XWinInput(ICore *pSystem, HWND hwnd) : XBaseInput()
+XWinInput::XWinInput(ICore* pSystem, HWND hwnd) : XBaseInput()
 {
+	X_UNUSED(pSystem);
+
 	isWow64_ = FALSE;
 	m_hwnd = hwnd;
 	m_prevWndProc = 0;
