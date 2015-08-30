@@ -377,7 +377,7 @@ bool XShaderManager::Shutdown(void)
 bool XShaderManager::OnFileChange(const char* name)
 {
 	const char* ext;
-	if (ext = core::strUtil::FileExtension(name))
+	if ((ext = core::strUtil::FileExtension(name)) != nullptr)
 	{
 
 		// this is just a cache update ignore this.
@@ -619,28 +619,27 @@ bool XShaderManager::loadCoreShaders(void)
 {
 	m_DefaultShader = createShader("default");
 
-	if (!(m_FixedFunction = forName("ffe"))) {
+	if ((m_FixedFunction = forName("ffe")) == nullptr) {
 		X_ERROR("Shader", "Failed to load ffe shader");
 		return false;
 	}
-	if (!(m_Font = forName("font"))){
+	if ((m_Font = forName("font")) == nullptr) {
 		X_ERROR("Shader", "Failed to load font shader");
 		return false;
 	}
-	if (!(m_Gui = forName("gui"))){
+	if ((m_Gui = forName("gui")) == nullptr) {
 		X_ERROR("Shader", "Failed to load gui shader");
 		return false;
 	}
-	if (!(m_DefferedShader = forName("deffered"))){
+	if ((m_DefferedShader = forName("deffered")) == nullptr) {
 		X_ERROR("Shader", "Failed to load deffered shader");
 		return false;
 	}
-	if (!(m_DefferedShaderVis = forName("defferedVis"))){
+	if ((m_DefferedShaderVis = forName("defferedVis")) == nullptr) {
 		X_ERROR("Shader", "Failed to load defferedVis shader");
 		return false;
 	}
-
-	if (!(m_WordShader = forName("World"))){
+	if ((m_WordShader = forName("World")) == nullptr) {
 		X_ERROR("Shader", "Failed to load World shader");
 		return false;
 	}
@@ -1101,7 +1100,7 @@ bool ShaderSourceFile::Technique::parse(core::XLexer& lex)
 bool ShaderSourceFile::Technique::processName(void)
 {
 	const char* pBrace, *pCloseBrace;
-	if ((pBrace = name.find('(')))
+	if ((pBrace = name.find('(')) != nullptr)
 	{
 		// if we find a () 
 		// we have diffrent compile macro's for the 
@@ -1148,7 +1147,7 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 	ShaderSourceFile* pShaderSource = nullptr;
 	core::StackString512 sourceFileName;
 
-	if (pfile = loadRawSourceFile(name, reload))
+	if ((pfile = loadRawSourceFile(name, reload)) != nullptr)
 	{
 		core::XLexer lex(pfile->fileData.begin(), pfile->fileData.end());
 		core::XLexToken token;
