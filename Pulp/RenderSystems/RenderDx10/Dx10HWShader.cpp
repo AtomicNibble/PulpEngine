@@ -627,11 +627,12 @@ bool XHWShader_Dx10::uploadtoHW()
 	else
 	{
 		// O'Deer
+		hr = 0; // prevent warning 4701
 		X_ASSERT_UNREACHABLE();
 	}
 
-	if (SUCCEEDED(hr)) {
-
+	if (SUCCEEDED(hr)) 
+	{
 		// compiled out in debug
 		if (this->type_ == ShaderType::Vertex)
 			render::D3DDebug::SetDebugObjectName(reinterpret_cast<ID3D11VertexShader*>(pHWHandle_), this->entryPoint_);
