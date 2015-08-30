@@ -20,15 +20,15 @@ public:
 	virtual ~XInputDevice() X_OVERRIDE;
 
 	// IInputDevice
-	virtual const char* GetDeviceName() const		X_OVERRIDE{ return m_deviceName.c_str(); }
-	virtual InputDevice::Enum GetDeviceId() const	X_OVERRIDE{ return m_deviceId; };
-	virtual bool Init()	X_OVERRIDE{ return true; }
-	virtual void PostInit() X_OVERRIDE{}
-	virtual void ShutDown() X_OVERRIDE{}
+	virtual const char* GetDeviceName(void) const		X_OVERRIDE{ return m_deviceName.c_str(); }
+	virtual InputDevice::Enum GetDeviceId(void) const	X_OVERRIDE{ return m_deviceId; };
+	virtual bool Init(void)	X_OVERRIDE{ return true; }
+	virtual void PostInit(void) X_OVERRIDE{}
+	virtual void ShutDown(void) X_OVERRIDE{}
 	virtual void Update(bool focus) X_OVERRIDE;
 	virtual void Enable(bool enable) X_OVERRIDE;
 	virtual bool IsEnabled() const X_OVERRIDE{ return m_enabled; }
-	virtual void ClearKeyState() X_OVERRIDE;
+	virtual void ClearKeyState(void) X_OVERRIDE;
 	virtual bool SetExclusiveMode(bool value) X_OVERRIDE { X_UNUSED(value); return true; }
 	virtual InputSymbol* LookupSymbol(KeyId::Enum id) const X_OVERRIDE;
 	// ~IInputDevice
