@@ -17,7 +17,7 @@ public:
 	virtual void ShutDown(void) X_OVERRIDE;
 	virtual void release(void) X_OVERRIDE;
 
-	virtual void Update() X_OVERRIDE;
+	virtual void Update(void) X_OVERRIDE;
 
 
 
@@ -26,7 +26,7 @@ public:
 
 	// Volume
 	virtual void SetMasterVolume(float v) X_OVERRIDE;
-	virtual float GetMasterVolume() const X_OVERRIDE;
+	virtual float GetMasterVolume(void) const X_OVERRIDE;
 
 private:
 
