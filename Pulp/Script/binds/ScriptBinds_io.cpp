@@ -94,7 +94,7 @@ int XBinds_Io_File::write(IFunctionHandler* pH)
 	core::XFile* pFile;
 	int arg, numArgs;
 
-	if (pFile = getFile(pH))
+	if ((pFile = getFile(pH)) != nullptr)
 	{
 		numArgs = pH->GetParamCount() - 1;
 		for (arg = 2; numArgs--; arg++)
@@ -141,7 +141,7 @@ int XBinds_Io_File::read(IFunctionHandler* pH)
 
 	total = 0;
 
-	if (pFile = getFile(pH))
+	if ((pFile = getFile(pH)) != nullptr)
 	{
 		numArgs = pH->GetParamCount() - 1;
 		if (numArgs == 0)
@@ -254,7 +254,7 @@ int XBinds_Io_File::seek(IFunctionHandler* pH)
 		}
 	}
 
-	if (pFile = getFile(pH))
+	if ((pFile = getFile(pH)) != nullptr)
 	{
 		// if random access is not set, file system will print error.
 		// may add a check here, and handle it diffrently.
@@ -268,7 +268,7 @@ int XBinds_Io_File::close(IFunctionHandler* pH)
 {
 	core::XFile* pFile;
 
-	if (pFile = getFile(pH,1,true))
+	if ((pFile = getFile(pH,1,true)) != nullptr)
 	{
 		if (pFile)
 			pFileSys_->closeFile(pFile);
@@ -501,7 +501,7 @@ int XBinds_Io::closeFile(IFunctionHandler* pH)
 
 	core::XFile* pFile;
 
-	if (pFile = XBinds_Io_File::getFile(pH,1,true))
+	if ((pFile = XBinds_Io_File::getFile(pH,1,true)) != nullptr)
 	{
 		pFileSys_->closeFile(pFile);
 	}

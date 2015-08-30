@@ -693,7 +693,9 @@ bool XScriptSys::ToAny(ScriptValue& var, int index)
 			else if (var.type_ == ScriptValueType::VECTOR)
 			{
 				Vec3f v(0, 0, 0);
-				if (res = ToVec3(v, index))
+				res = ToVec3(v, index);
+
+				if (res)
 				{
 					var.vec3.x = v.x;
 					var.vec3.y = v.y;
