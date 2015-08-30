@@ -262,7 +262,7 @@ void XKeyboard::ShutDown()
 bool XKeyboard::IsCHAR(const InputEvent& event)
 {
 #ifdef ASSCI_CACHE_TABLE
-	USHORT Vkey = event.keyId;
+	KeyId::Enum Vkey = event.keyId;
 
 	//  special case, numpad is only a input if numlock is active
 	if (Vkey >= KeyId::NUMPAD_0 && Vkey <= KeyId::NUMPAD_9)
@@ -379,18 +379,20 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb)
 
 	if (virtualKey == VK_SHIFT)
 	{
-		virtualKey = MapVirtualKey(scanCode, MAPVK_VSC_TO_VK_EX); // correct left-hand / right-hand SHIFT
+		// correct left-hand / right-hand SHIFT
+		virtualKey = safe_static_cast<USHORT,UINT>(MapVirtualKey(scanCode, MAPVK_VSC_TO_VK_EX)); 
 	}
 	else if (virtualKey == VK_NUMLOCK)
 	{
-		scanCode = (MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC) | 0x100); // correct PAUSE/BREAK and NUM LOCK silliness, and set the extended bit
+		// correct PAUSE/BREAK and NUM LOCK silliness, and set the extended bit
+		scanCode = safe_static_cast<USHORT,UINT>(MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC) | 0x100);
 	}
 
 	// e0 and e1 are escape sequences used for certain special keys, such as PRINT and PAUSE/BREAK.
 	// see http://www.win.tue.nl/~aeb/linux/kbd/scancodes-1.html
 	const bool isE0 = ((flags & RI_KEY_E0) != 0);
 	const bool isE1 = ((flags & RI_KEY_E1) != 0);
-	const bool IsUp = ((flags & RI_KEY_BREAK) != 0);
+//	const bool IsUp = ((flags & RI_KEY_BREAK) != 0);
 //	const bool IsDown = flags == RI_KEY_MAKE;
 	const bool IsDown = (flags & RI_KEY_BREAK) == 0;
 
@@ -399,10 +401,12 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb)
 	{
 		// for escaped sequences, turn the virtual key into the correct scan code using MapVirtualKey.
 		// however, MapVirtualKey is unable to map VK_PAUSE (this is a known bug), hence we map that by hand.
-		if (virtualKey == VK_PAUSE)
+		if (virtualKey == VK_PAUSE) {
 			scanCode = 0x45;
-		else
-			scanCode = MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC);
+		}
+		else {
+			scanCode = safe_static_cast<USHORT,UINT>(MapVirtualKey(virtualKey, MAPVK_VK_TO_VSC));
+		}
 	}
 
 
