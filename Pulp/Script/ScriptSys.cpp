@@ -59,18 +59,21 @@ extern "C"
 		int level = 0;
 		while (lua_getstack(L, level++, &ar))
 		{
-			const char *slevel = "";
-			if (level >= max_stack_lvl)
+			const char* slevel = "";
+			if (level >= max_stack_lvl) {
 				level = max_stack_lvl - 1;
+			}
 
-			int nRes = lua_getinfo(L, "lnS", &ar);
+			int ees = lua_getinfo(L, "lnS", &ar);
 			if (ar.name)
 			{
-				X_LOG0("ScriptError", "%s> %s, (%s: %i)", g_StackLevel[level], ar.name, ar.short_src, ar.currentline);
+				X_LOG0("ScriptError", "%s> %s, (%s: %i)",
+					g_StackLevel[level], ar.name, ar.short_src, ar.currentline);
 			}
 			else
 			{
-				X_LOG0("ScriptError", "%s> (null) (%s: %i)", g_StackLevel[level], ar.short_src, ar.currentline);
+				X_LOG0("ScriptError", "%s> (null) (%s: %i)", 
+					g_StackLevel[level], ar.short_src, ar.currentline);
 			}
 		}
 	}
