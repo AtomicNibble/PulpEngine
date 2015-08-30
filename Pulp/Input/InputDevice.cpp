@@ -19,7 +19,7 @@ XInputDevice::~XInputDevice()
 	m_idToInfo.free();
 }
 
-void XInputDevice::Update(bool bFocus)
+void XInputDevice::Update(bool focus)
 {
 
 }

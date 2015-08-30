@@ -25,7 +25,7 @@ public:
 	virtual bool Init()	X_OVERRIDE{ return true; }
 	virtual void PostInit() X_OVERRIDE{}
 	virtual void ShutDown() X_OVERRIDE{}
-	virtual void Update(bool bFocus) X_OVERRIDE;
+	virtual void Update(bool focus) X_OVERRIDE;
 	virtual void Enable(bool enable) X_OVERRIDE;
 	virtual bool IsEnabled() const X_OVERRIDE{ return m_enabled; }
 	virtual void ClearKeyState() X_OVERRIDE;
@@ -34,7 +34,7 @@ public:
 	// ~IInputDevice
 
 protected:
-	IInput& GetIInput() const	{ return m_input; }
+	IInput& GetIInput(void) const	{ return m_input; }
 
 	InputSymbol*				IdToSymbol(KeyId::Enum id) const;
 
