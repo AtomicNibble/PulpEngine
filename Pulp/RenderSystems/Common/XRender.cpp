@@ -355,7 +355,7 @@ void XRender::RT_FlushTextBuffer(void)
 {
 	const XTextDrawList::TextEntry* entry;
 	
-	while (entry = textDrawList_.getNextTextEntry())
+	while ((entry = textDrawList_.getNextTextEntry()) != nullptr)
 	{
 		const Vec3f& pos = entry->pos;
 		const char* pStr = entry->getText();
