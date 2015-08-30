@@ -135,18 +135,19 @@ void XRender::SetArenas(core::MemoryArenaBase* arena)
 
 bool XRender::Init(HWND hWnd, uint32_t width, uint32_t height)
 {
-	ViewPort_.set(width,height);
+	X_UNUSED(hWnd);
+
+	ViewPort_.set(width, height);
 	ViewPort_.setZ(0.f, 1.f);
 
-	m_pRt = X_NEW_ALIGNED(XRenderThread,g_rendererArena,"renderThread",X_ALIGN_OF(XRenderThread));
+	m_pRt = X_NEW_ALIGNED(XRenderThread, g_rendererArena, "renderThread", X_ALIGN_OF(XRenderThread));
 	m_pRt->startRenderThread();
 
 	vidMemMng_.StartUp();
 
-
-	if (gEnv->pFont)
+	if (gEnv->pFont) {
 		pDefaultFont_ = gEnv->pFont->GetFont("default");
-
+	}
 	return true;
 }
 
