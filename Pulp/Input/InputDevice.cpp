@@ -21,7 +21,7 @@ XInputDevice::~XInputDevice()
 
 void XInputDevice::Update(bool focus)
 {
-
+	X_UNUSED(focus);
 }
 
 void XInputDevice::ClearKeyState()
