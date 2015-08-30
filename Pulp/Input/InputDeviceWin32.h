@@ -25,6 +25,9 @@ public:
 	virtual void ShutDown() X_ABSTRACT;
 
 	// ~IInputDevice
+
+private:
+	X_NO_ASSIGN(XInputDeviceWin32);
 };
 
 X_NAMESPACE_END

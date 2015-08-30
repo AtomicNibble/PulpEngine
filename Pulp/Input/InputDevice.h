@@ -48,6 +48,8 @@ private:
 	typedef core::HashMap<KeyId::Enum, InputSymbol*>		TIdToSymbolMap;
 
 	TIdToSymbolMap				m_idToInfo;
+private:
+	X_NO_ASSIGN(XInputDevice);
 };
 
 
