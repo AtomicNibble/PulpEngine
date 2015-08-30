@@ -113,7 +113,7 @@ namespace hardwareBP
 
 					if (GetThreadContext(hThread, &ct))
 					{
-						DWORD64 reg = FindUsedReg((DWORD64)address, ct);
+						DWORD64 reg = FindUsedReg(reinterpret_cast<DWORD64>(address), ct);
 
 						if (reg == 4)
 						{
