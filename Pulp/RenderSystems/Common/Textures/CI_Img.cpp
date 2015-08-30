@@ -36,6 +36,8 @@ namespace CI
 
 		X_DECLARE_JOB_ENTRY(WriteCIJob)
 		{
+			X_UNUSED(workerIdx);
+
 			JobData* pData = reinterpret_cast<JobData*>(pParam);
 
 			WriteCIImg(pData->path, pData->image.instance());
