@@ -97,9 +97,10 @@ void XMouse::ShutDown()
 }
 
 ///////////////////////////////////////////
-void XMouse::Update(bool bFocus)
+void XMouse::Update(bool focus)
 {
 	X_ASSERT_UNREACHABLE();
+	X_UNUSED(focus);
 }
 
 void XMouse::ProcessInput(const RAWINPUTHEADER& header, const uint8_t* pData)
