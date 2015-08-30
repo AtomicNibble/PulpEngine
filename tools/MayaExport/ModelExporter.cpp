@@ -1544,16 +1544,16 @@ bool MayaModel::save(const char *filename)
 		header.version = model::MODEL_VERSION;
 		header.flags.Set(model::ModelFlags::LOOSE);
 		header.flags.Set(model::ModelFlags::STREAMS);
-		header.numBones = numExportJoints_;
+		header.numBones = safe_static_cast<uint8_t, int>(numExportJoints_);
 		header.numBlankBones = tagOrigin_.keep ? 1:0;
 		header.numLod = safe_static_cast<uint8_t, size_t>(numLods);
 		header.numMesh = safe_static_cast<uint8_t, size_t>(totalMeshes());
 		header.modified = core::dateTimeStampSmall::systemDateTime();
 
 		// Sizes
-		header.tagNameDataSize = this->calculateTagNameDataSize();
-		header.materialNameDataSize = this->calculateMaterialNameDataSize();
-		header.boneDataSize = this->calculateBoneDataSize();
+		header.tagNameDataSize = safe_static_cast<uint16_t, uint32_t>(this->calculateTagNameDataSize());
+		header.materialNameDataSize = safe_static_cast<uint16_t, uint32_t>(this->calculateMaterialNameDataSize());
+		header.boneDataSize = safe_static_cast<uint16_t, uint32_t>(this->calculateBoneDataSize());
 		header.subDataSize = this->calculateSubDataSize(streamsFlags);
 		header.dataSize = (header.subDataSize + 
 			header.tagNameDataSize + header.materialNameDataSize);
@@ -1859,9 +1859,9 @@ bool MayaModel::save(const char *filename)
 				{
 					const Vec3<int32_t>& f = mesh->faces[x];
 
-					stream.write<model::Index>(f[0]);
-					stream.write<model::Index>(f[1]);
-					stream.write<model::Index>(f[2]);
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[0]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[1]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[2]));
 				}
 
 			}
