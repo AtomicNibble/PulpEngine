@@ -612,7 +612,8 @@ XTexture* XTexture::Create2DTexture(const char* name, const Vec2i& size, size_t 
 	file.flags = Flags;
 	file.size = size;
 	file.type = TextureType::T2D;
-	file.datasize = get_data_size(size[0], size[1], 1, numMips, textureFmt);
+	file.datasize = get_data_size(size[0], size[1], 1, 
+		safe_static_cast<uint32_t, size_t>(numMips), textureFmt);
 	file.bDontDelete = true;
 	file.addReference();
 
