@@ -1882,14 +1882,14 @@ bool MayaModel::save(const char *filename)
 
 						if (num >= 1) // we always write one bone.
 						{
-							model::bindBone bone(weights->bone->exportIdx);
+							model::bindBone bone(safe_static_cast<uint16_t, uint32_t>(weights->bone->exportIdx));
 							stream.write(bone);
 						}
 
 
 						for (k = 1; k < num; k++) // for any weights greater than 1 we add a bone & weight, the base weight is 1 - (all others)
 						{
-							model::bindBone bone(weights[k].bone->exportIdx);
+							model::bindBone bone(safe_static_cast<uint16_t, uint32_t>(weights[k].bone->exportIdx));
 							model::bindWeight weight(weights[k].weight);
 
 							stream.write(bone);
