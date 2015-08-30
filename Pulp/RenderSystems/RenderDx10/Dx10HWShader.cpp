@@ -763,8 +763,8 @@ bool XHWShader_Dx10::reflectShader(void)
 
 				bind.name = CDesc.Name;
 				bind.nameHash = core::StrHash(CDesc.Name);
-				bind.bind = nReg;
-				bind.constBufferSlot = constBuftype;
+				bind.bind = safe_static_cast<short, int>(nReg);
+				bind.constBufferSlot = safe_static_cast<short, ConstbufType::Enum>(constBuftype);
 				bind.numParameters = (CDesc.Size + 15) >> 4; // vec4
 				bind.flags = VarTypeToFlags(CTDesc);
 				bind.type = ParamType::Unknown;
@@ -813,8 +813,8 @@ bool XHWShader_Dx10::reflectShader(void)
 			XShaderParam bind;
 			bind.name = CDesc.Name;
 			bind.nameHash = core::StrHash(CDesc.Name);
-			bind.bind = nReg;
-			bind.constBufferSlot = constBuftype;
+			bind.bind = safe_static_cast<short, int>(nReg);
+			bind.constBufferSlot = safe_static_cast<short, ConstbufType::Enum>(constBuftype);
 			bind.numParameters = (CDesc.Size + 15) >> 4; // vec4
 			bind.flags = entry->flags;
 			bind.type = entry->type;
@@ -853,7 +853,7 @@ bool XHWShader_Dx10::reflectShader(void)
 		XShaderParam bind;
 
 		bind.name = InputBindDesc.Name;
-		bind.bind = InputBindDesc.BindPoint | SHADER_BIND_SAMPLER;
+		bind.bind = safe_static_cast<short, UINT>(InputBindDesc.BindPoint | SHADER_BIND_SAMPLER);
 		bind.numParameters = InputBindDesc.BindCount;
 	//	BindVars.push_back(bind);
 	}
@@ -891,7 +891,7 @@ bool XHWShader_Dx10::reflectShader(void)
 			// samnpler basemapSampler
 			if (temp.findCaseInsen(pB->name) && temp.findCaseInsen("sampler"))
 			{
-				pB->constBufferSlot = InputBindDesc.BindPoint;
+				pB->constBufferSlot = safe_static_cast<short, UINT>(InputBindDesc.BindPoint);
 				break;
 			}
 		}
