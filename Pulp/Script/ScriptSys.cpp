@@ -377,6 +377,7 @@ bool XScriptSys::ExecuteFile(const char* FileName, bool silent, bool forceReload
 
 bool XScriptSys::ExecuteFile_Internal(const core::Path<char>& path, bool silent)
 {
+	X_UNUSED(silent);
 	bool res = false;
 
 	core::XFileMem* file = pFileSys_->openFileMem(path.c_str(), core::fileMode::READ);
@@ -1010,7 +1011,10 @@ void XScriptSys::TraceScriptError()
 	lua_Debug ar;
 	core::zero_object(ar);
 
+	// TODO
+	X_DISABLE_WARNING(4127)
 	if (0)
+	X_ENABLE_WARNING(4127)
 	{
 		if (lua_getstack(L, 1, &ar))
 		{
