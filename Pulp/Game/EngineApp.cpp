@@ -57,6 +57,8 @@ EngineApp::~EngineApp()
 
 bool EngineApp::Init(const char* sInCmdLine)
 {
+	X_UNUSED(sInCmdLine);
+
 	SCoreInitParams params;
 	params.hInstance = g_hInstance;
 	params.bSkipInput = false;
