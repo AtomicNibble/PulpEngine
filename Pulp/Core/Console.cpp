@@ -1381,6 +1381,8 @@ bool XConsole::OnFileChange(const char* name)
 	core::Path<char> temp(name);
 
 	LoadConfig(temp.fileName());
+#else
+	X_UNUSED(name);
 #endif // !X_ENABLE_CONFIG_HOT_RELOAD
 	return true;
 }
