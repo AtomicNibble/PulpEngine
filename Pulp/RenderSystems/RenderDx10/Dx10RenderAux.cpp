@@ -57,7 +57,7 @@ namespace{
 			Vec3f d(v[1] - v[0]);
 
 			// get clipped position
-			float t;
+			float t = 0.f;
 			v[0] = (false == bV0Behind) ? v[0] : IntersectLinePlane(p, d, nearPlane, t);
 			v[1] = (false == bV1Behind) ? v[1] : IntersectLinePlane(p, d, nearPlane, t);
 
@@ -444,9 +444,12 @@ void XRenderAuxImp::DrawAuxIndexedPrimitives(XRenderAux::AuxSortedPushBuffer::co
 
 	// helpers for DP call
 	uint32 initialVBLockOffset(auxGeomSBM_.curVBIndex);
-	uint32 numVerticesWrittenToVB(0);
+	uint32 numVerticesWrittenToVB;
 	uint32 initialIBLockOffset(auxGeomSBM_.curIBIndex);
-	uint32 numIndicesWrittenToIB(0);
+	uint32 numIndicesWrittenToIB;
+
+	numVerticesWrittenToVB = 0;
+	numIndicesWrittenToIB = 0;
 
 //	m_renderer.FX_Commit();
 //	renderer_.FX_ComitParams();
@@ -516,7 +519,8 @@ void XRenderAuxImp::DrawAuxIndexedPrimitives(XRenderAux::AuxSortedPushBuffer::co
 				// move index data of this entry (modify indices to match VB insert location)
 				for (i=0; i < curPBEntry->numIndices; ++i)
 				{
-					pIndices[i] = numVerticesWrittenToVB + auxIndexBuffer[curPBEntry->indexOffs + i];
+					pIndices[i] = safe_static_cast<uint16_t, uint32_t>(numVerticesWrittenToVB + 
+						auxIndexBuffer[curPBEntry->indexOffs + i]);
 				}
 
 				// unlock ib
@@ -1123,7 +1127,7 @@ void XRenderAuxImp::AdjustRenderStates(const XAuxGeomRenderFlags& renderFlags)
 	{
 		case AuxGeom_DepthWrite::DepthWriteOff:
 		{
-			state = (state & ~States::DEPTHWRITE);
+			state = (state.ToInt() & ~States::DEPTHWRITE);
 			break;
 		}
 		case AuxGeom_DepthWrite::DepthWriteOn:
