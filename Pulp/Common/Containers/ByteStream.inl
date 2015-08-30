@@ -10,7 +10,7 @@ ByteStream::ByteStream(MemoryArenaBase* arena) :
 	X_ASSERT_NOT_NULL(arena);
 }
 
-ByteStream::ByteStream(MemoryArenaBase* arena, size_t numBytes)
+ByteStream::ByteStream(MemoryArenaBase* arena, size_t numBytes) :
 	current_(nullptr),
 	start_(nullptr),
 	end_(nullptr),
