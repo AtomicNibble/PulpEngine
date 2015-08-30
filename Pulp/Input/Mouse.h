@@ -47,6 +47,10 @@ private:
 
 	const static int MAX_MOUSE_SYMBOLS = KeyId::MOUSE_LAST - KeyId::INPUT_MOUSE_BASE;
 	static InputSymbol*	Symbol_[MAX_MOUSE_SYMBOLS];
+
+private:
+	X_NO_ASSIGN(XMouse);
+	X_NO_COPY(XMouse);
 };
 
 
