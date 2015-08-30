@@ -12,6 +12,9 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 	LPVOID lpReserved
 	)
 {
+	X_UNUSED(hModule);
+	X_UNUSED(lpReserved);
+
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
