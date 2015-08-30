@@ -133,7 +133,10 @@ private:
 struct bindBone
 {
 	bindBone() {}
-	bindBone(uint16_t id) : compressed_(id * 128) {}
+	bindBone(uint16_t id) : compressed_(id * 128) {
+		X_ASSERT(static_cast<uint32_t>(id) * 128 < std::numeric_limits<uint16_t>::max(), 
+			"Bone id scaled exceeds type limits")(id);
+	}
 
 	X_INLINE uint16_t index() const {
 		return compressed_ / 128;
