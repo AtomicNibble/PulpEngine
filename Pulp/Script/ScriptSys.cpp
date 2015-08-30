@@ -64,7 +64,8 @@ extern "C"
 				level = max_stack_lvl - 1;
 			}
 
-			int ees = lua_getinfo(L, "lnS", &ar);
+			int res = lua_getinfo(L, "lnS", &ar);
+			X_UNUSED(res); // TODO
 			if (ar.name)
 			{
 				X_LOG0("ScriptError", "%s> %s, (%s: %i)",
