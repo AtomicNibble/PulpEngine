@@ -84,7 +84,6 @@ void XWinInput::Update(bool bFocus)
 	const size_t HeaderSize = sizeof(RAWINPUTHEADER);
 
 	RAWINPUT X_ALIGNED_SYMBOL(input[BufSize], 8);
-	PRAWINPUT pInput = input;
 	UINT size;
 	UINT num;
 
