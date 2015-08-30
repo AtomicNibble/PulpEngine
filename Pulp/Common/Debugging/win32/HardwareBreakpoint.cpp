@@ -142,9 +142,10 @@ namespace hardwareBP
 			template <>
 			struct Implementation<4u>
 			{
+#ifndef _WIN64
+
 				static void Install(void* address, Condition::Enum cond, Size::Enum size)
 				{
-				#ifndef _WIN64
 					CONTEXT ct = {0};
 					ct.ContextFlags = CONTEXT_DEBUG_REGISTERS;
 		
@@ -195,13 +196,11 @@ namespace hardwareBP
 						lastError::Description Dsc;
 						X_ERROR( "HardwareBreakpoint", "Failed to retrive thread conext. Error: %s", lastError::ToString( Dsc ) );
 					}
-				#endif
 				}
 
 
 				static void Uninstall(void* address)
 				{
-				#ifndef _WIN64
 					CONTEXT ct = {0};
 					ct.ContextFlags = CONTEXT_DEBUG_REGISTERS;
 		
@@ -231,9 +230,8 @@ namespace hardwareBP
 						lastError::Description Dsc;
 						X_ERROR( "HardwareBreakpoint", "Failed to retrive thread conext. Error: %s", lastError::ToString( Dsc ) );
 					}
-				#endif
 				}
-
+#endif // !_WIN64
 			};
 
 		}
