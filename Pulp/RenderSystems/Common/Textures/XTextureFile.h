@@ -70,9 +70,9 @@ public:
 	X_INLINE const Vec2<uint16_t> getSize(void) const { return size; }
 	X_INLINE const int getWidth(void) const { return size.x; }
 	X_INLINE const int getHeight(void) const { return size.y; }
-	X_INLINE const int getNumFaces(void) const { return numFaces; }
-	X_INLINE const int getDepth(void) const { return depth; }
-	X_INLINE const int getNumMips(void) const { return numMips; }
+	X_INLINE const uint8_t getNumFaces(void) const { return numFaces; }
+	X_INLINE const uint8_t getDepth(void) const { return depth; }
+	X_INLINE const uint8_t getNumMips(void) const { return numMips; }
 	X_INLINE const uint32_t getDataSize(void) const { return datasize; }
 	X_INLINE TextureFlags getFlags(void) const { return flags; }
 	X_INLINE Texturefmt::Enum getFormat(void) const { return format; }
