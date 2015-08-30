@@ -458,7 +458,7 @@ bool XScriptTable::AddFunction(const XUserFunctionDesc& fd)
 	PushRef();
 	lua_pushstring(L, fd.sFunctionName);
 
-	int8 nParamIdOffset = fd.nParamIdOffset;
+	int8 nParamIdOffset = safe_static_cast<int8,int>(fd.nParamIdOffset);
 	if (fd.function)
 	{
 		size_t nDataSize = sizeof(fd.function) + funcSig.length() + 1 + 1;
