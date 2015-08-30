@@ -258,17 +258,18 @@ void XRenderMesh::freeVB(VertexStream::Enum stream) // VertexBuffer
 
 void XRenderMesh::freeIB(void) // Index Buffer
 {
-
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 void XRenderMesh::freeVideoMem(bool restoreSys)
 {
-
+	X_UNUSED(restoreSys);
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 void XRenderMesh::freeSystemMem(void)
 {
-
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 
