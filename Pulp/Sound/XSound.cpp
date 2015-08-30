@@ -52,7 +52,7 @@ void XSound::Mute(bool mute)
 void XSound::SetMasterVolume(float v)
 {
 	// nope
-	X_UNUSED(f);
+	X_UNUSED(v);
 }
 
 float XSound::GetMasterVolume(void) const
