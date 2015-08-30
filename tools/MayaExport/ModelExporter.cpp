@@ -26,7 +26,10 @@
 #include <maya/MItGeometry.h>
 #include <maya/MArgList.h>
 
+X_DISABLE_WARNING(4702)
 #include <algorithm>
+#include <map>
+X_ENABLE_WARNING(4702)
 
 #include <String\StringTokenizer.h>
 #include <String\StackString.h>
@@ -465,7 +468,6 @@ int64 vertHash(const MayaVertex& vert)
 	return Hash(vert.pos[0], vert.pos[1], vert.pos[2]);
 }
 
-#include <map>
 
 struct Hashcontainer
 {
