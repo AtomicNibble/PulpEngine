@@ -689,7 +689,7 @@ void xFrame::PaintButtons( HWND hWnd, HDC hDC )
 	int Drawn = 0;
 	X_UNUSED(hWnd);
 
-	for (size_t i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++)
 	{
 		if( m_Buttons[i].Draw )
 		{
