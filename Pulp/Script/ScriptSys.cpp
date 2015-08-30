@@ -147,6 +147,7 @@ namespace
 
 	void ListScriptCmd(core::IConsoleCmdArgs* pArgs)
 	{
+		X_UNUSED(pArgs);
 		gEnv->pScriptSys->ListLoadedScripts();
 	}
 
