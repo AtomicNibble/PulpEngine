@@ -29,7 +29,7 @@ public:
 	virtual void Enable(bool enable) X_OVERRIDE;
 	virtual bool IsEnabled() const X_OVERRIDE{ return m_enabled; }
 	virtual void ClearKeyState() X_OVERRIDE;
-	virtual bool SetExclusiveMode(bool value) X_OVERRIDE{ return true; }
+	virtual bool SetExclusiveMode(bool value) X_OVERRIDE { X_UNUSED(value); return true; }
 	virtual InputSymbol* LookupSymbol(KeyId::Enum id) const X_OVERRIDE;
 	// ~IInputDevice
 
