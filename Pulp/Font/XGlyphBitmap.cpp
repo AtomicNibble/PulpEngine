@@ -107,7 +107,7 @@ void XGlyphBitmap::Blur(int iterations)
 					cSum += pBuffer_[yOffset + x];
 				}
 
-				pBuffer_[yOffset + x] = cSum >> 2;
+				pBuffer_[yOffset + x] = safe_static_cast<uint8_t, int>(cSum >> 2);
 			}
 		}
 	}
@@ -207,6 +207,9 @@ bool XGlyphBitmap::BlitScaledTo8(uint8_t* pBuffer,
 	int iDestWidth, int iDestHeight, 
 	int iDestBufferWidth)
 {
+	X_UNUSED(iDestY);
+	X_UNUSED(iSrcX);
+
 	int newWidth = (int)iDestWidth;
 	int newHeight = (int)iDestHeight;
 
@@ -277,6 +280,9 @@ bool XGlyphBitmap::BlitScaledTo32(unsigned char *pBuffer,
 	int iDestWidth, int iDestHeight, 
 	int iDestBufferWidth)
 {
+	X_UNUSED(iDestY);
+	X_UNUSED(iSrcX);
+
 	int newWidth = (int)iDestWidth;
 	int newHeight = (int)iDestHeight;
 
@@ -334,7 +340,7 @@ bool XGlyphBitmap::BlitScaledTo32(unsigned char *pBuffer,
 
 			cColor = (unsigned char)((oneMinusY * fR0) + (yFraction * fR1));
 
-			pNewBuffer[yNewOffset + x + iDestX] = 0xffffff | (cColor << 24);
+			pNewBuffer[yNewOffset + x + iDestX] = safe_static_cast<uint8_t, int>(0xffffff | (cColor << 24));
 		}
 	}
 

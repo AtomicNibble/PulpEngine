@@ -33,7 +33,7 @@ struct XCacheSlot
 	void			Reset()
 	{
 		uUsage = 0;
-		cCurrentChar = ~0;
+		cCurrentChar = static_cast<wchar_t>(~0);
 
 		iCharWidth = 0;
 		iCharHeight = 0;

@@ -13,18 +13,19 @@ X_NAMESPACE_BEGIN(font)
 namespace
 {
 
-	void Command_ListFonts(core::IConsoleCmdArgs* Cmd)
+	void Command_ListFonts(core::IConsoleCmdArgs* pCmd)
 	{
+		X_UNUSED(pCmd);
 		XFont* pFont = (XFont*)gEnv->pFont;
 
 		pFont->ListFontNames();
 	}
 
-	void Command_DumpForName(core::IConsoleCmdArgs* Cmd)
+	void Command_DumpForName(core::IConsoleCmdArgs* pCmd)
 	{
 		XFont* pFont = (XFont*)gEnv->pFont;
 
-		int Num = Cmd->GetArgCount();
+		int Num = pCmd->GetArgCount();
 
 		if (Num < 2)
 		{
@@ -32,7 +33,7 @@ namespace
 			return;
 		}
 
-		const char* name = Cmd->GetArg(1);
+		const char* name = pCmd->GetArg(1);
 		XFFont* font = (XFFont*)pFont->GetFont(name);
 		if (font)
 		{

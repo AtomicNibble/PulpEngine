@@ -505,16 +505,18 @@ bool XFFont::InitCache()
 	wchar_t buf[256];
 	wchar_t* p = buf;
 
-	unsigned int i = (wchar_t) ' '; // even space should be there - otherwise it's created later on demand
+	wchar_t i = L' '; // even space should be there - otherwise it's created later on demand
 
 	// precache all [normal] printable characters to the string (missing once are updated on demand)
-	for (; i <= (wchar_t) '~'; ++i)
+	for (; i <= L'~'; ++i) {
 		*p++ = i;
+	}
 
 	i += 35;
 
-	for (; i<256; ++i)
+	for (; i < 256; ++i) {
 		*p++ = i;
+	}
 
 	*p = 0;
 

@@ -63,6 +63,7 @@ class XEngineModule_Font : public IEngineModule
 	//////////////////////////////////////////////////////////////////////////
 	virtual bool Initialize(SCoreGlobals &env, const SCoreInitParams &initParams) X_OVERRIDE
 	{
+		X_UNUSED(initParams);
 		ICore* pCore = env.pCore;
 		env.pFont = CreateFontInterface(pCore);
 		return env.pFont != 0;

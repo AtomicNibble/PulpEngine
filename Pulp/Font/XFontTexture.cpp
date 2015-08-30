@@ -322,8 +322,8 @@ int XFontTexture::UpdateSlot(int iSlot, uint16 wSlotUsage, wchar_t cChar)
 		cChar))
 		return 0;
 
-	pSlot->iCharWidth = iWidth;
-	pSlot->iCharHeight = iHeight;
+	pSlot->iCharWidth = safe_static_cast<uint8_t, int>(iWidth);
+	pSlot->iCharHeight = safe_static_cast<uint8_t, int>(iHeight);
 
 	pGlyphBitmap->BlitTo8(pBuffer_, 
 		0, 0,
@@ -342,8 +342,8 @@ void XFontTexture::CreateGradientSlot()
 	X_ASSERT(pSlot->cCurrentChar == (uint16)~0, "slot idx zero needs to be empty")();		
 
 	pSlot->Reset();
-	pSlot->iCharWidth = iCellWidth_ - 2;
-	pSlot->iCharHeight = iCellHeight_ - 2;
+	pSlot->iCharWidth = safe_static_cast<uint8_t, int>(iCellWidth_ - 2);
+	pSlot->iCharHeight = safe_static_cast<uint8_t, int>(iCellHeight_ - 2);
 	pSlot->SetNotReusable();
 
 	int x = pSlot->iTextureSlot % iWidthCellCount_;
@@ -351,9 +351,12 @@ void XFontTexture::CreateGradientSlot()
 
 	uint8* pBuffer = &pBuffer_[x*iCellWidth_ + y*iCellHeight_*height_];
 
-	for (uint32 dwY = 0; dwY<pSlot->iCharHeight; ++dwY)
-		for (uint32 dwX = 0; dwX<pSlot->iCharWidth; ++dwX)
-			pBuffer[dwX + dwY*width_] = dwY * 255 / (pSlot->iCharHeight - 1);
+	for (uint32 dwY = 0; dwY < pSlot->iCharHeight; ++dwY) {
+		for (uint32 dwX = 0; dwX < pSlot->iCharWidth; ++dwX) {
+			pBuffer[dwX + dwY*width_] = safe_static_cast<uint8_t, uint32_t>(
+				dwY * 255 / (pSlot->iCharHeight - 1));
+		}
+	}
 }
 
 
