@@ -373,7 +373,8 @@ void DX11XRender::DrawQuadImage(const Rectf& rect, texture::ITexture* pTexutre,
 
 
 void DX11XRender::DrawImage(float xpos, float ypos, float z, float w, float h,
-	texture::TexID texture_id, float s0, float t0, float s1, float t1, const Colorf& col, bool filtered)
+	texture::TexID texture_id, float s0, float t0, float s1, float t1, 
+	const Colorf& col, bool filtered)
 {
 	float s[4], t[4];
 
@@ -382,7 +383,7 @@ void DX11XRender::DrawImage(float xpos, float ypos, float z, float w, float h,
 	s[2] = s0;	t[2] = 1.0f - t1;
 	s[3] = s1;	t[3] = 1.0f - t1;
 
-	DrawImageWithUV(xpos, ypos, 0, w, h, texture_id, s, t, col, filtered);
+	DrawImageWithUV(xpos, ypos, z, w, h, texture_id, s, t, col, filtered);
 }
 
 
@@ -397,14 +398,12 @@ void DX11XRender::DrawImageWithUV(float xpos, float ypos, float z, float w, floa
 
 
 void DX11XRender::RT_DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
-	texture::TexID texture_id, const float* s, const float* t, const Colorf& col, bool filtered)
+	texture::TexID texture_id, const float* s, const float* t, 
+	const Colorf& col, bool filtered)
 {
-	using namespace shader;
+	X_UNUSED(filtered);
 
-	float fx = xpos;
-	float fy = ypos;
-	float fw = w;
-	float fh = h;
+	using namespace shader;
 
 	//	SetCullMode(CullMode::NONE);
 	// SetFFE(true);
