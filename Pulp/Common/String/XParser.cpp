@@ -646,6 +646,7 @@ bool XParser::ExpandDefine(XLexToken& deftoken, MacroDefine* pDefine,
 			// if stringizing operator
 			if (dt->isEqual("#"))
 			{
+				t = nullptr; // warn 4701 fix.
 				X_ASSERT_NOT_IMPLEMENTED();
 			}
 			else
@@ -653,6 +654,7 @@ bool XParser::ExpandDefine(XLexToken& deftoken, MacroDefine* pDefine,
 				t = X_NEW(XLexToken,arena_,"DefineToken")(*dt);
 				t->line = deftoken.line;
 			}
+
 			// add the token to the list
 			t->pNext_ = nullptr;
 			// the token being read from the define list should use the line number of
