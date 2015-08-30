@@ -10,7 +10,7 @@ X_NAMESPACE_BEGIN(render)
 class XTextDrawList
 {
 public:
-	XTextDrawList();
+	XTextDrawList(core::MemoryArenaBase* arena);
 	~XTextDrawList();
 
 	void setArena(core::MemoryArenaBase* arena);
