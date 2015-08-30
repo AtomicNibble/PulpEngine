@@ -243,12 +243,12 @@ namespace hardwareBP
 
 	void Install(void* address, Condition::Enum cond, Size::Enum size)
 	{
-		internal::Implementation<sizeof(size_t)>::Install(address,cond,size);
+		internal::Implementation<sizeof(address)>::Install(address,cond,size);
 	}
 
 	void Uninstall(void* address)
 	{
-		internal::Implementation<sizeof(size_t)>::Uninstall(address);
+		internal::Implementation<sizeof(address)>::Uninstall(address);
 	}
 
 } // hardwareBP
