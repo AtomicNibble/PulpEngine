@@ -18,7 +18,10 @@ arena_(arena)
 	resize(numBits);
 }
 
-
+BitStream::~BitStream()
+{
+	free();
+}
 
 // writes a bit to the stream
 inline void BitStream::write(bool bit)
