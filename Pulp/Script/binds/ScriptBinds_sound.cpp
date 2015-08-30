@@ -51,6 +51,7 @@ ISound* XBinds_Sound::GetSoundPtr(IFunctionHandler* pH, int index)
 {
 	X_UNUSED(pH);
 	X_UNUSED(index);
+	X_ASSERT_NOT_IMPLEMENTED();
 /*
 	ScriptValueType::Enum type = pH->GetParamType(index);
 
