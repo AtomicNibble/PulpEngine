@@ -367,7 +367,7 @@ void XBaseInput::AddEventToHoldSymbols(const InputEvent& event)
 void XBaseInput::ClearHoldEvent(InputSymbol* pSymbol)
 {
 	// remove hold key
-	size_t slot = -1;
+	size_t slot = std::numeric_limits<size_t>::max();
 	size_t last = holdSymbols_.size() - 1;
 
 	for (size_t i = last; i >= 0; --i)
@@ -378,7 +378,7 @@ void XBaseInput::ClearHoldEvent(InputSymbol* pSymbol)
 			break;
 		}
 	}
-	if (slot != -1)
+	if (slot != std::numeric_limits<size_t>::max())
 	{
 		// swap last and found symbol
 		holdSymbols_[slot] = holdSymbols_[last];
