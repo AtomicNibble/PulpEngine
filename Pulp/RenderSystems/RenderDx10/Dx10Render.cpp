@@ -527,8 +527,8 @@ void DX11XRender::InitDynamicBuffers(void)
 				break;
 
 #else
-				X_NO_SWITCH_DEFAULT
-					break;
+				X_NO_SWITCH_DEFAULT;
+				break;
 #endif // !X_DEBUG
 
 		}
