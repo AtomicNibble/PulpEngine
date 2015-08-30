@@ -51,10 +51,10 @@ public:
 
 protected:
 
-	void RegisterGlobal(const char* Name, float value);
-	void RegisterGlobal(const char* Name, int value);
+	X_INLINE void RegisterGlobal(const char* Name, float value);
+	X_INLINE void RegisterGlobal(const char* Name, int value);
 
-	void RegisterFunction(const char* funcName,
+	X_INLINE void RegisterFunction(const char* funcName,
 		const IScriptTable::ScriptFunction& function);
 
 protected:
