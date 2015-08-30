@@ -302,7 +302,8 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse)
 ///////////////////////////////////////////
 bool XMouse::SetExclusiveMode(bool value)
 {
-
+	X_ASSERT_NOT_IMPLEMENTED();
+	X_UNUSED(value);
 	return true;
 }
 
