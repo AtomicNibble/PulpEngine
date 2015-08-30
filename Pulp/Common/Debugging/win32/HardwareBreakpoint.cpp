@@ -145,6 +145,8 @@ namespace hardwareBP
 				static void Install(void* address, Condition::Enum cond, Size::Enum size)
 				{
 				#ifndef _WIN64
+					
+
 					CONTEXT ct = {0};
 					ct.ContextFlags = CONTEXT_DEBUG_REGISTERS;
 		
@@ -163,16 +165,16 @@ namespace hardwareBP
 							switch( reg )
 							{
 							case 0:
-								ct.Dr0 = (DWORD)address;
+								ct.Dr0 = reinterpret_cast<DWORD>(address);
 								break;
 							case 1:
-								ct.Dr1 = (DWORD)address;
+								ct.Dr1 = reinterpret_cast<DWORD>(address);
 								break;
 							case 2:
-								ct.Dr2 = (DWORD)address;
+								ct.Dr2 = reinterpret_cast<DWORD>(address);
 								break;
 							case 3:
-								ct.Dr3 = (DWORD)address;
+								ct.Dr3 = reinterpret_cast<DWORD>(address);
 								break;
 
 							default:
