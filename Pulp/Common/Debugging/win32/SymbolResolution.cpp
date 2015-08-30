@@ -92,6 +92,8 @@ namespace symbolResolution
 		{
 			return SymbolInfo( sip.si.Name, line.FileName, line.LineNumber);
 		}
+#else
+		X_UNUSED(address);
 #endif
 		return SymbolInfo( "function", "filename", 0 );
 	}

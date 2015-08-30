@@ -25,7 +25,8 @@ namespace {
 }
 
 
-GrowingPoolAllocator::GrowingPoolAllocator(unsigned int maxSizeInBytes, unsigned int growSize, unsigned int chunkHeaderSize, size_t maxElementSize, size_t maxAlignment, size_t offset)
+GrowingPoolAllocator::GrowingPoolAllocator(unsigned int maxSizeInBytes, unsigned int growSize, 
+	unsigned int chunkHeaderSize, size_t maxElementSize, size_t maxAlignment, size_t offset)
 {
 	m_virtualStart = static_cast<char*>( VirtualMem::ReserveAddressSpace( maxSizeInBytes ) );
 	m_virtualEnd = &m_virtualStart[ maxSizeInBytes ];
@@ -38,6 +39,8 @@ GrowingPoolAllocator::GrowingPoolAllocator(unsigned int maxSizeInBytes, unsigned
 
 #if X_ENABLE_POOL_ALLOCATOR_CHECK
 	m_offset = offset;
+#else
+	X_UNUSED(offset);
 #endif
 
 	X_ASSERT( bitUtil::IsPowerOfTwo( growSize ), "Pool Grow size must be a power-of-two." )( growSize );

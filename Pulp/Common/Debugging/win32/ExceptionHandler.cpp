@@ -499,11 +499,12 @@ namespace exceptionHandler
 #endif
 
 
-	LONG WINAPI HandleException( _EXCEPTION_POINTERS *exceptionPointers )
+	LONG WINAPI HandleException( _EXCEPTION_POINTERS* exceptionPointers )
 	{
 #if X_ENABLE_UNHANDLED_EXCEPTION_HANDLER
 		return internal::HandleException(exceptionPointers);
 #else
+		X_UNUSED(exceptionPointers);
 		return 1;
 #endif
 	}

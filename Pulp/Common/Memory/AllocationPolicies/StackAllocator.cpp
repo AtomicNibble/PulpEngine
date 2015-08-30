@@ -39,7 +39,7 @@ void* StackAllocator::allocate( size_t size, size_t alignment, size_t align_offs
 
 	// get current relative offset
 	const uint32_t allocationOffset = safe_static_cast<uint32_t>(m_current - m_start);
-	const char* old_current = m_current;
+//	const char* old_current = m_current;
 
 	// align it at the offset position, then go back the offset to bring us to start.
 	// of return data not actual start as alignment can waste some memory.
