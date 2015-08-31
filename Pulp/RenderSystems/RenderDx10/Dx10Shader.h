@@ -126,17 +126,17 @@ struct ILTreeNode
 	static const size_t MAX_IL_NODE_CHILDREN = 4;
 	typedef core::Array<ILTreeNode> childVec;
 
-	ILTreeNode() : children(g_rendererArena) {
-		this->fmt = InputLayoutFormat::Invalid;
+	ILTreeNode() : children_(g_rendererArena) {
+		this->fmt_ = InputLayoutFormat::Invalid;
 	}
-	ILTreeNode(const ILTreeNode& oth) : children(g_rendererArena) {
-		this->children = oth.children;
-		this->SematicName = oth.SematicName;
-		this->fmt = oth.fmt;
+	ILTreeNode(const ILTreeNode& oth) : children_(g_rendererArena) {
+		this->children_ = oth.children_;
+		this->SematicName_ = oth.SematicName_;
+		this->fmt_ = oth.fmt_;
 	}
-	ILTreeNode(const char* Sematic) : children(g_rendererArena) {
-		this->SematicName.set(Sematic);
-		this->fmt = InputLayoutFormat::Invalid;
+	ILTreeNode(const char* Sematic) : children_(g_rendererArena) {
+		this->SematicName_.set(Sematic);
+		this->fmt_ = InputLayoutFormat::Invalid;
 	}
 
 	~ILTreeNode() {
@@ -144,17 +144,17 @@ struct ILTreeNode
 	}
 
 	void free(void) {
-		children.free();
+		children_.free();
 	}
 
 	ILTreeNode& AddChild(ILTreeNode& node, 
 		InputLayoutFormat::Enum fmt = InputLayoutFormat::Invalid) 
 	{
-		if (children.size() < MAX_IL_NODE_CHILDREN)
+		if (children_.size() < MAX_IL_NODE_CHILDREN)
 		{
-			children.append(node);
-			ILTreeNode& retnode = children[children.size() - 1];
-			retnode.fmt = fmt;
+			children_.append(node);
+			ILTreeNode& retnode = children_[children_.size() - 1];
+			retnode.fmt_ = fmt;
 			return retnode;
 		}
 		X_ERROR("Shader", "ILTree exceeded max children. max: %i", MAX_IL_NODE_CHILDREN);
@@ -165,10 +165,10 @@ struct ILTreeNode
 	const ILTreeNode* GetChildWithSemtaic(const char* sematic) const {
 		// we want to skip SEMTA0 SEMTA1 SEMTA2 etc so we only compare the length.
 		childVec::ConstIterator it;
-		for (it = children.begin(); it != children.end(); ++it)
+		for (it = children_.begin(); it != children_.end(); ++it)
 		{
-			if (core::strUtil::IsEqualCaseInsen(it->SematicName.begin(),
-				it->SematicName.end(), sematic, sematic + it->SematicName.length()))
+			if (core::strUtil::IsEqualCaseInsen(it->SematicName_.begin(),
+				it->SematicName_.end(), sematic, sematic + it->SematicName_.length()))
 			{
 				return it;
 			}
@@ -177,21 +177,21 @@ struct ILTreeNode
 	}
 
 	X_INLINE void SetFormat(InputLayoutFormat::Enum fmt) {
-		this->fmt = fmt;
+		this->fmt_ = fmt;
 	}
 
 	X_INLINE bool IsEnd(void) const {
-		return this->fmt == InputLayoutFormat::Invalid;
+		return this->fmt_ == InputLayoutFormat::Invalid;
 	}
 
 	X_INLINE InputLayoutFormat::Enum GetILFmt(void) const {
-		return fmt;
+		return fmt_;
 	}
 
 private:
-	core::StackString<64> SematicName;
-	InputLayoutFormat::Enum fmt;
-	childVec children; // never gonna be that many children.
+	core::StackString<64> SematicName_;
+	InputLayoutFormat::Enum fmt_;
+	childVec children_; // never gonna be that many children.
 	bool ___pad[3];
 };
 
