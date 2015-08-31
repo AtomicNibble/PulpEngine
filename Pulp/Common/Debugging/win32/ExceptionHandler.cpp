@@ -1,6 +1,8 @@
 #include "EngineCommon.h"
 
+X_DISABLE_WARNING(4091)
 #include <DbgHelp.h>
+X_ENABLE_WARNING(4091)
 
 #include "ExceptionHandler.h"
 
