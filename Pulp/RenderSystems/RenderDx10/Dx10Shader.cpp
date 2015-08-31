@@ -109,13 +109,13 @@ bool XShader::FXSetTechnique(const char* name, const TechFlags flag)
 bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 {
 	size_t i;
-	for (i = 0; i< techs.size(); i++)
+	for (i = 0; i< techs_.size(); i++)
 	{
-		if (techs[i].nameHash == name)
+		if (techs_[i].nameHash == name)
 		{
 			render::DX11XRender* rd = &render::g_Dx11D3D;
 
-			XShaderTechnique& tech = techs[i];
+			XShaderTechnique& tech = techs_[i];
 
 			rd->m_State.pCurShader = this;
 			rd->m_State.pCurShaderTech = &tech;
@@ -155,7 +155,7 @@ bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 	}
 
 	X_BREAKPOINT;
-	X_WARNING("Shader", "failed to find technique: %i", name);
+	X_WARNING("Shader", "failed to find technique: %i", name_);
 	return false;
 }
 

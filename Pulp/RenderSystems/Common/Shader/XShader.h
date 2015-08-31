@@ -235,43 +235,43 @@ struct ShaderSourceFile
 	friend class XShaderManager;
 
 	ShaderSourceFile() :
-		sourceCrc32(0),
-		techniques(g_rendererArena)
+		sourceCrc32_(0),
+		techniques_(g_rendererArena)
 	{}
 
 	struct Technique
 	{
 		Technique();
 
-		core::string name;
-		core::string vertex_func;
-		core::string pixel_func;
+		core::string name_;
+		core::string vertex_func_;
+		core::string pixel_func_;
 
-		BlendInfo src;
-		BlendInfo dst;
+		BlendInfo src_;
+		BlendInfo dst_;
 
-		render::CullMode::Enum cullMode;
-		bool depth_write;
+		render::CullMode::Enum cullMode_;
+		bool depth_write_;
 
-		render::StateFlag state;
-		Flags<TechniquePrams> flags;
-		Flags<TechFlag> techFlags;
+		render::StateFlag state_;
+		Flags<TechniquePrams> flags_;
+		Flags<TechFlag> techFlags_;
 
 		bool parse(core::XLexer& lex);
 		bool processName(void);
 	};
 
 
-	X_INLINE size_t numTechs(void) const { return techniques.size(); }
+	X_INLINE size_t numTechs(void) const { return techniques_.size(); }
 
 protected:
 
-	core::string name;
-	SourceFile* pFile;
-	SourceFile* pHlslFile;
-	uint32_t sourceCrc32;
-	uint32_t hlslSourceCrc32;
-	core::Array<Technique> techniques;
+	core::string name_;
+	SourceFile* pFile_;
+	SourceFile* pHlslFile_;
+	uint32_t sourceCrc32_;
+	uint32_t hlslSourceCrc32_;
+	core::Array<Technique> techniques_;
 };
 
 
@@ -354,8 +354,8 @@ public:
 	virtual const int addRef() X_OVERRIDE{ return XBaseAsset::addRef(); }
 	virtual const int release() X_OVERRIDE;
 
-	virtual const char* getName() const X_OVERRIDE{ return name.c_str(); }
-	virtual VertexFormat::Enum getVertexFmt() X_OVERRIDE{ return vertexFmt; }
+	virtual const char* getName() const X_OVERRIDE{ return name_.c_str(); }
+	virtual VertexFormat::Enum getVertexFmt() X_OVERRIDE{ return vertexFmt_; }
 
 	// D3D Effects interface
 	bool FXSetTechnique(const char* name, const TechFlags flag = TechFlags());
@@ -370,19 +370,19 @@ public:
 
 private:
 
-	X_INLINE size_t numTechs(void) const { return techs.size(); }
+	X_INLINE size_t numTechs(void) const { return techs_.size(); }
 
 private:
 
-	core::string name;
-	uint32_t sourceCrc32;
-	uint32_t hlslSourceCrc32;
+	core::string name_;
+	uint32_t sourceCrc32_;
+	uint32_t hlslSourceCrc32_;
 
-	SourceFile* pHlslFile;
+	SourceFile* pHlslFile_;
 
-	VertexFormat::Enum vertexFmt;
+	VertexFormat::Enum vertexFmt_;
 
-	core::Array<XShaderTechnique> techs;
+	core::Array<XShaderTechnique> techs_;
 };
 
 class XShaderManager : public core::IXHotReload
