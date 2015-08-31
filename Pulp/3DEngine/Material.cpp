@@ -317,8 +317,8 @@ bool XMaterial::ProcessMaterialXML(XMaterial* pMaterial,
 		{
 			flags.Set(MtlXmlFlags::FLAGS);
 
-			uint32_t flags = core::strUtil::StringToInt<uint32_t>(attr->value());
-			pMaterial->setFlags(flags);
+			uint32_t Matflags = core::strUtil::StringToInt<uint32_t>(attr->value());
+			pMaterial->setFlags(Matflags);
 		}
 		else if (core::strUtil::IsEqual(begin, end, "SurfaceType"))
 		{
