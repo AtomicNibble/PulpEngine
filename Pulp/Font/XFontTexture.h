@@ -72,9 +72,9 @@ struct XTextureSlot
 typedef std::vector<XTextureSlot *>								XTextureSlotList;
 typedef std::vector<XTextureSlot *>::iterator					XTextureSlotListItor;
 
-typedef std::hash_map<uint16, XTextureSlot *>					XTextureSlotTable;
-typedef std::hash_map<uint16, XTextureSlot *>::iterator			XTextureSlotTableItor;
-typedef std::hash_map<uint16, XTextureSlot *>::const_iterator	XTextureSlotTableItorConst;
+typedef std::unordered_map<uint16, XTextureSlot *>					XTextureSlotTable;
+typedef std::unordered_map<uint16, XTextureSlot *>::iterator		XTextureSlotTableItor;
+typedef std::unordered_map<uint16, XTextureSlot *>::const_iterator	XTextureSlotTableItorConst;
 
 struct XCharCords
 {
