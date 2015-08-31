@@ -605,7 +605,6 @@ int XScriptTable::StdCFunction(lua_State* L)
 	int ret = function->Invoke(&fh);
 	return ret;
 }
-X_ENABLE_WARNING(4458)
 
 int XScriptTable::StdCUserDataFunction(lua_State* L)
 {
@@ -621,9 +620,11 @@ int XScriptTable::StdCUserDataFunction(lua_State* L)
 
 	XFunctionHandler fh(pScriptSystem_, L, FuncName, nParamIdOffset);
 	// Call functor.
-	int nRet = (*pFunction)(&fh, pBuffer, nSize); 
-	return nRet;
+	int ret = (*pFunction)(&fh, pBuffer, nSize); 
+	return ret;
 }
+
+X_ENABLE_WARNING(4458)
 
 // --------------------------------------------------------------------------
 
