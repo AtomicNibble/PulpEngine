@@ -147,7 +147,7 @@ void XTexture::unbind(void)
 	}
 }
 
-
+X_DISABLE_WARNING(4458) //  warning C4458: declaration of 'type' hides class member
 void XTexture::apply(int slot, int state_id, shader::ShaderType::Enum type)
 {
 	ID3D11DeviceContext* dv = g_Dx11D3D.DxDeviceContext();
@@ -180,7 +180,7 @@ void XTexture::apply(int slot, int state_id, shader::ShaderType::Enum type)
 
 	dv->PSSetShaderResources(slot, 1, &pResView);
 }
-
+X_ENABLE_WARNING(4458)
 
 void XTexture::updateTextureRegion(byte* data, int nX, int nY, int USize, int VSize, 
 	Texturefmt::Enum srcFmt)
@@ -197,7 +197,9 @@ void XTexture::RT_UpdateTextureRegion(byte* data, int nX, int nY, int USize, int
 	}
 	
 //	DXGI_FORMAT frmtSrc = (DXGI_FORMAT)DCGIFormatFromTexFmt(srcFmt);
+	X_DISABLE_WARNING(4838) // conversion from 'int' to 'UINT' requires a narrowing conversion
 	D3D11_BOX rc = { nX, nY, 0, nX + USize, nY + VSize, 1 };
+	X_ENABLE_WARNING(4838);
 
 	if (!is_dxt(srcFmt))
 	{
