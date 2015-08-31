@@ -21,7 +21,7 @@ X_PRAGMA(optimize("", off))
 
 void TestJob(void* pParam, uint32_t batchOffset, uint32_t batchNum, uint32_t workerIdx)
 {
-	uint32_t idx = reinterpret_cast<uint32_t>(pParam);
+	size_t idx = reinterpret_cast<size_t>(pParam);
 
 	size_t i, running_total = 23;
 	size_t some_large_number = 0x10000;
