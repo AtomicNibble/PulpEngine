@@ -120,7 +120,7 @@ void XWinInput::Update(bool bFocus)
 
 			for (TInputDevices::Iterator it = Devices_.begin(); it != Devices_.end(); ++it)
 			{
-				XInputDeviceWin32* pDevice = (XInputDeviceWin32*)(*it);
+				XInputDeviceWin32* pDevice = (XInputDeviceWin32*)(*it	);
 				if (pDevice->IsEnabled())
 				{
 					pDevice->ProcessInput(rawInput->header, pData);
