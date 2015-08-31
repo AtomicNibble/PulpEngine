@@ -7,7 +7,7 @@ X_NAMESPACE_BEGIN(render)
 
 
 XTextDrawList::XTextDrawList(core::MemoryArenaBase* arena) :
-	data_(nullptr)
+	data_(arena)
 {
 
 }
