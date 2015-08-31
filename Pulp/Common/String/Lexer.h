@@ -278,8 +278,8 @@ public:
 	void Warning(const char *str, ...);
 
 private:
-	void SetPunctuations(const punctuation_t *p);
-	void CreatePunctuationTable(const punctuation_t *punctuations);
+	void SetPunctuations(const punctuation_t* p);
+	void CreatePunctuationTable(const punctuation_t* punctuations);
 	const char* GetPunctuationFromId(int id);
 
 	int ReadWhiteSpace(void);
@@ -301,12 +301,12 @@ private:
 	int			lastLine_;				// line before reading token
 	LexFlags	flags_;
 
-	XLexToken	token;
-	int			tokenavailable;
+	XLexToken	token_;
+	int			tokenavailable_;
 
-	const punctuation_t *punctuations;		// the punctuations used in the script
-	int *			punctuationtable;		// ASCII table with punctuations
-	int *			nextpunctuation;
+	const punctuation_t* punctuations_;		// the punctuations used in the script
+	int *			punctuationtable_;		// ASCII table with punctuations
+	int *			nextpunctuation_;
 };
 
 
