@@ -54,7 +54,7 @@ namespace
 		vb.push_back(XAuxObjVertex(Vec3f(0.0f, 0.0f, -radius), Vec3f(0.0f, 0.0f, 1.0f)));
 
 		// build "inner" faces
-		for (uint32 a(0); a < rings - 2; ++a)
+		for (a = 0; a < rings - 2; ++a)
 		{
 			for (uint32 i(0); i < sections; ++i)
 			{
@@ -69,14 +69,14 @@ namespace
 		}
 
 		// build faces for end caps (to connect "inner" vertices with poles)
-		for (uint32 i(0); i < sections; ++i)
+		for (i = 0; i < sections; ++i)
 		{
 			ib.push_back((uint16)(1 + (0) * (sections + 1) + i));
 			ib.push_back((uint16)(1 + (0) * (sections + 1) + i + 1));
 			ib.push_back((uint16)0);
 		}
 
-		for (uint32 i(0); i < sections; ++i)
+		for ( i = 0; i < sections; ++i)
 		{
 			ib.push_back((uint16)(1 + (rings - 2) * (sections + 1) + i + 1));
 			ib.push_back((uint16)(1 + (rings - 2) * (sections + 1) + i));
