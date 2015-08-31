@@ -605,16 +605,16 @@ XTexture* XTexture::Create2DTexture(const char* name, const Vec2i& size, size_t 
 
 	XTextureFile file;
 	file.pFaces[0] = pData;
-	file.depth = 1;
-	file.numFaces = 1;
-	file.format = textureFmt;
-	file.numMips = safe_static_cast<uint8_t,size_t>(numMips);
-	file.flags = Flags;
-	file.size = size;
-	file.type = TextureType::T2D;
-	file.datasize = get_data_size(size[0], size[1], 1, 
+	file.depth_ = 1;
+	file.numFaces_ = 1;
+	file.format_ = textureFmt;
+	file.numMips_ = safe_static_cast<uint8_t,size_t>(numMips);
+	file.flags_ = Flags;
+	file.size_ = size;
+	file.type_ = TextureType::T2D;
+	file.datasize_ = get_data_size(size[0], size[1], 1, 
 		safe_static_cast<uint32_t, size_t>(numMips), textureFmt);
-	file.bDontDelete = true;
+	file.bDontDelete_ = true;
 	file.addReference();
 
 	if (file.isValid())
@@ -640,15 +640,15 @@ XTexture* XTexture::CreateRenderTarget(const char* name, uint32_t width, uint32_
 
 	XTextureFile file;
 	file.pFaces[0] = nullptr;
-	file.depth = 1;
-	file.numFaces = 1;
-	file.format = fmt;
-	file.numMips = 1;
-	file.flags = Flags;
-	file.size = size;
-	file.type = type;
-	file.datasize = get_data_size(size[0], size[1], 1, 1, fmt);
-	file.bDontDelete = true;
+	file.depth_ = 1;
+	file.numFaces_ = 1;
+	file.format_ = fmt;
+	file.numMips_ = 1;
+	file.flags_ = Flags;
+	file.size_ = size;
+	file.type_ = type;
+	file.datasize_ = get_data_size(size[0], size[1], 1, 1, fmt);
+	file.bDontDelete_ = true;
 	file.addReference();
 
 	if (file.isValid())
