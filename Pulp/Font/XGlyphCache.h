@@ -4,7 +4,7 @@
 #define _X_FONT_GLYPH_CACHE_H_
 
 #include <vector>
-#include <unordered_map>>
+#include <unordered_map>
 
 #include "XGlyphBitmap.h"
 #include "XFontRender.h"
