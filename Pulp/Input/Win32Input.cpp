@@ -118,9 +118,9 @@ void XWinInput::Update(bool bFocus)
 				pData += 8;
 			}
 
-			for (TInputDevices::Iterator i = Devices_.begin(); i != Devices_.end(); ++i)
+			for (TInputDevices::Iterator it = Devices_.begin(); it != Devices_.end(); ++it)
 			{
-				XInputDeviceWin32* pDevice = (XInputDeviceWin32*)(*i);
+				XInputDeviceWin32* pDevice = (XInputDeviceWin32*)(*it);
 				if (pDevice->IsEnabled())
 				{
 					pDevice->ProcessInput(rawInput->header, pData);
