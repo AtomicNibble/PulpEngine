@@ -51,6 +51,7 @@ InputLayoutFormat::Enum ILfromVertexFormat(const VertexFormat::Enum fmt)
 			X_ASSERT_UNREACHABLE();
 			return InputLayoutFormat::POS_UV;
 #else
+		default:
 			X_NO_SWITCH_DEFAULT;
 #endif // !X_DEBUG
 	}
