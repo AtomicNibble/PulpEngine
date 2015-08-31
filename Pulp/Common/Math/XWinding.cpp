@@ -12,7 +12,7 @@ namespace
 	static const int MAX_WORLD_SIZE = (MAX_WORLD_COORD - MIN_WORLD_COORD);
 
 #if 1
-	#define alloca16(numBytes) ((void *)((((int)_alloca( (numBytes)+15 )) + 15) & ~15))
+	#define alloca16(numBytes) ((void *)((((uintptr_t)_alloca( (numBytes)+15 )) + 15) & ~15))
 #else
 	template<typename T>
 	X_INLINE T* Alloca16(size_t num)
