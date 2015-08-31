@@ -56,7 +56,7 @@ namespace
 		// build "inner" faces
 		for (a = 0; a < rings - 2; ++a)
 		{
-			for (uint32 i(0); i < sections; ++i)
+			for (i = 0; i < sections; ++i)
 			{
 				ib.push_back((uint16)(1 + a * (sections + 1) + i + 1));
 				ib.push_back((uint16)(1 + a * (sections + 1) + i));
