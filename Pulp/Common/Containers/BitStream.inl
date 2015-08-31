@@ -6,10 +6,22 @@ start_(0),
 arena_(arena)
 {
 	X_ASSERT_NOT_NULL(arena);
-
-
 }
 
+BitStream::BitStream(MemoryArenaBase* arena, size_t numBits) :
+bitIdx_(0),
+capacity_(0),
+start_(0),
+arena_(arena)
+{
+	X_ASSERT_NOT_NULL(arena);
+	resize(numBits);
+}
+
+BitStream::~BitStream()
+{
+	free();
+}
 
 // writes a bit to the stream
 inline void BitStream::write(bool bit)
@@ -29,7 +41,7 @@ inline void BitStream::write(bool bit)
 }
 
 // removes and returns the top bit off the stream.
-inline bool BitStream::read()
+inline bool BitStream::read(void)
 {
 	X_ASSERT(size() > 0, "can't read bit from stream.")(size());
 
@@ -42,7 +54,7 @@ inline bool BitStream::read()
 }
 
 // returns the top bit but dose not remove it.
-inline bool BitStream::peek() const
+inline bool BitStream::peek(void) const
 {
 	X_ASSERT(size() > 0, "can't peek bit from stream.")(size());
 
@@ -64,14 +76,26 @@ inline void BitStream::seek(size_t pos)
 
 
 // resizes the object
-inline void BitStream::resize(size_t size) 
+inline void BitStream::resize(size_t numBits) 
 {
-	if (size > capacity()) {
-		Delete(start_);
+	if (numBits > capacity())
+	{
+		// save local copy of old array and it's size.
+		char* pOld = start_;
+		size_t bytesAllocated = bytesRequired(capacity_);
 
-		start_ = Allocate(size);
-		capacity_ = size;
-		bitIdx_ = 0;
+		// allocate the new one.
+		start_ = Allocate(numBits);
+
+		// copy over.
+		if(pOld)
+		{
+			::memcpy(start_,pOld, bytesAllocated);
+			Delete(pOld);
+		}
+
+		// update capacity.		
+		capacity_ = numBits;
 	}
 }
 
@@ -85,6 +109,7 @@ inline void BitStream::free(void)
 	if (start_) {
 		Delete(start_);
 	}
+	start_ = nullptr;
 	bitIdx_ = capacity_ = 0;
 }
 
@@ -92,43 +117,46 @@ inline void BitStream::free(void)
 
 
 // returns how many bits are currently stored in the stream.
-inline size_t BitStream::size() const
+inline size_t BitStream::size(void) const
 {
 	return bitIdx_;
 }
 
 // returns the capacity
-inline size_t BitStream::capacity() const
+inline size_t BitStream::capacity(void) const
 {
 	return capacity_;
 }
 
 // returns the amount of bits that can be added.
-inline size_t BitStream::freeSpace() const
+inline size_t BitStream::freeSpace(void) const
 {
 	return capacity_ - bitIdx_;
 }
 
 // returns true if the stream is full.
-inline bool BitStream::isEos() const
+inline bool BitStream::isEos(void) const
 {
 	return bitIdx_ == capacity_;
 }
 
+inline size_t BitStream::bytesRequired(size_t numBits) const
+{
+	// align so that all the bits fit.
+	numBits = bitUtil::RoundUpToMultiple<size_t>(numBits, 8);
+	numBits >>= 3; // to bytes
+	return numBits;
+}
 
 // for easy memory allocation changes later.
-inline void BitStream::Delete(char* pData)
+inline void BitStream::Delete(char* pData) const
 {
-	// ::free((void*)pData);
 	X_DELETE_ARRAY(pData,arena_);
 }
 
-inline char* BitStream::Allocate(size_t numbits)
+inline char* BitStream::Allocate(size_t numbits) const
 {
-	// align so that all the bits fit.
-	numbits = bitUtil::RoundUpToMultiple<size_t>(numbits, 8);
-	numbits >>= 3; // to bytes
+	size_t numBytes = bytesRequired(numbits);
 
-	return X_NEW_ARRAY(char, numbits, arena_, "BitStream");
-	// return (char*)malloc(numbits);
+	return X_NEW_ARRAY(char, numBytes, arena_, "BitStream");
 }

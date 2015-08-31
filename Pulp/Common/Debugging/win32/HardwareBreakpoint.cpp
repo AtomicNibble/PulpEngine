@@ -70,16 +70,16 @@ namespace hardwareBP
 							switch( reg )
 							{
 							case 0:
-								ct.Dr0 = (DWORD64)address;
+								ct.Dr0 = reinterpret_cast<DWORD64>(address);
 								break;
 							case 1:
-								ct.Dr1 = (DWORD64)address;
+								ct.Dr1 = reinterpret_cast<DWORD64>(address);
 								break;
 							case 2:
-								ct.Dr2 = (DWORD64)address;
+								ct.Dr2 = reinterpret_cast<DWORD64>(address);
 								break;
 							case 3:
-								ct.Dr3 = (DWORD64)address;
+								ct.Dr3 = reinterpret_cast<DWORD64>(address);
 								break;
 
 							default:
@@ -113,7 +113,7 @@ namespace hardwareBP
 
 					if (GetThreadContext(hThread, &ct))
 					{
-						DWORD64 reg = FindUsedReg((DWORD64)address, ct);
+						DWORD64 reg = FindUsedReg(reinterpret_cast<DWORD64>(address), ct);
 
 						if (reg == 4)
 						{
@@ -164,16 +164,16 @@ namespace hardwareBP
 							switch( reg )
 							{
 							case 0:
-								ct.Dr0 = (DWORD)address;
+								ct.Dr0 = reinterpret_cast<DWORD>(address);
 								break;
 							case 1:
-								ct.Dr1 = (DWORD)address;
+								ct.Dr1 = reinterpret_cast<DWORD>(address);
 								break;
 							case 2:
-								ct.Dr2 = (DWORD)address;
+								ct.Dr2 = reinterpret_cast<DWORD>(address);
 								break;
 							case 3:
-								ct.Dr3 = (DWORD)address;
+								ct.Dr3 = reinterpret_cast<DWORD>(address);
 								break;
 
 							default:
@@ -239,12 +239,12 @@ namespace hardwareBP
 
 	void Install(void* address, Condition::Enum cond, Size::Enum size)
 	{
-		internal::Implementation<sizeof(size_t)>::Install(address,cond,size);
+		internal::Implementation<sizeof(address)>::Install(address,cond,size);
 	}
 
 	void Uninstall(void* address)
 	{
-		internal::Implementation<sizeof(size_t)>::Uninstall(address);
+		internal::Implementation<sizeof(address)>::Uninstall(address);
 	}
 
 } // hardwareBP

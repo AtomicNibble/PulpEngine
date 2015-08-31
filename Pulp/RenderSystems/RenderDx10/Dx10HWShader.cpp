@@ -467,7 +467,7 @@ bool XHWShader_Dx10::loadFromCache()
 {
 	core::Path<char> dest;
 
-//	XShaderManager* pShaderMan = &render::gRenDev->m_ShaderMan;
+	// XShaderManager* pShaderMan = &render::gRenDev->ShaderMan_;
 
 	getShaderCompileDest(dest);
 
@@ -494,7 +494,7 @@ bool XHWShader_Dx10::loadFromSource()
 
 	getShaderCompilePaths(src, dest);
 
-	XShaderManager* pShaderMan = &render::gRenDev->m_ShaderMan;
+	XShaderManager* pShaderMan = &render::gRenDev->ShaderMan_;
 
 	// we need to get the whole file :D
 	if (!pShaderMan->sourceToString(source, this->sourceFileName_))
@@ -514,7 +514,7 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 
 	X_LOG0("Shader", "Compiling shader: \"%s\"", name_.c_str());
 
-	pShaderMan = &render::gRenDev->m_ShaderMan;
+	pShaderMan = &render::gRenDev->ShaderMan_;
 	D3DCompileflags_ = 0;
 
 #if X_DEBUG // todo make this a cvar

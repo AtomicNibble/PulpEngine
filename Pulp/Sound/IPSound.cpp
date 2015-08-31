@@ -51,10 +51,13 @@ class XEngineModule_Sound : public IEngineModule
 
 		sound::ISound* pSound = nullptr;
 
-		g_SoundArena = X_NEW_ALIGNED(SoundArena, gEnv->pArena, "SoundArena", X_ALIGN_OF(SoundArena))(&g_SoundAlloc, "SoundArena");
-		pSound = X_NEW_ALIGNED(sound::XSound, g_SoundArena, "SoundSys", X_ALIGN_OF(sound::XSound));
+		g_SoundArena = X_NEW(SoundArena, gEnv->pArena, "SoundArena")(&g_SoundAlloc, "SoundArena");
+		pSound = X_NEW(sound::XSound, g_SoundArena, "SoundSys");
 
-		pSound->Init();
+		if (!pSound->Init()) {
+			X_DELETE(pSound, g_SoundArena);
+			return true;
+		}
 
 		env.pSound = pSound;
 		return true;

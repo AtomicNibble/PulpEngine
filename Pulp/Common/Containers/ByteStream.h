@@ -13,21 +13,23 @@ class ByteStream
 public:
 	// constructs the stream no memory is allocated.
 	inline ByteStream(MemoryArenaBase* arena);
+	inline ByteStream(MemoryArenaBase* arena, size_t numBytes);
+	inline ~ByteStream();
 
 	// writes the type to the stream.
 	template<typename T>
 	inline void write(const T& val);
 	// removes and returns the top object off the stream.
 	template<typename T>
-	inline T read();
+	inline T read(void);
 	// returns the top object but dose not remove it.
 	template<typename T>
-	inline T peek() const;
+	inline T peek(void) const;
 	// sets the absolute position in the stream.
 	inline void seek(size_t pos);
 
 	// resizes the object
-	inline void resize(size_t size);
+	inline void resize(size_t numBytes);
 	// clears the stream setting the cursor back to the start.
 	// no memory is freed
 	inline void reset(void);
@@ -35,15 +37,15 @@ public:
 	inline void free(void);
 
 	// returns how many bytes are currently stored in the stream.
-	inline size_t size() const;
+	inline size_t size(void) const;
 	// returns the capacity of the byte stream.
-	inline size_t capacity() const;
+	inline size_t capacity(void) const;
 	// returns the amount of bytes that can be added.
-	inline size_t freeSpace() const;
+	inline size_t freeSpace(void) const;
 	// returns true if the stream is full.
-	inline bool isEos() const;
+	inline bool isEos(void) const;
 
-	inline char* begin() const {
+	inline char* begin(void) const {
 		return start_;
 	}
 
@@ -52,8 +54,8 @@ protected:
 	X_NO_ASSIGN(ByteStream);
 
 	// for easy memory allocation changes later.
-	inline void Delete(char* pData);
-	inline char* Allocate(size_t num);
+	inline void Delete(char* pData) const;
+	inline char* Allocate(size_t num) const;
 
 	char* current_;
 	char* start_;

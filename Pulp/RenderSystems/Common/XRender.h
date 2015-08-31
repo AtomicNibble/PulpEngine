@@ -220,8 +220,8 @@ public:
 	// ~Drawing
 
 
-	X_INLINE XRenderThread* rThread() {
-		return m_pRt;
+	X_INLINE XRenderThread* rThread(void) {
+		return pRt_;
 	}
 
 
@@ -264,7 +264,7 @@ protected:
 	bool LoadResourceDeffintion(void);
 
 public:
-	shader::XShaderManager m_ShaderMan;
+	shader::XShaderManager ShaderMan_;
 
 	core::Array<RenderResource> RenderResources_;
 protected:
@@ -279,7 +279,7 @@ protected:
 
 	X_ENABLE_WARNING(4324)
 
-	XRenderThread* m_pRt;
+	XRenderThread* pRt_;
 	VidMemManager vidMemMng_;
 
 	// stores the with + height and the znear + zfar

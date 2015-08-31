@@ -995,7 +995,7 @@ void XRenderAuxImp::SetShader(const XAuxGeomRenderFlags& renderFlags)
 {
 	if (pAuxGeomShader_ == nullptr)
 	{
-		pAuxGeomShader_ = renderer_.m_ShaderMan.forName("AuxGeom");
+		pAuxGeomShader_ = renderer_.ShaderMan_.forName("AuxGeom");
 	}
 
 #if 1

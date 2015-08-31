@@ -299,13 +299,13 @@ const int XShader::release()
 void Cmd_ListShaders(core::IConsoleCmdArgs* pArgs)
 {
 	X_UNUSED(pArgs);
-	render::gRenDev->m_ShaderMan.listShaders();
+	render::gRenDev->ShaderMan_.listShaders();
 }
 
 void Cmd_ListShaderSources(core::IConsoleCmdArgs* pArgs)
 {
 	X_UNUSED(pArgs);
-	render::gRenDev->m_ShaderMan.listShaderSources();
+	render::gRenDev->ShaderMan_.listShaderSources();
 }
 
 bool XShaderManager::Init(void)
