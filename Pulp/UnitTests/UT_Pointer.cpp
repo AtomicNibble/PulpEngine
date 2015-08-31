@@ -19,8 +19,8 @@ TEST(PointerUtil, Align)
 	void* AlignedTop = pointerUtil::AlignTop(unAlinPointer, 4);
 	void* AlignedBot = pointerUtil::AlignBottom(unAlinPointer, 4);
 
-	EXPECT_TRUE(reinterpret_cast<int>(AlignedTop) == 4);
-	EXPECT_TRUE(reinterpret_cast<int>(AlignedBot) == 0);
+	EXPECT_TRUE(reinterpret_cast<uintptr_t>(AlignedTop) == 4);
+	EXPECT_TRUE(reinterpret_cast<uintptr_t>(AlignedBot) == 0);
 
 
 	unAlinPointer = reinterpret_cast<void*>(73);
@@ -28,8 +28,8 @@ TEST(PointerUtil, Align)
 	AlignedTop = pointerUtil::AlignTop(unAlinPointer, 8);
 	AlignedBot = pointerUtil::AlignBottom(unAlinPointer, 8);
 
-	EXPECT_TRUE(reinterpret_cast<int>(AlignedTop) == 80);
-	EXPECT_TRUE(reinterpret_cast<int>(AlignedBot) == 72);
+	EXPECT_TRUE(reinterpret_cast<uintptr_t>(AlignedTop) == 80);
+	EXPECT_TRUE(reinterpret_cast<uintptr_t>(AlignedBot) == 72);
 
 }
 
