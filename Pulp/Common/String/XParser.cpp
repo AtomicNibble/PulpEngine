@@ -421,7 +421,7 @@ bool XParser::Directive_define(void)
 
 	do
 	{
-		XLexToken* t = X_NEW(XLexToken, arena_, "Macrotoken")(token);
+		XLexToken* pT = X_NEW(XLexToken, arena_, "Macrotoken")(token);
 
 		if (token.type == TT_NAME && token.isEqual(define->name)) {
 		//	t->flags |= TOKEN_FL_RECURSIVE_DEFINE;
@@ -429,8 +429,8 @@ bool XParser::Directive_define(void)
 		}
 	//	t->ClearTokenWhiteSpace();
 		
-		t->pNext_ = define->pTokens;
-		define->pTokens = t;
+		pT->pNext_ = define->pTokens;
+		define->pTokens = pT;
 
 	} while (ReadLine(token));
 
