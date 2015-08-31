@@ -590,6 +590,7 @@ void XScriptTable::PushRef(IScriptTable* pObj)
 }
 
 
+X_DISABLE_WARNING(4458) // declaration of 'L' hides class member
 int XScriptTable::StdCFunction(lua_State* L)
 {
 	unsigned char* pBuffer = (unsigned char*)lua_touserdata(L, lua_upvalueindex(1));
@@ -601,9 +602,10 @@ int XScriptTable::StdCFunction(lua_State* L)
 	XFunctionHandler fh(pScriptSystem_, L, sFuncName, nParamIdOffset);
 	
 	
-	int nRet = function->Invoke(&fh);
-	return nRet;
+	int ret = function->Invoke(&fh);
+	return ret;
 }
+X_ENABLE_WARNING(4458)
 
 int XScriptTable::StdCUserDataFunction(lua_State* L)
 {
