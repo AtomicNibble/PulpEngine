@@ -113,7 +113,7 @@ namespace
 
 	bool HasCPUID(void)
 	{
-#ifdef _WIN64
+#if defined(_WIN64) || 1
 		return true;
 #else
 		__asm
