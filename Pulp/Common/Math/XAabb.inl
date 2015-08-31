@@ -43,10 +43,10 @@ X_INLINE void AABB::set(const Vec3f& center, float radius)
 	max = center + rad;
 }
 
-X_INLINE void AABB::set(const Vec3f &min, const Vec3f &max)
+X_INLINE void AABB::set(const Vec3f &min_, const Vec3f &max_)
 {
-	this->min = min;
-	this->max = max;
+	this->min = min_;
+	this->max = max_;
 }
 
 X_INLINE void AABB::set(const AABB &oth)
