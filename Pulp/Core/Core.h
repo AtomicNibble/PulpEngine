@@ -202,7 +202,7 @@ private:
 //	GlobalArena						arena_;
 
 	core::xWindow*				    pWindow_;
-	core::Console*					pConsole;
+	core::Console*					pConsole_;
 
 	VisualStudioLogger*				pVsLogger_;
 	ConsoleLogger*					pConsoleLogger_;
