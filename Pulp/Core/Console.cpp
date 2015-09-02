@@ -1705,9 +1705,9 @@ void XConsole::DrawBuffer()
 		if (cursor_.draw)
 		{
 			core::StackString<256> temp(InputBuffer_.c_str(), InputBuffer_.c_str() + CursorPos_);
-			float width = pFont_->GetTextSize(temp.c_str(), ctx).x + 3; // 3px offset from engine txt.
+			float Lwidth = pFont_->GetTextSize(temp.c_str(), ctx).x + 3; // 3px offset from engine txt.
 
-			pFont_->DrawString(Vec2f(pos.x + width, pos.y), "_", ctx);
+			pFont_->DrawString(Vec2f(pos.x + Lwidth, pos.y), "_", ctx);
 		}
 
 		// the log.
