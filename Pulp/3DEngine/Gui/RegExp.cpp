@@ -216,9 +216,8 @@ void XRegisterList::AddReg(const char* name, RegisterType::Enum type, core::XPar
 			core::XLexToken tok;
 			if (lex.ReadToken(tok)) 
 			{
-				core::StackString512 name(tok.begin(),tok.end());
-			//	tok = idLocalization::GetString(tok);
-				var->Init(name.c_str(), win);
+				core::StackString512 Lname(tok.begin(),tok.end());
+				var->Init(Lname.c_str(), win);
 			}
 		}
 		else 
