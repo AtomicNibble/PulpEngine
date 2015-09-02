@@ -508,7 +508,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb)
 		InputState::Enum newstate;
 
 		// get the modifiers.
-		IInput::ModifierFlags flags = input.GetModifiers();
+		IInput::ModifierFlags Lflags = input.GetModifiers();
 
 		if (IsDown)
 		{
@@ -524,14 +524,14 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb)
 
 			if (pSymbol->type == InputSymbol::Toggle)
 			{
-				if (flags.IsSet(pSymbol->modifer_mask))
-					flags.Remove(pSymbol->modifer_mask);
+				if (Lflags.IsSet(pSymbol->modifer_mask))
+					Lflags.Remove(pSymbol->modifer_mask);
 				else
-					flags.Set(pSymbol->modifer_mask);
+					Lflags.Set(pSymbol->modifer_mask);
 			}
 			else if (pSymbol->modifer_mask != ModifiersMasks::NONE)
 			{
-				flags.Set(pSymbol->modifer_mask);
+				Lflags.Set(pSymbol->modifer_mask);
 			}
 
 			newstate = InputState::PRESSED;
@@ -542,7 +542,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb)
 			if (pSymbol->modifer_mask != ModifiersMasks::NONE && pSymbol->type == InputSymbol::Button)
 			{
 				// this key is a modifer but is not togle type :)
-				flags.Remove(pSymbol->modifer_mask);
+				Lflags.Remove(pSymbol->modifer_mask);
 			}
 
 			newstate = InputState::RELEASED;
@@ -557,7 +557,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb)
 			if (g_pInputCVars->input_debug)
 			{
 				X_LOG0("Keyboard", "Skipped (%s) state has not changed: %s, flags: %i, value: %f", 
-					pSymbol->name.c_str(), InputState::toString(newstate), flags, pSymbol->value);
+					pSymbol->name.c_str(), InputState::toString(newstate), Lflags.ToInt(), pSymbol->value);
 			}
 			return;
 		}
@@ -566,7 +566,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb)
 
 		event.deviceId = InputDevice::KEYBOARD;
 		event.keyId = (KeyId::Enum)virtualKey;
-		event.modifiers = flags;
+		event.modifiers = Lflags;
 		event.name = pSymbol->name;
 		event.action = newstate;
 		event.pSymbol = pSymbol;
