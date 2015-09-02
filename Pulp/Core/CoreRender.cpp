@@ -36,9 +36,9 @@ void XCore::RenderEnd()
 			profileSys_.Render();
 		}
 
-		if (core::IConsole* pConsole = GetIConsole())
+		if (core::IConsole* pConsole = GetIConsole()) {
 			pConsole->Draw();
-	
+		}
 		
 		env_.pRender->RenderEnd();
 	}
