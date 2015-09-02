@@ -100,7 +100,7 @@ void XWinInput::Update(bool bFocus)
 		{
 			X_LOG0("Input", "Buffer size: %i", num);
 		}
-
+			
 		if (num == (UINT)-1)
 		{
 			core::lastError::Description Dsc;
