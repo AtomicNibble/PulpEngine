@@ -162,13 +162,16 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 		core::zero_object(osvi);
 
-		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
+		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOW);
 		GetVersionExW(&osvi);
 		
 		bool bIsWindowsXPorLater = osvi.dwMajorVersion > 5 || (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion >= 1);
 
 		if (!bIsWindowsXPorLater)
 		{
+			::MessageBoxW(reinterpret_cast<HWND>(startupParams.hWnd), 
+				L"Versions of windows older than XP are not supported.",
+				L"Critial Error", MB_OK);
 			return false;
 		}
 	}
