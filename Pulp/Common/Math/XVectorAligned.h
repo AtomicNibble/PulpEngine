@@ -16,7 +16,6 @@ X_ALIGNED_SYMBOL(class Vec4fA, 16)
 // warning C4359: 'Vec4fA': Alignment specifier is less than actual alignment (16), and will be ignored.
 X_DISABLE_WARNING(4359)
 X_ALIGNED_SYMBOL(class Vec4fA, 8)
-X_ENABLE_WARNING(4359)
 #endif // X_64
 {
 public:
@@ -101,6 +100,7 @@ public:
 	}
 
 };
+X_ENABLE_WARNING(4359)
 
 // ----------------------------------------------------
 
