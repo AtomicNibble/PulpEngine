@@ -28,7 +28,9 @@ nTextureSlotCount_(0),
 iSmoothMethod_(0),
 iSmoothAmount_(0),
 
-wSlotUsage_(1) // space for gradiant.
+wSlotUsage_(1), // space for gradiant.
+
+pSlotList_(g_fontArena)
 {
 
 }
@@ -279,13 +281,12 @@ int XFontTexture::ReleaseSlotList()
 {
 	XTextureSlotListItor pItor = pSlotList_.begin();
 
-	while (pItor != pSlotList_.end())
+	for (; pItor != pSlotList_.end(); ++pItor)
 	{
 		X_DELETE((*pItor), g_fontArena);
-
-		pItor = pSlotList_.erase(pItor);
 	}
 
+	pSlotList_.free();
 	return 1;
 }
 
