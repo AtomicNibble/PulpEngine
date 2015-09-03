@@ -104,7 +104,8 @@ XRender::XRender() :
 	fontIdx_(0),
 	pDefaultFont_(nullptr),
 	RenderResources_(g_rendererArena),
-	textDrawList_(g_rendererArena)
+//	textDrawList_(g_rendererArena)
+	pTextDrawList_(nullptr)
 {
 	// try make sure that the array above is valid.
 #if X_DEBUG
@@ -131,7 +132,7 @@ void XRender::SetArenas(core::MemoryArenaBase* arena)
 	X_ASSERT_NOT_NULL(arena);
 
 	RenderResources_.setArena(arena);
-	textDrawList_.setArena(arena);
+//	textDrawList_.setArena(arena);
 }
 
 bool XRender::Init(HWND hWnd, uint32_t width, uint32_t height)
@@ -143,6 +144,8 @@ bool XRender::Init(HWND hWnd, uint32_t width, uint32_t height)
 
 	pRt_ = X_NEW_ALIGNED(XRenderThread,g_rendererArena,"renderThread",X_ALIGN_OF(XRenderThread));
 	pRt_->startRenderThread();
+
+	pTextDrawList_ = X_NEW(XTextDrawList, g_rendererArena, "RenderTextDrawList")(g_rendererArena);
 
 	vidMemMng_.StartUp();
 
@@ -173,7 +176,9 @@ void XRender::freeResources()
 	ShaderMan_.Shutdown();
 
 	vidMemMng_.ShutDown();
-	textDrawList_.free();
+
+	pTextDrawList_->free();
+	X_DELETE_AND_NULL(pTextDrawList_, g_rendererArena);
 }
 
 
@@ -310,13 +315,15 @@ void XRender::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* for
 	core::StackString512 temp;
 	temp.appendFmt(format, args);
 
-	textDrawList_.addEntry(pos,ti,temp.c_str());
+	X_ASSERT_NOT_NULL(pTextDrawList_);
+	pTextDrawList_->addEntry(pos,ti,temp.c_str());
 }
 
 
 void XRender::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text)
 {
-	textDrawList_.addEntry(pos, ti, text);
+	X_ASSERT_NOT_NULL(pTextDrawList_);
+	pTextDrawList_->addEntry(pos, ti, text);
 }
 
 
@@ -346,7 +353,9 @@ void XRender::DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
 
 void XRender::FlushTextBuffer(void)
 {
-	if (!textDrawList_.isEmpty())
+	X_ASSERT_NOT_NULL(pTextDrawList_);
+
+	if (!pTextDrawList_->isEmpty())
 	{
 		rThread()->RC_FlushTextBuffer();
 	}
@@ -354,9 +363,11 @@ void XRender::FlushTextBuffer(void)
 
 void XRender::RT_FlushTextBuffer(void)
 {
+	X_ASSERT_NOT_NULL(pTextDrawList_);
+
 	const XTextDrawList::TextEntry* entry;
 	
-	while ((entry = textDrawList_.getNextTextEntry()) != nullptr)
+	while ((entry = pTextDrawList_->getNextTextEntry()) != nullptr)
 	{
 		const Vec3f& pos = entry->pos;
 		const char* pStr = entry->getText();
@@ -374,7 +385,7 @@ void XRender::RT_FlushTextBuffer(void)
 
 	}
 
-	textDrawList_.clear();
+	pTextDrawList_->clear();
 }
 
 
