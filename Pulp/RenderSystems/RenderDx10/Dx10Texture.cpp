@@ -20,7 +20,7 @@ XTexture* XTexture::s_pCurrentTexture[TEX_MAX_SLOTS] = { nullptr };
 bool XTexture::createDeviceTexture(core::ReferenceCountedOwner<XTextureFile>& image_data)
 {
 #if X_DEBUG
-	image_data->pName = this->FileName.c_str();
+	image_data->pName_ = this->FileName.c_str();
 #endif // !X_DEBUG
 	return g_Dx11D3D.rThread()->RC_CreateDeviceTexture(this, image_data.instance());
 }
