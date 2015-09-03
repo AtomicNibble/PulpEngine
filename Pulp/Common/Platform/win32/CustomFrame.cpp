@@ -620,10 +620,10 @@ void xFrame::PaintCaption(HWND hWnd, HDC hDC)
 
 	if (m_HasCaption)
 	{
-		StackString512 Title;
+		StackStringW512 Title;
 
 		int IconPad = 16 + 4;
-		int Len = GetWindowTextA(hWnd, &Title[0], 512);
+		int Len = GetWindowTextW(hWnd, &Title[0], 512);
 
 		// Title
 		SetBkMode(hDC, TRANSPARENT);	
@@ -660,7 +660,7 @@ void xFrame::PaintCaption(HWND hWnd, HDC hDC)
 		);
 
 
-		DrawTextExA(hDC, &Title[0], Len, &size, DT_END_ELLIPSIS | DT_SINGLELINE, 0);
+		DrawTextExW(hDC, &Title[0], Len, &size, DT_END_ELLIPSIS | DT_SINGLELINE, 0);
 
 		SetBkMode(hDC, OPAQUE);
 	}
