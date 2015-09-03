@@ -693,6 +693,11 @@ void XWindow::EvaluateRegisters(float* registers)
 				registers[op->c] = registers[op->a] || registers[op->b];
 				break;
 			case OpType::VAR:
+				// 'type cast': conversion from 'int' to 'Potato::gui::XWinVec4 *' of greater size
+
+				X_DISABLE_WARNING(4312) 
+				X_ASSERT_NOT_IMPLEMENTED();
+
 				if (!op->a) {
 					registers[op->c] = 0.0f;
 					break;
@@ -708,6 +713,8 @@ void XWindow::EvaluateRegisters(float* registers)
 				}
 				break;
 			case OpType::VAR_STR:
+				X_ASSERT_NOT_IMPLEMENTED();
+
 				if (op->a) {
 					XWinStr* var = reinterpret_cast<XWinStr*>(op->a);
 					registers[op->c] = static_cast<float>(::atof(var->c_str()));
@@ -717,6 +724,8 @@ void XWindow::EvaluateRegisters(float* registers)
 				}
 				break;
 			case OpType::VAR_FLOAT:
+				X_ASSERT_NOT_IMPLEMENTED();
+
 				if (op->a) {
 					XWinFloat* var = reinterpret_cast<XWinFloat*>(op->a);
 					registers[op->c] = *var;
@@ -726,6 +735,8 @@ void XWindow::EvaluateRegisters(float* registers)
 				}
 				break;
 			case OpType::VAR_INT:
+				X_ASSERT_NOT_IMPLEMENTED();
+
 				if (op->a) {
 					XWinInt* var = reinterpret_cast<XWinInt*>(op->a);
 					registers[op->c] = static_cast<float>(*var);
@@ -735,6 +746,8 @@ void XWindow::EvaluateRegisters(float* registers)
 				}
 				break;
 			case OpType::VAR_BOOL:
+				X_ASSERT_NOT_IMPLEMENTED();
+
 				if (op->a) {
 					XWinBool* var = reinterpret_cast<XWinBool*>(op->a);
 					registers[op->c] = *var;
@@ -743,6 +756,7 @@ void XWindow::EvaluateRegisters(float* registers)
 					registers[op->c] = 0;
 				}
 				break;
+				X_ENABLE_WARNING(4312)
 #if X_DEBUG
 			default:
 				X_ASSERT_UNREACHABLE();
