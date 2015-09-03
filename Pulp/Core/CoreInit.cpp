@@ -158,12 +158,12 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 #if defined(WIN32)
 	X_DISABLE_WARNING(4996);
 	{
-		OSVERSIONINFOA osvi;
+		OSVERSIONINFOW osvi;
 
 		core::zero_object(osvi);
 
 		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-		GetVersionExA(&osvi);
+		GetVersionExW(&osvi);
 		
 		bool bIsWindowsXPorLater = osvi.dwMajorVersion > 5 || (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion >= 1);
 
