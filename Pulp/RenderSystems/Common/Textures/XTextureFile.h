@@ -64,7 +64,7 @@ struct XTextureFile : public core::ReferenceCounted<XTextureFile>
 public:
 
 #if X_DEBUG
-	X_INLINE const char* getName(void) const { return pName; }
+	X_INLINE const char* getName(void) const { return pName_; }
 #endif // !X_DEBUG
 
 	X_INLINE const Vec2<uint16_t> getSize(void) const { return size_; }
