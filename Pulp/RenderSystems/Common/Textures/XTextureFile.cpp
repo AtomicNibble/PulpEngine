@@ -9,7 +9,7 @@ XTextureFile::XTextureFile()
 	core::zero_object(pFaces);
 
 #if X_DEBUG
-	pName = nullptr;
+	pName_ = nullptr;
 #endif //!X_DEBUG
 
 	datasize_ = 0; 
