@@ -202,7 +202,12 @@ bool Level::ProcessData(uint32_t bytesRead)
 			for (x = 0; x < numSub; x++)
 			{
 				model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
+				X_DISABLE_WARNING(4302)
+				X_DISABLE_WARNING(4311)
+				X_ASSERT_NOT_IMPLEMENTED();
 				uint32_t matID = reinterpret_cast<uint32_t>(pSubMesh->materialName.as<uint32_t>());
+				X_ENABLE_WARNING(4302)
+				X_ENABLE_WARNING(4311)
 				pSubMesh->materialName = stringTable_.getString(matID);
 			}
 
