@@ -549,7 +549,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb)
 			pSymbol->value = 0.f;
 		}
 
-		input.SetModifiers(flags);
+		input.SetModifiers(Lflags);
 
 
 		if (newstate == pSymbol->state)
