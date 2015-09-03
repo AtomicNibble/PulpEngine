@@ -163,7 +163,13 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		core::zero_object(osvi);
 
 		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOW);
-		GetVersionExW(&osvi);
+		if (!GetVersionExW(&osvi))
+		{
+			::MessageBoxW(reinterpret_cast<HWND>(startupParams.hWnd),
+				L"GetVersionExW failed.",
+				L"Critial Error", MB_OK);
+			return false;
+		}
 		
 		bool bIsWindowsXPorLater = osvi.dwMajorVersion > 5 || (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion >= 1);
 
