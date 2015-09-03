@@ -301,7 +301,7 @@ bool xFileSys::setGameDir(pathTypeW path)
 	X_ASSERT(gameDir_ == nullptr, "can only set one game directoy")(path,gameDir_);
 
 	// check if the irectory is even valid.
-	if (!this->directoryExists(path)) {
+	if (!this->directoryExistsOS(path)) {
 		X_ERROR("FileSys", "Faled to set game drectory the directory does not exsists: \"%s\"", path);
 		return false;
 	}
@@ -501,7 +501,7 @@ bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum locati
 
 			Start = End;
 
-			if (!directoryExists(Path.c_str()))
+			if (!directoryExistsOS(Path.c_str()))
 			{
 				if (!::CreateDirectoryW(Path.c_str(), NULL))
 				{
@@ -525,16 +525,107 @@ bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum locati
 bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 {
 	X_ASSERT_NOT_NULL(path);
-	X_UNUSED(location);
-
 	Path<wchar_t> buf;
-	createOSPath(gameDir_, path, buf);
 
-	if (isDebug()) {
-		X_LOG0("FileSys", "fileExists: \"%s\"", buf.c_str());
+	if (location == VirtualDirectory::GAME) {
+		createOSPath(gameDir_, path, buf);
+	}
+	else {
+		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
-	DWORD dwAttrib = GetFileAttributesW(buf.c_str());
+	return fileExistsOS(buf.c_str());
+}
+
+bool xFileSys::fileExists(pathTypeW path, VirtualDirectory::Enum location) const
+{
+	X_ASSERT_NOT_NULL(path);
+	Path<wchar_t> buf;
+
+	if (location == VirtualDirectory::GAME) {
+		createOSPath(gameDir_, path, buf);
+	}
+	else {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	return fileExistsOS(buf.c_str());
+}
+
+bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) const
+{
+	X_ASSERT_NOT_NULL(path);
+	Path<wchar_t> buf;
+
+	if (location == VirtualDirectory::GAME) {
+		createOSPath(gameDir_, path, buf);
+	}
+	else {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	return directoryExistsOS(buf.c_str());
+}
+
+bool xFileSys::directoryExists(pathTypeW path, VirtualDirectory::Enum location) const
+{
+	X_ASSERT_NOT_NULL(path);
+	Path<wchar_t> buf;
+
+	if (location == VirtualDirectory::GAME) {
+		createOSPath(gameDir_, path, buf);
+	}
+	else {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	return directoryExistsOS(buf.c_str());
+}
+
+
+bool xFileSys::isDirectory(pathType path, VirtualDirectory::Enum location) const
+{
+	X_ASSERT_NOT_NULL(path);
+	Path<wchar_t> buf;
+
+	if (location == VirtualDirectory::GAME) {
+		createOSPath(gameDir_, path, buf);
+	}
+	else {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	return isDirectoryOS(buf.c_str());
+}
+
+bool xFileSys::isDirectory(pathTypeW path, VirtualDirectory::Enum location) const
+{
+	X_ASSERT_NOT_NULL(path);
+	Path<wchar_t> buf;
+
+	if (location == VirtualDirectory::GAME) {
+		createOSPath(gameDir_, path, buf);
+	}
+	else {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	return isDirectoryOS(buf.c_str());
+}
+
+
+
+// --------------------------------------------------
+
+bool xFileSys::fileExistsOS(pathTypeW fullPath) const
+{
+	X_ASSERT_NOT_NULL(fullPath);
+
+	if (isDebug()) {
+		X_LOG0("FileSys", "fileExists: \"%s\"", fullPath);
+	}
+
+	DWORD dwAttrib = GetFileAttributesW(fullPath);
 
 	if (dwAttrib != INVALID_FILE_ATTRIBUTES) // make sure we did not fail for some shit, like permissions
 	{
@@ -550,8 +641,8 @@ bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 	// This means we checked for a file in a directory that don't exsists.
 	if (lastError::Get() == ERROR_PATH_NOT_FOUND)
 	{
-		X_LOG2("FileSys", "FileExsits failed, the target directory does not exsist: \"%s\"", 
-			buf.c_str());
+		X_LOG2("FileSys", "FileExsits failed, the target directory does not exsist: \"%s\"",
+			fullPath);
 	}
 	else if (lastError::Get() != ERROR_FILE_NOT_FOUND)
 	{
@@ -562,16 +653,15 @@ bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 	return false;
 }
 
-bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) const
+bool xFileSys::directoryExistsOS(pathTypeW fullPath) const
 {
-	X_ASSERT_NOT_NULL(path);
-	X_UNUSED(location);
+	X_ASSERT_NOT_NULL(fullPath);
 
 	if (isDebug()) {
-		X_LOG0("FileSys", "directoryExists: \"%s\"", path);
+		X_LOG0("FileSys", "directoryExists: \"%ls\"", fullPath);
 	}
 
-	DWORD dwAttrib = GetFileAttributesA(path);
+	DWORD dwAttrib = GetFileAttributesW(fullPath);
 
 	if (dwAttrib != INVALID_FILE_ATTRIBUTES) // make sure we did not fail for some shit, like permissions
 	{
@@ -581,39 +671,7 @@ bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) c
 			return true;
 		}
 
-		X_ERROR("FileSys", "DirectoryExists check was ran on a File: \"%s\"", path);
-		return false; 
-	}
-
-	if (lastError::Get() != ERROR_PATH_NOT_FOUND && lastError::Get() != ERROR_FILE_NOT_FOUND)
-	{
-		lastError::Description Dsc;
-		X_ERROR("FileSys", "DirectoryExists failed. Error: %s", lastError::ToString(Dsc));
-	}
-
-	return false;
-}
-
-bool xFileSys::directoryExists(pathTypeW path, VirtualDirectory::Enum location) const
-{
-	X_ASSERT_NOT_NULL(path);
-	X_UNUSED(location);
-
-	if (isDebug()) {
-		X_LOG0("FileSys", "directoryExists: \"%ls\"", path);
-	}
-
-	DWORD dwAttrib = GetFileAttributesW(path);
-
-	if (dwAttrib != INVALID_FILE_ATTRIBUTES) // make sure we did not fail for some shit, like permissions
-	{
-		if ((dwAttrib & FILE_ATTRIBUTE_DIRECTORY))
-		{
-			// found
-			return true;
-		}
-
-		X_ERROR("FileSys", "DirectoryExists check was ran on a File: \"%ls\"", path);
+		X_ERROR("FileSys", "DirectoryExists check was ran on a File: \"%ls\"", fullPath);
 		return false;
 	}
 
@@ -626,16 +684,16 @@ bool xFileSys::directoryExists(pathTypeW path, VirtualDirectory::Enum location) 
 	return false;
 }
 
-bool xFileSys::isDirectory(pathType path, VirtualDirectory::Enum location) const
+
+bool xFileSys::isDirectoryOS(pathTypeW fullPath) const
 {
-	X_ASSERT_NOT_NULL(path);
-	X_UNUSED(location);
+	X_ASSERT_NOT_NULL(fullPath);
 
 	if (isDebug()) {
-		X_LOG0("FileSys", "isDirectory: \"%s\"", path);
-	} 
+		X_LOG0("FileSys", "isDirectory: \"%ls\"", fullPath);
+	}
 
-	DWORD dwAttrib = GetFileAttributesA(path);
+	DWORD dwAttrib = GetFileAttributesW(fullPath);
 
 	if (dwAttrib != INVALID_FILE_ATTRIBUTES) {
 		if ((dwAttrib & FILE_ATTRIBUTE_DIRECTORY)) {
@@ -652,37 +710,8 @@ bool xFileSys::isDirectory(pathType path, VirtualDirectory::Enum location) const
 
 	return false;
 }
-
-bool xFileSys::isDirectory(pathTypeW path, VirtualDirectory::Enum location) const
-{
-	X_ASSERT_NOT_NULL(path);
-	X_UNUSED(location);
-
-	if (isDebug()) {
-		X_LOG0("FileSys", "isDirectory: \"%ls\"", path);
-	}
-
-	DWORD dwAttrib = GetFileAttributesW(path);
-
-	if (dwAttrib != INVALID_FILE_ATTRIBUTES) {
-		if ((dwAttrib & FILE_ATTRIBUTE_DIRECTORY)) {
-			return true;
-		}
-		return false;
-	}
-
-	if (lastError::Get() != INVALID_FILE_ATTRIBUTES)
-	{
-		lastError::Description Dsc;
-		X_ERROR("FileSys", "isDirectory failed. Error: %s", lastError::ToString(Dsc));
-	}
-
-	return false;
-}
-
 
 // --------------------------------------------------
-
 
 // Ajust path
 const wchar_t* xFileSys::createOSPath(directory_s* dir, pathType path, Path<wchar_t>& buffer) const
