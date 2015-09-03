@@ -1249,7 +1249,7 @@ void DX11XRender::FX_UnBindVStream(ID3D11Buffer* pVertexBuffer)
 {
 	// check if the vertex stream is currently bound to the pipeline
 	// if so unset.
-	size_t i;
+	uint32_t i;
 	for (i = 0; i < VertexStream::ENUM_COUNT; i++)
 	{
 		RenderState::XStreamInfo& info = m_State.VertexStreams[i];
