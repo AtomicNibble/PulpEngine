@@ -71,8 +71,9 @@ extern "C"
 
 		g_coreArena = startupParams.pCoreArena;
 
-		if (!g_coreArena)
+		if (!g_coreArena) {
 			return nullptr;
+		}
 
 		pCore = X_NEW_ALIGNED(XCore, startupParams.pCoreArena, "XCore", 16);
 
@@ -90,8 +91,9 @@ extern "C"
 
 		if (!pCore->Init(startupParams))
 		{
-			if (gEnv && gEnv->pLog)
+			if (gEnv && gEnv->pLog) {
 				X_ERROR("Core", "Failed to init core");
+			}
 
 			X_DELETE(pCore, startupParams.pCoreArena);
 			return nullptr;
