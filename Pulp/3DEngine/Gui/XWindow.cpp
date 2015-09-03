@@ -700,7 +700,7 @@ void XWindow::EvaluateRegisters(float* registers)
 				if (op->b >= 0 && registers[op->b] >= 0 && registers[op->b] < 4) 
 				{
 					// grabs vector components
-					XWinVec4 *var = (XWinVec4 *)(op->a);
+					XWinVec4 *var = reinterpret_cast<XWinVec4*>(op->a);
 					registers[op->c] = ((Vec4f&)var)[static_cast<int>(registers[op->b])];
 				}
 				else {
@@ -709,7 +709,7 @@ void XWindow::EvaluateRegisters(float* registers)
 				break;
 			case OpType::VAR_STR:
 				if (op->a) {
-					XWinStr* var = (XWinStr*)(op->a);
+					XWinStr* var = reinterpret_cast<XWinStr*>(op->a);
 					registers[op->c] = static_cast<float>(::atof(var->c_str()));
 				}
 				else {
@@ -718,7 +718,7 @@ void XWindow::EvaluateRegisters(float* registers)
 				break;
 			case OpType::VAR_FLOAT:
 				if (op->a) {
-					XWinFloat* var = (XWinFloat*)(op->a);
+					XWinFloat* var = reinterpret_cast<XWinFloat*>(op->a);
 					registers[op->c] = *var;
 				}
 				else {
@@ -727,7 +727,7 @@ void XWindow::EvaluateRegisters(float* registers)
 				break;
 			case OpType::VAR_INT:
 				if (op->a) {
-					XWinInt* var = (XWinInt*)(op->a);
+					XWinInt* var = reinterpret_cast<XWinInt*>(op->a);
 					registers[op->c] = static_cast<float>(*var);
 				}
 				else {
@@ -736,7 +736,7 @@ void XWindow::EvaluateRegisters(float* registers)
 				break;
 			case OpType::VAR_BOOL:
 				if (op->a) {
-					XWinBool* var = (XWinBool*)(op->a);
+					XWinBool* var = reinterpret_cast<XWinBool*>(op->a);
 					registers[op->c] = *var;
 				}
 				else {
