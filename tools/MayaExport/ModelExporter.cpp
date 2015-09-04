@@ -797,7 +797,7 @@ MStatus MayaLOD::LoadMeshes(void)
 		// some times we don't have vert colors it seams so.
 		// fill with white.
 		MColor white;
-		while (((int)vertColorsArray.length()) < numVerts)
+		while (safe_static_cast<int,size_t>(vertColorsArray.length()) < numVerts)
 		{
 			vertColorsArray.append(white);
 		}
