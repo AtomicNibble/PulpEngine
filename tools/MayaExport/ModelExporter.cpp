@@ -282,7 +282,7 @@ core::StackString<60> getMeshDisplayName(const MString& fullname)
 // ---------------------------------------------------
 
 
-MFnDagNode *GetParent(MFnDagNode *bone) 
+MFnDagNode* GetParent(MFnDagNode *bone) 
 {
 	MStatus		status;
 	MObject		parentObject;
@@ -306,9 +306,9 @@ MFnDagNode *GetParent(MFnDagNode *bone)
 
 	MFnDagNode *parentNode;
 
-	parentNode = new MFnDagNode(parentObject, &status);
+	parentNode = X_NEW(MFnDagNode, &g_arena, "ParentDagNode")(parentObject, &status);
 	if (!status) {
-		delete parentNode;
+		X_DELETE(parentNode, &g_arena);
 		return NULL;
 	}
 
@@ -664,7 +664,7 @@ MayaLOD::~MayaLOD()
 {
 	// clear meshes.
 	for (uint i = 0; i < meshes_.size(); i++) {
-		delete meshes_[i];
+		X_DELETE(meshes_[i], &g_arena);
 	}
 
 	meshes_.clear();
@@ -761,7 +761,7 @@ MStatus MayaLOD::LoadMeshes(void)
 			continue;
 		}
 
-		mesh = new MayaMesh();
+		mesh = X_NEW(MayaMesh, &g_arena, "Mesh");
 		meshes_.append(mesh);
 
 		mesh->displayName = getMeshDisplayName(fnmesh.fullPathName());
@@ -1082,7 +1082,7 @@ void MayaLOD::MergeMeshes(void)
 
 			if (combine) {
 				combine->merge(mesh);
-				delete mesh;
+				X_DELETE(mesh, &g_arena);
 				numMerged++;
 			}
 			else {
@@ -1154,7 +1154,7 @@ MayaModel::MayaModel() :
 MayaModel::~MayaModel()
 {
 	for (uint i = 0; i < bones_.size(); i++) {
-		delete bones_[i].dagnode;
+		X_DELETE(bones_[i].dagnode, &g_arena);
 	}
 
 	bones_.clear();
@@ -1276,10 +1276,10 @@ MStatus MayaModel::loadBones(void)
 			continue;
 		
 		MayaBone new_bone;
-		new_bone.dagnode = new MFnDagNode(dagPath, &status);
+		new_bone.dagnode = X_NEW(MFnDagNode,&g_arena, "BoneDagNode")(dagPath, &status);
 
 		if (!status) {
-			delete new_bone.dagnode; // dunno if maya returns null, don't matter tho.
+			X_DELETE(new_bone.dagnode, &g_arena);// dunno if maya returns null, don't matter tho.
 			MayaPrintError("Joint: MFnDagNode constructor failed (%s)", status.errorString().asChar());
 			return status;
 		}
@@ -1328,7 +1328,7 @@ MStatus MayaModel::loadBones(void)
 					break;
 				}
 			}
-			delete parentNode;
+			X_DELETE(parentNode, &g_arena);
 		}
 
 		bone->dagnode->getPath(dagPath);
