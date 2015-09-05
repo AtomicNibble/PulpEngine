@@ -334,7 +334,7 @@ void XMaterialManager::Init(void)
 
 void XMaterialManager::ShutDown(void)
 {
-	X_LOG0("MtlManager", "Shutting down");
+	X_LOG0("MtlManager", "Shutting Down");
 
 
 	// hotreload support.

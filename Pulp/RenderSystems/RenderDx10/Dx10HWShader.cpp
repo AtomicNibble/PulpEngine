@@ -1162,7 +1162,7 @@ void XHWShader_Dx10::Init(void)
 
 void XHWShader_Dx10::shutDown(void)
 {
-	X_LOG0("HWShaders", "Shutting down");
+	X_LOG0("HWShaders", "Shutting Down");
 
 	FreeBufferPointers();
 	FreeHWShaders();

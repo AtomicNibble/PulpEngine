@@ -339,7 +339,7 @@ bool XShaderManager::Init(void)
 
 bool XShaderManager::Shutdown(void)
 {
-	X_LOG0("ShadersManager", "Shutting down");
+	X_LOG0("ShadersManager", "Shutting Down");
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
 

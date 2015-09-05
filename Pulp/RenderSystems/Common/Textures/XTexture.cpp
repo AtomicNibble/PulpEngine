@@ -775,7 +775,7 @@ void XTexture::init(void)
 
 void XTexture::shutDown(void)
 {
-	X_LOG0("Textures", "Shutting down");
+	X_LOG0("Textures", "Shutting Down");
 	X_ASSERT_NOT_NULL(s_pTextures);
 	X_LOG_BULLET;
 

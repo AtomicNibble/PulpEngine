@@ -157,7 +157,7 @@ bool XRender::Init(HWND hWnd, uint32_t width, uint32_t height)
 
 void XRender::ShutDown()
 {
-	X_LOG0("render", "Shutting down");
+	X_LOG0("render", "Shutting Down");
 
 	pRt_->quitRenderThread();
 	pRt_->quitRenderLoadingThread();

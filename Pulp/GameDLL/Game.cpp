@@ -60,7 +60,7 @@ bool XGame::Init(void)
 
 bool XGame::ShutDown(void)
 {
-	X_LOG0("Game", "Shutting down");
+	X_LOG0("Game", "Shutting Down");
 
 	pCore_->GetIInput()->RemoveEventListener(this);
 

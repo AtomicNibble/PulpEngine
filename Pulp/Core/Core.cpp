@@ -105,7 +105,7 @@ void XCore::Release()
 
 void XCore::ShutDown()
 {
-	X_LOG0("Core", "Shutting down");
+	X_LOG0("Core", "Shutting Down");
 
 	dirWatcher_.ShutDown();
 

@@ -91,7 +91,7 @@ bool XGuiManager::Init(void)
 
 void XGuiManager::Shutdown(void)
 {
-	X_LOG0("Gui", "Shuting down GUI Systems");
+	X_LOG0("Gui", "Shutting Down");
 
 
 	gEnv->pHotReload->addfileType(nullptr, gui::GUI_FILE_EXTENSION);
