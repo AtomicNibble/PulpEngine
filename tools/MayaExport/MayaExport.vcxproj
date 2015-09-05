@@ -200,7 +200,7 @@
     <TargetName>engine_$(ProjectName)2015$(PlatformName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <TargetName>engine_$(ProjectName)2012$(PlatformName)</TargetName>
+    <TargetName>engine_$(ProjectName)2015$(PlatformName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug_2012|Win32'">
     <ClCompile>
