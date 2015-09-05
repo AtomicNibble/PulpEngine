@@ -43,12 +43,9 @@ X_ENABLE_WARNING(4702)
 
 double MayaProfiler::s_frequency = 0.0;
 
-struct SCoreGlobals * gEnv = nullptr;
+struct SCoreGlobals* gEnv = nullptr;
 
 bool g_StartOfBlock = false; // used for logging formating.
-
-ModelStats g_stats;
-PotatoOptions g_options;
 
 
 X_LINK_LIB(X_STRINGIZE(MAYA_SDK) "\\Foundation")
@@ -58,266 +55,321 @@ X_LINK_LIB(X_STRINGIZE(MAYA_SDK) "\\OpenMayaAnim")
 
 X_USING_NAMESPACE;
 
-static const float MERGE_VERTEX_EPSILON = 0.9f;
-static const float MERGE_TEXCORDS_EPSILON = 0.5f;
-static const float JOINT_WEIGHT_THRESHOLD = 0.005f;
-static const int   VERTEX_MAX_WEIGHTS		= 4;
-
-::std::ostream& operator<<(::std::ostream& os, const Vec3f& bar) {
-	return os << "(" << bar.x << ", " << bar.y << ", " << bar.z << ")";
-}
-
-static void MayaPrintError(const char *fmt, ...)
+namespace
 {
-	va_list	argptr;
-	char	msg[2048];
+	static ModelStats g_stats;
+	static PotatoOptions g_options;
 
-	va_start(argptr, fmt);
-	vsnprintf_s(msg, sizeof(msg), fmt, argptr);
-	va_end(argptr);
-	
+	static const float MERGE_VERTEX_EPSILON = 0.9f;
+	static const float MERGE_TEXCORDS_EPSILON = 0.5f;
+	static const float JOINT_WEIGHT_THRESHOLD = 0.005f;
+	static const int   VERTEX_MAX_WEIGHTS = 4;
 
-	if (g_StartOfBlock) {
-		std::cout << "\n";
-		g_StartOfBlock = false;
+	::std::ostream& operator<<(::std::ostream& os, const Vec3f& bar) {
+		return os << "(" << bar.x << ", " << bar.y << ", " << bar.z << ")";
 	}
 
-	std::cerr << "Error: " << msg << std::endl;
-	MGlobal::displayError(msg);
-}
-
-static void MayaPrintWarning(const char *fmt, ...)
-{
-	va_list	argptr;
-	char	msg[2048];
-
-	va_start(argptr, fmt);
-	vsnprintf_s(msg, sizeof(msg), fmt, argptr);
-	va_end(argptr);
-
-	if (g_StartOfBlock) {
-		std::cout << "\n";
-		g_StartOfBlock = false;
-	}
-
-	std::cerr << "Warning: " << msg << std::endl;
-	MGlobal::displayWarning(msg);
-}
-
-static void MayaPrintMsg(const char *fmt, ...)
-{
-	va_list	argptr;
-	char	msg[2048];
-
-	va_start(argptr, fmt);
-	vsnprintf_s(msg, sizeof(msg), fmt, argptr);
-	va_end(argptr);
-
-	if (g_StartOfBlock) {
-		std::cout << "\n";
-		g_StartOfBlock = false;
-	}
-
-	std::cout << msg << std::endl;
-}
-
-
-Vec3f ConvertToGameSpace(const Vec3f &pos) {
-	Vec3f idpos;
-	// we are Z up.
-	idpos.x = pos.x;
-	idpos.y = -pos.z;
-	idpos.z = pos.y;
-	return idpos;
-}
-
-Matrix33f ConvertToGameSpace(const Matrix33f& m) {
-	Matrix33f mat;
-
-	mat.m00 = m.m00;
-	mat.m01 = m.m02;
-	mat.m02 = m.m01;
-
-	mat.m10 = m.m10;
-	mat.m11 = m.m12;
-	mat.m12 = m.m11;
-
-	mat.m20 = m.m20;
-	mat.m21 = m.m22;
-	mat.m22 = m.m21;
-	return mat;
-}
-
-Vec3f XVec(const MFloatPoint& point) {
-	return Vec3f(point[0], point[1], point[2]);
-}
-
-Color XVec(const MColor& col) {
-	return Color(col[0], col[1], col[2], col[3]);
-}
-
-Vec3f XVec(const MMatrix& matrix) {
-	return Vec3f((float)matrix[3][0], (float)matrix[3][1], (float)matrix[3][2]);
-}
-
-Matrix33f XMat(const MMatrix& matrix) {
-	int		j, k;
-	Matrix33f	mat;
-
-	for (j = 0; j < 3; j++) 
-		for (k = 0; k < 3; k++) 
-			mat.at(j, k) = (float)matrix[j][k];
-
-	return mat;
-}
-
-
-MObject FindShader(MObject& setNode)
-{
-	MStatus				status;
-	MFnDependencyNode	fnNode(setNode);
-	MPlug				shaderPlug;
-
-	shaderPlug = fnNode.findPlug("surfaceShader");
-	if (!shaderPlug.isNull()) {
-		MPlugArray connectedPlugs;
-		bool asSrc = false;
-		bool asDst = true;
-		shaderPlug.connectedTo(connectedPlugs, asDst, asSrc, &status);
-
-		if (connectedPlugs.length() != 1) {
-			MayaPrintError("FindShader: Error getting shader (%s)", status.errorString().asChar());
-		}
-		else {
-			return connectedPlugs[0].node();
-		}
-	}
-
-	return MObject::kNullObj;
-}
-
-bool GetMeshMaterial(MayaMesh* mesh, MDagPath &dagPath)
-{
-	MStatus	 status;
-	MDagPath path = dagPath;
-	int	i;
-	int	instanceNum;
-
-	path.extendToShape();
-
-	instanceNum = 0;
-	if (path.isInstanced())
-		instanceNum = path.instanceNumber();
-
-	MFnMesh fnMesh(path);
-	MObjectArray sets;
-	MObjectArray comps;
-	status = fnMesh.getConnectedSetsAndMembers(instanceNum, sets, comps, true);
-	if (!status) {
-		MayaPrintError("MFnMesh::getConnectedSetsAndMembers failed (%s)", status.errorString().asChar());
-	}
-
-	for (i = 0; i < (int)sets.length(); i++) {
-		MObject set = sets[i];
-		MObject comp = comps[i];
-
-		MFnSet fnSet(set, &status);
-		if (status == MS::kFailure) {
-			MayaPrintError("MFnSet constructor failed (%s)", status.errorString().asChar());
-			continue;
-		}
-
-		// Make sure the set is a polygonal set.  If not, continue.
-		MItMeshPolygon piter(path, comp, &status);
-		if (status == MS::kFailure) {
-			continue;
-		}
-
-		MObject shaderNode = FindShader(set);
-		if (shaderNode == MObject::kNullObj) {
-			continue;
-		}
-
-		MFnDependencyNode Shader(shaderNode);
-
-		MPlug colorPlug = Shader.findPlug("color", &status);
-		if (status == MS::kFailure) {
-			MayaPrintError("material(%s) has no color channel", Shader.name().asChar());
-			continue;
-		}
-
-		if (Shader.name().length() > 64) {
-			MayaPrintError("Material name too long MAX(64): '%s'", Shader.name().asChar());
-			return false;
-		}
-
-		mesh->material.append(Shader.name().asChar());
-		return true;
-	}
-	return false;
-}
-
-
-core::StackString<60> getMeshDisplayName(const MString& fullname)
-{
-	typedef core::StackString<60> NameType;
-	core::FixedStack<NameType, 16> Stack;
-
-	core::StringTokenizer<char> tokens(fullname.asChar(), fullname.asChar() + fullname.length(), '|');
-	core::StringRange<char> range(nullptr, nullptr);
-
-	while (tokens.ExtractToken(range))
+	static void MayaPrintError(const char *fmt, ...)
 	{
-		Stack.push(NameType(range.GetStart(), range.GetEnd()));
-	}
+		va_list	argptr;
+		char	msg[2048];
 
-	// ok the name is 2nd one.
-	// check we have 2 tho.
-	if (Stack.size() > 1)
-		Stack.pop();
-
-	return Stack.top();
-}
+		va_start(argptr, fmt);
+		vsnprintf_s(msg, sizeof(msg), fmt, argptr);
+		va_end(argptr);
 
 
-// ---------------------------------------------------
-
-
-MFnDagNode* GetParent(MFnDagNode *bone) 
-{
-	MStatus		status;
-	MObject		parentObject;
-
-	parentObject = bone->parent(0, &status);
-	if (!status && status.statusCode() == MStatus::kInvalidParameter) {
-		return NULL;
-	}
-
-	while (!parentObject.hasFn(MFn::kTransform)) {
-		MFnDagNode parentNode(parentObject, &status);
-		if (!status) {
-			return NULL;
+		if (g_StartOfBlock) {
+			std::cout << "\n";
+			g_StartOfBlock = false;
 		}
 
-		parentObject = parentNode.parent(0, &status);
+		std::cerr << "Error: " << msg << std::endl;
+		MGlobal::displayError(msg);
+	}
+
+	static void MayaPrintWarning(const char *fmt, ...)
+	{
+		va_list	argptr;
+		char	msg[2048];
+
+		va_start(argptr, fmt);
+		vsnprintf_s(msg, sizeof(msg), fmt, argptr);
+		va_end(argptr);
+
+		if (g_StartOfBlock) {
+			std::cout << "\n";
+			g_StartOfBlock = false;
+		}
+
+		std::cerr << "Warning: " << msg << std::endl;
+		MGlobal::displayWarning(msg);
+	}
+
+	static void MayaPrintMsg(const char *fmt, ...)
+	{
+		va_list	argptr;
+		char	msg[2048];
+
+		va_start(argptr, fmt);
+		vsnprintf_s(msg, sizeof(msg), fmt, argptr);
+		va_end(argptr);
+
+		if (g_StartOfBlock) {
+			std::cout << "\n";
+			g_StartOfBlock = false;
+		}
+
+		std::cout << msg << std::endl;
+	}
+
+
+	Vec3f ConvertToGameSpace(const Vec3f &pos) {
+		Vec3f idpos;
+		// we are Z up.
+		idpos.x = pos.x;
+		idpos.y = -pos.z;
+		idpos.z = pos.y;
+		return idpos;
+	}
+
+	Matrix33f ConvertToGameSpace(const Matrix33f& m) {
+		Matrix33f mat;
+
+		mat.m00 = m.m00;
+		mat.m01 = m.m02;
+		mat.m02 = m.m01;
+
+		mat.m10 = m.m10;
+		mat.m11 = m.m12;
+		mat.m12 = m.m11;
+
+		mat.m20 = m.m20;
+		mat.m21 = m.m22;
+		mat.m22 = m.m21;
+		return mat;
+	}
+
+	Vec3f XVec(const MFloatPoint& point) {
+		return Vec3f(point[0], point[1], point[2]);
+	}
+
+	Color XVec(const MColor& col) {
+		return Color(col[0], col[1], col[2], col[3]);
+	}
+
+	Vec3f XVec(const MMatrix& matrix) {
+		return Vec3f((float)matrix[3][0], (float)matrix[3][1], (float)matrix[3][2]);
+	}
+
+	Matrix33f XMat(const MMatrix& matrix) {
+		int		j, k;
+		Matrix33f	mat;
+
+		for (j = 0; j < 3; j++)
+			for (k = 0; k < 3; k++)
+				mat.at(j, k) = (float)matrix[j][k];
+
+		return mat;
+	}
+
+
+	MObject FindShader(MObject& setNode)
+	{
+		MStatus				status;
+		MFnDependencyNode	fnNode(setNode);
+		MPlug				shaderPlug;
+
+		shaderPlug = fnNode.findPlug("surfaceShader");
+		if (!shaderPlug.isNull()) {
+			MPlugArray connectedPlugs;
+			bool asSrc = false;
+			bool asDst = true;
+			shaderPlug.connectedTo(connectedPlugs, asDst, asSrc, &status);
+
+			if (connectedPlugs.length() != 1) {
+				MayaPrintError("FindShader: Error getting shader (%s)", status.errorString().asChar());
+			}
+			else {
+				return connectedPlugs[0].node();
+			}
+		}
+
+		return MObject::kNullObj;
+	}
+
+	bool GetMeshMaterial(MayaMesh* mesh, MDagPath &dagPath)
+	{
+		MStatus	 status;
+		MDagPath path = dagPath;
+		int	i;
+		int	instanceNum;
+
+		path.extendToShape();
+
+		instanceNum = 0;
+		if (path.isInstanced())
+			instanceNum = path.instanceNumber();
+
+		MFnMesh fnMesh(path);
+		MObjectArray sets;
+		MObjectArray comps;
+		status = fnMesh.getConnectedSetsAndMembers(instanceNum, sets, comps, true);
+		if (!status) {
+			MayaPrintError("MFnMesh::getConnectedSetsAndMembers failed (%s)", status.errorString().asChar());
+		}
+
+		for (i = 0; i < (int)sets.length(); i++) {
+			MObject set = sets[i];
+			MObject comp = comps[i];
+
+			MFnSet fnSet(set, &status);
+			if (status == MS::kFailure) {
+				MayaPrintError("MFnSet constructor failed (%s)", status.errorString().asChar());
+				continue;
+			}
+
+			// Make sure the set is a polygonal set.  If not, continue.
+			MItMeshPolygon piter(path, comp, &status);
+			if (status == MS::kFailure) {
+				continue;
+			}
+
+			MObject shaderNode = FindShader(set);
+			if (shaderNode == MObject::kNullObj) {
+				continue;
+			}
+
+			MFnDependencyNode Shader(shaderNode);
+
+			MPlug colorPlug = Shader.findPlug("color", &status);
+			if (status == MS::kFailure) {
+				MayaPrintError("material(%s) has no color channel", Shader.name().asChar());
+				continue;
+			}
+
+			if (Shader.name().length() > 64) {
+				MayaPrintError("Material name too long MAX(64): '%s'", Shader.name().asChar());
+				return false;
+			}
+
+			mesh->material.append(Shader.name().asChar());
+			return true;
+		}
+		return false;
+	}
+
+
+	core::StackString<60> getMeshDisplayName(const MString& fullname)
+	{
+		typedef core::StackString<60> NameType;
+		core::FixedStack<NameType, 16> Stack;
+
+		core::StringTokenizer<char> tokens(fullname.asChar(), fullname.asChar() + fullname.length(), '|');
+		core::StringRange<char> range(nullptr, nullptr);
+
+		while (tokens.ExtractToken(range))
+		{
+			Stack.push(NameType(range.GetStart(), range.GetEnd()));
+		}
+
+		// ok the name is 2nd one.
+		// check we have 2 tho.
+		if (Stack.size() > 1)
+			Stack.pop();
+
+		return Stack.top();
+	}
+
+
+	// ---------------------------------------------------
+
+
+	MFnDagNode* GetParent(MFnDagNode *bone)
+	{
+		X_ASSERT_NOT_NULL(bone);
+
+		MStatus		status;
+		MObject		parentObject;
+
+		parentObject = bone->parent(0, &status);
 		if (!status && status.statusCode() == MStatus::kInvalidParameter) {
 			return NULL;
 		}
+
+		while (!parentObject.hasFn(MFn::kTransform)) {
+			MFnDagNode parentNode(parentObject, &status);
+			if (!status) {
+				return NULL;
+			}
+
+			parentObject = parentNode.parent(0, &status);
+			if (!status && status.statusCode() == MStatus::kInvalidParameter) {
+				return NULL;
+			}
+		}
+
+		MFnDagNode *parentNode;
+
+		parentNode = X_NEW(MFnDagNode, g_arena, "ParentDagNode")(parentObject, &status);
+		if (!status) {
+			X_DELETE(parentNode, g_arena);
+			return NULL;
+		}
+
+		return parentNode;
 	}
 
-	MFnDagNode *parentNode;
+	// ---------------------------------------------------
 
-	parentNode = X_NEW(MFnDagNode, &g_arena, "ParentDagNode")(parentObject, &status);
-	if (!status) {
-		X_DELETE(parentNode, &g_arena);
-		return NULL;
+	bool vertSortByWeights(const MayaVertex& a, const MayaVertex& b) {
+		return (a.numWeights<b.numWeights);
 	}
 
-	return parentNode;
-}
+	unsigned int hashsingle(float f)
+	{
+		union {
+			unsigned int ui;
+			float fv;
+		};
+		fv = f;
+		return ((ui & 0xfffff000) >> 12);
+	}
+
+	int64 Hash(float x, float y, float z)
+	{
+		int64 h1 = hashsingle(x);
+		int64 h2 = hashsingle(y);
+		int64 h3 = hashsingle(z);
+		return (h1 << 40) | (h2 << 20) | h3;
+	}
+
+	int64 vertHash(const MayaVertex& vert)
+	{
+		return Hash(vert.pos[0], vert.pos[1], vert.pos[2]);
+	}
+
+
+	struct Hashcontainer
+	{
+		Hashcontainer() {
+			pVert = nullptr;
+			idx = 0;
+		}
+
+		MayaVertex* pVert;
+		int idx;
+	};
+
+
+} // namespace
 
 // ---------------------------------------------------
 
+PotatoOptions::PotatoOptions()
+{
+
+}
 
 void PotatoOptions::setcmdArgs(const MArgList &args)
 {
@@ -385,17 +437,94 @@ void PotatoOptions::setcmdArgs(const MArgList &args)
 
 void PotatoOptions::reset(void)
 {
-	filePath_ = "";
+	lodInfo_.clear();
+	filePath_.clear();
 	scale_ = 1.0f;
 	jointThreshold_ = JOINT_WEIGHT_THRESHOLD;
+	forceBoneFilters_.clear();
+	progressCntl_.clear();
 	exportMode_ = EXPORT_INPUT;
-	lodInfo_.clear();
-	lodInfo_.setArena(&g_arena);
-
-//	weightsDropped_ = false;
 }
 
 // --------------------------------------------
+
+MayaBone::MayaBone() : dagnode(nullptr)
+{
+	mayaNode.setOwner(this);
+	exportNode.setOwner(this);
+
+	keep = false;
+	bindpos = Vec3f::zero();
+	bindm33 = Matrix33f::identity();
+}
+
+MayaBone::MayaBone(const MayaBone& oth)
+{
+	name = oth.name;
+	dagnode = oth.dagnode;
+	index = oth.index;
+
+	bindpos = oth.bindpos;
+	bindm33 = oth.bindm33;
+
+	mayaNode = oth.mayaNode;
+	exportNode = oth.exportNode;
+
+	keep = oth.keep;
+
+	mayaNode.setOwner(this);
+	exportNode.setOwner(this);
+}
+
+MayaBone& MayaBone::operator = (const MayaBone &oth)
+{
+	name = oth.name;
+	dagnode = oth.dagnode;
+	index = oth.index;
+
+	bindpos = oth.bindpos;
+	bindm33 = oth.bindm33;
+
+	mayaNode = oth.mayaNode;
+	exportNode = oth.exportNode;
+
+	keep = oth.keep;
+
+	mayaNode.setOwner(this);
+	exportNode.setOwner(this);
+	return *this;
+}
+
+// --------------------------------------------
+
+MayaWeight::MayaWeight()
+{
+	bone = nullptr;
+	weight = 0.f;
+}
+
+// --------------------------------------------
+
+MayaVertex::MayaVertex() :
+numWeights(0), 
+startWeightIdx(0) 
+{
+
+}
+
+// --------------------------------------------
+
+MayaMesh::MayaMesh() :
+	verts(g_arena),
+	faces(g_arena),
+	weights(g_arena)
+{
+}
+
+MayaMesh::~MayaMesh()
+{
+
+}
 
 void MayaMesh::clear(void)
 {
@@ -438,45 +567,6 @@ void MayaMesh::merge(MayaMesh *mesh)
 
 }
 
-
-bool vertSortByWeights(const MayaVertex& a, const MayaVertex& b) {
-	return (a.numWeights<b.numWeights); 
-}
-
-
-#if 1
-
-unsigned int hashsingle(float f)
-{
-	union {
-		unsigned int ui;
-		float fv;
-	};
-	fv = f;
-	return ((ui & 0xfffff000) >> 12);
-}
-
-int64 Hash(float x, float y, float z)
-{
-	int64 h1 = hashsingle(x);
-	int64 h2 = hashsingle(y);
-	int64 h3 = hashsingle(z);
-	return (h1 << 40) | (h2 << 20) | h3;
-}
-
-int64 vertHash(const MayaVertex& vert)
-{
-	return Hash(vert.pos[0], vert.pos[1], vert.pos[2]);
-}
-
-
-struct Hashcontainer
-{
-	MayaVertex* pVert;
-	int idx;
-};
-
-
 void MayaMesh::shareVerts(void)
 {
 	//	PROFILE_MAYA_NAME("process verts");
@@ -492,7 +582,7 @@ void MayaMesh::shareVerts(void)
 	// O(T*(3* V))
 	// then we update the triangles.
 	uint i, x; // , k;
-	core::Array<MayaVertex>	v(&g_arena);
+	core::Array<MayaVertex>	v(g_arena);
 
 	size_t before = verts.size();
 
@@ -573,72 +663,6 @@ void MayaMesh::shareVerts(void)
 	MayaPrintMsg("num merged: %i -> unique: %i (%i,%i)", numEqual, numUnique, before, verts.size());
 }
 
-#else
-
-void MayaMesh::shareVerts(void)
-{
-	//	PROFILE_MAYA_NAME("process verts");
-
-	// we want to get rid of duplicate verts.
-	// so we just add the verts one by one, checking if they match.
-	// O(T*(3* V))
-	// then we update the triangles.
-	uint i, x, k;
-	core::Array<MayaVertex>	v;
-
-	v = verts;
-	verts.clear();
-
-	size_t numEqual = 0;
-
-
-	// sort the weights
-	// a vertex has 1-4 weights.
-	// so we need to sort the verts so that the weight groups are grouped.
-	// we sort now so that the face index are correct.
-	if (this->hasBinds) {
-		std::sort(v.begin(), v.end(), vertSortByWeights);
-	}
-
-	for (i = 0; i < faces.size(); i++)
-	{
-		for (x = 0; x < 3; x++) // for each face.
-		{
-			const MayaVertex& vert = v[faces[i][x]];
-
-			for (k = 0; k < verts.size(); k++)
-			{
-				const MayaVertex& vv = verts[k];
-				if (!vert.pos.compare(vv.pos, MERGE_VERTEX_EPSILON))
-					continue; // not same
-
-				if (!vert.uv.compare(vv.uv, MERGE_TEXCORDS_EPSILON))
-					continue; // not same
-
-				break; // equal.
-			}
-
-			// update index if needs be.
-			if (k < verts.size()) {
-				faces[i][x] = k;
-				numEqual++;
-			}
-			else  
-			{
-				faces[i][x] = (int)verts.append(vert);
-
-				CompBinds[vert.numWeights - 1]++;
-			}
-
-
-		}
-	}
-
-	MayaPrintMsg("num merged: %i", numEqual);
-}
-
-#endif
-
 
 void MayaMesh::calBoundingbox()
 {
@@ -653,10 +677,11 @@ void MayaMesh::calBoundingbox()
 	boundingBox = aabb;
 }
 
+
 // --------------------------------------------
 
 MayaLOD::MayaLOD() :
-	meshes_(&g_arena)
+	meshes_(g_arena)
 {
 
 }
@@ -665,7 +690,7 @@ MayaLOD::~MayaLOD()
 {
 	// clear meshes.
 	for (uint i = 0; i < meshes_.size(); i++) {
-		X_DELETE(meshes_[i], &g_arena);
+		X_DELETE(meshes_[i], g_arena);
 	}
 
 	meshes_.clear();
@@ -762,7 +787,7 @@ MStatus MayaLOD::LoadMeshes(void)
 			continue;
 		}
 
-		mesh = X_NEW(MayaMesh, &g_arena, "Mesh");
+		mesh = X_NEW(MayaMesh, g_arena, "Mesh");
 		meshes_.append(mesh);
 
 		mesh->displayName = getMeshDisplayName(fnmesh.fullPathName());
@@ -877,7 +902,7 @@ MStatus MayaLOD::LoadMeshes(void)
 						}
 
 						MDagPath		path = exportObjects_[i];
-						core::Array<MayaBone*>	joints(&g_arena);
+						core::Array<MayaBone*>	joints(g_arena);
 						MayaBone				*joint;
 						MayaVertex				*vert;
 						MayaWeight				weight;
@@ -1061,7 +1086,7 @@ void MayaLOD::MergeMeshes(void)
 
 		MayaMesh				*mesh;
 		MayaMesh				*combine;
-		core::Array<MayaMesh*>	meshes(&g_arena);
+		core::Array<MayaMesh*>	meshes(g_arena);
 
 		meshes = meshes_;
 		meshes_.clear();
@@ -1083,7 +1108,7 @@ void MayaLOD::MergeMeshes(void)
 
 			if (combine) {
 				combine->merge(mesh);
-				X_DELETE(mesh, &g_arena);
+				X_DELETE(mesh, g_arena);
 				numMerged++;
 			}
 			else {
@@ -1098,7 +1123,7 @@ void MayaLOD::MergeMeshes(void)
 		{
 			// thread it.
 			core::Thread threads[numThreads];
-			core::Array<MayaMesh*>	meshes[numThreads] = { &g_arena, &g_arena };
+			core::Array<MayaMesh*>	meshes[numThreads] = { g_arena, g_arena };
 
 			uint numPerThread = numMeshes / numThreads;
 			uint currentThread = 0;
@@ -1137,7 +1162,7 @@ void MayaLOD::MergeMeshes(void)
 // --------------------------------------------
 
 MayaModel::MayaModel() :
-	bones_(&g_arena)
+	bones_(g_arena)
 {
 	for (uint i = 0; i < 4; i++)
 		lods_[i].setModel(this,i);
@@ -1155,7 +1180,7 @@ MayaModel::MayaModel() :
 MayaModel::~MayaModel()
 {
 	for (uint i = 0; i < bones_.size(); i++) {
-		X_DELETE(bones_[i].dagnode, &g_arena);
+		X_DELETE(bones_[i].dagnode, g_arena);
 	}
 
 	bones_.clear();
@@ -1262,8 +1287,9 @@ MStatus MayaModel::loadBones(void)
 
 	float scale = 1.0f;
 
+
 	// allocate max.
-	bones_.reserve(256);
+	bones_.reserve(model::MODEL_MAX_BONES);
 
 	MItDag dagIterator(MItDag::kDepthFirst, MFn::kTransform, &status);
 	for (; !dagIterator.isDone(); dagIterator.next()) {
@@ -1277,10 +1303,10 @@ MStatus MayaModel::loadBones(void)
 			continue;
 		
 		MayaBone new_bone;
-		new_bone.dagnode = X_NEW(MFnDagNode,&g_arena, "BoneDagNode")(dagPath, &status);
+		new_bone.dagnode = X_NEW(MFnDagNode,g_arena, "BoneDagNode")(dagPath, &status);
 
 		if (!status) {
-			X_DELETE(new_bone.dagnode, &g_arena);// dunno if maya returns null, don't matter tho.
+			X_DELETE(new_bone.dagnode, g_arena);// dunno if maya returns null, don't matter tho.
 			MayaPrintError("Joint: MFnDagNode constructor failed (%s)", status.errorString().asChar());
 			return status;
 		}
@@ -1329,7 +1355,7 @@ MStatus MayaModel::loadBones(void)
 					break;
 				}
 			}
-			X_DELETE(parentNode, &g_arena);
+			X_DELETE(parentNode, g_arena);
 		}
 
 		bone->dagnode->getPath(dagPath);
@@ -1529,7 +1555,7 @@ bool MayaModel::save(const char *filename)
 
 	// place file data in a stream.
 	// much faster(benchmarked), since we are doing lots of small writes.
-	core::ByteStream stream(&g_arena);
+	core::ByteStream stream(g_arena);
 
 	errno_t err = fopen_s(&f, filename, "wb");
 	if (f)
@@ -2118,8 +2144,8 @@ MStatus PotatoExporter::HideProgressDlg()
 {
 	using namespace std;
 	if (s_progressActive) {
-		CHECK_MSTATUS_AND_RETURN_IT(MProgressWindow::endProgress());
 		s_progressActive = false;
+		CHECK_MSTATUS_AND_RETURN_IT(MProgressWindow::endProgress());
 	}
 
 	return MS::kSuccess;
@@ -2230,7 +2256,8 @@ MStatus ModelExporterCmd::doIt(const MArgList &args)
 		core::StackString<32> lodName;
 		lodName.appendFmt("LOD%i", i);
 		idx = args.flagIndex(lodName.c_str());
-		if (idx != MArgList::kInvalidArgIndex) {
+		if (idx != MArgList::kInvalidArgIndex) 
+		{
 			double temp;
 			LODExportInfo info;
 			info.idx = currentLod;
@@ -2239,7 +2266,12 @@ MStatus ModelExporterCmd::doIt(const MArgList &args)
 				MayaPrintError("failed to parse LOD%i info", currentLod);
 				continue;
 			}
-			info.distance = (float)temp;
+			if (g_options.numLods() == model::MODEL_MAX_LODS) {
+				MayaPrintError("Exceeded max load count: %i", model::MODEL_MAX_LODS);
+				return MS::kFailure;
+			}
+
+			info.distance = static_cast<float>(temp);
 			g_options.AddLodInfo(info);
 
 	//		MayaPrintMsg("LOD%i distance: %f, objects: %s", currentLod, info.distance, info.objects.asChar());
@@ -2263,126 +2295,3 @@ void* ModelExporterCmd::creator()
 {
 	return new ModelExporterCmd;
 }
-
-
-
-
-/*
-
-
-MStatus PotatoExporter::getSelectedObjects(void)
-{
-MStatus status = MS::kSuccess;
-
-MSelectionList slist;
-MGlobal::getActiveSelectionList(slist);
-MItSelectionList iter(slist);
-
-MItDag dagIterator(MItDag::kDepthFirst, MFn::kInvalid, &status);
-
-
-// Selection list loop
-for (; !iter.isDone(); iter.next())
-{
-MDagPath objectPath;
-// get the selected node
-
-status = iter.getDagPath(objectPath);
-
-// reset iterator's root node to be the selected node.
-status = dagIterator.reset(objectPath.node(), MItDag::kDepthFirst, MFn::kInvalid);
-
-// DAG iteration beginning at at selected node
-for (; !dagIterator.isDone(); dagIterator.next())
-{
-MDagPath dagPath;
-status = dagIterator.getPath(dagPath);
-
-if (!status) {
-MayaPrintError("Failure getting DAG path.");
-return MS::kFailure;
-}
-
-if (status)
-{
-// skip over intermediate objects
-//
-MFnDagNode dagNode(dagPath, &status);
-if (dagNode.isIntermediateObject())
-{
-continue;
-}
-
-if (dagPath.hasFn(MFn::kNurbsSurface))
-{
-status = MS::kSuccess;
-MayaPrintWarning("skipping Nurbs Surface.");
-}
-else if ((dagPath.hasFn(MFn::kMesh)) && (dagPath.hasFn(MFn::kTransform)))
-{
-// We want only the shape,
-// not the transform-extended-to-shape.
-continue;
-}
-else if (dagPath.hasFn(MFn::kMesh))
-{
-exportObjects_.append(dagPath);
-}
-}
-}
-}
-return status;
-}
-
-
-MStatus PotatoExporter::getAllObjects(void)
-{
-MStatus status = MS::kSuccess;
-MItDag dagIterator(MItDag::kBreadthFirst, MFn::kInvalid, &status);
-
-if (MS::kSuccess != status) {
-MayaPrintError("Failure in DAG iterator setup.");
-return MS::kFailure;
-}
-
-for (; !dagIterator.isDone(); dagIterator.next())
-{
-MDagPath dagPath;
-status = dagIterator.getPath(dagPath);
-
-if (!status) {
-MayaPrintError("Failure getting DAG path.");
-return MS::kFailure;
-}
-
-// skip over intermediate objects
-//
-MFnDagNode dagNode(dagPath, &status);
-if (dagNode.isIntermediateObject())
-{
-continue;
-}
-
-if ((dagPath.hasFn(MFn::kNurbsSurface)) &&
-(dagPath.hasFn(MFn::kTransform)))
-{
-status = MS::kSuccess;
-MayaPrintWarning("skipping Nurbs Surface.");
-}
-else if ((dagPath.hasFn(MFn::kMesh)) &&
-(dagPath.hasFn(MFn::kTransform)))
-{
-// We want only the shape,
-// not the transform-extended-to-shape.
-continue;
-}
-else if (dagPath.hasFn(MFn::kMesh))
-{
-exportObjects_.append(dagPath);
-}
-}
-
-return status;
-}
-
-*/

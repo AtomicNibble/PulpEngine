@@ -8,15 +8,34 @@
 #include <IModel.h>
 #include <String\StackString.h>
 
+#include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
+#include <Memory\MemoryTaggingPolicies\NoMemoryTagging.h>
+#include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
+
+#include <Memory\BoundsCheckingPolicies\SimpleBoundsChecking.h>
+#include <Memory\MemoryTaggingPolicies\SimpleMemoryTagging.h>
+#include <Memory\MemoryTrackingPolicies\SimpleMemoryTracking.h>
+
+#if 1
+typedef core::MemoryArena<core::MallocFreeAllocator, core::SingleThreadPolicy,
+	core::NoBoundsChecking, core::NoMemoryTracking, core::NoMemoryTagging> Arena;
+#else
+typedef core::MemoryArena<core::MallocFreeAllocator, core::SingleThreadPolicy,
+	core::SimpleBoundsChecking, core::SimpleMemoryTracking, core::SimpleMemoryTagging> Arena;
+#endif
+
 char* g_OptionScript = "PotatoPluginOptions";
 char* g_DefaultExportOptions = "";
 
 char* g_createUiScript = "poatoCreateUI";
 char* g_destroyUiScript = "poatoDestroyUI";
 
-core::MallocFreeAllocator g_allocator;
-Arena g_arena(&g_allocator, "ModelExporterArena");
+namespace
+{
+	core::MallocFreeAllocator g_allocator;
+}
 
+core::MemoryArenaBase* g_arena = nullptr;
 
 #define ADD_FILE_TRANS 0
 
@@ -24,6 +43,8 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 {
 	core::StackString<64> ver;
 	ver.appendFmt("1.0.%i.2", model::MODEL_VERSION);
+
+	g_arena = new Arena(&g_allocator, "ModelExporterArena");
 
 #if X_DEBUG
 	ver.append(" - Debug");
@@ -69,6 +90,10 @@ MODELEX_EXPORT MStatus uninitializePlugin(MObject obj)
 	if (stat != MS::kSuccess) {
 		stat.perror("Error - uninitializePlugin");
 	}
+
+	delete g_arena;
+	g_arena = nullptr;
+
 	return stat;
 }
 
