@@ -3,7 +3,7 @@
   <PropertyGroup>
     <_PropertySheetDisplayName>Engine Release</_PropertySheetDisplayName>
     <OutDir>$(SolutionDir)..\..\build\$(PlatformName)\Release\</OutDir>
-    <IntDir>$(SolutionDir)..\..\Temp\$(Platform)\Debug\$(ProjectName)\</IntDir>
+    <IntDir>$(SolutionDir)..\..\Temp\$(Platform)\Release\$(ProjectName)\</IntDir>
    <TargetName>engine_$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>
