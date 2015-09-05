@@ -50,10 +50,12 @@ bool g_StartOfBlock = false; // used for logging formating.
 ModelStats g_stats;
 PotatoOptions g_options;
 
-X_LINK_LIB("Foundation")
-X_LINK_LIB("OpenMaya")
-X_LINK_LIB("OpenMayaUI")
-X_LINK_LIB("OpenMayaAnim")
+#define MAYA_VERSION "Maya2012"
+
+X_LINK_LIB(MAYA_VERSION "\\Foundation")
+X_LINK_LIB(MAYA_VERSION "\\OpenMaya")
+X_LINK_LIB(MAYA_VERSION "\\OpenMayaUI")
+X_LINK_LIB(MAYA_VERSION "\\OpenMayaAnim")
 
 X_USING_NAMESPACE;
 
