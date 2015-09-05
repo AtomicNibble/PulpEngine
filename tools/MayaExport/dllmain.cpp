@@ -25,6 +25,10 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 	core::StackString<64> ver;
 	ver.appendFmt("1.0.%i.2", model::MODEL_VERSION);
 
+#if X_DEBUG
+	ver.append(" - Debug");
+#endif // !X_DEBUG
+
 	MFnPlugin plugin(obj, "WinCat - "X_ENGINE_NAME" Engine", ver.c_str(), "Any");
 
 	MStatus stat;
