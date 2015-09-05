@@ -159,13 +159,12 @@ namespace strUtil
 
 			pat += 4, len -= 4;
 			// warning C4706: assignment within conditional expression
-			X_DISABLE_WARNING(4706)
-			while ((next = *(uint8_t const*)tgt++)) {
+			while ((next = *reinterpret_cast<uint8_t const*>(tgt++)) != 0)
+			{
 				wind = (wind << 8) + next;
 				if (wind == head && !memcmp(tgt, pat, len))
 					return tgt - 4;
 			}
-			X_ENABLE_WARNING(4706)
 			return  NULL;
 		}
 
