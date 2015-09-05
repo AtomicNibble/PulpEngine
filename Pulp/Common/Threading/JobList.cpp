@@ -577,7 +577,7 @@ void jobListRunner::StartThreads(void)
 
 void jobListRunner::ShutDown(void)
 {
-	X_LOG0("jobListRunner", "Shuting down");
+	X_LOG0("jobListRunner", "Shutting Down");
 
 	int32_t i;
 
