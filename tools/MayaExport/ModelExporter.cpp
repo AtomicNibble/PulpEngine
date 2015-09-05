@@ -1531,7 +1531,7 @@ bool MayaModel::save(const char *filename)
 	// much faster(benchmarked), since we are doing lots of small writes.
 	core::ByteStream stream(&g_arena);
 
-	fopen_s(&f, filename, "wb");
+	errno_t err = fopen_s(&f, filename, "wb");
 	if (f)
 	{
 		model::ModelHeader header;
@@ -1909,6 +1909,10 @@ bool MayaModel::save(const char *filename)
 
 		fclose(f);
 		return true;
+	}
+	else
+	{
+		MayaPrintError("Failed to open file for saving(%i): %s", err, filename);
 	}
 	return false;
 }
