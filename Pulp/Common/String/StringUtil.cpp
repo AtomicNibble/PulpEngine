@@ -158,11 +158,14 @@ namespace strUtil
 			uint32_t head = MSBF32(pat), wind = 0, next;
 
 			pat += 4, len -= 4;
+			// warning C4706: assignment within conditional expression
+			X_DISABLE_WARNING(4706)
 			while ((next = *(uint8_t const*)tgt++)) {
 				wind = (wind << 8) + next;
 				if (wind == head && !memcmp(tgt, pat, len))
 					return tgt - 4;
 			}
+			X_ENABLE_WARNING(4706)
 			return  NULL;
 		}
 
