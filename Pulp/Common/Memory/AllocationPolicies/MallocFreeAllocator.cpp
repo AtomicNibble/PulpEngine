@@ -25,7 +25,7 @@ namespace
 MallocFreeAllocator::MallocFreeAllocator(void)
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	zero_this( &m_statistics );
+	zero_object( m_statistics );
 
 	m_statistics.m_type = "MallocFree";
 #endif
