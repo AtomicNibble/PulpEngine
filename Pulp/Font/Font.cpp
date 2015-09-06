@@ -119,7 +119,7 @@ bool XFFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 
 	X_LOG0("Font", "loading: \"%s\"", pFilePath);
 
-	path /= "core_assets/Fonts/";
+	path /= "Fonts/";
 	path.setFileName(pFilePath);
 
 	FreeBuffers();

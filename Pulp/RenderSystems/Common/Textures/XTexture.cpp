@@ -834,16 +834,16 @@ void XTexture::loadDefaultTextures(void)
 		return;
 	}
 
-	s_ptexMipMapDebug = XTexture::FromName("core_assets/Textures/Debug/MipMapDebug.dds", default_flags | TextureFlags::FILTER_BILINEAR);
-	s_ptexColorBlue = XTexture::FromName("core_assets/Textures/Debug/color_Blue.dds", default_flags);
-	s_ptexColorCyan = XTexture::FromName("core_assets/Textures/Debug/color_Cyan.dds", default_flags);
-	s_ptexColorGreen = XTexture::FromName("core_assets/Textures/Debug/color_Green.dds", default_flags);
-	s_ptexColorPurple = XTexture::FromName("core_assets/Textures/Debug/color_Purple.dds", default_flags);
-	s_ptexColorRed = XTexture::FromName("core_assets/Textures/Debug/color_Red.dds", default_flags);
-	s_ptexColorWhite = XTexture::FromName("core_assets/Textures/Debug/color_White.dds", default_flags);
-	s_ptexColorYellow = XTexture::FromName("core_assets/Textures/Debug/color_Yellow.dds", default_flags);
-	s_ptexColorOrange = XTexture::FromName("core_assets/Textures/Debug/color_Orange.dds", default_flags);
-	s_ptexColorMagenta = XTexture::FromName("core_assets/Textures/Debug/color_Magenta.dds", default_flags);
+	s_ptexMipMapDebug = XTexture::FromName("Textures/Debug/MipMapDebug.dds", default_flags | TextureFlags::FILTER_BILINEAR);
+	s_ptexColorBlue = XTexture::FromName("Textures/Debug/color_Blue.dds", default_flags);
+	s_ptexColorCyan = XTexture::FromName("Textures/Debug/color_Cyan.dds", default_flags);
+	s_ptexColorGreen = XTexture::FromName("Textures/Debug/color_Green.dds", default_flags);
+	s_ptexColorPurple = XTexture::FromName("Textures/Debug/color_Purple.dds", default_flags);
+	s_ptexColorRed = XTexture::FromName("Textures/Debug/color_Red.dds", default_flags);
+	s_ptexColorWhite = XTexture::FromName("Textures/Debug/color_White.dds", default_flags);
+	s_ptexColorYellow = XTexture::FromName("Textures/Debug/color_Yellow.dds", default_flags);
+	s_ptexColorOrange = XTexture::FromName("Textures/Debug/color_Orange.dds", default_flags);
+	s_ptexColorMagenta = XTexture::FromName("Textures/Debug/color_Magenta.dds", default_flags);
 
 
 	Recti rect;

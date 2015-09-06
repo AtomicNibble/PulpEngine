@@ -666,7 +666,7 @@ bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 
 	pMat = (XMaterial*)pMat_;
 
-	path /= "core_assets/materials/";
+	path /= "materials/";
 	path /= pMat->getName();
 	path.setExtension(MTL_B_FILE_EXTENSION);
 

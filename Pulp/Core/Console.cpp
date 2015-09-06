@@ -588,7 +588,7 @@ void XConsole::Startup(ICore* pCore)
 	pCore->GetILog()->AddLogger(&logger_);
 
 	// load a texture baby!
-	pBackground_ = pRender_->LoadTexture("core_assets/Textures/white.dds", 
+	pBackground_ = pRender_->LoadTexture("Textures/white.dds", 
 		texture::TextureFlags::DONT_STREAM);
 
 	ADD_CVAR_REF_NO_NAME(console_debug, 0, 0, 1, VarFlag::SYSTEM | VarFlag::CHEAT, "Debugging for console operations. 0=off 1=on");

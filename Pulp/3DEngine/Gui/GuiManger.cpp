@@ -78,7 +78,7 @@ bool XGuiManager::Init(void)
 	gEnv->pInput->AddEventListener(this);
 
 	// what you pointing at? rude..
-	pCursorArrow_ = gEnv->pRender->LoadTexture("core_assets/Textures/cursor_arrow.dds",
+	pCursorArrow_ = gEnv->pRender->LoadTexture("Textures/cursor_arrow.dds",
 		texture::TextureFlags::DONT_STREAM | texture::TextureFlags::NOMIPS);
 
 	if (!pCursorArrow_) {
