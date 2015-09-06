@@ -5,6 +5,7 @@
 
 #include <Util\LastError.h>
 #include <String\StackString.h>
+#include <String\Path.h>
 
 #include <direct.h>
 #include <io.h>
@@ -73,8 +74,31 @@ bool xFileSys::Init()
 {
 	X_LOG0("FileSys", "Starting Filesys..");
 
+	strUtil::WorkingDirStrW buf;
+	strUtil::workingDir(buf);
+
+	core::Path<wchar_t> base(buf);
+	base /= L"\\..\\..\\..\\potatoengine\\game_folder\\";
+
+	core::Path<wchar_t> core(base);
+	core /= L"core_assets\\";
+
+	core::Path<wchar_t> mod(base);
+	mod /= L"mod\\";
+
+	core::Path<wchar_t> testAssets(base);
+	testAssets /= L"test_assets\\";
+
 	// TODO: yup.
-	return setGameDir(L"C:\\Users\\WinCat\\Documents\\code\\WinCat\\engine\\potatoengine\\game_folder");
+	if (setGameDir(core.c_str()))
+	{
+		// add mod dir's
+		addModDir(mod.c_str());
+		addModDir(testAssets.c_str());
+		return true;
+	}
+
+	return true;
 }
 
 void xFileSys::ShutDown()
@@ -320,6 +344,11 @@ void xFileSys::addModDir(pathTypeW path)
 {
 	if (isDebug()) {
 		X_LOG0("FileSys", "addModDir: \"%ls\"", path);
+	}
+
+	if (!this->directoryExistsOS(path)) {
+		X_ERROR("FileSys", "Faled to add mod drectory, the directory does not exsists: \"%s\"", path);
+		return;
 	}
 
 	// at it to virtual file system.
