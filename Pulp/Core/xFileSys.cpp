@@ -335,8 +335,6 @@ bool xFileSys::setGameDir(pathTypeW path)
 	X_ASSERT_NOT_NULL(searchPaths_->dir);
 	gameDir_ = searchPaths_->dir;
 
-	// add hotreload dir.
-	gEnv->pDirWatcher->addDirectory(path);
 	return true;
 }
 
@@ -359,6 +357,9 @@ void xFileSys::addModDir(pathTypeW path)
 	search->pak = nullptr;
 	search->next_ = searchPaths_;
 	searchPaths_ = search;
+
+	// add hotreload dir.
+	gEnv->pDirWatcher->addDirectory(path);
 }
 
 
