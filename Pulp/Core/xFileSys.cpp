@@ -349,17 +349,47 @@ void xFileSys::addModDir(pathTypeW path)
 		return;
 	}
 
+	// ok remove any ..//
+	DWORD  retval = 0;
+	TCHAR  fixedPath[512];
+
+	retval = GetFullPathNameW(path, 512, fixedPath, nullptr);
+	if (retval == 0)
+	{
+		core::lastError::Description Dsc;
+		X_ERROR("FileSys", "addModDir full path name creation failed: %s", 
+			core::lastError::ToString(Dsc));
+		return;
+	}
+
+	if (!this->directoryExistsOS(fixedPath)) {
+		X_ERROR("FileSys", "Fixed path does not exsists: \"%s\"", fixedPath);
+		return;
+	}
+
+	// work out if this directory is a sub directory of any of the current
+	// searxh paths.
+	for (search_s* s = searchPaths_; s; s = s->next_)
+	{
+		if (strUtil::FindCaseInsensitive(fixedPath, s->dir->path.c_str()) != nullptr)
+		{
+			X_ERROR("FileSys", "mod dir is identical or inside a current mod dir: \"%s\" -> \"%s\"",
+				fixedPath, s->dir->path.c_str());
+			return;
+		}
+	}
+
 	// at it to virtual file system.
 	search_s* search = X_NEW( search_s, g_coreArena, "FileSysSearch");
 	search->dir = X_NEW( directory_s, g_coreArena, "FileSysDir");
-	search->dir->path = path;
+	search->dir->path = fixedPath;
 	search->dir->path.ensureSlash();
 	search->pak = nullptr;
 	search->next_ = searchPaths_;
 	searchPaths_ = search;
 
 	// add hotreload dir.
-	gEnv->pDirWatcher->addDirectory(path);
+	gEnv->pDirWatcher->addDirectory(fixedPath);
 }
 
 
