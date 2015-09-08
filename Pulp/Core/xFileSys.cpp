@@ -131,7 +131,10 @@ void xFileSys::CreateVars(void)
 		name.set("filesys_mod_dir_");
 		name.appendFmt("%i", i);
 		vars_.pVirtualDirs[i] = ADD_CVAR_STRING(name.c_str(), "",
-			core::VarFlag::SYSTEM | core::VarFlag::READONLY, "Virtual mod directory");
+			core::VarFlag::SYSTEM | 
+			core::VarFlag::READONLY |
+			core::VarFlag::CPY_NAME,
+			"Virtual mod directory");
 	}
 }
 
