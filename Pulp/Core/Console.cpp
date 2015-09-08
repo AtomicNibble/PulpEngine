@@ -1054,7 +1054,7 @@ ICVar* XConsole::RegisterString(const char* Name, const char* Value,
 
 	if (bitUtil::IsBitFlagSet(Flags, VarFlag::CPY_NAME))
 	{
-		Flags = Flags & ~VarFlag::CPY_NAME;
+		Flags = bitUtil::ClearBitFlag(Flags, VarFlag::CPY_NAME);
 		pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, 
 			"CVarString<H>")(this, Name, Value, Flags, desc);
 	}
