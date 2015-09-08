@@ -1052,7 +1052,17 @@ ICVar* XConsole::RegisterString(const char* Name, const char* Value,
 	if (pCVar)
 		return pCVar;
 
-	pCVar = X_NEW(CVarString<CVarBaseConst>, &varArena_, "CVarString")(this, Name, Value, Flags, desc);
+	if (bitUtil::IsBitFlagSet(Flags, VarFlag::CPY_NAME))
+	{
+		Flags = Flags & ~VarFlag::CPY_NAME;
+		pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, 
+			"CVarString<H>")(this, Name, Value, Flags, desc);
+	}
+	else
+	{
+		pCVar = X_NEW(CVarString<CVarBaseConst>, &varArena_, 
+			"CVarString")(this, Name, Value, Flags, desc);
+	}
 	RegisterVar(pCVar, pChangeFunc);
 	return pCVar;
 }
