@@ -32,7 +32,8 @@ CONFIG,			// loaded or set from a config file.
 SAVE_IF_CHANGED, // saved to config if changed.
 
 SYSTEM,			// system related
-TOOL			// tool related
+TOOL,			// tool related
+CPY_NAME		// makes a copy of the name
 );
 
 
