@@ -286,7 +286,7 @@ protected:
 	XViewPort ViewPort_;
 	XCamera cam_;
 
-	XTextDrawList textDrawList_;
+	XTextDrawList* pTextDrawList_;
 
 	// font texture index.
 	int fontIdx_;

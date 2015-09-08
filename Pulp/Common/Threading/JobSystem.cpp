@@ -314,7 +314,7 @@ bool JobSystem::StartThreads(void)
 
 void JobSystem::ShutDown(void)
 {
-	X_LOG0("JobSystem", "Shuting down");
+	X_LOG0("JobSystem", "Shutting Down");
 
 	int32_t i;
 

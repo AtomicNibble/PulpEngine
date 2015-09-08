@@ -104,26 +104,28 @@ public:
 	void addModDir(pathTypeW path) X_FINAL;
 
 	// Find util
-	virtual uintptr_t findFirst(pathType path, _wfinddatai64_t* findinfo) X_FINAL;
-	virtual bool findnext(uintptr_t handle, _wfinddatai64_t* findinfo) X_FINAL;
-	virtual void findClose(uintptr_t handle) X_FINAL;
+	uintptr_t findFirst(pathType path, _wfinddatai64_t* findinfo) X_FINAL;
+	bool findnext(uintptr_t handle, _wfinddatai64_t* findinfo) X_FINAL;
+	void findClose(uintptr_t handle) X_FINAL;
 
 	// Delete
-	virtual bool deleteFile(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
-	virtual bool deleteDirectory(pathType path, bool recursive = false) const X_FINAL;
+	bool deleteFile(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool deleteDirectory(pathType path, bool recursive = false) const X_FINAL;
 
 	// Create
-	virtual bool createDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
-	virtual bool createDirectoryTree(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool createDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool createDirectoryTree(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
 
 	// exsists.
-	virtual bool fileExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
-	virtual bool directoryExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
-	virtual bool directoryExists(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool fileExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool fileExists(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool directoryExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool directoryExists(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+
 
 	// does not error, when it's a file or not exsist.
-	virtual bool isDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
-	virtual bool isDirectory(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool isDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool isDirectory(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
 
 	// settings baby
 	const XFileSysVars* getVars() const { return &vars_; }
@@ -132,6 +134,10 @@ public:
 	virtual XFileStats& getStats(void) const X_FINAL;
 
 private:
+
+	bool fileExistsOS(pathTypeW fullPath) const;
+	bool directoryExistsOS(pathTypeW fullPath) const;
+	bool isDirectoryOS(pathTypeW fullPath) const;
 
 	// Ajust path
 	const wchar_t* createOSPath(directory_s* dir, pathType path, Path<wchar_t>& buffer) const;

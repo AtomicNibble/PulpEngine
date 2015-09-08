@@ -1245,6 +1245,33 @@ void DX11XRender::FX_SetIStream(uint32_t IndexBuffer)
 }
 
 
+void DX11XRender::FX_UnBindVStream(ID3D11Buffer* pVertexBuffer)
+{
+	// check if the vertex stream is currently bound to the pipeline
+	// if so unset.
+	uint32_t i;
+	for (i = 0; i < VertexStream::ENUM_COUNT; i++)
+	{
+		RenderState::XStreamInfo& info = m_State.VertexStreams[i];
+		if (info.pBuf == pVertexBuffer)
+		{
+			m_deviceContext->IASetVertexBuffers(i, 0, nullptr,  nullptr, nullptr);
+			info.pBuf = nullptr;
+		}
+	}
+}
+
+void DX11XRender::FX_UnBindIStream(ID3D11Buffer* pIndexBuffer)
+{
+	// check if this index's are currently bound to the pipeline
+	// if so unset.
+
+	if (m_State.pIndexStream == pIndexBuffer) {
+		m_deviceContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_R16_UINT, 0);
+		m_State.pIndexStream = nullptr;
+	}
+}
+
 void DX11XRender::FX_DrawPrimitive(const PrimitiveType::Enum type,
 	const int StartVertex, const int VerticesCount)
 {

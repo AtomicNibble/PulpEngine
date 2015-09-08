@@ -91,8 +91,8 @@ namespace {
 			{
 				flags.Set(MtlXmlFlags::FLAGS);
 
-				uint32_t flags = core::strUtil::StringToInt<uint32_t>(attr->value());
-				pMaterial->setFlags(flags);
+				uint32_t Matflags = core::strUtil::StringToInt<uint32_t>(attr->value());
+				pMaterial->setFlags(Matflags);
 			}
 			else if (core::strUtil::IsEqual(begin, end, "SurfaceType"))
 			{
@@ -334,7 +334,7 @@ void XMaterialManager::Init(void)
 
 void XMaterialManager::ShutDown(void)
 {
-	X_LOG0("MtlManager", "Shutting down");
+	X_LOG0("MtlManager", "Shutting Down");
 
 
 	// hotreload support.
@@ -666,7 +666,7 @@ bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 
 	pMat = (XMaterial*)pMat_;
 
-	path /= "core_assets/materials/";
+	path /= "materials/";
 	path /= pMat->getName();
 	path.setExtension(MTL_B_FILE_EXTENSION);
 

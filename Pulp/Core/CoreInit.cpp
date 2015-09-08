@@ -158,17 +158,26 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 #if defined(WIN32)
 	X_DISABLE_WARNING(4996);
 	{
-		OSVERSIONINFOA osvi;
+		OSVERSIONINFOW osvi;
 
 		core::zero_object(osvi);
 
-		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-		GetVersionExA(&osvi);
+		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOW);
+		if (!GetVersionExW(&osvi))
+		{
+			::MessageBoxW(reinterpret_cast<HWND>(startupParams.hWnd),
+				L"GetVersionExW failed.",
+				L"Critial Error", MB_OK);
+			return false;
+		}
 		
 		bool bIsWindowsXPorLater = osvi.dwMajorVersion > 5 || (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion >= 1);
 
 		if (!bIsWindowsXPorLater)
 		{
+			::MessageBoxW(reinterpret_cast<HWND>(startupParams.hWnd), 
+				L"Versions of windows older than XP are not supported.",
+				L"Critial Error", MB_OK);
 			return false;
 		}
 	}
@@ -260,7 +269,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		pWindow_ = X_NEW(core::xWindow, g_coreArena, "GameWindow");
 
 		wchar_t titleW[128];
-		const char* pTitle = X_ENGINE_NAME" Engine "X_CPUSTRING
+		const char* pTitle = X_ENGINE_NAME " Engine " X_CPUSTRING
 #if X_SUPER == 0
 			" (fps:0, 0ms) Time: 0(x1)"
 #endif
@@ -277,9 +286,8 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		pWindow_->HideClientCursor(true);
 
 		// Alogn it
-		if (pConsole)
+		if (pConsole_)
 		{
-		
 			pWindow_->AlignTo(core::xWindow::GetPrimaryRect(), 
 				Alignment::TOP_ALIGN | Alignment::RIGHT_ALIGN);
 		}
@@ -349,18 +357,18 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 		if (initParams.bConsoleLog)
 		{
 			if (initParams.pConsoleWnd)
-				pConsole = initParams.pConsoleWnd;
+				pConsole_ = initParams.pConsoleWnd;
 			else {
-				pConsole = X_NEW( core::Console, g_coreArena, "ExternalConsoleLog")(L"Engine Log");
-				pConsole->SetSize(120, 60, 8000);
-				pConsole->MoveTo(10, 10);
+				pConsole_ = X_NEW( core::Console, g_coreArena, "ExternalConsoleLog")(L"Engine Log");
+				pConsole_->SetSize(120, 60, 8000);
+				pConsole_->MoveTo(10, 10);
 			}
 
 		//	if (!initParams.bTesting) {
 			pConsoleLogger_ = X_NEW( ConsoleLogger, g_coreArena,"ConsoleLogger")(
 					ConsoleLogger::FilterPolicy(),
 					ConsoleLogger::FormatPolicy(),
-					ConsoleLogger::WritePolicy(*pConsole));
+					ConsoleLogger::WritePolicy(*pConsole_));
 
 				env_.pLog->AddLogger(pConsoleLogger_);
 		//	}

@@ -25,36 +25,36 @@ public:
 		const type& baseSpeed, const type& speed, const extrapolationType::Enum extrapolationType);
 	type GetCurrentValue(int time) const;
 	type GetCurrentSpeed(int time) const;
-	bool IsDone(int time) const { return (time >= startTime + duration); }
-	void SetStartTime(int time) { startTime = time; }
-	int	GetStartTime() const { return startTime; }
-	int	GetEndTime() const { return (duration > 0) ? startTime + duration : 0; }
-	int	GetDuration() const { return duration; }
-	void SetStartValue(const type &value) { startValue = value; }
-	const type&	GetStartValue() const { return startValue; }
-	const type&	GetBaseSpeed() const { return baseSpeed; }
-	const type&	GetSpeed() const { return speed; }
-	extrapolationType::Enum	GetExtrapolationType() const { return extrapolationType; }
+	bool IsDone(int time) const { return (time >= startTime_ + duration_); }
+	void SetStartTime(int time) { startTime_ = time; }
+	int	GetStartTime() const { return startTime_; }
+	int	GetEndTime() const { return (duration_ > 0) ? startTime_ + duration_ : 0; }
+	int	GetDuration() const { return duration_; }
+	void SetStartValue(const type &value) { startValue_ = value; }
+	const type&	GetStartValue() const { return startValue_; }
+	const type&	GetBaseSpeed() const { return baseSpeed_; }
+	const type&	GetSpeed() const { return speed_; }
+	extrapolationType::Enum	GetExtrapolationType() const { return extrapolationType_; }
 
 private:
-	extrapolationType::Enum	extrapolationType;
-	int	startTime;
-	int	duration;
-	type startValue;
-	type baseSpeed;
-	type speed;
+	extrapolationType::Enum	extrapolationType_;
+	int	startTime_;
+	int	duration_;
+	type startValue_;
+	type baseSpeed_;
+	type speed_;
 };
 
 
 template< class type >
 X_INLINE XExtrapolate<type>::XExtrapolate()
 {
-	extrapolationType = extrapolationType::NONE;
-	startTime = duration = 0;
+	extrapolationType_ = extrapolationType::NONE;
+	startTime_ = duration_ = 0;
 
-	core::zero_object(startValue);
-	core::zero_object(baseSpeed);
-	core::zero_object(speed);
+	core::zero_object(startValue_);
+	core::zero_object(baseSpeed_);
+	core::zero_object(speed_);
 }
 
 
@@ -63,131 +63,131 @@ X_INLINE void XExtrapolate<type>::Init(const int startTime, const int duration,
 	const type& startValue, const type& baseSpeed, 
 	const type& speed, const extrapolationType::Enum extrapolationType)
 {
-	this->extrapolationType = extrapolationType;
-	this->startTime = startTime;
-	this->duration = duration;
-	this->startValue = startValue;
-	this->baseSpeed = baseSpeed;
-	this->speed = speed;
+	this->extrapolationType_ = extrapolationType;
+	this->startTime_ = startTime;
+	this->duration_ = duration;
+	this->startValue_ = startValue;
+	this->baseSpeed_ = baseSpeed;
+	this->speed_ = speed;
 }
 
 
 template< class type >
 X_INLINE type XExtrapolate<type>::GetCurrentValue(int time) const
 {
-	if (time < startTime) {
-		return startValue;
+	if (time < startTime_) {
+		return startValue_;
 	}
 	
-	if ((time > startTime + duration)) {
-		time = startTime + duration;
+	if ((time > startTime_ + duration_)) {
+		time = startTime_ + duration_;
 	}
 	
-	switch (extrapolationType)
+	switch (extrapolationType_)
 	{
 		case extrapolationType::NONE:
 		{
-			const float deltaTime = (time - startTime) * 0.001f;
-			return startValue + deltaTime * baseSpeed;
+			const float deltaTime = (time - startTime_) * 0.001f;
+			return startValue_ + deltaTime * baseSpeed_;
 		}
 		case extrapolationType::LINEAR:
 		{
-			const float deltaTime = (time - startTime) * 0.001f;
-			return startValue + deltaTime * (baseSpeed + speed);
+			const float deltaTime = (time - startTime_) * 0.001f;
+			return startValue_ + deltaTime * (baseSpeed_ + speed_);
 		}
 		case extrapolationType::ACCELLINEAR:
 		{
-			if (duration == 0) {
-				return startValue;
+			if (duration_ == 0) {
+				return startValue_;
 			}
 			else {
-				const float deltaTime = (time - startTime) / (float)duration;
+				const float deltaTime = (time - startTime_) / static_cast<float>(duration_);
 				const float s = (0.5f * deltaTime * deltaTime) * 
-					((float)duration * 0.001f);
-				return startValue + deltaTime * baseSpeed + s * speed;
+					(static_cast<float>(duration_) * 0.001f);
+				return startValue_ + deltaTime * baseSpeed_ + s * speed_;
 			}
 		}
 		case extrapolationType::DECELLINEAR:
 		{
-			if (duration == 0) {
-				return startValue;
+			if (duration_ == 0) {
+				return startValue_;
 			}
 			else {
-				const float deltaTime = (time - startTime) / (float)duration;
+				const float deltaTime = (time - startTime_) / static_cast<float>(duration_);
 				const float s = (deltaTime - (0.5f * deltaTime * deltaTime)) * 
-					((float)duration * 0.001f);
-				return startValue + deltaTime * baseSpeed + s * speed;
+					(static_cast<float>(duration_) * 0.001f);
+				return startValue_ + deltaTime * baseSpeed_ + s * speed_;
 			}
 		}
 		case extrapolationType::ACCELSINE:
-			if (duration == 0) {
-				return startValue;
+			if (duration_ == 0) {
+				return startValue_;
 			}
 			else {
-				const float deltaTime = (time - startTime) / (float)duration;
+				const float deltaTime = (time - startTime_) / static_cast<float>(duration_);
 				const float s = (1.0f - math<float>::cos(deltaTime * PIHalff))
-					* (float)duration * 0.001f * Sqrt_1OVER2;
-				return startValue + deltaTime * baseSpeed + s * speed;
+					* static_cast<float>(duration_) * 0.001f * Sqrt_1OVER2;
+				return startValue_ + deltaTime * baseSpeed_ + s * speed_;
 			}
 
 		case extrapolationType::DECELSINE:
-			if (duration == 0) {
-				return startValue;
+			if (duration_ == 0) {
+				return startValue_;
 			}
 			else {
-				const float deltaTime = (time - startTime) / (float)duration;
+				const float deltaTime = (time - startTime_) / static_cast<float>(duration_);
 				const float s = math<float>::sin(deltaTime * PIHalff) *
-					(float)duration * 0.001f * Sqrt_1OVER2;
-				return startValue + deltaTime * baseSpeed + s * speed;
+					static_cast<float>(duration_) * 0.001f * Sqrt_1OVER2;
+				return startValue_ + deltaTime * baseSpeed_ + s * speed_;
 			}
 
 	}
 
-	return startValue;
+	return startValue_;
 }
 
 
 template< class type >
 X_INLINE type XExtrapolate<type>::GetCurrentSpeed(int time) const
 {
-	if (time < startTime || duration == 0) {
-		return (startValue - startValue); 
+	if (time < startTime_ || duration_ == 0) {
+		return (startValue_ - startValue_); 
 	}
 
-	if ((time > startTime + duration)) {
-		return (startValue - startValue); 
+	if ((time > startTime_ + duration_)) {
+		return (startValue_ - startValue_); 
 	}
 
-	switch (extrapolationType)
+	switch (extrapolationType_)
 	{
 		case extrapolationType::NONE:
-			return baseSpeed;
+			return baseSpeed_;
 
 		case extrapolationType::LINEAR:
-			return baseSpeed + speed;
+			return baseSpeed_ + speed_;
 
 		case extrapolationType::ACCELLINEAR:
-			const float deltaTime = (time - startTime) / (float)duration;
+			const float deltaTime = (time - startTime_) / static_cast<float>(duration_);
 			const float s = deltaTime;
-			return baseSpeed + s * speed;
+			return baseSpeed_ + s * speed_;
 
 		case extrapolationType::DECELLINEAR:
-			const float deltaTime = (time - startTime) / (float)duration;
+			const float deltaTime = (time - startTime_) / static_cast<>float(duration_);
 			const float s = 1.0f - deltaTime;
-			return baseSpeed + s * speed;
+			return baseSpeed_ + s * speed_;
 
 		case extrapolationType::ACCELSINE:
-			const float deltaTime = (time - startTime) / (float)duration;
+			const float deltaTime = (time - startTime_) / static_cast<>float(duration_);
 			const float s = idMath::Sin(deltaTime * idMath::HALF_PI);
-			return baseSpeed + s * speed;
+			return baseSpeed_ + s * speed_;
 
 		case extrapolationType::DECELSINE:
-			const float deltaTime = (time - startTime) / (float)duration;
+			const float deltaTime = (time - startTime_) / static_cast<>float(duration_);
 			const float s = idMath::Cos(deltaTime * idMath::HALF_PI);
-			return baseSpeed + s * speed;
+			return baseSpeed_ + s * speed_;
 
 		default:
-			return baseSpeed;		
+			return baseSpeed_;		
 	}
 }
 

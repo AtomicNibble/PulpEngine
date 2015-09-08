@@ -78,7 +78,7 @@ bool XGuiManager::Init(void)
 	gEnv->pInput->AddEventListener(this);
 
 	// what you pointing at? rude..
-	pCursorArrow_ = gEnv->pRender->LoadTexture("core_assets/Textures/cursor_arrow.dds",
+	pCursorArrow_ = gEnv->pRender->LoadTexture("Textures/cursor_arrow.dds",
 		texture::TextureFlags::DONT_STREAM | texture::TextureFlags::NOMIPS);
 
 	if (!pCursorArrow_) {
@@ -91,7 +91,7 @@ bool XGuiManager::Init(void)
 
 void XGuiManager::Shutdown(void)
 {
-	X_LOG0("Gui", "Shuting down GUI Systems");
+	X_LOG0("Gui", "Shutting Down");
 
 
 	gEnv->pHotReload->addfileType(nullptr, gui::GUI_FILE_EXTENSION);

@@ -37,7 +37,7 @@ XCoreVars g_coreVars;
 
 XCore::XCore() :
 	pWindow_(nullptr),
-	pConsole(nullptr),
+	pConsole_(nullptr),
 	pCpuInfo_(nullptr),
 	pVsLogger_(nullptr),
 	pConsoleLogger_(nullptr),
@@ -105,7 +105,7 @@ void XCore::Release()
 
 void XCore::ShutDown()
 {
-	X_LOG0("Core", "Shutting down");
+	X_LOG0("Core", "Shutting Down");
 
 	dirWatcher_.ShutDown();
 
@@ -238,7 +238,7 @@ void XCore::ShutDown()
 		X_DELETE(pVsLogger_, g_coreArena);
 		X_DELETE(pConsoleLogger_, g_coreArena);
 		if (initParams_.pConsoleWnd == nullptr)
-			X_DELETE(pConsole, g_coreArena);
+			X_DELETE(pConsole_, g_coreArena);
 
 		core::Mem::DeleteAndNull(env_.pLog, g_coreArena);
 	}
@@ -371,7 +371,7 @@ bool XCore::Update()
 		
 		core::StackString<128> title;
 		title.clear();
-		title.appendFmt(X_ENGINE_NAME" Engine "X_CPUSTRING" (fps:%i, %ims) Time: %I64u(x%g) UI: %I64u",
+		title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%i, %ims) Time: %I64u(x%g) UI: %I64u",
 			(int)fps,
 			(int)(frametime * 1000.f),
 			(__int64)time_.GetFrameStartTime(core::ITimer::Timer::GAME).GetMilliSeconds(),

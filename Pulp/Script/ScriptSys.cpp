@@ -238,7 +238,7 @@ void XScriptSys::Init()
 
 	InitCommands();
 
-	ExecuteFile("core_assets/scripts/main.lua", false, false);
+	ExecuteFile("scripts/main.lua", false, false);
 
 	// hotreload
 	gEnv->pHotReload->addfileType(this, X_SCRIPT_FILE_EXTENSION);
@@ -487,6 +487,11 @@ HSCRIPTFUNCTION XScriptSys::GetFunctionPtr(const char* sTableName, const char* s
 
 HSCRIPTFUNCTION XScriptSys::AddFuncRef(HSCRIPTFUNCTION f)
 {
+	// type cast': conversion from 'int' to 'Potato::script::HSCRIPTFUNCTION' of greater size
+	X_DISABLE_WARNING(4312) 
+	X_ASSERT_NOT_IMPLEMENTED();
+
+
 	X_LUA_CHECK_STACK(L);
 
 	if (f)
@@ -503,6 +508,8 @@ HSCRIPTFUNCTION XScriptSys::AddFuncRef(HSCRIPTFUNCTION f)
 		X_ASSERT_UNREACHABLE();
 	}
 	return 0;
+
+	X_ENABLE_WARNING(4312)
 }
 
 bool XScriptSys::CompareFuncRef(HSCRIPTFUNCTION f1, HSCRIPTFUNCTION f2)

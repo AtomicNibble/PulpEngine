@@ -20,7 +20,7 @@ TEST(Model, Load)
 	{
 		UnitTests::ScopeProfiler profile("ModelLoader");
 
-		model_load_success = loader.LoadModel(model, "core_assets/models/default.model");
+		model_load_success = loader.LoadModel(model, "models/default.model");
 	}
 
 	EXPECT_TRUE(model_load_success);

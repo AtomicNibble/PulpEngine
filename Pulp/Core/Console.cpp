@@ -588,7 +588,7 @@ void XConsole::Startup(ICore* pCore)
 	pCore->GetILog()->AddLogger(&logger_);
 
 	// load a texture baby!
-	pBackground_ = pRender_->LoadTexture("core_assets/Textures/white.dds", 
+	pBackground_ = pRender_->LoadTexture("Textures/white.dds", 
 		texture::TextureFlags::DONT_STREAM);
 
 	ADD_CVAR_REF_NO_NAME(console_debug, 0, 0, 1, VarFlag::SYSTEM | VarFlag::CHEAT, "Debugging for console operations. 0=off 1=on");
@@ -1705,9 +1705,9 @@ void XConsole::DrawBuffer()
 		if (cursor_.draw)
 		{
 			core::StackString<256> temp(InputBuffer_.c_str(), InputBuffer_.c_str() + CursorPos_);
-			float width = pFont_->GetTextSize(temp.c_str(), ctx).x + 3; // 3px offset from engine txt.
+			float Lwidth = pFont_->GetTextSize(temp.c_str(), ctx).x + 3; // 3px offset from engine txt.
 
-			pFont_->DrawString(Vec2f(pos.x + width, pos.y), "_", ctx);
+			pFont_->DrawString(Vec2f(pos.x + Lwidth, pos.y), "_", ctx);
 		}
 
 		// the log.

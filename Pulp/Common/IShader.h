@@ -278,7 +278,6 @@ struct XTexState
 	X_INLINE XTexState& operator=(const XTexState& src)
 	{
 		this->~XTexState();
-		// new(this)XTexState(src);
 		core::Mem::Construct(this, src);
 		return *this;
 	}

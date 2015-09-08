@@ -335,6 +335,9 @@ public:
 		const int StartIndex,	 
 		const int BaseVertexLocation); // A value added to each index before reading a vertex from the vertex buffer.
 
+	void FX_UnBindVStream(ID3D11Buffer* pVertexBuffer);
+	void FX_UnBindIStream(ID3D11Buffer* pIndexBuffer);
+
 
 	const D3D11_PRIMITIVE_TOPOLOGY FX_ConvertPrimitiveType(const PrimitiveType::Enum type) {
 		return (D3D11_PRIMITIVE_TOPOLOGY)type;

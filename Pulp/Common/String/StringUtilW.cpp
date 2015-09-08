@@ -49,7 +49,7 @@ namespace strUtil
 	const wchar_t* workingDir(WorkingDirStrW& buf)
 	{
 		core::zero_object(buf);
-		_wgetcwd(buf, sizeof(buf) - 1);
+		_wgetcwd(buf, (sizeof(buf) / 2 ) - 1);
 
 		return buf;
 	}

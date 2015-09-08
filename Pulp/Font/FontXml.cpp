@@ -198,7 +198,7 @@ bool XFFont::loadFont()
 	core::Path<char> path;
 	size_t length;
 
-	path /= "core_assets/Fonts/";
+	path /= "Fonts/";
 	path.setFileName(name_.c_str());
 	path.setExtension(".font");
 

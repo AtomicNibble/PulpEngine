@@ -1,4 +1,4 @@
-Script.Load("core_assets/scripts/util.lua");	
+Script.Load("scripts/util.lua");	
 
 function OnInit()
 

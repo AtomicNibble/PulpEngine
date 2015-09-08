@@ -4,7 +4,7 @@
 #define _X_FONT_GLYPH_CACHE_H_
 
 #include <vector>
-#include <hash_map>
+#include <unordered_map>
 
 #include "XGlyphBitmap.h"
 #include "XFontRender.h"
@@ -45,7 +45,7 @@ struct XCacheSlot
 };
 
 
-typedef std::hash_map<uint16, XCacheSlot *>			XCacheTable;
+typedef std::unordered_map<uint16, XCacheSlot *>	XCacheTable;
 typedef std::vector<XCacheSlot *>					XCacheSlotList;
 typedef std::vector<XCacheSlot *>::iterator			XCacheSlotListItor;
 

@@ -1,0 +1,3 @@
+[submodule "tools/Ladybug"]
+	path = tools/Ladybug
+	url = git@touchingclothgames.com:root/ladybug.git
