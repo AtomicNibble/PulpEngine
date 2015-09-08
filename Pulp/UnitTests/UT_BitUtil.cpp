@@ -13,21 +13,36 @@ X_USING_NAMESPACE;
 
 using namespace core;
 
-TEST(BitTest, IsSet) {
+#ifdef BitTest
+#undef BitTest
+#endif
 
-	for (int i = 0; i < 32; i++)
-		EXPECT_FALSE(bitUtil::IsBitSet(0,i));
+typedef ::testing::Types<uint32_t, uint64_t> MyTypes;
+TYPED_TEST_CASE(BitTest, MyTypes);
 
-	for (int i = 0; i < 32; i++)
-		EXPECT_TRUE(bitUtil::IsBitSet(-1, i));
+template <typename T>
+class BitTest : public ::testing::Test {
+public:
+};
 
-	EXPECT_TRUE(bitUtil::IsBitSet(1, 0));
+TYPED_TEST(BitTest, IsSet) {
+
+	TypeParam val = 0;
+	for (int i = 0; i < (sizeof(TypeParam) * 8); i++)
+		EXPECT_FALSE(bitUtil::IsBitSet(val,i));
+
+	val = static_cast<TypeParam>(-1);
+	for (int i = 0; i < (sizeof(TypeParam) * 8); i++)
+		EXPECT_TRUE(bitUtil::IsBitSet(val, i));
+
+	val = 1;
+	EXPECT_TRUE(bitUtil::IsBitSet(val, 0));
 
 }
 
-TEST(BitTest, Set) {
+TYPED_TEST(BitTest, Set) {
 
-	uint32 val = 0;
+	TypeParam val = 0;
 	val = bitUtil::SetBit(val, 0);
 
 	EXPECT_TRUE(bitUtil::IsBitSet(val, 0));
@@ -54,9 +69,9 @@ TEST(BitTest, Set) {
 	EXPECT_TRUE(bitUtil::IsBitSet(val, 31));
 }
 
-TEST(BitTest, NotSet) {
+TYPED_TEST(BitTest, NotSet) {
 
-	uint32 val = 0;
+	TypeParam val = 0;
 	val = bitUtil::SetBit(val, 0);
 
 	EXPECT_FALSE(bitUtil::IsBitNotSet(val, 0));
@@ -83,13 +98,13 @@ TEST(BitTest, NotSet) {
 	EXPECT_FALSE(bitUtil::IsBitNotSet(val, 31));
 }
 
-TEST(BitTest, Clear) {
+TYPED_TEST(BitTest, Clear) {
 
 	// clearning any bits should should still return 0.
 	for (int i = 0; i < 32; i++)
 		EXPECT_FALSE(bitUtil::ClearBit(0, i));
 
-	uint32 val = ~0;
+	TypeParam val = ~0;
 	for (int i = 0; i < 31; i++) {
 		val = bitUtil::ClearBit(val, i);
 		EXPECT_TRUE(val == (~0 << (i + 1)));
@@ -97,10 +112,10 @@ TEST(BitTest, Clear) {
 
 }
 
-TEST(BitTest, Scan) {
+TYPED_TEST(BitTest, Scan) {
 
-	uint32 val = 0;
-	uint32 bit = 0;
+	TypeParam val = 0;
+	TypeParam bit = 0;
 
 	EXPECT_TRUE(bitUtil::NO_BIT_SET == bitUtil::ScanBits(val));
 
@@ -122,8 +137,7 @@ TEST(BitTest, Scan) {
 
 }
 
-TEST(BitTest, Count) {
-
+TYPED_TEST(BitTest, Count) {
 
 	EXPECT_TRUE(bitUtil::CountBits(0xf) == 4);
 	EXPECT_TRUE(bitUtil::CountBits(0xff) == 8);
@@ -135,7 +149,7 @@ TEST(BitTest, Count) {
 
 }
 
-TEST(BitTest, PowerOfTwo) {
+TYPED_TEST(BitTest, PowerOfTwo) {
 
 	EXPECT_TRUE(bitUtil::IsPowerOfTwo(2));
 	EXPECT_TRUE(bitUtil::IsPowerOfTwo(4));
@@ -161,7 +175,7 @@ TEST(BitTest, PowerOfTwo) {
 
 }
 
-TEST(BitTest, RoundUp) {
+TYPED_TEST(BitTest, RoundUp) {
 
 	EXPECT_TRUE(bitUtil::RoundUpToMultiple(4, 8) == 8);
 	EXPECT_TRUE(bitUtil::RoundUpToMultiple(0x29A7, 4) == 0x29A8);
@@ -171,7 +185,7 @@ TEST(BitTest, RoundUp) {
 
 }
 
-TEST(BitTest, RoundDown) {
+TYPED_TEST(BitTest, RoundDown) {
 
 	EXPECT_TRUE(bitUtil::RoundDownToMultiple(4, 8) == 0);
 	EXPECT_TRUE(bitUtil::RoundDownToMultiple(0x29A7, 4) == 0x29A4);
@@ -181,7 +195,7 @@ TEST(BitTest, RoundDown) {
 
 }
 
-TEST(BitTest, NextPower2) {
+TYPED_TEST(BitTest, NextPower2) {
 
 	EXPECT_TRUE(core::bitUtil::NextPowerOfTwo(0) == 0);
 	EXPECT_TRUE(core::bitUtil::NextPowerOfTwo(1) == 1);
@@ -192,7 +206,7 @@ TEST(BitTest, NextPower2) {
 }
 
 
-TEST(BitTest, SignedBit)
+TYPED_TEST(BitTest, SignedBit)
 {
 	EXPECT_TRUE(bitUtil::isSignBitSet(-15252));
 	EXPECT_TRUE(bitUtil::isSignBitSet(-626363));
