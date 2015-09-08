@@ -18,7 +18,11 @@ namespace bitUtil
 
 	/// Returns whether a flag is set in the given integer value.
 	template <typename T>
-	inline bool IsBitFlagSet(T value, unsigned int Flag);
+	inline bool IsBitFlagSet(T value, unsigned int flag);
+
+	/// Clears a flag in an integer
+	template <typename T>
+	inline T ClearBitFlag(T value, unsigned int flag);
 
 	/// Returns whether a certain bit is set in the given integer value.
 	template <typename T>

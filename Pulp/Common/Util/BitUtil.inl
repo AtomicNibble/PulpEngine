@@ -23,6 +23,14 @@ namespace bitUtil
 		struct Implementation<8u>
 		{
 
+			template <typename T>
+			inline T ClearBitFlag(T value, unsigned int flag)
+			{
+				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
+
+				return (static_cast<uint64_t>(value) & (~flag));
+			}
+
 			/// Internal function used by bitUtil::RoundUpToMultiple.
 			template <typename T>
 			static inline uint64_t RoundUpToMultiple(T numToRound, T multipleOf)
@@ -142,6 +150,13 @@ namespace bitUtil
 				return (static_cast<uint32_t>(value) & flag) == flag;
 			}
 
+			template <typename T>
+			inline T ClearBitFlag(T value, unsigned int flag)
+			{
+				static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
+
+				return (static_cast<uint32_t>(value) & (~flag));
+			}
 
 			/// Internal function used by bitUtil::IsBitSet.
 			template <typename T>
@@ -297,11 +312,18 @@ namespace bitUtil
 
 
 	template <typename T>
-	inline bool IsBitFlagSet(T value, unsigned int Flag)
+	inline bool IsBitFlagSet(T value, unsigned int flag)
 	{
-		return internal::Implementation<sizeof(T)>::IsBitFlagSet(value, Flag);
+		return internal::Implementation<sizeof(T)>::IsBitFlagSet(value, flag);
 	}
 
+
+	template <typename T>
+	inline T ClearBitFlag(T value, unsigned int flag)
+	{
+		// defer the implementation to the correct helper template, based on the size of the type
+		return internal::Implementation<sizeof(T)>::ClearBitFlag(value, flag);
+	}
 
 	template <typename T>
 	inline bool IsBitSet(T value, unsigned int whichBit)
