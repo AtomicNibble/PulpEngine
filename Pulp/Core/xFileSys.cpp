@@ -98,6 +98,17 @@ void xFileSys::CreateVars(void)
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
 	ADD_CVAR_REF("filesys_debug", vars_.debug, 0, 0, 1, core::VarFlag::SYSTEM, "Filesystem debug. 0=off 1=on");
+
+	// create vars for the virtual directories which we then update with the paths once set.
+	size_t i;
+	core::StackString<64> name;
+	for (i = 0; i < MAX_VIRTUAL_DIR; i++)
+	{
+		name.set("filesys_mod_dir_");
+		name.appendFmt("%i", i);
+		vars_.pVirtualDirs[i] = ADD_CVAR_STRING(name.c_str(), "",
+			core::VarFlag::SYSTEM | core::VarFlag::READONLY, "Virtual mod directory");
+	}
 }
 
 // --------------------- Open / Close ---------------------
