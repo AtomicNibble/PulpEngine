@@ -75,9 +75,11 @@ public:
 	static const wchar_t NON_NATIVE_SLASH_W = L'\\';
 #endif
 
+	static const size_t MAX_VIRTUAL_DIR = FS_MAX_VIRTUAL_DIR;
 
 	friend struct XFindData;
 
+public:
 	xFileSys();
 	~xFileSys() X_FINAL;
 
