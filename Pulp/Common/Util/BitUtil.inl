@@ -22,6 +22,13 @@ namespace bitUtil
 		template <>
 		struct Implementation<8u>
 		{
+			template <typename T>
+			static inline bool IsBitFlagSet(T value, unsigned int flag)
+			{
+				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
+
+				return (static_cast<uint64_t>(value) & flag) == flag;
+			}
 
 			template <typename T>
 			static inline T ClearBitFlag(T value, unsigned int flag)
