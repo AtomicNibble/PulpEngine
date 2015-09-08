@@ -24,7 +24,7 @@ namespace bitUtil
 		{
 
 			template <typename T>
-			inline T ClearBitFlag(T value, unsigned int flag)
+			static inline T ClearBitFlag(T value, unsigned int flag)
 			{
 				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
 
@@ -151,7 +151,7 @@ namespace bitUtil
 			}
 
 			template <typename T>
-			inline T ClearBitFlag(T value, unsigned int flag)
+			static inline T ClearBitFlag(T value, unsigned int flag)
 			{
 				static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
 
