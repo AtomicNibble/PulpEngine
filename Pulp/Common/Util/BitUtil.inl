@@ -73,6 +73,21 @@ namespace bitUtil
 				return index;
 			}
 
+			template <typename T>
+			static inline unsigned int ScanBitsForward(T value)
+			{
+				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
+
+				unsigned long index = 0;
+				const unsigned char result = _BitScanForward64(&index, static_cast<uint64_t>(value));
+				if (result == 0) {
+					return NO_BIT_SET;
+				}
+
+				return index;
+			}
+
+
 			/// Internal function used by bitUtil::SetBit.
 			template <typename T>
 			static inline T SetBit(T value, unsigned int whichBit)
