@@ -4,6 +4,9 @@ namespace bitUtil
 {
 	// tell the compiler to use the intrinsic versions of these functions
 	#pragma intrinsic(_BitScanReverse)
+	#pragma intrinsic(_BitScanReverse64)
+	#pragma intrinsic(_BitScanForward)
+	#pragma intrinsic(_BitScanForward64)
 
 	/// \ingroup Util
 	namespace internal
