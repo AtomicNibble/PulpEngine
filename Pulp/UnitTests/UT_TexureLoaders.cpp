@@ -37,7 +37,7 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path)
 
 	core::XFileScoped file;
 	
-	core::Path<char> testFolder("test_resources/images/");
+	core::Path<char> testFolder("images/");
 	testFolder /= path;
 
 	if (file.openFile(testFolder.c_str(), mode))
