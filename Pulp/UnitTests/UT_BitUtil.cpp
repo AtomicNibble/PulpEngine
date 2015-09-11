@@ -136,7 +136,7 @@ TYPED_TEST(BitTest, Scan) {
 
 }
 
-TYPED_TEST(BitTest, Scan64) {
+TEST(BitTest, Scan64) {
 
 	uint64_t val = 0;
 
