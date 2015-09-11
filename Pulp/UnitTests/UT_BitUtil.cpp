@@ -115,7 +115,6 @@ TYPED_TEST(BitTest, Clear) {
 TYPED_TEST(BitTest, Scan) {
 
 	TypeParam val = 0;
-	TypeParam bit = 0;
 
 	EXPECT_TRUE(bitUtil::NO_BIT_SET == bitUtil::ScanBits(val));
 
@@ -136,6 +135,26 @@ TYPED_TEST(BitTest, Scan) {
 	EXPECT_TRUE(bitUtil::ScanBitsForward(val) == 28);
 
 }
+
+TYPED_TEST(BitTest, Scan64) {
+
+	uint64_t val = 0;
+
+	EXPECT_TRUE(bitUtil::NO_BIT_SET == bitUtil::ScanBits(val));
+
+	val = 0x800000011000;
+	EXPECT_EQ(47,bitUtil::ScanBits(val));
+	EXPECT_EQ(12, bitUtil::ScanBitsForward(val));
+
+	val = 0x8200800000011000;
+	EXPECT_EQ(63,bitUtil::ScanBits(val));
+	EXPECT_EQ(12,bitUtil::ScanBitsForward(val));
+
+	val = 0x2A4890400000000;
+	EXPECT_EQ(57,bitUtil::ScanBits(val));
+	EXPECT_EQ(34,bitUtil::ScanBitsForward(val));
+}
+
 
 TYPED_TEST(BitTest, Count) {
 
