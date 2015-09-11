@@ -4,9 +4,12 @@ namespace bitUtil
 {
 	// tell the compiler to use the intrinsic versions of these functions
 	#pragma intrinsic(_BitScanReverse)
-	#pragma intrinsic(_BitScanReverse64)
 	#pragma intrinsic(_BitScanForward)
+
+#if X_64
+	#pragma intrinsic(_BitScanReverse64)
 	#pragma intrinsic(_BitScanForward64)
+#endif // !X_64
 
 	/// \ingroup Util
 	namespace internal
@@ -62,32 +65,79 @@ namespace bitUtil
 			}
 
 			/// Internal function used by bitUtil::ScanBits.
+			/// index of MSB
 			template <typename T>
 			static inline unsigned int ScanBits(T value)
 			{
 				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
 
 				unsigned long index = 0;
+
+#if X_64
 				const unsigned char result = _BitScanReverse64(&index, static_cast<uint64_t>(value));
 				if (result == 0) {
 					return NO_BIT_SET;
 				}
 
 				return index;
+#else
+				static const unsigned int bval[] =
+				{ 
+				0, 
+				1, 
+				2, 2, 
+				3, 3, 3, 3, 
+				4, 4, 4, 4, 4, 4, 4, 4 
+				};
+
+				unsigned int r = 0;
+
+				if (value & 0xFFFFFFFF00000000) {
+					r += 32 / 1;
+					value >>= 32 / 1;
+				}
+				if (value & 0x00000000FFFF0000) {
+					r += 16 / 1;
+					value >>= 16 / 1;
+				}
+				if (value & 0x000000000000FF00) {
+					r += 16 / 2;
+					value >>= 16 / 2;
+				}
+				if (value & 0x00000000000000F0) {
+					r += 16 / 4;
+					value >>= 16 / 4;
+				}
+				return r + bval[value] - 1;
+#endif // !X_64
 			}
 
+			/// index of LSB
 			template <typename T>
 			static inline unsigned int ScanBitsForward(T value)
 			{
 				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
 
 				unsigned long index = 0;
+#if X_64
 				const unsigned char result = _BitScanForward64(&index, static_cast<uint64_t>(value));
 				if (result == 0) {
 					return NO_BIT_SET;
 				}
 
 				return index;
+#else
+				if (value)
+				{
+					value = (value ^ (value - 1)) >> 1;  // Set v's trailing 0s to 1s and zero rest
+					for (index = 0; value; index++)
+					{
+						value >>= 1;
+					}
+					return index;
+				}
+				return NO_BIT_SET;
+#endif // !X_64
 			}
 
 
