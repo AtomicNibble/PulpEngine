@@ -90,6 +90,10 @@ namespace bitUtil
 				4, 4, 4, 4, 4, 4, 4, 4 
 				};
 
+				if (value == 0) {
+					return NO_BIT_SET;
+				}
+
 				unsigned int r = 0;
 
 				if (value & 0xFFFFFFFF00000000) {
