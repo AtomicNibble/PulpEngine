@@ -384,6 +384,33 @@ namespace bitUtil
 		template <>
 		struct Implementation<2u>
 		{
+			template <typename T>
+			static inline bool IsBitFlagSet(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+			{
+				static_assert(sizeof(T) == 2, "sizeof(T) is not 2 bytes.");
+				static_assert(sizeof(flag) == 2, "sizeof(flag) is not 2 bytes.");
+
+				return (static_cast<uint16_t>(value) & flag) == flag;
+			}
+
+			template <typename T>
+			static inline T ClearBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+			{
+				static_assert(sizeof(T) == 2, "sizeof(T) is not 2 bytes.");
+				static_assert(sizeof(flag) == 2, "sizeof(flag) is not 2 bytes.");
+
+				return (static_cast<uint16_t>(value) & (~flag));
+			}
+
+			template <typename T>
+			static inline T SetBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+			{
+				static_assert(sizeof(T) == 2, "sizeof(T) is not 2 bytes.");
+				static_assert(sizeof(flag) == 2, "sizeof(flag) is not 2 bytes.");
+
+				return (static_cast<uint16_t>(value) | flag);
+			}
+
 			/// Internal function used by bitUtil::IsBitSet.
 			template <typename T>
 			static inline bool IsBitSet(T value, unsigned int whichBit)
