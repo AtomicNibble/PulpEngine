@@ -94,7 +94,7 @@ TEST(BitTest, IsBitFlagSet64)
 
 	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_1));
 
-	flag = TestFlags64::FLAG_22 | TestFlags64::FLAG_31 | TestFlags64::FLAG_14;
+	flag |= TestFlags64::FLAG_22 | TestFlags64::FLAG_31 | TestFlags64::FLAG_14;
 
 	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_22));
 	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_31));
@@ -104,7 +104,7 @@ TEST(BitTest, IsBitFlagSet64)
 
 	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_31));
 
-	flag = TestFlags64::FLAG_63 | TestFlags64::FLAG_57 | TestFlags64::FLAG_44;
+	flag |= TestFlags64::FLAG_63 | TestFlags64::FLAG_57 | TestFlags64::FLAG_44;
 
 	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_22));
 	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_14));
