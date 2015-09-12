@@ -29,17 +29,19 @@ namespace bitUtil
 		struct Implementation<8u>
 		{
 			template <typename T>
-			static inline bool IsBitFlagSet(T value, unsigned int flag)
+			static inline bool IsBitFlagSet(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
 			{
 				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
+				static_assert(sizeof(flag) == 8, "sizeof(flag) is not 8 bytes.");
 
 				return (static_cast<uint64_t>(value) & flag) == flag;
 			}
 
 			template <typename T>
-			static inline T ClearBitFlag(T value, unsigned int flag)
+			static inline T ClearBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
 			{
 				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
+				static_assert(sizeof(flag) == 8, "sizeof(flag) is not 8 bytes.");
 
 				return (static_cast<uint64_t>(value) & (~flag));
 			}
@@ -222,17 +224,19 @@ namespace bitUtil
 		{
 			/// Internal function used by bitUtil::IsBitFlagSet.
 			template <typename T>
-			static inline bool IsBitFlagSet(T value, unsigned int flag)
+			static inline bool IsBitFlagSet(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
 			{
 				static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
+				static_assert(sizeof(flag) == 4, "sizeof(flag) is not 4 bytes.");
 
 				return (static_cast<uint32_t>(value) & flag) == flag;
 			}
 
 			template <typename T>
-			static inline T ClearBitFlag(T value, unsigned int flag)
+			static inline T ClearBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
 			{
 				static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
+				static_assert(sizeof(flag) == 4, "sizeof(flag) is not 4 bytes.");
 
 				return (static_cast<uint32_t>(value) & (~flag));
 			}
@@ -391,14 +395,14 @@ namespace bitUtil
 
 
 	template <typename T>
-	inline bool IsBitFlagSet(T value, unsigned int flag)
+	inline bool IsBitFlagSet(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
 	{
 		return internal::Implementation<sizeof(T)>::IsBitFlagSet(value, flag);
 	}
 
 
 	template <typename T>
-	inline T ClearBitFlag(T value, unsigned int flag)
+	inline T ClearBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
 	{
 		// defer the implementation to the correct helper template, based on the size of the type
 		return internal::Implementation<sizeof(T)>::ClearBitFlag(value, flag);
