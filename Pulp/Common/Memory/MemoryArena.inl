@@ -8,15 +8,15 @@ MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTracking
 	, m_isFrozen(false)
 {
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-	m_statistics.m_arenaName = name;
-	m_statistics.m_arenaType = "MemoryArena";
-	m_statistics.m_threadPolicyType = ThreadPolicy::TYPE_NAME;
-	m_statistics.m_boundsCheckingPolicyType = BoundsCheckingPolicy::TYPE_NAME;
-	m_statistics.m_memoryTrackingPolicyType = MemoryTrackingPolicy::TYPE_NAME;
-	m_statistics.m_memoryTaggingPolicyType = MemoryTaggingPolicy::TYPE_NAME;
-	m_statistics.m_allocatorStatistics = allocator->getStatistics();
-	m_statistics.m_trackingOverhead = 0;
-	m_statistics.m_boundsCheckingOverhead = 0;
+	m_statistics.arenaName_ = name;
+	m_statistics.arenaType_ = "MemoryArena";
+	m_statistics.threadPolicyType_ = ThreadPolicy::TYPE_NAME;
+	m_statistics.boundsCheckingPolicyType_ = BoundsCheckingPolicy::TYPE_NAME;
+	m_statistics.memoryTrackingPolicyType_ = MemoryTrackingPolicy::TYPE_NAME;
+	m_statistics.memoryTaggingPolicyType_ = MemoryTaggingPolicy::TYPE_NAME;
+	m_statistics.allocatorStatistics_ = allocator->getStatistics();
+	m_statistics.trackingOverhead_ = 0;
+	m_statistics.boundsCheckingOverhead_ = 0;
 #endif
 }
 
@@ -79,9 +79,9 @@ void* MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTr
 	m_boundsChecker.GuardBack(as_void);
 
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-	m_statistics.m_allocatorStatistics = m_allocator->getStatistics();
-	m_statistics.m_trackingOverhead += MemoryTrackingPolicy::PER_ALLOCATION_OVERHEAD;
-	m_statistics.m_boundsCheckingOverhead += BoundsCheckingPolicy::SIZE_FRONT + BoundsCheckingPolicy::SIZE_BACK;
+	m_statistics.allocatorStatistics_ = m_allocator->getStatistics();
+	m_statistics.trackingOverhead_ += MemoryTrackingPolicy::PER_ALLOCATION_OVERHEAD;
+	m_statistics.boundsCheckingOverhead_ += BoundsCheckingPolicy::SIZE_FRONT + BoundsCheckingPolicy::SIZE_BACK;
 #endif
 
 	m_threadGuard.Leave();
@@ -125,9 +125,9 @@ void MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTra
 		m_allocator->free(originalRawMemory);
 
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-		m_statistics.m_allocatorStatistics = m_allocator->getStatistics();
-		m_statistics.m_trackingOverhead -= MemoryTrackingPolicy::PER_ALLOCATION_OVERHEAD;
-		m_statistics.m_boundsCheckingOverhead -= BoundsCheckingPolicy::SIZE_FRONT + BoundsCheckingPolicy::SIZE_BACK;
+		m_statistics.allocatorStatistics_ = m_allocator->getStatistics();
+		m_statistics.trackingOverhead_ -= MemoryTrackingPolicy::PER_ALLOCATION_OVERHEAD;
+		m_statistics.boundsCheckingOverhead_ -= BoundsCheckingPolicy::SIZE_FRONT + BoundsCheckingPolicy::SIZE_BACK;
 #endif
 
 		m_threadGuard.Leave();
@@ -154,7 +154,7 @@ MemoryAllocatorStatistics MemoryArena<AllocationPolicy, ThreadPolicy, BoundsChec
 	MemoryTrackingPolicy, MemoryTaggingPolicy>::getAllocatorStatistics(bool children) const
 {
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-	MemoryAllocatorStatistics stats = m_statistics.m_allocatorStatistics;
+	MemoryAllocatorStatistics stats = m_statistics.allocatorStatistics_;
 
 	if (children) 
 	{
