@@ -396,6 +396,11 @@ TYPED_TEST(BitTest, Count) {
 	EXPECT_TRUE(bitUtil::CountBits(0x2824122A) == 9);
 	EXPECT_TRUE(bitUtil::CountBits(0xF1481669) == 14);
 
+	// 64 bit ones
+	EXPECT_TRUE(bitUtil::CountBits(0x24020820F1481669llu) == 19);
+	EXPECT_TRUE(bitUtil::CountBits(0x24022820F1481669llu) == 20);
+	EXPECT_TRUE(bitUtil::CountBits(0x24022820F1481660llu) == 18);
+	EXPECT_TRUE(bitUtil::CountBits(0x24F21822F1481669llu) == 25);
 }
 
 TYPED_TEST(BitTest, PowerOfTwo) {
