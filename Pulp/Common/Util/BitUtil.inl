@@ -70,9 +70,9 @@ namespace bitUtil
 			{
 				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
 
-				uint32_t v = static_cast<uint32_t>(value) - ((static_cast<uint32_t>(value) >> 1u) & 0x5555555555555555UL);
-				v = (v & 0x3333333333333333UL) + ((v >> 2) & 0x3333333333333333UL);
-				return (((v + (v >> 4u) & 0xF0F0F0F0F0F0F0FUL) * 0x101010101010101UL) >> 56);
+				uint64_t v = static_cast<uint64_t>(value)-((static_cast<uint64_t>(value) >> 1ui64) & 0x5555555555555555ui64);
+				v = (v & 0x3333333333333333ui64) + ((v >> 2ui64) & 0x3333333333333333ui64);
+				return (((v + (v >> 4ui64) & 0xF0F0F0F0F0F0F0Fui64) * 0x101010101010101ui64) >> 56ui64);
 			}
 
 			/// Internal function used by bitUtil::ScanBits.
