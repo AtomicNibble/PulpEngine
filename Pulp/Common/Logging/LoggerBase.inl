@@ -2,24 +2,24 @@
 
 inline void LoggerBase::SetPrevious(LoggerBase* logger)
 {
-	m_previous = logger;
+	previous_ = logger;
 }
 
 inline void LoggerBase::SetNext(LoggerBase* logger)
 {
-	m_next = logger;
+	next_ = logger;
 }
 
 
 inline LoggerBase* LoggerBase::GetPrevious(void) const
 {
-	return m_previous;
+	return previous_;
 }
 
 
 inline LoggerBase* LoggerBase::GetNext(void) const
 {
-	return m_next;
+	return next_;
 }
 
 /// ----------------------------------------------------------------------------------
