@@ -58,7 +58,7 @@ TYPED_TEST(BitTest, IsBitFlagSet)
 
 	for (i = 0; i < numBits; i++)
 	{
-		EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, static_cast<TestFlags::Enum>(i)));
+		EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, static_cast<TestFlags::Enum>(i + 1)));
 	}
 }
 
