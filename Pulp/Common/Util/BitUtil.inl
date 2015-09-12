@@ -181,7 +181,8 @@ namespace bitUtil
 				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
 
 				const uint64_t mask = ~(((1ui64 << howMany) - 1ui64) << startBit);
-				return (static_cast<T>((static_cast<uint64_t>(value) & mask) | (static_cast<uint64_t>(bits) << startBit)));
+				uint64_t cappedBits = howMany == 64 ? bits : static_cast<uint64_t>(bits)& ((1ui64 << howMany) - 1ui64);
+				return (static_cast<T>((static_cast<uint64_t>(value) & mask) | (cappedBits << startBit)));
 			}
 
 			/// Internal function used by bitUtil::IsBitSet.
@@ -294,7 +295,8 @@ namespace bitUtil
 				static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
 
 				const uint32_t mask = ~(((1u << howMany) - 1u) << startBit);
-				return (static_cast<T>((static_cast<uint32_t>(value) & mask) | (static_cast<uint32_t>(bits) << startBit)));
+				uint32_t cappedBits = howMany == 32 ? bits : static_cast<uint32_t>(bits)& ((1u << howMany) - 1u);
+				return (static_cast<T>((static_cast<uint32_t>(value)& mask) | (cappedBits << startBit)));
 			}
 
 			/// Internal function used by bitUtil::CountBits.
