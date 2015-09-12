@@ -25,6 +25,236 @@ class BitTest : public ::testing::Test {
 public:
 };
 
+namespace
+{
+	#define BIT_FLAG(idx, data) FLAG_##idx = BIT(idx),
+	#define BIT_FLAG64(idx, data) FLAG_##idx = ( 1llu << ( idx ) ),
+
+	struct TestFlags
+	{
+		enum Enum : uint32_t
+		{
+			X_PP_REPEAT(32, BIT_FLAG, 0)
+		};
+	};
+
+	struct TestFlags64
+	{
+		enum Enum : uint64_t
+		{
+			X_PP_REPEAT(64, BIT_FLAG64, 0)
+		};
+	};
+
+} // namespace
+
+
+TYPED_TEST(BitTest, IsBitFlagSet)
+{
+	TypeParam flag = 0;
+
+	const size_t numBits = sizeof(TypeParam) * 8;
+	size_t i;
+
+	for (i = 0; i < numBits; i++)
+	{
+		EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, static_cast<TestFlags::Enum>(i)));
+	}
+}
+
+TEST(BitTest, IsBitFlagSet32)
+{
+	uint32_t flag = 0;
+
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_1));
+
+	flag = TestFlags::FLAG_1;
+
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_1));
+
+	flag = TestFlags::FLAG_22 | TestFlags::FLAG_31 | TestFlags::FLAG_14;
+
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_22));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_31));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_14));
+
+	flag = bitUtil::ClearBitFlag(flag, TestFlags::FLAG_31);
+
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_31));
+}
+
+
+TEST(BitTest, IsBitFlagSet64)
+{
+	uint64_t flag = 0;
+
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_1));
+
+	flag = TestFlags64::FLAG_1;
+
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_1));
+
+	flag = TestFlags64::FLAG_22 | TestFlags64::FLAG_31 | TestFlags64::FLAG_14;
+
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_22));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_31));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_14));
+
+	flag = bitUtil::ClearBitFlag(flag, TestFlags64::FLAG_31);
+
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_31));
+
+	flag = TestFlags64::FLAG_63 | TestFlags64::FLAG_57 | TestFlags64::FLAG_44;
+
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_22));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_14));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_63));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_57));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_44));
+}
+
+
+TYPED_TEST(BitTest, ClearBitFlag32)
+{
+	uint32_t flag = 0;
+
+	flag = TestFlags::FLAG_1 | TestFlags::FLAG_22 |
+		TestFlags::FLAG_31 | TestFlags::FLAG_14;
+
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_1));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_22));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_31));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_14));
+
+	flag = bitUtil::ClearBitFlag(flag, TestFlags::FLAG_1);
+
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_1));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_22));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_31));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_14));
+
+	flag = bitUtil::ClearBitFlag(flag, TestFlags::FLAG_22);
+
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_1));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_22));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_31));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_14));
+
+	flag = bitUtil::ClearBitFlag(flag, TestFlags::FLAG_31);
+
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_1));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_22));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_31));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_14));
+
+	flag = bitUtil::ClearBitFlag(flag, TestFlags::FLAG_14);
+
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_1));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_22));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_31));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags::FLAG_14));
+
+	EXPECT_EQ(0u, flag);
+}
+
+TYPED_TEST(BitTest, ClearBitFlag64)
+{
+	uint64_t flag = 0;
+
+	flag = TestFlags64::FLAG_1 | TestFlags64::FLAG_22 |
+		TestFlags64::FLAG_31 | TestFlags64::FLAG_14 |
+		TestFlags64::FLAG_63 | TestFlags64::FLAG_50 |
+		TestFlags64::FLAG_32;
+
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_1));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_22));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_31));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_14));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_63));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_50));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_32));
+
+	flag = bitUtil::ClearBitFlag(flag, TestFlags64::FLAG_1);
+
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_1));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_22));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_31));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_14));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_63));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_50));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_32));
+
+	flag = bitUtil::ClearBitFlag(flag, TestFlags64::FLAG_22);
+
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_1));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_22));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_31));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_14));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_63));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_50));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_32));
+
+	flag = bitUtil::ClearBitFlag(flag, TestFlags64::FLAG_31);
+
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_1));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_22));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_31));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_14));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_63));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_50));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_32));
+
+	flag = bitUtil::ClearBitFlag(flag, TestFlags64::FLAG_14);
+
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_1));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_22));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_31));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_14));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_63));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_50));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_32));
+
+	flag = bitUtil::ClearBitFlag(flag, TestFlags64::FLAG_63);
+
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_1));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_22));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_31));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_14));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_63));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_50));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_32));
+
+	flag = bitUtil::ClearBitFlag(flag, TestFlags64::FLAG_50);
+
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_1));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_22));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_31));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_14));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_63));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_50));
+	EXPECT_TRUE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_32));
+
+	flag = bitUtil::ClearBitFlag(flag, TestFlags64::FLAG_32);
+
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_1));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_22));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_31));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_14));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_63));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_50));
+	EXPECT_FALSE(bitUtil::IsBitFlagSet(flag, TestFlags64::FLAG_32));
+
+	EXPECT_EQ(0llu , flag);
+}
+
+
+TYPED_TEST(BitTest, ReplaceBits)
+{
+
+
+}
+
+
 TYPED_TEST(BitTest, IsSet) {
 
 	TypeParam val = 0;
