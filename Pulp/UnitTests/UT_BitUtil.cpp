@@ -466,8 +466,8 @@ TYPED_TEST(BitTest, SignedBit)
 	EXPECT_TRUE(bitUtil::isSignBitSet(-626363));
 	EXPECT_TRUE(bitUtil::isSignBitSet(-3));
 	EXPECT_TRUE(bitUtil::isSignBitSet(-1));
-	EXPECT_TRUE(bitUtil::isSignBitSet(4294967295));
-	EXPECT_TRUE(bitUtil::isSignBitSet(2537551548));
+	EXPECT_TRUE(bitUtil::isSignBitSet(4294967295u));
+	EXPECT_TRUE(bitUtil::isSignBitSet(2537551548u));
 
 
 	EXPECT_TRUE(bitUtil::isSignBitNotSet(62626));
