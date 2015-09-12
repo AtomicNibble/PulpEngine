@@ -248,12 +248,33 @@ TYPED_TEST(BitTest, ClearBitFlag64)
 }
 
 
-TYPED_TEST(BitTest, ReplaceBits)
+TEST(BitTest, ReplaceBits32)
 {
+	// we will test sending more set bits with a smaller num
+	// to check extra bits get chopped off.
 
+	// 1010 1010 - 1010 1010 - 0101 0101 - 0101 0101
+	uint32_t val = 0xAAAA5555;
+	uint32_t bits = 0xFFFFFFFF;
 
+	EXPECT_EQ(0xAAABFD55,bitUtil::ReplaceBits(val, 10, 8, bits));
+	EXPECT_EQ(0xFFFFFFFF, bitUtil::ReplaceBits(val, 0, 32, bits));
+	EXPECT_EQ(0xBAAA5555,bitUtil::ReplaceBits(val, 28, 1, bits));
 }
 
+TEST(BitTest, ReplaceBits64)
+{
+	// we will test sending more set bits with a smaller num
+	// to check extra bits get chopped off.
+
+	// 1010 1010 - 1010 1010 - 0101 0101 - 0101 0101
+	uint64_t val = 0xAAAA5555llu;
+	uint64_t bits = 0xFFFFFFFFllu;
+
+	EXPECT_EQ(0xAAABFD55llu, bitUtil::ReplaceBits(val, 10, 8, bits));
+	EXPECT_EQ(0xFFFFFFFFllu, bitUtil::ReplaceBits(val, 0, 32, bits));
+	EXPECT_EQ(0xBAAA5555llu, bitUtil::ReplaceBits(val, 28, 1, bits));
+}
 
 TYPED_TEST(BitTest, IsSet) {
 
