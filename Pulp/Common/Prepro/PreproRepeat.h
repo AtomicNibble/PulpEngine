@@ -68,6 +68,7 @@
 #define X_PP_REPEAT_61(op, data)				X_PP_REPEAT_60(op, data) op(60, data)
 #define X_PP_REPEAT_62(op, data)				X_PP_REPEAT_61(op, data) op(61, data)
 #define X_PP_REPEAT_63(op, data)				X_PP_REPEAT_62(op, data) op(62, data)
+#define X_PP_REPEAT_64(op, data)				X_PP_REPEAT_63(op, data) op(63, data)
 
 
 /// \def X_PP_REPEAT
