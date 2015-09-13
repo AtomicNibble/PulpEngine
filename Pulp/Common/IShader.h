@@ -286,17 +286,17 @@ struct XTexState
 	{
 		return 
 			*(uint64 *)&lhs == *(uint64 *)&rhs &&
-			lhs.m_dwBorderColor == rhs.m_dwBorderColor &&
-			lhs.m_bComparison == rhs.m_bComparison &&
-			lhs.m_bSRGBLookup == rhs.m_bSRGBLookup;
+			lhs.dwBorderColor_ == rhs.dwBorderColor_ &&
+			lhs.bComparison_ == rhs.bComparison_ &&
+			lhs.bSRGBLookup_ == rhs.bSRGBLookup_;
 	}
 
-	X_INLINE void Release() {
+	X_INLINE void Release(void) {
 		delete this;
 	}
 
-	X_INLINE void* getDeviceState() {
-		return m_pDeviceState;
+	X_INLINE void* getDeviceState(void) {
+		return pDeviceState_;
 	}
 
 	bool setFilterMode(FilterMode::Enum filter);
@@ -305,7 +305,7 @@ struct XTexState
 		TextureAddressMode::Enum addressW);
 	void setBorderColor(Color8u color);
 	void setComparisonFilter(bool bEnable);
-	void postCreate();
+	void postCreate(void);
 
 private:
 
@@ -314,23 +314,23 @@ private:
 	X_PUSH_WARNING_LEVEL(3)
 	struct
 	{
-		signed char m_nMinFilter : 8;
-		signed char m_nMagFilter : 8;
-		signed char m_nMipFilter : 8;
-		signed char m_nAddressU : 8;
-		signed char m_nAddressV : 8;
-		signed char m_nAddressW : 8;
-		signed char m_nAnisotropy : 8;
-		signed char padding : 8;
+		signed char nMinFilter_ : 8;
+		signed char nMagFilter_ : 8;
+		signed char nMipFilter_ : 8;
+		signed char nAddressU_ : 8;
+		signed char nAddressV_ : 8;
+		signed char nAddressW_ : 8;
+		signed char nAnisotropy_ : 8;
+		signed char padding_ : 8;
 	};
 	X_POP_WARNING_LEVEL
 
-	Color8u m_dwBorderColor;
+	Color8u dwBorderColor_;
 
-	void* m_pDeviceState;
-	bool m_bActive;
-	bool m_bComparison;
-	bool m_bSRGBLookup;
+	void* pDeviceState_;
+	bool bActive_;
+	bool bComparison_;
+	bool bSRGBLookup_;
 };
 
 
