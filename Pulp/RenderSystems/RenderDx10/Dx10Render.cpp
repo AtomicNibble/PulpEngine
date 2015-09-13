@@ -19,15 +19,15 @@ DX11XRender g_Dx11D3D;
 
 DX11XRender::DX11XRender()  :
 #if X_DEBUG
-	m_d3dDebug(nullptr),
+	d3dDebug_(nullptr),
 #endif
 
-	m_ViewMat(),
-	m_ProMat(),
+	ViewMat_(),
+	ProMat_(),
 	BlendStates_(nullptr),
 	RasterStates_(nullptr),
 	DepthStates_(nullptr),
-	m_AuxGeo_(nullptr)
+	AuxGeo_(nullptr)
 {
 
 	gRenDev = this;
@@ -51,7 +51,7 @@ void DX11XRender::SetArenas(core::MemoryArenaBase* arena)
 	DepthStates_.setArena(arena);
 
 //	for (i = 0; i < shader::VertexFormat::Num; i++)
-//		m_State.vertexLayoutDescriptions[i].setArena(arena);
+//		State_.vertexLayoutDescriptions[i].setArena(arena);
 
 }
 
@@ -77,8 +77,8 @@ bool DX11XRender::Init(HWND hWnd,
 	SetArenas(g_rendererArena);
 
 
-	m_ViewMat.SetDepth(16);
-	m_ProMat.SetDepth(16);
+	ViewMat_.SetDepth(16);
+	ProMat_.SetDepth(16);
 
 
 	CurBlendState_ = (uint32_t)-1;
@@ -170,10 +170,10 @@ bool DX11XRender::Init(HWND hWnd,
 		numLevelsRequested,
 		D3D11_SDK_VERSION,
 		&swapChainDesc,
-		&m_swapChain, 
-		&m_device,
+		&swapChain_, 
+		&device_,
 		&featureout,
-		&m_deviceContext
+		&deviceContext_
 		);
 
 	if (FAILED(result))
@@ -182,14 +182,14 @@ bool DX11XRender::Init(HWND hWnd,
 	}
 
 	// Get the pointer to the back buffer.
-	result = m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
+	result = swapChain_->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	// Create the render target view with the back buffer pointer.
-	result = m_device->CreateRenderTargetView(backBufferPtr, NULL, &m_renderTargetView);
+	result = device_->CreateRenderTargetView(backBufferPtr, NULL, &renderTargetView_);
 	if (FAILED(result))
 	{
 		return false;
@@ -213,7 +213,7 @@ bool DX11XRender::Init(HWND hWnd,
 	depthBufferDesc.MiscFlags = 0;
 
 	// Create the texture for the depth buffer using the filled out description.
-	result = m_device->CreateTexture2D(&depthBufferDesc, NULL, &m_depthStencilBuffer);
+	result = device_->CreateTexture2D(&depthBufferDesc, NULL, &depthStencilBuffer_);
 	if (FAILED(result))
 	{
 		return false;
@@ -275,7 +275,7 @@ bool DX11XRender::Init(HWND hWnd,
 	depthStencilViewDesc.Flags = D3D11_DSV_READ_ONLY_DEPTH;
 
 	// Create the depth stencil view.
-	result = m_device->CreateDepthStencilView(m_depthStencilBuffer, &depthStencilViewDesc, &m_depthStencilViewReadOnly);
+	result = device_->CreateDepthStencilView(depthStencilBuffer_, &depthStencilViewDesc, &depthStencilViewReadOnly_);
 	if (FAILED(result))
 	{
 		return false;
@@ -289,14 +289,14 @@ bool DX11XRender::Init(HWND hWnd,
 	depthStencilViewDesc.Flags = 0;
 
 	// Create the depth stencil view.
-	result = m_device->CreateDepthStencilView(m_depthStencilBuffer, &depthStencilViewDesc, &m_depthStencilView);
+	result = device_->CreateDepthStencilView(depthStencilBuffer_, &depthStencilViewDesc, &depthStencilView_);
 	if (FAILED(result))
 	{
 		return false;
 	}
 
 	// Bind the render target view and depth stencil buffer to the output render pipeline.
-	m_deviceContext->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
+	deviceContext_->OMSetRenderTargets(1, &renderTargetView_, depthStencilView_);
 
 	// Setup the raster description which will determine how and what polygons will be drawn.
 	raster.Desc.AntialiasedLineEnable = false;
@@ -312,7 +312,7 @@ bool DX11XRender::Init(HWND hWnd,
 	
 
 	// Create the rasterizer state from the description we just filled out.
-	// result = m_device->CreateRasterizerState(&rasterDesc, &m_rasterState);
+	// result = device_->CreateRasterizerState(&rasterDesc, &m_rasterState);
 	if (!SetRasterState(raster))
 	{
 		return false;
@@ -341,7 +341,7 @@ bool DX11XRender::Init(HWND hWnd,
 
 
 	// Create the viewport.
-	m_deviceContext->RSSetViewports(1, &viewport);
+	deviceContext_->RSSetViewports(1, &viewport);
 
 	// Setup the projection matrix.
 	fieldOfView = (float)D3DX_PI / 4.0f;
@@ -352,7 +352,7 @@ bool DX11XRender::Init(HWND hWnd,
 	}
 
 #if X_DEBUG
-	if (SUCCEEDED(m_device->QueryInterface(__uuidof(ID3D11Debug), (void**)&m_d3dDebug)))
+	if (SUCCEEDED(device_->QueryInterface(__uuidof(ID3D11Debug), (void**)&d3dDebug_)))
 	{
 		return true;
 	}
@@ -370,10 +370,10 @@ void DX11XRender::ShutDown()
 
 	// needs clearingh before zrender::Shutdown.
 	// as we have VB / IB to free.
-	if (m_AuxGeo_) {
-		m_AuxGeo_->ReleaseDeviceObjects();
+	if (AuxGeo_) {
+		AuxGeo_->ReleaseDeviceObjects();
 		// might move
-		X_DELETE(m_AuxGeo_, g_rendererArena);
+		X_DELETE(AuxGeo_, g_rendererArena);
 	}
 
 	FreeDynamicBuffers();
@@ -383,8 +383,8 @@ void DX11XRender::ShutDown()
 
 
 	// clear the stacks
-	m_ViewMat.Clear();
-	m_ProMat.Clear();
+	ViewMat_.Clear();
+	ProMat_.Clear();
 
 	DxDeviceContext()->OMSetBlendState(nullptr, 0, 0xFFFFFFFF);
 	DxDeviceContext()->OMSetDepthStencilState(nullptr, 0);
@@ -404,59 +404,59 @@ void DX11XRender::ShutDown()
 
 	RenderResources_.free();
 
-	m_State.~RenderState();
+	State_.~RenderState();
 	// --------------------------
 
 
 	// Before shutting down set to windowed mode or when releasing the swap chain it will throw an exception.
-	if (m_swapChain)
+	if (swapChain_)
 	{
-		m_swapChain->SetFullscreenState(false, NULL);
+		swapChain_->SetFullscreenState(false, NULL);
 	}
 
-	if (m_depthStencilView)
+	if (depthStencilView_)
 	{
-		m_depthStencilView->Release();
-		m_depthStencilView = 0;
+		depthStencilView_->Release();
+		depthStencilView_ = 0;
 	}
 
-	if (m_depthStencilBuffer)
+	if (depthStencilBuffer_)
 	{
-		m_depthStencilBuffer->Release();
-		m_depthStencilBuffer = 0;
+		depthStencilBuffer_->Release();
+		depthStencilBuffer_ = 0;
 	}
 
-	if (m_renderTargetView)
+	if (renderTargetView_)
 	{
-		m_renderTargetView->Release();
-		m_renderTargetView = 0;
+		renderTargetView_->Release();
+		renderTargetView_ = 0;
 	}
 
-	if (m_swapChain)
+	if (swapChain_)
 	{
-		m_swapChain->Release();
-		m_swapChain = 0;
+		swapChain_->Release();
+		swapChain_ = 0;
 	}
 
-	if (m_deviceContext)
+	if (deviceContext_)
 	{
-		m_deviceContext->ClearState();
-		m_deviceContext->Flush();
-		m_deviceContext->Release();
-		m_deviceContext = nullptr;
+		deviceContext_->ClearState();
+		deviceContext_->Flush();
+		deviceContext_->Release();
+		deviceContext_ = nullptr;
 	}
 
-	if (m_device)
+	if (device_)
 	{
-		m_device->Release();
-		m_device = 0;
+		device_->Release();
+		device_ = 0;
 	}
 
 #if X_DEBUG
-	if (m_d3dDebug)
+	if (d3dDebug_)
 	{
-		m_d3dDebug->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL | D3D11_RLDO_SUMMARY);
-		m_d3dDebug->Release();
+		d3dDebug_->ReportLiveDeviceObjects(D3D11_RLDO_DETAIL | D3D11_RLDO_SUMMARY);
+		d3dDebug_->Release();
 	}
 	else
 	{
@@ -481,8 +481,8 @@ bool DX11XRender::OnPostCreateDevice(void)
 	InitResources();
 
 
-	m_AuxGeo_ = X_NEW(XRenderAuxImp, g_rendererArena, "AuxGeo")(*this);
-	m_AuxGeo_->RestoreDeviceObjects();
+	AuxGeo_ = X_NEW(XRenderAuxImp, g_rendererArena, "AuxGeo")(*this);
+	AuxGeo_->RestoreDeviceObjects();
 	return true;
 }
 
@@ -555,17 +555,17 @@ void DX11XRender::RenderBegin()
 
 	XRender::RenderBegin();
 
-	X_ASSERT(m_ViewMat.getDepth() == 0, "stack depth is not zero at start of frame")(m_ViewMat.getDepth());
-	X_ASSERT(m_ProMat.getDepth() == 0, "stack depth is not zero at start of frame")(m_ProMat.getDepth());
+	X_ASSERT(ViewMat_.getDepth() == 0, "stack depth is not zero at start of frame")(ViewMat_.getDepth());
+	X_ASSERT(ProMat_.getDepth() == 0, "stack depth is not zero at start of frame")(ProMat_.getDepth());
 
 	texture::XTexture::setDefaultFilterMode(shader::FilterMode::TRILINEAR);
 
 	Colorf clear_col(0.057f, 0.221f, 0.400f);
 
 	// Clear the back buffer.
-	m_deviceContext->ClearRenderTargetView(m_renderTargetView, clear_col);
+	deviceContext_->ClearRenderTargetView(renderTargetView_, clear_col);
 	// Clear the depth buffer.
-	m_deviceContext->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
+	deviceContext_->ClearDepthStencilView(depthStencilView_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
 
 }
@@ -576,16 +576,16 @@ void DX11XRender::RenderEnd()
 	XRender::RenderEnd();
 
 
-	if (m_AuxGeo_) {
-	//	m_AuxGeo_->GetRenderAuxGeom()->flush();
-		m_AuxGeo_->GetRenderAuxGeom()->Reset();
+	if (AuxGeo_) {
+	//	AuxGeo_->GetRenderAuxGeom()->flush();
+		AuxGeo_->GetRenderAuxGeom()->Reset();
 	}
 
 // slow as goat cus if large sleep.
 //	this->rThread()->syncMainWithRender();
 
 
-	m_swapChain->Present(0, 0);
+	swapChain_->Present(0, 0);
 }
 
 
@@ -601,14 +601,14 @@ bool DX11XRender::DefferedBegin()
 
 	Colorf clear_col(0.0f, 0.f, 0.0f);
 
-	m_deviceContext->ClearRenderTargetView(pViews[0], clear_col);
-	m_deviceContext->ClearRenderTargetView(pViews[1], clear_col);
-	m_deviceContext->ClearRenderTargetView(pViews[2], clear_col);
+	deviceContext_->ClearRenderTargetView(pViews[0], clear_col);
+	deviceContext_->ClearRenderTargetView(pViews[1], clear_col);
+	deviceContext_->ClearRenderTargetView(pViews[2], clear_col);
 
 
 	SetZPass();
 
-	m_deviceContext->OMSetRenderTargets(3, pViews, m_depthStencilView);
+	deviceContext_->OMSetRenderTargets(3, pViews, depthStencilView_);
 
 	return true;
 }
@@ -625,12 +625,12 @@ bool DX11XRender::DefferedEnd()
 
 	// switch the render target back
 	ID3D11RenderTargetView* pViewsReset[3] = {
-		m_renderTargetView,
+		renderTargetView_,
 		NULL,
 		NULL,
 	};
 
-	m_deviceContext->OMSetRenderTargets(3, pViewsReset, m_depthStencilView);
+	deviceContext_->OMSetRenderTargets(3, pViewsReset, depthStencilView_);
 
 	SetCullMode(CullMode::NONE);
 
@@ -698,8 +698,8 @@ void DX11XRender::Set2D(bool enable, float znear, float zfar)
 		// we need the screen dimensions so that we can multiple 
 		// the values by the correct amount.
 		
-		m_ProMat.Push();
-		m = m_ProMat.GetTop();
+		ProMat_.Push();
+		m = ProMat_.GetTop();
 
 		float width = getWidthf();
 		float height = getHeightf();
@@ -708,11 +708,11 @@ void DX11XRender::Set2D(bool enable, float znear, float zfar)
 
 		// want a identiy view.
 		PushViewMatrix();
-		m_ViewMat.LoadIdentity();
+		ViewMat_.LoadIdentity();
 
 
 	} else {
-		m_ProMat.Pop();
+		ProMat_.Pop();
 		PopViewMatrix();
 	}
 
@@ -769,11 +769,11 @@ void DX11XRender::SetCamera(const XCamera& cam)
 //	Vec3f vUp = Vec3f(0,0,1);
 
 	// View
-	Matrix44f* pView = m_ViewMat.GetTop();
+	Matrix44f* pView = ViewMat_.GetTop();
 	MatrixLookAtRH(pView, vEye, vAt, vUp);
 
 	// Proj
-	Matrix44f* pProj = m_ProMat.GetTop();
+	Matrix44f* pProj = ProMat_.GetTop();
 	MatrixPerspectiveFovRH(pProj, fov, ProjectionRatio, 1.0f, 6000.0f);
 
 
@@ -868,7 +868,7 @@ bool DX11XRender::Create2DTexture(texture::XTextureFile* img_data, texture::XDev
 		}
 	}
 
-	hr = m_device->CreateTexture2D(&Desc, pSubResource, &pTexture2D);
+	hr = device_->CreateTexture2D(&Desc, pSubResource, &pTexture2D);
 
 
 	// worky?
@@ -957,7 +957,7 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 
 	for (i = 0; i < max; i++)
 	{
-		RenderState::XVertexLayout& layout = m_State.vertexLayoutDescriptions[i];
+		RenderState::XVertexLayout& layout = State_.vertexLayoutDescriptions[i];
 
 		// for now all positions are just 32bit floats baby!
 		elem_pos.AlignedByteOffset = 0;
@@ -1095,9 +1095,9 @@ HRESULT DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFm
 	ID3DBlob* pBlob = nullptr;
 	HRESULT hr;
 
-	if (m_State.vertexLayoutCache[vertexFmt] == nullptr)
+	if (State_.vertexLayoutCache[vertexFmt] == nullptr)
 	{
-		RenderState::XVertexLayout& layout = m_State.vertexLayoutDescriptions[vertexFmt];
+		RenderState::XVertexLayout& layout = State_.vertexLayoutDescriptions[vertexFmt];
 
 		if (layout.isEmpty())
 		{
@@ -1109,7 +1109,7 @@ HRESULT DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFm
 		// lets not require a Hardware shader bet set.
 		// only a current tech.
 #if 1
-		if (!m_State.pCurShader || !m_State.pCurShaderTech) {
+		if (!State_.pCurShader || !State_.pCurShaderTech) {
 			X_ERROR("Render", "Failed to set input layout no shader currently set.");
 			return (HRESULT)-1;
 		}
@@ -1117,7 +1117,7 @@ HRESULT DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFm
 		// get the required ILfmt for the vertex fmt.
 		shader::InputLayoutFormat::Enum requiredIlFmt = shader::ILfromVertexFormat(vertexFmt);
 		// get the tech
-		shader::XShaderTechnique* pTech = m_State.pCurShaderTech;
+		shader::XShaderTechnique* pTech = State_.pCurShaderTech;
 		// find one that fits.
 		for (auto& it : pTech->hwTechs)
 		{
@@ -1159,12 +1159,12 @@ HRESULT DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFm
 		ID3DBlob* pBlob = shader::XHWShader_Dx10::pCurVS_->getshaderBlob();
 #endif
 
-		if (FAILED(hr = m_device->CreateInputLayout(
+		if (FAILED(hr = device_->CreateInputLayout(
 				layout.ptr(),
 				(uint)layout.size(),
 				pBlob->GetBufferPointer(),
 				pBlob->GetBufferSize(),
-				&m_State.vertexLayoutCache[vertexFmt]))
+				&State_.vertexLayoutCache[vertexFmt]))
 			)
 		{
 			const char* pShaderName = shader::XHWShader_Dx10::pCurVS_->getName();
@@ -1188,17 +1188,17 @@ HRESULT DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFm
 		}
 
 		// debug name
-		D3DDebug::SetDebugObjectName(m_State.vertexLayoutCache[vertexFmt],
+		D3DDebug::SetDebugObjectName(State_.vertexLayoutCache[vertexFmt],
 			shader::VertexFormat::toString(vertexFmt));
 	}
 
-	pLayout = m_State.vertexLayoutCache[vertexFmt];
+	pLayout = State_.vertexLayoutCache[vertexFmt];
 
-	if (m_State.pCurrentVertexFmt != pLayout)
+	if (State_.pCurrentVertexFmt != pLayout)
 	{
-		m_State.pCurrentVertexFmt = pLayout;
-		m_State.CurrentVertexFmt = vertexFmt;
-		m_deviceContext->IASetInputLayout(pLayout);
+		State_.pCurrentVertexFmt = pLayout;
+		State_.CurrentVertexFmt = vertexFmt;
+		deviceContext_->IASetInputLayout(pLayout);
 	}
 
 	return S_OK;
@@ -1208,23 +1208,23 @@ void DX11XRender::FX_SetVStream(ID3D11Buffer* pVertexBuffer, VertexStream::Enum 
 	uint32 stride, uint32 offset)
 {
 	// check for redundant calls
-	RenderState::XStreamInfo& info = m_State.VertexStreams[streamSlot];
+	RenderState::XStreamInfo& info = State_.VertexStreams[streamSlot];
 	if (info.pBuf != pVertexBuffer || info.offset != offset)
 	{
 		info.pBuf = pVertexBuffer;
 		info.offset = offset;
 
-		m_deviceContext->IASetVertexBuffers(streamSlot, 1, &pVertexBuffer, &stride, &offset);
+		deviceContext_->IASetVertexBuffers(streamSlot, 1, &pVertexBuffer, &stride, &offset);
 	}
 }
 
 void DX11XRender::FX_SetIStream(ID3D11Buffer* pIndexBuffer)
 {
-	if (m_State.pIndexStream != pIndexBuffer)
+	if (State_.pIndexStream != pIndexBuffer)
 	{
-		m_State.pIndexStream = pIndexBuffer;
+		State_.pIndexStream = pIndexBuffer;
 
-		m_deviceContext->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
+		deviceContext_->IASetIndexBuffer(pIndexBuffer, DXGI_FORMAT_R16_UINT, 0);
 	}
 }
 
@@ -1252,10 +1252,10 @@ void DX11XRender::FX_UnBindVStream(ID3D11Buffer* pVertexBuffer)
 	uint32_t i;
 	for (i = 0; i < VertexStream::ENUM_COUNT; i++)
 	{
-		RenderState::XStreamInfo& info = m_State.VertexStreams[i];
+		RenderState::XStreamInfo& info = State_.VertexStreams[i];
 		if (info.pBuf == pVertexBuffer)
 		{
-			m_deviceContext->IASetVertexBuffers(i, 0, nullptr,  nullptr, nullptr);
+			deviceContext_->IASetVertexBuffers(i, 0, nullptr,  nullptr, nullptr);
 			info.pBuf = nullptr;
 		}
 	}
@@ -1266,9 +1266,9 @@ void DX11XRender::FX_UnBindIStream(ID3D11Buffer* pIndexBuffer)
 	// check if this index's are currently bound to the pipeline
 	// if so unset.
 
-	if (m_State.pIndexStream == pIndexBuffer) {
-		m_deviceContext->IASetIndexBuffer(nullptr, DXGI_FORMAT_R16_UINT, 0);
-		m_State.pIndexStream = nullptr;
+	if (State_.pIndexStream == pIndexBuffer) {
+		deviceContext_->IASetIndexBuffer(nullptr, DXGI_FORMAT_R16_UINT, 0);
+		State_.pIndexStream = nullptr;
 	}
 }
 
@@ -1314,7 +1314,7 @@ void DX11XRender::FX_DrawPrimitive(const PrimitiveType::Enum type,
 //	FX_SetIStream(nullptr);
 
 	SetPrimitiveTopology(nativeType);
-	m_deviceContext->Draw(VerticesCount, StartVertex);
+	deviceContext_->Draw(VerticesCount, StartVertex);
 }
 
 void DX11XRender::FX_DrawIndexPrimitive(const PrimitiveType::Enum type, const int IndexCount,
@@ -1351,12 +1351,12 @@ void DX11XRender::FX_DrawIndexPrimitive(const PrimitiveType::Enum type, const in
 	const D3D11_PRIMITIVE_TOPOLOGY nativeType = FX_ConvertPrimitiveType(type);
 
 	SetPrimitiveTopology(nativeType);
-	m_deviceContext->DrawIndexed(IndexCount, StartIndex, BaseVertexLocation);
+	deviceContext_->DrawIndexed(IndexCount, StartIndex, BaseVertexLocation);
 }
 
 IRenderAux* DX11XRender::GetIRenderAuxGeo(void)
 {
-	return m_AuxGeo_->GetRenderAuxGeom();
+	return AuxGeo_->GetRenderAuxGeom();
 }
 
 

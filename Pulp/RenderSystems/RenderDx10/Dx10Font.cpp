@@ -47,8 +47,8 @@ void DX11XRender::FontSetRenderingState()
 
 	inFontState = true;
 
-	m_ProMat.Push();
-	m = m_ProMat.GetTop();
+	ProMat_.Push();
+	m = ProMat_.GetTop();
 
 	float width = getWidthf();
 	float height = getHeightf();
@@ -58,8 +58,8 @@ void DX11XRender::FontSetRenderingState()
 	MatrixOrthoOffCenterRH(m, 0, width, height, 0, znear, zfar);
 
 
-	m_ViewMat.Push();
-	m_ViewMat.LoadIdentity();
+	ViewMat_.Push();
+	ViewMat_.LoadIdentity();
 	
 	SetCullMode(CullMode::NONE);
 	SetFontShader();
@@ -69,8 +69,8 @@ void DX11XRender::FontRestoreRenderingState()
 {
 	inFontState = false; // built in assert
 
-	m_ProMat.Pop();
-	m_ViewMat.Pop();
+	ProMat_.Pop();
+	ViewMat_.Pop();
 }
 
 

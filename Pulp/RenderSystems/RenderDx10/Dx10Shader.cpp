@@ -117,9 +117,9 @@ bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 
 			XShaderTechnique& tech = techs_[i];
 
-			rd->m_State.pCurShader = this;
-			rd->m_State.pCurShaderTech = &tech;
-			rd->m_State.CurShaderTechIdx = (int32)i;
+			rd->State_.pCurShader = this;
+			rd->State_.pCurShaderTech = &tech;
+			rd->State_.CurShaderTechIdx = (int32)i;
 
 
 			// work out which HW tech to used based on the flags :D !
@@ -164,7 +164,7 @@ bool XShader::FXBegin(uint32 *pPassCountOut, uint32 flags)
 	X_UNUSED(flags);
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 
-	if (!rd->m_State.pCurShader || !rd->m_State.pCurShaderTech) {
+	if (!rd->State_.pCurShader || !rd->State_.pCurShaderTech) {
 		X_WARNING("Shader", "can't begin technique, none set");
 		return false;
 	}
@@ -181,7 +181,7 @@ bool XShader::FXBeginPass(uint32 passIdx)
 	X_UNUSED(passIdx);
 
 	render::DX11XRender* rd = &render::g_Dx11D3D;
-	render::RenderState& state = rd->m_State;
+	render::RenderState& state = rd->State_;
 
 	if (!state.pCurShader || !state.pCurShaderTech) {
 		X_WARNING("Shader", "fail to start pass, none set");
@@ -270,7 +270,7 @@ bool XShader::FXEndPass()
 {
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 
-	rd->m_State.pCurShaderTech = nullptr;
+	rd->State_.pCurShaderTech = nullptr;
 	return true;
 }
 
@@ -278,8 +278,8 @@ bool XShader::FXEnd()
 {
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 
-	rd->m_State.pCurShaderTech = nullptr;
-	rd->m_State.pCurShader = nullptr;
+	rd->State_.pCurShaderTech = nullptr;
+	rd->State_.pCurShader = nullptr;
 	return true;
 }
 
@@ -291,12 +291,12 @@ bool XShader::FXSetVSFloat(const core::StrHash& NameParam,
 
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 
-	if (!rd->m_State.pCurShader || !rd->m_State.pCurShaderTech) {
+	if (!rd->State_.pCurShader || !rd->State_.pCurShaderTech) {
 		X_WARNING("Shader", "fail to setVSFloat no shaer / tech set");
 		return false;
 	}
 
-	XShaderTechnique* pTech = rd->m_State.pCurShaderTech;
+	XShaderTechnique* pTech = rd->State_.pCurShaderTech;
 	XShaderTechniqueHW* pHwTech = pTech->pCurHwTech;
 
 	if (!pHwTech) {

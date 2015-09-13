@@ -195,10 +195,10 @@ public:
 	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_OVERRIDE;
 
 	virtual void GetModelViewMatrix(Matrix44f* pMat) X_OVERRIDE {
-		*pMat = *m_ViewMat.GetTop();
+		*pMat = *ViewMat_.GetTop();
 	}
 	virtual void GetProjectionMatrix(Matrix44f* pMat) X_OVERRIDE {
-		*pMat = *m_ProMat.GetTop();
+		*pMat = *ProMat_.GetTop();
 	}
 
 	// States
@@ -358,30 +358,30 @@ public:
 
 	void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY topType)
 	{
-		if (m_CurTopology != topType)
+		if (CurTopology_ != topType)
 		{
-			m_CurTopology = topType;
-			m_deviceContext->IASetPrimitiveTopology(m_CurTopology);
+			CurTopology_ = topType;
+			deviceContext_->IASetPrimitiveTopology(CurTopology_);
 		}
 	}
 
 
 
 	X_INLINE ID3D11Device* DxDevice() const {
-		return m_device;
+		return device_;
 	}
 	X_INLINE ID3D11DeviceContext* DxDeviceContext() const {
-		return m_deviceContext;
+		return deviceContext_;
 	}
 
 	  
 	X_INLINE void PushViewMatrix()
 	{
-		m_ViewMat.Push();
+		ViewMat_.Push();
 	}
 	X_INLINE void PopViewMatrix()
 	{
-		m_ViewMat.Pop();
+		ViewMat_.Pop();
 		DirtyMatrix();
 	}
 	X_INLINE void DirtyMatrix()
@@ -390,10 +390,10 @@ public:
 	}
 
 	X_INLINE Matrix44f* pCurViewMat(void) {
-		return m_ViewMat.GetTop();
+		return ViewMat_.GetTop();
 	}
 	X_INLINE Matrix44f* pCurProjMat(void) {
-		return m_ProMat.GetTop();
+		return ProMat_.GetTop();
 	}
 
 	X_INLINE bool IsDeviceLost(void) const {
@@ -414,8 +414,8 @@ private:
 protected:
 
 
-	XMatrixStack m_ViewMat;
-	XMatrixStack m_ProMat;
+	XMatrixStack ViewMat_;
+	XMatrixStack ProMat_;
 
 	XDynamicVB<byte> DynVB_[VertexPool::PoolMax];
 
@@ -435,23 +435,23 @@ protected:
 
 protected:
 #if X_DEBUG
-	ID3D11Debug* m_d3dDebug;
+	ID3D11Debug* d3dDebug_;
 #endif
 
-	ID3D11Device* m_device;
-	ID3D11DeviceContext *m_deviceContext;
+	ID3D11Device* device_;
+	ID3D11DeviceContext* deviceContext_;
 
-	IDXGISwapChain* m_swapChain;
-	ID3D11RenderTargetView* m_renderTargetView;
-	ID3D11Texture2D* m_depthStencilBuffer;
-	ID3D11DepthStencilView* m_depthStencilViewReadOnly;
-	ID3D11DepthStencilView* m_depthStencilView;
+	IDXGISwapChain* swapChain_;
+	ID3D11RenderTargetView* renderTargetView_;
+	ID3D11Texture2D* depthStencilBuffer_;
+	ID3D11DepthStencilView* depthStencilViewReadOnly_;
+	ID3D11DepthStencilView* depthStencilView_;
 
-	D3D11_PRIMITIVE_TOPOLOGY m_CurTopology;
+	D3D11_PRIMITIVE_TOPOLOGY CurTopology_;
 
-	RenderState m_State;
+	RenderState State_;
 
-	XRenderAuxImp* m_AuxGeo_;
+	XRenderAuxImp* AuxGeo_;
 };
 
 

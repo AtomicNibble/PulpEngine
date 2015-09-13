@@ -85,7 +85,7 @@ void DX11XRender::RT_SetState(StateFlag state)
 	bool bDirtyDS = false;
 
 	int Changed;
-	Changed = state.ToInt() ^ m_State.currentState.ToInt();
+	Changed = state.ToInt() ^ State_.currentState.ToInt();
 
 
 	if (Changed & States::WIREFRAME)
@@ -293,7 +293,7 @@ void DX11XRender::RT_SetState(StateFlag state)
 	bDirtyBS |= bNewATOC ^ bCurATOC;
 	blend.Desc.AlphaToCoverageEnable = bNewATOC;
 
-	m_State.currentState = state;
+	State_.currentState = state;
 
 	if (bDirtyBS)
 		SetBlendState(blend);
@@ -307,7 +307,7 @@ void DX11XRender::RT_SetState(StateFlag state)
 
 void DX11XRender::RT_SetCullMode(CullMode::Enum mode)
 {
-	if (this->m_State.cullMode == mode)
+	if (this->State_.cullMode == mode)
 		return;
 
 	RasterState state = curRasterState();
@@ -325,7 +325,7 @@ void DX11XRender::RT_SetCullMode(CullMode::Enum mode)
 		break;
 	}
 
-	m_State.cullMode = mode;
+	State_.cullMode = mode;
 
 	SetRasterState(state);
 }
