@@ -29,9 +29,9 @@ class MallocFreeAllocator
 	/// to each allocation.
 	struct BlockHeader
 	{
-		void* m_originalAllocation;
-		size_t m_AllocationSize;
-		size_t m_originalSize;
+		void* originalAllocation_;
+		size_t AllocationSize_;
+		size_t originalSize_;
 	};
 
 

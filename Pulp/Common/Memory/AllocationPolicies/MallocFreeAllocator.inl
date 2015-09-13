@@ -13,5 +13,5 @@ inline size_t MallocFreeAllocator::getSize(void* allocation) const
 	};
 
 	as_void = allocation;
-	return as_header[-1].m_originalSize;
+	return as_header[-1].originalSize_;
 }

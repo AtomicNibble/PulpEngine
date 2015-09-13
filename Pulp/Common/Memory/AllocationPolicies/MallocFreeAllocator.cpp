@@ -53,9 +53,9 @@ void* MallocFreeAllocator::allocate(size_t Origsize, size_t alignment, size_t of
 		as_byte -= offset; // take off any offset.
 
 		// we have taken off offfset so now header is just at -1 index.
-		as_header[-1].m_originalAllocation = pMem;
-		as_header[-1].m_AllocationSize = size;
-		as_header[-1].m_originalSize = Origsize;
+		as_header[-1].originalAllocation_ = pMem;
+		as_header[-1].AllocationSize_ = size;
+		as_header[-1].originalSize_ = Origsize;
 
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
@@ -97,8 +97,10 @@ void MallocFreeAllocator::free(void* ptr)
 
 	
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	size_t AlignmentWaste = safe_static_cast<size_t>((uintptr_t)ptr - (uintptr_t)as_header->m_originalAllocation) - SIZE_OF_HEADER;
-	size_t Size = as_header->m_AllocationSize;
+	size_t AlignmentWaste = safe_static_cast<size_t>((uintptr_t)ptr - 
+		(uintptr_t)as_header->originalAllocation_) - SIZE_OF_HEADER;
+
+	size_t Size = as_header->AllocationSize_;
 
 	statistics_.allocationCount_--;
 	statistics_.virtualMemoryReserved_ -= Size;
@@ -108,7 +110,7 @@ void MallocFreeAllocator::free(void* ptr)
 	statistics_.wasteAlignment_ -= AlignmentWaste;
 #endif
 
-	::free( as_header->m_originalAllocation );
+	::free( as_header->originalAllocation_ );
 }
 
 
