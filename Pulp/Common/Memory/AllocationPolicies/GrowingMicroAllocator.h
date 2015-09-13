@@ -38,7 +38,6 @@ X_NAMESPACE_BEGIN(core)
 /// allocated physical memory, additional memory will be requested from the OS. The granularity with which the allocator
 /// grows is provided by the user.
 ///
-/// For more information about the virtual memory system, visit http://molecularmusings.wordpress.com/2012/10/02/memory-allocation-strategies-interlude-virtual-memory/.
 /// \remark Statistics gathering can be enabled/disabled via the preprocessor option \ref X_ENABLE_MEMORY_ALLOCATOR_STATISTICS.
 /// If statistics are disabled, the allocator will still return a valid MemoryAllocatorStatistics object which is
 /// initialized to its default values.

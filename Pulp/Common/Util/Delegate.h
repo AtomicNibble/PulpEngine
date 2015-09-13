@@ -66,7 +66,6 @@ X_NAMESPACE_BEGIN(core)
 /// Even though pointers-to-member-functions are more complex than ordinary pointers-to-functions in C++, the delegate
 /// system implementation manages to achieve the exact same speed for member functions as for free functions.
 ///
-/// For more details and an explanation of how the delegate system works internally, see http://molecularmusings.wordpress.com/2011/09/19/generic-type-safe-delegates-and-events-in-c/.
 /// \remark The header file Delegate.h is built from Delegate.gen.h and Delegate.gen using an automatic pre-build step.
 /// Do not attempt to change something in the Delegate.h header file directly - all changes will be lost.
 /// \sa Event

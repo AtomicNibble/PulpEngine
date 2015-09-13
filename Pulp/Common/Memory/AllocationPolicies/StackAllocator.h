@@ -36,7 +36,6 @@ X_NAMESPACE_BEGIN(core)
 ///
 /// Common usage scenarios for a stack allocator include per-level allocations which can easily be freed in reverse order.
 ///
-/// For more information about the stack allocator, visit http://molecularmusings.wordpress.com/2012/08/27/memory-allocation-strategies-a-stack-like-lifo-allocator/.
 /// \remark Statistics gathering can be enabled/disabled via the preprocessor option \ref X_ENABLE_MEMORY_ALLOCATOR_STATISTICS.
 /// If statistics are disabled, the allocator will still return a valid MemoryAllocatorStatistics object which is
 /// initialized to its default values.

@@ -29,7 +29,6 @@ X_NAMESPACE_BEGIN(core)
 /// Whenever the allocator grows and requests a new chunk of memory from the OS, the last N bytes are reserved
 /// for filling it with header data.
 ///
-/// For more information about the virtual memory system, visit http://molecularmusings.wordpress.com/2012/10/02/memory-allocation-strategies-interlude-virtual-memory/.
 /// \remark Statistics gathering can be enabled/disabled via the preprocessor option \ref X_ENABLE_MEMORY_ALLOCATOR_STATISTICS.
 /// If statistics are disabled, the allocator will still return a valid MemoryAllocatorStatistics object which is
 /// initialized to its default values.

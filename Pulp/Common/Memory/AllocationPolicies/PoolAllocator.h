@@ -41,7 +41,6 @@ X_NAMESPACE_BEGIN(core)
 /// Common usage scenarios for a pool allocator are situations in which lots of objects need to be allocated and freed
 /// in random order, such as dynamic gameplay elements, or things like bullet holes, contact points, etc.
 ///
-/// For more information about the pool allocator, visit http://molecularmusings.wordpress.com/2012/09/17/memory-allocation-strategies-a-pool-allocator/.
 /// \remark Statistics gathering can be enabled/disabled via the preprocessor option \ref X_ENABLE_MEMORY_ALLOCATOR_STATISTICS.
 /// If statistics are disabled, the allocator will still return a valid MemoryAllocatorStatistics object which is
 /// initialized to its default values.
