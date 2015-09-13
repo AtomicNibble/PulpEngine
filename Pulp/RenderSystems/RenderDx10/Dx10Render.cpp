@@ -24,9 +24,9 @@ DX11XRender::DX11XRender()  :
 
 	m_ViewMat(),
 	m_ProMat(),
-	m_BlendStates(nullptr),
-	m_RasterStates(nullptr),
-	m_DepthStates(nullptr),
+	BlendStates_(nullptr),
+	RasterStates_(nullptr),
+	DepthStates_(nullptr),
 	m_AuxGeo_(nullptr)
 {
 
@@ -46,9 +46,9 @@ void DX11XRender::SetArenas(core::MemoryArenaBase* arena)
 
 	XRender::SetArenas(arena);
 
-	m_BlendStates.setArena(arena);
-	m_RasterStates.setArena(arena);
-	m_DepthStates.setArena(arena);
+	BlendStates_.setArena(arena);
+	RasterStates_.setArena(arena);
+	DepthStates_.setArena(arena);
 
 //	for (i = 0; i < shader::VertexFormat::Num; i++)
 //		m_State.vertexLayoutDescriptions[i].setArena(arena);
@@ -81,9 +81,9 @@ bool DX11XRender::Init(HWND hWnd,
 	m_ProMat.SetDepth(16);
 
 
-	m_CurBlendState = (uint32_t)-1;
-	m_CurRasterState = (uint32_t)-1;
-	m_CurDepthState = (uint32_t)-1;
+	CurBlendState_ = (uint32_t)-1;
+	CurRasterState_ = (uint32_t)-1;
+	CurDepthState_ = (uint32_t)-1;
 
 
 	float fieldOfView, screenAspect;
@@ -391,16 +391,16 @@ void DX11XRender::ShutDown()
 	DxDeviceContext()->OMSetDepthStencilState(nullptr, 0);
 
 
-	for (i = 0; i < m_BlendStates.size(); ++i)
-		m_BlendStates[i].pState->Release();
-	for (i = 0; i < m_RasterStates.size(); ++i)
-		m_RasterStates[i].pState->Release();
-	for (i = 0; i < m_DepthStates.size(); ++i)
-		m_DepthStates[i].pState->Release();
+	for (i = 0; i < BlendStates_.size(); ++i)
+		BlendStates_[i].pState->Release();
+	for (i = 0; i < RasterStates_.size(); ++i)
+		RasterStates_[i].pState->Release();
+	for (i = 0; i < DepthStates_.size(); ++i)
+		DepthStates_[i].pState->Release();
 
-	m_BlendStates.free();
-	m_RasterStates.free();
-	m_DepthStates.free();
+	BlendStates_.free();
+	RasterStates_.free();
+	DepthStates_.free();
 
 	RenderResources_.free();
 

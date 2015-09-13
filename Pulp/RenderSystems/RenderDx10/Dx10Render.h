@@ -420,17 +420,17 @@ protected:
 	XDynamicVB<byte> DynVB_[VertexPool::PoolMax];
 
 	// States
-	core::Array<BlendState> m_BlendStates;
-	core::Array<RasterState> m_RasterStates;
-	core::Array<DepthState> m_DepthStates;
+	core::Array<BlendState> BlendStates_;
+	core::Array<RasterState> RasterStates_;
+	core::Array<DepthState> DepthStates_;
 
-	uint32_t m_CurBlendState;
-	uint32_t m_CurRasterState;
-	uint32_t m_CurDepthState;
+	uint32_t CurBlendState_;
+	uint32_t CurRasterState_;
+	uint32_t CurDepthState_;
 
-	BlendState& curBlendState() { return m_BlendStates[m_CurBlendState]; }
-	RasterState& curRasterState() { return m_RasterStates[m_CurRasterState]; }
-	DepthState& curDepthState() { return m_DepthStates[m_CurDepthState]; }
+	BlendState& curBlendState(void) { return BlendStates_[CurBlendState_]; }
+	RasterState& curRasterState(void) { return RasterStates_[CurRasterState_]; }
+	DepthState& curDepthState(void) { return DepthStates_[CurDepthState_]; }
 
 
 protected:
