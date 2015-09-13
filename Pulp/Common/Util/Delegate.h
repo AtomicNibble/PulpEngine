@@ -157,11 +157,11 @@ public:
 	{
 		/// Default constructor.
 		NonConstWrapper(C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		C* m_instance;
+		C* instance_;
 	};
 
 	/// Internal wrapper class used as a helper in Bind() overload resolution for const member functions.
@@ -170,17 +170,17 @@ public:
 	{
 		/// Default constructor.
 		ConstWrapper(const C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		const C* m_instance;
+		const C* instance_;
 	};
 
 
 	/// Default constructor.
 	Delegate(void)
-		: m_stub()
+		: stub_()
 	{
 	}
 
@@ -188,35 +188,35 @@ public:
 	template <R(*Function)()>
 	void Bind(void)
 	{
-		m_stub.instance.as_void = nullptr;
-		m_stub.function = &FunctionStub<Function>;
+		stub_.instance.as_void = nullptr;
+		stub_.function = &FunctionStub<Function>;
 	}
 
 	/// Binds a non-const class method to the delegate.
 	template <class C, R(C::*Function)()>
 	void Bind(NonConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_void = wrapper.m_instance;
-		m_stub.function = &ClassMethodStub<C, Function>;
+		stub_.instance.as_void = wrapper.instance_;
+		stub_.function = &ClassMethodStub<C, Function>;
 	}
 
 	/// Binds a const class method to the delegate.
 	template <class C, R(C::*Function)() const>
 	void Bind(ConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_const_void = wrapper.m_instance;
-		m_stub.function = &ConstClassMethodStub<C, Function>;
+		stub_.instance.as_const_void = wrapper.instance_;
+		stub_.function = &ConstClassMethodStub<C, Function>;
 	}
 
 	/// Invokes the delegate.
 	R Invoke() const
 	{
-		X_ASSERT(m_stub.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-		return m_stub.function(m_stub.instance);
+		X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+		return stub_.function(stub_.instance);
 	}
 
 private:
-	Stub m_stub;
+	Stub stub_;
 };
 
 
@@ -303,11 +303,11 @@ public:
 	{
 		/// Default constructor.
 		NonConstWrapper(C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		C* m_instance;
+		C* instance_;
 	};
 
 	/// Internal wrapper class used as a helper in Bind() overload resolution for const member functions.
@@ -316,17 +316,17 @@ public:
 	{
 		/// Default constructor.
 		ConstWrapper(const C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		const C* m_instance;
+		const C* instance_;
 	};
 
 
 	/// Default constructor.
 	Delegate(void)
-		: m_stub()
+		: stub_()
 	{
 	}
 
@@ -334,37 +334,37 @@ public:
 	template <R(*Function)(ARG0)>
 	void Bind(void)
 	{
-		m_stub.instance.as_void = nullptr;
-		m_stub.function = &FunctionStub<Function>;
+		stub_.instance.as_void = nullptr;
+		stub_.function = &FunctionStub<Function>;
 	}
 
 	/// Binds a non-const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0)>
 	void Bind(NonConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_void = wrapper.m_instance;
-		m_stub.function = &ClassMethodStub<C, Function>;
+		stub_.instance.as_void = wrapper.instance_;
+		stub_.function = &ClassMethodStub<C, Function>;
 	}
 
 	/// Binds a const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0) const>
 	void Bind(ConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_const_void = wrapper.m_instance;
-		m_stub.function = &ConstClassMethodStub<C, Function>;
+		stub_.instance.as_const_void = wrapper.instance_;
+		stub_.function = &ConstClassMethodStub<C, Function>;
 	}
 
 	/// Invokes the delegate.
 	R Invoke(ARG0 arg0) const
 	{
-		X_ASSERT(m_stub.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-		return m_stub.function(m_stub.instance, arg0);
+		X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+		return stub_.function(stub_.instance, arg0);
 	}
 
-	operator bool() const { return m_stub.function != nullptr; }
+	operator bool() const { return stub_.function != nullptr; }
 
 private:
-	Stub m_stub;
+	Stub stub_;
 };
 
 
@@ -452,11 +452,11 @@ public:
 	{
 		/// Default constructor.
 		NonConstWrapper(C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		C* m_instance;
+		C* instance_;
 	};
 
 	/// Internal wrapper class used as a helper in Bind() overload resolution for const member functions.
@@ -465,17 +465,17 @@ public:
 	{
 		/// Default constructor.
 		ConstWrapper(const C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		const C* m_instance;
+		const C* instance_;
 	};
 
 
 	/// Default constructor.
 	Delegate(void)
-		: m_stub()
+		: stub_()
 	{
 	}
 
@@ -483,35 +483,35 @@ public:
 	template <R(*Function)(ARG0, ARG1)>
 	void Bind(void)
 	{
-		m_stub.instance.as_void = nullptr;
-		m_stub.function = &FunctionStub<Function>;
+		stub_.instance.as_void = nullptr;
+		stub_.function = &FunctionStub<Function>;
 	}
 
 	/// Binds a non-const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0, ARG1)>
 	void Bind(NonConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_void = wrapper.m_instance;
-		m_stub.function = &ClassMethodStub<C, Function>;
+		stub_.instance.as_void = wrapper.instance_;
+		stub_.function = &ClassMethodStub<C, Function>;
 	}
 
 	/// Binds a const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0, ARG1) const>
 	void Bind(ConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_const_void = wrapper.m_instance;
-		m_stub.function = &ConstClassMethodStub<C, Function>;
+		stub_.instance.as_const_void = wrapper.instance_;
+		stub_.function = &ConstClassMethodStub<C, Function>;
 	}
 
 	/// Invokes the delegate.
 	R Invoke(ARG0 arg0, ARG1 arg1) const
 	{
-		X_ASSERT(m_stub.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-		return m_stub.function(m_stub.instance, arg0, arg1);
+		X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+		return stub_.function(stub_.instance, arg0, arg1);
 	}
 
 private:
-	Stub m_stub;
+	Stub stub_;
 };
 
 
@@ -598,11 +598,11 @@ public:
 	{
 		/// Default constructor.
 		NonConstWrapper(C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		C* m_instance;
+		C* instance_;
 	};
 
 	/// Internal wrapper class used as a helper in Bind() overload resolution for const member functions.
@@ -611,17 +611,17 @@ public:
 	{
 		/// Default constructor.
 		ConstWrapper(const C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		const C* m_instance;
+		const C* instance_;
 	};
 
 
 	/// Default constructor.
 	Delegate(void)
-		: m_stub()
+		: stub_()
 	{
 	}
 
@@ -629,35 +629,35 @@ public:
 	template <R(*Function)(ARG0, ARG1, ARG2)>
 	void Bind(void)
 	{
-		m_stub.instance.as_void = nullptr;
-		m_stub.function = &FunctionStub<Function>;
+		stub_.instance.as_void = nullptr;
+		stub_.function = &FunctionStub<Function>;
 	}
 
 	/// Binds a non-const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0, ARG1, ARG2)>
 	void Bind(NonConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_void = wrapper.m_instance;
-		m_stub.function = &ClassMethodStub<C, Function>;
+		stub_.instance.as_void = wrapper.instance_;
+		stub_.function = &ClassMethodStub<C, Function>;
 	}
 
 	/// Binds a const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0, ARG1, ARG2) const>
 	void Bind(ConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_const_void = wrapper.m_instance;
-		m_stub.function = &ConstClassMethodStub<C, Function>;
+		stub_.instance.as_const_void = wrapper.instance_;
+		stub_.function = &ConstClassMethodStub<C, Function>;
 	}
 
 	/// Invokes the delegate.
 	R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2) const
 	{
-		X_ASSERT(m_stub.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-		return m_stub.function(m_stub.instance, arg0, arg1, arg2);
+		X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+		return stub_.function(stub_.instance, arg0, arg1, arg2);
 	}
 
 private:
-	Stub m_stub;
+	Stub stub_;
 };
 
 
@@ -744,11 +744,11 @@ public:
 	{
 		/// Default constructor.
 		NonConstWrapper(C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		C* m_instance;
+		C* instance_;
 	};
 
 	/// Internal wrapper class used as a helper in Bind() overload resolution for const member functions.
@@ -757,17 +757,17 @@ public:
 	{
 		/// Default constructor.
 		ConstWrapper(const C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		const C* m_instance;
+		const C* instance_;
 	};
 
 
 	/// Default constructor.
 	Delegate(void)
-		: m_stub()
+		: stub_()
 	{
 	}
 
@@ -775,35 +775,35 @@ public:
 	template <R(*Function)(ARG0, ARG1, ARG2, ARG3)>
 	void Bind(void)
 	{
-		m_stub.instance.as_void = nullptr;
-		m_stub.function = &FunctionStub<Function>;
+		stub_.instance.as_void = nullptr;
+		stub_.function = &FunctionStub<Function>;
 	}
 
 	/// Binds a non-const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0, ARG1, ARG2, ARG3)>
 	void Bind(NonConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_void = wrapper.m_instance;
-		m_stub.function = &ClassMethodStub<C, Function>;
+		stub_.instance.as_void = wrapper.instance_;
+		stub_.function = &ClassMethodStub<C, Function>;
 	}
 
 	/// Binds a const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0, ARG1, ARG2, ARG3) const>
 	void Bind(ConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_const_void = wrapper.m_instance;
-		m_stub.function = &ConstClassMethodStub<C, Function>;
+		stub_.instance.as_const_void = wrapper.instance_;
+		stub_.function = &ConstClassMethodStub<C, Function>;
 	}
 
 	/// Invokes the delegate.
 	R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3) const
 	{
-		X_ASSERT(m_stub.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-		return m_stub.function(m_stub.instance, arg0, arg1, arg2, arg3);
+		X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+		return stub_.function(stub_.instance, arg0, arg1, arg2, arg3);
 	}
 
 private:
-	Stub m_stub;
+	Stub stub_;
 };
 
 
@@ -891,11 +891,11 @@ public:
 	{
 		/// Default constructor.
 		NonConstWrapper(C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		C* m_instance;
+		C* instance_;
 	};
 
 	/// Internal wrapper class used as a helper in Bind() overload resolution for const member functions.
@@ -904,17 +904,17 @@ public:
 	{
 		/// Default constructor.
 		ConstWrapper(const C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		const C* m_instance;
+		const C* instance_;
 	};
 
 
 	/// Default constructor.
 	Delegate(void)
-		: m_stub()
+		: stub_()
 	{
 	}
 
@@ -922,35 +922,35 @@ public:
 	template <R(*Function)(ARG0, ARG1, ARG2, ARG3, ARG4)>
 	void Bind(void)
 	{
-		m_stub.instance.as_void = nullptr;
-		m_stub.function = &FunctionStub<Function>;
+		stub_.instance.as_void = nullptr;
+		stub_.function = &FunctionStub<Function>;
 	}
 
 	/// Binds a non-const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4)>
 	void Bind(NonConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_void = wrapper.m_instance;
-		m_stub.function = &ClassMethodStub<C, Function>;
+		stub_.instance.as_void = wrapper.instance_;
+		stub_.function = &ClassMethodStub<C, Function>;
 	}
 
 	/// Binds a const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4) const>
 	void Bind(ConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_const_void = wrapper.m_instance;
-		m_stub.function = &ConstClassMethodStub<C, Function>;
+		stub_.instance.as_const_void = wrapper.instance_;
+		stub_.function = &ConstClassMethodStub<C, Function>;
 	}
 
 	/// Invokes the delegate.
 	R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4) const
 	{
-		X_ASSERT(m_stub.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-		return m_stub.function(m_stub.instance, arg0, arg1, arg2, arg3, arg4);
+		X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+		return stub_.function(stub_.instance, arg0, arg1, arg2, arg3, arg4);
 	}
 
 private:
-	Stub m_stub;
+	Stub stub_;
 };
 
 
@@ -1038,11 +1038,11 @@ public:
 	{
 		/// Default constructor.
 		NonConstWrapper(C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		C* m_instance;
+		C* instance_;
 	};
 
 	/// Internal wrapper class used as a helper in Bind() overload resolution for const member functions.
@@ -1051,17 +1051,17 @@ public:
 	{
 		/// Default constructor.
 		ConstWrapper(const C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		const C* m_instance;
+		const C* instance_;
 	};
 
 
 	/// Default constructor.
 	Delegate(void)
-		: m_stub()
+		: stub_()
 	{
 	}
 
@@ -1069,35 +1069,35 @@ public:
 	template <R(*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)>
 	void Bind(void)
 	{
-		m_stub.instance.as_void = nullptr;
-		m_stub.function = &FunctionStub<Function>;
+		stub_.instance.as_void = nullptr;
+		stub_.function = &FunctionStub<Function>;
 	}
 
 	/// Binds a non-const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)>
 	void Bind(NonConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_void = wrapper.m_instance;
-		m_stub.function = &ClassMethodStub<C, Function>;
+		stub_.instance.as_void = wrapper.instance_;
+		stub_.function = &ClassMethodStub<C, Function>;
 	}
 
 	/// Binds a const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5) const>
 	void Bind(ConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_const_void = wrapper.m_instance;
-		m_stub.function = &ConstClassMethodStub<C, Function>;
+		stub_.instance.as_const_void = wrapper.instance_;
+		stub_.function = &ConstClassMethodStub<C, Function>;
 	}
 
 	/// Invokes the delegate.
 	R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5) const
 	{
-		X_ASSERT(m_stub.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-		return m_stub.function(m_stub.instance, arg0, arg1, arg2, arg3, arg4, arg5);
+		X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+		return stub_.function(stub_.instance, arg0, arg1, arg2, arg3, arg4, arg5);
 	}
 
 private:
-	Stub m_stub;
+	Stub stub_;
 };
 
 
@@ -1185,11 +1185,11 @@ public:
 	{
 		/// Default constructor.
 		NonConstWrapper(C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		C* m_instance;
+		C* instance_;
 	};
 
 	/// Internal wrapper class used as a helper in Bind() overload resolution for const member functions.
@@ -1198,17 +1198,17 @@ public:
 	{
 		/// Default constructor.
 		ConstWrapper(const C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		const C* m_instance;
+		const C* instance_;
 	};
 
 
 	/// Default constructor.
 	Delegate(void)
-		: m_stub()
+		: stub_()
 	{
 	}
 
@@ -1216,35 +1216,35 @@ public:
 	template <R(*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)>
 	void Bind(void)
 	{
-		m_stub.instance.as_void = nullptr;
-		m_stub.function = &FunctionStub<Function>;
+		stub_.instance.as_void = nullptr;
+		stub_.function = &FunctionStub<Function>;
 	}
 
 	/// Binds a non-const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)>
 	void Bind(NonConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_void = wrapper.m_instance;
-		m_stub.function = &ClassMethodStub<C, Function>;
+		stub_.instance.as_void = wrapper.instance_;
+		stub_.function = &ClassMethodStub<C, Function>;
 	}
 
 	/// Binds a const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6) const>
 	void Bind(ConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_const_void = wrapper.m_instance;
-		m_stub.function = &ConstClassMethodStub<C, Function>;
+		stub_.instance.as_const_void = wrapper.instance_;
+		stub_.function = &ConstClassMethodStub<C, Function>;
 	}
 
 	/// Invokes the delegate.
 	R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6) const
 	{
-		X_ASSERT(m_stub.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-		return m_stub.function(m_stub.instance, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+		X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+		return stub_.function(stub_.instance, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
 	}
 
 private:
-	Stub m_stub;
+	Stub stub_;
 };
 
 
@@ -1332,11 +1332,11 @@ public:
 	{
 		/// Default constructor.
 		NonConstWrapper(C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		C* m_instance;
+		C* instance_;
 	};
 
 	/// Internal wrapper class used as a helper in Bind() overload resolution for const member functions.
@@ -1345,17 +1345,17 @@ public:
 	{
 		/// Default constructor.
 		ConstWrapper(const C* instance)
-		: m_instance(instance)
+		: instance_(instance)
 		{
 		}
 
-		const C* m_instance;
+		const C* instance_;
 	};
 
 
 	/// Default constructor.
 	Delegate(void)
-		: m_stub()
+		: stub_()
 	{
 	}
 
@@ -1363,35 +1363,35 @@ public:
 	template <R(*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)>
 	void Bind(void)
 	{
-		m_stub.instance.as_void = nullptr;
-		m_stub.function = &FunctionStub<Function>;
+		stub_.instance.as_void = nullptr;
+		stub_.function = &FunctionStub<Function>;
 	}
 
 	/// Binds a non-const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)>
 	void Bind(NonConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_void = wrapper.m_instance;
-		m_stub.function = &ClassMethodStub<C, Function>;
+		stub_.instance.as_void = wrapper.instance_;
+		stub_.function = &ClassMethodStub<C, Function>;
 	}
 
 	/// Binds a const class method to the delegate.
 	template <class C, R(C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7) const>
 	void Bind(ConstWrapper<C, Function> wrapper)
 	{
-		m_stub.instance.as_const_void = wrapper.m_instance;
-		m_stub.function = &ConstClassMethodStub<C, Function>;
+		stub_.instance.as_const_void = wrapper.instance_;
+		stub_.function = &ConstClassMethodStub<C, Function>;
 	}
 
 	/// Invokes the delegate.
 	R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6, ARG7 arg7) const
 	{
-		X_ASSERT(m_stub.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-		return m_stub.function(m_stub.instance, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+		X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+		return stub_.function(stub_.instance, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 	}
 
 private:
-	Stub m_stub;
+	Stub stub_;
 };
 
 
