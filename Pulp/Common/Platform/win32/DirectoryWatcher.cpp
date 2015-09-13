@@ -31,14 +31,14 @@ namespace
 
 
 XDirectoryWatcher::XDirectoryWatcher(core::MemoryArenaBase* arena) :
-m_cache(arena),
-m_debug(0),
-m_dirs(arena),
-m_listeners(arena)
+cache_(arena),
+debug_(0),
+dirs_(arena),
+listeners_(arena)
 {
 	X_ASSERT_NOT_NULL(arena);
-	m_cache.reserve(32);
-	m_dirs.reserve(4);
+	cache_.reserve(32);
+	dirs_.reserve(4);
 }
 
 
@@ -49,10 +49,8 @@ XDirectoryWatcher::~XDirectoryWatcher(void)
 
 void XDirectoryWatcher::Init(void)
 {
-	ADD_CVAR_REF("filesys_dir_watcher_debug", m_debug, 0, 0, 1, core::VarFlag::SYSTEM,
+	ADD_CVAR_REF("filesys_dir_watcher_debug", debug_, 0, 0, 1, core::VarFlag::SYSTEM,
 		"Debug messages for directory watcher. 0=off 1=on");
-
-
 
 }
 
@@ -61,7 +59,7 @@ void XDirectoryWatcher::ShutDown(void)
 	// clear the monitors on listeners, to prevent them trying to access
 	// invalid memory.
 	listeners::Iterator it;
-	for (it = m_listeners.begin(); it != m_listeners.end(); ++it)
+	for (it = listeners_.begin(); it != listeners_.end(); ++it)
 	{
 		XDirectoryWatcherListener* pListener = *it;
 
@@ -71,7 +69,7 @@ void XDirectoryWatcher::ShutDown(void)
 	}
 
 	Directorys::Iterator it2;
-	for (it2 = m_dirs.begin(); it2 != m_dirs.end(); ++it2)
+	for (it2 = dirs_.begin(); it2 != dirs_.end(); ++it2)
 	{
 		WatchInfo* pInfo = it2;
 
@@ -80,8 +78,8 @@ void XDirectoryWatcher::ShutDown(void)
 
 	}
 
-	m_listeners.clear();
-	m_dirs.clear();
+	listeners_.clear();
+	dirs_.clear();
 }
 
 
@@ -133,7 +131,7 @@ void XDirectoryWatcher::addDirectory(const wchar_t* directory)
 	info.overlapped.hEvent = info.event;
 
 	// save
-	m_dirs.append(info);
+	dirs_.append(info);
 
 	// Watch
 	WatchDirectory(info.directory, info.result, &info.overlapped);
@@ -281,9 +279,9 @@ void XDirectoryWatcher::tick(void)
 {
 	X_PROFILE_BEGIN("DirectoryWatcher", core::ProfileSubSys::CORE);
 	// check all the directorys.
-	Directorys::Iterator it = m_dirs.begin();
+	Directorys::Iterator it = dirs_.begin();
 
-	for (; it != m_dirs.end(); ++it)
+	for (; it != dirs_.end(); ++it)
 	{
 		checkDirectory(*it);
 	}
@@ -297,18 +295,18 @@ bool XDirectoryWatcher::IsRepeat(const core::Path<char>& path)
 
 	Info_t info(st.st_mtime, st.st_size);
 
-	Fifo<Info_t>::const_iterator it = m_cache.begin();
+	Fifo<Info_t>::const_iterator it = cache_.begin();
 
-	for (; it != m_cache.end(); ++it)
+	for (; it != cache_.end(); ++it)
 	{
 		if ((*it) == info)
 			return true;
 	}
 
-	if (m_cache.capacity() == m_cache.size())
-		m_cache.pop();
+	if (cache_.capacity() == cache_.size())
+		cache_.pop();
 
-	m_cache.push(info);
+	cache_.push(info);
 	return false;
 }
 
@@ -320,18 +318,18 @@ bool XDirectoryWatcher::IsRepeat(const core::Path<wchar_t>& path)
 
 	Info_t info(st.st_mtime, st.st_size);
 
-	Fifo<Info_t>::const_iterator it = m_cache.begin();
+	Fifo<Info_t>::const_iterator it = cache_.begin();
 
-	for (; it != m_cache.end(); ++it)
+	for (; it != cache_.end(); ++it)
 	{
 		if ((*it) == info)
 			return true;
 	}
 
-	if (m_cache.capacity() == m_cache.size())
-		m_cache.pop();
+	if (cache_.capacity() == cache_.size())
+		cache_.pop();
 
-	m_cache.push(info);
+	cache_.push(info);
 	return false;
 }
 
@@ -341,21 +339,21 @@ void XDirectoryWatcher::registerListener(XDirectoryWatcherListener* pListener)
 {
 	X_ASSERT_NOT_NULL(pListener);
 	pListener->setMonitor(this);
-	m_listeners.insert(pListener);
+	listeners_.insert(pListener);
 }
 
 void XDirectoryWatcher::unregisterListener(XDirectoryWatcherListener* pListener)
 {
 	X_ASSERT_NOT_NULL(pListener);
 	pListener->setMonitor(nullptr);
-	m_listeners.removeIndex(m_listeners.find(pListener));
+	listeners_.removeIndex(listeners_.find(pListener));
 }
 
 void XDirectoryWatcher::notify(Action::Enum action,
 	const char* name, const char* oldName, bool isDirectory)
 {
-	listeners::ConstIterator it = m_listeners.begin();
-	for (; it != m_listeners.end(); ++it) {
+	listeners::ConstIterator it = listeners_.begin();
+	for (; it != listeners_.end(); ++it) {
 		(*it)->OnFileChange(action, name, oldName, isDirectory);
 		//	break;
 	}

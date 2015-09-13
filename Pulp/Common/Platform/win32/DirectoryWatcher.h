@@ -42,7 +42,7 @@ public:
 	void tick(void);
 
 	X_INLINE bool isDebugEnabled(void) const {
-		return m_debug != 0;
+		return debug_ != 0;
 	}
 
 private:
@@ -90,11 +90,11 @@ private:
 	typedef core::Array<XDirectoryWatcherListener*> listeners;
 	typedef core::Array<WatchInfo> Directorys;
 
-	int m_debug;
+	int debug_;
 
-	Directorys m_dirs;
-	listeners m_listeners;
-	Fifo<Info_t> m_cache;
+	Directorys dirs_;
+	listeners listeners_;
+	Fifo<Info_t> cache_;
 };
 
 
@@ -108,8 +108,9 @@ public:
 
 	virtual ~XDirectoryWatcherListener()
 	{
-		if (pMonitor_)
+		if (pMonitor_) {
 			pMonitor_->unregisterListener(this);
+		}
 	}
 
 	// returns true if it action was eaten.
