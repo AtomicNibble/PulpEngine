@@ -97,11 +97,11 @@ public:
 		{
 			/// Default constructor.
 			NonConstWrapper(C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			C* m_instance;
+			C* instance_;
 		};
 
 		/// Internal wrapper class used as a helper in AddListener()/RemoveListener() overload resolution for const member functions.
@@ -110,20 +110,20 @@ public:
 		{
 			/// Default constructor.
 			ConstWrapper(const C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			const C* m_instance;
+			const C* instance_;
 		};
 
 
 		/// \brief Constructs a sink, allocating memory to store the given number of listeners in an array.
 		/// \sa Array
 		Sink(MemoryArenaBase* arena, size_t numListeners)
-			: m_listeners(arena)
+			: listeners_(arena)
 		{
-			m_listeners.Reserve(numListeners);
+			listeners_.Reserve(numListeners);
 		}
 
 		/// Adds a free function as listener.
@@ -134,7 +134,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a non-const class method as listener.
@@ -142,10 +142,10 @@ public:
 		void AddListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a const class method as listener.
@@ -153,10 +153,10 @@ public:
 		void AddListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// \brief Removes a free function as listener.
@@ -168,7 +168,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a non-const class method as listener.
@@ -177,10 +177,10 @@ public:
 		void RemoveListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a const class method as listener.
@@ -189,52 +189,52 @@ public:
 		void RemoveListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// Returns the number of listeners.
 		inline size_t GetListenerCount(void) const
 		{
-			return m_listeners.Num();
+			return listeners_.Num();
 		}
 
 		/// Returns the i-th listener.
 		inline const Stub& GetListener(size_t i) const
 		{
-			return m_listeners[i];
+			return listeners_[i];
 		}
 
 	private:
 		X_NO_COPY(Sink);
 		X_NO_ASSIGN(Sink);
 
-		xArray<Stub> m_listeners;
+		xArray<Stub> listeners_;
 	};
 
 
 	/// Default constructor.
 	Event(void)
-		: m_sink(nullptr)
+		: sink_(nullptr)
 	{
 	}
 
 	/// Binds a sink to the event.
 	inline void Bind(Sink* sink)
 	{
-		m_sink = sink;
+		sink_ = sink;
 	}
 
 	/// Signals the sink.
 	void Signal() const
 	{
-		X_ASSERT(m_sink != nullptr, "Cannot signal unbound event. Call Bind() first.")();
+		X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
-		for (size_t i=0; i<m_sink->GetListenerCount(); ++i)
+		for (size_t i=0; i<sink_->GetListenerCount(); ++i)
 		{
-			const Stub& stub = m_sink->GetListener(i);
+			const Stub& stub = sink_->GetListener(i);
 			stub.function(stub.instance  );
 		}
 	}
@@ -242,14 +242,14 @@ public:
 	/// Returns whether a sink is bound to the event.
 	inline bool IsBound(void) const
 	{
-		return (m_sink != nullptr);
+		return (sink_ != nullptr);
 	}
 
 private:
 	X_NO_COPY(Event);
 	X_NO_ASSIGN(Event);
 
-	Sink* m_sink;
+	Sink* sink_;
 };
 
 
@@ -344,11 +344,11 @@ public:
 		{
 			/// Default constructor.
 			NonConstWrapper(C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			C* m_instance;
+			C* instance_;
 		};
 
 		// ned to check if hte pointer is const.
@@ -358,20 +358,20 @@ public:
 		{
 			/// Default constructor.
 			ConstWrapper(const C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			const C* m_instance;
+			const C* instance_;
 		};
 
 
 		/// \brief Constructs a sink, allocating memory to store the given number of listeners in an array.
 		/// \sa Array
 		Sink(MemoryArenaBase* arena, size_t numListeners)
-			: m_listeners(arena)
+			: listeners_(arena)
 		{
-			m_listeners.Reserve(numListeners);
+			listeners_.Reserve(numListeners);
 		}
 
 		/// Adds a free function as listener.
@@ -382,7 +382,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a non-const class method as listener.
@@ -390,10 +390,10 @@ public:
 		void AddListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a const class method as listener.
@@ -401,10 +401,10 @@ public:
 		void AddListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}*/
 
 		/// \brief Removes a free function as listener.
@@ -416,7 +416,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a non-const class method as listener.
@@ -425,10 +425,10 @@ public:
 		void RemoveListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a const class method as listener.
@@ -437,52 +437,52 @@ public:
 		void RemoveListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// Returns the number of listeners.
 		inline size_t GetListenerCount(void) const
 		{
-			return m_listeners.Num();
+			return listeners_.Num();
 		}
 
 		/// Returns the i-th listener.
 		inline const Stub& GetListener(size_t i) const
 		{
-			return m_listeners[i];
+			return listeners_[i];
 		}
 
 	private:
 		X_NO_COPY(Sink);
 		X_NO_ASSIGN(Sink);
 
-		xArray<Stub> m_listeners;
+		xArray<Stub> listeners_;
 	};
 
 
 	/// Default constructor.
 	Event(void)
-		: m_sink(nullptr)
+		: sink_(nullptr)
 	{
 	}
 
 	/// Binds a sink to the event.
 	inline void Bind(Sink* sink)
 	{
-		m_sink = sink;
+		sink_ = sink;
 	}
 
 	/// Signals the sink.
 	void Signal(ARG0 arg0) const
 	{
-		X_ASSERT(m_sink != nullptr, "Cannot signal unbound event. Call Bind() first.")();
+		X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
-		for (size_t i=0; i<m_sink->GetListenerCount(); ++i)
+		for (size_t i=0; i<sink_->GetListenerCount(); ++i)
 		{
-			const Stub& stub = m_sink->GetListener(i);
+			const Stub& stub = sink_->GetListener(i);
 			stub.function(stub.instance , arg0);
 		}
 	}
@@ -490,14 +490,14 @@ public:
 	/// Returns whether a sink is bound to the event.
 	inline bool IsBound(void) const
 	{
-		return (m_sink != nullptr);
+		return (sink_ != nullptr);
 	}
 
 private:
 	X_NO_COPY(Event);
 	X_NO_ASSIGN(Event);
 
-	Sink* m_sink;
+	Sink* sink_;
 };
 
 
@@ -591,11 +591,11 @@ public:
 		{
 			/// Default constructor.
 			NonConstWrapper(C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			C* m_instance;
+			C* instance_;
 		};
 
 		/// Internal wrapper class used as a helper in AddListener()/RemoveListener() overload resolution for const member functions.
@@ -604,20 +604,20 @@ public:
 		{
 			/// Default constructor.
 			ConstWrapper(const C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			const C* m_instance;
+			const C* instance_;
 		};
 
 
 		/// \brief Constructs a sink, allocating memory to store the given number of listeners in an array.
 		/// \sa Array
 		Sink(MemoryArenaBase* arena, size_t numListeners)
-			: m_listeners(arena)
+			: listeners_(arena)
 		{
-			m_listeners.Reserve(numListeners);
+			listeners_.Reserve(numListeners);
 		}
 
 		/// Adds a free function as listener.
@@ -628,7 +628,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a non-const class method as listener.
@@ -636,10 +636,10 @@ public:
 		void AddListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a const class method as listener.
@@ -647,10 +647,10 @@ public:
 		void AddListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// \brief Removes a free function as listener.
@@ -662,7 +662,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a non-const class method as listener.
@@ -671,10 +671,10 @@ public:
 		void RemoveListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a const class method as listener.
@@ -683,52 +683,52 @@ public:
 		void RemoveListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// Returns the number of listeners.
 		inline size_t GetListenerCount(void) const
 		{
-			return m_listeners.Num();
+			return listeners_.Num();
 		}
 
 		/// Returns the i-th listener.
 		inline const Stub& GetListener(size_t i) const
 		{
-			return m_listeners[i];
+			return listeners_[i];
 		}
 
 	private:
 		X_NO_COPY(Sink);
 		X_NO_ASSIGN(Sink);
 
-		xArray<Stub> m_listeners;
+		xArray<Stub> listeners_;
 	};
 
 
 	/// Default constructor.
 	Event(void)
-		: m_sink(nullptr)
+		: sink_(nullptr)
 	{
 	}
 
 	/// Binds a sink to the event.
 	inline void Bind(Sink* sink)
 	{
-		m_sink = sink;
+		sink_ = sink;
 	}
 
 	/// Signals the sink.
 	void Signal(ARG0 arg0, ARG1 arg1) const
 	{
-		X_ASSERT(m_sink != nullptr, "Cannot signal unbound event. Call Bind() first.")();
+		X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
-		for (size_t i=0; i<m_sink->GetListenerCount(); ++i)
+		for (size_t i=0; i<sink_->GetListenerCount(); ++i)
 		{
-			const Stub& stub = m_sink->GetListener(i);
+			const Stub& stub = sink_->GetListener(i);
 			stub.function(stub.instance , arg0, arg1);
 		}
 	}
@@ -736,14 +736,14 @@ public:
 	/// Returns whether a sink is bound to the event.
 	inline bool IsBound(void) const
 	{
-		return (m_sink != nullptr);
+		return (sink_ != nullptr);
 	}
 
 private:
 	X_NO_COPY(Event);
 	X_NO_ASSIGN(Event);
 
-	Sink* m_sink;
+	Sink* sink_;
 };
 
 
@@ -836,11 +836,11 @@ public:
 		{
 			/// Default constructor.
 			NonConstWrapper(C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			C* m_instance;
+			C* instance_;
 		};
 
 		/// Internal wrapper class used as a helper in AddListener()/RemoveListener() overload resolution for const member functions.
@@ -849,20 +849,20 @@ public:
 		{
 			/// Default constructor.
 			ConstWrapper(const C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			const C* m_instance;
+			const C* instance_;
 		};
 
 
 		/// \brief Constructs a sink, allocating memory to store the given number of listeners in an array.
 		/// \sa Array
 		Sink(MemoryArenaBase* arena, size_t numListeners)
-			: m_listeners(arena)
+			: listeners_(arena)
 		{
-			m_listeners.Reserve(numListeners);
+			listeners_.Reserve(numListeners);
 		}
 
 		/// Adds a free function as listener.
@@ -873,7 +873,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a non-const class method as listener.
@@ -881,10 +881,10 @@ public:
 		void AddListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a const class method as listener.
@@ -892,10 +892,10 @@ public:
 		void AddListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}*/
 
 		/// \brief Removes a free function as listener.
@@ -907,7 +907,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a non-const class method as listener.
@@ -916,10 +916,10 @@ public:
 		void RemoveListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a const class method as listener.
@@ -928,52 +928,52 @@ public:
 		void RemoveListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// Returns the number of listeners.
 		inline size_t GetListenerCount(void) const
 		{
-			return m_listeners.Num();
+			return listeners_.Num();
 		}
 
 		/// Returns the i-th listener.
 		inline const Stub& GetListener(size_t i) const
 		{
-			return m_listeners[i];
+			return listeners_[i];
 		}
 
 	private:
 		X_NO_COPY(Sink);
 		X_NO_ASSIGN(Sink);
 
-		xArray<Stub> m_listeners;
+		xArray<Stub> listeners_;
 	};
 
 
 	/// Default constructor.
 	Event(void)
-		: m_sink(nullptr)
+		: sink_(nullptr)
 	{
 	}
 
 	/// Binds a sink to the event.
 	inline void Bind(Sink* sink)
 	{
-		m_sink = sink;
+		sink_ = sink;
 	}
 
 	/// Signals the sink.
 	void Signal(ARG0 arg0, ARG1 arg1, ARG2 arg2) const
 	{
-		X_ASSERT(m_sink != nullptr, "Cannot signal unbound event. Call Bind() first.")();
+		X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
-		for (size_t i=0; i<m_sink->GetListenerCount(); ++i)
+		for (size_t i=0; i<sink_->GetListenerCount(); ++i)
 		{
-			const Stub& stub = m_sink->GetListener(i);
+			const Stub& stub = sink_->GetListener(i);
 			stub.function(stub.instance , arg0, arg1, arg2);
 		}
 	}
@@ -981,14 +981,14 @@ public:
 	/// Returns whether a sink is bound to the event.
 	inline bool IsBound(void) const
 	{
-		return (m_sink != nullptr);
+		return (sink_ != nullptr);
 	}
 
 private:
 	X_NO_COPY(Event);
 	X_NO_ASSIGN(Event);
 
-	Sink* m_sink;
+	Sink* sink_;
 };
 
 
@@ -1087,11 +1087,11 @@ public:
 		{
 			/// Default constructor.
 			NonConstWrapper(C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			C* m_instance;
+			C* instance_;
 		};
 
 		/// Internal wrapper class used as a helper in AddListener()/RemoveListener() overload resolution for const member functions.
@@ -1100,20 +1100,20 @@ public:
 		{
 			/// Default constructor.
 			ConstWrapper(const C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			const C* m_instance;
+			const C* instance_;
 		};
 
 
 		/// \brief Constructs a sink, allocating memory to store the given number of listeners in an array.
 		/// \sa Array
 		Sink(MemoryArenaBase* arena, size_t numListeners)
-			: m_listeners(arena)
+			: listeners_(arena)
 		{
-			m_listeners.Reserve(numListeners);
+			listeners_.Reserve(numListeners);
 		}
 
 		/// Adds a free function as listener.
@@ -1124,7 +1124,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a non-const class method as listener.
@@ -1132,10 +1132,10 @@ public:
 		void AddListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a const class method as listener.
@@ -1143,10 +1143,10 @@ public:
 		void AddListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// \brief Removes a free function as listener.
@@ -1158,7 +1158,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a non-const class method as listener.
@@ -1167,10 +1167,10 @@ public:
 		void RemoveListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a const class method as listener.
@@ -1179,52 +1179,52 @@ public:
 		void RemoveListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// Returns the number of listeners.
 		inline size_t GetListenerCount(void) const
 		{
-			return m_listeners.Num();
+			return listeners_.Num();
 		}
 
 		/// Returns the i-th listener.
 		inline const Stub& GetListener(size_t i) const
 		{
-			return m_listeners[i];
+			return listeners_[i];
 		}
 
 	private:
 		X_NO_COPY(Sink);
 		X_NO_ASSIGN(Sink);
 
-		xArray<Stub> m_listeners;
+		xArray<Stub> listeners_;
 	};
 
 
 	/// Default constructor.
 	Event(void)
-		: m_sink(nullptr)
+		: sink_(nullptr)
 	{
 	}
 
 	/// Binds a sink to the event.
 	inline void Bind(Sink* sink)
 	{
-		m_sink = sink;
+		sink_ = sink;
 	}
 
 	/// Signals the sink.
 	void Signal(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3) const
 	{
-		X_ASSERT(m_sink != nullptr, "Cannot signal unbound event. Call Bind() first.")();
+		X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
-		for (size_t i=0; i<m_sink->GetListenerCount(); ++i)
+		for (size_t i=0; i<sink_->GetListenerCount(); ++i)
 		{
-			const Stub& stub = m_sink->GetListener(i);
+			const Stub& stub = sink_->GetListener(i);
 			stub.function(stub.instance , arg0, arg1, arg2, arg3);
 		}
 	}
@@ -1232,14 +1232,14 @@ public:
 	/// Returns whether a sink is bound to the event.
 	inline bool IsBound(void) const
 	{
-		return (m_sink != nullptr);
+		return (sink_ != nullptr);
 	}
 
 private:
 	X_NO_COPY(Event);
 	X_NO_ASSIGN(Event);
 
-	Sink* m_sink;
+	Sink* sink_;
 };
 
 
@@ -1335,11 +1335,11 @@ public:
 		{
 			/// Default constructor.
 			NonConstWrapper(C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			C* m_instance;
+			C* instance_;
 		};
 
 		/// Internal wrapper class used as a helper in AddListener()/RemoveListener() overload resolution for const member functions.
@@ -1348,20 +1348,20 @@ public:
 		{
 			/// Default constructor.
 			ConstWrapper(const C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			const C* m_instance;
+			const C* instance_;
 		};
 
 
 		/// \brief Constructs a sink, allocating memory to store the given number of listeners in an array.
 		/// \sa Array
 		Sink(MemoryArenaBase* arena, size_t numListeners)
-			: m_listeners(arena)
+			: listeners_(arena)
 		{
-			m_listeners.Reserve(numListeners);
+			listeners_.Reserve(numListeners);
 		}
 
 		/// Adds a free function as listener.
@@ -1372,7 +1372,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a non-const class method as listener.
@@ -1380,10 +1380,10 @@ public:
 		void AddListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a const class method as listener.
@@ -1391,10 +1391,10 @@ public:
 		void AddListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// \brief Removes a free function as listener.
@@ -1406,7 +1406,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a non-const class method as listener.
@@ -1415,10 +1415,10 @@ public:
 		void RemoveListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a const class method as listener.
@@ -1427,52 +1427,52 @@ public:
 		void RemoveListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// Returns the number of listeners.
 		inline size_t GetListenerCount(void) const
 		{
-			return m_listeners.Num();
+			return listeners_.Num();
 		}
 
 		/// Returns the i-th listener.
 		inline const Stub& GetListener(size_t i) const
 		{
-			return m_listeners[i];
+			return listeners_[i];
 		}
 
 	private:
 		X_NO_COPY(Sink);
 		X_NO_ASSIGN(Sink);
 
-		xArray<Stub> m_listeners;
+		xArray<Stub> listeners_;
 	};
 
 
 	/// Default constructor.
 	Event(void)
-		: m_sink(nullptr)
+		: sink_(nullptr)
 	{
 	}
 
 	/// Binds a sink to the event.
 	inline void Bind(Sink* sink)
 	{
-		m_sink = sink;
+		sink_ = sink;
 	}
 
 	/// Signals the sink.
 	void Signal(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4) const
 	{
-		X_ASSERT(m_sink != nullptr, "Cannot signal unbound event. Call Bind() first.")();
+		X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
-		for (size_t i=0; i<m_sink->GetListenerCount(); ++i)
+		for (size_t i=0; i<sink_->GetListenerCount(); ++i)
 		{
-			const Stub& stub = m_sink->GetListener(i);
+			const Stub& stub = sink_->GetListener(i);
 			stub.function(stub.instance , arg0, arg1, arg2, arg3, arg4);
 		}
 	}
@@ -1480,14 +1480,14 @@ public:
 	/// Returns whether a sink is bound to the event.
 	inline bool IsBound(void) const
 	{
-		return (m_sink != nullptr);
+		return (sink_ != nullptr);
 	}
 
 private:
 	X_NO_COPY(Event);
 	X_NO_ASSIGN(Event);
 
-	Sink* m_sink;
+	Sink* sink_;
 };
 
 
@@ -1583,11 +1583,11 @@ public:
 		{
 			/// Default constructor.
 			NonConstWrapper(C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			C* m_instance;
+			C* instance_;
 		};
 
 		/// Internal wrapper class used as a helper in AddListener()/RemoveListener() overload resolution for const member functions.
@@ -1596,20 +1596,20 @@ public:
 		{
 			/// Default constructor.
 			ConstWrapper(const C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			const C* m_instance;
+			const C* instance_;
 		};
 
 
 		/// \brief Constructs a sink, allocating memory to store the given number of listeners in an array.
 		/// \sa Array
 		Sink(MemoryArenaBase* arena, size_t numListeners)
-			: m_listeners(arena)
+			: listeners_(arena)
 		{
-			m_listeners.Reserve(numListeners);
+			listeners_.Reserve(numListeners);
 		}
 
 		/// Adds a free function as listener.
@@ -1620,7 +1620,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a non-const class method as listener.
@@ -1628,10 +1628,10 @@ public:
 		void AddListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a const class method as listener.
@@ -1639,10 +1639,10 @@ public:
 		void AddListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// \brief Removes a free function as listener.
@@ -1654,7 +1654,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a non-const class method as listener.
@@ -1663,10 +1663,10 @@ public:
 		void RemoveListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a const class method as listener.
@@ -1675,52 +1675,52 @@ public:
 		void RemoveListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// Returns the number of listeners.
 		inline size_t GetListenerCount(void) const
 		{
-			return m_listeners.Num();
+			return listeners_.Num();
 		}
 
 		/// Returns the i-th listener.
 		inline const Stub& GetListener(size_t i) const
 		{
-			return m_listeners[i];
+			return listeners_[i];
 		}
 
 	private:
 		X_NO_COPY(Sink);
 		X_NO_ASSIGN(Sink);
 
-		xArray<Stub> m_listeners;
+		xArray<Stub> listeners_;
 	};
 
 
 	/// Default constructor.
 	Event(void)
-		: m_sink(nullptr)
+		: sink_(nullptr)
 	{
 	}
 
 	/// Binds a sink to the event.
 	inline void Bind(Sink* sink)
 	{
-		m_sink = sink;
+		sink_ = sink;
 	}
 
 	/// Signals the sink.
 	void Signal(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5) const
 	{
-		X_ASSERT(m_sink != nullptr, "Cannot signal unbound event. Call Bind() first.")();
+		X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
-		for (size_t i=0; i<m_sink->GetListenerCount(); ++i)
+		for (size_t i=0; i<sink_->GetListenerCount(); ++i)
 		{
-			const Stub& stub = m_sink->GetListener(i);
+			const Stub& stub = sink_->GetListener(i);
 			stub.function(stub.instance , arg0, arg1, arg2, arg3, arg4, arg5);
 		}
 	}
@@ -1728,14 +1728,14 @@ public:
 	/// Returns whether a sink is bound to the event.
 	inline bool IsBound(void) const
 	{
-		return (m_sink != nullptr);
+		return (sink_ != nullptr);
 	}
 
 private:
 	X_NO_COPY(Event);
 	X_NO_ASSIGN(Event);
 
-	Sink* m_sink;
+	Sink* sink_;
 };
 
 
@@ -1829,11 +1829,11 @@ public:
 		{
 			/// Default constructor.
 			NonConstWrapper(C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			C* m_instance;
+			C* instance_;
 		};
 
 		/// Internal wrapper class used as a helper in AddListener()/RemoveListener() overload resolution for const member functions.
@@ -1842,20 +1842,20 @@ public:
 		{
 			/// Default constructor.
 			ConstWrapper(const C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			const C* m_instance;
+			const C* instance_;
 		};
 
 
 		/// \brief Constructs a sink, allocating memory to store the given number of listeners in an array.
 		/// \sa Array
 		Sink(MemoryArenaBase* arena, size_t numListeners)
-			: m_listeners(arena)
+			: listeners_(arena)
 		{
-			m_listeners.Reserve(numListeners);
+			listeners_.Reserve(numListeners);
 		}
 
 		/// Adds a free function as listener.
@@ -1866,7 +1866,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a non-const class method as listener.
@@ -1874,10 +1874,10 @@ public:
 		void AddListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a const class method as listener.
@@ -1885,10 +1885,10 @@ public:
 		void AddListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// \brief Removes a free function as listener.
@@ -1900,7 +1900,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a non-const class method as listener.
@@ -1909,10 +1909,10 @@ public:
 		void RemoveListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a const class method as listener.
@@ -1921,52 +1921,52 @@ public:
 		void RemoveListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// Returns the number of listeners.
 		inline size_t GetListenerCount(void) const
 		{
-			return m_listeners.Num();
+			return listeners_.Num();
 		}
 
 		/// Returns the i-th listener.
 		inline const Stub& GetListener(size_t i) const
 		{
-			return m_listeners[i];
+			return listeners_[i];
 		}
 
 	private:
 		X_NO_COPY(Sink);
 		X_NO_ASSIGN(Sink);
 
-		xArray<Stub> m_listeners;
+		xArray<Stub> listeners_;
 	};
 
 
 	/// Default constructor.
 	Event(void)
-		: m_sink(nullptr)
+		: sink_(nullptr)
 	{
 	}
 
 	/// Binds a sink to the event.
 	inline void Bind(Sink* sink)
 	{
-		m_sink = sink;
+		sink_ = sink;
 	}
 
 	/// Signals the sink.
 	void Signal(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6) const
 	{
-		X_ASSERT(m_sink != nullptr, "Cannot signal unbound event. Call Bind() first.")();
+		X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
-		for (size_t i=0; i<m_sink->GetListenerCount(); ++i)
+		for (size_t i=0; i<sink_->GetListenerCount(); ++i)
 		{
-			const Stub& stub = m_sink->GetListener(i);
+			const Stub& stub = sink_->GetListener(i);
 			stub.function(stub.instance , arg0, arg1, arg2, arg3, arg4, arg5, arg6);
 		}
 	}
@@ -1974,14 +1974,14 @@ public:
 	/// Returns whether a sink is bound to the event.
 	inline bool IsBound(void) const
 	{
-		return (m_sink != nullptr);
+		return (sink_ != nullptr);
 	}
 
 private:
 	X_NO_COPY(Event);
 	X_NO_ASSIGN(Event);
 
-	Sink* m_sink;
+	Sink* sink_;
 };
 
 
@@ -2075,11 +2075,11 @@ public:
 		{
 			/// Default constructor.
 			NonConstWrapper(C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			C* m_instance;
+			C* instance_;
 		};
 
 		/// Internal wrapper class used as a helper in AddListener()/RemoveListener() overload resolution for const member functions.
@@ -2088,20 +2088,20 @@ public:
 		{
 			/// Default constructor.
 			ConstWrapper(const C* instance)
-				: m_instance(instance)
+				: instance_(instance)
 			{
 			}
 
-			const C* m_instance;
+			const C* instance_;
 		};
 
 
 		/// \brief Constructs a sink, allocating memory to store the given number of listeners in an array.
 		/// \sa Array
 		Sink(MemoryArenaBase* arena, size_t numListeners)
-			: m_listeners(arena)
+			: listeners_(arena)
 		{
-			m_listeners.Reserve(numListeners);
+			listeners_.Reserve(numListeners);
 		}
 
 		/// Adds a free function as listener.
@@ -2112,7 +2112,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a non-const class method as listener.
@@ -2120,10 +2120,10 @@ public:
 		void AddListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// Adds a const class method as listener.
@@ -2131,10 +2131,10 @@ public:
 		void AddListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.Add(stub);
+			listeners_.Add(stub);
 		}
 
 		/// \brief Removes a free function as listener.
@@ -2146,7 +2146,7 @@ public:
 			stub.instance.as_void = nullptr;
 			stub.function = &FunctionStub<Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a non-const class method as listener.
@@ -2155,10 +2155,10 @@ public:
 		void RemoveListener(NonConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_void = wrapper.m_instance;
+			stub.instance.as_void = wrapper.instance_;
 			stub.function = &ClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// \brief Removes a const class method as listener.
@@ -2167,52 +2167,52 @@ public:
 		void RemoveListener(ConstWrapper<C, Function> wrapper)
 		{
 			Stub stub;
-			stub.instance.as_const_void = wrapper.m_instance;
+			stub.instance.as_const_void = wrapper.instance_;
 			stub.function = &ConstClassMethodStub<C, Function>;
 
-			m_listeners.RemoveContiguous(stub);
+			listeners_.RemoveContiguous(stub);
 		}
 
 		/// Returns the number of listeners.
 		inline size_t GetListenerCount(void) const
 		{
-			return m_listeners.Num();
+			return listeners_.Num();
 		}
 
 		/// Returns the i-th listener.
 		inline const Stub& GetListener(size_t i) const
 		{
-			return m_listeners[i];
+			return listeners_[i];
 		}
 
 	private:
 		X_NO_COPY(Sink);
 		X_NO_ASSIGN(Sink);
 
-		xArray<Stub> m_listeners;
+		xArray<Stub> listeners_;
 	};
 
 
 	/// Default constructor.
 	Event(void)
-		: m_sink(nullptr)
+		: sink_(nullptr)
 	{
 	}
 
 	/// Binds a sink to the event.
 	inline void Bind(Sink* sink)
 	{
-		m_sink = sink;
+		sink_ = sink;
 	}
 
 	/// Signals the sink.
 	void Signal(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6, ARG7 arg7) const
 	{
-		X_ASSERT(m_sink != nullptr, "Cannot signal unbound event. Call Bind() first.")();
+		X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
-		for (size_t i=0; i<m_sink->GetListenerCount(); ++i)
+		for (size_t i=0; i<sink_->GetListenerCount(); ++i)
 		{
-			const Stub& stub = m_sink->GetListener(i);
+			const Stub& stub = sink_->GetListener(i);
 			stub.function(stub.instance , arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
 		}
 	}
@@ -2220,14 +2220,14 @@ public:
 	/// Returns whether a sink is bound to the event.
 	inline bool IsBound(void) const
 	{
-		return (m_sink != nullptr);
+		return (sink_ != nullptr);
 	}
 
 private:
 	X_NO_COPY(Event);
 	X_NO_ASSIGN(Event);
 
-	Sink* m_sink;
+	Sink* sink_;
 };
 
 
