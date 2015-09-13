@@ -44,7 +44,7 @@ private:
 	static inline uint32_t Reflect(uint32_t iReflect, const char cChar);
 
 private:
-	uint32_t crc32_table[8][0x100];
+	uint32_t crc32_table_[8][0x100];
 	bool tableInit_;
 };
 
