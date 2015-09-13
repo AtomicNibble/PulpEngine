@@ -91,8 +91,8 @@ void GrowingBlockAllocator::free( void* ptr )
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	statistics_.allocationCount_--;
 	statistics_.internalOverhead_ -= sizeof( BlockHeader );
-	statistics_.wasteAlignment_ -= safe_static_cast<size_t>((uintptr_t)ptr - 
-		(uintptr_t)as_header->originalAllocation_);
+	statistics_.wasteAlignment_ -= safe_static_cast<size_t>(reinterpret_cast<uintptr_t>(ptr) - 
+		reinterpret_cast<uintptr_t>(as_header->originalAllocation_));
 #endif
 
 	mspace_free( memorySpace_, as_header->originalAllocation_ );
