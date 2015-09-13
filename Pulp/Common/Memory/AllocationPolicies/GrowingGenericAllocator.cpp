@@ -8,8 +8,8 @@ X_NAMESPACE_BEGIN(core)
 
 
 GrowingGenericAllocator::GrowingGenericAllocator( uint32_t maxSizeInBytesPerPool, uint32_t growSize, size_t maxAlignment, size_t offset) :
-	m_microAllocator( maxSizeInBytesPerPool, growSize, maxAlignment, offset ),
-	m_blockAllocator()
+	microAllocator_( maxSizeInBytesPerPool, growSize, maxAlignment, offset ),
+	blockAllocator_()
 {
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
@@ -36,8 +36,8 @@ MemoryAllocatorStatistics GrowingGenericAllocator::getStatistics(void) const
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 void GrowingGenericAllocator::updateStatistics(void)
 {
-	MemoryAllocatorStatistics Micro = m_microAllocator.getStatistics();
-	MemoryAllocatorStatistics Block = m_blockAllocator.getStatistics();
+	MemoryAllocatorStatistics Micro = microAllocator_.getStatistics();
+	MemoryAllocatorStatistics Block = blockAllocator_.getStatistics();
 
 
 	statistics_.Clear();
