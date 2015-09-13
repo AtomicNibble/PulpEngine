@@ -19,7 +19,7 @@ public:
 	X_INLINE float GetMilliSeconds(void) const;
 
 private:
-	uint64_t m_start;
+	uint64_t start_;
 };
 
 
