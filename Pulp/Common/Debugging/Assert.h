@@ -116,7 +116,7 @@ private:
 	X_NO_COPY(Assert);
 	X_NO_ASSIGN(Assert);
 
-	const SourceInfo& m_sourceInfo;
+	const SourceInfo& sourceInfo_;
 };
 
 #include "Assert.inl"
