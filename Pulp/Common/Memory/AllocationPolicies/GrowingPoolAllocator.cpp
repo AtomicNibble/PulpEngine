@@ -120,8 +120,8 @@ void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offs
 			// update all dat info.
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 			size_t wasteAtFront = CalculateWasteAtFront(pMemoryRegionStart, maxAlignment_, offset);
-			size_t memoryRegionSize = safe_static_cast<uint32_t>( (char*)pChunkHeaderStart - 
-				(char*)pMemoryRegionStart );
+			size_t memoryRegionSize = safe_static_cast<uint32_t>( reinterpret_cast<char*>(pChunkHeaderStart) - 
+				reinterpret_cast<char*>(pMemoryRegionStart));
 			size_t elementCount = (memoryRegionSize - wasteAtFront) / elementSize_;
 
 			statistics_.physicalMemoryAllocated_ = safe_static_cast<uint32_t>( 
