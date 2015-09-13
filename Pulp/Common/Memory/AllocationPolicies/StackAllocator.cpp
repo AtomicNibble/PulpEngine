@@ -9,12 +9,12 @@ X_NAMESPACE_BEGIN(core)
 
 
 StackAllocator::StackAllocator(void* start, void* end) :
-	m_start( (char*)start ),
-	m_end( (char*)end ),
-	m_current( (char*)start )
+	start_( (char*)start ),
+	end_( (char*)end ),
+	current_( (char*)start )
 {
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
-	m_allocationID = 0;
+	allocationID_ = 0;
 #endif
 	
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
@@ -38,18 +38,18 @@ void* StackAllocator::allocate( size_t size, size_t alignment, size_t align_offs
 	align_offset += sizeof( BlockHeader ); // offset includes base position.
 
 	// get current relative offset
-	const uint32_t allocationOffset = safe_static_cast<uint32_t>(m_current - m_start);
+	const uint32_t allocationOffset = safe_static_cast<uint32_t>(current_ - start_);
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	const char* old_current = m_current;
+	const char* old_current = current_;
 #endif // !X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
 	// align it at the offset position, then go back the offset to bring us to start.
 	// of return data not actual start as alignment can waste some memory.
-	m_current = pointerUtil::AlignTop(m_current + align_offset, alignment) - align_offset;
+	current_ = pointerUtil::AlignTop(current_ + align_offset, alignment) - align_offset;
 
 	// Do we even have room slut?
-	if( (m_current + size) > m_end ) {
-		X_ASSERT((m_current + size) <= m_end, "Stack overflow!, a stack allocator can't satisfy the request.")();
+	if( (current_ + size) > end_ ) {
+		X_ASSERT((current_ + size) <= end_, "Stack overflow!, a stack allocator can't satisfy the request.")();
 		return nullptr;
 	}
 	
@@ -58,8 +58,8 @@ void* StackAllocator::allocate( size_t size, size_t alignment, size_t align_offs
 	// stats baby !
 	statistics_.allocationCount_++;
 	statistics_.internalOverhead_ += sizeof( BlockHeader );
-	statistics_.physicalMemoryUsed_ += size + (m_current - old_current);
-	statistics_.wasteAlignment_ += safe_static_cast<size_t>(((uintptr_t)m_current - (uintptr_t)m_start) - allocationOffset);
+	statistics_.physicalMemoryUsed_ += size + (current_ - old_current);
+	statistics_.wasteAlignment_ += safe_static_cast<size_t>(((uintptr_t)current_ - (uintptr_t)start_) - allocationOffset);
 
 	statistics_.wasteAlignmentMax_ = Max( statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_ );
 	statistics_.allocationCountMax_ = Max( statistics_.allocationCount_, statistics_.allocationCountMax_ );
@@ -75,16 +75,16 @@ void* StackAllocator::allocate( size_t size, size_t alignment, size_t align_offs
 		BlockHeader* as_header;
 	};
 
-	as_char = m_current;
+	as_char = current_;
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
-	as_header->m_AllocationID = m_allocationID++;
+	as_header->AllocationID_ = allocationID_++;
 #endif
-	as_header->m_allocationOffset = allocationOffset;
-	as_header->m_AllocationSize = AllocationSize;
+	as_header->allocationOffset_ = allocationOffset;
+	as_header->AllocationSize_ = AllocationSize;
 	as_char += sizeof( BlockHeader );
 
 	void* userPtr = as_void;
-	m_current += size;
+	current_ += size;
 	return userPtr;
 }
 
@@ -105,22 +105,22 @@ void StackAllocator::free(void* ptr)
 	as_char -= sizeof( BlockHeader );
 
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
-	if( as_header->m_AllocationID != (m_allocationID-1) )
+	if( as_header->AllocationID_ != (allocationID_-1) )
 	{
-		uint32_t AllocationID = as_header->m_AllocationID;
-		X_ASSERT( false, "Cannot free memory from stack(LIFO). invalid order." )( m_allocationID, AllocationID );
+		uint32_t AllocationID = as_header->AllocationID_;
+		X_ASSERT( false, "Cannot free memory from stack(LIFO). invalid order." )( allocationID_, AllocationID );
 	}
 
-	m_allocationID--;
+	allocationID_--;
 #endif
 
-	m_current = m_start + as_header->m_allocationOffset;
+	current_ = start_ + as_header->allocationOffset_;
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	statistics_.allocationCount_--;
-	statistics_.physicalMemoryUsed_ = as_header->m_allocationOffset;
+	statistics_.physicalMemoryUsed_ = as_header->allocationOffset_;
 	statistics_.internalOverhead_ -= sizeof( BlockHeader );
-	statistics_.wasteAlignment_ -= safe_static_cast<uint32_t>( as_char - m_current );
+	statistics_.wasteAlignment_ -= safe_static_cast<uint32_t>( as_char - current_ );
 #endif
 
 }

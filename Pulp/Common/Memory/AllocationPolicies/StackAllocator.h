@@ -48,10 +48,10 @@ class StackAllocator
 	struct BlockHeader
 	{
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
-		uint32_t m_AllocationID;
+		uint32_t AllocationID_;
 #endif
-		size_t m_allocationOffset;
-		size_t m_AllocationSize;
+		size_t allocationOffset_;
+		size_t AllocationSize_;
 	};
 
 public:
@@ -72,12 +72,12 @@ public:
 	MemoryAllocatorStatistics getStatistics(void) const;
 
 private:
-	char* m_start;
-	char* m_end;
-	char* m_current;
+	char* start_;
+	char* end_;
+	char* current_;
 
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
-	uint32_t m_allocationID;
+	uint32_t allocationID_;
 #endif
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
