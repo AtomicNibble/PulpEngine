@@ -417,7 +417,7 @@ protected:
 	XMatrixStack m_ViewMat;
 	XMatrixStack m_ProMat;
 
-	XDynamicVB<byte> m_DynVB[VertexPool::PoolMax];
+	XDynamicVB<byte> DynVB_[VertexPool::PoolMax];
 
 	// States
 	core::Array<BlendState> m_BlendStates;

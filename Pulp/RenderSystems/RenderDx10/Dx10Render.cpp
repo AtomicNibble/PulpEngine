@@ -533,7 +533,7 @@ void DX11XRender::InitDynamicBuffers(void)
 
 		}
 
-		m_DynVB[i].CreateVB(&vidMemMng_, numVerts, vertSize);
+		DynVB_[i].CreateVB(&vidMemMng_, numVerts, vertSize);
 	}
 }
 
@@ -543,7 +543,7 @@ void DX11XRender::FreeDynamicBuffers(void)
 	int i;
 	for (i = 0; i<VertexPool::PoolMax; i++)
 	{
-		m_DynVB[i].Release();
+		DynVB_[i].Release();
 	}
 }
 
