@@ -64,9 +64,9 @@ namespace Hash
 	private:
 		void transform(const uint8_t* pBuffer);
 
-		uint8_t buffer[BLOCK_BYTES];
-		uint64_t digest[DIGEST_INTS / 2];
-		uint32_t count[4];
+		uint8_t buffer_[BLOCK_BYTES];
+		uint64_t digest_[DIGEST_INTS / 2];
+		uint32_t count_[4];
 	};
 
 	#include "SHA512.inl"

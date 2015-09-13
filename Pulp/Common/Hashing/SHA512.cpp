@@ -123,22 +123,22 @@ namespace Hash
 
 	void SHA512::reset(void)
 	{
-		zero_object(buffer);
-		zero_object(count);
+		zero_object(buffer_);
+		zero_object(count_);
 
-		digest[0] = 0x6a09e667f3bcc908ULL;
-		digest[1] = 0xbb67ae8584caa73bULL;
-		digest[2] = 0x3c6ef372fe94f82bULL;
-		digest[3] = 0xa54ff53a5f1d36f1ULL;
-		digest[4] = 0x510e527fade682d1ULL;
-		digest[5] = 0x9b05688c2b3e6c1fULL;
-		digest[6] = 0x1f83d9abfb41bd6bULL;
-		digest[7] = 0x5be0cd19137e2179ULL;
+		digest_[0] = 0x6a09e667f3bcc908ULL;
+		digest_[1] = 0xbb67ae8584caa73bULL;
+		digest_[2] = 0x3c6ef372fe94f82bULL;
+		digest_[3] = 0xa54ff53a5f1d36f1ULL;
+		digest_[4] = 0x510e527fade682d1ULL;
+		digest_[5] = 0x9b05688c2b3e6c1fULL;
+		digest_[6] = 0x1f83d9abfb41bd6bULL;
+		digest_[7] = 0x5be0cd19137e2179ULL;
 	}
 
 	void SHA512::update(const void* buf, size_t length)
 	{
-		size_t index = static_cast<size_t>((count[0] >> 3) & 0x7F);
+		size_t index = static_cast<size_t>((count_[0] >> 3) & 0x7F);
 		size_t firstpart = BLOCK_BYTES - index;
 		size_t i;
 
@@ -146,8 +146,8 @@ namespace Hash
 
 		if (length >= firstpart)
 		{
-			memcpy(&buffer[index], input, firstpart);
-			transform(buffer);
+			memcpy(&buffer_[index], input, firstpart);
+			transform(buffer_);
 
 			for (i = firstpart; i + BLOCK_BYTES <= length; i += BLOCK_BYTES) {
 				transform(&input[i]);
@@ -161,19 +161,19 @@ namespace Hash
 		}
 
 		// Update number of bits 
-		if ((count[0] += static_cast<uint32_t>(length << 3)) < (length << 3))
+		if ((count_[0] += static_cast<uint32_t>(length << 3)) < (length << 3))
 		{
-			if ((count[1] += 1) < 1)
+			if ((count_[1] += 1) < 1)
 			{
-				if ((count[2] += 1) < 1)
+				if ((count_[2] += 1) < 1)
 				{
-					count[3]++;
+					count_[3]++;
 				}
 			}
-			count[1] += static_cast<uint32_t>(length >> 29);
+			count_[1] += static_cast<uint32_t>(length >> 29);
 		}
 
-		memcpy(&buffer[index], &input[i], length - i);
+		memcpy(&buffer_[index], &input[i], length - i);
 	}
 
 	void SHA512::update(const char* str)
@@ -188,22 +188,22 @@ namespace Hash
 
 		// calculate bits pre pad.
 		uint32_t bits[4];
-		bits[3] = core::Endian::swap(count[0]);
-		bits[2] = core::Endian::swap(count[1]);
-		bits[1] = core::Endian::swap(count[2]);
-		bits[0] = core::Endian::swap(count[3]);
+		bits[3] = core::Endian::swap(count_[0]);
+		bits[2] = core::Endian::swap(count_[1]);
+		bits[1] = core::Endian::swap(count_[2]);
+		bits[0] = core::Endian::swap(count_[3]);
 
 
 		// sha-1: pad out to 56 mod 64.
 		// sha-512: Pad out to 112 mod 128. 
-		size_t index = (count[0] >> 3) & 0x7F;
+		size_t index = (count_[0] >> 3) & 0x7F;
 		size_t padLen = (index < 112) ? (112 - index) : ((128 + 112) - index);
 		update(padding, padLen);
 		update(bits, 16);
 
 		for (size_t i = 0; i < DIGEST_BYTES; ++i)
 		{
-			uint64_t val = digest[i >> 3];
+			uint64_t val = digest_[i >> 3];
 			size_t shift = ((7 - (i & 7)) * 8);
 
 			res.bytes[i] = static_cast<uint8_t>((val >> shift) & 0xFF);
@@ -229,8 +229,8 @@ namespace Hash
 		}
 
 		// load the state into our registers 
-		a = digest[0];   b = digest[1];   c = digest[2];   d = digest[3];
-		e = digest[4];   f = digest[5];   g = digest[6];   h = digest[7];
+		a = digest_[0];   b = digest_[1];   c = digest_[2];   d = digest_[3];
+		e = digest_[4];   f = digest_[5];   g = digest_[6];   h = digest_[7];
 
 		// now iterate 
 		for (i = 0; i < 80; i += 8) {
@@ -252,8 +252,8 @@ namespace Hash
 			t2 = e0(b) + Maj(b, c, d);    e += t1;    a = t1 + t2;
 		}
 
-		digest[0] += a; digest[1] += b; digest[2] += c; digest[3] += d;
-		digest[4] += e; digest[5] += f; digest[6] += g; digest[7] += h;
+		digest_[0] += a; digest_[1] += b; digest_[2] += c; digest_[3] += d;
+		digest_[4] += e; digest_[5] += f; digest_[6] += g; digest_[7] += h;
 
 		// erase our data 
 		a = b = c = d = e = f = g = h = t1 = t2 = 0;
