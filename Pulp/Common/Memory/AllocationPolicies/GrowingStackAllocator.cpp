@@ -9,7 +9,7 @@ X_NAMESPACE_BEGIN(core)
 
 GrowingStackAllocator::GrowingStackAllocator(size_t maxSizeInBytes, size_t granularity)
 {
-	virtualStart_ = (char*)VirtualMem::ReserveAddressSpace(maxSizeInBytes);
+	virtualStart_ = reinterpret_cast<char*>(VirtualMem::ReserveAddressSpace(maxSizeInBytes));
 	virtualEnd_ = &virtualStart_[maxSizeInBytes];
 	physicalCurrent_ = virtualStart_;
 	physicalEnd_ = virtualStart_;
