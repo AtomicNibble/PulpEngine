@@ -3,20 +3,20 @@
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy, class MemoryTrackingPolicy, class MemoryTaggingPolicy>
 MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::MemoryArena(AllocationPolicy* allocator, const char* name)
-	: m_allocator(allocator)
-	, m_name(name)
-	, m_isFrozen(false)
+	: allocator_(allocator)
+	, name_(name)
+	, isFrozen_(false)
 {
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-	m_statistics.arenaName_ = name;
-	m_statistics.arenaType_ = "MemoryArena";
-	m_statistics.threadPolicyType_ = ThreadPolicy::TYPE_NAME;
-	m_statistics.boundsCheckingPolicyType_ = BoundsCheckingPolicy::TYPE_NAME;
-	m_statistics.memoryTrackingPolicyType_ = MemoryTrackingPolicy::TYPE_NAME;
-	m_statistics.memoryTaggingPolicyType_ = MemoryTaggingPolicy::TYPE_NAME;
-	m_statistics.allocatorStatistics_ = allocator->getStatistics();
-	m_statistics.trackingOverhead_ = 0;
-	m_statistics.boundsCheckingOverhead_ = 0;
+	statistics_.arenaName_ = name;
+	statistics_.arenaType_ = "MemoryArena";
+	statistics_.threadPolicyType_ = ThreadPolicy::TYPE_NAME;
+	statistics_.boundsCheckingPolicyType_ = BoundsCheckingPolicy::TYPE_NAME;
+	statistics_.memoryTrackingPolicyType_ = MemoryTrackingPolicy::TYPE_NAME;
+	statistics_.memoryTaggingPolicyType_ = MemoryTaggingPolicy::TYPE_NAME;
+	statistics_.allocatorStatistics_ = allocator->getStatistics();
+	statistics_.trackingOverhead_ = 0;
+	statistics_.boundsCheckingOverhead_ = 0;
 #endif
 }
 
@@ -36,9 +36,9 @@ void* MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTr
 {
 	X_ASSERT(bitUtil::IsPowerOfTwo(alignment), "Alignment is not a power-of-two.")(size, alignment, offset);
 	X_ASSERT((offset % 4) == 0, "Offset is not a multiple of 4.")(size, alignment, offset);
-	X_ASSERT(!m_isFrozen, "Memory arena \"%s\" is frozen, no memory can be allocated.", m_name)();
+	X_ASSERT(!isFrozen_, "Memory arena \"%s\" is frozen, no memory can be allocated.", name_)();
 
-	m_threadGuard.Enter();
+	threadGuard_.Enter();
 
 	union
 	{
@@ -54,21 +54,21 @@ void* MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTr
 	const size_t newSize = size + overheadTotal;
 
 	// allocate raw memory
-	as_void = m_allocator->allocate(newSize, alignment, offset + overheadFront);
+	as_void = allocator_->allocate(newSize, alignment, offset + overheadFront);
 
-	X_ASSERT(as_void != nullptr, "Out of memory. Cannot allocate %d bytes from arena \"%s\".", newSize, m_name)(size, newSize, alignment, offset, overheadFront, overheadBack);
+	X_ASSERT(as_void != nullptr, "Out of memory. Cannot allocate %d bytes from arena \"%s\".", newSize, name_)(size, newSize, alignment, offset, overheadFront, overheadBack);
 
-	const size_t RealAllocSize = m_allocator->getSize(as_void);
+	const size_t RealAllocSize = allocator_->getSize(as_void);
 
 	// then tell the memory tracker about the allocation
-	m_memoryTracker.OnAllocation(as_void, size, newSize, alignment, offset, ID, typeName, sourceInfo, m_name);
+	memoryTracker_.OnAllocation(as_void, size, newSize, alignment, offset, ID, typeName, sourceInfo, name_);
 
 	// the first few bytes belong to the bounds checker
-	m_boundsChecker.GuardFront(as_void);
+	boundsChecker_.GuardFront(as_void);
 	as_char += BoundsCheckingPolicy::SIZE_FRONT;
 
 	// tag the allocation, and store the pointer which is later handed to the user
-	m_memoryTagger.TagAllocation(as_void, RealAllocSize - overheadTotal );
+	memoryTagger_.TagAllocation(as_void, RealAllocSize - overheadTotal );
 
 	void* userPtr = as_void;
 
@@ -76,15 +76,15 @@ void* MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTr
 
 	// the last few bytes belong to the bounds checker as well
 	// we place at end of allocation.
-	m_boundsChecker.GuardBack(as_void);
+	boundsChecker_.GuardBack(as_void);
 
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-	m_statistics.allocatorStatistics_ = m_allocator->getStatistics();
-	m_statistics.trackingOverhead_ += MemoryTrackingPolicy::PER_ALLOCATION_OVERHEAD;
-	m_statistics.boundsCheckingOverhead_ += BoundsCheckingPolicy::SIZE_FRONT + BoundsCheckingPolicy::SIZE_BACK;
+	statistics_.allocatorStatistics_ = allocator_->getStatistics();
+	statistics_.trackingOverhead_ += MemoryTrackingPolicy::PER_ALLOCATION_OVERHEAD;
+	statistics_.boundsCheckingOverhead_ += BoundsCheckingPolicy::SIZE_FRONT + BoundsCheckingPolicy::SIZE_BACK;
 #endif
 
-	m_threadGuard.Leave();
+	threadGuard_.Leave();
 
 	return userPtr;
 }
@@ -96,11 +96,11 @@ template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy
 void MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::free(void* ptr)
 {
 	X_ASSERT_NOT_NULL(ptr);
-	X_ASSERT(!m_isFrozen, "Memory arena \"%s\" is frozen, no memory can be freed.", m_name)();
+	X_ASSERT(!isFrozen_, "Memory arena \"%s\" is frozen, no memory can be freed.", name_)();
 
 	if (ptr)
 	{
-		m_threadGuard.Enter();
+		threadGuard_.Enter();
 
 		union
 		{
@@ -114,23 +114,23 @@ void MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTra
 
 		char* frontGuard = as_char - BoundsCheckingPolicy::SIZE_FRONT;
 		char* originalRawMemory = frontGuard;
-		const size_t allocationSize = m_allocator->getSize(originalRawMemory);
+		const size_t allocationSize = allocator_->getSize(originalRawMemory);
 		char* backGuard = frontGuard + allocationSize - BoundsCheckingPolicy::SIZE_BACK;
 
-		m_boundsChecker.CheckFront(frontGuard);
-		m_boundsChecker.CheckBack(backGuard);
-		m_memoryTracker.OnDeallocation(originalRawMemory);
-		m_memoryTagger.TagDeallocation(ptr, allocationSize - BoundsCheckingPolicy::SIZE_FRONT - BoundsCheckingPolicy::SIZE_BACK);
+		boundsChecker_.CheckFront(frontGuard);
+		boundsChecker_.CheckBack(backGuard);
+		memoryTracker_.OnDeallocation(originalRawMemory);
+		memoryTagger_.TagDeallocation(ptr, allocationSize - BoundsCheckingPolicy::SIZE_FRONT - BoundsCheckingPolicy::SIZE_BACK);
 
-		m_allocator->free(originalRawMemory);
+		allocator_->free(originalRawMemory);
 
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-		m_statistics.allocatorStatistics_ = m_allocator->getStatistics();
-		m_statistics.trackingOverhead_ -= MemoryTrackingPolicy::PER_ALLOCATION_OVERHEAD;
-		m_statistics.boundsCheckingOverhead_ -= BoundsCheckingPolicy::SIZE_FRONT + BoundsCheckingPolicy::SIZE_BACK;
+		statistics_.allocatorStatistics_ = allocator_->getStatistics();
+		statistics_.trackingOverhead_ -= MemoryTrackingPolicy::PER_ALLOCATION_OVERHEAD;
+		statistics_.boundsCheckingOverhead_ -= BoundsCheckingPolicy::SIZE_FRONT + BoundsCheckingPolicy::SIZE_BACK;
 #endif
 
-		m_threadGuard.Leave();
+		threadGuard_.Leave();
 	}
 }
 
@@ -141,7 +141,7 @@ template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy
 MemoryArenaStatistics MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-	return m_statistics;
+	return statistics_;
 #else
 	MemoryArenaStatistics statistics;
 	core::zero_object(statistics);
@@ -154,7 +154,7 @@ MemoryAllocatorStatistics MemoryArena<AllocationPolicy, ThreadPolicy, BoundsChec
 	MemoryTrackingPolicy, MemoryTaggingPolicy>::getAllocatorStatistics(bool children) const
 {
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-	MemoryAllocatorStatistics stats = m_statistics.allocatorStatistics_;
+	MemoryAllocatorStatistics stats = statistics_.allocatorStatistics_;
 
 	if (children) 
 	{
@@ -183,7 +183,7 @@ MemoryAllocatorStatistics MemoryArena<AllocationPolicy, ThreadPolicy, BoundsChec
 template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy, class MemoryTrackingPolicy, class MemoryTaggingPolicy>
 inline void MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::freeze(void)
 {
-	m_isFrozen = true;
+	isFrozen_ = true;
 }
 
 
@@ -192,7 +192,7 @@ inline void MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, Me
 template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy, class MemoryTrackingPolicy, class MemoryTaggingPolicy>
 inline void MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::unfreeze(void)
 {
-	m_isFrozen = false;
+	isFrozen_ = false;
 }
 
 
