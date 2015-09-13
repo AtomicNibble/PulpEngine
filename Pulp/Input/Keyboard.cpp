@@ -33,7 +33,7 @@ bool XKeyboard::VkeyCharCache_[256] = { false };
 XKeyboard::XKeyboard(XWinInput& input) : 
 	XInputDeviceWin32(input, "keyboard")
 {
-	m_deviceId = InputDevice::KEYBOARD;
+	deviceId_ = InputDevice::KEYBOARD;
 }
 
 XKeyboard::~XKeyboard()

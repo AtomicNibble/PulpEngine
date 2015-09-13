@@ -13,7 +13,7 @@ InputSymbol*	XMouse::Symbol_[MAX_MOUSE_SYMBOLS] = { 0 };
 XMouse::XMouse(XWinInput& input) :
 	XInputDeviceWin32(input, "mouse")
 {
-	m_deviceId = InputDevice::MOUSE;
+	deviceId_ = InputDevice::MOUSE;
 }
 
 XMouse::~XMouse()
