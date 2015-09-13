@@ -3,11 +3,11 @@
 
 inline HANDLE Console::GetNativeConsole(void) const
 {
-	return m_console;
+	return console_;
 }
 
 
 inline HWND Console::GetNativeConsoleWindow(void) const
 {
-	return m_window;
+	return window_;
 }
