@@ -15,7 +15,7 @@ GrowingGenericAllocator::GrowingGenericAllocator( uint32_t maxSizeInBytesPerPool
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	zero_object( m_statistics );
 
-	m_statistics.m_type = "GrowingGeneric";
+	m_statistics.type_ = "GrowingGeneric";
 #endif
 }
 

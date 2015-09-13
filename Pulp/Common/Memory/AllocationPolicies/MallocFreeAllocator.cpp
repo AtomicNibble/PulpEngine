@@ -27,7 +27,7 @@ MallocFreeAllocator::MallocFreeAllocator(void)
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	zero_object( m_statistics );
 
-	m_statistics.m_type = "MallocFree";
+	m_statistics.type_ = "MallocFree";
 #endif
 }
 
@@ -59,19 +59,19 @@ void* MallocFreeAllocator::allocate(size_t Origsize, size_t alignment, size_t of
 
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-		m_statistics.m_allocationCount++;
-		m_statistics.m_virtualMemoryReserved += size;
-		m_statistics.m_physicalMemoryAllocated += size;
-		m_statistics.m_physicalMemoryUsed += size;
-		m_statistics.m_internalOverhead += SIZE_OF_HEADER;
-		m_statistics.m_wasteAlignment += safe_static_cast<size_t>((uintptr_t)as_byte - (uintptr_t)pMem) - SIZE_OF_HEADER;
+		m_statistics.allocationCount_++;
+		m_statistics.virtualMemoryReserved_ += size;
+		m_statistics.physicalMemoryAllocated_ += size;
+		m_statistics.physicalMemoryUsed_ += size;
+		m_statistics.internalOverhead_ += SIZE_OF_HEADER;
+		m_statistics.wasteAlignment_ += safe_static_cast<size_t>((uintptr_t)as_byte - (uintptr_t)pMem) - SIZE_OF_HEADER;
 
 
-		m_statistics.m_allocationCountMax = Max( m_statistics.m_allocationCount, m_statistics.m_allocationCountMax );
-		m_statistics.m_physicalMemoryUsedMax = Max( m_statistics.m_physicalMemoryUsed, m_statistics.m_physicalMemoryUsedMax );
-		m_statistics.m_physicalMemoryAllocatedMax = Max( m_statistics.m_physicalMemoryAllocated, m_statistics.m_physicalMemoryAllocatedMax );
-		m_statistics.m_wasteAlignmentMax = Max( m_statistics.m_wasteAlignment, m_statistics.m_wasteAlignmentMax );
-		m_statistics.m_internalOverheadMax = Max( m_statistics.m_internalOverhead, m_statistics.m_internalOverheadMax );
+		m_statistics.allocationCountMax_ = Max( m_statistics.allocationCount_, m_statistics.allocationCountMax_ );
+		m_statistics.physicalMemoryUsedMax_ = Max( m_statistics.physicalMemoryUsed_, m_statistics.physicalMemoryUsedMax_ );
+		m_statistics.physicalMemoryAllocatedMax_ = Max( m_statistics.physicalMemoryAllocated_, m_statistics.physicalMemoryAllocatedMax_ );
+		m_statistics.wasteAlignmentMax_ = Max( m_statistics.wasteAlignment_, m_statistics.wasteAlignmentMax_ );
+		m_statistics.internalOverheadMax_ = Max( m_statistics.internalOverhead_, m_statistics.internalOverheadMax_ );
 #endif
 		
 		return as_byte; // we return the mem - offset.
@@ -100,12 +100,12 @@ void MallocFreeAllocator::free(void* ptr)
 	size_t AlignmentWaste = safe_static_cast<size_t>((uintptr_t)ptr - (uintptr_t)as_header->m_originalAllocation) - SIZE_OF_HEADER;
 	size_t Size = as_header->m_AllocationSize;
 
-	m_statistics.m_allocationCount--;
-	m_statistics.m_virtualMemoryReserved -= Size;
-	m_statistics.m_physicalMemoryAllocated -= Size;
-	m_statistics.m_physicalMemoryUsed -= Size;
-	m_statistics.m_internalOverhead -= SIZE_OF_HEADER;
-	m_statistics.m_wasteAlignment -= AlignmentWaste;
+	m_statistics.allocationCount_--;
+	m_statistics.virtualMemoryReserved_ -= Size;
+	m_statistics.physicalMemoryAllocated_ -= Size;
+	m_statistics.physicalMemoryUsed_ -= Size;
+	m_statistics.internalOverhead_ -= SIZE_OF_HEADER;
+	m_statistics.wasteAlignment_ -= AlignmentWaste;
 #endif
 
 	::free( as_header->m_originalAllocation );

@@ -54,12 +54,12 @@ GrowingPoolAllocator::GrowingPoolAllocator(unsigned int maxSizeInBytes, unsigned
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	zero_object( m_statistics );
 
-	m_statistics.m_virtualMemoryReserved = maxSizeInBytes;
+	m_statistics.virtualMemoryReserved_ = maxSizeInBytes;
 
 	m_elementSize = CalculateElementSize( maxElementSize, maxAlignment );
 	m_wastePerElement = m_elementSize = maxElementSize;
 
-	m_statistics.m_type = "GrowPoolAllocator";
+	m_statistics.type_ = "GrowPoolAllocator";
 #endif
 
 }
@@ -118,16 +118,16 @@ void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offs
 			size_t memoryRegionSize = safe_static_cast<uint32_t>( (char*)pChunkHeaderStart - (char*)pMemoryRegionStart );
 			size_t elementCount = (memoryRegionSize - wasteAtFront) / m_elementSize;
 
-			m_statistics.m_physicalMemoryAllocated = safe_static_cast<uint32_t>( m_physicalCurrent - m_virtualStart );
-			m_statistics.m_physicalMemoryUsed += m_chunkHeaderSize + wasteAtFront;
-			m_statistics.m_wasteAlignment += wasteAtFront;
-			m_statistics.m_wasteUnused = m_chunkHeaderSize + memoryRegionSize - wasteAtFront- m_elementSize * elementCount;
+			m_statistics.physicalMemoryAllocated_ = safe_static_cast<uint32_t>( m_physicalCurrent - m_virtualStart );
+			m_statistics.physicalMemoryUsed_ += m_chunkHeaderSize + wasteAtFront;
+			m_statistics.wasteAlignment_ += wasteAtFront;
+			m_statistics.wasteUnused_ = m_chunkHeaderSize + memoryRegionSize - wasteAtFront- m_elementSize * elementCount;
 
 			// 1,2,3 what is the max? I hope i don't have to pay tax.
-			m_statistics.m_physicalMemoryAllocatedMax = Max( m_statistics.m_physicalMemoryAllocatedMax, m_statistics.m_physicalMemoryAllocated );
-			m_statistics.m_physicalMemoryUsedMax = Max( m_statistics.m_physicalMemoryUsedMax, m_statistics.m_physicalMemoryUsed );
-			m_statistics.m_wasteAlignmentMax = Max( m_statistics.m_wasteAlignmentMax, m_statistics.m_wasteAlignment );
-			m_statistics.m_wasteUnusedMax = Max( m_statistics.m_wasteUnusedMax, m_statistics.m_wasteUnused );
+			m_statistics.physicalMemoryAllocatedMax_ = Max( m_statistics.physicalMemoryAllocatedMax_, m_statistics.physicalMemoryAllocated_ );
+			m_statistics.physicalMemoryUsedMax_ = Max( m_statistics.physicalMemoryUsedMax_, m_statistics.physicalMemoryUsed_ );
+			m_statistics.wasteAlignmentMax_ = Max( m_statistics.wasteAlignmentMax_, m_statistics.wasteAlignment_ );
+			m_statistics.wasteUnusedMax_ = Max( m_statistics.wasteUnusedMax_, m_statistics.wasteUnused_ );
 #endif
 		}
 		else
@@ -139,13 +139,13 @@ void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offs
 	// info for when we either grow or not.
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
-	m_statistics.m_allocationCount++;
-	m_statistics.m_physicalMemoryUsed += m_elementSize;
-	m_statistics.m_wasteAlignment += m_wastePerElement;
+	m_statistics.allocationCount_++;
+	m_statistics.physicalMemoryUsed_ += m_elementSize;
+	m_statistics.wasteAlignment_ += m_wastePerElement;
 
-	m_statistics.m_allocationCountMax = Max( m_statistics.m_allocationCountMax, m_statistics.m_allocationCount );	
-	m_statistics.m_physicalMemoryUsedMax = Max( m_statistics.m_physicalMemoryUsedMax, m_statistics.m_physicalMemoryUsed );
-	m_statistics.m_wasteAlignmentMax = Max( m_statistics.m_wasteAlignmentMax, m_statistics.m_wasteAlignment );
+	m_statistics.allocationCountMax_ = Max( m_statistics.allocationCountMax_, m_statistics.allocationCount_ );	
+	m_statistics.physicalMemoryUsedMax_ = Max( m_statistics.physicalMemoryUsedMax_, m_statistics.physicalMemoryUsed_ );
+	m_statistics.wasteAlignmentMax_ = Max( m_statistics.wasteAlignmentMax_, m_statistics.wasteAlignment_ );
 #endif
 	return pMem;
 }

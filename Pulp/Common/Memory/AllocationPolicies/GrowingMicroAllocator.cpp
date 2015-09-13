@@ -38,7 +38,7 @@ GrowingMicroAllocator::GrowingMicroAllocator( uint32_t maxSizeInBytesPerPool, ui
 
 	zero_object( m_statistics );
 
-	m_statistics.m_type = "MicroPool";
+	m_statistics.type_ = "MicroPool";
 
 #endif
 }
@@ -85,7 +85,7 @@ void GrowingMicroAllocator::free( void* ptr )
 
 void GrowingMicroAllocator::updateStatistics(void)
 {
-//	memset( &m_statistics.m_allocationCount, 0, sizeof( m_statistics ) - sizeof( m_statistics.m_type ) );
+//	memset( &m_statistics.allocationCount_, 0, sizeof( m_statistics ) - sizeof( m_statistics.type_ ) );
 
 	m_statistics.Clear();
 
@@ -101,21 +101,21 @@ void GrowingMicroAllocator::updateStatistics(void)
 
 	lopi( 6 )
 	{
-		m_statistics.m_allocationCount += pStats->m_allocationCount;
-		m_statistics.m_virtualMemoryReserved += pStats->m_virtualMemoryReserved;
-		m_statistics.m_physicalMemoryAllocated += pStats->m_physicalMemoryAllocated;
-		m_statistics.m_physicalMemoryUsed += pStats->m_physicalMemoryUsed;
-		m_statistics.m_wasteAlignment += pStats->m_wasteAlignment;
-		m_statistics.m_wasteUnused += pStats->m_wasteUnused;
-		m_statistics.m_internalOverhead += pStats->m_internalOverhead;
+		m_statistics.allocationCount_ += pStats->allocationCount_;
+		m_statistics.virtualMemoryReserved_ += pStats->virtualMemoryReserved_;
+		m_statistics.physicalMemoryAllocated_ += pStats->physicalMemoryAllocated_;
+		m_statistics.physicalMemoryUsed_ += pStats->physicalMemoryUsed_;
+		m_statistics.wasteAlignment_ += pStats->wasteAlignment_;
+		m_statistics.wasteUnused_ += pStats->wasteUnused_;
+		m_statistics.internalOverhead_ += pStats->internalOverhead_;
 
 
-		m_statistics.m_allocationCountMax += pStats->m_allocationCountMax;
-		m_statistics.m_physicalMemoryAllocatedMax += pStats->m_physicalMemoryAllocatedMax;
-		m_statistics.m_physicalMemoryUsedMax += pStats->m_physicalMemoryUsedMax;
-		m_statistics.m_wasteAlignmentMax += pStats->m_wasteAlignmentMax;
-		m_statistics.m_wasteUnusedMax += pStats->m_wasteUnusedMax;
-		m_statistics.m_internalOverheadMax += pStats->m_internalOverheadMax;
+		m_statistics.allocationCountMax_ += pStats->allocationCountMax_;
+		m_statistics.physicalMemoryAllocatedMax_ += pStats->physicalMemoryAllocatedMax_;
+		m_statistics.physicalMemoryUsedMax_ += pStats->physicalMemoryUsedMax_;
+		m_statistics.wasteAlignmentMax_ += pStats->wasteAlignmentMax_;
+		m_statistics.wasteUnusedMax_ += pStats->wasteUnusedMax_;
+		m_statistics.internalOverheadMax_ += pStats->internalOverheadMax_;
 
 		++pStats;
 	}

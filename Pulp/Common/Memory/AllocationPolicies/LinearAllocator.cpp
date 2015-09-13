@@ -20,10 +20,10 @@ LinearAllocator::LinearAllocator(void* start, void* end) :
 
 	size_t Len = static_cast<size_t>((uintptr_t)end - (uintptr_t)start);
 
-	m_statistics.m_type = "Linear";
-	m_statistics.m_virtualMemoryReserved = Len;
-	m_statistics.m_physicalMemoryAllocated = Len;
-	m_statistics.m_physicalMemoryAllocatedMax = Len;
+	m_statistics.type_ = "Linear";
+	m_statistics.virtualMemoryReserved_ = Len;
+	m_statistics.physicalMemoryAllocated_ = Len;
+	m_statistics.physicalMemoryAllocatedMax_ = Len;
 #endif
 }
 
@@ -48,9 +48,9 @@ void* LinearAllocator::allocate(size_t size, size_t alignment, size_t align_offs
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	// stats baby !
-	m_statistics.m_allocationCount++;
-	m_statistics.m_internalOverhead += sizeof(size_t);
-	m_statistics.m_wasteAlignment += safe_static_cast<size_t>((uintptr_t)m_current - (uintptr_t)oldCurrent);
+	m_statistics.allocationCount_++;
+	m_statistics.internalOverhead_ += sizeof(size_t);
+	m_statistics.wasteAlignment_ += safe_static_cast<size_t>((uintptr_t)m_current - (uintptr_t)oldCurrent);
 
 #endif
 
@@ -70,12 +70,12 @@ void* LinearAllocator::allocate(size_t size, size_t alignment, size_t align_offs
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	// stats baby !
-	m_statistics.m_physicalMemoryUsed = safe_static_cast<size_t>(m_current - m_start);
+	m_statistics.physicalMemoryUsed_ = safe_static_cast<size_t>(m_current - m_start);
 
-	m_statistics.m_wasteAlignmentMax = Max( m_statistics.m_wasteAlignment, m_statistics.m_wasteAlignmentMax );
-	m_statistics.m_allocationCountMax = Max( m_statistics.m_allocationCount, m_statistics.m_allocationCountMax );
-	m_statistics.m_internalOverheadMax = Max( m_statistics.m_internalOverhead, m_statistics.m_internalOverheadMax );
-	m_statistics.m_physicalMemoryUsedMax = Max( m_statistics.m_physicalMemoryUsed, m_statistics.m_physicalMemoryUsedMax );
+	m_statistics.wasteAlignmentMax_ = Max( m_statistics.wasteAlignment_, m_statistics.wasteAlignmentMax_ );
+	m_statistics.allocationCountMax_ = Max( m_statistics.allocationCount_, m_statistics.allocationCountMax_ );
+	m_statistics.internalOverheadMax_ = Max( m_statistics.internalOverhead_, m_statistics.internalOverheadMax_ );
+	m_statistics.physicalMemoryUsedMax_ = Max( m_statistics.physicalMemoryUsed_, m_statistics.physicalMemoryUsedMax_ );
 #endif
 
 

@@ -240,19 +240,19 @@ TEST(PoolAlloc, Stats)
 
 		{
 			const core::MemoryAllocatorStatistics& stats = allocator.getStatistics();
-			EXPECT_EQ(stats.m_allocationCount, 0);
-			EXPECT_EQ(stats.m_allocationCountMax, 0);
-			EXPECT_EQ(stats.m_virtualMemoryReserved, 4096);
-			EXPECT_EQ(stats.m_physicalMemoryAllocated, 4096);
-			EXPECT_EQ(stats.m_physicalMemoryAllocatedMax, 4096);
-			EXPECT_EQ(stats.m_physicalMemoryUsed, 0);
-			EXPECT_EQ(stats.m_physicalMemoryUsedMax, 0);
-			EXPECT_EQ(stats.m_wasteAlignment, 0);
-			EXPECT_EQ(stats.m_wasteAlignmentMax, 0);
-			EXPECT_EQ(stats.m_wasteUnused, 0);
-			EXPECT_EQ(stats.m_wasteUnusedMax, 0);
-			EXPECT_EQ(stats.m_internalOverhead, 0);
-			EXPECT_EQ(stats.m_internalOverheadMax, 0);
+			EXPECT_EQ(stats.allocationCount_, 0);
+			EXPECT_EQ(stats.allocationCountMax_, 0);
+			EXPECT_EQ(stats.virtualMemoryReserved_, 4096);
+			EXPECT_EQ(stats.physicalMemoryAllocated_, 4096);
+			EXPECT_EQ(stats.physicalMemoryAllocatedMax_, 4096);
+			EXPECT_EQ(stats.physicalMemoryUsed_, 0);
+			EXPECT_EQ(stats.physicalMemoryUsedMax_, 0);
+			EXPECT_EQ(stats.wasteAlignment_, 0);
+			EXPECT_EQ(stats.wasteAlignmentMax_, 0);
+			EXPECT_EQ(stats.wasteUnused_, 0);
+			EXPECT_EQ(stats.wasteUnusedMax_, 0);
+			EXPECT_EQ(stats.internalOverhead_, 0);
+			EXPECT_EQ(stats.internalOverheadMax_, 0);
 		}
 
 		{
@@ -263,38 +263,38 @@ TEST(PoolAlloc, Stats)
 
 			{
 				const core::MemoryAllocatorStatistics& stats = allocator.getStatistics();
-				EXPECT_EQ(stats.m_allocationCount, 1);
-				EXPECT_EQ(stats.m_allocationCountMax, 1);
-				EXPECT_EQ(stats.m_virtualMemoryReserved, 4096);
-				EXPECT_EQ(stats.m_physicalMemoryAllocated, 4096);
-				EXPECT_EQ(stats.m_physicalMemoryAllocatedMax, 4096);
-				EXPECT_EQ(stats.m_physicalMemoryUsed, 32);
-				EXPECT_EQ(stats.m_physicalMemoryUsedMax, 32);
-				EXPECT_EQ(stats.m_wasteAlignment, 32 - 24);
-				EXPECT_EQ(stats.m_wasteAlignmentMax, 32 - 24);
-				EXPECT_EQ(stats.m_wasteUnused, 0);
-				EXPECT_EQ(stats.m_wasteUnusedMax, 0);
-				EXPECT_EQ(stats.m_internalOverhead, 0);
-				EXPECT_EQ(stats.m_internalOverheadMax, 0);
+				EXPECT_EQ(stats.allocationCount_, 1);
+				EXPECT_EQ(stats.allocationCountMax_, 1);
+				EXPECT_EQ(stats.virtualMemoryReserved_, 4096);
+				EXPECT_EQ(stats.physicalMemoryAllocated_, 4096);
+				EXPECT_EQ(stats.physicalMemoryAllocatedMax_, 4096);
+				EXPECT_EQ(stats.physicalMemoryUsed_, 32);
+				EXPECT_EQ(stats.physicalMemoryUsedMax_, 32);
+				EXPECT_EQ(stats.wasteAlignment_, 32 - 24);
+				EXPECT_EQ(stats.wasteAlignmentMax_, 32 - 24);
+				EXPECT_EQ(stats.wasteUnused_, 0);
+				EXPECT_EQ(stats.wasteUnusedMax_, 0);
+				EXPECT_EQ(stats.internalOverhead_, 0);
+				EXPECT_EQ(stats.internalOverheadMax_, 0);
 			}
 
 			allocator.free(alloc);
 
 			{
 				const core::MemoryAllocatorStatistics& stats = allocator.getStatistics();
-				EXPECT_EQ(stats.m_allocationCount, 0);
-				EXPECT_EQ(stats.m_allocationCountMax, 1);
-				EXPECT_EQ(stats.m_virtualMemoryReserved, 4096);
-				EXPECT_EQ(stats.m_physicalMemoryAllocated, 4096);
-				EXPECT_EQ(stats.m_physicalMemoryAllocatedMax, 4096);
-				EXPECT_EQ(stats.m_physicalMemoryUsed, 0);
-				EXPECT_EQ(stats.m_physicalMemoryUsedMax, 32);
-				EXPECT_EQ(stats.m_wasteAlignment, 0);
-				EXPECT_EQ(stats.m_wasteAlignmentMax, 32 - 24);
-				EXPECT_EQ(stats.m_wasteUnused, 0);
-				EXPECT_EQ(stats.m_wasteUnusedMax, 0);
-				EXPECT_EQ(stats.m_internalOverhead, 0);
-				EXPECT_EQ(stats.m_internalOverheadMax, 0);
+				EXPECT_EQ(stats.allocationCount_, 0);
+				EXPECT_EQ(stats.allocationCountMax_, 1);
+				EXPECT_EQ(stats.virtualMemoryReserved_, 4096);
+				EXPECT_EQ(stats.physicalMemoryAllocated_, 4096);
+				EXPECT_EQ(stats.physicalMemoryAllocatedMax_, 4096);
+				EXPECT_EQ(stats.physicalMemoryUsed_, 0);
+				EXPECT_EQ(stats.physicalMemoryUsedMax_, 32);
+				EXPECT_EQ(stats.wasteAlignment_, 0);
+				EXPECT_EQ(stats.wasteAlignmentMax_, 32 - 24);
+				EXPECT_EQ(stats.wasteUnused_, 0);
+				EXPECT_EQ(stats.wasteUnusedMax_, 0);
+				EXPECT_EQ(stats.internalOverhead_, 0);
+				EXPECT_EQ(stats.internalOverheadMax_, 0);
 			}
 		}
 	}
@@ -304,23 +304,23 @@ TEST(PoolAlloc, Stats)
 
 		{
 			const core::MemoryAllocatorStatistics& stats = allocator.getStatistics();
-			EXPECT_EQ(stats.m_allocationCount, 0);
-			EXPECT_EQ(stats.m_allocationCountMax, 0);
-			EXPECT_EQ(stats.m_virtualMemoryReserved, 4096);
-			EXPECT_EQ(stats.m_physicalMemoryAllocated, 4096);
-			EXPECT_EQ(stats.m_physicalMemoryAllocatedMax, 4096);
+			EXPECT_EQ(stats.allocationCount_, 0);
+			EXPECT_EQ(stats.allocationCountMax_, 0);
+			EXPECT_EQ(stats.virtualMemoryReserved_, 4096);
+			EXPECT_EQ(stats.physicalMemoryAllocated_, 4096);
+			EXPECT_EQ(stats.physicalMemoryAllocatedMax_, 4096);
 
 			// the allocator already needs physical memory due to the offset at the front
-			EXPECT_EQ(stats.m_physicalMemoryUsed, 12);
-			EXPECT_EQ(stats.m_physicalMemoryUsedMax, 12);
-			EXPECT_EQ(stats.m_wasteAlignment, 12);
-			EXPECT_EQ(stats.m_wasteAlignmentMax, 12);
+			EXPECT_EQ(stats.physicalMemoryUsed_, 12);
+			EXPECT_EQ(stats.physicalMemoryUsedMax_, 12);
+			EXPECT_EQ(stats.wasteAlignment_, 12);
+			EXPECT_EQ(stats.wasteAlignmentMax_, 12);
 
 			// because of the offset and the 12 bytes waste at the front, there's an unused space of 4 bytes at the back
-			EXPECT_EQ(stats.m_wasteUnused, 4);
-			EXPECT_EQ(stats.m_wasteUnusedMax, 4);
-			EXPECT_EQ(stats.m_internalOverhead, 0);
-			EXPECT_EQ(stats.m_internalOverheadMax, 0);
+			EXPECT_EQ(stats.wasteUnused_, 4);
+			EXPECT_EQ(stats.wasteUnusedMax_, 4);
+			EXPECT_EQ(stats.internalOverhead_, 0);
+			EXPECT_EQ(stats.internalOverheadMax_, 0);
 		}
 
 		{
@@ -331,38 +331,38 @@ TEST(PoolAlloc, Stats)
 
 			{
 				const core::MemoryAllocatorStatistics& stats = allocator.getStatistics();
-				EXPECT_EQ(stats.m_allocationCount, 1);
-				EXPECT_EQ(stats.m_allocationCountMax, 1);
-				EXPECT_EQ(stats.m_virtualMemoryReserved, 4096);
-				EXPECT_EQ(stats.m_physicalMemoryAllocated, 4096);
-				EXPECT_EQ(stats.m_physicalMemoryAllocatedMax, 4096);
-				EXPECT_EQ(stats.m_physicalMemoryUsed, 12 + 16);
-				EXPECT_EQ(stats.m_physicalMemoryUsedMax, 12 + 16);
-				EXPECT_EQ(stats.m_wasteAlignment, 12);
-				EXPECT_EQ(stats.m_wasteAlignmentMax, 12);
-				EXPECT_EQ(stats.m_wasteUnused, 4);
-				EXPECT_EQ(stats.m_wasteUnusedMax, 4);
-				EXPECT_EQ(stats.m_internalOverhead, 0);
-				EXPECT_EQ(stats.m_internalOverheadMax, 0);
+				EXPECT_EQ(stats.allocationCount_, 1);
+				EXPECT_EQ(stats.allocationCountMax_, 1);
+				EXPECT_EQ(stats.virtualMemoryReserved_, 4096);
+				EXPECT_EQ(stats.physicalMemoryAllocated_, 4096);
+				EXPECT_EQ(stats.physicalMemoryAllocatedMax_, 4096);
+				EXPECT_EQ(stats.physicalMemoryUsed_, 12 + 16);
+				EXPECT_EQ(stats.physicalMemoryUsedMax_, 12 + 16);
+				EXPECT_EQ(stats.wasteAlignment_, 12);
+				EXPECT_EQ(stats.wasteAlignmentMax_, 12);
+				EXPECT_EQ(stats.wasteUnused_, 4);
+				EXPECT_EQ(stats.wasteUnusedMax_, 4);
+				EXPECT_EQ(stats.internalOverhead_, 0);
+				EXPECT_EQ(stats.internalOverheadMax_, 0);
 			}
 
 			allocator.free(alloc);
 
 			{
 				const core::MemoryAllocatorStatistics& stats = allocator.getStatistics();
-				EXPECT_EQ(stats.m_allocationCount, 0);
-				EXPECT_EQ(stats.m_allocationCountMax, 1);
-				EXPECT_EQ(stats.m_virtualMemoryReserved, 4096);
-				EXPECT_EQ(stats.m_physicalMemoryAllocated, 4096);
-				EXPECT_EQ(stats.m_physicalMemoryAllocatedMax, 4096);
-				EXPECT_EQ(stats.m_physicalMemoryUsed, 12);
-				EXPECT_EQ(stats.m_physicalMemoryUsedMax, 12 + 16);
-				EXPECT_EQ(stats.m_wasteAlignment, 12);
-				EXPECT_EQ(stats.m_wasteAlignmentMax, 12);
-				EXPECT_EQ(stats.m_wasteUnused, 4);
-				EXPECT_EQ(stats.m_wasteUnusedMax, 4);
-				EXPECT_EQ(stats.m_internalOverhead, 0);
-				EXPECT_EQ(stats.m_internalOverheadMax, 0);
+				EXPECT_EQ(stats.allocationCount_, 0);
+				EXPECT_EQ(stats.allocationCountMax_, 1);
+				EXPECT_EQ(stats.virtualMemoryReserved_, 4096);
+				EXPECT_EQ(stats.physicalMemoryAllocated_, 4096);
+				EXPECT_EQ(stats.physicalMemoryAllocatedMax_, 4096);
+				EXPECT_EQ(stats.physicalMemoryUsed_, 12);
+				EXPECT_EQ(stats.physicalMemoryUsedMax_, 12 + 16);
+				EXPECT_EQ(stats.wasteAlignment_, 12);
+				EXPECT_EQ(stats.wasteAlignmentMax_, 12);
+				EXPECT_EQ(stats.wasteUnused_, 4);
+				EXPECT_EQ(stats.wasteUnusedMax_, 4);
+				EXPECT_EQ(stats.internalOverhead_, 0);
+				EXPECT_EQ(stats.internalOverheadMax_, 0);
 			}
 		}
 	}

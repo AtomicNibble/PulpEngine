@@ -12,10 +12,10 @@ inline void LinearAllocator::free(void* ptr)
 inline void LinearAllocator::reset(void)
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	m_statistics.m_allocationCount = 0;
-	m_statistics.m_physicalMemoryUsed = 0;
-	m_statistics.m_wasteAlignment = 0;
-	m_statistics.m_internalOverhead = 0;
+	m_statistics.allocationCount_ = 0;
+	m_statistics.physicalMemoryUsed_ = 0;
+	m_statistics.wasteAlignment_ = 0;
+	m_statistics.internalOverhead_ = 0;
 #endif
 
 	m_current = m_start;

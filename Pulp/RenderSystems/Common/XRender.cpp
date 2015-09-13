@@ -333,14 +333,14 @@ void XRender::DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
 	core::StackString512 str;
 	core::HumanSize::Str temp;
 
-	str.appendFmt("Num:%i\n", allocStats.m_allocationCount);
-	str.appendFmt("Num(Max):%i\n", allocStats.m_allocationCountMax);
-	str.appendFmt("Physical:%s\n", core::HumanSize::toString(temp, allocStats.m_physicalMemoryAllocated));
-	str.appendFmt("Physical(Used):%s\n", core::HumanSize::toString(temp, allocStats.m_physicalMemoryUsed));
-	str.appendFmt("Virtual(Res):%s\n", core::HumanSize::toString(temp, allocStats.m_virtualMemoryReserved));
-	str.appendFmt("WasteAlign:%s\n", core::HumanSize::toString(temp, allocStats.m_wasteAlignment));
-	str.appendFmt("WasteUnused:%s\n", core::HumanSize::toString(temp, allocStats.m_wasteUnused));
-	str.appendFmt("Overhead:%s\n", core::HumanSize::toString(temp, allocStats.m_internalOverhead));
+	str.appendFmt("Num:%i\n", allocStats.allocationCount_);
+	str.appendFmt("Num(Max):%i\n", allocStats.allocationCountMax_);
+	str.appendFmt("Physical:%s\n", core::HumanSize::toString(temp, allocStats.physicalMemoryAllocated_));
+	str.appendFmt("Physical(Used):%s\n", core::HumanSize::toString(temp, allocStats.physicalMemoryUsed_));
+	str.appendFmt("Virtual(Res):%s\n", core::HumanSize::toString(temp, allocStats.virtualMemoryReserved_));
+	str.appendFmt("WasteAlign:%s\n", core::HumanSize::toString(temp, allocStats.wasteAlignment_));
+	str.appendFmt("WasteUnused:%s\n", core::HumanSize::toString(temp, allocStats.wasteUnused_));
+	str.appendFmt("Overhead:%s\n", core::HumanSize::toString(temp, allocStats.internalOverhead_));
 
 	DrawTextQueued(pos + Vec3f(0, 15, 0), ti, str.c_str());
 

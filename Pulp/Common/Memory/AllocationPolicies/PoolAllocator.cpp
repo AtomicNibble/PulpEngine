@@ -47,21 +47,21 @@ PoolAllocator::PoolAllocator(void* start, void* end, size_t maxElementSize, size
 
 	zero_object( m_statistics );
 
-	m_statistics.m_type = "Pool";
-	m_statistics.m_virtualMemoryReserved = Size;
-	m_statistics.m_physicalMemoryAllocated = Size;
-	m_statistics.m_physicalMemoryUsed = Waste;
-	m_statistics.m_wasteAlignment = Waste;
+	m_statistics.type_ = "Pool";
+	m_statistics.virtualMemoryReserved_ = Size;
+	m_statistics.physicalMemoryAllocated_ = Size;
+	m_statistics.physicalMemoryUsed_ = Waste;
+	m_statistics.wasteAlignment_ = Waste;
 
 
-	m_statistics.m_wasteUnused = (Size - Waste) - (m_elementSize * ((Size - Waste) / m_elementSize));
+	m_statistics.wasteUnused_ = (Size - Waste) - (m_elementSize * ((Size - Waste) / m_elementSize));
 
-	m_statistics.m_wasteAlignmentMax = Max( m_statistics.m_wasteAlignment, m_statistics.m_wasteAlignmentMax );
-	m_statistics.m_wasteUnusedMax = Max( m_statistics.m_wasteUnused, m_statistics.m_wasteUnusedMax );
-	m_statistics.m_allocationCountMax = Max( m_statistics.m_allocationCount, m_statistics.m_allocationCountMax );
-	m_statistics.m_internalOverheadMax = Max( m_statistics.m_internalOverhead, m_statistics.m_internalOverheadMax );
-	m_statistics.m_physicalMemoryUsedMax = Max(m_statistics.m_physicalMemoryUsed, m_statistics.m_physicalMemoryUsedMax);
-	m_statistics.m_physicalMemoryAllocatedMax = Max(m_statistics.m_physicalMemoryAllocated, m_statistics.m_physicalMemoryAllocatedMax);
+	m_statistics.wasteAlignmentMax_ = Max( m_statistics.wasteAlignment_, m_statistics.wasteAlignmentMax_ );
+	m_statistics.wasteUnusedMax_ = Max( m_statistics.wasteUnused_, m_statistics.wasteUnusedMax_ );
+	m_statistics.allocationCountMax_ = Max( m_statistics.allocationCount_, m_statistics.allocationCountMax_ );
+	m_statistics.internalOverheadMax_ = Max( m_statistics.internalOverhead_, m_statistics.internalOverheadMax_ );
+	m_statistics.physicalMemoryUsedMax_ = Max(m_statistics.physicalMemoryUsed_, m_statistics.physicalMemoryUsedMax_);
+	m_statistics.physicalMemoryAllocatedMax_ = Max(m_statistics.physicalMemoryAllocated_, m_statistics.physicalMemoryAllocatedMax_);
 #endif
 
 }

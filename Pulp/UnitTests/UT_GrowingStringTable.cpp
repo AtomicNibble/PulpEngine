@@ -286,6 +286,6 @@ TEST(GrowingStringTableUnique, Add)
 	Table.free();
 
 	// check no leaks
-	EXPECT_EQ(0,allocator.getStatistics().m_allocationCount);
+	EXPECT_EQ(0,allocator.getStatistics().allocationCount_);
 
 }
