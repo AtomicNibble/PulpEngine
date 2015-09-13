@@ -21,8 +21,8 @@ Assert::Assert( const SourceInfo& sourceInfo, const char* fmt, ... )
 	}
 	else
 	{
-			// shieeeeet
-#if X_DEBUG
+		// shieeeeet
+#if X_DEBUG || 1
 		core::StackString<2048> temp;
 		temp.append("ASSERT: ");
 		temp.appendFmt(fmt, ap);
@@ -33,8 +33,7 @@ Assert::Assert( const SourceInfo& sourceInfo, const char* fmt, ... )
 		::OutputDebugStringW(wTxt);
 
 		X_BREAKPOINT;
-#endif
-		
+#endif		
 	}
 
 	va_end( ap );
