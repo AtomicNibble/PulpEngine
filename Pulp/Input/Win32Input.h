@@ -30,7 +30,7 @@ public:
 	virtual bool	AddInputDevice(XInputDeviceWin32* pDevice);
 
 
-	HWND			GetHWnd() const	{ return m_hwnd; }
+	HWND			GetHWnd(void) const	{ return hwnd_; }
 
 private:
 	// Window procedure handling
@@ -40,9 +40,9 @@ private:
 
 private:
 	BOOL					isWow64_;
-	HWND					m_hwnd;
-	WNDPROC					m_prevWndProc;
-	static XWinInput*		This;
+	HWND					hwnd_;
+	WNDPROC					prevWndProc_;
+	static XWinInput*		s_pThis;
 };
 
 X_NAMESPACE_END
