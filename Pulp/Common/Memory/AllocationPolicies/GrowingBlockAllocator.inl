@@ -13,5 +13,5 @@ inline size_t GrowingBlockAllocator::getSize(void* ptr) const
 	};
 
 	as_void = ptr;
-	return as_header[-1].m_originalSize;
+	return as_header[-1].originalSize_;
 }

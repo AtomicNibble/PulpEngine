@@ -10,7 +10,7 @@ X_NAMESPACE_BEGIN(core)
 
 GrowingBlockAllocator::GrowingBlockAllocator(void)
 {
-	m_memorySpace = create_mspace(0,0);
+	memorySpace_ = create_mspace(0,0);
 
 	
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
@@ -22,7 +22,7 @@ GrowingBlockAllocator::GrowingBlockAllocator(void)
 
 GrowingBlockAllocator::~GrowingBlockAllocator(void)
 {
-	destroy_mspace( m_memorySpace );
+	destroy_mspace( memorySpace_ );
 }
 
 void* GrowingBlockAllocator::allocate( size_t originalSize, size_t alignment, size_t offset )
@@ -31,7 +31,7 @@ void* GrowingBlockAllocator::allocate( size_t originalSize, size_t alignment, si
 
 	size_t size = alignment + BlockHeaderMem + originalSize;
 
-	void* pMem = mspace_malloc( m_memorySpace, size);
+	void* pMem = mspace_malloc( memorySpace_, size);
 
 	union
 	{
@@ -46,15 +46,15 @@ void* GrowingBlockAllocator::allocate( size_t originalSize, size_t alignment, si
 	{
 		as_void = pointerUtil::AlignBottom<char>( as_char + offset + alignment + BlockHeaderMem, alignment) - offset;
 
-		as_header[-1].m_originalAllocation = pMem;
-		as_header[-1].m_originalSize = originalSize;
+		as_header[-1].originalAllocation_ = pMem;
+		as_header[-1].originalSize_ = originalSize;
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 		statistics_.allocationCount_++;
 		statistics_.internalOverhead_ += sizeof( BlockHeader );
 		statistics_.wasteAlignment_ += safe_static_cast<size_t>((uintptr_t)as_void - (uintptr_t)pMem);
 
-		mallinfo info = mspace_mallinfo( m_memorySpace );
+		mallinfo info = mspace_mallinfo( memorySpace_ );
 
 		statistics_.physicalMemoryUsed_ = info.uordblks;
 		statistics_.physicalMemoryAllocated_ = info.uordblks;
@@ -91,13 +91,14 @@ void GrowingBlockAllocator::free( void* ptr )
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	statistics_.allocationCount_--;
 	statistics_.internalOverhead_ -= sizeof( BlockHeader );
-	statistics_.wasteAlignment_ -= safe_static_cast<size_t>((uintptr_t)ptr - (uintptr_t)as_header->m_originalAllocation);
+	statistics_.wasteAlignment_ -= safe_static_cast<size_t>((uintptr_t)ptr - 
+		(uintptr_t)as_header->originalAllocation_);
 #endif
 
-	mspace_free( m_memorySpace, as_header->m_originalAllocation );
+	mspace_free( memorySpace_, as_header->originalAllocation_ );
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	mallinfo info = mspace_mallinfo( m_memorySpace );
+	mallinfo info = mspace_mallinfo( memorySpace_ );
 
 	statistics_.physicalMemoryUsed_ = info.uordblks;
 	statistics_.physicalMemoryAllocated_ = info.uordblks;
