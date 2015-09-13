@@ -20,14 +20,14 @@ X_INLINE void* PoolAllocator::allocate(size_t size, size_t alignment, size_t off
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	if (memory != nullptr)
 	{
-		++m_statistics.allocationCount_;
-		m_statistics.allocationCountMax_ = Max(m_statistics.allocationCount_, m_statistics.allocationCountMax_);
+		++statistics_.allocationCount_;
+		statistics_.allocationCountMax_ = Max(statistics_.allocationCount_, statistics_.allocationCountMax_);
 
-		m_statistics.physicalMemoryUsed_ += m_elementSize;
-		m_statistics.physicalMemoryUsedMax_ = Max(m_statistics.physicalMemoryUsed_, m_statistics.physicalMemoryUsedMax_);
+		statistics_.physicalMemoryUsed_ += m_elementSize;
+		statistics_.physicalMemoryUsedMax_ = Max(statistics_.physicalMemoryUsed_, statistics_.physicalMemoryUsedMax_);
 
-		m_statistics.wasteAlignment_ += m_wastePerElement;
-		m_statistics.wasteAlignmentMax_ = Max(m_statistics.wasteAlignment_, m_statistics.wasteAlignmentMax_);
+		statistics_.wasteAlignment_ += m_wastePerElement;
+		statistics_.wasteAlignmentMax_ = Max(statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_);
 	}
 #endif
 
@@ -44,14 +44,14 @@ X_INLINE void PoolAllocator::free(void* ptr)
 	m_freelist.Return(ptr);
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	--m_statistics.allocationCount_;
-	m_statistics.allocationCountMax_ = Max(m_statistics.allocationCount_, m_statistics.allocationCountMax_);
+	--statistics_.allocationCount_;
+	statistics_.allocationCountMax_ = Max(statistics_.allocationCount_, statistics_.allocationCountMax_);
 
-	m_statistics.physicalMemoryUsed_ -= m_elementSize;
-	m_statistics.physicalMemoryUsedMax_ = Max(m_statistics.physicalMemoryUsed_, m_statistics.physicalMemoryUsedMax_);
+	statistics_.physicalMemoryUsed_ -= m_elementSize;
+	statistics_.physicalMemoryUsedMax_ = Max(statistics_.physicalMemoryUsed_, statistics_.physicalMemoryUsedMax_);
 
-	m_statistics.wasteAlignment_ -= m_wastePerElement;
-	m_statistics.wasteAlignmentMax_ = Max(m_statistics.wasteAlignment_, m_statistics.wasteAlignmentMax_);
+	statistics_.wasteAlignment_ -= m_wastePerElement;
+	statistics_.wasteAlignmentMax_ = Max(statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_);
 #endif
 }
 

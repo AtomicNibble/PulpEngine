@@ -16,14 +16,14 @@ LinearAllocator::LinearAllocator(void* start, void* end) :
 {
 	
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	zero_this( &m_statistics );
+	zero_this( &statistics_ );
 
 	size_t Len = static_cast<size_t>((uintptr_t)end - (uintptr_t)start);
 
-	m_statistics.type_ = "Linear";
-	m_statistics.virtualMemoryReserved_ = Len;
-	m_statistics.physicalMemoryAllocated_ = Len;
-	m_statistics.physicalMemoryAllocatedMax_ = Len;
+	statistics_.type_ = "Linear";
+	statistics_.virtualMemoryReserved_ = Len;
+	statistics_.physicalMemoryAllocated_ = Len;
+	statistics_.physicalMemoryAllocatedMax_ = Len;
 #endif
 }
 
@@ -48,9 +48,9 @@ void* LinearAllocator::allocate(size_t size, size_t alignment, size_t align_offs
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	// stats baby !
-	m_statistics.allocationCount_++;
-	m_statistics.internalOverhead_ += sizeof(size_t);
-	m_statistics.wasteAlignment_ += safe_static_cast<size_t>((uintptr_t)m_current - (uintptr_t)oldCurrent);
+	statistics_.allocationCount_++;
+	statistics_.internalOverhead_ += sizeof(size_t);
+	statistics_.wasteAlignment_ += safe_static_cast<size_t>((uintptr_t)m_current - (uintptr_t)oldCurrent);
 
 #endif
 
@@ -70,12 +70,12 @@ void* LinearAllocator::allocate(size_t size, size_t alignment, size_t align_offs
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	// stats baby !
-	m_statistics.physicalMemoryUsed_ = safe_static_cast<size_t>(m_current - m_start);
+	statistics_.physicalMemoryUsed_ = safe_static_cast<size_t>(m_current - m_start);
 
-	m_statistics.wasteAlignmentMax_ = Max( m_statistics.wasteAlignment_, m_statistics.wasteAlignmentMax_ );
-	m_statistics.allocationCountMax_ = Max( m_statistics.allocationCount_, m_statistics.allocationCountMax_ );
-	m_statistics.internalOverheadMax_ = Max( m_statistics.internalOverhead_, m_statistics.internalOverheadMax_ );
-	m_statistics.physicalMemoryUsedMax_ = Max( m_statistics.physicalMemoryUsed_, m_statistics.physicalMemoryUsedMax_ );
+	statistics_.wasteAlignmentMax_ = Max( statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_ );
+	statistics_.allocationCountMax_ = Max( statistics_.allocationCount_, statistics_.allocationCountMax_ );
+	statistics_.internalOverheadMax_ = Max( statistics_.internalOverhead_, statistics_.internalOverheadMax_ );
+	statistics_.physicalMemoryUsedMax_ = Max( statistics_.physicalMemoryUsed_, statistics_.physicalMemoryUsedMax_ );
 #endif
 
 
@@ -86,7 +86,7 @@ void* LinearAllocator::allocate(size_t size, size_t alignment, size_t align_offs
 MemoryAllocatorStatistics LinearAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	return this->m_statistics;
+	return this->statistics_;
 #else
 	static MemoryAllocatorStatistics stats;
 	core::zero_object(stats);

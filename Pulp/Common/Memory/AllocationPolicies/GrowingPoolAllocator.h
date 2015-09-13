@@ -95,7 +95,7 @@ private:
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	size_t m_elementSize;
 	size_t m_wastePerElement;
-	MemoryAllocatorStatistics m_statistics;
+	MemoryAllocatorStatistics statistics_;
 #endif
 };
 

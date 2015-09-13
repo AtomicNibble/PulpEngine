@@ -14,9 +14,9 @@ GrowingBlockAllocator::GrowingBlockAllocator(void)
 
 	
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	zero_object( m_statistics );
+	zero_object( statistics_ );
 
-	m_statistics.type_ = "GrowBlock";
+	statistics_.type_ = "GrowBlock";
 #endif
 }
 
@@ -50,21 +50,21 @@ void* GrowingBlockAllocator::allocate( size_t originalSize, size_t alignment, si
 		as_header[-1].m_originalSize = originalSize;
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-		m_statistics.allocationCount_++;
-		m_statistics.internalOverhead_ += sizeof( BlockHeader );
-		m_statistics.wasteAlignment_ += safe_static_cast<size_t>((uintptr_t)as_void - (uintptr_t)pMem);
+		statistics_.allocationCount_++;
+		statistics_.internalOverhead_ += sizeof( BlockHeader );
+		statistics_.wasteAlignment_ += safe_static_cast<size_t>((uintptr_t)as_void - (uintptr_t)pMem);
 
 		mallinfo info = mspace_mallinfo( m_memorySpace );
 
-		m_statistics.physicalMemoryUsed_ = info.uordblks;
-		m_statistics.physicalMemoryAllocated_ = info.uordblks;
-		m_statistics.physicalMemoryUsedMax_ = info.usmblks;
-		m_statistics.physicalMemoryAllocatedMax_ = info.usmblks;
+		statistics_.physicalMemoryUsed_ = info.uordblks;
+		statistics_.physicalMemoryAllocated_ = info.uordblks;
+		statistics_.physicalMemoryUsedMax_ = info.usmblks;
+		statistics_.physicalMemoryAllocatedMax_ = info.usmblks;
 		
 
-		m_statistics.allocationCountMax_ = Max( m_statistics.allocationCount_, m_statistics.allocationCountMax_ );
-		m_statistics.wasteAlignmentMax_ = Max( m_statistics.wasteAlignment_, m_statistics.wasteAlignmentMax_ );
-		m_statistics.internalOverheadMax_ = Max( m_statistics.internalOverhead_, m_statistics.internalOverheadMax_ );
+		statistics_.allocationCountMax_ = Max( statistics_.allocationCount_, statistics_.allocationCountMax_ );
+		statistics_.wasteAlignmentMax_ = Max( statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_ );
+		statistics_.internalOverheadMax_ = Max( statistics_.internalOverhead_, statistics_.internalOverheadMax_ );
 #endif
 
 		return as_void;
@@ -89,9 +89,9 @@ void GrowingBlockAllocator::free( void* ptr )
 	--as_header;
 	
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	m_statistics.allocationCount_--;
-	m_statistics.internalOverhead_ -= sizeof( BlockHeader );
-	m_statistics.wasteAlignment_ -= safe_static_cast<size_t>((uintptr_t)ptr - (uintptr_t)as_header->m_originalAllocation);
+	statistics_.allocationCount_--;
+	statistics_.internalOverhead_ -= sizeof( BlockHeader );
+	statistics_.wasteAlignment_ -= safe_static_cast<size_t>((uintptr_t)ptr - (uintptr_t)as_header->m_originalAllocation);
 #endif
 
 	mspace_free( m_memorySpace, as_header->m_originalAllocation );
@@ -99,8 +99,8 @@ void GrowingBlockAllocator::free( void* ptr )
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	mallinfo info = mspace_mallinfo( m_memorySpace );
 
-	m_statistics.physicalMemoryUsed_ = info.uordblks;
-	m_statistics.physicalMemoryAllocated_ = info.uordblks;
+	statistics_.physicalMemoryUsed_ = info.uordblks;
+	statistics_.physicalMemoryAllocated_ = info.uordblks;
 #endif
 
 }
@@ -110,7 +110,7 @@ void GrowingBlockAllocator::free( void* ptr )
 MemoryAllocatorStatistics GrowingBlockAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	return m_statistics;
+	return statistics_;
 #else
 	static MemoryAllocatorStatistics stats;
 	core::zero_object(stats);

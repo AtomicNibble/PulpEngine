@@ -36,9 +36,9 @@ GrowingMicroAllocator::GrowingMicroAllocator( uint32_t maxSizeInBytesPerPool, ui
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
-	zero_object( m_statistics );
+	zero_object( statistics_ );
 
-	m_statistics.type_ = "MicroPool";
+	statistics_.type_ = "MicroPool";
 
 #endif
 }
@@ -85,9 +85,9 @@ void GrowingMicroAllocator::free( void* ptr )
 
 void GrowingMicroAllocator::updateStatistics(void)
 {
-//	memset( &m_statistics.allocationCount_, 0, sizeof( m_statistics ) - sizeof( m_statistics.type_ ) );
+//	memset( &statistics_.allocationCount_, 0, sizeof( statistics_ ) - sizeof( statistics_.type_ ) );
 
-	m_statistics.Clear();
+	statistics_.Clear();
 
 	MemoryAllocatorStatistics Stats[6];
 	MemoryAllocatorStatistics* pStats = Stats;
@@ -101,21 +101,21 @@ void GrowingMicroAllocator::updateStatistics(void)
 
 	lopi( 6 )
 	{
-		m_statistics.allocationCount_ += pStats->allocationCount_;
-		m_statistics.virtualMemoryReserved_ += pStats->virtualMemoryReserved_;
-		m_statistics.physicalMemoryAllocated_ += pStats->physicalMemoryAllocated_;
-		m_statistics.physicalMemoryUsed_ += pStats->physicalMemoryUsed_;
-		m_statistics.wasteAlignment_ += pStats->wasteAlignment_;
-		m_statistics.wasteUnused_ += pStats->wasteUnused_;
-		m_statistics.internalOverhead_ += pStats->internalOverhead_;
+		statistics_.allocationCount_ += pStats->allocationCount_;
+		statistics_.virtualMemoryReserved_ += pStats->virtualMemoryReserved_;
+		statistics_.physicalMemoryAllocated_ += pStats->physicalMemoryAllocated_;
+		statistics_.physicalMemoryUsed_ += pStats->physicalMemoryUsed_;
+		statistics_.wasteAlignment_ += pStats->wasteAlignment_;
+		statistics_.wasteUnused_ += pStats->wasteUnused_;
+		statistics_.internalOverhead_ += pStats->internalOverhead_;
 
 
-		m_statistics.allocationCountMax_ += pStats->allocationCountMax_;
-		m_statistics.physicalMemoryAllocatedMax_ += pStats->physicalMemoryAllocatedMax_;
-		m_statistics.physicalMemoryUsedMax_ += pStats->physicalMemoryUsedMax_;
-		m_statistics.wasteAlignmentMax_ += pStats->wasteAlignmentMax_;
-		m_statistics.wasteUnusedMax_ += pStats->wasteUnusedMax_;
-		m_statistics.internalOverheadMax_ += pStats->internalOverheadMax_;
+		statistics_.allocationCountMax_ += pStats->allocationCountMax_;
+		statistics_.physicalMemoryAllocatedMax_ += pStats->physicalMemoryAllocatedMax_;
+		statistics_.physicalMemoryUsedMax_ += pStats->physicalMemoryUsedMax_;
+		statistics_.wasteAlignmentMax_ += pStats->wasteAlignmentMax_;
+		statistics_.wasteUnusedMax_ += pStats->wasteUnusedMax_;
+		statistics_.internalOverheadMax_ += pStats->internalOverheadMax_;
 
 		++pStats;
 	}
@@ -127,7 +127,7 @@ void GrowingMicroAllocator::updateStatistics(void)
 MemoryAllocatorStatistics GrowingMicroAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	return m_statistics;
+	return statistics_;
 #else
 	static MemoryAllocatorStatistics stats;
 	core::zero_object(stats);
