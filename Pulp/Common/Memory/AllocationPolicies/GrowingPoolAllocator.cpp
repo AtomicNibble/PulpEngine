@@ -114,7 +114,7 @@ void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offs
 			pMem = freelist_.Obtain(); 
 
 			if ( chunkHeaderData ) {
-				memcpy( (char*)pChunkHeaderStart, (char*)chunkHeaderData, chunkHeaderSize);
+				memcpy( pChunkHeaderStart, chunkHeaderData, chunkHeaderSize);
 			}
 
 			// update all dat info.
