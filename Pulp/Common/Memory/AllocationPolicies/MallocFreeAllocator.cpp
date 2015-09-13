@@ -49,7 +49,9 @@ void* MallocFreeAllocator::allocate(size_t Origsize, size_t alignment, size_t of
 		};
 
 		// get the aligned pointer.
-		as_void = pointerUtil::AlignBottom<char>( (char*)pMem + offset + alignment + (SIZE_OF_HEADER-1), alignment );
+		as_void = pointerUtil::AlignBottom<char>(reinterpret_cast<char*>(pMem) + offset +
+			alignment + (SIZE_OF_HEADER-1), alignment );
+
 		as_byte -= offset; // take off any offset.
 
 		// we have taken off offfset so now header is just at -1 index.
@@ -97,8 +99,8 @@ void MallocFreeAllocator::free(void* ptr)
 
 	
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	size_t AlignmentWaste = safe_static_cast<size_t>((uintptr_t)ptr - 
-		(uintptr_t)as_header->originalAllocation_) - SIZE_OF_HEADER;
+	size_t AlignmentWaste = safe_static_cast<size_t>(reinterpret_cast<uintptr_t>(ptr) - 
+		reinterpret_cast<uintptr_t>(as_header->originalAllocation_)) - SIZE_OF_HEADER;
 
 	size_t Size = as_header->AllocationSize_;
 
