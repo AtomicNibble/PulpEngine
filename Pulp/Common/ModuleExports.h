@@ -4,7 +4,7 @@
 #define _X_ENGINE_MOUDLE_EXPORTS_H_
 
 
-#include <Platform.h>
+#include <Core\Platform.h>
 #include <icore.h>
 
 #include <Extension\FactoryRegNode.h>

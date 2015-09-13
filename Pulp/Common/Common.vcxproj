@@ -56,8 +56,6 @@
     <ClInclude Include="Compression\LZ4.h" />
     <ClInclude Include="Compression\Lzma2.h" />
     <ClInclude Include="Compression\Zlib.h" />
-    <ClInclude Include="Configuration.h" />
-    <ClInclude Include="ConfigurationWin32.h" />
     <ClInclude Include="Containers\BitStream.h" />
     <ClInclude Include="Containers\ByteStream.h" />
     <ClInclude Include="Containers\ByteStreamFifo.h" />
@@ -74,6 +72,10 @@
     <ClInclude Include="Containers\LinkedList.h" />
     <ClInclude Include="Containers\LinkedListIntrusive.h" />
     <ClInclude Include="Containers\Stack.h" />
+    <ClInclude Include="Core\Configuration.h" />
+    <ClInclude Include="Core\ConfigurationWin32.h" />
+    <ClInclude Include="Core\Platform.h" />
+    <ClInclude Include="Core\PlatformWin32.h" />
     <ClInclude Include="Debugging\AbortHandler.h" />
     <ClInclude Include="Debugging\Assert.h" />
     <ClInclude Include="Debugging\AssertionHandler.h" />
@@ -218,8 +220,6 @@
     <ClInclude Include="Memory\ThreadPolicies\MultiThreadPolicy.h" />
     <ClInclude Include="Memory\ThreadPolicies\SingleThreadPolicy.h" />
     <ClInclude Include="Memory\VirtualMem.h" />
-    <ClInclude Include="Platform.h" />
-    <ClInclude Include="PlatformWin32.h" />
     <ClInclude Include="Platform\ClipBoard.h" />
     <ClInclude Include="Platform\Compiler.h" />
     <ClInclude Include="Platform\Console.h" />

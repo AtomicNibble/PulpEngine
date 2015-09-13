@@ -3,7 +3,7 @@
 #ifndef _X_CORE_I_H_
 #define _X_CORE_I_H_
 
-#include <Platform.h>
+#include <Core\Platform.h>
 // #include <Util/SourceInfo.h>
 
 // defaults.
