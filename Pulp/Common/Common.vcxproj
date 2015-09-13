@@ -53,6 +53,7 @@
     <ClInclude Include="CompileTime\IsPOD.h" />
     <ClInclude Include="CompileTime\IsPointer.h" />
     <ClInclude Include="CompileTime\IsStringLiteral.h" />
+    <ClInclude Include="Compression\LZ4.h" />
     <ClInclude Include="Compression\Lzma2.h" />
     <ClInclude Include="Compression\Zlib.h" />
     <ClInclude Include="Configuration.h" />
@@ -407,6 +408,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Assets\AssetContainer.cpp" />
+    <ClCompile Include="Compression\LZ4.cpp" />
     <ClCompile Include="Compression\Lzma2.cpp" />
     <ClCompile Include="Compression\Zlib.cpp" />
     <ClCompile Include="Containers\HashIndex.cpp" />

@@ -1009,6 +1009,9 @@
     <ClInclude Include="Threading\win32\ThreadLocalStorage.h">
       <Filter>Headers\Threading\win32</Filter>
     </ClInclude>
+    <ClInclude Include="Compression\LZ4.h">
+      <Filter>Headers\Compression</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1526,6 +1529,9 @@
     </ClCompile>
     <ClCompile Include="Threading\win32\ConditionVariable.cpp">
       <Filter>SourceFiles\Threading\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Compression\LZ4.cpp">
+      <Filter>SourceFiles\Compression</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
