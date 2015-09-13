@@ -92,7 +92,8 @@ bool XTexture::RT_CreateDeviceTexture(XTextureFile* image_data)
 
 bool XTexture::ReleaseDeviceTexture(void)
 {
-	ID3D11ShaderResourceView* pSRView = (ID3D11ShaderResourceView*)pDeviceShaderResource_;
+	ID3D11ShaderResourceView* pSRView = 
+		reinterpret_cast<ID3D11ShaderResourceView*>(pDeviceShaderResource_);
 
 	if (pSRView) {
 		pSRView->Release();
@@ -104,7 +105,7 @@ bool XTexture::ReleaseDeviceTexture(void)
 	return true;
 }
 
-void XTexture::setTexStates()
+void XTexture::setTexStates(void)
 {
 	s_DefaultTexState = s_GlobalDefaultTexState;
 
@@ -141,7 +142,7 @@ void XTexture::unbind(void)
 	for (i = 0; i < TEX_MAX_SLOTS; i++) {
 		if (s_pCurrentTexture[i] == this) {
 			s_pCurrentTexture[i] = nullptr;
-			ID3D11ShaderResourceView *RV = NULL;
+			ID3D11ShaderResourceView* RV = nullptr;
 			render::g_Dx11D3D.DxDeviceContext()->PSSetShaderResources(i, 1, &RV);
 		}
 	}
@@ -176,7 +177,7 @@ void XTexture::apply(int slot, int state_id, shader::ShaderType::Enum type)
 
 	setSamplerState(slot, state_id, type);
 
-	pResView = (ID3D11ShaderResourceView*)this->pDeviceShaderResource_;
+	pResView = reinterpret_cast<ID3D11ShaderResourceView*>(this->pDeviceShaderResource_);
 
 	dv->PSSetShaderResources(slot, 1, &pResView);
 }
@@ -220,7 +221,7 @@ void XTexture::RT_UpdateTextureRegion(byte* data, int nX, int nY, int USize, int
 
 ID3D11RenderTargetView* XTexture::getRenderTargetView(void)
 {
-	ID3D11RenderTargetView* pRenTarView = (ID3D11RenderTargetView*)pDeviceRenderTargetView_;
+	ID3D11RenderTargetView* pRenTarView = reinterpret_cast<ID3D11RenderTargetView*>(pDeviceRenderTargetView_);
 	HRESULT hr = S_OK;
 
 	if (pRenTarView == nullptr)
@@ -405,7 +406,7 @@ void XTexState::setBorderColor(Color8u color)
 	dwBorderColor_ = color;
 }
 
-void XTexState::postCreate()
+void XTexState::postCreate(void)
 {
 	// already got a device state?
 	if (pDeviceState_) {
@@ -528,7 +529,7 @@ void XTexState::postCreate()
 }
 
 
-XTexState::~XTexState()
+XTexState::~XTexState(void)
 {
 	clearDevice();
 }
@@ -538,7 +539,7 @@ XTexState::XTexState(const XTexState& src)
 	memcpy(this, &src, sizeof(src));
 	if (pDeviceState_)
 	{
-		ID3D11SamplerState *pSamp = (ID3D11SamplerState *)pDeviceState_;
+		ID3D11SamplerState* pSamp = reinterpret_cast<ID3D11SamplerState *>(pDeviceState_);
 		pSamp->AddRef();
 	}
 }
@@ -546,7 +547,7 @@ XTexState::XTexState(const XTexState& src)
 void XTexState::clearDevice(void)
 {
 	if (pDeviceState_) {
-		ID3D11SamplerState* pSamp = (ID3D11SamplerState*)pDeviceState_;
+		ID3D11SamplerState* pSamp = reinterpret_cast<ID3D11SamplerState *>(pDeviceState_);
 		pSamp->Release();
 		pDeviceState_ = nullptr;
 	}
