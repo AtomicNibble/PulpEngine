@@ -23,22 +23,22 @@ public:
 		{
 			struct EAX
 			{
-				uint32_t m_maxValidValue;					///< Maximum meaningful value for the info type parameter.
+				uint32_t maxValidValue_;					///< Maximum meaningful value for the info type parameter.
 			} eax;
 
 			struct EBX
 			{
-				uint32_t m_name;							///< Identification String (part 1).
+				uint32_t name_;							///< Identification String (part 1).
 			} ebx;
 
 			struct ECX
 			{
-				uint32_t m_name;							///< Identification String (part 3).
+				uint32_t name_;							///< Identification String (part 3).
 			} ecx;
 
 			struct EDX
 			{
-				uint32_t m_name;							///< Identification String (part 2).
+				uint32_t name_;							///< Identification String (part 2).
 			} edx;
 
 
@@ -53,90 +53,90 @@ public:
 		{
 			struct EAX
 			{
-				uint32_t m_steppingID : 4;					///< Stepping ID.
-				uint32_t m_model : 4;						///< CPU model.
-				uint32_t m_family : 4;						///< CPU family.
-				uint32_t m_processorType : 2;				///< CPU processor type.
-				uint32_t m_reserved : 2;					///< Reserved.
-				uint32_t m_extendedModel : 4;				///< CPU extended model.
-				uint32_t m_extendedFamily : 8;				///< CPU extended family.
-				uint32_t m_reserved2 : 4;					///< Reserved.
+				uint32_t steppingID_ : 4;					///< Stepping ID.
+				uint32_t model_ : 4;						///< CPU model.
+				uint32_t family_ : 4;						///< CPU family.
+				uint32_t processorType_ : 2;				///< CPU processor type.
+				uint32_t reserved_ : 2;						///< Reserved.
+				uint32_t extendedModel_ : 4;				///< CPU extended model.
+				uint32_t extendedFamily_ : 8;				///< CPU extended family.
+				uint32_t reserved2_ : 4;					///< Reserved.
 			} eax;
 
 			struct EBX
 			{
-				uint32_t m_brandIndex : 8;					///< Brand index.
-				uint32_t m_cflushCacheLine : 8;				///< The size of the CLFLUSH cache line, in quadwords.
-				uint32_t m_logicalProcessorCount : 8;		///< Logical processor count.
-				uint32_t m_apicId : 8;						///< Initial APIC ID.
+				uint32_t brandIndex_ : 8;					///< Brand index.
+				uint32_t cflushCacheLine_ : 8;				///< The size of the CLFLUSH cache line, in quadwords.
+				uint32_t logicalProcessorCount_ : 8;		///< Logical processor count.
+				uint32_t apicId_ : 8;						///< Initial APIC ID.
 			} ebx;
 
 			struct ECX
 			{
-				uint32_t m_SSE3newInstructions : 1;			///< SSE3 new instructions.
-				uint32_t m_reserved : 2;					///< Reserved.
-				uint32_t m_monitorWait : 1;					///< MONITOR/MWAIT.
-				uint32_t m_cplQualifiedStore : 1;			///< CPL Qualified Debug Store (Intel).
-				uint32_t m_vmExtensions : 1;				///< Virtual machine extensions (Intel).
-				uint32_t m_saferModeExtensions : 1;			///< Safer mode extensions (Intel).
-				uint32_t m_speedStepTech : 1;				///< Enhanced Intel SpeedStep technology (Intel).
-				uint32_t m_thermalMonitor : 1;				///< Thermal Monitor (Intel).
-				uint32_t m_SSSE3 : 1;						///< Supplemental Streaming SIMD Extensions 3 (SSSE3).
-				uint32_t m_l1ContextID : 1;					///< L1 context ID (Intel).
-				uint32_t m_reserved2 : 1;					///< Reserved.
-				uint32_t m_FMA : 1;							///< 256-bit FMA extensions (Intel).
-				uint32_t m_CMPXCHG16B : 1;					///< CMPXCHG16B support.
-				uint32_t m_xTPR : 1;						///< xTPR update control.
-				uint32_t m_perfCapMSR : 1;					///< Perf/Debug capability MSR.
-				uint32_t m_reserved3 : 2;					///< Reserved.
-				uint32_t m_DCA : 1;							///< Direct cache access (DCA) support (Intel).
-				uint32_t m_SSE41 : 1;						///< SSE4.1 extensions.
-				uint32_t m_SSE42 : 1;						///< SSE4.2 extensions.
-				uint32_t m_x2APIC : 1;						///< x2APIC support (Intel).
-				uint32_t m_MOVBE : 1;						///< MOVBE support (Intel).
-				uint32_t m_POPCNT : 1;						///< POPCNT instruction support.
-				uint32_t m_reserved4 : 1;					///< Reserved.
-				uint32_t m_AES : 1;							///< AES support (Intel).
-				uint32_t m_XSAVE : 1;						///< XSAVE support (Intel).
-				uint32_t m_OSXSAVE : 1;						///< OSXSAVE support (Intel).
-				uint32_t m_AVX : 1;							///< 256-bit Intel advanced vector extensions (Intel).
-				uint32_t m_reserved5 : 3;					///< Reserved.
+				uint32_t SSE3newInstructions_ : 1;			///< SSE3 new instructions.
+				uint32_t reserved_ : 2;						///< Reserved.
+				uint32_t monitorWait_ : 1;					///< MONITOR/MWAIT.
+				uint32_t cplQualifiedStore_ : 1;			///< CPL Qualified Debug Store (Intel).
+				uint32_t vmExtensions_ : 1;					///< Virtual machine extensions (Intel).
+				uint32_t saferModeExtensions_ : 1;			///< Safer mode extensions (Intel).
+				uint32_t speedStepTech_ : 1;				///< Enhanced Intel SpeedStep technology (Intel).
+				uint32_t thermalMonitor_ : 1;				///< Thermal Monitor (Intel).
+				uint32_t SSSE3_ : 1;						///< Supplemental Streaming SIMD Extensions 3 (SSSE3).
+				uint32_t l1ContextID_ : 1;					///< L1 context ID (Intel).
+				uint32_t reserved2_ : 1;					///< Reserved.
+				uint32_t FMA_ : 1;							///< 256-bit FMA extensions (Intel).
+				uint32_t CMPXCHG16B_ : 1;					///< CMPXCHG16B support.
+				uint32_t xTPR_ : 1;							///< xTPR update control.
+				uint32_t perfCapMSR_ : 1;					///< Perf/Debug capability MSR.
+				uint32_t reserved3_ : 2;					///< Reserved.
+				uint32_t DCA_ : 1;							///< Direct cache access (DCA) support (Intel).
+				uint32_t SSE41_ : 1;						///< SSE4.1 extensions.
+				uint32_t SSE42_ : 1;						///< SSE4.2 extensions.
+				uint32_t x2APIC_ : 1;						///< x2APIC support (Intel).
+				uint32_t MOVBE_ : 1;						///< MOVBE support (Intel).
+				uint32_t POPCNT_ : 1;						///< POPCNT instruction support.
+				uint32_t reserved4_ : 1;					///< Reserved.
+				uint32_t AES_ : 1;							///< AES support (Intel).
+				uint32_t XSAVE_ : 1;						///< XSAVE support (Intel).
+				uint32_t OSXSAVE_ : 1;						///< OSXSAVE support (Intel).
+				uint32_t AVX_ : 1;							///< 256-bit Intel advanced vector extensions (Intel).
+				uint32_t reserved5_ : 3;					///< Reserved.
 			} ecx;
 
 			struct EDX
 			{
-				uint32_t m_FPU : 1;							///< x87 FPU on chip.
-				uint32_t m_VME : 1;							///< Virtual-8086 mode enhancement.
-				uint32_t m_DE : 1;							///< Debugging extensions.
-				uint32_t m_PSE : 1;							///< Page size extensions.
-				uint32_t m_TSC : 1;							///< Time stamp counter.
-				uint32_t m_MSR : 1;							///< RDMSR and WRMSR support.
-				uint32_t m_PAE : 1;							///< Physical address extensions.
-				uint32_t m_MCE : 1;							///< Machine check exception.
-				uint32_t m_CX8 : 1;							///< CMPXCHG8B instruction.
-				uint32_t m_APIC : 1;						///< APIC on chip.
-				uint32_t m_reserved : 1;					///< Reserved.
-				uint32_t m_SEP : 1;							///< SYSENTER and SYSEXIT.
-				uint32_t m_MTRR : 1;						///< Memory type range registers.
-				uint32_t m_PGE : 1;							///< PTE global bit.
-				uint32_t m_MCA : 1;							///< Machine check architecture.
-				uint32_t m_CMOV : 1;						///< Conditional move/compare instruction.
-				uint32_t m_PAT : 1;							///< Page Attribute Table.
-				uint32_t m_PSE36 : 1;						///< 36-bit page size extension.
-				uint32_t m_PSN : 1;							///< Processor serial number.
-				uint32_t m_CLFSH : 1;						///< CFLUSH instruction.
-				uint32_t m_reserved2 : 1;					///< Reserved.
-				uint32_t m_DS : 1;							///< Debug store.
-				uint32_t m_ACPI : 1;						///< Thermal monitor and clock control.
-				uint32_t m_MMX : 1;							///< MMX technology.
-				uint32_t m_FXSR : 1;						///< FXSAVE/FXRSTOR.
-				uint32_t m_SSE : 1;							///< SSE extensions.
-				uint32_t m_SSE2 : 1;						///< SSE2 extensions.
-				uint32_t m_SS : 1;							///< Self snoop.
-				uint32_t m_HTT : 1;							///< Multi-threading.
-				uint32_t m_TM : 1;							///< Thermal monitor.
-				uint32_t m_reserved3 : 1;					///< Reserved.
-				uint32_t m_PBE : 1;							///< Pending break enable.
+				uint32_t FPU_ : 1;							///< x87 FPU on chip.
+				uint32_t VME_ : 1;							///< Virtual-8086 mode enhancement.
+				uint32_t DE_ : 1;							///< Debugging extensions.
+				uint32_t PSE_ : 1;							///< Page size extensions.
+				uint32_t TSC_ : 1;							///< Time stamp counter.
+				uint32_t MSR_ : 1;							///< RDMSR and WRMSR support.
+				uint32_t PAE_ : 1;							///< Physical address extensions.
+				uint32_t MCE_ : 1;							///< Machine check exception.
+				uint32_t CX8_ : 1;							///< CMPXCHG8B instruction.
+				uint32_t APIC_ : 1;							///< APIC on chip.
+				uint32_t reserved_ : 1;						///< Reserved.
+				uint32_t SEP_ : 1;							///< SYSENTER and SYSEXIT.
+				uint32_t MTRR_ : 1;							///< Memory type range registers.
+				uint32_t PGE_ : 1;							///< PTE global bit.
+				uint32_t MCA_ : 1;							///< Machine check architecture.
+				uint32_t CMOV_ : 1;							///< Conditional move/compare instruction.
+				uint32_t PAT_ : 1;							///< Page Attribute Table.
+				uint32_t PSE36_ : 1;						///< 36-bit page size extension.
+				uint32_t PSN_ : 1;							///< Processor serial number.
+				uint32_t CLFSH_ : 1;						///< CFLUSH instruction.
+				uint32_t reserved2_ : 1;					///< Reserved.
+				uint32_t DS_ : 1;							///< Debug store.
+				uint32_t ACPI_ : 1;							///< Thermal monitor and clock control.
+				uint32_t MMX_ : 1;							///< MMX technology.
+				uint32_t FXSR_ : 1;							///< FXSAVE/FXRSTOR.
+				uint32_t SSE_ : 1;							///< SSE extensions.
+				uint32_t SSE2_ : 1;							///< SSE2 extensions.
+				uint32_t SS_ : 1;							///< Self snoop.
+				uint32_t HTT_ : 1;							///< Multi-threading.
+				uint32_t TM_ : 1;							///< Thermal monitor.
+				uint32_t reserved3_ : 1;					///< Reserved.
+				uint32_t PBE_ : 1;							///< Pending break enable.
 			} edx;
 
 			X_ENSURE_SIZE(EAX, 4);
@@ -150,22 +150,22 @@ public:
 		{
 			struct EAX
 			{
-				uint32_t m_maxValidValue;					///< Maximum meaningful value of info type for extended function CPUID information.
+				uint32_t maxValidValue_;					///< Maximum meaningful value of info type for extended function CPUID information.
 			} eax;
 
 			struct EBX
 			{
-				uint32_t m_reserved0;						///< Reserved.
+				uint32_t reserved0_;						///< Reserved.
 			} ebx;
 
 			struct ECX
 			{
-				uint32_t m_reserved1;						///< Reserved.
+				uint32_t reserved1_;						///< Reserved.
 			} ecx;
 
 			struct EDX
 			{
-				uint32_t m_reserved2;						///< Reserved.
+				uint32_t reserved2_;						///< Reserved.
 			} edx;
 
 
@@ -181,46 +181,46 @@ public:
 		{
 			struct EAX
 			{
-				uint32_t m_extendedFeatures;				///< Extended processor signature and extended feature bits.
+				uint32_t extendedFeatures_;					///< Extended processor signature and extended feature bits.
 			} eax;
 
 			struct EBX
 			{
-				uint32_t m_reserved;						///< Reserved.
+				uint32_t reserved_;							///< Reserved.
 			} ebx;
 
 			struct ECX
 			{
-				uint32_t m_LAHF : 1;						///< LAHF/SAHF available in 64-bit mode.
-				uint32_t m_cmpLegacy : 1;					///< Core multi-processing legacy mode (CmpLegacy) (AMD).
-				uint32_t m_SVM : 1;							///< Secure virtual machine (SVM) (AMD).
-				uint32_t m_EAPICS : 1;						///< Extended APIC Register Space (ExtApicSpace) (AMD).
-				uint32_t m_AltMovCr8 : 1;					///< AltMovCr8 (AMD).
-				uint32_t m_LZCNT : 1;						///< LZCNT Support (AMD).
-				uint32_t m_SSE4A : 1;						///< SSE4A instruction support (EXTRQ, INSERTQ, MOVNTSD, MOVNTSS) (AMD).
-				uint32_t m_misalignedSSE : 1;				///< Misaligned SSE support mode available (AMD).
-				uint32_t m_PREFETCH : 1;					///< PREFETCH and PREFETCHW support (AMD).
-				uint32_t m_reserved2 : 3;					///< Reserved.
-				uint32_t m_SKINITDEV : 1;					///< SKINIT and DEV support (AMD).
-				uint32_t m_reserved3 : 19;					///< Reserved.
+				uint32_t LAHF_ : 1;							///< LAHF/SAHF available in 64-bit mode.
+				uint32_t cmpLegacy_ : 1;					///< Core multi-processing legacy mode (CmpLegacy) (AMD).
+				uint32_t SVM_ : 1;							///< Secure virtual machine (SVM) (AMD).
+				uint32_t EAPICS_ : 1;						///< Extended APIC Register Space (ExtApicSpace) (AMD).
+				uint32_t AltMovCr8_ : 1;					///< AltMovCr8 (AMD).
+				uint32_t LZCNT_ : 1;						///< LZCNT Support (AMD).
+				uint32_t SSE4A_ : 1;						///< SSE4A instruction support (EXTRQ, INSERTQ, MOVNTSD, MOVNTSS) (AMD).
+				uint32_t misalignedSSE_ : 1;				///< Misaligned SSE support mode available (AMD).
+				uint32_t PREFETCH_ : 1;						///< PREFETCH and PREFETCHW support (AMD).
+				uint32_t reserved2_ : 3;					///< Reserved.
+				uint32_t SKINITDEV_ : 1;					///< SKINIT and DEV support (AMD).
+				uint32_t reserved3_ : 19;					///< Reserved.
 			} ecx;
 
 			struct EDX
 			{
-				uint32_t m_reserved : 11;					///< Reserved.
-				uint32_t m_SYSCALL : 1;						///< SYSCALL/SYSRET available in 64-bit mode.
-				uint32_t m_reserved2 : 8;					///< Reserved.
-				uint32_t m_EDB : 1;							///< Execute disable bit available.
-				uint32_t m_reserved3 : 1;					///< Reserved.
-				uint32_t m_EMMX : 1;						///< Extensions to MMX instructions (AMD).
-				uint32_t m_reserved4 : 2;					///< Reserved.
-				uint32_t m_FFXSR : 1;						///< FFXSR (AMD).
-				uint32_t m_1GBPS : 1;						///< 1GB page support (AMD).
-				uint32_t m_RDTSCP : 1;						///< RDTSCP support (AMD).
-				uint32_t m_reserved5 : 1;					///< Reserved.
-				uint32_t m_64bit : 1;						///< 64-bit technology available.
-				uint32_t m_3DnowExt : 1;					///< 3DnowExt (AMD).
-				uint32_t m_3Dnow : 1;						///< 3Dnow! instructions (AMD).
+				uint32_t reserved_ : 11;					///< Reserved.
+				uint32_t SYSCALL_ : 1;						///< SYSCALL/SYSRET available in 64-bit mode.
+				uint32_t reserved2_ : 8;					///< Reserved.
+				uint32_t EDB_ : 1;							///< Execute disable bit available.
+				uint32_t reserved3_ : 1;					///< Reserved.
+				uint32_t EMMX_ : 1;						///< Extensions to MMX instructions (AMD).
+				uint32_t reserved4_ : 2;					///< Reserved.
+				uint32_t FFXSR_ : 1;						///< FFXSR (AMD).
+				uint32_t amd1GBPS_ : 1;						///< 1GB page support (AMD).
+				uint32_t RDTSCP_ : 1;						///< RDTSCP support (AMD).
+				uint32_t reserved5_ : 1;					///< Reserved.
+				uint32_t is64bit_ : 1;						///< 64-bit technology available.
+				uint32_t amd3DnowExt_ : 1;					///< 3DnowExt (AMD).
+				uint32_t amd3Dnow_ : 1;						///< 3Dnow! instructions (AMD).
 			} edx;
 
 			X_ENSURE_SIZE(EAX, 4);
