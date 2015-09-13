@@ -354,9 +354,19 @@ void XDirectoryWatcher::notify(Action::Enum action,
 {
 	listeners::ConstIterator it = listeners_.begin();
 	for (; it != listeners_.end(); ++it) {
-		(*it)->OnFileChange(action, name, oldName, isDirectory);
-		//	break;
+		if ((*it)->OnFileChange(action, name, oldName, isDirectory)) {
+#if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+			X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Event was handled");
+#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+			break;
+		}
 	}
+
+#if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+	if (it == listeners_.end()) {
+		X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Event was NOT handled");
+	}
+#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 }
 
 
