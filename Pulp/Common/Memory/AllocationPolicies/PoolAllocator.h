@@ -68,17 +68,17 @@ public:
 	MemoryAllocatorStatistics getStatistics(void) const;
 
 private:
-	Freelist m_freelist;
-	size_t m_maxSize;
+	Freelist freelist_;
+	size_t maxSize_;
 
 #if X_ENABLE_POOL_ALLOCATOR_CHECK
-	size_t m_maxAlignment;
-	size_t m_offset;
+	size_t maxAlignment_;
+	size_t offset_;
 #endif
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	size_t m_elementSize;
-	size_t m_wastePerElement;
+	size_t elementSize_;
+	size_t wastePerElement_;
 	MemoryAllocatorStatistics statistics_;
 #endif
 };

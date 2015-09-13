@@ -3,17 +3,17 @@
 // ---------------------------------------------------------------------------------------------------------------------
 X_INLINE void* PoolAllocator::allocate(size_t size, size_t alignment, size_t offset)
 {
-	X_ASSERT(size <= m_maxSize, "A pool allocator can only allocate instances of the same or smaller size.")(m_maxSize, size, alignment, offset);
+	X_ASSERT(size <= maxSize_, "A pool allocator can only allocate instances of the same or smaller size.")(maxSize_, size, alignment, offset);
 
 #if X_ENABLE_POOL_ALLOCATOR_CHECK
-	X_ASSERT(alignment <= m_maxAlignment, "A pool allocator can only allocate instances with the same or smaller alignment.")(m_maxSize, size, m_maxAlignment, alignment, m_offset, offset);
-	X_ASSERT(offset == m_offset, "A pool allocator can only allocate instances with the same offset.")(m_maxSize, size, m_maxAlignment, alignment, m_offset, offset);
+	X_ASSERT(alignment <= maxAlignment_, "A pool allocator can only allocate instances with the same or smaller alignment.")(maxSize_, size, maxAlignment_, alignment, offset_, offset);
+	X_ASSERT(offset == offset_, "A pool allocator can only allocate instances with the same offset.")(maxSize_, size, maxAlignment_, alignment, offset_, offset);
 #else
 	X_UNUSED(alignment);
 	X_UNUSED(offset);
 #endif
 
-	void* memory = m_freelist.Obtain();
+	void* memory = freelist_.Obtain();
 
 	X_ASSERT(memory != nullptr, "failed to allocate from pool")();
 
@@ -23,10 +23,10 @@ X_INLINE void* PoolAllocator::allocate(size_t size, size_t alignment, size_t off
 		++statistics_.allocationCount_;
 		statistics_.allocationCountMax_ = Max(statistics_.allocationCount_, statistics_.allocationCountMax_);
 
-		statistics_.physicalMemoryUsed_ += m_elementSize;
+		statistics_.physicalMemoryUsed_ += elementSize_;
 		statistics_.physicalMemoryUsedMax_ = Max(statistics_.physicalMemoryUsed_, statistics_.physicalMemoryUsedMax_);
 
-		statistics_.wasteAlignment_ += m_wastePerElement;
+		statistics_.wasteAlignment_ += wastePerElement_;
 		statistics_.wasteAlignmentMax_ = Max(statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_);
 	}
 #endif
@@ -41,16 +41,16 @@ X_INLINE void PoolAllocator::free(void* ptr)
 {
 	X_ASSERT_NOT_NULL(ptr);
 
-	m_freelist.Return(ptr);
+	freelist_.Return(ptr);
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	--statistics_.allocationCount_;
 	statistics_.allocationCountMax_ = Max(statistics_.allocationCount_, statistics_.allocationCountMax_);
 
-	statistics_.physicalMemoryUsed_ -= m_elementSize;
+	statistics_.physicalMemoryUsed_ -= elementSize_;
 	statistics_.physicalMemoryUsedMax_ = Max(statistics_.physicalMemoryUsed_, statistics_.physicalMemoryUsedMax_);
 
-	statistics_.wasteAlignment_ -= m_wastePerElement;
+	statistics_.wasteAlignment_ -= wastePerElement_;
 	statistics_.wasteAlignmentMax_ = Max(statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_);
 #endif
 }
@@ -60,5 +60,5 @@ X_INLINE void PoolAllocator::free(void* ptr)
 // ---------------------------------------------------------------------------------------------------------------------
 X_INLINE size_t PoolAllocator::getSize(void*) const
 {
-	return m_maxSize;
+	return maxSize_;
 }

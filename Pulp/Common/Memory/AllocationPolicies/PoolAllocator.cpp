@@ -28,12 +28,12 @@ namespace {
 
 
 PoolAllocator::PoolAllocator(void* start, void* end, size_t maxElementSize, size_t maxAlignment, size_t offset) :
-	m_freelist( start, end, maxElementSize, maxAlignment, offset ),
-	m_maxSize( maxElementSize )
+	freelist_( start, end, maxElementSize, maxAlignment, offset ),
+	maxSize_( maxElementSize )
 
 #if X_ENABLE_POOL_ALLOCATOR_CHECK
-	,m_maxAlignment( maxAlignment )
-	,m_offset( offset )
+	,maxAlignment_( maxAlignment )
+	,offset_( offset )
 #endif
 {
 
@@ -42,8 +42,8 @@ PoolAllocator::PoolAllocator(void* start, void* end, size_t maxElementSize, size
 	size_t Waste = CalculateWasteAtFront( start, maxAlignment, offset );
 	size_t Size = safe_static_cast<size_t>((char*)end - (char*)start);
 
-	m_elementSize = ElemSize;
-	m_wastePerElement = ElemSize - maxElementSize;
+	elementSize_ = ElemSize;
+	wastePerElement_ = ElemSize - maxElementSize;
 
 	zero_object( statistics_ );
 
@@ -54,7 +54,7 @@ PoolAllocator::PoolAllocator(void* start, void* end, size_t maxElementSize, size
 	statistics_.wasteAlignment_ = Waste;
 
 
-	statistics_.wasteUnused_ = (Size - Waste) - (m_elementSize * ((Size - Waste) / m_elementSize));
+	statistics_.wasteUnused_ = (Size - Waste) - (elementSize_ * ((Size - Waste) / elementSize_));
 
 	statistics_.wasteAlignmentMax_ = Max( statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_ );
 	statistics_.wasteUnusedMax_ = Max( statistics_.wasteUnused_, statistics_.wasteUnusedMax_ );
