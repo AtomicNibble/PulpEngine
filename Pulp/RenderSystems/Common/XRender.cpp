@@ -463,7 +463,7 @@ shader::XShaderItem XRender::LoadShaderItem(shader::XInputShaderResources& res)
 	// we want a shader + texture collection plz!
 	shader::XShaderItem item;
 
-	item.pShader_ = ShaderMan_.m_FixedFunction;
+	item.pShader_ = ShaderMan_.s_pFixedFunction_;
 	item.pShader_->addRef();
 	item.technique_ = 2;
 	item.pResources_ = ShaderMan_.createShaderResources(res);

@@ -619,7 +619,7 @@ bool DX11XRender::DefferedEnd()
 	using namespace texture;
 
 	// the shader
-	XShader* pSh = XShaderManager::m_DefferedShaderVis;
+	XShader* pSh = XShaderManager::s_pDefferedShaderVis_;
 	uint32_t pass;
 
 

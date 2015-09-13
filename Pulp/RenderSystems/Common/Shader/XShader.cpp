@@ -199,14 +199,14 @@ namespace
 // ----------------------------------------------------
 
 
-XShader* XShaderManager::m_DefaultShader = nullptr;
-XShader* XShaderManager::m_DebugShader = nullptr;
-XShader* XShaderManager::m_FixedFunction = nullptr;
-XShader* XShaderManager::m_Font = nullptr;
-XShader* XShaderManager::m_Gui = nullptr;
-XShader* XShaderManager::m_DefferedShader = nullptr;
-XShader* XShaderManager::m_DefferedShaderVis = nullptr;
-XShader* XShaderManager::m_WordShader = nullptr;
+XShader* XShaderManager::s_pDefaultShader_ =nullptr;
+XShader* XShaderManager::s_pDebugShader_ =nullptr;
+XShader* XShaderManager::s_pFixedFunction_ =nullptr;
+XShader* XShaderManager::s_pFont_ =nullptr;
+XShader* XShaderManager::s_pGui_ =nullptr;
+XShader* XShaderManager::s_pDefferedShader_ =nullptr;
+XShader* XShaderManager::s_pDefferedShaderVis_ =nullptr;
+XShader* XShaderManager::s_pWordShader_ =nullptr;
 
 
 XShaderManager::XShaderManager() : 
@@ -621,29 +621,29 @@ XShader* XShaderManager::reloadShader(const char* name)
 
 bool XShaderManager::loadCoreShaders(void)
 {
-	m_DefaultShader = createShader("default");
+	s_pDefaultShader_ =createShader("default");
 
-	if ((m_FixedFunction = forName("ffe")) == nullptr) {
+	if ((s_pFixedFunction_ =forName("ffe")) == nullptr) {
 		X_ERROR("Shader", "Failed to load ffe shader");
 		return false;
 	}
-	if ((m_Font = forName("font")) == nullptr) {
+	if ((s_pFont_ =forName("font")) == nullptr) {
 		X_ERROR("Shader", "Failed to load font shader");
 		return false;
 	}
-	if ((m_Gui = forName("gui")) == nullptr) {
+	if ((s_pGui_ =forName("gui")) == nullptr) {
 		X_ERROR("Shader", "Failed to load gui shader");
 		return false;
 	}
-	if ((m_DefferedShader = forName("deffered")) == nullptr) {
+	if ((s_pDefferedShader_ =forName("deffered")) == nullptr) {
 		X_ERROR("Shader", "Failed to load deffered shader");
 		return false;
 	}
-	if ((m_DefferedShaderVis = forName("defferedVis")) == nullptr) {
+	if ((s_pDefferedShaderVis_ =forName("defferedVis")) == nullptr) {
 		X_ERROR("Shader", "Failed to load defferedVis shader");
 		return false;
 	}
-	if ((m_WordShader = forName("World")) == nullptr) {
+	if ((s_pWordShader_ =forName("World")) == nullptr) {
 		X_ERROR("Shader", "Failed to load World shader");
 		return false;
 	}
@@ -654,23 +654,23 @@ bool XShaderManager::loadCoreShaders(void)
 
 bool XShaderManager::freeCoreShaders(void)
 {
-	if (m_DefaultShader)
-		m_DefaultShader->release();
-//	if (m_DebugShader)
-//		m_DebugShader->release();
-	if (m_FixedFunction)
-		m_FixedFunction->release();
-	if (m_Font)
-		m_Font->release();
-	if (m_Gui)
-		m_Gui->release();
-	if (m_DefferedShader)
-		m_DefferedShader->release();
-	if (m_DefferedShaderVis)
-		m_DefferedShaderVis->release();
+	if (s_pDefaultShader_)
+		s_pDefaultShader_->release();
+//	if (s_pDebugShader_)
+//		s_pDebugShader_->release();
+	if (s_pFixedFunction_)
+		s_pFixedFunction_->release();
+	if (s_pFont_)
+		s_pFont_->release();
+	if (s_pGui_)
+		s_pGui_->release();
+	if (s_pDefferedShader_)
+		s_pDefferedShader_->release();
+	if (s_pDefferedShaderVis_)
+		s_pDefferedShaderVis_->release();
 
-	if (m_WordShader)
-		m_WordShader->release();
+	if (s_pWordShader_)
+		s_pWordShader_->release();
 
 	return true;
 }

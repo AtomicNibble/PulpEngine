@@ -340,7 +340,7 @@ bool DX11XRender::SetWorldShader()
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_WordShader;
+	XShader* pSh = XShaderManager::s_pWordShader_;
 	uint32_t pass;
 
 
@@ -371,7 +371,7 @@ bool DX11XRender::SetSkyboxShader()
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_FixedFunction;
+	XShader* pSh = XShaderManager::s_pFixedFunction_;
 	uint32_t pass;
 
 	if (!pSh)
@@ -396,7 +396,7 @@ bool DX11XRender::SetFFE(shader::VertexFormat::Enum vertFmt, bool textured)
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_FixedFunction;
+	XShader* pSh = XShaderManager::s_pFixedFunction_;
 	uint32_t pass;
 
 	if (!pSh)
@@ -434,7 +434,7 @@ bool DX11XRender::SetFontShader()
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_Font;
+	XShader* pSh = XShaderManager::s_pFont_;
 	uint32_t pass;
 
 	if (!pSh)
@@ -462,7 +462,7 @@ bool DX11XRender::SetZPass()
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_DefferedShader;
+	XShader* pSh = XShaderManager::s_pDefferedShader_;
 	uint32_t pass;
 
 	if (!pSh)
@@ -490,7 +490,7 @@ bool DX11XRender::setGUIShader(bool textured)
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_Gui;
+	XShader* pSh = XShaderManager::s_pGui_;
 	uint32_t pass;
 
 	if (!pSh)

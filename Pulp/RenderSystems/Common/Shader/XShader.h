@@ -440,15 +440,15 @@ private:
 public:
 	core::Crc32* pCrc32;
 
-	static XShader* m_DefaultShader;
-	static XShader* m_DebugShader;
-	static XShader* m_FixedFunction;
-	static XShader* m_Font;
-	static XShader* m_Gui;
-	static XShader* m_DefferedShader;
-	static XShader* m_DefferedShaderVis;
+	static XShader* s_pDefaultShader_;
+	static XShader* s_pDebugShader_;
+	static XShader* s_pFixedFunction_;
+	static XShader* s_pFont_;
+	static XShader* s_pGui_;
+	static XShader* s_pDefferedShader_;
+	static XShader* s_pDefferedShaderVis_;
 
-	static XShader* m_WordShader;
+	static XShader* s_pWordShader_;
 };
 
 X_NAMESPACE_END
