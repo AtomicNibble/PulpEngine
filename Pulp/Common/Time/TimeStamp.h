@@ -37,7 +37,7 @@ private:
 	void InternalToMSPM() const;
 	void InternalToTime() const;
 
-	mutable int m_Time;
+	mutable int Time_;
 };
 
 X_NAMESPACE_END

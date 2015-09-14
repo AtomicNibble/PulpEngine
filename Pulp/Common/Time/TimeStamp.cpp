@@ -9,7 +9,7 @@ X_NAMESPACE_BEGIN(core)
 // Macro to ensure internal representation is as mill-seconds past midnight
 #define REPASMSPM(obj) \
 do { \
-	if ((obj).m_Time <  0) \
+	if ((obj).Time_ <  0) \
 		(obj).InternalToMSPM(); \
 } \
 X_DISABLE_WARNING(4127) \
@@ -19,7 +19,7 @@ X_ENABLE_WARNING(4127)
 // Macro to ensure internal representation is as time components
 #define REPASTIME(obj) \
 do { \
-	if ((obj).m_Time >= 0) \
+	if ((obj).Time_ >= 0) \
 		(obj).InternalToTime(); \
 }  \
 X_DISABLE_WARNING(4127) \
@@ -45,7 +45,7 @@ X_ENABLE_WARNING(4127)
 
 TimeStamp::TimeStamp( int hour, int minute, int second, int millisecond )
 {
-	m_Time = millisecond + 1000*(second + 60*(minute + 60*hour));
+	Time_ = millisecond + 1000*(second + 60*(minute + 60*hour));
 }
 
 
@@ -61,7 +61,7 @@ TimeStamp TimeStamp::GetSystemTime()
 int TimeStamp::GetHour() const
 {
 	REPASTIME(*this);
-	int Hour = GETCOMPONENT(m_Time, BITOFFSETHOUR, BITSIZEHOUR);
+	int Hour = GETCOMPONENT(Time_, BITOFFSETHOUR, BITSIZEHOUR);
 	X_ASSERT(Hour >= 0 && Hour < 24, "Hour value is not valid")(Hour);
 	return Hour;
 }
@@ -70,7 +70,7 @@ int TimeStamp::GetHour() const
 int TimeStamp::GetMinute() const
 {
 	REPASTIME(*this);
-	int Minute = GETCOMPONENT(m_Time, BITOFFSETMINUTE, BITSIZEMINUTE);
+	int Minute = GETCOMPONENT(Time_, BITOFFSETMINUTE, BITSIZEMINUTE);
 	X_ASSERT(Minute >= 0 && Minute < 60, "Minute value is not valid")(Minute);
 	return Minute;
 }
@@ -79,7 +79,7 @@ int TimeStamp::GetMinute() const
 int TimeStamp::GetSecond() const
 {
 	REPASTIME(*this);
-	int Second = GETCOMPONENT(m_Time, BITOFFSETSECOND, BITSIZESECOND);
+	int Second = GETCOMPONENT(Time_, BITOFFSETSECOND, BITSIZESECOND);
 	X_ASSERT(Second >= 0 && Second < 60, "Seconds value is not valid")(Second);
 	return Second;
 }
@@ -88,7 +88,7 @@ int TimeStamp::GetSecond() const
 int TimeStamp::GetMilliSecond() const
 {
 	REPASTIME(*this);
-	int MilliSecond = GETCOMPONENT(m_Time, BITOFFSETMILLISECOND, BITSIZEMILLISECOND);
+	int MilliSecond = GETCOMPONENT(Time_, BITOFFSETMILLISECOND, BITSIZEMILLISECOND);
 	X_ASSERT(MilliSecond >= 0 && MilliSecond < 1000, "Milliseconds value is not valid" )(MilliSecond);
 	return MilliSecond;
 }
@@ -96,7 +96,7 @@ int TimeStamp::GetMilliSecond() const
 int TimeStamp::GetMilliSecondsPastMidnight() const
 {
 	REPASMSPM(*this);
-	return m_Time;
+	return Time_;
 }
 
 
@@ -118,25 +118,25 @@ const char* TimeStamp::ToString(FileDescription& desc) const
 
 void TimeStamp::InternalToMSPM() const
 {
-	X_ASSERT(m_Time >= 0, "Time is negative")(m_Time);
+	X_ASSERT(Time_ >= 0, "Time is negative")(Time_);
 
-	int Hour = GETCOMPONENT(m_Time, BITOFFSETHOUR, BITSIZEHOUR);
-	int Minute = GETCOMPONENT(m_Time, BITOFFSETMINUTE, BITSIZEMINUTE);
-	int Second = GETCOMPONENT(m_Time, BITOFFSETSECOND, BITSIZESECOND);
-	int MilliSecond = GETCOMPONENT(m_Time, BITOFFSETMILLISECOND, BITSIZEMILLISECOND);
-	m_Time = MilliSecond + 1000*(Second + 60*(Minute + 60*Hour));
+	int Hour = GETCOMPONENT(Time_, BITOFFSETHOUR, BITSIZEHOUR);
+	int Minute = GETCOMPONENT(Time_, BITOFFSETMINUTE, BITSIZEMINUTE);
+	int Second = GETCOMPONENT(Time_, BITOFFSETSECOND, BITSIZESECOND);
+	int MilliSecond = GETCOMPONENT(Time_, BITOFFSETMILLISECOND, BITSIZEMILLISECOND);
+	Time_ = MilliSecond + 1000*(Second + 60*(Minute + 60*Hour));
 }
 
 
 void TimeStamp::InternalToTime() const
 {
-	X_ASSERT(m_Time >= 0, "Time is negative")(m_Time);
+	X_ASSERT(Time_ >= 0, "Time is negative")(Time_);
 
 	// Convert to time parts
-	int MilliSecond = m_Time % 1000; m_Time /= 1000;
-	int Second = m_Time % 60; m_Time /= 60;
-	int Minute = m_Time % 60; m_Time /= 60;
-	int Hour = m_Time;
+	int MilliSecond = Time_ % 1000; Time_ /= 1000;
+	int Second = Time_ % 60; Time_ /= 60;
+	int Minute = Time_ % 60; Time_ /= 60;
+	int Hour = Time_;
 
 	// Copy calculated values
 	int TimeRep =
@@ -146,7 +146,7 @@ void TimeStamp::InternalToTime() const
 		+ ((Hour) << BITOFFSETHOUR)
 		+ (1 << 31);
 
-	m_Time = TimeRep;
+	Time_ = TimeRep;
 }
 
 
