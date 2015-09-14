@@ -170,10 +170,10 @@ namespace {
 	FrameColor g_FrameActive;
 	FrameColor g_FrameInActive;
 
-	HICON		m_But_Close[3];
-	HICON		m_But_Max[2];
-	HICON		m_But_Min[2];
-	HICON		m_But_Restore[2];
+	HICON		g_But_Close[3];
+	HICON		g_But_Max[2];
+	HICON		g_But_Min[2];
+	HICON		g_But_Restore[2];
 
 	static const DWORD TOM_PAINT_BUTTONS = WM_USER + 20;
 
@@ -275,12 +275,12 @@ void xFrame::Startup(void)
 
 	// Load icons
 
-	LOAD_FRAME_ICON( m_But_Close,	IDI_FRAME_CLOSE );
-	LOAD_FRAME_ICON( m_But_Max,		IDI_FRAME_MAX );
-	LOAD_FRAME_ICON( m_But_Min,		IDI_FRAME_MIN );
-	LOAD_FRAME_ICON( m_But_Restore, IDI_FRAME_RESTORE );
+	LOAD_FRAME_ICON( g_But_Close,	IDI_FRAME_CLOSE );
+	LOAD_FRAME_ICON( g_But_Max,		IDI_FRAME_MAX );
+	LOAD_FRAME_ICON( g_But_Min,		IDI_FRAME_MIN );
+	LOAD_FRAME_ICON( g_But_Restore, IDI_FRAME_RESTORE );
 
-	m_But_Close[2]	= _LoadIcon( IDI_FRAME_CLOSE_DISABLE );
+	g_But_Close[2]	= _LoadIcon( IDI_FRAME_CLOSE_DISABLE );
 
 	g_hIcon = _LoadIcon( IDI_ENGINE_LOGO );
 
@@ -294,12 +294,12 @@ void xFrame::Startup(void)
 
 void xFrame::Shutdown(void)
 {
-	FREE_FRAME_ICON( m_But_Close );
-	FREE_FRAME_ICON( m_But_Max );
-	FREE_FRAME_ICON( m_But_Min );
-	FREE_FRAME_ICON( m_But_Restore );
+	FREE_FRAME_ICON( g_But_Close );
+	FREE_FRAME_ICON( g_But_Max );
+	FREE_FRAME_ICON( g_But_Min );
+	FREE_FRAME_ICON( g_But_Restore );
 
-	DestroyIcon( m_But_Close[2] );
+	DestroyIcon( g_But_Close[2] );
 
 	DeleteObject( g_font );
 	DeleteObject( g_Background );
@@ -717,16 +717,16 @@ void xFrame::PaintButton( int Idx, FrameButton* but, HDC dc, Recti rec )
 	{
 	case 0: // Exit
 		if( but->Locked ) Dull = 2;
-		Img = m_But_Close[ Dull ];
+		Img = g_But_Close[ Dull ];
 		break;
 	case 1: // Max
-		Img = m_But_Max[ Dull ];
+		Img = g_But_Max[ Dull ];
 		break;
 	case 2: // restore
-		Img = m_But_Restore[ Dull ];
+		Img = g_But_Restore[ Dull ];
 		break;
 	case 3: // min
-		Img = m_But_Min[ Dull ];
+		Img = g_But_Min[ Dull ];
 		break;
 	default:
 		X_ASSERT_UNREACHABLE();
