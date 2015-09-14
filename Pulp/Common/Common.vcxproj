@@ -286,6 +286,7 @@
     <ClInclude Include="Time\DateStamp.h" />
     <ClInclude Include="Time\TimeStamp.h" />
     <ClInclude Include="Time\TimeVal.h" />
+    <ClInclude Include="Time\win32\TimeStamp.h" />
     <ClInclude Include="Traits\FunctionSignatureTraits.h" />
     <ClInclude Include="Traits\FunctionTraits.h" />
     <ClInclude Include="Traits\MemberFunctionTraits.h" />
@@ -696,7 +697,7 @@
     <ClCompile Include="Threading\win32\Thread.cpp" />
     <ClCompile Include="Time\CompressedStamps.cpp" />
     <ClCompile Include="Time\DateStamp.cpp" />
-    <ClCompile Include="Time\TimeStamp.cpp" />
+    <ClCompile Include="Time\win32\TimeStamp.cpp" />
     <ClCompile Include="Util\Cpu.cpp" />
     <ClCompile Include="Util\win32\LastError.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>

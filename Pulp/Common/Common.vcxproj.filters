@@ -187,6 +187,12 @@
     <Filter Include="SourceFiles\Compression">
       <UniqueIdentifier>{7564a3c4-1bf5-45bb-a183-585be2d20c5d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SourceFiles\Time\win32">
+      <UniqueIdentifier>{b8d437ed-13fd-410a-bbc9-b4ab6faf37d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Time\win32">
+      <UniqueIdentifier>{f6ae4776-74dd-4c0b-960b-1477758141f5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -1012,6 +1018,9 @@
     <ClInclude Include="Core\PlatformWin32.h">
       <Filter>Headers\Core</Filter>
     </ClInclude>
+    <ClInclude Include="Time\win32\TimeStamp.h">
+      <Filter>Headers\Time\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1368,9 +1377,6 @@
     <ClCompile Include="Memory\HeapArea.cpp">
       <Filter>SourceFiles\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="Time\TimeStamp.cpp">
-      <Filter>SourceFiles\Time</Filter>
-    </ClCompile>
     <ClCompile Include="Time\DateStamp.cpp">
       <Filter>SourceFiles\Time</Filter>
     </ClCompile>
@@ -1532,6 +1538,9 @@
     </ClCompile>
     <ClCompile Include="Compression\LZ4.cpp">
       <Filter>SourceFiles\Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\win32\TimeStamp.cpp">
+      <Filter>SourceFiles\Time\win32</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
