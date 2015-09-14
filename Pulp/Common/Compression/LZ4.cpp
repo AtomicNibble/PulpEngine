@@ -1,7 +1,7 @@
 #include <EngineCommon.h>
 #include "LZ4.h"
 
-#include <../../3rdparty/source/lz4-r131/lz4.h>
+#include <../../3rdparty/source/lz4-r131/lz4_lib.h>
 
 X_NAMESPACE_BEGIN(core)
 

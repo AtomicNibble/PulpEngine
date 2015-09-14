@@ -193,6 +193,9 @@
     <Filter Include="Headers\Time\win32">
       <UniqueIdentifier>{f6ae4776-74dd-4c0b-960b-1477758141f5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SourceFiles\Compression\lz4">
+      <UniqueIdentifier>{b79d73e5-b398-461e-9b03-021f5fce847d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -1541,6 +1544,9 @@
     </ClCompile>
     <ClCompile Include="Time\win32\TimeStamp.cpp">
       <Filter>SourceFiles\Time\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\lz4-r131\lz4_lib.c">
+      <Filter>SourceFiles\Compression\lz4</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
