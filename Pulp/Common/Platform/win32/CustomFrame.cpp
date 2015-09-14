@@ -247,7 +247,7 @@ HICON _LoadIcon( int ID )
 	return icon;
 }
 
-uint32_t xFrame::s_numframes = 0;
+AtomicInt xFrame::s_numframes(0);
 
 void xFrame::Startup(void)
 {
@@ -314,7 +314,7 @@ xFrame::xFrame()
 	if (s_numframes == 0) {
 		Startup();
 	}
-	s_numframes++;
+	++s_numframes;
 
 	nHozBorder_ = ::GetSystemMetrics(SM_CXSIZEFRAME) + ::GetSystemMetrics(SM_CXPADDEDBORDER);
 	nVerBorder_ = ::GetSystemMetrics(SM_CYSIZEFRAME) + ::GetSystemMetrics(SM_CXPADDEDBORDER);
@@ -338,7 +338,7 @@ xFrame::xFrame()
 
 xFrame::~xFrame()
 {
-	s_numframes--;
+	--s_numframes;
 	if (s_numframes == 0) {
 		Shutdown();
 	}

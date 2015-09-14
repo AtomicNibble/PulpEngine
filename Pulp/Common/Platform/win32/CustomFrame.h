@@ -69,7 +69,7 @@ private:
 
 private:
 
-	static uint32_t s_numframes;
+	static AtomicInt s_numframes;
 };
 
 
