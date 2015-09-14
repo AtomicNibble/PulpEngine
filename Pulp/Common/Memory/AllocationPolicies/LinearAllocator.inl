@@ -18,7 +18,7 @@ inline void LinearAllocator::reset(void)
 	statistics_.internalOverhead_ = 0;
 #endif
 
-	m_current = m_start;
+	current_ = start_;
 }
 
 
