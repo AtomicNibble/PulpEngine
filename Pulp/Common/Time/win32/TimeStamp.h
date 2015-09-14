@@ -20,13 +20,13 @@ public:
 	TimeStamp( int hour, int minute, int second, int millisecond = 0 );
 
 public:
-	int GetHour() const;
-	int GetMinute() const;
-	int GetSecond() const;
-	int GetMilliSecond() const;
+	int GetHour(void) const;
+	int GetMinute(void) const;
+	int GetSecond(void) const;
+	int GetMilliSecond(void) const;
 
 	// Total Milliseconds past midnight :D
-	int GetMilliSecondsPastMidnight() const;
+	int GetMilliSecondsPastMidnight(void) const;
 
 	const char* ToString(Description& desc) const;
 	const char* ToString(FileDescription& desc) const;
@@ -34,8 +34,8 @@ public:
 	static TimeStamp GetSystemTime(void);
 
 private:
-	void InternalToMSPM() const;
-	void InternalToTime() const;
+	void InternalToMSPM(void) const;
+	void InternalToTime(void) const;
 
 	mutable int Time_;
 };

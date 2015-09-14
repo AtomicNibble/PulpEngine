@@ -49,7 +49,7 @@ TimeStamp::TimeStamp( int hour, int minute, int second, int millisecond )
 }
 
 
-TimeStamp TimeStamp::GetSystemTime()
+TimeStamp TimeStamp::GetSystemTime(void)
 {
 	_SYSTEMTIME Time;
 	GetLocalTime( &Time );
@@ -58,7 +58,7 @@ TimeStamp TimeStamp::GetSystemTime()
 }
 
 
-int TimeStamp::GetHour() const
+int TimeStamp::GetHour(void) const
 {
 	REPASTIME(*this);
 	int Hour = GETCOMPONENT(Time_, BITOFFSETHOUR, BITSIZEHOUR);
@@ -67,7 +67,7 @@ int TimeStamp::GetHour() const
 }
 
 
-int TimeStamp::GetMinute() const
+int TimeStamp::GetMinute(void) const
 {
 	REPASTIME(*this);
 	int Minute = GETCOMPONENT(Time_, BITOFFSETMINUTE, BITSIZEMINUTE);
@@ -76,7 +76,7 @@ int TimeStamp::GetMinute() const
 }
 
 
-int TimeStamp::GetSecond() const
+int TimeStamp::GetSecond(void) const
 {
 	REPASTIME(*this);
 	int Second = GETCOMPONENT(Time_, BITOFFSETSECOND, BITSIZESECOND);
@@ -85,7 +85,7 @@ int TimeStamp::GetSecond() const
 }
 
 
-int TimeStamp::GetMilliSecond() const
+int TimeStamp::GetMilliSecond(void) const
 {
 	REPASTIME(*this);
 	int MilliSecond = GETCOMPONENT(Time_, BITOFFSETMILLISECOND, BITSIZEMILLISECOND);
@@ -93,7 +93,7 @@ int TimeStamp::GetMilliSecond() const
 	return MilliSecond;
 }
 
-int TimeStamp::GetMilliSecondsPastMidnight() const
+int TimeStamp::GetMilliSecondsPastMidnight(void) const
 {
 	REPASMSPM(*this);
 	return Time_;
@@ -116,7 +116,7 @@ const char* TimeStamp::ToString(FileDescription& desc) const
 	
 
 
-void TimeStamp::InternalToMSPM() const
+void TimeStamp::InternalToMSPM(void) const
 {
 	X_ASSERT(Time_ >= 0, "Time is negative")(Time_);
 
@@ -128,7 +128,7 @@ void TimeStamp::InternalToMSPM() const
 }
 
 
-void TimeStamp::InternalToTime() const
+void TimeStamp::InternalToTime(void) const
 {
 	X_ASSERT(Time_ >= 0, "Time is negative")(Time_);
 
