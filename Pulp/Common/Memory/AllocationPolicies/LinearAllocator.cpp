@@ -18,7 +18,8 @@ LinearAllocator::LinearAllocator(void* start, void* end) :
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	zero_this( &statistics_ );
 
-	size_t Len = static_cast<size_t>((uintptr_t)end - (uintptr_t)start);
+	size_t Len = static_cast<size_t>(reinterpret_cast<uintptr_t>(end) - 
+		reinterpret_cast<uintptr_t>(start));
 
 	statistics_.type_ = "Linear";
 	statistics_.virtualMemoryReserved_ = Len;
@@ -50,7 +51,8 @@ void* LinearAllocator::allocate(size_t size, size_t alignment, size_t align_offs
 	// stats baby !
 	statistics_.allocationCount_++;
 	statistics_.internalOverhead_ += sizeof(size_t);
-	statistics_.wasteAlignment_ += safe_static_cast<size_t>((uintptr_t)current_ - (uintptr_t)oldCurrent);
+	statistics_.wasteAlignment_ += safe_static_cast<size_t>(reinterpret_cast<uintptr_t>(current_)-
+		reinterpret_cast<uintptr_t>(oldCurrent));
 
 #endif
 
