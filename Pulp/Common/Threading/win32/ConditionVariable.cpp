@@ -9,23 +9,23 @@ X_NAMESPACE_BEGIN(core)
 
 ConditionVariable::ConditionVariable(void)
 {
-	InitializeConditionVariable(&m_condVar);
+	InitializeConditionVariable(&condVar_);
 }
 
 void ConditionVariable::NotifyOne(void)
 {
-	WakeConditionVariable(&m_condVar);
+	WakeConditionVariable(&condVar_);
 }
 
 void ConditionVariable::NotifyAll(void)
 {
-	WakeAllConditionVariable(&m_condVar);
+	WakeAllConditionVariable(&condVar_);
 }
 
 void ConditionVariable::Wait(CriticalSection& criticalSection)
 {
 //	CriticalSection::ScopedLock lock(criticalSection);
-	SleepConditionVariableCS(&m_condVar, criticalSection.GetNativeObject(), INFINITE);
+	SleepConditionVariableCS(&condVar_, criticalSection.GetNativeObject(), INFINITE);
 }
 
 
