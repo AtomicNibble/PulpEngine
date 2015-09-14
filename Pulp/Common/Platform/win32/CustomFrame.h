@@ -22,7 +22,7 @@ public:
 	LRESULT DrawFrame( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 
 	void SetIcon(HICON hicon) {
-		this->m_Icon = hicon;
+		this->Icon_ = hicon;
 	}
 
 	struct FrameButton {
@@ -48,24 +48,24 @@ private:
 
 private:
 	// Buttons
-	FrameButton m_Buttons[4];
+	FrameButton Buttons_[4];
 
-	LONG	nHozBorder;
-	LONG	nVerBorder;
-	LONG	nCaptionHeight;
+	LONG	nHozBorder_;
+	LONG	nVerBorder_;
+	LONG	nCaptionHeight_;
 
-	BOOL	m_Hasfocus;
-	BOOL	m_HasCaption;
-	BOOL	m_IsMax;
+	BOOL	Hasfocus_;
+	BOOL	HasCaption_;
+	BOOL	IsMax_;
 
-	LONG	m_ClientWidth;
-	LONG	m_ClientHeight;
-	LONG	m_width;
-	LONG	m_height;
+	LONG	ClientWidth_;
+	LONG	ClientHeight_;
+	LONG	width_;
+	LONG	height_;
 
-	LONG	m_CapOff;
+	LONG	CapOff_;
 
-	HICON   m_Icon;
+	HICON   Icon_;
 
 private:
 
