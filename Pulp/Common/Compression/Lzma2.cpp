@@ -69,7 +69,7 @@ namespace Compression
 			);
 
 		if (res == SZ_OK) {
-			destLenOut = destLenTemp;
+			destLenOut = destLenTemp + propsSize;
 			return true;
 		}
 
