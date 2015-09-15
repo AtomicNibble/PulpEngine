@@ -298,6 +298,12 @@
     <ClCompile Include="UT_Path.cpp">
       <Filter>Source Files\tests\String</Filter>
     </ClCompile>
+    <ClCompile Include="UT_LZ4.cpp">
+      <Filter>Source Files\tests\Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_LZMA.cpp">
+      <Filter>Source Files\tests\Compression</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">
