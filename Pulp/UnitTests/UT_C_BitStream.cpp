@@ -114,8 +114,6 @@ TEST(BitStreamTest, Small)
 
 TEST(BitStreamTest, Move)
 {
-	BitStream stream(g_arena);
-
 	const size_t bytes = (sizeof(uint8_t) * (100 + 64)) + (sizeof(BitStream) * 2) +
 		(sizeof(size_t) * 3); // Linear header block.
 
