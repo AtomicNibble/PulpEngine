@@ -21,6 +21,9 @@ arena_(arena)
 
 BitStream::BitStream(const BitStream& oth)
 {
+	// use it's arena.
+	arena_ = oth.arena_;
+
 	resize(oth.capacity_);
 
 	// copy stored bits.
@@ -35,6 +38,7 @@ BitStream::BitStream(BitStream&& oth)
 	capacity_ = oth.capacity_;
 	bitIdx_ = oth.bitIdx_;
 	start_ = oth.start_;
+	arena_ = oth.arena_;
 
 	// clear oth.
 	oth.capacity_ = 0;
@@ -51,9 +55,11 @@ BitStream & BitStream::operator=(const BitStream & oth)
 {
 	if (this != &oth)
 	{
-		if (capacity_ < oth.capacity_) {
-			resize(oth.capacity_);
-		}
+		// free and re allocat using oth's arena.
+		free();
+		arena_ = oth.arena_;
+
+		resize(oth.capacity_);
 
 		// copy stored bits.
 		size_t numBytes = bytesRequired(oth.bitIdx_);
@@ -73,6 +79,7 @@ BitStream & BitStream::operator=(BitStream && oth)
 		capacity_ = oth.capacity_;
 		bitIdx_ = oth.bitIdx_;
 		start_ = oth.start_;
+		arena_ = oth.arena_;
 
 		// clear oth.
 		oth.capacity_ = 0;
