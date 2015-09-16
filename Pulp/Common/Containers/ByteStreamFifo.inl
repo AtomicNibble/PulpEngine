@@ -1,3 +1,4 @@
+#include "ByteStreamFifo.h"
 
 
 
@@ -20,6 +21,12 @@ arena_(arena)
 {
 	X_ASSERT_NOT_NULL(arena);
 	resize(numBytes);
+}
+
+ByteStreamFifo::ByteStreamFifo(const ByteStreamFifo & oth)
+{
+
+
 }
 
 
