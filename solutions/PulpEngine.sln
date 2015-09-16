@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "..\Pulp\Common\Common.vcxproj", "{07328CCB-F9CC-4967-861E-272BCA0CAB04}"
 EndProject
@@ -131,7 +131,6 @@ Global
 		{5F552C5E-1BF0-4132-9FC7-ABAB6D182A49}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
 		{5F552C5E-1BF0-4132-9FC7-ABAB6D182A49}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
 		{5F552C5E-1BF0-4132-9FC7-ABAB6D182A49}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
-		{5F552C5E-1BF0-4132-9FC7-ABAB6D182A49}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
 		{5F552C5E-1BF0-4132-9FC7-ABAB6D182A49}.Debug|Win32.ActiveCfg = Debug|Win32
 		{5F552C5E-1BF0-4132-9FC7-ABAB6D182A49}.Debug|Win32.Build.0 = Debug|Win32
 		{5F552C5E-1BF0-4132-9FC7-ABAB6D182A49}.Debug|x64.ActiveCfg = Debug|x64
@@ -151,7 +150,6 @@ Global
 		{0D5772AB-8569-4802-B751-42C67275B1A2}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
 		{0D5772AB-8569-4802-B751-42C67275B1A2}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
 		{0D5772AB-8569-4802-B751-42C67275B1A2}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
-		{0D5772AB-8569-4802-B751-42C67275B1A2}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
 		{0D5772AB-8569-4802-B751-42C67275B1A2}.Debug|Win32.ActiveCfg = Debug|Win32
 		{0D5772AB-8569-4802-B751-42C67275B1A2}.Debug|Win32.Build.0 = Debug|Win32
 		{0D5772AB-8569-4802-B751-42C67275B1A2}.Debug|x64.ActiveCfg = Debug|x64
@@ -171,7 +169,6 @@ Global
 		{D0135E9B-FB76-4057-8437-CCDD440B4824}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
 		{D0135E9B-FB76-4057-8437-CCDD440B4824}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
 		{D0135E9B-FB76-4057-8437-CCDD440B4824}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
-		{D0135E9B-FB76-4057-8437-CCDD440B4824}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
 		{D0135E9B-FB76-4057-8437-CCDD440B4824}.Debug|Win32.ActiveCfg = Debug|Win32
 		{D0135E9B-FB76-4057-8437-CCDD440B4824}.Debug|Win32.Build.0 = Debug|Win32
 		{D0135E9B-FB76-4057-8437-CCDD440B4824}.Debug|x64.ActiveCfg = Debug|x64
@@ -211,7 +208,6 @@ Global
 		{23D44F54-7077-4BBA-95ED-C05E2484821B}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
 		{23D44F54-7077-4BBA-95ED-C05E2484821B}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
 		{23D44F54-7077-4BBA-95ED-C05E2484821B}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
-		{23D44F54-7077-4BBA-95ED-C05E2484821B}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
 		{23D44F54-7077-4BBA-95ED-C05E2484821B}.Debug|Win32.ActiveCfg = Debug|Win32
 		{23D44F54-7077-4BBA-95ED-C05E2484821B}.Debug|Win32.Build.0 = Debug|Win32
 		{23D44F54-7077-4BBA-95ED-C05E2484821B}.Debug|x64.ActiveCfg = Debug|x64
@@ -231,7 +227,6 @@ Global
 		{A2F61776-D22C-4DB7-9F54-0694C002DDB0}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
 		{A2F61776-D22C-4DB7-9F54-0694C002DDB0}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
 		{A2F61776-D22C-4DB7-9F54-0694C002DDB0}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
-		{A2F61776-D22C-4DB7-9F54-0694C002DDB0}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
 		{A2F61776-D22C-4DB7-9F54-0694C002DDB0}.Debug|Win32.ActiveCfg = Debug|Win32
 		{A2F61776-D22C-4DB7-9F54-0694C002DDB0}.Debug|Win32.Build.0 = Debug|Win32
 		{A2F61776-D22C-4DB7-9F54-0694C002DDB0}.Debug|x64.ActiveCfg = Debug|x64
@@ -251,7 +246,6 @@ Global
 		{B484925C-AC88-4EB4-A7F1-AB4DA3F6A46F}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
 		{B484925C-AC88-4EB4-A7F1-AB4DA3F6A46F}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
 		{B484925C-AC88-4EB4-A7F1-AB4DA3F6A46F}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
-		{B484925C-AC88-4EB4-A7F1-AB4DA3F6A46F}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
 		{B484925C-AC88-4EB4-A7F1-AB4DA3F6A46F}.Debug|Win32.ActiveCfg = Debug|Win32
 		{B484925C-AC88-4EB4-A7F1-AB4DA3F6A46F}.Debug|Win32.Build.0 = Debug|Win32
 		{B484925C-AC88-4EB4-A7F1-AB4DA3F6A46F}.Debug|x64.ActiveCfg = Debug|x64
@@ -271,7 +265,6 @@ Global
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Debug Dynamic|Win32.ActiveCfg = Debug_2012|Win32
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Debug Dynamic|Win32.Build.0 = Debug_2012|Win32
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Debug Dynamic|x64.ActiveCfg = Debug_2012|x64
-		{1904BF9F-C79B-4715-A76D-7648593C9166}.Debug Dynamic|x64.Build.0 = Debug_2012|x64
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Debug|Win32.ActiveCfg = Debug_2012|Win32
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Debug|Win32.Build.0 = Debug_2012|Win32
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Debug|x64.ActiveCfg = Debug_2015|x64
@@ -291,7 +284,6 @@ Global
 		{8A25A0CE-9E98-4627-9117-54E1865CC925}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
 		{8A25A0CE-9E98-4627-9117-54E1865CC925}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
 		{8A25A0CE-9E98-4627-9117-54E1865CC925}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
-		{8A25A0CE-9E98-4627-9117-54E1865CC925}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
 		{8A25A0CE-9E98-4627-9117-54E1865CC925}.Debug|Win32.ActiveCfg = Debug|Win32
 		{8A25A0CE-9E98-4627-9117-54E1865CC925}.Debug|Win32.Build.0 = Debug|Win32
 		{8A25A0CE-9E98-4627-9117-54E1865CC925}.Debug|x64.ActiveCfg = Debug|x64
@@ -311,7 +303,6 @@ Global
 		{74C6E5D4-C6A5-4ED8-BB37-CFDBFCD2C95B}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
 		{74C6E5D4-C6A5-4ED8-BB37-CFDBFCD2C95B}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
 		{74C6E5D4-C6A5-4ED8-BB37-CFDBFCD2C95B}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
-		{74C6E5D4-C6A5-4ED8-BB37-CFDBFCD2C95B}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
 		{74C6E5D4-C6A5-4ED8-BB37-CFDBFCD2C95B}.Debug|Win32.ActiveCfg = Debug|Win32
 		{74C6E5D4-C6A5-4ED8-BB37-CFDBFCD2C95B}.Debug|Win32.Build.0 = Debug|Win32
 		{74C6E5D4-C6A5-4ED8-BB37-CFDBFCD2C95B}.Debug|x64.ActiveCfg = Debug|x64
@@ -331,7 +322,6 @@ Global
 		{41988F49-7A86-4F8D-9A27-650C33CDA156}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
 		{41988F49-7A86-4F8D-9A27-650C33CDA156}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
 		{41988F49-7A86-4F8D-9A27-650C33CDA156}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
-		{41988F49-7A86-4F8D-9A27-650C33CDA156}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
 		{41988F49-7A86-4F8D-9A27-650C33CDA156}.Debug|Win32.ActiveCfg = Debug|Win32
 		{41988F49-7A86-4F8D-9A27-650C33CDA156}.Debug|Win32.Build.0 = Debug|Win32
 		{41988F49-7A86-4F8D-9A27-650C33CDA156}.Debug|x64.ActiveCfg = Debug|x64
@@ -350,7 +340,6 @@ Global
 		{41988F49-7A86-4F8D-9A27-650C33CDA156}.Super|x64.Build.0 = Super|x64
 		{6B83AF8A-70F8-47CE-BA6F-4C6A5157F923}.Debug Dynamic|Win32.ActiveCfg = Debug|Win32
 		{6B83AF8A-70F8-47CE-BA6F-4C6A5157F923}.Debug Dynamic|x64.ActiveCfg = Debug|x64
-		{6B83AF8A-70F8-47CE-BA6F-4C6A5157F923}.Debug Dynamic|x64.Build.0 = Debug|x64
 		{6B83AF8A-70F8-47CE-BA6F-4C6A5157F923}.Debug|Win32.ActiveCfg = Debug|Win32
 		{6B83AF8A-70F8-47CE-BA6F-4C6A5157F923}.Debug|Win32.Build.0 = Debug|Win32
 		{6B83AF8A-70F8-47CE-BA6F-4C6A5157F923}.Debug|x64.ActiveCfg = Debug|x64
@@ -365,7 +354,6 @@ Global
 		{D3D5462A-6E35-4BAF-85C1-434377A02590}.Debug Dynamic|Win32.ActiveCfg = Debug|Win32
 		{D3D5462A-6E35-4BAF-85C1-434377A02590}.Debug Dynamic|Win32.Build.0 = Debug|Win32
 		{D3D5462A-6E35-4BAF-85C1-434377A02590}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
-		{D3D5462A-6E35-4BAF-85C1-434377A02590}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
 		{D3D5462A-6E35-4BAF-85C1-434377A02590}.Debug|Win32.ActiveCfg = Debug|Win32
 		{D3D5462A-6E35-4BAF-85C1-434377A02590}.Debug|Win32.Build.0 = Debug|Win32
 		{D3D5462A-6E35-4BAF-85C1-434377A02590}.Debug|x64.ActiveCfg = Debug|Win32
@@ -381,7 +369,6 @@ Global
 		{71E36592-B7B6-450C-B678-24E63AF5B51C}.Debug Dynamic|Win32.ActiveCfg = Debug|Win32
 		{71E36592-B7B6-450C-B678-24E63AF5B51C}.Debug Dynamic|Win32.Build.0 = Debug|Win32
 		{71E36592-B7B6-450C-B678-24E63AF5B51C}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
-		{71E36592-B7B6-450C-B678-24E63AF5B51C}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
 		{71E36592-B7B6-450C-B678-24E63AF5B51C}.Debug|Win32.ActiveCfg = Debug|Win32
 		{71E36592-B7B6-450C-B678-24E63AF5B51C}.Debug|Win32.Build.0 = Debug|Win32
 		{71E36592-B7B6-450C-B678-24E63AF5B51C}.Debug|x64.ActiveCfg = Debug|x64
