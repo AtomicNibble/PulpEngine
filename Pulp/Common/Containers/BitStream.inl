@@ -47,6 +47,41 @@ BitStream::~BitStream()
 	free();
 }
 
+BitStream & BitStream::operator=(const BitStream & oth)
+{
+	if (this != &oth)
+	{
+		if (capacity_ < oth.capacity_) {
+			resize(oth.capacity_);
+		}
+
+		// copy stored bits.
+		size_t numBytes = bytesRequired(oth.bitIdx_);
+		::memcpy(start_, oth.start_, numBytes);
+
+		bitIdx_ = oth.bitIdx_;
+	}
+	return *this;
+}
+
+BitStream & BitStream::operator=(BitStream && oth)
+{
+	if (this != &oth)
+	{
+		free();
+
+		capacity_ = oth.capacity_;
+		bitIdx_ = oth.bitIdx_;
+		start_ = oth.start_;
+
+		// clear oth.
+		oth.capacity_ = 0;
+		oth.bitIdx_ = 0;
+		oth.start_ = nullptr;
+	}
+	return *this;
+}
+
 // writes a bit to the stream
 inline void BitStream::write(bool bit)
 {

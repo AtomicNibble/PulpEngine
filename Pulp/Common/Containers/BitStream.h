@@ -22,6 +22,9 @@ public:
 	inline BitStream(BitStream&& oth);
 	inline ~BitStream();
 
+	inline BitStream& operator=(const BitStream& oth);
+	inline BitStream& operator=(BitStream&& oth);
+
 	// writes a bit to the stream
 	inline void write(bool bit);
 	// removes and returns the top bit off the stream.
@@ -51,7 +54,7 @@ public:
 	
 private:
 	// X_NO_COPY(BitStream);
-	X_NO_ASSIGN(BitStream);
+	// X_NO_ASSIGN(BitStream);
 
 	// for easy memory allocation changes later.
 	inline size_t bytesRequired(size_t numBits) const;
