@@ -66,7 +66,7 @@ public:
 	}
 
 protected:
-	X_NO_COPY(ByteStreamFifo);
+//	X_NO_COPY(ByteStreamFifo);
 	X_NO_ASSIGN(ByteStreamFifo);
 
 	// for easy memory allocation changes later.
