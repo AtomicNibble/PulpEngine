@@ -1,3 +1,4 @@
+#include "BitStream.h"
 
 BitStream::BitStream(MemoryArenaBase* arena) :
 bitIdx_(0),
@@ -16,6 +17,29 @@ arena_(arena)
 {
 	X_ASSERT_NOT_NULL(arena);
 	resize(numBits);
+}
+
+BitStream::BitStream(const BitStream& oth)
+{
+	resize(oth.capacity_);
+
+	// copy stored bits.
+	size_t numBytes = bytesRequired(oth.bitIdx_);
+	::memcpy(start_, oth.start_, numBytes);
+
+	bitIdx_ = oth.bitIdx_;
+}
+
+BitStream::BitStream(BitStream&& oth)
+{
+	capacity_ = oth.capacity_;
+	bitIdx_ = oth.bitIdx_;
+	start_ = oth.start_;
+
+	// clear oth.
+	oth.capacity_ = 0;
+	oth.bitIdx_ = 0;
+	oth.start_ = nullptr;
 }
 
 BitStream::~BitStream()
