@@ -27,9 +27,91 @@ Fifo<T>::Fifo(MemoryArenaBase* arena, size_type size) :
 }
 
 template<typename T>
+Fifo<T>::Fifo(const Fifo& oth)
+{
+	arena_ = oth.arena_;
+
+	reserve(oth.capacity());
+
+	::memcpy(start_, oth.start_, oth.capacity());
+
+	// set read/write/num
+	read_ = start_ + (oth.read_ - oth.start_);
+	write_ = start_ + (oth.write_ - oth.start_);
+	num_ = oth.num_;
+}
+
+template<typename T>
+Fifo<T>::Fifo(Fifo&& oth)
+{
+	start_ = oth.start_;
+	end_ = oth.end_;
+	read_ = oth.read_;
+	write_ = oth.write_;
+
+	num_ = oth.num_;
+
+	arena_ = oth.arena_;
+	
+	// clear oth.
+	oth.start_ = nullptr;
+	oth.end_ = nullptr;
+	oth.read_ = nullptr;
+	oth.write_ = nullptr;
+	oth.num_ = 0;
+}
+
+template<typename T>
 Fifo<T>::~Fifo()
 {
 	free();
+}
+
+template<typename T>
+Fifo<T>& Fifo<T>::operator = (const Fifo<T>& oth)
+{
+	if (this != &oth)
+	{
+		free();
+
+		arena_ = oth.arena_;
+
+		reserve(oth.capacity());
+
+		::memcpy(start_, oth.start_, oth.capacity());
+
+		// set read/write/num
+		read_ = start_ + (oth.read_ - oth.start_);
+		write_ = start_ + (oth.write_ - oth.start_);
+		num_ = oth.num_;
+	}
+	return *this;
+}
+
+template<typename T>
+Fifo<T>& Fifo<T>::operator = (Fifo<T>&& oth)
+{
+	if (this != &oth)
+	{
+		free();
+
+		start_ = oth.start_;
+		end_ = oth.end_;
+		read_ = oth.read_;
+		write_ = oth.write_;
+
+		num_ = oth.num_;
+
+		arena_ = oth.arena_;
+
+		// clear oth.
+		oth.start_ = nullptr;
+		oth.end_ = nullptr;
+		oth.read_ = nullptr;
+		oth.write_ = nullptr;
+		oth.num_ = 0;
+	}
+	return *this;
 }
 
 
