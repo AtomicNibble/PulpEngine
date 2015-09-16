@@ -14,6 +14,8 @@ public:
 	// constructs the stream no memory is allocated.
 	inline ByteStream(MemoryArenaBase* arena);
 	inline ByteStream(MemoryArenaBase* arena, size_t numBytes);
+	inline ByteStream(const ByteStream& oth);
+	inline ByteStream(ByteStream&& oth);
 	inline ~ByteStream();
 
 	// writes the type to the stream.
@@ -50,7 +52,7 @@ public:
 	}
 
 protected:
-	X_NO_COPY(ByteStream);
+//	X_NO_COPY(ByteStream);
 	X_NO_ASSIGN(ByteStream);
 
 	// for easy memory allocation changes later.

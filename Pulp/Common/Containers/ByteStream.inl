@@ -1,3 +1,4 @@
+#include "ByteStream.h"
 
 
 
@@ -18,6 +19,23 @@ ByteStream::ByteStream(MemoryArenaBase* arena, size_t numBytes) :
 {
 	X_ASSERT_NOT_NULL(arena);
 	resize(numBytes);
+}
+
+ByteStream::ByteStream(const ByteStream& oth)
+{
+	arena_ = oth.arena_;
+
+	resize(oth.capacity());
+
+	::memcpy(start_, oth.start_, oth.size());
+
+	current_ = start_ + oth.size();
+}
+
+ByteStream::ByteStream(ByteStream&& oth)
+{
+
+
 }
 
 ByteStream::~ByteStream()
