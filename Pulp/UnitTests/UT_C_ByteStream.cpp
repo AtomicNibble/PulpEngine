@@ -2,9 +2,25 @@
 
 #include <gtest\gtest.h>
 
+#include <Containers\ByteStream.h>
+#include <Containers\Array.h> // for move test.
+
+#include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
+#include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
+#include <Memory\AllocationPolicies\LinearAllocator.h>
+#include <Memory\MemoryTaggingPolicies\NoMemoryTagging.h>
+
 X_USING_NAMESPACE;
 
 using namespace core;
+
+typedef core::MemoryArena<
+	core::LinearAllocator,
+	core::SingleThreadPolicy,
+	core::NoBoundsChecking,
+	core::NoMemoryTracking,
+	core::NoMemoryTagging
+> LinearArea;
 
 
 TEST(ByteStreamTest, Genral)
@@ -139,4 +155,24 @@ TEST(ByteStreamTest, Grow)
 	EXPECT_EQ(2048, stream.capacity());
 	EXPECT_EQ(0, stream.size());
 	EXPECT_EQ(2048, stream.freeSpace());
+}
+
+
+
+TEST(ByteStreamTest, Move)
+{
+	const size_t bytes = (sizeof(uint8_t) * (100 + 64)) + (sizeof(ByteStream) * 2) +
+		(sizeof(size_t) * 3); // Linear header block.
+
+	X_ALIGNED_SYMBOL(char buf[bytes], 8) = {};
+	LinearAllocator allocator(buf, buf + bytes);
+	LinearArea arena(&allocator, "MoveAllocator");
+
+	Array<ByteStream> list(&arena);
+	list.setGranularity(2);
+	list.reserve(2);
+
+
+	list.push_back(ByteStream(&arena, 100));
+	list.push_back(ByteStream(&arena, 64));
 }
