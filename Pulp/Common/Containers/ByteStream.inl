@@ -1,3 +1,4 @@
+#include "ByteStream.h"
 
 
 
@@ -20,9 +21,70 @@ ByteStream::ByteStream(MemoryArenaBase* arena, size_t numBytes) :
 	resize(numBytes);
 }
 
+ByteStream::ByteStream(const ByteStream& oth)
+{
+	arena_ = oth.arena_;
+
+	resize(oth.capacity());
+
+	::memcpy(start_, oth.start_, oth.size());
+
+	current_ = start_ + oth.size();
+}
+
+ByteStream::ByteStream(ByteStream&& oth)
+{
+	arena_ = oth.arena_;
+	current_ = oth.current_;
+	start_ = oth.start_;
+	end_ = oth.end_;
+
+	// clear other.
+	oth.current_ = nullptr;
+	oth.start_ = nullptr;
+	oth.end_ = nullptr;
+}
+
 ByteStream::~ByteStream()
 {
 	free();
+}
+
+ByteStream& ByteStream::operator=(const ByteStream& oth)
+{
+	if (this != &oth)
+	{
+		free();
+
+		arena_ = oth.arena_;
+
+		resize(oth.capacity());
+
+		::memcpy(start_, oth.start_, oth.size());
+
+		current_ = start_ + oth.size();
+	}
+	return *this;
+}
+
+ByteStream& ByteStream::operator=(ByteStream&& oth)
+{
+	if (this != &oth)
+	{
+		free();
+
+		// steal buffer.
+		arena_ = oth.arena_;
+		current_ = oth.current_;
+		start_ = oth.start_;
+		end_ = oth.end_;
+
+		// clear other.
+		oth.current_ = nullptr;
+		oth.start_ = nullptr;
+		oth.end_ = nullptr;
+	}
+	return *this;
 }
 
 template<typename T>

@@ -1,3 +1,4 @@
+#include "BitStream.h"
 
 BitStream::BitStream(MemoryArenaBase* arena) :
 bitIdx_(0),
@@ -18,9 +19,74 @@ arena_(arena)
 	resize(numBits);
 }
 
+BitStream::BitStream(const BitStream& oth)
+{
+	// use it's arena.
+	arena_ = oth.arena_;
+
+	resize(oth.capacity_);
+
+	// copy stored bits.
+	size_t numBytes = bytesRequired(oth.bitIdx_);
+	::memcpy(start_, oth.start_, numBytes);
+
+	bitIdx_ = oth.bitIdx_;
+}
+
+BitStream::BitStream(BitStream&& oth)
+{
+	capacity_ = oth.capacity_;
+	bitIdx_ = oth.bitIdx_;
+	start_ = oth.start_;
+	arena_ = oth.arena_;
+
+	// clear oth.
+	oth.capacity_ = 0;
+	oth.bitIdx_ = 0;
+	oth.start_ = nullptr;
+}
+
 BitStream::~BitStream()
 {
 	free();
+}
+
+BitStream & BitStream::operator=(const BitStream & oth)
+{
+	if (this != &oth)
+	{
+		// free and re allocat using oth's arena.
+		free();
+		arena_ = oth.arena_;
+
+		resize(oth.capacity_);
+
+		// copy stored bits.
+		size_t numBytes = bytesRequired(oth.bitIdx_);
+		::memcpy(start_, oth.start_, numBytes);
+
+		bitIdx_ = oth.bitIdx_;
+	}
+	return *this;
+}
+
+BitStream & BitStream::operator=(BitStream && oth)
+{
+	if (this != &oth)
+	{
+		free();
+
+		capacity_ = oth.capacity_;
+		bitIdx_ = oth.bitIdx_;
+		start_ = oth.start_;
+		arena_ = oth.arena_;
+
+		// clear oth.
+		oth.capacity_ = 0;
+		oth.bitIdx_ = 0;
+		oth.start_ = nullptr;
+	}
+	return *this;
 }
 
 // writes a bit to the stream

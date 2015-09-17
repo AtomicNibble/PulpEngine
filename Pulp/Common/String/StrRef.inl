@@ -29,6 +29,15 @@ StringRef<CharT>::StringRef(const StrT& str)
 	}
 }
 
+// from another string object
+template<typename CharT>
+StringRef<CharT>::StringRef(StrT&& oth)
+{
+	str_ = oth.str_;
+
+	oth.SetEmpty();
+}
+
 // from another string object, define the offset and count
 template<typename CharT>
 StringRef<CharT>::StringRef(const StrT& str, size_type offset, size_type count)
@@ -281,6 +290,17 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::operator=(const StrT& str)
 			str_ = str.str_;
 			header()->addRef();
 		}
+	}
+	return *this;
+}
+
+template<typename CharT>
+typename StringRef<CharT>::StrT& StringRef<CharT>::operator=(StrT&& oth)
+{
+	if (this != &oth) 
+	{
+		str_ = oth.str_;
+		oth.SetEmpty();
 	}
 	return *this;
 }

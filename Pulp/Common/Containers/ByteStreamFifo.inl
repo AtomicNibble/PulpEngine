@@ -1,3 +1,4 @@
+#include "ByteStreamFifo.h"
 
 
 
@@ -22,10 +23,79 @@ arena_(arena)
 	resize(numBytes);
 }
 
+ByteStreamFifo::ByteStreamFifo(const ByteStreamFifo & oth)
+{
+	arena_ = oth.arena_;
+
+	resize(oth.capacity());
+
+	// copy it all.
+	::memcpy(start_, oth.start_, oth.capacity());
+
+	// offset read/write
+	read_ = start_ + (oth.read_ - oth.start_);
+	write_ = start_ + (oth.write_ - oth.start_);
+}
+
+ByteStreamFifo::ByteStreamFifo(ByteStreamFifo&& oth)
+{
+	read_ = oth.read_;
+	write_ = oth.write_;
+	start_ = oth.start_;
+	end_ = oth.end_;
+	arena_ = oth.arena_;
+
+	oth.read_ = nullptr;
+	oth.write_ = nullptr;
+	oth.start_ = nullptr;
+	oth.end_ = nullptr;
+}
+
+
 
 ByteStreamFifo::~ByteStreamFifo(void)
 {
 	free();
+}
+
+inline ByteStreamFifo& ByteStreamFifo::operator = (const ByteStreamFifo& oth)
+{
+	if (this != &oth)
+	{
+		free();
+
+		arena_ = oth.arena_;
+
+		resize(oth.capacity());
+
+		// copy it all.
+		::memcpy(start_, oth.start_, oth.capacity());
+
+		// offset read/write
+		read_ = start_ + (oth.read_ - oth.start_);
+		write_ = start_ + (oth.write_ - oth.start_);
+	}
+	return *this;
+}
+
+inline ByteStreamFifo& ByteStreamFifo::operator = (ByteStreamFifo&& oth)
+{
+	if (this != &oth)
+	{
+		free();
+
+		read_ = oth.read_;
+		write_ = oth.write_;
+		start_ = oth.start_;
+		end_ = oth.end_;
+		arena_ = oth.arena_;
+
+		oth.read_ = nullptr;
+		oth.write_ = nullptr;
+		oth.start_ = nullptr;
+		oth.end_ = nullptr;
+	}
+	return *this;
 }
 
 /*

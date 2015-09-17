@@ -2,8 +2,22 @@
 #include <gtest\gtest.h>
 #include <Containers\Fifo.h>
 
+#include <Containers\Array.h> // for move test.
+
+#include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
+#include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
+#include <Memory\AllocationPolicies\LinearAllocator.h>
+#include <Memory\MemoryTaggingPolicies\NoMemoryTagging.h>
 
 X_USING_NAMESPACE;
+
+typedef core::MemoryArena<
+	core::LinearAllocator,
+	core::SingleThreadPolicy,
+	core::NoBoundsChecking,
+	core::NoMemoryTracking,
+	core::NoMemoryTagging
+> LinearArea;
 
 using namespace core;
 
@@ -159,4 +173,43 @@ TYPED_TEST(FifoTest, Iteration)
 
 	// only matters on custom type.
 	EXPECT_EQ(CustomType::CONSTRUCTION_COUNT, CustomType::DECONSTRUCTION_COUNT);
+}
+
+
+TYPED_TEST(FifoTest, Move)
+{
+	const size_t bytes = (sizeof(TypeParam) * 164) + (sizeof(Fifo<TypeParam>) * 2) + 
+		(sizeof(size_t) * 3);
+
+	X_ALIGNED_SYMBOL(char buf[bytes], 8) = {};
+	LinearAllocator allocator(buf, buf + bytes);
+	LinearArea arena(&allocator, "MoveAllocator");
+
+	Array<Fifo<TypeParam>> list(&arena);
+	list.setGranularity(2);
+	list.reserve(2);
+
+
+	list.push_back(Fifo<TypeParam>(&arena, 100));
+	list.push_back(Fifo<TypeParam>(&arena, 64));
+}
+
+TYPED_TEST(FifoTest, MoveAssign)
+{
+	const size_t bytes = (sizeof(TypeParam) * (16 + 64)) +
+		(sizeof(size_t) * 2); // Linear header block.
+
+
+	X_ALIGNED_SYMBOL(char buf[bytes], 8) = {};
+	LinearAllocator allocator(buf, buf + bytes);
+	LinearArea arena(&allocator, "MoveAllocator");
+
+	// want the operator=(T&& oth) to be used.
+	Fifo<TypeParam> fifo(&arena);
+
+	fifo.reserve(16);
+	fifo = Fifo<TypeParam>(&arena, 64);
+
+	EXPECT_EQ(0, fifo.size());
+	EXPECT_EQ(64, fifo.capacity());
 }

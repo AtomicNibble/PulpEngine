@@ -14,7 +14,12 @@ public:
 	// constructs the stream no memory is allocated.
 	inline ByteStream(MemoryArenaBase* arena);
 	inline ByteStream(MemoryArenaBase* arena, size_t numBytes);
+	inline ByteStream(const ByteStream& oth);
+	inline ByteStream(ByteStream&& oth);
 	inline ~ByteStream();
+
+	inline ByteStream& operator=(const ByteStream& oth);
+	inline ByteStream& operator=(ByteStream&& oth);
 
 	// writes the type to the stream.
 	template<typename T>
@@ -50,8 +55,8 @@ public:
 	}
 
 protected:
-	X_NO_COPY(ByteStream);
-	X_NO_ASSIGN(ByteStream);
+//	X_NO_COPY(ByteStream);
+//	X_NO_ASSIGN(ByteStream);
 
 	// for easy memory allocation changes later.
 	inline void Delete(char* pData) const;
