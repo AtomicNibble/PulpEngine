@@ -129,3 +129,23 @@ TEST(BitStreamTest, Move)
 	list.push_back(BitStream(&arena, 100 * 8));
 	list.push_back(BitStream(&arena, 64 * 8));
 }
+
+TEST(BitStreamTest, MoveAssign)
+{
+	const size_t bytes = (sizeof(uint8_t) * (16 + 64)) + 
+		(sizeof(size_t) * 2); // Linear header block.
+
+
+	X_ALIGNED_SYMBOL(char buf[bytes], 8) = {};
+	LinearAllocator allocator(buf, buf + bytes);
+	LinearArea arena(&allocator, "MoveAllocator");
+
+	// want the operator=(T&& oth) to be used.
+	BitStream stream(&arena);
+
+	stream.resize(16 * 8);
+	stream = BitStream(&arena, 64 * 8);
+
+	EXPECT_EQ(0, stream.size());
+	EXPECT_EQ(64 * 8, stream.capacity());
+}
