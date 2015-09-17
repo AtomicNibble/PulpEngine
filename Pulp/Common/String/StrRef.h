@@ -41,6 +41,8 @@ public:
 	StringRef();
 	// from another string object
 	StringRef(const StrT& str); 
+	// from another string object 'move'
+	StringRef(StrT&& str);
 	// from another string object, define the offset & count
 	StringRef(const StrT& str, size_type offset, size_type count);
 	// const from char (optionaly repeat it x number of times)
@@ -99,6 +101,7 @@ public:
 
 	// overloaded assignment
 	StrT& operator=(const StrT& str);
+	StrT& operator=(StrT&& str);
 	StrT& operator=(value_type ch);
 	StrT& operator=(const_str str);
 	
