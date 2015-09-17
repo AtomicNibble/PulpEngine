@@ -118,11 +118,12 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 			if (engine.Init(lpCmdLine, Console))
 			{
 				core::Path<char> name;
+				name.set("map_source\\");
 				name.setFileName("basic - Copy.map");
 				name.setFileName("alcatraz.map");
 				name.setFileName("killzone.map");
 				name.setFileName("box.map");
-				name.setFileName("test_resources\\maps\\boxmap.map");
+				name.setFileName("boxmap.map");
 				name.setFileName("box2.map");
 				name.setFileName("box3.map");
 				name.setFileName("box4.map");
