@@ -193,3 +193,23 @@ TYPED_TEST(FifoTest, Move)
 	list.push_back(Fifo<TypeParam>(&arena, 100));
 	list.push_back(Fifo<TypeParam>(&arena, 64));
 }
+
+TYPED_TEST(FifoTest, MoveAssign)
+{
+	const size_t bytes = (sizeof(TypeParam) * (16 + 64)) +
+		(sizeof(size_t) * 2); // Linear header block.
+
+
+	X_ALIGNED_SYMBOL(char buf[bytes], 8) = {};
+	LinearAllocator allocator(buf, buf + bytes);
+	LinearArea arena(&allocator, "MoveAllocator");
+
+	// want the operator=(T&& oth) to be used.
+	Fifo<TypeParam> fifo(&arena);
+
+	fifo.reserve(16);
+	fifo = Fifo<TypeParam>(&arena, 64);
+
+	EXPECT_EQ(0, fifo.size());
+	EXPECT_EQ(64, fifo.capacity());
+}
