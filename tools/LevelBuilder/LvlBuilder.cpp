@@ -97,14 +97,14 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	calculateLvlBounds();
 
 
-	X_LOG0("Map", "Total world brush: %i", entities_[0].brushes.size());
-	X_LOG0("Map", "Total world patches: %i", 0); // TODO
-	X_LOG0("Map", "Total total brush: %i", stats_.numBrushes);
-	X_LOG0("Map", "Total total patches: %i", stats_.numPatches);
-	X_LOG0("Map", "Total entities: %i", stats_.numEntities);
-	X_LOG0("Map", "Total planes: %i", this->planes.size());
-	X_LOG0("Map", "Total areaPortals: %i", stats_.numAreaPortals);
-	X_LOG0("Map", "Size: (%.0f,%.0f,%.0f) to (%.0f,%.0f,%.0f)", 
+	X_LOG0("Map", "Total world brush: ^8%i", entities_[0].brushes.size());
+	X_LOG0("Map", "Total world patches: ^8%i", 0); // TODO
+	X_LOG0("Map", "Total total brush: ^8%i", stats_.numBrushes);
+	X_LOG0("Map", "Total total patches: ^8%i", stats_.numPatches);
+	X_LOG0("Map", "Total entities: ^8%i", stats_.numEntities);
+	X_LOG0("Map", "Total planes: ^8%i", this->planes.size());
+	X_LOG0("Map", "Total areaPortals: ^8%i", stats_.numAreaPortals);
+	X_LOG0("Map", "Size: (^8%.0f,%.0f,%.0f^7) to (^8%.0f,%.0f,%.0f^7)", 
 		mapBounds.min[0], mapBounds.min[1], mapBounds.min[2],
 		mapBounds.max[0], mapBounds.max[1], mapBounds.max[2]);
 

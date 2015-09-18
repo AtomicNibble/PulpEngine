@@ -110,7 +110,7 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 			iap.area1 = p->nodes[0]->area;
 		}
 
-		X_LOG0("Portal", "inter connection: %i <-> %i",
+		X_LOG0("Portal", "inter connection: ^8%i^7 <-> ^8%i",
 			iap.area0, iap.area1);
 		iap.pSide = pBSide;
 	}
@@ -209,7 +209,7 @@ bool LvlEntity::FacesToBSP(XPlaneSet& planeSet)
 		}
 	}
 
-	X_LOG0("LvlEntity", "num faces: %i", numFaces);
+	X_LOG0("LvlEntity", "num faces: ^8%i", numFaces);
 
 	// copy bounds.
 	root.headnode->bounds = root.bounds;
@@ -224,7 +224,7 @@ bool LvlEntity::FacesToBSP(XPlaneSet& planeSet)
 	// the have all been deleted
 	bspFaces = nullptr;
 
-	X_LOG0("LvlEntity", "num leafs: %i", treeBuilder.getNumLeafs());
+	X_LOG0("LvlEntity", "num leafs: ^8%i", treeBuilder.getNumLeafs());
 	return true;
 }
 
@@ -238,7 +238,7 @@ bool LvlEntity::FilterBrushesIntoTree(XPlaneSet& planeSet)
 	size_t		numUnique, numClusters, r;
 	LvlBrush	*b, *newb;
 
-	X_LOG0("LvlEntity", "----- FilterBrushesIntoTree -----");
+	X_LOG0("LvlEntity", "^5----- FilterBrushesIntoTree -----");
 
 	numUnique = 0;
 	numClusters = 0;
@@ -258,8 +258,8 @@ bool LvlEntity::FilterBrushesIntoTree(XPlaneSet& planeSet)
 		numClusters += r;
 	}
 
-	X_LOG0("LvlEntity", "%5i total brushes", numUnique);
-	X_LOG0("LvlEntity", "%5i cluster references", numClusters);
+	X_LOG0("LvlEntity", "^8%5i^7 total brushes", numUnique);
+	X_LOG0("LvlEntity", "^8%5i^7 cluster references", numClusters);
 	return true;
 }
 
@@ -267,7 +267,7 @@ bool LvlEntity::FilterBrushesIntoTree(XPlaneSet& planeSet)
 bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents, 
 	mapfile::XMapFile* pMap)
 {
-	X_LOG0("LvlEntity", "FloodEntities");
+	X_LOG0("LvlEntity", "^5----- FloodEntities -----");
 
 	struct bspTree* tree;
 	bspNode* headnode;
@@ -311,7 +311,7 @@ bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents,
 		}
 	}
 
-	X_LOG0("LvlEntity", "%5i flooded leafs", floodedLeafs);
+	X_LOG0("LvlEntity", "^8%5i^7 flooded leafs", floodedLeafs);
 
 	if (!inside)
 	{
@@ -358,7 +358,7 @@ bool LvlEntity::FillOutside(void)
 {
 	FillStats stats;
 
-	X_LOG0("LvlEntity", "--- FillOutside ---");
+	X_LOG0("LvlEntity", "^5----- FillOutside -----");
 	bspTree.headnode->FillOutside_r(stats);
 
 	stats.print();
@@ -367,7 +367,7 @@ bool LvlEntity::FillOutside(void)
 
 bool LvlEntity::ClipSidesByTree(XPlaneSet& planeSet)
 {
-	X_LOG0("LvlEntity", "--- ClipSidesByTree ---");
+	X_LOG0("LvlEntity", "^5----- ClipSidesByTree -----");
 
 	size_t i, x;
 
@@ -396,7 +396,7 @@ bool LvlEntity::ClipSidesByTree(XPlaneSet& planeSet)
 
 bool LvlEntity::FloodAreas(void)
 {
-	X_LOG0("LvlEntity", "--- FloodAreas ---");
+	X_LOG0("LvlEntity", "^5----- FloodAreas -----");
 
 	numAreas = 0;
 	// find how many we have.
@@ -427,7 +427,7 @@ bool LvlEntity::FloodAreas(void)
 
 bool LvlEntity::PruneNodes(void)
 {
-	X_LOG0("LvlEntity", "--- PruneNodes ---");
+	X_LOG0("LvlEntity", "^5----- PruneNodes -----");
 	
 	if (!bspTree.headnode) {
 		X_ERROR("LvlEntity", "Failed to prineNodes the tree is invalid.");
@@ -445,9 +445,9 @@ bool LvlEntity::PruneNodes(void)
 	X_ASSERT(numNodes == postPrune, "Invalid node couts. prunt and num don't match")(numNodes, postPrune);
 #endif
 
-	X_LOG0("LvlEntity", "prePrune: %i", prePrune);
-	X_LOG0("LvlEntity", "postPrune: %i", postPrune);
-	X_LOG0("LvlEntity", "numNodes: %i", numNodes);
+	X_LOG0("LvlEntity", "prePrune: ^8%i", prePrune);
+	X_LOG0("LvlEntity", "postPrune: ^8%i", postPrune);
+	X_LOG0("LvlEntity", "numNodes: ^8%i", numNodes);
 	return true;
 }
 

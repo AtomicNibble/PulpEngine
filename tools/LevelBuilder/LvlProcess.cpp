@@ -209,7 +209,7 @@ bool LvlBuilder::ProcessModels(void)
 			continue;
 		}
 
-		X_LOG0("Entity", "----------- entity %i -----------", i);
+		X_LOG0("Entity", "^5----- entity %i -----", i);
 
 		if (i == 0)
 		{
@@ -413,7 +413,7 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 
 bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 {
-	X_LOG0("Lvl", "--- PutPrimitivesInAreas ---");
+	X_LOG0("Lvl", "^5----- PutPrimitivesInAreas -----");
 
 	// ok now we must create the areas and place the primatives into each area.
 	// clip into non-solid leafs and divide between areas.
