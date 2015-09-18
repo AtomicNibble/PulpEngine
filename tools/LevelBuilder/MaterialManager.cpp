@@ -151,9 +151,9 @@ engine::IMaterial* MatManager::loadMaterialXML(const char* MtlName)
 	path.setFileName(MtlName);
 	path.setExtension(engine::MTL_FILE_EXTENSION);
 
-	if (!pFileSys_->fileExists(path.c_str())) {
-		return pMat;
-	}
+//	if (!pFileSys_->fileExists(path.c_str())) {
+//		return pMat;
+//	}
 
 	if (file.openFile(path.c_str(), core::fileMode::READ))
 	{
