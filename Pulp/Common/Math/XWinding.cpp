@@ -208,13 +208,13 @@ void XWinding::print(void) const
 	const Vec3f& max = bounds.max;
 	X_LOG0("Winding", "Printing values:");
 	X_LOG_BULLET;
-	X_LOG0("Winding", "min: (%g,%g,%g)", min[0], min[1], min[2]);
-	X_LOG0("Winding", "max: (%g,%g,%g)", max[0], max[1], max[2]);
-	X_LOG0("Winding", "NumPoints: %i", numPoints_);
+	X_LOG0("Winding", "min: (^5%g,%g,%g^7)", min[0], min[1], min[2]);
+	X_LOG0("Winding", "max: (%5%g,%g,%g^7)", max[0], max[1], max[2]);
+	X_LOG0("Winding", "NumPoints: ^5%i", numPoints_);
 	for (int i = 0; i < numPoints_; i++)
 	{
 		const Vec5f& pl = pPoints_[i];
-		X_LOG0("Winding", "P(%i): (%g,%g,%g) (%g,%g)", i,
+		X_LOG0("Winding", "P(^5%i^7): (^5%g,%g,%g^7) (^5%g,%g^7)", i,
 			pl[0], pl[1], pl[2], pl[3], pl[4]);
 	}
 }
