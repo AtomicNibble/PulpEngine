@@ -239,7 +239,6 @@
     <ClInclude Include="Settings.h" />
     <ClInclude Include="StringPair.h" />
     <ClInclude Include="VertexFmt.h" />
-    <ClInclude Include="Winding.h" />
     <ClInclude Include="MapLoader.h" />
     <ClInclude Include="MapTypes.h" />
     <ClInclude Include="PlaneSet.h" />
@@ -276,7 +275,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Winding.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LevelBuilder.rc" />
@@ -284,9 +282,6 @@
   <ItemGroup>
     <Image Include="LevelBuilder.ico" />
     <Image Include="small.ico" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Winding.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
