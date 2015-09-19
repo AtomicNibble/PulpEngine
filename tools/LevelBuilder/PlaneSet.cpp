@@ -2,7 +2,7 @@
 #include "PlaneSet.h"
 
 
-XPlaneSet::XPlaneSet() : std::vector<Planef>(), hash(g_arena)
+XPlaneSet::XPlaneSet() : core::Array<Planef>(g_arena), hash(g_arena)
 {
 	this->reserve(4096 * 8);
 }
