@@ -568,7 +568,7 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 
 			it = mapEnt->epairs.find("model");
 			if (it == mapEnt->epairs.end()) {
-				X_WARNING("Entity", "mist model missing 'model' kvp at: (%g,%g,%g)",
+				X_WARNING("Entity", "misc_model missing 'model' kvp at: (%g,%g,%g)",
 					lvlEnt.origin[0], lvlEnt.origin[1], lvlEnt.origin[2]);
 				continue;
 			}
