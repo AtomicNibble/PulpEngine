@@ -384,7 +384,7 @@ void PotatoOptions::setcmdArgs(const MArgList &args)
 		if (!args.get(++idx, temp)) {
 			MayaPrintWarning("failed to get scale flag");
 		} else {
-			scale_ = (float)temp;
+			scale_ = static_cast<float>(temp);
 		}
 	}
 
@@ -408,7 +408,7 @@ void PotatoOptions::setcmdArgs(const MArgList &args)
 			MayaPrintWarning("failed to get weight_thresh flag");
 		}
 		else {
-			jointThreshold_ = (float)temp;
+			jointThreshold_ = static_cast<float>(temp);
 		}
 	}
 
