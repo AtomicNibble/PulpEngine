@@ -242,7 +242,7 @@ bool LvlBuilder::LoadDefaultModel(void)
 {
 	if (!ModelInfo::GetNModelAABB("default", defaultModelBounds_))
 	{
-		X_ERROR("","FAield to load default model info");
+		X_ERROR("","Failed to load default model info");
 		return false;
 	}
 	return true;
