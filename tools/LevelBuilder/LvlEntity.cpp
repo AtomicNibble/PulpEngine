@@ -451,59 +451,6 @@ bool LvlEntity::PruneNodes(void)
 	return true;
 }
 
-void AreaForOrigin_r(XPlaneSet& planeSet, const AABB& bounds, bspNode* pNode)
-{
-	X_ASSERT_NOT_NULL(pNode);
-	bspNode* pCurNode = pNode;
-
-	// i need to go down the tree untill i hit a leaf with a area.
-	// when we cross a node we go down both paths so that we detech multiple intersections.
-
-
-	// how to crorrectly detech what leafs the bounding box resides in?
-	// i will have to go down the tree checking whatside the AABB is for the node.
-	// if we are not clearly front/back of the plane.
-	// we are intersecting, so travel down both paths so see what we hit.
-	// when we reach a leaf node that is solid we leave.
-	// if the noe is a lea and has a area we should be inside that area.
-
-	do
-	{
-		if (pCurNode->IsAreaLeaf())
-		{
-			const AABB& b = pCurNode->bounds;
-			
-			if (b.containsBox(bounds)) {
-				X_LOG0("Test", "Area: %i (%g,%g,%g) <=> (%g,%g,%g)", pCurNode->area,
-					b.min[0], b.min[1], b.min[2],
-					b.max[0], b.max[1], b.max[2]);
-			}
-			return;
-		}
-
-		const Planef& plane = planeSet[pCurNode->planenum];
-		PlaneSide::Enum side = bounds.planeSide(plane);
-
-		if (side == PlaneSide::FRONT) {
-			pCurNode = pCurNode->children[0];
-		}
-		else if (side == PlaneSide::BACK) {
-			pCurNode = pCurNode->children[1];
-		}
-		else
-		{
-			// travel down both paths.
-			if (!pCurNode->children[1]->IsSolidLeaf()) {
-				AreaForOrigin_r(planeSet, bounds, pCurNode->children[1]);
-			}
-
-			pCurNode = pCurNode->children[0];
-		}
-
-	} while (!pCurNode->IsSolidLeaf());
-
-}
-
 
 bool IsPointInAnyArea(XPlaneSet& planeSet, const Vec3f& pos, int32_t& areaOut, bspNode* pNode)
 {
@@ -522,7 +469,7 @@ bool IsPointInAnyArea(XPlaneSet& planeSet, const Vec3f& pos, int32_t& areaOut, b
 			pCurNode = pCurNode->children[1];
 		}
 
-		if (pCurNode->IsSolidLeaf() ) {
+		if (pCurNode->IsSolidLeaf()) {
 			areaOut = -1; // in solid
 			return false;
 		}
@@ -530,7 +477,7 @@ bool IsPointInAnyArea(XPlaneSet& planeSet, const Vec3f& pos, int32_t& areaOut, b
 		if (pCurNode->IsAreaLeaf())
 		{
 			areaOut = pCurNode->area;
-			X_LOG0("Area","Point (%g,%g,%g) is in area: %i", 
+			X_LOG0("Area", "Point (%g,%g,%g) is in area: %i",
 				pos.x, pos.y, pos.z, pCurNode->area);
 			return true;
 		}
@@ -538,6 +485,62 @@ bool IsPointInAnyArea(XPlaneSet& planeSet, const Vec3f& pos, int32_t& areaOut, b
 
 	areaOut = -1;
 	return false;
+}
+
+size_t AreaForOrigin_r(XPlaneSet& planeSet, const AABB& bounds, bspNode* pNode)
+{
+	X_ASSERT_NOT_NULL(pNode);
+	bspNode* pCurNode = pNode;
+	size_t numAreas = 0;
+	// i need to go down the tree untill i hit a leaf with a area.
+	// when we cross a node we go down both paths so that we detech multiple intersections.
+
+
+	// how to crorrectly detech what leafs the bounding box resides in?
+	// i will have to go down the tree checking whatside the AABB is for the node.
+	// if we are not clearly front/back of the plane.
+	// we are intersecting, so travel down both paths so see what we hit.
+	// when we reach a leaf node that is solid we leave.
+	// if the noe is a lea and has a area we should be inside that area.
+
+	do
+	{
+		if (pCurNode->IsAreaLeaf())
+		{
+			const AABB& b = pCurNode->bounds;
+			
+		//	if (b.containsBox(bounds))
+			{
+				X_LOG0("Test", "Area: %i (^6%g,%g,%g^7) <=> (^6%g,%g,%g^7)", 
+					pCurNode->area,
+					b.min[0], b.min[1], b.min[2],
+					b.max[0], b.max[1], b.max[2]);
+			}
+			return 1;
+		}
+
+		const Planef& plane = planeSet[pCurNode->planenum];
+		PlaneSide::Enum side = bounds.planeSide(plane);
+
+		if (side == PlaneSide::FRONT) {
+			pCurNode = pCurNode->children[0];
+		}
+		else if (side == PlaneSide::BACK) {
+			pCurNode = pCurNode->children[1];
+		}
+		else
+		{
+			// travel down both paths.
+			if (!pCurNode->children[1]->IsSolidLeaf()) {
+				numAreas += AreaForOrigin_r(planeSet, bounds, pCurNode->children[1]);
+			}
+
+			pCurNode = pCurNode->children[0];
+		}
+
+	} while (!pCurNode->IsSolidLeaf());
+
+	return numAreas;
 }
 
 
@@ -594,7 +597,12 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 		bounds.set(lvlEnt.bounds.min + lvlEnt.origin,
 			lvlEnt.bounds.max + lvlEnt.origin);
 
-		AreaForOrigin_r(planeSet, bounds, bspTree.headnode);
+		size_t numAreas = AreaForOrigin_r(planeSet, bounds, bspTree.headnode);
+
+		if (numAreas < 1)
+		{
+			X_ERROR("Entity", "ent resides in zero areas.");
+		}
 	}
 	return true;
 }
