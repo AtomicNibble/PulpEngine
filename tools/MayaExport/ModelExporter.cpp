@@ -446,6 +446,12 @@ void PotatoOptions::setcmdArgs(const MArgList &args)
 		}
 	}
 
+
+	// use the scale to make it cm -> inches.
+	// this applyies it post user scale.
+	if (unitOfMeasurement_ == INCHES) {
+		scale_ = scale_ * 0.393700787f;
+	}
 }
 
 void PotatoOptions::reset(void)
@@ -2036,9 +2042,19 @@ MStatus PotatoExporter::convert()
 	MStatus status = ShowProgressDlg();
 	bool saveOk = false;
 
-	MayaPrintMsg("Exporting to: '%s'", g_options.filePath_.c_str());
-	MayaPrintMsg("Scale: '%f'", g_options.scale_);
-	MayaPrintMsg(""); // new line
+	{
+		float appliedScale = g_options.scale_;
+		float scale = g_options.scale_;
+
+		if (g_options.unitOfMeasurement_ == PotatoOptions::INCHES) {
+			scale = appliedScale * 2.54f;
+		}
+
+		MayaPrintMsg("Exporting to: '%s'", g_options.filePath_.c_str());
+		MayaPrintMsg("Scale: '%f' Applied: '%f'", scale, appliedScale);
+		MayaPrintMsg(""); // new line
+	}
+
 
 	// name length check
 	if (strlen(g_options.filePath_.fileName()) > model::MODEL_MAX_NAME_LENGTH)
