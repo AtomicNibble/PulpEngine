@@ -128,8 +128,12 @@ namespace
 		Vec3f idpos;
 		// we are Z up.
 		idpos.x = pos.x;
-		idpos.y = -pos.z;
-		idpos.z = pos.y;
+	
+		// idpos.y = -pos.z;
+		// idpos.z = pos.y;
+
+		idpos.y = pos.y;
+		idpos.z = pos.z;
 		return idpos;
 	}
 
@@ -1489,6 +1493,17 @@ void MayaModel::printStats(PotatoOptions& options)
 		std::cout << "> Bounds: ";
 		std::cout << "(" << min[0] << "," << min[1] << "," << min[2] << ") <-> ";
 		std::cout << "(" << max[0] << "," << max[1] << "," << max[2] << ")\n";
+
+		const auto size = b.size();
+		std::cout << "> Dimensions: ";
+		std::cout << "w: " << size[0] << " d: " << size[1] << " h: " << size[2];
+
+		if (g_options.unitOfMeasurement_ == PotatoOptions::INCHES) {
+			std::cout << " (inches)";
+		}
+		else {
+			std::cout << " (cm)";
+		}
 	}
 }
 
