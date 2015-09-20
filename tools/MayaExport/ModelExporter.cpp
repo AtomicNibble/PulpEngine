@@ -388,6 +388,19 @@ void PotatoOptions::setcmdArgs(const MArgList &args)
 		}
 	}
 
+	idx = args.flagIndex("use_cm");
+	if (idx != MArgList::kInvalidArgIndex) {
+		bool useCm = false;
+		if (!args.get(++idx, useCm)) {
+			MayaPrintWarning("failed to get use_cm flag");
+		}
+		else {
+			if (useCm) {
+				unitOfMeasurement_ = CM;
+			}
+		}
+	}
+
 	idx = args.flagIndex("weight_thresh");
 	if (idx != MArgList::kInvalidArgIndex) {
 		double temp;
@@ -419,7 +432,7 @@ void PotatoOptions::setcmdArgs(const MArgList &args)
 		}
 	}
 
-	idx = args.flagIndex("dir");
+	idx = args.flagIndex("force_bones");
 	if (idx != MArgList::kInvalidArgIndex) {
 		if (!args.get(++idx, forceBoneFilters_)) {
 			MayaPrintWarning("failed to get force_bones flag");
@@ -444,6 +457,7 @@ void PotatoOptions::reset(void)
 	forceBoneFilters_.clear();
 	progressCntl_.clear();
 	exportMode_ = EXPORT_INPUT;
+	unitOfMeasurement_ = INCHES;
 }
 
 // --------------------------------------------

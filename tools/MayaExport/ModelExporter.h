@@ -70,6 +70,11 @@ public:
 		EXPORT_INPUT
 	};
 
+	enum UnitOfMeasureMent {
+		INCHES,
+		CM
+	};
+
 	void setcmdArgs(const MArgList &args);
 	void reset(void);
 	void setMode(MPxFileTranslator::FileAccessMode mode) {
@@ -105,9 +110,11 @@ public:
 	float jointThreshold_;
 	bool  zeroOrigin_;
 	bool  whiteVertColors_;
+	bool  _pad[2];
 	MString forceBoneFilters_;
 	MString progressCntl_;
 	ExpoMode exportMode_;
+	UnitOfMeasureMent unitOfMeasurement_;
 };
 
 
