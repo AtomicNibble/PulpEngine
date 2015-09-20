@@ -37,6 +37,8 @@ struct ModelStats
 
 		droppedBoneNames.setArena(g_arena);
 		droppedBoneNames.setGranularity(16);
+
+		bounds.clear();
 	}
 
 	uint32_t totalLods;
@@ -49,6 +51,8 @@ struct ModelStats
 
 	core::Array<core::StackString<128>>
 		droppedBoneNames;
+
+	AABB bounds;
 };
 
 

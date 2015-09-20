@@ -1481,6 +1481,15 @@ void MayaModel::printStats(PotatoOptions& options)
 	if (g_stats.totalWeightsDropped > 0) {
 		std::cout << "!> bind weights where dropped, consider binding with max influences: 4\n";
 	}
+
+	{
+		const AABB& b = g_stats.bounds;
+		const auto min = b.min;
+		const auto max = b.max;
+		std::cout << "> Bounds: ";
+		std::cout << "(" << min[0] << "," << min[1] << "," << min[2] << ") <-> ";
+		std::cout << "(" << max[0] << "," << max[1] << "," << max[2] << ")\n";
+	}
 }
 
 void MayaModel::calculateBoundingBox(void)
@@ -1650,6 +1659,9 @@ bool MayaModel::save(const char *filename)
 
 			header.boundingBox.add(lod.boundingBox);
 		}
+
+		// update bounds in stats.
+		g_stats.bounds = header.boundingBox;
 
 	//	const size_t temp = sizeof(header);
 
