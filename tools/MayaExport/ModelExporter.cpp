@@ -1299,7 +1299,7 @@ MStatus MayaModel::loadBones(void)
 	MayaBone		*bone;
 	uint				i, j;
 
-	float scale = 1.0f;
+	float scale = g_options.scale_;
 
 
 	// allocate max.
