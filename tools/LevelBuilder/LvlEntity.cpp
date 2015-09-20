@@ -568,7 +568,7 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 
 			it = mapEnt->epairs.find("model");
 			if (it == mapEnt->epairs.end()) {
-				X_WARNING("Entity", "misc_model missing 'model' kvp at: (%g,%g,%g)",
+				X_WARNING("Entity", "misc_model missing 'model' kvp at: (^8%g,%g,%g^7)",
 					lvlEnt.origin[0], lvlEnt.origin[1], lvlEnt.origin[2]);
 				continue;
 			}
@@ -587,12 +587,13 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 		// this dose mean i need to know the bounds of the model.
 		// meaning i must load it.
 
-		X_LOG0("Entity", "Finding areas for ent: %i origin: (%g,%g,%g)", i,
+		X_LOG0("Entity", "Finding areas for ent: %i origin: (^8%g,%g,%g^7)", i,
 			lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
 
 		AABB bounds;
-		bounds.add(lvlEnt.origin);
-		bounds.add(lvlEnt.origin + Vec3f::one());
+		bounds.set(lvlEnt.bounds.min + lvlEnt.origin,
+			lvlEnt.bounds.max + lvlEnt.origin);
+
 		AreaForOrigin_r(planeSet, bounds, bspTree.headnode);
 	}
 	return true;
