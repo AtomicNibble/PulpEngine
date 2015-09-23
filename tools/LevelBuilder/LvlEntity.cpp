@@ -487,21 +487,11 @@ bool IsPointInAnyArea(XPlaneSet& planeSet, const Vec3f& pos, int32_t& areaOut, b
 	return false;
 }
 
-size_t AreaForOrigin_r(XPlaneSet& planeSet, const AABB& bounds, bspNode* pNode)
+size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, const AABB& bounds, bspNode* pNode)
 {
 	X_ASSERT_NOT_NULL(pNode);
 	bspNode* pCurNode = pNode;
 	size_t numAreas = 0;
-	// i need to go down the tree untill i hit a leaf with a area.
-	// when we cross a node we go down both paths so that we detech multiple intersections.
-
-
-	// how to crorrectly detech what leafs the bounding box resides in?
-	// i will have to go down the tree checking whatside the AABB is for the node.
-	// if we are not clearly front/back of the plane.
-	// we are intersecting, so travel down both paths so see what we hit.
-	// when we reach a leaf node that is solid we leave.
-	// if the noe is a lea and has a area we should be inside that area.
 
 	do
 	{
@@ -520,6 +510,72 @@ size_t AreaForOrigin_r(XPlaneSet& planeSet, const AABB& bounds, bspNode* pNode)
 		}
 
 		const Planef& plane = planeSet[pCurNode->planenum];
+
+		float sd = plane.distance(sphere.center());
+
+		if (sd >= sphere.radius()) 
+		{
+			pCurNode = pCurNode->children[0];
+			if (!pCurNode->IsSolidLeaf()) {	// 0 = solid
+				AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
+			}
+			return 0;
+		}
+		if (sd <= -sphere.radius()) 
+		{
+			pCurNode = pCurNode->children[1];
+			if (!pCurNode->IsSolidLeaf()) {	// 0s = solid
+				AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
+			}
+			return 0 ;
+		}
+
+		Vec3f boundsVecs[2];
+		boundsVecs[0] = bounds.min;
+		boundsVecs[1] = bounds.max;
+
+		Vec3f points[8];
+		size_t i;
+		for (i = 0; i < 8; i++)
+		{
+			points[i][0] = boundsVecs[i & 1][0];
+			points[i][1] = boundsVecs[(i >> 1) & 1][1];
+			points[i][2] = boundsVecs[(i >> 2) & 1][2];
+		}
+
+		bool front = false;
+		bool back = false;
+		for (i = 0; i < 8; i++)
+		{
+			float d;
+
+			d = points[i] * plane.getNormal() + plane.getDistance();
+			if (d >= 0.0f) {
+				front = true;
+			}
+			else if (d <= 0.0f) {
+				back = true;
+			}
+			if (back && front) {
+				break;
+			}
+		}
+
+		if (front) {
+			pCurNode = pCurNode->children[0];
+			if (!pCurNode->IsSolidLeaf()) {	// 0 = solid
+				AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
+			}
+		}
+		if (back) {
+			pCurNode = pCurNode->children[1];
+			if (!pCurNode->IsSolidLeaf()) {	// 0 = solid
+				AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
+			}
+		}
+
+		/*
+		const Planef& plane = planeSet[pCurNode->planenum];
 		PlaneSide::Enum side = bounds.planeSide(plane);
 
 		if (side == PlaneSide::FRONT) {
@@ -537,7 +593,7 @@ size_t AreaForOrigin_r(XPlaneSet& planeSet, const AABB& bounds, bspNode* pNode)
 
 			pCurNode = pCurNode->children[0];
 		}
-
+		*/
 	} while (!pCurNode->IsSolidLeaf());
 
 	return numAreas;
@@ -597,7 +653,10 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 		bounds.set(lvlEnt.bounds.min + lvlEnt.origin,
 			lvlEnt.bounds.max + lvlEnt.origin);
 
-		size_t numAreas = AreaForOrigin_r(planeSet, bounds, bspTree.headnode);
+		// make a sphere.
+		Sphere sphere(bounds);
+
+		size_t numAreas = AreaForOrigin_r(planeSet, sphere, bounds, bspTree.headnode);
 
 		if (numAreas < 1)
 		{
