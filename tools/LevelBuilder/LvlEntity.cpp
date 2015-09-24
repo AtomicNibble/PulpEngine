@@ -517,17 +517,17 @@ size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, const AABB& bo
 		{
 			pCurNode = pCurNode->children[0];
 			if (!pCurNode->IsSolidLeaf()) {	// 0 = solid
-				AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
+				numAreas += AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
 			}
-			return 0;
+			return numAreas;
 		}
 		if (sd <= -sphere.radius()) 
 		{
 			pCurNode = pCurNode->children[1];
 			if (!pCurNode->IsSolidLeaf()) {	// 0s = solid
-				AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
+				numAreas += AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
 			}
-			return 0 ;
+			return numAreas;
 		}
 
 		Vec3f boundsVecs[2];
@@ -564,13 +564,13 @@ size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, const AABB& bo
 		if (front) {
 			pCurNode = pCurNode->children[0];
 			if (!pCurNode->IsSolidLeaf()) {	// 0 = solid
-				AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
+				numAreas += AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
 			}
 		}
 		if (back) {
 			pCurNode = pCurNode->children[1];
 			if (!pCurNode->IsSolidLeaf()) {	// 0 = solid
-				AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
+				numAreas += AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
 			}
 		}
 
@@ -634,6 +634,10 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 
 			const core::string& modelName = it->second;
 			X_LOG0("Entity", "Ent model: \"%s\"", modelName.c_str());
+
+			if (modelName.find("100")) {
+				int goat = 0;
+			}
 		}
 
 		// we want to find out what areas the bounds of this model
