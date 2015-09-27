@@ -20,7 +20,7 @@ class XBaseAsset
 	friend class XResourceContainer;
 
 public:
-	XBaseAsset() : RefCount_(1), pContainer_(nullptr) {}
+	XBaseAsset() : ID_(0xFFFFFFFF), RefCount_(1), pContainer_(nullptr) {}
 	XBaseAsset(const XBaseAsset& Src);
 	XBaseAsset& operator=(const XBaseAsset& Src);
 
