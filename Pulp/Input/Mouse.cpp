@@ -49,7 +49,7 @@ bool XMouse::Init()
 	}
 	else
 	{
-		X_WARNING("Mouse", "Failed to retive sys scroll settings");
+		X_WARNING("Mouse", "Failed to retive sys scroll settings, defaulting to: %i", g_pInputCVars->scrollLines);
 	}
 
 	IInput& input = GetIInput();
