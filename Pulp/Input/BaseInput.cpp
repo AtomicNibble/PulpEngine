@@ -35,7 +35,10 @@ namespace {
 XBaseInput::XBaseInput() :
 	pCVars_(X_NEW(XInputCVars,g_InputArena,"InputCvars")),
 	Devices_(g_InputArena),
-	holdSymbols_(g_InputArena)
+	holdSymbols_(g_InputArena),
+	enableEventPosting_(true),
+	hasFocus_(false),
+	retriggering_(false)
 {
 	g_pInputCVars = pCVars_;
 
