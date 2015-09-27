@@ -53,7 +53,8 @@ namespace
 LvlBuilder::LvlBuilder() :
 entities_(g_arena),
 areas_(g_arena),
-stringTable_(g_arena)
+stringTable_(g_arena),
+map_(nullptr)
 {
 	core::zero_object(stats_);
 
