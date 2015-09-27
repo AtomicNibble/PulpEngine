@@ -285,7 +285,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	X_LOG1("Shader", "HWS for name: \"%s\"", name.c_str());
 #endif // !X_DEBUG
 
-	pShader = (XHWShader_Dx10*)pHWshaders->findAsset(name.c_str());
+	pShader = static_cast<XHWShader_Dx10*>(pHWshaders->findAsset(name.c_str()));
 
 	if (pShader)
 	{
@@ -382,7 +382,7 @@ void XHWShader_Dx10::FreeHWShaders()
 
 	for (; it != pHWshaders->end();)
 	{
-		pShader = (XHWShader_Dx10*)it->second;
+		pShader = static_cast<XHWShader_Dx10*>(it->second);
 		++it;
 
 		if (!pShader)
