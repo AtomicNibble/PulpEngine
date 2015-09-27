@@ -352,8 +352,9 @@ void XMaterialManager::ShutDown(void)
 
 		++it;
 
-		if (!pMat)
+		if (!pMat) {
 			continue;
+		}
 
 		X_WARNING("Material", "\"%s\" was not deleted", pMat->getName());
 
