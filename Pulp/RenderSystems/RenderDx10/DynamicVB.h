@@ -62,6 +62,7 @@ XDynamicVB<VertexType>::XDynamicVB(VidMemManager* pVidMem, const uint32& vertCou
 	ReadWrite_(false),
 
 	pLockedData_(nullptr),
+	vbId_(VidMemManager::null_id),
 	pVidMem_(pVidMem)
 {
 	ReadWrite_ = readWrite;
