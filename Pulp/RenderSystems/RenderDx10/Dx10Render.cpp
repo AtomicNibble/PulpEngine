@@ -22,6 +22,17 @@ DX11XRender::DX11XRender()  :
 	d3dDebug_(nullptr),
 #endif
 
+	device_(nullptr),
+	deviceContext_(nullptr),
+
+	swapChain_(nullptr),
+	renderTargetView_(nullptr),
+	depthStencilBuffer_(nullptr),
+	depthStencilViewReadOnly_(nullptr),
+	depthStencilView_(nullptr),
+
+	CurTopology_(D3D_PRIMITIVE_TOPOLOGY_UNDEFINED),
+
 	ViewMat_(),
 	ProMat_(),
 	BlendStates_(nullptr),
