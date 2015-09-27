@@ -26,6 +26,7 @@ template <size_t N>
 StackString<N, wchar_t>::StackString(const char* const str)
 	: len_(strUtil::strlen(str))
 {
+	str_[0] = 0;
 	X_ASSERT_UNREACHABLE();
 }
 
