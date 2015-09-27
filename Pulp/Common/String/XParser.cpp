@@ -51,8 +51,10 @@ XParser::~XParser()
 	
 void XParser::freeSource(void)
 {
-	if (pLexer_)
+	if (pLexer_) {
 		X_DELETE(pLexer_, arena_);
+		pLexer_ = nullptr;
+	}
 }
 
 bool XParser::LoadMemory(const char* startInclusive, const char* endExclusive, const char* name)
@@ -733,7 +735,7 @@ void XParser::addDefinetoHash(MacroDefine* define)
 {
 	X_ASSERT_NOT_NULL(define);
 
-	macros_.insert(MacroMap::value_type(define->name.c_str(),define));
+	macros_.insert(MacroMap::value_type(core::string(define->name.c_str()), define));
 }
 
 
