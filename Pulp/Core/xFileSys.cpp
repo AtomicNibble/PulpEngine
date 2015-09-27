@@ -445,23 +445,25 @@ bool xFileSys::findnext(uintptr_t handle, _wfinddatai64_t* findinfo)
 	}
 #endif // !X_DEBUG
 
-	return ((XFindData*)handle)->findnext(findinfo);
+	return reinterpret_cast<XFindData*>(handle)->findnext(findinfo);
 }
 
 void xFileSys::findClose(uintptr_t handle)
 {
+	XFindData* pFindData = reinterpret_cast<XFindData*>(handle);
 #if X_DEBUG == 1
-	if (findData_.find((XFindData*)handle) == findData_.end()) {
+
+	if (findData_.find(pFindData) == findData_.end()) {
 		X_ERROR("FileSys", "FindData is not a valid handle.");
 		return;
 	}
 #endif // !X_DEBUG
 
-	X_DELETE(((XFindData*)handle), g_coreArena);
+	X_DELETE(pFindData, g_coreArena);
 
 
 #if X_DEBUG == 1
-	findData_.erase((XFindData*)handle);
+	findData_.erase(pFindData);
 #endif // !X_DEBUG
 }
 
