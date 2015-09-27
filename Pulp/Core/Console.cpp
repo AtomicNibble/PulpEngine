@@ -669,8 +669,6 @@ void XConsole::freeRenderResources(void)
 
 bool XConsole::OnInputEvent(const input::InputEvent& event)
 {
-	static size_t lol = 0;
-
 	if (event.action == input::InputState::RELEASED && isVisable())
 		repeatEvent_.keyId = input::KeyId::UNKNOWN;
 
