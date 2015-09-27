@@ -218,6 +218,8 @@ void StackString<N, TChar>::appendFmt(const TChar* format, ...)
 	{
 		len_ += charactersWritten;
 	}
+
+	va_end(args);
 }
 
 template <size_t N, typename TChar>
