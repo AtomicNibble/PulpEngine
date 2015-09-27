@@ -224,6 +224,8 @@ void StackString<N, wchar_t>::appendFmt(const wchar_t* format, ...)
 	{
 		len_ += charactersWritten;
 	}
+
+	va_end(args);
 }
 
 template <size_t N>
