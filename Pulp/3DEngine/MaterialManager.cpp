@@ -287,7 +287,7 @@ namespace {
 			searchPatten = Cmd->GetArg(1);
 		}
 
-		((XMaterialManager*)XEngineBase::getMaterialManager())->ListMaterials(searchPatten);
+		(static_cast<XMaterialManager*>(XEngineBase::getMaterialManager()))->ListMaterials(searchPatten);
 	}
 
 	static void sortMatsByName(core::Array<IMaterial*>& mats)
@@ -348,7 +348,7 @@ void XMaterialManager::ShutDown(void)
 	core::XResourceContainer::ResourceItor it = materials_.begin();
 	for (; it != materials_.end(); )
 	{
-		XMaterial* pMat = (XMaterial*)it->second;
+		XMaterial* pMat = static_cast<XMaterial*>(it->second);
 
 		++it;
 
@@ -389,7 +389,7 @@ void XMaterialManager::InitDefaults(void)
 {
 	if (pDefaultMtl_ == nullptr)
 	{
-		pDefaultMtl_ = (XMaterial*)createMaterial("default");
+		pDefaultMtl_ = static_cast<XMaterial*>(createMaterial("default"));
 
 		// we want texture info to sent and get back a shader item.
 		XInputShaderResources input;
@@ -409,7 +409,7 @@ IMaterial* XMaterialManager::createMaterial(const char* MtlName)
 {
 	XMaterial *pMat = nullptr;
 
-	pMat = (XMaterial*)materials_.findAsset(MtlName);
+	pMat = static_cast<XMaterial*>(materials_.findAsset(MtlName));
 
 	if (pMat)
 	{
@@ -420,8 +420,9 @@ IMaterial* XMaterialManager::createMaterial(const char* MtlName)
 		pMat = X_NEW_ALIGNED( XMaterial, g_3dEngineArena, "Material", X_ALIGN_OF(XMaterial));
 		pMat->setName(MtlName);
 
-		if (pListner_)
+		if (pListner_) {
 			pListner_->OnCreateMaterial(pMat);
+		}
 
 		// add it.
 		materials_.AddAsset(MtlName, pMat);
@@ -434,9 +435,10 @@ IMaterial* XMaterialManager::findMaterial(const char* MtlName) const
 {
 	X_ASSERT_NOT_NULL(MtlName);
 
-	XMaterial* pMaterial = (XMaterial*)materials_.findAsset(MtlName);
-	if (pMaterial)
+	XMaterial* pMaterial = static_cast<XMaterial*>(materials_.findAsset(MtlName));
+	if (pMaterial) {
 		return pMaterial;
+	}
 
 	return nullptr;
 }
@@ -463,7 +465,7 @@ IMaterial* XMaterialManager::loadMaterial(const char* MtlName)
 	if (iMat)
 	{
 		// inc ref count.
-		((XMaterial*)iMat)->addRef();
+		static_cast<XMaterial*>(iMat)->addRef();
 		return iMat;
 	}
 
@@ -488,8 +490,9 @@ void XMaterialManager::unregister(IMaterial* pMat)
 
 //	XMaterial* pXMat = (XMaterial*)pMat;
 
-	if (pListner_)
+	if (pListner_) {
 		pListner_->OnDeleteMaterial(pMat);
+	}
 }
 
 IMaterial* XMaterialManager::getDefaultMaterial()
@@ -568,7 +571,7 @@ IMaterial* XMaterialManager::loadMaterialXML(const char* MtlName)
 			xml_node<>* node = doc.first_node("material");
 			if (node)
 			{
-				pMat = (XMaterial*)createMaterial(MtlName);
+				pMat = static_cast<XMaterial*>(createMaterial(MtlName));
 				if (!ProcessMaterialXML(pMat, node))
 				{
 					// failed to load it :|
@@ -619,7 +622,7 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 
 			if (file.readObjs(texture, Num) == Num)
 			{
-				pMat = (XMaterial*)createMaterial(MtlName);
+				pMat = static_cast<XMaterial*>(createMaterial(MtlName));
 				pMat->CullType_ = hdr.cullType;
 				pMat->MatSurfaceType_ = hdr.type;
 				
@@ -632,7 +635,8 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 				
 				for (i = 0; i < Num; i++)
 				{
-					X_ASSERT(texture[i].type < static_cast<int32_t>(shader::ShaderTextureIdx::ENUM_COUNT), "invalid texture type")();
+					X_ASSERT(texture[i].type < static_cast<int32_t>(shader::ShaderTextureIdx::ENUM_COUNT),
+						"invalid texture type")();
 					input.textures[texture[i].type].name = texture[i].name.c_str();
 				}
 
@@ -664,7 +668,7 @@ bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 	MaterialHeader hdr;
 	uint32_t i, numTex;
 
-	pMat = (XMaterial*)pMat_;
+	pMat = static_cast<XMaterial*>(pMat_);
 
 	path /= "materials/";
 	path /= pMat->getName();
@@ -690,12 +694,12 @@ bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 
 	for (i = 0, numTex = 0; i < ShaderTextureIdx::ENUM_COUNT; i++)
 	{
-		pTex = pRes->getTexture((ShaderTextureIdx::Enum)i);
+		pTex = pRes->getTexture(static_cast<ShaderTextureIdx::Enum>(i));
 
 		if (pTex)
 		{
 			textures[numTex].name.set(pTex->name);
-			textures[numTex].type = (ShaderTextureIdx::Enum)i;
+			textures[numTex].type = static_cast<ShaderTextureIdx::Enum>(i);
 			numTex++;
 		}
 	}
