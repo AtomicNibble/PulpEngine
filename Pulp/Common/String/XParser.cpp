@@ -307,12 +307,12 @@ bool XParser::ReadDirective(void)
 	return false;
 }
 
-bool XParser::isInCache(const char ch) const
+bool XParser::isInCache(const uint8_t ch) const
 {
 	return macroCharCache[ch] == 1;
 }
 
-void XParser::addToCache(const char ch)
+void XParser::addToCache(const uint8_t ch)
 {
 	macroCharCache[ch] = 1;
 }

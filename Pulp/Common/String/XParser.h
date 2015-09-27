@@ -66,8 +66,8 @@ private:
 	bool UnreadSourceToken(const XLexToken& token);
 	bool ReadDirective(void);
 
-	bool isInCache(const char ch) const;
-	void addToCache(const char ch);
+	bool isInCache(const uint8_t ch) const;
+	void addToCache(const uint8_t ch);
 
 	bool Directive_define(void);
 	bool Directive_include(void);
