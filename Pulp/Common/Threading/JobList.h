@@ -102,7 +102,7 @@ public:
 	friend class jobListRunner;
 	friend class JobThread;
 public:
-	JobList(core::MemoryArenaBase* arena);
+	explicit JobList(core::MemoryArenaBase* arena);
 
 	void AddJob(Job job, void* pData);
 
