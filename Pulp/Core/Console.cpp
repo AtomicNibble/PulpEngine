@@ -248,7 +248,7 @@ int	XConsole::console_buffer_size = 0;
 
 void Command_Exec(IConsoleCmdArgs* Cmd)
 {
-	XConsole *pConsole = (XConsole *)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	if (Cmd->GetArgCount() != 2)
 	{
@@ -274,7 +274,7 @@ void Command_Help(IConsoleCmdArgs* Cmd)
 
 void Command_ListCmd(IConsoleCmdArgs* Cmd)
 {
-	XConsole *pConsole = (XConsole *)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	// optional search criteria
 	const char* searchPatten = nullptr;
@@ -288,7 +288,7 @@ void Command_ListCmd(IConsoleCmdArgs* Cmd)
 
 void Command_ListDvars(IConsoleCmdArgs* Cmd)
 {
-	XConsole *pConsole = (XConsole *)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	// optional search criteria
 	const char* searchPatten = nullptr;
@@ -351,7 +351,7 @@ void Command_Echo(IConsoleCmdArgs* Cmd)
 
 void Command_Wait(IConsoleCmdArgs* Cmd)
 {
-	XConsole *pConsole = (XConsole *)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	if (Cmd->GetArgCount() != 2)
 	{
@@ -366,7 +366,7 @@ void Command_Wait(IConsoleCmdArgs* Cmd)
 
 void Command_VarReset(IConsoleCmdArgs* Cmd)
 {
-	XConsole *pConsole = (XConsole *)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	if (Cmd->GetArgCount() != 2)
 	{
@@ -384,7 +384,7 @@ void Command_VarReset(IConsoleCmdArgs* Cmd)
 
 void Command_Bind(IConsoleCmdArgs* Cmd)
 {
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	int Num = Cmd->GetArgCount();
 
@@ -411,14 +411,14 @@ void Command_Bind(IConsoleCmdArgs* Cmd)
 void Command_BindsClear(IConsoleCmdArgs* Cmd)
 {
 	X_UNUSED(Cmd);
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 	pConsole->ClearAllBinds();
 }
 
 void Command_BindsList(IConsoleCmdArgs* Cmd)
 {
 	X_UNUSED(Cmd);
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	struct PrintBinds : public IKeyBindDumpSink {
 		virtual void OnKeyBindFound(const char* Bind, const char* Command){
@@ -440,7 +440,7 @@ void Command_BindsList(IConsoleCmdArgs* Cmd)
 
 void Command_SetVarArchive(IConsoleCmdArgs* Cmd)
 {
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	size_t Num = Cmd->GetArgCount();
 
@@ -489,7 +489,7 @@ void Command_SetVarArchive(IConsoleCmdArgs* Cmd)
 void Command_ConsoleShow(IConsoleCmdArgs* Cmd)
 {
 	X_UNUSED(Cmd);
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	pConsole->ShowConsole(XConsole::consoleState::OPEN);
 }
@@ -497,7 +497,7 @@ void Command_ConsoleShow(IConsoleCmdArgs* Cmd)
 void Command_ConsoleHide(IConsoleCmdArgs* Cmd)
 {
 	X_UNUSED(Cmd);
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	pConsole->ShowConsole(XConsole::consoleState::CLOSED);
 }
@@ -505,7 +505,7 @@ void Command_ConsoleHide(IConsoleCmdArgs* Cmd)
 void Command_ConsoleToggle(IConsoleCmdArgs* Cmd)
 {
 	X_UNUSED(Cmd);
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	pConsole->ToggleConsole();
 }
@@ -2048,7 +2048,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 					float colHeight = fCharHeight - colorBoxPadding * 2;
 
 					// draw the colors :D !
-					CVarColRef* PColVar = (CVarColRef*)pCvar;
+					CVarColRef* PColVar = static_cast<CVarColRef*>(pCvar);
 
 					pRender_->DrawQuad(colxpos, colypos, colorBoxWidth, colHeight, PColVar->GetColor());
 					pRender_->DrawRect(colxpos, colypos, colorBoxWidth, colHeight, Col_Black);
