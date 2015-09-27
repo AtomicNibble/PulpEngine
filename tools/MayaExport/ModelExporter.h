@@ -24,6 +24,7 @@ struct ModelStats
 	ModelStats() :
 		droppedBoneNames(g_arena)
 	{
+		clear();
 	}
 
 	void clear(void) {
