@@ -14,6 +14,7 @@ XMouse::XMouse(XWinInput& input) :
 	XInputDeviceWin32(input, "mouse")
 {
 	deviceId_ = InputDevice::MOUSE;
+	mouseWheel_ = 0.f;
 }
 
 XMouse::~XMouse()
@@ -230,9 +231,12 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse)
 		OnButtonUP(KeyId::MOUSE_AUX_5);
 	}
 
-
 	if (mouse.usButtonFlags & RI_MOUSE_WHEEL)
 	{
+		if (mouse.usFlags & MOUSE_MOVE_ABSOLUTE) {
+			X_WARNING("Mouse", "Absolute scroll is not yet supported.");
+		}
+
 		mouseWheel_ = (float)((short)mouse.usButtonData);
 
 		// we post scrool up and down once.
