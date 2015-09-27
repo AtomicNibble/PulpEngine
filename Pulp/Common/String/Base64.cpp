@@ -161,7 +161,8 @@ core::string Base64::Decode(const core::string& str)
 			// Abort on values that we don't understand
 			if (DecodedValues[Index] == -1)
 			{
-				return false;
+				X_ERROR("Base64", "Unable to decode a value in source string");
+				return core::string();
 			}
 		}
 
