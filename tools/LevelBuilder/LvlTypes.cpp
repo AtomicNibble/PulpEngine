@@ -24,17 +24,17 @@ culled(false),
 pWinding(nullptr), 
 pVisibleHull(nullptr)
 {
-
+	core::zero_object(__pad);
 }
 
-LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth)
+LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth) : matInfo(oth.matInfo)
 {
 	planenum = oth.planenum;
 
 	visible = oth.visible;
 	culled = oth.culled;
 
-	matInfo = oth.matInfo;
+//	matInfo = oth.matInfo;
 
 	// null them first.
 	pWinding = nullptr;
