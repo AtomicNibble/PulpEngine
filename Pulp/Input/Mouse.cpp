@@ -237,7 +237,7 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse)
 			X_WARNING("Mouse", "Absolute scroll is not yet supported.");
 		}
 
-		mouseWheel_ = (float)((short)mouse.usButtonData);
+		mouseWheel_ = static_cast<float>(static_cast<short>(mouse.usButtonData));
 
 		// we post scrool up and down once.
 		InputState::Enum newState;
