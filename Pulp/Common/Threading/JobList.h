@@ -176,6 +176,8 @@ class JobThread : public ThreadAbstract
 
 	struct threadJobList
 	{
+		threadJobList();
+
 		JobList* jobList;
 		int32_t	version;
 	};
