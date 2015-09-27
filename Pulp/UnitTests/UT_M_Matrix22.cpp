@@ -95,7 +95,7 @@ TYPED_TEST(Mat22, Contruction) {
 	// Matrix22<T>& operator=( T rhs );
 	{	
 		MatT c0(4, 4, 4, 4);
-		MatT m0 = (T)4;
+		MatT m0 = MatT(static_cast<T>(4));
 		EXPECT_EQ(c0, m0);
 	}
 	// template< typename FromT > Matrix22<T>& operator=( const Matrix22<FromT>& rhs );

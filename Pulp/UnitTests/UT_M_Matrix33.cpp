@@ -191,7 +191,7 @@ TYPED_TEST(Mat33, Contruction) {
 			3, 3, 3,
 			3, 3, 3);
 
-		MatT m0 = 3;
+		MatT m0 = MatT(3);
 
 		EXPECT_EQ(c0, m0);
 	}

@@ -35,7 +35,7 @@ public:
 	// i think i must hate myself.
 	// having to write UT for all these is fun fun xD
 	Matrix34();
-	Matrix34(T s);
+	explicit Matrix34(T s);
 	Matrix34(const T* dt, bool srcIsRowMajor = false);
 	Matrix34(const Matrix22<T>& src);
 	Matrix34(const Matrix33<T>& m);
