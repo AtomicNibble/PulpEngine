@@ -567,9 +567,9 @@ XTexture* XTexture::NewTexture(const char* name, const Vec2i& size,
 	X_ASSERT_NOT_NULL(name);
 
 
-	XTexture *pTex = NULL;
+	XTexture *pTex = nullptr;
 
-	pTex = (XTexture*)s_pTextures->findAsset(name);
+	pTex = static_cast<XTexture*>(s_pTextures->findAsset(name));
 
 	if (pTex)
 	{
@@ -599,7 +599,7 @@ XTexture* XTexture::Create2DTexture(const char* name, const Vec2i& size, size_t 
 	X_ASSERT_NOT_NULL(name);
 	X_ASSERT_NOT_NULL(pData);
 
-	XTexture *pTex;
+	XTexture* pTex;
 
 	pTex = XTexture::NewTexture(name, size, Flags, textureFmt);
 
@@ -629,7 +629,7 @@ XTexture* XTexture::CreateRenderTarget(const char* name, uint32_t width, uint32_
 {
 	X_ASSERT_NOT_NULL(name);
 
-	XTexture *pTex;
+	XTexture* pTex;
 	TextureFlags Flags = TextureFlags::TEX_FONT | TextureFlags::DONT_STREAM | 
 		TextureFlags::DONT_RESIZE | TextureFlags::RENDER_TARGET;
 
@@ -679,7 +679,7 @@ XTexture* XTexture::FromName(const char* name, TextureFlags Flags)
 	// can we find it?
 	// we store all image in a pool.
 	// we make a hash of the name tho.
-	XTexture* pTex = (XTexture*)s_pTextures->findAsset(name);
+	XTexture* pTex = static_cast<XTexture*>(s_pTextures->findAsset(name));
 
 	if (pTex)
 	{
@@ -709,7 +709,7 @@ XTexture* XTexture::FromName(const char* name, TextureFlags Flags)
 
 XTexture* XTexture::getByID(TexID id)
 {
-	XTexture* pTex = (XTexture*)s_pTextures->findAsset(id);
+	XTexture* pTex = static_cast<XTexture*>(s_pTextures->findAsset(id));
 
 	if (!pTex)
 		return s_pTexDefault;
@@ -794,7 +794,7 @@ void XTexture::shutDown(void)
 	render::XRenderResourceContainer::ResourceItor it = s_pTextures->begin();
 	for (; it != s_pTextures->end(); )
 	{
-		XTexture* pTex = (XTexture*)it->second;
+		XTexture* pTex = static_cast<XTexture*>(it->second);
 
 		++it;
 
@@ -919,7 +919,7 @@ bool XTexture::reloadForName(const char* name)
 		return true;
 	}
 
-	XTexture* pTex = (XTexture*)s_pTextures->findAsset(path.c_str());
+	XTexture* pTex = static_cast<XTexture*>(s_pTextures->findAsset(path.c_str()));
 
 	if (pTex)
 	{
