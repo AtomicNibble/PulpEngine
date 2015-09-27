@@ -530,7 +530,7 @@ namespace
 
 	void XmlFree(void* pointer)
 	{
-		char* pChar = (char*)pointer;
+		char* pChar = static_cast<char*>(pointer);
 		X_DELETE_ARRAY(pChar, g_3dEngineArena);
 	}
 }
