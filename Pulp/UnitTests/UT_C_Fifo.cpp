@@ -55,7 +55,7 @@ namespace {
 	int CustomType::DECONSTRUCTION_COUNT = 0;
 }
 
-typedef ::testing::Types<CustomType> MyTypes;
+typedef ::testing::Types<short, int, float, CustomType> MyTypes;
 TYPED_TEST_CASE(FifoTest, MyTypes);
 
 template <typename T>
