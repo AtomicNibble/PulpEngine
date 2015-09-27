@@ -24,7 +24,7 @@ TEST(StringTable, Add) {
 	uint16_t id8 = Table.addString("123456789AB");
 	uint16_t id9 = Table.addString("Meow");
 
-	EXPECT_EQ(Table.numStrings(), 9);
+	EXPECT_EQ(9,Table.numStrings());
 }
 
 TEST(StringTable, AddUnique) {
@@ -47,6 +47,6 @@ TEST(StringTable, AddUnique) {
 
 	EXPECT_EQ(id7, id8);
 	EXPECT_NE(id7, id9);
-	EXPECT_STREQ(str, "j_gun");
-	EXPECT_EQ(Table.numStrings(), 8);
+	EXPECT_STREQ("j_gun", str);
+	EXPECT_EQ(9,Table.numStrings());
 }
