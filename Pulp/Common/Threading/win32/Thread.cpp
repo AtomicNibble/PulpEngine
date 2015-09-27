@@ -116,7 +116,7 @@ void Thread::Yield(void)
 
 uint32_t __stdcall Thread::ThreadFunction_(void* threadInstance)
 {
-	Thread* pThis = (Thread*)threadInstance;
+	Thread* pThis = reinterpret_cast<Thread*>(threadInstance);
 
 	uint32_t ret = pThis->function_(*pThis);
 	pThis->state_ = State::FINISHED;
@@ -162,7 +162,7 @@ void ThreadAbstract::Join(void)
 
 Thread::ReturnValue ThreadAbstract::ThreadFunc(const Thread& thread)
 {
-	ThreadAbstract* pThis = (ThreadAbstract*)thread.getData();
+	ThreadAbstract* pThis = reinterpret_cast<ThreadAbstract*>(thread.getData());
 	return pThis->ThreadRun(thread);
 }
 
