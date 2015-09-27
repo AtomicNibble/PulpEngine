@@ -404,7 +404,7 @@ bool XShaderManager::OnFileChange(const char* name)
 			core::Path<char> temp(name);
 			temp.toLower(); // all source is lower case
 
-			ShaderSourceMap::const_iterator it = Sourcebin.find(temp.fileName());
+			ShaderSourceMap::const_iterator it = Sourcebin.find(core::string(temp.fileName()));
 			if (it != Sourcebin.end())
 			{
 				// reload the source file.
@@ -1262,9 +1262,9 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 
 		// add the refrences.
 		for (auto f : pShaderSource->pHlslFile_->includedFiles) {
-			f->refrences.insert(name);
+			f->refrences.insert(core::string(name));
 		}
-		pShaderSource->pHlslFile_->refrences.insert(name);
+		pShaderSource->pHlslFile_->refrences.insert(core::string(name));
 
 
 		pShaderSource->pFile_ = pfile;

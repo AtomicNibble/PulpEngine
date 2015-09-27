@@ -983,12 +983,12 @@ void XConsole::AddCmdToHistory(const char* Command)
 	{
 		// make sure it's not same as last command 
 		if (CmdHistory_.front() != Command)
-			CmdHistory_.push_front(Command);
+			CmdHistory_.push_front(core::string(Command));
 	}
 	else
 	{
 		// 1st commnd :D
-		CmdHistory_.push_front(Command);
+		CmdHistory_.push_front(core::string(Command));
 	}
 
 	// limit hte history.
@@ -1012,18 +1012,18 @@ void XConsole::AddBind(const char* key, const char* cmd)
 		if (console_debug)
 			X_LOG1("Console", "Overriding bind \"%s\" -> %s with -> %s", key, Old, cmd);
 
-		ConsoleBindMapItor it = Binds_.find(key);
+		ConsoleBindMapItor it = Binds_.find(X_CONST_STRING(key));
 		it->second = cmd;
 	}
 
-	Binds_.insert(ConsoleBindMapItor::value_type(key, cmd));
+	Binds_.insert(ConsoleBindMapItor::value_type(core::string(key), core::string(cmd)));
 }
 
 // returns the command for a given key
 // returns null if no bind found
 const char* XConsole::FindBind(const char* key)
 {
-	ConsoleBindMapItor it = Binds_.find(key);
+	ConsoleBindMapItor it = Binds_.find(X_CONST_STRING(key));
 	if (it != Binds_.end())
 		return it->second.c_str();
 	return nullptr;
@@ -1248,7 +1248,8 @@ void XConsole::AddCommand(const char* Name, ConsoleCmdFunc func, int Flags, cons
 	if (desc)
 		cmd.Desc = desc;
 
-	if (CmdMap_.find(Name) != CmdMap_.end())
+	// pass cmd.Name instead of Name, saves creating a second core::string
+	if (CmdMap_.find(cmd.Name) != CmdMap_.end())
 	{
 		X_WARNING("Console", "command already exsists: %s", Name);
 	}
@@ -1259,7 +1260,7 @@ void XConsole::AddCommand(const char* Name, ConsoleCmdFunc func, int Flags, cons
 
 void XConsole::RemoveCommand(const char* Name)
 {
-	ConsoleCmdMapItor it = CmdMap_.find(Name);
+	ConsoleCmdMapItor it = CmdMap_.find(X_CONST_STRING(Name));
 	if (it != CmdMap_.end())
 		CmdMap_.erase(it);
 }
@@ -1293,7 +1294,7 @@ void XConsole::Exec(const char* command, const bool DeferExecution)
 	}
 	else
 	{
-		deferredCmds_.push_back(DeferredCommand(temp.c_str(), false));
+		deferredCmds_.push_back(DeferredCommand(core::string(temp.c_str()), false));
 	}
 }
 
@@ -2209,7 +2210,7 @@ void XConsole::ResetAutoCompletion(void)
 void XConsole::addLineToLog(const char* pStr, uint32_t length)
 {
 	X_UNUSED(length);
-	ConsoleLog_.push_back(pStr);
+	ConsoleLog_.push_back(core::string(pStr));
 
 	int bufferSize = console_buffer_size;
 

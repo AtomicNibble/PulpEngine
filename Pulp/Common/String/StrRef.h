@@ -48,7 +48,7 @@ public:
 	// const from char (optionaly repeat it x number of times)
 	explicit StringRef(value_type ch, size_type numRepeat = 1);
 	// from a const str (allocates memory & copyies)
-	StringRef(const_str str);
+	explicit StringRef(const_str str);
 	// const from string + length saves a length 
 	StringRef(const_str str, size_type length);
 	// const from a begin(), end() saves a length cal

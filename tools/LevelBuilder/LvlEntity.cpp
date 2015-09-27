@@ -289,7 +289,7 @@ bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents,
 		mapfile::XMapEntity* mapEnt = pMap->getEntity(i);
 		LvlEntity& lvlEnt = ents[i];
 
-		mapfile::XMapEntity::PairIt it = mapEnt->epairs.find("origin");
+		mapfile::XMapEntity::PairIt it = mapEnt->epairs.find(X_CONST_STRING("origin"));
 		if (it == mapEnt->epairs.end()){
 			continue;
 		}
@@ -557,7 +557,7 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 
 		// for now just add the static models ents to world ent.
 		{
-			mapfile::XMapEntity::PairIt it = mapEnt->epairs.find("classname");
+			mapfile::XMapEntity::PairIt it = mapEnt->epairs.find(X_CONST_STRING("classname"));
 			if (it == mapEnt->epairs.end()) {
 				continue;
 			}
@@ -566,7 +566,7 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 				continue;
 			}
 
-			it = mapEnt->epairs.find("model");
+			it = mapEnt->epairs.find(X_CONST_STRING("model"));
 			if (it == mapEnt->epairs.end()) {
 				X_WARNING("Entity", "mist model missing 'model' kvp at: (%g,%g,%g)",
 					lvlEnt.origin[0], lvlEnt.origin[1], lvlEnt.origin[2]);

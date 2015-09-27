@@ -433,7 +433,7 @@ void XScriptSys::ListLoadedScripts(void)
 
 void XScriptSys::addFileName(const char* name)
 {
-	fileList_.insert(name);
+	fileList_.insert(core::string(name));
 }
 
 void XScriptSys::removeFileName(const char* name)

@@ -430,7 +430,7 @@ XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena, bool is
 			//	value.trimWhitespace();
 			//	key.trimWhitespace();
 
-			mapEnt->epairs[key.c_str()] = value.c_str();
+			mapEnt->epairs[core::string(key.c_str())] = value.c_str();
 
 			if (key.isEqual("origin"))
 			{

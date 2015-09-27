@@ -106,7 +106,7 @@ public:
 		X_ASSERT(core::strUtil::Find(name, name + strlen(name), '\\') == nullptr,
 			"asset name must have forward slash")(name);
 
-		hash.insert(ResourceItor::value_type(name, pAsset));
+		hash.insert(ResourceItor::value_type(core::string(name), pAsset));
 
 		uint32_t id = safe_static_cast<uint32_t, size_t>(list.size());
 		pAsset->setID(id);

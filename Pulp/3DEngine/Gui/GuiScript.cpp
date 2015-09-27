@@ -194,7 +194,7 @@ bool XGuiScript::Parse(core::XParser& lex)
 
 
 		XWinStr* str = X_NEW( XWinStr,g_3dEngineArena,"TransVar");
-		*str = temp.c_str();
+		*str = core::string(temp.c_str());
 		XGSWinVar wv;
 		wv.own = true;
 		wv.var = str;

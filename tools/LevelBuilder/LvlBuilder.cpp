@@ -149,7 +149,7 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 		}
 	}
 
-	mapfile::XMapEntity::PairIt it = mapEnt->epairs.find("origin");
+	mapfile::XMapEntity::PairIt it = mapEnt->epairs.find(X_CONST_STRING("origin"));
 	if (it != mapEnt->epairs.end())
 	{
 		// set the origin.
@@ -159,7 +159,7 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 	}
 
 	// check for angles.
-	it = mapEnt->epairs.find("angle");
+	it = mapEnt->epairs.find(X_CONST_STRING("angle"));
 	if (it != mapEnt->epairs.end())
 	{
 		const core::string& value = it->second;
@@ -170,7 +170,7 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 	ent.bounds.clear();
 
 	// check if this ent is a model
-	it = mapEnt->epairs.find("model");
+	it = mapEnt->epairs.find(X_CONST_STRING("model"));
 	if (it != mapEnt->epairs.end())
 	{ 
 		core::string& name = it->second;
