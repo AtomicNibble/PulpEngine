@@ -25,6 +25,8 @@ XMouse::~XMouse()
 ///////////////////////////////////////////
 bool XMouse::Init()
 {
+	X_ASSERT_NOT_NULL(g_pInputCVars);
+
 	RAWINPUTDEVICE Mouse;
 	Mouse.hwndTarget = 0;
 	Mouse.usUsagePage = 0x1;
