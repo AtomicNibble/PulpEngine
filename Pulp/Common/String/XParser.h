@@ -29,7 +29,7 @@ class XParser
 {
 	typedef XLexer::LexFlags LexFlags;
 public:
-	XParser(MemoryArenaBase* arena);
+	explicit XParser(MemoryArenaBase* arena);
 	XParser(LexFlags flags, MemoryArenaBase* arena);
 	XParser(const char* startInclusive, const char* endExclusive, const char* name, LexFlags flags, MemoryArenaBase* arena);
 	~XParser();
