@@ -1024,6 +1024,9 @@
     <ClInclude Include="Time\win32\TimeStamp.h">
       <Filter>Headers\Time\win32</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\win32\CustomFrame.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
