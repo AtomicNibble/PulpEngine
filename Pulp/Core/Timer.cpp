@@ -19,6 +19,9 @@ X_NAMESPACE_BEGIN(core)
 XTimer::XTimer() :
 time_scale_(1.0f),
 FrameCounter_(0),
+FrameTime_(0.f),
+FrameTimeActual_(0.f),
+max_frame_time_(0.f),
 TicksPerSec_(0),
 max_fps_(0),
 debugTime_(0)

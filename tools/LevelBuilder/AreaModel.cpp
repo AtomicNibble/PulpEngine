@@ -150,7 +150,7 @@ AreaSubMesh* LvlArea::MeshForSide(const LvlBrushSide& side, StringTableType& str
 	newMesh.matName_ = side.matInfo.name;
 
 	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes.insert(
-		AreaMeshMap::value_type(side.matInfo.name.c_str(), newMesh)
+		AreaMeshMap::value_type(core::string(side.matInfo.name.c_str()), newMesh)
 	);
 
 	return &newIt.first->second;

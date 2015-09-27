@@ -3,6 +3,20 @@
 
 X_INLINE XFrustum::XFrustum() 
 {
+	left_ = 0.f;
+	up_ = 0.f;
+	invFar_ = 0.f;
+
+	width_ = 0u;
+	height_ = 0u;
+
+	fov_ = 0.f;
+	projectionRatio_ = 0.f;
+	pixelAspectRatio_ = 0.f;
+
+	core::zero_object(idx_);
+	core::zero_object(idy_);
+	core::zero_object(idz_);
 }
 
 

@@ -69,8 +69,12 @@ size_t JobQue::numJobs(void) const
 
 JobThread::JobThread()
 {
+	core::zero_object(ques_);
+
 	moreWorkToDo_ = false;
 	threadIdx_ = 0;
+
+	pTimer_ = nullptr;
 }
 
 JobThread::~JobThread()

@@ -240,7 +240,7 @@ bool LvlBuilder::ProcessModel(LvlEntity& ent)
 
 bool LvlBuilder::LoadDefaultModel(void)
 {
-	if (!ModelInfo::GetNModelAABB("default", defaultModelBounds_))
+	if (!ModelInfo::GetNModelAABB(X_CONST_STRING("default"), defaultModelBounds_))
 	{
 		X_ERROR("","Failed to load default model info");
 		return false;

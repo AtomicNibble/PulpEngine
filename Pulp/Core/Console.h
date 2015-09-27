@@ -96,7 +96,7 @@ struct ConsoleCommandArgs : public IConsoleCmdArgs
 	static const int	MAX_COMMAND_STRING = 2 * MAX_STRING_CHARS;
 
 public:
-	ConsoleCommandArgs(core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& line) {
+	explicit ConsoleCommandArgs(core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& line) {
 		TokenizeString(line.begin(), line.end()); 
 	}
 	~ConsoleCommandArgs() X_OVERRIDE{}

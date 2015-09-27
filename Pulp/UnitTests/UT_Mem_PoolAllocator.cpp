@@ -29,11 +29,6 @@ TEST(PoolAlloc, Stack)
 			X_ASSERT_NOT_NULL(alloc);
 			X_ASSERT_ALIGNMENT(alloc, N, 0);
 
-			if (alloc == nullptr) {
-				int goat = 0;
-
-			}
-
 			ASSERT_TRUE(alloc != NULL);
 			ASSERT_TRUE(core::internal::IsAligned(alloc, N, 0));
 			memset(alloc, 0xAB, N);

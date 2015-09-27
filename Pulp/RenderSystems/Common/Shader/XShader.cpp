@@ -356,7 +356,7 @@ bool XShaderManager::Shutdown(void)
 	XResourceContainer::ResourceItor end = shaders.end();
 	for (; it != end; )
 	{
-		XShader* pShader = (XShader*)it->second;
+		XShader* pShader = static_cast<XShader*>(it->second);
 
 		++it;
 
@@ -404,7 +404,7 @@ bool XShaderManager::OnFileChange(const char* name)
 			core::Path<char> temp(name);
 			temp.toLower(); // all source is lower case
 
-			ShaderSourceMap::const_iterator it = Sourcebin.find(temp.fileName());
+			ShaderSourceMap::const_iterator it = Sourcebin.find(core::string(temp.fileName()));
 			if (it != Sourcebin.end())
 			{
 				// reload the source file.
@@ -443,7 +443,7 @@ XShader* XShaderManager::reloadShader(const char* name)
 	size_t i, x, numTecs;
 
 	// already loaded?
-	shader = (XShader*)shaders.findAsset(name);
+	shader = static_cast<XShader*>(shaders.findAsset(name));
 
 	if (shader)
 	{
@@ -697,7 +697,7 @@ void XShaderManager::listShaders(void)
 
 	for (; it != shaders.end(); ++it)
 	{
-		pShader = (XShader*)it->second;
+		pShader = static_cast<XShader*>(it->second);
 
 		X_LOG0("Shader", "Name: ^2\"%s\"^7 tecs: %i crc: ^10x%08x^7 vertexFmt: %s",
 			pShader->name_.c_str(),
@@ -738,7 +738,7 @@ XShader* XShaderManager::loadShader(const char* name)
 	XShader* shader = nullptr;
 
 	// already loaded?
-	shader = (XShader*)shaders.findAsset(name);
+	shader = static_cast<XShader*>(shaders.findAsset(name));
 
 	if (shader)
 		return shader;
@@ -828,7 +828,7 @@ XShader* XShaderManager::createShader(const char* name)
 	XShader* pShader;
 
 	// check if this shader already exsists.
-	pShader = (XShader*)shaders.findAsset(name);
+	pShader = static_cast<XShader*>(shaders.findAsset(name));
 	
 	if (pShader)
 	{
@@ -1262,9 +1262,9 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 
 		// add the refrences.
 		for (auto f : pShaderSource->pHlslFile_->includedFiles) {
-			f->refrences.insert(name);
+			f->refrences.insert(core::string(name));
 		}
-		pShaderSource->pHlslFile_->refrences.insert(name);
+		pShaderSource->pHlslFile_->refrences.insert(core::string(name));
 
 
 		pShaderSource->pFile_ = pfile;

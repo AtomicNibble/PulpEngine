@@ -372,7 +372,7 @@ namespace
 
 PotatoOptions::PotatoOptions()
 {
-
+	reset();
 }
 
 void PotatoOptions::setcmdArgs(const MArgList &args)
@@ -482,7 +482,9 @@ MayaBone::MayaBone() : dagnode(nullptr)
 	bindm33 = Matrix33f::identity();
 }
 
-MayaBone::MayaBone(const MayaBone& oth)
+MayaBone::MayaBone(const MayaBone& oth) : 
+mayaNode(oth.mayaNode), 
+exportNode(oth.exportNode)
 {
 	name = oth.name;
 	dagnode = oth.dagnode;
@@ -491,8 +493,8 @@ MayaBone::MayaBone(const MayaBone& oth)
 	bindpos = oth.bindpos;
 	bindm33 = oth.bindm33;
 
-	mayaNode = oth.mayaNode;
-	exportNode = oth.exportNode;
+//	mayaNode = oth.mayaNode;
+//	exportNode = oth.exportNode;
 
 	keep = oth.keep;
 

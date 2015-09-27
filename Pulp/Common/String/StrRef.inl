@@ -1020,7 +1020,7 @@ typename StringRef<CharT>::XStrHeader* StringRef<CharT>::header(void) const
 {
 	X_ASSERT_NOT_NULL(str_);
 
-	return ((XStrHeader*)str_) - 1;
+	return (reinterpret_cast<XStrHeader*>(str_) - 1);
 }
 
 // dose not check current length

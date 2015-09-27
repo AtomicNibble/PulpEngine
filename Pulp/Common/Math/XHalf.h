@@ -96,7 +96,7 @@ struct XHalf2
 		x = XHalfCompressor::compress(_x);
 		y = XHalfCompressor::compress(_y);
 	}
-	XHalf2(const float* const __restrict pArray)
+	explicit XHalf2(const float* const __restrict pArray)
 	{
 		x = XHalfCompressor::compress(pArray[0]);
 		y = XHalfCompressor::compress(pArray[1]);
@@ -129,7 +129,7 @@ struct XHalf4
 		z = XHalfCompressor::compress(_z);
 		w = XHalfCompressor::compress(_w);
 	}
-	XHalf4(const float* const __restrict pArray)
+	explicit XHalf4(const float* const __restrict pArray)
 	{
 		x = XHalfCompressor::compress(pArray[0]);
 		y = XHalfCompressor::compress(pArray[1]);

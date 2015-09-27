@@ -220,9 +220,9 @@ bool XShader::FXBeginPass(uint32 passIdx)
 		}
 	}
 
-	XHWShader_Dx10* pVS = (XHWShader_Dx10*)pHwTech->pVertexShader;
-	XHWShader_Dx10* pPS = (XHWShader_Dx10*)pHwTech->pPixelShader;
-	XHWShader_Dx10* pGS = (XHWShader_Dx10*)pHwTech->pGeoShader;
+	XHWShader_Dx10* pVS = static_cast<XHWShader_Dx10*>(pHwTech->pVertexShader);
+	XHWShader_Dx10* pPS = static_cast<XHWShader_Dx10*>(pHwTech->pPixelShader);
+	XHWShader_Dx10* pGS = static_cast<XHWShader_Dx10*>(pHwTech->pGeoShader);
 
 	if (!pVS || !pPS)
 	{
@@ -304,12 +304,12 @@ bool XShader::FXSetVSFloat(const core::StrHash& NameParam,
 		return false;
 	}
 
-	XHWShader_Dx10* pVS = (XHWShader_Dx10*)pHwTech->pVertexShader;
+	XHWShader_Dx10* pVS = static_cast<XHWShader_Dx10*>(pHwTech->pVertexShader);
 
 	if (!pVS)
 		return false;
 
-	XShaderParam *pParam = pVS->getParameter(NameParam);
+	XShaderParam* pParam = pVS->getParameter(NameParam);
 	if (!pParam)
 		return false;
 

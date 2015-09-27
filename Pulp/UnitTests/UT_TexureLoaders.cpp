@@ -55,6 +55,12 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path)
 			{
 				const bool isValid = loaded->isValid();
 
+				if (!isValid) {
+					X_ERROR("UT", "TextureFile is not valid");
+					texture::XTextureFile::freeTextureFile(loaded);
+					return false;
+				}
+
 				EXPECT_EQ(fmt, loaded->getFormat());
 				if (fmt != loaded->getFormat()) {
 					X_ERROR("UT", "ReturnFmt: %s ExpectedFmt: %s Path<char>: %s", 

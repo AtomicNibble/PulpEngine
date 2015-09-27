@@ -179,7 +179,7 @@ TYPED_TEST(FifoTest, Iteration)
 TYPED_TEST(FifoTest, Move)
 {
 	const size_t bytes = (sizeof(TypeParam) * 164) + (sizeof(Fifo<TypeParam>) * 2) + 
-		(sizeof(size_t) * 3);
+		(sizeof(size_t) * 6);
 
 	X_ALIGNED_SYMBOL(char buf[bytes], 8) = {};
 	LinearAllocator allocator(buf, buf + bytes);
@@ -189,7 +189,6 @@ TYPED_TEST(FifoTest, Move)
 	list.setGranularity(2);
 	list.reserve(2);
 
-
 	list.push_back(Fifo<TypeParam>(&arena, 100));
 	list.push_back(Fifo<TypeParam>(&arena, 64));
 }
@@ -197,7 +196,7 @@ TYPED_TEST(FifoTest, Move)
 TYPED_TEST(FifoTest, MoveAssign)
 {
 	const size_t bytes = (sizeof(TypeParam) * (16 + 64)) +
-		(sizeof(size_t) * 2); // Linear header block.
+		(sizeof(size_t) * 4); // Linear header block.
 
 
 	X_ALIGNED_SYMBOL(char buf[bytes], 8) = {};

@@ -325,6 +325,11 @@ TimeVal JobList::GetTimeReal(void) const
 }
 // ----------------------------------
 
+JobThread::threadJobList::threadJobList()
+{
+	jobList = nullptr;
+	version = 0;
+}
 
 JobThread::JobThread()
 {

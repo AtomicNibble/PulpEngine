@@ -26,6 +26,7 @@ template <size_t N>
 StackString<N, wchar_t>::StackString(const char* const str)
 	: len_(strUtil::strlen(str))
 {
+	str_[0] = 0;
 	X_ASSERT_UNREACHABLE();
 }
 
@@ -224,6 +225,8 @@ void StackString<N, wchar_t>::appendFmt(const wchar_t* format, ...)
 	{
 		len_ += charactersWritten;
 	}
+
+	va_end(args);
 }
 
 template <size_t N>
@@ -618,7 +621,7 @@ inline const wchar_t& StackString<N, wchar_t>::operator[](size_t i) const
 {
 	// allow access to the null terminator
 	X_ASSERT(i <= len_, "Character %d cannot be accessed. Subscript out of range.", i)(N, str_, len_);
-	return str_[i]; .
+	return str_[i]; 
 }
 
 

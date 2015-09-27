@@ -228,6 +228,7 @@
     <ClInclude Include="Platform\win32\ClipBoard.h" />
     <ClInclude Include="Platform\win32\Compiler.h" />
     <ClInclude Include="Platform\win32\Console.h" />
+    <ClInclude Include="Platform\win32\CustomFrame.h" />
     <ClInclude Include="Platform\win32\DirectoryWatcher.h" />
     <ClInclude Include="Platform\win32\Window.h" />
     <ClInclude Include="Platform\Window.h" />

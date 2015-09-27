@@ -248,7 +248,7 @@ int	XConsole::console_buffer_size = 0;
 
 void Command_Exec(IConsoleCmdArgs* Cmd)
 {
-	XConsole *pConsole = (XConsole *)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	if (Cmd->GetArgCount() != 2)
 	{
@@ -274,7 +274,7 @@ void Command_Help(IConsoleCmdArgs* Cmd)
 
 void Command_ListCmd(IConsoleCmdArgs* Cmd)
 {
-	XConsole *pConsole = (XConsole *)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	// optional search criteria
 	const char* searchPatten = nullptr;
@@ -288,7 +288,7 @@ void Command_ListCmd(IConsoleCmdArgs* Cmd)
 
 void Command_ListDvars(IConsoleCmdArgs* Cmd)
 {
-	XConsole *pConsole = (XConsole *)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	// optional search criteria
 	const char* searchPatten = nullptr;
@@ -351,7 +351,7 @@ void Command_Echo(IConsoleCmdArgs* Cmd)
 
 void Command_Wait(IConsoleCmdArgs* Cmd)
 {
-	XConsole *pConsole = (XConsole *)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	if (Cmd->GetArgCount() != 2)
 	{
@@ -366,7 +366,7 @@ void Command_Wait(IConsoleCmdArgs* Cmd)
 
 void Command_VarReset(IConsoleCmdArgs* Cmd)
 {
-	XConsole *pConsole = (XConsole *)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	if (Cmd->GetArgCount() != 2)
 	{
@@ -384,7 +384,7 @@ void Command_VarReset(IConsoleCmdArgs* Cmd)
 
 void Command_Bind(IConsoleCmdArgs* Cmd)
 {
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	int Num = Cmd->GetArgCount();
 
@@ -411,14 +411,14 @@ void Command_Bind(IConsoleCmdArgs* Cmd)
 void Command_BindsClear(IConsoleCmdArgs* Cmd)
 {
 	X_UNUSED(Cmd);
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 	pConsole->ClearAllBinds();
 }
 
 void Command_BindsList(IConsoleCmdArgs* Cmd)
 {
 	X_UNUSED(Cmd);
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	struct PrintBinds : public IKeyBindDumpSink {
 		virtual void OnKeyBindFound(const char* Bind, const char* Command){
@@ -440,7 +440,7 @@ void Command_BindsList(IConsoleCmdArgs* Cmd)
 
 void Command_SetVarArchive(IConsoleCmdArgs* Cmd)
 {
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	size_t Num = Cmd->GetArgCount();
 
@@ -489,7 +489,7 @@ void Command_SetVarArchive(IConsoleCmdArgs* Cmd)
 void Command_ConsoleShow(IConsoleCmdArgs* Cmd)
 {
 	X_UNUSED(Cmd);
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	pConsole->ShowConsole(XConsole::consoleState::OPEN);
 }
@@ -497,7 +497,7 @@ void Command_ConsoleShow(IConsoleCmdArgs* Cmd)
 void Command_ConsoleHide(IConsoleCmdArgs* Cmd)
 {
 	X_UNUSED(Cmd);
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	pConsole->ShowConsole(XConsole::consoleState::CLOSED);
 }
@@ -505,7 +505,7 @@ void Command_ConsoleHide(IConsoleCmdArgs* Cmd)
 void Command_ConsoleToggle(IConsoleCmdArgs* Cmd)
 {
 	X_UNUSED(Cmd);
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
+	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
 	pConsole->ToggleConsole();
 }
@@ -669,8 +669,6 @@ void XConsole::freeRenderResources(void)
 
 bool XConsole::OnInputEvent(const input::InputEvent& event)
 {
-	static size_t lol = 0;
-
 	if (event.action == input::InputState::RELEASED && isVisable())
 		repeatEvent_.keyId = input::KeyId::UNKNOWN;
 
@@ -983,12 +981,12 @@ void XConsole::AddCmdToHistory(const char* Command)
 	{
 		// make sure it's not same as last command 
 		if (CmdHistory_.front() != Command)
-			CmdHistory_.push_front(Command);
+			CmdHistory_.push_front(core::string(Command));
 	}
 	else
 	{
 		// 1st commnd :D
-		CmdHistory_.push_front(Command);
+		CmdHistory_.push_front(core::string(Command));
 	}
 
 	// limit hte history.
@@ -1012,18 +1010,18 @@ void XConsole::AddBind(const char* key, const char* cmd)
 		if (console_debug)
 			X_LOG1("Console", "Overriding bind \"%s\" -> %s with -> %s", key, Old, cmd);
 
-		ConsoleBindMapItor it = Binds_.find(key);
+		ConsoleBindMapItor it = Binds_.find(X_CONST_STRING(key));
 		it->second = cmd;
 	}
 
-	Binds_.insert(ConsoleBindMapItor::value_type(key, cmd));
+	Binds_.insert(ConsoleBindMapItor::value_type(core::string(key), core::string(cmd)));
 }
 
 // returns the command for a given key
 // returns null if no bind found
 const char* XConsole::FindBind(const char* key)
 {
-	ConsoleBindMapItor it = Binds_.find(key);
+	ConsoleBindMapItor it = Binds_.find(X_CONST_STRING(key));
 	if (it != Binds_.end())
 		return it->second.c_str();
 	return nullptr;
@@ -1248,7 +1246,8 @@ void XConsole::AddCommand(const char* Name, ConsoleCmdFunc func, int Flags, cons
 	if (desc)
 		cmd.Desc = desc;
 
-	if (CmdMap_.find(Name) != CmdMap_.end())
+	// pass cmd.Name instead of Name, saves creating a second core::string
+	if (CmdMap_.find(cmd.Name) != CmdMap_.end())
 	{
 		X_WARNING("Console", "command already exsists: %s", Name);
 	}
@@ -1259,7 +1258,7 @@ void XConsole::AddCommand(const char* Name, ConsoleCmdFunc func, int Flags, cons
 
 void XConsole::RemoveCommand(const char* Name)
 {
-	ConsoleCmdMapItor it = CmdMap_.find(Name);
+	ConsoleCmdMapItor it = CmdMap_.find(X_CONST_STRING(Name));
 	if (it != CmdMap_.end())
 		CmdMap_.erase(it);
 }
@@ -1293,7 +1292,7 @@ void XConsole::Exec(const char* command, const bool DeferExecution)
 	}
 	else
 	{
-		deferredCmds_.push_back(DeferredCommand(temp.c_str(), false));
+		deferredCmds_.push_back(DeferredCommand(core::string(temp.c_str()), false));
 	}
 }
 
@@ -2047,7 +2046,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 					float colHeight = fCharHeight - colorBoxPadding * 2;
 
 					// draw the colors :D !
-					CVarColRef* PColVar = (CVarColRef*)pCvar;
+					CVarColRef* PColVar = static_cast<CVarColRef*>(pCvar);
 
 					pRender_->DrawQuad(colxpos, colypos, colorBoxWidth, colHeight, PColVar->GetColor());
 					pRender_->DrawRect(colxpos, colypos, colorBoxWidth, colHeight, Col_Black);
@@ -2209,7 +2208,7 @@ void XConsole::ResetAutoCompletion(void)
 void XConsole::addLineToLog(const char* pStr, uint32_t length)
 {
 	X_UNUSED(length);
-	ConsoleLog_.push_back(pStr);
+	ConsoleLog_.push_back(core::string(pStr));
 
 	int bufferSize = console_buffer_size;
 

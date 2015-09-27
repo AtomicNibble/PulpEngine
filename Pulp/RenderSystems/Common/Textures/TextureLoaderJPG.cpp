@@ -38,7 +38,7 @@ namespace JPG
 
 		static void xfile_init_source(j_decompress_ptr cinfo)
 		{
-			jpeg_xfile_src_mgr* src = (jpeg_xfile_src_mgr*)cinfo->src;
+			jpeg_xfile_src_mgr* src = reinterpret_cast<jpeg_xfile_src_mgr*>(cinfo->src);
 			X_UNUSED(src);
 			// files already open since engine filesystem 
 			// will only give back a file object when it's valid and open.
@@ -47,7 +47,7 @@ namespace JPG
 
 		static boolean xfile_fill_input_buffer(j_decompress_ptr cinfo)
 		{
-			jpeg_xfile_src_mgr* src = (jpeg_xfile_src_mgr*)cinfo->src;
+			jpeg_xfile_src_mgr* src = reinterpret_cast<jpeg_xfile_src_mgr*>(cinfo->src);
 
 			uint32 bytes_read;
 			bytes_read = src->file->read(src->buffer, JPEG_MGR_BUFFER_SIZE);
@@ -66,7 +66,7 @@ namespace JPG
 
 		static void xfile_skip_input_data(j_decompress_ptr cinfo, long num_bytes)
 		{
-			jpeg_xfile_src_mgr* src = (jpeg_xfile_src_mgr*)cinfo->src;
+			jpeg_xfile_src_mgr* src = reinterpret_cast<jpeg_xfile_src_mgr*>(cinfo->src);
 
 			if (num_bytes <= 0)
 				return;
@@ -104,7 +104,7 @@ namespace JPG
 			src->mgr.term_source = xfile_term_source;
 			src->mgr.bytes_in_buffer = 0;
 			src->mgr.next_input_byte = nullptr;
-			cinfo->src = (jpeg_source_mgr*)src;
+			cinfo->src = reinterpret_cast<jpeg_source_mgr*>(src);
 		}
 
 		struct my_error_mgr {

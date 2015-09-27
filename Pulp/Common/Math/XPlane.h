@@ -53,7 +53,7 @@ template<typename T>
 class Plane
 {
 public:
-	X_INLINE Plane() {}
+	X_INLINE Plane() : Distance_(static_cast<T>(0)) {}
 
 	X_INLINE Plane(const Vec3<T> &v1, const Vec3<T> &v2, const Vec3<T> &v3) {
 		set(v1, v2, v3);

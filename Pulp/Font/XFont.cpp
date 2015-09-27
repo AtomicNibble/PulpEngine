@@ -107,13 +107,13 @@ IFFont* XFont::NewFont(const char* pFontName)
 		return it->second;
 
 	XFFont* pFont = X_NEW(XFFont, g_fontArena, "FontObject")(pCore_, this, pFontName);
-	fonts_.insert(FontMap::value_type(pFontName, pFont));
+	fonts_.insert(FontMap::value_type(core::string(pFontName), pFont));
 	return pFont;
 }
 
 IFFont* XFont::GetFont(const char* pFontName) const
 {
-	FontMapConstItor it = fonts_.find(pFontName);
+	FontMapConstItor it = fonts_.find(X_CONST_STRING(pFontName));
 	return it != fonts_.end() ? it->second : 0;
 }
 

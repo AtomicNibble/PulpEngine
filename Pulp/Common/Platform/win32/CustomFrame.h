@@ -26,7 +26,7 @@ public:
 	}
 
 	struct FrameButton {
-		FrameButton() : Focus(false), Locked(false) {}
+		FrameButton() : Draw(false), Focus(false), Locked(false), Type(-1) {}
 
 		bool Draw;
 		bool Focus;

@@ -16,8 +16,8 @@ TEST(StringUtil, StringBytes) {
 
 	std::string str = "how long is this txt?";
 	std::wstring strW = L"how long is this txt?";
-	core::string cstr = "how long is this txt?"; 
-	core::StringRef<wchar_t> cstrW = L"how long is this txt?";
+	core::string cstr = core::string("how long is this txt?"); 
+	core::StringRef<wchar_t> cstrW = core::StringRef<wchar_t>(L"how long is this txt?");
 
 	EXPECT_EQ(21, strUtil::StringBytes(str));
 	EXPECT_EQ(21 * 2, strUtil::StringBytes(strW));
@@ -29,8 +29,8 @@ TEST(StringUtil, StringBytesNUll) {
 
 	std::string str = "how long is this txt?";
 	std::wstring strW = L"how long is this txt?";
-	core::string cstr = "how long is this txt?";
-	core::StringRef<wchar_t> cstrW = L"how long is this txt?";
+	core::string cstr = core::string("how long is this txt?");
+	core::StringRef<wchar_t> cstrW = core::StringRef<wchar_t>(L"how long is this txt?");
 
 	EXPECT_EQ(22, strUtil::StringBytesIncNull(str));
 	EXPECT_EQ(22 * 2, strUtil::StringBytesIncNull(strW));

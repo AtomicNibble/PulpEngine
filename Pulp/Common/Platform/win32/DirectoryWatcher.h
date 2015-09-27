@@ -27,7 +27,7 @@ public:
 		};
 	};
 
-	XDirectoryWatcher(core::MemoryArenaBase* arena);
+	explicit XDirectoryWatcher(core::MemoryArenaBase* arena);
 	~XDirectoryWatcher(void);
 
 	void Init(void);

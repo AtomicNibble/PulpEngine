@@ -11,7 +11,7 @@ public:
 	typedef const_iterator PairConstIt;
 
 	bool GetString(const char* key, const char* defaultString, const char **out) const {
-		PairConstIt it = find(key);
+		PairConstIt it = find(X_CONST_STRING(key));
 		if (it != end()) {
 			*out = it->second;
 			return true;
@@ -22,7 +22,7 @@ public:
 
 
 	bool GetString(const char* key, const char* defaultString, core::string& out) const {
-		PairConstIt it = find(key);
+		PairConstIt it = find(X_CONST_STRING(key));
 		if (it != end()) {
 			out = it->second;
 			return true;
