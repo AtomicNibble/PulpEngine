@@ -235,7 +235,10 @@ struct ShaderSourceFile
 	friend class XShaderManager;
 
 	ShaderSourceFile() :
+		pFile_(nullptr),
+		pHlslFile_(nullptr),
 		sourceCrc32_(0),
+		hlslSourceCrc32_(0),
 		techniques_(g_rendererArena)
 	{}
 
@@ -434,11 +437,11 @@ private:
 private:
 	typedef core::HashMap<core::string, SourceFile*> ShaderSourceMap;
 
-	ShaderSourceMap Sourcebin;
-	render::XRenderResourceContainer shaders;
+	ShaderSourceMap Sourcebin_;
+	render::XRenderResourceContainer shaders_;
 
 public:
-	core::Crc32* pCrc32;
+	core::Crc32* pCrc32_;
 
 	static XShader* s_pDefaultShader_;
 	static XShader* s_pDebugShader_;
