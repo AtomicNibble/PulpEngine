@@ -437,11 +437,11 @@ private:
 private:
 	typedef core::HashMap<core::string, SourceFile*> ShaderSourceMap;
 
-	ShaderSourceMap Sourcebin;
-	render::XRenderResourceContainer shaders;
+	ShaderSourceMap Sourcebin_;
+	render::XRenderResourceContainer shaders_;
 
 public:
-	core::Crc32* pCrc32;
+	core::Crc32* pCrc32_;
 
 	static XShader* s_pDefaultShader_;
 	static XShader* s_pDebugShader_;

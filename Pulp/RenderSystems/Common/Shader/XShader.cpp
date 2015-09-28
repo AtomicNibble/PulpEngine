@@ -210,9 +210,9 @@ XShader* XShaderManager::s_pWordShader_ =nullptr;
 
 
 XShaderManager::XShaderManager() : 
-Sourcebin(nullptr),
-shaders(nullptr, 256), 
-pCrc32(nullptr)
+Sourcebin_(nullptr),
+shaders_(nullptr, 256), 
+pCrc32_(nullptr)
 {
 
 
@@ -220,14 +220,14 @@ pCrc32(nullptr)
 
 XShaderManager::~XShaderManager()
 {
-	ShaderSourceMap::iterator it = Sourcebin.begin();
+	ShaderSourceMap::iterator it = Sourcebin_.begin();
 
-	for (; it != Sourcebin.end(); ++it)
+	for (; it != Sourcebin_.end(); ++it)
 	{
 		X_DELETE(it->second, g_rendererArena);
 	}
 
-	Sourcebin.clear();
+	Sourcebin_.clear();
 }
 
 // -------------------------------------------
@@ -317,10 +317,10 @@ bool XShaderManager::Init(void)
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
 	X_ASSERT_NOT_NULL(g_rendererArena);
 
-	pCrc32 = gEnv->pCore->GetCrc32();
+	pCrc32_ = gEnv->pCore->GetCrc32();
 
-	Sourcebin.setArena(g_rendererArena, 64);
-	shaders.setArena(g_rendererArena, 256);
+	Sourcebin_.setArena(g_rendererArena, 64);
+	shaders_.setArena(g_rendererArena, 256);
 
 	texture::XTexture::init();
 
@@ -354,8 +354,8 @@ bool XShaderManager::Shutdown(void)
 	freeSourcebin();
 
 	// free the shaders.
-	XResourceContainer::ResourceItor it = shaders.begin();
-	XResourceContainer::ResourceItor end = shaders.end();
+	XResourceContainer::ResourceItor it = shaders_.begin();
+	XResourceContainer::ResourceItor end = shaders_.end();
 	for (; it != end; )
 	{
 		XShader* pShader = static_cast<XShader*>(it->second);
@@ -370,7 +370,7 @@ bool XShaderManager::Shutdown(void)
 	//	pTex->forceRelease();
 	}
 
-	shaders.free();
+	shaders_.free();
 
 	return true;
 }
@@ -406,8 +406,8 @@ bool XShaderManager::OnFileChange(const char* name)
 			core::Path<char> temp(name);
 			temp.toLower(); // all source is lower case
 
-			ShaderSourceMap::const_iterator it = Sourcebin.find(core::string(temp.fileName()));
-			if (it != Sourcebin.end())
+			ShaderSourceMap::const_iterator it = Sourcebin_.find(core::string(temp.fileName()));
+			if (it != Sourcebin_.end())
 			{
 				// reload the source file.
 				loadRawSourceFile(temp.fileName(), true);
@@ -445,7 +445,7 @@ XShader* XShaderManager::reloadShader(const char* name)
 	size_t i, x, numTecs;
 
 	// already loaded?
-	shader = static_cast<XShader*>(shaders.findAsset(name));
+	shader = static_cast<XShader*>(shaders_.findAsset(name));
 
 	if (shader)
 	{
@@ -679,25 +679,25 @@ bool XShaderManager::freeCoreShaders(void)
 
 bool XShaderManager::freeSourcebin(void)
 {
-	ShaderSourceMap::iterator it = Sourcebin.begin();;
-	for (; it != Sourcebin.end(); ++it)
+	ShaderSourceMap::iterator it = Sourcebin_.begin();;
+	for (; it != Sourcebin_.end(); ++it)
 	{
 		X_DELETE(it->second, g_rendererArena);
 	}
 
-	Sourcebin.free();
+	Sourcebin_.free();
 	return true;
 }
 
 void XShaderManager::listShaders(void)
 {
-	render::XRenderResourceContainer::ResourceConstItor it = shaders.begin();
+	render::XRenderResourceContainer::ResourceConstItor it = shaders_.begin();
 	XShader* pShader;
 
-	X_LOG0("Shader", "------------- ^8Shaders(%i)^7 -------------", shaders.size());
+	X_LOG0("Shader", "------------- ^8Shaders(%i)^7 -------------", shaders_.size());
 	X_LOG_BULLET;
 
-	for (; it != shaders.end(); ++it)
+	for (; it != shaders_.end(); ++it)
 	{
 		pShader = static_cast<XShader*>(it->second);
 
@@ -712,13 +712,13 @@ void XShaderManager::listShaders(void)
 
 void XShaderManager::listShaderSources(void)
 {
-	ShaderSourceMap::const_iterator it = Sourcebin.begin();
+	ShaderSourceMap::const_iterator it = Sourcebin_.begin();
 	const SourceFile* pSource;
 
-	X_LOG0("Shader", "--------- ^8Shader Sources(%i)^7 ---------", Sourcebin.size());
+	X_LOG0("Shader", "--------- ^8Shader Sources(%i)^7 ---------", Sourcebin_.size());
 	X_LOG_BULLET;
 
-	for (; it != Sourcebin.end(); ++it)
+	for (; it != Sourcebin_.end(); ++it)
 	{
 		pSource = it->second;
 
@@ -740,7 +740,7 @@ XShader* XShaderManager::loadShader(const char* name)
 	XShader* shader = nullptr;
 
 	// already loaded?
-	shader = static_cast<XShader*>(shaders.findAsset(name));
+	shader = static_cast<XShader*>(shaders_.findAsset(name));
 
 	if (shader)
 		return shader;
@@ -830,7 +830,7 @@ XShader* XShaderManager::createShader(const char* name)
 	XShader* pShader;
 
 	// check if this shader already exsists.
-	pShader = static_cast<XShader*>(shaders.findAsset(name));
+	pShader = static_cast<XShader*>(shaders_.findAsset(name));
 	
 	if (pShader)
 	{
@@ -840,7 +840,7 @@ XShader* XShaderManager::createShader(const char* name)
 	{
 		pShader = X_NEW_ALIGNED(XShader, g_rendererArena, "Shader", 16);
 		pShader->name_ = name;
-		shaders.AddAsset(name, pShader);
+		shaders_.AddAsset(name, pShader);
 	}
 
 	return pShader;
@@ -1274,7 +1274,7 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 		// don't combine these, I want to check if just the .shader has changed.
 		// seprate to the .hlsl source.
 		pShaderSource->sourceCrc32_ = pfile->sourceCrc32;
-		pShaderSource->hlslSourceCrc32_ = pCrc32->Combine(pfile->sourceCrc32,
+		pShaderSource->hlslSourceCrc32_ = pCrc32_->Combine(pfile->sourceCrc32,
 			pShaderSource->pHlslFile_->sourceCrc32, 
 			safe_static_cast<uint32_t,size_t>(pShaderSource->pHlslFile_->fileData.size()));
 
@@ -1315,15 +1315,16 @@ SourceFile* XShaderManager::loadRawSourceFile(const char* name, bool reload)
 
 	// already loded o.o?
 	
-	ShaderSourceMap::iterator it = Sourcebin.find(X_CONST_STRING(name));
+	ShaderSourceMap::iterator it = Sourcebin_.find(X_CONST_STRING(name));
 	SourceFile* pfile = nullptr;
 
-	if (it != Sourcebin.end())
+	if (it != Sourcebin_.end())
 	{
 		pfile = it->second;
 
-		if (!reload)
+		if (!reload) {
 			return pfile;
+		}
 	}
 
 	// fixed relative folder.
@@ -1348,7 +1349,7 @@ SourceFile* XShaderManager::loadRawSourceFile(const char* name, bool reload)
 		{
 			// tickle my pickle?
 			// check the crc.
-			uint32_t crc32 = pCrc32->GetCRC32(str.data());
+			uint32_t crc32 = pCrc32_->GetCRC32(str.data());
 
 			if (pfile)
 			{
@@ -1375,7 +1376,7 @@ SourceFile* XShaderManager::loadRawSourceFile(const char* name, bool reload)
 				data->fileData = str;
 				data->sourceCrc32 = crc32;
 
-				Sourcebin.insert(std::make_pair(data->fileName, data));
+				Sourcebin_.insert(std::make_pair(data->fileName, data));
 			
 				// load any files it includes.
 				ParseIncludesAndPrePro_r(data, data->includedFiles);
@@ -1449,7 +1450,7 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 								// add the include files crc to this one.
 								// only after parsing for child includes so that
 								// they are included.
-								file->sourceCrc32 = pCrc32->Combine(file->sourceCrc32,
+								file->sourceCrc32 = pCrc32_->Combine(file->sourceCrc32,
 									childFile->sourceCrc32,
 									safe_static_cast<uint32_t, size_t>(childFile->fileData.length()));
 
