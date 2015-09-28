@@ -235,7 +235,10 @@ struct ShaderSourceFile
 	friend class XShaderManager;
 
 	ShaderSourceFile() :
+		pFile_(nullptr),
+		pHlslFile_(nullptr),
 		sourceCrc32_(0),
+		hlslSourceCrc32_(0),
 		techniques_(g_rendererArena)
 	{}
 
