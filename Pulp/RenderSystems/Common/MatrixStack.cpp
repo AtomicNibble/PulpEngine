@@ -6,6 +6,7 @@
 XMatrixStack::XMatrixStack() :
 	curDpeth_(0),
 	maxDpeth_(0),
+	pTop_(nullptr),
 	pStack_(nullptr)
 { 
 
@@ -27,6 +28,7 @@ void XMatrixStack::SetDepth(uint32_t maxDepth)
 void XMatrixStack::Clear(void)
 {
 	X_DELETE_ARRAY(pStack_, g_rendererArena);
+	pTop_ = nullptr;
 	pStack_ = nullptr;
 	maxDpeth_ = 0;
 	curDpeth_ = 0;
