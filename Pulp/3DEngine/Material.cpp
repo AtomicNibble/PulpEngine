@@ -176,7 +176,7 @@ void XMaterial::ShutDown(void)
 
 	// free my nipples!
 	if (getMaterialManager()) {
-		((XMaterialManager*)getMaterialManager())->unregister(this);
+		static_cast<XMaterialManager*>(getMaterialManager())->unregister(this);
 	}
 }
 
@@ -184,8 +184,9 @@ void XMaterial::ShutDown(void)
 const int XMaterial::release()
 {
 	const int ref = XBaseAsset::release();
-	if (ref == 0)
+	if (ref == 0) {
 		X_DELETE(this, g_3dEngineArena);
+	}
 	return ref;
 }
 // ~XBaseAsset

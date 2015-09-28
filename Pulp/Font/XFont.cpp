@@ -16,14 +16,14 @@ namespace
 	void Command_ListFonts(core::IConsoleCmdArgs* pCmd)
 	{
 		X_UNUSED(pCmd);
-		XFont* pFont = (XFont*)gEnv->pFont;
+		XFont* pFont = static_cast<XFont*>(gEnv->pFont);
 
 		pFont->ListFontNames();
 	}
 
 	void Command_DumpForName(core::IConsoleCmdArgs* pCmd)
 	{
-		XFont* pFont = (XFont*)gEnv->pFont;
+		XFont* pFont = static_cast<XFont*>(gEnv->pFont);
 
 		int Num = pCmd->GetArgCount();
 
@@ -34,7 +34,7 @@ namespace
 		}
 
 		const char* name = pCmd->GetArg(1);
-		XFFont* font = (XFFont*)pFont->GetFont(name);
+		XFFont* font = static_cast<XFFont*>(pFont->GetFont(name));
 		if (font)
 		{
 			if (font->getFontTexture()->WriteToFile(name))
@@ -146,7 +146,7 @@ bool XFont::OnFileChange(const char* name)
 	{
 		path.removeExtension();
 
-		XFFont* pFont = (XFFont*)GetFont(path.fileName());
+		XFFont* pFont = static_cast<XFFont*>(GetFont(path.fileName()));
 		if (pFont)
 		{
 			pFont->Reload();
