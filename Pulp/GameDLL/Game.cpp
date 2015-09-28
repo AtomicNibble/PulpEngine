@@ -16,7 +16,8 @@ namespace
 
 XGame::XGame(ICore* pCore) :
 pCore_(pCore),
-pTimer_(nullptr)
+pTimer_(nullptr),
+pRender_(nullptr)
 {
 	X_ASSERT_NOT_NULL(pCore);
 
