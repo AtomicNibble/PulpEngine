@@ -267,6 +267,8 @@ XShader::XShader() :
 	techs_(g_rendererArena)
 {
 	sourceCrc32_ = 0;
+	hlslSourceCrc32_ = 0;
+
 	vertexFmt_ = VertexFormat::P3F_T2F_C4B;
 
 	pHlslFile_ = nullptr;
