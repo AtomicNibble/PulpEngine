@@ -38,7 +38,11 @@ DX11XRender::DX11XRender()  :
 	BlendStates_(nullptr),
 	RasterStates_(nullptr),
 	DepthStates_(nullptr),
-	AuxGeo_(nullptr)
+	AuxGeo_(nullptr),
+
+	CurBlendState_((uint32_t)-1),
+	CurRasterState_((uint32_t)-1),
+	CurDepthState_((uint32_t)-1)
 {
 
 	gRenDev = this;
@@ -90,11 +94,6 @@ bool DX11XRender::Init(HWND hWnd,
 
 	ViewMat_.SetDepth(16);
 	ProMat_.SetDepth(16);
-
-
-	CurBlendState_ = (uint32_t)-1;
-	CurRasterState_ = (uint32_t)-1;
-	CurDepthState_ = (uint32_t)-1;
 
 
 	float fieldOfView, screenAspect;
