@@ -611,7 +611,7 @@ template <size_t N>
 inline wchar_t& StackString<N, wchar_t>::operator[](size_t i)
 {
 	// allow access to the null terminator
-	X_ASSERT(i <= len_, "Character %d cannot be accessed. Subscript out of range.", i)(N, str_, len_);
+	X_ASSERT(i <= len_, "Character index %d cannot be accessed. Subscript out of range.", i)(N, str_, len_);
 	return str_[i];
 }
 
@@ -620,7 +620,7 @@ template <size_t N>
 inline const wchar_t& StackString<N, wchar_t>::operator[](size_t i) const
 {
 	// allow access to the null terminator
-	X_ASSERT(i <= len_, "Character %d cannot be accessed. Subscript out of range.", i)(N, str_, len_);
+	X_ASSERT(i <= len_, "Character index %d cannot be accessed. Subscript out of range.", i)(N, str_, len_);
 	return str_[i]; 
 }
 
