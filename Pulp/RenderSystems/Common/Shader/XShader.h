@@ -160,7 +160,7 @@ public:
 		return numInputParams_;
 	}
 protected:
-	static render::XRenderResourceContainer* pHWshaders;
+	static render::XRenderResourceContainer* s_pHWshaders;
 
 	core::string name_;
 	core::string sourceFileName_;

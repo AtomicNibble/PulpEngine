@@ -264,7 +264,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	const char* sourceFile, const Flags<TechFlag>& techFlags,
 	ShaderType::Enum type, Flags<ILFlag> ILFlags, uint32_t sourceCrc)
 {
-	X_ASSERT_NOT_NULL(pHWshaders);
+	X_ASSERT_NOT_NULL(s_pHWshaders);
 	X_ASSERT_NOT_NULL(shader_name);
 	X_ASSERT_NOT_NULL(entry);
 	X_ASSERT_NOT_NULL(sourceFile);
@@ -285,7 +285,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	X_LOG1("Shader", "HWS for name: \"%s\"", name.c_str());
 #endif // !X_DEBUG
 
-	pShader = static_cast<XHWShader_Dx10*>(pHWshaders->findAsset(name.c_str()));
+	pShader = static_cast<XHWShader_Dx10*>(s_pHWshaders->findAsset(name.c_str()));
 
 	if (pShader)
 	{
@@ -326,7 +326,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 		pShader->activate();
 
 		// register it.
-		pHWshaders->AddAsset(name.c_str(), pShader);
+		s_pHWshaders->AddAsset(name.c_str(), pShader);
 	}
 
 
@@ -371,16 +371,16 @@ void XHWShader_Dx10::FreeBufferPointers()
 
 void XHWShader_Dx10::FreeHWShaders()
 {
-	X_ASSERT_NOT_NULL(pHWshaders);
+	X_ASSERT_NOT_NULL(s_pHWshaders);
 
 	// NOTE: there should be none, since shaders that use them should release them.
 	// so if there are any here there is a problem.
 	// but we still clean up like a good boy.
 
-	core::XResourceContainer::ResourceItor it = pHWshaders->begin();
+	core::XResourceContainer::ResourceItor it = s_pHWshaders->begin();
 	XHWShader_Dx10* pShader;
 
-	for (; it != pHWshaders->end();)
+	for (; it != s_pHWshaders->end();)
 	{
 		pShader = static_cast<XHWShader_Dx10*>(it->second);
 		++it;
@@ -1145,7 +1145,7 @@ void XHWShader_Dx10::Init(void)
 {
 	X_ASSERT_NOT_NULL(g_rendererArena);
 
-	pHWshaders = X_NEW_ALIGNED(render::XRenderResourceContainer, g_rendererArena, 
+	s_pHWshaders = X_NEW_ALIGNED(render::XRenderResourceContainer, g_rendererArena,
 		"HwShaderRes", X_ALIGN_OF(render::XRenderResourceContainer))(g_rendererArena, 256);
 
 
@@ -1169,7 +1169,7 @@ void XHWShader_Dx10::shutDown(void)
 	FreeParams();
 	FreeInputLayoutTree();
 
-	core::Mem::DeleteAndNull(pHWshaders, g_rendererArena);
+	core::Mem::DeleteAndNull(s_pHWshaders, g_rendererArena);
 }
 
 
