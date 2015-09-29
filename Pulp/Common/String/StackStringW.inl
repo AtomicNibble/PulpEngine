@@ -492,8 +492,9 @@ StackString<N, wchar_t>& StackString<N, wchar_t>::trimLeft(void)
 	// we just loop over the string while there is white space and we are inside the string.
 	const wchar_t* str = str_;
 
-	while (*str && strUtil::IsWhitespaceW(const_cast<wchar_t*>(str)))
+	while (*str && strUtil::IsWhitespaceW(*const_cast<wchar_t*>(str))) {
 		str++;
+	}
 
 	// if they not equal we found white space.
 	if (str != str_)
@@ -520,8 +521,9 @@ StackString<N, wchar_t>& StackString<N, wchar_t>::trimRight(void)
 	const wchar_t* str = this->end() - 1;
 	const wchar_t* start = this->begin();
 
-	while (str > start && strUtil::IsWhitespaceW(const_cast<wchar_t*>(str))
+	while (str > start && strUtil::IsWhitespaceW(*const_cast<wchar_t*>(str))) {
 		--str;
+	}
 
 	if (str != end())
 	{
