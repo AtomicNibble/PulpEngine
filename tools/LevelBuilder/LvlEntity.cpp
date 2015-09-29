@@ -502,6 +502,8 @@ size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, const AABB& bo
 
 	if (pCurNode->IsAreaLeaf())
 	{
+		const AABB& b = pCurNode->bounds;
+
 		X_LOG0("Test", "Area: %i (^6%g,%g,%g^7) <=> (^6%g,%g,%g^7) node: %i",
 				pCurNode->area,
 				b.min[0], b.min[1], b.min[2],
