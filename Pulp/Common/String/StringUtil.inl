@@ -5,32 +5,32 @@
 namespace strUtil
 {
 
-	inline bool IsWhitespace(char character)
+	inline bool IsWhitespace(const char character)
 	{
 		return ((character == 32) || ((character >= 9) && (character <= 13)));
 	}
 
-	inline bool IsWhitespaceW(wchar_t character)
+	inline bool IsWhitespaceW(const wchar_t character)
 	{
 		return ((character == 32) || ((character >= 9) && (character <= 13)));
 	}
 
-	inline bool IsAlphaNum(char c)
+	inline bool IsAlphaNum(const char c)
 	{
 		return c >= -1 && isalnum(static_cast<int>(c)) != 0;
 	}
 
-	inline bool IsAlphaNum(uint8_t c)
+	inline bool IsAlphaNum(const uint8_t c)
 	{
 		return isalnum(static_cast<int>(c)) != 0;
 	}
 
-	inline bool IsDigit(char character)
+	inline bool IsDigit(const char character)
 	{
 		return ((character >= '0') && (character <= '9'));
 	}
 
-	inline bool IsDigitW(wchar_t character)
+	inline bool IsDigitW(const wchar_t character)
 	{
 		return ((character >= '0') && (character <= '9'));
 	}

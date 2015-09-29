@@ -39,16 +39,16 @@ namespace strUtil
 	size_t StringBytesIncNull(const T& str);
 
 	/// Returns whether or not the given character is a whitespace.
-	inline bool IsWhitespace(char character);
-	inline bool IsWhitespaceW(wchar_t character);
+	inline bool IsWhitespace(const char character);
+	inline bool IsWhitespaceW(const wchar_t character);
 
 	// reutrns if character is decimal digit or upper / lower case letter.
-	inline bool IsAlphaNum(char str);
-	inline bool IsAlphaNum(uint8_t str);
+	inline bool IsAlphaNum(const char str);
+	inline bool IsAlphaNum(const uint8_t str);
 
 	/// Returns whether or not the given character is a digit.
-	inline bool IsDigit(char character);
-	inline bool IsDigitW(wchar_t character);
+	inline bool IsDigit(const char character);
+	inline bool IsDigitW(const wchar_t character);
 
 	inline bool IsNumeric(const char* str);
 
