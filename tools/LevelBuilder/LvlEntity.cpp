@@ -494,8 +494,10 @@ bool IsPointInAnyArea(XPlaneSet& planeSet, const Vec3f& pos, int32_t& areaOut, b
 	return false;
 }
 
-size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, const Vec3f boundsPoints[8], bspNode* pNode)
+size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, 
+	const Vec3f boundsPoints[8], bspNode* pNode)
 {
+	X_ASSERT_NOT_NULL(boundsPoints);
 	X_ASSERT_NOT_NULL(pNode);
 	bspNode* pCurNode = pNode;
 	size_t i, numAreas = 0;
@@ -504,12 +506,13 @@ size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, const Vec3f bo
 	{
 		const AABB& b = pCurNode->bounds;
 
+#if 1
 		X_LOG0("Test", "Area: %i (^6%g,%g,%g^7) <=> (^6%g,%g,%g^7) node: %i",
 				pCurNode->area,
 				b.min[0], b.min[1], b.min[2],
 				b.max[0], b.max[1], b.max[2],
 				pCurNode->nodeNumber);
-
+#endif
 		return 1;
 	}
 
@@ -603,13 +606,6 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 			const core::string& modelName = it->second;
 			X_LOG0("Entity", "Ent model: \"%s\"", modelName.c_str());
 
-			if (modelName.find("100")) {
-				int goat = 0;
-			}
-			else
-			{
-				continue;
-			}
 		}
 
 		// we want to find out what areas the bounds of this model
@@ -617,9 +613,10 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 		// Since we will need to draw the model if either of the area's are active.
 		// i will want to store the model in both of the area's indivudual lists.
 		// at runtime I will use frame id's to work out what has already been drawn each frame.
-
+#if 0
 		X_LOG0("Entity", "Finding areas for ent: %i origin: (^8%g,%g,%g^7)", i,
 			lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
+#endif
 
 		AABB bounds;
 		bounds.set(lvlEnt.bounds.min + lvlEnt.origin,
