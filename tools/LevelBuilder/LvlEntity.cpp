@@ -494,11 +494,11 @@ bool IsPointInAnyArea(XPlaneSet& planeSet, const Vec3f& pos, int32_t& areaOut, b
 	return false;
 }
 
-size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, const AABB& bounds, bspNode* pNode)
+size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, const Vec3f boundsPoints[8], bspNode* pNode)
 {
 	X_ASSERT_NOT_NULL(pNode);
 	bspNode* pCurNode = pNode;
-	size_t numAreas = 0;
+	size_t i, numAreas = 0;
 
 	if (pCurNode->IsAreaLeaf())
 	{
@@ -520,40 +520,26 @@ size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, const AABB& bo
 	if (sd >= sphere.radius())
 	{
 		pCurNode = pCurNode->children[0];
-		if (!pCurNode->IsSolidLeaf()) {	// 0 = solid
-			numAreas += AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
+		if (!pCurNode->IsSolidLeaf()) {
+			numAreas += AreaForOrigin_r(planeSet, sphere, boundsPoints, pCurNode);
 		}
 		return numAreas;
 	}
 	if (sd <= -sphere.radius())
 	{
 		pCurNode = pCurNode->children[1];
-		if (!pCurNode->IsSolidLeaf()) {	// 0s = solid
-			numAreas += AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
+		if (!pCurNode->IsSolidLeaf()) {
+			numAreas += AreaForOrigin_r(planeSet, sphere, boundsPoints, pCurNode);
 		}
 		return numAreas;
-	}
-
-	Vec3f boundsVecs[2];
-	boundsVecs[0] = bounds.min;
-	boundsVecs[1] = bounds.max;
-
-	Vec3f points[8];
-	size_t i;
-	for (i = 0; i < 8; i++)
-	{
-		points[i][0] = boundsVecs[i & 1][0];
-		points[i][1] = boundsVecs[(i >> 1) & 1][1];
-		points[i][2] = boundsVecs[(i >> 2) & 1][2];
 	}
 
 	bool front = false;
 	bool back = false;
 	for (i = 0; i < 8; i++)
 	{
-		float d;
+		float d = plane.distance(boundsPoints[i]);
 
-		d = plane.distance(points[i]);
 		if (d >= 0.0f) {
 			front = true;
 		}
@@ -567,17 +553,16 @@ size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, const AABB& bo
 
 	if (front) {
 		bspNode* frontChild = pCurNode->children[0];
-		if (!frontChild->IsSolidLeaf()) {	// 0 = solid
-			numAreas += AreaForOrigin_r(planeSet, sphere, bounds, frontChild);
+		if (!frontChild->IsSolidLeaf()) {
+			numAreas += AreaForOrigin_r(planeSet, sphere, boundsPoints, frontChild);
 		}
 	}
 	if (back) {
 		bspNode* backChild = pCurNode->children[1];
-		if (!backChild->IsSolidLeaf()) {	// 0 = solid
-			numAreas += AreaForOrigin_r(planeSet, sphere, bounds, backChild);
+		if (!backChild->IsSolidLeaf()) {
+			numAreas += AreaForOrigin_r(planeSet, sphere, boundsPoints, backChild);
 		}
 	}
-
 
 	return numAreas;
 }
@@ -647,11 +632,12 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 		// make a sphere.
 		Sphere sphere(bounds);
 
-		size_t numAreas = AreaForOrigin_r(planeSet, sphere, bounds, bspTree.headnode);
+		// get bounds points.
+		Vec3f boundsPoints[8];
+		bounds.toPoints(boundsPoints);
 
-	//	int32_t areaOut;
-	//	bool inAArea = IsPointInAnyArea(planeSet, sphere.center(), areaOut, bspTree.headnode);
-	
+		size_t numAreas = AreaForOrigin_r(planeSet, sphere, boundsPoints, bspTree.headnode);
+
 
 		if (numAreas < 1)
 		{
