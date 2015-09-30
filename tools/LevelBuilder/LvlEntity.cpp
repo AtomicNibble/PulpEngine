@@ -618,10 +618,6 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 		// i will want to store the model in both of the area's indivudual lists.
 		// at runtime I will use frame id's to work out what has already been drawn each frame.
 
-
-		// this dose mean i need to know the bounds of the model.
-		// meaning i must load it.
-
 		X_LOG0("Entity", "Finding areas for ent: %i origin: (^8%g,%g,%g^7)", i,
 			lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
 
@@ -638,10 +634,14 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 
 		size_t numAreas = AreaForOrigin_r(planeSet, sphere, boundsPoints, bspTree.headnode);
 
-
-		if (numAreas < 1)
+		if (numAreas > 1)
 		{
-			X_ERROR("Entity", "ent resides in zero areas.");
+			X_WARNING("Entity", "Ent resides in more than one area: (^8%g,%g,%g^7)",
+				lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
+		}
+		else if (numAreas < 1)
+		{
+			X_ERROR("Entity", "Ent resides in zero areas.");
 		}
 	}
 	return true;
