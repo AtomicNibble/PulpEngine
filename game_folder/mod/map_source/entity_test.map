@@ -2612,3 +2612,10 @@ layer "roof"
 "model" "static_berlin_plainchair"
 "classname" "misc_model"
 }
+// entity 75
+{
+"origin" "-616.0 2052.0 -92.0"
+"angles" "0 90 0"
+"model" "static_berlin_plainchair"
+"classname" "misc_model"
+}
