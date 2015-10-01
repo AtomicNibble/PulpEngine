@@ -76,11 +76,11 @@ void AreaModel::EndModel(void)
 
 LvlArea::LvlArea() :
 areaMeshes(g_arena),
-entities(g_arena), 
+//entRefs(g_arena),
 cullSections(g_arena)
 {
 	areaMeshes.reserve(2048);
-	entities.setGranularity(512);
+//	entRefs.reserve(256);
 }
 
 void LvlArea::AreaBegin(void)

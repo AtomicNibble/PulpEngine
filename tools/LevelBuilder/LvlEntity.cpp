@@ -451,7 +451,7 @@ bool LvlEntity::PruneNodes(void)
 	return true;
 }
 
-
+/*
 bool IsPointInAnyArea(XPlaneSet& planeSet, const Vec3f& pos, int32_t& areaOut, bspNode* pNode)
 {
 	X_ASSERT_NOT_NULL(pNode);
@@ -493,6 +493,7 @@ bool IsPointInAnyArea(XPlaneSet& planeSet, const Vec3f& pos, int32_t& areaOut, b
 	areaOut = -1;
 	return false;
 }
+*/
 
 size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, 
 	const Vec3f boundsPoints[8], bspNode* pNode)

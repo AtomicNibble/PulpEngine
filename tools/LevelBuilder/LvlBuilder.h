@@ -47,6 +47,11 @@ private:
 	void PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 		LvlBrushSide& side, bspNode* pNode);
 
+	bool CreateEntAreaRefs(LvlEntity& worldEnt);
+
+	size_t AddAreaRefs_r(const size_t entId, const Sphere& sphere,
+		const Vec3f boundsPoints[8], bspNode* pNode);
+
 private:
 	AABB defaultModelBounds_;
 
