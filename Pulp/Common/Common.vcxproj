@@ -395,6 +395,7 @@
     <None Include="Threading\win32\CriticalSection.inl" />
     <None Include="Threading\win32\Semaphore.inl" />
     <None Include="Threading\win32\ThreadLocalStorage.inl" />
+    <None Include="Time\TimeVal.inl" />
     <None Include="Util\BitUtil.inl" />
     <None Include="Util\Cpu.inl" />
     <None Include="Util\EndianUtil.inl" />

@@ -1284,6 +1284,9 @@
     <None Include="Threading\win32\ThreadLocalStorage.inl">
       <Filter>Headers\Threading\win32</Filter>
     </None>
+    <None Include="Time\TimeVal.inl">
+      <Filter>Headers\Time</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">
