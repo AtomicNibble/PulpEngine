@@ -155,7 +155,7 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 	{
 		// set the origin.
 		const core::string& value = it->second;
-		sscanf(value.c_str(), "%f %f %f",
+		sscanf_s(value.c_str(), "%f %f %f",
 			&ent.origin.x, &ent.origin.y, &ent.origin.z);
 	}
 
@@ -164,7 +164,7 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 	if (it != mapEnt->epairs.end())
 	{
 		const core::string& value = it->second;
-		sscanf(value.c_str(), "%f %f %f",
+		sscanf_s(value.c_str(), "%f %f %f",
 			&ent.angle.x, &ent.angle.y, &ent.angle.z);
 	}
 
