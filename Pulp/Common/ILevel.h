@@ -342,6 +342,13 @@ X_DECLARE_ENUM(FileNodes) (
 	STATIC_MODELS
 );
 
+X_DECLARE_ENUM(ClassType) (
+	UNKNOWN,
+	WORLDSPAWN,
+	PLAYER_START,
+	MISC_MODEL
+);
+
 struct FileStaticModel
 {
 	Vec3f pos;
