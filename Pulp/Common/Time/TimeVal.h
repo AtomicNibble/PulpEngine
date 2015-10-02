@@ -12,10 +12,10 @@ public:
 	typedef int64_t TimeType;
 
 	X_INLINE TimeVal();
-	X_INLINE TimeVal(const float fSeconds);
-	X_INLINE TimeVal(const double fSeconds);
+	explicit X_INLINE TimeVal(const float fSeconds);
+	explicit X_INLINE TimeVal(const double fSeconds);
 	//		inllValue - positive negative, absolute or relative in 1 second= PRECISION units.
-	X_INLINE TimeVal(const TimeType inllValue);
+	explicit X_INLINE TimeVal(const TimeType inllValue);
 	X_INLINE TimeVal(const TimeVal &inValue);
 	X_INLINE ~TimeVal();
 

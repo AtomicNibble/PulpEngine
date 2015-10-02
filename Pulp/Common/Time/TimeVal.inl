@@ -81,17 +81,17 @@ X_INLINE void TimeVal::SetNanoSeconds(const TimeType indwNanoSec)
 }
 
 // Use only for relative value, absolute values suffer a lot from precision loss.
-X_INLINE float TimeVal::GetMilliSeconds() const
+X_INLINE float TimeVal::GetMilliSeconds(void) const
 {
 	return time_ * (1000.f / PRECISION);
 }
 
-X_INLINE TimeVal::TimeType TimeVal::GetMilliSecondsAsInt64() const
+X_INLINE TimeVal::TimeType TimeVal::GetMilliSecondsAsInt64(void) const
 {
 	return time_ * 1000 / PRECISION;
 }
 
-X_INLINE TimeVal::TimeType TimeVal::GetValue() const
+X_INLINE TimeVal::TimeType TimeVal::GetValue(void) const
 {
 	return time_;
 }
