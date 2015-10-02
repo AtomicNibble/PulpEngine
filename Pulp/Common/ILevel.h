@@ -354,8 +354,7 @@ struct FileStaticModel
 	Vec3f pos;
 	Quatf angle;
 
-	uint16_t modelNameIdx;
-	uint16_t _unused; // might place somthing here, like area id.
+	uint32_t modelNameIdx;
 };
 
 struct FileNode
