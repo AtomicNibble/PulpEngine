@@ -174,6 +174,8 @@ public:
 
 	size_t numAreas;
 
+	level::ClassType::Enum classType;
+
 	mapfile::XMapEntity*	mapEntity;		// points to the map data this was made from.
 };
 
