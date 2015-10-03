@@ -505,17 +505,11 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 
 		// for now just add the static models to area ref's
 		{
-			mapfile::XMapEntity::PairIt it = mapEnt->epairs.find(X_CONST_STRING("classname"));
-			if (it == mapEnt->epairs.end()) {
-				continue;
-			}
-			const core::string& className = it->second;
-			if (className != X_CONST_STRING("misc_model")) {
-				continue;
-			}
+			mapfile::XMapEntity::PairIt it;
 
 			it = mapEnt->epairs.find(X_CONST_STRING("model"));
-			if (it == mapEnt->epairs.end()) {
+			if (it == mapEnt->epairs.end()) 
+			{
 				X_WARNING("Entity", "misc_model missing 'model' kvp at: (^8%g,%g,%g^7)",
 					lvlEnt.origin[0], lvlEnt.origin[1], lvlEnt.origin[2]);
 				continue;
