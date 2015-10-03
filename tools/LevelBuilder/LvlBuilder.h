@@ -49,7 +49,7 @@ private:
 
 	bool CreateEntAreaRefs(LvlEntity& worldEnt);
 
-	size_t AddAreaRefs_r(const size_t entId, const Sphere& sphere,
+	void AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sphere,
 		const Vec3f boundsPoints[8], bspNode* pNode);
 
 private:

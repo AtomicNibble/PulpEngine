@@ -413,26 +413,37 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 }
 
 
-size_t LvlBuilder::AddAreaRefs_r(const size_t entId, const Sphere& sphere,
+void LvlBuilder::AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sphere,
 	const Vec3f boundsPoints[8], bspNode* pNode)
 {
 	X_ASSERT_NOT_NULL(boundsPoints);
 	X_ASSERT_NOT_NULL(pNode);
-	size_t numRefs = 0;
 	bspNode* pCurNode = pNode;
 
 	if (pCurNode->IsAreaLeaf()) 
 	{
-		size_t areaIdx = pCurNode->area;
-		LvlArea& area = areas_[areaIdx];
+		int32_t areaIdx = pCurNode->area;
 
-		// add to area ref only if ent not added before.
-		auto it = area.entRefs.insert(entId);
-		if (it.second) {
-			numRefs++;
+		// check if duplicate.
+		if (areaList.isEmpty()) {
+			areaList.append(areaIdx);
+		}
+		else
+		{
+			// just linear search as it will be fastest with such low numbers.
+			// and contigous memory.
+			size_t i;
+			for (i = 0; i < areaList.size(); i++) {
+				if (areaList[i] == areaIdx) {
+					break;
+				}
+			}
+			if (i == areaList.size()) {
+				areaList.append(areaIdx);
+			}
 		}
 
-		return numRefs;
+		return;
 	}
 
 	const Planef& plane = planes[pCurNode->planenum];
@@ -442,17 +453,17 @@ size_t LvlBuilder::AddAreaRefs_r(const size_t entId, const Sphere& sphere,
 	{
 		pCurNode = pCurNode->children[0];
 		if (!pCurNode->IsSolidLeaf()) {
-			numRefs += AddAreaRefs_r(entId, sphere, boundsPoints, pCurNode);
+			AddAreaRefs_r(areaList, sphere, boundsPoints, pCurNode);
 		}
-		return numRefs;
+		return;
 	}
 	if (sd <= -sphere.radius())
 	{
 		pCurNode = pCurNode->children[1];
 		if (!pCurNode->IsSolidLeaf()) {
-			numRefs += AddAreaRefs_r(entId, sphere, boundsPoints, pCurNode);
+			AddAreaRefs_r(areaList, sphere, boundsPoints, pCurNode);
 		}
-		return numRefs;
+		return;
 	}
 
 	// check bounds points.
@@ -476,34 +487,39 @@ size_t LvlBuilder::AddAreaRefs_r(const size_t entId, const Sphere& sphere,
 	if (front) {
 		bspNode* frontChild = pCurNode->children[0];
 		if (!frontChild->IsSolidLeaf()) {
-			numRefs += AddAreaRefs_r(entId, sphere, boundsPoints, frontChild);
+			AddAreaRefs_r(areaList, sphere, boundsPoints, frontChild);
 		}
 	}
 	if (back) {
 		bspNode* backChild = pCurNode->children[1];
 		if (!backChild->IsSolidLeaf()) {
-			numRefs += AddAreaRefs_r(entId, sphere, boundsPoints, backChild);
+			AddAreaRefs_r(areaList, sphere, boundsPoints, backChild);
 		}
 	}
-
-	return numRefs;
 }
 
 bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 {
 	int32_t i, numEnts;
 
+	// we go throught each ent, and work out what area's it is in.
+	// each ent is then added to the entRefts set.
+	// we then need to work out the ones that touch multiple area's
+	core::Array<int32_t> areaList(g_arena);
+	areaList.resize(this->areas_.size());
+
 	numEnts = map_->getNumEntities();
 	for (i = 0; i < numEnts; i++)
 	{
 		mapfile::XMapEntity* mapEnt = map_->getEntity(i);
 		LvlEntity& lvlEnt = entities_[i];
-
+		
 		if (lvlEnt.classType != level::ClassType::MISC_MODEL) {
 			continue;
 		}
 
 		// for now just add the static models to area ref's
+#if 1
 		{
 			mapfile::XMapEntity::PairIt it;
 
@@ -518,6 +534,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 			const core::string& modelName = it->second;
 			X_LOG0("Entity", "Ent model: \"%s\"", modelName.c_str());
 		}
+#endif
 
 		// find out what areas the bounds are in.
 		// then add a refrence for that end to the area.
@@ -533,11 +550,28 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 		Vec3f boundsPoints[8];
 		worldBounds.toPoints(boundsPoints);
 
+		// clear from last time.
+		areaList.clear();
+
 		// traverse the world ent's tree
-		size_t numRefs = AddAreaRefs_r(i, worldSphere, boundsPoints, worldEnt.bspTree.headnode);
-		if (numRefs > 0)
+		AddAreaRefs_r(areaList, worldSphere, boundsPoints, worldEnt.bspTree.headnode);
+
+		size_t numRefs = areaList.size();
+		if (numRefs)
 		{
 			X_LOG0("Lvl", "Entity(%i) has %i refs", i, numRefs);
+
+			// ok so we hold a list of unique areas ent is in.
+			if (numRefs == 1)
+			{
+				// add to area's ref list.
+
+			}
+			else
+			{
+				// added to the multiAreaRefList.
+
+			}
 		}
 		else
 		{
