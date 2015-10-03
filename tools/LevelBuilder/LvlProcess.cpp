@@ -494,10 +494,14 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 	int32_t i, numEnts;
 
 	numEnts = map_->getNumEntities();
-	for (i = 1; i < numEnts; i++)
+	for (i = 0; i < numEnts; i++)
 	{
 		mapfile::XMapEntity* mapEnt = map_->getEntity(i);
 		LvlEntity& lvlEnt = entities_[i];
+
+		if (lvlEnt.classType != level::ClassType::MISC_MODEL) {
+			continue;
+		}
 
 		// for now just add the static models to area ref's
 		{
@@ -600,6 +604,11 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "Processing World Entity");
 
+	if (ent.classType != level::ClassType::WORLDSPAWN) {
+		X_ERROR("Lvl", "World model is missing class name: 'worldspawn'");
+		return false;
+	}
+
 	// make structural face list.
 	// which is the planes and windings of all the structual faces.
 	// Portals become part of this.
@@ -640,6 +649,11 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	// prune the nodes, so that we only have one leaf per a area.
 	// we also number the nodes at this point also.
 	ent.PruneNodes();
+
+
+	// we want to create a list of static models for the level.
+	// we then work out a ref list for each area.
+	// so I know what models are in each area.
 
 	// work out which ents belong to which area.
 //	ent.PutEntsInAreas(planes, entities_, map_);
