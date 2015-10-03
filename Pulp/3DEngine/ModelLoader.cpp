@@ -277,7 +277,7 @@ bool ModelHeader::isValid(void) const
 	}
 
 	return version == MODEL_VERSION &&
-#if X_DEBUG == 0
+#if X_DEBUG == 0 && 0
 		numBones > 0 &&
 #endif // !X_DEBUG
 		numLod > 0 &&
