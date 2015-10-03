@@ -220,7 +220,7 @@ class LvlArea
 	typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
 	typedef std::set<int32_t> AreaEntsRef;
 //	typedef core::Array<LvlEntity*> AreaEntsArr;
-	typedef core::Array<AABB> CullSectionsArr;
+//	typedef core::Array<AABB> CullSectionsArr;
 public:
 	LvlArea();
 
@@ -235,9 +235,10 @@ public:
 	AreaMeshMap areaMeshes;
 	AreaEntsRef entRefs;
 //	AreaEntsArr	entities;
+
 	// we split the area up into a optimal avg'd collection of AABB's
 	// which are turned into worker jobs.
-	CullSectionsArr cullSections;
+	//CullSectionsArr cullSections;
 
 	// copy of the model values.
 	AABB boundingBox;
