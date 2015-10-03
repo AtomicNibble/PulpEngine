@@ -218,7 +218,7 @@ struct AreaSubMesh
 class LvlArea
 {
 	typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
-	typedef std::set<int32_t> AreaEntsRef;
+//	typedef std::set<uint32_t> AreaEntsRef;
 //	typedef core::Array<LvlEntity*> AreaEntsArr;
 //	typedef core::Array<AABB> CullSectionsArr;
 public:
@@ -233,7 +233,7 @@ public:
 	AreaModel model;
 
 	AreaMeshMap areaMeshes;
-	AreaEntsRef entRefs;
+//	AreaEntsRef entRefs;
 //	AreaEntsArr	entities;
 
 	// we split the area up into a optimal avg'd collection of AABB's
