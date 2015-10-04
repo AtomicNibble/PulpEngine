@@ -53,6 +53,8 @@ namespace
 LvlBuilder::LvlBuilder() :
 entities_(g_arena),
 areas_(g_arena),
+multiRefLists_({{ g_arena, g_arena, g_arena, g_arena,
+g_arena, g_arena, g_arena, g_arena }}),
 stringTable_(g_arena),
 map_(nullptr)
 {
