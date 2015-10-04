@@ -6,6 +6,8 @@
 #include "MaterialManager.h"
 #include "LvlTypes.h"
 
+#include <array>
+
 class LvlBuilder
 {
 	typedef core::Array<mapfile::XMapEntity*> MapEntArr;
@@ -47,11 +49,19 @@ private:
 	void PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 		LvlBrushSide& side, bspNode* pNode);
 
+	bool CreateEntAreaRefs(LvlEntity& worldEnt);
+
+	void AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sphere,
+		const Vec3f boundsPoints[8], bspNode* pNode);
+
 private:
 	AABB defaultModelBounds_;
 
 	LvlEntsArr	entities_;
 	LvlAreaArr	areas_;
+
+	static const size_t MAX_MULTI_REF_LISTS = (level::MAP_MAX_AREAS / 32);
+	std::array<core::Array<level::MultiAreaEntRef>, MAX_MULTI_REF_LISTS> multiRefLists_;
 
 	core::GrowingStringTableUnique<256, 16, 4, uint32_t> stringTable_;
 

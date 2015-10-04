@@ -53,6 +53,8 @@ namespace
 LvlBuilder::LvlBuilder() :
 entities_(g_arena),
 areas_(g_arena),
+multiRefLists_({{ g_arena, g_arena, g_arena, g_arena,
+g_arena, g_arena, g_arena, g_arena }}),
 stringTable_(g_arena),
 map_(nullptr)
 {
@@ -155,7 +157,7 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 	{
 		// set the origin.
 		const core::string& value = it->second;
-		sscanf(value.c_str(), "%f %f %f",
+		sscanf_s(value.c_str(), "%f %f %f",
 			&ent.origin.x, &ent.origin.y, &ent.origin.z);
 	}
 
@@ -164,23 +166,59 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 	if (it != mapEnt->epairs.end())
 	{
 		const core::string& value = it->second;
-		sscanf(value.c_str(), "%f %f %f",
+		sscanf_s(value.c_str(), "%f %f %f",
 			&ent.angle.x, &ent.angle.y, &ent.angle.z);
 	}
 
 	ent.bounds.clear();
 
-	// check if this ent is a model
-	it = mapEnt->epairs.find(X_CONST_STRING("model"));
+	// get classname.
+	it = mapEnt->epairs.find(X_CONST_STRING("classname"));
 	if (it != mapEnt->epairs.end())
-	{ 
-		core::string& name = it->second;
-		// load the models bounding box.
-		if (!ModelInfo::GetNModelAABB(name, ent.bounds))
+	{
+		core::string& classname = it->second;
+
+		if (classname == "worldspawn")
 		{
-			X_ERROR("Lvl", "Failed to load model \"%s\" at (%g,%g,%g), using default",
-			name.c_str(), ent.origin.x,ent.origin.y, ent.origin.z);
-			it->second = "default";
+			ent.classType = level::ClassType::WORLDSPAWN;
+		}
+		else if (classname == "misc_model")
+		{
+			ent.classType = level::ClassType::MISC_MODEL;
+		}
+		else if (classname == "info_player_start")
+		{
+			ent.classType = level::ClassType::PLAYER_START;
+		}
+		else
+		{
+			X_WARNING("Lvl", "ent has unknown class type: \"%s\"", classname.c_str());
+		}
+	}
+	else
+	{
+		X_WARNING("Lvl", "ent missing class type");
+	}
+
+	if (ent.classType == level::ClassType::MISC_MODEL)
+	{
+		it = mapEnt->epairs.find(X_CONST_STRING("model"));
+		if (it != mapEnt->epairs.end())
+		{ 
+			core::string& name = it->second;
+			// load the models bounding box.
+			if (!ModelInfo::GetNModelAABB(name, ent.bounds))
+			{
+				X_ERROR("Lvl", "Failed to load model \"%s\" at (%g,%g,%g), using default",
+				name.c_str(), ent.origin.x,ent.origin.y, ent.origin.z);
+				it->second = "default";
+			}
+		}
+		else
+		{
+			X_ERROR("Lvl", "Ent with classname \"misc_model\" is missing \"model\" kvp at (%g,%g,%g)",
+				ent.origin.x, ent.origin.y, ent.origin.z);
+			return false;
 		}
 	}
 

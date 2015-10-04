@@ -102,6 +102,7 @@ patches(g_arena),
 interPortals(g_arena),
 numAreas(0)
 {
+	classType = level::ClassType::UNKNOWN;
 	bspFaces = nullptr;
 	mapEntity = nullptr;
 }

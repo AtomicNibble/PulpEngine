@@ -2605,3 +2605,17 @@ layer "roof"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
+// entity 74
+{
+"origin" "8.0 152.0 8.0"
+"angles" "0 90 0"
+"model" "static_berlin_plainchair"
+"classname" "misc_model"
+}
+// entity 75
+{
+"origin" "-616.0 2052.0 -92.0"
+"angles" "0 90 0"
+"model" "static_berlin_plainchair"
+"classname" "misc_model"
+}

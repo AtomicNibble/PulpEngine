@@ -451,7 +451,7 @@ bool LvlEntity::PruneNodes(void)
 	return true;
 }
 
-
+/*
 bool IsPointInAnyArea(XPlaneSet& planeSet, const Vec3f& pos, int32_t& areaOut, bspNode* pNode)
 {
 	X_ASSERT_NOT_NULL(pNode);
@@ -493,23 +493,27 @@ bool IsPointInAnyArea(XPlaneSet& planeSet, const Vec3f& pos, int32_t& areaOut, b
 	areaOut = -1;
 	return false;
 }
+*/
 
-size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, const AABB& bounds, bspNode* pNode)
+size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, 
+	const Vec3f boundsPoints[8], bspNode* pNode)
 {
+	X_ASSERT_NOT_NULL(boundsPoints);
 	X_ASSERT_NOT_NULL(pNode);
 	bspNode* pCurNode = pNode;
-	size_t numAreas = 0;
+	size_t i, numAreas = 0;
 
 	if (pCurNode->IsAreaLeaf())
 	{
 		const AABB& b = pCurNode->bounds;
 
+#if 1
 		X_LOG0("Test", "Area: %i (^6%g,%g,%g^7) <=> (^6%g,%g,%g^7) node: %i",
 				pCurNode->area,
 				b.min[0], b.min[1], b.min[2],
 				b.max[0], b.max[1], b.max[2],
 				pCurNode->nodeNumber);
-
+#endif
 		return 1;
 	}
 
@@ -520,40 +524,26 @@ size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, const AABB& bo
 	if (sd >= sphere.radius())
 	{
 		pCurNode = pCurNode->children[0];
-		if (!pCurNode->IsSolidLeaf()) {	// 0 = solid
-			numAreas += AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
+		if (!pCurNode->IsSolidLeaf()) {
+			numAreas += AreaForOrigin_r(planeSet, sphere, boundsPoints, pCurNode);
 		}
 		return numAreas;
 	}
 	if (sd <= -sphere.radius())
 	{
 		pCurNode = pCurNode->children[1];
-		if (!pCurNode->IsSolidLeaf()) {	// 0s = solid
-			numAreas += AreaForOrigin_r(planeSet, sphere, bounds, pCurNode);
+		if (!pCurNode->IsSolidLeaf()) {
+			numAreas += AreaForOrigin_r(planeSet, sphere, boundsPoints, pCurNode);
 		}
 		return numAreas;
-	}
-
-	Vec3f boundsVecs[2];
-	boundsVecs[0] = bounds.min;
-	boundsVecs[1] = bounds.max;
-
-	Vec3f points[8];
-	size_t i;
-	for (i = 0; i < 8; i++)
-	{
-		points[i][0] = boundsVecs[i & 1][0];
-		points[i][1] = boundsVecs[(i >> 1) & 1][1];
-		points[i][2] = boundsVecs[(i >> 2) & 1][2];
 	}
 
 	bool front = false;
 	bool back = false;
 	for (i = 0; i < 8; i++)
 	{
-		float d;
+		float d = plane.distance(boundsPoints[i]);
 
-		d = plane.distance(points[i]);
 		if (d >= 0.0f) {
 			front = true;
 		}
@@ -567,17 +557,16 @@ size_t AreaForOrigin_r(XPlaneSet& planeSet, const Sphere& sphere, const AABB& bo
 
 	if (front) {
 		bspNode* frontChild = pCurNode->children[0];
-		if (!frontChild->IsSolidLeaf()) {	// 0 = solid
-			numAreas += AreaForOrigin_r(planeSet, sphere, bounds, frontChild);
+		if (!frontChild->IsSolidLeaf()) {
+			numAreas += AreaForOrigin_r(planeSet, sphere, boundsPoints, frontChild);
 		}
 	}
 	if (back) {
 		bspNode* backChild = pCurNode->children[1];
-		if (!backChild->IsSolidLeaf()) {	// 0 = solid
-			numAreas += AreaForOrigin_r(planeSet, sphere, bounds, backChild);
+		if (!backChild->IsSolidLeaf()) {
+			numAreas += AreaForOrigin_r(planeSet, sphere, boundsPoints, backChild);
 		}
 	}
-
 
 	return numAreas;
 }
@@ -618,13 +607,6 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 			const core::string& modelName = it->second;
 			X_LOG0("Entity", "Ent model: \"%s\"", modelName.c_str());
 
-			if (modelName.find("100")) {
-				int goat = 0;
-			}
-			else
-			{
-				continue;
-			}
 		}
 
 		// we want to find out what areas the bounds of this model
@@ -632,13 +614,10 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 		// Since we will need to draw the model if either of the area's are active.
 		// i will want to store the model in both of the area's indivudual lists.
 		// at runtime I will use frame id's to work out what has already been drawn each frame.
-
-
-		// this dose mean i need to know the bounds of the model.
-		// meaning i must load it.
-
+#if 0
 		X_LOG0("Entity", "Finding areas for ent: %i origin: (^8%g,%g,%g^7)", i,
 			lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
+#endif
 
 		AABB bounds;
 		bounds.set(lvlEnt.bounds.min + lvlEnt.origin,
@@ -647,15 +626,20 @@ bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents
 		// make a sphere.
 		Sphere sphere(bounds);
 
-		size_t numAreas = AreaForOrigin_r(planeSet, sphere, bounds, bspTree.headnode);
+		// get bounds points.
+		Vec3f boundsPoints[8];
+		bounds.toPoints(boundsPoints);
 
-	//	int32_t areaOut;
-	//	bool inAArea = IsPointInAnyArea(planeSet, sphere.center(), areaOut, bspTree.headnode);
-	
+		size_t numAreas = AreaForOrigin_r(planeSet, sphere, boundsPoints, bspTree.headnode);
 
-		if (numAreas < 1)
+		if (numAreas > 1)
 		{
-			X_ERROR("Entity", "ent resides in zero areas.");
+			X_WARNING("Entity", "Ent resides in more than one area: (^8%g,%g,%g^7)",
+				lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
+		}
+		else if (numAreas < 1)
+		{
+			X_ERROR("Entity", "Ent resides in zero areas.");
 		}
 	}
 	return true;

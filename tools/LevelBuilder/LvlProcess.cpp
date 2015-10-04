@@ -5,6 +5,9 @@
 #include <Containers\FixedArray.h>
 #include <IModel.h>
 
+#include "MapTypes.h"
+#include "MapLoader.h"
+
 namespace
 {
 	// ---------------------------------------------
@@ -410,6 +413,205 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 }
 
 
+void LvlBuilder::AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sphere,
+	const Vec3f boundsPoints[8], bspNode* pNode)
+{
+	X_ASSERT_NOT_NULL(boundsPoints);
+	X_ASSERT_NOT_NULL(pNode);
+	bspNode* pCurNode = pNode;
+
+	if (pCurNode->IsAreaLeaf()) 
+	{
+		int32_t areaIdx = pCurNode->area;
+
+		// check if duplicate.
+		if (areaList.isEmpty()) {
+			areaList.append(areaIdx);
+		}
+		else
+		{
+			// just linear search as it will be fastest with such low numbers.
+			// and contigous memory.
+			size_t i;
+			for (i = 0; i < areaList.size(); i++) {
+				if (areaList[i] == areaIdx) {
+					break;
+				}
+			}
+			if (i == areaList.size()) {
+				areaList.append(areaIdx);
+			}
+		}
+
+		return;
+	}
+
+	const Planef& plane = planes[pCurNode->planenum];
+	float sd = plane.distance(sphere.center());
+
+	if (sd >= sphere.radius())
+	{
+		pCurNode = pCurNode->children[0];
+		if (!pCurNode->IsSolidLeaf()) {
+			AddAreaRefs_r(areaList, sphere, boundsPoints, pCurNode);
+		}
+		return;
+	}
+	if (sd <= -sphere.radius())
+	{
+		pCurNode = pCurNode->children[1];
+		if (!pCurNode->IsSolidLeaf()) {
+			AddAreaRefs_r(areaList, sphere, boundsPoints, pCurNode);
+		}
+		return;
+	}
+
+	// check bounds points.
+	bool front = false;
+	bool back = false;
+	for (size_t i = 0; i < 8; i++)
+	{
+		float d = plane.distance(boundsPoints[i]);
+
+		if (d >= 0.0f) {
+			front = true;
+		}
+		else if (d <= 0.0f) {
+			back = true;
+		}
+		if (back && front) {
+			break;
+		}
+	}
+
+	if (front) {
+		bspNode* frontChild = pCurNode->children[0];
+		if (!frontChild->IsSolidLeaf()) {
+			AddAreaRefs_r(areaList, sphere, boundsPoints, frontChild);
+		}
+	}
+	if (back) {
+		bspNode* backChild = pCurNode->children[1];
+		if (!backChild->IsSolidLeaf()) {
+			AddAreaRefs_r(areaList, sphere, boundsPoints, backChild);
+		}
+	}
+}
+
+bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
+{
+	int32_t i, numEnts;
+
+	// we go throught each ent, and work out what area's it is in.
+	// each ent is then added to the entRefts set.
+	// we then need to work out the ones that touch multiple area's
+	core::Array<int32_t> areaList(g_arena);
+	areaList.resize(this->areas_.size());
+
+	for (i = 0; i < MAX_MULTI_REF_LISTS; i++)
+	{
+		multiRefLists_[i].clear();
+	}
+
+	numEnts = map_->getNumEntities();
+	for (i = 0; i < numEnts; i++)
+	{
+		mapfile::XMapEntity* mapEnt = map_->getEntity(i);
+		LvlEntity& lvlEnt = entities_[i];
+		
+		if (lvlEnt.classType != level::ClassType::MISC_MODEL) {
+			continue;
+		}
+
+		// for now just add the static models to area ref's
+#if 1
+		{
+			mapfile::XMapEntity::PairIt it;
+
+			it = mapEnt->epairs.find(X_CONST_STRING("model"));
+			if (it == mapEnt->epairs.end()) 
+			{
+				X_WARNING("Entity", "misc_model missing 'model' kvp at: (^8%g,%g,%g^7)",
+					lvlEnt.origin[0], lvlEnt.origin[1], lvlEnt.origin[2]);
+				continue;
+			}
+
+			const core::string& modelName = it->second;
+			X_LOG0("Entity", "Ent model: \"%s\"", modelName.c_str());
+		}
+#endif
+
+		// find out what areas the bounds are in.
+		// then add a refrence for that end to the area.
+
+		AABB worldBounds;
+		worldBounds.set(lvlEnt.bounds.min + lvlEnt.origin,
+			lvlEnt.bounds.max + lvlEnt.origin);
+
+		// make a sphere, for quicker testing.
+		Sphere worldSphere(worldBounds);
+
+		// get the the worldBounds points for more accurate testing if sphere test pass.
+		Vec3f boundsPoints[8];
+		worldBounds.toPoints(boundsPoints);
+
+		// clear from last time.
+		areaList.clear();
+
+		// traverse the world ent's tree
+		AddAreaRefs_r(areaList, worldSphere, boundsPoints, worldEnt.bspTree.headnode);
+
+		size_t numRefs = areaList.size();
+		if (numRefs)
+		{
+			X_LOG0("Lvl", "Entity(%i) has %i refs", i, numRefs);
+
+			// ok so we hold a list of unique areas ent is in.
+			if (numRefs == 1)
+			{
+				// add to area's ref list.
+				LvlArea& area = this->areas_[areaList[0]];
+
+				area.entRefs.push_back(i);
+			}
+			else
+			{
+				// added to the multiAreaRefList.
+				uint32_t flags[MAX_MULTI_REF_LISTS] = { 0 };
+
+				auto it = areaList.begin();
+				for (; it != areaList.end(); ++it)
+				{
+					const int32_t areaIdx = *it;
+					// work out what area list.
+					const size_t areaListIdx = (areaIdx / 32);
+
+					flags[areaListIdx] |= (1 << (areaIdx % 32));
+				}
+
+				level::MultiAreaEntRef entRef;
+				entRef.entId = i;
+				for (size_t x = 0; x < MAX_MULTI_REF_LISTS; x++)
+				{
+					if (flags[x] != 0)
+					{
+						entRef.flags = flags[x];
+						multiRefLists_[x].append(entRef);
+					}
+				}
+
+			}
+		}
+		else
+		{
+			// ent not in any area.
+			X_ERROR("Lvl", "Entity(%i) does not reside in any area: (%g,%g,%g)",
+				i, lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
+		}
+	}
+
+	return true;
+}
 
 bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 {
@@ -453,9 +655,16 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 	return true;
 }
 
+
+
 bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "Processing World Entity");
+
+	if (ent.classType != level::ClassType::WORLDSPAWN) {
+		X_ERROR("Lvl", "World model is missing class name: 'worldspawn'");
+		return false;
+	}
 
 	// make structural face list.
 	// which is the planes and windings of all the structual faces.
@@ -498,8 +707,14 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	// we also number the nodes at this point also.
 	ent.PruneNodes();
 
+
+	// we want to create a list of static models for the level.
+	// we then work out a ref list for each area.
+	// so I know what models are in each area.
+
 	// work out which ents belong to which area.
-	ent.PutEntsInAreas(planes, entities_, map_);
+//	ent.PutEntsInAreas(planes, entities_, map_);
+	CreateEntAreaRefs(ent);
  	return true;
 }
 
