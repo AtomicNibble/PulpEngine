@@ -380,6 +380,13 @@ X_DECLARE_ENUM(ClassType) (
 	MISC_MODEL
 );
 
+struct FileAreaRefHdr
+{
+	uint32_t startIndex;
+	uint32_t num;
+};
+
+
 X_PACK_PUSH(4)
 struct AreaEntRef
 {
