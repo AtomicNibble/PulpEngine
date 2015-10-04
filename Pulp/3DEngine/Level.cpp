@@ -183,8 +183,11 @@ void Level::free(void)
 
 	areas_.free();
 	areaNodes_.free();
+
 	areaEntRefs_.free();
 	areaEntRefHdrs_.free();
+
+	areaMultiEntRefs_.free();
 
 	if (pFileData_) {
 		X_DELETE_ARRAY(pFileData_, g_3dEngineArena);
