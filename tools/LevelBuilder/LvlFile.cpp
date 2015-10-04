@@ -215,6 +215,20 @@ bool LvlBuilder::save(const char* name)
 
 			hdr.flags.Set(LevelFileFlags::AREA_REF_LISTS);
 
+			uint32_t num = 0;
+
+			for (i = 0; i < areas_.size(); i++)
+			{
+				const LvlArea& area = areas_[i];
+				FileAreaRefHdr refHdr;
+				refHdr.startIndex = num;
+				refHdr.num = safe_static_cast<uint32_t, size_t>(area.entRefs.size());
+
+				num += safe_static_cast<uint32_t, size_t>(area.entRefs.size());
+
+				file->writeObj(refHdr);
+			}
+
 			// save each area's ref list.
 			for (i = 0; i < areas_.size(); i++)
 			{
@@ -222,9 +236,21 @@ bool LvlBuilder::save(const char* name)
 
 				file->writeObj(area.entRefs.ptr(), area.entRefs.size());
 			}
+
+			for (i = 0; i < MAX_MULTI_REF_LISTS; i++)
+			{
+				FileAreaRefHdr refHdr;
+				refHdr.num = safe_static_cast<uint32_t, size_t>(multiRefLists_[i].size());
+				refHdr.startIndex = 0; // not used.
+				file->writeObj(refHdr);
+			}
+
+			// write multi area ent ref lists.
+			for (i = 0; i < MAX_MULTI_REF_LISTS; i++)
+			{
+				file->writeObj(multiRefLists_[i].ptr(), multiRefLists_[i].size());
+			}
 		}
-
-
 
 
 		// bsp tree
