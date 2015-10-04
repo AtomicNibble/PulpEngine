@@ -169,7 +169,7 @@ bool LvlBuilder::save(const char* name)
 
 			for (i = 0; i < areas_.size(); i++)
 			{
-				AreaModel* pModel = &areas_[i].model;
+				const AreaModel* pModel = &areas_[i].model;
 
 				WriteAreaModel(file, pModel);
 			}
