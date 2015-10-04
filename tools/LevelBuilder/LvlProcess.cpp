@@ -8,6 +8,8 @@
 #include "MapTypes.h"
 #include "MapLoader.h"
 
+#include <algorithm>
+
 namespace
 {
 	// ---------------------------------------------
@@ -508,6 +510,11 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 	core::Array<int32_t> areaList(g_arena);
 	areaList.resize(this->areas_.size());
 
+	const size_t maxMultiRefLists = (level::MAP_MAX_AREAS / 32);
+	core::Array<level::MultiAreaEntRef> multiRefLists[maxMultiRefLists] = { g_arena,
+		g_arena, g_arena, g_arena, g_arena, g_arena, g_arena, g_arena };
+
+
 	numEnts = map_->getNumEntities();
 	for (i = 0; i < numEnts; i++)
 	{
@@ -565,11 +572,35 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 			if (numRefs == 1)
 			{
 				// add to area's ref list.
+				LvlArea& area = this->areas_[areaList[0]];
 
+				area.entRefs.push_back(i);
 			}
 			else
 			{
 				// added to the multiAreaRefList.
+				uint32_t flags[maxMultiRefLists] = { 0 };
+
+				auto it = areaList.begin();
+				for (; it != areaList.end(); ++it)
+				{
+					const int32_t areaIdx = *it;
+					// work out what area list.
+					const size_t areaListIdx = (areaIdx / 32);
+
+					flags[areaListIdx] |= (1 << (areaIdx % 32));
+				}
+
+				level::MultiAreaEntRef entRef;
+				entRef.entId = i;
+				for (size_t x = 0; x < maxMultiRefLists; x++)
+				{
+					if (flags[x] != 0)
+					{
+						entRef.flags = flags[x];
+						multiRefLists[x].append(entRef);
+					}
+				}
 
 			}
 		}
