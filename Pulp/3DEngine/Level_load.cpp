@@ -303,6 +303,37 @@ bool Level::ProcessData(uint32_t bytesRead)
 	}
 
 
+	if (fileHdr_.flags.IsSet(LevelFileFlags::AREA_REF_LISTS))
+	{
+		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_REFS);
+
+		areaEntRefHdrs_.resize(fileHdr_.numAreas);
+
+		file.readObj(areaEntRefHdrs_.ptr(), areaEntRefHdrs_.size());
+
+		size_t totalEntRefs = 0;
+		for (const auto& refHdr : areaEntRefHdrs_)
+		{
+			totalEntRefs += refHdr.num;
+		}
+
+		// load into single buffer.
+		areaEntRefs_.resize(totalEntRefs);
+		file.readObj(areaEntRefs_.ptr(), areaEntRefs_.size());
+
+		// load multi area ref list headers.
+		file.readObj(areaEntMultiRefHdrs_.data(), areaEntMultiRefHdrs_.size());
+
+		totalEntRefs = 0;
+		for (const auto& refHdr : areaEntMultiRefHdrs_)
+		{
+			totalEntRefs += refHdr.num;
+		}
+
+		// load the multi area ref lists data.
+		areaMultiEntRefs_.resize(totalEntRefs);
+		file.readObj(areaMultiEntRefs_.ptr(), areaMultiEntRefs_.size());
+	}
 
 	// nodes
 	if (fileHdr_.flags.IsSet(LevelFileFlags::BSP_TREE))

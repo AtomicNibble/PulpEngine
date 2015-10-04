@@ -7,6 +7,7 @@
 
 #include <Ilevel.h>
 #include <Time\TimeVal.h>
+#include <array>
 
 #include "String\GrowingStringTable.h"
 
@@ -112,6 +113,10 @@ class Level : public engine::XEngineBase
 {
 	typedef core::Array<Area> AreaArr;
 	typedef core::Array<AreaNode> AreaNodeArr;
+	typedef core::Array<AreaEntRef> AreaEntRefsArr;
+	typedef core::Array<FileAreaRefHdr> AreaEntRefsHdrArr;
+	typedef core::Array<MultiAreaEntRef> AreaMultiEntRefsArr;
+	typedef std::array<FileAreaRefHdr, MAP_MAX_MULTI_REF_LISTS> AreaMultiEntRefsHdrArr;
 
 public:
 	Level();
@@ -166,6 +171,13 @@ private:
 
 	AreaArr areas_;
 	AreaNodeArr areaNodes_;
+
+	// ent refrences for each area.
+	AreaEntRefsHdrArr areaEntRefHdrs_;
+	AreaEntRefsArr areaEntRefs_;
+	// ent refrences for stuff that is in multiple area's
+	AreaMultiEntRefsHdrArr areaEntMultiRefHdrs_;
+	AreaMultiEntRefsArr areaMultiEntRefs_;
 
 private:
 	size_t frameID_; // inc'd each frame.
