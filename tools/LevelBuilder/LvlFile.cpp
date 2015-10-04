@@ -237,16 +237,21 @@ bool LvlBuilder::save(const char* name)
 				file->writeObj(area.entRefs.ptr(), area.entRefs.size());
 			}
 
-			for (i = 0; i < MAX_MULTI_REF_LISTS; i++)
+			num = 0;
+
+			for (i = 0; i < MAP_MAX_MULTI_REF_LISTS; i++)
 			{
 				FileAreaRefHdr refHdr;
 				refHdr.num = safe_static_cast<uint32_t, size_t>(multiRefLists_[i].size());
-				refHdr.startIndex = 0; // not used.
+				refHdr.startIndex = num; // not used.
+			
+				num += refHdr.num;
+
 				file->writeObj(refHdr);
 			}
 
 			// write multi area ent ref lists.
-			for (i = 0; i < MAX_MULTI_REF_LISTS; i++)
+			for (i = 0; i < MAP_MAX_MULTI_REF_LISTS; i++)
 			{
 				file->writeObj(multiRefLists_[i].ptr(), multiRefLists_[i].size());
 			}
