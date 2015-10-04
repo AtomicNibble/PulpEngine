@@ -60,8 +60,7 @@ private:
 	LvlEntsArr	entities_;
 	LvlAreaArr	areas_;
 
-	static const size_t MAX_MULTI_REF_LISTS = (level::MAP_MAX_AREAS / 32);
-	std::array<core::Array<level::MultiAreaEntRef>, MAX_MULTI_REF_LISTS> multiRefLists_;
+	std::array<core::Array<level::MultiAreaEntRef>, level::MAP_MAX_MULTI_REF_LISTS> multiRefLists_;
 
 	core::GrowingStringTableUnique<256, 16, 4, uint32_t> stringTable_;
 
