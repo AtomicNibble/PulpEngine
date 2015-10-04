@@ -209,6 +209,23 @@ bool LvlBuilder::save(const char* name)
 				X_DELETE(pWindRev, g_arena);
 			}
 		}
+		// area ent ref data
+		{
+			ScopedNodeInfo node(hdr.nodes[FileNodes::AREA_REFS], file);
+
+			hdr.flags.Set(LevelFileFlags::AREA_REF_LISTS);
+
+			// save each area's ref list.
+			for (i = 0; i < areas_.size(); i++)
+			{
+				const LvlArea& area = areas_[i];
+
+				file->writeObj(area.entRefs.ptr(), area.entRefs.size());
+			}
+		}
+
+
+
 
 		// bsp tree
 		if (worldEnt.bspTree.headnode)
@@ -228,7 +245,7 @@ bool LvlBuilder::save(const char* name)
 			worldEnt.bspTree.headnode->WriteNodes_r(planes,file);
 		}
 
-		// write each areas static models.
+		// write all the static models, area have model ref's
 		{
 			ScopedNodeInfo node(hdr.nodes[FileNodes::STATIC_MODELS], file);
 
