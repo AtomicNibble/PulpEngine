@@ -243,7 +243,7 @@ bool Level::ProcessData(uint32_t bytesRead)
 	}
 
 	// area Portals
-	if (fileHdr_.numinterAreaPortals > 0)
+	if (fileHdr_.flags.IsSet(LevelFileFlags::INTER_AREA_INFO))
 	{
 		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_PORTALS);
 
@@ -301,6 +301,8 @@ bool Level::ProcessData(uint32_t bytesRead)
 	{
 		X_WARNING("Level", "Level has no inter area portals.");
 	}
+
+
 
 	// nodes
 	if (fileHdr_.flags.IsSet(LevelFileFlags::BSP_TREE))
