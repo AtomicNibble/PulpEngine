@@ -508,7 +508,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 	core::Array<int32_t> areaList(g_arena);
 	areaList.resize(this->areas_.size());
 
-	for (i = 0; i < MAX_MULTI_REF_LISTS; i++)
+	for (i = 0; i < level::MAP_MAX_MULTI_REF_LISTS; i++)
 	{
 		multiRefLists_[i].clear();
 	}
@@ -577,7 +577,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 			else
 			{
 				// added to the multiAreaRefList.
-				uint32_t flags[MAX_MULTI_REF_LISTS] = { 0 };
+				uint32_t flags[level::MAP_MAX_MULTI_REF_LISTS] = { 0 };
 
 				auto it = areaList.begin();
 				for (; it != areaList.end(); ++it)
@@ -591,7 +591,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 
 				level::MultiAreaEntRef entRef;
 				entRef.entId = i;
-				for (size_t x = 0; x < MAX_MULTI_REF_LISTS; x++)
+				for (size_t x = 0; x < level::MAP_MAX_MULTI_REF_LISTS; x++)
 				{
 					if (flags[x] != 0)
 					{
