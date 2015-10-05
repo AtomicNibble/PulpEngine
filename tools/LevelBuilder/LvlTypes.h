@@ -149,7 +149,6 @@ public:
 	bool FloodAreas(void);
 	bool PruneNodes(void);
 
-	bool PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents, mapfile::XMapFile* pMap);
 
 private:
 
