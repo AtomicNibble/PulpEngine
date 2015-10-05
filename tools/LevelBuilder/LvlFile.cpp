@@ -257,6 +257,16 @@ bool LvlBuilder::save(const char* name)
 			}
 		}
 
+		// models
+		{
+			ScopedNodeInfo node(hdr.nodes[FileNodes::STATIC_MODELS], file);
+
+			hdr.numStaticModels = safe_static_cast<int32_t, size_t>(
+				staticModels_.size());
+
+			file->writeObj(staticModels_.ptr(), staticModels_.size());
+		}
+
 
 		// bsp tree
 		if (worldEnt.bspTree.headnode)
@@ -274,15 +284,6 @@ bool LvlBuilder::save(const char* name)
 			// for none leaf nodes we will write the nodes number.
 			// for leafs nodes we write the children as the area number but negative.
 			worldEnt.bspTree.headnode->WriteNodes_r(planes,file);
-		}
-
-		// write all the static models, area have model ref's
-		{
-			ScopedNodeInfo node(hdr.nodes[FileNodes::STATIC_MODELS], file);
-
-
-
-
 		}
 
 		// update FourcCC to mark this bsp as valid.
