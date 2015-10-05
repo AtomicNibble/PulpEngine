@@ -665,6 +665,7 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 }
 
 
+
 bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "Processing World Entity");
