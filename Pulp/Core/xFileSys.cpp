@@ -178,8 +178,9 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 	else
 	{
 		// TODO: make createOSPath variation that takes a VirtualDirectory arg
-		if (location == VirtualDirectory::GAME)
+		if (location == VirtualDirectory::GAME) {
 			createOSPath(gameDir_, path, real_path);
+		}
 		else
 		{
 			X_ASSERT_NOT_IMPLEMENTED();
@@ -198,7 +199,6 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 	}
 
 	return file;
-
 }
 
 void xFileSys::closeFile(XFile* file)
