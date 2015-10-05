@@ -51,6 +51,7 @@ namespace
 
 
 LvlBuilder::LvlBuilder() :
+staticModels_(g_arena),
 entities_(g_arena),
 areas_(g_arena),
 multiRefLists_({{ g_arena, g_arena, g_arena, g_arena,

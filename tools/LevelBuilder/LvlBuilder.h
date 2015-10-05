@@ -11,6 +11,8 @@
 class LvlBuilder
 {
 	typedef core::Array<mapfile::XMapEntity*> MapEntArr;
+	typedef core::Array<level::FileStaticModel> StaticModelsArr;
+
 public:
 	LvlBuilder();
 	~LvlBuilder();
@@ -54,8 +56,12 @@ private:
 	void AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sphere,
 		const Vec3f boundsPoints[8], bspNode* pNode);
 
+	void CollectStaticModels(void);
+
 private:
 	AABB defaultModelBounds_;
+
+	StaticModelsArr staticModels_;
 
 	LvlEntsArr	entities_;
 	LvlAreaArr	areas_;

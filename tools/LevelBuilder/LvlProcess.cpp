@@ -514,6 +514,10 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 	}
 
 	numEnts = map_->getNumEntities();
+
+	// more than enougth.
+	staticModels_.reserve(numEnts);
+
 	for (i = 0; i < numEnts; i++)
 	{
 		mapfile::XMapEntity* mapEnt = map_->getEntity(i);
@@ -523,8 +527,12 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 			continue;
 		}
 
-		// for now just add the static models to area ref's
-#if 1
+		level::FileStaticModel& sm = staticModels_.AddOne();
+		sm.pos = lvlEnt.origin;
+		sm.angle = Quatf(lvlEnt.angle.x, lvlEnt.angle.y, lvlEnt.angle.y);
+
+		uint32_t entId = safe_static_cast<uint32_t, size_t>(staticModels_.size());
+
 		{
 			mapfile::XMapEntity::PairIt it;
 
@@ -538,8 +546,9 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 
 			const core::string& modelName = it->second;
 			X_LOG0("Entity", "Ent model: \"%s\"", modelName.c_str());
+
+			sm.modelNameIdx = stringTable_.addStringUnqiue(modelName.c_str());
 		}
-#endif
 
 		// find out what areas the bounds are in.
 		// then add a refrence for that end to the area.
@@ -572,7 +581,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 				// add to area's ref list.
 				LvlArea& area = this->areas_[areaList[0]];
 
-				area.entRefs.push_back(i);
+				area.entRefs.push_back(entId);
 			}
 			else
 			{
@@ -590,7 +599,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 				}
 
 				level::MultiAreaEntRef entRef;
-				entRef.entId = i;
+				entRef.entId = entId;
 				for (size_t x = 0; x < level::MAP_MAX_MULTI_REF_LISTS; x++)
 				{
 					if (flags[x] != 0)
@@ -656,7 +665,6 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 }
 
 
-
 bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "Processing World Entity");
@@ -707,10 +715,6 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	// we also number the nodes at this point also.
 	ent.PruneNodes();
 
-
-	// we want to create a list of static models for the level.
-	// we then work out a ref list for each area.
-	// so I know what models are in each area.
 
 	// work out which ents belong to which area.
 //	ent.PutEntsInAreas(planes, entities_, map_);
