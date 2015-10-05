@@ -241,6 +241,21 @@ bool Level::render(void)
 	else
 	{
 		X_LOG0_EVERY_N(24, "Level", "In area: %i", camArea);
+
+		const FileAreaRefHdr& areaEnts = areaEntRefHdrs_[camArea];
+		const FileAreaRefHdr& multiAreaEnts = areaEntMultiRefHdrs_[0];
+		size_t numMulti = 0;
+		for (size_t j = 0; j < multiAreaEnts.num; j++)
+		{
+			if (core::bitUtil::IsBitSet(areaMultiEntRefs_[multiAreaEnts.startIndex + j].flags,
+				camArea))
+			{
+				numMulti++;
+			}
+		}
+
+		X_LOG0_EVERY_N(24, "Level", "ents In area: %i multi: %i", 
+			areaEnts.num, numMulti);
 	}
 
 
