@@ -349,6 +349,17 @@ struct StaticModel : public Entity
 
 	core::Pointer64<model::IRenderMesh > pRenderMesh;
 };
+#else
+
+// not saved to file sruntime only.
+struct StaticModel
+{
+	Vec3f pos;
+	Quatf angle;
+
+	uint32_t modelNameIdx;
+	model::IRenderMesh* pRenderMesh;
+};
 #endif
 
 
