@@ -12,7 +12,7 @@ namespace lastError
 
 	const char* ToString( DWORD error, Description& desc )
 	{
-		DWORD size = ::FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,			// It´s a system error
+		DWORD size = ::FormatMessageA(FORMAT_MESSAGE_FROM_SYSTEM,			// It´s a system error
 			NULL,											// No string to be formatted needed
 			error,											// Hey Windows: Please explain this error!
 			MAKELANGID(LANG_NEUTRAL,SUBLANG_DEFAULT),		// Do it in the standard language

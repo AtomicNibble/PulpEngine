@@ -13,18 +13,19 @@ X_NAMESPACE_BEGIN(font)
 namespace
 {
 
-	void Command_ListFonts(core::IConsoleCmdArgs* Cmd)
+	void Command_ListFonts(core::IConsoleCmdArgs* pCmd)
 	{
-		XFont* pFont = (XFont*)gEnv->pFont;
+		X_UNUSED(pCmd);
+		XFont* pFont = static_cast<XFont*>(gEnv->pFont);
 
 		pFont->ListFontNames();
 	}
 
-	void Command_DumpForName(core::IConsoleCmdArgs* Cmd)
+	void Command_DumpForName(core::IConsoleCmdArgs* pCmd)
 	{
-		XFont* pFont = (XFont*)gEnv->pFont;
+		XFont* pFont = static_cast<XFont*>(gEnv->pFont);
 
-		int Num = Cmd->GetArgCount();
+		int Num = pCmd->GetArgCount();
 
 		if (Num < 2)
 		{
@@ -32,8 +33,8 @@ namespace
 			return;
 		}
 
-		const char* name = Cmd->GetArg(1);
-		XFFont* font = (XFFont*)pFont->GetFont(name);
+		const char* name = pCmd->GetArg(1);
+		XFFont* font = static_cast<XFFont*>(pFont->GetFont(name));
 		if (font)
 		{
 			if (font->getFontTexture()->WriteToFile(name))
@@ -106,13 +107,13 @@ IFFont* XFont::NewFont(const char* pFontName)
 		return it->second;
 
 	XFFont* pFont = X_NEW(XFFont, g_fontArena, "FontObject")(pCore_, this, pFontName);
-	fonts_.insert(FontMap::value_type(pFontName, pFont));
+	fonts_.insert(FontMap::value_type(core::string(pFontName), pFont));
 	return pFont;
 }
 
 IFFont* XFont::GetFont(const char* pFontName) const
 {
-	FontMapConstItor it = fonts_.find(pFontName);
+	FontMapConstItor it = fonts_.find(X_CONST_STRING(pFontName));
 	return it != fonts_.end() ? it->second : 0;
 }
 
@@ -140,12 +141,12 @@ bool XFont::OnFileChange(const char* name)
 {
 	using namespace core;
 
-	Path path(name);
+	Path<char> path(name);
 	if (strUtil::IsEqual(".font", path.extension()))
 	{
 		path.removeExtension();
 
-		XFFont* pFont = (XFFont*)GetFont(path.fileName());
+		XFFont* pFont = static_cast<XFFont*>(GetFont(path.fileName()));
 		if (pFont)
 		{
 			pFont->Reload();

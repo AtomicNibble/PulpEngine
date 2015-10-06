@@ -154,14 +154,14 @@ void XProfileSys::RenderMemoryInfo(float x, float y, float width, float height)
 	core::StackString512 str;
 	core::HumanSize::Str temp;
 
-	str.appendFmt("Num:%i\n", allocStats.m_allocationCount);
-	str.appendFmt("Num(Max):%i\n", allocStats.m_allocationCountMax);
-	str.appendFmt("Physical:%s\n", core::HumanSize::toString(temp, allocStats.m_physicalMemoryAllocated));
-	str.appendFmt("Physical(Used):%s\n", core::HumanSize::toString(temp, allocStats.m_physicalMemoryUsed));
-	str.appendFmt("Virtual(Res):%s\n", core::HumanSize::toString(temp, allocStats.m_virtualMemoryReserved));
-	str.appendFmt("WasteAlign:%s\n", core::HumanSize::toString(temp, allocStats.m_wasteAlignment));
-	str.appendFmt("WasteUnused:%s\n", core::HumanSize::toString(temp, allocStats.m_wasteUnused));
-	str.appendFmt("Overhead:%s\n", core::HumanSize::toString(temp, allocStats.m_internalOverhead));
+	str.appendFmt("Num:%i\n", allocStats.allocationCount_);
+	str.appendFmt("Num(Max):%i\n", allocStats.allocationCountMax_);
+	str.appendFmt("Physical:%s\n", core::HumanSize::toString(temp, allocStats.physicalMemoryAllocated_));
+	str.appendFmt("Physical(Used):%s\n", core::HumanSize::toString(temp, allocStats.physicalMemoryUsed_));
+	str.appendFmt("Virtual(Res):%s\n", core::HumanSize::toString(temp, allocStats.virtualMemoryReserved_));
+	str.appendFmt("WasteAlign:%s\n", core::HumanSize::toString(temp, allocStats.wasteAlignment_));
+	str.appendFmt("WasteUnused:%s\n", core::HumanSize::toString(temp, allocStats.wasteUnused_));
+	str.appendFmt("Overhead:%s\n", core::HumanSize::toString(temp, allocStats.internalOverhead_));
 
 
 	Color txt_col(0.7f, 0.7f, 0.7f, 1.f);
@@ -183,14 +183,14 @@ void XProfileSys::RenderMemoryInfo(float x, float y, float width, float height)
 	allocStats = gEnv->pStrArena->getAllocatorStatistics();
 
 	str.clear();
-	str.appendFmt("Num:%i\n", allocStats.m_allocationCount);
-	str.appendFmt("Num(Max):%i\n", allocStats.m_allocationCountMax);
-	str.appendFmt("Physical:%s\n", core::HumanSize::toString(temp, allocStats.m_physicalMemoryAllocated));
-	str.appendFmt("Physical(Used):%s\n", core::HumanSize::toString(temp, allocStats.m_physicalMemoryUsed));
-	str.appendFmt("Virtual(Res):%s\n", core::HumanSize::toString(temp, allocStats.m_virtualMemoryReserved));
-	str.appendFmt("WasteAlign:%s\n", core::HumanSize::toString(temp, allocStats.m_wasteAlignment));
-	str.appendFmt("WasteUnused:%s\n", core::HumanSize::toString(temp, allocStats.m_wasteUnused));
-	str.appendFmt("Overhead:%s\n", core::HumanSize::toString(temp, allocStats.m_internalOverhead));
+	str.appendFmt("Num:%i\n", allocStats.allocationCount_);
+	str.appendFmt("Num(Max):%i\n", allocStats.allocationCountMax_);
+	str.appendFmt("Physical:%s\n", core::HumanSize::toString(temp, allocStats.physicalMemoryAllocated_));
+	str.appendFmt("Physical(Used):%s\n", core::HumanSize::toString(temp, allocStats.physicalMemoryUsed_));
+	str.appendFmt("Virtual(Res):%s\n", core::HumanSize::toString(temp, allocStats.virtualMemoryReserved_));
+	str.appendFmt("WasteAlign:%s\n", core::HumanSize::toString(temp, allocStats.wasteAlignment_));
+	str.appendFmt("WasteUnused:%s\n", core::HumanSize::toString(temp, allocStats.wasteUnused_));
+	str.appendFmt("Overhead:%s\n", core::HumanSize::toString(temp, allocStats.internalOverhead_));
 
 	pRender_->DrawQuad(x, y, width, height, Color(0.1f, 0.1f, 0.1f, 0.6f),
 		Color(0.01f, 0.01f, 0.01f, 0.8f));
@@ -339,7 +339,7 @@ void XProfileSys::RenderFrameTimes(float x, float y, float width, float height)
 
 
 
-void XProfileSys::DrawLabel(float x, float y, const char* pStr, Color& col)
+void XProfileSys::DrawLabel(float x, float y, const char* pStr, const Color& col)
 {
 	Vec3f pos(x, y, 1);
 	XDrawTextInfo ti;
@@ -348,7 +348,7 @@ void XProfileSys::DrawLabel(float x, float y, const char* pStr, Color& col)
 	pRender_->DrawTextQueued(pos, ti, pStr);
 }
 
-void XProfileSys::DrawLabel(float x, float y, const char* pStr, Color& col, Flags<DrawTextFlags> flags)
+void XProfileSys::DrawLabel(float x, float y, const char* pStr, const Color& col, Flags<DrawTextFlags> flags)
 {
 	Vec3f pos(x,y, 1);
 	XDrawTextInfo ti;
@@ -361,14 +361,21 @@ void XProfileSys::DrawLabel(float x, float y, const char* pStr, Color& col, Flag
 
 
 
-void XProfileSys::DrawRect(float x1, float y1, float x2, float y2, Color& col)
+void XProfileSys::DrawRect(float x1, float y1, float x2, float y2, const Color& col)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
+	X_UNUSED(x1);
+	X_UNUSED(y1);
+	X_UNUSED(x2);
+	X_UNUSED(y2);
+	X_UNUSED(col);
 }
 
-void XProfileSys::DrawRect(Vec4f& rec, Color& col)
+void XProfileSys::DrawRect(Vec4f& rec, const Color& col)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
+	X_UNUSED(rec);
+	X_UNUSED(col);
 }
 
 X_NAMESPACE_END

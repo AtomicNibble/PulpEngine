@@ -35,9 +35,9 @@ public:
 
 	const char* ToString(Description& desc) const;
 private:
-	unsigned short	m_year;
-	unsigned char	m_month;
-	unsigned char	m_day;
+	unsigned short	year_;
+	unsigned char	month_;
+	unsigned char	day_;
 };
 
 X_NAMESPACE_END

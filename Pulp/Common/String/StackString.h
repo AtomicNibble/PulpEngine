@@ -22,7 +22,7 @@ X_NAMESPACE_BEGIN(core)
 /// In order to keep template instantiations to a minimum, certain typedefs for common usage scenarios are provided,
 /// which should be used whenever possible.
 /// \sa stringUtil StringRange FixedSizeString512 Pathname
-template <size_t N>
+template <size_t N, typename TChar = char>
 class StackString
 {
 public:
@@ -30,13 +30,15 @@ public:
 	inline StackString(void);
 
 	/// Constructs a string by copying the given string.
+	explicit StackString(const wchar_t* const str);
 	explicit StackString(const char* const str);
 
 	/// Constructs a string by copying the given range.
-	explicit StackString(const StringRange& range);
+	explicit StackString(const StringRange<TChar>& range);
 
 	explicit StackString(const bool b);
 	explicit StackString(const char c);
+	explicit StackString(const wchar_t c);
 	explicit StackString(const int i);
 	explicit StackString(const unsigned u);
 	explicit StackString(const float f);
@@ -44,57 +46,57 @@ public:
 	explicit StackString(const __int64 f);
 
 	/// Constructs a string by copying the given range.
-	StackString(const char* const beginInclusive, const char* const endExclusive);
+	StackString(const TChar* const beginInclusive, const TChar* const endExclusive);
 
 	/// Appends a character a certain amount of times.
-	void append(char ch, unsigned int count);
+	void append(TChar ch, size_t count);
 	/// Appends a string.
-	inline void append(const char* str);
+	inline void append(const TChar* str);
 	/// Appends part of another string.
-	void append(const char* str, unsigned int count);
+	void append(const TChar* str, size_t count);
 	/// Appends part of another string.
-	inline void append(const char* str, const char* end);
+	inline void append(const TChar* str, const TChar* end);
 	/// Appends a formatted string.
-	void appendFmt(const char* format, ...);
-	void appendFmt(const char* format, va_list args);
+	void appendFmt(const TChar* format, ...);
+	void appendFmt(const TChar* format, va_list args);
 
-	void set(const char* str);
-	void set(const char* const beginInclusive, const char* const endExclusive);
+	void set(const TChar* str);
+	void set(const TChar* const beginInclusive, const TChar* const endExclusive);
 
 	/// \brief Replaces part of the string.
 	/// \remark Returns whether the string was found and replaced.
-	bool replace(const char* original, const char* replacement);
-	bool replace(const char* start, const char* original, const char* replacement);
+	bool replace(const TChar* original, const TChar* replacement);
+	bool replace(const TChar* start, const TChar* original, const TChar* replacement);
 	/// \brief Replaces first occurenct of character
 	/// \remark Returns whether the string was found and replaced.
-	bool replace(const char original, const char replacement);
+	bool replace(const TChar original, const TChar replacement);
 
 	/// Replaces all occurrences of a string, and returns the number of occurrences replaced.
-	unsigned int replaceAll(const char* original, const char* replacement);	
+	size_t replaceAll(const TChar* original, const TChar* replacement);
 	/// Replaces all occurrences of a character, and returns the number of occurrences replaced.
-	unsigned int replaceAll(const char original, const char replacement);
+	size_t replaceAll(const TChar original, const TChar replacement);
 
 
 	/// Trims all whitespace to the left and right of the string.
 	void trimWhitespace(void);
 	/// Trims all occurrences of the given character to the left and right of the string.
-	void trimCharacter(char character);
+	void trimCharacter(TChar character);
 
 	/// \brief Trims all characters to the right of the first occurrence of \a ch. The resulting string is [..., \a ch).
 	/// \remark Does nothing if the character could not be found.
-	void trimRight(char ch);
+	void trimRight(TChar ch);
 	/// \brief Trims all characters to the right of \a pos. The resulting string is [..., \a pos).
-	inline void trimRight(const char* pos);
+	inline void trimRight(const TChar* pos);
 
-	StackString<N>& trim(void);
+	StackString<N, TChar>& trim(void);
 	/// removes all white space chars in front of string.
-	StackString<N>& trimLeft(void);
+	StackString<N, TChar>& trimLeft(void);
 	// removes any leading white space chars.
-	StackString<N>& trimRight(void);
+	StackString<N, TChar>& trimRight(void);
 
 
 	/// \brief strip char from end as many times as the char occurs
-	inline void stripTrailing( const char c );	
+	inline void stripTrailing(const TChar c);
 
 
 	/// \brief Clears the string such that GetLength() yields 0.
@@ -102,21 +104,21 @@ public:
 	inline void clear(void);
 
 	/// Returns whether the string equals a given string.
-	inline bool isEqual(const char* other) const;
+	inline bool isEqual(const TChar* other) const;
 
 
 	/// \brief Finds a character in the string, and returns a pointer to the last occurrence of the character.
 	/// \remark Returns a \c nullptr if the character could not be found.
-	inline const char* findLast(char ch) const;
+	inline const TChar* findLast(TChar ch) const;
 	/// \brief Finds a character in the string, and returns a pointer to the first occurrence of the character.
 	/// \remark Returns a \c nullptr if the character could not be found.
-	inline const char* find(char ch) const;
+	inline const TChar* find(TChar ch) const;
 	/// \brief Finds a string inside the string, and returns a pointer to it.
 	/// \remark Returns a \c nullptr if the string could not be found.
-	inline const char* find(const char* string) const;
+	inline const TChar* find(const TChar* string) const;
 
-	inline const char* findCaseInsen(char ch) const;
-	inline const char* findCaseInsen(const char* string) const;
+	inline const TChar* findCaseInsen(TChar ch) const;
+	inline const TChar* findCaseInsen(const TChar* string) const;
 	
 
 
@@ -124,13 +126,13 @@ public:
 	inline bool operator!=(const StackString& oth) const;
 	inline StackString& operator=(const StackString& oth);
 
-	inline char& operator[](uint32_t i);
-	inline const char& operator[](uint32_t i) const;
+	inline TChar& operator[](size_t i);
+	inline const TChar& operator[](size_t i) const;
 
-	inline const char* c_str(void) const;
+	inline const TChar* c_str(void) const;
 
-	inline uint32_t length(void) const;
-	inline uint32_t capacity(void) const;
+	inline size_t length(void) const;
+	inline size_t capacity(void) const;
 
 	inline bool isEmpty(void) const;
 	inline bool isNotEmpty(void) const;
@@ -138,18 +140,147 @@ public:
 	void toLower(void);
 	void toUpper(void);
 
-	inline const char* begin(void) const;
-	inline const char* end(void) const;
+	inline const TChar* begin(void) const;
+	inline const TChar* end(void) const;
 
 protected:
-	char str_[N];
-	uint32_t len_;
+	TChar str_[N];
+	size_t len_;
 };
 
+template <size_t N>
+class StackString<N,wchar_t>
+{
+public:
+	/// Constructs an empty string.
+	inline StackString(void);
+
+	/// Constructs a string by copying the given string.
+	explicit StackString(const wchar_t* const str);
+	explicit StackString(const char* const str);
+
+	/// Constructs a string by copying the given range.
+	explicit StackString(const StringRange<wchar_t>& range);
+
+	explicit StackString(const bool b);
+	explicit StackString(const char c);
+	explicit StackString(const wchar_t c);
+	explicit StackString(const int i);
+	explicit StackString(const unsigned u);
+	explicit StackString(const float f);
+	explicit StackString(const unsigned __int64 f);
+	explicit StackString(const __int64 f);
+
+	/// Constructs a string by copying the given range.
+	StackString(const wchar_t* const beginInclusive, const wchar_t* const endExclusive);
+
+	/// Appends a character a certain amount of times.
+	void append(wchar_t ch, size_t count);
+	/// Appends a string.
+	inline void append(const wchar_t* str);
+	/// Appends part of another string.
+	void append(const wchar_t* str, size_t count);
+	/// Appends part of another string.
+	inline void append(const wchar_t* str, const wchar_t* end);
+	/// Appends a formatted string.
+	void appendFmt(const wchar_t* format, ...);
+	void appendFmt(const wchar_t* format, va_list args);
+
+	void set(const wchar_t* str);
+	void set(const wchar_t* const beginInclusive, const wchar_t* const endExclusive);
+
+	/// \brief Replaces part of the string.
+	/// \remark Returns whether the string was found and replaced.
+	bool replace(const wchar_t* original, const wchar_t* replacement);
+	bool replace(const wchar_t* start, const wchar_t* original, const wchar_t* replacement);
+	/// \brief Replaces first occurenct of character
+	/// \remark Returns whether the string was found and replaced.
+	bool replace(const wchar_t original, const wchar_t replacement);
+
+	/// Replaces all occurrences of a string, and returns the number of occurrences replaced.
+	size_t replaceAll(const wchar_t* original, const wchar_t* replacement);
+	/// Replaces all occurrences of a character, and returns the number of occurrences replaced.
+	size_t replaceAll(const wchar_t original, const wchar_t replacement);
+
+
+	/// Trims all whitespace to the left and right of the string.
+	void trimWhitespace(void);
+	/// Trims all occurrences of the given character to the left and right of the string.
+	void trimCharacter(wchar_t character);
+
+	/// \brief Trims all characters to the right of the first occurrence of \a ch. The resulting string is [..., \a ch).
+	/// \remark Does nothing if the character could not be found.
+	void trimRight(wchar_t ch);
+	/// \brief Trims all characters to the right of \a pos. The resulting string is [..., \a pos).
+	inline void trimRight(const wchar_t* pos);
+
+	StackString<N, wchar_t>& trim(void);
+	/// removes all white space chars in front of string.
+	StackString<N, wchar_t>& trimLeft(void);
+	// removes any leading white space chars.
+	StackString<N, wchar_t>& trimRight(void);
+
+
+	/// \brief strip char from end as many times as the char occurs
+	inline void stripTrailing(const wchar_t c);
+
+
+	/// \brief Clears the string such that GetLength() yields 0.
+	/// \remark No assumptions about the characters stored in the internal array should be made.
+	inline void clear(void);
+
+	/// Returns whether the string equals a given string.
+	inline bool isEqual(const wchar_t* other) const;
+
+
+	/// \brief Finds a character in the string, and returns a pointer to the last occurrence of the character.
+	/// \remark Returns a \c nullptr if the character could not be found.
+	inline const wchar_t* findLast(wchar_t ch) const;
+	/// \brief Finds a character in the string, and returns a pointer to the first occurrence of the character.
+	/// \remark Returns a \c nullptr if the character could not be found.
+	inline const wchar_t* find(wchar_t ch) const;
+	/// \brief Finds a string inside the string, and returns a pointer to it.
+	/// \remark Returns a \c nullptr if the string could not be found.
+	inline const wchar_t* find(const wchar_t* string) const;
+
+	inline const wchar_t* findCaseInsen(wchar_t ch) const;
+	inline const wchar_t* findCaseInsen(const wchar_t* string) const;
+
+
+
+	inline bool operator==(const StackString& oth) const;
+	inline bool operator!=(const StackString& oth) const;
+	inline StackString& operator=(const StackString& oth);
+
+	inline wchar_t& operator[](size_t i);
+	inline const wchar_t& operator[](size_t i) const;
+
+	inline const wchar_t* c_str(void) const;
+
+	inline size_t length(void) const;
+	inline size_t capacity(void) const;
+
+	inline bool isEmpty(void) const;
+	inline bool isNotEmpty(void) const;
+
+	void toLower(void);
+	void toUpper(void);
+
+	inline const wchar_t* begin(void) const;
+	inline const wchar_t* end(void) const;
+
+protected:
+	wchar_t str_[N];
+	size_t len_;
+};
+
+
 #include "StackString.inl"
+#include "StackStringW.inl"
 
 
-typedef StackString<512> StackString512;
+typedef StackString<512, char> StackString512;
+typedef StackString<512, wchar_t> StackStringW512;
 
 X_NAMESPACE_END
 

@@ -100,10 +100,12 @@ uint32_t XRender::vertexSteamStride[VertexStream::ENUM_COUNT][shader::VertexForm
 
 
 XRender::XRender() :
-	m_pRt(nullptr),
+	pRt_(nullptr),
 	fontIdx_(0),
 	pDefaultFont_(nullptr),
-	RenderResources_(g_rendererArena)
+	RenderResources_(g_rendererArena),
+//	textDrawList_(g_rendererArena)
+	pTextDrawList_(nullptr)
 {
 	// try make sure that the array above is valid.
 #if X_DEBUG
@@ -130,36 +132,39 @@ void XRender::SetArenas(core::MemoryArenaBase* arena)
 	X_ASSERT_NOT_NULL(arena);
 
 	RenderResources_.setArena(arena);
-	textDrawList_.setArena(arena);
+//	textDrawList_.setArena(arena);
 }
 
 bool XRender::Init(HWND hWnd, uint32_t width, uint32_t height)
 {
-	ViewPort_.set(width,height);
+	X_UNUSED(hWnd);
+
+	ViewPort_.set(width, height);
 	ViewPort_.setZ(0.f, 1.f);
 
-	m_pRt = X_NEW_ALIGNED(XRenderThread,g_rendererArena,"renderThread",X_ALIGN_OF(XRenderThread));
-	m_pRt->startRenderThread();
+	pRt_ = X_NEW_ALIGNED(XRenderThread,g_rendererArena,"renderThread",X_ALIGN_OF(XRenderThread));
+	pRt_->startRenderThread();
+
+	pTextDrawList_ = X_NEW(XTextDrawList, g_rendererArena, "RenderTextDrawList")(g_rendererArena);
 
 	vidMemMng_.StartUp();
 
-
-	if (gEnv->pFont)
+	if (gEnv->pFont) {
 		pDefaultFont_ = gEnv->pFont->GetFont("default");
-
+	}
 	return true;
 }
 
 void XRender::ShutDown()
 {
-	X_LOG0("render", "Shutting down");
+	X_LOG0("render", "Shutting Down");
 
-	m_pRt->quitRenderThread();
-	m_pRt->quitRenderLoadingThread();
+	pRt_->quitRenderThread();
+	pRt_->quitRenderLoadingThread();
 
 	freeResources();
 
-	X_DELETE(m_pRt, g_rendererArena);
+	X_DELETE(pRt_, g_rendererArena);
 }
 
 void XRender::freeResources()
@@ -168,10 +173,12 @@ void XRender::freeResources()
 
 //	FX_PipelineShutdown();
 
-	m_ShaderMan.Shutdown();
+	ShaderMan_.Shutdown();
 
 	vidMemMng_.ShutDown();
-	textDrawList_.free();
+
+	pTextDrawList_->free();
+	X_DELETE_AND_NULL(pTextDrawList_, g_rendererArena);
 }
 
 
@@ -308,13 +315,15 @@ void XRender::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* for
 	core::StackString512 temp;
 	temp.appendFmt(format, args);
 
-	textDrawList_.addEntry(pos,ti,temp.c_str());
+	X_ASSERT_NOT_NULL(pTextDrawList_);
+	pTextDrawList_->addEntry(pos,ti,temp.c_str());
 }
 
 
 void XRender::DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text)
 {
-	textDrawList_.addEntry(pos, ti, text);
+	X_ASSERT_NOT_NULL(pTextDrawList_);
+	pTextDrawList_->addEntry(pos, ti, text);
 }
 
 
@@ -324,14 +333,14 @@ void XRender::DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
 	core::StackString512 str;
 	core::HumanSize::Str temp;
 
-	str.appendFmt("Num:%i\n", allocStats.m_allocationCount);
-	str.appendFmt("Num(Max):%i\n", allocStats.m_allocationCountMax);
-	str.appendFmt("Physical:%s\n", core::HumanSize::toString(temp, allocStats.m_physicalMemoryAllocated));
-	str.appendFmt("Physical(Used):%s\n", core::HumanSize::toString(temp, allocStats.m_physicalMemoryUsed));
-	str.appendFmt("Virtual(Res):%s\n", core::HumanSize::toString(temp, allocStats.m_virtualMemoryReserved));
-	str.appendFmt("WasteAlign:%s\n", core::HumanSize::toString(temp, allocStats.m_wasteAlignment));
-	str.appendFmt("WasteUnused:%s\n", core::HumanSize::toString(temp, allocStats.m_wasteUnused));
-	str.appendFmt("Overhead:%s\n", core::HumanSize::toString(temp, allocStats.m_internalOverhead));
+	str.appendFmt("Num:%i\n", allocStats.allocationCount_);
+	str.appendFmt("Num(Max):%i\n", allocStats.allocationCountMax_);
+	str.appendFmt("Physical:%s\n", core::HumanSize::toString(temp, allocStats.physicalMemoryAllocated_));
+	str.appendFmt("Physical(Used):%s\n", core::HumanSize::toString(temp, allocStats.physicalMemoryUsed_));
+	str.appendFmt("Virtual(Res):%s\n", core::HumanSize::toString(temp, allocStats.virtualMemoryReserved_));
+	str.appendFmt("WasteAlign:%s\n", core::HumanSize::toString(temp, allocStats.wasteAlignment_));
+	str.appendFmt("WasteUnused:%s\n", core::HumanSize::toString(temp, allocStats.wasteUnused_));
+	str.appendFmt("Overhead:%s\n", core::HumanSize::toString(temp, allocStats.internalOverhead_));
 
 	DrawTextQueued(pos + Vec3f(0, 15, 0), ti, str.c_str());
 
@@ -344,7 +353,9 @@ void XRender::DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
 
 void XRender::FlushTextBuffer(void)
 {
-	if (!textDrawList_.isEmpty())
+	X_ASSERT_NOT_NULL(pTextDrawList_);
+
+	if (!pTextDrawList_->isEmpty())
 	{
 		rThread()->RC_FlushTextBuffer();
 	}
@@ -352,9 +363,11 @@ void XRender::FlushTextBuffer(void)
 
 void XRender::RT_FlushTextBuffer(void)
 {
+	X_ASSERT_NOT_NULL(pTextDrawList_);
+
 	const XTextDrawList::TextEntry* entry;
 	
-	while (entry = textDrawList_.getNextTextEntry())
+	while ((entry = pTextDrawList_->getNextTextEntry()) != nullptr)
 	{
 		const Vec3f& pos = entry->pos;
 		const char* pStr = entry->getText();
@@ -372,7 +385,7 @@ void XRender::RT_FlushTextBuffer(void)
 
 	}
 
-	textDrawList_.clear();
+	pTextDrawList_->clear();
 }
 
 
@@ -450,10 +463,10 @@ shader::XShaderItem XRender::LoadShaderItem(shader::XInputShaderResources& res)
 	// we want a shader + texture collection plz!
 	shader::XShaderItem item;
 
-	item.pShader_ = m_ShaderMan.m_FixedFunction;
+	item.pShader_ = ShaderMan_.s_pFixedFunction_;
 	item.pShader_->addRef();
 	item.technique_ = 2;
-	item.pResources_ = m_ShaderMan.createShaderResources(res);
+	item.pResources_ = ShaderMan_.createShaderResources(res);
 
 	return item;
 }

@@ -22,20 +22,22 @@ namespace CI
 	{
 		struct JobData
 		{
-			JobData(core::Path& path_, core::ReferenceCountedOwner<XTextureFile>& image_, core::MemoryArenaBase* arena_) :
+			JobData(core::Path<char>& path_, core::ReferenceCountedOwner<XTextureFile>& image_, core::MemoryArenaBase* arena_) :
 			path(path_), image(image_), arena(arena_) {}
 
 			void release(void) {
 				X_DELETE(this, arena);
 			}
 
-			core::Path path;
+			core::Path<char> path;
 			core::ReferenceCountedOwner<XTextureFile> image;
 			core::MemoryArenaBase* arena;
 		};
 
 		X_DECLARE_JOB_ENTRY(WriteCIJob)
 		{
+			X_UNUSED(workerIdx);
+
 			JobData* pData = reinterpret_cast<JobData*>(pParam);
 
 			WriteCIImg(pData->path, pData->image.instance());
@@ -47,7 +49,7 @@ namespace CI
 
 	} // namespace
 
-	bool WriteCIImgAsync(core::Path& path, core::ReferenceCountedOwner<XTextureFile>& image, core::MemoryArenaBase* arena)
+	bool WriteCIImgAsync(core::Path<char>& path, core::ReferenceCountedOwner<XTextureFile>& image, core::MemoryArenaBase* arena)
 	{
 		JobData* pData = X_NEW(JobData, arena, "CIJobData")(path, image, arena);
 
@@ -56,7 +58,7 @@ namespace CI
 		return true;
 	}
 
-	bool WriteCIImg(core::Path& path, XTextureFile* image)
+	bool WriteCIImg(core::Path<char>& path, XTextureFile* image)
 	{
 		X_ASSERT_NOT_NULL(image);
 		core::XFileScoped file;
@@ -81,8 +83,8 @@ namespace CI
 			hdr.Faces = image->getNumFaces();
 			hdr.Flags = image->getFlags();
 
-			hdr.width = image->getWidth();
-			hdr.height = image->getHeight();
+			hdr.width = safe_static_cast<uint16_t,int>(image->getWidth());
+			hdr.height = safe_static_cast<uint16_t, int>(image->getHeight());
 
 			core::zero_object(hdr.__Unused);
 

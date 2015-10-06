@@ -28,12 +28,12 @@ namespace {
 
 
 PoolAllocator::PoolAllocator(void* start, void* end, size_t maxElementSize, size_t maxAlignment, size_t offset) :
-	m_freelist( start, end, maxElementSize, maxAlignment, offset ),
-	m_maxSize( maxElementSize )
+	freelist_( start, end, maxElementSize, maxAlignment, offset ),
+	maxSize_( maxElementSize )
 
 #if X_ENABLE_POOL_ALLOCATOR_CHECK
-	,m_maxAlignment( maxAlignment )
-	,m_offset( offset )
+	,maxAlignment_( maxAlignment )
+	,offset_( offset )
 #endif
 {
 
@@ -42,26 +42,26 @@ PoolAllocator::PoolAllocator(void* start, void* end, size_t maxElementSize, size
 	size_t Waste = CalculateWasteAtFront( start, maxAlignment, offset );
 	size_t Size = safe_static_cast<size_t>((char*)end - (char*)start);
 
-	m_elementSize = ElemSize;
-	m_wastePerElement = ElemSize - maxElementSize;
+	elementSize_ = ElemSize;
+	wastePerElement_ = ElemSize - maxElementSize;
 
-	zero_object( m_statistics );
+	zero_object( statistics_ );
 
-	m_statistics.m_type = "Pool";
-	m_statistics.m_virtualMemoryReserved = Size;
-	m_statistics.m_physicalMemoryAllocated = Size;
-	m_statistics.m_physicalMemoryUsed = Waste;
-	m_statistics.m_wasteAlignment = Waste;
+	statistics_.type_ = "Pool";
+	statistics_.virtualMemoryReserved_ = Size;
+	statistics_.physicalMemoryAllocated_ = Size;
+	statistics_.physicalMemoryUsed_ = Waste;
+	statistics_.wasteAlignment_ = Waste;
 
 
-	m_statistics.m_wasteUnused = (Size - Waste) - (m_elementSize * ((Size - Waste) / m_elementSize));
+	statistics_.wasteUnused_ = (Size - Waste) - (elementSize_ * ((Size - Waste) / elementSize_));
 
-	m_statistics.m_wasteAlignmentMax = Max( m_statistics.m_wasteAlignment, m_statistics.m_wasteAlignmentMax );
-	m_statistics.m_wasteUnusedMax = Max( m_statistics.m_wasteUnused, m_statistics.m_wasteUnusedMax );
-	m_statistics.m_allocationCountMax = Max( m_statistics.m_allocationCount, m_statistics.m_allocationCountMax );
-	m_statistics.m_internalOverheadMax = Max( m_statistics.m_internalOverhead, m_statistics.m_internalOverheadMax );
-	m_statistics.m_physicalMemoryUsedMax = Max(m_statistics.m_physicalMemoryUsed, m_statistics.m_physicalMemoryUsedMax);
-	m_statistics.m_physicalMemoryAllocatedMax = Max(m_statistics.m_physicalMemoryAllocated, m_statistics.m_physicalMemoryAllocatedMax);
+	statistics_.wasteAlignmentMax_ = Max( statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_ );
+	statistics_.wasteUnusedMax_ = Max( statistics_.wasteUnused_, statistics_.wasteUnusedMax_ );
+	statistics_.allocationCountMax_ = Max( statistics_.allocationCount_, statistics_.allocationCountMax_ );
+	statistics_.internalOverheadMax_ = Max( statistics_.internalOverhead_, statistics_.internalOverheadMax_ );
+	statistics_.physicalMemoryUsedMax_ = Max(statistics_.physicalMemoryUsed_, statistics_.physicalMemoryUsedMax_);
+	statistics_.physicalMemoryAllocatedMax_ = Max(statistics_.physicalMemoryAllocated_, statistics_.physicalMemoryAllocatedMax_);
 #endif
 
 }
@@ -70,7 +70,7 @@ PoolAllocator::PoolAllocator(void* start, void* end, size_t maxElementSize, size
 MemoryAllocatorStatistics PoolAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	return this->m_statistics;
+	return this->statistics_;
 #else
 	static MemoryAllocatorStatistics stats;
 	core::zero_object(stats);

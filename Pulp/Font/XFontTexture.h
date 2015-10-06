@@ -41,7 +41,7 @@ struct FontSmoothAmount
 
 
 
-typedef struct XTextureSlot
+struct XTextureSlot
 {
 	uint16		wSlotUsage;			// for LRU strategy, 0xffff is never released
 	wchar_t		cCurrentChar;		// ~0 if not used for characters
@@ -52,29 +52,29 @@ typedef struct XTextureSlot
 	char		iCharOffsetX;
 	char		iCharOffsetY;
 
-	void Reset()
+	void Reset(void)
 	{
 		wSlotUsage = 0;
-		cCurrentChar = ~0;
+		cCurrentChar = static_cast<wchar_t>(~0);
 		iCharWidth = 0;
 		iCharHeight = 0;
 		iCharOffsetX = 0;
 		iCharOffsetY = 0;
 	}
 
-	void SetNotReusable() { // this slot can't be reused for somthing else.
+	void SetNotReusable(void) { // this slot can't be reused for somthing else.
 		wSlotUsage = 0xffff;
 	}
 
-} XTextureSlot;
+};
 
 
-typedef std::vector<XTextureSlot *>								XTextureSlotList;
-typedef std::vector<XTextureSlot *>::iterator					XTextureSlotListItor;
+typedef core::Array<XTextureSlot *>								XTextureSlotList;
+typedef core::Array<XTextureSlot *>::Iterator					XTextureSlotListItor;
 
-typedef std::hash_map<uint16, XTextureSlot *>					XTextureSlotTable;
-typedef std::hash_map<uint16, XTextureSlot *>::iterator			XTextureSlotTableItor;
-typedef std::hash_map<uint16, XTextureSlot *>::const_iterator	XTextureSlotTableItorConst;
+typedef std::unordered_map<uint16, XTextureSlot *>					XTextureSlotTable;
+typedef std::unordered_map<uint16, XTextureSlot *>::iterator		XTextureSlotTableItor;
+typedef std::unordered_map<uint16, XTextureSlot *>::const_iterator	XTextureSlotTableItorConst;
 
 struct XCharCords
 {

@@ -16,15 +16,18 @@
 #include "XPlane.h"
 #include "XAabb.h"
 
+#include <ISerialize.h>
 
-X_DECLARE_ENUM(PlaneSide)(ON,FRONT,BACK,CROSS);
+// X_DECLARE_ENUM(PlaneSide)(ON,FRONT,BACK,CROSS);
 
-class XWinding
+class XWinding : public core::ISerialize
 {
+	static const int MAX_POINTS_ON_WINDING = 64;
 public:
 	XWinding(void);
 	explicit XWinding(const int n);								// allocate for n points
 	explicit XWinding(const Vec3f* verts, const int numVerts);	// winding from points
+	explicit XWinding(const Vec5f* verts, const int numVerts);	// winding from points
 	explicit XWinding(const Vec3f& normal, const float dist);	// base winding for plane
 	explicit XWinding(const Planef& plane);						// base winding for plane
 	explicit XWinding(const XWinding& winding);
@@ -32,11 +35,13 @@ public:
 
 
 	X_INLINE XWinding&		operator=(const XWinding& winding);
-	X_INLINE const Vec3f&	operator[](const int idx) const;
-	X_INLINE Vec3f&			operator[](const int idx);
+	X_INLINE const Vec5f&	operator[](const size_t idx) const;
+	X_INLINE Vec5f&			operator[](const size_t idx);
 
 	// add a point to the end of the winding point array
+	X_INLINE XWinding&		operator+=(const Vec5f& v);
 	X_INLINE XWinding&		operator+=(const Vec3f& v);
+	X_INLINE void			addPoint(const Vec5f& v);
 	X_INLINE void			addPoint(const Vec3f& v);
 
 	X_INLINE int getNumPoints(void) const;
@@ -44,21 +49,21 @@ public:
 
 	bool isTiny(void) const;
 	bool isHuge(void) const;
-
 	void clear(void);
+	void print(void) const;
+
 
 	// huge winding for plane, the points go counter clockwise when facing the front of the plane
 	// makes a winding for that plane
 	void baseForPlane(const Vec3f& normal, const float dist);
 	void baseForPlane(const Planef& plane);
 
-
 	float getArea(void) const;
 	Vec3f getCenter(void) const;
 	float getRadius(const Vec3f& center) const;
 	void getPlane(Vec3f& normal, float& dist) const;
 	void getPlane(Planef& plane) const;
-	void getBoundingBox(AABB& box) const;
+	void GetAABB(AABB& box) const;
 
 	float planeDistance(const Planef& plane) const;
 	PlaneSide::Enum	planeSide(const Planef& plane, const float epsilon = EPSILON) const;
@@ -67,21 +72,33 @@ public:
 	// if there is nothing at the front the number of points is set to zero
 	bool clipInPlace(const Planef& plane, const float epsilon = EPSILON, const bool keepOn = false);
 
-	XWinding* clip(Planef& plane, const float epsilon = EPSILON, const bool keepOn = false);
+	// returns false if invalid.
+	bool clip(const Planef& plane, const float epsilon = EPSILON, const bool keepOn = false);
+	XWinding* Copy(core::MemoryArenaBase* arena) const;
+	XWinding* ReverseWinding(core::MemoryArenaBase* arena) const;
+
+	int Split(const Planef &plane, const float epsilon, 
+		XWinding **front, XWinding **back, core::MemoryArenaBase* arena) const;
+
+
+	void AddToConvexHull(const XWinding *winding, const Vec3f& normal, const float epsilon = EPSILON);
+	void AddToConvexHull(const Vec3f& point, const Vec3f& normal, const float epsilon = EPSILON);
+
+	// ISerialize
+	virtual bool SSave(core::XFile* pFile) const X_FINAL;
+	virtual bool SLoad(core::XFile* pFile) X_FINAL;
+	// ~ISerialize
 
 
 private:
-	bool EnsureAlloced(int n, bool keep = false);
-	bool ReAllocate(int n, bool keep = false);
-
+	// must be inlined to not fuck up alloca
+	X_INLINE bool EnsureAlloced(int32_t num, bool keep = false);
+	X_INLINE bool ReAllocate(int32_t num, bool keep = false);
 
 private:
-	// should i do fixed of 6?
-	// with pointer to data to allow for bigger ones.
-	// or just allocate them all from a pool lol.
-	Vec3f*		p;
-	int			numPoints;
-	int			allocedSize;
+	Vec5f*	pPoints_;
+	int32_t	numPoints_;
+	int32_t	allocedSize_;
 };
 
 

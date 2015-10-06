@@ -78,7 +78,7 @@ bool XGuiManager::Init(void)
 	gEnv->pInput->AddEventListener(this);
 
 	// what you pointing at? rude..
-	pCursorArrow_ = gEnv->pRender->LoadTexture("core_assets/Textures/cursor_arrow.dds",
+	pCursorArrow_ = gEnv->pRender->LoadTexture("Textures/cursor_arrow.dds",
 		texture::TextureFlags::DONT_STREAM | texture::TextureFlags::NOMIPS);
 
 	if (!pCursorArrow_) {
@@ -91,7 +91,7 @@ bool XGuiManager::Init(void)
 
 void XGuiManager::Shutdown(void)
 {
-	X_LOG0("Gui", "Shuting down GUI Systems");
+	X_LOG0("Gui", "Shutting Down");
 
 
 	gEnv->pHotReload->addfileType(nullptr, gui::GUI_FILE_EXTENSION);
@@ -106,10 +106,12 @@ void XGuiManager::Shutdown(void)
 IGui* XGuiManager::loadGui(const char* name)
 {
 	X_ASSERT_NOT_NULL(name);
-	XGui* pGui;
+	XGui* pGui = nullptr;
 
-	if (pGui = static_cast<XGui*>(findGui(name)))
+	pGui = static_cast<XGui*>(findGui(name));
+	if (!pGui) {
 		return pGui;
+	}
 
 	// try load it :|
 	pGui = X_NEW(XGui, g_3dEngineArena, "GuiInterface");
@@ -182,13 +184,15 @@ void XGuiManager::listGuis(const char* wildcardSearch) const
 // IXHotReload
 bool XGuiManager::OnFileChange(const char* name)
 {
-	core::Path path(name);
-	XGui* pGui;
+	core::Path<char> path(name);
+	XGui* pGui = nullptr;
 
 	// we don't keep extension for name.
 	path.removeExtension();
 
-	if (pGui = static_cast<XGui*>(findGui(path.fileName())))
+	pGui = static_cast<XGui*>(findGui(path.fileName()));
+
+	if (pGui)
 	{
 		path = path.fileName();
 

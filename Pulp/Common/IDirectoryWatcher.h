@@ -11,6 +11,7 @@ class XDirectoryWatcherListener;
 struct IXDirectoryWatcher
 {
 	virtual	void addDirectory(const char* directory) X_ABSTRACT;
+	virtual	void addDirectory(const wchar_t* directory) X_ABSTRACT;
 
 	virtual void registerListener(XDirectoryWatcherListener* pListener) X_ABSTRACT;
 	virtual void unregisterListener(XDirectoryWatcherListener* pListener) X_ABSTRACT;

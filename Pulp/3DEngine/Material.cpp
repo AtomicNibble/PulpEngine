@@ -33,7 +33,7 @@ namespace
 
 	bool strToVec4(const char* pStr, Vec4f& vecOut)
 	{
-		uint32_t len = core::strUtil::strlen(pStr);
+		size_t len = core::strUtil::strlen(pStr);
 		if (len > 128)
 			return false;
 
@@ -176,7 +176,7 @@ void XMaterial::ShutDown(void)
 
 	// free my nipples!
 	if (getMaterialManager()) {
-		((XMaterialManager*)getMaterialManager())->unregister(this);
+		static_cast<XMaterialManager*>(getMaterialManager())->unregister(this);
 	}
 }
 
@@ -184,8 +184,9 @@ void XMaterial::ShutDown(void)
 const int XMaterial::release()
 {
 	const int ref = XBaseAsset::release();
-	if (ref == 0)
+	if (ref == 0) {
 		X_DELETE(this, g_3dEngineArena);
+	}
 	return ref;
 }
 // ~XBaseAsset
@@ -317,8 +318,8 @@ bool XMaterial::ProcessMaterialXML(XMaterial* pMaterial,
 		{
 			flags.Set(MtlXmlFlags::FLAGS);
 
-			uint32_t flags = core::strUtil::StringToInt<uint32_t>(attr->value());
-			pMaterial->setFlags(flags);
+			uint32_t Matflags = core::strUtil::StringToInt<uint32_t>(attr->value());
+			pMaterial->setFlags(Matflags);
 		}
 		else if (core::strUtil::IsEqual(begin, end, "SurfaceType"))
 		{
@@ -363,7 +364,8 @@ bool XMaterial::ProcessMaterialXML(XMaterial* pMaterial,
 			shader::ShaderTextureIdx::Enum texId;
 			core::StackString<256> name;
 
-			if (attr = texture->first_attribute("type", 4))
+			attr = texture->first_attribute("type", 4);
+			if (attr)
 			{
 				// check it's a valid type
 				const char* typeBegin = attr->value();
@@ -391,7 +393,8 @@ bool XMaterial::ProcessMaterialXML(XMaterial* pMaterial,
 				continue;
 			}
 
-			if (attr = texture->first_attribute("image_name", 10))
+			attr = texture->first_attribute("image_name", 10);
+			if (attr)
 			{
 				if (attr->value_size() < 2)
 				{

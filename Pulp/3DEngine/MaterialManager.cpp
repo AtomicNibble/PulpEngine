@@ -7,6 +7,7 @@
 #include <IShader.h>
 #include <IRender.h>
 #include <IConsole.h>
+#include <ITexture.h>
 
 #include <String\Xml.h>
 #include <String\Path.h>
@@ -44,7 +45,7 @@ namespace {
 
 	bool strToVec4(const char* pStr, Vec4f& vecOut)
 	{
-		uint32_t len = core::strUtil::strlen(pStr);
+		size_t len = core::strUtil::strlen(pStr);
 		if (len > 128)
 			return false;
 
@@ -90,8 +91,8 @@ namespace {
 			{
 				flags.Set(MtlXmlFlags::FLAGS);
 
-				uint32_t flags = core::strUtil::StringToInt<uint32_t>(attr->value());
-				pMaterial->setFlags(flags);
+				uint32_t Matflags = core::strUtil::StringToInt<uint32_t>(attr->value());
+				pMaterial->setFlags(Matflags);
 			}
 			else if (core::strUtil::IsEqual(begin, end, "SurfaceType"))
 			{
@@ -129,7 +130,8 @@ namespace {
 				shader::ShaderTextureIdx::Enum texId;
 				core::StackString<256> name;
 
-				if (attr = texture->first_attribute("type", 4))
+				attr = texture->first_attribute("type", 4);
+				if (attr)
 				{
 					// check it's a valid type
 					const char* typeBegin = attr->value();
@@ -157,7 +159,8 @@ namespace {
 					continue;
 				}
 
-				if (attr = texture->first_attribute("image_name", 10))
+				attr = texture->first_attribute("image_name", 10);
+				if (attr)
 				{
 					if (attr->value_size() < 2)
 					{
@@ -203,6 +206,11 @@ namespace {
 			X_WARNING("Mtl", "material has no albedo texture defined");
 		}
 
+		if (input.textures[shader::ShaderTextureIdx::BUMP].name.isEmpty()) {
+			X_WARNING("Mtl", "material has no bump map assigning identity");
+			input.textures[shader::ShaderTextureIdx::BUMP].name = texture::TEX_DEFAULT_BUMP;
+
+		}
 
 		// Ok now params!
 		params = node->first_node("Params", 6, false);
@@ -279,7 +287,7 @@ namespace {
 			searchPatten = Cmd->GetArg(1);
 		}
 
-		((XMaterialManager*)XEngineBase::getMaterialManager())->ListMaterials(searchPatten);
+		(static_cast<XMaterialManager*>(XEngineBase::getMaterialManager()))->ListMaterials(searchPatten);
 	}
 
 	static void sortMatsByName(core::Array<IMaterial*>& mats)
@@ -326,7 +334,7 @@ void XMaterialManager::Init(void)
 
 void XMaterialManager::ShutDown(void)
 {
-	X_LOG0("MtlManager", "Shutting down");
+	X_LOG0("MtlManager", "Shutting Down");
 
 
 	// hotreload support.
@@ -340,12 +348,13 @@ void XMaterialManager::ShutDown(void)
 	core::XResourceContainer::ResourceItor it = materials_.begin();
 	for (; it != materials_.end(); )
 	{
-		XMaterial* pMat = (XMaterial*)it->second;
+		XMaterial* pMat = static_cast<XMaterial*>(it->second);
 
 		++it;
 
-		if (!pMat)
+		if (!pMat) {
 			continue;
+		}
 
 		X_WARNING("Material", "\"%s\" was not deleted", pMat->getName());
 
@@ -356,9 +365,10 @@ void XMaterialManager::ShutDown(void)
 bool XMaterialManager::OnFileChange(const char* name)
 {
 	const char* fileExt;		
-	if (fileExt = core::strUtil::FileExtension(name))
-	{
 
+	fileExt = core::strUtil::FileExtension(name);
+	if (fileExt)
+	{
 		if (core::strUtil::IsEqual(MTL_FILE_EXTENSION, fileExt))
 		{
 			X_LOG0("Material", "reload material: \"%s\"", name);
@@ -380,7 +390,7 @@ void XMaterialManager::InitDefaults(void)
 {
 	if (pDefaultMtl_ == nullptr)
 	{
-		pDefaultMtl_ = (XMaterial*)createMaterial("default");
+		pDefaultMtl_ = static_cast<XMaterial*>(createMaterial("default"));
 
 		// we want texture info to sent and get back a shader item.
 		XInputShaderResources input;
@@ -400,7 +410,7 @@ IMaterial* XMaterialManager::createMaterial(const char* MtlName)
 {
 	XMaterial *pMat = nullptr;
 
-	pMat = (XMaterial*)materials_.findAsset(MtlName);
+	pMat = static_cast<XMaterial*>(materials_.findAsset(MtlName));
 
 	if (pMat)
 	{
@@ -411,8 +421,9 @@ IMaterial* XMaterialManager::createMaterial(const char* MtlName)
 		pMat = X_NEW_ALIGNED( XMaterial, g_3dEngineArena, "Material", X_ALIGN_OF(XMaterial));
 		pMat->setName(MtlName);
 
-		if (pListner_)
+		if (pListner_) {
 			pListner_->OnCreateMaterial(pMat);
+		}
 
 		// add it.
 		materials_.AddAsset(MtlName, pMat);
@@ -425,9 +436,10 @@ IMaterial* XMaterialManager::findMaterial(const char* MtlName) const
 {
 	X_ASSERT_NOT_NULL(MtlName);
 
-	XMaterial* pMaterial = (XMaterial*)materials_.findAsset(MtlName);
-	if (pMaterial)
+	XMaterial* pMaterial = static_cast<XMaterial*>(materials_.findAsset(MtlName));
+	if (pMaterial) {
 		return pMaterial;
+	}
 
 	return nullptr;
 }
@@ -438,7 +450,8 @@ IMaterial* XMaterialManager::loadMaterial(const char* MtlName)
 	const char* pExt;
 	IMaterial* iMat;
 
-	if((pExt = core::strUtil::FileExtension(MtlName)))
+	pExt = core::strUtil::FileExtension(MtlName);
+	if(pExt)
 	{
 		// engine should not make requests for materials with a extensiob
 		X_ERROR("MtlMan", "Invalid mtl name extension was included: %s",
@@ -448,18 +461,23 @@ IMaterial* XMaterialManager::loadMaterial(const char* MtlName)
 	}
 
 	// try find it.
-	if (iMat = findMaterial(MtlName)){
+	iMat = findMaterial(MtlName);
+
+	if (iMat)
+	{
 		// inc ref count.
-		((XMaterial*)iMat)->addRef();
+		static_cast<XMaterial*>(iMat)->addRef();
 		return iMat;
 	}
 
 	// lets look for binary first.
-	if ((iMat = loadMaterialCompiled(MtlName))) {
+	iMat = loadMaterialCompiled(MtlName);
+	if (iMat) {
 		return iMat;
 	}
 
-	if ((iMat = loadMaterialXML(MtlName))) {
+	iMat = loadMaterialXML(MtlName);
+	if (iMat) {
 		return iMat;
 	}
 
@@ -471,10 +489,11 @@ void XMaterialManager::unregister(IMaterial* pMat)
 {
 	X_ASSERT_NOT_NULL(pMat);
 
-	XMaterial* pXMat = (XMaterial*)pMat;
+//	XMaterial* pXMat = (XMaterial*)pMat;
 
-	if (pListner_)
+	if (pListner_) {
 		pListner_->OnDeleteMaterial(pMat);
+	}
 }
 
 IMaterial* XMaterialManager::getDefaultMaterial()
@@ -512,7 +531,7 @@ namespace
 
 	void XmlFree(void* pointer)
 	{
-		char* pChar = (char*)pointer;
+		char* pChar = static_cast<char*>(pointer);
 		X_DELETE_ARRAY(pChar, g_3dEngineArena);
 	}
 }
@@ -522,7 +541,7 @@ IMaterial* XMaterialManager::loadMaterialXML(const char* MtlName)
 	X_ASSERT_NOT_NULL(MtlName);
 
 	core::XFileScoped file;
-	core::Path path;
+	core::Path<char> path;
 	size_t length;
 	XMaterial* pMat = nullptr;
 
@@ -530,9 +549,9 @@ IMaterial* XMaterialManager::loadMaterialXML(const char* MtlName)
 	path.setFileName(MtlName);
 	path.setExtension(MTL_FILE_EXTENSION);
 
-	if (!pFileSys_->fileExists(path.c_str())) {
-		return pMat;
-	}
+//	if (!pFileSys_->fileExists(path.c_str())) {
+//		return pMat;
+//	}
 
 	if (file.openFile(path.c_str(), core::fileMode::READ))
 	{
@@ -553,7 +572,7 @@ IMaterial* XMaterialManager::loadMaterialXML(const char* MtlName)
 			xml_node<>* node = doc.first_node("material");
 			if (node)
 			{
-				pMat = (XMaterial*)createMaterial(MtlName);
+				pMat = static_cast<XMaterial*>(createMaterial(MtlName));
 				if (!ProcessMaterialXML(pMat, node))
 				{
 					// failed to load it :|
@@ -578,7 +597,7 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 {
 	X_ASSERT_NOT_NULL(MtlName);
 	core::XFileScoped file;
-	core::Path path;
+	core::Path<char> path;
 	MaterialHeader hdr;
 	XMaterial* pMat = nullptr;
 	uint32_t i;
@@ -587,9 +606,9 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 	path.setFileName(MtlName);
 	path.setExtension(MTL_B_FILE_EXTENSION);
 
-	if (!pFileSys_->fileExists(path.c_str())) {
-		return pMat;
-	}
+//	if (!pFileSys_->fileExists(path.c_str())) {
+//		return pMat;
+//	}
 
 	if (file.openFile(path.c_str(), core::fileMode::READ))
 	{
@@ -604,7 +623,7 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 
 			if (file.readObjs(texture, Num) == Num)
 			{
-				pMat = (XMaterial*)createMaterial(MtlName);
+				pMat = static_cast<XMaterial*>(createMaterial(MtlName));
 				pMat->CullType_ = hdr.cullType;
 				pMat->MatSurfaceType_ = hdr.type;
 				
@@ -617,7 +636,8 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 				
 				for (i = 0; i < Num; i++)
 				{
-					X_ASSERT(texture[i].type < shader::ShaderTextureIdx::ENUM_COUNT, "invalid texture type")();
+					X_ASSERT(texture[i].type < static_cast<int32_t>(shader::ShaderTextureIdx::ENUM_COUNT),
+						"invalid texture type")();
 					input.textures[texture[i].type].name = texture[i].name.c_str();
 				}
 
@@ -644,14 +664,14 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 {
 	X_ASSERT_NOT_NULL(pMat_);
-	core::Path path;
+	core::Path<char> path;
 	XMaterial* pMat;
 	MaterialHeader hdr;
 	uint32_t i, numTex;
 
-	pMat = (XMaterial*)pMat_;
+	pMat = static_cast<XMaterial*>(pMat_);
 
-	path /= "core_assets/materials/";
+	path /= "materials/";
 	path /= pMat->getName();
 	path.setExtension(MTL_B_FILE_EXTENSION);
 
@@ -675,15 +695,17 @@ bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 
 	for (i = 0, numTex = 0; i < ShaderTextureIdx::ENUM_COUNT; i++)
 	{
-		if (pTex = pRes->getTexture((ShaderTextureIdx::Enum)i))
+		pTex = pRes->getTexture(static_cast<ShaderTextureIdx::Enum>(i));
+
+		if (pTex)
 		{
 			textures[numTex].name.set(pTex->name);
-			textures[numTex].type = (ShaderTextureIdx::Enum)i;
+			textures[numTex].type = static_cast<ShaderTextureIdx::Enum>(i);
 			numTex++;
 		}
 	}
 
-	hdr.numTextures = numTex;
+	hdr.numTextures = safe_static_cast<uint8_t, uint32_t>(numTex);
 
 	X_ASSERT(hdr.isValid(), "invalid header")();
 

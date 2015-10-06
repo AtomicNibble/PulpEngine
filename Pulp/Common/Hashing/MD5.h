@@ -51,13 +51,13 @@ namespace Hash
 		static void encode(uint8_t* output, const uint32_t* input, size_t len);
 
 	private:
-		uint32_t state[4];
-		uint32_t count[2]; // bits
-		uint8_t buffer[blocksize];
+		uint32_t state_[4];
+		uint32_t count_[2]; // bits
+		uint8_t buffer_[blocksize];
 
-		bool finalized;
+		bool finalized_;
 
-		MD5Digest digest;
+		MD5Digest digest_;
 	};
 
 

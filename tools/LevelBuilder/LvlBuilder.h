@@ -6,9 +6,13 @@
 #include "MaterialManager.h"
 #include "LvlTypes.h"
 
+#include <array>
+
 class LvlBuilder
 {
 	typedef core::Array<mapfile::XMapEntity*> MapEntArr;
+	typedef core::Array<level::FileStaticModel> StaticModelsArr;
+
 public:
 	LvlBuilder();
 	~LvlBuilder();
@@ -27,11 +31,10 @@ private:
 
 	bool removeDuplicateBrushPlanes(LvlBrush& pBrush);
 
-private:
-	void MakeStructuralFaceList(LvlEntity& ent);
-	void FacesToBSP(LvlEntity& ent);
+private:	
+	bool LoadDefaultModel(void);
 	void calculateLvlBounds(void);
-		
+
 	bool ProcessModel(LvlEntity& ent);
 	bool ProcessWorldModel(LvlEntity& ent);
 
@@ -40,24 +43,7 @@ private:
 	void BuildFaceTree_r(bspNode* node, bspFace* faces, size_t& numLeafs);
 
 private:
-	void MakeTreePortals(LvlEntity& ent);
-	void MakeTreePortals_r(bspNode* node);
-
-	void FilterBrushesIntoTree(LvlEntity& ent);
-	int FilterBrushIntoTree_r(LvlBrush* b, bspNode* node);
 	void SplitBrush(LvlBrush* brush, int32_t planenum, LvlBrush** front, LvlBrush** back);
-
-private:
-	bool FloodEntities(LvlEntity& ent);
-	bool PlaceOccupant(bspNode* node, LvlEntity& ent);
-
-	bool FillOutside(LvlEntity& ent);
-
-	bool ClipSidesByTree(LvlEntity& ent);
-	void ClipSideByTree_r(XWinding* w, LvlBrushSide& side, bspNode *node);
-
-	bool FloodAreas(LvlEntity& ent);
-	void FindAreas_r(bspNode *node, size_t& numAreas);
 
 private:
 	bool PutPrimitivesInAreas(LvlEntity& ent);
@@ -65,9 +51,22 @@ private:
 	void PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 		LvlBrushSide& side, bspNode* pNode);
 
+	bool CreateEntAreaRefs(LvlEntity& worldEnt);
+
+	void AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sphere,
+		const Vec3f boundsPoints[8], bspNode* pNode);
+
+	void CollectStaticModels(void);
+
 private:
+	AABB defaultModelBounds_;
+
+	StaticModelsArr staticModels_;
+
 	LvlEntsArr	entities_;
 	LvlAreaArr	areas_;
+
+	std::array<core::Array<level::MultiAreaEntRef>, level::MAP_MAX_MULTI_REF_LISTS> multiRefLists_;
 
 	core::GrowingStringTableUnique<256, 16, 4, uint32_t> stringTable_;
 
@@ -80,21 +79,8 @@ private:
 
 	lvl::MatManager matMan_;
 
-	struct Stats
-	{
-		Stats()  {
-			core::zero_this(this);
-		}
-		int32_t	numEntities;
-		int32_t	numPatches;
-		int32_t	numBrushes;
-		int32_t	numAreaPortals;
-		int32_t	numFaceLeafs;
-	};
-
-	Stats stats_;
+	LvlStats stats_;
 };
-
 
 
 #endif // !X_LVL_BUILDER_H_

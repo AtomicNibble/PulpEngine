@@ -84,7 +84,7 @@ X_NAMESPACE_BEGIN(model)
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
 #define X_MODEL_MTL_LOWER_CASE_NAMES 1
 
-static const uint32_t	 MODEL_VERSION = 9;
+static const uint32_t	 MODEL_VERSION = 10;
 static const uint32_t	 MODEL_MAX_BONES = 255;
 static const uint32_t	 MODEL_MAX_BONE_NAME_LENGTH = 64;
 static const uint32_t	 MODEL_MAX_MESH = 64;
@@ -133,7 +133,10 @@ private:
 struct bindBone
 {
 	bindBone() {}
-	bindBone(uint16_t id) : compressed_(id * 128) {}
+	bindBone(uint16_t id) : compressed_(id * 128) {
+		X_ASSERT(static_cast<uint32_t>(id) * 128 < std::numeric_limits<uint16_t>::max(), 
+			"Bone id scaled exceeds type limits")(id);
+	}
 
 	X_INLINE uint16_t index() const {
 		return compressed_ / 128;
@@ -430,10 +433,11 @@ struct ModelHeader // File header.
 
 	// do i need this?
 	// the lods store one for each mesh so kinda redundant.
-//	AABB boundingBox;
+	AABB boundingBox;
 
 	LODHeader lodInfo[MODEL_MAX_LODS];
 
+	// definitions in 3DEngine::ModelLoader.cpp
 	bool isValid(void) const;
 };
 
@@ -452,7 +456,7 @@ X_ENSURE_SIZE(Face, 6);
 X_ENSURE_SIZE(SubMeshHeader, 128);
 X_ENSURE_SIZE(MeshHeader, 128);
 X_ENSURE_SIZE(LODHeader, sizeof(MeshHeader)+8);
-X_ENSURE_SIZE(ModelHeader, (sizeof(LODHeader)*MODEL_MAX_LODS) + (48 - 24));
+X_ENSURE_SIZE(ModelHeader, (sizeof(LODHeader)*MODEL_MAX_LODS) + 48);
 
 
 

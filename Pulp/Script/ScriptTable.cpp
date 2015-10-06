@@ -458,10 +458,10 @@ bool XScriptTable::AddFunction(const XUserFunctionDesc& fd)
 	PushRef();
 	lua_pushstring(L, fd.sFunctionName);
 
-	int8 nParamIdOffset = fd.nParamIdOffset;
+	int8 nParamIdOffset = safe_static_cast<int8,int>(fd.nParamIdOffset);
 	if (fd.function)
 	{
-		int nDataSize = sizeof(fd.function) + funcSig.length() + 1 + 1;
+		size_t nDataSize = sizeof(fd.function) + funcSig.length() + 1 + 1;
 
 		// Store functor in first upvalue.
 		unsigned char* pBuffer = (unsigned char*)lua_newuserdata(L, nDataSize);
@@ -476,8 +476,8 @@ bool XScriptTable::AddFunction(const XUserFunctionDesc& fd)
 	{
 		// user data function.
 		UserDataFunction::Pointer function = fd.pUserDataFunc;
-		int nSize = fd.userDataSize;
-		int nTotalSize = sizeof(function)+sizeof(int)+nSize + funcSig.length() + 1 + 1;
+		size_t nSize = fd.userDataSize;
+		size_t nTotalSize = sizeof(function)+sizeof(int)+nSize + funcSig.length() + 1 + 1;
 
 		// Store functor in first upvalue.
 		unsigned char *pBuffer = (unsigned char*)lua_newuserdata(L, nTotalSize);
@@ -590,6 +590,7 @@ void XScriptTable::PushRef(IScriptTable* pObj)
 }
 
 
+X_DISABLE_WARNING(4458) // declaration of 'L' hides class member
 int XScriptTable::StdCFunction(lua_State* L)
 {
 	unsigned char* pBuffer = (unsigned char*)lua_touserdata(L, lua_upvalueindex(1));
@@ -601,8 +602,8 @@ int XScriptTable::StdCFunction(lua_State* L)
 	XFunctionHandler fh(pScriptSystem_, L, sFuncName, nParamIdOffset);
 	
 	
-	int nRet = function->Invoke(&fh);
-	return nRet;
+	int ret = function->Invoke(&fh);
+	return ret;
 }
 
 int XScriptTable::StdCUserDataFunction(lua_State* L)
@@ -619,9 +620,11 @@ int XScriptTable::StdCUserDataFunction(lua_State* L)
 
 	XFunctionHandler fh(pScriptSystem_, L, FuncName, nParamIdOffset);
 	// Call functor.
-	int nRet = (*pFunction)(&fh, pBuffer, nSize); 
-	return nRet;
+	int ret = (*pFunction)(&fh, pBuffer, nSize); 
+	return ret;
 }
+
+X_ENABLE_WARNING(4458)
 
 // --------------------------------------------------------------------------
 

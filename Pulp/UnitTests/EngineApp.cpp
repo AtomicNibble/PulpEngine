@@ -11,7 +11,7 @@ extern HINSTANCE g_hInstance;
 
 void Error(const char* sErrorText)
 {
-	MessageBox(0, sErrorText, X_ENGINE_NAME" Start Error", MB_OK | MB_DEFAULT_DESKTOP_ONLY);
+	MessageBoxA(0, sErrorText, X_ENGINE_NAME" Start Error", MB_OK | MB_DEFAULT_DESKTOP_ONLY);
 }
 
 EngineApp::EngineApp() :

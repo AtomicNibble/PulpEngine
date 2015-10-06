@@ -94,7 +94,7 @@ int XBinds_Io_File::write(IFunctionHandler* pH)
 	core::XFile* pFile;
 	int arg, numArgs;
 
-	if (pFile = getFile(pH))
+	if ((pFile = getFile(pH)) != nullptr)
 	{
 		numArgs = pH->GetParamCount() - 1;
 		for (arg = 2; numArgs--; arg++)
@@ -106,7 +106,8 @@ int XBinds_Io_File::write(IFunctionHandler* pH)
 				case ScriptValueType::STRING:
 			//	pFile->writeString(value.str);
 			// no null term Plz!
-				pFile->write(value.str, core::strUtil::strlen(value.str));
+				pFile->write(value.str, safe_static_cast<uint32_t, size_t>(
+					core::strUtil::strlen(value.str)));
 				break;
 				case ScriptValueType::NUMBER:
 			//	pFile->writeObj(value.number);
@@ -140,7 +141,7 @@ int XBinds_Io_File::read(IFunctionHandler* pH)
 
 	total = 0;
 
-	if (pFile = getFile(pH))
+	if ((pFile = getFile(pH)) != nullptr)
 	{
 		numArgs = pH->GetParamCount() - 1;
 		if (numArgs == 0)
@@ -214,6 +215,7 @@ int XBinds_Io_File::seek(IFunctionHandler* pH)
 	const char* modeStr;
 	int offset;
 
+	mode = SeekMode::CUR;
 	modeStr = nullptr;
 	offset = 0;
 
@@ -248,12 +250,12 @@ int XBinds_Io_File::seek(IFunctionHandler* pH)
 
 		if (i == numModes)
 		{ 
-			mode = SeekMode::CUR;
 			pScriptSys_->OnScriptError("Unkown file:seek mode: \"%s\" valid modes: cur,set,end", mode);
+			return pH->EndFunction();
 		}
 	}
 
-	if (pFile = getFile(pH))
+	if ((pFile = getFile(pH)) != nullptr)
 	{
 		// if random access is not set, file system will print error.
 		// may add a check here, and handle it diffrently.
@@ -267,7 +269,7 @@ int XBinds_Io_File::close(IFunctionHandler* pH)
 {
 	core::XFile* pFile;
 
-	if (pFile = getFile(pH,1,true))
+	if ((pFile = getFile(pH,1,true)) != nullptr)
 	{
 		if (pFile)
 			pFileSys_->closeFile(pFile);
@@ -281,7 +283,7 @@ int XBinds_Io_File::close(IFunctionHandler* pH)
 int XBinds_Io_File::readNumber(IFunctionHandler* pH, core::XFile* pFile)
 {
 	X_ASSERT_NOT_NULL(pFile);
-
+	X_ASSERT_NOT_IMPLEMENTED();
 
 	return pH->EndFunction();
 }
@@ -289,8 +291,8 @@ int XBinds_Io_File::readNumber(IFunctionHandler* pH, core::XFile* pFile)
 int XBinds_Io_File::readLine(IFunctionHandler* pH, core::XFile* pFile, bool keepEol)
 {
 	X_ASSERT_NOT_NULL(pFile);
-
-
+	X_ASSERT_NOT_IMPLEMENTED();
+	X_UNUSED(keepEol);
 	return pH->EndFunction();
 }
 
@@ -422,7 +424,7 @@ int XBinds_Io::openFile(IFunctionHandler* pH)
 	const char* fileName = nullptr;
 	const char* mode = nullptr;
 	size_t i;
-	core::Path path;
+	core::Path<char> path;
 
 	core::fileModeFlags flags = core::fileMode::READ | fileMode::RANDOM_ACCESS;
 
@@ -500,7 +502,7 @@ int XBinds_Io::closeFile(IFunctionHandler* pH)
 
 	core::XFile* pFile;
 
-	if (pFile = XBinds_Io_File::getFile(pH,1,true))
+	if ((pFile = XBinds_Io_File::getFile(pH,1,true)) != nullptr)
 	{
 		pFileSys_->closeFile(pFile);
 	}

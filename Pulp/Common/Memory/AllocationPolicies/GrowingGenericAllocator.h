@@ -49,11 +49,11 @@ private:
 	X_NO_COPY(GrowingGenericAllocator);
 	X_NO_ASSIGN(GrowingGenericAllocator);
 
-	GrowingMicroAllocator m_microAllocator;
-	GrowingBlockAllocator m_blockAllocator;
+	GrowingMicroAllocator microAllocator_;
+	GrowingBlockAllocator blockAllocator_;
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	MemoryAllocatorStatistics m_statistics;
+	MemoryAllocatorStatistics statistics_;
 #endif
 };
 

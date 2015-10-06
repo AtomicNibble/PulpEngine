@@ -56,7 +56,7 @@ public:
 
 	Matrix33();
 
-	Matrix33( T s );
+	explicit Matrix33( T s );
 
 	// OpenGL layout - unless srcIsRowMajor is true
 	Matrix33( const T *dt, bool srcIsRowMajor = false );

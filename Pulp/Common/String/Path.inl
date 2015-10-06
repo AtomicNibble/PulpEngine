@@ -1,75 +1,86 @@
 
-
-Path::Path()
+template<typename TChar>
+Path<TChar>::Path()
 {
 
 }
 
-Path::Path(const Path& oth)
+template<typename TChar>
+Path<TChar>::Path(const Path& oth)
 {
-	append(oth.c_str(), (uint32_t)oth.length());
+	append(oth.c_str(), oth.length());
 }
 
-Path::Path(const char* const str) : StackString<MAX_PATH>(str)
+template<typename TChar>
+Path<TChar>::Path(const TChar* const str) : StackString<MAX_PATH, TChar>(str)
 {
 
 }
 
-const char* Path::fileName(void) const
+template<typename TChar>
+const TChar* Path<TChar>::fileName(void) const
 {
-	const char* res = findLast(NATIVE_SLASH);
-
-	if (!res || res == end())
-	{
-		// check both :Z
-		res = findLast(NON_NATIVE_SLASH);
-		if (!res || res == end())
-			return str_;
+	const TChar* native = findLast(NATIVE_SLASH);
+	// folder//
+	if (native == end() - 1) {
+		return native + 1;
 	}
-	return res + 1;
+
+	const TChar* noneNative = findLast(NON_NATIVE_SLASH);
+
+	if (!native && !noneNative)
+		return str_;
+	if (!noneNative && native)
+		return native + 1;
+	if (noneNative && !native)
+		return noneNative + 1;
+
+
+	// work out which is bigger
+	const TChar* last = core::Max(native, noneNative);
+
+	return last + 1;
 }
 
-const char* Path::extension(void) const
+template<typename TChar>
+const TChar* Path<TChar>::extension(void) const
 {
-	const char* res = findLast('.');
+	const TChar* res = findLast('.');
 
 	if (!res)
 		return str_;
 	return res;
 }
 
-void Path::setExtension(const char* extension)
+template<typename TChar>
+void Path<TChar>::setExtension(const TChar* extension)
 {
-	const char* remove = findLast('.');	// need to remvoe a extension?
+	const TChar* remove = findLast('.');	// need to remvoe a extension?
 	bool has_dot = (extension[0] == '.'); // new extension got a dot?
 	bool is_blank = (extension[0] == '\0'); // 
 
-	if (remove) { // replace making sure dot is kept.
-		// check if the same.
-		if (strUtil::IsEqual(has_dot ? remove : remove + 1, extension))
-			return;
-
-		// replace last.
-		if (is_blank)
-			--remove;
-		replace(remove, ++remove, has_dot ? ++extension : extension);
-		return;
+	if (remove) { 
+		trimRight(remove);
 	}
 
-	if (!has_dot)
-		append('.',1);
-	
-	append(extension);
+	if (!is_blank) 
+	{
+		if (!has_dot) {
+			append('.', 1);
+		}
+
+		append(extension);
+	}
 }
 
-
-void Path::setFileName(const char* filename)
+template<typename TChar>
+void Path<TChar>::setFileName(const TChar* filename)
 {
 	// place in temp buffer otherwise
 	// the original file name would be update
 	// while we are replacing.
 
-	const char* name = fileName();
+	const TChar* name = fileName();
 
 	if (isEmpty() || (name == end()))
 	{
@@ -77,43 +88,48 @@ void Path::setFileName(const char* filename)
 	}
 	else 
 	{
-		StackString<MAX_PATH> temp(str_, name); // want the text before filename
+		StackString<MAX_PATH, TChar> temp(str_, name); // want the text before filename
 		temp.append(filename);
 
 		*this = temp.c_str();
 	}
 }
 
-void Path::operator=(const char* str)
+template<typename TChar>
+void Path<TChar>::operator=(const TChar* str)
 {
 	len_ = strUtil::strlen(str);
-	len_ = core::Min<uint32_t>(len_, MAX_PATH);
-	memcpy(str_, str, len_+1);
+	len_ = core::Min<size_t>(len_, MAX_PATH);
+	memcpy(str_, str, (len_ + 1) * sizeof(TChar));
 }
 
 // -----------------------------------------------
 
-const Path Path::operator/(const Path& oth) const
+template<typename TChar>
+const Path<TChar> Path<TChar>::operator/(const Path<TChar>& oth) const
 {
 	Path path(*this);
 	path.append(oth.c_str());
 	return path;
 }
 
-const Path Path::operator/(const char* str) const
+template<typename TChar>
+const Path<TChar> Path<TChar>::operator/(const TChar* str) const
 {
-	Path path(*this);
+	Path<TChar> path(*this);
 	path.append(str);
 	return path;
 }
 
-const Path& Path::operator/=(const Path& oth)
+template<typename TChar>
+const Path<TChar>& Path<TChar>::operator/=(const Path<TChar>& oth)
 {
-	append(oth.c_str(), (uint32_t)oth.length());
+	append(oth.c_str(), oth.length());
 	return *this;
 }
 
-const Path& Path::operator/=(const char* str)
+template<typename TChar>
+const Path<TChar>& Path<TChar>::operator/=(const TChar* str)
 {
 	append(str);
 	return *this;
@@ -121,8 +137,8 @@ const Path& Path::operator/=(const char* str)
 
 
 // -----------------------------------------------
-
-inline void Path::ensureSlash(void)
+template<typename TChar>
+inline void Path<TChar>::ensureSlash(void)
 {
 	if (this->len_ > 0) {
 		stripTrailing(NATIVE_SLASH);
@@ -130,28 +146,55 @@ inline void Path::ensureSlash(void)
 	}
 }
 
-inline void Path::replaceSeprators(void)
+template<>
+inline void Path<char>::replaceSeprators(void)
 {
 	replaceAll(NON_NATIVE_SLASH, NATIVE_SLASH);
 }
 
-inline void Path::removeFileName(void)
+template<>
+inline void Path<wchar_t>::replaceSeprators(void)
 {
-	this->replace(this->fileName(),"");
+	replaceAll(NON_NATIVE_SLASH_W, NATIVE_SLASH_W);
 }
 
-inline void Path::removeExtension(void)
+template<>
+inline void Path<char>::removeFileName(void)
 {
-	setExtension("");
+	this->replace(this->fileName(), "");
 }
 
-inline void Path::removeTrailingSlash(void)
+template<>
+inline void Path<wchar_t>::removeFileName(void)
+{
+	this->replace(this->fileName(), L"");
+}
+
+template<>
+inline void Path<char>::removeExtension(void)
+{
+	if (isNotEmpty()) {
+		setExtension("");
+	}
+}
+
+template<>
+inline void Path<wchar_t>::removeExtension(void)
+{
+	if (isNotEmpty()) {
+		setExtension(L"");
+	}
+}
+
+template<typename TChar>
+inline void Path<TChar>::removeTrailingSlash(void)
 {
 	replaceSeprators();
 	stripTrailing(NATIVE_SLASH);
 }
 
-inline bool Path::isAbsolute(void) const
+template<typename TChar>
+inline bool Path<TChar>::isAbsolute(void) const
 {
 	return	str_[0] == NATIVE_SLASH ||
 		str_[0] == NON_NATIVE_SLASH ||

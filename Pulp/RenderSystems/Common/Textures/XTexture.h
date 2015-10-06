@@ -26,6 +26,7 @@ struct XTextureFile;
 
 static const size_t TEX_MAX_SLOTS = 8;
 
+X_DISABLE_WARNING(4324)
 class X_ALIGNED_SYMBOL(XTexture, 64) : public ITexture, public core::XBaseAsset
 {
 
@@ -134,7 +135,7 @@ public:
 	static XTexture* NewTexture(const char *name, const Vec2i& size, TextureFlags Flags, 
 		Texturefmt::Enum fmt);
 
-	static XTexture* Create2DTexture(const char* name, const Vec2i& size, int nMips, TextureFlags Flags,
+	static XTexture* Create2DTexture(const char* name, const Vec2i& size, size_t numMips, TextureFlags Flags,
 		byte* pData, Texturefmt::Enum fmt);
 
 	static XTexture* CreateRenderTarget(const char* name, uint32_t width, uint32_t height,
@@ -209,6 +210,7 @@ private:
 
 };
 
+X_ENABLE_WARNING(4324)
 // X_ENSURE_SIZE(XTexture, 64);
 
 X_NAMESPACE_END

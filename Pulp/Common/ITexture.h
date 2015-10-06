@@ -16,8 +16,8 @@ struct XFile;
 X_NAMESPACE_BEGIN(texture)
 
 // defaults.
-static const char* TEX_DEFAULT_DIFFUSE = "core_assets/Textures/default.dds";
-static const char* TEX_DEFAULT_BUMP = "core_assets/Textures/$identitynormal.dds";
+static const char* TEX_DEFAULT_DIFFUSE = "Textures/default.dds";
+static const char* TEX_DEFAULT_BUMP = "Textures/$identitynormal.dds";
 
 static const uint32_t	 TEX_MAX_DIMENSIONS = 4096;
 static const uint32_t	 TEX_MAX_MIPS = 13;
@@ -274,7 +274,7 @@ struct ITextureLoader
 {
 	virtual ~ITextureLoader() {}
 
-	virtual bool canLoadFile(const core::Path& path) const X_ABSTRACT;
+	virtual bool canLoadFile(const core::Path<char>& path) const X_ABSTRACT;
 	virtual XTextureFile* loadTexture(core::XFile* file) X_ABSTRACT;
 };
 

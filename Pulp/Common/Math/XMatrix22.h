@@ -51,7 +51,7 @@ public:
 
 	Matrix22();
 
-	Matrix22( T s );
+	explicit Matrix22(T s);
 
 	// OpenGL layout - unless srcIsRowMajor is true
 	Matrix22( const T *dt, bool srcIsRowMajor = false );

@@ -51,8 +51,10 @@ XParser::~XParser()
 	
 void XParser::freeSource(void)
 {
-	if (pLexer_)
+	if (pLexer_) {
 		X_DELETE(pLexer_, arena_);
+		pLexer_ = nullptr;
+	}
 }
 
 bool XParser::LoadMemory(const char* startInclusive, const char* endExclusive, const char* name)
@@ -72,7 +74,9 @@ bool XParser::LoadMemory(const char* startInclusive, const char* endExclusive, c
 
 int	XParser::ReadToken(XLexToken& token)
 {
-	while (1)
+	X_DISABLE_WARNING(4127)
+	while (true)
+	X_ENABLE_WARNING(4127)
 	{
 		if (!ReadSourceToken(token))
 			return false;
@@ -303,12 +307,12 @@ bool XParser::ReadDirective(void)
 	return false;
 }
 
-bool XParser::isInCache(const char ch) const
+bool XParser::isInCache(const uint8_t ch) const
 {
 	return macroCharCache[ch] == 1;
 }
 
-void XParser::addToCache(const char ch)
+void XParser::addToCache(const uint8_t ch)
 {
 	macroCharCache[ch] = 1;
 }
@@ -362,7 +366,9 @@ bool XParser::Directive_define(void)
 
 		if (!CheckTokenString(")")) 
 		{
-			while (1) 
+			X_DISABLE_WARNING(4127)
+			while (true)
+			X_ENABLE_WARNING(4127)
 			{
 				if (!ReadLine(token)) {
 					Error("expected define parameter");
@@ -417,7 +423,7 @@ bool XParser::Directive_define(void)
 
 	do
 	{
-		XLexToken* t = X_NEW(XLexToken, arena_, "Macrotoken")(token);
+		XLexToken* pT = X_NEW(XLexToken, arena_, "Macrotoken")(token);
 
 		if (token.type == TT_NAME && token.isEqual(define->name)) {
 		//	t->flags |= TOKEN_FL_RECURSIVE_DEFINE;
@@ -425,8 +431,8 @@ bool XParser::Directive_define(void)
 		}
 	//	t->ClearTokenWhiteSpace();
 		
-		t->pNext_ = define->pTokens;
-		define->pTokens = t;
+		pT->pNext_ = define->pTokens;
+		define->pTokens = pT;
 
 	} while (ReadLine(token));
 
@@ -642,6 +648,7 @@ bool XParser::ExpandDefine(XLexToken& deftoken, MacroDefine* pDefine,
 			// if stringizing operator
 			if (dt->isEqual("#"))
 			{
+				t = nullptr; // warn 4701 fix.
 				X_ASSERT_NOT_IMPLEMENTED();
 			}
 			else
@@ -649,6 +656,7 @@ bool XParser::ExpandDefine(XLexToken& deftoken, MacroDefine* pDefine,
 				t = X_NEW(XLexToken,arena_,"DefineToken")(*dt);
 				t->line = deftoken.line;
 			}
+
 			// add the token to the list
 			t->pNext_ = nullptr;
 			// the token being read from the define list should use the line number of
@@ -727,7 +735,7 @@ void XParser::addDefinetoHash(MacroDefine* define)
 {
 	X_ASSERT_NOT_NULL(define);
 
-	macros_.insert(MacroMap::value_type(define->name.c_str(),define));
+	macros_.insert(MacroMap::value_type(core::string(define->name.c_str()), define));
 }
 
 

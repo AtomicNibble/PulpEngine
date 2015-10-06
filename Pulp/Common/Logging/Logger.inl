@@ -4,13 +4,13 @@
 template <class FilterPolicy, class FormatPolicy, class WritePolicy>
 Logger<FilterPolicy, FormatPolicy, WritePolicy>::Logger(void) :
 	LoggerBase(),
-	m_filter(),
-	m_formatter(),
-	m_writer()
+	filter_(),
+	formatter_(),
+	writer_()
 {
-	m_filter.Init();
-	m_formatter.Init();
-	m_writer.Init();
+	filter_.Init();
+	formatter_.Init();
+	writer_.Init();
 }
 
 
@@ -19,13 +19,13 @@ Logger<FilterPolicy, FormatPolicy, WritePolicy>::Logger(void) :
 template <class FilterPolicy, class FormatPolicy, class WritePolicy>
 Logger<FilterPolicy, FormatPolicy, WritePolicy>::Logger(const FilterPolicy& filter, const FormatPolicy& formatter, const WritePolicy& writer) :
 	LoggerBase(),
-	m_filter(filter),
-	m_formatter(formatter),
-	m_writer(writer)
+	filter_(filter),
+	formatter_(formatter),
+	writer_(writer)
 {
-	m_filter.Init();
-	m_formatter.Init();
-	m_writer.Init();
+	filter_.Init();
+	formatter_.Init();
+	writer_.Init();
 }
 
 
@@ -34,9 +34,9 @@ Logger<FilterPolicy, FormatPolicy, WritePolicy>::Logger(const FilterPolicy& filt
 template <class FilterPolicy, class FormatPolicy, class WritePolicy>
 Logger<FilterPolicy, FormatPolicy, WritePolicy>::~Logger(void)
 {
-	m_filter.Exit();
-	m_formatter.Exit();
-	m_writer.Exit();
+	filter_.Exit();
+	formatter_.Exit();
+	writer_.Exit();
 }
 
 
@@ -45,11 +45,11 @@ Logger<FilterPolicy, FormatPolicy, WritePolicy>::~Logger(void)
 template <class FilterPolicy, class FormatPolicy, class WritePolicy>
 void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoLog(const SourceInfo& sourceInfo, const char* channel, size_t verbosity, const char* format, va_list args)
 {
-	if (m_filter.Filter("INFO", sourceInfo, channel, verbosity, format, args))
+	if (filter_.Filter("INFO", sourceInfo, channel, verbosity, format, args))
 	{
 		LoggerBase::Line line = {};
-		const uint32_t length = m_formatter.Format(line, pLog_->GetIndentation(), "INFO", sourceInfo, channel, verbosity, format, args);
-		m_writer.WriteLog(line, length);
+		const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), "INFO", sourceInfo, channel, verbosity, format, args);
+		writer_.WriteLog(line, length);
 	}
 }
 
@@ -59,11 +59,11 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoLog(const SourceInfo& so
 template <class FilterPolicy, class FormatPolicy, class WritePolicy>
 void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoWarning(const SourceInfo& sourceInfo, const char* channel, const char* format, va_list args)
 {
-	if (m_filter.Filter("WARNING", sourceInfo, channel, 0, format, args))
+	if (filter_.Filter("WARNING", sourceInfo, channel, 0, format, args))
 	{
 		LoggerBase::Line line = {};
-		const uint32_t length = m_formatter.Format(line, pLog_->GetIndentation(), "WARNING", sourceInfo, channel, 0, format, args);
-		m_writer.WriteWarning(line, length);
+		const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), "WARNING", sourceInfo, channel, 0, format, args);
+		writer_.WriteWarning(line, length);
 	}
 }
 
@@ -73,11 +73,11 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoWarning(const SourceInfo
 template <class FilterPolicy, class FormatPolicy, class WritePolicy>
 void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoError(const SourceInfo& sourceInfo, const char* channel, const char* format, va_list args)
 {
-	if (m_filter.Filter("ERROR", sourceInfo, channel, 0, format, args))
+	if (filter_.Filter("ERROR", sourceInfo, channel, 0, format, args))
 	{
 		LoggerBase::Line line = {};
-		const uint32_t length = m_formatter.Format(line, pLog_->GetIndentation(), "ERROR", sourceInfo, channel, 0, format, args);
-		m_writer.WriteError(line, length);
+		const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), "ERROR", sourceInfo, channel, 0, format, args);
+		writer_.WriteError(line, length);
 	}
 }
 
@@ -87,11 +87,11 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoError(const SourceInfo& 
 template <class FilterPolicy, class FormatPolicy, class WritePolicy>
 void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoFatal(const SourceInfo& sourceInfo, const char* channel, const char* format, va_list args)
 {
-	if (m_filter.Filter("FATAL", sourceInfo, channel, 0, format, args))
+	if (filter_.Filter("FATAL", sourceInfo, channel, 0, format, args))
 	{
 		LoggerBase::Line line = {};
-		const uint32_t length = m_formatter.Format(line, pLog_->GetIndentation(), "FATAL", sourceInfo, channel, 0, format, args);
-		m_writer.WriteFatal(line, length);
+		const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), "FATAL", sourceInfo, channel, 0, format, args);
+		writer_.WriteFatal(line, length);
 	}
 }
 
@@ -100,11 +100,11 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoFatal(const SourceInfo& 
 template <class FilterPolicy, class FormatPolicy, class WritePolicy>
 void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoAssert(const SourceInfo& sourceInfo, const char* format, va_list args)
 {
-	if (m_filter.Filter("ASSERT", sourceInfo, "Assert", 0, format, args))
+	if (filter_.Filter("ASSERT", sourceInfo, "Assert", 0, format, args))
 	{
 		LoggerBase::Line line = {};
-		const uint32_t length = m_formatter.Format(line, pLog_->GetIndentation(), "ASSERT", sourceInfo, "Assert", 0, format, args);
-		m_writer.WriteAssert(line, length);
+		const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), "ASSERT", sourceInfo, "Assert", 0, format, args);
+		writer_.WriteAssert(line, length);
 	}
 }
 
@@ -114,11 +114,11 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoAssert(const SourceInfo&
 template <class FilterPolicy, class FormatPolicy, class WritePolicy>
 void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoAssertVariable(const SourceInfo& sourceInfo, const char* format, va_list args)
 {
-	if (m_filter.Filter("ASSERT", sourceInfo, "Assert", 0, format, args))
+	if (filter_.Filter("ASSERT", sourceInfo, "Assert", 0, format, args))
 	{
 		LoggerBase::Line line = {};
-		const uint32_t length = m_formatter.Format(line, pLog_->GetIndentation(), "ASSERT", sourceInfo, "Assert", 0, format, args);
-		m_writer.WriteAssertVariable(line, length);
+		const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), "ASSERT", sourceInfo, "Assert", 0, format, args);
+		writer_.WriteAssertVariable(line, length);
 	}
 }
 
@@ -128,7 +128,7 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoAssertVariable(const Sou
 template <class FilterPolicy, class FormatPolicy, class WritePolicy>
 const FilterPolicy& Logger<FilterPolicy, FormatPolicy, WritePolicy>::GetFilterPolicy(void) const
 {
-	return m_filter;
+	return filter_;
 }
 
 
@@ -137,7 +137,7 @@ const FilterPolicy& Logger<FilterPolicy, FormatPolicy, WritePolicy>::GetFilterPo
 template <class FilterPolicy, class FormatPolicy, class WritePolicy>
 const FormatPolicy& Logger<FilterPolicy, FormatPolicy, WritePolicy>::GetFormatPolicy(void) const
 {
-	return m_formatter;
+	return formatter_;
 }
 
 
@@ -146,5 +146,5 @@ const FormatPolicy& Logger<FilterPolicy, FormatPolicy, WritePolicy>::GetFormatPo
 template <class FilterPolicy, class FormatPolicy, class WritePolicy>
 const WritePolicy& Logger<FilterPolicy, FormatPolicy, WritePolicy>::GetWritePolicy(void) const
 {
-	return m_writer;
+	return writer_;
 }

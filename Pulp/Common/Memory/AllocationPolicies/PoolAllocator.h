@@ -41,7 +41,6 @@ X_NAMESPACE_BEGIN(core)
 /// Common usage scenarios for a pool allocator are situations in which lots of objects need to be allocated and freed
 /// in random order, such as dynamic gameplay elements, or things like bullet holes, contact points, etc.
 ///
-/// For more information about the pool allocator, visit http://molecularmusings.wordpress.com/2012/09/17/memory-allocation-strategies-a-pool-allocator/.
 /// \remark Statistics gathering can be enabled/disabled via the preprocessor option \ref X_ENABLE_MEMORY_ALLOCATOR_STATISTICS.
 /// If statistics are disabled, the allocator will still return a valid MemoryAllocatorStatistics object which is
 /// initialized to its default values.
@@ -68,18 +67,18 @@ public:
 	MemoryAllocatorStatistics getStatistics(void) const;
 
 private:
-	Freelist m_freelist;
-	size_t m_maxSize;
+	Freelist freelist_;
+	size_t maxSize_;
 
 #if X_ENABLE_POOL_ALLOCATOR_CHECK
-	size_t m_maxAlignment;
-	size_t m_offset;
+	size_t maxAlignment_;
+	size_t offset_;
 #endif
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	size_t m_elementSize;
-	size_t m_wastePerElement;
-	MemoryAllocatorStatistics m_statistics;
+	size_t elementSize_;
+	size_t wastePerElement_;
+	MemoryAllocatorStatistics statistics_;
 #endif
 };
 

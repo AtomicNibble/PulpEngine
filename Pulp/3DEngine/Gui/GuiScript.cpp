@@ -10,7 +10,8 @@ namespace
 {
 	void Script_Set(XWindow* window, core::Array<XGSWinVar>& src)
 	{
-
+		X_UNUSED(window);
+		X_UNUSED(src);
 	}
 
 	void Script_ResetTime(XWindow* window, core::Array<XGSWinVar>& src)
@@ -171,7 +172,10 @@ bool XGuiScript::Parse(core::XParser& lex)
 	// now read parms til ;
 	// all parms are read as idWinStr's but will be fixed up later 
 	// to be proper types
-	while (1) {
+	X_DISABLE_WARNING(4127)
+	while (true)
+	X_ENABLE_WARNING(4127)
+	{
 		if (!lex.ReadToken(token)) {
 			X_ERROR("Gui", "unexpected end of file, while parsing '%s'", name.c_str());
 			return false;
@@ -190,7 +194,7 @@ bool XGuiScript::Parse(core::XParser& lex)
 
 
 		XWinStr* str = X_NEW( XWinStr,g_3dEngineArena,"TransVar");
-		*str = temp.c_str();
+		*str = core::string(temp.c_str());
 		XGSWinVar wv;
 		wv.own = true;
 		wv.var = str;

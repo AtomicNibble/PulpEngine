@@ -76,11 +76,11 @@ void AreaModel::EndModel(void)
 
 LvlArea::LvlArea() :
 areaMeshes(g_arena),
-entities(g_arena), 
-cullSections(g_arena)
+entRefs(g_arena)
+// cullSections(g_arena)
 {
 	areaMeshes.reserve(2048);
-	entities.setGranularity(512);
+	entRefs.reserve(256);
 }
 
 void LvlArea::AreaBegin(void)
@@ -150,7 +150,7 @@ AreaSubMesh* LvlArea::MeshForSide(const LvlBrushSide& side, StringTableType& str
 	newMesh.matName_ = side.matInfo.name;
 
 	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes.insert(
-		AreaMeshMap::value_type(side.matInfo.name.c_str(), newMesh)
+		AreaMeshMap::value_type(core::string(side.matInfo.name.c_str()), newMesh)
 	);
 
 	return &newIt.first->second;

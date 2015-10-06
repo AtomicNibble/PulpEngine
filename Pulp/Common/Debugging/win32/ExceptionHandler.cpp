@@ -1,6 +1,8 @@
 #include "EngineCommon.h"
 
+X_DISABLE_WARNING(4091)
 #include <DbgHelp.h>
+X_ENABLE_WARNING(4091)
 
 #include "ExceptionHandler.h"
 
@@ -139,7 +141,7 @@ namespace exceptionHandler
 
 		_tagSTACKFRAME64	stackFrame;
 
-		Path filename;
+		Path<char> filename;
 
 		DWORD Code = ExceptionRecord->ExceptionCode;
 
@@ -310,7 +312,7 @@ namespace exceptionHandler
 				X_LOG0( "ExceptionHandler", "Quitting the application." );		
 			}
 
-			MessageBox( GetDesktopWindow(), "Unhandled exception! The program will now close.", X_ENGINE_NAME" Error", MB_TOPMOST | MB_ICONERROR );
+			MessageBoxA( GetDesktopWindow(), "Unhandled exception! The program will now close.", X_ENGINE_NAME" Error", MB_TOPMOST | MB_ICONERROR );
 		}
 
 		return 1;
@@ -325,7 +327,7 @@ namespace exceptionHandler
 
 		_tagSTACKFRAME64	stackFrame;
 
-		Path filename;
+		Path<char> filename;
 
 
 		DWORD Code = ExceptionRecord->ExceptionCode;
@@ -489,7 +491,7 @@ namespace exceptionHandler
 			}
 
 
-			MessageBox( GetDesktopWindow(), "Unhandled exception! The program will now close.", X_ENGINE_NAME" Error", MB_TOPMOST | MB_ICONERROR );
+			MessageBoxA( GetDesktopWindow(), "Unhandled exception! The program will now close.", X_ENGINE_NAME" Error", MB_TOPMOST | MB_ICONERROR );
 		}
 		return 1;
 	}
@@ -499,11 +501,12 @@ namespace exceptionHandler
 #endif
 
 
-	LONG WINAPI HandleException( _EXCEPTION_POINTERS *exceptionPointers )
+	LONG WINAPI HandleException( _EXCEPTION_POINTERS* exceptionPointers )
 	{
 #if X_ENABLE_UNHANDLED_EXCEPTION_HANDLER
 		return internal::HandleException(exceptionPointers);
 #else
+		X_UNUSED(exceptionPointers);
 		return 1;
 #endif
 	}

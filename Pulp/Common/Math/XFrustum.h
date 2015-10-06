@@ -36,7 +36,7 @@ class XFrustum
 public:
 	XFrustum();
 
-	void SetFrustum(int nWidth, int nHeight, float32_t FOV, float32_t nearplane,
+	void SetFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV, float32_t nearplane,
 		float32_t farpane, float32_t fPixelAspectRatio);
 
 	// set some data
@@ -45,7 +45,7 @@ public:
 	void setSize(float dNear, float dFar, float dLeft, float dUp);
 
 	// get a goat
-	const Vec3f& getPosition(void) const;
+	const Vec3f getPosition(void) const;
 	const Matrix33f getAxis(void) const;
 	const Matrix34f& getMatrix(void) const;
 	Vec3f getCenter(void) const;
@@ -83,9 +83,22 @@ public:
 	CullType::Enum cullSphere_FastT(const Sphere& sphere) const;
 	CullType::Enum cullSphere_ExactT(const Sphere& sphere) const;
 
-
 	void GetFrustumVertices(Vec3f* pVerts) const;
 
+	X_INLINE float32_t getFov() const { return fov_; }
+	X_INLINE float32_t getProjectionRatio() const { return projectionRatio_; }
+
+	X_INLINE void setAngles(const Vec3f& angles) {
+		setAxis(Matrix33f::createRotation(angles));
+	}
+
+	X_INLINE Planef getFrustumPlane(FrustumPlane::Enum pl) {
+		return planes_[pl];
+	}
+
+	X_INLINE const Planef& getFrustumPlane(FrustumPlane::Enum pl) const {
+		return planes_[pl];
+	}
 
 private:
 	CullType::Enum AdditionalCheck(const AABB& aabb) const;
@@ -104,8 +117,8 @@ private:
 	float up_;
 	float invFar_;		// 1.0f / dFar
 	
-	int width_;
-	int height_;
+	uint32_t width_;
+	uint32_t height_;
 	float fov_;
 	float projectionRatio_;
 	float pixelAspectRatio_;

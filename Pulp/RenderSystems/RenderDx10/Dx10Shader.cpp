@@ -51,10 +51,10 @@ InputLayoutFormat::Enum ILfromVertexFormat(const VertexFormat::Enum fmt)
 			X_ASSERT_UNREACHABLE();
 			return InputLayoutFormat::POS_UV;
 #else
+		default:
 			X_NO_SWITCH_DEFAULT;
 #endif // !X_DEBUG
 	}
-	return InputLayoutFormat::Invalid;
 }
 
 ILFlags IlFlagsForVertexFormat(const VertexFormat::Enum fmt)
@@ -109,17 +109,17 @@ bool XShader::FXSetTechnique(const char* name, const TechFlags flag)
 bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 {
 	size_t i;
-	for (i = 0; i< techs.size(); i++)
+	for (i = 0; i< techs_.size(); i++)
 	{
-		if (techs[i].nameHash == name)
+		if (techs_[i].nameHash == name)
 		{
 			render::DX11XRender* rd = &render::g_Dx11D3D;
 
-			XShaderTechnique& tech = techs[i];
+			XShaderTechnique& tech = techs_[i];
 
-			rd->m_State.pCurShader = this;
-			rd->m_State.pCurShaderTech = &tech;
-			rd->m_State.CurShaderTechIdx = (int32)i;
+			rd->State_.pCurShader = this;
+			rd->State_.pCurShaderTech = &tech;
+			rd->State_.CurShaderTechIdx = (int32)i;
 
 
 			// work out which HW tech to used based on the flags :D !
@@ -155,31 +155,33 @@ bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 	}
 
 	X_BREAKPOINT;
-	X_WARNING("Shader", "failed to find technique: %i", name);
+	X_WARNING("Shader", "failed to find technique: %i", name_);
 	return false;
 }
 
-bool XShader::FXBegin(uint32 *uiPassCount, uint32 nFlags)
+bool XShader::FXBegin(uint32 *pPassCountOut, uint32 flags)
 {
+	X_UNUSED(flags);
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 
-	if (!rd->m_State.pCurShader || !rd->m_State.pCurShaderTech) {
+	if (!rd->State_.pCurShader || !rd->State_.pCurShaderTech) {
 		X_WARNING("Shader", "can't begin technique, none set");
 		return false;
 	}
 
-	if (uiPassCount)
-		*uiPassCount = 1;
+	if (pPassCountOut) {
+		*pPassCountOut = 1;
+	}
 
 	return true;
 }
 
-bool XShader::FXBeginPass(uint32 uiPass)
+bool XShader::FXBeginPass(uint32 passIdx)
 {
-	X_UNUSED(uiPass);
+	X_UNUSED(passIdx);
 
 	render::DX11XRender* rd = &render::g_Dx11D3D;
-	render::RenderState& state = rd->m_State;
+	render::RenderState& state = rd->State_;
 
 	if (!state.pCurShader || !state.pCurShaderTech) {
 		X_WARNING("Shader", "fail to start pass, none set");
@@ -214,13 +216,13 @@ bool XShader::FXBeginPass(uint32 uiPass)
 		{
 			// humm potentially the correct input will be set later.
 			// i will warm and fix any code that sets it after tho.
-			X_WARNING("Shader", "could not find a hardware tech that fits the current vertexFmt");
+		//	X_WARNING("Shader", "could not find a hardware tech that fits the current vertexFmt");
 		}
 	}
 
-	XHWShader_Dx10* pVS = (XHWShader_Dx10*)pHwTech->pVertexShader;
-	XHWShader_Dx10* pPS = (XHWShader_Dx10*)pHwTech->pPixelShader;
-	XHWShader_Dx10* pGS = (XHWShader_Dx10*)pHwTech->pGeoShader;
+	XHWShader_Dx10* pVS = static_cast<XHWShader_Dx10*>(pHwTech->pVertexShader);
+	XHWShader_Dx10* pPS = static_cast<XHWShader_Dx10*>(pHwTech->pPixelShader);
+	XHWShader_Dx10* pGS = static_cast<XHWShader_Dx10*>(pHwTech->pGeoShader);
 
 	if (!pVS || !pPS)
 	{
@@ -258,9 +260,9 @@ bool XShader::FXBeginPass(uint32 uiPass)
 	return true;
 }
 
-bool XShader::FXCommit(const uint32 nFlags)
+bool XShader::FXCommit(const uint32 flags)
 {
-
+	X_UNUSED(flags);
 	return true;
 }
 
@@ -268,7 +270,7 @@ bool XShader::FXEndPass()
 {
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 
-	rd->m_State.pCurShaderTech = nullptr;
+	rd->State_.pCurShaderTech = nullptr;
 	return true;
 }
 
@@ -276,8 +278,8 @@ bool XShader::FXEnd()
 {
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 
-	rd->m_State.pCurShaderTech = nullptr;
-	rd->m_State.pCurShader = nullptr;
+	rd->State_.pCurShaderTech = nullptr;
+	rd->State_.pCurShader = nullptr;
 	return true;
 }
 
@@ -289,12 +291,12 @@ bool XShader::FXSetVSFloat(const core::StrHash& NameParam,
 
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 
-	if (!rd->m_State.pCurShader || !rd->m_State.pCurShaderTech) {
+	if (!rd->State_.pCurShader || !rd->State_.pCurShaderTech) {
 		X_WARNING("Shader", "fail to setVSFloat no shaer / tech set");
 		return false;
 	}
 
-	XShaderTechnique* pTech = rd->m_State.pCurShaderTech;
+	XShaderTechnique* pTech = rd->State_.pCurShaderTech;
 	XShaderTechniqueHW* pHwTech = pTech->pCurHwTech;
 
 	if (!pHwTech) {
@@ -302,16 +304,16 @@ bool XShader::FXSetVSFloat(const core::StrHash& NameParam,
 		return false;
 	}
 
-	XHWShader_Dx10* pVS = (XHWShader_Dx10*)pHwTech->pVertexShader;
+	XHWShader_Dx10* pVS = static_cast<XHWShader_Dx10*>(pHwTech->pVertexShader);
 
 	if (!pVS)
 		return false;
 
-	XShaderParam *pParam = pVS->getParameter(NameParam);
+	XShaderParam* pParam = pVS->getParameter(NameParam);
 	if (!pParam)
 		return false;
 
-	if (pParam->numParameters != numVecs)
+	if (pParam->numParameters != safe_static_cast<int,uint32_t>(numVecs))
 	{
 		X_ERROR("Shader", "invalid paramater size: expected: %i, given: %i", pParam->numParameters,
 			numVecs);
@@ -338,7 +340,7 @@ bool DX11XRender::SetWorldShader()
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_WordShader;
+	XShader* pSh = XShaderManager::s_pWordShader_;
 	uint32_t pass;
 
 
@@ -369,7 +371,7 @@ bool DX11XRender::SetSkyboxShader()
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_FixedFunction;
+	XShader* pSh = XShaderManager::s_pFixedFunction_;
 	uint32_t pass;
 
 	if (!pSh)
@@ -394,7 +396,7 @@ bool DX11XRender::SetFFE(shader::VertexFormat::Enum vertFmt, bool textured)
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_FixedFunction;
+	XShader* pSh = XShaderManager::s_pFixedFunction_;
 	uint32_t pass;
 
 	if (!pSh)
@@ -432,7 +434,7 @@ bool DX11XRender::SetFontShader()
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_Font;
+	XShader* pSh = XShaderManager::s_pFont_;
 	uint32_t pass;
 
 	if (!pSh)
@@ -460,7 +462,7 @@ bool DX11XRender::SetZPass()
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_DefferedShader;
+	XShader* pSh = XShaderManager::s_pDefferedShader_;
 	uint32_t pass;
 
 	if (!pSh)
@@ -488,7 +490,7 @@ bool DX11XRender::setGUIShader(bool textured)
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_Gui;
+	XShader* pSh = XShaderManager::s_pGui_;
 	uint32_t pass;
 
 	if (!pSh)

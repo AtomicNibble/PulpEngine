@@ -22,6 +22,11 @@ int jobListRunner::var_LongJobMs = 8;
 void JobList::NopJob(void* pParam, uint32_t batchOffset,
 	uint32_t batchNum, uint32_t workerIdx)
 {
+	X_UNUSED(pParam);
+	X_UNUSED(batchOffset);
+	X_UNUSED(batchNum);
+	X_UNUSED(workerIdx);
+
 #if SCHEDULER_LOGS
 	X_LOG0("NopJob", "NobJob: pParam: %x workerIdx: %x", pParam, workerIdx);
 #endif // !SCHEDULER_LOGS
@@ -320,6 +325,11 @@ TimeVal JobList::GetTimeReal(void) const
 }
 // ----------------------------------
 
+JobThread::threadJobList::threadJobList()
+{
+	jobList = nullptr;
+	version = 0;
+}
 
 JobThread::JobThread()
 {
@@ -377,7 +387,9 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 {
 	Thread::ReturnValue retVal = Thread::ReturnValue(0);
 
+X_DISABLE_WARNING(4127)
 	while (true)
+X_ENABLE_WARNING(4127)
 	{
 		{
 			signalCritical_.Enter();
@@ -570,7 +582,7 @@ void jobListRunner::StartThreads(void)
 
 void jobListRunner::ShutDown(void)
 {
-	X_LOG0("jobListRunner", "Shuting down");
+	X_LOG0("jobListRunner", "Shutting Down");
 
 	int32_t i;
 

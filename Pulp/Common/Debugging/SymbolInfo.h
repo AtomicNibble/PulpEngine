@@ -35,7 +35,7 @@ private:
 	X_NO_ASSIGN(SymbolInfo);
 
 	StackString512 function_;
-	Path filename_;
+	Path<char> filename_;
 	uint32_t line_;
 };
 

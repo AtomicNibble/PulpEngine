@@ -84,7 +84,9 @@ struct math<float>
 	X_INLINE static  float	log10(float x)			{ return ::log10f(x); }
 	X_INLINE static  float	modf(float x, float *y)	{ return ::modff(x, y); }
 	X_INLINE static  float	pow(float x, float y)	{ return ::powf(x, y); }
+	X_DISABLE_WARNING(4756)
 	X_INLINE static  float	sqrt(float x)			{ return ::sqrtf(x); }
+	X_ENABLE_WARNING(4756)
 	X_INLINE static  float	cbrt(float x)			{ return (x > 0) ? (::powf(x, 1.0f / 3.0f)) : (-::powf(-x, 1.0f / 3.0f)); }
 	X_INLINE static  float	ceil(float x)			{ return ::ceilf(x); }
 	X_INLINE static  float	abs(float x)			{ return ::fabsf(x); }

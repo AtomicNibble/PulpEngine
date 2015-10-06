@@ -27,11 +27,11 @@ uint32_t LoggerSimpleFormatPolicy::Format(LoggerBase::Line& line, const char* in
 	size_t verbosity, const char* format, va_list args
 	)
 {
-//	StackString<512> channelStr(channel );
-//	channelStr.Append( channel, strUtil::strlen( channel ) );
-//	channelStr.Append( "", 1u);
-	
 	int bytesWritten; 
+
+	X_UNUSED(type);
+	X_UNUSED(sourceInfo);
+	X_UNUSED(verbosity);
 
 	bytesWritten = _snprintf_s(line, _TRUNCATE, "%-20s%s", channel, indentation);
 	bytesWritten += vsnprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, format, args);

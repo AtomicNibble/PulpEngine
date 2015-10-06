@@ -82,7 +82,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	int nRes = 0;
 	EngineApp engine;
 
-	core::Console Console("Engine Uint Test Log");
+	core::Console Console(L"Engine Uint Test Log");
+	Console.RedirectSTD();
 	Console.SetSize(150, 60, 8000);
 	Console.MoveTo(10, 10);
 
@@ -93,6 +94,8 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	if (engine.Init(lpCmdLine, Console))
 	{		
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pCore);
 		gEnv->pCore->RegisterAssertHandler(&g_AssetChecker);
 
 		X_LOG0("TESTS", "Running unit tests...");

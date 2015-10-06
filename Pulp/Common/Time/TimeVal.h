@@ -11,136 +11,52 @@ class TimeVal
 public:
 	typedef int64_t TimeType;
 
-	X_INLINE TimeVal()
-	{
-		time_ = 0;
-	}
-
-	// Constructor.
-	X_INLINE TimeVal(const float fSeconds)
-	{
-		SetSeconds(fSeconds);
-	}
-
-	X_INLINE TimeVal(const double fSeconds)
-	{
-		SetSeconds(fSeconds);
-	}
-
-	// Constructor.
-	// Arguments:
+	X_INLINE TimeVal();
+	explicit X_INLINE TimeVal(const float fSeconds);
+	explicit X_INLINE TimeVal(const double fSeconds);
 	//		inllValue - positive negative, absolute or relative in 1 second= PRECISION units.
-	X_INLINE TimeVal(const TimeType inllValue)
-	{
-		time_ = inllValue;
-	}
+	explicit X_INLINE TimeVal(const TimeType inllValue);
+	X_INLINE TimeVal(const TimeVal &inValue);
+	X_INLINE ~TimeVal();
 
-	// Copy constructor.
-	X_INLINE TimeVal(const TimeVal &inValue)
-	{
-		time_ = inValue.time_;
-	}
 
-	// Destructor.
-	X_INLINE ~TimeVal() {}
-
-	// Description:
-	//		Assignment operator.
-	// Arguments:
-	//		TimeVal - Right side.
-	X_INLINE TimeVal& operator=(const TimeVal &inRhs)
-	{
-		time_ = inRhs.time_;
-		return *this;
-	};
+	X_INLINE TimeVal& operator=(const TimeVal &inRhs);
 
 	// Use only for relative value, absolute values suffer a lot from precision loss.
-	X_INLINE float GetSeconds() const
-	{
-		return time_ * (1.f / PRECISION);
-	}
-
+	X_INLINE float GetSeconds(void) const;
 	// Get relative time difference in seconds - call on the endTime object:  endTime.GetDifferenceInSeconds( startTime );
-	X_INLINE float GetDifferenceInSeconds(const TimeVal& startTime) const
-	{
-		return (time_ - startTime.time_) * (1.f / PRECISION);
-	}
-
-	X_INLINE void SetSeconds(const float infSec)
-	{
-		time_ = (TimeType)(infSec*PRECISION);
-	}
-
-	//
-	X_INLINE void SetSeconds(const double infSec)
-	{
-		time_ = (TimeType)(infSec*PRECISION);
-	}
-
-	//
-	X_INLINE void SetSeconds(const TimeType indwSec)
-	{
-		time_ = indwSec*PRECISION;
-	}
-
-	X_INLINE void SetMilliSeconds(const int iniMilliSec)
-	{
-		time_ = iniMilliSec*(PRECISION / 1000);
-	}
-	X_INLINE void SetMilliSeconds(const double indMilliSec)
-	{
-		time_ = ((TimeType)indMilliSec)*(PRECISION / 1000);
-	}
-	//
-	X_INLINE void SetMilliSeconds(const TimeType indwMilliSec)
-	{
-		time_ = indwMilliSec*(PRECISION / 1000);
-	}
-
-	X_INLINE void SetNanoSeconds(const TimeType indwNanoSec)
-	{
-		time_ = indwNanoSec / (1000000 / PRECISION);
-	}
-
+	X_INLINE float GetDifferenceInSeconds(const TimeVal& startTime) const;
+	X_INLINE void SetSeconds(const float infSec);
+	X_INLINE void SetSeconds(const double infSec);
+	X_INLINE void SetSeconds(const TimeType indwSec);
+	X_INLINE void SetMilliSeconds(const int iniMilliSec);
+	X_INLINE void SetMilliSeconds(const double indMilliSec);
+	X_INLINE void SetMilliSeconds(const TimeType indwMilliSec);
+	X_INLINE void SetNanoSeconds(const TimeType indwNanoSec);
 	// Use only for relative value, absolute values suffer a lot from precision loss.
-	X_INLINE float GetMilliSeconds() const
-	{
-		return time_ * (1000.f / PRECISION);
-	}
-
-	X_INLINE TimeType GetMilliSecondsAsInt64() const
-	{
-		return time_ * 1000 / PRECISION;
-	}
-
-	X_INLINE TimeType GetValue() const
-	{
-		return time_;
-	}
-
-	X_INLINE void SetValue(TimeType val)
-	{
-		time_ = val;
-	}
+	X_INLINE float GetMilliSeconds(void) const;
+	X_INLINE TimeType GetMilliSecondsAsInt64(void) const;
+	X_INLINE TimeType GetValue(void) const;
+	X_INLINE void SetValue(TimeType val);
 
 
 	// Minus.
-	X_INLINE TimeVal operator-(const TimeVal &inRhs) const { TimeVal ret;	ret.time_ = time_ - inRhs.time_; return ret; };
+	X_INLINE TimeVal operator-(const TimeVal &inRhs) const;
 	// Plus.
-	X_INLINE TimeVal operator+(const TimeVal &inRhs) const { TimeVal ret;	ret.time_ = time_ + inRhs.time_; return ret; };
+	X_INLINE TimeVal operator+(const TimeVal &inRhs) const;
 	// Unary minus.
-	X_INLINE TimeVal operator-() const { TimeVal ret; ret.time_ = -time_; return ret; };
-	X_INLINE TimeVal& operator+=(const TimeVal& inRhs) { time_ += inRhs.time_; return *this; }
-	X_INLINE TimeVal& operator-=(const TimeVal& inRhs) { time_ -= inRhs.time_; return *this; }
-	X_INLINE TimeVal& operator/=(int inRhs) { time_ /= inRhs; return *this; }
+	X_INLINE TimeVal operator-() const;
+	X_INLINE TimeVal& operator+=(const TimeVal& inRhs);
+	X_INLINE TimeVal& operator-=(const TimeVal& inRhs);
+	X_INLINE TimeVal& operator/=(int inRhs);
 
 	// comparison -----------------------
-	X_INLINE bool operator<(const TimeVal &inRhs) const { return time_ < inRhs.time_; };
-	X_INLINE bool operator>(const TimeVal &inRhs) const { return time_ > inRhs.time_; };
-	X_INLINE bool operator>=(const TimeVal &inRhs) const { return time_ >= inRhs.time_; };
-	X_INLINE bool operator<=(const TimeVal &inRhs) const { return time_ <= inRhs.time_; };
-	X_INLINE bool operator==(const TimeVal &inRhs) const { return time_ == inRhs.time_; };
-	X_INLINE bool operator!=(const TimeVal &inRhs) const { return time_ != inRhs.time_; };
+	X_INLINE bool operator<(const TimeVal &inRhs) const;
+	X_INLINE bool operator>(const TimeVal &inRhs) const;
+	X_INLINE bool operator>=(const TimeVal &inRhs) const;
+	X_INLINE bool operator<=(const TimeVal &inRhs) const;
+	X_INLINE bool operator==(const TimeVal &inRhs) const;
+	X_INLINE bool operator!=(const TimeVal &inRhs) const;
 
 private:
 	TimeType time_;
@@ -150,6 +66,7 @@ private:
 	//	100000;
 };
 
+#include "TimeVal.inl"
 
 X_NAMESPACE_END
 

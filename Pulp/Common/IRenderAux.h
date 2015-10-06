@@ -14,10 +14,10 @@ struct XAuxGeomRenderFlags;
 
 struct AuxGeomBitMasks
 {
-	enum Enum
+	enum Enum : uint32_t
 	{
 		Mode2D3DShift = 31,
-		Mode2D3DMask = 0x1 << Mode2D3DShift,
+		Mode2D3DMask = 0x1u << Mode2D3DShift,
 
 		AlphaBlendingShift = 29,
 		AlphaBlendingMask = 0x3 << AlphaBlendingShift,
@@ -45,16 +45,16 @@ struct AuxGeomBitMasks
 
 struct AuxGeom_Mode2D3D
 {
-	enum Enum
+	enum Enum : uint32_t
 	{
 		Mode3D = 0x0 << AuxGeomBitMasks::Mode2D3DShift,
-		Mode2D = 0x1 << AuxGeomBitMasks::Mode2D3DShift,
+		Mode2D = 0x1u << AuxGeomBitMasks::Mode2D3DShift,
 	};
 };
 
 struct AuxGeom_AlphaBlendMode
 {
-	enum Enum
+	enum Enum : uint32_t
 	{
 
 		AlphaNone = 0x0 << AuxGeomBitMasks::AlphaBlendingShift,
@@ -65,7 +65,7 @@ struct AuxGeom_AlphaBlendMode
 
 struct AuxGeom_DrawInFrontMode
 {
-	enum Enum
+	enum Enum : uint32_t
 	{
 		DrawInFrontOff = 0x0 << AuxGeomBitMasks::DrawInFrontShift,
 		DrawInFrontOn = 0x1 << AuxGeomBitMasks::DrawInFrontShift,
@@ -74,7 +74,7 @@ struct AuxGeom_DrawInFrontMode
 
 struct AuxGeom_FillMode
 {
-	enum Enum
+	enum Enum : uint32_t
 	{
 		FillModeSolid = 0x0 << AuxGeomBitMasks::FillModeShift,
 		FillModeWireframe = 0x1 << AuxGeomBitMasks::FillModeShift,
@@ -84,7 +84,7 @@ struct AuxGeom_FillMode
 
 struct AuxGeom_CullMode
 {
-	enum Enum
+	enum Enum : uint32_t
 	{
 		CullModeNone = 0x0 << AuxGeomBitMasks::CullModeShift,
 		CullModeFront = 0x1 << AuxGeomBitMasks::CullModeShift,
@@ -94,7 +94,7 @@ struct AuxGeom_CullMode
 
 struct AuxGeom_DepthWrite
 {
-	enum Enum
+	enum Enum : uint32_t
 	{
 		DepthWriteOn = 0x0 << AuxGeomBitMasks::DepthWriteShift,
 		DepthWriteOff = 0x1 << AuxGeomBitMasks::DepthWriteShift,
@@ -104,7 +104,7 @@ struct AuxGeom_DepthWrite
 
 struct AuxGeom_DepthTest
 {
-	enum Enum
+	enum Enum : uint32_t
 	{
 		DepthTestOn = 0x0 << AuxGeomBitMasks::DepthTestShift,
 		DepthTestOff = 0x1 << AuxGeomBitMasks::DepthTestShift,
@@ -114,7 +114,7 @@ struct AuxGeom_DepthTest
 
 struct AuxGeom_Defaults
 {
-	enum Enum
+	enum Enum : uint32_t
 	{
 		// Default render flags for 3d primitives.
 		Def3DRenderflags = AuxGeom_Mode2D3D::Mode3D |
@@ -156,11 +156,13 @@ struct IRenderAux
 	virtual void drawTriangle(const Vec3f& v0, const Color8u& c0, const Vec3f& v1, const Color8u& c1, 
 				const Vec3f& v2, const Color8u& c2 ) X_ABSTRACT;
 
-	virtual void drawTriangle(Vec3f* points, uint32_t numPoints, const Color8u& c0) X_ABSTRACT;
-	virtual void drawTriangle(Vec3f* points, uint32_t numPoints, Color8u* pCol) X_ABSTRACT;
+	virtual void drawTriangle(const Vec3f* points, uint32_t numPoints, const Color8u& c0) X_ABSTRACT;
+	virtual void drawTriangle(const Vec3f* points, uint32_t numPoints, const Color8u* pCol) X_ABSTRACT;
 
-	virtual void drawTriangle(Vec3f* points, uint32_t numPoints, uint16_t* indices, uint32_t numIndices, const Color8u& c0) X_ABSTRACT;
-	virtual void drawTriangle(Vec3f* points, uint32_t numPoints, uint16_t* indices, uint32_t numIndices, Color8u* pCol) X_ABSTRACT;
+	virtual void drawTriangle(const Vec3f* points, uint32_t numPoints, 
+		const uint16_t* indices, uint32_t numIndices, const Color8u& c0) X_ABSTRACT;
+	virtual void drawTriangle(const Vec3f* points, uint32_t numPoints, 
+		const uint16_t* indices, uint32_t numIndices, const Color8u* pCol) X_ABSTRACT;
 
 	// AABB
 	virtual void drawAABB(const AABB& aabb, const Vec3f& pos, bool solid, const Color8u& col) X_ABSTRACT;

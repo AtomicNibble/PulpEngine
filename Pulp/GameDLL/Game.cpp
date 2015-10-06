@@ -16,7 +16,8 @@ namespace
 
 XGame::XGame(ICore* pCore) :
 pCore_(pCore),
-pTimer_(nullptr)
+pTimer_(nullptr),
+pRender_(nullptr)
 {
 	X_ASSERT_NOT_NULL(pCore);
 
@@ -60,7 +61,7 @@ bool XGame::Init(void)
 
 bool XGame::ShutDown(void)
 {
-	X_LOG0("Game", "Shutting down");
+	X_LOG0("Game", "Shutting Down");
 
 	pCore_->GetIInput()->RemoveEventListener(this);
 
@@ -74,8 +75,8 @@ bool XGame::Update(void)
 
 
 
-	cam_.SetAngles(cameraAngle_);
-	cam_.SetPosition(cameraPos_);
+	cam_.setAngles(cameraAngle_);
+	cam_.setPosition(cameraPos_);
 
 	pRender_->SetCamera(cam_);
 

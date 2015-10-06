@@ -3,6 +3,20 @@
 
 X_INLINE XFrustum::XFrustum() 
 {
+	left_ = 0.f;
+	up_ = 0.f;
+	invFar_ = 0.f;
+
+	width_ = 0u;
+	height_ = 0u;
+
+	fov_ = 0.f;
+	projectionRatio_ = 0.f;
+	pixelAspectRatio_ = 0.f;
+
+	core::zero_object(idx_);
+	core::zero_object(idy_);
+	core::zero_object(idz_);
 }
 
 
@@ -11,6 +25,7 @@ X_INLINE XFrustum::XFrustum()
 X_INLINE void XFrustum::setPosition(const Vec3f& pos)
 {
 	mat_.setTranslate(pos);
+	UpdateFrustum();
 }
 
 X_INLINE void XFrustum::setAxis(const Matrix33f& mat)
@@ -18,6 +33,8 @@ X_INLINE void XFrustum::setAxis(const Matrix33f& mat)
 	Vec3f temp = mat_.getTranslate();
 	mat_ = mat;
 	mat_.setTranslate(temp);
+
+	UpdateFrustum();
 }
 
 X_INLINE void XFrustum::setSize(float dNear, float dFar, float dLeft, float dUp)
@@ -30,7 +47,7 @@ X_INLINE void XFrustum::setSize(float dNear, float dFar, float dLeft, float dUp)
 }
 
 // get a goat
-X_INLINE const Vec3f& XFrustum::getPosition(void) const
+X_INLINE const Vec3f XFrustum::getPosition(void) const
 {
 	return mat_.getTranslate();
 }

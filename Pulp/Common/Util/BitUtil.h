@@ -13,12 +13,48 @@ X_NAMESPACE_BEGIN(core)
 /// contains routines for dealing with and rounding to power-of-two values.
 namespace bitUtil
 {
+	// used for selecting a type that can hold
+	// any flag that Type T can hold.
+	namespace FlagType
+	{
+		template<typename T>
+		struct return_
+		{
+			typedef T type;
+		};
+
+		template<uint64_t N>
+		struct bytetype : return_<uint64_t> {};
+
+		template<>
+		struct bytetype<4> : return_<uint32_t>{};
+
+		template<>
+		struct bytetype<3> : return_<uint32_t>{};
+
+		template<>
+		struct bytetype<2> : return_<uint16_t>{};
+
+		template<>
+		struct bytetype<1> : return_<uint8_t>{};
+
+	} // namespace FlagType
+
+
 	/// A constant for signaling that no bit is set in a value passed to ScanBits().
 	static const unsigned int NO_BIT_SET = 255;
 
 	/// Returns whether a flag is set in the given integer value.
 	template <typename T>
-	inline bool IsBitFlagSet(T value, unsigned int Flag);
+	inline bool IsBitFlagSet(T value, typename FlagType::bytetype<sizeof(T)>::type flag);
+
+	/// Clears a flag in an integer
+	template <typename T>
+	inline T ClearBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag);
+
+	/// Sets a flag in an integer
+	template <typename T>
+	inline T SetBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag);
 
 	/// Returns whether a certain bit is set in the given integer value.
 	template <typename T>

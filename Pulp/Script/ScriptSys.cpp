@@ -11,6 +11,7 @@
 #include <String\StackString.h>
 #include <String\Path.h>
 
+
 extern "C"
 {
 	#include "lua\lobject.h"
@@ -59,18 +60,21 @@ extern "C"
 		int level = 0;
 		while (lua_getstack(L, level++, &ar))
 		{
-			const char *slevel = "";
-			if (level >= max_stack_lvl)
+			if (level >= max_stack_lvl) {
 				level = max_stack_lvl - 1;
+			}
 
-			int nRes = lua_getinfo(L, "lnS", &ar);
+			int res = lua_getinfo(L, "lnS", &ar);
+			X_UNUSED(res); // TODO
 			if (ar.name)
 			{
-				X_LOG0("ScriptError", "%s> %s, (%s: %i)", g_StackLevel[level], ar.name, ar.short_src, ar.currentline);
+				X_LOG0("ScriptError", "%s> %s, (%s: %i)",
+					g_StackLevel[level], ar.name, ar.short_src, ar.currentline);
 			}
 			else
 			{
-				X_LOG0("ScriptError", "%s> (null) (%s: %i)", g_StackLevel[level], ar.short_src, ar.currentline);
+				X_LOG0("ScriptError", "%s> (null) (%s: %i)", 
+					g_StackLevel[level], ar.short_src, ar.currentline);
 			}
 		}
 	}
@@ -144,6 +148,7 @@ namespace
 
 	void ListScriptCmd(core::IConsoleCmdArgs* pArgs)
 	{
+		X_UNUSED(pArgs);
 		gEnv->pScriptSys->ListLoadedScripts();
 	}
 
@@ -233,7 +238,7 @@ void XScriptSys::Init()
 
 	InitCommands();
 
-	ExecuteFile("core_assets/scripts/main.lua", false, false);
+	ExecuteFile("scripts/main.lua", false, false);
 
 	// hotreload
 	gEnv->pHotReload->addfileType(this, X_SCRIPT_FILE_EXTENSION);
@@ -335,7 +340,7 @@ void XScriptSys::Update()
 
 bool XScriptSys::ExecuteFile(const char* FileName, bool silent, bool forceReload)
 {
-	core::Path path(FileName);
+	core::Path<char> path(FileName);
 
 
 	if (path.length() > 0)
@@ -372,8 +377,9 @@ bool XScriptSys::ExecuteFile(const char* FileName, bool silent, bool forceReload
 	return false;
 }
 
-bool XScriptSys::ExecuteFile_Internal(const core::Path& path, bool silent)
+bool XScriptSys::ExecuteFile_Internal(const core::Path<char>& path, bool silent)
 {
+	X_UNUSED(silent);
 	bool res = false;
 
 	core::XFileMem* file = pFileSys_->openFileMem(path.c_str(), core::fileMode::READ);
@@ -427,7 +433,7 @@ void XScriptSys::ListLoadedScripts(void)
 
 void XScriptSys::addFileName(const char* name)
 {
-	fileList_.insert(name);
+	fileList_.insert(core::string(name));
 }
 
 void XScriptSys::removeFileName(const char* name)
@@ -481,6 +487,11 @@ HSCRIPTFUNCTION XScriptSys::GetFunctionPtr(const char* sTableName, const char* s
 
 HSCRIPTFUNCTION XScriptSys::AddFuncRef(HSCRIPTFUNCTION f)
 {
+	// type cast': conversion from 'int' to 'Potato::script::HSCRIPTFUNCTION' of greater size
+	X_DISABLE_WARNING(4312) 
+	X_ASSERT_NOT_IMPLEMENTED();
+
+
 	X_LUA_CHECK_STACK(L);
 
 	if (f)
@@ -497,6 +508,8 @@ HSCRIPTFUNCTION XScriptSys::AddFuncRef(HSCRIPTFUNCTION f)
 		X_ASSERT_UNREACHABLE();
 	}
 	return 0;
+
+	X_ENABLE_WARNING(4312)
 }
 
 bool XScriptSys::CompareFuncRef(HSCRIPTFUNCTION f1, HSCRIPTFUNCTION f2)
@@ -688,7 +701,9 @@ bool XScriptSys::ToAny(ScriptValue& var, int index)
 			else if (var.type_ == ScriptValueType::VECTOR)
 			{
 				Vec3f v(0, 0, 0);
-				if (res = ToVec3(v, index))
+				res = ToVec3(v, index);
+
+				if (res)
 				{
 					var.vec3.x = v.x;
 					var.vec3.y = v.y;
@@ -1007,7 +1022,10 @@ void XScriptSys::TraceScriptError()
 	lua_Debug ar;
 	core::zero_object(ar);
 
+	// TODO
+	X_DISABLE_WARNING(4127)
 	if (0)
+	X_ENABLE_WARNING(4127)
 	{
 		if (lua_getstack(L, 1, &ar))
 		{
@@ -1064,7 +1082,7 @@ struct XRecursiveLuaDumpToFile : public IRecursiveLuaDump
 
 	char sLevelOffset[1024];
 	char sKeyStr[32];
-	int nSize;
+	size_t nSize;
 
 	const char* GetOffsetStr(int nLevel)
 	{
@@ -1193,7 +1211,7 @@ bool XScriptSys::DumpStateToFile(const char* name)
 {
 	X_LUA_CHECK_STACK(L);
 
-	core::Path path(name);
+	core::Path<char> path(name);
 	path.setExtension(".txt");
 
 	XRecursiveLuaDumpToFile sink(path.c_str());

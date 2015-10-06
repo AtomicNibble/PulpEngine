@@ -1,3 +1,4 @@
+#include "ByteStream.h"
 
 
 
@@ -8,6 +9,82 @@ ByteStream::ByteStream(MemoryArenaBase* arena) :
 	arena_(arena)
 {
 	X_ASSERT_NOT_NULL(arena);
+}
+
+ByteStream::ByteStream(MemoryArenaBase* arena, size_t numBytes) :
+	current_(nullptr),
+	start_(nullptr),
+	end_(nullptr),
+	arena_(arena)
+{
+	X_ASSERT_NOT_NULL(arena);
+	resize(numBytes);
+}
+
+ByteStream::ByteStream(const ByteStream& oth)
+{
+	arena_ = oth.arena_;
+
+	resize(oth.capacity());
+
+	::memcpy(start_, oth.start_, oth.size());
+
+	current_ = start_ + oth.size();
+}
+
+ByteStream::ByteStream(ByteStream&& oth)
+{
+	arena_ = oth.arena_;
+	current_ = oth.current_;
+	start_ = oth.start_;
+	end_ = oth.end_;
+
+	// clear other.
+	oth.current_ = nullptr;
+	oth.start_ = nullptr;
+	oth.end_ = nullptr;
+}
+
+ByteStream::~ByteStream()
+{
+	free();
+}
+
+ByteStream& ByteStream::operator=(const ByteStream& oth)
+{
+	if (this != &oth)
+	{
+		free();
+
+		arena_ = oth.arena_;
+
+		resize(oth.capacity());
+
+		::memcpy(start_, oth.start_, oth.size());
+
+		current_ = start_ + oth.size();
+	}
+	return *this;
+}
+
+ByteStream& ByteStream::operator=(ByteStream&& oth)
+{
+	if (this != &oth)
+	{
+		free();
+
+		// steal buffer.
+		arena_ = oth.arena_;
+		current_ = oth.current_;
+		start_ = oth.start_;
+		end_ = oth.end_;
+
+		// clear other.
+		oth.current_ = nullptr;
+		oth.start_ = nullptr;
+		oth.end_ = nullptr;
+	}
+	return *this;
 }
 
 template<typename T>
@@ -26,7 +103,7 @@ inline void ByteStream::write(const T& val)
 }
 
 template<typename T>
-inline T ByteStream::read()
+inline T ByteStream::read(void)
 {
 	X_ASSERT(sizeof(T) <= size(), "can't read a object of size: %i", sizeof(T))(sizeof(T), size());
 
@@ -41,7 +118,7 @@ inline T ByteStream::read()
 }
 
 template<typename T>
-inline T ByteStream::peek() const
+inline T ByteStream::peek(void) const
 {
 	X_ASSERT(sizeof(T) <= size(), "can't peek a object of size: %i", sizeof(T))(sizeof(T), size());
 
@@ -62,15 +139,31 @@ inline void ByteStream::seek(size_t pos)
 
 
 // resizes the object
-inline void ByteStream::resize(size_t size)
+inline void ByteStream::resize(size_t numBytes)
 {
-	if (size > capacity()) {
-		Delete(start_); // free any current memory
+	if (numBytes > capacity()) 
+	{
+		// copy of old memory.
+		char* pOld = start_;
+		size_t currentBytes = this->size();
 
-		current_ = start_ = Allocate(size);
-		end_ = start_ + size;
+		// allocate new
+		start_ = Allocate(numBytes);
+
+		// copy old over.
+		if (pOld)
+		{
+			::memcpy(start_, pOld, currentBytes);
+			Delete(pOld); 
+			current_ = start_ + currentBytes;
+		}
+		else
+		{
+			current_ = start_;
+		}
+
+		end_ = start_ + numBytes;
 	}
-	reset();
 }
 
 
@@ -94,25 +187,25 @@ inline void ByteStream::free(void)
 
 
 // returns how many bytes are currently stored in the stream.
-inline size_t ByteStream::size() const
+inline size_t ByteStream::size(void) const
 {
 	return static_cast<size_t>(current_ - start_);
 }
 
 // returns the capacity of the byte stream.
-inline size_t ByteStream::capacity() const
+inline size_t ByteStream::capacity(void) const
 {
 	return static_cast<size_t>(end_ - start_);
 }
 
 // returns the amount of bytes that can be added.
-inline size_t ByteStream::freeSpace() const
+inline size_t ByteStream::freeSpace(void) const
 {
 	return static_cast<size_t>(end_ - current_);
 }
 
 // returns true if the stream is full.
-inline bool ByteStream::isEos() const
+inline bool ByteStream::isEos(void) const
 {
 	return current_ == end_;
 }
@@ -121,14 +214,12 @@ inline bool ByteStream::isEos() const
 
 
 // for easy memory allocation changes later.
-inline void ByteStream::Delete(char* pData)
+inline void ByteStream::Delete(char* pData) const
 {
-	// ::free((void*)pData);
 	X_DELETE_ARRAY(pData, arena_);
 }
 
-inline char* ByteStream::Allocate(size_t num)
+inline char* ByteStream::Allocate(size_t num) const
 {
 	return X_NEW_ARRAY(char, num, arena_, "ByteStream");
-//	return (char*)malloc(num);
 }

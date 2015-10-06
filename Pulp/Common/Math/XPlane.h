@@ -25,16 +25,8 @@
 //
 //
 
-struct Planeside
-{
-	enum Enum
-	{
-		FRONT,
-		BACK,
-		ON,
-		CROSS
-	};
-};
+
+X_DECLARE_ENUM(PlaneSide)(FRONT, BACK, ON, CROSS);
 
 struct PlaneType
 {
@@ -61,7 +53,7 @@ template<typename T>
 class Plane
 {
 public:
-	X_INLINE Plane() {}
+	X_INLINE Plane() : Distance_(static_cast<T>(0)) {}
 
 	X_INLINE Plane(const Vec3<T> &v1, const Vec3<T> &v2, const Vec3<T> &v3) {
 		set(v1, v2, v3);
@@ -101,8 +93,8 @@ public:
 		Distance_ = d / length;
 	}
 
-	X_INLINE T					operator[](int idx) const;
-	X_INLINE T &				operator[](int idx);
+	X_INLINE T					operator[](size_t idx) const;
+	X_INLINE T &				operator[](size_t idx);
 
 	X_INLINE Plane				operator-() const {
 		return Plane(-Normal_, -Distance_);
@@ -126,17 +118,17 @@ public:
 		return Normal_.dot(oth.Normal_);
 	}
 
-	X_INLINE Planeside::Enum	side(const Vec3<T>& v, const float epsilon) const
+	X_INLINE PlaneSide::Enum side(const Vec3<T>& v, const float epsilon) const
 	{
 		float dist = distance(v);
 		if (dist > epsilon) {
-			return Planeside::FRONT;
+			return PlaneSide::FRONT;
 		}
 		else if (dist < -epsilon) {
-			return Planeside::BACK;
+			return PlaneSide::BACK;
 		}
 		
-		return Planeside::ON;
+		return PlaneSide::ON;
 	}
 
 	PlaneType::Enum getType(void) const
@@ -194,12 +186,12 @@ private:
 };
 
 template<typename T>
-X_INLINE T Plane<T>::operator[](int idx) const {
+X_INLINE T Plane<T>::operator[](size_t idx) const {
 	return Normal_[idx];
 }
 
 template<typename T>
-X_INLINE T& Plane<T>::operator[](int idx) {
+X_INLINE T& Plane<T>::operator[](size_t idx) {
 	return Normal_[idx];
 }
 

@@ -11,8 +11,13 @@
 
 #include <IRenderMesh.h>
 
-X_NAMESPACE_BEGIN(level)
 
+// forward Decs.
+class XWinding;
+// ~forward Decs.
+
+
+X_NAMESPACE_BEGIN(level)
 
 //
 // Some Refrences: (in no order)
@@ -198,9 +203,39 @@ X_NAMESPACE_BEGIN(level)
 //
 //	Step 4:	
 //
-//		Each area that has been determined as visable, is then drawn.
-//		Optionaly do I want to frustrum cull geo?
-//		Or keep that to just FX's
+//		Each area that has been determined as visable, has it's entiry list processed.
+//		When the level was compiled all the ents in the area where added to the area's ent ref list.
+//		So I know what is visible in each area.
+//		
+//		We can then perform aditional culling on this list: funcstrum, portal stack.
+//		
+//		Ent's that are in multiple area's are stored / processed diffrently.
+//		
+//		How they are stored:
+//		
+//		We ((areaNum / 32) + 1) lists, each responsible for 64 areas in the map.
+//		each item in the list has a 32bit flag for the area's it's in.
+//		
+//		Then we create a flag for the frames visible area's and traverse down the list
+//		& the flags and if it's positive the ent is in one of the visible area's
+//		
+//		Example:
+//		
+//		Visible Areas: 1,6,24
+//		Flag:    00000001 00000000 00000000 01000010
+//		
+//		0-63 list:
+//		
+//		| 0 | chair_wood | 00000000 00000000 00000000 00000011
+//		| 1 | chair_wood | 00000000 00000000 00100100 00000000
+//		| 2 | chair_wood | 00000001 00000000 00000000 00000000
+//		| 3 | chair_wood | 01100000 00000000 00000000 00000000
+//		
+//		So after going down the flag indexes 0,2 are visible.
+//		If a end is visible in area 62 and 79 it will still work fine.
+//		
+//		Lists will only get checked if there is a currently visible area in that list.
+//		Aka the lists visibility flag is not zero.
 //
 //	-----------------------------------------
 //
@@ -218,7 +253,7 @@ X_NAMESPACE_BEGIN(level)
 //
 //
 
-static const uint32_t	 LVL_VERSION = 11; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
+static const uint32_t	 LVL_VERSION = 14; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
 static const uint32_t	 LVL_FOURCC = X_TAG('x', 'l', 'v', 'l');
 static const uint32_t	 LVL_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r'); // if a file falid to write the final header, this will be it's FourCC
 // feels kinda wrong to call it a '.bsp', since it's otherthings as well. 
@@ -242,6 +277,7 @@ static const uint32_t	 MAP_MAX_SIDES_PER_BRUSH = 64;		// max sides a single brus
 static const uint32_t	 MAP_MAX_NODES = 65536;
 static const uint32_t	 MAP_MAX_LEAFS = 65536;
 static const uint32_t	 MAP_MAX_AREAS = 0x100;
+static const uint32_t	 MAP_MAX_MULTI_REF_LISTS = (MAP_MAX_AREAS / 32);
 static const uint32_t	 MAP_MAX_PORTALS = 0x100;
 static const uint32_t	 MAP_MAX_SURFACES = 65536 * 2;		
 static const uint32_t	 MAP_MAX_MODELS = 0x400;			// a model is a 'area'.
@@ -266,16 +302,11 @@ static const uint32_t	 LIGHT_MAP_WIDTH = 128;
 static const uint32_t	 LIGHT_MAP_HEIGHT = 128;
 
 
-// forward Decs.
-class XWinding;
-// ~forward Decs.
-
-
 X_DECLARE_FLAGS(MatContentFlags)(SOLID, WATER, PLAYER_CLIP, MONSTER_CLIP, TRIGGER, NO_FALL_DMG, DETAIL, STRUCTURAL, ORIGIN);
 X_DECLARE_FLAGS(MatSurfaceFlags)(NO_DRAW, LADDER);
 
 // this is the flags for the file header, which tells you what option stuff is inside the file.
-X_DECLARE_FLAGS(LevelFileFlags)(OCT_TREE);
+X_DECLARE_FLAGS(LevelFileFlags)(INTER_AREA_INFO, AREA_REF_LISTS, BSP_TREE, OCT_TREE, DEBUG_PORTAL_DATA);
 X_DECLARE_ENUM(SurfaceType)(Invalid, Plane, Patch);
 
 typedef Flags<MatContentFlags> MatContentFlag;
@@ -305,82 +336,12 @@ typedef int Index;
 // plane type for BSP.
 typedef Planef Plane;
 
-// a surface which can be a plane or a patch.
-// a plane also uses indexes.
-struct Surface
-{
-	int32_t				materialIdx;
-	SurfaceType::Enum	surfaceType; // 8
-
-	int32_t				vertexStartIdx;
-	int32_t				numVerts;	// 16
-
-	int32_t				indexStartIdx;
-	int32_t				numIndexes;	// 24
-
-	int32_t				lightMapNum;
-	Vec2<int32_t>		lightMapPos;
-	Vec2<int32_t>		lightMapDimensions;
-
-	// only set for patches.
-	Vec2<int32_t>		patchSize;	// 44
-}; 
-
-
-// Used for collision detection, not rendering.
-struct BrushSide
-{
-	int32_t planeIdx;
-	int32_t shaderNum;
-};
-
-struct Brush
-{
-	int32_t	firstSide;
-	int32_t	numSides;
-	int32_t	shaderNum;
-};
-
-struct Leaf
-{
-	int32_t cluster;	//cluster index for visdata
-	int32_t area;		// areaportal area
-
-	AABB bounds; // 0x20
-
-	int32_t leafFaceStartIdx;	// first index in leafFaces array
-	int32_t numFaces;	
-	int32_t leafBrushStartIdx;	// first index into leaf brushes array
-	int32_t numBrushes;	// 0x30
-};
-
-
-struct Node
-{
-	int32_t planeIdx;
-	// child nodes,  negative numbers are 'struct Leaf' not nodes.
-	int32_t front, back;
-	AABB bounds; // 0x24
-};
-
-struct Portal
-{
-	int32_t		areaTo;		// the area this portal leads to.
-	XWinding*	pWinding;	// winding points have counter clockwise ordering seen this area
-	// should i add seralise support to winding?
-	// or i could have a diffrent portal structure for the file.
-
-	Planef		plane;		// view must be on the positive side of the plane to cross
-	//	Portal*		pNext;		
-};
-
-
+#if 0
 struct Entity
 {
 	Vec3f pos;
 
 };
-
 
 struct StaticModel : public Entity
 {
@@ -388,46 +349,90 @@ struct StaticModel : public Entity
 
 	core::Pointer64<model::IRenderMesh > pRenderMesh;
 };
+#else
 
-struct Area
+// not saved to file sruntime only.
+struct StaticModel
 {
-	int32_t areaNum;
-	int32_t numPortals; // te number of portals leading out the area
-	int32_t numStaticModels;
+	Vec3f pos;
+	Quatf angle;
 
-	core::Pointer64<Portal> pPortals;
-	
-	AABB boundingBox;
-	Sphere boundingSphere;
+	uint32_t modelNameIdx;
+	model::IRenderMesh* pRenderMesh;
 };
+#endif
+
+
 
 // ============ File Structure stuff =========
 
+// WIP: format is currently been changed.
 //
-//  FileHeader
-//		||| String Table |||
-//		||| Area Models |||
-//		||| Materials |||
-//		||| Entites |||
-// 	  ||| BSP Tree |||
-//	  ||| |||
+// One question:
 //
-//
-//		Each area with have a collection of entites.
-//		And also the materials it uses.
-//		Since we will need material info for hte surfaces.
-//		
-//		They will be saved as one long array, but goruped based on area.
-//		So that a area can have a start index and num.
-//
-//		I will work out what todo with the tree later in terms of what i store.
-//
-//
-//		I wthink i'll first make it render the area AABB and glboal AABB
-//		Start to visualise the layout.
-//
-//		THen start adding in the entites etc.
+//	How do i want to store all the entities.
+//	the problem is that we support many diffrent kvp's for some ent's
+//	so i can't really have a structure that represents that in binary.
+//	so what i was thinking was have static models represented by binary layout
+//	since there will be so many of them compared to other ents.
 
+X_DECLARE_ENUM(FileNodes) (
+	STRING_TABLE,
+	AREAS,
+	AREA_PORTALS,
+	AREA_REFS,
+	BSP_TREE,
+	STATIC_MODELS
+);
+
+X_DECLARE_ENUM(ClassType) (
+	UNKNOWN,
+	WORLDSPAWN,
+	PLAYER_START,
+	MISC_MODEL
+);
+
+struct FileAreaRefHdr
+{
+	uint32_t startIndex;
+	uint32_t num;
+};
+
+
+X_PACK_PUSH(4)
+struct AreaEntRef
+{
+	uint32_t entId;
+};
+
+struct MultiAreaEntRef : public AreaEntRef
+{
+	uint32_t flags;
+};
+X_PACK_POP
+
+
+struct FileStaticModel
+{
+	Vec3f pos;
+	Quatf angle;
+
+	uint32_t modelNameIdx;
+};
+
+struct FileNode
+{
+	FileNode() {
+		core::zero_this(this);
+	}
+
+	X_INLINE bool isSet(void) const {
+		return size > 0;
+	}
+
+	uint32_t size;
+	uint32_t offset;
+};
 
 struct FileHeader
 {
@@ -439,45 +444,58 @@ struct FileHeader
 
 	core::dateTimeStampSmall modified; // 4
 
-	// string + data.
+	// size of all nodes
 	uint32_t totalDataSize;
 
 	// crc32 is just the header data
 	uint32_t datacrc32;
-	uint32_t datasize;
 
 	// stirng table data.
 	uint32_t numStrings;
-	uint32_t stringDataSize;
 
 	// the number of area;s in the level file.
-	uint32_t numAreas;
+	// also signifys how many multi area ref ent lists we have. (num / 32) + 1
+	int32_t numAreas;
+	int32_t numinterAreaPortals;
+	int32_t numNodes;
+
+	// ent ref sizes.
+	int32_t numEntRefs;
+	int32_t numMultiAreaEntRefs;
+	// size of the static model info.
+	int32_t numStaticModels;
+
+	FileNode nodes[FileNodes::ENUM_COUNT];
 
 	const bool isValid(void) const {
 		return fourCC == LVL_FOURCC;
+	}
+
+	core::XFileBuf FileBufForNode(uint8_t* pData, FileNodes::Enum node) const
+	{
+		uint8_t* pBegin = pData + nodes[node].offset;
+		return core::XFileBuf(pBegin, pBegin + nodes[node].size);
 	}
 };
 
 
 // my nipples don't mess around.
-X_ENSURE_SIZE(Material, 76);
+//X_ENSURE_SIZE(Material, 76);
 
-X_ENSURE_SIZE(Vertex, 44);
-X_ENSURE_SIZE(Index, 4);
-X_ENSURE_SIZE(Plane, 16);
+//X_ENSURE_SIZE(Vertex, 44);
+//X_ENSURE_SIZE(Index, 4);
+//X_ENSURE_SIZE(Plane, 16);
 
-X_ENSURE_SIZE(Surface, 0x34);
-
-X_ENSURE_SIZE(BrushSide, 8);
-X_ENSURE_SIZE(Brush, 12);
-
-X_ENSURE_SIZE(Leaf, 0x30);
-X_ENSURE_SIZE(Node, 0x24);
 // X_ENSURE_SIZE(Portal, 0x28);
-X_ENSURE_SIZE(Area, 0x28 + 0xC + 12);
+//X_ENSURE_SIZE(Area, 0x28 + 0xC + 12);
+
+X_ENSURE_SIZE(AreaEntRef, 4);
+X_ENSURE_SIZE(MultiAreaEntRef, 8);
+
 
 // check file structure sizes also.
-X_ENSURE_SIZE(FileHeader, 40);
+X_ENSURE_SIZE(FileNode, 8);
+X_ENSURE_SIZE(FileHeader, 52 + (sizeof(FileNode)* FileNodes::ENUM_COUNT));
 
 X_NAMESPACE_END
 

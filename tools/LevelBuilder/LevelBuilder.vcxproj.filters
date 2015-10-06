@@ -19,9 +19,6 @@
     <Filter Include="Source Files\BSP">
       <UniqueIdentifier>{8372cc90-6ca3-4dc8-9c84-249d54b75926}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Util">
-      <UniqueIdentifier>{0946935c-ec71-4ac9-8df3-4a02e906d184}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\MapFile">
       <UniqueIdentifier>{1d03dafd-7f52-4023-9abf-2c547d55d9b6}</UniqueIdentifier>
     </Filter>
@@ -43,6 +40,15 @@
     <Filter Include="Source Files\Material">
       <UniqueIdentifier>{d7808d51-1c4d-4c29-bab8-5f1d00d8aee7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Model">
+      <UniqueIdentifier>{1d5b6143-e760-495b-819e-61560a6b2a6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{0946935c-ec71-4ac9-8df3-4a02e906d184}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Model">
+      <UniqueIdentifier>{ff709cd7-b5be-4e57-9265-d55b85d7b7a9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -63,16 +69,7 @@
     <ClInclude Include="PlaneSet.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="Winding.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="StringPair.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="HashIndex.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="TriTools.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
     <ClInclude Include="MapLoader.h">
@@ -80,9 +77,6 @@
     </ClInclude>
     <ClInclude Include="VertexFmt.h">
       <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="BSPData.h">
-      <Filter>Header Files\BSP</Filter>
     </ClInclude>
     <ClInclude Include="LvlTypes.h">
       <Filter>Header Files\Lvl</Filter>
@@ -102,6 +96,9 @@
     <ClInclude Include="LvlBuilder.h">
       <Filter>Header Files\Lvl</Filter>
     </ClInclude>
+    <ClInclude Include="ModelInfo.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -112,18 +109,6 @@
     </ClCompile>
     <ClCompile Include="EngineApp.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Winding.cpp">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="BSPFile.cpp">
-      <Filter>Source Files\BSP</Filter>
-    </ClCompile>
-    <ClCompile Include="HashIndex.cpp">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
-    <ClCompile Include="TriTools.cpp">
-      <Filter>Source Files\Util</Filter>
     </ClCompile>
     <ClCompile Include="MapLoader.cpp">
       <Filter>Source Files\MapFile</Filter>
@@ -170,6 +155,15 @@
     <ClCompile Include="bspNode.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>
+    <ClCompile Include="LvlFile.cpp">
+      <Filter>Source Files\Lvl</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelInfo.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="PlaneSet.cpp">
+      <Filter>Source Files\Util</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="LevelBuilder.rc">
@@ -183,10 +177,5 @@
     <Image Include="LevelBuilder.ico">
       <Filter>Resource Files</Filter>
     </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Winding.inl">
-      <Filter>Header Files\Util</Filter>
-    </None>
   </ItemGroup>
 </Project>

@@ -14,7 +14,9 @@ extern "C"
 
 
 // TODO: temp
+X_DISABLE_WARNING(4702)
 #include <set>
+X_ENABLE_WARNING(4702)
 
 X_NAMESPACE_BEGIN(script)
 
@@ -139,7 +141,7 @@ public:
 private:
 	void InitCommands();
 
-	bool ExecuteFile_Internal(const core::Path& path, bool silent);
+	bool ExecuteFile_Internal(const core::Path<char>& path, bool silent);
 	bool ExecuteBuffer(const char* sBuffer, size_t nSize, const char* Description);
 
 	void TraceScriptError();

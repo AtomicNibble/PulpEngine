@@ -11,6 +11,9 @@
 
 X_NAMESPACE_BEGIN(core)
 
+static const size_t FS_MAX_VIRTUAL_DIR = 10;
+
+
 X_DECLARE_FLAGS(fileMode) (READ, WRITE, APPEND, WRITE_FLUSH, RECREATE, SHARE, RANDOM_ACCESS);
 X_DECLARE_FLAGS(SeekMode) (CUR, END, SET);
 X_DECLARE_ENUM(VirtualDirectory)(GAME, MOD);
@@ -131,7 +134,6 @@ struct XFile
 	inline uint32_t readString(core::string& str) {
 		// uggh
 		char Char;
-		size_t pos = tell();
 		str.clear();
 		while (read(&Char, 1))
 		{
@@ -170,8 +172,11 @@ struct XFile
 		length = vsnprintf(buf, sizeof(buf)-1, fmt, argptr);
 		va_end(argptr);
 
+		if (length < 0) {
+			return 0;
+		}
 
-		return write(buf, length);
+		return write(buf, static_cast<uint32_t>(length));
 	}
 
 	virtual inline bool isEof(void) const {
@@ -207,6 +212,8 @@ struct XFileMem : public XFile
 	}
 
 	virtual uint32_t write(const void* pBuf, uint32_t Len) X_FINAL{
+		X_UNUSED(pBuf);
+		X_UNUSED(Len);
 		X_ASSERT_NOT_IMPLEMENTED();
 		return 0;
 	}
@@ -225,13 +232,13 @@ struct XFileMem : public XFile
 			break;
 		}
 	}
-	virtual size_t remainingBytes(void) const X_FINAL{
-		return end_ - current_;
+	virtual size_t remainingBytes(void) const X_FINAL {
+		return static_cast<size_t>(end_ - current_);
 	}
-	virtual size_t tell(void) const X_FINAL{
-		return current_ - begin_;
+	virtual size_t tell(void) const X_FINAL {
+		return static_cast<size_t>(current_ - begin_);
 	}
-	virtual void setSize(size_t numBytes) X_FINAL{
+	virtual void setSize(size_t numBytes) X_FINAL {
 		X_UNUSED(numBytes);
 		X_ASSERT_UNREACHABLE();
 	}
@@ -243,14 +250,14 @@ struct XFileMem : public XFile
 	inline const char* getBufferEnd(void) const { return end_; }
 
 	inline size_t getSize(void) const {
-		return end_ - begin_;
+		return static_cast<size_t>(end_ - begin_);
 	}
 
 	inline MemoryArenaBase* getMemoryArena(void) {
 		return arena_;
 	}
 
-	inline bool isEof(void) const X_FINAL{
+	inline bool isEof(void) const X_FINAL {
 		return remainingBytes() == 0;
 	}
 
@@ -272,7 +279,7 @@ struct XFileBuf : public XFile
 		X_ASSERT_NOT_NULL(end);
 		X_ASSERT(end >= begin, "invalid buffer")(begin, end);
 	}
-	~XFileBuf() X_OVERRIDE{
+	~XFileBuf() X_OVERRIDE {
 	}
 
 	virtual uint32_t read(void* pBuf, uint32_t Len) X_FINAL{
@@ -284,7 +291,9 @@ struct XFileBuf : public XFile
 		return safe_static_cast<uint32_t, size_t>(size);
 	}
 
-	virtual uint32_t write(const void* pBuf, uint32_t Len) X_FINAL{
+	virtual uint32_t write(const void* pBuf, uint32_t Len) X_FINAL {
+		X_UNUSED(pBuf);
+		X_UNUSED(Len);
 		X_ASSERT_NOT_IMPLEMENTED();
 		return 0;
 	}
@@ -304,10 +313,10 @@ struct XFileBuf : public XFile
 		}
 	}
 	virtual size_t remainingBytes(void) const X_FINAL{
-		return end_ - current_;
+		return static_cast<size_t>(end_ - current_);
 	}
 	virtual size_t tell(void) const X_FINAL{
-		return current_ - begin_;
+		return static_cast<size_t>(current_ - begin_);
 	}
 	virtual void setSize(size_t numBytes) X_FINAL{
 		X_UNUSED(numBytes);
@@ -321,7 +330,7 @@ struct XFileBuf : public XFile
 	inline const uint8_t* getBufferEnd(void) const { return end_; }
 
 	inline size_t getSize(void) const {
-		return end_ - begin_;
+		return static_cast<size_t>(end_ - begin_);
 	}
 
 	inline bool isEof(void) const X_FINAL{
@@ -341,7 +350,8 @@ struct IFileSys
 	typedef Flags<fileMode> fileModeFlags;
 	typedef SeekMode SeekMode;
 	typedef const char* pathType;
-	typedef _finddatai64_t findData;
+	typedef const wchar_t* pathTypeW;
+	typedef _wfinddatai64_t findData;
 
 	static const uintptr_t INVALID_HANDLE = (uintptr_t)-1;
 
@@ -353,8 +363,8 @@ struct IFileSys
 
 	// folders - there is only one game dirtory.
 	// but other folders can be added with 'addModDir' to add to the virtual directory.
-	virtual bool setGameDir(pathType path) X_ABSTRACT;
-	virtual void addModDir(pathType path) X_ABSTRACT;
+	virtual bool setGameDir(pathTypeW path) X_ABSTRACT;
+	virtual void addModDir(pathTypeW path) X_ABSTRACT;
 
 	// Open Files
 	virtual XFile* openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_ABSTRACT;
@@ -369,8 +379,8 @@ struct IFileSys
 	virtual void closeFileMem(XFileMem* file) X_ABSTRACT;
 
 	// Find util
-	virtual uintptr_t findFirst(pathType path, _finddatai64_t* findinfo) X_ABSTRACT;
-	virtual bool findnext(uintptr_t handle, _finddatai64_t* findinfo) X_ABSTRACT;
+	virtual uintptr_t findFirst(pathType path, _wfinddatai64_t* findinfo) X_ABSTRACT;
+	virtual bool findnext(uintptr_t handle, _wfinddatai64_t* findinfo) X_ABSTRACT;
 	virtual void findClose(uintptr_t handle) X_ABSTRACT;
 
 	// Delete
@@ -383,10 +393,13 @@ struct IFileSys
 
 	// exsists.
 	virtual bool fileExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
+	virtual bool fileExists(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
 	virtual bool directoryExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
+	virtual bool directoryExists(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
 
 	// does not error, when it's a file or not exsist.
 	virtual bool isDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
+	virtual bool isDirectory(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
 
 	// stats
 	virtual XFileStats& getStats(void) const X_ABSTRACT;
@@ -546,7 +559,7 @@ public:
 
 	uint32_t printf(const char *fmt, ...) {
 		char buf[2048];
-		uint32_t length;
+		int32_t length;
 
 		va_list argptr;
 
@@ -554,7 +567,11 @@ public:
 		length = vsnprintf_s(buf, 2048 - 1, fmt, argptr);
 		va_end(argptr);
 
-		return write(buf, length);
+		if (length < 0) {
+			return 0;
+		}
+
+		return write(buf, safe_static_cast<uint32_t,int32_t>(length));
 	}
 
 	inline void seek(size_t position, SeekMode::Enum origin) {

@@ -463,15 +463,18 @@ void VidMemManager::DeviceUnsetIndexs(X3DBuffer* pBuf) const
 {
 	// check if this index's are currently bound to the pipeline
 	// if so unset.
+	X_ASSERT_NOT_NULL(pBuf);
 
-
+	render::g_Dx11D3D.FX_UnBindIStream(pBuf->pDevBuf);
 }
 
 void VidMemManager::DeviceUnsetVertexStream(X3DBuffer* pBuf) const
 {
 	// check if the vertex stream is currently bound to the pipeline
 	// if so unset.
+	X_ASSERT_NOT_NULL(pBuf);
 
+	render::g_Dx11D3D.FX_UnBindIStream(pBuf->pDevBuf);
 }
 
 // ---------------------------------------------------------------

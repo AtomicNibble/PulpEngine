@@ -19,9 +19,14 @@ void LoggerVerbosityFilterPolicy::Exit(void)
 	
 }
 
-bool LoggerVerbosityFilterPolicy::Filter(const char* type, const SourceInfo& sourceInfo, const char* channel, int verbosity, const char* format, va_list args)
+bool LoggerVerbosityFilterPolicy::Filter(const char* type, const SourceInfo& sourceInfo,
+	const char* channel, int verbosity, const char* format, va_list args)
 {
-	//	return g_verbosity.As<size_t>() >= verbosity;
+	X_UNUSED(type);
+	X_UNUSED(sourceInfo);
+	X_UNUSED(channel);
+	X_UNUSED(format);
+	X_UNUSED(args);
 	return log_verbosity >= verbosity;
 }
 

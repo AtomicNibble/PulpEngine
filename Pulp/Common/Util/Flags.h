@@ -72,7 +72,6 @@
 ///
 /// Last but not least, the Flags class can also be used to turn the stored values into a human-readable string,
 /// useful for displaying them in error messages, for logging, etc. For a complete discussion on the topic of enums/Flags,
-/// see http://molecularmusings.wordpress.com/2011/08/23/flags-on-steroids/.
 ///
 /// In order to use the Flags class, the template parameter T must be a struct that follows the following concepts:
 /// - It must have a member <tt>static const unsigned int FLAGS_COUNT</tt> = ...; that denotes the number of flags.

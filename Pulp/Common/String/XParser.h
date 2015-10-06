@@ -29,7 +29,7 @@ class XParser
 {
 	typedef XLexer::LexFlags LexFlags;
 public:
-	XParser(MemoryArenaBase* arena);
+	explicit XParser(MemoryArenaBase* arena);
 	XParser(LexFlags flags, MemoryArenaBase* arena);
 	XParser(const char* startInclusive, const char* endExclusive, const char* name, LexFlags flags, MemoryArenaBase* arena);
 	~XParser();
@@ -66,8 +66,8 @@ private:
 	bool UnreadSourceToken(const XLexToken& token);
 	bool ReadDirective(void);
 
-	bool isInCache(const char ch) const;
-	void addToCache(const char ch);
+	bool isInCache(const uint8_t ch) const;
+	void addToCache(const uint8_t ch);
 
 	bool Directive_define(void);
 	bool Directive_include(void);

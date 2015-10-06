@@ -4,7 +4,7 @@
 #define _TOM_CRC32_H_
 
 X_NAMESPACE_BEGIN(core)
-
+X_DISABLE_WARNING(4324) // warning C4324: structure was padded due to __declspec(align()) 
 
 X_ALIGNED_SYMBOL(class Crc32, 128)
 {
@@ -44,12 +44,13 @@ private:
 	static inline uint32_t Reflect(uint32_t iReflect, const char cChar);
 
 private:
-	uint32_t crc32_table[8][0x100];
+	uint32_t crc32_table_[8][0x100];
 	bool tableInit_;
 };
 
 #include "crc32.inl"
 
+X_ENABLE_WARNING(4324s);
 X_NAMESPACE_END
 
 

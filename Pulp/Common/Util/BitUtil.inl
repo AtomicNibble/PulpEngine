@@ -4,6 +4,12 @@ namespace bitUtil
 {
 	// tell the compiler to use the intrinsic versions of these functions
 	#pragma intrinsic(_BitScanReverse)
+	#pragma intrinsic(_BitScanForward)
+
+#if X_64
+	#pragma intrinsic(_BitScanReverse64)
+	#pragma intrinsic(_BitScanForward64)
+#endif // !X_64
 
 	/// \ingroup Util
 	namespace internal
@@ -22,6 +28,32 @@ namespace bitUtil
 		template <>
 		struct Implementation<8u>
 		{
+			template <typename T>
+			static inline bool IsBitFlagSet(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+			{
+				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
+				static_assert(sizeof(flag) == 8, "sizeof(flag) is not 8 bytes.");
+
+				return (static_cast<uint64_t>(value) & flag) == flag;
+			}
+
+			template <typename T>
+			static inline T ClearBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+			{
+				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
+				static_assert(sizeof(flag) == 8, "sizeof(flag) is not 8 bytes.");
+
+				return (static_cast<uint64_t>(value) & (~flag));
+			}
+
+			template <typename T>
+			static inline T SetBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+			{
+				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
+				static_assert(sizeof(flag) == 8, "sizeof(flag) is not 8 bytes.");
+
+				return (static_cast<uint64_t>(value) | flag);
+			}
 
 			/// Internal function used by bitUtil::RoundUpToMultiple.
 			template <typename T>
@@ -38,25 +70,91 @@ namespace bitUtil
 			{
 				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
 
-				uint32_t v = static_cast<uint32_t>(value) - ((static_cast<uint32_t>(value) >> 1u) & 0x5555555555555555UL);
-				v = (v & 0x3333333333333333UL) + ((v >> 2) & 0x3333333333333333UL);
-				return (((v + (v >> 4u) & 0xF0F0F0F0F0F0F0FUL) * 0x101010101010101UL) >> 56);
+				uint64_t v = static_cast<uint64_t>(value)-((static_cast<uint64_t>(value) >> 1ui64) & 0x5555555555555555ui64);
+				v = (v & 0x3333333333333333ui64) + ((v >> 2ui64) & 0x3333333333333333ui64);
+				return (((v + (v >> 4ui64) & 0xF0F0F0F0F0F0F0Fui64) * 0x101010101010101ui64) >> 56ui64);
 			}
 
 			/// Internal function used by bitUtil::ScanBits.
+			/// index of MSB
 			template <typename T>
 			static inline unsigned int ScanBits(T value)
 			{
 				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
 
 				unsigned long index = 0;
+
+#if X_64
 				const unsigned char result = _BitScanReverse64(&index, static_cast<uint64_t>(value));
 				if (result == 0) {
 					return NO_BIT_SET;
 				}
 
 				return index;
+#else
+				static const unsigned int bval[] =
+				{ 
+				0, 
+				1, 
+				2, 2, 
+				3, 3, 3, 3, 
+				4, 4, 4, 4, 4, 4, 4, 4 
+				};
+
+				if (value == 0) {
+					return NO_BIT_SET;
+				}
+
+				unsigned int r = 0;
+
+				if (value & 0xFFFFFFFF00000000) {
+					r += 32 / 1;
+					value >>= 32 / 1;
+				}
+				if (value & 0x00000000FFFF0000) {
+					r += 16 / 1;
+					value >>= 16 / 1;
+				}
+				if (value & 0x000000000000FF00) {
+					r += 16 / 2;
+					value >>= 16 / 2;
+				}
+				if (value & 0x00000000000000F0) {
+					r += 16 / 4;
+					value >>= 16 / 4;
+				}
+				return r + bval[value] - 1;
+#endif // !X_64
 			}
+
+			/// index of LSB
+			template <typename T>
+			static inline unsigned int ScanBitsForward(T value)
+			{
+				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
+
+				unsigned long index = 0;
+#if X_64
+				const unsigned char result = _BitScanForward64(&index, static_cast<uint64_t>(value));
+				if (result == 0) {
+					return NO_BIT_SET;
+				}
+
+				return index;
+#else
+				if (value)
+				{
+					value = (value ^ (value - 1)) >> 1;  // Set v's trailing 0s to 1s and zero rest
+					for (index = 0; value; index++)
+					{
+						value >>= 1;
+					}
+					return index;
+				}
+				return NO_BIT_SET;
+#endif // !X_64
+			}
+
 
 			/// Internal function used by bitUtil::SetBit.
 			template <typename T>
@@ -83,7 +181,8 @@ namespace bitUtil
 				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
 
 				const uint64_t mask = ~(((1ui64 << howMany) - 1ui64) << startBit);
-				return (static_cast<T>((static_cast<uint64_t>(value) & mask) | (static_cast<uint64_t>(bits) << startBit)));
+				uint64_t cappedBits = howMany == 64 ? bits : static_cast<uint64_t>(bits)& ((1ui64 << howMany) - 1ui64);
+				return (static_cast<T>((static_cast<uint64_t>(value) & mask) | (cappedBits << startBit)));
 			}
 
 			/// Internal function used by bitUtil::IsBitSet.
@@ -135,11 +234,30 @@ namespace bitUtil
 		{
 			/// Internal function used by bitUtil::IsBitFlagSet.
 			template <typename T>
-			static inline bool IsBitFlagSet(T value, unsigned int flag)
+			static inline bool IsBitFlagSet(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
 			{
 				static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
+				static_assert(sizeof(flag) == 4, "sizeof(flag) is not 4 bytes.");
 
 				return (static_cast<uint32_t>(value) & flag) == flag;
+			}
+
+			template <typename T>
+			static inline T ClearBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+			{
+				static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
+				static_assert(sizeof(flag) == 4, "sizeof(flag) is not 4 bytes.");
+
+				return (static_cast<uint32_t>(value) & (~flag));
+			}
+
+			template <typename T>
+			static inline T SetBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+			{
+				static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
+				static_assert(sizeof(flag) == 4, "sizeof(flag) is not 4 bytes.");
+
+				return (static_cast<uint32_t>(value) | flag);
 			}
 
 
@@ -177,7 +295,8 @@ namespace bitUtil
 				static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
 
 				const uint32_t mask = ~(((1u << howMany) - 1u) << startBit);
-				return (static_cast<T>((static_cast<uint32_t>(value) & mask) | (static_cast<uint32_t>(bits) << startBit)));
+				uint32_t cappedBits = howMany == 32 ? bits : static_cast<uint32_t>(bits)& ((1u << howMany) - 1u);
+				return (static_cast<T>((static_cast<uint32_t>(value)& mask) | (cappedBits << startBit)));
 			}
 
 			/// Internal function used by bitUtil::CountBits.
@@ -267,6 +386,33 @@ namespace bitUtil
 		template <>
 		struct Implementation<2u>
 		{
+			template <typename T>
+			static inline bool IsBitFlagSet(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+			{
+				static_assert(sizeof(T) == 2, "sizeof(T) is not 2 bytes.");
+				static_assert(sizeof(flag) == 2, "sizeof(flag) is not 2 bytes.");
+
+				return (static_cast<uint16_t>(value) & flag) == flag;
+			}
+
+			template <typename T>
+			static inline T ClearBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+			{
+				static_assert(sizeof(T) == 2, "sizeof(T) is not 2 bytes.");
+				static_assert(sizeof(flag) == 2, "sizeof(flag) is not 2 bytes.");
+
+				return (static_cast<uint16_t>(value) & (~flag));
+			}
+
+			template <typename T>
+			static inline T SetBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+			{
+				static_assert(sizeof(T) == 2, "sizeof(T) is not 2 bytes.");
+				static_assert(sizeof(flag) == 2, "sizeof(flag) is not 2 bytes.");
+
+				return (static_cast<uint16_t>(value) | flag);
+			}
+
 			/// Internal function used by bitUtil::IsBitSet.
 			template <typename T>
 			static inline bool IsBitSet(T value, unsigned int whichBit)
@@ -297,9 +443,25 @@ namespace bitUtil
 
 
 	template <typename T>
-	inline bool IsBitFlagSet(T value, unsigned int Flag)
+	inline bool IsBitFlagSet(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
 	{
-		return internal::Implementation<sizeof(T)>::IsBitFlagSet(value, Flag);
+		return internal::Implementation<sizeof(T)>::IsBitFlagSet(value, flag);
+	}
+
+
+	template <typename T>
+	inline T ClearBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+	{
+		// defer the implementation to the correct helper template, based on the size of the type
+		return internal::Implementation<sizeof(T)>::ClearBitFlag(value, flag);
+	}
+
+
+	template <typename T>
+	inline T SetBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+	{
+		// defer the implementation to the correct helper template, based on the size of the type
+		return internal::Implementation<sizeof(T)>::SetBitFlag(value, flag);
 	}
 
 

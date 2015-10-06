@@ -11,7 +11,7 @@ const char* const MultiThreadPolicy<SynchronizationPrimitive>::TYPE_NAME = "Mult
 template <class SynchronizationPrimitive>
 void MultiThreadPolicy<SynchronizationPrimitive>::Enter(void)
 {
-	m_primitive.Enter();
+	primitive_.Enter();
 }
 
 
@@ -20,5 +20,5 @@ void MultiThreadPolicy<SynchronizationPrimitive>::Enter(void)
 template <class SynchronizationPrimitive>
 void MultiThreadPolicy<SynchronizationPrimitive>::Leave(void)
 {
-	m_primitive.Leave();
+	primitive_.Leave();
 }

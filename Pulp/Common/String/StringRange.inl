@@ -1,63 +1,73 @@
 
 
 // ---------------------------------------------------------------------------------------------------------------------
-
-inline StringRange::StringRange(const char* const startInclusive, const char* const endExclusive) :
-	m_start(startInclusive), m_end(endExclusive)
+template<typename TChar>
+inline StringRange<TChar>::StringRange(const TChar* const startInclusive, 
+	const TChar* const endExclusive) :
+	start_(startInclusive), end_(endExclusive)
 {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-inline StringRange::StringRange(const char* const startInclusive, size_t length) :
-	m_start(startInclusive), m_end(startInclusive + length)
+template<typename TChar>
+inline StringRange<TChar>::StringRange(const TChar* const startInclusive, size_t length) :
+	start_(startInclusive), end_(startInclusive + length)
 {
 
 }
 // ---------------------------------------------------------------------------------------------------------------------
-inline const char* StringRange::Find(char character) const
+template<typename TChar>
+inline const TChar* StringRange<TChar>::Find(TChar character) const
 {
-	return strUtil::Find(m_start, m_end, character);
+	return strUtil::Find(start_, end_, character);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-inline const char* StringRange::Find(const char* sub) const
+template<typename TChar>
+inline const TChar* StringRange<TChar>::Find(const TChar* sub) const
 {
-	return strUtil::Find(m_start, m_end, sub);
+	return strUtil::Find(start_, end_, sub);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-inline const char* StringRange::FindWhitespace(void) const
+template<typename TChar>
+inline const TChar* StringRange<TChar>::FindWhitespace(void) const
 {
-	return strUtil::FindWhitespace(m_start, m_end);
+	return strUtil::FindWhitespace(start_, end_);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-inline const char* StringRange::FindNonWhitespace(void) const
+template<typename TChar>
+inline const TChar* StringRange<TChar>::FindNonWhitespace(void) const
 {
-	return strUtil::FindNonWhitespace(m_start, m_end);
+	return strUtil::FindNonWhitespace(start_, end_);
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-inline char StringRange::operator[](size_t i) const
+template<typename TChar>
+inline TChar StringRange<TChar>::operator[](size_t i) const
 {
-	X_ASSERT(m_start + i < m_end, "Character %d cannot be accessed. Subscript out of range.", i)(GetLength(), m_start, static_cast<const void*>(m_end));
-	return m_start[i];
+	X_ASSERT(start_ + i < end_, "Character %d cannot be accessed. Subscript out of range.", i)(GetLength(), start_, static_cast<const void*>(end_));
+	return start_[i];
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-inline const char* StringRange::GetStart(void) const
+template<typename TChar>
+inline const TChar* StringRange<TChar>::GetStart(void) const
 {
-	return m_start;
+	return start_;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-inline const char* StringRange::GetEnd(void) const
+template<typename TChar>
+inline const TChar* StringRange<TChar>::GetEnd(void) const
 {
-	return m_end;
+	return end_;
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-inline size_t StringRange::GetLength(void) const
+template<typename TChar>
+inline size_t StringRange<TChar>::GetLength(void) const
 {
-	return safe_static_cast<size_t>(m_end - m_start);
+	return safe_static_cast<size_t>(end_ - start_);
 }

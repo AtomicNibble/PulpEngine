@@ -8,6 +8,10 @@
 
 X_NAMESPACE_BEGIN(texture)
 
+X_DISABLE_WARNING(4061)
+X_DISABLE_WARNING(4062)
+
+
 namespace DDS
 {
 	namespace
@@ -188,6 +192,7 @@ namespace DDS
 			unsigned int    dwReserved;
 		};
 
+		X_DISABLE_WARNING(4201)
 		union DDS_header
 		{
 			struct {
@@ -214,6 +219,7 @@ namespace DDS
 
 			char data[128];
 		};
+		X_ENABLE_WARNING(4201)
 
 		struct DDS_DX10_header
 		{
@@ -260,6 +266,18 @@ namespace DDS
 				case PIXEL_FMT_DXT5_xGBR:
 				case PIXEL_FMT_DXT5_AGBR:
 					return true;
+
+					// explicit instead of fallthrough.
+					// probs allows a jmp table to be made.
+				case PIXEL_FMT_R8G8B8:
+				case PIXEL_FMT_L8:
+				case PIXEL_FMT_A8:
+				case PIXEL_FMT_A8L8:
+				case PIXEL_FMT_A8R8G8B8:
+				case PIXEL_FMT_DX10_HEADER: // humm?
+				case PIXEL_FMT_INVALID:
+					return false;
+
 				default: break;
 				}
 				return false;
@@ -282,6 +300,16 @@ namespace DDS
 				case PIXEL_FMT_DXT5_xGxR:    return DXT5;
 				case PIXEL_FMT_DXT5_xGBR:    return DXT5;
 				case PIXEL_FMT_DXT5_AGBR:    return DXT5;
+
+				case PIXEL_FMT_INVALID:
+				case PIXEL_FMT_R8G8B8:
+				case PIXEL_FMT_L8:
+				case PIXEL_FMT_A8:
+				case PIXEL_FMT_A8L8:
+				case PIXEL_FMT_A8R8G8B8:
+				case PIXEL_FMT_DX10_HEADER:
+					return DXTInvalid;
+
 				default: break;
 				}
 				return DXTInvalid;
@@ -305,7 +333,18 @@ namespace DDS
 					return PIXEL_FMT_3DC;
 				case DXT5A:
 					return PIXEL_FMT_DXT5A;
-				default: break;
+
+				case BC6_TYPELESS:
+				case BC6_UF16:
+				case BC6_SF16:
+				case BC7_TYPELESS:
+				case BC7_UNORM:
+				case BC7_UNORM_SRGB:
+				case DXTInvalid:
+					break;
+
+				default: 
+					break;
 				}
 				X_ASSERT_UNREACHABLE();
 				return PIXEL_FMT_INVALID;
@@ -345,6 +384,8 @@ namespace DDS
 						case dxt_format::BC7_UNORM:
 						case dxt_format::BC7_UNORM_SRGB:
 							return 8;
+						default:
+							break;
 					}
 				default:
 					break;
@@ -528,7 +569,7 @@ namespace DDS
 
 	// ITextureLoader
 
-	bool XTexLoaderDDS::canLoadFile(const core::Path& path) const
+	bool XTexLoaderDDS::canLoadFile(const core::Path<char>& path) const
 	{
 		return core::strUtil::IsEqual(DDS_FILE_EXTENSION, path.extension());
 	}
@@ -913,10 +954,10 @@ namespace DDS
 
 
 		// set the info
-		img->setWidth(hdr.dwWidth);
-		img->setHeigth(hdr.dwHeight);
-		img->setNumMips(num_mip_maps);
-		img->setNumFaces(num_faces); // 1 for 2D 6 for a cube.
+		img->setWidth(safe_static_cast<uint16_t,uint32_t>(hdr.dwWidth));
+		img->setHeigth(safe_static_cast<uint16_t, uint32_t>(hdr.dwHeight));
+		img->setNumMips(safe_static_cast<int32_t, uint32_t>(num_mip_maps));
+		img->setNumFaces(safe_static_cast<int32_t, uint32_t>(num_faces)); // 1 for 2D 6 for a cube.
 		img->setDepth(1); /// We Don't allow volume texture loading yet.
 		img->setFlags(flags);
 		img->setFormat(mapped_format);

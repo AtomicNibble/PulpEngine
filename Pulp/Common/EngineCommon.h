@@ -3,11 +3,13 @@
 #ifndef _X_ENGINE_COMMON_INCLUDES_H
 #define _X_ENGINE_COMMON_INCLUDES_H
 
-#include <Configuration.h>
-#include <Platform.h>
+#include <Core\Configuration.h>
+#include <Core\Platform.h>
 
 #include <Platform\Compiler.h>
 #include <Platform\Types.h>
+
+X_DISABLE_WARNING(4714) // __forceinline not inlined.
 
 // Util
 #include <Util\ClassMacros.h>

@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(texture)
 
 static const char*		CI_FILE_EXTENSION = ".ci";
 static const uint32_t	CI_FOURCC = X_TAG('c', 'i', 'm', 'g');
-static const uint32_t	CI_VERSION = 2;
+static const uint8_t	CI_VERSION = 2;
 // these are format limits.
 // global limtis must still be respected when loading.
 static const uint32_t	CI_MAX_DIMENSIONS = UINT16_MAX;
@@ -29,6 +29,7 @@ struct CITexureHeader
 
 	TextureFlags Flags;
 
+	X_DISABLE_WARNING(4201)
 	union {
 		struct {
 			uint16_t width;
@@ -38,6 +39,7 @@ struct CITexureHeader
 			Vec2<uint16_t> size;
 		};
 	};
+	X_ENABLE_WARNING(4201)
 
 	uint32 DataSize;	// the size of all the data.
 	uint32 FaceSize;	// face size

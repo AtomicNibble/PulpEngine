@@ -28,7 +28,8 @@ uint32_t LoggerFullFormatPolicy::Format(LoggerBase::Line& line, const char* inde
 	size_t verbosity, const char* format, va_list args)
 {
 	int bytesWritten; 
-
+	X_UNUSED(type);
+	X_UNUSED(verbosity);
 
 	DateStamp::Description DateStr;
 	DateStamp date = DateStamp::GetSystemDate();
@@ -48,9 +49,7 @@ uint32_t LoggerFullFormatPolicy::Format(LoggerBase::Line& line, const char* inde
 	bytesWritten += vsnprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, format, args);
 	bytesWritten += _snprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, "\n");
 
-	return safe_static_cast<int,uint32_t>( bytesWritten );
-
-	return 0;
+	return safe_static_cast<uint32_t, int>(bytesWritten);
 }
 
 

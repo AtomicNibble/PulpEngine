@@ -1,7 +1,10 @@
 #include "EngineCommon.h"
 #include "SymbolResolution.h"
 #include <Util\LastError.h>
+
+X_DISABLE_WARNING(4091)
 #include <DbgHelp.h>
+X_ENABLE_WARNING(4091)
 
 X_NAMESPACE_BEGIN(core)
 
@@ -92,6 +95,8 @@ namespace symbolResolution
 		{
 			return SymbolInfo( sip.si.Name, line.FileName, line.LineNumber);
 		}
+#else
+		X_UNUSED(address);
 #endif
 		return SymbolInfo( "function", "filename", 0 );
 	}

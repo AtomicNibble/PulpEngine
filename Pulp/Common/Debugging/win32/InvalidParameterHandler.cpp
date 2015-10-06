@@ -21,9 +21,11 @@ namespace invalidParameterHandler
 		_invalid_parameter_handler g_oldHandler;
 
 
-		void myInvalidParameterHandler( const wchar_t* expression, const wchar_t* function, const wchar_t* file, unsigned int line, uintptr_t pReserved )
+		void myInvalidParameterHandler( const wchar_t* expression, const wchar_t* function, const wchar_t* file,
+			unsigned int line, uintptr_t pReserved )
 		{		
 			X_FATAL( "InvParamHandler", "A CRT function has been called with an invalid parameter." );
+			X_UNUSED(pReserved);
 
 			{
 				X_LOG_BULLET;
@@ -42,7 +44,8 @@ namespace invalidParameterHandler
 
 				X_ERROR( "InvParamHandler", "Failed expression: %s", convExpression );
 				X_ERROR( "InvParamHandler", "Function: %s", function );
-				X_ERROR( "InvParamHandler", "File: %s", file );
+				X_ERROR("InvParamHandler", "File: %s", file);
+				X_ERROR("InvParamHandler", "Line: %i", line);
 
 			}
 			RaiseException( EXCEPTION_CODE, 0, 0, 0);

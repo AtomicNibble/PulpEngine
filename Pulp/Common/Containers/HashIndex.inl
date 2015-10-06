@@ -22,7 +22,7 @@ X_INLINE XHashIndex::~XHashIndex(void)
 
 X_INLINE size_t XHashIndex::allocated(void) const 
 {
-	return hashSize_ * sizeof(int)+indexSize_ * sizeof(int);
+	return hashSize_ * sizeof(int) + indexSize_ * sizeof(int);
 }
 
 
@@ -52,19 +52,19 @@ X_INLINE XHashIndex& XHashIndex::operator=(const XHashIndex& oth)
 		if (oth.hashSize_ != hashSize_ || hash_ == INVALID_INDEX)
 		{
 			if (hash_ != INVALID_INDEX) {
-				delete[] hash_;
+				X_DELETE_ARRAY(hash_, arena_);
 			}
 			hashSize_ = oth.hashSize_;
-			hash_ = new int[hashSize_];
+			hash_ = X_NEW_ARRAY(int, hashSize_, arena_, "HashIndex:Hash");
 		}
 
 		if (oth.indexSize_ != indexSize_ || indexChain_ == INVALID_INDEX)
 		{
 			if (indexChain_ != INVALID_INDEX) {
-				delete[] indexChain_;
+				X_DELETE_ARRAY(indexChain_, arena_);
 			}
 			indexSize_ = oth.indexSize_;
-			indexChain_ = new int[indexSize_];
+			indexChain_ = X_NEW_ARRAY(int, indexSize_, arena_, "HashIndex:Chain");
 		}
 
 		memcpy(hash_, oth.hash_, hashSize_ * sizeof(hash_[0]));
@@ -227,11 +227,9 @@ X_INLINE void XHashIndex::setGranularity(const size_type newGranularity)
 X_INLINE uint32_t XHashIndex::generateKey(const char* string, bool caseSensitive) const
 {
 	if (caseSensitive) {
-		//	return (idStr::Hash(string) & hashMask);
 		return core::Hash::Fnv1aHash(string, strlen(string));
 	}
 	else {
-		//	return (idStr::IHash(string) & hashMask);
 		return core::Hash::Fnv1aHash(string, strlen(string));
 	}
 }

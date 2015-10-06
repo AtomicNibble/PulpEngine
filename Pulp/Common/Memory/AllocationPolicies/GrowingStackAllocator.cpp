@@ -9,13 +9,13 @@ X_NAMESPACE_BEGIN(core)
 
 GrowingStackAllocator::GrowingStackAllocator(size_t maxSizeInBytes, size_t granularity)
 {
-	m_virtualStart = (char*)VirtualMem::ReserveAddressSpace(maxSizeInBytes);
-	m_virtualEnd = &m_virtualStart[maxSizeInBytes];
-	m_physicalCurrent = m_virtualStart;
-	m_physicalEnd = m_virtualStart;
-	m_granularity = granularity;
+	virtualStart_ = reinterpret_cast<char*>(VirtualMem::ReserveAddressSpace(maxSizeInBytes));
+	virtualEnd_ = &virtualStart_[maxSizeInBytes];
+	physicalCurrent_ = virtualStart_;
+	physicalEnd_ = virtualStart_;
+	granularity_ = granularity;
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
-	m_allocationID = 0;
+	allocationID_ = 0;
 #endif
 
 	if (!bitUtil::IsPowerOfTwo(granularity))
@@ -32,15 +32,15 @@ GrowingStackAllocator::GrowingStackAllocator(size_t maxSizeInBytes, size_t granu
 	}
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	core::zero_object(m_statistics);
-	m_statistics.m_type = "GrowingStackAlloc";
-	m_statistics.m_virtualMemoryReserved = maxSizeInBytes;
+	core::zero_object(statistics_);
+	statistics_.type_ = "GrowingStackAlloc";
+	statistics_.virtualMemoryReserved_ = maxSizeInBytes;
 #endif 
 }
 
 GrowingStackAllocator::~GrowingStackAllocator(void)
 {
-	VirtualMem::ReleaseAddressSpace(m_virtualStart);
+	VirtualMem::ReleaseAddressSpace(virtualStart_);
 }
 
 
@@ -53,38 +53,38 @@ void* GrowingStackAllocator::allocate(size_t size, size_t alignment, size_t offs
 
 
 	allocationSize = size; // Requested size
-	allocationOffset = safe_static_cast<size_t>(m_physicalCurrent - m_virtualStart);
-	oldCurrent = m_physicalCurrent;
+	allocationOffset = safe_static_cast<size_t>(physicalCurrent_ - virtualStart_);
+	oldCurrent = physicalCurrent_;
 	size += sizeof(BlockHeader); // add room for our book keeping.
 
 	// Get aligned location.
-	m_physicalCurrent = pointerUtil::AlignTop<char>(
-					&m_physicalCurrent[offset + sizeof(BlockHeader)], alignment)
+	physicalCurrent_ = pointerUtil::AlignTop<char>(
+					&physicalCurrent_[offset + sizeof(BlockHeader)], alignment)
 					- (offset + sizeof(BlockHeader));
 
 	// space?
-	if (&m_physicalCurrent[size] > m_physicalEnd)
+	if (&physicalCurrent_[size] > physicalEnd_)
 	{
-		neededPhysicalSize = bitUtil::RoundUpToMultiple(size, m_granularity);
+		neededPhysicalSize = bitUtil::RoundUpToMultiple(size, granularity_);
 
-		if (&m_physicalEnd[neededPhysicalSize] <= m_virtualEnd)
+		if (&physicalEnd_[neededPhysicalSize] <= virtualEnd_)
 		{
-			VirtualMem::AllocatePhysicalMemory(m_physicalEnd, neededPhysicalSize);
-			m_physicalEnd += neededPhysicalSize;
+			VirtualMem::AllocatePhysicalMemory(physicalEnd_, neededPhysicalSize);
+			physicalEnd_ += neededPhysicalSize;
 		}
 	}
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-		++m_statistics.m_allocationCount;
-		m_statistics.m_allocationCountMax = core::Max<size_t>(m_statistics.m_allocationCount, m_statistics.m_allocationCountMax);
-		m_statistics.m_physicalMemoryAllocated = safe_static_cast<size_t>(m_physicalEnd - m_virtualStart);
-		m_statistics.m_physicalMemoryAllocatedMax = core::Max<size_t>(m_statistics.m_physicalMemoryAllocated, m_statistics.m_physicalMemoryAllocatedMax);
-		m_statistics.m_physicalMemoryUsed = safe_static_cast<size_t>(m_physicalCurrent - m_virtualStart);
-		m_statistics.m_physicalMemoryUsedMax = core::Max<size_t>(m_statistics.m_physicalMemoryUsed, m_statistics.m_physicalMemoryUsedMax);
-		m_statistics.m_wasteAlignment += safe_static_cast<size_t>((uintptr_t)(m_physicalCurrent + (uintptr_t)oldCurrent - size));
-		m_statistics.m_wasteAlignmentMax = core::Max<size_t>(m_statistics.m_wasteAlignment, m_statistics.m_wasteAlignmentMax);
-		m_statistics.m_internalOverhead += sizeof(BlockHeader);
-		m_statistics.m_internalOverheadMax = core::Max<size_t>(m_statistics.m_internalOverhead, m_statistics.m_internalOverheadMax);
+		++statistics_.allocationCount_;
+		statistics_.allocationCountMax_ = core::Max<size_t>(statistics_.allocationCount_, statistics_.allocationCountMax_);
+		statistics_.physicalMemoryAllocated_ = safe_static_cast<size_t>(physicalEnd_ - virtualStart_);
+		statistics_.physicalMemoryAllocatedMax_ = core::Max<size_t>(statistics_.physicalMemoryAllocated_, statistics_.physicalMemoryAllocatedMax_);
+		statistics_.physicalMemoryUsed_ = safe_static_cast<size_t>(physicalCurrent_ - virtualStart_);
+		statistics_.physicalMemoryUsedMax_ = core::Max<size_t>(statistics_.physicalMemoryUsed_, statistics_.physicalMemoryUsedMax_);
+		statistics_.wasteAlignment_ += safe_static_cast<size_t>((uintptr_t)(physicalCurrent_ + (uintptr_t)oldCurrent - size));
+		statistics_.wasteAlignmentMax_ = core::Max<size_t>(statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_);
+		statistics_.internalOverhead_ += sizeof(BlockHeader);
+		statistics_.internalOverheadMax_ = core::Max<size_t>(statistics_.internalOverhead_, statistics_.internalOverheadMax_);
 #endif
 	
 
@@ -95,16 +95,16 @@ void* GrowingStackAllocator::allocate(size_t size, size_t alignment, size_t offs
 		BlockHeader* as_header;
 	};
 
-	as_char = m_physicalCurrent;
+	as_char = physicalCurrent_;
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
-	as_header->m_AllocationID = m_allocationID++;
+	as_header->AllocationID_ = allocationID_++;
 #endif
-	as_header->m_allocationOffset = allocationOffset;
-	as_header->m_AllocationSize = allocationSize;
+	as_header->allocationOffset_ = allocationOffset;
+	as_header->AllocationSize_ = allocationSize;
 	as_char += sizeof(BlockHeader);
 
 	void* userPtr = as_void;
-	m_physicalCurrent += size;
+	physicalCurrent_ += size;
 	return userPtr;
 }
 
@@ -123,37 +123,37 @@ void GrowingStackAllocator::free(void* ptr)
 	as_char -= sizeof(BlockHeader);
 
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
-	if (as_header->m_AllocationID != (m_allocationID - 1))
+	if (as_header->AllocationID_ != (allocationID_ - 1))
 	{
-		uint32_t AllocationID = as_header->m_AllocationID;
-		X_ASSERT(false, "Cannot free memory from stack(LIFO). invalid order.")(m_allocationID, AllocationID, ptr);
+		uint32_t AllocationID = as_header->AllocationID_;
+		X_ASSERT(false, "Cannot free memory from stack(LIFO). invalid order.")(allocationID_, AllocationID, ptr);
 	}
 
-	m_allocationID--;
+	allocationID_--;
 #endif
 
-	m_physicalCurrent = &m_virtualStart[as_header->m_allocationOffset];
+	physicalCurrent_ = &virtualStart_[as_header->allocationOffset_];
 
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	m_statistics.m_allocationCount--;
-	m_statistics.m_physicalMemoryUsed = as_header->m_allocationOffset;
-	m_statistics.m_internalOverhead -= sizeof(BlockHeader);
-	m_statistics.m_wasteAlignment -= safe_static_cast<size_t>(as_char - m_physicalCurrent);
+	statistics_.allocationCount_--;
+	statistics_.physicalMemoryUsed_ = as_header->allocationOffset_;
+	statistics_.internalOverhead_ -= sizeof(BlockHeader);
+	statistics_.wasteAlignment_ -= safe_static_cast<size_t>(as_char - physicalCurrent_);
 #endif
 }
 
 void GrowingStackAllocator::purge(void)
 {
-	char* start = pointerUtil::AlignTop<char>(m_physicalCurrent, m_granularity);
-	size_t size = safe_static_cast<size_t>(m_physicalEnd - start);
+	char* start = pointerUtil::AlignTop<char>(physicalCurrent_, granularity_);
+	size_t size = safe_static_cast<size_t>(physicalEnd_ - start);
 
 	VirtualMem::FreePhysicalMemory(start,size);
 
-	m_physicalEnd = start;
+	physicalEnd_ = start;
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	m_statistics.m_physicalMemoryAllocated = safe_static_cast<size_t>(m_physicalEnd - m_virtualStart);
+	statistics_.physicalMemoryAllocated_ = safe_static_cast<size_t>(physicalEnd_ - virtualStart_);
 #endif
 }
 
@@ -161,7 +161,7 @@ void GrowingStackAllocator::purge(void)
 MemoryAllocatorStatistics GrowingStackAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	return m_statistics;
+	return statistics_;
 #else
 	MemoryAllocatorStatistics stats;
 	core::zero_object(stats);

@@ -107,8 +107,7 @@ bool	XFontRender::GetGlyph(XGlyphBitmap *pGlyphBitmap, uint8 *iGlyphWidth, uint8
 { 
 	int iError = FT_Load_Char(pFace_, iCharCode, FT_LOAD_DEFAULT);
 
-	if (iError)
-	{
+	if (iError) {
 		return false;
 	}
 
@@ -120,13 +119,14 @@ bool	XFontRender::GetGlyph(XGlyphBitmap *pGlyphBitmap, uint8 *iGlyphWidth, uint8
 		return false;
 	}
 
-	if (iGlyphWidth)
-		*iGlyphWidth = pGlyph_->bitmap.width;
-	if (iGlyphHeight)
-		*iGlyphHeight = pGlyph_->bitmap.rows;
+	if (iGlyphWidth) {
+		*iGlyphWidth = safe_static_cast<uint8_t, int>(pGlyph_->bitmap.width);
+	}
+	if (iGlyphHeight) {
+		*iGlyphHeight = safe_static_cast<uint8_t, int>(pGlyph_->bitmap.rows);
+	}
 
-
-	int iTopOffset = (iGlyphBitmapHeight_ - (int)(iGlyphBitmapHeight_ * fSizeRatio_)) + pGlyph_->bitmap_top;
+//	int iTopOffset = (iGlyphBitmapHeight_ - (int)(iGlyphBitmapHeight_ * fSizeRatio_)) + pGlyph_->bitmap_top;
 
 	iCharOffsetX = (char)pGlyph_->bitmap_left;
 	iCharOffsetY = (char)((int)(iGlyphBitmapHeight_ * fSizeRatio_) - pGlyph_->bitmap_top);		// is that correct? - we need the baseline

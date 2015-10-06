@@ -43,21 +43,22 @@ namespace Compression
 		{
 			switch (lvl)
 			{
-				case Zlib::CompressLevel::LOW:
-					return Z_BEST_SPEED;
-				case Zlib::CompressLevel::NORMAL:
-					return Z_DEFAULT_COMPRESSION;
-				case Zlib::CompressLevel::HIGH:
-					return Z_BEST_COMPRESSION;
+			case Zlib::CompressLevel::LOW:
+				return Z_BEST_SPEED;
+			case Zlib::CompressLevel::NORMAL:
+				return Z_DEFAULT_COMPRESSION;
+			case Zlib::CompressLevel::HIGH:
+				return Z_BEST_COMPRESSION;
 #if X_DEBUG
-				default:
-					X_ASSERT_UNREACHABLE();
-					return Z_DEFAULT_COMPRESSION;
+			default:
+				X_ASSERT_UNREACHABLE();
+				return Z_DEFAULT_COMPRESSION;
+			}
 #else
 					X_NO_SWITCH_DEFAULT;
-#endif
 			}
 			return 0;
+#endif
 		}
 
 		static const char* ZlibErrToStr(int32_t err)

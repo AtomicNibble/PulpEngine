@@ -53,10 +53,9 @@
     <ClInclude Include="CompileTime\IsPOD.h" />
     <ClInclude Include="CompileTime\IsPointer.h" />
     <ClInclude Include="CompileTime\IsStringLiteral.h" />
+    <ClInclude Include="Compression\LZ4.h" />
     <ClInclude Include="Compression\Lzma2.h" />
     <ClInclude Include="Compression\Zlib.h" />
-    <ClInclude Include="Configuration.h" />
-    <ClInclude Include="ConfigurationWin32.h" />
     <ClInclude Include="Containers\BitStream.h" />
     <ClInclude Include="Containers\ByteStream.h" />
     <ClInclude Include="Containers\ByteStreamFifo.h" />
@@ -73,6 +72,10 @@
     <ClInclude Include="Containers\LinkedList.h" />
     <ClInclude Include="Containers\LinkedListIntrusive.h" />
     <ClInclude Include="Containers\Stack.h" />
+    <ClInclude Include="Core\Configuration.h" />
+    <ClInclude Include="Core\ConfigurationWin32.h" />
+    <ClInclude Include="Core\Platform.h" />
+    <ClInclude Include="Core\PlatformWin32.h" />
     <ClInclude Include="Debugging\AbortHandler.h" />
     <ClInclude Include="Debugging\Assert.h" />
     <ClInclude Include="Debugging\AssertionHandler.h" />
@@ -115,6 +118,7 @@
     <ClInclude Include="Hashing\MD5.h" />
     <ClInclude Include="Hashing\MurmurHash.h" />
     <ClInclude Include="Hashing\sha1.h" />
+    <ClInclude Include="Hashing\SHA512.h" />
     <ClInclude Include="IAnimation.h" />
     <ClInclude Include="IAssetPak.h" />
     <ClInclude Include="ICi.h" />
@@ -216,8 +220,6 @@
     <ClInclude Include="Memory\ThreadPolicies\MultiThreadPolicy.h" />
     <ClInclude Include="Memory\ThreadPolicies\SingleThreadPolicy.h" />
     <ClInclude Include="Memory\VirtualMem.h" />
-    <ClInclude Include="Platform.h" />
-    <ClInclude Include="PlatformWin32.h" />
     <ClInclude Include="Platform\ClipBoard.h" />
     <ClInclude Include="Platform\Compiler.h" />
     <ClInclude Include="Platform\Console.h" />
@@ -226,6 +228,7 @@
     <ClInclude Include="Platform\win32\ClipBoard.h" />
     <ClInclude Include="Platform\win32\Compiler.h" />
     <ClInclude Include="Platform\win32\Console.h" />
+    <ClInclude Include="Platform\win32\CustomFrame.h" />
     <ClInclude Include="Platform\win32\DirectoryWatcher.h" />
     <ClInclude Include="Platform\win32\Window.h" />
     <ClInclude Include="Platform\Window.h" />
@@ -274,12 +277,17 @@
     <ClInclude Include="Threading\Spinlock.h" />
     <ClInclude Include="Threading\Thread.h" />
     <ClInclude Include="Threading\ThreadLocalStorage.h" />
+    <ClInclude Include="Threading\win32\ConditionVariable.h" />
+    <ClInclude Include="Threading\win32\CriticalSection.h" />
+    <ClInclude Include="Threading\win32\Semaphore.h" />
     <ClInclude Include="Threading\win32\Signal.h" />
     <ClInclude Include="Threading\win32\Thread.h" />
+    <ClInclude Include="Threading\win32\ThreadLocalStorage.h" />
     <ClInclude Include="Time\CompressedStamps.h" />
     <ClInclude Include="Time\DateStamp.h" />
     <ClInclude Include="Time\TimeStamp.h" />
     <ClInclude Include="Time\TimeVal.h" />
+    <ClInclude Include="Time\win32\TimeStamp.h" />
     <ClInclude Include="Traits\FunctionSignatureTraits.h" />
     <ClInclude Include="Traits\FunctionTraits.h" />
     <ClInclude Include="Traits\MemberFunctionTraits.h" />
@@ -334,6 +342,7 @@
     <None Include="Debugging\Assert.inl" />
     <None Include="Debugging\SymbolInfo.inl" />
     <None Include="Debugging\win32\CallStack.inl" />
+    <None Include="Hashing\SHA512.inl" />
     <None Include="Logging\FilterPolicies\LoggerNoFilterPolicy.inl" />
     <None Include="Logging\Logger.inl" />
     <None Include="Logging\LoggerBase.inl" />
@@ -374,6 +383,7 @@
     <None Include="String\GrowingStringTable.inl" />
     <None Include="String\StackString.inl" />
     <None Include="String\Path.inl" />
+    <None Include="String\StackStringW.inl" />
     <None Include="String\StringHash.inl" />
     <None Include="String\StringRange.inl" />
     <None Include="String\StringTable.inl" />
@@ -381,10 +391,11 @@
     <None Include="String\StrRef.inl" />
     <None Include="Threading\Atomic.inl" />
     <None Include="Threading\AtomicInt.inl" />
-    <None Include="Threading\CriticalSection.inl" />
-    <None Include="Threading\Semaphore.inl" />
     <None Include="Threading\Spinlock.inl" />
-    <None Include="Threading\ThreadLocalStorage.inl" />
+    <None Include="Threading\win32\CriticalSection.inl" />
+    <None Include="Threading\win32\Semaphore.inl" />
+    <None Include="Threading\win32\ThreadLocalStorage.inl" />
+    <None Include="Time\TimeVal.inl" />
     <None Include="Util\BitUtil.inl" />
     <None Include="Util\Cpu.inl" />
     <None Include="Util\EndianUtil.inl" />
@@ -399,7 +410,20 @@
     <None Include="Util\StopWatch.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\3rdparty\source\lz4-r131\lz4_lib.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Assets\AssetContainer.cpp" />
+    <ClCompile Include="Compression\LZ4.cpp" />
     <ClCompile Include="Compression\Lzma2.cpp" />
     <ClCompile Include="Compression\Zlib.cpp" />
     <ClCompile Include="Containers\HashIndex.cpp" />
@@ -515,6 +539,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Hashing\sha1.cpp" />
+    <ClCompile Include="Hashing\SHA512.cpp" />
     <ClCompile Include="Logging\FilterPolicies\LoggerVerbosityFilterPolicy.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
@@ -675,29 +700,18 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
+    <ClCompile Include="String\StringUtilW.cpp" />
     <ClCompile Include="String\Xml.cpp" />
     <ClCompile Include="String\XParser.cpp" />
-    <ClCompile Include="Threading\ConditionVariable.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
-    </ClCompile>
-    <ClCompile Include="Threading\CriticalSection.cpp">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Use</PrecompiledHeader>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
-      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
-    </ClCompile>
     <ClCompile Include="Threading\JobList.cpp" />
     <ClCompile Include="Threading\JobSystem.cpp" />
+    <ClCompile Include="Threading\win32\ConditionVariable.cpp" />
+    <ClCompile Include="Threading\win32\CriticalSection.cpp" />
     <ClCompile Include="Threading\win32\Signal.cpp" />
     <ClCompile Include="Threading\win32\Thread.cpp" />
     <ClCompile Include="Time\CompressedStamps.cpp" />
     <ClCompile Include="Time\DateStamp.cpp" />
-    <ClCompile Include="Time\TimeStamp.cpp" />
+    <ClCompile Include="Time\win32\TimeStamp.cpp" />
     <ClCompile Include="Util\Cpu.cpp" />
     <ClCompile Include="Util\win32\LastError.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>
@@ -718,67 +732,67 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Super|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Super|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v120</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -838,7 +852,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
@@ -853,7 +867,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>EngineCommon.h</PrecompiledHeaderFile>
@@ -867,7 +881,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
@@ -881,7 +895,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">
     <ClCompile>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>false</MinimalRebuild>
@@ -894,7 +908,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -911,7 +925,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -928,7 +942,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -945,7 +959,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -962,7 +976,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Super|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
@@ -979,7 +993,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>Level4</WarningLevel>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <Optimization>MaxSpeed</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>

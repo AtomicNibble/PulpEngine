@@ -2,14 +2,73 @@
 #include "StringUtil.h"
 #include "Path.h"
 
+#include "StrRef.h"	
+#include <string>
+
 #include <direct.h>
-	
 
 X_NAMESPACE_BEGIN(core)
 
 
 namespace strUtil
 {
+	template<>
+	inline size_t StringBytes(const std::string& str)
+	{
+		return str.length();
+	}
+
+	template<>
+	inline size_t StringBytes(const std::wstring& str)
+	{
+		return str.length() * 2;
+	}
+
+	template<>
+	inline size_t StringBytes(const core::StringRef<char>& str)
+	{
+		return str.length();
+	}
+
+	template<>
+	inline size_t StringBytes(const core::StringRef<wchar_t>& str)
+	{
+		return str.length() * 2;
+	}
+
+	template<>
+	inline size_t StringBytesIncNull(const std::string& str)
+	{
+		return str.length() + 1;
+	}
+
+	template<>
+	inline size_t StringBytesIncNull(const std::wstring& str)
+	{
+		return (str.length() + 1) * 2;
+	}
+
+	template<>
+	inline size_t StringBytesIncNull(const core::StringRef<char>& str)
+	{
+		return str.length() + 1;
+	}
+
+	template<>
+	inline size_t StringBytesIncNull(const core::StringRef<wchar_t>& str)
+	{
+		return (str.length() + 1) * 2;
+	}
+
+	static const size_t initerlizer_1 = StringBytes(std::string(""));
+	static const size_t initerlizer_2 = StringBytes(std::wstring(L""));
+	static const size_t initerlizer_3 = StringBytes(core::StringRef<char>(""));
+	static const size_t initerlizer_4 = StringBytes(core::StringRef<wchar_t>(L""));
+	static const size_t initerlizer_5 = StringBytesIncNull(std::string(""));
+	static const size_t initerlizer_6 = StringBytesIncNull(std::wstring(L""));
+	static const size_t initerlizer_7 = StringBytesIncNull(core::StringRef<char>(""));
+	static const size_t initerlizer_8 = StringBytesIncNull(core::StringRef<wchar_t>(L""));
+
 	namespace
 	{
 #define  bswap16	_byteswap_ushort
@@ -39,7 +98,11 @@ namespace strUtil
 				if (load16(tgt - 1) == pair)
 					return tgt - 1;
 			}
-			while (1) {
+
+			X_DISABLE_WARNING(4127)
+			while (true)
+			X_ENABLE_WARNING(4127)
+			{
 				__m128i  x = xmload(tgt);
 				unsigned u = compxm(zero, x);
 				unsigned v = compxm(p0, x) & (compxm(p1, x) >> 1) & ~u & (u - 1);
@@ -73,7 +136,10 @@ namespace strUtil
 				if (u >> f) return  NULL;
 			}
 
-			while (1) {
+			X_DISABLE_WARNING(4127)
+			while (true)
+			X_ENABLE_WARNING(4127)
+			{
 				__m128i  x = xmload(tgt);
 				unsigned u = compxm(zero, x);
 				unsigned v = compxm(p0, x) & (compxm(p1, x) >> 1);
@@ -92,7 +158,9 @@ namespace strUtil
 			uint32_t head = MSBF32(pat), wind = 0, next;
 
 			pat += 4, len -= 4;
-			while ((next = *(uint8_t const*)tgt++)) {
+			// warning C4706: assignment within conditional expression
+			while ((next = *reinterpret_cast<uint8_t const*>(tgt++)) != 0)
+			{
 				wind = (wind << 8) + next;
 				if (wind == head && !memcmp(tgt, pat, len))
 					return tgt - 4;
@@ -119,7 +187,7 @@ namespace strUtil
 		void ReplaceSlashes(const char* path, const char* pathEnd)
 		{
 			replaceAll(path, pathEnd,
-				Path::NON_NATIVE_SLASH, Path::NATIVE_SLASH);
+				Path<char>::NON_NATIVE_SLASH, Path<char>::NATIVE_SLASH);
 		}
 
 
@@ -175,11 +243,27 @@ namespace strUtil
 			}
 #endif
 		};
+
+
+		uint32_t upperCaseSIMD(uint32_t x)
+		{
+			uint32_t b = 0x80808080ul | x;
+			uint32_t c = b - 0x61616161ul;
+			uint32_t d = ~(b - 0x7b7b7b7bul);
+			uint32_t e = (c & d) & (~x & 0x80808080ul);
+			return x - (e >> 2);
+		}
+
+	} // namespace
+
+	size_t strlen(const char* str)
+	{
+		return static_cast<size_t>(Implementation<sizeof(const char*)>::strlen(str));
 	}
 
-	uint32_t strlen(const char* str)
+	size_t strlen(const wchar_t* str)
 	{
-		return static_cast<uint32_t>(Implementation<sizeof(const char*)>::strlen(str));
+		return static_cast<size_t>(wcslen(str));
 	}
 
 	const char* Convert(const wchar_t *input, char *output, uint32_t outputLength)
@@ -189,10 +273,10 @@ namespace strUtil
 		return output;
 	}
 
-	const wchar_t* Convert(const char *input, wchar_t *output, uint32_t outputLength)
+	const wchar_t* Convert(const char *input, wchar_t *output, uint32_t outputBytes)
 	{
 		size_t convertedChars = 0;
-		mbstowcs_s(&convertedChars, output, outputLength, input, _TRUNCATE);
+		mbstowcs_s(&convertedChars, output, outputBytes / 2, input, _TRUNCATE);
 		return output;
 	}
 
@@ -231,7 +315,7 @@ namespace strUtil
 
 	bool IsEqual(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2, const char* endExclusiveS2)
 	{
-		size_t Len = endExclusiveS1 - startInclusiveS1;
+		ptrdiff_t Len = endExclusiveS1 - startInclusiveS1;
 
 		if (Len == (endExclusiveS2 - startInclusiveS2))
 			return memcmp(startInclusiveS1, startInclusiveS2, Len) == 0;
@@ -252,7 +336,7 @@ namespace strUtil
 	/// Returns whether two strings are equal, checks the length of the 1st range.
 	bool IsEqualCaseInsen(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2)
 	{
-		size_t Len = endExclusiveS1 - startInclusiveS1;
+		ptrdiff_t Len = endExclusiveS1 - startInclusiveS1;
 
 		while (Len && *startInclusiveS2 
 			&& (::tolower(*startInclusiveS1) == ::tolower(*startInclusiveS2)))
@@ -267,10 +351,18 @@ namespace strUtil
 
 	bool IsEqualCaseInsen(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2, const char* endExclusiveS2)
 	{
-		size_t Len = endExclusiveS1 - startInclusiveS1;
+		ptrdiff_t Len = endExclusiveS1 - startInclusiveS1;
 
 		if (Len == (endExclusiveS2 - startInclusiveS2))
-			return _stricmp(startInclusiveS1, startInclusiveS2) == 0;
+		{
+			// need to respect length values.
+			while (Len && (::tolower(*startInclusiveS1) == ::tolower(*startInclusiveS2))) {
+				Len--;
+				startInclusiveS1++;
+				startInclusiveS2++;
+			}
+			return Len == 0;
+		}
 
 		return false;
 	}
@@ -333,6 +425,19 @@ namespace strUtil
 		return result;
 	}
 
+	/// \brief Finds the first whitespace character in a string, and returns a pointer to it.
+	/// \remark Returns a \c nullptr if no such character could not be found.
+	const char* FindWhitespace(const char* startInclusive, const char* endExclusive)
+	{
+		while (startInclusive < endExclusive)
+		{
+			if (*startInclusive == ' ')
+				return startInclusive;
+			++startInclusive;
+		}
+
+		return nullptr;
+	}
 
 	const char* FindLastWhitespace(const char* startInclusive, const char* endExclusive)
 	{
@@ -345,8 +450,11 @@ namespace strUtil
 			// if whitespace return it.
 			if (IsWhitespace(*endExclusive))
 				return endExclusive;
-		} while (1);
-
+		}
+		X_DISABLE_WARNING(4127)
+		while (1);		
+		X_ENABLE_WARNING(4127)
+		
 		return nullptr;
 	}
 
@@ -361,7 +469,10 @@ namespace strUtil
 			// if not whitespace return it.
 			if (!IsWhitespace(*endExclusive))
 				return endExclusive;
-		} while (1);
+		}
+		X_DISABLE_WARNING(4127)
+			while (1);
+		X_ENABLE_WARNING(4127)
 
 		return nullptr;
 	}
@@ -401,8 +512,12 @@ namespace strUtil
 	}
 
 
-	const char* Find(const char* startInclusive, const char* endExclusive, const char* what, uint32_t whatLength)
+	const char* Find(const char* startInclusive, const char* endExclusive, const char* what, size_t whatLength)
 	{
+		if (whatLength == 0)
+			return startInclusive;
+
+#if 0 
 		// should check how much these aligne ment checks take.
 		// might be best to have a seprate aligned find
 		// for when i know it's aligned, as the global optermisation attempt.
@@ -420,12 +535,49 @@ namespace strUtil
 					return scanstrm(startInclusive, what, whatLength);
 			}
 		}
-		return strstr(startInclusive, what);
+#endif 
+		size_t len = endExclusive - startInclusive;
+
+		if (whatLength > len)
+			return nullptr;
+
+		while (startInclusive < endExclusive)
+		{
+			// we check if we have a match.
+			// we need to match the whole string.
+			if (*startInclusive == *what)
+			{
+				// we know the substring fits.
+				// so we just want to know if we have the rest of the substring.
+				const char* current = startInclusive + 1;
+				const char* currentWhat = what + 1;
+				size_t i = 0;
+				for (; i < (whatLength - 1); i++)
+				{
+					if (*current != *currentWhat)
+						break;
+
+					++current;
+					++currentWhat;
+				}
+
+				if (i == (whatLength - 1))
+					return startInclusive;
+			}
+
+			if (len == whatLength) // sub string can't fit anymore.
+				return nullptr;
+
+			--len;
+			++startInclusive;
+		}
+
+		return nullptr;
 	}
 
 	const char* Find(const char* startInclusive, const char* endExclusive, const char* whatStart, const char* whatEnd)
 	{
-		return Find(startInclusive, endExclusive, whatStart, safe_static_cast<int, size_t>(whatEnd - whatStart));
+		return Find(startInclusive, endExclusive, whatStart, safe_static_cast<size_t>(whatEnd - whatStart));
 	}
 
 
@@ -437,15 +589,6 @@ namespace strUtil
 	const char* FindCaseInsensitive(const char* startInclusive, const char* what)
 	{
 		return FindCaseInsensitive(startInclusive, startInclusive + strlen(startInclusive), what, strlen(what));
-	}
-
-	uint32_t upperCaseSIMD(uint32_t x) 
-	{
-		uint32_t b = 0x80808080ul | x;
-		uint32_t c = b - 0x61616161ul;
-		uint32_t d = ~(b - 0x7b7b7b7bul);
-		uint32_t e = (c & d) & (~x & 0x80808080ul);
-		return x - (e >> 2);
 	}
 
 	const char* FindCaseInsensitive(const char* startInclusive, const char* endExclusive, const char* what, size_t whatLength)
@@ -501,7 +644,7 @@ namespace strUtil
 		if (len == 0)
 			return nullptr;
 
-		char upperWhat = upperCaseSIMD(what);
+		uint32_t upperWhat = upperCaseSIMD(what);
 
 		while (startInclusive < endExclusive)
 		{
@@ -559,7 +702,7 @@ namespace strUtil
 		// make sure slash is correct.
 		strUtil::ReplaceSlashes(startInclusive, endExclusive);
 
-		const char* res = strUtil::FindLast(startInclusive, endExclusive, Path::NATIVE_SLASH);
+		const char* res = strUtil::FindLast(startInclusive, endExclusive, Path<char>::NATIVE_SLASH);
 
 		if (!res || res == (endExclusive-1))
 			return startInclusive; // might just be file name.

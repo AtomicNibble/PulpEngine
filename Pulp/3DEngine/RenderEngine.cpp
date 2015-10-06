@@ -43,8 +43,8 @@ class XEngineModule_3DEngine : public IEngineModule
 	{
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pArena);
+		X_UNUSED(initParams);
 
-		ICore* pCore = env.pCore;
 		engine::I3DEngine* engine = nullptr;
 
 		g_3dEngineArena = X_NEW_ALIGNED(Engine3DArena, gEnv->pArena, "3DEngineArena", 8)(&g_3dEngineAlloc, "3DEngineArena");

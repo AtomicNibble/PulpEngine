@@ -15,31 +15,31 @@
 #include <IModel.h>
 
 
-#include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
-#include <Memory\MemoryTaggingPolicies\NoMemoryTagging.h>
-#include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
-
-typedef core::MemoryArena<core::MallocFreeAllocator, core::SingleThreadPolicy,
-	core::NoBoundsChecking, core::NoMemoryTracking, core::NoMemoryTagging> Arena;
-
-
-extern core::MallocFreeAllocator g_allocator;
-extern Arena g_arena;
-
+extern core::MemoryArenaBase* g_arena;
 
 class MFnDagNode;
 
 struct ModelStats
 {
 	ModelStats() :
-		droppedBoneNames(&g_arena)
+		droppedBoneNames(g_arena)
 	{
+		clear();
 	}
 
 	void clear(void) {
-		core::zero_this(this);
-		droppedBoneNames.setArena(&g_arena);
+		totalLods = 0;
+		totalMesh = 0;
+		totalJoints = 0;
+		totalJointsDropped = 0;
+		totalVerts = 0;
+		totalFaces = 0;
+		totalWeightsDropped = 0;
+
+		droppedBoneNames.setArena(g_arena);
 		droppedBoneNames.setGranularity(16);
+
+		bounds.clear();
 	}
 
 	uint32_t totalLods;
@@ -52,8 +52,10 @@ struct ModelStats
 
 	core::Array<core::StackString<128>>
 		droppedBoneNames;
+
+	AABB bounds;
 };
-extern ModelStats g_stats;
+
 
 struct LODExportInfo
 {
@@ -65,16 +67,17 @@ struct LODExportInfo
 class PotatoOptions
 {
 public:
-	PotatoOptions() :
-		lodInfo_(&g_arena)
-	{
-
-	}
+	PotatoOptions();
 
 	enum ExpoMode {
 		EXPORT_ALL,
 		EXPORT_SELECTED,
 		EXPORT_INPUT
+	};
+
+	enum UnitOfMeasureMent {
+		INCHES,
+		CM
 	};
 
 	void setcmdArgs(const MArgList &args);
@@ -105,64 +108,27 @@ public:
 	}
 
 public:
-	core::Array<LODExportInfo> lodInfo_;
+	core::FixedArray<LODExportInfo, model::MODEL_MAX_LODS> lodInfo_;
 
-	core::Path filePath_;
+	core::Path<char> filePath_;
 	float scale_;
 	float jointThreshold_;
 	bool  zeroOrigin_;
 	bool  whiteVertColors_;
+	bool  _pad[2];
 	MString forceBoneFilters_;
 	MString progressCntl_;
 	ExpoMode exportMode_;
+	UnitOfMeasureMent unitOfMeasurement_;
 };
 
 
 struct MayaBone
 {
-	MayaBone() : dagnode(nullptr) {
-		mayaNode.setOwner(this);
-		exportNode.setOwner(this);
+	MayaBone();
+	MayaBone(const MayaBone& oth);
 
-		keep = false;
-		bindpos = Vec3f::zero();
-		bindm33 = Matrix33f::identity();
-	}
-
-	MayaBone(const MayaBone& oth)  {
-		name = oth.name;
-		dagnode = oth.dagnode;
-		index = oth.index;
-
-		bindpos = oth.bindpos;
-		bindm33 = oth.bindm33;
-
-		mayaNode = oth.mayaNode;
-		exportNode = oth.exportNode;
-
-		keep = oth.keep;
-
-		mayaNode.setOwner(this);
-		exportNode.setOwner(this);
-	}
-
-	MayaBone& operator=(const MayaBone &oth) {
-		name = oth.name;
-		dagnode = oth.dagnode;
-		index = oth.index;
-
-		bindpos = oth.bindpos;
-		bindm33 = oth.bindm33;
-
-		mayaNode = oth.mayaNode;
-		exportNode = oth.exportNode;
-
-		keep = oth.keep;
-
-		mayaNode.setOwner(this);
-		exportNode.setOwner(this);
-		return *this;
-	}
+	MayaBone& operator=(const MayaBone &oth);
 
 	size_t getDataSize() const {
 		return name.length() + sizeof(XQuatCompressedf) + sizeof(Vec3f)+2;
@@ -183,13 +149,17 @@ struct MayaBone
 	bool keep;
 };
 
-struct MayaWeight {
+struct MayaWeight 
+{
+	MayaWeight();
+
 	MayaBone* bone;
 	float weight;
 };
 
-struct MayaVertex {
-	MayaVertex() : numWeights(0), startWeightIdx(0) {}
+struct MayaVertex 
+{
+	MayaVertex();
 
 	Vec3f		pos;
 	Vec3f		normal;
@@ -207,13 +177,9 @@ struct MayaVertex {
 class MayaMesh
 {
 public:
-	MayaMesh()  :
-		verts(&g_arena),
-		faces(&g_arena),
-		weights(&g_arena)
-	{
-		core::zero_object(CompBinds);
-	}
+	MayaMesh();
+	~MayaMesh();
+
 	void clear(void);
 	void merge(MayaMesh *mesh); // merge other mesh.
 	void shareVerts(void);
@@ -280,7 +246,7 @@ public:
 	MayaModel();
 	~MayaModel();
 
-	void getBindPose(MObject &jointNode, MayaBone *bone, float scale);
+	void getBindPose(const MObject &jointNode, MayaBone *bone, float scale);
 
 	MStatus lodLODs(void);
 	MStatus loadBones(void);

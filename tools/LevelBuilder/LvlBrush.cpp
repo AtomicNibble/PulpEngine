@@ -4,82 +4,6 @@
 
 
 
-void LvlBuilder::FilterBrushesIntoTree(LvlEntity& ent)
-{
-	LvlBrush			*b, *newb;
-	int					r;
-	int					c_unique, c_clusters;
-
-	X_LOG0("Lvl","----- FilterBrushesIntoTree -----");
-
-	c_unique = 0;
-	c_clusters = 0;
-
-	LvlEntity::LvlBrushArr::Iterator it = ent.brushes.begin();
-	for (; it != ent.brushes.end(); ++it)
-	{
-		c_unique++;
-
-		b = it;
-
-		newb = X_NEW(LvlBrush, g_arena, "BrushCopy")(*b);
-
-		r = FilterBrushIntoTree_r(newb, ent.bspTree.headnode);
-
-		c_clusters += r;
-	}
-
-	X_LOG0("Lvl", "%5i total brushes", c_unique);
-	X_LOG0("Lvl", "%5i cluster references", c_clusters);
-}
-
-int LvlBuilder::FilterBrushIntoTree_r(LvlBrush* b, bspNode* node)
-{
-	LvlBrush		*front, *back;
-	int				c;
-
-	front = nullptr;
-	back = nullptr;
-
-	if (!b) {
-		return 0;
-	}
-
-	// add it to the leaf list
-	if (node->planenum == PLANENUM_LEAF) 
-	{
-	//	b->next = node->brushlist;
-	//	node->brushlist = b;
-		node->brushes.append(b);
-
-		// classify the leaf by the structural brush
-		if (b->opaque) {
-			node->opaque = true;
-		}
-
-		return 1;
-	}
-
-	// split it by the node plane
-	SplitBrush(b, node->planenum, &front, &back);
-
-	if (front && front->sides.size() < 6)
-	{
-		int goat = 0;
-	}
-	if (back && back->sides.size() < 6)
-	{
-		int goat = 0;
-	}
-
-	X_DELETE_AND_NULL(b, g_arena);
-
-	c = 0;
-	c += FilterBrushIntoTree_r(front, node->children[0]);
-	c += FilterBrushIntoTree_r(back, node->children[1]);
-
-	return c;
-}
 
 void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	LvlBrush** front, LvlBrush** back)
@@ -106,7 +30,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 		if (!w) {
 			continue;
 		}
-		for (j = 0; j < static_cast<size_t>(w->GetNumPoints()); j++) 
+		for (j = 0; j < static_cast<size_t>(w->getNumPoints()); j++) 
 		{
 			d = plane.distance((*w)[j].asVec3());
 			if (d > 0 && d > d_front)
@@ -132,10 +56,12 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	w = X_NEW(XWinding, g_arena, "Winding")(plane);
 	for (i = 0; i < brush->sides.size() && w; i++) {
 		Planef &plane2 = planes[brush->sides[i].planenum ^ 1];
-		w = w->Clip(plane2, 0); 
+		if (!w->clip(plane2, 0)) {
+			X_DELETE_AND_NULL(w, g_arena);
+		}
 	}
 
-	if (!w || w->IsTiny()) 
+	if (!w || w->isTiny()) 
 	{
 		// the brush isn't really split
 		BrushPlaneSide::Enum side;
@@ -148,9 +74,9 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 		return;
 	}
 
-	if (w->IsHuge()) {
+	if (w->isHuge()) {
 		X_WARNING("LvlBrush", "SplitBrush: huge winding");
-		w->Print();
+		w->print();
 	}
 
 	midwinding = w;
@@ -178,7 +104,7 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 			continue;
 		}
 
-		w->Split(plane, 0, &cw[0], &cw[1]);
+		w->Split(plane, 0, &cw[0], &cw[1], g_arena);
 
 		for (j = 0; j < 2; j++) 
 		{
@@ -232,11 +158,11 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	{
 		cs = &b[i]->sides.AddOne();
 
-		cs->planenum = planenum ^ i ^ 1;
+		cs->planenum = planenum ^ static_cast<int32>(i) ^ 1;
 	//	cs->material = NULL;
 
 		if (i == 0) {
-			cs->pWinding = midwinding->Copy();
+			cs->pWinding = midwinding->Copy(g_arena);
 		}
 		else {
 			cs->pWinding = midwinding;
@@ -331,7 +257,7 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum,
 		if (!w) {
 			continue;
 		}
-		for (j = 0; j < static_cast<size_t>(w->GetNumPoints()); j++)
+		for (j = 0; j < static_cast<size_t>(w->getNumPoints()); j++)
 		{
 			d = plane.distance((*w)[j].asVec3());
 			if (d > 0 && d > d_front)
@@ -358,10 +284,12 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum,
 	for (i = 0; i < sides.size() && w; i++) 
 	{
 		Planef &plane2 = planes[sides[i].planenum ^ 1];
-		w = w->Clip(plane2, 0);
+		if(!w->clip(plane2, 0)) {
+			X_DELETE_AND_NULL(w, g_arena);
+		}
 	}
 
-	if (!w || w->IsTiny())
+	if (!w || w->isTiny())
 	{
 		// the brush isn't really split
 		BrushPlaneSide::Enum side;
@@ -374,9 +302,9 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum,
 		return;
 	}
 
-	if (w->IsHuge()) {
+	if (w->isHuge()) {
 		X_WARNING("LvlBrush", "SplitBrush: huge winding");
-		w->Print();
+		w->print();
 	}
 
 	midwinding = w;
@@ -397,7 +325,7 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum,
 			continue;
 		}
 
-		w->Split(plane, 0, &cw[0], &cw[1]);
+		w->Split(plane, 0, &cw[0], &cw[1], g_arena);
 
 		for (j = 0; j < 2; j++)
 		{
@@ -451,11 +379,11 @@ void LvlBrush::Split(XPlaneSet& planes, int32_t planenum,
 	{
 		cs = &b[i]->sides.AddOne();
 
-		cs->planenum = planenum ^ i ^ 1;
+		cs->planenum = planenum ^ static_cast<int32_t>(i) ^ 1;
 		//	cs->material = NULL;
 
 		if (i == 0) {
-			cs->pWinding = midwinding->Copy();
+			cs->pWinding = midwinding->Copy(g_arena);
 		}
 		else {
 			cs->pWinding = midwinding;

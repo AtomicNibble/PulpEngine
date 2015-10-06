@@ -25,9 +25,9 @@ namespace
 MallocFreeAllocator::MallocFreeAllocator(void)
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	zero_this( &m_statistics );
+	zero_object( statistics_ );
 
-	m_statistics.m_type = "MallocFree";
+	statistics_.type_ = "MallocFree";
 #endif
 }
 
@@ -49,29 +49,31 @@ void* MallocFreeAllocator::allocate(size_t Origsize, size_t alignment, size_t of
 		};
 
 		// get the aligned pointer.
-		as_void = pointerUtil::AlignBottom<char>( (char*)pMem + offset + alignment + (SIZE_OF_HEADER-1), alignment );
+		as_void = pointerUtil::AlignBottom<char>(reinterpret_cast<char*>(pMem) + offset +
+			alignment + (SIZE_OF_HEADER-1), alignment );
+
 		as_byte -= offset; // take off any offset.
 
 		// we have taken off offfset so now header is just at -1 index.
-		as_header[-1].m_originalAllocation = pMem;
-		as_header[-1].m_AllocationSize = size;
-		as_header[-1].m_originalSize = Origsize;
+		as_header[-1].originalAllocation_ = pMem;
+		as_header[-1].AllocationSize_ = size;
+		as_header[-1].originalSize_ = Origsize;
 
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-		m_statistics.m_allocationCount++;
-		m_statistics.m_virtualMemoryReserved += size;
-		m_statistics.m_physicalMemoryAllocated += size;
-		m_statistics.m_physicalMemoryUsed += size;
-		m_statistics.m_internalOverhead += SIZE_OF_HEADER;
-		m_statistics.m_wasteAlignment += safe_static_cast<size_t>((uintptr_t)as_byte - (uintptr_t)pMem) - SIZE_OF_HEADER;
+		statistics_.allocationCount_++;
+		statistics_.virtualMemoryReserved_ += size;
+		statistics_.physicalMemoryAllocated_ += size;
+		statistics_.physicalMemoryUsed_ += size;
+		statistics_.internalOverhead_ += SIZE_OF_HEADER;
+		statistics_.wasteAlignment_ += safe_static_cast<size_t>((uintptr_t)as_byte - (uintptr_t)pMem) - SIZE_OF_HEADER;
 
 
-		m_statistics.m_allocationCountMax = Max( m_statistics.m_allocationCount, m_statistics.m_allocationCountMax );
-		m_statistics.m_physicalMemoryUsedMax = Max( m_statistics.m_physicalMemoryUsed, m_statistics.m_physicalMemoryUsedMax );
-		m_statistics.m_physicalMemoryAllocatedMax = Max( m_statistics.m_physicalMemoryAllocated, m_statistics.m_physicalMemoryAllocatedMax );
-		m_statistics.m_wasteAlignmentMax = Max( m_statistics.m_wasteAlignment, m_statistics.m_wasteAlignmentMax );
-		m_statistics.m_internalOverheadMax = Max( m_statistics.m_internalOverhead, m_statistics.m_internalOverheadMax );
+		statistics_.allocationCountMax_ = Max( statistics_.allocationCount_, statistics_.allocationCountMax_ );
+		statistics_.physicalMemoryUsedMax_ = Max( statistics_.physicalMemoryUsed_, statistics_.physicalMemoryUsedMax_ );
+		statistics_.physicalMemoryAllocatedMax_ = Max( statistics_.physicalMemoryAllocated_, statistics_.physicalMemoryAllocatedMax_ );
+		statistics_.wasteAlignmentMax_ = Max( statistics_.wasteAlignment_, statistics_.wasteAlignmentMax_ );
+		statistics_.internalOverheadMax_ = Max( statistics_.internalOverhead_, statistics_.internalOverheadMax_ );
 #endif
 		
 		return as_byte; // we return the mem - offset.
@@ -97,18 +99,20 @@ void MallocFreeAllocator::free(void* ptr)
 
 	
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	size_t AlignmentWaste = safe_static_cast<size_t>((uintptr_t)ptr - (uintptr_t)as_header->m_originalAllocation) - SIZE_OF_HEADER;
-	size_t Size = as_header->m_AllocationSize;
+	size_t AlignmentWaste = safe_static_cast<size_t>(reinterpret_cast<uintptr_t>(ptr) - 
+		reinterpret_cast<uintptr_t>(as_header->originalAllocation_)) - SIZE_OF_HEADER;
 
-	m_statistics.m_allocationCount--;
-	m_statistics.m_virtualMemoryReserved -= Size;
-	m_statistics.m_physicalMemoryAllocated -= Size;
-	m_statistics.m_physicalMemoryUsed -= Size;
-	m_statistics.m_internalOverhead -= SIZE_OF_HEADER;
-	m_statistics.m_wasteAlignment -= AlignmentWaste;
+	size_t Size = as_header->AllocationSize_;
+
+	statistics_.allocationCount_--;
+	statistics_.virtualMemoryReserved_ -= Size;
+	statistics_.physicalMemoryAllocated_ -= Size;
+	statistics_.physicalMemoryUsed_ -= Size;
+	statistics_.internalOverhead_ -= SIZE_OF_HEADER;
+	statistics_.wasteAlignment_ -= AlignmentWaste;
 #endif
 
-	::free( as_header->m_originalAllocation );
+	::free( as_header->originalAllocation_ );
 }
 
 
@@ -117,7 +121,7 @@ void MallocFreeAllocator::free(void* ptr)
 MemoryAllocatorStatistics MallocFreeAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	return m_statistics;
+	return statistics_;
 #else
 	static MemoryAllocatorStatistics stats;
 	core::zero_object(stats);

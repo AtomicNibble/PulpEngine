@@ -8,14 +8,14 @@ X_NAMESPACE_BEGIN(core)
 
 
 GrowingGenericAllocator::GrowingGenericAllocator( uint32_t maxSizeInBytesPerPool, uint32_t growSize, size_t maxAlignment, size_t offset) :
-	m_microAllocator( maxSizeInBytesPerPool, growSize, maxAlignment, offset ),
-	m_blockAllocator()
+	microAllocator_( maxSizeInBytesPerPool, growSize, maxAlignment, offset ),
+	blockAllocator_()
 {
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	zero_object( m_statistics );
+	zero_object( statistics_ );
 
-	m_statistics.m_type = "GrowingGeneric";
+	statistics_.type_ = "GrowingGeneric";
 #endif
 }
 
@@ -24,7 +24,7 @@ GrowingGenericAllocator::GrowingGenericAllocator( uint32_t maxSizeInBytesPerPool
 MemoryAllocatorStatistics GrowingGenericAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	return m_statistics;
+	return statistics_;
 #else
 	static MemoryAllocatorStatistics stats;
 	core::zero_object(stats);
@@ -36,13 +36,13 @@ MemoryAllocatorStatistics GrowingGenericAllocator::getStatistics(void) const
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 void GrowingGenericAllocator::updateStatistics(void)
 {
-	MemoryAllocatorStatistics Micro = m_microAllocator.getStatistics();
-	MemoryAllocatorStatistics Block = m_blockAllocator.getStatistics();
+	MemoryAllocatorStatistics Micro = microAllocator_.getStatistics();
+	MemoryAllocatorStatistics Block = blockAllocator_.getStatistics();
 
 
-	m_statistics.Clear();
-	m_statistics += Micro;
-	m_statistics += Block;
+	statistics_.Clear();
+	statistics_ += Micro;
+	statistics_ += Block;
 }
 #endif
 

@@ -203,8 +203,8 @@ void XLexToken::NumberValue(void)
 }
 
 
-//longer punctuations first
-punctuation_t default_punctuations[] = {
+//longer punctuations_ first
+punctuation_t default_punctuations_[] = {
 	//binary operators
 	{ ">>=", P_RSHIFT_ASSIGN },
 	{ "<<=", P_LSHIFT_ASSIGN },
@@ -279,7 +279,7 @@ punctuation_t default_punctuations[] = {
 };
 
 int default_punctuationtable[256];
-int default_nextpunctuation[sizeof(default_punctuations) / sizeof(punctuation_t)];
+int default_nextpunctuation[sizeof(default_punctuations_) / sizeof(punctuation_t)];
 bool default_setup = false;;
 
 
@@ -299,64 +299,68 @@ XLexer::XLexer(const char* startInclusive, const char* endExclusive)
 
 	SetPunctuations(NULL);
 
-	tokenavailable = 0;
+	tokenavailable_ = 0;
 }
 
 const char *XLexer::GetPunctuationFromId(int id) {
 	int i;
 
-	for (i = 0; punctuations[i].p; i++) {
-		if (punctuations[i].n == id) {
-			return punctuations[i].p;
+	for (i = 0; punctuations_[i].p; i++) {
+		if (punctuations_[i].n == id) {
+			return punctuations_[i].p;
 		}
 	}
 	return "unkown punctuation";
 }
 
-void XLexer::CreatePunctuationTable(const punctuation_t *punctuations)
+void XLexer::CreatePunctuationTable(const punctuation_t* punctuations)
 {
 	int i, n, lastp;
 	const punctuation_t *p, *newp;
 
 	//get memory for the table
-	if (punctuations == default_punctuations) {
-		punctuationtable = default_punctuationtable;
-		nextpunctuation = default_nextpunctuation;
+	if (punctuations == default_punctuations_) {
+		punctuationtable_ = default_punctuationtable;
+		nextpunctuation_ = default_nextpunctuation;
 		if (default_setup) {
 			return;
 		}
 		default_setup = true;
-		i = sizeof(default_punctuations) / sizeof(punctuation_t);
+		i = sizeof(default_punctuations_) / sizeof(punctuation_t);
+	}
+	else
+	{
+		i = 0;
 	}
 
-	memset(punctuationtable, 0xFF, 256 * sizeof(int));
-	memset(nextpunctuation, 0xFF, i * sizeof(int));
-	//add the punctuations in the list to the punctuation table
+	memset(punctuationtable_, 0xFF, 256 * sizeof(int));
+	memset(nextpunctuation_, 0xFF, i * sizeof(int));
+	//add the punctuations_ in the list to the punctuation table
 	for (i = 0; punctuations[i].p; i++) {
 		newp = &punctuations[i];
 		lastp = -1;
-		//sort the punctuations in this table entry on length (longer punctuations first)
-		for (n = punctuationtable[(unsigned int)newp->p[0]]; n >= 0; n = nextpunctuation[n]) {
+		//sort the punctuations_ in this table entry on length (longer punctuations_ first)
+		for (n = punctuationtable_[(unsigned int)newp->p[0]]; n >= 0; n = nextpunctuation_[n]) {
 			p = &punctuations[n];
 			if (strlen(p->p) < strlen(newp->p)) {
-				nextpunctuation[i] = n;
+				nextpunctuation_[i] = n;
 				if (lastp >= 0) {
-					nextpunctuation[lastp] = i;
+					nextpunctuation_[lastp] = i;
 				}
 				else {
-					punctuationtable[(unsigned int)newp->p[0]] = i;
+					punctuationtable_[(unsigned int)newp->p[0]] = i;
 				}
 				break;
 			}
 			lastp = n;
 		}
 		if (n < 0) {
-			nextpunctuation[i] = -1;
+			nextpunctuation_[i] = -1;
 			if (lastp >= 0) {
-				nextpunctuation[lastp] = i;
+				nextpunctuation_[lastp] = i;
 			}
 			else {
-				punctuationtable[(unsigned int)newp->p[0]] = i;
+				punctuationtable_[(unsigned int)newp->p[0]] = i;
 			}
 		}
 	}
@@ -369,14 +373,14 @@ void XLexer::SetPunctuations(const punctuation_t *p)
 		CreatePunctuationTable(p);
 	}
 	else {
-		CreatePunctuationTable(default_punctuations);
+		CreatePunctuationTable(default_punctuations_);
 	}
 #endif //PUNCTABLE
 	if (p) {
-		punctuations = p;
+		punctuations_ = p;
 	}
 	else {
-		punctuations = default_punctuations;
+		punctuations_ = default_punctuations_;
 	}
 }
 
@@ -386,9 +390,9 @@ int	XLexer::ReadToken(XLexToken& token)
 
 	token.Reset();
 
-	if (tokenavailable) {
-		tokenavailable = 0;
-		token = this->token;
+	if (tokenavailable_) {
+		tokenavailable_ = 0;
+		token = this->token_;
 		return 1;
 	}
 
@@ -458,7 +462,7 @@ int	XLexer::ReadToken(XLexToken& token)
 			return 0;
 		}
 	}
-	// check for punctuations
+	// check for punctuations_
 	else if (!ReadPunctuation(token)) {
 		Error("unknown punctuation %c", c);
 		return 0;
@@ -659,8 +663,8 @@ int XLexer::Parse3DMatrix(int z, int y, int x, float *m) {
 
 void XLexer::UnreadToken(const XLexToken& token)
 {
-	this->token = token;
-	tokenavailable = 1;
+	this->token_ = token;
+	tokenavailable_ = 1;
 }
 
 int XLexer::ReadTokenOnLine(XLexToken& token)
@@ -686,7 +690,10 @@ int XLexer::ReadTokenOnLine(XLexToken& token)
 
 int XLexer::ReadWhiteSpace(void)
 {
-	while (1) {
+	X_DISABLE_WARNING(4127)
+	while (1)
+	X_ENABLE_WARNING(4127)
+	{
 		// skip white space
 		while (*current_ <= ' ') {
 			if (!*current_) {
@@ -718,7 +725,10 @@ int XLexer::ReadWhiteSpace(void)
 			// comments /* */
 			else if (*(current_ + 1) == '*') {
 				current_++;
-				while (1) {
+				X_DISABLE_WARNING(4127)
+				while (1)
+				X_ENABLE_WARNING(4127)
+				{
 					current_++;
 					if (!*current_) {
 						return 0;
@@ -817,7 +827,7 @@ int XLexer::ReadEscapeCharacter(char *ch) {
 	// step over the escape character or the last digit of the number
 	current_++;
 	// store the escape character
-	*ch = c;
+	*ch = safe_static_cast<char,int>(c);
 	// succesfully read escape character
 	return 1;
 }
@@ -847,7 +857,10 @@ int XLexer::ReadString(XLexToken& token, int quote) {
 
 	token.start_ = current_;
 
-	while (1) {
+	X_DISABLE_WARNING(4127)
+	while (1)
+	X_ENABLE_WARNING(4127)
+	{
 		// if there is an escape character and escape characters are allowed
 		if (*current_ == '\\' && !(flags_.IsSet(LexFlag::NOSTRINGESCAPECHARS))) {
 			if (!ReadEscapeCharacter(&ch)) {
@@ -1029,7 +1042,10 @@ int XLexer::ReadNumber(XLexToken& token) {
 		// decimal integer or floating point number or ip address
 		dot = 0;
 		negative = 0;
-		while (1) {
+		X_DISABLE_WARNING(4127)
+		while (true)
+		X_ENABLE_WARNING(4127)
+		{
 			if (c >= '0' && c <= '9') {
 			}
 			else if (c == '.' ) {
@@ -1188,14 +1204,14 @@ int XLexer::ReadPunctuation(XLexToken& token) {
 	const punctuation_t *punc;
 
 #ifdef PUNCTABLE
-	for (n = punctuationtable[(unsigned int)*(current_)]; n >= 0; n = nextpunctuation[n])
+	for (n = punctuationtable_[(unsigned int)*(current_)]; n >= 0; n = nextpunctuation_[n])
 	{
-		punc = &(punctuations[n]);
+		punc = &(punctuations_[n]);
 #else
 	int i;
 
-	for (i = 0; punctuations[i].p; i++) {
-		punc = &punctuations[i];
+	for (i = 0; punctuations_[i].p; i++) {
+		punc = &punctuations_[i];
 #endif
 		p = punc->p;
 		// check for this punctuation in the script

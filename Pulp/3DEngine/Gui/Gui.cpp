@@ -65,6 +65,8 @@ void XGui::DrawCursor(void)
 
 const char* XGui::Activate(bool activate, int time)
 {
+	X_UNUSED(activate);
+	X_UNUSED(time);
 
 
 	return nullptr;
@@ -103,7 +105,7 @@ bool XGui::OnInputEventChar(const input::InputEvent& event)
 
 bool XGui::InitFromFile(const char* name)
 {
-	core::Path path, pathBinary;
+	core::Path<char> path, pathBinary;
 	core::XFileMemScoped file;
 	core::XFileScoped fileBinary;
 	core::fileModeFlags mode;
@@ -114,6 +116,7 @@ bool XGui::InitFromFile(const char* name)
 
 	mode.Set(core::fileMode::READ);
 
+	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 
 	// already init?
 	if (isDeskTopValid())
@@ -149,8 +152,6 @@ bool XGui::InitFromFile(const char* name)
 	path = "gui\\";
 	path.setFileName(name);
 	path.setExtension(GUI_FILE_EXTENSION);
-
-	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 
 	// first we check if a binary file exsists.
 	if(gEnv->pFileSys->fileExists(pathBinary.c_str()))
@@ -220,7 +221,7 @@ SourceLoad:
 	if(sourceCrc32_ == 0)
 	{
 		sourceCrc32_ = pCrc32->GetCRC32(file->getBufferStart(), 
-			safe_static_cast<int32_t, size_t>(file->getSize()));
+			file->getSize());
 	}
 
 	X_LOG0("Gui", "parsing: \"%s\"", path.c_str());
@@ -233,6 +234,7 @@ bool XGui::ParseBinaryFile(const FileHdr& hdr, core::XFile* pFile)
 	// should i just load the whole file and provides a meory cursor?
 	// i think i should just make it a memory file so that i can read form 
 	// that and it's provided th\t same functionatlity.
+	X_UNUSED(hdr);
 
 	return pDesktop_->Parse(pFile);
 }
@@ -265,7 +267,7 @@ bool XGui::ParseTextFile(const char* begin, const char* end)
 
 bool XGui::SaveBinaryVersion(void)
 {
-	core::Path path;
+	core::Path<char> path;
 	core::XFileScoped file;
 	core::fileModeFlags mode;
 	FileHdr hdr;

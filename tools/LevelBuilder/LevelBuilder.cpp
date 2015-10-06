@@ -60,7 +60,7 @@ X_LINK_LIB("engine_RenderNull")
 
 #endif // !X_LIB
 
-void CompileLevel(core::Path& path);
+void CompileLevel(core::Path<char>& path);
 
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
@@ -107,7 +107,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 		g_bspNodeAllocator = &bspNodeArena;
 
 
-		core::Console Console("Level Compiler");
+		core::Console Console(L"Level Compiler");
 		Console.SetSize(150, 60, 8000);
 		Console.MoveTo(10, 10);
 
@@ -117,17 +117,20 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 			// we need the engine for Assets, Logging, Profiling, FileSystem.
 			if (engine.Init(lpCmdLine, Console))
 			{
-				core::Path name;
+				core::Path<char> name;
+				name.set("map_source\\");
 				name.setFileName("basic - Copy.map");
 				name.setFileName("alcatraz.map");
 				name.setFileName("killzone.map");
 				name.setFileName("box.map");
-				name.setFileName("test_resources\\maps\\boxmap.map");
+				name.setFileName("boxmap.map");
 				name.setFileName("box2.map");
 				name.setFileName("box3.map");
 				name.setFileName("box4.map");
 				name.setFileName("boxmap.map");
-
+				name.setFileName("portal_test.map");
+				name.setFileName("entity_test.map");
+				
 				CompileLevel(name);
 
 				X_LOG0("Level", "Operation Complete...");
@@ -144,7 +147,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 }
 
 
-void CompileLevel(core::Path& path)
+void CompileLevel(core::Path<char>& path)
 {
 	if (core::strUtil::IsEqualCaseInsen("map", path.extension()))
 	{
@@ -171,10 +174,10 @@ void CompileLevel(core::Path& path)
 			core::TimeVal end = gEnv->pTimer->GetAsyncTime();
 			{
 				X_LOG_BULLET;
-				X_LOG0("Map", "Loaded: %.4fms", (end - start).GetMilliSeconds());
-				X_LOG0("Map", "Num Entities: %i", map.getNumEntities());
-				X_LOG0("Map", "Num Brushes: %i", map.getNumBrushes());
-				X_LOG0("Map", "Num Patches: %i", map.getNumPatches());
+				X_LOG0("Map", "Loaded: ^6%.4fms", (end - start).GetMilliSeconds());
+				X_LOG0("Map", "Num Entities: ^8%i", map.getNumEntities());
+				X_LOG0("Map", "Num Brushes: ^8%i", map.getNumBrushes());
+				X_LOG0("Map", "Num Patches: ^8%i", map.getNumPatches());
 			}
 
 			// all loaded time to get naked.
@@ -196,7 +199,7 @@ void CompileLevel(core::Path& path)
 
 
 			end = gEnv->pTimer->GetAsyncTime();
-			X_LOG0("Info", "Total Time: %.4fms", (end - start).GetMilliSeconds());
+			X_LOG0("Info", "Total Time: ^6%.4fms", (end - start).GetMilliSeconds());
 		}
 
 		gEnv->pFileSys->closeFileMem(pFile);

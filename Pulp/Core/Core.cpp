@@ -37,7 +37,7 @@ XCoreVars g_coreVars;
 
 XCore::XCore() :
 	pWindow_(nullptr),
-	pConsole(nullptr),
+	pConsole_(nullptr),
 	pCpuInfo_(nullptr),
 	pVsLogger_(nullptr),
 	pConsoleLogger_(nullptr),
@@ -105,7 +105,7 @@ void XCore::Release()
 
 void XCore::ShutDown()
 {
-	X_LOG0("Core", "Shutting down");
+	X_LOG0("Core", "Shutting Down");
 
 	dirWatcher_.ShutDown();
 
@@ -238,7 +238,7 @@ void XCore::ShutDown()
 		X_DELETE(pVsLogger_, g_coreArena);
 		X_DELETE(pConsoleLogger_, g_coreArena);
 		if (initParams_.pConsoleWnd == nullptr)
-			X_DELETE(pConsole, g_coreArena);
+			X_DELETE(pConsole_, g_coreArena);
 
 		core::Mem::DeleteAndNull(env_.pLog, g_coreArena);
 	}
@@ -371,7 +371,7 @@ bool XCore::Update()
 		
 		core::StackString<128> title;
 		title.clear();
-		title.appendFmt(X_ENGINE_NAME" Engine "X_CPUSTRING" (fps:%i, %ims) Time: %I64u(x%g) UI: %I64u",
+		title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%i, %ims) Time: %I64u(x%g) UI: %I64u",
 			(int)fps,
 			(int)(frametime * 1000.f),
 			(__int64)time_.GetFrameStartTime(core::ITimer::Timer::GAME).GetMilliSeconds(),
@@ -414,6 +414,7 @@ bool XCore::addfileType(core::IXHotReload* pHotReload, const char* extension)
 bool XCore::OnFileChange(core::XDirectoryWatcher::Action::Enum action,
 	const char* name, const char* oldName, bool isDirectory)
 {
+	X_UNUSED(oldName);
 	const char* ext = nullptr;
 	const char* fileName = nullptr;
 	hotReloadMap::const_iterator it;
@@ -425,7 +426,8 @@ bool XCore::OnFileChange(core::XDirectoryWatcher::Action::Enum action,
 	{
 		fileName = core::strUtil::FileName(name);
 
-		if (ext = core::strUtil::FileExtension(name))
+		ext = core::strUtil::FileExtension(name);
+		if (ext)
 		{
 			it = hotReloadExtMap_.find(ext);
 			if (it != hotReloadExtMap_.end())
@@ -460,13 +462,12 @@ void XCore::OnFatalError(const char* format, va_list args)
 	
 	X_LOG0("FatalError", "CallStack:\n%s", Dsc);
 
-	if (1)
-	{
-		core::LoggerBase::Line Line;
-		vsnprintf_s(Line, sizeof(core::LoggerBase::Line), _TRUNCATE, format, args);
 
-		::MessageBox(NULL, Line, X_ENGINE_NAME" Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
-	}
+	core::LoggerBase::Line Line;
+	vsnprintf_s(Line, sizeof(core::LoggerBase::Line), _TRUNCATE, format, args);
+
+	::MessageBoxA(NULL, Line, X_ENGINE_NAME" Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL);
+
 
 	X_BREAKPOINT;
 
@@ -476,7 +477,9 @@ void XCore::OnFatalError(const char* format, va_list args)
 
 void Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd)
 {
-	XCore* pCore = (XCore*)gEnv->pCore;
+	X_UNUSED(Cmd);
+
+	XCore* pCore = static_cast<XCore*>(gEnv->pCore);
 
 	pCore->HotReloadListExts();
 }

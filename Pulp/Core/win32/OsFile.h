@@ -10,7 +10,7 @@ X_NAMESPACE_BEGIN(core)
 
 struct OsFile
 {
-	OsFile(const char* path, IFileSys::fileModeFlags mode);
+	OsFile(const wchar_t* path, IFileSys::fileModeFlags mode);
 	~OsFile(void);
 
 	uint32_t read(void* buffer, uint32_t length);

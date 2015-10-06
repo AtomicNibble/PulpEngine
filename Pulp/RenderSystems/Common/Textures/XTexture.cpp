@@ -426,7 +426,7 @@ bool XTexture::LoadFromFile(const char* path_)
 	int i;
 	bool bRes;
 	XTextureFile* image_data;
-	core::Path path(path_);
+	core::Path<char> path(path_);
 	core::IFileSys::fileModeFlags mode;
 	mode.Set(core::IFileSys::fileMode::READ);
 	
@@ -548,7 +548,7 @@ void XTexture::preProcessImage(core::ReferenceCountedOwner<XTextureFile>& image_
 	{
 		X_LOG0("Texture", "Compiling image to CI: ^5%s", this->FileName.c_str());
 
-		core::Path outPath;
+		core::Path<char> outPath;
 		outPath = "compiled_images/";
 		outPath /= FileName.c_str();
 
@@ -567,9 +567,9 @@ XTexture* XTexture::NewTexture(const char* name, const Vec2i& size,
 	X_ASSERT_NOT_NULL(name);
 
 
-	XTexture *pTex = NULL;
+	XTexture *pTex = nullptr;
 
-	pTex = (XTexture*)s_pTextures->findAsset(name);
+	pTex = static_cast<XTexture*>(s_pTextures->findAsset(name));
 
 	if (pTex)
 	{
@@ -593,27 +593,28 @@ XTexture* XTexture::NewTexture(const char* name, const Vec2i& size,
 	return pTex;
 }
 
-XTexture* XTexture::Create2DTexture(const char* name, const Vec2i& size, int numMips,
+XTexture* XTexture::Create2DTexture(const char* name, const Vec2i& size, size_t numMips,
 	TextureFlags Flags, byte* pData, Texturefmt::Enum textureFmt)
 {
 	X_ASSERT_NOT_NULL(name);
 	X_ASSERT_NOT_NULL(pData);
 
-	XTexture *pTex;
+	XTexture* pTex;
 
 	pTex = XTexture::NewTexture(name, size, Flags, textureFmt);
 
 	XTextureFile file;
 	file.pFaces[0] = pData;
-	file.depth = 1;
-	file.numFaces = 1;
-	file.format = textureFmt;
-	file.numMips = numMips;
-	file.flags = Flags;
-	file.size = size;
-	file.type = TextureType::T2D;
-	file.datasize = get_data_size(size[0], size[1], 1, numMips, textureFmt);
-	file.bDontDelete = true;
+	file.depth_ = 1;
+	file.numFaces_ = 1;
+	file.format_ = textureFmt;
+	file.numMips_ = safe_static_cast<uint8_t,size_t>(numMips);
+	file.flags_ = Flags;
+	file.size_ = size;
+	file.type_ = TextureType::T2D;
+	file.datasize_ = get_data_size(size[0], size[1], 1, 
+		safe_static_cast<uint32_t, size_t>(numMips), textureFmt);
+	file.bDontDelete_ = true;
 	file.addReference();
 
 	if (file.isValid())
@@ -628,7 +629,7 @@ XTexture* XTexture::CreateRenderTarget(const char* name, uint32_t width, uint32_
 {
 	X_ASSERT_NOT_NULL(name);
 
-	XTexture *pTex;
+	XTexture* pTex;
 	TextureFlags Flags = TextureFlags::TEX_FONT | TextureFlags::DONT_STREAM | 
 		TextureFlags::DONT_RESIZE | TextureFlags::RENDER_TARGET;
 
@@ -639,15 +640,15 @@ XTexture* XTexture::CreateRenderTarget(const char* name, uint32_t width, uint32_
 
 	XTextureFile file;
 	file.pFaces[0] = nullptr;
-	file.depth = 1;
-	file.numFaces = 1;
-	file.format = fmt;
-	file.numMips = 1;
-	file.flags = Flags;
-	file.size = size;
-	file.type = type;
-	file.datasize = get_data_size(size[0], size[1], 1, 1, fmt);
-	file.bDontDelete = true;
+	file.depth_ = 1;
+	file.numFaces_ = 1;
+	file.format_ = fmt;
+	file.numMips_ = 1;
+	file.flags_ = Flags;
+	file.size_ = size;
+	file.type_ = type;
+	file.datasize_ = get_data_size(size[0], size[1], 1, 1, fmt);
+	file.bDontDelete_ = true;
 	file.addReference();
 
 	if (file.isValid())
@@ -678,7 +679,7 @@ XTexture* XTexture::FromName(const char* name, TextureFlags Flags)
 	// can we find it?
 	// we store all image in a pool.
 	// we make a hash of the name tho.
-	XTexture* pTex = (XTexture*)s_pTextures->findAsset(name);
+	XTexture* pTex = static_cast<XTexture*>(s_pTextures->findAsset(name));
 
 	if (pTex)
 	{
@@ -708,7 +709,7 @@ XTexture* XTexture::FromName(const char* name, TextureFlags Flags)
 
 XTexture* XTexture::getByID(TexID id)
 {
-	XTexture* pTex = (XTexture*)s_pTextures->findAsset(id);
+	XTexture* pTex = static_cast<XTexture*>(s_pTextures->findAsset(id));
 
 	if (!pTex)
 		return s_pTexDefault;
@@ -774,7 +775,7 @@ void XTexture::init(void)
 
 void XTexture::shutDown(void)
 {
-	X_LOG0("Textures", "Shutting down");
+	X_LOG0("Textures", "Shutting Down");
 	X_ASSERT_NOT_NULL(s_pTextures);
 	X_LOG_BULLET;
 
@@ -793,7 +794,7 @@ void XTexture::shutDown(void)
 	render::XRenderResourceContainer::ResourceItor it = s_pTextures->begin();
 	for (; it != s_pTextures->end(); )
 	{
-		XTexture* pTex = (XTexture*)it->second;
+		XTexture* pTex = static_cast<XTexture*>(it->second);
 
 		++it;
 
@@ -833,16 +834,16 @@ void XTexture::loadDefaultTextures(void)
 		return;
 	}
 
-	s_ptexMipMapDebug = XTexture::FromName("core_assets/Textures/Debug/MipMapDebug.dds", default_flags | TextureFlags::FILTER_BILINEAR);
-	s_ptexColorBlue = XTexture::FromName("core_assets/Textures/Debug/color_Blue.dds", default_flags);
-	s_ptexColorCyan = XTexture::FromName("core_assets/Textures/Debug/color_Cyan.dds", default_flags);
-	s_ptexColorGreen = XTexture::FromName("core_assets/Textures/Debug/color_Green.dds", default_flags);
-	s_ptexColorPurple = XTexture::FromName("core_assets/Textures/Debug/color_Purple.dds", default_flags);
-	s_ptexColorRed = XTexture::FromName("core_assets/Textures/Debug/color_Red.dds", default_flags);
-	s_ptexColorWhite = XTexture::FromName("core_assets/Textures/Debug/color_White.dds", default_flags);
-	s_ptexColorYellow = XTexture::FromName("core_assets/Textures/Debug/color_Yellow.dds", default_flags);
-	s_ptexColorOrange = XTexture::FromName("core_assets/Textures/Debug/color_Orange.dds", default_flags);
-	s_ptexColorMagenta = XTexture::FromName("core_assets/Textures/Debug/color_Magenta.dds", default_flags);
+	s_ptexMipMapDebug = XTexture::FromName("Textures/Debug/MipMapDebug.dds", default_flags | TextureFlags::FILTER_BILINEAR);
+	s_ptexColorBlue = XTexture::FromName("Textures/Debug/color_Blue.dds", default_flags);
+	s_ptexColorCyan = XTexture::FromName("Textures/Debug/color_Cyan.dds", default_flags);
+	s_ptexColorGreen = XTexture::FromName("Textures/Debug/color_Green.dds", default_flags);
+	s_ptexColorPurple = XTexture::FromName("Textures/Debug/color_Purple.dds", default_flags);
+	s_ptexColorRed = XTexture::FromName("Textures/Debug/color_Red.dds", default_flags);
+	s_ptexColorWhite = XTexture::FromName("Textures/Debug/color_White.dds", default_flags);
+	s_ptexColorYellow = XTexture::FromName("Textures/Debug/color_Yellow.dds", default_flags);
+	s_ptexColorOrange = XTexture::FromName("Textures/Debug/color_Orange.dds", default_flags);
+	s_ptexColorMagenta = XTexture::FromName("Textures/Debug/color_Magenta.dds", default_flags);
 
 
 	Recti rect;
@@ -911,14 +912,14 @@ bool XTexture::reloadForName(const char* name)
 	X_ASSERT_NOT_NULL(name);
 
 	// all asset names need forward slashes, for the hash.
-	core::Path path(name);
+	core::Path<char> path(name);
 	path.replaceAll('\\','/');
 
 	if (core::strUtil::IsEqualCaseInsen(path.extension(), ".ci")) {
 		return true;
 	}
 
-	XTexture* pTex = (XTexture*)s_pTextures->findAsset(path.c_str());
+	XTexture* pTex = static_cast<XTexture*>(s_pTextures->findAsset(path.c_str()));
 
 	if (pTex)
 	{

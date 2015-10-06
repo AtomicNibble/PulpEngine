@@ -32,9 +32,9 @@ private:
 	virtual void DoAssert(const SourceInfo& sourceInfo, const char* format, va_list args) X_OVERRIDE;
 	virtual void DoAssertVariable(const SourceInfo& sourceInfo, const char* format, va_list args) X_OVERRIDE;
 
-	FilterPolicy m_filter;
-	FormatPolicy m_formatter;
-	WritePolicy m_writer;
+	FilterPolicy filter_;
+	FormatPolicy formatter_;
+	WritePolicy writer_;
 };
 
 #include "Logger.inl"

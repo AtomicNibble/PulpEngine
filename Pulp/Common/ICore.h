@@ -3,7 +3,7 @@
 #ifndef _X_CORE_I_H_
 #define _X_CORE_I_H_
 
-#include <Platform.h>
+#include <Core\Platform.h>
 // #include <Util/SourceInfo.h>
 
 // defaults.
@@ -116,11 +116,18 @@ struct CoreEvent
 				return "LEVEL_POST_UNLOAD";
 
 			case Enum::USER:
-			default:
-				return "";
-		}
+				return "USER";
 
-		return "";
+			default:
+#if X_DEBUG
+				X_ASSERT_UNREACHABLE();
+				return "";
+
+#else
+				X_NO_SWITCH_DEFAULT;
+#endif // !X_DEBUG
+
+		}
 	}
 };
 

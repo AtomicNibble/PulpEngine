@@ -1,8 +1,12 @@
 #include "stdafx.h"
 #include "LvlBuilder.h"
+#include "ModelInfo.h"
 
 #include <Containers\FixedArray.h>
 #include <IModel.h>
+
+#include "MapTypes.h"
+#include "MapLoader.h"
 
 namespace
 {
@@ -208,7 +212,7 @@ bool LvlBuilder::ProcessModels(void)
 			continue;
 		}
 
-		X_LOG0("Entity", "----------- entity %i -----------", i);
+		X_LOG0("Entity", "^5----- entity %i -----", i);
 
 		if (i == 0)
 		{
@@ -237,62 +241,14 @@ bool LvlBuilder::ProcessModel(LvlEntity& ent)
 }
 
 
-void LvlBuilder::MakeStructuralFaceList(LvlEntity& ent)
+bool LvlBuilder::LoadDefaultModel(void)
 {
-	X_LOG0("Lvl", "MakeStructuralFaceList");
-#if 1
-	size_t i, x;
-
-	for (i = 0; i < ent.brushes.size(); i++)
-#else
-	size_t x;
-	int32_t i;
-
-	for (i = ent.brushes.size()-1; i >= 0; i--)
-#endif
+	if (!ModelInfo::GetNModelAABB(X_CONST_STRING("default"), defaultModelBounds_))
 	{
-		LvlBrush& brush = ent.brushes[i];
-
-		if (!brush.opaque)
-		{
-			// if it's not opaque and none of the sides are portals it can't be structual.
-			if (!brush.combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL))
-			{
-				continue;
-			}
-		}
-
-		for (x = 0; x < brush.sides.size(); x++)
-		{
-			LvlBrushSide& side = brush.sides[x];
-
-			if (!side.pWinding) {
-				continue;
-			}
-
-			engine::MaterialFlags flags = side.matInfo.getFlags();
-
-			// if combined flags are portal, check what this side is.
-			if (brush.combinedMatFlags.IsSet(engine::MaterialFlag::PORTAL))
-			{
-				if (!flags.IsSet(engine::MaterialFlag::PORTAL))
-				{
-					continue;
-				}
-			}
-
-			bspFace* pFace = X_NEW(bspFace, g_arena, "BspFace");
-			pFace->planenum = side.planenum & ~1;
-			pFace->w = side.pWinding->Copy();
-			pFace->pNext = ent.bspFaces;
-
-			if (flags.IsSet(engine::MaterialFlag::PORTAL)) {
-				pFace->portal = true;
-			}
-
-			ent.bspFaces = pFace;
-		}
+		X_ERROR("","Failed to load default model info");
+		return false;
 	}
+	return true;
 }
 
 void LvlBuilder::calculateLvlBounds(void)
@@ -313,90 +269,6 @@ void LvlBuilder::calculateLvlBounds(void)
 		}
 	}
 }
-
-
-void LvlBuilder::ClipSideByTree_r(XWinding* w, LvlBrushSide& side, bspNode *node)
-{
-	XWinding		*front, *back;
-
-	if (!w) {
-		return;
-	}
-
-	if (node->planenum != PLANENUM_LEAF)
-	{
-		if (side.planenum == node->planenum) {
-			ClipSideByTree_r(w, side, node->children[0]);
-			return;
-		}
-		if (side.planenum == (node->planenum ^ 1)) {
-			ClipSideByTree_r(w, side, node->children[1]);
-			return;
-		}
-
-		w->Split(planes[node->planenum], ON_EPSILON, &front, &back);
-	
-		X_DELETE(w, g_arena);
-
-		ClipSideByTree_r(front, side, node->children[0]);
-		ClipSideByTree_r(back, side, node->children[1]);
-
-		return;
-	}
-
-	// if opaque leaf, don't add
-	if (!node->opaque) {
-		if (!side.pVisibleHull) {
-			side.pVisibleHull = w->Copy();
-		}
-		else {
-			side.pVisibleHull->AddToConvexHull(w, planes[side.planenum].getNormal());
-		}
-	}
-
-	X_DELETE(w, g_arena);
-	return;
-
-
-}
-
-bool LvlBuilder::ClipSidesByTree(LvlEntity& ent)
-{
-	X_LOG0("Lvl", "--- ClipSidesByTree ---");
-
-	size_t i, x;
-
-	for (i = 0; i < ent.brushes.size(); i++)
-	{
-		LvlBrush& brush = ent.brushes[i];
-
-		for (x = 0; x < brush.sides.size(); x++)
-		{
-			LvlBrushSide& side = brush.sides[x];
-
-			if (!side.pWinding) {
-				continue;
-			}
-
-			side.pVisibleHull = nullptr;
-
-			XWinding* w = side.pWinding->Copy();
-
-			ClipSideByTree_r(w, side, ent.bspTree.headnode);
-
-#if 0
-			if (side.pVisibleHull) 
-			{
-				X_DELETE(side.pVisibleHull, g_arena);
-				side.pVisibleHull = side.pWinding->Copy();
-			}
-#endif
-		}
-	}
-
-	return true;
-}
-
 
 void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 	LvlBrushSide& side, bspNode* pNode)
@@ -421,7 +293,7 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 		}
 
 		pWinding->Split(planes[pNode->planenum], 
-			ON_EPSILON, &front, &back);
+			ON_EPSILON, &front, &back, g_arena);
 
 		PutWindingIntoAreas_r(ent, front, side, pNode->children[0]);
 		if (front) {
@@ -468,9 +340,9 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 
 	size_t StartVert = pSubMesh->verts_.size();
 
-	int numPoints = pWinding->GetNumPoints();
+	int numPoints = pWinding->getNumPoints();
 
-#if 1
+#if 0
 	int p;
 	for (p = 0; p < numPoints; p++)
 	{
@@ -541,10 +413,218 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 }
 
 
+void LvlBuilder::AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sphere,
+	const Vec3f boundsPoints[8], bspNode* pNode)
+{
+	X_ASSERT_NOT_NULL(boundsPoints);
+	X_ASSERT_NOT_NULL(pNode);
+	bspNode* pCurNode = pNode;
+
+	if (pCurNode->IsAreaLeaf()) 
+	{
+		int32_t areaIdx = pCurNode->area;
+
+		// check if duplicate.
+		if (areaList.isEmpty()) {
+			areaList.append(areaIdx);
+		}
+		else
+		{
+			// just linear search as it will be fastest with such low numbers.
+			// and contigous memory.
+			size_t i;
+			for (i = 0; i < areaList.size(); i++) {
+				if (areaList[i] == areaIdx) {
+					break;
+				}
+			}
+			if (i == areaList.size()) {
+				areaList.append(areaIdx);
+			}
+		}
+
+		return;
+	}
+
+	const Planef& plane = planes[pCurNode->planenum];
+	float sd = plane.distance(sphere.center());
+
+	if (sd >= sphere.radius())
+	{
+		pCurNode = pCurNode->children[0];
+		if (!pCurNode->IsSolidLeaf()) {
+			AddAreaRefs_r(areaList, sphere, boundsPoints, pCurNode);
+		}
+		return;
+	}
+	if (sd <= -sphere.radius())
+	{
+		pCurNode = pCurNode->children[1];
+		if (!pCurNode->IsSolidLeaf()) {
+			AddAreaRefs_r(areaList, sphere, boundsPoints, pCurNode);
+		}
+		return;
+	}
+
+	// check bounds points.
+	bool front = false;
+	bool back = false;
+	for (size_t i = 0; i < 8; i++)
+	{
+		float d = plane.distance(boundsPoints[i]);
+
+		if (d >= 0.0f) {
+			front = true;
+		}
+		else if (d <= 0.0f) {
+			back = true;
+		}
+		if (back && front) {
+			break;
+		}
+	}
+
+	if (front) {
+		bspNode* frontChild = pCurNode->children[0];
+		if (!frontChild->IsSolidLeaf()) {
+			AddAreaRefs_r(areaList, sphere, boundsPoints, frontChild);
+		}
+	}
+	if (back) {
+		bspNode* backChild = pCurNode->children[1];
+		if (!backChild->IsSolidLeaf()) {
+			AddAreaRefs_r(areaList, sphere, boundsPoints, backChild);
+		}
+	}
+}
+
+bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
+{
+	int32_t i, numEnts;
+
+	// we go throught each ent, and work out what area's it is in.
+	// each ent is then added to the entRefts set.
+	// we then need to work out the ones that touch multiple area's
+	core::Array<int32_t> areaList(g_arena);
+	areaList.resize(this->areas_.size());
+
+	for (i = 0; i < level::MAP_MAX_MULTI_REF_LISTS; i++)
+	{
+		multiRefLists_[i].clear();
+	}
+
+	numEnts = map_->getNumEntities();
+
+	// more than enougth.
+	staticModels_.reserve(numEnts);
+
+	for (i = 0; i < numEnts; i++)
+	{
+		mapfile::XMapEntity* mapEnt = map_->getEntity(i);
+		LvlEntity& lvlEnt = entities_[i];
+		
+		if (lvlEnt.classType != level::ClassType::MISC_MODEL) {
+			continue;
+		}
+
+		level::FileStaticModel& sm = staticModels_.AddOne();
+		sm.pos = lvlEnt.origin;
+		sm.angle = Quatf(lvlEnt.angle.x, lvlEnt.angle.y, lvlEnt.angle.y);
+
+		uint32_t entId = safe_static_cast<uint32_t, size_t>(staticModels_.size());
+
+		{
+			mapfile::XMapEntity::PairIt it;
+
+			it = mapEnt->epairs.find(X_CONST_STRING("model"));
+			if (it == mapEnt->epairs.end()) 
+			{
+				X_WARNING("Entity", "misc_model missing 'model' kvp at: (^8%g,%g,%g^7)",
+					lvlEnt.origin[0], lvlEnt.origin[1], lvlEnt.origin[2]);
+				continue;
+			}
+
+			const core::string& modelName = it->second;
+			X_LOG0("Entity", "Ent model: \"%s\"", modelName.c_str());
+
+			sm.modelNameIdx = stringTable_.addStringUnqiue(modelName.c_str());
+		}
+
+		// find out what areas the bounds are in.
+		// then add a refrence for that end to the area.
+
+		AABB worldBounds;
+		worldBounds.set(lvlEnt.bounds.min + lvlEnt.origin,
+			lvlEnt.bounds.max + lvlEnt.origin);
+
+		// make a sphere, for quicker testing.
+		Sphere worldSphere(worldBounds);
+
+		// get the the worldBounds points for more accurate testing if sphere test pass.
+		Vec3f boundsPoints[8];
+		worldBounds.toPoints(boundsPoints);
+
+		// clear from last time.
+		areaList.clear();
+
+		// traverse the world ent's tree
+		AddAreaRefs_r(areaList, worldSphere, boundsPoints, worldEnt.bspTree.headnode);
+
+		size_t numRefs = areaList.size();
+		if (numRefs)
+		{
+			X_LOG0("Lvl", "Entity(%i) has %i refs", i, numRefs);
+
+			// ok so we hold a list of unique areas ent is in.
+			if (numRefs == 1)
+			{
+				// add to area's ref list.
+				LvlArea& area = this->areas_[areaList[0]];
+
+				area.entRefs.push_back(entId);
+			}
+			else
+			{
+				// added to the multiAreaRefList.
+				uint32_t flags[level::MAP_MAX_MULTI_REF_LISTS] = { 0 };
+
+				auto it = areaList.begin();
+				for (; it != areaList.end(); ++it)
+				{
+					const int32_t areaIdx = *it;
+					// work out what area list.
+					const size_t areaListIdx = (areaIdx / 32);
+
+					flags[areaListIdx] |= (1 << (areaIdx % 32));
+				}
+
+				level::MultiAreaEntRef entRef;
+				entRef.entId = entId;
+				for (size_t x = 0; x < level::MAP_MAX_MULTI_REF_LISTS; x++)
+				{
+					if (flags[x] != 0)
+					{
+						entRef.flags = flags[x];
+						multiRefLists_[x].append(entRef);
+					}
+				}
+
+			}
+		}
+		else
+		{
+			// ent not in any area.
+			X_ERROR("Lvl", "Entity(%i) does not reside in any area: (%g,%g,%g)",
+				i, lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
+		}
+	}
+
+	return true;
+}
 
 bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 {
-	X_LOG0("Lvl", "--- PutPrimitivesInAreas ---");
+	X_LOG0("Lvl", "^5----- PutPrimitivesInAreas -----");
 
 	// ok now we must create the areas and place the primatives into each area.
 	// clip into non-solid leafs and divide between areas.
@@ -584,78 +664,62 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 	return true;
 }
 
+
+
 bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "Processing World Entity");
 
-#if 1
-	ent.MakeStructuralFaceList();
-
-	ent.FacesToBSP(planes);
-
-	ent.MakeTreePortals(planes);
-
-	ent.FilterBrushesIntoTree(planes);
-
-	if (!ent.FloodEntities(planes, entities_, map_)) {
-		X_ERROR("LvlEntity", "leaked");
+	if (ent.classType != level::ClassType::WORLDSPAWN) {
+		X_ERROR("Lvl", "World model is missing class name: 'worldspawn'");
 		return false;
 	}
-
-	ent.FillOutside();
-
-	ent.ClipSidesByTree(planes);
-
-	ent.FloodAreas();
-
-	PutPrimitivesInAreas(ent);
-
-#else
 
 	// make structural face list.
 	// which is the planes and windings of all the structual faces.
 	// Portals become part of this.
-	MakeStructuralFaceList(ent);
+	ent.MakeStructuralFaceList();
 	// we create a tree from the FaceList
 	// this is done by spliting the nodes multiple time.
 	// we end up with a binary tree.
-	FacesToBSP(ent);
-
+	ent.FacesToBSP(planes);
 	// next we want to make a portal that covers the whole map.
 	// this is the outside_node of the bspTree
-	MakeTreePortals(ent);
-
+	ent.MakeTreePortals(planes);
 	// Mark the leafs as opaque and areaportals and put brush
 	// fragments in each leaf so portal surfaces can be matched
 	// to materials
-	FilterBrushesIntoTree(ent);
+	ent.FilterBrushesIntoTree(planes);
 
-
-	if (!FloodEntities(ent))
-	{
-		X_ERROR("Lvl", "map leaked");
+	// take the entities and use them to floor the node portals.
+	// so that all inside leafs are marked.
+	if (!ent.FloodEntities(planes, entities_, map_)) {
+		X_ERROR("LvlEntity", "leaked");
 		return false;
 	}
-
-	FillOutside(ent);
-
-
+	// anything that is not inside or opaque must
+	// be none visable / outside.
+	ent.FillOutside();
 	// get minimum convex hulls for each visible side
 	// this must be done before creating area portals,
 	// because the visible hull is used as the portal
-	ClipSidesByTree(ent); 
-
+	ent.ClipSidesByTree(planes);
 	// determine areas before clipping tris into the
 	// tree, so tris will never cross area boundaries
-	FloodAreas(ent);
-
+	ent.FloodAreas();
 	// we now have a BSP tree with solid and non-solid leafs marked with areas
 	// all primitives will now be clipped into this, throwing away
 	// fragments in the solid areas
 	PutPrimitivesInAreas(ent);
-#endif
-	int goat = 0;
 
+	// prune the nodes, so that we only have one leaf per a area.
+	// we also number the nodes at this point also.
+	ent.PruneNodes();
+
+
+	// work out which ents belong to which area.
+//	ent.PutEntsInAreas(planes, entities_, map_);
+	CreateEntAreaRefs(ent);
  	return true;
 }
 

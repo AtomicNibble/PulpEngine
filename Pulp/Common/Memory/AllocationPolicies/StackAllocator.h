@@ -36,7 +36,6 @@ X_NAMESPACE_BEGIN(core)
 ///
 /// Common usage scenarios for a stack allocator include per-level allocations which can easily be freed in reverse order.
 ///
-/// For more information about the stack allocator, visit http://molecularmusings.wordpress.com/2012/08/27/memory-allocation-strategies-a-stack-like-lifo-allocator/.
 /// \remark Statistics gathering can be enabled/disabled via the preprocessor option \ref X_ENABLE_MEMORY_ALLOCATOR_STATISTICS.
 /// If statistics are disabled, the allocator will still return a valid MemoryAllocatorStatistics object which is
 /// initialized to its default values.
@@ -48,10 +47,10 @@ class StackAllocator
 	struct BlockHeader
 	{
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
-		uint32_t m_AllocationID;
+		uint32_t AllocationID_;
 #endif
-		size_t m_allocationOffset;
-		size_t m_AllocationSize;
+		size_t allocationOffset_;
+		size_t AllocationSize_;
 	};
 
 public:
@@ -72,16 +71,16 @@ public:
 	MemoryAllocatorStatistics getStatistics(void) const;
 
 private:
-	char* m_start;
-	char* m_end;
-	char* m_current;
+	char* start_;
+	char* end_;
+	char* current_;
 
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
-	uint32_t m_allocationID;
+	uint32_t allocationID_;
 #endif
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	MemoryAllocatorStatistics m_statistics;
+	MemoryAllocatorStatistics statistics_;
 #endif
 };
 

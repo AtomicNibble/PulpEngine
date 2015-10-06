@@ -5,7 +5,6 @@
 #define X_BSP_TYPES_H_
 
 #include <Containers\LinkedListIntrusive.h>
-#include "BSPData.h"
 
 X_NAMESPACE_DECLARE(mapfile,
 class XMapFile;
@@ -103,6 +102,36 @@ public:
 
 	bool CheckAreas_r(void);
 
+	int32_t	PruneNodes_r(void);
+	int32_t NumChildNodes(void);
+
+	void FreeTreePortals_r(void);
+	void FreeTree_r(void);
+
+	void WriteNodes_r(XPlaneSet& planes, core::XFile* pFile);
+
+	X_INLINE bool AreaSet(void) const {
+		return area != -1;
+	}
+
+	X_INLINE bool IsLeaf(void) const {
+		return planenum == PLANENUM_LEAF;
+	}
+
+	X_INLINE bool IsAreaLeaf(void) const {
+		return IsLeaf() && AreaSet();
+	}
+	X_INLINE bool IsSolidLeaf(void) const {
+		return IsLeaf() && !AreaSet();
+	}
+
+
+public:
+	// give each node a number.
+	static int32_t NumberNodes_r(bspNode* pNode, int32_t nextNumber);
+
+	static int32_t NumChildNodes_r(bspNode* pNode);
+
 public:
 	// leafs and nodes
 	int32_t			planenum;			// -1 = leaf node 
@@ -111,6 +140,7 @@ public:
 
 	// nodes only
 	struct bspNode* children[2];
+	int32_t			nodeNumber; // set on save.
 
 	// leafs only 
 	struct bspPortal* portals;

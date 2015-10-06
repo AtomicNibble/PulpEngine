@@ -25,19 +25,22 @@ namespace {
 }
 
 
-GrowingPoolAllocator::GrowingPoolAllocator(unsigned int maxSizeInBytes, unsigned int growSize, unsigned int chunkHeaderSize, size_t maxElementSize, size_t maxAlignment, size_t offset)
+GrowingPoolAllocator::GrowingPoolAllocator(unsigned int maxSizeInBytes, unsigned int growSize, 
+	unsigned int chunkHeaderSize, size_t maxElementSize, size_t maxAlignment, size_t offset)
 {
-	m_virtualStart = static_cast<char*>( VirtualMem::ReserveAddressSpace( maxSizeInBytes ) );
-	m_virtualEnd = &m_virtualStart[ maxSizeInBytes ];
+	virtualStart_ = static_cast<char*>( VirtualMem::ReserveAddressSpace( maxSizeInBytes ) );
+	virtualEnd_ = &virtualStart_[ maxSizeInBytes ];
 
-	m_physicalCurrent = m_virtualStart;
-	m_growSize = growSize;
-	m_chunkHeaderSize = chunkHeaderSize;
-	m_maxSize = maxElementSize;
-	m_maxAlignment = maxAlignment;
+	physicalCurrent_ = virtualStart_;
+	growSize_ = growSize;
+	chunkHeaderSize_ = chunkHeaderSize;
+	maxSize_ = maxElementSize;
+	maxAlignment_ = maxAlignment;
 
 #if X_ENABLE_POOL_ALLOCATOR_CHECK
-	m_offset = offset;
+	offset_ = offset;
+#else
+	X_UNUSED(offset);
 #endif
 
 	X_ASSERT( bitUtil::IsPowerOfTwo( growSize ), "Pool Grow size must be a power-of-two." )( growSize );
@@ -49,14 +52,14 @@ GrowingPoolAllocator::GrowingPoolAllocator(unsigned int maxSizeInBytes, unsigned
 	
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	zero_object( m_statistics );
+	zero_object( statistics_ );
 
-	m_statistics.m_virtualMemoryReserved = maxSizeInBytes;
+	statistics_.virtualMemoryReserved_ = maxSizeInBytes;
 
-	m_elementSize = CalculateElementSize( maxElementSize, maxAlignment );
-	m_wastePerElement = m_elementSize = maxElementSize;
+	elementSize_ = CalculateElementSize( maxElementSize, maxAlignment );
+	wastePerElement_ = elementSize_ = maxElementSize;
 
-	m_statistics.m_type = "GrowPoolAllocator";
+	statistics_.type_ = "GrowPoolAllocator";
 #endif
 
 }
@@ -64,68 +67,76 @@ GrowingPoolAllocator::GrowingPoolAllocator(unsigned int maxSizeInBytes, unsigned
 /// Frees all physical memory owned by the allocator.
 GrowingPoolAllocator::~GrowingPoolAllocator(void)
 {
-	VirtualMem::ReleaseAddressSpace( m_virtualStart );
+	VirtualMem::ReleaseAddressSpace( virtualStart_ );
 }
 
 
 
 void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offset, const void* chunkHeaderData, size_t chunkHeaderSize)
 {
-	if ( size > m_maxSize )
+	if ( size > maxSize_ )
 	{
-		X_ASSERT( false, "Pool allocator can't satsify a request bigger than max size only equal or less" )( size, m_maxSize );
+		X_ASSERT( false, "Pool allocator can't satsify a request bigger than max size only equal or less" )( size, maxSize_ );
 	}
 
-	if ( alignment > m_maxAlignment )
+	if ( alignment > maxAlignment_ )
 	{
-		X_ASSERT( false, "Pool allocaotr alignment must be equal or less" )( alignment, m_maxAlignment );
+		X_ASSERT( false, "Pool allocaotr alignment must be equal or less" )( alignment, maxAlignment_ );
 	}
 
 #if X_ENABLE_POOL_ALLOCATOR_CHECK
-	if ( offset != m_offset )
+	if ( offset != offset_ )
 	{
-		X_ASSERT( false, "A pool allocator can only allocate instances with the same offset." )( offset, m_offset );
+		X_ASSERT( false, "A pool allocator can only allocate instances with the same offset." )( offset, offset_ );
 	}
 #endif
 
-	void* pMem = m_freelist.Obtain();
+	void* pMem = freelist_.Obtain();
 
 	if( !pMem ) // we need to grow baby.
 	{
-		size_t neededPhysicalSize = bitUtil::RoundUpToMultiple<size_t>( offset + m_maxSize, m_growSize );
+		size_t neededPhysicalSize = bitUtil::RoundUpToMultiple<size_t>( offset + maxSize_,
+			growSize_ );
 
-		if ( &m_physicalCurrent[ neededPhysicalSize ] <= m_virtualEnd )
+		if ( &physicalCurrent_[ neededPhysicalSize ] <= virtualEnd_ )
 		{
-			void* pMemoryRegionStart = VirtualMem::AllocatePhysicalMemory( m_physicalCurrent, neededPhysicalSize );	
-			m_physicalCurrent += neededPhysicalSize;
-			void* pChunkHeaderStart = m_physicalCurrent - m_chunkHeaderSize;
+			void* pMemoryRegionStart = VirtualMem::AllocatePhysicalMemory( physicalCurrent_,
+				neededPhysicalSize );	
 
-			m_freelist = Freelist( pMemoryRegionStart, pChunkHeaderStart, m_maxSize, m_maxAlignment, offset );
+			physicalCurrent_ += neededPhysicalSize;
+
+			void* pChunkHeaderStart = physicalCurrent_ - chunkHeaderSize_;
+
+			freelist_ = Freelist( pMemoryRegionStart, pChunkHeaderStart, 
+				maxSize_, maxAlignment_, offset );
 
 			// ok now try.
-			pMem = m_freelist.Obtain(); 
+			pMem = freelist_.Obtain(); 
 
 			if ( chunkHeaderData ) {
-				memcpy( (char*)pChunkHeaderStart, (char*)chunkHeaderData, chunkHeaderSize);
+				memcpy( pChunkHeaderStart, chunkHeaderData, chunkHeaderSize);
 			}
 
-			size_t wasteAtFront = CalculateWasteAtFront( pMemoryRegionStart, m_maxAlignment, offset);
-			
 			// update all dat info.
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-			size_t memoryRegionSize = safe_static_cast<uint32_t>( (char*)pChunkHeaderStart - (char*)pMemoryRegionStart );
-			size_t elementCount = (memoryRegionSize - wasteAtFront) / m_elementSize;
+			size_t wasteAtFront = CalculateWasteAtFront(pMemoryRegionStart, maxAlignment_, offset);
+			size_t memoryRegionSize = safe_static_cast<uint32_t>( reinterpret_cast<char*>(pChunkHeaderStart) - 
+				reinterpret_cast<char*>(pMemoryRegionStart));
+			size_t elementCount = (memoryRegionSize - wasteAtFront) / elementSize_;
 
-			m_statistics.m_physicalMemoryAllocated = safe_static_cast<uint32_t>( m_physicalCurrent - m_virtualStart );
-			m_statistics.m_physicalMemoryUsed += m_chunkHeaderSize + wasteAtFront;
-			m_statistics.m_wasteAlignment += wasteAtFront;
-			m_statistics.m_wasteUnused = m_chunkHeaderSize + memoryRegionSize - wasteAtFront- m_elementSize * elementCount;
+			statistics_.physicalMemoryAllocated_ = safe_static_cast<uint32_t>( 
+				physicalCurrent_ - virtualStart_ );
+
+			statistics_.physicalMemoryUsed_ += chunkHeaderSize_ + wasteAtFront;
+			statistics_.wasteAlignment_ += wasteAtFront;
+			statistics_.wasteUnused_ = chunkHeaderSize_ + memoryRegionSize - 
+				wasteAtFront- elementSize_ * elementCount;
 
 			// 1,2,3 what is the max? I hope i don't have to pay tax.
-			m_statistics.m_physicalMemoryAllocatedMax = Max( m_statistics.m_physicalMemoryAllocatedMax, m_statistics.m_physicalMemoryAllocated );
-			m_statistics.m_physicalMemoryUsedMax = Max( m_statistics.m_physicalMemoryUsedMax, m_statistics.m_physicalMemoryUsed );
-			m_statistics.m_wasteAlignmentMax = Max( m_statistics.m_wasteAlignmentMax, m_statistics.m_wasteAlignment );
-			m_statistics.m_wasteUnusedMax = Max( m_statistics.m_wasteUnusedMax, m_statistics.m_wasteUnused );
+			statistics_.physicalMemoryAllocatedMax_ = Max( statistics_.physicalMemoryAllocatedMax_, statistics_.physicalMemoryAllocated_ );
+			statistics_.physicalMemoryUsedMax_ = Max( statistics_.physicalMemoryUsedMax_, statistics_.physicalMemoryUsed_ );
+			statistics_.wasteAlignmentMax_ = Max( statistics_.wasteAlignmentMax_, statistics_.wasteAlignment_ );
+			statistics_.wasteUnusedMax_ = Max( statistics_.wasteUnusedMax_, statistics_.wasteUnused_ );
 #endif
 		}
 		else
@@ -137,13 +148,13 @@ void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offs
 	// info for when we either grow or not.
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
-	m_statistics.m_allocationCount++;
-	m_statistics.m_physicalMemoryUsed += m_elementSize;
-	m_statistics.m_wasteAlignment += m_wastePerElement;
+	statistics_.allocationCount_++;
+	statistics_.physicalMemoryUsed_ += elementSize_;
+	statistics_.wasteAlignment_ += wastePerElement_;
 
-	m_statistics.m_allocationCountMax = Max( m_statistics.m_allocationCountMax, m_statistics.m_allocationCount );	
-	m_statistics.m_physicalMemoryUsedMax = Max( m_statistics.m_physicalMemoryUsedMax, m_statistics.m_physicalMemoryUsed );
-	m_statistics.m_wasteAlignmentMax = Max( m_statistics.m_wasteAlignmentMax, m_statistics.m_wasteAlignment );
+	statistics_.allocationCountMax_ = Max( statistics_.allocationCountMax_, statistics_.allocationCount_ );	
+	statistics_.physicalMemoryUsedMax_ = Max( statistics_.physicalMemoryUsedMax_, statistics_.physicalMemoryUsed_ );
+	statistics_.wasteAlignmentMax_ = Max( statistics_.wasteAlignmentMax_, statistics_.wasteAlignment_ );
 #endif
 	return pMem;
 }
@@ -152,7 +163,7 @@ void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offs
 MemoryAllocatorStatistics GrowingPoolAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	return m_statistics;
+	return statistics_;
 #else
 	static MemoryAllocatorStatistics stats;
 	core::zero_object(stats);

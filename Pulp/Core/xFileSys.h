@@ -7,7 +7,9 @@
 
 #include <Containers\HashMap.h>
 
+X_DISABLE_WARNING(4702)
 #include <set>
+X_ENABLE_WARNING(4702)
 
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 #include <Memory\AllocationPolicies\PoolAllocator.h>
@@ -28,7 +30,7 @@ struct pak_s
 
 struct directory_s
 {
-	Path path;
+	Path<wchar_t> path;
 
 };
 
@@ -64,15 +66,20 @@ public:
 #ifdef X_PLATFORM_WIN32
 	static const char NATIVE_SLASH = '\\';
 	static const char NON_NATIVE_SLASH = '/';
-
+	static const wchar_t NATIVE_SLASH_W = L'\\';
+	static const wchar_t NON_NATIVE_SLASH_W = L'/';
 #else
 	static const char NATIVE_SLASH = '/';
 	static const char NON_NATIVE_SLASH = '\\';
+	static const wchar_t NATIVE_SLASH_W = L'/';
+	static const wchar_t NON_NATIVE_SLASH_W = L'\\';
 #endif
 
+	static const size_t MAX_VIRTUAL_DIR = FS_MAX_VIRTUAL_DIR;
 
 	friend struct XFindData;
 
+public:
 	xFileSys();
 	~xFileSys() X_FINAL;
 
@@ -93,28 +100,32 @@ public:
 	void closeFileMem(XFileMem* file) X_FINAL;
 
 	// folders
-	bool setGameDir(pathType path) X_FINAL;
-	void addModDir(pathType path) X_FINAL;
+	bool setGameDir(pathTypeW path) X_FINAL;
+	void addModDir(pathTypeW path) X_FINAL;
 
 	// Find util
-	virtual uintptr_t findFirst(pathType path, _finddatai64_t* findinfo) X_FINAL;
-	virtual bool findnext(uintptr_t handle, _finddatai64_t* findinfo) X_FINAL;
-	virtual void findClose(uintptr_t handle) X_FINAL;
+	uintptr_t findFirst(pathType path, _wfinddatai64_t* findinfo) X_FINAL;
+	bool findnext(uintptr_t handle, _wfinddatai64_t* findinfo) X_FINAL;
+	void findClose(uintptr_t handle) X_FINAL;
 
 	// Delete
-	virtual bool deleteFile(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
-	virtual bool deleteDirectory(pathType path, bool recursive = false) const X_FINAL;
+	bool deleteFile(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool deleteDirectory(pathType path, bool recursive = false) const X_FINAL;
 
 	// Create
-	virtual bool createDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
-	virtual bool createDirectoryTree(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool createDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool createDirectoryTree(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
 
 	// exsists.
-	virtual bool fileExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
-	virtual bool directoryExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool fileExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool fileExists(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool directoryExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool directoryExists(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+
 
 	// does not error, when it's a file or not exsist.
-	virtual bool isDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool isDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+	bool isDirectory(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
 
 	// settings baby
 	const XFileSysVars* getVars() const { return &vars_; }
@@ -124,10 +135,16 @@ public:
 
 private:
 
-	// Ajust path
-	const char* createOSPath(directory_s* dir, pathType path, Path& buffer) const;
-	bool isAbsolute(pathType path) const;
+	bool fileExistsOS(pathTypeW fullPath) const;
+	bool directoryExistsOS(pathTypeW fullPath) const;
+	bool isDirectoryOS(pathTypeW fullPath) const;
 
+	// Ajust path
+	const wchar_t* createOSPath(directory_s* dir, pathType path, Path<wchar_t>& buffer) const;
+	const wchar_t* createOSPath(directory_s* dir, pathTypeW path, Path<wchar_t>& buffer) const;
+	bool isAbsolute(pathType path) const;
+	bool isAbsolute(pathTypeW path) const;
+	
 	bool isDebug(void) const;
 
 private:

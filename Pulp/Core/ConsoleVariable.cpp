@@ -29,12 +29,12 @@ CVarBase::~CVarBase()
 
 void CVarBase::ForceSet(const char* s)
 {
-
+	X_UNUSED(s);
 }
 
 void CVarBase::SetDefault(const char* s)
 {
-
+	X_UNUSED(s);
 }
 
 ICVar::FlagType CVarBase::GetFlags() const

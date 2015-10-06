@@ -94,6 +94,10 @@ namespace Mem
 	template <typename T>
 	inline T* Construct(void* where, const T& what);
 
+	/// Constructs an instance in memory at the given address, copying from another instance.
+	template <typename T>
+	inline T* Construct(void* where, T&& what);
+
 	/// Constructs N instances in memory at the given address, and returns a pointer to the first instance.
 	template <typename T>
 	inline T* ConstructArray(void* where, size_t N);

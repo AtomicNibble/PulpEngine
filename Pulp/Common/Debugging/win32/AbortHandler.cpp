@@ -17,6 +17,7 @@ namespace abortHandler
 		void _AbortHandler(int __formal)
 		{
 			X_FATAL( "AbortHandler", "abort() has been called." );
+			X_UNUSED(__formal);
 
 			RaiseException(EXCEPTION_CODE, 0, 0, 0);
 		}

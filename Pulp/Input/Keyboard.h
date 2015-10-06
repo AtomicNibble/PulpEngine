@@ -50,6 +50,9 @@ private:
 	static bool VkeyCharCache_[256];
 	static InputSymbol*	Symbol[256];
 
+private:
+	X_NO_ASSIGN(XKeyboard);
+	X_NO_COPY(XKeyboard);
 };
 
 

@@ -59,6 +59,26 @@ size_(0)
 
 
 template<typename T>
+X_INLINE Array<T>::Array(Array<T>&& oth) :
+granularity_(16),
+list_(nullptr),
+num_(0),
+size_(0)
+{
+	list_ = oth.list_;
+	num_ = oth.num_;
+	size_ = oth.size_;
+	granularity_ = oth.granularity_;
+	arena_ = oth.arena_;
+
+	// clear other.
+	oth.list_ = nullptr;
+	oth.num_ = 0;
+	oth.size_ = 0;
+}
+
+
+template<typename T>
 X_INLINE Array<T>::~Array(void) 
 {
 	free();
@@ -99,6 +119,27 @@ Array<T>& Array<T>::operator=(const Array<T> &oth)
 		}
 	}
 
+	return *this;
+}
+
+template<typename T>
+Array<T>& Array<T>::operator=(Array<T>&& oth)
+{
+	if (this != &oth)
+	{
+		free();
+
+		list_ = oth.list_;
+		num_ = oth.num_;
+		size_ = oth.size_;
+		granularity_ = oth.granularity_;
+		arena_ = oth.arena_;
+
+		// clear other.
+		oth.list_ = nullptr;
+		oth.num_ = 0;
+		oth.size_ = 0;
+	}
 	return *this;
 }
 
@@ -148,8 +189,9 @@ X_INLINE void Array<T>::clear(void)
 	// properly destruct the instances
 	size_t i;
 
-	for (i = 0; i<size(); ++i)
+	for (i = 0; i < size(); ++i) {
 		Mem::Destruct(list_ + i);
+	}
 
 	num_ = 0; // don't free any memory
 }
@@ -159,8 +201,9 @@ X_INLINE void Array<T>::free(void)
 {
 	clear(); // make sure to destruct the objects.
 
-	if (list_)
+	if (list_) {
 		DeleteArr(list_);
+	}
 
 	list_ = nullptr;
 	num_ =  0;
@@ -276,6 +319,20 @@ X_INLINE typename Array<T>::size_type Array<T>::append(T const& obj) {
 }
 
 template<typename T>
+X_INLINE typename Array<T>::size_type Array<T>::append(T&& obj) {
+	// if list empty allocate it
+	if (!list_)
+		reserve(granularity_);
+	// grow if needs be.
+	if (num_ == size_)
+		reserve(size_ + granularity_);
+
+	Mem::Construct(&list_[num_], std::forward<T>(obj));
+	num_++;
+	return num_ - 1;
+}
+
+template<typename T>
 X_INLINE typename Array<T>::size_type Array<T>::append(const Array<T>& oth) 
 {
 	if (this != &oth)
@@ -311,6 +368,20 @@ X_INLINE typename Array<T>::size_type Array<T>::push_back(T const& obj) {
 	return num_ - 1;
 }
 
+template<typename T>
+X_INLINE typename Array<T>::size_type Array<T>::push_back(T&& obj) {
+	// if list empty allocate it
+	if (!list_)
+		reserve(granularity_);
+	// grow if needs be.
+	if (num_ == size_)
+		reserve(size_ + granularity_);
+
+	Mem::Construct(&list_[num_], std::forward<T>(obj));
+	num_++;
+	return num_ - 1;
+}
+
 // -----------------------------------------------
 
 template<typename T>
@@ -340,6 +411,32 @@ X_INLINE typename Array<T>::size_type Array<T>::insert(const Type& obj, size_typ
 	if (index < 0) 
 		index = 0;
 	else if (index > num_) 
+		index = num_;
+
+	for (size_type i = num_; i > index; --i)
+		list_[i] = list_[i - 1];
+
+	num_++;
+	list_[index] = obj;
+
+	return index;
+}
+
+template<typename T>
+X_INLINE typename Array<T>::size_type Array<T>::insert(Type&& obj, size_type index)
+{
+	if (!list_)
+		reserve(granularity_);
+
+	if (num_ == size_) {
+		size_type newsize = size_ + granularity_;
+
+		reserve(newsize);
+	}
+
+	if (index < 0)
+		index = 0;
+	else if (index > num_)
 		index = num_;
 
 	for (size_type i = num_; i > index; --i)
@@ -438,10 +535,12 @@ bool Array<T>::SSave(XFile* pFile) const
 {
 	X_ASSERT_NOT_NULL(pFile);
 
+	X_DISABLE_WARNING(4127)
 	if (!compileTime::IsPOD<T>::Value) {
 		X_ERROR("Array", "Can't save a none POD type to file: %s", typeid(T).name());
 		return false;
 	}
+	X_ENABLE_WARNING(4127)
 
 	pFile->writeObj(num_);
 	pFile->writeObj(size_);
@@ -455,10 +554,12 @@ bool Array<T>::SLoad(XFile* pFile)
 {
 	X_ASSERT_NOT_NULL(pFile);
 
+	X_DISABLE_WARNING(4127)
 	if (!compileTime::IsPOD<T>::Value) {
 		X_ERROR("Array", "Can't load a none POD type from file: %s", typeid(T).name()); 
 		return false;
 	}
+	X_ENABLE_WARNING(4127)
 
 	free();
 	size_type read, num, size, gran;

@@ -10,6 +10,8 @@
 
 #include "BSPTypes.h"
 
+#include <set>
+
 
 X_NAMESPACE_DECLARE(mapfile,
 class XMapFile;
@@ -145,6 +147,8 @@ public:
 	bool FillOutside(void);
 	bool ClipSidesByTree(XPlaneSet& planeSet);
 	bool FloodAreas(void);
+	bool PruneNodes(void);
+
 
 private:
 
@@ -157,6 +161,8 @@ private:
 
 public:
 	Vec3f origin;
+	Vec3f angle; // euelr
+	AABB bounds; // set for models, only currently.
 
 	LvlBrushArr brushes;
 	TrisArr patches;
@@ -166,6 +172,8 @@ public:
 	bspTree bspTree;
 
 	size_t numAreas;
+
+	level::ClassType::Enum classType;
 
 	mapfile::XMapEntity*	mapEntity;		// points to the map data this was made from.
 };
@@ -209,8 +217,9 @@ struct AreaSubMesh
 class LvlArea
 {
 	typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
-	typedef core::Array<LvlEntity> AreaEntsArr;
-	typedef core::Array<AABB> CullSectionsArr;
+	typedef core::Array<uint32_t> AreaEntsRef;
+//	typedef core::Array<LvlEntity*> AreaEntsArr;
+//	typedef core::Array<AABB> CullSectionsArr;
 public:
 	LvlArea();
 
@@ -223,10 +232,12 @@ public:
 	AreaModel model;
 
 	AreaMeshMap areaMeshes;
-	AreaEntsArr	entities;
+	AreaEntsRef entRefs;
+//	AreaEntsArr	entities;
+
 	// we split the area up into a optimal avg'd collection of AABB's
 	// which are turned into worker jobs.
-	CullSectionsArr cullSections;
+	//CullSectionsArr cullSections;
 
 	// copy of the model values.
 	AABB boundingBox;
@@ -236,5 +247,19 @@ public:
 
 typedef core::Array<LvlEntity> LvlEntsArr;
 typedef core::Array<LvlArea> LvlAreaArr;
+
+struct LvlStats
+{
+	LvlStats()  {
+		core::zero_this(this);
+	}
+	int32_t	numEntities;
+	int32_t	numPatches;
+	int32_t	numBrushes;
+	int32_t	numAreaPortals;
+	int32_t	numFaceLeafs;
+};
+
+
 
 #endif // !X_LVL_TYPES_H_

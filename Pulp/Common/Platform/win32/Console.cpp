@@ -70,10 +70,10 @@ namespace {
 
 };
 
-Console::Console(const char* title) :
-m_stdout(nullptr),
-m_stdin(nullptr),
-m_stderr(nullptr)
+Console::Console(const wchar_t* title) :
+stdout_(nullptr),
+stdin_(nullptr),
+stderr_(nullptr)
 {
 //	int hConHandle;
 //	HANDLE lStdHandle;
@@ -87,9 +87,9 @@ m_stderr(nullptr)
 		return;
 	}
 
-	m_window = GetConsoleWindow();
+	window_ = GetConsoleWindow();
 
-	if( m_window == NULL )
+	if( window_ == NULL )
 	{
 		X_ERROR( "Console", "Cannot retrieve console window. Error: %s", lastError::ToString( Dsc ) );
 		return;
@@ -97,16 +97,16 @@ m_stderr(nullptr)
 
 	SetConsoleIcon(Dsc, IDI_ENGINE_LOGO);
 
-	m_console = GetStdHandle(STD_OUTPUT_HANDLE);
-	m_consoleInput = GetStdHandle(STD_INPUT_HANDLE);
+	console_ = GetStdHandle(STD_OUTPUT_HANDLE);
+	consoleInput_ = GetStdHandle(STD_INPUT_HANDLE);
 
-	if( m_consoleInput == INVALID_HANDLE_VALUE )
+	if( consoleInput_ == INVALID_HANDLE_VALUE )
 	{
 		X_ERROR( "Console", "Cannot retrieve console input handle. Error: %s", lastError::ToString( Dsc ) );
 		return;
 	}
 
-	if( SetConsoleMode( m_consoleInput, ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT ) == 0 )
+	if( SetConsoleMode( consoleInput_, ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT ) == 0 )
 	{
 		X_ERROR( "Console", "Cannot set console input mode. Error: %s", lastError::ToString( Dsc ) );
 		return;
@@ -115,21 +115,21 @@ m_stderr(nullptr)
 	/*
 	lStdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
 	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
-	m_stdout = _fdopen( hConHandle, "w" );
-	*stdout = *m_stdout;
+	stdout_ = _fdopen( hConHandle, "w" );
+	*stdout = *stdout_;
 //	setvbuf( stdout, NULL, _IONBF, 0 );
 
 	lStdHandle = GetStdHandle(STD_INPUT_HANDLE);
 	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
-	m_stdin = _fdopen( hConHandle, "r" );
-	*stdin = *m_stdin;
+	stdin_ = _fdopen( hConHandle, "r" );
+	*stdin = *stdin_;
 //	setvbuf( stdin, NULL, _IONBF, 0 );
 
 
 	lStdHandle = GetStdHandle(STD_ERROR_HANDLE);
 	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
-	m_stderr = _fdopen( hConHandle, "w" );
-	*stderr = *m_stderr;
+	stderr_ = _fdopen( hConHandle, "w" );
+	*stderr = *stderr_;
 //	setvbuf( stderr, NULL, _IONBF, 0 );
 	*/
 	SetTitle( title );
@@ -141,20 +141,20 @@ m_stderr(nullptr)
 Console::~Console(void)
 {
 	lastError::Description Dsc;
-
-	if (m_stdout) {
-		if (fclose(m_stdout) == EOF)
+	/*
+	if (stdout_) {
+		if (fclose(stdout_) == EOF)
 			X_ERROR("Console", "Cannot close stdout handle. Error: %s", lastError::ToString(Dsc));
 	}
-	if (m_stdout) {
-		if (fclose(m_stdin) == EOF)
+	if (stdout_) {
+		if (fclose(stdin_) == EOF)
 			X_ERROR("Console", "Cannot close stdin handle. Error: %s", lastError::ToString(Dsc));
 	}
-	if (m_stdout) {
-		if (fclose(m_stderr) == EOF)
+	if (stdout_) {
+		if (fclose(stderr_) == EOF)
 			X_ERROR("Console", "Cannot close stderr handle. Error: %s", lastError::ToString(Dsc));
 	}
-
+	*/
 	if( !FreeConsole() )
 	{
 		X_ERROR( "Console", "Cannot free console. Error: %s", lastError::ToString( Dsc ) );
@@ -163,9 +163,9 @@ Console::~Console(void)
 }
 
 /// Sets the console title.
-void Console::SetTitle(const char* title)
+void Console::SetTitle(const wchar_t* title)
 {
-	SetConsoleTitle( title );
+	SetConsoleTitleW( title );
 }
 
 /// \brief Sets the console window size and number of lines stored internally, in character units.
@@ -174,11 +174,11 @@ void Console::SetSize(unsigned int windowWidth, unsigned int windowHeight, unsig
 	lastError::Description Dsc;
 	CONSOLE_SCREEN_BUFFER_INFO Info;
 
-	WORD width = safe_static_cast<short,uint>(windowWidth);
-	WORD height = safe_static_cast<short,uint>(windowHeight);
-	WORD lines = safe_static_cast<short,uint>(numLines);
+	SHORT width = safe_static_cast<SHORT,uint>(windowWidth);
+	SHORT height = safe_static_cast<SHORT,uint>(windowHeight);
+	SHORT lines = safe_static_cast<SHORT,uint>(numLines);
 
-	if( !GetConsoleScreenBufferInfo( m_console, &Info ) )
+	if( !GetConsoleScreenBufferInfo( console_, &Info ) )
 	{
 		X_ERROR( "Console", "Cannot get console buffer info. Error: %s", lastError::ToString( Dsc ) );
 		return;
@@ -189,7 +189,7 @@ void Console::SetSize(unsigned int windowWidth, unsigned int windowHeight, unsig
 	{
 		Info.dwSize.X = Max<short>( safe_static_cast<short,uint>( windowWidth ), safe_static_cast<short,int>( GetSystemMetrics( SM_CXMIN ) ) );
 
-		if( !SetConsoleScreenBufferSize( m_console, Info.dwSize ) )
+		if( !SetConsoleScreenBufferSize( console_, Info.dwSize ) )
 		{
 			X_ERROR( "Console", "Cannot set console buffer width. Error: %s", lastError::ToString( Dsc ) );
 		}
@@ -200,17 +200,17 @@ void Console::SetSize(unsigned int windowWidth, unsigned int windowHeight, unsig
 	{
 		Info.dwSize.Y = Max<short>( lines, safe_static_cast<short,int>( GetSystemMetrics( SM_CYMIN ) ) );
 
-		if( !SetConsoleScreenBufferSize( m_console, Info.dwSize ) )
+		if( !SetConsoleScreenBufferSize( console_, Info.dwSize ) )
 		{
 			X_ERROR( "Console", "Cannot set console buffer height. Error: %s", lastError::ToString( Dsc ) );
 		}
 	}
 
 	// confirm buffer sizes.
-	GetConsoleScreenBufferInfo( m_console, &Info );
+	GetConsoleScreenBufferInfo( console_, &Info );
 
-	width = Min( width, safe_static_cast<WORD,SHORT>( Info.dwSize.X ) ) - 1;
-	height = Min( height, safe_static_cast<WORD,SHORT>( Info.dwSize.Y ) ) - 1;
+	width = Min( width, static_cast<SHORT>( Info.dwSize.X ) ) - 1;
+	height = Min( height, static_cast<SHORT>( Info.dwSize.Y ) ) - 1;
 	
 	SMALL_RECT windowSize = {
 		0, 
@@ -219,7 +219,7 @@ void Console::SetSize(unsigned int windowWidth, unsigned int windowHeight, unsig
 		height
 	};
 
-	if( !SetConsoleWindowInfo( m_console, 1, &windowSize ) )
+	if( !SetConsoleWindowInfo( console_, 1, &windowSize ) )
 	{
 		X_ERROR( "Console", "Cannot set console window width. Error: %s", lastError::ToString( Dsc ) );
 	}
@@ -230,7 +230,7 @@ void Console::SetSize(unsigned int windowWidth, unsigned int windowHeight, unsig
 /// Sets the cursor position inside the console, in character units.
 void Console::SetCursorPosition(unsigned int x, unsigned int y)
 {
-	if( !SetConsoleCursorPosition( m_console, GetCoord( x, y ) ) )
+	if( !SetConsoleCursorPosition( console_, GetCoord( x, y ) ) )
 	{
 		lastError::Description Dsc;
 		X_ERROR( "Console", "Cannot set console cursor position. Error: %s", lastError::ToString( Dsc ) );
@@ -241,12 +241,12 @@ void Console::SetCursorPosition(unsigned int x, unsigned int y)
 void Console::MoveTo(int x, int y)
 {
 	RECT rec;
-	GetWindowRect( m_window, &rec );
+	GetWindowRect( window_, &rec );
 
 	int nHeight = rec.bottom - rec.top;
 	int nWidth = rec.right - rec.left;
 
-	if( !MoveWindow( m_window, x, y, nWidth, nHeight, FALSE ) )
+	if( !MoveWindow( window_, x, y, nWidth, nHeight, FALSE ) )
 	{
 		lastError::Description Dsc;
 		X_ERROR( "Console", "Cannot move console window. Error: %s", lastError::ToString( Dsc ) );
@@ -269,7 +269,7 @@ void Console::AlignTo(const Rect& xRect, Alignment alignment)
 Console::Rect Console::GetRect(void) const
 {
 	RECT rec;
-	GetWindowRect( m_window, &rec );
+	GetWindowRect( window_, &rec );
 
 //	int nHeight = rec.bottom - rec.top;
 //	int nWidth = rec.right - rec.left;
@@ -284,13 +284,13 @@ char Console::ReadKey(void) const
 	lastError::Description Dsc;
 	DWORD NumEvents;
 
-	if( GetNumberOfConsoleInputEvents( m_consoleInput, &NumEvents ) )
+	if( GetNumberOfConsoleInputEvents( consoleInput_, &NumEvents ) )
 	{
 		if( NumEvents > 0 )
 		{
 			INPUT_RECORD InputInfo;
 
-			if( ReadConsoleInput( m_consoleInput, &InputInfo, 1, &NumEvents ) )
+			if( ReadConsoleInput( consoleInput_, &InputInfo, 1, &NumEvents ) )
 			{
 				if( InputInfo.EventType == KEY_EVENT )
 				{
@@ -314,9 +314,35 @@ char Console::ReadKey(void) const
 /// Shows/hides the console window.
 void Console::Show(bool show)
 {
-	ShowWindow( m_window, (show ? SW_SHOW : SW_HIDE) );
+	ShowWindow( window_, (show ? SW_SHOW : SW_HIDE) );
 }
 
 
+void Console::RedirectSTD(void)
+{
+	int hConHandle;
+	HANDLE lStdHandle;
+
+	lStdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
+	stdout_ = _fdopen( hConHandle, "w" );
+	*stdout = *stdout_;
+	//	setvbuf( stdout, NULL, _IONBF, 0 );
+
+	lStdHandle = GetStdHandle(STD_INPUT_HANDLE);
+	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
+	stdin_ = _fdopen( hConHandle, "r" );
+	*stdin = *stdin_;
+	//	setvbuf( stdin, NULL, _IONBF, 0 );
+
+
+	lStdHandle = GetStdHandle(STD_ERROR_HANDLE);
+	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
+	stderr_ = _fdopen( hConHandle, "w" );
+	*stderr = *stderr_;
+	//	setvbuf( stderr, NULL, _IONBF, 0 );
+
+	std::ios::sync_with_stdio();
+}
 
 X_NAMESPACE_END

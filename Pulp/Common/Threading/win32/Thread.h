@@ -123,7 +123,7 @@ protected:
 	virtual Thread::ReturnValue ThreadRun(const Thread& thread) X_ABSTRACT;
 
 private:
-	static Thread::ReturnValue ThreadAbstract::ThreadFunc(const Thread& thread);
+	static Thread::ReturnValue ThreadFunc(const Thread& thread);
 
 	Thread thread_;
 };

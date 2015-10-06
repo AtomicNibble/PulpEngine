@@ -36,12 +36,12 @@ class ExtendedMemoryTracking
 		/// Default constructor.
 		AllocationData(size_t originalSize, size_t internalSize, const char* ID, const char* typeName, const SourceInfo& sourceInfo, const char* memoryArenaName);
 
-		size_t m_originalSize;
-		size_t m_internalSize;
-		const char* m_ID;
-		const char* m_typeName;
-		SourceInfo m_sourceInfo;
-		const char* m_memoryArenaName;
+		size_t originalSize_;
+		size_t internalSize_;
+		const char* ID_;
+		const char* typeName_;
+		SourceInfo sourceInfo_;
+		const char* memoryArenaName_;
 
 	private:
 		X_NO_ASSIGN(AllocationData);

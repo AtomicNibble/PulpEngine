@@ -29,6 +29,11 @@ uint32_t LoggerInternalConsoleFormatPolicy::Format(LoggerBase::Line& line, const
 {
 	int bytesWritten;
 
+	X_UNUSED(indentation);
+	X_UNUSED(type);
+	X_UNUSED(verbosity);
+	X_UNUSED(sourceInfo);
+
 	bytesWritten = _snprintf_s(line, _TRUNCATE, "^4%-12s^7", channel);
 	bytesWritten += vsnprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, format, args);
 	bytesWritten += _snprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, "\n");

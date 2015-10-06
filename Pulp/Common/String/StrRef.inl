@@ -29,6 +29,15 @@ StringRef<CharT>::StringRef(const StrT& str)
 	}
 }
 
+// from another string object
+template<typename CharT>
+StringRef<CharT>::StringRef(StrT&& oth)
+{
+	str_ = oth.str_;
+
+	oth.SetEmpty();
+}
+
 // from another string object, define the offset and count
 template<typename CharT>
 StringRef<CharT>::StringRef(const StrT& str, size_type offset, size_type count)
@@ -156,7 +165,7 @@ typename StringRef<CharT>::const_iterator StringRef<CharT>::end(void) const
 template<typename CharT>
 typename StringRef<CharT>::size_type StringRef<CharT>::length(void) const
 {
-	return header()->length;
+	return safe_static_cast<StringRef<CharT>::size_type, StringRef<CharT>::length_type>(header()->length);
 }
 
 // same as length
@@ -170,7 +179,7 @@ typename StringRef<CharT>::size_type StringRef<CharT>::size(void) const
 template<typename CharT>
 typename StringRef<CharT>::size_type StringRef<CharT>::capacity(void) const
 {
-	return header()->allocSize;
+	return safe_static_cast<StringRef<CharT>::size_type, StringRef<CharT>::length_type>(header()->allocSize);
 }
 
 template<typename CharT>
@@ -281,6 +290,17 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::operator=(const StrT& str)
 			str_ = str.str_;
 			header()->addRef();
 		}
+	}
+	return *this;
+}
+
+template<typename CharT>
+typename StringRef<CharT>::StrT& StringRef<CharT>::operator=(StrT&& oth)
+{
+	if (this != &oth) 
+	{
+		str_ = oth.str_;
+		oth.SetEmpty();
 	}
 	return *this;
 }
@@ -1000,7 +1020,7 @@ typename StringRef<CharT>::XStrHeader* StringRef<CharT>::header(void) const
 {
 	X_ASSERT_NOT_NULL(str_);
 
-	return ((XStrHeader*)str_) - 1;
+	return (reinterpret_cast<XStrHeader*>(str_) - 1);
 }
 
 // dose not check current length

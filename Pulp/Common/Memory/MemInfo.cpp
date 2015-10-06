@@ -8,11 +8,18 @@
 
 X_NAMESPACE_BEGIN(core)
 
-
-bool GetProcessMemInfo(XProcessMemInfo &info)
+namespace
 {
 	typedef BOOL(WINAPI *GetProcessMemoryInfoProc)(HANDLE, PPROCESS_MEMORY_COUNTERS, DWORD);
 
+	core::CriticalSection g_lock;
+
+	HMODULE g_hPSAPI = 0;
+	GetProcessMemoryInfoProc g_pGetProcessMemoryInfo = nullptr;
+}
+
+bool GetProcessMemInfo(XProcessMemInfo &info)
+{
 	core::zero_object(info);
 
 #if _WIN32
@@ -28,14 +35,22 @@ bool GetProcessMemInfo(XProcessMemInfo &info)
 	info.TotalPhysicalMemory = mem.ullTotalPhys;
 	info.FreePhysicalMemory = mem.ullAvailPhys;
 
-	static HMODULE hPSAPI = GoatLoadLibary("psapi.dll");
+	core::CriticalSection::ScopedLock lock(g_lock);
 
-	if (hPSAPI)
+	if (!g_hPSAPI) {
+		g_hPSAPI = GoatLoadLibaryW(L"psapi.dll");
+	}
+
+	if (g_hPSAPI)
 	{
-		static GetProcessMemoryInfoProc pGetProcessMemoryInfo = (GetProcessMemoryInfoProc)GetProcAddress(hPSAPI, "GetProcessMemoryInfo");
-		if (pGetProcessMemoryInfo)
+		if (!g_pGetProcessMemoryInfo) {
+			g_pGetProcessMemoryInfo = (GetProcessMemoryInfoProc)GoatGetProcAddress(g_hPSAPI,
+				"GetProcessMemoryInfo");
+		}
+
+		if (g_pGetProcessMemoryInfo)
 		{
-			if (pGetProcessMemoryInfo(GetCurrentProcess(), &pc, sizeof(pc)))
+			if (g_pGetProcessMemoryInfo(GetCurrentProcess(), &pc, sizeof(pc)))
 			{
 				info.PageFaultCount = pc.PageFaultCount;
 				info.PeakWorkingSetSize = pc.PeakWorkingSetSize;

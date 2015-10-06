@@ -170,10 +170,10 @@ namespace {
 	FrameColor g_FrameActive;
 	FrameColor g_FrameInActive;
 
-	HICON		m_But_Close[3];
-	HICON		m_But_Max[2];
-	HICON		m_But_Min[2];
-	HICON		m_But_Restore[2];
+	HICON		g_But_Close[3];
+	HICON		g_But_Max[2];
+	HICON		g_But_Min[2];
+	HICON		g_But_Restore[2];
 
 	static const DWORD TOM_PAINT_BUTTONS = WM_USER + 20;
 
@@ -247,7 +247,7 @@ HICON _LoadIcon( int ID )
 	return icon;
 }
 
-uint32_t xFrame::s_numframes = 0;
+AtomicInt xFrame::s_numframes(0);
 
 void xFrame::Startup(void)
 {
@@ -275,29 +275,31 @@ void xFrame::Startup(void)
 
 	// Load icons
 
-	LOAD_FRAME_ICON( m_But_Close,	IDI_FRAME_CLOSE );
-	LOAD_FRAME_ICON( m_But_Max,		IDI_FRAME_MAX );
-	LOAD_FRAME_ICON( m_But_Min,		IDI_FRAME_MIN );
-	LOAD_FRAME_ICON( m_But_Restore, IDI_FRAME_RESTORE );
+	LOAD_FRAME_ICON( g_But_Close,	IDI_FRAME_CLOSE );
+	LOAD_FRAME_ICON( g_But_Max,		IDI_FRAME_MAX );
+	LOAD_FRAME_ICON( g_But_Min,		IDI_FRAME_MIN );
+	LOAD_FRAME_ICON( g_But_Restore, IDI_FRAME_RESTORE );
 
-	m_But_Close[2]	= _LoadIcon( IDI_FRAME_CLOSE_DISABLE );
+	g_But_Close[2]	= _LoadIcon( IDI_FRAME_CLOSE_DISABLE );
 
 	g_hIcon = _LoadIcon( IDI_ENGINE_LOGO );
 
 	g_pen = CreatePen(PS_NULL, 1, RGB(90, 90, 90));
 
 	g_Background = CreateSolidBrush(0x202020);
-	g_font = CreateFont(16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE, ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, "Times New Roman");
+	g_font = CreateFontW(16, 0, 0, 0, FW_NORMAL, FALSE, FALSE, FALSE,
+		ANSI_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, 
+		DEFAULT_QUALITY, DEFAULT_PITCH | FF_ROMAN, L"Times New Roman");
 }
 
 void xFrame::Shutdown(void)
 {
-	FREE_FRAME_ICON( m_But_Close );
-	FREE_FRAME_ICON( m_But_Max );
-	FREE_FRAME_ICON( m_But_Min );
-	FREE_FRAME_ICON( m_But_Restore );
+	FREE_FRAME_ICON( g_But_Close );
+	FREE_FRAME_ICON( g_But_Max );
+	FREE_FRAME_ICON( g_But_Min );
+	FREE_FRAME_ICON( g_But_Restore );
 
-	DestroyIcon( m_But_Close[2] );
+	DestroyIcon( g_But_Close[2] );
 
 	DeleteObject( g_font );
 	DeleteObject( g_Background );
@@ -309,35 +311,37 @@ void xFrame::Shutdown(void)
 
 xFrame::xFrame()
 {
-	if (s_numframes == 0)
+	if (s_numframes == 0) {
 		Startup();
-	s_numframes++;
+	}
+	++s_numframes;
 
-	nHozBorder = ::GetSystemMetrics(SM_CXSIZEFRAME) + ::GetSystemMetrics(SM_CXPADDEDBORDER);
-	nVerBorder = ::GetSystemMetrics(SM_CYSIZEFRAME) + ::GetSystemMetrics(SM_CXPADDEDBORDER);
-	nCaptionHeight = ::GetSystemMetrics(SM_CYCAPTION);
+	nHozBorder_ = ::GetSystemMetrics(SM_CXSIZEFRAME) + ::GetSystemMetrics(SM_CXPADDEDBORDER);
+	nVerBorder_ = ::GetSystemMetrics(SM_CYSIZEFRAME) + ::GetSystemMetrics(SM_CXPADDEDBORDER);
+	nCaptionHeight_ = ::GetSystemMetrics(SM_CYCAPTION);
 
 
-	m_Buttons[0].Type = HTMENU;
-	m_Buttons[1].Type = HTGROWBOX; 
-	m_Buttons[2].Type = HTGROWBOX;
-	m_Buttons[3].Type = HTMINBUTTON;
+	Buttons_[0].Type = HTMENU;
+	Buttons_[1].Type = HTGROWBOX; 
+	Buttons_[2].Type = HTGROWBOX;
+	Buttons_[3].Type = HTMINBUTTON;
 
-	m_Hasfocus = FALSE;
-	m_HasCaption = -1;
+	Hasfocus_ = FALSE;
+	HasCaption_ = -1;
 
-	m_CapOff = 0;
+	CapOff_ = 0;
 
-	m_IsMax = FALSE;
+	IsMax_ = FALSE;
 
-	m_Icon = NULL;
+	Icon_ = NULL;
 }
 
 xFrame::~xFrame()
 {
-	s_numframes--;
-	if (s_numframes == 0)
+	--s_numframes;
+	if (s_numframes == 0) {
 		Shutdown();
+	}
 }
 
 
@@ -393,9 +397,9 @@ LRESULT xFrame::DrawFrame( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 	case WM_ACTIVATE:
 		{
 			if(wParam == WA_INACTIVE)			
-				m_Hasfocus = 0;	
+				Hasfocus_ = 0;	
 			else									
-				m_Hasfocus = 1;
+				Hasfocus_ = 1;
 
 			SendMessage(hWnd, WM_NCPAINT, MAKEWPARAM(0, 0), 0);
 			break;
@@ -416,25 +420,25 @@ LRESULT xFrame::DrawFrame( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 			{
 				case SIZE_MAXIMIZED:
 				{
-				   if (!m_IsMax)
+				   if (!IsMax_)
 				   {
-					   m_IsMax = TRUE;
-					   m_CapOff = 2;
+					   IsMax_ = TRUE;
+					   CapOff_ = 2;
 
-					   m_Buttons[1].Draw = false;
-					   m_Buttons[2].Draw = true;
+					   Buttons_[1].Draw = false;
+					   Buttons_[2].Draw = true;
 				   }
 				   break;
 				}
 				case SIZE_RESTORED:
 				{
-					if (m_IsMax)
+					if (IsMax_)
 					{
-						m_IsMax = FALSE;
-						m_CapOff = 0;
+						IsMax_ = FALSE;
+						CapOff_ = 0;
 
-						m_Buttons[1].Draw = true;
-						m_Buttons[2].Draw = false;
+						Buttons_[1].Draw = true;
+						Buttons_[2].Draw = false;
 					}
 					break;
 				}
@@ -459,21 +463,21 @@ enum { // Index defines
 
 void xFrame::LoadButtonInfo( HWND hwnd )
 {
-	if( m_HasCaption == -1 )
+	if( HasCaption_ == -1 )
 	{
 		LONG Styles = GetWindowLong( hwnd, GWL_STYLE );
 
-		m_HasCaption = bitUtil::IsBitFlagSet( Styles, WS_CAPTION | WS_SYSMENU );
+		HasCaption_ = bitUtil::IsBitFlagSet( Styles, WS_CAPTION | WS_SYSMENU );
 
-		if( m_HasCaption )
+		if( HasCaption_ )
 		{
-			m_Buttons[ BUTTON_EXIT ].Draw = true;
-			m_Buttons[ BUTTON_MIN ].Draw = bitUtil::IsBitFlagSet( Styles, WS_MINIMIZEBOX );
+			Buttons_[ BUTTON_EXIT ].Draw = true;
+			Buttons_[ BUTTON_MIN ].Draw = bitUtil::IsBitFlagSet( Styles, WS_MINIMIZEBOX );
 
 			if( bitUtil::IsBitFlagSet( Styles, WS_MAXIMIZEBOX ) )
 			{
-				m_Buttons[ BUTTON_MAX ].Draw = true;
-				m_Buttons[ BUTTON_RESTORE ].Draw = false;
+				Buttons_[ BUTTON_MAX ].Draw = true;
+				Buttons_[ BUTTON_RESTORE ].Draw = false;
 			}
 		}
 	}
@@ -485,6 +489,8 @@ void xFrame::NCPaint( HWND hWnd, HDC hDC_, WPARAM wParam )
 	RECT rcClient, rcWind;
 	POINT temp;
 
+	X_UNUSED(wParam);
+
 	GetClientRect(hWnd, &rcClient);
 	GetWindowRect(hWnd,	&rcWind);
 
@@ -493,27 +499,27 @@ void xFrame::NCPaint( HWND hWnd, HDC hDC_, WPARAM wParam )
 
 	ClientToScreen(hWnd, &temp);
 
-	LONG CaptionHeight = nCaptionHeight + ( m_HasCaption ? nHozBorder : 0 );
+	LONG CaptionHeight = nCaptionHeight_ + ( HasCaption_ ? nHozBorder_ : 0 );
 
 	LONG CaptionEnd = temp.y - rcWind.top;
 
-	m_ClientWidth = rcClient.right - rcClient.left;
-	m_ClientHeight = rcClient.bottom - rcClient.top;
+	ClientWidth_ = rcClient.right - rcClient.left;
+	ClientHeight_ = rcClient.bottom - rcClient.top;
 
-	m_width = (rcWind.right-rcWind.left);
-	m_height = (rcWind.bottom-rcWind.top);
+	width_ = (rcWind.right-rcWind.left);
+	height_ = (rcWind.bottom-rcWind.top);
 
 
 	MemHDC mem(hWnd, hDC_);
 
 	HDC hDC = mem.GetGDC();
 
-	FrameColor* color = m_Hasfocus ? &g_FrameActive : &g_FrameInActive;
+	FrameColor* color = Hasfocus_ ? &g_FrameActive : &g_FrameInActive;
 
 		// Top Frame
 		DrawRectangleGrad(
 			hDC,
-				0, 0, m_width, CaptionHeight,
+				0, 0, width_, CaptionHeight,
 				color->Frame.TopL,
 				color->Frame.TopR,
 				GRADIENT_FILL_RECT_H
@@ -522,7 +528,7 @@ void xFrame::NCPaint( HWND hWnd, HDC hDC_, WPARAM wParam )
 		// left frame
 		DrawRectangleGrad(
 			hDC,
-				0,0, nVerBorder,m_height,
+				0,0, nVerBorder_,height_,
 				color->Frame.TopL,
 				color->Frame.BottomL,
 				GRADIENT_FILL_RECT_V
@@ -531,7 +537,7 @@ void xFrame::NCPaint( HWND hWnd, HDC hDC_, WPARAM wParam )
 		// right frame
 		DrawRectangleGrad(
 			hDC,
-				m_width - nVerBorder,0,m_width,m_height,
+				width_ - nVerBorder_,0,width_,height_,
 				color->Frame.TopR,
 				color->Frame.BottomR,
 				GRADIENT_FILL_RECT_V
@@ -539,7 +545,7 @@ void xFrame::NCPaint( HWND hWnd, HDC hDC_, WPARAM wParam )
 		// bottom frame
 		DrawRectangleGrad(
 			hDC,
-				0,m_height - nHozBorder,m_width,m_height,
+				0,height_ - nHozBorder_,width_,height_,
 				color->Frame.BottomL,
 				color->Frame.BottomR,
 				GRADIENT_FILL_RECT_H
@@ -551,21 +557,21 @@ void xFrame::NCPaint( HWND hWnd, HDC hDC_, WPARAM wParam )
 	DWORD col = color->Pin.Bottom;
 
 	// Top
-	DrawLine(hDC, nHozBorder, CaptionEnd - 1, m_ClientWidth + 1, 1, col_dark);
+	DrawLine(hDC, nHozBorder_, CaptionEnd - 1, ClientWidth_ + 1, 1, col_dark);
 
 	// Left
-	DrawLine(hDC, nHozBorder - 1, CaptionEnd, 1, m_ClientHeight + 1, col_dark);
+	DrawLine(hDC, nHozBorder_ - 1, CaptionEnd, 1, ClientHeight_ + 1, col_dark);
 
 	// Right
-	DrawLine(hDC, m_width - (nHozBorder), CaptionEnd, 1, m_ClientHeight + 1, col);
+	DrawLine(hDC, width_ - (nHozBorder_), CaptionEnd, 1, ClientHeight_ + 1, col);
 
 	// Bottom
-	DrawLine(hDC, nHozBorder - 1, m_height - (nVerBorder), m_ClientWidth + 2, 1, col);
+	DrawLine(hDC, nHozBorder_ - 1, height_ - (nVerBorder_), ClientWidth_ + 2, 1, col);
 	
-	if (m_HasCaption)
+	if (HasCaption_)
 	{
 		// draw scaled icon slut
-		DrawIconEx(hDC, 9, nHozBorder + m_CapOff, m_Icon ? m_Icon : g_hIcon, 16, 16, 0, NULL, DI_NORMAL);
+		DrawIconEx(hDC, 9, nHozBorder_ + CapOff_, Icon_ ? Icon_ : g_hIcon, 16, 16, 0, NULL, DI_NORMAL);
 
 		PaintCaption(hWnd, hDC);
 
@@ -577,13 +583,13 @@ void xFrame::NCPaint( HWND hWnd, HDC hDC_, WPARAM wParam )
 	// only BitBlt the shit we painted.
 	{
 		// Top
-		mem.BitBlt(0, 0, m_width, CaptionHeight);
+		mem.BitBlt(0, 0, width_, CaptionHeight);
 		// Left
-		mem.BitBlt(0, 0, nVerBorder, m_height);
+		mem.BitBlt(0, 0, nVerBorder_, height_);
 		// right
-		mem.BitBlt(m_width - nVerBorder, 0, m_width, m_height);
+		mem.BitBlt(width_ - nVerBorder_, 0, width_, height_);
 		// Bottom
-		mem.BitBlt(0, m_height - nHozBorder, m_width, m_height);
+		mem.BitBlt(0, height_ - nHozBorder_, width_, height_);
 	}
 }
 
@@ -606,19 +612,20 @@ xRGB16 blend(xRGB16 start, xRGB16 end, float percent)
 
 void xFrame::PaintCaption(HWND hWnd, HDC hDC)
 {
-	FrameColor* color = m_Hasfocus ? &g_FrameActive : &g_FrameInActive;
+	FrameColor* color = Hasfocus_ ? &g_FrameActive : &g_FrameInActive;
 
-	LONG CaptionHeight = nCaptionHeight + (m_HasCaption ? nHozBorder : 0);
+	LONG CaptionHeight = nCaptionHeight_ + (HasCaption_ ? nHozBorder_ : 0);
 
-	DWORD col_dark = color->Pin.Top;
-	DWORD col = color->Pin.Bottom;
+//	DWORD col_dark = color->Pin.Top;
+//	DWORD col = color->Pin.Bottom;
 
-	if (m_HasCaption)
+
+	if (HasCaption_)
 	{
-		StackString512 Title;
+		StackStringW512 Title;
 
 		int IconPad = 16 + 4;
-		int Len = GetWindowText(hWnd, &Title[0], 512);
+		int Len = GetWindowTextW(hWnd, &Title[0], 512);
 
 		// Title
 		SetBkMode(hDC, TRANSPARENT);	
@@ -627,16 +634,16 @@ void xFrame::PaintCaption(HWND hWnd, HDC hDC)
 
 
 		RECT size;
-		size.left = nVerBorder + 2 + IconPad;
-		size.top = nHozBorder + m_CapOff;
+		size.left = nVerBorder_ + 2 + IconPad;
+		size.top = nHozBorder_ + CapOff_;
 		size.bottom = CaptionHeight - 2;
-		size.right = m_width - 70;
+		size.right = width_ - 70;
 	
 		// can i blend the colors myself?
 		// well will it look correct is the question
 		// if we have a start color and end color and a range.
 		// we can just blend
-		int real_wdith = m_width;
+		int real_wdith = width_;
 		int innder_width = size.right - size.left;
 
 		float left_offset = (float)size.left / (float)real_wdith;
@@ -655,7 +662,7 @@ void xFrame::PaintCaption(HWND hWnd, HDC hDC)
 		);
 
 
-		DrawTextEx(hDC, &Title[0], Len, &size, DT_END_ELLIPSIS | DT_SINGLELINE, 0);
+		DrawTextExW(hDC, &Title[0], Len, &size, DT_END_ELLIPSIS | DT_SINGLELINE, 0);
 
 		SetBkMode(hDC, OPAQUE);
 	}
@@ -682,11 +689,13 @@ inline Recti GetButtonPos(int index, int width, BOOL max )
 void xFrame::PaintButtons( HWND hWnd, HDC hDC )
 {
 	int Drawn = 0;
-	lopi(4)
+	X_UNUSED(hWnd);
+
+	for (int i = 0; i < 4; i++)
 	{
-		if( m_Buttons[i].Draw )
+		if( Buttons_[i].Draw )
 		{
-			PaintButton(i, &m_Buttons[i], hDC, GetButtonPos(Drawn, m_width, m_IsMax));
+			PaintButton(i, &Buttons_[i], hDC, GetButtonPos(Drawn, width_, IsMax_));
 
 			Drawn++;
 		}
@@ -703,21 +712,24 @@ void xFrame::PaintButton( int Idx, FrameButton* but, HDC dc, Recti rec )
 	
 	int Dull = static_cast<int>(but->Focus);
 	
-	HICON Img;
+	HICON Img = NULL;
 	switch( Idx )
 	{
 	case 0: // Exit
 		if( but->Locked ) Dull = 2;
-		Img = m_But_Close[ Dull ];
+		Img = g_But_Close[ Dull ];
 		break;
 	case 1: // Max
-		Img = m_But_Max[ Dull ];
+		Img = g_But_Max[ Dull ];
 		break;
 	case 2: // restore
-		Img = m_But_Restore[ Dull ];
+		Img = g_But_Restore[ Dull ];
 		break;
 	case 3: // min
-		Img = m_But_Min[ Dull ];
+		Img = g_But_Min[ Dull ];
+		break;
+	default:
+		X_ASSERT_UNREACHABLE();
 		break;
 	}
 
@@ -730,25 +742,25 @@ LRESULT xFrame::NCHitTest( HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam
     RECT rect;
     GetWindowRect(hwnd, &rect);
 
-	LONG CaptionHeight = nCaptionHeight + ( m_HasCaption ? nHozBorder : 0 );
+	LONG CaptionHeight = nCaptionHeight_ + ( HasCaption_ ? nHozBorder_ : 0 );
 
 	Vec2i mouse(LOWORD(lparam) - rect.left,HIWORD(lparam) - rect.top);
 
 	Recti frame(0,0,rect.right - rect.left,rect.bottom - rect.top);
-	Recti c_frame(nVerBorder,CaptionHeight,m_ClientWidth,m_ClientHeight);
-	Recti caption(0, 0, m_ClientWidth, 4);
+	Recti c_frame(nVerBorder_,CaptionHeight,ClientWidth_,ClientHeight_);
+	Recti caption(0, 0, ClientWidth_, 4);
 	Recti top_left(0, 0, 4, 4);
-	Recti top_right(m_ClientWidth + nHozBorder, 0, m_ClientWidth + nHozBorder + nHozBorder, 4);
+	Recti top_right(ClientWidth_ + nHozBorder_, 0, ClientWidth_ + nHozBorder_ + nHozBorder_, 4);
 	Recti left(0, 0, 4, CaptionHeight);
-	Recti right(m_ClientWidth + nHozBorder, 0, m_ClientWidth + nHozBorder + nHozBorder, CaptionHeight);
+	Recti right(ClientWidth_ + nHozBorder_, 0, ClientWidth_ + nHozBorder_ + nHozBorder_, CaptionHeight);
 
 	bool Focus = true;
 	LRESULT res = HTNOWHERE;
 
 	lopi(4)
 	{
-		if (m_Buttons[i].Focus) {
-			m_Buttons[i].Focus = false;
+		if (Buttons_[i].Focus) {
+			Buttons_[i].Focus = false;
 			Focus = false;
 		}
 	}
@@ -776,25 +788,25 @@ LRESULT xFrame::NCHitTest( HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam
 	int enabled = 0;
 	lopi(4)
 	{
-		if(!m_Buttons[i].Draw)
+		if(!Buttons_[i].Draw)
 			continue;
 
-	//	bool temp_focus = m_Buttons[i].Focus;
-		if (GetButtonPos(enabled, m_width, m_IsMax).contains(mouse))
+	//	bool temp_focus = Buttons_[i].Focus;
+		if (GetButtonPos(enabled, width_, IsMax_).contains(mouse))
 		{	
-			m_Buttons[i].Focus = true;
+			Buttons_[i].Focus = true;
 	//		if(!temp_focus)	
 				SendMessage(hwnd, TOM_PAINT_BUTTONS, MAKEWPARAM(0, 0), 0);
-			return m_Buttons[i].Type;
+			return Buttons_[i].Type;
 		}
 		enabled++;
-	//	m_Buttons[i].Focus = false;
+	//	Buttons_[i].Focus = false;
 	//	if(temp_focus)	
 	//		SendMessage(hwnd, TOM_PAINT_BUTTONS, MAKEWPARAM(0, 0), 0);			
 	}
 
 	// title bar
-	if( Recti(0,0,m_width,CaptionHeight).contains( mouse ) )
+	if( Recti(0,0,width_,CaptionHeight).contains( mouse ) )
 		return HTCAPTION;
 
 	return DefWindowProc(hwnd,message,wparam,lparam);
@@ -808,17 +820,20 @@ void xFrame::NCButtonDown( HWND hwnd, ULONG message, WPARAM wparam, LPARAM lpara
 
 	Vec2<int32_t> mouse(LOWORD(lparam) - rect.left,HIWORD(lparam) - rect.top);
 
+	X_UNUSED(message);
+	X_UNUSED(wparam);
+
 	int enabled = 0;
 	lopi(4)
 	{
-		if(!m_Buttons[i].Draw || m_Buttons[i].Locked)
+		if(!Buttons_[i].Draw || Buttons_[i].Locked)
 			continue;
 
-		if (GetButtonPos(enabled, m_width, m_IsMax).contains(mouse))
+		if (GetButtonPos(enabled, width_, IsMax_).contains(mouse))
 		{
 			xWindow* pwind = reinterpret_cast<xWindow*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
-			switch(m_Buttons[i].Type)
+			switch(Buttons_[i].Type)
 			{
 			case HTMENU:
 				pwind->Close();
@@ -828,15 +843,15 @@ void xFrame::NCButtonDown( HWND hwnd, ULONG message, WPARAM wparam, LPARAM lpara
 					if( i == 1)
 					{
 						pwind->MaxiMise();
-						m_Buttons[i+1].Draw = true;
+						Buttons_[i+1].Draw = true;
 					}
 					else
 					{
 						pwind->Restore();			
-						m_Buttons[i-1].Draw = true;
+						Buttons_[i-1].Draw = true;
 					}
 					
-					m_Buttons[i].Draw = false;
+					Buttons_[i].Draw = false;
 					break;
 				}
 			case HTMINBUTTON:

@@ -10,9 +10,9 @@ FillStats::FillStats()
 
 void FillStats::print(void) const
 {
-	X_LOG0("FillStats", "%5i solid leafs", numSolid);
-	X_LOG0("FillStats", "%5i leafs filled", numOutside);
-	X_LOG0("FillStats", "%5i inside leafs", numInside);
+	X_LOG0("FillStats", "^8%5i^7 solid leafs", numSolid);
+	X_LOG0("FillStats", "^8%5i^7 leafs filled", numOutside);
+	X_LOG0("FillStats", "^8%5i^7 inside leafs", numInside);
 }
 
 // ------------------------------ Face -----------------------------------
@@ -44,14 +44,14 @@ bspNode::bspNode() :
 brushes(g_arena)
 {
 	planenum = 0;
-
 	parent = nullptr;
+
 	children[0] = nullptr;
 	children[1] = nullptr;
+	nodeNumber = 0;
+
 	portals = nullptr;
-
 	opaque = false;
-
 	area = -1;
 	occupied = 0;
 }

@@ -8,12 +8,12 @@ X_NAMESPACE_BEGIN(core)
 
 	/// \brief The data stored for each allocation.
 ExtendedMemoryTracking::AllocationData::AllocationData(size_t originalSize, size_t internalSize, const char* ID, const char* typeName, const SourceInfo& sourceInfo, const char* memoryArenaName) :
-	m_originalSize(originalSize),
-	m_internalSize(internalSize),
-	m_ID(ID),
-	m_typeName(typeName),
-	m_sourceInfo(sourceInfo),
-	m_memoryArenaName(memoryArenaName)
+	originalSize_(originalSize),
+	internalSize_(internalSize),
+	ID_(ID),
+	typeName_(typeName),
+	sourceInfo_(sourceInfo),
+	memoryArenaName_(memoryArenaName)
 {
 }
 
@@ -46,7 +46,9 @@ ExtendedMemoryTracking::~ExtendedMemoryTracking(void)
 		AllocationTable::const_iterator end = table_.end();
 		size_t Num = 1;
 
-		while(1)
+		X_DISABLE_WARNING(4127)
+		while (true)
+		X_ENABLE_WARNING(4127)
 		{
 			if( it == end )
 				break;
@@ -58,13 +60,13 @@ ExtendedMemoryTracking::~ExtendedMemoryTracking(void)
 			{
 				X_LOG_BULLET;
 
-				X_LOG0( "ExMemTracking", "Arena name: \"%s\"", info.m_memoryArenaName );
-				X_LOG0( "ExMemTracking", "Allocation ID: \"%s\"", info.m_ID );
-				X_LOG0( "ExMemTracking", "Type name: \"%s\"", info.m_typeName );
-				X_LOG0( "ExMemTracking", "Original size: %d", info.m_originalSize );
+				X_LOG0( "ExMemTracking", "Arena name: \"%s\"", info.memoryArenaName_ );
+				X_LOG0( "ExMemTracking", "Allocation ID: \"%s\"", info.ID_ );
+				X_LOG0( "ExMemTracking", "Type name: \"%s\"", info.typeName_ );
+				X_LOG0( "ExMemTracking", "Original size: %d", info.originalSize_ );
 			//	X_LOG0( "ExMemTracking", "Allocated size: %d", info.);
 
-				const SourceInfo& sourceInfo = info.m_sourceInfo;
+				const SourceInfo& sourceInfo = info.sourceInfo_;
 
 				X_LOG0( "ExMemTracking", "Filename(line): \"%s(%d)\"", sourceInfo.file_, sourceInfo.line_ );
 				X_LOG0( "ExMemTracking", "Function: \"%s\"", sourceInfo.function_ );
@@ -82,8 +84,13 @@ ExtendedMemoryTracking::~ExtendedMemoryTracking(void)
 
 
 /// Stores the allocation along with additional data in a hash map.
-void ExtendedMemoryTracking::OnAllocation(void* memory, size_t originalSize, size_t internalSize, size_t alignment, size_t offset, const char* ID, const char* typeName, const SourceInfo& sourceInfo, const char* memoryArenaName)
+void ExtendedMemoryTracking::OnAllocation(void* memory, size_t originalSize, size_t internalSize, 
+	size_t alignment, size_t offset, const char* ID, const char* typeName, 
+	const SourceInfo& sourceInfo, const char* memoryArenaName)
 {
+	X_UNUSED(alignment);
+	X_UNUSED(offset);
+
 	numAllocations_++;
 	table_.insert(std::make_pair(memory, AllocationData(originalSize, internalSize, ID, typeName, sourceInfo, memoryArenaName)));
 }

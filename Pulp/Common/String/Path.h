@@ -8,42 +8,47 @@
 
 X_NAMESPACE_BEGIN(core)
 
-
-class Path : public StackString<MAX_PATH>
+template<typename TChar = char>
+class Path : public StackString<MAX_PATH, TChar>
 {
 public:
 #ifdef X_PLATFORM_WIN32
-	static const char NATIVE_SLASH = '\\';
-	static const char NON_NATIVE_SLASH = '/';
+	static const TChar NATIVE_SLASH = '\\';
+	static const TChar NON_NATIVE_SLASH = '/';
+
+	static const wchar_t NATIVE_SLASH_W = L'\\';
+	static const wchar_t NON_NATIVE_SLASH_W = L'/';
 
 	// using none native slash on windows dose not work well
 	// since the drive slash must be a native one.
-//	static const char NATIVE_SLASH = '/';
-//	static const char NON_NATIVE_SLASH = '\\';
+//	static const TChar NATIVE_SLASH = '/';
+//	static const TChar NON_NATIVE_SLASH = '\\';
 #else
-	static const char NATIVE_SLASH = '/';
-	static const char NON_NATIVE_SLASH = '\\';
+	static const TChar NATIVE_SLASH = '/';
+	static const TChar NON_NATIVE_SLASH = '\\';
+	static const wchar_t NATIVE_SLASH_W = L'/';
+	static const wchar_t NON_NATIVE_SLASH_W = L'\\';
 #endif
 
 	inline Path();
 	inline Path(const Path& oth);
-	inline explicit Path(const char* const str);
+	inline explicit Path(const TChar* const str);
 
 
-	inline const char* fileName(void) const;
-	inline const char* extension(void) const;
+	inline const TChar* fileName(void) const;
+	inline const TChar* extension(void) const;
 
-	inline void setExtension(const char* extension);
-	inline void setFileName(const char* filename);
+	inline void setExtension(const TChar* extension);
+	inline void setFileName(const TChar* filename);
 
 	
-	inline void operator=(const char*);
+	inline void operator=(const TChar*);
 
-	inline const Path operator/(const Path& oth) const;
-	inline const Path operator/(const char*) const;
+	inline const Path operator/(const Path<TChar>& oth) const;
+	inline const Path operator/(const TChar*) const;
 
-	inline const Path& operator/=(const Path& oth);
-	inline const Path& operator/=(const char*);
+	inline const Path& operator/=(const Path<TChar>& oth);
+	inline const Path& operator/=(const TChar*);
 
 	inline void ensureSlash(void);
 	inline void replaceSeprators(void);

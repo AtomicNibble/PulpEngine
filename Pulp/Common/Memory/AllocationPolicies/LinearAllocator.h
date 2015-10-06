@@ -60,12 +60,12 @@ public:
 	MemoryAllocatorStatistics getStatistics(void) const;
 
 private:
-	char* m_start;
-	char* m_end;
-	char* m_current;
+	char* start_;
+	char* end_;
+	char* current_;
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	MemoryAllocatorStatistics m_statistics;
+	MemoryAllocatorStatistics statistics_;
 #endif
 };
 

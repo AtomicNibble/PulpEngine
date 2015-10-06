@@ -113,17 +113,17 @@ private:
 	X_NO_COPY(MemoryArena);
 	X_NO_ASSIGN(MemoryArena);
 
-	AllocationPolicy* m_allocator;
-	ThreadPolicy m_threadGuard;
-	BoundsCheckingPolicy m_boundsChecker;
-	MemoryTrackingPolicy m_memoryTracker;
-	MemoryTaggingPolicy m_memoryTagger;
+	AllocationPolicy* allocator_;
+	ThreadPolicy threadGuard_;
+	BoundsCheckingPolicy boundsChecker_;
+	MemoryTrackingPolicy memoryTracker_;
+	MemoryTaggingPolicy memoryTagger_;
 
-	const char* m_name;
-	bool m_isFrozen;
+	const char* name_;
+	bool isFrozen_;
 
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-	MemoryArenaStatistics m_statistics;
+	MemoryArenaStatistics statistics_;
 #endif
 };
 

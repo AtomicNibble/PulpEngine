@@ -29,7 +29,6 @@ X_NAMESPACE_BEGIN(core)
 /// Whenever the allocator grows and requests a new chunk of memory from the OS, the last N bytes are reserved
 /// for filling it with header data.
 ///
-/// For more information about the virtual memory system, visit http://molecularmusings.wordpress.com/2012/10/02/memory-allocation-strategies-interlude-virtual-memory/.
 /// \remark Statistics gathering can be enabled/disabled via the preprocessor option \ref X_ENABLE_MEMORY_ALLOCATOR_STATISTICS.
 /// If statistics are disabled, the allocator will still return a valid MemoryAllocatorStatistics object which is
 /// initialized to its default values.
@@ -79,23 +78,23 @@ private:
 	/// Allocates raw memory, and additionally fills newly allocated physical memory chunks with the given header data (if any).
 	void* allocate(size_t size, size_t alignment, size_t offset, const void* chunkHeaderData, size_t chunkHeaderSize);
 
-	Freelist m_freelist;
-	char* m_virtualStart;
-	char* m_virtualEnd;
-	char* m_physicalCurrent;
-	unsigned int m_growSize;
-	unsigned int m_chunkHeaderSize;
-	size_t m_maxSize;
-	size_t m_maxAlignment;
+	Freelist freelist_;
+	char* virtualStart_;
+	char* virtualEnd_;
+	char* physicalCurrent_;
+	unsigned int growSize_;
+	unsigned int chunkHeaderSize_;
+	size_t maxSize_;
+	size_t maxAlignment_;
 
 #if X_ENABLE_POOL_ALLOCATOR_CHECK
-	size_t m_offset;
+	size_t offset_;
 #endif
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	size_t m_elementSize;
-	size_t m_wastePerElement;
-	MemoryAllocatorStatistics m_statistics;
+	size_t elementSize_;
+	size_t wastePerElement_;
+	MemoryAllocatorStatistics statistics_;
 #endif
 };
 

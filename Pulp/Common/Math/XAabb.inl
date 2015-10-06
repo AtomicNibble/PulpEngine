@@ -2,7 +2,10 @@
 
 X_INLINE AABB::AABB()
 {
-	clear();
+	// don't clear otherwise it will have bounds.
+	// clear before adding points etc.
+	// that way it's empty by defauly not huge.
+	// clear();
 }
 
 X_INLINE AABB::AABB(float radius)
@@ -40,10 +43,10 @@ X_INLINE void AABB::set(const Vec3f& center, float radius)
 	max = center + rad;
 }
 
-X_INLINE void AABB::set(const Vec3f &min, const Vec3f &max)
+X_INLINE void AABB::set(const Vec3f &min_, const Vec3f &max_)
 {
-	this->min = min;
-	this->max = max;
+	this->min = min_;
+	this->max = max_;
 }
 
 X_INLINE void AABB::set(const AABB &oth)
@@ -195,4 +198,44 @@ X_INLINE float AABB::distanceSqr(const Vec3f& v) const
 	Near.checkMax(min);
 	Near.checkMin(max);
 	return Near.distanceSquared(v);
+}
+
+
+template<typename T>
+X_INLINE PlaneSide::Enum AABB::planeSide(const Plane<T>& plane, const float epsilon) const
+{
+	float d1, d2;
+
+	Vec3f center = this->center();
+	Vec3f half = this->halfVec();
+
+	// get the distance from the center.
+	d1 = plane.distance(center);
+
+	// next we get the dot product of the half vec against planes normal.
+	d2 = half.dot(plane.getNormal());
+
+	// check what side we are on.
+	if (d1 - d2 > epsilon) {
+		return PlaneSide::FRONT;
+	}
+	if (d1 + d2 > -epsilon) {
+		return PlaneSide::BACK;
+	}
+	return PlaneSide::CROSS;
+}
+
+X_INLINE void AABB::toPoints(Vec3f points[8]) const
+{
+	Vec3f vecs[2];
+	vecs[0] = min;
+	vecs[1] = max;
+
+	size_t i;
+	for (i = 0; i < 8; i++)
+	{
+		points[i][0] = vecs[i & 1][0];
+		points[i][1] = vecs[(i >> 1) & 1][1];
+		points[i][2] = vecs[(i >> 2) & 1][2];
+	}
 }

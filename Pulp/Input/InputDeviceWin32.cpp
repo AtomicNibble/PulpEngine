@@ -16,9 +16,10 @@ XInputDeviceWin32::~XInputDeviceWin32()
 
 }
 
-void XInputDeviceWin32::Update(bool bFocus)
+void XInputDeviceWin32::Update(bool focus)
 {
 	X_ASSERT_UNREACHABLE();
+	X_UNUSED(focus);
 }
 
 

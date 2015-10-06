@@ -58,7 +58,7 @@ protected:
 
 class XWinBool : public XWinVar {
 public:
-	XWinBool() : XWinVar() {};
+	XWinBool() : value(false), XWinVar() {};
 	~XWinBool()X_OVERRIDE{};
 
 	virtual void Init(const char *_name, XWindow *win) X_OVERRIDE {
@@ -68,7 +68,7 @@ public:
 		value = (::atoi(val) != 0);
 	}
 	virtual void Update() X_OVERRIDE {
-		const char* s = getName();
+//		const char* s = getName();
 	}
 	virtual const char* c_str() const X_OVERRIDE {
 		static core::StackString<4> temp;
@@ -167,7 +167,7 @@ protected:
 class XWinInt : public XWinVar 
 {
 public:
-	XWinInt() : XWinVar() {};
+	XWinInt() : value(0), XWinVar() {};
 	~XWinInt() X_OVERRIDE{};
 
 	virtual void Init(const char* _name, XWindow* win) X_OVERRIDE {
@@ -177,7 +177,7 @@ public:
 		value = ::atoi(val);;
 	}
 	virtual void Update(void) X_OVERRIDE{
-		const char* s = getName();
+//		const char* s = getName();
 	}
 	virtual const char* c_str() const X_OVERRIDE {
 		static core::StackString<16> temp;
@@ -215,7 +215,7 @@ protected:
 class XWinFloat : public XWinVar 
 {
 public:
-	XWinFloat() : XWinVar() {};
+	XWinFloat() : value(0.f), XWinVar() {};
 	~XWinFloat() X_OVERRIDE{};
 
 	virtual void Init(const char* _name, XWindow* win) X_OVERRIDE{
@@ -225,7 +225,7 @@ public:
 		value = static_cast<float>(::atof(val));
 	}
 	virtual void Update(void) X_OVERRIDE {
-		const char* s = getName();
+//		const char* s = getName();
 	}
 	virtual const char* c_str() const X_OVERRIDE {
 		static core::StackString<32> temp;
@@ -279,7 +279,7 @@ public:
 			sscanf(val, "%f %f", &value.x, &value.y);
 	}
 	virtual void Update(void) X_OVERRIDE{
-		const char* s = getName();
+//		const char* s = getName();
 	}
 	virtual const char* c_str() const X_OVERRIDE{
 		static core::StackString<256> temp;
@@ -341,7 +341,7 @@ public:
 			sscanf(val, "%f %f %f", &value.x, &value.y, &value.z);
 	}
 	virtual void Update(void) X_OVERRIDE{
-		const char* s = getName();
+//		const char* s = getName();
 	}
 	virtual const char* c_str() const X_OVERRIDE{
 		static core::StackString<256> temp;
@@ -407,7 +407,7 @@ public:
 			sscanf(val, "%f %f %f %f", &value.x, &value.y, &value.z, &value.w);
 	}
 	virtual void Update(void) X_OVERRIDE{
-		const char* s = getName();
+//		const char* s = getName();
 	}
 	virtual const char* c_str() const X_OVERRIDE{
 		static core::StackString<256> temp;
@@ -490,7 +490,7 @@ public:
 		value.y2 = oth[3];
 	}
 	virtual void Update(void) X_OVERRIDE{
-		const char* s = getName();
+//		const char* s = getName();
 	}
 	virtual const char* c_str() const X_OVERRIDE{
 		static core::StackString<256> temp;
@@ -568,7 +568,7 @@ public:
 			sscanf(val, "%f %f %f %f", &value.r, &value.g, &value.b, &value.a);
 	}
 	virtual void Update(void) X_OVERRIDE{
-		const char* s = getName();
+//		const char* s = getName();
 	}
 	virtual const char* c_str() const X_OVERRIDE{
 		static core::StackString<256> temp;

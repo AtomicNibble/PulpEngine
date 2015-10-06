@@ -19,6 +19,9 @@ X_NAMESPACE_BEGIN(core)
 XTimer::XTimer() :
 time_scale_(1.0f),
 FrameCounter_(0),
+FrameTime_(0.f),
+FrameTimeActual_(0.f),
+max_frame_time_(0.f),
 TicksPerSec_(0),
 max_fps_(0),
 debugTime_(0)
@@ -33,6 +36,7 @@ debugTime_(0)
 
 bool XTimer::Init(ICore* pCore)
 {
+	X_UNUSED(pCore);
 	SysTimer::Startup();
 
 	TicksPerSec_ = SysTimer::GetTickPerSec();
@@ -112,7 +116,6 @@ void XTimer::OnFrameBegin(void)
 	// if time is scaled etc..
 	if (FrameTime_ != FrameTimeActual_)
 	{
-		float fBefore = GetAsyncCurTime();
 		int64 nAdjust = (int64)((FrameTime_ - FrameTimeActual_) * (double)(TicksPerSec_));
 		CurrentTime_ += nAdjust;
 		BaseTime_ -= nAdjust;

@@ -105,7 +105,7 @@ void XFFont::FreeTexture()
 
 bool XFFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 {
-	core::Path path;
+	core::Path<char> path;
 	core::XFileScoped file;
 	uint8_t* pBuffer = nullptr;
 	size_t len = 0;
@@ -119,7 +119,7 @@ bool XFFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 
 	X_LOG0("Font", "loading: \"%s\"", pFilePath);
 
-	path /= "core_assets/Fonts/";
+	path /= "Fonts/";
 	path.setFileName(pFilePath);
 
 	FreeBuffers();
@@ -505,16 +505,18 @@ bool XFFont::InitCache()
 	wchar_t buf[256];
 	wchar_t* p = buf;
 
-	unsigned int i = (wchar_t) ' '; // even space should be there - otherwise it's created later on demand
+	wchar_t i = L' '; // even space should be there - otherwise it's created later on demand
 
 	// precache all [normal] printable characters to the string (missing once are updated on demand)
-	for (; i <= (wchar_t) '~'; ++i)
+	for (; i <= L'~'; ++i) {
 		*p++ = i;
+	}
 
 	i += 35;
 
-	for (; i<256; ++i)
+	for (; i < 256; ++i) {
 		*p++ = i;
+	}
 
 	*p = 0;
 

@@ -35,7 +35,10 @@ namespace {
 XBaseInput::XBaseInput() :
 	pCVars_(X_NEW(XInputCVars,g_InputArena,"InputCvars")),
 	Devices_(g_InputArena),
-	holdSymbols_(g_InputArena)
+	holdSymbols_(g_InputArena),
+	enableEventPosting_(true),
+	hasFocus_(false),
+	retriggering_(false)
 {
 	g_pInputCVars = pCVars_;
 
@@ -107,8 +110,9 @@ void XBaseInput::Update(bool bFocus)
 
 	for (TInputDevices::Iterator i = Devices_.begin(); i != Devices_.end(); ++i)
 	{
-		if ((*i)->IsEnabled())
+		if ((*i)->IsEnabled()) {
 			(*i)->Update(bFocus);
+		}
 	}
 
 	// send commit event after all input processing for this frame has finished
@@ -270,6 +274,8 @@ bool XBaseInput::HasInputDeviceOfType(InputDeviceType::Enum type) const
 
 void XBaseInput::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {
+	X_UNUSED(wparam);
+	X_UNUSED(lparam);
 	if (
 		event == CoreEvent::CHANGE_FOCUS ||
 		event == CoreEvent::LEVEL_LOAD_START ||
@@ -365,7 +371,7 @@ void XBaseInput::AddEventToHoldSymbols(const InputEvent& event)
 void XBaseInput::ClearHoldEvent(InputSymbol* pSymbol)
 {
 	// remove hold key
-	size_t slot = -1;
+	size_t slot = std::numeric_limits<size_t>::max();
 	size_t last = holdSymbols_.size() - 1;
 
 	for (size_t i = last; i >= 0; --i)
@@ -376,7 +382,7 @@ void XBaseInput::ClearHoldEvent(InputSymbol* pSymbol)
 			break;
 		}
 	}
-	if (slot != -1)
+	if (slot != std::numeric_limits<size_t>::max())
 	{
 		// swap last and found symbol
 		holdSymbols_[slot] = holdSymbols_[last];

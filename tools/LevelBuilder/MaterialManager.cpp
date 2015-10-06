@@ -143,7 +143,7 @@ engine::IMaterial* MatManager::loadMaterialXML(const char* MtlName)
 	X_ASSERT_NOT_NULL(MtlName);
 
 	core::XFileScoped file;
-	core::Path path;
+	core::Path<char> path;
 	size_t length;
 	engine::XMaterial* pMat = nullptr;
 
@@ -151,9 +151,9 @@ engine::IMaterial* MatManager::loadMaterialXML(const char* MtlName)
 	path.setFileName(MtlName);
 	path.setExtension(engine::MTL_FILE_EXTENSION);
 
-	if (!pFileSys_->fileExists(path.c_str())) {
-		return pMat;
-	}
+//	if (!pFileSys_->fileExists(path.c_str())) {
+//		return pMat;
+//	}
 
 	if (file.openFile(path.c_str(), core::fileMode::READ))
 	{
@@ -195,7 +195,7 @@ engine::IMaterial* MatManager::loadMaterialCompiled(const char* MtlName)
 {
 	X_ASSERT_NOT_NULL(MtlName);
 	core::XFileScoped file;
-	core::Path path;
+	core::Path<char> path;
 	engine::MaterialHeader hdr;
 	engine::XMaterial* pMat = nullptr;
 

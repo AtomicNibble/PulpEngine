@@ -14,21 +14,25 @@
 X_NAMESPACE_BEGIN(input)
 
 
-XWinInput* XWinInput::This = 0;
+XWinInput* XWinInput::s_pThis = 0;
 
-XWinInput::XWinInput(ICore *pSystem, HWND hwnd) : XBaseInput()
+XWinInput::XWinInput(ICore* pSystem, HWND hwnd) : XBaseInput()
 {
+	X_UNUSED(pSystem);
+
+	X_ASSERT(s_pThis == nullptr, "Only one instance of XWinInput currently supported")(s_pThis);
+
 	isWow64_ = FALSE;
-	m_hwnd = hwnd;
-	m_prevWndProc = 0;
-	This = this;
+	hwnd_ = hwnd;
+	prevWndProc_ = 0;
+	s_pThis = this;
 
 	Devices_.reserve(2);
 };
 
 XWinInput::~XWinInput()
 {
-	This = nullptr;
+	s_pThis = nullptr;
 }
 
 
@@ -82,7 +86,6 @@ void XWinInput::Update(bool bFocus)
 	const size_t HeaderSize = sizeof(RAWINPUTHEADER);
 
 	RAWINPUT X_ALIGNED_SYMBOL(input[BufSize], 8);
-	PRAWINPUT pInput = input;
 	UINT size;
 	UINT num;
 
@@ -99,7 +102,7 @@ void XWinInput::Update(bool bFocus)
 		{
 			X_LOG0("Input", "Buffer size: %i", num);
 		}
-
+			
 		if (num == (UINT)-1)
 		{
 			core::lastError::Description Dsc;
@@ -117,9 +120,9 @@ void XWinInput::Update(bool bFocus)
 				pData += 8;
 			}
 
-			for (TInputDevices::Iterator i = Devices_.begin(); i != Devices_.end(); ++i)
+			for (TInputDevices::Iterator it = Devices_.begin(); it != Devices_.end(); ++it)
 			{
-				XInputDeviceWin32* pDevice = (XInputDeviceWin32*)(*i);
+				XInputDeviceWin32* pDevice = (XInputDeviceWin32*)(*it	);
 				if (pDevice->IsEnabled())
 				{
 					pDevice->ProcessInput(rawInput->header, pData);
@@ -173,7 +176,7 @@ void XWinInput::ClearKeyState()
 // reroute to instance function
 LRESULT CALLBACK XWinInput::InputWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	return This->OnInputWndProc(hWnd, message, wParam, lParam);
+	return s_pThis->OnInputWndProc(hWnd, message, wParam, lParam);
 }
 
 LRESULT XWinInput::OnInputWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -189,7 +192,7 @@ LRESULT XWinInput::OnInputWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
 
 	}
 
-	return ::CallWindowProc(m_prevWndProc, hWnd, message, wParam, lParam);
+	return ::CallWindowProc(prevWndProc_, hWnd, message, wParam, lParam);
 }
 
 

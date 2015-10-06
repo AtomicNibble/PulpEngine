@@ -32,7 +32,7 @@ namespace{
 	static bool ClipLine(Vec3f* v, Color8u* c)
 	{
 		// get near plane to perform clipping	
-		Planef nearPlane = gRenDev->GetCamera().GetFrustumPlane(FrustumPlanes::NEAR);
+		Planef nearPlane = gRenDev->GetCamera().getFrustumPlane(FrustumPlane::NEAR);
 
 
 		// get clipping flags
@@ -57,7 +57,7 @@ namespace{
 			Vec3f d(v[1] - v[0]);
 
 			// get clipped position
-			float t;
+			float t = 0.f;
 			v[0] = (false == bV0Behind) ? v[0] : IntersectLinePlane(p, d, nearPlane, t);
 			v[1] = (false == bV1Behind) ? v[1] : IntersectLinePlane(p, d, nearPlane, t);
 
@@ -207,7 +207,9 @@ void XRenderAuxImp::RT_Flush(const XAuxGeomCBRawDataPackaged& data, size_t begin
 			XRenderAux::PrimType::Enum primType(XRenderAux::GetPrimType(curRenderFlags));
 
 			// find all entries sharing the same render flags
+			X_DISABLE_WARNING(4127)
 			while (true)
+			X_ENABLE_WARNING(4127)
 			{
 				++it;
 				if ((it == itEnd) || ((*it)->renderFlags != curRenderFlags) 
@@ -216,9 +218,6 @@ void XRenderAuxImp::RT_Flush(const XAuxGeomCBRawDataPackaged& data, size_t begin
 					break;
 				}
 			}
-
-			// adjust render states based on current render flags
-			AdjustRenderStates(curRenderFlags);
 
 			// prepare thick lines
 			if (XRenderAux::PrimType::TriList == primType && XRenderAux::IsThickLine(curRenderFlags))
@@ -308,8 +307,6 @@ void XRenderAuxImp::DrawAuxPrimitives(XRenderAux::AuxSortedPushBuffer::const_ite
 	const XRenderAux::PrimType::Enum primType)
 {
 	X_ASSERT(XRenderAux::PrimType::PtList == primType || XRenderAux::PrimType::LineList == primType || XRenderAux::PrimType::TriList == primType, "invalid primative type")(primType);
-
-	HRESULT hr = S_OK;
 
 	bool streamsBound = false;
 
@@ -430,8 +427,6 @@ void XRenderAuxImp::DrawAuxIndexedPrimitives(XRenderAux::AuxSortedPushBuffer::co
 {
 	X_ASSERT(XRenderAux::PrimType::LineListInd == primType || XRenderAux::PrimType::TriListInd == primType, "invalid prim type")(primType);
 
-	HRESULT hr = S_OK;
-
 	bool streamsBound = false;
 
 	// bind vertex and index streams and set vertex declaration
@@ -449,9 +444,12 @@ void XRenderAuxImp::DrawAuxIndexedPrimitives(XRenderAux::AuxSortedPushBuffer::co
 
 	// helpers for DP call
 	uint32 initialVBLockOffset(auxGeomSBM_.curVBIndex);
-	uint32 numVerticesWrittenToVB(0);
+	uint32 numVerticesWrittenToVB;
 	uint32 initialIBLockOffset(auxGeomSBM_.curIBIndex);
-	uint32 numIndicesWrittenToIB(0);
+	uint32 numIndicesWrittenToIB;
+
+	numVerticesWrittenToVB = 0;
+	numIndicesWrittenToIB = 0;
 
 //	m_renderer.FX_Commit();
 //	renderer_.FX_ComitParams();
@@ -521,7 +519,8 @@ void XRenderAuxImp::DrawAuxIndexedPrimitives(XRenderAux::AuxSortedPushBuffer::co
 				// move index data of this entry (modify indices to match VB insert location)
 				for (i=0; i < curPBEntry->numIndices; ++i)
 				{
-					pIndices[i] = numVerticesWrittenToVB + auxIndexBuffer[curPBEntry->indexOffs + i];
+					pIndices[i] = safe_static_cast<uint16_t, uint32_t>(numVerticesWrittenToVB + 
+						auxIndexBuffer[curPBEntry->indexOffs + i]);
 				}
 
 				// unlock ib
@@ -996,7 +995,7 @@ void XRenderAuxImp::SetShader(const XAuxGeomRenderFlags& renderFlags)
 {
 	if (pAuxGeomShader_ == nullptr)
 	{
-		pAuxGeomShader_ = renderer_.m_ShaderMan.forName("AuxGeom");
+		pAuxGeomShader_ = renderer_.ShaderMan_.forName("AuxGeom");
 	}
 
 #if 1
@@ -1012,6 +1011,10 @@ void XRenderAuxImp::SetShader(const XAuxGeomRenderFlags& renderFlags)
 			pAuxGeomShader_->FXSetTechnique(techName);
 			pAuxGeomShader_->FXBegin(&passes, 0);
 			pAuxGeomShader_->FXBeginPass(0);
+
+			// override the shaders states.
+			// adjust render states based on current render flags
+			AdjustRenderStates(renderFlags);
 
 
 			core::StrHash name("matViewProj");
@@ -1048,7 +1051,6 @@ void XRenderAuxImp::SetShader(const XAuxGeomRenderFlags& renderFlags)
 void XRenderAuxImp::AdjustRenderStates(const XAuxGeomRenderFlags& renderFlags)
 {
 	// init current render states mask
-	uint32 curRenderStates = 0;
 	StateFlag state;
 
 	// mode 2D/3D -- set new transformation matrix
@@ -1125,6 +1127,7 @@ void XRenderAuxImp::AdjustRenderStates(const XAuxGeomRenderFlags& renderFlags)
 	{
 		case AuxGeom_DepthWrite::DepthWriteOff:
 		{
+			state = (state.ToInt() & ~States::DEPTHWRITE);
 			break;
 		}
 		case AuxGeom_DepthWrite::DepthWriteOn:

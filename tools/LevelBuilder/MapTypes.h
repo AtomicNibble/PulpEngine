@@ -185,7 +185,7 @@ protected:
 class XMapEntity
 {
 public:
-	XMapEntity(void) {}
+	XMapEntity(void) : primitives(g_arena) {}
 	~XMapEntity(void) {}
 
 	int					GetNumPrimitives(void) const { return (int)primitives.size(); }
@@ -203,7 +203,7 @@ public:
 	PairMap epairs;
 
 protected:
-	std::vector<XMapPrimitive*>	primitives;
+	core::Array<XMapPrimitive*>	primitives;
 };
 
 X_NAMESPACE_END

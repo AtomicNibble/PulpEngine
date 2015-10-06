@@ -7,7 +7,9 @@
 #include <IInput.h>
 #include <ITexture.h>
 
+X_DISABLE_WARNING(4702)
 #include <map>
+
 // #include <string>
 // #include <vector>
 #include <list>
@@ -16,6 +18,8 @@
 #include <functional> 
 #include <cctype>
 #include <locale>
+X_ENABLE_WARNING(4702)
+
 
 #include <String\StrRef.h>
 
@@ -91,24 +95,25 @@ struct ConsoleCommandArgs : public IConsoleCmdArgs
 	static const int	MAX_COMMAND_ARGS = 64;
 	static const int	MAX_COMMAND_STRING = 2 * MAX_STRING_CHARS;
 
-	ConsoleCommandArgs(core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& line) {
+public:
+	explicit ConsoleCommandArgs(core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& line) {
 		TokenizeString(line.begin(), line.end()); 
 	}
+	~ConsoleCommandArgs() X_OVERRIDE{}
 
-	virtual int GetArgCount() const {
-		return argNum;
+	virtual int GetArgCount(void) const X_OVERRIDE {
+		return argNum_;
 	}
-	virtual const char* GetArg(int Idx) const {
-		return (argNum >= 0 && Idx < argNum) ? argv[Idx] : "";
+		virtual const char* GetArg(int Idx) const X_OVERRIDE {
+		return (argNum_ >= 0 && Idx < argNum_) ? argv_[Idx] : "";
 	}
 
-	void TokenizeString(const char *begin, const char* end);
-
+	void TokenizeString(const char* begin, const char* end);
 
 private:
-	int						argNum;								// number of arguments
-	char *					argv[MAX_COMMAND_ARGS];				// points into tokenized
-	char					tokenized[MAX_COMMAND_STRING];		// will have terminator bytes inserted
+	int		argNum_;								// number of arguments
+	char *	argv_[MAX_COMMAND_ARGS];				// points into tokenized
+	char	tokenized_[MAX_COMMAND_STRING];		// will have terminator bytes inserted
 };
 
 

@@ -61,9 +61,12 @@ void xWindow::RegisterClass(void)
 	if (!g_ClassRegisterd)
 	{
 		// Register the class
-		WNDCLASSEX wcex;
+		WNDCLASSEXW wcex;
 
-		wcex.cbSize = sizeof(WNDCLASSEX);
+		wchar_t wTxt[256];
+		core::strUtil::Convert(g_EngineName, wTxt);
+
+		wcex.cbSize = sizeof(wcex);
 		wcex.style = /*CS_HREDRAW | CS_VREDRAW |*/ CS_DBLCLKS | CS_OWNDC;
 		wcex.lpfnWndProc = PreWndProc;
 		wcex.cbClsExtra = 0;
@@ -73,10 +76,10 @@ void xWindow::RegisterClass(void)
 		wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
 		wcex.hbrBackground = 0;
 		wcex.lpszMenuName = 0;
-		wcex.lpszClassName = g_EngineName;
+		wcex.lpszClassName = wTxt;
 		wcex.hIconSm = 0;
 
-		RegisterClassEx(&wcex);
+		RegisterClassExW(&wcex);
 
 		g_ClassRegisterd = TRUE;
 	}
@@ -87,8 +90,12 @@ void xWindow::RegisterClass(void)
 void xWindow::UnRegisterClass(void)
 {
 	s_numwindows--;
-	if (s_numwindows == 0 && g_ClassRegisterd) {
-		UnregisterClass(g_EngineName, GetModuleHandle(NULL));
+	if (s_numwindows == 0 && g_ClassRegisterd) 
+	{
+		wchar_t wTxt[256];
+		core::strUtil::Convert(g_EngineName, wTxt);
+
+		UnregisterClassW(wTxt, GetModuleHandle(NULL));
 		g_ClassRegisterd = FALSE;
 	}
 }
@@ -250,9 +257,10 @@ Recti xWindow::GetDesktopRect(void)
 /// --------------------------------------------------------------------------------------------------------
 
 
-bool xWindow::Create(const char* const Title, int x, int y, int width, int height, xWindow::Mode::Enum mode)
+bool xWindow::Create(const wchar_t* const Title, int x, int y, int width, int height, xWindow::Mode::Enum mode)
 {
 	lastError::Description Dsc;
+	wchar_t wTxt[256];
 
 	if( !g_ClassRegisterd ) {
 		X_FATAL( "Window", "You cannot create a window before xlib has been started.", Title, lastError::ToString( Dsc ) );
@@ -274,10 +282,12 @@ bool xWindow::Create(const char* const Title, int x, int y, int width, int heigh
 		height = safe_static_cast<int,LONG>( Rect.bottom - Rect.top );
 	}
 
-	window_ = CreateWindowEx( 
+	core::strUtil::Convert(g_EngineName, wTxt);
+
+	window_ = CreateWindowExW( 
 		0, 
-		g_EngineName, 
-		Title, 
+		wTxt,
+		Title,
 		mode, 
 		x, y, 
 		width, height, 
@@ -285,7 +295,7 @@ bool xWindow::Create(const char* const Title, int x, int y, int width, int heigh
 		0, 
 		GetModuleHandle( NULL ),
 		this // required for winproc
-		);
+	);
 
 
 	HICON hIcon = NULL; //  LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ENGINE_LOGO));

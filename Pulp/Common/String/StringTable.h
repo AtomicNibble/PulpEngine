@@ -38,7 +38,7 @@ public:
 	X_INLINE StringTable();
 
 	X_INLINE IdType addString(const char* str);
-	X_INLINE IdType addString(const char* str, int Len);
+	X_INLINE IdType addString(const char* str, size_t Len);
 
 	X_INLINE const char* getString(IdType ID) const;
 
@@ -82,7 +82,7 @@ public:
 	X_INLINE ~StringTableUnique();
 
 	X_INLINE IdType addStringUnqiue(const char* Str);
-	X_INLINE IdType addStringUnqiue(const char* Str, int Len);
+	X_INLINE IdType addStringUnqiue(const char* Str, size_t Len);
 
 protected:
 
@@ -103,11 +103,11 @@ protected:
 
 
 	X_INLINE void AddStringToTrie(const char* Str, IdType id);
-	X_INLINE bool FindString(const char* Str, int Len, IdType& id);
+	X_INLINE bool FindString(const char* Str, size_t Len, IdType& id);
 
-	int   LongestStr_;
-	int   NumNodes_;
-	Node  searchTree_;
+	size_t LongestStr_;
+	size_t NumNodes_;
+	Node   searchTree_;
 };
 
 

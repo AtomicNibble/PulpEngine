@@ -12,6 +12,9 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 	LPVOID lpReserved
 	)
 {
+	X_UNUSED(hModule);
+	X_UNUSED(lpReserved);
+
 	switch (ul_reason_for_call)
 	{
 	case DLL_PROCESS_ATTACH:
@@ -34,6 +37,8 @@ struct XSystemEventListner_Core : public ICoreEventListener
 public:
 	virtual void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_OVERRIDE
 	{
+		X_UNUSED(wparam);
+		X_UNUSED(lparam);
 		switch (event)
 		{
 			case CoreEvent::LEVEL_UNLOAD:
@@ -66,8 +71,9 @@ extern "C"
 
 		g_coreArena = startupParams.pCoreArena;
 
-		if (!g_coreArena)
+		if (!g_coreArena) {
 			return nullptr;
+		}
 
 		pCore = X_NEW_ALIGNED(XCore, startupParams.pCoreArena, "XCore", 16);
 
@@ -85,8 +91,9 @@ extern "C"
 
 		if (!pCore->Init(startupParams))
 		{
-			if (gEnv && gEnv->pLog)
+			if (gEnv && gEnv->pLog) {
 				X_ERROR("Core", "Failed to init core");
+			}
 
 			X_DELETE(pCore, startupParams.pCoreArena);
 			return nullptr;

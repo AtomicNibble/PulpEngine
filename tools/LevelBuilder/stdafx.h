@@ -11,6 +11,7 @@
 #include <String\StrRef.h>
 
 #include <Math\XAabb.h>
+#include <Math\XWinding.h>
 
 #include <Containers\HashMap.h>
 
@@ -22,14 +23,13 @@
 X_USING_NAMESPACE;
 
 
-#include <vector>
-#include <map>
+// #include <vector>
+// #include <map>
 
-using namespace std;
+// using namespace std;
 
 #include "Globals.h"
 #include "Settings.h"
-#include "Winding.h"
 #include "PlaneSet.h"
 #include "VertexFmt.h"
 

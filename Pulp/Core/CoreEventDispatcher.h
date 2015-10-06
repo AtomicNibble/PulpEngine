@@ -4,7 +4,9 @@
 #define X_CORE_EVENT_DISPATCHER_H_
 
 #include <ICore.h>
+X_DISABLE_WARNING(4702)
 #include <set>
+X_ENABLE_WARNING(4702)
 
 #include <Containers\Array.h>
 

@@ -106,7 +106,9 @@ void XRenderThread::startRenderLoadingThread()
 // -------- Thread Functions -------------
 void XRenderThread::process(const core::Thread& t)
 {
+	X_DISABLE_WARNING(4127)
 	while (true)
+	X_ENABLE_WARNING(4127)
 	{
 		waitFlushCond(t);
 
@@ -118,12 +120,12 @@ void XRenderThread::process(const core::Thread& t)
 
 		processCommands();
 		signalFlushFinishedCond();
-
 	}
 }
 
 void XRenderThread::processLoading(const core::Thread& t)
 {
+	X_DISABLE_WARNING(4127)
 	while (true)
 	{
 		waitFlushCond(t);
@@ -135,8 +137,8 @@ void XRenderThread::processLoading(const core::Thread& t)
 		}
 
 		processCommands();
-
 	}
+	X_ENABLE_WARNING(4127)
 }
 
 
@@ -190,8 +192,8 @@ void XRenderThread::RC_DrawString(const Vec3f& pos, const char* pStr)
 		return;
 	}
 
-	const uint32_t str_len = core::strUtil::strlen(pStr);
-	const size_t CmdSize = sizeof(Vec3f)+str_len + sizeof(str_len);
+	const size_t str_len = core::strUtil::strlen(pStr);
+	const size_t CmdSize = sizeof(Vec3f) + str_len + sizeof(str_len);
 
 	beginCommand(RenderCommand::DrawString, CmdSize);
 
@@ -621,8 +623,9 @@ void XRenderThread::waitFlushFinishedCond()
 
 bool XRender::FlushRenderThreadCommands(bool wait)
 {
-	if (wait)
-		m_pRt->flushAndWait();
+	if (wait) {
+		pRt_->flushAndWait();
+	}
 	return true;
 }
 

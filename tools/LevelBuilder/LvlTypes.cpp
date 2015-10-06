@@ -24,27 +24,27 @@ culled(false),
 pWinding(nullptr), 
 pVisibleHull(nullptr)
 {
-
+	core::zero_object(__pad);
 }
 
-LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth)
+LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth) : matInfo(oth.matInfo)
 {
 	planenum = oth.planenum;
 
 	visible = oth.visible;
 	culled = oth.culled;
 
-	matInfo = oth.matInfo;
+//	matInfo = oth.matInfo;
 
 	// null them first.
 	pWinding = nullptr;
 	pVisibleHull = nullptr;
 
 	if (oth.pWinding){
-		pWinding = oth.pWinding->Copy();
+		pWinding = oth.pWinding->Copy(g_arena);
 	}
 	if (oth.pVisibleHull){
-		pVisibleHull = oth.pVisibleHull->Copy();
+		pVisibleHull = oth.pVisibleHull->Copy(g_arena);
 	}
 }
 
@@ -70,10 +70,10 @@ LvlBrushSide& LvlBrushSide::operator = (const LvlBrushSide& oth)
 	pVisibleHull = nullptr;
 
 	if (oth.pWinding){
-		pWinding = oth.pWinding->Copy();
+		pWinding = oth.pWinding->Copy(g_arena);
 	}
 	if (oth.pVisibleHull){
-		pVisibleHull = oth.pVisibleHull->Copy();
+		pVisibleHull = oth.pVisibleHull->Copy(g_arena);
 	}
 	return *this;
 }
@@ -102,6 +102,7 @@ patches(g_arena),
 interPortals(g_arena),
 numAreas(0)
 {
+	classType = level::ClassType::UNKNOWN;
 	bspFaces = nullptr;
 	mapEntity = nullptr;
 }
@@ -210,7 +211,9 @@ bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 				continue;		// back side clipaway
 			}
 
-			w = w->Clip(planes[sides[j].planenum ^ 1], 0.01f);
+			if(!w->clip(planes[sides[j].planenum ^ 1], 0.01f)) {
+				X_DELETE_AND_NULL(w, g_arena);
+			}
 		}
 		if (pSide->pWinding) {
 			X_DELETE(pSide->pWinding, g_arena);
@@ -234,7 +237,7 @@ bool LvlBrush::boundBrush(const XPlaneSet& planes)
 		if (!w) {
 			continue;
 		}
-		for (j = 0; j < w->GetNumPoints(); j++) {
+		for (j = 0; j < w->getNumPoints(); j++) {
 			bounds.add((*w)[j].asVec3());
 		}
 	}
@@ -337,7 +340,7 @@ float LvlBrush::Volume(const XPlaneSet& planes)
 		}
 		plane = &planes[sides[i].planenum];
 		d = -plane->distance(corner);
-		area = w->GetArea();
+		area = w->getArea();
 		volume += d * area;
 	}
 
@@ -364,7 +367,7 @@ BrushPlaneSide::Enum LvlBrush::BrushMostlyOnSide(const Planef& plane) const
 			continue;
 		}
 
-		for (j = 0; j < w->GetNumPoints(); j++)
+		for (j = 0; j < w->getNumPoints(); j++)
 		{
 			d = plane.distance((*w)[j].asVec3());
 			if (d > max)

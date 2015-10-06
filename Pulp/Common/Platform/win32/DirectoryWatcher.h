@@ -27,13 +27,14 @@ public:
 		};
 	};
 
-	XDirectoryWatcher(core::MemoryArenaBase* arena);
+	explicit XDirectoryWatcher(core::MemoryArenaBase* arena);
 	~XDirectoryWatcher(void);
 
 	void Init(void);
 	void ShutDown(void);
 
 	void addDirectory(const char* directory) X_OVERRIDE;
+	void addDirectory(const wchar_t* directory) X_OVERRIDE;
 
 	void registerListener(XDirectoryWatcherListener* pListener) X_OVERRIDE;
 	void unregisterListener(XDirectoryWatcherListener* pListener) X_OVERRIDE;
@@ -41,7 +42,7 @@ public:
 	void tick(void);
 
 	X_INLINE bool isDebugEnabled(void) const {
-		return m_debug != 0;
+		return debug_ != 0;
 	}
 
 private:
@@ -50,7 +51,8 @@ private:
 
 private:
 
-	bool IsRepeat(const core::Path& path);
+	bool IsRepeat(const core::Path<char>& path);
+	bool IsRepeat(const core::Path<wchar_t>& path);
 
 	struct Info_t
 	{
@@ -73,7 +75,7 @@ private:
 		}
 
 		OVERLAPPED overlapped;
-		Path directoryName;
+		Path<wchar_t> directoryName;
 		HANDLE directory;
 		HANDLE event;
 		char result[4096];
@@ -88,11 +90,11 @@ private:
 	typedef core::Array<XDirectoryWatcherListener*> listeners;
 	typedef core::Array<WatchInfo> Directorys;
 
-	int m_debug;
+	int debug_;
 
-	Directorys m_dirs;
-	listeners m_listeners;
-	Fifo<Info_t> m_cache;
+	Directorys dirs_;
+	listeners listeners_;
+	Fifo<Info_t> cache_;
 };
 
 
@@ -106,8 +108,9 @@ public:
 
 	virtual ~XDirectoryWatcherListener()
 	{
-		if (pMonitor_)
+		if (pMonitor_) {
 			pMonitor_->unregisterListener(this);
+		}
 	}
 
 	// returns true if it action was eaten.

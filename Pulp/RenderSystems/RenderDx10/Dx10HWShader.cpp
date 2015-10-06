@@ -101,6 +101,7 @@ namespace
 
 	X_INLINE void getObjectToWorldMatrix(render::DX11XRender* r)
 	{
+		X_UNUSED(r);
 		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
 
 		pMat->setToIdentity();
@@ -109,9 +110,8 @@ namespace
 
 	X_INLINE void getWorldMatrix(render::DX11XRender* r)
 	{
-		D3DXMATRIX* pMatD3D = (D3DXMATRIX*)(&vecTemp[0]);
-
 		X_ASSERT_NOT_IMPLEMENTED();
+		X_UNUSED(r);
 	}
 
 	X_INLINE void getviewMatrix(render::DX11XRender* r)
@@ -135,17 +135,19 @@ namespace
 
 	X_INLINE void getTime(render::DX11XRender* r)
 	{
+		X_UNUSED(r);
 		vecTemp[0][0] = 1.f / gEnv->pTimer->GetFrameTime();
 	}
 
 	X_INLINE void getFrameTime(render::DX11XRender* r)
 	{
+		X_UNUSED(r);
 		vecTemp[0][0] = 1.f / gEnv->pTimer->GetFrameTime();
 	}
 
 	X_INLINE void getCameraPos(render::DX11XRender* r)
 	{
-		Vec3f pos(r->GetCamera().GetPosition());
+		Vec3f pos(r->GetCamera().getPosition());
 
 		vecTemp[0] = pos;
 	}
@@ -166,16 +168,19 @@ namespace
 	X_INLINE void getCameraFront(render::DX11XRender* r)
 	{
 		X_ASSERT_NOT_IMPLEMENTED();
+		X_UNUSED(r);
 	}
 
 	X_INLINE void getCameraRight(render::DX11XRender* r)
 	{
 		X_ASSERT_NOT_IMPLEMENTED();
+		X_UNUSED(r);
 	}
 
 	X_INLINE void getCameraUp(render::DX11XRender* r)
 	{
 		X_ASSERT_NOT_IMPLEMENTED();
+		X_UNUSED(r);
 	}
 
 
@@ -259,7 +264,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	const char* sourceFile, const Flags<TechFlag>& techFlags,
 	ShaderType::Enum type, Flags<ILFlag> ILFlags, uint32_t sourceCrc)
 {
-	X_ASSERT_NOT_NULL(pHWshaders);
+	X_ASSERT_NOT_NULL(s_pHWshaders);
 	X_ASSERT_NOT_NULL(shader_name);
 	X_ASSERT_NOT_NULL(entry);
 	X_ASSERT_NOT_NULL(sourceFile);
@@ -280,7 +285,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	X_LOG1("Shader", "HWS for name: \"%s\"", name.c_str());
 #endif // !X_DEBUG
 
-	pShader = (XHWShader_Dx10*)pHWshaders->findAsset(name.c_str());
+	pShader = static_cast<XHWShader_Dx10*>(s_pHWshaders->findAsset(name.c_str()));
 
 	if (pShader)
 	{
@@ -295,7 +300,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 			pShader->setStatus(ShaderStatus::NotCompiled);
 
 			// remove the cache file, to save a file load / crc check.
-			core::Path path;
+			core::Path<char> path;
 			pShader->getShaderCompileDest(path);
 
 			// delete it!
@@ -321,7 +326,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 		pShader->activate();
 
 		// register it.
-		pHWshaders->AddAsset(name.c_str(), pShader);
+		s_pHWshaders->AddAsset(name.c_str(), pShader);
 	}
 
 
@@ -366,18 +371,18 @@ void XHWShader_Dx10::FreeBufferPointers()
 
 void XHWShader_Dx10::FreeHWShaders()
 {
-	X_ASSERT_NOT_NULL(pHWshaders);
+	X_ASSERT_NOT_NULL(s_pHWshaders);
 
 	// NOTE: there should be none, since shaders that use them should release them.
 	// so if there are any here there is a problem.
 	// but we still clean up like a good boy.
 
-	core::XResourceContainer::ResourceItor it = pHWshaders->begin();
+	core::XResourceContainer::ResourceItor it = s_pHWshaders->begin();
 	XHWShader_Dx10* pShader;
 
-	for (; it != pHWshaders->end();)
+	for (; it != s_pHWshaders->end();)
 	{
-		pShader = (XHWShader_Dx10*)it->second;
+		pShader = static_cast<XHWShader_Dx10*>(it->second);
 		++it;
 
 		if (!pShader)
@@ -415,7 +420,7 @@ XHWShader_Dx10::XHWShader_Dx10() :
 
 }
 
-void XHWShader_Dx10::getShaderCompilePaths(core::Path& src, core::Path& dest)
+void XHWShader_Dx10::getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest)
 {
 	src.clear();
 	src.appendFmt("shaders/temp/%s.merged", sourceFileName_.c_str());
@@ -428,7 +433,7 @@ void XHWShader_Dx10::getShaderCompilePaths(core::Path& src, core::Path& dest)
 	gEnv->pFileSys->createDirectoryTree(dest.c_str());
 }
 
-void XHWShader_Dx10::getShaderCompileDest(core::Path& dest)
+void XHWShader_Dx10::getShaderCompileDest(core::Path<char>& dest)
 {
 	dest.clear();
 	dest.appendFmt("shaders/compiled/%s.fxcb", name_.c_str());
@@ -440,7 +445,7 @@ void XHWShader_Dx10::getShaderCompileDest(core::Path& dest)
 
 bool XHWShader_Dx10::saveToCache(void)
 {
-	core::Path dest;
+	core::Path<char> dest;
 	getShaderCompileDest(dest);
 
 	// write the compiled version.
@@ -460,9 +465,9 @@ bool XHWShader_Dx10::saveToCache(void)
 
 bool XHWShader_Dx10::loadFromCache()
 {
-	core::Path dest;
+	core::Path<char> dest;
 
-	XShaderManager* pShaderMan = &render::gRenDev->m_ShaderMan;
+	// XShaderManager* pShaderMan = &render::gRenDev->ShaderMan_;
 
 	getShaderCompileDest(dest);
 
@@ -484,12 +489,12 @@ bool XHWShader_Dx10::loadFromCache()
 bool XHWShader_Dx10::loadFromSource()
 {
 	core::XFileScoped file;
-	core::Path src, dest;
+	core::Path<char> src, dest;
 	core::string source;
 
 	getShaderCompilePaths(src, dest);
 
-	XShaderManager* pShaderMan = &render::gRenDev->m_ShaderMan;
+	XShaderManager* pShaderMan = &render::gRenDev->ShaderMan_;
 
 	// we need to get the whole file :D
 	if (!pShaderMan->sourceToString(source, this->sourceFileName_))
@@ -509,7 +514,7 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 
 	X_LOG0("Shader", "Compiling shader: \"%s\"", name_.c_str());
 
-	pShaderMan = &render::gRenDev->m_ShaderMan;
+	pShaderMan = &render::gRenDev->ShaderMan_;
 	D3DCompileflags_ = 0;
 
 #if X_DEBUG // todo make this a cvar
@@ -622,11 +627,12 @@ bool XHWShader_Dx10::uploadtoHW()
 	else
 	{
 		// O'Deer
+		hr = 0; // prevent warning 4701
 		X_ASSERT_UNREACHABLE();
 	}
 
-	if (SUCCEEDED(hr)) {
-
+	if (SUCCEEDED(hr)) 
+	{
 		// compiled out in debug
 		if (this->type_ == ShaderType::Vertex)
 			render::D3DDebug::SetDebugObjectName(reinterpret_cast<ID3D11VertexShader*>(pHWHandle_), this->entryPoint_);
@@ -758,8 +764,8 @@ bool XHWShader_Dx10::reflectShader(void)
 
 				bind.name = CDesc.Name;
 				bind.nameHash = core::StrHash(CDesc.Name);
-				bind.bind = nReg;
-				bind.constBufferSlot = constBuftype;
+				bind.bind = safe_static_cast<short, int>(nReg);
+				bind.constBufferSlot = safe_static_cast<short, ConstbufType::Enum>(constBuftype);
 				bind.numParameters = (CDesc.Size + 15) >> 4; // vec4
 				bind.flags = VarTypeToFlags(CTDesc);
 				bind.type = ParamType::Unknown;
@@ -808,8 +814,8 @@ bool XHWShader_Dx10::reflectShader(void)
 			XShaderParam bind;
 			bind.name = CDesc.Name;
 			bind.nameHash = core::StrHash(CDesc.Name);
-			bind.bind = nReg;
-			bind.constBufferSlot = constBuftype;
+			bind.bind = safe_static_cast<short, int>(nReg);
+			bind.constBufferSlot = safe_static_cast<short, ConstbufType::Enum>(constBuftype);
 			bind.numParameters = (CDesc.Size + 15) >> 4; // vec4
 			bind.flags = entry->flags;
 			bind.type = entry->type;
@@ -848,7 +854,7 @@ bool XHWShader_Dx10::reflectShader(void)
 		XShaderParam bind;
 
 		bind.name = InputBindDesc.Name;
-		bind.bind = InputBindDesc.BindPoint | SHADER_BIND_SAMPLER;
+		bind.bind = safe_static_cast<short, UINT>(InputBindDesc.BindPoint | SHADER_BIND_SAMPLER);
 		bind.numParameters = InputBindDesc.BindCount;
 	//	BindVars.push_back(bind);
 	}
@@ -877,7 +883,7 @@ bool XHWShader_Dx10::reflectShader(void)
 			// as the texture link them.
 			if (temp.isEqual(pB->name))
 			{
-				pB->constBufferSlot = InputBindDesc.BindPoint;
+				pB->constBufferSlot = safe_static_cast<short,UINT>(InputBindDesc.BindPoint);
 				break;
 			}
 
@@ -886,7 +892,7 @@ bool XHWShader_Dx10::reflectShader(void)
 			// samnpler basemapSampler
 			if (temp.findCaseInsen(pB->name) && temp.findCaseInsen("sampler"))
 			{
-				pB->constBufferSlot = InputBindDesc.BindPoint;
+				pB->constBufferSlot = safe_static_cast<short, UINT>(InputBindDesc.BindPoint);
 				break;
 			}
 		}
@@ -895,7 +901,7 @@ bool XHWShader_Dx10::reflectShader(void)
 	for (i = 0; i < BindVars.size(); i++)
 	{
 		XShaderParam* pB = &BindVars[i];
-		const char *param = pB->name.c_str();
+		 // const char *param = pB->name.c_str();
 		bool bSampler = (pB->bind & SHADER_BIND_SAMPLER) != 0;
 
 		if (!bSampler)
@@ -1047,8 +1053,6 @@ const int XHWShader_Dx10::releaseHW(void)
 	ShaderType::Enum type = this->type_;
 	void* pHandle = pHWHandle_;
 
-	ID3D11DeviceContext* pDevice = render::g_Dx11D3D.DxDeviceContext();
-
 	if (status == ShaderStatus::ReadyToRock)
 	{
 		if (type == ShaderType::Vertex)
@@ -1141,7 +1145,7 @@ void XHWShader_Dx10::Init(void)
 {
 	X_ASSERT_NOT_NULL(g_rendererArena);
 
-	pHWshaders = X_NEW_ALIGNED(render::XRenderResourceContainer, g_rendererArena, 
+	s_pHWshaders = X_NEW_ALIGNED(render::XRenderResourceContainer, g_rendererArena,
 		"HwShaderRes", X_ALIGN_OF(render::XRenderResourceContainer))(g_rendererArena, 256);
 
 
@@ -1158,14 +1162,14 @@ void XHWShader_Dx10::Init(void)
 
 void XHWShader_Dx10::shutDown(void)
 {
-	X_LOG0("HWShaders", "Shutting down");
+	X_LOG0("HWShaders", "Shutting Down");
 
 	FreeBufferPointers();
 	FreeHWShaders();
 	FreeParams();
 	FreeInputLayoutTree();
 
-	core::Mem::DeleteAndNull(pHWshaders, g_rendererArena);
+	core::Mem::DeleteAndNull(s_pHWshaders, g_rendererArena);
 }
 
 

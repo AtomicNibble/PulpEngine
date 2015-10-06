@@ -66,6 +66,9 @@ void operator delete(void* m)
 
 int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
+	X_UNUSED(hPrevInstance);
+	X_UNUSED(lpCmdLine);
+	X_UNUSED(nCmdShow);
 	InitRootDir();
 	g_hInstance = hInstance;
 

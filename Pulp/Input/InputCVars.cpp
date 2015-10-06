@@ -17,6 +17,8 @@ XInputCVars::XInputCVars()
 	ADD_CVAR_REF_NO_NAME(input_mouse_pos_debug, 0, 0, 1, 0,
 		"Input mouse position debugging.");
 
+	
+	scrollLines = 1;
 }
 
 XInputCVars::~XInputCVars()

@@ -186,6 +186,12 @@ bool XRenderMesh::render(void)
 				texture::TexID id = pTextRes->pITex->getTexID();
 				texture::XTexture::applyFromId(0, id, 0);
 			}
+			pTextRes = shaderItem.pResources_->getTexture(shader::ShaderTextureIdx::BUMP);
+			if (pTextRes)
+			{
+				texture::TexID id = pTextRes->pITex->getTexID();
+				texture::XTexture::applyFromId(1, id, 0);
+			}
 		}
 
 		g_Dx11D3D.FX_DrawIndexPrimitive(
@@ -252,17 +258,18 @@ void XRenderMesh::freeVB(VertexStream::Enum stream) // VertexBuffer
 
 void XRenderMesh::freeIB(void) // Index Buffer
 {
-
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 void XRenderMesh::freeVideoMem(bool restoreSys)
 {
-
+	X_UNUSED(restoreSys);
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 void XRenderMesh::freeSystemMem(void)
 {
-
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 

@@ -2,7 +2,9 @@
 
 #include "MiniDump.h"
 
+X_DISABLE_WARNING(4091)
 #include <DbgHelp.h>
+X_ENABLE_WARNING(4091)
 
 #include "Util\LastError.h"
 
@@ -58,6 +60,8 @@ namespace debugging
 		}
 		return res;
 #else
+		X_UNUSED(filename);
+		X_UNUSED(exceptionPointers);
 		return true;
 #endif
 	}

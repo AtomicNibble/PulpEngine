@@ -580,7 +580,6 @@ void XWindow::Transition(void)
 			{
 				clear = false;
 				color->Set(data.interp.GetCurrentValue(timeMs));
-				int goat = 0;
 			}
 
 		}
@@ -694,6 +693,11 @@ void XWindow::EvaluateRegisters(float* registers)
 				registers[op->c] = registers[op->a] || registers[op->b];
 				break;
 			case OpType::VAR:
+				// 'type cast': conversion from 'int' to 'Potato::gui::XWinVec4 *' of greater size
+
+				X_DISABLE_WARNING(4312) 
+				X_ASSERT_NOT_IMPLEMENTED();
+
 				if (!op->a) {
 					registers[op->c] = 0.0f;
 					break;
@@ -701,7 +705,7 @@ void XWindow::EvaluateRegisters(float* registers)
 				if (op->b >= 0 && registers[op->b] >= 0 && registers[op->b] < 4) 
 				{
 					// grabs vector components
-					XWinVec4 *var = (XWinVec4 *)(op->a);
+					XWinVec4 *var = reinterpret_cast<XWinVec4*>(op->a);
 					registers[op->c] = ((Vec4f&)var)[static_cast<int>(registers[op->b])];
 				}
 				else {
@@ -709,8 +713,10 @@ void XWindow::EvaluateRegisters(float* registers)
 				}
 				break;
 			case OpType::VAR_STR:
+				X_ASSERT_NOT_IMPLEMENTED();
+
 				if (op->a) {
-					XWinStr* var = (XWinStr*)(op->a);
+					XWinStr* var = reinterpret_cast<XWinStr*>(op->a);
 					registers[op->c] = static_cast<float>(::atof(var->c_str()));
 				}
 				else {
@@ -718,8 +724,10 @@ void XWindow::EvaluateRegisters(float* registers)
 				}
 				break;
 			case OpType::VAR_FLOAT:
+				X_ASSERT_NOT_IMPLEMENTED();
+
 				if (op->a) {
-					XWinFloat* var = (XWinFloat*)(op->a);
+					XWinFloat* var = reinterpret_cast<XWinFloat*>(op->a);
 					registers[op->c] = *var;
 				}
 				else {
@@ -727,8 +735,10 @@ void XWindow::EvaluateRegisters(float* registers)
 				}
 				break;
 			case OpType::VAR_INT:
+				X_ASSERT_NOT_IMPLEMENTED();
+
 				if (op->a) {
-					XWinInt* var = (XWinInt*)(op->a);
+					XWinInt* var = reinterpret_cast<XWinInt*>(op->a);
 					registers[op->c] = static_cast<float>(*var);
 				}
 				else {
@@ -736,14 +746,17 @@ void XWindow::EvaluateRegisters(float* registers)
 				}
 				break;
 			case OpType::VAR_BOOL:
+				X_ASSERT_NOT_IMPLEMENTED();
+
 				if (op->a) {
-					XWinBool* var = (XWinBool*)(op->a);
+					XWinBool* var = reinterpret_cast<XWinBool*>(op->a);
 					registers[op->c] = *var;
 				}
 				else {
 					registers[op->c] = 0;
 				}
 				break;
+				X_ENABLE_WARNING(4312)
 #if X_DEBUG
 			default:
 				X_ASSERT_UNREACHABLE();
@@ -819,6 +832,9 @@ int XWindow::ParseTerm(core::XParser& lex, XWinVar* var, int component)
 	core::XLexToken token;
 	int	a;
 
+	X_UNUSED(var);
+	X_UNUSED(component);
+
 	lex.ReadToken(token);
 
 	if (token.isEqual("("))
@@ -841,7 +857,6 @@ int XWindow::ParseTerm(core::XParser& lex, XWinVar* var, int component)
 		{
 			return ExpressionConstant(-(float)token.GetFloatValue());
 		}
-	//	src->Warning("Bad negative number '%s'", token.c_str());
 		return 0;
 	}
 
@@ -1170,8 +1185,9 @@ bool XWindow::ParseScript(core::XParser& lex, XGuiScriptList& list )
 		return false;
 	}
 
-
-	while (1)
+	X_DISABLE_WARNING(4127)
+	while (true)
+	X_ENABLE_WARNING(4127)
 	{
 		if (!lex.ReadToken(token)) {
 			return false;
@@ -1669,14 +1685,14 @@ bool XWindow::OnInputEvent(const input::InputEvent& event)
 
 bool XWindow::OnInputEventChar(const input::InputEvent& event)
 {
-
+	X_UNUSED(event);
 	return false;
 }
 
 
 void XWindow::activate(bool activate)
 {
-
+	X_UNUSED(activate);
 }
 
 void XWindow::gainFocus(void)

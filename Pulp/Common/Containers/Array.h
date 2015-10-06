@@ -24,12 +24,14 @@ public:
 	Array(MemoryArenaBase* arena, size_type size);
 	Array(MemoryArenaBase* arena, size_type size, const T& initialValue);
 	Array(const Array& oth);
-	~Array(void);
+	Array(Array&& oth);
+	virtual ~Array(void);
 
 	void setArena(MemoryArenaBase* arena);
 	void setArena(MemoryArenaBase* arena, size_type capacity);
 
-	Array<T>& operator=(const Array<T> &oth);
+	Array<T>& operator=(const Array<T>& oth);
+	Array<T>& operator=(Array<T>&& oth);
 
 	// index operators
 	const T& operator[](size_type idx) const;
@@ -67,17 +69,20 @@ public:
 
 	// append element (same as push_back)
 	size_type append(const T& obj);
+	size_type append(T&& obj);
 	// add the list
 	size_type append(const Array<T>& oth);
 	// appends a item to the end, resizing if required.
 	size_type push_back(const T& obj);
+	size_type push_back(T&& obj);
 
 	// Removes the last element, it is deconstructed
-	void pop_back();
+	void pop_back(void);
 
 
 	// insert the element at the given index
 	size_type insert(const Type& obj, size_type index = 0);
+	size_type insert(Type&& obj, size_type index = 0);
 	// remove the element at the given index
 	bool removeIndex(size_type idx);
 

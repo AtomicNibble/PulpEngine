@@ -1,15 +1,13 @@
 #include "stdafx.h"
 #include "Level.h"
 
-#include <IFileSys.h>
 #include <IRender.h>
 #include <IRenderMesh.h>
 #include <ITimer.h>
 #include <IConsole.h>
 
-#include <Memory\MemCursor.h>
+#include <Math\XWinding.h>
 
-#include <IRenderAux.h>
 
 X_NAMESPACE_BEGIN(level)
 
@@ -19,16 +17,76 @@ AsyncLoadData::~AsyncLoadData()
 
 // --------------------------------
 
-int Level::s_var_drawAreaBounds_ = 0;
-int Level::s_var_drawArea_ = -1;
+AreaNode::AreaNode()
+{
+	children[0] = -1;
+	children[1] = -1;
+	commonChildrenArea = -1;
+}
 
+// --------------------------------
+
+AreaPortal::AreaPortal() : debugVerts(g_3dEngineArena)
+{
+	areaTo = -1;
+	pWinding = nullptr;
+}
+
+AreaPortal::~AreaPortal()
+{
+	if (pWinding) {
+		X_DELETE(pWinding, g_3dEngineArena);
+	}
+}
+
+// --------------------------------
+
+Area::Area() : portals(g_3dEngineArena)
+{
+	areaNum = -1;
+	pMesh = nullptr;
+	pRenderMesh = nullptr;
+}
+
+Area::~Area()
+{
+	pMesh = nullptr; // Area() don't own the memory.
+
+	if (pRenderMesh) {
+		pRenderMesh->release();
+	}
+}
+
+// --------------------------------
+
+PortalStack::PortalStack()
+{
+	pPortal = nullptr;
+	pNext = nullptr;
+	numPortalPlanes = 0;
+}
+
+// --------------------------------
+
+int Level::s_var_usePortals_ = 1;
+int Level::s_var_drawAreaBounds_ = 0;
+int Level::s_var_drawPortals_ = 0;
+int Level::s_var_drawArea_ = -1;
+int Level::s_var_drawCurrentAreaOnly_ = 0;
 
 // --------------------------------
 
 Level::Level() :
-areaModels_(g_3dEngineArena),
-stringTable_(g_3dEngineArena)
+areas_(g_3dEngineArena),
+areaNodes_(g_3dEngineArena),
+stringTable_(g_3dEngineArena),
+areaEntRefs_(g_3dEngineArena),
+areaEntRefHdrs_(g_3dEngineArena),
+areaMultiEntRefs_(g_3dEngineArena),
+staticModels_(g_3dEngineArena)
 {
+	frameID_ = 0;
+
 	canRender_ = false;
 
 	pFileData_ = nullptr;
@@ -57,13 +115,21 @@ bool Level::Init(void)
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
-	ADD_CVAR_REF("lvl_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 1, core::VarFlag::SYSTEM,
-		"Draws bounding box around each level area");
-		
-	ADD_CVAR_REF("lvl_drawArea", s_var_drawArea_, -1, -1, level::MAP_MAX_AREAS, core::VarFlag::SYSTEM,
-		"Draws the selected area index. -1 = disable");
-
+	ADD_CVAR_REF("lvl_usePortals", s_var_usePortals_, 1, 0, 1,
+		core::VarFlag::SYSTEM, "Use area portals when rendering the level.");
 	
+	ADD_CVAR_REF("lvl_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 1,
+		core::VarFlag::SYSTEM, "Draws bounding box around each level area");
+
+	ADD_CVAR_REF("lvl_drawPortals", s_var_drawPortals_, 1, 0, 4, core::VarFlag::SYSTEM,
+		"Draws the inter area portals. 0=off 1=solid 2=wire 3=solid_dt 4=wire_dt");
+
+	ADD_CVAR_REF("lvl_drawArea", s_var_drawArea_, -1, -1, level::MAP_MAX_AREAS,
+		core::VarFlag::SYSTEM, "Draws the selected area index. -1 = disable");
+
+	ADD_CVAR_REF("lvl_drawCurAreaOnly", s_var_drawCurrentAreaOnly_, 0, 0, 1, 
+		core::VarFlag::SYSTEM, "Draws just the current area. 0=off 1=on");
+
 
 	return true;
 }
@@ -76,6 +142,8 @@ void Level::ShutDown(void)
 
 void Level::update(void)
 {
+	frameID_++;
+
 	// are we trying to read?
 	if (pAsyncLoadData_ && pAsyncLoadData_->waitingForIo_)
 	{
@@ -103,6 +171,7 @@ void Level::free(void)
 {
 	canRender_ = false;
 
+#if 0
 	// clear render mesh.
 	core::Array<AreaModel>::ConstIterator it = areaModels_.begin();
 	for (; it != areaModels_.end(); ++it)
@@ -111,6 +180,18 @@ void Level::free(void)
 	}
 
 	areaModels_.free();
+#endif
+
+	areas_.free();
+	areaNodes_.free();
+
+	areaEntRefs_.free();
+	areaEntRefHdrs_.free();
+
+	areaMultiEntRefs_.free();
+	// areaEntMultiRefHdrs_ <- fixed size.
+
+	staticModels_.free();
 
 	if (pFileData_) {
 		X_DELETE_ARRAY(pFileData_, g_3dEngineArena);
@@ -141,375 +222,261 @@ bool Level::render(void)
 	if (!canRender())
 		return false;
 
-	core::Array<AreaModel>::ConstIterator it = areaModels_.begin();
+	// work out what area we are in.
+	const XCamera& cam = gEnv->pRender->GetCamera();
+	Vec3f camPos = cam.getPosition();
 
+	// build up the cams planes.
+	const Planef camPlanes[FrustumPlane::ENUM_COUNT] = {
+		-cam.getFrustumPlane(FrustumPlane::LEFT),
+		-cam.getFrustumPlane(FrustumPlane::RIGHT),
+		-cam.getFrustumPlane(FrustumPlane::TOP),
+		-cam.getFrustumPlane(FrustumPlane::BOTTOM),
+		-cam.getFrustumPlane(FrustumPlane::FAR),
+		-cam.getFrustumPlane(FrustumPlane::NEAR)
+	};
+
+
+	int32_t camArea = -1;
+	if (!IsPointInAnyArea(camPos, camArea))
+	{
+		X_LOG0_EVERY_N(24, "Level", "Outside of world");
+	}
+	else
+	{
+		X_LOG0_EVERY_N(24, "Level", "In area: %i", camArea);
+
+		const FileAreaRefHdr& areaEnts = areaEntRefHdrs_[camArea];
+		const FileAreaRefHdr& multiAreaEnts = areaEntMultiRefHdrs_[0];
+		size_t numMulti = 0;
+		for (size_t j = 0; j < multiAreaEnts.num; j++)
+		{
+			if (core::bitUtil::IsBitSet(areaMultiEntRefs_[multiAreaEnts.startIndex + j].flags,
+				camArea))
+			{
+				numMulti++;
+			}
+		}
+
+		X_LOG0_EVERY_N(24, "Level", "ents In area: %i multi: %i", 
+			areaEnts.num, numMulti);
+	}
+
+
+	AreaArr::ConstIterator it = areas_.begin();
 	if (s_var_drawArea_ == -1)
 	{
-		for (; it != areaModels_.end(); ++it)
+		// if we are outside world draw all.
+		// or usePortals is off.
+		if (camArea == -1 || s_var_usePortals_ == 0)
 		{
-			it->pRenderMesh->render();
-		}
-	}
-	else if (s_var_drawArea_ < safe_static_cast<int,size_t>(areaModels_.size()))
-	{
-		areaModels_[s_var_drawArea_].pRenderMesh->render();
-	}
-
-	if (s_var_drawAreaBounds_)
-	{
-		render::IRenderAux* pAux = gEnv->pRender->GetIRenderAuxGeo();
-
-		pAux->setRenderFlags(render::AuxGeom_Defaults::Def3DRenderflags);
-
-		it = areaModels_.begin();
-		for (; it != areaModels_.end(); ++it)
-		{
-			Vec3f pos = Vec3f::zero();
-			pAux->drawAABB(it->pMesh->boundingBox,pos, false, Col_Red);
-		}
-	}
-
-	return true;
-}
-
-
-bool Level::Load(const char* mapName)
-{
-	// does the other level file exsist?
-	path_.set(mapName);
-	path_.setExtension(level::LVL_FILE_EXTENSION);
-
-	if (!gEnv->pFileSys->fileExists(path_.c_str())) {
-		X_ERROR("Level", "could not find level file: \"%s\"",
-			path_.c_str());
-		return false;
-	}
-
-	// free it :)
-	free();
-
-	X_LOG0("Level", "Loading level: %s", mapName);
-	loadStats_ = LoadStats();
-	loadStats_.startTime = pTimer_->GetTimeReal();
-
-	// clear it.
-	core::zero_object(fileHdr_);
-
-	core::fileModeFlags mode = core::fileMode::READ;
-	core::XFileAsync* pFile = pFileSys_->openFileAsync(path_.c_str(), mode);
-	if (!pFile) {
-		return false;
-	}
-
-	core::XFileAsyncOperation HeaderOp = pFile->readAsync(&fileHdr_, sizeof(fileHdr_), 0);
-
-	pAsyncLoadData_ = X_NEW(AsyncLoadData, g_3dEngineArena, "LevelLoadHandles")(pFile, HeaderOp);
-	pAsyncLoadData_->waitingForIo_ = true;
-	return true;
-}
-
-bool Level::ProcessHeader(uint32_t bytesRead)
-{
-	if (bytesRead != sizeof(fileHdr_)) {
-		X_ERROR("Level", "failed to read header file: %s", path_.fileName());
-
-		return false;
-	}
-
-	// is this header valid m'lady?
-	if (!fileHdr_.isValid())
-	{
-		// this header is not valid :Z
-		if (fileHdr_.fourCC == LVL_FOURCC_INVALID)
-		{
-			X_ERROR("Level", "%s file is corrupt, please re-compile.", path_.fileName());
-			return false;
-		}
-	
-		X_ERROR("Level", "%s is not a valid level", path_.fileName());
-		return false;
-	}
-
-	if (fileHdr_.version != LVL_VERSION)
-	{
-		X_ERROR("Level", "%s has a invalid version. provided: %i required: %i",
-			path_.fileName(), fileHdr_.version, LVL_VERSION);
-		return false;
-	}
-
-	if (fileHdr_.datasize <= 0)
-	{
-		X_ERROR("Level", "level file is empty");
-		return false;
-	}
-
-	// require atleast one area.
-	if (fileHdr_.numAreas < 1)
-	{
-		X_ERROR("Level", "Level file has no areas");
-		return false;
-	}
-
-	// allocate the file data.
-	pFileData_ = X_NEW_ARRAY(uint8_t, fileHdr_.totalDataSize, g_3dEngineArena, "LevelBuffer");
-	
-	pAsyncLoadData_->AsyncOp_ = pAsyncLoadData_->pFile_->readAsync(pFileData_, 
-		fileHdr_.totalDataSize, sizeof(fileHdr_));
-
-	pAsyncLoadData_->waitingForIo_ = true;
-	return true;
-}
-
-bool Level::ProcessData(uint32_t bytesRead)
-{
-	if (bytesRead != fileHdr_.totalDataSize) {
-		X_ERROR("Level", "failed to read level file. read: %i of %i",
-			bytesRead, fileHdr_.totalDataSize);
-		return false;
-	}
-
-	// read string table.
-	core::XFileBuf file(pFileData_, pFileData_ + fileHdr_.stringDataSize);
-
-	if (!stringTable_.SLoad(&file))
-	{
-		X_ERROR("Level", "Failed to load string table.");
-		return false;
-	}
-
-	if (!file.isEof())
-	{
-		X_ERROR("Level", "Failed to fully parse sting table.");
-		return false;
-	}
-
-	core::StackString<64> meshName;
-	core::MemCursor<uint8_t> cursor(pFileData_ + fileHdr_.stringDataSize, fileHdr_.datasize);
-	uint32_t x, numSub;
-
-	areaModels_.reserve(fileHdr_.numAreas);
-	for (uint32_t i = 0; i < fileHdr_.numAreas; i++)
-	{
-		model::MeshHeader* pMesh = cursor.getSeekPtr<model::MeshHeader>();
-		numSub = pMesh->numSubMeshes;
-
-		X_ASSERT(numSub > 0, "a areamodel can't have zero meshes")(numSub);
-
-		// set meshHeads verts and faces.
-		pMesh->subMeshHeads = cursor.postSeekPtr<model::SubMeshHeader>(numSub);
-
-		// verts
-		pMesh->streams[VertexStream::VERT] = cursor.postSeekPtr<uint8_t>(pMesh->numVerts * 
-			((sizeof(Vec2f)*2) + sizeof(Vec3f)));
-		pMesh->streams[VertexStream::COLOR] = cursor.postSeekPtr<Color8u>(pMesh->numVerts);
-		pMesh->streams[VertexStream::NORMALS] = cursor.postSeekPtr<Vec3f>(pMesh->numVerts);
-
-		for (x = 0; x < numSub; x++)
-		{
-			model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
-			pSubMesh->streams[VertexStream::VERT] += pMesh->streams[VertexStream::VERT];
-			pSubMesh->streams[VertexStream::COLOR] += pMesh->streams[VertexStream::COLOR];
-			pSubMesh->streams[VertexStream::NORMALS] += pMesh->streams[VertexStream::NORMALS];
-		}
-
-		// indexes
-		for (x = 0; x < numSub; x++)
-		{
-			model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
-			pSubMesh->indexes = cursor.postSeekPtr<model::Index>(pSubMesh->numIndexes);
-		}
-
-		// mat names
-		for (x = 0; x < numSub; x++)
-		{
-			model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
-			uint32_t matID = reinterpret_cast<uint32_t>(pSubMesh->materialName.as<uint32_t>());
-			pSubMesh->materialName = stringTable_.getString(matID);
-		}
-
-		// load materials
-		for (x = 0; x < numSub; x++)
-		{
-			model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
-		
-			pSubMesh->pMat = pMaterialManager_->loadMaterial(pSubMesh->materialName);
-		}
-
-		// set the mesh head pointers.
-		pMesh->indexes = pMesh->subMeshHeads[0]->indexes;
-
-		meshName.clear();
-		meshName.appendFmt("$area_mesh%i", i);
-
-		AreaModel area;
-		area.pMesh = pMesh;
-		area.pRenderMesh = gEnv->pRender->createRenderMesh(pMesh,
-			shader::VertexFormat::P3F_T4F_C4B_N3F, meshName.c_str());
-		area.pRenderMesh->uploadToGpu();
-
-		areaModels_.append(area);
-	}
-
-	if (!cursor.isEof())
-	{
-		X_WARNING("Level", "potential read error, cursor is not at end. bytes left: %i",
-			cursor.numBytesRemaning());
-	}
-
-	// clean up.
-	pFileSys_->closeFileAsync(pAsyncLoadData_->pFile_);
-
-	X_DELETE_AND_NULL(pAsyncLoadData_, g_3dEngineArena);
-
-	// stats.
-	loadStats_.elapse = pTimer_->GetTimeReal() - loadStats_.startTime;
-
-	// safe to render?
-	canRender_ = true;
-
-	X_LOG0("Level", "%s loaded in %gms", 
-		path_.fileName(),
-		loadStats_.elapse.GetMilliSeconds());
-
-	return true;
-}
-
-#if 0
-bool Level::LoadFromFile(const char* filename)
-{
-	X_ASSERT_NOT_NULL(filename);
-
-	core::fileModeFlags mode;
-	FileHeader hdr;
-	core::Path path;
-	bool LumpsLoaded;
-
-	mode.Set(core::fileMode::READ);
-	mode.Set(core::fileMode::RANDOM_ACCESS); // the format allows for each lump to be in any order currently.
-
-	core::zero_object(hdr);
-
-	path.append(filename);
-	path.setExtension(level::LVL_FILE_EXTENSION);
-
-	LumpsLoaded = false;
-
-	core::XFileMemScoped file;
-	if (file.openFile(path.c_str(), mode))
-	{
-		file->readObj(hdr);
-
-		// is this header valid m'lady?
-		if (!hdr.isValid())
-		{
-			// this header is not valid :Z
-			if (hdr.fourCC == LVL_FOURCC_INVALID)
+			for (; it != areas_.end(); ++it)
 			{
-				X_ERROR("Bsp", "%s file is corrupt, please re-compile.", path.fileName());
+				it->pRenderMesh->render();
+			}
+		}
+		else
+		{
+			if (s_var_drawCurrentAreaOnly_)
+			{
+				// draw just this area.
+				areas_[camArea].pRenderMesh->render();
 			}
 			else
 			{
-				X_ERROR("Bsp", "%s is not a valid bsp", path.fileName());
+				// we find out all the visable area's.
+				// that we can see via portals.
+				FlowViewThroughPortals(camArea, camPos, 
+					6, camPlanes);
+
+				// for now just render any we touched.
+				for (const auto& a : areas_)
+				{
+					if (a.frameID == frameID_)
+					{
+						a.pRenderMesh->render();
+					}
+				}
 			}
-
-			return false;
 		}
-
-		if (hdr.version != LVL_VERSION)
-		{
-			X_ERROR("Bsp", "%s has a invalid version. provided: %i required: %i",
-				path.fileName(), hdr.version, LVL_VERSION);
-			return false;
-		}
-
-		if (hdr.datasize <= 0)
-		{
-			X_ERROR("Bsp", "level file is empty");
-			return false;
-		}
-
-		// require atleast one area.
-		if(hdr.numAreas < 1)
-		{
-			X_ERROR("Bsp", "Level file has no areas");
-			return false;
-		}
-
-		// copy some stuff.
-		numAreas_ = hdr.numAreas;
-
-
-		pFileData_ = X_NEW_ARRAY(uint8_t, hdr.datasize, g_3dEngineArena, "LevelBuffer");
-		
-		uint32_t bytesRead = file->read(pFileData_, hdr.datasize);
-		if (bytesRead != hdr.datasize)
-		{
-			X_ERROR("Bsp", "failed to read level file. read: %i of %i",
-				bytesRead, hdr.datasize);
-
-			X_DELETE_ARRAY(pFileData_,g_3dEngineArena);
-			pFileData_ = nullptr;
-			return false;
-		}
-
-		core::StackString<64> meshName;
-		core::MemCursor<uint8_t> cursor(pFileData_, hdr.datasize);
-		uint32_t x, numSub;
-
-		areaModels_.reserve(hdr.numAreas);
-		for (uint32_t i = 0; i < hdr.numAreas; i++)
-		{
-			model::MeshHeader* pMesh = cursor.getSeekPtr<model::MeshHeader>();		
-			numSub = pMesh->numSubMeshes;
-
-			X_ASSERT(numSub > 0, "a areamodel can't have zero meshes")(numSub);
-
-			// set meshHeads verts and faces.
-			pMesh->subMeshHeads = cursor.postSeekPtr<model::SubMeshHeader>(numSub);
-			
-			// verts
-			for (x = 0; x < numSub; x++)
-			{
-				model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
-				pSubMesh->verts = cursor.postSeekPtr<level::Vertex>(pSubMesh->numVerts);;
-			}
-
-			// indexs
-			for (x = 0; x < numSub; x++)
-			{
-				model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
-				pSubMesh->indexes = cursor.postSeekPtr<model::Index>(pSubMesh->numIndexes);
-			}
-
-			// set the mesh head pointers.
-			pMesh->streams[VertexStream::VERT] = pMesh->subMeshHeads[0]->verts;
-			pMesh->indexes = pMesh->subMeshHeads[0]->indexes;
-
-			meshName.clear();
-			meshName.appendFmt("$area_mesh%i", i);
-
-			AreaModel area;
-			area.pMesh = pMesh;
-			area.pRenderMesh = gEnv->pRender->createRenderMesh(pMesh, 
-				shader::VertexFormat::P3F_T4F_C4B_N3F, meshName.c_str());
-			area.pRenderMesh->uploadToGpu();
-
-			areaModels_.append(area);
-		}
-
-
-		if(!cursor.isEof())
-		{
-			X_WARNING("Bsp", "potential read error, cursor is not at end");
-		}
-
-
-		file.close(); // not needed but makes my nipples more perky.
-		return true;
+	}
+	else if (s_var_drawArea_ < safe_static_cast<int, size_t>(areas_.size()))
+	{
+		// force draw just this area even if outside world.
+		areas_[s_var_drawArea_].pRenderMesh->render();
 	}
 
+	DrawPortalDebug();
+	return true;
+}
+
+
+int32_t Level::CommonChildrenArea_r(AreaNode* pAreaNode)
+{
+	int32_t	nums[2];
+
+	for ( int i = 0 ; i < 2 ; i++ )
+	{
+		if (pAreaNode->children[i] <= 0) {
+			nums[i] = -1 - pAreaNode->children[i];
+		} else {
+			nums[i] = CommonChildrenArea_r(&areaNodes_[pAreaNode->children[i]]);
+		}
+	}
+
+	// solid nodes will match any area
+	if (nums[0] == AreaNode::AREANUM_SOLID) {
+		nums[0] = nums[1];
+	}
+	if (nums[1] == AreaNode::AREANUM_SOLID) {
+		nums[1] = nums[0];
+	}
+
+	int32_t	common;
+	if ( nums[0] == nums[1] ) {
+		common = nums[0];
+	} else {
+		common = AreaNode::CHILDREN_HAVE_MULTIPLE_AREAS;
+	}
+
+	pAreaNode->commonChildrenArea = common;
+
+	return common;
+}
+
+
+size_t Level::NumAreas(void) const
+{
+	return areas_.size();
+}
+
+bool Level::IsPointInAnyArea(const Vec3f& pos) const
+{
+	int32_t areaOut;
+	return IsPointInAnyArea(pos, areaOut);
+}
+
+bool Level::IsPointInAnyArea(const Vec3f& pos, int32_t& areaOut) const
+{
+	if (areaNodes_.isEmpty()) {
+		areaOut = -1;
+		return false;
+	}
+
+	const AreaNode* pNode = &areaNodes_[0];
+	int32_t nodeNum;
+
+	X_DISABLE_WARNING(4127)
+	while (true)
+	X_ENABLE_WARNING(4127)
+	{
+		float dis = pNode->plane.distance(pos);
+
+		if (dis > 0.f) {
+			nodeNum = pNode->children[0];
+		}
+		else {
+			nodeNum = pNode->children[1];
+		}
+		if (nodeNum == 0) {
+			areaOut = -1; // in solid
+			return false;
+		}
+		
+		if (nodeNum < 0) 
+		{
+			nodeNum = (-1 - nodeNum);
+
+			if (nodeNum >= safe_static_cast<int32_t,size_t>(areaNodes_.size())) {
+				X_ERROR("Level", "area out of range, when finding point for area");
+			}
+
+			areaOut = nodeNum;
+			return true;
+		}
+
+		pNode = &areaNodes_[nodeNum]; 
+	}
+
+	areaOut = -1;
 	return false;
 }
-#endif
+
+size_t Level::BoundsInAreas(const AABB& bounds, int32_t* pAreasOut, size_t maxAreas) const
+{
+	size_t numAreas = 0;
+
+	if (bounds.isEmpty()) {
+		X_WARNING("Level","Bounds to areas called with a empty bounds");
+		return 0;
+	}
+
+	if (maxAreas < 1) {
+		X_WARNING("Level","Bounds to areas called with maxarea count of zero");
+		return 0;
+	}
+
+	// must be valid here.
+	X_ASSERT_NOT_NULL(pAreasOut);
+
+	BoundsInAreas_r(0, bounds, numAreas, pAreasOut, maxAreas);
+
+	return numAreas;
+}
+
+
+void Level::BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numAreasOut,
+	int32_t* pAreasOut, size_t maxAreas) const
+{
+	X_ASSERT_NOT_NULL(pAreasOut);
+
+	// work out all the areas this bounds intersects with.
+
+	size_t i;
+
+	do 
+	{
+		if (nodeNum < 0) // negative is a area.
+		{
+			nodeNum = -1 - nodeNum;
+
+			for (i = 0; i < numAreasOut; i++) {
+				if (pAreasOut[i] == nodeNum) {
+					break;
+				}
+			}
+			if (i >= numAreasOut && numAreasOut < maxAreas) {
+				pAreasOut[numAreasOut++] = nodeNum;
+			}
+
+			return;
+		}
+
+		const AreaNode& node = areaNodes_[nodeNum];
+
+		PlaneSide::Enum side = bounds.planeSide(node.plane);
+
+		if (side == PlaneSide::FRONT) {
+			nodeNum = node.children[0];
+		}
+		else if (side == PlaneSide::BACK) {
+			nodeNum = node.children[1];
+		}
+		else 
+		{
+			if (node.children[1] != 0) // 0 is leaf without area since a area of -1 - -1 = 0;
+			{
+				BoundsInAreas_r(node.children[1], bounds, numAreasOut, pAreasOut, maxAreas);
+				if (numAreasOut >= maxAreas) {
+					return;
+				}
+			}
+			nodeNum = node.children[0];
+		}
+
+	} while (nodeNum != 0);
+
+}
+
 
 X_NAMESPACE_END

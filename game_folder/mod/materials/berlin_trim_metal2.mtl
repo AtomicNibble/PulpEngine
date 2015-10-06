@@ -1,0 +1,13 @@
+<material name="" flags="8" SurfaceType="none">
+	<textures>
+		<texture type="albedo" image_name="textures/berlin_trim_metal2_c.dds" />
+	</textures>
+
+	<Params 
+		diffuse="1,1,1,1"
+		specular="1,1,1,1"
+		emissive="1,1,1,1"
+		shineness="1"
+		opacity="1"
+	/>
+</material>

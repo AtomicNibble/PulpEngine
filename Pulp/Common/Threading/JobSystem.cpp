@@ -69,8 +69,12 @@ size_t JobQue::numJobs(void) const
 
 JobThread::JobThread()
 {
+	core::zero_object(ques_);
+
 	moreWorkToDo_ = false;
 	threadIdx_ = 0;
+
+	pTimer_ = nullptr;
 }
 
 JobThread::~JobThread()
@@ -118,7 +122,9 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
 {
 	Thread::ReturnValue retVal = Thread::ReturnValue(0);
 
+X_DISABLE_WARNING(4127)
 	while (true)
+X_ENABLE_WARNING(4127)
 	{
 		{
 			signalCritical_.Enter();
@@ -312,7 +318,7 @@ bool JobSystem::StartThreads(void)
 
 void JobSystem::ShutDown(void)
 {
-	X_LOG0("JobSystem", "Shuting down");
+	X_LOG0("JobSystem", "Shutting Down");
 
 	int32_t i;
 

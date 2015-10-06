@@ -48,7 +48,7 @@ struct hash<core::string>
 		// memory allocation + copy the string.
 		// so it's a win really.
 		// for the cost of a few redundant strlen's
-		uint32_t len = core::strUtil::strlen(__s);
+		size_t len = core::strUtil::strlen(__s);
 
 		return (size_t)core::Hash::Fnv1aHash(__s.data(), len);
 	}

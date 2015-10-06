@@ -71,7 +71,7 @@ class VidMemManager
 		> PoolArena;
 
 public:
-	enum {
+	enum : uint32_t {
 		null_id = (uint32_t)-1
 	};
 

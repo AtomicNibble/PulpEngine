@@ -31,7 +31,7 @@ void DX11XRender::DrawQuadSS(float x, float y, float width, float height, const 
 
 
 	uint32 nOffs;
-	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
+	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)DynVB_[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
 
 	// TL
 	Quad[0].pos.x = x1;
@@ -56,8 +56,8 @@ void DX11XRender::DrawQuadSS(float x, float y, float width, float height, const 
 		Quad[i].st = Vec2f::zero();
 	}
 
-	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
-	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
+	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
 	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
 		return;
@@ -89,7 +89,7 @@ void DX11XRender::DrawQuadSS(const Rectf& rect, const Color& col)
 
 
 	uint32 nOffs;
-	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
+	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)DynVB_[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
 
 	// TL
 	Quad[0].pos.x = x1;
@@ -114,8 +114,8 @@ void DX11XRender::DrawQuadSS(const Rectf& rect, const Color& col)
 		Quad[i].st = Vec2f::zero();
 	}
 
-	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
-	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
+	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
 	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
 		return;
@@ -151,7 +151,7 @@ void DX11XRender::DrawQuadImageSS(float x, float y, float width, float height,
 
 
 	uint32 nOffs;
-	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
+	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)DynVB_[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
 
 	// TL
 	Quad[0].pos.x = x1;
@@ -177,9 +177,9 @@ void DX11XRender::DrawQuadImageSS(float x, float y, float width, float height,
 	}
 
 	// We are finished with accessing the vertex buffer
-	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
+	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
 	// Bind our vertex as the first data stream of our device
-	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
 
 	texture::XTexture::applyFromId(0, texture_id, 0);
@@ -210,7 +210,7 @@ void DX11XRender::DrawQuadImageSS(const Rectf& rect, texture::TexID texture_id, 
 
 
 	uint32 nOffs;
-	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
+	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)DynVB_[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
 
 	// TL
 	Quad[0].pos.x = x1;
@@ -236,9 +236,9 @@ void DX11XRender::DrawQuadImageSS(const Rectf& rect, texture::TexID texture_id, 
 	}
 
 	// We are finished with accessing the vertex buffer
-	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
+	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
 	// Bind our vertex as the first data stream of our device
-	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
 
 	texture::XTexture::applyFromId(0, texture_id, 0);
@@ -327,7 +327,7 @@ void DX11XRender::DrawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& 
 {
 
 	uint32 nOffs;
-	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
+	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)DynVB_[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
 
 	Quad[0].pos = pos0;
 	Quad[1].pos = pos1;
@@ -341,8 +341,8 @@ void DX11XRender::DrawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& 
 		Quad[i].st = Vec2f::zero();
 	}
 
-	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
-	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
+	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
 	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
 		return;
@@ -373,7 +373,8 @@ void DX11XRender::DrawQuadImage(const Rectf& rect, texture::ITexture* pTexutre,
 
 
 void DX11XRender::DrawImage(float xpos, float ypos, float z, float w, float h,
-	texture::TexID texture_id, float s0, float t0, float s1, float t1, const Colorf& col, bool filtered)
+	texture::TexID texture_id, float s0, float t0, float s1, float t1, 
+	const Colorf& col, bool filtered)
 {
 	float s[4], t[4];
 
@@ -382,7 +383,7 @@ void DX11XRender::DrawImage(float xpos, float ypos, float z, float w, float h,
 	s[2] = s0;	t[2] = 1.0f - t1;
 	s[3] = s1;	t[3] = 1.0f - t1;
 
-	DrawImageWithUV(xpos, ypos, 0, w, h, texture_id, s, t, col, filtered);
+	DrawImageWithUV(xpos, ypos, z, w, h, texture_id, s, t, col, filtered);
 }
 
 
@@ -397,21 +398,19 @@ void DX11XRender::DrawImageWithUV(float xpos, float ypos, float z, float w, floa
 
 
 void DX11XRender::RT_DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
-	texture::TexID texture_id, const float* s, const float* t, const Colorf& col, bool filtered)
+	texture::TexID texture_id, const float* s, const float* t, 
+	const Colorf& col, bool filtered)
 {
-	using namespace shader;
+	X_UNUSED(filtered);
 
-	float fx = xpos;
-	float fy = ypos;
-	float fw = w;
-	float fh = h;
+	using namespace shader;
 
 	//	SetCullMode(CullMode::NONE);
 	// SetFFE(true);
 
 	// Lock the entire buffer and obtain a pointer to the location where we have to
 	uint32 nOffs;
-	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
+	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)DynVB_[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
 
 	// TL
 	Quad[0].pos.x = xpos;
@@ -437,9 +436,9 @@ void DX11XRender::RT_DrawImageWithUV(float xpos, float ypos, float z, float w, f
 	}
 
 	// We are finished with accessing the vertex buffer
-	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
+	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
 	// Bind our vertex as the first data stream of our device
-	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
 	texture::XTexture::applyFromId(0, texture_id, 0);
 
@@ -482,7 +481,7 @@ void DX11XRender::DrawQuad(float x, float y, float z, float width, float height,
 	float fh = height;
 
 	uint32 nOffs;
-	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
+	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)DynVB_[VertexPool::P3F_T2F_C4B].LockVB(4, nOffs);
 
 	// TL
 	Quad[0].pos.x = fx;
@@ -507,8 +506,8 @@ void DX11XRender::DrawQuad(float x, float y, float z, float width, float height,
 		Quad[i].st = Vec2f::zero();
 	}
 
-	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
-	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
+	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
 	// Render the two triangles from the data stream
 	FX_DrawPrimitive(PrimitiveType::TriangleStrip, nOffs, 4);
@@ -537,7 +536,7 @@ void DX11XRender::DrawLine(const Vec3f& pos1, const Vec3f& pos2)
 //	SetFFE(false);
 
 	uint32 nOffs;
-	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(2, nOffs);
+	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)DynVB_[VertexPool::P3F_T2F_C4B].LockVB(2, nOffs);
 
 	Quad[0].pos = pos1;
 	Quad[0].color = Color::white();
@@ -547,8 +546,8 @@ void DX11XRender::DrawLine(const Vec3f& pos1, const Vec3f& pos2)
 	Quad[1].color = Color::white();
 	Quad[1].st = Vec2f::zero();
 
-	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
-	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
+	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
 	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
 		return;
@@ -559,21 +558,21 @@ void DX11XRender::DrawLine(const Vec3f& pos1, const Vec3f& pos2)
 
 
 void DX11XRender::DrawLineColor(const Vec3f& pos1, const Color& color1,
-	const Vec3f& pos2, const Color& vColor2)
+	const Vec3f& pos2, const Color& color2)
 {
 //	SetFFE(false);
 
 	// Lock the entire buffer and obtain a pointer to the location where we have to
 	uint32 nOffs;
-	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(2, nOffs);
+	Vertex_P3F_T2F_C4B* Quad = (Vertex_P3F_T2F_C4B*)DynVB_[VertexPool::P3F_T2F_C4B].LockVB(2, nOffs);
 
 	Quad[0].pos = pos1;
 	Quad[0].color = color1;
 	Quad[1].pos = pos2;
-	Quad[1].color = color1;
+	Quad[1].color = color2;
 
-	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
-	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
+	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
 	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
 		return;
@@ -618,13 +617,13 @@ void DX11XRender::DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 
 
 	uint32 i, nOffs;
-	Vertex_P3F_T2F_C4B* Quads = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(num * 6, nOffs);
+	Vertex_P3F_T2F_C4B* Quads = (Vertex_P3F_T2F_C4B*)DynVB_[VertexPool::P3F_T2F_C4B].LockVB(num * 6, nOffs);
 
 
 	float right = rect.getX2();
 	float bottom = rect.getY2();
 	float height = rect.getHeight();
-	float width = rect.getWidth();
+//	float width = rect.getWidth();
 
 	Color8u col8(Col_Coral);
 
@@ -675,8 +674,8 @@ void DX11XRender::DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 		right -= (bar_width + padding);
 	}
 
-	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
-	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
+	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
 	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
 		return;
@@ -699,13 +698,13 @@ void DX11XRender::DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
 	uint32 nOffs;
 	Vertex_P3F_T2F_C4B* pVertBuf;
 
-	pVertBuf = (Vertex_P3F_T2F_C4B*)m_DynVB[VertexPool::P3F_T2F_C4B].LockVB(size, nOffs);
+	pVertBuf = (Vertex_P3F_T2F_C4B*)DynVB_[VertexPool::P3F_T2F_C4B].LockVB(size, nOffs);
 
 	// copy data into gpu buffer.
 	memcpy(pVertBuf, pVertBuffer, size * sizeof(Vertex_P3F_T2F_C4B));
 
-	m_DynVB[VertexPool::P3F_T2F_C4B].UnlockVB();
-	m_DynVB[VertexPool::P3F_T2F_C4B].Bind();
+	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
+	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
 	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
 		return;

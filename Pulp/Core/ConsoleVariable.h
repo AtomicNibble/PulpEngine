@@ -121,10 +121,11 @@ template<class T>
 class CVarString : public T
 {
 public:
-	CVarString(XConsole* pConsole, const char* Name, const char* Default, int Flags, const char* desc)
-		: T(pConsole, Name, Flags | VarFlag::STRING, desc)
+	CVarString(XConsole* pConsole, const char* Name, const char* Default, 
+		int Flags, const char* desc)
+		: T(pConsole, Name, Flags | VarFlag::STRING, desc),
+		String_(Default)
 	{
-		String_ = Default;
 	}
 
 	virtual int GetInteger() const { return atoi(String_.c_str()); }
@@ -220,16 +221,16 @@ public:
 
 		OnModified();
 
+		IntValue_ = i;
+
 		// min bigger than max disables the check.
 		if (IntMin_ <= IntMax_)
 		{
-			if (i < IntMin_)
-				(int)i = IntMin_;
-			else if (i > IntMax_)
-				(int)i = IntMax_;
+			if (IntValue_ < IntMin_)
+				IntValue_ = IntMin_;
+			else if (IntValue_ > IntMax_)
+				IntValue_ = IntMax_;
 		}
-
-		IntValue_ = i;
 
 		if (pChangeFunc_)
 			pChangeFunc_(this); // change callback.	
@@ -417,15 +418,15 @@ public:
 		OnModified();
 
 		// cap it sally.
+		IntValue_ = i;
+
 		if (IntMin_ <= IntMax_)
 		{
-			if (i < IntMin_)
-				(int)i = IntMin_;
-			else if (i > IntMax_)
-				(int)i = IntMax_;
+			if (IntValue_ < IntMin_)
+				IntValue_ = IntMin_;
+			else if (IntValue_ > IntMax_)
+				IntValue_ = IntMax_;
 		}
-
-		IntValue_ = i;
 
 		if (pChangeFunc_)
 			pChangeFunc_(this); // change callback.	
@@ -452,6 +453,8 @@ public:
 	virtual float GetMax(void) X_OVERRIDE{ return static_cast<float>(IntMax_); }
 
 protected:
+	X_NO_ASSIGN(CVarIntRef);
+
 	int& 		IntValue_;
 	int			IntMax_;
 	int			IntMin_;
@@ -559,6 +562,8 @@ public:
 
 
 private:
+	X_NO_ASSIGN(CVarFloatRef);
+
 	float& 		fValue_;
 	float		fMax_;
 	float		fMin_;
@@ -601,6 +606,7 @@ public:
 		if (Flags_.IsSet(VarFlag::READONLY))
 			return;
 
+		X_UNUSED(f);
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
@@ -609,6 +615,7 @@ public:
 		if (Flags_.IsSet(VarFlag::READONLY))
 			return;
 
+		X_UNUSED(i);
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
@@ -630,6 +637,8 @@ public:
 	static bool ColorFromString(const char* pStr, Color& out, bool Slient = true);
 
 private:
+	X_NO_ASSIGN(CVarColRef);
+
 	Color&	ColValue_;
 	Color	ColDefault_;
 };
@@ -669,7 +678,7 @@ public:
 	{
 		if (Flags_.IsSet(VarFlag::READONLY))
 			return;
-
+		X_UNUSED(f);
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
@@ -677,7 +686,7 @@ public:
 	{
 		if (Flags_.IsSet(VarFlag::READONLY))
 			return;
-
+		X_UNUSED(i);
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
@@ -699,6 +708,8 @@ public:
 	static bool Vec3FromString(const char* pStr, Vec3f& out, bool Slient = true);
 
 private:
+	X_NO_ASSIGN(CVarVec3Ref);
+
 	Vec3f&	Value_;
 	Vec3f	Default_;
 };

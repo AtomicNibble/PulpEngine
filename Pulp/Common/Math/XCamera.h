@@ -59,24 +59,24 @@ static const float  DEFAULT_FOV		= (75.0f*((float32_t)PI) / 180.0f);
 #undef FAR
 #endif
 
-X_DECLARE_ENUM(FrustumPlanes)(NEAR,FAR,RIGHT,LEFT,TOP,BOTTOM);
+// X_DECLARE_ENUM(FrustumPlanes)(NEAR,FAR,RIGHT,LEFT,TOP,BOTTOM);
 
 #include "XPlane.h"
 #include "XMatrix.h"
+#include "XFrustum.h"
 
-class XCamera
+class XCamera : public XFrustum
 {
 public:
 	XCamera()	{ 
-		matrix_.setToIdentity();
-		SetFrustum(640, 480); 
+
 	}
 	~XCamera() {}
 
 	X_INLINE void SetFrustum(uint32_t width, uint32_t height, 
 		float32_t fov = DEFAULT_FOV, float32_t nearplane = DEFAULT_NEAR, 
 		float32_t farpane = DEFAULT_FAR, float32_t pixelAspectRatio = 1.0f);
-
+	/*
 	X_INLINE void UpdateFrustum();
 
 	X_INLINE uint32_t GetViewSurfaceX() const { return width_; }
@@ -107,33 +107,20 @@ public:
 	X_INLINE const Planef& GetFrustumPlane(FrustumPlanes::Enum pl) const {
 		return fp_[pl];
 	}
-
+	*/
 protected:
-
-	Matrix34f matrix_;
-
-	uint32_t width_;
-	uint32_t height_;
-
-	float32_t fov_;
-
-	float32_t projectionRatio_;	// ratio between width and height of view-surface
-	float32_t pixelAspectRatio_;	// accounts for aspect ratio and non-square pixels
-
-	Vec3f	edge_nlt_;			// this is the left/upper vertex of the near-plane
-	Vec3f	edge_plt_;			// this is the left/upper vertex of the projection-plane 
-	Vec3f	edge_flt_;			// this is the left/upper vertex of the far-clip-plane
-
-
-	Planef		fp_[FrustumPlanes::ENUM_COUNT];
-
-	Vec3f	cltp_, crtp_, clbp_, crbp_;		//this are the 4 vertices of the projection-plane in cam-space
-	Vec3f	cltn_, crtn_, clbn_, crbn_;		//this are the 4 vertices of the near-plane in cam-space
-	Vec3f	cltf_, crtf_, clbf_, crbf_;		//this are the 4 vertices of the farclip-plane in cam-space
 
 };
 
 
+X_INLINE void XCamera::SetFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV,
+	float32_t nearplane, float32_t farpane, float32_t fPixelAspectRatio)
+{
+	XFrustum::SetFrustum(nWidth, nHeight, FOV,
+		nearplane, farpane, fPixelAspectRatio);
+}
+
+#if 0
 // Frustum diagram: http://winpic.co/152d7037
 // goat: http://winpic.co/153f6eb6
 // --------------------------------------------
@@ -212,5 +199,6 @@ X_INLINE void XCamera::UpdateFrustum()
 
 
 }
+#endif
 
 #endif // !_X_MATH_CAMERA_H_

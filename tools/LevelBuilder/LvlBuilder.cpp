@@ -3,6 +3,7 @@
 
 #include "MapTypes.h"
 #include "MapLoader.h"
+#include "ModelInfo.h"
 
 
 namespace
@@ -50,9 +51,13 @@ namespace
 
 
 LvlBuilder::LvlBuilder() :
+staticModels_(g_arena),
 entities_(g_arena),
 areas_(g_arena),
-stringTable_(g_arena)
+multiRefLists_({{ g_arena, g_arena, g_arena, g_arena,
+g_arena, g_arena, g_arena, g_arena }}),
+stringTable_(g_arena),
+map_(nullptr)
 {
 	core::zero_object(stats_);
 
@@ -73,6 +78,11 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 
 	map_ = map;
 
+	// first we need to load the AABB of the default model.
+	if (!LoadDefaultModel()) {
+		return false;
+	}
+
 	if (map->getNumEntities() == 0) {
 		X_ERROR("Lvl", "Map has zero entites, atleast one is required");
 		return false;
@@ -91,14 +101,14 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 	calculateLvlBounds();
 
 
-	X_LOG0("Map", "Total world brush: %i", entities_[0].brushes.size());
-	X_LOG0("Map", "Total world patches: %i", 0); // TODO
-	X_LOG0("Map", "Total total brush: %i", stats_.numBrushes);
-	X_LOG0("Map", "Total total patches: %i", stats_.numPatches);
-	X_LOG0("Map", "Total entities: %i", stats_.numEntities);
-	X_LOG0("Map", "Total planes: %i", this->planes.size());
-	X_LOG0("Map", "Total areaPortals: %i", stats_.numAreaPortals);
-	X_LOG0("Map", "Size: (%.0f,%.0f,%.0f) to (%.0f,%.0f,%.0f)", 
+	X_LOG0("Map", "Total world brush: ^8%i", entities_[0].brushes.size());
+	X_LOG0("Map", "Total world patches: ^8%i", 0); // TODO
+	X_LOG0("Map", "Total total brush: ^8%i", stats_.numBrushes);
+	X_LOG0("Map", "Total total patches: ^8%i", stats_.numPatches);
+	X_LOG0("Map", "Total entities: ^8%i", stats_.numEntities);
+	X_LOG0("Map", "Total planes: ^8%i", this->planes.size());
+	X_LOG0("Map", "Total areaPortals: ^8%i", stats_.numAreaPortals);
+	X_LOG0("Map", "Size: (^8%.0f,%.0f,%.0f^7) to (^8%.0f,%.0f,%.0f^7)", 
 		mapBounds.min[0], mapBounds.min[1], mapBounds.min[2],
 		mapBounds.max[0], mapBounds.max[1], mapBounds.max[2]);
 
@@ -143,13 +153,74 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 		}
 	}
 
-	mapfile::XMapEntity::PairIt it = mapEnt->epairs.find("origin");
+	mapfile::XMapEntity::PairIt it = mapEnt->epairs.find(X_CONST_STRING("origin"));
 	if (it != mapEnt->epairs.end())
 	{
 		// set the origin.
 		const core::string& value = it->second;
-		sscanf(value.c_str(), "%f %f %f",
+		sscanf_s(value.c_str(), "%f %f %f",
 			&ent.origin.x, &ent.origin.y, &ent.origin.z);
+	}
+
+	// check for angles.
+	it = mapEnt->epairs.find(X_CONST_STRING("angle"));
+	if (it != mapEnt->epairs.end())
+	{
+		const core::string& value = it->second;
+		sscanf_s(value.c_str(), "%f %f %f",
+			&ent.angle.x, &ent.angle.y, &ent.angle.z);
+	}
+
+	ent.bounds.clear();
+
+	// get classname.
+	it = mapEnt->epairs.find(X_CONST_STRING("classname"));
+	if (it != mapEnt->epairs.end())
+	{
+		core::string& classname = it->second;
+
+		if (classname == "worldspawn")
+		{
+			ent.classType = level::ClassType::WORLDSPAWN;
+		}
+		else if (classname == "misc_model")
+		{
+			ent.classType = level::ClassType::MISC_MODEL;
+		}
+		else if (classname == "info_player_start")
+		{
+			ent.classType = level::ClassType::PLAYER_START;
+		}
+		else
+		{
+			X_WARNING("Lvl", "ent has unknown class type: \"%s\"", classname.c_str());
+		}
+	}
+	else
+	{
+		X_WARNING("Lvl", "ent missing class type");
+	}
+
+	if (ent.classType == level::ClassType::MISC_MODEL)
+	{
+		it = mapEnt->epairs.find(X_CONST_STRING("model"));
+		if (it != mapEnt->epairs.end())
+		{ 
+			core::string& name = it->second;
+			// load the models bounding box.
+			if (!ModelInfo::GetNModelAABB(name, ent.bounds))
+			{
+				X_ERROR("Lvl", "Failed to load model \"%s\" at (%g,%g,%g), using default",
+				name.c_str(), ent.origin.x,ent.origin.y, ent.origin.z);
+				it->second = "default";
+			}
+		}
+		else
+		{
+			X_ERROR("Lvl", "Ent with classname \"misc_model\" is missing \"model\" kvp at (%g,%g,%g)",
+				ent.origin.x, ent.origin.y, ent.origin.z);
+			return false;
+		}
 	}
 
 	return true;
@@ -238,7 +309,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 		ComputeAxisBase(pMapBrushSide->GetPlane().getNormal(), texX, texY);
 
-		for (int j = 0; j < w->GetNumPoints(); j++)
+		for (int j = 0; j < w->getNumPoints(); j++)
 		{
 			// gets me position from 0,0 from 2d plane.
 			Vec5f& point = w->operator[](j);

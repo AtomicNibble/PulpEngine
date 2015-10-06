@@ -47,7 +47,7 @@ void bspNode::CalcNodeBounds(void)
 	{
 		s = (p->nodes[1] == this);
 
-		for (i = 0; i < p->pWinding->GetNumPoints(); i++)
+		for (i = 0; i < p->pWinding->getNumPoints(); i++)
 		{
 			const Vec5f& point = (*p->pWinding)[i];
 			bounds.add(point.asVec3());
@@ -72,13 +72,17 @@ XWinding* bspNode::GetBaseWinding(XPlaneSet& planeSet)
 		if (n->children[0] == pNode) 
 		{
 			// take front
-			w = w->Clip(plane, BASE_WINDING_EPSILON);
+			if (!w->clip(plane, BASE_WINDING_EPSILON)) {
+				X_DELETE_AND_NULL(w, g_arena);
+			}
 		}
 		else 
 		{
 			// take back
 			Planef	back = -plane;
-			w = w->Clip(back, BASE_WINDING_EPSILON);
+			if(!w->clip(back, BASE_WINDING_EPSILON)) {
+				X_DELETE_AND_NULL(w, g_arena);
+			}
 		}
 		pNode = n;
 		n = n->parent;
@@ -154,14 +158,15 @@ void bspNode::SplitPortals(XPlaneSet& planes)
 
 		// cut the portal into two portals, one on each side of the cut plane
 		// this means that the 
-		p->pWinding->Split(*plane, SPLIT_WINDING_EPSILON, &frontwinding, &backwinding);
+		p->pWinding->Split(*plane, SPLIT_WINDING_EPSILON, 
+			&frontwinding, &backwinding, g_arena);
 
-		if (frontwinding && frontwinding->IsTiny())
+		if (frontwinding && frontwinding->isTiny())
 		{
 			X_DELETE_AND_NULL(frontwinding, g_arena);
 		}
 
-		if (backwinding && backwinding->IsTiny())
+		if (backwinding && backwinding->isTiny())
 		{
 			X_DELETE_AND_NULL(backwinding, g_arena);
 		}
@@ -262,7 +267,7 @@ void bspNode::ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& sid
 			return;
 		}
 
-		w->Split(planes[planenum], ON_EPSILON, &front, &back);
+		w->Split(planes[planenum], ON_EPSILON, &front, &back, g_arena);
 
 		X_DELETE(w, g_arena);
 
@@ -276,7 +281,7 @@ void bspNode::ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& sid
 	if (!opaque)
 	{
 		if (!side.pVisibleHull) {
-			side.pVisibleHull = w->Copy();
+			side.pVisibleHull = w->Copy(g_arena);
 		}
 		else {
 			side.pVisibleHull->AddToConvexHull(w, planes[side.planenum].getNormal());
@@ -306,7 +311,7 @@ void bspNode::FindAreas_r(size_t& numAreas)
 	size_t areaFloods = 0;
 	this->FloodAreas_r(numAreas, areaFloods);
 
-	X_LOG0("Lvl", "area %i has %i leafs", numAreas, areaFloods);
+	X_LOG0("Lvl", "area ^8%i^7 has ^8%i^7 leafs", numAreas, areaFloods);
 	numAreas++;
 
 }
@@ -325,7 +330,7 @@ void bspNode::FloodAreas_r(size_t areaNum, size_t& areaFloods)
 	}
 
 	areaFloods++;
-	area = areaNum;
+	area = safe_static_cast<int32_t,size_t>(areaNum);
 
 	for (p = portals; p; p = p->next[s])
 	{
@@ -363,4 +368,149 @@ bool bspNode::CheckAreas_r(void)
 	}
 
 	return true;
+}
+
+
+int32_t	bspNode::PruneNodes_r(void)
+{
+	int32_t	a1, a2;
+
+	if (planenum == PLANENUM_LEAF) {
+		return area;
+	}
+
+	a1 = children[0]->PruneNodes_r();
+	a2 = children[1]->PruneNodes_r();
+
+	if (a1 != a2 || a1 == PLANENUM_AREA_DIFF) {
+		return PLANENUM_AREA_DIFF;
+	}
+
+	// free all the nodes below this point
+	children[0]->FreeTreePortals_r();
+	children[1]->FreeTreePortals_r();
+	children[0]->FreeTree_r();
+	children[1]->FreeTree_r();
+
+	core::zero_object(children);
+
+	// change this node to a leaf
+	planenum = PLANENUM_LEAF;
+	area = a1;
+
+	return a1;
+}
+
+int32_t bspNode::NumChildNodes(void)
+{
+	return NumChildNodes_r(this);
+}
+
+void bspNode::FreeTreePortals_r(void)
+{
+	// free all the portals.
+	bspPortal *p, *nextp;
+	int32_t s;
+
+	// free children
+	if (planenum != PLANENUM_LEAF)
+	{
+		children[0]->FreeTreePortals_r();
+		children[1]->FreeTreePortals_r();
+	}
+
+	// free portals
+	for (p = portals; p; p = nextp)
+	{
+		s = (p->nodes[1] == this);
+		nextp = p->next[s];
+
+		p->RemoveFromNode(p->nodes[!s]);
+		X_DELETE(p, g_arena);
+	}
+	
+	portals = nullptr;
+}
+
+void bspNode::FreeTree_r(void)
+{
+	// free all the sub nodes and self.
+	// free children
+	if (planenum != PLANENUM_LEAF)
+	{
+		children[0]->FreeTree_r();
+		children[1]->FreeTree_r();
+	}
+
+	X_DELETE(this, g_arena);
+}
+
+void bspNode::WriteNodes_r(XPlaneSet& planes, core::XFile* pFile)
+{
+	int32_t childIds[2];
+	size_t i;
+
+	if (planenum == PLANENUM_LEAF) {
+		X_WARNING("bspNode", "Got a leaf plane while writing nodes.");
+		return;
+	}
+
+	for (i = 0; i < 2; i++)
+	{
+		if (children[i]->planenum == PLANENUM_LEAF) {
+			childIds[i] = -1 - children[i]->area; // leafs with area -1 get child of 0
+		}
+		else {
+			childIds[i] = children[i]->nodeNumber;
+		}
+	}
+
+	// get the plane.
+	const Planef& plane = planes[planenum];
+
+	pFile->writeObj(plane);
+	pFile->writeObj(childIds);
+
+	// process the children, if they are not leafs.
+	if (childIds[0] > 0) {
+		children[0]->WriteNodes_r(planes, pFile);
+	}
+	if (childIds[1] > 0) {
+		children[1]->WriteNodes_r(planes, pFile);
+	}
+}
+
+int32_t bspNode::NumberNodes_r(bspNode* pNode, int32_t nextNumber)
+{
+	X_ASSERT_NOT_NULL(pNode);
+
+	if (pNode->planenum == PLANENUM_LEAF) {
+		return nextNumber;
+	}
+
+	pNode->nodeNumber = nextNumber;
+	nextNumber++;
+	nextNumber = NumberNodes_r(pNode->children[0], nextNumber);
+	nextNumber = NumberNodes_r(pNode->children[1], nextNumber);
+
+	return nextNumber;
+}
+
+
+int32_t bspNode::NumChildNodes_r(bspNode* pNode)
+{
+	X_ASSERT_NOT_NULL(pNode);
+	// leaf don't count.
+	if (pNode->planenum == PLANENUM_LEAF) {
+		return 0;
+	}
+
+	int32_t num = 1;
+
+	if (pNode->children[0])
+		num += NumChildNodes_r(pNode->children[0]);
+	if (pNode->children[1])
+		num += NumChildNodes_r(pNode->children[1]);
+
+	return num;
 }

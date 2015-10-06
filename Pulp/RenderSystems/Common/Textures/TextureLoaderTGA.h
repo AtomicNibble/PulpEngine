@@ -20,7 +20,7 @@ namespace TGA
 
 		// ITextureLoader
 
-		virtual bool canLoadFile(const core::Path& path) const X_OVERRIDE;
+		virtual bool canLoadFile(const core::Path<char>& path) const X_OVERRIDE;
 		virtual XTextureFile* loadTexture(core::XFile* file) X_OVERRIDE;
 
 		// ~ITextureLoader

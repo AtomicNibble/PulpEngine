@@ -195,10 +195,10 @@ bool ParseEffect(xml_node<>* node, XFFont::FontEffect& effect)
 bool XFFont::loadFont()
 {
 	core::XFileScoped file;
-	core::Path path;
+	core::Path<char> path;
 	size_t length;
 
-	path /= "core_assets/Fonts/";
+	path /= "Fonts/";
 	path.setFileName(name_.c_str());
 	path.setExtension(".font");
 

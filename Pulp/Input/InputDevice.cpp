@@ -5,23 +5,23 @@ X_NAMESPACE_BEGIN(input)
 
 
 XInputDevice::XInputDevice(IInput& input, const char* deviceName)
-: m_input(input)
-, m_deviceName(deviceName)
-, m_deviceId(InputDevice::UNKNOWN)
-, m_enabled(true),
-m_idToInfo(g_InputArena, 256)
+: input_(input)
+, deviceName_(deviceName)
+, deviceId_(InputDevice::UNKNOWN)
+, enabled_(true),
+idToInfo_(g_InputArena, 256)
 {
 
 }
 
 XInputDevice::~XInputDevice()
 {
-	m_idToInfo.free();
+	idToInfo_.free();
 }
 
-void XInputDevice::Update(bool bFocus)
+void XInputDevice::Update(bool focus)
 {
-
+	X_UNUSED(focus);
 }
 
 void XInputDevice::ClearKeyState()
@@ -31,7 +31,7 @@ void XInputDevice::ClearKeyState()
 
 void XInputDevice::Enable(bool enable)
 {
-	m_enabled = enable;
+	enabled_ = enable;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -43,11 +43,13 @@ InputSymbol* XInputDevice::LookupSymbol(KeyId::Enum id) const
 
 InputSymbol* XInputDevice::IdToSymbol(KeyId::Enum id) const
 {
-	TIdToSymbolMap::const_iterator i = m_idToInfo.find(id);
-	if (i != m_idToInfo.end())
+	TIdToSymbolMap::const_iterator i = idToInfo_.find(id);
+	if (i != idToInfo_.end()) {
 		return (*i).second;
-	else
+	}
+	else {
 		return 0;
+	}
 }
 
 X_NAMESPACE_END

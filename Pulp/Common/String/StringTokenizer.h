@@ -33,21 +33,22 @@ X_NAMESPACE_BEGIN(core)
 /// \endcode
 /// \remark The range of characters held by the tokenizer is defined as [begin, end).
 /// \sa FixedSizeString StringRange
+template<typename TChar = char>
 class StringTokenizer
 {
 public:
 	/// \brief Constructs a string tokenizer for the given range of characters.
 	/// \remark Ownership of the provided arguments stays at the calling site.
-	StringTokenizer(const char* startInclusive, const char* endExclusive, char delimiter);
+	StringTokenizer(const TChar* startInclusive, const TChar* endExclusive, TChar delimiter);
 
 	/// \brief Tries to extract the next token, and returns whether a token could be found or not.
 	/// \remark If no token could be extracted, no assumptions should be made about the contents of \a range.
-	bool ExtractToken(StringRange& range);
+	bool ExtractToken(StringRange<TChar>& range);
 
 private:
-	const char* m_start;
-	const char* m_end;
-	char m_delimiter;
+	const TChar* start_;
+	const TChar* end_;
+	TChar delimiter_;
 };
 
 X_NAMESPACE_END

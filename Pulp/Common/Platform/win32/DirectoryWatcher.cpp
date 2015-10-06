@@ -31,14 +31,14 @@ namespace
 
 
 XDirectoryWatcher::XDirectoryWatcher(core::MemoryArenaBase* arena) :
-m_cache(arena),
-m_debug(0),
-m_dirs(arena),
-m_listeners(arena)
+cache_(arena),
+debug_(0),
+dirs_(arena),
+listeners_(arena)
 {
 	X_ASSERT_NOT_NULL(arena);
-	m_cache.reserve(32);
-	m_dirs.reserve(4);
+	cache_.reserve(32);
+	dirs_.reserve(4);
 }
 
 
@@ -49,10 +49,8 @@ XDirectoryWatcher::~XDirectoryWatcher(void)
 
 void XDirectoryWatcher::Init(void)
 {
-	ADD_CVAR_REF("filesys_dir_watcher_debug", m_debug, 0, 0, 1, core::VarFlag::SYSTEM,
+	ADD_CVAR_REF("filesys_dir_watcher_debug", debug_, 0, 0, 1, core::VarFlag::SYSTEM,
 		"Debug messages for directory watcher. 0=off 1=on");
-
-
 
 }
 
@@ -61,7 +59,7 @@ void XDirectoryWatcher::ShutDown(void)
 	// clear the monitors on listeners, to prevent them trying to access
 	// invalid memory.
 	listeners::Iterator it;
-	for (it = m_listeners.begin(); it != m_listeners.end(); ++it)
+	for (it = listeners_.begin(); it != listeners_.end(); ++it)
 	{
 		XDirectoryWatcherListener* pListener = *it;
 
@@ -71,7 +69,7 @@ void XDirectoryWatcher::ShutDown(void)
 	}
 
 	Directorys::Iterator it2;
-	for (it2 = m_dirs.begin(); it2 != m_dirs.end(); ++it2)
+	for (it2 = dirs_.begin(); it2 != dirs_.end(); ++it2)
 	{
 		WatchInfo* pInfo = it2;
 
@@ -80,21 +78,29 @@ void XDirectoryWatcher::ShutDown(void)
 
 	}
 
-	m_listeners.clear();
-	m_dirs.clear();
+	listeners_.clear();
+	dirs_.clear();
 }
 
 
 
 void XDirectoryWatcher::addDirectory(const char* directory)
 {
+	wchar_t dirW[1024];
+	strUtil::Convert(directory, dirW, sizeof(dirW));
+
+	addDirectory(dirW);
+}
+
+void XDirectoryWatcher::addDirectory(const wchar_t* directory)
+{
 	WatchInfo info;
 
-	info.directoryName = Path(directory);
+	info.directoryName = Path<wchar_t>(directory);
 	info.directoryName.replaceSeprators();
 	info.directoryName.ensureSlash();
 
-	info.directory = CreateFileA(
+	info.directory = CreateFileW(
 		directory,
 		FILE_SHARE_READ,
 		FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
@@ -102,7 +108,7 @@ void XDirectoryWatcher::addDirectory(const char* directory)
 		OPEN_EXISTING,
 		FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OVERLAPPED,
 		0
-	);
+		);
 
 
 	if (info.directory == INVALID_HANDLE_VALUE)
@@ -111,9 +117,9 @@ void XDirectoryWatcher::addDirectory(const char* directory)
 		X_ERROR("DirectoryWatcher", "Cannot obtain handle for directory \"%s\". Error: %s", core::lastError::ToString(dsc));
 	}
 
-	info.event = CreateEventA(0, 
+	info.event = CreateEventA(0,
 		FALSE, // might try using TRUE see if it helps with duplicate events. 
-		0, 
+		0,
 		0);
 
 	if (info.event == NULL)
@@ -125,12 +131,11 @@ void XDirectoryWatcher::addDirectory(const char* directory)
 	info.overlapped.hEvent = info.event;
 
 	// save
-	m_dirs.append(info);
+	dirs_.append(info);
 
 	// Watch
 	WatchDirectory(info.directory, info.result, &info.overlapped);
 }
-
 
 void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 {
@@ -150,17 +155,15 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 			// null term. (string is not provided with one.)
 			pInfo->FileName[(pInfo->FileNameLength >> 1)] = '\0';
 
-
 			// multibyte me up.
 			core::strUtil::Convert(pInfo->FileName, filename);
 
 			// null term.
 			filename[(pInfo->FileNameLength >> 1)] = '\0';
 
-
 			// Path
-			core::Path path(info.directoryName);
-			path.append(filename);
+			core::Path<wchar_t> path(info.directoryName);
+			path.append(pInfo->FileName);
 
 
 			if (!path.isEmpty())
@@ -276,15 +279,15 @@ void XDirectoryWatcher::tick(void)
 {
 	X_PROFILE_BEGIN("DirectoryWatcher", core::ProfileSubSys::CORE);
 	// check all the directorys.
-	Directorys::Iterator it = m_dirs.begin();
+	Directorys::Iterator it = dirs_.begin();
 
-	for (; it != m_dirs.end(); ++it)
+	for (; it != dirs_.end(); ++it)
 	{
 		checkDirectory(*it);
 	}
 }
 
-bool XDirectoryWatcher::IsRepeat(const core::Path& path)
+bool XDirectoryWatcher::IsRepeat(const core::Path<char>& path)
 {
 	struct _stat64 st;
 	core::zero_object(st);
@@ -292,18 +295,41 @@ bool XDirectoryWatcher::IsRepeat(const core::Path& path)
 
 	Info_t info(st.st_mtime, st.st_size);
 
-	Fifo<Info_t>::const_iterator it = m_cache.begin();
+	Fifo<Info_t>::const_iterator it = cache_.begin();
 
-	for (; it != m_cache.end(); ++it)
+	for (; it != cache_.end(); ++it)
 	{
 		if ((*it) == info)
 			return true;
 	}
 
-	if (m_cache.capacity() == m_cache.size())
-		m_cache.pop();
+	if (cache_.capacity() == cache_.size())
+		cache_.pop();
 
-	m_cache.push(info);
+	cache_.push(info);
+	return false;
+}
+
+bool XDirectoryWatcher::IsRepeat(const core::Path<wchar_t>& path)
+{
+	struct _stat64 st;
+	core::zero_object(st);
+	_wstat64(path.c_str(), &st);
+
+	Info_t info(st.st_mtime, st.st_size);
+
+	Fifo<Info_t>::const_iterator it = cache_.begin();
+
+	for (; it != cache_.end(); ++it)
+	{
+		if ((*it) == info)
+			return true;
+	}
+
+	if (cache_.capacity() == cache_.size())
+		cache_.pop();
+
+	cache_.push(info);
 	return false;
 }
 
@@ -313,24 +339,34 @@ void XDirectoryWatcher::registerListener(XDirectoryWatcherListener* pListener)
 {
 	X_ASSERT_NOT_NULL(pListener);
 	pListener->setMonitor(this);
-	m_listeners.insert(pListener);
+	listeners_.insert(pListener);
 }
 
 void XDirectoryWatcher::unregisterListener(XDirectoryWatcherListener* pListener)
 {
 	X_ASSERT_NOT_NULL(pListener);
 	pListener->setMonitor(nullptr);
-	m_listeners.removeIndex(m_listeners.find(pListener));
+	listeners_.removeIndex(listeners_.find(pListener));
 }
 
 void XDirectoryWatcher::notify(Action::Enum action,
 	const char* name, const char* oldName, bool isDirectory)
 {
-	listeners::ConstIterator it = m_listeners.begin();
-	for (; it != m_listeners.end(); ++it) {
-		(*it)->OnFileChange(action, name, oldName, isDirectory);
-		//	break;
+	listeners::ConstIterator it = listeners_.begin();
+	for (; it != listeners_.end(); ++it) {
+		if ((*it)->OnFileChange(action, name, oldName, isDirectory)) {
+#if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+			X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Event was handled");
+#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+			break;
+		}
 	}
+
+#if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+	if (it == listeners_.end()) {
+		X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Event was NOT handled");
+	}
+#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 }
 
 

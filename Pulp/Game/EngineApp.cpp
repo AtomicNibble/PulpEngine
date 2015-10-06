@@ -36,7 +36,7 @@ void AssetHandler::OnAssertVariable(const core::SourceInfo& sourceInfo)
 
 void Error(const char* sErrorText)
 {
-	MessageBox(0, sErrorText, X_ENGINE_NAME" Start Error", MB_OK | MB_DEFAULT_DESKTOP_ONLY);
+	MessageBoxA(0, sErrorText, X_ENGINE_NAME" Start Error", MB_OK | MB_DEFAULT_DESKTOP_ONLY);
 }
 
 EngineApp::EngineApp() :
@@ -57,6 +57,8 @@ EngineApp::~EngineApp()
 
 bool EngineApp::Init(const char* sInCmdLine)
 {
+	X_UNUSED(sInCmdLine);
+
 	SCoreInitParams params;
 	params.hInstance = g_hInstance;
 	params.bSkipInput = false;

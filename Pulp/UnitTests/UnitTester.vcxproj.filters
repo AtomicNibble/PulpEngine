@@ -286,6 +286,24 @@
     <ClCompile Include="UT_JobSystem.cpp">
       <Filter>Source Files\tests\Threading</Filter>
     </ClCompile>
+    <ClCompile Include="UT_StackStringW.cpp">
+      <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_StringRange.cpp">
+      <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_StringTokenizer.cpp">
+      <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_Path.cpp">
+      <Filter>Source Files\tests\String</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_LZ4.cpp">
+      <Filter>Source Files\tests\Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="UT_LZMA.cpp">
+      <Filter>Source Files\tests\Compression</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">

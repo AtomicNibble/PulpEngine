@@ -29,8 +29,8 @@ class GrowingBlockAllocator
 	/// to each allocation.
 	struct BlockHeader
 	{
-		void* m_originalAllocation;
-		size_t m_originalSize;
+		void* originalAllocation_;
+		size_t originalSize_;
 	};
 
 public:
@@ -58,10 +58,10 @@ private:
 	X_NO_ASSIGN(GrowingBlockAllocator);
 
 
-	mspace m_memorySpace;
+	mspace memorySpace_;
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	MemoryAllocatorStatistics m_statistics;
+	MemoryAllocatorStatistics statistics_;
 #endif
 };
 

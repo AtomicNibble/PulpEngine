@@ -220,8 +220,8 @@ public:
 	// ~Drawing
 
 
-	X_INLINE XRenderThread* rThread() {
-		return m_pRt;
+	X_INLINE XRenderThread* rThread(void) {
+		return pRt_;
 	}
 
 
@@ -264,26 +264,29 @@ protected:
 	bool LoadResourceDeffintion(void);
 
 public:
-	shader::XShaderManager m_ShaderMan;
+	shader::XShaderManager ShaderMan_;
 
 	core::Array<RenderResource> RenderResources_;
 protected:
+
+	// Warning Render object was padded due to alignments.
+	X_DISABLE_WARNING(4324)
 
 	X_ALIGN16_MATRIX44F(ViewMatrix_);
 	X_ALIGN16_MATRIX44F(ProjMatrix_);
 	X_ALIGN16_MATRIX44F(ViewProjMatrix_);
 	X_ALIGN16_MATRIX44F(ViewProjInvMatrix_);
 
+	X_ENABLE_WARNING(4324)
 
-
-	XRenderThread* m_pRt;
+	XRenderThread* pRt_;
 	VidMemManager vidMemMng_;
 
 	// stores the with + height and the znear + zfar
 	XViewPort ViewPort_;
 	XCamera cam_;
 
-	XTextDrawList textDrawList_;
+	XTextDrawList* pTextDrawList_;
 
 	// font texture index.
 	int fontIdx_;

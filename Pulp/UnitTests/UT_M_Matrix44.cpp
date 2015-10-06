@@ -223,7 +223,7 @@ TYPED_TEST(Mat44, Operator) {
 			3, 3, 3, 3,
 			3, 3, 3, 3,
 			3, 3, 3, 3);
-		MatT m0 = 3;
+		MatT m0 = MatT(3);
 		EXPECT_EQ(c0, m0);
 	}
 	// template< typename FromT > Matrix44<T>& operator=( const Matrix44<FromT>& rhs );
