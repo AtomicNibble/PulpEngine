@@ -335,6 +335,30 @@ bool Level::ProcessData(uint32_t bytesRead)
 		file.readObj(areaMultiEntRefs_.ptr(), areaMultiEntRefs_.size());
 	}
 
+	{
+		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::STATIC_MODELS);
+
+		staticModels_.resize(fileHdr_.numStaticModels);
+		if (staticModels_.isNotEmpty())
+		{
+			// we read each item one by one since we are readong from a FileBuf.
+			size_t i;
+			for (i = 0; i < staticModels_.size(); i++)
+			{
+				StaticModel& sm = staticModels_[i];
+				FileStaticModel fsm;
+
+				file.readObj(fsm);
+
+				// copy over the info.
+				sm.pos = fsm.pos;
+				sm.angle = fsm.angle;
+				sm.modelNameIdx = fsm.modelNameIdx;
+				// models need to be loaded at some point.
+			}
+		}
+	}
+
 	// nodes
 	if (fileHdr_.flags.IsSet(LevelFileFlags::BSP_TREE))
 	{
@@ -363,6 +387,7 @@ bool Level::ProcessData(uint32_t bytesRead)
 	{
 		X_WARNING("Level", "Level has no area tree.");
 	}
+
 
 	// 
 	CommonChildrenArea_r(&areaNodes_[0]);
