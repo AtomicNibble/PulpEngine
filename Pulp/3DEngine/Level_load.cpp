@@ -311,27 +311,19 @@ bool Level::ProcessData(uint32_t bytesRead)
 
 		file.readObj(areaEntRefHdrs_.ptr(), areaEntRefHdrs_.size());
 
-		size_t totalEntRefs = 0;
-		for (const auto& refHdr : areaEntRefHdrs_)
-		{
-			totalEntRefs += refHdr.num;
-		}
+		size_t numEntRefs = fileHdr_.numEntRefs;
+		size_t numMultiAreaEntRefs = fileHdr_.numMultiAreaEntRefs;
 
 		// load into single buffer.
-		areaEntRefs_.resize(totalEntRefs);
+		areaEntRefs_.resize(numEntRefs);
 		file.readObj(areaEntRefs_.ptr(), areaEntRefs_.size());
 
 		// load multi area ref list headers.
 		file.readObj(areaEntMultiRefHdrs_.data(), areaEntMultiRefHdrs_.size());
 
-		totalEntRefs = 0;
-		for (const auto& refHdr : areaEntMultiRefHdrs_)
-		{
-			totalEntRefs += refHdr.num;
-		}
 
 		// load the multi area ref lists data.
-		areaMultiEntRefs_.resize(totalEntRefs);
+		areaMultiEntRefs_.resize(numMultiAreaEntRefs);
 		file.readObj(areaMultiEntRefs_.ptr(), areaMultiEntRefs_.size());
 	}
 

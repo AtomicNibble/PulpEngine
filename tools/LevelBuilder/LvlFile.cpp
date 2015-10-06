@@ -229,6 +229,9 @@ bool LvlBuilder::save(const char* name)
 				file->writeObj(refHdr);
 			}
 
+			// save the total.
+			hdr.numEntRefs = num;
+
 			// save each area's ref list.
 			for (i = 0; i < areas_.size(); i++)
 			{
@@ -249,6 +252,9 @@ bool LvlBuilder::save(const char* name)
 
 				file->writeObj(refHdr);
 			}
+
+			// aave the tototal.
+			hdr.numMultiAreaEntRefs = num;
 
 			// write multi area ent ref lists.
 			for (i = 0; i < MAP_MAX_MULTI_REF_LISTS; i++)

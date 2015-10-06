@@ -459,7 +459,10 @@ struct FileHeader
 	int32_t numinterAreaPortals;
 	int32_t numNodes;
 
-
+	// ent ref sizes.
+	int32_t numEntRefs;
+	int32_t numMultiAreaEntRefs;
+	// size of the static model info.
 	int32_t numStaticModels;
 
 	FileNode nodes[FileNodes::ENUM_COUNT];
@@ -492,7 +495,7 @@ X_ENSURE_SIZE(MultiAreaEntRef, 8);
 
 // check file structure sizes also.
 X_ENSURE_SIZE(FileNode, 8);
-X_ENSURE_SIZE(FileHeader, 44 + (sizeof(FileNode)* FileNodes::ENUM_COUNT));
+X_ENSURE_SIZE(FileHeader, 52 + (sizeof(FileNode)* FileNodes::ENUM_COUNT));
 
 X_NAMESPACE_END
 
