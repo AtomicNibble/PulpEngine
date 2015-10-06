@@ -118,6 +118,8 @@ class Level : public engine::XEngineBase
 	typedef core::Array<MultiAreaEntRef> AreaMultiEntRefsArr;
 	typedef std::array<FileAreaRefHdr, MAP_MAX_MULTI_REF_LISTS> AreaMultiEntRefsHdrArr;
 
+	typedef core::Array<level::StaticModel> StaticModelsArr;
+
 public:
 	Level();
 	~Level();	
@@ -178,6 +180,9 @@ private:
 	// ent refrences for stuff that is in multiple area's
 	AreaMultiEntRefsHdrArr areaEntMultiRefHdrs_;
 	AreaMultiEntRefsArr areaMultiEntRefs_;
+
+	// static mocel info.
+	StaticModelsArr staticModels_;
 
 private:
 	size_t frameID_; // inc'd each frame.

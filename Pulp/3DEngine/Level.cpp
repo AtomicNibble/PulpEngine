@@ -82,7 +82,8 @@ areaNodes_(g_3dEngineArena),
 stringTable_(g_3dEngineArena),
 areaEntRefs_(g_3dEngineArena),
 areaEntRefHdrs_(g_3dEngineArena),
-areaMultiEntRefs_(g_3dEngineArena)
+areaMultiEntRefs_(g_3dEngineArena),
+staticModels_(g_3dEngineArena)
 {
 	frameID_ = 0;
 
@@ -188,6 +189,9 @@ void Level::free(void)
 	areaEntRefHdrs_.free();
 
 	areaMultiEntRefs_.free();
+	// areaEntMultiRefHdrs_ <- fixed size.
+
+	staticModels_.free();
 
 	if (pFileData_) {
 		X_DELETE_ARRAY(pFileData_, g_3dEngineArena);
