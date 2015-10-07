@@ -277,9 +277,7 @@ bool ModelHeader::isValid(void) const
 	}
 
 	return version == MODEL_VERSION &&
-#if X_DEBUG == 0 && 0
-		numBones > 0 &&
-#endif // !X_DEBUG
+		(numBones + numBlankBones) > 0 &&
 		numLod > 0 &&
 		numLod <= MODEL_MAX_LODS &&
 		materialNameDataSize > 0 &&
