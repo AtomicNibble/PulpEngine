@@ -351,7 +351,7 @@
     <IncludePath>$(solutiondir)..\3rdparty\source\maya\Maya2015;$(IncludePath)</IncludePath>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <TargetExt>.mll</TargetExt>
-    <TargetName>engine_$(ProjectName)2015$(PlatformName)</TargetName>
+    <TargetName>engine_$(ProjectName)2016$(PlatformName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_2012|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -407,7 +407,7 @@
     <TargetExt>.mll</TargetExt>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IncludePath>$(solutiondir)..\3rdparty\source\maya\Maya2015;$(IncludePath)</IncludePath>
-    <TargetName>engine_$(ProjectName)2015$(PlatformName)</TargetName>
+    <TargetName>engine_$(ProjectName)2016$(PlatformName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release_2016|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -428,7 +428,7 @@
     <TargetExt>.mll</TargetExt>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IncludePath>$(solutiondir)..\3rdparty\source\maya\Maya2015;$(IncludePath)</IncludePath>
-    <TargetName>engine_$(ProjectName)2015$(PlatformName)</TargetName>
+    <TargetName>engine_$(ProjectName)2016$(PlatformName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Super_2012|x64'">
     <LinkIncremental>false</LinkIncremental>
