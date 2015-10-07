@@ -307,24 +307,24 @@ bool Level::ProcessData(uint32_t bytesRead)
 	{
 		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_REFS);
 
-		areaEntRefHdrs_.resize(fileHdr_.numAreas);
+		areaModelRefHdrs_.resize(fileHdr_.numAreas);
 
-		file.readObj(areaEntRefHdrs_.ptr(), areaEntRefHdrs_.size());
+		file.readObj(areaModelRefHdrs_.ptr(), areaModelRefHdrs_.size());
 
 		size_t numEntRefs = fileHdr_.numEntRefs;
 		size_t numMultiAreaEntRefs = fileHdr_.numMultiAreaEntRefs;
 
 		// load into single buffer.
-		areaEntRefs_.resize(numEntRefs);
-		file.readObj(areaEntRefs_.ptr(), areaEntRefs_.size());
+		areaModelRefs_.resize(numEntRefs);
+		file.readObj(areaModelRefs_.ptr(), areaModelRefs_.size());
 
 		// load multi area ref list headers.
-		file.readObj(areaEntMultiRefHdrs_.data(), areaEntMultiRefHdrs_.size());
+		file.readObj(areaModelMultiRefHdrs_.data(), areaModelMultiRefHdrs_.size());
 
 
 		// load the multi area ref lists data.
-		areaMultiEntRefs_.resize(numMultiAreaEntRefs);
-		file.readObj(areaMultiEntRefs_.ptr(), areaMultiEntRefs_.size());
+		areaMultiModelRefs_.resize(numMultiAreaEntRefs);
+		file.readObj(areaMultiModelRefs_.ptr(), areaMultiModelRefs_.size());
 	}
 
 	{

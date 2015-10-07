@@ -174,12 +174,12 @@ private:
 	AreaArr areas_;
 	AreaNodeArr areaNodes_;
 
-	// ent refrences for each area.
-	AreaEntRefsHdrArr areaEntRefHdrs_;
-	AreaEntRefsArr areaEntRefs_;
-	// ent refrences for stuff that is in multiple area's
-	AreaMultiEntRefsHdrArr areaEntMultiRefHdrs_;
-	AreaMultiEntRefsArr areaMultiEntRefs_;
+	// model refrences for each area.
+	AreaEntRefsHdrArr areaModelRefHdrs_;
+	AreaEntRefsArr areaModelRefs_;
+	// multi area model refrences for models that are in multiple area's
+	AreaMultiEntRefsHdrArr areaModelMultiRefHdrs_;
+	AreaMultiEntRefsArr areaMultiModelRefs_;
 
 	// static mocel info.
 	StaticModelsArr staticModels_;

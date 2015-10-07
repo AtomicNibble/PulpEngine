@@ -80,9 +80,9 @@ Level::Level() :
 areas_(g_3dEngineArena),
 areaNodes_(g_3dEngineArena),
 stringTable_(g_3dEngineArena),
-areaEntRefs_(g_3dEngineArena),
-areaEntRefHdrs_(g_3dEngineArena),
-areaMultiEntRefs_(g_3dEngineArena),
+areaModelRefs_(g_3dEngineArena),
+areaModelRefHdrs_(g_3dEngineArena),
+areaMultiModelRefs_(g_3dEngineArena),
 staticModels_(g_3dEngineArena)
 {
 	frameID_ = 0;
@@ -185,10 +185,10 @@ void Level::free(void)
 	areas_.free();
 	areaNodes_.free();
 
-	areaEntRefs_.free();
-	areaEntRefHdrs_.free();
+	areaModelRefs_.free();
+	areaModelRefHdrs_.free();
 
-	areaMultiEntRefs_.free();
+	areaMultiModelRefs_.free();
 	// areaEntMultiRefHdrs_ <- fixed size.
 
 	staticModels_.free();
@@ -246,12 +246,12 @@ bool Level::render(void)
 	{
 		X_LOG0_EVERY_N(24, "Level", "In area: %i", camArea);
 
-		const FileAreaRefHdr& areaEnts = areaEntRefHdrs_[camArea];
-		const FileAreaRefHdr& multiAreaEnts = areaEntMultiRefHdrs_[0];
+		const FileAreaRefHdr& areaEnts = areaModelRefHdrs_[camArea];
+		const FileAreaRefHdr& multiAreaEnts = areaModelMultiRefHdrs_[0];
 		size_t numMulti = 0;
 		for (size_t j = 0; j < multiAreaEnts.num; j++)
 		{
-			if (core::bitUtil::IsBitSet(areaMultiEntRefs_[multiAreaEnts.startIndex + j].flags,
+			if (core::bitUtil::IsBitSet(areaMultiModelRefs_[multiAreaEnts.startIndex + j].flags,
 				camArea))
 			{
 				numMulti++;
