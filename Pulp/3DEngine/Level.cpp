@@ -76,7 +76,23 @@ Level::AreaRefInfo::AreaRefInfo(core::MemoryArenaBase* arena) :
 
 }
 
+void Level::AreaRefInfo::clear(void)
+{
+	areaModelRefHdrs.clear();
+	areaModelRefs.clear();
+	areaMultiModelRefs.clear();
 
+	core::zero_object(areaModelMultiRefHdrs);
+}
+
+void Level::AreaRefInfo::free(void)
+{
+	areaModelRefHdrs.free();
+	areaModelRefs.free();
+	areaMultiModelRefs.free();
+
+	core::zero_object(areaModelMultiRefHdrs);
+}
 
 // --------------------------------
 
