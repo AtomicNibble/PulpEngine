@@ -253,7 +253,7 @@ X_NAMESPACE_BEGIN(level)
 //
 //
 
-static const uint32_t	 LVL_VERSION = 14; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
+static const uint32_t	 LVL_VERSION = 15; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
 static const uint32_t	 LVL_FOURCC = X_TAG('x', 'l', 'v', 'l');
 static const uint32_t	 LVL_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r'); // if a file falid to write the final header, this will be it's FourCC
 // feels kinda wrong to call it a '.bsp', since it's otherthings as well. 
@@ -306,7 +306,14 @@ X_DECLARE_FLAGS(MatContentFlags)(SOLID, WATER, PLAYER_CLIP, MONSTER_CLIP, TRIGGE
 X_DECLARE_FLAGS(MatSurfaceFlags)(NO_DRAW, LADDER);
 
 // this is the flags for the file header, which tells you what option stuff is inside the file.
-X_DECLARE_FLAGS(LevelFileFlags)(INTER_AREA_INFO, AREA_REF_LISTS, BSP_TREE, OCT_TREE, DEBUG_PORTAL_DATA);
+X_DECLARE_FLAGS(LevelFileFlags)(
+	INTER_AREA_INFO,
+	AREA_ENT_REF_LISTS,
+	AREA_MODEL_REF_LISTS,
+	BSP_TREE, 
+	OCT_TREE, 
+	DEBUG_PORTAL_DATA
+);
 X_DECLARE_ENUM(SurfaceType)(Invalid, Plane, Patch);
 
 typedef Flags<MatContentFlags> MatContentFlag;
@@ -380,9 +387,10 @@ X_DECLARE_ENUM(FileNodes) (
 	STRING_TABLE,
 	AREAS,
 	AREA_PORTALS,
-	AREA_REFS,
-	BSP_TREE,
-	STATIC_MODELS
+	AREA_ENT_REFS,		// all ents except models.
+	AREA_MODEL_REFS,	// area model refs.
+	STATIC_MODELS,		// all the static models in the map.
+	BSP_TREE
 );
 
 X_DECLARE_ENUM(ClassType) (
@@ -462,6 +470,10 @@ struct FileHeader
 	// ent ref sizes.
 	int32_t numEntRefs;
 	int32_t numMultiAreaEntRefs;
+
+	// model ref sizes.
+	int32_t numModelRefs;
+	int32_t numMultiAreaModelRefs;
 	// size of the static model info.
 	int32_t numStaticModels;
 
@@ -495,7 +507,7 @@ X_ENSURE_SIZE(MultiAreaEntRef, 8);
 
 // check file structure sizes also.
 X_ENSURE_SIZE(FileNode, 8);
-X_ENSURE_SIZE(FileHeader, 52 + (sizeof(FileNode)* FileNodes::ENUM_COUNT));
+X_ENSURE_SIZE(FileHeader, 60 + (sizeof(FileNode)* FileNodes::ENUM_COUNT));
 
 X_NAMESPACE_END
 

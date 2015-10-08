@@ -209,11 +209,12 @@ bool LvlBuilder::save(const char* name)
 				X_DELETE(pWindRev, g_arena);
 			}
 		}
+
 		// area ent ref data
 		{
-			ScopedNodeInfo node(hdr.nodes[FileNodes::AREA_REFS], file);
+			ScopedNodeInfo node(hdr.nodes[FileNodes::AREA_ENT_REFS], file);
 
-			hdr.flags.Set(LevelFileFlags::AREA_REF_LISTS);
+			hdr.flags.Set(LevelFileFlags::AREA_ENT_REF_LISTS);
 
 			uint32_t num = 0;
 
@@ -245,7 +246,7 @@ bool LvlBuilder::save(const char* name)
 			for (i = 0; i < MAP_MAX_MULTI_REF_LISTS; i++)
 			{
 				FileAreaRefHdr refHdr;
-				refHdr.num = safe_static_cast<uint32_t, size_t>(multiRefLists_[i].size());
+				refHdr.num = safe_static_cast<uint32_t, size_t>(multiRefEntLists_[i].size());
 				refHdr.startIndex = num; // not used.
 			
 				num += refHdr.num;
@@ -259,7 +260,60 @@ bool LvlBuilder::save(const char* name)
 			// write multi area ent ref lists.
 			for (i = 0; i < MAP_MAX_MULTI_REF_LISTS; i++)
 			{
-				file->writeObj(multiRefLists_[i].ptr(), multiRefLists_[i].size());
+				file->writeObj(multiRefEntLists_[i].ptr(), multiRefEntLists_[i].size());
+			}
+		}
+
+		// area model ent refs
+		{
+			ScopedNodeInfo node(hdr.nodes[FileNodes::AREA_MODEL_REFS], file);
+			hdr.flags.Set(LevelFileFlags::AREA_MODEL_REF_LISTS);
+
+			uint32_t num = 0;
+
+			for (i = 0; i < areas_.size(); i++)
+			{
+				const LvlArea& area = areas_[i];
+				FileAreaRefHdr refHdr;
+				refHdr.startIndex = num;
+				refHdr.num = safe_static_cast<uint32_t, size_t>(area.modelsRefs.size());
+
+				num += safe_static_cast<uint32_t, size_t>(area.modelsRefs.size());
+
+				file->writeObj(refHdr);
+			}
+
+			// save the total.
+			hdr.numModelRefs = num;
+
+			// save each area's ref list.
+			for (i = 0; i < areas_.size(); i++)
+			{
+				const LvlArea& area = areas_[i];
+
+				file->writeObj(area.modelsRefs.ptr(), area.modelsRefs.size());
+			}
+
+			num = 0;
+
+			for (i = 0; i < MAP_MAX_MULTI_REF_LISTS; i++)
+			{
+				FileAreaRefHdr refHdr;
+				refHdr.num = safe_static_cast<uint32_t, size_t>(multiModelRefLists_[i].size());
+				refHdr.startIndex = num; // not used.
+
+				num += refHdr.num;
+
+				file->writeObj(refHdr);
+			}
+
+			// aave the tototal.
+			hdr.numMultiAreaModelRefs = num;
+
+			// write multi area ent ref lists.
+			for (i = 0; i < MAP_MAX_MULTI_REF_LISTS; i++)
+			{
+				file->writeObj(multiModelRefLists_[i].ptr(), multiModelRefLists_[i].size());
 			}
 		}
 

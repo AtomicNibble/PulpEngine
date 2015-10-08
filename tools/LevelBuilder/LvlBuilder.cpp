@@ -54,8 +54,13 @@ LvlBuilder::LvlBuilder() :
 staticModels_(g_arena),
 entities_(g_arena),
 areas_(g_arena),
-multiRefLists_({{ g_arena, g_arena, g_arena, g_arena,
+
+multiRefEntLists_({{ g_arena, g_arena, g_arena, g_arena,
 g_arena, g_arena, g_arena, g_arena }}),
+
+multiModelRefLists_({ { g_arena, g_arena, g_arena, g_arena,
+	g_arena, g_arena, g_arena, g_arena } }),
+
 stringTable_(g_arena),
 map_(nullptr)
 {

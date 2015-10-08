@@ -217,9 +217,8 @@ struct AreaSubMesh
 class LvlArea
 {
 	typedef core::HashMap<core::string, AreaSubMesh> AreaMeshMap;
-	typedef core::Array<uint32_t> AreaEntsRef;
-//	typedef core::Array<LvlEntity*> AreaEntsArr;
-//	typedef core::Array<AABB> CullSectionsArr;
+	typedef core::Array<uint32_t> AreaRefs;
+
 public:
 	LvlArea();
 
@@ -232,12 +231,8 @@ public:
 	AreaModel model;
 
 	AreaMeshMap areaMeshes;
-	AreaEntsRef entRefs;
-//	AreaEntsArr	entities;
-
-	// we split the area up into a optimal avg'd collection of AABB's
-	// which are turned into worker jobs.
-	//CullSectionsArr cullSections;
+	AreaRefs entRefs;
+	AreaRefs modelsRefs;
 
 	// copy of the model values.
 	AABB boundingBox;

@@ -12,6 +12,8 @@ class LvlBuilder
 {
 	typedef core::Array<mapfile::XMapEntity*> MapEntArr;
 	typedef core::Array<level::FileStaticModel> StaticModelsArr;
+	typedef std::array<core::Array<level::MultiAreaEntRef>, 
+		level::MAP_MAX_MULTI_REF_LISTS> MultiRefArr;
 
 public:
 	LvlBuilder();
@@ -56,7 +58,7 @@ private:
 	void AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sphere,
 		const Vec3f boundsPoints[8], bspNode* pNode);
 
-	void CollectStaticModels(void);
+	// void CollectStaticModels(void);
 
 private:
 	AABB defaultModelBounds_;
@@ -66,7 +68,8 @@ private:
 	LvlEntsArr	entities_;
 	LvlAreaArr	areas_;
 
-	std::array<core::Array<level::MultiAreaEntRef>, level::MAP_MAX_MULTI_REF_LISTS> multiRefLists_;
+	MultiRefArr multiRefEntLists_;
+	MultiRefArr multiModelRefLists_;
 
 	core::GrowingStringTableUnique<256, 16, 4, uint32_t> stringTable_;
 

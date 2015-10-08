@@ -510,7 +510,8 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 
 	for (i = 0; i < level::MAP_MAX_MULTI_REF_LISTS; i++)
 	{
-		multiRefLists_[i].clear();
+		multiRefEntLists_[i].clear();
+		multiModelRefLists_[i].clear();
 	}
 
 	numEnts = map_->getNumEntities();
@@ -581,7 +582,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 				// add to area's ref list.
 				LvlArea& area = this->areas_[areaList[0]];
 
-				area.entRefs.push_back(entId);
+				area.modelsRefs.push_back(entId);
 			}
 			else
 			{
@@ -605,7 +606,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 					if (flags[x] != 0)
 					{
 						entRef.flags = flags[x];
-						multiRefLists_[x].append(entRef);
+						multiModelRefLists_[x].append(entRef);
 					}
 				}
 
