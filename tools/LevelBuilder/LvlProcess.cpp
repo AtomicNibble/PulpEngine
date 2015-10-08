@@ -91,7 +91,7 @@ namespace
 		X_ASSERT_NOT_NULL(pSubmesh);
 
 		int least;
-		int i, r, ni;
+		int i, r;
 		int rotate;
 		size_t numIndexes;
 		level::Vertex* pVerts;
