@@ -69,29 +69,29 @@ PortalStack::PortalStack()
 // --------------------------------
 
 Level::AreaRefInfo::AreaRefInfo(core::MemoryArenaBase* arena) :
-	areaModelRefHdrs(arena),
-	areaModelRefs(arena),
-	areaMultiModelRefs(arena)
+	areaRefHdrs(arena),
+	areaRefs(arena),
+	areaMultiRefs(arena)
 {
 
 }
 
 void Level::AreaRefInfo::clear(void)
 {
-	areaModelRefHdrs.clear();
-	areaModelRefs.clear();
-	areaMultiModelRefs.clear();
+	areaRefHdrs.clear();
+	areaRefs.clear();
+	areaMultiRefs.clear();
 
-	core::zero_object(areaModelMultiRefHdrs);
+	core::zero_object(areaMultiRefHdrs);
 }
 
 void Level::AreaRefInfo::free(void)
 {
-	areaModelRefHdrs.free();
-	areaModelRefs.free();
-	areaMultiModelRefs.free();
+	areaRefHdrs.free();
+	areaRefs.free();
+	areaMultiRefs.free();
 
-	core::zero_object(areaModelMultiRefHdrs);
+	core::zero_object(areaMultiRefHdrs);
 }
 
 // --------------------------------

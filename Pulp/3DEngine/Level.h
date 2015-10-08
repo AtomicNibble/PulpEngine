@@ -128,11 +128,11 @@ class Level : public engine::XEngineBase
 		void free(void);
 
 		// ent with single area ref.
-		AreaRefsHdrArr areaModelRefHdrs;
-		AreaRefsArr areaModelRefs;
+		AreaRefsHdrArr areaRefHdrs;
+		AreaRefsArr areaRefs;
 		// multi area model refrences for models that are in multiple area's
-		AreaMultiRefsHdrArr areaModelMultiRefHdrs;
-		AreaMultiRefsArr areaMultiModelRefs;
+		AreaMultiRefsHdrArr areaMultiRefHdrs;
+		AreaMultiRefsArr areaMultiRefs;
 	};
 
 public:
