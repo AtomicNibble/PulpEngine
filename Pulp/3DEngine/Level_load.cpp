@@ -302,31 +302,57 @@ bool Level::ProcessData(uint32_t bytesRead)
 		X_WARNING("Level", "Level has no inter area portals.");
 	}
 
-	/*
+	
 	if (fileHdr_.flags.IsSet(LevelFileFlags::AREA_ENT_REF_LISTS))
 	{
 		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_ENT_REFS);
 
-		areaModelRefHdrs_.resize(fileHdr_.numAreas);
+		AreaRefInfo& entRefs = entRefs_;
+		entRefs.areaRefHdrs.resize(fileHdr_.numAreas);
 
-		file.readObj(areaModelRefHdrs_.ptr(), areaModelRefHdrs_.size());
+		file.readObj(entRefs.areaRefHdrs.ptr(), entRefs.areaRefHdrs.size());
 
 		size_t numEntRefs = fileHdr_.numEntRefs;
 		size_t numMultiAreaEntRefs = fileHdr_.numMultiAreaEntRefs;
 
+
 		// load into single buffer.
-		areaModelRefs_.resize(numEntRefs);
-		file.readObj(areaModelRefs_.ptr(), areaModelRefs_.size());
+		entRefs.areaRefs.resize(numEntRefs);
+		file.readObj(entRefs.areaRefs.ptr(), entRefs.areaRefs.size());
 
 		// load multi area ref list headers.
-		file.readObj(areaModelMultiRefHdrs_.data(), areaModelMultiRefHdrs_.size());
-
+		file.readObj(entRefs.areaMultiRefHdrs.data(), entRefs.areaMultiRefHdrs.size());
 
 		// load the multi area ref lists data.
-		areaMultiModelRefs_.resize(numMultiAreaEntRefs);
-		file.readObj(areaMultiModelRefs_.ptr(), areaMultiModelRefs_.size());
+		entRefs.areaMultiRefs.resize(numMultiAreaEntRefs);
+		file.readObj(entRefs.areaMultiRefs.ptr(), entRefs.areaMultiRefs.size());
 	}
-	*/
+
+	if (fileHdr_.flags.IsSet(LevelFileFlags::AREA_MODEL_REF_LISTS))
+	{
+		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_MODEL_REFS);
+
+		AreaRefInfo& entRefs = modelRefs_;
+		entRefs.areaRefHdrs.resize(fileHdr_.numAreas);
+
+		file.readObj(entRefs.areaRefHdrs.ptr(), entRefs.areaRefHdrs.size());
+
+		size_t numEntRefs = fileHdr_.numEntRefs;
+		size_t numMultiAreaEntRefs = fileHdr_.numMultiAreaEntRefs;
+
+
+		// load into single buffer.
+		entRefs.areaRefs.resize(numEntRefs);
+		file.readObj(entRefs.areaRefs.ptr(), entRefs.areaRefs.size());
+
+		// load multi area ref list headers.
+		file.readObj(entRefs.areaMultiRefHdrs.data(), entRefs.areaMultiRefHdrs.size());
+
+		// load the multi area ref lists data.
+		entRefs.areaMultiRefs.resize(numMultiAreaEntRefs);
+		file.readObj(entRefs.areaMultiRefs.ptr(), entRefs.areaMultiRefs.size());
+	}
+
 	{
 		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::STATIC_MODELS);
 
