@@ -68,6 +68,18 @@ PortalStack::PortalStack()
 
 // --------------------------------
 
+Level::AreaRefInfo::AreaRefInfo(core::MemoryArenaBase* arena) :
+	areaModelRefHdrs(arena),
+	areaModelRefs(arena),
+	areaMultiModelRefs(arena)
+{
+
+}
+
+
+
+// --------------------------------
+
 int Level::s_var_usePortals_ = 1;
 int Level::s_var_drawAreaBounds_ = 0;
 int Level::s_var_drawPortals_ = 0;
@@ -80,9 +92,8 @@ Level::Level() :
 areas_(g_3dEngineArena),
 areaNodes_(g_3dEngineArena),
 stringTable_(g_3dEngineArena),
-areaModelRefs_(g_3dEngineArena),
-areaModelRefHdrs_(g_3dEngineArena),
-areaMultiModelRefs_(g_3dEngineArena),
+entRefs_(g_3dEngineArena),
+modelRefs_(g_3dEngineArena),
 staticModels_(g_3dEngineArena)
 {
 	frameID_ = 0;
@@ -185,11 +196,8 @@ void Level::free(void)
 	areas_.free();
 	areaNodes_.free();
 
-	areaModelRefs_.free();
-	areaModelRefHdrs_.free();
-
-	areaMultiModelRefs_.free();
-	// areaEntMultiRefHdrs_ <- fixed size.
+	entRefs_.free();
+	modelRefs_.free();
 
 	staticModels_.free();
 
@@ -246,6 +254,7 @@ bool Level::render(void)
 	{
 		X_LOG0_EVERY_N(24, "Level", "In area: %i", camArea);
 
+#if 0
 		const FileAreaRefHdr& areaEnts = areaModelRefHdrs_[camArea];
 		const FileAreaRefHdr& multiAreaEnts = areaModelMultiRefHdrs_[0];
 		size_t numMulti = 0;
@@ -260,6 +269,7 @@ bool Level::render(void)
 
 		X_LOG0_EVERY_N(24, "Level", "ents In area: %i multi: %i", 
 			areaEnts.num, numMulti);
+#endif
 	}
 
 

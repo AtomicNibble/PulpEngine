@@ -302,10 +302,10 @@ bool Level::ProcessData(uint32_t bytesRead)
 		X_WARNING("Level", "Level has no inter area portals.");
 	}
 
-
-	if (fileHdr_.flags.IsSet(LevelFileFlags::AREA_REF_LISTS))
+	/*
+	if (fileHdr_.flags.IsSet(LevelFileFlags::AREA_ENT_REF_LISTS))
 	{
-		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_REFS);
+		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_ENT_REFS);
 
 		areaModelRefHdrs_.resize(fileHdr_.numAreas);
 
@@ -326,7 +326,7 @@ bool Level::ProcessData(uint32_t bytesRead)
 		areaMultiModelRefs_.resize(numMultiAreaEntRefs);
 		file.readObj(areaMultiModelRefs_.ptr(), areaMultiModelRefs_.size());
 	}
-
+	*/
 	{
 		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::STATIC_MODELS);
 

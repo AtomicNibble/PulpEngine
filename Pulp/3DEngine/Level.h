@@ -113,12 +113,27 @@ class Level : public engine::XEngineBase
 {
 	typedef core::Array<Area> AreaArr;
 	typedef core::Array<AreaNode> AreaNodeArr;
-	typedef core::Array<AreaEntRef> AreaEntRefsArr;
-	typedef core::Array<FileAreaRefHdr> AreaEntRefsHdrArr;
-	typedef core::Array<MultiAreaEntRef> AreaMultiEntRefsArr;
-	typedef std::array<FileAreaRefHdr, MAP_MAX_MULTI_REF_LISTS> AreaMultiEntRefsHdrArr;
+	typedef core::Array<AreaEntRef> AreaRefsArr;
+	typedef core::Array<FileAreaRefHdr> AreaRefsHdrArr;
+	typedef core::Array<MultiAreaEntRef> AreaMultiRefsArr;
+	typedef std::array<FileAreaRefHdr, MAP_MAX_MULTI_REF_LISTS> AreaMultiRefsHdrArr;
 
 	typedef core::Array<level::StaticModel> StaticModelsArr;
+
+	struct AreaRefInfo
+	{
+		AreaRefInfo(core::MemoryArenaBase* arena);
+
+		void clear(void);
+		void free(void);
+
+		// ent with single area ref.
+		AreaRefsHdrArr areaModelRefHdrs;
+		AreaRefsArr areaModelRefs;
+		// multi area model refrences for models that are in multiple area's
+		AreaMultiRefsHdrArr areaModelMultiRefHdrs;
+		AreaMultiRefsArr areaMultiModelRefs;
+	};
 
 public:
 	Level();
@@ -174,12 +189,8 @@ private:
 	AreaArr areas_;
 	AreaNodeArr areaNodes_;
 
-	// model refrences for each area.
-	AreaEntRefsHdrArr areaModelRefHdrs_;
-	AreaEntRefsArr areaModelRefs_;
-	// multi area model refrences for models that are in multiple area's
-	AreaMultiEntRefsHdrArr areaModelMultiRefHdrs_;
-	AreaMultiEntRefsArr areaMultiModelRefs_;
+	AreaRefInfo entRefs_;
+	AreaRefInfo modelRefs_;
 
 	// static mocel info.
 	StaticModelsArr staticModels_;
