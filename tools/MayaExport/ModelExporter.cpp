@@ -464,6 +464,8 @@ void PotatoOptions::reset(void)
 	filePath_.clear();
 	scale_ = 1.0f;
 	jointThreshold_ = JOINT_WEIGHT_THRESHOLD;
+	zeroOrigin_ = true;
+	whiteVertColors_ = true;
 	forceBoneFilters_.clear();
 	progressCntl_.clear();
 	exportMode_ = EXPORT_INPUT;
@@ -545,6 +547,7 @@ MayaMesh::MayaMesh() :
 	faces(g_arena),
 	weights(g_arena)
 {
+	hasBinds = false;
 }
 
 MayaMesh::~MayaMesh()
@@ -557,6 +560,8 @@ void MayaMesh::clear(void)
 	verts.clear();
 	faces.clear();
 	weights.clear();
+
+	hasBinds = false;
 }
 
 void MayaMesh::merge(MayaMesh *mesh)
@@ -709,7 +714,8 @@ void MayaMesh::calBoundingbox()
 MayaLOD::MayaLOD() :
 	meshes_(g_arena)
 {
-
+	pModel = nullptr;
+	lodIdx_ = -1;
 }
 
 MayaLOD::~MayaLOD()
