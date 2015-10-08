@@ -17,11 +17,6 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	*front = *back = nullptr;
 	Planef &plane = planes[planenum];
 
-	if (brush->sides.size() < 6)
-	{
-		int goat = 0;
-	}
-
 	// check all points
 	d_front = d_back = 0;
 	for (i = 0; i < brush->sides.size(); i++)
@@ -80,13 +75,6 @@ void LvlBuilder::SplitBrush(LvlBrush* brush, int32_t planenum,
 	}
 
 	midwinding = w;
-
-	static int goat = 0;
-	goat++;
-
-	if (goat == 15) {
-		int xamel = 0;
-	}
 
 	// split it for real
 	for (i = 0; i < 2; i++) {

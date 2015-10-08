@@ -134,7 +134,7 @@ namespace
 				rotate = (r + least) % numVerts;
 
 				// walk the winding in both directions 
-				for (ni = 0, i = 0; i < numVerts - 2 - i; i++)
+				for (i = 0; i < numVerts - 2 - i; i++)
 				{
 					// make indexes 
 					model::Face face;
@@ -408,8 +408,6 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 	}
 #endif
 
-
-	int goat = 0;
 }
 
 
