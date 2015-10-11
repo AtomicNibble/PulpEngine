@@ -298,7 +298,7 @@ bool Level::render(void)
 		{
 			for (; it != areas_.end(); ++it)
 			{
-				it->pRenderMesh->render();
+				DrawArea(*it); 
 			}
 		}
 		else
@@ -306,7 +306,7 @@ bool Level::render(void)
 			if (s_var_drawCurrentAreaOnly_)
 			{
 				// draw just this area.
-				areas_[camArea].pRenderMesh->render();
+				DrawArea(areas_[camArea]);  
 			}
 			else
 			{
@@ -320,7 +320,7 @@ bool Level::render(void)
 				{
 					if (a.frameID == frameID_)
 					{
-						a.pRenderMesh->render();
+						DrawArea(a); 
 					}
 				}
 			}
@@ -329,11 +329,30 @@ bool Level::render(void)
 	else if (s_var_drawArea_ < safe_static_cast<int, size_t>(areas_.size()))
 	{
 		// force draw just this area even if outside world.
-		areas_[s_var_drawArea_].pRenderMesh->render();
+		DrawArea(areas_[s_var_drawArea_]);
 	}
 
 	DrawPortalDebug();
 	return true;
+}
+
+void Level::DrawArea(const Area& area)
+{
+	area.pRenderMesh->render();
+	/*
+	const FileAreaRefHdr& areaModelsHdr = modelRefs_.areaRefHdrs[area.areaNum];
+
+	size_t i, end;
+
+	i = areaModelsHdr.startIndex;
+	end = i + areaModelsHdr.num;
+	for (; i < end; i++)
+	{
+		level::StaticModel& model = staticModels_[i];
+
+		model.pRenderMesh->render();
+	}
+	*/
 }
 
 

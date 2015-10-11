@@ -176,9 +176,12 @@ private:
 
 	void AddAreaRefs(int32_t areaNum, const PortalStack* ps);
 
+	void DrawArea(const Area& area);
+
 private:
 	bool ProcessHeader(uint32_t bytesRead);
 	bool ProcessData(uint32_t bytesRead);
+
 
 private:
 	int32_t CommonChildrenArea_r(AreaNode* pAreaNode);
