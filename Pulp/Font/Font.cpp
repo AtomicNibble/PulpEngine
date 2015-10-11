@@ -39,8 +39,9 @@ void ByteToWide(const char* pStr, wchar_t* pOut, const size_t buflen)
 {
 	size_t len = core::Min<size_t>(buflen, strlen(pStr));
 
-	for (size_t i = 0; i<len; ++i)
+	for (size_t i = 0; i < len; ++i) {
 		pOut[i] = (uint8_t)pStr[i];
+	}
 	pOut[len] = 0;
 }
 
@@ -114,8 +115,9 @@ bool XFFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 	int iSmoothMethod = (flags & TTFFLAG_SMOOTH_MASK) >> TTFFLAG_SMOOTH_SHIFT;
 	int iSmoothAmount = (flags & TTFFLAG_SMOOTH_AMOUNT_MASK) >> TTFFLAG_SMOOTH_AMOUNT_SHIFT;
 
-	if (!pFilePath)
+	if (!pFilePath) {
 		return false;
+	}
 
 	X_LOG0("Font", "loading: \"%s\"", pFilePath);
 
@@ -128,16 +130,18 @@ bool XFFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 	{
 		len = file.remainingBytes();
 		if (len > 0) {
-			pBuffer = X_NEW_ARRAY( uint8_t,len,g_fontArena, "FontTTFBuffer");
+			pBuffer = X_NEW_ARRAY(uint8_t,len,g_fontArena, "FontTTFBuffer");
 			file.read(pBuffer, len);
 		}
 	}
 
-	if (pBuffer == nullptr || len == 0)
+	if (pBuffer == nullptr || len == 0) {
 		return false;
+	}
 
-	if (!pFontTexture_)
-		pFontTexture_ = X_NEW( XFontTexture, g_fontArena, "FontTexture");
+	if (!pFontTexture_) {
+		pFontTexture_ = X_NEW(XFontTexture, g_fontArena, "FontTexture");
+	}
 
 	if (!pFontTexture_->CreateFromMemory(pBuffer, len, width, height, iSmoothMethod, iSmoothAmount)) {
 
@@ -164,8 +168,9 @@ void XFFont::Reload(void)
 
 void XFFont::DrawString(const Vec2f& pos, const char* pStr, const XTextDrawConect& contex)
 {
-	if (!pStr)
+	if (!pStr) {
 		return;
+	}
 
 	// to wide char
 	wchar_t strW[MAX_TXT_SIZE];
@@ -177,8 +182,9 @@ void XFFont::DrawString(const Vec2f& pos, const char* pStr, const XTextDrawConec
 
 void XFFont::DrawString(float x, float y, const char* pStr, const XTextDrawConect& contex)
 {
-	if (!pStr)
+	if (!pStr) {
 		return;
+	}
 
 	// to wide char
 	wchar_t strW[MAX_TXT_SIZE];
@@ -190,8 +196,9 @@ void XFFont::DrawString(float x, float y, const char* pStr, const XTextDrawConec
 
 void XFFont::DrawString(const Vec3f& pos, const char* pStr, const XTextDrawConect& contex)
 {
-	if (!pStr)
+	if (!pStr) {
 		return;
+	}
 
 	// to wide char
 	wchar_t strW[MAX_TXT_SIZE];
@@ -216,8 +223,9 @@ void XFFont::DrawStringW(const Vec3f& pos, const wchar_t* pStr, const XTextDrawC
 // calculate the size.
 Vec2f XFFont::GetTextSize(const char* pStr, const XTextDrawConect& contex)
 {
-	if (!pStr)
+	if (!pStr) {
 		return Vec2f::zero();
+	}
 
 	// to wide char
 	wchar_t strW[MAX_TXT_SIZE];
@@ -237,8 +245,9 @@ uint32_t XFFont::GetEffectId(const char* pEffectName) const
 	Effets::ConstIterator it;
 	uint32_t idx = 0;
 	for (it = effects_.begin(); it != effects_.end(); ++it, idx++) {
-		if (it->name.isEqual(pEffectName))
+		if (it->name.isEqual(pEffectName)) {
 			break;
+		}
 	}
 	return idx;
 }
@@ -249,8 +258,8 @@ void XFFont::GetGradientTextureCoord(float& minU, float& minV, float& maxU, floa
 	const XTextureSlot* pSlot = pFontTexture_->GetGradientSlot();
 	X_ASSERT_NOT_NULL(pSlot);
 
-	float invWidth = 1.0f / (float)pFontTexture_->GetWidth();
-	float invHeight = 1.0f / (float)pFontTexture_->GetHeight();
+	float invWidth = 1.0f / static_cast<float>(pFontTexture_->GetWidth());
+	float invHeight = 1.0f / static_cast<float>(pFontTexture_->GetHeight());
 
 	// deflate by one pixel to avoid bilinear filtering on the borders
 	minU = pSlot->vTexCoord[0] + invWidth;
@@ -263,8 +272,9 @@ void XFFont::GetGradientTextureCoord(float& minU, float& minV, float& maxU, floa
 
 void XFFont::DrawStringWInternal(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& contex)
 {
-	if (!pStr)
+	if (!pStr) {
 		return;
+	}
 
 	render::IRender* pRenderer = gEnv->pRender;
 
@@ -275,8 +285,9 @@ Vec2f XFFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& c
 {
 	X_PROFILE_BEGIN("FontTextSize", core::ProfileSubSys::FONT);
 
-	if (!pStr)
+	if (!pStr) {
 		return Vec2f::zero();
+	}
 
 	render::IRender* pRenderer = gEnv->pRender;
 
@@ -311,8 +322,9 @@ Vec2f XFFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& c
 	float charX = 0;
 	float charY = 0 + size.y;
 
-	if (charY > maxH)
+	if (charY > maxH) {
 		maxH = charY;
+	}
 
 	// parse the string, ignoring control characters
 	wchar_t* pChar = (wchar_t*)pStr;
@@ -397,8 +409,9 @@ Vec2f XFFont::GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& c
 		charX += advance;
 	}
 
-	if (charX > maxW)
+	if (charX > maxW) {
 		maxW = charX;
+	}
 
 	return Vec2f(maxW, maxH);
 }
@@ -536,13 +549,15 @@ void XFFont::Prepare(const wchar_t* pStr, bool updateTexture)
 		gEnv->pRender->FontUpdateTexture(texID_, 0, 0, 
 			pFontTexture_->GetWidth(),
 			pFontTexture_->GetHeight(),
-			(unsigned char*)pFontTexture_->GetBuffer()
-			);
+			pFontTexture_->GetBuffer()
+		);
 
 		fontTexDirty_ = false;
 	}
 	else
+	{
 		fontTexDirty_ = texUpdateNeeded;
+	}
 }
 
 
@@ -558,8 +573,9 @@ void XFFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDr
 	uint32_t vbOffset;
 	bool drawFrame;
 
-	if(texID_ == -1 && !InitTexture(), 0)
+	if (texID_ == -1 && !InitTexture(), 0) {
 		return;
+	}
 
 	if (effects_.isEmpty()) {
 		X_WARNING("Font", "%s has no effects.", this->getName());
