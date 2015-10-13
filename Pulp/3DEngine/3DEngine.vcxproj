@@ -379,6 +379,7 @@
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialManager.h" />
     <ClInclude Include="ModelLoader.h" />
+    <ClInclude Include="ModelManager.h" />
     <ClInclude Include="X3DEngine.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XModel.h" />
@@ -397,6 +398,7 @@
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
     <ClCompile Include="ModelLoader.cpp" />
+    <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="RenderEngine.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
