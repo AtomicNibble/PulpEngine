@@ -412,6 +412,18 @@ private:
 	const char* pData_;
 };
 
+struct IModelManager
+{
+	virtual ~IModelManager(){}
+
+	// returns null if not found, ref count unaffected
+	virtual void* findModel(const char* ModelName) const X_ABSTRACT;
+	// if material is found adds ref and returns, if not try's to load the material file.
+	// if file can't be loaded or error it return the default material.
+	virtual void* loadModel(const char* ModelName) X_ABSTRACT;
+
+	virtual void* getDefaultModel(void) X_ABSTRACT;
+};
 
 
 struct ModelHeader // File header.
