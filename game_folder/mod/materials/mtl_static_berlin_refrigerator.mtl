@@ -1,0 +1,13 @@
+<material name="" flags="8" SurfaceType="none">
+	<textures>
+		<texture type="albedo" image_name="textures/atoll_ship_metal_rust1_c.dds" />
+	</textures>
+
+	<Params 
+		diffuse="1,1,1,1"
+		specular="1,1,1,1"
+		emissive="1,1,1,1"
+		shineness="1"
+		opacity="1"
+	/>
+</material>
