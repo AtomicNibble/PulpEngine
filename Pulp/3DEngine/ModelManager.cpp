@@ -82,7 +82,7 @@ void* XModelManager::loadModel(const char* ModelName)
 	}
 
 	// try find it.
-	iMat = findMaterial(MtlName);
+	iMat = findModel(ModelName);
 
 	if (iMat)
 	{
