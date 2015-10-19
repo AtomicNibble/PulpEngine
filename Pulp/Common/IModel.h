@@ -25,7 +25,7 @@ X_NAMESPACE_BEGIN(model)
 // The Model Foramts
 //
 //  File Ext: .model
-//	Version: 6.0 (i keep adding features / improving :( )
+//	Version: 10.0 (i keep adding features / improving :( )
 //  Info:
 //  
 //  This format contains the model info.
@@ -80,6 +80,14 @@ X_NAMESPACE_BEGIN(model)
 //		Since I will not need all the info all the time.
 //
 //		Streams in the file appear in the same order as the flags.
+//
+//  Version 9:
+//			??
+//
+//	Version 10:
+//			Includes combined AABB in header.
+//	
+//
 
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
 #define X_MODEL_MTL_LOWER_CASE_NAMES 1
