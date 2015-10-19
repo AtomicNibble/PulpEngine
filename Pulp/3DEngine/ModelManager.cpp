@@ -60,17 +60,18 @@ void XModelManager::ShutDown(void)
 }
 
 
-void* XModelManager::findModel(const char* ModelName) const
+IModel* XModelManager::findModel(const char* ModelName) const
 {
 	X_UNUSED(ModelName);
 
 	return nullptr;
 }
 
-void* XModelManager::loadModel(const char* ModelName)
+IModel* XModelManager::loadModel(const char* ModelName)
 {
 	X_ASSERT_NOT_NULL(ModelName);
 	const char* pExt;
+	IModel* iModel;
 
 	pExt = core::strUtil::FileExtension(ModelName);
 	if (pExt)
@@ -80,21 +81,21 @@ void* XModelManager::loadModel(const char* ModelName)
 			pExt);
 		return getDefaultModel();
 	}
-
+	
 	// try find it.
-	iMat = findModel(ModelName);
+	iModel = findModel(ModelName);
 
-	if (iMat)
+	if (iModel)
 	{
 		// inc ref count.
-		static_cast<XMaterial*>(iMat)->addRef();
-		return iMat;
+		iModel->addRef();
+		return iModel;
 	}
-
+	
 	return nullptr;
 }
 
-void* XModelManager::getDefaultModel(void)
+IModel* XModelManager::getDefaultModel(void)
 {
 
 	return nullptr;

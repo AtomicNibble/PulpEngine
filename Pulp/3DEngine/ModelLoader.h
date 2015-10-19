@@ -12,27 +12,6 @@
 X_NAMESPACE_BEGIN(model)
 
 
-//
-// Loads a mesh into a XMesh
-//
-//	the data is:
-//	
-//	||||| HEADER |||||
-
-//  ||||| tag name IDX |||||
-//  ||||| Bone Tree    |||||
-//  ||||| Bone angles  |||||
-//  ||||| Bone pos     |||||
-//	
-//
-//  ||||| All MeshHeaders   |||||
-//  ||||| All the verts   |||||
-//  ||||| All the faces   |||||
-//
-// I want to basically just check the header.
-// then be able to calculate the total buffer size.
-// load it and set the data pointers.
-//
 
 
 class ModelLoader : public engine::XEngineBase

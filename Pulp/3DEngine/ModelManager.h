@@ -22,12 +22,12 @@ public:
 
 	// IModelManager
 
-	void* findModel(const char* ModelName) const X_FINAL;
+	IModel* findModel(const char* ModelName) const X_FINAL;
 	// if material is found adds ref and returns, if not try's to load the material file.
 	// if file can't be loaded or error it return the default material.
-	void* loadModel(const char* ModelName) X_FINAL;
+	IModel* loadModel(const char* ModelName) X_FINAL;
 
-	void* getDefaultModel(void) X_FINAL;
+	IModel* getDefaultModel(void) X_FINAL;
 
 	// ~IModelManager
 

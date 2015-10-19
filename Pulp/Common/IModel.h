@@ -356,6 +356,7 @@ struct LODHeader : public MeshHeader
 };
 
 
+/*
 class XModel // a loaded mesh
 {
 	friend class ModelLoader;
@@ -419,18 +420,46 @@ private:
 
 	const char* pData_;
 };
+*/
+
+// I need to work out how to store models in the ModelManager
+// A model contains 1-4 lods so it can be represented by a renderMesh
+// We also keep lod info for working out which lod is visible for drawing.
+// In order for a render mesh to stay valid the XModel object must stay alive
+// and the buffer it points to.
+// SHould I just make the Xmodel ref counted?
+// OR make a interface any move XModel into the 3dengine.
+
+
+struct IModel
+{
+	virtual ~IModel() {}
+
+	virtual const int addRef(void) X_ABSTRACT;
+	virtual const int release(void) X_ABSTRACT;
+	virtual const int forceRelease(void) X_ABSTRACT;
+
+	virtual const char* getName(void) const X_ABSTRACT;
+	virtual int32_t numLods(void) const X_ABSTRACT;
+	virtual int32_t numBones(void) const X_ABSTRACT;
+	virtual int32_t numBlankBones(void) const X_ABSTRACT;
+	virtual int32_t numMeshTotal(void) const X_ABSTRACT;
+	virtual bool HasLods(void) const X_ABSTRACT;
+
+
+};
 
 struct IModelManager
 {
 	virtual ~IModelManager(){}
 
 	// returns null if not found, ref count unaffected
-	virtual void* findModel(const char* ModelName) const X_ABSTRACT;
+	virtual IModel* findModel(const char* ModelName) const X_ABSTRACT;
 	// if material is found adds ref and returns, if not try's to load the material file.
 	// if file can't be loaded or error it return the default material.
-	virtual void* loadModel(const char* ModelName) X_ABSTRACT;
+	virtual IModel* loadModel(const char* ModelName) X_ABSTRACT;
 
-	virtual void* getDefaultModel(void) X_ABSTRACT;
+	virtual IModel* getDefaultModel(void) X_ABSTRACT;
 };
 
 

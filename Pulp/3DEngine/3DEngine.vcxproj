@@ -413,6 +413,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="X3DEngine.cpp" />
+    <ClCompile Include="XModel.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Gui\Gui.inl" />

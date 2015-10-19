@@ -48,6 +48,9 @@
     <ClCompile Include="ModelManager.cpp">
       <Filter>Model</Filter>
     </ClCompile>
+    <ClCompile Include="XModel.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
