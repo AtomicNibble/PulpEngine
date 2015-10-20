@@ -6,7 +6,6 @@
 #include <String\Xml.h>
 
 
-X_LINK_LIB("engine_3DEngine")
 
 X_NAMESPACE_BEGIN(lvl)
 

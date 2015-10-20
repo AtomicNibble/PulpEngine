@@ -49,7 +49,7 @@ struct XRegFactoryNode* g_pHeadToRegFactories = 0;
 
 // X_LINK_LIB("engine_Font")
 X_LINK_LIB("engine_Core")
-// X_LINK_LIB("engine_3DEngine")
+X_LINK_LIB("engine_3DEngine")
 X_LINK_LIB("engine_RenderNull")
 // X_LINK_LIB("engine_Script")
 
