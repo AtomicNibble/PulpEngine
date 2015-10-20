@@ -410,7 +410,7 @@ IMaterial* XMaterialManager::createMaterial(const char* MtlName)
 {
 	XMaterial *pMat = nullptr;
 
-	pMat = static_cast<XMaterial*>(materials_.findAsset(MtlName));
+	pMat = static_cast<XMaterial*>(materials_.findAsset(X_CONST_STRING(MtlName)));
 
 	if (pMat)
 	{
@@ -436,7 +436,9 @@ IMaterial* XMaterialManager::findMaterial(const char* MtlName) const
 {
 	X_ASSERT_NOT_NULL(MtlName);
 
-	XMaterial* pMaterial = static_cast<XMaterial*>(materials_.findAsset(MtlName));
+	XMaterial* pMaterial = static_cast<XMaterial*>(
+		materials_.findAsset(X_CONST_STRING(MtlName)));
+
 	if (pMaterial) {
 		return pMaterial;
 	}
