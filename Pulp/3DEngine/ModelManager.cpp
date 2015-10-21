@@ -3,6 +3,8 @@
 
 #include <IConsole.h>
 
+#include "XModel.h"
+
 X_NAMESPACE_BEGIN(model)
 
 namespace
@@ -64,6 +66,13 @@ IModel* XModelManager::findModel(const char* ModelName) const
 {
 	X_UNUSED(ModelName);
 
+	XModel* pModel = static_cast<XModel*>(
+		models_.findAsset(X_CONST_STRING(ModelName)));
+
+	if (pModel) {
+		return pModel;
+	}
+
 	return nullptr;
 }
 
@@ -91,6 +100,8 @@ IModel* XModelManager::loadModel(const char* ModelName)
 		iModel->addRef();
 		return iModel;
 	}
+
+
 	
 	return nullptr;
 }
