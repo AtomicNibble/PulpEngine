@@ -365,7 +365,7 @@ struct StaticModel
 	Quatf angle;
 
 	uint32_t modelNameIdx;
-	model::IRenderMesh* pRenderMesh;
+	model::IModel* pModel;
 };
 #endif
 
