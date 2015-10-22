@@ -38,8 +38,12 @@ public:
 	void ListModels(const char* searchPatten = nullptr) const;
 
 private:
+	IModel* LoadCompiledModel(const char* ModelName);
+
+private:
 	typedef core::XResourceContainer ModelCon;
 
+	IModel*		pDefaultModel_;
 	ModelCon	models_;
 };
 

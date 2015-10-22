@@ -3,6 +3,11 @@
 
 #include <IConsole.h>
 
+#include "XModel.h"
+
+#include <algorithm>
+
+
 X_NAMESPACE_BEGIN(model)
 
 namespace
@@ -19,10 +24,23 @@ namespace
 		(static_cast<XModelManager*>(engine::XEngineBase::getModelManager()))->ListModels(searchPatten);
 	}
 
+	static void sortModelsByName(core::Array<XModel*>& models)
+	{
+		std::sort(models.begin(), models.end(),
+			[](XModel* a, XModel* b)
+		{
+			const char* nameA = a->getName();
+			const char* nameB = b->getName();
+			return strcmp(nameA, nameB) < 0;
+		}
+		);
+	}
 }
 
 
-XModelManager::XModelManager() : models_(g_3dEngineArena, 2048)
+XModelManager::XModelManager() : 
+	pDefaultModel_(nullptr),
+	models_(g_3dEngineArena, 2048)
 {
 
 }
@@ -42,6 +60,9 @@ void XModelManager::Init(void)
 
 	// hotreload support.
 	gEnv->pHotReload->addfileType(this, MODEL_FILE_EXTENSION);
+
+	// should load the default model.
+
 }
 
 
@@ -55,7 +76,21 @@ void XModelManager::ShutDown(void)
 	core::XResourceContainer::ResourceItor it = models_.begin();
 	for (; it != models_.end();)
 	{
+		IModel* pModel = static_cast<XModel*>(it->second);
+		
+		++it;
 
+		if (!pModel) {
+			continue;
+		}
+
+		X_WARNING("XModel", "\"%s\" was not deleted", pModel->getName());
+		pModel->forceRelease();
+	}
+
+	// default model
+	if (pDefaultModel_) {
+		pDefaultModel_->forceRelease();
 	}
 }
 
@@ -91,7 +126,13 @@ IModel* XModelManager::loadModel(const char* ModelName)
 		iModel->addRef();
 		return iModel;
 	}
-	
+
+	// try load it.
+	iModel = LoadCompiledModel(ModelName);
+	if (iModel) {
+		return iModel;
+	}
+
 	return nullptr;
 }
 
@@ -118,5 +159,56 @@ bool XModelManager::OnFileChange(const char* name)
 	return true;
 }
 
+void XModelManager::ListModels(const char* searchPatten) const
+{
+	core::Array<XModel*> sorted_models(g_3dEngineArena);
+	sorted_models.setGranularity(models_.size());
+
+	ModelCon::ResourceConstItor ModelIt;
+
+	for (ModelIt = models_.begin(); ModelIt != models_.end(); ++ModelIt)
+	{
+		XModel* model = static_cast<XModel*>(ModelIt->second);
+
+		if (!searchPatten || core::strUtil::WildCompare(searchPatten, model->getName()))
+		{
+			sorted_models.push_back(model);
+		}
+	}
+
+	sortModelsByName(sorted_models);
+
+	X_LOG0("Console", "------------ ^8Models(%i)^7 ------------", sorted_models.size());
+	X_LOG_BULLET;
+
+	core::Array<XModel*>::ConstIterator it = sorted_models.begin();
+	for (; it != sorted_models.end(); ++it)
+	{
+		const XModel* model = *it;
+		X_LOG0("Model", "^2\"%s\"^7",
+			model->getName());
+	}
+
+	X_LOG0("Console", "------------ ^8Materials End^7 ------------");
+
+}
+
+IModel* XModelManager::LoadCompiledModel(const char* ModelName)
+{
+	// check if the file exsists.
+	XModel* pModel = X_NEW(XModel, g_3dEngineArena, "3DModel");
+	if (pModel)
+	{
+		if (pModel->LoadModel(ModelName))
+		{
+			models_.AddAsset(ModelName, pModel);
+		}
+		else
+		{
+			X_DELETE(pModel, g_3dEngineArena);
+		}
+	}
+	return nullptr;
+}
 
 X_NAMESPACE_END
