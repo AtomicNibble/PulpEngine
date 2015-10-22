@@ -373,6 +373,11 @@ bool Level::ProcessData(uint32_t bytesRead)
 				sm.angle = fsm.angle;
 				sm.modelNameIdx = fsm.modelNameIdx;
 				// models need to be loaded at some point.
+
+				const char* modelName = stringTable_.getString(sm.modelNameIdx);
+				model::IModel* pModel = getModelManager()->loadModel(modelName);
+				
+				sm.pModel = pModel;
 			}
 		}
 	}
