@@ -378,7 +378,6 @@
     <ClInclude Include="Level.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="MaterialManager.h" />
-    <ClInclude Include="ModelLoader.h" />
     <ClInclude Include="ModelManager.h" />
     <ClInclude Include="X3DEngine.h" />
     <ClInclude Include="stdafx.h" />
@@ -397,7 +396,6 @@
     <ClCompile Include="Level_portal.cpp" />
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="MaterialManager.cpp" />
-    <ClCompile Include="ModelLoader.cpp" />
     <ClCompile Include="ModelManager.cpp" />
     <ClCompile Include="RenderEngine.cpp" />
     <ClCompile Include="stdafx.cpp">

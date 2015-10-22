@@ -99,6 +99,13 @@ IModel* XModelManager::findModel(const char* ModelName) const
 {
 	X_UNUSED(ModelName);
 
+	XModel* pModel = static_cast<XModel*>(
+		models_.findAsset(X_CONST_STRING(ModelName)));
+
+	if (pModel) {
+		return pModel;
+	}
+
 	return nullptr;
 }
 

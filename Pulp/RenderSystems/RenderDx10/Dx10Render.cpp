@@ -8,8 +8,6 @@
 #include "../Common/Shader/XShader.h"
 #include "Dx10Shader.h"
 
-#include "../3DEngine/ModelLoader.h"
-
 #include "Dx10RenderAux.h"
 
 X_NAMESPACE_BEGIN(render)

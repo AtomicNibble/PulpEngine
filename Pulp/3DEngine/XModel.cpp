@@ -79,13 +79,13 @@ bool XModel::HasLods(void) const
 
 const LODHeader& XModel::getLod(size_t idx) const 
 {
-	X_ASSERT(idx < numLods_, "invalid lod index")(numLods(), idx);
+	X_ASSERT(idx < static_cast<size_t>(numLods_), "invalid lod index")(numLods(), idx);
 	return lodInfo_[idx];
 }
 
 const SubMeshHeader* XModel::getMeshHead(size_t idx) const 
 {
-	X_ASSERT(idx < numMeshTotal(), "invalid mesh index")(numMeshTotal(), idx);
+	X_ASSERT(idx < static_cast<size_t>(numMeshTotal()), "invalid mesh index")(numMeshTotal(), idx);
 	return &pMeshHeads_[idx];
 }
 
