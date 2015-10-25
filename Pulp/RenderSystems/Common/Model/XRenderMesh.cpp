@@ -111,7 +111,14 @@ bool XRenderMesh::render(void)
 	if (!canRender())
 		return false;
 
-	g_Dx11D3D.SetWorldShader();
+	if (vertexFmt_ == shader::VertexFormat::P3F_T4F_C4B_N3F) 
+	{
+		g_Dx11D3D.SetWorldShader();
+	}
+	else
+	{
+		g_Dx11D3D.SetFFE(vertexFmt_, true);
+	}
 
 	g_Dx11D3D.FX_SetVertexDeclaration(vertexFmt_);
 	g_Dx11D3D.FX_SetIStream(indexStream_.BufId);
