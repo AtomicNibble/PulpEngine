@@ -984,7 +984,13 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 			i == VertexFormat::P3F_T2S_C4B_N3F || i == VertexFormat::P3F_T2S_C4B_N3F_TB3F ||
 			i == VertexFormat::P3F_T2S_C4B_N10 || i == VertexFormat::P3F_T2S_C4B_N10_TB10)
 		{
+#if 0
 			elem_col8888.AlignedByteOffset = 12 + 4;
+#else
+			// seperate stream
+			elem_col8888.AlignedByteOffset = 0;
+			elem_col8888.InputSlot = 1;
+#endif 
 			layout.append(elem_col8888);
 		}
 
