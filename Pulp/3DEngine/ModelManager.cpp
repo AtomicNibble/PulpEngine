@@ -136,7 +136,7 @@ IModel* XModelManager::loadModel(const char* ModelName)
 	}
 	
 	// try find it.
-	iModel = findModel(ModelName);
+	iModel = findModel_Internal(ModelName);
 
 	if (iModel)
 	{
