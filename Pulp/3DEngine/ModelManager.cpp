@@ -106,6 +106,7 @@ IModel* XModelManager::findModel(const char* ModelName) const
 		return pModel;
 	}
 
+	X_WARNING("ModelManager", "Failed to find model: \"%s\"", ModelName);
 	return nullptr;
 }
 
@@ -137,9 +138,11 @@ IModel* XModelManager::loadModel(const char* ModelName)
 	// try load it.
 	iModel = LoadCompiledModel(ModelName);
 	if (iModel) {
+		X_LOG1("ModelManager", "Loaded model: \"%s\"", ModelName);
 		return iModel;
 	}
 
+	X_WARNING("ModelManager", "Failed to load model: \"%s\"", ModelName);
 	return nullptr;
 }
 
