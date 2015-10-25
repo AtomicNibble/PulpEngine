@@ -198,8 +198,8 @@ void XModelManager::ListModels(const char* searchPatten) const
 
 	sortModelsByName(sorted_models);
 
-	X_LOG0("Console", "------------ ^8Models(%i)^7 ------------", sorted_models.size());
 	X_LOG_BULLET;
+	X_LOG0("Console", "------------ ^8Models(%i)^7 ------------", sorted_models.size());
 
 	core::Array<XModel*>::ConstIterator it = sorted_models.begin();
 	for (; it != sorted_models.end(); ++it)
@@ -209,7 +209,7 @@ void XModelManager::ListModels(const char* searchPatten) const
 			model->getName());
 	}
 
-	X_LOG0("Console", "------------ ^8Materials End^7 ------------");
+	X_LOG0("Console", "------------ ^8Models End^7 ------------");
 
 }
 
