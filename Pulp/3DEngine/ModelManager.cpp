@@ -205,8 +205,9 @@ void XModelManager::ListModels(const char* searchPatten) const
 	for (; it != sorted_models.end(); ++it)
 	{
 		const XModel* model = *it;
-		X_LOG0("Model", "^2\"%s\"^7",
-			model->getName());
+		X_LOG0("Model", "^2%-32s^7 Lods:^2%i^7 Bones:^2%i^7 BlankBones:^2%i^7 TotalMesh:^2%i^7",
+			model->getName(), model->numLods(), model->numBones(), model->numBlankBones(),
+			model->numMeshTotal());
 	}
 
 	X_LOG0("Console", "------------ ^8Models End^7 ------------");
