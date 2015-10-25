@@ -225,10 +225,10 @@ IModel* XModelManager::LoadCompiledModel(const char* ModelName)
 		}
 		else
 		{
-			X_DELETE(pModel, g_3dEngineArena);
+			X_DELETE_AND_NULL(pModel, g_3dEngineArena);
 		}
 	}
-	return nullptr;
+	return pModel;
 }
 
 X_NAMESPACE_END
