@@ -151,7 +151,7 @@ bool Level::Init(void)
 	ADD_CVAR_REF("lvl_drawPortals", s_var_drawPortals_, 1, 0, 4, core::VarFlag::SYSTEM,
 		"Draws the inter area portals. 0=off 1=solid 2=wire 3=solid_dt 4=wire_dt");
 
-	ADD_CVAR_REF("lvl_drawArea", s_var_drawArea_, -1, -1, level::MAP_MAX_AREAS,
+	ADD_CVAR_REF("lvl_drawArea", s_var_drawArea_, 10, -1, level::MAP_MAX_AREAS,
 		core::VarFlag::SYSTEM, "Draws the selected area index. -1 = disable");
 
 	ADD_CVAR_REF("lvl_drawCurAreaOnly", s_var_drawCurrentAreaOnly_, 0, 0, 1, 
@@ -260,7 +260,6 @@ bool Level::render(void)
 		-cam.getFrustumPlane(FrustumPlane::NEAR)
 	};
 
-
 	int32_t camArea = -1;
 	if (!IsPointInAnyArea(camPos, camArea))
 	{
@@ -339,20 +338,27 @@ bool Level::render(void)
 void Level::DrawArea(const Area& area)
 {
 	area.pRenderMesh->render();
-	/*
+	
 	const FileAreaRefHdr& areaModelsHdr = modelRefs_.areaRefHdrs[area.areaNum];
 
 	size_t i, end;
 
 	i = areaModelsHdr.startIndex;
 	end = i + areaModelsHdr.num;
+
+	X_LOG0("Level", "%i ent refs. start: %i num: %i", area.areaNum, 
+		areaModelsHdr.startIndex, areaModelsHdr.num);
+
 	for (; i < end; i++)
 	{
 		level::StaticModel& model = staticModels_[i];
+		const char* modelName = model.pModel->getName();
 
-		model.pRenderMesh->render();
+		X_LOG0("Level", "Name: %s pos: (%g,%g,%g)", modelName,
+			model.pos[0], model.pos[1], model.pos[2]);
+
+		model.pModel->Render();
 	}
-	*/
 }
 
 
