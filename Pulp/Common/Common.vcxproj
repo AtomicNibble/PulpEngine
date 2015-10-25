@@ -591,6 +591,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Logging\WritePolicies\LoggerInternalConsoleWritePolicy.cpp" />
+    <ClCompile Include="Math\XHalf.cpp" />
     <ClCompile Include="Math\XSphere.cpp" />
     <ClCompile Include="Math\XWinding.cpp" />
     <ClCompile Include="Math\XFrustum.cpp" />

@@ -1554,5 +1554,8 @@
     <ClCompile Include="..\..\3rdparty\source\lz4-r131\lz4_lib.c">
       <Filter>SourceFiles\Compression\lz4</Filter>
     </ClCompile>
+    <ClCompile Include="Math\XHalf.cpp">
+      <Filter>SourceFiles\Math</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
