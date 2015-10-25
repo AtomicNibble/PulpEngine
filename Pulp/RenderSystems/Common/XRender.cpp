@@ -279,9 +279,9 @@ void XRender::DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
 
 model::IRenderMesh* XRender::createRenderMesh(void)
 {
-	model::XRenderMesh* pMesh = X_NEW_ALIGNED(
+	model::XRenderMesh* pMesh = X_NEW(
 		model::XRenderMesh,g_rendererArena,
-		"RenderMesh", X_ALIGN_OF(model::XRenderMesh))();
+		"RenderMesh")();
 	
 	return pMesh;
 }
@@ -289,9 +289,9 @@ model::IRenderMesh* XRender::createRenderMesh(void)
 model::IRenderMesh* XRender::createRenderMesh(model::MeshHeader* pMesh, 
 	shader::VertexFormat::Enum fmt, const char* name)
 {
-	model::XRenderMesh* pRenMesh = X_NEW_ALIGNED(
+	model::XRenderMesh* pRenMesh = X_NEW(
 		model::XRenderMesh, g_rendererArena,
-		"RenderMesh", X_ALIGN_OF(model::XRenderMesh))(pMesh, fmt, name);
+		"RenderMesh")(pMesh, fmt, name);
 
 	return pRenMesh;
 }
