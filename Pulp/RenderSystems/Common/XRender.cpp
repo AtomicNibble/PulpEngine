@@ -286,7 +286,7 @@ model::IRenderMesh* XRender::createRenderMesh(void)
 	return pMesh;
 }
 
-model::IRenderMesh* XRender::createRenderMesh(model::MeshHeader* pMesh, 
+model::IRenderMesh* XRender::createRenderMesh(const model::MeshHeader* pMesh,
 	shader::VertexFormat::Enum fmt, const char* name)
 {
 	model::XRenderMesh* pRenMesh = X_NEW(

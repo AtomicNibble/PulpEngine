@@ -27,7 +27,7 @@ XRenderMesh::XRenderMesh()
 	indexStream_.BufId = render::VidMemManager::null_id;
 }
 
-XRenderMesh::XRenderMesh(model::MeshHeader* pMesh, shader::VertexFormat::Enum fmt, 
+XRenderMesh::XRenderMesh(const model::MeshHeader* pMesh, shader::VertexFormat::Enum fmt, 
 	const char* pName)
 {
 	X_ASSERT_NOT_NULL(pMesh);

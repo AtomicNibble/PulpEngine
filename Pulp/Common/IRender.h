@@ -398,7 +398,7 @@ struct IRender
 
 	// Model
 	virtual model::IRenderMesh* createRenderMesh(void) X_ABSTRACT;
-	virtual model::IRenderMesh* createRenderMesh(model::MeshHeader* pMesh, 
+	virtual model::IRenderMesh* createRenderMesh(const model::MeshHeader* pMesh,
 		shader::VertexFormat::Enum fmt, const char* name) X_ABSTRACT;
 	virtual void freeRenderMesh(model::IRenderMesh* pMesh) X_ABSTRACT;
 	 

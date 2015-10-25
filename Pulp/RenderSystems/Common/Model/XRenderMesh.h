@@ -78,7 +78,7 @@ class XRenderMesh : public IRenderMesh, public core::ReferenceCounted<XRenderMes
 {
 public:
 	XRenderMesh();
-	XRenderMesh(model::MeshHeader* pMesh, shader::VertexFormat::Enum fmt, const char* name);
+	XRenderMesh(const model::MeshHeader* pMesh, shader::VertexFormat::Enum fmt, const char* name);
 	~XRenderMesh() X_OVERRIDE;
 
 	// IRenderModel
