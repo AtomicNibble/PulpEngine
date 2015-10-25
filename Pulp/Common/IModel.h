@@ -446,7 +446,8 @@ struct IModel
 	virtual int32_t numMeshTotal(void) const X_ABSTRACT;
 	virtual bool HasLods(void) const X_ABSTRACT;
 
-
+	// temp.
+	virtual void Render(void) X_ABSTRACT;
 };
 
 struct IModelManager

@@ -31,9 +31,12 @@ public:
 	virtual int32_t numBlankBones(void) const X_FINAL;
 	virtual int32_t numMeshTotal(void) const X_FINAL;
 	virtual bool HasLods(void) const X_FINAL;
+
+	virtual void Render(void) X_FINAL;
 	// ~IModel
 
 	const LODHeader& getLod(size_t idx) const;
+	const MeshHeader& getLodMeshHdr(size_t idx) const;
 	const SubMeshHeader* getMeshHead(size_t idx) const;
 
 

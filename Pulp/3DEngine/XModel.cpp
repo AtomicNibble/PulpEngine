@@ -5,6 +5,8 @@
 #include "String\Path.h"
 #include "Memory\MemCursor.h"
 
+#include <IRender.h>
+
 X_NAMESPACE_BEGIN(model)
 
 XModel::XModel()
@@ -88,9 +90,28 @@ bool XModel::HasLods(void) const
 	return numLods() > 1;
 }
 
+void XModel::Render(void)
+{
+	if (pLodRenderMeshes_[0] == nullptr) {
+		pLodRenderMeshes_[0] = getRender()->createRenderMesh(&getLodMeshHdr(0),
+			shader::VertexFormat::P3F_T2S_C4B, getName());
+
+		pLodRenderMeshes_[0]->uploadToGpu();
+	}
+
+	pLodRenderMeshes_[0]->render();
+}
+
+
 // ~IModel
 
 const LODHeader& XModel::getLod(size_t idx) const 
+{
+	X_ASSERT(idx < static_cast<size_t>(numLods_), "invalid lod index")(numLods(), idx);
+	return lodInfo_[idx];
+}
+
+const MeshHeader& XModel::getLodMeshHdr(size_t idx) const
 {
 	X_ASSERT(idx < static_cast<size_t>(numLods_), "invalid lod index")(numLods(), idx);
 	return lodInfo_[idx];
