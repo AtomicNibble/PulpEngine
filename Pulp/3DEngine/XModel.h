@@ -7,6 +7,8 @@
 #include "Assets\AssertContainer.h"
 #include "EngineBase.h"
 
+#include <IRenderMesh.h>
+
 X_NAMESPACE_BEGIN(model)
 
 
@@ -44,6 +46,7 @@ private:
 private:
 	ModelName name_;
 
+	model::IRenderMesh* pLodRenderMeshes_[MODEL_MAX_LODS];
 	LODHeader lodInfo_[MODEL_MAX_LODS];
 
 	// runtime pointers.

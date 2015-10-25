@@ -9,7 +9,20 @@ X_NAMESPACE_BEGIN(model)
 
 XModel::XModel()
 {
+	core::zero_object(pLodRenderMeshes_);
 
+	pTagNames_ = nullptr;
+	pTagTree_ = nullptr;
+	pBoneAngles_ = nullptr;
+	pBonePos_ = nullptr;
+	pMeshHeads_ = nullptr;
+
+	numLods_ = 0;
+	numBones_ = 0;
+	numBlankBones_ = 0;
+	totalMeshNum_ = 0;
+
+	pData_ = nullptr;
 }
 
 XModel::~XModel()
