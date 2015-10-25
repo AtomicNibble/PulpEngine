@@ -60,7 +60,7 @@ struct XEngineBase
 	}
 
 	X_INLINE static model::IModelManager* getModelManager(void) {
-		return reinterpret_cast<model::IModelManager*>(pMaterialManager_);
+		return reinterpret_cast<model::IModelManager*>(pModelManager_);
 	}
 
 	X_INLINE static gui::XGuiManager* getGuiManager(void) {
