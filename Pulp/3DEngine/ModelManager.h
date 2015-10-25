@@ -38,6 +38,8 @@ public:
 	void ListModels(const char* searchPatten = nullptr) const;
 
 private:
+	IModel* findModel_Internal(const char* ModelName) const;
+
 	IModel* LoadCompiledModel(const char* ModelName);
 
 private:

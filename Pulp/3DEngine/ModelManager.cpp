@@ -99,8 +99,7 @@ IModel* XModelManager::findModel(const char* ModelName) const
 {
 	X_UNUSED(ModelName);
 
-	XModel* pModel = static_cast<XModel*>(
-		models_.findAsset(X_CONST_STRING(ModelName)));
+	IModel* pModel = findModel_Internal(ModelName);
 
 	if (pModel) {
 		return pModel;
@@ -109,6 +108,17 @@ IModel* XModelManager::findModel(const char* ModelName) const
 	X_WARNING("ModelManager", "Failed to find model: \"%s\"", ModelName);
 	return nullptr;
 }
+
+IModel* XModelManager::findModel_Internal(const char* ModelName) const
+{
+	X_UNUSED(ModelName);
+
+	XModel* pModel = static_cast<XModel*>(
+		models_.findAsset(X_CONST_STRING(ModelName)));
+
+	return pModel;
+}
+
 
 IModel* XModelManager::loadModel(const char* ModelName)
 {
