@@ -844,6 +844,14 @@ MStatus MayaLOD::LoadMeshes(void)
 		mesh->weights.setGranularity(2048 * 2);
 
 		status = fnmesh.getUVSetNames(UVSets);
+		if (!status) {
+			MayaPrintError("Mesh(%s): failed to get UV set names (%s)", 
+				fnmesh.name().asChar(), status.errorString().asChar());
+			return status;
+		}
+
+		// print how many :Z
+		MayaPrintMsg("NumUvSets: %i", UVSets.length());
 
 		fnmesh.getUVs(u, v, &UVSets[0]);
 		fnmesh.getPoints(vertexArray, MSpace::kPreTransform);
