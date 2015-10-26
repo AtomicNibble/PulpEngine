@@ -1110,8 +1110,9 @@ core::Thread::ReturnValue mergeVertsThreadFnc(const core::Thread& thread)
 {
 	core::Array<MayaMesh*>* meshes = (core::Array<MayaMesh*>*)thread.getData();
 
-	for (uint i = 0; i <meshes->size(); i++)
+	for (uint i = 0; i < meshes->size(); i++) {
 		(*meshes)[i]->shareVerts();
+	}
 
 	return 0;
 }
@@ -1180,21 +1181,25 @@ void MayaLOD::MergeMeshes(void)
 				threads[i].setData(&meshes[i]);
 			}
 
-			for (i = 0; i < numThreads; i++)
+			for (i = 0; i < numThreads; i++) {
 				threads[i].Start(mergeVertsThreadFnc);
+			}
 
-			for (i = 0; i < numThreads; i++)
+			for (i = 0; i < numThreads; i++) {
 				threads[i].Join();
+			}
 		}
 		else
 		{
-			for (i = 0; i <numMeshes; i++)
+			for (i = 0; i < numMeshes; i++) {
 				meshes_[i]->shareVerts();
+			}
 		}
 	}
 
-	if (numMerged > 0)
+	if (numMerged > 0) {
 		MayaPrintMsg("(%i) meshes merged", numMerged);
+	}
 }
 
 
