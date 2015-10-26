@@ -684,7 +684,7 @@ namespace
 
 
 
-}
+} // namespace
 
 
 X_DISABLE_WARNING(4244) // ival = fval;
