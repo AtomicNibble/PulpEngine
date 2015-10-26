@@ -1468,8 +1468,9 @@ void MayaModel::pruneBones(void)
 void MayaModel::MergeMeshes()
 {
 	PROFILE_MAYA("merge meshes");
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++) {
 		lods_[i].MergeMeshes();
+	}
 }
 
 void MayaModel::printStats(PotatoOptions& options)
@@ -1489,13 +1490,15 @@ void MayaModel::printStats(PotatoOptions& options)
 			if (i < (g_stats.droppedBoneNames.size() - 1))
 				std::cout << ", ";
 
-			if (i > 9 && (i % 10) == 0)
+			if (i > 9 && (i % 10) == 0) {
 				std::cout << "\n";
+			}
 		}
 		std::cout << ")";
 	}
-	if (g_stats.droppedBoneNames.size() > 10)
+	if (g_stats.droppedBoneNames.size() > 10) {
 		std::cout << "\n";
+	}
 
 	std::cout <<
 		"\n> Total Verts: " << g_stats.totalVerts <<
@@ -1653,9 +1656,9 @@ bool MayaModel::save(const char *filename)
 			header.tagNameDataSize + header.materialNameDataSize);
 
 
-		for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next())
+		for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next()) {
 			meshHeadOffsets += bone->getDataSize();
-		
+		}
 
 		for (i = 0; i < numLods; i++)
 		{
