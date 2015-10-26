@@ -1862,7 +1862,7 @@ bool MayaModel::save(const char *filename)
 
 				for (x = 0; x < mesh->verts.size(); x++)
 				{
-					const MayaVertex Mvert = mesh->verts[x];
+					const MayaVertex& Mvert = mesh->verts[x];
 
 					vert.pos = Mvert.pos;
 					vert.st[0] = XHalfCompressor::compress(Mvert.uv[0]);
