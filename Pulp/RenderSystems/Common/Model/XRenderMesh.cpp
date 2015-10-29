@@ -117,10 +117,10 @@ bool XRenderMesh::render(void)
 	}
 	else
 	{
-		g_Dx11D3D.SetFFE(vertexFmt_, true);
+		g_Dx11D3D.SetModelShader(vertexFmt_);
 	}
 
-	g_Dx11D3D.FX_SetVertexDeclaration(vertexFmt_);
+	g_Dx11D3D.FX_SetVertexDeclaration(vertexFmt_, true);
 	g_Dx11D3D.FX_SetIStream(indexStream_.BufId);
 
 

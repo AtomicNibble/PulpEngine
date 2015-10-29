@@ -59,7 +59,7 @@ void DX11XRender::DrawQuadSS(float x, float y, float width, float height, const 
 	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
 	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B, false))
 		return;
 
 	// Render the two triangles from the data stream
@@ -117,7 +117,7 @@ void DX11XRender::DrawQuadSS(const Rectf& rect, const Color& col)
 	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
 	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B, false))
 		return;
 
 	// Render the two triangles from the data stream
@@ -184,7 +184,7 @@ void DX11XRender::DrawQuadImageSS(float x, float y, float width, float height,
 
 	texture::XTexture::applyFromId(0, texture_id, 0);
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B, false))
 		return;
 
 	// Render the two triangles from the data stream
@@ -243,7 +243,7 @@ void DX11XRender::DrawQuadImageSS(const Rectf& rect, texture::TexID texture_id, 
 
 	texture::XTexture::applyFromId(0, texture_id, 0);
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B, false))
 		return;
 
 	// Render the two triangles from the data stream
@@ -344,7 +344,7 @@ void DX11XRender::DrawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& 
 	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
 	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B, false))
 		return;
 
 	// Render the two triangles from the data stream
@@ -442,7 +442,7 @@ void DX11XRender::RT_DrawImageWithUV(float xpos, float ypos, float z, float w, f
 
 	texture::XTexture::applyFromId(0, texture_id, 0);
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B, false))
 		return;
 
 	// Render the two triangles from the data stream
@@ -549,7 +549,7 @@ void DX11XRender::DrawLine(const Vec3f& pos1, const Vec3f& pos2)
 	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
 	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B, false))
 		return;
 
 	// Render the line
@@ -574,7 +574,7 @@ void DX11XRender::DrawLineColor(const Vec3f& pos1, const Color& color1,
 	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
 	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B, false))
 		return;
 
 	// Render the line
@@ -677,7 +677,7 @@ void DX11XRender::DrawBarChart(const Rectf& rect, uint32_t num, float* heights,
 	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
 	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B, false))
 		return;
 
 	// Render the two triangles from the data stream
@@ -706,7 +706,7 @@ void DX11XRender::DrawVB(Vertex_P3F_T2F_C4B* pVertBuffer, uint32_t size,
 	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
 	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B, false))
 		return;
 
 

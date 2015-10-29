@@ -354,7 +354,7 @@ bool DX11XRender::SetWorldShader()
 	if (!pSh->FXSetTechnique(tech))
 		return false;
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T4F_C4B_N3F)))
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T4F_C4B_N3F, false))
 		return false;
 
 	if (!pSh->FXBegin(&pass, 0))
@@ -392,6 +392,35 @@ bool DX11XRender::SetSkyboxShader()
 	return true;
 }
 
+bool DX11XRender::SetModelShader(shader::VertexFormat::Enum vertFmt)
+{
+	using namespace shader;
+
+	XShader* pSh = XShaderManager::s_pModelShader_;
+	uint32_t pass;
+
+	if (!pSh)
+		return false;
+
+	core::StrHash tech("Texture");
+
+	if (!pSh->FXSetTechnique(tech))
+		return false;
+
+	if (!FX_SetVertexDeclaration(vertFmt, false))
+		return false;
+
+	if (!pSh->FXBegin(&pass, 0))
+		return false;
+
+	if (!pSh->FXBeginPass(pass))
+		return false;
+
+	FX_ComitParams();
+	return true;
+}
+
+
 bool DX11XRender::SetFFE(shader::VertexFormat::Enum vertFmt, bool textured)
 {
 	using namespace shader;
@@ -417,7 +446,7 @@ bool DX11XRender::SetFFE(shader::VertexFormat::Enum vertFmt, bool textured)
 			return false;
 	}
 
-	if (FAILED(FX_SetVertexDeclaration(vertFmt)))
+	if (!FX_SetVertexDeclaration(vertFmt, false))
 		return false;
 
 	if(!pSh->FXBegin(&pass, 0))
@@ -444,7 +473,7 @@ bool DX11XRender::SetFontShader()
 	if (!pSh->FXSetTechnique(tech))
 		return false;
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B, false))
 		return false;
 
 	if (!pSh->FXBegin(&pass, 0))

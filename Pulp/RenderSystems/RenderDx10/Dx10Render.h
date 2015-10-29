@@ -124,6 +124,7 @@ public:
 		core::zero_object(vertexLayoutCache);
 		pCurrentVertexFmt = nullptr;
 		CurrentVertexFmt = shader::VertexFormat::P3F_T2S;
+		streamedIL = false;
 
 		pCurShader = nullptr;
 		pCurShaderTech = nullptr;
@@ -149,12 +150,15 @@ public:
 	// Layouts used for creating device layouts.
 	// XVertexLayout vertexLayoutDescriptions[shader::VertexFormat::Num];
 	std::array<XVertexLayout, shader::VertexFormat::Num> vertexLayoutDescriptions;
+	std::array<XVertexLayout, shader::VertexFormat::Num> streamedVertexLayoutDescriptions;
 
 	// GPU layouts.
 	ID3D11InputLayout* vertexLayoutCache[shader::VertexFormat::Num];
+	ID3D11InputLayout* streamedvertexLayoutCache[shader::VertexFormat::Num];
 	ID3D11InputLayout* pCurrentVertexFmt;
 	shader::VertexFormat::Enum CurrentVertexFmt;
-	
+	bool streamedIL;
+	bool _pad[3];
 
 	StateFlag currentState;
 	CullMode::Enum cullMode;
@@ -242,6 +246,7 @@ public:
 	virtual bool SetFontShader();
 	virtual bool SetZPass();
 	virtual bool setGUIShader(bool textured = false) X_FINAL;
+	bool SetModelShader(shader::VertexFormat::Enum vertFmt);
 
 	// ~Shaders 
 
@@ -321,7 +326,8 @@ public:
 	void FX_ComitParams(void);
 	void FX_Init(void);
 
-	HRESULT FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFmt);
+
+	bool FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFmt, bool streamed);
 //	HRESULT FX_SetTextureAsVStream(int nID, texture::XTexture* pVBTexture, uint32 nStride);
 	void FX_SetVStream(ID3D11Buffer* pVertexBuffer, VertexStream::Enum streamSlot,
 				uint32 stride, uint32 offset);
@@ -402,7 +408,8 @@ public:
 
 
 private:
-
+	ID3D11InputLayout* CreateILFromDesc(const shader::VertexFormat::Enum vertexFmt,
+		const RenderState::XVertexLayout& layout);
 
 	virtual void SetArenas(core::MemoryArenaBase* arena) X_OVERRIDE;
 	bool OnPostCreateDevice(void);

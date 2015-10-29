@@ -28,7 +28,7 @@ void DX11XRender::RT_DrawLines(Vec3f* points, uint32_t num, const Colorf& col)
 	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
 	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B, false))
 		return;
 
 	// Render the line

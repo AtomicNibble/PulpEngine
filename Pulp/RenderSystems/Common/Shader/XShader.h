@@ -452,6 +452,7 @@ public:
 	static XShader* s_pDefferedShaderVis_;
 
 	static XShader* s_pWordShader_;
+	static XShader* s_pModelShader_;
 };
 
 X_NAMESPACE_END

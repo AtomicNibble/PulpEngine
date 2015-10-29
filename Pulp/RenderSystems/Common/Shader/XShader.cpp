@@ -207,6 +207,7 @@ XShader* XShaderManager::s_pGui_ =nullptr;
 XShader* XShaderManager::s_pDefferedShader_ =nullptr;
 XShader* XShaderManager::s_pDefferedShaderVis_ =nullptr;
 XShader* XShaderManager::s_pWordShader_ =nullptr;
+XShader* XShaderManager::s_pModelShader_ = nullptr;
 
 
 XShaderManager::XShaderManager() : 
@@ -647,6 +648,11 @@ bool XShaderManager::loadCoreShaders(void)
 	}
 	if ((s_pWordShader_ =forName("World")) == nullptr) {
 		X_ERROR("Shader", "Failed to load World shader");
+		return false;
+	}
+
+	if ((s_pModelShader_ = forName("Model")) == nullptr) {
+		X_ERROR("Shader", "Failed to load Model shader");
 		return false;
 	}
 	return true;
