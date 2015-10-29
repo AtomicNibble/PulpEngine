@@ -1877,10 +1877,8 @@ bool MayaModel::save(const char *filename)
 					const MayaVertex& Mvert = mesh->verts[x];
 
 					vert.pos = Mvert.pos;
-					vert.st[0] =  Mvert.uv[0]; // XHalfCompressor::compress(Mvert.uv[0]);
-					vert.st[1] = 1- Mvert.uv[1]; // XHalfCompressor::compress(Mvert.uv[1]);
-
-					MayaPrintMsg("uv: %g, %g", vert.st[0], vert.st[1]);
+					vert.st[0] = XHalfCompressor::compress(Mvert.uv[0]);
+					vert.st[1] = XHalfCompressor::compress(1.f - Mvert.uv[1]);
 
 					stream.write(vert);
 				}
@@ -1965,7 +1963,7 @@ bool MayaModel::save(const char *filename)
 				{
 					const Vec3<int32_t>& f = mesh->faces[x];
 
-#if 1
+#if 1 // flip winding.
 					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[2]));
 					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[1]));
 					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[0]));
