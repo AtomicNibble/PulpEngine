@@ -488,7 +488,6 @@ bool XHWShader_Dx10::loadFromCache()
 
 bool XHWShader_Dx10::loadFromSource()
 {
-	core::XFileScoped file;
 	core::Path<char> src, dest;
 	core::string source;
 
