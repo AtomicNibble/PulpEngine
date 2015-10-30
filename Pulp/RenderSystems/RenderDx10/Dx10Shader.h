@@ -258,6 +258,7 @@ private:
 	bool loadFromSource();
 	bool loadFromCache();
 	void getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest);
+	void getShaderCompileSrc(core::Path<char>& src);
 	void getShaderCompileDest(core::Path<char>& dest);
 	bool compileFromSource(core::string& source);
 

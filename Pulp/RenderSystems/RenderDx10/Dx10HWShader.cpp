@@ -433,6 +433,16 @@ void XHWShader_Dx10::getShaderCompilePaths(core::Path<char>& src, core::Path<cha
 	gEnv->pFileSys->createDirectoryTree(dest.c_str());
 }
 
+void XHWShader_Dx10::getShaderCompileSrc(core::Path<char>& src)
+{
+	src.clear();
+	src.appendFmt("shaders/temp/%s.fxcb", name_.c_str());
+
+	// make sure the directory is created.
+	gEnv->pFileSys->createDirectoryTree(src.c_str());
+}
+
+
 void XHWShader_Dx10::getShaderCompileDest(core::Path<char>& dest)
 {
 	dest.clear();
@@ -497,6 +507,21 @@ bool XHWShader_Dx10::loadFromSource()
 		return false;
 	}
 
+	// save copy of merged shader for debugging.
+	{
+		core::Path<char> src;
+		getShaderCompileSrc(src);
+
+		src /= ".hlsl";
+
+		core::XFileScoped fileOut;
+		if (fileOut.openFile(src.c_str(), core::fileModeFlags::RECREATE |
+			core::fileModeFlags::WRITE))
+		{
+			fileOut.write(source.data(), source.length());
+		}
+	}
+
 	return compileFromSource(source);
 }
 
@@ -554,10 +579,12 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 
 	core::TimeVal start = gEnv->pTimer->GetAsyncTime();
 
+	core::string sourcName = name_ + ".fxcb.hlsl";
+
 	hr = D3DCompile(
 		source,
 		source.length(),
-		this->sourceFileName_,
+		sourcName,
 		Shader_Macros, // pDefines
 		NULL, // pInclude
 		this->entryPoint_,
