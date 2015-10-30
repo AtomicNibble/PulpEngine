@@ -351,13 +351,18 @@ void Level::DrawArea(const Area& area)
 
 	for (; i < end; i++)
 	{
-		level::StaticModel& model = staticModels_[i];
-		const char* modelName = model.pModel->getName();
+		uint32_t entId = modelRefs_.areaRefs[i].entId;
 
-		X_LOG0("Level", "Name: %s pos: (%g,%g,%g)", modelName,
-			model.pos[0], model.pos[1], model.pos[2]);
+		level::StaticModel& model = staticModels_[entId - 1];
+		if (model.pModel)
+		{
+			const char* modelName = model.pModel->getName();
 
-		model.pModel->Render();
+			X_LOG0("Level", "Name: %s pos: (%g,%g,%g)", modelName,
+				model.pos[0], model.pos[1], model.pos[2]);
+
+				model.pModel->Render();
+		}
 	}
 }
 
