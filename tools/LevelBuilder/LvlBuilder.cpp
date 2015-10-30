@@ -218,6 +218,9 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 				X_ERROR("Lvl", "Failed to load model \"%s\" at (%g,%g,%g), using default",
 				name.c_str(), ent.origin.x,ent.origin.y, ent.origin.z);
 				it->second = "default";
+				// give it the bounds of the default.
+				// since I have no idea what the bounds of the missing model is \o/
+				ent.bounds = defaultModelBounds_;
 			}
 		}
 		else
