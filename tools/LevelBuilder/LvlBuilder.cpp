@@ -168,7 +168,7 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 	}
 
 	// check for angles.
-	it = mapEnt->epairs.find(X_CONST_STRING("angle"));
+	it = mapEnt->epairs.find(X_CONST_STRING("angles"));
 	if (it != mapEnt->epairs.end())
 	{
 		const core::string& value = it->second;
