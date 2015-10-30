@@ -361,7 +361,19 @@ void Level::DrawArea(const Area& area)
 			X_LOG0("Level", "Name: %s pos: (%g,%g,%g)", modelName,
 				model.pos[0], model.pos[1], model.pos[2]);
 
-				model.pModel->Render();
+			Vec3f pos = model.pos;
+			Quatf angle = model.angle;
+		
+			Matrix44f posMat = Matrix44f::createTranslation(pos);
+			posMat.rotate(angle.getAxis(), angle.getAngle());
+
+			render::IRender* pRender = getRender();
+			pRender->SetModelMatrix(posMat);
+
+			model.pModel->Render();
+
+			pRender->SetModelMatrix(Matrix44f::identity());
+
 		}
 	}
 }
