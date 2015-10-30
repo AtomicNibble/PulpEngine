@@ -394,6 +394,7 @@ bool DX11XRender::SetSkyboxShader()
 
 bool DX11XRender::SetModelShader(shader::VertexFormat::Enum vertFmt)
 {
+	X_UNUSED(vertFmt);
 	using namespace shader;
 
 	XShader* pSh = XShaderManager::s_pModelShader_;
@@ -407,8 +408,8 @@ bool DX11XRender::SetModelShader(shader::VertexFormat::Enum vertFmt)
 	if (!pSh->FXSetTechnique(tech))
 		return false;
 
-	if (!FX_SetVertexDeclaration(vertFmt, false))
-		return false;
+//	if (!FX_SetVertexDeclaration(vertFmt, false))
+//		return false;
 
 	if (!pSh->FXBegin(&pass, 0))
 		return false;
