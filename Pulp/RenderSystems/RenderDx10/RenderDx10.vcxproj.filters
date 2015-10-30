@@ -215,4 +215,9 @@
       <Filter>Common\Textures</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Dx10Render.inl">
+      <Filter>Header Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

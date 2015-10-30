@@ -198,12 +198,8 @@ public:
 	virtual void SetCullMode(CullMode::Enum mode) X_OVERRIDE;
 	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_OVERRIDE;
 
-	virtual void GetModelViewMatrix(Matrix44f* pMat) X_OVERRIDE {
-		*pMat = *ViewMat_.GetTop();
-	}
-	virtual void GetProjectionMatrix(Matrix44f* pMat) X_OVERRIDE {
-		*pMat = *ProMat_.GetTop();
-	}
+	X_INLINE virtual void GetModelViewMatrix(Matrix44f* pMat) X_OVERRIDE;
+	X_INLINE virtual void GetProjectionMatrix(Matrix44f* pMat) X_OVERRIDE;
 
 	// States
 	bool SetBlendState(BlendState& state);
@@ -345,67 +341,20 @@ public:
 	void FX_UnBindIStream(ID3D11Buffer* pIndexBuffer);
 
 
-	const D3D11_PRIMITIVE_TOPOLOGY FX_ConvertPrimitiveType(const PrimitiveType::Enum type) {
-		return (D3D11_PRIMITIVE_TOPOLOGY)type;
-	}
+	X_INLINE const D3D11_PRIMITIVE_TOPOLOGY FX_ConvertPrimitiveType(const PrimitiveType::Enum type) const;
+	X_INLINE PrimitiveType::Enum PrimitiveTypeToInternal(PrimitiveTypePublic::Enum type) const;
 
-	PrimitiveType::Enum PrimitiveTypeToInternal(PrimitiveTypePublic::Enum type) {
-		if (type == PrimitiveTypePublic::LineList)
-			return PrimitiveType::LineList;
-		if (type == PrimitiveTypePublic::LineStrip)
-			return PrimitiveType::LineStrip;
-		if (type == PrimitiveTypePublic::TriangleList)
-			return PrimitiveType::TriangleList;
-		if (type == PrimitiveTypePublic::TriangleStrip)
-			return PrimitiveType::TriangleStrip;
-		X_ASSERT_UNREACHABLE();
-		return PrimitiveType::TriangleStrip;
-	}
+	X_INLINE void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY topType);
 
-	void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY topType)
-	{
-		if (CurTopology_ != topType)
-		{
-			CurTopology_ = topType;
-			deviceContext_->IASetPrimitiveTopology(CurTopology_);
-		}
-	}
+	X_INLINE ID3D11Device* DxDevice(void) const;
+	X_INLINE ID3D11DeviceContext* DxDeviceContext(void) const;
+	X_INLINE void PushViewMatrix(void);
+	X_INLINE void PopViewMatrix(void);
+	X_INLINE void DirtyMatrix(void);
 
-
-
-	X_INLINE ID3D11Device* DxDevice() const {
-		return device_;
-	}
-	X_INLINE ID3D11DeviceContext* DxDeviceContext() const {
-		return deviceContext_;
-	}
-
-	  
-	X_INLINE void PushViewMatrix()
-	{
-		ViewMat_.Push();
-	}
-	X_INLINE void PopViewMatrix()
-	{
-		ViewMat_.Pop();
-		DirtyMatrix();
-	}
-	X_INLINE void DirtyMatrix()
-	{
-
-	}
-
-	X_INLINE Matrix44f* pCurViewMat(void) {
-		return ViewMat_.GetTop();
-	}
-	X_INLINE Matrix44f* pCurProjMat(void) {
-		return ProMat_.GetTop();
-	}
-
-	X_INLINE bool IsDeviceLost(void) const {
-		return false;
-	}
-
+	X_INLINE Matrix44f* pCurViewMat(void);
+	X_INLINE Matrix44f* pCurProjMat(void);
+	X_INLINE bool IsDeviceLost(void) const;
 
 private:
 	ID3D11InputLayout* CreateILFromDesc(const shader::VertexFormat::Enum vertexFmt,
@@ -418,9 +367,8 @@ private:
 	void InitVertexLayoutDescriptions(void);
 
 	void FreeDynamicBuffers(void);
+
 protected:
-
-
 	XMatrixStack ViewMat_;
 	XMatrixStack ProMat_;
 
@@ -435,10 +383,9 @@ protected:
 	uint32_t CurRasterState_;
 	uint32_t CurDepthState_;
 
-	BlendState& curBlendState(void) { return BlendStates_[CurBlendState_]; }
-	RasterState& curRasterState(void) { return RasterStates_[CurRasterState_]; }
-	DepthState& curDepthState(void) { return DepthStates_[CurDepthState_]; }
-
+	X_INLINE BlendState& curBlendState(void);
+	X_INLINE RasterState& curRasterState(void);
+	X_INLINE DepthState& curDepthState(void);
 
 protected:
 #if X_DEBUG
@@ -461,9 +408,10 @@ protected:
 	XRenderAuxImp* AuxGeo_;
 };
 
-
 extern DX11XRender g_Dx11D3D;
 
 X_NAMESPACE_END
+
+#include "Dx10Render.inl"
 
 #endif // !_X_RENDER_DX10_H_
