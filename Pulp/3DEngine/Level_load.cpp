@@ -332,25 +332,31 @@ bool Level::ProcessData(uint32_t bytesRead)
 	{
 		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_MODEL_REFS);
 
-		AreaRefInfo& entRefs = modelRefs_;
-		entRefs.areaRefHdrs.resize(fileHdr_.numAreas);
+		AreaRefInfo& modelRefs = modelRefs_;
+		modelRefs.areaRefHdrs.resize(fileHdr_.numAreas);
 
-		file.readObj(entRefs.areaRefHdrs.ptr(), entRefs.areaRefHdrs.size());
+		file.readObj(modelRefs.areaRefHdrs.ptr(), modelRefs.areaRefHdrs.size());
 
-		size_t numEntRefs = fileHdr_.numEntRefs;
-		size_t numMultiAreaEntRefs = fileHdr_.numMultiAreaEntRefs;
+		size_t numModelRefs = fileHdr_.numModelRefs;
+		size_t numMultiAreaModelRefs = fileHdr_.numMultiAreaModelRefs;
 
 
 		// load into single buffer.
-		entRefs.areaRefs.resize(numEntRefs);
-		file.readObj(entRefs.areaRefs.ptr(), entRefs.areaRefs.size());
+		modelRefs.areaRefs.resize(numModelRefs);
+		file.readObj(modelRefs.areaRefs.ptr(), modelRefs.areaRefs.size());
 
 		// load multi area ref list headers.
-		file.readObj(entRefs.areaMultiRefHdrs.data(), entRefs.areaMultiRefHdrs.size());
+		file.readObj(modelRefs.areaMultiRefHdrs.data(), modelRefs.areaMultiRefHdrs.size());
 
 		// load the multi area ref lists data.
-		entRefs.areaMultiRefs.resize(numMultiAreaEntRefs);
-		file.readObj(entRefs.areaMultiRefs.ptr(), entRefs.areaMultiRefs.size());
+		modelRefs.areaMultiRefs.resize(numMultiAreaModelRefs);
+		file.readObj(modelRefs.areaMultiRefs.ptr(), modelRefs.areaMultiRefs.size());
+
+		for (size_t b = 0; b < fileHdr_.numAreas; b++)
+		{
+			const FileAreaRefHdr& areaModelsHdr = modelRefs.areaRefHdrs[b];
+			X_LOG0("modelRefs", "%i start: %i num: %i", b, areaModelsHdr.startIndex, areaModelsHdr.num);
+		}
 	}
 
 	{
@@ -377,6 +383,9 @@ bool Level::ProcessData(uint32_t bytesRead)
 				const char* modelName = stringTable_.getString(sm.modelNameIdx);
 				model::IModel* pModel = getModelManager()->loadModel(modelName);
 				
+				X_LOG0("SM", "%i name: %s pos: (%g,%g,%g,)", i,  modelName,
+					sm.pos[0], sm.pos[1], sm.pos[2]);
+
 				sm.pModel = pModel;
 			}
 		}
