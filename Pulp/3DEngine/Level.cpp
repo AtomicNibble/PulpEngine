@@ -123,6 +123,7 @@ staticModels_(g_3dEngineArena)
 	pFileSys_ = nullptr;
 
 	core::zero_object(fileHdr_);
+	core::zero_object(visibleAreaFlags_);
 
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pTimer);
@@ -246,6 +247,8 @@ bool Level::render(void)
 	if (!canRender())
 		return false;
 
+	clearVisableAreaFlags();
+
 	// work out what area we are in.
 	const XCamera& cam = gEnv->pRender->GetCamera();
 	Vec3f camPos = cam.getPosition();
@@ -331,12 +334,17 @@ bool Level::render(void)
 		DrawArea(areas_[s_var_drawArea_]);
 	}
 
+	// we know all the visible areas now.
+	DrawMultiAreaModels();
+
 	DrawPortalDebug();
 	return true;
 }
 
 void Level::DrawArea(const Area& area)
 {
+	SetAreaVisible(area.areaNum);
+
 	area.pRenderMesh->render();
 	
 	const FileAreaRefHdr& areaModelsHdr = modelRefs_.areaRefHdrs[area.areaNum];
@@ -354,30 +362,63 @@ void Level::DrawArea(const Area& area)
 		uint32_t entId = modelRefs_.areaRefs[i].entId;
 
 		level::StaticModel& model = staticModels_[entId - 1];
-		if (model.pModel)
+		DRawStaticModel(model);
+	}
+}
+
+void Level::DrawMultiAreaModels(void)
+{
+	size_t i, numArea = this->NumAreas();
+	size_t numLists = core::Min<size_t>(level::MAP_MAX_MULTI_REF_LISTS,
+		(numArea / 32) + 1);
+
+	for (i = 0; i < numLists; i++)
+	{
+		uint32_t visFlag = visibleAreaFlags_[i];
+		const FileAreaRefHdr& refHdr = modelRefs_.areaMultiRefHdrs[i];
+
+		size_t j, num;
+
+		j = refHdr.startIndex;
+		num = j + refHdr.num;
+
+		for (; j < num; j++)
 		{
-//			const char* modelName = model.pModel->getName();
+			const MultiAreaEntRef& ref = modelRefs_.areaMultiRefs[j];
 
-	//		X_LOG0("Level", "Name: %s pos: (%g,%g,%g)", modelName,
-	//			model.pos[0], model.pos[1], model.pos[2]);
+			// AND them and check for zero.
+			uint32_t visible = ref.flags & visFlag;
+			if (visible)
+			{
+				// draw it.
+				// ref.entId
 
-			Vec3f pos = model.pos;
-			Quatf angle = model.angle;
-		
-			Matrix44f posMat = Matrix44f::createTranslation(pos);
-			posMat.rotate(angle.getAxis(), angle.getAngle());
-
-			render::IRender* pRender = getRender();
-			pRender->SetModelMatrix(posMat);
-
-			model.pModel->Render();
-
-			pRender->SetModelMatrix(Matrix44f::identity());
-
+				level::StaticModel& model = staticModels_[ref.entId - 1];
+				
+				DRawStaticModel(model);
+			}
 		}
 	}
 }
 
+void Level::DRawStaticModel(const level::StaticModel& sm) const
+{
+	if (sm.pModel)
+	{
+		Vec3f pos = sm.pos;
+		Quatf angle = sm.angle;
+
+		Matrix44f posMat = Matrix44f::createTranslation(pos);
+		posMat.rotate(angle.getAxis(), angle.getAngle());
+
+		render::IRender* pRender = getRender();
+		pRender->SetModelMatrix(posMat);
+
+		sm.pModel->Render();
+
+		pRender->SetModelMatrix(Matrix44f::identity());
+	}
+}
 
 int32_t Level::CommonChildrenArea_r(AreaNode* pAreaNode)
 {
@@ -412,6 +453,19 @@ int32_t Level::CommonChildrenArea_r(AreaNode* pAreaNode)
 	return common;
 }
 
+void Level::clearVisableAreaFlags()
+{
+	core::zero_object(visibleAreaFlags_);
+}
+
+void Level::SetAreaVisible(uint32_t area)
+{
+	size_t index = area / 32;
+	uint32_t bit = area % 32;
+
+	visibleAreaFlags_[index] = core::bitUtil::SetBit(
+		visibleAreaFlags_[index], bit);
+}
 
 size_t Level::NumAreas(void) const
 {

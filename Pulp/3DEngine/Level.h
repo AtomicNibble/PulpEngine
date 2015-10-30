@@ -177,6 +177,9 @@ private:
 	void AddAreaRefs(int32_t areaNum, const PortalStack* ps);
 
 	void DrawArea(const Area& area);
+	void DrawMultiAreaModels(void);
+
+	void DRawStaticModel(const level::StaticModel& sm) const;
 
 private:
 	bool ProcessHeader(uint32_t bytesRead);
@@ -186,6 +189,10 @@ private:
 private:
 	int32_t CommonChildrenArea_r(AreaNode* pAreaNode);
 
+private:
+	void clearVisableAreaFlags(void);
+	void SetAreaVisible(uint32_t area);
+	
 private:
 	core::GrowingStringTable<256, 16, 4, uint32_t> stringTable_;
 
@@ -200,6 +207,9 @@ private:
 
 private:
 	size_t frameID_; // inc'd each frame.
+
+	// cleared each frame.
+	uint32_t visibleAreaFlags_[MAP_MAX_MULTI_REF_LISTS];
 
 	// pointer to the file data.
 	// kept valid while lvl is loaded since mesh headers point to it.
