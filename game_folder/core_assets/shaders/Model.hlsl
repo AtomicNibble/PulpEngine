@@ -38,6 +38,8 @@ struct PS_OUTPUT
 Texture2D  	baseMap : register(t0);
 SamplerState  	baseMapSampler;
 
+Texture2D  		bumpMap : register(t1);
+SamplerState  	bumpMapSampler;
 
 VS_OUTPUT BasicVS(VS_INPUT input)
 {
@@ -50,10 +52,17 @@ VS_OUTPUT BasicVS(VS_INPUT input)
 
 PS_OUTPUT TexturePS(PS_INPUT input)
 {
-    PS_OUTPUT output;
-    float4 textureCol = baseMap.Sample(baseMapSampler, input.texCoord);
-    output.color = input.color * textureCol;
-    return output;
+	PS_OUTPUT output;   
+	float4 textureCol = baseMap.Sample(baseMapSampler, input.texCoord);
+	float4 normalCol = bumpMap.Sample(bumpMapSampler, input.texCoord);
+	 
+	float4 bump;
+	bump.xy	= (normalCol.ag * 2.0) - 1.0;
+	bump.z = sqrt(1.0 - dot(bump.xy, bump.xy));
+	bump.a = 1.0;
+	 
+	output.color = input.color * (textureCol * saturate(dot(bump, float4(0.7,0.9,0.1,1))));
+	return output;
 }
 
 
