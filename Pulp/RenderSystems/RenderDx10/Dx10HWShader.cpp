@@ -467,8 +467,6 @@ bool XHWShader_Dx10::loadFromCache()
 {
 	core::Path<char> dest;
 
-	// XShaderManager* pShaderMan = &render::gRenDev->ShaderMan_;
-
 	getShaderCompileDest(dest);
 
 	// we should check if a compiled version already exsists!
@@ -488,10 +486,7 @@ bool XHWShader_Dx10::loadFromCache()
 
 bool XHWShader_Dx10::loadFromSource()
 {
-	core::Path<char> src, dest;
 	core::string source;
-
-	getShaderCompilePaths(src, dest);
 
 	XShaderManager* pShaderMan = &render::gRenDev->ShaderMan_;
 
@@ -577,7 +572,7 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 	{
 		if (error)
 		{
-			const char* err = (const char*)error->GetBufferPointer();
+			const char* err = static_cast<const char*>(error->GetBufferPointer());
 
 			core::StackString<4096> filterd(err, err + strlen(err));
 
