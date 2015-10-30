@@ -346,8 +346,8 @@ void Level::DrawArea(const Area& area)
 	i = areaModelsHdr.startIndex;
 	end = i + areaModelsHdr.num;
 
-	X_LOG0("Level", "%i ent refs. start: %i num: %i", area.areaNum, 
-		areaModelsHdr.startIndex, areaModelsHdr.num);
+//	X_LOG0("Level", "%i ent refs. start: %i num: %i", area.areaNum, 
+//		areaModelsHdr.startIndex, areaModelsHdr.num);
 
 	for (; i < end; i++)
 	{
@@ -356,10 +356,10 @@ void Level::DrawArea(const Area& area)
 		level::StaticModel& model = staticModels_[entId - 1];
 		if (model.pModel)
 		{
-			const char* modelName = model.pModel->getName();
+//			const char* modelName = model.pModel->getName();
 
-			X_LOG0("Level", "Name: %s pos: (%g,%g,%g)", modelName,
-				model.pos[0], model.pos[1], model.pos[2]);
+	//		X_LOG0("Level", "Name: %s pos: (%g,%g,%g)", modelName,
+	//			model.pos[0], model.pos[1], model.pos[2]);
 
 			Vec3f pos = model.pos;
 			Quatf angle = model.angle;
