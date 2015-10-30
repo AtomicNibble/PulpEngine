@@ -402,6 +402,7 @@ struct IRender
 		shader::VertexFormat::Enum fmt, const char* name) X_ABSTRACT;
 	virtual void freeRenderMesh(model::IRenderMesh* pMesh) X_ABSTRACT;
 	 
+	virtual void SetModelMatrix(const Matrix44f& mat) X_ABSTRACT;
 	// ~Model
 };
 

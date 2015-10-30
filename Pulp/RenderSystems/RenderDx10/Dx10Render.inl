@@ -6,6 +6,7 @@ X_NAMESPACE_BEGIN(render)
 void DX11XRender::GetModelViewMatrix(Matrix44f* pMat) 
 {
 	*pMat = *ViewMat_.GetTop();
+	*pMat *= modelMat_;
 }
 
 void DX11XRender::GetProjectionMatrix(Matrix44f* pMat)
@@ -84,6 +85,11 @@ Matrix44f* DX11XRender::pCurProjMat(void)
 bool DX11XRender::IsDeviceLost(void) const
 {
 	return false;
+}
+
+void DX11XRender::SetModelMatrix(const Matrix44f& mat)
+{
+	modelMat_ = mat;
 }
 
 

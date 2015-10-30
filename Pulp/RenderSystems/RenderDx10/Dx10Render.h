@@ -358,6 +358,9 @@ public:
 	X_INLINE Matrix44f* pCurProjMat(void);
 	X_INLINE bool IsDeviceLost(void) const;
 
+	X_INLINE void SetModelMatrix(const Matrix44f& mat) X_OVERRIDE;
+
+
 private:
 	ID3D11InputLayout* CreateILFromDesc(const shader::VertexFormat::Enum vertexFmt,
 		const RenderState::XVertexLayout& layout);
@@ -373,6 +376,7 @@ private:
 protected:
 	XMatrixStack ViewMat_;
 	XMatrixStack ProMat_;
+	Matrix44f modelMat_;
 
 	XDynamicVB<byte> DynVB_[VertexPool::PoolMax];
 
