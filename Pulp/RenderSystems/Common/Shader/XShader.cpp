@@ -1298,7 +1298,7 @@ bool XShaderManager::sourceToString(core::string& str, const char* name)
 		for (auto f : file->includedFiles)
 		{
 			str.append(f->fileData);
-			str.append("\n");
+			str.append("\r\n");
 		}
 
 		str.append(file->fileData);
