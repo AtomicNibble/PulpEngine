@@ -146,6 +146,7 @@ bool XRender::Init(HWND hWnd, uint32_t width, uint32_t height)
 	pRt_->startRenderThread();
 
 	pTextDrawList_ = X_NEW(XTextDrawList, g_rendererArena, "RenderTextDrawList")(g_rendererArena);
+	pTextDrawList_->setCapacity(500 * 512);
 
 	vidMemMng_.StartUp();
 
