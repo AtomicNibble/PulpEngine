@@ -121,7 +121,9 @@ public:
 	{
 		pIndexStream = nullptr;
 
-		core::zero_object(vertexLayoutCache);
+		core::zero_object(ILCache);
+		core::zero_object(streamedILCache);
+
 		pCurrentVertexFmt = nullptr;
 		CurrentVertexFmt = shader::VertexFormat::P3F_T2S;
 		streamedIL = false;
@@ -149,12 +151,12 @@ public:
 
 	// Layouts used for creating device layouts.
 	// XVertexLayout vertexLayoutDescriptions[shader::VertexFormat::Num];
-	std::array<XVertexLayout, shader::VertexFormat::Num> vertexLayoutDescriptions;
-	std::array<XVertexLayout, shader::VertexFormat::Num> streamedVertexLayoutDescriptions;
+	std::array<XVertexLayout, shader::VertexFormat::Num> ILDescriptions;
+	std::array<XVertexLayout, shader::VertexFormat::Num> streamedILDescriptions;
 
 	// GPU layouts.
-	ID3D11InputLayout* vertexLayoutCache[shader::VertexFormat::Num];
-	ID3D11InputLayout* streamedvertexLayoutCache[shader::VertexFormat::Num];
+	ID3D11InputLayout* ILCache[shader::VertexFormat::Num];
+	ID3D11InputLayout* streamedILCache[shader::VertexFormat::Num];
 	ID3D11InputLayout* pCurrentVertexFmt;
 	shader::VertexFormat::Enum CurrentVertexFmt;
 	bool streamedIL;
@@ -364,7 +366,7 @@ private:
 	bool OnPostCreateDevice(void);
 	void InitResources(void);
 	void InitDynamicBuffers(void);
-	void InitVertexLayoutDescriptions(void);
+	void InitILDescriptions(void);
 
 	void FreeDynamicBuffers(void);
 

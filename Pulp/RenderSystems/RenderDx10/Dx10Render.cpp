@@ -933,12 +933,12 @@ void DX11XRender::FX_PipelineShutdown()
 
 void DX11XRender::FX_Init(void)
 {
-	InitVertexLayoutDescriptions();
+	InitILDescriptions();
 
 }
 
 
-void DX11XRender::InitVertexLayoutDescriptions(void)
+void DX11XRender::InitILDescriptions(void)
 {
 	using namespace shader;
 
@@ -965,7 +965,7 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 
 	for (i = 0; i < max; i++)
 	{
-		RenderState::XVertexLayout& layout = State_.vertexLayoutDescriptions[i];
+		RenderState::XVertexLayout& layout = State_.ILDescriptions[i];
 
 		// for now all positions are just 32bit floats baby!
 		elem_pos.AlignedByteOffset = 0;
@@ -1078,7 +1078,7 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 
 	for (i = 0; i < max; i++)
 	{
-		RenderState::XVertexLayout& layout = State_.streamedVertexLayoutDescriptions[i];
+		RenderState::XVertexLayout& layout = State_.streamedILDescriptions[i];
 
 		// Streams
 		// Vert + uv
@@ -1314,28 +1314,28 @@ bool DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFmt, 
 
 	if (streamed)
 	{
-		if (State_.streamedvertexLayoutCache[vertexFmt] == nullptr)
+		if (State_.streamedILCache[vertexFmt] == nullptr)
 		{
-			RenderState::XVertexLayout& layout = State_.streamedVertexLayoutDescriptions[vertexFmt];
+			RenderState::XVertexLayout& layout = State_.streamedILDescriptions[vertexFmt];
 			pLayout = CreateILFromDesc(vertexFmt, layout);
-			State_.streamedvertexLayoutCache[vertexFmt] = pLayout;
+			State_.streamedILCache[vertexFmt] = pLayout;
 		}
 		else
 		{
-			pLayout = State_.streamedvertexLayoutCache[vertexFmt];
+			pLayout = State_.streamedILCache[vertexFmt];
 		}
 	}
 	else
 	{
-		if (State_.vertexLayoutCache[vertexFmt] == nullptr)
+		if (State_.ILCache[vertexFmt] == nullptr)
 		{
-			RenderState::XVertexLayout& layout = State_.vertexLayoutDescriptions[vertexFmt];
+			RenderState::XVertexLayout& layout = State_.ILDescriptions[vertexFmt];
 			pLayout = CreateILFromDesc(vertexFmt, layout);
-			State_.vertexLayoutCache[vertexFmt] = pLayout;
+			State_.ILCache[vertexFmt] = pLayout;
 		}
 		else
 		{
-			pLayout = State_.vertexLayoutCache[vertexFmt];
+			pLayout = State_.ILCache[vertexFmt];
 		}
 	}
 
