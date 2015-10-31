@@ -142,7 +142,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	g_bspFaceAllocator = nullptr;
 	g_bspNodeAllocator = nullptr;
 
-//	system("PAUSE");
 	return 0;
 }
 
