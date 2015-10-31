@@ -362,7 +362,7 @@ void Level::DrawArea(const Area& area)
 		uint32_t entId = modelRefs_.areaRefs[i].entId;
 
 		level::StaticModel& model = staticModels_[entId - 1];
-		DrsawStaticModel(model);
+		DrawStaticModel(model);
 	}
 }
 
