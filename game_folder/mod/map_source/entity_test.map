@@ -2436,413 +2436,525 @@ layer "roof"
 }
 // entity 26
 {
-"origin" "450.0 642.0 130.0"
+"origin" "574.0 578.0 130.0"
 "angles" "90 277.767 7.76748"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
 // entity 27
 {
-"origin" "574.0 578.0 130.0"
-"angles" "90 277.767 7.76748"
-"model" "lights_berlin_subway_hat_100"
-"classname" "misc_model"
-}
-// entity 28
-{
 "origin" "834.0 1390.0 -14.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 29
+// entity 28
 {
 "origin" "834.0 1390.0 -38.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 30
+// entity 29
 {
 "origin" "834.0 1390.0 -62.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 31
+// entity 30
 {
 "origin" "834.0 1390.0 -86.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 32
+// entity 31
 {
 "origin" "834.0 1390.0 -110.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 33
+// entity 32
 {
 "origin" "834.0 1414.0 -14.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 34
+// entity 33
 {
 "origin" "834.0 1414.0 -38.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 35
+// entity 34
 {
 "origin" "834.0 1414.0 -62.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 36
+// entity 35
 {
 "origin" "834.0 1414.0 -86.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 37
+// entity 36
 {
 "origin" "834.0 1414.0 -110.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 38
+// entity 37
 {
 "origin" "834.0 1438.0 -14.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 39
+// entity 38
 {
 "origin" "834.0 1438.0 -38.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 40
+// entity 39
 {
 "origin" "834.0 1438.0 -62.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 41
+// entity 40
 {
 "origin" "834.0 1438.0 -86.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 42
+// entity 41
 {
 "origin" "834.0 1438.0 -110.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 43
+// entity 42
 {
 "origin" "834.0 1462.0 -14.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 44
+// entity 43
 {
 "origin" "834.0 1462.0 -38.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 45
+// entity 44
 {
 "origin" "834.0 1462.0 -62.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 46
+// entity 45
 {
 "origin" "834.0 1462.0 -86.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 47
+// entity 46
 {
 "origin" "834.0 1462.0 -110.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 48
+// entity 47
 {
 "origin" "834.0 1486.0 -14.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 49
+// entity 48
 {
 "origin" "834.0 1486.0 -38.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 50
+// entity 49
 {
 "origin" "834.0 1486.0 -62.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 51
+// entity 50
 {
 "origin" "834.0 1486.0 -86.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 52
+// entity 51
 {
 "origin" "834.0 1486.0 -110.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 53
+// entity 52
 {
 "origin" "834.0 1510.0 -14.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 54
+// entity 53
 {
 "origin" "834.0 1510.0 -38.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 55
+// entity 54
 {
 "origin" "834.0 1510.0 -62.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 56
+// entity 55
 {
 "origin" "834.0 1510.0 -86.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 57
+// entity 56
 {
 "origin" "834.0 1510.0 -110.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 58
+// entity 57
 {
 "origin" "834.0 1318.0 -14.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 59
+// entity 58
 {
 "origin" "834.0 1318.0 -38.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 60
+// entity 59
 {
 "origin" "834.0 1318.0 -62.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 61
+// entity 60
 {
 "origin" "834.0 1318.0 -86.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 62
+// entity 61
 {
 "origin" "834.0 1318.0 -110.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 63
+// entity 62
 {
 "origin" "834.0 1342.0 -14.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 64
+// entity 63
 {
 "origin" "834.0 1342.0 -38.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 65
+// entity 64
 {
 "origin" "834.0 1342.0 -62.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 66
+// entity 65
 {
 "origin" "834.0 1342.0 -86.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 67
+// entity 66
 {
 "origin" "834.0 1342.0 -110.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 68
+// entity 67
 {
 "origin" "834.0 1366.0 -14.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 69
+// entity 68
 {
 "origin" "834.0 1366.0 -38.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 70
+// entity 69
 {
 "origin" "834.0 1366.0 -62.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 71
+// entity 70
 {
 "origin" "834.0 1366.0 -86.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 72
+// entity 71
 {
 "origin" "834.0 1366.0 -110.0"
 "angles" "3.38467e-007 180 90.0005"
 "model" "lights_berlin_subway_hat_100"
 "classname" "misc_model"
 }
-// entity 73
+// entity 72
 {
 "origin" "8.0 152.0 8.0"
 "angles" "0 90 0"
 "model" "static_berlin_plainchair"
 "classname" "misc_model"
 }
-// entity 74
+// entity 73
 {
 "origin" "-616.0 2052.0 -92.0"
 "angles" "0 90 0"
 "model" "static_berlin_plainchair"
 "classname" "misc_model"
 }
-// entity 75
+// entity 74
 {
 "origin" "-417.2 1244.8 144.0"
 "angles" "0 30 0"
 "model" "static_berlin_rolling_pan"
 "classname" "misc_model"
 }
-// entity 76
+// entity 75
 {
 "angles" "0 300 0"
 "origin" "33.5 1254.6 144.0"
 "model" "static_berlin_mannequin"
 "classname" "misc_model"
 }
-// entity 77
+// entity 76
 {
 "origin" "259.5 1420.6 144.0"
 "model" "static_berlin_refrigerator"
 "classname" "misc_model"
 }
-// entity 78
+// entity 77
 {
 "angles" "0 270 0"
 "origin" "258.6 1540.5 144.0"
 "model" "static_berlin_gurney"
 "classname" "misc_model"
 }
-// entity 79
+// entity 78
 {
 "angles" "0 270 0"
 "origin" "164.6 1540.5 144.0"
 "model" "static_berlin_gurney"
 "classname" "misc_model"
 }
-// entity 80
+// entity 79
 {
 "angles" "0 270 0"
 "origin" "256.6 1664.5 144.0"
 "model" "static_berlin_gurney"
 "classname" "misc_model"
 }
-// entity 81
+// entity 80
 {
 "angles" "0 270 0"
 "origin" "162.6 1664.5 144.0"
 "model" "static_berlin_gurney"
 "classname" "misc_model"
 }
-// entity 82
+// entity 81
 {
 "classname" "misc_model"
 "model" "static_berlin_plainchair"
 "angles" "0 90 0"
 "origin" "-144.0 200.0 8.0"
 }
-// entity 83
+// entity 82
 {
 "classname" "misc_model"
 "model" "static_berlin_plainchair"
 "angles" "0 90 0"
 "origin" "-88.0 152.0 8.0"
 }
-// entity 84
+// entity 83
 {
 "classname" "misc_model"
 "model" "static_berlin_plainchair"
 "angles" "0 90 0"
 "origin" "-184.0 168.0 8.0"
+}
+// entity 84
+{
+"classname" "misc_model"
+"model" "lights_berlin_subway_hat_100"
+"angles" "90 0 0"
+"origin" "450.0 642.0 130.0"
+}
+// entity 85
+{
+"classname" "misc_model"
+"model" "lights_berlin_subway_hat_100"
+"angles" "90 0 0"
+"origin" "-30.0 1218.0 122.0"
+}
+// entity 86
+{
+"classname" "misc_model"
+"model" "lights_berlin_subway_hat_100"
+"angles" "90 0 0"
+"origin" "-102.0 1218.0 122.0"
+}
+// entity 87
+{
+"classname" "misc_model"
+"model" "lights_berlin_subway_hat_100"
+"angles" "90 0 0"
+"origin" "-182.0 1218.0 122.0"
+}
+// entity 88
+{
+"classname" "misc_model"
+"model" "lights_berlin_subway_hat_100"
+"angles" "90 0 0"
+"origin" "34.0 1218.0 122.0"
+}
+// entity 89
+{
+"classname" "misc_model"
+"model" "lights_berlin_subway_hat_100"
+"angles" "90 0 0"
+"origin" "-64.0 1474.0 238.0"
+}
+// entity 90
+{
+"classname" "misc_model"
+"model" "lights_berlin_subway_hat_100"
+"angles" "90 0 0"
+"origin" "-570.0 1522.0 122.0"
+}
+// entity 91
+{
+"classname" "misc_model"
+"model" "lights_berlin_subway_hat_100"
+"angles" "90 0 0"
+"origin" "-834.0 1648.0 122.0"
+}
+// entity 92
+{
+"classname" "misc_model"
+"model" "lights_berlin_subway_hat_100"
+"angles" "90 0 0"
+"origin" "-874.0 1494.0 122.0"
+}
+// entity 93
+{
+"classname" "misc_model"
+"model" "lights_berlin_subway_hat_100"
+"angles" "90 0 0"
+"origin" "-574.0 1214.0 122.0"
+}
+// entity 94
+{
+"classname" "misc_model"
+"model" "lights_berlin_subway_hat_100"
+"angles" "90 0 0"
+"origin" "-352.0 640.0 122.0"
+}
+// entity 95
+{
+"classname" "misc_model"
+"model" "lights_berlin_subway_hat_100"
+"angles" "90 0 0"
+"origin" "-340.0 454.0 122.0"
+}
+// entity 96
+{
+"classname" "misc_model"
+"model" "lights_berlin_subway_hat_100"
+"angles" "90 0 0"
+"origin" "-114.0 448.0 122.0"
+}
+// entity 97
+{
+"angles" "0 35 0"
+"origin" "396.3 1262.2 8.0"
+"model" "static_berlin_mannequin"
+"classname" "misc_model"
+}
+// entity 98
+{
+"angles" "0 180 0"
+"origin" "722.5 833.4 8.0"
+"model" "static_berlin_gurney"
+"classname" "misc_model"
+}
+// entity 99
+{
+"angles" "0 35 0"
+"origin" "532.3 932.2 8.0"
+"model" "static_berlin_mannequin"
+"classname" "misc_model"
+}
+// entity 100
+{
+"angles" "0 295 0"
+"origin" "809.1 928.5 8.0"
+"model" "static_berlin_mannequin"
+"classname" "misc_model"
 }
