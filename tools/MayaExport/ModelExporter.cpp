@@ -1015,16 +1015,17 @@ MStatus MayaLOD::LoadMeshes(void)
 							vert = &mesh->verts[num];
 
 							// the start index for the weights in 'mesh->weights'
-							vert->startWeightIdx = (int32)mesh->weights.size();
+							vert->startWeightIdx = safe_static_cast<int32_t, size_t>(
+								mesh->weights.size());
 
 							float totalweight = 0.0f;
 
 							// copy the weight data for this vertex
 							int numNonZeroWeights = 0;
 							int k, numAdded = 0;
-							for (k = 0; k < (int)infCount; ++k)
+							for (k = 0; k < safe_static_cast<int,unsigned>(infCount); ++k)
 							{
-								float w = (float)wts[k];
+								float w = static_cast<float>(wts[k]);
 								if (w > 0.0f) {
 									numNonZeroWeights++;
 								}
@@ -1073,7 +1074,8 @@ MStatus MayaLOD::LoadMeshes(void)
 							}
 
 							// calculate total total vets TWAT!
-							vert->numWeights = (int32)mesh->weights.size() - vert->startWeightIdx;
+							vert->numWeights = safe_static_cast<int32_t, size_t>(
+								mesh->weights.size()) - vert->startWeightIdx;
 
 							if (vert->numWeights > VERTEX_MAX_WEIGHTS)
 							{
@@ -1181,7 +1183,7 @@ void MayaLOD::MergeMeshes(void)
 			}
 		}
 
-		uint numMeshes = (int32)meshes_.size();
+		uint numMeshes = safe_static_cast<int32_t, size_t>(meshes_.size());
 
 		const int numThreads = 2;
 		if (numMeshes >= numThreads) // atleast 2 meshes, before we bother threading.
@@ -1492,7 +1494,7 @@ void MayaModel::pruneBones(void)
 	//	tagOrigin_.exportNode.setParent(exportHead);
 	}
 
-	g_stats.totalJointsDropped = (int32_t)bones_.size() - numExportJoints_;
+	g_stats.totalJointsDropped = safe_static_cast<int32_t, size_t>(bones_.size() - numExportJoints_);
 }
 
 void MayaModel::MergeMeshes()
