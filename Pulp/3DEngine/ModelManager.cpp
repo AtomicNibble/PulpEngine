@@ -54,6 +54,7 @@ void XModelManager::Init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
+	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
 
 	ADD_COMMAND("listModels", Cmd_ListModels, core::VarFlag::SYSTEM, "List all the loaded models.");
