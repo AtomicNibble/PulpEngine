@@ -61,7 +61,7 @@ namespace
 	static PotatoOptions g_options;
 
 	static const float MERGE_VERTEX_EPSILON = 0.9f;
-	static const float MERGE_TEXCORDS_EPSILON = 0.05f;
+	static const float MERGE_TEXCORDS_EPSILON = 0.02f;
 	static const float JOINT_WEIGHT_THRESHOLD = 0.005f;
 	static const int   VERTEX_MAX_WEIGHTS = 4;
 
