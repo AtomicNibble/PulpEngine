@@ -470,6 +470,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Dx10Render.inl" />
+    <None Include="Dx10Shader.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

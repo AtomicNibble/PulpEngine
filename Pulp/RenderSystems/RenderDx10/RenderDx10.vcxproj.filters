@@ -219,5 +219,8 @@
     <None Include="Dx10Render.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="Dx10Shader.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
