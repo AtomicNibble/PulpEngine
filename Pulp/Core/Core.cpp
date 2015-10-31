@@ -394,6 +394,11 @@ bool XCore::addfileType(core::IXHotReload* pHotReload, const char* extension)
 //	X_ASSERT_NOT_NULL(pHotReload);
 	X_ASSERT_NOT_NULL(extension);
 	
+	if (core::strUtil::Find(extension, '.')) {
+		X_ERROR("HotReload", "extension can't contain dots");
+		return false;
+	}
+
 	// note: hotReloadExtMap_ stores char* pointer.
 	if (pHotReload == nullptr) {
 		hotReloadExtMap_.erase(extension);
