@@ -103,7 +103,7 @@ static const uint32_t	 MODEL_MAX_VERT_BINDS = 4;
 static const uint32_t	 MODEL_MAX_LODS = 4;
 // legnth checks are done without extension, to make it include extension, simple reduce it by the length of ext.
 static const uint32_t	 MODEL_MAX_NAME_LENGTH = 60; 
-static const char*		 MODEL_FILE_EXTENSION = ".model";
+static const char*		 MODEL_FILE_EXTENSION = "model";
 
 // Flags:
 // LOOSE: the model file is not packed, meaning it has a string table that needs processing.
