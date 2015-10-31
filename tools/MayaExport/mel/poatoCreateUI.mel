@@ -277,7 +277,7 @@ global proc ModelEntryExport(int $index)
 	string $options = "-progress PotatoExportProgress -dir \"" + $Dir + "\" -scale " + $scale + " -weight_thresh " + $weightThreshold + " -uv_merge_thresh " + $uvMergeThreshold + " -zero_origin " + $zeroOrigin + " -force_bones \"" + $forceBoneFilters + "\"";
 	string $command = "PotatoExportModel " + $args + " -f \"" + $filename + "\" "+ $options;
 	
-	print_Msg("cmd: " + $command);
+	// print_Msg("cmd: " + $command);
 	
 	// run 
 	string $errorMsg;
