@@ -1780,8 +1780,9 @@ bool MayaModel::save(const char *filename)
 				MayaBone* parent = bone->exportNode.parent();
 
 				uint8_t idx = 0;
-				if (parent)
-					idx = safe_static_cast<uint8_t,uint32_t>(parent->exportIdx);
+				if (parent) {
+					idx = safe_static_cast<uint8_t, uint32_t>(parent->exportIdx);
+				}
 
 				fwrite(&idx, sizeof(idx), 1, f);
 			}
