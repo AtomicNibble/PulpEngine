@@ -177,10 +177,10 @@ bool XModelManager::OnFileChange(const char* name)
 		{
 			X_LOG0("Model", "reload model: \"%s\"", name);
 
-
+			return true;
 		}
 	}
-	return true;
+	return false;
 }
 
 void XModelManager::ListModels(const char* searchPatten) const
