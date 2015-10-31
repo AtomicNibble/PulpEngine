@@ -210,29 +210,10 @@ public:
 	const int releaseHW(void);
 
 	// binds the shader to gpu ()
-	X_INLINE bool bind()
-	{
-		if (this->type_ == ShaderType::Vertex)
-			return bindVS();
-		if (this->type_ == ShaderType::Pixel)
-			return bindPS();
-		if (this->type_ == ShaderType::Geometry)
-			return bindGS();
-		X_ASSERT_UNREACHABLE();
-		return false;
-	}
-
-
-	X_INLINE ShaderStatus::Enum getStatus(void) const {
-		return status_;
-	}
-
-	X_INLINE bool isValid(void) const {
-		return status_ == ShaderStatus::ReadyToRock;
-	}
-	X_INLINE bool FailedtoCompile(void) const {
-		return status_ == ShaderStatus::FailedToCompile;
-	}
+	X_INLINE bool bind();
+	X_INLINE ShaderStatus::Enum getStatus(void) const;
+	X_INLINE bool isValid(void) const;
+	X_INLINE bool FailedtoCompile(void) const;
 
 	static void Init(void);
 	static void shutDown(void);
