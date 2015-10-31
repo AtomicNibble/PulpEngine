@@ -420,6 +420,17 @@ void PotatoOptions::setcmdArgs(const MArgList &args)
 		}
 	}
 
+	idx = args.flagIndex("uv_merge_thresh");
+	if (idx != MArgList::kInvalidArgIndex) {
+		double temp;
+		if (!args.get(++idx, temp)) {
+			MayaPrintWarning("failed to get uv_merge_thresh flag");
+		}
+		else {
+			uvMergeThreshold_ = static_cast<float>(temp);
+		}
+	}
+
 	idx = args.flagIndex("zero_origin");
 	if (idx != MArgList::kInvalidArgIndex) {
 		if (!args.get(++idx, zeroOrigin_)) {
@@ -468,6 +479,7 @@ void PotatoOptions::reset(void)
 	filePath_.clear();
 	scale_ = 1.0f;
 	jointThreshold_ = JOINT_WEIGHT_THRESHOLD;
+	uvMergeThreshold_ = MERGE_TEXCORDS_EPSILON;
 	zeroOrigin_ = true;
 	whiteVertColors_ = true;
 	forceBoneFilters_.clear();
@@ -635,6 +647,8 @@ void MayaMesh::shareVerts(void)
 	size_t numEqual = 0;
 	size_t numUnique = 0;
 
+	const float uvMergeThreshold_ = g_options.uvMergeThreshold_;
+
 	for (i = 0; i < faces.size(); i++)
 	{
 		for (x = 0; x < 3; x++) // for each face.
@@ -662,7 +676,7 @@ void MayaMesh::shareVerts(void)
 				if (!vert.pos.compare(vv->pos, MERGE_VERTEX_EPSILON))
 					continue; // not same
 
-				if (!vert.uv.compare(vv->uv, MERGE_TEXCORDS_EPSILON))
+				if (!vert.uv.compare(vv->uv, uvMergeThreshold_))
 					continue; // not same
 
 				equal = true;
