@@ -179,7 +179,7 @@ private:
 	void DrawArea(const Area& area);
 	void DrawMultiAreaModels(void);
 
-	void DRawStaticModel(const level::StaticModel& sm) const;
+	void DrawStaticModel(const level::StaticModel& sm) const;
 
 private:
 	bool ProcessHeader(uint32_t bytesRead);

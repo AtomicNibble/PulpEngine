@@ -362,7 +362,7 @@ void Level::DrawArea(const Area& area)
 		uint32_t entId = modelRefs_.areaRefs[i].entId;
 
 		level::StaticModel& model = staticModels_[entId - 1];
-		DRawStaticModel(model);
+		DrsawStaticModel(model);
 	}
 }
 
@@ -395,13 +395,13 @@ void Level::DrawMultiAreaModels(void)
 
 				level::StaticModel& model = staticModels_[ref.entId - 1];
 				
-				DRawStaticModel(model);
+				DrawStaticModel(model);
 			}
 		}
 	}
 }
 
-void Level::DRawStaticModel(const level::StaticModel& sm) const
+void Level::DrawStaticModel(const level::StaticModel& sm) const
 {
 	if (sm.pModel)
 	{
