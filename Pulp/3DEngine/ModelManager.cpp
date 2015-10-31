@@ -63,6 +63,10 @@ void XModelManager::Init(void)
 
 	// should load the default model.
 
+	pDefaultModel_ = loadModel("default");
+	if (!pDefaultModel_) {
+		X_ERROR("ModelManager", "Failed to load default model");
+	}
 }
 
 
@@ -153,13 +157,13 @@ IModel* XModelManager::loadModel(const char* ModelName)
 	}
 
 	X_WARNING("ModelManager", "Failed to load model: \"%s\"", ModelName);
-	return nullptr;
+	return getDefaultModel();
 }
 
 IModel* XModelManager::getDefaultModel(void)
 {
-
-	return nullptr;
+	X_ASSERT_NOT_NULL(pDefaultModel_);
+	return pDefaultModel_;
 }
 
 bool XModelManager::OnFileChange(const char* name)
