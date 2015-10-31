@@ -174,9 +174,11 @@ namespace
 		int		j, k;
 		Matrix33f	mat;
 
-		for (j = 0; j < 3; j++)
-			for (k = 0; k < 3; k++)
-				mat.at(j, k) = (float)matrix[j][k];
+		for (j = 0; j < 3; j++) {
+			for (k = 0; k < 3; k++) {
+				mat.at(j, k) = static_cast<float>(matrix[j][k]);
+			}
+		}
 
 		return mat;
 	}
@@ -216,8 +218,9 @@ namespace
 		path.extendToShape();
 
 		instanceNum = 0;
-		if (path.isInstanced())
+		if (path.isInstanced()) {
 			instanceNum = path.instanceNumber();
+		}
 
 		MFnMesh fnMesh(path);
 		MObjectArray sets;
@@ -283,8 +286,9 @@ namespace
 
 		// ok the name is 2nd one.
 		// check we have 2 tho.
-		if (Stack.size() > 1)
+		if (Stack.size() > 1) {
 			Stack.pop();
+		}
 
 		return Stack.top();
 	}
@@ -667,17 +671,18 @@ void MayaMesh::shareVerts(void)
 			{
 				const MayaVertex* vv = it->second.pVert;
 				
-				if (vert.numWeights != vv->numWeights)
+				if (vert.numWeights != vv->numWeights) {
 					continue;
-
-				if (vert.startWeightIdx != vv->startWeightIdx)
+				}
+				if (vert.startWeightIdx != vv->startWeightIdx) {
 					continue;
-
-				if (!vert.pos.compare(vv->pos, MERGE_VERTEX_EPSILON))
+				}
+				if (!vert.pos.compare(vv->pos, MERGE_VERTEX_EPSILON)) {
 					continue; // not same
-
-				if (!vert.uv.compare(vv->uv, uvMergeThreshold_))
+				}
+				if (!vert.uv.compare(vv->uv, uvMergeThreshold_)) {
 					continue; // not same
+				}
 
 				equal = true;
 				break; // equal.
@@ -1228,8 +1233,9 @@ void MayaLOD::MergeMeshes(void)
 MayaModel::MayaModel() :
 	bones_(g_arena)
 {
-	for (uint i = 0; i < 4; i++)
-		lods_[i].setModel(this,i);
+	for (uint i = 0; i < 4; i++) {
+		lods_[i].setModel(this, i);
+	}
 
 	g_stats.clear();
 	numExportJoints_ = 0;
@@ -1333,8 +1339,9 @@ MStatus MayaModel::lodLODs(void)
 	for (uint i = 0; i < g_options.numLods(); i++)
 	{
 		status = lods_[i].LoadMeshes();
-		if (!status)
+		if (!status) {
 			break;
+		}
 	}
 	return status;
 }
@@ -1363,8 +1370,9 @@ MStatus MayaModel::loadBones(void)
 			return status;
 		}
 
-		if (!dagPath.hasFn(MFn::kJoint))
+		if (!dagPath.hasFn(MFn::kJoint)) {
 			continue;
+		}
 		
 		MayaBone new_bone;
 		new_bone.dagnode = X_NEW(MFnDagNode,g_arena, "BoneDagNode")(dagPath, &status);
@@ -1399,8 +1407,9 @@ MStatus MayaModel::loadBones(void)
 	// create hierarchy
 	bone = bones_.ptr();
 	for (i = 0; i < bones_.size(); i++, bone++) {
-		if (!bone->dagnode) 
+		if (!bone->dagnode)  {
 			continue;
+		}
 		
 		bone->mayaNode.setParent(mayaHead);
 		bone->exportNode.setParent(exportHead);
@@ -1410,9 +1419,10 @@ MStatus MayaModel::loadBones(void)
 
 			// do we have this joint?
 			for (j = 0; j < bones_.size(); j++) {
-				if (!bones_[j].dagnode) 
+				if (!bones_[j].dagnode)  {
 					continue;
-				
+				}
+
 				if (bones_[j].dagnode->name() == parentNode->name()) {
 					bone->mayaNode.setParent(bones_[j].mayaNode);
 					bone->exportNode.setParent(bones_[j].exportNode);
@@ -1444,8 +1454,9 @@ void MayaModel::pruneBones(void)
 	MayaBone		*parent;
 	uint				i;
 
-	for (i = 0; i < g_options.numLods(); i++)
+	for (i = 0; i < g_options.numLods(); i++) {
 		lods_[i].pruneBones();
+	}
 
 	numExportJoints_ = 0;
 	bone = bones_.ptr();
@@ -1607,7 +1618,7 @@ uint32_t MayaModel::calculateSubDataSize(const Flags8<model::StreamType>& stream
 	for (i = 0; i < 4; i++)
 	{
 		// for each lod we have Vert, Face, bind
-		size += (uint32_t)lods_[i].getSubDataSize(streams);
+		size += safe_static_cast<uint32_t,size_t>(lods_[i].getSubDataSize(streams));
 	}
 
 	return size;
