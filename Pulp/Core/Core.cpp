@@ -394,21 +394,18 @@ bool XCore::addfileType(core::IXHotReload* pHotReload, const char* extension)
 //	X_ASSERT_NOT_NULL(pHotReload);
 	X_ASSERT_NOT_NULL(extension);
 	
-	// strip dots out.
-	core::string ext(extension);
-	ext.trim('.');
-
+	// note: hotReloadExtMap_ stores char* pointer.
 	if (pHotReload == nullptr) {
-		hotReloadExtMap_.erase(ext);
+		hotReloadExtMap_.erase(extension);
 		return true;
 	}
 
-	if (hotReloadExtMap_.find(ext) != hotReloadExtMap_.end()) {
+	if (hotReloadExtMap_.find(extension) != hotReloadExtMap_.end()) {
 		X_ERROR("HotReload", "failed to register file type, it already has a handler");
 		return false;
 	}
 
-	hotReloadExtMap_.insert(hotReloadMap::value_type(ext, pHotReload));
+	hotReloadExtMap_.insert(hotReloadMap::value_type(extension, pHotReload));
 	return true;
 }
 
