@@ -279,6 +279,12 @@ global proc ModelEntryExport(int $index)
 	
 	// print_Msg("cmd: " + $command);
 	
+	if(int(`size $Dir`) < 1)
+	{
+		print_Error("No export dir set! set a path in the paths tab.");
+		return;
+	}
+	
 	// run 
 	string $errorMsg;
 	$error = catch ( $errorMsg = eval( $command ) );
