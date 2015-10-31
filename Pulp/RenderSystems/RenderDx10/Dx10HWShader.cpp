@@ -36,6 +36,7 @@ int XHWShader_Dx10::perInstantMaxVecs_[ShaderType::ENUM_COUNT] = { 0 };
 core::Array<XShaderParam> XHWShader_Dx10::perFrameParams_[ShaderType::ENUM_COUNT] = {0,0,0,0};
 core::Array<XShaderParam> XHWShader_Dx10::perInstantParams_[ShaderType::ENUM_COUNT] = { 0, 0, 0, 0 };
 
+int XHWShader_Dx10::writeMergedSource_ = 0;
 
 
 namespace
@@ -508,6 +509,7 @@ bool XHWShader_Dx10::loadFromSource()
 	}
 
 	// save copy of merged shader for debugging.
+	if(writeMergedSource_ == 1)
 	{
 		core::Path<char> src;
 		getShaderCompileSrc(src);
@@ -1164,6 +1166,8 @@ XShaderParam* XHWShader_Dx10::getParameter(const core::StrHash& nameHash)
 
 void XHWShader_Dx10::Init(void)
 {
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pConsole);
 	X_ASSERT_NOT_NULL(g_rendererArena);
 
 	s_pHWshaders = X_NEW_ALIGNED(render::XRenderResourceContainer, g_rendererArena,
@@ -1178,8 +1182,16 @@ void XHWShader_Dx10::Init(void)
 
 	InitBufferPointers();
 	CreateInputLayoutTree();
+	RegisterDvars();
 }
 
+void XHWShader_Dx10::RegisterDvars()
+{
+	ADD_CVAR_REF("shader_writeMergedSource", writeMergedSource_, 1, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
+		"Writes the merged shader source to file before it's compiled");
+
+}
 
 void XHWShader_Dx10::shutDown(void)
 {

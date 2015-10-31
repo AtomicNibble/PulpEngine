@@ -523,6 +523,7 @@ private:
 
 	static void CreateInputLayoutTree(void);
 	static void FreeInputLayoutTree(void);
+	static void RegisterDvars(void);
 
 	static ILTreeNode ILTree_;
 	static XShaderBin bin_;
@@ -544,6 +545,8 @@ private:
 	static core::Array<XShaderParam> perFrameParams_[ShaderType::ENUM_COUNT];
 	static core::Array<XShaderParam> perInstantParams_[ShaderType::ENUM_COUNT];
 
+	// vars
+	static int writeMergedSource_;
 };
 
 
