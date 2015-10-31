@@ -574,6 +574,11 @@ void RenderNull::freeRenderMesh(model::IRenderMesh* pMesh)
 
 }
 
+void RenderNull::SetModelMatrix(const Matrix44f& mat)
+{
+	X_UNUSED(mat);
+}
+
 // ~Model
 
 
