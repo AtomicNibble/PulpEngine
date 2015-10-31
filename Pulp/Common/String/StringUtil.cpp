@@ -492,6 +492,12 @@ namespace strUtil
 	}
 
 
+
+	const char* Find(const char* startInclusive, char what)
+	{
+		return Find(startInclusive, startInclusive + strlen(startInclusive), what);
+	}
+
 	/// \brief Finds a character in a string, and returns a pointer to the first occurrence of the character.
 	/// \remark Returns a \c nullptr if the character could not be found.
 	const char* Find(const char* startInclusive, const char* endExclusive, char what)
