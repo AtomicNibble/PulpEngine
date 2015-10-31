@@ -352,11 +352,13 @@ bool Level::ProcessData(uint32_t bytesRead)
 		modelRefs.areaMultiRefs.resize(numMultiAreaModelRefs);
 		file.readObj(modelRefs.areaMultiRefs.ptr(), modelRefs.areaMultiRefs.size());
 
+#if 0
 		for (size_t b = 0; b < fileHdr_.numAreas; b++)
 		{
 			const FileAreaRefHdr& areaModelsHdr = modelRefs.areaRefHdrs[b];
 			X_LOG0("modelRefs", "%i start: %i num: %i", b, areaModelsHdr.startIndex, areaModelsHdr.num);
 		}
+#endif
 	}
 
 	{
@@ -383,8 +385,8 @@ bool Level::ProcessData(uint32_t bytesRead)
 				const char* modelName = stringTable_.getString(sm.modelNameIdx);
 				model::IModel* pModel = getModelManager()->loadModel(modelName);
 				
-				X_LOG0("SM", "%i name: %s pos: (%g,%g,%g,)", i,  modelName,
-					sm.pos[0], sm.pos[1], sm.pos[2]);
+		//		X_LOG0("SM", "%i name: %s pos: (%g,%g,%g,)", i,  modelName,
+		//			sm.pos[0], sm.pos[1], sm.pos[2]);
 
 				sm.pModel = pModel;
 			}
