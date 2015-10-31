@@ -152,7 +152,7 @@ bool Level::Init(void)
 	ADD_CVAR_REF("lvl_drawPortals", s_var_drawPortals_, 1, 0, 4, core::VarFlag::SYSTEM,
 		"Draws the inter area portals. 0=off 1=solid 2=wire 3=solid_dt 4=wire_dt");
 
-	ADD_CVAR_REF("lvl_drawArea", s_var_drawArea_, 10, -1, level::MAP_MAX_AREAS,
+	ADD_CVAR_REF("lvl_drawArea", s_var_drawArea_, -1, -1, level::MAP_MAX_AREAS,
 		core::VarFlag::SYSTEM, "Draws the selected area index. -1 = disable");
 
 	ADD_CVAR_REF("lvl_drawCurAreaOnly", s_var_drawCurrentAreaOnly_, 0, 0, 1, 
