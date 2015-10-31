@@ -680,9 +680,10 @@ void MayaMesh::shareVerts(void)
 				numUnique++;
 
 
-				faces[i][x] = (int)verts.append(vert);
-				if (vert.numWeights > 0)
+				faces[i][x] = safe_static_cast<int,size_t>(verts.append(vert));
+				if (vert.numWeights > 0) {
 					CompBinds[vert.numWeights - 1]++;
+				}
 
 				Hashcontainer temp;
 				temp.pVert = &verts[verts.size() - 1];
