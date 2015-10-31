@@ -394,17 +394,21 @@ bool XCore::addfileType(core::IXHotReload* pHotReload, const char* extension)
 //	X_ASSERT_NOT_NULL(pHotReload);
 	X_ASSERT_NOT_NULL(extension);
 	
+	// strip dots out.
+	core::string ext(extension);
+	ext.trim('.');
+
 	if (pHotReload == nullptr) {
-		hotReloadExtMap_.erase(extension);
+		hotReloadExtMap_.erase(ext);
 		return true;
 	}
 
-	if (hotReloadExtMap_.find(extension) != hotReloadExtMap_.end()) {
+	if (hotReloadExtMap_.find(ext) != hotReloadExtMap_.end()) {
 		X_ERROR("HotReload", "failed to register file type, it already has a handler");
 		return false;
 	}
 
-	hotReloadExtMap_.insert(hotReloadMap::value_type(extension, pHotReload));
+	hotReloadExtMap_.insert(hotReloadMap::value_type(ext, pHotReload));
 	return true;
 }
 
@@ -429,7 +433,7 @@ bool XCore::OnFileChange(core::XDirectoryWatcher::Action::Enum action,
 		ext = core::strUtil::FileExtension(name);
 		if (ext)
 		{
-			it = hotReloadExtMap_.find(ext);
+			it = hotReloadExtMap_.find(X_CONST_STRING(ext));
 			if (it != hotReloadExtMap_.end())
 			{
 				return it->second->OnFileChange(name);
