@@ -244,6 +244,8 @@ bool Level::canRender(void)
 
 bool Level::render(void)
 {
+	X_PROFILE_BEGIN("Level render", core::ProfileSubSys::ENGINE3D);
+
 	if (!canRender())
 		return false;
 
