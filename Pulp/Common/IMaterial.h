@@ -47,14 +47,19 @@ X_DECLARE_ENUM8(MaterialType)(
 	UNKNOWN
 );
 
-/*
+#ifdef TRANSPARENT
+#undef TRANSPARENT
+#endif // !TRANSPARENT
+#ifdef OPAQUE
+#undef OPAQUE
+#endif // !OPAQUE
+
 X_DECLARE_ENUM8(MaterialCoverage)(
 	BAD,
-	OPAQUE,			// completely fills the triangle, will have black drawn on fillDepthBuffer
-	PERFORATED,		// may have alpha tested holes
-	TRANSLUCENT		// blended with background
+	OPAQUE,
+	PERFORATED,
+	TRANSLUCENT
 );
-*/
 
 // offset types.
 X_DECLARE_ENUM8(MaterialPolygonOffset)(
@@ -159,6 +164,9 @@ struct IMaterial
 	virtual MaterialType::Enum getType(void) const X_ABSTRACT;
 	virtual void setType(MaterialType::Enum type) X_ABSTRACT;
 
+	virtual MaterialCoverage::Enum getCoverage(void) const X_ABSTRACT;
+	virtual void setCoverage(MaterialCoverage::Enum coverage) X_ABSTRACT;
+
 	virtual void setShaderItem(shader::XShaderItem& item) X_ABSTRACT;
 	virtual shader::XShaderItem& getShaderItem(void) X_ABSTRACT;
 
@@ -186,6 +194,9 @@ struct MaterialHeader
 	MaterialPolygonOffset::Enum polyOffsetType;
 	MaterialFilterType::Enum filterType;
 	MaterialType::Enum matType;
+	// 1
+	MaterialCoverage::Enum coverage;
+	uint8_t _pad[3];
 
 	Color diffuse;
 	Color specular;
@@ -213,8 +224,9 @@ X_ENSURE_SIZE(MaterialTexRepeat::Enum, 1);
 X_ENSURE_SIZE(MaterialPolygonOffset::Enum, 1);
 X_ENSURE_SIZE(MaterialFilterType::Enum, 1);
 X_ENSURE_SIZE(MaterialType::Enum, 1);
+X_ENSURE_SIZE(MaterialCoverage::Enum, 1);
 
-X_ENSURE_SIZE(MaterialHeader, 68);
+X_ENSURE_SIZE(MaterialHeader, 72);
 
 
 struct IMaterialManagerListener

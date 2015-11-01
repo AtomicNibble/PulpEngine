@@ -13,7 +13,7 @@ using namespace core::xml::rapidxml;
 namespace
 {
 
-	X_DECLARE_FLAGS(MtlXmlFlags)(NAME, FLAGS, SURFACETYPE);
+	X_DECLARE_FLAGS(MtlXmlFlags)(NAME, FLAGS, SURFACETYPE, COVERAGE);
 
 
 	struct TextureType
@@ -137,6 +137,25 @@ namespace
 		return MaterialSurType::NONE;
 	}
 
+	MaterialCoverage::Enum CoverageFromStr(const char* str)
+	{
+		const char* pBegin = str;
+		const char* pEnd = str + core::strUtil::strlen(str);
+
+		if (core::strUtil::IsEqual(pBegin, pEnd, "opaque")) {
+			return MaterialCoverage::OPAQUE;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "perforated")) {
+			return MaterialCoverage::PERFORATED;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "translucent")) {
+			return MaterialCoverage::TRANSLUCENT;
+		}
+
+		X_ERROR("Mtl", "Unkown material coverage type: '%s' (case-sen)", str);
+		return MaterialCoverage::BAD;
+	}
+
 } // namespace
 
 
@@ -162,6 +181,7 @@ XMaterial::XMaterial()
 	polyOffsetType_ = MaterialPolygonOffset::NONE;
 	filterType_ = MaterialFilterType::LINEAR;
 	MatType_ = MaterialType::UNKNOWN;
+	coverage_ = MaterialCoverage::BAD;
 }
 
 XMaterial::~XMaterial()
@@ -272,6 +292,16 @@ void XMaterial::setType(MaterialType::Enum type)
 	MatType_ = type;
 }
 
+MaterialCoverage::Enum XMaterial::getCoverage(void) const
+{
+	return coverage_;
+}
+
+void XMaterial::setCoverage(MaterialCoverage::Enum coverage)
+{
+	coverage_ = coverage;
+}
+
 
 void XMaterial::setShaderItem(shader::XShaderItem& item)
 {
@@ -328,6 +358,13 @@ bool XMaterial::ProcessMaterialXML(XMaterial* pMaterial,
 			MaterialSurType::Enum type = SurfaceTypeFromStr(attr->value());
 			pMaterial->setSurfaceType(type);
 		}
+		else if (core::strUtil::IsEqual(begin, end, "Coverage"))
+		{
+			flags.Set(MtlXmlFlags::COVERAGE);
+
+			MaterialCoverage::Enum coverage = CoverageFromStr(attr->value());
+			pMaterial->setCoverage(coverage);
+		}
 		else if (core::strUtil::IsEqual(begin, end, "MaterialType"))
 		{
 			// make sure the name is a valid material type.
@@ -348,9 +385,21 @@ bool XMaterial::ProcessMaterialXML(XMaterial* pMaterial,
 	if (!flags.IsSet(MtlXmlFlags::SURFACETYPE))
 		X_ERROR("Mtl", "material node missing 'SurfaceType' attribute");
 
+	// default to opaque
+	if (!flags.IsSet(MtlXmlFlags::COVERAGE))
+	{
+		flags.Set(MtlXmlFlags::COVERAGE);
+		pMaterial->setCoverage(MaterialCoverage::OPAQUE);
+	}
+		
+
 	// are all 3 set ?
-	if (core::bitUtil::CountBits(flags.ToInt()) != MtlXmlFlags::FLAGS_COUNT)
+	if (core::bitUtil::CountBits(flags.ToInt()) != MtlXmlFlags::FLAGS_COUNT) 
+	{
+		const char* pName = pMaterial->getName();
+		X_ERROR("Mtl", "Material missing required info: %s", pName);
 		return false;
+	}
 
 	// texture me up !
 	textures = node->first_node("textures");
