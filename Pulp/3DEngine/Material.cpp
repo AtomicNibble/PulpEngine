@@ -12,10 +12,6 @@ using namespace core::xml::rapidxml;
 
 namespace
 {
-
-	X_DECLARE_FLAGS(MtlXmlFlags)(NAME, FLAGS, SURFACETYPE, COVERAGE);
-
-
 	struct TextureType
 	{
 		const char* name;

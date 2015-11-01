@@ -24,9 +24,6 @@ using namespace shader;
 
 namespace {
 
-	X_DECLARE_FLAGS(MtlXmlFlags)(NAME, FLAGS, SURFACETYPE);
-
-
 	struct TextureType
 	{
 		const char* name;
@@ -58,6 +55,114 @@ namespace {
 		}
 
 		return false;
+	}
+
+	// string to material type.
+	MaterialType::Enum MatTypeFromStr(const char* str)
+	{
+		// case sensitive for this one
+		const char* pBegin = str;
+		const char* pEnd = str + core::strUtil::strlen(str);
+
+		if (core::strUtil::IsEqual(pBegin, pEnd, "world")) {
+			return MaterialType::WORLD;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "ui")) {
+			return MaterialType::UI;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "model")) {
+			return MaterialType::MODEL;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "tool")) {
+			return MaterialType::TOOL;
+		}
+
+		X_ERROR("Mtl", "Unknown material type: '%s' (case-sen)", str);
+		return MaterialType::UNKNOWN;
+	}
+
+	MaterialSurType::Enum SurfaceTypeFromStr(const char* str)
+	{
+		// case sensitive for this one
+		const char* pBegin = str;
+		const char* pEnd = str + core::strUtil::strlen(str);
+
+		if (core::strUtil::IsEqual(pBegin, pEnd, "none")) {
+			return MaterialSurType::NONE;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "brick")) {
+			return MaterialSurType::BRICK;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "concrete")) {
+			return MaterialSurType::CONCRETE;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "cloth")) {
+			return MaterialSurType::CLOTH;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "flesh")) {
+			return MaterialSurType::FLESH;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "glass")) {
+			return MaterialSurType::GLASS;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "grass")) {
+			return MaterialSurType::GRASS;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "gravel")) {
+			return MaterialSurType::GRAVEL;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "ice")) {
+			return MaterialSurType::ICE;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "metal")) {
+			return MaterialSurType::METAL;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "mud")) {
+			return MaterialSurType::MUD;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "plastic")) {
+			return MaterialSurType::PLASTIC;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "paper")) {
+			return MaterialSurType::PAPER;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "rock")) {
+			return MaterialSurType::ROCK;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "snow")) {
+			return MaterialSurType::SNOW;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "sand")) {
+			return MaterialSurType::SAND;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "wood")) {
+			return MaterialSurType::WOOD;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "water")) {
+			return MaterialSurType::WATER;
+		}
+
+		X_ERROR("Mtl", "Unknown material surface type: '%s' (case-sen)", str);
+		return MaterialSurType::NONE;
+	}
+
+	MaterialCoverage::Enum CoverageFromStr(const char* str)
+	{
+		const char* pBegin = str;
+		const char* pEnd = str + core::strUtil::strlen(str);
+
+		if (core::strUtil::IsEqual(pBegin, pEnd, "opaque")) {
+			return MaterialCoverage::OPAQUE;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "perforated")) {
+			return MaterialCoverage::PERFORATED;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "translucent")) {
+			return MaterialCoverage::TRANSLUCENT;
+		}
+
+		X_ERROR("Mtl", "Unknown material coverage type: '%s' (case-sen)", str);
+		return MaterialCoverage::BAD;
 	}
 
 	bool ProcessMaterialXML(XMaterial* pMaterial, xml_node<>* node)
@@ -101,6 +206,19 @@ namespace {
 				MaterialSurType::Enum type = core::strUtil::StringToInt<MaterialSurType::Enum>(attr->value());
 				pMaterial->setSurfaceType(type);
 			}
+			else if (core::strUtil::IsEqual(begin, end, "Coverage"))
+			{
+				flags.Set(MtlXmlFlags::COVERAGE);
+
+				MaterialCoverage::Enum coverage = CoverageFromStr(attr->value());
+				pMaterial->setCoverage(coverage);
+			}
+			else if (core::strUtil::IsEqual(begin, end, "MaterialType"))
+			{
+				// make sure the name is a valid material type.
+				MaterialType::Enum type = MatTypeFromStr(attr->value());
+				pMaterial->setType(type);
+			}
 			else
 			{
 				X_WARNING("Mtl", "unkown attribute: %s on material node", begin);
@@ -113,6 +231,13 @@ namespace {
 			X_ERROR("Mtl", "material node missing 'flags' attribute");
 		if (!flags.IsSet(MtlXmlFlags::SURFACETYPE))
 			X_ERROR("Mtl", "material node missing 'SurfaceType' attribute");
+
+		// default to opaque
+		if (!flags.IsSet(MtlXmlFlags::COVERAGE))
+		{
+			flags.Set(MtlXmlFlags::COVERAGE);
+			pMaterial->setCoverage(MaterialCoverage::OPAQUE);
+		}
 
 		// are all 3 set ?
 		if (core::bitUtil::CountBits(flags.ToInt()) != MtlXmlFlags::FLAGS_COUNT)

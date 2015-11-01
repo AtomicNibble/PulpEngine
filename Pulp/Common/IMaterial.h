@@ -19,6 +19,9 @@ static const char*		 MTL_FILE_EXTENSION = "mtl";
 static const float POLY_DECAL_OFFSET = 0.05f;
 static const float POLY_WEAPON_IMPACT_OFFSET = 0.1f;
 
+X_DECLARE_FLAGS(MtlXmlFlags)(NAME, FLAGS, SURFACETYPE, COVERAGE);
+
+
 X_DECLARE_FLAGS(MaterialFlag)(
 	NODRAW,			// 1 not visable
 	EDITOR_VISABLE, // 2 makes nodraw visable in editor modes.
