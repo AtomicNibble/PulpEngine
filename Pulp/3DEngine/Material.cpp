@@ -68,7 +68,7 @@ namespace
 			return MaterialType::TOOL;
 		}
 
-		X_ERROR("Mtl", "Unkown material type: '%s' (case-sen)", str);
+		X_ERROR("Mtl", "Unknown material type: '%s' (case-sen)", str);
 		return MaterialType::UNKNOWN;
 	}
 
@@ -133,7 +133,7 @@ namespace
 			return MaterialSurType::WATER;
 		}
 
-		X_ERROR("Mtl", "Unkown material surface type: '%s' (case-sen)", str);
+		X_ERROR("Mtl", "Unknown material surface type: '%s' (case-sen)", str);
 		return MaterialSurType::NONE;
 	}
 
@@ -152,7 +152,7 @@ namespace
 			return MaterialCoverage::TRANSLUCENT;
 		}
 
-		X_ERROR("Mtl", "Unkown material coverage type: '%s' (case-sen)", str);
+		X_ERROR("Mtl", "Unknown material coverage type: '%s' (case-sen)", str);
 		return MaterialCoverage::BAD;
 	}
 
