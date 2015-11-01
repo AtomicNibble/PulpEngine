@@ -528,11 +528,9 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 
 		level::FileStaticModel& sm = staticModels_.AddOne();
 		sm.pos = lvlEnt.origin;
+		sm.angle = Quatf(toRadians(lvlEnt.angle.x), 
+			toRadians(lvlEnt.angle.y), toRadians(lvlEnt.angle.z));
 
-	//	sm.angle = Quatf(toRadians(lvlEnt.angle.x), 
-	//		toRadians(lvlEnt.angle.y), toRadians(lvlEnt.angle.z));
-		sm.angle = Quatf(toRadians(lvlEnt.angle.z),
-			toRadians(lvlEnt.angle.x), toRadians(lvlEnt.angle.y));
 
 		uint32_t entId = safe_static_cast<uint32_t, size_t>(staticModels_.size());
 
