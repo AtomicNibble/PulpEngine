@@ -597,16 +597,20 @@ void XConsole::Startup(ICore* pCore)
 	ADD_CVAR_REF_NO_NAME(console_buffer_size, 1000, 1, 10000, VarFlag::SYSTEM, "Size of the log buffer");
 	ADD_CVAR_REF_NO_NAME(console_output_draw_channel, 1, 0, 1, VarFlag::SYSTEM, "Draw the channel in a diffrent color. 0=disabled 1=enabled");
 
-	ADD_CVAR_REF_COL_NO_NAME(console_input_box_color, Color(0.3f, 0.3f, 0.3f, 0.75f), VarFlag::SYSTEM, "Console input box color");
-	ADD_CVAR_REF_COL_NO_NAME(console_input_box_color_border, Color(0.1f, 0.1f, 0.1f, 1.0f), VarFlag::SYSTEM, "Console input box color");
-	ADD_CVAR_REF_COL_NO_NAME(console_output_box_color, Color(0.2f, 0.2f, 0.2f, 0.9f), VarFlag::SYSTEM, "Console output box color");
-	ADD_CVAR_REF_COL_NO_NAME(console_output_box_color_border, Color(0.1f, 0.1f, 0.1f, 1.0f), VarFlag::SYSTEM, "Console output box color");
-	ADD_CVAR_REF_COL_NO_NAME(console_output_box_channel_color, Color(0.15f, 0.15f, 0.15f, 0.9f), VarFlag::SYSTEM, "Console output box channel color");
-
+	ADD_CVAR_REF_COL_NO_NAME(console_input_box_color, Color(0.3f, 0.3f, 0.3f, 0.75f), 
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console input box color");
+	ADD_CVAR_REF_COL_NO_NAME(console_input_box_color_border, Color(0.1f, 0.1f, 0.1f, 1.0f), 
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console input box color");
+	ADD_CVAR_REF_COL_NO_NAME(console_output_box_color, Color(0.2f, 0.2f, 0.2f, 0.9f), 
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output box color");
+	ADD_CVAR_REF_COL_NO_NAME(console_output_box_color_border, Color(0.1f, 0.1f, 0.1f, 1.0f), 
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output box color");
+	ADD_CVAR_REF_COL_NO_NAME(console_output_box_channel_color, Color(0.15f, 0.15f, 0.15f, 0.9f), 
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output box channel color");
 	ADD_CVAR_REF_COL_NO_NAME(console_output_scroll_bar_color, Color(0.5f, 0.5f, 0.5f, 0.5f),
-		VarFlag::SYSTEM, "Console output scroll bar color");
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output scroll bar color");
 	ADD_CVAR_REF_COL_NO_NAME(console_output_scroll_bar_slider_color, Color(0.0f, 0.0f, 0.0f, 0.9f), 
-		VarFlag::SYSTEM, "Console output scroll bar slider color");
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output scroll bar slider color");
 
 
 
