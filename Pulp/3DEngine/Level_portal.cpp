@@ -208,6 +208,8 @@ void Level::DrawPortalDebug(void) const
 			flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOff);
 		}
 
+		flags.SetCullMode(AuxGeom_CullMode::CullModeNone);
+
 		pAux->setRenderFlags(flags);
 
 
