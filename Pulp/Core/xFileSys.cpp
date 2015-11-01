@@ -778,7 +778,7 @@ bool xFileSys::isDirectoryOS(pathTypeW fullPath) const
 		return false;
 	}
 
-	if (lastError::Get() != INVALID_FILE_ATTRIBUTES)
+	if (dwAttrib != INVALID_FILE_ATTRIBUTES)
 	{
 		lastError::Description Dsc;
 		X_ERROR("FileSys", "isDirectory failed. Error: %s", lastError::ToString(Dsc));
