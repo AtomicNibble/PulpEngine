@@ -34,7 +34,20 @@ uint32_t LoggerInternalConsoleFormatPolicy::Format(LoggerBase::Line& line, const
 	X_UNUSED(verbosity);
 	X_UNUSED(sourceInfo);
 
-	bytesWritten = _snprintf_s(line, _TRUNCATE, "^4%-12s^7", channel);
+	char colorCode = '7';
+
+	if (!core::strUtil::IsEqual(type, "INFO")) 
+	{
+		if (core::strUtil::IsEqual(type, "WARNING")) {
+			colorCode = '6';
+		}
+		else  {
+			colorCode = '1';
+		}
+	} 
+
+
+	bytesWritten = _snprintf_s(line, _TRUNCATE, "^4%-12s^%c", channel, colorCode);
 	bytesWritten += vsnprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, format, args);
 	bytesWritten += _snprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, "\n");
 
