@@ -69,6 +69,13 @@ namespace
 	static const size_t VAR_MAX = 4096;
 	static const char* CONFIG_FILE_EXTENSION = "cfg";
 
+
+	template <typename T, typename T2>
+	inline float PercentageOf(const T& sub, const T2& of)
+	{
+		return (static_cast<float>(sub) / static_cast<float>(of)) * 100;
+	}
+
 	static void sortVarsByName(core::Array<core::ICVar*>& vars)
 	{
 		using namespace std;
@@ -1801,13 +1808,6 @@ void XConsole::DrawBuffer()
 
 	}
 
-}
-
-
-template <typename T, typename T2>
-inline float PercentageOf(const T& sub, const T2& of)
-{
-	return (static_cast<float>(sub) / static_cast<float>(of)) * 100;
 }
 
 void XConsole::DrawScrollBar()
