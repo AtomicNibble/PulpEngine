@@ -320,8 +320,11 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	core::symbolResolution::Refresh();
 
 	// show the window
-	if (pWindow_)
+	if (pWindow_) {
 		pWindow_->Show();
+		pWindow_->ClipCursorToWindow();
+	}
+
 	return true;
 }
 
