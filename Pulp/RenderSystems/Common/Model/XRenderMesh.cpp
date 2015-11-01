@@ -172,6 +172,8 @@ bool XRenderMesh::render(void)
 	uint32_t i, num;
 	num = pMesh_->numSubMeshes;
 
+	bool drawNoneOpaque = false;
+
 	for (i = 0; i < num; i++)
 	{
 		const model::SubMeshHeader* mesh = pMesh_->subMeshHeads[i];
@@ -182,6 +184,12 @@ bool XRenderMesh::render(void)
 		engine::MaterialFlags flags = pMat->getFlags();
 		if (flags.IsSet(engine::MaterialFlag::NODRAW))
 		{
+			continue;
+		}
+
+		if (pMat->getCoverage() != engine::MaterialCoverage::OPAQUE)
+		{
+			drawNoneOpaque = true;
 			continue;
 		}
 
@@ -207,6 +215,50 @@ bool XRenderMesh::render(void)
 			mesh->startIndex,
 			mesh->startVertex
 		);
+	}
+
+	if (drawNoneOpaque)
+	{
+		for (i = 0; i < num; i++)
+		{
+			const model::SubMeshHeader* mesh = pMesh_->subMeshHeads[i];
+			engine::IMaterial* pMat = mesh->pMat;
+
+			if (pMat->getCoverage() == engine::MaterialCoverage::OPAQUE)
+			{
+				continue;
+			}
+
+			engine::MaterialFlags flags = pMat->getFlags();
+			if (flags.IsSet(engine::MaterialFlag::NODRAW))
+			{
+				continue;
+			}
+
+			shader::XShaderItem& shaderItem = pMat->getShaderItem();
+			if (shaderItem.pResources_)
+			{
+				shader::XTextureResource* pTextRes = shaderItem.pResources_->getTexture(shader::ShaderTextureIdx::DIFFUSE);
+				if (pTextRes)
+				{
+					texture::TexID id = pTextRes->pITex->getTexID();
+					texture::XTexture::applyFromId(0, id, 0);
+				}
+				pTextRes = shaderItem.pResources_->getTexture(shader::ShaderTextureIdx::BUMP);
+				if (pTextRes)
+				{
+					texture::TexID id = pTextRes->pITex->getTexID();
+					texture::XTexture::applyFromId(1, id, 0);
+				}
+			}
+
+			g_Dx11D3D.FX_DrawIndexPrimitive(
+				PrimitiveType::TriangleList,
+				mesh->numIndexes,
+				mesh->startIndex,
+				mesh->startVertex
+			);
+		}
 	}
 
 	return true;

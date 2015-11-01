@@ -384,8 +384,6 @@ void Level::DrawArea(const Area& area)
 {
 	SetAreaVisible(area.areaNum);
 
-	area.pRenderMesh->render();
-	
 	const FileAreaRefHdr& areaModelsHdr = modelRefs_.areaRefHdrs[area.areaNum];
 
 	size_t i, end;
@@ -403,6 +401,9 @@ void Level::DrawArea(const Area& area)
 		level::StaticModel& model = staticModels_[entId - 1];
 		DrawStaticModel(model);
 	}
+
+	area.pRenderMesh->render();
+
 }
 
 void Level::DrawMultiAreaModels(void)
