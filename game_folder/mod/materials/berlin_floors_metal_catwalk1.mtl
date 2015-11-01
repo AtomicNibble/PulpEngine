@@ -1,4 +1,4 @@
-<material name="" flags="8" SurfaceType="none">
+<material name="" flags="8" SurfaceType="metal" Coverage="perforated">
 	<textures>
 		<texture type="albedo" image_name="textures/berlin_floors_metal_catwalk1_c.dds" />
 	</textures>
