@@ -151,6 +151,7 @@ public:
 	bool Load(const char* mapName);
 
 	void DrawPortalDebug(void) const;
+	void DrawAreaBounds(void);
 
 public:
 	// util

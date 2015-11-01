@@ -7,6 +7,7 @@
 #include <IConsole.h>
 
 #include <Math\XWinding.h>
+#include <IRenderAux.h>
 
 
 X_NAMESPACE_BEGIN(level)
@@ -146,8 +147,8 @@ bool Level::Init(void)
 	ADD_CVAR_REF("lvl_usePortals", s_var_usePortals_, 1, 0, 1,
 		core::VarFlag::SYSTEM, "Use area portals when rendering the level.");
 	
-	ADD_CVAR_REF("lvl_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 1,
-		core::VarFlag::SYSTEM, "Draws bounding box around each level area");
+	ADD_CVAR_REF("lvl_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 2,
+		core::VarFlag::SYSTEM, "Draws bounding box around each level area. 1=visble 2=all");
 
 	ADD_CVAR_REF("lvl_drawPortals", s_var_drawPortals_, 1, 0, 4, core::VarFlag::SYSTEM,
 		"Draws the inter area portals. 0=off 1=solid 2=wire 3=solid_dt 4=wire_dt");
@@ -339,8 +340,44 @@ bool Level::render(void)
 	// we know all the visible areas now.
 	DrawMultiAreaModels();
 
+	DrawAreaBounds();
 	DrawPortalDebug();
 	return true;
+}
+
+void Level::DrawAreaBounds(void)
+{
+	using namespace render;
+
+	if (s_var_drawAreaBounds_)
+	{
+		IRenderAux* pAux = gEnv->pRender->GetIRenderAuxGeo();
+		XAuxGeomRenderFlags flags = AuxGeom_Defaults::Def3DRenderflags;
+		flags.SetDepthWriteFlag(AuxGeom_DepthWrite::DepthWriteOff);
+		flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOff);
+		pAux->setRenderFlags(flags);
+
+		Color color = Col_Red;
+
+		// visible only
+		if (s_var_drawAreaBounds_ == 1)
+		{
+			for (const auto& a : areas_)
+			{
+				if (a.frameID == frameID_)
+				{
+					pAux->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), false, color);
+				}
+			}
+		}
+		else // all
+		{
+			for (const auto& a : areas_)
+			{
+				pAux->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), false, color);
+			}
+		}
+	}
 }
 
 void Level::DrawArea(const Area& area)
