@@ -298,6 +298,9 @@ bool LvlBrush::calculateContents(void)
 		if (pMat->getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
 			opaque = false;
 		}
+		else if (pMat->getCoverage() != engine::MaterialCoverage::OPAQUE) {
+			opaque = false;
+		}
 
 		if (MatName != side.matInfo.name) {
 			allsidesSameMat = false;
