@@ -53,6 +53,8 @@ void AreaModel::EndModel(void)
 	// this could be done in parrell.
 	AABB bounds;
 
+	bounds.clear();
+
 	core::Array<model::SubMeshHeader>::ConstIterator it = meshes.begin();
 	for (; it != meshes.end(); ++it)
 	{
