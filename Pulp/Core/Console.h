@@ -140,6 +140,7 @@ class XConsole :
 {
 public:
 	static const size_t MAX_HISTORY_ENTRIES = 64;
+	static const size_t CONSOLE_LOG_LINE_HIEGHT = 20;
 
 	struct consoleState
 	{
@@ -283,6 +284,9 @@ private:
 		return autoCompleteNum_ > 0;
 	}
 
+	// returns the max log lines that fit on screen.
+	size_t MaxVisibleLogLines(void) const;
+
 private:
 	void DrawBuffer();
 	void DrawScrollBar();
@@ -378,6 +382,8 @@ private:
 	static Color	console_output_box_color;
 	static Color	console_output_box_color_border;
 	static Color	console_output_box_channel_color;
+	static Color	console_output_scroll_bar_color;
+	static Color	console_output_scroll_bar_slider_color;
 	static int		console_output_draw_channel;
 	static int		console_buffer_size;
 

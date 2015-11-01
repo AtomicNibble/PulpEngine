@@ -242,6 +242,8 @@ Color XConsole::console_input_box_color_border;
 Color XConsole::console_output_box_color;
 Color XConsole::console_output_box_color_border;
 Color XConsole::console_output_box_channel_color;
+Color XConsole::console_output_scroll_bar_color;
+Color XConsole::console_output_scroll_bar_slider_color;
 int	  XConsole::console_output_draw_channel;
 int	XConsole::console_buffer_size = 0;
 
@@ -601,6 +603,11 @@ void XConsole::Startup(ICore* pCore)
 	ADD_CVAR_REF_COL_NO_NAME(console_output_box_color_border, Color(0.1f, 0.1f, 0.1f, 1.0f), VarFlag::SYSTEM, "Console output box color");
 	ADD_CVAR_REF_COL_NO_NAME(console_output_box_channel_color, Color(0.15f, 0.15f, 0.15f, 0.9f), VarFlag::SYSTEM, "Console output box channel color");
 
+	ADD_CVAR_REF_COL_NO_NAME(console_output_scroll_bar_color, Color(0.5f, 0.5f, 0.5f, 0.5f),
+		VarFlag::SYSTEM, "Console output scroll bar color");
+	ADD_CVAR_REF_COL_NO_NAME(console_output_scroll_bar_slider_color, Color(0.0f, 0.0f, 0.0f, 0.9f), 
+		VarFlag::SYSTEM, "Console output scroll bar slider color");
+
 
 
 	ADD_COMMAND("exec", Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
@@ -669,19 +676,43 @@ void XConsole::freeRenderResources(void)
 
 bool XConsole::OnInputEvent(const input::InputEvent& event)
 {
+	if (event.keyId == input::KeyId::MOUSE_Z)
+	{
+		int32_t scaled = static_cast<int32_t>(event.value);
+
+		scaled /= 20;
+
+		ScrollPos_ += scaled;
+		if (ScrollPos_ < 0) {
+			ScrollPos_ = 0;
+		}
+		else
+		{
+			int32_t logSize = static_cast<int32_t>(ConsoleLog_.size());
+			int32_t visibleNum = static_cast<int32_t>(MaxVisibleLogLines());
+		
+			logSize -= visibleNum;
+			logSize += 2;
+
+			if (ScrollPos_ > logSize) {
+				ScrollPos_ = logSize;
+			}
+		} 
+
+		return true;
+	}
+
 	if (event.action == input::InputState::RELEASED && isVisable())
 		repeatEvent_.keyId = input::KeyId::UNKNOWN;
 
 	if (event.action != input::InputState::PRESSED)
 	{
 		// if open we eat all none mouse
-		if (event.deviceId == input::InputDeviceType::KEYBOARD)
+		if (event.deviceId == input::InputDeviceType::KEYBOARD)\
 			return isVisable();
 
 		return false;
 	}
-
-
 
 	repeatEvent_ = event;
 	repeatEventTimer_ = repeatEventInitialDelay_;
@@ -1654,6 +1685,16 @@ void XConsole::Draw()
 	DrawBuffer();
 }
 
+size_t XConsole::MaxVisibleLogLines(void) const
+{
+	size_t height = pRender_->getHeight() - 40;
+
+	size_t scaledLogHeight = static_cast<size_t>(
+		static_cast<float>(CONSOLE_LOG_LINE_HIEGHT)* 0.8f);
+
+	return height / scaledLogHeight;
+}
+
 void XConsole::DrawBuffer()
 {
 	if (this->consoleState_ == consoleState::CLOSED)
@@ -1662,7 +1703,7 @@ void XConsole::DrawBuffer()
 	font::XTextDrawConect ctx;
 	ctx.SetColor(Col_Khaki);
 	ctx.SetProportional(false);
-	ctx.SetSize(Vec2f(20, 20));
+	ctx.SetSize(Vec2f(20, static_cast<float>(CONSOLE_LOG_LINE_HIEGHT)));
 	ctx.SetCharWidthScale(0.5f);
 //	ctx.SetScaleFrom800x600(true);
 
@@ -1687,6 +1728,7 @@ void XConsole::DrawBuffer()
 			pRender_->DrawQuad(5, 35, width, height, console_output_box_color);
 			pRender_->DrawRect(5, 35, width, height, console_output_box_color_border);
 
+			DrawScrollBar();
 		}
 
 		pRender_->Set2D(false);	
@@ -1699,7 +1741,7 @@ void XConsole::DrawBuffer()
 		Vec2f pos(10, 5);
 		Vec2f txtwidth = pFont_->GetTextSize(txt, ctx);
 		float fCharHeight = 0.8f * ctx.GetCharHeight();
-		int	  CharHeight = (int)(fCharHeight);
+		int	  CharHeight = static_cast<int>(fCharHeight);
 
 		ctx.SetEffectId(pFont_->GetEffectId("drop"));
 		
@@ -1719,6 +1761,8 @@ void XConsole::DrawBuffer()
 			pFont_->DrawString(Vec2f(pos.x + Lwidth, pos.y), "_", ctx);
 		}
 
+		size_t numDraw = 0;
+
 		// the log.
 		if (isExpanded())
 		{
@@ -1731,6 +1775,8 @@ void XConsole::DrawBuffer()
 			float xPos = 8;
 			float yPos = height + 15; // 15 uints up
 			int nScroll = 0;
+
+
 			while (ritor != ConsoleLog_.rend() && yPos >= 30) // max 30 below top(not bottom)
 			{
 				if (nScroll >= ScrollPos_)
@@ -1739,6 +1785,7 @@ void XConsole::DrawBuffer()
 
 					pFont_->DrawString(xPos, yPos, buf, ctx);
 					yPos -= CharHeight;
+					numDraw++;
 				}
 				nScroll++;
 				++ritor;
@@ -1747,12 +1794,17 @@ void XConsole::DrawBuffer()
 
 		// draw the auto complete
 		DrawInputTxt(pos);
-		DrawScrollBar();
 
 	}
 
 }
 
+
+template <typename T, typename T2>
+inline float PercentageOf(const T& sub, const T2& of)
+{
+	return (static_cast<float>(sub) / static_cast<float>(of)) * 100;
+}
 
 void XConsole::DrawScrollBar()
 {
@@ -1761,7 +1813,38 @@ void XConsole::DrawScrollBar()
 
 	if(pFont_ && pRender_)
 	{
+		// oooo shit nuggger wuggger.
+		float width = pRender_->getWidthf() - 10;
+		float height = pRender_->getHeightf() - 40;
 
+		const float barWidth = 6;
+		const float marging = 5;
+		const float sliderHeight = 20;
+
+		float start_x = (width + 5) - (barWidth + marging);
+		float start_y = 35 + marging;
+		float barHeight = height - (marging * 2);
+
+		float slider_x = start_x;
+		float slider_y = start_y;
+		float slider_width = barWidth ;
+		float slider_height = sliderHeight;
+
+		// work out the possition of slider.
+		// we take the height of the bar - slider and divide.
+		size_t visibleNum = MaxVisibleLogLines();
+		size_t scrollableLines = ConsoleLog_.size() - (visibleNum += 2);
+
+		float positionPercent = PercentageOf(ScrollPos_, scrollableLines) * 0.01f;
+		float offset = (barHeight - slider_height) * positionPercent;
+
+		slider_y += (barHeight - slider_height - offset);
+		if (slider_y < start_y) {
+			slider_y = start_y;
+		}
+
+		pRender_->DrawQuad(start_x, start_y, barWidth, barHeight, console_output_scroll_bar_color);
+		pRender_->DrawQuad(slider_x, slider_y, slider_width, slider_height, console_output_scroll_bar_slider_color);
 
 	}
 }
@@ -2212,9 +2295,22 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
 
 	int bufferSize = console_buffer_size;
 
-	while (safe_static_cast<int,size_t>(ConsoleLog_.size()) > bufferSize)
+	if (safe_static_cast<int,size_t>(ConsoleLog_.size()) > bufferSize)
 	{
 		ConsoleLog_.pop_front();
+
+		size_t noneScroll = MaxVisibleLogLines();
+
+		// move scroll wheel with the moving items?
+		if (ScrollPos_ > 0 && ScrollPos_ < (ConsoleLog_.size() - noneScroll)) {
+			ScrollPos_++;
+		}
+	}
+	else
+	{
+		if (ScrollPos_ > 0) {
+			ScrollPos_++;
+		}
 	}
 }
 
