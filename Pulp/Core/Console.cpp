@@ -687,31 +687,7 @@ void XConsole::freeRenderResources(void)
 
 bool XConsole::OnInputEvent(const input::InputEvent& event)
 {
-	if (event.keyId == input::KeyId::MOUSE_Z)
-	{
-		int32_t scaled = static_cast<int32_t>(event.value);
-
-		scaled /= 20;
-
-		ScrollPos_ += scaled;
-		if (ScrollPos_ < 0) {
-			ScrollPos_ = 0;
-		}
-		else
-		{
-			int32_t logSize = static_cast<int32_t>(ConsoleLog_.size());
-			int32_t visibleNum = static_cast<int32_t>(MaxVisibleLogLines());
-		
-			logSize -= visibleNum;
-			logSize += 2;
-
-			if (ScrollPos_ > logSize) {
-				ScrollPos_ = logSize;
-			}
-		} 
-
-		return true;
-	}
+	// NOT OPEN
 
 	if (event.action == input::InputState::RELEASED && isVisable())
 		repeatEvent_.keyId = input::KeyId::UNKNOWN;
@@ -772,6 +748,33 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 	}
 	else
 	{
+		// OPEN
+		if (event.keyId == input::KeyId::MOUSE_Z)
+		{
+			int32_t scaled = static_cast<int32_t>(event.value);
+
+			scaled /= 20;
+
+			ScrollPos_ += scaled;
+			if (ScrollPos_ < 0) {
+				ScrollPos_ = 0;
+			}
+			else
+			{
+				int32_t logSize = static_cast<int32_t>(ConsoleLog_.size());
+				int32_t visibleNum = static_cast<int32_t>(MaxVisibleLogLines());
+
+				logSize -= visibleNum;
+				logSize += 2;
+
+				if (ScrollPos_ > logSize) {
+					ScrollPos_ = logSize;
+				}
+			}
+
+			return true;
+		}
+		
 		if (event.keyId != input::KeyId::TAB)
 		{
 		//	ResetAutoCompletion();
