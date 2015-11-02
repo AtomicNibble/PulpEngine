@@ -812,13 +812,16 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 		// clear states.
 		pInput_->ClearKeyState();
 
-		if (expand) // shift + ` dose not close anymore just expands.
+		if (expand) { // shift + ` dose not close anymore just expands.
 			ShowConsole(consoleState::EXPANDED);
-		else
+		}
+		else {
 			ToggleConsole(); // toggle it.
+		}
 
-		if (!visable) /// don't clear if already visable, as we are just expanding.
+		if (!visable) { /// don't clear if already visable, as we are just expanding.
 			ClearInputBuffer();
+		}
 		return true;
 	}
 	else if (event.keyId == input::KeyId::ESCAPE)
@@ -835,8 +838,9 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 
 bool XConsole::OnInputEventChar(const input::InputEvent& event)
 {
-	if (!isVisable())
+	if (!isVisable()) {
 		return false;
+	}
 
 	repeatEvent_ = event;
 
@@ -847,13 +851,16 @@ bool XConsole::OnInputEventChar(const input::InputEvent& event)
 
 void XConsole::AddInputChar(const char c)
 {
-	if (c == '`' || c == '¬') // sent twice.
+	if (c == '`' || c == '¬') { // sent twice.
 		return;
-	
-	if (CursorPos_ < safe_static_cast<int32_t,size_t>(InputBuffer_.length()))
+	}
+
+	if (CursorPos_ < safe_static_cast<int32_t, size_t>(InputBuffer_.length())) {
 		InputBuffer_.insert(CursorPos_, c);
-	else
+	}
+	else {
 		InputBuffer_ = InputBuffer_ + c;
+	}
 
 	CursorPos_++;
 

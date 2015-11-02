@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.40629.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "..\Pulp\Common\Common.vcxproj", "{07328CCB-F9CC-4967-861E-272BCA0CAB04}"
 EndProject
@@ -266,6 +266,7 @@ Global
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Debug|Win32.ActiveCfg = Super_8.5|Win32
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Debug|Win32.Build.0 = Super_8.5|Win32
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Debug|x64.ActiveCfg = Debug_2013|x64
+		{1904BF9F-C79B-4715-A76D-7648593C9166}.Debug|x64.Build.0 = Debug_2013|x64
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Release|Win32.ActiveCfg = Release_2015|Win32
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Release|Win32.Build.0 = Release_2015|Win32
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Release|x64.ActiveCfg = Super_2015|x64
