@@ -21,9 +21,9 @@ void XMapPatch::GenerateEdgeIndexes(void)
 	int *index, *vertexEdges, *edgeChain;
 	surfaceEdge_t e[3];
 
-	vertexEdges = Alloca16<int>(verts.size() * sizeof(int));
+	vertexEdges = reinterpret_cast<int*>(Alloca16(verts.size() * sizeof(int)));
 	memset(vertexEdges, -1, verts.size() * sizeof(int));
-	edgeChain = Alloca16<int>(indexes.size() * sizeof(int));
+	edgeChain = reinterpret_cast<int*>(Alloca16(indexes.size() * sizeof(int)));
 
 	edgeIndexes.resize(indexes.size());
 
