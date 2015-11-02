@@ -77,6 +77,12 @@ void XModelManager::ShutDown(void)
 
 	gEnv->pHotReload->addfileType(nullptr, MODEL_FILE_EXTENSION);
 
+
+	// default model
+	if (pDefaultModel_) {
+		pDefaultModel_->forceRelease();
+	}
+
 	// any left?
 	core::XResourceContainer::ResourceItor it = models_.begin();
 	for (; it != models_.end();)
@@ -91,11 +97,6 @@ void XModelManager::ShutDown(void)
 
 		X_WARNING("XModel", "\"%s\" was not deleted", pModel->getName());
 		pModel->forceRelease();
-	}
-
-	// default model
-	if (pDefaultModel_) {
-		pDefaultModel_->forceRelease();
 	}
 }
 
