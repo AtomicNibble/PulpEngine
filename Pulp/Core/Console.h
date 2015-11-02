@@ -387,6 +387,10 @@ private:
 	static int		console_output_draw_channel;
 	static int		console_buffer_size;
 
+	// some behaviour options.
+	static int		console_disable_mouse;
+
+
 	friend void Command_Exit(IConsoleCmdArgs* Cmd);
 	friend void Command_Exec(IConsoleCmdArgs* Cmd);
 	friend void Command_Help(IConsoleCmdArgs* Cmd);

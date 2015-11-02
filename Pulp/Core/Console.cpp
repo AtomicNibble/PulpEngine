@@ -253,6 +253,7 @@ Color XConsole::console_output_scroll_bar_color;
 Color XConsole::console_output_scroll_bar_slider_color;
 int	  XConsole::console_output_draw_channel;
 int	XConsole::console_buffer_size = 0;
+int XConsole::console_disable_mouse = 0;
 
 
 void Command_Exec(IConsoleCmdArgs* Cmd)
@@ -618,7 +619,9 @@ void XConsole::Startup(ICore* pCore)
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output scroll bar color");
 	ADD_CVAR_REF_COL_NO_NAME(console_output_scroll_bar_slider_color, Color(0.0f, 0.0f, 0.0f, 0.9f), 
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output scroll bar slider color");
-
+	ADD_CVAR_REF_NO_NAME(console_disable_mouse, 2, 0, 2,
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Disable mouse input when console open."
+		" 1=expanded only 2=always");
 
 
 	ADD_COMMAND("exec", Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
@@ -702,7 +705,14 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 		// Stops the camera moving around when we have console open.
 		if (event.deviceId == input::InputDevice::MOUSE)
 		{
-			return isVisable();
+			if (console_disable_mouse == 1) // only if expanded
+			{
+				return isExpanded();
+			}
+			if (console_disable_mouse == 2)
+			{
+				return isVisable();
+			}
 		}
 
 		return false;
