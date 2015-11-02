@@ -698,6 +698,13 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 		if (event.deviceId == input::InputDeviceType::KEYBOARD)
 			return isVisable();
 
+		// eat mouse move?
+		// Stops the camera moving around when we have console open.
+		if (event.deviceId == input::InputDevice::MOUSE)
+		{
+			return isVisable();
+		}
+
 		return false;
 	}
 
@@ -749,32 +756,35 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 	else
 	{
 		// OPEN
-		if (event.keyId == input::KeyId::MOUSE_Z)
+		if (isExpanded()) // you can only scroll a expanded console.
 		{
-			int32_t scaled = static_cast<int32_t>(event.value);
-
-			scaled /= 20;
-
-			ScrollPos_ += scaled;
-			if (ScrollPos_ < 0) {
-				ScrollPos_ = 0;
-			}
-			else
+			if (event.keyId == input::KeyId::MOUSE_Z)
 			{
-				int32_t logSize = static_cast<int32_t>(ConsoleLog_.size());
-				int32_t visibleNum = static_cast<int32_t>(MaxVisibleLogLines());
+				int32_t scaled = static_cast<int32_t>(event.value);
 
-				logSize -= visibleNum;
-				logSize += 2;
+				scaled /= 20;
 
-				if (ScrollPos_ > logSize) {
-					ScrollPos_ = logSize;
+				ScrollPos_ += scaled;
+				if (ScrollPos_ < 0) {
+					ScrollPos_ = 0;
 				}
-			}
+				else
+				{
+					int32_t logSize = static_cast<int32_t>(ConsoleLog_.size());
+					int32_t visibleNum = static_cast<int32_t>(MaxVisibleLogLines());
 
-			return true;
+					logSize -= visibleNum;
+					logSize += 2;
+
+					if (ScrollPos_ > logSize) {
+						ScrollPos_ = logSize;
+					}
+				}
+
+				return true;
+			}
 		}
-		
+
 		if (event.keyId != input::KeyId::TAB)
 		{
 		//	ResetAutoCompletion();
