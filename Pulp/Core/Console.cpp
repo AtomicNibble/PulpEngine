@@ -344,8 +344,9 @@ void Command_Echo(IConsoleCmdArgs* Cmd)
 			// trim it to be sorter then total length.
 			// but not shorter than it's length.
 			size_t new_len = core::Min(Len, 896 - TotalLen);
-
-			((char*)str)[new_len] = '\0';
+			//									  o o
+			// watch this become a bug one day.  ~~~~~
+			const_cast<char*>(str)[new_len] = '\0';
 
 			txt.appendFmt("%s", str);
 			break; // stop adding.
