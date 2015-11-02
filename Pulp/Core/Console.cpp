@@ -719,7 +719,7 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 	if (event.action != input::InputState::PRESSED)
 	{
 		// if open we eat all none mouse
-		if (event.deviceId == input::InputDeviceType::KEYBOARD)\
+		if (event.deviceId == input::InputDeviceType::KEYBOARD)
 			return isVisable();
 
 		return false;
