@@ -303,7 +303,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 	Vec3f texX, texY;
 	float u, v;
 
-	for (i = 0; i < brush.sides.size(); i++)
+	for (i = 0; i < safe_static_cast<int32_t,size_t>(brush.sides.size()); i++)
 	{
 		LvlBrushSide& side = brush.sides[i];
 		w = side.pWinding;

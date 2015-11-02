@@ -2337,7 +2337,7 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
 		size_t noneScroll = MaxVisibleLogLines();
 
 		// move scroll wheel with the moving items?
-		if (ScrollPos_ > 0 && ScrollPos_ < (ConsoleLog_.size() - noneScroll)) {
+		if (ScrollPos_ > 0 && ScrollPos_ < safe_static_cast<int32_t,size_t>(ConsoleLog_.size() - noneScroll)) {
 			ScrollPos_++;
 		}
 	}
