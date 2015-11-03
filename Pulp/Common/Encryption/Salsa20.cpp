@@ -215,9 +215,9 @@ namespace Encryption
 		// 7 - 11
 		x[7] = vector_[11];
 		// 8 - 5
-		x[8] = vector_[5];
+		x[8] = vector_[8];
 		// 9 - 8
-		x[9] = vector_[8];
+		x[9] = vector_[5];
 
 		// 10 - 2
 		x[10] = vector_[2];
@@ -278,8 +278,8 @@ namespace Encryption
 		// IV
 		x[6] += vector_[14];
 		x[7] += vector_[11];
-		x[8] += vector_[5];
-		x[9] += vector_[8];
+		x[8] += vector_[8];
+		x[9] += vector_[5];
 
 		x[10] += vector_[2];
 		x[11] += vector_[15];
@@ -294,7 +294,7 @@ namespace Encryption
 		}
 
 		++vector_[8];
-		vector_[5] += vector_[5] == 0 ? 1 : 0;
+		vector_[5] += vector_[8] == 0 ? 1 : 0;
 	}
 #endif // SALSA20_SSE
 
