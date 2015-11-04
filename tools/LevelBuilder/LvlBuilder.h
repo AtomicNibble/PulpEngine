@@ -53,6 +53,9 @@ private:
 	void PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 		LvlBrushSide& side, bspNode* pNode);
 
+	bool AddMapTriToAreas(LvlEntity& worldEnt, XPlaneSet& planeSet, const LvlTris& tri);
+	void AddTriListToArea(int32_t areaIdx, int32_t planeNum, const LvlTris& tris);
+
 	bool CreateEntAreaRefs(LvlEntity& worldEnt);
 
 	void AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sphere,

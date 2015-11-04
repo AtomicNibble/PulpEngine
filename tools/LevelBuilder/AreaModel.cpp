@@ -157,3 +157,23 @@ AreaSubMesh* LvlArea::MeshForSide(const LvlBrushSide& side, StringTableType& str
 
 	return &newIt.first->second;
 }
+
+AreaSubMesh* LvlArea::MeshForMat(const core::string& matName, StringTableType& stringTable)
+{
+	AreaMeshMap::iterator it = areaMeshes.find(matName);
+	if (it != areaMeshes.end()) {
+		return &it->second;
+	}
+	// add new.
+	AreaSubMesh newMesh;
+
+	// add mat name to string table.
+	newMesh.matNameID_ = stringTable.addStringUnqiue(matName);
+	newMesh.matName_ = core::StackString<level::MAP_MAX_MATERIAL_LEN>(matName.c_str());
+
+	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes.insert(
+		AreaMeshMap::value_type(matName, newMesh)
+	);
+
+	return &newIt.first->second;
+}

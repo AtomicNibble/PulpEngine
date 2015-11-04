@@ -107,7 +107,7 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 
 
 	X_LOG0("Map", "Total world brush: ^8%i", entities_[0].brushes.size());
-	X_LOG0("Map", "Total world patches: ^8%i", 0); // TODO
+	X_LOG0("Map", "Total world patches: ^8%i", entities_[0].patches.size()); // TODO
 	X_LOG0("Map", "Total total brush: ^8%i", stats_.numBrushes);
 	X_LOG0("Map", "Total total patches: ^8%i", stats_.numPatches);
 	X_LOG0("Map", "Total entities: ^8%i", stats_.numEntities);
@@ -195,6 +195,10 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 		else if (classname == "info_player_start")
 		{
 			ent.classType = level::ClassType::PLAYER_START;
+		}
+		else if (classname == "func_group")
+		{
+			ent.classType = level::ClassType::FUNC_GROUP;
 		}
 		else
 		{
@@ -345,7 +349,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 
 bool LvlBuilder::processPatch(LvlEntity& ent, 
-	mapfile::XMapPatch* mapBrush, int ent_idx)
+	mapfile::XMapPatch* mapPatch, int ent_idx)
 {
 	int i;
 
@@ -354,20 +358,29 @@ bool LvlBuilder::processPatch(LvlEntity& ent,
 	}
 
 	// meshes not supported yet.
-	if (mapBrush->isMesh()) {
-		return false;
+//	if (mapBrush->isMesh()) {
+//		return false;
+//	}
+
+	if (mapPatch->isMesh()) {
+		mapPatch->SubdivideExplicit(mapPatch->GetHorzSubdivisions(),
+			mapPatch->GetVertSubdivisions(), true);
+	}
+	else {
+		mapPatch->Subdivide(DEFAULT_CURVE_MAX_ERROR, DEFAULT_CURVE_MAX_ERROR, DEFAULT_CURVE_MAX_LENGTH, true);
 	}
 
-	mapBrush->Subdivide(DEFAULT_CURVE_MAX_ERROR, DEFAULT_CURVE_MAX_ERROR, DEFAULT_CURVE_MAX_LENGTH, true);
+	engine::IMaterial* pMaterial = matMan_.loadMaterial(mapPatch->GetMatName());
 
 	// create a Primative
-	for (i = 0; i < mapBrush->GetNumIndexes(); i += 3)
+	for (i = 0; i < mapPatch->GetNumIndexes(); i += 3)
 	{
 		LvlTris& tri = ent.patches.AddOne();
 
-		tri.verts[2] = (*mapBrush)[mapBrush->GetIndexes()[i + 0]];
-		tri.verts[1] = (*mapBrush)[mapBrush->GetIndexes()[i + 2]];
-		tri.verts[0] = (*mapBrush)[mapBrush->GetIndexes()[i + 1]];
+		tri.pMaterial = pMaterial;
+		tri.verts[2] = (*mapPatch)[mapPatch->GetIndexes()[i + 0]];
+		tri.verts[1] = (*mapPatch)[mapPatch->GetIndexes()[i + 2]];
+		tri.verts[0] = (*mapPatch)[mapPatch->GetIndexes()[i + 1]];
 	}
 
 	// stats

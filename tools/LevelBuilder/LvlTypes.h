@@ -149,7 +149,7 @@ public:
 	bool FloodAreas(void);
 	bool PruneNodes(void);
 
-
+	bool AddMapTriToAreas(XPlaneSet& planeSet, const LvlTris& tris);
 private:
 
 	bool PlaceOccupant(XPlaneSet& planeSet, bspNode* node, size_t& floodedNum);
@@ -225,6 +225,7 @@ public:
 	void AreaBegin(void);
 	void AreaEnd(void);
 	AreaSubMesh* MeshForSide(const LvlBrushSide& side, StringTableType& stringTable);
+	AreaSubMesh* MeshForMat(const core::string& matName, StringTableType& stringTable);
 
 public:
 	// area has one model.
