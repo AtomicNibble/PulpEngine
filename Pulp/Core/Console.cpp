@@ -706,17 +706,24 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 		// Stops the camera moving around when we have console open.
 		if (event.deviceId == input::InputDevice::MOUSE)
 		{
-			if (console_disable_mouse == 1) // only if expanded
+			if (event.keyId != input::KeyId::MOUSE_Z)
 			{
-				return isExpanded();
-			}
-			if (console_disable_mouse == 2)
-			{
-				return isVisable();
+				if (console_disable_mouse == 1) // only if expanded
+				{
+					return isExpanded();
+				}
+				if (console_disable_mouse == 2)
+				{
+					return isVisable();
+				}
+
+				return false;
 			}
 		}
-
-		return false;
+		else
+		{
+			return false;
+		}
 	}
 
 	repeatEvent_ = event;
