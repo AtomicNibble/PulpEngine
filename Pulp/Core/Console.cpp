@@ -781,6 +781,9 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 				int32_t scaled = static_cast<int32_t>(event.value);
 
 				scaled /= 20;
+				if (scaled < 1) {
+					scaled = 1;
+				}
 
 				ScrollPos_ += scaled;
 				if (ScrollPos_ < 0) {
