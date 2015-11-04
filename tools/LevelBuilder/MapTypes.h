@@ -131,6 +131,10 @@ public:
 		return isMesh_;
 	}
 
+	X_INLINE const char* GetMatName(void) const {
+		return matName.c_str();
+	}
+
 	// Subdived util.
 	void Subdivide(float maxHorizontalError, float maxVerticalError, 
 		float maxLength, bool genNormals = false);
@@ -170,6 +174,9 @@ protected:
 	core::Array<int>				indexes;	// 3 references to vertices for each triangle
 	core::Array<surfaceEdge_t>		edges;		// edges
 	core::Array<int>				edgeIndexes;
+
+	core::StackString<level::MAP_MAX_MATERIAL_LEN> matName;
+	core::StackString<level::MAP_MAX_MATERIAL_LEN> lightMap;
 
 	int		width, height;
 	int		maxWidth, maxHeight;

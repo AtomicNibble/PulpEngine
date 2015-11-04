@@ -45,7 +45,8 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 	// goaty meshes!
 	XLexToken token;
 	XMapPatch* patch = nullptr;
-	core::StackString<64> mat_name, light_map;
+
+	core::StackString<level::MAP_MAX_MATERIAL_LEN> matName, lightMap;
 
 	int width, height, dunno1, dunno2;
 	int x, y;
@@ -81,7 +82,7 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 		return false;
 	}
 
-	mat_name = core::StackString<64>(token.begin(), token.end());
+	matName = core::StackString<level::MAP_MAX_MATERIAL_LEN>(token.begin(), token.end());
 
 	// read the light map name
 	if (!src.ReadToken(token)) {
@@ -89,7 +90,7 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 		return false;
 	}
 
-	light_map = core::StackString<64>(token.begin(), token.end());
+	lightMap = core::StackString<level::MAP_MAX_MATERIAL_LEN>(token.begin(), token.end());
 
 
 	// sometimes we have smmothing bullshit.
@@ -107,6 +108,8 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 	dunno2 = src.ParseInt();
 
 	patch = X_NEW(XMapPatch,arena,"MapPatch")(width, height);
+	patch->matName = matName;
+	patch->lightMap = lightMap;
 	patch->verts.resize(width * height);
 	patch->SetHorzSubdivisions(dunno1);
 	patch->SetVertSubdivisions(dunno2);
