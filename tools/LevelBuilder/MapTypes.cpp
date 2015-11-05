@@ -695,7 +695,7 @@ void XMapPatch::SubdivideExplicit(size_t horzSubdivisions, size_t vertSubdivisio
 	xVert sample[3][3];
 	size_t outWidth = ((width_ - 1) / 2 * horzSubdivisions) + 1;
 	size_t outHeight = ((height_ - 1) / 2 * vertSubdivisions) + 1;
-	xVert* dv = X_NEW_ARRAY(xVert, outWidth * outHeight, g_arena, "PatchSubDivideVerts");
+	xVert* dv = X_NEW_ARRAY(xVert, (outWidth * outHeight), g_arena, "PatchSubDivideVerts");
 
 	// generate normals for the control mesh
 	if (genNormals) {
@@ -728,7 +728,7 @@ void XMapPatch::SubdivideExplicit(size_t horzSubdivisions, size_t vertSubdivisio
 		verts_[i] = dv[i];
 	}
 
-	X_DELETE(dv, g_arena);
+	X_DELETE_ARRAY(dv, g_arena);
 
 	width_ = maxWidth_ = outWidth;
 	height_ = maxHeight_ = outHeight;
