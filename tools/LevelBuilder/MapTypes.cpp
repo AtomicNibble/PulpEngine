@@ -221,16 +221,22 @@ void XMapPatch::Collapse(void)
 
 void XMapPatch::Expand(void)
 {
-	int i, j; // edit loop is you change this to unsigned.
+	int32_t i, j; // edit loop is you change this to unsigned.
 
 	if (expanded_) {
 		X_FATAL("Patch", "patch alread expanded_");
 	}
+
 	expanded_ = true;
+
 	verts_.resize(maxWidth_ * maxHeight_);
-	if (width_ != maxWidth_) {
-		for (j = height_ - 1; j >= 0; j--) {
-			for (i = width_ - 1; i >= 0; i--) {
+
+	if (width_ != maxWidth_) 
+	{
+		for (j = safe_static_cast<int32_t,size_t>(height_) - 1; j >= 0; j--) 
+		{
+			for (i = safe_static_cast<int32_t, size_t>(width_) - 1; i >= 0; i--)
+			{
 				verts_[j*maxWidth_ + i] = verts_[j*width_ + i];
 			}
 		}
@@ -412,18 +418,20 @@ void XMapPatch::GenerateIndexes(void)
 
 	indexes_.resize((width_ - 1) * (height_ - 1) * 2 * 3, false);
 	index = 0;
-	for (i = 0; i < width_ - 1; i++) {
-		for (j = 0; j < height_ - 1; j++) {
+	for (i = 0; i < width_ - 1; i++) 
+	{
+		for (j = 0; j < height_ - 1; j++) 
+		{
 			v1 = j * width_ + i;
 			v2 = v1 + 1;
 			v3 = v1 + width_ + 1;
 			v4 = v1 + width_;
-			indexes_[index++] = v1;
-			indexes_[index++] = v3;
-			indexes_[index++] = v2;
-			indexes_[index++] = v1;
-			indexes_[index++] = v4;
-			indexes_[index++] = v3;
+			indexes_[index++] = safe_static_cast<int32_t, size_t>(v1);
+			indexes_[index++] = safe_static_cast<int32_t, size_t>(v3);
+			indexes_[index++] = safe_static_cast<int32_t, size_t>(v2);
+			indexes_[index++] = safe_static_cast<int32_t, size_t>(v1);
+			indexes_[index++] = safe_static_cast<int32_t, size_t>(v4);
+			indexes_[index++] = safe_static_cast<int32_t, size_t>(v3);
 		}
 	}
 
