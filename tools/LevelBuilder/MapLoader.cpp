@@ -108,9 +108,9 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 	dunno2 = src.ParseInt();
 
 	patch = X_NEW(XMapPatch,arena,"MapPatch")(width, height);
-	patch->matName = matName;
-	patch->lightMap = lightMap;
-	patch->verts.resize(width * height);
+	patch->matName_ = matName;
+	patch->lightMap_ = lightMap;
+	patch->verts_.resize(width * height);
 	patch->SetHorzSubdivisions(dunno1);
 	patch->SetVertSubdivisions(dunno2);
 
@@ -124,7 +124,7 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 
 		for (y = 0; y < height; y++)
 		{
-			xVert& vert = patch->verts[(y * width) + x];
+			xVert& vert = patch->verts_[(y * width) + x];
 
 			// each line has a -v and a -t
 			if (!src.ExpectTokenString("v")) {

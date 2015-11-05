@@ -85,43 +85,43 @@ class XMapPatch : public XMapPrimitive
 {
 public:
 	XMapPatch(void) : XMapPrimitive(PrimType::PATCH),
-		verts(g_arena),
-		indexes(g_arena),
-		edges(g_arena),
-		edgeIndexes(g_arena),
-		width(0), height(0), 
-		maxWidth(0), maxHeight(0) 
+		verts_(g_arena),
+		indexes_(g_arena),
+		edges_(g_arena),
+		edgeIndexes_(g_arena),
+		width_(0), height_(0), 
+		maxWidth_(0), maxHeight_(0) 
 	{ 
 		isMesh_ = false;
-		expanded = false;
+		expanded_ = false;
 	}
 	XMapPatch(int w, int h) : XMapPrimitive(PrimType::PATCH),
-		verts(g_arena),
-		indexes(g_arena),
-		edges(g_arena),
-		edgeIndexes(g_arena),
-		width(w), height(h),
-		maxWidth(w), maxHeight(h) 
+		verts_(g_arena),
+		indexes_(g_arena),
+		edges_(g_arena),
+		edgeIndexes_(g_arena),
+		width_(w), height_(h),
+		maxWidth_(w), maxHeight_(h) 
 	{
 		isMesh_ = false;
-		expanded = false;
+		expanded_ = false;
 	}
 	~XMapPatch(void) X_OVERRIDE {}
 
 
-	void	SetHorzSubdivisions(int n) { horzSubdivisions = n; }
-	void	SetVertSubdivisions(int n) { vertSubdivisions = n; }
-	int		GetHorzSubdivisions(void) const { return horzSubdivisions; }
-	int		GetVertSubdivisions(void) const { return vertSubdivisions; }
+	void SetHorzSubdivisions(size_t num) { horzSubdivisions_ = num; }
+	void SetVertSubdivisions(size_t num) { vertSubdivisions_ = num; }
+	size_t GetHorzSubdivisions(void) const { return horzSubdivisions_; }
+	size_t GetVertSubdivisions(void) const { return vertSubdivisions_; }
 
-	int			GetNumIndexes(void) const { return (int)indexes.size(); }
-	const int*	GetIndexes(void) const { return indexes.ptr(); }
+	size_t GetNumIndexes(void) const { return indexes_.size(); }
+	const int* GetIndexes(void) const { return indexes_.ptr(); }
 
 	X_INLINE const xVert& operator[](const int idx) const {
-		return verts[idx];
+		return verts_[idx];
 	}
 	X_INLINE xVert& operator[](const int idx) {
-		return verts[idx];
+		return verts_[idx];
 	}
 
 	X_INLINE void SetMesh(bool b) {
@@ -132,31 +132,30 @@ public:
 	}
 
 	X_INLINE const char* GetMatName(void) const {
-		return matName.c_str();
+		return matName_.c_str();
 	}
 
 	// Subdived util.
 	void Subdivide(float maxHorizontalError, float maxVerticalError, 
 		float maxLength, bool genNormals = false);
-	void SubdivideExplicit(int horzSubdivisions, int vertSubdivisions,
+	void SubdivideExplicit(size_t horzSubdivisions, size_t vertSubdivisions,
 		bool genNormals, bool removeLinear = false);
 
-
 private:
-	void	PutOnCurve(void);
-	void	RemoveLinearColumnsRows(void);
-	void	ResizeExpanded(int height, int width);
-	void	Expand(void);
-	void	Collapse(void);
-	void	GenerateNormals(void);
-	void	GenerateIndexes(void);
-	void	LerpVert(const xVert& a, const xVert& b, xVert& out) const;
-	void	GenerateEdgeIndexes(void);
+	void PutOnCurve(void);
+	void RemoveLinearColumnsRows(void);
+	void ResizeExpanded(size_t height, size_t width);
+	void Expand(void);
+	void Collapse(void);
+	void GenerateNormals(void);
+	void GenerateIndexes(void);
+	void LerpVert(const xVert& a, const xVert& b, xVert& out) const;
+	void GenerateEdgeIndexes(void);
 
 	void ProjectPointOntoVector(const Vec3f& point, const Vec3f& vStart, 
 		const Vec3f& vEnd, Vec3f& vProj);
-	void SampleSinglePatch(const xVert ctrl[3][3], int baseCol, int baseRow,
-		int width, int horzSub, int vertSub, xVert* outVerts) const;
+	void SampleSinglePatch(const xVert ctrl[3][3], size_t baseCol, size_t baseRow,
+		size_t width, size_t horzSub, size_t vertSub, xVert* outVerts) const;
 	void SampleSinglePatchPoint(const xVert ctrl[3][3], float u,
 		float v, xVert* out) const;
 
@@ -164,27 +163,29 @@ public:
 	static XMapPatch* Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec3f &origin);
 
 protected:
-	typedef struct surfaceEdge_s {
-		int						verts[2];	// edge vertices always with ( verts[0] < verts[1] )
-		int						tris[2];	// edge triangles
-	} surfaceEdge_t;
+	struct surfaceEdge_t
+	{
+		int32_t	verts[2];	// edge vertices always with ( verts[0] < verts[1] )
+		int32_t	tris[2];	// edge triangles
+	};
 
+	core::Array<xVert>			verts_;
+	core::Array<int>			indexes_;	// 3 references to vertices for each triangle
+	core::Array<surfaceEdge_t>	edges_;		// edges
+	core::Array<int>			edgeIndexes_;
 
-	core::Array<xVert>				verts;
-	core::Array<int>				indexes;	// 3 references to vertices for each triangle
-	core::Array<surfaceEdge_t>		edges;		// edges
-	core::Array<int>				edgeIndexes;
+	core::StackString<level::MAP_MAX_MATERIAL_LEN> matName_;
+	core::StackString<level::MAP_MAX_MATERIAL_LEN> lightMap_;
 
-	core::StackString<level::MAP_MAX_MATERIAL_LEN> matName;
-	core::StackString<level::MAP_MAX_MATERIAL_LEN> lightMap;
+	size_t width_;
+	size_t height_;
+	size_t maxWidth_;
+	size_t maxHeight_;
+	size_t horzSubdivisions_;
+	size_t vertSubdivisions_;
 
-	int		width, height;
-	int		maxWidth, maxHeight;
-	int		horzSubdivisions;
-	int		vertSubdivisions;
-
-	bool	isMesh_;
-	bool	expanded;		
+	bool isMesh_;
+	bool expanded_;		
 };
 
 

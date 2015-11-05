@@ -351,7 +351,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 bool LvlBuilder::processPatch(LvlEntity& ent, 
 	mapfile::XMapPatch* mapPatch, int ent_idx)
 {
-	int i;
+	size_t i;
 
 	if (gSettings.noPatches) { // are these goat meshes even allowed O_0 ?
 		return false;
