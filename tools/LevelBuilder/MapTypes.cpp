@@ -257,13 +257,13 @@ Expects a Not expanded_ patch.
 
 void XMapPatch::GenerateNormals(void)
 {
-	size_t			i, j, k, dist;
+	size_t		i, j, k, dist;
 	Vec3f		norm;
 	Vec3f		sum;
 	size_t		count;
 	Vec3f		base;
 	Vec3f		delta;
-	size_t			x, y;
+	size_t		x, y;
 	Vec3f		around[8], temp;
 	bool		good[8];
 	bool		wrapWidth, wrapHeight;
@@ -316,7 +316,9 @@ void XMapPatch::GenerateNormals(void)
 
 	// check for wrapped edge cases, which should smooth across themselves
 	wrapWidth = false;
-	for (i = 0; i < height_; i++) {
+
+	for (i = 0; i < height_; i++) 
+	{
 		delta = verts_[i * width_].pos - verts_[i * width_ + width_ - 1].pos;
 		if (delta.lengthSquared() > math<float>::square(1.0f)) {
 			break;
@@ -327,28 +329,35 @@ void XMapPatch::GenerateNormals(void)
 	}
 
 	wrapHeight = false;
-	for (i = 0; i < width_; i++) {
+	for (i = 0; i < width_; i++) 
+	{
 		delta = verts_[i].pos - verts_[(height_ - 1) * width_ + i].pos;
 		if (delta.lengthSquared() > math<float>::square(1.0f)) {
 			break;
 		}
 	}
+
 	if (i == width_) {
 		wrapHeight = true;
 	}
 
-	for (i = 0; i < width_; i++) {
-		for (j = 0; j < height_; j++) {
+	for (i = 0; i < width_; i++) 
+	{
+		for (j = 0; j < height_; j++)
+		{
 			count = 0;
 			base = verts_[j * width_ + i].pos;
-			for (k = 0; k < 8; k++) {
+			for (k = 0; k < 8; k++) 
+			{
 				around[k] = Vec3f::zero();
 				good[k] = false;
 
-				for (dist = 1; dist <= 3; dist++) {
+				for (dist = 1; dist <= 3; dist++) 
+				{
 					x = i + neighbors[k][0] * dist;
 					y = j + neighbors[k][1] * dist;
-					if (wrapWidth) {
+					if (wrapWidth) 
+					{
 						if (x < 0) {
 							x = width_ - 1 + x;
 						}
@@ -356,7 +365,8 @@ void XMapPatch::GenerateNormals(void)
 							x = 1 + x - width_;
 						}
 					}
-					if (wrapHeight) {
+					if (wrapHeight) 
+					{
 						if (y < 0) {
 							y = height_ - 1 + y;
 						}
@@ -368,6 +378,7 @@ void XMapPatch::GenerateNormals(void)
 					if (x < 0 || x >= width_ || y < 0 || y >= height_) {
 						break;					// edge of patch
 					}
+
 					temp = verts_[y * width_ + x].pos - base;
 
 					length = norm.length();
@@ -377,7 +388,8 @@ void XMapPatch::GenerateNormals(void)
 					{
 						continue;				// degenerate edge, get more dist
 					}
-					else {
+					else 
+					{
 						good[k] = true;
 						around[k] = temp;
 						break;					// good edge
@@ -386,10 +398,13 @@ void XMapPatch::GenerateNormals(void)
 			}
 
 			sum = Vec3f::zero();
-			for (k = 0; k < 8; k++) {
-				if (!good[k] || !good[(k + 1) & 7]) {
+			for (k = 0; k < 8; k++) 
+			{
+				if (!good[k] || !good[(k + 1) & 7]) 
+				{
 					continue;	// didn't get two points
 				}
+
 				norm = around[(k + 1) & 7].cross(around[k]);
 
 				length = norm.length();
@@ -398,13 +413,15 @@ void XMapPatch::GenerateNormals(void)
 				if (length == 0.0f) {
 					continue;
 				}
+
 				sum += norm;
 				count++;
 			}
+
 			if (count == 0) {
-				//idLib::common->Printf("bad normal\n");
 				count = 1;
 			}
+
 			verts_[j * width_ + i].normal = sum;
 			verts_[j * width_ + i].normal.normalize();
 		}
@@ -417,6 +434,7 @@ void XMapPatch::GenerateIndexes(void)
 	size_t i, j, v1, v2, v3, v4, index;
 
 	indexes_.resize((width_ - 1) * (height_ - 1) * 2 * 3, false);
+
 	index = 0;
 	for (i = 0; i < width_ - 1; i++) 
 	{
@@ -441,11 +459,11 @@ void XMapPatch::GenerateIndexes(void)
 
 void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, float maxLength, bool genNormals)
 {
-	size_t			i, j, k, l;
+	size_t	i, j, k, l;
 	xVert	prev, next, mid;
-	Vec3f		prevxyz, nextxyz, midxyz;
-	Vec3f		delta;
-	float		maxHorizontalErrorSqr, maxVerticalErrorSqr, maxLengthSqr;
+	Vec3f	prevxyz, nextxyz, midxyz;
+	Vec3f	delta;
+	float	maxHorizontalErrorSqr, maxVerticalErrorSqr, maxLengthSqr;
 
 	// generate normals for the control mesh
 	if (genNormals) {
@@ -459,10 +477,13 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 	Expand();
 
 	// horizontal subdivisions
-	for (j = 0; j + 2 < width_; j += 2) {
+	for (j = 0; j + 2 < width_; j += 2) 
+	{
 		// check subdivided midpoints against control points
-		for (i = 0; i < height_; i++) {
-			for (l = 0; l < 3; l++) {
+		for (i = 0; i < height_; i++) 
+		{
+			for (l = 0; l < 3; l++) 
+			{
 				prevxyz[l] = verts_[i*maxWidth_ + j + 1].pos[l] - verts_[i*maxWidth_ + j].pos[l];
 				nextxyz[l] = verts_[i*maxWidth_ + j + 2].pos[l] - verts_[i*maxWidth_ + j + 1].pos[l];
 				midxyz[l] = (verts_[i*maxWidth_ + j].pos[l] + verts_[i*maxWidth_ + j + 1].pos[l] * 2.0f +
@@ -475,8 +496,10 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 					break;
 				}
 			}
+
 			// see if this midpoint is off far enough to subdivide
 			delta = verts_[i*maxWidth_ + j + 1].pos - midxyz;
+
 			if (delta.lengthSquared() > maxHorizontalErrorSqr) {
 				break;
 			}
@@ -493,7 +516,8 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 		// insert two columns and replace the peak
 		width_ += 2;
 
-		for (i = 0; i < height_; i++) {
+		for (i = 0; i < height_; i++)
+		{
 			LerpVert(verts_[i*maxWidth_ + j], verts_[i*maxWidth_ + j + 1], prev);
 			LerpVert(verts_[i*maxWidth_ + j + 1], verts_[i*maxWidth_ + j + 2], next);
 			LerpVert(prev, next, mid);
@@ -501,6 +525,7 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 			for (k = width_ - 1; k > j + 3; k--) {
 				verts_[i*maxWidth_ + k] = verts_[i*maxWidth_ + k - 2];
 			}
+
 			verts_[i*maxWidth_ + j + 1] = prev;
 			verts_[i*maxWidth_ + j + 2] = mid;
 			verts_[i*maxWidth_ + j + 3] = next;
@@ -511,10 +536,13 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 	}
 
 	// vertical subdivisions
-	for (j = 0; j + 2 < height_; j += 2) {
+	for (j = 0; j + 2 < height_; j += 2) 
+	{
 		// check subdivided midpoints against control points
-		for (i = 0; i < width_; i++) {
-			for (l = 0; l < 3; l++) {
+		for (i = 0; i < width_; i++)
+		{
+			for (l = 0; l < 3; l++)
+			{
 				prevxyz[l] = verts_[(j + 1)*maxWidth_ + i].pos[l] - verts_[j*maxWidth_ + i].pos[l];
 				nextxyz[l] = verts_[(j + 2)*maxWidth_ + i].pos[l] - verts_[(j + 1)*maxWidth_ + i].pos[l];
 				midxyz[l] = (verts_[j*maxWidth_ + i].pos[l] + verts_[(j + 1)*maxWidth_ + i].pos[l] * 2.0f +
@@ -527,6 +555,7 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 					break;
 				}
 			}
+
 			// see if this midpoint is off far enough to subdivide
 			delta = verts_[(j + 1)*maxWidth_ + i].pos - midxyz;
 			if (delta.lengthSquared() > maxVerticalErrorSqr) {
@@ -545,7 +574,8 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 		// insert two columns and replace the peak
 		height_ += 2;
 
-		for (i = 0; i < width_; i++) {
+		for (i = 0; i < width_; i++) 
+		{
 			LerpVert(verts_[j*maxWidth_ + i], verts_[(j + 1)*maxWidth_ + i], prev);
 			LerpVert(verts_[(j + 1)*maxWidth_ + i], verts_[(j + 2)*maxWidth_ + i], next);
 			LerpVert(prev, next, mid);
@@ -553,6 +583,7 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 			for (k = height_ - 1; k > j + 3; k--) {
 				verts_[k*maxWidth_ + i] = verts_[(k - 2)*maxWidth_ + i];
 			}
+
 			verts_[(j + 1)*maxWidth_ + i] = prev;
 			verts_[(j + 2)*maxWidth_ + i] = mid;
 			verts_[(j + 3)*maxWidth_ + i] = next;
@@ -569,7 +600,8 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 	Collapse();
 
 	// normalize all the lerped normals
-	if (genNormals) {
+	if (genNormals) 
+	{
 		for (i = 0; i < width_ * height_; i++) {
 			verts_[i].normal.normalize();
 		}
@@ -586,8 +618,10 @@ void XMapPatch::SampleSinglePatchPoint(const xVert ctrl[3][3], float u, float v,
 	int		axis;
 
 	// find the control points for the v coordinate
-	for (vPoint = 0; vPoint < 3; vPoint++) {
-		for (axis = 0; axis < 8; axis++) {
+	for (vPoint = 0; vPoint < 3; vPoint++)
+	{
+		for (axis = 0; axis < 8; axis++) 
+		{
 			float a, b, c;
 			float qA, qB, qC;
 			if (axis < 3) {
@@ -646,8 +680,8 @@ void XMapPatch::SampleSinglePatch(const xVert ctrl[3][3], size_t baseCol, size_t
 	vertSub++;
 	for (i = 0; i < horzSub; i++) {
 		for (j = 0; j < vertSub; j++) {
-			u = (float)i / (horzSub - 1);
-			v = (float)j / (vertSub - 1);
+			u = static_cast<float>(i) / (horzSub - 1);
+			v = static_cast<float>(j) / (vertSub - 1);
 			SampleSinglePatchPoint(ctrl, u, v, &outVerts[((baseRow + j) * width_) + i + baseCol]);
 		}
 	}
@@ -707,7 +741,8 @@ void XMapPatch::SubdivideExplicit(size_t horzSubdivisions, size_t vertSubdivisio
 	}
 
 	// normalize all the lerped normals
-	if (genNormals) {
+	if (genNormals) 
+	{
 		for (i = 0; i < width_ * height_; i++) {
 			verts_[i].normal.normalize();
 		}
