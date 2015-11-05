@@ -186,6 +186,7 @@ protected:
 
 	bool isMesh_;
 	bool expanded_;		
+	bool _pad[2];
 };
 
 
