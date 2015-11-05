@@ -221,7 +221,7 @@ void XMapPatch::Collapse(void)
 
 void XMapPatch::Expand(void)
 {
-	int i, j;
+	int i, j; // edit loop is you change this to unsigned.
 
 	if (expanded_) {
 		X_FATAL("Patch", "patch alread expanded_");
