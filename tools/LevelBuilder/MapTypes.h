@@ -109,13 +109,13 @@ public:
 	~XMapPatch(void) X_OVERRIDE {}
 
 
-	void SetHorzSubdivisions(size_t num) { horzSubdivisions_ = num; }
-	void SetVertSubdivisions(size_t num) { vertSubdivisions_ = num; }
-	size_t GetHorzSubdivisions(void) const { return horzSubdivisions_; }
-	size_t GetVertSubdivisions(void) const { return vertSubdivisions_; }
+	X_INLINE void SetHorzSubdivisions(size_t num) { horzSubdivisions_ = num; }
+	X_INLINE void SetVertSubdivisions(size_t num) { vertSubdivisions_ = num; }
+	X_INLINE size_t GetHorzSubdivisions(void) const { return horzSubdivisions_; }
+	X_INLINE size_t GetVertSubdivisions(void) const { return vertSubdivisions_; }
 
-	size_t GetNumIndexes(void) const { return indexes_.size(); }
-	const int* GetIndexes(void) const { return indexes_.ptr(); }
+	X_INLINE size_t GetNumIndexes(void) const { return indexes_.size(); }
+	X_INLINE const int* GetIndexes(void) const { return indexes_.ptr(); }
 
 	X_INLINE const xVert& operator[](const int idx) const {
 		return verts_[idx];
