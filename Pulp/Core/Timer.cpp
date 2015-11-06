@@ -85,7 +85,7 @@ void XTimer::OnFrameBegin(void)
 
 	if (max_fps_ != 0) // 0 is unlimated
 	{	
-		X_PROFILE_BEGIN("FpsCapSleep", core::ProfileSubSys::CORE);
+		X_PROFILE_BEGIN("FpsCapSleep", core::ProfileSubSys::UNCLASSIFIED);
 
 		float TargetFrameTime = (1.f / (float)max_fps_);
 		float sleep = TargetFrameTime - FrameTime_;
