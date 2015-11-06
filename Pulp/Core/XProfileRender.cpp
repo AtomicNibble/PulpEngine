@@ -66,7 +66,7 @@ void XProfileSys::UpdateSubSystemInfo(void)
 {
 	uint32_t i;
 	subSystemTotal_ = 0;
-	for (i = 0; i < ProfileSubSys::ENUM_COUNT; i++)
+	for (i = 0; i < ProfileSubSys::ENUM_COUNT - 1; i++)
 	{
 		subSystemInfo_[i].calAvg();
 		subSystemTotal_ += subSystemInfo_[i].avg;
@@ -92,7 +92,7 @@ void XProfileSys::RenderSubSysInfo(float x, float y, float& width_out, float& he
 	const float title_height = 20;
 
 	width_out = width;
-	height_out = (item_height + item_padding) * ProfileSubSys::ENUM_COUNT;
+	height_out = (item_height + item_padding) * (ProfileSubSys::ENUM_COUNT - 1);
 	height_out += item_padding; // bottom badding
 	height_out += title_height;
 
@@ -114,7 +114,7 @@ void XProfileSys::RenderSubSysInfo(float x, float y, float& width_out, float& he
 	item_x = x + item_padding;
 	item_y = y + item_padding + title_height;
 
-	for (i = 0; i < ProfileSubSys::ENUM_COUNT; i++)
+	for (i = 0; i < ProfileSubSys::ENUM_COUNT - 1; i++)
 	{
 		const XSubSystemInfo& sub = subSystemInfo_[i];
 
