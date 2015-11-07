@@ -114,21 +114,22 @@ void XTexture::setTexStates(void)
 
 void XTexture::setSamplerState(int tex_sampler_id, int state_id, ShaderType::Enum shader_type)
 {
-	if (state_id < 0) // if no state use this textures default texture state.
+	if (state_id < 0) { // if no state use this textures default texture state.
 		state_id = defaultTexStateId_;
-
-
+	}
 
 	XTexState& state = s_TexStates[state_id];
 	ID3D11DeviceContext* pd3dContex = render::g_Dx11D3D.DxDeviceContext();
 	ID3D11SamplerState* pSamp;
 
-	pSamp = (ID3D11SamplerState*)state.getDeviceState();
+	pSamp = reinterpret_cast<ID3D11SamplerState*>(state.getDeviceState());
 
-	if (shader_type == ShaderType::Pixel)
+	if (shader_type == ShaderType::Pixel) {
 		pd3dContex->PSSetSamplers(tex_sampler_id, 1, &pSamp);
-	else if (shader_type == ShaderType::Vertex)
+	}
+	else if (shader_type == ShaderType::Vertex) {
 		pd3dContex->VSSetSamplers(tex_sampler_id, 1, &pSamp);
+	}
 	else
 	{
 		X_ASSERT_NOT_IMPLEMENTED();
@@ -167,8 +168,10 @@ void XTexture::apply(int slot, int state_id, shader::ShaderType::Enum type)
 	}
 
 	// changed?
-	if (s_pCurrentTexture[slot] == this)
+	if (s_pCurrentTexture[slot] == this) {
 		return;
+	}
+
 	s_pCurrentTexture[slot] = this;
 
 
