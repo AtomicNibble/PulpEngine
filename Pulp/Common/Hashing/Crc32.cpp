@@ -119,8 +119,6 @@ void Crc32::buildTable(void)
 		crc32_table_[6][i] = (crc32_table_[5][i] >> 8) ^ crc32_table_[0][crc32_table_[5][i] & 0xFF];
 		crc32_table_[7][i] = (crc32_table_[6][i] >> 8) ^ crc32_table_[0][crc32_table_[6][i] & 0xFF];
 	}
-
-	tableInit_ = true;
 }
 
 

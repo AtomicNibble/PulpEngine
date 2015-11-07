@@ -1,8 +1,7 @@
 
 inline Crc32::Crc32()
 {
-	tableInit_ = false;
-	InitTable();
+	buildTable();
 }
 
 inline uint32_t Crc32::GetCRC32(const char *text) const
