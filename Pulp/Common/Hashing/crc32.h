@@ -20,6 +20,9 @@ public:
 	uint32_t GetCRC32(const char* text) const;
 	uint32_t GetCRC32(const char* data, size_t size) const;
 
+	template<typename T>
+	X_INLINE uint32_t GetCRC32OfObject(const T& obj);
+
 	// gets the crc32 as if all the text was lowercase.
 	uint32_t GetCRC32Lowercase(const char* text) const;
 	uint32_t GetCRC32Lowercase(const char* text, size_t len) const;

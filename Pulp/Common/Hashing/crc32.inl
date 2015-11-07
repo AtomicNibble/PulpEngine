@@ -17,6 +17,11 @@ inline uint32_t Crc32::GetCRC32(const char *data, size_t size) const
 	return Finish(crc);
 }
 
+template<typename T>
+uint32_t Crc32::GetCRC32OfObject(const T& obj)
+{
+	return GetCRC32(reinterpret_cast<const char*>(&obj), sizeof(T));
+}
 
 inline uint32_t Crc32::GetCRC32Lowercase(const char *text) const
 {
