@@ -6,6 +6,7 @@
 #include <Ilevel.h>
 
 #include <Hashing\crc32.h>
+#include <Util\ScopedPointer.h>
 
 X_USING_NAMESPACE;
 
@@ -101,23 +102,22 @@ namespace
 
 	struct ScopedNodeInfo
 	{
-		ScopedNodeInfo(FileNode& node, core::XFile* pFile) :
-		node_(node), pFile_(pFile) {
-			X_ASSERT_NOT_NULL(pFile);
-			node.offset = safe_static_cast<uint32_t,size_t>(pFile->tell());
+		ScopedNodeInfo(FileNode& node, core::XFileScoped& file) :
+			pNode_(&node), pFile_(file.GetFile())
+		{
+			node.offset = safe_static_cast<uint32_t, size_t>(file.tell());
 			node.offset -= sizeof(FileHeader);
 		}
 		~ScopedNodeInfo() {
-			node_.size = safe_static_cast<uint32_t, size_t>(pFile_->tell() - node_.offset);
-			node_.size -= sizeof(FileHeader);
+			pNode_->size = safe_static_cast<uint32_t, size_t>(pFile_->tell() - pNode_->offset);
+			pNode_->size -= sizeof(FileHeader);
 		}
 
-		FileNode& node_;
+		FileNode* pNode_;
 		core::XFile* pFile_;
 	};
 
 }
-
 
 
 bool LvlBuilder::save(const char* name)
@@ -125,7 +125,6 @@ bool LvlBuilder::save(const char* name)
 	core::fileModeFlags mode;
 	FileHeader hdr;
 	core::Path<char> path;
-	size_t i;
 
 	if (entities_.isEmpty()) {
 		X_ERROR("Lvl", "Failed to save lvl file has zero entities");
@@ -147,18 +146,18 @@ bool LvlBuilder::save(const char* name)
 	path.append(name);
 	path.setExtension(level::LVL_FILE_EXTENSION);
 
-	core::Crc32 crc;
-	core::XFile* file = gEnv->pFileSys->openFile(path.c_str(), mode);
-	if (file)
-	{
-		file->writeObj(hdr);
+	core::ScopedPointer<core::Crc32> crc(X_NEW(core::Crc32, g_arena, "LevelFileCrc32"), g_arena);
+	core::XFileScoped file;
 
+	if (file.openFile(path.c_str(), mode))
+	{
+		file.writeObj(hdr);
 		LvlEntity& worldEnt = entities_[0];
 
 		// string table
 		{
 			ScopedNodeInfo node(hdr.nodes[FileNodes::STRING_TABLE], file);
-			if (!stringTable_.SSave(file)) {
+			if (!stringTable_.SSave(file.GetFile())) {
 				X_ERROR("Lvl", "Failed to save string table");
 				return false;
 			}
@@ -166,12 +165,12 @@ bool LvlBuilder::save(const char* name)
 		// areas
 		{
 			ScopedNodeInfo node(hdr.nodes[FileNodes::AREAS], file);
+			size_t i;
 
 			for (i = 0; i < areas_.size(); i++)
 			{
 				const AreaModel* pModel = &areas_[i].model;
-
-				WriteAreaModel(file, pModel);
+				WriteAreaModel(file.GetFile(), pModel);
 			}
 		}
 		// area portals
@@ -189,8 +188,8 @@ bool LvlBuilder::save(const char* name)
 			// and the winding.
 			for (const auto& iap : worldEnt.interPortals)
 			{
-				file->writeObj(iap.area0);
-				file->writeObj(iap.area1);
+				file.writeObj(iap.area0);
+				file.writeObj(iap.area1);
 
 				X_ASSERT_NOT_NULL(iap.pSide);
 				X_ASSERT_NOT_NULL(iap.pSide->pWinding);
@@ -198,8 +197,8 @@ bool LvlBuilder::save(const char* name)
 				const XWinding* pWind = iap.pSide->pWinding;
 				XWinding* pWindRev = pWind->ReverseWinding(g_arena);
 
-				if (!SavePortalWinding(pWind, file) ||
-					!SavePortalWinding(pWindRev, file))
+				if (!SavePortalWinding(pWind, file.GetFile()) ||
+					!SavePortalWinding(pWindRev, file.GetFile()))
 				{
 					X_ERROR("Lvl", "Failed to save inter portal info");
 					X_DELETE(pWindRev, g_arena);
@@ -217,6 +216,7 @@ bool LvlBuilder::save(const char* name)
 			hdr.flags.Set(LevelFileFlags::AREA_ENT_REF_LISTS);
 
 			uint32_t num = 0;
+			size_t i;
 
 			for (i = 0; i < areas_.size(); i++)
 			{
@@ -227,7 +227,7 @@ bool LvlBuilder::save(const char* name)
 
 				num += safe_static_cast<uint32_t, size_t>(area.entRefs.size());
 
-				file->writeObj(refHdr);
+				file.writeObj(refHdr);
 			}
 
 			// save the total.
@@ -238,7 +238,7 @@ bool LvlBuilder::save(const char* name)
 			{
 				const LvlArea& area = areas_[i];
 
-				file->writeObj(area.entRefs.ptr(), area.entRefs.size());
+				file.writeObj(area.entRefs.ptr(), area.entRefs.size());
 			}
 
 			num = 0;
@@ -248,10 +248,10 @@ bool LvlBuilder::save(const char* name)
 				FileAreaRefHdr refHdr;
 				refHdr.num = safe_static_cast<uint32_t, size_t>(multiRefEntLists_[i].size());
 				refHdr.startIndex = num; // not used.
-			
+
 				num += refHdr.num;
 
-				file->writeObj(refHdr);
+				file.writeObj(refHdr);
 			}
 
 			// aave the tototal.
@@ -260,7 +260,7 @@ bool LvlBuilder::save(const char* name)
 			// write multi area ent ref lists.
 			for (i = 0; i < MAP_MAX_MULTI_REF_LISTS; i++)
 			{
-				file->writeObj(multiRefEntLists_[i].ptr(), multiRefEntLists_[i].size());
+				file.writeObj(multiRefEntLists_[i].ptr(), multiRefEntLists_[i].size());
 			}
 		}
 
@@ -270,6 +270,7 @@ bool LvlBuilder::save(const char* name)
 			hdr.flags.Set(LevelFileFlags::AREA_MODEL_REF_LISTS);
 
 			uint32_t num = 0;
+			size_t i;
 
 			for (i = 0; i < areas_.size(); i++)
 			{
@@ -280,7 +281,7 @@ bool LvlBuilder::save(const char* name)
 
 				num += safe_static_cast<uint32_t, size_t>(area.modelsRefs.size());
 
-				file->writeObj(refHdr);
+				file.writeObj(refHdr);
 			}
 
 			// save the total.
@@ -291,7 +292,7 @@ bool LvlBuilder::save(const char* name)
 			{
 				const LvlArea& area = areas_[i];
 
-				file->writeObj(area.modelsRefs.ptr(), area.modelsRefs.size());
+				file.writeObj(area.modelsRefs.ptr(), area.modelsRefs.size());
 			}
 
 			num = 0;
@@ -304,7 +305,7 @@ bool LvlBuilder::save(const char* name)
 
 				num += refHdr.num;
 
-				file->writeObj(refHdr);
+				file.writeObj(refHdr);
 			}
 
 			// aave the tototal.
@@ -313,7 +314,7 @@ bool LvlBuilder::save(const char* name)
 			// write multi area ent ref lists.
 			for (i = 0; i < MAP_MAX_MULTI_REF_LISTS; i++)
 			{
-				file->writeObj(multiModelRefLists_[i].ptr(), multiModelRefLists_[i].size());
+				file.writeObj(multiModelRefLists_[i].ptr(), multiModelRefLists_[i].size());
 			}
 		}
 
@@ -324,7 +325,7 @@ bool LvlBuilder::save(const char* name)
 			hdr.numStaticModels = safe_static_cast<int32_t, size_t>(
 				staticModels_.size());
 
-			file->writeObj(staticModels_.ptr(), staticModels_.size());
+			file.writeObj(staticModels_.ptr(), staticModels_.size());
 		}
 
 
@@ -343,24 +344,23 @@ bool LvlBuilder::save(const char* name)
 			// need to write out all the nodes.
 			// for none leaf nodes we will write the nodes number.
 			// for leafs nodes we write the children as the area number but negative.
-			worldEnt.bspTree.headnode->WriteNodes_r(planes,file);
+			worldEnt.bspTree.headnode->WriteNodes_r(planes,file.GetFile());
 		}
 
 		// update FourcCC to mark this bsp as valid.
 		hdr.fourCC = LVL_FOURCC;
 		hdr.numAreas = safe_static_cast<uint32_t,size_t>(areas_.size());
 		// crc the header
-		hdr.datacrc32 = crc.GetCRC32((const char*)&hdr, sizeof(hdr));
+  		hdr.datacrc32 = crc->GetCRC32((const char*)&hdr, sizeof(hdr));
 
 		for (uint32_t i = 0; i < FileNodes::ENUM_COUNT; i++)
 		{
 			hdr.totalDataSize += hdr.nodes[i].size;
 		}
 
-		file->seek(0, core::SeekMode::SET);
-		file->writeObj(hdr);
+		file.seek(0, core::SeekMode::SET);
+		file.writeObj(hdr);
 
-		gEnv->pFileSys->closeFile(file);
 		return true;
 	}
 	return false;
