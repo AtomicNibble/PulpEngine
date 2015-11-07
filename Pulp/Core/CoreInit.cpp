@@ -108,8 +108,12 @@ bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassNa
 
 #if !defined(X_LIB) 
 	WIN_HMODULE hModule = LoadDLL(path.c_str());
-	if (!hModule)
+	if (!hModule) {
+		if (gEnv && gEnv->pLog) {
+			X_ERROR("Core", "Failed to load engine module: %s", dllName);
+		}
 		return false;
+	}
 
 	moduleDLLHandles_.push_back(hModule);
 #endif // #if !defined(X_LIB) 
