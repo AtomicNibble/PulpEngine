@@ -546,6 +546,10 @@ public:
 	inline uint32_t writeObj(T& object) {
 		return write(&object, sizeof(T));
 	}
+	template <typename T>
+	inline uint32_t writeObj(const T* objects, size_t num) {
+		return write(objects, safe_static_cast<uint32_t, size_t>(sizeof(T)* num));
+	}
 
 	template <typename T>
 	inline uint32_t writeObjs(T* objects, uint32_t num) {
