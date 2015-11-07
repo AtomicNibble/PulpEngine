@@ -351,7 +351,7 @@ bool LvlBuilder::save(const char* name)
 		hdr.fourCC = LVL_FOURCC;
 		hdr.numAreas = safe_static_cast<uint32_t,size_t>(areas_.size());
 		// crc the header
-  		hdr.datacrc32 = crc->GetCRC32((const char*)&hdr, sizeof(hdr));
+		hdr.datacrc32 = crc->GetCRC32OfObject(hdr);
 
 		for (uint32_t i = 0; i < FileNodes::ENUM_COUNT; i++)
 		{
