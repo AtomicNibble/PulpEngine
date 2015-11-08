@@ -30,6 +30,7 @@ public:
 	virtual int32_t numBones(void) const X_FINAL;
 	virtual int32_t numBlankBones(void) const X_FINAL;
 	virtual int32_t numMeshTotal(void) const X_FINAL;
+	virtual int32_t numVerts(size_t lodIdx) const X_FINAL;
 	virtual bool HasLods(void) const X_FINAL;
 
 	virtual void Render(void) X_FINAL;

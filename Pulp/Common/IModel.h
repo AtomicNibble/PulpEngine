@@ -444,6 +444,7 @@ struct IModel
 	virtual int32_t numBones(void) const X_ABSTRACT;
 	virtual int32_t numBlankBones(void) const X_ABSTRACT;
 	virtual int32_t numMeshTotal(void) const X_ABSTRACT;
+	virtual int32_t numVerts(size_t lodIdx) const X_ABSTRACT;
 	virtual bool HasLods(void) const X_ABSTRACT;
 
 	// temp.
