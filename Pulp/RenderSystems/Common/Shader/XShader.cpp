@@ -422,7 +422,7 @@ bool XShaderManager::OnFileChange(const char* name)
 			else
 			{
 				// log as not found.
-				X_WARNING("Shader", "\"%s\" not used, skippin reload", name);
+				X_WARNING("Shader", "\"%s\" not used, skipping reload", name);
 			}
 		}
 		else
