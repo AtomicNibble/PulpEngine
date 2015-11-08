@@ -1948,6 +1948,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 		AutoResult(const char* name, ICVar* var) : name(name), var(var) {}
 		const char* name;
 		ICVar* var;
+
 		X_INLINE bool operator<(const AutoResult& oth) {
 			return strcmp(name, oth.name) < 0;
 		}
@@ -1992,8 +1993,9 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 
 
 		inputLen = inputEnd - inputBegin;
-		if (inputLen == 0)
+		if (inputLen == 0) {
 			return;
+		}
 
 		// try find and cmd's / dvars that match the current input.
 		ConsoleVarMapItor it = VarMap_.begin();
@@ -2004,8 +2006,9 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 			NameLen = core::strUtil::strlen(Name);
 
 			// if var name shorter than search leave it !
-			if (NameLen < inputLen)
+			if (NameLen < inputLen) {
 				continue;
+			}
 
 			// we search same length.
 			if (core::strUtil::IsEqual(Name, Name + inputLen, inputBegin, inputEnd))
@@ -2013,8 +2016,9 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				results.push_back(AutoResult(Name, it->second));
 			}
 
-			if (results.size() == results.capacity())
+			if (results.size() == results.capacity()) {
 				break;
+			}
 		}
 
 		if (results.size() < results.capacity())
@@ -2027,8 +2031,9 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				NameLen = cmdIt->second.Name.length();
 
 				// if cmd name shorter than search leave it !
-				if (NameLen < inputLen)
+				if (NameLen < inputLen) {
 					continue;
+				}
 
 				// we search same length.
 				if (core::strUtil::IsEqual(Name, Name + inputLen, inputBegin, inputEnd))
@@ -2036,14 +2041,17 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 					results.push_back(AutoResult(Name, nullptr));
 				}
 
-				if (results.size() == results.capacity())
+				if (results.size() == results.capacity()) {
 					break;
+				}
 			}
 
 		}
 
+
 		// sort them?
 		std::sort(results.begin(), results.end());
+
 		// Font contex
 		font::XTextDrawConect ctx;
 		ctx.SetProportional(false);
@@ -2070,7 +2078,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 			}
 		//	if (results[autoCompleteIdx_].var) // for var only?
 				InputBuffer_ += ' '; // add a space
-			CursorPos_ = (int32)InputBuffer_.length();
+			CursorPos_ = safe_static_cast<int32,size_t>(InputBuffer_.length());
 			autoCompleteIdx_ = -1;
 			autoCompleteSelect_ = false;
 		}
@@ -2101,8 +2109,9 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 
 				temp.trim();
 
-				if (temp.isEqual(fullName))
+				if (temp.isEqual(fullName)) {
 					txtCol = Col_Darkblue;
+				}
 			}
 			else if (results.size() > 1)
 			{
