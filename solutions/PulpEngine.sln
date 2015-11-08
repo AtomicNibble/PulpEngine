@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+# Visual Studio 2013
+VisualStudioVersion = 12.0.40629.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "..\Pulp\Common\Common.vcxproj", "{07328CCB-F9CC-4967-861E-272BCA0CAB04}"
 EndProject
@@ -192,6 +192,7 @@ Global
 		{6B3B7429-4715-43E8-873A-386C3F07A423}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
 		{6B3B7429-4715-43E8-873A-386C3F07A423}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
 		{6B3B7429-4715-43E8-873A-386C3F07A423}.Debug|Win32.ActiveCfg = Debug|Win32
+		{6B3B7429-4715-43E8-873A-386C3F07A423}.Debug|Win32.Build.0 = Debug|Win32
 		{6B3B7429-4715-43E8-873A-386C3F07A423}.Debug|x64.ActiveCfg = Debug|x64
 		{6B3B7429-4715-43E8-873A-386C3F07A423}.Release|Win32.ActiveCfg = Release|Win32
 		{6B3B7429-4715-43E8-873A-386C3F07A423}.Release|Win32.Build.0 = Release|Win32
@@ -363,8 +364,8 @@ Global
 		{D3D5462A-6E35-4BAF-85C1-434377A02590}.Super|Win32.ActiveCfg = Super|Win32
 		{D3D5462A-6E35-4BAF-85C1-434377A02590}.Super|Win32.Build.0 = Super|Win32
 		{D3D5462A-6E35-4BAF-85C1-434377A02590}.Super|x64.ActiveCfg = Release|Win32
-		{71E36592-B7B6-450C-B678-24E63AF5B51C}.Debug Dynamic|Win32.ActiveCfg = Debug|Win32
-		{71E36592-B7B6-450C-B678-24E63AF5B51C}.Debug Dynamic|Win32.Build.0 = Debug|Win32
+		{71E36592-B7B6-450C-B678-24E63AF5B51C}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
+		{71E36592-B7B6-450C-B678-24E63AF5B51C}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
 		{71E36592-B7B6-450C-B678-24E63AF5B51C}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
 		{71E36592-B7B6-450C-B678-24E63AF5B51C}.Debug|Win32.ActiveCfg = Debug|Win32
 		{71E36592-B7B6-450C-B678-24E63AF5B51C}.Debug|Win32.Build.0 = Debug|Win32
