@@ -414,12 +414,15 @@ void Level::DrawStatsBlock(void) const
 		str.appendFmt("NumAreas:%i\n", areas_.size());
 		str.appendFmt("VisibleAreas:%i\n", frameStats_.visibleAreas);
 		str.appendFmt("VisibleModels:%i\n", frameStats_.visibleModels);
+		str.appendFmt("VisibleVerts:%i\n", frameStats_.visibleVerts);
 	
 		Color txt_col(0.7f, 0.7f, 0.7f, 1.f);
 		const float height = 100.f;
 		const float width = 200.f;
 
-		Vec2f pos(5.f,35.f);
+		float screenWidth = pRender_->getWidthf();
+
+		Vec2f pos(screenWidth - (width + 5.f), 35.f);
 
 		pRender_->DrawQuad(pos.x, pos.y, width, height, Color(0.1f, 0.1f, 0.1f, 0.8f),
 			Color(0.01f, 0.01f, 0.01f, 0.95f));
@@ -472,6 +475,7 @@ void Level::DrawArea(const Area& area)
 		DrawStaticModel(model);
 	}
 
+	frameStats_.visibleVerts += area.pMesh->numVerts;
 	area.pRenderMesh->render();
 }
 
@@ -515,6 +519,8 @@ void Level::DrawStaticModel(const level::StaticModel& sm)
 	if (sm.pModel)
 	{
 		frameStats_.visibleModels++;
+		frameStats_.visibleVerts += sm.pModel->numVerts(0);
+
 
 		Vec3f pos = sm.pos;
 		Quatf angle = sm.angle;

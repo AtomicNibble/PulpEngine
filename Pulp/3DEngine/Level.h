@@ -34,7 +34,7 @@ struct FrameStats
 
 	size_t visibleModels;
 	size_t visibleAreas;
-//	size_t visibleAreas;
+	size_t visibleVerts;
 };
 
 struct AsyncLoadData
