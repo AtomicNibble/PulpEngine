@@ -117,7 +117,7 @@ void XProfileSys::Init(ICore* pCore)
 
 	// register some vars.
 	
-	ADD_CVAR_REF("profile_draw", s_drawProfileInfo_, 1, 0, 1, 
+	ADD_CVAR_REF("profile_draw", s_drawProfileInfo_, 0, 0, 1, 
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 			"Display profiler info. (visible items enabled via profile_draw_* vars)");
 	ADD_CVAR_REF("profile_draw_when_console_expanded", s_drawProfileInfoWhenConsoleExpaned_, 1, 0, 1, 
