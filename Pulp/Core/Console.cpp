@@ -1721,9 +1721,6 @@ void XConsole::OnFrameBegin()
 }
 
 
-
-
-
 void XConsole::Draw()
 {
 	cursor_.curTime += gEnv->pTimer->GetFrameTime();
@@ -1735,6 +1732,11 @@ void XConsole::Draw()
 	}
 
 	DrawBuffer();
+}
+
+consoleState::Enum XConsole::getVisState(void) const
+{
+	return consoleState_;
 }
 
 size_t XConsole::MaxVisibleLogLines(void) const
@@ -2499,6 +2501,10 @@ void XConsoleNULL::Draw(void)
 
 }
 
+consoleState::Enum XConsoleNULL::getVisState(void) const
+{
+	return consoleState::CLOSED;
+}
 
 ICVar* XConsoleNULL::RegisterString(const char* Name, const char* Value, int Flags, 
 	const char* desc, ConsoleVarFunc pChangeFunc)
