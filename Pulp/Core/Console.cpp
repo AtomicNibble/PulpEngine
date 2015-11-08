@@ -1948,6 +1948,9 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 		AutoResult(const char* name, ICVar* var) : name(name), var(var) {}
 		const char* name;
 		ICVar* var;
+		X_INLINE bool operator<(const AutoResult& oth) {
+			return strcmp(name, oth.name) < 0;
+		}
 	};
 
 	const size_t max_auto_complete_results = 32;
@@ -2039,6 +2042,8 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 
 		}
 
+		// sort them?
+		std::sort(results.begin(), results.end());
 		// Font contex
 		font::XTextDrawConect ctx;
 		ctx.SetProportional(false);
