@@ -15,6 +15,7 @@ X_NAMESPACE_BEGIN(core)
 
 class XProfileSys : public IProfileSys
 {
+
 public:
 	XProfileSys();
 	~XProfileSys() X_FINAL;
@@ -100,12 +101,12 @@ public:
 
 private:
 
+	Vec2f RenderSubSysInfo(const Vec2f& pos, const float width);
+	Vec2f RenderMemoryInfo(const Vec2f& pos, const float height);
+	Vec2f RenderProfileData(const Vec2f& pos, const float width);
+	Vec2f RenderProfileDataHeader(const Vec2f& pos, const float width);
+	Vec2f RenderFrameTimes(const Vec2f& pos, const float width, const float height);
 
-	void RenderSubSysInfo(float x, float y, float& width, float& height);
-	void RenderMemoryInfo(float x, float y, float width, float height);
-	void RenderProfileData(float x, float y, float width, float height);
-	void RenderProfileDataHeader(float& x, float& y, float& width, float& height);
-	void RenderFrameTimes(float x, float y, float width, float height);
 
 	void DrawLabel(float x, float y, const char* pStr, const Color& col);
 	void DrawLabel(float x, float y, const char* pStr, const Color& col, Flags<render::DrawTextFlags> flags);
