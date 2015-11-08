@@ -116,6 +116,7 @@ int Level::s_var_drawAreaBounds_ = 0;
 int Level::s_var_drawPortals_ = 0;
 int Level::s_var_drawArea_ = -1;
 int Level::s_var_drawCurrentAreaOnly_ = 0;
+int Level::s_var_drawStats_ = 0;
 
 // --------------------------------
 
@@ -172,6 +173,9 @@ bool Level::Init(void)
 
 	ADD_CVAR_REF("lvl_drawCurAreaOnly", s_var_drawCurrentAreaOnly_, 0, 0, 1, 
 		core::VarFlag::SYSTEM, "Draws just the current area. 0=off 1=on");
+
+	ADD_CVAR_REF("lvl_drawStats", s_var_drawStats_, 0, 0, 1,
+		core::VarFlag::SYSTEM, "Draws frame stats");
 
 
 	return true;
@@ -399,6 +403,10 @@ void Level::DrawAreaBounds(void)
 
 void Level::DrawStatsBlock(void) const
 {
+	if (!s_var_drawStats_) {
+		return;
+	}
+
 	pRender_->Set2D(true);
 	{
 		core::StackString512 str;

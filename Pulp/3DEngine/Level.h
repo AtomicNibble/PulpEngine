@@ -254,6 +254,7 @@ private:
 	static int s_var_drawPortals_;
 	static int s_var_drawArea_;
 	static int s_var_drawCurrentAreaOnly_;
+	static int s_var_drawStats_;
 };
 
 
