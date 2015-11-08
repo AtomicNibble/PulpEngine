@@ -3,6 +3,8 @@
 
 #include "Profile\ProfilerTypes.h"
 
+#include <IConsole.h>
+
 X_NAMESPACE_BEGIN(core)
 
 namespace
@@ -59,7 +61,6 @@ namespace
 
 XProfileSys* XProfileSys::s_this = nullptr;
 
-
 XProfileSys::XProfileSys() :
 	pCore_(nullptr),
 	profiles_(nullptr),
@@ -113,6 +114,27 @@ void XProfileSys::Init(ICore* pCore)
 	}
 
 #endif // !X_DEBUG
+
+	// register some vars.
+	
+	ADD_CVAR_REF("profile_draw", s_drawProfileInfo_, 1, 0, 1, 
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+			"Display profiler info. (visible items enabled via profile_draw_* vars)");
+	ADD_CVAR_REF("profile_draw_when_console_expanded", s_drawProfileInfoWhenConsoleExpaned_, 1, 0, 1, 
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler even when console is expanded");
+	ADD_CVAR_REF("profile_draw_subsystems", s_drawSubsystems_, 1, 0, 1, 
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler subsystem block");
+	ADD_CVAR_REF("profile_draw_meminfo", s_drawMemInfo_, 1, 0, 1, 
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler mem info blocks");
+	ADD_CVAR_REF("profile_draw_stats_table", s_drawStats_, 1, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler stats table block");
+	ADD_CVAR_REF("profile_draw_frame_time_graph", s_drawFrameTimeBar_, 1, 0, 1, 
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler frame time bar");
 }
 
 

@@ -144,8 +144,17 @@ private:
 	float subSystemTotal_;
 
 	bool enabled_;
+	bool _pad[3];
 
 	FrameTimes  frameTimeHistory_;
+
+	// vars
+	int s_drawProfileInfo_;
+	int s_drawProfileInfoWhenConsoleExpaned_;
+	int s_drawSubsystems_;
+	int s_drawMemInfo_;
+	int s_drawStats_;
+	int s_drawFrameTimeBar_;
 };
 
 

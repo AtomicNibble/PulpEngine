@@ -6,6 +6,7 @@
 #include <String\HumanSize.h>
 
 #include <IRender.h>
+#include <IConsole.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -21,19 +22,35 @@ namespace
 
 void XProfileSys::Render(void)
 {
+	if (!s_drawProfileInfo_) {
+		return;
+	}
+
 	pRender_ = gEnv->pRender;
 	if (!pRender_) {
 		return;
 	}
 
+	pRender_->FlushTextBuffer();
+
 	UpdateSubSystemInfo(); // calculate avg's
 
+	consoleState::Enum consoleState = gEnv->pConsole->getVisState();
+	if (consoleState == consoleState::EXPANDED) {
+		if (!s_drawProfileInfoWhenConsoleExpaned_) {
+			return;
+		}
+	}
+
 	const float X_START = 5.f;
-	const float Y_START = 35.f;
 	const float X_PAD = 5.f;
 	const float Y_PAD = 5.f;
-	//	const float Y_ROW_PAD = 5.f; 
 	const float WIDTH = 790.f;
+
+	float Y_START = 5.f;
+	if (consoleState != consoleState::CLOSED) {
+		Y_START = 35.f;
+	}
 
 	Vec2f xy(X_START, Y_START);
 
@@ -43,23 +60,38 @@ void XProfileSys::Render(void)
 		
 		// sub system + mem stats.
 		{
-			Vec2f size = RenderSubSysInfo(xy, WIDTH);
-			Vec2f memPos(xy.x + size.x, xy.y);
-			memPos.x += X_PAD;
-			RenderMemoryInfo(memPos, size.y);
+			Vec2f size;
+
+			if (s_drawSubsystems_) 
+			{
+				size = RenderSubSysInfo(xy, WIDTH);
+			}
+
+			if (s_drawMemInfo_)
+			{
+				Vec2f memPos(xy.x + size.x, xy.y);
+
+				if (s_drawSubsystems_) {
+					memPos.x += X_PAD;
+				}
+
+				Vec2f memSize = RenderMemoryInfo(memPos, size.y);
+				size.y = core::Max(size.y, memSize.y);
+			}
 
 			xy.y += size.y;
 			xy.y += Y_PAD;
 		}
 		// draw the table.
+		if (s_drawStats_)
 		{
-
 			Vec2f size = RenderProfileData(xy, WIDTH);
 
 			xy.y += size.y;
 			xy.y += Y_PAD;
 		}
 		// frame times bar
+		if (s_drawFrameTimeBar_)
 		{
 
 			RenderFrameTimes(xy, WIDTH, 20.f);
@@ -126,7 +158,7 @@ Vec2f XProfileSys::RenderSubSysInfo(const Vec2f& pos, const float maxWidth)
 	return sizeOut;
 }
 
-Vec2f XProfileSys::RenderMemoryInfo(const Vec2f& pos, const float height)
+Vec2f XProfileSys::RenderMemoryInfo(const Vec2f& pos, float height)
 {
 	core::MemoryArenaBase* arena = g_coreArena;// gEnv->pArena;
 	core::MemoryAllocatorStatistics allocStats = arena->getAllocatorStatistics(true);
@@ -146,6 +178,9 @@ Vec2f XProfileSys::RenderMemoryInfo(const Vec2f& pos, const float height)
 	Color txt_col(0.7f, 0.7f, 0.7f, 1.f);
 
 	const float width = 200.f;
+	if (height < 1.f) {
+		height = 200.f;
+	}
 
 	pRender_->DrawQuad(pos.x, pos.y, width, height, Color(0.1f, 0.1f, 0.1f, 0.6f),
 		Color(0.01f, 0.01f, 0.01f, 0.8f));
@@ -181,7 +216,7 @@ Vec2f XProfileSys::RenderMemoryInfo(const Vec2f& pos, const float height)
 
 	stringPos.x += width;
 
-	return stringPos - pos;
+	return Vec2f(stringPos.x - pos.x, height);
 }
 
 Vec2f XProfileSys::RenderProfileData(const Vec2f& pos, const float width)
