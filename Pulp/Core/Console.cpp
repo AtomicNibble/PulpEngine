@@ -2516,6 +2516,10 @@ void XConsole::Paste(void)
 		// add to length
 		CursorPos_ += safe_static_cast<int32_t, size_t>(core::strUtil::strlen(txt));
 	}
+	else
+	{
+		X_LOG1("Console", "Failed to paste text to console");
+	}
 }
 
 // ==================================================================
