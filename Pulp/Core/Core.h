@@ -248,8 +248,6 @@ public:
 	core::ICVar* var_win_height;
 
 	core::ICVar* var_profile;
-	core::ICVar* var_profile_draw;
-
 };
 
 X_NAMESPACE_BEGIN(core)

@@ -581,7 +581,6 @@ void XCore::CreateSystemVars()
 
 
 	var_profile = ADD_CVAR_INT("profile", 1, 0, 1, VarFlag::SYSTEM, "Enable Profiling");
-	var_profile_draw = ADD_CVAR_INT("profile_draw", 0, 0, 1, VarFlag::SYSTEM, "Display profiler");
 
 
 	ADD_CVAR_STRING("version", X_ENGINE_NAME "Engine " X_BUILD_STRING " Version " X_ENGINE_VERSION_STR, VarFlag::SYSTEM | VarFlag::STATIC, "Engine Version");
