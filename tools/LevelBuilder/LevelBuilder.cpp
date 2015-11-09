@@ -200,6 +200,10 @@ void CompileLevel(core::Path<char>& path)
 			end = gEnv->pTimer->GetAsyncTime();
 			X_LOG0("Info", "Total Time: ^6%.4fms", (end - start).GetMilliSeconds());
 		}
+		else
+		{
+			X_ERROR("Map", "Failed to parse map file");
+		}
 
 		gEnv->pFileSys->closeFileMem(pFile);
 	}
