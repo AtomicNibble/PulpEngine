@@ -317,4 +317,6 @@ X_INLINE const int XLexer::GetLineNumber(void)
 
 X_NAMESPACE_END
 
+#include "Lexer.inl"
+
 #endif // X_STRING_LEXER_H_
