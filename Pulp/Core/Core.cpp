@@ -293,7 +293,7 @@ void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 			g_coreVars.win_x_pos = rect.getX1();
 			g_coreVars.win_y_pos = rect.getY1();
 		}
-			break;
+		break;
 		case CoreEvent::RESIZE:
 		{
 			core::xWindow::Rect rect = pWindow_->GetClientRect();
@@ -301,9 +301,15 @@ void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 			g_coreVars.win_height = rect.getHeight();
 			g_coreVars.win_width = rect.getWidth();
 		}
-			break;
+		break;
+		case CoreEvent::ACTIVATE:
+		{
+			if (pWindow_) {
+				pWindow_->ClipCursorToWindow();
+			}
+		}
+		break;
 	}
-
 }
 
 
