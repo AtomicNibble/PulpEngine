@@ -268,14 +268,13 @@ void XMapPatch::GenerateNormals(void)
 	bool		good[8];
 	bool		wrapWidth, wrapHeight;
 	static size_t	neighbors[8][2] = {
-		{ 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 }, { -1, -1 }, { -1, 0 }, { -1, 1 }
+		{ 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, 
+		{ 0, -1 }, { -1, -1 }, { -1, 0 }, { -1, 1 }
 	};
 
-	//	assert(expanded_ == false);
-
-	//
+	X_ASSERT(!expanded_, "Patch must not be expanded before generating normals.")(expanded_);
+	
 	// if all points are coplanar, set all normals to that plane
-	//
 	Vec3f		extent[3];
 	float		offset;
 	float		length;
