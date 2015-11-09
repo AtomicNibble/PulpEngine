@@ -532,10 +532,12 @@ bool XMapFile::Parse(const char* pData, size_t length)
 			{
 				const XMapPrimitive* prim = mapEnt->GetPrimitive(i);
 
-				if (prim->getType() == PrimType::BRUSH)
+				if (prim->getType() == PrimType::BRUSH) {
 					this->numBrushes++;
-				else if (prim->getType() == PrimType::PATCH)
+				}
+				else if (prim->getType() == PrimType::PATCH) {
 					this->numPatches++;
+				}
 			}
 
 			entities_.push_back(mapEnt);
