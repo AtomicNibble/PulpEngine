@@ -388,6 +388,10 @@ bool XShaderManager::OnFileChange(const char* name)
 			return true;
 		}
 
+		// ignore .fxcb.hlsl which are merged sources saved out for debuggin.
+		if (core::strUtil::FindCaseInsensitive(name, ".fxcb.hlsl")) {
+			return true;
+		}
 
 		// is it source?
 		bool isSource = true;
@@ -422,7 +426,7 @@ bool XShaderManager::OnFileChange(const char* name)
 			else
 			{
 				// log as not found.
-				X_WARNING("Shader", "\"%s\" not used, skippin reload", name);
+				X_WARNING("Shader", "\"%s\" not used, skipping reload", name);
 			}
 		}
 		else

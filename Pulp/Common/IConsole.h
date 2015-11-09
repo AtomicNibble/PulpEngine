@@ -36,6 +36,12 @@ TOOL,			// tool related
 CPY_NAME		// makes a copy of the name
 );
 
+X_DECLARE_ENUM(consoleState)(
+	CLOSED,
+	OPEN,
+	EXPANDED
+);
+
 
 struct ICVar;
 
@@ -71,6 +77,8 @@ struct IConsole
 	virtual void freeRenderResources() X_ABSTRACT;
 
 	virtual void Draw() X_ABSTRACT;
+
+	virtual consoleState::Enum getVisState(void) const X_ABSTRACT;
 
 	// Register variables.
 	virtual ICVar* RegisterString(const char* Name, const char* Value, int flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;

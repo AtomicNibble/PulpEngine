@@ -25,6 +25,8 @@ public:
 
 	virtual void Draw(void) X_FINAL;
 
+	virtual consoleState::Enum getVisState(void) const X_FINAL;
+
 	virtual ICVar* RegisterString(const char* Name, const char* Value, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
 	virtual ICVar* RegisterInt(const char* Name, int Value, int Min, int Max, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
 	virtual ICVar* RegisterFloat(const char* Name, float Value, float Min, float Max, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;

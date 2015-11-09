@@ -142,15 +142,7 @@ public:
 	static const size_t MAX_HISTORY_ENTRIES = 64;
 	static const size_t CONSOLE_LOG_LINE_HIEGHT = 20;
 
-	struct consoleState
-	{
-		enum Enum
-		{
-			CLOSED,
-			OPEN,
-			EXPANDED
-		};
-	};
+	typedef consoleState consoleState;
 public:
 	XConsole();
 
@@ -162,6 +154,9 @@ public:
 	virtual void freeRenderResources(void) X_FINAL;
 
 	virtual void Draw(void) X_FINAL;
+
+	virtual consoleState::Enum getVisState(void) const X_FINAL;
+
 
 	// input callbacks
 	virtual bool OnInputEvent(const input::InputEvent& event) X_FINAL;

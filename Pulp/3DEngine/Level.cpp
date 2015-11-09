@@ -12,6 +12,20 @@
 
 X_NAMESPACE_BEGIN(level)
 
+// --------------------------------
+
+FrameStats::FrameStats()
+{
+	clear();
+}
+
+void FrameStats::clear(void)
+{
+	core::zero_this(this);
+}
+
+// --------------------------------
+
 AsyncLoadData::~AsyncLoadData()
 {
 }
@@ -102,6 +116,7 @@ int Level::s_var_drawAreaBounds_ = 0;
 int Level::s_var_drawPortals_ = 0;
 int Level::s_var_drawArea_ = -1;
 int Level::s_var_drawCurrentAreaOnly_ = 0;
+int Level::s_var_drawStats_ = 0;
 
 // --------------------------------
 
@@ -159,6 +174,9 @@ bool Level::Init(void)
 	ADD_CVAR_REF("lvl_drawCurAreaOnly", s_var_drawCurrentAreaOnly_, 0, 0, 1, 
 		core::VarFlag::SYSTEM, "Draws just the current area. 0=off 1=on");
 
+	ADD_CVAR_REF("lvl_drawStats", s_var_drawStats_, 0, 0, 1,
+		core::VarFlag::SYSTEM, "Draws frame stats");
+
 
 	return true;
 }
@@ -171,6 +189,8 @@ void Level::ShutDown(void)
 
 void Level::update(void)
 {
+	frameStats_.clear();
+
 	frameID_++;
 
 	// are we trying to read?
@@ -342,6 +362,7 @@ bool Level::render(void)
 
 	DrawAreaBounds();
 	DrawPortalDebug();
+	DrawStatsBlock();
 	return true;
 }
 
@@ -380,8 +401,60 @@ void Level::DrawAreaBounds(void)
 	}
 }
 
+void Level::DrawStatsBlock(void) const
+{
+	if (!s_var_drawStats_) {
+		return;
+	}
+
+	pRender_->Set2D(true);
+	{
+		core::StackString512 str;
+
+		str.appendFmt("NumAreas:%i\n", areas_.size());
+		str.appendFmt("VisibleAreas:%i\n", frameStats_.visibleAreas);
+		str.appendFmt("VisibleModels:%i\n", frameStats_.visibleModels);
+		str.appendFmt("VisibleVerts:%i\n", frameStats_.visibleVerts);
+	
+		Color txt_col(0.7f, 0.7f, 0.7f, 1.f);
+		const float height = 100.f;
+		const float width = 200.f;
+
+		float screenWidth = pRender_->getWidthf();
+
+		Vec2f pos(screenWidth - (width + 5.f), 35.f);
+
+		pRender_->DrawQuad(pos.x, pos.y, width, height, Color(0.1f, 0.1f, 0.1f, 0.8f),
+			Color(0.01f, 0.01f, 0.01f, 0.95f));
+		
+		{
+			render::XDrawTextInfo ti;
+			ti.col = txt_col;
+			ti.flags = render::DrawTextFlags::POS_2D | render::DrawTextFlags::MONOSPACE;
+
+			{
+				Vec3f txtPos(pos.x + 5, pos.y + 20, 1);
+				pRender_->DrawTextQueued(txtPos, ti, str.c_str());
+			}
+
+			{
+				Vec3f txtPos(pos.x + (width / 2), pos.y, 1);
+				ti.flags |= render::DrawTextFlags::CENTER;
+				pRender_->DrawTextQueued(txtPos, ti, "Level Draw Stats");
+			}
+		}
+	}
+	pRender_->Set2D(false);
+}
+
 void Level::DrawArea(const Area& area)
 {
+//	if (IsAreaVisible(area)) {
+//		return;
+//	}
+
+	frameStats_.visibleAreas++;
+
 	SetAreaVisible(area.areaNum);
 
 	const FileAreaRefHdr& areaModelsHdr = modelRefs_.areaRefHdrs[area.areaNum];
@@ -402,8 +475,8 @@ void Level::DrawArea(const Area& area)
 		DrawStaticModel(model);
 	}
 
+	frameStats_.visibleVerts += area.pMesh->numVerts;
 	area.pRenderMesh->render();
-
 }
 
 void Level::DrawMultiAreaModels(void)
@@ -441,10 +514,14 @@ void Level::DrawMultiAreaModels(void)
 	}
 }
 
-void Level::DrawStaticModel(const level::StaticModel& sm) const
+void Level::DrawStaticModel(const level::StaticModel& sm)
 {
 	if (sm.pModel)
 	{
+		frameStats_.visibleModels++;
+		frameStats_.visibleVerts += sm.pModel->numVerts(0);
+
+
 		Vec3f pos = sm.pos;
 		Quatf angle = sm.angle;
 
@@ -586,6 +663,18 @@ size_t Level::BoundsInAreas(const AABB& bounds, int32_t* pAreasOut, size_t maxAr
 	return numAreas;
 }
 
+bool Level::IsAreaVisible(int32_t areaIdx) const
+{
+	X_ASSERT((areaIdx >= 0 && areaIdx < safe_static_cast<int, size_t>(areas_.size())),
+		"Area index is out of bounds.")(areaIdx, areas_.size());
+
+	return IsAreaVisible(areas_[areaIdx]);
+}
+
+bool Level::IsAreaVisible(const Area& area) const
+{
+	return area.frameID == frameID_;
+}
 
 void Level::BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numAreasOut,
 	int32_t* pAreasOut, size_t maxAreas) const
@@ -637,7 +726,6 @@ void Level::BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numArea
 		}
 
 	} while (nodeNum != 0);
-
 }
 
 

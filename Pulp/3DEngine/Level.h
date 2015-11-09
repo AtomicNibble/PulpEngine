@@ -26,6 +26,17 @@ struct LoadStats
 	core::TimeVal elapse;
 };
 
+struct FrameStats
+{
+	FrameStats();
+
+	void clear(void);
+
+	size_t visibleModels;
+	size_t visibleAreas;
+	size_t visibleVerts;
+};
+
 struct AsyncLoadData
 {
 	AsyncLoadData(core::XFileAsync* pFile, core::XFileAsyncOperation AsyncOp) :
@@ -152,6 +163,7 @@ public:
 
 	void DrawPortalDebug(void) const;
 	void DrawAreaBounds(void);
+	void DrawStatsBlock(void) const;
 
 public:
 	// util
@@ -163,6 +175,8 @@ public:
 
 	size_t BoundsInAreas(const AABB& bounds, int32_t* pAreasOut, size_t maxAreas) const;
 
+	bool IsAreaVisible(int32_t areaIdx) const;
+	bool IsAreaVisible(const Area& area) const;
 
 private:
 	void BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numAreasOut,
@@ -180,7 +194,7 @@ private:
 	void DrawArea(const Area& area);
 	void DrawMultiAreaModels(void);
 
-	void DrawStaticModel(const level::StaticModel& sm) const;
+	void DrawStaticModel(const level::StaticModel& sm);
 
 private:
 	bool ProcessHeader(uint32_t bytesRead);
@@ -205,6 +219,10 @@ private:
 
 	// static mocel info.
 	StaticModelsArr staticModels_;
+
+private:
+
+	FrameStats frameStats_;
 
 private:
 	size_t frameID_; // inc'd each frame.
@@ -236,6 +254,7 @@ private:
 	static int s_var_drawPortals_;
 	static int s_var_drawArea_;
 	static int s_var_drawCurrentAreaOnly_;
+	static int s_var_drawStats_;
 };
 
 

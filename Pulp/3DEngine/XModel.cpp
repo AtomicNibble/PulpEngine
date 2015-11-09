@@ -85,6 +85,13 @@ int32_t XModel::numMeshTotal(void) const
 	return totalMeshNum_;
 }
 
+int32_t XModel::numVerts(size_t lodIdx) const
+{
+	X_ASSERT(lodIdx < static_cast<size_t>(numLods_), "invalid lod index")(numLods(), lodIdx);
+
+	return lodInfo_[lodIdx].numVerts;
+}
+
 bool XModel::HasLods(void) const
 {
 	return numLods() > 1;
