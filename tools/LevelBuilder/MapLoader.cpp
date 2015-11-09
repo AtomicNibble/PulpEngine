@@ -366,6 +366,7 @@ XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena, bool is
 	if (isWorldSpawn) {
 		// the world spawn is the layout, so gonna be lots :D
 		mapEnt->primitives.reserve(4096 * 8);
+		mapEnt->primitives.setGranularity(4096);
 	}
 
 	worldent = false;
