@@ -6,69 +6,42 @@
 X_NAMESPACE_BEGIN(core)
 
 
-double XLexToken::GetDoubleValue(void) {
-	if (type != TT_NUMBER) {
-		return 0.0;
-	}
-	if (!(subtype & TT_VALUESVALID)) {
-		NumberValue();
-	}
-	return floatvalue;
-}
-
-float XLexToken::GetFloatValue(void) {
-	return (float)GetDoubleValue();
-}
-
-unsigned long	XLexToken::GetUnsignedLongValue(void) {
-	if (type != TT_NUMBER) {
-		return 0;
-	}
-	if (!(subtype & TT_VALUESVALID)) {
-		NumberValue();
-	}
-	return intvalue;
-}
-
-int XLexToken::GetIntValue(void) {
-	return (int)GetUnsignedLongValue();
-}
-
 void XLexToken::NumberValue(void)
 {
 	int i, pow, div, c, negative;
 	const char* p;
 	double m;
 
-	X_ASSERT(type == TT_NUMBER, "token is not a number")(type);
+	X_ASSERT(type_ == TT_NUMBER, "token is not a number")(type_);
 
 	// make a nullterm string
 	// lol wtf this is 10% of the function.
 	core::StackString<128> temp(begin(), end());
 
 	p = temp.c_str();
-	floatvalue = 0;
-	intvalue = 0;
+
+	floatvalue_ = 0;
+	intvalue_ = 0;
 	negative = 0;
 
 	// floating point number
-	if (subtype & TT_FLOAT) 
+	if (subtype_ & TT_FLOAT) 
 	{
 #if 0
-		floatvalue = atof(p);
+		floatvalue_ = atof(p);
 #else
-		if (subtype & (TT_INFINITE | TT_INDEFINITE | TT_NAN)) {
-			if (subtype & TT_INFINITE) {			// 1.#INF
+		if (subtype_ & (TT_INFINITE | TT_INDEFINITE | TT_NAN)) {
+			if (subtype_ & TT_INFINITE) {			// 1.#INF
 				unsigned int inf = 0x7f800000;
-				floatvalue = (double)*(float*)&inf;
+				floatvalue_ = (double)*(float*)&inf;
 			}
-			else if (subtype & TT_INDEFINITE) {	// 1.#IND
+			else if (subtype_ & TT_INDEFINITE) {	// 1.#IND
 				unsigned int ind = 0xffc00000;
-				floatvalue = (double)*(float*)&ind;
+				floatvalue_ = (double)*(float*)&ind;
 			}
-			else if (subtype & TT_NAN) {			// 1.#QNAN
+			else if (subtype_ & TT_NAN) {			// 1.#QNAN
 				unsigned int nan = 0x7fc00000;
-				floatvalue = (double)*(float*)&nan;
+				floatvalue_ = (double)*(float*)&nan;
 			}
 		}
 		else 
@@ -80,13 +53,13 @@ void XLexToken::NumberValue(void)
 			}
 
 			while (*p && *p != '.' && *p != 'e') {
-				floatvalue = floatvalue * 10.0 + (double)(*p - '0');
+				floatvalue_ = floatvalue_ * 10.0 + (double)(*p - '0');
 				p++;
 			}
 			if (*p == '.') {
 				p++;
 				for (m = 0.1; *p && *p != 'e'; p++) {
-					floatvalue = floatvalue + (double)(*p - '0') * m;
+					floatvalue_ = floatvalue_ + (double)(*p - '0') * m;
 					m *= 0.1;
 				}
 			}
@@ -111,21 +84,21 @@ void XLexToken::NumberValue(void)
 					m *= 10.0;
 				}
 				if (div) {
-					floatvalue /= m;
+					floatvalue_ /= m;
 				}
 				else {
-					floatvalue *= m;
+					floatvalue_ *= m;
 				}
 			}
 			
 			if (negative) {
-				floatvalue -= floatvalue * 2;
+				floatvalue_ -= floatvalue_ * 2;
 			}
 		}
 #endif
-		intvalue = (unsigned long)(floatvalue);
+		intvalue_ = (unsigned long)(floatvalue_);
 	}
-	else if (subtype & TT_DECIMAL) 
+	else if (subtype_ & TT_DECIMAL) 
 	{
 		if (*p == '-')
 		{
@@ -134,72 +107,72 @@ void XLexToken::NumberValue(void)
 		}
 
 		while (*p != ' ' && *p) {
-			intvalue = intvalue * 10 + (*p - '0');
+			intvalue_ = intvalue_ * 10 + (*p - '0');
 			p++;
 		}
 
 		if (negative) {
-			intvalue = -intvalue;
+			intvalue_ = -intvalue_;
 		}
 
-		floatvalue = intvalue;
+		floatvalue_ = intvalue_;
 	}
-	else if (subtype & TT_IPADDRESS) {
+	else if (subtype_ & TT_IPADDRESS) {
 		c = 0;
 		while (*p && *p != ':') {
 			if (*p == '.') {
 				while (c != 3) {
-					intvalue = intvalue * 10;
+					intvalue_ = intvalue_ * 10;
 					c++;
 				}
 				c = 0;
 			}
 			else {
-				intvalue = intvalue * 10 + (*p - '0');
+				intvalue_ = intvalue_ * 10 + (*p - '0');
 				c++;
 			}
 			p++;
 		}
 		while (c != 3) {
-			intvalue = intvalue * 10;
+			intvalue_ = intvalue_ * 10;
 			c++;
 		}
-		floatvalue = intvalue;
+		floatvalue_ = intvalue_;
 	}
-	else if (subtype & TT_OCTAL) {
+	else if (subtype_ & TT_OCTAL) {
 		// step over the first zero
 		p += 1;
 		while (*p != ' ' && *p) {
-			intvalue = (intvalue << 3) + (*p - '0');
+			intvalue_ = (intvalue_ << 3) + (*p - '0');
 			p++;
 		}
-		floatvalue = intvalue;
+		floatvalue_ = intvalue_;
 	}
-	else if (subtype & TT_HEX) {
+	else if (subtype_ & TT_HEX) {
 		// step over the leading 0x or 0X
 		p += 2;
 		while (*p != ' ' && *p) {
-			intvalue <<= 4;
+			intvalue_ <<= 4;
 			if (*p >= 'a' && *p <= 'f')
-				intvalue += *p - 'a' + 10;
+				intvalue_ += *p - 'a' + 10;
 			else if (*p >= 'A' && *p <= 'F')
-				intvalue += *p - 'A' + 10;
+				intvalue_ += *p - 'A' + 10;
 			else
-				intvalue += *p - '0';
+				intvalue_ += *p - '0';
 			p++;
 		}
-		floatvalue = intvalue;
+		floatvalue_ = intvalue_;
 	}
-	else if (subtype & TT_BINARY) {
+	else if (subtype_ & TT_BINARY) {
 		// step over the leading 0b or 0B
 		p += 2;
 		while (*p != ' ' && *p) {
-			intvalue = (intvalue << 1) + (*p - '0');
+			intvalue_ = (intvalue_ << 1) + (*p - '0');
 			p++;
 		}
-		floatvalue = intvalue;
+		floatvalue_ = intvalue_;
 	}
-	subtype |= TT_VALUESVALID;
+	subtype_ |= TT_VALUESVALID;
 }
 
 
@@ -407,11 +380,11 @@ int	XLexer::ReadToken(XLexToken& token)
 
 //	token->whiteSpaceEnd_p = script_p;
 	// line the token is on
-	token.line = curLine_;
+	token.line_ = curLine_;
 	// number of lines crossed before token
-	token.linesCrossed = curLine_ - lastLine_;
+	token.linesCrossed_ = curLine_ - lastLine_;
 	// clear token flags
-	token.flags = 0;
+	token.flags_ = 0;
 
 	c = *current_;
 
@@ -499,7 +472,7 @@ int XLexer::ExpectTokenType(int type, int subtype, XLexToken& token) {
 		return 0;
 	}
 
-	if (token.type != type) {
+	if (token.GetType() != type) {
 		switch (type) {
 			case TT_STRING: str.append("string"); break;
 			case TT_LITERAL: str.append("literal"); break;
@@ -511,8 +484,8 @@ int XLexer::ExpectTokenType(int type, int subtype, XLexToken& token) {
 		Error("expected a %s but found '%.*s'", str.c_str(), token.length(), token.begin());
 		return 0;
 	}
-	if (token.type == TT_NUMBER) {
-		if ((token.subtype & subtype) != subtype) {
+	if (token.GetType() == TT_NUMBER) {
+		if ((token.GetSubType() & subtype) != subtype) {
 			str.clear();
 			if (subtype & TT_DECIMAL) str.append("decimal ");
 			if (subtype & TT_HEX) str.append("hex ");
@@ -527,12 +500,12 @@ int XLexer::ExpectTokenType(int type, int subtype, XLexToken& token) {
 			return 0;
 		}
 	}
-	else if (token.type == TT_PUNCTUATION) {
+	else if (token.GetType() == TT_PUNCTUATION) {
 		if (subtype < 0) {
 			Error("BUG: wrong punctuation subtype");
 			return 0;
 		}
-		if (token.subtype != subtype) {
+		if (token.GetSubType() != subtype) {
 			Error("expected '%s' but found '%.*s'", GetPunctuationFromId(subtype), token.length(), token.begin());
 			return 0;
 		}
@@ -548,11 +521,11 @@ int XLexer::ParseInt(void) {
 		Error("couldn't read expected integer");
 		return 0;
 	}
-	if (token.type == TT_PUNCTUATION && token.isEqual("-")) {
+	if (token.GetType() == TT_PUNCTUATION && token.isEqual("-")) {
 		ExpectTokenType(TT_NUMBER, TT_INTEGER, token);
 		return -((signed int)token.GetIntValue());
 	}
-	else if (token.type != TT_NUMBER || token.subtype == TT_FLOAT) {
+	else if (token.GetType() != TT_NUMBER || token.GetSubType() == TT_FLOAT) {
 		Error("expected integer value, found '%.*s'", token.length(), token.begin());
 	}
 	return token.GetIntValue();
@@ -585,11 +558,11 @@ float XLexer::ParseFloat() {
 		Error("couldn't read expected floating point number");
 		return 0;
 	}
-	if (token.type == TT_PUNCTUATION && token.isEqual("-")) {
+	if (token.GetType() == TT_PUNCTUATION && token.isEqual("-")) {
 		ExpectTokenType(TT_NUMBER, 0, token);
 		return -token.GetFloatValue();
 	}
-	else if (token.type != TT_NUMBER) {
+	else if (token.GetType() != TT_NUMBER) {
 		Error("expected float value, found '%.*s'", token.length(), token.begin());
 	}
 	return token.GetFloatValue();
@@ -677,7 +650,7 @@ int XLexer::ReadTokenOnLine(XLexToken& token)
 		return false;
 	}
 	// if no lines were crossed before this token
-	if (!tok.linesCrossed) {
+	if (!tok.linesCrossed_) {
 		token = tok;
 		return true;
 	}
@@ -846,10 +819,10 @@ int XLexer::ReadString(XLexToken& token, int quote) {
 	char ch;
 
 	if (quote == '\"') {
-		token.type = TT_STRING;
+		token.SetType(TT_STRING);
 	}
 	else {
-		token.type = TT_LITERAL;
+		token.SetType(TT_LITERAL);
 	}
 
 	// leading quote
@@ -928,29 +901,30 @@ int XLexer::ReadString(XLexToken& token, int quote) {
 
 	token.end_ = (current_-1);
 
-	if (token.type == TT_LITERAL) {
+	if (token.GetType() == TT_LITERAL) {
 		if (!(flags_.IsSet(LexFlag::ALLOWMULTICHARLITERALS))) {
 			if (token.length() != 1) {
 				Warning("literal is not one character long");
 			}
 		}
-		token.subtype = token.begin()[0];
+		token.subtype_ = token.begin()[0];
 	}
 	else {
 		// the sub type is the length of the string
-		token.subtype = (int)token.length();
+		token.subtype_ = safe_static_cast<int,size_t>(token.length());
 	}
 
 	return 1;
 }
 
 
-int XLexer::ReadName(XLexToken& token) {
+int XLexer::ReadName(XLexToken& token)
+{
 	char c;
 
-	token.type = TT_NAME;
+	token.SetType(TT_NAME);
 
-	token.start_ = current_;
+	token.SetStart(current_);
 
 	do {
 		//		token->AppendDirty(*current_++);
@@ -967,32 +941,22 @@ int XLexer::ReadName(XLexToken& token) {
 	//	token->data[token->len] = '\0';
 	//the sub type is the length of the name
 	//	token.subtype = token->Length();
-	token.end_ = current_;
+	token.SetEnd(current_);
 
 	return 1;
 }
 
 
-X_INLINE int XLexer::CheckString(const char *str) const {
-	int i;
-
-	for (i = 0; str[i]; i++) {
-		if (current_[i] != str[i]) {
-			return false;
-		}
-	}
-	return true;
-}
-
-int XLexer::ReadNumber(XLexToken& token) {
+int XLexer::ReadNumber(XLexToken& token) 
+{
 	int i;
 	int dot, negative;
 	char c, c2;
 
-	token.type = TT_NUMBER;
-	token.subtype = 0;
-	token.intvalue = 0;
-	token.floatvalue = 0;
+	token.SetType(TT_NUMBER);
+	token.subtype_ = 0;
+	token.intvalue_ = 0;
+	token.floatvalue_ = 0;
 
 	c = *current_;
 	c2 = *(current_ + 1);
@@ -1012,7 +976,7 @@ int XLexer::ReadNumber(XLexToken& token) {
 				//		token->AppendDirty(c);
 				c = *(++current_);
 			}
-			token.subtype = TT_HEX | TT_INTEGER;
+			token.subtype_ = TT_HEX | TT_INTEGER;
 		}
 		// check for a binary number
 		else if (c2 == 'b' || c2 == 'B') {
@@ -1024,7 +988,7 @@ int XLexer::ReadNumber(XLexToken& token) {
 				//	token->AppendDirty(c);
 				c = *(++current_);
 			}
-			token.subtype = TT_BINARY | TT_INTEGER;
+			token.subtype_ = TT_BINARY | TT_INTEGER;
 		}
 		// its an octal number
 		else {
@@ -1035,7 +999,7 @@ int XLexer::ReadNumber(XLexToken& token) {
 				//			token->AppendDirty(c);
 				c = *(++current_);
 			}
-			token.subtype = TT_OCTAL | TT_INTEGER;
+			token.subtype_ = TT_OCTAL | TT_INTEGER;
 		}
 	}
 	else {
@@ -1066,7 +1030,7 @@ int XLexer::ReadNumber(XLexToken& token) {
 		}
 		// if a floating point number
 		if (dot == 1) {
-			token.subtype = TT_DECIMAL | TT_FLOAT;
+			token.SetSubType(TT_DECIMAL | TT_FLOAT);
 			// check for floating point exponent
 			if (c == 'e') {
 				//Append the e so that GetFloatValue code works
@@ -1089,20 +1053,20 @@ int XLexer::ReadNumber(XLexToken& token) {
 			else if (c == '#') {
 				c2 = 4;
 				if (CheckString("INF")) {
-					token.subtype |= TT_INFINITE;
+					token.subtype_ |= TT_INFINITE;
 				}
 				else if (CheckString("IND")) {
-					token.subtype |= TT_INDEFINITE;
+					token.subtype_ |= TT_INDEFINITE;
 				}
 				else if (CheckString("NAN")) {
-					token.subtype |= TT_NAN;
+					token.subtype_ |= TT_NAN;
 				}
 				else if (CheckString("QNAN")) {
-					token.subtype |= TT_NAN;
+					token.subtype_ |= TT_NAN;
 					c2++;
 				}
 				else if (CheckString("SNAN")) {
-					token.subtype |= TT_NAN;
+					token.subtype_ |= TT_NAN;
 					c2++;
 				}
 				for (i = 0; i < c2; i++) {
@@ -1128,45 +1092,45 @@ int XLexer::ReadNumber(XLexToken& token) {
 				Error("ip address should have three dots");
 				return 0;
 			}
-			token.subtype = TT_IPADDRESS;
+			token.subtype_ = TT_IPADDRESS;
 		}
 		else {
-			token.subtype = TT_DECIMAL | TT_INTEGER;
+			token.subtype_ = TT_DECIMAL | TT_INTEGER;
 		}
 	}
 
-	if (token.subtype & TT_FLOAT) {
+	if (token.subtype_ & TT_FLOAT) {
 		if (c > ' ') {
 			// single-precision: float
 			if (c == 'f' || c == 'F') {
-				token.subtype |= TT_SINGLE_PRECISION;
+				token.subtype_ |= TT_SINGLE_PRECISION;
 				current_++;
 			}
 			// extended-precision: long double
 			else if (c == 'l' || c == 'L') {
-				token.subtype |= TT_EXTENDED_PRECISION;
+				token.subtype_ |= TT_EXTENDED_PRECISION;
 				current_++;
 			}
 			// default is double-precision: double
 			else {
-				token.subtype |= TT_DOUBLE_PRECISION;
+				token.subtype_ |= TT_DOUBLE_PRECISION;
 			}
 		}
 		else {
-			token.subtype |= TT_DOUBLE_PRECISION;
+			token.subtype_ |= TT_DOUBLE_PRECISION;
 		}
 	}
-	else if (token.subtype & TT_INTEGER) {
+	else if (token.subtype_ & TT_INTEGER) {
 		if (c > ' ') {
 			// default: signed long
 			for (i = 0; i < 2; i++) {
 				// long integer
 				if (c == 'l' || c == 'L') {
-					token.subtype |= TT_LONG;
+					token.subtype_ |= TT_LONG;
 				}
 				// unsigned integer
 				else if (c == 'u' || c == 'U') {
-					token.subtype |= TT_UNSIGNED;
+					token.subtype_ |= TT_UNSIGNED;
 				}
 				else {
 					break;
@@ -1175,7 +1139,7 @@ int XLexer::ReadNumber(XLexToken& token) {
 			}
 		}
 	}
-	else if (token.subtype & TT_IPADDRESS) {
+	else if (token.subtype_ & TT_IPADDRESS) {
 		if (c == ':') {
 			//		token->AppendDirty(c);
 			c = *(++current_);
@@ -1183,7 +1147,7 @@ int XLexer::ReadNumber(XLexToken& token) {
 				//			token->AppendDirty(c);
 				c = *(++current_);
 			}
-			token.subtype |= TT_IPPORT;
+			token.subtype_ |= TT_IPPORT;
 		}
 	}
 	//	token->data[token->len] = '\0';
@@ -1232,9 +1196,9 @@ int XLexer::ReadPunctuation(XLexToken& token) {
 			token.end_ = current_ + 1;
 
 			current_ += l;
-			token.type = TT_PUNCTUATION;
+			token.SetType(TT_PUNCTUATION);
 			// sub type is the punctuation id
-			token.subtype = punc->n;
+			token.subtype_ = punc->n;
 			return 1;
 		}
 	}
@@ -1272,7 +1236,7 @@ int XLexer::PeekTokenType(int type, int subtype, XLexToken& token) {
 	curLine_ = lastLine_;
 
 	// if the type matches
-	if (tok.type == type && (tok.subtype & subtype) == subtype) {
+	if (tok.GetType() == type && (tok.subtype_ & subtype) == subtype) {
 		token = tok;
 		return 1;
 	}
@@ -1295,7 +1259,7 @@ int XLexer::SkipRestOfLine(void) {
 	XLexToken token;
 
 	while (ReadToken(token)) {
-		if (token.linesCrossed) {
+		if (token.linesCrossed_) {
 			current_ = lastp_;
 			curLine_ = lastLine_;
 			return 1;

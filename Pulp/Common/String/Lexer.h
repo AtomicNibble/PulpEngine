@@ -165,65 +165,58 @@ class XLexer;
 class XLexToken
 {
 public:
-	XLexToken() : start_(nullptr), end_(nullptr), pNext_(nullptr) { Init(); }
-	XLexToken(const char* start, const char* end) : start_(start), end_(end), pNext_(nullptr) { Init(); }
+	X_INLINE XLexToken();
+	X_INLINE XLexToken(const char* start, const char* end);
 
-	size_t length() const { return end_ - start_; }
+	X_INLINE size_t length(void) const;
+	X_INLINE int GetType(void) const;
+	X_INLINE int GetSubType(void) const;
+	X_INLINE int GetLine(void) const;
+	X_INLINE void SetType(int type);
+	X_INLINE void SetSubType(int subType);
 
-	const char* begin() const { return start_; }
-	const char* end() const { return end_; }
 
-	inline bool isEqual(const char* str) {
-		return strUtil::IsEqual(start_, end_, str);
-	}
+	X_INLINE const char* begin(void) const;
+	X_INLINE const char* end(void) const;
 
-	double			GetDoubleValue(void);				// double value of TT_NUMBER
-	float			GetFloatValue(void);				// float value of TT_NUMBER
-	unsigned long	GetUnsignedLongValue(void);		// unsigned long value of TT_NUMBER
-	int				GetIntValue(void);
+	X_INLINE bool isEqual(const char* str) const;
 
+	X_INLINE double GetDoubleValue(void);				// double value of TT_NUMBER
+	X_INLINE float GetFloatValue(void);					// float value of TT_NUMBER
+	X_INLINE unsigned long GetUnsignedLongValue(void);	// unsigned long value of TT_NUMBER
+	X_INLINE int GetIntValue(void);
+
+	X_INLINE void Reset(void);
 
 private:
-	friend class XLexer;
-	friend class XParser;
+	X_INLINE void Init(void);
 
 	void NumberValue(void);
 
-	void Reset()
-	{
-		start_ = nullptr;
-		end_ = nullptr;
-		Init();
-	}
+protected:
+	friend class XLexer;
+	friend class XParser;
 
-	void Init()
-	{
-		line = -1;
-		linesCrossed = -1;
-		flags = 0;
+	X_INLINE void SetStart(const char* start);
+	X_INLINE void SetEnd(const char* end);
 
-		intvalue = 0;
-		floatvalue = 0.f;
+	X_INLINE XLexToken* GetNext(void);
+	X_INLINE const XLexToken* GetNext(void) const;
 
-		type = 0;
-		subtype = 0;
-	}
+private:
+	int	type_;				// token type
+	int	subtype_;			// token sub type
 
-public:
+	int	line_;				// line in script the token was on
+	int	linesCrossed_;		// number of lines crossed in white space before token
+	int	flags_;				// token flags, used for recursive defines
 
-	int		type;				// token type
-	int		subtype;			// token sub type
-	int		line;				// line in script the token was on
-	int		linesCrossed;		// number of lines crossed in white space before token
-	int		flags;				// token flags, used for recursive defines
-
-	long		intvalue;	// integer value
-	double		floatvalue;
+	long intvalue_;			// integer value
+	double floatvalue_;
 
 	const char* start_;
 	const char* end_;
 
-protected:
 	// shit used by parser.
 	XLexToken* pNext_;
 };
@@ -232,7 +225,7 @@ class XLexer
 {
 	friend class XParser;
 
-	XLexer() {}
+	X_INLINE XLexer();
 public:
 	typedef Flags<LexFlag> LexFlags;
 
@@ -262,18 +255,11 @@ public:
 	// read a token only if on the same line
 	int	ReadTokenOnLine(XLexToken& token);
 
-	const int GetLineNumber(void);
+	X_INLINE const int GetLineNumber(void) const;
+	X_INLINE bool isEOF(void) const;
+	X_INLINE void setFlags(LexFlags flags);
 
-	X_INLINE bool isEOF(void) const {
-		// check if we have gone past the end for some strange reason.
-		// still returns true for EOF if past tho.
-		X_ASSERT(current_ <= end_, "current is past the end of the file")(current_, end_);
-		return current_ >= end_; 
-	}
 
-	X_INLINE void setFlags(LexFlags flags) {
-		flags_ = flags;
-	}
 	void Error(const char *str, ...);
 	void Warning(const char *str, ...);
 
@@ -291,7 +277,7 @@ private:
 	int	ReadPunctuation(XLexToken& token);
 	int	ReadPrimitive(XLexToken& token);
 
-	X_INLINE int CheckString(const char *str) const;
+	X_INLINE int CheckString(const char* str) const;
 
 	const char* start_;
 	const char* end_;
@@ -310,10 +296,6 @@ private:
 };
 
 
-X_INLINE const int XLexer::GetLineNumber(void)
-{
-	return curLine_;
-}
 
 X_NAMESPACE_END
 

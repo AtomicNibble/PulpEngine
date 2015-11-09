@@ -917,7 +917,7 @@ bool ShaderSourceFile::Technique::parse(core::XLexer& lex)
 		// parse a key / value pair
 		key.append(token.begin(), token.end());
 		if (!lex.ReadTokenOnLine(token)) {
-			X_ERROR("Shader", "unexpected EOF while reading technique, Line: %i", token.line);
+			X_ERROR("Shader", "unexpected EOF while reading technique, Line: %i", token.GetLine());
 			return false;
 		}
 		value.append(token.begin(), token.end());
@@ -1185,7 +1185,7 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 
 			if (!token.isEqual("{"))
 			{
-				X_ERROR("Shader", "expected { on line: %i", token.line);
+				X_ERROR("Shader", "expected { on line: %i", token.GetLine());
 			}
 
 			{
@@ -1205,7 +1205,7 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 			// valid?
 			if (sourceFileName.isEmpty())
 			{
-				X_ERROR("Shader", "invalid source name Line: %i", token.line);
+				X_ERROR("Shader", "invalid source name Line: %i", token.GetLine());
 				return nullptr;
 			}
 			else
@@ -1228,7 +1228,7 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 						if (token.isEqual("}"))
 							break;
 						if (!token.isEqual("{")) {
-							X_ERROR("Shader", "expected { on line: %i", token.line);
+							X_ERROR("Shader", "expected { on line: %i", token.GetLine());
 							X_DELETE(pShaderSource,g_rendererArena);
 							return nullptr;
 						}
@@ -1439,7 +1439,8 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 						// you silly hoe!
 						if (fileName.isEmpty())
 						{
-							X_WARNING("Shader", "invalid #include in: \"%s\" line: %i", file->name.c_str(), token.line);
+							X_WARNING("Shader", "invalid #include in: \"%s\" line: %i", 
+								file->name.c_str(), token.GetLine());
 							return;
 						}
 
@@ -1469,7 +1470,8 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 							}
 							else
 							{
-								X_ERROR("Shader", "Recursive file #include for: \"%s\" in shader \"%s\" line: %i", fileName.c_str(), file->name.c_str(), token.line);
+								X_ERROR("Shader", "Recursive file #include for: \"%s\" in shader \"%s\" line: %i", 
+									fileName.c_str(), file->name.c_str(), token.GetLine());
 							}
 						}
 						else

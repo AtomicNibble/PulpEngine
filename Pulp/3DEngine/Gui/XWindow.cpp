@@ -213,11 +213,11 @@ bool XWindow::Parse(core::XParser& lex)
 				return false;
 			}
 			if (token.length() > 64) {
-				X_ERROR("Gui", "time value is too long. line(%i)", token.line);
+				X_ERROR("Gui", "time value is too long. line(%i)", token.GetLine());
 				return false;
 			}
-			if (token.type != TT_NUMBER) {
-				X_ERROR("Gui", "expected number after 'onTime' line(%i)", token.line);
+			if (token.GetType() != TT_NUMBER) {
+				X_ERROR("Gui", "expected number after 'onTime' line(%i)", token.GetLine());
 				return false;
 			}
 
@@ -227,7 +227,7 @@ bool XWindow::Parse(core::XParser& lex)
 
 			if (!ParseScript(lex, *event->script))
 			{
-				X_ERROR("Gui", "error parsing 'onTime' on line(%i)", token.line);
+				X_ERROR("Gui", "error parsing 'onTime' on line(%i)", token.GetLine());
 				return false;
 			}
 
@@ -853,14 +853,14 @@ int XWindow::ParseTerm(core::XParser& lex, XWinVar* var, int component)
 	if (token.isEqual("-")) 
 	{
 		lex.ReadToken(token);
-		if (token.type == TT_NUMBER || token.isEqual("."))
+		if (token.GetType() == TT_NUMBER || token.isEqual("."))
 		{
 			return ExpressionConstant(-(float)token.GetFloatValue());
 		}
 		return 0;
 	}
 
-	if (token.type == TT_NUMBER || token.isEqual(".") || token.isEqual("-")) {
+	if (token.GetType() == TT_NUMBER || token.isEqual(".") || token.isEqual("-")) {
 		return ExpressionConstant((float)token.GetFloatValue());
 	}
 

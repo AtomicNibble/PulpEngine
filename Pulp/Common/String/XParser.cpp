@@ -81,7 +81,7 @@ int	XParser::ReadToken(XLexToken& token)
 		if (!ReadSourceToken(token))
 			return false;
 
-		if (token.type == TT_PUNCTUATION && token.length() > 0 && token.begin()[0] == '#')
+		if (token.GetType() == TT_PUNCTUATION && token.length() > 0 && token.begin()[0] == '#')
 		{
 			if (!ReadDirective()) {
 				return false;
@@ -90,7 +90,7 @@ int	XParser::ReadToken(XLexToken& token)
 			continue;
 		}
 
-		if (token.type == TT_NAME)
+		if (token.GetType() == TT_NAME)
 		{
 			MacroDefine* define = FindDefine(token);
 			if (define)
@@ -133,7 +133,7 @@ int XParser::ExpectTokenType(int type, int subtype, XLexToken& token)
 		return 0;
 	}
 
-	if (token.type != type) 
+	if (token.GetType() != type) 
 	{
 		switch (type) {
 			case TT_STRING: str.append("string"); break;
@@ -146,9 +146,9 @@ int XParser::ExpectTokenType(int type, int subtype, XLexToken& token)
 		Error("expected a %s but found '%.*s'", str.c_str(), token.length(), token.begin());
 		return 0;
 	}
-	if (token.type == TT_NUMBER) 
+	if (token.GetType() == TT_NUMBER)
 	{
-		if ((token.subtype & subtype) != subtype) 
+		if ((token.GetSubType() & subtype) != subtype) 
 		{
 			str.clear();
 			if (subtype & TT_DECIMAL) str.append("decimal ");
@@ -164,12 +164,12 @@ int XParser::ExpectTokenType(int type, int subtype, XLexToken& token)
 			return 0;
 		}
 	}
-	else if (token.type == TT_PUNCTUATION) {
+	else if (token.GetType() == TT_PUNCTUATION) {
 		if (subtype < 0) {
 			Error("BUG: wrong punctuation subtype");
 			return 0;
 		}
-		if (token.subtype != subtype) {
+		if (token.GetSubType() != subtype) {
 			Error("expected '%s' but found '%.*s'", pLexer_->GetPunctuationFromId(subtype), token.length(), token.begin());
 			return 0;
 		}
@@ -185,11 +185,11 @@ int XParser::ParseInt()
 		Error("couldn't read expected integer");
 		return 0;
 	}
-	if (token.type == TT_PUNCTUATION && token.isEqual( "-")) {
+	if (token.GetType() == TT_PUNCTUATION && token.isEqual("-")) {
 		ExpectTokenType(TT_NUMBER, TT_INTEGER, token);
 		return -((signed int)token.GetIntValue());
 	}
-	else if (token.type != TT_NUMBER || token.subtype == TT_FLOAT) {
+	else if (token.GetType() != TT_NUMBER || token.GetSubType() == TT_FLOAT) {
 		Error("expected integer value, found '%.*s'", token.length(), token.begin());
 	}
 	return token.GetIntValue();
@@ -216,11 +216,11 @@ float XParser::ParseFloat()
 		Error("couldn't read expected floating point number");
 		return 0.0f;
 	}
-	if (token.type == TT_PUNCTUATION && token.isEqual("-")) {
+	if (token.GetType() == TT_PUNCTUATION && token.isEqual("-")) {
 		ExpectTokenType(TT_NUMBER, 0, token);
 		return -token.GetFloatValue();
 	}
-	else if (token.type != TT_NUMBER) {
+	else if (token.GetType() != TT_NUMBER) {
 		Error("expected float value, found '%.*s'", token.length(), token.begin());
 	}
 	return token.GetFloatValue();
@@ -233,16 +233,18 @@ void XParser::UnreadToken(const XLexToken& token)
 
 const int XParser::GetLineNumber(void)
 {
-	if (pLexer_)
+	if (pLexer_) {
 		return pLexer_->GetLineNumber();
+	}
 	X_WARNING("Parser", "called 'GetLineNumber' on a parser without a valid file loaded");
 	return true;
 }
 
 bool XParser::isEOF(void) const
 {
-	if (pLexer_)
+	if (pLexer_) {
 		return pLexer_->isEOF();
+	}
 	X_WARNING("Parser", "called 'EOF' on a parser without a valid file loaded");
 	return true;
 }
@@ -290,7 +292,7 @@ bool XParser::ReadDirective(void)
 		return false;
 	}
 
-	if (token.type == TT_NAME)
+	if (token.GetType() == TT_NAME)
 	{
 		if (token.isEqual("define"))
 		{
@@ -303,7 +305,7 @@ bool XParser::ReadDirective(void)
 
 	}
 
-	X_ERROR("Parser", "unknown precompiler directive. line(%i)", token.line);
+	X_ERROR("Parser", "unknown precompiler directive. line(%i)", token.GetLine());
 	return false;
 }
 
@@ -328,7 +330,7 @@ bool XParser::Directive_define(void)
 		return false;
 	}
 
-	if (token.type != TT_NAME)
+	if (token.GetType() != TT_NAME)
 	{
 		core::StackString512 temp(token.begin(), token.end());
 		X_ERROR("Parser", "expected a name after #define got: %s", temp.c_str());
@@ -337,7 +339,7 @@ bool XParser::Directive_define(void)
 
 	if (token.length() < 1)
 	{
-		X_ERROR("Parser", "invalid token line %i", token.line);
+		X_ERROR("Parser", "invalid token line %i", token.GetLine());
 		return false;
 	}
 
@@ -375,7 +377,7 @@ bool XParser::Directive_define(void)
 					return false;
 				}
 				// if it isn't a name
-				if (token.type != TT_NAME) {
+				if (token.GetType() != TT_NAME) {
 					Error("invalid define parameter");
 					return false;
 				}
@@ -425,7 +427,7 @@ bool XParser::Directive_define(void)
 	{
 		XLexToken* pT = X_NEW(XLexToken, arena_, "Macrotoken")(token);
 
-		if (token.type == TT_NAME && token.isEqual(define->name)) {
+		if (token.GetType() == TT_NAME && token.isEqual(define->name)) {
 		//	t->flags |= TOKEN_FL_RECURSIVE_DEFINE;
 		//	idParser::Warning("recursive define (removed recursion)");
 		}
@@ -490,7 +492,7 @@ int	XParser::ReadLine(XLexToken& token)
 			return false;
 		}
 
-		if (token.linesCrossed > crossline) {
+		if (token.linesCrossed_ > crossline) {
 			UnreadSourceToken(token);
 			return false;
 		}
@@ -570,7 +572,7 @@ int XParser::ReadDefineParms(MacroDefine* pDefine, XLexToken** parms, int maxpar
 					break;
 				}
 			}
-			else if (token.type == TT_NAME) {
+			else if (token.GetType() == TT_NAME) {
 				newdefine = FindDefine(token);
 				if (newdefine) {
 					if (!ExpandDefineIntoSource(token, newdefine)) {
@@ -625,7 +627,7 @@ bool XParser::ExpandDefine(XLexToken& deftoken, MacroDefine* pDefine,
 	{
 		parmnum = -1;
 		// if the token is a name, it could be a define parameter
-		if (dt->type == TT_NAME) {
+		if (dt->GetType() == TT_NAME) {
 			parmnum = FindDefineParm(pDefine, *dt);
 		}
 		// if it is a define parameter
@@ -654,19 +656,22 @@ bool XParser::ExpandDefine(XLexToken& deftoken, MacroDefine* pDefine,
 			else
 			{
 				t = X_NEW(XLexToken,arena_,"DefineToken")(*dt);
-				t->line = deftoken.line;
+				t->line_ = deftoken.GetLine();
 			}
 
 			// add the token to the list
 			t->pNext_ = nullptr;
 			// the token being read from the define list should use the line number of
 			// the original file, not the header file			
-			t->line = deftoken.line;
+			t->line_ = deftoken.GetLine();
 
-			if (last)
+			if (last) {
 				last->pNext_ = t;
-			else
+			}
+			else {
 				first = t;
+			}
+
 			last = t;
 		}
 	}
@@ -701,7 +706,7 @@ bool XParser::ExpandDefineIntoSource(XLexToken& token, MacroDefine* pDefine)
 
 	// if the define is not empty
 	if (firsttoken && lasttoken) {
-		firsttoken->linesCrossed += token.linesCrossed;
+		firsttoken->linesCrossed_ += token.linesCrossed_;
 		lasttoken->pNext_ = pTokens_;
 		pTokens_ = firsttoken;
 	}
