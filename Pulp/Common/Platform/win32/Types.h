@@ -5,6 +5,7 @@
 
 #include "Compiler.h"
 
+
 #ifdef DWORD
 #undef DWORD
 #endif
@@ -94,6 +95,9 @@ typedef signed __int64     int64;
 
 
 
+// typedef int INT_PTR, *PINT_PTR;
+// typedef unsigned int UINT_PTR, *PUINT_PTR;
+
 /* VC++ COMPILER PARAMETERS */
 #define _LONGLONG	__int64
 #define _ULONGLONG	unsigned __int64
@@ -122,6 +126,14 @@ typedef _ULonglong uint_fast64_t;
 typedef _Longlong intmax_t;
 typedef _ULonglong uintmax_t;
 
+#ifndef _PTRDIFF_T_DEFINED
+#ifdef _WIN64
+typedef __int64        ptrdiff_t;
+#else  /* _WIN64 */
+typedef int            ptrdiff_t;
+#endif  /* _WIN64 */
+#define _PTRDIFF_T_DEFINED
+#endif  /* _PTRDIFF_T_DEFINED */
 
 #undef INT8_MIN
 #undef INT8_MAX
@@ -136,6 +148,9 @@ typedef _ULonglong uintmax_t;
 #undef UINT16_MAX
 #undef UINT32_MAX
 #undef UINT64_MAX
+
+#undef F32NAN
+#undef F64NAN
 
 const uint8  UINT8_MIN = 0;
 const uint8  UINT8_MAX = 0xFFU;
@@ -156,8 +171,13 @@ const int64 INT64_MIN = (int64)0x8000000000000000ULL; //(-9223372036854775807i64
 const int64 INT64_MAX = (int64)0x7FFFFFFFFFFFFFFFULL; // 9223372036854775807i64;
 
 
-typedef float	float32_t;
-typedef double	float64_t;
+const int32 FLOAT_32NAN = (int32)0x7F800001; 
+const int64 FLOAT_64NAN = (int64)0x7FF0000000000001; 
+
+
+
+typedef float	float32_t, f32;
+typedef double	float64_t, f64;
 
 
 static_assert(sizeof(float32_t) == 4, "sizeof(float32_t) is not 4 bytes");

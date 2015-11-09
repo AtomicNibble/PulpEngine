@@ -247,9 +247,6 @@
       <Filter>Headers\Prepo</Filter>
     </ClInclude>
     <ClInclude Include="EngineCommon.h" />
-    <ClInclude Include="Types.h">
-      <Filter>Headers\Platform\win32</Filter>
-    </ClInclude>
     <ClInclude Include="Platform\Types.h">
       <Filter>Headers\Platform</Filter>
     </ClInclude>
@@ -1025,6 +1022,9 @@
       <Filter>Headers\Time\win32</Filter>
     </ClInclude>
     <ClInclude Include="Platform\win32\CustomFrame.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\win32\Types.h">
       <Filter>Headers\Platform\win32</Filter>
     </ClInclude>
   </ItemGroup>

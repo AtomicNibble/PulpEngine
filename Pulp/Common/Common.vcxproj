@@ -230,6 +230,7 @@
     <ClInclude Include="Platform\win32\Console.h" />
     <ClInclude Include="Platform\win32\CustomFrame.h" />
     <ClInclude Include="Platform\win32\DirectoryWatcher.h" />
+    <ClInclude Include="Platform\win32\Types.h" />
     <ClInclude Include="Platform\win32\Window.h" />
     <ClInclude Include="Platform\Window.h" />
     <ClInclude Include="Prepro\PreproCommaIf.h" />
@@ -293,7 +294,6 @@
     <ClInclude Include="Traits\MemberFunctionTraits.h" />
     <ClInclude Include="Traits\SignedTypes.h" />
     <ClInclude Include="Traits\UnsignedTypes.h" />
-    <ClInclude Include="Types.h" />
     <ClInclude Include="Util\BitUtil.h" />
     <ClInclude Include="Util\ClassMacros.h" />
     <ClInclude Include="Util\Cpu.h" />
