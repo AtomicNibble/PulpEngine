@@ -326,7 +326,8 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	// show the window
 	if (pWindow_) {
 		pWindow_->Show();
-		pWindow_->ClipCursorToWindow();
+	//	No longer needed since I call this on window activate events.
+	//	pWindow_->ClipCursorToWindow();
 	}
 
 	return true;
