@@ -23,7 +23,7 @@ size_t XLexToken::length() const
 	return end_ - start_; 
 }
 
-int XLexToken::GetType(void) const
+TokenType::Enum XLexToken::GetType(void) const
 {
 	return type_;
 }
@@ -38,7 +38,7 @@ int XLexToken::GetLine(void) const
 	return line_;
 }
 
-void XLexToken::SetType(int type)
+void XLexToken::SetType(TokenType::Enum type)
 {
 	type_ = type;
 }
@@ -65,7 +65,7 @@ bool XLexToken::isEqual(const char* str) const
 
 double XLexToken::GetDoubleValue(void)
 {
-	if (type_ != TT_NUMBER) {
+	if (type_ != TokenType::NUMBER) {
 		return 0.0;
 	}
 	if (!(subtype_ & TT_VALUESVALID)) {
@@ -82,7 +82,7 @@ float XLexToken::GetFloatValue(void)
 
 unsigned long XLexToken::GetUnsignedLongValue(void)
 {
-	if (type_ != TT_NUMBER) {
+	if (type_ != TokenType::NUMBER) {
 		return 0;
 	}
 	if (!(subtype_ & TT_VALUESVALID)) {
@@ -113,7 +113,7 @@ void XLexToken::Init(void)
 	intvalue_ = 0;
 	floatvalue_ = 0.f;
 
-	type_ = 0;
+	type_ = TokenType::INVALID;
 	subtype_ = 0;
 }
 

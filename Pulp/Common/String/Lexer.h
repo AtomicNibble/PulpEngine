@@ -31,7 +31,8 @@ X_DECLARE_ENUM(TokenType)(
 	LITERAL,
 	NUMBER,
 	NAME,
-	PUNCTUATION
+	PUNCTUATION,
+	INVALID
 );
 
 #ifdef NAN
@@ -41,7 +42,7 @@ X_DECLARE_ENUM(TokenType)(
 #undef INFINITE
 #endif 
 
-X_DECLARE_FLAGS(TokenTypeFlag)(
+X_DECLARE_FLAGS(TokenSubType)(
 	INTERGER,
 	DECIMAL,
 	HEX,
@@ -62,11 +63,13 @@ X_DECLARE_FLAGS(TokenTypeFlag)(
 
 
 // token types
+/*
 #define TT_STRING					1		// string
 #define TT_LITERAL					2		// literal
 #define TT_NUMBER					3		// number
 #define TT_NAME						4		// name
 #define TT_PUNCTUATION				5		// punctuation
+*/
 
 // number sub types
 #define TT_INTEGER					0x00001		// integer
@@ -165,14 +168,17 @@ class XLexer;
 class XLexToken
 {
 public:
+	typedef Flags<TokenSubType> TokenSubTypeFlags;
+
+public:
 	X_INLINE XLexToken();
 	X_INLINE XLexToken(const char* start, const char* end);
 
 	X_INLINE size_t length(void) const;
-	X_INLINE int GetType(void) const;
+	X_INLINE TokenType::Enum GetType(void) const;
 	X_INLINE int GetSubType(void) const;
 	X_INLINE int GetLine(void) const;
-	X_INLINE void SetType(int type);
+	X_INLINE void SetType(TokenType::Enum type);
 	X_INLINE void SetSubType(int subType);
 
 
@@ -204,7 +210,7 @@ protected:
 	X_INLINE const XLexToken* GetNext(void) const;
 
 private:
-	int	type_;				// token type
+	TokenType::Enum	type_;				// token type
 	int	subtype_;			// token sub type
 
 	int	line_;				// line in script the token was on

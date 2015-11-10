@@ -12,7 +12,7 @@ void XLexToken::NumberValue(void)
 	const char* p;
 	double m;
 
-	X_ASSERT(type_ == TT_NUMBER, "token is not a number")(type_);
+	X_ASSERT(type_ == TokenType::NUMBER, "token is not a number")(type_);
 
 	// make a nullterm string
 	// lol wtf this is 10% of the function.
@@ -474,17 +474,17 @@ int XLexer::ExpectTokenType(int type, int subtype, XLexToken& token) {
 
 	if (token.GetType() != type) {
 		switch (type) {
-			case TT_STRING: str.append("string"); break;
-			case TT_LITERAL: str.append("literal"); break;
-			case TT_NUMBER: str.append("number"); break;
-			case TT_NAME: str.append("name"); break;
-			case TT_PUNCTUATION: str.append("punctuation"); break;
+			case TokenType::STRING: str.append("string"); break;
+			case TokenType::LITERAL: str.append("literal"); break;
+			case TokenType::NUMBER: str.append("number"); break;
+			case TokenType::NAME: str.append("name"); break;
+			case TokenType::PUNCTUATION: str.append("punctuation"); break;
 			default: str.append("unknown type"); break;
 		}
 		Error("expected a %s but found '%.*s'", str.c_str(), token.length(), token.begin());
 		return 0;
 	}
-	if (token.GetType() == TT_NUMBER) {
+	if (token.GetType() == TokenType::NUMBER) {
 		if ((token.GetSubType() & subtype) != subtype) {
 			str.clear();
 			if (subtype & TT_DECIMAL) str.append("decimal ");
@@ -500,7 +500,7 @@ int XLexer::ExpectTokenType(int type, int subtype, XLexToken& token) {
 			return 0;
 		}
 	}
-	else if (token.GetType() == TT_PUNCTUATION) {
+	else if (token.GetType() == TokenType::PUNCTUATION) {
 		if (subtype < 0) {
 			Error("BUG: wrong punctuation subtype");
 			return 0;
@@ -521,11 +521,11 @@ int XLexer::ParseInt(void) {
 		Error("couldn't read expected integer");
 		return 0;
 	}
-	if (token.GetType() == TT_PUNCTUATION && token.isEqual("-")) {
-		ExpectTokenType(TT_NUMBER, TT_INTEGER, token);
+	if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) {
+		ExpectTokenType(TokenType::NUMBER, TT_INTEGER, token);
 		return -((signed int)token.GetIntValue());
 	}
-	else if (token.GetType() != TT_NUMBER || token.GetSubType() == TT_FLOAT) {
+	else if (token.GetType() != TokenType::NUMBER || token.GetSubType() == TT_FLOAT) {
 		Error("expected integer value, found '%.*s'", token.length(), token.begin());
 	}
 	return token.GetIntValue();
@@ -539,7 +539,7 @@ idLexer::ParseBool
 bool XLexer::ParseBool(void) {
 	XLexToken token;
 
-	if (!ExpectTokenType(TT_NUMBER, 0, token)) {
+	if (!ExpectTokenType(TokenType::NUMBER, 0, token)) {
 		Error("couldn't read expected boolean");
 		return false;
 	}
@@ -558,11 +558,11 @@ float XLexer::ParseFloat() {
 		Error("couldn't read expected floating point number");
 		return 0;
 	}
-	if (token.GetType() == TT_PUNCTUATION && token.isEqual("-")) {
-		ExpectTokenType(TT_NUMBER, 0, token);
+	if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) {
+		ExpectTokenType(TokenType::NUMBER, 0, token);
 		return -token.GetFloatValue();
 	}
-	else if (token.GetType() != TT_NUMBER) {
+	else if (token.GetType() != TokenType::NUMBER) {
 		Error("expected float value, found '%.*s'", token.length(), token.begin());
 	}
 	return token.GetFloatValue();
@@ -819,10 +819,10 @@ int XLexer::ReadString(XLexToken& token, int quote) {
 	char ch;
 
 	if (quote == '\"') {
-		token.SetType(TT_STRING);
+		token.SetType(TokenType::STRING);
 	}
 	else {
-		token.SetType(TT_LITERAL);
+		token.SetType(TokenType::LITERAL);
 	}
 
 	// leading quote
@@ -901,7 +901,7 @@ int XLexer::ReadString(XLexToken& token, int quote) {
 
 	token.end_ = (current_-1);
 
-	if (token.GetType() == TT_LITERAL) {
+	if (token.GetType() == TokenType::LITERAL) {
 		if (!(flags_.IsSet(LexFlag::ALLOWMULTICHARLITERALS))) {
 			if (token.length() != 1) {
 				Warning("literal is not one character long");
@@ -922,7 +922,7 @@ int XLexer::ReadName(XLexToken& token)
 {
 	char c;
 
-	token.SetType(TT_NAME);
+	token.SetType(TokenType::NAME);
 
 	token.SetStart(current_);
 
@@ -953,7 +953,7 @@ int XLexer::ReadNumber(XLexToken& token)
 	int dot, negative;
 	char c, c2;
 
-	token.SetType(TT_NUMBER);
+	token.SetType(TokenType::NUMBER);
 	token.subtype_ = 0;
 	token.intvalue_ = 0;
 	token.floatvalue_ = 0;
@@ -1196,7 +1196,7 @@ int XLexer::ReadPunctuation(XLexToken& token) {
 			token.end_ = current_ + 1;
 
 			current_ += l;
-			token.SetType(TT_PUNCTUATION);
+			token.SetType(TokenType::PUNCTUATION);
 			// sub type is the punctuation id
 			token.subtype_ = punc->n;
 			return 1;

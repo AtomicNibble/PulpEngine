@@ -282,15 +282,15 @@ XMapBrush* XMapBrush::Parse(XLexer& src, core::MemoryArenaBase* arena, const Vec
 				break;
 			}
 			// the token should be a key string for a key/value pair
-			if (token.GetType() != TT_NAME) {
+			if (token.GetType() != TokenType::NAME) {
 				src.Error("MapBrush::Parse: unexpected %.*s, expected '(' or pair key string.",
 					token.length(), token.begin());
 				X_DELETE(brush, arena);
 				return nullptr;
 			}
 
-			if (!src.ReadTokenOnLine(token) || (token.GetType() != TT_STRING
-				&& token.GetType() != TT_NAME)) 
+			if (!src.ReadTokenOnLine(token) || (token.GetType() != TokenType::STRING
+				&& token.GetType() != TokenType::NAME))
 			{
 				src.Error("MapBrush::Parse: expected pair value string not found.");
 				X_DELETE(brush, arena);

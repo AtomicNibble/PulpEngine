@@ -100,7 +100,7 @@ bool CVarColRef::ColorFromString(const char* pStr, Color& out, bool Slient)
 	{
 		if (lex.ReadToken(token))
 		{
-			if (token.GetType() == TT_NUMBER)// && core::bitUtil::IsBitFlagSet(token.subtype,TT_FLOAT))
+			if (token.GetType() == TokenType::NUMBER)// && core::bitUtil::IsBitFlagSet(token.subtype,TT_FLOAT))
 			{
 				col[i] = token.GetFloatValue();
 			}
@@ -180,7 +180,7 @@ bool CVarVec3Ref::Vec3FromString(const char* pStr, Vec3f& out, bool Slient)
 	{
 		if (lex.ReadToken(token))
 		{
-			if (token.GetType() == TT_NUMBER)// && core::bitUtil::IsBitFlagSet(token.subtype,TT_FLOAT))
+			if (token.GetType() == TokenType::NUMBER)// && core::bitUtil::IsBitFlagSet(token.subtype,TT_FLOAT))
 			{
 				vec[i] = token.GetFloatValue();
 			}
