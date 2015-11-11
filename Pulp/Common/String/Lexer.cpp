@@ -292,6 +292,8 @@ XLexer::XLexer(const char* startInclusive, const char* endExclusive)
 	SetPunctuations(nullptr);
 
 	tokenavailable_ = 0;
+
+	errState_ = ErrorState::OK;
 }
 
 const char *XLexer::GetPunctuationFromId(PunctuationId::Enum id) {
@@ -1316,6 +1318,8 @@ void XLexer::Error(const char* str, ...)
 {
 	core::StackString<1024> temp;
 
+	errState_ = ErrorState::ERRORS;
+
 	va_list args;
 	va_start(args, str);
 
@@ -1329,6 +1333,8 @@ void XLexer::Error(const char* str, ...)
 void XLexer::Warning(const char* str, ...)
 {
 	core::StackString<1024> temp;
+
+	errState_ = ErrorState::WARNINGS;
 
 	va_list args;
 	va_start(args, str);

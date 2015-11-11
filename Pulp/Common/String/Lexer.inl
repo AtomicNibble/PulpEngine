@@ -168,6 +168,11 @@ void XLexer::setFlags(LexFlags flags)
 	flags_ = flags;
 }
 
+XLexer::ErrorState::Enum XLexer::GetErrorState(void) const
+{
+	return errState_;
+}
+
 
 int XLexer::CheckString(const char *str) const 
 {

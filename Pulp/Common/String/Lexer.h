@@ -212,7 +212,16 @@ class XLexer
 {
 	friend class XParser;
 
+
 	X_INLINE XLexer();
+
+public:
+	X_DECLARE_ENUM(ErrorState) (
+		OK,
+		WARNINGS,
+		ERRORS
+	);
+
 public:
 	typedef Flags<LexFlag> LexFlags;
 
@@ -248,7 +257,7 @@ public:
 	X_INLINE bool isEOF(void) const;
 	X_INLINE size_t BytesLeft(void) const;
 	X_INLINE void setFlags(LexFlags flags);
-
+	X_INLINE ErrorState::Enum GetErrorState(void) const;
 
 	void Error(const char* str, ...);
 	void Warning(const char* str, ...);
@@ -283,6 +292,8 @@ private:
 	const PunctuationPair* punctuations_;		// the punctuations used in the script
 	int *			punctuationtable_;		// ASCII table with punctuations
 	int *			nextpunctuation_;
+
+	ErrorState::Enum errState_;
 };
 
 
