@@ -5,6 +5,12 @@
 
 X_NAMESPACE_BEGIN(core)
 
+namespace
+{
+
+	#define PUNCTABLE
+
+} // namespace
 
 void XLexToken::NumberValue(void)
 {
@@ -25,21 +31,30 @@ void XLexToken::NumberValue(void)
 	negative = 0;
 
 	// floating point number
-	if (subtype_ & TT_FLOAT) 
+	if (subtype_.IsSet(TokenSubType::FLOAT))
 	{
 #if 0
 		floatvalue_ = atof(p);
 #else
-		if (subtype_ & (TT_INFINITE | TT_INDEFINITE | TT_NAN)) {
-			if (subtype_ & TT_INFINITE) {			// 1.#INF
+		if (subtype_.IsSet(TokenSubType::INFINITE) &&
+			subtype_.IsSet(TokenSubType::INDEFINITE) && 
+			subtype_.IsSet(TokenSubType::NAN))
+		{
+			if (subtype_.IsSet(TokenSubType::INFINITE)) 
+			{	
+				// 1.#INF
 				unsigned int inf = 0x7f800000;
 				floatvalue_ = (double)*(float*)&inf;
 			}
-			else if (subtype_ & TT_INDEFINITE) {	// 1.#IND
+			else if (subtype_.IsSet(TokenSubType::INDEFINITE)) 
+			{	
+				// 1.#IND
 				unsigned int ind = 0xffc00000;
 				floatvalue_ = (double)*(float*)&ind;
 			}
-			else if (subtype_ & TT_NAN) {			// 1.#QNAN
+			else if (subtype_.IsSet(TokenSubType::NAN)) 
+			{	
+				// 1.#QNAN
 				unsigned int nan = 0x7fc00000;
 				floatvalue_ = (double)*(float*)&nan;
 			}
@@ -98,7 +113,7 @@ void XLexToken::NumberValue(void)
 #endif
 		intvalue_ = (unsigned long)(floatvalue_);
 	}
-	else if (subtype_ & TT_DECIMAL) 
+	else if (subtype_.IsSet(TokenSubType::DECIMAL))
 	{
 		if (*p == '-')
 		{
@@ -117,7 +132,8 @@ void XLexToken::NumberValue(void)
 
 		floatvalue_ = intvalue_;
 	}
-	else if (subtype_ & TT_IPADDRESS) {
+	else if (subtype_.IsSet(TokenSubType::IPADDRESS)) 
+	{
 		c = 0;
 		while (*p && *p != ':') {
 			if (*p == '.') {
@@ -139,7 +155,8 @@ void XLexToken::NumberValue(void)
 		}
 		floatvalue_ = intvalue_;
 	}
-	else if (subtype_ & TT_OCTAL) {
+	else if (subtype_.IsSet(TokenSubType::OCTAL)) 
+	{
 		// step over the first zero
 		p += 1;
 		while (*p != ' ' && *p) {
@@ -148,7 +165,8 @@ void XLexToken::NumberValue(void)
 		}
 		floatvalue_ = intvalue_;
 	}
-	else if (subtype_ & TT_HEX) {
+	else if (subtype_.IsSet(TokenSubType::HEX)) 
+	{
 		// step over the leading 0x or 0X
 		p += 2;
 		while (*p != ' ' && *p) {
@@ -163,7 +181,8 @@ void XLexToken::NumberValue(void)
 		}
 		floatvalue_ = intvalue_;
 	}
-	else if (subtype_ & TT_BINARY) {
+	else if (subtype_.IsSet(TokenSubType::BINARY))
+	{
 		// step over the leading 0b or 0B
 		p += 2;
 		while (*p != ' ' && *p) {
@@ -172,88 +191,88 @@ void XLexToken::NumberValue(void)
 		}
 		floatvalue_ = intvalue_;
 	}
-	subtype_ |= TT_VALUESVALID;
+	subtype_ |= TokenSubType::VALUESVALID;
 }
 
 
 //longer punctuations_ first
-punctuation_t default_punctuations_[] = {
+PunctuationPair default_punctuations_[] = {
 	//binary operators
-	{ ">>=", P_RSHIFT_ASSIGN },
-	{ "<<=", P_LSHIFT_ASSIGN },
+	{ ">>=", PunctuationId::RSHIFT_ASSIGN },
+	{ "<<=", PunctuationId::LSHIFT_ASSIGN },
 	//
-	{ "...", P_PARMS },
+	{ "...", PunctuationId::PARMS },
 	//define merge operator
-	{ "##", P_PRECOMPMERGE },				// pre-compiler
+	{ "##", PunctuationId::PRECOMPMERGE },				// pre-compiler
 	//logic operators
-	{ "&&", P_LOGIC_AND },					// pre-compiler
-	{ "||", P_LOGIC_OR },					// pre-compiler
-	{ ">=", P_LOGIC_GEQ },					// pre-compiler
-	{ "<=", P_LOGIC_LEQ },					// pre-compiler
-	{ "==", P_LOGIC_EQ },					// pre-compiler
-	{ "!=", P_LOGIC_UNEQ },				// pre-compiler
+	{ "&&", PunctuationId::LOGIC_AND },					// pre-compiler
+	{ "||", PunctuationId::LOGIC_OR },					// pre-compiler
+	{ ">=", PunctuationId::LOGIC_GEQ },					// pre-compiler
+	{ "<=", PunctuationId::LOGIC_LEQ },					// pre-compiler
+	{ "==", PunctuationId::LOGIC_EQ },					// pre-compiler
+	{ "!=", PunctuationId::LOGIC_UNEQ },				// pre-compiler
 	//arithmatic operators
-	{ "*=", P_MUL_ASSIGN },
-	{ "/=", P_DIV_ASSIGN },
-	{ "%=", P_MOD_ASSIGN },
-	{ "+=", P_ADD_ASSIGN },
-	{ "-=", P_SUB_ASSIGN },
-	{ "++", P_INC },
-	{ "--", P_DEC },
+	{ "*=", PunctuationId::MUL_ASSIGN },
+	{ "/=", PunctuationId::DIV_ASSIGN },
+	{ "%=", PunctuationId::MOD_ASSIGN },
+	{ "+=", PunctuationId::ADD_ASSIGN },
+	{ "-=", PunctuationId::SUB_ASSIGN },
+	{ "++", PunctuationId::INC },
+	{ "--", PunctuationId::DEC },
 	//binary operators
-	{ "&=", P_BIN_AND_ASSIGN },
-	{ "|=", P_BIN_OR_ASSIGN },
-	{ "^=", P_BIN_XOR_ASSIGN },
-	{ ">>", P_RSHIFT },					// pre-compiler
-	{ "<<", P_LSHIFT },					// pre-compiler
+	{ "&=", PunctuationId::BIN_AND_ASSIGN },
+	{ "|=", PunctuationId::BIN_OR_ASSIGN },
+	{ "^=", PunctuationId::BIN_XOR_ASSIGN },
+	{ ">>", PunctuationId::RSHIFT },					// pre-compiler
+	{ "<<", PunctuationId::LSHIFT },					// pre-compiler
 	//reference operators
-	{ "->", P_POINTERREF },
+	{ "->", PunctuationId::POINTERREF },
 	//C++
-	{ "::", P_CPP1 },
-	{ ".*", P_CPP2 },
+	{ "::", PunctuationId::CPP1 },
+	{ ".*", PunctuationId::CPP2 },
 	//arithmatic operators
-	{ "*", P_MUL },						// pre-compiler
-	{ "/", P_DIV },						// pre-compiler
-	{ "%", P_MOD },						// pre-compiler
-	{ "+", P_ADD },						// pre-compiler
-	{ "-", P_SUB },						// pre-compiler
-	{ "=", P_ASSIGN },
+	{ "*", PunctuationId::MUL },						// pre-compiler
+	{ "/", PunctuationId::DIV },						// pre-compiler
+	{ "%", PunctuationId::MOD },						// pre-compiler
+	{ "+", PunctuationId::ADD },						// pre-compiler
+	{ "-", PunctuationId::SUB },						// pre-compiler
+	{ "=", PunctuationId::ASSIGN },
 	//binary operators
-	{ "&", P_BIN_AND },					// pre-compiler
-	{ "|", P_BIN_OR },						// pre-compiler
-	{ "^", P_BIN_XOR },					// pre-compiler
-	{ "~", P_BIN_NOT },					// pre-compiler
+	{ "&", PunctuationId::BIN_AND },					// pre-compiler
+	{ "|", PunctuationId::BIN_OR },						// pre-compiler
+	{ "^", PunctuationId::BIN_XOR },					// pre-compiler
+	{ "~", PunctuationId::BIN_NOT },					// pre-compiler
 	//logic operators
-	{ "!", P_LOGIC_NOT },					// pre-compiler
-	{ ">", P_LOGIC_GREATER },				// pre-compiler
-	{ "<", P_LOGIC_LESS },					// pre-compiler
+	{ "!", PunctuationId::LOGIC_NOT },					// pre-compiler
+	{ ">", PunctuationId::LOGIC_GREATER },				// pre-compiler
+	{ "<", PunctuationId::LOGIC_LESS },					// pre-compiler
 	//reference operator
-	{ ".", P_REF },
+	{ ".", PunctuationId::REF },
 	//seperators
-	{ ",", P_COMMA },						// pre-compiler
-	{ ";", P_SEMICOLON },
+	{ ",", PunctuationId::COMMA },						// pre-compiler
+	{ ";", PunctuationId::SEMICOLON },
 	//label indication
-	{ ":", P_COLON },						// pre-compiler
+	{ ":", PunctuationId::COLON },						// pre-compiler
 	//if statement
-	{ "?", P_QUESTIONMARK },				// pre-compiler
+	{ "?", PunctuationId::QUESTIONMARK },				// pre-compiler
 	//embracements
-	{ "(", P_PARENTHESESOPEN },			// pre-compiler
-	{ ")", P_PARENTHESESCLOSE },			// pre-compiler
-	{ "{", P_BRACEOPEN },					// pre-compiler
-	{ "}", P_BRACECLOSE },					// pre-compiler
-	{ "[", P_SQBRACKETOPEN },
-	{ "]", P_SQBRACKETCLOSE },
+	{ "(", PunctuationId::PARENTHESESOPEN },			// pre-compiler
+	{ ")", PunctuationId::PARENTHESESCLOSE },			// pre-compiler
+	{ "{", PunctuationId::BRACEOPEN },					// pre-compiler
+	{ "}", PunctuationId::BRACECLOSE },					// pre-compiler
+	{ "[", PunctuationId::SQBRACKETOPEN },
+	{ "]", PunctuationId::SQBRACKETCLOSE },
 	//
-	{ "\\", P_BACKSLASH },
+	{ "\\", PunctuationId::BACKSLASH },
 	//precompiler operator
-	{ "#", P_PRECOMP },					// pre-compiler
-	{ "$", P_DOLLAR },
-	{ NULL, 0 }
+	{ "#", PunctuationId::PRECOMP },					// pre-compiler
+	{ "$", PunctuationId::DOLLAR },
+	{ nullptr, PunctuationId::UNUSET }
 };
 
 int default_punctuationtable[256];
-int default_nextpunctuation[sizeof(default_punctuations_) / sizeof(punctuation_t)];
-bool default_setup = false;;
+int default_nextpunctuation[sizeof(default_punctuations_) / sizeof(PunctuationPair)];
+bool default_setup = false;
 
 
 
@@ -270,36 +289,37 @@ XLexer::XLexer(const char* startInclusive, const char* endExclusive)
 
 	flags_ = 0;
 
-	SetPunctuations(NULL);
+	SetPunctuations(nullptr);
 
 	tokenavailable_ = 0;
 }
 
-const char *XLexer::GetPunctuationFromId(int id) {
+const char *XLexer::GetPunctuationFromId(PunctuationId::Enum id) {
 	int i;
 
-	for (i = 0; punctuations_[i].p; i++) {
-		if (punctuations_[i].n == id) {
-			return punctuations_[i].p;
+	for (i = 0; punctuations_[i].pCharacter; i++) {
+		if (punctuations_[i].id == id) {
+			return punctuations_[i].pCharacter;
 		}
 	}
 	return "unkown punctuation";
 }
 
-void XLexer::CreatePunctuationTable(const punctuation_t* punctuations)
+void XLexer::CreatePunctuationTable(const PunctuationPair* punctuations)
 {
 	int i, n, lastp;
-	const punctuation_t *p, *newp;
+	const PunctuationPair *p, *newp;
 
 	//get memory for the table
-	if (punctuations == default_punctuations_) {
+	if (punctuations == default_punctuations_) 
+	{
 		punctuationtable_ = default_punctuationtable;
 		nextpunctuation_ = default_nextpunctuation;
 		if (default_setup) {
 			return;
 		}
 		default_setup = true;
-		i = sizeof(default_punctuations_) / sizeof(punctuation_t);
+		i = sizeof(default_punctuations_) / sizeof(PunctuationPair);
 	}
 	else
 	{
@@ -308,38 +328,44 @@ void XLexer::CreatePunctuationTable(const punctuation_t* punctuations)
 
 	memset(punctuationtable_, 0xFF, 256 * sizeof(int));
 	memset(nextpunctuation_, 0xFF, i * sizeof(int));
+
 	//add the punctuations_ in the list to the punctuation table
-	for (i = 0; punctuations[i].p; i++) {
+	for (i = 0; punctuations[i].pCharacter; i++)
+	{
 		newp = &punctuations[i];
 		lastp = -1;
 		//sort the punctuations_ in this table entry on length (longer punctuations_ first)
-		for (n = punctuationtable_[(unsigned int)newp->p[0]]; n >= 0; n = nextpunctuation_[n]) {
+		for (n = punctuationtable_[static_cast<uint32_t>(newp->pCharacter[0])];
+			n >= 0; n = nextpunctuation_[n]) 
+		{
 			p = &punctuations[n];
-			if (strlen(p->p) < strlen(newp->p)) {
+			if (strlen(p->pCharacter) < strlen(newp->pCharacter)) 
+			{
 				nextpunctuation_[i] = n;
 				if (lastp >= 0) {
 					nextpunctuation_[lastp] = i;
 				}
 				else {
-					punctuationtable_[(unsigned int)newp->p[0]] = i;
+					punctuationtable_[static_cast<uint32_t>(newp->pCharacter[0])] = i;
 				}
 				break;
 			}
 			lastp = n;
 		}
-		if (n < 0) {
+		if (n < 0) 
+		{
 			nextpunctuation_[i] = -1;
 			if (lastp >= 0) {
 				nextpunctuation_[lastp] = i;
 			}
 			else {
-				punctuationtable_[(unsigned int)newp->p[0]] = i;
+				punctuationtable_[static_cast<uint32_t>(newp->pCharacter[0])] = i;
 			}
 		}
 	}
 }
 
-void XLexer::SetPunctuations(const punctuation_t *p) 
+void XLexer::SetPunctuations(const PunctuationPair* p)
 {
 #ifdef PUNCTABLE
 	if (p) {
@@ -357,7 +383,7 @@ void XLexer::SetPunctuations(const punctuation_t *p)
 	}
 }
 
-int	XLexer::ReadToken(XLexToken& token)
+bool XLexer::ReadToken(XLexToken& token)
 {
 	int c;
 
@@ -366,13 +392,17 @@ int	XLexer::ReadToken(XLexToken& token)
 	if (tokenavailable_) {
 		tokenavailable_ = 0;
 		token = this->token_;
-		return 1;
+		return true;
+	}
+
+	if (BytesLeft() == 0) {
+		return false;
 	}
 
 	lastLine_ = curLine_;
 
 	if (!ReadWhiteSpace()) {
-		return 0;
+		return false;
 	}
 
 	// save script pointer
@@ -393,11 +423,11 @@ int	XLexer::ReadToken(XLexToken& token)
 		// if there is a leading quote
 		if (c == '\"' || c == '\'') {
 			if (!ReadString(token, c)) {
-				return 0;
+				return false;
 			}
 		}
 		else if (!ReadName(token)) {
-			return 0;
+			return false;
 		}
 	}
 	// if there is a number
@@ -405,14 +435,14 @@ int	XLexer::ReadToken(XLexToken& token)
 		((c == '.' || c == '-') && (*(current_ + 1) >= '0' && *(current_ + 1) <= '9'))) 
 	{
 		if (!ReadNumber(token)) {
-			return 0;
+			return false;
 		}
 		// if names are allowed to start with a number
 		if (flags_.IsSet(LexFlag::ALLOWNUMBERNAMES)) {
 			c = *current_;
 			if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_') {
 				if (!ReadName(token)) {
-					return 0;
+					return false;
 				}
 			}
 		}
@@ -420,60 +450,61 @@ int	XLexer::ReadToken(XLexToken& token)
 	// if there is a leading quote
 	else if (c == '\"' || c == '\'') {
 		if (!ReadString(token, c)) {
-			return 0;
+			return false;
 		}
 	}
 	// if there is a name
 	else if ((c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_') {
 		if (!ReadName(token)) {
-			return 0;
+			return false;
 		}
 	}
 	// names may also start with a slash when pathnames are allowed
-	else if ((flags_.IsSet(LexFlag::ALLOWPATHNAMES)) && ((c == '/' || c == '\\') || c == '.')) {
+	else if ((flags_.IsSet(LexFlag::ALLOWPATHNAMES)) && 
+		((c == '/' || c == '\\') || c == '.')) {
 		if (!ReadName(token)) {
-			return 0;
+			return false;
 		}
 	}
 	// check for punctuations_
 	else if (!ReadPunctuation(token)) {
 		Error("unknown punctuation %c", c);
-		return 0;
+		return false;
 	}
 	// succesfully read a token
-	return 1;
+	return true;
 }
 
-int XLexer::ExpectTokenString(const char *string) {
+bool XLexer::ExpectTokenString(const char* string) 
+{
 	XLexToken token;
 
 	if (!ReadToken(token)) {
 		Error("couldn't find expected '%s' EOF", string);
-		return 0;
+		return false;
 	}
 	if (!token.isEqual(string)) {
 		Error("expected '%s' but found '%.*s'", string, token.length(), token.begin());
-		return 0;
+		return false;
 	}
-	return 1;
+	return true;
 }
 
-/*
-================
-idLexer::ExpectTokenType
-================
-*/
-int XLexer::ExpectTokenType(int type, int subtype, XLexToken& token) {
 
+bool XLexer::ExpectTokenType(TokenType::Enum type, XLexToken::TokenSubTypeFlags subtype,
+	PunctuationId::Enum puncId, XLexToken& token)
+{
 	core::StackString<128> str;
 
 	if (!ReadToken(token)) {
 		Error("couldn't read expected token");
-		return 0;
+		return false;
 	}
 
-	if (token.GetType() != type) {
-		switch (type) {
+	if (token.GetType() != type)
+	{
+		switch (type) 
+		{
 			case TokenType::STRING: str.append("string"); break;
 			case TokenType::LITERAL: str.append("literal"); break;
 			case TokenType::NUMBER: str.append("number"); break;
@@ -481,85 +512,90 @@ int XLexer::ExpectTokenType(int type, int subtype, XLexToken& token) {
 			case TokenType::PUNCTUATION: str.append("punctuation"); break;
 			default: str.append("unknown type"); break;
 		}
-		Error("expected a %s but found '%.*s'", str.c_str(), token.length(), token.begin());
-		return 0;
+		Error("expected a %s but found '%.*s'", str.c_str(), 
+			token.length(), token.begin());
+		return false;
 	}
-	if (token.GetType() == TokenType::NUMBER) {
-		if ((token.GetSubType() & subtype) != subtype) {
+
+	if (token.GetType() == TokenType::NUMBER) 
+	{
+		if ((token.GetSubType() & subtype) != subtype) 
+		{
 			str.clear();
-			if (subtype & TT_DECIMAL) str.append("decimal ");
-			if (subtype & TT_HEX) str.append("hex ");
-			if (subtype & TT_OCTAL) str.append("octal ");
-			if (subtype & TT_BINARY) str.append("binary ");
-			if (subtype & TT_UNSIGNED) str.append("unsigned ");
-			if (subtype & TT_LONG) str.append("long ");
-			if (subtype & TT_FLOAT) str.append("float ");
-			if (subtype & TT_INTEGER) str.append("integer ");
+			if (subtype.IsSet(TokenSubType::DECIMAL)) str.append("decimal ");
+			if (subtype.IsSet(TokenSubType::HEX)) str.append("hex ");
+			if (subtype.IsSet(TokenSubType::OCTAL)) str.append("octal ");
+			if (subtype.IsSet(TokenSubType::BINARY)) str.append("binary ");
+			if (subtype.IsSet(TokenSubType::UNSIGNED)) str.append("unsigned ");
+			if (subtype.IsSet(TokenSubType::LONG)) str.append("long ");
+			if (subtype.IsSet(TokenSubType::FLOAT)) str.append("float ");
+			if (subtype.IsSet(TokenSubType::INTEGER)) str.append("integer ");
 			str.stripTrailing(' ');
 			Error("expected %s but found '%.*s'", str.c_str(), token.length(), token.begin());
-			return 0;
+			return false;
 		}
 	}
-	else if (token.GetType() == TokenType::PUNCTUATION) {
-		if (subtype < 0) {
-			Error("BUG: wrong punctuation subtype");
-			return 0;
-		}
-		if (token.GetSubType() != subtype) {
-			Error("expected '%s' but found '%.*s'", GetPunctuationFromId(subtype), token.length(), token.begin());
-			return 0;
+	else if (token.GetType() == TokenType::PUNCTUATION) 
+	{
+		if (token.GetPuncId() != puncId) 
+		{
+			Error("expected '%s' but found '%.*s'", GetPunctuationFromId(puncId),
+				token.length(), token.begin());
+			return false;
 		}
 	}
-	return 1;
+	return true;
 }
 
 
-int XLexer::ParseInt(void) {
+int XLexer::ParseInt(void) 
+{
 	XLexToken token;
 
 	if (!ReadToken(token)) {
 		Error("couldn't read expected integer");
 		return 0;
 	}
-	if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) {
-		ExpectTokenType(TokenType::NUMBER, TT_INTEGER, token);
-		return -((signed int)token.GetIntValue());
+	if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) 
+	{
+		ExpectTokenType(TokenType::NUMBER, TokenSubType::INTEGER, 
+			PunctuationId::UNUSET, token);
+
+		return -(safe_static_cast<signed int, int32_t>(token.GetIntValue()));
 	}
-	else if (token.GetType() != TokenType::NUMBER || token.GetSubType() == TT_FLOAT) {
+	else if (token.GetType() != TokenType::NUMBER || 
+		token.GetSubType() == TokenSubType::FLOAT) 
+	{
 		Error("expected integer value, found '%.*s'", token.length(), token.begin());
 	}
 	return token.GetIntValue();
 }
 
-/*
-================
-idLexer::ParseBool
-================
-*/
-bool XLexer::ParseBool(void) {
+
+bool XLexer::ParseBool(void)
+{
 	XLexToken token;
 
-	if (!ExpectTokenType(TokenType::NUMBER, 0, token)) {
+	if (!ExpectTokenType(TokenType::NUMBER, TokenSubType::UNUSET,
+		PunctuationId::UNUSET, token))
+	{
 		Error("couldn't read expected boolean");
 		return false;
 	}
 	return (token.GetIntValue() != 0);
 }
 
-/*
-================
-idLexer::ParseFloat
-================
-*/
 float XLexer::ParseFloat() {
 	XLexToken token;
 
 	if (!ReadToken(token)) {
 		Error("couldn't read expected floating point number");
-		return 0;
+		return 0.f;
 	}
-	if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) {
-		ExpectTokenType(TokenType::NUMBER, 0, token);
+	if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) 
+	{
+		ExpectTokenType(TokenType::NUMBER, TokenSubType::UNUSET, 
+			PunctuationId::UNUSET, token);
 		return -token.GetFloatValue();
 	}
 	else if (token.GetType() != TokenType::NUMBER) {
@@ -568,12 +604,10 @@ float XLexer::ParseFloat() {
 	return token.GetFloatValue();
 }
 
-/*
-================
-idLexer::Parse1DMatrix
-================
-*/
-int XLexer::Parse1DMatrix(int x, float *m) {
+
+bool XLexer::Parse1DMatrix(int x, float* m)
+{
+	X_ASSERT_NOT_NULL(m);
 	int i;
 
 	if (!ExpectTokenString("(")) {
@@ -590,12 +624,10 @@ int XLexer::Parse1DMatrix(int x, float *m) {
 	return true;
 }
 
-/*
-================
-idLexer::Parse2DMatrix
-================
-*/
-int XLexer::Parse2DMatrix(int y, int x, float *m) {
+
+bool XLexer::Parse2DMatrix(int y, int x, float* m)
+{
+	X_ASSERT_NOT_NULL(m);
 	int i;
 
 	if (!ExpectTokenString("(")) {
@@ -615,7 +647,9 @@ int XLexer::Parse2DMatrix(int y, int x, float *m) {
 }
 
 
-int XLexer::Parse3DMatrix(int z, int y, int x, float *m) {
+bool XLexer::Parse3DMatrix(int z, int y, int x, float* m)
+{
+	X_ASSERT_NOT_NULL(m);
 	int i;
 
 	if (!ExpectTokenString("(")) {
@@ -640,7 +674,7 @@ void XLexer::UnreadToken(const XLexToken& token)
 	tokenavailable_ = 1;
 }
 
-int XLexer::ReadTokenOnLine(XLexToken& token)
+bool XLexer::ReadTokenOnLine(XLexToken& token)
 {
 	XLexToken tok;
 
@@ -657,54 +691,62 @@ int XLexer::ReadTokenOnLine(XLexToken& token)
 	// restore our position
 	current_ = lastp_;
 	curLine_ = lastLine_;
-//	token.Reset();
 	return false;
 }
 
-int XLexer::ReadWhiteSpace(void)
+bool XLexer::ReadWhiteSpace(void)
 {
+	if (isEOF()) {
+		return true;
+	}
+
 	X_DISABLE_WARNING(4127)
 	while (1)
 	X_ENABLE_WARNING(4127)
 	{
 		// skip white space
-		while (*current_ <= ' ') {
-			if (!*current_) {
-				return 0;
+		while (*current_ <= ' ')
+		{
+			if (isEOF()) {
+				return false;
 			}
 			if (*current_ == '\n') {
 				curLine_++;
 			}
 			current_++;
 		}
+
 		// skip comments
-		if (*current_ == '/') {
+		if (*current_ == '/')
+		{
 			// comments //
-			if (*(current_ + 1) == '/') {
+			if (*(current_ + 1) == '/') 
+			{
 				current_++;
 				do {
 					current_++;
-					if (!*current_) {
-						return 0;
+					if (isEOF()) {
+						return false;
 					}
 				} while (*current_ != '\n');
 				curLine_++;
 				current_++;
-				if (!*current_) {
-					return 0;
+				if (isEOF()) {
+					return false;
 				}
 				continue;
 			}
 			// comments /* */
-			else if (*(current_ + 1) == '*') {
+			else if (*(current_ + 1) == '*') 
+			{
 				current_++;
 				X_DISABLE_WARNING(4127)
 				while (1)
 				X_ENABLE_WARNING(4127)
 				{
 					current_++;
-					if (!*current_) {
-						return 0;
+					if (isEOF()) {
+						return false;
 					}
 					if (*current_ == '\n') {
 						curLine_++;
@@ -719,28 +761,34 @@ int XLexer::ReadWhiteSpace(void)
 					}
 				}
 				current_++;
-				if (!*current_) {
-					return 0;
+
+				if (isEOF()) {
+					return false;
 				}
+
 				current_++;
-				if (!*current_) {
-					return 0;
+
+				if (isEOF()) {
+					return false;
 				}
+
 				continue;
 			}
 		}
 		break;
 	}
-	return 1;
+	return true;
 }
 
-int XLexer::ReadEscapeCharacter(char *ch) {
+bool XLexer::ReadEscapeCharacter(char* ch) 
+{
 	int c, val, i;
 
 	// step over the leading '\\'
 	current_++;
 	// determine the escape character
-	switch (*current_) {
+	switch (*current_) 
+	{
 		case '\\': c = '\\'; break;
 		case 'n': c = '\n'; break;
 		case 'r': c = '\r'; break;
@@ -802,18 +850,17 @@ int XLexer::ReadEscapeCharacter(char *ch) {
 	// store the escape character
 	*ch = safe_static_cast<char,int>(c);
 	// succesfully read escape character
-	return 1;
+	return true;
 }
 
 /*
 ================
-idLexer::ReadString
-
 Escape characters are interpretted.
 Reads two strings with only a white space between them as one string.
 ================
 */
-int XLexer::ReadString(XLexToken& token, int quote) {
+bool XLexer::ReadString(XLexToken& token, int quote) 
+{
 	int tmpline;
 	const char *tmpscript_p;
 	char ch;
@@ -835,24 +882,29 @@ int XLexer::ReadString(XLexToken& token, int quote) {
 	X_ENABLE_WARNING(4127)
 	{
 		// if there is an escape character and escape characters are allowed
-		if (*current_ == '\\' && !(flags_.IsSet(LexFlag::NOSTRINGESCAPECHARS))) {
+		if (*current_ == '\\' && !(flags_.IsSet(LexFlag::NOSTRINGESCAPECHARS))) 
+		{
 			if (!ReadEscapeCharacter(&ch)) {
 				return 0;
 			}
-			//			token->AppendDirty(ch);
 		}
 		// if a trailing quote
-		else if (*current_ == quote) {
+		else if (*current_ == quote) 
+		{
 			// step over the quote
 			current_++;
+
 			// if consecutive strings should not be concatenated
 			if (flags_.IsSet(LexFlag::NOSTRINGCONCAT) &&
-				(!flags_.IsSet(LexFlag::ALLOWBACKSLASHSTRINGCONCAT) || (quote != '\"'))) {
+				(!flags_.IsSet(LexFlag::ALLOWBACKSLASHSTRINGCONCAT) 
+				|| (quote != '\"')))
+			{
 				break;
 			}
 
 			tmpscript_p = current_;
 			tmpline = this->curLine_;
+
 			// read white space between possible two consecutive strings
 			if (!ReadWhiteSpace()) {
 				current_ = tmpscript_p;
@@ -860,7 +912,8 @@ int XLexer::ReadString(XLexToken& token, int quote) {
 				break;
 			}
 
-			if (flags_.IsSet(LexFlag::NOSTRINGCONCAT)) {
+			if (flags_.IsSet(LexFlag::NOSTRINGCONCAT)) 
+			{
 				if (*current_ != '\\') {
 					current_ = tmpscript_p;
 					curLine_ = tmpline;
@@ -870,7 +923,7 @@ int XLexer::ReadString(XLexToken& token, int quote) {
 				current_++;
 				if (!ReadWhiteSpace() || (*current_ != quote)) {
 					Error("expecting string after '\' terminated line");
-					return 0;
+					return false;
 				}
 			}
 
@@ -886,18 +939,17 @@ int XLexer::ReadString(XLexToken& token, int quote) {
 		else {
 			if (*current_ == '\0') {
 				Error("missing trailing quote");
-				return 0;
+				return false;
 			}
 			if (*current_ == '\n') {
 				Error("newline inside string");
-				return 0;
+				return false;
 			}
 
 			current_++;
-			//			token->AppendDirty(*current_++);
 		}
 	}
-	//	token->data[token->len] = '\0';
+
 
 	token.end_ = (current_-1);
 
@@ -914,11 +966,11 @@ int XLexer::ReadString(XLexToken& token, int quote) {
 		token.subtype_ = safe_static_cast<int,size_t>(token.length());
 	}
 
-	return 1;
+	return true;
 }
 
 
-int XLexer::ReadName(XLexToken& token)
+bool XLexer::ReadName(XLexToken& token)
 {
 	char c;
 
@@ -926,8 +978,8 @@ int XLexer::ReadName(XLexToken& token)
 
 	token.SetStart(current_);
 
-	do {
-		//		token->AppendDirty(*current_++);
+	do 
+	{
 		current_++;
 		c = *current_;
 	} while ((c >= 'a' && c <= 'z') ||
@@ -937,17 +989,17 @@ int XLexer::ReadName(XLexToken& token)
 		// if treating all tokens as strings, don't parse '-' as a seperate token
 		(flags_.IsSet(LexFlag::ONLYSTRINGS) && (c == '-')) ||
 		// if special path name characters are allowed
-		(flags_.IsSet(LexFlag::ALLOWPATHNAMES) && (c == '/' || c == '\\' || c == ':' || c == '.')));
-	//	token->data[token->len] = '\0';
-	//the sub type is the length of the name
-	//	token.subtype = token->Length();
+		(flags_.IsSet(LexFlag::ALLOWPATHNAMES) && 
+		(c == '/' || c == '\\' || c == ':' || c == '.'))
+	); // while
+
 	token.SetEnd(current_);
 
-	return 1;
+	return true;
 }
 
 
-int XLexer::ReadNumber(XLexToken& token) 
+bool XLexer::ReadNumber(XLexToken& token) 
 {
 	int i;
 	int dot, negative;
@@ -963,43 +1015,39 @@ int XLexer::ReadNumber(XLexToken& token)
 
 	token.start_ = current_;
 
-	if (c == '0' && c2 != '.' && c2 != ' ') {
+	if (c == '0' && c2 != '.' && c2 != ' ')
+	{
 		// check for a hexadecimal number
-		if (c2 == 'x' || c2 == 'X') {
-			//	token->AppendDirty(*current_++);
-			//	token->AppendDirty(*current_++);
+		if (c2 == 'x' || c2 == 'X') 
+		{
 			current_ += 2;
 			c = *current_;
 			while ((c >= '0' && c <= '9') ||
 				(c >= 'a' && c <= 'f') ||
 				(c >= 'A' && c <= 'F')) {
-				//		token->AppendDirty(c);
 				c = *(++current_);
 			}
-			token.subtype_ = TT_HEX | TT_INTEGER;
+			token.subtype_ = TokenSubType::HEX | TokenSubType::INTEGER;
 		}
 		// check for a binary number
-		else if (c2 == 'b' || c2 == 'B') {
-			//	token->AppendDirty(*current_++);
-			//	token->AppendDirty(*current_++);
+		else if (c2 == 'b' || c2 == 'B') 
+		{
 			current_ += 2;
 			c = *current_;
 			while (c == '0' || c == '1') {
-				//	token->AppendDirty(c);
 				c = *(++current_);
 			}
-			token.subtype_ = TT_BINARY | TT_INTEGER;
+			token.subtype_ = TokenSubType::BINARY | TokenSubType::INTEGER;
 		}
 		// its an octal number
-		else {
-			//		token->AppendDirty(*current_++);
+		else 
+		{
 			current_++;
 			c = *current_;
 			while (c >= '0' && c <= '7') {
-				//			token->AppendDirty(c);
 				c = *(++current_);
 			}
-			token.subtype_ = TT_OCTAL | TT_INTEGER;
+			token.subtype_ = TokenSubType::OCTAL | TokenSubType::INTEGER;
 		}
 	}
 	else {
@@ -1021,7 +1069,6 @@ int XLexer::ReadNumber(XLexToken& token)
 			else {
 				break;
 			}
-			//		token->AppendDirty(c);
 			c = *(++current_);
 		}
 		if (c == 'e' && dot == 0) {
@@ -1029,23 +1076,20 @@ int XLexer::ReadNumber(XLexToken& token)
 			dot++;
 		}
 		// if a floating point number
-		if (dot == 1) {
-			token.SetSubType(TT_DECIMAL | TT_FLOAT);
+		if (dot == 1) 
+		{
+			token.SetSubType(TokenSubType::DECIMAL | TokenSubType::FLOAT);
 			// check for floating point exponent
 			if (c == 'e') {
 				//Append the e so that GetFloatValue code works
-				//			token->AppendDirty(c);
 				c = *(++current_);
 				if (c == '-') {
-					//				token->AppendDirty(c);
 					c = *(++current_);
 				}
 				else if (c == '+') {
-					//				token->AppendDirty(c);
 					c = *(++current_);
 				}
 				while (c >= '0' && c <= '9') {
-					//				token->AppendDirty(c);
 					c = *(++current_);
 				}
 			}
@@ -1053,84 +1097,83 @@ int XLexer::ReadNumber(XLexToken& token)
 			else if (c == '#') {
 				c2 = 4;
 				if (CheckString("INF")) {
-					token.subtype_ |= TT_INFINITE;
+					token.subtype_ |= TokenSubType::INFINITE;
 				}
 				else if (CheckString("IND")) {
-					token.subtype_ |= TT_INDEFINITE;
+					token.subtype_ |= TokenSubType::INDEFINITE;
 				}
 				else if (CheckString("NAN")) {
-					token.subtype_ |= TT_NAN;
+					token.subtype_ |= TokenSubType::NAN;
 				}
 				else if (CheckString("QNAN")) {
-					token.subtype_ |= TT_NAN;
+					token.subtype_ |= TokenSubType::NAN;
 					c2++;
 				}
 				else if (CheckString("SNAN")) {
-					token.subtype_ |= TT_NAN;
+					token.subtype_ |= TokenSubType::NAN;
 					c2++;
 				}
 				for (i = 0; i < c2; i++) {
-					//				token->AppendDirty(c);
 					c = *(++current_);
 				}
 				while (c >= '0' && c <= '9') {
-					//				token->AppendDirty(c);
 					c = *(++current_);
 				}
 				if (!flags_.IsSet(LexFlag::ALLOWFLOATEXCEPTIONS)) {
-					//				token->AppendDirty(0);	// zero terminate for c_str
-					//				Error("parsed %s", token->c_str());
+					Error("Float exception detected '%.*s'", 
+						token.length(), token.begin());
 				}
 			}
 		}
-		else if (dot > 1) {
+		else if (dot > 1) 
+		{
 			if (!flags_.IsSet(LexFlag::ALLOWIPADDRESSES)) {
-				Error("more than one dot in number");
-				return 0;
+				Error("More than one dot in number");
+				return false;
 			}
 			if (dot != 3) {
-				Error("ip address should have three dots");
-				return 0;
+				Error("Ip address should have three dots");
+				return false;
 			}
-			token.subtype_ = TT_IPADDRESS;
+			token.subtype_ = TokenSubType::IPADDRESS;
 		}
 		else {
-			token.subtype_ = TT_DECIMAL | TT_INTEGER;
+			token.subtype_ = TokenSubType::DECIMAL | TokenSubType::INTEGER;
 		}
 	}
 
-	if (token.subtype_ & TT_FLOAT) {
+	if (token.subtype_.IsSet(TokenSubType::FLOAT)) {
 		if (c > ' ') {
 			// single-precision: float
 			if (c == 'f' || c == 'F') {
-				token.subtype_ |= TT_SINGLE_PRECISION;
+				token.subtype_ |= TokenSubType::SINGLE_PRECISION;
 				current_++;
 			}
 			// extended-precision: long double
 			else if (c == 'l' || c == 'L') {
-				token.subtype_ |= TT_EXTENDED_PRECISION;
+				token.subtype_ |= TokenSubType::EXTENDED_PRECISION;
 				current_++;
 			}
 			// default is double-precision: double
 			else {
-				token.subtype_ |= TT_DOUBLE_PRECISION;
+				token.subtype_ |= TokenSubType::DOUBLE_PRECISION;
 			}
 		}
 		else {
-			token.subtype_ |= TT_DOUBLE_PRECISION;
+			token.subtype_ |= TokenSubType::DOUBLE_PRECISION;
 		}
 	}
-	else if (token.subtype_ & TT_INTEGER) {
+	else if (token.subtype_.IsSet(TokenSubType::INTEGER)) {
 		if (c > ' ') {
 			// default: signed long
 			for (i = 0; i < 2; i++) {
 				// long integer
 				if (c == 'l' || c == 'L') {
-					token.subtype_ |= TT_LONG;
+					token.subtype_ |= TokenSubType::LONG;
 				}
 				// unsigned integer
 				else if (c == 'u' || c == 'U') {
-					token.subtype_ |= TT_UNSIGNED;
+					token.subtype_ |= TokenSubType::UNSIGNED;
 				}
 				else {
 					break;
@@ -1139,33 +1182,25 @@ int XLexer::ReadNumber(XLexToken& token)
 			}
 		}
 	}
-	else if (token.subtype_ & TT_IPADDRESS) {
+	else if (token.subtype_.IsSet(TokenSubType::IPADDRESS)) {
 		if (c == ':') {
-			//		token->AppendDirty(c);
 			c = *(++current_);
 			while (c >= '0' && c <= '9') {
-				//			token->AppendDirty(c);
 				c = *(++current_);
 			}
-			token.subtype_ |= TT_IPPORT;
+			token.subtype_ |= TokenSubType::IPPORT;
 		}
 	}
-	//	token->data[token->len] = '\0';
 
 	token.end_ = current_;
-
-	return 1;
+	return true;
 }
 
-/*
-================
-idLexer::ReadPunctuation
-================
-*/
-int XLexer::ReadPunctuation(XLexToken& token) {
-	int l, n, i;
-	char *p;
-	const punctuation_t *punc;
+bool XLexer::ReadPunctuation(XLexToken& token)
+{
+	int l, n;
+	const char* p;
+	const PunctuationPair* punc;
 
 #ifdef PUNCTABLE
 	for (n = punctuationtable_[(unsigned int)*(current_)]; n >= 0; n = nextpunctuation_[n])
@@ -1177,40 +1212,34 @@ int XLexer::ReadPunctuation(XLexToken& token) {
 	for (i = 0; punctuations_[i].p; i++) {
 		punc = &punctuations_[i];
 #endif
-		p = punc->p;
+		p = punc->pCharacter;
 		// check for this punctuation in the script
 		for (l = 0; p[l] && current_[l]; l++) {
 			if (current_[l] != p[l]) {
 				break;
 			}
 		}
-		if (!p[l]) {
-			//
-			//		token->EnsureAlloced(l + 1, false);
-			for (i = 0; i <= l; i++) {
-				//			token->data[i] = p[i];
-			}
-			//		token->len = l;
-			//
+		if (!p[l])
+		{
 			token.start_ = current_;
 			token.end_ = current_ + 1;
 
 			current_ += l;
 			token.SetType(TokenType::PUNCTUATION);
-			// sub type is the punctuation id
-			token.subtype_ = punc->n;
-			return 1;
+			token.puncId_ = punc->id;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
 
-int XLexer::PeekTokenString(const char *string) {
+bool XLexer::PeekTokenString(const char* string)
+{
 	XLexToken tok;
 
 	if (!ReadToken(tok)) {
-		return 0;
+		return false;
 	}
 
 	// unread token
@@ -1219,58 +1248,71 @@ int XLexer::PeekTokenString(const char *string) {
 
 	// if the given string is available
 	if (tok.isEqual(string)) {
-		return 1;
+		return true;
 	}
-	return 0;
+	return false;
 }
 
-int XLexer::PeekTokenType(int type, int subtype, XLexToken& token) {
+bool XLexer::PeekTokenType(TokenType::Enum type, XLexToken::TokenSubTypeFlags subtype,
+	PunctuationId::Enum puncId, XLexToken& token)
+{
 	XLexToken tok;
 
 	if (!ReadToken(tok)) {
-		return 0;
+		return false;
 	}
 
 	// unread token
 	current_ = lastp_;
 	curLine_ = lastLine_;
 
-	// if the type matches
-	if (tok.GetType() == type && (tok.subtype_ & subtype) == subtype) {
-		token = tok;
-		return 1;
+	if (tok.GetType() == type)
+	{
+		if (type == TokenType::PUNCTUATION && tok.GetPuncId() == puncId)
+		{
+			token = tok;
+			return true;
+		}
+		if (tok.GetSubType() == subtype)
+		{
+			token = tok;
+			return true;
+		}
 	}
-	return 0;
+
+	return false;
 }
 
 
-int XLexer::SkipUntilString(const char *string) {
+bool XLexer::SkipUntilString(const char* string)
+{
 	XLexToken token;
 
 	while (ReadToken(token)) {
 		if (token.isEqual(string)) {
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
-int XLexer::SkipRestOfLine(void) {
+bool XLexer::SkipRestOfLine(void)
+{
 	XLexToken token;
 
 	while (ReadToken(token)) {
 		if (token.linesCrossed_) {
 			current_ = lastp_;
 			curLine_ = lastLine_;
-			return 1;
+			return true;
 		}
 	}
-	return 0;
+	return false;
 }
 
 
 
-void XLexer::Error(const char *str, ...)
+void XLexer::Error(const char* str, ...)
 {
 	core::StackString<1024> temp;
 
@@ -1284,7 +1326,7 @@ void XLexer::Error(const char *str, ...)
 	X_ERROR("Lex", temp.c_str());
 }
 
-void XLexer::Warning(const char *str, ...)
+void XLexer::Warning(const char* str, ...)
 {
 	core::StackString<1024> temp;
 

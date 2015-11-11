@@ -37,13 +37,14 @@ public:
 	// load me up!
 	bool LoadMemory(const char* startInclusive, const char* endExclusive, const char* name);
 
-	int	ReadToken(XLexToken& token);
-	int ExpectTokenString(const char* string);
-	int	ExpectTokenType(int type, int subtype, XLexToken& token);
+	bool ReadToken(XLexToken& token);
+	bool ExpectTokenString(const char* string);
+	bool ExpectTokenType(TokenType::Enum type, XLexToken::TokenSubTypeFlags subtype,
+		PunctuationId::Enum puncId, XLexToken& token);
 
-	int ParseInt();
-	bool ParseBool();
-	float ParseFloat();
+	int ParseInt(void);
+	bool ParseBool(void);
+	float ParseFloat(void);
 
 	void UnreadToken(const XLexToken& token);
 	const int GetLineNumber(void);
@@ -57,8 +58,8 @@ public:
 	}
 
 private:
-	void Error(const char *str, ...);
-	void Warning(const char *str, ...);
+	void Error(const char* str, ...);
+	void Warning(const char* str, ...);
 
 	void freeSource(void);
 
