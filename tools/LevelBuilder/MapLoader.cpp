@@ -50,8 +50,7 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 
 	int width, height, dunno1, dunno2;
 	int x, y;
-	float t[4];
-	int  c[4];
+	int c[4];
 
 	if (!src.ExpectTokenString("{")) {
 		return nullptr;
@@ -114,6 +113,9 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 	patch->SetHorzSubdivisions(dunno1);
 	patch->SetVertSubdivisions(dunno2);
 
+	Vec2f uv;
+	Vec2f lightMapUv;
+
 	// we now how x groups each with y entryies.
 	for (x = 0; x < width; x++)
 	{
@@ -171,14 +173,23 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 				vert.color = Vec4<uint8>::max();
 			}
 
-			t[0] = src.ParseFloat();
-			t[1] = src.ParseFloat();
-			t[2] = src.ParseFloat();
-			t[3] = src.ParseFloat();
+			uv[0] = src.ParseFloat();
+			uv[1] = src.ParseFloat();
+			lightMapUv[0] = src.ParseFloat();
+			lightMapUv[1] = src.ParseFloat();
 
-			// 4 tex cords what is this shit!
-			vert.uv[0] = t[0];
-			vert.uv[1] = t[1];
+			// we have two sets of values on for text other for light map :Z
+			// for a 512x512 texture that is fit to the patch
+			// the values will range from 0-1024
+			// [0,0]		[512,0]		[1024,0]
+			//
+			// [0,512]		[512,512]		[1024,512]
+			//
+			// [0,1024]		[512,1024]		[1024,1024]
+
+			// /= 1024
+			uv *= 0.0009765625f; 
+			vert.uv = uv;
 
 			// some lines have "f 1"
 			// get rekt.
