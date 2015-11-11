@@ -526,8 +526,7 @@ bool XMapFile::Parse(const char* pData, size_t length)
 		{
 			mapEnt = XMapEntity::Parse(lexer, &primPoolArena_, entities_.isEmpty());
 			if (!mapEnt) {
-				X_ERROR("Map", "Failed to parse map ent");
-				return false;
+				break;
 			}
 
 			for (i = 0; i < mapEnt->GetNumPrimitives(); i++)
