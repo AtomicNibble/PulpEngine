@@ -525,7 +525,12 @@ bool XMapFile::Parse(const char* pData, size_t length)
 		while (1) 
 		{
 			mapEnt = XMapEntity::Parse(lexer, &primPoolArena_, entities_.isEmpty());
-			if (!mapEnt) {
+			if (!mapEnt) 
+			{
+				if (lexer.GetErrorState() != XLexer::ErrorState::OK) {
+					X_ERROR("Map", "Failed to load map file correctly.");
+					return false;
+				}
 				break;
 			}
 
