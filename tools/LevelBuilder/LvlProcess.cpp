@@ -734,7 +734,7 @@ void LvlBuilder::AddTriListToArea(int32_t areaIdx, int32_t planeNum, const LvlTr
 
 		face += model::Face(localOffset, localOffset, localOffset);
 
-		pSubMesh->faces_.append(face);
+		pSubMesh->AddFace(face);
 	}
 }
 
