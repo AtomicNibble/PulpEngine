@@ -43,20 +43,20 @@ void XLexToken::NumberValue(void)
 			if (subtype_.IsSet(TokenSubType::INFINITE)) 
 			{	
 				// 1.#INF
-				unsigned int inf = 0x7f800000;
-				floatvalue_ = (double)*(float*)&inf;
+				uint32_t inf = 0x7f800000;
+				floatvalue_ = static_cast<double>(*reinterpret_cast<float*>(&inf));
 			}
 			else if (subtype_.IsSet(TokenSubType::INDEFINITE)) 
 			{	
 				// 1.#IND
-				unsigned int ind = 0xffc00000;
-				floatvalue_ = (double)*(float*)&ind;
+				uint32_t ind = 0xffc00000;
+				floatvalue_ = static_cast<double>(*reinterpret_cast<float*>(&ind));
 			}
 			else if (subtype_.IsSet(TokenSubType::NAN)) 
 			{	
 				// 1.#QNAN
-				unsigned int nan = 0x7fc00000;
-				floatvalue_ = (double)*(float*)&nan;
+				uint32_t nan = 0x7fc00000;
+				floatvalue_ = static_cast<double>(*reinterpret_cast<float*>(&nan));
 			}
 		}
 		else 
@@ -68,13 +68,13 @@ void XLexToken::NumberValue(void)
 			}
 
 			while (*p && *p != '.' && *p != 'e') {
-				floatvalue_ = floatvalue_ * 10.0 + (double)(*p - '0');
+				floatvalue_ = floatvalue_ * 10.0 + static_cast<double>(*p - '0');
 				p++;
 			}
 			if (*p == '.') {
 				p++;
 				for (m = 0.1; *p && *p != 'e'; p++) {
-					floatvalue_ = floatvalue_ + (double)(*p - '0') * m;
+					floatvalue_ = floatvalue_ + static_cast<double>(*p - '0') * m;
 					m *= 0.1;
 				}
 			}
@@ -93,7 +93,7 @@ void XLexToken::NumberValue(void)
 				}
 				pow = 0;
 				for (pow = 0; *p; p++) {
-					pow = pow * 10 + (int)(*p - '0');
+					pow = pow * 10 + static_cast<int>(*p - '0');
 				}
 				for (m = 1.0, i = 0; i < pow; i++) {
 					m *= 10.0;
@@ -111,7 +111,7 @@ void XLexToken::NumberValue(void)
 			}
 		}
 #endif
-		intvalue_ = (unsigned long)(floatvalue_);
+		intvalue_ = static_cast<long>(floatvalue_);
 	}
 	else if (subtype_.IsSet(TokenSubType::DECIMAL))
 	{
