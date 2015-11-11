@@ -203,7 +203,7 @@ void XCore::ShutDown()
 
 	moduleInterfaces_.free();
 
-#if X_PLATFORM_WIN32 && X_DEBUG
+#if X_PLATFORM_WIN32 // && X_DEBUG
 	_getch();
 #endif // !X_PLATFORM_WIN32
 
