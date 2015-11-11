@@ -75,6 +75,15 @@ void AreaModel::EndModel(void)
 
 // ----------------------------
 
+AreaSubMesh::AreaSubMesh() : verts_(g_arena), faces_(g_arena)
+{
+	verts_.setGranularity(4096);
+	faces_.setGranularity(4096);
+}
+
+
+// ----------------------------
+
 
 LvlArea::LvlArea() :
 areaMeshes(g_arena),

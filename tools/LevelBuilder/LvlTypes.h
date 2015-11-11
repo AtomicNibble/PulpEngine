@@ -198,10 +198,13 @@ struct AreaModel
 // so faces with same materials are grouped into meshes.
 struct AreaSubMesh
 {
-	AreaSubMesh() : verts_(g_arena), faces_(g_arena) {}
+	AreaSubMesh();
 
-	void AddVert(const level::Vertex& vert) {
+	X_INLINE void AddVert(const level::Vertex& vert) {
 		verts_.append(vert);
+	}
+	X_INLINE void AddFace(const model::Face& face) {
+		faces_.append(face);
 	}
 
 	core::StackString<level::MAP_MAX_MATERIAL_LEN> matName_;
