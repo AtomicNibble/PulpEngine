@@ -102,6 +102,30 @@ inline void ByteStream::write(const T& val)
 	current_ += sizeof(T);
 }
 
+
+template<typename T>
+inline void ByteStream::write(const T* val, size_t num)
+{
+	X_ASSERT(((sizeof(T) * num) <= freeSpace()), "can't write %i objects of size: %i",
+		num, sizeof(T)) (sizeof(T), freeSpace());
+
+	union {
+		char* as_char;
+		T* as_type;
+	};
+
+	as_char = current_;
+
+	size_t i;
+	for (i = 0; i < num; i++)
+	{
+		*as_type = val[i];
+		++as_type;
+	}
+
+	current_ += (sizeof(T) * num);
+}
+
 template<typename T>
 inline T ByteStream::read(void)
 {
