@@ -346,13 +346,17 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 			out[0] = out[0] / repeate.x;
 			out[1] = out[1] / repeate.y;
 
+
+			out[0] = -out[0];
+			out[1] = out[1];
+
 			if (rotate != 0.f)
 			{
 				out.rotate(rotateRadians);
 			}
 
 			point.s = out[0];
-			point.t = -out[1];
+			point.t = out[1];
 
 		}
 	}
