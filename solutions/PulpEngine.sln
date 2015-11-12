@@ -95,11 +95,6 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameDLL", "..\Pulp\GameDLL\
 		{07328CCB-F9CC-4967-861E-272BCA0CAB04} = {07328CCB-F9CC-4967-861E-272BCA0CAB04}
 	EndProjectSection
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C9C8063D-5D84-42A0-B95F-48D420DD8618}"
-	ProjectSection(SolutionItems) = preProject
-		Performance1.psess = Performance1.psess
-	EndProjectSection
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Dynamic|Win32 = Debug Dynamic|Win32
@@ -418,8 +413,5 @@ Global
 		{6B83AF8A-70F8-47CE-BA6F-4C6A5157F923} = {24E6CBB2-B9F1-4F1D-8C4F-3C5CBA4459C1}
 		{D3D5462A-6E35-4BAF-85C1-434377A02590} = {8955E779-D1DB-47E2-9534-73BE843ED106}
 		{71E36592-B7B6-450C-B678-24E63AF5B51C} = {E05376D4-787B-4FB1-978C-1B11BD0C24D7}
-	EndGlobalSection
-	GlobalSection(Performance) = preSolution
-		HasPerformanceSessions = true
 	EndGlobalSection
 EndGlobal
