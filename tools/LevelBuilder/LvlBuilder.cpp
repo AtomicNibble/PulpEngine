@@ -298,7 +298,6 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 	Vec3f coords[2];
 	Vec2f out;
-	Vec2f size(128, 128);
 
 	coords[0][0] = 1.0f;
 	coords[1][1] = 1.0f;
@@ -318,6 +317,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 		pMapBrushSide = mapBrush->GetSide(i);
 		Vec2f repeate = pMapBrushSide->material.matRepeate;
+		Vec2f shift = pMapBrushSide->material.shift;
 
 		ComputeAxisBase(pMapBrushSide->GetPlane().getNormal(), texX, texY);
 
@@ -331,12 +331,14 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 			out[0] = coords[0][0] * u + coords[0][1] * v + coords[0][2];
 			out[1] = coords[1][0] * u + coords[1][1] * v + coords[1][2];
 
+			out += shift;
+
 			// I have a repeate rate.
-			out[0] = out[0] / size.x;
-			out[1] = out[1] / size.y;
+			out[0] = out[0] / repeate.x;
+			out[1] = out[1] / repeate.y;
 
 			point.s = out[0];
-			point.t = out[1];
+			point.t = -out[1];
 		}
 	}
 
