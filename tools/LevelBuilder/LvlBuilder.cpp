@@ -9,9 +9,11 @@
 namespace
 {
 
-	static void ComputeAxisBase(Vec3f normal, Vec3f& texS, Vec3f& texT)
+	static void ComputeAxisBase(const Vec3f& normal_, Vec3f& texS, Vec3f& texT)
 	{
 		float RotY, RotZ;
+		Vec3f normal = normal_;
+
 		// do some cleaning
 		if (fabs(normal[0]) < 1e-6) {
 			normal[0] = 0.0f;
@@ -298,7 +300,6 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 	Vec3f coords[2];
 	Vec2f out;
-	Vec2f size(128, 128);
 
 	coords[0][0] = 1.0f;
 	coords[1][1] = 1.0f;
@@ -316,8 +317,16 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 			continue;
 		}
 
+		if (pMapBrushSide->material.name.isEqual("berlin_wall_concrete_block")) {
+			int goat = 0;
+		}
+
 		pMapBrushSide = mapBrush->GetSide(i);
-		Vec2f repeate = pMapBrushSide->material.matRepeate;
+		const Vec2f& repeate = pMapBrushSide->material.matRepeate;
+		const Vec2f& shift = pMapBrushSide->material.shift;
+		const float& rotate = pMapBrushSide->material.rotate;
+	
+		const float rotateRadians = toRadians(rotate);
 
 		ComputeAxisBase(pMapBrushSide->GetPlane().getNormal(), texX, texY);
 
@@ -331,12 +340,24 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 			out[0] = coords[0][0] * u + coords[0][1] * v + coords[0][2];
 			out[1] = coords[1][0] * u + coords[1][1] * v + coords[1][2];
 
+			out += shift;
+
 			// I have a repeate rate.
-			out[0] = out[0] / size.x;
-			out[1] = out[1] / size.y;
+			out[0] = out[0] / repeate.x;
+			out[1] = out[1] / repeate.y;
+
+
+			out[0] = -out[0];
+			out[1] = out[1];
+
+			if (rotate != 0.f)
+			{
+				out.rotate(rotateRadians);
+			}
 
 			point.s = out[0];
 			point.t = out[1];
+
 		}
 	}
 

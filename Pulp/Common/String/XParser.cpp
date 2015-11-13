@@ -57,7 +57,8 @@ void XParser::freeSource(void)
 	}
 }
 
-bool XParser::LoadMemory(const char* startInclusive, const char* endExclusive, const char* name)
+bool XParser::LoadMemory(const char* startInclusive, const char* endExclusive, 
+	const char* name)
 {
 	X_ASSERT_NOT_NULL(startInclusive);
 	X_ASSERT_NOT_NULL(endExclusive);
@@ -72,21 +73,21 @@ bool XParser::LoadMemory(const char* startInclusive, const char* endExclusive, c
 }
 
 
-int	XParser::ReadToken(XLexToken& token)
+bool XParser::ReadToken(XLexToken& token)
 {
 	X_DISABLE_WARNING(4127)
 	while (true)
 	X_ENABLE_WARNING(4127)
 	{
-		if (!ReadSourceToken(token))
+		if (!ReadSourceToken(token)) {
 			return false;
+		}
 
 		if (token.GetType() == TokenType::PUNCTUATION && token.length() > 0 && token.begin()[0] == '#')
 		{
 			if (!ReadDirective()) {
 				return false;
 			}
-
 			continue;
 		}
 
@@ -101,14 +102,12 @@ int	XParser::ReadToken(XLexToken& token)
 				}
 				continue;
 			}
-
 		}
-
 		return true;
 	}
 }
 
-int XParser::ExpectTokenString(const char* string)
+bool XParser::ExpectTokenString(const char* string)
 {
 	XLexToken token;
 
@@ -118,19 +117,21 @@ int XParser::ExpectTokenString(const char* string)
 	}
 
 	if (!token.isEqual(string)) {
-		X_LOG0("Parser", "expected '%s' but found '%.*s'", string, token.length(), token.begin());
+		X_LOG0("Parser", "expected '%s' but found '%.*s'", 
+			string, token.length(), token.begin());
 		return false;
 	}
 	return true;
 }
 
-int XParser::ExpectTokenType(int type, int subtype, XLexToken& token)
+bool XParser::ExpectTokenType(TokenType::Enum type, XLexToken::TokenSubTypeFlags subtype,
+	PunctuationId::Enum puncId, XLexToken& token)
 {
 	core::StackString<128> str;
 
 	if (!ReadToken(token)) {
 		Error("couldn't read expected token");
-		return 0;
+		return false;
 	}
 
 	if (token.GetType() != type) 
@@ -144,37 +145,37 @@ int XParser::ExpectTokenType(int type, int subtype, XLexToken& token)
 			default: str.append("unknown type"); break;
 		}
 		Error("expected a %s but found '%.*s'", str.c_str(), token.length(), token.begin());
-		return 0;
+		return false;
 	}
+
 	if (token.GetType() == TokenType::NUMBER)
 	{
 		if ((token.GetSubType() & subtype) != subtype) 
 		{
 			str.clear();
-			if (subtype & TT_DECIMAL) str.append("decimal ");
-			if (subtype & TT_HEX) str.append("hex ");
-			if (subtype & TT_OCTAL) str.append("octal ");
-			if (subtype & TT_BINARY) str.append("binary ");
-			if (subtype & TT_UNSIGNED) str.append("unsigned ");
-			if (subtype & TT_LONG) str.append("long ");
-			if (subtype & TT_FLOAT) str.append("float ");
-			if (subtype & TT_INTEGER) str.append("integer ");
+			if (subtype.IsSet(TokenSubType::DECIMAL)) str.append("decimal ");
+			if (subtype.IsSet(TokenSubType::HEX)) str.append("hex ");
+			if (subtype.IsSet(TokenSubType::OCTAL)) str.append("octal ");
+			if (subtype.IsSet(TokenSubType::BINARY)) str.append("binary ");
+			if (subtype.IsSet(TokenSubType::UNSIGNED)) str.append("unsigned ");
+			if (subtype.IsSet(TokenSubType::LONG)) str.append("long ");
+			if (subtype.IsSet(TokenSubType::FLOAT)) str.append("float ");
+			if (subtype.IsSet(TokenSubType::INTEGER)) str.append("integer ");
 			str.stripTrailing(' ');
 			Error("expected %s but found '%.*s'", str.c_str(), token.length(), token.begin());
-			return 0;
+			return false;
 		}
 	}
-	else if (token.GetType() == TokenType::PUNCTUATION) {
-		if (subtype < 0) {
-			Error("BUG: wrong punctuation subtype");
-			return 0;
-		}
-		if (token.GetSubType() != subtype) {
-			Error("expected '%s' but found '%.*s'", pLexer_->GetPunctuationFromId(subtype), token.length(), token.begin());
-			return 0;
+	else if (token.GetType() == TokenType::PUNCTUATION) 
+	{
+		if (token.GetPuncId() != puncId)
+		{
+			Error("expected '%s' but found '%.*s'", 
+				pLexer_->GetPunctuationFromId(puncId), token.length(), token.begin());
+			return false;
 		}
 	}
-	return 1;
+	return true;
 }
 
 int XParser::ParseInt()
@@ -185,11 +186,15 @@ int XParser::ParseInt()
 		Error("couldn't read expected integer");
 		return 0;
 	}
-	if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) {
-		ExpectTokenType(TokenType::NUMBER, TT_INTEGER, token);
-		return -((signed int)token.GetIntValue());
+	if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) 
+	{
+		ExpectTokenType(TokenType::NUMBER, TokenSubType::INTEGER,
+			PunctuationId::UNUSET, token);
+
+		return -(safe_static_cast<signed int, int32_t>(token.GetIntValue()));
 	}
-	else if (token.GetType() != TokenType::NUMBER || token.GetSubType() == TT_FLOAT) {
+	else if (token.GetType() != TokenType::NUMBER 
+		|| token.GetSubType() == TokenSubType::FLOAT) {
 		Error("expected integer value, found '%.*s'", token.length(), token.begin());
 	}
 	return token.GetIntValue();
@@ -200,7 +205,9 @@ bool XParser::ParseBool()
 {
 	XLexToken token;
 
-	if (!ExpectTokenType(TokenType::NUMBER, 0, token)) {
+	if (!ExpectTokenType(TokenType::NUMBER, TokenSubType::UNUSET, 
+		PunctuationId::UNUSET, token)) 
+	{
 		Error("couldn't read expected boolean");
 		return false;
 	}
@@ -217,7 +224,9 @@ float XParser::ParseFloat()
 		return 0.0f;
 	}
 	if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) {
-		ExpectTokenType(TokenType::NUMBER, 0, token);
+		ExpectTokenType(TokenType::NUMBER, TokenSubType::UNUSET,
+			PunctuationId::UNUSET, token);
+
 		return -token.GetFloatValue();
 	}
 	else if (token.GetType() != TokenType::NUMBER) {
@@ -302,7 +311,6 @@ bool XParser::ReadDirective(void)
 		{
 			return Directive_include();
 		}
-
 	}
 
 	X_ERROR("Parser", "unknown precompiler directive. line(%i)", token.GetLine());
@@ -429,15 +437,14 @@ bool XParser::Directive_define(void)
 
 		if (token.GetType() == TokenType::NAME && token.isEqual(define->name)) {
 		//	t->flags |= TOKEN_FL_RECURSIVE_DEFINE;
-		//	idParser::Warning("recursive define (removed recursion)");
-		}
+			XParser::Warning("recursive define (removed recursion)");
+		} 
 	//	t->ClearTokenWhiteSpace();
 		
 		pT->pNext_ = define->pTokens;
 		define->pTokens = pT;
 
 	} while (ReadLine(token));
-
 
 	return true;
 }

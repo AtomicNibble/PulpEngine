@@ -28,9 +28,14 @@ TokenType::Enum XLexToken::GetType(void) const
 	return type_;
 }
 
-int XLexToken::GetSubType(void) const
+XLexToken::TokenSubTypeFlags XLexToken::GetSubType(void) const
 {
 	return subtype_;
+}
+
+PunctuationId::Enum XLexToken::GetPuncId(void) const
+{
+	return puncId_;
 }
 
 int XLexToken::GetLine(void) const
@@ -43,7 +48,7 @@ void XLexToken::SetType(TokenType::Enum type)
 	type_ = type;
 }
 
-void XLexToken::SetSubType(int subType)
+void XLexToken::SetSubType(TokenSubTypeFlags subType)
 {
 	subtype_ = subType;
 }
@@ -68,7 +73,7 @@ double XLexToken::GetDoubleValue(void)
 	if (type_ != TokenType::NUMBER) {
 		return 0.0;
 	}
-	if (!(subtype_ & TT_VALUESVALID)) {
+	if (!(subtype_.IsSet(TokenSubTypeFlags::VALUESVALID))) {
 		NumberValue();
 	}
 	return floatvalue_;
@@ -85,7 +90,7 @@ unsigned long XLexToken::GetUnsignedLongValue(void)
 	if (type_ != TokenType::NUMBER) {
 		return 0;
 	}
-	if (!(subtype_ & TT_VALUESVALID)) {
+	if (!(subtype_.IsSet(TokenSubTypeFlags::VALUESVALID))) {
 		NumberValue();
 	}
 	return intvalue_;
@@ -153,9 +158,19 @@ bool XLexer::isEOF(void) const
 	return current_ >= end_;
 }
 
+size_t XLexer::BytesLeft(void) const
+{
+	return static_cast<size_t>(end_ - current_);
+}
+
 void XLexer::setFlags(LexFlags flags)
 {
 	flags_ = flags;
+}
+
+XLexer::ErrorState::Enum XLexer::GetErrorState(void) const
+{
+	return errState_;
 }
 
 

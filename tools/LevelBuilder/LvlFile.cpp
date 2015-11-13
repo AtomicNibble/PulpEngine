@@ -39,6 +39,44 @@ namespace
 		file->writeObj(pModel->faces.ptr(), (pModel->faces.size()));
 	}
 
+	void WriteAreaModel(core::ByteStream& stream, AreaModel const* pModel)
+	{
+		stream.write(pModel->model);
+		stream.write(pModel->meshes.ptr(), (pModel->meshes.size()));
+
+		// write the streams.
+		core::Array<level::Vertex>::ConstIterator it = pModel->verts.begin();
+		core::Array<level::Vertex>::ConstIterator end = pModel->verts.end();
+		for (; it != end; ++it) {
+			stream.write(it->pos);
+			stream.write(it->texcoord[0]);
+			stream.write(it->texcoord[1]);
+		}
+		it = pModel->verts.begin();
+		for (; it != end; ++it) {
+			stream.write(it->color);
+		}
+		it = pModel->verts.begin();
+		for (; it != end; ++it) {
+			stream.write(it->normal);
+		}
+
+		stream.write(pModel->faces.ptr(), (pModel->faces.size()));
+	}
+
+	// the number of bytes it will use in a file.
+	size_t AreaModelFileBytes(AreaModel const* pModel)
+	{
+		size_t numBytes = 0;
+
+		numBytes += sizeof(pModel->model);
+		numBytes += sizeof(model::SubMeshHeader) * pModel->meshes.size();
+		numBytes += sizeof(level::Vertex) * pModel->verts.size();
+		numBytes += sizeof(model::Face) * pModel->faces.size();
+
+		return numBytes;
+	}
+
 	void WindingToTri(const XWinding* pWinding, core::Array<Vec3f>& verts)
 	{
 		X_ASSERT_NOT_NULL(pWinding);
@@ -48,6 +86,7 @@ namespace
 		numPoints = w->getNumPoints();
 
 		verts.clear();
+		verts.reserve((numPoints - 2) * 3);
 
 		for (i = 2; i < numPoints; i++)
 		{
@@ -147,6 +186,26 @@ bool LvlBuilder::save(const char* name)
 	path.setExtension(level::LVL_FILE_EXTENSION);
 
 	core::ScopedPointer<core::Crc32> crc(X_NEW(core::Crc32, g_arena, "LevelFileCrc32"), g_arena);
+
+
+	core::ByteStream stream(g_arena);
+
+	// work out space for area models
+	// we write it to a stream.
+	{
+		LvlEntity& worldEnt = entities_[0];
+
+		size_t i, requiredBytes = 0;
+
+		for ( i = 0; i < areas_.size(); i++)
+		{
+			const AreaModel* pModel = &areas_[i].model;
+			requiredBytes += AreaModelFileBytes(pModel);
+		}
+
+		stream.resize(requiredBytes);
+	}
+
 	core::XFileScoped file;
 
 	if (file.openFile(path.c_str(), mode))
@@ -170,8 +229,11 @@ bool LvlBuilder::save(const char* name)
 			for (i = 0; i < areas_.size(); i++)
 			{
 				const AreaModel* pModel = &areas_[i].model;
-				WriteAreaModel(file.GetFile(), pModel);
+				WriteAreaModel(stream, pModel);
 			}
+
+			// write the stream.
+			file.write(stream.begin(), stream.size());
 		}
 		// area portals
 		if (worldEnt.interPortals.isNotEmpty())

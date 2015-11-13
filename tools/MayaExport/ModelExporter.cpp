@@ -2075,7 +2075,7 @@ MStatus PotatoExporter::getInputObjects(void)
 	uint i, x;
 	MStatus status = MS::kSuccess;
 
-	for (i = 0; i < (uint)g_options.numLods(); i++)
+	for (i = 0; i < safe_static_cast<uint32_t, size_t>(g_options.numLods()); i++)
 	{
 		MDagPathArray pathArry;
 		MSelectionList list;
@@ -2092,15 +2092,18 @@ MStatus PotatoExporter::getInputObjects(void)
 		{
 			MDagPath path;
 			status = list.getDagPath(x, path);
-			if (status)
+			if (status) {
 				pathArry.append(path);
-			else 
+			}
+			else {
 				MayaPrintError("getDagPath failed: %s", status.errorString().asChar());
+			}
 		}
 		
 
-		if (pathArry.length() < 1)
+		if (pathArry.length() < 1) {
 			return MS::kFailure;
+		}
 
 	//	int goat = pathArry.length();
 	//	MayaPrintMsg("TEST: %s", info.objects.asChar());
