@@ -1,3 +1,6 @@
 [submodule "tools/Ladybug"]
 	path = tools/Ladybug
 	url = git@touchingclothgames.com:root/ladybug.git
+[submodule "game_folder/mod"]
+	path = game_folder/mod
+	url = git@touchingclothgames.com:root/PotatoEngine-TestAssets.git
