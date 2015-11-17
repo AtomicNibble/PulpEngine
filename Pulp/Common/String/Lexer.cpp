@@ -468,6 +468,9 @@ bool XLexer::ReadToken(XLexToken& token)
 			return false;
 		}
 	}
+	else if (flags_.IsSet(LexFlag::ALLOWDOLLARNAMES) && c == '$' && ReadName(token)) {
+		return true;
+	}
 	// check for punctuations_
 	else if (!ReadPunctuation(token)) {
 		Error("unknown punctuation %c", c);

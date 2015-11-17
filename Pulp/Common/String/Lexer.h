@@ -19,6 +19,7 @@ X_DECLARE_FLAGS(LexFlag)(
 	NOBASEINCLUDES,				// don't include files embraced with < >
 	ALLOWPATHNAMES,				// allow path seperators in names
 	ALLOWNUMBERNAMES,			// allow names to start with a number
+	ALLOWDOLLARNAMES,			// allow names to start with a $
 	ALLOWIPADDRESSES,			// allow ip addresses to be parsed as numbers
 	ALLOWFLOATEXCEPTIONS,		// allow float exceptions like 1.#INF or 1.#IND to be parsed
 	ALLOWMULTICHARLITERALS,		// allow multi character literals
