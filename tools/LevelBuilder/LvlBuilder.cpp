@@ -191,32 +191,32 @@ namespace
 		TextureAxisFromPlane(plane.getNormal(), vecs[0], vecs[1]);
 
 		if (!scale[0]) {
-			scale[0] = 1;
+			scale[0] = 1.f;
 		}
 		if (!scale[1]) {
-			scale[1] = 1;
+			scale[1] = 1.f;
 		}
 
 		// rotate axis
 		if (rotate == 0)
 		{
-			sinv = 0;
-			cosv = 1;
+			sinv = 0.f;
+			cosv = 1.f;
 		}
 		else if (rotate == 90)
 		{
-			sinv = 1;
-			cosv = 0;
+			sinv = 1.f;
+			cosv = 0.f;
 		}
 		else if (rotate == 180)
 		{
-			sinv = 0;
-			cosv = -1;
+			sinv = 0.f;
+			cosv = -1.f;
 		}
 		else if (rotate == 270)
 		{
-			sinv = -1;
-			cosv = 0;
+			sinv = -1.f;
+			cosv = 0.f;
 		}
 		else
 		{
