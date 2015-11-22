@@ -514,7 +514,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 	for (i = 0; i < safe_static_cast<int32_t,size_t>(brush.sides.size()); i++)
 	{
-		LvlBrushSide& side = brush.sides[i];
+		const LvlBrushSide& side = brush.sides[i];
 		w = side.pWinding;
 
 		if (!w) {
