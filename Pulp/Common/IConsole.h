@@ -50,9 +50,9 @@ struct IConsoleCmdArgs
 {
 	virtual ~IConsoleCmdArgs(){}
 	// Gets number of arguments supplied to the command (including the command itself)
-	virtual int GetArgCount() const X_ABSTRACT;
-	// Gets argument by index, nIndex must be in 0 <= nIndex < GetArgCount()
-	virtual const char* GetArg(int nIndex) const X_ABSTRACT;
+	virtual size_t GetArgCount() const X_ABSTRACT;
+	// Gets argument by index, idx must be in 0 <= idx < GetArgCount()
+	virtual const char* GetArg(size_t idx) const X_ABSTRACT;
 };
 
 struct IKeyBindDumpSink

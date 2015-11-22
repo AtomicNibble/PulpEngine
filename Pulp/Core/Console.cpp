@@ -228,7 +228,7 @@ namespace
 		size_t TotalLen = 0;
 		size_t Len = 0;
 
-		for (int i = 1; i < Cmd->GetArgCount(); i++)
+		for (size_t i = 1; i < Cmd->GetArgCount(); i++)
 		{
 			const char* str = Cmd->GetArg(i);
 
@@ -438,14 +438,15 @@ ConsoleCommandArgs::~ConsoleCommandArgs()
 
 }
 
-int ConsoleCommandArgs::GetArgCount(void) const 
+size_t ConsoleCommandArgs::GetArgCount(void) const 
 {
 	return argNum_;
 }
 
-const char* ConsoleCommandArgs::GetArg(int Idx) const
+const char* ConsoleCommandArgs::GetArg(size_t Idx) const
 {
-	return (argNum_ >= 0 && Idx < argNum_) ? argv_[Idx] : "";
+	X_ASSERT(Idx < argNum_, "Argument index out of range")(argNum_, Idx);
+	return argv_[Idx];
 }
 
 // we want to get arguemtns.
@@ -470,8 +471,9 @@ void ConsoleCommandArgs::TokenizeString(const char *begin, const char* end)
 	const char* commandLine = begin;
 	while (char ch = *commandLine++)
 	{
-		if (argNum_ == MAX_COMMAND_ARGS)
+		if (argNum_ == MAX_COMMAND_ARGS) {
 			return;
+		}
 
 		switch (ch)
 		{
