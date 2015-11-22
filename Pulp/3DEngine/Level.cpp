@@ -7,9 +7,24 @@
 #include <IConsole.h>
 
 #include <Math\XWinding.h>
+#include <IRenderAux.h>
 
 
 X_NAMESPACE_BEGIN(level)
+
+// --------------------------------
+
+FrameStats::FrameStats()
+{
+	clear();
+}
+
+void FrameStats::clear(void)
+{
+	core::zero_this(this);
+}
+
+// --------------------------------
 
 AsyncLoadData::~AsyncLoadData()
 {
@@ -68,11 +83,40 @@ PortalStack::PortalStack()
 
 // --------------------------------
 
+Level::AreaRefInfo::AreaRefInfo(core::MemoryArenaBase* arena) :
+	areaRefHdrs(arena),
+	areaRefs(arena),
+	areaMultiRefs(arena)
+{
+
+}
+
+void Level::AreaRefInfo::clear(void)
+{
+	areaRefHdrs.clear();
+	areaRefs.clear();
+	areaMultiRefs.clear();
+
+	core::zero_object(areaMultiRefHdrs);
+}
+
+void Level::AreaRefInfo::free(void)
+{
+	areaRefHdrs.free();
+	areaRefs.free();
+	areaMultiRefs.free();
+
+	core::zero_object(areaMultiRefHdrs);
+}
+
+// --------------------------------
+
 int Level::s_var_usePortals_ = 1;
 int Level::s_var_drawAreaBounds_ = 0;
 int Level::s_var_drawPortals_ = 0;
 int Level::s_var_drawArea_ = -1;
 int Level::s_var_drawCurrentAreaOnly_ = 0;
+int Level::s_var_drawStats_ = 0;
 
 // --------------------------------
 
@@ -80,9 +124,8 @@ Level::Level() :
 areas_(g_3dEngineArena),
 areaNodes_(g_3dEngineArena),
 stringTable_(g_3dEngineArena),
-areaEntRefs_(g_3dEngineArena),
-areaEntRefHdrs_(g_3dEngineArena),
-areaMultiEntRefs_(g_3dEngineArena),
+entRefs_(g_3dEngineArena),
+modelRefs_(g_3dEngineArena),
 staticModels_(g_3dEngineArena)
 {
 	frameID_ = 0;
@@ -96,6 +139,7 @@ staticModels_(g_3dEngineArena)
 	pFileSys_ = nullptr;
 
 	core::zero_object(fileHdr_);
+	core::zero_object(visibleAreaFlags_);
 
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pTimer);
@@ -118,8 +162,8 @@ bool Level::Init(void)
 	ADD_CVAR_REF("lvl_usePortals", s_var_usePortals_, 1, 0, 1,
 		core::VarFlag::SYSTEM, "Use area portals when rendering the level.");
 	
-	ADD_CVAR_REF("lvl_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 1,
-		core::VarFlag::SYSTEM, "Draws bounding box around each level area");
+	ADD_CVAR_REF("lvl_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 2,
+		core::VarFlag::SYSTEM, "Draws bounding box around each level area. 1=visble 2=all");
 
 	ADD_CVAR_REF("lvl_drawPortals", s_var_drawPortals_, 1, 0, 4, core::VarFlag::SYSTEM,
 		"Draws the inter area portals. 0=off 1=solid 2=wire 3=solid_dt 4=wire_dt");
@@ -129,6 +173,9 @@ bool Level::Init(void)
 
 	ADD_CVAR_REF("lvl_drawCurAreaOnly", s_var_drawCurrentAreaOnly_, 0, 0, 1, 
 		core::VarFlag::SYSTEM, "Draws just the current area. 0=off 1=on");
+
+	ADD_CVAR_REF("lvl_drawStats", s_var_drawStats_, 0, 0, 1,
+		core::VarFlag::SYSTEM, "Draws frame stats");
 
 
 	return true;
@@ -142,6 +189,8 @@ void Level::ShutDown(void)
 
 void Level::update(void)
 {
+	frameStats_.clear();
+
 	frameID_++;
 
 	// are we trying to read?
@@ -185,11 +234,8 @@ void Level::free(void)
 	areas_.free();
 	areaNodes_.free();
 
-	areaEntRefs_.free();
-	areaEntRefHdrs_.free();
-
-	areaMultiEntRefs_.free();
-	// areaEntMultiRefHdrs_ <- fixed size.
+	entRefs_.free();
+	modelRefs_.free();
 
 	staticModels_.free();
 
@@ -219,8 +265,12 @@ bool Level::canRender(void)
 
 bool Level::render(void)
 {
+	X_PROFILE_BEGIN("Level render", core::ProfileSubSys::ENGINE3D);
+
 	if (!canRender())
 		return false;
+
+	clearVisableAreaFlags();
 
 	// work out what area we are in.
 	const XCamera& cam = gEnv->pRender->GetCamera();
@@ -236,7 +286,6 @@ bool Level::render(void)
 		-cam.getFrustumPlane(FrustumPlane::NEAR)
 	};
 
-
 	int32_t camArea = -1;
 	if (!IsPointInAnyArea(camPos, camArea))
 	{
@@ -246,12 +295,13 @@ bool Level::render(void)
 	{
 		X_LOG0_EVERY_N(24, "Level", "In area: %i", camArea);
 
-		const FileAreaRefHdr& areaEnts = areaEntRefHdrs_[camArea];
-		const FileAreaRefHdr& multiAreaEnts = areaEntMultiRefHdrs_[0];
+#if 0
+		const FileAreaRefHdr& areaEnts = areaModelRefHdrs_[camArea];
+		const FileAreaRefHdr& multiAreaEnts = areaModelMultiRefHdrs_[0];
 		size_t numMulti = 0;
 		for (size_t j = 0; j < multiAreaEnts.num; j++)
 		{
-			if (core::bitUtil::IsBitSet(areaMultiEntRefs_[multiAreaEnts.startIndex + j].flags,
+			if (core::bitUtil::IsBitSet(areaMultiModelRefs_[multiAreaEnts.startIndex + j].flags,
 				camArea))
 			{
 				numMulti++;
@@ -260,6 +310,7 @@ bool Level::render(void)
 
 		X_LOG0_EVERY_N(24, "Level", "ents In area: %i multi: %i", 
 			areaEnts.num, numMulti);
+#endif
 	}
 
 
@@ -272,7 +323,7 @@ bool Level::render(void)
 		{
 			for (; it != areas_.end(); ++it)
 			{
-				it->pRenderMesh->render();
+				DrawArea(*it); 
 			}
 		}
 		else
@@ -280,7 +331,7 @@ bool Level::render(void)
 			if (s_var_drawCurrentAreaOnly_)
 			{
 				// draw just this area.
-				areas_[camArea].pRenderMesh->render();
+				DrawArea(areas_[camArea]);  
 			}
 			else
 			{
@@ -294,7 +345,7 @@ bool Level::render(void)
 				{
 					if (a.frameID == frameID_)
 					{
-						a.pRenderMesh->render();
+						DrawArea(a); 
 					}
 				}
 			}
@@ -303,13 +354,188 @@ bool Level::render(void)
 	else if (s_var_drawArea_ < safe_static_cast<int, size_t>(areas_.size()))
 	{
 		// force draw just this area even if outside world.
-		areas_[s_var_drawArea_].pRenderMesh->render();
+		DrawArea(areas_[s_var_drawArea_]);
 	}
 
+	// we know all the visible areas now.
+	DrawMultiAreaModels();
+
+	DrawAreaBounds();
 	DrawPortalDebug();
+	DrawStatsBlock();
 	return true;
 }
 
+void Level::DrawAreaBounds(void)
+{
+	using namespace render;
+
+	if (s_var_drawAreaBounds_)
+	{
+		IRenderAux* pAux = gEnv->pRender->GetIRenderAuxGeo();
+		XAuxGeomRenderFlags flags = AuxGeom_Defaults::Def3DRenderflags;
+		flags.SetDepthWriteFlag(AuxGeom_DepthWrite::DepthWriteOff);
+		flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOff);
+		pAux->setRenderFlags(flags);
+
+		Color color = Col_Red;
+
+		// visible only
+		if (s_var_drawAreaBounds_ == 1)
+		{
+			for (const auto& a : areas_)
+			{
+				if (a.frameID == frameID_)
+				{
+					pAux->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), false, color);
+				}
+			}
+		}
+		else // all
+		{
+			for (const auto& a : areas_)
+			{
+				pAux->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), false, color);
+			}
+		}
+	}
+}
+
+void Level::DrawStatsBlock(void) const
+{
+	if (!s_var_drawStats_) {
+		return;
+	}
+
+	pRender_->Set2D(true);
+	{
+		core::StackString512 str;
+
+		str.appendFmt("NumAreas:%i\n", areas_.size());
+		str.appendFmt("VisibleAreas:%i\n", frameStats_.visibleAreas);
+		str.appendFmt("VisibleModels:%i\n", frameStats_.visibleModels);
+		str.appendFmt("VisibleVerts:%i\n", frameStats_.visibleVerts);
+	
+		Color txt_col(0.7f, 0.7f, 0.7f, 1.f);
+		const float height = 100.f;
+		const float width = 200.f;
+
+		float screenWidth = pRender_->getWidthf();
+
+		Vec2f pos(screenWidth - (width + 5.f), 35.f);
+
+		pRender_->DrawQuad(pos.x, pos.y, width, height, Color(0.1f, 0.1f, 0.1f, 0.8f),
+			Color(0.01f, 0.01f, 0.01f, 0.95f));
+		
+		{
+			render::XDrawTextInfo ti;
+			ti.col = txt_col;
+			ti.flags = render::DrawTextFlags::POS_2D | render::DrawTextFlags::MONOSPACE;
+
+			{
+				Vec3f txtPos(pos.x + 5, pos.y + 20, 1);
+				pRender_->DrawTextQueued(txtPos, ti, str.c_str());
+			}
+
+			{
+				Vec3f txtPos(pos.x + (width / 2), pos.y, 1);
+				ti.flags |= render::DrawTextFlags::CENTER;
+				pRender_->DrawTextQueued(txtPos, ti, "Level Draw Stats");
+			}
+		}
+	}
+	pRender_->Set2D(false);
+}
+
+void Level::DrawArea(const Area& area)
+{
+//	if (IsAreaVisible(area)) {
+//		return;
+//	}
+
+	frameStats_.visibleAreas++;
+
+	SetAreaVisible(area.areaNum);
+
+	const FileAreaRefHdr& areaModelsHdr = modelRefs_.areaRefHdrs[area.areaNum];
+
+	size_t i, end;
+
+	i = areaModelsHdr.startIndex;
+	end = i + areaModelsHdr.num;
+
+//	X_LOG0("Level", "%i ent refs. start: %i num: %i", area.areaNum, 
+//		areaModelsHdr.startIndex, areaModelsHdr.num);
+
+	for (; i < end; i++)
+	{
+		uint32_t entId = modelRefs_.areaRefs[i].entId;
+
+		level::StaticModel& model = staticModels_[entId - 1];
+		DrawStaticModel(model);
+	}
+
+	frameStats_.visibleVerts += area.pMesh->numVerts;
+	area.pRenderMesh->render();
+}
+
+void Level::DrawMultiAreaModels(void)
+{
+	size_t i, numArea = this->NumAreas();
+	size_t numLists = core::Min<size_t>(level::MAP_MAX_MULTI_REF_LISTS,
+		(numArea / 32) + 1);
+
+	for (i = 0; i < numLists; i++)
+	{
+		uint32_t visFlag = visibleAreaFlags_[i];
+		const FileAreaRefHdr& refHdr = modelRefs_.areaMultiRefHdrs[i];
+
+		size_t j, num;
+
+		j = refHdr.startIndex;
+		num = j + refHdr.num;
+
+		for (; j < num; j++)
+		{
+			const MultiAreaEntRef& ref = modelRefs_.areaMultiRefs[j];
+
+			// AND them and check for zero.
+			uint32_t visible = ref.flags & visFlag;
+			if (visible)
+			{
+				// draw it.
+				// ref.entId
+
+				level::StaticModel& model = staticModels_[ref.entId - 1];
+				
+				DrawStaticModel(model);
+			}
+		}
+	}
+}
+
+void Level::DrawStaticModel(const level::StaticModel& sm)
+{
+	if (sm.pModel)
+	{
+		frameStats_.visibleModels++;
+		frameStats_.visibleVerts += sm.pModel->numVerts(0);
+
+
+		Vec3f pos = sm.pos;
+		Quatf angle = sm.angle;
+
+		Matrix44f posMat = Matrix44f::createTranslation(pos);
+		posMat.rotate(angle.getAxis(), angle.getAngle());
+
+		render::IRender* pRender = getRender();
+		pRender->SetModelMatrix(posMat);
+
+		sm.pModel->Render();
+
+		pRender->SetModelMatrix(Matrix44f::identity());
+	}
+}
 
 int32_t Level::CommonChildrenArea_r(AreaNode* pAreaNode)
 {
@@ -344,6 +570,19 @@ int32_t Level::CommonChildrenArea_r(AreaNode* pAreaNode)
 	return common;
 }
 
+void Level::clearVisableAreaFlags()
+{
+	core::zero_object(visibleAreaFlags_);
+}
+
+void Level::SetAreaVisible(uint32_t area)
+{
+	size_t index = area / 32;
+	uint32_t bit = area % 32;
+
+	visibleAreaFlags_[index] = core::bitUtil::SetBit(
+		visibleAreaFlags_[index], bit);
+}
 
 size_t Level::NumAreas(void) const
 {
@@ -424,6 +663,18 @@ size_t Level::BoundsInAreas(const AABB& bounds, int32_t* pAreasOut, size_t maxAr
 	return numAreas;
 }
 
+bool Level::IsAreaVisible(int32_t areaIdx) const
+{
+	X_ASSERT((areaIdx >= 0 && areaIdx < safe_static_cast<int, size_t>(areas_.size())),
+		"Area index is out of bounds.")(areaIdx, areas_.size());
+
+	return IsAreaVisible(areas_[areaIdx]);
+}
+
+bool Level::IsAreaVisible(const Area& area) const
+{
+	return area.frameID == frameID_;
+}
 
 void Level::BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numAreasOut,
 	int32_t* pAreasOut, size_t maxAreas) const
@@ -475,7 +726,6 @@ void Level::BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numArea
 		}
 
 	} while (nodeNum != 0);
-
 }
 
 

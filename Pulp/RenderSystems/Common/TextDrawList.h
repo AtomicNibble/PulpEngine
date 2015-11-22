@@ -14,8 +14,9 @@ public:
 	~XTextDrawList();
 
 	void setArena(core::MemoryArenaBase* arena);
-
 	void addEntry(const Vec3f& vPos, const XDrawTextInfo& ti, const char* pStr);
+
+	void setCapacity(size_t numBytes);
 
 	void clear();
 	void free();

@@ -3,6 +3,8 @@
 
 #include "Profile\ProfilerTypes.h"
 
+#include <IConsole.h>
+
 X_NAMESPACE_BEGIN(core)
 
 namespace
@@ -59,7 +61,6 @@ namespace
 
 XProfileSys* XProfileSys::s_this = nullptr;
 
-
 XProfileSys::XProfileSys() :
 	pCore_(nullptr),
 	profiles_(nullptr),
@@ -100,6 +101,7 @@ void XProfileSys::Init(ICore* pCore)
 	subSystemInfo_[ProfileSubSys::SCRIPT].name = "Script";
 	subSystemInfo_[ProfileSubSys::SOUND].name = "Sound";
 	subSystemInfo_[ProfileSubSys::GAME].name = "Game";
+	subSystemInfo_[ProfileSubSys::UNCLASSIFIED].name = "UnClassified";
 
 #if X_DEBUG
 	// check i've not forgot to add one.
@@ -112,6 +114,27 @@ void XProfileSys::Init(ICore* pCore)
 	}
 
 #endif // !X_DEBUG
+
+	// register some vars.
+	
+	ADD_CVAR_REF("profile_draw", s_drawProfileInfo_, 0, 0, 1, 
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+			"Display profiler info. (visible items enabled via profile_draw_* vars)");
+	ADD_CVAR_REF("profile_draw_when_console_expanded", s_drawProfileInfoWhenConsoleExpaned_, 1, 0, 1, 
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler even when console is expanded");
+	ADD_CVAR_REF("profile_draw_subsystems", s_drawSubsystems_, 1, 0, 1, 
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler subsystem block");
+	ADD_CVAR_REF("profile_draw_meminfo", s_drawMemInfo_, 1, 0, 1, 
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler mem info blocks");
+	ADD_CVAR_REF("profile_draw_stats_table", s_drawStats_, 1, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler stats table block");
+	ADD_CVAR_REF("profile_draw_frame_time_graph", s_drawFrameTimeBar_, 1, 0, 1, 
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Display profiler frame time bar");
 }
 
 
@@ -127,19 +150,19 @@ void XProfileSys::AddProfileData(XProfileData* pData)
 
 void XProfileSys::FrameBegin(void)
 {
-	if (!isEnabled())
+	if (!isEnabled()) {
 		return;
+	}
 
 	// get kinky.
 	frameStartTime_ = ProfileTimer::getTicks();
-
-
 }
 
 void XProfileSys::FrameEnd(void)
 {
-	if (!isEnabled())
+	if (!isEnabled()) {
 		return;
+	}
 
 	uint64_t end = ProfileTimer::getTicks();
 
@@ -150,10 +173,8 @@ void XProfileSys::FrameEnd(void)
 
 	frameTimeHistory_.append(ProfileTimer::toMS(frameTime_));
 
-
 	DisplayProfileData();
 	UpdateProfileData();
-
 }
 
 
@@ -172,8 +193,9 @@ void XProfileSys::AddProfileDisplayData_r(XProfileData* pData, int lvl)
 	{
 		XProfileData* pChildData = profiles_[i];
 
-		if (pChildData->pParent_ == pData)
+		if (pChildData->pParent_ == pData) {
 			AddProfileDisplayData_r(pChildData, lvl + 1);
+		}
 	}
 }
 
@@ -193,20 +215,16 @@ void XProfileSys::DisplayProfileData(void)
 	{
 		XProfileData* pData = profiles_[i];
 
-		if (pData->pParent_ == nullptr)
+		if (pData->pParent_ == nullptr) {
 			AddProfileDisplayData_r(pData, 0);
+		}
 	}
-
-
-//	std::sort(displayInfo_.begin(),
-//		displayInfo_.end(),
-//		CompareFrameProfilersValue);
-
 }
 
 void XProfileSys::UpdateProfileData(void)
 {
-	for (int i = 0; i<(int)profiles_.size(); i++)
+	size_t i;
+	for (i = 0; i<profiles_.size(); i++)
 	{
 		XProfileData* pData = profiles_[i];
 
@@ -215,8 +233,8 @@ void XProfileSys::UpdateProfileData(void)
 		pData->sumTimeSelf_ += pData->timeSelf_;
 
 		// create 'ruff time values' (but acurate in relation to other times)
-		float fTotalTime = ProfileTimer::toMS(pData->time_);
-		float fSelfTime = ProfileTimer::toMS(pData->timeSelf_);
+		const float fTotalTime = ProfileTimer::toMS(pData->time_);
+		const float fSelfTime = ProfileTimer::toMS(pData->timeSelf_);
 
 		// log values.
 		pData->totalTimeHistory_.append(fTotalTime);
@@ -227,8 +245,8 @@ void XProfileSys::UpdateProfileData(void)
 		subSystemInfo_[pData->subSystem_].selfTime += fSelfTime;
 
 		// clear frame values
-		pData->time_ = 0;
-		pData->timeSelf_ = 0;
+		pData->time_ = 0llu;
+		pData->timeSelf_ = 0llu;
 		pData->callCount_ = 0;
 	}
 }
@@ -240,7 +258,7 @@ void XProfileSys::ScopeStart(XProfileScope* pProScope)
 	s_this->callstack_.Push(pProScope);
 
 	pProScope->start_ = ProfileTimer::getTicks();
-	pProScope->excludeTime_ = 0;
+	pProScope->excludeTime_ = 0llu;
 }
 
 void XProfileSys::ScopeEnd(XProfileScope* pProScope)
@@ -272,7 +290,6 @@ void XProfileSys::ScopeEnd(XProfileScope* pProScope)
 	{
 		pProScope->pParent_ = nullptr;
 	}
-
 }
 
 // ~Static

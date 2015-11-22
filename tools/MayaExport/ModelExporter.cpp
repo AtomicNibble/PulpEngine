@@ -61,7 +61,7 @@ namespace
 	static PotatoOptions g_options;
 
 	static const float MERGE_VERTEX_EPSILON = 0.9f;
-	static const float MERGE_TEXCORDS_EPSILON = 0.5f;
+	static const float MERGE_TEXCORDS_EPSILON = 0.02f;
 	static const float JOINT_WEIGHT_THRESHOLD = 0.005f;
 	static const int   VERTEX_MAX_WEIGHTS = 4;
 
@@ -154,6 +154,10 @@ namespace
 		return mat;
 	}
 
+	Vec3f XVec(const MFloatVector& point) {
+		return Vec3f(point[0], point[1], point[2]);
+	}
+
 	Vec3f XVec(const MFloatPoint& point) {
 		return Vec3f(point[0], point[1], point[2]);
 	}
@@ -170,9 +174,11 @@ namespace
 		int		j, k;
 		Matrix33f	mat;
 
-		for (j = 0; j < 3; j++)
-			for (k = 0; k < 3; k++)
-				mat.at(j, k) = (float)matrix[j][k];
+		for (j = 0; j < 3; j++) {
+			for (k = 0; k < 3; k++) {
+				mat.at(j, k) = static_cast<float>(matrix[j][k]);
+			}
+		}
 
 		return mat;
 	}
@@ -212,8 +218,9 @@ namespace
 		path.extendToShape();
 
 		instanceNum = 0;
-		if (path.isInstanced())
+		if (path.isInstanced()) {
 			instanceNum = path.instanceNumber();
+		}
 
 		MFnMesh fnMesh(path);
 		MObjectArray sets;
@@ -279,8 +286,9 @@ namespace
 
 		// ok the name is 2nd one.
 		// check we have 2 tho.
-		if (Stack.size() > 1)
+		if (Stack.size() > 1) {
 			Stack.pop();
+		}
 
 		return Stack.top();
 	}
@@ -416,6 +424,17 @@ void PotatoOptions::setcmdArgs(const MArgList &args)
 		}
 	}
 
+	idx = args.flagIndex("uv_merge_thresh");
+	if (idx != MArgList::kInvalidArgIndex) {
+		double temp;
+		if (!args.get(++idx, temp)) {
+			MayaPrintWarning("failed to get uv_merge_thresh flag");
+		}
+		else {
+			uvMergeThreshold_ = static_cast<float>(temp);
+		}
+	}
+
 	idx = args.flagIndex("zero_origin");
 	if (idx != MArgList::kInvalidArgIndex) {
 		if (!args.get(++idx, zeroOrigin_)) {
@@ -464,6 +483,9 @@ void PotatoOptions::reset(void)
 	filePath_.clear();
 	scale_ = 1.0f;
 	jointThreshold_ = JOINT_WEIGHT_THRESHOLD;
+	uvMergeThreshold_ = MERGE_TEXCORDS_EPSILON;
+	zeroOrigin_ = true;
+	whiteVertColors_ = true;
 	forceBoneFilters_.clear();
 	progressCntl_.clear();
 	exportMode_ = EXPORT_INPUT;
@@ -545,6 +567,7 @@ MayaMesh::MayaMesh() :
 	faces(g_arena),
 	weights(g_arena)
 {
+	hasBinds = false;
 }
 
 MayaMesh::~MayaMesh()
@@ -557,6 +580,8 @@ void MayaMesh::clear(void)
 	verts.clear();
 	faces.clear();
 	weights.clear();
+
+	hasBinds = false;
 }
 
 void MayaMesh::merge(MayaMesh *mesh)
@@ -626,6 +651,8 @@ void MayaMesh::shareVerts(void)
 	size_t numEqual = 0;
 	size_t numUnique = 0;
 
+	const float uvMergeThreshold_ = g_options.uvMergeThreshold_;
+
 	for (i = 0; i < faces.size(); i++)
 	{
 		for (x = 0; x < 3; x++) // for each face.
@@ -644,17 +671,18 @@ void MayaMesh::shareVerts(void)
 			{
 				const MayaVertex* vv = it->second.pVert;
 				
-				if (vert.numWeights != vv->numWeights)
+				if (vert.numWeights != vv->numWeights) {
 					continue;
-
-				if (vert.startWeightIdx != vv->startWeightIdx)
+				}
+				if (vert.startWeightIdx != vv->startWeightIdx) {
 					continue;
-
-				if (!vert.pos.compare(vv->pos, MERGE_VERTEX_EPSILON))
+				}
+				if (!vert.pos.compare(vv->pos, MERGE_VERTEX_EPSILON)) {
 					continue; // not same
-
-				if (!vert.uv.compare(vv->uv, MERGE_TEXCORDS_EPSILON))
+				}
+				if (!vert.uv.compare(vv->uv, uvMergeThreshold_)) {
 					continue; // not same
+				}
 
 				equal = true;
 				break; // equal.
@@ -671,9 +699,10 @@ void MayaMesh::shareVerts(void)
 				numUnique++;
 
 
-				faces[i][x] = (int)verts.append(vert);
-				if (vert.numWeights > 0)
+				faces[i][x] = safe_static_cast<int,size_t>(verts.append(vert));
+				if (vert.numWeights > 0) {
 					CompBinds[vert.numWeights - 1]++;
+				}
 
 				Hashcontainer temp;
 				temp.pVert = &verts[verts.size() - 1];
@@ -709,7 +738,8 @@ void MayaMesh::calBoundingbox()
 MayaLOD::MayaLOD() :
 	meshes_(g_arena)
 {
-
+	pModel = nullptr;
+	lodIdx_ = -1;
 }
 
 MayaLOD::~MayaLOD()
@@ -838,6 +868,14 @@ MStatus MayaLOD::LoadMeshes(void)
 		mesh->weights.setGranularity(2048 * 2);
 
 		status = fnmesh.getUVSetNames(UVSets);
+		if (!status) {
+			MayaPrintError("Mesh(%s): failed to get UV set names (%s)", 
+				fnmesh.name().asChar(), status.errorString().asChar());
+			return status;
+		}
+
+		// print how many :Z
+		MayaPrintMsg("NumUvSets: %i", UVSets.length());
 
 		fnmesh.getUVs(u, v, &UVSets[0]);
 		fnmesh.getPoints(vertexArray, MSpace::kPreTransform);
@@ -977,16 +1015,17 @@ MStatus MayaLOD::LoadMeshes(void)
 							vert = &mesh->verts[num];
 
 							// the start index for the weights in 'mesh->weights'
-							vert->startWeightIdx = (int32)mesh->weights.size();
+							vert->startWeightIdx = safe_static_cast<int32_t, size_t>(
+								mesh->weights.size());
 
 							float totalweight = 0.0f;
 
 							// copy the weight data for this vertex
 							int numNonZeroWeights = 0;
 							int k, numAdded = 0;
-							for (k = 0; k < (int)infCount; ++k)
+							for (k = 0; k < safe_static_cast<int,unsigned>(infCount); ++k)
 							{
-								float w = (float)wts[k];
+								float w = static_cast<float>(wts[k]);
 								if (w > 0.0f) {
 									numNonZeroWeights++;
 								}
@@ -1035,7 +1074,8 @@ MStatus MayaLOD::LoadMeshes(void)
 							}
 
 							// calculate total total vets TWAT!
-							vert->numWeights = (int32)mesh->weights.size() - vert->startWeightIdx;
+							vert->numWeights = safe_static_cast<int32_t, size_t>(
+								mesh->weights.size()) - vert->startWeightIdx;
 
 							if (vert->numWeights > VERTEX_MAX_WEIGHTS)
 							{
@@ -1096,8 +1136,9 @@ core::Thread::ReturnValue mergeVertsThreadFnc(const core::Thread& thread)
 {
 	core::Array<MayaMesh*>* meshes = (core::Array<MayaMesh*>*)thread.getData();
 
-	for (uint i = 0; i <meshes->size(); i++)
+	for (uint i = 0; i < meshes->size(); i++) {
 		(*meshes)[i]->shareVerts();
+	}
 
 	return 0;
 }
@@ -1142,7 +1183,7 @@ void MayaLOD::MergeMeshes(void)
 			}
 		}
 
-		uint numMeshes = (int32)meshes_.size();
+		uint numMeshes = safe_static_cast<int32_t, size_t>(meshes_.size());
 
 		const int numThreads = 2;
 		if (numMeshes >= numThreads) // atleast 2 meshes, before we bother threading.
@@ -1166,21 +1207,25 @@ void MayaLOD::MergeMeshes(void)
 				threads[i].setData(&meshes[i]);
 			}
 
-			for (i = 0; i < numThreads; i++)
+			for (i = 0; i < numThreads; i++) {
 				threads[i].Start(mergeVertsThreadFnc);
+			}
 
-			for (i = 0; i < numThreads; i++)
+			for (i = 0; i < numThreads; i++) {
 				threads[i].Join();
+			}
 		}
 		else
 		{
-			for (i = 0; i <numMeshes; i++)
+			for (i = 0; i < numMeshes; i++) {
 				meshes_[i]->shareVerts();
+			}
 		}
 	}
 
-	if (numMerged > 0)
+	if (numMerged > 0) {
 		MayaPrintMsg("(%i) meshes merged", numMerged);
+	}
 }
 
 
@@ -1190,8 +1235,9 @@ void MayaLOD::MergeMeshes(void)
 MayaModel::MayaModel() :
 	bones_(g_arena)
 {
-	for (uint i = 0; i < 4; i++)
-		lods_[i].setModel(this,i);
+	for (uint i = 0; i < 4; i++) {
+		lods_[i].setModel(this, i);
+	}
 
 	g_stats.clear();
 	numExportJoints_ = 0;
@@ -1295,8 +1341,9 @@ MStatus MayaModel::lodLODs(void)
 	for (uint i = 0; i < g_options.numLods(); i++)
 	{
 		status = lods_[i].LoadMeshes();
-		if (!status)
+		if (!status) {
 			break;
+		}
 	}
 	return status;
 }
@@ -1325,8 +1372,9 @@ MStatus MayaModel::loadBones(void)
 			return status;
 		}
 
-		if (!dagPath.hasFn(MFn::kJoint))
+		if (!dagPath.hasFn(MFn::kJoint)) {
 			continue;
+		}
 		
 		MayaBone new_bone;
 		new_bone.dagnode = X_NEW(MFnDagNode,g_arena, "BoneDagNode")(dagPath, &status);
@@ -1361,8 +1409,9 @@ MStatus MayaModel::loadBones(void)
 	// create hierarchy
 	bone = bones_.ptr();
 	for (i = 0; i < bones_.size(); i++, bone++) {
-		if (!bone->dagnode) 
+		if (!bone->dagnode)  {
 			continue;
+		}
 		
 		bone->mayaNode.setParent(mayaHead);
 		bone->exportNode.setParent(exportHead);
@@ -1372,9 +1421,10 @@ MStatus MayaModel::loadBones(void)
 
 			// do we have this joint?
 			for (j = 0; j < bones_.size(); j++) {
-				if (!bones_[j].dagnode) 
+				if (!bones_[j].dagnode)  {
 					continue;
-				
+				}
+
 				if (bones_[j].dagnode->name() == parentNode->name()) {
 					bone->mayaNode.setParent(bones_[j].mayaNode);
 					bone->exportNode.setParent(bones_[j].exportNode);
@@ -1406,8 +1456,9 @@ void MayaModel::pruneBones(void)
 	MayaBone		*parent;
 	uint				i;
 
-	for (i = 0; i < g_options.numLods(); i++)
+	for (i = 0; i < g_options.numLods(); i++) {
 		lods_[i].pruneBones();
+	}
 
 	numExportJoints_ = 0;
 	bone = bones_.ptr();
@@ -1443,14 +1494,15 @@ void MayaModel::pruneBones(void)
 	//	tagOrigin_.exportNode.setParent(exportHead);
 	}
 
-	g_stats.totalJointsDropped = (int32_t)bones_.size() - numExportJoints_;
+	g_stats.totalJointsDropped = safe_static_cast<int32_t, size_t>(bones_.size() - numExportJoints_);
 }
 
 void MayaModel::MergeMeshes()
 {
 	PROFILE_MAYA("merge meshes");
-	for (int i = 0; i < 4; i++)
+	for (int i = 0; i < 4; i++) {
 		lods_[i].MergeMeshes();
+	}
 }
 
 void MayaModel::printStats(PotatoOptions& options)
@@ -1470,13 +1522,15 @@ void MayaModel::printStats(PotatoOptions& options)
 			if (i < (g_stats.droppedBoneNames.size() - 1))
 				std::cout << ", ";
 
-			if (i > 9 && (i % 10) == 0)
+			if (i > 9 && (i % 10) == 0) {
 				std::cout << "\n";
+			}
 		}
 		std::cout << ")";
 	}
-	if (g_stats.droppedBoneNames.size() > 10)
+	if (g_stats.droppedBoneNames.size() > 10) {
 		std::cout << "\n";
+	}
 
 	std::cout <<
 		"\n> Total Verts: " << g_stats.totalVerts <<
@@ -1566,7 +1620,7 @@ uint32_t MayaModel::calculateSubDataSize(const Flags8<model::StreamType>& stream
 	for (i = 0; i < 4; i++)
 	{
 		// for each lod we have Vert, Face, bind
-		size += (uint32_t)lods_[i].getSubDataSize(streams);
+		size += safe_static_cast<uint32_t,size_t>(lods_[i].getSubDataSize(streams));
 	}
 
 	return size;
@@ -1634,9 +1688,9 @@ bool MayaModel::save(const char *filename)
 			header.tagNameDataSize + header.materialNameDataSize);
 
 
-		for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next())
+		for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next()) {
 			meshHeadOffsets += bone->getDataSize();
-		
+		}
 
 		for (i = 0; i < numLods; i++)
 		{
@@ -1726,8 +1780,9 @@ bool MayaModel::save(const char *filename)
 				MayaBone* parent = bone->exportNode.parent();
 
 				uint8_t idx = 0;
-				if (parent)
-					idx = safe_static_cast<uint8_t,uint32_t>(parent->exportIdx);
+				if (parent) {
+					idx = safe_static_cast<uint8_t, uint32_t>(parent->exportIdx);
+				}
 
 				fwrite(&idx, sizeof(idx), 1, f);
 			}
@@ -1848,11 +1903,11 @@ bool MayaModel::save(const char *filename)
 
 				for (x = 0; x < mesh->verts.size(); x++)
 				{
-					const MayaVertex Mvert = mesh->verts[x];
+					const MayaVertex& Mvert = mesh->verts[x];
 
 					vert.pos = Mvert.pos;
 					vert.st[0] = XHalfCompressor::compress(Mvert.uv[0]);
-					vert.st[1] = XHalfCompressor::compress(Mvert.uv[1]);
+					vert.st[1] = XHalfCompressor::compress(1.f - Mvert.uv[1]);
 
 					stream.write(vert);
 				}
@@ -1937,9 +1992,15 @@ bool MayaModel::save(const char *filename)
 				{
 					const Vec3<int32_t>& f = mesh->faces[x];
 
+#if 1 // flip winding.
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[2]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[1]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[0]));
+#else
 					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[0]));
 					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[1]));
 					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[2]));
+#endif
 				}
 
 			}
@@ -2014,7 +2075,7 @@ MStatus PotatoExporter::getInputObjects(void)
 	uint i, x;
 	MStatus status = MS::kSuccess;
 
-	for (i = 0; i < (uint)g_options.numLods(); i++)
+	for (i = 0; i < safe_static_cast<uint32_t, size_t>(g_options.numLods()); i++)
 	{
 		MDagPathArray pathArry;
 		MSelectionList list;
@@ -2031,15 +2092,18 @@ MStatus PotatoExporter::getInputObjects(void)
 		{
 			MDagPath path;
 			status = list.getDagPath(x, path);
-			if (status)
+			if (status) {
 				pathArry.append(path);
-			else 
+			}
+			else {
 				MayaPrintError("getDagPath failed: %s", status.errorString().asChar());
+			}
 		}
 		
 
-		if (pathArry.length() < 1)
+		if (pathArry.length() < 1) {
 			return MS::kFailure;
+		}
 
 	//	int goat = pathArry.length();
 	//	MayaPrintMsg("TEST: %s", info.objects.asChar());

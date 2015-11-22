@@ -54,6 +54,19 @@ X_INLINE T Quat<T>::lengthSquared() const
 }
 
 template<typename T>
+X_INLINE Vec3<T> Quat<T>::getEuler(void) const
+{
+	Vec3<T> euler;
+
+	euler.x = toDegrees(getPitch());
+	euler.y = toDegrees(getYaw());
+	euler.z = toDegrees(getRoll());
+
+	return euler;
+}
+
+
+template<typename T>
 X_INLINE Quat<T>& Quat<T>::normalize()
 {
 	if (T len = length()) {
@@ -186,27 +199,25 @@ X_INLINE void Quat<T>::set(const Vec3<T> &axis, T radians)
 
 // assumes ZYX rotation order and radians
 template<typename T>
-X_INLINE void Quat<T>::set(T xRotation, T yRotation, T zRotation)
+X_INLINE void Quat<T>::set(T pitch, T yaw, T roll)
 {
-	zRotation *= T(0.5);
-	yRotation *= T(0.5);
-	xRotation *= T(0.5);
+	pitch *= T(0.5);
+	yaw *= T(0.5);
+	roll *= T(0.5);
 
-	// get sines and cosines of half angles
-	T Cx = math<T>::cos(xRotation);
-	T Sx = math<T>::sin(xRotation);
+	const T sinPitch(math<T>::sin(pitch));
+	const T cosPitch(math<T>::cos(pitch));
+	const T sinYaw(math<T>::sin(yaw));
+	const T cosYaw(math<T>::cos(yaw));
+	const T sinRoll(math<T>::sin(roll));
+	const T cosRoll(math<T>::cos(roll));
+	const T cosPitchCosYaw(cosPitch*cosYaw);
+	const T sinPitchSinYaw(sinPitch*sinYaw);
 
-	T Cy = math<T>::cos(yRotation);
-	T Sy = math<T>::sin(yRotation);
-
-	T Cz = math<T>::cos(zRotation);
-	T Sz = math<T>::sin(zRotation);
-
-	// multiply it out
-	w = Cx*Cy*Cz - Sx*Sy*Sz;
-	v.x = Sx*Cy*Cz + Cx*Sy*Sz;
-	v.y = Cx*Sy*Cz - Sx*Cy*Sz;
-	v.z = Cx*Cy*Sz + Sx*Sy*Cx;
+	v.x = sinRoll * cosPitchCosYaw - cosRoll * sinPitchSinYaw;
+	v.y = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
+	v.z = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
+	w = cosRoll * cosPitchCosYaw + sinRoll * sinPitchSinYaw;
 }
 
 

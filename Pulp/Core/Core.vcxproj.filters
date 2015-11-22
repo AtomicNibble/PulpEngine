@@ -183,5 +183,8 @@
     <None Include="win32\SystemTimer.inl">
       <Filter>Header Files\win32</Filter>
     </None>
+    <None Include="Console.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

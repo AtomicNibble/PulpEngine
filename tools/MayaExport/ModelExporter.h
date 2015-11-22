@@ -96,7 +96,7 @@ public:
 
 	void setFileName(MString path) {
 		filePath_.append(path.asChar());
-		filePath_.setExtension(".model");
+		filePath_.setExtension(model::MODEL_FILE_EXTENSION);
 	}
 
 	void AddLodInfo(const LODExportInfo& info) {
@@ -113,6 +113,7 @@ public:
 	core::Path<char> filePath_;
 	float scale_;
 	float jointThreshold_;
+	float uvMergeThreshold_;
 	bool  zeroOrigin_;
 	bool  whiteVertColors_;
 	bool  _pad[2];

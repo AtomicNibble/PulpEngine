@@ -115,7 +115,12 @@ bool XGame::OnInputEvent(const input::InputEvent& event)
 
 	// timeLast_ = pTimer_->GetAsyncTime() - timeLast_;
 
-	float moveDelta = 500.f * pTimer_->GetFrameTime();
+	float speed = 250.f;
+	if (event.modifiers.IsSet(InputEvent::ModiferType::LSHIFT)) {
+		speed *= 2.f;
+	}
+
+	float moveDelta = speed * pTimer_->GetFrameTime();
 	switch (event.keyId)		
 	{
 		// forwards.

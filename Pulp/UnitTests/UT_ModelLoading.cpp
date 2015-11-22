@@ -3,13 +3,12 @@
 #include "Profiler.h"
 
 #include <IModel.h>
-#include "../3DEngine/ModelLoader.h"
 
 X_USING_NAMESPACE;
 
 using namespace core;
 
-#ifdef X_LIB
+#if 0 // ifdef X_LIB 
 
 TEST(Model, Load)
 {

@@ -1054,6 +1054,19 @@ void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const fl
 
 // ----------------------------------------------------------------------
 
+float XWinding::TriangleArea(const Vec3f& a, const Vec3f& b, const Vec3f& c)
+{
+	Vec3f v1, v2;
+	Vec3f cross;
+
+	v1 = b - a;
+	v2 = c - a;
+	cross = v1.cross(v2);
+	return 0.5f * cross.length();
+}
+
+// ----------------------------------------------------------------------
+
 
 // ISerialize
 bool XWinding::SSave(core::XFile* pFile) const

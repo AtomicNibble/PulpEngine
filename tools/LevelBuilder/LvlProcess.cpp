@@ -91,7 +91,7 @@ namespace
 		X_ASSERT_NOT_NULL(pSubmesh);
 
 		int least;
-		int i, r, ni;
+		int i, r;
 		int rotate;
 		size_t numIndexes;
 		level::Vertex* pVerts;
@@ -134,7 +134,7 @@ namespace
 				rotate = (r + least) % numVerts;
 
 				// walk the winding in both directions 
-				for (ni = 0, i = 0; i < numVerts - 2 - i; i++)
+				for (i = 0; i < numVerts - 2 - i; i++)
 				{
 					// make indexes 
 					model::Face face;
@@ -197,7 +197,28 @@ namespace
 	}
 
 
-}
+	float MapTriArea(const LvlTris& tri) {
+		return XWinding::TriangleArea(tri.verts[0].pos, tri.verts[1].pos, tri.verts[2].pos);
+	}
+
+
+	XWinding* WindingForTri(const LvlTris& tri)
+	{
+		XWinding* w;
+
+		w = X_NEW(XWinding, g_arena, "WindingForTri")(3);
+		w->addPoint(tri.verts[0].pos);
+		w->addPoint(tri.verts[1].pos);
+		w->addPoint(tri.verts[2].pos);
+		return w;
+	}
+
+	void PlaneForTri(const LvlTris& tri, Planef& plane)
+	{
+		plane = Planef(tri.verts[0].pos, tri.verts[1].pos, tri.verts[2].pos);
+	}
+
+} // namespace
 
 
 
@@ -267,6 +288,10 @@ void LvlBuilder::calculateLvlBounds(void)
 
 			mapBounds.add(brush.bounds);
 		}
+
+		// Pooooooches.
+	//	LvlEntity::TrisArr::ConstIterator patchIt = it->patches.begin();
+
 	}
 }
 
@@ -341,28 +366,9 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 	size_t StartVert = pSubMesh->verts_.size();
 
 	int numPoints = pWinding->getNumPoints();
-
-#if 0
-	int p;
-	for (p = 0; p < numPoints; p++)
-	{
-		level::Vertex vert;
-		const Vec5f& vec = pWinding->operator[](p);
-
-		vert.pos = vec.asVec3();
-		vert.normal = planes[side.planenum].getNormal();
-		vert.color = Col_White;
-		vert.texcoord[0] = Vec2f(vec.s, vec.t);
-
-		pSubMesh->AddVert(vert);
-	}
-	// create some indexes
-	createIndexs(numPoints, StartVert, pSubMesh);
-
-#else
+	int i, j;
 
 	const XWinding* w = pWinding;
-	int i, j;
 
 	model::Index offset = safe_static_cast<model::Index, size_t>(StartVert);
 
@@ -406,10 +412,6 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 
 		pSubMesh->faces_.append(face);
 	}
-#endif
-
-
-	int goat = 0;
 }
 
 
@@ -510,7 +512,8 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 
 	for (i = 0; i < level::MAP_MAX_MULTI_REF_LISTS; i++)
 	{
-		multiRefLists_[i].clear();
+		multiRefEntLists_[i].clear();
+		multiModelRefLists_[i].clear();
 	}
 
 	numEnts = map_->getNumEntities();
@@ -529,7 +532,9 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 
 		level::FileStaticModel& sm = staticModels_.AddOne();
 		sm.pos = lvlEnt.origin;
-		sm.angle = Quatf(lvlEnt.angle.x, lvlEnt.angle.y, lvlEnt.angle.y);
+		sm.angle = Quatf(toRadians(lvlEnt.angle.x), 
+			toRadians(lvlEnt.angle.y), toRadians(lvlEnt.angle.z));
+
 
 		uint32_t entId = safe_static_cast<uint32_t, size_t>(staticModels_.size());
 
@@ -581,7 +586,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 				// add to area's ref list.
 				LvlArea& area = this->areas_[areaList[0]];
 
-				area.entRefs.push_back(entId);
+				area.modelsRefs.push_back(entId);
 			}
 			else
 			{
@@ -605,7 +610,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 					if (flags[x] != 0)
 					{
 						entRef.flags = flags[x];
-						multiRefLists_[x].append(entRef);
+						multiModelRefLists_[x].append(entRef);
 					}
 				}
 
@@ -652,6 +657,14 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 		}
 	}
 	
+	for (i = 0; i < ent.patches.size(); i++)
+	{
+		LvlTris& tris = ent.patches[i];
+		// for each side that's visable.
+
+		AddMapTriToAreas(ent, planes, tris);
+	}
+
 	for (i = 0; i < areas_.size(); i++){
 		areas_[i].AreaEnd();
 
@@ -664,6 +677,105 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 	return true;
 }
 
+
+void LvlBuilder::AddTriListToArea(int32_t areaIdx, int32_t planeNum, const LvlTris& tris)
+{
+	X_ASSERT_NOT_NULL(tris.pMaterial);
+
+	LvlArea& area = areas_[areaIdx];
+
+	const core::string matName = core::string(tris.pMaterial->getName());
+
+	// get areaSubMesh for this material.
+	AreaSubMesh* pSubMesh = area.MeshForMat(matName, stringTable_);
+
+	size_t StartVert = pSubMesh->verts_.size();
+
+	int numPoints = 3;
+	int i, j;
+
+	model::Index offset = safe_static_cast<model::Index, size_t>(StartVert);
+
+	for (i = 2; i < numPoints; i++)
+	{
+		for (j = 0; j < 3; j++)
+		{
+			level::Vertex vert;
+
+			if (j == 0) {
+				const xVert trisVert = tris.verts[0];
+				vert.pos = trisVert.pos;
+				vert.texcoord[0] = trisVert.uv;
+			}
+			else if (j == 1) {
+				const xVert trisVert = tris.verts[i - 1];
+				vert.pos = trisVert.pos;
+				vert.texcoord[0] = trisVert.uv;
+			}
+			else
+			{
+				const xVert trisVert = tris.verts[i];
+				vert.pos = trisVert.pos;
+				vert.texcoord[0] = trisVert.uv;
+			}
+
+			// copy normal
+			vert.normal = planes[planeNum].getNormal();
+			vert.color = Col_White;
+
+			pSubMesh->AddVert(vert);
+		}
+
+		model::Face face(0, 1, 2);
+
+		face += model::Face(offset, offset, offset);
+
+		model::Index localOffset = safe_static_cast<model::Index, size_t>((i - 2) * 3);
+
+		face += model::Face(localOffset, localOffset, localOffset);
+
+		pSubMesh->AddFace(face);
+	}
+}
+
+bool LvlBuilder::AddMapTriToAreas(LvlEntity& worldEnt, XPlaneSet& planeSet, const LvlTris& tri)
+{
+	int32_t area;
+	XWinding* w;
+
+	// skip degenerate triangles from pinched curves
+	if (MapTriArea(tri) <= 0) {
+		return false;
+	}
+
+	w = WindingForTri(tri);
+	area = worldEnt.bspTree.headnode->CheckWindingInAreas_r(planeSet, w);
+	X_DELETE(w, g_arena);
+
+	if (area == -1) {
+		return false;
+	}
+	if (area >= 0)
+	{
+		LvlTris 	newTri;
+		Planef		plane;
+		int			planeNum;
+
+		//textureVectors_t	texVec;
+
+		// put in single area
+		newTri = tri;
+
+		PlaneForTri(tri, plane);
+		planeNum = planeSet.FindPlane(plane, PLANE_NORMAL_EPSILON, PLANE_DIST_EPSILON);
+
+		//	TexVecForTri(&texVec, newTri);
+		//	AddTriListToArea(e, newTri, planeNum, area, &texVec);
+		AddTriListToArea(area, planeNum, newTri);
+	}
+
+	return true;
+}
 
 
 bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)

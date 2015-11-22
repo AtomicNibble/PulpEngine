@@ -21,9 +21,9 @@ XTextDrawList::~XTextDrawList()
 void XTextDrawList::setArena(core::MemoryArenaBase* arena)
 {
 	X_ASSERT_NOT_NULL(arena);
-
+	X_ASSERT_NOT_IMPLEMENTED();
 //	data_.setArena(arena);
-	data_.resize((sizeof(TextEntry)+200) * 512);
+//	data_.resize((sizeof(TextEntry)+200) * 512);
 }
 
 
@@ -50,6 +50,12 @@ void XTextDrawList::addEntry(const Vec3f& vPos, const XDrawTextInfo& ti, const c
 	{
 		X_ERROR("TextDrawList", "Ran out of space in data stream for entry: \"%s\"", pStr);
 	}
+}
+
+void XTextDrawList::setCapacity(size_t numBytes)
+{
+	clear();
+	data_.resize(numBytes);
 }
 
 

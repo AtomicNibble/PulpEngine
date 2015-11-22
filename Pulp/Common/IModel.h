@@ -25,7 +25,7 @@ X_NAMESPACE_BEGIN(model)
 // The Model Foramts
 //
 //  File Ext: .model
-//	Version: 6.0 (i keep adding features / improving :( )
+//	Version: 10.0 (i keep adding features / improving :( )
 //  Info:
 //  
 //  This format contains the model info.
@@ -80,11 +80,19 @@ X_NAMESPACE_BEGIN(model)
 //		Since I will not need all the info all the time.
 //
 //		Streams in the file appear in the same order as the flags.
+//
+//  Version 9:
+//			??
+//
+//	Version 10:
+//			Includes combined AABB in header.
+//	
+//
 
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
 #define X_MODEL_MTL_LOWER_CASE_NAMES 1
 
-static const uint32_t	 MODEL_VERSION = 10;
+static const uint32_t	 MODEL_VERSION = 11;
 static const uint32_t	 MODEL_MAX_BONES = 255;
 static const uint32_t	 MODEL_MAX_BONE_NAME_LENGTH = 64;
 static const uint32_t	 MODEL_MAX_MESH = 64;
@@ -95,7 +103,7 @@ static const uint32_t	 MODEL_MAX_VERT_BINDS = 4;
 static const uint32_t	 MODEL_MAX_LODS = 4;
 // legnth checks are done without extension, to make it include extension, simple reduce it by the length of ext.
 static const uint32_t	 MODEL_MAX_NAME_LENGTH = 60; 
-static const char*		 MODEL_FILE_EXTENSION = ".model";
+static const char*		 MODEL_FILE_EXTENSION = "model";
 
 // Flags:
 // LOOSE: the model file is not packed, meaning it has a string table that needs processing.
@@ -348,6 +356,7 @@ struct LODHeader : public MeshHeader
 };
 
 
+/*
 class XModel // a loaded mesh
 {
 	friend class ModelLoader;
@@ -411,7 +420,49 @@ private:
 
 	const char* pData_;
 };
+*/
 
+// I need to work out how to store models in the ModelManager
+// A model contains 1-4 lods so it can be represented by a renderMesh
+// We also keep lod info for working out which lod is visible for drawing.
+// In order for a render mesh to stay valid the XModel object must stay alive
+// and the buffer it points to.
+// SHould I just make the Xmodel ref counted?
+// OR make a interface any move XModel into the 3dengine.
+
+
+struct IModel
+{
+	virtual ~IModel() {}
+
+	virtual const int addRef(void) X_ABSTRACT;
+	virtual const int release(void) X_ABSTRACT;
+	virtual const int forceRelease(void) X_ABSTRACT;
+
+	virtual const char* getName(void) const X_ABSTRACT;
+	virtual int32_t numLods(void) const X_ABSTRACT;
+	virtual int32_t numBones(void) const X_ABSTRACT;
+	virtual int32_t numBlankBones(void) const X_ABSTRACT;
+	virtual int32_t numMeshTotal(void) const X_ABSTRACT;
+	virtual int32_t numVerts(size_t lodIdx) const X_ABSTRACT;
+	virtual bool HasLods(void) const X_ABSTRACT;
+
+	// temp.
+	virtual void Render(void) X_ABSTRACT;
+};
+
+struct IModelManager
+{
+	virtual ~IModelManager(){}
+
+	// returns null if not found, ref count unaffected
+	virtual IModel* findModel(const char* ModelName) const X_ABSTRACT;
+	// if material is found adds ref and returns, if not try's to load the material file.
+	// if file can't be loaded or error it return the default material.
+	virtual IModel* loadModel(const char* ModelName) X_ABSTRACT;
+
+	virtual IModel* getDefaultModel(void) X_ABSTRACT;
+};
 
 
 struct ModelHeader // File header.

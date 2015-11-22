@@ -59,26 +59,9 @@ struct equal_to_case_insen
 	}
 };
 
-namespace stl
-{
-	//////////////////////////////////////////////////////////////////////////
-	//! Searches the given entry in the map by key, and if there is none, returns the default value
-	//////////////////////////////////////////////////////////////////////////
-	template <typename Map>
-	inline typename Map::mapped_type find_in_map(const Map& mapKeyToValue, const typename Map::key_type& key, typename Map::mapped_type valueDefault)
-	{
-		typename Map::const_iterator it = mapKeyToValue.find(key);
-		if (it == mapKeyToValue.end())
-			return valueDefault;
-		else
-			return it->second;
-	}
-}
-
-
 struct ConsoleCommand
 {
-	ConsoleCommand() : pFunc(0) {} // flags default con is (0)
+	ConsoleCommand(); 
 
 	typedef Flags<VarFlag> FlagType;
 
@@ -91,46 +74,36 @@ struct ConsoleCommand
 
 struct ConsoleCommandArgs : public IConsoleCmdArgs
 {
-	static const int	MAX_STRING_CHARS = 1024;
-	static const int	MAX_COMMAND_ARGS = 64;
-	static const int	MAX_COMMAND_STRING = 2 * MAX_STRING_CHARS;
+	static const size_t	MAX_STRING_CHARS = 1024;
+	static const size_t	MAX_COMMAND_ARGS = 64;
+	static const size_t	MAX_COMMAND_STRING = 2 * MAX_STRING_CHARS;
 
 public:
-	explicit ConsoleCommandArgs(core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& line) {
-		TokenizeString(line.begin(), line.end()); 
-	}
-	~ConsoleCommandArgs() X_OVERRIDE{}
+	explicit ConsoleCommandArgs(core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& line);
+	~ConsoleCommandArgs() X_OVERRIDE;
 
-	virtual int GetArgCount(void) const X_OVERRIDE {
-		return argNum_;
-	}
-		virtual const char* GetArg(int Idx) const X_OVERRIDE {
-		return (argNum_ >= 0 && Idx < argNum_) ? argv_[Idx] : "";
-	}
-
+	virtual size_t GetArgCount(void) const X_OVERRIDE;
+	virtual const char* GetArg(size_t idx) const X_OVERRIDE;
 	void TokenizeString(const char* begin, const char* end);
 
 private:
-	int		argNum_;								// number of arguments
+	size_t		argNum_;								// number of arguments
 	char *	argv_[MAX_COMMAND_ARGS];				// points into tokenized
 	char	tokenized_[MAX_COMMAND_STRING];		// will have terminator bytes inserted
 };
 
 
-struct CmdHistory
-{
-	enum Enum
-	{
-		UP,
-		DOWN
-	};
-};
+
+X_DECLARE_ENUM(CmdHistory) (
+	UP,
+	DOWN
+);
 
 X_DECLARE_FLAGS(ExecSource)(
 	CONSOLE,
 	CONFIG,
 	SYSTEM
-	);
+);
 
 
 class XConsole : 
@@ -140,16 +113,10 @@ class XConsole :
 {
 public:
 	static const size_t MAX_HISTORY_ENTRIES = 64;
+	static const size_t CONSOLE_LOG_LINE_HIEGHT = 20;
+	static const char* CMD_HISTORY_FILE_NAME;
 
-	struct consoleState
-	{
-		enum Enum
-		{
-			CLOSED,
-			OPEN,
-			EXPANDED
-		};
-	};
+	typedef consoleState consoleState;
 public:
 	XConsole();
 
@@ -161,6 +128,9 @@ public:
 	virtual void freeRenderResources(void) X_FINAL;
 
 	virtual void Draw(void) X_FINAL;
+
+	virtual consoleState::Enum getVisState(void) const X_FINAL;
+
 
 	// input callbacks
 	virtual bool OnInputEvent(const input::InputEvent& event) X_FINAL;
@@ -200,41 +170,26 @@ public:
 	virtual bool OnFileChange(const char* name) X_FINAL;
 	// ~IXHotReload
 
-	void OnFrameBegin() X_FINAL;
+	void OnFrameBegin(void) X_FINAL;
 
-	X_INLINE void ShowConsole(consoleState::Enum state) {
-		consoleState_ = state;
-	}
-	X_INLINE bool isVisable(void) const {
-		return consoleState_ != consoleState::CLOSED;
-	}
-	X_INLINE bool isExpanded(void) const {
-		return consoleState_ == consoleState::EXPANDED;
-	}
-	X_INLINE void ToggleConsole(bool expand = false) {
-		if (isVisable())
-			consoleState_ = consoleState::CLOSED;
-		else {
-			if (expand)
-				consoleState_ = consoleState::EXPANDED;
-			else
-				consoleState_ = consoleState::OPEN;
-		}
-	}
+	X_INLINE void ShowConsole(consoleState::Enum state);
+	X_INLINE bool isVisable(void) const;
+	X_INLINE bool isExpanded(void) const;
+	X_INLINE void ToggleConsole(bool expand = false);
 
 protected:
-	void ExecuteStringInternal(const char *command, ExecSource::Enum source = ExecSource::CONSOLE, const bool bSilentMode = false);
+	void ExecuteStringInternal(const char* command, ExecSource::Enum source = ExecSource::CONSOLE, const bool bSilentMode = false);
 	void ExecuteCommand(ConsoleCommand &cmd, core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& str);
 
 	ICVar* GetCVarForRegistration(const char* Name);
 
-	void RegisterVar(ICVar *pCVar, ConsoleVarFunc pChangeFunc);
+	void RegisterVar(ICVar* pCVar, ConsoleVarFunc pChangeFunc);
 
 	void ListCommands(const char* searchPatten = nullptr);
 	void ListVariables(const char* searchPatten = nullptr);
 
-	void DisplayVarValue(ICVar *pVar);
-	void DisplayVarInfo(ICVar *pVar);
+	void DisplayVarValue(ICVar* pVar);
+	void DisplayVarInfo(ICVar* pVar);
 
 	void ExecuteDeferredCommands();
 
@@ -244,10 +199,11 @@ protected:
 
 	bool ProcessInput(const input::InputEvent& event);
 
-	void ExecuteInputBuffer();
+	void ExecuteInputBuffer(void);
 
+	void SaveCmdHistory(void) const;
+	void LoadCmdHistory(void);
 	void AddCmdToHistory(const char* Command);
-
 	const char* GetHistory(CmdHistory::Enum direction);
 
 	// Binds a cmd to a key
@@ -258,7 +214,7 @@ protected:
 	const char* FindBind(const char* key);
 
 	// removes all the binds.
-	void ClearAllBinds();
+	void ClearAllBinds(void);
 
 	void Listbinds(IKeyBindDumpSink* CallBack);
 
@@ -279,13 +235,14 @@ private:
 	int autoCompleteIdx_;
 	bool autoCompleteSelect_;
 
-	X_INLINE bool isAutocompleteVis(void) {
-		return autoCompleteNum_ > 0;
-	}
+	X_INLINE bool isAutocompleteVis(void);
+
+	// returns the max log lines that fit on screen.
+	size_t MaxVisibleLogLines(void) const;
 
 private:
-	void DrawBuffer();
-	void DrawScrollBar();
+	void DrawBuffer(void);
+	void DrawScrollBar(void);
 
 	void Copy(void);
 	void Paste(void);
@@ -297,13 +254,21 @@ private:
 
 	struct DeferredCommand
 	{
+		DeferredCommand(const string& command, bool silentMode);
+
 		string		command;
 		bool		silentMode;
-
-		DeferredCommand(const string& command, bool silentMode)
-			: command(command), silentMode(silentMode)
-		{}
 	};
+
+	struct Cursor
+	{
+		Cursor();
+
+		float curTime;
+		float displayTime;
+		bool draw;
+	};
+
 
 	// members.
 	typedef core::HashMap<const char*, ICVar*, core::hash<const char*>, equal_to_case_insen> ConsoleVarMap;		// key points into string stored in ICVar or in .exe/.dll
@@ -363,23 +328,24 @@ private:
 
 	texture::ITexture*		pBackground_;
 
-	struct Cursor_t
-	{
-		Cursor_t() : curTime(0.f), displayTime(0.5f), draw(false) {}
-		float curTime;
-		float displayTime;
-		bool draw;
-	}cursor_;
+	Cursor					cursor_;
 
 private:
 	static int		console_debug;
+	static int		console_save_history;
 	static Color	console_input_box_color;
 	static Color	console_input_box_color_border;
 	static Color	console_output_box_color;
 	static Color	console_output_box_color_border;
 	static Color	console_output_box_channel_color;
+	static Color	console_output_scroll_bar_color;
+	static Color	console_output_scroll_bar_slider_color;
 	static int		console_output_draw_channel;
 	static int		console_buffer_size;
+
+	// some behaviour options.
+	static int		console_disable_mouse;
+
 
 	friend void Command_Exit(IConsoleCmdArgs* Cmd);
 	friend void Command_Exec(IConsoleCmdArgs* Cmd);
@@ -400,5 +366,7 @@ private:
 };
 
 X_NAMESPACE_END
+
+#include "Console.inl"
 
 #endif // _X_CONSOLE_DEF_H_

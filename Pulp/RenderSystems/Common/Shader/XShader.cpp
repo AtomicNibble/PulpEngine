@@ -207,6 +207,7 @@ XShader* XShaderManager::s_pGui_ =nullptr;
 XShader* XShaderManager::s_pDefferedShader_ =nullptr;
 XShader* XShaderManager::s_pDefferedShaderVis_ =nullptr;
 XShader* XShaderManager::s_pWordShader_ =nullptr;
+XShader* XShaderManager::s_pModelShader_ = nullptr;
 
 
 XShaderManager::XShaderManager() : 
@@ -387,6 +388,10 @@ bool XShaderManager::OnFileChange(const char* name)
 			return true;
 		}
 
+		// ignore .fxcb.hlsl which are merged sources saved out for debuggin.
+		if (core::strUtil::FindCaseInsensitive(name, ".fxcb.hlsl")) {
+			return true;
+		}
 
 		// is it source?
 		bool isSource = true;
@@ -421,7 +426,7 @@ bool XShaderManager::OnFileChange(const char* name)
 			else
 			{
 				// log as not found.
-				X_WARNING("Shader", "\"%s\" not used, skippin reload", name);
+				X_WARNING("Shader", "\"%s\" not used, skipping reload", name);
 			}
 		}
 		else
@@ -647,6 +652,11 @@ bool XShaderManager::loadCoreShaders(void)
 	}
 	if ((s_pWordShader_ =forName("World")) == nullptr) {
 		X_ERROR("Shader", "Failed to load World shader");
+		return false;
+	}
+
+	if ((s_pModelShader_ = forName("Model")) == nullptr) {
+		X_ERROR("Shader", "Failed to load Model shader");
 		return false;
 	}
 	return true;
@@ -907,7 +917,7 @@ bool ShaderSourceFile::Technique::parse(core::XLexer& lex)
 		// parse a key / value pair
 		key.append(token.begin(), token.end());
 		if (!lex.ReadTokenOnLine(token)) {
-			X_ERROR("Shader", "unexpected EOF while reading technique, Line: %i", token.line);
+			X_ERROR("Shader", "unexpected EOF while reading technique, Line: %i", token.GetLine());
 			return false;
 		}
 		value.append(token.begin(), token.end());
@@ -1175,7 +1185,7 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 
 			if (!token.isEqual("{"))
 			{
-				X_ERROR("Shader", "expected { on line: %i", token.line);
+				X_ERROR("Shader", "expected { on line: %i", token.GetLine());
 			}
 
 			{
@@ -1195,7 +1205,7 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 			// valid?
 			if (sourceFileName.isEmpty())
 			{
-				X_ERROR("Shader", "invalid source name Line: %i", token.line);
+				X_ERROR("Shader", "invalid source name Line: %i", token.GetLine());
 				return nullptr;
 			}
 			else
@@ -1218,7 +1228,7 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 						if (token.isEqual("}"))
 							break;
 						if (!token.isEqual("{")) {
-							X_ERROR("Shader", "expected { on line: %i", token.line);
+							X_ERROR("Shader", "expected { on line: %i", token.GetLine());
 							X_DELETE(pShaderSource,g_rendererArena);
 							return nullptr;
 						}
@@ -1292,7 +1302,7 @@ bool XShaderManager::sourceToString(core::string& str, const char* name)
 		for (auto f : file->includedFiles)
 		{
 			str.append(f->fileData);
-			str.append("\n");
+			str.append("\r\n");
 		}
 
 		str.append(file->fileData);
@@ -1429,7 +1439,8 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 						// you silly hoe!
 						if (fileName.isEmpty())
 						{
-							X_WARNING("Shader", "invalid #include in: \"%s\" line: %i", file->name.c_str(), token.line);
+							X_WARNING("Shader", "invalid #include in: \"%s\" line: %i", 
+								file->name.c_str(), token.GetLine());
 							return;
 						}
 
@@ -1459,7 +1470,8 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 							}
 							else
 							{
-								X_ERROR("Shader", "Recursive file #include for: \"%s\" in shader \"%s\" line: %i", fileName.c_str(), file->name.c_str(), token.line);
+								X_ERROR("Shader", "Recursive file #include for: \"%s\" in shader \"%s\" line: %i", 
+									fileName.c_str(), file->name.c_str(), token.GetLine());
 							}
 						}
 						else

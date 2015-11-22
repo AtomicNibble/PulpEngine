@@ -247,9 +247,6 @@
       <Filter>Headers\Prepo</Filter>
     </ClInclude>
     <ClInclude Include="EngineCommon.h" />
-    <ClInclude Include="Types.h">
-      <Filter>Headers\Platform\win32</Filter>
-    </ClInclude>
     <ClInclude Include="Platform\Types.h">
       <Filter>Headers\Platform</Filter>
     </ClInclude>
@@ -1027,6 +1024,9 @@
     <ClInclude Include="Platform\win32\CustomFrame.h">
       <Filter>Headers\Platform\win32</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\win32\Types.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1286,6 +1286,9 @@
     </None>
     <None Include="Time\TimeVal.inl">
       <Filter>Headers\Time</Filter>
+    </None>
+    <None Include="String\Lexer.inl">
+      <Filter>Headers\String</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1553,6 +1556,9 @@
     </ClCompile>
     <ClCompile Include="..\..\3rdparty\source\lz4-r131\lz4_lib.c">
       <Filter>SourceFiles\Compression\lz4</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\XHalf.cpp">
+      <Filter>SourceFiles\Math</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

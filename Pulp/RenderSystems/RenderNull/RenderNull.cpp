@@ -558,7 +558,7 @@ model::IRenderMesh* RenderNull::createRenderMesh(void)
 	return nullptr;
 }
 
-model::IRenderMesh* RenderNull::createRenderMesh(model::MeshHeader* pMesh,
+model::IRenderMesh* RenderNull::createRenderMesh(const model::MeshHeader* pMesh,
 	shader::VertexFormat::Enum fmt, const char* name)
 {
 	X_UNUSED(pMesh);
@@ -572,6 +572,11 @@ void RenderNull::freeRenderMesh(model::IRenderMesh* pMesh)
 {
 	X_UNUSED(pMesh);
 
+}
+
+void RenderNull::SetModelMatrix(const Matrix44f& mat)
+{
+	X_UNUSED(mat);
 }
 
 // ~Model

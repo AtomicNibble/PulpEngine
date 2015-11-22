@@ -210,29 +210,10 @@ public:
 	const int releaseHW(void);
 
 	// binds the shader to gpu ()
-	X_INLINE bool bind()
-	{
-		if (this->type_ == ShaderType::Vertex)
-			return bindVS();
-		if (this->type_ == ShaderType::Pixel)
-			return bindPS();
-		if (this->type_ == ShaderType::Geometry)
-			return bindGS();
-		X_ASSERT_UNREACHABLE();
-		return false;
-	}
-
-
-	X_INLINE ShaderStatus::Enum getStatus(void) const {
-		return status_;
-	}
-
-	X_INLINE bool isValid(void) const {
-		return status_ == ShaderStatus::ReadyToRock;
-	}
-	X_INLINE bool FailedtoCompile(void) const {
-		return status_ == ShaderStatus::FailedToCompile;
-	}
+	X_INLINE bool bind();
+	X_INLINE ShaderStatus::Enum getStatus(void) const;
+	X_INLINE bool isValid(void) const;
+	X_INLINE bool FailedtoCompile(void) const;
 
 	static void Init(void);
 	static void shutDown(void);
@@ -258,6 +239,7 @@ private:
 	bool loadFromSource();
 	bool loadFromCache();
 	void getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest);
+	void getShaderCompileSrc(core::Path<char>& src);
 	void getShaderCompileDest(core::Path<char>& dest);
 	bool compileFromSource(core::string& source);
 
@@ -276,208 +258,37 @@ private:
 	static void setParamValues(XShaderParam* pPrams, uint32_t numPrams,
 		ShaderType::Enum shaderType, uint32_t maxVecs);
 
-	X_INLINE void setShader()
-	{
-		ID3D11DeviceContext* pDevice = render::g_Dx11D3D.DxDeviceContext();
-		if (isValid())
-		{
-			if (this->type_ == ShaderType::Vertex)
-				pDevice->VSSetShader((ID3D11VertexShader*)pHWHandle_, NULL, 0);
-			else if (this->type_ == ShaderType::Pixel)
-				pDevice->PSSetShader((ID3D11PixelShader*)pHWHandle_, NULL, 0);
-			else if(this->type_ == ShaderType::Geometry)
-				pDevice->GSSetShader((ID3D11GeometryShader*)pHWHandle_, NULL, 0);
-			else
-			{
-				// O'Deer
-				X_ASSERT_UNREACHABLE();
-			}
-		}
-	}
-
-	X_INLINE static void setConstBuffer(ShaderType::Enum type, uint slot, ID3D11Buffer* pBuf)
-	{
-		ID3D11DeviceContext* pDevice = render::g_Dx11D3D.DxDeviceContext();
-
-		switch (type)
-		{
-			case ShaderType::Vertex:
-			pDevice->VSSetConstantBuffers(slot, 1, &pBuf);
-			break;
-
-			case ShaderType::Pixel:
-			pDevice->PSSetConstantBuffers(slot, 1, &pBuf);
-			break;
-
-			case ShaderType::Geometry:
-			pDevice->GSSetConstantBuffers(slot, 1, &pBuf);
-			break;
-
-#if X_DEBUG
-			default:
-				X_ASSERT_UNREACHABLE();
-			break;
-#else
-			X_NO_SWITCH_DEFAULT;
-#endif
-		}
-	}
-
-
-
+	X_INLINE void setShader();
+	X_INLINE static void setConstBuffer(ShaderType::Enum type, uint slot, ID3D11Buffer* pBuf);
 	static _inline void unMapConstbuffer(ShaderType::Enum shaderType,
-		ConstbufType::Enum bufType)
-	{
-		ID3D11DeviceContext* pDeviceContext;
-
-		pDeviceContext = render::g_Dx11D3D.DxDeviceContext();
-
-		// mapped?
-		// if no values in the const buffer where set.
-		// this will be null.
-		// preventing a pointles update.
-		if (!pConstBuffData_[shaderType][bufType])
-			return;
-
-		// unmapp it.
-		pDeviceContext->Unmap(pCurRequestCB_[shaderType][bufType], 0);
-
-		// clear data pointer, to flag remapping.
-		pConstBuffData_[shaderType][bufType] = nullptr;
-
-		// Update device!
-		setConstBuffer(shaderType, 0, pCurRequestCB_[shaderType][bufType]);
-	}
-
+		ConstbufType::Enum bufType);
 
 	X_INLINE static bool mapConstBuffer(ShaderType::Enum shaderType,
-		ConstbufType::Enum bufType, int maxVectors)
-	{
-		D3D11_MAPPED_SUBRESOURCE mappedResource;
-		ID3D11DeviceContext* pDeviceContext;
-		pDeviceContext = render::g_Dx11D3D.DxDeviceContext();
+		ConstbufType::Enum bufType, int maxVectors);
 
-		if (pConstBuffData_[shaderType][bufType])
-		{
-			// mapping a buffer that's still mapped O.o?
-			// send it to the gpu.
-			unMapConstbuffer(shaderType, bufType);
-		}
-
-		if (!pConstBuffers_[shaderType][bufType])
-		{
-			X_ERROR("Shader", "Buffer pointers have not yet been init");
-			return false;
-		}
-
-		// if buffer not created, make it :D !
-		if (!createConstBuffer(shaderType, bufType, maxVectors)) 
-		{
-			X_ERROR("Shader", "failed to create device buffer");
-			return false;
-		}
-
-
-		pCurRequestCB_[shaderType][bufType] = pConstBuffers_[shaderType][bufType][maxVectors];
-
-		pDeviceContext->Map(
-			pCurRequestCB_[shaderType][bufType],
-			0, 
-			D3D11_MAP_WRITE_DISCARD, 
-			0, 
-			&mappedResource
-			);
-
-		pConstBuffData_[shaderType][bufType] = (Vec4f*)mappedResource.pData;
-
-		return true;
-	}
-
-	X_INLINE static bool createConstBuffer(ShaderType::Enum shaderType, 
-			ConstbufType::Enum bufType, int maxVectors)
-	{
-		ID3D11Device* pDevice;
-		D3D11_BUFFER_DESC bd;
-		HRESULT hr = S_OK;
-
-		if (maxVectors == 0)
-			return false;
-
-		// buffer already created?
-		if (pConstBuffData_[shaderType][bufType])
-			return true;
-
-		core::zero_object(bd);
-		pDevice = render::g_Dx11D3D.DxDevice();
-
-		// set size.
-		curMaxVecs_[shaderType][bufType] = maxVectors;
-
-		if (!pConstBuffers_[shaderType][bufType][maxVectors] && maxVectors)
-		{
-			bd.Usage = D3D11_USAGE_DYNAMIC;
-			bd.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-			bd.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-			bd.MiscFlags = 0;
-			bd.ByteWidth = maxVectors * sizeof(Vec4f);
-			hr = pDevice->CreateBuffer(&bd, NULL, 
-				&pConstBuffers_[shaderType][bufType][maxVectors]);
-		}
-
-		return SUCCEEDED(hr);
-	}
-
+	X_INLINE static bool createConstBuffer(ShaderType::Enum shaderType,
+		ConstbufType::Enum bufType, int maxVectors);
 
 	X_INLINE static void setConstBuffer(int nReg, int nCBufSlot, ShaderType::Enum shaderType,
-		const Vec4f* pData, const int nVecs, int nMaxVecs)
-	{
-
-		if (!pConstBuffData_[shaderType][nCBufSlot])
-			mapConstBuffer(shaderType, (ConstbufType::Enum)nCBufSlot, nMaxVecs);
-
-		memcpy(&pConstBuffData_[shaderType][nCBufSlot][nReg], pData, nVecs << 4);
-	}
+		const Vec4f* pData, const int nVecs, int nMaxVecs);
 
 public:
 
 	X_INLINE static void setParameterRegA(int nReg, int nCBufSlot, ShaderType::Enum shaderType,
-		const Vec4f* pData, int nComps, int nMaxVecs)
-	{
-		setConstBuffer(nReg, nCBufSlot, shaderType, pData, nComps, nMaxVecs);
-	}
+		const Vec4f* pData, int nComps, int nMaxVecs);
 
 	X_INLINE static void setParameteri(XShaderParam* pParam, const Vec4f* pData,
-		ShaderType::Enum shaderType, uint32_t maxVecs)
-	{
-		if (!pParam || pParam->bind < 0)
-			return;
-
-		int nReg = pParam->bind;
-		setParameterRegA(nReg, pParam->constBufferSlot, shaderType, pData, pParam->numParameters, maxVecs);
-	}
+		ShaderType::Enum shaderType, uint32_t maxVecs);
 
 	X_INLINE static void setParameterf(XShaderParam* pParam, const Vec4f* pData,
-		ShaderType::Enum shaderType, uint32_t maxVecs)
-	{
-		if (!pParam || pParam->bind < 0)
-			return;
-
-		int nReg = pParam->bind;
-		setParameterRegA(nReg, pParam->constBufferSlot, shaderType, pData, pParam->numParameters, maxVecs);
-	}
+		ShaderType::Enum shaderType, uint32_t maxVecs);
 
 
 public:
 	XShaderParam* getParameter(const core::StrHash& NameParam);
 
-	int getMaxVecs(XShaderParam* pParam) const {
-		return maxVecs_[pParam->constBufferSlot];
-	}
-
-	ID3DBlob* getshaderBlob(void) const {
-		X_ASSERT_NOT_NULL(pBlob_);
-		return pBlob_;
-	}
+	X_INLINE int getMaxVecs(XShaderParam* pParam) const;
+	X_INLINE ID3DBlob* getshaderBlob(void) const;
 
 private:
 	ShaderStatus::Enum status_;
@@ -491,28 +302,16 @@ private:
 	uint32_t D3DCompileflags_;
 
 protected:
-	void setMaxVecs(int maxVecs[3]) {
-		memcpy(maxVecs_, maxVecs, sizeof(maxVecs_));
-	}
+	X_INLINE void setMaxVecs(int maxVecs[3]);
 
-	const core::Array<XShaderParam>& getBindVars(void) const {
-		return bindVars_;
-	}
-	void setBindVars(core::Array<XShaderParam>& vars) {
-		bindVars_ = vars;
-	}
+	X_INLINE const core::Array<XShaderParam>& getBindVars(void) const;
+	X_INLINE void setBindVars(core::Array<XShaderParam>& vars);
 
-	uint32_t getD3DCompileFlags(void) const {
-		return D3DCompileflags_;
-	}
+	X_INLINE uint32_t getD3DCompileFlags(void) const;
 
-	void setBlob(ID3DBlob* pBlob) {
-		pBlob_ = pBlob;
-	}
+	X_INLINE void setBlob(ID3DBlob* pBlob);
 
-	void setStatus(ShaderStatus::Enum status) {
-		status_ = status;
-	}
+	X_INLINE void setStatus(ShaderStatus::Enum status);
 
 private:
 	static void InitBufferPointers();
@@ -522,6 +321,7 @@ private:
 
 	static void CreateInputLayoutTree(void);
 	static void FreeInputLayoutTree(void);
+	static void RegisterDvars(void);
 
 	static ILTreeNode ILTree_;
 	static XShaderBin bin_;
@@ -543,9 +343,13 @@ private:
 	static core::Array<XShaderParam> perFrameParams_[ShaderType::ENUM_COUNT];
 	static core::Array<XShaderParam> perInstantParams_[ShaderType::ENUM_COUNT];
 
+	// vars
+	static int writeMergedSource_;
 };
 
 
 X_NAMESPACE_END;
+
+#include "Dx10Shader.inl"
 
 #endif // X_DX10_SHADER_H_

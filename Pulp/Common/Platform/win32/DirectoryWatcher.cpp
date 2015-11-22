@@ -168,11 +168,11 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 
 			if (!path.isEmpty())
 			{
-
 				bool is_directory = false;
 
-				if (pInfo->Action != FILE_ACTION_REMOVED)
+				if (pInfo->Action != FILE_ACTION_REMOVED) {
 					is_directory = gEnv->pFileSys->isDirectory(path.c_str());
+				}
 
 				if (is_directory)
 				{

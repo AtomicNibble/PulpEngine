@@ -84,6 +84,8 @@ public:
 	void AddToConvexHull(const XWinding *winding, const Vec3f& normal, const float epsilon = EPSILON);
 	void AddToConvexHull(const Vec3f& point, const Vec3f& normal, const float epsilon = EPSILON);
 
+	static float TriangleArea(const Vec3f& a, const Vec3f& b, const Vec3f& c);
+
 	// ISerialize
 	virtual bool SSave(core::XFile* pFile) const X_FINAL;
 	virtual bool SLoad(core::XFile* pFile) X_FINAL;

@@ -24,6 +24,9 @@ public:
 	// writes the type to the stream.
 	template<typename T>
 	inline void write(const T& val);
+	// writes the type * num to the stream.
+	template<typename T>
+	inline void write(const T* val, size_t num);
 	// removes and returns the top object off the stream.
 	template<typename T>
 	inline T read(void);

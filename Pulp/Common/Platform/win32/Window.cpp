@@ -191,6 +191,16 @@ void xWindow::CustomFrame(bool val)
 	}
 }
 
+void xWindow::ClipCursorToWindow(void)
+{
+	RECT r;
+	::GetClientRect(window_, &r);
+	ClientToScreen(window_, reinterpret_cast<LPPOINT>(&r.left));
+	ClientToScreen(window_, reinterpret_cast<LPPOINT>(&r.right));
+	ClipCursor(&r);
+}
+
+
 void xWindow::MoveTo(int x, int y)
 {
 	RECT rect;

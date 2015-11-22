@@ -24,6 +24,11 @@ X_NAMESPACE_DECLARE(gui,
 class XGuiManager;
 )
 
+X_NAMESPACE_DECLARE(model,
+class XModelManager;
+struct IModelManager;
+)
+
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -38,6 +43,7 @@ struct XEngineBase
 
 	// 3d
 	static engine::XMaterialManager* pMaterialManager_;
+	static model::XModelManager* pModelManager_;
 
 	// gui
 	static gui::XGuiManager* pGuiManger_;
@@ -51,6 +57,10 @@ struct XEngineBase
 
 	X_INLINE static IMaterialManager* getMaterialManager(void) { 
 		return reinterpret_cast<IMaterialManager*>(pMaterialManager_); 
+	}
+
+	X_INLINE static model::IModelManager* getModelManager(void) {
+		return reinterpret_cast<model::IModelManager*>(pModelManager_);
 	}
 
 	X_INLINE static gui::XGuiManager* getGuiManager(void) {

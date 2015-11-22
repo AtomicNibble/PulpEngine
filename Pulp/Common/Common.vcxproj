@@ -230,6 +230,7 @@
     <ClInclude Include="Platform\win32\Console.h" />
     <ClInclude Include="Platform\win32\CustomFrame.h" />
     <ClInclude Include="Platform\win32\DirectoryWatcher.h" />
+    <ClInclude Include="Platform\win32\Types.h" />
     <ClInclude Include="Platform\win32\Window.h" />
     <ClInclude Include="Platform\Window.h" />
     <ClInclude Include="Prepro\PreproCommaIf.h" />
@@ -293,7 +294,6 @@
     <ClInclude Include="Traits\MemberFunctionTraits.h" />
     <ClInclude Include="Traits\SignedTypes.h" />
     <ClInclude Include="Traits\UnsignedTypes.h" />
-    <ClInclude Include="Types.h" />
     <ClInclude Include="Util\BitUtil.h" />
     <ClInclude Include="Util\ClassMacros.h" />
     <ClInclude Include="Util\Cpu.h" />
@@ -381,6 +381,7 @@
     <None Include="Random\MultiplyWithCarry.inl" />
     <None Include="Random\XorShift.inl" />
     <None Include="String\GrowingStringTable.inl" />
+    <None Include="String\Lexer.inl" />
     <None Include="String\StackString.inl" />
     <None Include="String\Path.inl" />
     <None Include="String\StackStringW.inl" />
@@ -591,6 +592,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Logging\WritePolicies\LoggerInternalConsoleWritePolicy.cpp" />
+    <ClCompile Include="Math\XHalf.cpp" />
     <ClCompile Include="Math\XSphere.cpp" />
     <ClCompile Include="Math\XWinding.cpp" />
     <ClCompile Include="Math\XFrustum.cpp" />

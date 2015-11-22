@@ -8,8 +8,6 @@
 #include "../Common/Shader/XShader.h"
 #include "Dx10Shader.h"
 
-#include "../3DEngine/ModelLoader.h"
-
 #include "Dx10RenderAux.h"
 
 X_NAMESPACE_BEGIN(render)
@@ -935,12 +933,12 @@ void DX11XRender::FX_PipelineShutdown()
 
 void DX11XRender::FX_Init(void)
 {
-	InitVertexLayoutDescriptions();
+	InitILDescriptions();
 
 }
 
 
-void DX11XRender::InitVertexLayoutDescriptions(void)
+void DX11XRender::InitILDescriptions(void)
 {
 	using namespace shader;
 
@@ -967,7 +965,7 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 
 	for (i = 0; i < max; i++)
 	{
-		RenderState::XVertexLayout& layout = State_.vertexLayoutDescriptions[i];
+		RenderState::XVertexLayout& layout = State_.ILDescriptions[i];
 
 		// for now all positions are just 32bit floats baby!
 		elem_pos.AlignedByteOffset = 0;
@@ -1047,12 +1045,10 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 			elem_uv3232.SemanticIndex = 0;
 
 			// byte offset is zero since diffrent stream.
-			elem_col8888.AlignedByteOffset = 0;
-			elem_col8888.InputSlot = 1;
+			elem_col8888.AlignedByteOffset = 28;
 			layout.append(elem_col8888);
 
-			elem_nor323232.AlignedByteOffset = 0;
-			elem_col8888.InputSlot = 2;
+			elem_nor323232.AlignedByteOffset = 32;
 			layout.append(elem_nor323232); 
 		}
 	
@@ -1079,6 +1075,120 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 		{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, VertexStream::TANGENT_BI, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
 	};
 
+
+	for (i = 0; i < max; i++)
+	{
+		RenderState::XVertexLayout& layout = State_.streamedILDescriptions[i];
+
+		// Streams
+		// Vert + uv
+		// Color
+		// Normal
+		// Tan + Bi
+
+		elem_pos.AlignedByteOffset = 0;
+		elem_pos.SemanticIndex = 0;
+		elem_uv3232.SemanticIndex = 0;
+		layout.append(elem_pos);
+
+		// uv
+		if (i == VertexFormat::P3F_T2S || i == VertexFormat::P3F_T2S_C4B ||
+			i == VertexFormat::P3F_T2S_C4B_N3F || i == VertexFormat::P3F_T2S_C4B_N3F_TB3F ||
+			i == VertexFormat::P3F_T2S_C4B_N10 || i == VertexFormat::P3F_T2S_C4B_N10_TB10)
+		{
+			elem_uv1616.AlignedByteOffset = 12;
+			layout.append(elem_uv1616);
+		}
+
+		// col
+		if (i == VertexFormat::P3F_T2S_C4B ||
+			i == VertexFormat::P3F_T2S_C4B_N3F || i == VertexFormat::P3F_T2S_C4B_N3F_TB3F ||
+			i == VertexFormat::P3F_T2S_C4B_N10 || i == VertexFormat::P3F_T2S_C4B_N10_TB10)
+		{
+			// seperate stream
+			elem_col8888.AlignedByteOffset = 0;
+			elem_col8888.InputSlot = 1;
+			layout.append(elem_col8888);
+		}
+
+		// nor
+		if (i == VertexFormat::P3F_T2S_C4B_N3F || i == VertexFormat::P3F_T2S_C4B_N3F_TB3F)
+		{
+			elem_nor323232.AlignedByteOffset = 0;
+			elem_nor323232.InputSlot = 2;
+			layout.append(elem_nor323232); // 12 bytes
+		}
+		//  tan + bi
+		if (i == VertexFormat::P3F_T2S_C4B_N3F_TB3F)
+		{
+			elem_tagent323232.InputSlot = 3;
+			elem_tagent323232.AlignedByteOffset = 0;
+			layout.append(elem_tagent323232); // 12 bytes
+
+			elem_biNormal323232.InputSlot = 3;
+			elem_biNormal323232.AlignedByteOffset = 12;
+			layout.append(elem_biNormal323232); // 12 bytes
+		}
+
+		// 32 bit floats
+		if (i == VertexFormat::P3F_T2F_C4B)
+		{
+			elem_uv3232.AlignedByteOffset = 12;
+			layout.append(elem_uv3232);
+
+			elem_col8888.InputSlot = 1;
+			elem_col8888.AlignedByteOffset = 0;
+			layout.append(elem_col8888);
+		}
+		else if (i == VertexFormat::P3F_T3F)
+		{
+			elem_t3f.AlignedByteOffset = 12;
+			layout.append(elem_t3f);
+		}
+
+
+		if (i == VertexFormat::P3F_T2S_C4B_N10 || i == VertexFormat::P3F_T2S_C4B_N10_TB10)
+		{
+			// 12 + 4 + 4
+			elem_nor101010.InputSlot = 2;
+			elem_nor101010.AlignedByteOffset = 0;
+			layout.append(elem_nor101010);
+		}
+		if (i == VertexFormat::P3F_T2S_C4B_N10_TB10)
+		{
+			elem_tagent101010.InputSlot = 3;
+			elem_tagent101010.AlignedByteOffset = 0;
+			layout.append(elem_tagent101010);
+
+			elem_biNormal101010.InputSlot = 3;
+			elem_biNormal101010.AlignedByteOffset = 4;
+			layout.append(elem_biNormal101010);
+		}
+
+		if (i == VertexFormat::P3F_T4F_C4B_N3F)
+		{
+			// big man texcoords
+			elem_uv3232.AlignedByteOffset = 12;
+			layout.append(elem_uv3232);
+
+			// two of them
+			elem_uv3232.AlignedByteOffset = 20;
+			elem_uv3232.SemanticIndex = 1;
+			layout.append(elem_uv3232);
+			elem_uv3232.SemanticIndex = 0;
+
+			// byte offset is zero since diffrent stream.
+			elem_col8888.AlignedByteOffset = 0;
+			elem_col8888.InputSlot = 1;
+			layout.append(elem_col8888);
+
+			elem_nor323232.AlignedByteOffset = 0;
+			elem_nor323232.InputSlot = 2;
+			layout.append(elem_nor323232);
+		}
+	}
+
+
 	// Skinning!
 	// I support 4 bones per vert.
 	// so 4 weights and 4 indexs.
@@ -1093,125 +1203,151 @@ void DX11XRender::InitVertexLayoutDescriptions(void)
 #endif
 
 
-
-
-
 }
 
 
-HRESULT DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFmt)
+ID3D11InputLayout* DX11XRender::CreateILFromDesc(const shader::VertexFormat::Enum vertexFmt,
+	const RenderState::XVertexLayout& layout)
 {
-	ID3D11InputLayout* pLayout = nullptr;
+	ID3D11InputLayout* pInputLayout = nullptr;
 	ID3DBlob* pBlob = nullptr;
 	HRESULT hr;
 
-	if (State_.vertexLayoutCache[vertexFmt] == nullptr)
+	if (layout.isEmpty())
 	{
-		RenderState::XVertexLayout& layout = State_.vertexLayoutDescriptions[vertexFmt];
-
-		if (layout.isEmpty())
-		{
-			X_ERROR("Render", "Failed to set input 'layout description' is empty. fmt: %i", vertexFmt);
-			return (HRESULT)-1;
-		}
-
-		// need the current shaders byte code / length.
-		// lets not require a Hardware shader bet set.
-		// only a current tech.
-#if 1
-		if (!State_.pCurShader || !State_.pCurShaderTech) {
-			X_ERROR("Render", "Failed to set input layout no shader currently set.");
-			return (HRESULT)-1;
-		}
-
-		// get the required ILfmt for the vertex fmt.
-		shader::InputLayoutFormat::Enum requiredIlFmt = shader::ILfromVertexFormat(vertexFmt);
-		// get the tech
-		shader::XShaderTechnique* pTech = State_.pCurShaderTech;
-		// find one that fits.
-		for (auto& it : pTech->hwTechs)
-		{
-			if(it.IlFmt == requiredIlFmt) 
-			{
-				shader::XHWShader_Dx10* pVs;
-				if (!it.pVertexShader) {
-					X_ERROR("Render", "Failed to set input layout, tech VS is null");
-					return (HRESULT)-1;
-				}
-
-				pVs = reinterpret_cast<shader::XHWShader_Dx10*>(it.pVertexShader);
-
-				// make sure it's compiled.
-				if (!pVs->activate()) {
-					X_ERROR("Render", "Failed to set input layout, VS failed to compile");
-					return (HRESULT)-1;
-				}
-
-				pBlob = pVs->getshaderBlob();
-				break;
-			}
-		}
-
-		if(!pBlob)
-		{
-			X_ERROR("Render", "Failed to set input layout shader does not support input layout: %s",
-				shader::InputLayoutFormat::ToString(requiredIlFmt));
-			return (HRESULT)-1;
-		}
-
-#else
-		if (!shader::XHWShader_Dx10::pCurVS_)
-		{
-			X_ERROR("Render", "Failed to set input layout no shader currently set.");
-			return (HRESULT)-1;
-		}
-
-		ID3DBlob* pBlob = shader::XHWShader_Dx10::pCurVS_->getshaderBlob();
-#endif
-
-		if (FAILED(hr = device_->CreateInputLayout(
-				layout.ptr(),
-				(uint)layout.size(),
-				pBlob->GetBufferPointer(),
-				pBlob->GetBufferSize(),
-				&State_.vertexLayoutCache[vertexFmt]))
-			)
-		{
-			const char* pShaderName = shader::XHWShader_Dx10::pCurVS_->getName();
-			X_ERROR("Render", "Failed to CreateInputLayout: %i", hr);
-			X_ERROR("Render", "CurrentShader: %s", pShaderName);
-			X_ERROR("Render", "Layout:");
-			X_LOG_BULLET;
-			RenderState::XVertexLayout::const_iterator it;
-			for ( it = layout.begin(); it != layout.end(); ++it)
-			{
-				X_LOG0("Layout", "\"%s(%i)\" ByteOffset: %i Slot: %i", 
-					it->SemanticName, it->SemanticIndex,
-					it->AlignedByteOffset, it->InputSlot );
-			}
-
-			// sleep in debug mode
-#if X_DEBUG
-			GoatSleep(500);
-#endif // !X_DEBUG
-			return hr;
-		}
-
-		// debug name
-		D3DDebug::SetDebugObjectName(State_.vertexLayoutCache[vertexFmt],
-			shader::VertexFormat::toString(vertexFmt));
+		X_ERROR("Render", "Failed to set input 'layout description' is empty. fmt: %i", vertexFmt);
+		return nullptr;
 	}
 
-	pLayout = State_.vertexLayoutCache[vertexFmt];
+	// need the current shaders byte code / length.
+	// lets not require a Hardware shader bet set.
+	// only a current tech.
+#if 1
+	if (!State_.pCurShader || !State_.pCurShaderTech) {
+		X_ERROR("Render", "Failed to set input layout no shader currently set.");
+		return nullptr;
+	}
+
+	// get the required ILfmt for the vertex fmt.
+	shader::InputLayoutFormat::Enum requiredIlFmt = shader::ILfromVertexFormat(vertexFmt);
+	// get the tech
+	shader::XShaderTechnique* pTech = State_.pCurShaderTech;
+	// find one that fits.
+	for (auto& it : pTech->hwTechs)
+	{
+		if (it.IlFmt == requiredIlFmt)
+		{
+			shader::XHWShader_Dx10* pVs;
+			if (!it.pVertexShader) {
+				X_ERROR("Render", "Failed to set input layout, tech VS is null");
+				return nullptr;
+			}
+
+			pVs = reinterpret_cast<shader::XHWShader_Dx10*>(it.pVertexShader);
+
+			// make sure it's compiled.
+			if (!pVs->activate()) {
+				X_ERROR("Render", "Failed to set input layout, VS failed to compile");
+				return nullptr;
+			}
+
+			pBlob = pVs->getshaderBlob();
+			break;
+		}
+	}
+
+	if (!pBlob)
+	{
+		X_ERROR("Render", "Failed to set input layout shader does not support input layout: %s",
+			shader::InputLayoutFormat::ToString(requiredIlFmt));
+		return nullptr;
+	}
+
+#else
+	if (!shader::XHWShader_Dx10::pCurVS_)
+	{
+		X_ERROR("Render", "Failed to set input layout no shader currently set.");
+		return (HRESULT)-1;
+	}
+
+	ID3DBlob* pBlob = shader::XHWShader_Dx10::pCurVS_->getshaderBlob();
+#endif
+
+	if (FAILED(hr = device_->CreateInputLayout(
+		layout.ptr(),
+		(uint)layout.size(),
+		pBlob->GetBufferPointer(),
+		pBlob->GetBufferSize(),
+		&pInputLayout))
+		)
+	{
+		const char* pShaderName = shader::XHWShader_Dx10::pCurVS_->getName();
+		X_ERROR("Render", "Failed to CreateInputLayout: %i", hr);
+		X_ERROR("Render", "CurrentShader: %s", pShaderName);
+		X_ERROR("Render", "Layout:");
+		X_LOG_BULLET;
+		RenderState::XVertexLayout::const_iterator it;
+		for (it = layout.begin(); it != layout.end(); ++it)
+		{
+			X_LOG0("Layout", "\"%s(%i)\" ByteOffset: %i Slot: %i",
+				it->SemanticName, it->SemanticIndex,
+				it->AlignedByteOffset, it->InputSlot);
+		}
+
+		// sleep in debug mode
+#if X_DEBUG
+		GoatSleep(500);
+#endif // !X_DEBUG
+		return nullptr;
+	}
+
+	// debug name
+	D3DDebug::SetDebugObjectName(pInputLayout,
+		shader::VertexFormat::toString(vertexFmt));
+
+	return pInputLayout;
+}
+
+bool DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFmt, bool streamed)
+{
+	ID3D11InputLayout* pLayout = nullptr;
+
+	if (streamed)
+	{
+		if (State_.streamedILCache[vertexFmt] == nullptr)
+		{
+			RenderState::XVertexLayout& layout = State_.streamedILDescriptions[vertexFmt];
+			pLayout = CreateILFromDesc(vertexFmt, layout);
+			State_.streamedILCache[vertexFmt] = pLayout;
+		}
+		else
+		{
+			pLayout = State_.streamedILCache[vertexFmt];
+		}
+	}
+	else
+	{
+		if (State_.ILCache[vertexFmt] == nullptr)
+		{
+			RenderState::XVertexLayout& layout = State_.ILDescriptions[vertexFmt];
+			pLayout = CreateILFromDesc(vertexFmt, layout);
+			State_.ILCache[vertexFmt] = pLayout;
+		}
+		else
+		{
+			pLayout = State_.ILCache[vertexFmt];
+		}
+	}
 
 	if (State_.pCurrentVertexFmt != pLayout)
 	{
 		State_.pCurrentVertexFmt = pLayout;
 		State_.CurrentVertexFmt = vertexFmt;
+		State_.streamedIL = streamed;
 		deviceContext_->IASetInputLayout(pLayout);
 	}
 
-	return S_OK;
+	return true;
 }
 
 void DX11XRender::FX_SetVStream(ID3D11Buffer* pVertexBuffer, VertexStream::Enum streamSlot,

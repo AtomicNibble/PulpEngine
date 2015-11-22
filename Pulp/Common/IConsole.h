@@ -36,6 +36,12 @@ TOOL,			// tool related
 CPY_NAME		// makes a copy of the name
 );
 
+X_DECLARE_ENUM(consoleState)(
+	CLOSED,
+	OPEN,
+	EXPANDED
+);
+
 
 struct ICVar;
 
@@ -44,9 +50,9 @@ struct IConsoleCmdArgs
 {
 	virtual ~IConsoleCmdArgs(){}
 	// Gets number of arguments supplied to the command (including the command itself)
-	virtual int GetArgCount() const X_ABSTRACT;
-	// Gets argument by index, nIndex must be in 0 <= nIndex < GetArgCount()
-	virtual const char* GetArg(int nIndex) const X_ABSTRACT;
+	virtual size_t GetArgCount() const X_ABSTRACT;
+	// Gets argument by index, idx must be in 0 <= idx < GetArgCount()
+	virtual const char* GetArg(size_t idx) const X_ABSTRACT;
 };
 
 struct IKeyBindDumpSink
@@ -71,6 +77,8 @@ struct IConsole
 	virtual void freeRenderResources() X_ABSTRACT;
 
 	virtual void Draw() X_ABSTRACT;
+
+	virtual consoleState::Enum getVisState(void) const X_ABSTRACT;
 
 	// Register variables.
 	virtual ICVar* RegisterString(const char* Name, const char* Value, int flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;

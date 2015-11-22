@@ -51,11 +51,6 @@ private:
 	gui::XGuiManager guisMan_;
 
 	level::Level level_;
-
-
-	model::XModel model, modelSky;
-	model::IRenderMesh* pMesh;
-	model::IRenderMesh* pSkybox;
 };
 
 

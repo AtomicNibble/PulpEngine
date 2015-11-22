@@ -302,29 +302,63 @@ bool Level::ProcessData(uint32_t bytesRead)
 		X_WARNING("Level", "Level has no inter area portals.");
 	}
 
-
-	if (fileHdr_.flags.IsSet(LevelFileFlags::AREA_REF_LISTS))
+	
+	if (fileHdr_.flags.IsSet(LevelFileFlags::AREA_ENT_REF_LISTS))
 	{
-		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_REFS);
+		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_ENT_REFS);
 
-		areaEntRefHdrs_.resize(fileHdr_.numAreas);
+		AreaRefInfo& entRefs = entRefs_;
+		entRefs.areaRefHdrs.resize(fileHdr_.numAreas);
 
-		file.readObj(areaEntRefHdrs_.ptr(), areaEntRefHdrs_.size());
+		file.readObj(entRefs.areaRefHdrs.ptr(), entRefs.areaRefHdrs.size());
 
 		size_t numEntRefs = fileHdr_.numEntRefs;
 		size_t numMultiAreaEntRefs = fileHdr_.numMultiAreaEntRefs;
 
+
 		// load into single buffer.
-		areaEntRefs_.resize(numEntRefs);
-		file.readObj(areaEntRefs_.ptr(), areaEntRefs_.size());
+		entRefs.areaRefs.resize(numEntRefs);
+		file.readObj(entRefs.areaRefs.ptr(), entRefs.areaRefs.size());
 
 		// load multi area ref list headers.
-		file.readObj(areaEntMultiRefHdrs_.data(), areaEntMultiRefHdrs_.size());
-
+		file.readObj(entRefs.areaMultiRefHdrs.data(), entRefs.areaMultiRefHdrs.size());
 
 		// load the multi area ref lists data.
-		areaMultiEntRefs_.resize(numMultiAreaEntRefs);
-		file.readObj(areaMultiEntRefs_.ptr(), areaMultiEntRefs_.size());
+		entRefs.areaMultiRefs.resize(numMultiAreaEntRefs);
+		file.readObj(entRefs.areaMultiRefs.ptr(), entRefs.areaMultiRefs.size());
+	}
+
+	if (fileHdr_.flags.IsSet(LevelFileFlags::AREA_MODEL_REF_LISTS))
+	{
+		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_MODEL_REFS);
+
+		AreaRefInfo& modelRefs = modelRefs_;
+		modelRefs.areaRefHdrs.resize(fileHdr_.numAreas);
+
+		file.readObj(modelRefs.areaRefHdrs.ptr(), modelRefs.areaRefHdrs.size());
+
+		size_t numModelRefs = fileHdr_.numModelRefs;
+		size_t numMultiAreaModelRefs = fileHdr_.numMultiAreaModelRefs;
+
+
+		// load into single buffer.
+		modelRefs.areaRefs.resize(numModelRefs);
+		file.readObj(modelRefs.areaRefs.ptr(), modelRefs.areaRefs.size());
+
+		// load multi area ref list headers.
+		file.readObj(modelRefs.areaMultiRefHdrs.data(), modelRefs.areaMultiRefHdrs.size());
+
+		// load the multi area ref lists data.
+		modelRefs.areaMultiRefs.resize(numMultiAreaModelRefs);
+		file.readObj(modelRefs.areaMultiRefs.ptr(), modelRefs.areaMultiRefs.size());
+
+#if 0
+		for (size_t b = 0; b < fileHdr_.numAreas; b++)
+		{
+			const FileAreaRefHdr& areaModelsHdr = modelRefs.areaRefHdrs[b];
+			X_LOG0("modelRefs", "%i start: %i num: %i", b, areaModelsHdr.startIndex, areaModelsHdr.num);
+		}
+#endif
 	}
 
 	{
@@ -347,6 +381,14 @@ bool Level::ProcessData(uint32_t bytesRead)
 				sm.angle = fsm.angle;
 				sm.modelNameIdx = fsm.modelNameIdx;
 				// models need to be loaded at some point.
+
+				const char* modelName = stringTable_.getString(sm.modelNameIdx);
+				model::IModel* pModel = getModelManager()->loadModel(modelName);
+				
+		//		X_LOG0("SM", "%i name: %s pos: (%g,%g,%g,)", i,  modelName,
+		//			sm.pos[0], sm.pos[1], sm.pos[2]);
+
+				sm.pModel = pModel;
 			}
 		}
 	}

@@ -66,7 +66,7 @@ PS_OUTPUT SolidPS(PS_INPUT input)
 	 
 //	bump = normalize(bump);
 	 
-	output.color = textureCol * saturate(dot(bump, float4(0.7,0.9,0.1,1)));
+	output.color = input.color * (textureCol * saturate(dot(bump, float4(0.7,0.9,0.1,1))));
 // 	output.color = textureCol;
 	return output;
 }

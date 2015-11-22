@@ -49,7 +49,7 @@ struct XRegFactoryNode* g_pHeadToRegFactories = 0;
 
 // X_LINK_LIB("engine_Font")
 X_LINK_LIB("engine_Core")
-// X_LINK_LIB("engine_3DEngine")
+X_LINK_LIB("engine_3DEngine")
 X_LINK_LIB("engine_RenderNull")
 // X_LINK_LIB("engine_Script")
 
@@ -142,7 +142,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	g_bspFaceAllocator = nullptr;
 	g_bspNodeAllocator = nullptr;
 
-//	system("PAUSE");
 	return 0;
 }
 
@@ -200,6 +199,10 @@ void CompileLevel(core::Path<char>& path)
 
 			end = gEnv->pTimer->GetAsyncTime();
 			X_LOG0("Info", "Total Time: ^6%.4fms", (end - start).GetMilliSeconds());
+		}
+		else
+		{
+			X_ERROR("Map", "Failed to parse map file");
 		}
 
 		gEnv->pFileSys->closeFileMem(pFile);

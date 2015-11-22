@@ -15,16 +15,13 @@ X_ALIGNED_SYMBOL(class Crc32, 128)
 public:
 	Crc32();
 
-	void InitTable(void) {
-		if (!tableInit_) {
-			buildTable();
-		}
-	}
-
 	uint32_t Combine(const uint32_t lhs, const uint32_t rhs, const uint32_t rhs_length) const;
 
 	uint32_t GetCRC32(const char* text) const;
 	uint32_t GetCRC32(const char* data, size_t size) const;
+
+	template<typename T>
+	X_INLINE uint32_t GetCRC32OfObject(const T& obj);
 
 	// gets the crc32 as if all the text was lowercase.
 	uint32_t GetCRC32Lowercase(const char* text) const;
@@ -45,7 +42,6 @@ private:
 
 private:
 	uint32_t crc32_table_[8][0x100];
-	bool tableInit_;
 };
 
 #include "crc32.inl"
