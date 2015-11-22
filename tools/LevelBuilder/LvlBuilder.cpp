@@ -534,7 +534,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 		{
 			// gets me position from 0,0 from 2d plane.
 			Vec5f& point = w->operator[](j);
-			Vec3f translated(point.asVec3());
+			Vec3f translated(point.asVec3() + ent.origin);
 
 			point.s = mappingVecs[0][3] + mappingVecs[0].dot(translated);
 			point.t = mappingVecs[1][3] + mappingVecs[1].dot(translated);
