@@ -15,25 +15,39 @@ namespace
 		Vec3f normal = normal_;
 
 		// do some cleaning
-		if (fabs(normal[0]) < 1e-6) {
+		if (math<float>::abs(normal[0]) < 1e-6) {
 			normal[0] = 0.0f;
 		}
-		if (fabs(normal[1]) < 1e-6) {
+		if (math<float>::abs(normal[1]) < 1e-6) {
 			normal[1] = 0.0f;
 		}
-		if (fabs(normal[2]) < 1e-6) {
+		if (math<float>::abs(normal[2]) < 1e-6) {
 			normal[2] = 0.0f;
 		}
-		RotY = -atan2(normal[2], sqrt(normal[1] * normal[1] + normal[0] * normal[0]));
-		RotZ = atan2(normal[1], normal[0]);
+
+		// length of x,y
+		float sqRt = math<float>::sqrt(normal[1] * normal[1] + normal[0] * normal[0]);
+
+		// angle against x axis for the position: normal[2], sqRt (y,x)
+		RotY = -math<float>::atan2(normal[2], sqRt);
+		// angle against x axis for the: y, x (y,z)
+		RotZ = math<float>::atan2(normal[1], normal[0]);
+
+
+		float RotZSin = math<float>::sin(RotZ);
+		float RotZCos = math<float>::cos(RotZ);
+		float RotYSin = math<float>::sin(RotY);
+		float RotYCos = math<float>::cos(RotY);
+
 		// rotate (0,1,0) and (0,0,1) to compute texS and texT
-		texS[0] = -sin(RotZ);
-		texS[1] = cos(RotZ);
-		texS[2] = 0;
+		texS[0] = -RotZSin;
+		texS[1] = RotZCos;
+		texS[2] = 0.f;
+
 		// the texT vector is along -Z ( T texture coorinates axis )
-		texT[0] = -sin(RotY) * cos(RotZ);
-		texT[1] = -sin(RotY) * sin(RotZ);
-		texT[2] = -cos(RotY);
+		texT[0] = -(RotYSin * RotZCos);
+		texT[1] = -(RotYSin * RotZSin);
+		texT[2] = -RotYCos;
 	}
 
 	static void ConvertTexMatWithQTexture(Vec3f texMat1[2], Vec3f texMat2[2])
@@ -49,7 +63,208 @@ namespace
 		texMat2[1][2] = s2 * texMat1[1][2];
 	}
 
-}
+	Vec3f baseaxis[18] =
+	{
+		{ 1.0, 0.0, 0.0 },
+		{ 0.0, -1.0, 0.0 },
+		{ 0.0, 0.0, -1.0 },
+
+		{ 1.0, 0.0, 0.0 },
+		{ 0.0, -1.0, 0.0 },
+		{ 1.0, 0.0, 0.0 },
+
+		{ 0.0, 1.0, 0.0 },
+		{ 0.0, 0.0, -1.0 },
+		{ -1.0, 0.0, 0.0 },
+
+		{ 0.0, 1.0, 0.0 },
+		{ 0.0, 0.0, -1.0 },
+		{ 0.0, 1.0, 0.0 },
+
+		{ 1.0, 0.0, 0.0 },
+		{ 0.0, 0.0, -1.0 },
+		{ 0.0, -1.0, 0.0 },
+
+		{ 1.0, 0.0, 0.0 },
+		{ 0.0, 0.0, -1.0 },
+		{ 0.0, -1.0, 0.0 }
+	}; // idb
+
+
+	X_DISABLE_WARNING(4244)
+	int TextureAxisFromPlane(const Vec3f& a1, Vec3f& a2, Vec3f& a3)
+	{
+		signed int v3; // edx@1
+		double v4; // st6@1
+		double v5; // st4@1
+		double v6; // st3@1
+		float v7; // ST04_4@1
+		double v8; // st7@2
+		float v9; // ST04_4@4
+		double v10; // st5@6
+		float v11; // ST04_4@6
+		double v12; // rt2@8
+		double v13; // st4@8
+		double v14; // st6@8
+		float v15; // ST04_4@8
+		float v16; // ST04_4@10
+		float v17; // ST04_4@12
+		int result; // eax@14
+		float v19; // [sp+0h] [bp-8h]@1
+
+		v3 = 0;
+		v19 = 0.0;
+		v4 = 0; // a1[1] * 0.0;
+		v5 = 0; // a1[0] * 0.0;
+		v6 = v5 + v4;
+		v7 = a1[2] + v5 + v4;
+
+		if (v7 <= 0.0)
+		{
+			v8 = v6;
+		}
+		else
+		{
+			v8 = v6;
+			v19 = a1[2] + v5 + v4;
+		}
+
+		v9 = v8 - a1[2] * 1.0;
+		if (v19 < v9)
+		{
+			v19 = v8 - a1[2] * 1.0;
+			v3 = 1;
+		}
+
+		v10 = 0.0 * a1[2];
+		v11 = a1[0] + v4 + v10;
+
+		if (v19 < v11)
+		{
+			v19 = a1[0] + v4 + v10;
+			v3 = 2;
+		}
+
+		v12 = v5;
+		v13 = v4 - a1[0] * 1.0;
+		v14 = v12;
+		v15 = v13 + v10;
+
+		if (v19 < v15)
+		{
+			v19 = v13 + v10;
+			v3 = 3;
+		}
+
+		v16 = a1[1] + v14 + v10;
+
+		if (v19 < v16)
+		{
+			v19 = a1[1] + v14 + v10;
+			v3 = 4;
+		}
+
+		v17 = v14 - 1.0 * a1[1] + v10;
+		if (v19 < v17) {
+			v3 = 5;
+		}
+
+		result = 36 * v3;
+
+		a2 = baseaxis[3 * v3];
+		a3 = baseaxis[3 * v3 + 1];
+
+		return result;
+	}
+	X_ENABLE_WARNING(4244)
+
+
+	static void QuakeTextureVecs(const Planef& plane, Vec2f shift, float rotate, Vec2f scale, Vec4f mappingVecs[2])
+	{
+		Vec3f	vecs[2];
+		int		sv, tv;
+		float	ang, sinv, cosv;
+		float	ns, nt;
+		int		i, j;
+
+		// TextureAxisFromPlane(plane, vecs[0], vecs[1]);
+		TextureAxisFromPlane(plane.getNormal(), vecs[0], vecs[1]);
+
+		if (!scale[0]) {
+			scale[0] = 1;
+		}
+		if (!scale[1]) {
+			scale[1] = 1;
+		}
+
+		// rotate axis
+		if (rotate == 0)
+		{
+			sinv = 0;
+			cosv = 1;
+		}
+		else if (rotate == 90)
+		{
+			sinv = 1;
+			cosv = 0;
+		}
+		else if (rotate == 180)
+		{
+			sinv = 0;
+			cosv = -1;
+		}
+		else if (rotate == 270)
+		{
+			sinv = -1;
+			cosv = 0;
+		}
+		else
+		{
+			ang = rotate / 180 * PIf;
+			sinv = sin(ang);
+			cosv = cos(ang);
+		}
+
+		if (vecs[0][0]) {
+			sv = 0;
+		}
+		else if (vecs[0][1]) {
+			sv = 1;
+		}
+		else {
+			sv = 2;
+		}
+
+		if (vecs[1][0]) {
+			tv = 0;
+		}
+		else if (vecs[1][1]) {
+			tv = 1;
+		}
+		else {
+			tv = 2;
+		}
+
+		for (i = 0; i < 2; i++) {
+			ns = cosv * vecs[i][sv] - sinv * vecs[i][tv];
+			nt = sinv * vecs[i][sv] + cosv * vecs[i][tv];
+			vecs[i][sv] = ns;
+			vecs[i][tv] = nt;
+		}
+
+		for (i = 0; i < 2; i++) {
+			for (j = 0; j < 3; j++) {
+				mappingVecs[i][j] = vecs[i][j] / scale[i];
+			}
+		}
+
+		mappingVecs[0][3] = -(shift[0] / scale[0]);
+		mappingVecs[1][3] = -(shift[1] / scale[1]);
+	}
+
+} // namespace
+
+
 
 
 LvlBuilder::LvlBuilder() :
@@ -297,17 +512,6 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 		stats_.numAreaPortals++;
 	}
 
-
-	Vec3f coords[2];
-	Vec2f out;
-
-	coords[0][0] = 1.0f;
-	coords[1][1] = 1.0f;
-	ConvertTexMatWithQTexture(coords, coords);
-
-	Vec3f texX, texY;
-	float u, v;
-
 	for (i = 0; i < safe_static_cast<int32_t,size_t>(brush.sides.size()); i++)
 	{
 		LvlBrushSide& side = brush.sides[i];
@@ -316,48 +520,24 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 		if (!w) {
 			continue;
 		}
-
-		if (pMapBrushSide->material.name.isEqual("berlin_wall_concrete_block")) {
-			int goat = 0;
-		}
-
+	
 		pMapBrushSide = mapBrush->GetSide(i);
+		const Planef& plane = pMapBrushSide->GetPlane();
 		const Vec2f& repeate = pMapBrushSide->material.matRepeate;
 		const Vec2f& shift = pMapBrushSide->material.shift;
 		const float& rotate = pMapBrushSide->material.rotate;
-	
-		const float rotateRadians = toRadians(rotate);
 
-		ComputeAxisBase(pMapBrushSide->GetPlane().getNormal(), texX, texY);
+		Vec4f mappingVecs[2];
+		QuakeTextureVecs(plane, shift, rotate, repeate, mappingVecs);
 
 		for (int j = 0; j < w->getNumPoints(); j++)
 		{
 			// gets me position from 0,0 from 2d plane.
 			Vec5f& point = w->operator[](j);
-			u = texX.dot(point.asVec3());
-			v = texY.dot(point.asVec3());
+			Vec3f translated(point.asVec3());
 
-			out[0] = coords[0][0] * u + coords[0][1] * v + coords[0][2];
-			out[1] = coords[1][0] * u + coords[1][1] * v + coords[1][2];
-
-			out += shift;
-
-			// I have a repeate rate.
-			out[0] = out[0] / repeate.x;
-			out[1] = out[1] / repeate.y;
-
-
-			out[0] = -out[0];
-			out[1] = out[1];
-
-			if (rotate != 0.f)
-			{
-				out.rotate(rotateRadians);
-			}
-
-			point.s = out[0];
-			point.t = out[1];
-
+			point.s = mappingVecs[0][3] + mappingVecs[0].dot(translated);
+			point.t = mappingVecs[1][3] + mappingVecs[1].dot(translated);
 		}
 	}
 
