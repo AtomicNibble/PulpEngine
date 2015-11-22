@@ -141,6 +141,7 @@ class XConsole :
 public:
 	static const size_t MAX_HISTORY_ENTRIES = 64;
 	static const size_t CONSOLE_LOG_LINE_HIEGHT = 20;
+	static const char* CMD_HISTORY_FILE_NAME;
 
 	typedef consoleState consoleState;
 public:
@@ -242,8 +243,9 @@ protected:
 
 	void ExecuteInputBuffer();
 
+	void SaveCmdHistory(void) const;
+	void LoadCmdHistory(void);
 	void AddCmdToHistory(const char* Command);
-
 	const char* GetHistory(CmdHistory::Enum direction);
 
 	// Binds a cmd to a key
@@ -372,6 +374,7 @@ private:
 
 private:
 	static int		console_debug;
+	static int		console_save_history;
 	static Color	console_input_box_color;
 	static Color	console_input_box_color_border;
 	static Color	console_output_box_color;

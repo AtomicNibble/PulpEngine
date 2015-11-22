@@ -243,7 +243,10 @@ void ConsoleCommandArgs::TokenizeString(const char *begin, const char* end)
 
 //////////////////////////////////////////////////////////////////////////
 
+const char* XConsole::CMD_HISTORY_FILE_NAME = "cmdHistory.txt";
+
 int XConsole::console_debug = 0;
+int XConsole::console_save_history = 0;
 Color XConsole::console_input_box_color;
 Color XConsole::console_input_box_color_border;
 Color XConsole::console_output_box_color;
@@ -603,6 +606,8 @@ void XConsole::Startup(ICore* pCore)
 		texture::TextureFlags::DONT_STREAM);
 
 	ADD_CVAR_REF_NO_NAME(console_debug, 0, 0, 1, VarFlag::SYSTEM | VarFlag::CHEAT, "Debugging for console operations. 0=off 1=on");
+	ADD_CVAR_REF_NO_NAME(console_save_history, 1, 0, 1, VarFlag::SYSTEM | VarFlag::CHEAT | VarFlag::SAVE_IF_CHANGED,
+		"Saves command history to file");
 	ADD_CVAR_REF_NO_NAME(console_buffer_size, 1000, 1, 10000, VarFlag::SYSTEM, "Size of the log buffer");
 	ADD_CVAR_REF_NO_NAME(console_output_draw_channel, 1, 0, 1, VarFlag::SYSTEM, "Draw the channel in a diffrent color. 0=disabled 1=enabled");
 
@@ -647,6 +652,10 @@ void XConsole::Startup(ICore* pCore)
 
 	// hot reload
 	pCore->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
+
+	if (console_save_history) {
+		LoadCmdHistory();
+	}
 }
 
 void XConsole::ShutDown(void)
@@ -1070,6 +1079,63 @@ const char* XConsole::GetHistory(CmdHistory::Enum direction)
 }
 
 
+void XConsole::SaveCmdHistory(void) const
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pFileSys);
+
+	fileModeFlags mode;
+
+	mode.Set(fileMode::WRITE);
+	mode.Set(fileMode::RECREATE);
+	mode.Set(fileMode::SHARE);
+
+	XFileScoped file;
+	if (file.openFile(CMD_HISTORY_FILE_NAME, mode))
+	{
+		ConsoleBuffer::const_reverse_iterator it = CmdHistory_.crbegin();
+		for (; it != CmdHistory_.crend(); it++)
+		{
+			file.writeString(it->c_str(), it->length());
+			file.write('\n');
+		}
+	}
+}
+
+void XConsole::LoadCmdHistory(void)
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pFileSys);
+
+	fileModeFlags mode;
+
+	mode.Set(fileMode::READ);
+	mode.Set(fileMode::SHARE);
+
+	XFileMemScoped file;
+	if (file.openFile(CMD_HISTORY_FILE_NAME, mode))
+	{
+		const char* pBegin = file->getBufferStart();
+		const char* pEnd = file->getBufferEnd();
+
+		core::StringTokenizer<char> tokenizer(pBegin, pEnd, '\n');
+		StringRange<char> range(nullptr, nullptr);
+
+		while (tokenizer.ExtractToken(range))
+		{
+			if (range.GetLength() > 0) {
+				AddCmdToHistory(core::string(range.GetStart(), range.GetEnd()));
+			}
+		}
+
+		// limit the history.
+		while (CmdHistory_.size() > MAX_HISTORY_ENTRIES) {
+			CmdHistory_.pop_back();
+		}
+	}
+}
+
+
 void XConsole::AddCmdToHistory(const char* Command)
 {
 	// so we can scroll through past commands.
@@ -1092,6 +1158,10 @@ void XConsole::AddCmdToHistory(const char* Command)
 	// limit hte history.
 	while (CmdHistory_.size() > MAX_HISTORY_ENTRIES) {
 		CmdHistory_.pop_back();
+	}
+
+	if (console_save_history) {
+		SaveCmdHistory();
 	}
 }
 
