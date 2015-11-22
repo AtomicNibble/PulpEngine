@@ -162,8 +162,8 @@ bool Level::Init(void)
 	ADD_CVAR_REF("lvl_usePortals", s_var_usePortals_, 1, 0, 1,
 		core::VarFlag::SYSTEM, "Use area portals when rendering the level.");
 	
-	ADD_CVAR_REF("lvl_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 2,
-		core::VarFlag::SYSTEM, "Draws bounding box around each level area. 1=visble 2=all");
+	ADD_CVAR_REF("lvl_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 4,
+		core::VarFlag::SYSTEM, "Draws bounding box around each level area. 1=visble 2=all 3=visble-fill 4=all-fill");
 
 	ADD_CVAR_REF("lvl_drawPortals", s_var_drawPortals_, 1, 0, 4, core::VarFlag::SYSTEM,
 		"Draws the inter area portals. 0=off 1=solid 2=wire 3=solid_dt 4=wire_dt");
@@ -381,7 +381,7 @@ void Level::DrawAreaBounds(void)
 		Color color = Col_Red;
 
 		// visible only
-		if (s_var_drawAreaBounds_ == 1)
+		if (s_var_drawAreaBounds_ == 1 || s_var_drawAreaBounds_ == 3)
 		{
 			for (const auto& a : areas_)
 			{
@@ -396,6 +396,34 @@ void Level::DrawAreaBounds(void)
 			for (const auto& a : areas_)
 			{
 				pAux->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), false, color);
+			}
+		}
+
+		if (s_var_drawAreaBounds_ > 2)
+		{
+			flags.SetFillMode(AuxGeom_FillMode::FillModeSolid);
+			flags.SetAlphaBlendMode(AuxGeom_AlphaBlendMode::AlphaBlended);
+			pAux->setRenderFlags(flags);
+
+			color.a = 0.2f;
+
+			// visible only
+			if (s_var_drawAreaBounds_ == 3)
+			{
+				for (const auto& a : areas_)
+				{
+					if (a.frameID == frameID_)
+					{
+						pAux->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), true, color);
+					}
+				}
+			}
+			else // all
+			{
+				for (const auto& a : areas_)
+				{
+					pAux->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), true, color);
+				}
 			}
 		}
 	}
