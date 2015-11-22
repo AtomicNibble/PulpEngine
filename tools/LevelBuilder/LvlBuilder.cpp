@@ -220,7 +220,7 @@ namespace
 		}
 		else
 		{
-			ang = rotate / 180 * PIf;
+			ang = ::toRadians(rotate);
 			sinv = sin(ang);
 			cosv = cos(ang);
 		}
