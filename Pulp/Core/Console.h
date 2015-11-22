@@ -178,18 +178,18 @@ public:
 	X_INLINE void ToggleConsole(bool expand = false);
 
 protected:
-	void ExecuteStringInternal(const char *command, ExecSource::Enum source = ExecSource::CONSOLE, const bool bSilentMode = false);
+	void ExecuteStringInternal(const char* command, ExecSource::Enum source = ExecSource::CONSOLE, const bool bSilentMode = false);
 	void ExecuteCommand(ConsoleCommand &cmd, core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& str);
 
 	ICVar* GetCVarForRegistration(const char* Name);
 
-	void RegisterVar(ICVar *pCVar, ConsoleVarFunc pChangeFunc);
+	void RegisterVar(ICVar* pCVar, ConsoleVarFunc pChangeFunc);
 
 	void ListCommands(const char* searchPatten = nullptr);
 	void ListVariables(const char* searchPatten = nullptr);
 
-	void DisplayVarValue(ICVar *pVar);
-	void DisplayVarInfo(ICVar *pVar);
+	void DisplayVarValue(ICVar* pVar);
+	void DisplayVarInfo(ICVar* pVar);
 
 	void ExecuteDeferredCommands();
 
@@ -199,7 +199,7 @@ protected:
 
 	bool ProcessInput(const input::InputEvent& event);
 
-	void ExecuteInputBuffer();
+	void ExecuteInputBuffer(void);
 
 	void SaveCmdHistory(void) const;
 	void LoadCmdHistory(void);
@@ -214,7 +214,7 @@ protected:
 	const char* FindBind(const char* key);
 
 	// removes all the binds.
-	void ClearAllBinds();
+	void ClearAllBinds(void);
 
 	void Listbinds(IKeyBindDumpSink* CallBack);
 
@@ -241,8 +241,8 @@ private:
 	size_t MaxVisibleLogLines(void) const;
 
 private:
-	void DrawBuffer();
-	void DrawScrollBar();
+	void DrawBuffer(void);
+	void DrawScrollBar(void);
 
 	void Copy(void);
 	void Paste(void);
@@ -254,9 +254,7 @@ private:
 
 	struct DeferredCommand
 	{
-		DeferredCommand(const string& command, bool silentMode)
-			: command(command), silentMode(silentMode)
-		{}
+		DeferredCommand(const string& command, bool silentMode);
 
 		string		command;
 		bool		silentMode;
@@ -264,7 +262,8 @@ private:
 
 	struct Cursor
 	{
-		Cursor() : curTime(0.f), displayTime(0.5f), draw(false) {}
+		Cursor();
+
 		float curTime;
 		float displayTime;
 		bool draw;

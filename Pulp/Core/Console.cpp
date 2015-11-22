@@ -420,12 +420,14 @@ namespace
 
 
 
+// ==================================================
+
 ConsoleCommand::ConsoleCommand() : pFunc(0) // flags default con is (0)
 {
 
 }
 
-// ==================================
+// ==================================================
 
 ConsoleCommandArgs::ConsoleCommandArgs(
 	core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& line)
@@ -554,6 +556,26 @@ Color XConsole::console_output_scroll_bar_slider_color;
 int	  XConsole::console_output_draw_channel;
 int	XConsole::console_buffer_size = 0;
 int XConsole::console_disable_mouse = 0;
+
+
+//////////////////////////////////////////////////////////////////////////
+
+
+XConsole::DeferredCommand::DeferredCommand(const string& command, bool silentMode) :
+	command(command), 
+	silentMode(silentMode)
+{
+
+}
+
+XConsole::Cursor::Cursor() : 
+	curTime(0.f), 
+	displayTime(0.5f), 
+	draw(false) 
+{
+
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -961,7 +983,7 @@ void XConsole::ClearInputBuffer(void)
 	CursorPos_ = 0;
 }
 
-void XConsole::ExecuteInputBuffer()
+void XConsole::ExecuteInputBuffer(void)
 {
 	if (InputBuffer_.isEmpty()) {
 		return;
@@ -1231,7 +1253,7 @@ const char* XConsole::FindBind(const char* key)
 }
 
 // removes all the binds.
-void XConsole::ClearAllBinds()
+void XConsole::ClearAllBinds(void)
 {
 	Binds_.clear();
 }
@@ -1734,7 +1756,7 @@ void XConsole::ExecuteStringInternal(const char* pCommand, ExecSource::Enum sour
 
 }
 
-void XConsole::DisplayVarValue(ICVar *pVar)
+void XConsole::DisplayVarValue(ICVar* pVar)
 {
 	if (!pVar) {
 		return;
@@ -1743,7 +1765,7 @@ void XConsole::DisplayVarValue(ICVar *pVar)
 	X_LOG0("Dvar", "\"%s\" = %s", pVar->GetName(), pVar->GetString());
 }
 
-void XConsole::DisplayVarInfo(ICVar *pVar)
+void XConsole::DisplayVarInfo(ICVar* pVar)
 {
 	if (!pVar) {
 		return;
@@ -1836,7 +1858,7 @@ void XConsole::ExecuteDeferredCommands()
 	}
 }
 
-void XConsole::OnFrameBegin()
+void XConsole::OnFrameBegin(void)
 {
 	ExecuteDeferredCommands();
 
@@ -1899,10 +1921,11 @@ size_t XConsole::MaxVisibleLogLines(void) const
 	return height / scaledLogHeight;
 }
 
-void XConsole::DrawBuffer()
+void XConsole::DrawBuffer(void)
 {
-	if (this->consoleState_ == consoleState::CLOSED)
+	if (this->consoleState_ == consoleState::CLOSED) {
 		return;
+	}
 
 	font::XTextDrawConect ctx;
 	ctx.SetColor(Col_Khaki);
@@ -2003,10 +2026,11 @@ void XConsole::DrawBuffer()
 
 }
 
-void XConsole::DrawScrollBar()
+void XConsole::DrawScrollBar(void)
 {
-	if (!isExpanded())
+	if (!isExpanded()) {
 		return;
+	}
 
 	if(pFont_ && pRender_)
 	{
