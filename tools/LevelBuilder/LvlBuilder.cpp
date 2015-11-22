@@ -198,22 +198,22 @@ namespace
 		}
 
 		// rotate axis
-		if (rotate == 0)
+		if (rotate == 0.f)
 		{
 			sinv = 0.f;
 			cosv = 1.f;
 		}
-		else if (rotate == 90)
+		else if (rotate == 90.f)
 		{
 			sinv = 1.f;
 			cosv = 0.f;
 		}
-		else if (rotate == 180)
+		else if (rotate == 180.f)
 		{
 			sinv = 0.f;
 			cosv = -1.f;
 		}
-		else if (rotate == 270)
+		else if (rotate == 270.f)
 		{
 			sinv = -1.f;
 			cosv = 0.f;
