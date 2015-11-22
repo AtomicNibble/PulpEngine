@@ -25,7 +25,7 @@ namespace
 	{
 		XFont* pFont = static_cast<XFont*>(gEnv->pFont);
 
-		int Num = pCmd->GetArgCount();
+		size_t Num = pCmd->GetArgCount();
 
 		if (Num < 2)
 		{

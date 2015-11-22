@@ -128,14 +128,14 @@ namespace
 
 	void LoadScriptCmd(core::IConsoleCmdArgs* pArgs)
 	{
-		int num = pArgs->GetArgCount();
+		size_t num = pArgs->GetArgCount();
 		if (num < 2)
 		{
 			X_WARNING("Script", "script_load <filename>");
 			return;
 		}
 
-		for (int i = 1; i<num; i++)
+		for (size_t i = 1; i<num; i++)
 		{
 			const char* Filename = pArgs->GetArg(i);
 
@@ -154,14 +154,14 @@ namespace
 
 	void ReloadScriptCmd(core::IConsoleCmdArgs* pArgs)
 	{
-		int num = pArgs->GetArgCount();
+		size_t num = pArgs->GetArgCount();
 		if (num < 2)
 		{
 			X_WARNING("Script", "script_reload <filename>");
 			return;
 		}
 
-		for (int i = 1; i<num; i++)
+		for (size_t i = 1; i<num; i++)
 		{
 			const char* Filename = pArgs->GetArg(i);
 

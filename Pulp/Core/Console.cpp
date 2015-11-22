@@ -294,7 +294,7 @@ namespace
 	{
 		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
 
-		int Num = Cmd->GetArgCount();
+		size_t Num = Cmd->GetArgCount();
 
 		if (Num < 3)
 		{
@@ -304,7 +304,7 @@ namespace
 
 		core::StackString<1024> cmd;
 
-		for (int i = 2; i < Num; i++)
+		for (size_t i = 2; i < Num; i++)
 		{
 			cmd.append(Cmd->GetArg(i));
 			if (i + 1 == Num)
@@ -1148,7 +1148,7 @@ void XConsole::SaveCmdHistory(void) const
 		ConsoleBuffer::const_reverse_iterator it = CmdHistory_.crbegin();
 		for (; it != CmdHistory_.crend(); it++)
 		{
-			file.writeString(it->c_str(), it->length());
+			file.writeString(it->c_str(), safe_static_cast<uint32_t,size_t>(it->length()));
 			file.write('\n');
 		}
 	}
