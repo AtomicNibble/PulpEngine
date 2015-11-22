@@ -180,7 +180,7 @@ namespace
 			pfileName =	pArgs->GetArg(0);
 		}
 
-		((XScriptSys*)gEnv->pScriptSys)->DumpStateToFile(pfileName);
+		static_cast<XScriptSys*>(gEnv->pScriptSys)->DumpStateToFile(pfileName);
 	}
 
 	int g_pErrorHandlerFunc;
@@ -1044,7 +1044,7 @@ void XScriptSys::TraceScriptError()
 
 int XScriptSys::ErrorHandler(lua_State *L)
 {
-	XScriptSys* pThis = (XScriptSys*)gEnv->pScriptSys;
+	XScriptSys* pThis = static_cast<XScriptSys*>(gEnv->pScriptSys);
 
 //	lua_Debug ar;
 //	core::zero_object(ar);
