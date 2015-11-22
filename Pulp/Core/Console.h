@@ -130,7 +130,7 @@ X_DECLARE_FLAGS(ExecSource)(
 	CONSOLE,
 	CONFIG,
 	SYSTEM
-	);
+);
 
 
 class XConsole : 
@@ -197,27 +197,12 @@ public:
 	virtual bool OnFileChange(const char* name) X_FINAL;
 	// ~IXHotReload
 
-	void OnFrameBegin() X_FINAL;
+	void OnFrameBegin(void) X_FINAL;
 
-	X_INLINE void ShowConsole(consoleState::Enum state) {
-		consoleState_ = state;
-	}
-	X_INLINE bool isVisable(void) const {
-		return consoleState_ != consoleState::CLOSED;
-	}
-	X_INLINE bool isExpanded(void) const {
-		return consoleState_ == consoleState::EXPANDED;
-	}
-	X_INLINE void ToggleConsole(bool expand = false) {
-		if (isVisable())
-			consoleState_ = consoleState::CLOSED;
-		else {
-			if (expand)
-				consoleState_ = consoleState::EXPANDED;
-			else
-				consoleState_ = consoleState::OPEN;
-		}
-	}
+	X_INLINE void ShowConsole(consoleState::Enum state);
+	X_INLINE bool isVisable(void) const;
+	X_INLINE bool isExpanded(void) const;
+	X_INLINE void ToggleConsole(bool expand = false);
 
 protected:
 	void ExecuteStringInternal(const char *command, ExecSource::Enum source = ExecSource::CONSOLE, const bool bSilentMode = false);
@@ -277,9 +262,7 @@ private:
 	int autoCompleteIdx_;
 	bool autoCompleteSelect_;
 
-	X_INLINE bool isAutocompleteVis(void) {
-		return autoCompleteNum_ > 0;
-	}
+	X_INLINE bool isAutocompleteVis(void);
 
 	// returns the max log lines that fit on screen.
 	size_t MaxVisibleLogLines(void) const;
