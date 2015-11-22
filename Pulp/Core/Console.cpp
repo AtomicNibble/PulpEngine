@@ -150,8 +150,303 @@ namespace
 		const char* end_;
 	};
 
+} // namespace
+
+
+	void Command_Exec(IConsoleCmdArgs* Cmd)
+	{
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		if (Cmd->GetArgCount() != 2)
+		{
+			X_WARNING("Console", "exec <filename>");
+			return;
+		}
+
+		const char* filename = Cmd->GetArg(1);
+
+		pConsole->LoadConfig(filename);
+	}
+
+	void Command_Help(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
+
+		X_LOG0("Console", "------- ^8Help^7 -------");
+		X_LOG_BULLET;
+		X_LOG0("Console", "listcmds: lists avaliable commands");
+		X_LOG0("Console", "listdvars: lists dvars");
+		X_LOG0("Console", "listbinds: lists all the bind");
+	}
+
+	void Command_ListCmd(IConsoleCmdArgs* Cmd)
+	{
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		// optional search criteria
+		const char* searchPatten = nullptr;
+
+		if (Cmd->GetArgCount() >= 2) {
+			searchPatten = Cmd->GetArg(1);
+		}
+
+		pConsole->ListCommands(searchPatten);
+	}
+
+	void Command_ListDvars(IConsoleCmdArgs* Cmd)
+	{
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		// optional search criteria
+		const char* searchPatten = nullptr;
+
+		if (Cmd->GetArgCount() >= 2) {
+			searchPatten = Cmd->GetArg(1);
+		}
+
+		pConsole->ListVariables(searchPatten);
+	}
+
+	void Command_Exit(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
+
+		// we want to exit I guess.
+		// dose this check even make sense?
+		// it might for dedicated server.
+		if (gEnv && gEnv->pCore && gEnv->pCore->GetGameWindow())
+			gEnv->pCore->GetGameWindow()->Close();
+		else
+			X_ERROR("Cmd", "Failed to exit game");
+	}
+
+	void Command_Echo(IConsoleCmdArgs* Cmd)
+	{
+		// we only print the 1st arg ?
+		StackString<1024> txt;
+
+		size_t TotalLen = 0;
+		size_t Len = 0;
+
+		for (int i = 1; i < Cmd->GetArgCount(); i++)
+		{
+			const char* str = Cmd->GetArg(i);
+
+			Len = strlen(str);
+
+			if ((TotalLen + Len) >= 896) // we need to make sure other info like channle name fit into 1024
+			{
+				X_WARNING("Echo", "input too long truncating");
+
+				// trim it to be sorter then total length.
+				// but not shorter than it's length.
+				size_t new_len = core::Min(Len, 896 - TotalLen);
+				//									  o o
+				// watch this become a bug one day.  ~~~~~
+				const_cast<char*>(str)[new_len] = '\0';
+
+				txt.appendFmt("%s", str);
+				break; // stop adding.
+			}
+
+			txt.appendFmt("%s ", str);
+
+			TotalLen = txt.length();
+		}
+
+		X_LOG0("echo", txt.c_str());
+	}
+
+	void Command_Wait(IConsoleCmdArgs* Cmd)
+	{
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		if (Cmd->GetArgCount() != 2)
+		{
+			X_WARNING("Console", "wait <seconds>");
+			return;
+		}
+
+
+		pConsole->WaitSeconds_.SetSeconds(atof(Cmd->GetArg(1)));
+		pConsole->WaitSeconds_ += gEnv->pTimer->GetFrameStartTime();
+	}
+
+	void Command_VarReset(IConsoleCmdArgs* Cmd)
+	{
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		if (Cmd->GetArgCount() != 2)
+		{
+			X_WARNING("Console", "vreset <var_name>");
+			return;
+		}
+
+		// find the var
+		ICVar* cvar = pConsole->GetCVar(Cmd->GetArg(1));
+
+		cvar->Reset();
+
+		pConsole->DisplayVarValue(cvar);
+	}
+
+	void Command_Bind(IConsoleCmdArgs* Cmd)
+	{
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		int Num = Cmd->GetArgCount();
+
+		if (Num < 3)
+		{
+			X_WARNING("Console", "bind <key_combo> '<cmd>'");
+			return;
+		}
+
+		core::StackString<1024> cmd;
+
+		for (int i = 2; i < Num; i++)
+		{
+			cmd.append(Cmd->GetArg(i));
+			if (i + 1 == Num)
+				cmd.append(';', 1);
+			else
+				cmd.append(' ', 1);
+		}
+
+		pConsole->AddBind(Cmd->GetArg(1), cmd.c_str());
+	}
+
+	void Command_BindsClear(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+		pConsole->ClearAllBinds();
+	}
+
+	void Command_BindsList(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		struct PrintBinds : public IKeyBindDumpSink {
+			virtual void OnKeyBindFound(const char* Bind, const char* Command){
+				X_LOG0("Console", "Key: %s Cmd: \"%s\"", Bind, Command);
+			}
+		};
+
+		PrintBinds print;
+
+		X_LOG0("Console", "--------------- ^8Binds^7 ----------------");
+
+		{
+			X_LOG_BULLET;
+			pConsole->Listbinds(&print);
+		}
+
+		X_LOG0("Console", "------------- ^8Binds End^7 --------------");
+	}
+
+	void Command_SetVarArchive(IConsoleCmdArgs* Cmd)
+	{
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		size_t Num = Cmd->GetArgCount();
+
+		if (Num != 3)
+		{
+			X_WARNING("Console", "seta <var> <val>");
+			return;
+		}
+
+		if (ICVar* pCBar = pConsole->GetCVar(Cmd->GetArg(1)))
+		{
+			pCBar->Set(Cmd->GetArg(2));
+
+			pCBar->SetFlags(pCBar->GetFlags() | VarFlag::ARCHIVE);
+		}
+		else
+		{
+			// we need to work out what kinda value it is.
+			// int, float, string.
+			const char* start = Cmd->GetArg(2);
+			char* End;
+			// long int val = strtol(Cmd->GetArg(2), &End, 0);
+			float valf = strtof(start, &End);
+
+
+			if (valf != 0)
+			{
+				// using the End var is safe since we the condition above checks parsing was valid.
+				if (fmod(valf, 1) == 0.f && !strUtil::Find(start, End, '.'))
+				{
+					pConsole->ConfigRegisterInt(Cmd->GetArg(1), (int)valf, 1, 0, 0, "");
+				}
+				else
+				{
+					pConsole->ConfigRegisterFloat(Cmd->GetArg(1), valf, 1, 0, 0, "");
+				}
+			}
+			else
+			{
+				pConsole->ConfigRegisterString(Cmd->GetArg(1), Cmd->GetArg(2), 0, "");
+			}
+
+		}
+	}
+
+	void Command_ConsoleShow(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		pConsole->ShowConsole(XConsole::consoleState::OPEN);
+	}
+
+	void Command_ConsoleHide(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		pConsole->ShowConsole(XConsole::consoleState::CLOSED);
+	}
+
+	void Command_ConsoleToggle(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		pConsole->ToggleConsole();
+	}
+
+
+
+ConsoleCommand::ConsoleCommand() : pFunc(0) // flags default con is (0)
+{
+
 }
 
+// ==================================
+
+ConsoleCommandArgs::ConsoleCommandArgs(
+	core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& line)
+{
+	TokenizeString(line.begin(), line.end());
+}
+
+ConsoleCommandArgs::~ConsoleCommandArgs()
+{
+
+}
+
+int ConsoleCommandArgs::GetArgCount(void) const 
+{
+	return argNum_;
+}
+
+const char* ConsoleCommandArgs::GetArg(int Idx) const
+{
+	return (argNum_ >= 0 && Idx < argNum_) ? argv_[Idx] : "";
+}
 
 // we want to get arguemtns.
 // how will a command be formated. 
@@ -257,273 +552,6 @@ Color XConsole::console_output_scroll_bar_slider_color;
 int	  XConsole::console_output_draw_channel;
 int	XConsole::console_buffer_size = 0;
 int XConsole::console_disable_mouse = 0;
-
-
-void Command_Exec(IConsoleCmdArgs* Cmd)
-{
-	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
-
-	if (Cmd->GetArgCount() != 2)
-	{
-		X_WARNING("Console", "exec <filename>");
-		return;
-	}
-
-	const char* filename = Cmd->GetArg(1);
-
-	pConsole->LoadConfig(filename);
-}
-
-void Command_Help(IConsoleCmdArgs* Cmd)
-{
-	X_UNUSED(Cmd);
-
-	X_LOG0("Console", "------- ^8Help^7 -------");
-	X_LOG_BULLET;
-	X_LOG0("Console", "listcmds: lists avaliable commands");
-	X_LOG0("Console", "listdvars: lists dvars");
-	X_LOG0("Console", "listbinds: lists all the bind");
-}
-
-void Command_ListCmd(IConsoleCmdArgs* Cmd)
-{
-	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
-
-	// optional search criteria
-	const char* searchPatten = nullptr;
-
-	if (Cmd->GetArgCount() >= 2) {
-		searchPatten = Cmd->GetArg(1);
-	}
-
-	pConsole->ListCommands(searchPatten);
-}
-
-void Command_ListDvars(IConsoleCmdArgs* Cmd)
-{
-	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
-
-	// optional search criteria
-	const char* searchPatten = nullptr;
-
-	if (Cmd->GetArgCount() >= 2) {
-		searchPatten = Cmd->GetArg(1);
-	}
-
-	pConsole->ListVariables(searchPatten);
-}
-
-void Command_Exit(IConsoleCmdArgs* Cmd)
-{
-	X_UNUSED(Cmd);
-
-	// we want to exit I guess.
-	// dose this check even make sense?
-	// it might for dedicated server.
-	if (gEnv && gEnv->pCore && gEnv->pCore->GetGameWindow())
-		gEnv->pCore->GetGameWindow()->Close();
-	else
-		X_ERROR("Cmd", "Failed to exit game");
-}
-
-void Command_Echo(IConsoleCmdArgs* Cmd)
-{
-	// we only print the 1st arg ?
-	StackString<1024> txt;
-
-	size_t TotalLen = 0;
-	size_t Len = 0;
-
-	for (int i = 1; i < Cmd->GetArgCount(); i++)
-	{
-		const char* str = Cmd->GetArg(i);
-
-		Len = strlen(str);
-
-		if ((TotalLen + Len) >= 896) // we need to make sure other info like channle name fit into 1024
-		{
-			X_WARNING("Echo", "input too long truncating");
-
-			// trim it to be sorter then total length.
-			// but not shorter than it's length.
-			size_t new_len = core::Min(Len, 896 - TotalLen);
-			//									  o o
-			// watch this become a bug one day.  ~~~~~
-			const_cast<char*>(str)[new_len] = '\0';
-
-			txt.appendFmt("%s", str);
-			break; // stop adding.
-		}
-
-		txt.appendFmt("%s ", str);
-
-		TotalLen = txt.length();
-	}
-
-	X_LOG0("echo", txt.c_str());
-}
-
-void Command_Wait(IConsoleCmdArgs* Cmd)
-{
-	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
-
-	if (Cmd->GetArgCount() != 2)
-	{
-		X_WARNING("Console", "wait <seconds>");
-		return;
-	}
-
-
-	pConsole->WaitSeconds_.SetSeconds(atof(Cmd->GetArg(1)));
-	pConsole->WaitSeconds_ += gEnv->pTimer->GetFrameStartTime();
-}
-
-void Command_VarReset(IConsoleCmdArgs* Cmd)
-{
-	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
-
-	if (Cmd->GetArgCount() != 2)
-	{
-		X_WARNING("Console", "vreset <var_name>");
-		return;
-	}
-
-	// find the var
-	ICVar* cvar = pConsole->GetCVar(Cmd->GetArg(1));
-
-	cvar->Reset();
-
-	pConsole->DisplayVarValue(cvar);
-}
-
-void Command_Bind(IConsoleCmdArgs* Cmd)
-{
-	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
-
-	int Num = Cmd->GetArgCount();
-
-	if (Num < 3)
-	{
-		X_WARNING("Console", "bind <key_combo> '<cmd>'");
-		return;
-	}
-
-	core::StackString<1024> cmd;
-
-	for (int i = 2; i < Num; i++)
-	{
-		cmd.append(Cmd->GetArg(i));
-		if (i + 1 == Num)
-			cmd.append(';', 1);
-		else
-			cmd.append(' ', 1);
-	}
-
-	pConsole->AddBind(Cmd->GetArg(1), cmd.c_str());
-}
-
-void Command_BindsClear(IConsoleCmdArgs* Cmd)
-{
-	X_UNUSED(Cmd);
-	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
-	pConsole->ClearAllBinds();
-}
-
-void Command_BindsList(IConsoleCmdArgs* Cmd)
-{
-	X_UNUSED(Cmd);
-	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
-
-	struct PrintBinds : public IKeyBindDumpSink {
-		virtual void OnKeyBindFound(const char* Bind, const char* Command){
-			X_LOG0("Console", "Key: %s Cmd: \"%s\"", Bind, Command);
-		}
-	};
-
-	PrintBinds print;
-
-	X_LOG0("Console", "--------------- ^8Binds^7 ----------------");
-
-	{
-		X_LOG_BULLET;
-		pConsole->Listbinds(&print);
-	}
-
-	X_LOG0("Console", "------------- ^8Binds End^7 --------------");
-}
-
-void Command_SetVarArchive(IConsoleCmdArgs* Cmd)
-{
-	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
-
-	size_t Num = Cmd->GetArgCount();
-
-	if (Num != 3)
-	{
-		X_WARNING("Console", "seta <var> <val>");
-		return;
-	}
-
-	if (ICVar* pCBar = pConsole->GetCVar(Cmd->GetArg(1)))
-	{
-		pCBar->Set(Cmd->GetArg(2));
-
-		pCBar->SetFlags(pCBar->GetFlags() | VarFlag::ARCHIVE);
-	}
-	else
-	{
-		// we need to work out what kinda value it is.
-		// int, float, string.
-		const char* start = Cmd->GetArg(2);
-		char* End;
-		// long int val = strtol(Cmd->GetArg(2), &End, 0);
-		float valf = strtof(start, &End);
-
-
-		if (valf != 0)
-		{
-			// using the End var is safe since we the condition above checks parsing was valid.
-			if (fmod(valf, 1) == 0.f && !strUtil::Find(start, End, '.'))
-			{
-				pConsole->ConfigRegisterInt(Cmd->GetArg(1), (int)valf, 1, 0, 0, "");
-			}
-			else
-			{
-				pConsole->ConfigRegisterFloat(Cmd->GetArg(1), valf, 1, 0, 0, "");
-			}
-		}
-		else
-		{
-			pConsole->ConfigRegisterString(Cmd->GetArg(1), Cmd->GetArg(2), 0, "");
-		}
-
-	}
-}
-
-void Command_ConsoleShow(IConsoleCmdArgs* Cmd)
-{
-	X_UNUSED(Cmd);
-	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
-
-	pConsole->ShowConsole(XConsole::consoleState::OPEN);
-}
-
-void Command_ConsoleHide(IConsoleCmdArgs* Cmd)
-{
-	X_UNUSED(Cmd);
-	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
-
-	pConsole->ShowConsole(XConsole::consoleState::CLOSED);
-}
-
-void Command_ConsoleToggle(IConsoleCmdArgs* Cmd)
-{
-	X_UNUSED(Cmd);
-	XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
-
-	pConsole->ToggleConsole();
-}
-
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -1757,7 +1785,13 @@ void XConsole::ExecuteCommand(ConsoleCommand &cmd,
 
 ICVar* XConsole::GetCVarForRegistration(const char* Name)
 {
-	ICVar *pCVar = stl::find_in_map(this->VarMap_, Name, NULL);
+	ICVar* pCVar = nullptr;
+
+	ConsoleVarMap::const_iterator it = VarMap_.find(X_CONST_STRING(Name));
+	if (it != VarMap_.end()) {
+		pCVar = it->second;
+	}
+
 	if (pCVar)
 	{
 		X_WARNING("Console", "var(%s) is already registerd", Name);

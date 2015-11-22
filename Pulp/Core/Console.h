@@ -59,26 +59,9 @@ struct equal_to_case_insen
 	}
 };
 
-namespace stl
-{
-	//////////////////////////////////////////////////////////////////////////
-	//! Searches the given entry in the map by key, and if there is none, returns the default value
-	//////////////////////////////////////////////////////////////////////////
-	template <typename Map>
-	inline typename Map::mapped_type find_in_map(const Map& mapKeyToValue, const typename Map::key_type& key, typename Map::mapped_type valueDefault)
-	{
-		typename Map::const_iterator it = mapKeyToValue.find(key);
-		if (it == mapKeyToValue.end())
-			return valueDefault;
-		else
-			return it->second;
-	}
-}
-
-
 struct ConsoleCommand
 {
-	ConsoleCommand() : pFunc(0) {} // flags default con is (0)
+	ConsoleCommand(); 
 
 	typedef Flags<VarFlag> FlagType;
 
@@ -96,18 +79,11 @@ struct ConsoleCommandArgs : public IConsoleCmdArgs
 	static const int	MAX_COMMAND_STRING = 2 * MAX_STRING_CHARS;
 
 public:
-	explicit ConsoleCommandArgs(core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& line) {
-		TokenizeString(line.begin(), line.end()); 
-	}
-	~ConsoleCommandArgs() X_OVERRIDE{}
+	explicit ConsoleCommandArgs(core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& line);
+	~ConsoleCommandArgs() X_OVERRIDE;
 
-	virtual int GetArgCount(void) const X_OVERRIDE {
-		return argNum_;
-	}
-		virtual const char* GetArg(int Idx) const X_OVERRIDE {
-		return (argNum_ >= 0 && Idx < argNum_) ? argv_[Idx] : "";
-	}
-
+	virtual int GetArgCount(void) const X_OVERRIDE;
+	virtual const char* GetArg(int Idx) const X_OVERRIDE;
 	void TokenizeString(const char* begin, const char* end);
 
 private:
@@ -117,14 +93,11 @@ private:
 };
 
 
-struct CmdHistory
-{
-	enum Enum
-	{
-		UP,
-		DOWN
-	};
-};
+
+X_DECLARE_ENUM(CmdHistory) (
+	UP,
+	DOWN
+);
 
 X_DECLARE_FLAGS(ExecSource)(
 	CONSOLE,
@@ -281,13 +254,22 @@ private:
 
 	struct DeferredCommand
 	{
-		string		command;
-		bool		silentMode;
-
 		DeferredCommand(const string& command, bool silentMode)
 			: command(command), silentMode(silentMode)
 		{}
+
+		string		command;
+		bool		silentMode;
 	};
+
+	struct Cursor
+	{
+		Cursor() : curTime(0.f), displayTime(0.5f), draw(false) {}
+		float curTime;
+		float displayTime;
+		bool draw;
+	};
+
 
 	// members.
 	typedef core::HashMap<const char*, ICVar*, core::hash<const char*>, equal_to_case_insen> ConsoleVarMap;		// key points into string stored in ICVar or in .exe/.dll
@@ -347,13 +329,7 @@ private:
 
 	texture::ITexture*		pBackground_;
 
-	struct Cursor_t
-	{
-		Cursor_t() : curTime(0.f), displayTime(0.5f), draw(false) {}
-		float curTime;
-		float displayTime;
-		bool draw;
-	}cursor_;
+	Cursor					cursor_;
 
 private:
 	static int		console_debug;
