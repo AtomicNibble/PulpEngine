@@ -409,4 +409,6 @@ private:
 
 X_NAMESPACE_END
 
+#include "Console.inl"
+
 #endif // _X_CONSOLE_DEF_H_
