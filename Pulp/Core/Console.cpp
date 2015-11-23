@@ -67,12 +67,6 @@ namespace
 		X_ALIGN_OF(CVarColRef)>::value;
 
 
-	template <typename T, typename T2>
-	inline float PercentageOf(const T& sub, const T2& of)
-	{
-		return (static_cast<float>(sub) / static_cast<float>(of)) * 100;
-	}
-
 	static void sortVarsByName(core::Array<core::ICVar*>& vars)
 	{
 		using namespace std;
