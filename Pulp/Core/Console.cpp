@@ -726,6 +726,10 @@ void XConsole::ShutDown(void)
 
 		VarMap_.clear();
 	}
+
+	InputBuffer_.clear();
+	RefString_.clear();
+	CmdHistory_.clear();
 }
 
 void XConsole::SaveChangedVars(void)
