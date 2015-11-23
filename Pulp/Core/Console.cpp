@@ -725,6 +725,55 @@ void XConsole::ShutDown(void)
 	}
 }
 
+void XConsole::SaveChangedVars(void)
+{
+	ConsoleVarMapItor itrVar, itrVarEnd = VarMap_.end();
+
+	if (VarMap_.empty()) {
+		X_WARNING("Console", "Skipping saving of modified vars. no registerd vars.");
+		return;
+	}
+
+	X_LOG0("Console", "Saving moified vars");
+
+	core::XFileScoped file;
+	core::fileModeFlags mode;
+
+	mode.Set(fileMode::WRITE);
+	mode.Set(fileMode::RECREATE);
+
+	if (file.openFile("user_config.cfg", mode))
+	{
+		file.writeStringNNT("// auto generated");
+
+		for (itrVar = VarMap_.begin(); itrVar != itrVarEnd; ++itrVar)
+		{
+			ICVar* pVar = itrVar->second;
+			ICVar::FlagType flags = pVar->GetFlags();
+
+			if (flags.IsSet(VarFlag::SAVE_IF_CHANGED))
+			{
+				if (flags.IsSet(VarFlag::MODIFIED))
+				{
+					// save out name + value.
+					const char* pName = pVar->GetName();
+					const char* pValue = pVar->GetString();
+
+					file.writeStringNNT(pName);
+					file.write(' ');
+					file.writeStringNNT(pValue);
+					file.write('\n');
+				}
+			}
+		}
+	}
+	else
+	{
+		X_ERROR("Console", "Failed to open file for saving modifed vars");
+	}
+}
+
+
 void XConsole::unregisterInputListener(void)
 {
 	pInput_ = gEnv->pInput;
@@ -2666,6 +2715,11 @@ void XConsoleNULL::Startup(ICore* pCore)
 }
 
 void XConsoleNULL::ShutDown(void)
+{
+
+}
+
+void XConsoleNULL::SaveChangedVars(void)
 {
 
 }
