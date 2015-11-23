@@ -683,6 +683,8 @@ bool XShaderManager::freeCoreShaders(void)
 
 	if (s_pWordShader_)
 		s_pWordShader_->release();
+	if (s_pModelShader_)
+		s_pModelShader_->release();
 
 	return true;
 }
