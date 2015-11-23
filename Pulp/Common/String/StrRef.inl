@@ -299,6 +299,8 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::operator=(StrT&& oth)
 {
 	if (this != &oth) 
 	{
+		freeData(header());
+
 		str_ = oth.str_;
 		oth.SetEmpty();
 	}
