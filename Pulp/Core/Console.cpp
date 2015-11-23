@@ -329,10 +329,7 @@ namespace
 
 		X_LOG0("Console", "--------------- ^8Binds^7 ----------------");
 
-		{
-			X_LOG_BULLET;
-			pConsole->Listbinds(&print);
-		}
+		pConsole->Listbinds(&print);
 
 		X_LOG0("Console", "------------- ^8Binds End^7 --------------");
 	}
@@ -2617,7 +2614,6 @@ void XConsole::ListCommands(const char* searchPatten)
 
 	sortCmdsByName(sorted_cmds);
 
-	X_LOG_BULLET;
 	X_LOG0("Console", "------------ ^8Commands(%i)^7 ------------", sorted_cmds.size());
 
 	core::Array<ConsoleCommand*>::ConstIterator it = sorted_cmds.begin();
@@ -2656,7 +2652,6 @@ void XConsole::ListVariables(const char* searchPatten)
 
 	sortVarsByName(sorted_vars);
 
-	X_LOG_BULLET;
 	X_LOG0("Console", "-------------- ^8Vars(%i)^7 --------------", sorted_vars.size());
 
 	core::Array<ICVar*>::ConstIterator it = sorted_vars.begin();

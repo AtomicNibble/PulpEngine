@@ -168,7 +168,6 @@ void XGuiManager::listGuis(const char* wildcardSearch) const
 
 	sortGuisByName(sorted_guis);
 	X_LOG0("Gui", "-------------- ^8Guis(%i)^7 ---------------", sorted_guis.size());
-	X_LOG_BULLET;
 
 	itrGui = sorted_guis.begin();
 	for (; itrGui != sorted_guis.end(); ++itrGui)
