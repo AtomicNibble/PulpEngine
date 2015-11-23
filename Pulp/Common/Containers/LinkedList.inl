@@ -1,4 +1,5 @@
 
+X_DISABLE_WARNING(4355)
 
 template<typename T>
 X_INLINE XLinkedList<T>::XLinkedList() :
@@ -9,6 +10,8 @@ pOwner_(nullptr)
 {
 
 }
+
+X_ENABLE_WARNING(4355)
 
 template<typename T>
 X_INLINE XLinkedList<T>::~XLinkedList()
