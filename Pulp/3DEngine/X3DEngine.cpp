@@ -106,7 +106,7 @@ bool X3DEngine::Init()
 
 //	level_.Load("boxmap");
 //	level_.Load("portal_test");
-	level_.Load("entity_test");
+//	level_.Load("entity_test");
 	return true;
 }
 
