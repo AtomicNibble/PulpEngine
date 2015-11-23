@@ -299,6 +299,8 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::operator=(StrT&& oth)
 {
 	if (this != &oth) 
 	{
+		freeData(header());
+
 		str_ = oth.str_;
 		oth.SetEmpty();
 	}
@@ -1036,10 +1038,10 @@ void StringRef<CharT>::Allocate(size_type length)
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pStrArena);
 
-		size_type allocLen = sizeof(XStrHeader)+((length + 1)*sizeof(value_type));
-		XStrHeader* pData = (XStrHeader*)X_NEW_ARRAY_OFFSET(BYTE, allocLen, gEnv->pStrArena, "StringBuf", sizeof(XStrHeader));
-		//	XStrHeader* pData = (XStrHeader*)X_NEW_ARRAY(BYTE, allocLen, gEnv->pStrArena, "StringBuf");
+		size_type allocLen = sizeof(XStrHeader) + ((length + 1) * sizeof(value_type));
 
+		XStrHeader* pData = reinterpret_cast<XStrHeader*>(X_NEW_ARRAY_OFFSET(BYTE, allocLen, 
+			gEnv->pStrArena, "StringBuf", sizeof(XStrHeader)));
 
 		pData->refCount = 1;
 		str_ = pData->getChars();

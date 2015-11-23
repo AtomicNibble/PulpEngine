@@ -114,7 +114,11 @@ class XConsole :
 public:
 	static const size_t MAX_HISTORY_ENTRIES = 64;
 	static const size_t CONSOLE_LOG_LINE_HIEGHT = 20;
+
+	static const size_t VAR_MAX = 4096;
+
 	static const char* CMD_HISTORY_FILE_NAME;
+	static const char* CONFIG_FILE_EXTENSION;
 
 	typedef consoleState consoleState;
 public:
@@ -124,6 +128,7 @@ public:
 
 	virtual void Startup(ICore* pCore) X_FINAL;
 	virtual void ShutDown(void) X_FINAL;
+	virtual void SaveChangedVars(void) X_FINAL;
 	virtual void unregisterInputListener(void) X_FINAL;
 	virtual void freeRenderResources(void) X_FINAL;
 

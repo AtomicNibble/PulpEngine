@@ -166,6 +166,11 @@ void XCore::ShutDown()
 		core::SafeRelease(env_.p3DEngine);
 	}
 
+	if (env_.pConsole)
+	{
+		env_.pConsole->SaveChangedVars();
+	}
+
 	if (env_.pFileSys)
 	{
 		env_.pFileSys->ShutDown();

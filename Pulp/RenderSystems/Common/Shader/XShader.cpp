@@ -683,6 +683,8 @@ bool XShaderManager::freeCoreShaders(void)
 
 	if (s_pWordShader_)
 		s_pWordShader_->release();
+	if (s_pModelShader_)
+		s_pModelShader_->release();
 
 	return true;
 }
@@ -705,7 +707,6 @@ void XShaderManager::listShaders(void)
 	XShader* pShader;
 
 	X_LOG0("Shader", "------------- ^8Shaders(%i)^7 -------------", shaders_.size());
-	X_LOG_BULLET;
 
 	for (; it != shaders_.end(); ++it)
 	{
@@ -726,7 +727,6 @@ void XShaderManager::listShaderSources(void)
 	const SourceFile* pSource;
 
 	X_LOG0("Shader", "--------- ^8Shader Sources(%i)^7 ---------", Sourcebin_.size());
-	X_LOG_BULLET;
 
 	for (; it != Sourcebin_.end(); ++it)
 	{

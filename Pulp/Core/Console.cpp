@@ -66,15 +66,6 @@ namespace
 		X_ALIGN_OF(CVarIntRef)>::value,
 		X_ALIGN_OF(CVarColRef)>::value;
 
-	static const size_t VAR_MAX = 4096;
-	static const char* CONFIG_FILE_EXTENSION = "cfg";
-
-
-	template <typename T, typename T2>
-	inline float PercentageOf(const T& sub, const T2& of)
-	{
-		return (static_cast<float>(sub) / static_cast<float>(of)) * 100;
-	}
 
 	static void sortVarsByName(core::Array<core::ICVar*>& vars)
 	{
@@ -338,10 +329,7 @@ namespace
 
 		X_LOG0("Console", "--------------- ^8Binds^7 ----------------");
 
-		{
-			X_LOG_BULLET;
-			pConsole->Listbinds(&print);
-		}
+		pConsole->Listbinds(&print);
 
 		X_LOG0("Console", "------------- ^8Binds End^7 --------------");
 	}
@@ -543,6 +531,7 @@ void ConsoleCommandArgs::TokenizeString(const char *begin, const char* end)
 //////////////////////////////////////////////////////////////////////////
 
 const char* XConsole::CMD_HISTORY_FILE_NAME = "cmdHistory.txt";
+const char* XConsole::CONFIG_FILE_EXTENSION = "cfg";
 
 int XConsole::console_debug = 0;
 int XConsole::console_save_history = 0;
@@ -732,6 +721,55 @@ void XConsole::ShutDown(void)
 		VarMap_.clear();
 	}
 }
+
+void XConsole::SaveChangedVars(void)
+{
+	ConsoleVarMapItor itrVar, itrVarEnd = VarMap_.end();
+
+	if (VarMap_.empty()) {
+		X_WARNING("Console", "Skipping saving of modified vars. no registerd vars.");
+		return;
+	}
+
+	X_LOG0("Console", "Saving moified vars");
+
+	core::XFileScoped file;
+	core::fileModeFlags mode;
+
+	mode.Set(fileMode::WRITE);
+	mode.Set(fileMode::RECREATE);
+
+	if (file.openFile("user_config.cfg", mode))
+	{
+		file.writeStringNNT("// auto generated");
+
+		for (itrVar = VarMap_.begin(); itrVar != itrVarEnd; ++itrVar)
+		{
+			ICVar* pVar = itrVar->second;
+			ICVar::FlagType flags = pVar->GetFlags();
+
+			if (flags.IsSet(VarFlag::SAVE_IF_CHANGED))
+			{
+				if (flags.IsSet(VarFlag::MODIFIED))
+				{
+					// save out name + value.
+					const char* pName = pVar->GetName();
+					const char* pValue = pVar->GetString();
+
+					file.writeStringNNT(pName);
+					file.write(' ');
+					file.writeStringNNT(pValue);
+					file.write('\n');
+				}
+			}
+		}
+	}
+	else
+	{
+		X_ERROR("Console", "Failed to open file for saving modifed vars");
+	}
+}
+
 
 void XConsole::unregisterInputListener(void)
 {
@@ -2576,7 +2614,6 @@ void XConsole::ListCommands(const char* searchPatten)
 
 	sortCmdsByName(sorted_cmds);
 
-	X_LOG_BULLET;
 	X_LOG0("Console", "------------ ^8Commands(%i)^7 ------------", sorted_cmds.size());
 
 	core::Array<ConsoleCommand*>::ConstIterator it = sorted_cmds.begin();
@@ -2615,7 +2652,6 @@ void XConsole::ListVariables(const char* searchPatten)
 
 	sortVarsByName(sorted_vars);
 
-	X_LOG_BULLET;
 	X_LOG0("Console", "-------------- ^8Vars(%i)^7 --------------", sorted_vars.size());
 
 	core::Array<ICVar*>::ConstIterator it = sorted_vars.begin();
@@ -2674,6 +2710,11 @@ void XConsoleNULL::Startup(ICore* pCore)
 }
 
 void XConsoleNULL::ShutDown(void)
+{
+
+}
+
+void XConsoleNULL::SaveChangedVars(void)
 {
 
 }

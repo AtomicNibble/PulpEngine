@@ -162,6 +162,15 @@ struct XFile
 	inline uint32_t writeString(const char* str, uint32_t Length) {
 		return write(str, Length);
 	}
+
+	inline uint32_t writeStringNNT(core::string& str) {
+		return write(str.c_str(), safe_static_cast<uint32_t, size_t>(str.length()));
+	}
+	inline uint32_t writeStringNNT(const char* str) {
+		return write(str, safe_static_cast<uint32_t, size_t>(strlen(str)));
+	}
+
+
 	inline uint32_t printf(const char *fmt, ...) {
 		char buf[2048]; // more? i think not!
 		int length;
@@ -540,6 +549,13 @@ public:
 	}
 	inline uint32_t writeString(const char* str, uint32_t Length) {
 		return pFile_->writeString(str, Length);
+	}
+
+	inline uint32_t writeStringNNT(core::string& str) {
+		return pFile_->writeStringNNT(str);
+	}
+	inline uint32_t writeStringNNT(const char* str) {
+		return pFile_->writeStringNNT(str);
 	}
 
 	template <typename T>
