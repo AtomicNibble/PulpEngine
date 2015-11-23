@@ -534,6 +534,7 @@ const char* XConsole::CMD_HISTORY_FILE_NAME = "cmdHistory.txt";
 const char* XConsole::CONFIG_FILE_EXTENSION = "cfg";
 
 int XConsole::console_debug = 0;
+int XConsole::console_case_sensitive = 0;
 int XConsole::console_save_history = 0;
 Color XConsole::console_input_box_color;
 Color XConsole::console_input_box_color_border;
@@ -646,11 +647,16 @@ void XConsole::Startup(ICore* pCore)
 	pBackground_ = pRender_->LoadTexture("Textures/white.dds", 
 		texture::TextureFlags::DONT_STREAM);
 
-	ADD_CVAR_REF_NO_NAME(console_debug, 0, 0, 1, VarFlag::SYSTEM | VarFlag::CHEAT, "Debugging for console operations. 0=off 1=on");
-	ADD_CVAR_REF_NO_NAME(console_save_history, 1, 0, 1, VarFlag::SYSTEM | VarFlag::CHEAT | VarFlag::SAVE_IF_CHANGED,
+	ADD_CVAR_REF_NO_NAME(console_debug, 0, 0, 1, VarFlag::SYSTEM | VarFlag::CHEAT, 
+		"Debugging for console operations. 0=off 1=on");
+	ADD_CVAR_REF_NO_NAME(console_case_sensitive, 0, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+		"Console input auto complete is case-sensitive");
+	ADD_CVAR_REF_NO_NAME(console_save_history, 1, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
 		"Saves command history to file");
-	ADD_CVAR_REF_NO_NAME(console_buffer_size, 1000, 1, 10000, VarFlag::SYSTEM, "Size of the log buffer");
-	ADD_CVAR_REF_NO_NAME(console_output_draw_channel, 1, 0, 1, VarFlag::SYSTEM, "Draw the channel in a diffrent color. 0=disabled 1=enabled");
+	ADD_CVAR_REF_NO_NAME(console_buffer_size, 1000, 1, 10000, VarFlag::SYSTEM, 
+		"Size of the log buffer");
+	ADD_CVAR_REF_NO_NAME(console_output_draw_channel, 1, 0, 1, VarFlag::SYSTEM, 
+		"Draw the channel in a diffrent color. 0=disabled 1=enabled");
 
 	ADD_CVAR_REF_COL_NO_NAME(console_input_box_color, Color(0.3f, 0.3f, 0.3f, 0.75f), 
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console input box color");
@@ -720,6 +726,10 @@ void XConsole::ShutDown(void)
 
 		VarMap_.clear();
 	}
+
+	InputBuffer_.clear();
+	RefString_.clear();
+	CmdHistory_.clear();
 }
 
 void XConsole::SaveChangedVars(void)
@@ -2165,6 +2175,14 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 			return;
 		}
 
+		typedef core::traits::Function<bool(const char*, const char*,
+			const char*, const char*)> MyComparisionFunc;
+
+		MyComparisionFunc::Pointer pComparison = core::strUtil::IsEqual;
+		if (!console_case_sensitive) {
+			pComparison = core::strUtil::IsEqualCaseInsen;
+		}
+
 		// try find and cmd's / dvars that match the current input.
 		ConsoleVarMapItor it = VarMap_.begin();
 
@@ -2179,7 +2197,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 			}
 
 			// we search same length.
-			if (core::strUtil::IsEqual(Name, Name + inputLen, inputBegin, inputEnd))
+			if (pComparison(Name, Name + inputLen, inputBegin, inputEnd))
 			{
 				results.push_back(AutoResult(Name, it->second));
 			}
@@ -2204,7 +2222,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				}
 
 				// we search same length.
-				if (core::strUtil::IsEqual(Name, Name + inputLen, inputBegin, inputEnd))
+				if (pComparison(Name, Name + inputLen, inputBegin, inputEnd))
 				{
 					results.push_back(AutoResult(Name, nullptr));
 				}
@@ -2213,7 +2231,6 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 					break;
 				}
 			}
-
 		}
 
 

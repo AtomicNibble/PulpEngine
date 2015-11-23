@@ -337,6 +337,7 @@ private:
 
 private:
 	static int		console_debug;
+	static int		console_case_sensitive;
 	static int		console_save_history;
 	static Color	console_input_box_color;
 	static Color	console_input_box_color_border;
