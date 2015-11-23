@@ -45,12 +45,12 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 	// goaty meshes!
 	XLexToken token;
 	XMapPatch* patch = nullptr;
-	core::StackString<64> mat_name, light_map;
+
+	core::StackString<level::MAP_MAX_MATERIAL_LEN> matName, lightMap;
 
 	int width, height, dunno1, dunno2;
 	int x, y;
-	float t[4];
-	int  c[4];
+	int c[4];
 
 	if (!src.ExpectTokenString("{")) {
 		return nullptr;
@@ -81,7 +81,7 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 		return false;
 	}
 
-	mat_name = core::StackString<64>(token.begin(), token.end());
+	matName = core::StackString<level::MAP_MAX_MATERIAL_LEN>(token.begin(), token.end());
 
 	// read the light map name
 	if (!src.ReadToken(token)) {
@@ -89,7 +89,7 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 		return false;
 	}
 
-	light_map = core::StackString<64>(token.begin(), token.end());
+	lightMap = core::StackString<level::MAP_MAX_MATERIAL_LEN>(token.begin(), token.end());
 
 
 	// sometimes we have smmothing bullshit.
@@ -107,9 +107,14 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 	dunno2 = src.ParseInt();
 
 	patch = X_NEW(XMapPatch,arena,"MapPatch")(width, height);
-	patch->verts.resize(width * height);
+	patch->matName_ = matName;
+	patch->lightMap_ = lightMap;
+	patch->verts_.resize(width * height);
 	patch->SetHorzSubdivisions(dunno1);
 	patch->SetVertSubdivisions(dunno2);
+
+	Vec2f uv;
+	Vec2f lightMapUv;
 
 	// we now how x groups each with y entryies.
 	for (x = 0; x < width; x++)
@@ -121,7 +126,7 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 
 		for (y = 0; y < height; y++)
 		{
-			xVert& vert = patch->verts[(y * width) + x];
+			xVert& vert = patch->verts_[(y * width) + x];
 
 			// each line has a -v and a -t
 			if (!src.ExpectTokenString("v")) {
@@ -168,14 +173,23 @@ XMapPatch* XMapPatch::Parse(XLexer &src, core::MemoryArenaBase* arena, const Vec
 				vert.color = Vec4<uint8>::max();
 			}
 
-			t[0] = src.ParseFloat();
-			t[1] = src.ParseFloat();
-			t[2] = src.ParseFloat();
-			t[3] = src.ParseFloat();
+			uv[0] = src.ParseFloat();
+			uv[1] = src.ParseFloat();
+			lightMapUv[0] = src.ParseFloat();
+			lightMapUv[1] = src.ParseFloat();
 
-			// 4 tex cords what is this shit!
-			vert.uv[0] = t[0];
-			vert.uv[1] = t[1];
+			// we have two sets of values on for text other for light map :Z
+			// for a 512x512 texture that is fit to the patch
+			// the values will range from 0-1024
+			// [0,0]		[512,0]		[1024,0]
+			//
+			// [0,512]		[512,512]		[1024,512]
+			//
+			// [0,1024]		[512,1024]		[1024,1024]
+
+			// /= 1024
+			uv *= 0.0009765625f; 
+			vert.uv = uv;
 
 			// some lines have "f 1"
 			// get rekt.
@@ -279,14 +293,16 @@ XMapBrush* XMapBrush::Parse(XLexer& src, core::MemoryArenaBase* arena, const Vec
 				break;
 			}
 			// the token should be a key string for a key/value pair
-			if (token.type != TT_NAME) {
+			if (token.GetType() != TokenType::NAME) {
 				src.Error("MapBrush::Parse: unexpected %.*s, expected '(' or pair key string.",
 					token.length(), token.begin());
 				X_DELETE(brush, arena);
 				return nullptr;
 			}
 
-			if (!src.ReadTokenOnLine(token) || (token.type != TT_STRING && token.type != TT_NAME)) {
+			if (!src.ReadTokenOnLine(token) || (token.GetType() != TokenType::STRING
+				&& token.GetType() != TokenType::NAME))
+			{
 				src.Error("MapBrush::Parse: expected pair value string not found.");
 				X_DELETE(brush, arena);
 				return nullptr;
@@ -363,6 +379,7 @@ XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena, bool is
 	if (isWorldSpawn) {
 		// the world spawn is the layout, so gonna be lots :D
 		mapEnt->primitives.reserve(4096 * 8);
+		mapEnt->primitives.setGranularity(4096);
 	}
 
 	worldent = false;
@@ -430,7 +447,7 @@ XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena, bool is
 			//	value.trimWhitespace();
 			//	key.trimWhitespace();
 
-			mapEnt->epairs[key.c_str()] = value.c_str();
+			mapEnt->epairs[core::string(key.c_str())] = value.c_str();
 
 			if (key.isEqual("origin"))
 			{
@@ -503,7 +520,10 @@ bool XMapFile::Parse(const char* pData, size_t length)
 		XLexToken token;
 		XMapEntity *mapEnt;
 
-		lexer.setFlags(LexFlag::NOSTRINGCONCAT | LexFlag::NOSTRINGESCAPECHARS | LexFlag::ALLOWPATHNAMES);
+		lexer.setFlags(LexFlag::NOSTRINGCONCAT | 
+			LexFlag::NOSTRINGESCAPECHARS | 
+			LexFlag::ALLOWPATHNAMES |
+			LexFlag::ALLOWDOLLARNAMES);
 
 		// we need to parse up untill the first brace.
 		while (lexer.ReadToken(token))
@@ -519,7 +539,12 @@ bool XMapFile::Parse(const char* pData, size_t length)
 		while (1) 
 		{
 			mapEnt = XMapEntity::Parse(lexer, &primPoolArena_, entities_.isEmpty());
-			if (!mapEnt) {
+			if (!mapEnt) 
+			{
+				if (lexer.GetErrorState() != XLexer::ErrorState::OK) {
+					X_ERROR("Map", "Failed to load map file correctly.");
+					return false;
+				}
 				break;
 			}
 
@@ -527,10 +552,12 @@ bool XMapFile::Parse(const char* pData, size_t length)
 			{
 				const XMapPrimitive* prim = mapEnt->GetPrimitive(i);
 
-				if (prim->getType() == PrimType::BRUSH)
+				if (prim->getType() == PrimType::BRUSH) {
 					this->numBrushes++;
-				else if (prim->getType() == PrimType::PATCH)
+				}
+				else if (prim->getType() == PrimType::PATCH) {
 					this->numPatches++;
+				}
 			}
 
 			entities_.push_back(mapEnt);

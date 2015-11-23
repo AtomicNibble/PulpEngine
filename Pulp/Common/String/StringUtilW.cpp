@@ -49,7 +49,7 @@ namespace strUtil
 	const wchar_t* workingDir(WorkingDirStrW& buf)
 	{
 		core::zero_object(buf);
-		_wgetcwd(buf, sizeof(buf) - 1);
+		_wgetcwd(buf, (sizeof(buf) / 2 ) - 1);
 
 		return buf;
 	}
@@ -265,6 +265,10 @@ namespace strUtil
 		return nullptr;
 	}
 
+	const wchar_t* Find(const wchar_t* startInclusive, wchar_t what)
+	{
+		return Find(startInclusive, startInclusive + strlen(startInclusive), what);
+	}
 
 	/// \brief Finds a character in a string, and returns a pointer to the first occurrence of the character.
 	/// \remark Returns a \c nullptr if the character could not be found.

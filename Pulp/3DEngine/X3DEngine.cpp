@@ -11,8 +11,8 @@
 
 #include <IGui.h>
 
-#include "ModelLoader.h"
 #include "MaterialManager.h"
+#include "ModelManager.h"
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -25,15 +25,12 @@ render::IRender* X3DEngine::pRender_ = nullptr;
 
 // 3d
 engine::XMaterialManager* X3DEngine::pMaterialManager_ = nullptr;
+model::XModelManager* X3DEngine::pModelManager_ = nullptr;
 
 gui::XGuiManager* X3DEngine::pGuiManger_ = nullptr;
 
 
 //------------------------------------------
-texture::ITexture* pTex = nullptr;
-texture::ITexture* pTex1 = nullptr;
-texture::ITexture* pTexSky = nullptr;
-
 gui::IGui* gui = nullptr;
 
 // Commands
@@ -98,6 +95,9 @@ bool X3DEngine::Init()
 	pMaterialManager_->Init();
 	pGuiManger_ = &guisMan_;
 
+	pModelManager_ = X_NEW(model::XModelManager, g_3dEngineArena, "ModelManager");
+	pModelManager_->Init();
+
 	RegisterCmds();
 
 	guisMan_.Init();
@@ -105,7 +105,8 @@ bool X3DEngine::Init()
 	level::Level::Init();
 
 //	level_.Load("boxmap");
-	level_.Load("portal_test");
+//	level_.Load("portal_test");
+//	level_.Load("entity_test");
 	return true;
 }
 
@@ -117,6 +118,11 @@ void X3DEngine::ShutDown()
 	gEnv->pHotReload->addfileType(nullptr, "map");
 
 	guisMan_.Shutdown();
+
+	if (pModelManager_) {
+		pModelManager_->ShutDown();
+		X_DELETE(pModelManager_, g_3dEngineArena);
+	}
 
 	if (pMaterialManager_) {
 		pMaterialManager_->ShutDown();

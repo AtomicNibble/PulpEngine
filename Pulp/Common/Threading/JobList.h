@@ -102,7 +102,7 @@ public:
 	friend class jobListRunner;
 	friend class JobThread;
 public:
-	JobList(core::MemoryArenaBase* arena);
+	explicit JobList(core::MemoryArenaBase* arena);
 
 	void AddJob(Job job, void* pData);
 
@@ -176,6 +176,8 @@ class JobThread : public ThreadAbstract
 
 	struct threadJobList
 	{
+		threadJobList();
+
 		JobList* jobList;
 		int32_t	version;
 	};

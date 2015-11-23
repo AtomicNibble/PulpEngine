@@ -38,7 +38,7 @@ public:
 	inline void Leave(void);
 
 private:
-	SynchronizationPrimitive m_primitive;
+	SynchronizationPrimitive primitive_;
 };
 
 #include "MultiThreadPolicy.inl"

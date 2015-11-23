@@ -14,9 +14,12 @@ public:
 	// constructs the stream no memory is allocated.
 	inline ByteStreamFifo(MemoryArenaBase* arena);
 	inline ByteStreamFifo(MemoryArenaBase* arena, size_t numBytes);
+	inline ByteStreamFifo(const ByteStreamFifo& oth);
+	inline ByteStreamFifo(ByteStreamFifo&& oth);
 	inline ~ByteStreamFifo(void);
 
-//	inline void setArena(MemoryArenaBase* arena);
+	inline ByteStreamFifo& operator=(const ByteStreamFifo& oth);
+	inline ByteStreamFifo& operator=(ByteStreamFifo&& oth);
 
 	// writes the type to the stream.
 	template<typename T>
@@ -65,8 +68,8 @@ public:
 	}
 
 protected:
-	X_NO_COPY(ByteStreamFifo);
-	X_NO_ASSIGN(ByteStreamFifo);
+//	X_NO_COPY(ByteStreamFifo);
+//	X_NO_ASSIGN(ByteStreamFifo);
 
 	// for easy memory allocation changes later.
 	inline void Delete(char* pData) const;

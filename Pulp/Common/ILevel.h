@@ -203,9 +203,39 @@ X_NAMESPACE_BEGIN(level)
 //
 //	Step 4:	
 //
-//		Each area that has been determined as visable, is then drawn.
-//		Optionaly do I want to frustrum cull geo?
-//		Or keep that to just FX's
+//		Each area that has been determined as visable, has it's entiry list processed.
+//		When the level was compiled all the ents in the area where added to the area's ent ref list.
+//		So I know what is visible in each area.
+//		
+//		We can then perform aditional culling on this list: funcstrum, portal stack.
+//		
+//		Ent's that are in multiple area's are stored / processed diffrently.
+//		
+//		How they are stored:
+//		
+//		We ((areaNum / 32) + 1) lists, each responsible for 64 areas in the map.
+//		each item in the list has a 32bit flag for the area's it's in.
+//		
+//		Then we create a flag for the frames visible area's and traverse down the list
+//		& the flags and if it's positive the ent is in one of the visible area's
+//		
+//		Example:
+//		
+//		Visible Areas: 1,6,24
+//		Flag:    00000001 00000000 00000000 01000010
+//		
+//		0-63 list:
+//		
+//		| 0 | chair_wood | 00000000 00000000 00000000 00000011
+//		| 1 | chair_wood | 00000000 00000000 00100100 00000000
+//		| 2 | chair_wood | 00000001 00000000 00000000 00000000
+//		| 3 | chair_wood | 01100000 00000000 00000000 00000000
+//		
+//		So after going down the flag indexes 0,2 are visible.
+//		If a end is visible in area 62 and 79 it will still work fine.
+//		
+//		Lists will only get checked if there is a currently visible area in that list.
+//		Aka the lists visibility flag is not zero.
 //
 //	-----------------------------------------
 //
@@ -223,7 +253,7 @@ X_NAMESPACE_BEGIN(level)
 //
 //
 
-static const uint32_t	 LVL_VERSION = 12; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
+static const uint32_t	 LVL_VERSION = 15; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
 static const uint32_t	 LVL_FOURCC = X_TAG('x', 'l', 'v', 'l');
 static const uint32_t	 LVL_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r'); // if a file falid to write the final header, this will be it's FourCC
 // feels kinda wrong to call it a '.bsp', since it's otherthings as well. 
@@ -247,6 +277,7 @@ static const uint32_t	 MAP_MAX_SIDES_PER_BRUSH = 64;		// max sides a single brus
 static const uint32_t	 MAP_MAX_NODES = 65536;
 static const uint32_t	 MAP_MAX_LEAFS = 65536;
 static const uint32_t	 MAP_MAX_AREAS = 0x100;
+static const uint32_t	 MAP_MAX_MULTI_REF_LISTS = (MAP_MAX_AREAS / 32);
 static const uint32_t	 MAP_MAX_PORTALS = 0x100;
 static const uint32_t	 MAP_MAX_SURFACES = 65536 * 2;		
 static const uint32_t	 MAP_MAX_MODELS = 0x400;			// a model is a 'area'.
@@ -275,7 +306,14 @@ X_DECLARE_FLAGS(MatContentFlags)(SOLID, WATER, PLAYER_CLIP, MONSTER_CLIP, TRIGGE
 X_DECLARE_FLAGS(MatSurfaceFlags)(NO_DRAW, LADDER);
 
 // this is the flags for the file header, which tells you what option stuff is inside the file.
-X_DECLARE_FLAGS(LevelFileFlags)(INTER_AREA_INFO, BSP_TREE, OCT_TREE, DEBUG_PORTAL_DATA);
+X_DECLARE_FLAGS(LevelFileFlags)(
+	INTER_AREA_INFO,
+	AREA_ENT_REF_LISTS,
+	AREA_MODEL_REF_LISTS,
+	BSP_TREE, 
+	OCT_TREE, 
+	DEBUG_PORTAL_DATA
+);
 X_DECLARE_ENUM(SurfaceType)(Invalid, Plane, Patch);
 
 typedef Flags<MatContentFlags> MatContentFlag;
@@ -318,6 +356,17 @@ struct StaticModel : public Entity
 
 	core::Pointer64<model::IRenderMesh > pRenderMesh;
 };
+#else
+
+// not saved to file sruntime only.
+struct StaticModel
+{
+	Vec3f pos;
+	Quatf angle;
+
+	uint32_t modelNameIdx;
+	model::IModel* pModel;
+};
 #endif
 
 
@@ -338,17 +387,46 @@ X_DECLARE_ENUM(FileNodes) (
 	STRING_TABLE,
 	AREAS,
 	AREA_PORTALS,
-	BSP_TREE,
-	STATIC_MODELS
+	AREA_ENT_REFS,		// all ents except models.
+	AREA_MODEL_REFS,	// area model refs.
+	STATIC_MODELS,		// all the static models in the map.
+	BSP_TREE
 );
+
+X_DECLARE_ENUM(ClassType) (
+	UNKNOWN,
+	WORLDSPAWN,
+	PLAYER_START,
+	MISC_MODEL,
+	FUNC_GROUP
+);
+
+struct FileAreaRefHdr
+{
+	uint32_t startIndex;
+	uint32_t num;
+};
+
+
+X_PACK_PUSH(4)
+struct AreaEntRef
+{
+	uint32_t entId;
+};
+
+struct MultiAreaEntRef : public AreaEntRef
+{
+	uint32_t flags;
+};
+X_PACK_POP
+
 
 struct FileStaticModel
 {
 	Vec3f pos;
 	Quatf angle;
 
-	uint16_t modelNameIdx;
-	uint16_t _unused; // might place somthing here, like area id.
+	uint32_t modelNameIdx;
 };
 
 struct FileNode
@@ -385,10 +463,20 @@ struct FileHeader
 	uint32_t numStrings;
 
 	// the number of area;s in the level file.
+	// also signifys how many multi area ref ent lists we have. (num / 32) + 1
 	int32_t numAreas;
 	int32_t numinterAreaPortals;
 	int32_t numNodes;
 
+	// ent ref sizes.
+	int32_t numEntRefs;
+	int32_t numMultiAreaEntRefs;
+
+	// model ref sizes.
+	int32_t numModelRefs;
+	int32_t numMultiAreaModelRefs;
+	// size of the static model info.
+	int32_t numStaticModels;
 
 	FileNode nodes[FileNodes::ENUM_COUNT];
 
@@ -414,10 +502,13 @@ struct FileHeader
 // X_ENSURE_SIZE(Portal, 0x28);
 //X_ENSURE_SIZE(Area, 0x28 + 0xC + 12);
 
+X_ENSURE_SIZE(AreaEntRef, 4);
+X_ENSURE_SIZE(MultiAreaEntRef, 8);
+
 
 // check file structure sizes also.
 X_ENSURE_SIZE(FileNode, 8);
-X_ENSURE_SIZE(FileHeader, 40 + (sizeof(FileNode)* FileNodes::ENUM_COUNT));
+X_ENSURE_SIZE(FileHeader, 60 + (sizeof(FileNode)* FileNodes::ENUM_COUNT));
 
 X_NAMESPACE_END
 

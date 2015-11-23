@@ -50,9 +50,9 @@ namespace
 		cpuid(&Info, 0);
 
 #if _WIN64
-		*((int*)Name) = Info.ebx.m_name;
-		*((int*)(Name + 4)) = Info.edx.m_name;
-		*((int*)(Name + 8)) = Info.ecx.m_name;
+		*((int*)Name) = Info.ebx.name_;
+		*((int*)(Name + 4)) = Info.edx.name_;
+		*((int*)(Name + 8)) = Info.ecx.name_;
 #else
 		__asm {
 			mov esi, Name
@@ -166,17 +166,17 @@ CpuInfo::CpuInfo(void)
 
 	ProcessVendor(info0_, cpuVendor_);
 
-	if (info0_.eax.m_maxValidValue >= 1)
+	if (info0_.eax.maxValidValue_ >= 1)
 	{
 		cpuid(&info1_, 1);
 		cpuid(&infoEx0_, 0x80000000);
 
-		if (infoEx0_.eax.m_maxValidValue >= 0x80000001)
+		if (infoEx0_.eax.maxValidValue_ >= 0x80000001)
 		{
 			cpuid(&infoEx1_, 0x80000001);
 		}
 
-		if (infoEx0_.eax.m_maxValidValue >= 0x80000004)
+		if (infoEx0_.eax.maxValidValue_ >= 0x80000004)
 		{
 			ProcessCPUName(cpuName_);
 		}

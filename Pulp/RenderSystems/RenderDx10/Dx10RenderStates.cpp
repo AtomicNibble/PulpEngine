@@ -85,7 +85,7 @@ void DX11XRender::RT_SetState(StateFlag state)
 	bool bDirtyDS = false;
 
 	int Changed;
-	Changed = state.ToInt() ^ m_State.currentState.ToInt();
+	Changed = state.ToInt() ^ State_.currentState.ToInt();
 
 
 	if (Changed & States::WIREFRAME)
@@ -293,7 +293,7 @@ void DX11XRender::RT_SetState(StateFlag state)
 	bDirtyBS |= bNewATOC ^ bCurATOC;
 	blend.Desc.AlphaToCoverageEnable = bNewATOC;
 
-	m_State.currentState = state;
+	State_.currentState = state;
 
 	if (bDirtyBS)
 		SetBlendState(blend);
@@ -307,7 +307,7 @@ void DX11XRender::RT_SetState(StateFlag state)
 
 void DX11XRender::RT_SetCullMode(CullMode::Enum mode)
 {
-	if (this->m_State.cullMode == mode)
+	if (this->State_.cullMode == mode)
 		return;
 
 	RasterState state = curRasterState();
@@ -325,7 +325,7 @@ void DX11XRender::RT_SetCullMode(CullMode::Enum mode)
 		break;
 	}
 
-	m_State.cullMode = mode;
+	State_.cullMode = mode;
 
 	SetRasterState(state);
 }
@@ -339,26 +339,26 @@ bool DX11XRender::SetBlendState(BlendState& state)
 
 	state.createHash();
 
-	for (i = 0; i< (uint32_t)m_BlendStates.size(); i++)
+	for (i = 0; i< safe_static_cast<uint32_t, size_t>(BlendStates_.size()); i++)
 	{
-		if (m_BlendStates[i] == state) {
+		if (BlendStates_[i] == state) {
 			break;
 		}
 	}
 
-	if (i == m_BlendStates.size())
+	if (i == BlendStates_.size())
 	{
 		// we dont have this state of this type on the gpu yet.
 		hr = DxDevice()->CreateBlendState(&state.Desc, &state.pState);
 		// save it, and since we add 1 i becomes a valid index.
-		m_BlendStates.push_back(state);
+		BlendStates_.push_back(state);
 	}
 
 	// needs changing?
-	if (i != m_CurBlendState)
+	if (i != CurBlendState_)
 	{
-		m_CurBlendState = i;
-		DxDeviceContext()->OMSetBlendState(m_BlendStates[i].pState, 0, 0xFFFFFFFF);
+		CurBlendState_ = i;
+		DxDeviceContext()->OMSetBlendState(BlendStates_[i].pState, 0, 0xFFFFFFFF);
 	}
 
 	return SUCCEEDED(hr);
@@ -373,26 +373,26 @@ bool DX11XRender::SetRasterState(RasterState& state)
 
 	state.createHash();
 
-	for (i = 0; i< (uint32_t)m_RasterStates.size(); i++)
+	for (i = 0; i< safe_static_cast<uint32_t, size_t>(RasterStates_.size()); i++)
 	{
-		if (m_RasterStates[i] == state) {
+		if (RasterStates_[i] == state) {
 			break;
 		}
 	}
 
-	if (i == m_RasterStates.size())
+	if (i == RasterStates_.size())
 	{
 		// we dont have this state of this type on the gpu yet.
 		hr = DxDevice()->CreateRasterizerState(&state.Desc, &state.pState);
 		// save it, and since we add 1 i becomes a valid index.
-		m_RasterStates.push_back(state);
+		RasterStates_.push_back(state);
 	}
 
 	// needs changing?
-	if (i != m_CurRasterState)
+	if (i != CurRasterState_)
 	{
-		m_CurRasterState = i;
-		DxDeviceContext()->RSSetState(m_RasterStates[i].pState);
+		CurRasterState_ = i;
+		DxDeviceContext()->RSSetState(RasterStates_[i].pState);
 	}
 
 	return SUCCEEDED(hr);
@@ -407,28 +407,28 @@ bool DX11XRender::SetDepthState(DepthState& state)
 
 	state.createHash();
 
-	for (i = 0; i< (uint32_t)m_DepthStates.size(); i++)
+	for (i = 0; i< safe_static_cast<uint32_t,size_t>(DepthStates_.size()); i++)
 	{
-		if (m_DepthStates[i] == state) {
+		if (DepthStates_[i] == state) {
 			break;
 		}
 	}
 
-	if (i == m_DepthStates.size())
+	if (i == DepthStates_.size())
 	{
 		// we dont have this state of this type on the gpu yet.
 		hr = DxDevice()->CreateDepthStencilState(&state.Desc, &state.pState);
 		// save it, and since we add 1 i becomes a valid index.
-		m_DepthStates.push_back(state);
+		DepthStates_.push_back(state);
 
 		D3DDebug::SetDebugObjectName(state.pState, __FUNCTION__);
 	}
 
 	// needs changing?
-	if (i != m_CurDepthState)
+	if (i != CurDepthState_)
 	{
-		m_CurDepthState = i;
-		DxDeviceContext()->OMSetDepthStencilState(m_DepthStates[i].pState, 0);
+		CurDepthState_ = i;
+		DxDeviceContext()->OMSetDepthStencilState(DepthStates_[i].pState, 0);
 	}
 
 	return SUCCEEDED(hr);

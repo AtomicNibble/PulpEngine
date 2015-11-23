@@ -292,6 +292,44 @@ void bspNode::ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& sid
 	return;
 }
 
+int32_t bspNode::CheckWindingInAreas_r(XPlaneSet& planes, const XWinding* w)
+{
+	if (!w) {
+		return -1;
+	}
+
+	XWinding* front, *back;
+
+	if (planenum != PLANENUM_LEAF)
+	{
+		int32_t a1, a2;
+
+		w->Split(planes[planenum], ON_EPSILON, &front, &back, g_arena);
+
+		a1 = children[0]->CheckWindingInAreas_r(planes, front);
+		X_DELETE(front, g_arena);
+		a2 = children[1]->CheckWindingInAreas_r(planes, back);
+		X_DELETE(back, g_arena);
+
+		if (a1 == -2 || a2 == -2) {
+			return -2;	// different
+		}
+		if (a1 == -1) {
+			return a2;	// one solid
+		}
+		if (a2 == -1) {
+			return a1;	// one solid
+		}
+
+		if (a1 != a2) {
+			return -2;	// cross areas
+		}
+		return a1;
+	}
+
+	return area;
+}
+
 void bspNode::FindAreas_r(size_t& numAreas)
 {
 	if (planenum != PLANENUM_LEAF) {
@@ -311,7 +349,7 @@ void bspNode::FindAreas_r(size_t& numAreas)
 	size_t areaFloods = 0;
 	this->FloodAreas_r(numAreas, areaFloods);
 
-	X_LOG0("Lvl", "area %i has %i leafs", numAreas, areaFloods);
+	X_LOG0("Lvl", "area ^8%i^7 has ^8%i^7 leafs", numAreas, areaFloods);
 	numAreas++;
 
 }

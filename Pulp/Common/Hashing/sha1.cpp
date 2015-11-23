@@ -16,14 +16,14 @@ namespace Hash
 #endif
 
 #ifdef SHA1_LITTLE_ENDIAN
-#define SHABLK0(i) (block.l[i] = \
-	(ROL32(block.l[i], 24) & 0xFF00FF00) | (ROL32(block.l[i], 8) & 0x00FF00FF))
+#define SHABLK0(i) (block_.l[i] = \
+	(ROL32(block_.l[i], 24) & 0xFF00FF00) | (ROL32(block_.l[i], 8) & 0x00FF00FF))
 #else
 #define SHABLK0(i) (buffer.l[i])
 #endif
 
-#define SHABLK(i) (block.l[i&15] = ROL32(block.l[(i+13)&15] ^ \
-	block.l[(i + 8) & 15] ^ block.l[(i + 2) & 15] ^ block.l[i & 15], 1))
+#define SHABLK(i) (block_.l[i&15] = ROL32(block_.l[(i+13)&15] ^ \
+	block_.l[(i + 8) & 15] ^ block_.l[(i + 2) & 15] ^ block_.l[i & 15], 1))
 
 // SHA-1 rounds
 #define S_R0(v,w,x,y,z,i) {z+=((w&(x^y))^y)+SHABLK0(i)+0x5A827999+ROL32(v,5);w=ROL32(w,30);}
@@ -76,18 +76,18 @@ namespace Hash
 
 	void SHA1::reset(void)
 	{
-		zero_object(buffer);
-		digest[0] = 0x67452301;
-		digest[1] = 0xefcdab89;
-		digest[2] = 0x98badcfe;
-		digest[3] = 0x10325476;
-		digest[4] = 0xc3d2e1f0;
-		numBytes = 0;
+		zero_object(buffer_);
+		digest_[0] = 0x67452301;
+		digest_[1] = 0xefcdab89;
+		digest_[2] = 0x98badcfe;
+		digest_[3] = 0x10325476;
+		digest_[4] = 0xc3d2e1f0;
+		numBytes_ = 0;
 	}
 
 	void SHA1::update(const void* buf, size_t length)
 	{
-		size_t index = numBytes % BLOCK_BYTES;
+		size_t index = numBytes_ % BLOCK_BYTES;
 		size_t firstpart = BLOCK_BYTES - index;
 		size_t i;
 
@@ -95,8 +95,8 @@ namespace Hash
 
 		if (length >= firstpart)
 		{
-			memcpy(&buffer[index], input, firstpart);
-			transform(buffer);
+			memcpy(&buffer_[index], input, firstpart);
+			transform(buffer_);
 
 			for (i = firstpart; i + BLOCK_BYTES <= length; i += BLOCK_BYTES) {
 				transform(&input[i]);
@@ -109,9 +109,9 @@ namespace Hash
 			i = 0;
 		}
 
-		numBytes += length;
+		numBytes_ += length;
 
-		memcpy(&buffer[index], &input[i], length - i);
+		memcpy(&buffer_[index], &input[i], length - i);
 	}
 
 	void SHA1::update(const char* str)
@@ -129,10 +129,10 @@ namespace Hash
 			0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 		};
 
-		uint64_t size = numBytes << 3;
+		uint64_t size = numBytes_ << 3;
 
 		// pad out to 56 mod 64.
-		size_t index = numBytes % 64;
+		size_t index = numBytes_ % 64;
 		size_t padLen = (index < 56) ? (56 - index) : (120 - index);
 		update(padding, padLen);
 
@@ -143,7 +143,7 @@ namespace Hash
 
 		for (size_t i = 0; i < 20; ++i)
 		{
-			res.bytes[i] = static_cast<uint8_t>((digest[i >> 2] >> ((3 -
+			res.bytes[i] = static_cast<uint8_t>((digest_[i >> 2] >> ((3 -
 				(i & 3)) * 8)) & 0xFF);
 		}
 
@@ -153,9 +153,9 @@ namespace Hash
 
 	void SHA1::transform(const uint8_t* pBuffer)
 	{
-		uint32_t a = digest[0], b = digest[1], c = digest[2], d = digest[3], e = digest[4];
+		uint32_t a = digest_[0], b = digest_[1], c = digest_[2], d = digest_[3], e = digest_[4];
 
-		memcpy(&block, pBuffer, 64);
+		memcpy(&block_, pBuffer, 64);
 
 		// 4 rounds of 20 operations each, loop unrolled
 		S_R0(a, b, c, d, e, 0); S_R0(e, a, b, c, d, 1); S_R0(d, e, a, b, c, 2); S_R0(c, d, e, a, b, 3);
@@ -180,11 +180,11 @@ namespace Hash
 		S_R4(e, a, b, c, d, 76); S_R4(d, e, a, b, c, 77); S_R4(c, d, e, a, b, 78); S_R4(b, c, d, e, a, 79);
 
 		// Add the working vars back into state
-		digest[0] += a;
-		digest[1] += b;
-		digest[2] += c;
-		digest[3] += d;
-		digest[4] += e;
+		digest_[0] += a;
+		digest_[1] += b;
+		digest_[2] += c;
+		digest_[3] += d;
+		digest_[4] += e;
 
 		// Wipe variables
 		a = b = c = d = e = 0;

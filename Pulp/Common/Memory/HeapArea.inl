@@ -3,7 +3,7 @@
 // ---------------------------------------------------------------------------------------------------------------------
 X_INLINE void* HeapArea::start(void) const
 {
-	return m_start;
+	return start_;
 }
 
 
@@ -11,5 +11,5 @@ X_INLINE void* HeapArea::start(void) const
 // ---------------------------------------------------------------------------------------------------------------------
 X_INLINE void* HeapArea::end(void) const
 {
-	return m_end;
+	return end_;
 }

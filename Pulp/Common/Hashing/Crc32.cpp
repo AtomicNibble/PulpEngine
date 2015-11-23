@@ -105,22 +105,20 @@ void Crc32::buildTable(void)
 		uint32_t crc = i;
 		for (j = 0; j < 8; j++)
 			crc = (crc >> 1) ^ ((crc & 1) * CRC32_POLY_NORMAL);
-		crc32_table[0][i] = crc;
+		crc32_table_[0][i] = crc;
 	}
 	for (i = 0; i <= 0xFF; i++)
 	{
 		// for Slicing-by-4 and Slicing-by-8
-		crc32_table[1][i] = (crc32_table[0][i] >> 8) ^ crc32_table[0][crc32_table[0][i] & 0xFF];
-		crc32_table[2][i] = (crc32_table[1][i] >> 8) ^ crc32_table[0][crc32_table[1][i] & 0xFF];
-		crc32_table[3][i] = (crc32_table[2][i] >> 8) ^ crc32_table[0][crc32_table[2][i] & 0xFF];
+		crc32_table_[1][i] = (crc32_table_[0][i] >> 8) ^ crc32_table_[0][crc32_table_[0][i] & 0xFF];
+		crc32_table_[2][i] = (crc32_table_[1][i] >> 8) ^ crc32_table_[0][crc32_table_[1][i] & 0xFF];
+		crc32_table_[3][i] = (crc32_table_[2][i] >> 8) ^ crc32_table_[0][crc32_table_[2][i] & 0xFF];
 		// only Slicing-by-8
-		crc32_table[4][i] = (crc32_table[3][i] >> 8) ^ crc32_table[0][crc32_table[3][i] & 0xFF];
-		crc32_table[5][i] = (crc32_table[4][i] >> 8) ^ crc32_table[0][crc32_table[4][i] & 0xFF];
-		crc32_table[6][i] = (crc32_table[5][i] >> 8) ^ crc32_table[0][crc32_table[5][i] & 0xFF];
-		crc32_table[7][i] = (crc32_table[6][i] >> 8) ^ crc32_table[0][crc32_table[6][i] & 0xFF];
+		crc32_table_[4][i] = (crc32_table_[3][i] >> 8) ^ crc32_table_[0][crc32_table_[3][i] & 0xFF];
+		crc32_table_[5][i] = (crc32_table_[4][i] >> 8) ^ crc32_table_[0][crc32_table_[4][i] & 0xFF];
+		crc32_table_[6][i] = (crc32_table_[5][i] >> 8) ^ crc32_table_[0][crc32_table_[5][i] & 0xFF];
+		crc32_table_[7][i] = (crc32_table_[6][i] >> 8) ^ crc32_table_[0][crc32_table_[6][i] & 0xFF];
 	}
-
-	tableInit_ = true;
 }
 
 
@@ -138,7 +136,7 @@ uint32_t Crc32::Update(const void* data, size_t size, uint32_t& crcvalue) const
 
 	while (len && !core::pointerUtil::IsAligned(buf8, 8, 0))
 	{
-		crc = (crc >> 8) ^ crc32_table[0][(crc & 0xFF) ^ *buf8++];
+		crc = (crc >> 8) ^ crc32_table_[0][(crc & 0xFF) ^ *buf8++];
 		len--;
 	}
 
@@ -148,14 +146,14 @@ uint32_t Crc32::Update(const void* data, size_t size, uint32_t& crcvalue) const
 	{
 		uint32_t one = *buf32++ ^ crc;
 		uint32_t two = *buf32++;
-		crc = crc32_table[7][one & 0xFF] ^
-			crc32_table[6][(one >> 8) & 0xFF] ^
-			crc32_table[5][(one >> 16) & 0xFF] ^
-			crc32_table[4][one >> 24] ^
-			crc32_table[3][two & 0xFF] ^
-			crc32_table[2][(two >> 8) & 0xFF] ^
-			crc32_table[1][(two >> 16) & 0xFF] ^
-			crc32_table[0][two >> 24];
+		crc = crc32_table_[7][one & 0xFF] ^
+			crc32_table_[6][(one >> 8) & 0xFF] ^
+			crc32_table_[5][(one >> 16) & 0xFF] ^
+			crc32_table_[4][one >> 24] ^
+			crc32_table_[3][two & 0xFF] ^
+			crc32_table_[2][(two >> 8) & 0xFF] ^
+			crc32_table_[1][(two >> 16) & 0xFF] ^
+			crc32_table_[0][two >> 24];
 		len -= 8;
 	}
 
@@ -164,7 +162,7 @@ uint32_t Crc32::Update(const void* data, size_t size, uint32_t& crcvalue) const
 		buf8 = reinterpret_cast<const uint8_t*>(buf32);
 		while (len--)
 		{
-			crc = (crc >> 8) ^ crc32_table[0][(crc & 0xFF) ^ *buf8++];
+			crc = (crc >> 8) ^ crc32_table_[0][(crc & 0xFF) ^ *buf8++];
 		}
 	}
 
@@ -184,7 +182,7 @@ uint32_t Crc32::UpdateLowerCase(const char* text, size_t size, uint32_t& crcvalu
 
 	while (len && !core::pointerUtil::IsAligned(buf8, 8, 0))
 	{
-		crc = (crc >> 8) ^ crc32_table[0][(crc & 0xFF) ^ ToLower(*buf8++)];
+		crc = (crc >> 8) ^ crc32_table_[0][(crc & 0xFF) ^ ToLower(*buf8++)];
 		len--;
 	}
 
@@ -194,14 +192,14 @@ uint32_t Crc32::UpdateLowerCase(const char* text, size_t size, uint32_t& crcvalu
 	{
 		uint32_t one = ToLower(*buf32++ ^ crc);
 		uint32_t two = ToLower(*buf32++);
-		crc = crc32_table[7][one & 0xFF] ^
-			crc32_table[6][(one >> 8) & 0xFF] ^
-			crc32_table[5][(one >> 16) & 0xFF] ^
-			crc32_table[4][one >> 24] ^
-			crc32_table[3][two & 0xFF] ^
-			crc32_table[2][(two >> 8) & 0xFF] ^
-			crc32_table[1][(two >> 16) & 0xFF] ^
-			crc32_table[0][two >> 24];
+		crc = crc32_table_[7][one & 0xFF] ^
+			crc32_table_[6][(one >> 8) & 0xFF] ^
+			crc32_table_[5][(one >> 16) & 0xFF] ^
+			crc32_table_[4][one >> 24] ^
+			crc32_table_[3][two & 0xFF] ^
+			crc32_table_[2][(two >> 8) & 0xFF] ^
+			crc32_table_[1][(two >> 16) & 0xFF] ^
+			crc32_table_[0][two >> 24];
 		len -= 8;
 	}
 
@@ -210,7 +208,7 @@ uint32_t Crc32::UpdateLowerCase(const char* text, size_t size, uint32_t& crcvalu
 		buf8 = reinterpret_cast<const uint8_t*>(buf32);
 		while (len--)
 		{
-			crc = (crc >> 8) ^ crc32_table[0][(crc & 0xFF) ^ ToLower(*buf8++)];
+			crc = (crc >> 8) ^ crc32_table_[0][(crc & 0xFF) ^ ToLower(*buf8++)];
 		}
 	}
 

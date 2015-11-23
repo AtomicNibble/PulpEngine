@@ -50,7 +50,7 @@ private:
 
 	X_NO_ASSIGN(PointerFlags);
 
-	T* m_pointer;
+	T* pointer_;
 };
 
 #include "PointerFlags.inl"

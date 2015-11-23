@@ -5,6 +5,9 @@
 #include <Containers\FixedArray.h>
 #include <IModel.h>
 
+#include "MapTypes.h"
+#include "MapLoader.h"
+
 namespace
 {
 	// ---------------------------------------------
@@ -88,7 +91,7 @@ namespace
 		X_ASSERT_NOT_NULL(pSubmesh);
 
 		int least;
-		int i, r, ni;
+		int i, r;
 		int rotate;
 		size_t numIndexes;
 		level::Vertex* pVerts;
@@ -131,7 +134,7 @@ namespace
 				rotate = (r + least) % numVerts;
 
 				// walk the winding in both directions 
-				for (ni = 0, i = 0; i < numVerts - 2 - i; i++)
+				for (i = 0; i < numVerts - 2 - i; i++)
 				{
 					// make indexes 
 					model::Face face;
@@ -194,7 +197,28 @@ namespace
 	}
 
 
-}
+	float MapTriArea(const LvlTris& tri) {
+		return XWinding::TriangleArea(tri.verts[0].pos, tri.verts[1].pos, tri.verts[2].pos);
+	}
+
+
+	XWinding* WindingForTri(const LvlTris& tri)
+	{
+		XWinding* w;
+
+		w = X_NEW(XWinding, g_arena, "WindingForTri")(3);
+		w->addPoint(tri.verts[0].pos);
+		w->addPoint(tri.verts[1].pos);
+		w->addPoint(tri.verts[2].pos);
+		return w;
+	}
+
+	void PlaneForTri(const LvlTris& tri, Planef& plane)
+	{
+		plane = Planef(tri.verts[0].pos, tri.verts[1].pos, tri.verts[2].pos);
+	}
+
+} // namespace
 
 
 
@@ -209,7 +233,7 @@ bool LvlBuilder::ProcessModels(void)
 			continue;
 		}
 
-		X_LOG0("Entity", "----------- entity %i -----------", i);
+		X_LOG0("Entity", "^5----- entity %i -----", i);
 
 		if (i == 0)
 		{
@@ -240,9 +264,9 @@ bool LvlBuilder::ProcessModel(LvlEntity& ent)
 
 bool LvlBuilder::LoadDefaultModel(void)
 {
-	if (!ModelInfo::GetNModelAABB("default", defaultModelBounds_))
+	if (!ModelInfo::GetNModelAABB(X_CONST_STRING("default"), defaultModelBounds_))
 	{
-		X_ERROR("","FAield to load default model info");
+		X_ERROR("","Failed to load default model info");
 		return false;
 	}
 	return true;
@@ -264,6 +288,10 @@ void LvlBuilder::calculateLvlBounds(void)
 
 			mapBounds.add(brush.bounds);
 		}
+
+		// Pooooooches.
+	//	LvlEntity::TrisArr::ConstIterator patchIt = it->patches.begin();
+
 	}
 }
 
@@ -338,28 +366,9 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 	size_t StartVert = pSubMesh->verts_.size();
 
 	int numPoints = pWinding->getNumPoints();
-
-#if 0
-	int p;
-	for (p = 0; p < numPoints; p++)
-	{
-		level::Vertex vert;
-		const Vec5f& vec = pWinding->operator[](p);
-
-		vert.pos = vec.asVec3();
-		vert.normal = planes[side.planenum].getNormal();
-		vert.color = Col_White;
-		vert.texcoord[0] = Vec2f(vec.s, vec.t);
-
-		pSubMesh->AddVert(vert);
-	}
-	// create some indexes
-	createIndexs(numPoints, StartVert, pSubMesh);
-
-#else
+	int i, j;
 
 	const XWinding* w = pWinding;
-	int i, j;
 
 	model::Index offset = safe_static_cast<model::Index, size_t>(StartVert);
 
@@ -403,17 +412,224 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 
 		pSubMesh->faces_.append(face);
 	}
-#endif
-
-
-	int goat = 0;
 }
 
 
+void LvlBuilder::AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sphere,
+	const Vec3f boundsPoints[8], bspNode* pNode)
+{
+	X_ASSERT_NOT_NULL(boundsPoints);
+	X_ASSERT_NOT_NULL(pNode);
+	bspNode* pCurNode = pNode;
+
+	if (pCurNode->IsAreaLeaf()) 
+	{
+		int32_t areaIdx = pCurNode->area;
+
+		// check if duplicate.
+		if (areaList.isEmpty()) {
+			areaList.append(areaIdx);
+		}
+		else
+		{
+			// just linear search as it will be fastest with such low numbers.
+			// and contigous memory.
+			size_t i;
+			for (i = 0; i < areaList.size(); i++) {
+				if (areaList[i] == areaIdx) {
+					break;
+				}
+			}
+			if (i == areaList.size()) {
+				areaList.append(areaIdx);
+			}
+		}
+
+		return;
+	}
+
+	const Planef& plane = planes[pCurNode->planenum];
+	float sd = plane.distance(sphere.center());
+
+	if (sd >= sphere.radius())
+	{
+		pCurNode = pCurNode->children[0];
+		if (!pCurNode->IsSolidLeaf()) {
+			AddAreaRefs_r(areaList, sphere, boundsPoints, pCurNode);
+		}
+		return;
+	}
+	if (sd <= -sphere.radius())
+	{
+		pCurNode = pCurNode->children[1];
+		if (!pCurNode->IsSolidLeaf()) {
+			AddAreaRefs_r(areaList, sphere, boundsPoints, pCurNode);
+		}
+		return;
+	}
+
+	// check bounds points.
+	bool front = false;
+	bool back = false;
+	for (size_t i = 0; i < 8; i++)
+	{
+		float d = plane.distance(boundsPoints[i]);
+
+		if (d >= 0.0f) {
+			front = true;
+		}
+		else if (d <= 0.0f) {
+			back = true;
+		}
+		if (back && front) {
+			break;
+		}
+	}
+
+	if (front) {
+		bspNode* frontChild = pCurNode->children[0];
+		if (!frontChild->IsSolidLeaf()) {
+			AddAreaRefs_r(areaList, sphere, boundsPoints, frontChild);
+		}
+	}
+	if (back) {
+		bspNode* backChild = pCurNode->children[1];
+		if (!backChild->IsSolidLeaf()) {
+			AddAreaRefs_r(areaList, sphere, boundsPoints, backChild);
+		}
+	}
+}
+
+bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
+{
+	int32_t i, numEnts;
+
+	// we go throught each ent, and work out what area's it is in.
+	// each ent is then added to the entRefts set.
+	// we then need to work out the ones that touch multiple area's
+	core::Array<int32_t> areaList(g_arena);
+	areaList.resize(this->areas_.size());
+
+	for (i = 0; i < level::MAP_MAX_MULTI_REF_LISTS; i++)
+	{
+		multiRefEntLists_[i].clear();
+		multiModelRefLists_[i].clear();
+	}
+
+	numEnts = map_->getNumEntities();
+
+	// more than enougth.
+	staticModels_.reserve(numEnts);
+
+	for (i = 0; i < numEnts; i++)
+	{
+		mapfile::XMapEntity* mapEnt = map_->getEntity(i);
+		LvlEntity& lvlEnt = entities_[i];
+		
+		if (lvlEnt.classType != level::ClassType::MISC_MODEL) {
+			continue;
+		}
+
+		level::FileStaticModel& sm = staticModels_.AddOne();
+		sm.pos = lvlEnt.origin;
+		sm.angle = Quatf(toRadians(lvlEnt.angle.x), 
+			toRadians(lvlEnt.angle.y), toRadians(lvlEnt.angle.z));
+
+
+		uint32_t entId = safe_static_cast<uint32_t, size_t>(staticModels_.size());
+
+		{
+			mapfile::XMapEntity::PairIt it;
+
+			it = mapEnt->epairs.find(X_CONST_STRING("model"));
+			if (it == mapEnt->epairs.end()) 
+			{
+				X_WARNING("Entity", "misc_model missing 'model' kvp at: (^8%g,%g,%g^7)",
+					lvlEnt.origin[0], lvlEnt.origin[1], lvlEnt.origin[2]);
+				continue;
+			}
+
+			const core::string& modelName = it->second;
+			X_LOG0("Entity", "Ent model: \"%s\"", modelName.c_str());
+
+			sm.modelNameIdx = stringTable_.addStringUnqiue(modelName.c_str());
+		}
+
+		// find out what areas the bounds are in.
+		// then add a refrence for that end to the area.
+
+		AABB worldBounds;
+		worldBounds.set(lvlEnt.bounds.min + lvlEnt.origin,
+			lvlEnt.bounds.max + lvlEnt.origin);
+
+		// make a sphere, for quicker testing.
+		Sphere worldSphere(worldBounds);
+
+		// get the the worldBounds points for more accurate testing if sphere test pass.
+		Vec3f boundsPoints[8];
+		worldBounds.toPoints(boundsPoints);
+
+		// clear from last time.
+		areaList.clear();
+
+		// traverse the world ent's tree
+		AddAreaRefs_r(areaList, worldSphere, boundsPoints, worldEnt.bspTree.headnode);
+
+		size_t numRefs = areaList.size();
+		if (numRefs)
+		{
+			X_LOG0("Lvl", "Entity(%i) has %i refs", i, numRefs);
+
+			// ok so we hold a list of unique areas ent is in.
+			if (numRefs == 1)
+			{
+				// add to area's ref list.
+				LvlArea& area = this->areas_[areaList[0]];
+
+				area.modelsRefs.push_back(entId);
+			}
+			else
+			{
+				// added to the multiAreaRefList.
+				uint32_t flags[level::MAP_MAX_MULTI_REF_LISTS] = { 0 };
+
+				auto it = areaList.begin();
+				for (; it != areaList.end(); ++it)
+				{
+					const int32_t areaIdx = *it;
+					// work out what area list.
+					const size_t areaListIdx = (areaIdx / 32);
+
+					flags[areaListIdx] |= (1 << (areaIdx % 32));
+				}
+
+				level::MultiAreaEntRef entRef;
+				entRef.entId = entId;
+				for (size_t x = 0; x < level::MAP_MAX_MULTI_REF_LISTS; x++)
+				{
+					if (flags[x] != 0)
+					{
+						entRef.flags = flags[x];
+						multiModelRefLists_[x].append(entRef);
+					}
+				}
+
+			}
+		}
+		else
+		{
+			// ent not in any area.
+			X_ERROR("Lvl", "Entity(%i) does not reside in any area: (%g,%g,%g)",
+				i, lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
+		}
+	}
+
+	return true;
+}
 
 bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 {
-	X_LOG0("Lvl", "--- PutPrimitivesInAreas ---");
+	X_LOG0("Lvl", "^5----- PutPrimitivesInAreas -----");
 
 	// ok now we must create the areas and place the primatives into each area.
 	// clip into non-solid leafs and divide between areas.
@@ -441,6 +657,14 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 		}
 	}
 	
+	for (i = 0; i < ent.patches.size(); i++)
+	{
+		LvlTris& tris = ent.patches[i];
+		// for each side that's visable.
+
+		AddMapTriToAreas(ent, planes, tris);
+	}
+
 	for (i = 0; i < areas_.size(); i++){
 		areas_[i].AreaEnd();
 
@@ -453,9 +677,115 @@ bool LvlBuilder::PutPrimitivesInAreas(LvlEntity& ent)
 	return true;
 }
 
+
+void LvlBuilder::AddTriListToArea(int32_t areaIdx, int32_t planeNum, const LvlTris& tris)
+{
+	X_ASSERT_NOT_NULL(tris.pMaterial);
+
+	LvlArea& area = areas_[areaIdx];
+
+	const core::string matName = core::string(tris.pMaterial->getName());
+
+	// get areaSubMesh for this material.
+	AreaSubMesh* pSubMesh = area.MeshForMat(matName, stringTable_);
+
+	size_t StartVert = pSubMesh->verts_.size();
+
+	int numPoints = 3;
+	int i, j;
+
+	model::Index offset = safe_static_cast<model::Index, size_t>(StartVert);
+
+	for (i = 2; i < numPoints; i++)
+	{
+		for (j = 0; j < 3; j++)
+		{
+			level::Vertex vert;
+
+			if (j == 0) {
+				const xVert trisVert = tris.verts[0];
+				vert.pos = trisVert.pos;
+				vert.texcoord[0] = trisVert.uv;
+			}
+			else if (j == 1) {
+				const xVert trisVert = tris.verts[i - 1];
+				vert.pos = trisVert.pos;
+				vert.texcoord[0] = trisVert.uv;
+			}
+			else
+			{
+				const xVert trisVert = tris.verts[i];
+				vert.pos = trisVert.pos;
+				vert.texcoord[0] = trisVert.uv;
+			}
+
+			// copy normal
+			vert.normal = planes[planeNum].getNormal();
+			vert.color = Col_White;
+
+			pSubMesh->AddVert(vert);
+		}
+
+		model::Face face(0, 1, 2);
+
+		face += model::Face(offset, offset, offset);
+
+		model::Index localOffset = safe_static_cast<model::Index, size_t>((i - 2) * 3);
+
+		face += model::Face(localOffset, localOffset, localOffset);
+
+		pSubMesh->AddFace(face);
+	}
+}
+
+bool LvlBuilder::AddMapTriToAreas(LvlEntity& worldEnt, XPlaneSet& planeSet, const LvlTris& tri)
+{
+	int32_t area;
+	XWinding* w;
+
+	// skip degenerate triangles from pinched curves
+	if (MapTriArea(tri) <= 0) {
+		return false;
+	}
+
+	w = WindingForTri(tri);
+	area = worldEnt.bspTree.headnode->CheckWindingInAreas_r(planeSet, w);
+	X_DELETE(w, g_arena);
+
+	if (area == -1) {
+		return false;
+	}
+	if (area >= 0)
+	{
+		LvlTris 	newTri;
+		Planef		plane;
+		int			planeNum;
+
+		//textureVectors_t	texVec;
+
+		// put in single area
+		newTri = tri;
+
+		PlaneForTri(tri, plane);
+		planeNum = planeSet.FindPlane(plane, PLANE_NORMAL_EPSILON, PLANE_DIST_EPSILON);
+
+		//	TexVecForTri(&texVec, newTri);
+		//	AddTriListToArea(e, newTri, planeNum, area, &texVec);
+		AddTriListToArea(area, planeNum, newTri);
+	}
+
+	return true;
+}
+
+
 bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 {
 	X_LOG0("Lvl", "Processing World Entity");
+
+	if (ent.classType != level::ClassType::WORLDSPAWN) {
+		X_ERROR("Lvl", "World model is missing class name: 'worldspawn'");
+		return false;
+	}
 
 	// make structural face list.
 	// which is the planes and windings of all the structual faces.
@@ -498,8 +828,10 @@ bool LvlBuilder::ProcessWorldModel(LvlEntity& ent)
 	// we also number the nodes at this point also.
 	ent.PruneNodes();
 
+
 	// work out which ents belong to which area.
-	ent.PutEntsInAreas(planes, entities_, map_);
+//	ent.PutEntsInAreas(planes, entities_, map_);
+	CreateEntAreaRefs(ent);
  	return true;
 }
 

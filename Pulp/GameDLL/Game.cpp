@@ -16,7 +16,9 @@ namespace
 
 XGame::XGame(ICore* pCore) :
 pCore_(pCore),
-pTimer_(nullptr)
+pTimer_(nullptr),
+pRender_(nullptr),
+pFovVar_(nullptr)
 {
 	X_ASSERT_NOT_NULL(pCore);
 
@@ -41,10 +43,15 @@ bool XGame::Init(void)
 	timeLast_ = pTimer_->GetAsyncTime();
 
 	// register some vars
-	ADD_CVAR_REF_VEC3("cam_pos", cameraPos_, s_DefaultCamPosition, core::VarFlag::STATIC, "camera position");
-	ADD_CVAR_REF_VEC3("cam_angle", cameraAngle_, s_DefaultCamAngle, core::VarFlag::STATIC, "camera angle(radians)");
+	ADD_CVAR_REF_VEC3("cam_pos", cameraPos_, s_DefaultCamPosition, core::VarFlag::STATIC, 
+		"camera position");
+	ADD_CVAR_REF_VEC3("cam_angle", cameraAngle_, s_DefaultCamAngle, core::VarFlag::STATIC, 
+		"camera angle(radians)");
+	pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.0001f, ::toDegrees(PIf), 
+		core::VarFlag::SAVE_IF_CHANGED, "camera fov");
 
-	
+	pFovVar_->SetOnChangeCallback(s_OnFovChanged);
+
 	uint32_t width, height;
 
 	height = static_cast<uint32_t>(gEnv->pRender->getHeight());
@@ -53,17 +60,20 @@ bool XGame::Init(void)
 	X_ASSERT(height > 0, "height is not valid")(height);
 	X_ASSERT(width > 0, "height is not valid")(width);
 
-	cam_.SetFrustum(width, height);
+	cam_.SetFrustum(width, height, DEFAULT_FOV);
 
 	return true;
 }
 
 bool XGame::ShutDown(void)
 {
-	X_LOG0("Game", "Shutting down");
+	X_LOG0("Game", "Shutting Down");
 
 	pCore_->GetIInput()->RemoveEventListener(this);
 
+	if (pFovVar_) {
+		pFovVar_->Release();
+	}
 
 	return true;
 }
@@ -76,6 +86,7 @@ bool XGame::Update(void)
 
 	cam_.setAngles(cameraAngle_);
 	cam_.setPosition(cameraPos_);
+//	cam_.setFov(cameraFov_);
 
 	pRender_->SetCamera(cam_);
 
@@ -114,7 +125,12 @@ bool XGame::OnInputEvent(const input::InputEvent& event)
 
 	// timeLast_ = pTimer_->GetAsyncTime() - timeLast_;
 
-	float moveDelta = 500.f * pTimer_->GetFrameTime();
+	float speed = 250.f;
+	if (event.modifiers.IsSet(InputEvent::ModiferType::LSHIFT)) {
+		speed *= 2.f;
+	}
+
+	float moveDelta = speed * pTimer_->GetFrameTime();
 	switch (event.keyId)		
 	{
 		// forwards.
@@ -165,6 +181,22 @@ bool XGame::OnInputEventChar(const input::InputEvent& event)
 
 	return false;
 }
+
+void XGame::s_OnFovChanged(core::ICVar* pVar)
+{
+	float fovDegress = pVar->GetFloat();
+	float fov = ::toRadians(fovDegress);
+
+	XGame* pGame = static_cast<XGame*>(gEnv->pGame);
+	pGame->OnFovChanged(fov);
+}
+
+void XGame::OnFovChanged(float fov)
+{
+	cam_.setFov(fov);
+}
+
+
 
 
 X_NAMESPACE_END

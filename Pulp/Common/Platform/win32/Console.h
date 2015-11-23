@@ -74,12 +74,12 @@ private:
 	X_NO_COPY(Console);
 	X_NO_ASSIGN(Console);
 
-	HANDLE m_console;
-	HANDLE m_consoleInput;
-	HWND m_window;
-	FILE* m_stdout;
-	FILE* m_stdin;
-	FILE* m_stderr;
+	HANDLE console_;
+	HANDLE consoleInput_;
+	HWND window_;
+	FILE* stdout_;
+	FILE* stdin_;
+	FILE* stderr_;
 };
 
 #include "Console.inl"

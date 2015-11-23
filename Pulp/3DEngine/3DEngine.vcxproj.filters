@@ -3,9 +3,6 @@
   <ItemGroup>
     <ClCompile Include="RenderEngine.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="ModelLoader.cpp">
-      <Filter>Model</Filter>
-    </ClCompile>
     <ClCompile Include="Material.cpp">
       <Filter>Material</Filter>
     </ClCompile>
@@ -45,12 +42,15 @@
     <ClCompile Include="Level_portal.cpp">
       <Filter>Level</Filter>
     </ClCompile>
+    <ClCompile Include="ModelManager.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
+    <ClCompile Include="XModel.cpp">
+      <Filter>Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="ModelLoader.h">
-      <Filter>Model</Filter>
-    </ClInclude>
     <ClInclude Include="Material.h">
       <Filter>Material</Filter>
     </ClInclude>
@@ -87,6 +87,9 @@
     </ClInclude>
     <ClInclude Include="Level.h">
       <Filter>Level</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelManager.h">
+      <Filter>Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

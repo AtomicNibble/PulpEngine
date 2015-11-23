@@ -160,7 +160,7 @@ public:
 		return numInputParams_;
 	}
 protected:
-	static render::XRenderResourceContainer* pHWshaders;
+	static render::XRenderResourceContainer* s_pHWshaders;
 
 	core::string name_;
 	core::string sourceFileName_;
@@ -235,7 +235,10 @@ struct ShaderSourceFile
 	friend class XShaderManager;
 
 	ShaderSourceFile() :
+		pFile_(nullptr),
+		pHlslFile_(nullptr),
 		sourceCrc32_(0),
+		hlslSourceCrc32_(0),
 		techniques_(g_rendererArena)
 	{}
 
@@ -434,21 +437,22 @@ private:
 private:
 	typedef core::HashMap<core::string, SourceFile*> ShaderSourceMap;
 
-	ShaderSourceMap Sourcebin;
-	render::XRenderResourceContainer shaders;
+	ShaderSourceMap Sourcebin_;
+	render::XRenderResourceContainer shaders_;
 
 public:
-	core::Crc32* pCrc32;
+	core::Crc32* pCrc32_;
 
-	static XShader* m_DefaultShader;
-	static XShader* m_DebugShader;
-	static XShader* m_FixedFunction;
-	static XShader* m_Font;
-	static XShader* m_Gui;
-	static XShader* m_DefferedShader;
-	static XShader* m_DefferedShaderVis;
+	static XShader* s_pDefaultShader_;
+	static XShader* s_pDebugShader_;
+	static XShader* s_pFixedFunction_;
+	static XShader* s_pFont_;
+	static XShader* s_pGui_;
+	static XShader* s_pDefferedShader_;
+	static XShader* s_pDefferedShaderVis_;
 
-	static XShader* m_WordShader;
+	static XShader* s_pWordShader_;
+	static XShader* s_pModelShader_;
 };
 
 X_NAMESPACE_END

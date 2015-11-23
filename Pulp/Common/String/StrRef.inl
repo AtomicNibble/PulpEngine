@@ -29,6 +29,15 @@ StringRef<CharT>::StringRef(const StrT& str)
 	}
 }
 
+// from another string object
+template<typename CharT>
+StringRef<CharT>::StringRef(StrT&& oth)
+{
+	str_ = oth.str_;
+
+	oth.SetEmpty();
+}
+
 // from another string object, define the offset and count
 template<typename CharT>
 StringRef<CharT>::StringRef(const StrT& str, size_type offset, size_type count)
@@ -281,6 +290,19 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::operator=(const StrT& str)
 			str_ = str.str_;
 			header()->addRef();
 		}
+	}
+	return *this;
+}
+
+template<typename CharT>
+typename StringRef<CharT>::StrT& StringRef<CharT>::operator=(StrT&& oth)
+{
+	if (this != &oth) 
+	{
+		freeData(header());
+
+		str_ = oth.str_;
+		oth.SetEmpty();
 	}
 	return *this;
 }
@@ -1000,7 +1022,7 @@ typename StringRef<CharT>::XStrHeader* StringRef<CharT>::header(void) const
 {
 	X_ASSERT_NOT_NULL(str_);
 
-	return ((XStrHeader*)str_) - 1;
+	return (reinterpret_cast<XStrHeader*>(str_) - 1);
 }
 
 // dose not check current length
@@ -1016,10 +1038,10 @@ void StringRef<CharT>::Allocate(size_type length)
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pStrArena);
 
-		size_type allocLen = sizeof(XStrHeader)+((length + 1)*sizeof(value_type));
-		XStrHeader* pData = (XStrHeader*)X_NEW_ARRAY_OFFSET(BYTE, allocLen, gEnv->pStrArena, "StringBuf", sizeof(XStrHeader));
-		//	XStrHeader* pData = (XStrHeader*)X_NEW_ARRAY(BYTE, allocLen, gEnv->pStrArena, "StringBuf");
+		size_type allocLen = sizeof(XStrHeader) + ((length + 1) * sizeof(value_type));
 
+		XStrHeader* pData = reinterpret_cast<XStrHeader*>(X_NEW_ARRAY_OFFSET(BYTE, allocLen, 
+			gEnv->pStrArena, "StringBuf", sizeof(XStrHeader)));
 
 		pData->refCount = 1;
 		str_ = pData->getChars();

@@ -65,7 +65,7 @@ public:
 
 	Matrix44();
 	
-	Matrix44( T s );
+	explicit Matrix44(T s);
 
 	// OpenGL layout - unless srcIsRowMajor is true
 	Matrix44( const T *dt, bool srcIsRowMajor = false );

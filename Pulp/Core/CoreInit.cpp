@@ -108,8 +108,12 @@ bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassNa
 
 #if !defined(X_LIB) 
 	WIN_HMODULE hModule = LoadDLL(path.c_str());
-	if (!hModule)
+	if (!hModule) {
+		if (gEnv && gEnv->pLog) {
+			X_ERROR("Core", "Failed to load engine module: %s", dllName);
+		}
 		return false;
+	}
 
 	moduleDLLHandles_.push_back(hModule);
 #endif // #if !defined(X_LIB) 
@@ -158,17 +162,26 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 #if defined(WIN32)
 	X_DISABLE_WARNING(4996);
 	{
-		OSVERSIONINFOA osvi;
+		OSVERSIONINFOW osvi;
 
 		core::zero_object(osvi);
 
-		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOA);
-		GetVersionExA(&osvi);
+		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOW);
+		if (!GetVersionExW(&osvi))
+		{
+			::MessageBoxW(reinterpret_cast<HWND>(startupParams.hWnd),
+				L"GetVersionExW failed.",
+				L"Critial Error", MB_OK);
+			return false;
+		}
 		
 		bool bIsWindowsXPorLater = osvi.dwMajorVersion > 5 || (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion >= 1);
 
 		if (!bIsWindowsXPorLater)
 		{
+			::MessageBoxW(reinterpret_cast<HWND>(startupParams.hWnd), 
+				L"Versions of windows older than XP are not supported.",
+				L"Critial Error", MB_OK);
 			return false;
 		}
 	}
@@ -311,8 +324,12 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	core::symbolResolution::Refresh();
 
 	// show the window
-	if (pWindow_)
+	if (pWindow_) {
 		pWindow_->Show();
+	//	No longer needed since I call this on window activate events.
+	//	pWindow_->ClipCursorToWindow();
+	}
+
 	return true;
 }
 
@@ -565,7 +582,6 @@ void XCore::CreateSystemVars()
 
 
 	var_profile = ADD_CVAR_INT("profile", 1, 0, 1, VarFlag::SYSTEM, "Enable Profiling");
-	var_profile_draw = ADD_CVAR_INT("profile_draw", 0, 0, 1, VarFlag::SYSTEM, "Display profiler");
 
 
 	ADD_CVAR_STRING("version", X_ENGINE_NAME "Engine " X_BUILD_STRING " Version " X_ENGINE_VERSION_STR, VarFlag::SYSTEM | VarFlag::STATIC, "Engine Version");

@@ -12,7 +12,7 @@ inline void* GrowingPoolAllocator::allocate(size_t size, size_t alignment, size_
 template <class T>
 inline void* GrowingPoolAllocator::allocate(size_t size, size_t alignment, size_t offset, const T& chunkHeader)
 {
-	X_ASSERT(m_chunkHeaderSize == sizeof(chunkHeader), "Given chunk header does not match the size given upon initialization.")(m_chunkHeaderSize, sizeof(chunkHeader));
+	X_ASSERT(chunkHeaderSize_ == sizeof(chunkHeader), "Given chunk header does not match the size given upon initialization.")(chunkHeaderSize_, sizeof(chunkHeader));
 	return allocate(size, alignment, offset, chunkHeader, sizeof(chunkHeader));
 }
 
@@ -23,12 +23,12 @@ inline void GrowingPoolAllocator::free(void* ptr)
 {
 	X_ASSERT_NOT_NULL(ptr);
 
-	m_freelist.Return(ptr);
+	freelist_.Return(ptr);
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	m_statistics.m_allocationCount--;
-	m_statistics.m_physicalMemoryUsed -= m_elementSize;
-	m_statistics.m_wasteAlignment -= m_wastePerElement;
+	statistics_.allocationCount_--;
+	statistics_.physicalMemoryUsed_ -= elementSize_;
+	statistics_.wasteAlignment_ -= wastePerElement_;
 #endif
 }
 
@@ -37,7 +37,7 @@ inline void GrowingPoolAllocator::free(void* ptr)
 // ---------------------------------------------------------------------------------------------------------------------
 inline size_t GrowingPoolAllocator::getSize(void*) const
 {
-	return m_maxSize;	
+	return maxSize_;	
 }
 
 
@@ -45,7 +45,7 @@ inline size_t GrowingPoolAllocator::getSize(void*) const
 // ---------------------------------------------------------------------------------------------------------------------
 inline bool GrowingPoolAllocator::containsAllocation(void* ptr) const
 {
-	return ((ptr >= m_virtualStart) && (ptr < m_physicalCurrent));
+	return ((ptr >= virtualStart_) && (ptr < physicalCurrent_));
 }
 
 

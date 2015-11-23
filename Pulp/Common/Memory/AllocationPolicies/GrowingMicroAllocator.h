@@ -38,7 +38,6 @@ X_NAMESPACE_BEGIN(core)
 /// allocated physical memory, additional memory will be requested from the OS. The granularity with which the allocator
 /// grows is provided by the user.
 ///
-/// For more information about the virtual memory system, visit http://molecularmusings.wordpress.com/2012/10/02/memory-allocation-strategies-interlude-virtual-memory/.
 /// \remark Statistics gathering can be enabled/disabled via the preprocessor option \ref X_ENABLE_MEMORY_ALLOCATOR_STATISTICS.
 /// If statistics are disabled, the allocator will still return a valid MemoryAllocatorStatistics object which is
 /// initialized to its default values.
@@ -52,7 +51,7 @@ class GrowingMicroAllocator
 	//X_ALIGNED_SYMBOL(struct,4)  ChunkHeader
 	struct ChunkHeader
 	{
-		size_t m_allocatorIndex;
+		size_t allocatorIndex_;
 	};
 	//#pragma pack(pop)
 
@@ -87,17 +86,17 @@ private:
 	void updateStatistics(void);
 #endif
 
-	unsigned int m_chunkSize;
-	GrowingPoolAllocator m_poolAllocator8;
-	GrowingPoolAllocator m_poolAllocator16;
-	GrowingPoolAllocator m_poolAllocator32;
-	GrowingPoolAllocator m_poolAllocator64;
-	GrowingPoolAllocator m_poolAllocator128;
-	GrowingPoolAllocator m_poolAllocator256;
-	GrowingPoolAllocator* m_poolAllocators[257];
+	unsigned int chunkSize_;
+	GrowingPoolAllocator poolAllocator8_;
+	GrowingPoolAllocator poolAllocator16_;
+	GrowingPoolAllocator poolAllocator32_;
+	GrowingPoolAllocator poolAllocator64_;
+	GrowingPoolAllocator poolAllocator128_;
+	GrowingPoolAllocator poolAllocator256_;
+	GrowingPoolAllocator* poolAllocators_[257];
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	MemoryAllocatorStatistics m_statistics;
+	MemoryAllocatorStatistics statistics_;
 #endif
 };
 

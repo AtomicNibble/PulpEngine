@@ -6,7 +6,7 @@
 
 #include <Containers\HashIndex.h>
 
-class XPlaneSet : public std::vector<Planef>
+class XPlaneSet : public core::Array<Planef>
 {
 public:
 	XPlaneSet();

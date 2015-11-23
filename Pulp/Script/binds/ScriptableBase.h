@@ -66,7 +66,9 @@ protected:
 
 
 XScriptableBase::XScriptableBase() :
-	pScriptSys_(nullptr)
+	pScriptSys_(nullptr),
+	pMethodsTable_(nullptr),
+	paramIdOffset_(0)
 {
 
 }

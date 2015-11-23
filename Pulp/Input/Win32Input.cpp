@@ -14,23 +14,25 @@
 X_NAMESPACE_BEGIN(input)
 
 
-XWinInput* XWinInput::This = 0;
+XWinInput* XWinInput::s_pThis = 0;
 
 XWinInput::XWinInput(ICore* pSystem, HWND hwnd) : XBaseInput()
 {
 	X_UNUSED(pSystem);
 
+	X_ASSERT(s_pThis == nullptr, "Only one instance of XWinInput currently supported")(s_pThis);
+
 	isWow64_ = FALSE;
-	m_hwnd = hwnd;
-	m_prevWndProc = 0;
-	This = this;
+	hwnd_ = hwnd;
+	prevWndProc_ = 0;
+	s_pThis = this;
 
 	Devices_.reserve(2);
 };
 
 XWinInput::~XWinInput()
 {
-	This = nullptr;
+	s_pThis = nullptr;
 }
 
 
@@ -174,7 +176,7 @@ void XWinInput::ClearKeyState()
 // reroute to instance function
 LRESULT CALLBACK XWinInput::InputWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
-	return This->OnInputWndProc(hWnd, message, wParam, lParam);
+	return s_pThis->OnInputWndProc(hWnd, message, wParam, lParam);
 }
 
 LRESULT XWinInput::OnInputWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -190,7 +192,7 @@ LRESULT XWinInput::OnInputWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM
 
 	}
 
-	return ::CallWindowProc(m_prevWndProc, hWnd, message, wParam, lParam);
+	return ::CallWindowProc(prevWndProc_, hWnd, message, wParam, lParam);
 }
 
 

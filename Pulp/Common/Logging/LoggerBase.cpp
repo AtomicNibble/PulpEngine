@@ -4,8 +4,8 @@
 X_NAMESPACE_BEGIN(core)
 
 LoggerBase::LoggerBase(void) :
-m_previous(nullptr),
-m_next(nullptr)
+previous_(nullptr),
+next_(nullptr)
 {
 
 }

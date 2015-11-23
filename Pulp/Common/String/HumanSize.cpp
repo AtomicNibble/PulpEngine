@@ -14,8 +14,10 @@ namespace HumanSize
 		// Kibi not Kilo
 
 		// i use each type untill there is 10,240 of them.
-		if (numBytes <= 10240)
+		if (numBytes <= 10240) 
+		{
 			str.appendFmt("%ibytes", numBytes);
+		}
 		else if (numBytes <= 10485760)
 		{
 			str.appendFmt("%.2fKB", static_cast<float>(numBytes) / 1024);

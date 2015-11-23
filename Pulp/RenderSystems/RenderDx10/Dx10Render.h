@@ -121,9 +121,12 @@ public:
 	{
 		pIndexStream = nullptr;
 
-		core::zero_object(vertexLayoutCache);
+		core::zero_object(ILCache);
+		core::zero_object(streamedILCache);
+
 		pCurrentVertexFmt = nullptr;
 		CurrentVertexFmt = shader::VertexFormat::P3F_T2S;
+		streamedIL = false;
 
 		pCurShader = nullptr;
 		pCurShaderTech = nullptr;
@@ -148,13 +151,16 @@ public:
 
 	// Layouts used for creating device layouts.
 	// XVertexLayout vertexLayoutDescriptions[shader::VertexFormat::Num];
-	std::array<XVertexLayout, shader::VertexFormat::Num> vertexLayoutDescriptions;
+	std::array<XVertexLayout, shader::VertexFormat::Num> ILDescriptions;
+	std::array<XVertexLayout, shader::VertexFormat::Num> streamedILDescriptions;
 
 	// GPU layouts.
-	ID3D11InputLayout* vertexLayoutCache[shader::VertexFormat::Num];
+	ID3D11InputLayout* ILCache[shader::VertexFormat::Num];
+	ID3D11InputLayout* streamedILCache[shader::VertexFormat::Num];
 	ID3D11InputLayout* pCurrentVertexFmt;
 	shader::VertexFormat::Enum CurrentVertexFmt;
-	
+	bool streamedIL;
+	bool _pad[3];
 
 	StateFlag currentState;
 	CullMode::Enum cullMode;
@@ -194,12 +200,8 @@ public:
 	virtual void SetCullMode(CullMode::Enum mode) X_OVERRIDE;
 	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_OVERRIDE;
 
-	virtual void GetModelViewMatrix(Matrix44f* pMat) X_OVERRIDE {
-		*pMat = *m_ViewMat.GetTop();
-	}
-	virtual void GetProjectionMatrix(Matrix44f* pMat) X_OVERRIDE {
-		*pMat = *m_ProMat.GetTop();
-	}
+	X_INLINE virtual void GetModelViewMatrix(Matrix44f* pMat) X_OVERRIDE;
+	X_INLINE virtual void GetProjectionMatrix(Matrix44f* pMat) X_OVERRIDE;
 
 	// States
 	bool SetBlendState(BlendState& state);
@@ -242,6 +244,7 @@ public:
 	virtual bool SetFontShader();
 	virtual bool SetZPass();
 	virtual bool setGUIShader(bool textured = false) X_FINAL;
+	bool SetModelShader(shader::VertexFormat::Enum vertFmt);
 
 	// ~Shaders 
 
@@ -321,7 +324,8 @@ public:
 	void FX_ComitParams(void);
 	void FX_Init(void);
 
-	HRESULT FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFmt);
+
+	bool FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFmt, bool streamed);
 //	HRESULT FX_SetTextureAsVStream(int nID, texture::XTexture* pVBTexture, uint32 nStride);
 	void FX_SetVStream(ID3D11Buffer* pVertexBuffer, VertexStream::Enum streamSlot,
 				uint32 stride, uint32 offset);
@@ -335,125 +339,85 @@ public:
 		const int StartIndex,	 
 		const int BaseVertexLocation); // A value added to each index before reading a vertex from the vertex buffer.
 
-
-	const D3D11_PRIMITIVE_TOPOLOGY FX_ConvertPrimitiveType(const PrimitiveType::Enum type) {
-		return (D3D11_PRIMITIVE_TOPOLOGY)type;
-	}
-
-	PrimitiveType::Enum PrimitiveTypeToInternal(PrimitiveTypePublic::Enum type) {
-		if (type == PrimitiveTypePublic::LineList)
-			return PrimitiveType::LineList;
-		if (type == PrimitiveTypePublic::LineStrip)
-			return PrimitiveType::LineStrip;
-		if (type == PrimitiveTypePublic::TriangleList)
-			return PrimitiveType::TriangleList;
-		if (type == PrimitiveTypePublic::TriangleStrip)
-			return PrimitiveType::TriangleStrip;
-		X_ASSERT_UNREACHABLE();
-		return PrimitiveType::TriangleStrip;
-	}
-
-	void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY topType)
-	{
-		if (m_CurTopology != topType)
-		{
-			m_CurTopology = topType;
-			m_deviceContext->IASetPrimitiveTopology(m_CurTopology);
-		}
-	}
+	void FX_UnBindVStream(ID3D11Buffer* pVertexBuffer);
+	void FX_UnBindIStream(ID3D11Buffer* pIndexBuffer);
 
 
+	X_INLINE const D3D11_PRIMITIVE_TOPOLOGY FX_ConvertPrimitiveType(const PrimitiveType::Enum type) const;
+	X_INLINE PrimitiveType::Enum PrimitiveTypeToInternal(PrimitiveTypePublic::Enum type) const;
 
-	X_INLINE ID3D11Device* DxDevice() const {
-		return m_device;
-	}
-	X_INLINE ID3D11DeviceContext* DxDeviceContext() const {
-		return m_deviceContext;
-	}
+	X_INLINE void SetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY topType);
 
-	  
-	X_INLINE void PushViewMatrix()
-	{
-		m_ViewMat.Push();
-	}
-	X_INLINE void PopViewMatrix()
-	{
-		m_ViewMat.Pop();
-		DirtyMatrix();
-	}
-	X_INLINE void DirtyMatrix()
-	{
+	X_INLINE ID3D11Device* DxDevice(void) const;
+	X_INLINE ID3D11DeviceContext* DxDeviceContext(void) const;
+	X_INLINE void PushViewMatrix(void);
+	X_INLINE void PopViewMatrix(void);
+	X_INLINE void DirtyMatrix(void);
 
-	}
+	X_INLINE Matrix44f* pCurViewMat(void);
+	X_INLINE Matrix44f* pCurProjMat(void);
+	X_INLINE bool IsDeviceLost(void) const;
 
-	X_INLINE Matrix44f* pCurViewMat(void) {
-		return m_ViewMat.GetTop();
-	}
-	X_INLINE Matrix44f* pCurProjMat(void) {
-		return m_ProMat.GetTop();
-	}
-
-	X_INLINE bool IsDeviceLost(void) const {
-		return false;
-	}
+	X_INLINE void SetModelMatrix(const Matrix44f& mat) X_OVERRIDE;
 
 
 private:
-
+	ID3D11InputLayout* CreateILFromDesc(const shader::VertexFormat::Enum vertexFmt,
+		const RenderState::XVertexLayout& layout);
 
 	virtual void SetArenas(core::MemoryArenaBase* arena) X_OVERRIDE;
 	bool OnPostCreateDevice(void);
 	void InitResources(void);
 	void InitDynamicBuffers(void);
-	void InitVertexLayoutDescriptions(void);
+	void InitILDescriptions(void);
 
 	void FreeDynamicBuffers(void);
+
 protected:
+	XMatrixStack ViewMat_;
+	XMatrixStack ProMat_;
+	Matrix44f modelMat_;
 
-
-	XMatrixStack m_ViewMat;
-	XMatrixStack m_ProMat;
-
-	XDynamicVB<byte> m_DynVB[VertexPool::PoolMax];
+	XDynamicVB<byte> DynVB_[VertexPool::PoolMax];
 
 	// States
-	core::Array<BlendState> m_BlendStates;
-	core::Array<RasterState> m_RasterStates;
-	core::Array<DepthState> m_DepthStates;
+	core::Array<BlendState> BlendStates_;
+	core::Array<RasterState> RasterStates_;
+	core::Array<DepthState> DepthStates_;
 
-	uint32_t m_CurBlendState;
-	uint32_t m_CurRasterState;
-	uint32_t m_CurDepthState;
+	uint32_t CurBlendState_;
+	uint32_t CurRasterState_;
+	uint32_t CurDepthState_;
 
-	BlendState& curBlendState() { return m_BlendStates[m_CurBlendState]; }
-	RasterState& curRasterState() { return m_RasterStates[m_CurRasterState]; }
-	DepthState& curDepthState() { return m_DepthStates[m_CurDepthState]; }
-
+	X_INLINE BlendState& curBlendState(void);
+	X_INLINE RasterState& curRasterState(void);
+	X_INLINE DepthState& curDepthState(void);
 
 protected:
 #if X_DEBUG
-	ID3D11Debug* m_d3dDebug;
+	ID3D11Debug* d3dDebug_;
 #endif
 
-	ID3D11Device* m_device;
-	ID3D11DeviceContext *m_deviceContext;
+	ID3D11Device* device_;
+	ID3D11DeviceContext* deviceContext_;
 
-	IDXGISwapChain* m_swapChain;
-	ID3D11RenderTargetView* m_renderTargetView;
-	ID3D11Texture2D* m_depthStencilBuffer;
-	ID3D11DepthStencilView* m_depthStencilViewReadOnly;
-	ID3D11DepthStencilView* m_depthStencilView;
+	IDXGISwapChain* swapChain_;
+	ID3D11RenderTargetView* renderTargetView_;
+	ID3D11Texture2D* depthStencilBuffer_;
+	ID3D11DepthStencilView* depthStencilViewReadOnly_;
+	ID3D11DepthStencilView* depthStencilView_;
 
-	D3D11_PRIMITIVE_TOPOLOGY m_CurTopology;
+	D3D11_PRIMITIVE_TOPOLOGY CurTopology_;
 
-	RenderState m_State;
+	RenderState State_;
 
-	XRenderAuxImp* m_AuxGeo_;
+	XRenderAuxImp* AuxGeo_;
 };
-
 
 extern DX11XRender g_Dx11D3D;
 
 X_NAMESPACE_END
+
+#include "Dx10Render.inl"
 
 #endif // !_X_RENDER_DX10_H_

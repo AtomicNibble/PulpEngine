@@ -224,3 +224,18 @@ X_INLINE PlaneSide::Enum AABB::planeSide(const Plane<T>& plane, const float epsi
 	}
 	return PlaneSide::CROSS;
 }
+
+X_INLINE void AABB::toPoints(Vec3f points[8]) const
+{
+	Vec3f vecs[2];
+	vecs[0] = min;
+	vecs[1] = max;
+
+	size_t i;
+	for (i = 0; i < 8; i++)
+	{
+		points[i][0] = vecs[i & 1][0];
+		points[i][1] = vecs[(i >> 1) & 1][1];
+		points[i][2] = vecs[(i >> 2) & 1][2];
+	}
+}

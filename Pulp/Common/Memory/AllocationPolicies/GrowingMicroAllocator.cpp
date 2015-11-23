@@ -8,37 +8,37 @@ X_NAMESPACE_BEGIN(core)
 
 
 GrowingMicroAllocator::GrowingMicroAllocator( uint32_t maxSizeInBytesPerPool, uint32_t growSize, size_t maxAlignment, size_t offset ) :
-	m_poolAllocator8( maxSizeInBytesPerPool, growSize, sizeof(ChunkHeader), 0x8, maxAlignment, offset ),
-	m_poolAllocator16( maxSizeInBytesPerPool, growSize, sizeof(ChunkHeader), 0x10, maxAlignment, offset ),
-	m_poolAllocator32( maxSizeInBytesPerPool, growSize, sizeof(ChunkHeader), 0x20, maxAlignment, offset ),
-	m_poolAllocator64( maxSizeInBytesPerPool, growSize, sizeof(ChunkHeader), 0x40, maxAlignment, offset ),
-	m_poolAllocator128( maxSizeInBytesPerPool, growSize, sizeof(ChunkHeader), 0x80, maxAlignment, offset ),
-	m_poolAllocator256( maxSizeInBytesPerPool, growSize, sizeof(ChunkHeader), 0x100, maxAlignment, offset )
+	poolAllocator8_( maxSizeInBytesPerPool, growSize, sizeof(ChunkHeader), 0x8, maxAlignment, offset ),
+	poolAllocator16_( maxSizeInBytesPerPool, growSize, sizeof(ChunkHeader), 0x10, maxAlignment, offset ),
+	poolAllocator32_( maxSizeInBytesPerPool, growSize, sizeof(ChunkHeader), 0x20, maxAlignment, offset ),
+	poolAllocator64_( maxSizeInBytesPerPool, growSize, sizeof(ChunkHeader), 0x40, maxAlignment, offset ),
+	poolAllocator128_( maxSizeInBytesPerPool, growSize, sizeof(ChunkHeader), 0x80, maxAlignment, offset ),
+	poolAllocator256_( maxSizeInBytesPerPool, growSize, sizeof(ChunkHeader), 0x100, maxAlignment, offset )
 {
-	m_chunkSize = growSize;
+	chunkSize_ = growSize;
 
 
 	// setup lookup table.
 	uint i = 0;
 
 	for( ; i<=8; i++ )
-		m_poolAllocators[ i ] = &m_poolAllocator8;
+		poolAllocators_[ i ] = &poolAllocator8_;
 	for( ; i<=0x10; i++ )
-		m_poolAllocators[ i ] = &m_poolAllocator16;
+		poolAllocators_[ i ] = &poolAllocator16_;
 	for( ; i<=0x20; i++ )
-		m_poolAllocators[ i ] = &m_poolAllocator32;
+		poolAllocators_[ i ] = &poolAllocator32_;
 	for( ; i<=0x40; i++ )
-		m_poolAllocators[ i ] = &m_poolAllocator64;
+		poolAllocators_[ i ] = &poolAllocator64_;
 	for( ; i<=0x80; i++ )
-		m_poolAllocators[ i ] = &m_poolAllocator128;
+		poolAllocators_[ i ] = &poolAllocator128_;
 	for( ; i<=0x100; i++ )
-		m_poolAllocators[ i ] = &m_poolAllocator256;
+		poolAllocators_[ i ] = &poolAllocator256_;
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
-	zero_object( m_statistics );
+	zero_object( statistics_ );
 
-	m_statistics.m_type = "MicroPool";
+	statistics_.type_ = "MicroPool";
 
 #endif
 }
@@ -51,9 +51,9 @@ void* GrowingMicroAllocator::allocate( size_t size, size_t alignment, size_t off
 	}
 
 	X_ALIGNED_SYMBOL(ChunkHeader,4) chunkHeader;
-	chunkHeader.m_allocatorIndex = size; /// safe_static_cast<uint32_t,size_t>(size);
+	chunkHeader.allocatorIndex_ = size; /// safe_static_cast<uint32_t,size_t>(size);
 
-	void* pMem = m_poolAllocators[ size ]->allocate( size, alignment, offset, &chunkHeader );
+	void* pMem = poolAllocators_[ size ]->allocate( size, alignment, offset, &chunkHeader );
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	updateStatistics();
@@ -64,17 +64,18 @@ void* GrowingMicroAllocator::allocate( size_t size, size_t alignment, size_t off
 
 void GrowingMicroAllocator::free( void* ptr )
 {
-	ChunkHeader* header = GrowingPoolAllocator::getChunkHeader<ChunkHeader>(ptr, m_chunkSize, sizeof(ChunkHeader));
+	ChunkHeader* header = GrowingPoolAllocator::getChunkHeader<ChunkHeader>(ptr, 
+		chunkSize_, sizeof(ChunkHeader));
 
 	X_ASSERT_NOT_NULL( header );
 
-	if( header->m_allocatorIndex > 0x100 )
+	if (header->allocatorIndex_ > 0x100)
 	{
-		size_t allocatorIndex = header->m_allocatorIndex;
+		size_t allocatorIndex = header->allocatorIndex_;
 		X_ASSERT( false, "Invalid allocation index" )( allocatorIndex );
 	}
 
-	m_poolAllocators[ header->m_allocatorIndex ]->free( ptr );
+	poolAllocators_[header->allocatorIndex_]->free(ptr);
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	updateStatistics();
@@ -85,37 +86,37 @@ void GrowingMicroAllocator::free( void* ptr )
 
 void GrowingMicroAllocator::updateStatistics(void)
 {
-//	memset( &m_statistics.m_allocationCount, 0, sizeof( m_statistics ) - sizeof( m_statistics.m_type ) );
+//	memset( &statistics_.allocationCount_, 0, sizeof( statistics_ ) - sizeof( statistics_.type_ ) );
 
-	m_statistics.Clear();
+	statistics_.Clear();
 
 	MemoryAllocatorStatistics Stats[6];
 	MemoryAllocatorStatistics* pStats = Stats;
 
-	Stats[0] = m_poolAllocator8.getStatistics();
-	Stats[1] = m_poolAllocator16.getStatistics();
-	Stats[2] = m_poolAllocator32.getStatistics();
-	Stats[3] = m_poolAllocator64.getStatistics();
-	Stats[4] = m_poolAllocator128.getStatistics();
-	Stats[5] = m_poolAllocator256.getStatistics();
+	Stats[0] = poolAllocator8_.getStatistics();
+	Stats[1] = poolAllocator16_.getStatistics();
+	Stats[2] = poolAllocator32_.getStatistics();
+	Stats[3] = poolAllocator64_.getStatistics();
+	Stats[4] = poolAllocator128_.getStatistics();
+	Stats[5] = poolAllocator256_.getStatistics();
 
 	lopi( 6 )
 	{
-		m_statistics.m_allocationCount += pStats->m_allocationCount;
-		m_statistics.m_virtualMemoryReserved += pStats->m_virtualMemoryReserved;
-		m_statistics.m_physicalMemoryAllocated += pStats->m_physicalMemoryAllocated;
-		m_statistics.m_physicalMemoryUsed += pStats->m_physicalMemoryUsed;
-		m_statistics.m_wasteAlignment += pStats->m_wasteAlignment;
-		m_statistics.m_wasteUnused += pStats->m_wasteUnused;
-		m_statistics.m_internalOverhead += pStats->m_internalOverhead;
+		statistics_.allocationCount_ += pStats->allocationCount_;
+		statistics_.virtualMemoryReserved_ += pStats->virtualMemoryReserved_;
+		statistics_.physicalMemoryAllocated_ += pStats->physicalMemoryAllocated_;
+		statistics_.physicalMemoryUsed_ += pStats->physicalMemoryUsed_;
+		statistics_.wasteAlignment_ += pStats->wasteAlignment_;
+		statistics_.wasteUnused_ += pStats->wasteUnused_;
+		statistics_.internalOverhead_ += pStats->internalOverhead_;
 
 
-		m_statistics.m_allocationCountMax += pStats->m_allocationCountMax;
-		m_statistics.m_physicalMemoryAllocatedMax += pStats->m_physicalMemoryAllocatedMax;
-		m_statistics.m_physicalMemoryUsedMax += pStats->m_physicalMemoryUsedMax;
-		m_statistics.m_wasteAlignmentMax += pStats->m_wasteAlignmentMax;
-		m_statistics.m_wasteUnusedMax += pStats->m_wasteUnusedMax;
-		m_statistics.m_internalOverheadMax += pStats->m_internalOverheadMax;
+		statistics_.allocationCountMax_ += pStats->allocationCountMax_;
+		statistics_.physicalMemoryAllocatedMax_ += pStats->physicalMemoryAllocatedMax_;
+		statistics_.physicalMemoryUsedMax_ += pStats->physicalMemoryUsedMax_;
+		statistics_.wasteAlignmentMax_ += pStats->wasteAlignmentMax_;
+		statistics_.wasteUnusedMax_ += pStats->wasteUnusedMax_;
+		statistics_.internalOverheadMax_ += pStats->internalOverheadMax_;
 
 		++pStats;
 	}
@@ -127,7 +128,7 @@ void GrowingMicroAllocator::updateStatistics(void)
 MemoryAllocatorStatistics GrowingMicroAllocator::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	return m_statistics;
+	return statistics_;
 #else
 	static MemoryAllocatorStatistics stats;
 	core::zero_object(stats);

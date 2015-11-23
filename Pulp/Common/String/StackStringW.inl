@@ -26,6 +26,7 @@ template <size_t N>
 StackString<N, wchar_t>::StackString(const char* const str)
 	: len_(strUtil::strlen(str))
 {
+	str_[0] = 0;
 	X_ASSERT_UNREACHABLE();
 }
 
@@ -224,6 +225,8 @@ void StackString<N, wchar_t>::appendFmt(const wchar_t* format, ...)
 	{
 		len_ += charactersWritten;
 	}
+
+	va_end(args);
 }
 
 template <size_t N>
@@ -489,8 +492,9 @@ StackString<N, wchar_t>& StackString<N, wchar_t>::trimLeft(void)
 	// we just loop over the string while there is white space and we are inside the string.
 	const wchar_t* str = str_;
 
-	while (*str && strUtil::IsWhitespaceW((wchar_t)*str))
+	while (*str && strUtil::IsWhitespaceW(*str)) {
 		str++;
+	}
 
 	// if they not equal we found white space.
 	if (str != str_)
@@ -517,8 +521,9 @@ StackString<N, wchar_t>& StackString<N, wchar_t>::trimRight(void)
 	const wchar_t* str = this->end() - 1;
 	const wchar_t* start = this->begin();
 
-	while (str > start && strUtil::IsWhitespaceW((wchar_t)*str))
+	while (str > start && strUtil::IsWhitespaceW(*str)) {
 		--str;
+	}
 
 	if (str != end())
 	{
@@ -608,7 +613,7 @@ template <size_t N>
 inline wchar_t& StackString<N, wchar_t>::operator[](size_t i)
 {
 	// allow access to the null terminator
-	X_ASSERT(i <= len_, "Character %d cannot be accessed. Subscript out of range.", i)(N, str_, len_);
+	X_ASSERT(i <= len_, "Character index %d cannot be accessed. Subscript out of range.", i)(N, str_, len_);
 	return str_[i];
 }
 
@@ -617,8 +622,8 @@ template <size_t N>
 inline const wchar_t& StackString<N, wchar_t>::operator[](size_t i) const
 {
 	// allow access to the null terminator
-	X_ASSERT(i <= len_, "Character %d cannot be accessed. Subscript out of range.", i)(N, str_, len_);
-	return str_[i]; .
+	X_ASSERT(i <= len_, "Character index %d cannot be accessed. Subscript out of range.", i)(N, str_, len_);
+	return str_[i]; 
 }
 
 

@@ -37,8 +37,8 @@ public:
 	X_INLINE void* end(void) const;
 
 private:
-	void* m_start;
-	void* m_end;
+	void* start_;
+	void* end_;
 };
 
 #include "HeapArea.inl"

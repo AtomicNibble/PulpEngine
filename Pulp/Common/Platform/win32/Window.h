@@ -64,6 +64,9 @@ public:
 	X_INLINE void Destroy(void);
 	X_INLINE void HideClientCursor(bool hide = true);
 //	X_INLINE bool isValid(void);
+
+
+	void ClipCursorToWindow(void);
 	
 	virtual void MoveTo(int x, int y);
 	virtual void MoveTo(const Position& position);

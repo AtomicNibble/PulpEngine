@@ -35,7 +35,10 @@ namespace {
 XBaseInput::XBaseInput() :
 	pCVars_(X_NEW(XInputCVars,g_InputArena,"InputCvars")),
 	Devices_(g_InputArena),
-	holdSymbols_(g_InputArena)
+	holdSymbols_(g_InputArena),
+	enableEventPosting_(true),
+	hasFocus_(false),
+	retriggering_(false)
 {
 	g_pInputCVars = pCVars_;
 
@@ -107,8 +110,9 @@ void XBaseInput::Update(bool bFocus)
 
 	for (TInputDevices::Iterator i = Devices_.begin(); i != Devices_.end(); ++i)
 	{
-		if ((*i)->IsEnabled())
+		if ((*i)->IsEnabled()) {
 			(*i)->Update(bFocus);
+		}
 	}
 
 	// send commit event after all input processing for this frame has finished

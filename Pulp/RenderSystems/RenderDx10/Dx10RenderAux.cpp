@@ -1178,7 +1178,7 @@ bool XRenderAuxImp::BindStreams(shader::VertexFormat::Enum newVertexFormat,
 	uint32_t NewVB, uint32_t NewIB)
 {
 	// set vertex declaration
-	if (FAILED(renderer_.FX_SetVertexDeclaration(newVertexFormat)))
+	if (!renderer_.FX_SetVertexDeclaration(newVertexFormat, false))
 		return false;
 
 	// bind streams

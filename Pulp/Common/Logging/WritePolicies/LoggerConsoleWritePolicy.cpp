@@ -227,6 +227,28 @@ namespace {
 						isString = (isString == 0);
 					}
 				}
+				else
+				{
+					wchar_t curChar = *(pCur + SectionSize);
+
+					// skip color codes.
+					if (hasCoolorCode && curChar == L'^' && SectionSize < length)
+					{
+						wchar_t colChar = *(pCur + SectionSize + 1);
+						if (core::strUtil::IsDigitW(colChar))
+						{
+							// we draw anything then change color.
+							NumberOfCharsWritten = 0;
+							WriteConsoleW(console, pCur, SectionSize, &NumberOfCharsWritten, 0);
+
+							SectionSize += 2;
+
+							length -= SectionSize;
+							pCur = pCur + SectionSize;
+							SectionSize = 0;
+						}
+					}
+				}
 
 				++SectionSize;
 			}

@@ -37,7 +37,7 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path)
 
 	core::XFileScoped file;
 	
-	core::Path<char> testFolder("test_resources/images/");
+	core::Path<char> testFolder("images/");
 	testFolder /= path;
 
 	if (file.openFile(testFolder.c_str(), mode))
@@ -54,6 +54,12 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path)
 			if (loaded)
 			{
 				const bool isValid = loaded->isValid();
+
+				if (!isValid) {
+					X_ERROR("UT", "TextureFile is not valid");
+					texture::XTextureFile::freeTextureFile(loaded);
+					return false;
+				}
 
 				EXPECT_EQ(fmt, loaded->getFormat());
 				if (fmt != loaded->getFormat()) {

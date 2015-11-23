@@ -204,7 +204,7 @@ bool Level::ProcessData(uint32_t bytesRead)
 				model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
 				X_DISABLE_WARNING(4302)
 				X_DISABLE_WARNING(4311)
-				X_ASSERT_NOT_IMPLEMENTED();
+		//		X_ASSERT_NOT_IMPLEMENTED();
 				uint32_t matID = reinterpret_cast<uint32_t>(pSubMesh->materialName.as<uint32_t>());
 				X_ENABLE_WARNING(4302)
 				X_ENABLE_WARNING(4311)
@@ -243,7 +243,7 @@ bool Level::ProcessData(uint32_t bytesRead)
 	}
 
 	// area Portals
-	if (fileHdr_.numinterAreaPortals > 0)
+	if (fileHdr_.flags.IsSet(LevelFileFlags::INTER_AREA_INFO))
 	{
 		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_PORTALS);
 
@@ -302,6 +302,97 @@ bool Level::ProcessData(uint32_t bytesRead)
 		X_WARNING("Level", "Level has no inter area portals.");
 	}
 
+	
+	if (fileHdr_.flags.IsSet(LevelFileFlags::AREA_ENT_REF_LISTS))
+	{
+		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_ENT_REFS);
+
+		AreaRefInfo& entRefs = entRefs_;
+		entRefs.areaRefHdrs.resize(fileHdr_.numAreas);
+
+		file.readObj(entRefs.areaRefHdrs.ptr(), entRefs.areaRefHdrs.size());
+
+		size_t numEntRefs = fileHdr_.numEntRefs;
+		size_t numMultiAreaEntRefs = fileHdr_.numMultiAreaEntRefs;
+
+
+		// load into single buffer.
+		entRefs.areaRefs.resize(numEntRefs);
+		file.readObj(entRefs.areaRefs.ptr(), entRefs.areaRefs.size());
+
+		// load multi area ref list headers.
+		file.readObj(entRefs.areaMultiRefHdrs.data(), entRefs.areaMultiRefHdrs.size());
+
+		// load the multi area ref lists data.
+		entRefs.areaMultiRefs.resize(numMultiAreaEntRefs);
+		file.readObj(entRefs.areaMultiRefs.ptr(), entRefs.areaMultiRefs.size());
+	}
+
+	if (fileHdr_.flags.IsSet(LevelFileFlags::AREA_MODEL_REF_LISTS))
+	{
+		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_MODEL_REFS);
+
+		AreaRefInfo& modelRefs = modelRefs_;
+		modelRefs.areaRefHdrs.resize(fileHdr_.numAreas);
+
+		file.readObj(modelRefs.areaRefHdrs.ptr(), modelRefs.areaRefHdrs.size());
+
+		size_t numModelRefs = fileHdr_.numModelRefs;
+		size_t numMultiAreaModelRefs = fileHdr_.numMultiAreaModelRefs;
+
+
+		// load into single buffer.
+		modelRefs.areaRefs.resize(numModelRefs);
+		file.readObj(modelRefs.areaRefs.ptr(), modelRefs.areaRefs.size());
+
+		// load multi area ref list headers.
+		file.readObj(modelRefs.areaMultiRefHdrs.data(), modelRefs.areaMultiRefHdrs.size());
+
+		// load the multi area ref lists data.
+		modelRefs.areaMultiRefs.resize(numMultiAreaModelRefs);
+		file.readObj(modelRefs.areaMultiRefs.ptr(), modelRefs.areaMultiRefs.size());
+
+#if 0
+		for (size_t b = 0; b < fileHdr_.numAreas; b++)
+		{
+			const FileAreaRefHdr& areaModelsHdr = modelRefs.areaRefHdrs[b];
+			X_LOG0("modelRefs", "%i start: %i num: %i", b, areaModelsHdr.startIndex, areaModelsHdr.num);
+		}
+#endif
+	}
+
+	{
+		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::STATIC_MODELS);
+
+		staticModels_.resize(fileHdr_.numStaticModels);
+		if (staticModels_.isNotEmpty())
+		{
+			// we read each item one by one since we are readong from a FileBuf.
+			size_t i;
+			for (i = 0; i < staticModels_.size(); i++)
+			{
+				StaticModel& sm = staticModels_[i];
+				FileStaticModel fsm;
+
+				file.readObj(fsm);
+
+				// copy over the info.
+				sm.pos = fsm.pos;
+				sm.angle = fsm.angle;
+				sm.modelNameIdx = fsm.modelNameIdx;
+				// models need to be loaded at some point.
+
+				const char* modelName = stringTable_.getString(sm.modelNameIdx);
+				model::IModel* pModel = getModelManager()->loadModel(modelName);
+				
+		//		X_LOG0("SM", "%i name: %s pos: (%g,%g,%g,)", i,  modelName,
+		//			sm.pos[0], sm.pos[1], sm.pos[2]);
+
+				sm.pModel = pModel;
+			}
+		}
+	}
+
 	// nodes
 	if (fileHdr_.flags.IsSet(LevelFileFlags::BSP_TREE))
 	{
@@ -330,6 +421,7 @@ bool Level::ProcessData(uint32_t bytesRead)
 	{
 		X_WARNING("Level", "Level has no area tree.");
 	}
+
 
 	// 
 	CommonChildrenArea_r(&areaNodes_[0]);

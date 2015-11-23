@@ -3,7 +3,7 @@
 #ifndef _X_INPUT_I_H_
 #define _X_INPUT_I_H_
 
-#include <Platform.h>
+#include <Core\Platform.h>
 
 #include <Util\Flags.h>
 // #include <Util\FlagsMacros.h>

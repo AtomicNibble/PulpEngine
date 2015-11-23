@@ -105,7 +105,7 @@ void XCore::Release()
 
 void XCore::ShutDown()
 {
-	X_LOG0("Core", "Shutting down");
+	X_LOG0("Core", "Shutting Down");
 
 	dirWatcher_.ShutDown();
 
@@ -166,6 +166,11 @@ void XCore::ShutDown()
 		core::SafeRelease(env_.p3DEngine);
 	}
 
+	if (env_.pConsole)
+	{
+		env_.pConsole->SaveChangedVars();
+	}
+
 	if (env_.pFileSys)
 	{
 		env_.pFileSys->ShutDown();
@@ -203,7 +208,7 @@ void XCore::ShutDown()
 
 	moduleInterfaces_.free();
 
-#if X_PLATFORM_WIN32 && X_DEBUG
+#if X_PLATFORM_WIN32 // && X_DEBUG
 	_getch();
 #endif // !X_PLATFORM_WIN32
 
@@ -293,7 +298,7 @@ void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 			g_coreVars.win_x_pos = rect.getX1();
 			g_coreVars.win_y_pos = rect.getY1();
 		}
-			break;
+		break;
 		case CoreEvent::RESIZE:
 		{
 			core::xWindow::Rect rect = pWindow_->GetClientRect();
@@ -301,9 +306,15 @@ void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 			g_coreVars.win_height = rect.getHeight();
 			g_coreVars.win_width = rect.getWidth();
 		}
-			break;
+		break;
+		case CoreEvent::ACTIVATE:
+		{
+			if (pWindow_) {
+				pWindow_->ClipCursorToWindow();
+			}
+		}
+		break;
 	}
-
 }
 
 
@@ -394,6 +405,12 @@ bool XCore::addfileType(core::IXHotReload* pHotReload, const char* extension)
 //	X_ASSERT_NOT_NULL(pHotReload);
 	X_ASSERT_NOT_NULL(extension);
 	
+	if (core::strUtil::Find(extension, '.')) {
+		X_ERROR("HotReload", "extension can't contain dots");
+		return false;
+	}
+
+	// note: hotReloadExtMap_ stores char* pointer.
 	if (pHotReload == nullptr) {
 		hotReloadExtMap_.erase(extension);
 		return true;
@@ -429,7 +446,7 @@ bool XCore::OnFileChange(core::XDirectoryWatcher::Action::Enum action,
 		ext = core::strUtil::FileExtension(name);
 		if (ext)
 		{
-			it = hotReloadExtMap_.find(ext);
+			it = hotReloadExtMap_.find(X_CONST_STRING(ext));
 			if (it != hotReloadExtMap_.end())
 			{
 				return it->second->OnFileChange(name);

@@ -49,7 +49,7 @@ struct XRegFactoryNode* g_pHeadToRegFactories = 0;
 
 // X_LINK_LIB("engine_Font")
 X_LINK_LIB("engine_Core")
-// X_LINK_LIB("engine_3DEngine")
+X_LINK_LIB("engine_3DEngine")
 X_LINK_LIB("engine_RenderNull")
 // X_LINK_LIB("engine_Script")
 
@@ -118,11 +118,12 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 			if (engine.Init(lpCmdLine, Console))
 			{
 				core::Path<char> name;
+				name.set("map_source\\");
 				name.setFileName("basic - Copy.map");
 				name.setFileName("alcatraz.map");
 				name.setFileName("killzone.map");
 				name.setFileName("box.map");
-				name.setFileName("test_resources\\maps\\boxmap.map");
+				name.setFileName("boxmap.map");
 				name.setFileName("box2.map");
 				name.setFileName("box3.map");
 				name.setFileName("box4.map");
@@ -141,7 +142,6 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 	g_bspFaceAllocator = nullptr;
 	g_bspNodeAllocator = nullptr;
 
-//	system("PAUSE");
 	return 0;
 }
 
@@ -173,10 +173,10 @@ void CompileLevel(core::Path<char>& path)
 			core::TimeVal end = gEnv->pTimer->GetAsyncTime();
 			{
 				X_LOG_BULLET;
-				X_LOG0("Map", "Loaded: %.4fms", (end - start).GetMilliSeconds());
-				X_LOG0("Map", "Num Entities: %i", map.getNumEntities());
-				X_LOG0("Map", "Num Brushes: %i", map.getNumBrushes());
-				X_LOG0("Map", "Num Patches: %i", map.getNumPatches());
+				X_LOG0("Map", "Loaded: ^6%.4fms", (end - start).GetMilliSeconds());
+				X_LOG0("Map", "Num Entities: ^8%i", map.getNumEntities());
+				X_LOG0("Map", "Num Brushes: ^8%i", map.getNumBrushes());
+				X_LOG0("Map", "Num Patches: ^8%i", map.getNumPatches());
 			}
 
 			// all loaded time to get naked.
@@ -198,7 +198,11 @@ void CompileLevel(core::Path<char>& path)
 
 
 			end = gEnv->pTimer->GetAsyncTime();
-			X_LOG0("Info", "Total Time: %.4fms", (end - start).GetMilliSeconds());
+			X_LOG0("Info", "Total Time: ^6%.4fms", (end - start).GetMilliSeconds());
+		}
+		else
+		{
+			X_ERROR("Map", "Failed to parse map file");
 		}
 
 		gEnv->pFileSys->closeFileMem(pFile);

@@ -268,7 +268,7 @@ XCacheSlot* XGlyphCache::GetLRUSlot()
 				dwMinUsage = pSlot->uUsage;
 			}
 		}
-		pItor++;
+		++pItor;
 	}
 	return pLRUSlot;
 }
@@ -295,7 +295,7 @@ XCacheSlot* XGlyphCache::GetMRUSlot()
 				dwMaxUsage = pSlot->uUsage;
 			}
 		}
-		pItor++;
+		++pItor;
 	}
 	return pMRUSlot;
 }

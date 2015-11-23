@@ -31,7 +31,7 @@ public:
 
 	Quat() : w(1), v(0, 0, 0){} // default constructor is identity quat
 	template<typename FromT>
-	Quat(const Quat<FromT>& q) : w(static_cast<T>(q.w)), v(q.v) {}
+	explicit Quat(const Quat<FromT>& q) : w(static_cast<T>(q.w)), v(q.v) {}
 
 	Quat(T aW, T x, T y, T z) : w(aW), v(x, y, z) {}
 	// construct from axis-angle
@@ -39,9 +39,9 @@ public:
 	Quat(const Vec3<T> &axis, T radians) { set(axis, radians); }
 	Quat(const Vec3<T> &from, const Vec3<T> &to) { set(from, to); }
 	// create from Euler angles in radians expressed in ZYX rotation order
-	Quat(T xRotation, T yRotation, T zRotation) { set(xRotation, yRotation, zRotation); }
-	Quat(const Matrix33<T> &m) { set(m); }
-	Quat(const Matrix44<T> &m) { set(m); }
+	Quat(T pitch, T yaw, T roll) { set(pitch, yaw, roll); }
+	explicit Quat(const Matrix33<T> &m) { set(m); }
+	explicit Quat(const Matrix44<T> &m) { set(m); }
 	explicit Quat(const Matrix34<T>& m) { set(m); }
 
 	template<typename Y>
@@ -59,6 +59,7 @@ public:
 	T dot(const Quat<T> &quat) const;
 	T length() const;
 	T lengthSquared() const;
+	Vec3<T> getEuler(void) const;
 
 	Quat<T>& normalize();
 	Quat<T> normalized() const;
@@ -71,7 +72,7 @@ public:
 	void set(T aW, T x, T y, T z);
 	void set(const Vec3<T> &from, const Vec3<T> &to);
 	void set(const Vec3<T> &axis, T radians);
-	void set(T xRotation, T yRotation, T zRotation);
+	void set(T pitch, T yaw, T roll);
 	void getAxisAngle(Vec3<T> *axis, T *radians) const;
 	Matrix33<T> toMatrix33() const;
 	Matrix44<T> toMatrix44() const;
@@ -155,7 +156,7 @@ public:
 	QuatTrans(const Vec3<T>& vec, const Quat<T>& quat);
 
 	template <typename TOth>
-	QuatTrans(const QuatTrans<TOth>& qt);
+	explicit QuatTrans(const QuatTrans<TOth>& qt);
 
 	explicit QuatTrans(const Matrix34<T>& mat);
 

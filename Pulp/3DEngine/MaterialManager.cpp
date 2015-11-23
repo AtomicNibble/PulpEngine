@@ -24,9 +24,6 @@ using namespace shader;
 
 namespace {
 
-	X_DECLARE_FLAGS(MtlXmlFlags)(NAME, FLAGS, SURFACETYPE);
-
-
 	struct TextureType
 	{
 		const char* name;
@@ -58,6 +55,114 @@ namespace {
 		}
 
 		return false;
+	}
+
+	// string to material type.
+	MaterialType::Enum MatTypeFromStr(const char* str)
+	{
+		// case sensitive for this one
+		const char* pBegin = str;
+		const char* pEnd = str + core::strUtil::strlen(str);
+
+		if (core::strUtil::IsEqual(pBegin, pEnd, "world")) {
+			return MaterialType::WORLD;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "ui")) {
+			return MaterialType::UI;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "model")) {
+			return MaterialType::MODEL;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "tool")) {
+			return MaterialType::TOOL;
+		}
+
+		X_ERROR("Mtl", "Unknown material type: '%s' (case-sen)", str);
+		return MaterialType::UNKNOWN;
+	}
+
+	MaterialSurType::Enum SurfaceTypeFromStr(const char* str)
+	{
+		// case sensitive for this one
+		const char* pBegin = str;
+		const char* pEnd = str + core::strUtil::strlen(str);
+
+		if (core::strUtil::IsEqual(pBegin, pEnd, "none")) {
+			return MaterialSurType::NONE;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "brick")) {
+			return MaterialSurType::BRICK;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "concrete")) {
+			return MaterialSurType::CONCRETE;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "cloth")) {
+			return MaterialSurType::CLOTH;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "flesh")) {
+			return MaterialSurType::FLESH;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "glass")) {
+			return MaterialSurType::GLASS;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "grass")) {
+			return MaterialSurType::GRASS;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "gravel")) {
+			return MaterialSurType::GRAVEL;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "ice")) {
+			return MaterialSurType::ICE;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "metal")) {
+			return MaterialSurType::METAL;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "mud")) {
+			return MaterialSurType::MUD;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "plastic")) {
+			return MaterialSurType::PLASTIC;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "paper")) {
+			return MaterialSurType::PAPER;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "rock")) {
+			return MaterialSurType::ROCK;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "snow")) {
+			return MaterialSurType::SNOW;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "sand")) {
+			return MaterialSurType::SAND;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "wood")) {
+			return MaterialSurType::WOOD;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "water")) {
+			return MaterialSurType::WATER;
+		}
+
+		X_ERROR("Mtl", "Unknown material surface type: '%s' (case-sen)", str);
+		return MaterialSurType::NONE;
+	}
+
+	MaterialCoverage::Enum CoverageFromStr(const char* str)
+	{
+		const char* pBegin = str;
+		const char* pEnd = str + core::strUtil::strlen(str);
+
+		if (core::strUtil::IsEqual(pBegin, pEnd, "opaque")) {
+			return MaterialCoverage::OPAQUE;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "perforated")) {
+			return MaterialCoverage::PERFORATED;
+		}
+		if (core::strUtil::IsEqual(pBegin, pEnd, "translucent")) {
+			return MaterialCoverage::TRANSLUCENT;
+		}
+
+		X_ERROR("Mtl", "Unknown material coverage type: '%s' (case-sen)", str);
+		return MaterialCoverage::BAD;
 	}
 
 	bool ProcessMaterialXML(XMaterial* pMaterial, xml_node<>* node)
@@ -101,6 +206,19 @@ namespace {
 				MaterialSurType::Enum type = core::strUtil::StringToInt<MaterialSurType::Enum>(attr->value());
 				pMaterial->setSurfaceType(type);
 			}
+			else if (core::strUtil::IsEqual(begin, end, "Coverage"))
+			{
+				flags.Set(MtlXmlFlags::COVERAGE);
+
+				MaterialCoverage::Enum coverage = CoverageFromStr(attr->value());
+				pMaterial->setCoverage(coverage);
+			}
+			else if (core::strUtil::IsEqual(begin, end, "MaterialType"))
+			{
+				// make sure the name is a valid material type.
+				MaterialType::Enum type = MatTypeFromStr(attr->value());
+				pMaterial->setType(type);
+			}
 			else
 			{
 				X_WARNING("Mtl", "unkown attribute: %s on material node", begin);
@@ -113,6 +231,13 @@ namespace {
 			X_ERROR("Mtl", "material node missing 'flags' attribute");
 		if (!flags.IsSet(MtlXmlFlags::SURFACETYPE))
 			X_ERROR("Mtl", "material node missing 'SurfaceType' attribute");
+
+		// default to opaque
+		if (!flags.IsSet(MtlXmlFlags::COVERAGE))
+		{
+			flags.Set(MtlXmlFlags::COVERAGE);
+			pMaterial->setCoverage(MaterialCoverage::OPAQUE);
+		}
 
 		// are all 3 set ?
 		if (core::bitUtil::CountBits(flags.ToInt()) != MtlXmlFlags::FLAGS_COUNT)
@@ -287,7 +412,7 @@ namespace {
 			searchPatten = Cmd->GetArg(1);
 		}
 
-		((XMaterialManager*)XEngineBase::getMaterialManager())->ListMaterials(searchPatten);
+		(static_cast<XMaterialManager*>(XEngineBase::getMaterialManager()))->ListMaterials(searchPatten);
 	}
 
 	static void sortMatsByName(core::Array<IMaterial*>& mats)
@@ -334,7 +459,7 @@ void XMaterialManager::Init(void)
 
 void XMaterialManager::ShutDown(void)
 {
-	X_LOG0("MtlManager", "Shutting down");
+	X_LOG0("MtlManager", "Shutting Down");
 
 
 	// hotreload support.
@@ -348,12 +473,13 @@ void XMaterialManager::ShutDown(void)
 	core::XResourceContainer::ResourceItor it = materials_.begin();
 	for (; it != materials_.end(); )
 	{
-		XMaterial* pMat = (XMaterial*)it->second;
+		XMaterial* pMat = static_cast<XMaterial*>(it->second);
 
 		++it;
 
-		if (!pMat)
+		if (!pMat) {
 			continue;
+		}
 
 		X_WARNING("Material", "\"%s\" was not deleted", pMat->getName());
 
@@ -389,7 +515,7 @@ void XMaterialManager::InitDefaults(void)
 {
 	if (pDefaultMtl_ == nullptr)
 	{
-		pDefaultMtl_ = (XMaterial*)createMaterial("default");
+		pDefaultMtl_ = static_cast<XMaterial*>(createMaterial("default"));
 
 		// we want texture info to sent and get back a shader item.
 		XInputShaderResources input;
@@ -409,7 +535,7 @@ IMaterial* XMaterialManager::createMaterial(const char* MtlName)
 {
 	XMaterial *pMat = nullptr;
 
-	pMat = (XMaterial*)materials_.findAsset(MtlName);
+	pMat = static_cast<XMaterial*>(materials_.findAsset(X_CONST_STRING(MtlName)));
 
 	if (pMat)
 	{
@@ -420,8 +546,9 @@ IMaterial* XMaterialManager::createMaterial(const char* MtlName)
 		pMat = X_NEW_ALIGNED( XMaterial, g_3dEngineArena, "Material", X_ALIGN_OF(XMaterial));
 		pMat->setName(MtlName);
 
-		if (pListner_)
+		if (pListner_) {
 			pListner_->OnCreateMaterial(pMat);
+		}
 
 		// add it.
 		materials_.AddAsset(MtlName, pMat);
@@ -434,9 +561,12 @@ IMaterial* XMaterialManager::findMaterial(const char* MtlName) const
 {
 	X_ASSERT_NOT_NULL(MtlName);
 
-	XMaterial* pMaterial = (XMaterial*)materials_.findAsset(MtlName);
-	if (pMaterial)
+	XMaterial* pMaterial = static_cast<XMaterial*>(
+		materials_.findAsset(X_CONST_STRING(MtlName)));
+
+	if (pMaterial) {
 		return pMaterial;
+	}
 
 	return nullptr;
 }
@@ -463,7 +593,7 @@ IMaterial* XMaterialManager::loadMaterial(const char* MtlName)
 	if (iMat)
 	{
 		// inc ref count.
-		((XMaterial*)iMat)->addRef();
+		static_cast<XMaterial*>(iMat)->addRef();
 		return iMat;
 	}
 
@@ -488,8 +618,9 @@ void XMaterialManager::unregister(IMaterial* pMat)
 
 //	XMaterial* pXMat = (XMaterial*)pMat;
 
-	if (pListner_)
+	if (pListner_) {
 		pListner_->OnDeleteMaterial(pMat);
+	}
 }
 
 IMaterial* XMaterialManager::getDefaultMaterial()
@@ -527,7 +658,7 @@ namespace
 
 	void XmlFree(void* pointer)
 	{
-		char* pChar = (char*)pointer;
+		char* pChar = static_cast<char*>(pointer);
 		X_DELETE_ARRAY(pChar, g_3dEngineArena);
 	}
 }
@@ -545,9 +676,9 @@ IMaterial* XMaterialManager::loadMaterialXML(const char* MtlName)
 	path.setFileName(MtlName);
 	path.setExtension(MTL_FILE_EXTENSION);
 
-	if (!pFileSys_->fileExists(path.c_str())) {
-		return pMat;
-	}
+//	if (!pFileSys_->fileExists(path.c_str())) {
+//		return pMat;
+//	}
 
 	if (file.openFile(path.c_str(), core::fileMode::READ))
 	{
@@ -568,7 +699,7 @@ IMaterial* XMaterialManager::loadMaterialXML(const char* MtlName)
 			xml_node<>* node = doc.first_node("material");
 			if (node)
 			{
-				pMat = (XMaterial*)createMaterial(MtlName);
+				pMat = static_cast<XMaterial*>(createMaterial(MtlName));
 				if (!ProcessMaterialXML(pMat, node))
 				{
 					// failed to load it :|
@@ -602,9 +733,9 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 	path.setFileName(MtlName);
 	path.setExtension(MTL_B_FILE_EXTENSION);
 
-	if (!pFileSys_->fileExists(path.c_str())) {
-		return pMat;
-	}
+//	if (!pFileSys_->fileExists(path.c_str())) {
+//		return pMat;
+//	}
 
 	if (file.openFile(path.c_str(), core::fileMode::READ))
 	{
@@ -619,7 +750,7 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 
 			if (file.readObjs(texture, Num) == Num)
 			{
-				pMat = (XMaterial*)createMaterial(MtlName);
+				pMat = static_cast<XMaterial*>(createMaterial(MtlName));
 				pMat->CullType_ = hdr.cullType;
 				pMat->MatSurfaceType_ = hdr.type;
 				
@@ -632,7 +763,8 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 				
 				for (i = 0; i < Num; i++)
 				{
-					X_ASSERT(texture[i].type < static_cast<int32_t>(shader::ShaderTextureIdx::ENUM_COUNT), "invalid texture type")();
+					X_ASSERT(texture[i].type < static_cast<int32_t>(shader::ShaderTextureIdx::ENUM_COUNT),
+						"invalid texture type")();
 					input.textures[texture[i].type].name = texture[i].name.c_str();
 				}
 
@@ -664,9 +796,9 @@ bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 	MaterialHeader hdr;
 	uint32_t i, numTex;
 
-	pMat = (XMaterial*)pMat_;
+	pMat = static_cast<XMaterial*>(pMat_);
 
-	path /= "core_assets/materials/";
+	path /= "materials/";
 	path /= pMat->getName();
 	path.setExtension(MTL_B_FILE_EXTENSION);
 
@@ -690,12 +822,12 @@ bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 
 	for (i = 0, numTex = 0; i < ShaderTextureIdx::ENUM_COUNT; i++)
 	{
-		pTex = pRes->getTexture((ShaderTextureIdx::Enum)i);
+		pTex = pRes->getTexture(static_cast<ShaderTextureIdx::Enum>(i));
 
 		if (pTex)
 		{
 			textures[numTex].name.set(pTex->name);
-			textures[numTex].type = (ShaderTextureIdx::Enum)i;
+			textures[numTex].type = static_cast<ShaderTextureIdx::Enum>(i);
 			numTex++;
 		}
 	}
@@ -739,7 +871,6 @@ void XMaterialManager::ListMaterials(const char* searchPatten) const
 	sortMatsByName(sorted_mats);
 
 	X_LOG0("Console", "------------ ^8Materials(%i)^7 ------------", sorted_mats.size());
-	X_LOG_BULLET;
 
 	core::Array<IMaterial*>::ConstIterator it = sorted_mats.begin();
 	for (; it != sorted_mats.end(); ++it)
@@ -749,7 +880,7 @@ void XMaterialManager::ListMaterials(const char* searchPatten) const
 			mat->getName());
 	}
 
-	X_LOG0("Console", "------------ ^8Materials End^7 ------------");
+	X_LOG0("Console", "------------ ^8Materials End^7 -----------");
 }
 
 

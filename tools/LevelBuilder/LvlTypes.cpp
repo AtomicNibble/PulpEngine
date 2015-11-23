@@ -24,17 +24,17 @@ culled(false),
 pWinding(nullptr), 
 pVisibleHull(nullptr)
 {
-
+	core::zero_object(__pad);
 }
 
-LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth)
+LvlBrushSide::LvlBrushSide(const LvlBrushSide& oth) : matInfo(oth.matInfo)
 {
 	planenum = oth.planenum;
 
 	visible = oth.visible;
 	culled = oth.culled;
 
-	matInfo = oth.matInfo;
+//	matInfo = oth.matInfo;
 
 	// null them first.
 	pWinding = nullptr;
@@ -102,6 +102,7 @@ patches(g_arena),
 interPortals(g_arena),
 numAreas(0)
 {
+	classType = level::ClassType::UNKNOWN;
 	bspFaces = nullptr;
 	mapEntity = nullptr;
 }
@@ -295,6 +296,9 @@ bool LvlBrush::calculateContents(void)
 		combinedMatFlags |= pMat->getFlags();
 
 		if (pMat->getFlags().IsSet(engine::MaterialFlag::PORTAL)) {
+			opaque = false;
+		}
+		else if (pMat->getCoverage() != engine::MaterialCoverage::OPAQUE) {
 			opaque = false;
 		}
 

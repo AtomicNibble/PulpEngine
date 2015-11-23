@@ -58,7 +58,7 @@ protected:
 
 class XWinBool : public XWinVar {
 public:
-	XWinBool() : XWinVar() {};
+	XWinBool() : value(false), XWinVar() {};
 	~XWinBool()X_OVERRIDE{};
 
 	virtual void Init(const char *_name, XWindow *win) X_OVERRIDE {
@@ -167,7 +167,7 @@ protected:
 class XWinInt : public XWinVar 
 {
 public:
-	XWinInt() : XWinVar() {};
+	XWinInt() : value(0), XWinVar() {};
 	~XWinInt() X_OVERRIDE{};
 
 	virtual void Init(const char* _name, XWindow* win) X_OVERRIDE {
@@ -215,7 +215,7 @@ protected:
 class XWinFloat : public XWinVar 
 {
 public:
-	XWinFloat() : XWinVar() {};
+	XWinFloat() : value(0.f), XWinVar() {};
 	~XWinFloat() X_OVERRIDE{};
 
 	virtual void Init(const char* _name, XWindow* win) X_OVERRIDE{

@@ -18,7 +18,12 @@ public:
 	// constructs the stream no memory is allocated.
 	inline BitStream(MemoryArenaBase* arena);
 	inline BitStream(MemoryArenaBase* arena, size_t numBits);
+	inline BitStream(const BitStream& oth);
+	inline BitStream(BitStream&& oth);
 	inline ~BitStream();
+
+	inline BitStream& operator=(const BitStream& oth);
+	inline BitStream& operator=(BitStream&& oth);
 
 	// writes a bit to the stream
 	inline void write(bool bit);
@@ -48,8 +53,8 @@ public:
 	inline bool isEos(void) const;
 	
 private:
-	X_NO_COPY(BitStream);
-	X_NO_ASSIGN(BitStream);
+	// X_NO_COPY(BitStream);
+	// X_NO_ASSIGN(BitStream);
 
 	// for easy memory allocation changes later.
 	inline size_t bytesRequired(size_t numBits) const;

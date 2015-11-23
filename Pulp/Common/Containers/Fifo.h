@@ -75,7 +75,12 @@ public:
 
 	X_INLINE Fifo(MemoryArenaBase* arena);
 	X_INLINE Fifo(MemoryArenaBase* arena, size_type size);
+	X_INLINE Fifo(const Fifo& oth);
+	X_INLINE Fifo(Fifo&& oth);
 	X_INLINE ~Fifo(void);
+
+	X_INLINE Fifo& operator=(const Fifo& oth);
+	X_INLINE Fifo& operator=(Fifo&& oth);
 
 	X_INLINE void setArena(MemoryArenaBase* arena);
 
@@ -115,8 +120,8 @@ public:
 
 
 private:
-	X_NO_COPY(Fifo);
-	X_NO_ASSIGN(Fifo);
+//	X_NO_COPY(Fifo);
+//	X_NO_ASSIGN(Fifo);
 
 	// for easy memory allocation changes later.
 	X_INLINE void Delete(T* pData);

@@ -11,6 +11,9 @@
 
 X_NAMESPACE_BEGIN(core)
 
+static const size_t FS_MAX_VIRTUAL_DIR = 10;
+
+
 X_DECLARE_FLAGS(fileMode) (READ, WRITE, APPEND, WRITE_FLUSH, RECREATE, SHARE, RANDOM_ACCESS);
 X_DECLARE_FLAGS(SeekMode) (CUR, END, SET);
 X_DECLARE_ENUM(VirtualDirectory)(GAME, MOD);
@@ -159,6 +162,15 @@ struct XFile
 	inline uint32_t writeString(const char* str, uint32_t Length) {
 		return write(str, Length);
 	}
+
+	inline uint32_t writeStringNNT(core::string& str) {
+		return write(str.c_str(), safe_static_cast<uint32_t, size_t>(str.length()));
+	}
+	inline uint32_t writeStringNNT(const char* str) {
+		return write(str, safe_static_cast<uint32_t, size_t>(strlen(str)));
+	}
+
+
 	inline uint32_t printf(const char *fmt, ...) {
 		char buf[2048]; // more? i think not!
 		int length;
@@ -390,7 +402,9 @@ struct IFileSys
 
 	// exsists.
 	virtual bool fileExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
+	virtual bool fileExists(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
 	virtual bool directoryExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
+	virtual bool directoryExists(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
 
 	// does not error, when it's a file or not exsist.
 	virtual bool isDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
@@ -537,9 +551,20 @@ public:
 		return pFile_->writeString(str, Length);
 	}
 
+	inline uint32_t writeStringNNT(core::string& str) {
+		return pFile_->writeStringNNT(str);
+	}
+	inline uint32_t writeStringNNT(const char* str) {
+		return pFile_->writeStringNNT(str);
+	}
+
 	template <typename T>
 	inline uint32_t writeObj(T& object) {
 		return write(&object, sizeof(T));
+	}
+	template <typename T>
+	inline uint32_t writeObj(const T* objects, size_t num) {
+		return write(objects, safe_static_cast<uint32_t, size_t>(sizeof(T)* num));
 	}
 
 	template <typename T>

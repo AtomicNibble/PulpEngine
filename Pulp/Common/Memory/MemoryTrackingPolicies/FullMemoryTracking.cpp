@@ -29,7 +29,7 @@ numAllocations_(0),
 
 heapArea_(
 	bitUtil::RoundUpToMultiple<size_t>(
-	AllocationTable::GetMemoryRequirement<LinearArena>(10000), VirtualMem::GetPageSize()
+	AllocationTable::GetMemoryRequirement<LinearArena>(20000), VirtualMem::GetPageSize()
 	)
 ),
 

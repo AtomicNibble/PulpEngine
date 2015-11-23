@@ -438,6 +438,8 @@
     <ClCompile Include="UT_JobList.cpp" />
     <ClCompile Include="UT_JobSystem.cpp" />
     <ClCompile Include="UT_Lexer.cpp" />
+    <ClCompile Include="UT_LZ4.cpp" />
+    <ClCompile Include="UT_LZMA.cpp" />
     <ClCompile Include="UT_MemoryCursor.cpp" />
     <ClCompile Include="UT_Mem_GrowingBlockAllocator.cpp" />
     <ClCompile Include="UT_Mem_GrowingGenericAllocator.cpp" />

@@ -208,13 +208,13 @@ void XWinding::print(void) const
 	const Vec3f& max = bounds.max;
 	X_LOG0("Winding", "Printing values:");
 	X_LOG_BULLET;
-	X_LOG0("Winding", "min: (%g,%g,%g)", min[0], min[1], min[2]);
-	X_LOG0("Winding", "max: (%g,%g,%g)", max[0], max[1], max[2]);
-	X_LOG0("Winding", "NumPoints: %i", numPoints_);
+	X_LOG0("Winding", "min: (^8%g,%g,%g^7)", min[0], min[1], min[2]);
+	X_LOG0("Winding", "max: (^8%g,%g,%g^7)", max[0], max[1], max[2]);
+	X_LOG0("Winding", "NumPoints: ^8%i", numPoints_);
 	for (int i = 0; i < numPoints_; i++)
 	{
 		const Vec5f& pl = pPoints_[i];
-		X_LOG0("Winding", "P(%i): (%g,%g,%g) (%g,%g)", i,
+		X_LOG0("Winding", "P(^8%i^7): (^8%g,%g,%g^7) (^8%g,%g^7)", i,
 			pl[0], pl[1], pl[2], pl[3], pl[4]);
 	}
 }
@@ -1050,6 +1050,19 @@ void XWinding::AddToConvexHull(const Vec3f &point, const Vec3f &normal, const fl
 	}
 	numPoints_ = numHullPoints;
 	memcpy(pPoints_, hullPoints, numHullPoints * sizeof(Vec3f));
+}
+
+// ----------------------------------------------------------------------
+
+float XWinding::TriangleArea(const Vec3f& a, const Vec3f& b, const Vec3f& c)
+{
+	Vec3f v1, v2;
+	Vec3f cross;
+
+	v1 = b - a;
+	v2 = c - a;
+	cross = v1.cross(v2);
+	return 0.5f * cross.length();
 }
 
 // ----------------------------------------------------------------------

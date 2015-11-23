@@ -59,16 +59,16 @@ namespace Hash
 	private:
 		void transform(const uint8_t* pBuffer);
 
-		uint8_t buffer[BLOCK_BYTES];
+		uint8_t buffer_[BLOCK_BYTES];
 
 		union
 		{
 			uint8_t c[BLOCK_BYTES];
 			uint32_t l[BLOCK_INTS];
-		} block;
+		} block_;
 
-		uint32_t digest[DIGEST_INTS];
-		size_t numBytes;
+		uint32_t digest_[DIGEST_INTS];
+		size_t numBytes_;
 	};
 
 } // namespace Hash

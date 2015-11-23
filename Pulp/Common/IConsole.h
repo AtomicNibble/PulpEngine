@@ -32,7 +32,14 @@ CONFIG,			// loaded or set from a config file.
 SAVE_IF_CHANGED, // saved to config if changed.
 
 SYSTEM,			// system related
-TOOL			// tool related
+TOOL,			// tool related
+CPY_NAME		// makes a copy of the name
+);
+
+X_DECLARE_ENUM(consoleState)(
+	CLOSED,
+	OPEN,
+	EXPANDED
 );
 
 
@@ -41,11 +48,11 @@ struct ICVar;
 // console commands.
 struct IConsoleCmdArgs
 {
-	virtual ~IConsoleCmdArgs(){}
+	virtual ~IConsoleCmdArgs() {}
 	// Gets number of arguments supplied to the command (including the command itself)
-	virtual int GetArgCount() const X_ABSTRACT;
-	// Gets argument by index, nIndex must be in 0 <= nIndex < GetArgCount()
-	virtual const char* GetArg(int nIndex) const X_ABSTRACT;
+	virtual size_t GetArgCount(void) const X_ABSTRACT;
+	// Gets argument by index, idx must be in 0 <= idx < GetArgCount()
+	virtual const char* GetArg(size_t idx) const X_ABSTRACT;
 };
 
 struct IKeyBindDumpSink
@@ -65,11 +72,14 @@ struct IConsole
 	virtual ~IConsole(){}
 
 	virtual void Startup(ICore* pCore) X_ABSTRACT;
-	virtual void ShutDown() X_ABSTRACT;
+	virtual void ShutDown(void) X_ABSTRACT;
+	virtual void SaveChangedVars(void) X_ABSTRACT; // saves vars with 'SAVE_IF_CHANGED' if modified.
 	virtual void unregisterInputListener(void) X_ABSTRACT;
-	virtual void freeRenderResources() X_ABSTRACT;
+	virtual void freeRenderResources(void) X_ABSTRACT;
 
-	virtual void Draw() X_ABSTRACT;
+	virtual void Draw(void) X_ABSTRACT;
+
+	virtual consoleState::Enum getVisState(void) const X_ABSTRACT;
 
 	// Register variables.
 	virtual ICVar* RegisterString(const char* Name, const char* Value, int flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_ABSTRACT;
@@ -100,7 +110,7 @@ struct IConsole
 //	virtual void ConfigExec(const char* command) X_ABSTRACT;
 	virtual bool LoadConfig(const char* fileName) X_ABSTRACT;
 
-	virtual void OnFrameBegin() X_ABSTRACT;
+	virtual void OnFrameBegin(void) X_ABSTRACT;
 
 	// Logging
 	virtual void addLineToLog(const char* pStr, uint32_t length) X_ABSTRACT;
@@ -116,9 +126,9 @@ struct ICVar
 
 	virtual ~ICVar() {}
 
-	virtual const char* GetName() const X_ABSTRACT;
-	virtual const char* GetDesc() const X_ABSTRACT;
-	virtual const char* GetDefaultStr() const X_ABSTRACT;
+	virtual const char* GetName(void) const X_ABSTRACT;
+	virtual const char* GetDesc(void) const X_ABSTRACT;
+	virtual const char* GetDefaultStr(void) const X_ABSTRACT;
 
 	virtual int GetInteger(void) const X_ABSTRACT;
 	virtual float GetFloat(void) const X_ABSTRACT;
@@ -131,18 +141,18 @@ struct ICVar
 	virtual void Set(const float f) X_ABSTRACT;
 	virtual void Set(const int i) X_ABSTRACT;
 
-	virtual FlagType GetFlags() const X_ABSTRACT;
+	virtual FlagType GetFlags(void) const X_ABSTRACT;
 	virtual FlagType SetFlags(FlagType flags) X_ABSTRACT;
 	virtual float GetMin(void) X_ABSTRACT;
 	virtual float GetMax(void) X_ABSTRACT;
 
-	virtual VarFlag::Enum GetType() X_ABSTRACT;
+	virtual VarFlag::Enum GetType(void) X_ABSTRACT;
 
-	virtual void Release() X_ABSTRACT;
-	virtual void Reset() X_ABSTRACT; // reset to default value.
+	virtual void Release(void) X_ABSTRACT;
+	virtual void Reset(void) X_ABSTRACT; // reset to default value.
 
 	virtual void SetOnChangeCallback(ConsoleVarFunc pChangeFunc) X_ABSTRACT;
-	virtual ConsoleVarFunc GetOnChangeCallback() X_ABSTRACT;
+	virtual ConsoleVarFunc GetOnChangeCallback(void) X_ABSTRACT;
 };
 
 

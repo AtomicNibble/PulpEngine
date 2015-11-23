@@ -12,7 +12,7 @@
 #endif // X_DEDICATED_SERVER
 
 
-#include <Platform.h>
+#include <Core\Platform.h>
 
 #include <IConsole.h>
 #include <IFont.h>

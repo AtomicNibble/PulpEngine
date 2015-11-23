@@ -158,7 +158,9 @@ namespace strUtil
 			uint32_t head = MSBF32(pat), wind = 0, next;
 
 			pat += 4, len -= 4;
-			while ((next = *(uint8_t const*)tgt++)) {
+			// warning C4706: assignment within conditional expression
+			while ((next = *reinterpret_cast<uint8_t const*>(tgt++)) != 0)
+			{
 				wind = (wind << 8) + next;
 				if (wind == head && !memcmp(tgt, pat, len))
 					return tgt - 4;
@@ -489,6 +491,12 @@ namespace strUtil
 		return nullptr;
 	}
 
+
+
+	const char* Find(const char* startInclusive, char what)
+	{
+		return Find(startInclusive, startInclusive + strlen(startInclusive), what);
+	}
 
 	/// \brief Finds a character in a string, and returns a pointer to the first occurrence of the character.
 	/// \remark Returns a \c nullptr if the character could not be found.

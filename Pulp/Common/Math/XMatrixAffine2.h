@@ -55,7 +55,7 @@ public:
 	X_POP_WARNING_LEVEL
 
 	MatrixAffine2();
-	MatrixAffine2(T s);
+	explicit MatrixAffine2(T s);
 	MatrixAffine2(const T *dt);
 	// m[0]=d0, m[1]=d1, m[2]=d2 ... m[5]=d5
 	MatrixAffine2(T d0, T d1, T d2, T d3, T d4, T d5);

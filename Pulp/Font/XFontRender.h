@@ -6,7 +6,7 @@
 #define FT_EXPORT(x) x
 // #define FT_EXPORT_DEF(x) x
 // #define FT_EXPORT_VAR( x ) x
-#include "freetype-2.5.3\include\ft2build.h"
+#include <ft2build.h>
 #include FT_FREETYPE_H
 
 X_NAMESPACE_BEGIN(font)

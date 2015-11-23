@@ -33,13 +33,13 @@ void Command_ListUis(core::IConsoleCmdArgs* pArgs)
 {
 	// we support wildcards
 	const char* pSearchString = nullptr;
-	if (pArgs->GetArgCount() > 0)
+	if (pArgs->GetArgCount() > 1)
 	{
 		pSearchString = pArgs->GetArg(1);
 	}
 
 
-	engine::XEngineBase::getGuiManager()->listGuis();
+	engine::XEngineBase::getGuiManager()->listGuis(pSearchString);
 }
 
 
@@ -68,7 +68,8 @@ bool XGuiManager::Init(void)
 	X_ASSERT_NOT_NULL(gEnv->pRender);
 	X_LOG0("Gui", "Starting GUI System");
 
-	ADD_COMMAND("ui_list", Command_ListUis, 0, "List the loaded ui's");
+	ADD_COMMAND("ui_list", Command_ListUis, 0, "List the loaded ui's <search-filter>");
+	ADD_COMMAND("listUi", Command_ListUis, 0, "List the loaded ui's <search-filter>");
 
 	ADD_CVAR_REF("ui_DrawDebug", var_showDebug_, 1, 0, 1, core::VarFlag::SYSTEM, "draw debug info over gui");
 
@@ -78,7 +79,7 @@ bool XGuiManager::Init(void)
 	gEnv->pInput->AddEventListener(this);
 
 	// what you pointing at? rude..
-	pCursorArrow_ = gEnv->pRender->LoadTexture("core_assets/Textures/cursor_arrow.dds",
+	pCursorArrow_ = gEnv->pRender->LoadTexture("Textures/cursor_arrow.dds",
 		texture::TextureFlags::DONT_STREAM | texture::TextureFlags::NOMIPS);
 
 	if (!pCursorArrow_) {
@@ -91,7 +92,7 @@ bool XGuiManager::Init(void)
 
 void XGuiManager::Shutdown(void)
 {
-	X_LOG0("Gui", "Shuting down GUI Systems");
+	X_LOG0("Gui", "Shutting Down");
 
 
 	gEnv->pHotReload->addfileType(nullptr, gui::GUI_FILE_EXTENSION);
@@ -168,7 +169,6 @@ void XGuiManager::listGuis(const char* wildcardSearch) const
 
 	sortGuisByName(sorted_guis);
 	X_LOG0("Gui", "-------------- ^8Guis(%i)^7 ---------------", sorted_guis.size());
-	X_LOG_BULLET;
 
 	itrGui = sorted_guis.begin();
 	for (; itrGui != sorted_guis.end(); ++itrGui)

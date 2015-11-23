@@ -3,13 +3,12 @@
 #include "Profiler.h"
 
 #include <IModel.h>
-#include "../3DEngine/ModelLoader.h"
 
 X_USING_NAMESPACE;
 
 using namespace core;
 
-#ifdef X_LIB
+#if 0 // ifdef X_LIB 
 
 TEST(Model, Load)
 {
@@ -20,7 +19,7 @@ TEST(Model, Load)
 	{
 		UnitTests::ScopeProfiler profile("ModelLoader");
 
-		model_load_success = loader.LoadModel(model, "core_assets/models/default.model");
+		model_load_success = loader.LoadModel(model, "models/default.model");
 	}
 
 	EXPECT_TRUE(model_load_success);

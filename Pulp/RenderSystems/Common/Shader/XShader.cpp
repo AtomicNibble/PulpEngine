@@ -199,20 +199,21 @@ namespace
 // ----------------------------------------------------
 
 
-XShader* XShaderManager::m_DefaultShader = nullptr;
-XShader* XShaderManager::m_DebugShader = nullptr;
-XShader* XShaderManager::m_FixedFunction = nullptr;
-XShader* XShaderManager::m_Font = nullptr;
-XShader* XShaderManager::m_Gui = nullptr;
-XShader* XShaderManager::m_DefferedShader = nullptr;
-XShader* XShaderManager::m_DefferedShaderVis = nullptr;
-XShader* XShaderManager::m_WordShader = nullptr;
+XShader* XShaderManager::s_pDefaultShader_ =nullptr;
+XShader* XShaderManager::s_pDebugShader_ =nullptr;
+XShader* XShaderManager::s_pFixedFunction_ =nullptr;
+XShader* XShaderManager::s_pFont_ =nullptr;
+XShader* XShaderManager::s_pGui_ =nullptr;
+XShader* XShaderManager::s_pDefferedShader_ =nullptr;
+XShader* XShaderManager::s_pDefferedShaderVis_ =nullptr;
+XShader* XShaderManager::s_pWordShader_ =nullptr;
+XShader* XShaderManager::s_pModelShader_ = nullptr;
 
 
 XShaderManager::XShaderManager() : 
-Sourcebin(nullptr),
-shaders(nullptr, 256), 
-pCrc32(nullptr)
+Sourcebin_(nullptr),
+shaders_(nullptr, 256), 
+pCrc32_(nullptr)
 {
 
 
@@ -220,14 +221,14 @@ pCrc32(nullptr)
 
 XShaderManager::~XShaderManager()
 {
-	ShaderSourceMap::iterator it = Sourcebin.begin();
+	ShaderSourceMap::iterator it = Sourcebin_.begin();
 
-	for (; it != Sourcebin.end(); ++it)
+	for (; it != Sourcebin_.end(); ++it)
 	{
 		X_DELETE(it->second, g_rendererArena);
 	}
 
-	Sourcebin.clear();
+	Sourcebin_.clear();
 }
 
 // -------------------------------------------
@@ -267,6 +268,8 @@ XShader::XShader() :
 	techs_(g_rendererArena)
 {
 	sourceCrc32_ = 0;
+	hlslSourceCrc32_ = 0;
+
 	vertexFmt_ = VertexFormat::P3F_T2F_C4B;
 
 	pHlslFile_ = nullptr;
@@ -315,10 +318,10 @@ bool XShaderManager::Init(void)
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
 	X_ASSERT_NOT_NULL(g_rendererArena);
 
-	pCrc32 = gEnv->pCore->GetCrc32();
+	pCrc32_ = gEnv->pCore->GetCrc32();
 
-	Sourcebin.setArena(g_rendererArena, 64);
-	shaders.setArena(g_rendererArena, 256);
+	Sourcebin_.setArena(g_rendererArena, 64);
+	shaders_.setArena(g_rendererArena, 256);
 
 	texture::XTexture::init();
 
@@ -339,7 +342,7 @@ bool XShaderManager::Init(void)
 
 bool XShaderManager::Shutdown(void)
 {
-	X_LOG0("ShadersManager", "Shutting down");
+	X_LOG0("ShadersManager", "Shutting Down");
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
 
@@ -352,11 +355,11 @@ bool XShaderManager::Shutdown(void)
 	freeSourcebin();
 
 	// free the shaders.
-	XResourceContainer::ResourceItor it = shaders.begin();
-	XResourceContainer::ResourceItor end = shaders.end();
+	XResourceContainer::ResourceItor it = shaders_.begin();
+	XResourceContainer::ResourceItor end = shaders_.end();
 	for (; it != end; )
 	{
-		XShader* pShader = (XShader*)it->second;
+		XShader* pShader = static_cast<XShader*>(it->second);
 
 		++it;
 
@@ -368,7 +371,7 @@ bool XShaderManager::Shutdown(void)
 	//	pTex->forceRelease();
 	}
 
-	shaders.free();
+	shaders_.free();
 
 	return true;
 }
@@ -385,6 +388,10 @@ bool XShaderManager::OnFileChange(const char* name)
 			return true;
 		}
 
+		// ignore .fxcb.hlsl which are merged sources saved out for debuggin.
+		if (core::strUtil::FindCaseInsensitive(name, ".fxcb.hlsl")) {
+			return true;
+		}
 
 		// is it source?
 		bool isSource = true;
@@ -404,8 +411,8 @@ bool XShaderManager::OnFileChange(const char* name)
 			core::Path<char> temp(name);
 			temp.toLower(); // all source is lower case
 
-			ShaderSourceMap::const_iterator it = Sourcebin.find(temp.fileName());
-			if (it != Sourcebin.end())
+			ShaderSourceMap::const_iterator it = Sourcebin_.find(core::string(temp.fileName()));
+			if (it != Sourcebin_.end())
 			{
 				// reload the source file.
 				loadRawSourceFile(temp.fileName(), true);
@@ -419,7 +426,7 @@ bool XShaderManager::OnFileChange(const char* name)
 			else
 			{
 				// log as not found.
-				X_WARNING("Shader", "\"%s\" not used, skippin reload", name);
+				X_WARNING("Shader", "\"%s\" not used, skipping reload", name);
 			}
 		}
 		else
@@ -443,7 +450,7 @@ XShader* XShaderManager::reloadShader(const char* name)
 	size_t i, x, numTecs;
 
 	// already loaded?
-	shader = (XShader*)shaders.findAsset(name);
+	shader = static_cast<XShader*>(shaders_.findAsset(name));
 
 	if (shader)
 	{
@@ -621,30 +628,35 @@ XShader* XShaderManager::reloadShader(const char* name)
 
 bool XShaderManager::loadCoreShaders(void)
 {
-	m_DefaultShader = createShader("default");
+	s_pDefaultShader_ =createShader("default");
 
-	if ((m_FixedFunction = forName("ffe")) == nullptr) {
+	if ((s_pFixedFunction_ =forName("ffe")) == nullptr) {
 		X_ERROR("Shader", "Failed to load ffe shader");
 		return false;
 	}
-	if ((m_Font = forName("font")) == nullptr) {
+	if ((s_pFont_ =forName("font")) == nullptr) {
 		X_ERROR("Shader", "Failed to load font shader");
 		return false;
 	}
-	if ((m_Gui = forName("gui")) == nullptr) {
+	if ((s_pGui_ =forName("gui")) == nullptr) {
 		X_ERROR("Shader", "Failed to load gui shader");
 		return false;
 	}
-	if ((m_DefferedShader = forName("deffered")) == nullptr) {
+	if ((s_pDefferedShader_ =forName("deffered")) == nullptr) {
 		X_ERROR("Shader", "Failed to load deffered shader");
 		return false;
 	}
-	if ((m_DefferedShaderVis = forName("defferedVis")) == nullptr) {
+	if ((s_pDefferedShaderVis_ =forName("defferedVis")) == nullptr) {
 		X_ERROR("Shader", "Failed to load defferedVis shader");
 		return false;
 	}
-	if ((m_WordShader = forName("World")) == nullptr) {
+	if ((s_pWordShader_ =forName("World")) == nullptr) {
 		X_ERROR("Shader", "Failed to load World shader");
+		return false;
+	}
+
+	if ((s_pModelShader_ = forName("Model")) == nullptr) {
+		X_ERROR("Shader", "Failed to load Model shader");
 		return false;
 	}
 	return true;
@@ -654,50 +666,51 @@ bool XShaderManager::loadCoreShaders(void)
 
 bool XShaderManager::freeCoreShaders(void)
 {
-	if (m_DefaultShader)
-		m_DefaultShader->release();
-//	if (m_DebugShader)
-//		m_DebugShader->release();
-	if (m_FixedFunction)
-		m_FixedFunction->release();
-	if (m_Font)
-		m_Font->release();
-	if (m_Gui)
-		m_Gui->release();
-	if (m_DefferedShader)
-		m_DefferedShader->release();
-	if (m_DefferedShaderVis)
-		m_DefferedShaderVis->release();
+	if (s_pDefaultShader_)
+		s_pDefaultShader_->release();
+//	if (s_pDebugShader_)
+//		s_pDebugShader_->release();
+	if (s_pFixedFunction_)
+		s_pFixedFunction_->release();
+	if (s_pFont_)
+		s_pFont_->release();
+	if (s_pGui_)
+		s_pGui_->release();
+	if (s_pDefferedShader_)
+		s_pDefferedShader_->release();
+	if (s_pDefferedShaderVis_)
+		s_pDefferedShaderVis_->release();
 
-	if (m_WordShader)
-		m_WordShader->release();
+	if (s_pWordShader_)
+		s_pWordShader_->release();
+	if (s_pModelShader_)
+		s_pModelShader_->release();
 
 	return true;
 }
 
 bool XShaderManager::freeSourcebin(void)
 {
-	ShaderSourceMap::iterator it = Sourcebin.begin();;
-	for (; it != Sourcebin.end(); ++it)
+	ShaderSourceMap::iterator it = Sourcebin_.begin();;
+	for (; it != Sourcebin_.end(); ++it)
 	{
 		X_DELETE(it->second, g_rendererArena);
 	}
 
-	Sourcebin.free();
+	Sourcebin_.free();
 	return true;
 }
 
 void XShaderManager::listShaders(void)
 {
-	render::XRenderResourceContainer::ResourceConstItor it = shaders.begin();
+	render::XRenderResourceContainer::ResourceConstItor it = shaders_.begin();
 	XShader* pShader;
 
-	X_LOG0("Shader", "------------- ^8Shaders(%i)^7 -------------", shaders.size());
-	X_LOG_BULLET;
+	X_LOG0("Shader", "------------- ^8Shaders(%i)^7 -------------", shaders_.size());
 
-	for (; it != shaders.end(); ++it)
+	for (; it != shaders_.end(); ++it)
 	{
-		pShader = (XShader*)it->second;
+		pShader = static_cast<XShader*>(it->second);
 
 		X_LOG0("Shader", "Name: ^2\"%s\"^7 tecs: %i crc: ^10x%08x^7 vertexFmt: %s",
 			pShader->name_.c_str(),
@@ -710,13 +723,12 @@ void XShaderManager::listShaders(void)
 
 void XShaderManager::listShaderSources(void)
 {
-	ShaderSourceMap::const_iterator it = Sourcebin.begin();
+	ShaderSourceMap::const_iterator it = Sourcebin_.begin();
 	const SourceFile* pSource;
 
-	X_LOG0("Shader", "--------- ^8Shader Sources(%i)^7 ---------", Sourcebin.size());
-	X_LOG_BULLET;
+	X_LOG0("Shader", "--------- ^8Shader Sources(%i)^7 ---------", Sourcebin_.size());
 
-	for (; it != Sourcebin.end(); ++it)
+	for (; it != Sourcebin_.end(); ++it)
 	{
 		pSource = it->second;
 
@@ -738,7 +750,7 @@ XShader* XShaderManager::loadShader(const char* name)
 	XShader* shader = nullptr;
 
 	// already loaded?
-	shader = (XShader*)shaders.findAsset(name);
+	shader = static_cast<XShader*>(shaders_.findAsset(name));
 
 	if (shader)
 		return shader;
@@ -828,7 +840,7 @@ XShader* XShaderManager::createShader(const char* name)
 	XShader* pShader;
 
 	// check if this shader already exsists.
-	pShader = (XShader*)shaders.findAsset(name);
+	pShader = static_cast<XShader*>(shaders_.findAsset(name));
 	
 	if (pShader)
 	{
@@ -838,7 +850,7 @@ XShader* XShaderManager::createShader(const char* name)
 	{
 		pShader = X_NEW_ALIGNED(XShader, g_rendererArena, "Shader", 16);
 		pShader->name_ = name;
-		shaders.AddAsset(name, pShader);
+		shaders_.AddAsset(name, pShader);
 	}
 
 	return pShader;
@@ -905,7 +917,7 @@ bool ShaderSourceFile::Technique::parse(core::XLexer& lex)
 		// parse a key / value pair
 		key.append(token.begin(), token.end());
 		if (!lex.ReadTokenOnLine(token)) {
-			X_ERROR("Shader", "unexpected EOF while reading technique, Line: %i", token.line);
+			X_ERROR("Shader", "unexpected EOF while reading technique, Line: %i", token.GetLine());
 			return false;
 		}
 		value.append(token.begin(), token.end());
@@ -1173,7 +1185,7 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 
 			if (!token.isEqual("{"))
 			{
-				X_ERROR("Shader", "expected { on line: %i", token.line);
+				X_ERROR("Shader", "expected { on line: %i", token.GetLine());
 			}
 
 			{
@@ -1193,7 +1205,7 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 			// valid?
 			if (sourceFileName.isEmpty())
 			{
-				X_ERROR("Shader", "invalid source name Line: %i", token.line);
+				X_ERROR("Shader", "invalid source name Line: %i", token.GetLine());
 				return nullptr;
 			}
 			else
@@ -1216,7 +1228,7 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 						if (token.isEqual("}"))
 							break;
 						if (!token.isEqual("{")) {
-							X_ERROR("Shader", "expected { on line: %i", token.line);
+							X_ERROR("Shader", "expected { on line: %i", token.GetLine());
 							X_DELETE(pShaderSource,g_rendererArena);
 							return nullptr;
 						}
@@ -1262,9 +1274,9 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 
 		// add the refrences.
 		for (auto f : pShaderSource->pHlslFile_->includedFiles) {
-			f->refrences.insert(name);
+			f->refrences.insert(core::string(name));
 		}
-		pShaderSource->pHlslFile_->refrences.insert(name);
+		pShaderSource->pHlslFile_->refrences.insert(core::string(name));
 
 
 		pShaderSource->pFile_ = pfile;
@@ -1272,7 +1284,7 @@ ShaderSourceFile* XShaderManager::loadShaderFile(const char* name, bool reload)
 		// don't combine these, I want to check if just the .shader has changed.
 		// seprate to the .hlsl source.
 		pShaderSource->sourceCrc32_ = pfile->sourceCrc32;
-		pShaderSource->hlslSourceCrc32_ = pCrc32->Combine(pfile->sourceCrc32,
+		pShaderSource->hlslSourceCrc32_ = pCrc32_->Combine(pfile->sourceCrc32,
 			pShaderSource->pHlslFile_->sourceCrc32, 
 			safe_static_cast<uint32_t,size_t>(pShaderSource->pHlslFile_->fileData.size()));
 
@@ -1290,7 +1302,7 @@ bool XShaderManager::sourceToString(core::string& str, const char* name)
 		for (auto f : file->includedFiles)
 		{
 			str.append(f->fileData);
-			str.append("\n");
+			str.append("\r\n");
 		}
 
 		str.append(file->fileData);
@@ -1313,15 +1325,16 @@ SourceFile* XShaderManager::loadRawSourceFile(const char* name, bool reload)
 
 	// already loded o.o?
 	
-	ShaderSourceMap::iterator it = Sourcebin.find(X_CONST_STRING(name));
+	ShaderSourceMap::iterator it = Sourcebin_.find(X_CONST_STRING(name));
 	SourceFile* pfile = nullptr;
 
-	if (it != Sourcebin.end())
+	if (it != Sourcebin_.end())
 	{
 		pfile = it->second;
 
-		if (!reload)
+		if (!reload) {
 			return pfile;
+		}
 	}
 
 	// fixed relative folder.
@@ -1346,7 +1359,7 @@ SourceFile* XShaderManager::loadRawSourceFile(const char* name, bool reload)
 		{
 			// tickle my pickle?
 			// check the crc.
-			uint32_t crc32 = pCrc32->GetCRC32(str.data());
+			uint32_t crc32 = pCrc32_->GetCRC32(str.data());
 
 			if (pfile)
 			{
@@ -1373,7 +1386,7 @@ SourceFile* XShaderManager::loadRawSourceFile(const char* name, bool reload)
 				data->fileData = str;
 				data->sourceCrc32 = crc32;
 
-				Sourcebin.insert(std::make_pair(data->fileName, data));
+				Sourcebin_.insert(std::make_pair(data->fileName, data));
 			
 				// load any files it includes.
 				ParseIncludesAndPrePro_r(data, data->includedFiles);
@@ -1426,7 +1439,8 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 						// you silly hoe!
 						if (fileName.isEmpty())
 						{
-							X_WARNING("Shader", "invalid #include in: \"%s\" line: %i", file->name.c_str(), token.line);
+							X_WARNING("Shader", "invalid #include in: \"%s\" line: %i", 
+								file->name.c_str(), token.GetLine());
 							return;
 						}
 
@@ -1447,7 +1461,7 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 								// add the include files crc to this one.
 								// only after parsing for child includes so that
 								// they are included.
-								file->sourceCrc32 = pCrc32->Combine(file->sourceCrc32,
+								file->sourceCrc32 = pCrc32_->Combine(file->sourceCrc32,
 									childFile->sourceCrc32,
 									safe_static_cast<uint32_t, size_t>(childFile->fileData.length()));
 
@@ -1456,7 +1470,8 @@ void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* file,
 							}
 							else
 							{
-								X_ERROR("Shader", "Recursive file #include for: \"%s\" in shader \"%s\" line: %i", fileName.c_str(), file->name.c_str(), token.line);
+								X_ERROR("Shader", "Recursive file #include for: \"%s\" in shader \"%s\" line: %i", 
+									fileName.c_str(), file->name.c_str(), token.GetLine());
 							}
 						}
 						else

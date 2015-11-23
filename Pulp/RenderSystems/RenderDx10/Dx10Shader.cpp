@@ -117,9 +117,9 @@ bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 
 			XShaderTechnique& tech = techs_[i];
 
-			rd->m_State.pCurShader = this;
-			rd->m_State.pCurShaderTech = &tech;
-			rd->m_State.CurShaderTechIdx = (int32)i;
+			rd->State_.pCurShader = this;
+			rd->State_.pCurShaderTech = &tech;
+			rd->State_.CurShaderTechIdx = (int32)i;
 
 
 			// work out which HW tech to used based on the flags :D !
@@ -164,7 +164,7 @@ bool XShader::FXBegin(uint32 *pPassCountOut, uint32 flags)
 	X_UNUSED(flags);
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 
-	if (!rd->m_State.pCurShader || !rd->m_State.pCurShaderTech) {
+	if (!rd->State_.pCurShader || !rd->State_.pCurShaderTech) {
 		X_WARNING("Shader", "can't begin technique, none set");
 		return false;
 	}
@@ -181,7 +181,7 @@ bool XShader::FXBeginPass(uint32 passIdx)
 	X_UNUSED(passIdx);
 
 	render::DX11XRender* rd = &render::g_Dx11D3D;
-	render::RenderState& state = rd->m_State;
+	render::RenderState& state = rd->State_;
 
 	if (!state.pCurShader || !state.pCurShaderTech) {
 		X_WARNING("Shader", "fail to start pass, none set");
@@ -220,9 +220,9 @@ bool XShader::FXBeginPass(uint32 passIdx)
 		}
 	}
 
-	XHWShader_Dx10* pVS = (XHWShader_Dx10*)pHwTech->pVertexShader;
-	XHWShader_Dx10* pPS = (XHWShader_Dx10*)pHwTech->pPixelShader;
-	XHWShader_Dx10* pGS = (XHWShader_Dx10*)pHwTech->pGeoShader;
+	XHWShader_Dx10* pVS = static_cast<XHWShader_Dx10*>(pHwTech->pVertexShader);
+	XHWShader_Dx10* pPS = static_cast<XHWShader_Dx10*>(pHwTech->pPixelShader);
+	XHWShader_Dx10* pGS = static_cast<XHWShader_Dx10*>(pHwTech->pGeoShader);
 
 	if (!pVS || !pPS)
 	{
@@ -270,7 +270,7 @@ bool XShader::FXEndPass()
 {
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 
-	rd->m_State.pCurShaderTech = nullptr;
+	rd->State_.pCurShaderTech = nullptr;
 	return true;
 }
 
@@ -278,8 +278,8 @@ bool XShader::FXEnd()
 {
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 
-	rd->m_State.pCurShaderTech = nullptr;
-	rd->m_State.pCurShader = nullptr;
+	rd->State_.pCurShaderTech = nullptr;
+	rd->State_.pCurShader = nullptr;
 	return true;
 }
 
@@ -291,12 +291,12 @@ bool XShader::FXSetVSFloat(const core::StrHash& NameParam,
 
 	render::DX11XRender* rd = &render::g_Dx11D3D;
 
-	if (!rd->m_State.pCurShader || !rd->m_State.pCurShaderTech) {
+	if (!rd->State_.pCurShader || !rd->State_.pCurShaderTech) {
 		X_WARNING("Shader", "fail to setVSFloat no shaer / tech set");
 		return false;
 	}
 
-	XShaderTechnique* pTech = rd->m_State.pCurShaderTech;
+	XShaderTechnique* pTech = rd->State_.pCurShaderTech;
 	XShaderTechniqueHW* pHwTech = pTech->pCurHwTech;
 
 	if (!pHwTech) {
@@ -304,12 +304,12 @@ bool XShader::FXSetVSFloat(const core::StrHash& NameParam,
 		return false;
 	}
 
-	XHWShader_Dx10* pVS = (XHWShader_Dx10*)pHwTech->pVertexShader;
+	XHWShader_Dx10* pVS = static_cast<XHWShader_Dx10*>(pHwTech->pVertexShader);
 
 	if (!pVS)
 		return false;
 
-	XShaderParam *pParam = pVS->getParameter(NameParam);
+	XShaderParam* pParam = pVS->getParameter(NameParam);
 	if (!pParam)
 		return false;
 
@@ -340,7 +340,7 @@ bool DX11XRender::SetWorldShader()
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_WordShader;
+	XShader* pSh = XShaderManager::s_pWordShader_;
 	uint32_t pass;
 
 
@@ -354,7 +354,7 @@ bool DX11XRender::SetWorldShader()
 	if (!pSh->FXSetTechnique(tech))
 		return false;
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T4F_C4B_N3F)))
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T4F_C4B_N3F, false))
 		return false;
 
 	if (!pSh->FXBegin(&pass, 0))
@@ -371,7 +371,7 @@ bool DX11XRender::SetSkyboxShader()
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_FixedFunction;
+	XShader* pSh = XShaderManager::s_pFixedFunction_;
 	uint32_t pass;
 
 	if (!pSh)
@@ -392,11 +392,41 @@ bool DX11XRender::SetSkyboxShader()
 	return true;
 }
 
+bool DX11XRender::SetModelShader(shader::VertexFormat::Enum vertFmt)
+{
+	X_UNUSED(vertFmt);
+	using namespace shader;
+
+	XShader* pSh = XShaderManager::s_pModelShader_;
+	uint32_t pass;
+
+	if (!pSh)
+		return false;
+
+	core::StrHash tech("Texture");
+
+	if (!pSh->FXSetTechnique(tech))
+		return false;
+
+//	if (!FX_SetVertexDeclaration(vertFmt, false))
+//		return false;
+
+	if (!pSh->FXBegin(&pass, 0))
+		return false;
+
+	if (!pSh->FXBeginPass(pass))
+		return false;
+
+	FX_ComitParams();
+	return true;
+}
+
+
 bool DX11XRender::SetFFE(shader::VertexFormat::Enum vertFmt, bool textured)
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_FixedFunction;
+	XShader* pSh = XShaderManager::s_pFixedFunction_;
 	uint32_t pass;
 
 	if (!pSh)
@@ -417,7 +447,7 @@ bool DX11XRender::SetFFE(shader::VertexFormat::Enum vertFmt, bool textured)
 			return false;
 	}
 
-	if (FAILED(FX_SetVertexDeclaration(vertFmt)))
+	if (!FX_SetVertexDeclaration(vertFmt, false))
 		return false;
 
 	if(!pSh->FXBegin(&pass, 0))
@@ -434,7 +464,7 @@ bool DX11XRender::SetFontShader()
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_Font;
+	XShader* pSh = XShaderManager::s_pFont_;
 	uint32_t pass;
 
 	if (!pSh)
@@ -444,7 +474,7 @@ bool DX11XRender::SetFontShader()
 	if (!pSh->FXSetTechnique(tech))
 		return false;
 
-	if (FAILED(FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B)))
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B, false))
 		return false;
 
 	if (!pSh->FXBegin(&pass, 0))
@@ -462,7 +492,7 @@ bool DX11XRender::SetZPass()
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_DefferedShader;
+	XShader* pSh = XShaderManager::s_pDefferedShader_;
 	uint32_t pass;
 
 	if (!pSh)
@@ -490,7 +520,7 @@ bool DX11XRender::setGUIShader(bool textured)
 {
 	using namespace shader;
 
-	XShader* pSh = XShaderManager::m_Gui;
+	XShader* pSh = XShaderManager::s_pGui_;
 	uint32_t pass;
 
 	if (!pSh)

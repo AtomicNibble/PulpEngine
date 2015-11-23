@@ -10,6 +10,9 @@
 X_NAMESPACE_DECLARE(render,
 struct IRender
 );
+X_NAMESPACE_DECLARE(core,
+struct ICVar
+);
 
 X_NAMESPACE_BEGIN(game)
 
@@ -33,6 +36,10 @@ public:
 	bool OnInputEventChar(const input::InputEvent& event) X_OVERRIDE;
 	// ~IInputEventListner
 		
+private:
+
+	static void s_OnFovChanged(core::ICVar* pVar);
+	void OnFovChanged(float fov);
 
 private:
 	ICore* pCore_;
@@ -44,6 +51,8 @@ private:
 
 	Vec3f cameraPos_;
 	Vec3f cameraAngle_; // radins
+
+	core::ICVar* pFovVar_;
 
 	XCamera cam_;
 };

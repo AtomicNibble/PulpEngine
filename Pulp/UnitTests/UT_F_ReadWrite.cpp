@@ -156,7 +156,7 @@ TEST(FileSys, Find)
 
 	int num = 0;
 	IFileSys::findData fd;
-	uintptr_t handle = pFileSys->findFirst("core_assets/models/*.model", &fd);
+	uintptr_t handle = pFileSys->findFirst("models/*.model", &fd);
 	if (handle != IFileSys::INVALID_HANDLE)
 	{
 		do

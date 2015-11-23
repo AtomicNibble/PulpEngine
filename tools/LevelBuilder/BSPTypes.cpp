@@ -10,9 +10,9 @@ FillStats::FillStats()
 
 void FillStats::print(void) const
 {
-	X_LOG0("FillStats", "%5i solid leafs", numSolid);
-	X_LOG0("FillStats", "%5i leafs filled", numOutside);
-	X_LOG0("FillStats", "%5i inside leafs", numInside);
+	X_LOG0("FillStats", "^8%5i^7 solid leafs", numSolid);
+	X_LOG0("FillStats", "^8%5i^7 leafs filled", numOutside);
+	X_LOG0("FillStats", "^8%5i^7 inside leafs", numInside);
 }
 
 // ------------------------------ Face -----------------------------------

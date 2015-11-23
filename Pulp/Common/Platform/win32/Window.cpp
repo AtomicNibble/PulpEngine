@@ -61,7 +61,10 @@ void xWindow::RegisterClass(void)
 	if (!g_ClassRegisterd)
 	{
 		// Register the class
-		WNDCLASSEXA wcex;
+		WNDCLASSEXW wcex;
+
+		wchar_t wTxt[256];
+		core::strUtil::Convert(g_EngineName, wTxt);
 
 		wcex.cbSize = sizeof(wcex);
 		wcex.style = /*CS_HREDRAW | CS_VREDRAW |*/ CS_DBLCLKS | CS_OWNDC;
@@ -73,10 +76,10 @@ void xWindow::RegisterClass(void)
 		wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
 		wcex.hbrBackground = 0;
 		wcex.lpszMenuName = 0;
-		wcex.lpszClassName = g_EngineName;
+		wcex.lpszClassName = wTxt;
 		wcex.hIconSm = 0;
 
-		RegisterClassExA(&wcex);
+		RegisterClassExW(&wcex);
 
 		g_ClassRegisterd = TRUE;
 	}
@@ -87,8 +90,12 @@ void xWindow::RegisterClass(void)
 void xWindow::UnRegisterClass(void)
 {
 	s_numwindows--;
-	if (s_numwindows == 0 && g_ClassRegisterd) {
-		UnregisterClassA(g_EngineName, GetModuleHandle(NULL));
+	if (s_numwindows == 0 && g_ClassRegisterd) 
+	{
+		wchar_t wTxt[256];
+		core::strUtil::Convert(g_EngineName, wTxt);
+
+		UnregisterClassW(wTxt, GetModuleHandle(NULL));
 		g_ClassRegisterd = FALSE;
 	}
 }
@@ -184,6 +191,16 @@ void xWindow::CustomFrame(bool val)
 	}
 }
 
+void xWindow::ClipCursorToWindow(void)
+{
+	RECT r;
+	::GetClientRect(window_, &r);
+	ClientToScreen(window_, reinterpret_cast<LPPOINT>(&r.left));
+	ClientToScreen(window_, reinterpret_cast<LPPOINT>(&r.right));
+	ClipCursor(&r);
+}
+
+
 void xWindow::MoveTo(int x, int y)
 {
 	RECT rect;
@@ -275,10 +292,12 @@ bool xWindow::Create(const wchar_t* const Title, int x, int y, int width, int he
 		height = safe_static_cast<int,LONG>( Rect.bottom - Rect.top );
 	}
 
+	core::strUtil::Convert(g_EngineName, wTxt);
+
 	window_ = CreateWindowExW( 
 		0, 
-		core::strUtil::Convert(g_EngineName, wTxt), 
-		Title, 
+		wTxt,
+		Title,
 		mode, 
 		x, y, 
 		width, height, 

@@ -97,6 +97,9 @@ public:
 
 	void ClipSideByTree_r(XPlaneSet& planes, XWinding* w, LvlBrushSide& side);
 
+	// area number that the winding is in, or - 2 if it crosses multiple areas.
+	int32_t CheckWindingInAreas_r(XPlaneSet& planes, const XWinding* w);
+
 	void FindAreas_r(size_t& numAreas);
 	void FloodAreas_r(size_t areaNum, size_t& areaFloods);
 

@@ -20,34 +20,36 @@ public:
 	virtual ~XInputDevice() X_OVERRIDE;
 
 	// IInputDevice
-	virtual const char* GetDeviceName(void) const		X_OVERRIDE{ return m_deviceName.c_str(); }
-	virtual InputDevice::Enum GetDeviceId(void) const	X_OVERRIDE{ return m_deviceId; };
+	virtual const char* GetDeviceName(void) const		X_OVERRIDE{ return deviceName_.c_str(); }
+	virtual InputDevice::Enum GetDeviceId(void) const	X_OVERRIDE{ return deviceId_; };
 	virtual bool Init(void)	X_OVERRIDE{ return true; }
 	virtual void PostInit(void) X_OVERRIDE{}
 	virtual void ShutDown(void) X_OVERRIDE{}
 	virtual void Update(bool focus) X_OVERRIDE;
 	virtual void Enable(bool enable) X_OVERRIDE;
-	virtual bool IsEnabled() const X_OVERRIDE{ return m_enabled; }
+	virtual bool IsEnabled() const X_OVERRIDE{ return enabled_; }
 	virtual void ClearKeyState(void) X_OVERRIDE;
 	virtual bool SetExclusiveMode(bool value) X_OVERRIDE { X_UNUSED(value); return true; }
 	virtual InputSymbol* LookupSymbol(KeyId::Enum id) const X_OVERRIDE;
 	// ~IInputDevice
 
 protected:
-	IInput& GetIInput(void) const	{ return m_input; }
+	IInput& GetIInput(void) const	{ return input_; }
 
 	InputSymbol*				IdToSymbol(KeyId::Enum id) const;
 
 protected:
-	InputDevice::Enum			m_deviceId;
-	bool						m_enabled;
-private:
-	IInput&						m_input;		// point to input system in use
-	core::string				m_deviceName;	// name of the device (used for input binding)
+	InputDevice::Enum			deviceId_;
+	bool						enabled_;
 
+private:
+	IInput&						input_;		// point to input system in use
+	core::string				deviceName_;	// name of the device (used for input binding)
+
+private:
 	typedef core::HashMap<KeyId::Enum, InputSymbol*>		TIdToSymbolMap;
 
-	TIdToSymbolMap				m_idToInfo;
+	TIdToSymbolMap				idToInfo_;
 private:
 	X_NO_ASSIGN(XInputDevice);
 };

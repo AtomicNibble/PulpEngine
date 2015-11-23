@@ -19,11 +19,14 @@ public:
 
 	virtual void Startup(ICore* pCore) X_FINAL;
 	virtual void ShutDown(void) X_FINAL;
+	virtual void SaveChangedVars(void) X_FINAL;
 	virtual void unregisterInputListener(void) X_FINAL;
 	virtual void freeRenderResources(void) X_FINAL;
 
 
 	virtual void Draw(void) X_FINAL;
+
+	virtual consoleState::Enum getVisState(void) const X_FINAL;
 
 	virtual ICVar* RegisterString(const char* Name, const char* Value, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
 	virtual ICVar* RegisterInt(const char* Name, int Value, int Min, int Max, int Flags, const char* desc, ConsoleVarFunc pChangeFunc = 0) X_FINAL;
@@ -53,7 +56,7 @@ public:
 //	virtual void ConfigExec(const char* command) X_FINAL;
 	virtual bool LoadConfig(const char* fileName) X_FINAL;
 
-	void OnFrameBegin() X_FINAL;
+	void OnFrameBegin(void) X_FINAL;
 
 	// Loggging
 	virtual void addLineToLog(const char* pStr, uint32_t length) X_FINAL;

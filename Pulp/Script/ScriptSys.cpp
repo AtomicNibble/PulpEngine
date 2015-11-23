@@ -128,14 +128,14 @@ namespace
 
 	void LoadScriptCmd(core::IConsoleCmdArgs* pArgs)
 	{
-		int num = pArgs->GetArgCount();
+		size_t num = pArgs->GetArgCount();
 		if (num < 2)
 		{
 			X_WARNING("Script", "script_load <filename>");
 			return;
 		}
 
-		for (int i = 1; i<num; i++)
+		for (size_t i = 1; i<num; i++)
 		{
 			const char* Filename = pArgs->GetArg(i);
 
@@ -154,14 +154,14 @@ namespace
 
 	void ReloadScriptCmd(core::IConsoleCmdArgs* pArgs)
 	{
-		int num = pArgs->GetArgCount();
+		size_t num = pArgs->GetArgCount();
 		if (num < 2)
 		{
 			X_WARNING("Script", "script_reload <filename>");
 			return;
 		}
 
-		for (int i = 1; i<num; i++)
+		for (size_t i = 1; i<num; i++)
 		{
 			const char* Filename = pArgs->GetArg(i);
 
@@ -180,7 +180,7 @@ namespace
 			pfileName =	pArgs->GetArg(0);
 		}
 
-		((XScriptSys*)gEnv->pScriptSys)->DumpStateToFile(pfileName);
+		static_cast<XScriptSys*>(gEnv->pScriptSys)->DumpStateToFile(pfileName);
 	}
 
 	int g_pErrorHandlerFunc;
@@ -238,7 +238,7 @@ void XScriptSys::Init()
 
 	InitCommands();
 
-	ExecuteFile("core_assets/scripts/main.lua", false, false);
+	ExecuteFile("scripts/main.lua", false, false);
 
 	// hotreload
 	gEnv->pHotReload->addfileType(this, X_SCRIPT_FILE_EXTENSION);
@@ -433,7 +433,7 @@ void XScriptSys::ListLoadedScripts(void)
 
 void XScriptSys::addFileName(const char* name)
 {
-	fileList_.insert(name);
+	fileList_.insert(core::string(name));
 }
 
 void XScriptSys::removeFileName(const char* name)
@@ -1044,7 +1044,7 @@ void XScriptSys::TraceScriptError()
 
 int XScriptSys::ErrorHandler(lua_State *L)
 {
-	XScriptSys* pThis = (XScriptSys*)gEnv->pScriptSys;
+	XScriptSys* pThis = static_cast<XScriptSys*>(gEnv->pScriptSys);
 
 //	lua_Debug ar;
 //	core::zero_object(ar);

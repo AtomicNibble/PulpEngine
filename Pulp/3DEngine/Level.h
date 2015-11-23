@@ -7,6 +7,7 @@
 
 #include <Ilevel.h>
 #include <Time\TimeVal.h>
+#include <array>
 
 #include "String\GrowingStringTable.h"
 
@@ -23,6 +24,17 @@ struct LoadStats
 {
 	core::TimeVal startTime;
 	core::TimeVal elapse;
+};
+
+struct FrameStats
+{
+	FrameStats();
+
+	void clear(void);
+
+	size_t visibleModels;
+	size_t visibleAreas;
+	size_t visibleVerts;
 };
 
 struct AsyncLoadData
@@ -112,6 +124,27 @@ class Level : public engine::XEngineBase
 {
 	typedef core::Array<Area> AreaArr;
 	typedef core::Array<AreaNode> AreaNodeArr;
+	typedef core::Array<AreaEntRef> AreaRefsArr;
+	typedef core::Array<FileAreaRefHdr> AreaRefsHdrArr;
+	typedef core::Array<MultiAreaEntRef> AreaMultiRefsArr;
+	typedef std::array<FileAreaRefHdr, MAP_MAX_MULTI_REF_LISTS> AreaMultiRefsHdrArr;
+
+	typedef core::Array<level::StaticModel> StaticModelsArr;
+
+	struct AreaRefInfo
+	{
+		AreaRefInfo(core::MemoryArenaBase* arena);
+
+		void clear(void);
+		void free(void);
+
+		// ent with single area ref.
+		AreaRefsHdrArr areaRefHdrs;
+		AreaRefsArr areaRefs;
+		// multi area model refrences for models that are in multiple area's
+		AreaMultiRefsHdrArr areaMultiRefHdrs;
+		AreaMultiRefsArr areaMultiRefs;
+	};
 
 public:
 	Level();
@@ -129,6 +162,8 @@ public:
 	bool Load(const char* mapName);
 
 	void DrawPortalDebug(void) const;
+	void DrawAreaBounds(void);
+	void DrawStatsBlock(void) const;
 
 public:
 	// util
@@ -140,6 +175,8 @@ public:
 
 	size_t BoundsInAreas(const AABB& bounds, int32_t* pAreasOut, size_t maxAreas) const;
 
+	bool IsAreaVisible(int32_t areaIdx) const;
+	bool IsAreaVisible(const Area& area) const;
 
 private:
 	void BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numAreasOut,
@@ -154,21 +191,44 @@ private:
 
 	void AddAreaRefs(int32_t areaNum, const PortalStack* ps);
 
+	void DrawArea(const Area& area);
+	void DrawMultiAreaModels(void);
+
+	void DrawStaticModel(const level::StaticModel& sm);
+
 private:
 	bool ProcessHeader(uint32_t bytesRead);
 	bool ProcessData(uint32_t bytesRead);
 
+
 private:
 	int32_t CommonChildrenArea_r(AreaNode* pAreaNode);
 
+private:
+	void clearVisableAreaFlags(void);
+	void SetAreaVisible(uint32_t area);
+	
 private:
 	core::GrowingStringTable<256, 16, 4, uint32_t> stringTable_;
 
 	AreaArr areas_;
 	AreaNodeArr areaNodes_;
 
+	AreaRefInfo entRefs_;
+	AreaRefInfo modelRefs_;
+
+	// static mocel info.
+	StaticModelsArr staticModels_;
+
+private:
+
+	FrameStats frameStats_;
+
 private:
 	size_t frameID_; // inc'd each frame.
+
+	// cleared each frame.
+	uint32_t visibleAreaFlags_[MAP_MAX_MULTI_REF_LISTS];
 
 	// pointer to the file data.
 	// kept valid while lvl is loaded since mesh headers point to it.
@@ -194,6 +254,7 @@ private:
 	static int s_var_drawPortals_;
 	static int s_var_drawArea_;
 	static int s_var_drawCurrentAreaOnly_;
+	static int s_var_drawStats_;
 };
 
 

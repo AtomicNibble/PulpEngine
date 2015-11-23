@@ -37,10 +37,10 @@ class GrowingStackAllocator
 	struct BlockHeader
 	{
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
-		uint32_t m_AllocationID;
+		uint32_t AllocationID_;
 #endif
-		size_t m_allocationOffset;
-		size_t m_AllocationSize;
+		size_t allocationOffset_;
+		size_t AllocationSize_;
 	};
 
 public:
@@ -68,18 +68,18 @@ public:
 	MemoryAllocatorStatistics getStatistics(void) const;
 
 private:
-	char* m_virtualStart;
-	char* m_virtualEnd;
-	char* m_physicalCurrent;
-	char* m_physicalEnd;
-	size_t m_granularity;
+	char* virtualStart_;
+	char* virtualEnd_;
+	char* physicalCurrent_;
+	char* physicalEnd_;
+	size_t granularity_;
 
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
-	uint32_t m_allocationID;
+	uint32_t allocationID_;
 #endif
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	MemoryAllocatorStatistics m_statistics;
+	MemoryAllocatorStatistics statistics_;
 #endif
 };
 

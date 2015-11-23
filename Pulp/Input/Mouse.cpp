@@ -13,7 +13,8 @@ InputSymbol*	XMouse::Symbol_[MAX_MOUSE_SYMBOLS] = { 0 };
 XMouse::XMouse(XWinInput& input) :
 	XInputDeviceWin32(input, "mouse")
 {
-	m_deviceId = InputDevice::MOUSE;
+	deviceId_ = InputDevice::MOUSE;
+	mouseWheel_ = 0.f;
 }
 
 XMouse::~XMouse()
@@ -25,6 +26,8 @@ XMouse::~XMouse()
 ///////////////////////////////////////////
 bool XMouse::Init()
 {
+	X_ASSERT_NOT_NULL(g_pInputCVars);
+
 	RAWINPUTDEVICE Mouse;
 	Mouse.hwndTarget = 0;
 	Mouse.usUsagePage = 0x1;
@@ -49,7 +52,7 @@ bool XMouse::Init()
 	}
 	else
 	{
-		X_WARNING("Mouse", "Failed to retive sys scroll settings");
+		X_WARNING("Mouse", "Failed to retive sys scroll settings, defaulting to: %i", g_pInputCVars->scrollLines);
 	}
 
 	IInput& input = GetIInput();
@@ -228,10 +231,13 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse)
 		OnButtonUP(KeyId::MOUSE_AUX_5);
 	}
 
-
 	if (mouse.usButtonFlags & RI_MOUSE_WHEEL)
 	{
-		mouseWheel_ = (float)((short)mouse.usButtonData);
+		if (mouse.usFlags & MOUSE_MOVE_ABSOLUTE) {
+			X_WARNING("Mouse", "Absolute scroll is not yet supported.");
+		}
+
+		mouseWheel_ = static_cast<float>(static_cast<short>(mouse.usButtonData));
 
 		// we post scrool up and down once.
 		InputState::Enum newState;

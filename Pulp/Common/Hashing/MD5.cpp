@@ -113,18 +113,18 @@ MD5::~MD5()
 
 void MD5::Init(void)
 {
-	finalized = false;
+	finalized_ = false;
 
-	state[0] = 0x67452301;
-	state[1] = 0xefcdab89;
-	state[2] = 0x98badcfe;
-	state[3] = 0x10325476;
+	state_[0] = 0x67452301;
+	state_[1] = 0xefcdab89;
+	state_[2] = 0x98badcfe;
+	state_[3] = 0x10325476;
 
-	count[0] = 0;
-	count[1] = 0;
+	count_[0] = 0;
+	count_[1] = 0;
 
 	// not need, but clear.
-	zero_object(buffer);
+	zero_object(buffer_);
 }
 
 void MD5::update(const char* str)
@@ -141,25 +141,25 @@ void MD5::update(const char* buf, size_t length)
 void MD5::update(const uint8_t* input, size_t length)
 {
 	// compute number of bytes mod 64
-	size_t index = count[0] / 8 % blocksize;
+	size_t index = count_[0] / 8 % blocksize;
 
 	// Update number of bits
-	if ((count[0] += static_cast<uint32_t>(length << 3)) < (length << 3)) {
-		count[1]++;
+	if ((count_[0] += static_cast<uint32_t>(length << 3)) < (length << 3)) {
+		count_[1]++;
 	}
 
-	count[1] += static_cast<uint32_t>(length >> 29);
+	count_[1] += static_cast<uint32_t>(length >> 29);
 
-	// number of bytes we need to fill in buffer
+	// number of bytes we need to fill in buffer_
 	size_t firstpart = 64 - index;
 	size_t i;
 
 	// transform as many times as possible.
 	if (length >= firstpart)
 	{
-		// fill buffer first, transform
-		memcpy(&buffer[index], input, firstpart);
-		transform(buffer);
+		// fill buffer_ first, transform
+		memcpy(&buffer_[index], input, firstpart);
+		transform(buffer_);
 
 		// transform chunks of blocksize (64 bytes)
 		for (i = firstpart; i + blocksize <= length; i += blocksize) {
@@ -173,8 +173,8 @@ void MD5::update(const uint8_t* input, size_t length)
 		i = 0;
 	}
 
-	// buffer remaining input
-	memcpy(&buffer[index], &input[i], length - i);
+	// buffer_ remaining input
+	memcpy(&buffer_[index], &input[i], length - i);
 }
 
 MD5Digest& MD5::finalize(void)
@@ -185,37 +185,37 @@ MD5Digest& MD5::finalize(void)
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
 	};
 
-	if (!finalized)
+	if (!finalized_)
 	{
 		// Save number of bits
 		uint8_t bits[8];
-		encode(bits, count, 8);
+		encode(bits, count_, 8);
 
 		// pad out to 56 mod 64.
-		size_t index = count[0] / 8 % 64;
+		size_t index = count_[0] / 8 % 64;
 		size_t padLen = (index < 56) ? (56 - index) : (120 - index);
 		update(padding, padLen);
 
 		// Append length (before padding)
 		update(bits, 8);
 
-		// Store state in digest
-		encode(digest.bytes, state, 16);
+		// Store state_ in digest
+		encode(digest_.bytes, state_, 16);
 
 		// zero sensitive information.
-		zero_object(buffer);
-		zero_object(count);
+		zero_object(buffer_);
+		zero_object(count_);
 
-		finalized = true;
+		finalized_ = true;
 	}
 
-	return digest;
+	return digest_;
 }
 
 
 void MD5::transform(const uint8_t block[blocksize])
 {
-	uint32_t a = state[0], b = state[1], c = state[2], d = state[3], x[16];
+	uint32_t a = state_[0], b = state_[1], c = state_[2], d = state_[3], x[16];
 	decode(x, block, blocksize);
 
 	/* Round 1 */
@@ -290,10 +290,10 @@ void MD5::transform(const uint8_t block[blocksize])
 	II(c, d, a, b, x[2], S43, 0x2ad7d2bb); /* 63 */
 	II(b, c, d, a, x[9], S44, 0xeb86d391); /* 64 */
 
-	state[0] += a;
-	state[1] += b;
-	state[2] += c;
-	state[3] += d;
+	state_[0] += a;
+	state_[1] += b;
+	state_[2] += c;
+	state_[3] += d;
 
 	// zero sensitive information.
 	zero_object(x);

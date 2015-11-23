@@ -53,6 +53,8 @@ void AreaModel::EndModel(void)
 	// this could be done in parrell.
 	AABB bounds;
 
+	bounds.clear();
+
 	core::Array<model::SubMeshHeader>::ConstIterator it = meshes.begin();
 	for (; it != meshes.end(); ++it)
 	{
@@ -73,14 +75,23 @@ void AreaModel::EndModel(void)
 
 // ----------------------------
 
+AreaSubMesh::AreaSubMesh() : verts_(g_arena), faces_(g_arena)
+{
+	verts_.setGranularity(4096);
+	faces_.setGranularity(4096);
+}
+
+
+// ----------------------------
+
 
 LvlArea::LvlArea() :
 areaMeshes(g_arena),
-entities(g_arena), 
-cullSections(g_arena)
+entRefs(g_arena),
+modelsRefs(g_arena)
 {
 	areaMeshes.reserve(2048);
-	entities.setGranularity(512);
+	entRefs.reserve(256);
 }
 
 void LvlArea::AreaBegin(void)
@@ -150,7 +161,27 @@ AreaSubMesh* LvlArea::MeshForSide(const LvlBrushSide& side, StringTableType& str
 	newMesh.matName_ = side.matInfo.name;
 
 	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes.insert(
-		AreaMeshMap::value_type(side.matInfo.name.c_str(), newMesh)
+		AreaMeshMap::value_type(core::string(side.matInfo.name.c_str()), newMesh)
+	);
+
+	return &newIt.first->second;
+}
+
+AreaSubMesh* LvlArea::MeshForMat(const core::string& matName, StringTableType& stringTable)
+{
+	AreaMeshMap::iterator it = areaMeshes.find(matName);
+	if (it != areaMeshes.end()) {
+		return &it->second;
+	}
+	// add new.
+	AreaSubMesh newMesh;
+
+	// add mat name to string table.
+	newMesh.matNameID_ = stringTable.addStringUnqiue(matName);
+	newMesh.matName_ = core::StackString<level::MAP_MAX_MATERIAL_LEN>(matName.c_str());
+
+	std::pair<AreaMeshMap::iterator, bool> newIt = areaMeshes.insert(
+		AreaMeshMap::value_type(matName, newMesh)
 	);
 
 	return &newIt.first->second;

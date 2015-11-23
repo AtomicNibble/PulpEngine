@@ -85,6 +85,8 @@ void XFrustum::SetFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV, floa
 	fov_ = FOV;
 	width_ = nWidth;		//surface x-resolution
 	height_ = nHeight;		//surface z-resolution
+	near_ = nearplane;
+	far_ = farpane;
 
 	float32_t fWidth = (static_cast<float32_t>(nWidth) / fPixelAspectRatio);
 	float32_t fHeight = static_cast<float32_t>(nHeight);
@@ -116,6 +118,39 @@ void XFrustum::SetFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV, floa
 	UpdateFrustum();
 }
 
+void XFrustum::setFov(float fov)
+{
+	X_ASSERT(fov >= 0.000001f && fov<X_PI, "invalid fov")(fov);		  //check if specified FOV is valid
+
+	fov_ = fov;
+
+	float32_t fWidth = (static_cast<float32_t>(width_) / pixelAspectRatio_);
+	float32_t fHeight = static_cast<float32_t>(height_);
+
+	// calculate the Left/Top edge of the Projection-Plane in EYE-SPACE 
+	float projLeftTopX = -fWidth*0.5f;
+	float projLeftTopY = static_cast<float32_t>((1.0f / math<float>::tan(fov_ * 0.5f)) * (fHeight * 0.5f));
+	float projLeftTopZ = fHeight * 0.5f;
+
+	edge_plt_.x = projLeftTopX;
+	edge_plt_.y = projLeftTopY;
+	edge_plt_.z = projLeftTopZ;
+	X_ASSERT(math<float>::abs(math<float>::acos(Vec3f(0, edge_plt_.y, edge_plt_.z).normalized().y) * 2 - fov_)<0.001, "")();
+
+	// this is the left/upper vertex of the projection-plane (local-space)	
+	float invProjLeftTopY = 1.0f / projLeftTopY;
+	edge_nlt_.x = near_ * projLeftTopX * invProjLeftTopY;
+	edge_nlt_.y = near_;
+	edge_nlt_.z = near_ * projLeftTopZ * invProjLeftTopY;
+
+	//calculate the left/upper edge of the far-plane (=not rotated) 
+	edge_flt_.x = projLeftTopX  * (far_ * invProjLeftTopY);
+	edge_flt_.y = far_;
+	edge_flt_.z = projLeftTopZ  * (far_ * invProjLeftTopY);
+
+
+	UpdateFrustum();
+}
 
 void XFrustum::UpdateFrustum()
 {

@@ -36,6 +36,7 @@ int XHWShader_Dx10::perInstantMaxVecs_[ShaderType::ENUM_COUNT] = { 0 };
 core::Array<XShaderParam> XHWShader_Dx10::perFrameParams_[ShaderType::ENUM_COUNT] = {0,0,0,0};
 core::Array<XShaderParam> XHWShader_Dx10::perInstantParams_[ShaderType::ENUM_COUNT] = { 0, 0, 0, 0 };
 
+int XHWShader_Dx10::writeMergedSource_ = 0;
 
 
 namespace
@@ -264,7 +265,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	const char* sourceFile, const Flags<TechFlag>& techFlags,
 	ShaderType::Enum type, Flags<ILFlag> ILFlags, uint32_t sourceCrc)
 {
-	X_ASSERT_NOT_NULL(pHWshaders);
+	X_ASSERT_NOT_NULL(s_pHWshaders);
 	X_ASSERT_NOT_NULL(shader_name);
 	X_ASSERT_NOT_NULL(entry);
 	X_ASSERT_NOT_NULL(sourceFile);
@@ -285,7 +286,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	X_LOG1("Shader", "HWS for name: \"%s\"", name.c_str());
 #endif // !X_DEBUG
 
-	pShader = (XHWShader_Dx10*)pHWshaders->findAsset(name.c_str());
+	pShader = static_cast<XHWShader_Dx10*>(s_pHWshaders->findAsset(name.c_str()));
 
 	if (pShader)
 	{
@@ -326,7 +327,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 		pShader->activate();
 
 		// register it.
-		pHWshaders->AddAsset(name.c_str(), pShader);
+		s_pHWshaders->AddAsset(name.c_str(), pShader);
 	}
 
 
@@ -371,18 +372,18 @@ void XHWShader_Dx10::FreeBufferPointers()
 
 void XHWShader_Dx10::FreeHWShaders()
 {
-	X_ASSERT_NOT_NULL(pHWshaders);
+	X_ASSERT_NOT_NULL(s_pHWshaders);
 
 	// NOTE: there should be none, since shaders that use them should release them.
 	// so if there are any here there is a problem.
 	// but we still clean up like a good boy.
 
-	core::XResourceContainer::ResourceItor it = pHWshaders->begin();
+	core::XResourceContainer::ResourceItor it = s_pHWshaders->begin();
 	XHWShader_Dx10* pShader;
 
-	for (; it != pHWshaders->end();)
+	for (; it != s_pHWshaders->end();)
 	{
-		pShader = (XHWShader_Dx10*)it->second;
+		pShader = static_cast<XHWShader_Dx10*>(it->second);
 		++it;
 
 		if (!pShader)
@@ -433,6 +434,16 @@ void XHWShader_Dx10::getShaderCompilePaths(core::Path<char>& src, core::Path<cha
 	gEnv->pFileSys->createDirectoryTree(dest.c_str());
 }
 
+void XHWShader_Dx10::getShaderCompileSrc(core::Path<char>& src)
+{
+	src.clear();
+	src.appendFmt("shaders/temp/%s.fxcb", name_.c_str());
+
+	// make sure the directory is created.
+	gEnv->pFileSys->createDirectoryTree(src.c_str());
+}
+
+
 void XHWShader_Dx10::getShaderCompileDest(core::Path<char>& dest)
 {
 	dest.clear();
@@ -467,8 +478,6 @@ bool XHWShader_Dx10::loadFromCache()
 {
 	core::Path<char> dest;
 
-	// XShaderManager* pShaderMan = &render::gRenDev->ShaderMan_;
-
 	getShaderCompileDest(dest);
 
 	// we should check if a compiled version already exsists!
@@ -488,11 +497,7 @@ bool XHWShader_Dx10::loadFromCache()
 
 bool XHWShader_Dx10::loadFromSource()
 {
-	core::XFileScoped file;
-	core::Path<char> src, dest;
 	core::string source;
-
-	getShaderCompilePaths(src, dest);
 
 	XShaderManager* pShaderMan = &render::gRenDev->ShaderMan_;
 
@@ -501,6 +506,22 @@ bool XHWShader_Dx10::loadFromSource()
 	{
 		X_ERROR("Shader", "failed to get source for compiling");
 		return false;
+	}
+
+	// save copy of merged shader for debugging.
+	if(writeMergedSource_ == 1)
+	{
+		core::Path<char> src;
+		getShaderCompileSrc(src);
+
+		src /= ".hlsl";
+
+		core::XFileScoped fileOut;
+		if (fileOut.openFile(src.c_str(), core::fileModeFlags::RECREATE |
+			core::fileModeFlags::WRITE))
+		{
+			fileOut.write(source.data(), source.length());
+		}
 	}
 
 	return compileFromSource(source);
@@ -560,10 +581,12 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 
 	core::TimeVal start = gEnv->pTimer->GetAsyncTime();
 
+	core::string sourcName = name_ + ".fxcb.hlsl";
+
 	hr = D3DCompile(
 		source,
 		source.length(),
-		this->sourceFileName_,
+		sourcName,
 		Shader_Macros, // pDefines
 		NULL, // pInclude
 		this->entryPoint_,
@@ -578,7 +601,7 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 	{
 		if (error)
 		{
-			const char* err = (const char*)error->GetBufferPointer();
+			const char* err = static_cast<const char*>(error->GetBufferPointer());
 
 			core::StackString<4096> filterd(err, err + strlen(err));
 
@@ -1143,9 +1166,11 @@ XShaderParam* XHWShader_Dx10::getParameter(const core::StrHash& nameHash)
 
 void XHWShader_Dx10::Init(void)
 {
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pConsole);
 	X_ASSERT_NOT_NULL(g_rendererArena);
 
-	pHWshaders = X_NEW_ALIGNED(render::XRenderResourceContainer, g_rendererArena, 
+	s_pHWshaders = X_NEW_ALIGNED(render::XRenderResourceContainer, g_rendererArena,
 		"HwShaderRes", X_ALIGN_OF(render::XRenderResourceContainer))(g_rendererArena, 256);
 
 
@@ -1157,19 +1182,27 @@ void XHWShader_Dx10::Init(void)
 
 	InitBufferPointers();
 	CreateInputLayoutTree();
+	RegisterDvars();
 }
 
+void XHWShader_Dx10::RegisterDvars()
+{
+	ADD_CVAR_REF("shader_writeMergedSource", writeMergedSource_, 1, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
+		"Writes the merged shader source to file before it's compiled");
+
+}
 
 void XHWShader_Dx10::shutDown(void)
 {
-	X_LOG0("HWShaders", "Shutting down");
+	X_LOG0("HWShaders", "Shutting Down");
 
 	FreeBufferPointers();
 	FreeHWShaders();
 	FreeParams();
 	FreeInputLayoutTree();
 
-	core::Mem::DeleteAndNull(pHWshaders, g_rendererArena);
+	core::Mem::DeleteAndNull(s_pHWshaders, g_rendererArena);
 }
 
 

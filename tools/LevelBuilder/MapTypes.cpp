@@ -21,26 +21,26 @@ void XMapPatch::GenerateEdgeIndexes(void)
 	int *index, *vertexEdges, *edgeChain;
 	surfaceEdge_t e[3];
 
-	vertexEdges = Alloca16<int>(verts.size() * sizeof(int));
-	memset(vertexEdges, -1, verts.size() * sizeof(int));
-	edgeChain = Alloca16<int>(indexes.size() * sizeof(int));
+	vertexEdges = reinterpret_cast<int*>(Alloca16(verts_.size() * sizeof(int)));
+	memset(vertexEdges, -1, verts_.size() * sizeof(int));
+	edgeChain = reinterpret_cast<int*>(Alloca16(indexes_.size() * sizeof(int)));
 
-	edgeIndexes.resize(indexes.size());
+	edgeIndexes_.resize(indexes_.size());
 
-	edges.clear();
+	edges_.clear();
 
 	// the first edge is a dummy
 	e[0].verts[0] = e[0].verts[1] = e[0].tris[0] = e[0].tris[1] = 0;
-	edges.push_back(e[0]);
+	edges_.push_back(e[0]);
 
-	for (i = 0; i < safe_static_cast<int,size_t>(indexes.size()); i += 3) 
+	for (i = 0; i < safe_static_cast<int,size_t>(indexes_.size()); i += 3) 
 	{
-		index = indexes.ptr() + i;
+		index = indexes_.ptr() + i;
 		// vertex numbers
 		i0 = index[0];
 		i1 = index[1];
 		i2 = index[2];
-		// setup edges each with smallest vertex number first
+		// setup edges_ each with smallest vertex number first
 		s = core::bitUtil::isSignBitSet(i1 - i0);
 		e[0].verts[0] = index[s];
 		e[0].verts[1] = index[s ^ 1];
@@ -50,35 +50,35 @@ void XMapPatch::GenerateEdgeIndexes(void)
 		s = core::bitUtil::isSignBitSet(i2 - i0) << 1;
 		e[2].verts[0] = index[s];
 		e[2].verts[1] = index[s ^ 2];
-		// get edges
+		// get edges_
 		for (j = 0; j < 3; j++) {
 			v0 = e[j].verts[0];
 			v1 = e[j].verts[1];
 			for (edgeNum = vertexEdges[v0]; edgeNum >= 0; edgeNum = edgeChain[edgeNum]) {
-				if (edges[edgeNum].verts[1] == v1) {
+				if (edges_[edgeNum].verts[1] == v1) {
 					break;
 				}
 			}
 			// if the edge does not yet exist
 			if (edgeNum < 0) {
 				e[j].tris[0] = e[j].tris[1] = -1;
-				//	edgeNum = edges.push_back(e[j]);
-				edges.push_back(e[j]);
-				edgeNum = (int)(edges.size() - 1);
+				//	edgeNum = edges_.push_back(e[j]);
+				edges_.push_back(e[j]);
+				edgeNum = (int)(edges_.size() - 1);
 
 				edgeChain[edgeNum] = vertexEdges[v0];
 				vertexEdges[v0] = edgeNum;
 			}
 			// update edge index and edge tri references
 			if (index[j] == v0) {
-				//			assert(edges[edgeNum].tris[0] == -1); // edge may not be shared by more than two triangles
-				edges[edgeNum].tris[0] = i;
-				edgeIndexes[i + j] = edgeNum;
+				//			assert(edges_[edgeNum].tris[0] == -1); // edge may not be shared by more than two triangles
+				edges_[edgeNum].tris[0] = i;
+				edgeIndexes_[i + j] = edgeNum;
 			}
 			else {
-				//			assert(edges[edgeNum].tris[1] == -1); // edge may not be shared by more than two triangles
-				edges[edgeNum].tris[1] = i;
-				edgeIndexes[i + j] = -edgeNum;
+				//			assert(edges_[edgeNum].tris[1] == -1); // edge may not be shared by more than two triangles
+				edges_[edgeNum].tris[1] = i;
+				edgeIndexes_[i + j] = -edgeNum;
 			}
 		}
 	}
@@ -87,25 +87,25 @@ void XMapPatch::GenerateEdgeIndexes(void)
 
 void XMapPatch::PutOnCurve(void)
 {
-	int i, j;
+	size_t i, j;
 	xVert prev, next;
 
-	X_ASSERT(expanded, "needs to be exapanded")(expanded);
+	X_ASSERT(expanded_, "needs to be exapanded")(expanded_);
 
 	// put all the approximating points on the curve
-	for (i = 0; i < width; i++) {
-		for (j = 1; j < height; j += 2) {
-			LerpVert(verts[j*maxWidth + i], verts[(j + 1)*maxWidth + i], prev);
-			LerpVert(verts[j*maxWidth + i], verts[(j - 1)*maxWidth + i], next);
-			LerpVert(prev, next, verts[j*maxWidth + i]);
+	for (i = 0; i < width_; i++) {
+		for (j = 1; j < height_; j += 2) {
+			LerpVert(verts_[j*maxWidth_ + i], verts_[(j + 1)*maxWidth_ + i], prev);
+			LerpVert(verts_[j*maxWidth_ + i], verts_[(j - 1)*maxWidth_ + i], next);
+			LerpVert(prev, next, verts_[j*maxWidth_ + i]);
 		}
 	}
 
-	for (j = 0; j < height; j++) {
-		for (i = 1; i < width; i += 2) {
-			LerpVert(verts[j*maxWidth + i], verts[j*maxWidth + i + 1], prev);
-			LerpVert(verts[j*maxWidth + i], verts[j*maxWidth + i - 1], next);
-			LerpVert(prev, next, verts[j*maxWidth + i]);
+	for (j = 0; j < height_; j++) {
+		for (i = 1; i < width_; i += 2) {
+			LerpVert(verts_[j*maxWidth_ + i], verts_[j*maxWidth_ + i + 1], prev);
+			LerpVert(verts_[j*maxWidth_ + i], verts_[j*maxWidth_ + i - 1], next);
+			LerpVert(prev, next, verts_[j*maxWidth_ + i]);
 		}
 	}
 }
@@ -125,53 +125,53 @@ void XMapPatch::ProjectPointOntoVector(const Vec3f &point, const Vec3f &vStart,
 
 /*
 
-Expects an expanded patch.
+Expects an expanded_ patch.
 */
 void XMapPatch::RemoveLinearColumnsRows(void)
 {
-	int i, j, k;
+	size_t i, j, k;
 	float len, maxLength;
 	Vec3f proj, dir;
 
-	X_ASSERT(expanded, "needs to be exapanded")(expanded);
+	X_ASSERT(expanded_, "needs to be exapanded")(expanded_);
 
-	for (j = 1; j < width - 1; j++) {
+	for (j = 1; j < width_ - 1; j++) {
 		maxLength = 0;
-		for (i = 0; i < height; i++) {
-			ProjectPointOntoVector(verts[i*maxWidth + j].pos,
-				verts[i*maxWidth + j - 1].pos, verts[i*maxWidth + j + 1].pos, proj);
-			dir = verts[i*maxWidth + j].pos - proj;
+		for (i = 0; i < height_; i++) {
+			ProjectPointOntoVector(verts_[i*maxWidth_ + j].pos,
+				verts_[i*maxWidth_ + j - 1].pos, verts_[i*maxWidth_ + j + 1].pos, proj);
+			dir = verts_[i*maxWidth_ + j].pos - proj;
 			len = dir.lengthSquared();
 			if (len > maxLength) {
 				maxLength = len;
 			}
 		}
 		if (maxLength < math<float>::square(0.2f)) {
-			width--;
-			for (i = 0; i < height; i++) {
-				for (k = j; k < width; k++) {
-					verts[i*maxWidth + k] = verts[i*maxWidth + k + 1];
+			width_--;
+			for (i = 0; i < height_; i++) {
+				for (k = j; k < width_; k++) {
+					verts_[i*maxWidth_ + k] = verts_[i*maxWidth_ + k + 1];
 				}
 			}
 			j--;
 		}
 	}
-	for (j = 1; j < height - 1; j++) {
+	for (j = 1; j < height_ - 1; j++) {
 		maxLength = 0;
-		for (i = 0; i < width; i++) {
-			ProjectPointOntoVector(verts[j*maxWidth + i].pos,
-				verts[(j - 1)*maxWidth + i].pos, verts[(j + 1)*maxWidth + i].pos, proj);
-			dir = verts[j*maxWidth + i].pos - proj;
+		for (i = 0; i < width_; i++) {
+			ProjectPointOntoVector(verts_[j*maxWidth_ + i].pos,
+				verts_[(j - 1)*maxWidth_ + i].pos, verts_[(j + 1)*maxWidth_ + i].pos, proj);
+			dir = verts_[j*maxWidth_ + i].pos - proj;
 			len = dir.lengthSquared();
 			if (len > maxLength) {
 				maxLength = len;
 			}
 		}
 		if (maxLength < math<float>::square(0.2f)) {
-			height--;
-			for (i = 0; i < width; i++) {
-				for (k = j; k < height; k++) {
-					verts[k*maxWidth + i] = verts[(k + 1)*maxWidth + i];
+			height_--;
+			for (i = 0; i < width_; i++) {
+				for (k = j; k < height_; k++) {
+					verts_[k*maxWidth_ + i] = verts_[(k + 1)*maxWidth_ + i];
 				}
 			}
 			j--;
@@ -179,59 +179,65 @@ void XMapPatch::RemoveLinearColumnsRows(void)
 	}
 }
 
-void XMapPatch::ResizeExpanded(int newHeight, int newWidth)
+void XMapPatch::ResizeExpanded(size_t newHeight, size_t newWidth)
 {
-	int i, j;
+	size_t i, j;
 
-	X_ASSERT(expanded,"needs to be exapanded")(expanded);
-	if (newHeight <= maxHeight && newWidth <= maxWidth) {
+	X_ASSERT(expanded_,"needs to be exapanded")(expanded_);
+	if (newHeight <= maxHeight_ && newWidth <= maxWidth_) {
 		return;
 	}
-	if (newHeight * newWidth > maxHeight * maxWidth) {
-		verts.resize(newHeight * newWidth);
+	if (newHeight * newWidth > maxHeight_ * maxWidth_) {
+		verts_.resize(newHeight * newWidth);
 	}
-	// space out verts for new height and width
-	for (j = maxHeight - 1; j >= 0; j--) {
-		for (i = maxWidth - 1; i >= 0; i--) {
-			verts[j*newWidth + i] = verts[j*maxWidth + i];
+	// space out verts_ for new height_ and width_
+	for (j = maxHeight_ - 1; j >= 0; j--) {
+		for (i = maxWidth_ - 1; i >= 0; i--) {
+			verts_[j*newWidth + i] = verts_[j*maxWidth_ + i];
 		}
 	}
-	maxHeight = newHeight;
-	maxWidth = newWidth;
+	maxHeight_ = newHeight;
+	maxWidth_ = newWidth;
 }
 
 void XMapPatch::Collapse(void)
 {
-	int i, j;
+	size_t i, j;
 
-	if (!expanded) {
-		X_FATAL("Patch", "patch not expanded");
+	if (!expanded_) {
+		X_FATAL("Patch", "patch not expanded_");
 	}
-	expanded = false;
-	if (width != maxWidth) {
-		for (j = 0; j < height; j++) {
-			for (i = 0; i < width; i++) {
-				verts[j*width + i] = verts[j*maxWidth + i];
+	expanded_ = false;
+	if (width_ != maxWidth_) {
+		for (j = 0; j < height_; j++) {
+			for (i = 0; i < width_; i++) {
+				verts_[j*width_ + i] = verts_[j*maxWidth_ + i];
 			}
 		}
 	}
-	verts.resize(width * height);
+	verts_.resize(width_ * height_);
 }
 
 
 void XMapPatch::Expand(void)
 {
-	int i, j;
+	int32_t i, j; // edit loop is you change this to unsigned.
 
-	if (expanded) {
-		X_FATAL("Patch", "patch alread expanded");
+	if (expanded_) {
+		X_FATAL("Patch", "patch alread expanded_");
 	}
-	expanded = true;
-	verts.resize(maxWidth * maxHeight);
-	if (width != maxWidth) {
-		for (j = height - 1; j >= 0; j--) {
-			for (i = width - 1; i >= 0; i--) {
-				verts[j*maxWidth + i] = verts[j*width + i];
+
+	expanded_ = true;
+
+	verts_.resize(maxWidth_ * maxHeight_);
+
+	if (width_ != maxWidth_) 
+	{
+		for (j = safe_static_cast<int32_t,size_t>(height_) - 1; j >= 0; j--) 
+		{
+			for (i = safe_static_cast<int32_t, size_t>(width_) - 1; i >= 0; i--)
+			{
+				verts_[j*maxWidth_ + i] = verts_[j*width_ + i];
 			}
 		}
 	}
@@ -246,37 +252,36 @@ void XMapPatch::LerpVert(const xVert& a, const xVert& b, xVert& out) const
 
 /*
 Handles all the complicated wrapping and degenerate cases
-Expects a Not expanded patch.
+Expects a Not expanded_ patch.
 */
 
 void XMapPatch::GenerateNormals(void)
 {
-	int			i, j, k, dist;
+	size_t		i, j, k, dist;
 	Vec3f		norm;
 	Vec3f		sum;
-	int			count;
+	size_t		count;
 	Vec3f		base;
 	Vec3f		delta;
-	int			x, y;
+	size_t		x, y;
 	Vec3f		around[8], temp;
 	bool		good[8];
 	bool		wrapWidth, wrapHeight;
-	static int	neighbors[8][2] = {
-		{ 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, { 0, -1 }, { -1, -1 }, { -1, 0 }, { -1, 1 }
+	static size_t	neighbors[8][2] = {
+		{ 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, 
+		{ 0, -1 }, { -1, -1 }, { -1, 0 }, { -1, 1 }
 	};
 
-	//	assert(expanded == false);
-
-	//
+	X_ASSERT(!expanded_, "Patch must not be expanded before generating normals.")(expanded_);
+	
 	// if all points are coplanar, set all normals to that plane
-	//
 	Vec3f		extent[3];
 	float		offset;
 	float		length;
 
-	extent[0] = verts[width - 1].pos - verts[0].pos;
-	extent[1] = verts[(height - 1) * width + width - 1].pos - verts[0].pos;
-	extent[2] = verts[(height - 1) * width].pos - verts[0].pos;
+	extent[0] = verts_[width_ - 1].pos - verts_[0].pos;
+	extent[1] = verts_[(height_ - 1) * width_ + width_ - 1].pos - verts_[0].pos;
+	extent[2] = verts_[(height_ - 1) * width_].pos - verts_[0].pos;
 
 	norm = extent[0].cross(extent[1]);
 	if (norm.lengthSquared() == 0.0f) {
@@ -291,18 +296,18 @@ void XMapPatch::GenerateNormals(void)
 	norm.normalize();
 	if (length != 0.0f)
 	{
-		offset = verts[0].pos * norm;
-		for (i = 1; i < width * height; i++) {
-			float d = verts[i].pos * norm;
+		offset = verts_[0].pos * norm;
+		for (i = 1; i < width_ * height_; i++) {
+			float d = verts_[i].pos * norm;
 			if (math<float>::abs(d - offset) > COPLANAR_EPSILON) {
 				break;
 			}
 		}
 
-		if (i == width * height) {
+		if (i == width_ * height_) {
 			// all are coplanar
-			for (i = 0; i < width * height; i++) {
-				verts[i].normal = norm;
+			for (i = 0; i < width_ * height_; i++) {
+				verts_[i].normal = norm;
 			}
 			return;
 		}
@@ -310,59 +315,70 @@ void XMapPatch::GenerateNormals(void)
 
 	// check for wrapped edge cases, which should smooth across themselves
 	wrapWidth = false;
-	for (i = 0; i < height; i++) {
-		delta = verts[i * width].pos - verts[i * width + width - 1].pos;
+
+	for (i = 0; i < height_; i++) 
+	{
+		delta = verts_[i * width_].pos - verts_[i * width_ + width_ - 1].pos;
 		if (delta.lengthSquared() > math<float>::square(1.0f)) {
 			break;
 		}
 	}
-	if (i == height) {
+	if (i == height_) {
 		wrapWidth = true;
 	}
 
 	wrapHeight = false;
-	for (i = 0; i < width; i++) {
-		delta = verts[i].pos - verts[(height - 1) * width + i].pos;
+	for (i = 0; i < width_; i++) 
+	{
+		delta = verts_[i].pos - verts_[(height_ - 1) * width_ + i].pos;
 		if (delta.lengthSquared() > math<float>::square(1.0f)) {
 			break;
 		}
 	}
-	if (i == width) {
+
+	if (i == width_) {
 		wrapHeight = true;
 	}
 
-	for (i = 0; i < width; i++) {
-		for (j = 0; j < height; j++) {
+	for (i = 0; i < width_; i++) 
+	{
+		for (j = 0; j < height_; j++)
+		{
 			count = 0;
-			base = verts[j * width + i].pos;
-			for (k = 0; k < 8; k++) {
+			base = verts_[j * width_ + i].pos;
+			for (k = 0; k < 8; k++) 
+			{
 				around[k] = Vec3f::zero();
 				good[k] = false;
 
-				for (dist = 1; dist <= 3; dist++) {
+				for (dist = 1; dist <= 3; dist++) 
+				{
 					x = i + neighbors[k][0] * dist;
 					y = j + neighbors[k][1] * dist;
-					if (wrapWidth) {
+					if (wrapWidth) 
+					{
 						if (x < 0) {
-							x = width - 1 + x;
+							x = width_ - 1 + x;
 						}
-						else if (x >= width) {
-							x = 1 + x - width;
+						else if (x >= width_) {
+							x = 1 + x - width_;
 						}
 					}
-					if (wrapHeight) {
+					if (wrapHeight) 
+					{
 						if (y < 0) {
-							y = height - 1 + y;
+							y = height_ - 1 + y;
 						}
-						else if (y >= height) {
-							y = 1 + y - height;
+						else if (y >= height_) {
+							y = 1 + y - height_;
 						}
 					}
 
-					if (x < 0 || x >= width || y < 0 || y >= height) {
+					if (x < 0 || x >= width_ || y < 0 || y >= height_) {
 						break;					// edge of patch
 					}
-					temp = verts[y * width + x].pos - base;
+
+					temp = verts_[y * width_ + x].pos - base;
 
 					length = norm.length();
 					norm.normalize();
@@ -371,7 +387,8 @@ void XMapPatch::GenerateNormals(void)
 					{
 						continue;				// degenerate edge, get more dist
 					}
-					else {
+					else 
+					{
 						good[k] = true;
 						around[k] = temp;
 						break;					// good edge
@@ -380,10 +397,13 @@ void XMapPatch::GenerateNormals(void)
 			}
 
 			sum = Vec3f::zero();
-			for (k = 0; k < 8; k++) {
-				if (!good[k] || !good[(k + 1) & 7]) {
+			for (k = 0; k < 8; k++) 
+			{
+				if (!good[k] || !good[(k + 1) & 7]) 
+				{
 					continue;	// didn't get two points
 				}
+
 				norm = around[(k + 1) & 7].cross(around[k]);
 
 				length = norm.length();
@@ -392,15 +412,17 @@ void XMapPatch::GenerateNormals(void)
 				if (length == 0.0f) {
 					continue;
 				}
+
 				sum += norm;
 				count++;
 			}
+
 			if (count == 0) {
-				//idLib::common->Printf("bad normal\n");
 				count = 1;
 			}
-			verts[j * width + i].normal = sum;
-			verts[j * width + i].normal.normalize();
+
+			verts_[j * width_ + i].normal = sum;
+			verts_[j * width_ + i].normal.normalize();
 		}
 	}
 }
@@ -408,22 +430,25 @@ void XMapPatch::GenerateNormals(void)
 
 void XMapPatch::GenerateIndexes(void)
 {
-	int i, j, v1, v2, v3, v4, index;
+	size_t i, j, v1, v2, v3, v4, index;
 
-	indexes.resize((width - 1) * (height - 1) * 2 * 3, false);
+	indexes_.resize((width_ - 1) * (height_ - 1) * 2 * 3, false);
+
 	index = 0;
-	for (i = 0; i < width - 1; i++) {
-		for (j = 0; j < height - 1; j++) {
-			v1 = j * width + i;
+	for (i = 0; i < width_ - 1; i++) 
+	{
+		for (j = 0; j < height_ - 1; j++) 
+		{
+			v1 = j * width_ + i;
 			v2 = v1 + 1;
-			v3 = v1 + width + 1;
-			v4 = v1 + width;
-			indexes[index++] = v1;
-			indexes[index++] = v3;
-			indexes[index++] = v2;
-			indexes[index++] = v1;
-			indexes[index++] = v4;
-			indexes[index++] = v3;
+			v3 = v1 + width_ + 1;
+			v4 = v1 + width_;
+			indexes_[index++] = safe_static_cast<int32_t, size_t>(v1);
+			indexes_[index++] = safe_static_cast<int32_t, size_t>(v3);
+			indexes_[index++] = safe_static_cast<int32_t, size_t>(v2);
+			indexes_[index++] = safe_static_cast<int32_t, size_t>(v1);
+			indexes_[index++] = safe_static_cast<int32_t, size_t>(v4);
+			indexes_[index++] = safe_static_cast<int32_t, size_t>(v3);
 		}
 	}
 
@@ -433,11 +458,11 @@ void XMapPatch::GenerateIndexes(void)
 
 void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, float maxLength, bool genNormals)
 {
-	int			i, j, k, l;
+	size_t	i, j, k, l;
 	xVert	prev, next, mid;
-	Vec3f		prevxyz, nextxyz, midxyz;
-	Vec3f		delta;
-	float		maxHorizontalErrorSqr, maxVerticalErrorSqr, maxLengthSqr;
+	Vec3f	prevxyz, nextxyz, midxyz;
+	Vec3f	delta;
+	float	maxHorizontalErrorSqr, maxVerticalErrorSqr, maxLengthSqr;
 
 	// generate normals for the control mesh
 	if (genNormals) {
@@ -451,14 +476,17 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 	Expand();
 
 	// horizontal subdivisions
-	for (j = 0; j + 2 < width; j += 2) {
+	for (j = 0; j + 2 < width_; j += 2) 
+	{
 		// check subdivided midpoints against control points
-		for (i = 0; i < height; i++) {
-			for (l = 0; l < 3; l++) {
-				prevxyz[l] = verts[i*maxWidth + j + 1].pos[l] - verts[i*maxWidth + j].pos[l];
-				nextxyz[l] = verts[i*maxWidth + j + 2].pos[l] - verts[i*maxWidth + j + 1].pos[l];
-				midxyz[l] = (verts[i*maxWidth + j].pos[l] + verts[i*maxWidth + j + 1].pos[l] * 2.0f +
-					verts[i*maxWidth + j + 2].pos[l]) * 0.25f;
+		for (i = 0; i < height_; i++) 
+		{
+			for (l = 0; l < 3; l++) 
+			{
+				prevxyz[l] = verts_[i*maxWidth_ + j + 1].pos[l] - verts_[i*maxWidth_ + j].pos[l];
+				nextxyz[l] = verts_[i*maxWidth_ + j + 2].pos[l] - verts_[i*maxWidth_ + j + 1].pos[l];
+				midxyz[l] = (verts_[i*maxWidth_ + j].pos[l] + verts_[i*maxWidth_ + j + 1].pos[l] * 2.0f +
+					verts_[i*maxWidth_ + j + 2].pos[l]) * 0.25f;
 			}
 
 			if (maxLength > 0.0f) {
@@ -467,35 +495,39 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 					break;
 				}
 			}
+
 			// see if this midpoint is off far enough to subdivide
-			delta = verts[i*maxWidth + j + 1].pos - midxyz;
+			delta = verts_[i*maxWidth_ + j + 1].pos - midxyz;
+
 			if (delta.lengthSquared() > maxHorizontalErrorSqr) {
 				break;
 			}
 		}
 
-		if (i == height) {
+		if (i == height_) {
 			continue;	// didn't need subdivision
 		}
 
-		if (width + 2 >= maxWidth) {
-			ResizeExpanded(maxHeight, maxWidth + 4);
+		if (width_ + 2 >= maxWidth_) {
+			ResizeExpanded(maxHeight_, maxWidth_ + 4);
 		}
 
 		// insert two columns and replace the peak
-		width += 2;
+		width_ += 2;
 
-		for (i = 0; i < height; i++) {
-			LerpVert(verts[i*maxWidth + j], verts[i*maxWidth + j + 1], prev);
-			LerpVert(verts[i*maxWidth + j + 1], verts[i*maxWidth + j + 2], next);
+		for (i = 0; i < height_; i++)
+		{
+			LerpVert(verts_[i*maxWidth_ + j], verts_[i*maxWidth_ + j + 1], prev);
+			LerpVert(verts_[i*maxWidth_ + j + 1], verts_[i*maxWidth_ + j + 2], next);
 			LerpVert(prev, next, mid);
 
-			for (k = width - 1; k > j + 3; k--) {
-				verts[i*maxWidth + k] = verts[i*maxWidth + k - 2];
+			for (k = width_ - 1; k > j + 3; k--) {
+				verts_[i*maxWidth_ + k] = verts_[i*maxWidth_ + k - 2];
 			}
-			verts[i*maxWidth + j + 1] = prev;
-			verts[i*maxWidth + j + 2] = mid;
-			verts[i*maxWidth + j + 3] = next;
+
+			verts_[i*maxWidth_ + j + 1] = prev;
+			verts_[i*maxWidth_ + j + 2] = mid;
+			verts_[i*maxWidth_ + j + 3] = next;
 		}
 
 		// back up and recheck this set again, it may need more subdivision
@@ -503,14 +535,17 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 	}
 
 	// vertical subdivisions
-	for (j = 0; j + 2 < height; j += 2) {
+	for (j = 0; j + 2 < height_; j += 2) 
+	{
 		// check subdivided midpoints against control points
-		for (i = 0; i < width; i++) {
-			for (l = 0; l < 3; l++) {
-				prevxyz[l] = verts[(j + 1)*maxWidth + i].pos[l] - verts[j*maxWidth + i].pos[l];
-				nextxyz[l] = verts[(j + 2)*maxWidth + i].pos[l] - verts[(j + 1)*maxWidth + i].pos[l];
-				midxyz[l] = (verts[j*maxWidth + i].pos[l] + verts[(j + 1)*maxWidth + i].pos[l] * 2.0f +
-					verts[(j + 2)*maxWidth + i].pos[l]) * 0.25f;
+		for (i = 0; i < width_; i++)
+		{
+			for (l = 0; l < 3; l++)
+			{
+				prevxyz[l] = verts_[(j + 1)*maxWidth_ + i].pos[l] - verts_[j*maxWidth_ + i].pos[l];
+				nextxyz[l] = verts_[(j + 2)*maxWidth_ + i].pos[l] - verts_[(j + 1)*maxWidth_ + i].pos[l];
+				midxyz[l] = (verts_[j*maxWidth_ + i].pos[l] + verts_[(j + 1)*maxWidth_ + i].pos[l] * 2.0f +
+					verts_[(j + 2)*maxWidth_ + i].pos[l]) * 0.25f;
 			}
 
 			if (maxLength > 0.0f) {
@@ -519,35 +554,38 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 					break;
 				}
 			}
+
 			// see if this midpoint is off far enough to subdivide
-			delta = verts[(j + 1)*maxWidth + i].pos - midxyz;
+			delta = verts_[(j + 1)*maxWidth_ + i].pos - midxyz;
 			if (delta.lengthSquared() > maxVerticalErrorSqr) {
 				break;
 			}
 		}
 
-		if (i == width) {
+		if (i == width_) {
 			continue;	// didn't need subdivision
 		}
 
-		if (height + 2 >= maxHeight) {
-			ResizeExpanded(maxHeight + 4, maxWidth);
+		if (height_ + 2 >= maxHeight_) {
+			ResizeExpanded(maxHeight_ + 4, maxWidth_);
 		}
 
 		// insert two columns and replace the peak
-		height += 2;
+		height_ += 2;
 
-		for (i = 0; i < width; i++) {
-			LerpVert(verts[j*maxWidth + i], verts[(j + 1)*maxWidth + i], prev);
-			LerpVert(verts[(j + 1)*maxWidth + i], verts[(j + 2)*maxWidth + i], next);
+		for (i = 0; i < width_; i++) 
+		{
+			LerpVert(verts_[j*maxWidth_ + i], verts_[(j + 1)*maxWidth_ + i], prev);
+			LerpVert(verts_[(j + 1)*maxWidth_ + i], verts_[(j + 2)*maxWidth_ + i], next);
 			LerpVert(prev, next, mid);
 
-			for (k = height - 1; k > j + 3; k--) {
-				verts[k*maxWidth + i] = verts[(k - 2)*maxWidth + i];
+			for (k = height_ - 1; k > j + 3; k--) {
+				verts_[k*maxWidth_ + i] = verts_[(k - 2)*maxWidth_ + i];
 			}
-			verts[(j + 1)*maxWidth + i] = prev;
-			verts[(j + 2)*maxWidth + i] = mid;
-			verts[(j + 3)*maxWidth + i] = next;
+
+			verts_[(j + 1)*maxWidth_ + i] = prev;
+			verts_[(j + 2)*maxWidth_ + i] = mid;
+			verts_[(j + 3)*maxWidth_ + i] = next;
 		}
 
 		// back up and recheck this set again, it may need more subdivision
@@ -561,9 +599,10 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 	Collapse();
 
 	// normalize all the lerped normals
-	if (genNormals) {
-		for (i = 0; i < width * height; i++) {
-			verts[i].normal.normalize();
+	if (genNormals) 
+	{
+		for (i = 0; i < width_ * height_; i++) {
+			verts_[i].normal.normalize();
 		}
 	}
 
@@ -578,8 +617,10 @@ void XMapPatch::SampleSinglePatchPoint(const xVert ctrl[3][3], float u, float v,
 	int		axis;
 
 	// find the control points for the v coordinate
-	for (vPoint = 0; vPoint < 3; vPoint++) {
-		for (axis = 0; axis < 8; axis++) {
+	for (vPoint = 0; vPoint < 3; vPoint++)
+	{
+		for (axis = 0; axis < 8; axis++) 
+		{
 			float a, b, c;
 			float qA, qB, qC;
 			if (axis < 3) {
@@ -628,62 +669,69 @@ void XMapPatch::SampleSinglePatchPoint(const xVert ctrl[3][3], float u, float v,
 	}
 }
 
-void XMapPatch::SampleSinglePatch(const xVert ctrl[3][3], int baseCol, int baseRow,
-	int width, int horzSub, int vertSub, xVert* outVerts) const
+void XMapPatch::SampleSinglePatch(const xVert ctrl[3][3], size_t baseCol, size_t baseRow,
+	size_t width_, size_t horzSub, size_t vertSub, xVert* outVerts) const
 {
-	int		i, j;
+	size_t	i, j;
 	float	u, v;
 
 	horzSub++;
 	vertSub++;
 	for (i = 0; i < horzSub; i++) {
 		for (j = 0; j < vertSub; j++) {
-			u = (float)i / (horzSub - 1);
-			v = (float)j / (vertSub - 1);
-			SampleSinglePatchPoint(ctrl, u, v, &outVerts[((baseRow + j) * width) + i + baseCol]);
+			u = static_cast<float>(i) / (horzSub - 1);
+			v = static_cast<float>(j) / (vertSub - 1);
+			SampleSinglePatchPoint(ctrl, u, v, &outVerts[((baseRow + j) * width_) + i + baseCol]);
 		}
 	}
 }
 
 
-void XMapPatch::SubdivideExplicit(int horzSubdivisions, int vertSubdivisions,
+void XMapPatch::SubdivideExplicit(size_t horzSubdivisions, size_t vertSubdivisions,
 	bool genNormals, bool removeLinear)
 {
-	int i, j, k, l;
+	size_t i, j, k, l;
 	xVert sample[3][3];
-	int outWidth = ((width - 1) / 2 * horzSubdivisions) + 1;
-	int outHeight = ((height - 1) / 2 * vertSubdivisions) + 1;
-	xVert *dv = new xVert[outWidth * outHeight];
+	size_t outWidth = ((width_ - 1) / 2 * horzSubdivisions) + 1;
+	size_t outHeight = ((height_ - 1) / 2 * vertSubdivisions) + 1;
+	xVert* dv = X_NEW_ARRAY(xVert, (outWidth * outHeight), g_arena, "PatchSubDivideVerts");
 
 	// generate normals for the control mesh
 	if (genNormals) {
 		GenerateNormals();
 	}
 
-	int baseCol = 0;
-	for (i = 0; i + 2 < width; i += 2) {
-		int baseRow = 0;
-		for (j = 0; j + 2 < height; j += 2) {
-			for (k = 0; k < 3; k++) {
-				for (l = 0; l < 3; l++) {
-					sample[k][l] = verts[((j + l) * width) + i + k];
+	size_t baseCol = 0;
+	for (i = 0; i + 2 < width_; i += 2) 
+	{
+		size_t baseRow = 0;
+		for (j = 0; j + 2 < height_; j += 2) 
+		{
+			for (k = 0; k < 3; k++) 
+			{
+				for (l = 0; l < 3; l++) 
+				{
+					sample[k][l] = verts_[((j + l) * width_) + i + k];
 				}
 			}
+
 			SampleSinglePatch(sample, baseCol, baseRow, outWidth, horzSubdivisions, vertSubdivisions, dv);
 			baseRow += vertSubdivisions;
 		}
+
 		baseCol += horzSubdivisions;
 	}
-	verts.resize(outWidth * outHeight);
+
+	verts_.resize(outWidth * outHeight);
 	for (i = 0; i < outWidth * outHeight; i++) {
-		verts[i] = dv[i];
+		verts_[i] = dv[i];
 	}
 
-	delete[] dv;
+	X_DELETE_ARRAY(dv, g_arena);
 
-	width = maxWidth = outWidth;
-	height = maxHeight = outHeight;
-	expanded = false;
+	width_ = maxWidth_ = outWidth;
+	height_ = maxHeight_ = outHeight;
+	expanded_ = false;
 
 	if (removeLinear) {
 		Expand();
@@ -692,9 +740,10 @@ void XMapPatch::SubdivideExplicit(int horzSubdivisions, int vertSubdivisions,
 	}
 
 	// normalize all the lerped normals
-	if (genNormals) {
-		for (i = 0; i < width * height; i++) {
-			verts[i].normal.normalize();
+	if (genNormals) 
+	{
+		for (i = 0; i < width_ * height_; i++) {
+			verts_[i].normal.normalize();
 		}
 	}
 

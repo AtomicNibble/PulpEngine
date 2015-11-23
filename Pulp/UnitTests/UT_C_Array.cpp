@@ -6,10 +6,23 @@
 
 #include <String\Path.h>
 
+#include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
+#include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
+#include <Memory\AllocationPolicies\LinearAllocator.h>
+#include <Memory\MemoryTaggingPolicies\NoMemoryTagging.h>
+
 X_USING_NAMESPACE;
 
 using namespace core;
 
+
+typedef core::MemoryArena<
+	core::LinearAllocator,
+	core::SingleThreadPolicy,
+	core::NoBoundsChecking,
+	core::NoMemoryTracking,
+	core::NoMemoryTagging
+> LinearArea;
 
 typedef ::testing::Types<short, int> MyTypes;
 TYPED_TEST_CASE(ArrayTest, MyTypes);
@@ -75,6 +88,27 @@ TYPED_TEST(ArrayTest, Contruct)
 	EXPECT_EQ(4, list2.size());
 	EXPECT_EQ(345, list.granularity());
 	EXPECT_EQ(345, list2.granularity());
+}
+
+
+TYPED_TEST(ArrayTest, Move)
+{
+	// make a stack based arena that can't allocate multiple buffers.
+	// meaning allocation will fail if the copy constructors are used.
+	const size_t bytes = (sizeof(TypeParam) * (100 + 64)) + (sizeof(Array<TypeParam>) * 2) + 
+		(sizeof(size_t) * 3); // Linear header block.
+
+	X_ALIGNED_SYMBOL(char buf[bytes], 8) = {};
+	LinearAllocator allocator(buf, buf + bytes);
+
+	LinearArea arena(&allocator, "MoveAllocator");
+
+	Array<Array<TypeParam>> list(&arena);
+	list.setGranularity(2);
+	list.reserve(2);
+
+	list.push_back(Array<TypeParam>(&arena, 100, TypeParam()));
+	list.push_back(Array<TypeParam>(&arena, 64, TypeParam()));
 }
 
 TYPED_TEST(ArrayTest, Append)

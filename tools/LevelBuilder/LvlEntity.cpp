@@ -110,7 +110,7 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 			iap.area1 = p->nodes[0]->area;
 		}
 
-		X_LOG0("Portal", "inter connection: %i <-> %i",
+		X_LOG0("Portal", "inter connection: ^8%i^7 <-> ^8%i",
 			iap.area0, iap.area1);
 		iap.pSide = pBSide;
 	}
@@ -209,7 +209,7 @@ bool LvlEntity::FacesToBSP(XPlaneSet& planeSet)
 		}
 	}
 
-	X_LOG0("LvlEntity", "num faces: %i", numFaces);
+	X_LOG0("LvlEntity", "num faces: ^8%i", numFaces);
 
 	// copy bounds.
 	root.headnode->bounds = root.bounds;
@@ -224,7 +224,7 @@ bool LvlEntity::FacesToBSP(XPlaneSet& planeSet)
 	// the have all been deleted
 	bspFaces = nullptr;
 
-	X_LOG0("LvlEntity", "num leafs: %i", treeBuilder.getNumLeafs());
+	X_LOG0("LvlEntity", "num leafs: ^8%i", treeBuilder.getNumLeafs());
 	return true;
 }
 
@@ -238,7 +238,7 @@ bool LvlEntity::FilterBrushesIntoTree(XPlaneSet& planeSet)
 	size_t		numUnique, numClusters, r;
 	LvlBrush	*b, *newb;
 
-	X_LOG0("LvlEntity", "----- FilterBrushesIntoTree -----");
+	X_LOG0("LvlEntity", "^5----- FilterBrushesIntoTree -----");
 
 	numUnique = 0;
 	numClusters = 0;
@@ -258,8 +258,8 @@ bool LvlEntity::FilterBrushesIntoTree(XPlaneSet& planeSet)
 		numClusters += r;
 	}
 
-	X_LOG0("LvlEntity", "%5i total brushes", numUnique);
-	X_LOG0("LvlEntity", "%5i cluster references", numClusters);
+	X_LOG0("LvlEntity", "^8%5i^7 total brushes", numUnique);
+	X_LOG0("LvlEntity", "^8%5i^7 cluster references", numClusters);
 	return true;
 }
 
@@ -267,7 +267,7 @@ bool LvlEntity::FilterBrushesIntoTree(XPlaneSet& planeSet)
 bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents, 
 	mapfile::XMapFile* pMap)
 {
-	X_LOG0("LvlEntity", "FloodEntities");
+	X_LOG0("LvlEntity", "^5----- FloodEntities -----");
 
 	struct bspTree* tree;
 	bspNode* headnode;
@@ -289,7 +289,7 @@ bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents,
 		mapfile::XMapEntity* mapEnt = pMap->getEntity(i);
 		LvlEntity& lvlEnt = ents[i];
 
-		mapfile::XMapEntity::PairIt it = mapEnt->epairs.find("origin");
+		mapfile::XMapEntity::PairIt it = mapEnt->epairs.find(X_CONST_STRING("origin"));
 		if (it == mapEnt->epairs.end()){
 			continue;
 		}
@@ -311,7 +311,7 @@ bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents,
 		}
 	}
 
-	X_LOG0("LvlEntity", "%5i flooded leafs", floodedLeafs);
+	X_LOG0("LvlEntity", "^8%5i^7 flooded leafs", floodedLeafs);
 
 	if (!inside)
 	{
@@ -358,7 +358,7 @@ bool LvlEntity::FillOutside(void)
 {
 	FillStats stats;
 
-	X_LOG0("LvlEntity", "--- FillOutside ---");
+	X_LOG0("LvlEntity", "^5----- FillOutside -----");
 	bspTree.headnode->FillOutside_r(stats);
 
 	stats.print();
@@ -367,7 +367,7 @@ bool LvlEntity::FillOutside(void)
 
 bool LvlEntity::ClipSidesByTree(XPlaneSet& planeSet)
 {
-	X_LOG0("LvlEntity", "--- ClipSidesByTree ---");
+	X_LOG0("LvlEntity", "^5----- ClipSidesByTree -----");
 
 	size_t i, x;
 
@@ -396,13 +396,13 @@ bool LvlEntity::ClipSidesByTree(XPlaneSet& planeSet)
 
 bool LvlEntity::FloodAreas(void)
 {
-	X_LOG0("LvlEntity", "--- FloodAreas ---");
+	X_LOG0("LvlEntity", "^5----- FloodAreas -----");
 
 	numAreas = 0;
 	// find how many we have.
 	bspTree.headnode->FindAreas_r(numAreas);
 
-	X_LOG0("LvlEntity", "%5i areas", numAreas);
+	X_LOG0("LvlEntity", "^8%5i^7 areas", numAreas);
 
 
 	// check we not missed.
@@ -427,7 +427,7 @@ bool LvlEntity::FloodAreas(void)
 
 bool LvlEntity::PruneNodes(void)
 {
-	X_LOG0("LvlEntity", "--- PruneNodes ---");
+	X_LOG0("LvlEntity", "^5----- PruneNodes -----");
 	
 	if (!bspTree.headnode) {
 		X_ERROR("LvlEntity", "Failed to prineNodes the tree is invalid.");
@@ -445,156 +445,9 @@ bool LvlEntity::PruneNodes(void)
 	X_ASSERT(numNodes == postPrune, "Invalid node couts. prunt and num don't match")(numNodes, postPrune);
 #endif
 
-	X_LOG0("LvlEntity", "prePrune: %i", prePrune);
-	X_LOG0("LvlEntity", "postPrune: %i", postPrune);
-	X_LOG0("LvlEntity", "numNodes: %i", numNodes);
-	return true;
-}
-
-void AreaForOrigin_r(XPlaneSet& planeSet, const AABB& bounds, bspNode* pNode)
-{
-	X_ASSERT_NOT_NULL(pNode);
-	bspNode* pCurNode = pNode;
-
-	// i need to go down the tree untill i hit a leaf with a area.
-	// when we cross a node we go down both paths so that we detech multiple intersections.
-
-
-	// how to crorrectly detech what leafs the bounding box resides in?
-	// i will have to go down the tree checking whatside the AABB is for the node.
-	// if we are not clearly front/back of the plane.
-	// we are intersecting, so travel down both paths so see what we hit.
-	// when we reach a leaf node that is solid we leave.
-	// if the noe is a lea and has a area we should be inside that area.
-
-	do
-	{
-		if (pCurNode->IsAreaLeaf())
-		{
-			const AABB& b = pCurNode->bounds;
-			
-			if (b.containsBox(bounds)) {
-				X_LOG0("Test", "Area: %i (%g,%g,%g) <=> (%g,%g,%g)", pCurNode->area,
-					b.min[0], b.min[1], b.min[2],
-					b.max[0], b.max[1], b.max[2]);
-			}
-			return;
-		}
-
-		const Planef& plane = planeSet[pCurNode->planenum];
-		PlaneSide::Enum side = bounds.planeSide(plane);
-
-		if (side == PlaneSide::FRONT) {
-			pCurNode = pCurNode->children[0];
-		}
-		else if (side == PlaneSide::BACK) {
-			pCurNode = pCurNode->children[1];
-		}
-		else
-		{
-			// travel down both paths.
-			if (!pCurNode->children[1]->IsSolidLeaf()) {
-				AreaForOrigin_r(planeSet, bounds, pCurNode->children[1]);
-			}
-
-			pCurNode = pCurNode->children[0];
-		}
-
-	} while (!pCurNode->IsSolidLeaf());
-
-}
-
-
-bool IsPointInAnyArea(XPlaneSet& planeSet, const Vec3f& pos, int32_t& areaOut, bspNode* pNode)
-{
-	X_ASSERT_NOT_NULL(pNode);
-	bspNode* pCurNode = pNode;
-
-	while (1)
-	{
-		const Planef& plane = planeSet[pCurNode->planenum];
-		float dis = plane.distance(pos);
-
-		if (dis > 0.f) {
-			pCurNode = pCurNode->children[0];
-		}
-		else {
-			pCurNode = pCurNode->children[1];
-		}
-
-		if (pCurNode->IsSolidLeaf() ) {
-			areaOut = -1; // in solid
-			return false;
-		}
-
-		if (pCurNode->IsAreaLeaf())
-		{
-			areaOut = pCurNode->area;
-			X_LOG0("Area","Point (%g,%g,%g) is in area: %i", 
-				pos.x, pos.y, pos.z, pCurNode->area);
-			return true;
-		}
-	}
-
-	areaOut = -1;
-	return false;
-}
-
-
-bool LvlEntity::PutEntsInAreas(XPlaneSet& planeSet, core::Array<LvlEntity>& ents,
-	mapfile::XMapFile* pMap)
-{
-	X_ASSERT_NOT_NULL(pMap);
-	int32_t i;
-
-	LvlEntity& world = ents[0];
-
-	// iterate the map ents.
-	for (i = 1; i < pMap->getNumEntities(); i++)
-	{
-		mapfile::XMapEntity* mapEnt = pMap->getEntity(i);
-		LvlEntity& lvlEnt = ents[i];
-
-		// for now just add the static models ents to world ent.
-		{
-			mapfile::XMapEntity::PairIt it = mapEnt->epairs.find("classname");
-			if (it == mapEnt->epairs.end()) {
-				continue;
-			}
-			const core::string& className = it->second;
-			if (className != X_CONST_STRING("misc_model")) {
-				continue;
-			}
-
-			it = mapEnt->epairs.find("model");
-			if (it == mapEnt->epairs.end()) {
-				X_WARNING("Entity", "mist model missing 'model' kvp at: (%g,%g,%g)",
-					lvlEnt.origin[0], lvlEnt.origin[1], lvlEnt.origin[2]);
-				continue;
-			}
-
-			const core::string& modelName = it->second;
-			X_LOG0("Entity", "Ent model: \"%s\"", modelName.c_str());
-		}
-
-		// we want to find out what areas the bounds of this model
-		// are in, then add a refrence for that model to both areas.
-		// Since we will need to draw the model if either of the area's are active.
-		// i will want to store the model in both of the area's indivudual lists.
-		// at runtime I will use frame id's to work out what has already been drawn each frame.
-
-
-		// this dose mean i need to know the bounds of the model.
-		// meaning i must load it.
-
-		X_LOG0("Entity", "Finding areas for ent: %i origin: (%g,%g,%g)", i,
-			lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
-
-		AABB bounds;
-		bounds.add(lvlEnt.origin);
-		bounds.add(lvlEnt.origin + Vec3f::one());
-		AreaForOrigin_r(planeSet, bounds, bspTree.headnode);
-	}
+	X_LOG0("LvlEntity", "prePrune: ^8%i", prePrune);
+	X_LOG0("LvlEntity", "postPrune: ^8%i", postPrune);
+	X_LOG0("LvlEntity", "numNodes: ^8%i", numNodes);
 	return true;
 }
 

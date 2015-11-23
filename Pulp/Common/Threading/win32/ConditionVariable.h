@@ -18,7 +18,7 @@ public:
 	void Wait(CriticalSection& criticalSection);
 
 private:
-	CONDITION_VARIABLE m_condVar;
+	CONDITION_VARIABLE condVar_;
 };
 
 

@@ -3,7 +3,7 @@
 
 X_NAMESPACE_BEGIN(shader)
 
-render::XRenderResourceContainer* XHWShader::pHWshaders = nullptr;
+render::XRenderResourceContainer* XHWShader::s_pHWshaders = nullptr;
 
 
 XHWShader::XHWShader() :

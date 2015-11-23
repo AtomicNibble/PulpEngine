@@ -187,6 +187,15 @@
     <Filter Include="SourceFiles\Compression">
       <UniqueIdentifier>{7564a3c4-1bf5-45bb-a183-585be2d20c5d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SourceFiles\Time\win32">
+      <UniqueIdentifier>{b8d437ed-13fd-410a-bbc9-b4ab6faf37d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Time\win32">
+      <UniqueIdentifier>{f6ae4776-74dd-4c0b-960b-1477758141f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SourceFiles\Compression\lz4">
+      <UniqueIdentifier>{b79d73e5-b398-461e-9b03-021f5fce847d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -238,23 +247,8 @@
       <Filter>Headers\Prepo</Filter>
     </ClInclude>
     <ClInclude Include="EngineCommon.h" />
-    <ClInclude Include="Types.h">
-      <Filter>Headers\Platform\win32</Filter>
-    </ClInclude>
     <ClInclude Include="Platform\Types.h">
       <Filter>Headers\Platform</Filter>
-    </ClInclude>
-    <ClInclude Include="Configuration.h">
-      <Filter>Headers\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="ConfigurationWin32.h">
-      <Filter>Headers\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Platform.h">
-      <Filter>Headers\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="PlatformWin32.h">
-      <Filter>Headers\Core</Filter>
     </ClInclude>
     <ClInclude Include="Util\BitUtil.h">
       <Filter>Headers\Util</Filter>
@@ -1009,6 +1003,30 @@
     <ClInclude Include="Threading\win32\ThreadLocalStorage.h">
       <Filter>Headers\Threading\win32</Filter>
     </ClInclude>
+    <ClInclude Include="Compression\LZ4.h">
+      <Filter>Headers\Compression</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Configuration.h">
+      <Filter>Headers\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\ConfigurationWin32.h">
+      <Filter>Headers\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\Platform.h">
+      <Filter>Headers\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Core\PlatformWin32.h">
+      <Filter>Headers\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Time\win32\TimeStamp.h">
+      <Filter>Headers\Time\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\win32\CustomFrame.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\win32\Types.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1266,6 +1284,12 @@
     <None Include="Threading\win32\ThreadLocalStorage.inl">
       <Filter>Headers\Threading\win32</Filter>
     </None>
+    <None Include="Time\TimeVal.inl">
+      <Filter>Headers\Time</Filter>
+    </None>
+    <None Include="String\Lexer.inl">
+      <Filter>Headers\String</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">
@@ -1364,9 +1388,6 @@
     <ClCompile Include="EngineCommon.cpp" />
     <ClCompile Include="Memory\HeapArea.cpp">
       <Filter>SourceFiles\Memory</Filter>
-    </ClCompile>
-    <ClCompile Include="Time\TimeStamp.cpp">
-      <Filter>SourceFiles\Time</Filter>
     </ClCompile>
     <ClCompile Include="Time\DateStamp.cpp">
       <Filter>SourceFiles\Time</Filter>
@@ -1526,6 +1547,18 @@
     </ClCompile>
     <ClCompile Include="Threading\win32\ConditionVariable.cpp">
       <Filter>SourceFiles\Threading\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Compression\LZ4.cpp">
+      <Filter>SourceFiles\Compression</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\win32\TimeStamp.cpp">
+      <Filter>SourceFiles\Time\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\lz4-r131\lz4_lib.c">
+      <Filter>SourceFiles\Compression\lz4</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\XHalf.cpp">
+      <Filter>SourceFiles\Math</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

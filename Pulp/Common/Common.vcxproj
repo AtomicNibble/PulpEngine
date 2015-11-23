@@ -53,10 +53,9 @@
     <ClInclude Include="CompileTime\IsPOD.h" />
     <ClInclude Include="CompileTime\IsPointer.h" />
     <ClInclude Include="CompileTime\IsStringLiteral.h" />
+    <ClInclude Include="Compression\LZ4.h" />
     <ClInclude Include="Compression\Lzma2.h" />
     <ClInclude Include="Compression\Zlib.h" />
-    <ClInclude Include="Configuration.h" />
-    <ClInclude Include="ConfigurationWin32.h" />
     <ClInclude Include="Containers\BitStream.h" />
     <ClInclude Include="Containers\ByteStream.h" />
     <ClInclude Include="Containers\ByteStreamFifo.h" />
@@ -73,6 +72,10 @@
     <ClInclude Include="Containers\LinkedList.h" />
     <ClInclude Include="Containers\LinkedListIntrusive.h" />
     <ClInclude Include="Containers\Stack.h" />
+    <ClInclude Include="Core\Configuration.h" />
+    <ClInclude Include="Core\ConfigurationWin32.h" />
+    <ClInclude Include="Core\Platform.h" />
+    <ClInclude Include="Core\PlatformWin32.h" />
     <ClInclude Include="Debugging\AbortHandler.h" />
     <ClInclude Include="Debugging\Assert.h" />
     <ClInclude Include="Debugging\AssertionHandler.h" />
@@ -217,8 +220,6 @@
     <ClInclude Include="Memory\ThreadPolicies\MultiThreadPolicy.h" />
     <ClInclude Include="Memory\ThreadPolicies\SingleThreadPolicy.h" />
     <ClInclude Include="Memory\VirtualMem.h" />
-    <ClInclude Include="Platform.h" />
-    <ClInclude Include="PlatformWin32.h" />
     <ClInclude Include="Platform\ClipBoard.h" />
     <ClInclude Include="Platform\Compiler.h" />
     <ClInclude Include="Platform\Console.h" />
@@ -227,7 +228,9 @@
     <ClInclude Include="Platform\win32\ClipBoard.h" />
     <ClInclude Include="Platform\win32\Compiler.h" />
     <ClInclude Include="Platform\win32\Console.h" />
+    <ClInclude Include="Platform\win32\CustomFrame.h" />
     <ClInclude Include="Platform\win32\DirectoryWatcher.h" />
+    <ClInclude Include="Platform\win32\Types.h" />
     <ClInclude Include="Platform\win32\Window.h" />
     <ClInclude Include="Platform\Window.h" />
     <ClInclude Include="Prepro\PreproCommaIf.h" />
@@ -285,12 +288,12 @@
     <ClInclude Include="Time\DateStamp.h" />
     <ClInclude Include="Time\TimeStamp.h" />
     <ClInclude Include="Time\TimeVal.h" />
+    <ClInclude Include="Time\win32\TimeStamp.h" />
     <ClInclude Include="Traits\FunctionSignatureTraits.h" />
     <ClInclude Include="Traits\FunctionTraits.h" />
     <ClInclude Include="Traits\MemberFunctionTraits.h" />
     <ClInclude Include="Traits\SignedTypes.h" />
     <ClInclude Include="Traits\UnsignedTypes.h" />
-    <ClInclude Include="Types.h" />
     <ClInclude Include="Util\BitUtil.h" />
     <ClInclude Include="Util\ClassMacros.h" />
     <ClInclude Include="Util\Cpu.h" />
@@ -378,6 +381,7 @@
     <None Include="Random\MultiplyWithCarry.inl" />
     <None Include="Random\XorShift.inl" />
     <None Include="String\GrowingStringTable.inl" />
+    <None Include="String\Lexer.inl" />
     <None Include="String\StackString.inl" />
     <None Include="String\Path.inl" />
     <None Include="String\StackStringW.inl" />
@@ -392,6 +396,7 @@
     <None Include="Threading\win32\CriticalSection.inl" />
     <None Include="Threading\win32\Semaphore.inl" />
     <None Include="Threading\win32\ThreadLocalStorage.inl" />
+    <None Include="Time\TimeVal.inl" />
     <None Include="Util\BitUtil.inl" />
     <None Include="Util\Cpu.inl" />
     <None Include="Util\EndianUtil.inl" />
@@ -406,7 +411,20 @@
     <None Include="Util\StopWatch.inl" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\3rdparty\source\lz4-r131\lz4_lib.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Assets\AssetContainer.cpp" />
+    <ClCompile Include="Compression\LZ4.cpp" />
     <ClCompile Include="Compression\Lzma2.cpp" />
     <ClCompile Include="Compression\Zlib.cpp" />
     <ClCompile Include="Containers\HashIndex.cpp" />
@@ -574,6 +592,7 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="Logging\WritePolicies\LoggerInternalConsoleWritePolicy.cpp" />
+    <ClCompile Include="Math\XHalf.cpp" />
     <ClCompile Include="Math\XSphere.cpp" />
     <ClCompile Include="Math\XWinding.cpp" />
     <ClCompile Include="Math\XFrustum.cpp" />
@@ -694,7 +713,7 @@
     <ClCompile Include="Threading\win32\Thread.cpp" />
     <ClCompile Include="Time\CompressedStamps.cpp" />
     <ClCompile Include="Time\DateStamp.cpp" />
-    <ClCompile Include="Time\TimeStamp.cpp" />
+    <ClCompile Include="Time\win32\TimeStamp.cpp" />
     <ClCompile Include="Util\Cpu.cpp" />
     <ClCompile Include="Util\win32\LastError.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Use</PrecompiledHeader>

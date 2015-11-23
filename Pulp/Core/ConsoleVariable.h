@@ -121,10 +121,11 @@ template<class T>
 class CVarString : public T
 {
 public:
-	CVarString(XConsole* pConsole, const char* Name, const char* Default, int Flags, const char* desc)
-		: T(pConsole, Name, Flags | VarFlag::STRING, desc)
+	CVarString(XConsole* pConsole, const char* Name, const char* Default, 
+		int Flags, const char* desc)
+		: T(pConsole, Name, Flags | VarFlag::STRING, desc),
+		String_(Default)
 	{
-		String_ = Default;
 	}
 
 	virtual int GetInteger() const { return atoi(String_.c_str()); }

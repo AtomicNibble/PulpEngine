@@ -92,7 +92,8 @@ bool XTexture::RT_CreateDeviceTexture(XTextureFile* image_data)
 
 bool XTexture::ReleaseDeviceTexture(void)
 {
-	ID3D11ShaderResourceView* pSRView = (ID3D11ShaderResourceView*)pDeviceShaderResource_;
+	ID3D11ShaderResourceView* pSRView = 
+		reinterpret_cast<ID3D11ShaderResourceView*>(pDeviceShaderResource_);
 
 	if (pSRView) {
 		pSRView->Release();
@@ -104,7 +105,7 @@ bool XTexture::ReleaseDeviceTexture(void)
 	return true;
 }
 
-void XTexture::setTexStates()
+void XTexture::setTexStates(void)
 {
 	s_DefaultTexState = s_GlobalDefaultTexState;
 
@@ -113,21 +114,22 @@ void XTexture::setTexStates()
 
 void XTexture::setSamplerState(int tex_sampler_id, int state_id, ShaderType::Enum shader_type)
 {
-	if (state_id < 0) // if no state use this textures default texture state.
+	if (state_id < 0) { // if no state use this textures default texture state.
 		state_id = defaultTexStateId_;
-
-
+	}
 
 	XTexState& state = s_TexStates[state_id];
 	ID3D11DeviceContext* pd3dContex = render::g_Dx11D3D.DxDeviceContext();
 	ID3D11SamplerState* pSamp;
 
-	pSamp = (ID3D11SamplerState*)state.getDeviceState();
+	pSamp = reinterpret_cast<ID3D11SamplerState*>(state.getDeviceState());
 
-	if (shader_type == ShaderType::Pixel)
+	if (shader_type == ShaderType::Pixel) {
 		pd3dContex->PSSetSamplers(tex_sampler_id, 1, &pSamp);
-	else if (shader_type == ShaderType::Vertex)
+	}
+	else if (shader_type == ShaderType::Vertex) {
 		pd3dContex->VSSetSamplers(tex_sampler_id, 1, &pSamp);
+	}
 	else
 	{
 		X_ASSERT_NOT_IMPLEMENTED();
@@ -141,7 +143,7 @@ void XTexture::unbind(void)
 	for (i = 0; i < TEX_MAX_SLOTS; i++) {
 		if (s_pCurrentTexture[i] == this) {
 			s_pCurrentTexture[i] = nullptr;
-			ID3D11ShaderResourceView *RV = NULL;
+			ID3D11ShaderResourceView* RV = nullptr;
 			render::g_Dx11D3D.DxDeviceContext()->PSSetShaderResources(i, 1, &RV);
 		}
 	}
@@ -166,8 +168,10 @@ void XTexture::apply(int slot, int state_id, shader::ShaderType::Enum type)
 	}
 
 	// changed?
-	if (s_pCurrentTexture[slot] == this)
+	if (s_pCurrentTexture[slot] == this) {
 		return;
+	}
+
 	s_pCurrentTexture[slot] = this;
 
 
@@ -176,7 +180,7 @@ void XTexture::apply(int slot, int state_id, shader::ShaderType::Enum type)
 
 	setSamplerState(slot, state_id, type);
 
-	pResView = (ID3D11ShaderResourceView*)this->pDeviceShaderResource_;
+	pResView = reinterpret_cast<ID3D11ShaderResourceView*>(this->pDeviceShaderResource_);
 
 	dv->PSSetShaderResources(slot, 1, &pResView);
 }
@@ -220,7 +224,7 @@ void XTexture::RT_UpdateTextureRegion(byte* data, int nX, int nY, int USize, int
 
 ID3D11RenderTargetView* XTexture::getRenderTargetView(void)
 {
-	ID3D11RenderTargetView* pRenTarView = (ID3D11RenderTargetView*)pDeviceRenderTargetView_;
+	ID3D11RenderTargetView* pRenTarView = reinterpret_cast<ID3D11RenderTargetView*>(pDeviceRenderTargetView_);
 	HRESULT hr = S_OK;
 
 	if (pRenTarView == nullptr)
@@ -321,7 +325,7 @@ void XTexState::setComparisonFilter(bool bEnable)
 {
 	clearDevice();
 
-	m_bComparison = bEnable;
+	bComparison_ = bEnable;
 }
 
 bool XTexState::setClampMode(
@@ -331,9 +335,9 @@ bool XTexState::setClampMode(
 {
 	clearDevice();
 
-	m_nAddressU = TextureAddressModeToD3D(addressU);
-	m_nAddressV = TextureAddressModeToD3D(addressV);
-	m_nAddressW = TextureAddressModeToD3D(addressW);
+	nAddressU_ = TextureAddressModeToD3D(addressU);
+	nAddressV_ = TextureAddressModeToD3D(addressV);
+	nAddressW_ = TextureAddressModeToD3D(addressW);
 	return true;
 }
 
@@ -342,9 +346,9 @@ bool XTexState::setFilterMode(FilterMode::Enum filter)
 /*	if (nFilter < 0)
 	{
 		XTexState *pTS = &CTexture::s_TexStates[CTexture::s_nGlobalDefState];
-		m_nMinFilter = pTS->m_nMinFilter;
-		m_nMagFilter = pTS->m_nMagFilter;
-		m_nMipFilter = pTS->m_nMipFilter;
+		nMinFilter_ = pTS->nMinFilter_;
+		nMagFilter_ = pTS->nMagFilter_;
+		nMipFilter_ = pTS->nMipFilter_;
 		return true;
 	}
 	*/
@@ -355,24 +359,24 @@ bool XTexState::setFilterMode(FilterMode::Enum filter)
 	{
 		case FilterMode::POINT:
 		case FilterMode::NONE:
-			m_nMinFilter = FilterMode::POINT;
-			m_nMagFilter = FilterMode::POINT;
-			m_nMipFilter = FilterMode::NONE;
+			nMinFilter_ = FilterMode::POINT;
+			nMagFilter_ = FilterMode::POINT;
+			nMipFilter_ = FilterMode::NONE;
 			break;
 		case FilterMode::LINEAR:
-			m_nMinFilter = FilterMode::LINEAR;
-			m_nMagFilter = FilterMode::LINEAR;
-			m_nMipFilter = FilterMode::NONE;
+			nMinFilter_ = FilterMode::LINEAR;
+			nMagFilter_ = FilterMode::LINEAR;
+			nMipFilter_ = FilterMode::NONE;
 			break;
 		case FilterMode::BILINEAR:
-			m_nMinFilter = FilterMode::LINEAR;
-			m_nMagFilter = FilterMode::LINEAR;
-			m_nMipFilter = FilterMode::POINT;
+			nMinFilter_ = FilterMode::LINEAR;
+			nMagFilter_ = FilterMode::LINEAR;
+			nMipFilter_ = FilterMode::POINT;
 			break;
 		case FilterMode::TRILINEAR:
-			m_nMinFilter = FilterMode::LINEAR;
-			m_nMagFilter = FilterMode::LINEAR;
-			m_nMipFilter = FilterMode::LINEAR;
+			nMinFilter_ = FilterMode::LINEAR;
+			nMagFilter_ = FilterMode::LINEAR;
+			nMipFilter_ = FilterMode::LINEAR;
 			break;
 
 #if X_RENDER_ALLOW_ANISOTROPIC
@@ -402,29 +406,30 @@ bool XTexState::setFilterMode(FilterMode::Enum filter)
 void XTexState::setBorderColor(Color8u color)
 {
 	clearDevice();
-	m_dwBorderColor = color;
+	dwBorderColor_ = color;
 }
 
-void XTexState::postCreate()
+void XTexState::postCreate(void)
 {
 	// already got a device state?
-	if (m_pDeviceState)
+	if (pDeviceState_) {
 		return;
+	}
 
 	D3D11_SAMPLER_DESC Desc;
 	ID3D11SamplerState *pSamp = NULL;
 	core::zero_object(Desc);
 
-	Desc.AddressU = (D3D11_TEXTURE_ADDRESS_MODE)m_nAddressU;
-	Desc.AddressV = (D3D11_TEXTURE_ADDRESS_MODE)m_nAddressV;
-	Desc.AddressW = (D3D11_TEXTURE_ADDRESS_MODE)m_nAddressW;
-	Colorf col = Colorf(m_dwBorderColor);
+	Desc.AddressU = (D3D11_TEXTURE_ADDRESS_MODE)nAddressU_;
+	Desc.AddressV = (D3D11_TEXTURE_ADDRESS_MODE)nAddressV_;
+	Desc.AddressW = (D3D11_TEXTURE_ADDRESS_MODE)nAddressW_;
+	Colorf col = Colorf(dwBorderColor_);
 	Desc.BorderColor[0] = col.r;
 	Desc.BorderColor[1] = col.g;
 	Desc.BorderColor[2] = col.b;
 	Desc.BorderColor[3] = col.a;
 
-	if (m_bComparison)
+	if (bComparison_)
 		Desc.ComparisonFunc = D3D11_COMPARISON_LESS;
 	else
 		Desc.ComparisonFunc = D3D11_COMPARISON_ALWAYS;
@@ -432,7 +437,7 @@ void XTexState::postCreate()
 	Desc.MaxAnisotropy = 1;
 	Desc.MinLOD = 0;
 
-	if (m_nMipFilter == FilterMode::NONE)
+	if (nMipFilter_ == FilterMode::NONE)
 	{
 		Desc.MaxLOD = 0.0f;
 	}
@@ -443,29 +448,29 @@ void XTexState::postCreate()
 
 	Desc.MipLODBias = 0;
 
-	if (m_bComparison)
+	if (bComparison_)
 	{
-		if (m_nMinFilter == FilterMode::LINEAR && 
-			m_nMagFilter == FilterMode::LINEAR && 
-			m_nMipFilter == FilterMode::LINEAR ||
-			m_nMinFilter == FilterMode::TRILINEAR ||
-			m_nMagFilter == FilterMode::TRILINEAR)
+		if (nMinFilter_ == FilterMode::LINEAR && 
+			nMagFilter_ == FilterMode::LINEAR && 
+			nMipFilter_ == FilterMode::LINEAR ||
+			nMinFilter_ == FilterMode::TRILINEAR ||
+			nMagFilter_ == FilterMode::TRILINEAR)
 		{
 			Desc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_LINEAR;
 		}
 		else if (
-			m_nMinFilter == FilterMode::LINEAR && 
-			m_nMagFilter == FilterMode::LINEAR &&
-			(m_nMipFilter == FilterMode::NONE || m_nMipFilter == FilterMode::POINT) ||
-			m_nMinFilter == FilterMode::BILINEAR ||
-			m_nMagFilter == FilterMode::BILINEAR)
+			nMinFilter_ == FilterMode::LINEAR && 
+			nMagFilter_ == FilterMode::LINEAR &&
+			(nMipFilter_ == FilterMode::NONE || nMipFilter_ == FilterMode::POINT) ||
+			nMinFilter_ == FilterMode::BILINEAR ||
+			nMagFilter_ == FilterMode::BILINEAR)
 		{
 			Desc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
 		}
 		else if (
-			m_nMinFilter == FilterMode::POINT && 
-			m_nMagFilter == FilterMode::POINT &&
-			(m_nMipFilter == FilterMode::NONE || m_nMipFilter == FilterMode::POINT))
+			nMinFilter_ == FilterMode::POINT && 
+			nMagFilter_ == FilterMode::POINT &&
+			(nMipFilter_ == FilterMode::NONE || nMipFilter_ == FilterMode::POINT))
 		{
 			Desc.Filter = D3D11_FILTER_COMPARISON_MIN_MAG_MIP_POINT;
 		}
@@ -473,38 +478,38 @@ void XTexState::postCreate()
 	}
 	else
 	{
-		if (m_nMinFilter == FilterMode::LINEAR && 
-			m_nMagFilter == FilterMode::LINEAR && 
-			m_nMipFilter == FilterMode::LINEAR ||
-			m_nMinFilter == FilterMode::TRILINEAR || 
-			m_nMagFilter == FilterMode::TRILINEAR)
+		if (nMinFilter_ == FilterMode::LINEAR && 
+			nMagFilter_ == FilterMode::LINEAR && 
+			nMipFilter_ == FilterMode::LINEAR ||
+			nMinFilter_ == FilterMode::TRILINEAR || 
+			nMagFilter_ == FilterMode::TRILINEAR)
 		{
 			Desc.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
 		}
 		else if (
-			m_nMinFilter == FilterMode::LINEAR && 
-			m_nMagFilter == FilterMode::LINEAR && 
-			(m_nMipFilter == FilterMode::NONE || m_nMipFilter == FilterMode::POINT) || 
-			m_nMinFilter == FilterMode::BILINEAR || 
-			m_nMagFilter == FilterMode::BILINEAR)
+			nMinFilter_ == FilterMode::LINEAR && 
+			nMagFilter_ == FilterMode::LINEAR && 
+			(nMipFilter_ == FilterMode::NONE || nMipFilter_ == FilterMode::POINT) || 
+			nMinFilter_ == FilterMode::BILINEAR || 
+			nMagFilter_ == FilterMode::BILINEAR)
 		{
 			Desc.Filter = D3D11_FILTER_MIN_MAG_LINEAR_MIP_POINT;
 		}
 		else if (
-			m_nMinFilter == FilterMode::POINT && 
-			m_nMagFilter == FilterMode::POINT && 
-			(m_nMipFilter == FilterMode::NONE || m_nMipFilter == FilterMode::POINT))
+			nMinFilter_ == FilterMode::POINT && 
+			nMagFilter_ == FilterMode::POINT && 
+			(nMipFilter_ == FilterMode::NONE || nMipFilter_ == FilterMode::POINT))
 		{
 			Desc.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
 		}
 #if X_RENDER_ALLOW_ANISOTROPIC
 		else if (
-			m_nMinFilter >= FilterMode::ANISO2X &&
-			m_nMagFilter >= FilterMode::ANISO2X &&
-			m_nMipFilter >= FilterMode::ANISO2X)
+			nMinFilter_ >= FilterMode::ANISO2X &&
+			nMagFilter_ >= FilterMode::ANISO2X &&
+			nMipFilter_ >= FilterMode::ANISO2X)
 		{
 			Desc.Filter = D3D11_FILTER_ANISOTROPIC;
-			Desc.MaxAnisotropy = m_nAnisotropy;
+			Desc.MaxAnisotropy = nAnisotropy_;
 		}
 #endif // !X_RENDER_ALLOW_ANISOTROPIC
 		else
@@ -516,7 +521,7 @@ void XTexState::postCreate()
 	HRESULT hr = render::g_Dx11D3D.DxDevice()->CreateSamplerState(&Desc, &pSamp);
 	if (SUCCEEDED(hr))
 	{
-		m_pDeviceState = pSamp;
+		pDeviceState_ = pSamp;
 
 		D3DDebug::SetDebugObjectName(pSamp, "XTexState");
 	}
@@ -527,7 +532,7 @@ void XTexState::postCreate()
 }
 
 
-XTexState::~XTexState()
+XTexState::~XTexState(void)
 {
 	clearDevice();
 }
@@ -535,18 +540,18 @@ XTexState::~XTexState()
 XTexState::XTexState(const XTexState& src)
 {
 	memcpy(this, &src, sizeof(src));
-	if (m_pDeviceState)
+	if (pDeviceState_)
 	{
-		ID3D11SamplerState *pSamp = (ID3D11SamplerState *)m_pDeviceState;
+		ID3D11SamplerState* pSamp = reinterpret_cast<ID3D11SamplerState *>(pDeviceState_);
 		pSamp->AddRef();
 	}
 }
 
 void XTexState::clearDevice(void)
 {
-	if (m_pDeviceState) {
-		ID3D11SamplerState* pSamp = (ID3D11SamplerState*)m_pDeviceState;
+	if (pDeviceState_) {
+		ID3D11SamplerState* pSamp = reinterpret_cast<ID3D11SamplerState *>(pDeviceState_);
 		pSamp->Release();
-		m_pDeviceState = nullptr;
+		pDeviceState_ = nullptr;
 	}
 }

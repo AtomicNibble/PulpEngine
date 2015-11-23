@@ -114,6 +114,11 @@ X_INLINE void Swap(T& left, T& right)
 	right = tmp;
 }
 
+template <typename T, typename T2>
+inline float PercentageOf(const T& sub, const T2& of)
+{
+	return (static_cast<float>(sub) / static_cast<float>(of)) * 100;
+}
 
 
 X_NAMESPACE_END

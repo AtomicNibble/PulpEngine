@@ -45,8 +45,8 @@ private:
 	virtual void DoAssert(const SourceInfo& sourceInfo, const char* format, va_list args) X_ABSTRACT;
 	virtual void DoAssertVariable(const SourceInfo& sourceInfo, const char* format, va_list args) X_ABSTRACT;
 
-	LoggerBase* m_previous;
-	LoggerBase* m_next;
+	LoggerBase* previous_;
+	LoggerBase* next_;
 
 protected:
 	ILog*		pLog_;

@@ -66,8 +66,6 @@ namespace
 		X_ALIGN_OF(CVarIntRef)>::value,
 		X_ALIGN_OF(CVarColRef)>::value;
 
-	static const size_t VAR_MAX = 4096;
-	static const char* CONFIG_FILE_EXTENSION = "cfg";
 
 	static void sortVarsByName(core::Array<core::ICVar*>& vars)
 	{
@@ -143,8 +141,303 @@ namespace
 		const char* end_;
 	};
 
+} // namespace
+
+
+	void Command_Exec(IConsoleCmdArgs* Cmd)
+	{
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		if (Cmd->GetArgCount() != 2)
+		{
+			X_WARNING("Console", "exec <filename>");
+			return;
+		}
+
+		const char* filename = Cmd->GetArg(1);
+
+		pConsole->LoadConfig(filename);
+	}
+
+	void Command_Help(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
+
+		X_LOG0("Console", "------- ^8Help^7 -------");
+		X_LOG_BULLET;
+		X_LOG0("Console", "listcmds: lists avaliable commands");
+		X_LOG0("Console", "listdvars: lists dvars");
+		X_LOG0("Console", "listbinds: lists all the bind");
+	}
+
+	void Command_ListCmd(IConsoleCmdArgs* Cmd)
+	{
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		// optional search criteria
+		const char* searchPatten = nullptr;
+
+		if (Cmd->GetArgCount() >= 2) {
+			searchPatten = Cmd->GetArg(1);
+		}
+
+		pConsole->ListCommands(searchPatten);
+	}
+
+	void Command_ListDvars(IConsoleCmdArgs* Cmd)
+	{
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		// optional search criteria
+		const char* searchPatten = nullptr;
+
+		if (Cmd->GetArgCount() >= 2) {
+			searchPatten = Cmd->GetArg(1);
+		}
+
+		pConsole->ListVariables(searchPatten);
+	}
+
+	void Command_Exit(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
+
+		// we want to exit I guess.
+		// dose this check even make sense?
+		// it might for dedicated server.
+		if (gEnv && gEnv->pCore && gEnv->pCore->GetGameWindow())
+			gEnv->pCore->GetGameWindow()->Close();
+		else
+			X_ERROR("Cmd", "Failed to exit game");
+	}
+
+	void Command_Echo(IConsoleCmdArgs* Cmd)
+	{
+		// we only print the 1st arg ?
+		StackString<1024> txt;
+
+		size_t TotalLen = 0;
+		size_t Len = 0;
+
+		for (size_t i = 1; i < Cmd->GetArgCount(); i++)
+		{
+			const char* str = Cmd->GetArg(i);
+
+			Len = strlen(str);
+
+			if ((TotalLen + Len) >= 896) // we need to make sure other info like channle name fit into 1024
+			{
+				X_WARNING("Echo", "input too long truncating");
+
+				// trim it to be sorter then total length.
+				// but not shorter than it's length.
+				size_t new_len = core::Min(Len, 896 - TotalLen);
+				//									  o o
+				// watch this become a bug one day.  ~~~~~
+				const_cast<char*>(str)[new_len] = '\0';
+
+				txt.appendFmt("%s", str);
+				break; // stop adding.
+			}
+
+			txt.appendFmt("%s ", str);
+
+			TotalLen = txt.length();
+		}
+
+		X_LOG0("echo", txt.c_str());
+	}
+
+	void Command_Wait(IConsoleCmdArgs* Cmd)
+	{
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		if (Cmd->GetArgCount() != 2)
+		{
+			X_WARNING("Console", "wait <seconds>");
+			return;
+		}
+
+
+		pConsole->WaitSeconds_.SetSeconds(atof(Cmd->GetArg(1)));
+		pConsole->WaitSeconds_ += gEnv->pTimer->GetFrameStartTime();
+	}
+
+	void Command_VarReset(IConsoleCmdArgs* Cmd)
+	{
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		if (Cmd->GetArgCount() != 2)
+		{
+			X_WARNING("Console", "vreset <var_name>");
+			return;
+		}
+
+		// find the var
+		ICVar* cvar = pConsole->GetCVar(Cmd->GetArg(1));
+
+		cvar->Reset();
+
+		pConsole->DisplayVarValue(cvar);
+	}
+
+	void Command_Bind(IConsoleCmdArgs* Cmd)
+	{
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		size_t Num = Cmd->GetArgCount();
+
+		if (Num < 3)
+		{
+			X_WARNING("Console", "bind <key_combo> '<cmd>'");
+			return;
+		}
+
+		core::StackString<1024> cmd;
+
+		for (size_t i = 2; i < Num; i++)
+		{
+			cmd.append(Cmd->GetArg(i));
+			if (i + 1 == Num)
+				cmd.append(';', 1);
+			else
+				cmd.append(' ', 1);
+		}
+
+		pConsole->AddBind(Cmd->GetArg(1), cmd.c_str());
+	}
+
+	void Command_BindsClear(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+		pConsole->ClearAllBinds();
+	}
+
+	void Command_BindsList(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		struct PrintBinds : public IKeyBindDumpSink {
+			virtual void OnKeyBindFound(const char* Bind, const char* Command){
+				X_LOG0("Console", "Key: %s Cmd: \"%s\"", Bind, Command);
+			}
+		};
+
+		PrintBinds print;
+
+		X_LOG0("Console", "--------------- ^8Binds^7 ----------------");
+
+		pConsole->Listbinds(&print);
+
+		X_LOG0("Console", "------------- ^8Binds End^7 --------------");
+	}
+
+	void Command_SetVarArchive(IConsoleCmdArgs* Cmd)
+	{
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		size_t Num = Cmd->GetArgCount();
+
+		if (Num != 3)
+		{
+			X_WARNING("Console", "seta <var> <val>");
+			return;
+		}
+
+		if (ICVar* pCBar = pConsole->GetCVar(Cmd->GetArg(1)))
+		{
+			pCBar->Set(Cmd->GetArg(2));
+
+			pCBar->SetFlags(pCBar->GetFlags() | VarFlag::ARCHIVE);
+		}
+		else
+		{
+			// we need to work out what kinda value it is.
+			// int, float, string.
+			const char* start = Cmd->GetArg(2);
+			char* End;
+			// long int val = strtol(Cmd->GetArg(2), &End, 0);
+			float valf = strtof(start, &End);
+
+
+			if (valf != 0)
+			{
+				// using the End var is safe since we the condition above checks parsing was valid.
+				if (fmod(valf, 1) == 0.f && !strUtil::Find(start, End, '.'))
+				{
+					pConsole->ConfigRegisterInt(Cmd->GetArg(1), (int)valf, 1, 0, 0, "");
+				}
+				else
+				{
+					pConsole->ConfigRegisterFloat(Cmd->GetArg(1), valf, 1, 0, 0, "");
+				}
+			}
+			else
+			{
+				pConsole->ConfigRegisterString(Cmd->GetArg(1), Cmd->GetArg(2), 0, "");
+			}
+
+		}
+	}
+
+	void Command_ConsoleShow(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		pConsole->ShowConsole(XConsole::consoleState::OPEN);
+	}
+
+	void Command_ConsoleHide(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		pConsole->ShowConsole(XConsole::consoleState::CLOSED);
+	}
+
+	void Command_ConsoleToggle(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		pConsole->ToggleConsole();
+	}
+
+
+
+// ==================================================
+
+ConsoleCommand::ConsoleCommand() : pFunc(0) // flags default con is (0)
+{
+
 }
 
+// ==================================================
+
+ConsoleCommandArgs::ConsoleCommandArgs(
+	core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& line)
+{
+	TokenizeString(line.begin(), line.end());
+}
+
+ConsoleCommandArgs::~ConsoleCommandArgs()
+{
+
+}
+
+size_t ConsoleCommandArgs::GetArgCount(void) const 
+{
+	return argNum_;
+}
+
+const char* ConsoleCommandArgs::GetArg(size_t Idx) const
+{
+	X_ASSERT(Idx < argNum_, "Argument index out of range")(argNum_, Idx);
+	return argv_[Idx];
+}
 
 // we want to get arguemtns.
 // how will a command be formated. 
@@ -168,8 +461,9 @@ void ConsoleCommandArgs::TokenizeString(const char *begin, const char* end)
 	const char* commandLine = begin;
 	while (char ch = *commandLine++)
 	{
-		if (argNum_ == MAX_COMMAND_ARGS)
+		if (argNum_ == MAX_COMMAND_ARGS) {
 			return;
+		}
 
 		switch (ch)
 		{
@@ -236,278 +530,40 @@ void ConsoleCommandArgs::TokenizeString(const char *begin, const char* end)
 
 //////////////////////////////////////////////////////////////////////////
 
+const char* XConsole::CMD_HISTORY_FILE_NAME = "cmdHistory.txt";
+const char* XConsole::CONFIG_FILE_EXTENSION = "cfg";
+
 int XConsole::console_debug = 0;
+int XConsole::console_case_sensitive = 0;
+int XConsole::console_save_history = 0;
 Color XConsole::console_input_box_color;
 Color XConsole::console_input_box_color_border;
 Color XConsole::console_output_box_color;
 Color XConsole::console_output_box_color_border;
 Color XConsole::console_output_box_channel_color;
+Color XConsole::console_output_scroll_bar_color;
+Color XConsole::console_output_scroll_bar_slider_color;
 int	  XConsole::console_output_draw_channel;
 int	XConsole::console_buffer_size = 0;
+int XConsole::console_disable_mouse = 0;
 
 
-void Command_Exec(IConsoleCmdArgs* Cmd)
+//////////////////////////////////////////////////////////////////////////
+
+
+XConsole::DeferredCommand::DeferredCommand(const string& command, bool silentMode) :
+	command(command), 
+	silentMode(silentMode)
 {
-	XConsole *pConsole = (XConsole *)gEnv->pConsole;
 
-	if (Cmd->GetArgCount() != 2)
-	{
-		X_WARNING("Console", "exec <filename>");
-		return;
-	}
-
-	const char* filename = Cmd->GetArg(1);
-
-	pConsole->LoadConfig(filename);
 }
 
-void Command_Help(IConsoleCmdArgs* Cmd)
+XConsole::Cursor::Cursor() : 
+	curTime(0.f), 
+	displayTime(0.5f), 
+	draw(false) 
 {
-	X_UNUSED(Cmd);
 
-	X_LOG0("Console", "------- ^8Help^7 -------");
-	X_LOG_BULLET;
-	X_LOG0("Console", "listcmds: lists avaliable commands");
-	X_LOG0("Console", "listdvars: lists dvars");
-	X_LOG0("Console", "listbinds: lists all the bind");
-}
-
-void Command_ListCmd(IConsoleCmdArgs* Cmd)
-{
-	XConsole *pConsole = (XConsole *)gEnv->pConsole;
-
-	// optional search criteria
-	const char* searchPatten = nullptr;
-
-	if (Cmd->GetArgCount() >= 2) {
-		searchPatten = Cmd->GetArg(1);
-	}
-
-	pConsole->ListCommands(searchPatten);
-}
-
-void Command_ListDvars(IConsoleCmdArgs* Cmd)
-{
-	XConsole *pConsole = (XConsole *)gEnv->pConsole;
-
-	// optional search criteria
-	const char* searchPatten = nullptr;
-
-	if (Cmd->GetArgCount() >= 2) {
-		searchPatten = Cmd->GetArg(1);
-	}
-
-	pConsole->ListVariables(searchPatten);
-}
-
-void Command_Exit(IConsoleCmdArgs* Cmd)
-{
-	X_UNUSED(Cmd);
-
-	// we want to exit I guess.
-	// dose this check even make sense?
-	// it might for dedicated server.
-	if (gEnv && gEnv->pCore && gEnv->pCore->GetGameWindow())
-		gEnv->pCore->GetGameWindow()->Close();
-	else
-		X_ERROR("Cmd", "Failed to exit game");
-}
-
-void Command_Echo(IConsoleCmdArgs* Cmd)
-{
-	// we only print the 1st arg ?
-	StackString<1024> txt;
-
-	size_t TotalLen = 0;
-	size_t Len = 0;
-
-	for (int i = 1; i < Cmd->GetArgCount(); i++)
-	{
-		const char* str = Cmd->GetArg(i);
-
-		Len = strlen(str);
-
-		if ((TotalLen + Len) >= 896) // we need to make sure other info like channle name fit into 1024
-		{
-			X_WARNING("Echo", "input too long truncating");
-
-			// trim it to be sorter then total length.
-			// but not shorter than it's length.
-			size_t new_len = core::Min(Len, 896 - TotalLen);
-
-			((char*)str)[new_len] = '\0';
-
-			txt.appendFmt("%s", str);
-			break; // stop adding.
-		}
-
-		txt.appendFmt("%s ", str);
-
-		TotalLen = txt.length();
-	}
-
-	X_LOG0("echo", txt.c_str());
-}
-
-void Command_Wait(IConsoleCmdArgs* Cmd)
-{
-	XConsole *pConsole = (XConsole *)gEnv->pConsole;
-
-	if (Cmd->GetArgCount() != 2)
-	{
-		X_WARNING("Console", "wait <seconds>");
-		return;
-	}
-
-
-	pConsole->WaitSeconds_.SetSeconds(atof(Cmd->GetArg(1)));
-	pConsole->WaitSeconds_ += gEnv->pTimer->GetFrameStartTime();
-}
-
-void Command_VarReset(IConsoleCmdArgs* Cmd)
-{
-	XConsole *pConsole = (XConsole *)gEnv->pConsole;
-
-	if (Cmd->GetArgCount() != 2)
-	{
-		X_WARNING("Console", "vreset <var_name>");
-		return;
-	}
-
-	// find the var
-	ICVar* cvar = pConsole->GetCVar(Cmd->GetArg(1));
-
-	cvar->Reset();
-
-	pConsole->DisplayVarValue(cvar);
-}
-
-void Command_Bind(IConsoleCmdArgs* Cmd)
-{
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
-
-	int Num = Cmd->GetArgCount();
-
-	if (Num < 3)
-	{
-		X_WARNING("Console", "bind <key_combo> '<cmd>'");
-		return;
-	}
-
-	core::StackString<1024> cmd;
-
-	for (int i = 2; i < Num; i++)
-	{
-		cmd.append(Cmd->GetArg(i));
-		if (i + 1 == Num)
-			cmd.append(';', 1);
-		else
-			cmd.append(' ', 1);
-	}
-
-	pConsole->AddBind(Cmd->GetArg(1), cmd.c_str());
-}
-
-void Command_BindsClear(IConsoleCmdArgs* Cmd)
-{
-	X_UNUSED(Cmd);
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
-	pConsole->ClearAllBinds();
-}
-
-void Command_BindsList(IConsoleCmdArgs* Cmd)
-{
-	X_UNUSED(Cmd);
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
-
-	struct PrintBinds : public IKeyBindDumpSink {
-		virtual void OnKeyBindFound(const char* Bind, const char* Command){
-			X_LOG0("Console", "Key: %s Cmd: \"%s\"", Bind, Command);
-		}
-	};
-
-	PrintBinds print;
-
-	X_LOG0("Console", "--------------- ^8Binds^7 ----------------");
-
-	{
-		X_LOG_BULLET;
-		pConsole->Listbinds(&print);
-	}
-
-	X_LOG0("Console", "------------- ^8Binds End^7 --------------");
-}
-
-void Command_SetVarArchive(IConsoleCmdArgs* Cmd)
-{
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
-
-	size_t Num = Cmd->GetArgCount();
-
-	if (Num != 3)
-	{
-		X_WARNING("Console", "seta <var> <val>");
-		return;
-	}
-
-	if (ICVar* pCBar = pConsole->GetCVar(Cmd->GetArg(1)))
-	{
-		pCBar->Set(Cmd->GetArg(2));
-
-		pCBar->SetFlags(pCBar->GetFlags() | VarFlag::ARCHIVE);
-	}
-	else
-	{
-		// we need to work out what kinda value it is.
-		// int, float, string.
-		const char* start = Cmd->GetArg(2);
-		char* End;
-		// long int val = strtol(Cmd->GetArg(2), &End, 0);
-		float valf = strtof(start, &End);
-
-
-		if (valf != 0)
-		{
-			// using the End var is safe since we the condition above checks parsing was valid.
-			if (fmod(valf, 1) == 0.f && !strUtil::Find(start, End, '.'))
-			{
-				pConsole->ConfigRegisterInt(Cmd->GetArg(1), (int)valf, 1, 0, 0, "");
-			}
-			else
-			{
-				pConsole->ConfigRegisterFloat(Cmd->GetArg(1), valf, 1, 0, 0, "");
-			}
-		}
-		else
-		{
-			pConsole->ConfigRegisterString(Cmd->GetArg(1), Cmd->GetArg(2), 0, "");
-		}
-
-	}
-}
-
-void Command_ConsoleShow(IConsoleCmdArgs* Cmd)
-{
-	X_UNUSED(Cmd);
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
-
-	pConsole->ShowConsole(XConsole::consoleState::OPEN);
-}
-
-void Command_ConsoleHide(IConsoleCmdArgs* Cmd)
-{
-	X_UNUSED(Cmd);
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
-
-	pConsole->ShowConsole(XConsole::consoleState::CLOSED);
-}
-
-void Command_ConsoleToggle(IConsoleCmdArgs* Cmd)
-{
-	X_UNUSED(Cmd);
-	XConsole* pConsole = (XConsole*)gEnv->pConsole;
-
-	pConsole->ToggleConsole();
 }
 
 
@@ -588,19 +644,37 @@ void XConsole::Startup(ICore* pCore)
 	pCore->GetILog()->AddLogger(&logger_);
 
 	// load a texture baby!
-	pBackground_ = pRender_->LoadTexture("core_assets/Textures/white.dds", 
+	pBackground_ = pRender_->LoadTexture("Textures/white.dds", 
 		texture::TextureFlags::DONT_STREAM);
 
-	ADD_CVAR_REF_NO_NAME(console_debug, 0, 0, 1, VarFlag::SYSTEM | VarFlag::CHEAT, "Debugging for console operations. 0=off 1=on");
-	ADD_CVAR_REF_NO_NAME(console_buffer_size, 1000, 1, 10000, VarFlag::SYSTEM, "Size of the log buffer");
-	ADD_CVAR_REF_NO_NAME(console_output_draw_channel, 1, 0, 1, VarFlag::SYSTEM, "Draw the channel in a diffrent color. 0=disabled 1=enabled");
+	ADD_CVAR_REF_NO_NAME(console_debug, 0, 0, 1, VarFlag::SYSTEM | VarFlag::CHEAT, 
+		"Debugging for console operations. 0=off 1=on");
+	ADD_CVAR_REF_NO_NAME(console_case_sensitive, 0, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+		"Console input auto complete is case-sensitive");
+	ADD_CVAR_REF_NO_NAME(console_save_history, 1, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+		"Saves command history to file");
+	ADD_CVAR_REF_NO_NAME(console_buffer_size, 1000, 1, 10000, VarFlag::SYSTEM, 
+		"Size of the log buffer");
+	ADD_CVAR_REF_NO_NAME(console_output_draw_channel, 1, 0, 1, VarFlag::SYSTEM, 
+		"Draw the channel in a diffrent color. 0=disabled 1=enabled");
 
-	ADD_CVAR_REF_COL_NO_NAME(console_input_box_color, Color(0.3f, 0.3f, 0.3f, 0.75f), VarFlag::SYSTEM, "Console input box color");
-	ADD_CVAR_REF_COL_NO_NAME(console_input_box_color_border, Color(0.1f, 0.1f, 0.1f, 1.0f), VarFlag::SYSTEM, "Console input box color");
-	ADD_CVAR_REF_COL_NO_NAME(console_output_box_color, Color(0.2f, 0.2f, 0.2f, 0.9f), VarFlag::SYSTEM, "Console output box color");
-	ADD_CVAR_REF_COL_NO_NAME(console_output_box_color_border, Color(0.1f, 0.1f, 0.1f, 1.0f), VarFlag::SYSTEM, "Console output box color");
-	ADD_CVAR_REF_COL_NO_NAME(console_output_box_channel_color, Color(0.15f, 0.15f, 0.15f, 0.9f), VarFlag::SYSTEM, "Console output box channel color");
-
+	ADD_CVAR_REF_COL_NO_NAME(console_input_box_color, Color(0.3f, 0.3f, 0.3f, 0.75f), 
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console input box color");
+	ADD_CVAR_REF_COL_NO_NAME(console_input_box_color_border, Color(0.1f, 0.1f, 0.1f, 1.0f), 
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console input box color");
+	ADD_CVAR_REF_COL_NO_NAME(console_output_box_color, Color(0.2f, 0.2f, 0.2f, 0.9f), 
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output box color");
+	ADD_CVAR_REF_COL_NO_NAME(console_output_box_color_border, Color(0.1f, 0.1f, 0.1f, 1.0f), 
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output box color");
+	ADD_CVAR_REF_COL_NO_NAME(console_output_box_channel_color, Color(0.15f, 0.15f, 0.15f, 0.9f), 
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output box channel color");
+	ADD_CVAR_REF_COL_NO_NAME(console_output_scroll_bar_color, Color(0.5f, 0.5f, 0.5f, 0.5f),
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output scroll bar color");
+	ADD_CVAR_REF_COL_NO_NAME(console_output_scroll_bar_slider_color, Color(0.0f, 0.0f, 0.0f, 0.9f), 
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console output scroll bar slider color");
+	ADD_CVAR_REF_NO_NAME(console_disable_mouse, 2, 0, 2,
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Disable mouse input when console open."
+		" 1=expanded only 2=always");
 
 
 	ADD_COMMAND("exec", Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
@@ -625,6 +699,10 @@ void XConsole::Startup(ICore* pCore)
 
 	// hot reload
 	pCore->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
+
+	if (console_save_history) {
+		LoadCmdHistory();
+	}
 }
 
 void XConsole::ShutDown(void)
@@ -642,12 +720,66 @@ void XConsole::ShutDown(void)
 	// clear up vars.
 	if (!VarMap_.empty())
 	{
-		while (!VarMap_.empty())
+		while (!VarMap_.empty()) {
 			VarMap_.begin()->second->Release();
+		}
 
 		VarMap_.clear();
 	}
+
+	InputBuffer_.clear();
+	RefString_.clear();
+	CmdHistory_.clear();
 }
+
+void XConsole::SaveChangedVars(void)
+{
+	ConsoleVarMapItor itrVar, itrVarEnd = VarMap_.end();
+
+	if (VarMap_.empty()) {
+		X_WARNING("Console", "Skipping saving of modified vars. no registerd vars.");
+		return;
+	}
+
+	X_LOG0("Console", "Saving moified vars");
+
+	core::XFileScoped file;
+	core::fileModeFlags mode;
+
+	mode.Set(fileMode::WRITE);
+	mode.Set(fileMode::RECREATE);
+
+	if (file.openFile("user_config.cfg", mode))
+	{
+		file.writeStringNNT("// auto generated");
+
+		for (itrVar = VarMap_.begin(); itrVar != itrVarEnd; ++itrVar)
+		{
+			ICVar* pVar = itrVar->second;
+			ICVar::FlagType flags = pVar->GetFlags();
+
+			if (flags.IsSet(VarFlag::SAVE_IF_CHANGED))
+			{
+				if (flags.IsSet(VarFlag::MODIFIED))
+				{
+					// save out name + value.
+					const char* pName = pVar->GetName();
+					const char* pValue = pVar->GetString();
+
+					file.writeStringNNT(pName);
+					file.write(' ');
+					file.writeStringNNT(pValue);
+					file.write('\n');
+				}
+			}
+		}
+	}
+	else
+	{
+		X_ERROR("Console", "Failed to open file for saving modifed vars");
+	}
+}
+
 
 void XConsole::unregisterInputListener(void)
 {
@@ -661,29 +793,51 @@ void XConsole::freeRenderResources(void)
 {
 	if (pRender_)
 	{
-		if (pBackground_)
+		if (pBackground_) {
 			pBackground_->release();
+		}
 	}
 }
 
 
 bool XConsole::OnInputEvent(const input::InputEvent& event)
 {
-	static size_t lol = 0;
+	// NOT OPEN
 
-	if (event.action == input::InputState::RELEASED && isVisable())
+	if (event.action == input::InputState::RELEASED && isVisable()) {
 		repeatEvent_.keyId = input::KeyId::UNKNOWN;
+	}
 
 	if (event.action != input::InputState::PRESSED)
 	{
 		// if open we eat all none mouse
-		if (event.deviceId == input::InputDeviceType::KEYBOARD)
+		if (event.deviceId == input::InputDeviceType::KEYBOARD) {
 			return isVisable();
+		}
 
-		return false;
+		// eat mouse move?
+		// Stops the camera moving around when we have console open.
+		if (event.deviceId == input::InputDevice::MOUSE)
+		{
+			if (event.keyId != input::KeyId::MOUSE_Z)
+			{
+				if (console_disable_mouse == 1) // only if expanded
+				{
+					return isExpanded();
+				}
+				if (console_disable_mouse == 2)
+				{
+					return isVisable();
+				}
+
+				return false;
+			}
+		}
+		else
+		{
+			return false;
+		}
 	}
-
-
 
 	repeatEvent_ = event;
 	repeatEventTimer_ = repeatEventInitialDelay_;
@@ -732,6 +886,39 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 	}
 	else
 	{
+		// OPEN
+		if (isExpanded()) // you can only scroll a expanded console.
+		{
+			if (event.keyId == input::KeyId::MOUSE_Z)
+			{
+				int32_t scaled = static_cast<int32_t>(event.value);
+
+				scaled /= 20;
+				if (scaled < 1) {
+					scaled = 1;
+				}
+
+				ScrollPos_ += scaled;
+				if (ScrollPos_ < 0) {
+					ScrollPos_ = 0;
+				}
+				else
+				{
+					int32_t logSize = static_cast<int32_t>(ConsoleLog_.size());
+					int32_t visibleNum = static_cast<int32_t>(MaxVisibleLogLines());
+
+					logSize -= visibleNum;
+					logSize += 2;
+
+					if (ScrollPos_ > logSize) {
+						ScrollPos_ = logSize;
+					}
+				}
+
+				return true;
+			}
+		}
+
 		if (event.keyId != input::KeyId::TAB)
 		{
 		//	ResetAutoCompletion();
@@ -759,13 +946,16 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 		// clear states.
 		pInput_->ClearKeyState();
 
-		if (expand) // shift + ` dose not close anymore just expands.
+		if (expand) { // shift + ` dose not close anymore just expands.
 			ShowConsole(consoleState::EXPANDED);
-		else
+		}
+		else {
 			ToggleConsole(); // toggle it.
+		}
 
-		if (!visable) /// don't clear if already visable, as we are just expanding.
+		if (!visable) { /// don't clear if already visable, as we are just expanding.
 			ClearInputBuffer();
+		}
 		return true;
 	}
 	else if (event.keyId == input::KeyId::ESCAPE)
@@ -782,8 +972,9 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 
 bool XConsole::OnInputEventChar(const input::InputEvent& event)
 {
-	if (!isVisable())
+	if (!isVisable()) {
 		return false;
+	}
 
 	repeatEvent_ = event;
 
@@ -794,13 +985,16 @@ bool XConsole::OnInputEventChar(const input::InputEvent& event)
 
 void XConsole::AddInputChar(const char c)
 {
-	if (c == '`' || c == '¬') // sent twice.
+	if (c == '`' || c == '¬') { // sent twice.
 		return;
-	
-	if (CursorPos_ < safe_static_cast<int32_t,size_t>(InputBuffer_.length()))
+	}
+
+	if (CursorPos_ < safe_static_cast<int32_t, size_t>(InputBuffer_.length())) {
 		InputBuffer_.insert(CursorPos_, c);
-	else
+	}
+	else {
 		InputBuffer_ = InputBuffer_ + c;
+	}
 
 	CursorPos_++;
 
@@ -809,8 +1003,9 @@ void XConsole::AddInputChar(const char c)
 
 void XConsole::RemoveInputChar(bool bBackSpace)
 {
-	if (InputBuffer_.isEmpty())
+	if (InputBuffer_.isEmpty()) {
 		return;
+	}
 
 	if (bBackSpace)
 	{
@@ -836,10 +1031,11 @@ void XConsole::ClearInputBuffer(void)
 	CursorPos_ = 0;
 }
 
-void XConsole::ExecuteInputBuffer()
+void XConsole::ExecuteInputBuffer(void)
 {
-	if (InputBuffer_.isEmpty())
+	if (InputBuffer_.isEmpty()) {
 		return;
+	}
 
 	string Temp = InputBuffer_;
 
@@ -854,39 +1050,47 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 {
 	using namespace input;
 
-	if (!isVisable())
+	if (!isVisable()) {
 		return false;
+	}
 
 	if (event.keyId == KeyId::ENTER || event.keyId == KeyId::NUMPAD_ENTER)
 	{
-		if (autoCompleteIdx_ >= 0)
+		if (autoCompleteIdx_ >= 0) {
 			autoCompleteSelect_ = true;
-		else
+		}
+		else {
 			ExecuteInputBuffer();
+		}
 		return true;
 	}
 	else if (event.keyId == KeyId::BACKSPACE || event.keyId == KeyId::DELETE)
 	{
 		// shift + DEL / BACK fully clears
-		if (event.modifiers.IsSet(input::ModifiersMasks::Shift))
+		if (event.modifiers.IsSet(input::ModifiersMasks::Shift)) {
 			ClearInputBuffer();
-		else
+		}
+		else {
 			RemoveInputChar(true);
+		}
 		return true;
 	}
 	else if (event.keyId == KeyId::LEFT_ARROW)
 	{
-		if (CursorPos_)  // can we go left?
+		if (CursorPos_) {  // can we go left?
 			CursorPos_--;
+		}
 		return true;
 	}
 	else if (event.keyId == KeyId::RIGHT_ARROW)
 	{
 		// are we pre end ?
-		if (CursorPos_ < (int)(InputBuffer_.length()))
+		if (CursorPos_ < safe_static_cast<int32_t, size_t>(InputBuffer_.length())) {
 			CursorPos_++;
-		else if (autoCompleteIdx_ >= 0)
+		}
+		else if (autoCompleteIdx_ >= 0) {
 			autoCompleteSelect_ = true;
+		}
 		return true;
 	}
 	else if (event.keyId == KeyId::UP_ARROW)
@@ -902,11 +1106,12 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 
 			if (HistoryLine)
 			{
-				if (console_debug)
+				if (console_debug) {
 					X_LOG0("Cmd history", "%s", HistoryLine);
+				}
 
 				InputBuffer_ = HistoryLine;
-				CursorPos_ = (int)InputBuffer_.size();
+				CursorPos_ = safe_static_cast<int32_t, size_t>(InputBuffer_.size());
 			}
 		}
 		return true;
@@ -924,11 +1129,12 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 
 			if (HistoryLine)
 			{
-				if (console_debug)
+				if (console_debug) {
 					X_LOG0("Cmd history", "%s", HistoryLine);
+				}
 
 				InputBuffer_ = HistoryLine;
-				CursorPos_ = (int)InputBuffer_.size();
+				CursorPos_ = safe_static_cast<int32_t, size_t>(InputBuffer_.size());
 			}
 		}
 		return true;
@@ -948,7 +1154,7 @@ const char* XConsole::GetHistory(CmdHistory::Enum direction)
 	{
 		if (!CmdHistory_.empty())
 		{
-			if (HistoryPos_<(int)(CmdHistory_.size() - 1))
+			if (HistoryPos_ < safe_static_cast<int32_t, size_t>(CmdHistory_.size() - 1))
 			{
 				HistoryPos_++;
 
@@ -973,6 +1179,63 @@ const char* XConsole::GetHistory(CmdHistory::Enum direction)
 }
 
 
+void XConsole::SaveCmdHistory(void) const
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pFileSys);
+
+	fileModeFlags mode;
+
+	mode.Set(fileMode::WRITE);
+	mode.Set(fileMode::RECREATE);
+	mode.Set(fileMode::SHARE);
+
+	XFileScoped file;
+	if (file.openFile(CMD_HISTORY_FILE_NAME, mode))
+	{
+		ConsoleBuffer::const_reverse_iterator it = CmdHistory_.crbegin();
+		for (; it != CmdHistory_.crend(); it++)
+		{
+			file.writeString(it->c_str(), safe_static_cast<uint32_t,size_t>(it->length()));
+			file.write('\n');
+		}
+	}
+}
+
+void XConsole::LoadCmdHistory(void)
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pFileSys);
+
+	fileModeFlags mode;
+
+	mode.Set(fileMode::READ);
+	mode.Set(fileMode::SHARE);
+
+	XFileMemScoped file;
+	if (file.openFile(CMD_HISTORY_FILE_NAME, mode))
+	{
+		const char* pBegin = file->getBufferStart();
+		const char* pEnd = file->getBufferEnd();
+
+		core::StringTokenizer<char> tokenizer(pBegin, pEnd, '\n');
+		StringRange<char> range(nullptr, nullptr);
+
+		while (tokenizer.ExtractToken(range))
+		{
+			if (range.GetLength() > 0) {
+				AddCmdToHistory(core::string(range.GetStart(), range.GetEnd()));
+			}
+		}
+
+		// limit the history.
+		while (CmdHistory_.size() > MAX_HISTORY_ENTRIES) {
+			CmdHistory_.pop_back();
+		}
+	}
+}
+
+
 void XConsole::AddCmdToHistory(const char* Command)
 {
 	// so we can scroll through past commands.
@@ -982,18 +1245,24 @@ void XConsole::AddCmdToHistory(const char* Command)
 	if (!CmdHistory_.empty())
 	{
 		// make sure it's not same as last command 
-		if (CmdHistory_.front() != Command)
-			CmdHistory_.push_front(Command);
+		if (CmdHistory_.front() != Command) {
+			CmdHistory_.push_front(core::string(Command));
+		}
 	}
 	else
 	{
 		// 1st commnd :D
-		CmdHistory_.push_front(Command);
+		CmdHistory_.push_front(core::string(Command));
 	}
 
 	// limit hte history.
-	while (CmdHistory_.size()>MAX_HISTORY_ENTRIES)
+	while (CmdHistory_.size() > MAX_HISTORY_ENTRIES) {
 		CmdHistory_.pop_back();
+	}
+
+	if (console_save_history) {
+		SaveCmdHistory();
+	}
 }
 
 // Binds a cmd to a key
@@ -1009,28 +1278,30 @@ void XConsole::AddBind(const char* key, const char* cmd)
 			// bind is same.
 			return;
 		}
-		if (console_debug)
+		if (console_debug) {
 			X_LOG1("Console", "Overriding bind \"%s\" -> %s with -> %s", key, Old, cmd);
+		}
 
-		ConsoleBindMapItor it = Binds_.find(key);
+		ConsoleBindMapItor it = Binds_.find(X_CONST_STRING(key));
 		it->second = cmd;
 	}
 
-	Binds_.insert(ConsoleBindMapItor::value_type(key, cmd));
+	Binds_.insert(ConsoleBindMapItor::value_type(core::string(key), core::string(cmd)));
 }
 
 // returns the command for a given key
 // returns null if no bind found
 const char* XConsole::FindBind(const char* key)
 {
-	ConsoleBindMapItor it = Binds_.find(key);
-	if (it != Binds_.end())
+	ConsoleBindMapItor it = Binds_.find(X_CONST_STRING(key));
+	if (it != Binds_.end()) {
 		return it->second.c_str();
+	}
 	return nullptr;
 }
 
 // removes all the binds.
-void XConsole::ClearAllBinds()
+void XConsole::ClearAllBinds(void)
 {
 	Binds_.clear();
 }
@@ -1049,10 +1320,21 @@ ICVar* XConsole::RegisterString(const char* Name, const char* Value,
 	X_ASSERT_NOT_NULL(Name);
 
 	ICVar *pCVar = GetCVarForRegistration(Name);
-	if (pCVar)
+	if (pCVar) {
 		return pCVar;
+	}
 
-	pCVar = X_NEW(CVarString<CVarBaseConst>, &varArena_, "CVarString")(this, Name, Value, Flags, desc);
+	if (bitUtil::IsBitFlagSet(Flags, VarFlag::CPY_NAME))
+	{
+		Flags = bitUtil::ClearBitFlag(Flags, VarFlag::CPY_NAME);
+		pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, 
+			"CVarString<H>")(this, Name, Value, Flags, desc);
+	}
+	else
+	{
+		pCVar = X_NEW(CVarString<CVarBaseConst>, &varArena_, 
+			"CVarString")(this, Name, Value, Flags, desc);
+	}
 	RegisterVar(pCVar, pChangeFunc);
 	return pCVar;
 }
@@ -1063,8 +1345,9 @@ ICVar* XConsole::RegisterInt(const char* Name, int Value, int Min,
 	X_ASSERT_NOT_NULL(Name);
 
 	ICVar *pCVar = GetCVarForRegistration(Name);
-	if (pCVar)
+	if (pCVar) {
 		return pCVar;
+	}
 
 	pCVar = X_NEW(CVarInt<CVarBaseConst>, &varArena_, "CVarInt")(this, Name, Value, Min, Max, Flags, desc);
 	RegisterVar(pCVar, pChangeFunc);
@@ -1077,8 +1360,9 @@ ICVar* XConsole::RegisterFloat(const char* Name, float Value, float Min,
 	X_ASSERT_NOT_NULL(Name);
 
 	ICVar *pCVar = GetCVarForRegistration(Name);
-	if (pCVar)
+	if (pCVar) {
 		return pCVar;
+	}
 
 	pCVar = X_NEW(CVarFloat<CVarBaseConst>, &varArena_, "CVarFloat")(this, Name, Value, Min, Max, Flags, desc);
 	RegisterVar(pCVar, pChangeFunc);
@@ -1091,8 +1375,9 @@ ICVar* XConsole::ConfigRegisterString(const char* Name, const char* Value, int f
 	X_ASSERT_NOT_NULL(Name);
 
 	ICVar *pCVar = GetCVarForRegistration(Name);
-	if (pCVar)
+	if (pCVar) {
 		return pCVar;
+	}
 
 	pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, "CVarStringConfig")(this, Name, Value, flags, desc);
 	RegisterVar(pCVar, nullptr);
@@ -1105,8 +1390,9 @@ ICVar* XConsole::ConfigRegisterInt(const char* Name, int Value, int Min,
 	X_ASSERT_NOT_NULL(Name);
 
 	ICVar *pCVar = GetCVarForRegistration(Name);
-	if (pCVar)
+	if (pCVar) {
 		return pCVar;
+	}
 
 	pCVar = X_NEW(CVarInt<CVarBaseHeap>, &varArena_, "CVarIntConfig")(this, Name, Value, Min, Max, flags, desc);
 	RegisterVar(pCVar, nullptr);
@@ -1119,8 +1405,9 @@ ICVar* XConsole::ConfigRegisterFloat(const char* Name, float Value, float Min,
 	X_ASSERT_NOT_NULL(Name);
 
 	ICVar *pCVar = GetCVarForRegistration(Name);
-	if (pCVar)
+	if (pCVar) {
 		return pCVar;
+	}
 
 	pCVar = X_NEW(CVarFloat<CVarBaseHeap>, &varArena_, "CVarFloatConfig")(this, Name, Value, Min, Max, flags, desc);
 	RegisterVar(pCVar, nullptr);
@@ -1135,8 +1422,9 @@ ICVar* XConsole::Register(const char* Name, float* src, float defaultvalue,
 	X_ASSERT_NOT_NULL(src);
 
 	ICVar *pCVar = GetCVarForRegistration(Name);
-	if (pCVar)
+	if (pCVar) {
 		return pCVar;
+	}
 
 	*src = defaultvalue;
 
@@ -1152,8 +1440,9 @@ ICVar* XConsole::Register(const char* Name, int* src, int defaultvalue,
 	X_ASSERT_NOT_NULL(src);
 
 	ICVar *pCVar = GetCVarForRegistration(Name);
-	if (pCVar)
+	if (pCVar) {
 		return pCVar;
+	}
 
 	*src = defaultvalue;
 
@@ -1169,8 +1458,9 @@ ICVar* XConsole::Register(const char* Name, Color* src, Color defaultvalue,
 	X_ASSERT_NOT_NULL(src);
 
 	ICVar *pCVar = GetCVarForRegistration(Name);
-	if (pCVar)
+	if (pCVar) {
 		return pCVar;
+	}
 
 	*src = defaultvalue;
 
@@ -1187,8 +1477,9 @@ ICVar* XConsole::Register(const char* Name, Vec3f* src, Vec3f defaultvalue,
 	X_ASSERT_NOT_NULL(src);
 
 	ICVar *pCVar = GetCVarForRegistration(Name);
-	if (pCVar)
+	if (pCVar) {
 		return pCVar;
+	}
 
 	*src = defaultvalue;
 
@@ -1204,8 +1495,9 @@ ICVar* XConsole::GetCVar(const char* name)
 	ConsoleVarMapItor it;
 
 	it = VarMap_.find(name);
-	if (it != VarMap_.end())
+	if (it != VarMap_.end()) {
 		return it->second;
+	}
 	return nullptr;
 }
 
@@ -1214,8 +1506,9 @@ void XConsole::UnregisterVariable(const char* sVarName)
 	ConsoleVarMapItor itor;
 	itor = VarMap_.find(sVarName);
 
-	if (itor == VarMap_.end())
+	if (itor == VarMap_.end()) {
 		return;
+	}
 
 	ICVar *pCVar = itor->second;
 
@@ -1235,10 +1528,12 @@ void XConsole::AddCommand(const char* Name, ConsoleCmdFunc func, int Flags, cons
 	cmd.Name = Name;
 	cmd.Flags = Flags;
 	cmd.pFunc = func;
-	if (desc)
+	if (desc) {
 		cmd.Desc = desc;
+	}
 
-	if (CmdMap_.find(Name) != CmdMap_.end())
+	// pass cmd.Name instead of Name, saves creating a second core::string
+	if (CmdMap_.find(cmd.Name) != CmdMap_.end())
 	{
 		X_WARNING("Console", "command already exsists: %s", Name);
 	}
@@ -1249,9 +1544,10 @@ void XConsole::AddCommand(const char* Name, ConsoleCmdFunc func, int Flags, cons
 
 void XConsole::RemoveCommand(const char* Name)
 {
-	ConsoleCmdMapItor it = CmdMap_.find(Name);
-	if (it != CmdMap_.end())
+	ConsoleCmdMapItor it = CmdMap_.find(X_CONST_STRING(Name));
+	if (it != CmdMap_.end()) {
 		CmdMap_.erase(it);
+	}
 }
 
 
@@ -1273,8 +1569,9 @@ void XConsole::Exec(const char* command, const bool DeferExecution)
 
 	if (temp.length() >= 4)
 	{
-		if (core::strUtil::FindCaseInsensitive(temp.begin(), temp.begin() + 4, "exec"))
+		if (core::strUtil::FindCaseInsensitive(temp.begin(), temp.begin() + 4, "exec")) {
 			unroll = true;
+		}
 	}
 
 	if (unroll)
@@ -1283,7 +1580,7 @@ void XConsole::Exec(const char* command, const bool DeferExecution)
 	}
 	else
 	{
-		deferredCmds_.push_back(DeferredCommand(temp.c_str(), false));
+		deferredCmds_.push_back(DeferredCommand(core::string(temp.c_str()), false));
 	}
 }
 
@@ -1327,8 +1624,10 @@ bool XConsole::LoadConfig(const char* fileName)
 				while ((pComment = core::strUtil::Find(begin, end, '/')) != nullptr)
 				{
 					// wee need atleast 1 more char.
-					if (pComment >= (end - 1))
+					if (pComment >= (end - 1)) {
 						break;
+					}
+
 					begin = const_cast<char*>(++pComment);
 
 					if (*begin == '*')
@@ -1494,25 +1793,31 @@ void XConsole::ExecuteStringInternal(const char* pCommand, ExecSource::Enum sour
 
 		if (!bSilentMode)
 		{
-			if (source == ExecSource::CONFIG)
+			if (source == ExecSource::CONFIG) {
 				X_WARNING("Config", "Unknown command/var: %s", name.c_str());
-			else
+			}
+			else {
 				X_WARNING("Console", "Unknown command: %s", name.c_str());
+			}
 		}
 	}
 
 }
 
-void XConsole::DisplayVarValue(ICVar *pVar)
+void XConsole::DisplayVarValue(ICVar* pVar)
 {
-	if (!pVar) return;
+	if (!pVar) {
+		return;
+	}
 
 	X_LOG0("Dvar", "\"%s\" = %s", pVar->GetName(), pVar->GetString());
 }
 
-void XConsole::DisplayVarInfo(ICVar *pVar)
+void XConsole::DisplayVarInfo(ICVar* pVar)
 {
-	if (!pVar) return;
+	if (!pVar) {
+		return;
+	}
 
 	ICVar::FlagType::Description dsc;
 
@@ -1552,7 +1857,13 @@ void XConsole::ExecuteCommand(ConsoleCommand &cmd,
 
 ICVar* XConsole::GetCVarForRegistration(const char* Name)
 {
-	ICVar *pCVar = stl::find_in_map(this->VarMap_, Name, NULL);
+	ICVar* pCVar = nullptr;
+
+	ConsoleVarMap::const_iterator it = VarMap_.find(X_CONST_STRING(Name));
+	if (it != VarMap_.end()) {
+		pCVar = it->second;
+	}
+
 	if (pCVar)
 	{
 		X_WARNING("Console", "var(%s) is already registerd", Name);
@@ -1563,8 +1874,9 @@ ICVar* XConsole::GetCVarForRegistration(const char* Name)
 
 void XConsole::RegisterVar(ICVar *pCVar, ConsoleVarFunc pChangeFunc)
 {
-	if (pChangeFunc)
+	if (pChangeFunc) {
 		pCVar->SetOnChangeCallback(pChangeFunc);
+	}
 
 	VarMap_.insert(ConsoleVarMapItor::value_type(pCVar->GetName(), pCVar));
 }
@@ -1594,12 +1906,14 @@ void XConsole::ExecuteDeferredCommands()
 	}
 }
 
-void XConsole::OnFrameBegin()
+void XConsole::OnFrameBegin(void)
 {
 	ExecuteDeferredCommands();
 
 	if (!isVisable())
+	{
 		repeatEvent_.keyId = input::KeyId::UNKNOWN;
+	}
 	else if (repeatEvent_.keyId != input::KeyId::UNKNOWN)
 	{
 		repeatEventTimer_ -= gEnv->pTimer->GetFrameTime();
@@ -1613,23 +1927,18 @@ void XConsole::OnFrameBegin()
 		//	else
 			{
 
-				if (repeatEvent_.action == input::InputState::CHAR)
+				if (repeatEvent_.action == input::InputState::CHAR) {
 					OnInputEventChar(repeatEvent_);
-				else
+				}
+				else {
 					ProcessInput(repeatEvent_);
-
+				}
 
 				repeatEventTimer_ = repeatEventInterval_;
 			}
 		}
-
 	}
-
-
 }
-
-
-
 
 
 void XConsole::Draw()
@@ -1645,15 +1954,31 @@ void XConsole::Draw()
 	DrawBuffer();
 }
 
-void XConsole::DrawBuffer()
+consoleState::Enum XConsole::getVisState(void) const
 {
-	if (this->consoleState_ == consoleState::CLOSED)
+	return consoleState_;
+}
+
+size_t XConsole::MaxVisibleLogLines(void) const
+{
+	size_t height = pRender_->getHeight() - 40;
+
+	size_t scaledLogHeight = static_cast<size_t>(
+		static_cast<float>(CONSOLE_LOG_LINE_HIEGHT)* 0.8f);
+
+	return height / scaledLogHeight;
+}
+
+void XConsole::DrawBuffer(void)
+{
+	if (this->consoleState_ == consoleState::CLOSED) {
 		return;
+	}
 
 	font::XTextDrawConect ctx;
 	ctx.SetColor(Col_Khaki);
 	ctx.SetProportional(false);
-	ctx.SetSize(Vec2f(20, 20));
+	ctx.SetSize(Vec2f(20, static_cast<float>(CONSOLE_LOG_LINE_HIEGHT)));
 	ctx.SetCharWidthScale(0.5f);
 //	ctx.SetScaleFrom800x600(true);
 
@@ -1678,6 +2003,7 @@ void XConsole::DrawBuffer()
 			pRender_->DrawQuad(5, 35, width, height, console_output_box_color);
 			pRender_->DrawRect(5, 35, width, height, console_output_box_color_border);
 
+			DrawScrollBar();
 		}
 
 		pRender_->Set2D(false);	
@@ -1690,7 +2016,7 @@ void XConsole::DrawBuffer()
 		Vec2f pos(10, 5);
 		Vec2f txtwidth = pFont_->GetTextSize(txt, ctx);
 		float fCharHeight = 0.8f * ctx.GetCharHeight();
-		int	  CharHeight = (int)(fCharHeight);
+		int	  CharHeight = static_cast<int>(fCharHeight);
 
 		ctx.SetEffectId(pFont_->GetEffectId("drop"));
 		
@@ -1710,6 +2036,8 @@ void XConsole::DrawBuffer()
 			pFont_->DrawString(Vec2f(pos.x + Lwidth, pos.y), "_", ctx);
 		}
 
+		size_t numDraw = 0;
+
 		// the log.
 		if (isExpanded())
 		{
@@ -1722,6 +2050,8 @@ void XConsole::DrawBuffer()
 			float xPos = 8;
 			float yPos = height + 15; // 15 uints up
 			int nScroll = 0;
+
+
 			while (ritor != ConsoleLog_.rend() && yPos >= 30) // max 30 below top(not bottom)
 			{
 				if (nScroll >= ScrollPos_)
@@ -1730,6 +2060,7 @@ void XConsole::DrawBuffer()
 
 					pFont_->DrawString(xPos, yPos, buf, ctx);
 					yPos -= CharHeight;
+					numDraw++;
 				}
 				nScroll++;
 				++ritor;
@@ -1738,21 +2069,51 @@ void XConsole::DrawBuffer()
 
 		// draw the auto complete
 		DrawInputTxt(pos);
-		DrawScrollBar();
 
 	}
 
 }
 
-
-void XConsole::DrawScrollBar()
+void XConsole::DrawScrollBar(void)
 {
-	if (!isExpanded())
+	if (!isExpanded()) {
 		return;
+	}
 
 	if(pFont_ && pRender_)
 	{
+		// oooo shit nuggger wuggger.
+		float width = pRender_->getWidthf() - 10;
+		float height = pRender_->getHeightf() - 40;
 
+		const float barWidth = 6;
+		const float marging = 5;
+		const float sliderHeight = 20;
+
+		float start_x = (width + 5) - (barWidth + marging);
+		float start_y = 35 + marging;
+		float barHeight = height - (marging * 2);
+
+		float slider_x = start_x;
+		float slider_y = start_y;
+		float slider_width = barWidth ;
+		float slider_height = sliderHeight;
+
+		// work out the possition of slider.
+		// we take the height of the bar - slider and divide.
+		size_t visibleNum = MaxVisibleLogLines();
+		size_t scrollableLines = ConsoleLog_.size() - (visibleNum += 2);
+
+		float positionPercent = PercentageOf(ScrollPos_, scrollableLines) * 0.01f;
+		float offset = (barHeight - slider_height) * positionPercent;
+
+		slider_y += (barHeight - slider_height - offset);
+		if (slider_y < start_y) {
+			slider_y = start_y;
+		}
+
+		pRender_->DrawQuad(start_x, start_y, barWidth, barHeight, console_output_scroll_bar_color);
+		pRender_->DrawQuad(slider_x, slider_y, slider_width, slider_height, console_output_scroll_bar_slider_color);
 
 	}
 }
@@ -1765,6 +2126,10 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 		AutoResult(const char* name, ICVar* var) : name(name), var(var) {}
 		const char* name;
 		ICVar* var;
+
+		X_INLINE bool operator<(const AutoResult& oth) {
+			return strcmp(name, oth.name) < 0;
+		}
 	};
 
 	const size_t max_auto_complete_results = 32;
@@ -1806,8 +2171,17 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 
 
 		inputLen = inputEnd - inputBegin;
-		if (inputLen == 0)
+		if (inputLen == 0) {
 			return;
+		}
+
+		typedef core::traits::Function<bool(const char*, const char*,
+			const char*, const char*)> MyComparisionFunc;
+
+		MyComparisionFunc::Pointer pComparison = core::strUtil::IsEqual;
+		if (!console_case_sensitive) {
+			pComparison = core::strUtil::IsEqualCaseInsen;
+		}
 
 		// try find and cmd's / dvars that match the current input.
 		ConsoleVarMapItor it = VarMap_.begin();
@@ -1818,17 +2192,19 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 			NameLen = core::strUtil::strlen(Name);
 
 			// if var name shorter than search leave it !
-			if (NameLen < inputLen)
+			if (NameLen < inputLen) {
 				continue;
+			}
 
 			// we search same length.
-			if (core::strUtil::IsEqual(Name, Name + inputLen, inputBegin, inputEnd))
+			if (pComparison(Name, Name + inputLen, inputBegin, inputEnd))
 			{
 				results.push_back(AutoResult(Name, it->second));
 			}
 
-			if (results.size() == results.capacity())
+			if (results.size() == results.capacity()) {
 				break;
+			}
 		}
 
 		if (results.size() < results.capacity())
@@ -1841,20 +2217,25 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				NameLen = cmdIt->second.Name.length();
 
 				// if cmd name shorter than search leave it !
-				if (NameLen < inputLen)
+				if (NameLen < inputLen) {
 					continue;
+				}
 
 				// we search same length.
-				if (core::strUtil::IsEqual(Name, Name + inputLen, inputBegin, inputEnd))
+				if (pComparison(Name, Name + inputLen, inputBegin, inputEnd))
 				{
 					results.push_back(AutoResult(Name, nullptr));
 				}
 
-				if (results.size() == results.capacity())
+				if (results.size() == results.capacity()) {
 					break;
+				}
 			}
-
 		}
+
+
+		// sort them?
+		std::sort(results.begin(), results.end());
 
 		// Font contex
 		font::XTextDrawConect ctx;
@@ -1882,7 +2263,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 			}
 		//	if (results[autoCompleteIdx_].var) // for var only?
 				InputBuffer_ += ' '; // add a space
-			CursorPos_ = (int32)InputBuffer_.length();
+			CursorPos_ = safe_static_cast<int32,size_t>(InputBuffer_.length());
 			autoCompleteIdx_ = -1;
 			autoCompleteSelect_ = false;
 		}
@@ -1913,8 +2294,9 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 
 				temp.trim();
 
-				if (temp.isEqual(fullName))
+				if (temp.isEqual(fullName)) {
 					txtCol = Col_Darkblue;
+				}
 			}
 			else if (results.size() > 1)
 			{
@@ -2037,7 +2419,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 					float colHeight = fCharHeight - colorBoxPadding * 2;
 
 					// draw the colors :D !
-					CVarColRef* PColVar = (CVarColRef*)pCvar;
+					CVarColRef* PColVar = static_cast<CVarColRef*>(pCvar);
 
 					pRender_->DrawQuad(colxpos, colypos, colorBoxWidth, colHeight, PColVar->GetColor());
 					pRender_->DrawRect(colxpos, colypos, colorBoxWidth, colHeight, Col_Black);
@@ -2199,13 +2581,26 @@ void XConsole::ResetAutoCompletion(void)
 void XConsole::addLineToLog(const char* pStr, uint32_t length)
 {
 	X_UNUSED(length);
-	ConsoleLog_.push_back(pStr);
+	ConsoleLog_.push_back(core::string(pStr));
 
 	int bufferSize = console_buffer_size;
 
-	while (safe_static_cast<int,size_t>(ConsoleLog_.size()) > bufferSize)
+	if (safe_static_cast<int,size_t>(ConsoleLog_.size()) > bufferSize)
 	{
 		ConsoleLog_.pop_front();
+
+		size_t noneScroll = MaxVisibleLogLines();
+
+		// move scroll wheel with the moving items?
+		if (ScrollPos_ > 0 && ScrollPos_ < safe_static_cast<int32_t,size_t>(ConsoleLog_.size() - noneScroll)) {
+			ScrollPos_++;
+		}
+	}
+	else
+	{
+		if (ScrollPos_ > 0) {
+			ScrollPos_++;
+		}
 	}
 }
 
@@ -2236,7 +2631,6 @@ void XConsole::ListCommands(const char* searchPatten)
 
 	sortCmdsByName(sorted_cmds);
 
-	X_LOG_BULLET;
 	X_LOG0("Console", "------------ ^8Commands(%i)^7 ------------", sorted_cmds.size());
 
 	core::Array<ConsoleCommand*>::ConstIterator it = sorted_cmds.begin();
@@ -2275,7 +2669,6 @@ void XConsole::ListVariables(const char* searchPatten)
 
 	sortVarsByName(sorted_vars);
 
-	X_LOG_BULLET;
 	X_LOG0("Console", "-------------- ^8Vars(%i)^7 --------------", sorted_vars.size());
 
 	core::Array<ICVar*>::ConstIterator it = sorted_vars.begin();
@@ -2306,6 +2699,10 @@ void XConsole::Paste(void)
 		// add to length
 		CursorPos_ += safe_static_cast<int32_t, size_t>(core::strUtil::strlen(txt));
 	}
+	else
+	{
+		X_LOG1("Console", "Failed to paste text to console");
+	}
 }
 
 // ==================================================================
@@ -2334,6 +2731,11 @@ void XConsoleNULL::ShutDown(void)
 
 }
 
+void XConsoleNULL::SaveChangedVars(void)
+{
+
+}
+
 void XConsoleNULL::unregisterInputListener(void)
 {
 
@@ -2349,6 +2751,10 @@ void XConsoleNULL::Draw(void)
 
 }
 
+consoleState::Enum XConsoleNULL::getVisState(void) const
+{
+	return consoleState::CLOSED;
+}
 
 ICVar* XConsoleNULL::RegisterString(const char* Name, const char* Value, int Flags, 
 	const char* desc, ConsoleVarFunc pChangeFunc)
