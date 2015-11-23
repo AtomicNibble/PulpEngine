@@ -66,9 +66,6 @@ namespace
 		X_ALIGN_OF(CVarIntRef)>::value,
 		X_ALIGN_OF(CVarColRef)>::value;
 
-	static const size_t VAR_MAX = 4096;
-	static const char* CONFIG_FILE_EXTENSION = "cfg";
-
 
 	template <typename T, typename T2>
 	inline float PercentageOf(const T& sub, const T2& of)
@@ -543,6 +540,7 @@ void ConsoleCommandArgs::TokenizeString(const char *begin, const char* end)
 //////////////////////////////////////////////////////////////////////////
 
 const char* XConsole::CMD_HISTORY_FILE_NAME = "cmdHistory.txt";
+const char* XConsole::CONFIG_FILE_EXTENSION = "cfg";
 
 int XConsole::console_debug = 0;
 int XConsole::console_save_history = 0;
