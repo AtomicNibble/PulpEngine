@@ -43,6 +43,7 @@ public:
 	void setPosition(const Vec3f& pos);
 	void setAxis(const Matrix33f& mat);
 	void setSize(float dNear, float dFar, float dLeft, float dUp);
+	void setFov(float fov);
 
 	// get a goat
 	const Vec3f getPosition(void) const;
@@ -111,8 +112,8 @@ private:
 
 	// pos + ang
 	Matrix34f mat_;
-//	float near_;
-//	float far_;
+	float near_;
+	float far_;
 	float left_;
 	float up_;
 	float invFar_;		// 1.0f / dFar
