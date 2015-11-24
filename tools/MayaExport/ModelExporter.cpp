@@ -1990,16 +1990,16 @@ bool MayaModel::save(const char *filename)
 		
 				for (x = 0; x < mesh->faces.size(); x++)
 				{
-					const Vec3<int32_t>& f = mesh->faces[x];
+					const Vec3<int32_t>& face = mesh->faces[x];
 
 #if 1 // flip winding.
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[2]));
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[1]));
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[0]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[2]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[1]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[0]));
 #else
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[0]));
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[1]));
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[2]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[0]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[1]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[2]));
 #endif
 				}
 
