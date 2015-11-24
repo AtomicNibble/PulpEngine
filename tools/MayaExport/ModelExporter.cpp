@@ -1190,7 +1190,7 @@ void MayaLOD::MergeMeshes(void)
 		{
 			// thread it.
 			core::Thread threads[numThreads];
-			core::Array<MayaMesh*>	meshes[numThreads] = { g_arena, g_arena };
+			core::Array<MayaMesh*>	threadMeshes[numThreads] = { g_arena, g_arena };
 
 			uint numPerThread = numMeshes / numThreads;
 			uint currentThread = 0;
@@ -1199,12 +1199,12 @@ void MayaLOD::MergeMeshes(void)
 					currentThread++;
 					numPerThread += (numMeshes / numThreads);
 				}
-				meshes[currentThread].append(meshes_[i]);
+				threadMeshes[currentThread].append(meshes_[i]);
 			}
 
 			for (i = 0; i < numThreads; i++) {
 				threads[i].Create("merge worker"); // default stack size
-				threads[i].setData(&meshes[i]);
+				threads[i].setData(&threadMeshes[i]);
 			}
 
 			for (i = 0; i < numThreads; i++) {
