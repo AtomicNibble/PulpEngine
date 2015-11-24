@@ -75,9 +75,6 @@ stdout_(nullptr),
 stdin_(nullptr),
 stderr_(nullptr)
 {
-//	int hConHandle;
-//	HANDLE lStdHandle;
-
 	lastError::Description Dsc;
 
 	// allocate a console for this app
@@ -112,29 +109,7 @@ stderr_(nullptr)
 		return;
 	}
 
-	/*
-	lStdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
-	stdout_ = _fdopen( hConHandle, "w" );
-	*stdout = *stdout_;
-//	setvbuf( stdout, NULL, _IONBF, 0 );
-
-	lStdHandle = GetStdHandle(STD_INPUT_HANDLE);
-	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
-	stdin_ = _fdopen( hConHandle, "r" );
-	*stdin = *stdin_;
-//	setvbuf( stdin, NULL, _IONBF, 0 );
-
-
-	lStdHandle = GetStdHandle(STD_ERROR_HANDLE);
-	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
-	stderr_ = _fdopen( hConHandle, "w" );
-	*stderr = *stderr_;
-//	setvbuf( stderr, NULL, _IONBF, 0 );
-	*/
 	SetTitle( title );
-
-//	std::ios::sync_with_stdio();
 }
 
 /// Frees all resources.
