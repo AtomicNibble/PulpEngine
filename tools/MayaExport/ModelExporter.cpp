@@ -1647,7 +1647,6 @@ bool MayaModel::save(const char *filename)
 	PROFILE_MAYA("save");
 
 	FILE* f;
-	MayaBone* bone;
 	size_t i, x, k, j;
 	size_t numMesh;
 	size_t meshHeadOffsets = sizeof(model::ModelHeader);
@@ -1687,9 +1686,12 @@ bool MayaModel::save(const char *filename)
 		header.dataSize = (header.subDataSize + 
 			header.tagNameDataSize + header.materialNameDataSize);
 
+		{
+			MayaBone* bone = nullptr;
 
-		for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next()) {
-			meshHeadOffsets += bone->getDataSize();
+			for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next()) {
+				meshHeadOffsets += bone->getDataSize();
+			}
 		}
 
 		for (i = 0; i < numLods; i++)
@@ -1760,6 +1762,8 @@ bool MayaModel::save(const char *filename)
 
 		// bone data.
 		{
+			MayaBone* bone = nullptr;
+
 			// TAG NAMES
 			for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next()) 
 			{
