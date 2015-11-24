@@ -1047,11 +1047,11 @@ MStatus MayaLOD::LoadMeshes(void)
 										// make sure we replace the current lowest.
 										numVertsTrimmed++;
 
-										int w, smallest = -1;
-										for (w = 0; w < numAdded; w++) {
-											const float checkWeight = mesh->weights[vert->startWeightIdx + w].weight;
+										int wIdx, smallest = -1;
+										for (wIdx = 0; wIdx < numAdded; wIdx++) {
+											const float checkWeight = mesh->weights[vert->startWeightIdx + wIdx].weight;
 											if (checkWeight < weight.weight) {
-												smallest = w; // save the index.
+												smallest = wIdx; // save the index.
 											}
 										}
 
