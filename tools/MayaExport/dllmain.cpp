@@ -50,7 +50,7 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 	ver.append(" - Debug");
 #endif // !X_DEBUG
 
-	MFnPlugin plugin(obj, "WinCat - "X_ENGINE_NAME" Engine", ver.c_str(), "Any");
+	MFnPlugin plugin(obj, "WinCat - " X_ENGINE_NAME " Engine", ver.c_str(), "Any");
 
 	MStatus stat;
 
