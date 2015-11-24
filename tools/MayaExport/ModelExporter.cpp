@@ -1309,7 +1309,7 @@ void MayaModel::getBindPose(const MObject &jointNode, MayaBone *bone, float scal
 
 					// get the world matrix data
 					MObject worldMatrix;
-					MStatus status = pWorldMatrix.getValue(worldMatrix);
+					status = pWorldMatrix.getValue(worldMatrix);
 					if (MS::kSuccess != status) {
 						// Problem retrieving world matrix
 						return;
