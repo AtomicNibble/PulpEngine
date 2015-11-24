@@ -20,7 +20,7 @@
     </ClCompile>
 	<Link>
 		<TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
-		<AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\$(PlatformName)\;$(SolutionDir)..\..\build\$(PlatformName)\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+		<AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\$(PlatformToolset)\$(PlatformName)\;$(SolutionDir)..\..\build\$(PlatformName)\Release\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
 	</Link>
   </ItemDefinitionGroup>
 </Project> 

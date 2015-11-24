@@ -1047,11 +1047,11 @@ MStatus MayaLOD::LoadMeshes(void)
 										// make sure we replace the current lowest.
 										numVertsTrimmed++;
 
-										int w, smallest = -1;
-										for (w = 0; w < numAdded; w++) {
-											const float checkWeight = mesh->weights[vert->startWeightIdx + w].weight;
+										int wIdx, smallest = -1;
+										for (wIdx = 0; wIdx < numAdded; wIdx++) {
+											const float checkWeight = mesh->weights[vert->startWeightIdx + wIdx].weight;
 											if (checkWeight < weight.weight) {
-												smallest = w; // save the index.
+												smallest = wIdx; // save the index.
 											}
 										}
 
@@ -1190,7 +1190,7 @@ void MayaLOD::MergeMeshes(void)
 		{
 			// thread it.
 			core::Thread threads[numThreads];
-			core::Array<MayaMesh*>	meshes[numThreads] = { g_arena, g_arena };
+			core::Array<MayaMesh*>	threadMeshes[numThreads] = { g_arena, g_arena };
 
 			uint numPerThread = numMeshes / numThreads;
 			uint currentThread = 0;
@@ -1199,12 +1199,12 @@ void MayaLOD::MergeMeshes(void)
 					currentThread++;
 					numPerThread += (numMeshes / numThreads);
 				}
-				meshes[currentThread].append(meshes_[i]);
+				threadMeshes[currentThread].append(meshes_[i]);
 			}
 
 			for (i = 0; i < numThreads; i++) {
 				threads[i].Create("merge worker"); // default stack size
-				threads[i].setData(&meshes[i]);
+				threads[i].setData(&threadMeshes[i]);
 			}
 
 			for (i = 0; i < numThreads; i++) {
@@ -1309,7 +1309,7 @@ void MayaModel::getBindPose(const MObject &jointNode, MayaBone *bone, float scal
 
 					// get the world matrix data
 					MObject worldMatrix;
-					MStatus status = pWorldMatrix.getValue(worldMatrix);
+					status = pWorldMatrix.getValue(worldMatrix);
 					if (MS::kSuccess != status) {
 						// Problem retrieving world matrix
 						return;
@@ -1647,7 +1647,6 @@ bool MayaModel::save(const char *filename)
 	PROFILE_MAYA("save");
 
 	FILE* f;
-	MayaBone* bone;
 	size_t i, x, k, j;
 	size_t numMesh;
 	size_t meshHeadOffsets = sizeof(model::ModelHeader);
@@ -1687,9 +1686,12 @@ bool MayaModel::save(const char *filename)
 		header.dataSize = (header.subDataSize + 
 			header.tagNameDataSize + header.materialNameDataSize);
 
+		{
+			MayaBone* bone = nullptr;
 
-		for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next()) {
-			meshHeadOffsets += bone->getDataSize();
+			for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next()) {
+				meshHeadOffsets += bone->getDataSize();
+			}
 		}
 
 		for (i = 0; i < numLods; i++)
@@ -1760,6 +1762,8 @@ bool MayaModel::save(const char *filename)
 
 		// bone data.
 		{
+			MayaBone* bone = nullptr;
+
 			// TAG NAMES
 			for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next()) 
 			{
@@ -1990,16 +1994,16 @@ bool MayaModel::save(const char *filename)
 		
 				for (x = 0; x < mesh->faces.size(); x++)
 				{
-					const Vec3<int32_t>& f = mesh->faces[x];
+					const Vec3<int32_t>& face = mesh->faces[x];
 
 #if 1 // flip winding.
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[2]));
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[1]));
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[0]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[2]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[1]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[0]));
 #else
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[0]));
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[1]));
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(f[2]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[0]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[1]));
+					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[2]));
 #endif
 				}
 

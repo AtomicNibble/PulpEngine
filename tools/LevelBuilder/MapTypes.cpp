@@ -267,7 +267,7 @@ void XMapPatch::GenerateNormals(void)
 	Vec3f		around[8], temp;
 	bool		good[8];
 	bool		wrapWidth, wrapHeight;
-	static size_t	neighbors[8][2] = {
+	static int32_t	neighbors[8][2] = {
 		{ 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, 
 		{ 0, -1 }, { -1, -1 }, { -1, 0 }, { -1, 1 }
 	};
