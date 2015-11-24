@@ -14,9 +14,9 @@
 
 // Google Test
 #if X_DEBUG == 1
-X_LINK_LIB("gtestd"X_CPUSTRING)
+X_LINK_LIB("gtestd")
 #else
-X_LINK_LIB("gtest"X_CPUSTRING)
+X_LINK_LIB("gtest")
 #endif
 
 // X_LINK_LIB("Shlwapi") // GetModuleFileNameW
@@ -92,7 +92,7 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	EngineApp engine;
 
 	core::Console Console(L"Engine Uint Test Log");
-	Console.RedirectSTD();
+//	Console.RedirectSTD();
 	Console.SetSize(150, 60, 8000);
 	Console.MoveTo(10, 10);
 
