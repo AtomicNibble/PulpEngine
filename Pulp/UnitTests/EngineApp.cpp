@@ -28,7 +28,7 @@ EngineApp::~EngineApp()
 }
 
 
-bool EngineApp::Init(const char* sInCmdLine, core::Console& Console)
+bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 {
 	SCoreInitParams params;
 	params.hInstance = g_hInstance;

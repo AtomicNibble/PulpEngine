@@ -3,8 +3,6 @@
 #include "EngineApp.h"
 #include "gtest\gtest.h"
 
-#include <shellapi.h>
-
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
@@ -83,7 +81,7 @@ const char* googleTestResTostr(int nRes)
 	return "ERROR";
 }
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	g_hInstance = hInstance;
 //	InitRootDir();
@@ -104,18 +102,13 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	if (engine.Init(lpCmdLine, Console))
 	{		
-		int numArgs;
-		LPWSTR* pCmdLine;
-
-		pCmdLine = CommandLineToArgvW(GetCommandLineW(), &numArgs);
-
 		{
 			X_ASSERT_NOT_NULL(gEnv);
 			X_ASSERT_NOT_NULL(gEnv->pCore);
 			gEnv->pCore->RegisterAssertHandler(&g_AssetChecker);
 
 			X_LOG0("TESTS", "Running unit tests...");
-			testing::InitGoogleTest(&numArgs, pCmdLine);
+			testing::InitGoogleTest(&__argc, __wargv);
 			nRes = RUN_ALL_TESTS();
 
 			X_LOG0("TESTS", "Tests Complete result: %s", googleTestResTostr(nRes));
