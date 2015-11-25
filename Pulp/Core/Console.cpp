@@ -749,7 +749,7 @@ void XConsole::SaveChangedVars(void)
 	mode.Set(fileMode::WRITE);
 	mode.Set(fileMode::RECREATE);
 
-	if (file.openFile("user_config.cfg", mode))
+	if (file.openFile("config//user_config.cfg", mode))
 	{
 		file.writeStringNNT("// auto generated\n");
 
