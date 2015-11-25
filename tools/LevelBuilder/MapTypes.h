@@ -84,29 +84,9 @@ protected:
 class XMapPatch : public XMapPrimitive
 {
 public:
-	XMapPatch(void) : XMapPrimitive(PrimType::PATCH),
-		verts_(g_arena),
-		indexes_(g_arena),
-		edges_(g_arena),
-		edgeIndexes_(g_arena),
-		width_(0), height_(0), 
-		maxWidth_(0), maxHeight_(0) 
-	{ 
-		isMesh_ = false;
-		expanded_ = false;
-	}
-	XMapPatch(int w, int h) : XMapPrimitive(PrimType::PATCH),
-		verts_(g_arena),
-		indexes_(g_arena),
-		edges_(g_arena),
-		edgeIndexes_(g_arena),
-		width_(w), height_(h),
-		maxWidth_(w), maxHeight_(h) 
-	{
-		isMesh_ = false;
-		expanded_ = false;
-	}
-	~XMapPatch(void) X_OVERRIDE {}
+	XMapPatch(void);
+	XMapPatch(int w, int h);
+	~XMapPatch(void);
 
 
 	X_INLINE void SetHorzSubdivisions(size_t num) { horzSubdivisions_ = num; }
@@ -140,6 +120,8 @@ public:
 		float maxLength, bool genNormals = false);
 	void SubdivideExplicit(size_t horzSubdivisions, size_t vertSubdivisions,
 		bool genNormals, bool removeLinear = false);
+
+	void CreateNormalsAndIndexes(void);
 
 private:
 	void PutOnCurve(void);
