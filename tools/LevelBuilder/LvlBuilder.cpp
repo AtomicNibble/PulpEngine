@@ -485,7 +485,8 @@ bool LvlBuilder::processPatch(LvlEntity& ent,
 		mapPatch->CreateNormalsAndIndexes();
 	}
 	else {
-		mapPatch->Subdivide(DEFAULT_CURVE_MAX_ERROR, DEFAULT_CURVE_MAX_ERROR, DEFAULT_CURVE_MAX_LENGTH, true);
+		mapPatch->Subdivide(DEFAULT_CURVE_MAX_ERROR, DEFAULT_CURVE_MAX_ERROR, 
+			DEFAULT_CURVE_MAX_LENGTH, true);
 	}
 
 	engine::IMaterial* pMaterial = matMan_.loadMaterial(mapPatch->GetMatName());
