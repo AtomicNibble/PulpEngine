@@ -482,8 +482,7 @@ bool LvlBuilder::processPatch(LvlEntity& ent,
 //	}
 
 	if (mapPatch->isMesh()) {
-		mapPatch->SubdivideExplicit(mapPatch->GetHorzSubdivisions(),
-			mapPatch->GetVertSubdivisions(), true);
+		mapPatch->CreateNormalsAndIndexes();
 	}
 	else {
 		mapPatch->Subdivide(DEFAULT_CURVE_MAX_ERROR, DEFAULT_CURVE_MAX_ERROR, DEFAULT_CURVE_MAX_LENGTH, true);
