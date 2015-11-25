@@ -8,61 +8,6 @@
 
 namespace
 {
-
-	static void ComputeAxisBase(const Vec3f& normal_, Vec3f& texS, Vec3f& texT)
-	{
-		float RotY, RotZ;
-		Vec3f normal = normal_;
-
-		// do some cleaning
-		if (math<float>::abs(normal[0]) < 1e-6) {
-			normal[0] = 0.0f;
-		}
-		if (math<float>::abs(normal[1]) < 1e-6) {
-			normal[1] = 0.0f;
-		}
-		if (math<float>::abs(normal[2]) < 1e-6) {
-			normal[2] = 0.0f;
-		}
-
-		// length of x,y
-		float sqRt = math<float>::sqrt(normal[1] * normal[1] + normal[0] * normal[0]);
-
-		// angle against x axis for the position: normal[2], sqRt (y,x)
-		RotY = -math<float>::atan2(normal[2], sqRt);
-		// angle against x axis for the: y, x (y,z)
-		RotZ = math<float>::atan2(normal[1], normal[0]);
-
-
-		float RotZSin = math<float>::sin(RotZ);
-		float RotZCos = math<float>::cos(RotZ);
-		float RotYSin = math<float>::sin(RotY);
-		float RotYCos = math<float>::cos(RotY);
-
-		// rotate (0,1,0) and (0,0,1) to compute texS and texT
-		texS[0] = -RotZSin;
-		texS[1] = RotZCos;
-		texS[2] = 0.f;
-
-		// the texT vector is along -Z ( T texture coorinates axis )
-		texT[0] = -(RotYSin * RotZCos);
-		texT[1] = -(RotYSin * RotZSin);
-		texT[2] = -RotYCos;
-	}
-
-	static void ConvertTexMatWithQTexture(Vec3f texMat1[2], Vec3f texMat2[2])
-	{
-		float s1, s2;
-		s1 = (512.0f) / (512.0f);
-		s2 = (512.0f) / (512.0f);
-		texMat2[0][0] = s1 * texMat1[0][0];
-		texMat2[0][1] = s1 * texMat1[0][1];
-		texMat2[0][2] = s1 * texMat1[0][2];
-		texMat2[1][0] = s2 * texMat1[1][0];
-		texMat2[1][1] = s2 * texMat1[1][1];
-		texMat2[1][2] = s2 * texMat1[1][2];
-	}
-
 	Vec3f baseaxis[18] =
 	{
 		{ 1.0, 0.0, 0.0 },
@@ -161,7 +106,6 @@ namespace
 		float	ns, nt;
 		int		i, j;
 
-		// TextureAxisFromPlane(plane, vecs[0], vecs[1]);
 		TextureAxisFromPlane(plane.getNormal(), vecs[0], vecs[1]);
 
 		if (!scale[0]) {
