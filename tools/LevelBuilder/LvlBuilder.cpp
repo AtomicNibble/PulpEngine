@@ -95,10 +95,10 @@ namespace
 	void TextureAxisFromPlane(const Vec3f& normal, Vec3f& a2, Vec3f& a3)
 	{
 		size_t axis; 
-		float temp; 
+		float largestAxis;
 
 		axis = 0;
-		temp = 0.0;
+		largestAxis = 0.0;
 
 		const float x = normal[0];
 		const float y = normal[1];
@@ -111,36 +111,36 @@ namespace
 		// Z
 		if (z > 0.0)
 		{
-			temp = z;
+			largestAxis = z;
 		}
 
-		if (temp < negZ)
+		if (largestAxis < negZ)
 		{
-			temp = negZ;
+			largestAxis = negZ;
 			axis = 1;
 		}
 
 		// X
-		if (temp < x)
+		if (largestAxis < x)
 		{
-			temp = x;
+			largestAxis = x;
 			axis = 2;
 		}
 
-		if (temp < negX)
+		if (largestAxis < negX)
 		{
-			temp = negX;
+			largestAxis = negX;
 			axis = 3;
 		}
 
 		// Y
-		if (temp < y)
+		if (largestAxis < y)
 		{
-			temp = y;
+			largestAxis = y;
 			axis = 4;
 		}
 
-		if (temp < negY) {
+		if (largestAxis < negY) {
 			axis = 5;
 		}
 
