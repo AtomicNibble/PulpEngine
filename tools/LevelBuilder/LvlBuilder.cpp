@@ -88,14 +88,13 @@ namespace
 		{ 1.0, 0.0, 0.0 },
 		{ 0.0, 0.0, -1.0 },
 		{ 0.0, -1.0, 0.0 }
-	}; // idb
+	}; 
 
 
 	X_DISABLE_WARNING(4244)
-	int TextureAxisFromPlane(const Vec3f& normal, Vec3f& a2, Vec3f& a3)
+	void TextureAxisFromPlane(const Vec3f& normal, Vec3f& a2, Vec3f& a3)
 	{
 		size_t axis; 
-		int result; 
 		float temp; 
 
 		axis = 0;
@@ -146,14 +145,10 @@ namespace
 		}
 
 		X_ASSERT(((3 * axis + 1) < 18),"axis out of range")(axis);
-
-		result = 36 * axis;
-
 		a2 = baseaxis[3 * axis];
 		a3 = baseaxis[3 * axis + 1];
-
-		return result;
 	}
+
 	X_ENABLE_WARNING(4244)
 
 
