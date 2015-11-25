@@ -112,36 +112,37 @@ namespace
 		if (z > 0.0)
 		{
 			largestAxis = z;
+			axis = 0; // positive Z
 		}
 
 		if (largestAxis < negZ)
 		{
 			largestAxis = negZ;
-			axis = 1;
+			axis = 1; // negative Z
 		}
 
 		// X
 		if (largestAxis < x)
 		{
 			largestAxis = x;
-			axis = 2;
+			axis = 2; // positive X
 		}
 
 		if (largestAxis < negX)
 		{
 			largestAxis = negX;
-			axis = 3;
+			axis = 3; // negative Z
 		}
 
 		// Y
 		if (largestAxis < y)
 		{
 			largestAxis = y;
-			axis = 4;
+			axis = 4; // positive Y
 		}
 
 		if (largestAxis < negY) {
-			axis = 5;
+			axis = 5; // negative Y
 		}
 
 		X_ASSERT(((3 * axis + 1) < 18),"axis out of range")(axis);
