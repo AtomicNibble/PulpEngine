@@ -243,8 +243,8 @@ bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 
 	X_LOG0("Map", "Total world brush: ^8%i", entities_[0].brushes.size());
 	X_LOG0("Map", "Total world patches: ^8%i", entities_[0].patches.size()); // TODO
-	X_LOG0("Map", "Total total brush: ^8%i", stats_.numBrushes);
-	X_LOG0("Map", "Total total patches: ^8%i", stats_.numPatches);
+	X_LOG0("Map", "Total brush: ^8%i", stats_.numBrushes);
+	X_LOG0("Map", "Total patches: ^8%i", stats_.numPatches);
 	X_LOG0("Map", "Total entities: ^8%i", stats_.numEntities);
 	X_LOG0("Map", "Total planes: ^8%i", this->planes.size());
 	X_LOG0("Map", "Total areaPortals: ^8%i", stats_.numAreaPortals);
