@@ -486,7 +486,8 @@ void XMapPatch::GenerateIndexes(void)
 }
 
 
-void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, float maxLength, bool genNormals)
+void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, 
+	float maxLength, bool genNormals)
 {
 	size_t	i, j, k, l;
 	xVert	prev, next, mid;
@@ -513,15 +514,21 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 		{
 			for (l = 0; l < 3; l++) 
 			{
-				prevxyz[l] = verts_[i*maxWidth_ + j + 1].pos[l] - verts_[i*maxWidth_ + j].pos[l];
-				nextxyz[l] = verts_[i*maxWidth_ + j + 2].pos[l] - verts_[i*maxWidth_ + j + 1].pos[l];
-				midxyz[l] = (verts_[i*maxWidth_ + j].pos[l] + verts_[i*maxWidth_ + j + 1].pos[l] * 2.0f +
+				prevxyz[l] = verts_[i*maxWidth_ + j + 1].pos[l] - 
+					verts_[i*maxWidth_ + j].pos[l];
+
+				nextxyz[l] = verts_[i*maxWidth_ + j + 2].pos[l] - 
+					verts_[i*maxWidth_ + j + 1].pos[l];
+
+				midxyz[l] = (verts_[i*maxWidth_ + j].pos[l] + 
+					verts_[i*maxWidth_ + j + 1].pos[l] * 2.0f +
 					verts_[i*maxWidth_ + j + 2].pos[l]) * 0.25f;
 			}
 
 			if (maxLength > 0.0f) {
 				// if the span length is too long, force a subdivision
-				if (prevxyz.lengthSquared() > maxLengthSqr || nextxyz.lengthSquared() > maxLengthSqr) {
+				if (prevxyz.lengthSquared() > maxLengthSqr ||
+					nextxyz.lengthSquared() > maxLengthSqr) {
 					break;
 				}
 			}
@@ -572,15 +579,21 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 		{
 			for (l = 0; l < 3; l++)
 			{
-				prevxyz[l] = verts_[(j + 1)*maxWidth_ + i].pos[l] - verts_[j*maxWidth_ + i].pos[l];
-				nextxyz[l] = verts_[(j + 2)*maxWidth_ + i].pos[l] - verts_[(j + 1)*maxWidth_ + i].pos[l];
-				midxyz[l] = (verts_[j*maxWidth_ + i].pos[l] + verts_[(j + 1)*maxWidth_ + i].pos[l] * 2.0f +
+				prevxyz[l] = verts_[(j + 1)*maxWidth_ + i].pos[l] -
+					verts_[j*maxWidth_ + i].pos[l];
+
+				nextxyz[l] = verts_[(j + 2)*maxWidth_ + i].pos[l] - 
+					verts_[(j + 1)*maxWidth_ + i].pos[l];
+
+				midxyz[l] = (verts_[j*maxWidth_ + i].pos[l] + 
+					verts_[(j + 1)*maxWidth_ + i].pos[l] * 2.0f +
 					verts_[(j + 2)*maxWidth_ + i].pos[l]) * 0.25f;
 			}
 
 			if (maxLength > 0.0f) {
 				// if the span length is too long, force a subdivision
-				if (prevxyz.lengthSquared() > maxLengthSqr || nextxyz.lengthSquared() > maxLengthSqr) {
+				if (prevxyz.lengthSquared() > maxLengthSqr ||
+					nextxyz.lengthSquared() > maxLengthSqr) {
 					break;
 				}
 			}
@@ -745,7 +758,9 @@ void XMapPatch::SubdivideExplicit(size_t horzSubdivisions, size_t vertSubdivisio
 				}
 			}
 
-			SampleSinglePatch(sample, baseCol, baseRow, outWidth, horzSubdivisions, vertSubdivisions, dv);
+			SampleSinglePatch(sample, baseCol, baseRow, outWidth, 
+				horzSubdivisions, vertSubdivisions, dv);
+
 			baseRow += vertSubdivisions;
 		}
 
