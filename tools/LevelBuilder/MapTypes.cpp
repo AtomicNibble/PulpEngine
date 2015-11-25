@@ -211,7 +211,7 @@ void XMapPatch::RemoveLinearColumnsRows(void)
 
 void XMapPatch::ResizeExpanded(size_t newHeight, size_t newWidth)
 {
-	size_t i, j;
+	int32_t i, j; // must be signed
 
 	X_ASSERT(expanded_,"needs to be exapanded")(expanded_);
 	if (newHeight <= maxHeight_ && newWidth <= maxWidth_) {
