@@ -766,6 +766,7 @@ void XConsole::SaveChangedVars(void)
 					const char* pName = pVar->GetName();
 					const char* pValue = pVar->GetString();
 
+					file.writeStringNNT("seta ");
 					file.writeStringNNT(pName);
 					file.write(' ');
 					file.writeStringNNT(pValue);
