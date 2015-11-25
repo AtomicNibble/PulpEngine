@@ -476,30 +476,32 @@ bool LvlBuilder::processPatch(LvlEntity& ent,
 		return false;
 	}
 
+	mapfile::XMapPatch& patch = *mapPatch;
+
 	// meshes not supported yet.
 //	if (mapBrush->isMesh()) {
 //		return false;
 //	}
 
-	if (mapPatch->isMesh()) {
-		mapPatch->CreateNormalsAndIndexes();
+	if (patch.isMesh()) {
+		patch.CreateNormalsAndIndexes();
 	}
 	else {
-		mapPatch->Subdivide(DEFAULT_CURVE_MAX_ERROR, DEFAULT_CURVE_MAX_ERROR, 
+		patch.Subdivide(DEFAULT_CURVE_MAX_ERROR, DEFAULT_CURVE_MAX_ERROR,
 			DEFAULT_CURVE_MAX_LENGTH, true);
 	}
 
-	engine::IMaterial* pMaterial = matMan_.loadMaterial(mapPatch->GetMatName());
+	engine::IMaterial* pMaterial = matMan_.loadMaterial(patch.GetMatName());
 
 	// create a Primative
-	for (i = 0; i < mapPatch->GetNumIndexes(); i += 3)
+	for (i = 0; i < patch.GetNumIndexes(); i += 3)
 	{
 		LvlTris& tri = ent.patches.AddOne();
 
 		tri.pMaterial = pMaterial;
-		tri.verts[2] = (*mapPatch)[mapPatch->GetIndexes()[i + 0]];
-		tri.verts[1] = (*mapPatch)[mapPatch->GetIndexes()[i + 2]];
-		tri.verts[0] = (*mapPatch)[mapPatch->GetIndexes()[i + 1]];
+		tri.verts[2] = patch[patch.GetIndexes()[i + 0]];
+		tri.verts[1] = patch[patch.GetIndexes()[i + 2]];
+		tri.verts[0] = patch[patch.GetIndexes()[i + 1]];
 	}
 
 	// stats
