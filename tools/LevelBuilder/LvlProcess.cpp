@@ -745,6 +745,7 @@ bool LvlBuilder::AddMapTriToAreas(LvlEntity& worldEnt, XPlaneSet& planeSet, cons
 
 	// skip degenerate triangles from pinched curves
 	if (MapTriArea(tri) <= 0) {
+		X_WARNING("Tri", "degenerate tri");
 		return false;
 	}
 
@@ -768,6 +769,7 @@ bool LvlBuilder::AddMapTriToAreas(LvlEntity& worldEnt, XPlaneSet& planeSet, cons
 
 		PlaneForTri(tri, plane);
 		planeNum = planeSet.FindPlane(plane, PLANE_NORMAL_EPSILON, PLANE_DIST_EPSILON);
+
 
 		//	TexVecForTri(&texVec, newTri);
 		//	AddTriListToArea(e, newTri, planeNum, area, &texVec);
