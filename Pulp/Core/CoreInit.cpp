@@ -390,6 +390,9 @@ bool XCore::InitConsole()
 {
 	env_.pConsole->Startup(this);
 
+	env_.pConsole->LoadConfig("user_config.cfg");
+
+
 	return true;
 }
 
