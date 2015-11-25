@@ -27,7 +27,7 @@ TEST(Half, Single) {
 
 	out = XHalfCompressor::compress(0.12345678f);
 
-	EXPECT_EQ(12262, out);
+	EXPECT_NEAR(12262, out, 1);
 	EXPECT_NEAR(0.12345678f, XHalfCompressor::decompress(out), 0.0001f);
 }
 
