@@ -90,7 +90,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 	EngineApp engine;
 
 	core::Console Console(L"Engine Uint Test Log");
-//	Console.RedirectSTD();
+	Console.RedirectSTD();
 	Console.SetSize(150, 60, 8000);
 	Console.MoveTo(10, 10);
 
@@ -109,6 +109,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
 			X_LOG0("TESTS", "Running unit tests...");
 			testing::InitGoogleTest(&__argc, __wargv);
+
 			nRes = RUN_ALL_TESTS();
 
 			X_LOG0("TESTS", "Tests Complete result: %s", googleTestResTostr(nRes));
