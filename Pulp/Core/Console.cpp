@@ -751,27 +751,29 @@ void XConsole::SaveChangedVars(void)
 
 	if (file.openFile("user_config.cfg", mode))
 	{
-		file.writeStringNNT("// auto generated");
+		file.writeStringNNT("// auto generated\n");
 
 		for (itrVar = VarMap_.begin(); itrVar != itrVarEnd; ++itrVar)
 		{
 			ICVar* pVar = itrVar->second;
 			ICVar::FlagType flags = pVar->GetFlags();
 
-			if (flags.IsSet(VarFlag::SAVE_IF_CHANGED))
-			{
-				if (flags.IsSet(VarFlag::MODIFIED))
-				{
-					// save out name + value.
-					const char* pName = pVar->GetName();
-					const char* pValue = pVar->GetString();
+			// we always save 'ARCHIVE' and only save 'SAVE_IF_CHANGED' if 'MODIFIED'
+			bool save = (flags.IsSet(VarFlag::SAVE_IF_CHANGED) &&
+				flags.IsSet(VarFlag::MODIFIED)) ||
+				flags.IsSet(VarFlag::ARCHIVE);
 
-					file.writeStringNNT("seta ");
-					file.writeStringNNT(pName);
-					file.write(' ');
-					file.writeStringNNT(pValue);
-					file.write('\n');
-				}
+			if (save)
+			{
+				// save out name + value.
+				const char* pName = pVar->GetName();
+				const char* pValue = pVar->GetString();
+
+				file.writeStringNNT("seta ");
+				file.writeStringNNT(pName);
+				file.write(' ');
+				file.writeStringNNT(pValue);
+				file.write('\n');
 			}
 		}
 	}
