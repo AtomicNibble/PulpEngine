@@ -295,6 +295,16 @@ void Console::Show(bool show)
 
 void Console::RedirectSTD(void)
 {
+#if _MSC_FULL_VER >= 190023026
+	// shit got broken in vs2015 toolset v140
+	// https://connect.microsoft.com/VisualStudio/Feedback/Details/1924921
+
+	for (auto &file : { stdout, stderr }) {
+		freopen("CONOUT$", "w", file);
+		setvbuf(file, nullptr, _IONBF, 0);
+	}
+
+#else
 	int hConHandle;
 	HANDLE lStdHandle;
 
@@ -318,6 +328,7 @@ void Console::RedirectSTD(void)
 	//	setvbuf( stderr, NULL, _IONBF, 0 );
 
 	std::ios::sync_with_stdio();
+#endif // !_MSC_FULL_VER
 }
 
 X_NAMESPACE_END
