@@ -92,87 +92,65 @@ namespace
 
 
 	X_DISABLE_WARNING(4244)
-	int TextureAxisFromPlane(const Vec3f& a1, Vec3f& a2, Vec3f& a3)
+	int TextureAxisFromPlane(const Vec3f& normal, Vec3f& a2, Vec3f& a3)
 	{
-		signed int v3; // edx@1
-		double v4; // st6@1
-		double v5; // st4@1
-		double v6; // st3@1
-		float v7; // ST04_4@1
-		double v8; // st7@2
-		float v9; // ST04_4@4
-		double v10; // st5@6
-		float v11; // ST04_4@6
-		double v12; // rt2@8
-		double v13; // st4@8
-		double v14; // st6@8
-		float v15; // ST04_4@8
-		float v16; // ST04_4@10
-		float v17; // ST04_4@12
-		int result; // eax@14
-		float v19; // [sp+0h] [bp-8h]@1
+		size_t axis; 
+		int result; 
+		float temp; 
 
-		v3 = 0;
-		v19 = 0.0;
-		v4 = 0; // a1[1] * 0.0;
-		v5 = 0; // a1[0] * 0.0;
-		v6 = v5 + v4;
-		v7 = a1[2] + v5 + v4;
+		axis = 0;
+		temp = 0.0;
 
-		if (v7 <= 0.0)
+		const float x = normal[0];
+		const float y = normal[1];
+		const float z = normal[2];
+
+		const float negX = -normal[0];
+		const float negY = -normal[1];
+		const float negZ = -normal[2];
+
+		// Z
+		if (z > 0.0)
 		{
-			v8 = v6;
+			temp = z;
 		}
-		else
+
+		if (temp < negZ)
 		{
-			v8 = v6;
-			v19 = a1[2] + v5 + v4;
+			temp = negZ;
+			axis = 1;
 		}
 
-		v9 = v8 - a1[2] * 1.0;
-		if (v19 < v9)
+		// X
+		if (temp < x)
 		{
-			v19 = v8 - a1[2] * 1.0;
-			v3 = 1;
+			temp = x;
+			axis = 2;
 		}
 
-		v10 = 0.0 * a1[2];
-		v11 = a1[0] + v4 + v10;
-
-		if (v19 < v11)
+		if (temp < negX)
 		{
-			v19 = a1[0] + v4 + v10;
-			v3 = 2;
+			temp = negX;
+			axis = 3;
 		}
 
-		v12 = v5;
-		v13 = v4 - a1[0] * 1.0;
-		v14 = v12;
-		v15 = v13 + v10;
-
-		if (v19 < v15)
+		// Y
+		if (temp < y)
 		{
-			v19 = v13 + v10;
-			v3 = 3;
+			temp = y;
+			axis = 4;
 		}
 
-		v16 = a1[1] + v14 + v10;
-
-		if (v19 < v16)
-		{
-			v19 = a1[1] + v14 + v10;
-			v3 = 4;
+		if (temp < negY) {
+			axis = 5;
 		}
 
-		v17 = v14 - 1.0 * a1[1] + v10;
-		if (v19 < v17) {
-			v3 = 5;
-		}
+		X_ASSERT(((3 * axis + 1) < 18),"axis out of range")(axis);
 
-		result = 36 * v3;
+		result = 36 * axis;
 
-		a2 = baseaxis[3 * v3];
-		a3 = baseaxis[3 * v3 + 1];
+		a2 = baseaxis[3 * axis];
+		a3 = baseaxis[3 * axis + 1];
 
 		return result;
 	}
