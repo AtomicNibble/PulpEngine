@@ -484,7 +484,7 @@ typename Array<T>::size_type Array<T>::find(const Type& val) const
 			return i;
 	}
 
-	return (size_type)-1;
+	return invalid_index;
 }
 
 template<typename T>
