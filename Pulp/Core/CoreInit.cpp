@@ -203,6 +203,8 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	if (!startupParams.isCoreOnly())
 	{
 		env_.pConsole = X_NEW_ALIGNED(core::XConsole, g_coreArena, "ConsoleSys",8);
+		// register the commands so they can be used before Console::Init
+		env_.pConsole->RegisterCommnads();
 
 		// register system vars to the console.
 		CreateSystemVars();
@@ -320,6 +322,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	if (!InitConsole())
 		return false;
 
+#if X_DEBUG
+	// don't warn about shit like .txt!
+	hotReloadIgnores_.append(core::string("txt"));
+#endif // !X_DEBUG
 
 	core::symbolResolution::Refresh();
 

@@ -677,32 +677,35 @@ void XConsole::Startup(ICore* pCore)
 		" 1=expanded only 2=always");
 
 
-	ADD_COMMAND("exec", Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
-	ADD_COMMAND("help", Command_Help, VarFlag::SYSTEM, "displays help info");
-	ADD_COMMAND("listcmds", Command_ListCmd, VarFlag::SYSTEM, "lists avaliable commands");
-	ADD_COMMAND("listdvars", Command_ListDvars, VarFlag::SYSTEM, "lists dvars");
-	ADD_COMMAND("exit", Command_Exit, VarFlag::SYSTEM, "closes the game");
-	ADD_COMMAND("quit", Command_Exit, VarFlag::SYSTEM, "closes the game");
-	ADD_COMMAND("echo", Command_Echo, VarFlag::SYSTEM, "prints text in argument, prefix dvar's with # to print value.");
-	ADD_COMMAND("wait", Command_Wait, VarFlag::SYSTEM, "waits a given number of seconds before processing the next commands");
-	ADD_COMMAND("vreset", Command_VarReset, VarFlag::SYSTEM, "resets a variable to it's default value");
-	ADD_COMMAND("seta", Command_SetVarArchive, VarFlag::SYSTEM, "set a var and flagging it to be archived");
-
-	ADD_COMMAND("bind", Command_Bind, VarFlag::SYSTEM, "binds a key to a action Eg: bind shift a 'echo hello';");
-	ADD_COMMAND("clearbinds", Command_BindsClear, VarFlag::SYSTEM, "clears all binds");
-	ADD_COMMAND("listbinds", Command_BindsList, VarFlag::SYSTEM, "lists all the binds");
-
-
-	ADD_COMMAND("console_show", Command_ConsoleShow, VarFlag::SYSTEM, "opens the console");
-	ADD_COMMAND("console_hide", Command_ConsoleHide, VarFlag::SYSTEM, "hides the console");
-	ADD_COMMAND("console_toggle", Command_ConsoleToggle, VarFlag::SYSTEM, "toggle the console");
-
 	// hot reload
 	pCore->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
 
 	if (console_save_history) {
 		LoadCmdHistory();
 	}
+}
+
+void XConsole::RegisterCommnads(void)
+{
+	AddCommand("exec", Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
+	AddCommand("help", Command_Help, VarFlag::SYSTEM, "displays help info");
+	AddCommand("listcmds", Command_ListCmd, VarFlag::SYSTEM, "lists avaliable commands");
+	AddCommand("listdvars", Command_ListDvars, VarFlag::SYSTEM, "lists dvars");
+	AddCommand("exit", Command_Exit, VarFlag::SYSTEM, "closes the game");
+	AddCommand("quit", Command_Exit, VarFlag::SYSTEM, "closes the game");
+	AddCommand("echo", Command_Echo, VarFlag::SYSTEM, "prints text in argument, prefix dvar's with # to print value.");
+	AddCommand("wait", Command_Wait, VarFlag::SYSTEM, "waits a given number of seconds before processing the next commands");
+	AddCommand("vreset", Command_VarReset, VarFlag::SYSTEM, "resets a variable to it's default value");
+	AddCommand("seta", Command_SetVarArchive, VarFlag::SYSTEM, "set a var and flagging it to be archived");
+
+	AddCommand("bind", Command_Bind, VarFlag::SYSTEM, "binds a key to a action Eg: bind shift a 'echo hello';");
+	AddCommand("clearbinds", Command_BindsClear, VarFlag::SYSTEM, "clears all binds");
+	AddCommand("listbinds", Command_BindsList, VarFlag::SYSTEM, "lists all the binds");
+
+
+	AddCommand("console_show", Command_ConsoleShow, VarFlag::SYSTEM, "opens the console");
+	AddCommand("console_hide", Command_ConsoleHide, VarFlag::SYSTEM, "hides the console");
+	AddCommand("console_toggle", Command_ConsoleToggle, VarFlag::SYSTEM, "toggle the console");
 }
 
 void XConsole::ShutDown(void)
@@ -2729,6 +2732,11 @@ XConsoleNULL::~XConsoleNULL()
 void XConsoleNULL::Startup(ICore* pCore)
 {
 	X_UNUSED(pCore);
+
+}
+
+void XConsoleNULL::RegisterCommnads(void)
+{
 
 }
 
