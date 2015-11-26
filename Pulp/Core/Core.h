@@ -227,6 +227,12 @@ private:
 	typedef core::HashMap<const char* const, core::IXHotReload*> hotReloadMap;
 
 	hotReloadMap					hotReloadExtMap_;
+
+#if X_DEBUG
+	typedef core::Array<core::string> hotRelodIgnoreList;
+
+	hotRelodIgnoreList hotREloadIgnores_;
+#endif // !X_DEBUG
 	// ~Hotreload
 
 
