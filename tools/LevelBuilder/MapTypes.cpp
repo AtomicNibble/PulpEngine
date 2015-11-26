@@ -221,8 +221,8 @@ void XMapPatch::ResizeExpanded(size_t newHeight, size_t newWidth)
 		verts_.resize(newHeight * newWidth);
 	}
 	// space out verts_ for new height_ and width_
-	for (j = maxHeight_ - 1; j >= 0; j--) {
-		for (i = maxWidth_ - 1; i >= 0; i--) {
+	for (j = safe_static_cast<int32_t, size_t>(maxHeight_) - 1; j >= 0; j--) {
+		for (i = safe_static_cast<int32,size_t>(maxWidth_) - 1; i >= 0; i--) {
 			verts_[j*newWidth + i] = verts_[j*maxWidth_ + i];
 		}
 	}
