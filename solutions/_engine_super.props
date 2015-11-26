@@ -2,8 +2,6 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <_PropertySheetDisplayName>Engine Super</_PropertySheetDisplayName>
-    <OutDir>$(SolutionDir)..\..\build\$(PlatformName)\Super\</OutDir>
-    <IntDir>$(SolutionDir)..\..\Temp\$(Platform)\Super\$(ProjectName)\</IntDir>
    <TargetName>engine_$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>

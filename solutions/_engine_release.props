@@ -2,8 +2,6 @@
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <_PropertySheetDisplayName>Engine Release</_PropertySheetDisplayName>
-    <OutDir>$(SolutionDir)..\..\build\$(PlatformName)\Release\</OutDir>
-    <IntDir>$(SolutionDir)..\..\Temp\$(Platform)\Release\$(ProjectName)\</IntDir>
    <TargetName>engine_$(ProjectName)</TargetName>
   </PropertyGroup>
   <ItemDefinitionGroup>
