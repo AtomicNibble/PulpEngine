@@ -51,7 +51,7 @@ XCore::XCore() :
 	hotReloadExtMap_(g_coreArena),
 
 #if X_DEBUG
-	hotREloadIgnores_(g_coreArena),
+	hotReloadIgnores_(g_coreArena),
 #endif // !X_DEBUG
 
 	strAlloc_(1 << 24, core::VirtualMem::GetPageSize() * 2, 
@@ -460,7 +460,7 @@ bool XCore::OnFileChange(core::XDirectoryWatcher::Action::Enum action,
 #if X_DEBUG
 				// before we log a warning check to see if it's in the hotreload ignore list.
 				if (hotRelodIgnoreList::invalid_index == 
-					hotREloadIgnores_.find(core::string(ext)))
+					hotReloadIgnores_.find(core::string(ext)))
 				{
 					X_WARNING("hotReload", "file extension '%s' has no reload handle.", ext);
 				}

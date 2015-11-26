@@ -231,7 +231,7 @@ private:
 #if X_DEBUG
 	typedef core::Array<core::string> hotRelodIgnoreList;
 
-	hotRelodIgnoreList hotREloadIgnores_;
+	hotRelodIgnoreList hotReloadIgnores_;
 #endif // !X_DEBUG
 	// ~Hotreload
 
