@@ -62,6 +62,17 @@ X_INLINE void AABB::clear()
 	min[0] = min[1] = min[2] = INFINITY;
 }
 
+X_INLINE bool AABB::IsInfinate(void) const
+{
+	if (max[0] == -INFINITY && max[1] == -INFINITY && max[2] == -INFINITY) {
+		return true;
+	}
+	if (min[0] == INFINITY && min[1] == INFINITY && min[2] == INFINITY) {
+		return true;
+	}
+
+	return false;
+}
 
 X_INLINE bool AABB::isEmpty() const
 {
