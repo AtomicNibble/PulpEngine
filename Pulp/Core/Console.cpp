@@ -1238,12 +1238,15 @@ void XConsole::LoadCmdHistory(void)
 	}
 }
 
+void XConsole::ResetHistoryPos(void)
+{
+	HistoryPos_ = -1;
+}
 
 void XConsole::AddCmdToHistory(const char* Command)
 {
 	// so we can scroll through past commands.
-
-	HistoryPos_ = -1;
+	ResetHistoryPos();
 
 	if (!CmdHistory_.empty())
 	{

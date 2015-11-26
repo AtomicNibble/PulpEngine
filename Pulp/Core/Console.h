@@ -209,6 +209,7 @@ protected:
 	void SaveCmdHistory(void) const;
 	void LoadCmdHistory(void);
 	void AddCmdToHistory(const char* Command);
+	void ResetHistoryPos(void);
 	const char* GetHistory(CmdHistory::Enum direction);
 
 	// Binds a cmd to a key
