@@ -225,8 +225,6 @@ private:
 
 	// I think i can just use stack strings, since all handlers are hard coded.
 	typedef core::HashMap<const char* const, core::IXHotReload*> hotReloadMap;
-	// typedef std::map<const char* const, core::IXHotReload*> hotReloadMap;
-	//typedef std::map<core::string, core::IXHotReload*> hotReloadMap;
 
 	hotReloadMap					hotReloadExtMap_;
 	// ~Hotreload
