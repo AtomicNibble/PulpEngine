@@ -57,8 +57,8 @@ public:
 	bool Parse(const char* pData, size_t length);
 
 	size_t getNumEntities(void) const { return entities_.size(); }
-	size_t getNumBrushes(void) const { return numBrushes; }
-	size_t getNumPatches(void) const { return numPatches; }
+	size_t getNumBrushes(void) const { return numBrushes_; }
+	size_t getNumPatches(void) const { return numPatches_; }
 
 	XMapEntity* getEntity(int i) const { return entities_[i]; }
 
@@ -73,8 +73,8 @@ private:
 
 	EntityArray	entities_;
 
-	size_t numBrushes;
-	size_t numPatches;
+	size_t numBrushes_;
+	size_t numPatches_;
 };
 
 X_NAMESPACE_END

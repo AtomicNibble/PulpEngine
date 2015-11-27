@@ -489,8 +489,8 @@ primPoolArena_(&primAllocator_, "PrimativePool"),
 
 entities_(g_arena)
 {
-	numBrushes = 0;
-	numPatches = 0;
+	numBrushes_ = 0;
+	numPatches_ = 0;
 
 	// we typically will have a few hundred models, a load of triggers etc.
 	// might make this 8k
@@ -553,10 +553,10 @@ bool XMapFile::Parse(const char* pData, size_t length)
 				const XMapPrimitive* prim = mapEnt->GetPrimitive(i);
 
 				if (prim->getType() == PrimType::BRUSH) {
-					this->numBrushes++;
+					this->numBrushes_++;
 				}
 				else if (prim->getType() == PrimType::PATCH) {
-					this->numPatches++;
+					this->numPatches_++;
 				}
 			}
 
