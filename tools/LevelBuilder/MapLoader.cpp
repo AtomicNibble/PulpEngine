@@ -487,7 +487,8 @@ primPoolArena_(&primPoolAllocator_, "PrimativePool"),
 primPoolArena_(&primAllocator_, "PrimativePool"),
 #endif
 
-entities_(g_arena)
+entities_(g_arena),
+layers_(g_arena)
 {
 	numBrushes_ = 0;
 	numPatches_ = 0;

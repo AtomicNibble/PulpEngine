@@ -49,6 +49,7 @@ typedef core::MemoryArena<
 class XMapFile
 {
 	typedef core::Array<XMapEntity*> EntityArray;
+	typedef core::Array<Layer> LayerArray;
 
 public:
 	XMapFile();
@@ -72,6 +73,7 @@ private:
 	PrimativePoolArena		primPoolArena_;
 
 	EntityArray	entities_;
+	LayerArray layers_;
 
 	size_t numBrushes_;
 	size_t numPatches_;
