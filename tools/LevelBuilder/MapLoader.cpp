@@ -527,7 +527,15 @@ bool XMapFile::Parse(const char* pData, size_t length)
 			LexFlag::ALLOWPATHNAMES |
 			LexFlag::ALLOWDOLLARNAMES);
 
-		// we need to parse up untill the first brace.
+		// parce the layers and shit.
+
+	//	iwmap 4
+		if (!lexer.ExpectTokenString("iwmap 4")) {
+			X_ERROR("Map", "Failed to load map file correctly.");
+			return false;
+		}
+		lexer.SkipRestOfLine();
+
 		while (lexer.ReadToken(token))
 		{
 			if (token.isEqual("{"))
@@ -535,7 +543,48 @@ bool XMapFile::Parse(const char* pData, size_t length)
 				lexer.UnreadToken(token);
 				break;
 			}
+			else
+			{
+				Layer layer;
+
+				layer.name = core::string(token.begin(), token.end());
+
+				if(!lexer.ReadTokenOnLine(token)) {
+					X_ERROR("Map", "Error when parsing layers");
+					return false;
+				}
+
+				if (!token.isEqual("flags")) {
+					X_ERROR("Map", "Error when parsing layers");
+					return false;
+				}
+
+				// read the flags
+				while (lexer.ReadTokenOnLine(token)) 	
+				{
+					core::string flag(token.begin(), token.end());
+
+					if (flag.compare("active")) {
+						layer.flags.Set(LayerFlag::ACTIVE);
+					}
+					else if (flag.compare("expanded")) {
+						layer.flags.Set(LayerFlag::EXPANDED);
+					}
+					else if (flag.compare("ignore")) {
+						layer.flags.Set(LayerFlag::IGNORE);
+					}
+					else {
+						X_WARNING("Map", "Unkown layer flag: '%s'",
+							flag.c_str());
+					}
+				}
+
+				layers_.push_back(layer);
+
+			}
 		}
+
+		ListLayers();
 
 		// load all the entites.
 		while (1) 
@@ -567,6 +616,21 @@ bool XMapFile::Parse(const char* pData, size_t length)
 	}
 
 	return true;
+}
+
+void XMapFile::ListLayers(void) const
+{
+	Layer::LayerFlags::Description Dsc;
+
+	X_LOG0("Map", "Listing Layers");
+	X_LOG_BULLET;
+
+	LayerArray::ConstIterator it = layers_.begin();
+	for (; it != layers_.end(); ++it)
+	{
+		X_LOG0("Map", "Layer: \"%s\" flags: %s",
+			it->name.c_str(), it->flags.ToString(Dsc));
+	}
 }
 
 

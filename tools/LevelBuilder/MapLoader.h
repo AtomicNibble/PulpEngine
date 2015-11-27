@@ -64,6 +64,10 @@ public:
 	XMapEntity* getEntity(size_t i) const { return entities_[i]; }
 
 private:
+
+	void ListLayers(void) const;
+
+private:
 #if MAP_LOADER_USE_POOL
 	core::HeapArea			primPoolHeap_;
 	core::PoolAllocator		primPoolAllocator_;
