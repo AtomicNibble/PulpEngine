@@ -197,6 +197,20 @@ protected:
 	core::Array<XMapPrimitive*>	primitives;
 };
 
+#ifdef IGNORE
+#undef IGNORE
+#endif // !IGNORE
+
+X_DECLARE_FLAGS(LayerFlag)(ACTIVE, EXPANDED, IGNORE);
+
+struct Layer
+{
+	typedef Flags<LayerFlag> LayerFlags;
+
+	core::string name;
+	LayerFlags flags;
+};
+
 X_NAMESPACE_END
 
 
