@@ -56,9 +56,9 @@ public:
 
 	bool Parse(const char* pData, size_t length);
 
-	int	getNumEntities(void) const { return safe_static_cast<int, EntityArray::size_type>(entities_.size()); }
-	int	getNumBrushes(void) const { return numBrushes; }
-	int	getNumPatches(void) const { return numPatches; }
+	size_t getNumEntities(void) const { return entities_.size(); }
+	size_t getNumBrushes(void) const { return numBrushes; }
+	size_t getNumPatches(void) const { return numPatches; }
 
 	XMapEntity* getEntity(int i) const { return entities_[i]; }
 
@@ -75,8 +75,8 @@ private:
 	core::Array<XMapEntity*>	entities_;
 //	std::vector<XMapEntity*>	entities;
 
-	int numBrushes;
-	int numPatches;
+	size_t numBrushes;
+	size_t numPatches;
 };
 
 X_NAMESPACE_END

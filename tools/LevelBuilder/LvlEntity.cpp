@@ -272,7 +272,7 @@ bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents,
 	struct bspTree* tree;
 	bspNode* headnode;
 	bool inside;
-	int32_t i;
+	size_t i;
 	size_t floodedLeafs;
 
 	tree = &bspTree;

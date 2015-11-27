@@ -214,7 +214,7 @@ LvlBuilder::~LvlBuilder()
 bool LvlBuilder::LoadFromMap(mapfile::XMapFile* map)
 {
 	X_ASSERT_NOT_NULL(map);
-	int32_t i;
+	size_t i;
 
 	map_ = map;
 
