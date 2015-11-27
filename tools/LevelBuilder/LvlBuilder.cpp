@@ -493,6 +493,8 @@ bool LvlBuilder::processPatch(LvlEntity& ent,
 
 	engine::IMaterial* pMaterial = matMan_.loadMaterial(patch.GetMatName());
 
+	X_ASSERT_NOT_NULL(pMaterial);
+
 	// create a Primative
 	for (i = 0; i < patch.GetNumIndexes(); i += 3)
 	{
