@@ -73,7 +73,6 @@ private:
 
 
 	core::Array<XMapEntity*>	entities_;
-//	std::vector<XMapEntity*>	entities;
 
 	size_t numBrushes;
 	size_t numPatches;
