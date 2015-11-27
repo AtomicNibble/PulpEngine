@@ -65,6 +65,8 @@ public:
 
 private:
 
+	bool isLayerIgnored(const char* pLayerName) const;
+
 	void ListLayers(void) const;
 
 private:
