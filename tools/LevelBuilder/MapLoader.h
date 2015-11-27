@@ -71,8 +71,7 @@ private:
 #endif
 	PrimativePoolArena		primPoolArena_;
 
-
-	core::Array<XMapEntity*>	entities_;
+	EntityArray	entities_;
 
 	size_t numBrushes;
 	size_t numPatches;
