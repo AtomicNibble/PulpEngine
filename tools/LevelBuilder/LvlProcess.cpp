@@ -502,7 +502,7 @@ void LvlBuilder::AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sph
 
 bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 {
-	int32_t i, numEnts;
+	size_t i, numEnts;
 
 	// we go throught each ent, and work out what area's it is in.
 	// each ent is then added to the entRefts set.
