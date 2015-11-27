@@ -60,7 +60,7 @@ public:
 	size_t getNumBrushes(void) const { return numBrushes_; }
 	size_t getNumPatches(void) const { return numPatches_; }
 
-	XMapEntity* getEntity(int i) const { return entities_[i]; }
+	XMapEntity* getEntity(size_t i) const { return entities_[i]; }
 
 private:
 #if MAP_LOADER_USE_POOL
