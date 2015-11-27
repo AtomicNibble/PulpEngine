@@ -496,6 +496,7 @@ entities_(g_arena)
 	// might make this 8k
 	// worldspawn is 1 entity.
 	entities_.reserve(4096 * 2);
+	entities_.setGranularity(512);
 }
 
 XMapFile::~XMapFile()
