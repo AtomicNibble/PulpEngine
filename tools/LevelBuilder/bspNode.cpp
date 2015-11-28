@@ -39,7 +39,7 @@ void bspNode::MakeTreePortals_r(XPlaneSet& planeSet)
 void bspNode::CalcNodeBounds(void)
 {
 	bspPortal* p;
-	int	s, i;
+	size_t	s, i;
 
 	// calc mins/maxs for both leafs and nodes
 	bounds.clear();

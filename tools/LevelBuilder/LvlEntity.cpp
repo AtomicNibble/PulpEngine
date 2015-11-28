@@ -203,7 +203,7 @@ bool LvlEntity::FacesToBSP(XPlaneSet& planeSet)
 		const bspFace& face = *pFace;
 		const XWinding& winding = *face.w;
 
-		for (int32_t i = 0; i < winding.getNumPoints(); i++)
+		for (size_t i = 0; i < winding.getNumPoints(); i++)
 		{
 			root.bounds.add(winding[i].asVec3());
 		}

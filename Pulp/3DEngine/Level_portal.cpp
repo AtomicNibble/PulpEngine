@@ -111,7 +111,7 @@ void Level::FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum,
 
 		for (j = 0; j < ps->numPortalPlanes; j++)
 		{
-			for (int32_t x = 0; x < w.getNumPoints(); x++) {
+			for (size_t x = 0; x < w.getNumPoints(); x++) {
 				points[x] = w[x].asVec3();
 			}
 
@@ -128,7 +128,7 @@ void Level::FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum,
 		newStack.pPortal = &portal;
 		newStack.pNext = ps;
 
-		int i, addPlanes;
+		size_t i, addPlanes;
 		Vec3f	v1, v2;
 
 		addPlanes = w.getNumPoints();
@@ -140,7 +140,7 @@ void Level::FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum,
 		for (i = 0; i < addPlanes; i++)
 		{
 			j = i + 1;
-			if (safe_static_cast<int,size_t>(j) == w.getNumPoints()) {
+			if (j == w.getNumPoints()) {
 				j = 0;
 			}
 

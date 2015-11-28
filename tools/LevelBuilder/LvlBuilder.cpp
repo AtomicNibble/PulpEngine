@@ -447,7 +447,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 		Vec4f mappingVecs[2];
 		QuakeTextureVecs(plane, shift, rotate, repeate, mappingVecs);
 
-		for (int j = 0; j < w->getNumPoints(); j++)
+		for (size_t j = 0; j < w->getNumPoints(); j++)
 		{
 			// gets me position from 0,0 from 2d plane.
 			Vec5f& point = w->operator[](j);
