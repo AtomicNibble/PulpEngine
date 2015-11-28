@@ -285,6 +285,8 @@ XMapBrush* XMapBrush::Parse(XLexer& src, core::MemoryArenaBase* arena, const Vec
 			break;
 		}
 
+		bool hasLayer = false;
+
 		// here we may have to jump over brush epairs ( only used in editor )
 		do
 		{
@@ -300,12 +302,19 @@ XMapBrush* XMapBrush::Parse(XLexer& src, core::MemoryArenaBase* arena, const Vec
 				return nullptr;
 			}
 
+			// check if layer
+			hasLayer = token.isEqual("layer");
+
 			if (!src.ReadTokenOnLine(token) || (token.GetType() != TokenType::STRING
 				&& token.GetType() != TokenType::NAME))
 			{
 				src.Error("MapBrush::Parse: expected pair value string not found.");
 				X_DELETE(brush, arena);
 				return nullptr;
+			}
+
+			if (hasLayer) {			
+				brush->layer_ = core::string(token.begin(), token.end());
 			}
 
 			// try to read the next key

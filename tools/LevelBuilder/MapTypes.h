@@ -26,8 +26,10 @@ public:
 	virtual	~XMapPrimitive(void) {}
 
 	PrimType::Enum getType(void) const { return type_; }
+	const core::string& getLayer(void) const { return layer_; }
 
 protected:
+	core::string layer_;
 	PrimType::Enum	type_;
 };
 
