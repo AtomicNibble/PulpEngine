@@ -178,4 +178,9 @@
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="MapTypes.inl">
+      <Filter>Header Files\MapFile</Filter>
+    </None>
+  </ItemGroup>
 </Project>

@@ -240,5 +240,6 @@ struct Layer
 
 X_NAMESPACE_END
 
+#include "MapTypes.inl"
 
 #endif // X_MAP_TYPES_H_
