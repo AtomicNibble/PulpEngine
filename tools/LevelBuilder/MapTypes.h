@@ -72,9 +72,9 @@ public:
 	XMapBrush(void) : XMapPrimitive(PrimType::BRUSH), sides(g_arena) { sides.reserve(6); }
 	~XMapBrush(void) X_OVERRIDE {}
 
-	int					GetNumSides(void) const { return safe_static_cast<int,size_t>(sides.size()); }
+	size_t				GetNumSides(void) const { return sides.size(); }
 	void				AddSide(XMapBrushSide *side) { sides.push_back(side); }
-	XMapBrushSide*		GetSide(int i) const { return sides[i]; }
+	XMapBrushSide*		GetSide(size_t i) const { return sides[i]; }
 
 public:
 	static XMapBrush*	Parse(XLexer& src, core::MemoryArenaBase* arena, const Vec3f& origin);
@@ -209,7 +209,7 @@ public:
 	XMapEntity(void) : primitives(g_arena) {}
 	~XMapEntity(void) {}
 
-	int					GetNumPrimitives(void) const { return (int)primitives.size(); }
+	size_t					GetNumPrimitives(void) const { return primitives.size(); }
 	XMapPrimitive*		GetPrimitive(int i) const { return primitives[i]; }
 	void				AddPrimitive(XMapPrimitive *p) { primitives.push_back(p); }
 

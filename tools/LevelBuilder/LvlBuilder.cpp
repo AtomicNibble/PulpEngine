@@ -377,7 +377,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 {
 	const mapfile::XMapBrushSide* pMapBrushSide;
 	XWinding*	w;
-	int32_t		i, numSides;
+	size_t		i, numSides;
 
 
 	LvlBrush& brush = ent.brushes.AddOne();
