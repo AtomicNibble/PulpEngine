@@ -25,9 +25,9 @@ class XWinding : public core::ISerialize
 	static const int MAX_POINTS_ON_WINDING = 64;
 public:
 	XWinding(void);
-	explicit XWinding(const int n);								// allocate for n points
-	explicit XWinding(const Vec3f* verts, const int numVerts);	// winding from points
-	explicit XWinding(const Vec5f* verts, const int numVerts);	// winding from points
+	explicit XWinding(const size_t n);								// allocate for n points
+	explicit XWinding(const Vec3f* verts, const size_t numVerts);	// winding from points
+	explicit XWinding(const Vec5f* verts, const size_t numVerts);	// winding from points
 	explicit XWinding(const Vec3f& normal, const float dist);	// base winding for plane
 	explicit XWinding(const Planef& plane);						// base winding for plane
 	explicit XWinding(const XWinding& winding);
@@ -44,8 +44,8 @@ public:
 	X_INLINE void			addPoint(const Vec5f& v);
 	X_INLINE void			addPoint(const Vec3f& v);
 
-	X_INLINE int getNumPoints(void) const;
-	X_INLINE int getAllocatedSize(void) const;
+	X_INLINE size_t getNumPoints(void) const;
+	X_INLINE size_t getAllocatedSize(void) const;
 
 	bool isTiny(void) const;
 	bool isHuge(void) const;
@@ -94,7 +94,7 @@ public:
 
 private:
 	// must be inlined to not fuck up alloca
-	X_INLINE bool EnsureAlloced(int32_t num, bool keep = false);
+	X_INLINE bool EnsureAlloced(size_t num, bool keep = false);
 	X_INLINE bool ReAllocate(int32_t num, bool keep = false);
 
 private:
