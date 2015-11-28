@@ -538,7 +538,6 @@ XMapFile::~XMapFile()
 
 bool XMapFile::Parse(const char* pData, size_t length)
 {
-	int i = 0;
 	if (length > 0)
 	{
 		XLexer lexer(pData, pData + length);
@@ -625,6 +624,8 @@ bool XMapFile::Parse(const char* pData, size_t length)
 				}
 				break;
 			}
+
+			size_t i;
 
 			for (i = 0; i < mapEnt->GetNumPrimitives(); i++)
 			{

@@ -262,7 +262,7 @@ int32_t LvlBuilder::FindFloatPlane(const Planef& plane)
 bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 {
 	mapfile::XMapPrimitive* prim;
-	int32_t i;
+	size_t i;
 
 	// update stats.
 	stats_.numEntities++;
