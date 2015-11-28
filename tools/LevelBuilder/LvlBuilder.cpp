@@ -429,7 +429,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 		stats_.numAreaPortals++;
 	}
 
-	for (i = 0; i < safe_static_cast<int32_t,size_t>(brush.sides.size()); i++)
+	for (i = 0; i < brush.sides.size(); i++)
 	{
 		const LvlBrushSide& side = brush.sides[i];
 		w = side.pWinding;
