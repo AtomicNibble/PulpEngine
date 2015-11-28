@@ -16,19 +16,17 @@ X_NAMESPACE_BEGIN(mapfile)
 
 class XMapBrush;
 
-
-
 // base class for Brush / Patch
 class XMapPrimitive
 {
 public:
-	XMapPrimitive(PrimType::Enum type) : type_(type) { }
-	virtual	~XMapPrimitive(void) {}
+	X_INLINE XMapPrimitive(PrimType::Enum type);
+	X_INLINE virtual ~XMapPrimitive(void);
 
-	PrimType::Enum getType(void) const { return type_; }
-	const core::string& getLayer(void) const { return layer_; }
+	X_INLINE PrimType::Enum getType(void) const;
+	X_INLINE const core::string& getLayer(void) const;
 
-	const bool hasLayer(void) const { return layer_.isNotEmpty(); }
+	X_INLINE const bool hasLayer(void) const;
 
 protected:
 	core::string layer_;
@@ -40,10 +38,11 @@ class XMapBrushSide
 	friend class XMapBrush;
 
 public:
-	XMapBrushSide(void) {}
-	~XMapBrushSide(void) { }
-	const char*			GetMaterialName(void) const { return material.name.c_str(); }
-	const Planef&		GetPlane(void) const { return plane; }
+	X_INLINE XMapBrushSide(void);
+	X_INLINE ~XMapBrushSide(void);
+
+	X_INLINE const char* GetMaterialName(void) const;
+	X_INLINE const Planef& GetPlane(void) const;
 
 	struct MaterialInfo
 	{
@@ -57,9 +56,7 @@ public:
 	MaterialInfo	lightMap;
 
 protected:
-
 	Planef			plane;
-
 
 protected:
 	static bool ParseMatInfo(XLexer& src, MaterialInfo& mat);
@@ -69,19 +66,18 @@ protected:
 class XMapBrush : public XMapPrimitive
 {
 public:
-	XMapBrush(void) : XMapPrimitive(PrimType::BRUSH), sides(g_arena) { sides.reserve(6); }
-	~XMapBrush(void) X_OVERRIDE {}
+	X_INLINE XMapBrush(void);
+	X_INLINE ~XMapBrush(void) X_OVERRIDE;
 
-	size_t				GetNumSides(void) const { return sides.size(); }
-	void				AddSide(XMapBrushSide *side) { sides.push_back(side); }
-	XMapBrushSide*		GetSide(size_t i) const { return sides[i]; }
+	X_INLINE size_t	GetNumSides(void) const;
+	X_INLINE void AddSide(XMapBrushSide* pSide);
+	X_INLINE XMapBrushSide*	GetSide(size_t i) const;
 
 public:
-	static XMapBrush*	Parse(XLexer& src, core::MemoryArenaBase* arena, const Vec3f& origin);
+	static XMapBrush* Parse(XLexer& src, core::MemoryArenaBase* arena, const Vec3f& origin);
 
 protected:
 	core::Array<XMapBrushSide*> sides;
-
 };
 
 class XMapPatch : public XMapPrimitive
@@ -89,34 +85,22 @@ class XMapPatch : public XMapPrimitive
 public:
 	XMapPatch(void);
 	XMapPatch(int w, int h);
-	~XMapPatch(void);
+	~XMapPatch(void) X_OVERRIDE;
 
+	X_INLINE void SetHorzSubdivisions(size_t num);
+	X_INLINE void SetVertSubdivisions(size_t num);
+	X_INLINE size_t GetHorzSubdivisions(void) const;
+	X_INLINE size_t GetVertSubdivisions(void) const;
 
-	X_INLINE void SetHorzSubdivisions(size_t num) { horzSubdivisions_ = num; }
-	X_INLINE void SetVertSubdivisions(size_t num) { vertSubdivisions_ = num; }
-	X_INLINE size_t GetHorzSubdivisions(void) const { return horzSubdivisions_; }
-	X_INLINE size_t GetVertSubdivisions(void) const { return vertSubdivisions_; }
+	X_INLINE size_t GetNumIndexes(void) const;
+	X_INLINE const int* GetIndexes(void) const;
 
-	X_INLINE size_t GetNumIndexes(void) const { return indexes_.size(); }
-	X_INLINE const int* GetIndexes(void) const { return indexes_.ptr(); }
+	X_INLINE const xVert& operator[](const int idx) const;
+	X_INLINE xVert& operator[](const int idx);
 
-	X_INLINE const xVert& operator[](const int idx) const {
-		return verts_[idx];
-	}
-	X_INLINE xVert& operator[](const int idx) {
-		return verts_[idx];
-	}
-
-	X_INLINE void SetMesh(bool b) {
-		isMesh_ = b;
-	}
-	X_INLINE const bool isMesh(void) const {
-		return isMesh_;
-	}
-
-	X_INLINE const char* GetMatName(void) const {
-		return matName_.c_str();
-	}
+	X_INLINE void SetMesh(bool b);
+	X_INLINE const bool isMesh(void) const;
+	X_INLINE const char* GetMatName(void) const;
 
 	// Subdived util.
 	void Subdivide(float maxHorizontalError, float maxVerticalError, 
@@ -180,19 +164,9 @@ class IgnoreList
 	typedef core::Array<core::string> IgnoreArray;
 
 public:
-	IgnoreList(IgnoreArray& ignoreList) : ignoreList_(ignoreList) {}
+	X_INLINE IgnoreList(IgnoreArray& ignoreList);
 
-	bool isIgnored(const core::string& layerName) const 
-	{
-		IgnoreArray::ConstIterator it = ignoreList_.begin();
-		for (; it != ignoreList_.end(); ++it)
-		{
-			if (*it == layerName) {
-				return true;
-			}
-		}
-		return false;
-	}
+	X_INLINE bool isIgnored(const core::string& layerName) const;
 
 private:
 	IgnoreArray ignoreList_;
@@ -206,15 +180,15 @@ public:
 	typedef KeyPair::PairIt PairIt;
 
 public:
-	XMapEntity(void) : primitives(g_arena) {}
-	~XMapEntity(void) {}
+	X_INLINE XMapEntity(void);
+	X_INLINE ~XMapEntity(void);
 
-	size_t					GetNumPrimitives(void) const { return primitives.size(); }
-	XMapPrimitive*		GetPrimitive(int i) const { return primitives[i]; }
-	void				AddPrimitive(XMapPrimitive *p) { primitives.push_back(p); }
+	X_INLINE size_t GetNumPrimitives(void) const;
+	X_INLINE XMapPrimitive* GetPrimitive(size_t i) const;
+	X_INLINE void AddPrimitive(XMapPrimitive* p);
 
 public:
-	static XMapEntity*	Parse(XLexer &src, core::MemoryArenaBase* arena,
+	static XMapEntity* Parse(XLexer &src, core::MemoryArenaBase* arena,
 		const IgnoreList& ignoredLayers, bool isWorldSpawn = false);
 
 
