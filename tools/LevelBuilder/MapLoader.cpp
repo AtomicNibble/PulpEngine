@@ -627,12 +627,12 @@ bool XMapFile::Parse(const char* pData, size_t length)
 	return true;
 }
 
-bool XMapFile::isLayerIgnored(const char* pLayerName) const
+bool XMapFile::isLayerIgnored(const core::string& layerName) const
 {
 	LayerArray::ConstIterator it = layers_.begin();
 	for (; it != layers_.end(); ++it)
 	{
-		if (it->name == pLayerName) {
+		if (it->name == layerName) {
 			return it->flags.IsSet(LayerFlag::IGNORE);
 		}
 	}

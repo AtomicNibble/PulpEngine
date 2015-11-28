@@ -64,8 +64,7 @@ public:
 	XMapEntity* getEntity(size_t i) const { return entities_[i]; }
 
 private:
-
-	bool isLayerIgnored(const char* pLayerName) const;
+	bool isLayerIgnored(const core::string& layerName) const;
 
 	void ListLayers(void) const;
 
