@@ -78,12 +78,17 @@ namespace strUtil
 	}
 
 
-	/// Returns whether two strings are equal, checks the length of the 1st range.
+	/// Returns whether two strings are equal, checks the length of both srings are equal.
 	bool IsEqual(const wchar_t* startInclusiveS1, const wchar_t* endExclusiveS1, const wchar_t* startInclusiveS2)
 	{
 		size_t Len = endExclusiveS1 - startInclusiveS1;
+		size_t Len2 = strlen(startInclusiveS2);
 
-		return memcmp(startInclusiveS1, startInclusiveS2, Len * sizeof(wchar_t)) == 0;
+		if (Len == Len2) {
+			return memcmp(startInclusiveS1, startInclusiveS2, Len * sizeof(wchar_t)) == 0;
+		}
+
+		return false;
 	}
 
 	bool IsEqual(const wchar_t* startInclusiveS1, const wchar_t* endExclusiveS1, const wchar_t* startInclusiveS2, const wchar_t* endExclusiveS2)

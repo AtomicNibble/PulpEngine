@@ -76,7 +76,7 @@ namespace strUtil
 	bool IsEqual(const char* str1, const char* str2);
 	bool IsEqual(const wchar_t* str1, const wchar_t* str2);
 
-	/// Returns whether two strings are equal, checks the length of the 1sr range.
+	/// Returns whether two strings are equal, checks the length of both srings are equal.
 	bool IsEqual(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2);
 	bool IsEqual(const wchar_t* startInclusiveS1, const wchar_t* endExclusiveS1, const wchar_t* startInclusiveS2);
 
