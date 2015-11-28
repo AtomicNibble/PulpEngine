@@ -75,7 +75,6 @@ public:
 	int					GetNumSides(void) const { return safe_static_cast<int,size_t>(sides.size()); }
 	void				AddSide(XMapBrushSide *side) { sides.push_back(side); }
 	XMapBrushSide*		GetSide(int i) const { return sides[i]; }
-	uint32_t			GetGeometryCRC(void) const;
 
 public:
 	static XMapBrush*	Parse(XLexer& src, core::MemoryArenaBase* arena, const Vec3f& origin);
@@ -186,8 +185,6 @@ public:
 	int					GetNumPrimitives(void) const { return (int)primitives.size(); }
 	XMapPrimitive*		GetPrimitive(int i) const { return primitives[i]; }
 	void				AddPrimitive(XMapPrimitive *p) { primitives.push_back(p); }
-	uint32_t			GetGeometryCRC(void) const;
-	void				RemovePrimitiveData();
 
 public:
 	static XMapEntity*	Parse(XLexer &src, core::MemoryArenaBase* arena, bool isWorldSpawn = false);
