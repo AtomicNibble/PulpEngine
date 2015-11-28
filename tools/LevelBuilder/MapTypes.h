@@ -28,6 +28,8 @@ public:
 	PrimType::Enum getType(void) const { return type_; }
 	const core::string& getLayer(void) const { return layer_; }
 
+	const bool hasLayer(void) const { return layer_.isNotEmpty(); }
+
 protected:
 	core::string layer_;
 	PrimType::Enum	type_;
