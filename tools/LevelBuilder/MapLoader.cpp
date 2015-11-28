@@ -492,13 +492,14 @@ XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena,
 
 XMapFile::XMapFile() :
 #if MAP_LOADER_USE_POOL
-primPoolHeap_(
-	bitUtil::RoundUpToMultiple<size_t>(
-		PrimativePoolArena::getMemoryRequirement(PRIMATIVE_ALLOC_SIZE) * MAX_PRIMATIVES,
-		core::VirtualMem::GetPageSize()
-	)
-),
-primPoolAllocator_(primPoolHeap_.start(), primPoolHeap_.end(),
+primPoolAllocator_(
+	bitUtil::NextPowerOfTwo(
+		PrimativePoolArena::getMemoryRequirement(PRIMATIVE_ALLOC_SIZE) * MAX_PRIMATIVES
+	),
+	bitUtil::NextPowerOfTwo(
+		PrimativePoolArena::getMemoryRequirement(PRIMATIVE_ALLOC_SIZE) * (MAX_PRIMATIVES / 10)
+	),
+	0,
 	PrimativePoolArena::getMemoryRequirement(PRIMATIVE_ALLOC_SIZE),
 	PrimativePoolArena::getMemoryAlignmentRequirement(PRIMATIVE_ALLOC_ALIGN),
 	PrimativePoolArena::getMemoryOffsetRequirement()

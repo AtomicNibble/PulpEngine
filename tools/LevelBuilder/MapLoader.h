@@ -9,6 +9,7 @@
 #include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
 #include <Memory\MemoryTaggingPolicies\NoMemoryTagging.h>
 #include <Memory\AllocationPolicies\PoolAllocator.h>
+#include <Memory\AllocationPolicies\GrowingPoolAllocator.h>
 #include <Memory\AllocationPolicies\MallocFreeAllocator.h>
 #include <Containers\Array.h>
 
@@ -31,11 +32,11 @@ X_NAMESPACE_BEGIN(mapfile)
 // i would of though that only take a ms.
 // something todo when i'm borded xD !
 
-#define MAP_LOADER_USE_POOL 0
+#define MAP_LOADER_USE_POOL 1
 
 typedef core::MemoryArena<
 #if MAP_LOADER_USE_POOL
-	core::PoolAllocator,
+	core::GrowingPoolAllocator,
 #else
 	core::MallocFreeAllocator,
 #endif
@@ -71,8 +72,7 @@ private:
 
 private:
 #if MAP_LOADER_USE_POOL
-	core::HeapArea			primPoolHeap_;
-	core::PoolAllocator		primPoolAllocator_;
+	core::GrowingPoolAllocator	primPoolAllocator_;
 #else
 	core::MallocFreeAllocator primAllocator_;
 #endif
