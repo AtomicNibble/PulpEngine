@@ -308,6 +308,7 @@ bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents,
 				lvlEnt.origin.y,
 				lvlEnt.origin.z);
 
+			return false;
 		}
 	}
 
