@@ -537,111 +537,114 @@ XMapFile::~XMapFile()
 
 bool XMapFile::Parse(const char* pData, size_t length)
 {
-	if (length > 0)
+	if (length == 0) {
+		X_ERROR("Map", "Can't parse map with source length of zero");
+		return false;
+	}
+
+	XLexer lexer(pData, pData + length);
+	XLexToken token;
+	XMapEntity *mapEnt;
+
+	lexer.setFlags(LexFlag::NOSTRINGCONCAT |
+		LexFlag::NOSTRINGESCAPECHARS |
+		LexFlag::ALLOWPATHNAMES |
+		LexFlag::ALLOWDOLLARNAMES);
+
+	// parce the layers and shit.
+
+	//	iwmap 4 
+	if (!lexer.ExpectTokenString("iwmap")) {
+		X_ERROR("Map", "Failed to load map file correctly.");
+		return false;
+	}
+	// don't bother checking version.
+	lexer.SkipRestOfLine();
+
+	while (lexer.ReadToken(token))
 	{
-		XLexer lexer(pData, pData + length);
-		XLexToken token;
-		XMapEntity *mapEnt;
-
-		lexer.setFlags(LexFlag::NOSTRINGCONCAT | 
-			LexFlag::NOSTRINGESCAPECHARS | 
-			LexFlag::ALLOWPATHNAMES |
-			LexFlag::ALLOWDOLLARNAMES);
-
-		// parce the layers and shit.
-
-		//	iwmap 4 
-		if (!lexer.ExpectTokenString("iwmap")) {
-			X_ERROR("Map", "Failed to load map file correctly.");
-			return false;
-		}
-		// don't bother checking version.
-		lexer.SkipRestOfLine();
-
-		while (lexer.ReadToken(token))
+		if (token.isEqual("{"))
 		{
-			if (token.isEqual("{"))
-			{
-				lexer.UnreadToken(token);
-				break;
-			}
-			else
-			{
-				Layer layer;
-
-				layer.name = core::string(token.begin(), token.end());
-
-				if(!lexer.ReadTokenOnLine(token)) {
-					X_ERROR("Map", "Error when parsing layers");
-					return false;
-				}
-
-				if (!token.isEqual("flags")) {
-					X_ERROR("Map", "Error when parsing layers");
-					return false;
-				}
-
-				// read the flags
-				while (lexer.ReadTokenOnLine(token)) 	
-				{
-					core::string flag(token.begin(), token.end());
-
-					if (flag.compare("active")) {
-						layer.flags.Set(LayerFlag::ACTIVE);
-					}
-					else if (flag.compare("expanded")) {
-						layer.flags.Set(LayerFlag::EXPANDED);
-					}
-					else if (flag.compare("ignore")) {
-						layer.flags.Set(LayerFlag::IGNORE);
-					}
-					else {
-						X_WARNING("Map", "Unkown layer flag: '%s'",
-							flag.c_str());
-					}
-				}
-
-				layers_.push_back(layer);
-
-			}
+			lexer.UnreadToken(token);
+			break;
 		}
-
-		ListLayers();
-
-		IgnoreList ignoreList = getIgnoreList();
-
-		// load all the entites.
-		while (1) 
+		else
 		{
-			mapEnt = XMapEntity::Parse(lexer, &primPoolArena_, 
-				ignoreList, entities_.isEmpty());
+			Layer layer;
 
-			if (!mapEnt) 
-			{
-				if (lexer.GetErrorState() != XLexer::ErrorState::OK) {
-					X_ERROR("Map", "Failed to load map file correctly.");
-					return false;
-				}
-				break;
+			layer.name = core::string(token.begin(), token.end());
+
+			if (!lexer.ReadTokenOnLine(token)) {
+				X_ERROR("Map", "Error when parsing layers");
+				return false;
 			}
 
-			size_t i;
+			if (!token.isEqual("flags")) {
+				X_ERROR("Map", "Error when parsing layers");
+				return false;
+			}
 
-			for (i = 0; i < mapEnt->GetNumPrimitives(); i++)
+			// read the flags
+			while (lexer.ReadTokenOnLine(token))
 			{
-				const XMapPrimitive* prim = mapEnt->GetPrimitive(i);
+				core::string flag(token.begin(), token.end());
 
-				if (prim->getType() == PrimType::BRUSH) {
-					this->numBrushes_++;
+				if (flag.compare("active")) {
+					layer.flags.Set(LayerFlag::ACTIVE);
 				}
-				else if (prim->getType() == PrimType::PATCH) {
-					this->numPatches_++;
+				else if (flag.compare("expanded")) {
+					layer.flags.Set(LayerFlag::EXPANDED);
+				}
+				else if (flag.compare("ignore")) {
+					layer.flags.Set(LayerFlag::IGNORE);
+				}
+				else {
+					X_WARNING("Map", "Unkown layer flag: '%s'",
+						flag.c_str());
 				}
 			}
 
-			entities_.push_back(mapEnt);
+			layers_.push_back(layer);
+
 		}
 	}
+
+	ListLayers();
+
+	IgnoreList ignoreList = getIgnoreList();
+
+	// load all the entites.
+	while (1)
+	{
+		mapEnt = XMapEntity::Parse(lexer, &primPoolArena_,
+			ignoreList, entities_.isEmpty());
+
+		if (!mapEnt)
+		{
+			if (lexer.GetErrorState() != XLexer::ErrorState::OK) {
+				X_ERROR("Map", "Failed to load map file correctly.");
+				return false;
+			}
+			break;
+		}
+
+		size_t i;
+
+		for (i = 0; i < mapEnt->GetNumPrimitives(); i++)
+		{
+			const XMapPrimitive* prim = mapEnt->GetPrimitive(i);
+
+			if (prim->getType() == PrimType::BRUSH) {
+				this->numBrushes_++;
+			}
+			else if (prim->getType() == PrimType::PATCH) {
+				this->numPatches_++;
+			}
+		}
+
+		entities_.push_back(mapEnt);
+	}
+
 
 	PrimtPrimMemInfo();
 	return true;
