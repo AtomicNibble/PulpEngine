@@ -425,7 +425,7 @@ XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena,
 					return nullptr;
 				}
 				// don't add if ignored.
-				if (mapBrush->hasLayer()) {
+				if (mapPatch->hasLayer()) {
 					if (ignoredLayers.isIgnored(mapPatch->getLayer())) {
 						X_DELETE(mapPatch, arena);
 						continue;
