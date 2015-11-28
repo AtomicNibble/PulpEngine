@@ -551,11 +551,12 @@ bool XMapFile::Parse(const char* pData, size_t length)
 
 		// parce the layers and shit.
 
-	//	iwmap 4
-		if (!lexer.ExpectTokenString("iwmap 4")) {
+		//	iwmap 4 
+		if (!lexer.ExpectTokenString("iwmap")) {
 			X_ERROR("Map", "Failed to load map file correctly.");
 			return false;
 		}
+		// don't bother checking version.
 		lexer.SkipRestOfLine();
 
 		while (lexer.ReadToken(token))
