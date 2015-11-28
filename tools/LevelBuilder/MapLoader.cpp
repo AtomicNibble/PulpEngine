@@ -368,9 +368,7 @@ XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena,
 	const IgnoreList& ignoredLayers, bool isWorldSpawn)
 {
 	XLexToken token;
-	XMapEntity *mapEnt;
-	XMapBrush *mapBrush;
-	XMapPatch *mapPatch;
+	XMapEntity* mapEnt;
 	Vec3f origin;
 	float v1, v2, v3;
 	bool worldent;
@@ -420,7 +418,7 @@ XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena,
 
 			if (token.isEqual("mesh") || token.isEqual("curve"))
 			{
-				mapPatch = XMapPatch::Parse(src, arena, origin);
+				XMapPatch* mapPatch = XMapPatch::Parse(src, arena, origin);
 				if (!mapPatch) {
 					return nullptr;
 				}
@@ -441,7 +439,7 @@ XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena,
 			else
 			{
 				src.UnreadToken(token);
-				mapBrush = XMapBrush::Parse(src, arena, origin);
+				XMapBrush* mapBrush = XMapBrush::Parse(src, arena, origin);
 				if (!mapBrush) {
 					return nullptr;
 				}
