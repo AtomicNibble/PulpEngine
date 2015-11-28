@@ -111,6 +111,10 @@ void XCore::ShutDown()
 {
 	X_LOG0("Core", "Shutting Down");
 
+#if X_DEBUG
+	hotReloadIgnores_.free();
+#endif // !X_DEBUG
+
 	dirWatcher_.ShutDown();
 
 	if (env_.pJobSys)
