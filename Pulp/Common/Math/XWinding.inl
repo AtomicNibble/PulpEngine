@@ -32,10 +32,25 @@ X_INLINE Vec5f&	XWinding::operator[](const size_t idx)
 
 
 // add a point to the end of the winding point array
+X_INLINE XWinding&XWinding::operator+=(const Vec5f& v)
+{
+	addPoint(v);
+	return *this;
+}
+
 X_INLINE XWinding&XWinding::operator+=(const Vec3f& v)
 {
 	addPoint(v);
 	return *this;
+}
+
+X_INLINE void XWinding::addPoint(const Vec5f& v)
+{
+	if (!EnsureAlloced(numPoints_ + 1, true)) {
+		return;
+	}
+	pPoints_[numPoints_] = v;
+	numPoints_++;
 }
 
 X_INLINE void XWinding::addPoint(const Vec3f& v)
