@@ -385,6 +385,7 @@ XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena,
 	}
 
 	mapEnt = X_NEW(XMapEntity, arena, "MapEntity");
+	mapEnt-> primArena_ = arena;
 
 	if (isWorldSpawn) {
 		// the world spawn is the layout, so gonna be lots :D

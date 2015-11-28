@@ -176,6 +176,7 @@ private:
 class XMapEntity
 {
 public:
+	typedef core::Array<XMapPrimitive*> PrimativeArry;
 	typedef KeyPair PairMap;
 	typedef KeyPair::PairIt PairIt;
 
@@ -195,7 +196,8 @@ public:
 	PairMap epairs;
 
 protected:
-	core::Array<XMapPrimitive*>	primitives;
+	core::MemoryArenaBase* primArena_;
+	PrimativeArry	primitives;
 };
 
 #ifdef IGNORE

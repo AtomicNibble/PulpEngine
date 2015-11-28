@@ -166,14 +166,23 @@ bool IgnoreList::isIgnored(const core::string& layerName) const
 // ======================
 
 XMapEntity::XMapEntity(void) : 
-	primitives(g_arena) 
+	primArena_(nullptr),
+	primitives(g_arena)
 {
 
 }
 
 XMapEntity::~XMapEntity(void) 
 {
+	X_ASSERT_NOT_NULL(primArena_);
 
+	PrimativeArry::size_type i;
+	for (i = 0; i < primitives.size(); i++)
+	{
+		X_DELETE(primitives[i], primArena_);
+	}
+
+	primitives.free();
 }
 
 size_t XMapEntity::GetNumPrimitives(void) const 
