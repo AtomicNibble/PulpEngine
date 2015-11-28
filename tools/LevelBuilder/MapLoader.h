@@ -69,13 +69,14 @@ private:
 	bool isLayerIgnored(const core::string& layerName) const;
 	void ListLayers(void) const;
 
+	void PrimtPrimMemInfo(void) const;
 
 private:
 #if MAP_LOADER_USE_POOL
 	core::GrowingPoolAllocator	primPoolAllocator_;
 #else
 	core::MallocFreeAllocator primAllocator_;
-#endif
+#endif // !MAP_LOADER_USE_POOL
 	PrimativePoolArena		primPoolArena_;
 
 	EntityArray	entities_;
