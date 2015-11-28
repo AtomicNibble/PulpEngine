@@ -468,8 +468,6 @@ XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena,
 			// strip trailing spaces
 			value.trim();
 			key.trim();
-			//	value.trimWhitespace();
-			//	key.trimWhitespace();
 
 			mapEnt->epairs[core::string(key.c_str())] = value.c_str();
 
