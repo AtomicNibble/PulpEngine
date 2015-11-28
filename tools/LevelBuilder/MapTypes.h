@@ -175,9 +175,36 @@ protected:
 };
 
 
+class IgnoreList
+{
+	typedef core::Array<core::string> IgnoreArray;
+
+public:
+	IgnoreList(IgnoreArray& ignoreList) : ignoreList_(ignoreList) {}
+
+	bool isIgnored(const core::string& layerName) const 
+	{
+		IgnoreArray::ConstIterator it = ignoreList_.begin();
+		for (; it != ignoreList_.end(); ++it)
+		{
+			if (*it == layerName) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+private:
+	IgnoreArray ignoreList_;
+};
+
 
 class XMapEntity
 {
+public:
+	typedef KeyPair PairMap;
+	typedef KeyPair::PairIt PairIt;
+
 public:
 	XMapEntity(void) : primitives(g_arena) {}
 	~XMapEntity(void) {}
@@ -187,10 +214,9 @@ public:
 	void				AddPrimitive(XMapPrimitive *p) { primitives.push_back(p); }
 
 public:
-	static XMapEntity*	Parse(XLexer &src, core::MemoryArenaBase* arena, bool isWorldSpawn = false);
+	static XMapEntity*	Parse(XLexer &src, core::MemoryArenaBase* arena,
+		const IgnoreList& ignoredLayers, bool isWorldSpawn = false);
 
-	typedef KeyPair PairMap;
-	typedef KeyPair::PairIt PairIt;
 
 	PairMap epairs;
 

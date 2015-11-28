@@ -364,7 +364,8 @@ XMapBrush* XMapBrush::Parse(XLexer& src, core::MemoryArenaBase* arena, const Vec
 }
 
 
-XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena, bool isWorldSpawn)
+XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena, 
+	const IgnoreList& ignoredLayers, bool isWorldSpawn)
 {
 	XLexToken token;
 	XMapEntity *mapEnt;
@@ -422,6 +423,13 @@ XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena, bool is
 				if (!mapPatch) {
 					return nullptr;
 				}
+				// don't add if ignored.
+				if (mapBrush->hasLayer()) {
+					if (ignoredLayers.isIgnored(mapPatch->getLayer())) {
+						X_DELETE(mapPatch, arena);
+						continue;
+					}
+				}
 
 				if (token.isEqual("mesh")) {
 					mapPatch->SetMesh(true);
@@ -435,6 +443,13 @@ XMapEntity*	XMapEntity::Parse(XLexer& src, core::MemoryArenaBase* arena, bool is
 				mapBrush = XMapBrush::Parse(src, arena, origin);
 				if (!mapBrush) {
 					return nullptr;
+				}
+				// don't add if ignored.
+				if (mapBrush->hasLayer()) {
+					if (ignoredLayers.isIgnored(mapBrush->getLayer())) {
+						X_DELETE(mapBrush, arena);
+						continue;
+					}
 				}
 
 				mapEnt->AddPrimitive(mapBrush);
@@ -595,10 +610,14 @@ bool XMapFile::Parse(const char* pData, size_t length)
 
 		ListLayers();
 
+		IgnoreList ignoreList = getIgnoreList();
+
 		// load all the entites.
 		while (1) 
 		{
-			mapEnt = XMapEntity::Parse(lexer, &primPoolArena_, entities_.isEmpty());
+			mapEnt = XMapEntity::Parse(lexer, &primPoolArena_, 
+				ignoreList, entities_.isEmpty());
+
 			if (!mapEnt) 
 			{
 				if (lexer.GetErrorState() != XLexer::ErrorState::OK) {
@@ -625,6 +644,22 @@ bool XMapFile::Parse(const char* pData, size_t length)
 	}
 
 	return true;
+}
+
+// withmove semantics this aint to expensive.
+IgnoreList XMapFile::getIgnoreList(void) const
+{
+	core::Array<core::string> list(g_arena);
+
+	LayerArray::ConstIterator it = layers_.begin();
+	for (; it != layers_.end(); ++it)
+	{
+		if (it->flags.IsSet(LayerFlag::IGNORE)) {
+			list.append(it->name);
+		}
+	}
+
+	return IgnoreList(list);
 }
 
 bool XMapFile::isLayerIgnored(const core::string& layerName) const

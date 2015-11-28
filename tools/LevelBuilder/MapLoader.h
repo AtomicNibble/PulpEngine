@@ -64,9 +64,10 @@ public:
 	XMapEntity* getEntity(size_t i) const { return entities_[i]; }
 
 private:
+	IgnoreList getIgnoreList(void) const;
 	bool isLayerIgnored(const core::string& layerName) const;
-
 	void ListLayers(void) const;
+
 
 private:
 #if MAP_LOADER_USE_POOL
