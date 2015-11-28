@@ -259,6 +259,7 @@ TEST(StringUtil, Count) {
 TEST(StringUtil, Equal) {
 
 	StackString512 str("Hello jane.");
+	StackString512 str_longer("Hello jane. meow");
 	StackString512 str1("Hello jane.");
 	StackString512 upper("HELLO JaNe.");
 
@@ -267,16 +268,21 @@ TEST(StringUtil, Equal) {
 	bool equal_3 = strUtil::IsEqual(str.begin(), str1.c_str());
 	bool equal_fail = strUtil::IsEqual(str.begin(), upper.c_str());
 
+	// should not match now, due to outcome of issue #4
+	bool equal_fail2 = strUtil::IsEqual(str.begin(), str.end(), str_longer.c_str());
+
 
 	EXPECT_TRUE(equal_1);
 	EXPECT_TRUE(equal_2);
 	EXPECT_TRUE(equal_3);
 	EXPECT_FALSE(equal_fail);
+	EXPECT_FALSE(equal_fail2);
 }
 
 TEST(StringUtil, EqualW) {
 
 	StackStringW512 str(L"Hello jane.");
+	StackStringW512 str_longer(L"Hello jane. meow");
 	StackStringW512 str1(L"Hello jane.");
 	StackStringW512 upper(L"HELLO JaNe.");
 
@@ -285,10 +291,14 @@ TEST(StringUtil, EqualW) {
 	bool equal_3 = strUtil::IsEqual(str.begin(), str1.c_str());
 	bool equal_fail = strUtil::IsEqual(str.begin(), upper.c_str());
 
+	// should not match now, due to outcome of issue #4
+	bool equal_fail2 = strUtil::IsEqual(str.begin(), str.end(), str_longer.c_str());
+
 	EXPECT_TRUE(equal_1);
 	EXPECT_TRUE(equal_2);
 	EXPECT_TRUE(equal_3);
 	EXPECT_FALSE(equal_fail);
+	EXPECT_FALSE(equal_fail2);
 }
 
 TEST(StringUtil, EqualCaseInsen) {
