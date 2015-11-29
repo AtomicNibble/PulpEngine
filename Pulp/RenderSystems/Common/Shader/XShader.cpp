@@ -893,6 +893,7 @@ bool BlendInfo::ParseBlendInfo(const char* name,
 
 ShaderSourceFile::Technique::Technique()
 {
+	depth_write_ = true;
 }
 
 bool ShaderSourceFile::Technique::parse(core::XLexer& lex)
