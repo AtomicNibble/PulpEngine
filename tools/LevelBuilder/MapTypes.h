@@ -46,7 +46,7 @@ public:
 
 	struct MaterialInfo
 	{
-		MaterialInfo();
+		X_INLINE MaterialInfo();
 
 		core::StackString<level::MAP_MAX_MATERIAL_LEN> name;
 		Vec2f				  matRepeate;
