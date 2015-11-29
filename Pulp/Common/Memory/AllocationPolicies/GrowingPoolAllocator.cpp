@@ -8,7 +8,8 @@
 X_NAMESPACE_BEGIN(core)
 
 
-namespace {
+namespace
+{
 
 	size_t CalculateElementSize( size_t maxElementSize, size_t maxAlignment )
 	{
@@ -23,7 +24,7 @@ namespace {
 			- union_cast<uintptr_t>(start) );
 	}
 
-}
+} // namespace
 
 
 GrowingPoolAllocator::GrowingPoolAllocator(size_t maxSizeInBytes, size_t growSize,
