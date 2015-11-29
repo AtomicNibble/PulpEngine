@@ -20,22 +20,18 @@ indexes_(g_arena),
 edges_(g_arena),
 edgeIndexes_(g_arena),
 width_(0), height_(0),
-maxWidth_(0), maxHeight_(0)
+maxWidth_(0), maxHeight_(0),
+horzSubdivisions_(0), vertSubdivisions_(0),
+isMesh_(false), expanded_(false)
 {
-	isMesh_ = false;
-	expanded_ = false;
+
 }
 
-XMapPatch::XMapPatch(int w, int h) : XMapPrimitive(PrimType::PATCH),
-verts_(g_arena),
-indexes_(g_arena),
-edges_(g_arena),
-edgeIndexes_(g_arena),
-width_(w), height_(h),
-maxWidth_(w), maxHeight_(h)
+// hello c++11: delegated constructor
+XMapPatch::XMapPatch(int w, int h) : XMapPatch()
 {
-	isMesh_ = false;
-	expanded_ = false;
+	width_ = w;
+	height_ = h;
 }
 
 XMapPatch::~XMapPatch(void)
