@@ -6,6 +6,7 @@
 
 #include <IFileSys.h>
 #include <ITimer.h>
+#include <IConsole.h>
 
 #include "MapLoader.h"
 #include "BSPTypes.h"
@@ -117,6 +118,12 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 			// we need the engine for Assets, Logging, Profiling, FileSystem.
 			if (engine.Init(lpCmdLine, Console))
 			{
+				{
+					core::ICVar* pLogVerbosity = gEnv->pConsole->GetCVar("log_verbosity");
+					X_ASSERT_NOT_NULL(pLogVerbosity);
+					pLogVerbosity->Set(0);
+				}		
+
 				core::Path<char> name;
 				name.set("map_source\\");
 				name.setFileName("basic - Copy.map");
