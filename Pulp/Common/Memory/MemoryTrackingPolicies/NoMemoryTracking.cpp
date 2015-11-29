@@ -5,7 +5,7 @@
 X_NAMESPACE_BEGIN(core)
 
 
-const char* const NoMemoryTracking::TYPE_NAME = "";
+const char* const NoMemoryTracking::TYPE_NAME = "NoMemoryTracking";
 
 
 
