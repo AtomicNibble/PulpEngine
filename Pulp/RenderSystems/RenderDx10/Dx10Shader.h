@@ -95,27 +95,13 @@ struct XShaderParam
 
 	XShaderParam()
 	{
+		type = ParamType::Unknown;
 		bind = -2;
 		constBufferSlot = 0;
 		numParameters = 1;
 	}
-	XShaderParam(const XShaderParam& sb)
-	{
-		name = sb.name;
-		nameHash = sb.nameHash;
-		bind = sb.bind;
-		constBufferSlot = sb.constBufferSlot;
-		numParameters = sb.numParameters;
-		flags = sb.flags;
-		type = sb.type;
-	}
-	XShaderParam& operator = (const XShaderParam& sb)
-	{
-		this->~XShaderParam();
-		// new(this) XShaderParam(sb);
-		core::Mem::Construct(this, sb);
-		return *this;
-	}
+	XShaderParam(const XShaderParam& sb) = default;
+	XShaderParam& operator = (const XShaderParam& sb) = default;
 };
 
 X_ENSURE_SIZE(ParamType::Enum, 1);
