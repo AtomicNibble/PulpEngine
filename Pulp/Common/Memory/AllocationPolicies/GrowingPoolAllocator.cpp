@@ -57,7 +57,7 @@ GrowingPoolAllocator::GrowingPoolAllocator(unsigned int maxSizeInBytes, unsigned
 	statistics_.virtualMemoryReserved_ = maxSizeInBytes;
 
 	elementSize_ = CalculateElementSize( maxElementSize, maxAlignment );
-	wastePerElement_ = elementSize_ = maxElementSize;
+	wastePerElement_ = maxElementSize - elementSize_;
 
 	statistics_.type_ = "GrowPoolAllocator";
 #endif
@@ -72,7 +72,8 @@ GrowingPoolAllocator::~GrowingPoolAllocator(void)
 
 
 
-void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offset, const void* chunkHeaderData, size_t chunkHeaderSize)
+void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offset, 
+	const void* chunkHeaderData, size_t chunkHeaderSize)
 {
 	if ( size > maxSize_ )
 	{
@@ -130,7 +131,7 @@ void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offs
 			statistics_.physicalMemoryUsed_ += chunkHeaderSize_ + wasteAtFront;
 			statistics_.wasteAlignment_ += wasteAtFront;
 			statistics_.wasteUnused_ = chunkHeaderSize_ + memoryRegionSize - 
-				wasteAtFront- elementSize_ * elementCount;
+				wasteAtFront - elementSize_ * elementCount;
 
 			// 1,2,3 what is the max? I hope i don't have to pay tax.
 			statistics_.physicalMemoryAllocatedMax_ = Max( statistics_.physicalMemoryAllocatedMax_, statistics_.physicalMemoryAllocated_ );
