@@ -2,6 +2,7 @@
 
 #include <String\Lexer.h>
 #include <String\StackString.h>
+#include <String\HumanSize.h>
 
 #include <IFileSys.h>
 
@@ -705,6 +706,34 @@ void XMapFile::PrimtPrimMemInfo(void) const
 
 	X_LOG0("Map", "allocationCount: ^6%i", stats.allocationCount_);
 	X_LOG0("Map", "allocationCountMax: ^6%i", stats.allocationCountMax_);
+
+#if 1 // toggle human sizes
+
+	HumanSize::Str SizeStr;
+
+	X_LOG0("Map", "virtualMemoryReserved: ^6%s", 
+		HumanSize::toString(SizeStr, stats.virtualMemoryReserved_));
+	X_LOG0("Map", "physicalMemoryAllocated: ^6%s",
+		HumanSize::toString(SizeStr, stats.physicalMemoryAllocated_));
+	X_LOG0("Map", "physicalMemoryAllocatedMax: ^6%s", 
+		HumanSize::toString(SizeStr, stats.physicalMemoryAllocatedMax_));
+	X_LOG0("Map", "physicalMemoryUsed: ^6%s", 
+		HumanSize::toString(SizeStr, stats.physicalMemoryUsed_));
+	X_LOG0("Map", "physicalMemoryUsedMax: ^6%s", 
+		HumanSize::toString(SizeStr, stats.physicalMemoryUsedMax_));
+	X_LOG0("Map", "wasteAlignment: ^6%s", 
+		HumanSize::toString(SizeStr, stats.wasteAlignment_));
+	X_LOG0("Map", "wasteAlignmentMax: ^6%s", 
+		HumanSize::toString(SizeStr, stats.wasteAlignmentMax_));
+	X_LOG0("Map", "wasteUnused: ^6%s", 
+		HumanSize::toString(SizeStr, stats.wasteUnused_));
+	X_LOG0("Map", "wasteUnusedMax: ^6%s", 
+		HumanSize::toString(SizeStr, stats.wasteUnusedMax_));
+	X_LOG0("Map", "internalOverhead: ^6%s", 
+		HumanSize::toString(SizeStr, stats.internalOverhead_));
+	X_LOG0("Map", "internalOverheadMax: ^6%s", 
+		HumanSize::toString(SizeStr, stats.internalOverheadMax_));
+#else
 	X_LOG0("Map", "virtualMemoryReserved: ^6%i", stats.virtualMemoryReserved_);
 	X_LOG0("Map", "physicalMemoryAllocated: ^6%i", stats.physicalMemoryAllocated_);
 	X_LOG0("Map", "physicalMemoryAllocatedMax: ^6%i", stats.physicalMemoryAllocatedMax_);
@@ -716,6 +745,7 @@ void XMapFile::PrimtPrimMemInfo(void) const
 	X_LOG0("Map", "wasteUnusedMax: ^6%i", stats.wasteUnusedMax_);
 	X_LOG0("Map", "internalOverhead: ^6%i", stats.internalOverhead_);
 	X_LOG0("Map", "internalOverheadMax: ^6%i", stats.internalOverheadMax_);
+#endif 
 #endif // !MAP_LOADER_USE_POOL && X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
