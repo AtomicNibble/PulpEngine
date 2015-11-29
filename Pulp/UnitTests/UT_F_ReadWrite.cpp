@@ -161,7 +161,7 @@ TEST(FileSys, Find)
 	{
 		do
 		{
-			X_LOG0("findresult", "name: \"%s\"", fd.name);
+			X_LOG0("findresult", "name: \"%ls\"", fd.name);
 			num++;
 		}
 		while (pFileSys->findnext(handle, &fd));
