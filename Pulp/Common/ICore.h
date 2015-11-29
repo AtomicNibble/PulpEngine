@@ -175,7 +175,7 @@ struct SCoreInitParams
 	bool bSkipInput;
 	bool bSkipSound;
 	bool bCoreOnly;
-
+	bool bEnableConsole;
 
 	const bool isCoreOnly() const {
 		return bCoreOnly;
@@ -189,6 +189,7 @@ struct SCoreInitParams
 		pConsoleWnd(nullptr),
 		bTesting(false),
 		bCoreOnly(false),
+		bEnableConsole(true),
 
 #if X_SUPER == 0
 		bConsoleLog(true),
