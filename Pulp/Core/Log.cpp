@@ -49,7 +49,7 @@ void XLog::Init()
 	// no point printing a 'starting msg' since  log system 
 	// not quite ready yet xD
 
-	ADD_CVAR_REF("log_verbosity", logVerbosity_, 0, 0, 2, 0, "Logging verbosity");
+//	ADD_CVAR_REF("log_verbosity", logVerbosity_, 0, 0, 2, 0, "Logging verbosity");
 
 }
 
