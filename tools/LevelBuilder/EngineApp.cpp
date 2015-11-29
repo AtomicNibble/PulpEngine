@@ -35,6 +35,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 {
 	SCoreInitParams params;
 	params.hInstance = g_hInstance;
+	params.pCmdLine = sInCmdLine;
 	params.bVsLog = false;
 	params.bConsoleLog = true;
 	params.bCoreOnly = true;
