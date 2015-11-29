@@ -15,6 +15,8 @@ public:
 
 	inline void Exit(void);
 
+	inline void RegisterVars(void);
+
 	inline bool Filter(const char* type, const SourceInfo& sourceInfo, 
 		const char* channel, size_t verbosity,
 		const char* format, va_list args);

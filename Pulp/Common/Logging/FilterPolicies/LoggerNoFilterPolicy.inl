@@ -12,6 +12,11 @@ inline void LoggerNoFilterPolicy::Exit(void)
 
 }
 
+inline void LoggerNoFilterPolicy::RegisterVars(void)
+{
+
+}
+
 inline bool LoggerNoFilterPolicy::Filter(const char* type, const SourceInfo& sourceInfo, 
 	const char* channel, size_t verbosity, const char* format, va_list args)
 {
