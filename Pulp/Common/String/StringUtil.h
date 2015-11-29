@@ -21,8 +21,6 @@ namespace strUtil
 	}
 
 	
-	const char* bytesToHumanString(size_t numBytes);
-
 	typedef char WorkingDirStr[512];
 	const char* workingDir(WorkingDirStr& buf);
 	typedef wchar_t WorkingDirStrW[512];
