@@ -15,11 +15,12 @@ namespace {
 		return bitUtil::RoundUpToMultiple( maxElementSize, maxAlignment );
 	}
 
-	size_t CalculateWasteAtFront(void *start, size_t maxAlignment, size_t offset)
+	size_t CalculateWasteAtFront(void* start, size_t maxAlignment, size_t offset)
 	{
-		char* pAdd = pointerUtil::AlignTop( (char*)start + offset, maxAlignment );
+		char* pAdd = pointerUtil::AlignTop( reinterpret_cast<char*>(start) + offset, maxAlignment );
 
-		return safe_static_cast<uint32_t>( ( pAdd - offset ) - (char*)start );
+		return safe_static_cast<size_t>( union_cast<uintptr_t>( pAdd - offset )
+			- union_cast<uintptr_t>(start) );
 	}
 
 }
