@@ -43,7 +43,7 @@ Logger<FilterPolicy, FormatPolicy, WritePolicy>::~Logger(void)
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class FilterPolicy, class FormatPolicy, class WritePolicy>
-void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoLog(const SourceInfo& sourceInfo, const char* channel, size_t verbosity, const char* format, va_list args)
+void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoLog(const SourceInfo& sourceInfo, const char* channel, int verbosity, const char* format, va_list args)
 {
 	if (filter_.Filter("INFO", sourceInfo, channel, verbosity, format, args))
 	{

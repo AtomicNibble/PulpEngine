@@ -126,7 +126,7 @@ for (LoggerBase* logger = listHead_; logger; logger = logger->GetNext()) \
 	logger->pfnc;
 
 
-void XLog::Log(const SourceInfo& sourceInfo, const char* channel, size_t verbosity, const char* format, ...)
+void XLog::Log(const SourceInfo& sourceInfo, const char* channel, int verbosity, const char* format, ...)
 {
 	X_VALIST_START(format)
 		X_CALL_LOGGERS(Log(sourceInfo, channel, verbosity, format, args))

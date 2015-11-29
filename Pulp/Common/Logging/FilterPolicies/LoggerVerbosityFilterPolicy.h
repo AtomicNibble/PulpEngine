@@ -33,7 +33,7 @@ public:
 
 	/// Filters messages according to the current verbosity level.
 	bool Filter(const char* type, const SourceInfo& sourceInfo, const char* channel, 
-		size_t verbosity, const char* format, va_list args);
+		int verbosity, const char* format, va_list args);
 
 private:
 	core::StackString<64> nickName_;

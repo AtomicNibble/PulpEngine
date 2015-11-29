@@ -19,7 +19,7 @@ public:
 	virtual void Init() X_OVERRIDE;
 	virtual void ShutDown() X_OVERRIDE;
 
-	virtual void Log(const SourceInfo& sourceInfo, const char* channel, size_t verbosity, const char* foramt, ...) X_OVERRIDE;
+	virtual void Log(const SourceInfo& sourceInfo, const char* channel, int verbosity, const char* foramt, ...) X_OVERRIDE;
 
 	virtual void Warning(const SourceInfo& sourceInfo, const char* channel, const char* foramt, ...) X_OVERRIDE;
 	virtual void Error(const SourceInfo& sourceInfo, const char* channel, const char* foramt, ...) X_OVERRIDE;

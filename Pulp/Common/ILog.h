@@ -31,7 +31,7 @@ struct ILog
 	virtual void Init() X_ABSTRACT;
 	virtual void ShutDown() X_ABSTRACT;
 
-	virtual void Log(const SourceInfo& sourceInfo, const char* channel, size_t verbosity, const char* foramt, ...) X_ABSTRACT;
+	virtual void Log(const SourceInfo& sourceInfo, const char* channel, int verbosity, const char* foramt, ...) X_ABSTRACT;
 	
 	virtual void Warning(const SourceInfo& sourceInfo, const char* channel, const char* foramt, ...) X_ABSTRACT;
 	virtual void Error(const SourceInfo& sourceInfo, const char* channel, const char* foramt, ...) X_ABSTRACT;
