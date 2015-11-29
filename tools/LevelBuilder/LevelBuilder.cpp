@@ -148,6 +148,8 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
 void CompileLevel(core::Path<char>& path)
 {
+	core::ITimer* pTimer = gEnv->pTimer;
+
 	if (core::strUtil::IsEqualCaseInsen("map", path.extension()))
 	{
 		X_ERROR("Map", "extension is not valid, must be .map");
@@ -160,7 +162,7 @@ void CompileLevel(core::Path<char>& path)
 
 	X_LOG0("Map", "Loading: \"%s\"", path.fileName());
 
-	core::TimeVal start = gEnv->pTimer->GetAsyncTime();
+	core::TimeVal start = pTimer->GetAsyncTime();
 
 	if (pFile = gEnv->pFileSys->openFileMem(path.c_str(), mode))
 	{
@@ -170,7 +172,7 @@ void CompileLevel(core::Path<char>& path)
 		//	parse the map file.
 		if (map.Parse(pFile->getBufferStart(),pFile->getSize()))
 		{
-			core::TimeVal end = gEnv->pTimer->GetAsyncTime();
+			core::TimeVal end = pTimer->GetAsyncTime();
 			{
 				X_LOG_BULLET;
 				X_LOG0("Map", "Loaded: ^6%.4fms", (end - start).GetMilliSeconds());
@@ -184,9 +186,14 @@ void CompileLevel(core::Path<char>& path)
 			{
 				if (lvl.ProcessModels())
 				{
+					core::TimeVal saveStart = pTimer->GetAsyncTime();
+
 					if (lvl.save(path.fileName()))
 					{
-						X_LOG0("Level", "Success.");
+						core::TimeVal saveElapsed = (pTimer->GetAsyncTime() - saveStart);
+
+						X_LOG0("Level", "Success. saved in: ^6%gms",
+							saveElapsed.GetMilliSeconds());
 					//	X_LOG0("Level", "saved as: \"%s\"", path.fileName());
 					}
 					else
@@ -197,7 +204,7 @@ void CompileLevel(core::Path<char>& path)
 			}
 
 
-			end = gEnv->pTimer->GetAsyncTime();
+			end = pTimer->GetAsyncTime();
 			X_LOG0("Info", "Total Time: ^6%.4fms", (end - start).GetMilliSeconds());
 		}
 		else
