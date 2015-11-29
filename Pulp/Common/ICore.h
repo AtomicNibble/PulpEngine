@@ -162,8 +162,8 @@ struct IAssertHandler
 //  Structure passed to Init method of ISystem interface.
 struct SCoreInitParams
 {
-	void *hInstance;								
-	void *hWnd;
+	void* hInstance;								
+	void* hWnd;
 
 //	core::LoggerBase* pLog;
 	core::Console* pConsoleWnd;
