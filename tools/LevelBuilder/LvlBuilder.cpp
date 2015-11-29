@@ -373,7 +373,7 @@ bool LvlBuilder::processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt)
 }
 
 bool LvlBuilder::processBrush(LvlEntity& ent,
-	mapfile::XMapBrush* mapBrush, int ent_idx)
+	mapfile::XMapBrush* mapBrush, size_t entIdx)
 {
 	const mapfile::XMapBrushSide* pMapBrushSide;
 	XWinding*	w;
@@ -382,7 +382,7 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 	LvlBrush& brush = ent.brushes.AddOne();
 	brush.entityNum = stats_.numEntities;
-	brush.brushNum = ent_idx;
+	brush.brushNum = safe_static_cast<int32_t, size_t>(entIdx);
 
 
 	numSides = mapBrush->GetNumSides();
@@ -467,8 +467,9 @@ bool LvlBuilder::processBrush(LvlEntity& ent,
 
 
 bool LvlBuilder::processPatch(LvlEntity& ent, 
-	mapfile::XMapPatch* mapPatch, int ent_idx)
+	mapfile::XMapPatch* mapPatch, size_t entIdx)
 {
+	X_UNUSED(entIdx);
 	size_t i;
 
 	if (gSettings.noPatches) { // are these goat meshes even allowed O_0 ?

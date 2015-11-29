@@ -365,8 +365,8 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 
 	size_t StartVert = pSubMesh->verts_.size();
 
-	int numPoints = pWinding->getNumPoints();
-	int i, j;
+	size_t numPoints = pWinding->getNumPoints();
+	size_t i, j;
 
 	const XWinding* w = pWinding;
 
@@ -406,7 +406,8 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 
 		face += model::Face(offset, offset, offset);
 
-		model::Index localOffset = safe_static_cast<model::Index, size_t>((i - 2) * 3);
+		model::Index localOffset = safe_static_cast<model::Index, size_t>(
+			(i - 2) * 3);
 
 		face += model::Face(localOffset, localOffset, localOffset);
 
