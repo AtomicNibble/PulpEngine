@@ -148,3 +148,29 @@ const WritePolicy& Logger<FilterPolicy, FormatPolicy, WritePolicy>::GetWritePoli
 {
 	return writer_;
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+template <class FilterPolicy, class FormatPolicy, class WritePolicy>
+FilterPolicy& Logger<FilterPolicy, FormatPolicy, WritePolicy>::GetFilterPolicy(void)
+{
+	return filter_;
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+template <class FilterPolicy, class FormatPolicy, class WritePolicy>
+FormatPolicy& Logger<FilterPolicy, FormatPolicy, WritePolicy>::GetFormatPolicy(void)
+{
+	return formatter_;
+}
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+template <class FilterPolicy, class FormatPolicy, class WritePolicy>
+WritePolicy& Logger<FilterPolicy, FormatPolicy, WritePolicy>::GetWritePolicy(void)
+{
+	return writer_;
+}
