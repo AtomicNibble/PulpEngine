@@ -218,6 +218,11 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		env_.pConsole->ShutDown();
 	}
 
+	// register verbosity vars.
+	if (pConsoleLogger_) {
+		pConsoleLogger_->GetFilterPolicy().RegisterVars();
+	}
+
 	// register filesystemvars.
 	env_.pFileSys->CreateVars();
 
@@ -382,7 +387,7 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 
 		//	if (!initParams.bTesting) {
 			pConsoleLogger_ = X_NEW( ConsoleLogger, g_coreArena,"ConsoleLogger")(
-					ConsoleLogger::FilterPolicy(),
+					ConsoleLogger::FilterPolicy(3, "console"),
 					ConsoleLogger::FormatPolicy(),
 					ConsoleLogger::WritePolicy(*pConsole_));
 
