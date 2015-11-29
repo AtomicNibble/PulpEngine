@@ -64,7 +64,7 @@ void InitRootDir()
 
 	if (!SetCurrentDirectoryW(path.c_str())) {
 		::MessageBoxW(0, L"Failed to set current directory", L"Error", MB_OK);
-		ExitProcess(-1);
+		ExitProcess(static_cast<uint32_t>(-1));
 	}
 #endif
 }
