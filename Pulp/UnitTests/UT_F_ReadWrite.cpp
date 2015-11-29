@@ -161,6 +161,8 @@ TEST(FileSys, Find)
 	{
 		do
 		{
+			EXPECT_TRUE(strUtil::Find(fd.name, L".model") != nullptr);
+
 			X_LOG0("findresult", "name: \"%ls\"", fd.name);
 			num++;
 		}
