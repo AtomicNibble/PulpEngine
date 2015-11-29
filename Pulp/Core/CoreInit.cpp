@@ -188,8 +188,8 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	X_ENABLE_WARNING(4996);
 #endif
 
-	hInst_ = (WIN_HINSTANCE)startupParams.hInstance;
-	hWnd_ = (WIN_HWND)startupParams.hWnd;
+	hInst_ = static_cast<WIN_HINSTANCE>(startupParams.hInstance);
+	hWnd_ = static_cast<WIN_HWND>(startupParams.hWnd);
 
 	// #------------------------- Logging -----------------------
 	if (!InitLogging(startupParams))
