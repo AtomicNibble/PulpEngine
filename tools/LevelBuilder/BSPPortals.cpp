@@ -3,6 +3,8 @@
 
 #include "MapLoader.h"
 
+#include <IConsole.h>
+
 namespace
 {
 	#define	SIDESPACE	8
@@ -151,13 +153,15 @@ void bspPortal::MakeHeadnodePortals(bspTree& tree)
 		}
 	}
 
-#if X_DEBUG
-	X_LOG0("BspPortal", "Head node windings");
-	// print the head nodes portal bounds.
-	for (i = 0; i<6; i++) {
-		portals[i]->pWinding->print();
+	core::ICVar* pLogVerbosity = gEnv->pConsole->GetCVar("log_verbosity");
+	if (!pLogVerbosity || pLogVerbosity->GetInteger() >= 1)
+	{
+		X_LOG1("BspPortal", "Head node windings");
+		// print the head nodes portal bounds.
+		for (i = 0; i < 6; i++) {
+			portals[i]->pWinding->print();
+		}
 	}
-#endif // !X_DEBUG
 }
 
 

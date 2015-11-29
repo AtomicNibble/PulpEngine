@@ -349,7 +349,7 @@ void bspNode::FindAreas_r(size_t& numAreas)
 	size_t areaFloods = 0;
 	this->FloodAreas_r(numAreas, areaFloods);
 
-	X_LOG0("Lvl", "area ^8%i^7 has ^8%i^7 leafs", numAreas, areaFloods);
+	X_LOG1("Lvl", "area ^8%i^7 has ^8%i^7 leafs", numAreas, areaFloods);
 	numAreas++;
 
 }

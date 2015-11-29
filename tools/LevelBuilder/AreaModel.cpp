@@ -65,10 +65,10 @@ void AreaModel::EndModel(void)
 	model.boundingSphere = Sphere(bounds);
 
 	X_LOG_BULLET;
-	X_LOG0("AreaModel", "num verts: %i", model.numVerts);
-	X_LOG0("AreaModel", "num indexes: %i", model.numIndexes);
-	X_LOG0("AreaModel", "num meshes: %i", model.numSubMeshes);
-	X_LOG0("AreaModel", "bounds: (%.0f,%.0f,%.0f) to (%.0f,%.0f,%.0f)", bounds.min[0], bounds.min[1], bounds.min[2],
+	X_LOG1("AreaModel", "num verts: %i", model.numVerts);
+	X_LOG1("AreaModel", "num indexes: %i", model.numIndexes);
+	X_LOG1("AreaModel", "num meshes: %i", model.numSubMeshes);
+	X_LOG1("AreaModel", "bounds: (%.0f,%.0f,%.0f) to (%.0f,%.0f,%.0f)", bounds.min[0], bounds.min[1], bounds.min[2],
 		bounds.max[0], bounds.max[1], bounds.max[2]);
 }
 
@@ -125,7 +125,7 @@ void LvlArea::AreaEnd(void)
 
 		mesh.materialName = aSub.matNameID_;
 		
-		X_LOG0("SubMesh", "Mat: ^3%s^7 verts: %i indexs: %i", 
+		X_LOG1("SubMesh", "Mat: ^3%s^7 verts: %i indexs: %i", 
 			aSub.matName_.c_str(), mesh.numVerts, mesh.numIndexes);
 
 		// faces

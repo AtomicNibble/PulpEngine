@@ -550,7 +550,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 			}
 
 			const core::string& modelName = it->second;
-			X_LOG0("Entity", "Ent model: \"%s\"", modelName.c_str());
+			X_LOG1("Entity", "Ent model: \"%s\"", modelName.c_str());
 
 			sm.modelNameIdx = stringTable_.addStringUnqiue(modelName.c_str());
 		}
@@ -578,7 +578,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 		size_t numRefs = areaList.size();
 		if (numRefs)
 		{
-			X_LOG0("Lvl", "Entity(%i) has %i refs", i, numRefs);
+			X_LOG1("Lvl", "Entity(%i) has %i refs", i, numRefs);
 
 			// ok so we hold a list of unique areas ent is in.
 			if (numRefs == 1)
@@ -663,7 +663,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 		if (numRefs)
 		{
 			
-			X_LOG0("Lvl", "Entity(%i:%s) has %i refs", 
+			X_LOG1("Lvl", "Entity(%i:%s) has %i refs", 
 				i, level::ClassType::ToString(lvlEnt.classType), numRefs);
 
 			// ok so we hold a list of unique areas ent is in.
