@@ -282,7 +282,6 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="LevelBuilder.ico" />
-    <Image Include="small.ico" />
   </ItemGroup>
   <ItemGroup>
     <None Include="MapTypes.inl" />
