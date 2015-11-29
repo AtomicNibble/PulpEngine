@@ -175,10 +175,14 @@ struct SCoreInitParams
 	bool bSkipInput;
 	bool bSkipSound;
 	bool bCoreOnly;
-	bool bEnableConsole;
+	bool bEnableBasicConsole; // when in core only mode, optional enable a basic console.
 
-	const bool isCoreOnly() const {
+	const bool isCoreOnly(void) const {
 		return bCoreOnly;
+	}
+
+	const bool basicConsole(void) const {
+		return isCoreOnly() && bEnableBasicConsole;
 	}
 
 	SCoreInitParams() :
@@ -189,7 +193,7 @@ struct SCoreInitParams
 		pConsoleWnd(nullptr),
 		bTesting(false),
 		bCoreOnly(false),
-		bEnableConsole(true),
+		bEnableBasicConsole(false),
 
 #if X_SUPER == 0
 		bConsoleLog(true),

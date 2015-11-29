@@ -200,7 +200,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		return false;
 
 	// #------------------------- Create Console ----------------
-	if (!startupParams.isCoreOnly() || startupParams.bEnableConsole)
+	if (!startupParams.isCoreOnly() || startupParams.basicConsole())
 	{
 		env_.pConsole = X_NEW_ALIGNED(core::XConsole, g_coreArena, "ConsoleSys",8);
 		// register the commands so they can be used before Console::Init
@@ -401,7 +401,7 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 
 bool XCore::InitConsole(const SCoreInitParams &initParams)
 {
-	env_.pConsole->Startup(this, initParams.isCoreOnly());
+	env_.pConsole->Startup(this, initParams.basicConsole());
 	env_.pConsole->LoadConfig("user_config.cfg");
 
 
