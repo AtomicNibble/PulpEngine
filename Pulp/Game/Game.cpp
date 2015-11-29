@@ -38,7 +38,7 @@ X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Game@@0V12@A")
 
 #endif // !X_LIB
 
-void InitRootDir()
+void InitRootDir(void)
 {
 #ifdef WIN32
 	WCHAR szExeFileName[_MAX_PATH] = { 0 };
