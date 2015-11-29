@@ -47,7 +47,7 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoLog(const SourceInfo& so
 {
 	if (filter_.Filter("INFO", sourceInfo, channel, verbosity, format, args))
 	{
-		LoggerBase::Line line = {};
+		LoggerBase::Line line;
 		const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), "INFO", sourceInfo, channel, verbosity, format, args);
 		writer_.WriteLog(line, length);
 	}
@@ -61,7 +61,7 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoWarning(const SourceInfo
 {
 	if (filter_.Filter("WARNING", sourceInfo, channel, 0, format, args))
 	{
-		LoggerBase::Line line = {};
+		LoggerBase::Line line;
 		const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), "WARNING", sourceInfo, channel, 0, format, args);
 		writer_.WriteWarning(line, length);
 	}
@@ -75,7 +75,7 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoError(const SourceInfo& 
 {
 	if (filter_.Filter("ERROR", sourceInfo, channel, 0, format, args))
 	{
-		LoggerBase::Line line = {};
+		LoggerBase::Line line;
 		const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), "ERROR", sourceInfo, channel, 0, format, args);
 		writer_.WriteError(line, length);
 	}
@@ -89,7 +89,7 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoFatal(const SourceInfo& 
 {
 	if (filter_.Filter("FATAL", sourceInfo, channel, 0, format, args))
 	{
-		LoggerBase::Line line = {};
+		LoggerBase::Line line;
 		const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), "FATAL", sourceInfo, channel, 0, format, args);
 		writer_.WriteFatal(line, length);
 	}
@@ -102,7 +102,7 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoAssert(const SourceInfo&
 {
 	if (filter_.Filter("ASSERT", sourceInfo, "Assert", 0, format, args))
 	{
-		LoggerBase::Line line = {};
+		LoggerBase::Line line;
 		const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), "ASSERT", sourceInfo, "Assert", 0, format, args);
 		writer_.WriteAssert(line, length);
 	}
@@ -116,7 +116,7 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoAssertVariable(const Sou
 {
 	if (filter_.Filter("ASSERT", sourceInfo, "Assert", 0, format, args))
 	{
-		LoggerBase::Line line = {};
+		LoggerBase::Line line;
 		const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), "ASSERT", sourceInfo, "Assert", 0, format, args);
 		writer_.WriteAssertVariable(line, length);
 	}
