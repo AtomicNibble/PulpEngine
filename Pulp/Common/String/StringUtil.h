@@ -103,21 +103,6 @@ namespace strUtil
 	const char* Find(const char* startInclusive, const char* endExclusive, char what);
 	const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what);
 
-	/// \brief Finds the first character in a string that is not a certain character, and returns a pointer to it.
-	/// \remark Returns a \c nullptr if the character could not be found.
-	const char* FindNon(const char* startInclusive, const char* endExclusive, char what);
-	const wchar_t* FindNon(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what);
-
-	/// \brief Finds a character in a string, and returns a pointer to the last occurrence of the character.
-	/// \remark Returns a \c nullptr if the character could not be found.
-	const char* FindLast(const char* startInclusive, const char* endExclusive, char what);
-	const wchar_t* FindLast(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what);
-
-	/// \brief Finds the last character in a string that is not a certain character, and returns a pointer to it.
-	/// \remark Returns a \c nullptr if the character could not be found.
-	const char* FindLastNon(const char* startInclusive, const char* endExclusive, char what);
-	const wchar_t* FindLastNon(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what);
-
 	/// \brief Finds a string inside a string, and returns a pointer to it.
 	/// \remark Returns a \c nullptr if the string could not be found.
 	const char* Find(const char* startInclusive, const char* endExclusive, const char* what);
@@ -132,6 +117,22 @@ namespace strUtil
 	/// \remark Returns a \c nullptr if the string could not be found.
 	const char* Find(const char* startInclusive, const char* endExclusive, const char* whatStart, const char* whatEnd);
 	const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* whatStart, const wchar_t* whatEnd);
+
+
+	/// \brief Finds the first character in a string that is not a certain character, and returns a pointer to it.
+	/// \remark Returns a \c nullptr if the character could not be found.
+	const char* FindNon(const char* startInclusive, const char* endExclusive, char what);
+	const wchar_t* FindNon(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what);
+
+	/// \brief Finds a character in a string, and returns a pointer to the last occurrence of the character.
+	/// \remark Returns a \c nullptr if the character could not be found.
+	const char* FindLast(const char* startInclusive, const char* endExclusive, char what);
+	const wchar_t* FindLast(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what);
+
+	/// \brief Finds the last character in a string that is not a certain character, and returns a pointer to it.
+	/// \remark Returns a \c nullptr if the character could not be found.
+	const char* FindLastNon(const char* startInclusive, const char* endExclusive, char what);
+	const wchar_t* FindLastNon(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what);
 
 	/// \brief Finds a string inside a string using a case-insensitive search, and returns a pointer to it.
 	/// \remark Returns a \c nullptr if the string could not be found.
