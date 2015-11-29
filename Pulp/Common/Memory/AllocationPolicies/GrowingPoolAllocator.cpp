@@ -25,8 +25,8 @@ namespace {
 }
 
 
-GrowingPoolAllocator::GrowingPoolAllocator(unsigned int maxSizeInBytes, unsigned int growSize, 
-	unsigned int chunkHeaderSize, size_t maxElementSize, size_t maxAlignment, size_t offset)
+GrowingPoolAllocator::GrowingPoolAllocator(size_t maxSizeInBytes, size_t growSize,
+	size_t chunkHeaderSize, size_t maxElementSize, size_t maxAlignment, size_t offset)
 {
 	virtualStart_ = static_cast<char*>( VirtualMem::ReserveAddressSpace( maxSizeInBytes ) );
 	virtualEnd_ = &virtualStart_[ maxSizeInBytes ];
