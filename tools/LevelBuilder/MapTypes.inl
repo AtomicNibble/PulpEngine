@@ -52,6 +52,10 @@ const Planef& XMapBrushSide::GetPlane(void) const
 	return plane; 
 }
 
+XMapBrushSide::MaterialInfo::MaterialInfo(void)
+{
+	rotate = 0.f;
+}
 
 // ======================
 
