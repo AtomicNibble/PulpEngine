@@ -699,22 +699,23 @@ void XMapFile::PrimtPrimMemInfo(void) const
 {
 #if MAP_LOADER_USE_POOL && X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	core::MemoryAllocatorStatistics stats = primPoolAllocator_.getStatistics();
+	X_LOG_BULLET;
 	X_LOG0("Map", "Listing map loader primative allocator stats");
 	X_LOG_BULLET;
 
-	X_LOG0("Map", "allocationCount: %i", stats.allocationCount_);
-	X_LOG0("Map", "allocationCountMax: %i", stats.allocationCountMax_);
-	X_LOG0("Map", "virtualMemoryReserved: %i", stats.virtualMemoryReserved_);
-	X_LOG0("Map", "physicalMemoryAllocated: %i", stats.physicalMemoryAllocated_);
-	X_LOG0("Map", "physicalMemoryAllocatedMax: %i", stats.physicalMemoryAllocatedMax_);
-	X_LOG0("Map", "physicalMemoryUsed: %i", stats.physicalMemoryUsed_);
-	X_LOG0("Map", "physicalMemoryUsedMax: %i", stats.physicalMemoryUsedMax_);
-	X_LOG0("Map", "wasteAlignment: %i", stats.wasteAlignment_);
-	X_LOG0("Map", "wasteAlignmentMax: %i", stats.wasteAlignmentMax_);
-	X_LOG0("Map", "wasteUnused: %i", stats.wasteUnused_);
-	X_LOG0("Map", "wasteUnusedMax: %i", stats.wasteUnusedMax_);
-	X_LOG0("Map", "internalOverhead: %i", stats.internalOverhead_);
-	X_LOG0("Map", "internalOverheadMax: %i", stats.internalOverheadMax_);
+	X_LOG0("Map", "allocationCount: ^6%i", stats.allocationCount_);
+	X_LOG0("Map", "allocationCountMax: ^6%i", stats.allocationCountMax_);
+	X_LOG0("Map", "virtualMemoryReserved: ^6%i", stats.virtualMemoryReserved_);
+	X_LOG0("Map", "physicalMemoryAllocated: ^6%i", stats.physicalMemoryAllocated_);
+	X_LOG0("Map", "physicalMemoryAllocatedMax: ^6%i", stats.physicalMemoryAllocatedMax_);
+	X_LOG0("Map", "physicalMemoryUsed: ^6%i", stats.physicalMemoryUsed_);
+	X_LOG0("Map", "physicalMemoryUsedMax: ^6%i", stats.physicalMemoryUsedMax_);
+	X_LOG0("Map", "wasteAlignment: ^6%i", stats.wasteAlignment_);
+	X_LOG0("Map", "wasteAlignmentMax: ^6%i", stats.wasteAlignmentMax_);
+	X_LOG0("Map", "wasteUnused: ^6%i", stats.wasteUnused_);
+	X_LOG0("Map", "wasteUnusedMax: ^6%i", stats.wasteUnusedMax_);
+	X_LOG0("Map", "internalOverhead: ^6%i", stats.internalOverhead_);
+	X_LOG0("Map", "internalOverheadMax: ^6%i", stats.internalOverheadMax_);
 #endif // !MAP_LOADER_USE_POOL && X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 }
 
