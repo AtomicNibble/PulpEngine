@@ -16,6 +16,7 @@
 // Logging
 #include "Logging\Logger.h"
 #include "Logging\FilterPolicies\LoggerNoFilterPolicy.h"
+#include "Logging\FilterPolicies\LoggerVerbosityFilterPolicy.h"
 #include "Logging\FormatPolicies\LoggerExtendedFormatPolicy.h"
 #include "Logging\FormatPolicies\LoggerSimpleFormatPolicy.h"
 #include "Logging\FormatPolicies\LoggerFullFormatPolicy.h"
@@ -72,7 +73,7 @@ core::LoggerFullFormatPolicy,
 core::LoggerDebuggerWritePolicy> VisualStudioLogger;
 
 typedef core::Logger<
-	core::LoggerNoFilterPolicy,
+	core::LoggerVerbosityFilterPolicy,
 	core::LoggerSimpleFormatPolicy,
 	core::LoggerConsoleWritePolicy> ConsoleLogger;
 
@@ -162,8 +163,7 @@ private:
 		const SCoreInitParams &initParams);
 	
 
-	bool InitConsole();
-	
+	bool InitConsole(const SCoreInitParams &initParams);
 	bool InitFileSys(const SCoreInitParams &startupParams);
 	bool InitLogging(const SCoreInitParams &startupParams);
 	bool InitInput(const SCoreInitParams &startupParams);

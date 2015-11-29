@@ -71,7 +71,7 @@ struct IConsole
 {
 	virtual ~IConsole(){}
 
-	virtual void Startup(ICore* pCore) X_ABSTRACT;
+	virtual void Startup(ICore* pCore, bool basic) X_ABSTRACT;
 	virtual void RegisterCommnads(void) X_ABSTRACT;
 	virtual void ShutDown(void) X_ABSTRACT;
 	virtual void SaveChangedVars(void) X_ABSTRACT; // saves vars with 'SAVE_IF_CHANGED' if modified.

@@ -622,30 +622,20 @@ XConsole::~XConsole()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void XConsole::Startup(ICore* pCore)
+void XConsole::Startup(ICore* pCore, bool basic)
 {
 	X_ASSERT_NOT_NULL(pCore);
 	X_LOG0("Console", "Starting console");
 
-
 	pCore_ = pCore;
-	pFont_ = pCore->GetIFontSys()->GetFont("default");
-	pRender_ = pCore->GetIRender();
-	pInput_ = pCore->GetIInput();
 
-	X_ASSERT_NOT_NULL(pFont_);
-//	X_ASSERT_NOT_NULL(pRender_); // can be null i think, ask wincat.
-	X_ASSERT_NOT_NULL(pInput_);
-
-	// we want input events plooxx.
-	pInput_->AddConsoleEventListener(this);
-	
 	// add this as a logger.
 	pCore->GetILog()->AddLogger(&logger_);
 
-	// load a texture baby!
-	pBackground_ = pRender_->LoadTexture("Textures/white.dds", 
-		texture::TextureFlags::DONT_STREAM);
+	if (!basic) {
+		LoadRenderResources();
+		RegisterInputListener();
+	}
 
 	ADD_CVAR_REF_NO_NAME(console_debug, 0, 0, 1, VarFlag::SYSTEM | VarFlag::CHEAT, 
 		"Debugging for console operations. 0=off 1=on");
@@ -676,14 +666,51 @@ void XConsole::Startup(ICore* pCore)
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Disable mouse input when console open."
 		" 1=expanded only 2=always");
 
+	if (!basic)
+	{
+		// hot reload
+		pCore->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
 
-	// hot reload
-	pCore->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
-
-	if (console_save_history) {
-		LoadCmdHistory();
+		if (console_save_history) {
+			LoadCmdHistory();
+		}
+	}
+	else {
+		// when in basic mode, don't save out.
+		console_save_history = 0;
 	}
 }
+
+void XConsole::LoadRenderResources(void)
+{
+	X_ASSERT_NOT_NULL(pCore_);
+	X_ASSERT_NOT_NULL(pCore_->GetIFontSys());
+
+	pFont_ = pCore_->GetIFontSys()->GetFont("default");
+
+	X_ASSERT_NOT_NULL(pFont_);
+
+	pRender_ = pCore_->GetIRender();
+
+	X_ASSERT_NOT_NULL(pRender_);
+
+	// load a texture baby!
+	pBackground_ = pRender_->LoadTexture("Textures/white.dds",
+		texture::TextureFlags::DONT_STREAM);
+}
+
+void XConsole::RegisterInputListener(void)
+{
+	X_ASSERT_NOT_NULL(pCore_);
+
+	pInput_ = pCore_->GetIInput();
+
+	X_ASSERT_NOT_NULL(pInput_);
+
+	// we want input events plooxx.
+	pInput_->AddConsoleEventListener(this);
+}
+
 
 void XConsole::RegisterCommnads(void)
 {
@@ -2729,11 +2756,12 @@ XConsoleNULL::~XConsoleNULL()
 
 }
 
-void XConsoleNULL::Startup(ICore* pCore)
+void XConsoleNULL::Startup(ICore* pCore, bool basic)
 {
 	X_UNUSED(pCore);
-
+	X_UNUSED(basic);
 }
+
 
 void XConsoleNULL::RegisterCommnads(void)
 {

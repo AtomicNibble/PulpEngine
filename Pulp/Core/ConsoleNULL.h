@@ -17,7 +17,7 @@ public:
 
 	virtual ~XConsoleNULL() X_FINAL;
 
-	virtual void Startup(ICore* pCore) X_FINAL;
+	virtual void Startup(ICore* pCore, bool basic) X_FINAL;
 	virtual void RegisterCommnads(void) X_FINAL;
 	virtual void ShutDown(void) X_FINAL;
 	virtual void SaveChangedVars(void) X_FINAL;

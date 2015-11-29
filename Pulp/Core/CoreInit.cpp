@@ -200,7 +200,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		return false;
 
 	// #------------------------- Create Console ----------------
-	if (!startupParams.isCoreOnly())
+	if (!startupParams.isCoreOnly() || startupParams.bEnableConsole)
 	{
 		env_.pConsole = X_NEW_ALIGNED(core::XConsole, g_coreArena, "ConsoleSys",8);
 		// register the commands so they can be used before Console::Init
@@ -225,8 +225,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	core::xWindow::RegisterVars();
 
 	// Load the default config.
-	if (!env_.pConsole->LoadConfig("default.cfg")) {
-		return false;
+	if (!startupParams.isCoreOnly()) {
+		if (!env_.pConsole->LoadConfig("default.cfg")) {
+			return false;
+		}
 	}
 
 	// #------------------------- CPU Info ----------------------
@@ -319,7 +321,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	}
 
 	// #------------------------- Console ---------------------------
-	if (!InitConsole())
+	if (!InitConsole(startupParams))
 		return false;
 
 #if X_DEBUG
@@ -392,10 +394,9 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 	return env_.pLog != nullptr;
 }
 
-bool XCore::InitConsole()
+bool XCore::InitConsole(const SCoreInitParams &initParams)
 {
-	env_.pConsole->Startup(this);
-
+	env_.pConsole->Startup(this, initParams.isCoreOnly());
 	env_.pConsole->LoadConfig("user_config.cfg");
 
 

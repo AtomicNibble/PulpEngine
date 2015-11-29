@@ -126,7 +126,7 @@ public:
 
 	virtual ~XConsole();
 
-	virtual void Startup(ICore* pCore) X_FINAL;
+	virtual void Startup(ICore* pCore, bool basic) X_FINAL;
 	virtual void RegisterCommnads(void) X_FINAL;
 	virtual void ShutDown(void) X_FINAL;
 	virtual void SaveChangedVars(void) X_FINAL;
@@ -184,6 +184,9 @@ public:
 	X_INLINE void ToggleConsole(bool expand = false);
 
 protected:
+	void LoadRenderResources(void);
+	void RegisterInputListener(void);
+
 	void ExecuteStringInternal(const char* command, ExecSource::Enum source = ExecSource::CONSOLE, const bool bSilentMode = false);
 	void ExecuteCommand(ConsoleCommand &cmd, core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& str);
 
