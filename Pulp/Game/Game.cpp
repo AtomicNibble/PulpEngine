@@ -9,6 +9,8 @@ HINSTANCE g_hInstance = 0;
 
 X_LINK_LIB("Shlwapi")
 
+#include <tchar.h>
+
 #define _LAUNCHER
 
 // #undef X_LIB
@@ -64,7 +66,8 @@ void operator delete(void* m)
 
 
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+	LPTSTR lpCmdLine, int nCmdShow)
 {
 	X_UNUSED(hPrevInstance);
 	X_UNUSED(lpCmdLine);

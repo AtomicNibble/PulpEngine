@@ -40,7 +40,7 @@ public:
 	EngineApp();
 	~EngineApp();
 
-	bool Init(const char* sInCmdLine);
+	bool Init(const wchar_t* sInCmdLine);
 	int	MainLoop();
 
 private:
