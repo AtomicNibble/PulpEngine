@@ -28,8 +28,8 @@ struct ILog
 {
 	virtual ~ILog(){};
 
-	virtual void Init() X_ABSTRACT;
-	virtual void ShutDown() X_ABSTRACT;
+	virtual void Init(void) X_ABSTRACT;
+	virtual void ShutDown(void) X_ABSTRACT;
 
 	virtual void Log(const SourceInfo& sourceInfo, const char* channel, int verbosity, const char* foramt, ...) X_ABSTRACT;
 	
@@ -62,8 +62,8 @@ struct ILog
 	friend struct Bullet;
 
 private:
-	virtual void Indent() X_ABSTRACT;
-	virtual void UnIndent() X_ABSTRACT;
+	virtual void Indent(void) X_ABSTRACT;
+	virtual void UnIndent(void) X_ABSTRACT;
 
 };
 

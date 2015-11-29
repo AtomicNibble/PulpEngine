@@ -44,7 +44,7 @@ XLog::~XLog()
 }
 
 
-void XLog::Init()
+void XLog::Init(void)
 {
 	// no point printing a 'starting msg' since  log system 
 	// not quite ready yet xD
@@ -53,7 +53,7 @@ void XLog::Init()
 
 }
 
-void XLog::ShutDown()
+void XLog::ShutDown(void)
 {
 	X_LOG0("LogSys", "Shutting Down");
 
@@ -111,12 +111,12 @@ const char* XLog::GetIndentation(void)
 	return result;
 }
 
-void XLog::Indent()
+void XLog::Indent(void)
 {
 	logVerbosity_++;
 }
 
-void XLog::UnIndent()
+void XLog::UnIndent(void)
 {
 	--logVerbosity_;
 }

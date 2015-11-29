@@ -175,7 +175,7 @@ private:
 	bool InitGameDll(const SCoreInitParams &startupParams);
 	
 	
-	void CreateSystemVars();
+	void CreateSystemVars(void);
 
 
 	friend void Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd);

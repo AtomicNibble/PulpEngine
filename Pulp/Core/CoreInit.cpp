@@ -568,7 +568,7 @@ void WindowSizeVarChange(core::ICVar* pVar)
 }
 
 
-void XCore::CreateSystemVars()
+void XCore::CreateSystemVars(void)
 {
 	using namespace core;
 
