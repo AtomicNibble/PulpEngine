@@ -516,6 +516,12 @@ namespace strUtil
 		return nullptr;
 	}
 
+
+	const char* Find(const char* startInclusive, const char* what)
+	{
+		return Find(startInclusive, startInclusive + strlen(startInclusive), what);
+	}
+
 	const char* Find(const char* startInclusive, const char* endExclusive, const char* what)
 	{
 		return Find(startInclusive, endExclusive, what, strlen(what));

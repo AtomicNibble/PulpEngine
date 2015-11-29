@@ -105,6 +105,11 @@ namespace strUtil
 
 	/// \brief Finds a string inside a string, and returns a pointer to it.
 	/// \remark Returns a \c nullptr if the string could not be found.
+	const char* Find(const char* startInclusive, const char* what);
+	const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* what);
+
+	/// \brief Finds a string inside a string, and returns a pointer to it.
+	/// \remark Returns a \c nullptr if the string could not be found.
 	const char* Find(const char* startInclusive, const char* endExclusive, const char* what);
 	const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* what);
 
