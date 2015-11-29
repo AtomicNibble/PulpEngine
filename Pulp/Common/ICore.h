@@ -164,6 +164,7 @@ struct SCoreInitParams
 {
 	void* hInstance;								
 	void* hWnd;
+	const wchar_t* pCmdLine;
 
 //	core::LoggerBase* pLog;
 	core::Console* pConsoleWnd;
@@ -188,6 +189,7 @@ struct SCoreInitParams
 	SCoreInitParams() :
 		hInstance(nullptr),
 		hWnd(nullptr),
+		pCmdLine(nullptr),
 		bSkipInput(false),
 		bSkipSound(false),
 		pConsoleWnd(nullptr),
