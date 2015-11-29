@@ -37,6 +37,12 @@
 
 #include "xFileSys.h"
 
+#if defined(WIN32)
+
+#include <VersionHelpers.h>
+
+#endif // !defined(WIN32)
+
 
 X_USING_NAMESPACE;
 
@@ -160,32 +166,17 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	initParams_ = startupParams;
 
 #if defined(WIN32)
-	X_DISABLE_WARNING(4996);
 	{
-		OSVERSIONINFOW osvi;
-
-		core::zero_object(osvi);
-
-		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOW);
-		if (!GetVersionExW(&osvi))
-		{
-			::MessageBoxW(reinterpret_cast<HWND>(startupParams.hWnd),
-				L"GetVersionExW failed.",
-				L"Critial Error", MB_OK);
-			return false;
-		}
-		
-		bool bIsWindowsXPorLater = osvi.dwMajorVersion > 5 || (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion >= 1);
+		bool bIsWindowsXPorLater = ::IsWindowsXPOrGreater();
 
 		if (!bIsWindowsXPorLater)
 		{
 			::MessageBoxW(reinterpret_cast<HWND>(startupParams.hWnd), 
-				L"Versions of windows older than XP are not supported.",
+				L"Versions of windows older than and including XP are not supported.",
 				L"Critial Error", MB_OK);
 			return false;
 		}
 	}
-	X_ENABLE_WARNING(4996);
 #endif
 
 	hInst_ = static_cast<WIN_HINSTANCE>(startupParams.hInstance);
