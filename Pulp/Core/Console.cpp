@@ -1180,8 +1180,11 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 	}
 	else if (event.keyId == KeyId::ESCAPE)
 	{
-		// rekt
-		ClearInputBuffer();
+		// don't think this is every reached.
+		// lets check..
+		X_ASSERT_UNREACHABLE();
+
+		// ClearInputBuffer();
 	}
 
 	return true;
