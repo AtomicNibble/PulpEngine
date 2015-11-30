@@ -186,6 +186,7 @@ bool DX11XRender::Init(HWND hWnd,
 
 	if (FAILED(result))
 	{
+		X_ERROR("Dx10", "Failed to CreateDevice: 0x%x", result);
 		return false;
 	}
 
@@ -193,6 +194,7 @@ bool DX11XRender::Init(HWND hWnd,
 	result = swapChain_->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if (FAILED(result))
 	{
+		X_ERROR("Dx10", "Failed to get back buffer: 0x%x", result);
 		return false;
 	}
 
@@ -200,6 +202,7 @@ bool DX11XRender::Init(HWND hWnd,
 	result = device_->CreateRenderTargetView(backBufferPtr, NULL, &renderTargetView_);
 	if (FAILED(result))
 	{
+		X_ERROR("Dx10", "Failed to create render target view: 0x%x", result);
 		return false;
 	}
 
@@ -224,6 +227,7 @@ bool DX11XRender::Init(HWND hWnd,
 	result = device_->CreateTexture2D(&depthBufferDesc, NULL, &depthStencilBuffer_);
 	if (FAILED(result))
 	{
+		X_ERROR("Dx10", "Failed to create depth buffer: 0x%x", result);
 		return false;
 	}
 
@@ -253,6 +257,7 @@ bool DX11XRender::Init(HWND hWnd,
 	// Create the depth stencil state.
 	if (!this->SetDepthState(depthStencil))
 	{
+		X_ERROR("Dx10", "Failed to set depth states");
 		return false;
 	}
 
@@ -271,6 +276,7 @@ bool DX11XRender::Init(HWND hWnd,
 	// Create the depth stencil state.
 	if (!this->SetBlendState(blend))
 	{
+		X_ERROR("Dx10", "Failed to blend states");
 		return false;
 	}
 
@@ -286,6 +292,7 @@ bool DX11XRender::Init(HWND hWnd,
 	result = device_->CreateDepthStencilView(depthStencilBuffer_, &depthStencilViewDesc, &depthStencilViewReadOnly_);
 	if (FAILED(result))
 	{
+		X_ERROR("Dx10", "Failed to set deptch stencil view: 0x%x", result);
 		return false;
 	}
 
@@ -300,6 +307,7 @@ bool DX11XRender::Init(HWND hWnd,
 	result = device_->CreateDepthStencilView(depthStencilBuffer_, &depthStencilViewDesc, &depthStencilView_);
 	if (FAILED(result))
 	{
+		X_ERROR("Dx10", "Failed to create depth stencil view: 0x%x", result);
 		return false;
 	}
 
@@ -323,6 +331,7 @@ bool DX11XRender::Init(HWND hWnd,
 	// result = device_->CreateRasterizerState(&rasterDesc, &m_rasterState);
 	if (!SetRasterState(raster))
 	{
+		X_ERROR("Dx10", "Failed to set raster state");
 		return false;
 	}
 
@@ -356,6 +365,7 @@ bool DX11XRender::Init(HWND hWnd,
 	screenAspect = (float)screenWidth / (float)screenHeight;
 
 	if (!OnPostCreateDevice()) {
+		X_ERROR("Dx10", "Post device creation operations failed");
 		return false;
 	}
 
