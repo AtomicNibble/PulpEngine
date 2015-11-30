@@ -403,11 +403,13 @@ bool DX11XRender::Init(HWND hWnd,
 		return true;
 	}
 
-	if (SUCCEEDED(device_->QueryInterface(__uuidof(ID3D11Debug), (void**)&d3dDebug_)))
+	result = device_->QueryInterface(__uuidof(ID3D11Debug), (void**)&d3dDebug_);
+	if (SUCCEEDED(result))
 	{
 		return true;
 	}
 	// where is my debug interface slut!
+	X_ERROR("Dx10", "Failed to create debug interface");
 	return false;
 #else
 	return true;
