@@ -163,6 +163,9 @@ bool DX11XRender::Init(HWND hWnd,
 	D3D_FEATURE_LEVEL featureout;
 	const UINT numLevelsRequested = sizeof(FeatureLevels) / sizeof(D3D_FEATURE_LEVEL);
 
+#if X_DEBUG 
+	bool debugNotAvaliable = false;
+#endif // !X_DEBUG
 
 	// Create the swap chain and the Direct3D device.
 	result = D3D11CreateDeviceAndSwapChain(
@@ -173,7 +176,7 @@ bool DX11XRender::Init(HWND hWnd,
 		D3D11_CREATE_DEVICE_DEBUG,
 #else
 		0,
-#endif
+#endif // !X_DEBUG
 		FeatureLevels,
 		numLevelsRequested,
 		D3D11_SDK_VERSION,
@@ -182,7 +185,32 @@ bool DX11XRender::Init(HWND hWnd,
 		&device_,
 		&featureout,
 		&deviceContext_
+	);
+
+#if X_DEBUG 
+	if (FAILED(result) && result == 0x887a002d)
+	{
+		result = D3D11CreateDeviceAndSwapChain(
+			NULL,
+			D3D_DRIVER_TYPE_HARDWARE,
+			NULL,
+			0,
+			FeatureLevels,
+			numLevelsRequested,
+			D3D11_SDK_VERSION,
+			&swapChainDesc,
+			&swapChain_,
+			&device_,
+			&featureout,
+			&deviceContext_
 		);
+
+		if (SUCCEEDED(result)) {
+			debugNotAvaliable = true;
+			X_WARNING("Dx10", "Unable to create debug device!");
+		}
+	}
+#endif // !X_DEBUG
 
 	if (FAILED(result))
 	{
@@ -362,7 +390,8 @@ bool DX11XRender::Init(HWND hWnd,
 
 	// Setup the projection matrix.
 	fieldOfView = PIf / 4.0f;
-	screenAspect = screenWidth / screenHeight;
+	screenAspect = 
+		screenWidth / screenHeight;
 
 	if (!OnPostCreateDevice()) {
 		X_ERROR("Dx10", "Post device creation operations failed");
@@ -370,6 +399,10 @@ bool DX11XRender::Init(HWND hWnd,
 	}
 
 #if X_DEBUG
+	if (debugNotAvaliable) {
+		return true;
+	}
+
 	if (SUCCEEDED(device_->QueryInterface(__uuidof(ID3D11Debug), (void**)&d3dDebug_)))
 	{
 		return true;
