@@ -1112,6 +1112,10 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 	{
 		if (CursorPos_) {  // can we go left?
 			CursorPos_--;
+		
+			// disable blinking while moving.
+			cursor_.curTime = 0.f; 
+			cursor_.draw = true;
 		}
 		return true;
 	}
@@ -1120,6 +1124,10 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 		// are we pre end ?
 		if (CursorPos_ < safe_static_cast<int32_t, size_t>(InputBuffer_.length())) {
 			CursorPos_++;
+
+			// disable blinking while moving.
+			cursor_.curTime = 0.f;
+			cursor_.draw = true;
 		}
 		else if (autoCompleteIdx_ >= 0) {
 			autoCompleteSelect_ = true;
