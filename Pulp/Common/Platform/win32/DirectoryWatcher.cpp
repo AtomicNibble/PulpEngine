@@ -186,12 +186,6 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 			core::Path<wchar_t> path(info.directoryName);
 			path.append(pInfo->FileName);
 
-#if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
-			X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Action: ^9%s", 
-					FileActionToStr(pInfo->Action));
-#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
-
-
 			if (!path.isEmpty())
 			{
 				bool is_directory = false;
