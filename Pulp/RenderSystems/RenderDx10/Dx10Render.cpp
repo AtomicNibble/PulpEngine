@@ -394,10 +394,11 @@ void DX11XRender::ShutDown()
 	ViewMat_.Clear();
 	ProMat_.Clear();
 
-	DxDeviceContext()->OMSetBlendState(nullptr, 0, 0xFFFFFFFF);
-	DxDeviceContext()->OMSetDepthStencilState(nullptr, 0);
-	DxDeviceContext()->OMSetDepthStencilState(nullptr, 0);
-
+	if (DxDeviceContext()) {
+		DxDeviceContext()->OMSetBlendState(nullptr, 0, 0xFFFFFFFF);
+		DxDeviceContext()->OMSetDepthStencilState(nullptr, 0);
+		DxDeviceContext()->OMSetDepthStencilState(nullptr, 0);
+	}
 
 	for (i = 0; i < BlendStates_.size(); ++i)
 		BlendStates_[i].pState->Release();

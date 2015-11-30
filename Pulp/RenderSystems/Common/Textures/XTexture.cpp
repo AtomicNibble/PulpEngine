@@ -776,7 +776,6 @@ void XTexture::init(void)
 void XTexture::shutDown(void)
 {
 	X_LOG0("Textures", "Shutting Down");
-	X_ASSERT_NOT_NULL(s_pTextures);
 	X_LOG_BULLET;
 
 	gEnv->pHotReload->addfileType(nullptr, "ci");
@@ -790,23 +789,29 @@ void XTexture::shutDown(void)
 
 	s_TexStates.free();
 
-	// list any textures still lurking
-	render::XRenderResourceContainer::ResourceItor it = s_pTextures->begin();
-	for (; it != s_pTextures->end(); )
+	// either we did not full start up or there is a issue.
+	X_ASSERT_NOT_NULL(s_pTextures);
+
+	if (s_pTextures)
 	{
-		XTexture* pTex = static_cast<XTexture*>(it->second);
+		// list any textures still lurking
+		render::XRenderResourceContainer::ResourceItor it = s_pTextures->begin();
+		for (; it != s_pTextures->end(); )
+		{
+			XTexture* pTex = static_cast<XTexture*>(it->second);
 
-		++it;
+			++it;
 
-		if (!pTex)
-			continue;
+			if (!pTex)
+				continue;
 
-		X_WARNING("Texture", "\"%s\" was not deleted", pTex->getName());
+			X_WARNING("Texture", "\"%s\" was not deleted", pTex->getName());
 
-		pTex->forceRelease();
+			pTex->forceRelease();
+		}
+
+		X_DELETE_AND_NULL(s_pTextures, g_rendererArena);
 	}
-
-	X_DELETE_AND_NULL(s_pTextures, g_rendererArena);
 }
 
 void XTexture::update(void)
