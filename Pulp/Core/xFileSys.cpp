@@ -157,7 +157,7 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 			FindData.getOSPath(real_path, &findinfo);
 
 			if (isDebug()) {
-				X_LOG0("FileSys", "openFile: \"%s\"", real_path.c_str());
+				X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
 			}
 
 			// TODO: pool allocations.
@@ -187,7 +187,7 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 		}
 
 		if (isDebug()) {
-			X_LOG0("FileSys", "openFile: \"%s\"", real_path.c_str());
+			X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
 		}
 
 		file = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path.c_str(), mode);
@@ -377,7 +377,7 @@ void xFileSys::addModDir(pathTypeW path)
 	}
 
 	if (!this->directoryExistsOS(fixedPath)) {
-		X_ERROR("FileSys", "Fixed path does not exsists: \"%s\"", fixedPath);
+		X_ERROR("FileSys", "Fixed path does not exsists: \"%ls\"", fixedPath);
 		return;
 	}
 
@@ -387,7 +387,7 @@ void xFileSys::addModDir(pathTypeW path)
 	{
 		if (strUtil::FindCaseInsensitive(fixedPath, s->dir->path.c_str()) != nullptr)
 		{
-			X_ERROR("FileSys", "mod dir is identical or inside a current mod dir: \"%s\" -> \"%s\"",
+			X_ERROR("FileSys", "mod dir is identical or inside a current mod dir: \"%ls\" -> \"%ls\"",
 				fixedPath, s->dir->path.c_str());
 			return;
 		}
@@ -496,7 +496,7 @@ bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 	}
 
 	if (isDebug()) {
-		X_LOG0("FileSys", "deleteDirectory: \"%s\"", temp.c_str());
+		X_LOG0("FileSys", "deleteDirectory: \"%ls\"", temp.c_str());
 	}
 
 	SHFILEOPSTRUCTW file_op = {
@@ -536,7 +536,8 @@ bool xFileSys::createDirectory(pathType path, VirtualDirectory::Enum location) c
 	if (!::CreateDirectoryW(buf.c_str(), NULL) && lastError::Get() != ERROR_ALREADY_EXISTS)
 	{
 		lastError::Description Dsc;
-		X_ERROR("FileSys", "Failed to create directory. Error: %s", lastError::ToString(Dsc));
+		X_ERROR("FileSys", "Failed to create directory. Error: %s", 
+			lastError::ToString(Dsc));
 		return false;
 	}
 
@@ -582,7 +583,8 @@ bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum locati
 				if (!::CreateDirectoryW(Path.c_str(), NULL))
 				{
 					lastError::Description Dsc;
-					X_ERROR("xDir", "Failed to create directory. Error: %s", lastError::ToString(Dsc));
+					X_ERROR("xDir", "Failed to create directory. Error: %s",
+						lastError::ToString(Dsc));
 					return false;
 				}
 			}
@@ -698,7 +700,7 @@ bool xFileSys::fileExistsOS(pathTypeW fullPath) const
 	X_ASSERT_NOT_NULL(fullPath);
 
 	if (isDebug()) {
-		X_LOG0("FileSys", "fileExists: \"%s\"", fullPath);
+		X_LOG0("FileSys", "fileExists: \"%ls\"", fullPath);
 	}
 
 	DWORD dwAttrib = GetFileAttributesW(fullPath);
