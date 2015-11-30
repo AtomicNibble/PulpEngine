@@ -361,8 +361,8 @@ bool DX11XRender::Init(HWND hWnd,
 	deviceContext_->RSSetViewports(1, &viewport);
 
 	// Setup the projection matrix.
-	fieldOfView = (float)D3DX_PI / 4.0f;
-	screenAspect = (float)screenWidth / (float)screenHeight;
+	fieldOfView = PIf / 4.0f;
+	screenAspect = screenWidth / screenHeight;
 
 	if (!OnPostCreateDevice()) {
 		X_ERROR("Dx10", "Post device creation operations failed");
