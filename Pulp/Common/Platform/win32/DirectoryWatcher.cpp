@@ -26,6 +26,26 @@ namespace
 			) == TRUE;
 	}
 
+	const char* FileActionToStr(DWORD action)
+	{
+		switch(action)
+		{
+			case FILE_ACTION_ADDED:
+				return "FILE_ACTION_ADDED";
+			case FILE_ACTION_REMOVED:
+				return "FILE_ACTION_REMOVED";
+			case FILE_ACTION_MODIFIED:
+				return "FILE_ACTION_MODIFIED";
+			case FILE_ACTION_RENAMED_OLD_NAME:
+				return "FILE_ACTION_RENAMED_OLD_NAME";
+			case FILE_ACTION_RENAMED_NEW_NAME:
+				return "FILE_ACTION_RENAMED_NEW_NAME";
+			default:
+				break;
+		}
+		X_ASSERT_UNREACHABLE();
+		return "<unkown>";
+	}
 }
 
 
@@ -165,6 +185,11 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 			core::Path<wchar_t> path(info.directoryName);
 			path.append(pInfo->FileName);
 
+#if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+			X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Action: ^9%s", 
+				FileActionToStr(pInfo->Action));
+#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+
 
 			if (!path.isEmpty())
 			{
@@ -173,6 +198,11 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 				if (pInfo->Action != FILE_ACTION_REMOVED) {
 					is_directory = gEnv->pFileSys->isDirectory(path.c_str());
 				}
+
+#if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+				X_LOG1_IF(isDebugEnabled(), "DirWatcher", "path \"%ls\" is dir: %s", 
+					path.c_str(), is_directory ? "^2TRUE":"^1FALSE");
+#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 
 				if (is_directory)
 				{
@@ -201,7 +231,8 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 							// then we get given new name, in next loop.
 						case FILE_ACTION_RENAMED_NEW_NAME:
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
-							X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Dir \"%s\" was renamed to \"%s\"", oldFilename, filename);
+							X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Dir \"%s\" was renamed to \"%s\"",
+								oldFilename, filename);
 #endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 
 							notify(Action::RENAMED, filename, oldFilename, true);
