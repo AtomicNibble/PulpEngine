@@ -69,7 +69,8 @@ XDirectoryWatcher::~XDirectoryWatcher(void)
 
 void XDirectoryWatcher::Init(void)
 {
-	ADD_CVAR_REF("filesys_dir_watcher_debug", debug_, 0, 0, 1, core::VarFlag::SYSTEM,
+	ADD_CVAR_REF("filesys_dir_watcher_debug", debug_, 0, 0, 1, 
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Debug messages for directory watcher. 0=off 1=on");
 
 }
@@ -187,7 +188,7 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 			X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Action: ^9%s", 
-				FileActionToStr(pInfo->Action));
+					FileActionToStr(pInfo->Action));
 #endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 
 
