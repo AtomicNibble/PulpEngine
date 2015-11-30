@@ -1151,10 +1151,16 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 	}
 	else if (event.keyId == KeyId::DOWN_ARROW)
 	{
-		if (isAutocompleteVis())
+		bool inHistory = (HistoryPos_ > 0);
+		bool multiAutoComplete = autoCompleteNum_ > 1;
+
+		if (isAutocompleteVis() && (!inHistory || multiAutoComplete))
 		{
 			autoCompleteIdx_= core::Min(autoCompleteNum_ - 1, ++autoCompleteIdx_);
 
+			// reset history if we move into autocomplete?
+			// i think so..
+			ResetHistoryPos();
 		}
 		else
 		{
