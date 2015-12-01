@@ -200,11 +200,6 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 					is_directory = gEnv->pFileSys->isDirectory(path.c_str());
 				}
 
-#if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
-				X_LOG1_IF(isDebugEnabled(), "DirWatcher", "path \"%ls\" is dir: %s", 
-					path.c_str(), is_directory ? "^2TRUE":"^1FALSE");
-#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
-
 				if (is_directory)
 				{
 					switch (pInfo->Action)
