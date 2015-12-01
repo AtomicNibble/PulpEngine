@@ -373,6 +373,7 @@ private:
 	friend void Command_ConsoleShow(IConsoleCmdArgs* Cmd);
 	friend void Command_ConsoleHide(IConsoleCmdArgs* Cmd);
 	friend void Command_ConsoleToggle(IConsoleCmdArgs* Cmd);
+	friend void Command_SaveModifiedVars(IConsoleCmdArgs* Cmd);
 
 };
 

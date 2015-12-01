@@ -406,7 +406,14 @@ namespace
 		pConsole->ToggleConsole();
 	}
 
+	void Command_SaveModifiedVars(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
 
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		pConsole->SaveChangedVars();
+	}
 
 // ==================================================
 
@@ -729,6 +736,7 @@ void XConsole::RegisterCommnads(void)
 	AddCommand("clearbinds", Command_BindsClear, VarFlag::SYSTEM, "clears all binds");
 	AddCommand("listbinds", Command_BindsList, VarFlag::SYSTEM, "lists all the binds");
 
+	AddCommand("savemodifiedvars", Command_SaveModifiedVars, VarFlag::SYSTEM, "Saves modifed vars");
 
 	AddCommand("console_show", Command_ConsoleShow, VarFlag::SYSTEM, "opens the console");
 	AddCommand("console_hide", Command_ConsoleHide, VarFlag::SYSTEM, "hides the console");
