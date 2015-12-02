@@ -9,15 +9,28 @@ CVarBaseConst::CVarBaseConst(XConsole* pConsole, const char* Name, int Flags, co
 {
 }
 
+CVarBaseConst::~CVarBaseConst()
+{
+
+}
+
 const char* CVarBaseConst::GetName(void) const 
 {
 	return Name_;
 }
 
 
+// ------------------------------------------------------------
+
+
 CVarBaseHeap::CVarBaseHeap(XConsole* pConsole, const char* Name, int Flags, const char* desc) :
 	CVarBase(pConsole, Flags, desc),
 	Name_(Name)
+{
+
+}
+
+CVarBaseHeap::~CVarBaseHeap()
 {
 
 }
@@ -35,6 +48,12 @@ CVarString<T>::CVarString(XConsole* pConsole, const char* Name, const char* Defa
 	: T(pConsole, Name, Flags | VarFlag::STRING, desc),
 	String_(Default)
 {
+}
+
+template<class T>
+CVarString<T>::~CVarString()
+{
+
 }
 
 template<class T>
@@ -126,6 +145,12 @@ CVarInt<T>::CVarInt(XConsole* pConsole, const char* Name, const int iDefault,
 	IntMax_(Max), 
 	IntDefault_(iDefault)
 {
+}
+
+template<class T>
+CVarInt<T>::~CVarInt()
+{
+
 }
 
 template<class T>
@@ -243,6 +268,12 @@ CVarFloat<T>::CVarFloat(XConsole* pConsole, const char* Name, const float fDefau
 	fMax_(Max), 
 	fDefault_(fDefault)
 {
+}
+
+template<class T>
+CVarFloat<T>::~CVarFloat()
+{
+
 }
 
 template<class T>
@@ -402,6 +433,10 @@ CVarIntRef::CVarIntRef(XConsole* pConsole, const char* Name, int* pVar,
 
 }
 
+CVarIntRef::~CVarIntRef()
+{
+
+}
 
 int CVarIntRef::GetInteger(void) const
 { 
@@ -516,6 +551,10 @@ CVarFloatRef::CVarFloatRef(XConsole* pConsole, const char* Name, float* pVal,
 {
 }
 
+CVarFloatRef::~CVarFloatRef()
+{
+
+}
 
 int CVarFloatRef::GetInteger(void) const
 { 
@@ -655,6 +694,11 @@ CVarColRef::CVarColRef(XConsole* pConsole, const char* Name, Color* pVal,
 {
 }
 
+CVarColRef::~CVarColRef()
+{
+
+}
+
 int CVarColRef::GetInteger(void) const
 { 
 	return static_cast<int>(0.f); 
@@ -743,6 +787,10 @@ CVarVec3Ref::CVarVec3Ref(XConsole* pConsole, const char* Name, Vec3f* pVal,
 {
 }
 
+CVarVec3Ref::~CVarVec3Ref()
+{
+
+}
 
 int CVarVec3Ref::GetInteger(void) const
 { 
