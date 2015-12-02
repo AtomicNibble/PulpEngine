@@ -169,41 +169,43 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 
 	if (GetOverlappedResult(info.directory, &info.overlapped, &bytesTransferred, 0))
 	{
-		do
+		if (bytesTransferred > 0)
 		{
-			pInfo = (_FILE_NOTIFY_INFORMATION*)&info.result[offset];
-			
-			// null term. (string is not provided with one.)
-			pInfo->FileName[(pInfo->FileNameLength >> 1)] = '\0';
+			do
+			{
+				pInfo = (_FILE_NOTIFY_INFORMATION*)&info.result[offset];
 
-			// multibyte me up.
-			core::strUtil::Convert(pInfo->FileName, filename);
+				// null term. (string is not provided with one.)
+				pInfo->FileName[(pInfo->FileNameLength >> 1)] = '\0';
 
-			// null term.
-			filename[(pInfo->FileNameLength >> 1)] = '\0';
+				// multibyte me up.
+				core::strUtil::Convert(pInfo->FileName, filename);
 
-			// Path
-			core::Path<wchar_t> path(info.directoryName);
-			path.append(pInfo->FileName);
+				// null term.
+				filename[(pInfo->FileNameLength >> 1)] = '\0';
+
+				// Path
+				core::Path<wchar_t> path(info.directoryName);
+				path.append(pInfo->FileName);
 
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
-			X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Action: ^9%s", 
+				X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Action: ^9%s",
 					FileActionToStr(pInfo->Action));
 #endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 
 
-			if (!path.isEmpty())
-			{
-				bool is_directory = false;
-
-				if (pInfo->Action != FILE_ACTION_REMOVED) {
-					is_directory = gEnv->pFileSys->isDirectory(path.c_str());
-				}
-
-				if (is_directory)
+				if (!path.isEmpty())
 				{
-					switch (pInfo->Action)
+					bool is_directory = false;
+
+					if (pInfo->Action != FILE_ACTION_REMOVED) {
+						is_directory = gEnv->pFileSys->isDirectory(path.c_str());
+					}
+
+					if (is_directory)
 					{
+						switch (pInfo->Action)
+						{
 						case FILE_ACTION_ADDED:
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 							X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Dir \"%s\" was added", filename);
@@ -233,12 +235,12 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 
 							notify(Action::RENAMED, filename, oldFilename, true);
 							break;
+						}
 					}
-				}
-				else
-				{
-					switch (pInfo->Action)
+					else
 					{
+						switch (pInfo->Action)
+						{
 						case FILE_ACTION_ADDED:
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 							X_LOG1_IF(isDebugEnabled(), "DirWatcher", "File \"%s\" was added", filename);
@@ -264,9 +266,9 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 								notify(Action::MODIFIED, filename, nullptr, false);
 							}
 						}
-							break;
+						break;
 
-							// the old name
+						// the old name
 						case FILE_ACTION_RENAMED_OLD_NAME:
 							memcpy(oldFilename, filename, sizeof(oldFilename));
 							break;
@@ -278,15 +280,15 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 #endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 							notify(Action::RENAMED, filename, oldFilename, false);
 							break;
+						}
 					}
+
 				}
 
-			}
-
-			offsetToNext = pInfo->NextEntryOffset;
-			offset += offsetToNext;
+				offsetToNext = pInfo->NextEntryOffset;
+				offset += offsetToNext;
+			} while (offsetToNext);
 		}
-		while (offsetToNext);
 
 		// watch again.
 		WatchDirectory(info.directory, info.result, &info.overlapped);
