@@ -9,7 +9,7 @@ CVarBaseConst::CVarBaseConst(XConsole* pConsole, const char* Name, int Flags, co
 {
 }
 
-const char* CVarBaseConst::GetName() const 
+const char* CVarBaseConst::GetName(void) const 
 {
 	return Name_;
 }
@@ -22,7 +22,7 @@ CVarBaseHeap::CVarBaseHeap(XConsole* pConsole, const char* Name, int Flags, cons
 
 }
 
-const char* CVarBaseHeap::GetName() const 
+const char* CVarBaseHeap::GetName(void) const 
 {
 	return Name_.c_str();
 }
@@ -38,19 +38,19 @@ CVarString<T>::CVarString(XConsole* pConsole, const char* Name, const char* Defa
 }
 
 template<class T>
-int CVarString<T>::GetInteger() const
+int CVarString<T>::GetInteger(void) const
 { 
 	return atoi(String_.c_str()); 
 }
 
 template<class T>
-float CVarString<T>::GetFloat() const
+float CVarString<T>::GetFloat(void) const
 { 
 	return (float)atof(String_.c_str()); 
 }
 
 template<class T>
-const char* CVarString<T>::GetString()
+const char* CVarString<T>::GetString(void)
 { 
 	return String_.c_str(); 
 }
@@ -84,19 +84,19 @@ void CVarString<T>::Set(const int i)
 }
 
 template<class T>
-VarFlag::Enum CVarString<T>::GetType()
+VarFlag::Enum CVarString<T>::GetType(void)
 {
 	return VarFlag::STRING;
 }
 
 template<class T>
-void CVarString<T>::Reset()
+void CVarString<T>::Reset(void)
 {
 
 }
 
 template<class T>
-const char* CVarString<T>::GetDefaultStr() const
+const char* CVarString<T>::GetDefaultStr(void) const
 {
 	return "";
 }
@@ -127,19 +127,19 @@ CVarInt<T>::CVarInt(XConsole* pConsole, const char* Name, const int iDefault,
 }
 
 template<class T>
-int CVarInt<T>::GetInteger() const
+int CVarInt<T>::GetInteger(void) const
 {
 	return IntValue_; 
 }
 
 template<class T>
-float CVarInt<T>::GetFloat() const
+float CVarInt<T>::GetFloat(void) const
 {
 	return static_cast<float>(IntValue_);
 }
 
 template<class T>
-const char* CVarInt<T>::GetString()
+const char* CVarInt<T>::GetString(void)
 {
 	static char szReturnString[64];
 
@@ -194,13 +194,13 @@ void CVarInt<T>::Set(const int i)
 }
 
 template<class T>
-VarFlag::Enum CVarInt<T>::GetType()
+VarFlag::Enum CVarInt<T>::GetType(void)
 { 
 	return VarFlag::INT;
 }
 
 template<class T>
-void CVarInt<T>::Reset()
+void CVarInt<T>::Reset(void)
 {
 	// do i want to set modified here HUMUM
 	// i don't think so.
@@ -208,7 +208,7 @@ void CVarInt<T>::Reset()
 }
 
 template<class T>
-const char* CVarInt<T>::GetDefaultStr() const
+const char* CVarInt<T>::GetDefaultStr(void) const
 {
 	static char szReturnString[64];
 	sprintf(szReturnString, "%d", IntDefault_);
@@ -241,19 +241,19 @@ CVarFloat<T>::CVarFloat(XConsole* pConsole, const char* Name, const float fDefau
 }
 
 template<class T>
-int CVarFloat<T>::GetInteger() const
+int CVarFloat<T>::GetInteger(void) const
 { 
 	return static_cast<int>(fValue_);
 }
 
 template<class T>
-float CVarFloat<T>::GetFloat() const
+float CVarFloat<T>::GetFloat(void) const
 { 
 	return fValue_; 
 }
 
 template<class T>
-const char* CVarFloat<T>::GetString()
+const char* CVarFloat<T>::GetString(void)
 {
 	static char szReturnString[128];
 
@@ -343,19 +343,19 @@ void CVarFloat<T>::Set(const int i)
 }
 
 template<class T>
-VarFlag::Enum CVarFloat<T>::GetType()
+VarFlag::Enum CVarFloat<T>::GetType(void)
 { 
 	return VarFlag::FLOAT; 
 }
 
 template<class T>
-void CVarFloat<T>::Reset()
+void CVarFloat<T>::Reset(void)
 {
 	fValue_ = fDefault_;
 }
 
 template<class T>
-const char* CVarFloat<T>::GetDefaultStr() const
+const char* CVarFloat<T>::GetDefaultStr(void) const
 {
 	static char szReturnString[64];
 	sprintf(szReturnString, "%g", fDefault_);
@@ -389,19 +389,19 @@ CVarIntRef::CVarIntRef(XConsole* pConsole, const char* Name, int* pVar,
 }
 
 
-int CVarIntRef::GetInteger() const
+int CVarIntRef::GetInteger(void) const
 { 
 	return IntValue_; 
 }
 
 
-float CVarIntRef::GetFloat() const
+float CVarIntRef::GetFloat(void) const
 { 
 	return static_cast<float>(IntValue_); 
 }
 
 
-const char* CVarIntRef::GetString()
+const char* CVarIntRef::GetString(void)
 {
 	static char szReturnString[64];
 
@@ -449,13 +449,13 @@ void CVarIntRef::Set(const int i)
 }
 
 
-VarFlag::Enum CVarIntRef::GetType()
+VarFlag::Enum CVarIntRef::GetType(void)
 {
 	return VarFlag::INT; 
 }
 
 
-void CVarIntRef::Reset()
+void CVarIntRef::Reset(void)
 {
 	bool changed = IntValue_ != DefaultVal_;
 
@@ -466,7 +466,7 @@ void CVarIntRef::Reset()
 }
 
 
-const char* CVarIntRef::GetDefaultStr() const
+const char* CVarIntRef::GetDefaultStr(void) const
 {
 	static char szReturnString[64];
 	sprintf(szReturnString, "%d", DefaultVal_);
@@ -499,19 +499,19 @@ CVarFloatRef::CVarFloatRef(XConsole* pConsole, const char* Name, float* pVal,
 }
 
 
-int CVarFloatRef::GetInteger() const
+int CVarFloatRef::GetInteger(void) const
 { 
 	return static_cast<int>(fValue_); 
 }
 
 
-float CVarFloatRef::GetFloat() const
+float CVarFloatRef::GetFloat(void) const
 {
 	return fValue_;
 }
 
 
-const char* CVarFloatRef::GetString()
+const char* CVarFloatRef::GetString(void)
 {
 	static char szReturnString[128];
 
@@ -587,19 +587,19 @@ void CVarFloatRef::Set(const int i)
 }
 
 
-VarFlag::Enum CVarFloatRef::GetType()
+VarFlag::Enum CVarFloatRef::GetType(void)
 { 
 	return VarFlag::FLOAT;
 }
 
 
-void CVarFloatRef::Reset()
+void CVarFloatRef::Reset(void)
 {
 	fValue_ = fDefault_;
 }
 
 
-const char* CVarFloatRef::GetDefaultStr() const
+const char* CVarFloatRef::GetDefaultStr(void) const
 {
 	static char szReturnString[64];
 	sprintf(szReturnString, "%g", fDefault_);
@@ -629,17 +629,17 @@ CVarColRef::CVarColRef(XConsole* pConsole, const char* Name, Color* pVal,
 {
 }
 
-int CVarColRef::GetInteger() const
+int CVarColRef::GetInteger(void) const
 { 
 	return static_cast<int>(0.f); 
 }
 
-float CVarColRef::GetFloat() const
+float CVarColRef::GetFloat(void) const
 { 
 	return 0.f; 
 }
 
-const char* CVarColRef::GetString()
+const char* CVarColRef::GetString(void)
 {
 	static char szReturnString[128];
 	sprintf(szReturnString, "%g %g %g %g", ColValue_.r,
@@ -647,7 +647,7 @@ const char* CVarColRef::GetString()
 	return szReturnString;
 }
 
-const char* CVarColRef::GetDefaultStr() const
+const char* CVarColRef::GetDefaultStr(void) const
 {
 	static char szReturnString[64];
 	sprintf(szReturnString, "%g %g %g %g", ColDefault_.r,
@@ -674,12 +674,12 @@ void CVarColRef::Set(const int i)
 	X_ASSERT_NOT_IMPLEMENTED();
 }
 
-void CVarColRef::Reset()
+void CVarColRef::Reset(void)
 {
 	ColValue_ = ColDefault_;
 }
 
-VarFlag::Enum CVarColRef::GetType()
+VarFlag::Enum CVarColRef::GetType(void)
 { 
 	return VarFlag::COLOR;
 }
@@ -716,17 +716,17 @@ CVarVec3Ref::CVarVec3Ref(XConsole* pConsole, const char* Name, Vec3f* pVal,
 }
 
 
-int CVarVec3Ref::GetInteger() const
+int CVarVec3Ref::GetInteger(void) const
 { 
 	return static_cast<int>(0.f);
 }
 
-float CVarVec3Ref::GetFloat() const
+float CVarVec3Ref::GetFloat(void) const
 { 
 	return 0.f; 
 }
 
-const char* CVarVec3Ref::GetString()
+const char* CVarVec3Ref::GetString(void)
 {
 	static char szReturnString[128];
 	sprintf(szReturnString, "%g %g %g", Value_.x,
@@ -734,7 +734,7 @@ const char* CVarVec3Ref::GetString()
 	return szReturnString;
 }
 
-const char* CVarVec3Ref::GetDefaultStr() const
+const char* CVarVec3Ref::GetDefaultStr(void) const
 {
 	static char szReturnString[64];
 	sprintf(szReturnString, "%g %g %g", Default_.x,
@@ -759,12 +759,12 @@ void CVarVec3Ref::Set(const int i)
 	X_ASSERT_NOT_IMPLEMENTED();
 }
 
-void CVarVec3Ref::Reset()
+void CVarVec3Ref::Reset(void)
 {
 	Value_ = Default_;
 }
 
-VarFlag::Enum CVarVec3Ref::GetType()
+VarFlag::Enum CVarVec3Ref::GetType(void)
 { 
 	return VarFlag::VECTOR; 
 }
