@@ -46,7 +46,7 @@ int CVarString<T>::GetInteger(void) const
 template<class T>
 float CVarString<T>::GetFloat(void) const
 { 
-	return (float)atof(String_.c_str()); 
+	return static_cast<float>(atof(String_.c_str())); 
 }
 
 template<class T>
@@ -58,15 +58,17 @@ const char* CVarString<T>::GetString(void)
 template<class T>
 void CVarString<T>::Set(const char* s)
 {
-	if (Flags_.IsSet(VarFlag::READONLY) || !s)
+	if (Flags_.IsSet(VarFlag::READONLY) || !s) {
 		return;
+	}
 
 	OnModified();
 
 	String_ = s;
 
-	if (pChangeFunc_)
+	if (pChangeFunc_) {
 		pChangeFunc_(this); // change callback.
+	}
 }
 
 template<class T>
@@ -165,16 +167,18 @@ void CVarInt<T>::Set(const char* s)
 template<class T>
 void CVarInt<T>::Set(const float f)
 {
-	Set((int)f);
+	Set(static_cast<int>(f));
 }
 
 template<class T>
 void CVarInt<T>::Set(const int i)
 {
-	if (i == IntValue_)
+	if (i == IntValue_) {
 		return;
-	if (Flags_.IsSet(VarFlag::READONLY))
+	}
+	if (Flags_.IsSet(VarFlag::READONLY)) {
 		return;
+	}
 
 	OnModified();
 
@@ -189,8 +193,9 @@ void CVarInt<T>::Set(const int i)
 			IntValue_ = IntMax_;
 	}
 
-	if (pChangeFunc_)
+	if (pChangeFunc_) {
 		pChangeFunc_(this); // change callback.	
+	}
 }
 
 template<class T>
@@ -271,12 +276,14 @@ void CVarFloat<T>::SetDefault(const char* s)
 template<class T>
 void CVarFloat<T>::Set(const char* s)
 {
-	if (Flags_.IsSet(VarFlag::READONLY))
+	if (Flags_.IsSet(VarFlag::READONLY)) {
 		return;
+	}
 
 	float fValue = 0;
-	if (s)
-		fValue = (float)atof(s);
+	if (s) {
+		fValue = static_cast<float>(atof(s));
+	}
 
 	// cap it before check :D
 	if (fMin_ <= fMax_)
@@ -287,21 +294,24 @@ void CVarFloat<T>::Set(const char* s)
 			fValue_ = fMax_;
 	}
 
-	if (fValue == fValue_)
+	if (fValue == fValue_) {
 		return;
+	}
 
 	OnModified();
 	fValue_ = fValue;
 
-	if (pChangeFunc_)
+	if (pChangeFunc_) {
 		pChangeFunc_(this); // change callback.	
+	}
 }
 
 template<class T>
 void CVarFloat<T>::Set(const float f)
 {
-	if (f == fValue_ || Flags_.IsSet(VarFlag::READONLY))
+	if (f == fValue_ || Flags_.IsSet(VarFlag::READONLY)) {
 		return;
+	}
 
 	OnModified();
 	fValue_ = f;
@@ -315,18 +325,22 @@ void CVarFloat<T>::Set(const float f)
 			fValue_ = fMax_;
 	}
 
-	if (pChangeFunc_)
+	if (pChangeFunc_) {
 		pChangeFunc_(this); // change callback.	
+	}
 }
 
 template<class T>
 void CVarFloat<T>::Set(const int i)
 {
-	if ((float)i == fValue_ || Flags_.IsSet(VarFlag::READONLY))
+	const float fVal = static_cast<float>(i);
+
+	if (fVal == fValue_ || Flags_.IsSet(VarFlag::READONLY)) {
 		return;
+	}
 
 	OnModified();
-	fValue_ = (float)i;
+	fValue_ = fVal;
 
 	// cap it sally.
 	if (fMin_ <= fMax_)
@@ -337,9 +351,9 @@ void CVarFloat<T>::Set(const int i)
 			fValue_ = fMax_;
 	}
 
-	if (pChangeFunc_)
+	if (pChangeFunc_) {
 		pChangeFunc_(this); // change callback.	
-
+	}
 }
 
 template<class T>
@@ -420,16 +434,18 @@ void CVarIntRef::Set(const char* s)
 
 void CVarIntRef::Set(const float f)
 {
-	Set((int)f);
+	Set(static_cast<int>(f));
 }
 
 
 void CVarIntRef::Set(const int i)
 {
-	if (i == IntValue_)
+	if (i == IntValue_) {
 		return;
-	if (Flags_.IsSet(VarFlag::READONLY))
+	} 
+	if (Flags_.IsSet(VarFlag::READONLY)) {
 		return;
+	}
 
 	OnModified();
 
@@ -444,8 +460,9 @@ void CVarIntRef::Set(const int i)
 			IntValue_ = IntMax_;
 	}
 
-	if (pChangeFunc_)
+	if (pChangeFunc_) {
 		pChangeFunc_(this); // change callback.	
+	}
 }
 
 
@@ -461,8 +478,9 @@ void CVarIntRef::Reset(void)
 
 	IntValue_ = DefaultVal_;
 
-	if (changed && pChangeFunc_)
+	if (changed && pChangeFunc_) {
 		pChangeFunc_(this); // change callback.	
+	}
 }
 
 
@@ -522,15 +540,18 @@ const char* CVarFloatRef::GetString(void)
 
 void CVarFloatRef::Set(const char* s)
 {
-	if (Flags_.IsSet(VarFlag::READONLY))
+	if (Flags_.IsSet(VarFlag::READONLY)) {
 		return;
+	}
 
 	float fValue = 0;
-	if (s)
-		fValue = (float)atof(s);
+	if (s) {
+		fValue = static_cast<float>(atof(s));
+	}
 
-	if (fValue == fValue_)
+	if (fValue == fValue_) {
 		return;
+	}
 
 	OnModified();
 
@@ -545,32 +566,37 @@ void CVarFloatRef::Set(const char* s)
 
 	fValue_ = fValue;
 
-	if (pChangeFunc_)
+	if (pChangeFunc_) {
 		pChangeFunc_(this); // change callback.	
+	}
 }
 
 
 void CVarFloatRef::Set(const float f)
 {
-	if (f == fValue_ || Flags_.IsSet(VarFlag::READONLY))
+	if (f == fValue_ || Flags_.IsSet(VarFlag::READONLY)) {
 		return;
+	}
 
 	OnModified();
 	fValue_ = f;
 
-	if (pChangeFunc_)
+	if (pChangeFunc_) {
 		pChangeFunc_(this); // change callback.	
+	}
 }
 
 
 void CVarFloatRef::Set(const int i)
 {
-	if ((float)i == fValue_ || Flags_.IsSet(VarFlag::READONLY))
+	const float fVal = static_cast<float>(i);
+	if (fVal == fValue_ || Flags_.IsSet(VarFlag::READONLY)) {
 		return;
+	}
 
 	OnModified();
 
-	fValue_ = (float)i;
+	fValue_ = fVal;
 
 	// cap it sally.
 	if (fMin_ <= fMax_)
@@ -581,9 +607,9 @@ void CVarFloatRef::Set(const int i)
 			fValue_ = fMax_;
 	}
 
-	if (pChangeFunc_)
+	if (pChangeFunc_) {
 		pChangeFunc_(this); // change callback.	
-
+	}
 }
 
 
@@ -658,8 +684,9 @@ const char* CVarColRef::GetDefaultStr(void) const
 
 void CVarColRef::Set(const float f)
 {
-	if (Flags_.IsSet(VarFlag::READONLY))
+	if (Flags_.IsSet(VarFlag::READONLY)) {
 		return;
+	}
 
 	X_UNUSED(f);
 	X_ASSERT_NOT_IMPLEMENTED();
@@ -667,8 +694,9 @@ void CVarColRef::Set(const float f)
 
 void CVarColRef::Set(const int i)
 {
-	if (Flags_.IsSet(VarFlag::READONLY))
+	if (Flags_.IsSet(VarFlag::READONLY)) {
 		return;
+	}
 
 	X_UNUSED(i);
 	X_ASSERT_NOT_IMPLEMENTED();
@@ -745,16 +773,18 @@ const char* CVarVec3Ref::GetDefaultStr(void) const
 
 void CVarVec3Ref::Set(const float f)
 {
-	if (Flags_.IsSet(VarFlag::READONLY))
+	if (Flags_.IsSet(VarFlag::READONLY)) {
 		return;
+	}
 	X_UNUSED(f);
 	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 void CVarVec3Ref::Set(const int i)
 {
-	if (Flags_.IsSet(VarFlag::READONLY))
+	if (Flags_.IsSet(VarFlag::READONLY)) {
 		return;
+	}
 	X_UNUSED(i);
 	X_ASSERT_NOT_IMPLEMENTED();
 }
