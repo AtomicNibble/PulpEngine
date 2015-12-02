@@ -116,10 +116,14 @@ int XBinds_Core::GetDvar(IFunctionHandler* pH)
 			return pH->EndFunction(var->GetInteger());
 		if (var->GetType() == core::VarFlag::FLOAT)
 			return pH->EndFunction(var->GetFloat());
-		if (var->GetType() == core::VarFlag::STRING)
-			return pH->EndFunction(var->GetString());
-		if (var->GetType() == core::VarFlag::COLOR)
-			return pH->EndFunction(var->GetString());
+
+		{
+			core::ICVar::StrBuf strBuf;
+			if (var->GetType() == core::VarFlag::STRING)
+				return pH->EndFunction(var->GetString(strBuf));
+			if (var->GetType() == core::VarFlag::COLOR)
+				return pH->EndFunction(var->GetString(strBuf));
+		}
 	}
 	else
 	{

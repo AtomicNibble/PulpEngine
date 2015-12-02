@@ -511,9 +511,10 @@ void ConsoleCommandArgs::TokenizeString(const char *begin, const char* end)
 
 					if (var)
 					{
-						name.clear();
+						core::ICVar::StrBuf strBuf;
 
-						name.append(var->GetString());
+						name.clear();
+						name.append(var->GetString(strBuf));
 
 						::memcpy(tokenized_ + totalLen, name.begin(), name.length());
 						totalLen += (name.length() + 1);
@@ -803,9 +804,11 @@ void XConsole::SaveChangedVars(void)
 
 			if (save)
 			{
+				core::ICVar::StrBuf strBuf;
+
 				// save out name + value.
 				const char* pName = pVar->GetName();
-				const char* pValue = pVar->GetString();
+				const char* pValue = pVar->GetString(strBuf);
 
 				file.writeStringNNT("seta ");
 				file.writeStringNNT(pName);
@@ -1871,7 +1874,8 @@ void XConsole::DisplayVarValue(ICVar* pVar)
 		return;
 	}
 
-	X_LOG0("Dvar", "\"%s\" = %s", pVar->GetName(), pVar->GetString());
+	core::ICVar::StrBuf strBuf;
+	X_LOG0("Dvar", "\"%s\" = %s", pVar->GetName(), pVar->GetString(strBuf));
 }
 
 void XConsole::DisplayVarInfo(ICVar* pVar)
@@ -1881,8 +1885,9 @@ void XConsole::DisplayVarInfo(ICVar* pVar)
 	}
 
 	ICVar::FlagType::Description dsc;
+	core::ICVar::StrBuf strBuf;
 
-	X_LOG0("Dvar", "\"%s\" = %s [%s]", pVar->GetName(), pVar->GetString(), 
+	X_LOG0("Dvar", "\"%s\" = %s [%s]", pVar->GetName(), pVar->GetString(strBuf),
 		pVar->GetFlags().ToString(dsc));
 }
 
@@ -2414,10 +2419,11 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				nameStr.appendFmt("%s", pCvar->GetName());
 				defaultStr.append("	default");
 
-				value.appendFmt("%s", pCvar->GetString());
 				{
-					ICVar::DefaultStr DefaultStrBuf;
-					defaultValue.appendFmt("%s", pCvar->GetDefaultStr(DefaultStrBuf));
+					ICVar::StrBuf strBuf;
+
+					value.appendFmt("%s", pCvar->GetString(strBuf));	
+					defaultValue.appendFmt("%s", pCvar->GetDefaultStr(strBuf));
 				}
 				description.append(pCvar->GetDesc()); // dose string length for us / caps.
 

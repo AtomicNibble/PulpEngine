@@ -69,8 +69,9 @@ float CVarString<T>::GetFloat(void) const
 }
 
 template<class T>
-const char* CVarString<T>::GetString(void)
+const char* CVarString<T>::GetString(CVarBase::StrBuf& buf)
 { 
+	X_UNUSED(buf);
 	return String_.c_str(); 
 }
 
@@ -117,7 +118,7 @@ void CVarString<T>::Reset(void)
 }
 
 template<class T>
-const char* CVarString<T>::GetDefaultStr(CVarBase::DefaultStr& buf) const
+const char* CVarString<T>::GetDefaultStr(CVarBase::StrBuf& buf) const
 {
 	core::zero_object(buf);
 	return buf;
@@ -167,12 +168,10 @@ float CVarInt<T>::GetFloat(void) const
 }
 
 template<class T>
-const char* CVarInt<T>::GetString(void)
+const char* CVarInt<T>::GetString(CVarBase::StrBuf& buf)
 {
-	static char szReturnString[64];
-
-	sprintf_s(szReturnString, "%d", IntValue_);
-	return szReturnString;
+	sprintf_s(buf, "%d", IntValue_);
+	return buf;
 }
 
 template<class T>
@@ -239,7 +238,7 @@ void CVarInt<T>::Reset(void)
 }
 
 template<class T>
-const char* CVarInt<T>::GetDefaultStr(CVarBase::DefaultStr& buf) const
+const char* CVarInt<T>::GetDefaultStr(CVarBase::StrBuf& buf) const
 {
 	sprintf_s(buf, "%d", IntDefault_);
 	return buf;
@@ -289,12 +288,10 @@ float CVarFloat<T>::GetFloat(void) const
 }
 
 template<class T>
-const char* CVarFloat<T>::GetString(void)
+const char* CVarFloat<T>::GetString(CVarBase::StrBuf& buf)
 {
-	static char szReturnString[128];
-
-	sprintf_s(szReturnString, "%f", fValue_);
-	return szReturnString;
+	sprintf_s(buf, "%f", fValue_);
+	return buf;
 }
 
 template<class T>
@@ -400,7 +397,7 @@ void CVarFloat<T>::Reset(void)
 }
 
 template<class T>
-const char* CVarFloat<T>::GetDefaultStr(CVarBase::DefaultStr& buf) const
+const char* CVarFloat<T>::GetDefaultStr(CVarBase::StrBuf& buf) const
 {
 	sprintf_s(buf, "%g", fDefault_);
 	return buf;
@@ -449,12 +446,10 @@ float CVarIntRef::GetFloat(void) const
 }
 
 
-const char* CVarIntRef::GetString(void)
+const char* CVarIntRef::GetString(CVarBase::StrBuf& buf)
 {
-	static char szReturnString[64];
-
-	sprintf_s(szReturnString, "%d", GetInteger());
-	return szReturnString;
+	sprintf_s(buf, "%d", GetInteger());
+	return buf;
 }
 
 
@@ -518,7 +513,7 @@ void CVarIntRef::Reset(void)
 }
 
 
-const char* CVarIntRef::GetDefaultStr(CVarBase::DefaultStr& buf) const
+const char* CVarIntRef::GetDefaultStr(CVarBase::StrBuf& buf) const
 {
 	sprintf_s(buf, "%d", DefaultVal_);
 	return buf;
@@ -566,12 +561,10 @@ float CVarFloatRef::GetFloat(void) const
 }
 
 
-const char* CVarFloatRef::GetString(void)
+const char* CVarFloatRef::GetString(CVarBase::StrBuf& buf)
 {
-	static char szReturnString[128];
-
-	sprintf_s(szReturnString, "%g", fValue_);
-	return szReturnString;
+	sprintf_s(buf, "%g", fValue_);
+	return buf;
 }
 
 
@@ -662,7 +655,7 @@ void CVarFloatRef::Reset(void)
 }
 
 
-const char* CVarFloatRef::GetDefaultStr(CVarBase::DefaultStr& buf) const
+const char* CVarFloatRef::GetDefaultStr(CVarBase::StrBuf& buf) const
 {
 	sprintf_s(buf, "%g", fDefault_);
 	return buf;
@@ -706,15 +699,14 @@ float CVarColRef::GetFloat(void) const
 	return 0.f; 
 }
 
-const char* CVarColRef::GetString(void)
+const char* CVarColRef::GetString(CVarBase::StrBuf& buf)
 {
-	static char szReturnString[128];
-	sprintf_s(szReturnString, "%g %g %g %g", ColValue_.r,
+	sprintf_s(buf, "%g %g %g %g", ColValue_.r,
 		ColValue_.g, ColValue_.b, ColValue_.a);
-	return szReturnString;
+	return buf;
 }
 
-const char* CVarColRef::GetDefaultStr(CVarBase::DefaultStr& buf) const
+const char* CVarColRef::GetDefaultStr(CVarBase::StrBuf& buf) const
 {
 	sprintf_s(buf, "%g %g %g %g", ColDefault_.r,
 		ColDefault_.g, ColDefault_.b, ColDefault_.a);
@@ -798,16 +790,16 @@ float CVarVec3Ref::GetFloat(void) const
 	return 0.f; 
 }
 
-const char* CVarVec3Ref::GetString(void)
+const char* CVarVec3Ref::GetString(CVarBase::StrBuf& buf)
 {
-	static char szReturnString[128];
-	sprintf_s(szReturnString, "%g %g %g", Value_.x,
+	sprintf_s(buf, "%g %g %g", Value_.x,
 		Value_.y, Value_.z);
-	return szReturnString;
+	return buf;
 }
 
-const char* CVarVec3Ref::GetDefaultStr(CVarBase::DefaultStr& buf) const
+const char* CVarVec3Ref::GetDefaultStr(CVarBase::StrBuf& buf) const
 {
+	static char szReturnString[64];
 	sprintf_s(buf, "%g %g %g", Default_.x,
 		Default_.y, Default_.z);
 	return buf;
