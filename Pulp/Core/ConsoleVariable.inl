@@ -147,6 +147,13 @@ CVarInt<T>::CVarInt(XConsole* pConsole, const char* Name, const int iDefault,
 	IntMax_(Max), 
 	IntDefault_(iDefault)
 {
+#if X_DEBUG
+	if (IntMin_ <= IntMax_)
+	{
+		X_ASSERT(iDefault >= Min && iDefault <= Max,
+			"Error VarInt has a default value outside min/max")(iDefault, Min, Max);
+	}
+#endif // !X_DEBUG
 }
 
 template<class T>
@@ -259,6 +266,13 @@ CVarFloat<T>::CVarFloat(XConsole* pConsole, const char* Name, const float fDefau
 	fMax_(Max), 
 	fDefault_(fDefault)
 {
+#if X_DEBUG
+	if (fMin_ <= fMax_)
+	{
+		X_ASSERT(fDefault >= Min && fDefault <= Max,
+			"Error VarFloat has a default value outside min/max")(fDefault, Min, Max);
+	}
+#endif // !X_DEBUG
 }
 
 template<class T>
@@ -418,7 +432,13 @@ CVarIntRef::CVarIntRef(XConsole* pConsole, const char* Name, int* pVar,
 	IntMax_(Max), 
 	DefaultVal_(*pVar)
 {
-
+#if X_DEBUG
+	if (IntMin_ <= IntMax_)
+	{
+		X_ASSERT(*pVar >= Min && *pVar <= Max,
+			"Error VarInt has a default value outside min/max")(*pVar, Min, Max);
+	}
+#endif // !X_DEBUG
 }
 
 CVarIntRef::~CVarIntRef()
@@ -526,6 +546,13 @@ CVarFloatRef::CVarFloatRef(XConsole* pConsole, const char* Name, float* pVal,
 	fMax_(Max),
 	fDefault_(*pVal)
 {
+#if X_DEBUG
+	if (fMin_ <= fMax_)
+	{
+		X_ASSERT(*pVal >= Min && *pVal <= Max,
+			"Error VarFloat has a default value outside min/max")(*pVal, Min, Max);
+	}
+#endif // !X_DEBUG
 }
 
 CVarFloatRef::~CVarFloatRef()
