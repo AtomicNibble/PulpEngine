@@ -170,7 +170,7 @@ const char* CVarInt<T>::GetString(void)
 {
 	static char szReturnString[64];
 
-	sprintf(szReturnString, "%d", IntValue_);
+	sprintf_s(szReturnString, "%d", IntValue_);
 	return szReturnString;
 }
 
@@ -241,7 +241,7 @@ template<class T>
 const char* CVarInt<T>::GetDefaultStr(void) const
 {
 	static char szReturnString[64];
-	sprintf(szReturnString, "%d", IntDefault_);
+	sprintf_s(szReturnString, "%d", IntDefault_);
 	return szReturnString;
 }
 
@@ -293,7 +293,7 @@ const char* CVarFloat<T>::GetString(void)
 {
 	static char szReturnString[128];
 
-	sprintf(szReturnString, "%f", fValue_);
+	sprintf_s(szReturnString, "%f", fValue_);
 	return szReturnString;
 }
 
@@ -403,7 +403,7 @@ template<class T>
 const char* CVarFloat<T>::GetDefaultStr(void) const
 {
 	static char szReturnString[64];
-	sprintf(szReturnString, "%g", fDefault_);
+	sprintf_s(szReturnString, "%g", fDefault_);
 	return szReturnString;
 }
 
@@ -454,7 +454,7 @@ const char* CVarIntRef::GetString(void)
 {
 	static char szReturnString[64];
 
-	sprintf(szReturnString, "%d", GetInteger());
+	sprintf_s(szReturnString, "%d", GetInteger());
 	return szReturnString;
 }
 
@@ -522,7 +522,7 @@ void CVarIntRef::Reset(void)
 const char* CVarIntRef::GetDefaultStr(void) const
 {
 	static char szReturnString[64];
-	sprintf(szReturnString, "%d", DefaultVal_);
+	sprintf_s(szReturnString, "%d", DefaultVal_);
 	return szReturnString;
 }
 
@@ -572,7 +572,7 @@ const char* CVarFloatRef::GetString(void)
 {
 	static char szReturnString[128];
 
-	sprintf(szReturnString, "%g", fValue_);
+	sprintf_s(szReturnString, "%g", fValue_);
 	return szReturnString;
 }
 
@@ -667,7 +667,7 @@ void CVarFloatRef::Reset(void)
 const char* CVarFloatRef::GetDefaultStr(void) const
 {
 	static char szReturnString[64];
-	sprintf(szReturnString, "%g", fDefault_);
+	sprintf_s(szReturnString, "%g", fDefault_);
 	return szReturnString;
 }
 
@@ -712,7 +712,7 @@ float CVarColRef::GetFloat(void) const
 const char* CVarColRef::GetString(void)
 {
 	static char szReturnString[128];
-	sprintf(szReturnString, "%g %g %g %g", ColValue_.r,
+	sprintf_s(szReturnString, "%g %g %g %g", ColValue_.r,
 		ColValue_.g, ColValue_.b, ColValue_.a);
 	return szReturnString;
 }
@@ -720,7 +720,7 @@ const char* CVarColRef::GetString(void)
 const char* CVarColRef::GetDefaultStr(void) const
 {
 	static char szReturnString[64];
-	sprintf(szReturnString, "%g %g %g %g", ColDefault_.r,
+	sprintf_s(szReturnString, "%g %g %g %g", ColDefault_.r,
 		ColDefault_.g, ColDefault_.b, ColDefault_.a);
 	return szReturnString;
 }
@@ -805,7 +805,7 @@ float CVarVec3Ref::GetFloat(void) const
 const char* CVarVec3Ref::GetString(void)
 {
 	static char szReturnString[128];
-	sprintf(szReturnString, "%g %g %g", Value_.x,
+	sprintf_s(szReturnString, "%g %g %g", Value_.x,
 		Value_.y, Value_.z);
 	return szReturnString;
 }
@@ -813,7 +813,7 @@ const char* CVarVec3Ref::GetString(void)
 const char* CVarVec3Ref::GetDefaultStr(void) const
 {
 	static char szReturnString[64];
-	sprintf(szReturnString, "%g %g %g", Default_.x,
+	sprintf_s(szReturnString, "%g %g %g", Default_.x,
 		Default_.y, Default_.z);
 	return szReturnString;
 }
