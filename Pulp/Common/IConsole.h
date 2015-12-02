@@ -124,16 +124,17 @@ struct IConsole
 struct ICVar
 {
 	typedef Flags<VarFlag> FlagType;
+	typedef char DefaultStr[128];
 
 	virtual ~ICVar() {}
 
 	virtual const char* GetName(void) const X_ABSTRACT;
 	virtual const char* GetDesc(void) const X_ABSTRACT;
-	virtual const char* GetDefaultStr(void) const X_ABSTRACT;
+	virtual const char* GetDefaultStr(DefaultStr& buf) const X_ABSTRACT;
 
 	virtual int GetInteger(void) const X_ABSTRACT;
 	virtual float GetFloat(void) const X_ABSTRACT;
-	virtual const char *GetString(void) X_ABSTRACT;
+	virtual const char* GetString(void) X_ABSTRACT;
 
 	virtual void SetDefault(const char* s) X_ABSTRACT;
 	virtual void Set(const char* s) X_ABSTRACT;

@@ -136,7 +136,7 @@ public:
 	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;
 	X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-	X_INLINE virtual const char* GetDefaultStr(void) const X_OVERRIDE;
+	X_INLINE virtual const char* GetDefaultStr(CVarBase::CVarBase::DefaultStr& buf) const X_OVERRIDE;
 
 	X_INLINE virtual float GetMin(void) X_OVERRIDE;
 	X_INLINE virtual float GetMax(void) X_OVERRIDE;
@@ -167,7 +167,7 @@ public:
 	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;
 	X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-	X_INLINE virtual const char* GetDefaultStr(void) const X_OVERRIDE;
+	X_INLINE virtual const char* GetDefaultStr(CVarBase::DefaultStr& buf) const X_OVERRIDE;
 	X_INLINE virtual float GetMin(void) X_OVERRIDE;
 	X_INLINE virtual float GetMax(void) X_OVERRIDE;
 
@@ -200,7 +200,7 @@ public:
 	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;
 	X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-	X_INLINE virtual const char* GetDefaultStr(void) const X_OVERRIDE;
+	X_INLINE virtual const char* GetDefaultStr(CVarBase::DefaultStr& buf) const X_OVERRIDE;
 	X_INLINE virtual float GetMin(void) X_OVERRIDE;
 	X_INLINE virtual float GetMax(void) X_OVERRIDE;
 
@@ -231,7 +231,7 @@ public:
 	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;
 	X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-	X_INLINE virtual const char* GetDefaultStr(void) const X_OVERRIDE;
+	X_INLINE virtual const char* GetDefaultStr(CVarBase::DefaultStr& buf) const X_OVERRIDE;
 	X_INLINE virtual float GetMin(void) X_OVERRIDE;
 	X_INLINE virtual float GetMax(void) X_OVERRIDE;
 protected:
@@ -263,7 +263,7 @@ public:
 	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;
 	X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-	X_INLINE virtual const char* GetDefaultStr(void) const X_OVERRIDE;
+	X_INLINE virtual const char* GetDefaultStr(CVarBase::DefaultStr& buf) const X_OVERRIDE;
 	X_INLINE virtual float GetMin(void) X_OVERRIDE;
 	X_INLINE virtual float GetMax(void) X_OVERRIDE;
 
@@ -290,7 +290,7 @@ public:
 	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
 	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
 	X_INLINE virtual const char *GetString(void) X_OVERRIDE;
-	X_INLINE virtual const char* GetDefaultStr(void) const X_OVERRIDE;
+	X_INLINE virtual const char* GetDefaultStr(CVarBase::DefaultStr& buf) const X_OVERRIDE;
 
 	virtual void Set(const char* s) X_OVERRIDE;
 	X_INLINE virtual void Set(const float f) X_OVERRIDE;
@@ -326,7 +326,7 @@ public:
 	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
 	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
 	X_INLINE virtual const char* GetString(void) X_OVERRIDE;
-	X_INLINE virtual const char* GetDefaultStr(void) const X_OVERRIDE;
+	X_INLINE virtual const char* GetDefaultStr(CVarBase::DefaultStr& buf) const X_OVERRIDE;
 
 	virtual void Set(const char* s) X_OVERRIDE;
 	X_INLINE virtual void Set(const float f) X_OVERRIDE;

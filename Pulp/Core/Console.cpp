@@ -2415,8 +2415,10 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				defaultStr.append("	default");
 
 				value.appendFmt("%s", pCvar->GetString());
-				defaultValue.appendFmt("%s", pCvar->GetDefaultStr());
-
+				{
+					ICVar::DefaultStr DefaultStrBuf;
+					defaultValue.appendFmt("%s", pCvar->GetDefaultStr(DefaultStrBuf));
+				}
 				description.append(pCvar->GetDesc()); // dose string length for us / caps.
 
 				if (pCvar->GetType() == VarFlag::INT)
