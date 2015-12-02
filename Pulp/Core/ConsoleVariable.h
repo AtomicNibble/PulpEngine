@@ -13,44 +13,6 @@ X_NAMESPACE_BEGIN(core)
 
 class XConsole;
 
-inline uint32_t AlphaBit(char c)
-{
-	return c >= 'a' && c <= 'z' ? 1 << (c - 'z' + 31) : 0;
-}
-
-inline int TextToInt(const char* s, int nCurrent, bool bBitfield)
-{
-	int nValue = 0;
-	if (s)
-	{
-		char* e;
-		if (bBitfield)
-		{
-			// Bit manipulation.
-			if (*s == '^')
-				// Bit number
-				nValue = 1 << strtol(++s, &e, 10);
-			else
-				// Full number
-				nValue = strtol(s, &e, 10);
-
-			// Check letter codes.
-			for (; *e >= 'a'&& *e <= 'z'; e++)
-				nValue |= AlphaBit(*e);
-
-			if (*e == '+')
-				nValue = nCurrent | nValue;
-			else if (*e == '-')
-				nValue = nCurrent & ~nValue;
-			else if (*e == '^')
-				nValue = nCurrent ^ nValue;
-		}
-		else
-			nValue = strtol(s, &e, 10);
-	}
-	return nValue;
-}
-
 class CVarBase : public ICVar
 {
 public:
@@ -161,7 +123,7 @@ public:
 	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) X_OVERRIDE;
 	X_INLINE virtual void SetDefault(const char* s) X_OVERRIDE;
 
-	X_INLINE virtual void Set(const char* s) X_OVERRIDE;
+	virtual void Set(const char* s) X_OVERRIDE;
 	X_INLINE virtual void Set(const float f) X_OVERRIDE;
 	X_INLINE virtual void Set(const int i) X_OVERRIDE;
 	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;
@@ -225,7 +187,7 @@ public:
 	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
 	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) X_OVERRIDE;
 
-	X_INLINE virtual void Set(const char* s) X_OVERRIDE;
+	virtual void Set(const char* s) X_OVERRIDE;
 	X_INLINE virtual void Set(const float f) X_OVERRIDE;
 	X_INLINE virtual void Set(const int i) X_OVERRIDE;
 	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;

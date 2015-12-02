@@ -182,14 +182,6 @@ void CVarInt<T>::SetDefault(const char* s)
 }
 
 template<class T>
-void CVarInt<T>::Set(const char* s)
-{
-	int nValue = TextToInt(s, IntValue_, Flags_.IsSet(VarFlag::BITFIELD));
-
-	Set(nValue);
-}
-
-template<class T>
 void CVarInt<T>::Set(const float f)
 {
 	Set(static_cast<int>(f));
@@ -450,14 +442,6 @@ const char* CVarIntRef::GetString(CVarBase::StrBuf& buf)
 {
 	sprintf_s(buf, "%d", GetInteger());
 	return buf;
-}
-
-
-void CVarIntRef::Set(const char* s)
-{
-	int nValue = TextToInt(s, IntValue_, Flags_.IsSet(VarFlag::BITFIELD));
-
-	Set(nValue);
 }
 
 

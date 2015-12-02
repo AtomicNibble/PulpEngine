@@ -12,6 +12,52 @@
 
 X_NAMESPACE_BEGIN(core)
 
+template class CVarInt<CVarBaseConst>;
+template class CVarInt<CVarBaseHeap>;
+
+namespace
+{
+
+	inline uint32_t AlphaBit(char c)
+	{
+		return c >= 'a' && c <= 'z' ? 1 << (c - 'z' + 31) : 0;
+	}
+
+	inline int TextToInt(const char* s, int nCurrent, bool bBitfield)
+	{
+		int nValue = 0;
+		if (s)
+		{
+			char* e;
+			if (bBitfield)
+			{
+				// Bit manipulation.
+				if (*s == '^')
+					// Bit number
+					nValue = 1 << strtol(++s, &e, 10);
+				else
+					// Full number
+					nValue = strtol(s, &e, 10);
+
+				// Check letter codes.
+				for (; *e >= 'a'&& *e <= 'z'; e++)
+					nValue |= AlphaBit(*e);
+
+				if (*e == '+')
+					nValue = nCurrent | nValue;
+				else if (*e == '-')
+					nValue = nCurrent & ~nValue;
+				else if (*e == '^')
+					nValue = nCurrent ^ nValue;
+			}
+			else
+				nValue = strtol(s, &e, 10);
+		}
+		return nValue;
+	}
+
+
+} // namespace 
 
 CVarBase::CVarBase(XConsole* pConsole, int nFlags, const char* desc) :
 Desc_(desc),
@@ -83,6 +129,28 @@ void CVarBase::OnModified()
 void CVarBase::Reset()
 {
 	// nothing to set here :D
+}
+
+
+// ========================================================
+
+
+template<class T>
+void CVarInt<T>::Set(const char* s)
+{
+	int nValue = TextToInt(s, IntValue_, Flags_.IsSet(VarFlag::BITFIELD));
+
+	Set(nValue);
+}
+
+
+// ========================================================
+
+void CVarIntRef::Set(const char* s)
+{
+	int nValue = TextToInt(s, IntValue_, Flags_.IsSet(VarFlag::BITFIELD));
+
+	Set(nValue);
 }
 
 // ========================================================
