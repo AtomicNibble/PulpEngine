@@ -404,6 +404,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Console.inl" />
+    <None Include="ConsoleVariable.inl" />
     <None Include="win32\SystemTimer.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
