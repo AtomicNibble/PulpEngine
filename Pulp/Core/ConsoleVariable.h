@@ -716,4 +716,6 @@ private:
 
 X_NAMESPACE_END
 
+#include "ConsoleVariable.inl"
+
 #endif // _X_CONSOLE_VAR_X_H_
