@@ -378,7 +378,7 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 
 		//	if (!initParams.bTesting) {
 			pConsoleLogger_ = X_NEW( ConsoleLogger, g_coreArena,"ConsoleLogger")(
-					ConsoleLogger::FilterPolicy(3, "console"),
+					ConsoleLogger::FilterPolicy(2, "console"),
 					ConsoleLogger::FormatPolicy(),
 					ConsoleLogger::WritePolicy(*pConsole_));
 
