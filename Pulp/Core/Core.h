@@ -103,6 +103,7 @@ class XCore :
 	public core::XDirectoryWatcherListener,
 	public ICoreEventListener
 {
+	static const size_t MAX_CMD_ARS = 16;
 public:
 	XCore();
 	~XCore() X_OVERRIDE;
@@ -247,7 +248,7 @@ private:
 
 	// args
 	size_t numArgs_;
-	core::CmdArgs<1024,wchar_t> args_[16];
+	core::CmdArgs<1024,wchar_t> args_[MAX_CMD_ARS];
 
 public:
 	// All the vars

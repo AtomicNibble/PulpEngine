@@ -358,6 +358,10 @@ bool XCore::ParseCmdArgs(const wchar_t* pArgs)
 
 	for (i = 0; i < num; i++)
 	{
+		if (numArgs_ >= MAX_CMD_ARS) {
+			break;
+		}
+
 		const wchar_t* pArg = args.getArgv(i);
 		if (*pArg == L'+' && core::strUtil::strlen(pArg) > 1)
 		{
