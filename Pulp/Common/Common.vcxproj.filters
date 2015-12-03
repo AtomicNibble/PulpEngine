@@ -1030,6 +1030,9 @@
     <ClInclude Include="String\CmdArgs.h">
       <Filter>Headers\String</Filter>
     </ClInclude>
+    <ClInclude Include="String\CmdArgs.inl">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1562,9 +1565,6 @@
     </ClCompile>
     <ClCompile Include="Math\XHalf.cpp">
       <Filter>SourceFiles\Math</Filter>
-    </ClCompile>
-    <ClCompile Include="String\CmdArgs.cpp">
-      <Filter>SourceFiles\String</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

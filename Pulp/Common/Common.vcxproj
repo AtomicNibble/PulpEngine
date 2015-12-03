@@ -381,6 +381,9 @@
     <None Include="Platform\win32\Window.inl" />
     <None Include="Random\MultiplyWithCarry.inl" />
     <None Include="Random\XorShift.inl" />
+    <ClInclude Include="String\CmdArgs.inl">
+      <FileType>Document</FileType>
+    </ClInclude>
     <None Include="String\GrowingStringTable.inl" />
     <None Include="String\Lexer.inl" />
     <None Include="String\StackString.inl" />
@@ -685,7 +688,6 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="String\Base64.cpp" />
-    <ClCompile Include="String\CmdArgs.cpp" />
     <ClCompile Include="String\HumanSize.cpp" />
     <ClCompile Include="String\Lexer.cpp" />
     <ClCompile Include="String\StringTokenizer.cpp">
