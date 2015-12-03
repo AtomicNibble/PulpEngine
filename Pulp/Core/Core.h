@@ -12,6 +12,7 @@
 
 #include "Util\SourceInfo.h"
 #include "String\StrRef.h"
+#include "String\CmdArgs.h"
 
 // Logging
 #include "Logging\Logger.h"
@@ -162,6 +163,7 @@ private:
 	bool IntializeEngineModule(const char *dllName, const char *moduleClassName,
 		const SCoreInitParams &initParams);
 	
+	bool ParseCmdArgs(const wchar_t* pArgs);
 
 	bool InitConsole(const SCoreInitParams &initParams);
 	bool InitFileSys(const SCoreInitParams &startupParams);
@@ -242,6 +244,10 @@ private:
 	SCoreInitParams initParams_;
 
 	core::GrowingGenericAllocator	strAlloc_;
+
+	// args
+	size_t numArgs_;
+	core::CmdArgs<1024,wchar_t> args_[16];
 
 public:
 	// All the vars

@@ -56,7 +56,9 @@ XCore::XCore() :
 
 	strAlloc_(1 << 24, core::VirtualMem::GetPageSize() * 2, 
 	StrArena::getMemoryAlignmentRequirement(8), 
-	StrArena::getMemoryOffsetRequirement() + 12)
+	StrArena::getMemoryOffsetRequirement() + 12),
+
+	numArgs_(0)
 {
 	X_ASSERT_NOT_NULL(g_coreArena);
 

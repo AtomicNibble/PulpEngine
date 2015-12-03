@@ -5,6 +5,7 @@
 #include "Log.h"
 
 #include <String\StackString.h>
+#include <String\CmdArgs.h>
 
 #include "NullImplementation/NullInput.h"
 
@@ -179,6 +180,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	}
 #endif
 
+	if (ParseCmdArgs(startupParams.pCmdLine)) {
+		return false;
+	}
+
 	hInst_ = static_cast<WIN_HINSTANCE>(startupParams.hInstance);
 	hWnd_ = static_cast<WIN_HWND>(startupParams.hWnd);
 
@@ -336,6 +341,41 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 	return true;
 }
+
+bool XCore::ParseCmdArgs(const wchar_t* pArgs)
+{
+	// should never be null
+	if (!pArgs) {
+		return false;
+	}
+
+	// tokenize all the args
+	core::CmdArgs<4096, wchar_t> args(pArgs);
+	
+	// now group them based on '+'
+	size_t i;
+	size_t num = args.getArgc();
+
+	for (i = 0; i < num; i++)
+	{
+		const wchar_t* pArg = args.getArgv(i);
+		if (*pArg == L'+' && core::strUtil::strlen(pArg) > 1)
+		{
+			numArgs_++;
+			args_[numArgs_ - 1].AppendArg(args.getArgv(i) + 1);
+		}
+		else
+		{
+			if (!numArgs_) {
+				numArgs_++;
+			}
+			args_[numArgs_ - 1].AppendArg(args.getArgv(i));
+		}
+	}
+
+	return true;
+}
+
 
 bool XCore::InitFileSys(const SCoreInitParams &initParams)
 {
