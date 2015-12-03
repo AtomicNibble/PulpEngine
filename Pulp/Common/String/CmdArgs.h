@@ -20,6 +20,8 @@ public:
 	X_INLINE size_t getArgc(void) const;
 	X_INLINE const TChar* getArgv(size_t arg) const;
 
+	X_INLINE void AppendArg(const TChar* pArg);
+
 private:
 	X_INLINE void tokenize(const TChar* pText);
 
@@ -43,6 +45,9 @@ public:
 	X_INLINE size_t getArgc(void) const;
 	X_INLINE const wchar_t* getArgv(size_t arg) const;
 
+	X_INLINE void AppendArg(const char* pArg);
+
+
 private:
 	X_INLINE void tokenize(const char* pText);
 
@@ -65,6 +70,8 @@ public:
 
 	X_INLINE size_t getArgc(void) const;
 	X_INLINE const wchar_t* getArgv(size_t arg) const;
+
+	X_INLINE void AppendArg(const wchar_t* pArg);
 
 private:
 	X_INLINE void tokenize(const wchar_t* pText);

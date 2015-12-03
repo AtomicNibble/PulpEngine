@@ -84,6 +84,41 @@ void CmdArgs<BUF_SIZE,char>::tokenize(const char* pText)
 	}
 }
 
+template<size_t BUF_SIZE>
+void CmdArgs<BUF_SIZE, char>::AppendArg(const char* pArg)
+{
+	const size_t argLen = wcslen(pArg);
+
+	if (argc_ < 1)
+	{
+		const size_t copySize = core::Min(argLen + 1, BUF_SIZE - 1);
+
+		argc_ = 1;
+		argv_[0] = tokenized_;
+
+		::memcpy(
+			tokenized_,
+			pArg,
+			copySize * sizeof(char)
+		);
+	}
+	else
+	{
+		argv_[argc_] = argv_[argc_ - 1] + (wcslen(argv_[argc_ - 1]) + 1) * sizeof(char);
+
+		const size_t bytesLeft = (sizeof(tokenized_) - (argv_[argc_] - tokenized_));
+		const size_t copySize = core::Min(argLen + 1, bytesLeft - 1);
+
+		::memcpy(
+			argv_[argc_],
+			pArg,
+			copySize * sizeof(char) // copy nt.
+		);
+
+		argc_++;
+	}
+}
+
 // ==================================
 
 
@@ -173,6 +208,42 @@ void CmdArgs<BUF_SIZE, wchar_t>::tokenize(const wchar_t* pText)
 			);
 
 		totalLen += (len + 1);
+	}
+}
+
+
+template<size_t BUF_SIZE>
+void CmdArgs<BUF_SIZE, wchar_t>::AppendArg(const wchar_t* pArg)
+{
+	const size_t argLen = wcslen(pArg);
+
+	if (argc_ < 1)
+	{
+		const size_t copySize = core::Min(argLen + 1, BUF_SIZE - 1);
+
+		argc_ = 1;
+		argv_[0] = tokenized_;
+
+		::memcpy(
+			tokenized_,
+			pArg, 
+			copySize * sizeof(wchar_t)
+		);
+	}
+	else
+	{
+		argv_[argc_] = argv_[argc_ - 1] + (wcslen(argv_[argc_ - 1]) + 1) * sizeof(wchar_t);
+
+		const size_t bytesLeft = (sizeof(tokenized_) - (argv_[argc_] - tokenized_));
+		const size_t copySize = core::Min(argLen + 1, bytesLeft - 1);
+
+		::memcpy(
+			argv_[argc_],
+			pArg,
+			copySize * sizeof(wchar_t) // copy nt.
+		);
+
+		argc_++;
 	}
 }
 
