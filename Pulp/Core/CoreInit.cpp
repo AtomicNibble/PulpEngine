@@ -180,7 +180,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	}
 #endif
 
-	if (ParseCmdArgs(startupParams.pCmdLine)) {
+	if (!ParseCmdArgs(startupParams.pCmdLine)) {
 		return false;
 	}
 
@@ -639,6 +639,8 @@ void XCore::CreateSystemVars(void)
 	ADD_COMMAND("filesys_hotreload_etx_list", Command_HotReloadListExts, VarFlag::SYSTEM,
 		"Display all registered file extensions in the hotreload system");
 	
+	ADD_COMMAND("list_program_args", Command_ListProgramArgs, VarFlag::SYSTEM,
+		"Lists the processed command line arguments parsed to the program");
 
 	dirWatcher_.Init();
 }

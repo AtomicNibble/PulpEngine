@@ -516,6 +516,14 @@ void Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd)
 	pCore->HotReloadListExts();
 }
 
+void Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd)
+{
+	X_UNUSED(Cmd);
+
+	XCore* pCore = static_cast<XCore*>(gEnv->pCore);
+
+	pCore->ListProgramArgs();
+}
 
 void XCore::HotReloadListExts(void)
 {
@@ -531,6 +539,35 @@ void XCore::HotReloadListExts(void)
 	}
 
 	X_LOG0("HotReload", "----- ^8Registerd Extensions End^7 -----");
+}
+
+void XCore::ListProgramArgs(void)
+{
+	size_t i, num = numArgs_;
+
+	X_LOG0("AppArgs", "------ ^8Program Args(%i)^7 ------", num);
+
+	core::StackString<1024 + 128> merged;
+
+	for (i = 0; i < num; i++)
+	{
+		const auto& arg = args_[i];
+		size_t j, argsNum = arg.getArgc();
+
+		merged.appendFmt("(%i) ", i);
+
+		for (j = 0; j < argsNum; j++)
+		{
+			merged.appendFmt("^1%ls^7", arg.getArgv(j));
+			if ((j+1) < argsNum) {
+				merged.append(" -> ");
+			}
+		}
+
+		X_LOG0("AppArgs", "%s", merged.c_str());
+	}
+
+	X_LOG0("AppArgs", "------ ^8Program Args End^7 -----");
 }
 
 X_NAMESPACE_BEGIN(core)

@@ -182,8 +182,10 @@ private:
 
 
 	friend void Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd);
+	friend void Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd);
 
 	void HotReloadListExts(void);
+	void ListProgramArgs(void);
 
 private:
 
