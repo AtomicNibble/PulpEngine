@@ -13,7 +13,7 @@ class CmdArgs
 
 public:
 	CmdArgs(void);
-	explicit CmdArgs(const TChar* text);
+	explicit CmdArgs(const TChar* pText);
 
 	void clear(void);
 
