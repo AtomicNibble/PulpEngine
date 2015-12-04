@@ -365,7 +365,7 @@ namespace
 			if (valf != 0)
 			{
 				// using the End var is safe since we the condition above checks parsing was valid.
-				if (fmod(valf, 1) == 0.f && !strUtil::Find(start, End, '.'))
+				if (math<float>::fmod(valf, 1.f) == 0.f && !strUtil::Find(start, End, '.'))
 				{
 					pConsole->ConfigRegisterInt(Cmd->GetArg(1), (int)valf, 1, 0, 0, "");
 				}
