@@ -30,7 +30,7 @@ namespace
 	}
 
 	LRESULT CALLBACK PreWndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
-	{		
+	{			
 		if( msg == WM_NCCREATE ) 
 		{
 			LPCREATESTRUCT pInfo = reinterpret_cast<LPCREATESTRUCT>(lParam);
@@ -138,7 +138,7 @@ xWindow::Notification::Enum xWindow::PumpMessages(void) const
 	uint32_t msgNumStart = numMsgs_;
 
 	// need two for WM_INPUT goat shiz.
-	while (PeekMessage(&msg, NULL, 0, WM_INPUT - 1, PM_REMOVE))
+	while (PeekMessage(&msg, this->window_, 0, WM_INPUT - 1, PM_REMOVE))
 	{
 		numMsgs_++;
 
@@ -149,7 +149,7 @@ xWindow::Notification::Enum xWindow::PumpMessages(void) const
 		DispatchMessage(&msg);
 	}
 
-	while (PeekMessage(&msg, NULL, WM_INPUT + 1, 0xffffffff, PM_REMOVE))
+	while (PeekMessage(&msg, this->window_, WM_INPUT + 1, 0xffffffff, PM_REMOVE))
 	{
 		numMsgs_++;
 
