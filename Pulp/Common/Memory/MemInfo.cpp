@@ -38,14 +38,14 @@ bool GetProcessMemInfo(XProcessMemInfo &info)
 	core::CriticalSection::ScopedLock lock(g_lock);
 
 	if (!g_hPSAPI) {
-		g_hPSAPI = GoatLoadLibaryW(L"psapi.dll");
+		g_hPSAPI = PotatoLoadLibaryW(L"psapi.dll");
 	}
 
 	if (g_hPSAPI)
 	{
 		if (!g_pGetProcessMemoryInfo) {
-			g_pGetProcessMemoryInfo = (GetProcessMemoryInfoProc)GoatGetProcAddress(g_hPSAPI,
-				"GetProcessMemoryInfo");
+			g_pGetProcessMemoryInfo = reinterpret_cast<GetProcessMemoryInfoProc>(
+				PotatoGetProcAddress(g_hPSAPI,"GetProcessMemoryInfo"));
 		}
 
 		if (g_pGetProcessMemoryInfo)

@@ -27,7 +27,7 @@ EngineApp::~EngineApp()
 		pICore_->Release();
 
 	if (hSystemHandle_)
-		GoatFreeLibrary(hSystemHandle_);
+		PotatoFreeLibrary(hSystemHandle_);
 }
 
 

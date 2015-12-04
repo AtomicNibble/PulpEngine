@@ -40,7 +40,7 @@ namespace {
 		HMODULE hDll = GetModuleHandleA( "kernel32" );
 		if( hDll )
 		{
-			pSetConsoleIcon = (SetConsoleIcon_t)GoatGetProcAddress(hDll, "SetConsoleIcon");
+			pSetConsoleIcon = (SetConsoleIcon_t)PotatoGetProcAddress(hDll, "SetConsoleIcon");
 			if( pSetConsoleIcon )
 				return pSetConsoleIcon( hIcon );
 		}

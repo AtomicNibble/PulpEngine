@@ -73,7 +73,7 @@ WIN_HMODULE XCore::LoadDynamiclibrary(const char *dllName) const
 {
 	WIN_HMODULE handle = NULL;
 
-	handle = GoatLoadLibary(dllName);
+	handle = PotatoLoadLibary(dllName);
 
 	return handle;
 }
@@ -91,7 +91,10 @@ WIN_HMODULE XCore::LoadDLL(const char *dllName)
 	// std::string moduleName = dllName; // PathUtil::GetFileName(dllName);
 
 	typedef void *(*PtrFunc_LinkModule)(ICore *pSystem, const char *moduleName);
-	PtrFunc_LinkModule pfnModuleInitISystem = (PtrFunc_LinkModule)GoatGetProcAddress(handle, DLL_MODULE_INIT_ICORE);
+
+	PtrFunc_LinkModule pfnModuleInitISystem = reinterpret_cast<PtrFunc_LinkModule>(
+			PotatoGetProcAddress(handle, DLL_MODULE_INIT_ICORE));
+
 	if (pfnModuleInitISystem)
 	{
 		pfnModuleInitISystem(this, dllName);

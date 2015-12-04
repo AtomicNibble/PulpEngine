@@ -273,7 +273,7 @@ void XCore::ShutDown()
 
 
 	for (size_t i = 0; i < moduleDLLHandles_.size(); i++) {
-		GoatFreeLibrary(moduleDLLHandles_[i]);
+		PotatoFreeLibrary(moduleDLLHandles_[i]);
 	}
 
 	moduleDLLHandles_.free();
