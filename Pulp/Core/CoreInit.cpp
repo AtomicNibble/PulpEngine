@@ -586,8 +586,6 @@ bool XCore::InitGameDll(const SCoreInitParams& initParams)
 // ->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->
 void WindowPosVarChange(core::ICVar* pVar)
 {
-	X_UNUSED(pVar);
-
 	int x_pos = g_coreVars.win_x_pos;
 	int y_pos = g_coreVars.win_y_pos;
 
