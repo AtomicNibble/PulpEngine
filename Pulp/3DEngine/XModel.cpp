@@ -29,7 +29,7 @@ XModel::XModel()
 
 XModel::~XModel()
 {
-
+	X_DELETE_ARRAY(const_cast<char*>(pData_), gEnv->pArena);
 }
 
 
