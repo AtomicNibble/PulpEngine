@@ -58,7 +58,15 @@ XCore::XCore() :
 	StrArena::getMemoryAlignmentRequirement(8), 
 	StrArena::getMemoryOffsetRequirement() + 12),
 
-	numArgs_(0)
+	numArgs_(0),
+
+	var_win_pos_x(nullptr),
+	var_win_pos_y(nullptr),
+	var_win_width(nullptr),
+	var_win_height(nullptr),
+	var_win_custom_Frame(nullptr),
+
+	var_profile(nullptr)
 {
 	X_ASSERT_NOT_NULL(g_coreArena);
 
