@@ -315,6 +315,13 @@ void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 
 			g_coreVars.win_x_pos = rect.getX1();
 			g_coreVars.win_y_pos = rect.getY1();
+
+			if (var_win_pos_x) {
+				var_win_pos_x->SetModified();
+			}
+			if (var_win_pos_x) {
+				var_win_pos_y->SetModified();
+			}
 		}
 		break;
 		case CoreEvent::RESIZE:
@@ -323,6 +330,13 @@ void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 
 			g_coreVars.win_height = rect.getHeight();
 			g_coreVars.win_width = rect.getWidth();
+
+			if (var_win_width) {
+				var_win_width->SetModified();
+			}
+			if (var_win_height) {
+				var_win_height->SetModified();
+			}
 		}
 		break;
 		case CoreEvent::ACTIVATE:
