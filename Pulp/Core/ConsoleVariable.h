@@ -25,6 +25,7 @@ public:
 
 	virtual FlagType GetFlags(void) const X_OVERRIDE;
 	virtual FlagType SetFlags(FlagType flags) X_OVERRIDE;
+	virtual void SetModified(void) X_FINAL;
 
 	virtual void Release(void) X_OVERRIDE;
 

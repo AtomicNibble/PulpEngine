@@ -145,6 +145,7 @@ struct ICVar
 
 	virtual FlagType GetFlags(void) const X_ABSTRACT;
 	virtual FlagType SetFlags(FlagType flags) X_ABSTRACT;
+	virtual void SetModified(void) X_ABSTRACT;
 	virtual float GetMin(void) X_ABSTRACT;
 	virtual float GetMax(void) X_ABSTRACT;
 

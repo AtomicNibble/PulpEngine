@@ -94,6 +94,10 @@ ICVar::FlagType CVarBase::SetFlags(FlagType flags)
 	return Flags_;
 }
 
+void CVarBase::SetModified(void)
+{
+	Flags_.Set(VarFlag::MODIFIED);
+}
 //const char* CVarBase::GetName() const
 //{
 //	return Name_;
