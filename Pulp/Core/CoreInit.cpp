@@ -608,7 +608,7 @@ void WindowCustomFrameVarChange(core::ICVar* pVar)
 
 	XCore* pCore = static_cast<XCore*>(gEnv->pCore);
 	if (!pCore) {
-
+		X_WARNING("Core", "Can't update custom frame as core is not initialized yet");
 		return;
 	}
 
