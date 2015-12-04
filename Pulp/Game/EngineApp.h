@@ -55,6 +55,6 @@ private:
 	ICore* pICore_;
 
 	core::MallocFreeAllocator allocator_;
-	CoreArena arena_; 
+	CoreArena* pArena_; 
 };
 

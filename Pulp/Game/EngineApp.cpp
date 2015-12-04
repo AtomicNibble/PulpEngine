@@ -42,16 +42,25 @@ void Error(const char* sErrorText)
 EngineApp::EngineApp() :
 	pICore_(nullptr),
 	hSystemHandle_(NULL),
-	allocator_(),
-	arena_(&allocator_, "CoreArena")
+	allocator_()
+//	arena_(&allocator_, "CoreArena")
 {
+	void* pMem = allocator_.allocate(sizeof(CoreArena),
+		X_ALIGN_OF(CoreArena), 0);
+
+	pArena_ = new(pMem) CoreArena(&allocator_, "CoreArena");
 }
 
 
 EngineApp::~EngineApp()
 {
-	if (hSystemHandle_)
+	// core allocator needs to close before this for leak reporting.
+	core::Mem::Destruct(pArena_);
+	allocator_.free(pArena_);
+
+	if (hSystemHandle_) {
 		GoatFreeLibrary(hSystemHandle_);
+	}
 }
 
 
@@ -67,7 +76,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 	// enable loggers
 	params.bVsLog = core::debugging::IsDebuggerConnected();
 	params.bConsoleLog = true;
-	params.pCoreArena = &arena_;
+	params.pCoreArena = pArena_;
 
 #ifdef X_LIB
 
@@ -84,7 +93,8 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 	}
 
 	PFNCREATECOREINTERFACE pfnCreateCoreInterface =
-		(PFNCREATECOREINTERFACE)GoatGetProcAddress(hSystemHandle_, CORE_DLL_INITFUNC);
+		reinterpret_cast<PFNCREATECOREINTERFACE>(
+			GoatGetProcAddress(hSystemHandle_, CORE_DLL_INITFUNC));
 
 	if (!pfnCreateCoreInterface)
 	{
