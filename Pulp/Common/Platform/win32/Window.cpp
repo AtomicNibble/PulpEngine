@@ -174,19 +174,26 @@ void xWindow::CustomFrame(bool val)
 {
 	if (val)
 	{
-		if (pFrame_ == nullptr)
-			pFrame_ = X_NEW( xFrame, gEnv->pArena, "Win32CustomFrame");
+		if (pFrame_ == nullptr) {
+			pFrame_ = X_NEW(xFrame, gEnv->pArena, "Win32CustomFrame");
+
+			RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
+			RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_NOCHILDREN | RDW_VALIDATE);
+		}
+		else 
+		{
+			RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
+			RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_NOCHILDREN | RDW_VALIDATE);
+		}
 	}
 	else
 	{
 		if (pFrame_ != nullptr)
 		{
 			X_DELETE_AND_NULL(pFrame_, gEnv->pArena);
-
-
-			RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_UPDATENOW | RDW_NOCHILDREN);
-			::InvalidateRect(window_, NULL, TRUE);
-			::UpdateWindow(window_);
+			
+			RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
+			RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_NOCHILDREN | RDW_VALIDATE);
 		}
 	}
 }
