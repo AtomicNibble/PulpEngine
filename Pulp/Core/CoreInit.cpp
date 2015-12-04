@@ -602,6 +602,22 @@ void WindowSizeVarChange(core::ICVar* pVar)
 
 }
 
+void WindowCustomFrameVarChange(core::ICVar* pVar)
+{
+	bool enabled = (pVar->GetInteger() == 1);
+
+	XCore* pCore = static_cast<XCore*>(gEnv->pCore);
+	if (!pCore) {
+
+		return;
+	}
+
+	if (pCore->pWindow_) {
+		pCore->pWindow_->CustomFrame(enabled);
+	}
+}
+
+
 
 void XCore::CreateSystemVars(void)
 {
@@ -629,6 +645,11 @@ void XCore::CreateSystemVars(void)
 	var_win_pos_y->SetOnChangeCallback(WindowPosVarChange);
 	var_win_width->SetOnChangeCallback(WindowSizeVarChange);
 	var_win_height->SetOnChangeCallback(WindowSizeVarChange);
+
+	var_win_custom_Frame = ADD_CVAR_INT("win_custom_Frame", 1, 0, 1,
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Enable / disable the windows custom frame");
+
+	var_win_custom_Frame->SetOnChangeCallback(WindowCustomFrameVarChange);
 
 
 	var_profile = ADD_CVAR_INT("profile", 1, 0, 1, VarFlag::SYSTEM, "Enable Profiling");

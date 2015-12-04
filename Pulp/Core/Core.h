@@ -254,13 +254,17 @@ private:
 
 public:
 	// All the vars
+	friend void WindowCustomFrameVarChange(core::ICVar* pVar);
+
 
 	core::ICVar* var_win_pos_x;
 	core::ICVar* var_win_pos_y;
 	core::ICVar* var_win_width;
 	core::ICVar* var_win_height;
+	core::ICVar* var_win_custom_Frame;
 
 	core::ICVar* var_profile;
+
 };
 
 X_NAMESPACE_BEGIN(core)
