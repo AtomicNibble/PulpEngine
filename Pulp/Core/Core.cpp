@@ -415,12 +415,12 @@ bool XCore::Update()
 		core::StackString<128> title;
 		title.clear();
 		title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%i, %ims) Time: %I64u(x%g) UI: %I64u",
-			(int)fps,
-			(int)(frametime * 1000.f),
-			(__int64)time_.GetFrameStartTime(core::ITimer::Timer::GAME).GetMilliSeconds(),
+			static_cast<int>(fps),
+			static_cast<int>(frametime * 1000.f),
+			static_cast<__int64>(time_.GetFrameStartTime(core::ITimer::Timer::GAME).GetMilliSeconds()),
 			time_.GetTimeScale(),
-			(__int64)time_.GetFrameStartTime(core::ITimer::Timer::UI).GetMilliSeconds()
-			);
+			static_cast<__int64>(time_.GetFrameStartTime(core::ITimer::Timer::UI).GetMilliSeconds())
+		);
 
 		pWindow_->SetTitle(title.c_str());
 	}
