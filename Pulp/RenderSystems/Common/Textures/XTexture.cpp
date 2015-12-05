@@ -751,7 +751,7 @@ void XTexture::init(void)
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
 	ADD_CVAR_REF("image_autoConvert", s_Var_SaveToCI, 0, 0, 1, core::VarFlag::SYSTEM, 
-		"Save unconverted images as ci automatically.");
+		"Save unconverted images as ci automatically");
 
 	s_pTextures = X_NEW_ALIGNED(render::XRenderResourceContainer, g_rendererArena, 
 		"TexturesRes", X_ALIGN_OF(render::XRenderResourceContainer))(g_rendererArena, 4096);

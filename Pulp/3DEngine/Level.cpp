@@ -160,10 +160,12 @@ bool Level::Init(void)
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
 	ADD_CVAR_REF("lvl_usePortals", s_var_usePortals_, 1, 0, 1,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Use area portals when rendering the level.");
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
+		"Use area portals when rendering the level");
 	
 	ADD_CVAR_REF("lvl_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 4,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Draws bounding box around each level area. 1=visble 2=all 3=visble-fill 4=all-fill");
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Draws bounding box around each level area. 1=visble 2=all 3=visble-fill 4=all-fill");
 
 	ADD_CVAR_REF("lvl_drawPortals", s_var_drawPortals_, 1, 0, 4, 
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
