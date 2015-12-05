@@ -141,6 +141,23 @@ namespace
 		const char* end_;
 	};
 
+	struct AutoResult
+	{
+		AutoResult() : AutoResult(nullptr, nullptr, nullptr) {}
+		AutoResult(const char* name, ICVar* var, ConsoleCommand* pCmd) :
+			name(name), var(var), pCmd(pCmd) {}
+
+		X_INLINE bool operator<(const AutoResult& oth) {
+			return strcmp(name, oth.name) < 0;
+		}
+
+	public:
+		const char* name;
+		ICVar* var;
+		ConsoleCommand* pCmd;
+	};
+
+
 } // namespace
 
 
@@ -2184,23 +2201,9 @@ void XConsole::DrawScrollBar(void)
 	}
 }
 
+
 void XConsole::DrawInputTxt(const Vec2f& start)
 {
-	struct AutoResult
-	{
-		AutoResult() : name(nullptr), var(nullptr), pCmd(nullptr) {}
-		AutoResult(const char* name, ICVar* var, ConsoleCommand* pCmd) : 
-			name(name), var(var), pCmd(pCmd) {}
-
-		const char* name;
-		ICVar* var;
-		ConsoleCommand* pCmd;
-
-		X_INLINE bool operator<(const AutoResult& oth) {
-			return strcmp(name, oth.name) < 0;
-		}
-	};
-
 	const size_t max_auto_complete_results = 32;
 	typedef core::FixedArray<AutoResult, max_auto_complete_results> Results;
 	Results results;
