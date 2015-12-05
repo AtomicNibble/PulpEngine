@@ -340,6 +340,10 @@ private:
 
 	Cursor					cursor_;
 
+#if X_ENABLE_CONFIG_HOT_RELOAD
+	bool					ignoreHotReload_;
+#endif // !X_ENABLE_CONFIG_HOT_RELOAD
+
 private:
 	static int		console_debug;
 	static int		console_case_sensitive;
