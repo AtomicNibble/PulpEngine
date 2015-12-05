@@ -8,7 +8,7 @@
 #include <ICore.h>
 #include <IConsole.h>
 
-// #include "resource.h"
+#include "resource.h"
 
 X_NAMESPACE_BEGIN(core)
 
@@ -72,7 +72,7 @@ void xWindow::RegisterClass(void)
 		wcex.cbClsExtra = 0;
 		wcex.cbWndExtra = 0;
 		wcex.hInstance = GetModuleHandle(NULL);
-		wcex.hIcon = 0;
+		wcex.hIcon = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ENGINE_LOGO));
 		wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
 		wcex.hbrBackground = 0;
 		wcex.lpszMenuName = 0;
