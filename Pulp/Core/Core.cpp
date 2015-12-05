@@ -430,6 +430,38 @@ bool XCore::Update()
 }
 
 
+const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
+{
+	X_ASSERT_NOT_NULL(pVarName);
+
+	if (numArgs_ == 0) {
+		return nullptr;
+	}
+
+	size_t i;
+	for (i = 0; i < numArgs_; i++)
+	{
+		const core::CmdArgs<1024, wchar_t>& arg = args_[i];
+
+		if (arg.getArgc() >= 3)
+		{
+			const wchar_t* pCmd = arg.getArgv(0);
+			if (core::strUtil::IsEqualCaseInsen(pCmd, L"set"))
+			{
+				const wchar_t* pName = arg.getArgv(1);
+				if (core::strUtil::IsEqual(pName, pVarName))
+				{
+					const wchar_t* pValue = arg.getArgv(2);
+					return pValue;
+				}
+			}
+		}
+	}
+
+	return nullptr;
+}
+
+
 
 // IXHotReloadManager
 bool XCore::addfileType(core::IXHotReload* pHotReload, const char* extension)

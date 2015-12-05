@@ -117,6 +117,9 @@ public:
 	virtual void RenderBegin() X_OVERRIDE;
 	virtual void RenderEnd() X_OVERRIDE;
 
+	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_OVERRIDE;
+
+
 	core::ITimer		*GetITimer() X_OVERRIDE{ return env_.pTimer; }
 	input::IInput		*GetIInput() X_OVERRIDE{ return env_.pInput; }
 	core::IConsole		*GetIConsole() X_OVERRIDE{ return env_.pConsole; }

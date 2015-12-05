@@ -284,6 +284,9 @@ struct ICore
 	virtual void RenderBegin() X_ABSTRACT;
 	virtual void RenderEnd() X_ABSTRACT;
 
+	// cmd-line util
+	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_ABSTRACT;
+
 
 	virtual IGoatFactoryRegistry* GetFactoryRegistry() const X_ABSTRACT;
 
