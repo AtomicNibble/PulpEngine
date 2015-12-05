@@ -72,33 +72,61 @@ xFileSys::~xFileSys()
 
 bool xFileSys::Init()
 {
+	X_ASSERT_NOT_NULL(gEnv->pCore);
 	X_LOG0("FileSys", "Starting Filesys..");
 
-	strUtil::WorkingDirStrW buf;
-	strUtil::workingDir(buf);
-
-	core::Path<wchar_t> base(buf);
-	base /= L"\\..\\..\\..\\potatoengine\\game_folder\\";
-
-	core::Path<wchar_t> core(base);
-	core /= L"core_assets\\";
-
-	core::Path<wchar_t> mod(base);
-	mod /= L"mod\\";
-
-	core::Path<wchar_t> testAssets(base);
-	testAssets /= L"test_assets\\";
-
-	// TODO: yup.
-	if (setGameDir(core.c_str()))
+	// check if game dir set via cmd line.
+	const wchar_t* pGameDir = gEnv->pCore->GetCommandLineArgForVarW(L"fs_basepath");
+	if (pGameDir)
 	{
-		// add mod dir's
-		addModDir(mod.c_str());
-		addModDir(testAssets.c_str());
-		return true;
+		core::Path<wchar_t> base(pGameDir);
+		base.ensureSlash();
+
+		core::Path<wchar_t> core(base);
+		core /= L"core_assets\\";
+
+		core::Path<wchar_t> mod(base);
+		mod /= L"mod\\";
+
+		core::Path<wchar_t> testAssets(base);
+		testAssets /= L"test_assets\\";
+
+		if (setGameDir(core.c_str()))
+		{
+			// add mod dir's
+			addModDir(mod.c_str());
+			addModDir(testAssets.c_str());
+			return true;
+		}
+	}
+	else
+	{
+		strUtil::WorkingDirStrW buf;
+		strUtil::workingDir(buf);
+
+		core::Path<wchar_t> base(buf);
+		base /= L"\\..\\..\\..\\potatoengine\\game_folder\\";
+
+		core::Path<wchar_t> core(base);
+		core /= L"core_assets\\";
+
+		core::Path<wchar_t> mod(base);
+		mod /= L"mod\\";
+
+		core::Path<wchar_t> testAssets(base);
+		testAssets /= L"test_assets\\";
+
+		// TODO: yup.
+		if (setGameDir(core.c_str()))
+		{
+			// add mod dir's
+			addModDir(mod.c_str());
+			addModDir(testAssets.c_str());
+			return true;
+		}
 	}
 
-	return true;
+	return false;
 }
 
 void xFileSys::ShutDown()
