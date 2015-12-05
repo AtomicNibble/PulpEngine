@@ -184,7 +184,7 @@ void XCore::ShutDown()
 		core::SafeRelease(env_.p3DEngine);
 	}
 
-	if (env_.pConsole)
+	if (env_.pConsole && !initParams_.basicConsole())
 	{
 		env_.pConsole->SaveChangedVars();
 	}
