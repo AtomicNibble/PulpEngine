@@ -594,9 +594,10 @@ void WindowPosVarChange(core::ICVar* pVar)
 	int x_pos = g_coreVars.win_x_pos;
 	int y_pos = g_coreVars.win_y_pos;
 
-	core::xWindow* win = gEnv->pCore->GetGameWindow();
-
-	win->MoveTo(x_pos, y_pos);
+	core::xWindow* pWin = gEnv->pCore->GetGameWindow();
+	if (pWin) {
+		pWin->MoveTo(x_pos, y_pos);
+	}
 }
 
 void WindowSizeVarChange(core::ICVar* pVar)
