@@ -441,7 +441,7 @@ const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
 	size_t i;
 	for (i = 0; i < numArgs_; i++)
 	{
-		const core::CmdArgs<1024, wchar_t>& arg = args_[i];
+		const CmdArg& arg = args_[i];
 
 		if (arg.getArgc() >= 3)
 		{
