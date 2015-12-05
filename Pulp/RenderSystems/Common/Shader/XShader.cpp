@@ -334,8 +334,12 @@ bool XShaderManager::Init(void)
 	gEnv->pHotReload->addfileType(this, "shader");
 	gEnv->pHotReload->addfileType(this, "fxcb");
 
-	ADD_COMMAND("shader_list", Cmd_ListShaders, core::VarFlag::SYSTEM, "lists the loaded shaders");
-	ADD_COMMAND("shader_listsourcebin", Cmd_ListShaderSources, core::VarFlag::SYSTEM, "lists the loaded shaders sources");
+	ADD_COMMAND("shaderList", Cmd_ListShaders, core::VarFlag::SYSTEM, "lists the loaded shaders");
+	ADD_COMMAND("shaderListsourcebin", Cmd_ListShaderSources, core::VarFlag::SYSTEM, "lists the loaded shaders sources");
+
+	// alternate names
+	ADD_COMMAND("listShaders", Cmd_ListShaders, core::VarFlag::SYSTEM, "lists the loaded shaders");
+	ADD_COMMAND("listShaderSource", Cmd_ListShaderSources, core::VarFlag::SYSTEM, "lists the loaded shaders sources");
 
 	return true;
 }

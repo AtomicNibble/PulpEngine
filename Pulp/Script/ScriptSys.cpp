@@ -250,11 +250,12 @@ void XScriptSys::Init()
 void XScriptSys::InitCommands()
 {
 	// add the shieeeeeeet.
+	ADD_COMMAND("listScipts", ListScriptCmd, core::VarFlag::SYSTEM, "List loaded script files");
 
-	ADD_COMMAND("script_load", LoadScriptCmd, core::VarFlag::SYSTEM, "Load and run a script file");
-	ADD_COMMAND("script_list", ListScriptCmd, core::VarFlag::SYSTEM, "List loaded script files");
-	ADD_COMMAND("script_reload", ReloadScriptCmd, core::VarFlag::SYSTEM, "Reload a given script <filename>");
-	ADD_COMMAND("script_dump_state", LuaDumpState, core::VarFlag::SYSTEM, "Dump the lua state to a file <filename>");
+	ADD_COMMAND("scriptLoad", LoadScriptCmd, core::VarFlag::SYSTEM, "Load and run a script file");
+	ADD_COMMAND("scriptList", ListScriptCmd, core::VarFlag::SYSTEM, "List loaded script files");
+	ADD_COMMAND("scriptReload", ReloadScriptCmd, core::VarFlag::SYSTEM, "Reload a given script <filename>");
+	ADD_COMMAND("scriptDumpState", LuaDumpState, core::VarFlag::SYSTEM, "Dump the lua state to a file <filename>");
 	
 	ADD_CVAR_REF("script_draw_memory_stats", c_script_draw_memory_stats_, 0, 0, 1, core::VarFlag::SYSTEM,
 		"Draw lua memory stats on screen");

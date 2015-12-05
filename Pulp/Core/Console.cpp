@@ -743,8 +743,8 @@ void XConsole::RegisterCommnads(void)
 {
 	AddCommand("exec", Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
 	AddCommand("help", Command_Help, VarFlag::SYSTEM, "displays help info");
-	AddCommand("listcmds", Command_ListCmd, VarFlag::SYSTEM, "lists avaliable commands");
-	AddCommand("listdvars", Command_ListDvars, VarFlag::SYSTEM, "lists dvars");
+	AddCommand("listCmds", Command_ListCmd, VarFlag::SYSTEM, "lists avaliable commands");
+	AddCommand("listDvars", Command_ListDvars, VarFlag::SYSTEM, "lists dvars");
 	AddCommand("exit", Command_Exit, VarFlag::SYSTEM, "closes the game");
 	AddCommand("quit", Command_Exit, VarFlag::SYSTEM, "closes the game");
 	AddCommand("echo", Command_Echo, VarFlag::SYSTEM, "prints text in argument, prefix dvar's with # to print value");
@@ -753,14 +753,14 @@ void XConsole::RegisterCommnads(void)
 	AddCommand("seta", Command_SetVarArchive, VarFlag::SYSTEM, "set a var and flagging it to be archived");
 
 	AddCommand("bind", Command_Bind, VarFlag::SYSTEM, "binds a key to a action Eg: bind shift a 'echo hello';");
-	AddCommand("clearbinds", Command_BindsClear, VarFlag::SYSTEM, "clears all binds");
-	AddCommand("listbinds", Command_BindsList, VarFlag::SYSTEM, "lists all the binds");
+	AddCommand("clearBinds", Command_BindsClear, VarFlag::SYSTEM, "clears all binds");
+	AddCommand("listBinds", Command_BindsList, VarFlag::SYSTEM, "lists all the binds");
 
-	AddCommand("savemodifiedvars", Command_SaveModifiedVars, VarFlag::SYSTEM, "Saves modifed vars");
+	AddCommand("saveModifiedVars", Command_SaveModifiedVars, VarFlag::SYSTEM, "Saves modifed vars");
 
-	AddCommand("console_show", Command_ConsoleShow, VarFlag::SYSTEM, "opens the console");
-	AddCommand("console_hide", Command_ConsoleHide, VarFlag::SYSTEM, "hides the console");
-	AddCommand("console_toggle", Command_ConsoleToggle, VarFlag::SYSTEM, "toggle the console");
+	AddCommand("consoleShow", Command_ConsoleShow, VarFlag::SYSTEM, "opens the console");
+	AddCommand("consoleHide", Command_ConsoleHide, VarFlag::SYSTEM, "hides the console");
+	AddCommand("consoleToggle", Command_ConsoleToggle, VarFlag::SYSTEM, "toggle the console");
 }
 
 void XConsole::ShutDown(void)
