@@ -239,7 +239,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 		else
 		{
 			fileModeFlags::Description Dsc;
-			X_WARNING("FileSys", "Failed to find file: %Ls, Flags: %s",
+			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s",
 				path, mode.ToString(Dsc));
 		}
 	}
@@ -340,7 +340,7 @@ bool xFileSys::setGameDir(pathTypeW path)
 
 	// check if the irectory is even valid.
 	if (!this->directoryExistsOS(path)) {
-		X_ERROR("FileSys", "Faled to set game drectory the directory does not exsists: \"%s\"", path);
+		X_ERROR("FileSys", "Faled to set game drectory the directory does not exsists: \"%ls\"", path);
 		return false;
 	}
 
@@ -724,7 +724,7 @@ bool xFileSys::fileExistsOS(pathTypeW fullPath) const
 		// This means we checked for a file in a directory that don't exsists.
 		if (err == ERROR_PATH_NOT_FOUND)
 		{
-			X_LOG2("FileSys", "FileExsits failed, the target directory does not exsist: \"%s\"",
+			X_LOG2("FileSys", "FileExsits failed, the target directory does not exsist: \"%ls\"",
 				fullPath);
 		}
 		else if (err != ERROR_FILE_NOT_FOUND)
