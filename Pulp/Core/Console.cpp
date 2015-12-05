@@ -2188,10 +2188,13 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 {
 	struct AutoResult
 	{
-		AutoResult() : name(nullptr), var(nullptr) {}
-		AutoResult(const char* name, ICVar* var) : name(name), var(var) {}
+		AutoResult() : name(nullptr), var(nullptr), pCmd(nullptr) {}
+		AutoResult(const char* name, ICVar* var, ConsoleCommand* pCmd) : 
+			name(name), var(var), pCmd(pCmd) {}
+
 		const char* name;
 		ICVar* var;
+		ConsoleCommand* pCmd;
 
 		X_INLINE bool operator<(const AutoResult& oth) {
 			return strcmp(name, oth.name) < 0;
@@ -2265,7 +2268,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 			// we search same length.
 			if (pComparison(Name, Name + inputLen, inputBegin, inputEnd))
 			{
-				results.push_back(AutoResult(Name, it->second));
+				results.push_back(AutoResult(Name, it->second, nullptr));
 			}
 
 			if (results.size() == results.capacity()) {
@@ -2290,7 +2293,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				// we search same length.
 				if (pComparison(Name, Name + inputLen, inputBegin, inputEnd))
 				{
-					results.push_back(AutoResult(Name, nullptr));
+					results.push_back(AutoResult(Name, nullptr, &cmdIt->second));
 				}
 
 				if (results.size() == results.capacity()) {
@@ -2553,6 +2556,40 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 					ypos += fCharHeight;
 					pFont_->DrawString(xpos, ypos, domain.c_str(), ctx);
 				}
+			}
+			else if (isSingleCmd)
+			{
+				AutoResult& result = *results.begin();
+				const core::string& Desc = result.pCmd->Desc;
+
+				const float box2Offset = 5.f;
+				const float descWidth = core::Max(width, pFont_->GetTextSize(Desc, ctx).x) + 10.f;
+
+				width = core::Max(width, pFont_->GetTextSize(result.name, ctx).x);
+				width += 10; // add a few pixels.
+				height += fCharHeight;
+
+
+				pRender_->Set2D(true);
+				pRender_->DrawQuadImage(xpos, ypos, width, height, this->pBackground_->getTexID(), col);
+				pRender_->DrawRect(xpos, ypos, width, height, console_output_box_color_border);
+				pRender_->DrawQuad(xpos, ypos + height + box2Offset, descWidth, height, col);
+				pRender_->DrawRect(xpos, ypos + height + box2Offset, descWidth, height, console_input_box_color_border);
+				pRender_->Set2D(false);
+
+				xpos += 5.f;
+
+				// cmd color
+				ctx.SetColor(Col_Darkblue);
+				pFont_->DrawString(xpos, ypos, result.name, ctx);
+
+				ypos += fCharHeight;
+				ypos += 5.f;
+				ypos += box2Offset;
+
+				ctx.SetColor(Col_Whitesmoke);
+				pFont_->DrawString(xpos, ypos, Desc, ctx);
+
 			}
 			else
 			{
