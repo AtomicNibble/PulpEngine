@@ -745,7 +745,7 @@ void XConsole::RegisterCommnads(void)
 	AddCommand("listdvars", Command_ListDvars, VarFlag::SYSTEM, "lists dvars");
 	AddCommand("exit", Command_Exit, VarFlag::SYSTEM, "closes the game");
 	AddCommand("quit", Command_Exit, VarFlag::SYSTEM, "closes the game");
-	AddCommand("echo", Command_Echo, VarFlag::SYSTEM, "prints text in argument, prefix dvar's with # to print value.");
+	AddCommand("echo", Command_Echo, VarFlag::SYSTEM, "prints text in argument, prefix dvar's with # to print value");
 	AddCommand("wait", Command_Wait, VarFlag::SYSTEM, "waits a given number of seconds before processing the next commands");
 	AddCommand("vreset", Command_VarReset, VarFlag::SYSTEM, "resets a variable to it's default value");
 	AddCommand("seta", Command_SetVarArchive, VarFlag::SYSTEM, "set a var and flagging it to be archived");

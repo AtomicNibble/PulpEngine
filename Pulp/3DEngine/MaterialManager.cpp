@@ -449,7 +449,7 @@ void XMaterialManager::Init(void)
 	InitDefaults();
 
 
-	ADD_COMMAND("listMaterials", Cmd_ListMaterials, core::VarFlag::SYSTEM, "List all the loaded materials.");
+	ADD_COMMAND("listMaterials", Cmd_ListMaterials, core::VarFlag::SYSTEM, "List all the loaded materials");
 
 	// hotreload support.
 	gEnv->pHotReload->addfileType(this, MTL_FILE_EXTENSION);
