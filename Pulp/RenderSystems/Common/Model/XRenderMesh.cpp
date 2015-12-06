@@ -106,6 +106,8 @@ bool XRenderMesh::uploadToGpu(void)
 
 bool XRenderMesh::render(void)
 {
+	X_PROFILE_BEGIN("RenderMesh", core::ProfileSubSys::RENDER);
+
 	using namespace render;
 
 	if (!canRender())
