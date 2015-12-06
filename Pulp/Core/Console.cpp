@@ -961,10 +961,16 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 			if (event.keyId == input::KeyId::MOUSE_Z)
 			{
 				int32_t scaled = static_cast<int32_t>(event.value);
+				bool positive = (scaled >= 0);
 
 				scaled /= 20;
-				if (scaled < 1) {
+
+				// enuse scaled didnt remove all scrolling
+				if(positive && scaled < 1) {
 					scaled = 1;
+				}
+				else if (!positive && scaled > -1) {
+					scaled = -1;
 				}
 
 				ScrollPos_ += scaled;
