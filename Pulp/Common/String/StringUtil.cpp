@@ -266,14 +266,14 @@ namespace strUtil
 		return static_cast<size_t>(wcslen(str));
 	}
 
-	const char* Convert(const wchar_t *input, char *output, uint32_t outputLength)
+	const char* Convert(const wchar_t *input, char *output, size_t outputLength)
 	{
 		size_t convertedChars = 0;
 		wcstombs_s(&convertedChars, output, outputLength, input, _TRUNCATE);
 		return output;
 	}
 
-	const wchar_t* Convert(const char *input, wchar_t *output, uint32_t outputBytes)
+	const wchar_t* Convert(const char *input, wchar_t *output, size_t outputBytes)
 	{
 		size_t convertedChars = 0;
 		mbstowcs_s(&convertedChars, output, outputBytes / 2, input, _TRUNCATE);
