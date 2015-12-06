@@ -24,8 +24,13 @@ public:
 	const FormatPolicy& GetFormatPolicy(void) const;
 	const WritePolicy& GetWritePolicy(void) const;
 
+	FilterPolicy& GetFilterPolicy(void);
+	FormatPolicy& GetFormatPolicy(void);
+	WritePolicy& GetWritePolicy(void);
+
+
 private:
-	virtual void DoLog(const SourceInfo& sourceInfo, const char* channel, size_t verbosity, const char* foramt, va_list args) X_OVERRIDE;
+	virtual void DoLog(const SourceInfo& sourceInfo, const char* channel, int verbosity, const char* foramt, va_list args) X_OVERRIDE;
 	virtual void DoWarning(const SourceInfo& sourceInfo, const char* channel, const char* foramt, va_list args) X_OVERRIDE;
 	virtual void DoError(const SourceInfo& sourceInfo, const char* channel, const char* foramt, va_list args) X_OVERRIDE;
 	virtual void DoFatal(const SourceInfo& sourceInfo, const char* channel, const char* foramt, va_list args) X_OVERRIDE;

@@ -2,12 +2,13 @@
 #include "Game.h"
 #include "EngineApp.h"
 
-#include <Shlwapi.h>
 #include <IFileSys.h>
+
+#include <String\Path.h>
 
 HINSTANCE g_hInstance = 0;
 
-X_LINK_LIB("Shlwapi")
+#include <tchar.h>
 
 #define _LAUNCHER
 
@@ -37,13 +38,21 @@ X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Game@@0V12@A")
 
 #endif // !X_LIB
 
-void InitRootDir()
+void InitRootDir(void)
 {
 #ifdef WIN32
-	WCHAR szExeFileName[_MAX_PATH];
-	GetModuleFileNameW(GetModuleHandle(NULL), szExeFileName, sizeof(szExeFileName));
-	PathRemoveFileSpecW(szExeFileName);
-	SetCurrentDirectoryW(szExeFileName);
+	WCHAR szExeFileName[_MAX_PATH] = { 0 };
+	GetModuleFileNameW(GetModuleHandleW(NULL), szExeFileName, sizeof(szExeFileName));
+
+	core::Path<wchar_t> path(szExeFileName);
+
+	path.removeFileName();
+	path.removeTrailingSlash();
+
+	if (!SetCurrentDirectoryW(path.c_str())) {
+		::MessageBoxW(0, L"Failed to set current directory", L"Error", MB_OK);
+		ExitProcess(static_cast<uint32_t>(-1));
+	}
 #endif
 }
 
@@ -64,7 +73,8 @@ void operator delete(void* m)
 
 
 
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
+	LPTSTR lpCmdLine, int nCmdShow)
 {
 	X_UNUSED(hPrevInstance);
 	X_UNUSED(lpCmdLine);

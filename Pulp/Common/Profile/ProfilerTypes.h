@@ -169,7 +169,7 @@ private:
 };
 
 
-#if X_ENNABLE_PROFILER 
+#if X_ENABLE_PROFILER 
 
 #define X_PROFILE_BEGIN(nickname, sys) \
 	static core::XProfileData __Profiledata(gEnv->pCore, __FUNCTION__, nickname, sys); \
@@ -180,7 +180,7 @@ private:
 #define X_PROFILE_BEGIN(nickname, sys) X_UNUSED(nickname), X_UNUSED(sys)
 
 
-#endif // !X_ENNABLE_PROFILER
+#endif // !X_ENABLE_PROFILER
 
 X_NAMESPACE_END
 

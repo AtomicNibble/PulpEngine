@@ -24,14 +24,15 @@ hSystemHandle_(NULL)
 EngineApp::~EngineApp()
 {
 	if (hSystemHandle_)
-		GoatFreeLibrary(hSystemHandle_);
+		PotatoFreeLibrary(hSystemHandle_);
 }
 
 
-bool EngineApp::Init(const char* sInCmdLine, core::Console& Console)
+bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 {
 	SCoreInitParams params;
 	params.hInstance = g_hInstance;
+	params.pCmdLine = sInCmdLine;
 	params.bSkipInput = true;
 	params.bSkipSound = true;
 	params.bVsLog = false;
@@ -48,7 +49,7 @@ bool EngineApp::Init(const char* sInCmdLine, core::Console& Console)
 
 #else
 	// load the dll.
-	hSystemHandle_ = GoatLoadLibary(CORE_DLL_NAME);
+	hSystemHandle_ = PotatoLoadLibary(CORE_DLL_NAME);
 
 	if (!hSystemHandle_)
 	{
@@ -57,7 +58,7 @@ bool EngineApp::Init(const char* sInCmdLine, core::Console& Console)
 	}
 
 	PFNCREATECOREINTERFACE pfnCreateCoreInterface =
-		(PFNCREATECOREINTERFACE)GoatGetProcAddress(hSystemHandle_, CORE_DLL_INITFUNC);
+		(PFNCREATECOREINTERFACE)PotatoGetProcAddress(hSystemHandle_, CORE_DLL_INITFUNC);
 
 	if (!pfnCreateCoreInterface)
 	{

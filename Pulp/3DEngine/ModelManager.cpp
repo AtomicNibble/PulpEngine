@@ -57,7 +57,7 @@ void XModelManager::Init(void)
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
 
-	ADD_COMMAND("listModels", Cmd_ListModels, core::VarFlag::SYSTEM, "List all the loaded models.");
+	ADD_COMMAND("listModels", Cmd_ListModels, core::VarFlag::SYSTEM, "List all the loaded models");
 
 	// hotreload support.
 	gEnv->pHotReload->addfileType(this, MODEL_FILE_EXTENSION);

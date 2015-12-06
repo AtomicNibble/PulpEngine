@@ -227,7 +227,7 @@ bool LvlBrush::createBrushWindings(const XPlaneSet& planes)
 bool LvlBrush::boundBrush(const XPlaneSet& planes)
 {
 	size_t i;
-	int32_t j;
+	size_t j;
 	XWinding* w;
 
 	bounds.clear();
@@ -355,7 +355,7 @@ float LvlBrush::Volume(const XPlaneSet& planes)
 BrushPlaneSide::Enum LvlBrush::BrushMostlyOnSide(const Planef& plane) const
 {
 	size_t i;
-	int32_t j;
+	size_t j;
 	XWinding* w;
 	float d, max;
 	BrushPlaneSide::Enum side;

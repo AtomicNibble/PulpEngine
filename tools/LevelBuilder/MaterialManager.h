@@ -20,12 +20,17 @@ public:
 	MatManager();
 	~MatManager();
 
-	void Init(void);
+	bool Init(void);
 	void ShutDown(void);
 
 	engine::IMaterial* createMaterial(const char* MtlName);
 	engine::IMaterial* findMaterial(const char* MtlName) const;
 	engine::IMaterial* loadMaterial(const char* MtlName);
+
+private:
+	bool loadDefaultMaterial(void);
+
+	engine::IMaterial* getDefaultMaterial(void) const;
 
 private:
 	friend class XMaterial;
@@ -38,6 +43,7 @@ private:
 
 	MaterialCon	materials_;
 	
+	engine::IMaterial* pDefaultMtl_;
 	core::IFileSys* pFileSys_;
 };
 

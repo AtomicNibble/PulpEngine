@@ -253,7 +253,8 @@ bool JobSystem::StartUp(void)
 		"The number of threads used by the job system");
 
 	// register longJob
-	ADD_CVAR_REF("jobsys_longJobMs", var_LongJobMs, var_LongJobMs, 0, 32, core::VarFlag::SYSTEM, "If a single job takes longer than this a warning is printed.\n0 = disabled.");
+	ADD_CVAR_REF("jobsys_longJobMs", var_LongJobMs, var_LongJobMs, 0, 32, core::VarFlag::SYSTEM,
+		"If a single job takes longer than this a warning is printed. 0 = disabled");
 
 	return StartThreads();
 }

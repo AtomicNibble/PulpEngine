@@ -126,7 +126,8 @@ public:
 
 	virtual ~XConsole();
 
-	virtual void Startup(ICore* pCore) X_FINAL;
+	virtual void Startup(ICore* pCore, bool basic) X_FINAL;
+	virtual void RegisterCommnads(void) X_FINAL;
 	virtual void ShutDown(void) X_FINAL;
 	virtual void SaveChangedVars(void) X_FINAL;
 	virtual void unregisterInputListener(void) X_FINAL;
@@ -183,6 +184,9 @@ public:
 	X_INLINE void ToggleConsole(bool expand = false);
 
 protected:
+	void LoadRenderResources(void);
+	void RegisterInputListener(void);
+
 	void ExecuteStringInternal(const char* command, ExecSource::Enum source = ExecSource::CONSOLE, const bool bSilentMode = false);
 	void ExecuteCommand(ConsoleCommand &cmd, core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& str);
 
@@ -209,6 +213,7 @@ protected:
 	void SaveCmdHistory(void) const;
 	void LoadCmdHistory(void);
 	void AddCmdToHistory(const char* Command);
+	void ResetHistoryPos(void);
 	const char* GetHistory(CmdHistory::Enum direction);
 
 	// Binds a cmd to a key
@@ -335,6 +340,10 @@ private:
 
 	Cursor					cursor_;
 
+#if X_ENABLE_CONFIG_HOT_RELOAD
+	bool					ignoreHotReload_;
+#endif // !X_ENABLE_CONFIG_HOT_RELOAD
+
 private:
 	static int		console_debug;
 	static int		console_case_sensitive;
@@ -368,6 +377,7 @@ private:
 	friend void Command_ConsoleShow(IConsoleCmdArgs* Cmd);
 	friend void Command_ConsoleHide(IConsoleCmdArgs* Cmd);
 	friend void Command_ConsoleToggle(IConsoleCmdArgs* Cmd);
+	friend void Command_SaveModifiedVars(IConsoleCmdArgs* Cmd);
 
 };
 

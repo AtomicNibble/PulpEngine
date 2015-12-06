@@ -12,10 +12,12 @@
 
 #include "Util\SourceInfo.h"
 #include "String\StrRef.h"
+#include "String\CmdArgs.h"
 
 // Logging
 #include "Logging\Logger.h"
 #include "Logging\FilterPolicies\LoggerNoFilterPolicy.h"
+#include "Logging\FilterPolicies\LoggerVerbosityFilterPolicy.h"
 #include "Logging\FormatPolicies\LoggerExtendedFormatPolicy.h"
 #include "Logging\FormatPolicies\LoggerSimpleFormatPolicy.h"
 #include "Logging\FormatPolicies\LoggerFullFormatPolicy.h"
@@ -72,7 +74,7 @@ core::LoggerFullFormatPolicy,
 core::LoggerDebuggerWritePolicy> VisualStudioLogger;
 
 typedef core::Logger<
-	core::LoggerNoFilterPolicy,
+	core::LoggerVerbosityFilterPolicy,
 	core::LoggerSimpleFormatPolicy,
 	core::LoggerConsoleWritePolicy> ConsoleLogger;
 
@@ -101,6 +103,7 @@ class XCore :
 	public core::XDirectoryWatcherListener,
 	public ICoreEventListener
 {
+	static const size_t MAX_CMD_ARS = 16;
 public:
 	XCore();
 	~XCore() X_OVERRIDE;
@@ -113,6 +116,9 @@ public:
 	virtual bool Update() X_OVERRIDE;
 	virtual void RenderBegin() X_OVERRIDE;
 	virtual void RenderEnd() X_OVERRIDE;
+
+	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_OVERRIDE;
+
 
 	core::ITimer		*GetITimer() X_OVERRIDE{ return env_.pTimer; }
 	input::IInput		*GetIInput() X_OVERRIDE{ return env_.pInput; }
@@ -161,9 +167,9 @@ private:
 	bool IntializeEngineModule(const char *dllName, const char *moduleClassName,
 		const SCoreInitParams &initParams);
 	
+	bool ParseCmdArgs(const wchar_t* pArgs);
 
-	bool InitConsole();
-	
+	bool InitConsole(const SCoreInitParams &initParams);
 	bool InitFileSys(const SCoreInitParams &startupParams);
 	bool InitLogging(const SCoreInitParams &startupParams);
 	bool InitInput(const SCoreInitParams &startupParams);
@@ -175,12 +181,14 @@ private:
 	bool InitGameDll(const SCoreInitParams &startupParams);
 	
 	
-	void CreateSystemVars();
+	void CreateSystemVars(void);
 
 
 	friend void Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd);
+	friend void Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd);
 
 	void HotReloadListExts(void);
+	void ListProgramArgs(void);
 
 private:
 
@@ -225,10 +233,14 @@ private:
 
 	// I think i can just use stack strings, since all handlers are hard coded.
 	typedef core::HashMap<const char* const, core::IXHotReload*> hotReloadMap;
-	// typedef std::map<const char* const, core::IXHotReload*> hotReloadMap;
-	//typedef std::map<core::string, core::IXHotReload*> hotReloadMap;
 
 	hotReloadMap					hotReloadExtMap_;
+
+#if X_DEBUG
+	typedef core::Array<core::string> hotRelodIgnoreList;
+
+	hotRelodIgnoreList hotReloadIgnores_;
+#endif // !X_DEBUG
 	// ~Hotreload
 
 
@@ -239,15 +251,25 @@ private:
 
 	core::GrowingGenericAllocator	strAlloc_;
 
+	// args
+	typedef core::CmdArgs<1024, wchar_t> CmdArg;
+
+	size_t numArgs_;
+	CmdArg args_[MAX_CMD_ARS];
+
 public:
 	// All the vars
+	friend void WindowCustomFrameVarChange(core::ICVar* pVar);
+
 
 	core::ICVar* var_win_pos_x;
 	core::ICVar* var_win_pos_y;
 	core::ICVar* var_win_width;
 	core::ICVar* var_win_height;
+	core::ICVar* var_win_custom_Frame;
 
 	core::ICVar* var_profile;
+
 };
 
 X_NAMESPACE_BEGIN(core)

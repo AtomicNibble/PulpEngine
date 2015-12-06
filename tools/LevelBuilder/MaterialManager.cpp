@@ -29,9 +29,9 @@ namespace
 
 MatManager::MatManager() :
 materials_(g_arena, 2048),
+pDefaultMtl_(nullptr),
 pFileSys_(nullptr)
 {
-
 }
 
 MatManager::~MatManager()
@@ -39,12 +39,14 @@ MatManager::~MatManager()
 
 }
 
-void MatManager::Init(void)
+bool MatManager::Init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
 	pFileSys_ = gEnv->pFileSys;
+
+	return loadDefaultMaterial();
 }
 
 void MatManager::ShutDown(void)
@@ -65,6 +67,25 @@ void MatManager::ShutDown(void)
 	//	while (pMat->release() > 0) {
 	//	}
 	}
+}
+
+bool MatManager::loadDefaultMaterial(void)
+{
+	// even tho loadMaterial returns default when not found, default is set as null
+	// so we are able to tell if it loaded.
+	engine::IMaterial* pDefault = loadMaterial(engine::MTL_DEFAULT_NAME);
+	if (!pDefault) {
+		X_ERROR("MatMan", "Failed to load default material");
+		return false;
+	}
+
+	this->pDefaultMtl_ = pDefault;
+	return true;
+}
+
+engine::IMaterial* MatManager::getDefaultMaterial(void) const
+{
+	return pDefaultMtl_;
 }
 
 engine::IMaterial* MatManager::createMaterial(const char* MtlName)
@@ -132,7 +153,9 @@ engine::IMaterial* MatManager::loadMaterial(const char* MtlName)
 	}
 
 	X_ERROR("MatMan", "Failed to find material: %s", MtlName);
-	return nullptr;
+
+	// return default?
+	return getDefaultMaterial();
 }
 
 // loaders.

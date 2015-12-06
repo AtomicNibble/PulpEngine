@@ -41,7 +41,8 @@ public:
 	/// \brief Constructs a pool allocator.
 	/// \details The allocator will never grow larger than \a maxSizeInBytes, and only grows in \a growSize chunks. Each
 	/// chunk will reserve \a chunkHeaderSize bytes at the end of a chunk in order to store user-supplied data.
-	GrowingPoolAllocator(unsigned int maxSizeInBytes, unsigned int growSize, unsigned int chunkHeaderSize, size_t maxElementSize, size_t maxAlignment, size_t offset);
+	GrowingPoolAllocator(size_t maxSizeInBytes, size_t growSize,
+		size_t chunkHeaderSize, size_t maxElementSize, size_t maxAlignment, size_t offset);
 
 	/// Frees all physical memory owned by the allocator.
 	~GrowingPoolAllocator(void);
@@ -82,8 +83,8 @@ private:
 	char* virtualStart_;
 	char* virtualEnd_;
 	char* physicalCurrent_;
-	unsigned int growSize_;
-	unsigned int chunkHeaderSize_;
+	size_t growSize_;
+	size_t chunkHeaderSize_;
 	size_t maxSize_;
 	size_t maxAlignment_;
 

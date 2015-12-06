@@ -27,7 +27,7 @@ EngineApp::~EngineApp()
 		pICore_->Release();
 
 	if (hSystemHandle_)
-		GoatFreeLibrary(hSystemHandle_);
+		PotatoFreeLibrary(hSystemHandle_);
 }
 
 
@@ -35,11 +35,13 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 {
 	SCoreInitParams params;
 	params.hInstance = g_hInstance;
+	params.pCmdLine = sInCmdLine;
 	params.bVsLog = false;
 	params.bConsoleLog = true;
 	params.bCoreOnly = true;
 	params.pConsoleWnd = &Console;
 	params.pCoreArena = g_arena;
+	params.bEnableBasicConsole = true;
 
 #ifdef X_LIB
 

@@ -30,6 +30,7 @@ public:
 	X_INLINE void set(const AABB &oth);
 
 	X_INLINE void  clear();
+	X_INLINE bool  IsInfinate(void) const; // returns if it's infinate: the value it's made after clear.
 	X_INLINE bool  isEmpty() const; // retruns if the box contains anyspace 
 	X_INLINE Vec3f center() const;	// the center point of the box
 	X_INLINE Vec3f size() const;	// the size of the box.

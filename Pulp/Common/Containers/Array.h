@@ -20,6 +20,10 @@ public:
 	typedef const T* ConstIterator;
 	typedef size_t size_type;
 
+	enum : size_type {
+		invalid_index = static_cast<size_type>(-1)
+	};
+
 	Array(MemoryArenaBase* arena);
 	Array(MemoryArenaBase* arena, size_type size);
 	Array(MemoryArenaBase* arena, size_type size, const T& initialValue);
@@ -86,6 +90,7 @@ public:
 	// remove the element at the given index
 	bool removeIndex(size_type idx);
 
+	// returns invalid_index when not found.
 	size_type find(const Type& val) const;
 
 	// swaps the arrays

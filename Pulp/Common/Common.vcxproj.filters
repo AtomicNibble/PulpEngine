@@ -1027,6 +1027,12 @@
     <ClInclude Include="Platform\win32\Types.h">
       <Filter>Headers\Platform\win32</Filter>
     </ClInclude>
+    <ClInclude Include="String\CmdArgs.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
+    <ClInclude Include="String\CmdArgs.inl">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">

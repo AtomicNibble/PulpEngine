@@ -26,6 +26,26 @@ namespace
 			) == TRUE;
 	}
 
+	const char* FileActionToStr(DWORD action)
+	{
+		switch(action)
+		{
+			case FILE_ACTION_ADDED:
+				return "FILE_ACTION_ADDED";
+			case FILE_ACTION_REMOVED:
+				return "FILE_ACTION_REMOVED";
+			case FILE_ACTION_MODIFIED:
+				return "FILE_ACTION_MODIFIED";
+			case FILE_ACTION_RENAMED_OLD_NAME:
+				return "FILE_ACTION_RENAMED_OLD_NAME";
+			case FILE_ACTION_RENAMED_NEW_NAME:
+				return "FILE_ACTION_RENAMED_NEW_NAME";
+			default:
+				break;
+		}
+		X_ASSERT_UNREACHABLE();
+		return "<unkown>";
+	}
 }
 
 
@@ -49,7 +69,8 @@ XDirectoryWatcher::~XDirectoryWatcher(void)
 
 void XDirectoryWatcher::Init(void)
 {
-	ADD_CVAR_REF("filesys_dir_watcher_debug", debug_, 0, 0, 1, core::VarFlag::SYSTEM,
+	ADD_CVAR_REF("filesys_dir_watcher_debug", debug_, 0, 0, 1, 
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Debug messages for directory watcher. 0=off 1=on");
 
 }
@@ -148,36 +169,43 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 
 	if (GetOverlappedResult(info.directory, &info.overlapped, &bytesTransferred, 0))
 	{
-		do
+		if (bytesTransferred > 0)
 		{
-			pInfo = (_FILE_NOTIFY_INFORMATION*)&info.result[offset];
-			
-			// null term. (string is not provided with one.)
-			pInfo->FileName[(pInfo->FileNameLength >> 1)] = '\0';
-
-			// multibyte me up.
-			core::strUtil::Convert(pInfo->FileName, filename);
-
-			// null term.
-			filename[(pInfo->FileNameLength >> 1)] = '\0';
-
-			// Path
-			core::Path<wchar_t> path(info.directoryName);
-			path.append(pInfo->FileName);
-
-
-			if (!path.isEmpty())
+			do
 			{
-				bool is_directory = false;
+				pInfo = (_FILE_NOTIFY_INFORMATION*)&info.result[offset];
 
-				if (pInfo->Action != FILE_ACTION_REMOVED) {
-					is_directory = gEnv->pFileSys->isDirectory(path.c_str());
-				}
+				// null term. (string is not provided with one.)
+				pInfo->FileName[(pInfo->FileNameLength >> 1)] = '\0';
 
-				if (is_directory)
+				// multibyte me up.
+				core::strUtil::Convert(pInfo->FileName, filename);
+
+				// null term.
+				filename[(pInfo->FileNameLength >> 1)] = '\0';
+
+				// Path
+				core::Path<wchar_t> path(info.directoryName);
+				path.append(pInfo->FileName);
+
+#if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+				X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Action: ^9%s",
+					FileActionToStr(pInfo->Action));
+#endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
+
+
+				if (!path.isEmpty())
 				{
-					switch (pInfo->Action)
+					bool is_directory = false;
+
+					if (pInfo->Action != FILE_ACTION_REMOVED) {
+						is_directory = gEnv->pFileSys->isDirectory(path.c_str());
+					}
+
+					if (is_directory)
 					{
+						switch (pInfo->Action)
+						{
 						case FILE_ACTION_ADDED:
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 							X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Dir \"%s\" was added", filename);
@@ -201,17 +229,18 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 							// then we get given new name, in next loop.
 						case FILE_ACTION_RENAMED_NEW_NAME:
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
-							X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Dir \"%s\" was renamed to \"%s\"", oldFilename, filename);
+							X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Dir \"%s\" was renamed to \"%s\"",
+								oldFilename, filename);
 #endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 
 							notify(Action::RENAMED, filename, oldFilename, true);
 							break;
+						}
 					}
-				}
-				else
-				{
-					switch (pInfo->Action)
+					else
 					{
+						switch (pInfo->Action)
+						{
 						case FILE_ACTION_ADDED:
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 							X_LOG1_IF(isDebugEnabled(), "DirWatcher", "File \"%s\" was added", filename);
@@ -237,9 +266,9 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 								notify(Action::MODIFIED, filename, nullptr, false);
 							}
 						}
-							break;
+						break;
 
-							// the old name
+						// the old name
 						case FILE_ACTION_RENAMED_OLD_NAME:
 							memcpy(oldFilename, filename, sizeof(oldFilename));
 							break;
@@ -251,15 +280,15 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
 #endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
 							notify(Action::RENAMED, filename, oldFilename, false);
 							break;
+						}
 					}
+
 				}
 
-			}
-
-			offsetToNext = pInfo->NextEntryOffset;
-			offset += offsetToNext;
+				offsetToNext = pInfo->NextEntryOffset;
+				offset += offsetToNext;
+			} while (offsetToNext);
 		}
-		while (offsetToNext);
 
 		// watch again.
 		WatchDirectory(info.directory, info.result, &info.overlapped);

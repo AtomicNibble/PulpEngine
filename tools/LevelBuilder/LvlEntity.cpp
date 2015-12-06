@@ -110,7 +110,7 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 			iap.area1 = p->nodes[0]->area;
 		}
 
-		X_LOG0("Portal", "inter connection: ^8%i^7 <-> ^8%i",
+		X_LOG1("Portal", "inter connection: ^8%i^7 <-> ^8%i",
 			iap.area0, iap.area1);
 		iap.pSide = pBSide;
 	}
@@ -203,7 +203,7 @@ bool LvlEntity::FacesToBSP(XPlaneSet& planeSet)
 		const bspFace& face = *pFace;
 		const XWinding& winding = *face.w;
 
-		for (int32_t i = 0; i < winding.getNumPoints(); i++)
+		for (size_t i = 0; i < winding.getNumPoints(); i++)
 		{
 			root.bounds.add(winding[i].asVec3());
 		}
@@ -272,7 +272,7 @@ bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents,
 	struct bspTree* tree;
 	bspNode* headnode;
 	bool inside;
-	int32_t i;
+	size_t i;
 	size_t floodedLeafs;
 
 	tree = &bspTree;
@@ -308,6 +308,7 @@ bool LvlEntity::FloodEntities(XPlaneSet& planeSet, LvlEntsArr& ents,
 				lvlEnt.origin.y,
 				lvlEnt.origin.z);
 
+			return false;
 		}
 	}
 

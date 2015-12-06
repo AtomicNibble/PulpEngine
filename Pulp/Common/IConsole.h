@@ -71,7 +71,8 @@ struct IConsole
 {
 	virtual ~IConsole(){}
 
-	virtual void Startup(ICore* pCore) X_ABSTRACT;
+	virtual void Startup(ICore* pCore, bool basic) X_ABSTRACT;
+	virtual void RegisterCommnads(void) X_ABSTRACT;
 	virtual void ShutDown(void) X_ABSTRACT;
 	virtual void SaveChangedVars(void) X_ABSTRACT; // saves vars with 'SAVE_IF_CHANGED' if modified.
 	virtual void unregisterInputListener(void) X_ABSTRACT;
@@ -123,16 +124,17 @@ struct IConsole
 struct ICVar
 {
 	typedef Flags<VarFlag> FlagType;
+	typedef char StrBuf[128];
 
 	virtual ~ICVar() {}
 
 	virtual const char* GetName(void) const X_ABSTRACT;
 	virtual const char* GetDesc(void) const X_ABSTRACT;
-	virtual const char* GetDefaultStr(void) const X_ABSTRACT;
+	virtual const char* GetDefaultStr(StrBuf& buf) const X_ABSTRACT;
 
 	virtual int GetInteger(void) const X_ABSTRACT;
 	virtual float GetFloat(void) const X_ABSTRACT;
-	virtual const char *GetString(void) X_ABSTRACT;
+	virtual const char* GetString(StrBuf& buf) X_ABSTRACT;
 
 	virtual void SetDefault(const char* s) X_ABSTRACT;
 	virtual void Set(const char* s) X_ABSTRACT;
@@ -143,6 +145,7 @@ struct ICVar
 
 	virtual FlagType GetFlags(void) const X_ABSTRACT;
 	virtual FlagType SetFlags(FlagType flags) X_ABSTRACT;
+	virtual void SetModified(void) X_ABSTRACT;
 	virtual float GetMin(void) X_ABSTRACT;
 	virtual float GetMax(void) X_ABSTRACT;
 

@@ -162,8 +162,9 @@ struct IAssertHandler
 //  Structure passed to Init method of ISystem interface.
 struct SCoreInitParams
 {
-	void *hInstance;								
-	void *hWnd;
+	void* hInstance;								
+	void* hWnd;
+	const wchar_t* pCmdLine;
 
 //	core::LoggerBase* pLog;
 	core::Console* pConsoleWnd;
@@ -175,20 +176,26 @@ struct SCoreInitParams
 	bool bSkipInput;
 	bool bSkipSound;
 	bool bCoreOnly;
+	bool bEnableBasicConsole; // when in core only mode, optional enable a basic console.
 
-
-	const bool isCoreOnly() const {
+	const bool isCoreOnly(void) const {
 		return bCoreOnly;
+	}
+
+	const bool basicConsole(void) const {
+		return isCoreOnly() && bEnableBasicConsole;
 	}
 
 	SCoreInitParams() :
 		hInstance(nullptr),
 		hWnd(nullptr),
+		pCmdLine(nullptr),
 		bSkipInput(false),
 		bSkipSound(false),
 		pConsoleWnd(nullptr),
 		bTesting(false),
 		bCoreOnly(false),
+		bEnableBasicConsole(false),
 
 #if X_SUPER == 0
 		bConsoleLog(true),
@@ -276,6 +283,9 @@ struct ICore
 	virtual bool Update() X_ABSTRACT;
 	virtual void RenderBegin() X_ABSTRACT;
 	virtual void RenderEnd() X_ABSTRACT;
+
+	// cmd-line util
+	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_ABSTRACT;
 
 
 	virtual IGoatFactoryRegistry* GetFactoryRegistry() const X_ABSTRACT;

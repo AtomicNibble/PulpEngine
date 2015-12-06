@@ -46,7 +46,7 @@ private:
 
 #include "crc32.inl"
 
-X_ENABLE_WARNING(4324s);
+X_ENABLE_WARNING(4324);
 X_NAMESPACE_END
 
 

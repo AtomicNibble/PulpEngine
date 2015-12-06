@@ -28,8 +28,8 @@ private:
 	int32_t FindFloatPlane(const Planef& plane);
 
 	bool processMapEntity(LvlEntity& ent, mapfile::XMapEntity* mapEnt);
-	bool processBrush(LvlEntity& ent, mapfile::XMapBrush* brush, int32_t entIdx);
-	bool processPatch(LvlEntity& ent, mapfile::XMapPatch* brush, int32_t entIdx);
+	bool processBrush(LvlEntity& ent, mapfile::XMapBrush* brush, size_t entIdx);
+	bool processPatch(LvlEntity& ent, mapfile::XMapPatch* brush, size_t entIdx);
 
 	bool removeDuplicateBrushPlanes(LvlBrush& pBrush);
 

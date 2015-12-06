@@ -266,14 +266,14 @@ namespace strUtil
 		return static_cast<size_t>(wcslen(str));
 	}
 
-	const char* Convert(const wchar_t *input, char *output, uint32_t outputLength)
+	const char* Convert(const wchar_t *input, char *output, size_t outputLength)
 	{
 		size_t convertedChars = 0;
 		wcstombs_s(&convertedChars, output, outputLength, input, _TRUNCATE);
 		return output;
 	}
 
-	const wchar_t* Convert(const char *input, wchar_t *output, uint32_t outputBytes)
+	const wchar_t* Convert(const char *input, wchar_t *output, size_t outputBytes)
 	{
 		size_t convertedChars = 0;
 		mbstowcs_s(&convertedChars, output, outputBytes / 2, input, _TRUNCATE);
@@ -305,12 +305,16 @@ namespace strUtil
 	}
 
 
-	/// Returns whether two strings are equal, checks the length of the 1st range.
+	/// Returns whether two strings are equal, checks the length of both srings are equal.
 	bool IsEqual(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2)
 	{
 		size_t Len = endExclusiveS1 - startInclusiveS1;
+		size_t Len2 = strlen(startInclusiveS2);
 
-		return memcmp(startInclusiveS1, startInclusiveS2, Len) == 0;
+		if(Len == Len2)
+			return memcmp(startInclusiveS1, startInclusiveS2, Len) == 0;
+
+		return false;
 	}
 
 	bool IsEqual(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2, const char* endExclusiveS2)
@@ -510,6 +514,12 @@ namespace strUtil
 		}
 
 		return nullptr;
+	}
+
+
+	const char* Find(const char* startInclusive, const char* what)
+	{
+		return Find(startInclusive, startInclusive + strlen(startInclusive), what);
 	}
 
 	const char* Find(const char* startInclusive, const char* endExclusive, const char* what)

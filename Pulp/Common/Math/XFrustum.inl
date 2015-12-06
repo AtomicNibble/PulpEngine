@@ -3,6 +3,8 @@
 
 X_INLINE XFrustum::XFrustum() 
 {
+	near_ = 0.f;
+	far_ = 0.f;
 	left_ = 0.f;
 	up_ = 0.f;
 	invFar_ = 0.f;

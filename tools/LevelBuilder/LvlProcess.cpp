@@ -365,8 +365,8 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 
 	size_t StartVert = pSubMesh->verts_.size();
 
-	int numPoints = pWinding->getNumPoints();
-	int i, j;
+	size_t numPoints = pWinding->getNumPoints();
+	size_t i, j;
 
 	const XWinding* w = pWinding;
 
@@ -406,7 +406,8 @@ void LvlBuilder::PutWindingIntoAreas_r(LvlEntity& ent, XWinding* pWinding,
 
 		face += model::Face(offset, offset, offset);
 
-		model::Index localOffset = safe_static_cast<model::Index, size_t>((i - 2) * 3);
+		model::Index localOffset = safe_static_cast<model::Index, size_t>(
+			(i - 2) * 3);
 
 		face += model::Face(localOffset, localOffset, localOffset);
 
@@ -502,7 +503,7 @@ void LvlBuilder::AddAreaRefs_r(core::Array<int32_t>& areaList, const Sphere& sph
 
 bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 {
-	int32_t i, numEnts;
+	size_t i, numEnts;
 
 	// we go throught each ent, and work out what area's it is in.
 	// each ent is then added to the entRefts set.
@@ -550,7 +551,7 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 			}
 
 			const core::string& modelName = it->second;
-			X_LOG0("Entity", "Ent model: \"%s\"", modelName.c_str());
+			X_LOG1("Entity", "Ent model: \"%s\"", modelName.c_str());
 
 			sm.modelNameIdx = stringTable_.addStringUnqiue(modelName.c_str());
 		}
@@ -578,7 +579,93 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 		size_t numRefs = areaList.size();
 		if (numRefs)
 		{
-			X_LOG0("Lvl", "Entity(%i) has %i refs", i, numRefs);
+			X_LOG1("Lvl", "Entity(%i) has %i refs", i, numRefs);
+
+			// ok so we hold a list of unique areas ent is in.
+			if (numRefs == 1)
+			{
+				// add to area's ref list.
+				LvlArea& area = this->areas_[areaList[0]];
+
+				area.modelsRefs.push_back(entId);
+			}
+			else
+			{
+				// added to the multiAreaRefList.
+				uint32_t flags[level::MAP_MAX_MULTI_REF_LISTS] = { 0 };
+
+				auto it = areaList.begin();
+				for (; it != areaList.end(); ++it)
+				{
+					const int32_t areaIdx = *it;
+					// work out what area list.
+					const size_t areaListIdx = (areaIdx / 32);
+
+					flags[areaListIdx] |= (1 << (areaIdx % 32));
+				}
+
+				level::MultiAreaEntRef entRef;
+				entRef.entId = entId;
+				for (size_t x = 0; x < level::MAP_MAX_MULTI_REF_LISTS; x++)
+				{
+					if (flags[x] != 0)
+					{
+						entRef.flags = flags[x];
+						multiModelRefLists_[x].append(entRef);
+					}
+				}
+
+			}
+		}
+		else
+		{
+			// ent not in any area.
+			X_ERROR("Lvl", "Entity(%i) does not reside in any area: (%g,%g,%g)",
+				i, lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
+		}
+	}
+
+	// everything that is not a misc model.
+	for (i = 0; i < numEnts; i++)
+	{
+		mapfile::XMapEntity* mapEnt = map_->getEntity(i);
+		LvlEntity& lvlEnt = entities_[i];
+
+		if (lvlEnt.classType == level::ClassType::MISC_MODEL) {
+			continue;
+		}
+
+		if (lvlEnt.bounds.IsInfinate()) {
+			X_ERROR("Lvl", "Entity(%i:%s) has empty bounds at (%g,%g,%g)",
+				i, level::ClassType::ToString(lvlEnt.classType),
+				lvlEnt.origin.x, lvlEnt.origin.y, lvlEnt.origin.z);
+			continue;
+		}
+
+		uint32_t entId = safe_static_cast<uint32_t, size_t>(i);
+
+
+		areaList.clear();
+
+		AABB worldBounds;
+		worldBounds.set(lvlEnt.bounds.min + lvlEnt.origin,
+			lvlEnt.bounds.max + lvlEnt.origin);
+
+		Sphere worldSphere(worldBounds);
+
+		Vec3f boundsPoints[8];
+		worldBounds.toPoints(boundsPoints);
+
+		// traverse the world ent's tree
+		AddAreaRefs_r(areaList, worldSphere, boundsPoints, worldEnt.bspTree.headnode);
+
+		size_t numRefs = areaList.size();
+
+		if (numRefs)
+		{
+			
+			X_LOG1("Lvl", "Entity(%i:%s) has %i refs", 
+				i, level::ClassType::ToString(lvlEnt.classType), numRefs);
 
 			// ok so we hold a list of unique areas ent is in.
 			if (numRefs == 1)
@@ -745,6 +832,7 @@ bool LvlBuilder::AddMapTriToAreas(LvlEntity& worldEnt, XPlaneSet& planeSet, cons
 
 	// skip degenerate triangles from pinched curves
 	if (MapTriArea(tri) <= 0) {
+		X_WARNING("Tri", "degenerate tri");
 		return false;
 	}
 
@@ -768,6 +856,7 @@ bool LvlBuilder::AddMapTriToAreas(LvlEntity& worldEnt, XPlaneSet& planeSet, cons
 
 		PlaneForTri(tri, plane);
 		planeNum = planeSet.FindPlane(plane, PLANE_NORMAL_EPSILON, PLANE_DIST_EPSILON);
+
 
 		//	TexVecForTri(&texVec, newTri);
 		//	AddTriListToArea(e, newTri, planeNum, area, &texVec);

@@ -82,7 +82,7 @@ namespace
 		X_ASSERT_NOT_NULL(pWinding);
 		const XWinding* w = pWinding;
 
-		int32_t i, j, numPoints;
+		size_t i, j, numPoints;
 		numPoints = w->getNumPoints();
 
 		verts.clear();

@@ -3,21 +3,21 @@
 #include "EngineApp.h"
 #include "gtest\gtest.h"
 
-#include <Shlwapi.h>
-
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
 #include <Threading\CriticalSection.h>
 
+#include <String\Path.h>
+
 // Google Test
 #if X_DEBUG == 1
-X_LINK_LIB("gtestd"X_CPUSTRING)
+X_LINK_LIB("gtestd")
 #else
-X_LINK_LIB("gtest"X_CPUSTRING)
+X_LINK_LIB("gtest")
 #endif
 
-X_LINK_LIB("Shlwapi") // GetModuleFileNameW
+// X_LINK_LIB("Shlwapi") // GetModuleFileNameW
 
 #define _LAUNCHER
 #include <ModuleExports.h>
@@ -51,13 +51,21 @@ X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
 
 #endif // !X_LIB
 
-void InitRootDir()
+void InitRootDir(void)
 {
 #ifdef WIN32
-	WCHAR szExeFileName[_MAX_PATH];
-	GetModuleFileNameW(GetModuleHandle(NULL), szExeFileName, sizeof(szExeFileName));	
-	PathRemoveFileSpecW(szExeFileName);
-	SetCurrentDirectoryW(szExeFileName);
+	WCHAR szExeFileName[_MAX_PATH] = { 0 };
+	GetModuleFileNameW(GetModuleHandleW(NULL), szExeFileName, sizeof(szExeFileName));	
+
+	core::Path<wchar_t> path(szExeFileName);
+
+	path.removeFileName();
+	path.removeTrailingSlash();
+
+	if (!SetCurrentDirectoryW(path.c_str())) {
+		::MessageBoxW(0, L"Failed to set current directory", L"Error", MB_OK);
+		ExitProcess(static_cast<uint32_t>(-1));
+	}
 #endif
 }
 
@@ -68,13 +76,12 @@ core::MemoryArenaBase* g_arena = nullptr;
 
 const char* googleTestResTostr(int nRes)
 {
-	if (nRes == 0)
+	if (nRes == 0) 
 		return "SUCCESS";
 	return "ERROR";
 }
 
-
-int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	g_hInstance = hInstance;
 //	InitRootDir();
@@ -92,20 +99,24 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	g_arena = &arena;
 
+
 	if (engine.Init(lpCmdLine, Console))
 	{		
-		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pCore);
-		gEnv->pCore->RegisterAssertHandler(&g_AssetChecker);
+		{
+			X_ASSERT_NOT_NULL(gEnv);
+			X_ASSERT_NOT_NULL(gEnv->pCore);
+			gEnv->pCore->RegisterAssertHandler(&g_AssetChecker);
 
-		X_LOG0("TESTS", "Running unit tests...");
-		testing::InitGoogleTest(&__argc, __argv);
-		nRes = RUN_ALL_TESTS();
+			X_LOG0("TESTS", "Running unit tests...");
+			testing::InitGoogleTest(&__argc, __wargv);
 
-		X_LOG0("TESTS", "Tests Complete result: %s", googleTestResTostr(nRes));
+			nRes = RUN_ALL_TESTS();
+
+			X_LOG0("TESTS", "Tests Complete result: %s", googleTestResTostr(nRes));
 
 
-		gEnv->pCore->UnRegisterAssertHandler(&g_AssetChecker);
+			gEnv->pCore->UnRegisterAssertHandler(&g_AssetChecker);
+		}
 
 		system("PAUSE");
 	}

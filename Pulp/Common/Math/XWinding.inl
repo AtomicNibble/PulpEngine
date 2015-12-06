@@ -32,10 +32,25 @@ X_INLINE Vec5f&	XWinding::operator[](const size_t idx)
 
 
 // add a point to the end of the winding point array
+X_INLINE XWinding&XWinding::operator+=(const Vec5f& v)
+{
+	addPoint(v);
+	return *this;
+}
+
 X_INLINE XWinding&XWinding::operator+=(const Vec3f& v)
 {
 	addPoint(v);
 	return *this;
+}
+
+X_INLINE void XWinding::addPoint(const Vec5f& v)
+{
+	if (!EnsureAlloced(numPoints_ + 1, true)) {
+		return;
+	}
+	pPoints_[numPoints_] = v;
+	numPoints_++;
 }
 
 X_INLINE void XWinding::addPoint(const Vec3f& v)
@@ -48,27 +63,28 @@ X_INLINE void XWinding::addPoint(const Vec3f& v)
 }
 
 
-X_INLINE int XWinding::getNumPoints(void) const
+X_INLINE size_t XWinding::getNumPoints(void) const
 {
 	return numPoints_;
 }
 
-X_INLINE int XWinding::getAllocatedSize(void) const
+X_INLINE size_t XWinding::getAllocatedSize(void) const
 {
 	return allocedSize_;
 }
 
 
 
-X_INLINE bool XWinding::EnsureAlloced(int n, bool keep)
+X_INLINE bool XWinding::EnsureAlloced(size_t n, bool keep)
 {
-	if (n > allocedSize_) {
-		return ReAllocate(n, keep);
+	int32_t num = safe_static_cast<int32_t, size_t>(n);
+	if (num > allocedSize_) {
+		return ReAllocate(num, keep);
 	}
 	return true;
 }
 
-X_INLINE bool XWinding::ReAllocate(int n, bool keep)
+X_INLINE bool XWinding::ReAllocate(int32_t n, bool keep)
 {
 	Vec5f* oldP;
 

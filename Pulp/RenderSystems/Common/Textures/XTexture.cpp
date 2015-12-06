@@ -47,7 +47,7 @@ namespace {
 	struct eqstr {
 		bool operator()(const char* s1, const char* s2) const
 		{
-			return strcmp(s1, s2) == 0;
+			return core::strUtil::IsEqual(s1, s2);
 		}
 	};
 
@@ -751,7 +751,12 @@ void XTexture::init(void)
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
 	ADD_CVAR_REF("image_autoConvert", s_Var_SaveToCI, 0, 0, 1, core::VarFlag::SYSTEM, 
-		"Save unconverted images as ci automatically.");
+		"Save unconverted images as ci automatically");
+
+	ADD_COMMAND("imageReloadAll", Command_ReloadTextures, core::VarFlag::SYSTEM, 
+		"Reload all textures");
+	ADD_COMMAND("imageReload", Command_ReloadTexture, core::VarFlag::SYSTEM,
+		"Reload a textures <name>");
 
 	s_pTextures = X_NEW_ALIGNED(render::XRenderResourceContainer, g_rendererArena, 
 		"TexturesRes", X_ALIGN_OF(render::XRenderResourceContainer))(g_rendererArena, 4096);
@@ -776,7 +781,6 @@ void XTexture::init(void)
 void XTexture::shutDown(void)
 {
 	X_LOG0("Textures", "Shutting Down");
-	X_ASSERT_NOT_NULL(s_pTextures);
 	X_LOG_BULLET;
 
 	gEnv->pHotReload->addfileType(nullptr, "ci");
@@ -790,23 +794,29 @@ void XTexture::shutDown(void)
 
 	s_TexStates.free();
 
-	// list any textures still lurking
-	render::XRenderResourceContainer::ResourceItor it = s_pTextures->begin();
-	for (; it != s_pTextures->end(); )
+	// either we did not full start up or there is a issue.
+	X_ASSERT_NOT_NULL(s_pTextures);
+
+	if (s_pTextures)
 	{
-		XTexture* pTex = static_cast<XTexture*>(it->second);
+		// list any textures still lurking
+		render::XRenderResourceContainer::ResourceItor it = s_pTextures->begin();
+		for (; it != s_pTextures->end(); )
+		{
+			XTexture* pTex = static_cast<XTexture*>(it->second);
 
-		++it;
+			++it;
 
-		if (!pTex)
-			continue;
+			if (!pTex)
+				continue;
 
-		X_WARNING("Texture", "\"%s\" was not deleted", pTex->getName());
+			X_WARNING("Texture", "\"%s\" was not deleted", pTex->getName());
 
-		pTex->forceRelease();
+			pTex->forceRelease();
+		}
+
+		X_DELETE_AND_NULL(s_pTextures, g_rendererArena);
 	}
-
-	X_DELETE_AND_NULL(s_pTextures, g_rendererArena);
 }
 
 void XTexture::update(void)
@@ -942,6 +952,26 @@ bool XTexture::reload(void)
 		return false;
 
 	return true; // such lies.
+}
+
+
+void XTexture::Command_ReloadTextures(core::IConsoleCmdArgs* Cmd)
+{
+	X_UNUSED(Cmd);
+	// TODO
+}
+
+
+void XTexture::Command_ReloadTexture(core::IConsoleCmdArgs* Cmd)
+{
+	if (Cmd->GetArgCount() < 2) {
+		X_ERROR("Texture","imageReload <filename>");
+		return;
+	}
+
+	const char* pName = Cmd->GetArg(1);
+
+	XTexture::reloadForName(pName);
 }
 
 

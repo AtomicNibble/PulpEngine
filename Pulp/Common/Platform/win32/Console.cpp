@@ -40,7 +40,7 @@ namespace {
 		HMODULE hDll = GetModuleHandleA( "kernel32" );
 		if( hDll )
 		{
-			pSetConsoleIcon = (SetConsoleIcon_t)GoatGetProcAddress(hDll, "SetConsoleIcon");
+			pSetConsoleIcon = (SetConsoleIcon_t)PotatoGetProcAddress(hDll, "SetConsoleIcon");
 			if( pSetConsoleIcon )
 				return pSetConsoleIcon( hIcon );
 		}
@@ -75,9 +75,6 @@ stdout_(nullptr),
 stdin_(nullptr),
 stderr_(nullptr)
 {
-//	int hConHandle;
-//	HANDLE lStdHandle;
-
 	lastError::Description Dsc;
 
 	// allocate a console for this app
@@ -112,29 +109,7 @@ stderr_(nullptr)
 		return;
 	}
 
-	/*
-	lStdHandle = GetStdHandle(STD_OUTPUT_HANDLE);
-	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
-	stdout_ = _fdopen( hConHandle, "w" );
-	*stdout = *stdout_;
-//	setvbuf( stdout, NULL, _IONBF, 0 );
-
-	lStdHandle = GetStdHandle(STD_INPUT_HANDLE);
-	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
-	stdin_ = _fdopen( hConHandle, "r" );
-	*stdin = *stdin_;
-//	setvbuf( stdin, NULL, _IONBF, 0 );
-
-
-	lStdHandle = GetStdHandle(STD_ERROR_HANDLE);
-	hConHandle = _open_osfhandle((intptr_t)lStdHandle, _O_TEXT);
-	stderr_ = _fdopen( hConHandle, "w" );
-	*stderr = *stderr_;
-//	setvbuf( stderr, NULL, _IONBF, 0 );
-	*/
 	SetTitle( title );
-
-//	std::ios::sync_with_stdio();
 }
 
 /// Frees all resources.
@@ -320,6 +295,16 @@ void Console::Show(bool show)
 
 void Console::RedirectSTD(void)
 {
+#if _MSC_FULL_VER >= 190023026
+	// shit got broken in vs2015 toolset v140
+	// https://connect.microsoft.com/VisualStudio/Feedback/Details/1924921
+
+	for (auto &file : { stdout, stderr }) {
+		freopen("CONOUT$", "w", file);
+		setvbuf(file, nullptr, _IONBF, 0);
+	}
+
+#else
 	int hConHandle;
 	HANDLE lStdHandle;
 
@@ -343,6 +328,7 @@ void Console::RedirectSTD(void)
 	//	setvbuf( stderr, NULL, _IONBF, 0 );
 
 	std::ios::sync_with_stdio();
+#endif // !_MSC_FULL_VER
 }
 
 X_NAMESPACE_END

@@ -5,6 +5,7 @@
 #include "Log.h"
 
 #include <String\StackString.h>
+#include <String\CmdArgs.h>
 
 #include "NullImplementation/NullInput.h"
 
@@ -37,6 +38,12 @@
 
 #include "xFileSys.h"
 
+#if defined(WIN32)
+
+#include <VersionHelpers.h>
+
+#endif // !defined(WIN32)
+
 
 X_USING_NAMESPACE;
 
@@ -66,7 +73,7 @@ WIN_HMODULE XCore::LoadDynamiclibrary(const char *dllName) const
 {
 	WIN_HMODULE handle = NULL;
 
-	handle = GoatLoadLibary(dllName);
+	handle = PotatoLoadLibary(dllName);
 
 	return handle;
 }
@@ -84,7 +91,10 @@ WIN_HMODULE XCore::LoadDLL(const char *dllName)
 	// std::string moduleName = dllName; // PathUtil::GetFileName(dllName);
 
 	typedef void *(*PtrFunc_LinkModule)(ICore *pSystem, const char *moduleName);
-	PtrFunc_LinkModule pfnModuleInitISystem = (PtrFunc_LinkModule)GoatGetProcAddress(handle, DLL_MODULE_INIT_ICORE);
+
+	PtrFunc_LinkModule pfnModuleInitISystem = reinterpret_cast<PtrFunc_LinkModule>(
+			PotatoGetProcAddress(handle, DLL_MODULE_INIT_ICORE));
+
 	if (pfnModuleInitISystem)
 	{
 		pfnModuleInitISystem(this, dllName);
@@ -160,36 +170,25 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	initParams_ = startupParams;
 
 #if defined(WIN32)
-	X_DISABLE_WARNING(4996);
 	{
-		OSVERSIONINFOW osvi;
-
-		core::zero_object(osvi);
-
-		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFOW);
-		if (!GetVersionExW(&osvi))
-		{
-			::MessageBoxW(reinterpret_cast<HWND>(startupParams.hWnd),
-				L"GetVersionExW failed.",
-				L"Critial Error", MB_OK);
-			return false;
-		}
-		
-		bool bIsWindowsXPorLater = osvi.dwMajorVersion > 5 || (osvi.dwMajorVersion == 5 && osvi.dwMinorVersion >= 1);
+		bool bIsWindowsXPorLater = ::IsWindowsXPOrGreater();
 
 		if (!bIsWindowsXPorLater)
 		{
 			::MessageBoxW(reinterpret_cast<HWND>(startupParams.hWnd), 
-				L"Versions of windows older than XP are not supported.",
+				L"Versions of windows older than and including XP are not supported.",
 				L"Critial Error", MB_OK);
 			return false;
 		}
 	}
-	X_ENABLE_WARNING(4996);
 #endif
 
-	hInst_ = (WIN_HINSTANCE)startupParams.hInstance;
-	hWnd_ = (WIN_HWND)startupParams.hWnd;
+	if (!ParseCmdArgs(startupParams.pCmdLine)) {
+		return false;
+	}
+
+	hInst_ = static_cast<WIN_HINSTANCE>(startupParams.hInstance);
+	hWnd_ = static_cast<WIN_HWND>(startupParams.hWnd);
 
 	// #------------------------- Logging -----------------------
 	if (!InitLogging(startupParams))
@@ -200,9 +199,11 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		return false;
 
 	// #------------------------- Create Console ----------------
-	if (!startupParams.isCoreOnly())
+	if (!startupParams.isCoreOnly() || startupParams.basicConsole())
 	{
 		env_.pConsole = X_NEW_ALIGNED(core::XConsole, g_coreArena, "ConsoleSys",8);
+		// register the commands so they can be used before Console::Init
+		env_.pConsole->RegisterCommnads();
 
 		// register system vars to the console.
 		CreateSystemVars();
@@ -216,6 +217,11 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		env_.pConsole->ShutDown();
 	}
 
+	// register verbosity vars.
+	if (pConsoleLogger_) {
+		pConsoleLogger_->GetFilterPolicy().RegisterVars();
+	}
+
 	// register filesystemvars.
 	env_.pFileSys->CreateVars();
 
@@ -223,8 +229,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	core::xWindow::RegisterVars();
 
 	// Load the default config.
-	if (!env_.pConsole->LoadConfig("default.cfg")) {
-		return false;
+	if (!startupParams.isCoreOnly()) {
+		if (!env_.pConsole->LoadConfig("default.cfg")) {
+			return false;
+		}
 	}
 
 	// #------------------------- CPU Info ----------------------
@@ -317,9 +325,13 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	}
 
 	// #------------------------- Console ---------------------------
-	if (!InitConsole())
+	if (!InitConsole(startupParams))
 		return false;
 
+#if X_DEBUG
+	// don't warn about shit like .txt!
+	hotReloadIgnores_.append(core::string("txt"));
+#endif // !X_DEBUG
 
 	core::symbolResolution::Refresh();
 
@@ -332,6 +344,45 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 	return true;
 }
+
+bool XCore::ParseCmdArgs(const wchar_t* pArgs)
+{
+	// should never be null
+	if (!pArgs) {
+		return false;
+	}
+
+	// tokenize all the args
+	core::CmdArgs<4096, wchar_t> args(pArgs);
+	
+	// now group them based on '+'
+	size_t i;
+	size_t num = args.getArgc();
+
+	for (i = 0; i < num; i++)
+	{
+		if (numArgs_ >= MAX_CMD_ARS) {
+			break;
+		}
+
+		const wchar_t* pArg = args.getArgv(i);
+		if (*pArg == L'+' && core::strUtil::strlen(pArg) > 1)
+		{
+			numArgs_++;
+			args_[numArgs_ - 1].AppendArg(args.getArgv(i) + 1);
+		}
+		else
+		{
+			if (!numArgs_) {
+				numArgs_++;
+			}
+			args_[numArgs_ - 1].AppendArg(args.getArgv(i));
+		}
+	}
+
+	return true;
+}
+
 
 bool XCore::InitFileSys(const SCoreInitParams &initParams)
 {
@@ -374,7 +425,7 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 
 		//	if (!initParams.bTesting) {
 			pConsoleLogger_ = X_NEW( ConsoleLogger, g_coreArena,"ConsoleLogger")(
-					ConsoleLogger::FilterPolicy(),
+					ConsoleLogger::FilterPolicy(2, "console"),
 					ConsoleLogger::FormatPolicy(),
 					ConsoleLogger::WritePolicy(*pConsole_));
 
@@ -386,9 +437,11 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 	return env_.pLog != nullptr;
 }
 
-bool XCore::InitConsole()
+bool XCore::InitConsole(const SCoreInitParams &initParams)
 {
-	env_.pConsole->Startup(this);
+	env_.pConsole->Startup(this, initParams.basicConsole());
+	env_.pConsole->LoadConfig("user_config.cfg");
+
 
 	return true;
 }
@@ -541,9 +594,10 @@ void WindowPosVarChange(core::ICVar* pVar)
 	int x_pos = g_coreVars.win_x_pos;
 	int y_pos = g_coreVars.win_y_pos;
 
-	core::xWindow* win = gEnv->pCore->GetGameWindow();
-
-	win->MoveTo(x_pos, y_pos);
+	core::xWindow* pWin = gEnv->pCore->GetGameWindow();
+	if (pWin) {
+		pWin->MoveTo(x_pos, y_pos);
+	}
 }
 
 void WindowSizeVarChange(core::ICVar* pVar)
@@ -552,8 +606,24 @@ void WindowSizeVarChange(core::ICVar* pVar)
 
 }
 
+void WindowCustomFrameVarChange(core::ICVar* pVar)
+{
+	bool enabled = (pVar->GetInteger() == 1);
 
-void XCore::CreateSystemVars()
+	XCore* pCore = static_cast<XCore*>(gEnv->pCore);
+	if (!pCore) {
+		X_WARNING("Core", "Can't update custom frame as core is not initialized yet");
+		return;
+	}
+
+	if (pCore->pWindow_) {
+		pCore->pWindow_->CustomFrame(enabled);
+	}
+}
+
+
+
+void XCore::CreateSystemVars(void)
 {
 	using namespace core;
 
@@ -580,15 +650,22 @@ void XCore::CreateSystemVars()
 	var_win_width->SetOnChangeCallback(WindowSizeVarChange);
 	var_win_height->SetOnChangeCallback(WindowSizeVarChange);
 
+	var_win_custom_Frame = ADD_CVAR_INT("win_custom_Frame", 1, 0, 1,
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Enable / disable the windows custom frame");
+
+	var_win_custom_Frame->SetOnChangeCallback(WindowCustomFrameVarChange);
+
 
 	var_profile = ADD_CVAR_INT("profile", 1, 0, 1, VarFlag::SYSTEM, "Enable Profiling");
 
 
 	ADD_CVAR_STRING("version", X_ENGINE_NAME "Engine " X_BUILD_STRING " Version " X_ENGINE_VERSION_STR, VarFlag::SYSTEM | VarFlag::STATIC, "Engine Version");
 
-	ADD_COMMAND("filesys_hotreload_etx_list", Command_HotReloadListExts, VarFlag::SYSTEM,
+	ADD_COMMAND("filesysHotReloadEtxList", Command_HotReloadListExts, VarFlag::SYSTEM,
 		"Display all registered file extensions in the hotreload system");
 	
+	ADD_COMMAND("listProgramArgs", Command_ListProgramArgs, VarFlag::SYSTEM,
+		"Lists the processed command line arguments parsed to the program");
 
 	dirWatcher_.Init();
 }

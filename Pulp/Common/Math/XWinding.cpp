@@ -64,7 +64,7 @@ XWinding::XWinding(void) :
 }
 
 // allocate for n points
-XWinding::XWinding(const int n) :
+XWinding::XWinding(const size_t n) :
 	pPoints_(nullptr),
 	numPoints_(0),
 	allocedSize_(0)
@@ -74,12 +74,12 @@ XWinding::XWinding(const int n) :
 
 
 // winding from points
-XWinding::XWinding(const Vec3f* verts, const int numVerts) :
+XWinding::XWinding(const Vec3f* verts, const size_t numVerts) :
 pPoints_(nullptr),
 numPoints_(0),
 allocedSize_(0)
 {
-	int32_t i;
+	size_t i;
 
 	if (!EnsureAlloced(numVerts)) {
 		numPoints_ = 0;
@@ -88,17 +88,17 @@ allocedSize_(0)
 	for (i = 0; i < numVerts; i++) {
 		pPoints_[i] = Vec5f(verts[i]);
 	}
-	numPoints_ = numVerts;
+	numPoints_ = safe_static_cast<int32_t, size_t>(numVerts);
 }
 
 
 // winding from points
-XWinding::XWinding(const Vec5f* verts, const int numVerts) :
+XWinding::XWinding(const Vec5f* verts, const size_t numVerts) :
 	pPoints_(nullptr),
 	numPoints_(0),
 	allocedSize_(0)
 {
-	int32_t i;
+	size_t i;
 
 	if (!EnsureAlloced(numVerts)) {
 		numPoints_ = 0;
@@ -107,7 +107,7 @@ XWinding::XWinding(const Vec5f* verts, const int numVerts) :
 	for (i = 0; i < numVerts; i++) {
 		pPoints_[i] = verts[i];
 	}
-	numPoints_ = numVerts;
+	numPoints_ = safe_static_cast<int32_t, size_t>(numVerts);
 }
 
 // base winding for plane
@@ -134,7 +134,7 @@ XWinding::XWinding(const XWinding& winding) :
 	numPoints_(0),
 	allocedSize_(0)
 {
-	int i;
+	size_t i;
 	if (!EnsureAlloced(winding.getNumPoints())) {
 		numPoints_ = 0;
 		return;
@@ -142,7 +142,7 @@ XWinding::XWinding(const XWinding& winding) :
 	for (i = 0; i < winding.getNumPoints(); i++) {
 		pPoints_[i] = winding[i];
 	}
-	numPoints_ = winding.getNumPoints();
+	numPoints_ = safe_static_cast<int32_t, size_t>(winding.getNumPoints());
 }
 
 

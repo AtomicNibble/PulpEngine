@@ -44,16 +44,16 @@ XLog::~XLog()
 }
 
 
-void XLog::Init()
+void XLog::Init(void)
 {
 	// no point printing a 'starting msg' since  log system 
 	// not quite ready yet xD
 
-	ADD_CVAR_REF("log_verbosity", logVerbosity_, 0, 0, 2, 0, "Logging verbosity");
+//	ADD_CVAR_REF("log_verbosity", logVerbosity_, 0, 0, 2, 0, "Logging verbosity");
 
 }
 
-void XLog::ShutDown()
+void XLog::ShutDown(void)
 {
 	X_LOG0("LogSys", "Shutting Down");
 
@@ -111,12 +111,12 @@ const char* XLog::GetIndentation(void)
 	return result;
 }
 
-void XLog::Indent()
+void XLog::Indent(void)
 {
 	logVerbosity_++;
 }
 
-void XLog::UnIndent()
+void XLog::UnIndent(void)
 {
 	--logVerbosity_;
 }
@@ -126,7 +126,7 @@ for (LoggerBase* logger = listHead_; logger; logger = logger->GetNext()) \
 	logger->pfnc;
 
 
-void XLog::Log(const SourceInfo& sourceInfo, const char* channel, size_t verbosity, const char* format, ...)
+void XLog::Log(const SourceInfo& sourceInfo, const char* channel, int verbosity, const char* format, ...)
 {
 	X_VALIST_START(format)
 		X_CALL_LOGGERS(Log(sourceInfo, channel, verbosity, format, args))

@@ -13,10 +13,14 @@ typedef core::MemoryArena<
 	core::MallocFreeAllocator,
 	core::SingleThreadPolicy,
 	core::SimpleBoundsChecking,
-//	core::SimpleMemoryTracking,
-		core::FullMemoryTracking,
-	//	core::ExtendedMemoryTracking,
+#if X_SUPER || 1
+	core::SimpleMemoryTracking,
+	core::NoMemoryTagging
+#else 
+	core::FullMemoryTracking,
 	core::SimpleMemoryTagging
+#endif // !X_SUPER
+
 > CoreArena;
 
 
@@ -40,7 +44,7 @@ public:
 	EngineApp();
 	~EngineApp();
 
-	bool Init(const char* sInCmdLine);
+	bool Init(const wchar_t* sInCmdLine);
 	int	MainLoop();
 
 private:
@@ -55,6 +59,6 @@ private:
 	ICore* pICore_;
 
 	core::MallocFreeAllocator allocator_;
-	CoreArena arena_; 
+	CoreArena* pArena_; 
 };
 

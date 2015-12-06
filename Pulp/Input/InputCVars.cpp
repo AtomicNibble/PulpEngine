@@ -12,10 +12,10 @@ XInputCVars* g_pInputCVars = 0;
 XInputCVars::XInputCVars()
 {
 	ADD_CVAR_REF_NO_NAME(input_debug, 0, 0, 3, 0,
-		"Input debugging.");
+		"Input debugging");
 
 	ADD_CVAR_REF_NO_NAME(input_mouse_pos_debug, 0, 0, 1, 0,
-		"Input mouse position debugging.");
+		"Input mouse position debugging");
 
 	
 	scrollLines = 1;

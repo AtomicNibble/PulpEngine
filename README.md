@@ -1,6 +1,7 @@
 ## Synopsis
 
-Potato Engine is a 3D Game engine designed to be fast, functional with a super fast development pipeline for devs.
+Potato Engine is a 3D Game engine designed to be performant, functional with a fast development pipeline for devs.
+The engine is most suited but not limited to, high detail enclosed levels.
 
 ## Credits
 

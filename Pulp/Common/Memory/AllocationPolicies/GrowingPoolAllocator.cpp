@@ -8,25 +8,27 @@
 X_NAMESPACE_BEGIN(core)
 
 
-namespace {
+namespace
+{
 
 	size_t CalculateElementSize( size_t maxElementSize, size_t maxAlignment )
 	{
 		return bitUtil::RoundUpToMultiple( maxElementSize, maxAlignment );
 	}
 
-	size_t CalculateWasteAtFront(void *start, size_t maxAlignment, size_t offset)
+	size_t CalculateWasteAtFront(void* start, size_t maxAlignment, size_t offset)
 	{
-		char* pAdd = pointerUtil::AlignTop( (char*)start + offset, maxAlignment );
+		char* pAdd = pointerUtil::AlignTop( reinterpret_cast<char*>(start) + offset, maxAlignment );
 
-		return safe_static_cast<uint32_t>( ( pAdd - offset ) - (char*)start );
+		return safe_static_cast<size_t>( union_cast<uintptr_t>( pAdd - offset )
+			- union_cast<uintptr_t>(start) );
 	}
 
-}
+} // namespace
 
 
-GrowingPoolAllocator::GrowingPoolAllocator(unsigned int maxSizeInBytes, unsigned int growSize, 
-	unsigned int chunkHeaderSize, size_t maxElementSize, size_t maxAlignment, size_t offset)
+GrowingPoolAllocator::GrowingPoolAllocator(size_t maxSizeInBytes, size_t growSize,
+	size_t chunkHeaderSize, size_t maxElementSize, size_t maxAlignment, size_t offset)
 {
 	virtualStart_ = static_cast<char*>( VirtualMem::ReserveAddressSpace( maxSizeInBytes ) );
 	virtualEnd_ = &virtualStart_[ maxSizeInBytes ];
@@ -57,7 +59,7 @@ GrowingPoolAllocator::GrowingPoolAllocator(unsigned int maxSizeInBytes, unsigned
 	statistics_.virtualMemoryReserved_ = maxSizeInBytes;
 
 	elementSize_ = CalculateElementSize( maxElementSize, maxAlignment );
-	wastePerElement_ = elementSize_ = maxElementSize;
+	wastePerElement_ = maxElementSize - elementSize_;
 
 	statistics_.type_ = "GrowPoolAllocator";
 #endif
@@ -72,7 +74,8 @@ GrowingPoolAllocator::~GrowingPoolAllocator(void)
 
 
 
-void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offset, const void* chunkHeaderData, size_t chunkHeaderSize)
+void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offset, 
+	const void* chunkHeaderData, size_t chunkHeaderSize)
 {
 	if ( size > maxSize_ )
 	{
@@ -130,7 +133,7 @@ void* GrowingPoolAllocator::allocate( size_t size, size_t alignment, size_t offs
 			statistics_.physicalMemoryUsed_ += chunkHeaderSize_ + wasteAtFront;
 			statistics_.wasteAlignment_ += wasteAtFront;
 			statistics_.wasteUnused_ = chunkHeaderSize_ + memoryRegionSize - 
-				wasteAtFront- elementSize_ * elementCount;
+				wasteAtFront - elementSize_ * elementCount;
 
 			// 1,2,3 what is the max? I hope i don't have to pay tax.
 			statistics_.physicalMemoryAllocatedMax_ = Max( statistics_.physicalMemoryAllocatedMax_, statistics_.physicalMemoryAllocated_ );

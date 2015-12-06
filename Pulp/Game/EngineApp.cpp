@@ -42,31 +42,41 @@ void Error(const char* sErrorText)
 EngineApp::EngineApp() :
 	pICore_(nullptr),
 	hSystemHandle_(NULL),
-	allocator_(),
-	arena_(&allocator_, "CoreArena")
+	allocator_()
+//	arena_(&allocator_, "CoreArena")
 {
+	void* pMem = allocator_.allocate(sizeof(CoreArena),
+		X_ALIGN_OF(CoreArena), 0);
+
+	pArena_ = new(pMem) CoreArena(&allocator_, "CoreArena");
 }
 
 
 EngineApp::~EngineApp()
 {
-	if (hSystemHandle_)
-		GoatFreeLibrary(hSystemHandle_);
+	// core allocator needs to close before this for leak reporting.
+	core::Mem::Destruct(pArena_);
+	allocator_.free(pArena_);
+
+	if (hSystemHandle_) {
+		PotatoFreeLibrary(hSystemHandle_);
+	}
 }
 
 
-bool EngineApp::Init(const char* sInCmdLine)
+bool EngineApp::Init(const wchar_t* sInCmdLine)
 {
 	X_UNUSED(sInCmdLine);
 
 	SCoreInitParams params;
+	params.pCmdLine = sInCmdLine;
 	params.hInstance = g_hInstance;
 	params.bSkipInput = false;
 
 	// enable loggers
 	params.bVsLog = core::debugging::IsDebuggerConnected();
 	params.bConsoleLog = true;
-	params.pCoreArena = &arena_;
+	params.pCoreArena = pArena_;
 
 #ifdef X_LIB
 
@@ -74,7 +84,7 @@ bool EngineApp::Init(const char* sInCmdLine)
 
 #else
 	// load the dll.
-	hSystemHandle_ = GoatLoadLibary(CORE_DLL_NAME);
+	hSystemHandle_ = PotatoLoadLibary(CORE_DLL_NAME);
 
 	if (!hSystemHandle_)
 	{
@@ -83,7 +93,8 @@ bool EngineApp::Init(const char* sInCmdLine)
 	}
 
 	PFNCREATECOREINTERFACE pfnCreateCoreInterface =
-		(PFNCREATECOREINTERFACE)GoatGetProcAddress(hSystemHandle_, CORE_DLL_INITFUNC);
+		reinterpret_cast<PFNCREATECOREINTERFACE>(
+			PotatoGetProcAddress(hSystemHandle_, CORE_DLL_INITFUNC));
 
 	if (!pfnCreateCoreInterface)
 	{

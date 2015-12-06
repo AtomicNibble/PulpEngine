@@ -68,7 +68,7 @@ bool XGuiManager::Init(void)
 	X_ASSERT_NOT_NULL(gEnv->pRender);
 	X_LOG0("Gui", "Starting GUI System");
 
-	ADD_COMMAND("ui_list", Command_ListUis, 0, "List the loaded ui's <search-filter>");
+	ADD_COMMAND("uiList", Command_ListUis, 0, "List the loaded ui's <search-filter>");
 	ADD_COMMAND("listUi", Command_ListUis, 0, "List the loaded ui's <search-filter>");
 
 	ADD_CVAR_REF("ui_DrawDebug", var_showDebug_, 1, 0, 1, core::VarFlag::SYSTEM, "draw debug info over gui");

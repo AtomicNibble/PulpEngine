@@ -372,28 +372,30 @@ void XHWShader_Dx10::FreeBufferPointers()
 
 void XHWShader_Dx10::FreeHWShaders()
 {
+	// null on start up failed.
 	X_ASSERT_NOT_NULL(s_pHWshaders);
 
 	// NOTE: there should be none, since shaders that use them should release them.
 	// so if there are any here there is a problem.
 	// but we still clean up like a good boy.
-
-	core::XResourceContainer::ResourceItor it = s_pHWshaders->begin();
-	XHWShader_Dx10* pShader;
-
-	for (; it != s_pHWshaders->end();)
+	if(s_pHWshaders)
 	{
-		pShader = static_cast<XHWShader_Dx10*>(it->second);
-		++it;
+		core::XResourceContainer::ResourceItor it = s_pHWshaders->begin();
+		XHWShader_Dx10* pShader;
 
-		if (!pShader)
-			continue;
+		for (; it != s_pHWshaders->end();)
+		{
+			pShader = static_cast<XHWShader_Dx10*>(it->second);
+			++it;
 
-		X_WARNING("HWShaders", "\"%s\" was not deleted", pShader->name_.c_str());
+			if (!pShader)
+				continue;
 
-		pShader->release();
+			X_WARNING("HWShaders", "\"%s\" was not deleted", pShader->name_.c_str());
+
+			pShader->release();
+		}
 	}
-
 }
 
 
@@ -1202,9 +1204,10 @@ void XHWShader_Dx10::shutDown(void)
 	FreeParams();
 	FreeInputLayoutTree();
 
-	core::Mem::DeleteAndNull(s_pHWshaders, g_rendererArena);
+	if (s_pHWshaders) {
+		core::Mem::DeleteAndNull(s_pHWshaders, g_rendererArena);
+	}
 }
-
 
 void XHWShader_Dx10::bindGS(XHWShader_Dx10* pShader)
 {

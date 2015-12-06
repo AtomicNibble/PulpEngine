@@ -14,6 +14,31 @@ namespace
 
 X_NAMESPACE_BEGIN(mapfile)
 
+XMapPatch::XMapPatch(void) : XMapPatch(0,0)
+{
+
+}
+
+// hello c++11: delegated constructor
+XMapPatch::XMapPatch(int w, int h) : XMapPrimitive(PrimType::PATCH),
+	verts_(g_arena),
+	indexes_(g_arena),
+	edges_(g_arena),
+	edgeIndexes_(g_arena),
+	width_(w), height_(h),
+	maxWidth_(w), maxHeight_(h),
+	horzSubdivisions_(0), vertSubdivisions_(0),
+	isMesh_(false), expanded_(false)
+{
+
+}
+
+XMapPatch::~XMapPatch(void)
+{
+
+}
+
+
 void XMapPatch::GenerateEdgeIndexes(void)
 {
 	int i, j;
@@ -181,7 +206,7 @@ void XMapPatch::RemoveLinearColumnsRows(void)
 
 void XMapPatch::ResizeExpanded(size_t newHeight, size_t newWidth)
 {
-	size_t i, j;
+	int32_t i, j; // must be signed
 
 	X_ASSERT(expanded_,"needs to be exapanded")(expanded_);
 	if (newHeight <= maxHeight_ && newWidth <= maxWidth_) {
@@ -191,8 +216,8 @@ void XMapPatch::ResizeExpanded(size_t newHeight, size_t newWidth)
 		verts_.resize(newHeight * newWidth);
 	}
 	// space out verts_ for new height_ and width_
-	for (j = maxHeight_ - 1; j >= 0; j--) {
-		for (i = maxWidth_ - 1; i >= 0; i--) {
+	for (j = safe_static_cast<int32_t, size_t>(maxHeight_) - 1; j >= 0; j--) {
+		for (i = safe_static_cast<int32,size_t>(maxWidth_) - 1; i >= 0; i--) {
 			verts_[j*newWidth + i] = verts_[j*maxWidth_ + i];
 		}
 	}
@@ -267,7 +292,7 @@ void XMapPatch::GenerateNormals(void)
 	Vec3f		around[8], temp;
 	bool		good[8];
 	bool		wrapWidth, wrapHeight;
-	static size_t	neighbors[8][2] = {
+	static int32_t	neighbors[8][2] = {
 		{ 0, 1 }, { 1, 1 }, { 1, 0 }, { 1, -1 }, 
 		{ 0, -1 }, { -1, -1 }, { -1, 0 }, { -1, 1 }
 	};
@@ -456,7 +481,8 @@ void XMapPatch::GenerateIndexes(void)
 }
 
 
-void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, float maxLength, bool genNormals)
+void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, 
+	float maxLength, bool genNormals)
 {
 	size_t	i, j, k, l;
 	xVert	prev, next, mid;
@@ -483,15 +509,21 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 		{
 			for (l = 0; l < 3; l++) 
 			{
-				prevxyz[l] = verts_[i*maxWidth_ + j + 1].pos[l] - verts_[i*maxWidth_ + j].pos[l];
-				nextxyz[l] = verts_[i*maxWidth_ + j + 2].pos[l] - verts_[i*maxWidth_ + j + 1].pos[l];
-				midxyz[l] = (verts_[i*maxWidth_ + j].pos[l] + verts_[i*maxWidth_ + j + 1].pos[l] * 2.0f +
+				prevxyz[l] = verts_[i*maxWidth_ + j + 1].pos[l] - 
+					verts_[i*maxWidth_ + j].pos[l];
+
+				nextxyz[l] = verts_[i*maxWidth_ + j + 2].pos[l] - 
+					verts_[i*maxWidth_ + j + 1].pos[l];
+
+				midxyz[l] = (verts_[i*maxWidth_ + j].pos[l] + 
+					verts_[i*maxWidth_ + j + 1].pos[l] * 2.0f +
 					verts_[i*maxWidth_ + j + 2].pos[l]) * 0.25f;
 			}
 
 			if (maxLength > 0.0f) {
 				// if the span length is too long, force a subdivision
-				if (prevxyz.lengthSquared() > maxLengthSqr || nextxyz.lengthSquared() > maxLengthSqr) {
+				if (prevxyz.lengthSquared() > maxLengthSqr ||
+					nextxyz.lengthSquared() > maxLengthSqr) {
 					break;
 				}
 			}
@@ -542,15 +574,21 @@ void XMapPatch::Subdivide(float maxHorizontalError, float maxVerticalError, floa
 		{
 			for (l = 0; l < 3; l++)
 			{
-				prevxyz[l] = verts_[(j + 1)*maxWidth_ + i].pos[l] - verts_[j*maxWidth_ + i].pos[l];
-				nextxyz[l] = verts_[(j + 2)*maxWidth_ + i].pos[l] - verts_[(j + 1)*maxWidth_ + i].pos[l];
-				midxyz[l] = (verts_[j*maxWidth_ + i].pos[l] + verts_[(j + 1)*maxWidth_ + i].pos[l] * 2.0f +
+				prevxyz[l] = verts_[(j + 1)*maxWidth_ + i].pos[l] -
+					verts_[j*maxWidth_ + i].pos[l];
+
+				nextxyz[l] = verts_[(j + 2)*maxWidth_ + i].pos[l] - 
+					verts_[(j + 1)*maxWidth_ + i].pos[l];
+
+				midxyz[l] = (verts_[j*maxWidth_ + i].pos[l] + 
+					verts_[(j + 1)*maxWidth_ + i].pos[l] * 2.0f +
 					verts_[(j + 2)*maxWidth_ + i].pos[l]) * 0.25f;
 			}
 
 			if (maxLength > 0.0f) {
 				// if the span length is too long, force a subdivision
-				if (prevxyz.lengthSquared() > maxLengthSqr || nextxyz.lengthSquared() > maxLengthSqr) {
+				if (prevxyz.lengthSquared() > maxLengthSqr ||
+					nextxyz.lengthSquared() > maxLengthSqr) {
 					break;
 				}
 			}
@@ -715,7 +753,9 @@ void XMapPatch::SubdivideExplicit(size_t horzSubdivisions, size_t vertSubdivisio
 				}
 			}
 
-			SampleSinglePatch(sample, baseCol, baseRow, outWidth, horzSubdivisions, vertSubdivisions, dv);
+			SampleSinglePatch(sample, baseCol, baseRow, outWidth, 
+				horzSubdivisions, vertSubdivisions, dv);
+
 			baseRow += vertSubdivisions;
 		}
 
@@ -747,6 +787,12 @@ void XMapPatch::SubdivideExplicit(size_t horzSubdivisions, size_t vertSubdivisio
 		}
 	}
 
+	GenerateIndexes();
+}
+
+void XMapPatch::CreateNormalsAndIndexes(void)
+{
+	GenerateNormals();
 	GenerateIndexes();
 }
 

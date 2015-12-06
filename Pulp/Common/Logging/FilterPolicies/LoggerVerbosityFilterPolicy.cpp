@@ -1,22 +1,49 @@
 #include "EngineCommon.h"
-
-
 #include "LoggerVerbosityFilterPolicy.h"
+
+#include <String\StackString.h>
+
+#include <IConsole.h>
 
 X_NAMESPACE_BEGIN(core)
 
-static int log_verbosity;
+LoggerVerbosityFilterPolicy::LoggerVerbosityFilterPolicy(int initialVerbosityLvl, 
+	const char* nickName) :
+	logVerbosity_(initialVerbosityLvl),
+	pVar_(nullptr),
+	nickName_(nickName)
+{
+	
+}
 
 void LoggerVerbosityFilterPolicy::Init(void)
 {
-//	ADD_CVAR_REF_NO_NAME(log_verbosity, 0, 0, 3, VarFlag::SYSTEM, "filer logs");
 
 }
 
 
 void LoggerVerbosityFilterPolicy::Exit(void)
 {
-	
+
+}
+
+void LoggerVerbosityFilterPolicy::RegisterVars(void)
+{
+	// check if 'log_verbosity' has already been registered
+	// that way all verbosity instances are controlled by same var.
+
+	core::ICVar* pVar = gEnv->pConsole->GetCVar("log_verbosity");
+	if (pVar) 
+	{
+		pVar_ = pVar;
+	}
+	else
+	{
+		// ref
+		ADD_CVAR_REF("log_verbosity", logVerbosity_, logVerbosity_, 0, 2,
+			VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+			"Logging verbosity level");
+	}
 }
 
 bool LoggerVerbosityFilterPolicy::Filter(const char* type, const SourceInfo& sourceInfo,
@@ -27,7 +54,15 @@ bool LoggerVerbosityFilterPolicy::Filter(const char* type, const SourceInfo& sou
 	X_UNUSED(channel);
 	X_UNUSED(format);
 	X_UNUSED(args);
-	return log_verbosity >= verbosity;
+
+	// if we where not the first logger to register var
+	// we must update out value.
+	// var sticks around in memory even if 1st instances dies.
+	if (pVar_) {
+		logVerbosity_ = pVar_->GetInteger();
+	}
+
+	return logVerbosity_ >= verbosity;
 }
 
 

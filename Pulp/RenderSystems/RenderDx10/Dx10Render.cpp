@@ -163,6 +163,9 @@ bool DX11XRender::Init(HWND hWnd,
 	D3D_FEATURE_LEVEL featureout;
 	const UINT numLevelsRequested = sizeof(FeatureLevels) / sizeof(D3D_FEATURE_LEVEL);
 
+#if X_DEBUG 
+	bool debugNotAvaliable = false;
+#endif // !X_DEBUG
 
 	// Create the swap chain and the Direct3D device.
 	result = D3D11CreateDeviceAndSwapChain(
@@ -173,7 +176,7 @@ bool DX11XRender::Init(HWND hWnd,
 		D3D11_CREATE_DEVICE_DEBUG,
 #else
 		0,
-#endif
+#endif // !X_DEBUG
 		FeatureLevels,
 		numLevelsRequested,
 		D3D11_SDK_VERSION,
@@ -182,10 +185,36 @@ bool DX11XRender::Init(HWND hWnd,
 		&device_,
 		&featureout,
 		&deviceContext_
+	);
+
+#if X_DEBUG 
+	if (FAILED(result) && result == 0x887a002d)
+	{
+		result = D3D11CreateDeviceAndSwapChain(
+			NULL,
+			D3D_DRIVER_TYPE_HARDWARE,
+			NULL,
+			0,
+			FeatureLevels,
+			numLevelsRequested,
+			D3D11_SDK_VERSION,
+			&swapChainDesc,
+			&swapChain_,
+			&device_,
+			&featureout,
+			&deviceContext_
 		);
+
+		if (SUCCEEDED(result)) {
+			debugNotAvaliable = true;
+			X_WARNING("Dx10", "Unable to create debug device!");
+		}
+	}
+#endif // !X_DEBUG
 
 	if (FAILED(result))
 	{
+		X_ERROR("Dx10", "Failed to CreateDevice: 0x%x", result);
 		return false;
 	}
 
@@ -193,6 +222,7 @@ bool DX11XRender::Init(HWND hWnd,
 	result = swapChain_->GetBuffer(0, __uuidof(ID3D11Texture2D), (LPVOID*)&backBufferPtr);
 	if (FAILED(result))
 	{
+		X_ERROR("Dx10", "Failed to get back buffer: 0x%x", result);
 		return false;
 	}
 
@@ -200,6 +230,7 @@ bool DX11XRender::Init(HWND hWnd,
 	result = device_->CreateRenderTargetView(backBufferPtr, NULL, &renderTargetView_);
 	if (FAILED(result))
 	{
+		X_ERROR("Dx10", "Failed to create render target view: 0x%x", result);
 		return false;
 	}
 
@@ -224,6 +255,7 @@ bool DX11XRender::Init(HWND hWnd,
 	result = device_->CreateTexture2D(&depthBufferDesc, NULL, &depthStencilBuffer_);
 	if (FAILED(result))
 	{
+		X_ERROR("Dx10", "Failed to create depth buffer: 0x%x", result);
 		return false;
 	}
 
@@ -253,6 +285,7 @@ bool DX11XRender::Init(HWND hWnd,
 	// Create the depth stencil state.
 	if (!this->SetDepthState(depthStencil))
 	{
+		X_ERROR("Dx10", "Failed to set depth states");
 		return false;
 	}
 
@@ -271,6 +304,7 @@ bool DX11XRender::Init(HWND hWnd,
 	// Create the depth stencil state.
 	if (!this->SetBlendState(blend))
 	{
+		X_ERROR("Dx10", "Failed to blend states");
 		return false;
 	}
 
@@ -286,6 +320,7 @@ bool DX11XRender::Init(HWND hWnd,
 	result = device_->CreateDepthStencilView(depthStencilBuffer_, &depthStencilViewDesc, &depthStencilViewReadOnly_);
 	if (FAILED(result))
 	{
+		X_ERROR("Dx10", "Failed to set deptch stencil view: 0x%x", result);
 		return false;
 	}
 
@@ -300,6 +335,7 @@ bool DX11XRender::Init(HWND hWnd,
 	result = device_->CreateDepthStencilView(depthStencilBuffer_, &depthStencilViewDesc, &depthStencilView_);
 	if (FAILED(result))
 	{
+		X_ERROR("Dx10", "Failed to create depth stencil view: 0x%x", result);
 		return false;
 	}
 
@@ -323,6 +359,7 @@ bool DX11XRender::Init(HWND hWnd,
 	// result = device_->CreateRasterizerState(&rasterDesc, &m_rasterState);
 	if (!SetRasterState(raster))
 	{
+		X_ERROR("Dx10", "Failed to set raster state");
 		return false;
 	}
 
@@ -352,19 +389,27 @@ bool DX11XRender::Init(HWND hWnd,
 	deviceContext_->RSSetViewports(1, &viewport);
 
 	// Setup the projection matrix.
-	fieldOfView = (float)D3DX_PI / 4.0f;
-	screenAspect = (float)screenWidth / (float)screenHeight;
+	fieldOfView = PIf / 4.0f;
+	screenAspect = 
+		screenWidth / screenHeight;
 
 	if (!OnPostCreateDevice()) {
+		X_ERROR("Dx10", "Post device creation operations failed");
 		return false;
 	}
 
 #if X_DEBUG
-	if (SUCCEEDED(device_->QueryInterface(__uuidof(ID3D11Debug), (void**)&d3dDebug_)))
+	if (debugNotAvaliable) {
+		return true;
+	}
+
+	result = device_->QueryInterface(__uuidof(ID3D11Debug), (void**)&d3dDebug_);
+	if (SUCCEEDED(result))
 	{
 		return true;
 	}
 	// where is my debug interface slut!
+	X_ERROR("Dx10", "Failed to create debug interface");
 	return false;
 #else
 	return true;
@@ -394,10 +439,11 @@ void DX11XRender::ShutDown()
 	ViewMat_.Clear();
 	ProMat_.Clear();
 
-	DxDeviceContext()->OMSetBlendState(nullptr, 0, 0xFFFFFFFF);
-	DxDeviceContext()->OMSetDepthStencilState(nullptr, 0);
-	DxDeviceContext()->OMSetDepthStencilState(nullptr, 0);
-
+	if (DxDeviceContext()) {
+		DxDeviceContext()->OMSetBlendState(nullptr, 0, 0xFFFFFFFF);
+		DxDeviceContext()->OMSetDepthStencilState(nullptr, 0);
+		DxDeviceContext()->OMSetDepthStencilState(nullptr, 0);
+	}
 
 	for (i = 0; i < BlendStates_.size(); ++i)
 		BlendStates_[i].pState->Release();

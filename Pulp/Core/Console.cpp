@@ -141,6 +141,23 @@ namespace
 		const char* end_;
 	};
 
+	struct AutoResult
+	{
+		AutoResult() : AutoResult(nullptr, nullptr, nullptr) {}
+		AutoResult(const char* name, ICVar* var, ConsoleCommand* pCmd) :
+			name(name), var(var), pCmd(pCmd) {}
+
+		X_INLINE bool operator<(const AutoResult& oth) {
+			return strcmp(name, oth.name) < 0;
+		}
+
+	public:
+		const char* name;
+		ICVar* var;
+		ConsoleCommand* pCmd;
+	};
+
+
 } // namespace
 
 
@@ -365,9 +382,9 @@ namespace
 			if (valf != 0)
 			{
 				// using the End var is safe since we the condition above checks parsing was valid.
-				if (fmod(valf, 1) == 0.f && !strUtil::Find(start, End, '.'))
+				if (math<float>::fmod(valf, 1.f) == 0.f && !strUtil::Find(start, End, '.'))
 				{
-					pConsole->ConfigRegisterInt(Cmd->GetArg(1), (int)valf, 1, 0, 0, "");
+					pConsole->ConfigRegisterInt(Cmd->GetArg(1), static_cast<int>(valf), 1, 0, 0, "");
 				}
 				else
 				{
@@ -406,7 +423,14 @@ namespace
 		pConsole->ToggleConsole();
 	}
 
+	void Command_SaveModifiedVars(IConsoleCmdArgs* Cmd)
+	{
+		X_UNUSED(Cmd);
 
+		XConsole* pConsole = static_cast<XConsole*>(gEnv->pConsole);
+
+		pConsole->SaveChangedVars();
+	}
 
 // ==================================================
 
@@ -504,9 +528,10 @@ void ConsoleCommandArgs::TokenizeString(const char *begin, const char* end)
 
 					if (var)
 					{
-						name.clear();
+						core::ICVar::StrBuf strBuf;
 
-						name.append(var->GetString());
+						name.clear();
+						name.append(var->GetString(strBuf));
 
 						::memcpy(tokenized_ + totalLen, name.begin(), name.length());
 						totalLen += (name.length() + 1);
@@ -614,6 +639,10 @@ XConsole::XConsole() :
 	repeatEventTimer_ = 0.f;
 	repeatEventInterval_ = 0.025f;
 	repeatEventInitialDelay_ = 0.5f;
+
+#if X_ENABLE_CONFIG_HOT_RELOAD
+	ignoreHotReload_ = false;
+#endif // !X_ENABLE_CONFIG_HOT_RELOAD
 }
 
 XConsole::~XConsole()
@@ -622,30 +651,20 @@ XConsole::~XConsole()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void XConsole::Startup(ICore* pCore)
+void XConsole::Startup(ICore* pCore, bool basic)
 {
 	X_ASSERT_NOT_NULL(pCore);
 	X_LOG0("Console", "Starting console");
 
-
 	pCore_ = pCore;
-	pFont_ = pCore->GetIFontSys()->GetFont("default");
-	pRender_ = pCore->GetIRender();
-	pInput_ = pCore->GetIInput();
 
-	X_ASSERT_NOT_NULL(pFont_);
-//	X_ASSERT_NOT_NULL(pRender_); // can be null i think, ask wincat.
-	X_ASSERT_NOT_NULL(pInput_);
-
-	// we want input events plooxx.
-	pInput_->AddConsoleEventListener(this);
-	
 	// add this as a logger.
 	pCore->GetILog()->AddLogger(&logger_);
 
-	// load a texture baby!
-	pBackground_ = pRender_->LoadTexture("Textures/white.dds", 
-		texture::TextureFlags::DONT_STREAM);
+	if (!basic) {
+		LoadRenderResources();
+		RegisterInputListener();
+	}
 
 	ADD_CVAR_REF_NO_NAME(console_debug, 0, 0, 1, VarFlag::SYSTEM | VarFlag::CHEAT, 
 		"Debugging for console operations. 0=off 1=on");
@@ -676,33 +695,74 @@ void XConsole::Startup(ICore* pCore)
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Disable mouse input when console open."
 		" 1=expanded only 2=always");
 
+	if (!basic)
+	{
+		// hot reload
+		pCore->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
 
-	ADD_COMMAND("exec", Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
-	ADD_COMMAND("help", Command_Help, VarFlag::SYSTEM, "displays help info");
-	ADD_COMMAND("listcmds", Command_ListCmd, VarFlag::SYSTEM, "lists avaliable commands");
-	ADD_COMMAND("listdvars", Command_ListDvars, VarFlag::SYSTEM, "lists dvars");
-	ADD_COMMAND("exit", Command_Exit, VarFlag::SYSTEM, "closes the game");
-	ADD_COMMAND("quit", Command_Exit, VarFlag::SYSTEM, "closes the game");
-	ADD_COMMAND("echo", Command_Echo, VarFlag::SYSTEM, "prints text in argument, prefix dvar's with # to print value.");
-	ADD_COMMAND("wait", Command_Wait, VarFlag::SYSTEM, "waits a given number of seconds before processing the next commands");
-	ADD_COMMAND("vreset", Command_VarReset, VarFlag::SYSTEM, "resets a variable to it's default value");
-	ADD_COMMAND("seta", Command_SetVarArchive, VarFlag::SYSTEM, "set a var and flagging it to be archived");
-
-	ADD_COMMAND("bind", Command_Bind, VarFlag::SYSTEM, "binds a key to a action Eg: bind shift a 'echo hello';");
-	ADD_COMMAND("clearbinds", Command_BindsClear, VarFlag::SYSTEM, "clears all binds");
-	ADD_COMMAND("listbinds", Command_BindsList, VarFlag::SYSTEM, "lists all the binds");
-
-
-	ADD_COMMAND("console_show", Command_ConsoleShow, VarFlag::SYSTEM, "opens the console");
-	ADD_COMMAND("console_hide", Command_ConsoleHide, VarFlag::SYSTEM, "hides the console");
-	ADD_COMMAND("console_toggle", Command_ConsoleToggle, VarFlag::SYSTEM, "toggle the console");
-
-	// hot reload
-	pCore->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
-
-	if (console_save_history) {
-		LoadCmdHistory();
+		if (console_save_history) {
+			LoadCmdHistory();
+		}
 	}
+	else {
+		// when in basic mode, don't save out.
+		console_save_history = 0;
+	}
+}
+
+void XConsole::LoadRenderResources(void)
+{
+	X_ASSERT_NOT_NULL(pCore_);
+	X_ASSERT_NOT_NULL(pCore_->GetIFontSys());
+
+	pFont_ = pCore_->GetIFontSys()->GetFont("default");
+
+	X_ASSERT_NOT_NULL(pFont_);
+
+	pRender_ = pCore_->GetIRender();
+
+	X_ASSERT_NOT_NULL(pRender_);
+
+	// load a texture baby!
+	pBackground_ = pRender_->LoadTexture("Textures/white.dds",
+		texture::TextureFlags::DONT_STREAM);
+}
+
+void XConsole::RegisterInputListener(void)
+{
+	X_ASSERT_NOT_NULL(pCore_);
+
+	pInput_ = pCore_->GetIInput();
+
+	X_ASSERT_NOT_NULL(pInput_);
+
+	// we want input events plooxx.
+	pInput_->AddConsoleEventListener(this);
+}
+
+
+void XConsole::RegisterCommnads(void)
+{
+	AddCommand("exec", Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
+	AddCommand("help", Command_Help, VarFlag::SYSTEM, "displays help info");
+	AddCommand("listCmds", Command_ListCmd, VarFlag::SYSTEM, "lists avaliable commands");
+	AddCommand("listDvars", Command_ListDvars, VarFlag::SYSTEM, "lists dvars");
+	AddCommand("exit", Command_Exit, VarFlag::SYSTEM, "closes the game");
+	AddCommand("quit", Command_Exit, VarFlag::SYSTEM, "closes the game");
+	AddCommand("echo", Command_Echo, VarFlag::SYSTEM, "prints text in argument, prefix dvar's with # to print value");
+	AddCommand("wait", Command_Wait, VarFlag::SYSTEM, "waits a given number of seconds before processing the next commands");
+	AddCommand("vreset", Command_VarReset, VarFlag::SYSTEM, "resets a variable to it's default value");
+	AddCommand("seta", Command_SetVarArchive, VarFlag::SYSTEM, "set a var and flagging it to be archived");
+
+	AddCommand("bind", Command_Bind, VarFlag::SYSTEM, "binds a key to a action Eg: bind shift a 'echo hello';");
+	AddCommand("clearBinds", Command_BindsClear, VarFlag::SYSTEM, "clears all binds");
+	AddCommand("listBinds", Command_BindsList, VarFlag::SYSTEM, "lists all the binds");
+
+	AddCommand("saveModifiedVars", Command_SaveModifiedVars, VarFlag::SYSTEM, "Saves modifed vars");
+
+	AddCommand("consoleShow", Command_ConsoleShow, VarFlag::SYSTEM, "opens the console");
+	AddCommand("consoleHide", Command_ConsoleHide, VarFlag::SYSTEM, "hides the console");
+	AddCommand("consoleToggle", Command_ConsoleToggle, VarFlag::SYSTEM, "toggle the console");
 }
 
 void XConsole::ShutDown(void)
@@ -749,28 +809,37 @@ void XConsole::SaveChangedVars(void)
 	mode.Set(fileMode::WRITE);
 	mode.Set(fileMode::RECREATE);
 
-	if (file.openFile("user_config.cfg", mode))
+#if X_ENABLE_CONFIG_HOT_RELOAD
+	ignoreHotReload_ = true;
+#endif // !X_ENABLE_CONFIG_HOT_RELOAD
+
+	if (file.openFile("config//user_config.cfg", mode))
 	{
-		file.writeStringNNT("// auto generated");
+		file.writeStringNNT("// auto generated\n");
 
 		for (itrVar = VarMap_.begin(); itrVar != itrVarEnd; ++itrVar)
 		{
 			ICVar* pVar = itrVar->second;
 			ICVar::FlagType flags = pVar->GetFlags();
 
-			if (flags.IsSet(VarFlag::SAVE_IF_CHANGED))
-			{
-				if (flags.IsSet(VarFlag::MODIFIED))
-				{
-					// save out name + value.
-					const char* pName = pVar->GetName();
-					const char* pValue = pVar->GetString();
+			// we always save 'ARCHIVE' and only save 'SAVE_IF_CHANGED' if 'MODIFIED'
+			bool save = (flags.IsSet(VarFlag::SAVE_IF_CHANGED) &&
+				flags.IsSet(VarFlag::MODIFIED)) ||
+				flags.IsSet(VarFlag::ARCHIVE);
 
-					file.writeStringNNT(pName);
-					file.write(' ');
-					file.writeStringNNT(pValue);
-					file.write('\n');
-				}
+			if (save)
+			{
+				core::ICVar::StrBuf strBuf;
+
+				// save out name + value.
+				const char* pName = pVar->GetName();
+				const char* pValue = pVar->GetString(strBuf);
+
+				file.writeStringNNT("seta ");
+				file.writeStringNNT(pName);
+				file.write(' ');
+				file.writeStringNNT(pValue);
+				file.write('\n');
 			}
 		}
 	}
@@ -892,10 +961,16 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 			if (event.keyId == input::KeyId::MOUSE_Z)
 			{
 				int32_t scaled = static_cast<int32_t>(event.value);
+				bool positive = (scaled >= 0);
 
 				scaled /= 20;
-				if (scaled < 1) {
+
+				// enuse scaled didnt remove all scrolling
+				if(positive && scaled < 1) {
 					scaled = 1;
+				}
+				else if (!positive && scaled > -1) {
+					scaled = -1;
 				}
 
 				ScrollPos_ += scaled;
@@ -1079,6 +1154,10 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 	{
 		if (CursorPos_) {  // can we go left?
 			CursorPos_--;
+		
+			// disable blinking while moving.
+			cursor_.curTime = 0.f; 
+			cursor_.draw = true;
 		}
 		return true;
 	}
@@ -1087,6 +1166,10 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 		// are we pre end ?
 		if (CursorPos_ < safe_static_cast<int32_t, size_t>(InputBuffer_.length())) {
 			CursorPos_++;
+
+			// disable blinking while moving.
+			cursor_.curTime = 0.f;
+			cursor_.draw = true;
 		}
 		else if (autoCompleteIdx_ >= 0) {
 			autoCompleteSelect_ = true;
@@ -1118,10 +1201,16 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 	}
 	else if (event.keyId == KeyId::DOWN_ARROW)
 	{
-		if (isAutocompleteVis())
+		bool inHistory = (HistoryPos_ > 0);
+		bool multiAutoComplete = autoCompleteNum_ > 1;
+
+		if (isAutocompleteVis() && (!inHistory || multiAutoComplete))
 		{
 			autoCompleteIdx_= core::Min(autoCompleteNum_ - 1, ++autoCompleteIdx_);
 
+			// reset history if we move into autocomplete?
+			// i think so..
+			ResetHistoryPos();
 		}
 		else
 		{
@@ -1141,8 +1230,11 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 	}
 	else if (event.keyId == KeyId::ESCAPE)
 	{
-		// rekt
-		ClearInputBuffer();
+		// don't think this is every reached.
+		// lets check..
+		X_ASSERT_UNREACHABLE();
+
+		// ClearInputBuffer();
 	}
 
 	return true;
@@ -1235,12 +1327,15 @@ void XConsole::LoadCmdHistory(void)
 	}
 }
 
+void XConsole::ResetHistoryPos(void)
+{
+	HistoryPos_ = -1;
+}
 
 void XConsole::AddCmdToHistory(const char* Command)
 {
 	// so we can scroll through past commands.
-
-	HistoryPos_ = -1;
+	ResetHistoryPos();
 
 	if (!CmdHistory_.empty())
 	{
@@ -1677,9 +1772,15 @@ bool XConsole::LoadConfig(const char* fileName)
 bool XConsole::OnFileChange(const char* name)
 {
 #if X_ENABLE_CONFIG_HOT_RELOAD
-	core::Path<char> temp(name);
+	if (!ignoreHotReload_)
+	{
+		core::Path<char> temp(name);
 
-	LoadConfig(temp.fileName());
+		LoadConfig(temp.fileName());
+	}
+
+	ignoreHotReload_ = false;
+
 #else
 	X_UNUSED(name);
 #endif // !X_ENABLE_CONFIG_HOT_RELOAD
@@ -1810,7 +1911,8 @@ void XConsole::DisplayVarValue(ICVar* pVar)
 		return;
 	}
 
-	X_LOG0("Dvar", "\"%s\" = %s", pVar->GetName(), pVar->GetString());
+	core::ICVar::StrBuf strBuf;
+	X_LOG0("Dvar", "\"%s\" = %s", pVar->GetName(), pVar->GetString(strBuf));
 }
 
 void XConsole::DisplayVarInfo(ICVar* pVar)
@@ -1820,8 +1922,9 @@ void XConsole::DisplayVarInfo(ICVar* pVar)
 	}
 
 	ICVar::FlagType::Description dsc;
+	core::ICVar::StrBuf strBuf;
 
-	X_LOG0("Dvar", "\"%s\" = %s [%s]", pVar->GetName(), pVar->GetString(), 
+	X_LOG0("Dvar", "\"%s\" = %s [%s]", pVar->GetName(), pVar->GetString(strBuf),
 		pVar->GetFlags().ToString(dsc));
 }
 
@@ -2118,20 +2221,9 @@ void XConsole::DrawScrollBar(void)
 	}
 }
 
+
 void XConsole::DrawInputTxt(const Vec2f& start)
 {
-	struct AutoResult
-	{
-		AutoResult() : name(nullptr), var(nullptr) {}
-		AutoResult(const char* name, ICVar* var) : name(name), var(var) {}
-		const char* name;
-		ICVar* var;
-
-		X_INLINE bool operator<(const AutoResult& oth) {
-			return strcmp(name, oth.name) < 0;
-		}
-	};
-
 	const size_t max_auto_complete_results = 32;
 	typedef core::FixedArray<AutoResult, max_auto_complete_results> Results;
 	Results results;
@@ -2199,7 +2291,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 			// we search same length.
 			if (pComparison(Name, Name + inputLen, inputBegin, inputEnd))
 			{
-				results.push_back(AutoResult(Name, it->second));
+				results.push_back(AutoResult(Name, it->second, nullptr));
 			}
 
 			if (results.size() == results.capacity()) {
@@ -2224,7 +2316,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				// we search same length.
 				if (pComparison(Name, Name + inputLen, inputBegin, inputEnd))
 				{
-					results.push_back(AutoResult(Name, nullptr));
+					results.push_back(AutoResult(Name, nullptr, &cmdIt->second));
 				}
 
 				if (results.size() == results.capacity()) {
@@ -2353,9 +2445,12 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				nameStr.appendFmt("%s", pCvar->GetName());
 				defaultStr.append("	default");
 
-				value.appendFmt("%s", pCvar->GetString());
-				defaultValue.appendFmt("%s", pCvar->GetDefaultStr());
+				{
+					ICVar::StrBuf strBuf;
 
+					value.appendFmt("%s", pCvar->GetString(strBuf));	
+					defaultValue.appendFmt("%s", pCvar->GetDefaultStr(strBuf));
+				}
 				description.append(pCvar->GetDesc()); // dose string length for us / caps.
 
 				if (pCvar->GetType() == VarFlag::INT)
@@ -2484,6 +2579,40 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 					ypos += fCharHeight;
 					pFont_->DrawString(xpos, ypos, domain.c_str(), ctx);
 				}
+			}
+			else if (isSingleCmd)
+			{
+				AutoResult& result = *results.begin();
+				const core::string& Desc = result.pCmd->Desc;
+
+				const float box2Offset = 5.f;
+				const float descWidth = core::Max(width, pFont_->GetTextSize(Desc, ctx).x) + 10.f;
+
+				width = core::Max(width, pFont_->GetTextSize(result.name, ctx).x);
+				width += 10; // add a few pixels.
+				height += fCharHeight;
+
+
+				pRender_->Set2D(true);
+				pRender_->DrawQuadImage(xpos, ypos, width, height, this->pBackground_->getTexID(), col);
+				pRender_->DrawRect(xpos, ypos, width, height, console_output_box_color_border);
+				pRender_->DrawQuad(xpos, ypos + height + box2Offset, descWidth, height, col);
+				pRender_->DrawRect(xpos, ypos + height + box2Offset, descWidth, height, console_input_box_color_border);
+				pRender_->Set2D(false);
+
+				xpos += 5.f;
+
+				// cmd color
+				ctx.SetColor(Col_Darkblue);
+				pFont_->DrawString(xpos, ypos, result.name, ctx);
+
+				ypos += fCharHeight;
+				ypos += 5.f;
+				ypos += box2Offset;
+
+				ctx.SetColor(Col_Whitesmoke);
+				pFont_->DrawString(xpos, ypos, Desc, ctx);
+
 			}
 			else
 			{
@@ -2720,9 +2849,15 @@ XConsoleNULL::~XConsoleNULL()
 
 }
 
-void XConsoleNULL::Startup(ICore* pCore)
+void XConsoleNULL::Startup(ICore* pCore, bool basic)
 {
 	X_UNUSED(pCore);
+	X_UNUSED(basic);
+}
+
+
+void XConsoleNULL::RegisterCommnads(void)
+{
 
 }
 

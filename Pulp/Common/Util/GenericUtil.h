@@ -114,6 +114,14 @@ X_INLINE void Swap(T& left, T& right)
 	right = tmp;
 }
 
+template<class T, class OtherT = T> 
+inline T exchange(T& val, OtherT&& newVal)
+{	
+	T OldVal = std::move(val);
+	val = std::forward<OtherT>(newVal);
+	return OldVal;
+}
+
 template <typename T, typename T2>
 inline float PercentageOf(const T& sub, const T2& of)
 {

@@ -13,44 +13,6 @@ X_NAMESPACE_BEGIN(core)
 
 class XConsole;
 
-inline uint32_t AlphaBit(char c)
-{
-	return c >= 'a' && c <= 'z' ? 1 << (c - 'z' + 31) : 0;
-}
-
-inline int TextToInt(const char* s, int nCurrent, bool bBitfield)
-{
-	int nValue = 0;
-	if (s)
-	{
-		char* e;
-		if (bBitfield)
-		{
-			// Bit manipulation.
-			if (*s == '^')
-				// Bit number
-				nValue = 1 << strtol(++s, &e, 10);
-			else
-				// Full number
-				nValue = strtol(s, &e, 10);
-
-			// Check letter codes.
-			for (; *e >= 'a'&& *e <= 'z'; e++)
-				nValue |= AlphaBit(*e);
-
-			if (*e == '+')
-				nValue = nCurrent | nValue;
-			else if (*e == '-')
-				nValue = nCurrent & ~nValue;
-			else if (*e == '^')
-				nValue = nCurrent ^ nValue;
-		}
-		else
-			nValue = strtol(s, &e, 10);
-	}
-	return nValue;
-}
-
 class CVarBase : public ICVar
 {
 public:
@@ -59,60 +21,61 @@ public:
 	virtual ~CVarBase();
 
 	// interface ICvar 
-	// virtual const char* GetName() const;
-	virtual const char* GetDesc() const;
+	virtual const char* GetDesc() const X_OVERRIDE;
 
-	virtual FlagType GetFlags() const;
-	virtual FlagType SetFlags(FlagType flags);
+	virtual FlagType GetFlags(void) const X_OVERRIDE;
+	virtual FlagType SetFlags(FlagType flags) X_OVERRIDE;
+	virtual void SetModified(void) X_FINAL;
 
-	virtual void Release();
+	virtual void Release(void) X_OVERRIDE;
 
-	virtual void ForceSet(const char* s);
-	virtual void SetDefault(const char* s);
+	virtual void ForceSet(const char* s) X_OVERRIDE;
+	virtual void SetDefault(const char* s) X_OVERRIDE;
 
-	virtual void SetOnChangeCallback(ConsoleVarFunc pChangeFunc);
-	virtual ConsoleVarFunc GetOnChangeCallback();
+	virtual void SetOnChangeCallback(ConsoleVarFunc pChangeFunc) X_OVERRIDE;
+	virtual ConsoleVarFunc GetOnChangeCallback(void) X_OVERRIDE;
 
-	virtual void OnModified();
+	virtual void OnModified(void);
 
-	virtual void Reset();
+	virtual void Reset(void) X_OVERRIDE;
+	// interface ~ICvar 
+
 
 protected:
-	// const char*					Name_;
-	const char*					Desc_;
+	const char*			Desc_;
 
-	FlagType					Flags_;
+	FlagType			Flags_;
 
-	ConsoleVarFunc				pChangeFunc_;
-	XConsole*					pConsole_;
+	ConsoleVarFunc		pChangeFunc_;
+	XConsole*			pConsole_;
 };
 
 
 class CVarBaseConst : public CVarBase
 {
 public:
-	CVarBaseConst(XConsole* pConsole, const char* Name, int Flags, const char* desc) :
-		CVarBase(pConsole, Flags, desc), Name_(Name) {}
+	X_INLINE CVarBaseConst(XConsole* pConsole, const char* Name, int Flags, const char* desc);
 
-	virtual const char* GetName() const {
-		return Name_;
-	}
+	X_INLINE ~CVarBaseConst() X_OVERRIDE;
+
+	X_INLINE virtual const char* GetName(void) const X_OVERRIDE;
+
 protected:
-	const char*			Name_;
+	const char*	Name_;
 };
 
 
 class CVarBaseHeap : public CVarBase
 {
 public:
-	CVarBaseHeap(XConsole* pConsole, const char* Name, int Flags, const char* desc) :
-		CVarBase(pConsole, Flags, desc), Name_(Name) {}
+	X_INLINE CVarBaseHeap(XConsole* pConsole, const char* Name, int Flags, const char* desc);
 
-	virtual const char* GetName() const {
-		return Name_.c_str();
-	}
+	X_INLINE ~CVarBaseHeap() X_OVERRIDE;
+
+	X_INLINE virtual const char* GetName(void) const X_OVERRIDE;
+
 protected:
-	string		Name_;
+	string Name_;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -121,56 +84,25 @@ template<class T>
 class CVarString : public T
 {
 public:
-	CVarString(XConsole* pConsole, const char* Name, const char* Default, 
-		int Flags, const char* desc)
-		: T(pConsole, Name, Flags | VarFlag::STRING, desc),
-		String_(Default)
-	{
-	}
+	X_INLINE CVarString(XConsole* pConsole, const char* Name, const char* Default,
+		int Flags, const char* desc);
 
-	virtual int GetInteger() const { return atoi(String_.c_str()); }
-	virtual float GetFloat() const { return (float)atof(String_.c_str()); }
-	virtual const char *GetString() { return String_.c_str(); }
-	virtual void Set(const char* s)
-	{
-		if (Flags_.IsSet(VarFlag::READONLY) || !s)
-			return;
+	X_INLINE ~CVarString() X_OVERRIDE;
 
-		OnModified();
+	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
+	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
+	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) X_OVERRIDE;
 
-		String_ = s;
+	X_INLINE virtual void Set(const char* s) X_OVERRIDE;
+	X_INLINE virtual void Set(const float f) X_OVERRIDE;
+	X_INLINE virtual void Set(const int i) X_OVERRIDE;
+	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;
+	X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-		if (pChangeFunc_)
-			pChangeFunc_(this); // change callback.
-	}
+	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
 
-	virtual void Set(const float f)
-	{
-		StackString<32> val(f);
-		Set(val.c_str());
-	}
-
-	virtual void Set(const int i)
-	{
-		StackString<32> val(i);
-		Set(val.c_str());
-	}
-
-	virtual VarFlag::Enum GetType()
-	{
-		return VarFlag::STRING;
-	}
-
-	virtual void Reset() {
-
-	}
-
-	virtual const char* GetDefaultStr() const X_OVERRIDE{
-		return "";
-	}
-
-	virtual float GetMin(void) X_OVERRIDE{ return 0.f; }
-	virtual float GetMax(void) X_OVERRIDE{ return 0.f; }
+	X_INLINE virtual float GetMin(void) X_OVERRIDE;
+	X_INLINE virtual float GetMax(void) X_OVERRIDE;
 
 private:
 	string String_;
@@ -182,76 +114,25 @@ class CVarInt : public T
 {
 public:
 	// constructor
-	CVarInt(XConsole* pConsole, const char *Name, const int iDefault, int Min, int Max, int Flags, const char* desc)
-		: T(pConsole, Name, Flags | VarFlag::INT, desc),
-		IntValue_(iDefault), IntMin_(Min), IntMax_(Max), IntDefault_(iDefault)
-	{
-	}
+	X_INLINE CVarInt(XConsole* pConsole, const char* Name, const int iDefault,
+		int Min, int Max, int Flags, const char* desc);
 
-	virtual int GetInteger() const { return IntValue_; }
-	virtual float GetFloat() const { return static_cast<float>(IntValue_); }
-	virtual const char *GetString()
-	{
-		static char szReturnString[64];
+	X_INLINE ~CVarInt() X_OVERRIDE;
 
-		sprintf(szReturnString, "%d", IntValue_);
-		return szReturnString;
-	}
-	virtual void SetDefault(const char* s)
-	{
-		Set(s);
-		IntDefault_ = IntValue_;
-	}
-	virtual void Set(const char* s)
-	{
-		int nValue = TextToInt(s, IntValue_, Flags_.IsSet(VarFlag::BITFIELD));
+	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
+	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
+	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) X_OVERRIDE;
+	X_INLINE virtual void SetDefault(const char* s) X_OVERRIDE;
 
-		Set(nValue);
-	}
-	virtual void Set(const float f)
-	{
-		Set((int)f);
-	}
-	virtual void Set(const int i)
-	{
-		if (i == IntValue_)
-			return;
-		if (Flags_.IsSet(VarFlag::READONLY))
-			return;
+	virtual void Set(const char* s) X_OVERRIDE;
+	X_INLINE virtual void Set(const float f) X_OVERRIDE;
+	X_INLINE virtual void Set(const int i) X_OVERRIDE;
+	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;
+	X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-		OnModified();
-
-		IntValue_ = i;
-
-		// min bigger than max disables the check.
-		if (IntMin_ <= IntMax_)
-		{
-			if (IntValue_ < IntMin_)
-				IntValue_ = IntMin_;
-			else if (IntValue_ > IntMax_)
-				IntValue_ = IntMax_;
-		}
-
-		if (pChangeFunc_)
-			pChangeFunc_(this); // change callback.	
-	}
-	virtual VarFlag::Enum GetType() { return VarFlag::INT; }
-
-	virtual void Reset() {
-		// do i want to set modified here HUMUM
-		// i don't think so.
-		IntValue_ = IntDefault_;
-	}
-
-	virtual const char* GetDefaultStr() const X_OVERRIDE{
-		static char szReturnString[64];
-		sprintf(szReturnString, "%d", IntDefault_);
-		return szReturnString;
-	}
-
-
-	virtual float GetMin(void) X_OVERRIDE{ return static_cast<float>(IntMin_); }
-	virtual float GetMax(void) X_OVERRIDE{ return static_cast<float>(IntMax_); }
+	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
+	X_INLINE virtual float GetMin(void) X_OVERRIDE;
+	X_INLINE virtual float GetMax(void) X_OVERRIDE;
 
 protected:
 	int 		IntValue_;
@@ -266,110 +147,25 @@ class CVarFloat : public T
 {
 public:
 	// constructor
-	CVarFloat(XConsole* pConsole, const char* Name, const float fDefault, float Min, float Max, int nFlags, const char* desc)
-		: T(pConsole, Name, nFlags | VarFlag::FLOAT, desc),
-		fValue_(fDefault), fMin_(Min), fMax_(Max), fDefault_(fDefault)
-	{
-	}
+	CVarFloat(XConsole* pConsole, const char* Name, const float fDefault,
+		float Min, float Max, int nFlags, const char* desc);
 
-	virtual int GetInteger() const { return static_cast<int>(fValue_); }
-	virtual float GetFloat() const { return fValue_; }
-	virtual const char *GetString()
-	{
-		static char szReturnString[128];
+	X_INLINE ~CVarFloat() X_OVERRIDE;
 
-		sprintf(szReturnString, "%f", fValue_);
-		return szReturnString;
-	}
-	virtual void SetDefault(const char* s)
-	{
-		Set(s);
-		fDefault_ = fValue_;
-	}
-	virtual void Set(const char* s)
-	{
-		if (Flags_.IsSet(VarFlag::READONLY))
-			return;
+	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
+	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
+	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) X_OVERRIDE;
+	X_INLINE virtual void SetDefault(const char* s) X_OVERRIDE;
 
-		float fValue = 0;
-		if (s)
-			fValue = (float)atof(s);
+	X_INLINE virtual void Set(const char* s) X_OVERRIDE;
+	X_INLINE virtual void Set(const float f) X_OVERRIDE;
+	X_INLINE virtual void Set(const int i) X_OVERRIDE;
+	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;
+	X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-		// cap it before check :D
-		if (fMin_ <= fMax_)
-		{
-			if (fValue_ < fMin_)
-				fValue_ = fMin_;
-			else if (fValue_ > fMax_)
-				fValue_ = fMax_;
-		}
-
-		if (fValue == fValue_)
-			return;
-
-		OnModified();
-		fValue_ = fValue;
-
-		if (pChangeFunc_)
-			pChangeFunc_(this); // change callback.	
-	}
-
-	virtual void Set(const float f)
-	{
-		if (f == fValue_ || Flags_.IsSet(VarFlag::READONLY))
-			return;
-
-		OnModified();
-		fValue_ = f;
-
-		// cap it sally.
-		if (fMin_ <= fMax_)
-		{
-			if (fValue_ < fMin_)
-				fValue_ = fMin_;
-			else if (fValue_ > fMax_)
-				fValue_ = fMax_;
-		}
-
-		if (pChangeFunc_)
-			pChangeFunc_(this); // change callback.	
-	}
-
-	virtual void Set(const int i)
-	{
-		if ((float)i == fValue_ || Flags_.IsSet(VarFlag::READONLY))
-			return;
-
-		OnModified();
-		fValue_ = (float)i;
-
-		// cap it sally.
-		if (fMin_ <= fMax_)
-		{
-			if (fValue_ < fMin_)
-				fValue_ = fMin_;
-			else if (fValue_ > fMax_)
-				fValue_ = fMax_;
-		}
-
-		if (pChangeFunc_)
-			pChangeFunc_(this); // change callback.	
-
-	}
-	virtual VarFlag::Enum GetType() { return VarFlag::FLOAT; }
-
-	virtual void Reset() {
-		fValue_ = fDefault_;
-	}
-
-	virtual const char* GetDefaultStr() const X_OVERRIDE{
-		static char szReturnString[64];
-		sprintf(szReturnString, "%g", fDefault_);
-		return szReturnString;
-	}
-
-	virtual float GetMin(void) X_OVERRIDE{ return fMin_; }
-	virtual float GetMax(void) X_OVERRIDE{ return fMax_; }
+	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
+	X_INLINE virtual float GetMin(void) X_OVERRIDE;
+	X_INLINE virtual float GetMax(void) X_OVERRIDE;
 
 private:
 	float 		fValue_;
@@ -383,75 +179,24 @@ class CVarIntRef : public CVarBaseConst
 {
 public:
 	// constructor
-	CVarIntRef(XConsole* pConsole, const char *Name, int* pVar, int Min, int Max, int nFlags, const char* desc)
-		: CVarBaseConst(pConsole, Name, nFlags | VarFlag::INT, desc),
-		IntValue_(*pVar), IntMin_(Min), IntMax_(Max), DefaultVal_(*pVar)
-	{
-	}
+	X_INLINE CVarIntRef(XConsole* pConsole, const char* Name, int* pVar,
+		int Min, int Max, int nFlags, const char* desc);
 
-	virtual int GetInteger() const { return IntValue_; }
-	virtual float GetFloat() const { return static_cast<float>(IntValue_); }
-	virtual const char *GetString()
-	{
-		static char szReturnString[64];
+	X_INLINE ~CVarIntRef() X_OVERRIDE;
 
-		sprintf(szReturnString, "%d", GetInteger());
-		return szReturnString;
-	}
-	virtual void Set(const char* s)
-	{
-		int nValue = TextToInt(s, IntValue_, Flags_.IsSet(VarFlag::BITFIELD));
+	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
+	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
+	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) X_OVERRIDE;
 
-		Set(nValue);
-	}
-	virtual void Set(const float f)
-	{
-		Set((int)f);
-	}
-	virtual void Set(const int i)
-	{
-		if (i == IntValue_)
-			return;
-		if (Flags_.IsSet(VarFlag::READONLY))
-			return;
+	virtual void Set(const char* s) X_OVERRIDE;
+	X_INLINE virtual void Set(const float f) X_OVERRIDE;
+	X_INLINE virtual void Set(const int i) X_OVERRIDE;
+	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;
+	X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-		OnModified();
-
-		// cap it sally.
-		IntValue_ = i;
-
-		if (IntMin_ <= IntMax_)
-		{
-			if (IntValue_ < IntMin_)
-				IntValue_ = IntMin_;
-			else if (IntValue_ > IntMax_)
-				IntValue_ = IntMax_;
-		}
-
-		if (pChangeFunc_)
-			pChangeFunc_(this); // change callback.	
-	}
-	virtual VarFlag::Enum GetType() { return VarFlag::INT; }
-
-	virtual void Reset() {
-
-		bool changed = IntValue_ != DefaultVal_;
-
-		IntValue_ = DefaultVal_;
-
-		if (changed && pChangeFunc_)
-			pChangeFunc_(this); // change callback.	
-	}
-
-	virtual const char* GetDefaultStr() const X_OVERRIDE{
-		static char szReturnString[64];
-		sprintf(szReturnString, "%d", DefaultVal_);
-		return szReturnString;
-	}
-
-	virtual float GetMin(void) X_OVERRIDE{ return static_cast<float>(IntMin_); }
-	virtual float GetMax(void) X_OVERRIDE{ return static_cast<float>(IntMax_); }
-
+	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
+	X_INLINE virtual float GetMin(void) X_OVERRIDE;
+	X_INLINE virtual float GetMax(void) X_OVERRIDE;
 protected:
 	X_NO_ASSIGN(CVarIntRef);
 
@@ -466,100 +211,24 @@ class CVarFloatRef : public CVarBaseConst
 {
 public:
 	// constructor
-	CVarFloatRef(XConsole* pConsole, const char* Name, float* pVal, float Min, float Max, int nFlags, const char* desc)
-		: CVarBaseConst(pConsole, Name, nFlags | VarFlag::FLOAT, desc), fValue_(*pVal),
-		fMin_(Min), fMax_(Max), fDefault_(*pVal)
-	{
-	}
+	X_INLINE CVarFloatRef(XConsole* pConsole, const char* Name, float* pVal,
+		float Min, float Max, int nFlags, const char* desc);
 
-	virtual int GetInteger() const { return static_cast<int>(fValue_); }
-	virtual float GetFloat() const { return fValue_; }
-	virtual const char *GetString()
-	{
-		static char szReturnString[128];
+	X_INLINE ~CVarFloatRef() X_OVERRIDE;
 
-		sprintf(szReturnString, "%g", fValue_);
-		return szReturnString;
-	}
+	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
+	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
+	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) X_OVERRIDE;
 
-	virtual void Set(const char* s)
-	{
-		if (Flags_.IsSet(VarFlag::READONLY))
-			return;
+	X_INLINE virtual void Set(const char* s) X_OVERRIDE;
+	X_INLINE virtual void Set(const float f) X_OVERRIDE;
+	X_INLINE virtual void Set(const int i) X_OVERRIDE;
+	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;
+	X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-		float fValue = 0;
-		if (s)
-			fValue = (float)atof(s);
-
-		if (fValue == fValue_)
-			return;
-
-		OnModified();
-
-		// cap it sally.
-		if (fMin_ <= fMax_)
-		{
-			if (fValue_ < fMin_)
-				fValue_ = fMin_;
-			else if (fValue_ > fMax_)
-				fValue_ = fMax_;
-		}
-
-		fValue_ = fValue;
-
-		if (pChangeFunc_)
-			pChangeFunc_(this); // change callback.	
-	}
-
-	virtual void Set(const float f)
-	{
-		if (f == fValue_ || Flags_.IsSet(VarFlag::READONLY))
-			return;
-
-		OnModified();
-		fValue_ = f;
-
-		if (pChangeFunc_)
-			pChangeFunc_(this); // change callback.	
-	}
-
-	virtual void Set(const int i)
-	{
-		if ((float)i == fValue_ || Flags_.IsSet(VarFlag::READONLY))
-			return;
-
-		OnModified();
-
-		fValue_ = (float)i;
-
-		// cap it sally.
-		if (fMin_ <= fMax_)
-		{
-			if (fValue_ < fMin_)
-				fValue_ = fMin_;
-			else if (fValue_ > fMax_)
-				fValue_ = fMax_;
-		}
-
-		if (pChangeFunc_)
-			pChangeFunc_(this); // change callback.	
-
-	}
-	virtual VarFlag::Enum GetType() { return VarFlag::FLOAT; }
-
-	virtual void Reset() {
-		fValue_ = fDefault_;
-	}
-
-	virtual const char* GetDefaultStr() const X_OVERRIDE{
-		static char szReturnString[64];
-		sprintf(szReturnString, "%g", fDefault_);
-		return szReturnString;
-	}
-
-	virtual float GetMin(void) X_OVERRIDE{ return fMin_; }
-	virtual float GetMax(void) X_OVERRIDE{ return fMax_; }
-
+	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
+	X_INLINE virtual float GetMin(void) X_OVERRIDE;
+	X_INLINE virtual float GetMax(void) X_OVERRIDE;
 
 private:
 	X_NO_ASSIGN(CVarFloatRef);
@@ -576,63 +245,26 @@ class CVarColRef : public CVarBaseConst
 {
 public:
 	// constructor
-	CVarColRef(XConsole* pConsole, const char* Name, Color* pVal, int nFlags, const char* desc)
-		: CVarBaseConst(pConsole, Name, nFlags | VarFlag::FLOAT | VarFlag::COLOR, desc),
-		ColValue_(*pVal), ColDefault_(*pVal)
-	{
-	}
+	X_INLINE CVarColRef(XConsole* pConsole, 
+		const char* Name, Color* pVal, int nFlags, const char* desc);
 
-	virtual int GetInteger() const X_OVERRIDE { return static_cast<int>(0.f); }
-	virtual float GetFloat() const X_OVERRIDE { return 0.f; }
-	virtual const char *GetString() X_OVERRIDE
-	{
-		static char szReturnString[128];
-		sprintf(szReturnString, "%g %g %g %g", ColValue_.r,
-			ColValue_.g, ColValue_.b, ColValue_.a);
-		return szReturnString;
-	}
-	virtual const char* GetDefaultStr() const X_OVERRIDE
-	{
-		static char szReturnString[64];
-		sprintf(szReturnString, "%g %g %g %g", ColDefault_.r,
-			ColDefault_.g, ColDefault_.b, ColDefault_.a);
-		return szReturnString;
-	}
+	X_INLINE ~CVarColRef() X_OVERRIDE;
+
+	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
+	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
+	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) X_OVERRIDE;
+	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
 
 	virtual void Set(const char* s) X_OVERRIDE;
+	X_INLINE virtual void Set(const float f) X_OVERRIDE;
+	X_INLINE virtual void Set(const int i) X_OVERRIDE;
+	X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-	virtual void Set(const float f)
-	{
-		if (Flags_.IsSet(VarFlag::READONLY))
-			return;
-
-		X_UNUSED(f);
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
-
-	virtual void Set(const int i)
-	{
-		if (Flags_.IsSet(VarFlag::READONLY))
-			return;
-
-		X_UNUSED(i);
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
-
-	virtual void Reset() X_OVERRIDE {
-		ColValue_ = ColDefault_;
-	}
-
-	virtual VarFlag::Enum GetType() X_OVERRIDE{ return VarFlag::COLOR; }
-	virtual float GetMin(void) X_OVERRIDE{ return 0.f; }
-	virtual float GetMax(void) X_OVERRIDE{ return 1.f; }
-
-	const Color& GetColor(void) const {
-		return ColValue_;
-	}
-	const Color& GetDefaultColor(void) const {
-		return ColDefault_;
-	}
+	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;
+	X_INLINE virtual float GetMin(void) X_OVERRIDE;
+	X_INLINE virtual float GetMax(void) X_OVERRIDE;
+	X_INLINE const Color& GetColor(void) const;
+	X_INLINE const Color& GetDefaultColor(void) const;
 
 	static bool ColorFromString(const char* pStr, Color& out, bool Slient = true);
 
@@ -649,61 +281,28 @@ class CVarVec3Ref : public CVarBaseConst
 {
 public:
 	// constructor
-	CVarVec3Ref(XConsole* pConsole, const char* Name, Vec3f* pVal, int nFlags, const char* desc)
-		: CVarBaseConst(pConsole, Name, nFlags | VarFlag::FLOAT | VarFlag::VECTOR, desc),
-		Value_(*pVal), Default_(*pVal)
-	{
-	}
+	X_INLINE CVarVec3Ref(XConsole* pConsole, const char* Name, Vec3f* pVal,
+		int nFlags, const char* desc);
 
-	virtual int GetInteger() const X_OVERRIDE{ return static_cast<int>(0.f); }
-	virtual float GetFloat() const X_OVERRIDE{ return 0.f; }
-	virtual const char *GetString() X_OVERRIDE
-	{
-		static char szReturnString[128];
-		sprintf(szReturnString, "%g %g %g", Value_.x,
-			Value_.y, Value_.z);
-		return szReturnString;
-	}
-	virtual const char* GetDefaultStr() const X_OVERRIDE
-	{
-		static char szReturnString[64];
-		sprintf(szReturnString, "%g %g %g", Default_.x,
-			Default_.y, Default_.z);
-		return szReturnString;
-	}
+	X_INLINE ~CVarVec3Ref() X_OVERRIDE;
+
+	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
+	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
+	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) X_OVERRIDE;
+	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
 
 	virtual void Set(const char* s) X_OVERRIDE;
+	X_INLINE virtual void Set(const float f) X_OVERRIDE;
+	X_INLINE virtual void Set(const int i) X_OVERRIDE;
 
-	virtual void Set(const float f)
-	{
-		if (Flags_.IsSet(VarFlag::READONLY))
-			return;
-		X_UNUSED(f);
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
+	X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-	virtual void Set(const int i)
-	{
-		if (Flags_.IsSet(VarFlag::READONLY))
-			return;
-		X_UNUSED(i);
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
+	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;
+	X_INLINE virtual float GetMin(void) X_OVERRIDE;
+	X_INLINE virtual float GetMax(void) X_OVERRIDE;
 
-	virtual void Reset() X_OVERRIDE{
-		Value_ = Default_;
-	}
-
-	virtual VarFlag::Enum GetType() X_OVERRIDE{ return VarFlag::VECTOR; }
-	virtual float GetMin(void) X_OVERRIDE{ return 0.f; }
-	virtual float GetMax(void) X_OVERRIDE{ return 1.f; }
-
-	const Vec3f& GetVal(void) const {
-		return Value_;
-	}
-	const Vec3f& GetDefaultVal(void) const {
-		return Default_;
-	}
+	X_INLINE const Vec3f& GetVal(void) const;
+	X_INLINE const Vec3f& GetDefaultVal(void) const;
 
 	static bool Vec3FromString(const char* pStr, Vec3f& out, bool Slient = true);
 
@@ -715,5 +314,7 @@ private:
 };
 
 X_NAMESPACE_END
+
+#include "ConsoleVariable.inl"
 
 #endif // _X_CONSOLE_VAR_X_H_

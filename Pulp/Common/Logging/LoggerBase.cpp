@@ -23,7 +23,7 @@ void LoggerBase::SetParent(ILog* pLog)
 /// ----------------------------------------------------------------------------------
 
 void LoggerBase::Log(const SourceInfo& sourceInfo, const char* channel,
-	size_t verbosity, const char* format, va_list args)
+	int verbosity, const char* format, va_list args)
 {
 	DoLog(sourceInfo, channel, verbosity, format, args);
 }
@@ -63,7 +63,7 @@ void LoggerBase::AssertVariable(const SourceInfo& sourceInfo,
 
 
 void LoggerBase::DoLog(const SourceInfo& sourceInfo, const char* channel,
-	size_t verbosity, const char* format, va_list args)
+	int verbosity, const char* format, va_list args)
 {
 	X_UNUSED(sourceInfo);
 	X_UNUSED(channel);

@@ -160,12 +160,15 @@ bool Level::Init(void)
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
 	ADD_CVAR_REF("lvl_usePortals", s_var_usePortals_, 1, 0, 1,
-		core::VarFlag::SYSTEM, "Use area portals when rendering the level.");
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
+		"Use area portals when rendering the level");
 	
 	ADD_CVAR_REF("lvl_drawAreaBounds", s_var_drawAreaBounds_, 0, 0, 4,
-		core::VarFlag::SYSTEM, "Draws bounding box around each level area. 1=visble 2=all 3=visble-fill 4=all-fill");
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Draws bounding box around each level area. 1=visble 2=all 3=visble-fill 4=all-fill");
 
-	ADD_CVAR_REF("lvl_drawPortals", s_var_drawPortals_, 1, 0, 4, core::VarFlag::SYSTEM,
+	ADD_CVAR_REF("lvl_drawPortals", s_var_drawPortals_, 1, 0, 4, 
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Draws the inter area portals. 0=off 1=solid 2=wire 3=solid_dt 4=wire_dt");
 
 	ADD_CVAR_REF("lvl_drawArea", s_var_drawArea_, -1, -1, level::MAP_MAX_AREAS,
@@ -443,6 +446,7 @@ void Level::DrawStatsBlock(void) const
 		str.appendFmt("VisibleAreas:%i\n", frameStats_.visibleAreas);
 		str.appendFmt("VisibleModels:%i\n", frameStats_.visibleModels);
 		str.appendFmt("VisibleVerts:%i\n", frameStats_.visibleVerts);
+		str.appendFmt("VisibleEnts:%i\n", frameStats_.visibleEnts);
 	
 		Color txt_col(0.7f, 0.7f, 0.7f, 1.f);
 		const float height = 100.f;
@@ -485,22 +489,39 @@ void Level::DrawArea(const Area& area)
 
 	SetAreaVisible(area.areaNum);
 
-	const FileAreaRefHdr& areaModelsHdr = modelRefs_.areaRefHdrs[area.areaNum];
-
 	size_t i, end;
-
-	i = areaModelsHdr.startIndex;
-	end = i + areaModelsHdr.num;
-
-//	X_LOG0("Level", "%i ent refs. start: %i num: %i", area.areaNum, 
-//		areaModelsHdr.startIndex, areaModelsHdr.num);
-
-	for (; i < end; i++)
 	{
-		uint32_t entId = modelRefs_.areaRefs[i].entId;
+		const FileAreaRefHdr& areaModelsHdr = modelRefs_.areaRefHdrs[area.areaNum];
 
-		level::StaticModel& model = staticModels_[entId - 1];
-		DrawStaticModel(model);
+		i = areaModelsHdr.startIndex;
+		end = i + areaModelsHdr.num;
+
+		//	X_LOG0("Level", "%i ent refs. start: %i num: %i", area.areaNum, 
+		//		areaModelsHdr.startIndex, areaModelsHdr.num);
+
+		for (; i < end; i++)
+		{
+			uint32_t entId = modelRefs_.areaRefs[i].entId;
+
+			level::StaticModel& model = staticModels_[entId - 1];
+			DrawStaticModel(model);
+		}
+	}
+	{
+		const FileAreaRefHdr& areaEntsHdr = entRefs_.areaRefHdrs[area.areaNum];
+
+		i = areaEntsHdr.startIndex;
+		end = i + areaEntsHdr.num;
+
+		for (; i < end; i++)
+		{
+			uint32_t entId = entRefs_.areaRefs[i].entId;
+
+			X_LOG0("lvl", "VisibleEnt: %i", entId);
+		}
+
+
+		frameStats_.visibleEnts += areaEntsHdr.num;
 	}
 
 	frameStats_.visibleVerts += area.pMesh->numVerts;

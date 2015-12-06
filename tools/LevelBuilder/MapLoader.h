@@ -9,6 +9,7 @@
 #include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
 #include <Memory\MemoryTaggingPolicies\NoMemoryTagging.h>
 #include <Memory\AllocationPolicies\PoolAllocator.h>
+#include <Memory\AllocationPolicies\GrowingPoolAllocator.h>
 #include <Memory\AllocationPolicies\MallocFreeAllocator.h>
 #include <Containers\Array.h>
 
@@ -31,11 +32,11 @@ X_NAMESPACE_BEGIN(mapfile)
 // i would of though that only take a ms.
 // something todo when i'm borded xD !
 
-#define MAP_LOADER_USE_POOL 0
+#define MAP_LOADER_USE_POOL 1
 
 typedef core::MemoryArena<
 #if MAP_LOADER_USE_POOL
-	core::PoolAllocator,
+	core::GrowingPoolAllocator,
 #else
 	core::MallocFreeAllocator,
 #endif
@@ -49,6 +50,7 @@ typedef core::MemoryArena<
 class XMapFile
 {
 	typedef core::Array<XMapEntity*> EntityArray;
+	typedef core::Array<Layer> LayerArray;
 
 public:
 	XMapFile();
@@ -56,27 +58,32 @@ public:
 
 	bool Parse(const char* pData, size_t length);
 
-	int	getNumEntities(void) const { return safe_static_cast<int, EntityArray::size_type>(entities_.size()); }
-	int	getNumBrushes(void) const { return numBrushes; }
-	int	getNumPatches(void) const { return numPatches; }
+	size_t getNumEntities(void) const { return entities_.size(); }
+	size_t getNumBrushes(void) const { return numBrushes_; }
+	size_t getNumPatches(void) const { return numPatches_; }
 
-	XMapEntity* getEntity(int i) const { return entities_[i]; }
+	XMapEntity* getEntity(size_t i) const { return entities_[i]; }
+
+private:
+	IgnoreList getIgnoreList(void) const;
+	bool isLayerIgnored(const core::string& layerName) const;
+	void ListLayers(void) const;
+
+	void PrimtPrimMemInfo(void) const;
 
 private:
 #if MAP_LOADER_USE_POOL
-	core::HeapArea			primPoolHeap_;
-	core::PoolAllocator		primPoolAllocator_;
+	core::GrowingPoolAllocator	primPoolAllocator_;
 #else
 	core::MallocFreeAllocator primAllocator_;
-#endif
+#endif // !MAP_LOADER_USE_POOL
 	PrimativePoolArena		primPoolArena_;
 
+	EntityArray	entities_;
+	LayerArray layers_;
 
-	core::Array<XMapEntity*>	entities_;
-//	std::vector<XMapEntity*>	entities;
-
-	int numBrushes;
-	int numPatches;
+	size_t numBrushes_;
+	size_t numPatches_;
 };
 
 X_NAMESPACE_END

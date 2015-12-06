@@ -50,9 +50,23 @@ XCore::XCore() :
 	dirWatcher_(g_coreArena),
 	hotReloadExtMap_(g_coreArena),
 
+#if X_DEBUG
+	hotReloadIgnores_(g_coreArena),
+#endif // !X_DEBUG
+
 	strAlloc_(1 << 24, core::VirtualMem::GetPageSize() * 2, 
 	StrArena::getMemoryAlignmentRequirement(8), 
-	StrArena::getMemoryOffsetRequirement() + 12)
+	StrArena::getMemoryOffsetRequirement() + 12),
+
+	numArgs_(0),
+
+	var_win_pos_x(nullptr),
+	var_win_pos_y(nullptr),
+	var_win_width(nullptr),
+	var_win_height(nullptr),
+	var_win_custom_Frame(nullptr),
+
+	var_profile(nullptr)
 {
 	X_ASSERT_NOT_NULL(g_coreArena);
 
@@ -106,6 +120,10 @@ void XCore::Release()
 void XCore::ShutDown()
 {
 	X_LOG0("Core", "Shutting Down");
+
+#if X_DEBUG
+	hotReloadIgnores_.free();
+#endif // !X_DEBUG
 
 	dirWatcher_.ShutDown();
 
@@ -166,7 +184,7 @@ void XCore::ShutDown()
 		core::SafeRelease(env_.p3DEngine);
 	}
 
-	if (env_.pConsole)
+	if (env_.pConsole && !initParams_.basicConsole())
 	{
 		env_.pConsole->SaveChangedVars();
 	}
@@ -255,7 +273,7 @@ void XCore::ShutDown()
 
 
 	for (size_t i = 0; i < moduleDLLHandles_.size(); i++) {
-		GoatFreeLibrary(moduleDLLHandles_[i]);
+		PotatoFreeLibrary(moduleDLLHandles_[i]);
 	}
 
 	moduleDLLHandles_.free();
@@ -297,6 +315,13 @@ void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 
 			g_coreVars.win_x_pos = rect.getX1();
 			g_coreVars.win_y_pos = rect.getY1();
+
+			if (var_win_pos_x) {
+				var_win_pos_x->SetModified();
+			}
+			if (var_win_pos_x) {
+				var_win_pos_y->SetModified();
+			}
 		}
 		break;
 		case CoreEvent::RESIZE:
@@ -305,6 +330,13 @@ void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 
 			g_coreVars.win_height = rect.getHeight();
 			g_coreVars.win_width = rect.getWidth();
+
+			if (var_win_width) {
+				var_win_width->SetModified();
+			}
+			if (var_win_height) {
+				var_win_height->SetModified();
+			}
 		}
 		break;
 		case CoreEvent::ACTIVATE:
@@ -383,18 +415,50 @@ bool XCore::Update()
 		core::StackString<128> title;
 		title.clear();
 		title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%i, %ims) Time: %I64u(x%g) UI: %I64u",
-			(int)fps,
-			(int)(frametime * 1000.f),
-			(__int64)time_.GetFrameStartTime(core::ITimer::Timer::GAME).GetMilliSeconds(),
+			static_cast<int>(fps),
+			static_cast<int>(frametime * 1000.f),
+			static_cast<__int64>(time_.GetFrameStartTime(core::ITimer::Timer::GAME).GetMilliSeconds()),
 			time_.GetTimeScale(),
-			(__int64)time_.GetFrameStartTime(core::ITimer::Timer::UI).GetMilliSeconds()
-			);
+			static_cast<__int64>(time_.GetFrameStartTime(core::ITimer::Timer::UI).GetMilliSeconds())
+		);
 
 		pWindow_->SetTitle(title.c_str());
 	}
 #endif
 
 	return true;
+}
+
+
+const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
+{
+	X_ASSERT_NOT_NULL(pVarName);
+
+	if (numArgs_ == 0) {
+		return nullptr;
+	}
+
+	size_t i;
+	for (i = 0; i < numArgs_; i++)
+	{
+		const CmdArg& arg = args_[i];
+
+		if (arg.getArgc() >= 3)
+		{
+			const wchar_t* pCmd = arg.getArgv(0);
+			if (core::strUtil::IsEqualCaseInsen(pCmd, L"set"))
+			{
+				const wchar_t* pName = arg.getArgv(1);
+				if (core::strUtil::IsEqual(pName, pVarName))
+				{
+					const wchar_t* pValue = arg.getArgv(2);
+					return pValue;
+				}
+			}
+		}
+	}
+
+	return nullptr;
 }
 
 
@@ -454,7 +518,12 @@ bool XCore::OnFileChange(core::XDirectoryWatcher::Action::Enum action,
 			else
 			{
 #if X_DEBUG
-				X_WARNING("hotReload", "file extension '%s' has no reload handle.", ext);
+				// before we log a warning check to see if it's in the hotreload ignore list.
+				if (hotRelodIgnoreList::invalid_index == 
+					hotReloadIgnores_.find(core::string(ext)))
+				{
+					X_WARNING("hotReload", "file extension '%s' has no reload handle.", ext);
+				}
 #endif // !X_DEBUG
 			}
 		}
@@ -501,6 +570,14 @@ void Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd)
 	pCore->HotReloadListExts();
 }
 
+void Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd)
+{
+	X_UNUSED(Cmd);
+
+	XCore* pCore = static_cast<XCore*>(gEnv->pCore);
+
+	pCore->ListProgramArgs();
+}
 
 void XCore::HotReloadListExts(void)
 {
@@ -516,6 +593,35 @@ void XCore::HotReloadListExts(void)
 	}
 
 	X_LOG0("HotReload", "----- ^8Registerd Extensions End^7 -----");
+}
+
+void XCore::ListProgramArgs(void)
+{
+	size_t i, num = numArgs_;
+
+	X_LOG0("AppArgs", "------ ^8Program Args(%i)^7 ------", num);
+
+	core::StackString<1024 + 128> merged;
+
+	for (i = 0; i < num; i++)
+	{
+		const auto& arg = args_[i];
+		size_t j, argsNum = arg.getArgc();
+
+		merged.appendFmt("(%i) ", i);
+
+		for (j = 0; j < argsNum; j++)
+		{
+			merged.appendFmt("^1%ls^7", arg.getArgv(j));
+			if ((j+1) < argsNum) {
+				merged.append(" -> ");
+			}
+		}
+
+		X_LOG0("AppArgs", "%s", merged.c_str());
+	}
+
+	X_LOG0("AppArgs", "------ ^8Program Args End^7 -----");
 }
 
 X_NAMESPACE_BEGIN(core)

@@ -75,11 +75,11 @@ void XFont::release()
 void XFont::Init()
 {
 	// add font commands
-	ADD_COMMAND("font_list_loaded", Command_ListFonts, core::VarFlag::SYSTEM, 
+	ADD_COMMAND("fontListLoaded", Command_ListFonts, core::VarFlag::SYSTEM, 
 		"Lists all the loaded fonts");
 
-	ADD_COMMAND("font_dump_for_name", Command_DumpForName, core::VarFlag::SYSTEM,
-		"Dumps the font texture for a given name");
+	ADD_COMMAND("fontDumpForMame", Command_DumpForName, core::VarFlag::SYSTEM,
+		"Dumps the font texture for a given font name");
 
 	gEnv->pHotReload->addfileType(this, "font");
 }
