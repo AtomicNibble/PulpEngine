@@ -205,7 +205,7 @@ void CmdArgs<BUF_SIZE, wchar_t>::tokenize(const wchar_t* pText)
 			temp.begin(),
 			tokenized_ + totalLen,
 			sizeof(tokenized_) - (totalLen * 2) // bytes left in buffer.
-			);
+		);
 
 		totalLen += (len + 1);
 	}
