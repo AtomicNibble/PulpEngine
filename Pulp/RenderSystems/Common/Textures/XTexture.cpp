@@ -753,6 +753,11 @@ void XTexture::init(void)
 	ADD_CVAR_REF("image_autoConvert", s_Var_SaveToCI, 0, 0, 1, core::VarFlag::SYSTEM, 
 		"Save unconverted images as ci automatically");
 
+	ADD_COMMAND("imageReloadAll", Command_ReloadTextures, core::VarFlag::SYSTEM, 
+		"Reload all textures");
+	ADD_COMMAND("imageReload", Command_ReloadTexture, core::VarFlag::SYSTEM,
+		"Reload a textures <name>");
+
 	s_pTextures = X_NEW_ALIGNED(render::XRenderResourceContainer, g_rendererArena, 
 		"TexturesRes", X_ALIGN_OF(render::XRenderResourceContainer))(g_rendererArena, 4096);
 
@@ -947,6 +952,26 @@ bool XTexture::reload(void)
 		return false;
 
 	return true; // such lies.
+}
+
+
+void XTexture::Command_ReloadTextures(core::IConsoleCmdArgs* Cmd)
+{
+	X_UNUSED(Cmd);
+	// TODO
+}
+
+
+void XTexture::Command_ReloadTexture(core::IConsoleCmdArgs* Cmd)
+{
+	if (Cmd->GetArgCount() < 2) {
+		X_ERROR("Texture","imageReload <filename>");
+		return;
+	}
+
+	const char* pName = Cmd->GetArg(1);
+
+	XTexture::reloadForName(pName);
 }
 
 

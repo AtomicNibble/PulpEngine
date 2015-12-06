@@ -18,6 +18,12 @@
 
 // #include <vector> // temp
 
+
+X_NAMESPACE_DECLARE(core,
+struct IConsoleCmdArgs;
+)
+
+
 X_NAMESPACE_BEGIN(texture)
 
 
@@ -147,6 +153,10 @@ public:
 		shader::TextureAddressMode::Enum addressW);
 
 	bool setFilterMode(shader::FilterMode::Enum filter);
+
+private:
+	static void Command_ReloadTextures(core::IConsoleCmdArgs* Cmd);
+	static void Command_ReloadTexture(core::IConsoleCmdArgs* Cmd);
 
 
 private:
