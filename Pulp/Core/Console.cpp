@@ -640,7 +640,9 @@ XConsole::XConsole() :
 	repeatEventInterval_ = 0.025f;
 	repeatEventInitialDelay_ = 0.5f;
 
+#if X_ENABLE_CONFIG_HOT_RELOAD
 	ignoreHotReload_ = false;
+#endif // !X_ENABLE_CONFIG_HOT_RELOAD
 }
 
 XConsole::~XConsole()
@@ -807,7 +809,9 @@ void XConsole::SaveChangedVars(void)
 	mode.Set(fileMode::WRITE);
 	mode.Set(fileMode::RECREATE);
 
+#if X_ENABLE_CONFIG_HOT_RELOAD
 	ignoreHotReload_ = true;
+#endif // !X_ENABLE_CONFIG_HOT_RELOAD
 
 	if (file.openFile("config//user_config.cfg", mode))
 	{
