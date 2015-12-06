@@ -13,7 +13,7 @@ typedef core::MemoryArena<
 	core::MallocFreeAllocator,
 	core::SingleThreadPolicy,
 	core::SimpleBoundsChecking,
-#if X_SUPER
+#if X_SUPER || 1
 	core::SimpleMemoryTracking,
 	core::NoMemoryTagging
 #else 
