@@ -9,6 +9,7 @@
   <ItemDefinitionGroup>
     <ClCompile>
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+	  <ProgramDataBaseFileName>$(SolutionDir)..\..\\build\$(PlatformName)\Debug\engine_$(ProjectName).pdb</ProgramDataBaseFileName>
       <WarningLevel>EnableAllWarnings</WarningLevel>
       <TreatWarningAsError>true</TreatWarningAsError>
       <ExceptionHandling>false</ExceptionHandling>
