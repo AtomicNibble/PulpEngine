@@ -165,3 +165,4 @@ $RECYCLE.BIN/
 /game_folder/**/*.ut_dat
 /game_folder/compiled_images
 /game_folder/core_assets/cmdHistory.txt
+user_config.cfg
