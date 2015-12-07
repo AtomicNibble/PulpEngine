@@ -1,0 +1,138 @@
+==== Potato Engine Style Guide v0.1 ====
+
+LeadDev: WinCat
+CodeBitch: Tom Crowley
+
+Doc Status: INCOMPLETE
+
+
+Intro:
+
+This document is for me to write down how I'm currently 'doing things' in regards to style.
+My personal style guide changes all the time but I always try to be consistent within a project.
+By writing it down it's in black and white I'm less likley to drift over the years.
+
+Updating Code:
+
+Any code that does not follow this style guide, should be updated.
+
+Goals:
+
+1. Consistent
+2. Help reduce bugs
+3. Readability
+
+------------------------------------------------------------------------------------------------------------------------------
+
+Source Naming:
+
+    Header, inline and source files should have the same name.
+    Improves readability
+
+Header File Guards:
+
+    EVery header file should contain a #pragma once and a #ifndef guard.
+
+Forward declarations:
+
+    Forward declarations of types is allowed, to aid in reduced compile times.
+
+Inline Functions:
+
+    Use common sense when deciding if a function should be inlined or not.
+
+    Inline functions should not be in the header file but a .inl file.
+    Helps to reduce clutter in the header file, making the definition more easy to read.
+
+Namespaces:
+
+    All namespsaces must be declared using the X_NAMESPACE_BEGIN macro, so that they are children of the global engine namespace.
+
+Unnamed Namespaces:
+
+    Unmaned namespaces are encouraged.
+    Any function that is not a member and declared + defined in a source file should be placed in a unnamed namespace.
+
+Classes
+
+    Constructors:
+
+        No heay work should be performed in constructors.
+
+    Single argument constructors:
+
+        constructors taking a single argument in should be declared explicit.
+
+    Delegating constructors:
+
+        delegating construcors are allowed.
+
+    Copy / Move:
+
+        Support copy + move if it makes sense for the type.
+        If not disable the copy + move operators.
+
+    Virtual functions:
+
+        all virtual functions must have either X_ABSTRACT, X_OVERRIDE OR X_FINAL.
+        classes that inherit interfaces must have a X_OVERRIDE on the deconstructor.
+        Helps catch interfaces without virtual constructors.
+
+    Member variable naming:
+
+        none-static:
+                None static members variables should all have trailing underscores.
+
+        static:
+                All static members should have a leading s_ prefix including a trailing underscore.
+
+    Templated members:
+
+            Add typedefs for templated members.
+            Eg: typedef core::Array<MyType> MyTypeArr;
+
+
+Struct vs Classes:
+
+    Use structs for 'data' structs are allowed to have members and constructors.
+    Anything compelex / exposing logic should be a class.
+
+Interfaces:
+
+    All interfaces must have captial I prefix in name.
+
+Exceptions:
+
+    Eexceptions are disabled.
+
+Run-time Type Information (RTTI)
+
+    RTTI is disable, so use of dynamic_cast<T> is not allowed.
+
+Casting:
+
+    All casts should be c++ casts.
+    All c casts should be replaced.
+
+Const:
+
+    Use const whenever it makes sense.
+
+Null Pointers:
+
+    favor nullptr over NULL.
+    Using NULL in win32 api calls is about the only place it's allowed.
+
+sizeof:
+
+    Use sizeof(varName) not sizeof(Type) reduces chances of bugs when a variables type is changed.
+
+Switches:
+
+    Switches that do not need a deault should have a default case in debug mode with a asset.
+    In release mode use the X_NO_SWITCH_DEFAULT
+
+Unused paramaters:
+
+    Used params are marked with X_UNUSED(paramName)
+
