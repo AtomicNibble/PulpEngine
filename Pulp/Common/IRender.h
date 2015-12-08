@@ -29,27 +29,20 @@ X_NAMESPACE_BEGIN(render)
 struct IRenderAux;
 
 
-struct CullMode
-{
-	enum Enum
-	{
-		NONE,
-		FRONT,
-		BACK
-	};
-};
+X_DECLARE_ENUM(CullMode)(
+	NONE,
+	FRONT,
+	BACK
+);
+
+X_DECLARE_ENUM(PrimitiveTypePublic)(
+	TriangleList,
+	TriangleStrip,
+	LineList,
+	LineStrip
+);
 
 
-struct PrimitiveTypePublic
-{
-	enum Enum
-	{
-		TriangleList,
-		TriangleStrip,
-		LineList,
-		LineStrip
-	};
-};
 
 struct StencilOperation
 {
@@ -65,6 +58,7 @@ struct StencilOperation
 		DECR = 8
 	};
 };
+
 
 #if 0
 X_DECLARE_FLAGS8(StencilOperation)( KEEP, ZERO, REPLACE, INCR_SAT, DECR_SAT, INVERT, INCR, DECR );
