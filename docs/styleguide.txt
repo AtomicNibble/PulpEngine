@@ -59,11 +59,26 @@ Classes
 
         No heay work should be performed in constructors.
 
+    Layout:
+
+        try to place methods above all fields.
+        Avoid mixing and matching.
+
+    Interfaces:
+
+        Wrap interfaces overrides with commets of the interface name before and after.
+
+        Example:
+
+                // IInterface
+                virtual void foo() X_OVERIDE;
+                // ~IInterface
+
     Single argument constructors:
 
-        constructors taking a single argument in should be declared explicit.
+        constructors taking a single argument should be declared explicit.
 
-    Delegating constructors:
+    Delegating constructors: (c++11)
 
         delegating construcors are allowed.
 
@@ -71,6 +86,8 @@ Classes
 
         Support copy + move if it makes sense for the type.
         If not disable the copy + move operators.
+
+        Using the = default AND = disabled are allowed.
 
     Virtual functions:
 
@@ -85,6 +102,11 @@ Classes
 
         static:
                 All static members should have a leading s_ prefix including a trailing underscore.
+
+        Pointers:
+
+            Any pointer types static, or none static members should be prefixed with a lower case p.
+            Type prefixing is not required for any other type.
 
     Templated members:
 
@@ -136,3 +158,39 @@ Unused paramaters:
 
     Used params are marked with X_UNUSED(paramName)
 
+Pass by refrence:
+
+    If passing by refrence allmost always should it be const.
+    if a param is passed by none const ref place the word 'out' in the param name and have it last.
+
+Enums:
+
+    Enums should be declared using the following macros:
+        X_DECLARE_ENUM          <- 32bit
+        X_DECLARE_ENUM8        <- 8bit
+
+        So that the additional functionality of ENUM_COUNT and to string is automatically added.
+
+        Exceptions to the rule are enums that require specific numbering that is not 0-n
+
+Flags:
+
+    Flags should be declared used the following macros:
+        X_DECLARE_FLAGS     <- 32ibt
+        X_DECLARE_FLAGS8   <- 8bit
+
+        Exceptions to the rule are flags that are more complete, having things like masks to allow
+        for none power of 2 flags to be store in the flag.
+
+Data types that are written to file:
+
+    Any structure or type that is written out to a file should have a X_ENSURE_SIZE macro.
+
+    This macro checks the size of the type is the same in 32 and 64 bit builds and also will prevent compile
+    when a data type that is written to file size is mistakleny changed.
+
+Macros:
+
+    When ever using #if, #ifndef etc allwyas place the condition in a comment after the #endif with a leading !
+
+    Eg: #if X_EXAMPLE .... #endinf // !X_EXAMPLE
