@@ -82,12 +82,12 @@ JobThread::~JobThread()
 
 }
 
-void JobThread::init(uint32_t idx, JobQue* ques)
+void JobThread::init(uint32_t idx, JobQue* pQues)
 {
 	threadIdx_ = idx;
 
 	for (size_t i = 0; i < JobPriority::ENUM_COUNT; i++) {
-		ques_[i] = &ques[i];
+		ques_[i] = &pQues[i];
 	}
 
 	X_ASSERT_NOT_NULL(gEnv->pTimer);

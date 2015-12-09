@@ -58,7 +58,7 @@ public:
 	JobThread();
 	~JobThread();
 
-	void init(uint32_t idx, JobQue* ques);
+	void init(uint32_t idx, JobQue* pQues);
 
 	void SignalWork(void);
 	void Stop(void);
