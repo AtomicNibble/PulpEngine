@@ -241,7 +241,7 @@ bool JobSystem::StartUp(void)
 	}
 
 	// get the num HW threads
-	ICore* pCore = (ICore*)gEnv->pCore;
+	ICore* pCore = gEnv->pCore;
 	CpuInfo* pCpu = pCore->GetCPUInfo();
 
 	int32_t numCores = pCpu->GetCoreCount();
