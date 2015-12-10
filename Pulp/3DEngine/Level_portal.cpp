@@ -13,12 +13,178 @@
 
 X_NAMESPACE_BEGIN(level)
 
+
+void Level::FloodVisibleAreas(void)
+{
+	if (s_var_drawArea_ == -1)
+	{
+		const XCamera& cam = gEnv->pRender->GetCamera();
+		const Vec3f camPos = cam.getPosition();
+
+		int32_t camArea = -1;
+		outsideWorld_ = !IsPointInAnyArea(camPos, camArea);
+
+
+		// if we are outside world draw all.
+		// or usePortals is off.
+		if (camArea < 0 || s_var_usePortals_ == 0)
+		{
+			// add all areas
+			AreaArr::ConstIterator it = areas_.begin();
+			for (; it != areas_.end(); ++it)
+			{
+				SetAreaVisible(it->areaNum);
+			}
+		}
+		else
+		{
+			SetAreaVisible(camArea);
+
+			gEnv->pJobSys;
+
+			if (s_var_drawCurrentAreaOnly_ != 1)
+			{
+				if (!AreaHasPortals(camArea)) {
+					return;
+				}
+
+				XWinding w;
+
+				// build up the cams planes.
+				const Planef camPlanes[FrustumPlane::ENUM_COUNT] = {
+					-cam.getFrustumPlane(FrustumPlane::LEFT),
+					-cam.getFrustumPlane(FrustumPlane::RIGHT),
+					-cam.getFrustumPlane(FrustumPlane::TOP),
+					-cam.getFrustumPlane(FrustumPlane::BOTTOM),
+					-cam.getFrustumPlane(FrustumPlane::FAR),
+					-cam.getFrustumPlane(FrustumPlane::NEAR)
+				};
+
+				PortalStack	ps;
+				size_t i, j;
+
+				for (i = 0; i < FrustumPlane::ENUM_COUNT; i++) {
+					ps.portalPlanes.append(camPlanes[i]);
+				}
+
+
+				// work out what other areas we can see from this one.
+				const Area& area = areas_[camArea];
+
+				Area::AreaPortalArr::ConstIterator apIt = area.portals.begin();
+				for (; apIt != area.portals.end(); ++apIt)
+				{
+					const AreaPortal& portal = *apIt;
+
+					// make sure this portal is facing away from the view
+					float dis = portal.plane.distance(camPos);
+					if (dis < -0.1f) {
+						continue;
+					}
+
+
+					if (dis < 1.0f) {
+						// go through this portal
+						PortalStack	newStack;
+						newStack = ps;
+						newStack.pPortal = &portal;
+						newStack.pNext = &ps;
+						FloodViewThroughArea_r(camPos, portal.areaTo, &newStack);
+						continue;
+					}
+
+					// work out if the portal is visible, by clipping the portals winding with that of the cam planes.
+					w = (*portal.pWinding);
+
+					for (j = 0; j < FrustumPlane::ENUM_COUNT; j++) {
+						if (!w.clipInPlace(-camPlanes[j], 0)) {
+							break;
+						}
+					}
+					if (!w.getNumPoints()) {
+						continue;	// portal not visible
+					}
+
+					// go through this portal
+					PortalStack	newStack;
+					newStack.pPortal = &portal;
+					newStack.pNext = &ps;
+
+					Vec3f v1, v2;
+
+					size_t addPlanes = w.getNumPoints();
+					if (addPlanes > PortalStack::MAX_PORTAL_PLANES) {
+						addPlanes = PortalStack::MAX_PORTAL_PLANES;
+					}
+
+					for (i = 0; i < addPlanes; i++)
+					{
+						j = i + 1;
+						if (j == w.getNumPoints()) {
+							j = 0;
+						}
+
+						v1 = camPos - w[i].asVec3();
+						v2 = camPos - w[j].asVec3();
+
+						Vec3f normal = v2.cross(v1);
+						normal.normalize();
+
+						// if it is degenerate, skip the plane
+						if (normal.length() < 0.01f) {
+							continue;
+						}
+
+						Planef& plane = newStack.portalPlanes.AddOne();
+						plane.setNormal(normal);
+						plane.setDistance(normal * camPos);
+					}
+
+					// the last stack plane is the portal plane
+					newStack.portalPlanes.append(portal.plane);
+
+					FloodViewThroughArea_r(camPos, portal.areaTo, &newStack);
+
+				}
+			}
+		}
+	}
+	else if (s_var_drawArea_ < safe_static_cast<int, size_t>(areas_.size()))
+	{
+		// force draw just this area even if outside world.
+		SetAreaVisible(s_var_drawArea_);
+	}
+}
+
+
+void Level::DrawVisibleAreas(void)
+{
+	AreaArr::ConstIterator it = areas_.begin();
+
+	for (; it != areas_.end(); ++it)
+	{
+		const Area& area = *it;
+
+		if (IsAreaVisible(area)) {
+			DrawArea(area);
+		}
+	}
+}
+
+
+// ==================================================================
+
 size_t Level::NumPortalsInArea(int32_t areaNum) const
 {
 	X_ASSERT((areaNum >= 0 && areaNum < safe_static_cast<int32_t, size_t>(NumAreas())),
 		"areaNum out of range")(areaNum, NumAreas());
 
 	return areas_[areaNum].portals.size();
+}
+
+bool Level::AreaHasPortals(int32_t areaNum) const
+{
+	return NumPortalsInArea(areaNum) > 0;
 }
 
 
@@ -30,9 +196,8 @@ void Level::FlowViewThroughPortals(const int32_t areaNum, const Vec3f origin,
 
 	// copy the planes.
 	for (i = 0; i < numPlanes; i++) {
-		ps.portalPlanes[i] = pPlanes[i];
+		ps.portalPlanes.append(pPlanes[i]);
 	}
-	ps.numPortalPlanes = numPlanes;
 
 	if (areaNum < 0)
 	{
@@ -60,7 +225,7 @@ void Level::FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum,
 	float dis;
 	size_t j;
 
-	Area& area = areas_[areaNum];
+	const Area& area = areas_[areaNum];
 
 	// add this area.
 	AddAreaRefs(areaNum, ps);
@@ -89,9 +254,6 @@ void Level::FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum,
 			continue;	// already in stack
 		}
 
-	//	X_LOG0_EVERY_N(24, "Level", "distance from area %i plane: %f",
-	//		portal.areaTo, dis);
-
 		// if we are very close to the portal surface, don't bother clipping
 		// it, which tends to give epsilon problems that make the area vanish
 		if (dis < 1.0f)
@@ -107,14 +269,8 @@ void Level::FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum,
 		// clip the portal winding to all of the planes
 		w = *portal.pWinding;
 
-		Vec3f points[8];
-
-		for (j = 0; j < ps->numPortalPlanes; j++)
+		for (j = 0; j < ps->portalPlanes.size(); j++)
 		{
-			for (size_t x = 0; x < w.getNumPoints(); x++) {
-				points[x] = w[x].asVec3();
-			}
-
 			if (!w.clipInPlace(-ps->portalPlanes[j], 0))
 			{
 				break;
@@ -127,6 +283,7 @@ void Level::FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum,
 		// go through this portal
 		newStack.pPortal = &portal;
 		newStack.pNext = ps;
+		newStack.portalPlanes.clear();
 
 		size_t i, addPlanes;
 		Vec3f	v1, v2;
@@ -136,7 +293,6 @@ void Level::FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum,
 			addPlanes = PortalStack::MAX_PORTAL_PLANES;
 		}
 
-		newStack.numPortalPlanes = 0;
 		for (i = 0; i < addPlanes; i++)
 		{
 			j = i + 1;
@@ -155,15 +311,13 @@ void Level::FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum,
 				continue;
 			}
 
-			newStack.portalPlanes[newStack.numPortalPlanes].setNormal(normal);
-			newStack.portalPlanes[newStack.numPortalPlanes].setDistance((normal * origin));
-
-			newStack.numPortalPlanes++;
+			Planef& plane = newStack.portalPlanes.AddOne();
+			plane.setNormal(normal);
+			plane.setDistance(normal * origin);
 		}
 
 		// the last stack plane is the portal plane
-		newStack.portalPlanes[newStack.numPortalPlanes] = portal.plane;
-		newStack.numPortalPlanes++;
+		newStack.portalPlanes.append(portal.plane);
 
 		FloodViewThroughArea_r(origin, portal.areaTo, &newStack);
 	}
@@ -177,14 +331,15 @@ void Level::AddAreaRefs(int32_t areaNum, const PortalStack* ps)
 	X_ASSERT((areaNum >= 0 && areaNum < safe_static_cast<int32_t, size_t>(NumAreas())),
 		"areaNum out of range")(areaNum, NumAreas());
 
-	areas_[areaNum].frameID = frameID_;
+//	areas_[areaNum].frameID = frameID_;
+	SetAreaVisible(areaNum);
 }
 
 void Level::DrawPortalDebug(void) const
 {
 	using namespace render;
 
-	if (s_var_drawPortals_ > 0)
+	if (s_var_drawPortals_ > 0 && !outsideWorld_)
 	{
 		IRenderAux* pAux = gEnv->pRender->GetIRenderAuxGeo();
 		XAuxGeomRenderFlags flags = AuxGeom_Defaults::Def3DRenderflags;
@@ -217,7 +372,7 @@ void Level::DrawPortalDebug(void) const
 		AreaArr::ConstIterator areaIt = areas_.begin();
 		for (; areaIt != areas_.end(); ++areaIt)
 		{
-			if (areaIt->frameID != frameID_) {
+			if (!IsAreaVisible(*areaIt)) {
 				continue;
 			}
 
@@ -227,7 +382,7 @@ void Level::DrawPortalDebug(void) const
 				const AreaPortal& portal = *apIt;
 
 #if 1
-				if (areas_[portal.areaTo].frameID == frameID_)
+				if (IsAreaVisible(areas_[portal.areaTo]))
 				{
 					pAux->drawTriangle(portal.debugVerts.ptr(),
 						static_cast<uint32_t>(portal.debugVerts.size()), Colorf(0.f, 1.f, 0.f, 0.35f));

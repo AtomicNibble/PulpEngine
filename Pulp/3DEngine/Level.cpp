@@ -78,7 +78,6 @@ PortalStack::PortalStack()
 {
 	pPortal = nullptr;
 	pNext = nullptr;
-	numPortalPlanes = 0;
 }
 
 // --------------------------------
@@ -128,9 +127,8 @@ entRefs_(g_3dEngineArena),
 modelRefs_(g_3dEngineArena),
 staticModels_(g_3dEngineArena)
 {
-	frameID_ = 0;
-
 	canRender_ = false;
+	outsideWorld_ = true;
 
 	pFileData_ = nullptr;
 	pAsyncLoadData_ = nullptr;
@@ -193,8 +191,6 @@ void Level::ShutDown(void)
 void Level::update(void)
 {
 	frameStats_.clear();
-
-	frameID_++;
 
 	// are we trying to read?
 	if (pAsyncLoadData_ && pAsyncLoadData_->waitingForIo_)
@@ -270,102 +266,22 @@ bool Level::render(void)
 {
 	X_PROFILE_BEGIN("Level render", core::ProfileSubSys::ENGINE3D);
 
-	if (!canRender())
+	if (!canRender()) {
 		return false;
-
-	clearVisableAreaFlags();
-
-	// work out what area we are in.
-	const XCamera& cam = gEnv->pRender->GetCamera();
-	Vec3f camPos = cam.getPosition();
-
-	// build up the cams planes.
-	const Planef camPlanes[FrustumPlane::ENUM_COUNT] = {
-		-cam.getFrustumPlane(FrustumPlane::LEFT),
-		-cam.getFrustumPlane(FrustumPlane::RIGHT),
-		-cam.getFrustumPlane(FrustumPlane::TOP),
-		-cam.getFrustumPlane(FrustumPlane::BOTTOM),
-		-cam.getFrustumPlane(FrustumPlane::FAR),
-		-cam.getFrustumPlane(FrustumPlane::NEAR)
-	};
-
-	int32_t camArea = -1;
-	if (!IsPointInAnyArea(camPos, camArea))
-	{
-		X_LOG0_EVERY_N(24, "Level", "Outside of world");
-	}
-	else
-	{
-		X_LOG0_EVERY_N(24, "Level", "In area: %i", camArea);
-
-#if 0
-		const FileAreaRefHdr& areaEnts = areaModelRefHdrs_[camArea];
-		const FileAreaRefHdr& multiAreaEnts = areaModelMultiRefHdrs_[0];
-		size_t numMulti = 0;
-		for (size_t j = 0; j < multiAreaEnts.num; j++)
-		{
-			if (core::bitUtil::IsBitSet(areaMultiModelRefs_[multiAreaEnts.startIndex + j].flags,
-				camArea))
-			{
-				numMulti++;
-			}
-		}
-
-		X_LOG0_EVERY_N(24, "Level", "ents In area: %i multi: %i", 
-			areaEnts.num, numMulti);
-#endif
 	}
 
 
-	AreaArr::ConstIterator it = areas_.begin();
-	if (s_var_drawArea_ == -1)
-	{
-		// if we are outside world draw all.
-		// or usePortals is off.
-		if (camArea == -1 || s_var_usePortals_ == 0)
-		{
-			for (; it != areas_.end(); ++it)
-			{
-				DrawArea(*it); 
-			}
-		}
-		else
-		{
-			if (s_var_drawCurrentAreaOnly_)
-			{
-				// draw just this area.
-				DrawArea(areas_[camArea]);  
-			}
-			else
-			{
-				// we find out all the visable area's.
-				// that we can see via portals.
-				FlowViewThroughPortals(camArea, camPos, 
-					6, camPlanes);
+	FloodVisibleAreas();
 
-				// for now just render any we touched.
-				for (const auto& a : areas_)
-				{
-					if (a.frameID == frameID_)
-					{
-						DrawArea(a); 
-					}
-				}
-			}
-		}
-	}
-	else if (s_var_drawArea_ < safe_static_cast<int, size_t>(areas_.size()))
-	{
-		// force draw just this area even if outside world.
-		DrawArea(areas_[s_var_drawArea_]);
-	}
+	DrawVisibleAreas();
 
-	// we know all the visible areas now.
 	DrawMultiAreaModels();
-
 	DrawAreaBounds();
 	DrawPortalDebug();
 	DrawStatsBlock();
+
+	clearVisableAreaFlags();
+
 	return true;
 }
 
@@ -388,7 +304,7 @@ void Level::DrawAreaBounds(void)
 		{
 			for (const auto& a : areas_)
 			{
-				if (a.frameID == frameID_)
+				if (IsAreaVisible(a))
 				{
 					pAux->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), false, color);
 				}
@@ -415,7 +331,7 @@ void Level::DrawAreaBounds(void)
 			{
 				for (const auto& a : areas_)
 				{
-					if (a.frameID == frameID_)
+					if (IsAreaVisible(a))
 					{
 						pAux->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), true, color);
 					}
@@ -624,14 +540,29 @@ void Level::clearVisableAreaFlags()
 	core::zero_object(visibleAreaFlags_);
 }
 
-void Level::SetAreaVisible(uint32_t area)
+void Level::SetAreaVisible(int32_t areaNum)
 {
-	size_t index = area / 32;
-	uint32_t bit = area % 32;
+	size_t index = areaNum / 32;
+	uint32_t bit = areaNum % 32;
 
 	visibleAreaFlags_[index] = core::bitUtil::SetBit(
 		visibleAreaFlags_[index], bit);
 }
+
+bool Level::IsAreaVisible(int32_t areaNum) const
+{
+	size_t index = areaNum / 32;
+	uint32_t bit = areaNum % 32;
+
+	return core::bitUtil::IsBitSet(
+		visibleAreaFlags_[index], bit);
+}
+
+bool Level::IsAreaVisible(const Area& area) const
+{
+	return IsAreaVisible(area.areaNum);
+}
+
 
 size_t Level::NumAreas(void) const
 {
@@ -710,19 +641,6 @@ size_t Level::BoundsInAreas(const AABB& bounds, int32_t* pAreasOut, size_t maxAr
 	BoundsInAreas_r(0, bounds, numAreas, pAreasOut, maxAreas);
 
 	return numAreas;
-}
-
-bool Level::IsAreaVisible(int32_t areaIdx) const
-{
-	X_ASSERT((areaIdx >= 0 && areaIdx < safe_static_cast<int, size_t>(areas_.size())),
-		"Area index is out of bounds.")(areaIdx, areas_.size());
-
-	return IsAreaVisible(areas_[areaIdx]);
-}
-
-bool Level::IsAreaVisible(const Area& area) const
-{
-	return area.frameID == frameID_;
 }
 
 void Level::BoundsInAreas_r(int32_t nodeNum, const AABB& bounds, size_t& numAreasOut,

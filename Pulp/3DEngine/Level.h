@@ -10,6 +10,7 @@
 #include <array>
 
 #include "String\GrowingStringTable.h"
+#include "Threading\JobList.h"
 
 X_NAMESPACE_DECLARE(model,
 struct MeshHeader;
@@ -100,9 +101,6 @@ public:
 	model::IRenderMesh* pRenderMesh;
 	// portals leading out this area.
 	AreaPortalArr portals;
-
-	// used to check if it's visable this frame.
-	size_t frameID;
 };
 
 struct PortalStack 
@@ -116,8 +114,7 @@ public:
 	const struct PortalStack* pNext;
 
 	Rectf rect;
-	size_t numPortalPlanes;
-	Planef portalPlanes[MAX_PORTAL_PLANES + 1];
+	core::FixedArray<Planef, MAX_PORTAL_PLANES + 1> portalPlanes;
 };
 
 
@@ -166,17 +163,23 @@ public:
 	void DrawAreaBounds(void);
 	void DrawStatsBlock(void) const;
 
+private:
+	void FloodVisibleAreas(void);
+	void DrawVisibleAreas(void);
+
+
 public:
 	// util
 	size_t NumAreas(void) const;
 	size_t NumPortalsInArea(int32_t areaNum) const;
+	bool AreaHasPortals(int32_t areaNum) const;
 
 	bool IsPointInAnyArea(const Vec3f& pos) const;
 	bool IsPointInAnyArea(const Vec3f& pos, int32_t& areaOut) const;
 
 	size_t BoundsInAreas(const AABB& bounds, int32_t* pAreasOut, size_t maxAreas) const;
 
-	bool IsAreaVisible(int32_t areaIdx) const;
+	bool IsAreaVisible(int32_t areaNum) const;
 	bool IsAreaVisible(const Area& area) const;
 
 private:
@@ -207,8 +210,11 @@ private:
 
 private:
 	void clearVisableAreaFlags(void);
-	void SetAreaVisible(uint32_t area);
+	void SetAreaVisible(int32_t area);
 	
+private:
+//	core::JobList::JobList jobList_;
+
 private:
 	core::GrowingStringTable<256, 16, 4, uint32_t> stringTable_;
 
@@ -222,11 +228,9 @@ private:
 	StaticModelsArr staticModels_;
 
 private:
-
 	FrameStats frameStats_;
 
 private:
-	size_t frameID_; // inc'd each frame.
 
 	// cleared each frame.
 	uint32_t visibleAreaFlags_[MAP_MAX_MULTI_REF_LISTS];
@@ -236,7 +240,8 @@ private:
 	uint8_t* pFileData_;
 
 	bool canRender_;
-	bool _pad[3];
+	bool outsideWorld_;
+	bool _pad[2];
 
 private:
 	core::Path<char> path_;
