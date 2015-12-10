@@ -20,7 +20,7 @@
 X_NAMESPACE_BEGIN(core)
 
 
-static const uint32_t HW_THREAD_MAX = 6; // max even if hardware supports more.
+static const uint32_t HW_THREAD_MAX = 32; // max even if hardware supports more.
 static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
 
 
@@ -58,7 +58,7 @@ public:
 	JobThread();
 	~JobThread();
 
-	void init(uint32_t idx, JobQue* ques);
+	void init(uint32_t idx, JobQue* pQues);
 
 	void SignalWork(void);
 	void Stop(void);
