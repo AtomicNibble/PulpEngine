@@ -1033,6 +1033,12 @@
     <ClInclude Include="String\CmdArgs.inl">
       <Filter>Headers\String</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\Fiber.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\win32\Fiber.h">
+      <Filter>Headers\Threading\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1565,6 +1571,9 @@
     </ClCompile>
     <ClCompile Include="Math\XHalf.cpp">
       <Filter>SourceFiles\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\win32\Fiber.cpp">
+      <Filter>SourceFiles\Threading\win32</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

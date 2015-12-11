@@ -272,6 +272,7 @@
     <ClInclude Include="Threading\AtomicInt.h" />
     <ClInclude Include="Threading\ConditionVariable.h" />
     <ClInclude Include="Threading\CriticalSection.h" />
+    <ClInclude Include="Threading\Fiber.h" />
     <ClInclude Include="Threading\JobList.h" />
     <ClInclude Include="Threading\JobSystem.h" />
     <ClInclude Include="Threading\Semaphore.h" />
@@ -281,6 +282,7 @@
     <ClInclude Include="Threading\ThreadLocalStorage.h" />
     <ClInclude Include="Threading\win32\ConditionVariable.h" />
     <ClInclude Include="Threading\win32\CriticalSection.h" />
+    <ClInclude Include="Threading\win32\Fiber.h" />
     <ClInclude Include="Threading\win32\Semaphore.h" />
     <ClInclude Include="Threading\win32\Signal.h" />
     <ClInclude Include="Threading\win32\Thread.h" />
@@ -713,6 +715,7 @@
     <ClCompile Include="Threading\JobSystem.cpp" />
     <ClCompile Include="Threading\win32\ConditionVariable.cpp" />
     <ClCompile Include="Threading\win32\CriticalSection.cpp" />
+    <ClCompile Include="Threading\win32\Fiber.cpp" />
     <ClCompile Include="Threading\win32\Signal.cpp" />
     <ClCompile Include="Threading\win32\Thread.cpp" />
     <ClCompile Include="Time\CompressedStamps.cpp" />
