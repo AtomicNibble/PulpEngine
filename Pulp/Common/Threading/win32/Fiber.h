@@ -15,7 +15,7 @@ namespace Fiber
 	void ConvertFiberToThread(void);
 	FiberHandle CreateFiber(size_t stackCommitSize, size_t stackReserveSize,
 		FiberStartRoutine startRoutine, void* pArg);
-	inline void DeleteFiber(FiberHandle fiber);
+	void DeleteFiber(FiberHandle fiber);
 
 	void SwitchToFiber(FiberHandle destFiber);
 	FiberHandle GetCurrentFiber(void);
