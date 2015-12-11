@@ -304,6 +304,9 @@
     <ClCompile Include="UT_LZMA.cpp">
       <Filter>Source Files\tests\Compression</Filter>
     </ClCompile>
+    <ClCompile Include="UT_Fiber.cpp">
+      <Filter>Source Files\tests\Threading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">
