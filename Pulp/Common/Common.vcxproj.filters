@@ -1039,6 +1039,12 @@
     <ClInclude Include="Threading\win32\Fiber.h">
       <Filter>Headers\Threading\win32</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\win32\FiberScheduler.h">
+      <Filter>Headers\Threading\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Threading\FiberScheduler.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1573,6 +1579,9 @@
       <Filter>SourceFiles\Math</Filter>
     </ClCompile>
     <ClCompile Include="Threading\win32\Fiber.cpp">
+      <Filter>SourceFiles\Threading\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\win32\FiberScheduler.cpp">
       <Filter>SourceFiles\Threading\win32</Filter>
     </ClCompile>
   </ItemGroup>
