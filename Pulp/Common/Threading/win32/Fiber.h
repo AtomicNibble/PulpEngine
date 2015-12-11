@@ -10,7 +10,7 @@ namespace Fiber
 	typedef void* FiberHandle;
 
 
-	FiberHandle ConvertThreadToFiber(void);
+	FiberHandle ConvertThreadToFiber(void* pArg);
 
 	void ConvertFiberToThread(void);
 	FiberHandle CreateFiber(size_t stackCommitSize, size_t stackReserveSize,
@@ -19,6 +19,7 @@ namespace Fiber
 
 	void SwitchToFiber(FiberHandle destFiber);
 	FiberHandle GetCurrentFiber(void);
+
 
 } // namespadce Fiber
 

@@ -8,20 +8,33 @@ X_NAMESPACE_BEGIN(core)
 namespace Fiber
 {
 
-	FiberHandle ConvertThreadToFiber(void)
+	FiberHandle ConvertThreadToFiber(void* pArg)
 	{
-		return ::ConvertThreadToFiberEx(nullptr, FIBER_FLAG_FLOAT_SWITCH);
+		FiberHandle fiber = ::ConvertThreadToFiberEx(pArg, FIBER_FLAG_FLOAT_SWITCH);
+
+		if (!fiber)
+		{
+			lastError::Description Dsc;
+			X_ERROR("Fiber", "Failed to create fiber. Err: %s", lastError::ToString(Dsc));
+		}
+
+		return fiber;
+
 	}
 
 	void ConvertFiberToThread(void)
 	{
-		::ConvertFiberToThread();
+		if (!::ConvertFiberToThread())
+		{
+			lastError::Description Dsc;
+			X_ERROR("Fiber", "Failed to convert fiber to thread. Err: %s", lastError::ToString(Dsc));
+		}
 	}
 
 	FiberHandle CreateFiber(size_t stackCommitSize, size_t stackReserveSize, 
 		FiberStartRoutine startRoutine, void* pArg)
 	{
-		FiberHandle fiber =::CreateFiberEx(stackCommitSize, stackReserveSize,
+		FiberHandle fiber = ::CreateFiberEx(stackCommitSize, stackReserveSize,
 			FIBER_FLAG_FLOAT_SWITCH, startRoutine, pArg);
 
 		if (!fiber)
