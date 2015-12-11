@@ -61,7 +61,10 @@ namespace Fiber
 		return ::GetCurrentFiber();
 	}
 
-
+	void* GetFiberData(void)
+	{
+		return ::GetFiberData();
+	}
 
 } // namespadce Fiber
 

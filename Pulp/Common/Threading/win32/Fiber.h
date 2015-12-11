@@ -20,6 +20,7 @@ namespace Fiber
 	void SwitchToFiber(FiberHandle destFiber);
 	FiberHandle GetCurrentFiber(void);
 
+	void* GetFiberData(void);
 
 } // namespadce Fiber
 
