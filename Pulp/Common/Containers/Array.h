@@ -19,6 +19,8 @@ public:
 	typedef T* Iterator;
 	typedef const T* ConstIterator;
 	typedef size_t size_type;
+	typedef T& Reference;
+	typedef const T& ConstReference;
 
 	enum : size_type {
 		invalid_index = static_cast<size_type>(-1)
@@ -102,6 +104,8 @@ public:
 	inline ConstIterator begin(void) const;
 	inline Iterator end(void);
 	inline ConstIterator end(void) const;
+	inline Reference back(void);
+	inline ConstReference back(void) const;
 
 	// ISerialize
 	virtual bool SSave(XFile* pFile) const X_FINAL;

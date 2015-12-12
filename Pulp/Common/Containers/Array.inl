@@ -527,6 +527,19 @@ inline typename Array<T>::ConstIterator Array<T>::end(void) const
 }
 
 
+template<typename T>
+inline typename Array<T>::Reference Array<T>::back(void)
+{
+	return (*(end() - 1));
+}
+
+template<typename T>
+inline typename Array<T>::ConstReference Array<T>::back(void) const
+{
+	return (*(end() - 1));
+}
+
+
 // -----------------------------------------------
 
 // ISerialize
