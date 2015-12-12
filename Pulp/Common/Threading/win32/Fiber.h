@@ -9,6 +9,8 @@ namespace Fiber
 	typedef void (__stdcall *FiberStartRoutine)(void* arg);
 	typedef void* FiberHandle;
 
+	constexpr FiberHandle InvalidFiberHandle = nullptr;
+
 
 	FiberHandle ConvertThreadToFiber(void* pArg);
 
