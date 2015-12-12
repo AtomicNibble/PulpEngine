@@ -58,7 +58,8 @@ TEST(Threading, Fiber)
 
 	Fiber::ConvertFiberToThread();
 
-	for (size_t i = 0; i < NUM_FIBERS; i++)
+	// don't delete last fiber as it got deleted by ConvertFiberToThread above.
+	for (size_t i = 0; i < NUM_FIBERS - 1; i++)
 	{
 		Fiber::DeleteFiber(g_fibers[i]);
 	}
