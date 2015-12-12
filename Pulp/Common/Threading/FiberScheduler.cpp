@@ -193,6 +193,11 @@ namespace Fiber
 		counterWaitingFibers_.free();
 	}
 
+	size_t Scheduler::NumThreads(void) const
+	{
+		return numThreads_;
+	}
+
 
 	void Scheduler::AddTask(Task task, core::AtomicInt** pCounterOut, JobPriority::Enum priority)
 	{
@@ -300,7 +305,7 @@ namespace Fiber
 		uint32_t i;
 		for (i = 0; i < FIBER_POOL_SIZE; i++)
 		{
-			Fiber::FiberHandle newFiber = Fiber::CreateFiber(FIBER_STACK_SIZE, FIBER_STACK_SIZE, FiberStart,
+			Fiber::FiberHandle newFiber = Fiber::CreateFiber(FIBER_STACK_SIZE, FIBER_STACK_RESERVE_SIZE, FiberStart,
 				reinterpret_cast<void*>(this));
 
 			fibers_.Add(newFiber);
@@ -325,10 +330,10 @@ namespace Fiber
 		threadToFiberIndex_.append(std::make_pair(threadId, fiberSwitchingFibers_.size()));
 
 		fiberSwitchingFibers_.append(
-			Fiber::CreateFiber(FIBER_STACK_SIZE, FIBER_STACK_SIZE, FiberSwitchStart, this)
+			Fiber::CreateFiber(FIBER_STACK_SIZE, FIBER_STACK_RESERVE_SIZE, FiberSwitchStart, this)
 		);
 		counterWaitingFibers_.append(
-			Fiber::CreateFiber(FIBER_STACK_SIZE, FIBER_STACK_SIZE, CounterWaitStart, this)
+			Fiber::CreateFiber(FIBER_STACK_SIZE, FIBER_STACK_RESERVE_SIZE, CounterWaitStart, this)
 		);
 
 		return true;

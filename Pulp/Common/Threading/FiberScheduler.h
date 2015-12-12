@@ -107,7 +107,8 @@ namespace Fiber
 		static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
 		static const uint32_t FIBER_POOL_SIZE = 64;
 
-		static const size_t FIBER_STACK_SIZE = 2048;
+		static const size_t FIBER_STACK_SIZE = 32768; // 0 = binary default
+		static const size_t FIBER_STACK_RESERVE_SIZE = 0; // 0 = binary default
 		static const size_t MAX_TASKS_PER_QUE = 1024 * 10;
 		static const size_t MAX_COUNTERS = 1024;
 
@@ -127,6 +128,8 @@ namespace Fiber
 
 		bool StartUp(void);
 		void ShutDown(void);
+
+		size_t NumThreads(void) const;
 
 		void AddTask(Task task, core::AtomicInt** pCounterOut, JobPriority::Enum priority = JobPriority::NORMAL);
 		void AddTasks(Task* pTasks, size_t numTasks, core::AtomicInt** pCounterOut, JobPriority::Enum priority = JobPriority::NORMAL);
