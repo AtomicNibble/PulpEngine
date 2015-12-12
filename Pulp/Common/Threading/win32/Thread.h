@@ -84,6 +84,8 @@ public:
 
 	bool SetThreadAffinity(const AffinityFlags flags);
 
+	uint32_t GetID(void) const;
+
 	X_INLINE void setData(void* pData) {
 		pData_ = pData;
 	}
@@ -118,6 +120,8 @@ public:
 	void Start(void);	 // runs the thread
 	void Stop(void); // tells the thread to stop dose not wait.
 	void Join(void); // waits till thread has finished.
+
+	uint32_t GetID(void) const;
 
 protected:
 	virtual ~ThreadAbstract();

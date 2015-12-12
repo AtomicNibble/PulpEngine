@@ -102,6 +102,11 @@ bool Thread::SetThreadAffinity(const AffinityFlags flags)
 	return true;
 }
 
+uint32_t Thread::GetID(void) const
+{
+	return ::GetThreadId(handle_);
+}
+
 // static
 void Thread::Sleep(uint32_t milliSeconds)
 {
@@ -164,6 +169,10 @@ void ThreadAbstract::Join(void)
 	thread_.Join();
 }
 
+uint32_t ThreadAbstract::GetID(void) const
+{
+	return thread_.GetID();
+}
 
 Thread::ReturnValue ThreadAbstract::ThreadFunc(const Thread& thread)
 {
