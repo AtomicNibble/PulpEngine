@@ -53,8 +53,13 @@ namespace Fiber
 	class ThreadQue
 	{
 	public:
+		ThreadQue();
 		ThreadQue(core::MemoryArenaBase* arena, size_t size);
 		~ThreadQue();
+
+		void setArena(core::MemoryArenaBase* arena, size_t size);
+		void setArena(core::MemoryArenaBase* arena);
+
 
 		void Add(const T item);
 		void Add(T* pItems, size_t numItems);
@@ -65,6 +70,7 @@ namespace Fiber
 		void Unlock(void);
 		void Add_nolock(const T item);
 
+		bool isNotEmpty(void) const;
 		size_t numItems(void) const;
 
 	protected:
@@ -87,16 +93,16 @@ namespace Fiber
 		core::Signal signal_;
 	};
 
+	X_DECLARE_ENUM(JobPriority)(HIGH, NORMAL, NONE);
+
 
 	class Scheduler
 	{
-		static const size_t FIBER_STACK_SIZE = 2048;
-		static const size_t MAX_TASKS = 1024 * 10;
-
 		static const uint32_t HW_THREAD_MAX = 32; // max even if hardware supports more.
 		static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
-
+		static const size_t FIBER_STACK_SIZE = 2048;
 		static const uint32_t FIBER_POOL_SIZE = 64;
+		static const size_t MAX_TASKS_PER_QUE = 1024 * 10;
 
 	public:
 		Scheduler();
@@ -105,8 +111,8 @@ namespace Fiber
 		bool StartUp(void);
 		void ShutDown(void);
 
-		void AddTask(Task task, core::AtomicInt** pCounterOut);
-		void AddTasks(Task* pTasks, size_t numTasks, core::AtomicInt** pCounterOut);
+		void AddTask(Task task, core::AtomicInt** pCounterOut, JobPriority::Enum priority = JobPriority::NORMAL);
+		void AddTasks(Task* pTasks, size_t numTasks, core::AtomicInt** pCounterOut, JobPriority::Enum priority = JobPriority::NORMAL);
 
 		void WaitForCounter(core::AtomicInt* pCounter, int32_t value);
 		void WaitForCounterAndFree(core::AtomicInt* pCounter, int32_t value);
@@ -142,7 +148,7 @@ namespace Fiber
 		core::AtomicInt stop_;
 		core::AtomicInt activeWorkers_;
 
-		TaskQue tasks_;
+		TaskQue tasks_[JobPriority::ENUM_COUNT];
 
 		WaitingTaskArr waitingTasks_;
 		Spinlock waitingTaskLock_;

@@ -70,9 +70,8 @@ namespace Fiber
 		threadToFiberIndex_(gEnv->pArena),
 		fiberSwitchingFibers_(gEnv->pArena),
 		counterWaitingFibers_(gEnv->pArena),
-
-		tasks_(gEnv->pArena, MAX_TASKS),
-		fibers_(gEnv->pArena, FIBER_POOL_SIZE)
+		fibers_(gEnv->pArena, FIBER_POOL_SIZE),
+		pAtomicArean_(nullptr)
 	{
 
 	}
@@ -89,6 +88,13 @@ namespace Fiber
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 		X_ASSERT_NOT_NULL(gEnv->pCore);
 		X_ASSERT_NOT_NULL(gEnv->pConsole);
+
+		pAtomicArean_ = gEnv->pArena;
+
+		for (size_t i = 0; i < JobPriority::ENUM_COUNT; i++) {
+			tasks_[i].setArena(gEnv->pArena, MAX_TASKS_PER_QUE);
+		}
+
 
 		// get the num HW threads
 		ICore* pCore = gEnv->pCore;
@@ -108,7 +114,7 @@ namespace Fiber
 			return false;
 		}
 
-return true;
+		return true;
 	}
 
 	void Scheduler::ShutDown(void)
@@ -178,7 +184,7 @@ return true;
 	}
 
 
-	void Scheduler::AddTask(Task task, core::AtomicInt** pCounterOut)
+	void Scheduler::AddTask(Task task, core::AtomicInt** pCounterOut, JobPriority::Enum priority)
 	{
 		if (*pCounterOut == nullptr) {
 			*pCounterOut = X_NEW(core::AtomicInt, pAtomicArean_, "Fiber::Counter");
@@ -188,11 +194,11 @@ return true;
 
 
 		TaskBundle bundle = { task, *pCounterOut };
-		tasks_.Add(bundle);
+		tasks_[priority].Add(bundle);
 	}
 
 
-	void Scheduler::AddTasks(Task* pTasks, size_t numTasks, core::AtomicInt** pCounterOut)
+	void Scheduler::AddTasks(Task* pTasks, size_t numTasks, core::AtomicInt** pCounterOut, JobPriority::Enum priority)
 	{
 		if (*pCounterOut == nullptr) {
 			*pCounterOut = X_NEW(core::AtomicInt, pAtomicArean_, "Fiber::Counter");
@@ -204,21 +210,22 @@ return true;
 			return;
 		}
 
-		tasks_.Lock();
+		tasks_[priority].Lock();
 
 
-		if ((tasks_.numItems() + numTasks) > MAX_TASKS) {
-			X_ERROR("Scheduler", "Failed to add %i tasks, not enough space in task que", numTasks);
+		if ((tasks_[priority].numItems() + numTasks) > MAX_TASKS_PER_QUE) {
+			X_ERROR("Scheduler", "Failed to add %i tasks, not enough space in task que: %s", 
+				numTasks, JobPriority::ToString(priority));
 			return;
 		}
 
 		for (size_t i = 0; i < numTasks; i++)
 		{
 			TaskBundle bundle = { pTasks[i], *pCounterOut };
-			tasks_.Add_nolock(bundle);
+			tasks_[priority].Add_nolock(bundle);
 		}
 
-		tasks_.Unlock();
+		tasks_[priority].Unlock();
 	}
 
 	void Scheduler::WaitForCounter(core::AtomicInt* pCounter, int32_t value)
@@ -337,7 +344,19 @@ return true;
 
 	bool Scheduler::GetTask(TaskBundle& task)
 	{
-		return tasks_.tryPop(task);
+		if (tasks_[JobPriority::HIGH].isNotEmpty()) {
+			return tasks_[JobPriority::HIGH].tryPop(task);
+		}
+
+		if (tasks_[JobPriority::NORMAL].isNotEmpty()) {
+			return tasks_[JobPriority::NORMAL].tryPop(task);
+		}
+
+		if (tasks_[JobPriority::NONE].isNotEmpty()) {
+			return tasks_[JobPriority::NONE].tryPop(task);
+		}
+
+		return false;
 	}
 
 	void Scheduler::SwitchFibers(FiberHandle fiberToSwitchTo)

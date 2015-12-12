@@ -6,6 +6,14 @@ namespace Fiber
 {
 
 	template<typename T>
+	ThreadQue<T>::ThreadQue() :
+		list_(nullptr)
+	{
+
+	}
+
+
+	template<typename T>
 	ThreadQue<T>::ThreadQue(core::MemoryArenaBase* arena, size_t size) :
 		list_(arena, size)
 	{
@@ -16,6 +24,19 @@ namespace Fiber
 	ThreadQue<T>::~ThreadQue()
 	{
 
+	}
+
+	template<typename T>
+	void ThreadQue<T>::setArena(core::MemoryArenaBase* arena, size_t size)
+	{
+		list_.setArena(arena);
+		list_.reserve(size);
+	}
+
+	template<typename T>
+	void ThreadQue<T>::setArena(core::MemoryArenaBase* arena)
+	{
+		list_.setArena(arena);
 	}
 
 	template<typename T>
@@ -78,6 +99,11 @@ namespace Fiber
 		return list_.size();
 	}
 
+	template<typename T>
+	bool ThreadQue<T>::isNotEmpty(void) const
+	{
+		return !list_.isEmpty();
+	}
 
 	// =============================
 
