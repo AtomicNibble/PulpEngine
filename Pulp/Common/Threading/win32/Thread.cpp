@@ -114,6 +114,11 @@ void Thread::Yield(void)
 	SwitchToThread();
 }
 
+uint32_t Thread::GetCurrentID(void)
+{
+	return ::GetCurrentThreadId();
+}
+
 uint32_t __stdcall Thread::ThreadFunction_(void* threadInstance)
 {
 	Thread* pThis = reinterpret_cast<Thread*>(threadInstance);

@@ -94,6 +94,7 @@ public:
 
 	static void Sleep(uint32_t milliSeconds);
 	static void Yield(void);
+	static uint32_t GetCurrentID(void);
 
 private:
 	static uint32_t __stdcall ThreadFunction_(void* threadInstance);
