@@ -14,7 +14,7 @@
 #include "Threading\ThreadLocalStorage.h"
 
 #include "Fiber.h"
-#include <atomic>
+
 X_NAMESPACE_BEGIN(core)
 
 namespace Fiber
