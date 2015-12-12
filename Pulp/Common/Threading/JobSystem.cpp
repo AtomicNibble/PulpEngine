@@ -308,7 +308,7 @@ bool JobSystem::StartThreads(void)
 	for (i = 0; i < numThreads_; i++)
 	{
 		core::StackString<64> name;
-		name.appendFmt("Worker_%i", i);
+		name.appendFmt("JobSystem::Worker_%i", i);
 		threads_[i].init(i, ques_);
 		threads_[i].Create(name.c_str()); // default stack size.
 		threads_[i].Start();
