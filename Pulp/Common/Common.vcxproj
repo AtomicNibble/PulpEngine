@@ -399,6 +399,7 @@
     <None Include="String\StrRef.inl" />
     <None Include="Threading\Atomic.inl" />
     <None Include="Threading\AtomicInt.inl" />
+    <None Include="Threading\FiberScheduler.inl" />
     <None Include="Threading\Spinlock.inl" />
     <None Include="Threading\win32\CriticalSection.inl" />
     <None Include="Threading\win32\Semaphore.inl" />

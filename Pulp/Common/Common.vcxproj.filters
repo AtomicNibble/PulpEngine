@@ -1305,6 +1305,9 @@
     <None Include="String\Lexer.inl">
       <Filter>Headers\String</Filter>
     </None>
+    <None Include="Threading\FiberScheduler.inl">
+      <Filter>Headers\Threading</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">

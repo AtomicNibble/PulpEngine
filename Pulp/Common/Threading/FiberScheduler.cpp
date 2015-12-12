@@ -23,6 +23,19 @@ namespace Fiber
 	} // namespace
 
 
+	Task::Task()
+	{
+		Function = nullptr;
+		pArgData = nullptr;
+	}
+
+	Task::Task(TaskFunction::Pointer Function, void* pArgData) :
+		Function(Function),
+		pArgData(pArgData)
+	{
+
+	}
+
 	// =============================
 
 	TaskBundle::TaskBundle()
