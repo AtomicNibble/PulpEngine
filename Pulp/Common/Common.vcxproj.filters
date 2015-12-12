@@ -1039,9 +1039,6 @@
     <ClInclude Include="Threading\win32\Fiber.h">
       <Filter>Headers\Threading\win32</Filter>
     </ClInclude>
-    <ClInclude Include="Threading\win32\FiberScheduler.h">
-      <Filter>Headers\Threading\win32</Filter>
-    </ClInclude>
     <ClInclude Include="Threading\FiberScheduler.h">
       <Filter>Headers\Threading</Filter>
     </ClInclude>
@@ -1581,8 +1578,8 @@
     <ClCompile Include="Threading\win32\Fiber.cpp">
       <Filter>SourceFiles\Threading\win32</Filter>
     </ClCompile>
-    <ClCompile Include="Threading\win32\FiberScheduler.cpp">
-      <Filter>SourceFiles\Threading\win32</Filter>
+    <ClCompile Include="Threading\FiberScheduler.cpp">
+      <Filter>SourceFiles\Threading</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
