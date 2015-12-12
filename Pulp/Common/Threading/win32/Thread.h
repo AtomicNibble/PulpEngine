@@ -6,6 +6,8 @@
 
 #include <Traits/FunctionTraits.h>
 
+#include <String\StackString.h>
+
 X_NAMESPACE_BEGIN(core)
 
 /// \code
@@ -97,6 +99,7 @@ public:
 	static void Sleep(uint32_t milliSeconds);
 	static void Yield(void);
 	static uint32_t GetCurrentID(void);
+	static void SetName(uint32_t threadId, const char* name);
 
 private:
 	static uint32_t __stdcall ThreadFunction_(void* threadInstance);
@@ -106,6 +109,8 @@ private:
 	Function::Pointer function_;
 	State::Enum state_;
 	void* pData_;
+
+	core::StackString<64> name_;
 };
 
 

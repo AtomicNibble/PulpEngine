@@ -5,6 +5,40 @@
 
 X_NAMESPACE_BEGIN(core)
 
+namespace
+{
+
+	const DWORD MS_VC_EXCEPTION = 0x406D1388;
+
+	X_PACK_PUSH(8)
+	struct THREADNAME_INFO
+	{
+		DWORD dwType;		// Must be 0x1000.
+		LPCSTR szName;		// Pointer to name (in user addr space).
+		DWORD dwThreadID;	// Thread ID (-1=caller thread).
+		DWORD dwFlags;		// Reserved for future use, must be zero.
+	};
+	X_PACK_POP;
+
+	void SetThreadName(DWORD dwThreadID, const char* threadName)
+	{
+		THREADNAME_INFO info;
+		info.dwType = 0x1000;
+		info.szName = threadName;
+		info.dwThreadID = dwThreadID;
+		info.dwFlags = 0;
+
+		__try
+		{
+			RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
+		}
+		__except (EXCEPTION_EXECUTE_HANDLER)
+		{
+
+		}
+	}
+}
+
 
 Thread::Thread(void) :
 handle_(NULL),
@@ -22,10 +56,10 @@ Thread::~Thread(void)
 
 void Thread::Create(const char* name, uint32_t stackSize )
 {
-	X_UNUSED(name);
-
 	handle_ = CreateThread(NULL, stackSize, (LPTHREAD_START_ROUTINE)ThreadFunction_, 
 					this, CREATE_SUSPENDED, (LPDWORD)&id_);
+
+	name_.set(name);
 
 	if (handle_ == NULL)
 	{
@@ -53,6 +87,8 @@ void Thread::Start(Function::Pointer function)
 		lastError::Description Dsc;
 		X_ERROR("Thread", "failed to start thread. Erorr: %s", lastError::ToString(Dsc));
 	}
+
+	SetThreadName(GetID(), name_.c_str());
 }
 
 void Thread::Stop(void)
@@ -123,6 +159,12 @@ uint32_t Thread::GetCurrentID(void)
 {
 	return ::GetCurrentThreadId();
 }
+
+void Thread::SetName(uint32_t threadId, const char* name)
+{
+	SetThreadName(threadId, name);
+}
+
 
 uint32_t __stdcall Thread::ThreadFunction_(void* threadInstance)
 {
