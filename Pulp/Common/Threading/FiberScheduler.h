@@ -9,6 +9,11 @@
 #include "Threading\Signal.h"
 #include "Threading\ThreadLocalStorage.h"
 
+#include <Memory\ThreadPolicies\MultiThreadPolicy.h>
+#include <Memory\AllocationPolicies\PoolAllocator.h>
+#include <Memory\HeapArea.h>
+
+
 #include "Fiber.h"
 	
 X_NAMESPACE_BEGIN(core)
@@ -100,9 +105,21 @@ namespace Fiber
 	{
 		static const uint32_t HW_THREAD_MAX = 32; // max even if hardware supports more.
 		static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
-		static const size_t FIBER_STACK_SIZE = 2048;
 		static const uint32_t FIBER_POOL_SIZE = 64;
+
+		static const size_t FIBER_STACK_SIZE = 2048;
 		static const size_t MAX_TASKS_PER_QUE = 1024 * 10;
+		static const size_t MAX_COUNTERS = 1024;
+
+		static const size_t COUNTER_ALLOCATION_SIZE = sizeof(core::AtomicInt);
+		static const size_t FCOUNTER_ALLOCATION_ALIGN = X_ALIGN_OF(core::AtomicInt);
+
+		typedef core::MemoryArena<
+			core::PoolAllocator,
+			core::MultiThreadPolicy<core::Spinlock>,
+			core::SimpleBoundsChecking,
+			core::SimpleMemoryTracking,
+			core::SimpleMemoryTagging> CounterArena;
 
 	public:
 		Scheduler();
@@ -168,7 +185,9 @@ namespace Fiber
 		uint32_t numThreads_;
 
 	private:
-		core::MemoryArenaBase* pAtomicArean_;
+		core::HeapArea      counterPoolHeap_;
+		core::PoolAllocator counterPoolAllocator_;
+		CounterArena		counterPoolArena_;
 	};
 
 

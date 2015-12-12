@@ -2,9 +2,9 @@
 #include "FiberScheduler.h"
 
 #include "Util\Cpu.h"
-
 #include "String\StackString.h"
 
+#include <Memory\VirtualMem.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -70,8 +70,19 @@ namespace Fiber
 		threadToFiberIndex_(gEnv->pArena),
 		fiberSwitchingFibers_(gEnv->pArena),
 		counterWaitingFibers_(gEnv->pArena),
-		fibers_(gEnv->pArena, FIBER_POOL_SIZE),
-		pAtomicArean_(nullptr)
+		fibers_(gEnv->pArena, FIBER_POOL_SIZE),		
+		counterPoolHeap_(
+			bitUtil::RoundUpToMultiple<size_t>(
+				CounterArena::getMemoryRequirement(COUNTER_ALLOCATION_SIZE) * MAX_COUNTERS,
+				VirtualMem::GetPageSize()
+			)
+		),
+		counterPoolAllocator_(counterPoolHeap_.start(), counterPoolHeap_.end(),
+			CounterArena::getMemoryRequirement(COUNTER_ALLOCATION_SIZE),
+			CounterArena::getMemoryAlignmentRequirement(FCOUNTER_ALLOCATION_ALIGN),
+			CounterArena::getMemoryOffsetRequirement()
+		),
+		counterPoolArena_(&counterPoolAllocator_, "CounterPool")
 	{
 
 	}
@@ -89,7 +100,6 @@ namespace Fiber
 		X_ASSERT_NOT_NULL(gEnv->pCore);
 		X_ASSERT_NOT_NULL(gEnv->pConsole);
 
-		pAtomicArean_ = gEnv->pArena;
 
 		for (size_t i = 0; i < JobPriority::ENUM_COUNT; i++) {
 			tasks_[i].setArena(gEnv->pArena, MAX_TASKS_PER_QUE);
@@ -187,7 +197,7 @@ namespace Fiber
 	void Scheduler::AddTask(Task task, core::AtomicInt** pCounterOut, JobPriority::Enum priority)
 	{
 		if (*pCounterOut == nullptr) {
-			*pCounterOut = X_NEW(core::AtomicInt, pAtomicArean_, "Fiber::Counter");
+			*pCounterOut = X_NEW(core::AtomicInt, &counterPoolArena_, "Fiber::Counter");
 		}
 
 		(**pCounterOut) = 1;
@@ -201,7 +211,7 @@ namespace Fiber
 	void Scheduler::AddTasks(Task* pTasks, size_t numTasks, core::AtomicInt** pCounterOut, JobPriority::Enum priority)
 	{
 		if (*pCounterOut == nullptr) {
-			*pCounterOut = X_NEW(core::AtomicInt, pAtomicArean_, "Fiber::Counter");
+			*pCounterOut = X_NEW(core::AtomicInt, &counterPoolArena_, "Fiber::Counter");
 		}
 
 		(**pCounterOut) = safe_static_cast<int32_t, size_t>(numTasks);
@@ -278,7 +288,7 @@ namespace Fiber
 
 	void Scheduler::FreeCounter(core::AtomicInt* pCounter)
 	{
-		X_DELETE(pCounter, pAtomicArean_);
+		X_DELETE(pCounter, &counterPoolArena_);
 	}
 
 	bool Scheduler::CreateFibers(void)
