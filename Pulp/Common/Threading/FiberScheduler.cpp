@@ -108,7 +108,7 @@ namespace Fiber
 			return false;
 		}
 
-		return true;
+return true;
 	}
 
 	void Scheduler::ShutDown(void)
@@ -205,6 +205,12 @@ namespace Fiber
 		}
 
 		tasks_.Lock();
+
+
+		if ((tasks_.numItems() + numTasks) > MAX_TASKS) {
+			X_ERROR("Scheduler", "Failed to add %i tasks, not enough space in task que", numTasks);
+			return;
+		}
 
 		for (size_t i = 0; i < numTasks; i++)
 		{
