@@ -1,10 +1,6 @@
 #pragma once
 
-#include "Util\ReferenceCounted.h"
-#include "Util\ReferenceCountedOwner.h"
-
 #include "Containers\Fifo.h"
-#include "Containers\FixedFifo.h"
 #include "Containers\Array.h"
 
 #include "Traits\FunctionTraits.h"
@@ -114,6 +110,7 @@ namespace Fiber
 
 		void WaitForCounter(core::AtomicInt* pCounter, int32_t value);
 		void WaitForCounterAndFree(core::AtomicInt* pCounter, int32_t value);
+		void FreeCounter(core::AtomicInt* pCounter);
 
 	private:
 		bool CreateFibers(void);
@@ -163,6 +160,9 @@ namespace Fiber
 		Fiber::FiberHandle mainThreadFiber_;
 		uint32_t startUpThreadId_;
 		uint32_t numThreads_;
+
+	private:
+		core::MemoryArenaBase* pAtomicArean_;
 	};
 
 

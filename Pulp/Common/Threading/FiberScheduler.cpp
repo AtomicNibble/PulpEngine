@@ -181,7 +181,7 @@ return true;
 	void Scheduler::AddTask(Task task, core::AtomicInt** pCounterOut)
 	{
 		if (*pCounterOut == nullptr) {
-			*pCounterOut = X_NEW(core::AtomicInt, gEnv->pArena, "Fiber::Counter");
+			*pCounterOut = X_NEW(core::AtomicInt, pAtomicArean_, "Fiber::Counter");
 		}
 
 		(**pCounterOut) = 1;
@@ -195,7 +195,7 @@ return true;
 	void Scheduler::AddTasks(Task* pTasks, size_t numTasks, core::AtomicInt** pCounterOut)
 	{
 		if (*pCounterOut == nullptr) {
-			*pCounterOut = X_NEW(core::AtomicInt, gEnv->pArena, "Fiber::Counter");
+			*pCounterOut = X_NEW(core::AtomicInt, pAtomicArean_, "Fiber::Counter");
 		}
 
 		(**pCounterOut) = safe_static_cast<int32_t, size_t>(numTasks);
@@ -266,9 +266,13 @@ return true;
 		FiberHandle switchFiber = GetWaitFiberForThread();
 		Fiber::SwitchToFiber(switchFiber);
 
-		X_DELETE(pCounter, gEnv->pArena);
+		FreeCounter(pCounter);
 	}
 
+	void Scheduler::FreeCounter(core::AtomicInt* pCounter)
+	{
+		X_DELETE(pCounter, pAtomicArean_);
+	}
 
 	bool Scheduler::CreateFibers(void)
 	{
