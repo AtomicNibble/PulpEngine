@@ -32,8 +32,8 @@ namespace Fiber
 		void* pArgData;
 	};
 
-	typedef ReferenceCountedInstance<core::AtomicInt> RefCountedAtomicInt;
-	typedef core::ReferenceCountedOwner<RefCountedAtomicInt> RefCountedAtomicIntOwner;
+//	typedef ReferenceCountedInstance<core::AtomicInt> RefCountedAtomicInt;
+//	typedef core::ReferenceCountedOwner<RefCountedAtomicInt> RefCountedAtomicIntOwner;
 
 	struct TaskBundle
 	{
@@ -95,9 +95,11 @@ namespace Fiber
 	class Scheduler
 	{
 		static const size_t FIBER_STACK_SIZE = 2048;
+		static const size_t MAX_TASKS = 1024 * 10;
 
 		static const uint32_t HW_THREAD_MAX = 32; // max even if hardware supports more.
 		static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
+
 		static const uint32_t FIBER_POOL_SIZE = 64;
 
 	public:
@@ -107,10 +109,11 @@ namespace Fiber
 		bool StartUp(void);
 		void ShutDown(void);
 
-		RefCountedAtomicIntOwner AddTask(Task task);
-		RefCountedAtomicIntOwner AddTasks(Task* pTasks, size_t numTasks);
+		void AddTask(Task task, core::AtomicInt** pCounterOut);
+		void AddTasks(Task* pTasks, size_t numTasks, core::AtomicInt** pCounterOut);
 
-		void WaitForCounter(RefCountedAtomicIntOwner& counter, int32_t value);
+		void WaitForCounter(core::AtomicInt* pCounter, int32_t value);
+		void WaitForCounterAndFree(core::AtomicInt* pCounter, int32_t value);
 
 	private:
 		bool CreateFibers(void);

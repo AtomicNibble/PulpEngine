@@ -71,7 +71,7 @@ namespace Fiber
 		fiberSwitchingFibers_(gEnv->pArena),
 		counterWaitingFibers_(gEnv->pArena),
 
-		tasks_(gEnv->pArena, 1024 * 10),
+		tasks_(gEnv->pArena, MAX_TASKS),
 		fibers_(gEnv->pArena, FIBER_POOL_SIZE)
 	{
 
@@ -178,44 +178,46 @@ namespace Fiber
 	}
 
 
-
-	core::ReferenceCountedOwner<RefCountedAtomicInt> Scheduler::AddTask(Task task)
+	void Scheduler::AddTask(Task task, core::AtomicInt** pCounterOut)
 	{
-		core::ReferenceCountedOwner<RefCountedAtomicInt> counter = core::ReferenceCountedOwner<RefCountedAtomicInt>(
-			X_NEW(RefCountedAtomicInt, gEnv->pArena, "SchedulerCounter"), gEnv->pArena);
-		
-		(*counter.instance()->instance()) = static_cast<int32_t>(1);
+		if (*pCounterOut == nullptr) {
+			*pCounterOut = X_NEW(core::AtomicInt, gEnv->pArena, "Fiber::Counter");
+		}
 
-		TaskBundle bundle = { task, counter.instance()->instance() };
+		(**pCounterOut) = 1;
+
+
+		TaskBundle bundle = { task, *pCounterOut };
 		tasks_.Add(bundle);
-
-		return counter;
 	}
 
-	core::ReferenceCountedOwner<RefCountedAtomicInt> Scheduler::AddTasks(Task* pTasks, size_t numTasks)
+
+	void Scheduler::AddTasks(Task* pTasks, size_t numTasks, core::AtomicInt** pCounterOut)
 	{
-		core::ReferenceCountedOwner<RefCountedAtomicInt> counter = core::ReferenceCountedOwner<RefCountedAtomicInt>(
-			X_NEW(RefCountedAtomicInt, gEnv->pArena, "SchedulerCounter"), gEnv->pArena);
+		if (*pCounterOut == nullptr) {
+			*pCounterOut = X_NEW(core::AtomicInt, gEnv->pArena, "Fiber::Counter");
+		}
 
+		(**pCounterOut) = safe_static_cast<int32_t, size_t>(numTasks);
 
-		(*counter.instance()->instance()) = safe_static_cast<int32_t, size_t>(numTasks);
+		if (numTasks < 1) {
+			return;
+		}
 
 		tasks_.Lock();
 
 		for (size_t i = 0; i < numTasks; i++)
 		{
-			TaskBundle bundle = { pTasks[i], counter.instance()->instance() };
+			TaskBundle bundle = { pTasks[i], *pCounterOut };
 			tasks_.Add_nolock(bundle);
 		}
 
 		tasks_.Unlock();
-
-		return counter;
 	}
 
-	void Scheduler::WaitForCounter(RefCountedAtomicIntOwner& counter, int32_t value)
+	void Scheduler::WaitForCounter(core::AtomicInt* pCounter, int32_t value)
 	{
-		if ((*counter.instance()->instance()) == value) {
+		if ((*pCounter) == value) {
 			return;
 		}
 
@@ -228,7 +230,7 @@ namespace Fiber
 
 			tlsOriginFiber.SetValue(curFiber);
 			tlsDestFiber.SetValue(newFiber);
-			tlsWaitCounter.SetValue(counter.instance());
+			tlsWaitCounter.SetValue(pCounter);
 			tlsWaitValue.SetValue(union_cast<void*, int32_t>(value));
 		}
 
@@ -236,6 +238,30 @@ namespace Fiber
 		Fiber::SwitchToFiber(switchFiber);
 	}
 
+	void Scheduler::WaitForCounterAndFree(core::AtomicInt* pCounter, int32_t value)
+	{
+		if ((*pCounter) == value) {
+			return;
+		}
+
+		{
+			// switch to a new fiber to do some other work.
+			FiberHandle newFiber;
+			fibers_.Pop(newFiber);
+
+			FiberHandle curFiber = Fiber::GetCurrentFiber();
+
+			tlsOriginFiber.SetValue(curFiber);
+			tlsDestFiber.SetValue(newFiber);
+			tlsWaitCounter.SetValue(pCounter);
+			tlsWaitValue.SetValue(union_cast<void*, int32_t>(value));
+		}
+
+		FiberHandle switchFiber = GetWaitFiberForThread();
+		Fiber::SwitchToFiber(switchFiber);
+
+		X_DELETE(pCounter, gEnv->pArena);
+	}
 
 
 	bool Scheduler::CreateFibers(void)
@@ -476,7 +502,7 @@ namespace Fiber
 
 				WaitingTask waitingTask;
 				waitingTask.fiber = tlsOriginFiber.GetValue<FiberHandle>();
-				waitingTask.pCounter = tlsWaitCounter.GetValue<RefCountedAtomicInt>()->instance();
+				waitingTask.pCounter = tlsWaitCounter.GetValue<core::AtomicInt>();
 				waitingTask.val = union_cast<int32_t,int32_t*>(tlsWaitValue.GetValue<int32_t>());
 
 				pScheduler->waitingTasks_.append(waitingTask);

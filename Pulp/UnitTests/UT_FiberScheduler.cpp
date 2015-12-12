@@ -32,7 +32,7 @@ namespace
 		}
 
 		pSubSet->total += pSubSet->end;
-	}
+		}
 
 	X_PRAGMA(optimize("", on))
 }
@@ -72,13 +72,14 @@ TEST(Threading, FiberScheduler)
 
 	core::Thread::SetName(core::Thread::GetCurrentID(), "MainThread");
 
-	Fiber::RefCountedAtomicIntOwner counter = scheduler.AddTasks(pTasks, numTasks);
+	core::AtomicInt* pCounter = nullptr;
+	scheduler.AddTasks(pTasks, numTasks, &pCounter);
 
 	// these can be deleted now.
 	X_DELETE_ARRAY(pTasks, g_arena);
 
 
-	scheduler.WaitForCounter(counter, 0);
+	scheduler.WaitForCounterAndFree(pCounter, 0);
 
 	// Add the results
 	uint64 result = 0ull;
