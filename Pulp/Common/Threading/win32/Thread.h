@@ -121,11 +121,6 @@ public:
 	void Stop(void); // tells the thread to stop dose not wait.
 	void Join(void); // waits till thread has finished.
 
-
-	void setData(void* pData);
-	void* getData(void) const;
-
-
 	uint32_t GetID(void) const;
 
 protected:
