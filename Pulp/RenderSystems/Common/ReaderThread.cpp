@@ -81,7 +81,7 @@ void XRenderThread::quitRenderLoadingThread()
 // -------- Init -------
 void XRenderThread::init()
 {
-	m_nRenderThread = ::GetCurrentThreadId();
+	m_nRenderThread = core::Thread::GetCurrentID();
 	m_nMainThread = m_nRenderThread;
 	m_bSuccessful = true;
 

@@ -169,7 +169,7 @@ X_INLINE int XRenderThread::getCurrentThreadId(bool bAlwaysCheck)
 {
 	if (!bAlwaysCheck && m_nRenderThread == m_nMainThread)
 		return m_nRenderThread;
-	return ::GetCurrentThreadId();
+	return core::Thread::GetCurrentID();
 }
 
 X_INLINE void XRenderThread::beginCommand(RenderCommand::Enum RenderCmd, size_t nParamBytes)

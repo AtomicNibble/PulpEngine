@@ -162,7 +162,7 @@ bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassNa
 bool XCore::Init(const SCoreInitParams &startupParams)
 {
 	// init the system baby!
-	gEnv->uMainThreadId = GetCurrentThreadId();			//Set this ASAP on startup
+	gEnv->uMainThreadId = core::Thread::GetCurrentID();			//Set this ASAP on startup
 
 	core::invalidParameterHandler::Startup(); 
 	core::symbolResolution::Startup();
