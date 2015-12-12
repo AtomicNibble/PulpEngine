@@ -169,6 +169,17 @@ void ThreadAbstract::Join(void)
 	thread_.Join();
 }
 
+
+void ThreadAbstract::setData(void* pData)
+{
+	thread_.setData(pData);
+}
+
+void* ThreadAbstract::getData(void) const
+{
+	return thread_.getData();
+}
+
 uint32_t ThreadAbstract::GetID(void) const
 {
 	return thread_.GetID();
