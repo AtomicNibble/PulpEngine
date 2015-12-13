@@ -114,8 +114,6 @@ TEST(Threading, FiberScheduler)
 
 	numJobsRan = 0;
 
-	::Sleep(500);
-
 	{
 		Fiber::Scheduler scheduler;
 
