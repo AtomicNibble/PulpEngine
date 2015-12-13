@@ -377,15 +377,21 @@ namespace Fiber
 	bool Scheduler::GetTask(TaskBundle& task)
 	{
 		if (tasks_[JobPriority::HIGH].isNotEmpty()) {
-			return tasks_[JobPriority::HIGH].tryPop(task);
+			if (tasks_[JobPriority::HIGH].tryPop(task)) {
+				return true;
+			}
 		}
 
 		if (tasks_[JobPriority::NORMAL].isNotEmpty()) {
-			return tasks_[JobPriority::NORMAL].tryPop(task);
+			if (tasks_[JobPriority::NORMAL].tryPop(task)) {
+				return true;
+			}
 		}
 
 		if (tasks_[JobPriority::NONE].isNotEmpty()) {
-			return tasks_[JobPriority::NONE].tryPop(task);
+			if (tasks_[JobPriority::NONE].tryPop(task)) {
+				return true;
+			}
 		}
 
 		return false;
