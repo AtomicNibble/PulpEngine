@@ -1416,9 +1416,6 @@
     <ClCompile Include="Time\CompressedStamps.cpp">
       <Filter>SourceFiles\Time</Filter>
     </ClCompile>
-    <ClCompile Include="Memory\ThreadPolicies\MultiThreadPolicy.cpp">
-      <Filter>SourceFiles\Memory\ThreadPolicies</Filter>
-    </ClCompile>
     <ClCompile Include="Memory\ThreadPolicies\SingleThreadPolicy.cpp">
       <Filter>SourceFiles\Memory\ThreadPolicies</Filter>
     </ClCompile>

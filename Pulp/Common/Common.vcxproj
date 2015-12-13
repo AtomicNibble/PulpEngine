@@ -643,7 +643,6 @@
     <ClCompile Include="Memory\MemoryTrackingPolicies\FullMemoryTracking.cpp" />
     <ClCompile Include="Memory\MemoryTrackingPolicies\NoMemoryTracking.cpp" />
     <ClCompile Include="Memory\MemoryTrackingPolicies\SimpleMemoryTracking.cpp" />
-    <ClCompile Include="Memory\ThreadPolicies\MultiThreadPolicy.cpp" />
     <ClCompile Include="Memory\ThreadPolicies\SingleThreadPolicy.cpp" />
     <ClCompile Include="Memory\VirtualMem.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Use</PrecompiledHeader>
