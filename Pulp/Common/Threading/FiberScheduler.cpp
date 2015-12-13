@@ -225,22 +225,39 @@ namespace Fiber
 			return;
 		}
 
-		tasks_[priority].Lock();
-
-
 		if ((tasks_[priority].numItems() + numTasks) > MAX_TASKS_PER_QUE) {
 			X_ERROR("Scheduler", "Failed to add %i tasks, not enough space in task que: %s", 
 				numTasks, JobPriority::ToString(priority));
 			return;
 		}
 
-		for (size_t i = 0; i < numTasks; i++)
-		{
-			TaskBundle bundle = { pTasks[i], *pCounterOut };
-			tasks_[priority].Add_nolock(bundle);
-		}
+		core::AtomicInt* pCounter = *pCounterOut;
 
-		tasks_[priority].Unlock();
+
+		// ok potentially holding the lock the whole time we are adding a large batch could starve the workers.
+		// since they can't get any work out.
+		// this also helps when there are no jobs, as it means the jobs can start been worked on a tiny tiny bit quicker ;)
+		// so lets split it in to batches
+		const size_t lockBatchSize = 32;
+		const size_t numBatches = ((numTasks + lockBatchSize - 1) / lockBatchSize);
+
+		for (size_t i = 0; i < numBatches; i++)
+		{
+			tasks_[priority].Lock();
+
+			const size_t batchSize = core::Min(numTasks, lockBatchSize);
+
+			numTasks -= batchSize;
+
+			for (size_t j = 0; j < batchSize; j++)
+			{
+				TaskBundle bundle = { pTasks[j], pCounter };
+				tasks_[priority].Add_nolock(bundle);
+			}
+
+			// unlock between batches.
+			tasks_[priority].Unlock();
+		}
 	}
 
 	void Scheduler::WaitForCounter(core::AtomicInt* pCounter, int32_t value)
