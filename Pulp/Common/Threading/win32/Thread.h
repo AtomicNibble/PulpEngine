@@ -8,6 +8,10 @@
 
 #include <String\StackString.h>
 
+#ifdef YieldProcessor
+#undef YieldProcessor
+#endif // !YieldProcessor
+
 X_NAMESPACE_BEGIN(core)
 
 /// \code
@@ -98,6 +102,7 @@ public:
 
 	static void Sleep(uint32_t milliSeconds);
 	static void Yield(void);
+	static void YieldProcessor(void);
 	static uint32_t GetCurrentID(void);
 	static void SetName(uint32_t threadId, const char* name);
 

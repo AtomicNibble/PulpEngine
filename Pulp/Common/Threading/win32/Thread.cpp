@@ -1,7 +1,11 @@
 #include <EngineCommon.h>
 #include "Thread.h"
 
-
+#if !defined(__midl) && !defined(GENUTIL) && !defined(_GENIA64_) && defined(_IA64_)
+#pragma intrinsic(__yield)
+#else
+#pragma intrinsic(_mm_pause)
+#endif
 
 X_NAMESPACE_BEGIN(core)
 
@@ -154,6 +158,17 @@ void Thread::Yield(void)
 	// http://msdn.microsoft.com/en-us/library/windows/desktop/ms686352(v=vs.85).aspx
 	SwitchToThread();
 }
+
+void Thread::YieldProcessor(void)
+{
+	// about a 9 cycle delay
+#if !defined(__midl) && !defined(GENUTIL) && !defined(_GENIA64_) && defined(_IA64_)
+	__yield();
+#else
+	_mm_pause();
+#endif
+}
+
 
 uint32_t Thread::GetCurrentID(void)
 {
