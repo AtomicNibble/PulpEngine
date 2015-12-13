@@ -1,4 +1,8 @@
 
+X_INLINE AtomicInt::AtomicInt()
+	: value_(0)
+{
+}
 
 X_INLINE AtomicInt::AtomicInt(int32_t value)
 : value_(value)

@@ -13,7 +13,7 @@ class AtomicInt
 {
 public:
 	/// Constructs an AtomicInt from an integer.
-	AtomicInt() = default;
+	X_INLINE AtomicInt();
 	X_INLINE explicit AtomicInt(int32_t value);
 
 	X_INLINE int32_t operator=(int32_t value) volatile;
