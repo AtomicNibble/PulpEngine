@@ -7,6 +7,10 @@ X_NAMESPACE_BEGIN(font)
 
 XFontNull XFontSysNull::nullFont_;
 
+#else
+
+X_DISABLE_EMPTY_FILE_WARNING
+
 #endif // X_USE_NULLFONT
 
 
