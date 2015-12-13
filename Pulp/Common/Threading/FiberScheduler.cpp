@@ -207,7 +207,8 @@ namespace Fiber
 			*pCounterOut = X_NEW(core::AtomicInt, &counterPoolArena_, "Fiber::Counter");
 		}
 
-		(**pCounterOut) = 1;
+		// support a coutner that has a value been passed by adding not assign
+		(**pCounterOut) += 1;
 
 
 		TaskBundle bundle = { task, *pCounterOut };
@@ -223,7 +224,8 @@ namespace Fiber
 			*pCounterOut = X_NEW(core::AtomicInt, &counterPoolArena_, "Fiber::Counter");
 		}
 
-		(**pCounterOut) = safe_static_cast<int32_t, size_t>(numTasks);
+		// support a coutner that has a value been passed by adding not assign
+		(**pCounterOut) += safe_static_cast<int32_t, size_t>(numTasks);
 
 		if (numTasks < 1) {
 			return;
