@@ -263,6 +263,10 @@ namespace Fiber
 
 			// unlock between batches.
 			tasks_[priority].Unlock();
+
+			if ((i + 1) != numBatches) {
+				core::Thread::YieldProcessor();
+			}
 		}
 	}
 
