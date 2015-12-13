@@ -252,12 +252,12 @@ namespace Fiber
 			tasks_[priority].Lock();
 
 			const size_t batchSize = core::Min(numTasks, lockBatchSize);
-
+			const size_t batchOffset = (i*lockBatchSize);
 			numTasks -= batchSize;
 
 			for (size_t j = 0; j < batchSize; j++)
 			{
-				TaskBundle bundle = { pTasks[j], pCounter };
+				TaskBundle bundle = { pTasks[batchOffset + j], pCounter };
 				tasks_[priority].Add_nolock(bundle);
 			}
 
