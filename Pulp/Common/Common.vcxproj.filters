@@ -196,6 +196,9 @@
     <Filter Include="SourceFiles\Compression\lz4">
       <UniqueIdentifier>{b79d73e5-b398-461e-9b03-021f5fce847d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SourceFiles\Util\win32">
+      <UniqueIdentifier>{16363cff-6e3e-4b46-8600-923097a213eb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -1586,6 +1589,9 @@
     </ClCompile>
     <ClCompile Include="Threading\win32\Semaphore.cpp">
       <Filter>SourceFiles\Threading\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\win32\StopWatch.cpp">
+      <Filter>SourceFiles\Util\win32</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

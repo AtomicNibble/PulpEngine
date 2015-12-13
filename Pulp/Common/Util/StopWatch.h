@@ -1,5 +1,5 @@
 
-#include "System\SystemTimer.h"
+#include "Time\TimeVal.h"
 
 X_NAMESPACE_BEGIN(core)
 
@@ -13,13 +13,20 @@ public:
 
 	X_INLINE void Start(void);
 
-	X_INLINE uint64_t GetCount(void) const;
+	X_INLINE int64_t GetCount(void) const;
 
 	X_INLINE float GetSeconds(void) const;
 	X_INLINE float GetMilliSeconds(void) const;
+	X_INLINE TimeVal GetTimeVal(void) const;
 
 private:
-	uint64_t start_;
+
+	static int64_t SysGet(void);
+	static float SysToSeconds(int64_t count);
+	static float SysToMilliSeconds(int64_t count);
+
+private:
+	int64_t start_;
 };
 
 
