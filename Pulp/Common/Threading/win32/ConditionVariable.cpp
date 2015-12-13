@@ -24,7 +24,6 @@ void ConditionVariable::NotifyAll(void)
 
 void ConditionVariable::Wait(CriticalSection& criticalSection)
 {
-//	CriticalSection::ScopedLock lock(criticalSection);
 	SleepConditionVariableCS(&condVar_, criticalSection.GetNativeObject(), INFINITE);
 }
 
