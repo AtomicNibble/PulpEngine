@@ -282,7 +282,7 @@ namespace Fiber
 			tlsOriginFiber.SetValue(curFiber);
 			tlsDestFiber.SetValue(newFiber);
 			tlsWaitCounter.SetValue(pCounter);
-			tlsWaitValue.SetValue(union_cast<void*, int32_t>(value));
+			tlsWaitValue.SetValue(union_cast<void*, intptr_t>(value));
 		}
 
 		FiberHandle switchFiber = GetWaitFiberForThread();
@@ -305,7 +305,7 @@ namespace Fiber
 			tlsOriginFiber.SetValue(curFiber);
 			tlsDestFiber.SetValue(newFiber);
 			tlsWaitCounter.SetValue(pCounter);
-			tlsWaitValue.SetValue(union_cast<void*, int32_t>(value));
+			tlsWaitValue.SetValue(union_cast<void*, intptr_t>(value));
 		}
 
 		FiberHandle switchFiber = GetWaitFiberForThread();
@@ -576,7 +576,8 @@ namespace Fiber
 				WaitingTask waitingTask;
 				waitingTask.fiber = tlsOriginFiber.GetValue<FiberHandle>();
 				waitingTask.pCounter = tlsWaitCounter.GetValue<core::AtomicInt>();
-				waitingTask.val = union_cast<int32_t,int32_t*>(tlsWaitValue.GetValue<int32_t>());
+				waitingTask.val = safe_static_cast<int32_t, intptr_t>(
+					union_cast<intptr_t,int32_t*>(tlsWaitValue.GetValue<int32_t>()));
 
 				pScheduler->waitingTasks_.append(waitingTask);
 			}
