@@ -15,7 +15,11 @@ CriticalSection::CriticalSection(void)
 /// the critical section if spinning was unsuccessful.
 CriticalSection::CriticalSection(unsigned int spinCount)
 {
-	InitializeCriticalSectionAndSpinCount(&cs_, spinCount);
+	if (!InitializeCriticalSectionAndSpinCount(&cs_, spinCount)) {
+		lastError::Description Dsc;
+		X_ERROR("CriticalSection", "Failed to create critical section with spin count. Err: %s", 
+			lastError::ToString(Dsc));
+	}
 }
 
 /// Releases OS resources of the critical section.
