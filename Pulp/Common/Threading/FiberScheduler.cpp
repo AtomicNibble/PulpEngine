@@ -201,6 +201,8 @@ namespace Fiber
 
 	void Scheduler::AddTask(Task task, core::AtomicInt** pCounterOut, JobPriority::Enum priority)
 	{
+		X_ASSERT_NOT_NULL(pCounterOut);
+
 		if (*pCounterOut == nullptr) {
 			*pCounterOut = X_NEW(core::AtomicInt, &counterPoolArena_, "Fiber::Counter");
 		}
@@ -215,6 +217,8 @@ namespace Fiber
 
 	void Scheduler::AddTasks(Task* pTasks, size_t numTasks, core::AtomicInt** pCounterOut, JobPriority::Enum priority)
 	{
+		X_ASSERT_NOT_NULL(pCounterOut);
+
 		if (*pCounterOut == nullptr) {
 			*pCounterOut = X_NEW(core::AtomicInt, &counterPoolArena_, "Fiber::Counter");
 		}
