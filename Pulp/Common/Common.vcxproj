@@ -719,6 +719,7 @@
     <ClCompile Include="Threading\win32\ConditionVariable.cpp" />
     <ClCompile Include="Threading\win32\CriticalSection.cpp" />
     <ClCompile Include="Threading\win32\Fiber.cpp" />
+    <ClCompile Include="Threading\win32\Semaphore.cpp" />
     <ClCompile Include="Threading\win32\Signal.cpp" />
     <ClCompile Include="Threading\win32\Thread.cpp" />
     <ClCompile Include="Time\CompressedStamps.cpp" />

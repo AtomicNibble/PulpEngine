@@ -1584,5 +1584,8 @@
     <ClCompile Include="Threading\FiberScheduler.cpp">
       <Filter>SourceFiles\Threading</Filter>
     </ClCompile>
+    <ClCompile Include="Threading\win32\Semaphore.cpp">
+      <Filter>SourceFiles\Threading\win32</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

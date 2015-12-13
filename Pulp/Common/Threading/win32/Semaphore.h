@@ -51,7 +51,7 @@ X_NAMESPACE_BEGIN(core)
 class Semaphore
 {
 public:
-	X_INLINE Semaphore(int initialValue, int maximumValue);
+	Semaphore(int initialValue, int maximumValue);
 	X_INLINE ~Semaphore(void);
 
 	// release a slot, allowing other threads that call wait to take a slot.

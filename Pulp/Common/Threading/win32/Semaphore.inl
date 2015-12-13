@@ -1,13 +1,5 @@
 
 
-X_INLINE Semaphore::Semaphore(int initialValue, int maximumValue)
-{
-	sema_ = CreateSemaphore(
-		NULL,           // default security attributes
-		initialValue,  // initial count
-		maximumValue,  // maximum count
-		NULL);          // unnamed semaphore
-}
 
 X_INLINE Semaphore::~Semaphore(void)
 {
