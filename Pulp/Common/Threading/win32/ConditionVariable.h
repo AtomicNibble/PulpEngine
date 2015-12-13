@@ -12,9 +12,12 @@ class ConditionVariable
 public:
 	ConditionVariable(void);
 
+	// notify one thread that is sleeping on the condition to wake up.
 	void NotifyOne(void);
+	// notify all threads that are sleeping on the condition to wake up.
 	void NotifyAll(void);
 
+	// releease the critical section lock, and puts thread to sleep until it is notified.
 	void Wait(CriticalSection& criticalSection);
 
 private:
