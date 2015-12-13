@@ -19,6 +19,31 @@ namespace Fiber
 		ThreadLocalStorage tlsWaitValue;
 
 
+		void ThreadBackOff(int32_t& backoff)
+		{
+			if (backoff < 10 && backoff > 0) {
+				Thread::YieldProcessor();
+			}
+			else if (backoff < 20) {
+				for (size_t i = 0; i != 50; i += 1) {
+					Thread::YieldProcessor();
+				}
+			}
+			else if (backoff < 22) {
+				Thread::Yield();
+			}
+			else if (backoff < 24) {
+				Thread::Sleep(0);
+			}
+			else if (backoff < 26) {
+				Thread::Sleep(1);
+			}
+			else {
+				Thread::Sleep(5);
+			}
+
+			backoff += 1;
+		}
 
 	} // namespace
 
@@ -467,6 +492,8 @@ namespace Fiber
 
 		core::AtomicInt& stop = pScheduler->stop_;
 
+		int32_t curBackOffCount = 0;
+
 		while (stop == 0)
 		{
 
@@ -524,10 +551,13 @@ namespace Fiber
 				core::AtomicInt& counter = *curTask.pCounter;
 
 				--counter;
+
+				// reset backoff.
+				curBackOffCount = 0;
 			}
 			else
 			{
-				Thread::Yield();
+				ThreadBackOff(curBackOffCount);
 			}
 		}
 			
