@@ -11,8 +11,7 @@
 #endif
 
 #include "Mmsystem.h"
-X_LINK_LIB("Winmm.lib")
-
+// Winmm.lib is delay loaded.
 
 X_NAMESPACE_BEGIN(core)
 
@@ -70,6 +69,8 @@ namespace
 			frequency_ = 1000;
 			pUpdateFunc_ = &MMTimeGet;
 		}
+
+		pUpdateFunc_ = &MMTimeGet;
 
 		double resolution = 1.0 / static_cast<double>(frequency.QuadPart);
 

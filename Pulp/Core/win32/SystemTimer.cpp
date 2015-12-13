@@ -15,9 +15,8 @@
 #include "Mmsystem.h"
 
 // needed for timeGetTime
-// I add the link here since this file is only used for 
-// windows builds.
-X_LINK_LIB("Winmm.lib")
+// Delay loaded now.
+// X_LINK_LIB("Winmm.lib")
 
 X_NAMESPACE_BEGIN(core)
 
