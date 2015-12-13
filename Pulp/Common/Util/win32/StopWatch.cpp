@@ -1,6 +1,7 @@
 #include "EngineCommon.h"
 #include "../StopWatch.h"
 
+#include "Traits\FunctionTraits.h"
 
 #ifndef NEAR
 #define NEAR near
@@ -20,7 +21,7 @@ namespace
 
 	class SysTimer
 	{
-		typedef int64(*TimeUpdateFunc) ();
+		typedef core::traits::Function<int64(void)> TimeUpdateFunc;
 
 	public:
 		SysTimer();
@@ -37,7 +38,7 @@ namespace
 		static int64_t MMTimeGet(void);
 
 	private:
-		TimeUpdateFunc pUpdateFunc_;
+		TimeUpdateFunc::Pointer pUpdateFunc_;
 
 		float oneOverFrequency_;
 		float thousandOverFrequency_;
