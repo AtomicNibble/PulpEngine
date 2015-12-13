@@ -20,6 +20,8 @@ extern "C" void* _ReturnAddress(void);
 #define X_DISABLE_WARNING(number)					X_PRAGMA(warning(disable:number))
 #define X_ENABLE_WARNING(number)					X_PRAGMA(warning(default:number))
 
+#define X_DISABLE_EMPTY_FILE_WARNING				namespace { char NoEmptyFileDummy##__LINE__; }
+
 #define X_RESTRICT									__restrict
 #define X_RESTRICT_RV								__declspec(restrict)
 #define X_NO_ALIAS									__declspec(noalias)
