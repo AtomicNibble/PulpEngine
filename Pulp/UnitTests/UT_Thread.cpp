@@ -107,7 +107,7 @@ namespace
 
 	static Thread::ReturnValue ThreadFunction_semaphone(const Thread&)
 	{
-		g_Sema.Wait();
+		g_Sema.AcquireSlot();
 		++g_int;
 		return Thread::ReturnValue(0);
 	}
@@ -271,7 +271,7 @@ TEST(Threading, Semaphore) {
 		threads[i].Start(ThreadFunction_semaphone);
 
 	for (int i = 0; i < THREAD_NUM; i++)
-		g_Sema.Signal();
+		g_Sema.ReleaseSlot();
 
 	for (int i = 0; i < THREAD_NUM; i++)
 		threads[i].Join();

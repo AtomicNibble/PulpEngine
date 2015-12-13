@@ -36,12 +36,12 @@ X_NAMESPACE_BEGIN(core)
 //		while (thread.ShouldRun())
 //		{
 //			// wait for a slot for the calling thread.
-//			seamaphore.Wait();
+//			seamaphore.AcquireSlot();
 //
 //			// Do Work..
 //
 //			// release slot, for another thread to pick up.
-//			seamaphore.Signal();
+//			seamaphore.ReleaseSlot();
 //		}
 //
 //		return core::Thread::ReturnValue(0);
@@ -55,13 +55,13 @@ public:
 	X_INLINE ~Semaphore(void);
 
 	// release a slot, allowing other threads that call wait to take a slot.
-	X_INLINE void Signal(void);
+	X_INLINE void ReleaseSlot(void);
 
 	// wait untill we have a free slot.
-	X_INLINE void Wait(void);
+	X_INLINE void AcquireSlot(void);
 
 	// see if we can
-	X_INLINE bool TryWait(void);
+	X_INLINE bool TryAcquireSlot(void);
 
 private:
 	HANDLE sema_;
