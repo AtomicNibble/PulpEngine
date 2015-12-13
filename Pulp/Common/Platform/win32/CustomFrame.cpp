@@ -14,7 +14,8 @@
 
 #include "Window.h"
 
-#pragma comment(lib,"Msimg32.lib")
+
+X_LINK_LIB("Msimg32");
 
 X_NAMESPACE_BEGIN(core)
 
