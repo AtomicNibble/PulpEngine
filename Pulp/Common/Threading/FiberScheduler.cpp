@@ -249,11 +249,11 @@ namespace Fiber
 
 		for (size_t i = 0; i < numBatches; i++)
 		{
-			tasks_[priority].Lock();
-
 			const size_t batchSize = core::Min(numTasks, lockBatchSize);
 			const size_t batchOffset = (i*lockBatchSize);
 			numTasks -= batchSize;
+
+			tasks_[priority].Lock();
 
 			for (size_t j = 0; j < batchSize; j++)
 			{
