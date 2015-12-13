@@ -6,10 +6,10 @@ X_NAMESPACE_BEGIN(core)
 /// \class StopWatch
 /// \brief Can be used to measure elpased time since the time was constructed / started
 /// Makes use of the game timer providing high-resolution
-class xStopWatch
+class StopWatch
 {
 public:
-	X_INLINE xStopWatch(void);
+	X_INLINE StopWatch(void);
 
 	X_INLINE void Start(void);
 
