@@ -658,10 +658,11 @@ void XConsole::Startup(ICore* pCore, bool basic)
 
 	pCore_ = pCore;
 
-	// add this as a logger.
-	pCore->GetILog()->AddLogger(&logger_);
-
 	if (!basic) {
+
+		// add this as a logger.
+		pCore->GetILog()->AddLogger(&logger_);
+
 		LoadRenderResources();
 		RegisterInputListener();
 	}
