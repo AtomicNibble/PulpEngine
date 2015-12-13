@@ -5,8 +5,7 @@ namespace SysTimer
 
 	X_INLINE int64_t Get(void)
 	{
-		typedef int64(*TimeUpdateFunc) ();
-		extern TimeUpdateFunc g_pUpdateFunc;
+		extern TimeUpdateFunc::Pointer g_pUpdateFunc;
 
 		return g_pUpdateFunc();
 	}

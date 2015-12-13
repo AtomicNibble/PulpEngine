@@ -22,8 +22,7 @@ X_NAMESPACE_BEGIN(core)
 
 namespace SysTimer
 {
-	typedef int64(*TimeUpdateFunc) ();
-	TimeUpdateFunc g_pUpdateFunc;
+	TimeUpdateFunc::Pointer g_pUpdateFunc;
 
 	float g_oneOverFrequency; 
 	float g_thousandOverFrequency; 

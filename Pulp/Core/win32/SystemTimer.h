@@ -4,6 +4,9 @@
 #define X_GAMETIMER_H_
 
 
+#include "Traits\FunctionTraits.h"
+
+
 X_NAMESPACE_BEGIN(core)
 
 /// \ingroup Platform
@@ -12,7 +15,7 @@ X_NAMESPACE_BEGIN(core)
 /// ( basically float percision sucks after game running for long time )
 namespace SysTimer
 {
-	typedef int64(*TimeUpdateFunc) ();
+	typedef core::traits::Function<int64(void)> TimeUpdateFunc;
 
 	/// \brief Starts the time stamp mechanism.
 	/// \remark This is called automatically when starting the Core module.
