@@ -47,7 +47,7 @@ public:
 	/// \brief Initializes the critical section with a certain spin count.
 	/// \remark Entering the critical section will first try spinning the given number of times before finally acquiring
 	/// the critical section if spinning was unsuccessful.
-	explicit CriticalSection(unsigned int spinCount);
+	explicit CriticalSection(uint32_t spinCount);
 
 	/// Releases OS resources of the critical section.
 	~CriticalSection(void);
@@ -60,6 +60,9 @@ public:
 
 	/// Leaves the critical section.
 	void Leave(void);
+
+	/// set number of sinds before acquirung critical section.
+	void SetSpinCount(uint32_t count);
 
 	/// \brief Returns a pointer to the native object.
 	/// \remark For internal use only.

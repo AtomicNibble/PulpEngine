@@ -13,7 +13,7 @@ CriticalSection::CriticalSection(void)
 /// \brief Initializes the critical section with a certain spin count.
 /// \remark Entering the critical section will first try spinning the given number of times before finally acquiring
 /// the critical section if spinning was unsuccessful.
-CriticalSection::CriticalSection(unsigned int spinCount)
+CriticalSection::CriticalSection(uint32_t spinCount)
 {
 	if (!InitializeCriticalSectionAndSpinCount(&cs_, spinCount)) {
 		lastError::Description Dsc;
@@ -46,6 +46,12 @@ void CriticalSection::Leave(void)
 	LeaveCriticalSection(&cs_);
 }
 
+
+void CriticalSection::SetSpinCount(uint32_t count)
+{
+	uint32_t previous = SetCriticalSectionSpinCount(&cs_, count);
+	X_UNUSED(previous);
+}
 
 
 
