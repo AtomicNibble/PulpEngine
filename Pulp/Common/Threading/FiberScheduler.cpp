@@ -204,7 +204,7 @@ namespace Fiber
 		X_ASSERT_NOT_NULL(pCounterOut);
 
 		if (*pCounterOut == nullptr) {
-			*pCounterOut = X_NEW(core::AtomicInt, &counterPoolArena_, "Fiber::Counter");
+			*pCounterOut = X_NEW(core::AtomicInt, &counterPoolArena_, "Fiber::Counter")(0);
 		}
 
 		// support a coutner that has a value been passed by adding not assign
@@ -221,7 +221,7 @@ namespace Fiber
 		X_ASSERT_NOT_NULL(pCounterOut);
 
 		if (*pCounterOut == nullptr) {
-			*pCounterOut = X_NEW(core::AtomicInt, &counterPoolArena_, "Fiber::Counter");
+			*pCounterOut = X_NEW(core::AtomicInt, &counterPoolArena_, "Fiber::Counter")(0);
 		}
 
 		// support a coutner that has a value been passed by adding not assign
