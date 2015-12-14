@@ -4,6 +4,9 @@
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 #include <Threading\CriticalSection.h>
 
+#include "Util\StopWatch.h"
+#include "Time\TimeVal.h"
+
 #include "gtest/gtest.h"
 
 #include "Profiler.h"
@@ -53,9 +56,10 @@ TEST(Threading, JobList)
 
 	jobSys.StartUp();
 
+	core::StopWatch timer;
 	core::TimeVal singleThreadElapse;
 	{
-		core::TimeVal start = gEnv->pTimer->GetTimeReal();
+		timer.Start();
 
 		size_t i;
 		size_t num = 10000;
@@ -64,8 +68,7 @@ TEST(Threading, JobList)
 			TestJob((void*)i, 0, 1, 0);
 		}
 
-		core::TimeVal end = gEnv->pTimer->GetTimeReal();
-		singleThreadElapse = end - start;
+		singleThreadElapse = timer.GetTimeVal();
 
 		X_LOG0("jobListRunner", "Single threaded exec time: %f", singleThreadElapse.GetMilliSeconds());
 	}
@@ -83,7 +86,7 @@ TEST(Threading, JobList)
 
 		StackArena arena(&allocator, "jobListRunnerArena");
 
-		core::TimeVal start = gEnv->pTimer->GetTimeReal();
+		timer.Start();
 
 		const size_t numLists = 10;
 		JobListStats combinedStats;
@@ -152,8 +155,7 @@ TEST(Threading, JobList)
 			X_DELETE(jobLists[j], &arena);
 		}
 
-		core::TimeVal end = gEnv->pTimer->GetTimeReal();
-		core::TimeVal MultiElapsed = end - start;
+		core::TimeVal MultiElapsed = timer.GetTimeVal();
 
 		// work out percentage.
 		// if it took 5 times less time it is 500%
