@@ -165,3 +165,119 @@ TEST(Threading, FiberScheduler)
 		scheduler.ShutDown();
 	}
 }
+
+
+
+namespace
+{
+	static void EmptyJob(Fiber::Scheduler* pScheduler, void* pArg)
+	{
+
+	}
+
+
+	core::AtomicInt* gpCounter = nullptr;
+//	core::AtomicInt numJobsRanEmpty(0);
+
+
+	void UpdateParticles(unsigned int count)
+	{
+	//	++numJobsRanEmpty;
+	}
+
+	static void parallel_for_job(Fiber::Scheduler* pScheduler, void* pArg)
+	{
+		uint32_t count = reinterpret_cast<uint32_t>(pArg);
+
+		if (count > 2)
+		{
+			Fiber::Task task;
+			task.Function = parallel_for_job;
+
+			// split in two
+			const unsigned int leftCount = count / 2u;
+			const unsigned int rightCount = count - leftCount;
+
+			task.pArgData = reinterpret_cast<void*>(leftCount);
+			pScheduler->AddTask(task, &gpCounter, Fiber::JobPriority::HIGH);
+
+
+			task.pArgData = reinterpret_cast<void*>(rightCount);
+			pScheduler->AddTask(task, &gpCounter, Fiber::JobPriority::HIGH);
+		}
+		else
+		{
+			// execute the function on the range of data
+			UpdateParticles(count);
+		}
+	}
+
+
+
+}
+
+
+TEST(Threading, FiberSchedulerEmpty)
+{
+	const size_t numJobs = 65000;
+
+	Fiber::Scheduler scheduler;
+
+	ASSERT_TRUE(scheduler.StartUp());
+
+
+	core::TimeVal MultiElapsed;
+	core::StopWatch timer;
+	{
+		timer.Start();
+
+		core::AtomicInt* pCounter = nullptr;
+
+		size_t i;
+		for (i = 0; i < numJobs; i++)
+		{
+			Fiber::Task task;
+			task.pArgData = 0;
+			task.Function = EmptyJob;
+
+			scheduler.AddTask(task, &pCounter, Fiber::JobPriority::HIGH);
+		}
+
+		scheduler.WaitForCounterAndFree(pCounter, 0);
+
+		MultiElapsed = timer.GetTimeVal();
+	}
+
+	X_LOG0("FiberScheduler", "%i empty jobs: %gms", numJobs, MultiElapsed.GetMilliSeconds());
+
+	scheduler.ShutDown();
+}
+
+TEST(Threading, FiberSchedulerEmpty_parallel)
+{
+	const size_t numJobs = 65000;
+
+	Fiber::Scheduler scheduler;
+
+	ASSERT_TRUE(scheduler.StartUp());
+
+
+	core::TimeVal MultiElapsed;
+	core::StopWatch timer;
+	{
+		timer.Start();
+
+		Fiber::Task task;
+		task.Function = parallel_for_job;
+		task.pArgData = reinterpret_cast<void*>(numJobs);
+
+		scheduler.AddTask(task, &gpCounter, Fiber::JobPriority::HIGH);
+		scheduler.WaitForCounterAndFree(gpCounter, 0);
+
+		MultiElapsed = timer.GetTimeVal();
+	}
+
+	X_LOG0("FiberScheduler", "%i empty jobs: %gms", numJobs, MultiElapsed.GetMilliSeconds());
+
+	scheduler.ShutDown();
+}

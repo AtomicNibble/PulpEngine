@@ -1,6 +1,9 @@
 #include "stdafx.h"
 
 #include "Threading\JobSystem.h"
+#include "Util\StopWatch.h"
+#include "Time\TimeVal.h"
+
 
 #include "gtest/gtest.h"
 
@@ -19,7 +22,7 @@ namespace
 		size_t idx = reinterpret_cast<size_t>(pParam);
 
 		size_t i, running_total = 23;
-		size_t some_large_number = 0x8000;
+		size_t some_large_number = 0x100000;
 		for (i = 0; i < some_large_number; i++)
 		{
 			running_total = 37 * running_total + i;
@@ -34,29 +37,108 @@ namespace
 }
 
 
-
 TEST(Threading, JobSystem)
 {
 	JobSystem jobSys;
 
 	jobSys.StartUp();
 
-	// create jobs on stack.
-	JobDecl jobs[0x100];
-	size_t i;
+	const size_t numJobs = 0x100;
 
-	for (i = 0; i < 0x100; i++)
+	core::StopWatch timer;
+	core::TimeVal singleThreadElapse;
 	{
-		jobs[i] = JobDecl(TestJob, (void*)(i));
+		timer.Start();
+
+		size_t i;
+		for (i = 0; i < numJobs; i++)
+		{
+			TestJob((void*)(i), 0);
+		}
+
+		singleThreadElapse = timer.GetTimeVal();
+
+		X_LOG0("jobListRunner", "Single threaded exec time: %f", singleThreadElapse.GetMilliSeconds());
+	}
+
+	numJobsRan = 0;
+
+	core::TimeVal MultiElapsed;
+	{
+		timer.Start();
+
+		// create jobs on stack.
+		JobDecl jobs[numJobs];
+		size_t i;
+
+		for (i = 0; i < numJobs; i++)
+		{
+			jobs[i] = JobDecl(TestJob, (void*)(i));
+		}
+
+
+		jobSys.AddJobs(jobs, numJobs, JobPriority::HIGH);
+		jobSys.waitForAllJobs();
+
+		MultiElapsed = timer.GetTimeVal();
+
+		EXPECT_EQ(numJobs, numJobsRan);
 	}
 
 
-	jobSys.AddJobs(jobs, 0x80, JobPriority::NORMAL);
-	jobSys.AddJobs(&jobs[0x80], 0x80, JobPriority::HIGH);
+	float32_t percentage = static_cast<float32_t>(singleThreadElapse.GetValue()) /
+		static_cast<float32_t>(MultiElapsed.GetValue());
 
-	jobSys.waitForAllJobs();
+	percentage *= 100;
 
-	EXPECT_EQ(0x100, numJobsRan);
+	// print the stats.
+	X_LOG0("JobSystem", "Stats");
+	X_LOG_BULLET;
+	X_LOG0("JobSystem", "SingleThreaded: %g", singleThreadElapse.GetMilliSeconds());
+	X_LOG0("JobSystem", "MultiThreaded: %g", MultiElapsed.GetMilliSeconds());
+	X_LOG0("JobSystem", "Percentage: %g%% scaling: %g%%", percentage, percentage / jobSys.numThreads());
+
+
+	jobSys.ShutDown();
+}
+
+
+namespace
+{
+	static void EmptyJob(void* pParam, uint32_t workerIdx)
+	{
+
+	}
+}
+
+
+TEST(Threading, JobSystemEmpty)
+{
+	JobSystem jobSys;
+	jobSys.StartUp();
+
+	const size_t numJobs = 65000;
+
+	core::TimeVal MultiElapsed;
+	core::StopWatch timer;
+	{
+		timer.Start();
+
+		size_t i;
+
+		for (i = 0; i < numJobs; i++)
+		{
+			JobDecl job(EmptyJob, 0);
+
+			jobSys.AddJob(job, JobPriority::HIGH);
+		}
+
+		jobSys.waitForAllJobs();
+
+		MultiElapsed = timer.GetTimeVal();
+	}
+
+	X_LOG0("JobSystem", "%i empty jobs: %gms", numJobs, MultiElapsed.GetMilliSeconds());
 
 	jobSys.ShutDown();
 }
