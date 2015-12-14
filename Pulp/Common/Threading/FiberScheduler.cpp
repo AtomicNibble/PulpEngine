@@ -32,10 +32,10 @@ namespace Fiber
 			else if (backoff < 22) {
 				Thread::Yield();
 			}
-			else if (backoff < 24) {
+			else if (backoff < 28) {
 				Thread::Sleep(0);
 			}
-			else if (backoff < 26) {
+			else if (backoff < 32) {
 				Thread::Sleep(1);
 			}
 			else {
