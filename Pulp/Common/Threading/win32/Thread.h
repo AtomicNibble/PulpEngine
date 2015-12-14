@@ -49,7 +49,7 @@ X_NAMESPACE_BEGIN(core)
 ///   // wait until the thread has finished
 ///   thread.Join();
 /// \endcode
-class Thread
+X_ALIGNED_SYMBOL(class Thread, 64)
 {
 	struct State
 	{
@@ -117,8 +117,6 @@ private:
 
 	core::StackString<64> name_;
 };
-
-
 
 // member thread
 class ThreadAbstract
