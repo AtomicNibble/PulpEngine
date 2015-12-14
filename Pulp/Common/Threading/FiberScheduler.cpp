@@ -228,6 +228,12 @@ namespace Fiber
 	{
 		X_ASSERT_NOT_NULL(pCounterOut);
 
+		if ((tasks_[priority].numItems() + 1) > MAX_TASKS_PER_QUE) {
+			X_ERROR("Scheduler", "Failed to add task, not enough space in task que: %s",
+				JobPriority::ToString(priority));
+			return;
+		}
+
 		if (*pCounterOut == nullptr) {
 			*pCounterOut = X_NEW(core::AtomicInt, &counterPoolArena_, "Fiber::Counter")(0);
 		}
