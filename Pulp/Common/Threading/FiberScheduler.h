@@ -100,6 +100,7 @@ namespace Fiber
 
 	X_DECLARE_ENUM(JobPriority)(HIGH, NORMAL, NONE);
 
+	X_DISABLE_WARNING(4324)
 
 	class Scheduler
 	{
@@ -193,6 +194,7 @@ namespace Fiber
 		CounterArena		counterPoolArena_;
 	};
 
+	X_ENABLE_WARNING(4324)
 
 
 } // namespace Fiber
