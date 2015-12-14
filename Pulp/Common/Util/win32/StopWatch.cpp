@@ -71,8 +71,6 @@ namespace
 			pUpdateFunc_ = &MMTimeGet;
 		}
 
-		pUpdateFunc_ = &MMTimeGet;
-
 		double resolution = 1.0 / static_cast<double>(frequency.QuadPart);
 
 		oneOverFrequency_ = static_cast<float>(resolution);
