@@ -109,7 +109,7 @@ namespace Fiber
 
 		static const size_t FIBER_STACK_SIZE = 32768; // 0 = binary default
 		static const size_t FIBER_STACK_RESERVE_SIZE = 0; // 0 = binary default
-		static const size_t MAX_TASKS_PER_QUE = 1024 * 10;
+		static const size_t MAX_TASKS_PER_QUE = 1024 * 64;
 		static const size_t MAX_COUNTERS = 1024;
 
 		static const size_t COUNTER_ALLOCATION_SIZE = sizeof(core::AtomicInt);
