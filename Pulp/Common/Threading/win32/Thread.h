@@ -49,6 +49,9 @@ X_NAMESPACE_BEGIN(core)
 ///   // wait until the thread has finished
 ///   thread.Join();
 /// \endcode
+
+X_DISABLE_WARNING(4324)
+
 X_ALIGNED_SYMBOL(class Thread, 64)
 {
 	struct State
@@ -117,6 +120,8 @@ private:
 
 	core::StackString<64> name_;
 };
+
+X_ENABLE_WARNING(4324)
 
 // member thread
 class ThreadAbstract
