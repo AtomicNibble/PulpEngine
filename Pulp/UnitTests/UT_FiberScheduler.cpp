@@ -1,11 +1,12 @@
 #include "stdafx.h"
 
 #include "Threading\FiberScheduler.h"
+#include "Util\StopWatch.h"
+#include "Time\TimeVal.h"
 
 #include "gtest/gtest.h"
 
 #include "Profiler.h"
-#include <ITimer.h>
 
 X_USING_NAMESPACE;
 
@@ -77,7 +78,7 @@ TEST(Threading, FiberScheduler)
 
 	core::TimeVal singleThreadElapse; 
 	{
-		core::TimeVal start = gEnv->pTimer->GetTimeReal();
+		core::StopWatch timer;
 
 		for (uint64 i = 0ull; i < numTasks; ++i) {
 			AddNumberSubset(nullptr, &pSubSets[i]);
@@ -89,8 +90,7 @@ TEST(Threading, FiberScheduler)
 			result += pSubSets[i].total;
 		}
 
-		core::TimeVal end = gEnv->pTimer->GetTimeReal();
-		singleThreadElapse = end - start;
+		singleThreadElapse = timer.GetTimeVal();
 
 		EXPECT_EQ(expectedValue, result);
 		EXPECT_EQ(numTasks, numJobsRan);
@@ -119,19 +119,19 @@ TEST(Threading, FiberScheduler)
 
 		ASSERT_TRUE(scheduler.StartUp());
 
-		core::TimeVal start;
-		core::TimeVal end;
+		core::TimeVal MultiElapsed;
 		{
 			core::Thread::SetName(core::Thread::GetCurrentID(), "MainThread");
 
-			start = gEnv->pTimer->GetTimeReal();
+			core::StopWatch timer;
+
 
 			core::AtomicInt* pCounter = nullptr;
 			scheduler.AddTasks(pTasks, numTasks, &pCounter);
 
 			scheduler.WaitForCounterAndFree(pCounter, 0);
 
-			end = gEnv->pTimer->GetTimeReal();
+			MultiElapsed = timer.GetTimeVal();
 
 			// Add the results
 			uint64 result = 0ull;
@@ -146,7 +146,6 @@ TEST(Threading, FiberScheduler)
 		X_DELETE_ARRAY(pTasks, g_arena);
 		X_DELETE_ARRAY(pSubSets, g_arena);
 
-		core::TimeVal MultiElapsed = end - start;
 
 		// work out percentage.
 		// if it took 5 times less time it is 500%
