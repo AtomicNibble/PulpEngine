@@ -99,7 +99,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 
 	g_arena = &arena;
 
-
 	if (engine.Init(lpCmdLine, Console))
 	{		
 		{
@@ -107,6 +106,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 			X_ASSERT_NOT_NULL(gEnv->pCore);
 			gEnv->pCore->RegisterAssertHandler(&g_AssetChecker);
 
+		//	::testing::GTEST_FLAG(filter) = "Threading.*";
 			X_LOG0("TESTS", "Running unit tests...");
 			testing::InitGoogleTest(&__argc, __wargv);
 
