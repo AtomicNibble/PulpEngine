@@ -38,7 +38,7 @@ namespace V2
 		jobs_[b & MASK] = job;
 
 		// ensure the job is written before b+1 is published to other threads.
-		// COMPILER_BARRIER_W;
+		COMPILER_BARRIER_W;
 
 		bottom_ = b + 1;
 	}
@@ -47,7 +47,7 @@ namespace V2
 	{
 		long b = bottom_ - 1;
 
-		_InterlockedExchange(&bottom_, b);
+		atomic::Exchange(&bottom_, b);
 
 		long t = top_;
 		if (t <= b)
@@ -61,7 +61,7 @@ namespace V2
 			}
 
 			// this is the last item in the queue
-			if (_InterlockedCompareExchange(&top_, t + 1, t) != t)
+			if (atomic::CompareExchange(&top_, t + 1, t) != t)
 			{
 				// failed race against steal operation
 				job = nullptr;
@@ -84,7 +84,7 @@ namespace V2
 
 		// ensure that top is always read before bottom.
 		// loads will not be reordered with other loads on x86, so a compiler barrier is enough.
-		// COMPILER_BARRIER_R;
+		COMPILER_BARRIER_R;
 
 		long b = bottom_;
 		if (t < b)
@@ -93,7 +93,7 @@ namespace V2
 			Job* job = jobs_[t & MASK];
 
 			// the interlocked function serves as a compiler barrier, and guarantees that the read happens before the CAS.
-			if (_InterlockedCompareExchange(&top_, t + 1, t) != t)
+			if (atomic::CompareExchange(&top_, t + 1, t) != t)
 			{
 				// a concurrent steal or pop operation removed an element from the deque in the meantime.
 				return nullptr;
