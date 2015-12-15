@@ -251,13 +251,6 @@ namespace V2
 		return job;
 	}
 
-	Job* JobSystem::CreateJob(JobFunction::Pointer function, void* pData)
-	{
-		Job* job = CreateJob(function);
-		job->pArgData = pData;
-		return job;
-	}
-
 	Job* JobSystem::CreateJobAsChild(Job* pParent, JobFunction::Pointer function)
 	{
 		++pParent->unfinishedJobs;
@@ -266,13 +259,6 @@ namespace V2
 		job->pFunction = function;
 		job->pParent = pParent;
 		job->unfinishedJobs = 1;
-		return job;
-	}
-
-	Job* JobSystem::CreateJobAsChild(Job* pParent, JobFunction::Pointer function, void* pData)
-	{
-		Job* job = CreateJobAsChild(pParent, function);
-		job->pArgData = pData;
 		return job;
 	}
 

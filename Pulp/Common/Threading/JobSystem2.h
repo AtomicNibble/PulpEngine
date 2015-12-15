@@ -47,14 +47,21 @@ typedef core::traits::Function<void(JobSystem*, size_t, Job*, void*)> JobFunctio
 
 struct Job
 {
-	static const size_t PAD_SIZE = 64 - (sizeof(void*) * 3 + sizeof(core::AtomicInt));
+	static const size_t PAD_SIZE = (64 - ((sizeof(void*) * 3) + (sizeof(core::AtomicInt) + sizeof(int32_t))));
 public:
+	core::AtomicInt unfinishedJobs;
+#if X_64
+	int32_t pad_;
+#endif
+
 	JobFunction::Pointer pFunction;
 	Job* pParent;
 	void* pArgData;
-	core::AtomicInt unfinishedJobs;
 
-	char pad[PAD_SIZE];
+	union
+	{
+		char pad[PAD_SIZE];
+	};
 };
 
 X_ENSURE_SIZE(Job, 64);
@@ -85,6 +92,82 @@ struct JobID
 	uint32_t jobOffset;
 };
 
+
+class CountSplitter
+{
+public:
+	explicit CountSplitter(size_t count);
+
+	template <typename T>
+	X_INLINE bool Split(size_t count) const;
+
+private:
+	size_t count_;
+};
+
+class DataSizeSplitter
+{
+public:
+	explicit DataSizeSplitter(size_t size);
+
+	template <typename T>
+	X_INLINE bool Split(size_t count) const;
+
+private:
+	size_t size_;
+};
+
+
+template <typename JobData>
+static inline void parallel_for_job(JobSystem* pJobSys, size_t threadIdx, Job* job, void* jobData)
+{
+	const JobData* data = static_cast<const JobData*>(jobData);
+	const JobData::SplitterType& splitter = data->splitter;
+
+	if (splitter.Split<JobData::DataType>(data->count))
+	{
+		// split in two
+		const size_t leftCount = data->count / 2u;
+		const JobData leftData(data->data, leftCount, data->function, splitter);
+		Job* left = pJobSys->CreateJobAsChild(job, &parallel_for_job<JobData>, leftData);
+		pJobSys->Run(left);
+
+		const size_t rightCount = data->count - leftCount;
+		const JobData rightData(data->data + leftCount, rightCount, data->function, splitter);
+		Job* right = pJobSys->CreateJobAsChild(job, &parallel_for_job<JobData>, rightData);
+		pJobSys->Run(right);
+	}
+	else
+	{
+		(data->function)(data->data, data->count);
+	}
+}
+
+
+
+
+template <typename T, typename S>
+struct parallel_for_job_data
+{
+	typedef T DataType;
+	typedef S SplitterType;
+	typedef traits::Function<void(DataType*, size_t)> DataJobFunction;
+	typedef typename DataJobFunction::Pointer DataJobFunctionPtr;
+
+	parallel_for_job_data(DataType* data, size_t count, DataJobFunctionPtr function, const SplitterType& splitter)
+		: data(data)
+		, count(count)
+		, function(function)
+		, splitter(splitter)
+	{
+	}
+
+	DataType* data;
+	size_t count;
+	DataJobFunctionPtr function;
+	SplitterType splitter;
+};
+
 class JobSystem
 {
 	struct ThreadJobAllocator;
@@ -107,9 +190,19 @@ private:
 
 public:
 	Job* CreateJob(JobFunction::Pointer function);
-	Job* CreateJob(JobFunction::Pointer function, void* pData);
 	Job* CreateJobAsChild(Job* pParent, JobFunction::Pointer function);
-	Job* CreateJobAsChild(Job* pParent, JobFunction::Pointer function, void* pData);
+
+	X_INLINE Job* CreateJob(JobFunction::Pointer function, void* pData);
+	X_INLINE Job* CreateJobAsChild(Job* pParent, JobFunction::Pointer function, void* pData);
+
+	template<typename T>
+	X_INLINE Job* CreateJob(JobFunction::Pointer function, const T& data);
+	template<typename T>
+	X_INLINE Job* CreateJobAsChild(Job* pParent, JobFunction::Pointer function, const T& data);
+
+	template <typename T, typename SplitterT>
+	X_INLINE Job* parallel_for(T* data, size_t count, 
+		typename parallel_for_job_data<T,SplitterT>::DataJobFunctionPtr function, const SplitterT& splitter);
 
 	void Run(Job* pJob);
 	void Wait(Job* pJob);
