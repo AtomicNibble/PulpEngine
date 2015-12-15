@@ -440,6 +440,7 @@
     <ClCompile Include="UT_Hash.cpp" />
     <ClCompile Include="UT_JobList.cpp" />
     <ClCompile Include="UT_JobSystem.cpp" />
+    <ClCompile Include="UT_JobSystemV2.cpp" />
     <ClCompile Include="UT_Lexer.cpp" />
     <ClCompile Include="UT_LZ4.cpp" />
     <ClCompile Include="UT_LZMA.cpp" />

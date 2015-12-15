@@ -1045,6 +1045,9 @@
     <ClInclude Include="Threading\FiberScheduler.h">
       <Filter>Headers\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\JobSystem2.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1309,6 +1312,9 @@
       <Filter>Headers\String</Filter>
     </None>
     <None Include="Threading\FiberScheduler.inl">
+      <Filter>Headers\Threading</Filter>
+    </None>
+    <None Include="Threading\JobSystem2.inl">
       <Filter>Headers\Threading</Filter>
     </None>
   </ItemGroup>
@@ -1589,6 +1595,9 @@
     </ClCompile>
     <ClCompile Include="Util\win32\StopWatch.cpp">
       <Filter>SourceFiles\Util\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Threading\JobSystem2.cpp">
+      <Filter>SourceFiles\Threading</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

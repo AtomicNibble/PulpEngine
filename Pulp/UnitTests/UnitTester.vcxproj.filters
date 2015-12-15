@@ -310,6 +310,9 @@
     <ClCompile Include="UT_FiberScheduler.cpp">
       <Filter>Source Files\tests\Threading</Filter>
     </ClCompile>
+    <ClCompile Include="UT_JobSystemV2.cpp">
+      <Filter>Source Files\tests\Threading</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">

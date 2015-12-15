@@ -276,6 +276,7 @@
     <ClInclude Include="Threading\FiberScheduler.h" />
     <ClInclude Include="Threading\JobList.h" />
     <ClInclude Include="Threading\JobSystem.h" />
+    <ClInclude Include="Threading\JobSystem2.h" />
     <ClInclude Include="Threading\Semaphore.h" />
     <ClInclude Include="Threading\Signal.h" />
     <ClInclude Include="Threading\Spinlock.h" />
@@ -400,6 +401,7 @@
     <None Include="Threading\Atomic.inl" />
     <None Include="Threading\AtomicInt.inl" />
     <None Include="Threading\FiberScheduler.inl" />
+    <None Include="Threading\JobSystem2.inl" />
     <None Include="Threading\Spinlock.inl" />
     <None Include="Threading\win32\CriticalSection.inl" />
     <None Include="Threading\win32\Semaphore.inl" />
@@ -715,6 +717,7 @@
     <ClCompile Include="Threading\FiberScheduler.cpp" />
     <ClCompile Include="Threading\JobList.cpp" />
     <ClCompile Include="Threading\JobSystem.cpp" />
+    <ClCompile Include="Threading\JobSystem2.cpp" />
     <ClCompile Include="Threading\win32\ConditionVariable.cpp" />
     <ClCompile Include="Threading\win32\CriticalSection.cpp" />
     <ClCompile Include="Threading\win32\Fiber.cpp" />
