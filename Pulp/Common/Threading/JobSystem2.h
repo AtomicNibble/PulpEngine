@@ -47,16 +47,14 @@ typedef core::traits::Function<void(JobSystem*, size_t, Job*, void*)> JobFunctio
 
 struct Job
 {
+	static const size_t PAD_SIZE = 64 - (sizeof(void*) * 3 + sizeof(core::AtomicInt));
+public:
 	JobFunction::Pointer pFunction;
 	Job* pParent;
 	void* pArgData;
 	core::AtomicInt unfinishedJobs;
 
-#if X_64
-	char pad[(50 - 4) - 12];
-#else
-	char pad[50 - 4];
-#endif
+	char pad[PAD_SIZE];
 };
 
 X_ENSURE_SIZE(Job, 64);
