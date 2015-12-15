@@ -33,9 +33,6 @@ namespace Fiber
 		void* pArgData;
 	};
 
-//	typedef ReferenceCountedInstance<core::AtomicInt> RefCountedAtomicInt;
-//	typedef core::ReferenceCountedOwner<RefCountedAtomicInt> RefCountedAtomicIntOwner;
-
 	struct TaskBundle
 	{
 		TaskBundle();
