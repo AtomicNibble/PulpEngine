@@ -180,14 +180,14 @@ namespace
 //	core::AtomicInt numJobsRanEmpty(0);
 
 
-	void UpdateParticles(unsigned int count)
+	void UpdateParticles(uintptr_t count)
 	{
 	//	++numJobsRanEmpty;
 	}
 
 	static void parallel_for_job(Fiber::Scheduler* pScheduler, void* pArg)
 	{
-		uint32_t count = reinterpret_cast<uint32_t>(pArg);
+		uintptr_t count = union_cast<uintptr_t, void*>(pArg);
 
 		if (count > 2)
 		{
@@ -195,14 +195,14 @@ namespace
 			task.Function = parallel_for_job;
 
 			// split in two
-			const unsigned int leftCount = count / 2u;
-			const unsigned int rightCount = count - leftCount;
+			const uintptr_t leftCount = count / 2u;
+			const uintptr_t rightCount = count - leftCount;
 
-			task.pArgData = reinterpret_cast<void*>(leftCount);
+			task.pArgData = union_cast<void*, uintptr_t>(leftCount);
 			pScheduler->AddTask(task, &gpCounter, Fiber::JobPriority::HIGH);
 
 
-			task.pArgData = reinterpret_cast<void*>(rightCount);
+			task.pArgData = union_cast<void*, uintptr_t>(rightCount);
 			pScheduler->AddTask(task, &gpCounter, Fiber::JobPriority::HIGH);
 		}
 		else
