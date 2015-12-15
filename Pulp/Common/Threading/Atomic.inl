@@ -7,11 +7,13 @@ namespace atomic
 	#pragma intrinsic (_InterlockedExchange)
 	#pragma intrinsic (_InterlockedCompareExchange)
 
+#if X_64
 	#pragma intrinsic (_InterlockedIncrement64)
 	#pragma intrinsic (_InterlockedDecrement64)
 	#pragma intrinsic (_InterlockedExchangeAdd64)
 	#pragma intrinsic (_InterlockedExchange64)
 	#pragma intrinsic (_InterlockedCompareExchange64)
+#endif // !X_64
 
 //	#pragma intrinsic (_InterlockedIncrement16)
 //	#pragma intrinsic (_InterlockedDecrement16)
@@ -24,6 +26,8 @@ namespace atomic
 	{
 		template <size_t N>
 		struct Implementation {};
+
+#if X_64
 
 		/// Template specialization for 8-byte types.
 		template <>
@@ -70,6 +74,7 @@ namespace atomic
 					static_cast<__int64 >(exchange), static_cast<__int64 >(comperand)));
 			}
 		};
+#endif // !X_64
 
 		/// Template specialization for 4-byte types.
 		template <>
