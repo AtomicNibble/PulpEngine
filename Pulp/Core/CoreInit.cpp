@@ -12,6 +12,8 @@
 #include <Debugging\InvalidParameterHandler.h>
 #include <Debugging\SymbolResolution.h>
 
+#include <Threading\JobSystem2.h>
+
 #include <IInput.h>
 #include <IEngineModule.h>
 #include <IScriptSys.h>
@@ -248,7 +250,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 	// #------------------------- JOB SYSTEM ------------------------
 	if (env_.pJobSys) {
-//		env_.pJobSys->StartUp();
+		env_.pJobSys->StartUp();
 	}
 
 	// #------------------------- ProfileSys ---------------------------
