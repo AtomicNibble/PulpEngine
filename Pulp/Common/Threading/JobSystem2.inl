@@ -91,7 +91,16 @@ namespace V2
 		return job;
 	}
 
+	template<typename ClassType>
+	X_INLINE Job* JobSystem::CreateJobMemberFunc(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction)
+	{
+		typedef member_function_job_data<ClassType> MemberCallerData;
+		MemberCallerData jobData(pInst, pFunction);
 
+		Job* job = CreateJob<MemberCallerData>(&member_function_job<MemberCallerData>, jobData);
+
+		return job;
+	}
 
 } // namespace V2
 

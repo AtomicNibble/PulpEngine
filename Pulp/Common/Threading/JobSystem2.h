@@ -128,22 +128,20 @@ static inline void parallel_for_job(JobSystem* pJobSys, size_t threadIdx, Job* j
 	{
 		// split in two
 		const size_t leftCount = data->count / 2u;
-		const JobData leftData(data->data, leftCount, data->function, splitter);
+		const JobData leftData(data->data, leftCount, data->pFunction, splitter);
 		Job* left = pJobSys->CreateJobAsChild(job, &parallel_for_job<JobData>, leftData);
 		pJobSys->Run(left);
 
 		const size_t rightCount = data->count - leftCount;
-		const JobData rightData(data->data + leftCount, rightCount, data->function, splitter);
+		const JobData rightData(data->data + leftCount, rightCount, data->pFunction, splitter);
 		Job* right = pJobSys->CreateJobAsChild(job, &parallel_for_job<JobData>, rightData);
 		pJobSys->Run(right);
 	}
 	else
 	{
-		(data->function)(data->data, data->count);
+		(data->pFunction)(data->data, data->count);
 	}
 }
-
-
 
 
 template <typename T, typename S>
@@ -154,18 +152,44 @@ struct parallel_for_job_data
 	typedef traits::Function<void(DataType*, size_t)> DataJobFunction;
 	typedef typename DataJobFunction::Pointer DataJobFunctionPtr;
 
-	parallel_for_job_data(DataType* data, size_t count, DataJobFunctionPtr function, const SplitterType& splitter)
-		: data(data)
+	parallel_for_job_data(DataType* data, size_t count, DataJobFunctionPtr function, const SplitterType& splitter): 
+		data(data)
 		, count(count)
-		, function(function)
+		, pFunction(function)
 		, splitter(splitter)
 	{
 	}
 
 	DataType* data;
 	size_t count;
-	DataJobFunctionPtr function;
+	DataJobFunctionPtr pFunction;
 	SplitterType splitter;
+};
+
+template <typename JobData>
+static inline void member_function_job(JobSystem* pJobSys, size_t threadIdx, Job* job, void* jobData)
+{
+	JobData* data = static_cast<JobData*>(jobData);
+	(*data->pInst.*data->pFunction)(pJobSys, threadIdx, job);
+}
+
+
+template<typename C>
+struct member_function_job_data
+{
+	typedef C ClassType;
+	typedef traits::MemberFunction<C, void(JobSystem*, size_t, Job*)> MemberFunction;
+	typedef typename MemberFunction::Pointer MemberFunctionPtr;
+
+	member_function_job_data(ClassType* pInst, MemberFunctionPtr function) :
+		pInst(pInst),
+		pFunction(function)
+	{
+
+	}
+
+	ClassType* pInst;
+	MemberFunctionPtr pFunction;
 };
 
 class JobSystem
@@ -203,6 +227,10 @@ public:
 	template <typename T, typename SplitterT>
 	X_INLINE Job* parallel_for(T* data, size_t count, 
 		typename parallel_for_job_data<T,SplitterT>::DataJobFunctionPtr function, const SplitterT& splitter);
+
+	template<typename ClassType>
+	X_INLINE Job* CreateJobMemberFunc(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction);
+
 
 	void Run(Job* pJob);
 	void Wait(Job* pJob);
