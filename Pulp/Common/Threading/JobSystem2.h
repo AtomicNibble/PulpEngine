@@ -50,10 +50,7 @@ struct Job
 	static const size_t PAD_SIZE = (64 - ((sizeof(void*) * 3) + (sizeof(core::AtomicInt) + sizeof(int32_t))));
 public:
 	core::AtomicInt unfinishedJobs;
-#if X_64
 	int32_t pad_;
-#endif
-
 	JobFunction::Pointer pFunction;
 	Job* pParent;
 	void* pArgData;
