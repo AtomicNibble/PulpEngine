@@ -206,7 +206,7 @@ public:
 
 	void Run(Job* pJob);
 	void Wait(Job* pJob);
-	void WaitWithoutHelp(Job* pJob);
+	void WaitWithoutHelp(Job* pJob) const;
 
 private:
 	Job* AllocateJob(void);

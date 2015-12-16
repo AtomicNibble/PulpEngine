@@ -285,7 +285,7 @@ namespace V2
 		}
 	}
 
-	void JobSystem::WaitWithoutHelp(Job* pJob)
+	void JobSystem::WaitWithoutHelp(Job* pJob) const 
 	{
 		while (!HasJobCompleted(pJob))
 		{
