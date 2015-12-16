@@ -192,6 +192,10 @@ namespace V2
 
 		core::zero_object(pThreadQues_);
 		core::zero_object(pJobAllocators_);
+
+		// clear main thread tls values also.
+		gThreadQue.SetValue(nullptr);
+		gThreadAllocator.SetValue(nullptr);
 	}
 
 	/// ===============================================

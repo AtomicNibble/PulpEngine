@@ -31,7 +31,7 @@ TEST(Threading, JobSystem2Empty)
 	JobSystem jobSys;
 	jobSys.Start();
 
-	const size_t numJobs = 65000;
+	const size_t numJobs = 4000;
 
 	core::TimeVal MultiElapsed;
 	core::StopWatch timer;
@@ -116,7 +116,7 @@ namespace Data
 
 TEST(Threading, JobSystem2Empty_parallel_data)
 {
-	unsigned int count = 65000;
+	unsigned int count = 4000;
 
 	JobSystem jobSys;
 	jobSys.Start();
@@ -181,7 +181,7 @@ namespace NoData
 
 TEST(Threading, JobSystem2Empty_parallel)
 {
-	const size_t numJobs = 65000;
+	const size_t numJobs = 4000;
 
 	JobSystem jobSys;
 	jobSys.Start();

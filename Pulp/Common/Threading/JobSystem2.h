@@ -196,8 +196,10 @@ class JobSystem
 public:
 	static const uint32_t HW_THREAD_MAX = 16; // max even if hardware supports more.
 	static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
-	static const size_t MAX_JOBS = 1 << 16;
-
+	static const size_t MAX_JOBS = 1 << 12;
+	// 68kb(72kb x64) per 1024 jobs per thread
+	// so for 4096 jobs with 6 threads it's: 1728kb ~1.7mb
+	static const size_t MEMORY_PER_THREAD = (MAX_JOBS * sizeof(Job)) + (MAX_JOBS * sizeof(Job*));
 public:
 	JobSystem();
 	~JobSystem();
