@@ -109,43 +109,43 @@ public:
 	~XCore() X_OVERRIDE;
 
 	virtual bool Init(const SCoreInitParams &startupParams) X_OVERRIDE;
-	virtual void ShutDown(); // not part of ICore currently
-	virtual void Release() X_OVERRIDE;
+	virtual void ShutDown(void); // not part of ICore currently
+	virtual void Release(void) X_OVERRIDE;
 
-	virtual bool PumpMessages() X_OVERRIDE;
-	virtual bool Update() X_OVERRIDE;
-	virtual void RenderBegin() X_OVERRIDE;
-	virtual void RenderEnd() X_OVERRIDE;
+	virtual bool PumpMessages(void) X_OVERRIDE;
+	virtual bool Update(void) X_OVERRIDE;
+	virtual void RenderBegin(void) X_OVERRIDE;
+	virtual void RenderEnd(void) X_OVERRIDE;
 
 	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_OVERRIDE;
 
 
-	core::ITimer		*GetITimer() X_OVERRIDE{ return env_.pTimer; }
-	input::IInput		*GetIInput() X_OVERRIDE{ return env_.pInput; }
-	core::IConsole		*GetIConsole() X_OVERRIDE{ return env_.pConsole; }
-	core::IFileSys		*GetIFileSys() X_OVERRIDE{ return env_.pFileSys; }
-	sound::ISound		*GetISound() X_OVERRIDE{ return env_.pSound; }
-	script::IScriptSys  *GetISscriptSys() X_OVERRIDE{ return env_.pScriptSys; }
-	render::IRender		*GetIRender() X_OVERRIDE{ return env_.pRender; }
-	font::IXFontSys		*GetIFontSys() X_OVERRIDE{ return env_.pFont; }
-	core::IJobSystem	*GetJobSystem() X_OVERRIDE{ return env_.pJobSys; }
-	core::IProfileSys	*GetIProfileSys() X_OVERRIDE{ return &profileSys_; }
-	core::IXDirectoryWatcher *GetDirWatcher() X_OVERRIDE{ return env_.pDirWatcher; }
-	core::IXHotReloadManager*   GetHotReloadMan() X_OVERRIDE{ return this; };
+	core::ITimer		*GetITimer(void) X_OVERRIDE{ return env_.pTimer; }
+	input::IInput		*GetIInput(void) X_OVERRIDE{ return env_.pInput; }
+	core::IConsole		*GetIConsole(void) X_OVERRIDE{ return env_.pConsole; }
+	core::IFileSys		*GetIFileSys(void) X_OVERRIDE{ return env_.pFileSys; }
+	sound::ISound		*GetISound(void) X_OVERRIDE{ return env_.pSound; }
+	script::IScriptSys  *GetISscriptSys(void) X_OVERRIDE{ return env_.pScriptSys; }
+	render::IRender		*GetIRender(void) X_OVERRIDE{ return env_.pRender; }
+	font::IXFontSys		*GetIFontSys(void) X_OVERRIDE{ return env_.pFont; }
+	core::IJobSystem	*GetJobSystem(void) X_OVERRIDE{ return env_.pJobSys; }
+	core::IProfileSys	*GetIProfileSys(void) X_OVERRIDE{ return &profileSys_; }
+	core::IXDirectoryWatcher *GetDirWatcher(void) X_OVERRIDE{ return env_.pDirWatcher; }
+	core::IXHotReloadManager*   GetHotReloadMan(void) X_OVERRIDE{ return this; };
 
-	ICoreEventDispatcher* GetCoreEventDispatcher() X_OVERRIDE{ return pEventDispatcher_; }
-	core::ILog			*GetILog() X_OVERRIDE{ return env_.pLog; };
-	core::Crc32			*GetCrc32() X_OVERRIDE;
-	core::CpuInfo*	GetCPUInfo() X_OVERRIDE { return pCpuInfo_; };
-
-
-	core::xWindow* GetGameWindow() X_OVERRIDE { return pWindow_; }
-
-	virtual IGoatFactoryRegistry* GetFactoryRegistry() const X_OVERRIDE;
+	ICoreEventDispatcher* GetCoreEventDispatcher(void) X_OVERRIDE{ return pEventDispatcher_; }
+	core::ILog			*GetILog(void) X_OVERRIDE{ return env_.pLog; };
+	core::Crc32			*GetCrc32(void) X_OVERRIDE;
+	core::CpuInfo*	GetCPUInfo(void) X_OVERRIDE { return pCpuInfo_; };
 
 
-	virtual SCoreGlobals* GetGlobalEnv() X_OVERRIDE{ return &env_; }
-	virtual core::MallocFreeAllocator* GetGlobalMalloc() X_OVERRIDE{ return &malloc_; }
+	core::xWindow* GetGameWindow(void) X_OVERRIDE { return pWindow_; }
+
+	virtual IGoatFactoryRegistry* GetFactoryRegistry(void) const X_OVERRIDE;
+
+
+	virtual SCoreGlobals* GetGlobalEnv(void) X_OVERRIDE{ return &env_; }
+	virtual core::MallocFreeAllocator* GetGlobalMalloc(void) X_OVERRIDE{ return &malloc_; }
 
 	static SCoreGlobals env_;
 	static core::MallocFreeAllocator malloc_;
