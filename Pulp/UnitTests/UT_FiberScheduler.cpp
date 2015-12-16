@@ -225,13 +225,12 @@ TEST(Threading, FiberSchedulerEmpty)
 
 	ASSERT_TRUE(scheduler.StartUp());
 
+	core::AtomicInt* pCounter = nullptr;
 
 	core::TimeVal MultiElapsed;
 	core::StopWatch timer;
 	{
 		timer.Start();
-
-		core::AtomicInt* pCounter = nullptr;
 
 		size_t i;
 		for (i = 0; i < numJobs; i++)
