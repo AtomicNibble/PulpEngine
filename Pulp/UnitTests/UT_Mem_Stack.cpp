@@ -58,7 +58,7 @@ TEST(StackAlloc, Stack)
 		memset(alloc1, 0xAB, 16);
 
 		// the first allocation (4 bytes) must end at a 16-byte boundary, hence this allocation should be at the next boundary
-#if X_64
+#if X_64 && X_ENABLE_STACK_ALLOCATOR_CHECK
 		EXPECT_EQ(buf + 32 + 32, alloc1);
 #else
 		EXPECT_EQ(buf + 32 + 16, alloc1);
@@ -187,7 +187,7 @@ TEST(StackAlloc, Heap)
 		memset(alloc1, 0xAB, 16);
 
 		// the first allocation (4 bytes) must end at a 16-byte boundary, hence this allocation should be at the next boundary
-#if X_64
+#if X_64 && X_ENABLE_STACK_ALLOCATOR_CHECK
 		EXPECT_EQ(memory + 32 + 32, alloc1);
 #else
 		EXPECT_EQ(memory + 32 + 16, alloc1);
