@@ -95,6 +95,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameDLL", "..\Pulp\GameDLL\
 		{07328CCB-F9CC-4967-861E-272BCA0CAB04} = {07328CCB-F9CC-4967-861E-272BCA0CAB04}
 	EndProjectSection
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{308CE098-B629-42F4-97D6-621B6A7CEEDA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Dynamic|Win32 = Debug Dynamic|Win32

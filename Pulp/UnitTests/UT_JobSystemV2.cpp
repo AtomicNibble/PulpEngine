@@ -236,3 +236,56 @@ TEST(Threading, JobSystem2Empty_parallel_for)
 }
 
 
+namespace Member
+{
+	class JobClass
+	{
+	public:
+		void job(JobSystem* pJobSys, size_t threadIdx, Job* pJob)
+		{
+			X_UNUSED(pJobSys);
+			X_UNUSED(threadIdx);
+			X_UNUSED(pJob);
+
+			++callCount_;
+		}
+
+		int32_t GetCallCount(void) const {
+			return callCount_;
+		}
+
+	private:
+		core::AtomicInt callCount_;
+	};
+
+} // namespace Member
+
+TEST(Threading, JobSystem2Empty_member_func)
+{
+	JobSystem jobSys;
+	jobSys.Start();
+
+
+	core::TimeVal MultiElapsed;
+	core::StopWatch timer;
+	{
+		timer.Start();
+
+		Member::JobClass inst;
+
+		Job* job = jobSys.CreateJobMemberFunc<Member::JobClass>(&inst, &Member::JobClass::job);
+
+		jobSys.Run(job);
+		jobSys.Wait(job);
+
+		EXPECT_EQ(1, inst.GetCallCount());
+
+		MultiElapsed = timer.GetTimeVal();
+	}
+
+	X_LOG0("JobSystem", "Member Function %gms",  MultiElapsed.GetMilliSeconds());
+
+	jobSys.ShutDown();
+}
+
+
