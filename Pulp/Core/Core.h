@@ -128,7 +128,7 @@ public:
 	script::IScriptSys  *GetISscriptSys(void) X_OVERRIDE{ return env_.pScriptSys; }
 	render::IRender		*GetIRender(void) X_OVERRIDE{ return env_.pRender; }
 	font::IXFontSys		*GetIFontSys(void) X_OVERRIDE{ return env_.pFont; }
-	core::IJobSystem	*GetJobSystem(void) X_OVERRIDE{ return env_.pJobSys; }
+//	core::IJobSystem	*GetJobSystem(void) X_OVERRIDE{ return env_.pJobSys; }
 	core::IProfileSys	*GetIProfileSys(void) X_OVERRIDE{ return &profileSys_; }
 	core::IXDirectoryWatcher *GetDirWatcher(void) X_OVERRIDE{ return env_.pDirWatcher; }
 	core::IXHotReloadManager*   GetHotReloadMan(void) X_OVERRIDE{ return this; };

@@ -37,6 +37,10 @@ class Console;
 class xWindow;
 class MallocFreeAllocator;
 class MemoryArenaBase;
+
+namespace V2 {
+	class JobSystem;
+}
 )
 X_NAMESPACE_DECLARE(font, struct IXFontSys; struct IFFont)
 X_NAMESPACE_DECLARE(sound, struct ISound)
@@ -228,7 +232,9 @@ struct SCoreGlobals
 	render::IRender*			pRender;
 	engine::I3DEngine*			p3DEngine;
 	game::IGame*				pGame;
-	core::IJobSystem*			pJobSys;
+//	core::IJobSystem*			pJobSys;
+	core::V2::JobSystem*		pJobSys;
+
 
 	core::IXDirectoryWatcher*   pDirWatcher;
 	core::IXHotReloadManager*   pHotReload;
@@ -302,7 +308,7 @@ struct ICore
 	virtual script::IScriptSys  *GetISscriptSys() X_ABSTRACT;
 	virtual render::IRender		*GetIRender() X_ABSTRACT;
 	virtual font::IXFontSys		*GetIFontSys() X_ABSTRACT;
-	virtual core::IJobSystem	*GetJobSystem() X_ABSTRACT;
+//	virtual core::IJobSystem	*GetJobSystem() X_ABSTRACT;
 
 	virtual core::IProfileSys	*GetIProfileSys() X_ABSTRACT;
 	virtual core::ILog			*GetILog() X_ABSTRACT;

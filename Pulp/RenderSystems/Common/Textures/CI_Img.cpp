@@ -53,8 +53,10 @@ namespace CI
 	{
 		JobData* pData = X_NEW(JobData, arena, "CIJobData")(path, image, arena);
 
-		core::JobDecl job(WriteCIJob, pData);
-		gEnv->pJobSys->AddJob(job, core::JobPriority::NONE);
+		X_UNUSED(pData);
+		X_ASSERT_NOT_IMPLEMENTED();
+//		core::JobDecl job(WriteCIJob, pData);
+//		gEnv->pJobSys->AddJob(job, core::JobPriority::NONE);
 		return true;
 	}
 
