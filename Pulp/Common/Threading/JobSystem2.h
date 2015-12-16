@@ -204,7 +204,7 @@ public:
 	JobSystem();
 	~JobSystem();
 
-	bool Start(void);
+	bool StartUp(void);
 	void ShutDown(void);
 
 private:

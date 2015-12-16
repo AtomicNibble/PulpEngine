@@ -29,7 +29,7 @@ namespace
 TEST(Threading, JobSystem2Empty)
 {
 	JobSystem jobSys;
-	jobSys.Start();
+	jobSys.StartUp();
 
 	const size_t numJobs = 4000;
 
@@ -119,7 +119,7 @@ TEST(Threading, JobSystem2Empty_parallel_data)
 	unsigned int count = 4000;
 
 	JobSystem jobSys;
-	jobSys.Start();
+	jobSys.StartUp();
 
 	core::TimeVal MultiElapsed;
 	core::StopWatch timer;
@@ -184,7 +184,7 @@ TEST(Threading, JobSystem2Empty_parallel)
 	const size_t numJobs = 4000;
 
 	JobSystem jobSys;
-	jobSys.Start();
+	jobSys.StartUp();
 
 	core::TimeVal MultiElapsed;
 	core::StopWatch timer;
@@ -210,7 +210,7 @@ void UpdateCamel(uint32_t*, size_t count)
 TEST(Threading, JobSystem2Empty_parallel_for)
 {
 	JobSystem jobSys;
-	jobSys.Start();
+	jobSys.StartUp();
 
 	numJobsRan = 0;
 
@@ -263,7 +263,7 @@ namespace Member
 TEST(Threading, JobSystem2Empty_member_func)
 {
 	JobSystem jobSys;
-	jobSys.Start();
+	jobSys.StartUp();
 
 
 	core::TimeVal MultiElapsed;

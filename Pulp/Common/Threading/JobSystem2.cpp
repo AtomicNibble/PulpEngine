@@ -143,7 +143,7 @@ namespace V2
 
 
 
-	bool JobSystem::Start(void)
+	bool JobSystem::StartUp(void)
 	{
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pArena);
