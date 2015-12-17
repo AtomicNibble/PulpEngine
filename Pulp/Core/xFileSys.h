@@ -15,6 +15,9 @@ X_ENABLE_WARNING(4702)
 #include <Memory\AllocationPolicies\PoolAllocator.h>
 #include <Memory\HeapArea.h>
 
+#include "Threading\ThreadQue.h"
+#include "Threading\Thread.h"
+
 X_NAMESPACE_BEGIN(core)
 
 
@@ -44,8 +47,80 @@ struct search_s
 
 struct XFindData;
 
+// stuff for io requests
+X_DECLARE_ENUM(IoRequest)(
+	// open a file gor a given name and mode.
+	// OnSuccess: vaild async file handle.
+	OPEN,			
+	OPEN_READ_ALL,
+	CLOSE,
+	READ,			
+	WRITE
+);
 
-class xFileSys : public IFileSys
+typedef core::traits::Function<void(IoRequest::Enum requestType, bool, XFileAsync*)> IoRequestCallback;
+
+struct IoRequestOpen
+{
+	core::string name;
+	fileModeFlags mode;
+};
+
+struct IoRequestClose
+{
+	XFileAsync* pFile;
+};
+
+struct IoRequestRead 
+{
+	XFileAsync* pFile;
+	void* pBuf;
+	uint64_t offset;	// support files >4gb.
+	uint32_t dataSize; // don't support reading >4gb at once.
+};
+
+typedef IoRequestRead IoRequestWrite;
+
+struct IoRequestData
+{
+	IoRequestData() {}
+	~IoRequestData() {}
+
+	IoRequestData(const IoRequestData&) {
+
+	}
+
+	IoRequestData& operator=(const IoRequestData& oth) {
+		type = oth.type;
+		return *this;
+	}
+
+	X_INLINE IoRequest::Enum getType(void) const {
+		return type;
+	}
+
+	IoRequest::Enum type;
+	IoRequestCallback::Pointer callback;
+
+	union Data
+	{
+		Data() {
+		}
+		~Data() {
+		}
+
+		IoRequestOpen openInfo;
+		IoRequestClose closeInfo;
+		IoRequestRead readInfo;
+		IoRequestWrite writeInfo;
+	}data;
+};
+
+X_ENSURE_LE(sizeof(IoRequestData), 64, "IoRequest data should be 64 bytes or less");
+
+
+
+class xFileSys : public IFileSys, private core::ThreadAbstract
 {
 	typedef core::MemoryArena<
 		core::PoolAllocator,
@@ -85,6 +160,8 @@ public:
 	bool Init(void) X_FINAL;
 	void ShutDown(void) X_FINAL;
 	void CreateVars(void) X_FINAL;
+
+	bool InitDirectorys(void);
 
 	// Open / Close
 	XFile* openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;
@@ -132,6 +209,19 @@ public:
 	// stats
 	virtual XFileStats& getStats(void) const X_FINAL;
 
+
+	// IoRequest que.
+
+	void AddIoRequestToQue(const IoRequestData& request);
+	bool StartRequestWorker(void);
+	void ShutDownRequestWorker(void);
+
+	// ~
+
+	// ThreadAbstract
+	virtual Thread::ReturnValue ThreadRun(const Thread& thread) X_FINAL;
+	// ~ThreadAbstract
+
 private:
 
 	bool fileExistsOS(pathTypeW fullPath) const;
@@ -164,6 +254,13 @@ private:
 	core::MallocFreeAllocator memfileAllocator_;
 	MemfileArena		memFileArena_;
 
+private:
+	static const size_t IO_QUE_SIZE = 0x200;
+
+	// io thread.
+	typedef ThreadQueBlocking<IoRequestData, core::CriticalSection> IoQue;
+
+	IoQue ioQue_;
 };
 
 

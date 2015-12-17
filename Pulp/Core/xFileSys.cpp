@@ -56,7 +56,8 @@ xFileSys::xFileSys() :
 	FilePoolArena::getMemoryOffsetRequirement()
 	),
 	filePoolArena_(&filePoolAllocator_, "FilePool"),
-	memFileArena_(&memfileAllocator_, "MemFileArena")
+	memFileArena_(&memfileAllocator_, "MemFileArena"),
+	ioQue_(gEnv->pArena, IO_QUE_SIZE)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pArena);
@@ -75,6 +76,60 @@ bool xFileSys::Init()
 	X_ASSERT_NOT_NULL(gEnv->pCore);
 	X_LOG0("FileSys", "Starting Filesys..");
 
+	if (!InitDirectorys()) {
+		X_ERROR("FileSys", "Failed to set game directories");
+		return false;
+	}
+
+	if (!StartRequestWorker()) {
+		X_ERROR("FileSys", "Failed to start io request worker");
+		return false;
+	}
+
+	return true;
+}
+
+void xFileSys::ShutDown()
+{
+	X_LOG0("FileSys", "Shutting Down");
+
+	ShutDownRequestWorker();
+
+	for (search_s* s = searchPaths_; s; ) {
+		search_s* cur = s;
+		s = cur->next_;
+		if (cur->dir)
+			X_DELETE( cur->dir, g_coreArena);
+		else
+			X_DELETE(cur->pak, g_coreArena);
+		X_DELETE(cur, g_coreArena);
+	}
+}
+
+void xFileSys::CreateVars(void)
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pConsole);
+
+	ADD_CVAR_REF("filesys_debug", vars_.debug, 0, 0, 1, core::VarFlag::SYSTEM, "Filesystem debug. 0=off 1=on");
+
+	// create vars for the virtual directories which we then update with the paths once set.
+	size_t i;
+	core::StackString<64> name;
+	for (i = 0; i < MAX_VIRTUAL_DIR; i++)
+	{
+		name.set("filesys_mod_dir_");
+		name.appendFmt("%i", i);
+		vars_.pVirtualDirs[i] = ADD_CVAR_STRING(name.c_str(), "",
+			core::VarFlag::SYSTEM | 
+			core::VarFlag::READONLY |
+			core::VarFlag::CPY_NAME,
+			"Virtual mod directory");
+	}
+}
+
+bool xFileSys::InitDirectorys(void)
+{
 	// check if game dir set via cmd line.
 	const wchar_t* pGameDir = gEnv->pCore->GetCommandLineArgForVarW(L"fs_basepath");
 	if (pGameDir)
@@ -127,43 +182,6 @@ bool xFileSys::Init()
 	}
 
 	return false;
-}
-
-void xFileSys::ShutDown()
-{
-	X_LOG0("FileSys", "Shutting Down");
-
-	for (search_s* s = searchPaths_; s; ) {
-		search_s* cur = s;
-		s = cur->next_;
-		if (cur->dir)
-			X_DELETE( cur->dir, g_coreArena);
-		else
-			X_DELETE(cur->pak, g_coreArena);
-		X_DELETE(cur, g_coreArena);
-	}
-}
-
-void xFileSys::CreateVars(void)
-{
-	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->pConsole);
-
-	ADD_CVAR_REF("filesys_debug", vars_.debug, 0, 0, 1, core::VarFlag::SYSTEM, "Filesystem debug. 0=off 1=on");
-
-	// create vars for the virtual directories which we then update with the paths once set.
-	size_t i;
-	core::StackString<64> name;
-	for (i = 0; i < MAX_VIRTUAL_DIR; i++)
-	{
-		name.set("filesys_mod_dir_");
-		name.appendFmt("%i", i);
-		vars_.pVirtualDirs[i] = ADD_CVAR_STRING(name.c_str(), "",
-			core::VarFlag::SYSTEM | 
-			core::VarFlag::READONLY |
-			core::VarFlag::CPY_NAME,
-			"Virtual mod directory");
-	}
 }
 
 // --------------------- Open / Close ---------------------
@@ -903,6 +921,102 @@ XFileStats& xFileSys::getStats(void) const
 	return OsFile::fileStats();
 }
 
+
+// ----------------------- io que ---------------------------
+
+
+void xFileSys::AddIoRequestToQue(const IoRequestData& request)
+{
+	if (request.getType() != IoRequest::CLOSE) {
+		X_ASSERT_NOT_NULL(request.callback);
+	}
+
+	ioQue_.push(request);
+}
+
+bool xFileSys::StartRequestWorker(void)
+{
+	ThreadAbstract::Create("IoWorker", 1024 * 16); // small stack
+	ThreadAbstract::Start();
+	return true;
+}
+
+
+void xFileSys::ShutDownRequestWorker(void)
+{
+	ThreadAbstract::Stop();
+
+	// post a close job with a none null callback.
+	IoRequestData closeRequest;
+	closeRequest.type = IoRequest::CLOSE;
+	*reinterpret_cast<uintptr_t*>(&closeRequest.callback) = 1;
+
+	AddIoRequestToQue(closeRequest);
+
+	ThreadAbstract::Join();
+}
+
+
+Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
+{
+	IoRequestData request;
+
+	while (thread.ShouldRun())
+	{
+		ioQue_.pop(request);
+
+		if (request.getType() == IoRequest::OPEN)
+		{
+			IoRequestOpen& open = request.data.openInfo;
+			XFileAsync* pFile =	openFileAsync(open.name.c_str(), open.mode);
+			bool operationSucced = pFile != nullptr;
+
+			(request.callback)(request.getType(), operationSucced, pFile);
+		}
+		else if (request.getType() == IoRequest::OPEN_READ_ALL)
+		{
+
+		}
+		else if (request.getType() == IoRequest::CLOSE)
+		{
+			// if the close job has a callback, we are shutting down.
+			if (request.callback) {
+				uintptr_t val = reinterpret_cast<uintptr_t>(request.callback);
+				X_ASSERT(val == 1, "Close job can't have a callback other than shutdown magic")(val);
+				continue;
+			}
+
+			// normal close request.
+			IoRequestClose& close = request.data.closeInfo;
+
+			closeFileAsync(close.pFile);
+		}
+		else if (request.getType() == IoRequest::READ)
+		{
+			IoRequestRead& read = request.data.readInfo;
+			XFileAsync* pFile = read.pFile;
+
+			XFileAsyncOperation operation = pFile->readAsync(
+				read.pBuf,
+				read.dataSize,
+				safe_static_cast<uint32_t, uint64_t>(read.offset)
+			);
+		}
+		else if (request.getType() == IoRequest::WRITE)
+		{
+			IoRequestRead& write = request.data.writeInfo;
+			XFileAsync* pFile = write.pFile;
+
+			XFileAsyncOperation operation = pFile->readAsync(
+				write.pBuf,
+				write.dataSize,
+				safe_static_cast<uint32_t, uint64_t>(write.offset)
+			);
+		}
+	}
+
+	return Thread::ReturnValue(0);
+}
 
 
 
