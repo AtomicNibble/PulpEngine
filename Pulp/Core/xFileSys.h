@@ -44,24 +44,23 @@ struct search_s
 
 struct XFindData;
 
-typedef core::MemoryArena<
-	core::PoolAllocator, 
-	core::MultiThreadPolicy<core::Spinlock>,
-	core::SimpleBoundsChecking, 
-	core::SimpleMemoryTracking,
-	core::SimpleMemoryTagging> FilePoolArena;
-
-typedef core::MemoryArena<
-	core::MallocFreeAllocator,
-	core::MultiThreadPolicy<core::Spinlock>,
-	core::SimpleBoundsChecking,
-	core::SimpleMemoryTracking,
-	core::SimpleMemoryTagging> MemfileArena;
-
-
 
 class xFileSys : public IFileSys
 {
+	typedef core::MemoryArena<
+		core::PoolAllocator,
+		core::MultiThreadPolicy<core::Spinlock>,
+		core::SimpleBoundsChecking,
+		core::SimpleMemoryTracking,
+		core::SimpleMemoryTagging> FilePoolArena;
+
+	typedef core::MemoryArena<
+		core::MallocFreeAllocator,
+		core::MultiThreadPolicy<core::Spinlock>,
+		core::SimpleBoundsChecking,
+		core::SimpleMemoryTracking,
+		core::SimpleMemoryTagging> MemfileArena;
+
 public:
 #ifdef X_PLATFORM_WIN32
 	static const char NATIVE_SLASH = '\\';
