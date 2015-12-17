@@ -145,7 +145,7 @@ T ThreadQueBlocking<T, SynchronizationPrimitive>::pop(void)
 template<typename T>
 void ThreadQueBlocking<T, core::CriticalSection>::push(T const& value)
 {
-	ThreadQue<T, SynchronizationPrimitive>::Add(item);
+	ThreadQue<T, CriticalSection>::push(value);
 	cond_.NotifyOne();
 }
 
@@ -153,7 +153,7 @@ void ThreadQueBlocking<T, core::CriticalSection>::push(T const& value)
 template<typename T>
 void ThreadQueBlocking<T, core::CriticalSection>::pop(T& value)
 {
-	SynchronizationPrimitive::ScopedLock lock(primitive_);
+	CriticalSection::ScopedLock lock(primitive_);
 
 	while (que_.isEmpty())
 	{
@@ -168,7 +168,7 @@ void ThreadQueBlocking<T, core::CriticalSection>::pop(T& value)
 template<typename T>
 T ThreadQueBlocking<T, core::CriticalSection>::pop(void)
 {
-	SynchronizationPrimitive::ScopedLock lock(primitive_);
+	CriticalSection::ScopedLock lock(primitive_);
 
 	while (que_.isEmpty())
 	{
