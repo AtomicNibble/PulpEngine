@@ -1048,6 +1048,9 @@
     <ClInclude Include="Threading\JobSystem2.h">
       <Filter>Headers\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="Threading\ThreadQue.h">
+      <Filter>Headers\Threading</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1315,6 +1318,9 @@
       <Filter>Headers\Threading</Filter>
     </None>
     <None Include="Threading\JobSystem2.inl">
+      <Filter>Headers\Threading</Filter>
+    </None>
+    <None Include="Threading\ThreadQue.inl">
       <Filter>Headers\Threading</Filter>
     </None>
   </ItemGroup>
