@@ -18,6 +18,14 @@ struct IRenderMesh;
 )
 
 
+X_NAMESPACE_DECLARE(core,
+namespace V2 {
+	struct Job;
+	class JobSystem;
+}
+)
+
+
 X_NAMESPACE_BEGIN(level)
 
 
@@ -38,24 +46,6 @@ struct FrameStats
 	size_t visibleVerts;
 	size_t visibleEnts;
 };
-
-struct AsyncLoadData
-{
-	AsyncLoadData(core::XFileAsync* pFile, core::XFileAsyncOperation AsyncOp) :
-	headerLoaded_(false),
-	waitingForIo_(false),
-	pFile_(pFile), 
-	AsyncOp_(AsyncOp)
-	{}
-
-	~AsyncLoadData();
-
-	bool waitingForIo_;
-	bool headerLoaded_;
-	core::XFileAsync* pFile_;
-	core::XFileAsyncOperation AsyncOp_;
-};
-
 
 struct AreaNode 
 {
@@ -118,7 +108,7 @@ public:
 };
 
 
-class Level : public engine::XEngineBase
+class Level : public engine::XEngineBase, private core::IIoRequestHandler
 {
 	typedef core::Array<Area> AreaArr;
 	typedef core::Array<AreaNode> AreaNodeArr;
@@ -167,6 +157,16 @@ private:
 	void FloodVisibleAreas(void);
 	void DrawVisibleAreas(void);
 
+	// IIoRequestHandler
+	virtual void IoRequestCallback(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
+		core::XFileAsync* pFile, bool result) X_FINAL;
+	virtual void IoRequestCallbackMem(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
+		core::XFileMem* pFile, bool result) X_FINAL;
+	// ~IIoRequestHandler
+
+
+	void ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* job, void* pData);
+	void ProcessData_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* job, void* pData);
 
 public:
 	// util
@@ -201,8 +201,8 @@ private:
 	void DrawStaticModel(const level::StaticModel& sm);
 
 private:
-	bool ProcessHeader(uint32_t bytesRead);
-	bool ProcessData(uint32_t bytesRead);
+	bool ProcessHeader(void);
+	bool ProcessData(void);
 
 
 private:
@@ -241,17 +241,19 @@ private:
 
 	bool canRender_;
 	bool outsideWorld_;
-	bool _pad[2];
+	bool headerLoaded_;
+	bool _pad[1];
 
 private:
 	core::Path<char> path_;
 	FileHeader fileHdr_;
 	LoadStats loadStats_;
-	AsyncLoadData* pAsyncLoadData_;
+
 
 private:
 	core::ITimer* pTimer_;
 	core::IFileSys* pFileSys_;
+	core::V2::JobSystem* pJobSys_;
 
 private:
 	// vars

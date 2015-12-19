@@ -26,12 +26,6 @@ void FrameStats::clear(void)
 
 // --------------------------------
 
-AsyncLoadData::~AsyncLoadData()
-{
-}
-
-// --------------------------------
-
 AreaNode::AreaNode()
 {
 	children[0] = -1;
@@ -129,9 +123,9 @@ staticModels_(g_3dEngineArena)
 {
 	canRender_ = false;
 	outsideWorld_ = true;
+	headerLoaded_ = false;
 
 	pFileData_ = nullptr;
-	pAsyncLoadData_ = nullptr;
 
 	pTimer_ = nullptr;
 	pFileSys_ = nullptr;
@@ -142,9 +136,11 @@ staticModels_(g_3dEngineArena)
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pTimer);
 	X_ASSERT_NOT_NULL(gEnv->pFileSys);
+	X_ASSERT_NOT_NULL(gEnv->pJobSys);
 
 	pTimer_ = gEnv->pTimer;
 	pFileSys_ = gEnv->pFileSys;
+	pJobSys_ = gEnv->pJobSys;
 }
 
 Level::~Level()
@@ -191,28 +187,6 @@ void Level::ShutDown(void)
 void Level::update(void)
 {
 	frameStats_.clear();
-
-	// are we trying to read?
-	if (pAsyncLoadData_ && pAsyncLoadData_->waitingForIo_)
-	{
-		uint32_t numbytes = 0;
-
-		if (pAsyncLoadData_->AsyncOp_.hasFinished(&numbytes))
-		{
-			pAsyncLoadData_->waitingForIo_ = false;
-
-			if (!pAsyncLoadData_->headerLoaded_)
-			{
-				pAsyncLoadData_->headerLoaded_ = true;
-				ProcessHeader(numbytes);
-			}
-			else
-			{
-				// the data is loaded.
-				ProcessData(numbytes);
-			}
-		}
-	}
 }
 
 void Level::free(void)
@@ -241,19 +215,6 @@ void Level::free(void)
 	if (pFileData_) {
 		X_DELETE_ARRAY(pFileData_, g_3dEngineArena);
 		pFileData_ = nullptr;
-	}
-
-	if (pAsyncLoadData_) 
-	{
-		if (pAsyncLoadData_->waitingForIo_)
-		{
-			// cancel the read request
-			pAsyncLoadData_->AsyncOp_.cancel();
-			// close file.
-			gEnv->pFileSys->closeFileAsync(pAsyncLoadData_->pFile_);
-		}
-
-		X_DELETE_AND_NULL(pAsyncLoadData_, g_3dEngineArena);
 	}
 }
 

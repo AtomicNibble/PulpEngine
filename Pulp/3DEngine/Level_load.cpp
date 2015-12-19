@@ -10,7 +10,110 @@
 
 #include <Math\XWinding.h>
 
+#include <Threading\JobSystem2.h>
+
 X_NAMESPACE_BEGIN(level)
+
+
+  // IIoRequestHandler
+void Level::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
+	core::XFileAsync* pFile, bool result)
+{
+	if (requestType == core::IoRequest::OPEN)
+	{
+		if (!result) {
+			X_ERROR("Level", "Failed to open level file");
+			return;
+		}
+		
+		core::IoRequestData req;
+		req.setType(core::IoRequest::READ);
+		req.pHandler = this;
+
+		core::IoRequestRead& read = req.readInfo;
+		read.pFile = pFile;
+		read.dataSize = sizeof(fileHdr_);
+		read.offset = 0;
+		read.pBuf = &fileHdr_;
+
+		pFileSys->AddIoRequestToQue(req);
+	}
+	else if (requestType == core::IoRequest::READ)
+	{
+		if (!result) {
+			X_ERROR("Level", "Failed to read level data");
+			return;
+		}
+		core::V2::Job* pJob = nullptr;
+
+		if (!headerLoaded_) {
+			pJob = pJobSys_->CreateJobMemberFunc<Level>(this, &Level::ProcessHeader_job, pFile);
+		}
+		else {
+			pJob = pJobSys_->CreateJobMemberFunc<Level>(this, &Level::ProcessData_job, pFile);
+		}
+		
+		pJobSys_->Run(pJob);
+	}
+}
+
+void Level::IoRequestCallbackMem(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
+	core::XFileMem* pFile, bool result)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+	X_UNUSED(pFileSys);
+	X_UNUSED(requestType);
+	X_UNUSED(result);
+	X_UNUSED(pFile);
+
+}
+// ~IIoRequestHandler
+
+void Level::ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* job, void* pData)
+{
+	X_UNUSED(pJobSys);
+	X_UNUSED(threadIdx);
+	X_UNUSED(job);
+
+	core::XFileAsync* pFile = static_cast<core::XFileAsync*>(pData);
+
+	// check if the header is correct.
+	if (ProcessHeader()) 
+	{
+		headerLoaded_ = true;
+
+		// allocate buffer for the file data.
+		uint32_t dataSize = fileHdr_.totalDataSize;
+
+		pFileData_ = X_NEW_ARRAY(uint8_t, dataSize, g_3dEngineArena, "LevelBuffer");
+
+
+		core::IoRequestData req;
+		req.setType(core::IoRequest::READ);
+		req.pHandler = this;
+
+		core::IoRequestRead& read = req.readInfo;
+		read.dataSize = dataSize;
+		read.offset = sizeof(fileHdr_);
+		read.pBuf = pFileData_;
+		read.pFile = pFile;
+
+		pFileSys_->AddIoRequestToQue(req);
+	}
+}
+
+void Level::ProcessData_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* job, void* pData)
+{
+	X_UNUSED(pJobSys);
+	X_UNUSED(threadIdx);
+	X_UNUSED(job);
+	X_UNUSED(pData);
+
+	X_ASSERT(headerLoaded_, "Header must be loaded in order to process data")(headerLoaded_);
+	X_ASSERT_NOT_NULL(pFileData_);
+
+	ProcessData();
+}
 
 
 
@@ -19,12 +122,6 @@ bool Level::Load(const char* mapName)
 	// does the other level file exsist?
 	path_.set(mapName);
 	path_.setExtension(level::LVL_FILE_EXTENSION);
-
-	if (!gEnv->pFileSys->fileExists(path_.c_str())) {
-		X_ERROR("Level", "could not find level file: \"%s\"",
-			path_.c_str());
-		return false;
-	}
 
 	// free it :)
 	free();
@@ -36,27 +133,22 @@ bool Level::Load(const char* mapName)
 	// clear it.
 	core::zero_object(fileHdr_);
 
-	core::fileModeFlags mode = core::fileMode::READ;
-	core::XFileAsync* pFile = pFileSys_->openFileAsync(path_.c_str(), mode);
-	if (!pFile) {
-		return false;
-	}
+	headerLoaded_ = false;
 
-	core::XFileAsyncOperation HeaderOp = pFile->readAsync(&fileHdr_, sizeof(fileHdr_), 0);
+	core::IoRequestData req;
+	req.setType(core::IoRequest::OPEN);
+	req.pHandler = this;
+	core::IoRequestOpen& open = req.openInfo;
 
-	pAsyncLoadData_ = X_NEW(AsyncLoadData, g_3dEngineArena, "LevelLoadHandles")(pFile, HeaderOp);
-	pAsyncLoadData_->waitingForIo_ = true;
+	open.mode = core::fileMode::READ;
+	open.name = path_.c_str();
+
+	pFileSys_->AddIoRequestToQue(req);
 	return true;
 }
 
-bool Level::ProcessHeader(uint32_t bytesRead)
+bool Level::ProcessHeader(void)
 {
-	if (bytesRead != sizeof(fileHdr_)) {
-		X_ERROR("Level", "failed to read header file: %s", path_.fileName());
-
-		return false;
-	}
-
 	// is this header valid m'lady?
 	if (!fileHdr_.isValid())
 	{
@@ -91,13 +183,6 @@ bool Level::ProcessHeader(uint32_t bytesRead)
 		return false;
 	}
 
-	// allocate the file data.
-	pFileData_ = X_NEW_ARRAY(uint8_t, fileHdr_.totalDataSize, g_3dEngineArena, "LevelBuffer");
-
-	pAsyncLoadData_->AsyncOp_ = pAsyncLoadData_->pFile_->readAsync(pFileData_,
-		fileHdr_.totalDataSize, sizeof(fileHdr_));
-
-	pAsyncLoadData_->waitingForIo_ = true;
 	return true;
 }
 
@@ -126,21 +211,15 @@ bool ProcessIAP(core::XFileBuf& file, Area& area, int32_t areaTo)
 
 	// read them.
 	if (!file.readObj(p.debugVerts.ptr(), numVerts)) {
-
+		X_ERROR("Level", "Failed to read iap verts");
 		return false;
 	}
 
 	return true;
 }
 
-bool Level::ProcessData(uint32_t bytesRead)
+bool Level::ProcessData(void)
 {
-	if (bytesRead != fileHdr_.totalDataSize) {
-		X_ERROR("Level", "failed to read level file. read: %i of %i",
-			bytesRead, fileHdr_.totalDataSize);
-		return false;
-	}
-
 	// read string table.
 	{
 		core::XFileBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::STRING_TABLE);
@@ -426,11 +505,6 @@ bool Level::ProcessData(uint32_t bytesRead)
 	// 
 	CommonChildrenArea_r(&areaNodes_[0]);
 
-
-	// clean up.
-	pFileSys_->closeFileAsync(pAsyncLoadData_->pFile_);
-
-	X_DELETE_AND_NULL(pAsyncLoadData_, g_3dEngineArena);
 
 	// stats.
 	loadStats_.elapse = pTimer_->GetTimeReal() - loadStats_.startTime;
