@@ -133,7 +133,7 @@ StackString<N, TChar>::StackString(const float f)
 	while (l > 0 && text[l - 1] == '.')
 		text[--l] = '\0';
 
-	strcpy(str_, text);
+	strcpy_s(str_, text);
 	len_ = l;
 }
 
