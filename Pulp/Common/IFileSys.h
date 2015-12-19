@@ -488,7 +488,7 @@ public:
 };
 X_ENABLE_WARNING(4624)
 
-ENSURE_LE(sizeof(IoRequestData), 64, "IoRequest data should be 64 bytes or less");
+X_ENSURE_LE(sizeof(IoRequestData), 64, "IoRequest data should be 64 bytes or less");
 
 
 struct IFileSys
