@@ -167,7 +167,7 @@ template <typename JobData>
 static inline void member_function_job(JobSystem* pJobSys, size_t threadIdx, Job* job, void* jobData)
 {
 	JobData* data = static_cast<JobData*>(jobData);
-	(*data->pInst.*data->pFunction)(pJobSys, threadIdx, job);
+	(*data->pInst.*data->pFunction)(pJobSys, threadIdx, job, data->pJobData);
 }
 
 
@@ -175,18 +175,20 @@ template<typename C>
 struct member_function_job_data
 {
 	typedef C ClassType;
-	typedef traits::MemberFunction<C, void(JobSystem*, size_t, Job*)> MemberFunction;
+	typedef traits::MemberFunction<C, void(JobSystem*, size_t, Job*, void*)> MemberFunction;
 	typedef typename MemberFunction::Pointer MemberFunctionPtr;
 
-	member_function_job_data(ClassType* pInst, MemberFunctionPtr function) :
+	member_function_job_data(ClassType* pInst, MemberFunctionPtr function, void* jobData) :
 		pInst(pInst),
-		pFunction(function)
+		pFunction(function),
+		pJobData(jobData)
 	{
 
 	}
 
 	ClassType* pInst;
 	MemberFunctionPtr pFunction;
+	void* pJobData;
 };
 
 class JobSystem
@@ -206,6 +208,8 @@ public:
 
 	bool StartUp(void);
 	void ShutDown(void);
+
+	void CreateQueForCurrentThread(void);
 
 private:
 	bool StartThreads(void);
@@ -228,7 +232,8 @@ public:
 		typename parallel_for_job_data<T,SplitterT>::DataJobFunctionPtr function, const SplitterT& splitter);
 
 	template<typename ClassType>
-	X_INLINE Job* CreateJobMemberFunc(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction);
+	X_INLINE Job* CreateJobMemberFunc(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, 
+		void* pJobData);
 
 
 	void Run(Job* pJob);

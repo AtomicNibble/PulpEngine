@@ -200,6 +200,22 @@ namespace V2
 
 	/// ===============================================
 
+	void JobSystem::CreateQueForCurrentThread(void)
+	{
+		uint32_t threadId = Thread::GetCurrentID();
+
+		CreateThreadObjects(threadId);
+		{
+			size_t threadIdx = GetThreadIndex();
+			gThreadQue.SetValue(pThreadQues_[threadIdx]);
+			gThreadAllocator.SetValue(pJobAllocators_[threadIdx]);
+		}
+
+		numThreads_++;
+	}
+
+	/// ===============================================
+
 
 	bool JobSystem::StartThreads(void)
 	{
