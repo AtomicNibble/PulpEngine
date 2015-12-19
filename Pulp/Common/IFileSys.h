@@ -353,6 +353,144 @@ private:
 };
 
 
+
+// stuff for io requests
+X_DECLARE_ENUM(IoRequest)(
+	// open a file gor a given name and mode.
+	// OnSuccess: vaild async file handle.
+	OPEN,
+	OPEN_READ_ALL,
+	CLOSE,
+	READ,
+	WRITE
+);
+
+typedef core::traits::Function<void(core::IFileSys*,IoRequest::Enum, bool, XFileAsync*)> IoRequestCallback;
+typedef core::traits::Function<void(core::IFileSys*,IoRequest::Enum, bool, XFileMem*)> IoRequestMemCallback;
+
+
+struct IIoRequestHandler
+{
+	virtual void IoRequestCallback(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
+		core::XFileAsync* pFile, bool result) X_ABSTRACT;
+	virtual void IoRequestCallbackMem(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
+		core::XFileMem* pFile, bool result) X_ABSTRACT;
+};
+
+struct IoRequestOpen
+{
+	core::string name;
+	fileModeFlags mode;
+};
+
+struct IoRequestClose
+{
+	XFileAsync* pFile;
+};
+
+struct IoRequestRead
+{
+	XFileAsync* pFile;
+	void* pBuf;
+	uint64_t offset;	// support files >4gb.
+	uint32_t dataSize; // don't support reading >4gb at once.
+};
+
+typedef IoRequestRead IoRequestWrite;
+
+X_DISABLE_WARNING(4624)
+class IoRequestData
+{
+public:
+	X_INLINE IoRequestData() {
+		type = IoRequest::CLOSE;
+	}
+	X_INLINE ~IoRequestData()
+	{
+		if (type == IoRequest::OPEN || type == IoRequest::OPEN_READ_ALL)
+		{
+			core::Mem::Destruct(&openInfo.name);
+		}
+	}
+
+	X_INLINE IoRequestData(const IoRequestData& oth) {
+		type = oth.type;
+		pHandler = oth.pHandler;
+		
+		if (type == IoRequest::OPEN || type == IoRequest::OPEN_READ_ALL)
+		{
+			core::Mem::Construct(&openInfo.name, oth.openInfo.name);
+			openInfo.mode = oth.openInfo.mode;
+		}
+		else if (type == IoRequest::CLOSE) {
+			closeInfo = oth.closeInfo;
+		}
+		else if (type == IoRequest::READ) {
+			readInfo = oth.readInfo;
+		}
+		else if (type == IoRequest::WRITE) {
+			writeInfo = oth.writeInfo;
+		}
+	}
+
+	X_INLINE IoRequestData& operator=(const IoRequestData& oth) {
+		type = oth.type;
+		pHandler = oth.pHandler;
+
+		if (type == IoRequest::OPEN || type == IoRequest::OPEN_READ_ALL)
+		{
+			core::Mem::Construct(&openInfo.name, oth.openInfo.name);
+			openInfo.mode = oth.openInfo.mode;
+		}	
+		else if (type == IoRequest::CLOSE) {
+			closeInfo = oth.closeInfo;
+		}
+		else if (type == IoRequest::READ) {
+			readInfo = oth.readInfo;
+		}
+		else if (type == IoRequest::WRITE) {
+			writeInfo = oth.writeInfo;
+		}
+		return *this;
+	}
+
+	X_INLINE IoRequest::Enum getType(void) const {
+		return type;
+	}
+
+	X_INLINE void setType(IoRequest::Enum type_)
+	{
+		if (type_ == IoRequest::OPEN || type == IoRequest::OPEN_READ_ALL)
+		{
+			core::Mem::Construct<core::string>(&openInfo.name);
+		}
+		this->type = type_;
+	}
+
+private:
+	IoRequest::Enum type;
+
+public:
+
+	union {
+		IoRequestMemCallback::Pointer callbackMem;
+		IoRequestCallback::Pointer callback;
+		IIoRequestHandler* pHandler;
+	};
+
+	union
+	{
+		IoRequestOpen openInfo;
+		IoRequestClose closeInfo;
+		IoRequestRead readInfo;
+		IoRequestWrite writeInfo;
+	};
+};
+X_ENABLE_WARNING(4624)
+
+ENSURE_LE(sizeof(IoRequestData), 64, "IoRequest data should be 64 bytes or less");
+
+
 struct IFileSys
 {
 	typedef fileMode fileMode;
@@ -412,6 +550,8 @@ struct IFileSys
 
 	// stats
 	virtual XFileStats& getStats(void) const X_ABSTRACT;
+
+	virtual void AddIoRequestToQue(const IoRequestData& request) X_ABSTRACT;
 };
 
 class XFileMemScoped

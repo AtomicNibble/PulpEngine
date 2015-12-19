@@ -47,76 +47,6 @@ struct search_s
 
 struct XFindData;
 
-// stuff for io requests
-X_DECLARE_ENUM(IoRequest)(
-	// open a file gor a given name and mode.
-	// OnSuccess: vaild async file handle.
-	OPEN,			
-	OPEN_READ_ALL,
-	CLOSE,
-	READ,			
-	WRITE
-);
-
-typedef core::traits::Function<void(IoRequest::Enum requestType, bool, XFileAsync*)> IoRequestCallback;
-
-struct IoRequestOpen
-{
-	core::string name;
-	fileModeFlags mode;
-};
-
-struct IoRequestClose
-{
-	XFileAsync* pFile;
-};
-
-struct IoRequestRead 
-{
-	XFileAsync* pFile;
-	void* pBuf;
-	uint64_t offset;	// support files >4gb.
-	uint32_t dataSize; // don't support reading >4gb at once.
-};
-
-typedef IoRequestRead IoRequestWrite;
-
-struct IoRequestData
-{
-	IoRequestData() {}
-	~IoRequestData() {}
-
-	IoRequestData(const IoRequestData&) {
-
-	}
-
-	IoRequestData& operator=(const IoRequestData& oth) {
-		type = oth.type;
-		return *this;
-	}
-
-	X_INLINE IoRequest::Enum getType(void) const {
-		return type;
-	}
-
-	IoRequest::Enum type;
-	IoRequestCallback::Pointer callback;
-
-	union Data
-	{
-		Data() {
-		}
-		~Data() {
-		}
-
-		IoRequestOpen openInfo;
-		IoRequestClose closeInfo;
-		IoRequestRead readInfo;
-		IoRequestWrite writeInfo;
-	}data;
-};
-
-X_ENSURE_LE(sizeof(IoRequestData), 64, "IoRequest data should be 64 bytes or less");
 
 
 
@@ -212,7 +142,7 @@ public:
 
 	// IoRequest que.
 
-	void AddIoRequestToQue(const IoRequestData& request);
+	void AddIoRequestToQue(const IoRequestData& request) X_FINAL;
 	bool StartRequestWorker(void);
 	void ShutDownRequestWorker(void);
 

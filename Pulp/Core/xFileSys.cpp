@@ -21,6 +21,8 @@
 
 #include <Memory\VirtualMem.h>
 
+#include <Threading\JobSystem2.h>
+
 X_NAMESPACE_BEGIN(core)
 
 namespace
@@ -948,7 +950,7 @@ void xFileSys::ShutDownRequestWorker(void)
 
 	// post a close job with a none null callback.
 	IoRequestData closeRequest;
-	closeRequest.type = IoRequest::CLOSE;
+	closeRequest.setType(IoRequest::CLOSE);
 	*reinterpret_cast<uintptr_t*>(&closeRequest.callback) = 1;
 
 	AddIoRequestToQue(closeRequest);
@@ -961,21 +963,69 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 {
 	IoRequestData request;
 
+	struct PendingOp
+	{
+		PendingOp(const IoRequestData& req, const XFileAsyncOperation& op) :
+			rquest(req), op(op) {
+		}
+
+		IoRequestData rquest;
+		XFileAsyncOperation op;
+	};
+
+
+	typedef core::FixedArray<PendingOp, 512> AsyncOps;
+
+	AsyncOps pendingOps;
+
+	gEnv->pJobSys->CreateQueForCurrentThread();
+
 	while (thread.ShouldRun())
 	{
-		ioQue_.pop(request);
+		if (pendingOps.isEmpty())
+		{
+			ioQue_.pop(request);
+		}
+		else
+		{
+			// poll the pending io requests to see if any have finished.
+			AsyncOps::size_type i;
+			for (i = 0; i < pendingOps.size(); i++)
+			{
+				PendingOp& asyncOp = pendingOps[i];
+
+				if (asyncOp.op.hasFinished())
+				{
+					asyncOp.rquest.pHandler->IoRequestCallback(this, request.getType(), 
+						request.readInfo.pFile, true);
+
+					pendingOps.removeIndex(i);
+				}
+			}
+
+			// got any requests?
+			if (!ioQue_.tryPop(request)) {
+				core::Thread::Sleep(0);
+				continue;
+			}
+		}
 
 		if (request.getType() == IoRequest::OPEN)
 		{
-			IoRequestOpen& open = request.data.openInfo;
+			IoRequestOpen& open = request.openInfo;
 			XFileAsync* pFile =	openFileAsync(open.name.c_str(), open.mode);
 			bool operationSucced = pFile != nullptr;
 
-			(request.callback)(request.getType(), operationSucced, pFile);
+			request.pHandler->IoRequestCallback(this, request.getType(), pFile, operationSucced);
 		}
 		else if (request.getType() == IoRequest::OPEN_READ_ALL)
 		{
+			IoRequestOpen& open = request.openInfo;
+			XFileMem* pFile = openFileMem(open.name.c_str(), open.mode);
+			bool operationSucced = pFile != nullptr;
 
+
+			(request.callbackMem)(this, request.getType(), operationSucced, pFile);
 		}
 		else if (request.getType() == IoRequest::CLOSE)
 		{
@@ -987,13 +1037,13 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			}
 
 			// normal close request.
-			IoRequestClose& close = request.data.closeInfo;
+			IoRequestClose& close = request.closeInfo;
 
 			closeFileAsync(close.pFile);
 		}
 		else if (request.getType() == IoRequest::READ)
 		{
-			IoRequestRead& read = request.data.readInfo;
+			IoRequestRead& read = request.readInfo;
 			XFileAsync* pFile = read.pFile;
 
 			XFileAsyncOperation operation = pFile->readAsync(
@@ -1001,10 +1051,12 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				read.dataSize,
 				safe_static_cast<uint32_t, uint64_t>(read.offset)
 			);
+
+			pendingOps.append(PendingOp(request,operation));
 		}
 		else if (request.getType() == IoRequest::WRITE)
 		{
-			IoRequestRead& write = request.data.writeInfo;
+			IoRequestRead& write = request.writeInfo;
 			XFileAsync* pFile = write.pFile;
 
 			XFileAsyncOperation operation = pFile->readAsync(
@@ -1012,6 +1064,8 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				write.dataSize,
 				safe_static_cast<uint32_t, uint64_t>(write.offset)
 			);
+
+			pendingOps.append(PendingOp(request, operation));
 		}
 	}
 
