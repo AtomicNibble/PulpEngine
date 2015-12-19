@@ -241,7 +241,7 @@ namespace Member
 	class JobClass
 	{
 	public:
-		void job(JobSystem* pJobSys, size_t threadIdx, Job* pJob)
+		void job(JobSystem* pJobSys, size_t threadIdx, Job* pJob, void* pData)
 		{
 			X_UNUSED(pJobSys);
 			X_UNUSED(threadIdx);
@@ -273,7 +273,7 @@ TEST(Threading, JobSystem2Empty_member_func)
 
 		Member::JobClass inst;
 
-		Job* job = jobSys.CreateJobMemberFunc<Member::JobClass>(&inst, &Member::JobClass::job);
+		Job* job = jobSys.CreateJobMemberFunc<Member::JobClass>(&inst, &Member::JobClass::job, nullptr);
 
 		jobSys.Run(job);
 		jobSys.Wait(job);
