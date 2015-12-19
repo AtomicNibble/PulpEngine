@@ -118,6 +118,11 @@ StringRef<CharT>::~StringRef()
 	// no need to assing empty string (aka free())
 	// as this object is dead.
 	freeData(header());
+
+	// in debug builds check for double deconstruction.
+#if X_DEBUG
+	str_ = nullptr;
+#endif // !X_DEBUG
 }
 
 
