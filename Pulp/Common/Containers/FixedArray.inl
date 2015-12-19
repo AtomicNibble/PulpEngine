@@ -13,8 +13,10 @@ template<typename T, size_t N>
 FixedArray<T, N>::FixedArray(const T& initial) :
 	size_(0)
 {
+	T* pArr = begin();
+
 	for (size_type i = 0; i < N; ++i)
-		array_[i] = initial;
+		pArr[i] = initial;
 	size_ = N;
 }
 
@@ -31,27 +33,31 @@ template<typename T, size_t N>
 const T& FixedArray<T, N>::operator[](size_type idx) const
 {
 	X_ASSERT(idx >= 0 && idx < N, "Array index out of bounds")(idx, N);
-	return array_[idx];
+	const T* pArr = begin();
+
+	return pArr[idx];
 }
 
 template<typename T, size_t N>
 T& FixedArray<T, N>::operator[](size_type idx)
 {
 	X_ASSERT(idx >= 0 && idx < N, "Array index out of bounds")(idx, N);
-	return array_[idx];
+	T* pArr = begin();
+
+	return pArr[idx];
 }
 
 // returns a pointer to the list
 template<typename T, size_t N>
 T* FixedArray<T, N>::ptr(void)
 {
-	return array_;
+	return begin();
 }
 
 template<typename T, size_t N>
 const T* FixedArray<T, N>::ptr(void) const
 {
-	return array_;
+	return begin();
 }
 
 
@@ -60,9 +66,10 @@ template<typename T, size_t N>
 inline void FixedArray<T, N>::clear(void)
 {
 	size_t i;
+	T* pArr = begin();
 
 	for (i = 0; i<size_; ++i)
-		Mem::Destruct(array_ + i);
+		Mem::Destruct(pArr + i);
 
 	size_ = 0;
 }
@@ -72,10 +79,11 @@ template<typename T, size_t N>
 X_INLINE typename FixedArray<T, N>::Type& FixedArray<T, N>::AddOne(void)
 {
 	X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
+	T* pArr = begin();
 
-	Mem::Construct<T>(&array_[size_]);
+	Mem::Construct<T>(&pArr[size_]);
 
-	return array_[size_++];
+	return pArr[size_++];
 }
 
 // append element (same as push_back)
@@ -83,8 +91,9 @@ template<typename T, size_t N>
 typename FixedArray<T, N>::size_type FixedArray<T, N>::append(const T& obj)
 {
 	X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
+	T* pArr = begin();
 
-	Mem::Construct(&array_[size_], obj);
+	Mem::Construct(&pArr[size_], obj);
 
 	size_++;
 	return size_ - 1;
@@ -95,8 +104,9 @@ template<typename T, size_t N>
 typename FixedArray<T, N>::size_type FixedArray<T, N>::push_back(const T& obj)
 {
 	X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
+	T* pArr = begin();
 
-	Mem::Construct(&array_[size_], obj);
+	Mem::Construct(&pArr[size_], obj);
 
 	size_++;
 	return size_ - 1;
@@ -109,15 +119,16 @@ typename FixedArray<T, N>::iterator FixedArray<T, N>::insert(iterator position, 
 
 	X_ASSERT(off < N, "invalid position for FixedArray: out of bounds")(N, off);
 
+	T* pArr = begin();
 
 	if (off < size_)
 	{
 		// move them down.
 		for (size_type i = size_; i > off; --i)
-			array_[i] = array_[i - 1];
+			pArr[i] = pArr[i - 1];
 	}
 
-	array_[off] = val;
+	pArr[off] = val;
 	size_++;
 	return position;
 }
@@ -127,14 +138,16 @@ bool FixedArray<T, N>::removeIndex(size_type idx)
 {
 	if (idx < size() && isNotEmpty())
 	{
+		T* pArr = begin();
+
 		size_--; // remove first so we don't try access it.
 
 		// shift them down.
 		size_type i, num;
 		for (i = idx, num = size_; i < num; i++)
-			array_[i] = array_[i + 1];
+			pArr[i] = pArr[i + 1];
 
-		Mem::Destruct(array_ + size_);
+		Mem::Destruct(pArr + size_);
 		return true;
 	}
 	return false;
@@ -181,24 +194,24 @@ typename FixedArray<T, N>::size_type FixedArray<T, N>::capacity(void) const
 template<typename T, size_t N>
 inline typename FixedArray<T, N>::iterator FixedArray<T, N>::begin(void)
 {
-	return array_;
+	return reinterpret_cast<FixedArray<T, N>::iterator>(array_);
 }
 
 template<typename T, size_t N>
 inline typename FixedArray<T, N>::const_iterator FixedArray<T, N>::begin(void) const
 {
-	return array_;
+	return reinterpret_cast<FixedArray<T, N>::const_iterator>(array_);
 }
 
 template<typename T, size_t N>
 inline typename FixedArray<T, N>::iterator FixedArray<T, N>::end(void)
 {
-	return array_ + size_;
+	return begin() + size_;
 }
 
 template<typename T, size_t N>
 inline typename FixedArray<T, N>::const_iterator FixedArray<T, N>::end(void) const
 {
-	return array_ + size_;
+	return begin() + size_;
 }
 

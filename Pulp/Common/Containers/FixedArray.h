@@ -62,7 +62,8 @@ public:
 
 private:
 	size_type size_;
-	T	array_[N];
+//	T	array_[N];
+	uint8_t	array_[N * sizeof(T)];
 };
 
 #include "FixedArray.inl"
