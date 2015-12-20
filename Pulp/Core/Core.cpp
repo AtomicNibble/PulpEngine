@@ -602,7 +602,7 @@ void XCore::ListProgramArgs(void)
 {
 	size_t i, num = numArgs_;
 
-	X_LOG0("AppArgs", "------ ^8Program Args(%i)^7 ------", num);
+	X_LOG0("AppArgs", "------ ^8Program Args(%" PRIuS ")^7 ------", num);
 
 	core::StackString<1024 + 128> merged;
 

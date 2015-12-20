@@ -138,7 +138,7 @@ TEST(Threading, JobSystemEmpty)
 		MultiElapsed = timer.GetTimeVal();
 	}
 
-	X_LOG0("JobSystem", "%i empty jobs: %gms", numJobs, MultiElapsed.GetMilliSeconds());
+	X_LOG0("JobSystem", "%" PRIuS " empty jobs: %gms", numJobs, MultiElapsed.GetMilliSeconds());
 
 	jobSys.ShutDown();
 }

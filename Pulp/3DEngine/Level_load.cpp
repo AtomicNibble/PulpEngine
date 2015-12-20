@@ -492,7 +492,7 @@ bool Level::ProcessData(void)
 
 		if (!file.isEof()) {
 			X_WARNING("Level", "potential read error, "
-				"failed to process all bytes for node %i. bytes left: %i",
+				"failed to process all bytes for node %i. bytes left: %" PRIuS,
 				FileNodes::BSP_TREE, file.remainingBytes());
 		}
 	}

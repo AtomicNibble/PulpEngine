@@ -710,13 +710,13 @@ void XShaderManager::listShaders(void)
 	render::XRenderResourceContainer::ResourceConstItor it = shaders_.begin();
 	XShader* pShader;
 
-	X_LOG0("Shader", "------------- ^8Shaders(%i)^7 -------------", shaders_.size());
+	X_LOG0("Shader", "------------- ^8Shaders(%" PRIuS ")^7 -------------", shaders_.size());
 
 	for (; it != shaders_.end(); ++it)
 	{
 		pShader = static_cast<XShader*>(it->second);
 
-		X_LOG0("Shader", "Name: ^2\"%s\"^7 tecs: %i crc: ^10x%08x^7 vertexFmt: %s",
+		X_LOG0("Shader", "Name: ^2\"%s\"^7 tecs: %" PRIuS " crc: ^10x%08x^7 vertexFmt: %s",
 			pShader->name_.c_str(),
 			pShader->techs_.size(),
 			pShader->sourceCrc32_,
@@ -730,7 +730,7 @@ void XShaderManager::listShaderSources(void)
 	ShaderSourceMap::const_iterator it = Sourcebin_.begin();
 	const SourceFile* pSource;
 
-	X_LOG0("Shader", "--------- ^8Shader Sources(%i)^7 ---------", Sourcebin_.size());
+	X_LOG0("Shader", "--------- ^8Shader Sources(%" PRIuS ")^7 ---------", Sourcebin_.size());
 
 	for (; it != Sourcebin_.end(); ++it)
 	{

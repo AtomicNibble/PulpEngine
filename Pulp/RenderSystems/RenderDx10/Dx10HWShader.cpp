@@ -574,7 +574,7 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 		// log the macros
 		for (size_t i = 0; i < numFlags; i++)
 		{
-			X_LOG0("Shader", "Macro(%i): name: \"%s\" value: \"%s\"",
+			X_LOG0("Shader", "Macro(%" PRIuS "): name: \"%s\" value: \"%s\"",
 				i, Shader_Macros[i].Name, Shader_Macros[i].Definition);
 		}
 	}

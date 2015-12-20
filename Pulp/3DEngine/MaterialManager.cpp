@@ -870,7 +870,7 @@ void XMaterialManager::ListMaterials(const char* searchPatten) const
 
 	sortMatsByName(sorted_mats);
 
-	X_LOG0("Console", "------------ ^8Materials(%i)^7 ------------", sorted_mats.size());
+	X_LOG0("Console", "------------ ^8Materials(%" PRIuS ")^7 ------------", sorted_mats.size());
 
 	core::Array<IMaterial*>::ConstIterator it = sorted_mats.begin();
 	for (; it != sorted_mats.end(); ++it)

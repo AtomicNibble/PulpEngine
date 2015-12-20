@@ -448,7 +448,7 @@ bool VidMemManager::DeviceCreateIB(X3DBuffer* pBuf, const void* pData, const Cpu
 	hr = render::g_Dx11D3D.DxDevice()->CreateBuffer(&BufDesc, pResData, &pBuf->pDevBuf);
 
 	if (FAILED(hr)) {
-		X_ERROR("VidMem", "failed to allocated index stream of size: %i", pBuf->getSizeInBytes());
+		X_ERROR("VidMem", "failed to allocated index stream of size: %" PRIuS, pBuf->getSizeInBytes());
 	}
 	else {
 		D3DDebug::SetDebugObjectName(pBuf->pDevBuf, "Index Buffer");

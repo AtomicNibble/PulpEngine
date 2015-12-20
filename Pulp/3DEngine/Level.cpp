@@ -319,11 +319,11 @@ void Level::DrawStatsBlock(void) const
 	{
 		core::StackString512 str;
 
-		str.appendFmt("NumAreas:%i\n", areas_.size());
-		str.appendFmt("VisibleAreas:%i\n", frameStats_.visibleAreas);
-		str.appendFmt("VisibleModels:%i\n", frameStats_.visibleModels);
-		str.appendFmt("VisibleVerts:%i\n", frameStats_.visibleVerts);
-		str.appendFmt("VisibleEnts:%i\n", frameStats_.visibleEnts);
+		str.appendFmt("NumAreas:%" PRIuS "\n", areas_.size());
+		str.appendFmt("VisibleAreas:%" PRIuS "\n", frameStats_.visibleAreas);
+		str.appendFmt("VisibleModels:%" PRIuS "\n", frameStats_.visibleModels);
+		str.appendFmt("VisibleVerts:%" PRIuS "\n", frameStats_.visibleVerts);
+		str.appendFmt("VisibleEnts:%" PRIuS "\n", frameStats_.visibleEnts);
 	
 		Color txt_col(0.7f, 0.7f, 0.7f, 1.f);
 		const float height = 100.f;

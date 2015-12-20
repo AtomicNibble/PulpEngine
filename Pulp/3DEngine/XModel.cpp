@@ -236,7 +236,7 @@ bool XModel::LoadModel(core::XFile* file)
 	// either the loader or export has a bug.
 	if (file->remainingBytes() != 0)
 	{
-		X_ERROR("Model", "load error, remaning bytes: %i", file->remainingBytes());
+		X_ERROR("Model", "load error, remaning bytes: %" PRIuS, file->remainingBytes());
 		X_DELETE_ARRAY(pData, g_3dEngineArena);
 		return false;
 	}
