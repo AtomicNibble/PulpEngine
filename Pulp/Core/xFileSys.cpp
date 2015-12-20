@@ -990,10 +990,11 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			{
 				PendingOp& asyncOp = pendingOps[i];
 
-				if (asyncOp.op.hasFinished())
+				uint32_t bytesRead = 0;
+				if (asyncOp.op.hasFinished(&bytesRead))
 				{
-					asyncOp.rquest.callback.Invoke(this, request.getType(), 
-						request.readInfo.pFile, true);
+					asyncOp.rquest.callback.Invoke(this, request, 
+						request.readInfo.pFile, bytesRead);
 
 					pendingOps.removeIndex(i);
 				}
@@ -1010,9 +1011,8 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 		{
 			IoRequestOpen& open = request.openInfo;
 			XFileAsync* pFile =	openFileAsync(open.name.c_str(), open.mode);
-			bool operationSucced = pFile != nullptr;
 
-			request.callback.Invoke(this, request.getType(), pFile, operationSucced);
+			request.callback.Invoke(this, request, pFile, 0);
 		}
 		else if (request.getType() == IoRequest::OPEN_READ_ALL)
 		{
