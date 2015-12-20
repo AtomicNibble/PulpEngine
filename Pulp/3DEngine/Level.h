@@ -157,8 +157,8 @@ private:
 	void FloodVisibleAreas(void);
 	void DrawVisibleAreas(void);
 
-	void IoRequestCallback(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
-		core::XFileAsync* pFile, bool result);
+	void IoRequestCallback(core::IFileSys* pFileSys, core::IoRequestData& request,
+		core::XFileAsync* pFile, uint32_t bytesTransferred);
 
 
 	void ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* job, void* pData);

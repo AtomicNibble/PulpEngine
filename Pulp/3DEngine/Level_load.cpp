@@ -15,12 +15,14 @@
 X_NAMESPACE_BEGIN(level)
 
 
-void Level::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
-	core::XFileAsync* pFile, bool result)
+void Level::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequestData& request,
+	core::XFileAsync* pFile, uint32_t bytesTransferred)
 {
+	core::IoRequest::Enum requestType = request.getType();
+
 	if (requestType == core::IoRequest::OPEN)
 	{
-		if (!result) {
+		if (!pFile) {
 			X_ERROR("Level", "Failed to open level file");
 			return;
 		}
@@ -39,7 +41,7 @@ void Level::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequest::Enum re
 	}
 	else if (requestType == core::IoRequest::READ)
 	{
-		if (!result) {
+		if (!bytesTransferred) {
 			X_ERROR("Level", "Failed to read level data");
 			return;
 		}
@@ -109,7 +111,6 @@ void Level::ProcessData_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core
 
 	core::IoRequestData req;
 	req.setType(core::IoRequest::CLOSE);
-	req.callback.Bind<Level, &Level::IoRequestCallback>(this);
 	req.closeInfo.pFile = pFile;
 	pFileSys_->AddIoRequestToQue(req);
 }
