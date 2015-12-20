@@ -1054,6 +1054,9 @@
     <ClInclude Include="String\FormatMacros.h">
       <Filter>Headers\String</Filter>
     </ClInclude>
+    <ClInclude Include="Util\Delegate.gen.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1607,6 +1610,9 @@
     </ClCompile>
     <ClCompile Include="Threading\JobSystem2.cpp">
       <Filter>SourceFiles\Threading</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\Delegate.gen">
+      <Filter>Headers\Util</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

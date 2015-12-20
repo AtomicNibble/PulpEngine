@@ -1,0 +1,53 @@
+#pragma once
+
+
+#include "Prepro/PreproCommaIf.h"
+#include "Prepro/PreproIf.h"
+#include "Prepro/PreproJoin.h"
+#include "Prepro/PreproList.h"
+#include "Prepro/PreproToBool.h"
+
+
+X_NAMESPACE_BEGIN(core)
+
+template <typename T>
+class Delegate {};
+
+#define COUNT 0
+#include "Delegate.gen.h"
+#undef COUNT
+
+#define COUNT 1
+#include "Delegate.gen.h"
+#undef COUNT
+
+#define COUNT 2
+#include "Delegate.gen.h"
+#undef COUNT
+
+#define COUNT 3
+#include "Delegate.gen.h"
+#undef COUNT
+
+#define COUNT 4
+#include "Delegate.gen.h"
+#undef COUNT
+
+#define COUNT 5
+#include "Delegate.gen.h"
+#undef COUNT
+
+#define COUNT 6
+#include "Delegate.gen.h"
+#undef COUNT
+
+#define COUNT 7
+#include "Delegate.gen.h"
+#undef COUNT
+
+#define COUNT 8
+#include "Delegate.gen.h"
+#undef COUNT
+
+
+X_NAMESPACE_END
