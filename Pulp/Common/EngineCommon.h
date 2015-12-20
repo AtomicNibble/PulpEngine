@@ -11,6 +11,8 @@
 
 X_DISABLE_WARNING(4714) // __forceinline not inlined.
 
+#include <inttypes.h>
+
 // Util
 #include <Util\ClassMacros.h>
 #include <Util\NamespaceMacros.h>
