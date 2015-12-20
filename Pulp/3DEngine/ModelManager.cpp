@@ -12,6 +12,7 @@ X_NAMESPACE_BEGIN(model)
 
 namespace
 {
+
 	void Cmd_ListModels(core::IConsoleCmdArgs* Cmd)
 	{
 		// optional search criteria
@@ -35,8 +36,26 @@ namespace
 		}
 		);
 	}
-}
 
+} // namespace
+
+
+/*
+
+I need to redesign this so that models are returned instantly and loaded later.
+
+Allowing for the IO reads to be que'd and performend by one thread.
+Creating process jobs at the end, that once complete switch out the data.
+
+Also this will allow for proper hot reload as the handels given back can have thier data updated in background.
+
+This does pose the issue of where to store the actuall data buffer.
+Well we are only storing one instance of XModel no matter how many times it's used.
+So if that owned the data would be ok.
+
+WE have special case for default model which we want to load / setup in a synchronous manner.
+
+*/
 
 XModelManager::XModelManager() : 
 	pDefaultModel_(nullptr),
@@ -64,7 +83,7 @@ void XModelManager::Init(void)
 
 	// should load the default model.
 
-	pDefaultModel_ = loadModel("default");
+	pDefaultModel_ = loadModelSync("default");
 	if (!pDefaultModel_) {
 		X_ERROR("ModelManager", "Failed to load default model");
 	}
@@ -140,7 +159,7 @@ IModel* XModelManager::loadModel(const char* ModelName)
 			pExt);
 		return getDefaultModel();
 	}
-	
+
 	// try find it.
 	iModel = findModel_Internal(ModelName);
 
@@ -150,6 +169,55 @@ IModel* XModelManager::loadModel(const char* ModelName)
 		iModel->addRef();
 		return iModel;
 	}
+
+	// we create a model and give it back
+	XModel* pModel = X_NEW(XModel, g_3dEngineArena, "3DModel");
+
+	pModel->LoadModelAsync(ModelName);
+
+	models_.AddAsset(ModelName, pModel);
+
+	return pModel;
+}
+
+IModel* XModelManager::createModel(const char* ModelName)
+{
+	XModel* pModel = X_NEW(XModel, g_3dEngineArena, "3DModel");
+	if (pModel)
+	{
+		pModel->AssignDefault();
+
+		models_.AddAsset(ModelName, pModel);
+	}
+
+	return pModel;
+}
+
+IModel* XModelManager::loadModelSync(const char* ModelName)
+{
+	X_ASSERT_NOT_NULL(ModelName);
+	const char* pExt;
+	IModel* iModel;
+
+	pExt = core::strUtil::FileExtension(ModelName);
+	if (pExt)
+	{
+		// engine should not make requests for models with a extension
+		X_ERROR("ModelManager", "Invalid model name extension was included: %s",
+			pExt);
+		return getDefaultModel();
+	}
+
+	// try find it.
+	iModel = findModel_Internal(ModelName);
+
+	if (iModel)
+	{
+		// inc ref count.
+		iModel->addRef();
+		return iModel;
+	}
+
 
 	// try load it.
 	iModel = LoadCompiledModel(ModelName);
@@ -161,6 +229,7 @@ IModel* XModelManager::loadModel(const char* ModelName)
 	X_WARNING("ModelManager", "Failed to load model: \"%s\"", ModelName);
 	return getDefaultModel();
 }
+
 
 IModel* XModelManager::getDefaultModel(void)
 {

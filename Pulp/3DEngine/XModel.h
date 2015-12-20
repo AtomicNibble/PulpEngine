@@ -9,8 +9,14 @@
 
 #include <IRenderMesh.h>
 
-X_NAMESPACE_BEGIN(model)
+X_NAMESPACE_DECLARE(core,
+	namespace V2 {
+		struct Job;
+		class JobSystem;
+	}
+)
 
+X_NAMESPACE_BEGIN(model)
 
 class XModel : public IModel, public core::XBaseAsset, public engine::XEngineBase
 {
@@ -40,12 +46,23 @@ public:
 	const MeshHeader& getLodMeshHdr(size_t idx) const;
 	const SubMeshHeader* getMeshHead(size_t idx) const;
 
+	void AssignDefault(void);
 
-	bool LoadModel(const char* fileName);
+	bool LoadModelAsync(const char* name);
+	bool LoadModel(const char* name);
 	bool LoadModel(core::XFile* pFile);
 
 private:
-	bool ReadHeader(ModelHeader& hdr, core::XFile* file);
+	void ProcessData(char* pData);
+
+	void IoRequestCallback(core::IFileSys* pFileSys, core::IoRequestData& request,
+		core::XFileAsync* pFile, uint32_t bytesTransferred);
+
+	void ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* job, void* pData);
+	void ProcessData_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* job, void* pData);
+
+
+	static bool ReadHeader(ModelHeader& hdr, core::XFile* file);
 
 private:
 	ModelName name_;
@@ -68,6 +85,9 @@ private:
 	int32_t totalMeshNum_; // combined mesh count of all lods.
 
 	const char* pData_;
+
+	// used for async loading.
+	ModelHeader hdr_;
 };
 
 

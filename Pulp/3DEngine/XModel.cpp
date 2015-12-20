@@ -7,6 +7,9 @@
 
 #include <IRender.h>
 
+#include <Threading\JobSystem2.h>
+
+
 X_NAMESPACE_BEGIN(model)
 
 XModel::XModel()
@@ -29,7 +32,9 @@ XModel::XModel()
 
 XModel::~XModel()
 {
-	X_DELETE_ARRAY(const_cast<char*>(pData_), gEnv->pArena);
+	if (pData_) {
+		X_DELETE_ARRAY(const_cast<char*>(pData_), gEnv->pArena);
+	}
 }
 
 
@@ -131,6 +136,32 @@ const SubMeshHeader* XModel::getMeshHead(size_t idx) const
 }
 
 
+void XModel::AssignDefault(void)
+{
+	XModel* pDefault = static_cast<XModel*>(getModelManager()->getDefaultModel());
+
+	pTagNames_ = pDefault->pTagNames_;
+	pTagTree_ = pDefault->pTagTree_;
+	pBoneAngles_ = pDefault->pBoneAngles_;
+	pBonePos_ = pDefault->pBonePos_;
+	pMeshHeads_ = pDefault->pMeshHeads_;
+
+
+	numLods_ = pDefault->numLods_;
+	numBones_ = pDefault->numBones_;
+	numBlankBones_ = pDefault->numBlankBones_;
+	totalMeshNum_ = pDefault->totalMeshNum_;
+
+
+	for (size_t i = 0; i < MODEL_MAX_LODS; i++) {
+		pLodRenderMeshes_[i] = pDefault->pLodRenderMeshes_[i];
+	}
+	for (size_t i = 0; i < MODEL_MAX_LODS; i++) {
+		lodInfo_[i] = pDefault->lodInfo_[i];
+	}
+
+}
+
 // ==================================
 
 
@@ -157,8 +188,144 @@ const SubMeshHeader* XModel::getMeshHead(size_t idx) const
 // load it and set the data pointers.
 //
 
+void XModel::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequestData& request,
+	core::XFileAsync* pFile, uint32_t bytesTransferred)
+{
+	core::IoRequest::Enum requestType = request.getType();
+
+	if (requestType == core::IoRequest::OPEN)
+	{
+		if (!pFile) {
+			X_ERROR("Model", "Failed to load: %s", name_.c_str());
+			return;
+		}
+
+		core::IoRequestData req;
+		req.setType(core::IoRequest::READ);
+		req.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
+
+		core::IoRequestRead& read = req.readInfo;
+		read.pFile = pFile;
+		read.dataSize = sizeof(hdr_);
+		read.offset = 0;
+		read.pBuf = &hdr_;
+
+		pFileSys->AddIoRequestToQue(req);
+
+	}
+	else if (requestType == core::IoRequest::READ)
+	{
+		if (!bytesTransferred) {
+			X_ERROR("Model", "Failed to read model data for: %s", name_.c_str());
+
+			core::IoRequestData req;
+			req.setType(core::IoRequest::CLOSE);
+			req.closeInfo.pFile = pFile;
+			pFileSys_->AddIoRequestToQue(req);
+			return;
+		}
+
+		core::V2::JobSystem* pJobSys = gEnv->pJobSys;
+		core::V2::Job* pJob = nullptr;
+
+		if (request.readInfo.pBuf == &hdr_) {
+			pJob = pJobSys->CreateJobMemberFunc<XModel>(this, &XModel::ProcessHeader_job, pFile);
+		}
+		else {
+			pJob = pJobSys->CreateJobMemberFunc<XModel>(this, &XModel::ProcessData_job, pFile);
+		}
+
+		pJobSys->Run(pJob);
+	}
+}
 
 
+void XModel::ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+{
+	X_UNUSED(pJobSys);
+	X_UNUSED(threadIdx);
+	X_UNUSED(pJob);
+
+	core::XFileAsync* pFile = static_cast<core::XFileAsync*>(pData);
+
+	// check if the header is correct.
+	if (hdr_.isValid())
+	{
+		// allocate buffer for the file data.
+		uint32_t dataSize = hdr_.dataSize;
+
+		char* pModelData = X_NEW_ARRAY_ALIGNED(char, hdr_.dataSize, gEnv->pArena, "ModelBuffer", 8);
+
+		pData_ = pModelData;
+
+		core::IoRequestData req;
+		req.setType(core::IoRequest::READ);
+		req.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
+
+		core::IoRequestRead& read = req.readInfo;
+		read.dataSize = dataSize;
+		read.offset = sizeof(hdr_);
+		read.pBuf = pModelData;
+		read.pFile = pFile;
+
+		pFileSys_->AddIoRequestToQue(req);
+	}
+	else
+	{
+		X_ERROR("Model", "\"%s\" model header is invalid", name_.c_str());
+
+		core::IoRequestData req;
+		req.setType(core::IoRequest::CLOSE);
+		req.closeInfo.pFile = pFile;
+		pFileSys_->AddIoRequestToQue(req);
+	}
+}
+
+
+void XModel::ProcessData_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+{
+	X_UNUSED(pJobSys);
+	X_UNUSED(threadIdx);
+	X_UNUSED(pJob);
+	X_UNUSED(pData);
+	X_ASSERT_NOT_NULL(pData);
+
+	core::XFileAsync* pFile = static_cast<core::XFileAsync*>(pData);
+
+	ProcessData(const_cast<char*>(pData_));
+
+	core::IoRequestData req;
+	req.setType(core::IoRequest::CLOSE);
+	req.closeInfo.pFile = pFile;
+	pFileSys_->AddIoRequestToQue(req);
+
+	// temp, unassign the render meshes so new ones get made.
+	core::zero_object(pLodRenderMeshes_);
+}
+
+
+bool XModel::LoadModelAsync(const char* name)
+{
+	AssignDefault();
+
+	core::Path<char> path;
+	path /= "models/";
+	path /= name;
+	path.setExtension(".model");
+
+	// dispatch a read request baby!
+	core::IoRequestData req;
+	req.setType(core::IoRequest::OPEN);
+	req.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
+
+	core::IoRequestOpen& open = req.openInfo;
+	open.mode = core::fileMode::READ;
+	open.name = path.c_str();
+
+	pFileSys_->AddIoRequestToQue(req);
+
+	return true;
+}
 
 bool XModel::LoadModel(const char* name)
 {
@@ -183,23 +350,20 @@ bool XModel::LoadModel(core::XFile* file)
 {
 	X_ASSERT_NOT_NULL(file);
 
-	int i, x;
-	uint32_t readSize;
-	ModelHeader hdr;
-
-	if (!ReadHeader(hdr, file)) {
+	if (!ReadHeader(hdr_, file)) {
 		X_ERROR("Model", "\"%s\" model header is invalid", name_.c_str());
 		return false;
 	}
 
-
 #if X_DEBUG // debug only.
+	int i;
+
 	// quick check that model is somewhat valid.
 	// we make a few assumptions, since this is my format.
 	// and if this is not right, there is a tool issue
-	for (i = 0; i < hdr.numLod; i++)
+	for (i = 0; i < hdr_.numLod; i++)
 	{
-		LODHeader& lod = hdr.lodInfo[i];
+		LODHeader& lod = hdr_.lodInfo[i];
 
 		if (lod.numSubMeshes == 0) {
 			X_ERROR("Model", "model lod(%i) has no meshes defined", i);
@@ -219,13 +383,14 @@ bool XModel::LoadModel(core::XFile* file)
 
 	// ok now we just have the model + bone data.
 	// which we can load all at once and just set pointers.
-	//	char* pData = X_NEW_ARRAY_ALIGNED(char, hdr.dataSize, g_3dEngineArena, "ModelBuffer", 8);
-	char* pData = X_NEW_ARRAY_ALIGNED(char, hdr.dataSize, gEnv->pArena, "ModelBuffer", 8);
+	//	char* pData = X_NEW_ARRAY_ALIGNED(char, hdr_.dataSize, g_3dEngineArena, "ModelBuffer", 8);
+	char* pData = X_NEW_ARRAY_ALIGNED(char, hdr_.dataSize, gEnv->pArena, "ModelBuffer", 8);
+	uint32_t readSize;
 
-	if ((readSize = file->read(pData, hdr.dataSize)) != hdr.dataSize)
+	if ((readSize = file->read(pData, hdr_.dataSize)) != hdr_.dataSize)
 	{
 		X_ERROR("Model", "load error failed to read %i bytes, recived: %i",
-			hdr.dataSize, readSize);
+			hdr_.dataSize, readSize);
 
 		X_DELETE_ARRAY(pData, g_3dEngineArena);
 		return false;
@@ -242,12 +407,21 @@ bool XModel::LoadModel(core::XFile* file)
 	}
 #endif // !X_DEBUG
 
-	core::MemCursor<char> mat_name_cursor(pData, hdr.materialNameDataSize);
-	core::MemCursor<char> tag_name_cursor(pData + hdr.materialNameDataSize, hdr.tagNameDataSize);
-	core::MemCursor<char> cursor(pData + (hdr.dataSize - hdr.subDataSize), hdr.subDataSize);
+	ProcessData(pData);
 
-	const size_t numBone = hdr.numBones;
-	const size_t numBoneTotal = hdr.numBones + hdr.numBlankBones;
+	return true;
+}
+
+void XModel::ProcessData(char* pData)
+{
+	int i, x;
+
+	core::MemCursor<char> mat_name_cursor(pData, hdr_.materialNameDataSize);
+	core::MemCursor<char> tag_name_cursor(pData + hdr_.materialNameDataSize, hdr_.tagNameDataSize);
+	core::MemCursor<char> cursor(pData + (hdr_.dataSize - hdr_.subDataSize), hdr_.subDataSize);
+
+	const size_t numBone = hdr_.numBones;
+	const size_t numBoneTotal = hdr_.numBones + hdr_.numBlankBones;
 
 	pTagNames_ = cursor.postSeekPtr<uint16_t>(numBoneTotal);
 	pTagTree_ = cursor.postSeekPtr<uint8_t>(numBone);
@@ -257,18 +431,18 @@ bool XModel::LoadModel(core::XFile* file)
 	pData_ = pData;
 
 	// we now have the mesh headers.
-	for (i = 0; i < hdr.numLod; i++)
+	for (i = 0; i < hdr_.numLod; i++)
 	{
-		LODHeader& lod = hdr.lodInfo[i];
+		LODHeader& lod = hdr_.lodInfo[i];
 
 		lod.subMeshHeads = cursor.postSeekPtr<SubMeshHeader>(lod.numSubMeshes);
 	}
 
 	// ok we now need to set vert and face pointers.
 	// for each Lod
-	for (i = 0; i < hdr.numLod; i++)
+	for (i = 0; i < hdr_.numLod; i++)
 	{
-		LODHeader& lod = hdr.lodInfo[i];
+		LODHeader& lod = hdr_.lodInfo[i];
 		// we have 3 blocks of data.
 		// Verts, Faces, Binddata
 		SubMeshHeader* meshHeads = lod.subMeshHeads;
@@ -335,7 +509,7 @@ bool XModel::LoadModel(core::XFile* file)
 	// Material name list null-term
 	{
 		core::StackString<engine::MTL_MATERIAL_MAX_LEN> name;
-		for (i = 0; i < hdr.numMesh; i++)
+		for (i = 0; i < hdr_.numMesh; i++)
 		{
 			SubMeshHeader* pMesh = const_cast<SubMeshHeader*>(&pMeshHeads_[i]);
 			// set the pointer.
@@ -353,11 +527,11 @@ bool XModel::LoadModel(core::XFile* file)
 	}
 
 	// Tag name list null-term
-	if (hdr.flags.IsSet(ModelFlags::LOOSE) && hdr.tagNameDataSize > 0)
+	if (hdr_.flags.IsSet(ModelFlags::LOOSE) && hdr_.tagNameDataSize > 0)
 	{
 		core::StackString<MODEL_MAX_BONE_NAME_LENGTH> name;
 
-		for (i = 0; i < hdr.numBones; i++)
+		for (i = 0; i < hdr_.numBones; i++)
 		{
 			while (!tag_name_cursor.isEof() && tag_name_cursor.get<char>() != '\0') {
 				name.append(tag_name_cursor.getSeek<char>(), 1);
@@ -372,7 +546,7 @@ bool XModel::LoadModel(core::XFile* file)
 	}
 
 	// load the materials.
-	for (i = 0; i < hdr.numMesh; i++)
+	for (i = 0; i < hdr_.numMesh; i++)
 	{
 		SubMeshHeader* pMesh = const_cast<SubMeshHeader*>(&pMeshHeads_[i]);
 
@@ -380,13 +554,12 @@ bool XModel::LoadModel(core::XFile* file)
 	}
 
 	// copy lod info activating the data.
-	core::copy_object(lodInfo_, hdr.lodInfo);
+	core::copy_object(lodInfo_, hdr_.lodInfo);
 
-	numLods_ = hdr.numLod;
-	numBones_ = hdr.numBones;
-	numBlankBones_ = hdr.numBlankBones;
-	totalMeshNum_ = hdr.numMesh;
-	return true;
+	numLods_ = hdr_.numLod;
+	numBones_ = hdr_.numBones;
+	numBlankBones_ = hdr_.numBlankBones;
+	totalMeshNum_ = hdr_.numMesh;
 }
 
 
