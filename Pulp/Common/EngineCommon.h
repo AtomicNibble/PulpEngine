@@ -11,7 +11,6 @@
 
 X_DISABLE_WARNING(4714) // __forceinline not inlined.
 
-#include <inttypes.h>
 
 // Util
 #include <Util\ClassMacros.h>
@@ -116,6 +115,7 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 // #include <Containers\LinkedListIntrusive.h>
 
 // string
+#include <String\FormatMacros.h>
 #include <String\StrRef.h>
 
 // Math

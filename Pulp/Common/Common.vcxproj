@@ -255,6 +255,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="String\Base64.h" />
     <ClInclude Include="String\CmdArgs.h" />
+    <ClInclude Include="String\FormatMacros.h" />
     <ClInclude Include="String\GrowingStringTable.h" />
     <ClInclude Include="String\HumanSize.h" />
     <ClInclude Include="String\Lexer.h" />

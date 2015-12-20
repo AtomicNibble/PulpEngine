@@ -1051,6 +1051,9 @@
     <ClInclude Include="Threading\ThreadQue.h">
       <Filter>Headers\Threading</Filter>
     </ClInclude>
+    <ClInclude Include="String\FormatMacros.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
