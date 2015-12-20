@@ -108,7 +108,7 @@ public:
 };
 
 
-class Level : public engine::XEngineBase, private core::IIoRequestHandler
+class Level : public engine::XEngineBase
 {
 	typedef core::Array<Area> AreaArr;
 	typedef core::Array<AreaNode> AreaNodeArr;
@@ -157,12 +157,8 @@ private:
 	void FloodVisibleAreas(void);
 	void DrawVisibleAreas(void);
 
-	// IIoRequestHandler
-	virtual void IoRequestCallback(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
-		core::XFileAsync* pFile, bool result) X_FINAL;
-	virtual void IoRequestCallbackMem(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
-		core::XFileMem* pFile, bool result) X_FINAL;
-	// ~IIoRequestHandler
+	void IoRequestCallback(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
+		core::XFileAsync* pFile, bool result);
 
 
 	void ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* job, void* pData);

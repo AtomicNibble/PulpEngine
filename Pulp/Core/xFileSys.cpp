@@ -929,10 +929,6 @@ XFileStats& xFileSys::getStats(void) const
 
 void xFileSys::AddIoRequestToQue(const IoRequestData& request)
 {
-	if (request.getType() != IoRequest::CLOSE) {
-		X_ASSERT_NOT_NULL(request.callback);
-	}
-
 	ioQue_.push(request);
 }
 
@@ -996,7 +992,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 				if (asyncOp.op.hasFinished())
 				{
-					asyncOp.rquest.pHandler->IoRequestCallback(this, request.getType(), 
+					asyncOp.rquest.callback.Invoke(this, request.getType(), 
 						request.readInfo.pFile, true);
 
 					pendingOps.removeIndex(i);
@@ -1016,25 +1012,25 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			XFileAsync* pFile =	openFileAsync(open.name.c_str(), open.mode);
 			bool operationSucced = pFile != nullptr;
 
-			request.pHandler->IoRequestCallback(this, request.getType(), pFile, operationSucced);
+			request.callback.Invoke(this, request.getType(), pFile, operationSucced);
 		}
 		else if (request.getType() == IoRequest::OPEN_READ_ALL)
 		{
-			IoRequestOpen& open = request.openInfo;
-			XFileMem* pFile = openFileMem(open.name.c_str(), open.mode);
-			bool operationSucced = pFile != nullptr;
+		//	IoRequestOpen& open = request.openInfo;
+		//	XFileMem* pFile = openFileMem(open.name.c_str(), open.mode);
+		//	bool operationSucced = pFile != nullptr;
 
 
-			(request.callbackMem)(this, request.getType(), operationSucced, pFile);
+		//	request.callback.Invoke(this, request.getType(), pFile, operationSucced);
 		}
 		else if (request.getType() == IoRequest::CLOSE)
 		{
 			// if the close job has a callback, we are shutting down.
-			if (request.callback) {
+		/*	if (request.callback) {
 				uintptr_t val = reinterpret_cast<uintptr_t>(request.callback);
 				X_ASSERT(val == 1, "Close job can't have a callback other than shutdown magic")(val);
 				continue;
-			}
+			}*/
 
 			// normal close request.
 			IoRequestClose& close = request.closeInfo;

@@ -15,7 +15,6 @@
 X_NAMESPACE_BEGIN(level)
 
 
-  // IIoRequestHandler
 void Level::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
 	core::XFileAsync* pFile, bool result)
 {
@@ -28,7 +27,7 @@ void Level::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequest::Enum re
 		
 		core::IoRequestData req;
 		req.setType(core::IoRequest::READ);
-		req.pHandler = this;
+		req.callback.Bind<Level, &Level::IoRequestCallback>(this);
 
 		core::IoRequestRead& read = req.readInfo;
 		read.pFile = pFile;
@@ -57,17 +56,7 @@ void Level::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequest::Enum re
 	}
 }
 
-void Level::IoRequestCallbackMem(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
-	core::XFileMem* pFile, bool result)
-{
-	X_ASSERT_NOT_IMPLEMENTED();
-	X_UNUSED(pFileSys);
-	X_UNUSED(requestType);
-	X_UNUSED(result);
-	X_UNUSED(pFile);
 
-}
-// ~IIoRequestHandler
 
 void Level::ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* job, void* pData)
 {
@@ -90,7 +79,8 @@ void Level::ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, co
 
 		core::IoRequestData req;
 		req.setType(core::IoRequest::READ);
-		req.pHandler = this;
+		req.callback.Bind<Level, &Level::IoRequestCallback>(this);
+
 
 		core::IoRequestRead& read = req.readInfo;
 		read.dataSize = dataSize;
@@ -112,7 +102,16 @@ void Level::ProcessData_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core
 	X_ASSERT(headerLoaded_, "Header must be loaded in order to process data")(headerLoaded_);
 	X_ASSERT_NOT_NULL(pFileData_);
 
+	core::XFileAsync* pFile = static_cast<core::XFileAsync*>(pData);
+
 	ProcessData();
+
+
+	core::IoRequestData req;
+	req.setType(core::IoRequest::CLOSE);
+	req.callback.Bind<Level, &Level::IoRequestCallback>(this);
+	req.closeInfo.pFile = pFile;
+	pFileSys_->AddIoRequestToQue(req);
 }
 
 
@@ -137,7 +136,7 @@ bool Level::Load(const char* mapName)
 
 	core::IoRequestData req;
 	req.setType(core::IoRequest::OPEN);
-	req.pHandler = this;
+	req.callback.Bind<Level, &Level::IoRequestCallback>(this);
 	core::IoRequestOpen& open = req.openInfo;
 
 	open.mode = core::fileMode::READ;

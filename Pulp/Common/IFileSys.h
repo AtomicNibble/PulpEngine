@@ -5,6 +5,7 @@
 #define _X_FILE_SYSTEM_I_H_
 
 #include <io.h>
+#include <Util\Delegate.h>
 
 // i need the definition :|
 #include X_INCLUDE(../Core/X_PLATFORM/OsFileAsyncOperation.h)
@@ -365,6 +366,7 @@ X_DECLARE_ENUM(IoRequest)(
 	WRITE
 );
 
+/*
 typedef core::traits::Function<void(core::IFileSys*,IoRequest::Enum, bool, XFileAsync*)> IoRequestCallback;
 typedef core::traits::Function<void(core::IFileSys*,IoRequest::Enum, bool, XFileMem*)> IoRequestMemCallback;
 
@@ -375,7 +377,8 @@ struct IIoRequestHandler
 		core::XFileAsync* pFile, bool result) X_ABSTRACT;
 	virtual void IoRequestCallbackMem(core::IFileSys* pFileSys, core::IoRequest::Enum requestType,
 		core::XFileMem* pFile, bool result) X_ABSTRACT;
-};
+}; 
+*/
 
 struct IoRequestOpen
 {
@@ -415,7 +418,7 @@ public:
 
 	X_INLINE IoRequestData(const IoRequestData& oth) {
 		type = oth.type;
-		pHandler = oth.pHandler;
+		callback = oth.callback;
 		
 		if (type == IoRequest::OPEN || type == IoRequest::OPEN_READ_ALL)
 		{
@@ -435,7 +438,7 @@ public:
 
 	X_INLINE IoRequestData& operator=(const IoRequestData& oth) {
 		type = oth.type;
-		pHandler = oth.pHandler;
+		callback = oth.callback;
 
 		if (type == IoRequest::OPEN || type == IoRequest::OPEN_READ_ALL)
 		{
@@ -471,12 +474,8 @@ private:
 	IoRequest::Enum type;
 
 public:
-
-	union {
-		IoRequestMemCallback::Pointer callbackMem;
-		IoRequestCallback::Pointer callback;
-		IIoRequestHandler* pHandler;
-	};
+	core::Delegate<void(core::IFileSys*, core::IoRequest::Enum, 
+		core::XFileAsync*, bool)> callback;
 
 	union
 	{
