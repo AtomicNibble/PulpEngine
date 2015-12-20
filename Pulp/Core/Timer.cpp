@@ -138,7 +138,7 @@ void XTimer::OnFrameBegin(void)
 
 	if (debugTime_)
 	{
-		X_LOG0("Timer", "Cur=%lld Now=%lld Async=%f CurrTime=%f UI=%f",
+		X_LOG0("Timer", "Cur=%" PRId64 " Now=%" PRId64 " Async=%f CurrTime=%f UI=%f",
 			CurrentTime_,
 			now, 
 			GetAsyncCurTime(), 
