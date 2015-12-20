@@ -5,7 +5,7 @@
 #define X_FORMAT_MACROS_H_
 
 
-if X_PLATFORM_WIN32
+#if X_PLATFORM_WIN32
 
 #include <inttypes.h>
 
