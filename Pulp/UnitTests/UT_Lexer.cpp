@@ -603,9 +603,9 @@ TEST(Lexer, Mapfile)
 			}
 		}
 
-		X_LOG0("MapInfo", "num entites: %i", num);
-		X_LOG0("MapInfo", "num brushes: %i", num_brush);
-		X_LOG0("MapInfo", "num patches: %i", num_patch);
+		X_LOG0("MapInfo", "num entites: %" PRIuS, num);
+		X_LOG0("MapInfo", "num brushes: %" PRIuS, num_brush);
+		X_LOG0("MapInfo", "num patches: %" PRIuS, num_patch);
 
 	}
 	else

@@ -165,8 +165,8 @@ Vec2f XProfileSys::RenderMemoryInfo(const Vec2f& pos, float height)
 	core::StackString512 str;
 	core::HumanSize::Str temp;
 
-	str.appendFmt("Num:%i\n", allocStats.allocationCount_);
-	str.appendFmt("Num(Max):%i\n", allocStats.allocationCountMax_);
+	str.appendFmt("Num:%" PRIuS "\n", allocStats.allocationCount_);
+	str.appendFmt("Num(Max):%" PRIuS "\n", allocStats.allocationCountMax_);
 	str.appendFmt("Physical:%s\n", core::HumanSize::toString(temp, allocStats.physicalMemoryAllocated_));
 	str.appendFmt("Physical(Used):%s\n", core::HumanSize::toString(temp, allocStats.physicalMemoryUsed_));
 	str.appendFmt("Virtual(Res):%s\n", core::HumanSize::toString(temp, allocStats.virtualMemoryReserved_));
