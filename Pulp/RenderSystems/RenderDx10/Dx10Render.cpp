@@ -71,8 +71,8 @@ void DX11XRender::SetArenas(core::MemoryArenaBase* arena)
 bool DX11XRender::Init(HWND hWnd, 
 	uint32_t width, uint32_t hieght)
 {
-	float screenWidth = (float)width;
-	float screenHeight = (float)hieght;
+	float screenWidth = static_cast<float>(width);
+	float screenHeight = static_cast<float>(hieght);
 
 //	float screenDepth = 1000.f;
 //	float screenNear = 1.f;
@@ -81,7 +81,7 @@ bool DX11XRender::Init(HWND hWnd,
 		return false;
 	}
 
-	if (hWnd == (HWND)0)
+	if (hWnd == static_cast<HWND>(0))
 	{
 		X_ERROR("dx10", "target window is not valid");
 		return false;
@@ -118,8 +118,8 @@ bool DX11XRender::Init(HWND hWnd,
 	swapChainDesc.BufferCount = 1;
 
 	// Set the width and height of the back buffer.
-	swapChainDesc.BufferDesc.Width = (UINT)screenWidth;
-	swapChainDesc.BufferDesc.Height = (UINT)screenHeight;
+	swapChainDesc.BufferDesc.Width = static_cast<UINT>(screenWidth);
+	swapChainDesc.BufferDesc.Height = static_cast<UINT>(screenHeight);
 
 	// Set regular 32-bit surface for the back buffer.
 	swapChainDesc.BufferDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -239,8 +239,8 @@ bool DX11XRender::Init(HWND hWnd,
 	backBufferPtr = 0;
 
 	// Set up the description of the depth buffer.
-	depthBufferDesc.Width = (UINT)screenWidth;
-	depthBufferDesc.Height = (UINT)screenHeight;
+	depthBufferDesc.Width = static_cast<UINT>(screenWidth);
+	depthBufferDesc.Height = static_cast<UINT>(screenHeight);
 	depthBufferDesc.MipLevels = 1;
 	depthBufferDesc.ArraySize = 1;
 	depthBufferDesc.Format = DXGI_FORMAT_R24G8_TYPELESS;
@@ -390,8 +390,7 @@ bool DX11XRender::Init(HWND hWnd,
 
 	// Setup the projection matrix.
 	fieldOfView = PIf / 4.0f;
-	screenAspect = 
-		screenWidth / screenHeight;
+	screenAspect = screenWidth / screenHeight;
 
 	if (!OnPostCreateDevice()) {
 		X_ERROR("Dx10", "Post device creation operations failed");
@@ -403,7 +402,7 @@ bool DX11XRender::Init(HWND hWnd,
 		return true;
 	}
 
-	result = device_->QueryInterface(__uuidof(ID3D11Debug), (void**)&d3dDebug_);
+	result = device_->QueryInterface(__uuidof(ID3D11Debug), reinterpret_cast<void**>(&d3dDebug_));
 	if (SUCCEEDED(result))
 	{
 		return true;
@@ -1313,7 +1312,7 @@ ID3D11InputLayout* DX11XRender::CreateILFromDesc(const shader::VertexFormat::Enu
 
 	if (FAILED(hr = device_->CreateInputLayout(
 		layout.ptr(),
-		(uint)layout.size(),
+		static_cast<uint>(layout.size()),
 		pBlob->GetBufferPointer(),
 		pBlob->GetBufferSize(),
 		&pInputLayout))
