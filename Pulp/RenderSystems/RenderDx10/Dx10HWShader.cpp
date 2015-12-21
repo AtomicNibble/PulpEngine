@@ -334,7 +334,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 	return pShader;
 }
 
-void XHWShader_Dx10::InitBufferPointers()
+void XHWShader_Dx10::InitBufferPointers(void)
 {
 	// already allocated?
 	if (pConstBuffers_[0][0] != nullptr)
@@ -356,7 +356,7 @@ void XHWShader_Dx10::InitBufferPointers()
 
 }
 
-void XHWShader_Dx10::FreeBufferPointers()
+void XHWShader_Dx10::FreeBufferPointers(void)
 {
 	int i, x;
 
@@ -370,7 +370,7 @@ void XHWShader_Dx10::FreeBufferPointers()
 
 }
 
-void XHWShader_Dx10::FreeHWShaders()
+void XHWShader_Dx10::FreeHWShaders(void)
 {
 	// null on start up failed.
 	X_ASSERT_NOT_NULL(s_pHWshaders);
@@ -399,7 +399,7 @@ void XHWShader_Dx10::FreeHWShaders()
 }
 
 
-void XHWShader_Dx10::FreeParams()
+void XHWShader_Dx10::FreeParams(void)
 {
 	int i;
 	for (i = 0; i < ShaderType::ENUM_COUNT; i++) {
@@ -476,7 +476,7 @@ bool XHWShader_Dx10::saveToCache(void)
 }
 
 
-bool XHWShader_Dx10::loadFromCache()
+bool XHWShader_Dx10::loadFromCache(void)
 {
 	core::Path<char> dest;
 
@@ -497,7 +497,7 @@ bool XHWShader_Dx10::loadFromCache()
 }
 
 
-bool XHWShader_Dx10::loadFromSource()
+bool XHWShader_Dx10::loadFromSource(void)
 {
 	core::string source;
 
@@ -633,7 +633,7 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 	return true;
 }
 
-bool XHWShader_Dx10::uploadtoHW()
+bool XHWShader_Dx10::uploadtoHW(void)
 {
 	HRESULT hr;
 	ID3D11Device* pDevice;
@@ -1012,7 +1012,7 @@ bool XHWShader_Dx10::reflectShader(void)
 
 
 
-bool XHWShader_Dx10::activate()
+bool XHWShader_Dx10::activate(void)
 {
 	if (!isValid())
 	{
@@ -1059,7 +1059,7 @@ bool XHWShader_Dx10::activate()
 }
 
 
-const int XHWShader_Dx10::release()
+const int XHWShader_Dx10::release(void)
 {
 	int res = XHWShader::release();
 	if (res)
@@ -1109,7 +1109,7 @@ const int XHWShader_Dx10::releaseHW(void)
 
 // ===================================================
 
-bool XHWShader_Dx10::bindVS()
+bool XHWShader_Dx10::bindVS(void)
 {
 	// make sure the shader is loaded
 	// and compiled / ready for binding.
@@ -1125,7 +1125,7 @@ bool XHWShader_Dx10::bindVS()
 	return true;
 }
 
-bool XHWShader_Dx10::bindPS()
+bool XHWShader_Dx10::bindPS(void)
 {
 	if (!activate())
 		return false;
@@ -1138,7 +1138,7 @@ bool XHWShader_Dx10::bindPS()
 	return true;
 }
 
-bool XHWShader_Dx10::bindGS()
+bool XHWShader_Dx10::bindGS(void)
 {
 	if (!activate())
 		return false;
@@ -1187,7 +1187,7 @@ void XHWShader_Dx10::Init(void)
 	RegisterDvars();
 }
 
-void XHWShader_Dx10::RegisterDvars()
+void XHWShader_Dx10::RegisterDvars(void)
 {
 	ADD_CVAR_REF("shader_writeMergedSource", writeMergedSource_, 1, 0, 1,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
@@ -1227,7 +1227,7 @@ void XHWShader_Dx10::commitConstBuffer(ConstbufType::Enum buf_type, ShaderType::
 	unMapConstbuffer(shader_type, buf_type);
 }
 
-void XHWShader_Dx10::comitParamsGlobal()
+void XHWShader_Dx10::comitParamsGlobal(void)
 {
 	X_PROFILE_BEGIN("setParamsGlobal", core::ProfileSubSys::RENDER);
 
@@ -1237,7 +1237,7 @@ void XHWShader_Dx10::comitParamsGlobal()
 	commitConstBuffer(ConstbufType::PER_FRAME, ShaderType::Pixel);
 }
 
-void XHWShader_Dx10::comitParams()
+void XHWShader_Dx10::comitParams(void)
 {
 	X_PROFILE_BEGIN("setParams", core::ProfileSubSys::RENDER);
 
@@ -1259,7 +1259,7 @@ void XHWShader_Dx10::comitParams()
 
 
 
-void XHWShader_Dx10::setParamsGlobal()
+void XHWShader_Dx10::setParamsGlobal(void)
 {
 	if (!perFrameParams_[ShaderType::Vertex].isEmpty())
 	{
@@ -1282,7 +1282,7 @@ void XHWShader_Dx10::setParamsGlobal()
 
 }
 
-void XHWShader_Dx10::setParams()
+void XHWShader_Dx10::setParams(void)
 {
 	// we basically just loop over the parama update the values, 
 	// and copy them into the mapped buffer.

@@ -189,14 +189,14 @@ class XHWShader_Dx10 : public XHWShader
 public:
 	XHWShader_Dx10();
 
-	bool activate();
-	const int release() X_OVERRIDE;
+	bool activate(void);
+	const int release(void) X_OVERRIDE;
 
 	// release just the HW device.
 	const int releaseHW(void);
 
 	// binds the shader to gpu ()
-	X_INLINE bool bind();
+	X_INLINE bool bind(void);
 	X_INLINE ShaderStatus::Enum getStatus(void) const;
 	X_INLINE bool isValid(void) const;
 	X_INLINE bool FailedtoCompile(void) const;
@@ -204,10 +204,10 @@ public:
 	static void Init(void);
 	static void shutDown(void);
 
-	static void comitParamsGlobal();
-	static void comitParams();
-	static void setParamsGlobal();
-	static void setParams();
+	static void comitParamsGlobal(void);
+	static void comitParams(void);
+	static void setParamsGlobal(void);
+	static void setParams(void);
 
 	// o baby your so dirty.
 	static void SetCameraDirty(void) {}
@@ -222,8 +222,8 @@ public:
 	static class XHWShader_Dx10* pCurGS_;
 
 private:
-	bool loadFromSource();
-	bool loadFromCache();
+	bool loadFromSource(void);
+	bool loadFromCache(void);
 	void getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest);
 	void getShaderCompileSrc(core::Path<char>& src);
 	void getShaderCompileDest(core::Path<char>& dest);
@@ -235,16 +235,16 @@ private:
 	bool saveToCache(void);
 
 private:
-	bool bindVS();
-	bool bindPS();
-	bool bindGS();
+	bool bindVS(void);
+	bool bindPS(void);
+	bool bindGS(void);
 
 	static void commitConstBuffer(ConstbufType::Enum buf_type, ShaderType::Enum shader_type);
 	
 	static void setParamValues(XShaderParam* pPrams, uint32_t numPrams,
 		ShaderType::Enum shaderType, uint32_t maxVecs);
 
-	X_INLINE void setShader();
+	X_INLINE void setShader(void);
 	X_INLINE static void setConstBuffer(ShaderType::Enum type, uint slot, ID3D11Buffer* pBuf);
 	static _inline void unMapConstbuffer(ShaderType::Enum shaderType,
 		ConstbufType::Enum bufType);
@@ -300,10 +300,10 @@ protected:
 	X_INLINE void setStatus(ShaderStatus::Enum status);
 
 private:
-	static void InitBufferPointers();
-	static void FreeBufferPointers();
-	static void FreeHWShaders();
-	static void FreeParams();
+	static void InitBufferPointers(void);
+	static void FreeBufferPointers(void);
+	static void FreeHWShaders(void);
+	static void FreeParams(void);
 
 	static void CreateInputLayoutTree(void);
 	static void FreeInputLayoutTree(void);
