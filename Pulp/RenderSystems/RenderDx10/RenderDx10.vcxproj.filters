@@ -213,5 +213,8 @@
     <None Include="Dx10Shader.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="..\Common\XRender.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

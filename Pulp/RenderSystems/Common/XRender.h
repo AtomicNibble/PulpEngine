@@ -109,39 +109,23 @@ public:
 	virtual void GetViewport(Recti& rect) X_OVERRIDE;
 	virtual void SetViewport(const Recti& rect) X_OVERRIDE;
 
-	virtual int getWidth(void) const X_OVERRIDE{ return ViewPort_.getWidth(); }
-	virtual int getHeight(void) const X_OVERRIDE{ return ViewPort_.getHeight(); }
-	virtual float getWidthf(void) const X_OVERRIDE{ return ViewPort_.getWidthf(); }
-	virtual float getHeightf(void) const X_OVERRIDE{ return ViewPort_.getHeightf(); }
+	X_INLINE virtual int getWidth(void) const X_OVERRIDE;
+	X_INLINE virtual int getHeight(void) const X_OVERRIDE;
+	X_INLINE virtual float getWidthf(void) const X_OVERRIDE;
+	X_INLINE virtual float getHeightf(void) const X_OVERRIDE;
 	// ~ViewPort
 
 	// scales from 800x600
-	virtual float ScaleCoordX(float value) const X_OVERRIDE{ return ScaleCoordXInternal(value); }
-	virtual float ScaleCoordY(float value) const X_OVERRIDE{ return ScaleCoordYInternal(value); }
-	virtual void ScaleCoord(float& x, float& y) const X_OVERRIDE{ ScaleCoordInternal(x, y); }
-	virtual void ScaleCoord(Vec2f& xy) const X_OVERRIDE{ ScaleCoordInternal(xy); }
+	X_INLINE virtual float ScaleCoordX(float value) const X_OVERRIDE;
+	X_INLINE virtual float ScaleCoordY(float value) const X_OVERRIDE;
+	X_INLINE virtual void ScaleCoord(float& x, float& y) const X_OVERRIDE;
+	X_INLINE virtual void ScaleCoord(Vec2f& xy) const X_OVERRIDE;
 
 	// none virtual versions for this lib.
-	X_INLINE float ScaleCoordXInternal(float value) const
-	{
-		value *= ViewPort_.getWidthf() / 800.0f;
-		return (value);
-	}
-	X_INLINE float ScaleCoordYInternal(float value) const
-	{
-		value *= ViewPort_.getHeightf() / 600.0f;
-		return (value);
-	}
-	X_INLINE void ScaleCoordInternal(float& x, float& y) const
-	{
-		x = ScaleCoordXInternal(x);
-		y = ScaleCoordYInternal(y);
-	}
-	X_INLINE void ScaleCoordInternal(Vec2f& xy) const
-	{
-		xy.x = ScaleCoordXInternal(xy.x);
-		xy.y = ScaleCoordYInternal(xy.y);
-	}
+	X_INLINE float ScaleCoordXInternal(float value) const;
+	X_INLINE float ScaleCoordYInternal(float value) const;
+	X_INLINE void ScaleCoordInternal(float& x, float& y) const;
+	X_INLINE void ScaleCoordInternal(Vec2f& xy) const;
 
 	// AuxGeo
 	virtual IRenderAux* GetIRenderAuxGeo(void) X_ABSTRACT;
@@ -160,8 +144,8 @@ public:
 	// ~Textures 
 
 	// Camera
-	virtual void  SetCamera(const XCamera& cam) X_ABSTRACT;
-	virtual const XCamera& GetCamera() X_OVERRIDE { return cam_; };
+	virtual void SetCamera(const XCamera& cam) X_ABSTRACT;
+	X_INLINE virtual const XCamera& GetCamera() X_OVERRIDE;
 	// ~Camera
 
 
@@ -218,9 +202,7 @@ public:
 	// ~Drawing
 
 
-	VidMemManager* VidMemMng(void) {
-		return &vidMemMng_;
-	}
+	X_INLINE VidMemManager* VidMemMng(void);
 
 
 	// RT
@@ -241,11 +223,10 @@ public:
 
 	// ~RT
 
-	X_INLINE Matrix44f* pViewMatrix() { return &ViewMatrix_; }
-	X_INLINE Matrix44f* pProjMatrix() { return &ProjMatrix_; }
-	X_INLINE Matrix44f* pViewProjMatrix() { return &ViewProjMatrix_; }
-	X_INLINE Matrix44f* pViewProjInvMatrix() { return &ViewProjInvMatrix_; }
-
+	X_INLINE Matrix44f* pViewMatrix();
+	X_INLINE Matrix44f* pProjMatrix();
+	X_INLINE Matrix44f* pViewProjMatrix();
+	X_INLINE Matrix44f* pViewProjInvMatrix();
 
 
 	static uint32_t vertexFormatStride[shader::VertexFormat::Num];
@@ -289,8 +270,9 @@ protected:
 
 extern XRender* gRenDev;
 
-
 X_NAMESPACE_END
+
+#include "XRender.inl"
 
 #endif // !_X_RENDER_BASE_H_
 

@@ -468,6 +468,7 @@
     <ClCompile Include="XShaderBin.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\Common\XRender.inl" />
     <None Include="Dx10Render.inl" />
     <None Include="Dx10Shader.inl" />
   </ItemGroup>
