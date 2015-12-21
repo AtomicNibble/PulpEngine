@@ -23,8 +23,6 @@ bool XTexture::createDeviceTexture(core::ReferenceCountedOwner<XTextureFile>& im
 	image_data->pName_ = this->FileName.c_str();
 #endif // !X_DEBUG
 
-
-//	return g_Dx11D3D.rThread()->RC_CreateDeviceTexture(this, image_data.instance());
 	return RT_CreateDeviceTexture(image_data.instance());
 }
 

@@ -148,7 +148,6 @@ void XCore::ShutDown()
 	}
 
 	if (env_.pRender) {
-		env_.pRender->FlushRenderThreadCommands(true);
 	//	env_.pRender->ShutDown();
 	}
 

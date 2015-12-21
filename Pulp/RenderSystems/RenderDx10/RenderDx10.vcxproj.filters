@@ -18,9 +18,6 @@
     <Filter Include="DeviceManager">
       <UniqueIdentifier>{7581eb9d-8fd9-4fde-9f25-93d3c2f25038}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Common\Thread">
-      <UniqueIdentifier>{9ab8a37d-cabb-4050-a80b-121d7c30c72a}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Common\Textures\Loaders">
       <UniqueIdentifier>{25b65d28-c16d-4702-9a51-65bd41d49a9e}</UniqueIdentifier>
     </Filter>
@@ -52,9 +49,6 @@
     </ClInclude>
     <ClInclude Include="DeviceManager\DeviceManager.h">
       <Filter>DeviceManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\ReaderThread.h">
-      <Filter>Common\Thread</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Textures\TextureLoaderCI.h">
       <Filter>Common\Textures\Loaders</Filter>
@@ -132,9 +126,6 @@
     </ClCompile>
     <ClCompile Include="Dx10Texture.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\ReaderThread.cpp">
-      <Filter>Common\Thread</Filter>
     </ClCompile>
     <ClCompile Include="..\Common\Textures\TextureLoaderCI.cpp">
       <Filter>Common\Textures\Loaders</Filter>

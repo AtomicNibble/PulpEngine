@@ -275,8 +275,6 @@ struct IRender
 	virtual void RenderBegin() X_ABSTRACT;
 	virtual void RenderEnd() X_ABSTRACT;
 
-	virtual bool FlushRenderThreadCommands(bool wait) X_ABSTRACT;
-
 	virtual void SetState(StateFlag state) X_ABSTRACT;
 	virtual void SetStencilState(StencilState::Value ss) X_ABSTRACT;
 	virtual void SetCullMode(CullMode::Enum mode) X_ABSTRACT;

@@ -165,7 +165,6 @@ XRenderAuxImp::~XRenderAuxImp()
 // IRenderAuxImpl
 void XRenderAuxImp::Flush(const XAuxGeomCBRawDataPackaged& data, size_t begin, size_t end)
 {
-//	renderer_.rThread()->RC_AuxFlush(this, data, begin, end);
 	RT_Flush(data, begin, end);
 }
 
@@ -176,8 +175,6 @@ void XRenderAuxImp::RT_Flush(const XAuxGeomCBRawDataPackaged& data, size_t begin
 
 	X_PROFILE_BEGIN("AuxGeom", core::ProfileSubSys::RENDER);
 
-	// should only be called from render thread
-	// assert(m_renderer.m_pRT->IsRenderThread());
 	X_ASSERT_NOT_NULL(data.pData_);
 
 	pCurCBRawData_ = data.pData_;

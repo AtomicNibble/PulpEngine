@@ -121,10 +121,6 @@ XTexture::XTexture()
 
 XTexture::~XTexture()
 {
-//	if (render::gRenDev->rThread()) {
-//		render::gRenDev->rThread()->RC_ReleaseDeviceTexture(this);
-//	}
-
 	this->ReleaseDeviceTexture();
 }
 

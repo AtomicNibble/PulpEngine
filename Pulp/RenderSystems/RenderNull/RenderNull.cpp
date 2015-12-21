@@ -41,12 +41,6 @@ void RenderNull::RenderEnd()
 
 }
 
-bool RenderNull::FlushRenderThreadCommands(bool wait)
-{
-	X_UNUSED(wait);
-	return true;
-}
-
 void RenderNull::SetState(StateFlag state)
 {
 	X_UNUSED(state);

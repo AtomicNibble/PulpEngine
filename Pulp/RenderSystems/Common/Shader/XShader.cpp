@@ -1595,11 +1595,9 @@ XShaderResources::~XShaderResources()
 
 void XShaderResources::release(void)
 {
-	if (render::gRenDev) // && render::gRenDev->rThread())
+	if (render::gRenDev)
 	{
-
 		this->RT_Release();
-	//	render::gRenDev->rThread()->RC_ReleaseShaderResource(this);
 	}
 	else
 	{

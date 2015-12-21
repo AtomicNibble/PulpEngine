@@ -18,9 +18,6 @@ public:
 	virtual void RenderBegin() X_OVERRIDE;
 	virtual void RenderEnd() X_OVERRIDE;
 
-	virtual bool FlushRenderThreadCommands(bool wait) X_OVERRIDE;
-
-
 	virtual void SetState(StateFlag state) X_OVERRIDE;
 	virtual void SetStencilState(StencilState::Value ss) X_OVERRIDE;
 	virtual void SetCullMode(CullMode::Enum mode) X_OVERRIDE;

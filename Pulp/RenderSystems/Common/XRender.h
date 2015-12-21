@@ -96,8 +96,6 @@ public:
 	virtual void RenderBegin() X_OVERRIDE;
 	virtual void RenderEnd() X_OVERRIDE;
 
-	virtual bool FlushRenderThreadCommands(bool wait) X_OVERRIDE;
-
 	virtual void SetState(StateFlag state) X_ABSTRACT;
 	virtual void SetStencilState(StencilState::Value ss) X_ABSTRACT;
 
@@ -274,7 +272,6 @@ protected:
 
 	X_ENABLE_WARNING(4324)
 
-//	XRenderThread* pRt_;
 	VidMemManager vidMemMng_;
 
 	// stores the with + height and the znear + zfar
