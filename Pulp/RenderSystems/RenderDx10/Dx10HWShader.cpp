@@ -48,7 +48,7 @@ namespace
 
 	X_INLINE void getworldToCameraMatrix(render::DX11XRender* r)
 	{
-		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
+		Matrix44f* pMat = reinterpret_cast<Matrix44f*>(&vecTemp[0]);
 
 		r->GetModelViewMatrix(pMat);
 
@@ -57,7 +57,7 @@ namespace
 
 	X_INLINE void getworldToScreenMatrix(render::DX11XRender* r)
 	{
-		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
+		Matrix44f* pMat = reinterpret_cast<Matrix44f*>(&vecTemp[0]);
 
 		Matrix44f View;
 		Matrix44f Projection;
@@ -71,7 +71,7 @@ namespace
 
 	X_INLINE void getcameraToWorldMatrix(render::DX11XRender* r)
 	{
-		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
+		Matrix44f* pMat = reinterpret_cast<Matrix44f*>(&vecTemp[0]);
 
 		r->GetModelViewMatrix(pMat);
 
@@ -82,7 +82,7 @@ namespace
 
 	X_INLINE void getWorldViewProjectionMatrix(render::DX11XRender* r)
 	{
-		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
+		Matrix44f* pMat = reinterpret_cast<Matrix44f*>(&vecTemp[0]);
 
 		Matrix44f World;
 		Matrix44f View;
@@ -103,7 +103,7 @@ namespace
 	X_INLINE void getObjectToWorldMatrix(render::DX11XRender* r)
 	{
 		X_UNUSED(r);
-		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
+		Matrix44f* pMat = reinterpret_cast<Matrix44f*>(&vecTemp[0]);
 
 		pMat->setToIdentity();
 		pMat->transpose();
@@ -117,7 +117,7 @@ namespace
 
 	X_INLINE void getviewMatrix(render::DX11XRender* r)
 	{
-		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
+		Matrix44f* pMat = reinterpret_cast<Matrix44f*>(&vecTemp[0]);
 
 		r->GetModelViewMatrix(pMat);
 		pMat->transpose();
@@ -125,7 +125,7 @@ namespace
 
 	X_INLINE void getProjectionMatrix(render::DX11XRender* r)
 	{
-		Matrix44f* pMat = (Matrix44f*)(&vecTemp[0]);
+		Matrix44f* pMat = reinterpret_cast<Matrix44f*>(&vecTemp[0]);
 
 		r->GetProjectionMatrix(pMat);
 		pMat->transpose();
