@@ -417,7 +417,7 @@ bool DX11XRender::Init(HWND hWnd,
 }
 
 
-void DX11XRender::ShutDown()
+void DX11XRender::ShutDown(void)
 {
 	size_t i;
 
@@ -603,7 +603,7 @@ void DX11XRender::FreeDynamicBuffers(void)
 
 
 
-void DX11XRender::RenderBegin()
+void DX11XRender::RenderBegin(void)
 {
 	X_PROFILE_BEGIN("DXRenderBegin", core::ProfileSubSys::RENDER);
 
@@ -624,7 +624,7 @@ void DX11XRender::RenderBegin()
 
 }
 
-void DX11XRender::RenderEnd()
+void DX11XRender::RenderEnd(void)
 {
 	X_PROFILE_BEGIN("DXRenderEnd", core::ProfileSubSys::RENDER);
 	XRender::RenderEnd();
@@ -635,15 +635,12 @@ void DX11XRender::RenderEnd()
 		AuxGeo_->GetRenderAuxGeom()->Reset();
 	}
 
-// slow as goat cus if large sleep.
-//	this->rThread()->syncMainWithRender();
-
 
 	swapChain_->Present(0, 0);
 }
 
 
-bool DX11XRender::DefferedBegin()
+bool DX11XRender::DefferedBegin(void)
 {
 	using namespace texture;
 
@@ -667,7 +664,7 @@ bool DX11XRender::DefferedBegin()
 	return true;
 }
 
-bool DX11XRender::DefferedEnd()
+bool DX11XRender::DefferedEnd(void)
 {
 	using namespace shader;
 	using namespace texture;
@@ -968,7 +965,7 @@ bool DX11XRender::SetTexture(int texId)
 
 // Shaders 
 
-void DX11XRender::FX_PipelineShutdown()
+void DX11XRender::FX_PipelineShutdown(void)
 {
 
 	shader::XHWShader_Dx10::shutDown();

@@ -185,10 +185,10 @@ public:
 	~DX11XRender();
 
 	virtual bool Init(HWND hWnd, uint32_t width, uint32_t hieght) X_OVERRIDE;
-	virtual void ShutDown() X_OVERRIDE;
+	virtual void ShutDown(void) X_OVERRIDE;
 
-	virtual void RenderBegin() X_OVERRIDE;
-	virtual void RenderEnd() X_OVERRIDE;
+	virtual void RenderBegin(void) X_OVERRIDE;
+	virtual void RenderEnd(void) X_OVERRIDE;
 
 
 	bool Create2DTexture(texture::XTextureFile* image_data,
@@ -211,7 +211,7 @@ public:
 
 
 	// Camera
-	virtual void  SetCamera(const XCamera& cam) X_OVERRIDE;
+	virtual void SetCamera(const XCamera& cam) X_OVERRIDE;
 	void SetCameraInfo(void);
 	// ~Camera
 
@@ -232,7 +232,7 @@ public:
 	// ~Textures 
 
 	// Shaders 
-	virtual void FX_PipelineShutdown() X_OVERRIDE;
+	virtual void FX_PipelineShutdown(void) X_OVERRIDE;
 
 
 	virtual bool DefferedBegin(void) X_FINAL;
@@ -241,8 +241,8 @@ public:
 	virtual bool SetWorldShader(void) X_FINAL;
 	virtual bool SetSkyboxShader(void);
 	virtual bool SetFFE(shader::VertexFormat::Enum vertFmt, bool textured = false);
-	virtual bool SetFontShader();
-	virtual bool SetZPass();
+	virtual bool SetFontShader(void);
+	virtual bool SetZPass(void);
 	virtual bool setGUIShader(bool textured = false) X_FINAL;
 	bool SetModelShader(shader::VertexFormat::Enum vertFmt);
 
