@@ -67,7 +67,7 @@ X_INLINE void XRender::ScaleCoordInternal(Vec2f& xy) const
 	xy.y = ScaleCoordYInternal(xy.y);
 }
 
-X_INLINE const XCamera& XRender::GetCamera()
+X_INLINE const XCamera& XRender::GetCamera(void)
 {
 	return cam_;
 }
@@ -79,22 +79,22 @@ X_INLINE VidMemManager* XRender::VidMemMng(void)
 }
 
 
-X_INLINE Matrix44f* XRender::pViewMatrix()
+X_INLINE Matrix44f* XRender::pViewMatrix(void)
 { 
 	return &ViewMatrix_; 
 }
 
-X_INLINE Matrix44f* XRender::pProjMatrix()
+X_INLINE Matrix44f* XRender::pProjMatrix(void)
 { 
 	return &ProjMatrix_; 
 }
 
-X_INLINE Matrix44f* XRender::pViewProjMatrix()
+X_INLINE Matrix44f* XRender::pViewProjMatrix(void)
 { 
 	return &ViewProjMatrix_;
 }
 
-X_INLINE Matrix44f* XRender::pViewProjInvMatrix()
+X_INLINE Matrix44f* XRender::pViewProjInvMatrix(void)
 { 
 	return &ViewProjInvMatrix_;
 }

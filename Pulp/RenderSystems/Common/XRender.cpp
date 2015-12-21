@@ -152,14 +152,14 @@ bool XRender::Init(HWND hWnd, uint32_t width, uint32_t height)
 	return true;
 }
 
-void XRender::ShutDown()
+void XRender::ShutDown(void)
 {
 	X_LOG0("render", "Shutting Down");
 
 	freeResources();
 }
 
-void XRender::freeResources()
+void XRender::freeResources(void)
 {
 	texture::XTexture::shutDown();
 
@@ -173,12 +173,12 @@ void XRender::freeResources()
 
 
 
-void XRender::RenderBegin()
+void XRender::RenderBegin(void)
 {
 
 }
 
-void XRender::RenderEnd()
+void XRender::RenderEnd(void)
 {
 
 	RT_FlushTextBuffer();

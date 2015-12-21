@@ -90,11 +90,11 @@ public:
 	virtual ~XRender();
 
 	virtual bool Init(HWND hWnd, uint32_t width, uint32_t hieght) X_OVERRIDE;
-	virtual void ShutDown() X_OVERRIDE;
-	virtual void freeResources() X_OVERRIDE;
+	virtual void ShutDown(void) X_OVERRIDE;
+	virtual void freeResources(void) X_OVERRIDE;
 
-	virtual void RenderBegin() X_OVERRIDE;
-	virtual void RenderEnd() X_OVERRIDE;
+	virtual void RenderBegin(void) X_OVERRIDE;
+	virtual void RenderEnd(void) X_OVERRIDE;
 
 	virtual void SetState(StateFlag state) X_ABSTRACT;
 	virtual void SetStencilState(StencilState::Value ss) X_ABSTRACT;
@@ -134,7 +134,7 @@ public:
 	virtual void GetModelViewMatrix(Matrix44f* pMat) X_ABSTRACT;
 	virtual void GetProjectionMatrix(Matrix44f* pMat) X_ABSTRACT;
 
-	virtual void FX_PipelineShutdown() X_ABSTRACT;
+	virtual void FX_PipelineShutdown(void) X_ABSTRACT;
 
 	// Textures 
 	virtual texture::ITexture* LoadTexture(const char* path, texture::TextureFlags flags) X_OVERRIDE;
@@ -145,7 +145,7 @@ public:
 
 	// Camera
 	virtual void SetCamera(const XCamera& cam) X_ABSTRACT;
-	X_INLINE virtual const XCamera& GetCamera() X_OVERRIDE;
+	X_INLINE virtual const XCamera& GetCamera(void) X_OVERRIDE;
 	// ~Camera
 
 
@@ -157,9 +157,9 @@ public:
 		int VSize, uint8_t* pData) X_ABSTRACT;
 
 	virtual bool FontSetTexture(int texId) X_ABSTRACT;
-	virtual void FontSetRenderingState() X_ABSTRACT;
-	virtual void FontRestoreRenderingState() X_ABSTRACT;
-	virtual void FontSetBlending() X_ABSTRACT;
+	virtual void FontSetRenderingState(void) X_ABSTRACT;
+	virtual void FontRestoreRenderingState(void) X_ABSTRACT;
+	virtual void FontSetBlending(void) X_ABSTRACT;
 
 
 	virtual void DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,
@@ -223,10 +223,10 @@ public:
 
 	// ~RT
 
-	X_INLINE Matrix44f* pViewMatrix();
-	X_INLINE Matrix44f* pProjMatrix();
-	X_INLINE Matrix44f* pViewProjMatrix();
-	X_INLINE Matrix44f* pViewProjInvMatrix();
+	X_INLINE Matrix44f* pViewMatrix(void);
+	X_INLINE Matrix44f* pProjMatrix(void);
+	X_INLINE Matrix44f* pViewProjMatrix(void);
+	X_INLINE Matrix44f* pViewProjInvMatrix(void);
 
 
 	static uint32_t vertexFormatStride[shader::VertexFormat::Num];
