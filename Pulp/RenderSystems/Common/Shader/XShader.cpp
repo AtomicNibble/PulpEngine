@@ -1595,8 +1595,12 @@ XShaderResources::~XShaderResources()
 
 void XShaderResources::release(void)
 {
-	if (render::gRenDev && render::gRenDev->rThread())
-		render::gRenDev->rThread()->RC_ReleaseShaderResource(this);
+	if (render::gRenDev) // && render::gRenDev->rThread())
+	{
+
+		this->RT_Release();
+	//	render::gRenDev->rThread()->RC_ReleaseShaderResource(this);
+	}
 	else
 	{
 		X_ASSERT_UNREACHABLE();

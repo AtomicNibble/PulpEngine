@@ -16,14 +16,16 @@ namespace
 {
 	static core::Thread::ReturnValue process_run(const core::Thread& t)
 	{
-		gRenDev->rThread()->process(t);
+		X_UNUSED(t);
+	//	gRenDev->rThread()->process(t);
 
 		return core::Thread::ReturnValue(0);
 	}
 
 	static core::Thread::ReturnValue processLoading_run(const core::Thread& t)
 	{
-		gRenDev->rThread()->processLoading(t);
+		X_UNUSED(t);
+	//	gRenDev->rThread()->processLoading(t);
 
 		return core::Thread::ReturnValue(0);
 	}
@@ -624,7 +626,7 @@ void XRenderThread::waitFlushFinishedCond()
 bool XRender::FlushRenderThreadCommands(bool wait)
 {
 	if (wait) {
-		pRt_->flushAndWait();
+//		pRt_->flushAndWait();
 	}
 	return true;
 }

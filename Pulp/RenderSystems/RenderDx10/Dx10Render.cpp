@@ -778,7 +778,7 @@ void DX11XRender::Set2D(bool enable, float znear, float zfar)
 
 void DX11XRender::SetCameraInfo(void)
 {
-	pRt_->RT_SetCameraInfo();
+	RT_SetCameraInfo();
 }
 
 void DX11XRender::RT_SetCameraInfo(void)

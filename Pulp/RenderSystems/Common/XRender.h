@@ -220,11 +220,6 @@ public:
 	// ~Drawing
 
 
-	X_INLINE XRenderThread* rThread(void) {
-		return pRt_;
-	}
-
-
 	VidMemManager* VidMemMng(void) {
 		return &vidMemMng_;
 	}
@@ -279,7 +274,7 @@ protected:
 
 	X_ENABLE_WARNING(4324)
 
-	XRenderThread* pRt_;
+//	XRenderThread* pRt_;
 	VidMemManager vidMemMng_;
 
 	// stores the with + height and the znear + zfar

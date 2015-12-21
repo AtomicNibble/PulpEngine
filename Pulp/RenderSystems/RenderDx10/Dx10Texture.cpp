@@ -22,7 +22,10 @@ bool XTexture::createDeviceTexture(core::ReferenceCountedOwner<XTextureFile>& im
 #if X_DEBUG
 	image_data->pName_ = this->FileName.c_str();
 #endif // !X_DEBUG
-	return g_Dx11D3D.rThread()->RC_CreateDeviceTexture(this, image_data.instance());
+
+
+//	return g_Dx11D3D.rThread()->RC_CreateDeviceTexture(this, image_data.instance());
+	return RT_CreateDeviceTexture(image_data.instance());
 }
 
 
@@ -189,7 +192,7 @@ X_ENABLE_WARNING(4458)
 void XTexture::updateTextureRegion(byte* data, int nX, int nY, int USize, int VSize, 
 	Texturefmt::Enum srcFmt)
 {
-	g_Dx11D3D.rThread()->RC_UpdateTextureRegion(this, data, nX, nY, USize, VSize, srcFmt);
+	RT_UpdateTextureRegion(data, nX, nY, USize, VSize, srcFmt);
 }
 
 void XTexture::RT_UpdateTextureRegion(byte* data, int nX, int nY, int USize, int VSize, 

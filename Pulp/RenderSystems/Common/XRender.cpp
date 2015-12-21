@@ -100,7 +100,7 @@ uint32_t XRender::vertexSteamStride[VertexStream::ENUM_COUNT][shader::VertexForm
 
 
 XRender::XRender() :
-	pRt_(nullptr),
+//	pRt_(nullptr),
 	fontIdx_(0),
 	pDefaultFont_(nullptr),
 	RenderResources_(g_rendererArena),
@@ -142,8 +142,8 @@ bool XRender::Init(HWND hWnd, uint32_t width, uint32_t height)
 	ViewPort_.set(width, height);
 	ViewPort_.setZ(0.f, 1.f);
 
-	pRt_ = X_NEW_ALIGNED(XRenderThread,g_rendererArena,"renderThread",X_ALIGN_OF(XRenderThread));
-	pRt_->startRenderThread();
+//	pRt_ = X_NEW_ALIGNED(XRenderThread,g_rendererArena,"renderThread",X_ALIGN_OF(XRenderThread));
+//	pRt_->startRenderThread();
 
 	pTextDrawList_ = X_NEW(XTextDrawList, g_rendererArena, "RenderTextDrawList")(g_rendererArena);
 	pTextDrawList_->setCapacity(500 * 512);
@@ -160,12 +160,12 @@ void XRender::ShutDown()
 {
 	X_LOG0("render", "Shutting Down");
 
-	pRt_->quitRenderThread();
-	pRt_->quitRenderLoadingThread();
+//	pRt_->quitRenderThread();
+//	pRt_->quitRenderLoadingThread();
 
 	freeResources();
 
-	X_DELETE(pRt_, g_rendererArena);
+//	X_DELETE(pRt_, g_rendererArena);
 }
 
 void XRender::freeResources()
@@ -358,7 +358,8 @@ void XRender::FlushTextBuffer(void)
 
 	if (!pTextDrawList_->isEmpty())
 	{
-		rThread()->RC_FlushTextBuffer();
+		FlushTextBuffer();
+	//	rThread()->RC_FlushTextBuffer();
 	}
 }
 
