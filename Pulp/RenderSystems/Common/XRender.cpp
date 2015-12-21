@@ -181,7 +181,7 @@ void XRender::RenderBegin(void)
 void XRender::RenderEnd(void)
 {
 
-	RT_FlushTextBuffer();
+	FlushTextBuffer();
 
 }
 
@@ -345,15 +345,9 @@ void XRender::FlushTextBuffer(void)
 {
 	X_ASSERT_NOT_NULL(pTextDrawList_);
 
-	if (!pTextDrawList_->isEmpty())
-	{
-		RT_FlushTextBuffer();
+	if (pTextDrawList_->isEmpty()) {
+		return;
 	}
-}
-
-void XRender::RT_FlushTextBuffer(void)
-{
-	X_ASSERT_NOT_NULL(pTextDrawList_);
 
 	const XTextDrawList::TextEntry* entry;
 	
@@ -372,7 +366,6 @@ void XRender::RT_FlushTextBuffer(void)
 		ti.col = entry->color;
 
 		Draw2dText(posX, posY, pStr, ti);
-
 	}
 
 	pTextDrawList_->clear();

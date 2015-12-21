@@ -34,11 +34,6 @@ namespace
 } // namespace
 
 
-void DX11XRender::SetState(StateFlag state)
-{
-	RT_SetState(state);
-}
-
 void DX11XRender::SetStencilState(StencilState::Value ss)
 {
 	DepthState depth = curDepthState();
@@ -69,12 +64,7 @@ void DX11XRender::SetStencilState(StencilState::Value ss)
 	SetDepthState(depth);
 }
 
-void DX11XRender::SetCullMode(CullMode::Enum mode)
-{
-	RT_SetCullMode(mode);
-}
-
-void DX11XRender::RT_SetState(StateFlag state)
+void DX11XRender::SetState(StateFlag state)
 {
 	BlendState blend = curBlendState();
 	RasterState raster = curRasterState();
@@ -305,7 +295,7 @@ void DX11XRender::RT_SetState(StateFlag state)
 
 
 
-void DX11XRender::RT_SetCullMode(CullMode::Enum mode)
+void DX11XRender::SetCullMode(CullMode::Enum mode)
 {
 	if (this->State_.cullMode == mode)
 		return;

@@ -775,11 +775,6 @@ void DX11XRender::Set2D(bool enable, float znear, float zfar)
 
 void DX11XRender::SetCameraInfo(void)
 {
-	RT_SetCameraInfo();
-}
-
-void DX11XRender::RT_SetCameraInfo(void)
-{
 	// calculate the current camera shit.
 
 	GetModelViewMatrix(&ViewMatrix_);

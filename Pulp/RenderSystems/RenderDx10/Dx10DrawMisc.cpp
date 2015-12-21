@@ -386,22 +386,12 @@ void DX11XRender::DrawImage(float xpos, float ypos, float z, float w, float h,
 	DrawImageWithUV(xpos, ypos, z, w, h, texture_id, s, t, col, filtered);
 }
 
-
 void DX11XRender::DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
-	texture::TexID texture_id, const float* s, const float* t, const Colorf& col, bool filtered)
-{
-	X_ASSERT_NOT_NULL(s);
-	X_ASSERT_NOT_NULL(t);
-
-//	rThread()->RC_DrawImageWithUV(xpos, ypos, z, w, h, texture_id, s, t, col, filtered);
-	RT_DrawImageWithUV(xpos, ypos, z, w, h, texture_id, s, t, col, filtered);
-}
-
-
-void DX11XRender::RT_DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
 	texture::TexID texture_id, const float* s, const float* t, 
 	const Colorf& col, bool filtered)
 {
+	X_ASSERT_NOT_NULL(s);
+	X_ASSERT_NOT_NULL(t);
 	X_UNUSED(filtered);
 
 	using namespace shader;
@@ -527,8 +517,28 @@ void DX11XRender::DrawLines(Vec3f* points, uint32_t num, const Color& col)
 	if (num < 2) // 2 points needed to make a line.
 		return;
 
-//	rThread()->RC_DrawLines(points, num, col);
-	DrawLines(points, num, col);
+	SetCullMode(CullMode::NONE);
+
+	uint32 nOffs, i;
+	Vertex_P3F_T2F_C4B* Quad;
+
+	Quad = (Vertex_P3F_T2F_C4B*)DynVB_[VertexPool::P3F_T2F_C4B].LockVB(num, nOffs);
+
+	for (i = 0; i < num; i++)
+	{
+		Quad[i].pos = points[i];
+		Quad[i].color = col;
+		Quad[i].st = Vec2<float32_t>::zero();
+	}
+
+	DynVB_[VertexPool::P3F_T2F_C4B].UnlockVB();
+	DynVB_[VertexPool::P3F_T2F_C4B].Bind();
+
+	if (!FX_SetVertexDeclaration(shader::VertexFormat::P3F_T2F_C4B, false))
+		return;
+
+	// Render the line
+	FX_DrawPrimitive(PrimitiveType::LineList, nOffs, num);
 }
 
 

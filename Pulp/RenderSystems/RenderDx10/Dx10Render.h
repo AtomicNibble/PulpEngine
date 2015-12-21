@@ -307,18 +307,7 @@ public:
 		PrimitiveTypePublic::Enum type) X_OVERRIDE;
 
 
-	// RT
-	virtual void RT_DrawLines(Vec3f* points, uint32_t num, const Colorf& col) X_OVERRIDE;
-
-	virtual void RT_DrawString(const Vec3f& pos, const char* pStr) X_OVERRIDE;
-
-	virtual void RT_SetState(StateFlag state) X_OVERRIDE;
-	virtual void RT_SetCullMode(CullMode::Enum mode) X_OVERRIDE;
-
-	virtual void RT_DrawImageWithUV(float xpos, float ypos, float z, float w, float h,
-		texture::TexID texture_id, const float* s, const float* t, const Colorf& col, bool filtered = true) X_OVERRIDE;
-	
-	virtual void RT_SetCameraInfo(void) X_OVERRIDE;
+	virtual void DrawString(const Vec3f& pos, const char* pStr) X_OVERRIDE;
 
 	// ~RT
 	void FX_ComitParams(void);
