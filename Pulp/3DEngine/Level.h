@@ -161,8 +161,8 @@ private:
 		core::XFileAsync* pFile, uint32_t bytesTransferred);
 
 
-	void ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* job, void* pData);
-	void ProcessData_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* job, void* pData);
+	void ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+	void ProcessData_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 public:
 	// util

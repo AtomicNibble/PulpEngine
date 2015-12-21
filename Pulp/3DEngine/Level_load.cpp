@@ -60,11 +60,11 @@ void Level::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequestData& req
 
 
 
-void Level::ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* job, void* pData)
+void Level::ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
 {
 	X_UNUSED(pJobSys);
 	X_UNUSED(threadIdx);
-	X_UNUSED(job);
+	X_UNUSED(pJob);
 
 	core::XFileAsync* pFile = static_cast<core::XFileAsync*>(pData);
 
@@ -94,11 +94,11 @@ void Level::ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, co
 	}
 }
 
-void Level::ProcessData_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* job, void* pData)
+void Level::ProcessData_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
 {
 	X_UNUSED(pJobSys);
 	X_UNUSED(threadIdx);
-	X_UNUSED(job);
+	X_UNUSED(pJob);
 	X_UNUSED(pData);
 
 	X_ASSERT(headerLoaded_, "Header must be loaded in order to process data")(headerLoaded_);
