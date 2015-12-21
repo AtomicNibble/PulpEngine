@@ -36,7 +36,7 @@ public:
 	// ~IXHotReload
 
 	void ListModels(const char* searchPatten = nullptr) const;
-
+	void ReloadModel(const char* pName);
 private:
 	IModel* createModel(const char* ModelName);
 	IModel* loadModelSync(const char* ModelName);

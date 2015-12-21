@@ -25,6 +25,19 @@ namespace
 		(static_cast<XModelManager*>(engine::XEngineBase::getModelManager()))->ListModels(searchPatten);
 	}
 
+	void Cmd_ReloadModel(core::IConsoleCmdArgs* pCmd)
+	{
+		if (pCmd->GetArgCount() < 2) {
+			X_WARNING("Model", "reloadModel <name>");
+			return;
+		}
+		
+		XModelManager* pModelManager = (static_cast<XModelManager*>(engine::XEngineBase::getModelManager()));
+		const char* pName = pCmd->GetArg(1);
+
+		pModelManager->ReloadModel(pName);
+	}
+
 	static void sortModelsByName(core::Array<XModel*>& models)
 	{
 		std::sort(models.begin(), models.end(),
@@ -77,6 +90,7 @@ void XModelManager::Init(void)
 
 
 	ADD_COMMAND("listModels", Cmd_ListModels, core::VarFlag::SYSTEM, "List all the loaded models");
+	ADD_COMMAND("modelReload", Cmd_ReloadModel, core::VarFlag::SYSTEM, "Reload a model <name>");
 
 	// hotreload support.
 	gEnv->pHotReload->addfileType(this, MODEL_FILE_EXTENSION);
@@ -251,16 +265,7 @@ bool XModelManager::OnFileChange(const char* name)
 			path.replaceAll('\\', '/');
 			path.removeExtension();
 
-			XModel* pModel = static_cast<XModel*>(findModel_Internal(path.fileName()));
-			if (pModel)
-			{
-				X_LOG0("Model", "reload model: \"%s\"", name);
-				pModel->ReloadAsync();
-			}
-			else
-			{
-				X_LOG1("Model", "%s is not loaded skipping reload", name);
-			}
+			ReloadModel(path.fileName());
 			return true;
 		}
 	}
@@ -299,6 +304,22 @@ void XModelManager::ListModels(const char* searchPatten) const
 
 	X_LOG0("Console", "------------ ^8Models End^7 --------------");
 
+}
+
+void XModelManager::ReloadModel(const char* pName)
+{
+	X_ASSERT_NOT_NULL(pName);
+
+	XModel* pModel = static_cast<XModel*>(findModel_Internal(pName));
+	if (pModel)
+	{
+		X_LOG0("Model", "Reload model: \"%s\"", pName);
+		pModel->ReloadAsync();
+	}
+	else
+	{
+		X_WARNING("Model", "%s is not loaded skipping reload", pName);
+	}
 }
 
 IModel* XModelManager::LoadCompiledModel(const char* ModelName)
