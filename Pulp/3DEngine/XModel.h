@@ -49,6 +49,7 @@ public:
 	void AssignDefault(void);
 
 	bool LoadModelAsync(const char* name);
+	bool ReloadAsync(void);
 	bool LoadModel(const char* name);
 	bool LoadModel(core::XFile* pFile);
 

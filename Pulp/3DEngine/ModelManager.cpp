@@ -246,8 +246,21 @@ bool XModelManager::OnFileChange(const char* name)
 	{
 		if (core::strUtil::IsEqual(MODEL_FILE_EXTENSION, fileExt))
 		{
-			X_LOG0("Model", "reload model: \"%s\"", name);
+			// all asset names need forward slashes, for the hash.
+			core::Path<char> path(name);
+			path.replaceAll('\\', '/');
+			path.removeExtension();
 
+			XModel* pModel = static_cast<XModel*>(findModel_Internal(path.fileName()));
+			if (pModel)
+			{
+				X_LOG0("Model", "reload model: \"%s\"", name);
+				pModel->ReloadAsync();
+			}
+			else
+			{
+				X_LOG1("Model", "%s is not loaded skipping reload", name);
+			}
 			return true;
 		}
 	}

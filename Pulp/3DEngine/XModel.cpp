@@ -313,6 +313,9 @@ bool XModel::LoadModelAsync(const char* name)
 	path /= name;
 	path.setExtension(".model");
 
+	// save the name
+	name_.set(path.fileName());
+
 	// dispatch a read request baby!
 	core::IoRequestData req;
 	req.setType(core::IoRequest::OPEN);
@@ -326,6 +329,27 @@ bool XModel::LoadModelAsync(const char* name)
 
 	return true;
 }
+
+bool XModel::ReloadAsync(void)
+{
+	core::Path<char> path;
+	path /= "models/";
+	path /= name_.c_str();
+	path.setExtension(".model");
+
+	// dispatch a read request baby!
+	core::IoRequestData req;
+	req.setType(core::IoRequest::OPEN);
+	req.callback.Bind<XModel, &XModel::IoRequestCallback>(this);
+
+	core::IoRequestOpen& open = req.openInfo;
+	open.mode = core::fileMode::READ;
+	open.name = path.c_str();
+
+	pFileSys_->AddIoRequestToQue(req);
+	return true;
+}
+
 
 bool XModel::LoadModel(const char* name)
 {
