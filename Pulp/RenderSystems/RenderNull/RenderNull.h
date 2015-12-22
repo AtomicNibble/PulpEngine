@@ -107,7 +107,7 @@ public:
 
 	virtual bool FontUpdateTexture(int texId, int X, int Y, int USize, int VSize, uint8_t* pData) X_OVERRIDE;
 	virtual bool FontSetTexture(int texId) X_OVERRIDE;
-	virtual void FontSetRenderingState() X_OVERRIDE;
+	virtual bool FontSetRenderingState() X_OVERRIDE;
 	virtual void FontRestoreRenderingState() X_OVERRIDE;
 	virtual void FontSetBlending() X_OVERRIDE;
 	virtual void DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,

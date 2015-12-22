@@ -7,8 +7,9 @@
 #include <IConsole.h>
 #include <Util\BitUtil.h>
 
-#include "../Common/XRender.h"
+#include <Threading\JobSystem2.h>
 
+#include "../Common/XRender.h"
 
 #include <D3Dcompiler.h>
 #include <../../3rdparty/source/directx/D3DX9Shader.h>
@@ -324,7 +325,7 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 		pShader->techFlags_ = techFlags;
 
 		// temp
-		pShader->activate();
+	//	pShader->activate();
 
 		// register it.
 		s_pHWshaders->AddAsset(name.c_str(), pShader);
@@ -333,6 +334,15 @@ XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
 
 	return pShader;
 }
+
+
+bool XHWShader::Compile(XHWShader* pShader)
+{
+	X_ASSERT_NOT_NULL(pShader);
+
+	return static_cast<XHWShader_Dx10*>(pShader)->activate();
+}
+
 
 void XHWShader_Dx10::InitBufferPointers(void)
 {
@@ -414,7 +424,6 @@ void XHWShader_Dx10::FreeParams(void)
 // ------------------------------------------------------------------
 
 XHWShader_Dx10::XHWShader_Dx10() :
-	status_(ShaderStatus::NotCompiled),
 	pBlob_(nullptr),
 	pHWHandle_(nullptr),
 	bindVars_(g_rendererArena)
@@ -496,7 +505,6 @@ bool XHWShader_Dx10::loadFromCache(void)
 	return false;
 }
 
-
 bool XHWShader_Dx10::loadFromSource(void)
 {
 	core::string source;
@@ -526,7 +534,17 @@ bool XHWShader_Dx10::loadFromSource(void)
 		}
 	}
 
-	return compileFromSource(source);
+	source_ = source;
+
+
+	core::V2::JobSystem* pJobSys = gEnv->pJobSys;
+	core::V2::Job* pJob = pJobSys->CreateJob(&CompileShader_job, reinterpret_cast<void*>(this));
+
+	pJobSys->Run(pJob);
+
+	status_ = ShaderStatus::Compiling;
+	//return compileFromSource(source);
+	return true;
 }
 
 
@@ -631,6 +649,22 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 	X_LOG0("Shader", "Compile complete: %.3fms", elapsed);
 
 	return true;
+}
+
+void XHWShader_Dx10::CompileShader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+{
+	X_UNUSED(pJobSys);
+	X_UNUSED(threadIdx);
+	X_UNUSED(pJob);
+	X_UNUSED(pData);
+
+	XHWShader_Dx10* pThis = static_cast<XHWShader_Dx10*>(pData);
+
+	if (!pThis->compileFromSource(pThis->source_)) {
+		pThis->status_ = ShaderStatus::FailedToCompile;
+	}
+
+	pThis->status_ = ShaderStatus::AsyncCompileDone;
 }
 
 bool XHWShader_Dx10::uploadtoHW(void)
@@ -1016,6 +1050,24 @@ bool XHWShader_Dx10::activate(void)
 {
 	if (!isValid())
 	{
+		if (isCompiling())
+		{
+			if (status_ == ShaderStatus::AsyncCompileDone)
+			{
+				if (uploadtoHW())
+				{
+					if (reflectShader())
+					{
+						status_ = ShaderStatus::ReadyToRock;
+						saveToCache();
+						return true;
+					}
+				}
+			}
+
+			return false;
+		}
+
 		if (FailedtoCompile())
 			return false;
 
@@ -1039,6 +1091,11 @@ bool XHWShader_Dx10::activate(void)
 			// instead of trying to compile it all the time.
 			status_ = ShaderStatus::FailedToCompile;
 			X_LOG0("Shader", "Failed to activate shader: \"%s\"", getName());
+			return false;
+		}
+
+		if (isCompiling()) {
+			X_LOG0("Shader", "shader: \"%s\" is compiling", getName());
 			return false;
 		}
 

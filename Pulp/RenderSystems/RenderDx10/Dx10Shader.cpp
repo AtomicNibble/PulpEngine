@@ -128,6 +128,11 @@ bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 				// ok so for every we have ones for all flags.
 				for (auto& it : tech.hwTechs)
 				{
+					if (!it.canDraw()) {
+						it.tryCompile();
+						return false;
+					}
+
 					if (it.techFlags == flags)
 					{
 						tech.pCurHwTech = &it;
@@ -145,7 +150,16 @@ bool XShader::FXSetTechnique(const core::StrHash& name, const TechFlags flags)
 			}
 #endif // !X_DEBUG
 			else
-			{
+			{			
+				XShaderTechniqueHW& t = tech.hwTechs[0];
+				if (!t.canDraw()) {
+					t.tryCompile();
+					return false;
+				}
+
+				return true;
+
+			//	tech.
 			// not needed if only one.
 			//	tech.resetCurHWTech();
 			}
@@ -233,19 +247,25 @@ bool XShader::FXBeginPass(uint32 passIdx)
 	// Pixel-shader
 	if (pPS)
 	{
-		pPS->bind();
+		if (!pPS->bind()) {
+			return false;
+		}
 	}
 
 	// Vertex-shader
 	if (pVS)
 	{
-		pVS->bind();
+		if (!pVS->bind()) {
+			return false;
+		}
 	}
 
 	// Geometry-shader
 	if (pGS)
 	{
-		pGS->bind();
+		if (!pGS->bind()) {
+			return false;
+		}
 	}
 	else
 	{

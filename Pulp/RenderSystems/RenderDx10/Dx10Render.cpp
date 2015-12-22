@@ -1356,6 +1356,10 @@ bool DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFmt, 
 			RenderState::XVertexLayout& layout = State_.streamedILDescriptions[vertexFmt];
 			pLayout = CreateILFromDesc(vertexFmt, layout);
 			State_.streamedILCache[vertexFmt] = pLayout;
+
+			if (!pLayout) {
+				return false;
+			}
 		}
 		else
 		{
@@ -1369,13 +1373,17 @@ bool DX11XRender::FX_SetVertexDeclaration(shader::VertexFormat::Enum vertexFmt, 
 			RenderState::XVertexLayout& layout = State_.ILDescriptions[vertexFmt];
 			pLayout = CreateILFromDesc(vertexFmt, layout);
 			State_.ILCache[vertexFmt] = pLayout;
+
+			if (!pLayout) {
+				return false;
+			}
 		}
 		else
 		{
 			pLayout = State_.ILCache[vertexFmt];
 		}
-	}
-
+	}			
+	
 	if (State_.pCurrentVertexFmt != pLayout)
 	{
 		State_.pCurrentVertexFmt = pLayout;

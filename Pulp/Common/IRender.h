@@ -366,7 +366,7 @@ struct IRender
 
 	virtual bool FontUpdateTexture(int texId, int X, int Y, int USize, int VSize, uint8_t* pData) X_ABSTRACT;
 	virtual bool FontSetTexture(int texId) X_ABSTRACT;
-	virtual void FontSetRenderingState() X_ABSTRACT;
+	virtual bool FontSetRenderingState() X_ABSTRACT;
 	virtual void FontRestoreRenderingState() X_ABSTRACT;
 	virtual void FontSetBlending() X_ABSTRACT;
 	virtual void DrawStringW(font::IXFont_RenderProxy* pFont, const Vec3f& pos,

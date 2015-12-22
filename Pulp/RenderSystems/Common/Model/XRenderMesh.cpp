@@ -15,7 +15,7 @@ XMeshDevBuf::XMeshDevBuf() : BufId(render::VidMemManager::null_id), stride(0) {}
 
 bool XMeshDevBuf::isValid(void) const 
 {
-	return BufId != render::VidMemManager::null_id;
+return BufId != render::VidMemManager::null_id;
 }
 
 
@@ -27,7 +27,7 @@ XRenderMesh::XRenderMesh()
 	indexStream_.BufId = render::VidMemManager::null_id;
 }
 
-XRenderMesh::XRenderMesh(const model::MeshHeader* pMesh, shader::VertexFormat::Enum fmt, 
+XRenderMesh::XRenderMesh(const model::MeshHeader* pMesh, shader::VertexFormat::Enum fmt,
 	const char* pName)
 {
 	X_ASSERT_NOT_NULL(pMesh);
@@ -49,7 +49,7 @@ bool XRenderMesh::canRender(void)
 {
 	using namespace render;
 
-	return indexStream_.BufId != VidMemManager::null_id && 
+	return indexStream_.BufId != VidMemManager::null_id &&
 		vertexStreams_[VertexStream::VERT].BufId != VidMemManager::null_id;
 }
 
@@ -73,7 +73,7 @@ bool XRenderMesh::uploadToGpu(void)
 
 	if (baseVertStride > 0)
 	{
-		vertexStreams_[VertexStream::VERT].BufId = g_Dx11D3D.VidMemMng()->CreateVB(baseVertStride * numVerts, 
+		vertexStreams_[VertexStream::VERT].BufId = g_Dx11D3D.VidMemMng()->CreateVB(baseVertStride * numVerts,
 			pMesh_->streams[VertexStream::VERT]);
 
 		vertexStreams_[VertexStream::VERT].stride = baseVertStride;
@@ -82,7 +82,7 @@ bool XRenderMesh::uploadToGpu(void)
 	{
 		vertexStreams_[VertexStream::COLOR].BufId = g_Dx11D3D.VidMemMng()->CreateVB(ColorStride * numVerts,
 			pMesh_->streams[VertexStream::COLOR]);
-		
+
 		vertexStreams_[VertexStream::COLOR].stride = ColorStride;
 	}
 	if (normalStride > 0)
@@ -113,13 +113,17 @@ bool XRenderMesh::render(void)
 	if (!canRender())
 		return false;
 
-	if (vertexFmt_ == shader::VertexFormat::P3F_T4F_C4B_N3F) 
+	if (vertexFmt_ == shader::VertexFormat::P3F_T4F_C4B_N3F)
 	{
-		g_Dx11D3D.SetWorldShader();
+		if(!g_Dx11D3D.SetWorldShader()) {
+			return false;
+		}
 	}
 	else
 	{
-		g_Dx11D3D.SetModelShader(vertexFmt_);
+		if (!g_Dx11D3D.SetModelShader(vertexFmt_)) {
+			return false;
+		}
 	}
 
 	g_Dx11D3D.FX_SetVertexDeclaration(vertexFmt_, true);

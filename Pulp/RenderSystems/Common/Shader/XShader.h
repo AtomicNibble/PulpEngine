@@ -54,6 +54,7 @@ struct BlendInfo
 
 
 X_DECLARE_FLAGS(TechniquePrams) (NAME, VERTEX_FNC, PIXEL_FNC);
+X_DECLARE_FLAGS(ShaderStatus) (NotCompiled, Compiling, AsyncCompileDone, UploadedToHW, ReadyToRock, FailedToCompile);
 
 // in the shader name space so it's ok to call just: PrePro
 X_DECLARE_ENUM(PreProType)(Include, Define, Undef, If, IfDef, IfNDef, Else, EndIF);
@@ -136,7 +137,9 @@ public:
 		return entryPoint_.c_str();
 	}
 
-
+	X_INLINE ShaderStatus::Enum getStatus(void) const {
+		return status_;
+	}
 	X_INLINE TechFlags getTechFlags(void) const {
 		return techFlags_;
 	}
@@ -159,14 +162,26 @@ public:
 	X_INLINE uint32_t getNumInputParams(void) const {
 		return numInputParams_;
 	}
+
+	X_INLINE bool Compile(void) {
+		return Compile(this);
+	}
+
+
+private:
+	static bool Compile(XHWShader* pShader);
+
 protected:
 	static render::XRenderResourceContainer* s_pHWshaders;
+
 
 	core::string name_;
 	core::string sourceFileName_;
 	core::string entryPoint_;
 	uint32_t sourceCrc32_; // the crc of the source this was compiled from.
 
+	// status
+	ShaderStatus::Enum status_;
 	// color, textured, skinned, instanced
 	TechFlags techFlags_;
 	// Vert / Pixel / Hull / Geo
@@ -289,6 +304,42 @@ struct XShaderTechniqueHW
 		core::SafeRelease(pVertexShader);
 		core::SafeRelease(pPixelShader);
 		core::SafeRelease(pGeoShader);
+	}
+
+	bool canDraw(void) const 
+	{
+		bool canDraw = true;
+
+		if (pVertexShader) {
+			canDraw &= pVertexShader->getStatus() == ShaderStatus::ReadyToRock;
+		}
+		if (pPixelShader) {
+			canDraw &= pPixelShader->getStatus() == ShaderStatus::ReadyToRock;
+		}
+		if (pGeoShader) {
+			canDraw &= pGeoShader->getStatus() == ShaderStatus::ReadyToRock;
+		}
+
+		return canDraw;
+	}
+
+	void tryCompile(void)
+	{
+		if (pVertexShader) {
+			if (pVertexShader->getStatus() != ShaderStatus::FailedToCompile) {
+				if (pVertexShader->Compile())
+				{
+					IlFmt = pVertexShader->getILFormat();
+				}
+			}
+		}
+		if (pPixelShader) {
+			if (pPixelShader->getStatus() != ShaderStatus::FailedToCompile) {
+				pPixelShader->Compile();
+			}
+		}
+
+
 	}
 
 public:

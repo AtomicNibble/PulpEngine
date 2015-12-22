@@ -41,7 +41,7 @@ bool DX11XRender::FontSetTexture(int texId)
 }
 
 
-void DX11XRender::FontSetRenderingState()
+bool DX11XRender::FontSetRenderingState()
 {
 	Matrix44f* m;
 
@@ -62,7 +62,14 @@ void DX11XRender::FontSetRenderingState()
 	ViewMat_.LoadIdentity();
 	
 	SetCullMode(CullMode::NONE);
-	SetFontShader();
+	if (!SetFontShader()) {
+		inFontState = false;
+		ProMat_.Pop();
+		ViewMat_.Pop();
+		return false;
+	}
+
+	return true;
 }
 
 void DX11XRender::FontRestoreRenderingState()

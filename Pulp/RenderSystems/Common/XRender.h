@@ -157,7 +157,7 @@ public:
 		int VSize, uint8_t* pData) X_ABSTRACT;
 
 	virtual bool FontSetTexture(int texId) X_ABSTRACT;
-	virtual void FontSetRenderingState(void) X_ABSTRACT;
+	virtual bool FontSetRenderingState(void) X_ABSTRACT;
 	virtual void FontRestoreRenderingState(void) X_ABSTRACT;
 	virtual void FontSetBlending(void) X_ABSTRACT;
 

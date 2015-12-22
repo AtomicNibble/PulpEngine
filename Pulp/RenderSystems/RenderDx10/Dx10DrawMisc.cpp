@@ -398,6 +398,9 @@ void DX11XRender::DrawImageWithUV(float xpos, float ypos, float z, float w, floa
 
 	//	SetCullMode(CullMode::NONE);
 	// SetFFE(true);
+	if (!SetFFE(shader::VertexFormat::P3F_T2F_C4B, true)) {
+		return;
+	}
 
 	// Lock the entire buffer and obtain a pointer to the location where we have to
 	uint32 nOffs;
@@ -463,7 +466,9 @@ void DX11XRender::DrawQuad(float x, float y, float z, float width, float height,
 void DX11XRender::DrawQuad(float x, float y, float z, float width, float height, const Color& col)
 {
 	SetCullMode(CullMode::NONE);
-	SetFFE(shader::VertexFormat::P3F_T2F_C4B, false);
+	if (!SetFFE(shader::VertexFormat::P3F_T2F_C4B, false)) {
+		return;
+	}
 
 	float fx = x;
 	float fy = y;
@@ -573,6 +578,9 @@ void DX11XRender::DrawLineColor(const Vec3f& pos1, const Color& color1,
 	const Vec3f& pos2, const Color& color2)
 {
 //	SetFFE(false);
+	if (!SetFFE(shader::VertexFormat::P3F_T2F_C4B, false)) {
+		return;
+	}
 
 	// Lock the entire buffer and obtain a pointer to the location where we have to
 	uint32 nOffs;

@@ -468,9 +468,9 @@ bool RenderNull::FontSetTexture(int texId)
 	return false;
 }
 
-void RenderNull::FontSetRenderingState()
+bool RenderNull::FontSetRenderingState()
 {
-
+	return false;
 }
 
 void RenderNull::FontRestoreRenderingState()

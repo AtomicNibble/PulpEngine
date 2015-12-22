@@ -33,6 +33,11 @@ bool XHWShader_Dx10::FailedtoCompile(void) const
 	return status_ == ShaderStatus::FailedToCompile;
 }
 
+bool XHWShader_Dx10::isCompiling(void) const
+{
+	return status_ == ShaderStatus::Compiling || status_ == ShaderStatus::AsyncCompileDone;
+}
+
 void XHWShader_Dx10::setShader()
 {
 	ID3D11DeviceContext* pDevice = render::g_Dx11D3D.DxDeviceContext();

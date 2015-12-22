@@ -231,7 +231,10 @@ void XRenderAuxImp::RT_Flush(const XAuxGeomCBRawDataPackaged& data, size_t begin
 			}
 
 			// set appropriate shader
-			SetShader(curRenderFlags);
+			if (!SetShader(curRenderFlags)) {
+				renderer_.PopViewMatrix();
+				return;
+			}
 
 			// draw push buffer entries
 			switch (primType)
@@ -989,7 +992,7 @@ void XRenderAuxImp::PrepareRendering()
 }
 
 
-void XRenderAuxImp::SetShader(const XAuxGeomRenderFlags& renderFlags)
+bool XRenderAuxImp::SetShader(const XAuxGeomRenderFlags& renderFlags)
 {
 	if (pAuxGeomShader_ == nullptr)
 	{
@@ -1006,9 +1009,16 @@ void XRenderAuxImp::SetShader(const XAuxGeomRenderFlags& renderFlags)
 		if (XRenderAux::PrimType::Obj != newPrimType)
 		{
 			core::StrHash techName("AuxGeometry");
-			pAuxGeomShader_->FXSetTechnique(techName);
-			pAuxGeomShader_->FXBegin(&passes, 0);
-			pAuxGeomShader_->FXBeginPass(0);
+			
+			if (!pAuxGeomShader_->FXSetTechnique(techName)) {
+				return false;
+			}
+			if (!pAuxGeomShader_->FXBegin(&passes, 0)) {
+				return false;
+			}
+			if (!pAuxGeomShader_->FXBeginPass(0)) {
+				return false;
+			}
 
 			// override the shaders states.
 			// adjust render states based on current render flags
@@ -1027,9 +1037,15 @@ void XRenderAuxImp::SetShader(const XAuxGeomRenderFlags& renderFlags)
 		{
 			
 			core::StrHash techName("AuxGeometryObj");
-			pAuxGeomShader_->FXSetTechnique(techName);
-			pAuxGeomShader_->FXBegin(&passes, 0);
-			pAuxGeomShader_->FXBeginPass(0);
+			if (!pAuxGeomShader_->FXSetTechnique(techName)) {
+				return false;
+			}
+			if (!pAuxGeomShader_->FXBegin(&passes, 0)) {
+				return false;
+			}
+			if (!pAuxGeomShader_->FXBeginPass(0)) {
+				return false;
+			}
 
 
 			core::StrHash name("matViewProj");
@@ -1043,6 +1059,8 @@ void XRenderAuxImp::SetShader(const XAuxGeomRenderFlags& renderFlags)
 		curPrimType_ = newPrimType;
 	}
 #endif
+
+	return true;
 }
 
 

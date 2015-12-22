@@ -588,7 +588,9 @@ void XFFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDr
 	Prepare(pStr, true);
 
 	pRenderer->FontSetTexture(texID_);
-	pRenderer->FontSetRenderingState();
+	if (!pRenderer->FontSetRenderingState()) {
+		return;
+	}
 
 	// Scale it?
 	Vec2f size = ctx.size; // in pixel

@@ -8,21 +8,31 @@
 #include "Dx10Render.h"
 #include "XShaderBin.h"
 
+X_NAMESPACE_DECLARE(core,
+	namespace V2 {
+		struct Job;
+		class JobSystem;
+	}
+)
+
 X_NAMESPACE_BEGIN(shader)
 
 // No float flag, it's float by default.
 X_DECLARE_FLAGS(ParamFlags)(FLOAT, INT, BOOL, MATRIX, VEC2, VEC3, VEC4);
 
+/*
 struct ShaderStatus
 {
 	enum Enum
 	{
 		NotCompiled,
+		Compiling,		// async compile in progress.
 		UploadedToHW, // reflection is required now, this is when uploaded to gpu
 		ReadyToRock,	// this is set after successful reflection.
 		FailedToCompile
 	};
 };
+*/
 
 // PF = PerFrame
 // PI = Per Instance
@@ -200,6 +210,7 @@ public:
 	X_INLINE ShaderStatus::Enum getStatus(void) const;
 	X_INLINE bool isValid(void) const;
 	X_INLINE bool FailedtoCompile(void) const;
+	X_INLINE bool isCompiling(void) const;
 
 	static void Init(void);
 	static void shutDown(void);
@@ -228,6 +239,8 @@ private:
 	void getShaderCompileSrc(core::Path<char>& src);
 	void getShaderCompileDest(core::Path<char>& dest);
 	bool compileFromSource(core::string& source);
+
+	static void CompileShader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 	bool uploadtoHW(void);
 
@@ -277,7 +290,7 @@ public:
 	X_INLINE ID3DBlob* getshaderBlob(void) const;
 
 private:
-	ShaderStatus::Enum status_;
+//	ShaderStatus::Enum status_;
 	ID3DBlob* pBlob_;
 	void* pHWHandle_;
 
@@ -286,6 +299,9 @@ private:
 
 	// the flags it was compiled with: DEBUG | OPT_LEVEL1 etc.
 	uint32_t D3DCompileflags_;
+
+	// valid during compile.
+	core::string source_;
 
 protected:
 	X_INLINE void setMaxVecs(int maxVecs[3]);

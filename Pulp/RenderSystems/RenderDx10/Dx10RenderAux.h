@@ -167,7 +167,7 @@ private:
 	void PrepareThickLines3D(XRenderAux::AuxSortedPushBuffer::const_iterator itBegin, XRenderAux::AuxSortedPushBuffer::const_iterator itEnd);
 
 	void PrepareRendering();
-	void SetShader(const XAuxGeomRenderFlags& renderFlags);
+	bool SetShader(const XAuxGeomRenderFlags& renderFlags);
 	void AdjustRenderStates(const XAuxGeomRenderFlags& renderFlags);
 	bool BindStreams(shader::VertexFormat::Enum newVertexFormat, 
 		uint32_t NewVB, uint32_t NewIB);
