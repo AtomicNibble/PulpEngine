@@ -240,7 +240,7 @@ private:
 	void getShaderCompileDest(core::Path<char>& dest);
 	bool compileFromSource(core::string& source);
 
-	static void CompileShader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+	void CompileShader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 	bool uploadtoHW(void);
 
@@ -347,6 +347,7 @@ private:
 
 	// vars
 	static int writeMergedSource_;
+	static int asyncShaderCompile_;
 };
 
 

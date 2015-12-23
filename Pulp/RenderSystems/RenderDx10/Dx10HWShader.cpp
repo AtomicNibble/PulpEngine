@@ -38,6 +38,7 @@ core::Array<XShaderParam> XHWShader_Dx10::perFrameParams_[ShaderType::ENUM_COUNT
 core::Array<XShaderParam> XHWShader_Dx10::perInstantParams_[ShaderType::ENUM_COUNT] = { 0, 0, 0, 0 };
 
 int XHWShader_Dx10::writeMergedSource_ = 0;
+int XHWShader_Dx10::asyncShaderCompile_ = 0;
 
 
 namespace
@@ -534,17 +535,20 @@ bool XHWShader_Dx10::loadFromSource(void)
 		}
 	}
 
-	source_ = source;
+	if (asyncShaderCompile_)
+	{
+		source_ = source;
 
+		core::V2::JobSystem* pJobSys = gEnv->pJobSys;
+		core::V2::Job* pJob = pJobSys->CreateJobMemberFunc<XHWShader_Dx10>(this,
+			&XHWShader_Dx10::CompileShader_job, nullptr);
+		pJobSys->Run(pJob);
 
-	core::V2::JobSystem* pJobSys = gEnv->pJobSys;
-	core::V2::Job* pJob = pJobSys->CreateJob(&CompileShader_job, reinterpret_cast<void*>(this));
+		status_ = ShaderStatus::Compiling;
+		return true;
+	}
 
-	pJobSys->Run(pJob);
-
-	status_ = ShaderStatus::Compiling;
-	//return compileFromSource(source);
-	return true;
+	return compileFromSource(source);
 }
 
 
@@ -658,13 +662,14 @@ void XHWShader_Dx10::CompileShader_job(core::V2::JobSystem* pJobSys, size_t thre
 	X_UNUSED(pJob);
 	X_UNUSED(pData);
 
-	XHWShader_Dx10* pThis = static_cast<XHWShader_Dx10*>(pData);
-
-	if (!pThis->compileFromSource(pThis->source_)) {
-		pThis->status_ = ShaderStatus::FailedToCompile;
+	if (!compileFromSource(source_)) {
+		status_ = ShaderStatus::FailedToCompile;
+	}
+	else {
+		status_ = ShaderStatus::AsyncCompileDone;
 	}
 
-	pThis->status_ = ShaderStatus::AsyncCompileDone;
+	source_.clear();
 }
 
 bool XHWShader_Dx10::uploadtoHW(void)
@@ -1249,7 +1254,9 @@ void XHWShader_Dx10::RegisterDvars(void)
 	ADD_CVAR_REF("shader_writeMergedSource", writeMergedSource_, 1, 0, 1,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
 		"Writes the merged shader source to file before it's compiled");
-
+	ADD_CVAR_REF("shader_asyncCompile", asyncShaderCompile_, 1, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Performs hardware shader compiling async");
 }
 
 void XHWShader_Dx10::shutDown(void)
