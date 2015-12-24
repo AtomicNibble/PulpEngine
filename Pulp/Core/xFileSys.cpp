@@ -929,6 +929,11 @@ XFileStats& xFileSys::getStats(void) const
 
 void xFileSys::AddIoRequestToQue(const IoRequestData& request)
 {
+	if (request.getType() == IoRequest::CLOSE) {
+		X_ASSERT(request.callback, "Close request can't have a callback")(request.closeInfo.pFile);
+		return;
+	}
+
 	ioQue_.push(request);
 }
 
@@ -947,9 +952,9 @@ void xFileSys::ShutDownRequestWorker(void)
 	// post a close job with a none null callback.
 	IoRequestData closeRequest;
 	closeRequest.setType(IoRequest::CLOSE);
-	*reinterpret_cast<uintptr_t*>(&closeRequest.callback) = 1;
+	::memset(&closeRequest.callback, 1, sizeof(closeRequest.callback));
 
-	AddIoRequestToQue(closeRequest);
+	ioQue_.push(closeRequest);
 
 	ThreadAbstract::Join();
 }
@@ -1026,11 +1031,9 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 		else if (request.getType() == IoRequest::CLOSE)
 		{
 			// if the close job has a callback, we are shutting down.
-		/*	if (request.callback) {
-				uintptr_t val = reinterpret_cast<uintptr_t>(request.callback);
-				X_ASSERT(val == 1, "Close job can't have a callback other than shutdown magic")(val);
+			if (request.callback) {
 				continue;
-			}*/
+			}
 
 			// normal close request.
 			IoRequestClose& close = request.closeInfo;
