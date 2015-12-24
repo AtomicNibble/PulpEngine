@@ -939,7 +939,7 @@ void xFileSys::AddIoRequestToQue(const IoRequestData& request)
 
 bool xFileSys::StartRequestWorker(void)
 {
-	ThreadAbstract::Create("IoWorker", 1024 * 16); // small stack
+	ThreadAbstract::Create("IoWorker", 1024 * 128); // small stack
 	ThreadAbstract::Start();
 	return true;
 }
@@ -975,7 +975,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 	};
 
 
-	typedef core::FixedArray<PendingOp, 512> AsyncOps;
+	typedef core::FixedArray<PendingOp, IO_QUE_SIZE> AsyncOps;
 
 	AsyncOps pendingOps;
 
