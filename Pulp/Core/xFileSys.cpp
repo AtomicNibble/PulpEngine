@@ -930,7 +930,7 @@ XFileStats& xFileSys::getStats(void) const
 void xFileSys::AddIoRequestToQue(const IoRequestData& request)
 {
 	if (request.getType() == IoRequest::CLOSE) {
-		X_ASSERT(request.callback, "Close request can't have a callback")(request.closeInfo.pFile);
+		X_ASSERT(!request.callback, "Close request can't have a callback")(request.closeInfo.pFile);
 		return;
 	}
 
