@@ -202,6 +202,8 @@ namespace V2
 
 	void JobSystem::CreateQueForCurrentThread(void)
 	{
+		X_ASSERT(numThreads_ > 0, "Can't create que for thread before StartUp has been called")(numThreads_);
+
 		uint32_t threadId = Thread::GetCurrentID();
 
 		CreateThreadObjects(threadId);
