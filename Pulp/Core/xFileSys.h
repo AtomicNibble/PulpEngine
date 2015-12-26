@@ -88,6 +88,7 @@ public:
 	~xFileSys() X_FINAL;
 
 	bool Init(void) X_FINAL;
+	bool InitWorker(void) X_FINAL;
 	void ShutDown(void) X_FINAL;
 	void CreateVars(void) X_FINAL;
 

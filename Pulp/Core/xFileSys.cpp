@@ -83,6 +83,12 @@ bool xFileSys::Init()
 		return false;
 	}
 
+
+	return true;
+}
+
+bool xFileSys::InitWorker(void)
+{
 	if (!StartRequestWorker()) {
 		X_ERROR("FileSys", "Failed to start io request worker");
 		return false;

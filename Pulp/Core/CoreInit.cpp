@@ -253,6 +253,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		env_.pJobSys->StartUp();
 	}
 
+	// #------------------------- FileSystem Workets ------------------------
+	env_.pFileSys->InitWorker();
+
+
 	// #------------------------- ProfileSys ---------------------------
 	profileSys_.Init(this);
 
