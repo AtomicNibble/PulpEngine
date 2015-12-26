@@ -152,7 +152,7 @@ void XFrustum::setFov(float fov)
 	UpdateFrustum();
 }
 
-void XFrustum::UpdateFrustum()
+void XFrustum::UpdateFrustum(void)
 {
 	// Local-space
 	Matrix33f m33 = Matrix33f(mat_);

@@ -77,27 +77,27 @@ X_INLINE bool XFrustum::isValid(void) const
 }
 					
 
-X_INLINE float32_t XFrustum::getNearPlane() const
+X_INLINE float32_t XFrustum::getNearPlane(void) const
 { 
 	return edge_nlt_.y;
 }
 
-X_INLINE float32_t XFrustum::getFarPlane() const
+X_INLINE float32_t XFrustum::getFarPlane(void) const
 { 
 	return edge_flt_.y;
 }
 
-X_INLINE Vec3f XFrustum::getEdgeP() const
+X_INLINE Vec3f XFrustum::getEdgeP(void) const
 { 
 	return edge_plt_; 
 }
 
-X_INLINE Vec3f XFrustum::getEdgeN() const
+X_INLINE Vec3f XFrustum::getEdgeN(void) const
 {
 	return edge_nlt_;
 }
 
-X_INLINE Vec3f XFrustum::getEdgeF() const
+X_INLINE Vec3f XFrustum::getEdgeF(void) const
 {
 	return edge_flt_; 
 }
@@ -407,24 +407,45 @@ X_INLINE CullType::Enum XFrustum::cullSphere_ExactT(const Sphere& s) const
 // ---------------------------------------------------------------
 
 
-X_INLINE void XFrustum::GetFrustumVertices(Vec3f* pVerts) const
+X_INLINE void XFrustum::GetFrustumVertices(core::FixedArray<Vec3f, 8>& verts) const
 {
-	X_ASSERT_NOT_NULL(pVerts);
-
 	Matrix33f m33 = Matrix33f(mat_);
 	Vec3f pos = getPosition();
 
-	pVerts[0] = m33*Vec3f(+edge_flt_.x, +edge_flt_.y, +edge_flt_.z) + pos;
-	pVerts[1] = m33*Vec3f(+edge_flt_.x, +edge_flt_.y, -edge_flt_.z) + pos;
-	pVerts[2] = m33*Vec3f(-edge_flt_.x, +edge_flt_.y, -edge_flt_.z) + pos;
-	pVerts[3] = m33*Vec3f(-edge_flt_.x, +edge_flt_.y, +edge_flt_.z) + pos;
 
-	pVerts[4] = m33*Vec3f(+edge_nlt_.x, +edge_nlt_.y, +edge_nlt_.z) + pos;
-	pVerts[5] = m33*Vec3f(+edge_nlt_.x, +edge_nlt_.y, -edge_nlt_.z) + pos;
-	pVerts[6] = m33*Vec3f(-edge_nlt_.x, +edge_nlt_.y, -edge_nlt_.z) + pos;
-	pVerts[7] = m33*Vec3f(-edge_nlt_.x, +edge_nlt_.y, +edge_nlt_.z) + pos;
+	verts[0] = m33*Vec3f(+edge_flt_.x, +edge_flt_.y, +edge_flt_.z) + pos;
+	verts[1] = m33*Vec3f(+edge_flt_.x, +edge_flt_.y, -edge_flt_.z) + pos;
+	verts[2] = m33*Vec3f(-edge_flt_.x, +edge_flt_.y, -edge_flt_.z) + pos;
+	verts[3] = m33*Vec3f(-edge_flt_.x, +edge_flt_.y, +edge_flt_.z) + pos;
+
+	verts[4] = m33*Vec3f(+edge_nlt_.x, +edge_nlt_.y, +edge_nlt_.z) + pos;
+	verts[5] = m33*Vec3f(+edge_nlt_.x, +edge_nlt_.y, -edge_nlt_.z) + pos;
+	verts[6] = m33*Vec3f(-edge_nlt_.x, +edge_nlt_.y, -edge_nlt_.z) + pos;
+	verts[7] = m33*Vec3f(-edge_nlt_.x, +edge_nlt_.y, +edge_nlt_.z) + pos;
 }
 
+
+X_INLINE void XFrustum::GetFrustumVertices(core::FixedArray<Vec3f, 12>& verts) const
+{
+	Matrix33f m33 = Matrix33f(mat_);
+	Vec3f pos = getPosition();
+
+
+	verts[0] = m33*Vec3f(+edge_flt_.x, +edge_flt_.y, +edge_flt_.z) + pos;
+	verts[1] = m33*Vec3f(+edge_flt_.x, +edge_flt_.y, -edge_flt_.z) + pos;
+	verts[2] = m33*Vec3f(-edge_flt_.x, +edge_flt_.y, -edge_flt_.z) + pos;
+	verts[3] = m33*Vec3f(-edge_flt_.x, +edge_flt_.y, +edge_flt_.z) + pos;
+
+	verts[4] = m33*Vec3f(+edge_plt_.x, +edge_plt_.y, +edge_plt_.z) + pos;
+	verts[5] = m33*Vec3f(+edge_plt_.x, +edge_plt_.y, -edge_plt_.z) + pos;
+	verts[6] = m33*Vec3f(-edge_plt_.x, +edge_plt_.y, -edge_plt_.z) + pos;
+	verts[7] = m33*Vec3f(-edge_plt_.x, +edge_plt_.y, +edge_plt_.z) + pos;
+
+	verts[8] = m33*Vec3f(+edge_nlt_.x, +edge_nlt_.y, +edge_nlt_.z) + pos;
+	verts[9] = m33*Vec3f(+edge_nlt_.x, +edge_nlt_.y, -edge_nlt_.z) + pos;
+	verts[10] = m33*Vec3f(-edge_nlt_.x, +edge_nlt_.y, -edge_nlt_.z) + pos;
+	verts[11] = m33*Vec3f(-edge_nlt_.x, +edge_nlt_.y, +edge_nlt_.z) + pos;
+}
 
 // ---------------------------------------------------------------
 namespace Frustum
@@ -658,4 +679,31 @@ X_INLINE CullType::Enum XFrustum::AdditionalCheck(const OBB& obb, float32_t scal
 
 	//now we are 100% sure that the OBB is visible on the screen
 	return CullType::OVERLAP;
+}
+
+
+
+X_INLINE float32_t XFrustum::getFov(void) const
+{ 
+	return fov_;
+}
+
+X_INLINE float32_t XFrustum::getProjectionRatio(void) const
+{
+	return projectionRatio_; 
+}
+
+X_INLINE void XFrustum::setAngles(const Vec3f& angles)
+{
+	setAxis(Matrix33f::createRotation(angles));
+}
+
+X_INLINE Planef XFrustum::getFrustumPlane(FrustumPlane::Enum pl)
+{
+	return planes_[pl];
+}
+
+X_INLINE const Planef& XFrustum::getFrustumPlane(FrustumPlane::Enum pl) const
+{
+	return planes_[pl];
 }

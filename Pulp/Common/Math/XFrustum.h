@@ -57,11 +57,11 @@ public:
 	float getLeft(void) const;					// returns left vector length
 	float getUp(void) const;					// returns up vector length
 
-	float32_t getNearPlane() const;
-	float32_t getFarPlane() const;
-	Vec3f getEdgeP() const;
-	Vec3f getEdgeN() const;
-	Vec3f getEdgeF() const;
+	float32_t getNearPlane(void) const;
+	float32_t getFarPlane(void) const;
+	Vec3f getEdgeP(void) const;
+	Vec3f getEdgeN(void) const;
+	Vec3f getEdgeF(void) const;
 
 	// fast culling but might not cull everything outside the frustum
 	bool cullPoint(const Vec3f& point) const;
@@ -84,22 +84,15 @@ public:
 	CullType::Enum cullSphere_FastT(const Sphere& sphere) const;
 	CullType::Enum cullSphere_ExactT(const Sphere& sphere) const;
 
-	void GetFrustumVertices(Vec3f* pVerts) const;
+	void GetFrustumVertices(core::FixedArray<Vec3f, 8>& verts) const;
+	void GetFrustumVertices(core::FixedArray<Vec3f, 12>& verts) const;
 
-	X_INLINE float32_t getFov() const { return fov_; }
-	X_INLINE float32_t getProjectionRatio() const { return projectionRatio_; }
+	X_INLINE float32_t getFov(void) const;
+	X_INLINE float32_t getProjectionRatio(void) const;
 
-	X_INLINE void setAngles(const Vec3f& angles) {
-		setAxis(Matrix33f::createRotation(angles));
-	}
-
-	X_INLINE Planef getFrustumPlane(FrustumPlane::Enum pl) {
-		return planes_[pl];
-	}
-
-	X_INLINE const Planef& getFrustumPlane(FrustumPlane::Enum pl) const {
-		return planes_[pl];
-	}
+	X_INLINE void setAngles(const Vec3f& angles);
+	X_INLINE Planef getFrustumPlane(FrustumPlane::Enum pl);
+	X_INLINE const Planef& getFrustumPlane(FrustumPlane::Enum pl) const;
 
 private:
 	CullType::Enum AdditionalCheck(const AABB& aabb) const;
@@ -107,7 +100,7 @@ private:
 
 
 private:
-	void UpdateFrustum();
+	void UpdateFrustum(void);
 
 
 	// pos + ang
