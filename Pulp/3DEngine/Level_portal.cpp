@@ -52,12 +52,12 @@ void Level::FloodVisibleAreas(void)
 
 				// build up the cams planes.
 				const Planef camPlanes[FrustumPlane::ENUM_COUNT] = {
-					-cam.getFrustumPlane(FrustumPlane::LEFT),
-					-cam.getFrustumPlane(FrustumPlane::RIGHT),
-					-cam.getFrustumPlane(FrustumPlane::TOP),
-					-cam.getFrustumPlane(FrustumPlane::BOTTOM),
-					-cam.getFrustumPlane(FrustumPlane::FAR),
-					-cam.getFrustumPlane(FrustumPlane::NEAR)
+					cam.getFrustumPlane(FrustumPlane::LEFT),
+					cam.getFrustumPlane(FrustumPlane::RIGHT),
+					cam.getFrustumPlane(FrustumPlane::TOP),
+					cam.getFrustumPlane(FrustumPlane::BOTTOM),
+					cam.getFrustumPlane(FrustumPlane::FAR),
+					cam.getFrustumPlane(FrustumPlane::NEAR)
 				};
 
 				PortalStack	ps;
@@ -97,7 +97,7 @@ void Level::FloodVisibleAreas(void)
 					w = (*portal.pWinding);
 
 					for (j = 0; j < FrustumPlane::ENUM_COUNT; j++) {
-						if (!w.clipInPlace(-camPlanes[j], 0)) {
+						if (!w.clipInPlace(camPlanes[j], 0)) {
 							break;
 						}
 					}
