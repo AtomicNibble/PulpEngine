@@ -296,6 +296,9 @@ private:
 
 
 	ThreadJobAllocator* pJobAllocators_[HW_THREAD_MAX];
+
+	ThreadLocalStorage ThreadQue_;
+	ThreadLocalStorage ThreadAllocator_;
 };
 
 X_ENABLE_WARNING(4324)

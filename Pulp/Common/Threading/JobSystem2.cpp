@@ -14,9 +14,6 @@ namespace V2
 {
 	namespace
 	{
-		ThreadLocalStorage gThreadQue;
-		ThreadLocalStorage gThreadAllocator;
-
 		#define COMPILER_BARRIER_R _ReadBarrier();
 		#define COMPILER_BARRIER_W _WriteBarrier();
 		#define COMPILER_BARRIER_RW _ReadWriteBarrier();
@@ -194,8 +191,8 @@ namespace V2
 		core::zero_object(pJobAllocators_);
 
 		// clear main thread tls values also.
-		gThreadQue.SetValue(nullptr);
-		gThreadAllocator.SetValue(nullptr);
+		ThreadQue_.SetValue(nullptr);
+		ThreadAllocator_.SetValue(nullptr);
 	}
 
 	/// ===============================================
@@ -209,8 +206,8 @@ namespace V2
 		CreateThreadObjects(threadId);
 		{
 			size_t threadIdx = GetThreadIndex();
-			gThreadQue.SetValue(pThreadQues_[threadIdx]);
-			gThreadAllocator.SetValue(pJobAllocators_[threadIdx]);
+			ThreadQue_.SetValue(pThreadQues_[threadIdx]);
+			ThreadAllocator_.SetValue(pJobAllocators_[threadIdx]);
 		}
 
 		numThreads_++;
@@ -229,8 +226,8 @@ namespace V2
 		CreateThreadObjects(threadId);
 		{
 			size_t threadIdx = GetThreadIndex();
-			gThreadQue.SetValue(pThreadQues_[threadIdx]);
-			gThreadAllocator.SetValue(pJobAllocators_[threadIdx]);
+			ThreadQue_.SetValue(pThreadQues_[threadIdx]);
+			ThreadAllocator_.SetValue(pJobAllocators_[threadIdx]);
 		}
 
 		uint32_t i;
@@ -343,7 +340,7 @@ namespace V2
 
 	ThreadQue* JobSystem::GetWorkerThreadQueue(void) const
 	{
-		return gThreadQue.GetValue<ThreadQue>();
+		return ThreadQue_.GetValue<ThreadQue>();
 	}
 
 	ThreadQue* JobSystem::GetWorkerThreadQueue(size_t threadIdx) const
@@ -353,7 +350,7 @@ namespace V2
 
 	JobSystem::ThreadJobAllocator* JobSystem::GetWorkerThreadAllocator(void) const
 	{
-		return gThreadAllocator.GetValue<ThreadJobAllocator>();
+		return ThreadAllocator_.GetValue<ThreadJobAllocator>();
 	}
 
 	JobSystem::ThreadJobAllocator* JobSystem::GetWorkerThreadAllocator(size_t threadIdx) const
@@ -466,8 +463,8 @@ namespace V2
 		ThreadQue& threadQue = *GetWorkerThreadQueue(threadIdx);
 		ThreadJobAllocator* pThreadAlloc = GetWorkerThreadAllocator(threadIdx);
 
-		gThreadQue.SetValue(&threadQue);
-		gThreadAllocator.SetValue(pThreadAlloc);
+		ThreadQue_.SetValue(&threadQue);
+		ThreadAllocator_.SetValue(pThreadAlloc);
 
 		int32_t backoff = 0;
 
@@ -487,8 +484,8 @@ namespace V2
 		}
 
 		// null the tls (not needed)
-		gThreadQue.SetValue(nullptr);
-		gThreadAllocator.SetValue(nullptr);
+		ThreadQue_.SetValue(nullptr);
+		ThreadAllocator_.SetValue(nullptr);
 
 		return Thread::ReturnValue(0);
 	}
