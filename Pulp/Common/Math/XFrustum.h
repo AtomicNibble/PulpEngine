@@ -13,6 +13,8 @@
 #include "XObb.h"
 #include "XSphere.h"
 
+#include <array>
+
 // class AABB;
 // class Sphere;
 // class OBB;
@@ -84,8 +86,8 @@ public:
 	CullType::Enum cullSphere_FastT(const Sphere& sphere) const;
 	CullType::Enum cullSphere_ExactT(const Sphere& sphere) const;
 
-	void GetFrustumVertices(core::FixedArray<Vec3f, 8>& verts) const;
-	void GetFrustumVertices(core::FixedArray<Vec3f, 12>& verts) const;
+	void GetFrustumVertices(std::array<Vec3f, 8>& verts) const;
+	void GetFrustumVertices(std::array<Vec3f, 12>& verts) const;
 
 	X_INLINE float32_t getFov(void) const;
 	X_INLINE float32_t getProjectionRatio(void) const;

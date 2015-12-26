@@ -407,7 +407,7 @@ X_INLINE CullType::Enum XFrustum::cullSphere_ExactT(const Sphere& s) const
 // ---------------------------------------------------------------
 
 
-X_INLINE void XFrustum::GetFrustumVertices(core::FixedArray<Vec3f, 8>& verts) const
+X_INLINE void XFrustum::GetFrustumVertices(std::array<Vec3f, 8>& verts) const
 {
 	Matrix33f m33 = Matrix33f(mat_);
 	Vec3f pos = getPosition();
@@ -425,7 +425,7 @@ X_INLINE void XFrustum::GetFrustumVertices(core::FixedArray<Vec3f, 8>& verts) co
 }
 
 
-X_INLINE void XFrustum::GetFrustumVertices(core::FixedArray<Vec3f, 12>& verts) const
+X_INLINE void XFrustum::GetFrustumVertices(std::array<Vec3f, 12>& verts) const
 {
 	Matrix33f m33 = Matrix33f(mat_);
 	Vec3f pos = getPosition();
