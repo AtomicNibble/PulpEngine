@@ -4,8 +4,6 @@ template<typename T, size_t N>
 FixedArray<T, N>::FixedArray() :
 	size_(0)
 {
-//	for (size_type i = 0; i<N; ++i)
-//		array_[i] = T();
 }
 
 
