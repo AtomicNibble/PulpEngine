@@ -1054,9 +1054,8 @@ void XRenderAux::drawBone(const Matrix34f& rParent, const Matrix34f& rBone, cons
 
 void XRenderAux::drawFrustum(const XFrustum& frustum, const Color8u& col)
 {
-	core::FixedArray<Vec3f,8> v;
+	std::array<Vec3f,8> v;
 	size_t i;
-
 
 	frustum.GetFrustumVertices(v);
 
