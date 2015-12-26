@@ -773,6 +773,9 @@
     </ClCompile>
     <ClCompile Include="Util\win32\StopWatch.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="FixedArray.natvis" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{07328CCB-F9CC-4967-861E-272BCA0CAB04}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>

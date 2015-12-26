@@ -1615,4 +1615,7 @@
       <Filter>Headers\Util</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="FixedArray.natvis" />
+  </ItemGroup>
 </Project>
