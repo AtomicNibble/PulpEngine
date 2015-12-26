@@ -1617,5 +1617,6 @@
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="FixedArray.natvis" />
+    <Natvis Include="Array.natvis" />
   </ItemGroup>
 </Project>

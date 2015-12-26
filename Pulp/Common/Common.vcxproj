@@ -774,6 +774,7 @@
     <ClCompile Include="Util\win32\StopWatch.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <Natvis Include="Array.natvis" />
     <Natvis Include="FixedArray.natvis" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
