@@ -158,6 +158,39 @@ bool FixedArray<T, N>::remove(iterator position)
 	return removeIndex(idx);
 }
 
+
+template<typename T, size_t N>
+void FixedArray<T, N>::resize(size_type newNum, const T& t)
+{
+	X_ASSERT(newNum >= 0, "array size must be positive")(newNum);
+	X_ASSERT(newNum < N, "array size must be less or equal to capacity")(newNum, N);
+	
+	if (newNum == num_) {
+		return;
+	}
+
+	T* pArr = begin();
+
+	// remove some?
+	if (newNum < size_)
+	{
+		// we don't delete memory just deconstruct.
+		Mem::DestructArray<T>(&pArr[newNum], size_ - newNum);
+	}
+	else
+	{
+		size_type	i;
+
+		// construct the new items.
+		for (i = size_; i < newNum; i++) {
+			Mem::Construct<T>(&pArr[i], t);
+		}
+	}
+
+	// set num
+	size_ = newNum;
+}
+
 // any iterms in the array
 template<typename T, size_t N>
 bool FixedArray<T, N>::isEmpty(void) const

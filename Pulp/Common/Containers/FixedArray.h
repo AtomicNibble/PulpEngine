@@ -45,6 +45,9 @@ public:
 
 	bool remove(iterator position);
 
+	// Inserts or erases elements at the end such that size is 'size'
+	inline void resize(size_type size, const T& t = T());
+
 	// any iterms in the array
 	inline bool isEmpty(void) const;
 	inline bool isNotEmpty(void) const;
