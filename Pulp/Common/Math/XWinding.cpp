@@ -457,8 +457,8 @@ bool XWinding::clipInPlace(const Planef& plane, const float epsilon, const bool 
 	int			maxpts;
 
 
-	dists = (float*)_alloca((numPoints_ + 4) * sizeof(float));
-	sides = (uint8_t*)_alloca((numPoints_ + 4) * sizeof(uint8_t));
+	dists = static_cast<float*>(_alloca((numPoints_ + 4) * sizeof(float)));
+	sides = static_cast<uint8_t*>(_alloca((numPoints_ + 4) * sizeof(uint8_t)));
 
 	core::zero_object(counts);
 
