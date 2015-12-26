@@ -39,6 +39,9 @@ public:
 	virtual int32_t numVerts(size_t lodIdx) const X_FINAL;
 	virtual bool HasLods(void) const X_FINAL;
 
+	virtual const AABB& bounds(void) const X_FINAL;
+	virtual const AABB& bounds(size_t lodIdx) const X_FINAL;
+
 	virtual void Render(void) X_FINAL;
 	// ~IModel
 

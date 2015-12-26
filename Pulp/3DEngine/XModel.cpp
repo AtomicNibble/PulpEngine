@@ -102,6 +102,17 @@ bool XModel::HasLods(void) const
 	return numLods() > 1;
 }
 
+
+const AABB& XModel::bounds(void) const
+{
+	return hdr_.boundingBox;
+}
+
+const AABB& XModel::bounds(size_t lodIdx) const
+{
+	return hdr_.lodInfo[lodIdx].boundingBox;
+}
+
 void XModel::Render(void)
 {
 	if (pLodRenderMeshes_[0] == nullptr) {

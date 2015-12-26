@@ -447,6 +447,9 @@ struct IModel
 	virtual int32_t numVerts(size_t lodIdx) const X_ABSTRACT;
 	virtual bool HasLods(void) const X_ABSTRACT;
 
+	virtual const AABB& bounds(void) const X_ABSTRACT;
+	virtual const AABB& bounds(size_t lodIdx) const X_ABSTRACT;
+
 	// temp.
 	virtual void Render(void) X_ABSTRACT;
 };
