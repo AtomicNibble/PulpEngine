@@ -1047,6 +1047,7 @@ bool XRenderAuxImp::SetShader(const XAuxGeomRenderFlags& renderFlags)
 				return false;
 			}
 
+			AdjustRenderStates(renderFlags);
 
 			core::StrHash name("matViewProj");
 			Matrix44f matViewProjT;
