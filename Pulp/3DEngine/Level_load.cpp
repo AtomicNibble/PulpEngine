@@ -207,6 +207,7 @@ bool ProcessIAP(core::XFileBuf& file, Area& area, int32_t areaTo)
 		return false;
 	}
 
+	p.debugVerts.setGranularity(numVerts);
 	p.debugVerts.resize(numVerts);
 
 	// read them.
