@@ -26,6 +26,11 @@ namespace V2 {
 )
 
 
+X_NAMESPACE_DECLARE(render,
+struct IRenderAux;
+)
+
+
 X_NAMESPACE_BEGIN(level)
 
 
@@ -41,6 +46,7 @@ struct FrameStats
 
 	void clear(void);
 
+	size_t culledModels;
 	size_t visibleModels;
 	size_t visibleAreas;
 	size_t visibleVerts;
@@ -76,10 +82,31 @@ public:
 };
 
 
+struct PortalStack
+{
+	static const size_t MAX_PORTAL_PLANES = 20;
+	typedef core::FixedArray<Planef, PortalStack::MAX_PORTAL_PLANES + 1> PortalPlanesArr;
+
+public:
+	PortalStack();
+
+public:
+	const AreaPortal* pPortal;
+	const struct PortalStack* pNext;
+
+	Rectf rect;
+	PortalPlanesArr portalPlanes;
+};
+
 struct Area
 {
+	typedef core::FixedArray<Planef, PortalStack::MAX_PORTAL_PLANES + 1> PortalPlanesArr;
+	typedef core::Array<PortalPlanesArr> VisPortalsArr;
+public:
 	Area();
 	~Area();
+
+	bool CullEnt(const AABB& bounds, const Sphere& sphere, const Matrix44f worldMatrix) const;
 
 public:
 	typedef core::Array<AreaPortal> AreaPortalArr;
@@ -91,20 +118,8 @@ public:
 	model::IRenderMesh* pRenderMesh;
 	// portals leading out this area.
 	AreaPortalArr portals;
-};
-
-struct PortalStack 
-{
-	static const int MAX_PORTAL_PLANES = 20;
-public:
-	PortalStack();
-
-public:
-	const AreaPortal* pPortal;
-	const struct PortalStack* pNext;
-
-	Rectf rect;
-	core::FixedArray<Planef, MAX_PORTAL_PLANES + 1> portalPlanes;
+	// plane collections for this area.
+	VisPortalsArr visPortalPlanes;
 };
 
 
@@ -116,7 +131,6 @@ class Level : public engine::XEngineBase
 	typedef core::Array<FileAreaRefHdr> AreaRefsHdrArr;
 	typedef core::Array<MultiAreaEntRef> AreaMultiRefsArr;
 	typedef std::array<FileAreaRefHdr, MAP_MAX_MULTI_REF_LISTS> AreaMultiRefsHdrArr;
-
 	typedef core::Array<level::StaticModel> StaticModelsArr;
 
 	struct AreaRefInfo
@@ -154,6 +168,7 @@ public:
 	void DrawStatsBlock(void) const;
 
 private:
+	void clearVisPortals(void);
 	void FloodVisibleAreas(void);
 	void DrawVisibleAreas(void);
 
@@ -175,6 +190,7 @@ public:
 
 	size_t BoundsInAreas(const AABB& bounds, int32_t* pAreasOut, size_t maxAreas) const;
 
+	bool IsCamArea(int32_t areaNum) const;
 	bool IsAreaVisible(int32_t areaNum) const;
 	bool IsAreaVisible(const Area& area) const;
 
@@ -186,15 +202,16 @@ private:
 	void FlowViewThroughPortals(const int32_t areaNum, const Vec3f origin, 
 		size_t numPlanes, const Planef* pPlanes);
 
-	void FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum,
+	void FloodViewThroughArea_r(const Vec3f origin, int32_t areaNum, const Planef& farPlane,
 		const PortalStack* ps);
 
-	void AddAreaRefs(int32_t areaNum, const PortalStack* ps);
 
 	void DrawArea(const Area& area);
 	void DrawMultiAreaModels(void);
 
-	void DrawStaticModel(const level::StaticModel& sm);
+	bool DrawStaticModel(const level::StaticModel& sm, int32_t areaNum);
+
+	void DrawPortalStacks(void) const;
 
 private:
 	bool ProcessHeader(void);
@@ -207,6 +224,8 @@ private:
 private:
 	void clearVisableAreaFlags(void);
 	void SetAreaVisible(int32_t area);
+	void SetAreaVisible(int32_t areaNum, const PortalStack* ps);
+
 	
 private:
 //	core::JobList::JobList jobList_;
@@ -227,6 +246,9 @@ private:
 	FrameStats frameStats_;
 
 private:
+	XCamera cam_;
+
+	int32_t camArea_;
 
 	// cleared each frame.
 	uint32_t visibleAreaFlags_[MAP_MAX_MULTI_REF_LISTS];
@@ -250,6 +272,7 @@ private:
 	core::ITimer* pTimer_;
 	core::IFileSys* pFileSys_;
 	core::V2::JobSystem* pJobSys_;
+	render::IRenderAux* pAux_;
 
 private:
 	// vars
@@ -259,6 +282,10 @@ private:
 	static int s_var_drawArea_;
 	static int s_var_drawCurrentAreaOnly_;
 	static int s_var_drawStats_;
+	static int s_var_drawModelBounds_;
+	static int s_var_drawPortalStacks_;
+	static int s_var_detechCam_;
+	static int s_var_cullEnts_;
 };
 
 

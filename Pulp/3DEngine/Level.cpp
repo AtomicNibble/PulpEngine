@@ -50,7 +50,7 @@ AreaPortal::~AreaPortal()
 
 // --------------------------------
 
-Area::Area() : portals(g_3dEngineArena)
+Area::Area() : portals(g_3dEngineArena), visPortalPlanes(g_3dEngineArena)
 {
 	areaNum = -1;
 	pMesh = nullptr;
@@ -65,6 +65,48 @@ Area::~Area()
 		pRenderMesh->release();
 	}
 }
+
+bool Area::CullEnt(const AABB& bounds, const Sphere& sphere, const Matrix44f worldMatrix) const
+{
+	X_UNUSED(bounds);
+	X_UNUSED(sphere);
+	// work out if it's visible.
+	// the bounds and sphere are world space.
+
+	for (size_t x = 0; x < visPortalPlanes.size(); x++)
+	{
+		const PortalPlanesArr& portalPlanes = visPortalPlanes[x];
+
+		size_t numPlanes = portalPlanes.size();
+
+		// sphere
+		{
+			Vec3f center = sphere.center();
+			const float radius = sphere.radius();
+
+			center = worldMatrix * center;
+
+			for (size_t i = 0; i < numPlanes; i++)
+			{
+				const Planef& plane = portalPlanes[i];
+
+				const float d = plane.distance(center);
+				if (d < radius) {
+					goto notVisible; // not visible in this stack, might be in another.
+				}
+			}
+
+			// if we get here we are visible.
+			// not culled.
+			return false; 
+		}
+
+	notVisible:;
+	}
+
+	return true; // culled
+}
+
 
 // --------------------------------
 
@@ -110,6 +152,10 @@ int Level::s_var_drawPortals_ = 0;
 int Level::s_var_drawArea_ = -1;
 int Level::s_var_drawCurrentAreaOnly_ = 0;
 int Level::s_var_drawStats_ = 0;
+int Level::s_var_drawModelBounds_ = 0;
+int Level::s_var_drawPortalStacks_ = 0;
+int Level::s_var_detechCam_ = 0;
+int Level::s_var_cullEnts_ = 0;
 
 // --------------------------------
 
@@ -137,10 +183,12 @@ staticModels_(g_3dEngineArena)
 	X_ASSERT_NOT_NULL(gEnv->pTimer);
 	X_ASSERT_NOT_NULL(gEnv->pFileSys);
 	X_ASSERT_NOT_NULL(gEnv->pJobSys);
+	X_ASSERT_NOT_NULL(gEnv->pRender);
 
 	pTimer_ = gEnv->pTimer;
 	pFileSys_ = gEnv->pFileSys;
 	pJobSys_ = gEnv->pJobSys;
+	pAux_ = gEnv->pRender->GetIRenderAuxGeo();
 }
 
 Level::~Level()
@@ -172,8 +220,19 @@ bool Level::Init(void)
 		core::VarFlag::SYSTEM, "Draws just the current area. 0=off 1=on");
 
 	ADD_CVAR_REF("lvl_drawStats", s_var_drawStats_, 0, 0, 1,
-		core::VarFlag::SYSTEM, "Draws frame stats");
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Draws frame stats");
 
+	ADD_CVAR_REF("lvl_drawModelBounds", s_var_drawModelBounds_, 0, 0, 4,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Draws bounds around models. 1=visible-AABB 2=visible=Sphere 3=all-AABB 4=all-Sphere");
+
+	ADD_CVAR_REF("lvl_drawPortalStacks", s_var_drawPortalStacks_, 0, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Draws portal stacks");
+
+	ADD_CVAR_REF("lvl_detachCam", s_var_detechCam_, 0, 0, 2,
+		core::VarFlag::SYSTEM, "Detaches the camera");
+
+	ADD_CVAR_REF("lvl_cullEnts", s_var_cullEnts_, 0, 0, 2,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Culls the ent");
 
 	return true;
 }
@@ -187,6 +246,11 @@ void Level::ShutDown(void)
 void Level::update(void)
 {
 	frameStats_.clear();
+
+	// don't update cam if we are deteched.
+	if (!s_var_detechCam_) {
+		cam_ = gEnv->pRender->GetCamera();
+	}
 }
 
 void Level::free(void)
@@ -231,6 +295,7 @@ bool Level::render(void)
 		return false;
 	}
 
+	clearVisPortals();
 
 	FloodVisibleAreas();
 
@@ -239,9 +304,28 @@ bool Level::render(void)
 	DrawMultiAreaModels();
 	DrawAreaBounds();
 	DrawPortalDebug();
+	DrawPortalStacks();
 	DrawStatsBlock();
 
 	clearVisableAreaFlags();
+
+	// if the camera is detached always draw the frustum of it.
+	if (s_var_detechCam_ > 0) 
+	{
+		render::XAuxGeomRenderFlags flags = render::AuxGeom_Defaults::Def3DRenderflags;
+		flags.SetDepthWriteFlag(render::AuxGeom_DepthWrite::DepthWriteOff);
+		flags.SetDepthTestFlag(render::AuxGeom_DepthTest::DepthTestOff);
+		flags.SetCullMode(render::AuxGeom_CullMode::CullModeNone);
+		flags.SetAlphaBlendMode(render::AuxGeom_AlphaBlendMode::AlphaBlended);
+
+		pAux_->setRenderFlags(flags);
+
+		if(s_var_detechCam_ == 1)
+			pAux_->drawFrustum(cam_, Color8u(255,255,255,128), Color8u(200, 0, 0, 100), true);
+		else
+			pAux_->drawFrustum(cam_, Color8u(255, 255, 255, 255), Color8u(200, 0, 0, 255), false);
+
+	}
 
 	return true;
 }
@@ -252,11 +336,10 @@ void Level::DrawAreaBounds(void)
 
 	if (s_var_drawAreaBounds_)
 	{
-		IRenderAux* pAux = gEnv->pRender->GetIRenderAuxGeo();
 		XAuxGeomRenderFlags flags = AuxGeom_Defaults::Def3DRenderflags;
 		flags.SetDepthWriteFlag(AuxGeom_DepthWrite::DepthWriteOff);
 		flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOff);
-		pAux->setRenderFlags(flags);
+		pAux_->setRenderFlags(flags);
 
 		Color color = Col_Red;
 
@@ -267,7 +350,7 @@ void Level::DrawAreaBounds(void)
 			{
 				if (IsAreaVisible(a))
 				{
-					pAux->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), false, color);
+					pAux_->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), false, color);
 				}
 			}
 		}
@@ -275,7 +358,7 @@ void Level::DrawAreaBounds(void)
 		{
 			for (const auto& a : areas_)
 			{
-				pAux->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), false, color);
+				pAux_->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), false, color);
 			}
 		}
 
@@ -283,7 +366,7 @@ void Level::DrawAreaBounds(void)
 		{
 			flags.SetFillMode(AuxGeom_FillMode::FillModeSolid);
 			flags.SetAlphaBlendMode(AuxGeom_AlphaBlendMode::AlphaBlended);
-			pAux->setRenderFlags(flags);
+			pAux_->setRenderFlags(flags);
 
 			color.a = 0.2f;
 
@@ -294,7 +377,7 @@ void Level::DrawAreaBounds(void)
 				{
 					if (IsAreaVisible(a))
 					{
-						pAux->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), true, color);
+						pAux_->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), true, color);
 					}
 				}
 			}
@@ -302,7 +385,85 @@ void Level::DrawAreaBounds(void)
 			{
 				for (const auto& a : areas_)
 				{
-					pAux->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), true, color);
+					pAux_->drawAABB(a.pMesh->boundingBox, Vec3f::zero(), true, color);
+				}
+			}
+		}
+	}
+}
+
+void Level::DrawPortalStacks(void) const
+{
+	if (s_var_drawPortalStacks_)
+	{
+		// i wanna draw me the planes!
+		// we have a clipped shape, described by a collection of planes.
+		// how to i turn that into a visible shape.
+		// in order to create the shape we need to clip the planes with each other.
+		for (const auto& a : areas_)
+		{
+			if (!IsAreaVisible(a)) {
+				continue;
+			}
+
+			for (size_t x = 0; x < a.visPortalPlanes.size(); x++)
+			{
+				const Area::PortalPlanesArr& portalPlanes = a.visPortalPlanes[x];
+
+				XWinding* windings[PortalStack::MAX_PORTAL_PLANES] = { nullptr };
+				XWinding* w;
+
+				size_t i, j;
+				for (i = 0; i < portalPlanes.size(); i++)
+				{
+					const Planef& plane = portalPlanes[i];
+
+					w = X_NEW(XWinding, g_3dEngineArena, "PortalStackDebugWinding")(plane);
+
+					for (j = 0; j < portalPlanes.size() && w; j++)
+					{
+						if (i == j) {
+							continue;
+						}
+
+						if (!w->clip(portalPlanes[j], 0.01f)) {
+							X_DELETE_AND_NULL(w, g_3dEngineArena);
+						}
+					}
+
+					windings[i] = w;
+				}
+
+				render::XAuxGeomRenderFlags flags = render::AuxGeom_Defaults::Def3DRenderflags;
+				flags.SetDepthWriteFlag(render::AuxGeom_DepthWrite::DepthWriteOff);
+				flags.SetDepthTestFlag(render::AuxGeom_DepthTest::DepthTestOff);
+				pAux_->setRenderFlags(flags);
+
+				Color8u col = Col_Limegreen;
+
+				for (i = 0; i < portalPlanes.size(); i++)
+				{
+					if (!windings[i]) {
+						continue;
+					}
+
+					w = windings[i];
+
+					size_t numPoints = w->getNumPoints();
+					for (j = 0; j < numPoints; j++)
+					{
+						Vec3f start = (*w)[j].asVec3();
+						Vec3f end = (*w)[(j + 1) % numPoints].asVec3();
+						pAux_->drawLine(start, col, end, col);
+					}
+				}
+
+				for (i = 0; i < portalPlanes.size(); i++)
+				{
+					if (!windings[i]) {
+						continue;
+					}
+					X_DELETE(windings[i], g_3dEngineArena);
 				}
 			}
 		}
@@ -322,11 +483,12 @@ void Level::DrawStatsBlock(void) const
 		str.appendFmt("NumAreas:%" PRIuS "\n", areas_.size());
 		str.appendFmt("VisibleAreas:%" PRIuS "\n", frameStats_.visibleAreas);
 		str.appendFmt("VisibleModels:%" PRIuS "\n", frameStats_.visibleModels);
+		str.appendFmt("CulledModel:%" PRIuS "\n", frameStats_.culledModels);
 		str.appendFmt("VisibleVerts:%" PRIuS "\n", frameStats_.visibleVerts);
 		str.appendFmt("VisibleEnts:%" PRIuS "\n", frameStats_.visibleEnts);
 	
 		Color txt_col(0.7f, 0.7f, 0.7f, 1.f);
-		const float height = 100.f;
+		const float height = 120.f;
 		const float width = 200.f;
 
 		float screenWidth = pRender_->getWidthf();
@@ -364,7 +526,7 @@ void Level::DrawArea(const Area& area)
 
 	frameStats_.visibleAreas++;
 
-	SetAreaVisible(area.areaNum);
+	const int32_t areaNum = area.areaNum;
 
 	size_t i, end;
 	{
@@ -381,7 +543,8 @@ void Level::DrawArea(const Area& area)
 			uint32_t entId = modelRefs_.areaRefs[i].entId;
 
 			level::StaticModel& model = staticModels_[entId - 1];
-			DrawStaticModel(model);
+
+			DrawStaticModel(model, areaNum);
 		}
 	}
 	{
@@ -432,35 +595,126 @@ void Level::DrawMultiAreaModels(void)
 				// draw it.
 				// ref.entId
 
-				level::StaticModel& model = staticModels_[ref.entId - 1];
+			//	level::StaticModel& model = staticModels_[ref.entId - 1];
 				
-				DrawStaticModel(model);
+			//	DrawStaticModel(model, 0);
 			}
 		}
 	}
 }
 
-void Level::DrawStaticModel(const level::StaticModel& sm)
+bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 {
+	using namespace render;
+	X_UNUSED(areaNum);
 	if (sm.pModel)
 	{
-		frameStats_.visibleModels++;
-		frameStats_.visibleVerts += sm.pModel->numVerts(0);
+		model::IModel* pModel = sm.pModel;
 
-
-		Vec3f pos = sm.pos;
-		Quatf angle = sm.angle;
+		const Vec3f pos = sm.pos;
+		const Quatf angle = sm.angle;
 
 		Matrix44f posMat = Matrix44f::createTranslation(pos);
 		posMat.rotate(angle.getAxis(), angle.getAngle());
 
+
+		if (s_var_cullEnts_)
+		{
+			const AABB& bounds = pModel->bounds(0);
+			const Sphere sphere = pModel->boundingSphere(0);
+
+			bool culled = false;
+			if (IsCamArea(areaNum))
+			{
+				// use the frustrum.
+				Sphere wSphere(sphere);
+				
+				wSphere.setCenter(posMat * sphere.center());
+
+				if (cam_.cullSphere_FastT(wSphere) == CullType::EXCLUSION)
+				{
+					frameStats_.culledModels++;
+					culled = true;
+				}
+			}
+			else
+			{
+				const Area& area = areas_[areaNum];
+
+
+				// cull it with the portalstack planes.
+				if (area.CullEnt(bounds, sphere, posMat))
+				{
+					frameStats_.culledModels++;
+					culled = true;
+				}
+			}
+
+			if (culled)
+			{
+				if (s_var_drawModelBounds_ > 2)
+				{
+					XAuxGeomRenderFlags flags = AuxGeom_Defaults::Def3DRenderflags;
+
+					if (s_var_drawModelBounds_ == 3)
+					{
+						flags.SetCullMode(AuxGeom_CullMode::CullModeNone);
+						pAux_->setRenderFlags(flags);
+						pAux_->drawAABB(pModel->bounds(), posMat, false, Color8u(128, 0, 0, 128));
+					}
+					else
+					{
+						flags.SetFillMode(AuxGeom_FillMode::FillModeWireframe);
+						pAux_->setRenderFlags(flags);
+						pAux_->drawSphere(pModel->boundingSphere(0), posMat, Color8u(128, 0, 0, 64), false);
+					}
+				}
+
+				return false;
+			}
+		}
+
+		frameStats_.visibleModels++;
+		frameStats_.visibleVerts += pModel->numVerts(0);
+
+
 		render::IRender* pRender = getRender();
 		pRender->SetModelMatrix(posMat);
 
-		sm.pModel->Render();
+		pModel->Render();
 
 		pRender->SetModelMatrix(Matrix44f::identity());
+
+		if (s_var_drawModelBounds_)
+		{
+			XAuxGeomRenderFlags flags = AuxGeom_Defaults::Def3DRenderflags;
+
+			//	flags.SetFillMode(AuxGeom_FillMode::FillModeWireframe);
+		//	flags.SetDepthWriteFlag(AuxGeom_DepthWrite::DepthWriteOff);
+		//	flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOff);
+
+			// 1 == aabb 2 = sphee
+			if (s_var_drawModelBounds_ == 1 || s_var_drawModelBounds_ == 3)
+			{
+				flags.SetCullMode(AuxGeom_CullMode::CullModeNone);
+
+				pAux_->setRenderFlags(flags);
+
+				pAux_->drawAABB(pModel->bounds(), posMat, false, Color8u(255, 255, 64, 128));
+			}
+			else
+			{
+				flags.SetFillMode(AuxGeom_FillMode::FillModeWireframe);
+				pAux_->setRenderFlags(flags);
+
+				pAux_->drawSphere(pModel->boundingSphere(0), posMat, Color8u(255, 255, 64, 64), false);
+			}
+		}
+
+		return true;
 	}
+
+	return false;
 }
 
 int32_t Level::CommonChildrenArea_r(AreaNode* pAreaNode)
@@ -508,6 +762,11 @@ void Level::SetAreaVisible(int32_t areaNum)
 
 	visibleAreaFlags_[index] = core::bitUtil::SetBit(
 		visibleAreaFlags_[index], bit);
+}
+
+bool Level::IsCamArea(int32_t areaNum) const
+{
+	return areaNum == camArea_;
 }
 
 bool Level::IsAreaVisible(int32_t areaNum) const
