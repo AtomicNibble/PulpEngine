@@ -42,6 +42,8 @@ public:
 	virtual const AABB& bounds(void) const X_FINAL;
 	virtual const AABB& bounds(size_t lodIdx) const X_FINAL;
 
+	virtual const Sphere& boundingSphere(size_t lodIdx) const X_FINAL;
+
 	virtual void Render(void) X_FINAL;
 	// ~IModel
 

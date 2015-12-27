@@ -113,6 +113,11 @@ const AABB& XModel::bounds(size_t lodIdx) const
 	return hdr_.lodInfo[lodIdx].boundingBox;
 }
 
+const Sphere& XModel::boundingSphere(size_t lodIdx) const
+{
+	return hdr_.lodInfo[lodIdx].boundingSphere;
+}
+
 void XModel::Render(void)
 {
 	if (pLodRenderMeshes_[0] == nullptr) {
