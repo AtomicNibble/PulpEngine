@@ -903,6 +903,26 @@ void XRenderAux::drawSphere(const Sphere& sphere, const Color8u& col,
 }
 
 
+void XRenderAux::drawSphere(const Sphere& sphere, const Matrix34f& mat, 
+	const Color8u& col, bool drawShaded)
+{
+	if (sphere.radius() > 0.0f)
+	{
+		XAuxDrawObjParams* pDrawParams = nullptr;
+		AddObject(pDrawParams, CreateObjectRenderFlags(DrawObjType::Sphere) | AlphaFlags(col));
+
+
+		Matrix33f scale = Matrix33f::createScale(sphere.radius());
+		Matrix34f trans = Matrix34f::createTranslation(mat * sphere.center());
+
+		pDrawParams->matWorld = trans * scale;
+		pDrawParams->color = col;
+		pDrawParams->size = sphere.radius();
+		pDrawParams->shaded = drawShaded;
+	}
+}
+
+
 // ---------------------------- Sphere ----------------------------
 
 void XRenderAux::drawCone(const Vec3f& pos, const Vec3f& dir, float radius,
@@ -1052,24 +1072,198 @@ void XRenderAux::drawBone(const Matrix34f& rParent, const Matrix34f& rBone, cons
 
 
 
-void XRenderAux::drawFrustum(const XFrustum& frustum, const Color8u& col)
+void XRenderAux::drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol,
+	bool drawShaded)
 {
-	std::array<Vec3f,8> v;
-	size_t i;
-
+#if 1
+	std::array<Vec3f, 8> v;
 	frustum.GetFrustumVertices(v);
 
-	if (frustum.getNearPlane() > 0.0f) 
+	if (drawShaded)
 	{
-		for (i = 0; i < 4; i++) {
-			drawLine(v[i], col, v[(i + 1) & 3], col);
+		// draw the 3 planes as shaded solids.
+		XAuxVertex* pVertices = nullptr;
+		uint16* pIndices = nullptr;
+		AddIndexedPrimitive(pVertices, 8, pIndices, (6 * 6), CreateTriangleRenderFlags(true));
+
+		// far
+		pVertices[0].pos = v[0];
+		pVertices[0].color = farCol;
+		pVertices[1].pos = v[1];
+		pVertices[1].color = farCol;
+		pVertices[2].pos = v[2];
+		pVertices[2].color = farCol;
+		pVertices[3].pos = v[3];
+		pVertices[3].color = farCol;
+
+		pIndices[0] = 0; pIndices[1] = 1; pIndices[2] = 2;
+		pIndices[3] = 0; pIndices[4] = 2; pIndices[5] = 3;
+
+		// near
+		pVertices[4].pos = v[4];
+		pVertices[4].color = nearCol;
+		pVertices[5].pos = v[5];
+		pVertices[5].color = nearCol;
+		pVertices[6].pos = v[6];
+		pVertices[6].color = nearCol;
+		pVertices[7].pos = v[7];
+		pVertices[7].color = nearCol;
+
+		pIndices[6] = 0 + 4; pIndices[7] = 1 + 4; pIndices[8] = 2 + 4;
+		pIndices[9] = 0 + 4; pIndices[10] = 2 + 4; pIndices[11] = 3 + 4;
+
+		// shaded sisdes.
+
+		// 0 ------ 3
+		// |		|
+		// |		|
+		// 1 ------ 2
+
+		// side1
+		pIndices[12] = 0; 
+		pIndices[13] = 1; 
+		pIndices[14] = 1 + 4;
+		pIndices[15] = 0; 
+		pIndices[16] = 0 + 4;
+		pIndices[17] = 1 + 4;
+
+	
+		// side2
+		pIndices[18] = 0;
+		pIndices[19] = 0 + 4;
+		pIndices[20] = 3 + 4;
+		pIndices[21] = 0;
+		pIndices[22] = 3;
+		pIndices[23] = 3 + 4;
+
+		
+		// side3
+		pIndices[24] = 3;
+		pIndices[25] = 2;
+		pIndices[26] = 3 + 4;
+		pIndices[27] = 3 + 4;
+		pIndices[28] = 2 + 4;
+		pIndices[29] = 2;
+		
+		// side4
+		// 1 2
+		// 2
+		pIndices[30] = 2;
+		pIndices[31] = 1 + 4;
+		pIndices[32] = 2 + 4;
+
+		// 1
+		// 1 2
+		pIndices[33] = 1 + 4;
+		pIndices[34] = 1;
+		pIndices[35] = 2;
+		
+		Color8u lineColFar(farCol);
+		Color8u lineColNear(nearCol);
+
+		lineColFar.a = 255;
+		lineColNear.a = 255;
+
+		// connect them with lines.
+		for (size_t i = 0; i < 4; i++)
+		{
+			drawLine(v[i], lineColFar, v[((i + 1) & 3)], lineColFar);
+			drawLine(v[4 + i], lineColNear, v[4 + ((i + 1) & 3)], lineColNear);
+
+			// far to near
+			drawLine(v[i], lineColFar, v[4 + i], lineColNear);
 		}
 	}
+	else
+	{
+		for (size_t i = 0; i < 4; i++)
+		{
+			drawLine(v[i], farCol, v[((i + 1) & 3)], farCol);
+			drawLine(v[4 + i], nearCol, v[4 + ((i + 1) & 3)], nearCol);
 
-	for (i = 0; i < 4; i++) {
-		drawLine(v[4 + i], col, v[4 + ((i + 1) & 3)], col);
-		drawLine(v[i], col, v[4 + i], col);
+			// far to near
+			drawLine(v[i], farCol, v[4 + i], nearCol);
+		}
 	}
+#else
+	std::array<Vec3f, 12> v;
+	frustum.GetFrustumVertices(v);
+
+	if (drawShaded)
+	{	
+		// draw the 3 planes as shaded solids.
+		XAuxVertex* pVertices = nullptr;
+		uint16* pIndices = nullptr;
+		AddIndexedPrimitive(pVertices, 12, pIndices, 18, CreateTriangleRenderFlags(true));
+
+		// far
+		pVertices[0].pos = v[0];
+		pVertices[0].color = farCol;
+		pVertices[1].pos = v[1];
+		pVertices[1].color = farCol;
+		pVertices[2].pos = v[2];
+		pVertices[2].color = farCol;
+		pVertices[3].pos = v[3];
+		pVertices[3].color = farCol;
+
+		pIndices[0] = 0; pIndices[1] = 1; pIndices[2] = 2;
+		pIndices[3] = 0; pIndices[4] = 2; pIndices[5] = 3;
+
+		Color8u blended = ((Colorf(nearCol) + Colorf(farCol)) / 2);
+
+		// pro
+		pVertices[4].pos = v[4];
+		pVertices[4].color = blended;
+		pVertices[5].pos = v[5];
+		pVertices[5].color = blended;
+		pVertices[6].pos = v[6];
+		pVertices[6].color = blended;
+		pVertices[7].pos = v[7];
+		pVertices[7].color = blended;
+
+		pIndices[6] = 0 + 4; pIndices[7] = 1 + 4; pIndices[8] = 2 + 4;
+		pIndices[9] = 0 + 4; pIndices[10] = 2 + 4; pIndices[11] = 3 + 4;
+
+		// near
+		pVertices[8].pos = v[8];
+		pVertices[8].color = nearCol;
+		pVertices[9].pos = v[9];
+		pVertices[9].color = nearCol;
+		pVertices[10].pos = v[10];
+		pVertices[10].color = nearCol;
+		pVertices[11].pos = v[11];
+		pVertices[11].color = nearCol;
+
+		pIndices[12] = 0 + 8; pIndices[13] = 1 + 8; pIndices[14] = 2 + 8;
+		pIndices[15] = 0 + 8; pIndices[16] = 2 + 8; pIndices[17] = 3 + 8;
+
+		// connect them with lines.
+		for (size_t i = 0; i < 4; i++) 
+		{
+			// far to pro
+			drawLine(v[i], farCol, v[4 + i], blended);
+			// pro to near
+			drawLine(v[i], blended, v[8 + i], nearCol);
+		}
+
+	}
+	else
+	{
+		Color8u col = nearCol;
+
+		for (size_t i = 0; i < 4; i++)
+		{
+			drawLine(v[i], col, v[((i + 1) & 3)], col);
+			drawLine(v[4 + i], col, v[4 + ((i + 1) & 3)], col);
+			drawLine(v[8 + i], col, v[8 + ((i + 1) & 3)], col);
+
+			// far to pro
+			drawLine(v[i], col, v[4 + i], col);
+			// pro to near
+			drawLine(v[i], col, v[8 + i], col);
+		}
+	}
+#endif
 }
 
 // --------------------------------------------------------------------------

@@ -174,6 +174,7 @@ struct IRenderAux
 
 	// Sphere
 	virtual void drawSphere(const Sphere& sphere, const Color8u& col, bool drawShaded = true) X_ABSTRACT;
+	virtual void drawSphere(const Sphere& sphere, const Matrix34f& mat, const Color8u& col, bool drawShaded = true) X_ABSTRACT;
 
 	// Cone
 	virtual void drawCone(const Vec3f& pos, const Vec3f& dir, float radius, float height, const Color8u& col, bool drawShaded = true) X_ABSTRACT;
@@ -186,7 +187,7 @@ struct IRenderAux
 	virtual void drawBone(const Matrix34f& rParent, const Matrix34f& rBone, const Color8u& col) X_ABSTRACT;
 
 	// Frustum - Sexyyyyyyyyyy
-	virtual void drawFrustum(const XFrustum& frustum, const Color8u& col) X_ABSTRACT;
+	virtual void drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol, bool drawShaded = false) X_ABSTRACT;
 };
 
 

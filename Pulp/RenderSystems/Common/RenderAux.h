@@ -67,6 +67,7 @@ public:
 
 	// Sphere
 	void drawSphere(const Sphere& sphere, const Color8u& col, bool drawShaded = true) X_OVERRIDE;
+	void drawSphere(const Sphere& sphere, const Matrix34f& mat, const Color8u& col, bool drawShaded = true) X_OVERRIDE;
 
 	// Cone
 	void drawCone(const Vec3f& pos, const Vec3f& dir, float radius, float height, const Color8u& col, bool drawShaded = true) X_OVERRIDE;
@@ -79,7 +80,7 @@ public:
 	void drawBone(const Matrix34f& rParent, const Matrix34f& rBone, const Color8u& col) X_OVERRIDE;
 
 	// Frustum
-	void drawFrustum(const XFrustum& frustum, const Color8u& col) X_FINAL;
+	void drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol, bool drawShaded = false) X_FINAL;
 
 public:
 	X_DECLARE_ENUM(DrawObjType)(Sphere, Cone, Cylinder);
