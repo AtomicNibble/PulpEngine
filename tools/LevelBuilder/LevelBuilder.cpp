@@ -11,9 +11,10 @@
 #include "MapLoader.h"
 #include "BSPTypes.h"
 
-
 #define _LAUNCHER
 #include <ModuleExports.h>
+
+#include <Time\StopWatch.h>
 
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
 #include <Memory\AllocationPolicies\GrowingPoolAllocator.h>
@@ -168,7 +169,7 @@ void CompileLevel(core::Path<char>& path)
 
 	X_LOG0("Map", "Loading: \"%s\"", path.fileName());
 
-	core::TimeVal start = pTimer->GetAsyncTime();
+	core::StopWatch stopwatch;
 
 	if (pFile = gEnv->pFileSys->openFileMem(path.c_str(), mode))
 	{
@@ -178,10 +179,10 @@ void CompileLevel(core::Path<char>& path)
 		//	parse the map file.
 		if (map.Parse(pFile->getBufferStart(),pFile->getSize()))
 		{
-			core::TimeVal end = pTimer->GetAsyncTime();
+			core::TimeVal elapsed = stopwatch.GetTimeVal();
 			{
 				X_LOG_BULLET;
-				X_LOG0("Map", "Loaded: ^6%.4fms", (end - start).GetMilliSeconds());
+				X_LOG0("Map", "Loaded: ^6%.4fms", elapsed.GetMilliSeconds());
 				X_LOG0("Map", "Num Entities: ^8%" PRIuS, map.getNumEntities());
 				X_LOG0("Map", "Num Brushes: ^8%" PRIuS, map.getNumBrushes());
 				X_LOG0("Map", "Num Patches: ^8%" PRIuS, map.getNumPatches());
@@ -210,8 +211,8 @@ void CompileLevel(core::Path<char>& path)
 			}
 
 
-			end = pTimer->GetAsyncTime();
-			X_LOG0("Info", "Total Time: ^6%.4fms", (end - start).GetMilliSeconds());
+			elapsed = stopwatch.GetTimeVal();
+			X_LOG0("Info", "Total Time: ^6%.4fms", elapsed.GetMilliSeconds());
 		}
 		else
 		{
