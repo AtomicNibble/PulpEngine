@@ -28,14 +28,14 @@ X_INLINE void OBB::set(Matrix33f m33, const AABB& aabb)
 {
 	orientation_ = m33;
 	this->center_ = aabb.center();
-	this->halfLVec_ = aabb.size() * 0.5f;
+	this->halfLVec_ = aabb.halfVec();
 }
 
 X_INLINE void OBB::set(Quatf quat, const AABB& aabb)
 {
 	orientation_ = quat.toMatrix33();
 	this->center_ = aabb.center();
-	this->halfLVec_ = aabb.size() * 0.5f;
+	this->halfLVec_ = aabb.halfVec();
 }
 
 // --------------------------------------
