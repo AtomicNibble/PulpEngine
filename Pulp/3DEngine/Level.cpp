@@ -617,10 +617,15 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 		Matrix44f posMat = Matrix44f::createTranslation(pos);
 		posMat.rotate(angle.getAxis(), angle.getAngle());
 
+		Color8u visColor(255, 255, 64, 128);
 
 		if (s_var_cullEnts_)
 		{
 			bool culled = false;
+
+			// RED is culled.
+			// GREEN is not culled by Sphere but culled by AABB
+			// BLUE we are overlapping with sphere
 
 			Color8u cullColor(128, 0, 0, 64);
 
@@ -628,16 +633,46 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 			{
 				// use the frustrum.		
 
-				CullType::Enum type = cam_.cullSphere_ExactT(wSphere);
-				if (type == CullType::EXCLUSION || type == CullType::OVERLAP)
+#if 0
+				CullType::Enum type = cam_.cullAABB_FastT(wbounds);
+				if (type == CullType::EXCLUSION)
 				{
 					frameStats_.culledModels++;
 					culled = true;
-
-					if (type == CullType::OVERLAP) {
-						cullColor = Color8u(255, 56, 200, 128);
-					}
 				}
+
+#else
+				CullType::Enum type = cam_.cullSphere_ExactT(wSphere);
+				if (type == CullType::OVERLAP)
+				{
+					if (s_var_cullEnts_ > 1)
+					{
+						// sphere test says overlap.
+						// see if we can cull it with AABB.
+						type = cam_.cullAABB_FastT(wbounds);
+						if (type == CullType::EXCLUSION)
+						{
+							// got culled by AABB
+							cullColor = Color8u(0, 128, 0, 128);
+
+							frameStats_.culledModels++;
+							culled = true;
+						}
+					}
+
+
+					if(!culled)
+					{
+						// we are visible from overlap.
+						visColor = Color8u(0, 0, 128, 128);
+					}	
+				}
+				else if (type == CullType::EXCLUSION)
+				{
+					frameStats_.culledModels++;
+					culled = true;
+				}
+#endif
 			}
 			else
 			{
@@ -662,7 +697,7 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 					{
 						flags.SetCullMode(AuxGeom_CullMode::CullModeNone);
 						pAux_->setRenderFlags(flags);
-						pAux_->drawAABB(sm.boundingBox, pos, false, Color8u(128, 0, 0, 128));
+						pAux_->drawAABB(sm.boundingBox, false, cullColor);
 					}
 					else
 					{
@@ -704,7 +739,7 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 
 				pAux_->setRenderFlags(flags);
 
-				pAux_->drawAABB(sm.boundingBox, pos, false, Color8u(255, 255, 64, 128));
+				pAux_->drawAABB(sm.boundingBox, false, visColor);
 			}
 			else
 			{
@@ -713,7 +748,7 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 				flags.SetFillMode(AuxGeom_FillMode::FillModeWireframe);
 				pAux_->setRenderFlags(flags);
 
-				pAux_->drawSphere(wSphere, Color8u(255, 255, 64, 64), false);
+				pAux_->drawSphere(wSphere, visColor, false);
 			}
 		}
 
