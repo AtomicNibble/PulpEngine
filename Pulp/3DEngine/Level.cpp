@@ -611,12 +611,12 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 
 		const Vec3f& pos = sm.pos;
 		const Quatf& angle = sm.angle;
-		const AABB& bounds = sm.boundingBox;
+		const AABB& wbounds = sm.boundingBox;
+		const Sphere& wSphere = sm.boundingSphere;
 
 		Matrix44f posMat = Matrix44f::createTranslation(pos);
 		posMat.rotate(angle.getAxis(), angle.getAngle());
 
-		const Sphere wSphere(bounds);
 
 		if (s_var_cullEnts_)
 		{
@@ -645,7 +645,7 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 
 
 				// cull it with the portalstack planes.
-				if (area.CullEnt(bounds, wSphere))
+				if (area.CullEnt(wbounds, wSphere))
 				{
 					frameStats_.culledModels++;
 					culled = true;

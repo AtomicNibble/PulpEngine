@@ -366,6 +366,7 @@ struct StaticModel
 
 	// bounding box that takes into account the angle.
 	AABB boundingBox;
+	Sphere boundingSphere;
 
 	uint32_t modelNameIdx;
 	model::IModel* pModel;

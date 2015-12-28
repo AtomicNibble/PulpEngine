@@ -461,6 +461,7 @@ bool Level::ProcessData(void)
 				sm.angle = fsm.angle;
 				sm.modelNameIdx = fsm.modelNameIdx;
 				sm.boundingBox = fsm.boundingBox;
+				sm.boundingSphere = Sphere(fsm.boundingBox); // create sphere from AABB.
 				// models need to be loaded at some point.
 
 				const char* modelName = stringTable_.getString(sm.modelNameIdx);
