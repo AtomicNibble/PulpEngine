@@ -535,7 +535,17 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 		sm.pos = lvlEnt.origin;
 		sm.angle = Quatf(toRadians(lvlEnt.angle.x), 
 			toRadians(lvlEnt.angle.y), toRadians(lvlEnt.angle.z));
+		// lvl ent bounds are the model bounds when type is MISC_MODEL
+		sm.boundingBox = lvlEnt.bounds;
 
+		// if the angle is not zero we need to slap a duck.
+		// aka update the AABB to still contain the model when rotated.
+		// axis rotations make me horny.
+		if (sm.angle != Quatf::identity())
+		{
+			OBB obb(sm.angle, sm.boundingBox);
+			sm.boundingBox = AABB(obb);
+		}
 
 		uint32_t entId = safe_static_cast<uint32_t, size_t>(staticModels_.size());
 
