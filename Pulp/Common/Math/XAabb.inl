@@ -56,7 +56,7 @@ X_INLINE void AABB::set(const AABB &oth)
 }
 
 
-X_INLINE void AABB::clear()
+X_INLINE void AABB::clear(void)
 {
 	max[0] = max[1] = max[2] = -INFINITY;
 	min[0] = min[1] = min[2] = INFINITY;
@@ -74,41 +74,41 @@ X_INLINE bool AABB::IsInfinate(void) const
 	return false;
 }
 
-X_INLINE bool AABB::isEmpty() const
+X_INLINE bool AABB::isEmpty(void) const
 {
 	return min == max;
 }
 
  // retruns if the box contains anyspace 
-X_INLINE Vec3f AABB::center() const
+X_INLINE Vec3f AABB::center(void) const
 {
 	// size / 2
 	return (min + max)*0.5f;
 }
 	// the center point of the box
-X_INLINE Vec3f AABB::size() const
+X_INLINE Vec3f AABB::size(void) const
 {
 	return (max - min);
 }
 
-X_INLINE Vec3f AABB::halfVec() const
+X_INLINE Vec3f AABB::halfVec(void) const
 {
 	return size() * 0.5f;
 }
 
 // the size of the box.
-X_INLINE float AABB::radius() const
+X_INLINE float AABB::radius(void) const
 {
 	return min.distance(max) * 0.5f; // 1/2 it for radius
 }
 
-X_INLINE float AABB::radiusSqr() const
+X_INLINE float AABB::radiusSqr(void) const
 {
 //	return min.distanceSquared(max) * 0.5f; // same?
 	return ((max - min)*0.5f).lengthSquared();
 }
 
-X_INLINE float AABB::volume() const
+X_INLINE float AABB::volume(void) const
 {
 	return (min.x - max.x) * (min.y - max.y) * (min.z - max.z);
 }

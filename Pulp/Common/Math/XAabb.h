@@ -33,15 +33,15 @@ public:
 	X_INLINE void set(const AABB &oth);
 	void set(const OBB &oth);
 
-	X_INLINE void  clear();
+	X_INLINE void  clear(void);
 	X_INLINE bool  IsInfinate(void) const; // returns if it's infinate: the value it's made after clear.
-	X_INLINE bool  isEmpty() const; // retruns if the box contains anyspace 
-	X_INLINE Vec3f center() const;	// the center point of the box
-	X_INLINE Vec3f size() const;	// the size of the box.
-	X_INLINE Vec3f halfVec() const;	// the size of the box / 2
-	X_INLINE float radius() const;	
-	X_INLINE float radiusSqr() const;
-	X_INLINE float volume() const;
+	X_INLINE bool  isEmpty(void) const; // retruns if the box contains anyspace 
+	X_INLINE Vec3f center(void) const;	// the center point of the box
+	X_INLINE Vec3f size(void) const;	// the size of the box.
+	X_INLINE Vec3f halfVec(void) const;	// the size of the box / 2
+	X_INLINE float radius(void) const;
+	X_INLINE float radiusSqr(void) const;
+	X_INLINE float volume(void) const;
 
 	// add to the bounding box.
 	X_INLINE void add(const Vec3f& v);
