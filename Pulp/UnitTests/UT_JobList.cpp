@@ -4,7 +4,7 @@
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 #include <Threading\CriticalSection.h>
 
-#include "Util\StopWatch.h"
+#include "Time\StopWatch.h"
 #include "Time\TimeVal.h"
 
 #include "gtest/gtest.h"

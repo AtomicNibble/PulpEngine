@@ -1,7 +1,7 @@
 #include "stdafx.h"
 
 #include "Threading\FiberScheduler.h"
-#include "Util\StopWatch.h"
+#include "Time\StopWatch.h"
 #include "Time\TimeVal.h"
 
 #include "gtest/gtest.h"
