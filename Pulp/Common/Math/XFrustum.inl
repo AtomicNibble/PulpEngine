@@ -155,29 +155,54 @@ X_INLINE CullType::Enum XFrustum::cullAABB_FastT(const AABB& box) const
 {
 	const float* p = &box.min.x;
 	uint32 x, y, z;
+	float d;
 
-	x = idx_[0]; y = idy_[0]; z = idz_[0];
-	if (planes_[FrustumPlane::NEAR].distance(Vec3f(p[x], p[y], p[z])) > 0)
+	x = idx_[FrustumPlane::NEAR];
+	y = idy_[FrustumPlane::NEAR];
+	z = idz_[FrustumPlane::NEAR];
+
+	d = planes_[FrustumPlane::NEAR].distance(Vec3f(p[x], p[y], p[z])); 
+	if (d < 0)
 		return CullType::EXCLUSION;
 
-	x = idx_[1]; y = idy_[1]; z = idz_[1];
-	if (planes_[FrustumPlane::FAR].distance(Vec3f(p[x], p[y], p[z])) > 0)
+	x = idx_[FrustumPlane::FAR];
+	y = idy_[FrustumPlane::FAR];
+	z = idz_[FrustumPlane::FAR];
+
+	d = planes_[FrustumPlane::FAR].distance(Vec3f(p[x], p[y], p[z])); 
+	if (d < 0)
 		return CullType::EXCLUSION;
 
-	x = idx_[2]; y = idy_[2]; z = idz_[2];
-	if (planes_[FrustumPlane::RIGHT].distance(Vec3f(p[x], p[y], p[z])) > 0)
+	x = idx_[FrustumPlane::RIGHT];
+	y = idy_[FrustumPlane::RIGHT];
+	z = idz_[FrustumPlane::RIGHT];
+
+	d = planes_[FrustumPlane::RIGHT].distance(Vec3f(p[x], p[y], p[z])); 
+	if (d < 0)
 		return CullType::EXCLUSION;
 
-	x = idx_[3]; y = idy_[3]; z = idz_[3];
-	if (planes_[FrustumPlane::LEFT].distance(Vec3f(p[x], p[y], p[z])) > 0)
+	x = idx_[FrustumPlane::LEFT];
+	y = idy_[FrustumPlane::LEFT];
+	z = idz_[FrustumPlane::LEFT];
+
+	d = planes_[FrustumPlane::LEFT].distance(Vec3f(p[x], p[y], p[z]));
+	if (d < 0)
 		return CullType::EXCLUSION;
 
-	x = idx_[4]; y = idy_[4]; z = idz_[4];
-	if (planes_[FrustumPlane::TOP].distance(Vec3f(p[x], p[y], p[z])) > 0)
+	x = idx_[FrustumPlane::TOP];
+	y = idy_[FrustumPlane::TOP];
+	z = idz_[FrustumPlane::TOP];
+
+	d = planes_[FrustumPlane::TOP].distance(Vec3f(p[x], p[y], p[z])); 
+	if (d < 0)
 		return CullType::EXCLUSION;
 
-	x = idx_[5]; y = idy_[5]; z = idz_[5];
-	if (planes_[FrustumPlane::BOTTOM].distance(Vec3f(p[x], p[y], p[z])) > 0)
+	x = idx_[FrustumPlane::BOTTOM];
+	y = idy_[FrustumPlane::BOTTOM];
+	z = idz_[FrustumPlane::BOTTOM];
+
+	d = planes_[FrustumPlane::BOTTOM].distance(Vec3f(p[x], p[y], p[z])); 
+	if (d < 0)
 		return CullType::EXCLUSION;
 
 	return CullType::OVERLAP;

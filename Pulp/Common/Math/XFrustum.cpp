@@ -1,6 +1,8 @@
 #include "EngineCommon.h"
 #include "XFrustum.h"
 
+#include "Util\FloatIEEEUtil.h"
+
 namespace Frustum
 {
 
@@ -191,37 +193,16 @@ void XFrustum::UpdateFrustum(void)
 	planes_[FrustumPlane::BOTTOM] = Planef(clbf + pos, crbf + pos, pos);
 	planes_[FrustumPlane::FAR] = Planef(crtf + pos, crbf + pos, cltf + pos);  //clip-plane
 
-	/*
-	uint32 rh = mat_.ort.IsOrthonormalRH();
-	if (rh == 0)
-	{
-	planes_[FrustumPlane::NEAR] = -planes_[FrustumPlane::NEAR];
-	planes_[FrustumPlane::RIGHT] = -m_fp[FrustumPlane::RIGHT];
-	planes_[FrustumPlane::LEFT] = -planes_[FrustumPlane::LEFT];
-	planes_[FrustumPlane::TOP] = -planes_[FrustumPlane::TOP];
-	planes_[FrustumPlane::BOTTOM] = -planes_[FrustumPlane::BOTTOM];
-	planes_[FrustumPlane::FAR] = -planes_[FrustumPlane::FAR];  //clip-plane
-	}
-	*/
-
-	union f32_u
-	{
-		float floatVal;
-		uint32 uintVal;
-	};
-
 	for (int i = 0; i < FrustumPlane::ENUM_COUNT; i++)
 	{
-		f32_u ux; ux.floatVal = planes_[i].getNormal().x;
-		f32_u uy; uy.floatVal = planes_[i].getNormal().y;
-		f32_u uz; uz.floatVal = planes_[i].getNormal().z;
-		uint32 bitX = ux.uintVal >> 31;
-		uint32 bitY = uy.uintVal >> 31;
-		uint32 bitZ = uz.uintVal >> 31;
+		const Vec3f& normal = planes_[i].getNormal();
+
+		uint32 bitX = core::FloatUtil::isSignBitNotSet(normal.x) ? 1 : 0;
+		uint32 bitY = core::FloatUtil::isSignBitNotSet(normal.y) ? 1 : 0;
+		uint32 bitZ = core::FloatUtil::isSignBitNotSet(normal.z) ? 1 : 0;
 
 		idx_[i] = bitX * 3 + 0;
 		idy_[i] = bitY * 3 + 1;
 		idz_[i] = bitZ * 3 + 2;
 	}
-
 }
