@@ -460,6 +460,7 @@ bool Level::ProcessData(void)
 				sm.pos = fsm.pos;
 				sm.angle = fsm.angle;
 				sm.modelNameIdx = fsm.modelNameIdx;
+				sm.boundingBox = fsm.boundingBox;
 				// models need to be loaded at some point.
 
 				const char* modelName = stringTable_.getString(sm.modelNameIdx);
