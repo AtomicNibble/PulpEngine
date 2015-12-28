@@ -253,7 +253,7 @@ X_NAMESPACE_BEGIN(level)
 //
 //
 
-static const uint32_t	 LVL_VERSION = 15; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
+static const uint32_t	 LVL_VERSION = 16; //  chnage everytime the format changes. (i'll reset it once i'm doing messing around)
 static const uint32_t	 LVL_FOURCC = X_TAG('x', 'l', 'v', 'l');
 static const uint32_t	 LVL_FOURCC_INVALID = X_TAG('x', 'e', 'r', 'r'); // if a file falid to write the final header, this will be it's FourCC
 // feels kinda wrong to call it a '.bsp', since it's otherthings as well. 
@@ -363,6 +363,9 @@ struct StaticModel
 {
 	Vec3f pos;
 	Quatf angle;
+
+	// bounding box that takes into account the angle.
+	AABB boundingBox;
 
 	uint32_t modelNameIdx;
 	model::IModel* pModel;
