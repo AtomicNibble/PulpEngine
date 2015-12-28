@@ -350,22 +350,24 @@ X_INLINE bool XFrustum::cullSphere_Exact(const Sphere& sphere) const
 
 X_INLINE CullType::Enum XFrustum::cullSphere_FastT(const Sphere& s) const
 {
-	if ((planes_[FrustumPlane::NEAR].distance( s.center())) > s.radius())
+	float32_t r = -s.radius();
+
+	if ((planes_[FrustumPlane::NEAR].distance( s.center())) < r)
 		return CullType::EXCLUSION;
 
-	if ((planes_[FrustumPlane::FAR].distance(s.center())) > s.radius())
+	if ((planes_[FrustumPlane::FAR].distance(s.center())) < r)
 		return CullType::EXCLUSION;
 
-	if ((planes_[FrustumPlane::RIGHT].distance(s.center())) > s.radius())
+	if ((planes_[FrustumPlane::RIGHT].distance(s.center())) < r)
 		return CullType::EXCLUSION;
 
-	if ((planes_[FrustumPlane::LEFT].distance(s.center())) > s.radius())
+	if ((planes_[FrustumPlane::LEFT].distance(s.center())) < r)
 		return CullType::EXCLUSION;
 
-	if ((planes_[FrustumPlane::TOP].distance(s.center())) > s.radius())
+	if ((planes_[FrustumPlane::TOP].distance(s.center())) < r)
 		return CullType::EXCLUSION;
 
-	if ((planes_[FrustumPlane::BOTTOM].distance(s.center())) > s.radius())
+	if ((planes_[FrustumPlane::BOTTOM].distance(s.center())) < r)
 		return CullType::EXCLUSION;
 	
 	return CullType::OVERLAP;
@@ -374,33 +376,35 @@ X_INLINE CullType::Enum XFrustum::cullSphere_FastT(const Sphere& s) const
 X_INLINE CullType::Enum XFrustum::cullSphere_ExactT(const Sphere& s) const
 {
 	float32_t nc, rc, lc, tc, bc, cc;
+	float32_t r = -s.radius();
 
-	if ((nc = planes_[FrustumPlane::NEAR].distance(s.center())) > s.radius())
+	if ((nc = planes_[FrustumPlane::NEAR].distance(s.center())) < r)
 		return CullType::EXCLUSION;
 
-	if ((rc = planes_[FrustumPlane::FAR].distance(s.center())) > s.radius())
+	if ((rc = planes_[FrustumPlane::FAR].distance(s.center())) < r)
 		return CullType::EXCLUSION;
 
-	if ((lc = planes_[FrustumPlane::RIGHT].distance(s.center())) > s.radius())
+	if ((lc = planes_[FrustumPlane::RIGHT].distance(s.center())) < r)
 		return CullType::EXCLUSION;
 
-	if ((tc = planes_[FrustumPlane::LEFT].distance(s.center())) > s.radius())
+	if ((tc = planes_[FrustumPlane::LEFT].distance(s.center())) < r)
 		return CullType::EXCLUSION;
 
-	if ((bc = planes_[FrustumPlane::TOP].distance(s.center())) > s.radius())
+	if ((bc = planes_[FrustumPlane::TOP].distance(s.center())) < r)
 		return CullType::EXCLUSION;
 
-	if ((cc = planes_[FrustumPlane::BOTTOM].distance(s.center())) > s.radius())
+	if ((cc = planes_[FrustumPlane::BOTTOM].distance(s.center())) < r)
 		return CullType::EXCLUSION;
 
 	//now we have to check if it is completely in frustum
-	float32_t r = -s.radius();
-	if (nc>r) return CullType::OVERLAP;
-	if (lc>r) return CullType::OVERLAP;
-	if (rc>r) return CullType::OVERLAP;
-	if (tc>r) return CullType::OVERLAP;
-	if (bc>r) return CullType::OVERLAP;
-	if (cc>r) return CullType::OVERLAP;
+	r = -r;
+	if (nc<r) return CullType::OVERLAP;
+	if (lc<r) return CullType::OVERLAP;
+	if (rc<r) return CullType::OVERLAP;
+	if (tc<r) return CullType::OVERLAP;
+	if (bc<r) return CullType::OVERLAP;
+	if (cc<r) return CullType::OVERLAP;
+
 	return CullType::INCLUSION;
 }
 
