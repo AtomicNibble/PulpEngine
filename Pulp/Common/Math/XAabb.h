@@ -9,6 +9,8 @@
 #include "XSphere.h"
 #include "XPlane.h"
 
+class OBB;
+
 class AABB
 {
 public:
@@ -23,11 +25,13 @@ public:
 	X_INLINE AABB(const Vec3f& center, float radius);
 	X_INLINE AABB(const Vec3f &min, const Vec3f& max);
 	X_INLINE AABB(const AABB& oth);
+	AABB(const OBB& oth);
 
 	X_INLINE void set(float radius);
 	X_INLINE void set(const Vec3f& center, float radius);
 	X_INLINE void set(const Vec3f &min, const Vec3f& max);
 	X_INLINE void set(const AABB &oth);
+	void set(const OBB &oth);
 
 	X_INLINE void  clear();
 	X_INLINE bool  IsInfinate(void) const; // returns if it's infinate: the value it's made after clear.

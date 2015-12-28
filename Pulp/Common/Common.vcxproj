@@ -425,6 +425,7 @@
     <None Include="Time\TimeVal.inl" />
     <None Include="Util\BitUtil.inl" />
     <None Include="Util\Cpu.inl" />
+    <ClCompile Include="Math\XAabb.cpp" />
     <ClCompile Include="Time\win32\StopWatch.cpp" />
     <ClCompile Include="Util\Delegate.gen">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
