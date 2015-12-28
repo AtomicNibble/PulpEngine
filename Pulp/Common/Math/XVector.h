@@ -104,6 +104,10 @@ public:
 			math<T>::abs(y - oth.y) <= epsilon;
 	}
 
+	X_INLINE Vec2<T> abs(void) const {
+		return Vec2<T>(math<T>::abs(x), math<T>::abs(y));
+	}
+
 	X_INLINE T dot(const Vec2<T>& oth) const {
 		return x * oth.x + y * oth.y;
 	}
@@ -238,6 +242,10 @@ public:
 
 	static Vec2<T> xAxis() { return Vec2<T>(1, 0); }
 	static Vec2<T> yAxis() { return Vec2<T>(0, 1); }
+
+	static Vec2<T> abs(const Vec2<T>& vec) {
+		return vec.abs();
+	}
 };
 
 template<typename T>
@@ -328,6 +336,10 @@ public:
 		return math<T>::abs(x - oth.x) <= epsilon &&
 			math<T>::abs(y - oth.y) <= epsilon &&
 			math<T>::abs(z - oth.z) <= epsilon;
+	}
+
+	X_INLINE Vec3<T> abs(void) const {
+		return Vec3<T>(math<T>::abs(x), math<T>::abs(y), math<T>::abs(z));
 	}
 
 	X_INLINE T dot(const Vec3<T>& oth) const {
@@ -567,6 +579,10 @@ public:
 	static Vec3<T> zAxis() { return Vec3<T>(0, 0, 1); }
 
 	static Vec3<T> NaN()   { return Vec3<T>(math<T>::NaN(), math<T>::NaN(), math<T>::NaN()); }
+
+	static Vec3<T> abs(const Vec3<T>& vec) {
+		return vec.abs();
+	}
 };
 
 
@@ -650,6 +666,10 @@ public:
 
 	X_INLINE bool operator!=(const Vec4<T>& oth) const {
 		return !(*this == oth);
+	}
+
+	X_INLINE Vec4<T> abs(void) const {
+		return Vec4<T>(math<T>::abs(x), math<T>::abs(y), math<T>::abs(z), math<T>::abs(w));
 	}
 
 	X_INLINE T dot(const Vec4<T>& oth) const {
@@ -825,6 +845,9 @@ public:
 
 	static Vec4<T> NaN()   { return Vec4<T>(math<T>::NaN(), math<T>::NaN(), math<T>::NaN(), math<T>::NaN()); }
 
+	static Vec4<T> abs(const Vec4<T>& vec) {
+		return vec.abs();
+	}
 };
 
 
@@ -928,6 +951,10 @@ public:
 		return !(*this == oth);
 	}
 
+	X_INLINE Vec5<T> abs(void) const {
+		return Vec5<T>(math<T>::abs(x), math<T>::abs(y), math<T>::abs(z), math<T>::abs(s), math<T>::abs(t));
+	}
+
 	X_INLINE T dot(const Vec5<T>& oth) const {
 		return x * oth.x + y * oth.y + z * oth.z;
 	}
@@ -1022,6 +1049,9 @@ public:
 		math<T>::NaN(), , math<T>::NaN());
 	}
 
+	static Vec5<T> abs(const Vec5<T>& vec) {
+		return vec.abs();
+	}
 };
 
 
