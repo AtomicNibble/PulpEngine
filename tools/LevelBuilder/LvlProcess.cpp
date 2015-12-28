@@ -543,9 +543,16 @@ bool LvlBuilder::CreateEntAreaRefs(LvlEntity& worldEnt)
 		// axis rotations make me horny.
 		if (sm.angle != Quatf::identity())
 		{
+			// this is a quick sloppy AABB
+			// loading the model and processing it's verts is required for snug AABB.
+			// I will add it as a release compile option, since it will not be quick for a map with 2000 models.
 			OBB obb(sm.angle, sm.boundingBox);
 			sm.boundingBox = AABB(obb);
 		}
+
+		// make them world bounds.
+		sm.boundingBox.move(sm.pos);
+
 
 		uint32_t entId = safe_static_cast<uint32_t, size_t>(staticModels_.size());
 
