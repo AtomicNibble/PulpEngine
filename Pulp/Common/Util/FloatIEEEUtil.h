@@ -19,14 +19,16 @@ namespace FloatUtil
 
 	X_INLINE bool isSignBitSet(float val)
 	{
-		return core::bitUtil::IsBitSet<float>(val, IEEE_FLT_SIGN_BIT);
+		uint32_t u = union_cast<uint32_t, float>(val);
+
+		return core::bitUtil::IsBitSet<uint32_t>(u, IEEE_FLT_SIGN_BIT);
 	}
 
 	X_INLINE bool isSignBitNotSet(float val)
 	{
-		return ((~(*(const unsigned long *)&(val))) >> IEEE_FLT_SIGN_BIT) == 1;
-		// dose not work, check why later, yolo!
-		//	return core::bitUtil::IsBitSet<float>(val, IEEE_FLT_SIGN_BIT) == false;
+		uint32_t u = union_cast<uint32_t, float>(val);
+
+		return core::bitUtil::IsBitSet<uint32_t>(u, IEEE_FLT_SIGN_BIT) == false;
 	}
 
 } // namespace FloatUtil
