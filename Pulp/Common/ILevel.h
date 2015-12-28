@@ -426,8 +426,16 @@ struct FileStaticModel
 	Vec3f pos;
 	Quatf angle;
 
+	// storing a precomputed AABB here would be nice.
+	// that takes into account rotation of the model.
+	// this could either be done fast by using the AABB or slow and more accurate
+	// using rotated verts.
+	AABB boundingBox;
+
 	uint32_t modelNameIdx;
 };
+
+
 
 struct FileNode
 {
@@ -507,6 +515,7 @@ X_ENSURE_SIZE(MultiAreaEntRef, 8);
 
 
 // check file structure sizes also.
+X_ENSURE_SIZE(FileStaticModel, 56);
 X_ENSURE_SIZE(FileNode, 8);
 X_ENSURE_SIZE(FileHeader, 60 + (sizeof(FileNode)* FileNodes::ENUM_COUNT));
 
