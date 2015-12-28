@@ -106,7 +106,7 @@ public:
 	Area();
 	~Area();
 
-	bool CullEnt(const AABB& bounds, const Sphere& sphere, const Matrix44f worldMatrix) const;
+	bool CullEnt(const AABB& bounds, const Sphere& sphere) const;
 
 public:
 	typedef core::Array<AreaPortal> AreaPortalArr;

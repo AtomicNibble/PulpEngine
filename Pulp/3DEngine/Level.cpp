@@ -66,10 +66,10 @@ Area::~Area()
 	}
 }
 
-bool Area::CullEnt(const AABB& bounds, const Sphere& sphere, const Matrix44f worldMatrix) const
+bool Area::CullEnt(const AABB& wBounds, const Sphere& wSphere) const
 {
-	X_UNUSED(bounds);
-	X_UNUSED(sphere);
+	X_UNUSED(wBounds);
+	X_UNUSED(wSphere);
 	// work out if it's visible.
 	// the bounds and sphere are world space.
 
@@ -81,10 +81,8 @@ bool Area::CullEnt(const AABB& bounds, const Sphere& sphere, const Matrix44f wor
 
 		// sphere
 		{
-			Vec3f center = sphere.center();
-			const float radius = sphere.radius();
-
-			center = worldMatrix * center;
+			const Vec3f& center = wSphere.center();
+			const float radius = -wSphere.radius();
 
 			for (size_t i = 0; i < numPlanes; i++)
 			{
@@ -611,30 +609,34 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 	{
 		model::IModel* pModel = sm.pModel;
 
-		const Vec3f pos = sm.pos;
-		const Quatf angle = sm.angle;
+		const Vec3f& pos = sm.pos;
+		const Quatf& angle = sm.angle;
+		const AABB& bounds = sm.boundingBox;
 
 		Matrix44f posMat = Matrix44f::createTranslation(pos);
 		posMat.rotate(angle.getAxis(), angle.getAngle());
 
+		const Sphere wSphere(bounds);
 
 		if (s_var_cullEnts_)
 		{
-			const AABB& bounds = pModel->bounds(0);
-			const Sphere sphere = pModel->boundingSphere(0);
-
 			bool culled = false;
+
+			Color8u cullColor(128, 0, 0, 64);
+
 			if (IsCamArea(areaNum))
 			{
-				// use the frustrum.
-				Sphere wSphere(sphere);
-				
-				wSphere.setCenter(posMat * sphere.center());
+				// use the frustrum.		
 
-				if (cam_.cullSphere_FastT(wSphere) == CullType::EXCLUSION)
+				CullType::Enum type = cam_.cullSphere_ExactT(wSphere);
+				if (type == CullType::EXCLUSION || type == CullType::OVERLAP)
 				{
 					frameStats_.culledModels++;
 					culled = true;
+
+					if (type == CullType::OVERLAP) {
+						cullColor = Color8u(255, 56, 200, 128);
+					}
 				}
 			}
 			else
@@ -643,7 +645,7 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 
 
 				// cull it with the portalstack planes.
-				if (area.CullEnt(bounds, sphere, posMat))
+				if (area.CullEnt(bounds, wSphere))
 				{
 					frameStats_.culledModels++;
 					culled = true;
@@ -660,13 +662,13 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 					{
 						flags.SetCullMode(AuxGeom_CullMode::CullModeNone);
 						pAux_->setRenderFlags(flags);
-						pAux_->drawAABB(pModel->bounds(), posMat, false, Color8u(128, 0, 0, 128));
+						pAux_->drawAABB(sm.boundingBox, pos, false, Color8u(128, 0, 0, 128));
 					}
 					else
 					{
 						flags.SetFillMode(AuxGeom_FillMode::FillModeWireframe);
 						pAux_->setRenderFlags(flags);
-						pAux_->drawSphere(pModel->boundingSphere(0), posMat, Color8u(128, 0, 0, 64), false);
+						pAux_->drawSphere(wSphere, cullColor, false);
 					}
 				}
 
@@ -676,6 +678,7 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 
 		frameStats_.visibleModels++;
 		frameStats_.visibleVerts += pModel->numVerts(0);
+
 
 
 		render::IRender* pRender = getRender();
@@ -693,6 +696,7 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 		//	flags.SetDepthWriteFlag(AuxGeom_DepthWrite::DepthWriteOff);
 		//	flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOff);
 
+
 			// 1 == aabb 2 = sphee
 			if (s_var_drawModelBounds_ == 1 || s_var_drawModelBounds_ == 3)
 			{
@@ -700,14 +704,16 @@ bool Level::DrawStaticModel(const level::StaticModel& sm, int32_t areaNum)
 
 				pAux_->setRenderFlags(flags);
 
-				pAux_->drawAABB(pModel->bounds(), posMat, false, Color8u(255, 255, 64, 128));
+				pAux_->drawAABB(sm.boundingBox, pos, false, Color8u(255, 255, 64, 128));
 			}
 			else
 			{
+				posMat = Matrix44f::createTranslation(pos);
+
 				flags.SetFillMode(AuxGeom_FillMode::FillModeWireframe);
 				pAux_->setRenderFlags(flags);
 
-				pAux_->drawSphere(pModel->boundingSphere(0), posMat, Color8u(255, 255, 64, 64), false);
+				pAux_->drawSphere(wSphere, Color8u(255, 255, 64, 64), false);
 			}
 		}
 
