@@ -293,6 +293,7 @@
     <ClInclude Include="Threading\win32\ThreadLocalStorage.h" />
     <ClInclude Include="Time\CompressedStamps.h" />
     <ClInclude Include="Time\DateStamp.h" />
+    <ClInclude Include="Time\StopWatch.h" />
     <ClInclude Include="Time\TimeStamp.h" />
     <ClInclude Include="Time\TimeVal.h" />
     <ClInclude Include="Time\win32\TimeStamp.h" />
@@ -336,7 +337,6 @@
     <ClInclude Include="Util\SmartPointer.h" />
     <ClInclude Include="Util\SourceInfo.h" />
     <ClInclude Include="Util\SourceInfoMacros.h" />
-    <ClInclude Include="Util\StopWatch.h" />
     <ClInclude Include="Util\ToggleChecker.h" />
     <ClInclude Include="Util\win32\LastError.h" />
   </ItemGroup>
@@ -421,9 +421,11 @@
     <None Include="Threading\win32\CriticalSection.inl" />
     <None Include="Threading\win32\Semaphore.inl" />
     <None Include="Threading\win32\ThreadLocalStorage.inl" />
+    <None Include="Time\StopWatch.inl" />
     <None Include="Time\TimeVal.inl" />
     <None Include="Util\BitUtil.inl" />
     <None Include="Util\Cpu.inl" />
+    <ClCompile Include="Time\win32\StopWatch.cpp" />
     <ClCompile Include="Util\Delegate.gen">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
@@ -453,7 +455,6 @@
     <None Include="Util\ReferenceCountedOwner.inl" />
     <None Include="Util\SmartPointer.inl" />
     <None Include="Util\SourceInfo.inl" />
-    <None Include="Util\StopWatch.inl" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\3rdparty\source\lz4-r131\lz4_lib.c">
@@ -771,7 +772,6 @@
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">EngineCommon.h</PrecompiledHeaderFile>
       <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">EngineCommon.h</PrecompiledHeaderFile>
     </ClCompile>
-    <ClCompile Include="Util\win32\StopWatch.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Array.natvis" />
