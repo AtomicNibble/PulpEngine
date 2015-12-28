@@ -316,6 +316,144 @@ void XRenderAux::drawTriangle(const Vec3f* points, uint32_t numPoints,
 
 // ---------------------------- AABB ----------------------------
 
+void XRenderAux::drawAABB(const AABB& aabb, bool solid, const Color8u& col)
+{
+	XAuxVertex* pVertices = nullptr;
+	uint16* pIndices = nullptr;
+
+	if (!solid)
+	{
+		AddIndexedPrimitive(pVertices, 8, pIndices, 24,
+			CreateLineRenderFlags(true) | AlphaFlags(col));
+
+		Color8u color(col);
+
+		pVertices[0].pos = Vec3f(aabb.min.x, aabb.min.y, aabb.min.z);
+		pVertices[0].color = color;
+		pVertices[1].pos = Vec3f(aabb.min.x, aabb.max.y, aabb.min.z);
+		pVertices[1].color = color;
+		pVertices[2].pos = Vec3f(aabb.max.x, aabb.max.y, aabb.min.z);
+		pVertices[2].color = color;
+		pVertices[3].pos = Vec3f(aabb.max.x, aabb.min.y, aabb.min.z);
+		pVertices[3].color = color;
+		pVertices[4].pos = Vec3f(aabb.min.x, aabb.min.y, aabb.max.z);
+		pVertices[4].color = color;
+		pVertices[5].pos = Vec3f(aabb.min.x, aabb.max.y, aabb.max.z);
+		pVertices[5].color = color;
+		pVertices[6].pos = Vec3f(aabb.max.x, aabb.max.y, aabb.max.z);
+		pVertices[6].color = color;
+		pVertices[7].pos = Vec3f(aabb.max.x, aabb.min.y, aabb.max.z);
+		pVertices[7].color = color;
+
+		pIndices[0] = 0; pIndices[1] = 1;
+		pIndices[2] = 1; pIndices[3] = 2;
+		pIndices[4] = 2; pIndices[5] = 3;
+		pIndices[6] = 3; pIndices[7] = 0;
+
+		pIndices[8] = 4; pIndices[9] = 5;
+		pIndices[10] = 5; pIndices[11] = 6;
+		pIndices[12] = 6; pIndices[13] = 7;
+		pIndices[14] = 7; pIndices[15] = 4;
+
+		pIndices[16] = 0; pIndices[17] = 4;
+		pIndices[18] = 1; pIndices[19] = 5;
+		pIndices[20] = 2; pIndices[21] = 6;
+		pIndices[22] = 3; pIndices[23] = 7;
+	}
+	else
+	{
+		AddIndexedPrimitive(pVertices, 24, pIndices, 36, CreateTriangleRenderFlags(true));
+
+		const Vec3f& xyz = aabb.min;
+		const Vec3f xyZ(aabb.min.x, aabb.min.y, aabb.max.z);
+		const Vec3f xYz(aabb.min.x, aabb.max.y, aabb.min.z);
+		const Vec3f xYZ(aabb.min.x, aabb.max.y, aabb.max.z);
+		const Vec3f Xyz(aabb.max.x, aabb.min.y, aabb.min.z);
+		const Vec3f XyZ(aabb.max.x, aabb.min.y, aabb.max.z);
+		const Vec3f XYz(aabb.max.x, aabb.max.y, aabb.min.z);
+		const Vec3f& XYZ = aabb.max;
+
+		Color8u colDown(col * 0.5f);
+
+		pVertices[0].pos = xyz;
+		pVertices[0].color = colDown;
+		pVertices[1].pos = xYz;
+		pVertices[1].color = colDown;
+		pVertices[2].pos = XYz;
+		pVertices[2].color = colDown;
+		pVertices[3].pos = Xyz;
+		pVertices[3].color = colDown;
+
+		pIndices[0] = 0; pIndices[1] = 1; pIndices[2] = 2;
+		pIndices[3] = 0; pIndices[4] = 2; pIndices[5] = 3;
+
+		Color8u colTop(col);
+		pVertices[4].pos = xyZ;
+		pVertices[4].color = colTop;
+		pVertices[5].pos = XyZ;
+		pVertices[5].color = colTop;
+		pVertices[6].pos = XYZ;
+		pVertices[6].color = colTop;
+		pVertices[7].pos = xYZ;
+		pVertices[7].color = colTop;
+
+		pIndices[6] = 4; pIndices[7] = 5; pIndices[8] = 6;
+		pIndices[9] = 4; pIndices[10] = 6; pIndices[11] = 7;
+
+		Color8u colBack(col * 0.5f);
+		pVertices[8].pos = xyz;
+		pVertices[8].color = colBack;
+		pVertices[9].pos = Xyz;
+		pVertices[9].color = colBack;
+		pVertices[10].pos = XyZ;
+		pVertices[10].color = colBack;
+		pVertices[11].pos = xyZ;
+		pVertices[11].color = colBack;
+
+		pIndices[12] = 8; pIndices[13] = 9; pIndices[14] = 10;
+		pIndices[15] = 8; pIndices[16] = 10; pIndices[17] = 11;
+
+		Color8u colFront(col * 0.9f);
+		pVertices[12].pos = xYz;
+		pVertices[12].color = colFront;
+		pVertices[13].pos = xYZ;
+		pVertices[13].color = colFront;
+		pVertices[14].pos = XYZ;
+		pVertices[14].color = colFront;
+		pVertices[15].pos = XYz;
+		pVertices[15].color = colFront;
+
+		pIndices[18] = 12; pIndices[19] = 13; pIndices[20] = 14;
+		pIndices[21] = 12; pIndices[22] = 14; pIndices[23] = 15;
+
+		Color8u colLeft(col * 0.7f);
+		pVertices[16].pos = xyz;
+		pVertices[16].color = colLeft;
+		pVertices[17].pos = xyZ;
+		pVertices[17].color = colLeft;
+		pVertices[18].pos = xYZ;
+		pVertices[18].color = colLeft;
+		pVertices[19].pos = xYz;
+		pVertices[19].color = colLeft;
+
+		pIndices[24] = 16; pIndices[25] = 17; pIndices[26] = 18;
+		pIndices[27] = 16; pIndices[28] = 18; pIndices[29] = 19;
+
+		Color8u colRight(col * 0.8f);
+		pVertices[20].pos = Xyz;
+		pVertices[20].color = colRight;
+		pVertices[21].pos = XYz;
+		pVertices[21].color = colRight;
+		pVertices[22].pos = XYZ;
+		pVertices[22].color = colRight;
+		pVertices[23].pos = XyZ;
+		pVertices[23].color = colRight;
+
+		pIndices[30] = 20; pIndices[31] = 21; pIndices[32] = 22;
+		pIndices[33] = 20; pIndices[34] = 22; pIndices[35] = 23;
+	}
+}
+
 void XRenderAux::drawAABB(const AABB& aabb, const Vec3f& pos,
 	bool solid, const Color8u& col)
 {

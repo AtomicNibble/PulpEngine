@@ -165,6 +165,7 @@ struct IRenderAux
 		const uint16_t* indices, uint32_t numIndices, const Color8u* pCol) X_ABSTRACT;
 
 	// AABB
+	virtual void drawAABB(const AABB& aabb, bool solid, const Color8u& col) X_ABSTRACT;
 	virtual void drawAABB(const AABB& aabb, const Vec3f& pos, bool solid, const Color8u& col) X_ABSTRACT;
 	virtual void drawAABB(const AABB& aabb, const Matrix34f& mat, bool solid, const Color8u& col) X_ABSTRACT;
 

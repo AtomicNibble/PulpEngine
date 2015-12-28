@@ -58,6 +58,7 @@ public:
 		uint32_t numIndices, const Color8u* pCol) X_OVERRIDE;
 
 	// AABB
+	void drawAABB(const AABB& aabb, bool solid, const Color8u& col) X_OVERRIDE;
 	void drawAABB(const AABB& aabb, const Vec3f& pos, bool solid, const Color8u& col) X_OVERRIDE;
 	void drawAABB(const AABB& aabb, const Matrix34f& mat, bool solid, const Color8u& col) X_OVERRIDE;
 
