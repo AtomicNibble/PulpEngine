@@ -298,9 +298,6 @@
     <ClInclude Include="Util\SourceInfoMacros.h">
       <Filter>Headers\Util</Filter>
     </ClInclude>
-    <ClInclude Include="Util\StopWatch.h">
-      <Filter>Headers\Util</Filter>
-    </ClInclude>
     <ClInclude Include="Util\win32\LastError.h">
       <Filter>Headers\Util\win32</Filter>
     </ClInclude>
@@ -1057,6 +1054,9 @@
     <ClInclude Include="Util\Delegate.gen.h">
       <Filter>Headers\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Util\StopWatch.h">
+      <Filter>Headers\Time</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1078,9 +1078,6 @@
       <Filter>Headers\Util</Filter>
     </None>
     <None Include="Util\SourceInfo.inl">
-      <Filter>Headers\Util</Filter>
-    </None>
-    <None Include="Util\StopWatch.inl">
       <Filter>Headers\Util</Filter>
     </None>
     <None Include="Casts\safe_static_cast.inl">
@@ -1328,6 +1325,9 @@
     </None>
     <None Include="Threading\ThreadQue.inl">
       <Filter>Headers\Threading</Filter>
+    </None>
+    <None Include="Util\StopWatch.inl">
+      <Filter>Headers\Time</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
