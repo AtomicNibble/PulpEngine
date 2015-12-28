@@ -30,11 +30,10 @@ public:
 	X_INLINE void set(Quatf quat, const AABB& aabb);
 
 
-	X_INLINE Vec3f center() const;	// the center point of the box
-	X_INLINE Vec3f size() const;	// the size of the box.
-	X_INLINE Vec3f halfVec() const;	// 
-	X_INLINE const Matrix33f& orientation() const;	// 
-
+	X_INLINE Vec3f center(void) const;	// the center point of the box
+	X_INLINE Vec3f size(void) const;	// the size of the box.
+	X_INLINE Vec3f halfVec(void) const;	// 
+	X_INLINE const Matrix33f& orientation(void) const;	// 
 
 private:
 	Matrix33f orientation_;
