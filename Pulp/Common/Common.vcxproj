@@ -446,6 +446,15 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">true</ExcludedFromBuild>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Util\%(Filename).h</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">Util\%(Filename).h</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Util\%(Filename).h</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Util\%(Filename).h</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">Util\%(Filename).h</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Util\%(Filename).h</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Util\%(Filename).h</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Util\%(Filename).h</ObjectFileName>
+      <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Util\%(Filename).h</ObjectFileName>
     </ClCompile>
     <None Include="Util\EndianUtil.inl" />
     <None Include="Util\Flags.inl" />
@@ -960,6 +969,10 @@
     <Lib>
       <AdditionalDependencies>Winmm.lib</AdditionalDependencies>
     </Lib>
+    <PreBuildEvent>
+      <Command>CL.exe /c /I$(ProjectDir) /Zi /nologo /W4 /WX /MP /Od /P /EP /C /GR- /Fo"Util\Delegate.h" Util\Delegate.gen
+move "Delegate.i" "Util\Delegate.h"</Command>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">
     <ClCompile>
