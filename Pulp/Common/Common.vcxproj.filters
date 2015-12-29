@@ -199,6 +199,9 @@
     <Filter Include="SourceFiles\Util\win32">
       <UniqueIdentifier>{16363cff-6e3e-4b46-8600-923097a213eb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Natvis">
+      <UniqueIdentifier>{a5bcf281-a42f-44b2-9bff-fc5ce022c151}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -1619,7 +1622,11 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Natvis Include="FixedArray.natvis" />
-    <Natvis Include="Array.natvis" />
+    <Natvis Include="Array.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
+    <Natvis Include="FixedArray.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>
