@@ -1,5 +1,5 @@
 // ==========================
-// Potato - Model Exporter (UIScript) 
+// Potato - Model Exporter (UIScript)
 // Version: 1.0
 // site: tom-crowley.co.uk
 // Copyright: Tom Crowley 2014
@@ -21,4 +21,5 @@ global proc poatoDestroyUI()
 {
 	DestoryMenu();
 	potato_DestoryExportWindow("potato_ExportWindow");
+            potato_DestoryExportWindow("potato_AnimExportWindow");
 }

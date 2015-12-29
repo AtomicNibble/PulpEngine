@@ -1,5 +1,5 @@
 // ==========================
-// Potato - Model Exporter (UIScript) 
+// Potato - Model Exporter (UIScript)
 // Version: 1.1
 // site: tom-crowley.co.uk
 // Copyright: Tom Crowley 2014
@@ -56,14 +56,14 @@ global proc ModelEntryNameChanged(int $index)
 global proc ModelEntryLODIncludeChanged(int $lod_number, int $index)
 {
 	int $checked = modelIsLODIncluded($lod_number, $index);
-	
+
 	print_Msg("test: " + $checked);
-	setAttr ("PotatoGNode.Export" + $index + $lod_number) $checked;	
+	setAttr ("PotatoGNode.Export" + $index + $lod_number) $checked;
 }
 
 global proc ModelSetLODDistance(int $lod_number, int $index)
 {
-	float $dis = modelGetLODDistance($lod_number, $index);	
+	float $dis = modelGetLODDistance($lod_number, $index);
 	setAttr ("PotatoGNode.Distance" + $index + $lod_number) $dis;
 }
 
@@ -100,20 +100,20 @@ global proc forceBoneFiltersUpdate()
 global proc ModelSetLODObjects_internal(int $lod_number, int $index, string $Selected[])
 {
 	string $selected_str = "";
-	
+
 	for($obj in $Selected) {
 		$selected_str = $selected_str + $obj + " ";
-	}	
+	}
 
 	if (`size $Selected`)
 	{
 		int $num = size($Selected);
 		int $info[] = (`polyEvaluate -v -t $Selected`);
-		
+
 		text -e -l $num ("ModelInfoNum" + $lod_number + $index );
 		text -e -l $info[0] ("ModelInfoVerts" + $lod_number + $index );
 		text -e -l $info[1] ("ModelInfoFaces" + $lod_number + $index );
-	
+
 		setAttr -type "string" ("PotatoGNode.ObjectList" + $index + $lod_number) $selected_str;
 	}
 }
@@ -121,11 +121,11 @@ global proc ModelSetLODObjects_internal(int $lod_number, int $index, string $Sel
 global proc ModelSetLODObjects(int $lod_number, int $index)
 {
 	string $Selected[] = `ls -sl`;
-	
+
 	if (`size $Selected`)
 		ModelSetLODObjects_internal($lod_number, $index, $Selected);
 	else
-		print_Warn("unable to set lod objects: no meshes are selected.");		
+		print_Warn("unable to set lod objects: no meshes are selected.");
 }
 
 global proc ModelSelectLODObjects(int $lod_number, int $index)
@@ -133,32 +133,32 @@ global proc ModelSelectLODObjects(int $lod_number, int $index)
 	// get rekt.
 	string $objects = `getAttr ("PotatoGNode.ObjectList" + $index + $lod_number)`;
 	string $objectsArray[];
-	
+
 	string $validObjects;
 	string $deletedObjects;
-	
+
 	int $idx;
 	int $num = `tokenize $objects " " $objectsArray`;
-		
-	if ( $num > 1 ) {			
-		for ( $idx = 0; $idx < $num; $idx++ ) {	
+
+	if ( $num > 1 ) {
+		for ( $idx = 0; $idx < $num; $idx++ ) {
 			if( `objExists $objectsArray[$idx]` )
 				$validObjects += $objectsArray[$idx] + " ";
 			else
-				$deletedObjects += $objectsArray[$idx] + " ";		
+				$deletedObjects += $objectsArray[$idx] + " ";
 		}
 	} else {
 		$validObjects = $objects;
 	}
-		
-	$res = ("select -r " + $validObjects);	
+
+	$res = ("select -r " + $validObjects);
 	eval $res;
-		
-		
+
+
 	if ( $deletedObjects != "" )
 	{
 		// objects added previously no longer exsist.
-	
+
 	}
 }
 
@@ -167,9 +167,9 @@ global proc ModelClearLODObjects(int $lod_number, int $index)
 	text -e -l "0" ("ModelInfoNum" + $lod_number + $index );
 	text -e -l "0" ("ModelInfoVerts" + $lod_number + $index );
 	text -e -l "0" ("ModelInfoFaces" + $lod_number + $index );
-	
-	setAttr -type "string" ("PotatoGNode.ObjectList" + $index + $lod_number) "";	
-	
+
+	setAttr -type "string" ("PotatoGNode.ObjectList" + $index + $lod_number) "";
+
 	print_Msg( "'" + modelGetName($index) + "' LOD" + $lod_number + " was cleared.");
 }
 
@@ -190,19 +190,19 @@ global proc ModelEntryExport(int $index)
 	int $total_lods = 0;
 	int $total_mesh = 0;
 	int $idx;
-	
+
 	for($idx = 0; $idx < 4; $idx++)
 	{
 		$lod_inc[size($lod_inc)] = `getAttr ("PotatoGNode.Export" + $index + $idx)`;
 		$lod_distance[size($lod_distance)]= `getAttr ("PotatoGNode.Distance" + $index + $idx)`;
 		$lod_objects[size($lod_objects)]= `getAttr ("PotatoGNode.ObjectList" + $index + $idx)`;
-		
+
 		$total_lods += $lod_inc[$idx];
 	}
-	
+
 /*	print_Msg("===============");
 	print_Msg("NumLods: " + $total_lods);
-	
+
 	for($idx = 0; $idx < 4; $idx++)
 	{
 		print_Msg( "Inc: " + $lod_inc[$idx] );
@@ -210,48 +210,48 @@ global proc ModelEntryExport(int $index)
 		print_Msg( "Objects: " + $lod_objects[$idx] );
 		print_Msg("");
 	}*/
-	
+
 	// any lods?
 	if($total_lods < 1) {
 		print_Error("Can't export model: '"+ modelGetName($index) + "' has no lods included.");
 		return;
 	}
-	
+
 	// check we have atleast one mesh and build the args.
 	for($idx = 0; $idx < 4; $idx++)
 	{
 		if($lod_inc[$idx] != 0) {
 			string $tokens[];
 			int $num = 0;
-			
+
 			if(size($lod_objects[$idx]) > 0) {
 				$num = `tokenize $lod_objects[$idx] " " $tokens`;
 				$total_mesh += $num;
 			}
-			
+
 			if($num < 1) { // warn about it, instead of cancel export as we can just not include this lod :)
 				print_Warn("LOD" + $idx + " has no meshes defined");
 				$lod_inc[$idx] = 0;
 				$total_lods--;
 				continue;
 			}
-			
+
 			// add info to args.
-			$args += "LOD"+$idx + " " + $lod_distance[$idx] + " \"" + $lod_objects[$idx] + "\""; 
+			$args += "LOD"+$idx + " " + $lod_distance[$idx] + " \"" + $lod_objects[$idx] + "\"";
 		}
 	}
-	
+
 //	print_Msg("NumMesh: " + $total_mesh);
-	
+
 	if($total_mesh < 1) {
 		print_Error("Can't export model: '"+ modelGetName($index) + "' none of the included LODs have meshes.");
 		return;
 	}
-	
+
 	// should we check if the same mesh is used in multiple LOD's ?
 	// would we ever want that?
 	// sounds unlikly, but lets just warm about instead of error.
-	
+
 	// we compare each LOD with the others once.
 	int $x;
 	for($idx = 0; $idx < 4; $idx++) {
@@ -263,8 +263,8 @@ global proc ModelEntryExport(int $index)
 	}
 
 	// plugin checks lod distances for us
-	
-	
+
+
 	// build the shit!
 	// we need file name.
 	string $filename = modelGetName($index);
@@ -276,23 +276,23 @@ global proc ModelEntryExport(int $index)
 	string $forceBoneFilters = substituteAllString(`getAttr ("PotatoGNode.forceBoneFilters")`, "\n", " ");
 	string $options = "-progress PotatoExportProgress -dir \"" + $Dir + "\" -scale " + $scale + " -weight_thresh " + $weightThreshold + " -uv_merge_thresh " + $uvMergeThreshold + " -zero_origin " + $zeroOrigin + " -force_bones \"" + $forceBoneFilters + "\"";
 	string $command = "PotatoExportModel " + $args + " -f \"" + $filename + "\" "+ $options;
-	
+
 	// print_Msg("cmd: " + $command);
-	
+
 	if(int(`size $Dir`) < 1)
 	{
 		print_Error("No export dir set! set a path in the paths tab.");
 		return;
 	}
-	
-	// run 
+
+	// run
 	string $errorMsg;
 	$error = catch ( $errorMsg = eval( $command ) );
 }
 
 global proc string[] getCommonItems(string $a, string $b)
 {
-	string $aa[] = stringToStringArray($a, " "); 
+	string $aa[] = stringToStringArray($a, " ");
 	string $bb[] = stringToStringArray($b, " ");
 	return stringArrayRemove(stringArrayRemove($aa, $bb), $bb);
 }
@@ -304,7 +304,7 @@ global proc potato_AddModelLodEntry(int $index, int $lod_idx)
 	int $checked = `getAttr ("PotatoGNode.Export" + $index + $lod_idx)`;
 	float $distance = `getAttr ("PotatoGNode.Distance" + $index + $lod_idx)`;
 	string $objects = `getAttr ("PotatoGNode.ObjectList" + $index + $lod_idx)`;
-	
+
 	text -l "";
 	checkBox -l ("LOD" + $lod_idx) -v $checked -cc ("ModelEntryLODIncludeChanged " + $lod_idx + " "+ $index) ("ModelIncludeLod" + $lod_idx + $index );
 	floatField -v $distance -s 10 -min 0 -pre 2 -cc ("ModelSetLODDistance " + $lod_idx + " " + $index);
@@ -314,8 +314,8 @@ global proc potato_AddModelLodEntry(int $index, int $lod_idx)
 	button -label "set" -bgc 0.3 0.3 0.3 -c ("ModelSetLODObjects " + $lod_idx + " " + $index);
 	button -label "select" -bgc 0.3 0.3 0.3 -c ("ModelSelectLODObjects " + $lod_idx + " " + $index);
 	button -label "clear" -bgc 0.3 0.3 0.3 -c ("ModelClearLODObjects " + $lod_idx + " " + $index);
-	
-	string $obj_array[] = stringToStringArray($objects, " ");	
+
+	string $obj_array[] = stringToStringArray($objects, " ");
 	ModelSetLODObjects_internal($lod_idx, $index, $obj_array);
 }
 
@@ -325,34 +325,34 @@ global proc potato_AddModelEntry( int $index )
 
 //	print_Msg("Adding: " + $name + " " + $index);
 
-	frameLayout 
+	frameLayout
 	-l $name
-	-w 200 
-	-bs "etchedOut" 
-	-bv on 
-	-collapsable true 
-	-cl false 
+	-w 200
+	-bs "etchedOut"
+	-bv on
+	-collapsable true
+	-cl false
 	-bgc 0.3 0.3 0.45
 	-p  modelList ("exportFrame" + $index);
-	
+
 	//rowLayout -numberOfColumns 1 -columnWidth1 120 -columnAlign1 "left";
 	//	textFieldGrp -l "Name" -fi $name;
-	
+
 		formLayout -numberOfDivisions 1 -h 20 myForm;
-		
+
 			textFieldGrp -l "Name" -cc ("ModelEntryNameChanged " + $index) -fi $name ("modelName" + $index);
 			iconTextButton -st "iconOnly" -i "arrowRight" -w 16 -h 16  -c ("ModelEntryNameChanged " + $index) ("exportModelUpdate" + $index);
 			button -label "Export" -bgc 0.6 0.4 0.4 -w 80 -c ("ModelEntryExport " + $index) ("exportModel" + $index);
-			
+
 		formLayout -edit
 			-attachForm ("modelName" + $index) "top" 5
 			-attachForm ("modelName" + $index) "left" -100
 			-attachForm ("exportModelUpdate" + $index) "top" 8
 			-attachForm ("exportModelUpdate" + $index) "left" 285
 			-attachForm ("exportModel" + $index) "top" 5
-			-attachForm ("exportModel" + $index) "right" 5			
-		myForm; 
-		
+			-attachForm ("exportModel" + $index) "right" 5
+		myForm;
+
 	gridLayout -numberOfColumns 9 -cellWidthHeight 71 20 -bgc 0.2 0.2 0.2 -p ("exportFrame" + $index);
 		text -l "" -bgc 0.15 0.15 0.15;
 		text -l "Include"  -bgc 0.15 0.15 0.15;
@@ -363,7 +363,7 @@ global proc potato_AddModelEntry( int $index )
 		text -l "" -bgc 0.15 0.15 0.15;
 		text -l "" -bgc 0.15 0.15 0.15;
 		text -l "" -bgc 0.15 0.15 0.15;
-	
+
 		potato_AddModelLodEntry($index,0);
 		potato_AddModelLodEntry($index,1);
 		potato_AddModelLodEntry($index,2);
@@ -375,14 +375,14 @@ global proc potato_AddModelEntry( int $index )
 global proc potato_copyNodeLODInfo(int $lod_index, int $dest_idx, int $src_idx)
 {
 	setAttr ("PotatoGNode.Export" + $dest_idx + $lod_index) (`getAttr ("PotatoGNode.Export" + $src_idx + $lod_index)`);
-	setAttr ("PotatoGNode.Distance" + $dest_idx + $lod_index)	(`getAttr ("PotatoGNode.Distance" + $src_idx + $lod_index)`);			
+	setAttr ("PotatoGNode.Distance" + $dest_idx + $lod_index)	(`getAttr ("PotatoGNode.Distance" + $src_idx + $lod_index)`);
 	setAttr -type "string" ("PotatoGNode.ObjectList" + $dest_idx + $lod_index) (`getAttr ("PotatoGNode.ObjectList" + $src_idx + $lod_index)`);
 }
 
 global proc potato_copyNodeInfo(int $dest_idx, int $src_idx)
 {
 	setAttr -type "string" ("PotatoGNode.ModelName" + $dest_idx) (`getAttr ("PotatoGNode.ModelName" + $src_idx)`);
-	
+
 	potato_copyNodeLODInfo(0, $dest_idx, $src_idx);
 	potato_copyNodeLODInfo(1, $dest_idx, $src_idx);
 	potato_copyNodeLODInfo(2, $dest_idx, $src_idx);
@@ -413,17 +413,17 @@ global proc addModelLODToNode(int $lod_index, int $index, int $include, float $d
 	addAttr -ln ("Export" + $index + $lod_index) -at byte PotatoGNode;
 	addAttr -ln ("Distance" + $index + $lod_index) -at "float" PotatoGNode;
 	addAttr -ln ("ObjectList" + $index + $lod_index) -dt "string" PotatoGNode;
-	
+
 	setAttr ("PotatoGNode.Export" + $index + $lod_index) $include;
-	setAttr ("PotatoGNode.Distance" + $index + $lod_index) $distance;	
-	setAttr -type "string" ("PotatoGNode.ObjectList" + $index + $lod_index) "";		
+	setAttr ("PotatoGNode.Distance" + $index + $lod_index) $distance;
+	setAttr -type "string" ("PotatoGNode.ObjectList" + $index + $lod_index) "";
 }
 
 global proc addModelToNode(int $index, string $name)
 {
 	addAttr -ln ("ModelName" + $index) -dt "string" PotatoGNode;
 	setAttr -type "string" ("PotatoGNode.ModelName" + $index) $name;
-	
+
 	addModelLODToNode(0, $index, 1, 0);
 	addModelLODToNode(1, $index, 0, 800);
 	addModelLODToNode(2, $index, 0, 1600);
@@ -445,20 +445,20 @@ global proc potato_AddModel()
 		if(int(`size $name`) < 3){
 			print_Error("Name must be at least 3 chars long.");
 		} else {
-			
+
 			unlockPotatoNode();
-			
+
 			int $numModels = `getAttr PotatoGNode.numModels`;
-			
+
 				addModelToNode($numModels, $name);
 				potato_AddModelEntry($numModels);
-			
+
 			$numModels++;
-			
+
 			setAttr PotatoGNode.numModels $numModels;
 			lockPotatoNode();
 		}
-	}	
+	}
 }
 
 
@@ -469,8 +469,8 @@ global proc potato_removeModel(string $name)
 	int $numModels = `getAttr PotatoGNode.numModels`;
 	int $i;
 	int $entry_idx = -1;
-	
-	for($i = 0; $i < $numModels; $i++) 
+
+	for($i = 0; $i < $numModels; $i++)
 	{
 		string $str = `getAttr ("PotatoGNode.ModelName" + $i)`;
 		if($name == $str) {
@@ -478,17 +478,17 @@ global proc potato_removeModel(string $name)
 			break;
 		}
 	}
-	for($i = $entry_idx; $i < ($numModels-1); $i++) 
+	for($i = $entry_idx; $i < ($numModels-1); $i++)
 	{
 		potato_copyNodeInfo($i, $i+1);
 	}
-	
+
 	$numModels--;
-	
+
 	removeModelFromNode($numModels);
-	
+
 	setAttr PotatoGNode.numModels $numModels;
-	
+
 	// now we just remake the window.
 	potato_ShowModelExport();
 }
@@ -497,7 +497,7 @@ global proc potato_DoDeleteSelected()
 {
 	string $items[] = `textScrollList -q -si DeleteListCntl`;
 	int $i;
-	int $size = `size $items`;	
+	int $size = `size $items`;
 	for($i = 0; $i < $size; $i++) {
 		textScrollList -e -ri $items[$i] DeleteListCntl;
 		potato_removeModel($items[$i]);
@@ -515,43 +515,149 @@ global proc potato_DeleteEntry()
 	string $closeDialog = "deleteUI " + $name;
 	if (`window -exists $name`)
 		deleteUI $name;
-		
+
 	// build a list you goat!
 	int $numModels = `getAttr PotatoGNode.numModels`;
 	int $i;
-	
+
 	if($numModels < 1)
 		return;
-	
+
 	window  -title "Potato - Delete Entry" -wh 300 180 -s true $name;
 		formLayout -numberOfDivisions 100 -h 40 Export;
-			
+
 			textScrollList -numberOfRows $numModels -allowMultiSelection true DeleteListCntl;
 			for($i = 0; $i < $numModels; $i++) {
 				string $name = `getAttr ("PotatoGNode.ModelName" + $i)`;
 				textScrollList -e -append $name DeleteListCntl;
-			} 
-			
+			}
+
 			// Model Util Buttons
 			rowLayout -numberOfColumns 2 -height 28 -cw2 142 142  -ct2 "both" "both" -co2 1 1 -p Export deleteEntryRow;
 				button -label "Delete Selected" -align "center" -c potato_DoDeleteSelected;
-				button -label "Close" -align "center" -c $closeDialog;	
-				
+				button -label "Close" -align "center" -c $closeDialog;
+
 		formLayout -edit
 			-af DeleteListCntl left 0
 			-af DeleteListCntl right 0
 			-af DeleteListCntl top 0
-			-ac DeleteListCntl bottom 0 deleteEntryRow	
+			-ac DeleteListCntl bottom 0 deleteEntryRow
 			-af deleteEntryRow bottom 0
 			-af deleteEntryRow left 0
-		Export; 	
-	
+		Export;
+
 	showWindow $name;
+}
+
+global proc addAnimToNode(int $index, string $name)
+{
+	addAttr -ln ("AnimName" + $index) -dt "string" PotatoGNode;
+	setAttr -type "string" ("PotatoGNode.AnimName" + $index) $name;
+
+
+}
+
+global proc potato_AddAnimEntry( int $index )
+{
+	string $name = `getAttr ("PotatoGNode.AnimName" + $index)`;
+
+	frameLayout
+	-l $name
+	-w 200
+	-bs "etchedOut"
+	-bv on
+	-collapsable true
+	-cl false
+	-bgc 0.3 0.3 0.45
+	-p  AnimList ("exportAnimFrame" + $index);
+
+	formLayout -numberOfDivisions 2 -h 60 myForm;
+
+		textFieldGrp -l "Name" -cc ("AnimEntryNameChanged " + $index) -fi $name ("animName" + $index);
+		iconTextButton -st "iconOnly" -i "arrowRight" -w 16 -h 16  -c ("AnimEntryNameChanged " + $index) ("exportAnimUpdate" + $index);
+		button -label "Export" -bgc 0.6 0.4 0.4 -w 80 -c ("AnimEntryExport " + $index) ("exportAnim" + $index);
+
+		intFieldGrp -cw 2 40 -label "Start" ("exportAnimFrameStart" + $index);
+		intFieldGrp -cw 2 40 -label "End" ("exportAnimFrameEnd" + $index);
+		intFieldGrp -cw 2 40 -enable1 false -label "Frames" ("exportAnimFrames" + $index);
+
+		button -label "Set to timeline" -bgc 0.4 0.4 0.4 -w 80 -c ("AnimEntryTimeLineSet " + $index) ("exportAnimTimeLine" + $index);
+
+
+	formLayout -edit
+		-attachForm ("animName" + $index) "top" 5
+		-attachForm ("animName" + $index) "left" -100
+		-attachForm ("exportAnimUpdate" + $index) "top" 8
+		-attachForm ("exportAnimUpdate" + $index) "left" 285
+		-attachForm ("exportAnim" + $index) "top" 5
+		-attachForm ("exportAnim" + $index) "right" 5
+
+		-attachForm ("exportAnimFrameStart" + $index) "top" 30
+		-attachForm ("exportAnimFrameStart" + $index) "left"  -100
+		-attachForm ("exportAnimFrameEnd" + $index) "top" 30
+		-attachForm ("exportAnimFrameEnd" + $index) "left"  -30
+		-attachForm ("exportAnimFrames" + $index) "top" 30
+		-attachForm ("exportAnimFrames" + $index) "left"  55
+
+		-attachForm ("exportAnimTimeLine" + $index) "top" 30
+		-attachForm ("exportAnimTimeLine" + $index) "left"  245
+	myForm;
+
+	// what we need
+	// start - end frames
+	// list of nodes to export.
+	// note tracks
+
+	// frames:
+	// need to be manually set plus ability to set them to the current rage of the timeline
+
+	// nodes:
+	// setting based on selected
+	// select all bones button? (maybe have that at bottom of menu as a helper button)
+
+	// note tracks:
+	// need to be able to add events to the animations timeline.
+
+}
+
+global proc potato_AddAnim()
+{
+	string $text;
+	string $result = `promptDialog
+	    -title "Add Anim"
+	    -message "Enter Name:"
+	    -button "OK" -button "Cancel"
+	    -defaultButton "OK" -cancelButton "Cancel"
+	    -dismissString "Cancel"`;
+
+	if ($result == "OK" ) {
+		$name = `promptDialog -query -text`;
+		if(int(`size $name`) < 3){
+			print_Error("Name must be at least 3 chars long.");
+		} else {
+
+			unlockPotatoNode();
+
+			int $numAnims = `getAttr PotatoGNode.numAnims`;
+
+			print_Msg("numanim: " + $numAnims);
+
+				addAnimToNode($numAnims, $name);
+				potato_AddAnimEntry($numAnims);
+
+			$numAnims++;
+
+			print_Msg("numanim: " + $numAnims);
+
+			setAttr PotatoGNode.numAnims $numAnims;
+			lockPotatoNode();
+		}
+	}
 }
 
 global proc urlMainSite()
 {
-	system("load http://www.tom-crowley.co.uk/"); 
+	system("load http://www.tom-crowley.co.uk/");
 }
 
 global proc urlYouTube()
@@ -562,68 +668,93 @@ global proc urlYouTube()
 global proc potato_CreateExportWindow( string $name )
 {
 	string $closeDialog = "deleteUI " + $name;
-	
+
 	if (`window -exists $name`)
 		deleteUI $name;
 	if (`window -exists potato_DeleteEntry`)
 		deleteUI potato_DeleteEntry;
 
-	window  -title "Potato - Model Exporter" -wh 676 540 -s true $name;
-	
+	window  -title "Potato - Anim / Model Exporter" -wh 676 540 -s true $name;
+
 	// columnLayout -cal "center" -adj 1 -p $name mainLayout;
 	formLayout mainLayout;
-	
+
 	{
-        tabLayout -imw 5 -imh 5 -p mainLayout tabs;
+        tabLayout -imw 6 -imh 6 -p mainLayout tabs;
 
 // Export Tab
-		formLayout -numberOfDivisions 100 -h 40 Export;
-			image -w 32 -h 32 -i "potato-logo" -p Export winLogo;
-		
-			scrollLayout -p Export modelScrollArea;
+		formLayout -numberOfDivisions 100 -h 40 ModelExport;
+			image -w 32 -h 32 -i "potato-logo" -p ModelExport winLogo;
+
+			scrollLayout -p ModelExport modelScrollArea;
 			columnLayout -columnAttach "both" 0 -rowSpacing 0 -columnWidth 641 -p modelScrollArea modelList;
 
 			// Model Util Buttons
-			rowLayout -numberOfColumns 2 -height 28 -cw2 105 105  -ct2 "both" "both" -co2 1 1 -p Export ModelUtilButtons;
-		
+			rowLayout -numberOfColumns 2 -height 28 -cw2 105 105  -ct2 "both" "both" -co2 1 1 -p ModelExport ModelUtilButtons;
+
 				button -label "Add Model" -align "center" -c "potato_AddModel" -p ModelUtilButtons;
-				button -label "Delete Entry" -align "center" -c potato_DeleteEntry -p ModelUtilButtons;	
-				
-				
+				button -label "Delete Entry" -align "center" -c potato_DeleteEntry -p ModelUtilButtons;
+
+
 		formLayout -edit
 			-af winLogo "top" 2
 			-af winLogo "right" 0
 			-af modelScrollArea left 0
 			-af modelScrollArea right 0
 			-af modelScrollArea top 36
-			-ac modelScrollArea bottom 0 ModelUtilButtons	
+			-ac modelScrollArea bottom 0 ModelUtilButtons
 			-af ModelUtilButtons bottom 0
 			-af ModelUtilButtons left 0
-		Export; 	
-			
+			ModelExport;
+
+// Anim Export Tab
+
+	formLayout -numberOfDivisions 100 -h 40   -p tabs  AnimExport;
+		image -w 32 -h 32 -i "potato-logo" -p AnimExport winLogoAnim;
+
+		scrollLayout -p AnimExport AnimScrollArea;
+			columnLayout -columnAttach "both" 0 -rowSpacing 0 -columnWidth 641 -p AnimScrollArea AnimList;
+
+			// Anim Util Buttons
+			rowLayout -numberOfColumns 2 -height 28 -cw2 105 105  -ct2 "both" "both" -co2 1 1 -p AnimExport AnimUtilButtons;
+
+				button -label "Add Anim" -align "center" -c "potato_AddAnim" -p AnimUtilButtons;
+				button -label "Delete Entry" -align "center" -c potato_DeleteEntry -p AnimUtilButtons;
+
+		formLayout -edit
+			-af winLogoAnim "top" 2
+			-af winLogoAnim "right" 0
+			-af AnimScrollArea left 0
+			-af AnimScrollArea right 0
+			-af AnimScrollArea top 36
+			-ac AnimScrollArea bottom 0 AnimUtilButtons
+			-af AnimUtilButtons bottom 0
+			-af AnimUtilButtons left 0
+			AnimExport;
+
 // Path Tab
   		columnLayout -cat "both" 5 -cal "center" -adj 1 -rs 20  -p tabs Paths;
-		
+
 			frameLayout -l "Export Paths" -marginHeight 2 -marginWidth 2 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p Paths pathTabFrame1;
 				textFieldButtonGrp -l "Output Directory" -bl "..." -bc browseForDir -ed false - fi `getAttr PotatoGNode.outputDir` -p pathTabFrame1 pathsOutputDir;
 // Settings Tab
   		columnLayout -cat "both" 5 -cal "center" -adj 1 -rs 20  -p tabs Settings;
-			
+
 			frameLayout -l "Model" -marginHeight 2 -marginWidth 2 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p Settings setTabFrame1;
 				floatFieldGrp -l "Scale" -nf 1 -v1 `getAttr PotatoGNode.scale` -cc ScaleUpdate -p setTabFrame1 ScaleCntrl;
 				floatSliderGrp -l "Uv Merge Threshold" -min 0 -max 0.999 -s 0.00001 -v `getAttr PotatoGNode.uvMergeThreshold` -f true -cc uvMergeThresholdUpdate -p setTabFrame1 uvMergeThreshCntl;
-			
+
 			frameLayout -l "Bones" -marginHeight 2 -marginWidth 2 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p Settings setTabFrame2;
-				columnLayout -adj 1 -cal "center" -p setTabFrame2 setcolLayout1;			
+				columnLayout -adj 1 -cal "center" -p setTabFrame2 setcolLayout1;
 					floatSliderGrp -l "Weight Threshold" -min 0 -max 0.999 -s 0.001 -v `getAttr PotatoGNode.weightThreshold` -f true -cc weightThresholdUpdate -p setcolLayout1 weightThreshCntl;
 					checkBoxGrp -l "Zero-out origin" -value1 `getAttr PotatoGNode.zeroOrigin` -cc zeroOutOriginUpdate -p setcolLayout1 zeroOriginCntrl;
-					
+
 				rowLayout -nc 2 -cw2 140 140 -p setTabFrame2 boneForceRow;
 					columnLayout -cal "right" -w 137 -h 60 -p boneForceRow colLayoutBone;
 						text -w 137 -l "Force Include bones" -al "right" -p colLayoutBone;
 					scrollField -w 160 -h 60 -tx `getAttr PotatoGNode.forceBoneFilters` -cc forceBoneFiltersUpdate -p boneForceRow forceBoneFiltersCntrl;
-						
-					
+
+
 // Help Tab
 		string $help;
 		$help += "How To Export:\n";
@@ -635,92 +766,92 @@ global proc potato_CreateExportWindow( string $name )
 		$help += "\n";
 		$help += "Settings:\n";
 		$help += "	-Model\n";
-		$help += " 		scale: 				scales the model and bones, Maya scene is unaffected\n";	
-		$help += "	-Bones\n";		
-		$help += " 		weight threshold: 	vertex weights below this value are ignored\n";	
-		$help += " 		zero-out orign: 	places the root of the model at (0,0,0)\n";	
+		$help += " 		scale: 				scales the model and bones, Maya scene is unaffected\n";
+		$help += "	-Bones\n";
+		$help += " 		weight threshold: 	vertex weights below this value are ignored\n";
+		$help += " 		zero-out orign: 	places the root of the model at (0,0,0)\n";
 		$help += " 		force inc bones: 	forces bones matching any of the filters to be included\n";
 		$help += "\n";
-		$help += "Model Info:\n";	
-		$help += " 	-All models must be polygons.\n"; 
+		$help += "Model Info:\n";
+		$help += " 	-All models must be polygons.\n";
 		$help += " 	-The plugin supports polygons with more than 3 verts per face,\n";
 		$help += " 		it will convert them to triangles for you.\n";
-		$help += " 	-Binded bones are automatically added.\n"; 
-		$help += " 	-Bones with no binds to the selected export meshes will not be included,\n"; 
+		$help += " 	-Binded bones are automatically added.\n";
+		$help += " 	-Bones with no binds to the selected export meshes will not be included,\n";
 		$help += " 		unless thier name matches on of the force-inc bone filters set in settings..\n";
-		$help += " 	-You can skip 'include LOD0' as long as atleast one lod is included. it just places\n"; 
+		$help += " 	-You can skip 'include LOD0' as long as atleast one lod is included. it just places\n";
 		$help += " 		the first included lod as LOD0 automatically, the next as LOD1 and so on.\n";
-		$help += " 	-LOD distance of 0 is equivalent to unlimted.\n"; 
-		$help += " 	-LOD distances must be positive and increased in distance.\n"; 
-		$help += " 	-Meshes with identical materials may be merged automatically,\n"; 
-		$help += " 		making it possible to have more than 64 meshes set per a lod in somecases.\n"; 
-		$help += " 	-Meshes with no binds are automatically binded to the root bone\n"; 				
+		$help += " 	-LOD distance of 0 is equivalent to unlimted.\n";
+		$help += " 	-LOD distances must be positive and increased in distance.\n";
+		$help += " 	-Meshes with identical materials may be merged automatically,\n";
+		$help += " 		making it possible to have more than 64 meshes set per a lod in somecases.\n";
+		$help += " 	-Meshes with no binds are automatically binded to the root bone\n";
 		$help += "\n";
 		$help += "Limits:\n";
 		$help += " 	Max Verts:  	65535 (per mesh)\n";
-		$help += " 	Max Triangles:  65535 (per mesh)\n";		
-		$help += " 	Max Meshes:  	64 (per a LOD)\n";	
+		$help += " 	Max Triangles:  65535 (per mesh)\n";
+		$help += " 	Max Meshes:  	64 (per a LOD)\n";
 		$help += " 	Max Bones:  	255\n";
 		$help += "\n";
 		$help += "Jargon:\n";
-		$help += " 	LOD:			'Level of Detail' LOD0 should the highest quality version of the model,\n";		
-		$help += " 	 				with each LOD having less verts, LOD3 having the least detail.\n";		
+		$help += " 	LOD:			'Level of Detail' LOD0 should the highest quality version of the model,\n";
+		$help += " 	 				with each LOD having less verts, LOD3 having the least detail.\n";
 		$help += " 	LOD(Distance): 	The distance at which the model is switched to the LOD.\n";
-		$help += " 	 				for example a LOD0 with 800 distance means at 800 LOD1 is used(if included), \n";	
-		$help += " 	 				LOD1 with 1600 distance means LOD1 is used untill distance is 1600. \n";	
-		
+		$help += " 	 				for example a LOD0 with 800 distance means at 800 LOD1 is used(if included), \n";
+		$help += " 	 				LOD1 with 1600 distance means LOD1 is used untill distance is 1600. \n";
+
 		// THE TAB!
 		// columnLayout  -cal "center" -adj 1 -rs 20  -p tabs Help;
 		formLayout -numberOfDivisions 100 -h 40 -p tabs Help;
-		
+
 			scrollField -text $help -ed 0 helpScrollArea;
 			rowLayout -numberOfColumns 1 -height 2 -cw1 105 -ct1 "both" -co1 1  -p Help fakerow;
-			
+
 		formLayout -edit
 			-af helpScrollArea left 0
 			-af helpScrollArea right 0
 			-af helpScrollArea top 1
-			-ac helpScrollArea bottom 0 fakerow	
+			-ac helpScrollArea bottom 0 fakerow
 			-af fakerow bottom 0
 			-af fakerow left 0
-		Help; 
-		
+		Help;
+
 // About Tab
   		columnLayout -cat "both" 5 -cal "center" -adj 1 -rs 20  -p tabs About;
-		    
+
 			frameLayout -l "Info" -marginHeight 5 -marginWidth 5 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p About aboutTabFrame1;
-				
+
 				string $info;
 				$info += "Potato Engine - Export Plugin\n";
 				$info += " Version  :\t 1.0\n";
-				$info += " File Ext :\t .model\n";	
-				$info += " Made By  :\t Tom Crowley\n\n";		
+				$info += " File Ext :\t .model\n";
+				$info += " Made By  :\t Tom Crowley\n\n";
 				scrollField -w 300 -h 100 -text $info -ed 0 -p aboutTabFrame1;
-			
+
 			frameLayout  -l "Websites" -marginHeight 5 -marginWidth 5 -bs "etchedOut" -bv on -collapsable true -p About aboutTabFrame2;
 				columnLayout -adj 1 -h 60 -cal "center" -p aboutTabFrame2 colLayout1;
 					button -l "tom-crowley.co.uk" -p colLayout1 -c urlMainSite;
-					button -l "YouTube" -p colLayout1 -c urlYouTube; 
-					
+					button -l "YouTube" -p colLayout1 -c urlYouTube;
+
 	}
-	
+
 	rowLayout -numberOfColumns 3 -height 28 -cw3 105 105 105 -ct3 "both" "both" "both" -co3 1 1 1 -p mainLayout mainButtons;
 		button -label "Export All" -align "center" -bgc 0.7 0.3 0.3 -c potato_ExportAll;
 		button -label "Reset Settings" -align "center" -c potato_resetSettings;
-		button -label "Close" -align "center" -c $closeDialog;	
-	
+		button -label "Close" -align "center" -c $closeDialog;
+
 	rowLayout -numberOfColumns 1 -height 28 -cw1 160 -ct1 "both" -co1 1 -p mainLayout exportProgressRow;
 		progressBar -w 120 -min 0 -max 7 PotatoExportProgress;
-	
+
 	formLayout -edit
          -af tabs left 0
          -af tabs right 0
          -af tabs top 0
-         -ac tabs bottom 0 mainButtons	
+         -ac tabs bottom 0 mainButtons
          -af mainButtons bottom 1
          -af mainButtons left 1
          -af exportProgressRow bottom 1
-         -af exportProgressRow right 1		
+         -af exportProgressRow right 1
 	mainLayout;
 }
 
@@ -733,6 +864,12 @@ global proc potato_AddSavedItems()
 	{
 		potato_AddModelEntry($i);
 	}
+
+	$num = `getAttr PotatoGNode.numAnims`;
+	for($i =0; $i < $num; $i++)
+	{
+		potato_AddAnimEntry($i);
+	}
 }
 
 global proc potato_ShowModelExport()
@@ -742,13 +879,18 @@ global proc potato_ShowModelExport()
 
 	string $name = "potato_ExportWindow";
 	potato_CreateExportWindow $name;
-		
+
 	// add any items stored in settings.
 	potato_AddSavedItems();
-	
+
 	showWindow $name;
 }
 
+
+global proc potato_ShowAnimExport()
+{
+
+}
 
 global proc CreateMenu()
 {
@@ -758,25 +900,26 @@ global proc CreateMenu()
 	string $tokName[];
 	string $mayaMode = `setMenuMode`;
 	string $site = "system(\"load http://www.tom-crowley.co.uk/ \")";
-       
+
 	if(`menu -exists PotatoToolsMenu`)
 	deleteUI -menu PotatoToolsMenu;
 
 	setParent $gMainWindow;
 
-	menu 
-	-label "Potato - Tools" 
-	-parent $gMainWindow 
+	menu
+	-label "Potato - Tools"
+	-parent $gMainWindow
 	-allowOptionBoxes false
 	-tearOff true
 	PotatoToolsMenu;
 
 	setParent -menu ..;
 
-	menuItem -label "Model Exporter" -command "potato_ShowModelExport";
+	menuItem -label "Exporter" -command "potato_ShowModelExport";
+//	menuItem -label "Anim Exporter" -command "potato_ShowAnimExport"; // flex dem pecs
 	menuItem -divider true;
 	menuItem -label "Site" -command $site;
-    
+
 	hotBox -updateMenus;
 }
 
@@ -789,30 +932,30 @@ global proc potato_resetSettingsALL() // clears everything, for my use not calle
 
 global proc potato_resetSettings()
 {
-	$response = `confirmDialog -title "Confirm Setting Reset" 
+	$response = `confirmDialog -title "Confirm Setting Reset"
 			              -message "Are you sure you want to reset settings?"
-			              -button "Yes" 
+			              -button "Yes"
 			              -button "No"
 			              -defaultButton "Yes"
 			              -cancelButton "No"
 			              -dismissString "No"`;
-		
-		// check response	  
-	if( $response != "Yes" ) 
+
+		// check response
+	if( $response != "Yes" )
 		return;
-		
+
 	unlockPotatoNode();
-	
+
 	// we only want to reset settings not model entry.
 	setAttr PotatoGNode.outputDir -type "string" "";
 	setAttr PotatoGNode.scale 1.0;
 	setAttr PotatoGNode.weightThreshold 0.005;
 	setAttr PotatoGNode.uvMergeThreshold 0.02;
-	setAttr PotatoGNode.zeroOrigin 1;	
-	setAttr PotatoGNode.forceBoneFilters -type "string" "tag_";		
-	
+	setAttr PotatoGNode.zeroOrigin 1;
+	setAttr PotatoGNode.forceBoneFilters -type "string" "tag_";
+
 	lockPotatoNode();
-	
+
 	potato_ShowModelExport();
 }
 
@@ -821,20 +964,22 @@ global proc initNodeDefaults()
 	if ( !`attributeExists numModels PotatoGNode`)
 	{
 		addAttr -ln numModels -at byte PotatoGNode;
+		addAttr -ln numAnims -at byte PotatoGNode;
 		addAttr -ln outputDir -dt "string" PotatoGNode;
 		addAttr -ln scale -at "float" -min 0.001 -max 1000 -dv 1.0 PotatoGNode;
 		addAttr -ln weightThreshold -at "float" -min 0.00001 -max 0.999 -dv 0.005 PotatoGNode;
 		addAttr -ln uvMergeThreshold -at "float" -min 0.000001 -max 0.999 -dv 0.005 PotatoGNode;
 		addAttr -ln zeroOrigin -min 0 -max 1 -dv 1 PotatoGNode;
 		addAttr -ln forceBoneFilters -dt "string" PotatoGNode;
-		
+
 		setAttr PotatoGNode.numModels 0;
+		setAttr PotatoGNode.numAnims 0;
 		setAttr PotatoGNode.outputDir -type "string" "";
 		setAttr PotatoGNode.scale 1;
 		setAttr PotatoGNode.weightThreshold 0.005;
 		setAttr PotatoGNode.uvMergeThreshold 0.02;
 		setAttr PotatoGNode.zeroOrigin 1;
-		setAttr PotatoGNode.forceBoneFilters -type "string" "tag_";		
+		setAttr PotatoGNode.forceBoneFilters -type "string" "tag_";
 	}
 }
 
@@ -845,7 +990,7 @@ global proc ensureNode()
 		createNode "renderLayer" -n "PotatoGNode";
 		initNodeDefaults();
 	}
-	
+
 	lockNode PotatoGNode;
 	select -cl;
 }
@@ -855,7 +1000,7 @@ global proc unlockPotatoNode()
 	int $lockCheck[];
 	$lockCheck = `lockNode -q PotatoGNode`;
 	if($lockCheck[0])
-		lockNode -lock off PotatoGNode;		
+		lockNode -lock off PotatoGNode;
 }
 
 global proc lockPotatoNode()
@@ -866,7 +1011,10 @@ global proc lockPotatoNode()
 global proc poatoCreateUI()
 {
 	CreateMenu();
-	
+
 	// show it for debug
 	potato_ShowModelExport();
+//	potato_ShowAnimExport();
 }
+
+
