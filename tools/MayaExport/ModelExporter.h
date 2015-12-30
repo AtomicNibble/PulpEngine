@@ -15,8 +15,6 @@
 #include <IModel.h>
 
 
-extern core::MemoryArenaBase* g_arena;
-
 class MFnDagNode;
 
 struct ModelStats

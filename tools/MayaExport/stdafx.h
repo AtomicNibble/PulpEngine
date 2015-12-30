@@ -21,3 +21,6 @@
 
 #include <maya/MStatus.h>
 #include <maya/MObject.h>
+
+
+extern core::MemoryArenaBase* g_arena;
