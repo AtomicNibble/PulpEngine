@@ -8,22 +8,57 @@
 
 X_NAMESPACE_BEGIN(anim)
 
-// The Model Foramts
+// The Anim Foramts
 //
 //  File Ext: .anim
 //	Version: 1.0
 //  Info:
 //  
-//  This format contains the animation data
+//  for each tag we have a list of names.
+//	The data is in the same order as the data.
+//	And there is same data as num tags.
+//	for the tag with a name at index 5 it's data is at index 5 of the tag data.
 //	
+//	Animation data is relative to bone positions.
+//	So requires the default pose skelton to compile against.
+//	
+//	Tag Data:
+//		The amount of frames we have data for is diffrent for pos / angle.
+//		Meaning a tag can have full frame position data but part frame angles data
+//		If we have data for every frame, we don't store frame indexs.
+//		Angle data comes first then position data.
+//		Both angle and position data are optional.
 //
+//	Angles:
+//		Angles are compressed Quatanions with the w dropped.
+//		So angles become 3 16bit ints.
+//		Optionaly a tag can be defined as having only z rotation.
+//		Meaning for that tag there is only one 16bit int per angle.
 //
+//	Positions:
+//		if we have only one position it's a vec3f
+//		otherwise we have two vec3f start - range
+//		followed by translate frames which can be either 8bit or 16bit (flag per tag)
+//		which is a value between 0-1 that is used to scale the range.
+//		there are 3 scalers pe frame one for each axis x,y,z
+//		Example:
+//			start + (range * frameScale);
 //
+//	Notes:
+//		notes area at the end of the file if the flag NOTES is present.
+//		they have a 16bit frame number and note name.
+//		they are sorted in frame order.
+//		multiple notes can occur on the same frame.
 //
 
 static const uint32_t	 ANIM_VERSION = 1;
 static const uint32_t	 ANIM_MAX_BONES = 255;
+static const uint32_t	 ANIM_MAX_FRAMES = 4096; // can be increased up to (1 << 16) -1
 static const uint32_t	 ANIM_MAX_FPS = 90;
+static const uint32_t	 ANIM_MAX_NOTES = 255;
+static const uint32_t	 ANIM_MAX_NOT_NAME_LENGTH = 48; // the max lengt of each notes name
+static const uint32_t	 ANIM_MAX_NAME_LENGTH = 60;
+static const char*		 ANIM_FILE_EXTENSION = "anim";
 
 
 #ifdef RELATIVE
@@ -33,16 +68,12 @@ static const uint32_t	 ANIM_MAX_FPS = 90;
 #undef ABSOLUTE
 #endif
 
-struct AnimType
-{
-	enum Enum : uint8_t
-	{
-		RELATIVE,
-		ABSOLUTE
-	};
-};
 
-
+X_DECLARE_ENUM8(AnimType)(RELATIVE, ABSOLUTE);
+X_DECLARE_FLAGS8(AnimFlag)(
+	LOOP,
+	NOTES // got notes
+);
 
 struct tagData
 {
@@ -55,15 +86,20 @@ struct tagData
 
 struct AnimHeader
 {
-	uint8_t			version;
-	uint8_t			flags;
-	AnimType::Enum	type;
-	uint8_t			numJoints;
-	uint16_t		numFrames;
-	uint16_t		fps;
+	// 4
+	uint8_t				version;
+	Flags8<AnimFlag>	flags;
+	AnimType::Enum		type;
+	uint8_t				numJoints;
+	// 4
+	uint16_t			numFrames;
+	uint16_t			fps;
+
 
 };
 
+
+X_ENSURE_SIZE(AnimHeader, 8);
 
 
 X_NAMESPACE_END
