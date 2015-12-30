@@ -40,12 +40,13 @@ X_ENABLE_WARNING(4702)
 #include <Threading\Thread.h>
 
 #include "Profiler.h"
+#include "MayaUtil.h"
+
+using namespace MayaUtil;
 
 double MayaProfiler::s_frequency = 0.0;
 
 struct SCoreGlobals* gEnv = nullptr;
-
-bool g_StartOfBlock = false; // used for logging formating.
 
 
 X_LINK_LIB(X_STRINGIZE(MAYA_SDK) "\\Foundation")
@@ -67,60 +68,6 @@ namespace
 
 	::std::ostream& operator<<(::std::ostream& os, const Vec3f& bar) {
 		return os << "(" << bar.x << ", " << bar.y << ", " << bar.z << ")";
-	}
-
-	static void MayaPrintError(const char *fmt, ...)
-	{
-		va_list	argptr;
-		char	msg[2048];
-
-		va_start(argptr, fmt);
-		vsnprintf_s(msg, sizeof(msg), fmt, argptr);
-		va_end(argptr);
-
-
-		if (g_StartOfBlock) {
-			std::cout << "\n";
-			g_StartOfBlock = false;
-		}
-
-		std::cerr << "Error: " << msg << std::endl;
-		MGlobal::displayError(msg);
-	}
-
-	static void MayaPrintWarning(const char *fmt, ...)
-	{
-		va_list	argptr;
-		char	msg[2048];
-
-		va_start(argptr, fmt);
-		vsnprintf_s(msg, sizeof(msg), fmt, argptr);
-		va_end(argptr);
-
-		if (g_StartOfBlock) {
-			std::cout << "\n";
-			g_StartOfBlock = false;
-		}
-
-		std::cerr << "Warning: " << msg << std::endl;
-		MGlobal::displayWarning(msg);
-	}
-
-	static void MayaPrintMsg(const char *fmt, ...)
-	{
-		va_list	argptr;
-		char	msg[2048];
-
-		va_start(argptr, fmt);
-		vsnprintf_s(msg, sizeof(msg), fmt, argptr);
-		va_end(argptr);
-
-		if (g_StartOfBlock) {
-			std::cout << "\n";
-			g_StartOfBlock = false;
-		}
-
-		std::cout << msg << std::endl;
 	}
 
 
@@ -462,13 +409,16 @@ void PotatoOptions::setcmdArgs(const MArgList &args)
 		}
 	}
 
+	MString progressCntl;
+
 	idx = args.flagIndex("progress");
 	if (idx != MArgList::kInvalidArgIndex) {
-		if (!args.get(++idx, progressCntl_)) {
+		if (!args.get(++idx, progressCntl)) {
 			MayaPrintWarning("failed to get progress cntl flag");
 		}
 	}
 
+	MayaUtil::SetProgressCtrl(progressCntl);
 
 	// use the scale to make it cm -> inches.
 	// this applyies it post user scale.
@@ -487,7 +437,6 @@ void PotatoOptions::reset(void)
 	zeroOrigin_ = true;
 	whiteVertColors_ = true;
 	forceBoneFilters_.clear();
-	progressCntl_.clear();
 	exportMode_ = EXPORT_INPUT;
 	unitOfMeasurement_ = INCHES;
 }
@@ -2059,8 +2008,6 @@ bool MayaModel::save(const char *filename)
 
 // --------------------------------------------
 
-bool PotatoExporter::s_progressActive = false;
-
 PotatoExporter::PotatoExporter()
 {
 	MayaPrintMsg("=========== Exporting Model ===========");
@@ -2231,66 +2178,6 @@ MStatus PotatoExporter::convert()
 //	SetProgressText("Finished"); // rekt
 	return status;
 }
-
-
-MStatus PotatoExporter::ShowProgressDlg()
-{
-	using namespace std;
-	if (g_options.progressCntl_.length() > 0) {
-		MGlobal::executeCommand("progressBar -e -pr 0 " + g_options.progressCntl_);
-	}
-	else if (!s_progressActive) {
-		MString title = X_ENGINE_NAME" Engine - Saving Model";
-		MString process = "Starting...                                            ";
-
-		int amount = 0;
-		int maxProgress = 8;
-
-		if (!MProgressWindow::reserve()) {
-			MGlobal::displayError("Progress window already in use.");
-			return MS::kFailure;
-		}
-
-		CHECK_MSTATUS_AND_RETURN_IT(MProgressWindow::setProgressRange(amount, maxProgress))
-		CHECK_MSTATUS_AND_RETURN_IT(MProgressWindow::setTitle(title));
-		CHECK_MSTATUS_AND_RETURN_IT(MProgressWindow::setInterruptable(false));
-		CHECK_MSTATUS_AND_RETURN_IT(MProgressWindow::setProgress(amount));
-		CHECK_MSTATUS_AND_RETURN_IT(MProgressWindow::setProgressStatus(process));
-		CHECK_MSTATUS_AND_RETURN_IT(MProgressWindow::startProgress());
-	
-		CHECK_MSTATUS(MProgressWindow::advanceProgress(1));
-
-
-		s_progressActive = true;
-	}
-	return MS::kSuccess;
-}
-
-
-MStatus PotatoExporter::HideProgressDlg()
-{
-	using namespace std;
-	if (s_progressActive) {
-		s_progressActive = false;
-		CHECK_MSTATUS_AND_RETURN_IT(MProgressWindow::endProgress());
-	}
-
-	return MS::kSuccess;
-}
-
-void PotatoExporter::SetProgressText(MString str)
-{
-	g_StartOfBlock = true;
-
-	if (g_options.progressCntl_.length() > 0) {
-		MGlobal::executeCommand("progressBar -e -s 1 " + g_options.progressCntl_);
-	} else {
-		MProgressWindow::setProgressStatus(str);
-		MProgressWindow::advanceProgress(1);
-	}
-	std::cout << str.asChar() << ":";
-}
-
 
 // >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>|
 

@@ -116,7 +116,6 @@ public:
 	bool  whiteVertColors_;
 	bool  _pad[2];
 	MString forceBoneFilters_;
-	MString progressCntl_;
 	ExpoMode exportMode_;
 	UnitOfMeasureMent unitOfMeasurement_;
 };
@@ -294,9 +293,6 @@ public:
 
 	MStatus convert();
 
-	static MStatus ShowProgressDlg();
-	static MStatus HideProgressDlg();
-	static void SetProgressText(MString str);
 private:
 	MStatus getExportObjects(void);
 	MStatus getInputObjects(void);
@@ -304,8 +300,6 @@ private:
 
 private:
 	MayaModel  model_;
-
-	static bool s_progressActive;
 };
 
 

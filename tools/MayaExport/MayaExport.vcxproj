@@ -1083,6 +1083,7 @@
   <ItemGroup>
     <ClInclude Include="AnimExport.h" />
     <ClInclude Include="Hierarchy.h" />
+    <ClInclude Include="MayaUtil.h" />
     <ClInclude Include="ModelExporter.h" />
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="stdafx.h" />
@@ -1171,6 +1172,7 @@
       </PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="MayaExport.cpp" />
+    <ClCompile Include="MayaUtil.cpp" />
     <ClCompile Include="ModelExporter.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_2012|Win32'">Create</PrecompiledHeader>
