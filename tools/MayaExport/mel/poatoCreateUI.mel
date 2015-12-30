@@ -578,6 +578,11 @@ global proc int[] getTimeLineRange()
 	return $res;
 }
 
+global proc setTimeLineRange(float $start, float $end)
+{
+	playbackOptions -minTime $start -maxTime $end;
+}
+
 global proc AnimEntryTimeLineSet(int $index)
 {
 	print_Msg("set timeline for animation index: " + $index);
@@ -597,18 +602,69 @@ global proc AnimEntryTimeLineSet(int $index)
 	intFieldGrp -e -value1 $numFrames ("exportAnimFrames" + $index);
 }
 
+global proc AnimEntrySetNodes_internal(int $index, string $nodes[])
+{
+	string $nodes_str = "";
+
+	for($obj in $nodes) {
+		$nodes_str = $nodes_str + $obj + " ";
+	}
+
+	if (`size $nodes`)
+	{
+		int $num = size($nodes);
+
+		intFieldGrp -e -value1 $num ("exportAnimNodes" + $index);
+
+		setAttr -type "string" ("PotatoGNode.AnimNodes" + $index) $nodes_str;
+	}
+}
+
 global proc AnimEntrySetNodes(int $index)
 {
 	print_Msg("set nodes for animation index: " + $index);
 
-
+	string $Selected[] = `ls -type joint`;
+	if (`size $Selected`) {
+		AnimEntrySetNodes_internal($index, $Selected);
+	} else {
+		print_Warn("unable to set nodes. no valid nodes selected");
+	}
 }
 
 global proc AnimEntrySelectNodes(int $index)
 {
 	print_Msg("select nodes for animation index: " + $index);
 
+	// get slammed.
+	string $nodes = `getAttr ("PotatoGNode.AnimNodes" + $index)`;
+	string $nodesArray[];
 
+	string $validNodes;
+	string $deletedNodes;
+
+
+	int $idx;
+	int $num = `tokenize $nodes " " $nodesArray`;
+
+	if ( $num > 1 ) {
+		for ( $idx = 0; $idx < $num; $idx++ ) {
+			if( `objExists $nodesArray[$idx]` )
+				$validNodes += $nodesArray[$idx] + " ";
+			else
+				$deletedNodes += $nodesArray[$idx] + " ";
+		}
+	} else {
+		$validNodes = $nodes;
+	}
+
+	$res = ("select -r " + $validNodes);
+	eval $res;
+
+	if ( $deletedNodes != "" )
+	{
+		// objects added previously that no longer exsist.
+	}
 }
 
 global proc potato_AddAnimEntry( int $index )
@@ -692,6 +748,11 @@ global proc potato_AddAnimEntry( int $index )
 	intFieldGrp -e -value1 $start ("exportAnimFrameStart" + $index);
 	intFieldGrp -e -value1 $end ("exportAnimFrameEnd" + $index);
 	intFieldGrp -e -value1 $numFrames ("exportAnimFrames" + $index);
+
+	// nodes
+	string $nodes = `getAttr ("PotatoGNode.AnimNodes" + $index)`;
+	string $nodes_array[] = stringToStringArray($nodes, " ");
+	AnimEntrySetNodes_internal($index, $nodes_array);
 }
 
 global proc potato_AddAnim()
