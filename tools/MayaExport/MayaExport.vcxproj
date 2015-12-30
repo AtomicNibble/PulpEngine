@@ -1081,6 +1081,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AnimExport.h" />
     <ClInclude Include="Hierarchy.h" />
     <ClInclude Include="ModelExporter.h" />
     <ClInclude Include="Profiler.h" />
@@ -1088,6 +1089,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AnimExport.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug_2012|Win32'">false</CompileAsManaged>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug_2013|Win32'">false</CompileAsManaged>
