@@ -667,6 +667,46 @@ global proc AnimEntrySelectNodes(int $index)
 	}
 }
 
+global proc string animGetName(int $index) {
+	return `textFieldGrp -q -fi ("animName" + $index)`;
+}
+
+global proc AnimEntryExport(int $index)
+{
+	string $nodes = `getAttr ("PotatoGNode.AnimNodes" + $index)`;
+	int $start = `getAttr ("PotatoGNode.AnimStart" + $index)`;
+	int $end = `getAttr ("PotatoGNode.AnimEnd" + $index)`;
+	int $numFrames =  $end -  $start;
+
+	if($numFrames < 1) {
+		print_Error("Can't export anim " + animGetName($index) + " has zero frames");
+		return;
+	}
+
+	string $args;
+
+	$args += "Nodes \"" + $nodes + "\"";
+	$args += " Start " + $start;
+	$args += " End " + $end;
+
+	// make the command
+	string $filename = animGetName($index);
+	string $Dir = `getAttr ("PotatoGNode.outputDir")`;
+	string $options = "-progress PotatoExportProgress -dir \"" + $Dir + "\"";
+	string $command = "PotatoExportAnim " + $args + " -f \"" + $filename + "\" "+ $options;
+
+	print_Msg("cmd: " + $command);
+
+	if(int(`size $Dir`) < 1)
+	{
+		print_Error("No export dir set! set a path in the paths tab.");
+		return;
+	}
+
+	string $errorMsg;
+	$error = catch ( $errorMsg = eval( $command ) );
+}
+
 global proc potato_AddAnimEntry( int $index )
 {
 	string $name = `getAttr ("PotatoGNode.AnimName" + $index)`;
