@@ -526,7 +526,7 @@ global proc potato_DeleteEntry()
 	window  -title "Potato - Delete Entry" -wh 300 180 -s true $name;
 		formLayout -numberOfDivisions 100 -h 40 Export;
 
-			textScrollList -numberOfRows $numModels -allowMultiSelection true DeleteListCntl;
+			textScrollList -numberOfRows $numModels -allowMultiSelection true -h 190 DeleteListCntl;
 			for($i = 0; $i < $numModels; $i++) {
 				string $name = `getAttr ("PotatoGNode.ModelName" + $i)`;
 				textScrollList -e -append $name DeleteListCntl;
@@ -551,8 +551,62 @@ global proc potato_DeleteEntry()
 
 global proc addAnimToNode(int $index, string $name)
 {
+	// for each anim we need to save:
+	// * name
+	// * start frame
+	// * end frame
+	// * node names
 	addAttr -ln ("AnimName" + $index) -dt "string" PotatoGNode;
-	setAttr -type "string" ("PotatoGNode.AnimName" + $index) $name;
+	addAttr -ln ("AnimStart" + $index) -at long PotatoGNode;
+	addAttr -ln ("AnimEnd" + $index) -at long PotatoGNode;
+	addAttr -ln ("AnimNodes" + $index) -dt "string" PotatoGNode;
+
+	// assign defaults.
+	setAttr ("PotatoGNode.AnimName" + $index) -type "string" $name;
+	setAttr ("PotatoGNode.AnimStart" + $index) 0;
+	setAttr ("PotatoGNode.AnimEnd" + $index) 0;
+	setAttr ("PotatoGNode.AnimNodes" + $index) -type "string" "";
+}
+
+
+global proc int[] getTimeLineRange()
+{
+	float $minTime = `playbackOptions -q -minTime`;
+	float $maxTime = `playbackOptions -q -maxTime`;
+
+	int $res[] = { (int)(floor ($minTime)), (int)(ceil( $maxTime)) };
+	return $res;
+}
+
+global proc AnimEntryTimeLineSet(int $index)
+{
+	print_Msg("set timeline for animation index: " + $index);
+
+	$timeLine = getTimeLineRange();
+	print_Msg("current timeline: " + $timeLine[0] + ", " + $timeLine[1]);
+
+	// update settings
+	setAttr ("PotatoGNode.AnimStart" + $index)  $timeLine[0];
+	setAttr ("PotatoGNode.AnimEnd" + $index)  $timeLine[1];
+
+	// update UI
+	intFieldGrp -e -value1 $timeLine[0] ("exportAnimFrameStart" + $index);
+	intFieldGrp -e -value1 $timeLine[1] ("exportAnimFrameEnd" + $index);
+
+	$numFrames =  $timeLine[1] -  $timeLine[0];
+	intFieldGrp -e -value1 $numFrames ("exportAnimFrames" + $index);
+}
+
+global proc AnimEntrySetNodes(int $index)
+{
+	print_Msg("set nodes for animation index: " + $index);
+
+
+}
+
+global proc AnimEntrySelectNodes(int $index)
+{
+	print_Msg("select nodes for animation index: " + $index);
 
 
 }
@@ -571,17 +625,22 @@ global proc potato_AddAnimEntry( int $index )
 	-bgc 0.3 0.3 0.45
 	-p  AnimList ("exportAnimFrame" + $index);
 
-	formLayout -numberOfDivisions 2 -h 60 myForm;
+	formLayout -numberOfDivisions 2 -h 90 myForm;
 
 		textFieldGrp -l "Name" -cc ("AnimEntryNameChanged " + $index) -fi $name ("animName" + $index);
 		iconTextButton -st "iconOnly" -i "arrowRight" -w 16 -h 16  -c ("AnimEntryNameChanged " + $index) ("exportAnimUpdate" + $index);
 		button -label "Export" -bgc 0.6 0.4 0.4 -w 80 -c ("AnimEntryExport " + $index) ("exportAnim" + $index);
 
+		// time line stuff
 		intFieldGrp -cw 2 40 -label "Start" ("exportAnimFrameStart" + $index);
 		intFieldGrp -cw 2 40 -label "End" ("exportAnimFrameEnd" + $index);
 		intFieldGrp -cw 2 40 -enable1 false -label "Frames" ("exportAnimFrames" + $index);
-
 		button -label "Set to timeline" -bgc 0.4 0.4 0.4 -w 80 -c ("AnimEntryTimeLineSet " + $index) ("exportAnimTimeLine" + $index);
+
+		// nodes
+		button -label "Set from selected" -bgc 0.4 0.4 0.4 -w 110 -c ("AnimEntrySetNodes " + $index) ("exportAnimSetNodes" + $index);
+		button -label "Select export nodes" -bgc 0.4 0.4 0.4 -w 110 -c ("AnimEntrySelectNodes " + $index) ("exportAnimSelectNodes" + $index);
+		intFieldGrp -cw 2 40 -enable1 false -label "Nodes" ("exportAnimNodes" + $index);
 
 
 	formLayout -edit
@@ -601,6 +660,13 @@ global proc potato_AddAnimEntry( int $index )
 
 		-attachForm ("exportAnimTimeLine" + $index) "top" 30
 		-attachForm ("exportAnimTimeLine" + $index) "left"  245
+
+		-attachForm ("exportAnimSetNodes" + $index) "top" 60
+		-attachForm ("exportAnimSetNodes" + $index) "left"  10
+		-attachForm ("exportAnimSelectNodes" + $index) "top" 60
+		-attachForm ("exportAnimSelectNodes" + $index) "left"  125
+		-attachForm ("exportAnimNodes" + $index) "top" 60
+		-attachForm ("exportAnimNodes" + $index) "left"  130
 	myForm;
 
 	// what we need
@@ -618,6 +684,14 @@ global proc potato_AddAnimEntry( int $index )
 	// note tracks:
 	// need to be able to add events to the animations timeline.
 
+	// set values.
+	int $start = `getAttr ("PotatoGNode.AnimStart" + $index)`;
+	int $end = `getAttr ("PotatoGNode.AnimEnd" + $index)`;
+	int $numFrames =  $end -  $start;
+
+	intFieldGrp -e -value1 $start ("exportAnimFrameStart" + $index);
+	intFieldGrp -e -value1 $end ("exportAnimFrameEnd" + $index);
+	intFieldGrp -e -value1 $numFrames ("exportAnimFrames" + $index);
 }
 
 global proc potato_AddAnim()
