@@ -4,6 +4,7 @@
 #include <maya/MFnPlugin.h>
 
 #include "ModelExporter.h"
+#include "AnimExport.h"
 
 #include <IModel.h>
 #include <String\StackString.h>
@@ -68,7 +69,15 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 
 	if (stat != MS::kSuccess) {
 		stat.perror("Error - initializePlugin");
+		return stat;
 	}
+
+	stat = plugin.registerCommand("PotatoExportAnim", AnimExporterCmd::creator);
+
+	if (stat != MS::kSuccess) {
+		stat.perror("Error - initializePlugin");
+	}
+
 	return stat;
 }
 
@@ -86,6 +95,13 @@ MODELEX_EXPORT MStatus uninitializePlugin(MObject obj)
 #endif
 
 	stat = plugin.deregisterCommand("PotatoExportModel");
+
+	if (stat != MS::kSuccess) {
+		stat.perror("Error - uninitializePlugin");
+		// should i return or try next :S
+	}
+
+	stat = plugin.deregisterCommand("PotatoExportAnim");
 
 	if (stat != MS::kSuccess) {
 		stat.perror("Error - uninitializePlugin");
