@@ -171,6 +171,8 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 
 				data.rotation = MQuaternion(qx, qy, qz, qw);
 
+				data.scale = MVector::one;
+
 #if 0
 				{
 					MEulerRotation euler = data.rotation.asEulerRotation();
