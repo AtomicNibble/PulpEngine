@@ -16,9 +16,11 @@ namespace MayaUtil
 
 
 	void SetProgressCtrl(const MString& str);
-	MStatus ShowProgressDlg(void);
+	MStatus ShowProgressDlg(int32_t progressMin, int32_t progressMax);
+	MStatus SetProgressRange(int32_t progressMin, int32_t progressMax);
+	MStatus IncProcess(void);
 	MStatus HideProgressDlg(void);
-	void SetProgressText(const MString& str);
+	void SetProgressText(const MString& str, bool advProgress = true);
 
 
 	X_INLINE ::std::ostream& operator<<(::std::ostream& os, const Vec3f& bar) {

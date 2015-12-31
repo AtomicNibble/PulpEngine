@@ -2018,7 +2018,7 @@ MStatus PotatoExporter::getExportObjects(void)
 
 MStatus PotatoExporter::convert()
 {
-	MStatus status = ShowProgressDlg();
+	MStatus status = ShowProgressDlg(0, 8);
 	bool saveOk = false;
 
 	{

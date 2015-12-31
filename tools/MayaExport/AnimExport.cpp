@@ -186,6 +186,7 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 #endif
 			}
 		}
+		MayaUtil::IncProcess();
 		MayaUtil::MayaPrintMsg("=========================");
 
 		curFrame++;
@@ -288,6 +289,8 @@ MStatus PotatoAnimExporter::writeIntermidiate(void)
 
 			// save stream
 			fwrite(stream.begin(), 1, stream.size(), f);
+
+			MayaUtil::IncProcess();
 		}
 
 		fclose(f);
@@ -329,7 +332,7 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 	}
 
 
-	status = MayaUtil::ShowProgressDlg();
+	status = MayaUtil::ShowProgressDlg(0, 4);
 
 	if (!status) {
 		MayaUtil::MayaPrintError("Failed to create progress window: %s", status.errorString().asChar());
@@ -349,6 +352,7 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 			return status;
 		}
 
+		MayaUtil::SetProgressRange(0, 4 + getNumFrames() + exportObjects_.length());
 		MayaUtil::SetProgressText("Loading bones");
 
 		status = loadBones();
@@ -448,6 +452,16 @@ MStatus PotatoAnimExporter::processArgs(const MArgList &args)
 			MayaUtil::MayaPrintWarning("failed to get nodes");
 		}
 	}
+
+	MString progressCntl;
+	idx = args.flagIndex("progress");
+	if (idx != MArgList::kInvalidArgIndex) {
+		if (!args.get(++idx, progressCntl)) {
+			MayaUtil::MayaPrintWarning("failed to get progress cntl flag");
+		}
+	}
+
+	MayaUtil::SetProgressCtrl(progressCntl);
 
 	intermidiate_ = true;
 
