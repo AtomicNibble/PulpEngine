@@ -999,7 +999,7 @@ global proc potato_CreateExportWindow( string $name )
 
 				string $info;
 				$info += "Potato Engine - Export Plugin\n";
-				$info += " Version  :\t 1.0\n";
+				$info += " UI Version  :\t 1.1\n";
 				$info += " File Ext :\t .model\n";
 				$info += " Made By  :\t Tom Crowley\n\n";
 				scrollField -w 300 -h 100 -text $info -ed 0 -p aboutTabFrame1;
