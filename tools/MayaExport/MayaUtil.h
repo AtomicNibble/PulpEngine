@@ -23,6 +23,9 @@ namespace MayaUtil
 	void SetProgressText(const MString& str, bool advProgress = true);
 
 
+	MString RemoveNameSpace(const MString& str);
+
+
 	X_INLINE ::std::ostream& operator<<(::std::ostream& os, const Vec3f& bar) {
 		return os << "(" << bar.x << ", " << bar.y << ", " << bar.z << ")";
 	}

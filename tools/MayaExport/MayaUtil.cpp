@@ -190,4 +190,19 @@ namespace MayaUtil
 	}
 
 
+	MString RemoveNameSpace(const MString& str)
+	{
+		const int cIndex(str.rindex(':'));
+		if (cIndex >= 0)
+		{
+			const int l(str.length());
+			if (cIndex + 1 < l)
+			{
+				return str.substring(cIndex + 1, l - 1);
+			}
+		}
+
+		return str;
+	}
+
 } // namespace MayaUtil
