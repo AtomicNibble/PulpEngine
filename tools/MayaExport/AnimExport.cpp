@@ -115,7 +115,6 @@ MStatus PotatoAnimExporter::loadBones(void)
 			MFnDagNode node(jointDag);
 			
 			MayaUtil::MayaPrintMsg("Bone(%i) name: %s", i, node.name().asChar());
-			node.name();
 
 			Bone& bone = bones_.AddOne();
 			bone.dag = jointDag;
