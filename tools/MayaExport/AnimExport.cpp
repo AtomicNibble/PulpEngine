@@ -277,7 +277,7 @@ MStatus PotatoAnimExporter::writeIntermidiate(void)
 					data.scale.z);
 
 				buf.append("ANG ");
-				buf.appendFmt("%.4g %.4g %.4g %.4g\n",
+				buf.appendFmt("%.8g %.8g %.4g %.8g\n",
 					data.rotation.x,
 					data.rotation.y,
 					data.rotation.z,
