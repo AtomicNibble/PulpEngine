@@ -118,7 +118,7 @@ MStatus PotatoAnimExporter::loadBones(void)
 
 			Bone& bone = bones_.AddOne();
 			bone.dag = jointDag;
-			bone.name = node.name();
+			bone.name = MayaUtil::RemoveNameSpace(node.name());
 			bone.data.reserve(numFrames);
 		}
 		else
