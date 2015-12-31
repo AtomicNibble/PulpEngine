@@ -1,0 +1,29 @@
+//Puts a directory into the MAYA_SCRIPT_PATH and prints the result.
+global proc putMayaScriptPath (string $path)
+{
+    if (!`filetest -d $path`) error ($path + " does not exist.");
+    string $newScriptPath = $path + ";" +`getenv "MAYA_SCRIPT_PATH"`;
+    putenv "MAYA_SCRIPT_PATH" $newScriptPath;
+    //printMayaScriptPaths;
+}
+
+//Prints MAYA_SCRIPT_PATH as list
+global proc printMayaScriptPaths ()
+{
+    string $list = `getenv "MAYA_SCRIPT_PATH"`;
+    print "\n\nPrinting MAYA_SCRIPT_PATH Paths...\n----------\n";
+    string $buffer[];
+    int $numTokens = `tokenize $list ";" $buffer`;
+
+    if ($numTokens >= 1){
+
+        for ($b in $buffer){
+
+            print ($b + "\n");
+
+            }
+
+        }
+}
+
+putMayaScriptPath("C:\\Users\\WinCat\\Documents\\code\\WinCat\\engine\\potatoengine\\tools\\MayaExport\\mel\\");
