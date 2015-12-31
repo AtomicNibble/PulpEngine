@@ -9,10 +9,19 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="Header Files\anim_inter">
+      <UniqueIdentifier>{c715de10-0f03-43df-94d6-4e7792374abd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\anim_inter">
+      <UniqueIdentifier>{ede01363-2ba7-470d-a735-ceb7f4b100c6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="anim_inter.h">
+      <Filter>Header Files\anim_inter</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -24,6 +33,9 @@
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="anim_inter.cpp">
+      <Filter>Source Files\anim_inter</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
