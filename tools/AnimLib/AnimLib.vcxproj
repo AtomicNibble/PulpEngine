@@ -230,12 +230,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AnimCompiler.h" />
     <ClInclude Include="anim_inter.h" />
     <ClInclude Include="ModelSkeleton.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XAnimLib.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AnimCompiler.cpp" />
     <ClCompile Include="AnimLib.cpp" />
     <ClCompile Include="anim_inter.cpp" />
     <ClCompile Include="dllmain.cpp">

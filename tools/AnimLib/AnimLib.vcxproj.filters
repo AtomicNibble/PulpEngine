@@ -21,6 +21,12 @@
     <Filter Include="Source Files\model">
       <UniqueIdentifier>{bcbb4e71-9311-4df2-8ae4-8e895b974893}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\anim">
+      <UniqueIdentifier>{77caf59a-12a0-4d45-989f-d465d799f29a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\anim">
+      <UniqueIdentifier>{20b4be40-ab10-4c26-85bf-dc35ef364ff2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -34,6 +40,9 @@
     </ClInclude>
     <ClInclude Include="ModelSkeleton.h">
       <Filter>Header Files\model</Filter>
+    </ClInclude>
+    <ClInclude Include="AnimCompiler.h">
+      <Filter>Header Files\anim</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -54,6 +63,9 @@
     </ClCompile>
     <ClCompile Include="ModelSkeleton.cpp">
       <Filter>Source Files\model</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimCompiler.cpp">
+      <Filter>Source Files\anim</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
