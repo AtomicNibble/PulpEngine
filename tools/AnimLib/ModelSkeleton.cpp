@@ -131,7 +131,7 @@ bool ModelSkeleton::LoadSkelton(core::Path<char>& filePath)
 }
 
 
-size_t ModelSkeleton::numBones(void) const
+size_t ModelSkeleton::getNumBones(void) const
 {
 	return numBones_;
 }

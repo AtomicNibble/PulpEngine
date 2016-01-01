@@ -18,7 +18,7 @@ public:
 
 	bool LoadSkelton(core::Path<char>& path);
 
-	size_t numBones(void) const;
+	size_t getNumBones(void) const;
 
 	const char* getTagName(size_t idx) const;
 
