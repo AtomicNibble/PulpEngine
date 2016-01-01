@@ -98,6 +98,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{308CE098-B629-42F4-97D6-621B6A7CEEDA}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnimLib", "..\tools\AnimLib\AnimLib.vcxproj", "{858DF185-AE64-4730-86D3-6E9E4CFBD779}"
+	ProjectSection(ProjectDependencies) = postProject
+		{07328CCB-F9CC-4967-861E-272BCA0CAB04} = {07328CCB-F9CC-4967-861E-272BCA0CAB04}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
