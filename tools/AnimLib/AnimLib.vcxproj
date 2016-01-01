@@ -232,6 +232,7 @@
   <ItemGroup>
     <ClInclude Include="anim_inter.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="XAnimLib.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnimLib.cpp" />
@@ -264,6 +265,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="XAnimLib.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

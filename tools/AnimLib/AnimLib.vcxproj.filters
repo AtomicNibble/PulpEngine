@@ -23,6 +23,9 @@
     <ClInclude Include="anim_inter.h">
       <Filter>Header Files\anim_inter</Filter>
     </ClInclude>
+    <ClInclude Include="XAnimLib.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -31,11 +34,11 @@
     <ClCompile Include="AnimLib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="anim_inter.cpp">
       <Filter>Source Files\anim_inter</Filter>
+    </ClCompile>
+    <ClCompile Include="XAnimLib.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
