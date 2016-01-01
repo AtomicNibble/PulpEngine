@@ -103,6 +103,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AnimLib", "..\tools\AnimLib
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Converter", "..\tools\Converter\Converter.vcxproj", "{F06DE30E-8AC2-45E6-83DE-4F5590EEA54F}"
+	ProjectSection(ProjectDependencies) = postProject
+		{858DF185-AE64-4730-86D3-6E9E4CFBD779} = {858DF185-AE64-4730-86D3-6E9E4CFBD779}
+		{07328CCB-F9CC-4967-861E-272BCA0CAB04} = {07328CCB-F9CC-4967-861E-272BCA0CAB04}
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
