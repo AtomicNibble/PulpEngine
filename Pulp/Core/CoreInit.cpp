@@ -196,6 +196,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	if (!InitLogging(startupParams))
 		return false;
 
+	// #------------------------- JOB SYSTEM ------------------------
+	env_.pJobSys = X_NEW(core::V2::JobSystem, g_coreArena, "JobSystem");
+
 	// #------------------------- FileSystem --------------------
 	if (!InitFileSys(startupParams))
 		return false;

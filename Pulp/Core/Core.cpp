@@ -93,8 +93,9 @@ XCore::XCore() :
 	env_.dedicated_ = false;
 	env_.profilerEnabled_ = false;
 
+	// created in coreInit.
 	//	env_.pJobSys = X_NEW(core::JobSystem, g_coreArena, "JobSystem");
-	env_.pJobSys = X_NEW(core::V2::JobSystem, g_coreArena, "JobSystem");
+	//env_.pJobSys = X_NEW(core::V2::JobSystem, g_coreArena, "JobSystem");
 
 	dirWatcher_.registerListener(this);
 }
