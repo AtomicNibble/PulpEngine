@@ -181,6 +181,7 @@ struct SCoreInitParams
 	bool bSkipSound;
 	bool bCoreOnly;
 	bool bEnableBasicConsole; // when in core only mode, optional enable a basic console.
+	bool bEnableJobSystem;
 
 	const bool isCoreOnly(void) const {
 		return bCoreOnly;
@@ -188,6 +189,10 @@ struct SCoreInitParams
 
 	const bool basicConsole(void) const {
 		return isCoreOnly() && bEnableBasicConsole;
+	}
+
+	const bool jobSystemEnabled(void) const {
+		return bEnableJobSystem;
 	}
 
 	SCoreInitParams() :
@@ -200,6 +205,7 @@ struct SCoreInitParams
 		bTesting(false),
 		bCoreOnly(false),
 		bEnableBasicConsole(false),
+		bEnableJobSystem(true),
 
 #if X_SUPER == 0
 		bConsoleLog(true),

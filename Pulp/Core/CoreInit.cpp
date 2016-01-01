@@ -197,7 +197,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		return false;
 
 	// #------------------------- JOB SYSTEM ------------------------
-	env_.pJobSys = X_NEW(core::V2::JobSystem, g_coreArena, "JobSystem");
+	if (startupParams.jobSystemEnabled()) {
+		env_.pJobSys = X_NEW(core::V2::JobSystem, g_coreArena, "JobSystem");
+	}
 
 	// #------------------------- FileSystem --------------------
 	if (!InitFileSys(startupParams))
@@ -257,7 +259,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	}
 
 	// #------------------------- FileSystem Workets ------------------------
-	env_.pFileSys->InitWorker();
+	if (startupParams.jobSystemEnabled()) {
+		env_.pFileSys->InitWorker();
+	}
 
 
 	// #------------------------- ProfileSys ---------------------------
