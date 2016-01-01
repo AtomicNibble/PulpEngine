@@ -46,7 +46,7 @@ Bone::~Bone()
 
 // =================================
 
-InterAnim::InterAnim(core::MemoryArenaBase* arena) : bones_(arena)
+InterAnim::InterAnim(core::MemoryArenaBase* arena) : arena_(arena), bones_(arena)
 {
 
 }
