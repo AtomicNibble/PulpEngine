@@ -256,6 +256,7 @@ public:
 
 	X_INLINE const int GetLineNumber(void) const;
 	X_INLINE bool isEOF(void) const;
+	X_INLINE bool isEOF(bool skipWhiteSpace);
 	X_INLINE size_t BytesLeft(void) const;
 	X_INLINE void setFlags(LexFlags flags);
 	X_INLINE ErrorState::Enum GetErrorState(void) const;
