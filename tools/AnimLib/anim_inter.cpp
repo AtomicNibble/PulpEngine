@@ -191,6 +191,11 @@ bool InterAnim::ParseData(core::XLexer& lex)
 		return false;
 	}
 
+	if (!lex.isEOF(true)) {
+		X_ERROR("InterAnim", "trailing data in file");
+		return false;
+	}
+
 	return true;
 }
 
@@ -308,7 +313,7 @@ bool InterAnim::ReadFrameData(core::XLexer& lex, int32_t numBones)
 			if (!lex.SkipUntilString("POS")) {
 				return false;
 			}
-			if (lex.Parse1DMatrix(3, &fd.position[0])) {
+			if (!lex.Parse1DMatrix(3, &fd.position[0])) {
 				return false;
 			}
 
@@ -324,7 +329,7 @@ bool InterAnim::ReadFrameData(core::XLexer& lex, int32_t numBones)
 			if (!lex.SkipUntilString("ANG")) {
 				return false;
 			}
-			if (lex.Parse1DMatrix(4, &fd.rotation[0])) {
+			if (!lex.Parse1DMatrix(4, &fd.rotation[0])) {
 				return false;
 			}
 
