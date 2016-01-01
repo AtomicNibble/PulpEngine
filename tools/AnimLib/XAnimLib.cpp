@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "XAnimLib.h"
 
+#include "anim_inter.h"
 
 X_NAMESPACE_BEGIN(anim)
 
@@ -22,6 +23,15 @@ bool XAnimLib::ConvertAnim(const char* pAnimInter,
 	X_UNUSED(pAnimInter);
 	X_UNUSED(pModel);
 	X_UNUSED(pDest);
+
+	core::Path<char> interPath(pAnimInter);
+
+	InterAnim inter(g_AnimLibArena);
+
+	if (!inter.LoadFile(interPath)) {
+		return false;
+	}
+
 
 	return false;
 }
