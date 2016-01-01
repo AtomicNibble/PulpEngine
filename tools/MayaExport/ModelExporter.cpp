@@ -2052,7 +2052,7 @@ MStatus PotatoExporter::getExportObjects(void)
 
 MStatus PotatoExporter::convert()
 {
-	MStatus status = ShowProgressDlg(0, 8);
+	MStatus status = ShowProgressDlg(0, 7);
 	bool saveOk = false;
 
 	{
