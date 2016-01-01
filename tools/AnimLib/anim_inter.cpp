@@ -12,7 +12,7 @@ namespace
 	size_t getFileSize(FILE* pFile)
 	{
 		X_ASSERT_NOT_NULL(pFile);
-		int32_t pos;
+		int32_t pos, len;
 
 		pos = ftell(pFile);
 		if (pos == -1) {
@@ -21,13 +21,13 @@ namespace
 
 		fseek(pFile, 0, SEEK_END);
 
-		pos = ftell(pFile);
-		if (pos == -1) {
+		len = ftell(pFile);
+		if (len == -1) {
 			return 0;
 		}
 		fseek(pFile, pos, SEEK_SET);
 
-		return pos;
+		return len;
 	}
 
 
@@ -80,20 +80,24 @@ bool InterAnim::LoadFile(core::Path<wchar_t>& filePath)
 	errno_t err = _wfopen_s(&f, filePath.c_str(), L"r");
 	if (!f)
 	{
+		X_ERROR("InterAnim", "failed to open file(%i): %ls", filePath.c_str());
 		return false;
 	}
 
 	size_t fileSize = getFileSize(f);
 	if (fileSize < 1) {
 		::fclose(f);
+		X_ERROR("InterAnim", "failed to get file size");
 		return false;
 	}
 
 	core::Array<char> fileData(arena_);
 	fileData.resize(fileSize);
 
-	if (fread(fileData.ptr(), 1, fileSize, f) != fileSize) {
+	size_t bytesRead = fread(fileData.ptr(), 1, fileSize, f);
+	if (bytesRead != fileSize) {
 		::fclose(f);
+		X_ERROR("InterAnim", "failed to read file data. got: %" PRIuS " requested: %" PRIuS, bytesRead, fileSize);
 		return false;
 	}
 
