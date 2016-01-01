@@ -277,7 +277,7 @@ bool InterAnim::ReadFrameData(core::XLexer& lex, int32_t numBones)
 	X_ASSERT(numBones == bones_.size(), "bones size should alread equal numbones")(numBones, bones_.size());
 
 	// data has a start tag.
-	if (lex.SkipUntilString("BONE_DATA")) {
+	if (!lex.SkipUntilString("BONE_DATA")) {
 		X_ERROR("InterAnim", "missing BONE_DATA tag");
 		return false;
 	}
