@@ -21,9 +21,9 @@ AnimLibrena* g_AnimLibArena = nullptr;
 
 extern "C" DLL_EXPORT X_NAMESPACE_NAME::anim::IAnimLib* CreateInterface(ICore *pCore)
 {
-	g_AnimLibArena = X_NEW(AnimLibrena, gEnv->pArena, "AnimLibArena")(&g_AnimLibAlloc, "AnimLibArena");
-	
 	LinkModule(pCore, "AnimLib");
+
+	g_AnimLibArena = X_NEW(AnimLibrena, gEnv->pArena, "AnimLibArena")(&g_AnimLibAlloc, "AnimLibArena");
 
 	return X_NEW(anim::XAnimLib, g_AnimLibArena, "AnimLib")();
 }
