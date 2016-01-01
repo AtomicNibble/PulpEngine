@@ -70,6 +70,7 @@ static const char*		 ANIM_FILE_EXTENSION = "anim";
 // This also allows other tools to export anims since the inter format is text based.
 static const uint32_t	 ANIM_INTER_VERSION = 1;
 static const char*		 ANIM_INTER_FILE_EXTENSION = "anim_inter";
+static const wchar_t*	 ANIM_INTER_FILE_EXTENSION_W = L"anim_inter";
 
 
 #ifdef RELATIVE
