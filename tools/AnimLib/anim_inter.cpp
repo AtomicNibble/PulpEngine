@@ -63,7 +63,6 @@ bool InterAnim::LoadFile(core::Path<wchar_t>& filePath)
 	// What do we want to use instead?
 	// I kinda need to use the file system tho, since this lib needs to be goat platform.
 	// wait lol I can just use the c io shit.
-
 	FILE* f = nullptr;
 
 	errno_t err = _wfopen_s(&f, filePath.c_str(), L"r");
@@ -74,6 +73,7 @@ bool InterAnim::LoadFile(core::Path<wchar_t>& filePath)
 
 	size_t fileSize = getFileSize(f);
 	if (fileSize < 1) {
+		::fclose(f);
 		return false;
 	}
 
@@ -81,152 +81,39 @@ bool InterAnim::LoadFile(core::Path<wchar_t>& filePath)
 	fileData.resize(fileSize);
 
 	if (fread(fileData.ptr(), 1, fileSize, f) != fileSize) {
-
+		::fclose(f);
 		return false;
 	}
 
 	core::XLexer lex(fileData.begin(), fileData.end());
 
+	bool result = ParseData(lex);
 
-	return ParseData(lex);
+	::fclose(f);
+	return result;
 }
 
-bool InterAnim::ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut)
+
+int32_t InterAnim::getNumFrames(void) const
 {
-	core::XLexToken token(nullptr, nullptr);
-
-	valOut = 0;
-
-	if (!lex.SkipUntilString(pName)) {
-		X_ERROR("InterAnim", "Failed to find '%s' token", pName);
-		return false;
-	}
-
-	// get value
-	if (!lex.ReadToken(token)) {
-		X_ERROR("InterAnim", "Failed to read '%s' value", pName);
-		return false;
-	}
-
-	if (token.GetType() != core::TokenType::NUMBER) {
-		X_ERROR("InterAnim", "Failed to read '%s' value, it's not of interger type", pName);
-		return false;
-	}
-
-	valOut = token.GetIntValue();
-	return true;
+	return numFrames_;
 }
 
-bool InterAnim::ReadBones(core::XLexer& lex, int32_t numBones)
+int32_t InterAnim::getFps(void) const
 {
-	bones_.reserve(numBones);
-
-	core::XLexToken token(nullptr, nullptr);
-
-	// BONE "name"
-	for (int32_t i = 0; i < numBones; i++)
-	{
-		if (!lex.ReadToken(token)) {
-			X_ERROR("InterAnim", "Failed to read 'BONE' token");
-			return false;
-		}
-
-		if (!token.isEqual("BONE")) {
-			X_ERROR("InterAnim", "Failed to read 'BONE' token");
-			return false;
-		}
-
-		// read the string
-		if (!lex.ReadTokenOnLine(token)) {
-			X_ERROR("InterAnim", "Failed to read 'BONE' token");
-			return false;
-		}
-
-		Bone bone(arena_);
-		bone.name = core::string(token.begin(), token.end());
-
-		// validate the names
-		if (bone.name.length() < 1) {
-			X_ERROR("InterAnim", "bone name too short: \"%s\"", bone.name.c_str());
-			return false;
-		}
-		if (bone.name.length() > model::MODEL_MAX_BONE_NAME_LENGTH) {
-			X_ERROR("InterAnim", "bone name too long: \"%s\" max: %i", 
-				bone.name.c_str(), model::MODEL_MAX_BONE_NAME_LENGTH);
-			return false;
-		}
-
-#if X_MODEL_BONES_LOWER_CASE_NAMES
-		bone.name.toLower();
-#endif // !X_MODEL_BONES_LOWER_CASE_NAMES
-
-		bones_.append(bone);
-	}
-	
-	return true;
+	return fps_;
 }
 
-bool InterAnim::ReadFrameData(core::XLexer& lex, int32_t numBones)
+size_t InterAnim::getNumBones(void) const
 {
-	X_ASSERT(numBones == bones_.size(), "bones size should alread equal numbones")(numBones, bones_.size());
-
-	// data has a start tag.
-	if (lex.SkipUntilString("BONE_DATA")) {
-		X_ERROR("InterAnim", "missing BONE_DATA tag");
-		return false;
-	}
-
-	// for each bone there is numFrames worth of data.
-	// in bone order.
-	for (auto& bone : bones_)
-	{
-		/*
-		Example:
-			POS 0 0 0
-			SCALE 1 1 1
-			ANG 0 -0.21869613 0 0.97579301
-		*/
-
-		Bone::BoneData& data = bone.data;
-
-		data.reserve(numFrames_);
-		data.clear();
-
-		core::XLexToken token(nullptr, nullptr);
-
-		for (int32_t i = 0; i < numFrames_; i++)
-		{
-			FrameData& fd = data.AddOne();
-
-			// pos
-			if (!lex.SkipUntilString("POS")) {
-				return false;
-			}
-			if(lex.Parse1DMatrix(3, &fd.position[0])) {
-				return false;
-			}
-
-			// scale
-			if (!lex.SkipUntilString("SCALE")) {
-				return false;
-			}
-			if (!lex.Parse1DMatrix(3, &fd.scale[0])) {
-				return false;
-			}
-
-			// angles
-			if (!lex.SkipUntilString("ANG")) {
-				return false;
-			}
-			if(lex.Parse1DMatrix(4, &fd.rotation[0])) {
-				return false;
-			}
-
-		}
-	}
-
-	return true;
+	return bones_.size();
 }
+
+const Bone& InterAnim::getBone(size_t idx) const
+{
+	return bones_[idx];
+}
+
 
 
 bool InterAnim::ParseData(core::XLexer& lex)
@@ -288,11 +175,147 @@ bool InterAnim::ParseData(core::XLexer& lex)
 		return false;
 	}
 
-
-
 	return true;
-
 }
 
+
+bool InterAnim::ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut)
+{
+	core::XLexToken token(nullptr, nullptr);
+
+	valOut = 0;
+
+	if (!lex.SkipUntilString(pName)) {
+		X_ERROR("InterAnim", "Failed to find '%s' token", pName);
+		return false;
+	}
+
+	// get value
+	if (!lex.ReadToken(token)) {
+		X_ERROR("InterAnim", "Failed to read '%s' value", pName);
+		return false;
+	}
+
+	if (token.GetType() != core::TokenType::NUMBER) {
+		X_ERROR("InterAnim", "Failed to read '%s' value, it's not of interger type", pName);
+		return false;
+	}
+
+	valOut = token.GetIntValue();
+	return true;
+}
+
+
+bool InterAnim::ReadBones(core::XLexer& lex, int32_t numBones)
+{
+	bones_.reserve(numBones);
+
+	core::XLexToken token(nullptr, nullptr);
+
+	// BONE "name"
+	for (int32_t i = 0; i < numBones; i++)
+	{
+		if (!lex.ReadToken(token)) {
+			X_ERROR("InterAnim", "Failed to read 'BONE' token");
+			return false;
+		}
+
+		if (!token.isEqual("BONE")) {
+			X_ERROR("InterAnim", "Failed to read 'BONE' token");
+			return false;
+		}
+
+		// read the string
+		if (!lex.ReadTokenOnLine(token)) {
+			X_ERROR("InterAnim", "Failed to read 'BONE' token");
+			return false;
+		}
+
+		Bone bone(arena_);
+		bone.name = core::string(token.begin(), token.end());
+
+		// validate the names
+		if (bone.name.length() < 1) {
+			X_ERROR("InterAnim", "bone name too short: \"%s\"", bone.name.c_str());
+			return false;
+		}
+		if (bone.name.length() > model::MODEL_MAX_BONE_NAME_LENGTH) {
+			X_ERROR("InterAnim", "bone name too long: \"%s\" max: %i",
+				bone.name.c_str(), model::MODEL_MAX_BONE_NAME_LENGTH);
+			return false;
+		}
+
+#if X_MODEL_BONES_LOWER_CASE_NAMES
+		bone.name.toLower();
+#endif // !X_MODEL_BONES_LOWER_CASE_NAMES
+
+		bones_.append(bone);
+	}
+
+	return true;
+}
+
+
+bool InterAnim::ReadFrameData(core::XLexer& lex, int32_t numBones)
+{
+	X_ASSERT(numBones == bones_.size(), "bones size should alread equal numbones")(numBones, bones_.size());
+
+	// data has a start tag.
+	if (lex.SkipUntilString("BONE_DATA")) {
+		X_ERROR("InterAnim", "missing BONE_DATA tag");
+		return false;
+	}
+
+	// for each bone there is numFrames worth of data.
+	// in bone order.
+	for (auto& bone : bones_)
+	{
+		/*
+		Example:
+		POS 0 0 0
+		SCALE 1 1 1
+		ANG 0 -0.21869613 0 0.97579301
+		*/
+
+		Bone::BoneData& data = bone.data;
+
+		data.reserve(numFrames_);
+		data.clear();
+
+		core::XLexToken token(nullptr, nullptr);
+
+		for (int32_t i = 0; i < numFrames_; i++)
+		{
+			FrameData& fd = data.AddOne();
+
+			// pos
+			if (!lex.SkipUntilString("POS")) {
+				return false;
+			}
+			if (lex.Parse1DMatrix(3, &fd.position[0])) {
+				return false;
+			}
+
+			// scale
+			if (!lex.SkipUntilString("SCALE")) {
+				return false;
+			}
+			if (!lex.Parse1DMatrix(3, &fd.scale[0])) {
+				return false;
+			}
+
+			// angles
+			if (!lex.SkipUntilString("ANG")) {
+				return false;
+			}
+			if (lex.Parse1DMatrix(4, &fd.rotation[0])) {
+				return false;
+			}
+
+		}
+	}
+
+	return true;
+}
 
 X_NAMESPACE_END

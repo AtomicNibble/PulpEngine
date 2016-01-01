@@ -40,12 +40,16 @@ class InterAnim
 
 	bool LoadFile(core::Path<wchar_t>& file);
 
+	int32_t getNumFrames(void) const;
+	int32_t getFps(void) const;
+	size_t getNumBones(void) const;
+	const Bone& getBone(size_t idx) const;
+
 private:
 	bool ParseData(core::XLexer& lex);
 	bool ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut);
 	bool ReadBones(core::XLexer& lex, int32_t numBones);
 	bool ReadFrameData(core::XLexer& lex, int32_t numBones);
-
 
 private:
 	core::MemoryArenaBase* arena_;
