@@ -80,6 +80,17 @@ static const char*		 ANIM_INTER_FILE_EXTENSION = "anim_inter";
 #endif
 
 
+struct IAnimLib
+{
+	virtual ~IAnimLib() {}
+
+	virtual bool ConvertAnim(const char* pAnimInter,
+		const char* pModel, const char* pDest) X_ABSTRACT;
+
+
+};
+
+
 X_DECLARE_ENUM8(AnimType)(RELATIVE, ABSOLUTE);
 X_DECLARE_FLAGS8(AnimFlag)(
 	LOOP,
