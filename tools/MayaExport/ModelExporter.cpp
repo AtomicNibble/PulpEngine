@@ -25,6 +25,8 @@
 #include <maya/MItDependencyNodes.h>
 #include <maya/MItGeometry.h>
 #include <maya/MArgList.h>
+#include <maya/MTransformationMatrix.h>
+
 
 X_DISABLE_WARNING(4702)
 #include <algorithm>
@@ -1166,6 +1168,8 @@ void MayaModel::getBindPose(const MObject &jointNode, MayaBone *bone, float scal
 	bone->bindpos = Vec3f::zero();
 	bone->bindm33 = Matrix33f::identity();
 
+	bool set = false;
+
 	if (MS::kSuccess == status) {
 		unsigned	ii;
 		unsigned	jointIndex;
@@ -1196,6 +1200,8 @@ void MayaModel::getBindPose(const MObject &jointNode, MayaBone *bone, float scal
 					status = pWorldMatrix.getValue(worldMatrix);
 					if (MS::kSuccess != status) {
 						// Problem retrieving world matrix
+						MayaPrintError("failed to get world matrix for bone(1): %s", 
+							bone->name.c_str());
 						return;
 					}
 
@@ -1208,12 +1214,40 @@ void MayaModel::getBindPose(const MObject &jointNode, MayaBone *bone, float scal
 					//if (!options.ignoreScale) {
 					//	joint->bindpos *= joint->scale;
 					//}
-
-					return;
+					set = true;
+					break;
 				}
 			}
 		}
 	}
+	else {
+		MayaPrintError("error getting bind pose for '%s' error: %s",
+			bone->name.c_str(), status.errorString().asChar());
+	}
+
+	// failed to get the bind pose :(
+	if (!set)
+	{
+		MayaPrintError("failed to get bind pose for bone: %s",
+			bone->name.c_str());
+
+		// try get world pos.
+
+		MDagPath path;
+		status = bone->dagnode->getPath(path);
+		if (status != MS::kSuccess) {
+			MayaPrintError("Failed to get bone path: '%s'", bone->name.c_str());
+			return;
+		}
+
+		MTransformationMatrix worldMatrix = path.inclusiveMatrix();
+		MMatrix m = worldMatrix.asMatrix();
+		bone->bindm33 = ConvertToGameSpace(XMat(m));
+		bone->bindpos = ConvertToGameSpace(XVec(m)) * scale;
+	}
+
+	MayaPrintMsg("Bone '%s' pos: (%g,%g,%g)", 
+		bone->name.c_str(), bone->bindpos.x, bone->bindpos.y, bone->bindpos.z);
 }
 
 
