@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "ModelBones.h"
+#include "ModelSkeleton.h"
 
 X_NAMESPACE_BEGIN(model)
 
