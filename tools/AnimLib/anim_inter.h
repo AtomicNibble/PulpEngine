@@ -39,6 +39,7 @@ public:
 	InterAnim(core::MemoryArenaBase* arena);
 	~InterAnim() = default;
 
+	bool LoadFile(core::Path<char>& file);
 	bool LoadFile(core::Path<wchar_t>& file);
 
 	int32_t getNumFrames(void) const;
