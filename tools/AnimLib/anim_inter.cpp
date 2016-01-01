@@ -69,6 +69,8 @@ bool InterAnim::LoadFile(core::Path<wchar_t>& filePath)
 		return false;
 	}
 
+	filePath.setExtension(anim::ANIM_INTER_FILE_EXTENSION_W);
+
 	// Lets assume we don't have a vaild engine file system ;(
 	// What do we want to use instead?
 	// I kinda need to use the file system tho, since this lib needs to be goat platform.
