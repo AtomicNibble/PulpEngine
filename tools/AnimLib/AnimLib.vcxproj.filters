@@ -15,6 +15,12 @@
     <Filter Include="Source Files\anim_inter">
       <UniqueIdentifier>{ede01363-2ba7-470d-a735-ceb7f4b100c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\model">
+      <UniqueIdentifier>{92e81150-86fc-4159-92f5-7c69bb359eeb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\model">
+      <UniqueIdentifier>{bcbb4e71-9311-4df2-8ae4-8e895b974893}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -25,6 +31,9 @@
     </ClInclude>
     <ClInclude Include="XAnimLib.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelBones.h">
+      <Filter>Header Files\model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -39,6 +48,12 @@
     </ClCompile>
     <ClCompile Include="XAnimLib.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="dllmain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelBones.cpp">
+      <Filter>Source Files\model</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

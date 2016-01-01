@@ -231,6 +231,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="anim_inter.h" />
+    <ClInclude Include="ModelBones.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XAnimLib.h" />
   </ItemGroup>
@@ -257,6 +258,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="ModelBones.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
