@@ -34,7 +34,7 @@ ModelSkeleton::ModelSkeleton(core::MemoryArenaBase* arena) :
 	angles_(arena),
 	positions_(arena)
 {
-
+	numBones_ = 0;
 }
 
 ModelSkeleton::~ModelSkeleton()
@@ -88,6 +88,7 @@ bool ModelSkeleton::LoadSkelton(core::Path<char>& filePath)
 		angles_.resize(hdr.numBones);
 		positions_.resize(hdr.numBones);
 
+		numBones_ = hdr.numBones;
 
 		// the tag names are after the material names.
 		const long tagNameOffset = sizeof(hdr) + hdr.materialNameDataSize;
@@ -127,6 +128,17 @@ bool ModelSkeleton::LoadSkelton(core::Path<char>& filePath)
 
 	::fclose(f);
 	return true;
+}
+
+
+size_t ModelSkeleton::numBones(void) const
+{
+	return numBones_;
+}
+
+const char* ModelSkeleton::getTagName(size_t idx) const
+{
+	return tagNames_[idx].c_str();
 }
 
 

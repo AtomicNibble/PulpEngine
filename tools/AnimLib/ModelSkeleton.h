@@ -18,12 +18,18 @@ public:
 
 	bool LoadSkelton(core::Path<char>& path);
 
+	size_t numBones(void) const;
+
+	const char* getTagName(size_t idx) const;
+
 private:
 	typedef core::Array<core::StackString<model::MODEL_MAX_BONE_NAME_LENGTH>> TagNames;
 	typedef core::Array<uint16_t> TagNameIdx;
 	typedef core::Array<uint8_t> TagTree;
 	typedef core::Array<XQuatCompressedf> TagAngles;
 	typedef core::Array<Vec3f> TagPos;
+
+	size_t numBones_;
 
 	// built.
 	TagNames tagNames_;
