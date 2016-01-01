@@ -32,7 +32,7 @@
     <ClInclude Include="XAnimLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ModelBones.h">
+    <ClInclude Include="ModelSkeleton.h">
       <Filter>Header Files\model</Filter>
     </ClInclude>
   </ItemGroup>
@@ -52,7 +52,7 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ModelBones.cpp">
+    <ClCompile Include="ModelSkeleton.cpp">
       <Filter>Source Files\model</Filter>
     </ClCompile>
   </ItemGroup>
