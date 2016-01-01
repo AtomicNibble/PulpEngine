@@ -35,6 +35,7 @@ public:
 
 class InterAnim
 {
+public:
 	InterAnim(core::MemoryArenaBase* arena);
 	~InterAnim() = default;
 
