@@ -6,11 +6,11 @@ before_script:
   - echo.
   
 stages:
- - build_win32
- - test_win32
+ - build
+ - test
 
-build:
-  stage: build_win32
+build_win32:
+  stage: build
   script:
     - echo building...
     - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Debug;Platform=win32
@@ -18,20 +18,9 @@ build:
  #   - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Super;Platform=win32
   tags:
     - windows
-  build:
-  
-stage: build_64
-  script:
-    - echo building x64...
-    - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Debug;Platform=x64
-    - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Release;Platform=x64
-    - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Super;Platform=x64
-  tags:
-    - windows  
-    
-    
-test:
-  stage: test_win32
+
+test_win32:
+  stage: test
   script:
    - echo testing...
    - '../build/Win32/Debug/engine_UnitTester.exe'
