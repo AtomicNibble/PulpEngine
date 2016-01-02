@@ -1,5 +1,5 @@
 build-visual-studio:
   script:
-    - mkdir build
+    - msbuild solutions/PulpEngine.sln
   tags:
     - windows
