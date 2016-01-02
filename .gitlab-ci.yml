@@ -13,7 +13,7 @@ build_win32:
   stage: build
   script:
     - echo building...
-    - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Debug;Platform=win32
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=win32
  #   - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Release;Platform=win32
  #   - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Super;Platform=win32
   tags:
