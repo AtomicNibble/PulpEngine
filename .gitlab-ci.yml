@@ -7,6 +7,7 @@ before_script:
   
 stages:
  - build
+ - test
 
 build:
   stage: build
@@ -21,3 +22,11 @@ build:
     - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Super;Platform=x64
   tags:
     - windows
+    
+test:
+ stage: test
+  script:
+   - echo testing...
+   - ../build/Win32/Debug/engine_UnitTester.exe
+  tags:
+   - windows 
