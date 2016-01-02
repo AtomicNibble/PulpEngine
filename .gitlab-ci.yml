@@ -1,0 +1,5 @@
+build-visual-studio:
+  script:
+    - mkdir build
+  tags:
+    - windows
