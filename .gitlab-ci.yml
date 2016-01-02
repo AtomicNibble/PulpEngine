@@ -23,6 +23,7 @@ test_win32:
   stage: test
   script:
    - echo testing...
-   - '"../build/Win32/Debug/engine_UnitTester.exe"'
+   -  'cd "../build/Win32/Debug/'   
+   - engine_UnitTester.exe
   tags:
    - windows 
