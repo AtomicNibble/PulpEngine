@@ -12,6 +12,6 @@ build:
   stage: build
   script:
     - echo building...
-    - msbuild solutions/PulpEngine.sln
+    - msbuild solutions/PulpEngine.sln /t:t:Rebuild
   tags:
     - windows
