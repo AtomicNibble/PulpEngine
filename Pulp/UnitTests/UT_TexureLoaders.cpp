@@ -92,7 +92,7 @@ TEST(DDS, ati2)
 	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::ATI2, Path<char>("test_img_load_ati2_nomips.dds")));
 }
 
-TEST(DDS, A8R8G8B8)
+TEST(DDS, DISABLED_A8R8G8B8)
 {
 	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::A8R8G8B8, Path<char>("test_img_load_A8R8G8B8.dds")));
 	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::A8R8G8B8, Path<char>("test_img_load_A8R8G8B8_nomips.dds")));
@@ -104,7 +104,7 @@ TEST(DDS, B8G8R8A8)
 	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::B8G8R8A8, Path<char>("test_img_load_B8G8R8A8_nomips.dds")));
 }
 
-TEST(DDS, R8B8G8)
+TEST(DDS, DISABLED_R8B8G8)
 {
 	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::R8G8B8, Path<char>("test_img_load_R8G8B8.dds")));
 	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::R8G8B8, Path<char>("test_img_load_R8G8B8_nomips.dds")));
