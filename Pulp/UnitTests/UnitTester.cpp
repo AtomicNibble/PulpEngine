@@ -118,7 +118,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 			gEnv->pCore->UnRegisterAssertHandler(&g_AssetChecker);
 		}
 
-		system("PAUSE");
+		//system("PAUSE");
 	}
 	return nRes;
 }
