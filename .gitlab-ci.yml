@@ -11,7 +11,11 @@ stages:
 build:
   stage: build
   script:
-    - echo building...
-    - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild
+    - echo building: Debug-Win32
+    - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Debug;Platform=win32
+    - echo building: Release-Win32
+    - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Release;Platform=win32
+    - echo building: Super-Win32
+    - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Super;Platform=win32
   tags:
     - windows
