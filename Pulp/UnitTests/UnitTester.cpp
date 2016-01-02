@@ -81,18 +81,31 @@ const char* googleTestResTostr(int nRes)
 	return "ERROR";
 }
 
+#include <Logging\Logger.h>
+#include <Logging\FilterPolicies\LoggerNoFilterPolicy.h>
+#include <Logging\FormatPolicies\LoggerFullFormatPolicy.h>
+#include <Logging\WritePolicies\LoggerDebuggerWritePolicy.h>
+
 int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
 {
 	g_hInstance = hInstance;
 //	InitRootDir();
 
-	int nRes = 0;
+	int nRes = -1; // if we never run the tests that is also a fail.
 	EngineApp engine;
 
 	core::Console Console(L"Engine Uint Test Log");
 	Console.RedirectSTD();
 	Console.SetSize(150, 60, 8000);
 	Console.MoveTo(10, 10);
+
+
+	typedef core::Logger<
+		core::LoggerNoFilterPolicy,
+		core::LoggerFullFormatPolicy,
+		core::LoggerDebuggerWritePolicy> vsLogger;
+
+	vsLogger debugLogger;
 
 	core::MallocFreeAllocator allocator;
 	UnitTestArena arena(&allocator,"UintTestArena");
@@ -105,6 +118,8 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 			X_ASSERT_NOT_NULL(gEnv);
 			X_ASSERT_NOT_NULL(gEnv->pCore);
 			gEnv->pCore->RegisterAssertHandler(&g_AssetChecker);
+
+			gEnv->pLog->AddLogger(&debugLogger);
 
 		//	::testing::GTEST_FLAG(filter) = "Threading.*";
 			X_LOG0("TESTS", "Running unit tests...");
