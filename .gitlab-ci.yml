@@ -4,7 +4,7 @@ before_script:
   - echo.
   - set
   - echo.
-  
+
 stages:
  - build
  - test
@@ -23,7 +23,7 @@ test_win32:
   stage: test
   script:
    - echo testing...
-   -  'cd "../build/Win32/Debug/'   
-   - engine_UnitTester.exe
+   -  'cd "../build/Win32/Debug/'
+   - engine_UnitTester.exe -CI
   tags:
-   - windows 
+   - windows
