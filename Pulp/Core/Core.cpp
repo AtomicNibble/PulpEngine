@@ -230,7 +230,9 @@ void XCore::ShutDown()
 	moduleInterfaces_.free();
 
 #if X_PLATFORM_WIN32 // && X_DEBUG
-	_getch();
+	if (!initParams_.bTesting) { // don't pause when testing.
+		_getch();
+	}
 #endif // !X_PLATFORM_WIN32
 
 	if (env_.pConsole)
