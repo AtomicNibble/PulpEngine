@@ -15,5 +15,9 @@ build:
     - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Debug;Platform=win32
     - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Release;Platform=win32
     - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Super;Platform=win32
+    - echo building x64...
+    - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Debug;Platform=x64
+    - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Release;Platform=x64
+    - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Super;Platform=x64
   tags:
     - windows
