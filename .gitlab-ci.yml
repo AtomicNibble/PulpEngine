@@ -1,5 +1,17 @@
-build-visual-studio:
+before_script:
+  - "echo off"
+  - 'call "%VS140COMNTOOLS%\vsvars32.bat"'
+  - echo.
+  - set
+  - echo.
+  
+stages:
+ - build
+
+build:
+  stage: build
   script:
-    - mkdir build
+    - echo building...
+    - msbuild solutions/PulpEngine.sln
   tags:
     - windows
