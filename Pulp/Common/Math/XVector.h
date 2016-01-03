@@ -43,7 +43,7 @@ public:
 	}
 	X_INLINE void Set(const Vec2<T>& src) {
 		x = src.x; y = src.y;
-	} 
+	}
 
 	// kinky operators
 	X_INLINE int operator!() const { return x == 0 && y == 0; }
@@ -65,7 +65,7 @@ public:
 
 	X_INLINE const T& operator[](size_t i) const {
 		X_ASSERT(i >= 0 && i < 2, "out of range")(i);
-		return (&x)[i]; 
+		return (&x)[i];
 	}
 
 	X_INLINE T& operator[](size_t i) {
@@ -237,6 +237,22 @@ public:
 	{
 		return Vec2<T>(1, 1);
 	}
+
+	static Vec2<T> min()
+	{
+		return Vec2<T>(
+			std::numeric_limits<T>::min(),
+			std::numeric_limits<T>::min()
+		);
+	}
+	static Vec2<T> max()
+	{
+		return Vec2<T>(
+			std::numeric_limits<T>::max(),
+			std::numeric_limits<T>::max()
+		);
+	}
+
 
 	static Vec2<T> NaN()   { return Vec2<T>(math<T>::NaN(), math<T>::NaN()); }
 
@@ -527,6 +543,24 @@ public:
 		return Vec3<T>(static_cast<T>(1), static_cast<T>(1), static_cast<T>(1));
 	}
 
+	static Vec3<T> min()
+	{
+		return Vec3<T>(
+			std::numeric_limits<T>::min(),
+			std::numeric_limits<T>::min(),
+			std::numeric_limits<T>::min()
+		);
+	}
+	static Vec3<T> max()
+	{
+		return Vec3<T>(
+			std::numeric_limits<T>::max(),
+			std::numeric_limits<T>::max(),
+			std::numeric_limits<T>::max()
+		);
+	}
+
+
 	Vec3<T> slerp(T fact, const Vec3<T> &r) const
 	{
 		T cosAlpha, alpha, sinAlpha;
@@ -792,6 +826,16 @@ public:
 		return Vec4<T>(static_cast<T>(1), static_cast<T>(1), static_cast<T>(1), static_cast<T>(1));
 	}
 
+	static Vec4<T> min()
+	{
+		return Vec4<T>(
+			std::numeric_limits<T>::min(),
+			std::numeric_limits<T>::min(),
+			std::numeric_limits<T>::min(),
+			std::numeric_limits<T>::min()
+			);
+	}
+
 	static Vec4<T> max()
 	{
 		return Vec4<T>(
@@ -836,7 +880,6 @@ public:
 
 	X_INLINE Vec3<T> xyz() const { return Vec3<T>(x,y,z); }
 	X_INLINE Vec2<T> xy() const { return Vec2<T>(x, y); }
-
 
 	static Vec4<T> xAxis() { return Vec4<T>(1, 0, 0, 0); }
 	static Vec4<T> yAxis() { return Vec4<T>(0, 1, 0, 0); }
@@ -1030,6 +1073,16 @@ public:
 		return Vec5<T>(static_cast<T>(1), static_cast<T>(1), static_cast<T>(1), static_cast<T>(1), static_cast<T>(1));
 	}
 
+	static Vec5<T> min()
+	{
+		return Vec5<T>(
+			std::numeric_limits<T>::min(),
+			std::numeric_limits<T>::min(),
+			std::numeric_limits<T>::min(),
+			std::numeric_limits<T>::min(),
+			std::numeric_limits<T>::min()
+		);
+	}
 	static Vec5<T> max()
 	{
 		return Vec5<T>(
@@ -1038,7 +1091,7 @@ public:
 			std::numeric_limits<T>::max(),
 			std::numeric_limits<T>::max(),
 			std::numeric_limits<T>::max()
-			);
+		);
 	}
 
 	X_INLINE Vec3<T> xyz() const { return Vec3<T>(x, y, z); }
