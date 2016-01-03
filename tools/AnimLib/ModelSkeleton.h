@@ -20,7 +20,7 @@ public:
 
 	size_t getNumBones(void) const;
 
-	const char* getTagName(size_t idx) const;
+	const char* getBoneName(size_t idx) const;
 
 private:
 	typedef core::Array<core::StackString<model::MODEL_MAX_BONE_NAME_LENGTH>> TagNames;

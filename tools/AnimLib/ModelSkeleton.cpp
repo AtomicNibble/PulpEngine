@@ -136,7 +136,7 @@ size_t ModelSkeleton::getNumBones(void) const
 	return numBones_;
 }
 
-const char* ModelSkeleton::getTagName(size_t idx) const
+const char* ModelSkeleton::getBoneName(size_t idx) const
 {
 	return tagNames_[idx].c_str();
 }
