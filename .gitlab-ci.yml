@@ -19,11 +19,22 @@ build_win32:
   tags:
     - windows
 
-test_win32:
+build_win64:
+  stage: build
+  script:
+    - echo building...
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=x64
+ #   - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Release;Platform=x64
+ #   - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Super;Platform=x64
+  tags:
+    - windows
+
+
+test_win64:
   stage: test
   script:
    - echo testing...
-   -  'cd "../build/Win32/Debug/'
+   -  'cd "../build/x64/Debug/'
    - engine_UnitTester.exe -CI
   tags:
    - windows
