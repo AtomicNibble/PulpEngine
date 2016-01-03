@@ -58,6 +58,7 @@ static const uint32_t	 ANIM_VERSION = 1;
 static const uint32_t	 ANIM_MAX_BONES = 255;
 static const uint32_t	 ANIM_MAX_FRAMES = 4096; // can be increased up to (1 << 16) -1
 static const uint32_t	 ANIM_DEFAULT_FPS = 30;
+static const uint32_t	 ANIM_MIN_FPS = 1;
 static const uint32_t	 ANIM_MAX_FPS = 90;
 static const uint32_t	 ANIM_MAX_NOTES = 255;
 static const uint32_t	 ANIM_MAX_NOT_NAME_LENGTH = 48; // the max lengt of each notes name
