@@ -9,25 +9,56 @@ stages:
  - build
  - test
 
-build_win32:
+build_win32_debug:
   stage: build
   script:
     - echo building...
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=win32
-    - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Release;Platform=win32
-    - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Super;Platform=win32
   tags:
     - windows
 
-build_win64:
+
+build_win32_release:
+  stage: build
+  script:
+    - echo building...
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Release;Platform=win32
+  tags:
+    - windows
+
+build_win32_super:
+  stage: build
+  script:
+    - echo building...
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Super;Platform=win32
+  tags:
+    - windows
+
+
+build_win64_debug:
   stage: build
   script:
     - echo building...
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=x64
- #   - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Release;Platform=x64
- #   - msbuild solutions/PulpEngine.sln /t:Clean;Rebuild /p:Configuration=Super;Platform=x64
   tags:
     - windows
+
+build_win64_release:
+  stage: build
+  script:
+    - echo building...
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Release;Platform=x64
+  tags:
+    - windows
+
+build_win64_super:
+  stage: build
+  script:
+    - echo building...
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Super;Platform=x64
+  tags:
+    - windows
+
 
 
 test_win64:
