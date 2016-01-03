@@ -60,7 +60,7 @@ bool XGame::Init(void)
 	X_ASSERT(height > 0, "height is not valid")(height);
 	X_ASSERT(width > 0, "height is not valid")(width);
 
-	cam_.SetFrustum(width, height, DEFAULT_FOV);
+	cam_.SetFrustum(width, height, DEFAULT_FOV, 0.25f, 512.f);
 
 	return true;
 }
