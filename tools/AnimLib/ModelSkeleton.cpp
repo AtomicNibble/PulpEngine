@@ -141,5 +141,14 @@ const char* ModelSkeleton::getBoneName(size_t idx) const
 	return tagNames_[idx].c_str();
 }
 
+const XQuatCompressedf ModelSkeleton::getBoneAngle(size_t idx) const
+{
+	return angles_[idx];
+}
+
+const Vec3f ModelSkeleton::getBonePos(size_t idx) const
+{
+	return positions_[idx];
+}
 
 X_NAMESPACE_END
