@@ -61,11 +61,20 @@ build_win64_super:
 
 
 
-test_win64:
+test_win64_debug:
   stage: test
   script:
    - echo testing...
    -  'cd "../build/x64/Debug/'
+   - engine_UnitTester.exe -CI
+  tags:
+   - windows
+
+   test_win32_debug:
+  stage: test
+  script:
+   - echo testing...
+   -  'cd "../build/win32/Debug/'
    - engine_UnitTester.exe -CI
   tags:
    - windows
