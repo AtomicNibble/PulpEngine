@@ -9,64 +9,83 @@ class AnimCompiler
 {
 	// we want to know what frames have changed data.
 
-	struct PosDelta
+	class Position
 	{
-		int32_t frame;
-		Vec3f worldPos;
-		Vec3f delta;
-	};
+		struct PosDelta
+		{
+			int32_t frame;
+			Vec3f worldPos;
+			Vec3f delta;
+		};
 
-	struct Position
-	{
 		typedef Vec3<uint16_t> Scaler;
 		typedef core::Array<PosDelta> PosDeltaArr;
 		typedef core::Array<Vec3f> PosData;
 		typedef core::Array<Scaler> ScalerArr;
-
+	public:
 		Position(core::MemoryArenaBase* arena);
 
+		void appendFullPos(const Vec3f& pos);
+		void setBasePosition(const Vec3f& basePos);
+
+		size_t numPosFrames(void) const;
+		bool isLargeScalers(void) const;
+		bool isFullFrames(void) const;
+		const Vec3f& min(void) const;
+		const Vec3f& range(void) const;
+
+		void save(core::XFile* pFile) const;
+
 		void CalculateDeltas(const float posError = 0.075f);
+
 	private:
 		void BuildScalers(const float posError);
 
-	public:
-		PosData fullPos;
-		PosDeltaArr posDeltas;
+	private:
+		PosData fullPos_;
+		PosDeltaArr posDeltas_;
 
-		ScalerArr scalers;
+		ScalerArr scalers_;
 
-		Vec3f min;
-		Vec3f max;
-		Vec3f range;
-		Vec3f basePosition;
+		Vec3f min_;
+		Vec3f max_;
+		Vec3f range_;
+		Vec3f basePosition_;
 
-		bool largeScalers;
+		bool largeScalers_;
 		bool _pad[3];
 	};
 
-	struct AngleFrame
-	{
-		int32_t frame;
-		Quatf angle;
 
-	};
-
-	struct Angle
+	class Angle
 	{
+		struct AngleFrame
+		{
+			int32_t frame;
+			Quatf angle;
+		};
+
 		typedef core::Array<Quatf> AnglesArr;
 		typedef core::Array<AngleFrame> AngleFrameArr;
 
+	public:
 		Angle(core::MemoryArenaBase* arena);
+
+		void appendFullAng(const Quatf& ang);
+		void setBaseOrient(const Quatf& ang);
+		bool isFullFrames(void) const;
 
 		void CalculateDeltas(const float posError = 0.075f);
 
-	public:
-		AnglesArr fullAngles;
-		AngleFrameArr angles;
+		void save(core::XFile* pFile) const;
 
-		Vec3<bool> axisChanges;
+	private:
+		AnglesArr fullAngles_;
+		AngleFrameArr angles_;
 
-		Quatf baseOrient;
+		Vec3<bool> axisChanges_;
+
+		Quatf baseOrient_;
 	};
 
 	struct Bone
@@ -90,7 +109,10 @@ public:
 	AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter, const model::ModelSkeleton& skelton);
 	~AnimCompiler();
 
-	bool compile(void);
+	bool compile(core::Path<char>& path);
+
+private:
+	bool save(core::Path<char>& path);
 
 private:
 

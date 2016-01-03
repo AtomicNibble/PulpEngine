@@ -6,38 +6,137 @@ X_NAMESPACE_BEGIN(anim)
 
 
 AnimCompiler::Position::Position(core::MemoryArenaBase* arena) :
-	fullPos(arena),
-	posDeltas(arena),
-	scalers(arena)
+	fullPos_(arena),
+	posDeltas_(arena),
+	scalers_(arena)
 {
-	largeScalers = false;
+	fullPos_.setGranularity(128);
+
+	largeScalers_ = false;
 }
 
+void AnimCompiler::Position::appendFullPos(const Vec3f& pos)
+{
+	fullPos_.append(pos);
+}
+
+void AnimCompiler::Position::setBasePosition(const Vec3f& basePos)
+{
+	basePosition_ = basePos;
+}
+
+size_t AnimCompiler::Position::numPosFrames(void) const
+{
+	return posDeltas_.size();
+}
+
+bool AnimCompiler::Position::isLargeScalers(void) const
+{
+	return largeScalers_;
+}
+
+bool AnimCompiler::Position::isFullFrames(void) const
+{
+	return posDeltas_.size() == fullPos_.size();
+}
+
+const Vec3f& AnimCompiler::Position::min(void) const
+{
+	return min_;
+}
+
+const Vec3f& AnimCompiler::Position::range(void) const
+{
+	return range_;
+}
+
+void AnimCompiler::Position::save(core::XFile* pFile) const
+{
+	X_ASSERT_NOT_NULL(pFile);
+
+	int16_t numPos = safe_static_cast<uint16_t, size_t>(posDeltas_.size());
+
+	pFile->writeObj(numPos);
+
+	if (numPos == 0)
+	{
+		pFile->writeObj(min_); // just write min pos.
+	}
+	else
+	{
+		// if we not full frames we write frames numbers out.
+		if (!isFullFrames() && posDeltas_.size() > 1)
+		{
+			size_t numFrames = fullPos_.size();
+
+			// frame numbers are 8bit if total anim frames less than 255
+			if (numFrames <= 255)
+			{
+				for (const PosDelta& delta : posDeltas_)
+				{
+					uint8_t frame = safe_static_cast<uint8_t,uint32_t>(delta.frame);
+					pFile->writeObj(frame);
+				}
+			}
+			else
+			{
+				for (const PosDelta& delta : posDeltas_)
+				{
+					uint16_t frame = safe_static_cast<uint16_t, uint32_t>(delta.frame);
+					pFile->writeObj(frame);
+				}
+			}
+		}
+
+		// now we need to write the scalers.
+		if (isLargeScalers())
+		{
+			pFile->write(scalers_.ptr(),
+				safe_static_cast<uint32_t, size_t>(scalers_.size() * sizeof(Scaler)));
+		}
+		else
+		{
+			for (auto s : scalers_)
+			{
+				Vec3<uint8_t> s8;
+
+				s8.x = safe_static_cast<uint8_t, uint16_t>(s.x);
+				s8.y = safe_static_cast<uint8_t, uint16_t>(s.y);
+				s8.z = safe_static_cast<uint8_t, uint16_t>(s.z);
+
+				pFile->writeObj(s8);
+			}
+		}
+
+		pFile->writeObj(min_);
+		pFile->writeObj(range_);
+	}
+}
 
 void AnimCompiler::Position::CalculateDeltas(const float posError)
 {
-	posDeltas.clear();
-	posDeltas.reserve(fullPos.size());
+	posDeltas_.clear();
+	posDeltas_.reserve(fullPos_.size());
 
 	// we only store a delta if it's diffrent.
 	int32_t frame = 0;
-	Vec3f curPos = basePosition;
+	Vec3f curPos = basePosition_;
 
-	min = Vec3f::max();
-	max = Vec3f::min();
+	min_ = Vec3f::max();
+	max_ = Vec3f::min();
 
-	for (auto& pos : fullPos)
+	for (auto& pos : fullPos_)
 	{
 		Vec3f delta = curPos - pos;
 
 		if (!delta.compare(Vec3f::zero(), posError))
 		{
 			// only store min max for positions we are going to move to.
-			min.checkMin(pos);
-			max.checkMax(pos);
+			min_.checkMin(pos);
+			max_.checkMax(pos);
 
 			// we moved enougth.
-			PosDelta& deltaEntry = posDeltas.AddOne();
+			PosDelta& deltaEntry = posDeltas_.AddOne();
 			deltaEntry.worldPos = pos;
 			deltaEntry.delta = delta;
 			deltaEntry.frame = frame;
@@ -54,30 +153,30 @@ void AnimCompiler::Position::CalculateDeltas(const float posError)
 
 void AnimCompiler::Position::BuildScalers(const float posError)
 {
-	range = max - min;
+	range_ = max_ - min_;
 
 	uint32_t segments = (1 << 8) - 1;
 
 	// work out if we can use 8bit scalers with selected posError.
-	Vec3f rangePercision = range / 255;
+	Vec3f rangePercision = range_ / 255;
 	if (rangePercision.x > posError || rangePercision.y > posError || rangePercision.z > posError) {
 		segments = (1 << 16) - 1; // need 16 bit.
 
-		largeScalers = true;
+		largeScalers_ = true;
 	}
 	else {
-		largeScalers = false;
+		largeScalers_ = false;
 	}
 
-	Vec3f segmentsize(range / Vec3f(static_cast<float>(segments)));
+	Vec3f segmentsize(range_ / Vec3f(static_cast<float>(segments)));
 
-	scalers.clear();
-	scalers.reserve(posDeltas.size());
+	scalers_.clear();
+	scalers_.reserve(posDeltas_.size());
 
-	for (auto& deltaEntry : posDeltas)
+	for (auto& deltaEntry : posDeltas_)
 	{
 		// we know want to know the scaler needed to get the world pos.
-		Vec3f worldDelta = deltaEntry.worldPos - min;
+		Vec3f worldDelta = deltaEntry.worldPos - min_;
 		Vec3f scalerF = (worldDelta / segmentsize);
 	
 
@@ -86,7 +185,7 @@ void AnimCompiler::Position::BuildScalers(const float posError)
 		scaler.y = static_cast<Scaler::value_type>(math<float>::round(scalerF.y));
 		scaler.z = static_cast<Scaler::value_type>(math<float>::round(scalerF.z));
 
-		scalers.append(scaler);
+		scalers_.append(scaler);
 	}
 }
 
@@ -95,21 +194,80 @@ void AnimCompiler::Position::BuildScalers(const float posError)
 
 
 AnimCompiler::Angle::Angle(core::MemoryArenaBase* arena) :
-	fullAngles(arena),
-	angles(arena)
+	fullAngles_(arena),
+	angles_(arena)
 {
+	fullAngles_.setGranularity(128);
+}
 
+
+void AnimCompiler::Angle::appendFullAng(const Quatf& ang)
+{
+	fullAngles_.append(ang);
+}
+
+void AnimCompiler::Angle::setBaseOrient(const Quatf& ang)
+{
+	baseOrient_ = ang;
+}
+
+bool AnimCompiler::Angle::isFullFrames(void) const
+{
+	return fullAngles_.size() == angles_.size();
+}
+
+void AnimCompiler::Angle::save(core::XFile* pFile) const
+{
+	X_ASSERT_NOT_NULL(pFile);
+
+	int16_t numAngle = safe_static_cast<uint16_t, size_t>(angles_.size());
+
+	pFile->writeObj(numAngle);
+
+	if (numAngle > 0)
+	{
+		if (!isFullFrames() && angles_.size() > 1)
+		{
+			size_t numFrames = fullAngles_.size();
+
+			// frame numbers are 8bit if total anim frames less than 255
+			if (numFrames <= 255)
+			{
+				for (const auto& a : angles_)
+				{
+					uint8_t frame = safe_static_cast<uint8_t, uint32_t>(a.frame);
+					pFile->writeObj(frame);
+				}
+			}
+			else
+			{
+				for (const auto& a : angles_)
+				{
+					uint16_t frame = safe_static_cast<uint16_t, uint32_t>(a.frame);
+					pFile->writeObj(frame);
+				}
+			}
+		}
+
+		// write angles
+		for (const auto& a : angles_)
+		{
+			// compressed quat.
+			XQuatCompressedf quatf(a.angle);
+			pFile->writeObj(quatf);
+		}
+	}
 }
 
 void AnimCompiler::Angle::CalculateDeltas(const float posError)
 {
-	angles.clear();
-	angles.reserve(fullAngles.size());
+	angles_.clear();
+	angles_.reserve(fullAngles_.size());
 
-	Quatf curAng = baseOrient;
+	Quatf curAng = baseOrient_;
 	int32_t frame = 0;
 
-	for (auto& ang : fullAngles)
+	for (auto& ang : fullAngles_)
 	{
 		Quatf delta = curAng * ang.inverse();
 
@@ -123,16 +281,17 @@ void AnimCompiler::Angle::CalculateDeltas(const float posError)
 
 		if (pitchPass || rollPass || yawPass)
 		{
-			axisChanges[0] |= pitchPass;
-			axisChanges[1] |= rollPass;
-			axisChanges[2] |= yawPass;
+			axisChanges_[0] |= pitchPass;
+			axisChanges_[1] |= rollPass;
+			axisChanges_[2] |= yawPass;
 
 			// add it :)
 			AngleFrame a;
 			a.frame = frame;
 			a.angle = ang;
+			angles_.append(a);
 
-			angles.append(a);
+			curAng = ang;
 		}
 
 		frame++;
@@ -151,7 +310,6 @@ AnimCompiler::Bone::Bone() :
 AnimCompiler::AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter, const model::ModelSkeleton& skelton) :
 	inter_(inter),
 	skelton_(skelton),
-
 	bones_(arena)
 {
 
@@ -163,7 +321,7 @@ AnimCompiler::~AnimCompiler()
 
 }
 
-bool AnimCompiler::compile(void)
+bool AnimCompiler::compile(core::Path<char>& path)
 {
 	// got any bones in the inter?
 	if (inter_.getNumBones() < 1) {
@@ -200,6 +358,54 @@ bool AnimCompiler::compile(void)
 	loadBaseData();
 	processBones();
 
+	return save(path);
+}
+
+bool AnimCompiler::save(core::Path<char>& path)
+{
+	path.setExtension(anim::ANIM_FILE_EXTENSION);
+
+	core::fileModeFlags mode;
+	mode.Set(core::fileMode::RECREATE);
+	mode.Set(core::fileMode::WRITE);
+
+	core::XFile* pFile = gEnv->pFileSys->openFile(path.c_str(), mode);
+	if (!pFile) {
+		X_ERROR("Anim", "Failed to open output file for compiled animation: \"%s\"",
+			path.c_str());
+		return false;
+	}
+
+	const bool loop = false;
+
+	anim::AnimHeader hdr;
+	hdr.version = anim::ANIM_VERSION;
+
+	if (loop) {
+		hdr.flags.Set(AnimFlag::LOOP);
+	}
+
+	hdr.type = AnimType::RELATIVE;
+	hdr.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
+	hdr.numFrames = safe_static_cast<uint16_t, uint32_t>(inter_.getNumFrames());
+	hdr.fps = safe_static_cast<uint16_t, uint32_t>(inter_.getFps());
+
+	pFile->writeObj(hdr);
+
+	// write the bone names.
+	for (const auto& bone : bones_)
+	{
+		pFile->writeString(bone.name);
+	}
+
+	// now we save the data.
+	for (const auto& bone : bones_)
+	{
+		bone.ang.save(pFile);
+		bone.pos.save(pFile);
+	}
+
+	gEnv->pFileSys->closeFile(pFile);
 	return true;
 }
 
@@ -215,14 +421,12 @@ void AnimCompiler::loadInterBones(void)
 		const size_t dataNum = interBone.data.size();
 
 		bones_[i].name = interBone.name;
-		bones_[i].pos.fullPos.reserve(dataNum);
-		bones_[i].ang.fullAngles.reserve(dataNum);
 
 		// load pos / angles.
 		for (size_t x = 0; x < dataNum; x++)
 		{
-			bones_[i].pos.fullPos.append(interBone.data[x].position);
-			bones_[i].ang.fullAngles.append(interBone.data[x].rotation);
+			bones_[i].pos.appendFullPos(interBone.data[x].position);
+			bones_[i].ang.appendFullAng(interBone.data[x].rotation);
 		}
 	}
 }
@@ -273,8 +477,8 @@ void AnimCompiler::loadBaseData(void)
 				const Vec3f& pos = skelton_.getBonePos(x);
 
 				Bone& bone = bones_[i];
-				bone.pos.basePosition = pos;
-				bone.ang.baseOrient = angle.asQuat();
+				bone.pos.setBasePosition(pos);
+				bone.ang.setBaseOrient(angle.asQuat());
 				break;
 			}
 		}
@@ -289,7 +493,7 @@ void AnimCompiler::loadBaseData(void)
 
 void AnimCompiler::processBones(void)
 {
-	for (auto bone : bones_)
+	for (auto& bone : bones_)
 	{
 		bone.pos.CalculateDeltas();
 		bone.ang.CalculateDeltas();
