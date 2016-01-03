@@ -198,10 +198,9 @@ bool AnimCompiler::compile(void)
 
 	// load base bone positions from model skelton.
 	loadBaseData();
-
 	processBones();
 
-	return false;
+	return true;
 }
 
 
