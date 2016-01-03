@@ -163,6 +163,23 @@ bool InterAnim::ParseData(core::XLexer& lex)
 			version, anim::ANIM_INTER_VERSION);
 		return false;
 	}
+	// limit checks
+	if (fps_ < anim::ANIM_MAX_FPS) {
+		X_ERROR("InterAnim", "InterAnim file fps is too high: %i max: %i",
+			fps_, version, anim::ANIM_MAX_FPS);
+		return false;
+	}
+	if (fps_ < anim::ANIM_MIN_FPS) {
+		X_ERROR("InterAnim", "InterAnim file fps is too low: %i min: %i",
+			fps_, version, anim::ANIM_MIN_FPS);
+		return false;
+	}
+	if (numBones > anim::ANIM_MAX_BONES) {
+		X_ERROR("InterAnim", "InterAnim file has too many bones: %i max: %i",
+			numBones, version, anim::ANIM_MAX_BONES);
+		return false;
+	}
+
 	// how many bones!
 	if (numBones < 1) {
 		X_ERROR("InterAnim", "animation has zero bones");
