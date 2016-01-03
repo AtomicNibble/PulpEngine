@@ -48,6 +48,7 @@ struct math
 	X_INLINE static  T	ceil(T x)					{ return ::ceil(double(x)); }
 	X_INLINE static  T	abs(T x)					{ return ::fabs(double(x)); }
 	X_INLINE static  T	floor(T x)					{ return ::floor(double(x)); }
+	X_INLINE static  T	round(T x)					{ return ::floor(double(x) + T(0.5)); }
 	X_INLINE static  T	fmod(T x, T y)				{ return ::fmod(double(x), double(y)); }
 	X_INLINE static  T	hypot(T x, T y)				{ return ::hypot(double(x), double(y)); }
 	X_INLINE static  T	signum(T x)					{ return (x >0.0) ? 1.0 : ((x < 0.0) ? -1.0 : 0.0); }
@@ -91,6 +92,7 @@ struct math<float>
 	X_INLINE static  float	ceil(float x)			{ return ::ceilf(x); }
 	X_INLINE static  float	abs(float x)			{ return ::fabsf(x); }
 	X_INLINE static  float	floor(float x)			{ return ::floorf(x); }
+	X_INLINE static  float	round(float x)			{ return ::floorf(float(x) + 0.5f); }
 	X_INLINE static  float	fmod(float x, float y)	{ return ::fmodf(x, y); }
 	X_INLINE static  float	hypot(float x, float y)	{ return ::sqrtf(x*x + y*y); }
 	X_INLINE static  float	signum(float x)			{ return (x > 0.0f) ? 1.0f : ((x < 0.0f) ? -1.0f : 0.0f); }
