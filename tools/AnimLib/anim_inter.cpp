@@ -164,7 +164,7 @@ bool InterAnim::ParseData(core::XLexer& lex)
 		return false;
 	}
 	// limit checks
-	if (fps_ < anim::ANIM_MAX_FPS) {
+	if (fps_ > anim::ANIM_MAX_FPS) {
 		X_ERROR("InterAnim", "InterAnim file fps is too high: %i max: %i",
 			fps_, version, anim::ANIM_MAX_FPS);
 		return false;
