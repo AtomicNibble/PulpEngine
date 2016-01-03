@@ -114,6 +114,7 @@ public:
 	Quat<T> operator~() const;
 	Quat<T> operator-() const;
 
+	bool compare(const Quat<T>& oth, const T elipson) const;
 
 	bool operator==(const Quat<T> &rhs) const;
 	bool operator!=(const Quat<T> &rhs) const;

@@ -671,6 +671,12 @@ X_INLINE Quat<T> Quat<T>::operator-() const
 	return Quat<T>(-w, -v.x, -v.y, -v.z);
 }
 
+template<typename T>
+X_INLINE bool Quat<T>::compare(const Quat<T>& rhs, const T elipson) const
+{
+	const Quat<T>& lhs = *this;
+	return (math<float>::abs(lhs.w - rhs.w) < elipson) && lhs.v.compare(rhs.v, elipson);
+}
 
 template<typename T>
 X_INLINE bool Quat<T>::operator==(const Quat<T> &rhs) const
