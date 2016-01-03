@@ -75,7 +75,7 @@ class AnimCompiler
 		void setBaseOrient(const Quatf& ang);
 		bool isFullFrames(void) const;
 
-		void CalculateDeltas(const float posError = 0.075f);
+		void CalculateDeltas(const float angError = 0.075f);
 
 		void save(core::XFile* pFile) const;
 
@@ -109,7 +109,7 @@ public:
 	AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter, const model::ModelSkeleton& skelton);
 	~AnimCompiler();
 
-	bool compile(core::Path<char>& path);
+	bool compile(core::Path<char>& path, const float posError = 0.5f, const float angError = 0.5f);
 
 private:
 	bool save(core::Path<char>& path);
@@ -119,7 +119,7 @@ private:
 	void loadInterBones(void);
 	void dropMissingBones(void);
 	void loadBaseData(void);
-	void processBones(void);
+	void processBones(const float posError, const float angError);
 
 private:
 	const InterAnim& inter_;

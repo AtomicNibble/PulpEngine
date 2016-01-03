@@ -259,7 +259,7 @@ void AnimCompiler::Angle::save(core::XFile* pFile) const
 	}
 }
 
-void AnimCompiler::Angle::CalculateDeltas(const float posError)
+void AnimCompiler::Angle::CalculateDeltas(const float angError)
 {
 	angles_.clear();
 	angles_.reserve(fullAngles_.size());
@@ -275,9 +275,9 @@ void AnimCompiler::Angle::CalculateDeltas(const float posError)
 		float rollDelta = delta.getRoll();
 		float yawDelta = delta.getYaw();
 
-		bool pitchPass = math<float>::abs(pitchDelta) > posError;
-		bool rollPass = math<float>::abs(rollDelta) > posError;
-		bool yawPass = math<float>::abs(yawDelta) > posError;
+		bool pitchPass = math<float>::abs(pitchDelta) > angError;
+		bool rollPass = math<float>::abs(rollDelta) > angError;
+		bool yawPass = math<float>::abs(yawDelta) > angError;
 
 		if (pitchPass || rollPass || yawPass)
 		{
@@ -321,7 +321,7 @@ AnimCompiler::~AnimCompiler()
 
 }
 
-bool AnimCompiler::compile(core::Path<char>& path)
+bool AnimCompiler::compile(core::Path<char>& path, const float posError, const float angError)
 {
 	// got any bones in the inter?
 	if (inter_.getNumBones() < 1) {
@@ -356,7 +356,7 @@ bool AnimCompiler::compile(core::Path<char>& path)
 
 	// load base bone positions from model skelton.
 	loadBaseData();
-	processBones();
+	processBones(posError, angError);
 
 	return save(path);
 }
@@ -491,12 +491,12 @@ void AnimCompiler::loadBaseData(void)
 }
 
 
-void AnimCompiler::processBones(void)
+void AnimCompiler::processBones(const float posError, const float angError)
 {
 	for (auto& bone : bones_)
 	{
-		bone.pos.CalculateDeltas();
-		bone.ang.CalculateDeltas();
+		bone.pos.CalculateDeltas(posError);
+		bone.ang.CalculateDeltas(angError);
 	}
 }
 
