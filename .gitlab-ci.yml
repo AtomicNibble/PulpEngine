@@ -70,7 +70,7 @@ test_win64_debug:
   tags:
    - windows
 
-   test_win32_debug:
+test_win32_debug:
   stage: test
   script:
    - echo testing...
