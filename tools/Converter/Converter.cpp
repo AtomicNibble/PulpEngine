@@ -10,6 +10,8 @@
 #define _LAUNCHER
 #include <ModuleExports.h>
 
+#include <IAnimation.h>
+
 HINSTANCE g_hInstance = 0;
 
 #ifdef X_LIB
@@ -17,6 +19,10 @@ HINSTANCE g_hInstance = 0;
 struct XRegFactoryNode* g_pHeadToRegFactories = 0;
 
 X_LINK_LIB("engine_Core")
+X_LINK_LIB("engine_RenderNull")
+
+X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
+
 
 #endif // !X_LIB
 
@@ -44,7 +50,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	core::Console Console(L"Potato - Converter");
 	Console.RedirectSTD();
-	Console.SetSize(90, 60, 2000);
+	Console.SetSize(60, 40, 2000);
 	Console.MoveTo(10, 10);
 
 
@@ -56,8 +62,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	if (engine.Init(lpCmdLine, Console))
 	{
 		{
+			HMODULE hAnimLib = PotatoLoadLibary("engine_AnimLib");
+			if (hAnimLib)
+			{
+				typedef core::traits::Function<anim::IAnimLib* (ICore *)> AnimLibInter;
 
+				AnimLibInter::Pointer pFunc = reinterpret_cast<AnimLibInter::Pointer>(PotatoGetProcAddress(hAnimLib, "CreateInterface"));
+				if (pFunc)
+				{
+					anim::IAnimLib* pLib = pFunc(gEnv->pCore);
 
+					const char* animInter = "C:\\Users\\WinCat\\Documents\\code\\WinCat\\engine\\potatoengine\\game_folder\\mod\\anims\\anim_test_01.anim_inter";
+					const char* pModel = "C:\\Users\\WinCat\\Documents\\code\\WinCat\\engine\\potatoengine\\game_folder\\mod\\models\\anim_test.model";
+					const char* pDest = "K:\\anim_test_01";
+
+					pLib->ConvertAnim(animInter, pModel, pDest);
+				}
+			}
 		}
 		system("PAUSE");
 	}
