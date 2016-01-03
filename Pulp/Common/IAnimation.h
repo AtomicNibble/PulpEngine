@@ -93,7 +93,12 @@ struct IAnimLib
 };
 
 
-X_DECLARE_ENUM8(AnimType)(RELATIVE, ABSOLUTE);
+X_DECLARE_ENUM8(AnimType)(
+	RELATIVE, 
+	ABSOLUTE,
+	ADDITIVE,
+	DELTA
+);
 X_DECLARE_FLAGS8(AnimFlag)(
 	LOOP,
 	NOTES // got notes
