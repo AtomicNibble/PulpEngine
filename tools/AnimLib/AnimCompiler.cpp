@@ -3,7 +3,8 @@
 
 X_NAMESPACE_BEGIN(anim)
 
-
+const float AnimCompiler::DEFAULT_POS_ERRR = 0.05f;
+const float AnimCompiler::DEFAULT_ANGLE_ERRR = 0.005f;
 
 AnimCompiler::Position::Position(core::MemoryArenaBase* arena) :
 	fullPos_(arena),

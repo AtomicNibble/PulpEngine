@@ -106,10 +106,14 @@ class AnimCompiler
 	typedef core::Array<Bone> BoneArr;
 
 public:
+	static const float DEFAULT_POS_ERRR;
+	static const float DEFAULT_ANGLE_ERRR;
+
+public:
 	AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter, const model::ModelSkeleton& skelton);
 	~AnimCompiler();
 
-	bool compile(core::Path<char>& path, const float posError = 0.5f, const float angError = 0.5f);
+	bool compile(core::Path<char>& path, const float posError = DEFAULT_POS_ERRR, const float angError = DEFAULT_ANGLE_ERRR);
 
 private:
 	bool save(core::Path<char>& path);
