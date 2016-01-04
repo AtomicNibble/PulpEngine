@@ -68,6 +68,7 @@ public:
 	Quat<T> inverse() const;
 	Quat<T> inverted() const;
 	Quat<T>& invert();
+	Quat<T> diff(const Quat& oth) const;
 
 	void set(T aW, T x, T y, T z);
 	void set(const Vec3<T> &from, const Vec3<T> &to);

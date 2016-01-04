@@ -162,6 +162,13 @@ X_INLINE Quat<T>& Quat<T>::invert()
 }
 
 template<typename T>
+X_INLINE Quat<T> Quat<T>::diff(const Quat<T>& oth) const
+{
+	Quat<T> in = inverse();
+	return in * oth;
+}
+
+template<typename T>
 X_INLINE void Quat<T>::set(T aW, T x, T y, T z)
 {
 	w = aW;
