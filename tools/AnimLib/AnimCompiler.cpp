@@ -269,7 +269,7 @@ void AnimCompiler::Angle::CalculateDeltas(const float angError)
 
 	for (auto& ang : fullAngles_)
 	{
-		Quatf delta = curAng * ang.inverse();
+		Quatf delta = ang.diff(curAng);
 
 		float pitchDelta = delta.getPitch();
 		float rollDelta = delta.getRoll();
