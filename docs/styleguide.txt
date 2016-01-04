@@ -194,3 +194,15 @@ Macros:
     When ever using #if, #ifndef etc allwyas place the condition in a comment after the #endif with a leading !
 
     Eg: #if X_EXAMPLE .... #endinf // !X_EXAMPLE
+
+
+Format strings:
+
+    Certain format strings should be prefixed.
+
+    TYPE                                    Don't                               Do
+    void * (or any pointer)             %lx                                 %p
+    int64_t                                     %qd, %lld                      %" PRId64 "
+    uint64_t                                   %qu, %llu, %llx              %" PRIu64 ", %" PRIx64 "
+    size_t                                      %u                                  %" PRIuS ", %" PRIxS "
+    ptrdiff_t                                   %d                                  %" PRIdS "
