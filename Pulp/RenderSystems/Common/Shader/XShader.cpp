@@ -572,7 +572,7 @@ XShader* XShaderManager::reloadShader(const char* name)
 
 				SourceFile* Hlslsource = loadRawSourceFile(shader->pHlslFile_->fileName.c_str(), true);
 
-				if (source)
+				if (Hlslsource)
 				{
 					if (lastCrc32 != Hlslsource->sourceCrc32)
 					{
