@@ -2531,7 +2531,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 					string::const_str pos = InputBuffer_.find(nameStr.c_str());
 					if (pos)
 					{
-						static core::StackString<64> lastValue;
+					//	static core::StackString<64> lastValue;
 						core::StackString<64> colorStr(&pos[nameStr.length()],
 							InputBuffer_.end());
 						
@@ -2542,7 +2542,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 						// add some checks if still needs drawing if the lex time is a issue.
 						if (!colorStr.isEmpty()) // && colorStr != lastValue)
 						{
-							lastValue = colorStr;
+						//	lastValue = colorStr;
 
 							// parse it.
 							Color previewCol;
