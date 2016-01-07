@@ -193,6 +193,11 @@ bool CVarColRef::ColorFromString(const char* pStr, Color& out, bool Slient)
 				col.a = col.r;
 				break;
 			}
+			if (i == 3)
+			{
+				// solid alpha.
+				col.a = 1.f;
+			}
 			else
 			{
 				X_ERROR_IF(!Slient, "Cvar", "failed to set color, require either 1 or 4 real numbers");
