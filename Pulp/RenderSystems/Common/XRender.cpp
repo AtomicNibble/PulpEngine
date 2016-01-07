@@ -6,6 +6,7 @@
 #include <ICore.h>
 
 #include <ITexture.h>
+#include <IConsole.h>
 
 #include "ReaderThread.h"
 #include "Textures\XTexture.h"
@@ -149,8 +150,20 @@ bool XRender::Init(HWND hWnd, uint32_t width, uint32_t height)
 	if (gEnv->pFont) {
 		pDefaultFont_ = gEnv->pFont->GetFont("default");
 	}
+
+	RegisterVars();
 	return true;
 }
+
+void XRender::RegisterVars(void)
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pConsole);
+
+	ADD_CVAR_REF_COL_NO_NAME(r_clear_color, Color(0.057f, 0.221f, 0.400f),
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Clear color");
+}
+
 
 void XRender::ShutDown(void)
 {

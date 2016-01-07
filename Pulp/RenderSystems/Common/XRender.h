@@ -218,6 +218,7 @@ public:
 	static uint32_t vertexFormatStride[shader::VertexFormat::Num];
 	static uint32_t vertexSteamStride[VertexStream::ENUM_COUNT][shader::VertexFormat::Num];
 protected:
+	void RegisterVars(void);
 
 	virtual void SetArenas(core::MemoryArenaBase* arena);
 
@@ -252,6 +253,9 @@ protected:
 
 	// default font baby.
 	font::IFFont* pDefaultFont_;
+
+	// vars
+	Colorf r_clear_color;
 };
 
 extern XRender* gRenDev;

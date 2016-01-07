@@ -613,10 +613,8 @@ void DX11XRender::RenderBegin(void)
 
 	texture::XTexture::setDefaultFilterMode(shader::FilterMode::TRILINEAR);
 
-	Colorf clear_col(0.057f, 0.221f, 0.400f);
-
 	// Clear the back buffer.
-	deviceContext_->ClearRenderTargetView(renderTargetView_, clear_col);
+	deviceContext_->ClearRenderTargetView(renderTargetView_, r_clear_color);
 	// Clear the depth buffer.
 	deviceContext_->ClearDepthStencilView(depthStencilView_, D3D11_CLEAR_DEPTH | D3D11_CLEAR_STENCIL, 1.0f, 0);
 
