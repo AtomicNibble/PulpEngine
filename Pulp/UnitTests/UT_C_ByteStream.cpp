@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include <gtest\gtest.h>
+
 
 #include <Containers\ByteStream.h>
 #include <Containers\Array.h> // for move test.

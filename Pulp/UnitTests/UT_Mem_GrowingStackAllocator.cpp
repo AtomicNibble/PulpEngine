@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "gtest/gtest.h"
+
 
 #include <Memory/AllocationPolicies/GrowingStackAllocator.h>
 #include <Memory\VirtualMem.h>

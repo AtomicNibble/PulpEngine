@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "gtest/gtest.h"
+
 
 
 #include <Compression\Lzma2.h>

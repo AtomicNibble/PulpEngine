@@ -7,7 +7,7 @@
 #include "Time\StopWatch.h"
 #include "Time\TimeVal.h"
 
-#include "gtest/gtest.h"
+
 
 #include "Profiler.h"
 

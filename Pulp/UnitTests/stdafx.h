@@ -4,6 +4,7 @@
 
 #include <EngineCommon.h>
 
+#include <gtest\gtest.h>
 
 #include "UT_AssertChecker.h"
 

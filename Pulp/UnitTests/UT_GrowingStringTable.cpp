@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "gtest/gtest.h"
+
 
 #include <String\GrowingStringTable.h>
 #include <Memory/AllocationPolicies/StackAllocator.h>

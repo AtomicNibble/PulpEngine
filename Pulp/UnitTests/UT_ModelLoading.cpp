@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include <gtest\gtest.h>
+
 #include "Profiler.h"
 
 #include <IModel.h>

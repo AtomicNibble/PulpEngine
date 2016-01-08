@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "gtest/gtest.h"
+
 
 #include <Math\XVector.h>
 #include "Math\XIntersect.h"

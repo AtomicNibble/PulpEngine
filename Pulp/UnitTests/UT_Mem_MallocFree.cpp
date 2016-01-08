@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "gtest/gtest.h"
+
 
 #include <Memory\AllocationPolicies\MallocFreeAllocator.h>
 #include <Memory\VirtualMem.h>

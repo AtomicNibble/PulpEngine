@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include <gtest\gtest.h>
+
 #include <Containers\Fifo.h>
 
 #include <Containers\Array.h> // for move test.

@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include <gtest\gtest.h>
+
 #include <Math\XAabb.h>
 
 // streames not used in engine, so declare.

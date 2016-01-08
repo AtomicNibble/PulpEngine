@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "gtest/gtest.h"
+
 
 #include <Debugging\SymbolResolution.h>
 #include <Debugging\CallStack.h>

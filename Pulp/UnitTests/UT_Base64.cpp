@@ -1,6 +1,7 @@
 #include "stdafx.h"
-#include "gtest\gtest.h"
+
 #include "String\Base64.h"
+
 
 X_USING_NAMESPACE;
 

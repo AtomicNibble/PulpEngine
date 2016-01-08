@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "gtest/gtest.h"
+
 #include <Math\XQuatCompressed.h>
 
 #define EXPECT_NEAR_VEC3(expected,actual,angle_error) \

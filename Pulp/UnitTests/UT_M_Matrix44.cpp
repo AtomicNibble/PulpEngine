@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "gtest/gtest.h"
+
 
 #include <Platform\Compiler.h>
 

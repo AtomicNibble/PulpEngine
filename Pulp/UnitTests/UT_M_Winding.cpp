@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "Math\XWinding.h"
 
-#include <gtest\gtest.h>
+
 
 #include "Math\XAabb.h"
 

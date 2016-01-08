@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "gtest/gtest.h"
+
 // slap goat, just don't tickle it's throat.
 // or you will be going home in a boat.
 // i wrote it's address on a note.

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "gtest/gtest.h"
+
 
 #include <Util\PointerUtil.h>
 #include <Util\PointerFlags.h>

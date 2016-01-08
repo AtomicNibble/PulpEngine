@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "UnitTester.h"
 #include "EngineApp.h"
-#include "gtest\gtest.h"
+
 
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>

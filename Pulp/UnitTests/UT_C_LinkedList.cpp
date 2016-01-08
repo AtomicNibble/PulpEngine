@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include <gtest\gtest.h>
+
 
 #include <Containers\LinkedListIntrusive.h>
 #include <Containers\LinkedList.h>

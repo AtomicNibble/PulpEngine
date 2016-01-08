@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "Math\XObb.h"
-#include <gtest\gtest.h>
+
 
 #define EXPECT_NEAR_VEC3(expected,actual,angle_error) \
 { Vec3f _exp = expected; \
