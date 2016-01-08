@@ -93,7 +93,7 @@ class AnimCompiler
 
 		typedef core::Array<Quatf> AngleData;
 
-		Bone();
+		Bone(core::MemoryArenaBase* arena);
 
 		core::string name;
 
@@ -126,6 +126,8 @@ private:
 	void processBones(const float posError, const float angError);
 
 private:
+	core::MemoryArenaBase* arena_;
+
 	const InterAnim& inter_;
 	const model::ModelSkeleton& skelton_;
 private:

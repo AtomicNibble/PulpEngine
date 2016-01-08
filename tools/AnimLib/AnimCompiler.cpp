@@ -301,14 +301,15 @@ void AnimCompiler::Angle::CalculateDeltas(const float angError)
 
 // ====================================================
 
-AnimCompiler::Bone::Bone() : 
-	pos(g_AnimLibArena),
-	ang(g_AnimLibArena)
+AnimCompiler::Bone::Bone(core::MemoryArenaBase* arena) :
+	pos(arena),
+	ang(arena)
 {
 
 }
 
 AnimCompiler::AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter, const model::ModelSkeleton& skelton) :
+	arena_(arena),
 	inter_(inter),
 	skelton_(skelton),
 	bones_(arena)
@@ -414,20 +415,21 @@ bool AnimCompiler::save(core::Path<char>& path)
 void AnimCompiler::loadInterBones(void)
 {
 	// make a copy of all the bones names in anim file.
-	bones_.resize(inter_.getNumBones());
+	bones_.resize(inter_.getNumBones(), Bone(arena_));
 
 	for (size_t i = 0; i < inter_.getNumBones(); i++)
 	{
 		const anim::Bone& interBone = inter_.getBone(i);
 		const size_t dataNum = interBone.data.size();
 
-		bones_[i].name = interBone.name;
+		Bone& bone = bones_[i];
+		bone.name = interBone.name;
 
 		// load pos / angles.
 		for (size_t x = 0; x < dataNum; x++)
 		{
-			bones_[i].pos.appendFullPos(interBone.data[x].position);
-			bones_[i].ang.appendFullAng(interBone.data[x].rotation);
+			bone.pos.appendFullPos(interBone.data[x].position);
+			bone.ang.appendFullAng(interBone.data[x].rotation);
 		}
 	}
 }
