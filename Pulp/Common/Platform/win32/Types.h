@@ -99,6 +99,11 @@ typedef signed __int64     int64;
 // typedef unsigned int UINT_PTR, *PUINT_PTR;
 
 /* VC++ COMPILER PARAMETERS */
+#if _MSC_FULL_VER >= 190023506
+# include <stdint.h>
+#else
+
+
 #define _LONGLONG	__int64
 #define _ULONGLONG	unsigned __int64
 #define _LLONG_MAX	0x7fffffffffffffff
@@ -125,6 +130,8 @@ typedef _ULonglong uint_fast64_t;
 
 typedef _Longlong intmax_t;
 typedef _ULonglong uintmax_t;
+
+#endif // !_MSC_FULL_VER < 190023506
 
 #ifndef _PTRDIFF_T_DEFINED
 #ifdef _WIN64
