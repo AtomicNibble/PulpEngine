@@ -71,7 +71,7 @@ void AnimCompiler::Position::save(core::XFile* pFile) const
 			size_t numFrames = fullPos_.size();
 
 			// frame numbers are 8bit if total anim frames less than 255
-			if (numFrames <= 255)
+			if (numFrames <= std::numeric_limits<uint8_t>::max())
 			{
 				for (const PosDelta& delta : posDeltas_)
 				{
@@ -159,7 +159,7 @@ void AnimCompiler::Position::BuildScalers(const float posError)
 	uint32_t segments = (1 << 8) - 1;
 
 	// work out if we can use 8bit scalers with selected posError.
-	Vec3f rangePercision = range_ / 255;
+	Vec3f rangePercision = range_ / std::numeric_limits<uint8_t>::max();
 	if (rangePercision.x > posError || rangePercision.y > posError || rangePercision.z > posError) {
 		segments = (1 << 16) - 1; // need 16 bit.
 
@@ -232,7 +232,7 @@ void AnimCompiler::Angle::save(core::XFile* pFile) const
 			size_t numFrames = fullAngles_.size();
 
 			// frame numbers are 8bit if total anim frames less than 255
-			if (numFrames <= 255)
+			if (numFrames <= std::numeric_limits<uint8_t>::max())
 			{
 				for (const auto& a : angles_)
 				{
