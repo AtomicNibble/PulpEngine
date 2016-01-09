@@ -69,7 +69,7 @@ Quat<T> XQuatCompressed<T>::asQuat() const
 template<class T>
 Matrix33<T> XQuatCompressed<T>::asMatrix33() const
 {
-	asQuat().toMatrix33();
+	return asQuat().toMatrix33();
 }
 
 template<typename T>
