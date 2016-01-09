@@ -244,7 +244,14 @@ void XModel::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequestData& re
 		core::V2::JobSystem* pJobSys = gEnv->pJobSys;
 		core::V2::Job* pJob = nullptr;
 
-		if (request.readInfo.pBuf == &hdr_) {
+		if (request.readInfo.pBuf == &hdr_) 
+		{
+			if (bytesTransferred != sizeof(hdr_)) {
+				X_ERROR("Model", "Failed to read model header. Got: 0x%x need: 0x%x",
+					bytesTransferred, static_cast<uint32_t>(sizeof(hdr_)));
+				return;
+			}
+
 			pJob = pJobSys->CreateJobMemberFunc<XModel>(this, &XModel::ProcessHeader_job, pFile);
 		}
 		else {
