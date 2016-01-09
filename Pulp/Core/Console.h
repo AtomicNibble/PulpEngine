@@ -357,6 +357,7 @@ private:
 	static Color	console_output_scroll_bar_slider_color;
 	static int		console_output_draw_channel;
 	static int		console_buffer_size;
+	static int		console_cursor_skip_color_codes;
 
 	// some behaviour options.
 	static int		console_disable_mouse;

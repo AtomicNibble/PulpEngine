@@ -571,6 +571,7 @@ Color XConsole::console_output_scroll_bar_slider_color;
 int	  XConsole::console_output_draw_channel;
 int	XConsole::console_buffer_size = 0;
 int XConsole::console_disable_mouse = 0;
+int XConsole::console_cursor_skip_color_codes = 0;
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -695,6 +696,9 @@ void XConsole::Startup(ICore* pCore, bool basic)
 	ADD_CVAR_REF_NO_NAME(console_disable_mouse, 2, 0, 2,
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Disable mouse input when console open."
 		" 1=expanded only 2=always");
+	ADD_CVAR_REF_NO_NAME(console_cursor_skip_color_codes, 1, 0, 1,
+		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Skips over the color codes when moving cursor.");
+	
 
 	if (!basic)
 	{
@@ -1159,6 +1163,28 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 			// disable blinking while moving.
 			cursor_.curTime = 0.f; 
 			cursor_.draw = true;
+
+			if (console_cursor_skip_color_codes)
+			{
+				// if we are at a number and ^ is before us go back two more.
+				if (CursorPos_ >= 1)
+				{
+					const char curChar = InputBuffer_[CursorPos_];
+
+					if (core::strUtil::IsDigit(curChar))
+					{
+						const char PreChar = InputBuffer_[CursorPos_ - 1];
+
+						if (PreChar == '^')
+						{
+							CursorPos_--;
+							if (CursorPos_ > 0) {
+								CursorPos_--;
+							}
+						}
+					}
+				}
+			}
 		}
 		return true;
 	}
@@ -1171,6 +1197,20 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 			// disable blinking while moving.
 			cursor_.curTime = 0.f;
 			cursor_.draw = true;
+
+			if (console_cursor_skip_color_codes)
+			{
+				uint32_t charsLeft = (safe_static_cast<int32_t, size_t>(InputBuffer_.length()) - CursorPos_);
+				if (charsLeft >= 2)
+				{
+					const char curChar = InputBuffer_[CursorPos_];
+					const char nextChar = InputBuffer_[CursorPos_ + 1];
+					if (curChar == '^' && core::strUtil::IsDigit(nextChar))
+					{
+						CursorPos_ += 2;
+					}
+				}
+			}
 		}
 		else if (autoCompleteIdx_ >= 0) {
 			autoCompleteSelect_ = true;
