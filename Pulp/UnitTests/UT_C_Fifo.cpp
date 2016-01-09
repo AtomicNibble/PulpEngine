@@ -212,3 +212,40 @@ TYPED_TEST(FifoTest, MoveAssign)
 	EXPECT_EQ(0, fifo.size());
 	EXPECT_EQ(64, fifo.capacity());
 }
+
+TYPED_TEST(FifoTest, Reserver)
+{
+	CustomType::CONSTRUCTION_COUNT = 0;
+	CustomType::DECONSTRUCTION_COUNT = 0;
+
+	// check for reserver not constructing
+	{
+		Fifo<TypeParam> fifo(g_arena);
+
+		fifo.reserve(3);
+	}
+
+	EXPECT_EQ(0, CustomType::DECONSTRUCTION_COUNT);
+	EXPECT_EQ(CustomType::CONSTRUCTION_COUNT, CustomType::DECONSTRUCTION_COUNT);
+}
+
+TYPED_TEST(FifoTest, CleanUp)
+{
+	CustomType::CONSTRUCTION_COUNT = 0;
+	CustomType::DECONSTRUCTION_COUNT = 0;
+
+	// check for double deconstruction.
+	{
+		Fifo<TypeParam> fifo(g_arena);
+
+		fifo.reserve(3);
+
+		EXPECT_EQ(0, fifo.size());
+		ASSERT_EQ(3, fifo.capacity());
+
+		fifo.push(16);
+		fifo.push(32);
+	}
+
+	EXPECT_EQ(CustomType::CONSTRUCTION_COUNT, CustomType::DECONSTRUCTION_COUNT);
+}
