@@ -342,11 +342,14 @@ inline bool Fifo<T>::const_iterator::operator!=(const const_iterator& rhs) const
 template<typename T>
 void Fifo<T>::Delete(T* pData)
 {
-	X_DELETE_ARRAY(pData, arena_);
+	// don't deconstruct
+	uint8_t* pDataPod = union_cast<uint8_t*, T*>(pData);
+
+	X_DELETE_ARRAY(pDataPod, arena_);
 }
 
 template<typename T>
 T* Fifo<T>::Allocate(size_type num)
 {
-	return X_NEW_ARRAY(T, num, arena_, "Fifo<"X_PP_STRINGIZE(T)">");
+	return reinterpret_cast<T*>(X_NEW_ARRAY(uint8_t, num * sizeof(T), arena_, "Fifo<"X_PP_STRINGIZE(T)">"));
 }
