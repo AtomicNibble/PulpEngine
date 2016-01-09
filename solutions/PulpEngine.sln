@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "..\Pulp\Common\Common.vcxproj", "{07328CCB-F9CC-4967-861E-272BCA0CAB04}"
 EndProject
@@ -294,8 +294,8 @@ Global
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Debug|x64.Build.0 = Debug_2013|x64
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Release|Win32.ActiveCfg = Release_2015|Win32
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Release|x64.ActiveCfg = Super_2015|x64
-		{1904BF9F-C79B-4715-A76D-7648593C9166}.Super Dynamic|Win32.ActiveCfg = Release_2012|Win32
-		{1904BF9F-C79B-4715-A76D-7648593C9166}.Super Dynamic|Win32.Build.0 = Release_2012|Win32
+		{1904BF9F-C79B-4715-A76D-7648593C9166}.Super Dynamic|Win32.ActiveCfg = Super_2012|Win32
+		{1904BF9F-C79B-4715-A76D-7648593C9166}.Super Dynamic|Win32.Build.0 = Super_2012|Win32
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Super Dynamic|x64.ActiveCfg = Release_2012|x64
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Super Dynamic|x64.Build.0 = Release_2012|x64
 		{1904BF9F-C79B-4715-A76D-7648593C9166}.Super|Win32.ActiveCfg = Release_2012|Win32
@@ -427,8 +427,8 @@ Global
 		{858DF185-AE64-4730-86D3-6E9E4CFBD779}.Release|Win32.Build.0 = Release|Win32
 		{858DF185-AE64-4730-86D3-6E9E4CFBD779}.Release|x64.ActiveCfg = Release|x64
 		{858DF185-AE64-4730-86D3-6E9E4CFBD779}.Release|x64.Build.0 = Release|x64
-		{858DF185-AE64-4730-86D3-6E9E4CFBD779}.Super Dynamic|Win32.ActiveCfg = Release|Win32
-		{858DF185-AE64-4730-86D3-6E9E4CFBD779}.Super Dynamic|Win32.Build.0 = Release|Win32
+		{858DF185-AE64-4730-86D3-6E9E4CFBD779}.Super Dynamic|Win32.ActiveCfg = Super|Win32
+		{858DF185-AE64-4730-86D3-6E9E4CFBD779}.Super Dynamic|Win32.Build.0 = Super|Win32
 		{858DF185-AE64-4730-86D3-6E9E4CFBD779}.Super Dynamic|x64.ActiveCfg = Release|x64
 		{858DF185-AE64-4730-86D3-6E9E4CFBD779}.Super Dynamic|x64.Build.0 = Release|x64
 		{858DF185-AE64-4730-86D3-6E9E4CFBD779}.Super|Win32.ActiveCfg = Super|Win32
@@ -447,8 +447,8 @@ Global
 		{F06DE30E-8AC2-45E6-83DE-4F5590EEA54F}.Release|Win32.Build.0 = Release|Win32
 		{F06DE30E-8AC2-45E6-83DE-4F5590EEA54F}.Release|x64.ActiveCfg = Release|x64
 		{F06DE30E-8AC2-45E6-83DE-4F5590EEA54F}.Release|x64.Build.0 = Release|x64
-		{F06DE30E-8AC2-45E6-83DE-4F5590EEA54F}.Super Dynamic|Win32.ActiveCfg = Release|Win32
-		{F06DE30E-8AC2-45E6-83DE-4F5590EEA54F}.Super Dynamic|Win32.Build.0 = Release|Win32
+		{F06DE30E-8AC2-45E6-83DE-4F5590EEA54F}.Super Dynamic|Win32.ActiveCfg = Super|Win32
+		{F06DE30E-8AC2-45E6-83DE-4F5590EEA54F}.Super Dynamic|Win32.Build.0 = Super|Win32
 		{F06DE30E-8AC2-45E6-83DE-4F5590EEA54F}.Super Dynamic|x64.ActiveCfg = Super Dynamic|x64
 		{F06DE30E-8AC2-45E6-83DE-4F5590EEA54F}.Super Dynamic|x64.Build.0 = Super Dynamic|x64
 		{F06DE30E-8AC2-45E6-83DE-4F5590EEA54F}.Super|Win32.ActiveCfg = Super|Win32
