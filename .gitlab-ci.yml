@@ -9,72 +9,40 @@ stages:
  - build
  - test
 
-build_win32_debug:
+
+build:
   stage: build
   script:
     - echo building...
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=win32
-  tags:
-    - windows
-
-
-build_win32_release:
-  stage: build
-  script:
-    - echo building...
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Release;Platform=win32
-  tags:
-    - windows
-
-build_win32_super:
-  stage: build
-  script:
-    - echo building...
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Super;Platform=win32
-  tags:
-    - windows
-
-
-build_win64_debug:
-  stage: build
-  script:
-    - echo building...
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=x64
-  tags:
-    - windows
-
-build_win64_release:
-  stage: build
-  script:
-    - echo building...
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Release;Platform=x64
-  tags:
-    - windows
-
-build_win64_super:
-  stage: build
-  script:
-    - echo building...
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Super;Platform=x64
   tags:
     - windows
 
-
-
-test_win64_debug:
+test:
   stage: test
   script:
-   - echo testing...
+   - echo testing (win32 Debug)
+   -  'cd "../build/win32/Debug/'
+   - engine_UnitTester.exe -CI
+   - echo testing (win32 Release)
+   -  'cd "../build/win32/Release/'
+   - engine_UnitTester.exe -CI
+   - echo testing (win32 Super)
+   -  'cd "../build/win32/Super/'
+   - engine_UnitTester.exe -CI
+   - echo testing (x64 Debug)
    -  'cd "../build/x64/Debug/'
    - engine_UnitTester.exe -CI
-  tags:
-   - windows
-
-test_win32_debug:
-  stage: test
-  script:
-   - echo testing...
-   -  'cd "../build/win32/Debug/'
+   - echo testing (x64 Release)
+   -  'cd "../build/x64/Release/'
+   - engine_UnitTester.exe -CI
+   - echo testing (x64 Super)
+   -  'cd "../build/x64/Super/'
    - engine_UnitTester.exe -CI
   tags:
    - windows
