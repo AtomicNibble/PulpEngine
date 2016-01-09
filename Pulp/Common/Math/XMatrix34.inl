@@ -8,7 +8,12 @@
 template<typename T>
 X_INLINE Matrix34<T>::Matrix34()
 {
-#if X_DEBUG == 1
+	setToIdentity();
+
+	// I think when using the class I would assume defualt construction is 
+	// identity.
+	// I also set to identity for Mat22,33,44
+#if X_DEBUG == 1 && 0
 	memset(m, 0xff, MEM_LEN);
 #endif
 }
