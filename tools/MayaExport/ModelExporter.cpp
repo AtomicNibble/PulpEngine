@@ -1427,58 +1427,64 @@ void MayaModel::printStats(PotatoOptions& options)
 {
 	X_UNUSED(options);
 
-	std::cout << "\nModel Info:\n" <<
-		"> Total Lods: " << g_stats.totalLods <<
-		"\n> Total Mesh: " << g_stats.totalMesh <<
-		"\n> Total Joints: " << g_stats.totalJoints <<
-		"\n> Total Joints Dropped: " << g_stats.totalJointsDropped;
+	core::StackString<2048> info;
+
+	info.append("\nModel Info:\n");
+	info.appendFmt("> Total Lods: %i", g_stats.totalLods);
+	info.appendFmt("\n> Total Mesh: %i", g_stats.totalMesh);
+	info.appendFmt("\n> Total Joints: %i", g_stats.totalJoints);
+	info.appendFmt("\n> Total Joints Dropped: %i", g_stats.totalJointsDropped);
+
 		
 	if (g_stats.droppedBoneNames.size() > 0) {
-		std::cout << " -> (";
+		info.append(" -> (");
 		for (uint i = 0; i < g_stats.droppedBoneNames.size(); i++) {
-			std::cout << g_stats.droppedBoneNames[i].c_str();
-			if (i < (g_stats.droppedBoneNames.size() - 1))
-				std::cout << ", ";
+			info.append(g_stats.droppedBoneNames[i].c_str());
+
+			if (i < (g_stats.droppedBoneNames.size() - 1)) {
+				info.append(", ");
+			}
 
 			if (i > 9 && (i % 10) == 0) {
-				std::cout << "\n";
+				info.append("\n");
 			}
 		}
-		std::cout << ")";
+		info.append(")");
 	}
 	if (g_stats.droppedBoneNames.size() > 10) {
-		std::cout << "\n";
+		info.append("\n");
 	}
 
-	std::cout <<
-		"\n> Total Verts: " << g_stats.totalVerts <<
-		"\n> Total Faces: " << g_stats.totalFaces <<
-		"\n> Total Weights Dropped: " << g_stats.totalWeightsDropped <<
-		std::endl;
+
+	info.appendFmt("\n> Total Verts: %i", g_stats.totalVerts);
+	info.appendFmt("\n> Total Faces: %i", g_stats.totalFaces);
+	info.appendFmt("\n> Total eights Dropped: %i", g_stats.totalWeightsDropped);
+	info.append("\n");
 
 	if (g_stats.totalWeightsDropped > 0) {
-		std::cout << "!> bind weights where dropped, consider binding with max influences: 4\n";
+		info.append("!> bind weights where dropped, consider binding with max influences: 4\n");
 	}
 
 	{
 		const AABB& b = g_stats.bounds;
 		const auto min = b.min;
 		const auto max = b.max;
-		std::cout << "> Bounds: ";
-		std::cout << "(" << min[0] << "," << min[1] << "," << min[2] << ") <-> ";
-		std::cout << "(" << max[0] << "," << max[1] << "," << max[2] << ")\n";
+		info.append("> Bounds: ");
+		info.appendFmt("(%g,%g,%g) <-> ", min[0], min[1], min[2]);
 
 		const auto size = b.size();
-		std::cout << "> Dimensions: ";
-		std::cout << "w: " << size[0] << " d: " << size[1] << " h: " << size[2];
+		info.append("> Dimensions: ");
+		info.appendFmt("w: %g d: %g h: %d", size[0], size[1], size[2]);
 
 		if (g_options.unitOfMeasurement_ == PotatoOptions::INCHES) {
-			std::cout << " (inches)";
+			info.append(" (inches)");
 		}
 		else {
-			std::cout << " (cm)";
+			info.append(" (cm)");
 		}
 	}
+
+	MayaUtil::MayaPrintMsg(info.c_str());
 }
 
 void MayaModel::calculateBoundingBox(void)
