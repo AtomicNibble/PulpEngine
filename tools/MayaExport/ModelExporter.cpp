@@ -1471,6 +1471,7 @@ void MayaModel::printStats(PotatoOptions& options)
 		const auto max = b.max;
 		info.append("> Bounds: ");
 		info.appendFmt("(%g,%g,%g) <-> ", min[0], min[1], min[2]);
+		info.appendFmt("(%g,%g,%g)\n", max[0], max[1], max[2]);
 
 		const auto size = b.size();
 		info.append("> Dimensions: ");
