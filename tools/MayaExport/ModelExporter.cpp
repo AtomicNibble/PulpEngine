@@ -1756,7 +1756,7 @@ bool MayaModel::save(const char *filename)
 					mesh.numBinds = 0;
 					mesh.numVerts = safe_static_cast<uint16_t, size_t>(pMesh->verts.size());
 					mesh.numIndexes = safe_static_cast<uint16_t, size_t>(pMesh->faces.size() * 3);
-			//		mesh.material = pMesh->material;
+					//		mesh.material = pMesh->material;
 					mesh.CompBinds = pMesh->CompBinds;
 					mesh.boundingBox = pMesh->boundingBox;
 					mesh.boundingSphere = Sphere(pMesh->boundingBox);
@@ -1776,7 +1776,11 @@ bool MayaModel::save(const char *filename)
 
 					g_stats.totalMesh++;
 					g_stats.totalVerts += mesh.numVerts;
-					g_stats.totalFaces += mesh.numIndexes;
+					g_stats.totalFaces += (mesh.numIndexes / 3);
+
+					if ((mesh.numIndexes % 3) != 0) {
+						MayaUtil::MayaPrintError("Mesh index count is not a multipel of 3, count: %i", mesh.numIndexes);
+					}
 
 					fwrite(&mesh, sizeof(mesh), 1, f);
 				}
