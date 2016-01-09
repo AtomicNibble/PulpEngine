@@ -16,7 +16,7 @@ namespace ModelInfo
 		path /= name;
 		path.setExtension(model::MODEL_FILE_EXTENSION);
 
-		core::fileModeFlags mode = core::fileMode::READ;
+		core::fileModeFlags mode = core::fileMode::READ | core::fileMode::SHARE;
 		core::XFileScoped file;
 
 		boxOut.clear();
