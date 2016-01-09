@@ -1474,7 +1474,7 @@ void MayaModel::printStats(PotatoOptions& options)
 
 		const auto size = b.size();
 		info.append("> Dimensions: ");
-		info.appendFmt("w: %g d: %g h: %d", size[0], size[1], size[2]);
+		info.appendFmt("w: %g d: %g h: %g", size[0], size[1], size[2]);
 
 		if (g_options.unitOfMeasurement_ == PotatoOptions::INCHES) {
 			info.append(" (inches)");
