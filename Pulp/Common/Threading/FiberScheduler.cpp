@@ -327,6 +327,7 @@ namespace Fiber
 	void Scheduler::WaitForCounterAndFree(core::AtomicInt* pCounter, int32_t value)
 	{
 		if ((*pCounter) == value) {
+			FreeCounter(pCounter);
 			return;
 		}
 
