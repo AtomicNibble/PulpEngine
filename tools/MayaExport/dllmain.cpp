@@ -5,6 +5,7 @@
 
 #include "ModelExporter.h"
 #include "AnimExport.h"
+#include "MayaUtil.h"
 
 #include <IModel.h>
 #include <IAnimation.h>
@@ -57,6 +58,8 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 	MFnPlugin plugin(obj, "WinCat - " X_ENGINE_NAME " Engine", ver.c_str(), "Any");
 
 	MStatus stat;
+
+	MayaUtil::MayaPrintMsg("=== Potato Plugin Loaded (%s) ===", ver.c_str());
 
 	plugin.registerUI(g_createUiScript, g_destroyUiScript);
 
