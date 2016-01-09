@@ -75,6 +75,7 @@ namespace MayaUtil
 		}
 
 		std::cout << msg << std::endl;
+		MGlobal::displayInfo(msg);
 	}
 
 
