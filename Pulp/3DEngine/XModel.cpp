@@ -454,7 +454,13 @@ bool XModel::LoadModel(core::XFile* file)
 
 void XModel::ProcessData(char* pData)
 {
+	X_ASSERT_NOT_NULL(pData);
 	int i, x;
+
+	if (!pData) {
+		X_ERROR("Model", "model data is null");
+		return;
+	}
 
 	core::MemCursor<char> mat_name_cursor(pData, hdr_.materialNameDataSize);
 	core::MemCursor<char> tag_name_cursor(pData + hdr_.materialNameDataSize, hdr_.tagNameDataSize);
