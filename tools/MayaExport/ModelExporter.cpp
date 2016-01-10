@@ -319,6 +319,18 @@ void PotatoOptions::setcmdArgs(const MArgList &args)
 		}
 	}
 
+	idx = args.flagIndex("uv_merge_thresh");
+	if (idx != MArgList::kInvalidArgIndex) {
+		double temp;
+		if (!args.get(++idx, temp)) {
+			MayaPrintWarning("failed to get vert_merge_thresh flag");
+		}
+		else {
+			vertThreshold_ = static_cast<float>(temp);
+		}
+	}
+	
+
 	idx = args.flagIndex("zero_origin");
 	if (idx != MArgList::kInvalidArgIndex) {
 		if (!args.get(++idx, zeroOrigin_)) {
@@ -371,6 +383,7 @@ void PotatoOptions::reset(void)
 	scale_ = 1.0f;
 	jointThreshold_ = JOINT_WEIGHT_THRESHOLD;
 	uvMergeThreshold_ = MERGE_TEXCORDS_EPSILON;
+	vertThreshold_ = MERGE_VERTEX_EPSILON;
 	zeroOrigin_ = true;
 	whiteVertColors_ = true;
 	forceBoneFilters_.clear();
@@ -538,6 +551,7 @@ void MayaMesh::shareVerts(void)
 	size_t numUnique = 0;
 
 	const float uvMergeThreshold_ = g_options.uvMergeThreshold_;
+	const float vertThreshold_ = g_options.vertThreshold_;
 
 	for (i = 0; i < faces.size(); i++)
 	{
@@ -563,7 +577,7 @@ void MayaMesh::shareVerts(void)
 				if (vert.startWeightIdx != vv->startWeightIdx) {
 					continue;
 				}
-				if (!vert.pos.compare(vv->pos, MERGE_VERTEX_EPSILON)) {
+				if (!vert.pos.compare(vv->pos, vertThreshold_)) {
 					continue; // not same
 				}
 				if (!vert.uv.compare(vv->uv, uvMergeThreshold_)) {
@@ -764,10 +778,10 @@ MStatus MayaLOD::LoadMeshes(void)
 		MayaPrintMsg("NumUvSets: %i", UVSets.length());
 
 		fnmesh.getUVs(u, v, &UVSets[0]);
-		fnmesh.getPoints(vertexArray, MSpace::kPreTransform);
-		fnmesh.getNormals(normalsArray, MSpace::kPreTransform);
-		fnmesh.getTangents(tangentsArray, MSpace::kPreTransform);
-		fnmesh.getBinormals(binormalsArray, MSpace::kPreTransform);
+		fnmesh.getPoints(vertexArray, MSpace::kWorld);
+		fnmesh.getNormals(normalsArray, MSpace::kWorld);
+		fnmesh.getTangents(tangentsArray, MSpace::kWorld);
+		fnmesh.getBinormals(binormalsArray, MSpace::kWorld);
 		fnmesh.getVertexColors(vertColorsArray);
 
 		// some times we don't have vert colors it seams so.
@@ -2131,7 +2145,7 @@ MStatus PotatoExporter::convert()
 
 		// merge any meshes that share materials.
 		// MergeMeshes();
-		model_.MergeMeshes();
+	//	model_.MergeMeshes();
 
 		SetProgressText("Creating info");
 

@@ -116,6 +116,7 @@ public:
 	float scale_;
 	float jointThreshold_;
 	float uvMergeThreshold_;
+	float vertThreshold_;
 	bool  zeroOrigin_;
 	bool  whiteVertColors_;
 	bool  _pad[2];
