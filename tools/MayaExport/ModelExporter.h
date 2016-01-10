@@ -92,8 +92,12 @@ public:
 		}
 	}
 
-	void setFileName(MString path) {
-		filePath_.append(path.asChar());
+	void setFileName(const MString& path)
+	{
+		core::StackString<512,char> temp(path.asChar());
+		temp.trim();
+
+		filePath_.append(temp.c_str());
 		filePath_.setExtension(model::MODEL_FILE_EXTENSION);
 	}
 
