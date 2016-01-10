@@ -100,22 +100,35 @@ global proc forceBoneFiltersUpdate()
 
 global proc ModelSetLODObjects_internal(int $lod_number, int $index, string $Selected[])
 {
-	string $selected_str = "";
+	string $valid_str = "";
+ 	string $valid[];
 
-	for($obj in $Selected) {
-		$selected_str = $selected_str + $obj + " ";
+	for($obj in $Selected)
+	{
+		int $objTest = `objExists $obj` ;
+		if($objTest)
+		{
+			$valid_str = $valid_str + $obj + " ";
+			$valid[size($valid)] = $obj;
+		}
+		else
+		{
+			print_Warn($obj + " does not exsists removing from object list");
+		}
 	}
 
-	if (`size $Selected`)
+	print_Warn(stringArrayToString($valid, " "));
+
+	if (`size $valid`)
 	{
-		int $num = size($Selected);
-		int $info[] = (`polyEvaluate -v -t $Selected`);
+		int $num = size($valid);
+		int $info[] = (`polyEvaluate -v -t $valid`);
 
 		text -e -l $num ("ModelInfoNum" + $lod_number + $index );
 		text -e -l $info[0] ("ModelInfoVerts" + $lod_number + $index );
 		text -e -l $info[1] ("ModelInfoFaces" + $lod_number + $index );
 
-		setAttr -type "string" ("PotatoGNode.ObjectList" + $index + $lod_number) $selected_str;
+		setAttr -type "string" ("PotatoGNode.ObjectList" + $index + $lod_number) $valid_str;
 	}
 }
 
@@ -1192,5 +1205,3 @@ global proc poatoCreateUI()
 	potato_ShowModelExport();
 //	potato_ShowAnimExport();
 }
-
-
