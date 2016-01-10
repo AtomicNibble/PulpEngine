@@ -86,6 +86,12 @@ global proc uvMergeThresholdUpdate()
 	setAttr ("PotatoGNode.uvMergeThreshold") $val;
 }
 
+global proc vertMergeThresholdUpdate()
+{
+	float $val = `floatSliderGrp -q -v vertMergeThresholdCntl`;
+	setAttr ("PotatoGNode.vertMergeThreshold") $val;
+}
+
 global proc zeroOutOriginUpdate()
 {
 	int $val = `checkBoxGrp -q -v1 zeroOriginCntrl`;
@@ -286,9 +292,16 @@ global proc ModelEntryExport(int $index)
 	string $scale = `getAttr ("PotatoGNode.scale")`;
 	string $weightThreshold = `getAttr ("PotatoGNode.weightThreshold")`;
 	string $uvMergeThreshold = `getAttr ("PotatoGNode.uvMergeThreshold")`;
+	string $vertMergeThreshold = `getAttr ("PotatoGNode.vertMergeThreshold")`;
 	string $zeroOrigin = `getAttr ("PotatoGNode.zeroOrigin")`;
 	string $forceBoneFilters = substituteAllString(`getAttr ("PotatoGNode.forceBoneFilters")`, "\n", " ");
-	string $options = "-progress PotatoExportProgress -dir \"" + $Dir + "\" -scale " + $scale + " -weight_thresh " + $weightThreshold + " -uv_merge_thresh " + $uvMergeThreshold + " -zero_origin " + $zeroOrigin + " -force_bones \"" + $forceBoneFilters + "\"";
+	string $options = "-progress PotatoExportProgress -dir \"" + $Dir + "\" -scale " + $scale
+	+ " -weight_thresh " + $weightThreshold
+	+ " -uv_merge_thresh " + $uvMergeThreshold
+	+ " -vert_merge_thresh " + $vertMergeThreshold
+	+ " -zero_origin " + $zeroOrigin
+	+ " -force_bones \"" + $forceBoneFilters + "\"";
+
 	string $command = "PotatoExportModel " + $args + " -f \"" + $filename + "\" "+ $options;
 
 	// print_Msg("cmd: " + $command);
@@ -932,6 +945,7 @@ global proc potato_CreateExportWindow( string $name )
 			frameLayout -l "Model" -marginHeight 2 -marginWidth 2 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p Settings setTabFrame1;
 				floatFieldGrp -l "Scale" -nf 1 -v1 `getAttr PotatoGNode.scale` -cc ScaleUpdate -p setTabFrame1 ScaleCntrl;
 				floatSliderGrp -l "Uv Merge Threshold" -min 0 -max 0.999 -s 0.00001 -v `getAttr PotatoGNode.uvMergeThreshold` -f true -cc uvMergeThresholdUpdate -p setTabFrame1 uvMergeThreshCntl;
+				floatSliderGrp -l "Vert Merge Threshold" -min 0 -max 0.999 -s 0.00001 -v `getAttr PotatoGNode.vertMergeThreshold` -f true -cc vertMergeThresholdUpdate -p setTabFrame1 vertMergeThreshCntl;
 
 			frameLayout -l "Bones" -marginHeight 2 -marginWidth 2 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p Settings setTabFrame2;
 				columnLayout -adj 1 -cal "center" -p setTabFrame2 setcolLayout1;
@@ -1140,6 +1154,7 @@ global proc potato_resetSettings()
 	setAttr PotatoGNode.scale 1.0;
 	setAttr PotatoGNode.weightThreshold 0.005;
 	setAttr PotatoGNode.uvMergeThreshold 0.02;
+	setAttr PotatoGNode.vertMergeThreshold 0.02;
 	setAttr PotatoGNode.zeroOrigin 1;
 	setAttr PotatoGNode.forceBoneFilters -type "string" "tag_";
 
@@ -1158,6 +1173,7 @@ global proc initNodeDefaults()
 		addAttr -ln scale -at "float" -min 0.001 -max 1000 -dv 1.0 PotatoGNode;
 		addAttr -ln weightThreshold -at "float" -min 0.00001 -max 0.999 -dv 0.005 PotatoGNode;
 		addAttr -ln uvMergeThreshold -at "float" -min 0.000001 -max 0.999 -dv 0.005 PotatoGNode;
+		addAttr -ln vertMergeThreshold -at "float" -min 0.000001 -max 0.999 -dv 0.005 PotatoGNode;
 		addAttr -ln zeroOrigin -min 0 -max 1 -dv 1 PotatoGNode;
 		addAttr -ln forceBoneFilters -dt "string" PotatoGNode;
 
@@ -1167,6 +1183,7 @@ global proc initNodeDefaults()
 		setAttr PotatoGNode.scale 1;
 		setAttr PotatoGNode.weightThreshold 0.005;
 		setAttr PotatoGNode.uvMergeThreshold 0.02;
+		setAttr PotatoGNode.vertMergeThreshold 0.02;
 		setAttr PotatoGNode.zeroOrigin 1;
 		setAttr PotatoGNode.forceBoneFilters -type "string" "tag_";
 	}
