@@ -721,7 +721,7 @@ MStatus MayaLOD::LoadMeshes(void)
 
 	meshes_.reserve(numMesh);
 
-	uint i; int x;
+	uint i;
 	float scale = g_options.scale_;
 	float jointThreshold = g_options.jointThreshold_;
 
@@ -755,6 +755,11 @@ MStatus MayaLOD::LoadMeshes(void)
 
 		int numVerts = fnmesh.numVertices(&status);
 		int numPoly = fnmesh.numPolygons(&status);
+		
+		if (fnmesh.numUVSets() < 1) {
+			MayaPrintError("Mesh(%s): has no uv sets: %s", fnmesh.name().asChar());
+			return MS::kFailure;
+		}
 //		int numNormals = fnmesh.numNormals(&status);
 
 		if (!status) {
@@ -776,13 +781,31 @@ MStatus MayaLOD::LoadMeshes(void)
 
 		// print how many :Z
 		MayaPrintMsg("NumUvSets: %i", UVSets.length());
+		for (uint32_t x = 0; x < UVSets.length(); x++) {
+			MayaPrintMsg("-> Set(%i): %s", x, UVSets[i].asChar());
+		}
 
-		fnmesh.getUVs(u, v, &UVSets[0]);
-		fnmesh.getPoints(vertexArray, MSpace::kWorld);
-		fnmesh.getNormals(normalsArray, MSpace::kWorld);
-		fnmesh.getTangents(tangentsArray, MSpace::kWorld);
-		fnmesh.getBinormals(binormalsArray, MSpace::kWorld);
-		fnmesh.getVertexColors(vertColorsArray);
+		{
+			using std::cerr;
+			using std::endl;
+			CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getUVs(u, v, &UVSets[0]));
+			CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getPoints(vertexArray, MSpace::kWorld));
+			CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getNormals(normalsArray, MSpace::kWorld));
+			CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getTangents(tangentsArray, MSpace::kWorld));
+			CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getBinormals(binormalsArray, MSpace::kWorld));
+
+			vertColorsArray.setSizeIncrement(numVerts);
+
+			if (fnmesh.numColorSets() > 0) {
+				CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getVertexColors(vertColorsArray));
+			}
+		}
+
+#if X_DEBUG
+		MayaPrintMsg("u: %i v: %i", u.length(), v.length());
+		MayaPrintMsg("NumVerts: %i", numVerts);
+		MayaPrintMsg("NumPoly: %i", numPoly);
+#endif // X_DEBUG
 
 		// some times we don't have vert colors it seams so.
 		// fill with white.
@@ -793,6 +816,7 @@ MStatus MayaLOD::LoadMeshes(void)
 		}
 
 		// verts
+		int32_t x;
 		for (x = 0; x < numVerts; x++) {
 			MayaVertex& vert = mesh->verts[x];
 			vert.pos = ConvertToGameSpace(XVec(vertexArray[x])) * scale;
