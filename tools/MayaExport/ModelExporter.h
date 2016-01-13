@@ -35,6 +35,7 @@ struct ModelStats
 		totalWeightsDropped = 0;
 
 		droppedBoneNames.setArena(g_arena);
+		droppedBoneNames.clear();
 		droppedBoneNames.setGranularity(16);
 
 		bounds.clear();
