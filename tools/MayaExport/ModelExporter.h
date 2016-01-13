@@ -254,7 +254,7 @@ public:
 
 	MStatus lodLODs(void);
 	MStatus loadBones(void);
-	void pruneBones(void);
+	void pruneBones(PotatoOptions& options);
 	void MergeMeshes(void);
 
 	void printStats(PotatoOptions& options);

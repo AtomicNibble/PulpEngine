@@ -1403,7 +1403,7 @@ MStatus MayaModel::loadBones(void)
 }
 
 
-void MayaModel::pruneBones(void)
+void MayaModel::pruneBones(PotatoOptions& options)
 {
 	PROFILE_MAYA("process bones");
 
@@ -1416,10 +1416,26 @@ void MayaModel::pruneBones(void)
 		lods_[i].pruneBones();
 	}
 
+	// split string.
+	MStringArray forceIncludeArr;
+	options.forceBoneFilters_.split(' ', forceIncludeArr);
+
 	numExportJoints_ = 0;
 	bone = bones_.ptr();
 	for (i = 0; i < bones_.size(); i++, bone++) 
 	{
+		if (!bone->keep)
+		{
+			// see if we force include.
+			for (uint32_t x = 0; x < forceIncludeArr.length(); x++)
+			{
+				if (bone->name.findCaseInsen(forceIncludeArr[x].asChar()) != nullptr) {
+					bone->keep = true;
+					break;
+				}
+			}
+		}
+
 		if (!bone->keep) 
 		{
 			bone->exportNode.removeFromHierarchy();
@@ -2163,7 +2179,7 @@ MStatus PotatoExporter::convert()
 
 		SetProgressText("Processing joints");
 
-		model_.pruneBones();
+		model_.pruneBones(g_options);
 
 		SetProgressText("Processing meshes");
 
