@@ -780,9 +780,9 @@ MStatus MayaLOD::LoadMeshes(void)
 		}
 
 		// print how many :Z
-		MayaPrintMsg("NumUvSets: %i", UVSets.length());
+		MayaPrintVerbose("NumUvSets: %i", UVSets.length());
 		for (uint32_t x = 0; x < UVSets.length(); x++) {
-			MayaPrintMsg("-> Set(%i): %s", x, UVSets[i].asChar());
+			MayaPrintVerbose("-> Set(%i): %s", x, UVSets[i].asChar());
 		}
 
 		{
@@ -801,11 +801,9 @@ MStatus MayaLOD::LoadMeshes(void)
 			}
 		}
 
-#if X_DEBUG
-		MayaPrintMsg("u: %i v: %i", u.length(), v.length());
-		MayaPrintMsg("NumVerts: %i", numVerts);
-		MayaPrintMsg("NumPoly: %i", numPoly);
-#endif // X_DEBUG
+		MayaPrintVerbose("u: %i v: %i", u.length(), v.length());
+		MayaPrintVerbose("NumVerts: %i", numVerts);
+		MayaPrintVerbose("NumPoly: %i", numPoly);
 
 		// some times we don't have vert colors it seams so.
 		// fill with white.
@@ -1284,7 +1282,7 @@ void MayaModel::getBindPose(const MObject &jointNode, MayaBone *bone, float scal
 		bone->bindpos = ConvertToGameSpace(XVec(m)) * scale;
 	}
 
-	MayaPrintMsg("Bone '%s' pos: (%g,%g,%g)", 
+	MayaPrintVerbose("Bone '%s' pos: (%g,%g,%g)",
 		bone->name.c_str(), bone->bindpos.x, bone->bindpos.y, bone->bindpos.z);
 }
 
