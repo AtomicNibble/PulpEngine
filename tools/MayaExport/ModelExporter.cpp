@@ -1466,6 +1466,13 @@ void MayaModel::pruneBones(PotatoOptions& options)
 	//	tagOrigin_.exportNode.setParent(exportHead);
 	}
 
+	// update bone index.
+	uint32_t boneIdx = 0;
+	for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next()) {
+		bone->exportIdx = boneIdx++;
+	}
+
+
 	g_stats.totalJointsDropped = safe_static_cast<int32_t, size_t>(bones_.size() - numExportJoints_);
 }
 
