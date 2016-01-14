@@ -115,6 +115,9 @@ global proc ModelSetLODObjects_internal(int $lod_number, int $index, string $Sel
 	string $valid_str = "";
  	string $valid[];
 
+  // filters out all the non-polymesh nodes
+	$Selected = `filterExpand -sm 12 $Selected`;
+
 	for($obj in $Selected)
 	{
 		int $objTest = `objExists $obj` ;
