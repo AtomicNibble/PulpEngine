@@ -274,6 +274,11 @@ void PotatoOptions::setcmdArgs(const MArgList &args)
 	uint idx;
 
 	// allow for options to be parsed.
+	idx = args.flagIndex("verbose");
+	if (idx != MArgList::kInvalidArgIndex) {
+		MayaUtil::SetVerbose(true);
+	}
+
 	idx = args.flagIndex("scale");
 	if (idx != MArgList::kInvalidArgIndex) {
 		double temp;
