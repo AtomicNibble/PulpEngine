@@ -120,6 +120,7 @@ void xFileSys::CreateVars(void)
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
 	ADD_CVAR_REF("filesys_debug", vars_.debug, 0, 0, 1, core::VarFlag::SYSTEM, "Filesystem debug. 0=off 1=on");
+	ADD_CVAR_REF("filesys_Quedebug", vars_.QueDebug, 0, 0, 1, core::VarFlag::SYSTEM, "Filesystem que debug. 0=off 1=on");
 
 	// create vars for the virtual directories which we then update with the paths once set.
 	size_t i;
@@ -939,6 +940,12 @@ void xFileSys::AddIoRequestToQue(const IoRequestData& request)
 		if (request.callback) {
 			X_ERROR("FileSys", "Close request can't have a callback. pfile: %p", request.closeInfo.pFile);
 			return;
+		}
+	}
+
+	if (request.getType() == IoRequest::READ) {
+		if (request.readInfo.dataSize == 592) {
+	//		::DebugBreak();
 		}
 	}
 

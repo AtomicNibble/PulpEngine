@@ -10,12 +10,14 @@ struct XFileSysVars
 {
 	XFileSysVars() :
 		debug(0),
+		QueDebug(0),
 		numVirtualDir(0)
 	{
 		core::zero_object(pVirtualDirs);
 	}
 
 	int32_t debug;
+	int32_t QueDebug;
 	int32_t numVirtualDir;
 	
 	core::ICVar* pVirtualDirs[core::FS_MAX_VIRTUAL_DIR];
