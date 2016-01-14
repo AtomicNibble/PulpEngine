@@ -98,6 +98,12 @@ global proc zeroOutOriginUpdate()
 	setAttr ("PotatoGNode.zeroOrigin") $val;
 }
 
+global proc verboseUpdate()
+{
+	int $val = `checkBoxGrp -q -v1 verboseCntrl`;
+	setAttr ("PotatoGNode.verbose") $val;
+}
+
 global proc forceBoneFiltersUpdate()
 {
 	string $val = `scrollField -q -tx forceBoneFiltersCntrl`;
@@ -295,6 +301,7 @@ global proc ModelEntryExport(int $index)
 	string $vertMergeThreshold = `getAttr ("PotatoGNode.vertMergeThreshold")`;
 	string $zeroOrigin = `getAttr ("PotatoGNode.zeroOrigin")`;
 	string $forceBoneFilters = substituteAllString(`getAttr ("PotatoGNode.forceBoneFilters")`, "\n", " ");
+	string $verbose = `getAttr ("PotatoGNode.verbose")`;
 	string $options = "-progress PotatoExportProgress -dir \"" + $Dir + "\" -scale " + $scale
 	+ " -weight_thresh " + $weightThreshold
 	+ " -uv_merge_thresh " + $uvMergeThreshold
@@ -302,9 +309,13 @@ global proc ModelEntryExport(int $index)
 	+ " -zero_origin " + $zeroOrigin
 	+ " -force_bones \"" + $forceBoneFilters + "\"";
 
+	if($verbose) {
+		$options += " -verbose";
+	}
+
 	string $command = "PotatoExportModel " + $args + " -f \"" + $filename + "\" "+ $options;
 
-	// print_Msg("cmd: " + $command);
+	print_Msg("cmd: " + $command);
 
 	if(int(`size $Dir`) < 1)
 	{
@@ -957,6 +968,10 @@ global proc potato_CreateExportWindow( string $name )
 						text -w 137 -l "Force Include bones" -al "right" -p colLayoutBone;
 					scrollField -w 160 -h 60 -tx `getAttr PotatoGNode.forceBoneFilters` -cc forceBoneFiltersUpdate -p boneForceRow forceBoneFiltersCntrl;
 
+					frameLayout -l "Misc" -marginHeight 2 -marginWidth 2 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p Settings setTabFrame3;
+						columnLayout -adj 1 -cal "center" -p setTabFrame3 setcolLayout2;
+
+							checkBoxGrp -l "Verbose" -value1 `getAttr PotatoGNode.verbose` -cc verboseUpdate -p setcolLayout2 verboseCntrl;
 
 // Help Tab
 		string $help;
@@ -1156,6 +1171,7 @@ global proc potato_resetSettings()
 	setAttr PotatoGNode.uvMergeThreshold 0.02;
 	setAttr PotatoGNode.vertMergeThreshold 0.02;
 	setAttr PotatoGNode.zeroOrigin 1;
+	setAttr PotatoGNode.verbose 0;
 	setAttr PotatoGNode.forceBoneFilters -type "string" "tag_";
 
 	lockPotatoNode();
@@ -1175,6 +1191,7 @@ global proc initNodeDefaults()
 		addAttr -ln uvMergeThreshold -at "float" -min 0.000001 -max 0.999 -dv 0.005 PotatoGNode;
 		addAttr -ln vertMergeThreshold -at "float" -min 0.000001 -max 0.999 -dv 0.005 PotatoGNode;
 		addAttr -ln zeroOrigin -min 0 -max 1 -dv 1 PotatoGNode;
+		addAttr -ln verbose -min 0 -max 1 -dv 1 PotatoGNode;
 		addAttr -ln forceBoneFilters -dt "string" PotatoGNode;
 
 		setAttr PotatoGNode.numModels 0;
@@ -1185,6 +1202,7 @@ global proc initNodeDefaults()
 		setAttr PotatoGNode.uvMergeThreshold 0.02;
 		setAttr PotatoGNode.vertMergeThreshold 0.02;
 		setAttr PotatoGNode.zeroOrigin 1;
+		setAttr PotatoGNode.verbose 0;
 		setAttr PotatoGNode.forceBoneFilters -type "string" "tag_";
 	}
 }
