@@ -1393,11 +1393,6 @@ MStatus MayaModel::loadBones(void)
 		bone->dagnode->getPath(dagPath);
 		getBindPose(dagPath.node(&status), bone, scale);
 	}
-	
-	uint32_t index = 0;
-	for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next()) {
-		bone->exportIdx = index++; 
-	}
 
 	return status;
 }
