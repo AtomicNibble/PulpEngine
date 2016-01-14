@@ -949,6 +949,14 @@ void xFileSys::AddIoRequestToQue(const IoRequestData& request)
 		}
 	}
 
+	if (vars_.QueDebug)
+	{
+		uint32_t threadId = core::Thread::GetCurrentID();
+
+		X_LOG0("FileSys","IoRequest(0x%x) type: %s", threadId,
+			IoRequest::ToString(request.getType()));
+	}
+
 	ioQue_.push(request);
 }
 
