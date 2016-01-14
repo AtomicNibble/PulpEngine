@@ -1138,12 +1138,10 @@ void XRenderAux::drawBone(const QuatTransf& rParent, const QuatTransf& rChild, c
 	if (fBoneLength < 1e-4)
 		return;
 
-
-
 	Matrix33f m33 = Matrix33f::createRotationV01(Vec3f(1, 0, 0), vBoneVec / fBoneLength);
 	Matrix34f m34 = Matrix34f(m33, p);
 
-	float32_t t = fBoneLength*0.05f;
+	float32_t t = fBoneLength*0.025f;
 
 	//bone points in x-direction
 	Vec3f s = Vec3f::zero();
