@@ -129,7 +129,7 @@ global proc ModelSetLODObjects_internal(int $lod_number, int $index, string $Sel
 		}
 	}
 
-	print_Warn(stringArrayToString($valid, " "));
+//	print_Warn(stringArrayToString($valid, " "));
 
 	if (`size $valid`)
 	{
@@ -315,7 +315,7 @@ global proc ModelEntryExport(int $index)
 
 	string $command = "PotatoExportModel " + $args + " -f \"" + $filename + "\" "+ $options;
 
-	print_Msg("cmd: " + $command);
+//	print_Msg("cmd: " + $command);
 
 	if(int(`size $Dir`) < 1)
 	{
