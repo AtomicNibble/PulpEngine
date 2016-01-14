@@ -10,6 +10,7 @@ namespace MayaUtil
 	namespace
 	{
 		bool g_StartOfBlock = false; // used for logging formating.
+		bool g_Verbose = true;
 		bool s_progressActive = false;
 
 		int32_t gProgressMin = 0;
@@ -21,6 +22,11 @@ namespace MayaUtil
 	void SetStartOfBlock(bool start)
 	{
 		g_StartOfBlock = start;
+	}
+
+	void SetVerbose(bool verbose)
+	{
+		g_Verbose = verbose;
 	}
 
 	void MayaPrintError(const char *fmt, ...)
@@ -74,8 +80,32 @@ namespace MayaUtil
 			g_StartOfBlock = false;
 		}
 
-		std::cout << msg << std::endl;
+		std::cerr << msg << std::endl;
 		MGlobal::displayInfo(msg);
+	}
+
+
+	void MayaPrintVerbose(const char *fmt, ...)
+	{
+		if (!g_Verbose) {
+			return;
+		}
+		{
+			va_list	argptr;
+			char	msg[2048];
+
+			va_start(argptr, fmt);
+			vsnprintf_s(msg, sizeof(msg), fmt, argptr);
+			va_end(argptr);
+
+			if (g_StartOfBlock) {
+				std::cout << "\n";
+				g_StartOfBlock = false;
+			}
+
+			std::cerr << msg << std::endl;
+			MGlobal::displayInfo(msg);
+		}
 	}
 
 

@@ -9,10 +9,13 @@
 namespace MayaUtil
 {
 	void SetStartOfBlock(bool start);
+	void SetVerbose(bool verbose);
 
 	void MayaPrintError(const char *fmt, ...);
 	void MayaPrintWarning(const char *fmt, ...);
 	void MayaPrintMsg(const char *fmt, ...);
+	void MayaPrintVerbose(const char *fmt, ...);
+
 
 
 	void SetProgressCtrl(const MString& str);
