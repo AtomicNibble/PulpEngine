@@ -1126,6 +1126,17 @@ void XRenderAux::drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius,
 
 // ---------------------------- Bone ----------------------------
 
+void XRenderAux::drawBone(const QuatTransf& rBone, const Color8u& col)
+{
+	X_UNUSED(rBone);
+	X_UNUSED(col);
+
+
+
+}
+
+
+
 void XRenderAux::drawBone(const QuatTransf& rParent, const QuatTransf& rChild, const Color8u& col)
 {
 //	X_ASSERT_NOT_IMPLEMENTED();
@@ -1198,10 +1209,71 @@ void XRenderAux::drawBone(const QuatTransf& rParent, const QuatTransf& rChild, c
 
 void XRenderAux::drawBone(const Matrix34f& rParent, const Matrix34f& rBone, const Color8u& col)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
-	X_UNUSED(rParent);
-	X_UNUSED(rBone);
-	X_UNUSED(col);
+	Vec3f p = rParent.getTranslate();
+	Vec3f c = rBone.getTranslate();
+	Vec3f vBoneVec = c - p;
+	float fBoneLength = vBoneVec.length();
+
+	if (fBoneLength < 1e-4)
+		return;
+
+	Matrix33f m33 = Matrix33f::createRotationV01(Vec3f(1, 0, 0), vBoneVec / fBoneLength);
+	Matrix34f m34 = Matrix34f(m33, p);
+
+	float32_t t = fBoneLength*0.025f;
+
+	//bone points in x-direction
+	Vec3f s = Vec3f::zero();
+	Vec3f m0 = Vec3f(t, +t, +t);
+	Vec3f m1 = Vec3f(t, -t, +t);
+	Vec3f m2 = Vec3f(t, -t, -t);
+	Vec3f m3 = Vec3f(t, +t, -t);
+	Vec3f e = Vec3f(fBoneLength, 0, 0);
+
+	Vec3f VBuffer[6];
+	Color8u CBuffer[6];
+
+	Color8u comp;
+	comp.r = col.r ^ 0xFF;
+	comp.r = (col.r - comp.r) / 2;
+	comp.g = col.g ^ 0xFF;
+	comp.g = (col.g - comp.g) / 2;
+	comp.b = col.b ^ 0xFF;
+	comp.b = (col.b - comp.b) / 2;
+
+	comp.a = col.a;
+
+	VBuffer[0] = m34*s;
+	CBuffer[0] = comp;  //start of bone (joint)
+
+	VBuffer[1] = m34*m0;
+	CBuffer[1] = col;
+	VBuffer[2] = m34*m1;
+	CBuffer[2] = col;
+	VBuffer[3] = m34*m2;
+	CBuffer[3] = col;
+	VBuffer[4] = m34*m3;
+	CBuffer[4] = col;
+
+	VBuffer[5] = m34*e;
+	CBuffer[5] = comp; //end of bone
+
+
+	drawLine(VBuffer[0], CBuffer[0], VBuffer[1], CBuffer[1]);
+	drawLine(VBuffer[0], CBuffer[0], VBuffer[2], CBuffer[2]);
+	drawLine(VBuffer[0], CBuffer[0], VBuffer[3], CBuffer[3]);
+	drawLine(VBuffer[0], CBuffer[0], VBuffer[4], CBuffer[4]);
+
+	drawLine(VBuffer[1], CBuffer[1], VBuffer[2], CBuffer[2]);
+	drawLine(VBuffer[2], CBuffer[2], VBuffer[3], CBuffer[3]);
+	drawLine(VBuffer[3], CBuffer[3], VBuffer[4], CBuffer[4]);
+	drawLine(VBuffer[4], CBuffer[4], VBuffer[1], CBuffer[1]);
+
+	drawLine(VBuffer[5], CBuffer[5], VBuffer[1], CBuffer[1]);
+	drawLine(VBuffer[5], CBuffer[5], VBuffer[2], CBuffer[2]);
+	drawLine(VBuffer[5], CBuffer[5], VBuffer[3], CBuffer[3]);
+	drawLine(VBuffer[5], CBuffer[5], VBuffer[4], CBuffer[4]);
+
 }
 
 // --------------------------------------------------------------------------
