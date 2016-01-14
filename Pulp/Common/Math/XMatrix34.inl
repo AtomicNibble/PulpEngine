@@ -743,6 +743,14 @@ Matrix34<T> Matrix34<T>::invertTransform() const
 	return ret;
 }
 
+template<typename T>
+void Matrix34<T>::setRotation(const Matrix33<T>& rotation)
+{
+	m00 = rotation.m00;	m01 = rotation.m01; m02 = rotation.m02;
+	m10 = rotation.m10;	m11 = rotation.m11; m12 = rotation.m12;
+	m20 = rotation.m20;	m21 = rotation.m21; m22 = rotation.m22;
+}
+
 
 template<typename T>
 Matrix34<T> Matrix34<T>::createRotation(const Vec3<T> &from, const Vec3<T> &to, const Vec3<T> &worldUp)
