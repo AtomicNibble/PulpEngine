@@ -1765,6 +1765,11 @@ bool MayaModel::save(const char *filename)
 				uint8_t idx = 0;
 				if (parent) {
 					idx = safe_static_cast<uint8_t, uint32_t>(parent->exportIdx);
+
+					MayaPrintVerbose("%s parent -> %s", bone->name.c_str(), parent->name.c_str());
+				}
+				else {
+					MayaPrintVerbose("%s no-parent", bone->name.c_str());
 				}
 
 				fwrite(&idx, sizeof(idx), 1, f);
