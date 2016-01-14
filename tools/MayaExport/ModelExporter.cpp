@@ -785,10 +785,30 @@ MStatus MayaLOD::LoadMeshes(void)
 			MayaPrintVerbose("-> Set(%i): %s", x, UVSets[i].asChar());
 		}
 
+		MString uvSet;
+		status = fnmesh.getCurrentUVSetName(uvSet);
+		if (!status) {
+			MayaPrintError("Mesh(%s): failed to get current UV set (%s)",
+				fnmesh.name().asChar(), status.errorString().asChar());
+
+			if (UVSets.length() < 1) {
+				return status;
+			}
+
+			uvSet = UVSets[0];
+
+			MayaPrintWarning("Falling back to uv set: %s", uvSet.asChar());
+		}
+		else 
+		{
+			MayaPrintVerbose("Default uv set: %s", uvSet.asChar());
+		}
+
+
 		{
 			using std::cerr;
 			using std::endl;
-			CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getUVs(u, v, &UVSets[0]));
+			CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getUVs(u, v, &uvSet));
 			CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getPoints(vertexArray, MSpace::kWorld));
 			CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getNormals(normalsArray, MSpace::kWorld));
 			CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getTangents(tangentsArray, MSpace::kWorld));
