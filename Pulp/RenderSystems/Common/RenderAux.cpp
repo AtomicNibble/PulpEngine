@@ -1126,16 +1126,6 @@ void XRenderAux::drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius,
 
 // ---------------------------- Bone ----------------------------
 
-void XRenderAux::drawBone(const QuatTransf& rBone, const Color8u& col)
-{
-	X_UNUSED(rBone);
-	X_UNUSED(col);
-
-
-
-}
-
-
 
 void XRenderAux::drawBone(const QuatTransf& rParent, const QuatTransf& rChild, const Color8u& col)
 {
