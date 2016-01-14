@@ -10,7 +10,7 @@ namespace MayaUtil
 	namespace
 	{
 		bool g_StartOfBlock = false; // used for logging formating.
-		bool g_Verbose = true;
+		bool g_Verbose = false;
 		bool s_progressActive = false;
 
 		int32_t gProgressMin = 0;
