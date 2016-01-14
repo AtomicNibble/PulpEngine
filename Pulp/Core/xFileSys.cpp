@@ -119,8 +119,10 @@ void xFileSys::CreateVars(void)
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
 
-	ADD_CVAR_REF("filesys_debug", vars_.debug, 0, 0, 1, core::VarFlag::SYSTEM, "Filesystem debug. 0=off 1=on");
-	ADD_CVAR_REF("filesys_Quedebug", vars_.QueDebug, 0, 0, 1, core::VarFlag::SYSTEM, "Filesystem que debug. 0=off 1=on");
+	ADD_CVAR_REF("filesys_debug", vars_.debug, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
+		"Filesystem debug. 0=off 1=on");
+	ADD_CVAR_REF("filesys_Quedebug", vars_.QueDebug, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
+		"Filesystem que debug. 0=off 1=on");
 
 	// create vars for the virtual directories which we then update with the paths once set.
 	size_t i;
