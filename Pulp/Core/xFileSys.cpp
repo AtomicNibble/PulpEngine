@@ -992,10 +992,10 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 	struct PendingOp
 	{
 		PendingOp(const IoRequestData& req, const XFileAsyncOperation& op) :
-			rquest(req), op(op) {
+			request(req), op(op) {
 		}
 
-		IoRequestData rquest;
+		IoRequestData request;
 		XFileAsyncOperation op;
 	};
 
@@ -1023,8 +1023,8 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				uint32_t bytesRead = 0;
 				if (asyncOp.op.hasFinished(&bytesRead))
 				{
-					asyncOp.rquest.callback.Invoke(this, request, 
-						request.readInfo.pFile, bytesRead);
+					asyncOp.request.callback.Invoke(this, asyncOp.request,
+						asyncOp.request.readInfo.pFile, bytesRead);
 
 					pendingOps.removeIndex(i);
 				}
