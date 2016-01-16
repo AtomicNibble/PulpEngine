@@ -21,9 +21,19 @@ global proc print_Msg(string $msg) {
 global proc int dirSelectedCallBck(string $dirpath,string $type)
 {
 	unlockPotatoNode();
-		print_Msg("selected directory: " + $dirpath);
+		print_Msg("selected directory(model): " + $dirpath);
 		string $res = `textFieldButtonGrp -e -fi $dirpath pathsOutputDir`;
 		setAttr -type "string" ("PotatoGNode.outputDir") $dirpath;
+	lockPotatoNode();
+	return 1;
+}
+
+global proc int dirSelectedCallBck_anim(string $dirpath,string $type)
+{
+	unlockPotatoNode();
+		print_Msg("selected directory(anim): " + $dirpath);
+		string $res = `textFieldButtonGrp -e -fi $dirpath pathsAnimOutputDir`;
+		setAttr -type "string" ("PotatoGNode.outputDirAnims") $dirpath;
 	lockPotatoNode();
 	return 1;
 }
@@ -32,8 +42,16 @@ global proc browseForDir() {
 	fileBrowser( "dirSelectedCallBck", "Select a Folder", "", 4 );
 }
 
+global proc browseForDir_anim() {
+	fileBrowser( "dirSelectedCallBck_anim", "Select a Folder", "", 4 );
+}
+
 global proc string getOutputDir() {
 	return `getAttr ("PotatoGNode.outputDir")`;
+}
+
+global proc string getOutputDirAnims() {
+	return `getAttr ("PotatoGNode.outputDirAnims")`;
 }
 
 global proc string modelGetName(int $index) {
@@ -732,7 +750,7 @@ global proc AnimEntryExport(int $index)
 
 	// make the command
 	string $filename = animGetName($index);
-	string $Dir = `getAttr ("PotatoGNode.outputDir")`;
+	string $Dir = `getAttr ("PotatoGNode.outputDirAnims")`;
 	string $options = "-progress PotatoExportProgress -dir \"" + $Dir + "\"";
 	string $command = "PotatoExportAnim " + $args + " -f \"" + $filename + "\" "+ $options;
 
@@ -951,8 +969,12 @@ global proc potato_CreateExportWindow( string $name )
 // Path Tab
   		columnLayout -cat "both" 5 -cal "center" -adj 1 -rs 20  -p tabs Paths;
 
-			frameLayout -l "Export Paths" -marginHeight 2 -marginWidth 2 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p Paths pathTabFrame1;
+			frameLayout -l "Models" -marginHeight 2 -marginWidth 2 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p Paths pathTabFrame1;
 				textFieldButtonGrp -l "Output Directory" -bl "..." -bc browseForDir -ed false - fi `getAttr PotatoGNode.outputDir` -p pathTabFrame1 pathsOutputDir;
+
+			frameLayout -l "Animations" -marginHeight 2 -marginWidth 2 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p Paths pathTabFrame2;
+			  textFieldButtonGrp -l "Output Directory" -bl "..." -bc browseForDir_anim -ed false - fi `getAttr PotatoGNode.outputDirAnims` -p pathTabFrame2 pathsAnimOutputDir;
+
 // Settings Tab
   		columnLayout -cat "both" 5 -cal "center" -adj 1 -rs 20  -p tabs Settings;
 
@@ -1189,6 +1211,7 @@ global proc initNodeDefaults()
 		addAttr -ln numModels -at byte PotatoGNode;
 		addAttr -ln numAnims -at byte PotatoGNode;
 		addAttr -ln outputDir -dt "string" PotatoGNode;
+		addAttr -ln outputDirAnims -dt "string" PotatoGNode;
 		addAttr -ln scale -at "float" -min 0.001 -max 1000 -dv 1.0 PotatoGNode;
 		addAttr -ln weightThreshold -at "float" -min 0.00001 -max 0.999 -dv 0.005 PotatoGNode;
 		addAttr -ln uvMergeThreshold -at "float" -min 0.000001 -max 0.999 -dv 0.005 PotatoGNode;
@@ -1200,6 +1223,7 @@ global proc initNodeDefaults()
 		setAttr PotatoGNode.numModels 0;
 		setAttr PotatoGNode.numAnims 0;
 		setAttr PotatoGNode.outputDir -type "string" "";
+		setAttr PotatoGNode.outputDirAnims -type "string" "";
 		setAttr PotatoGNode.scale 1;
 		setAttr PotatoGNode.weightThreshold 0.005;
 		setAttr PotatoGNode.uvMergeThreshold 0.02;
