@@ -454,6 +454,7 @@ struct IModel
 
 	// temp.
 	virtual void Render(void) X_ABSTRACT;
+	virtual void RenderBones(const Matrix44f& modelMax) X_ABSTRACT;
 };
 
 struct IModelManager

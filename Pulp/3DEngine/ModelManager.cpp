@@ -92,6 +92,8 @@ void XModelManager::Init(void)
 	ADD_COMMAND("listModels", Cmd_ListModels, core::VarFlag::SYSTEM, "List all the loaded models");
 	ADD_COMMAND("modelReload", Cmd_ReloadModel, core::VarFlag::SYSTEM, "Reload a model <name>");
 
+	XModel::RegisterVars();
+
 	// hotreload support.
 	gEnv->pHotReload->addfileType(this, MODEL_FILE_EXTENSION);
 

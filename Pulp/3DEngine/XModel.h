@@ -45,7 +45,12 @@ public:
 	virtual const Sphere& boundingSphere(size_t lodIdx) const X_FINAL;
 
 	virtual void Render(void) X_FINAL;
+	virtual void RenderBones(const Matrix44f& modelMat) X_FINAL;
+
 	// ~IModel
+
+	static void RegisterVars(void);
+
 
 	const LODHeader& getLod(size_t idx) const;
 	const MeshHeader& getLodMeshHdr(size_t idx) const;
@@ -94,6 +99,10 @@ private:
 
 	// used for async loading.
 	ModelHeader hdr_;
+
+private:
+	static int32_t model_bones_draw;
+	static Colorf model_bones_col;
 };
 
 

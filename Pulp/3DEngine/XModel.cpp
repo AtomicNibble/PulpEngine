@@ -6,11 +6,16 @@
 #include "Memory\MemCursor.h"
 
 #include <IRender.h>
+#include <IRenderAux.h>
+#include <IConsole.h>
 
 #include <Threading\JobSystem2.h>
 
 
 X_NAMESPACE_BEGIN(model)
+
+int32_t XModel::model_bones_draw;
+Colorf XModel::model_bones_col;
 
 XModel::XModel()
 {
@@ -130,8 +135,65 @@ void XModel::Render(void)
 	pLodRenderMeshes_[0]->render();
 }
 
-
 // ~IModel
+
+void XModel::RenderBones(const Matrix44f& modelMat)
+{
+	using namespace render;
+
+	if (!model_bones_draw) {
+		return;
+	}
+
+	if (numBones() > 0)
+	{
+		render::IRenderAux* pAux = this->getRender()->GetIRenderAuxGeo();
+
+		XAuxGeomRenderFlags flags = AuxGeom_Defaults::Def3DRenderflags;
+		flags.SetDepthWriteFlag(AuxGeom_DepthWrite::DepthWriteOff);
+		flags.SetDepthTestFlag(AuxGeom_DepthTest::DepthTestOff);
+		flags.SetFillMode(AuxGeom_FillMode::FillModeWireframe);
+
+		pAux->setRenderFlags(flags);
+
+		int32_t num = numBones();
+
+		Color8u col = model_bones_col;
+
+		for (int32_t i = 0; i < num; i++)
+		{
+			const Vec3f& pos = pBonePos_[i];
+			const XQuatCompressedf& angle = pBoneAngles_[i];
+			const uint8_t parIdx = pTagTree_[i];
+
+			const Vec3f& parPos = pBonePos_[parIdx];
+			const XQuatCompressedf& parAngle = pBoneAngles_[parIdx];
+
+			{
+				QuatTransf qTrans;
+				qTrans.quat = angle.asQuat();
+				qTrans.trans = modelMat * pos;
+			
+
+				QuatTransf qTransPar;
+				qTransPar.quat = parAngle.asQuat();
+				qTransPar.trans = modelMat * parPos;
+
+				pAux->drawBone(qTransPar, qTrans, col);
+			}
+		}
+	}
+}
+
+void XModel::RegisterVars(void)
+{	
+	ADD_CVAR_REF_NO_NAME(model_bones_draw, 0, 0, 1, 
+		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
+		"Draw model bones. 0=off 1=on");
+
+	ADD_CVAR_REF_COL_NO_NAME(model_bones_col, Color(0.7f, 0.5f, 0.f, 1.f),
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Model bone color");
+}
 
 const LODHeader& XModel::getLod(size_t idx) const 
 {
