@@ -23,12 +23,22 @@ global proc potato_revealSelected()
 	outlinerEditor -edit -showSelected  1 outlinerPanel1;
 }
 
-global proc potato_SelectAllBonesInScene()
+global proc potato_SelectAndRevealType(string $type)
 {
-	string $selected[] = `ls -type joint`;
+	string $selected[] = `ls -type $type`;
 	select -r $selected;
 
 	potato_revealSelected();
+}
+
+global proc potato_SelectAllBonesInScene()
+{
+	potato_SelectAndRevealType("joint");
+}
+
+global proc potato_SelectAllMeshInScene()
+{
+	potato_SelectAndRevealType("mesh");
 }
 
 global proc int dirSelectedCallBck(string $dirpath,string $type)
@@ -994,6 +1004,10 @@ global proc potato_CreateExportWindow( string $name )
 			frameLayout -l "Animations" -marginHeight 2 -marginWidth 2 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p Paths pathTabFrame2;
 			  textFieldButtonGrp -l "Output Directory" -bl "..." -bc browseForDir_anim -ed false - fi `getAttr PotatoGNode.outputDirAnims` -p pathTabFrame2 pathsAnimOutputDir;
 
+				optionMenu -label "Colors" -changeCommand "print #1";
+	            menuItem -label "Yellow";
+	            menuItem -label "Purple";
+	            menuItem -label "Orange";
 // Settings Tab
   		columnLayout -cat "both" 5 -cal "center" -adj 1 -rs 20  -p tabs Settings;
 
@@ -1178,7 +1192,9 @@ global proc CreateMenu()
 	setParent -menu ..;
 
 	menuItem -label "Exporter" -command "potato_ShowModelExport";
-//	menuItem -label "Anim Exporter" -command "potato_ShowAnimExport"; // flex dem pecs
+	menuItem -divider true;
+	menuItem -label "Select and reveal all bones" -command "potato_SelectAllBonesInScene";
+	menuItem -label "Select and reveal all mesh" -command "potato_SelectAllMeshInScene";
 	menuItem -divider true;
 	menuItem -label "Site" -command $site;
 
