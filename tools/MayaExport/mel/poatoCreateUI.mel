@@ -18,6 +18,19 @@ global proc print_Msg(string $msg) {
 	print($msg + "\n");
 }
 
+global proc potato_revealSelected()
+{
+	outlinerEditor -edit -showSelected  1 outlinerPanel1;
+}
+
+global proc potato_SelectAllBonesInScene()
+{
+	string $selected[] = `ls -type joint`;
+	select -r $selected;
+
+	potato_revealSelected();
+}
+
 global proc int dirSelectedCallBck(string $dirpath,string $type)
 {
 	unlockPotatoNode();
@@ -955,6 +968,9 @@ global proc potato_CreateExportWindow( string $name )
 				button -label "Add Anim" -align "center" -c "potato_AddAnim" -p AnimUtilButtons;
 				button -label "Delete Entry" -align "center" -c potato_DeleteEntry -p AnimUtilButtons;
 
+			rowLayout -numberOfColumns 1 -height 28 -cw1 130 -ct1 "both" -co1 1 -p AnimExport AnimUtilButtons2;
+				button -label "Select all bones in scene" -align "right" -c potato_SelectAllBonesInScene -p AnimUtilButtons2;
+
 		formLayout -edit
 			-af winLogoAnim "top" 2
 			-af winLogoAnim "right" 0
@@ -964,6 +980,9 @@ global proc potato_CreateExportWindow( string $name )
 			-ac AnimScrollArea bottom 0 AnimUtilButtons
 			-af AnimUtilButtons bottom 0
 			-af AnimUtilButtons left 0
+			-ac AnimScrollArea bottom 0 AnimUtilButtons2
+			-af AnimUtilButtons2 bottom 0
+			-af AnimUtilButtons2 right 0
 			AnimExport;
 
 // Path Tab
