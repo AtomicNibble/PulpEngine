@@ -4,3 +4,6 @@
 [submodule "game_folder/mod"]
 	path = game_folder/mod
 	url = git@touchingclothgames.com:root/PotatoEngine-TestAssets.git
+[submodule "game_folder/art_source"]
+	path = game_folder/art_source
+	url = git@www.touchingclothgames.com:root/PotatoEngine-ArtSource.git
