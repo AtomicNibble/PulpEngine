@@ -12,6 +12,9 @@ namespace xml
 
 	#include <../../3rdparty/source/rapidxml/rapidxml.hpp>
 
+	X_DISABLE_WARNING(4100)
+	#include <../../3rdparty/source/rapidxml/rapidxml_print.hpp>
+	X_ENABLE_WARNING(4100)
 }
 
 X_NAMESPACE_END
