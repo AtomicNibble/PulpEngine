@@ -54,6 +54,14 @@ struct hash<core::string>
 	}
 };
 
+template<size_t N>
+struct hash<core::StackString<N>>
+{
+	size_t operator()(const core::StackString<N>& __s) const
+	{
+		return (size_t)core::Hash::Fnv1aHash(__s.c_str(), __s.length());
+	}
+};
 
 template<>
 struct hash<const char*>
@@ -85,6 +93,14 @@ template<>
 struct equal_to<core::string>
 {
 	bool operator()(const core::string& _Left, const core::string& _Right) const {
+		return (_Left == _Right);
+	}
+};
+
+template<size_t N>
+struct equal_to<core::StackString<N>>
+{
+	bool operator()(const core::StackString<N>& _Left, const core::StackString<N>& _Right) const {
 		return (_Left == _Right);
 	}
 };
