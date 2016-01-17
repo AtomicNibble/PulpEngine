@@ -25,7 +25,7 @@ AssetDB::~AssetDB()
 
 void AssetDB::Init(void)
 {
-	X_NEW(AssetDB, g_arena, "AssetDB");
+	gAssetDb = X_NEW(AssetDB, g_arena, "AssetDB");
 }
 
 void AssetDB::ShutDown(void)
