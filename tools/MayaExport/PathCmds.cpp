@@ -111,8 +111,6 @@ MStatus PathCmd::doIt(const MArgList & args)
 			return MS::kFailure;
 		}
 
-		MayaUtil::MayaPrintMsg("test: %s", valueStr.asChar());
-
 		core::Path<char> newValue;
 		newValue.append(valueStr.asChar());
 		newValue.replaceSeprators();
