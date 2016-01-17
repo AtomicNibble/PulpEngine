@@ -6,6 +6,7 @@
 #include "ModelExporter.h"
 #include "AnimExport.h"
 #include "PathCmds.h"
+#include "AssetDB.h"
 #include "MayaUtil.h"
 
 #include <IModel.h>
@@ -83,6 +84,7 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 	
 	// path util
 	plugin.registerCommand("PotatoPath", PathCmd::creator, PathCmd::newSyntax);
+	plugin.registerCommand("PotatoAssetDB", AssetDBCmd::creator, AssetDBCmd::newSyntax);
 
 	// PotatoPath -get -path_id animout
 	if (stat != MS::kSuccess) {
@@ -119,6 +121,12 @@ MODELEX_EXPORT MStatus uninitializePlugin(MObject obj)
 	}
 
 	stat = plugin.deregisterCommand("PotatoPath");
+
+	if (stat != MS::kSuccess) {
+		stat.perror("Error - uninitializePlugin");
+	}
+
+	stat = plugin.deregisterCommand("PotatoAssetDB");
 
 	if (stat != MS::kSuccess) {
 		stat.perror("Error - uninitializePlugin");
