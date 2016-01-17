@@ -41,6 +41,20 @@ global proc potato_SelectAllMeshInScene()
 	potato_SelectAndRevealType("mesh");
 }
 
+
+global proc savePathGlobal(string $pathId, string $value)
+{
+	string $command = "PotatoPath -set -path_id " + $pathId + " -value \"" + $value + "\"";
+	string $errorMsg;
+	$error = catch ( $errorMsg = eval( $command ) );
+}
+
+global proc string loadPathGlobal(string $pathId)
+{
+	string $command = "PotatoPath -get -path_id " + $pathId;
+	return eval( $command );
+}
+
 global proc int dirSelectedCallBck(string $dirpath,string $type)
 {
 	unlockPotatoNode();
@@ -48,6 +62,9 @@ global proc int dirSelectedCallBck(string $dirpath,string $type)
 		string $res = `textFieldButtonGrp -e -fi $dirpath pathsOutputDir`;
 		setAttr -type "string" ("PotatoGNode.outputDir") $dirpath;
 	lockPotatoNode();
+
+	// set global value.
+	savePathGlobal("modelOut", $dirpath);
 	return 1;
 }
 
@@ -58,6 +75,9 @@ global proc int dirSelectedCallBck_anim(string $dirpath,string $type)
 		string $res = `textFieldButtonGrp -e -fi $dirpath pathsAnimOutputDir`;
 		setAttr -type "string" ("PotatoGNode.outputDirAnims") $dirpath;
 	lockPotatoNode();
+
+	// set global value.
+	savePathGlobal("animOut", $dirpath);
 	return 1;
 }
 
@@ -1004,10 +1024,6 @@ global proc potato_CreateExportWindow( string $name )
 			frameLayout -l "Animations" -marginHeight 2 -marginWidth 2 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p Paths pathTabFrame2;
 			  textFieldButtonGrp -l "Output Directory" -bl "..." -bc browseForDir_anim -ed false - fi `getAttr PotatoGNode.outputDirAnims` -p pathTabFrame2 pathsAnimOutputDir;
 
-				optionMenu -label "Colors" -changeCommand "print #1";
-	            menuItem -label "Yellow";
-	            menuItem -label "Purple";
-	            menuItem -label "Orange";
 // Settings Tab
   		columnLayout -cat "both" 5 -cal "center" -adj 1 -rs 20  -p tabs Settings;
 
