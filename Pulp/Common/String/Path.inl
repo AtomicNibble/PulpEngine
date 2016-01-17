@@ -18,6 +18,14 @@ Path<TChar>::Path(const TChar* const str) : StackString<MAX_PATH, TChar>(str)
 }
 
 template<typename TChar>
+Path<TChar>::Path(const TChar* const beginInclusive, const TChar* const endExclusive) : 
+	StackString<MAX_PATH, TChar>(beginInclusive, endExclusive)
+{
+
+}
+
+
+template<typename TChar>
 const TChar* Path<TChar>::fileName(void) const
 {
 	const TChar* native = findLast(NATIVE_SLASH);

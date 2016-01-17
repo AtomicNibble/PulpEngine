@@ -34,6 +34,7 @@ public:
 	inline Path(const Path& oth);
 	inline explicit Path(const TChar* const str);
 
+	Path(const TChar* const beginInclusive, const TChar* const endExclusive);
 
 	inline const TChar* fileName(void) const;
 	inline const TChar* extension(void) const;
