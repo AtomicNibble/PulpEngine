@@ -6,8 +6,18 @@
 class AssetDB
 {
 public:
+	X_DECLARE_ENUM(AssetType)(MODEL, ANIM);
+
+public:
 	AssetDB();
 	~AssetDB();
+
+	static void Init(void);
+	static void ShutDown(void);
+
+	MStatus AddAsset(AssetType::Enum type, const MString& name);
+	MStatus RemoveAsset(AssetType::Enum type, const MString& name);
+	MStatus RenameAsset(AssetType::Enum type, const MString& name, const MString& oldName);
 
 private:
 
@@ -16,6 +26,10 @@ private:
 
 class AssetDBCmd : public MPxCommand
 {
+	X_DECLARE_ENUM(Action)(ADD, REMOVE, RENAME);
+
+	typedef AssetDB::AssetType AssetType;
+
 public:
 	AssetDBCmd();
 	~AssetDBCmd();
@@ -26,5 +40,4 @@ public:
 	static MSyntax newSyntax(void);
 
 private:
-
 };
