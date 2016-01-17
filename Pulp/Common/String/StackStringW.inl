@@ -683,7 +683,7 @@ inline const wchar_t* StackString<N, wchar_t>::end(void) const
 }
 
 template <size_t N>
-inline size_t StackString<N, wchar_t>::capacity(void) const
+inline constexpr size_t StackString<N, wchar_t>::capacity(void) const
 {
 	return N;
 }

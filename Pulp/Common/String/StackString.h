@@ -132,7 +132,7 @@ public:
 	inline const TChar* c_str(void) const;
 
 	inline size_t length(void) const;
-	inline size_t capacity(void) const;
+	inline constexpr size_t capacity(void) const;
 
 	inline bool isEmpty(void) const;
 	inline bool isNotEmpty(void) const;
@@ -258,7 +258,7 @@ public:
 	inline const wchar_t* c_str(void) const;
 
 	inline size_t length(void) const;
-	inline size_t capacity(void) const;
+	inline constexpr size_t capacity(void) const;
 
 	inline bool isEmpty(void) const;
 	inline bool isNotEmpty(void) const;

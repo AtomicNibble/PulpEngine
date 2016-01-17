@@ -676,7 +676,7 @@ inline const TChar* StackString<N, TChar>::end(void) const
 }
 
 template <size_t N, typename TChar>
-inline size_t StackString<N, TChar>::capacity(void) const
+inline constexpr size_t StackString<N, TChar>::capacity(void) const
 {
 	return N;
 }
