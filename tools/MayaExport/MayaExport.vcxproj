@@ -1168,6 +1168,7 @@
   <ItemGroup>
     <ClInclude Include="AnimExport.h" />
     <ClInclude Include="AppDataPath.h" />
+    <ClInclude Include="AssetDB.h" />
     <ClInclude Include="Hierarchy.h" />
     <ClInclude Include="MayaUtil.h" />
     <ClInclude Include="ModelExporter.h" />
@@ -1178,6 +1179,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AnimExport.cpp" />
+    <ClCompile Include="AssetDB.cpp" />
     <ClCompile Include="dllmain.cpp">
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug_2012|Win32'">false</CompileAsManaged>
       <CompileAsManaged Condition="'$(Configuration)|$(Platform)'=='Debug_2013|Win32'">false</CompileAsManaged>

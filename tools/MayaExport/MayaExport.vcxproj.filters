@@ -38,6 +38,9 @@
     <ClInclude Include="AppDataPath.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AssetDB.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -62,6 +65,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AppDataPath.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetDB.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
