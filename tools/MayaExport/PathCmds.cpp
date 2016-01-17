@@ -3,6 +3,7 @@
 #include "MayaUtil.h"
 
 #include <maya\MArgList.h>
+#include <maya\MSyntax.h>
 
 #include <String\Path.h>
 #include <String\Xml.h>
@@ -139,6 +140,18 @@ MStatus PathCmd::doIt(const MArgList & args)
 void* PathCmd::creator(void)
 {
 	return new PathCmd;
+}
+
+MSyntax PathCmd::newSyntax(void)
+{
+	MSyntax syn;
+
+	syn.addFlag("-g", "-get", MSyntax::kString);
+	syn.addFlag("-s", "-set", MSyntax::kString);
+	syn.addFlag("-v", "-value", MSyntax::kString);
+	syn.addFlag("-pi", "-path_id", MSyntax::kString);
+
+	return syn;
 }
 
 bool PathCmd::SetValue(PathId::Enum id, core::Path<char> value)

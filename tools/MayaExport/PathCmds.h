@@ -16,9 +16,10 @@ public:
 	PathCmd();
 	~PathCmd();
 
-	virtual MStatus doIt(const MArgList &args);
+	virtual MStatus doIt(const MArgList &args) X_OVERRIDE;
 
 	static void* creator(void);
+	static MSyntax newSyntax(void);
 
 private:
 	bool SetValue(PathId::Enum id, core::Path<char> value);

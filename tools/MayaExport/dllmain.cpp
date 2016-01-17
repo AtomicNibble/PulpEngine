@@ -82,7 +82,7 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 	stat = plugin.registerCommand("PotatoExportAnim", AnimExporterCmd::creator);
 	
 	// path util
-	plugin.registerCommand("PotatoPath", PathCmd::creator);
+	plugin.registerCommand("PotatoPath", PathCmd::creator, PathCmd::newSyntax);
 
 	// PotatoPath -get -path_id animout
 	if (stat != MS::kSuccess) {
