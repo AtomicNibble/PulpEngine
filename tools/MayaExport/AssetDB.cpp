@@ -75,6 +75,8 @@ MStatus AssetDBCmd::doIt(const MArgList &args)
 	MStatus stat;
 	MArgDatabase parser(syntax(), args, &stat);
 
+	setResult(false);
+
 	if (stat != MS::kSuccess) {
 		return stat;
 	}
@@ -177,26 +179,31 @@ MStatus AssetDBCmd::doIt(const MArgList &args)
 		return MS::kFailure;
 	}
 
+	stat = MS::kFailure;
+
 	// all good.
 	if (action == Action::ADD)
 	{
-		return gAssetDb->AddAsset(assetType, name);
+		stat = gAssetDb->AddAsset(assetType, name);
 	}
 	else if (action == Action::REMOVE)
 	{
-		return gAssetDb->RemoveAsset(assetType, name);
-
+		stat = gAssetDb->RemoveAsset(assetType, name);
 	}
 	else if (action == Action::RENAME)
 	{
-		return gAssetDb->RenameAsset(assetType, name, oldName);
+		stat = gAssetDb->RenameAsset(assetType, name, oldName);
 	}
 	else
 	{
 		X_ASSERT_UNREACHABLE();
 	}
 
-	return MS::kFailure;
+	if (stat == MS::kSuccess) {
+		setResult(true);
+	}
+
+	return stat;
 }
 
 void* AssetDBCmd::creator(void)
