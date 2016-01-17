@@ -145,11 +145,23 @@ void* PathCmd::creator(void)
 
 bool PathCmd::SetValue(PathId::Enum id, core::Path<char> value)
 {
-	const char* pName = PathIdToStr(id);
+	core::StackString<64> name = core::StackString<64>(PathIdToStr(id));
 
 	value.replaceSeprators();
 
-	PathCache_.insert(std::make_pair(core::StackString<64>(pName), value));
+	// load it if not already loaded.
+	// before we insert our value.
+	if (!cacheLoaded_) {
+		ReloadCache();
+	}
+
+	PathCacheMap::const_iterator it = PathCache_.find(name);
+	if (it != PathCache_.end()) {
+		PathCache_[name] = value;
+	}
+	else {
+		PathCache_.insert(std::make_pair(name, value));
+	}
 
 	FlushCache();
 
@@ -205,6 +217,7 @@ bool PathCmd::ReloadCache(void)
 	// empty?
 	if (fileSize < 1) {
 		::fclose(pFile);
+		cacheLoaded_ = true;
 		return true;
 	}
 
