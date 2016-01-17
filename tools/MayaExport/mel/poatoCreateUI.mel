@@ -82,11 +82,11 @@ global proc int dirSelectedCallBck_anim(string $dirpath,string $type)
 }
 
 global proc browseForDir() {
-	fileBrowser( "dirSelectedCallBck", "Select a Folder", "", 4 );
+	fileBrowser( "dirSelectedCallBck", "Select a Folder (Model Out)", "", 4 );
 }
 
 global proc browseForDir_anim() {
-	fileBrowser( "dirSelectedCallBck_anim", "Select a Folder", "", 4 );
+	fileBrowser( "dirSelectedCallBck_anim", "Select a Folder (Anim Out)", "", 4 );
 }
 
 global proc string getOutputDir() {
@@ -358,7 +358,8 @@ global proc ModelEntryExport(int $index)
 	// build the shit!
 	// we need file name.
 	string $filename = modelGetName($index);
-	string $Dir = `getAttr ("PotatoGNode.outputDir")`;
+//	string $Dir = `getAttr ("PotatoGNode.outputDir")`;
+  string $Dir = loadPathGlobal("modelOut");
 	string $scale = `getAttr ("PotatoGNode.scale")`;
 	string $weightThreshold = `getAttr ("PotatoGNode.weightThreshold")`;
 	string $uvMergeThreshold = `getAttr ("PotatoGNode.uvMergeThreshold")`;
@@ -793,7 +794,8 @@ global proc AnimEntryExport(int $index)
 
 	// make the command
 	string $filename = animGetName($index);
-	string $Dir = `getAttr ("PotatoGNode.outputDirAnims")`;
+//	string $Dir = `getAttr ("PotatoGNode.outputDirAnims")`;
+	string $Dir = loadPathGlobal("animOut");
 	string $options = "-progress PotatoExportProgress -dir \"" + $Dir + "\"";
 	string $command = "PotatoExportAnim " + $args + " -f \"" + $filename + "\" "+ $options;
 
