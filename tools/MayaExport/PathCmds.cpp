@@ -49,14 +49,14 @@ MStatus PathCmd::doIt(const MArgList & args)
 
 	// get the mode.
 	{
-		idx = args.flagIndex("get");
+		idx = args.flagIndex("g", "get");
 		if (idx != MArgList::kInvalidArgIndex)
 		{
 			mode = Mode::GET;
 		}
 		else
 		{
-			idx = args.flagIndex("set");
+			idx = args.flagIndex("s", "set");
 			if (idx == MArgList::kInvalidArgIndex)
 			{
 				MayaUtil::MayaPrintError("unkown mode valid modes: set, get");
@@ -70,7 +70,7 @@ MStatus PathCmd::doIt(const MArgList & args)
 	// get the path id.
 	{
 
-		idx = args.flagIndex("path_id");
+		idx = args.flagIndex("pi", "path_id");
 		if (idx == MArgList::kInvalidArgIndex) {
 			MayaUtil::MayaPrintError("path_id flag missing");
 			return MS::kFailure;
@@ -100,7 +100,7 @@ MStatus PathCmd::doIt(const MArgList & args)
 	// if set mode we also need a value.
 	if (mode == Mode::SET)
 	{
-		idx = args.flagIndex("value");
+		idx = args.flagIndex("v", "value");
 		if (idx == MArgList::kInvalidArgIndex) {
 			MayaUtil::MayaPrintError("value flag missing");
 			return MS::kFailure;
