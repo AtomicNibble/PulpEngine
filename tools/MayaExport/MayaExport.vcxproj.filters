@@ -32,6 +32,12 @@
     <ClInclude Include="MayaUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PathCmds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AppDataPath.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -50,6 +56,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="MayaUtil.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PathCmds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AppDataPath.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

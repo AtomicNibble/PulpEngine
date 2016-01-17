@@ -5,6 +5,7 @@
 
 #include "ModelExporter.h"
 #include "AnimExport.h"
+#include "PathCmds.h"
 #include "MayaUtil.h"
 
 #include <IModel.h>
@@ -79,7 +80,11 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 	}
 
 	stat = plugin.registerCommand("PotatoExportAnim", AnimExporterCmd::creator);
+	
+	// path util
+	plugin.registerCommand("PotatoPath", PathCmd::creator);
 
+	// PotatoPath -get -path_id animout
 	if (stat != MS::kSuccess) {
 		stat.perror("Error - initializePlugin");
 	}
@@ -108,6 +113,12 @@ MODELEX_EXPORT MStatus uninitializePlugin(MObject obj)
 	}
 
 	stat = plugin.deregisterCommand("PotatoExportAnim");
+
+	if (stat != MS::kSuccess) {
+		stat.perror("Error - uninitializePlugin");
+	}
+
+	stat = plugin.deregisterCommand("PotatoPath");
 
 	if (stat != MS::kSuccess) {
 		stat.perror("Error - uninitializePlugin");
