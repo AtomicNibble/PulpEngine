@@ -90,11 +90,11 @@ global proc browseForDir_anim() {
 }
 
 global proc string getOutputDir() {
-	return `getAttr ("PotatoGNode.outputDir")`;
+  	return loadPathGlobal("modelOut");
 }
 
 global proc string getOutputDirAnims() {
-	return `getAttr ("PotatoGNode.outputDirAnims")`;
+  	return loadPathGlobal("animOut");
 }
 
 global proc string modelGetName(int $index) {
@@ -358,8 +358,7 @@ global proc ModelEntryExport(int $index)
 	// build the shit!
 	// we need file name.
 	string $filename = modelGetName($index);
-//	string $Dir = `getAttr ("PotatoGNode.outputDir")`;
-  string $Dir = loadPathGlobal("modelOut");
+  	string $Dir = getOutputDir();
 	string $scale = `getAttr ("PotatoGNode.scale")`;
 	string $weightThreshold = `getAttr ("PotatoGNode.weightThreshold")`;
 	string $uvMergeThreshold = `getAttr ("PotatoGNode.uvMergeThreshold")`;
@@ -794,8 +793,7 @@ global proc AnimEntryExport(int $index)
 
 	// make the command
 	string $filename = animGetName($index);
-//	string $Dir = `getAttr ("PotatoGNode.outputDirAnims")`;
-	string $Dir = loadPathGlobal("animOut");
+	string $Dir = getOutputDirAnims();
 	string $options = "-progress PotatoExportProgress -dir \"" + $Dir + "\"";
 	string $command = "PotatoExportAnim " + $args + " -f \"" + $filename + "\" "+ $options;
 
