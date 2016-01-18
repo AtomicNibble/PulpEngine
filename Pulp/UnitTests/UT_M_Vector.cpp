@@ -7,6 +7,15 @@ X_USING_NAMESPACE;
 
 using namespace core;
 
+typedef ::testing::Types<float, double> MyTypes;
+TYPED_TEST_CASE(TypedVector, MyTypes);
+
+template <typename T>
+class TypedVector : public ::testing::Test {
+public:
+};
+
+
 #define EXPECT_NEAR_VEC2(expected,actual,angle_error) \
 { Vec2f _exp = expected; \
 	Vec2f _act = actual; \
@@ -394,4 +403,63 @@ TEST(XVector, Limit) {
 }
 
 
+TYPED_TEST(TypedVector, Min) 
+{
+	typedef Vec2<TypeParam> Vec2T;
+	typedef Vec3<TypeParam> Vec3T;
+	typedef Vec4<TypeParam> Vec4T;
+	typedef Vec5<TypeParam> Vec5T;
+
+	Vec2T min2 = Vec2T::min();
+	EXPECT_EQ(std::numeric_limits<TypeParam>::min(), min2.x);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::min(), min2.y);
+
+	Vec3T min3 = Vec3T::min();
+	EXPECT_EQ(std::numeric_limits<TypeParam>::min(), min3.x);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::min(), min3.y);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::min(), min3.z);
+
+	Vec4T min4 = Vec4T::min();
+	EXPECT_EQ(std::numeric_limits<TypeParam>::min(), min4.x);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::min(), min4.y);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::min(), min4.z);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::min(), min4.w);
+
+	Vec5T min5 = Vec5T::min();
+	EXPECT_EQ(std::numeric_limits<TypeParam>::min(), min5.x);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::min(), min5.y);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::min(), min5.z);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::min(), min5.s);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::min(), min5.t);
+}
+
+TYPED_TEST(TypedVector, Max)
+{
+	typedef Vec2<TypeParam> Vec2T;
+	typedef Vec3<TypeParam> Vec3T;
+	typedef Vec4<TypeParam> Vec4T;
+	typedef Vec5<TypeParam> Vec5T;
+
+	Vec2T min2 = Vec2T::min();
+	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min2.x);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min2.y);
+
+	Vec3T min3 = Vec3T::min();
+	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min3.x);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min3.y);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min3.z);
+
+	Vec4T min4 = Vec4T::min();
+	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min4.x);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min4.y);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min4.z);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min4.w);
+
+	Vec5T min5 = Vec5T::min();
+	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min5.x);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min5.y);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min5.z);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min5.s);
+	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min5.t);
+}
 
