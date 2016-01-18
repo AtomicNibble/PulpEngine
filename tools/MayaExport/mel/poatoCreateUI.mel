@@ -1018,11 +1018,14 @@ global proc potato_CreateExportWindow( string $name )
 // Path Tab
   		columnLayout -cat "both" 5 -cal "center" -adj 1 -rs 20  -p tabs Paths;
 
+  			string $OutDir = getOutputDir();
+			string $OutDirAnim = getOutputDirAnims();
+
 			frameLayout -l "Models" -marginHeight 2 -marginWidth 2 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p Paths pathTabFrame1;
-				textFieldButtonGrp -l "Output Directory" -bl "..." -bc browseForDir -ed false - fi `getAttr PotatoGNode.outputDir` -p pathTabFrame1 pathsOutputDir;
+				textFieldButtonGrp -l "Output Directory" -bl "..." -bc browseForDir -ed false - fi $OuDir -p pathTabFrame1 pathsOutputDir;
 
 			frameLayout -l "Animations" -marginHeight 2 -marginWidth 2 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p Paths pathTabFrame2;
-			  textFieldButtonGrp -l "Output Directory" -bl "..." -bc browseForDir_anim -ed false - fi `getAttr PotatoGNode.outputDirAnims` -p pathTabFrame2 pathsAnimOutputDir;
+			  textFieldButtonGrp -l "Output Directory" -bl "..." -bc browseForDir_anim -ed false - fi $OutDirAnim -p pathTabFrame2 pathsAnimOutputDir;
 
 // Settings Tab
   		columnLayout -cat "both" 5 -cal "center" -adj 1 -rs 20  -p tabs Settings;
