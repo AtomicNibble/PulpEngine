@@ -7,7 +7,11 @@ X_USING_NAMESPACE;
 
 using namespace core;
 
-typedef ::testing::Types<float, double> MyTypes;
+typedef ::testing::Types<int16_t, uint16_t, 
+	int32_t, uint32_t, 
+	int64_t, uint64_t, 
+	float, double> MyTypes;
+
 TYPED_TEST_CASE(TypedVector, MyTypes);
 
 template <typename T>
