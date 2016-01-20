@@ -105,6 +105,13 @@ static const uint32_t	 MODEL_MAX_LODS = 4;
 static const uint32_t	 MODEL_MAX_NAME_LENGTH = 60; 
 static const char*		 MODEL_FILE_EXTENSION = "model";
 
+// Intermidiate format stuff.
+// this is used for saving out raw un processed data. so no dropping of bones, or weights
+// Also text based allowing for other tools to create it with ease.
+// I plan to also have the maya plugin background save one
+static const uint32_t	 MODEL_RAW_VERSION = 1;
+static const char*		 MODEL_RAW_FILE_EXTENSION = "model_raw";
+
 // Flags:
 // LOOSE: the model file is not packed, meaning it has a string table that needs processing.
 // FULL_VERT: the vertex data is not compressed.
