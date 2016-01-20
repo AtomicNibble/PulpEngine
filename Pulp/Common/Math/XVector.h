@@ -118,7 +118,7 @@ public:
 
 	X_INLINE T distance(const Vec2<T> &rhs) const
 	{
-		return (T)(*this - rhs).length();
+		return static_cast<T>((*this - rhs).length());
 	}
 
 	X_INLINE T distanceSquared(const Vec2<T> &rhs) const
@@ -277,7 +277,10 @@ public:
 	Vec3(T X, T Y, T Z) : x(X), y(Y), z(Z) {}
 	Vec3(const Vec3<T>& src) : x(src.x), y(src.y), z(src.z) {}
 	template<typename TOth>
-	explicit Vec3(const Vec3<TOth>& src) : x((T)src.x), y((T)src.y), z((T)src.z) {}
+	explicit Vec3(const Vec3<TOth>& src) : 
+		x(static_cast<T>(src.x)), 
+		y(static_cast<T>(src.y)), 
+		z(static_cast<T>(src.z)) {}
 	explicit Vec3(const T* pSrc) : x(pSrc[0]), y(pSrc[1]), z(pSrc[2]) {}
 	explicit Vec3(const T val) : x(val), y(val), z(val) {}
 	explicit Vec3(const Vec2<T>& src) : x(src.x), y(src.y), z(0) {}
@@ -368,7 +371,7 @@ public:
 
 	T distance(const Vec3<T> &rhs) const
 	{
-		return (T)(*this - rhs).length();
+		return static_cast<T>((*this - rhs).length());
 	}
 
 	T distanceSquared(const Vec3<T> &rhs) const
@@ -425,7 +428,7 @@ public:
 
 	Vec3<T>& normalize()
 	{
-		T invS = ((T)1) / length();
+		T invS = (static_cast<T>(1)) / length();
 		x *= invS;
 		y *= invS;
 		z *= invS;
@@ -434,7 +437,7 @@ public:
 
 	Vec3<T> normalized() const
 	{
-		T invS = ((T)1) / length();
+		T invS = (static_cast<T>(1)) / length();
 		return Vec3<T>(x * invS, y * invS, z * invS);
 	}
 
@@ -443,7 +446,7 @@ public:
 	{
 		T s = lengthSquared();
 		if (s > 0) {
-			T invS = ((T)1) / math<T>::sqrt(s);
+			T invS = (static_cast<T>(1)) / math<T>::sqrt(s);
 			x *= invS;
 			y *= invS;
 			z *= invS;
@@ -455,7 +458,7 @@ public:
 	{
 		T s = lengthSquared();
 		if (s > 0) {
-			float invS = ((T)1) / math<T>::sqrt(s);
+			float invS = (static_cast<T>(1)) / math<T>::sqrt(s);
 			return Vec3<T>(x * invS, y * invS, z * invS);
 		}
 		else
@@ -465,7 +468,7 @@ public:
 	//! Returns a vector which is orthogonal to \a this
 	Vec3<T> getOrthogonal() const
 	{
-		if (math<T>::abs(y) < (T)0.99) // abs(dot(u, Y)), somewhat arbitrary epsilon
+		if (math<T>::abs(y) < static_cast<T>(0.99)) // abs(dot(u, Y)), somewhat arbitrary epsilon
 			return Vec3<T>(-z, 0, x); // cross( this, Y )
 		else
 			return Vec3<T>(0, z, -y); // cross( this, X )
@@ -577,7 +580,7 @@ public:
 		sinAlpha = math<T>::sin(alpha);
 
 		// this breaks down when sinAlpha = 0, i.e. alpha = 0 or pi
-		t1 = math<T>::sin(((T)1 - fact) * alpha) / sinAlpha;
+		t1 = math<T>::sin((static_cast<T>(1) - fact) * alpha) / sinAlpha;
 		t2 = math<T>::sin(fact * alpha) / sinAlpha;
 
 		// interpolate src vectors
@@ -717,7 +720,7 @@ public:
 
 	T distance(const Vec4<T> &rhs) const
 	{
-		return (T)(*this - rhs).length();
+		return static_cast<T>((*this - rhs).length());
 	}
 
 	T distanceSquared(const Vec4<T> &rhs) const
@@ -739,7 +742,7 @@ public:
 
 	Vec4<T>& normalize()
 	{
-		T invS = ((T)1) / length();
+		T invS = (static_cast<T>(1)) / length();
 		x *= invS;
 		y *= invS;
 		z *= invS;
@@ -749,7 +752,7 @@ public:
 
 	Vec4<T> normalized() const
 	{
-		T invS = ((T)1) / length();
+		T invS = (static_cast<T>(1)) / length();
 		return Vec4<T>(x*invS, y*invS, z*invS, w*invS);
 	}
 
@@ -757,12 +760,12 @@ public:
 	Vec4<T>& normalizeSafe()
 	{
 		T s = lengthSquared();
-		if (s > 0) {
-			T invS = ((T)1) / math<T>::sqrt(s);
+		if (s > static_cast<T>(0)) {
+			T invS = (static_cast<T>(1)) / math<T>::sqrt(s);
 			x *= invS;
 			y *= invS;
 			z *= invS;
-			w = (T)0;
+			w = static_cast<T>(0);
 		}
 		return *this;
 	}
@@ -863,7 +866,7 @@ public:
 		sinAlpha = math<T>::sin(alpha);
 
 		// this breaks down when sinAlpha = 0, i.e. alpha = 0 or pi
-		t1 = math<T>::sin(((T)1 - fact) * alpha) / sinAlpha;
+		t1 = math<T>::sin((static_cast<T>(1) - fact) * alpha) / sinAlpha;
 		t2 = math<T>::sin(fact * alpha) / sinAlpha;
 
 		// interpolate src vectors
@@ -1009,7 +1012,7 @@ public:
 
 	T distance(const Vec5<T> &rhs) const
 	{
-		return (T)(*this - rhs).length();
+		return static_cast<T>((*this - rhs).length());
 	}
 
 	T distanceSquared(const Vec5<T> &rhs) const
@@ -1031,7 +1034,7 @@ public:
 
 	Vec5<T>& normalize()
 	{
-		T invS = ((T)1) / length();
+		T invS = (static_cast<T>(1)) / length();
 		x *= invS;
 		y *= invS;
 		z *= invS;
@@ -1042,7 +1045,7 @@ public:
 
 	Vec5<T> normalized() const
 	{
-		T invS = ((T)1) / length();
+		T invS = (static_cast<T>(1)) / length();
 		return Vec5<T>(x*invS, y*invS, z*invS, s*invS, t*invS);
 	}
 
@@ -1051,12 +1054,12 @@ public:
 	{
 		T s = lengthSquared();
 		if (s > 0) {
-			T invS = ((T)1) / math<T>::sqrt(s);
+			T invS = (static_cast<T>(1)) / math<T>::sqrt(s);
 			x *= invS;
 			y *= invS;
 			z *= invS;
-			s = (T)0;
-			t = (T)0;
+			s = static_cast<T>(0);
+			t = static_cast<T>(0);
 		}
 		return *this;
 	}
