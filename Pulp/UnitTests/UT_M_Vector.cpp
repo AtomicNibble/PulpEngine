@@ -467,3 +467,52 @@ TYPED_TEST(TypedVector, Max)
 	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min5.t);
 }
 
+TYPED_TEST(TypedVector, abs)
+{
+	typedef Vec2<TypeParam> Vec2T;
+	typedef Vec3<TypeParam> Vec3T;
+	typedef Vec4<TypeParam> Vec4T;
+	typedef Vec5<TypeParam> Vec5T;
+	typedef TypeParam T;
+
+	Vec2T abs2 = Vec2T(static_cast<T>(15.2),
+		static_cast<T>(-15)).abs();
+	
+	EXPECT_EQ(static_cast<T>(15.2), abs2.x);
+	EXPECT_EQ(static_cast<T>(15), abs2.y);
+
+	Vec3T abs3 = Vec3T(static_cast<T>(15.2),
+		static_cast<T>(-15), 
+		static_cast<T>(15)).abs();
+
+	EXPECT_EQ(static_cast<T>(15.2), abs3.x);
+	EXPECT_EQ(static_cast<T>(15), abs3.y);
+	EXPECT_EQ(static_cast<T>(15), abs3.z);
+
+	X_DISABLE_WARNING(4309)
+	Vec4T abs4 = Vec4T(static_cast<T>(15.2),
+		static_cast<T>(-15), 
+		static_cast<T>(15), 
+		static_cast<T>(-4.94258)).abs();
+	X_ENABLE_WARNING(4309)
+
+	EXPECT_EQ(static_cast<T>(15.2), abs4.x);
+	EXPECT_EQ(static_cast<T>(15), abs4.y);
+	EXPECT_EQ(static_cast<T>(15), abs4.z);
+	EXPECT_EQ(static_cast<T>(4.94258), abs4.w);
+
+	X_DISABLE_WARNING(4309)
+	Vec5T abs5 = Vec5T(static_cast<T>(15.2),
+		static_cast<T>(-15),
+		static_cast<T>(15),
+		static_cast<T>(-4.94258),
+		static_cast<T>(-0.001)).abs();
+	X_ENABLE_WARNING(4309)
+
+	EXPECT_EQ(static_cast<T>(15.2), abs5.x);
+	EXPECT_EQ(static_cast<T>(15), abs5.y);
+	EXPECT_EQ(static_cast<T>(15), abs5.z);
+	EXPECT_EQ(static_cast<T>(4.94258), abs5.s);
+	EXPECT_EQ(static_cast<T>(0.001), abs5.t);
+
+}
