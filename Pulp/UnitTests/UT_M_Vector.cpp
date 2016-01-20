@@ -19,6 +19,18 @@ class TypedVector : public ::testing::Test {
 public:
 };
 
+typedef ::testing::Types<int16_t,
+	int32_t,
+	int64_t, 
+	float, double> MyTypesSigned;
+
+TYPED_TEST_CASE(TypedVectorSigned, MyTypesSigned);
+
+template <typename T>
+class TypedVectorSigned : public ::testing::Test {
+public:
+};
+
 
 #define EXPECT_NEAR_VEC2(expected,actual,angle_error) \
 { Vec2f _exp = expected; \
@@ -467,7 +479,7 @@ TYPED_TEST(TypedVector, Max)
 	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min5.t);
 }
 
-TYPED_TEST(TypedVector, abs)
+TYPED_TEST(TypedVectorSigned, abs)
 {
 	typedef Vec2<TypeParam> Vec2T;
 	typedef Vec3<TypeParam> Vec3T;
