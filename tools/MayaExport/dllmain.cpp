@@ -64,6 +64,7 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 	MayaUtil::MayaPrintMsg("=== Potato Plugin Loaded (%s) ===", ver.c_str());
 
 	AssetDB::Init();
+	PathCache::Init();
 
 	plugin.registerUI(g_createUiScript, g_destroyUiScript);
 
@@ -135,6 +136,7 @@ MODELEX_EXPORT MStatus uninitializePlugin(MObject obj)
 	}
 
 	AssetDB::ShutDown();
+	PathCache::ShutDown();
 
 	delete g_arena;
 	g_arena = nullptr;
