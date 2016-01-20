@@ -1023,6 +1023,16 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				uint32_t bytesRead = 0;
 				if (asyncOp.op.hasFinished(&bytesRead))
 				{
+					if (vars_.QueDebug)
+					{
+						uint32_t threadId = core::Thread::GetCurrentID();
+
+						X_LOG0("FileSys", "IoRequest(0x%x) '%s' async request complete. "
+							"bytesTrans: 0x%x pBuf: %p", 
+							threadId, IoRequest::ToString(request.getType()),
+							bytesRead, asyncOp.request.readInfo.pBuf);
+					}
+
 					asyncOp.request.callback.Invoke(this, asyncOp.request,
 						asyncOp.request.readInfo.pFile, bytesRead);
 
