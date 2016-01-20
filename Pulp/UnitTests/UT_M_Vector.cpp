@@ -444,22 +444,22 @@ TYPED_TEST(TypedVector, Max)
 	typedef Vec4<TypeParam> Vec4T;
 	typedef Vec5<TypeParam> Vec5T;
 
-	Vec2T min2 = Vec2T::min();
+	Vec2T min2 = Vec2T::max();
 	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min2.x);
 	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min2.y);
 
-	Vec3T min3 = Vec3T::min();
+	Vec3T min3 = Vec3T::max();
 	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min3.x);
 	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min3.y);
 	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min3.z);
 
-	Vec4T min4 = Vec4T::min();
+	Vec4T min4 = Vec4T::max();
 	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min4.x);
 	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min4.y);
 	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min4.z);
 	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min4.w);
 
-	Vec5T min5 = Vec5T::min();
+	Vec5T min5 = Vec5T::max();
 	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min5.x);
 	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min5.y);
 	EXPECT_EQ(std::numeric_limits<TypeParam>::max(), min5.z);
