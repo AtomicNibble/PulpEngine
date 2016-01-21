@@ -9,6 +9,12 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="Header Files\RawModel">
+      <UniqueIdentifier>{8e318376-4ecb-4918-8e5e-9288d4483348}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\RawModel">
+      <UniqueIdentifier>{0f0b67d8-1a05-48c7-ae5d-188972383b7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -16,6 +22,12 @@
     </ClInclude>
     <ClInclude Include="XModelLib.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RawModelTypes.h">
+      <Filter>Header Files\RawModel</Filter>
+    </ClInclude>
+    <ClInclude Include="RawModel.h">
+      <Filter>Header Files\RawModel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -30,6 +42,9 @@
     </ClCompile>
     <ClCompile Include="XModelLib.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RawModel.cpp">
+      <Filter>Source Files\RawModel</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
