@@ -979,8 +979,11 @@ void xFileSys::ShutDownRequestWorker(void)
 	closeRequest.setType(IoRequest::CLOSE);
 	::memset(&closeRequest.callback, 1, sizeof(closeRequest.callback));
 
-	ioQue_.push(closeRequest);
-
+	// push a few close jobs on to give chance for thread should run to get updated.
+	for (size_t i = 0; i < 10; i++) {
+		ioQue_.push(closeRequest);
+	}
+	
 	ThreadAbstract::Join();
 }
 
