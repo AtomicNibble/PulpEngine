@@ -1079,6 +1079,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 		}
 		else if (request.getType() == IoRequest::OPEN_READ_ALL)
 		{
+			X_ASSERT_NOT_IMPLEMENTED();
 		//	IoRequestOpen& open = request.openInfo;
 		//	XFileMem* pFile = openFileMem(open.name.c_str(), open.mode);
 		//	bool operationSucced = pFile != nullptr;
