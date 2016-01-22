@@ -979,8 +979,11 @@ void xFileSys::ShutDownRequestWorker(void)
 	closeRequest.setType(IoRequest::CLOSE);
 	::memset(&closeRequest.callback, 1, sizeof(closeRequest.callback));
 
-	ioQue_.push(closeRequest);
-
+	// push a few close jobs on to give chance for thread should run to get updated.
+	for (size_t i = 0; i < 10; i++) {
+		ioQue_.push(closeRequest);
+	}
+	
 	ThreadAbstract::Join();
 }
 
@@ -1020,21 +1023,41 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			{
 				PendingOp& asyncOp = pendingOps[i];
 
-				uint32_t bytesRead = 0;
-				if (asyncOp.op.hasFinished(&bytesRead))
+				uint32_t bytesTransferd = 0;
+				if (asyncOp.op.hasFinished(&bytesTransferd))
 				{
+					const IoRequestData& asyncReq = asyncOp.request;
+
 					if (vars_.QueDebug)
 					{
 						uint32_t threadId = core::Thread::GetCurrentID();
 
+						void* pBuf = nullptr;
+
+						if (asyncReq.getType() == IoRequest::READ) {
+							pBuf = asyncReq.readInfo.pBuf;
+						}
+						else {
+							pBuf = asyncReq.writeInfo.pBuf;
+						}
+
 						X_LOG0("FileSys", "IoRequest(0x%x) '%s' async request complete. "
 							"bytesTrans: 0x%x pBuf: %p", 
-							threadId, IoRequest::ToString(request.getType()),
-							bytesRead, asyncOp.request.readInfo.pBuf);
+							threadId, IoRequest::ToString(asyncReq.getType()),
+							bytesTransferd, asyncReq.readInfo.pBuf);
 					}
 
-					asyncOp.request.callback.Invoke(this, asyncOp.request,
-						asyncOp.request.readInfo.pFile, bytesRead);
+					XFileAsync* pReqFile = nullptr;
+
+					if (asyncReq.getType() == IoRequest::READ) {
+						pReqFile = asyncReq.readInfo.pFile;
+					}
+					else {
+						pReqFile = asyncReq.writeInfo.pFile;
+					}
+
+					asyncReq.callback.Invoke(this, asyncOp.request,
+						pReqFile, bytesTransferd);
 
 					pendingOps.removeIndex(i);
 				}
