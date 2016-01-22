@@ -1044,8 +1044,17 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 							bytesTransferd, asyncReq.readInfo.pBuf);
 					}
 
+					XFileAsync* pReqFile = nullptr;
+
+					if (asyncReq.getType() == IoRequest::READ) {
+						pReqFile = asyncReq.readInfo.pFile;
+					}
+					else {
+						pReqFile = asyncReq.writeInfo.pFile;
+					}
+
 					asyncReq.callback.Invoke(this, asyncOp.request,
-						asyncReq.readInfo.pFile, bytesTransferd);
+						pReqFile, bytesTransferd);
 
 					pendingOps.removeIndex(i);
 				}
