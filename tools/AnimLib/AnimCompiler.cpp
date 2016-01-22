@@ -365,6 +365,9 @@ bool AnimCompiler::compile(core::Path<char>& path, const float posError, const f
 
 bool AnimCompiler::save(core::Path<char>& path)
 {
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pFileSys);
+
 	path.setExtension(anim::ANIM_FILE_EXTENSION);
 
 	core::fileModeFlags mode;
