@@ -1020,21 +1020,32 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			{
 				PendingOp& asyncOp = pendingOps[i];
 
-				uint32_t bytesRead = 0;
-				if (asyncOp.op.hasFinished(&bytesRead))
+				uint32_t bytesTransferd = 0;
+				if (asyncOp.op.hasFinished(&bytesTransferd))
 				{
+					const IoRequestData& asyncReq = asyncOp.request;
+
 					if (vars_.QueDebug)
 					{
 						uint32_t threadId = core::Thread::GetCurrentID();
 
+						void* pBuf = nullptr;
+
+						if (asyncReq.getType() == IoRequest::READ) {
+							pBuf = asyncReq.readInfo.pBuf;
+						}
+						else {
+							pBuf = asyncReq.writeInfo.pBuf;
+						}
+
 						X_LOG0("FileSys", "IoRequest(0x%x) '%s' async request complete. "
 							"bytesTrans: 0x%x pBuf: %p", 
-							threadId, IoRequest::ToString(request.getType()),
-							bytesRead, asyncOp.request.readInfo.pBuf);
+							threadId, IoRequest::ToString(asyncReq.getType()),
+							bytesTransferd, asyncReq.readInfo.pBuf);
 					}
 
-					asyncOp.request.callback.Invoke(this, asyncOp.request,
-						asyncOp.request.readInfo.pFile, bytesRead);
+					asyncReq.callback.Invoke(this, asyncOp.request,
+						asyncReq.readInfo.pFile, bytesTransferd);
 
 					pendingOps.removeIndex(i);
 				}
