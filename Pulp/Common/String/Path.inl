@@ -11,6 +11,23 @@ Path<TChar>::Path(const Path& oth)
 	append(oth.c_str(), oth.length());
 }
 
+template<>
+template<>
+inline Path<char>::Path(const Path<wchar_t>& oth)
+{
+	strUtil::Convert(oth.c_str(), str_, capacity());
+	str_[oth.length()] = L'\0';
+}
+
+template<>
+template<>
+inline Path<wchar_t>::Path(const Path<char>& oth)
+{
+	strUtil::Convert(oth.c_str(), str_, capacity());
+	str_[oth.length()] = L'\0';
+}
+
+
 template<typename TChar>
 Path<TChar>::Path(const TChar* const str) : StackString<MAX_PATH, TChar>(str)
 {

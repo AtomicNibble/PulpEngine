@@ -113,6 +113,14 @@ static const char*		 MODEL_FILE_EXTENSION = "model";
 static const uint32_t	 MODEL_RAW_VERSION = 1;
 static const char*		 MODEL_RAW_FILE_EXTENSION = "model_raw";
 
+
+struct IModelLib
+{
+	virtual ~IModelLib() {}
+
+};
+
+
 // Flags:
 // LOOSE: the model file is not packed, meaning it has a string table that needs processing.
 // FULL_VERT: the vertex data is not compressed.
