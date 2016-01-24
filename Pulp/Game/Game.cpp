@@ -84,7 +84,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
 	int nRes = 0;
 
-
 	{ // scope it for leak tests.
 		EngineApp engine;
 

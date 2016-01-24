@@ -35,7 +35,7 @@ core::MemoryArenaBase* g_ScriptArena = nullptr;
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Script : public IEngineModule
 {
-	X_GOAT_GENERATE_SINGLETONCLASS(XEngineModule_Script, "Engine_Script");
+	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Script, "Engine_Script");
 	//////////////////////////////////////////////////////////////////////////
 	virtual const char *GetName() X_OVERRIDE{ return "Script"; };
 
@@ -69,7 +69,7 @@ class XEngineModule_Script : public IEngineModule
 
 
 
-X_GOAT_REGISTER_CLASS(XEngineModule_Script);
+X_POTATO_REGISTER_CLASS(XEngineModule_Script);
 
 XEngineModule_Script::XEngineModule_Script()
 {

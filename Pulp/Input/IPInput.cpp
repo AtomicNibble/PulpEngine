@@ -38,7 +38,7 @@ core::MemoryArenaBase* g_InputArena = nullptr;
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Input : public IEngineModule
 {
-	X_GOAT_GENERATE_SINGLETONCLASS(XEngineModule_Input, "Engine_Input");
+	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Input, "Engine_Input");
 	//////////////////////////////////////////////////////////////////////////
 	virtual const char *GetName() X_OVERRIDE{ return "Input"; };
 
@@ -89,7 +89,7 @@ class XEngineModule_Input : public IEngineModule
 
 
 
-X_GOAT_REGISTER_CLASS(XEngineModule_Input);
+X_POTATO_REGISTER_CLASS(XEngineModule_Input);
 
 XEngineModule_Input::XEngineModule_Input()
 {

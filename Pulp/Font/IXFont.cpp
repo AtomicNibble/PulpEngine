@@ -55,7 +55,7 @@ X_NAMESPACE_NAME::font::IXFontSys* CreateFontInterface(ICore *pCore)
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Font : public IEngineModule
 {
-	X_GOAT_GENERATE_SINGLETONCLASS(XEngineModule_Font, "Engine_Font");
+	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Font, "Engine_Font");
 
 	//////////////////////////////////////////////////////////////////////////
 	virtual const char *GetName() X_OVERRIDE { return "Font"; };
@@ -80,7 +80,7 @@ class XEngineModule_Font : public IEngineModule
 	}
 };
 
-X_GOAT_REGISTER_CLASS(XEngineModule_Font);
+X_POTATO_REGISTER_CLASS(XEngineModule_Font);
 
 XEngineModule_Font::XEngineModule_Font()
 {

@@ -4,13 +4,13 @@
 #ifndef _X_GOAT_CLASS_I_H_
 #define _X_GOAT_CLASS_I_H_
 
-struct IGoatFactory;
+struct IPotatoFactory;
 
 
-struct IGoatClass
+struct IPotatoClass
 {
 
-	virtual IGoatFactory* GetFactory() const =0;
+	virtual IPotatoFactory* GetFactory() const =0;
 
 };
 

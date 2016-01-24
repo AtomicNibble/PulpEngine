@@ -27,7 +27,7 @@ XGoatFactoryRegistryImpl::XGoatFactoryRegistryImpl()
 }
 
 
-IGoatFactory* XGoatFactoryRegistryImpl::GetFactory(const char* cname) const
+IPotatoFactory* XGoatFactoryRegistryImpl::GetFactory(const char* cname) const
 {
 	if (!cname)
 		return 0;
@@ -39,7 +39,7 @@ IGoatFactory* XGoatFactoryRegistryImpl::GetFactory(const char* cname) const
 
 
 
-bool XGoatFactoryRegistryImpl::GetInsertionPos(IGoatFactory* pFactory, 
+bool XGoatFactoryRegistryImpl::GetInsertionPos(IPotatoFactory* pFactory, 
 	FactoriesByCNameIt& itPosForCName)
 {
 	FactoryByCName searchByCName(pFactory);
@@ -60,7 +60,7 @@ void XGoatFactoryRegistryImpl::RegisterFactories(const XRegFactoryNode* pFactori
 	const XRegFactoryNode* p = pFactories;
 	while (p)
 	{
-		IGoatFactory* pFactory = p->m_pFactory;
+		IPotatoFactory* pFactory = p->m_pFactory;
 		if (pFactory)
 		{
 			FactoriesByCNameIt itPosForCName;

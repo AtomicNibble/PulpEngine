@@ -38,7 +38,7 @@ game::IGame* CreateGame(ICore* pCore)
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Game : public IEngineModule
 {
-	X_GOAT_GENERATE_SINGLETONCLASS(XEngineModule_Game, "Engine_Game");
+	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Game, "Engine_Game");
 	//////////////////////////////////////////////////////////////////////////
 	virtual const char *GetName() X_OVERRIDE{ return "Game"; };
 
@@ -69,7 +69,7 @@ class XEngineModule_Game : public IEngineModule
 	}
 };
 
-X_GOAT_REGISTER_CLASS(XEngineModule_Game);
+X_POTATO_REGISTER_CLASS(XEngineModule_Game);
 
 XEngineModule_Game::XEngineModule_Game()
 {

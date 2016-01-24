@@ -6,7 +6,7 @@ struct XRegFactoryNode;
 
 struct IGoatFactoryRegistryImpl : public IGoatFactoryRegistry
 {
-	virtual IGoatFactory* GetFactory(const char* cname) const = 0;
+	virtual IPotatoFactory* GetFactory(const char* cname) const = 0;
 
 
 

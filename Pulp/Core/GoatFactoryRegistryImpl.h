@@ -10,7 +10,7 @@
 class XGoatFactoryRegistryImpl : public IGoatFactoryRegistryImpl
 {
 public:
-	virtual IGoatFactory* GetFactory(const char* cname) const;
+	virtual IPotatoFactory* GetFactory(const char* cname) const;
 
 
 	virtual void RegisterFactories(const XRegFactoryNode* pFactories);
@@ -25,11 +25,11 @@ private:
 	struct FactoryByCName
 	{
 		const char* m_cname;
-		IGoatFactory* m_ptr;
+		IPotatoFactory* m_ptr;
 
 		FactoryByCName() : m_cname(nullptr), m_ptr(nullptr) {}
 		FactoryByCName(const char* cname) : m_cname(cname), m_ptr(0) { }
-		FactoryByCName(IGoatFactory* ptr) : m_cname(ptr ? ptr->GetName() : 0), m_ptr(ptr) {  }
+		FactoryByCName(IPotatoFactory* ptr) : m_cname(ptr ? ptr->GetName() : 0), m_ptr(ptr) {  }
 		bool operator <(const FactoryByCName& rhs) const { return strcmp(m_cname, rhs.m_cname) < 0; }
 	};
 
@@ -39,7 +39,7 @@ private:
 	typedef FactoriesByCName::const_iterator FactoriesByCNameConstIt;
 
 
-	bool GetInsertionPos(IGoatFactory* pFactory,
+	bool GetInsertionPos(IPotatoFactory* pFactory,
 		FactoriesByCNameIt& itPosForCName);
 
 private:

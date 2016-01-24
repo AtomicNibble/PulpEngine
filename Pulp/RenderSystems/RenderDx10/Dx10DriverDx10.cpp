@@ -68,7 +68,7 @@ extern "C" DLL_EXPORT render::IRender* CreateRender(ICore *pCore)
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Render : public IEngineModule
 {
-	X_GOAT_GENERATE_SINGLETONCLASS(XEngineModule_Render, "Engine_RenderDx10");
+	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Render, "Engine_RenderDx10");
 	//////////////////////////////////////////////////////////////////////////
 	virtual const char *GetName() X_OVERRIDE{ return "RenderDx10"; };
 
@@ -103,7 +103,7 @@ class XEngineModule_Render : public IEngineModule
 	}
 };
 
-X_GOAT_REGISTER_CLASS(XEngineModule_Render);
+X_POTATO_REGISTER_CLASS(XEngineModule_Render);
 
 XEngineModule_Render::XEngineModule_Render()
 {

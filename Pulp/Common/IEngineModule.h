@@ -9,7 +9,7 @@
 struct SCoreInitParams;
 
 // Base Interface for all engine module extensions
-struct IEngineModule : public IGoatClass
+struct IEngineModule : public IPotatoClass
 {
 	// Retrieve name of the extension module.
 	virtual const char *GetName() X_ABSTRACT;

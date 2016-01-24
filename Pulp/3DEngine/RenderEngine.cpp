@@ -34,7 +34,7 @@ core::MemoryArenaBase* g_3dEngineArena = nullptr;
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_3DEngine : public IEngineModule
 {
-	X_GOAT_GENERATE_SINGLETONCLASS(XEngineModule_3DEngine, "Engine_3DEngine");
+	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_3DEngine, "Engine_3DEngine");
 	//////////////////////////////////////////////////////////////////////////
 	virtual const char *GetName() X_OVERRIDE{ return "3DEngine"; };
 
@@ -69,7 +69,7 @@ class XEngineModule_3DEngine : public IEngineModule
 
 
 
-X_GOAT_REGISTER_CLASS(XEngineModule_3DEngine);
+X_POTATO_REGISTER_CLASS(XEngineModule_3DEngine);
 
 XEngineModule_3DEngine::XEngineModule_3DEngine()
 {
