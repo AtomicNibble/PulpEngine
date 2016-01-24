@@ -46,5 +46,8 @@
     <ClCompile Include="RawModel.cpp">
       <Filter>Source Files\RawModel</Filter>
     </ClCompile>
+    <ClCompile Include="RawModelTypes.cpp">
+      <Filter>Source Files\RawModel</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
