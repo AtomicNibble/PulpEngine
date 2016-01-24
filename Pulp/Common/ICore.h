@@ -4,6 +4,7 @@
 #define _X_CORE_I_H_
 
 #include <Core\Platform.h>
+#include <Traits\FunctionSignatureTraits.h>
 // #include <Util/SourceInfo.h>
 
 // defaults.
@@ -385,7 +386,7 @@ extern "C" DLL_EXPORT void LinkModule(ICore *pCore, const char *moduleName);
 //	 Interface of the DLL.
 extern "C"
 {
-	typedef ICore* (*PFNCREATECOREINTERFACE)(SCoreInitParams &initParams);
+	typedef core::traits::Function< ICore*(SCoreInitParams &initParams)> CreateCoreInfterFaceFunc;
 
 	IPCORE_API ICore* CreateCoreInterface(const SCoreInitParams &initParams);
 

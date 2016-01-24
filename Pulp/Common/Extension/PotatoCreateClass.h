@@ -2,14 +2,8 @@
 
 #include <Extension\IPotatoFactoryRegistry.h>
 
-template <class Dst, class Src>
-Dst interface_cast(Src p)
-{
-	return std::dynamic_pointer_cast<Dst>(p);
-}
-
 template <class T>
-bool GoatCreateClassInstance(const char* cname, std::shared_ptr<T>& p)
+bool PotatoCreateClassInstance(const char* cname, std::shared_ptr<T>& p)
 {
 	p = std::shared_ptr<T>();
 	IPotatoFactoryRegistry* pFactoryReg = gEnv->pCore->GetFactoryRegistry();

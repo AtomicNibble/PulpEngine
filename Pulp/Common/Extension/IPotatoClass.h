@@ -1,8 +1,8 @@
 #pragma once
 
 
-#ifndef _X_GOAT_CLASS_I_H_
-#define _X_GOAT_CLASS_I_H_
+#ifndef _X_POTATO_CLASS_I_H_
+#define _X_POTATO_CLASS_I_H_
 
 struct IPotatoFactory;
 
@@ -15,4 +15,4 @@ struct IPotatoClass
 };
 
 
-#endif // !_X_GOAT_CLASS_I_H_
+#endif // !_X_POTATO_CLASS_I_H_

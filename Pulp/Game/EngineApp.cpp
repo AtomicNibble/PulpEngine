@@ -92,8 +92,8 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 		return false;
 	}
 
-	PFNCREATECOREINTERFACE pfnCreateCoreInterface =
-		reinterpret_cast<PFNCREATECOREINTERFACE>(
+	CreateCoreInfterFaceFunc::Pointer pfnCreateCoreInterface =
+		reinterpret_cast<CreateCoreInfterFaceFunc::Pointer>(
 			PotatoGetProcAddress(hSystemHandle_, CORE_DLL_INITFUNC));
 
 	if (!pfnCreateCoreInterface)

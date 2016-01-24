@@ -150,7 +150,7 @@ uint32_t Thread::GetID(void) const
 // static
 void Thread::Sleep(uint32_t milliSeconds)
 {
-	GoatSleep(milliSeconds);
+	PotatoSleep(milliSeconds);
 }
 
 void Thread::Yield(void)

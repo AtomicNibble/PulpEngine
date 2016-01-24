@@ -91,7 +91,7 @@ void XTimer::OnFrameBegin(void)
 		float sleep = TargetFrameTime - FrameTime_;
 		if (sleep > 0)
 		{
-			GoatSleep((uint32_t)(sleep * 1000.f)); // scale to ms
+			PotatoSleep((uint32_t)(sleep * 1000.f)); // scale to ms
 	
 			CurrentTime_ = SysTimer::Get() - BaseTime_;
 			// update actual frame time.

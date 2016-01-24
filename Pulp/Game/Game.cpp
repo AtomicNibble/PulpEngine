@@ -56,18 +56,22 @@ void InitRootDir(void)
 #endif
 }
 
+namespace 
+{
+	core::MallocFreeAllocator gAlloc;
 
-core::MallocFreeAllocator goat;
+} // namespace
 
 void* operator new(size_t sz)
 {
-	return goat.allocate(sz, 4, 0);
+	return gAlloc.allocate(sz, 4, 0);
 }
 
 void operator delete(void* m)
 {
-	if (m)
-		goat.free(m);
+	if (m) {
+		gAlloc.free(m);
+	}
 }
 
 

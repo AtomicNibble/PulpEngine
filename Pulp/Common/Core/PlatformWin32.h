@@ -117,13 +117,13 @@ X_POP_WARNING_LEVEL
 #endif // !X_LIB
 
 
-#define GoatSharedLibraySupported true
-#define GoatSharedLibrayExtension ".dll"
+#define PotatoSharedLibraySupported true
+#define PotatoSharedLibrayExtension ".dll"
 #define PotatoGetProcAddress(libHandle, procName) ::GetProcAddress((HMODULE)(libHandle), procName)
 #define PotatoFreeLibrary(libHandle) ::FreeLibrary((HMODULE)(libHandle))
 #define PotatoLoadLibary(libname) ::LoadLibraryA(libname);
 #define PotatoLoadLibaryW(libname) ::LoadLibraryW(libname);
 
-#define GoatSleep(ms) ::Sleep(ms)
+#define PotatoSleep(ms) ::Sleep(ms)
 
 #endif // !_X_PLATFORM_WIN32_H_

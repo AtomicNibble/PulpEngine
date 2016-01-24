@@ -134,7 +134,7 @@ bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassNa
 
 
 	std::shared_ptr<IEngineModule> pModule;
-	if (GoatCreateClassInstance(moduleClassName, pModule))
+	if (PotatoCreateClassInstance(moduleClassName, pModule))
 	{
 		res = pModule->Initialize(env_, initParams);
 	}

@@ -65,7 +65,7 @@ public:\
 	virtual ~classname();
 
 
-#define X_POTATO_IMPLEMENT_GOATCLASS()\
+#define X_POTATO_IMPLEMENT_POTATOCLASS()\
 public:\
 	virtual IPotatoFactory* GetFactory() const\
 	{\
@@ -78,7 +78,7 @@ public:\
 	X_POTATO_FACTORY_BEGIN(cname)\
 	X_POTATO_FACTORY_CREATECLASSINSTANCE(classname)\
 	X_POTATO_FACTORY_END()\
-	X_POTATO_IMPLEMENT_GOATCLASS()\
+	X_POTATO_IMPLEMENT_POTATOCLASS()\
 	X_POTATO_ENFORCE_CRYFACTORY_USAGE(classname)
 
 
