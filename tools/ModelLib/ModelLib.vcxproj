@@ -321,6 +321,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ModelCompiler.h" />
     <ClInclude Include="RawModel.h" />
     <ClInclude Include="RawModelTypes.h" />
     <ClInclude Include="XModelLib.h" />
@@ -328,6 +329,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="ModelCompiler.cpp" />
     <ClCompile Include="ModelLib.cpp" />
     <ClCompile Include="RawModel.cpp" />
     <ClCompile Include="RawModelTypes.cpp" />

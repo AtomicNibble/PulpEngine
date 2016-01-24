@@ -15,6 +15,12 @@
     <Filter Include="Source Files\RawModel">
       <UniqueIdentifier>{0f0b67d8-1a05-48c7-ae5d-188972383b7d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\model">
+      <UniqueIdentifier>{126cddf3-4a1c-41cd-a5e1-d0eff767fe1b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\model">
+      <UniqueIdentifier>{2311ee6b-483f-4b9c-a625-8a3272a66789}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -28,6 +34,9 @@
     </ClInclude>
     <ClInclude Include="RawModel.h">
       <Filter>Header Files\RawModel</Filter>
+    </ClInclude>
+    <ClInclude Include="ModelCompiler.h">
+      <Filter>Header Files\model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -48,6 +57,9 @@
     </ClCompile>
     <ClCompile Include="RawModelTypes.cpp">
       <Filter>Source Files\RawModel</Filter>
+    </ClCompile>
+    <ClCompile Include="ModelCompiler.cpp">
+      <Filter>Source Files\model</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
