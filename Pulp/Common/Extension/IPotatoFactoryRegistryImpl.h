@@ -1,10 +1,10 @@
 #pragma once
 
-#include "IGoatFactoryRegistry.h"
+#include "IPotatoFactoryRegistry.h"
 
 struct XRegFactoryNode;
 
-struct IGoatFactoryRegistryImpl : public IGoatFactoryRegistry
+struct IPotatoFactoryRegistryImpl : public IPotatoFactoryRegistry
 {
 	virtual IPotatoFactory* GetFactory(const char* cname) const = 0;
 
@@ -15,5 +15,5 @@ struct IGoatFactoryRegistryImpl : public IGoatFactoryRegistry
 
 protected:
 	// prevent explicit destruction from client side (delete, shared_ptr, etc)
-	virtual ~IGoatFactoryRegistryImpl() {}
+	virtual ~IPotatoFactoryRegistryImpl() {}
 };

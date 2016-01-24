@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Extension\IGoatFactoryRegistry.h>
+#include <Extension\IPotatoFactoryRegistry.h>
 
 template <class Dst, class Src>
 Dst interface_cast(Src p)
@@ -12,7 +12,7 @@ template <class T>
 bool GoatCreateClassInstance(const char* cname, std::shared_ptr<T>& p)
 {
 	p = std::shared_ptr<T>();
-	IGoatFactoryRegistry* pFactoryReg = gEnv->pCore->GetFactoryRegistry();
+	IPotatoFactoryRegistry* pFactoryReg = gEnv->pCore->GetFactoryRegistry();
 	if (pFactoryReg)
 	{
 		IPotatoFactory* pFactory = pFactoryReg->GetFactory(cname);

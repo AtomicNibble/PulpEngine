@@ -46,7 +46,7 @@ typedef void* WIN_HWND;
 typedef void* WIN_HINSTANCE;
 #endif
 
-struct IGoatFactoryRegistryImpl;
+struct IPotatoFactoryRegistryImpl;
 struct IEngineModule;
 
 X_NAMESPACE_DECLARE(core,
@@ -141,7 +141,7 @@ public:
 
 	core::xWindow* GetGameWindow(void) X_OVERRIDE { return pWindow_; }
 
-	virtual IGoatFactoryRegistry* GetFactoryRegistry(void) const X_OVERRIDE;
+	virtual IPotatoFactoryRegistry* GetFactoryRegistry(void) const X_OVERRIDE;
 
 
 	virtual SCoreGlobals* GetGlobalEnv(void) X_OVERRIDE{ return &env_; }

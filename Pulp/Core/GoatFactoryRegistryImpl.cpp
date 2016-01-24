@@ -3,8 +3,8 @@
 
 #include "Core.h"
 
-#include <Extension\IGoatClass.h>
-#include <Extension\IGoatFactory.h>
+#include <Extension\IPotatoClass.h>
+#include <Extension\IPotatoFactory.h>
 #include <Extension\FactoryRegNode.h>
 
 #include <algorithm>
@@ -13,21 +13,21 @@
 X_USING_NAMESPACE;
 
 
-XGoatFactoryRegistryImpl XGoatFactoryRegistryImpl::s_registry;
+XPotatoFactoryRegistryImpl XPotatoFactoryRegistryImpl::s_registry;
 
 
-XGoatFactoryRegistryImpl& XGoatFactoryRegistryImpl::Access()
+XPotatoFactoryRegistryImpl& XPotatoFactoryRegistryImpl::Access()
 {
 	return s_registry;
 }
 
-XGoatFactoryRegistryImpl::XGoatFactoryRegistryImpl()
+XPotatoFactoryRegistryImpl::XPotatoFactoryRegistryImpl()
 {
 
 }
 
 
-IPotatoFactory* XGoatFactoryRegistryImpl::GetFactory(const char* cname) const
+IPotatoFactory* XPotatoFactoryRegistryImpl::GetFactory(const char* cname) const
 {
 	if (!cname)
 		return 0;
@@ -39,7 +39,7 @@ IPotatoFactory* XGoatFactoryRegistryImpl::GetFactory(const char* cname) const
 
 
 
-bool XGoatFactoryRegistryImpl::GetInsertionPos(IPotatoFactory* pFactory, 
+bool XPotatoFactoryRegistryImpl::GetInsertionPos(IPotatoFactory* pFactory,
 	FactoriesByCNameIt& itPosForCName)
 {
 	FactoryByCName searchByCName(pFactory);
@@ -55,7 +55,7 @@ bool XGoatFactoryRegistryImpl::GetInsertionPos(IPotatoFactory* pFactory,
 }
 
 
-void XGoatFactoryRegistryImpl::RegisterFactories(const XRegFactoryNode* pFactories)
+void XPotatoFactoryRegistryImpl::RegisterFactories(const XRegFactoryNode* pFactories)
 {
 	const XRegFactoryNode* p = pFactories;
 	while (p)
@@ -78,13 +78,13 @@ void XGoatFactoryRegistryImpl::RegisterFactories(const XRegFactoryNode* pFactori
 
 }
 
-void XGoatFactoryRegistryImpl::UnregisterFactories(const XRegFactoryNode* pFactories)
+void XPotatoFactoryRegistryImpl::UnregisterFactories(const XRegFactoryNode* pFactories)
 {
 	X_UNUSED(pFactories);
 	X_ASSERT_NOT_IMPLEMENTED();
 }
 
-IGoatFactoryRegistry* XCore::GetFactoryRegistry() const
+IPotatoFactoryRegistry* XCore::GetFactoryRegistry() const
 {
-	return &XGoatFactoryRegistryImpl::Access();
+	return &XPotatoFactoryRegistryImpl::Access();
 }

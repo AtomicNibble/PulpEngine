@@ -24,9 +24,9 @@
 #include <IGame.h>
 #include <IJobSystem.h>
 
-#include <Extension\IGoatClass.h>
-#include <Extension\IGoatFactory.h>
-#include <Extension\GoatCreateClass.h>
+#include <Extension\IPotatoClass.h>
+#include <Extension\IPotatoFactory.h>
+#include <Extension\PotatoCreateClass.h>
 
 #include <Memory\MemInfo.h>
 

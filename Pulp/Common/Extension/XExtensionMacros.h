@@ -6,8 +6,8 @@
 #define _STDINT // fuck standard types!
 #include <memory>
 
-#include "IGoatClass.h"
-#include "IGoatFactory.h"
+#include "IPotatoClass.h"
+#include "IPotatoFactory.h"
 
 #include "FactoryRegNode.h"
 

@@ -4,7 +4,7 @@
 #define _X_ENGINEMODULE_I_H_
 
 
-#include <Extension\IGoatClass.h>
+#include <Extension\IPotatoClass.h>
 
 struct SCoreInitParams;
 

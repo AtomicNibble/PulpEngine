@@ -1,13 +1,13 @@
 #pragma once
 
 
-#include <Extension\IGoatFactory.h>
-#include <Extension\IGoatFactoryRegistryImpl.h>
+#include <Extension\IPotatoFactory.h>
+#include <Extension\IPotatoFactoryRegistryImpl.h>
 #include <Containers\FixedArray.h>
 
 #include <vector>
 
-class XGoatFactoryRegistryImpl : public IGoatFactoryRegistryImpl
+class XPotatoFactoryRegistryImpl : public IPotatoFactoryRegistryImpl
 {
 public:
 	virtual IPotatoFactory* GetFactory(const char* cname) const;
@@ -17,9 +17,9 @@ public:
 	virtual void UnregisterFactories(const XRegFactoryNode* pFactories);
 
 public:
-	static XGoatFactoryRegistryImpl& Access();
+	static XPotatoFactoryRegistryImpl& Access();
 
-	XGoatFactoryRegistryImpl();
+	XPotatoFactoryRegistryImpl();
 
 private:
 	struct FactoryByCName
@@ -47,5 +47,5 @@ private:
 
 
 private:
-	static XGoatFactoryRegistryImpl s_registry;
+	static XPotatoFactoryRegistryImpl s_registry;
 };

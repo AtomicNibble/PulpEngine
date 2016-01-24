@@ -105,11 +105,11 @@
     <ClInclude Include="Encryption\Salsa20.h" />
     <ClInclude Include="EngineCommon.h" />
     <ClInclude Include="Extension\FactoryRegNode.h" />
-    <ClInclude Include="Extension\GoatCreateClass.h" />
-    <ClInclude Include="Extension\IGoatClass.h" />
-    <ClInclude Include="Extension\IGoatFactory.h" />
-    <ClInclude Include="Extension\IGoatFactoryRegistry.h" />
-    <ClInclude Include="Extension\IGoatFactoryRegistryImpl.h" />
+    <ClInclude Include="Extension\PotatoCreateClass.h" />
+    <ClInclude Include="Extension\IPotatoClass.h" />
+    <ClInclude Include="Extension\IPotatoFactory.h" />
+    <ClInclude Include="Extension\IPotatoFactoryRegistry.h" />
+    <ClInclude Include="Extension\IPotatoFactoryRegistryImpl.h" />
     <ClInclude Include="Extension\XExtensionMacros.h" />
     <ClInclude Include="Hashing\Adler32.h" />
     <ClInclude Include="Hashing\crc32.h" />

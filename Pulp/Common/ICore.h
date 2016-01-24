@@ -20,7 +20,7 @@
 #include <IDirectoryWatcher.h>
 
 struct ICore;
-struct IGoatFactoryRegistry;
+struct IPotatoFactoryRegistry;
 
 X_NAMESPACE_DECLARE(input, struct IInput)
 X_NAMESPACE_DECLARE(core, 
@@ -300,7 +300,7 @@ struct ICore
 	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_ABSTRACT;
 
 
-	virtual IGoatFactoryRegistry* GetFactoryRegistry() const X_ABSTRACT;
+	virtual IPotatoFactoryRegistry* GetFactoryRegistry() const X_ABSTRACT;
 
 
 	virtual SCoreGlobals* GetGlobalEnv() X_ABSTRACT;

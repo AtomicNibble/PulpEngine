@@ -445,22 +445,7 @@
     <ClInclude Include="IFont.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\IGoatFactory.h">
-      <Filter>Headers\Extension</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\IGoatClass.h">
-      <Filter>Headers\Extension</Filter>
-    </ClInclude>
     <ClInclude Include="Extension\XExtensionMacros.h">
-      <Filter>Headers\Extension</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\GoatCreateClass.h">
-      <Filter>Headers\Extension</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\IGoatFactoryRegistry.h">
-      <Filter>Headers\Extension</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\IGoatFactoryRegistryImpl.h">
       <Filter>Headers\Extension</Filter>
     </ClInclude>
     <ClInclude Include="Extension\FactoryRegNode.h">
@@ -1059,6 +1044,21 @@
     </ClInclude>
     <ClInclude Include="Time\StopWatch.h">
       <Filter>Headers\Time</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\IPotatoClass.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\IPotatoFactory.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\IPotatoFactoryRegistry.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\IPotatoFactoryRegistryImpl.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\PotatoCreateClass.h">
+      <Filter>Headers\Extension</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
