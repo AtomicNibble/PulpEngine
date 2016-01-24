@@ -165,7 +165,7 @@ void FixedArray<T, N>::resize(size_type newNum, const T& t)
 	X_ASSERT(newNum >= 0, "array size must be positive")(newNum);
 	X_ASSERT(newNum < N, "array size must be less or equal to capacity")(newNum, N);
 	
-	if (newNum == num_) {
+	if (newNum == size_) {
 		return;
 	}
 
