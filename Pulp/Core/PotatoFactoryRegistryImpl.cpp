@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "GoatFactoryRegistryImpl.h"
+#include "PotatoFactoryRegistryImpl.h"
 
 #include "Core.h"
 

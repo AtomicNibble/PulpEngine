@@ -30,7 +30,7 @@
 
 #include <Memory\MemInfo.h>
 
-#include "GoatFactoryRegistryImpl.h"
+#include "PotatoFactoryRegistryImpl.h"
 
 // Logging
 #include "Platform\Console.h"

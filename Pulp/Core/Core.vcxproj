@@ -369,7 +369,7 @@
     <ClInclude Include="DiskFile.h" />
     <ClInclude Include="DiskFileAsync.h" />
     <ClInclude Include="FileSysVars.h" />
-    <ClInclude Include="GoatFactoryRegistryImpl.h" />
+    <ClInclude Include="PotatoFactoryRegistryImpl.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="NullImplementation\NullInput.h" />
     <ClInclude Include="OsFile.h" />
@@ -394,7 +394,7 @@
     <ClCompile Include="DiskFile.cpp" />
     <ClCompile Include="DiskFileAsync.cpp" />
     <ClCompile Include="DllMain.cpp" />
-    <ClCompile Include="GoatFactoryRegistryImpl.cpp" />
+    <ClCompile Include="PotatoFactoryRegistryImpl.cpp" />
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="NullImplementation\NullInput.cpp" />
     <ClCompile Include="stdafx.cpp">

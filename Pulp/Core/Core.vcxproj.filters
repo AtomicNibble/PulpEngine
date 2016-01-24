@@ -62,9 +62,6 @@
     <ClInclude Include="SystemTimer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GoatFactoryRegistryImpl.h">
-      <Filter>ExtensionSystem</Filter>
-    </ClInclude>
     <ClInclude Include="Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -116,6 +113,9 @@
     <ClInclude Include="win32\OsFileAsyncOperation.inl">
       <Filter>FileSys\win32</Filter>
     </ClInclude>
+    <ClInclude Include="PotatoFactoryRegistryImpl.h">
+      <Filter>ExtensionSystem</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -138,9 +138,6 @@
     </ClCompile>
     <ClCompile Include="ConsoleVariable.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GoatFactoryRegistryImpl.cpp">
-      <Filter>ExtensionSystem</Filter>
     </ClCompile>
     <ClCompile Include="Log.cpp">
       <Filter>Source Files</Filter>
@@ -177,6 +174,9 @@
     </ClCompile>
     <ClCompile Include="NullImplementation\NullInput.cpp">
       <Filter>NullImplementation</Filter>
+    </ClCompile>
+    <ClCompile Include="PotatoFactoryRegistryImpl.cpp">
+      <Filter>ExtensionSystem</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
