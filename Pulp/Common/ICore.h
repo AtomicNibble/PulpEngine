@@ -369,15 +369,6 @@ extern core::MallocFreeAllocator* gMalloc;
 #include "Logging\LogMacros.h"
 
 
-
-// Summary:
-//	 Gets the system interface.
-inline ICore *GetISystem()
-{
-	return gEnv->pCore;
-};
-
-
 //	 This function must be called once by each module at the beginning, to setup global pointers.
 extern "C" DLL_EXPORT void LinkModule(ICore *pCore, const char *moduleName);
 
