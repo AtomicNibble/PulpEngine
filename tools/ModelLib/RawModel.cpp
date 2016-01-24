@@ -292,8 +292,9 @@ namespace RawModel
 			normal
 			col
 			uv */
-			if (!lex.ExpectTokenString("v")) {
-				X_ERROR("RawModel", "Failed to read 'v' token");
+			int32_t numBinds;
+
+			if (!ReadheaderToken(lex, "v", numBinds)) {
 				return false;
 			}
 
@@ -312,6 +313,21 @@ namespace RawModel
 			if (!lex.Parse1DMatrix(2, &vert.uv_[0])) {
 				X_ERROR("RawModel", "Failed to read vert uv");
 				return false;
+			}
+
+			// read bines.
+			if (numBinds > safe_static_cast<int32_t, size_t>(vert.binds_.capacity())) {
+				X_ERROR("RawModel", "Vert has too many binds. max: %" PRIuS,
+					vert.binds_.capacity());
+				return false;
+			}
+
+			vert.binds_.resize(numBinds);
+			for (auto bind : vert.binds_)
+			{
+				// boneIDx + weigth
+				bind.boneIdx_ = lex.ParseInt();
+				bind.weight_ = lex.ParseFloat();
 			}
 		}
 
@@ -459,11 +475,17 @@ namespace RawModel
 			const Color& col = vert.col_;
 			const Vec2f& uv = vert.uv_;
 
-			fputs("v\n", f);
+			fprintf(f, "v %" PRIuS "\n", vert.binds_.size());
 			fprintf(f, "(%g,%g,%g)\n", pos.x, pos.y, pos.z);
 			fprintf(f, "(%g,%g,%g)\n", normal.x, normal.y, normal.z);
 			fprintf(f, "(%g,%g,%g,%g)\n", col.r, col.g, col.b, col.a);
 			fprintf(f, "(%g,%g)\n", uv.x, uv.y);
+
+			for (const auto& bind : vert.binds_)
+			{
+				fprintf(f, "%i %f\n",bind.boneIdx_, bind.weight_);
+			}
+
 			fputs("\n", f);
 		}
 
