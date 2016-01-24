@@ -416,9 +416,9 @@ namespace RawModel
 		for (const auto& bone : bones_)
 		{
 			fprintf(f, "BONE %i \"%s\"\n", bone.parIndx_, bone.name_.c_str());
-			fprintf(f, "POS (%g,%g,%g)\n", bone.worldPos_.x, bone.worldPos_.y, bone.worldPos_.z);
+			fprintf(f, "POS (%f,%f,%f)\n", bone.worldPos_.x, bone.worldPos_.y, bone.worldPos_.z);
 			auto ang = bone.rotation_;
-			fprintf(f, "ANG (%g,%g,%g) (%g,%g,%g) (%g,%g,%g)\n", 
+			fprintf(f, "ANG (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)\n", 
 				ang.m00, ang.m01, ang.m02, 
 				ang.m10, ang.m11, ang.m12, 
 				ang.m20, ang.m21, ang.m22);
@@ -437,7 +437,7 @@ namespace RawModel
 		for (const auto& lod : lods_)
 		{
 			fprintf(f, "LOD");
-			fprintf(f, "DISTANCE %g\n", lod.distance_);
+			fprintf(f, "DISTANCE %f\n", lod.distance_);
 			fprintf(f, "NUMMESH %" PRIuS "\n", lod.meshes_.size());
 
 			for (const auto& mesh : lod.meshes_)
@@ -476,10 +476,10 @@ namespace RawModel
 			const Vec2f& uv = vert.uv_;
 
 			fprintf(f, "v %" PRIuS "\n", vert.binds_.size());
-			fprintf(f, "(%g,%g,%g)\n", pos.x, pos.y, pos.z);
-			fprintf(f, "(%g,%g,%g)\n", normal.x, normal.y, normal.z);
-			fprintf(f, "(%g,%g,%g,%g)\n", col.r, col.g, col.b, col.a);
-			fprintf(f, "(%g,%g)\n", uv.x, uv.y);
+			fprintf(f, "(%f,%f,%f)\n", pos.x, pos.y, pos.z);
+			fprintf(f, "(%f,%f,%f)\n", normal.x, normal.y, normal.z);
+			fprintf(f, "(%f,%f,%f,%f)\n", col.r, col.g, col.b, col.a);
+			fprintf(f, "(%f,%f)\n", uv.x, uv.y);
 
 			for (const auto& bind : vert.binds_)
 			{
@@ -510,11 +510,11 @@ namespace RawModel
 
 
 		fprintf(f, "MATERIAL \"%s\"\n", mat.name_.c_str());
-		fprintf(f, "COL (%g,%g,%g,%g)\n", col.r, col.g, col.b, col.a);
-		fprintf(f, "TRANS (%g,%g,%g,%g)\n", tansparency.r, tansparency.g, tansparency.b, tansparency.a);
-		fprintf(f, "AMBIENTCOL (%g,%g,%g,%g)\n", ambientColor.r, ambientColor.g, ambientColor.b, ambientColor.a);
-		fprintf(f, "SPECCOL (%g,%g,%g,%g)\n", specCol.r, specCol.g, specCol.b, specCol.a);
-		fprintf(f, "REFLECTIVECOL (%g,%g,%g,%g)\n", reflectiveCol.r, reflectiveCol.g, reflectiveCol.b, reflectiveCol.a);
+		fprintf(f, "COL (%f,%f,%f,%f)\n", col.r, col.g, col.b, col.a);
+		fprintf(f, "TRANS (%f,%f,%f,%f)\n", tansparency.r, tansparency.g, tansparency.b, tansparency.a);
+		fprintf(f, "AMBIENTCOL (%f,%f,%f,%f)\n", ambientColor.r, ambientColor.g, ambientColor.b, ambientColor.a);
+		fprintf(f, "SPECCOL (%f,%f,%f,%f)\n", specCol.r, specCol.g, specCol.b, specCol.a);
+		fprintf(f, "REFLECTIVECOL (%f,%f,%f,%f)\n", reflectiveCol.r, reflectiveCol.g, reflectiveCol.b, reflectiveCol.a);
 
 		fputs("\n", f);
 		return true;
