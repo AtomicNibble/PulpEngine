@@ -76,7 +76,7 @@ namespace RawModel
 
 		VertsArr verts_;
 		FaceArr face_;
-		Material materials_;
+		Material material_;
 	};
 
 	class Lod

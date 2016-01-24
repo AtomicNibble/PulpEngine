@@ -259,6 +259,15 @@ namespace RawModel
 					return false;
 				}
 			}
+
+			// now have all this lods materials
+
+			for (auto& mesh : lod.meshes_)
+			{
+				if (!ReadMaterial(lex, mesh.material_)) {
+					return false;
+				}
+			}
 		}
 
 		return true;
@@ -348,6 +357,59 @@ namespace RawModel
 		return true;
 	}
 
+	bool Model::ReadMaterial(core::XLexer& lex, Material& mat)
+	{
+		// name
+		if (!lex.ExpectTokenString("MATERIAL")) {
+			X_ERROR("RawModel", "Failed to read 'MATERIAL' token");
+			return false;
+		}
+
+		core::XLexToken token(nullptr, nullptr);
+
+		if (!lex.ReadToken(token)) {
+			X_ERROR("RawModel", "Failed to read 'MATERIAL' name");
+			return false;
+		}
+		if (token.GetType() != core::TokenType::STRING) {
+			X_ERROR("RawModel", "Failed to read 'MATERIAL' name");
+			return false;
+		}
+
+		mat.name_ = core::string(token.begin(), token.end());
+
+		// col
+		if (!ReadMaterialCol(lex, "COL", mat.col_)) {
+			return false;
+		}
+		if (!ReadMaterialCol(lex, "TRANS", mat.tansparency_)) {
+			return false;
+		}
+		if (!ReadMaterialCol(lex, "AMBIENTCOL", mat.ambientColor_)) {
+			return false;
+		}
+		if (!ReadMaterialCol(lex, "SPECCOL", mat.specCol_)) {
+			return false;
+		}
+		if (!ReadMaterialCol(lex, "REFLECTIVECOL", mat.reflectiveCol_)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	bool Model::ReadMaterialCol(core::XLexer& lex, const char* pName, Color& col)
+	{
+		if (!lex.SkipUntilString(pName)) {
+			X_ERROR("RawModel", "Failed to find material '%s' token", pName);
+			return false;
+		}
+		if (!lex.Parse1DMatrix(4, &col[0])) {
+			X_ERROR("RawModel", "Failed to read material '%s' col", pName);
+			return false;
+		}
+		return true;
+	}
 
 	bool Model::ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut)
 	{
@@ -385,6 +447,9 @@ namespace RawModel
 
 		FILE* f;
 		errno_t err = fopen_s(&f, path.c_str(), "wb");
+
+		bool result = false;
+
 		if (f)
 		{
 			fprintf(f, "VERSION %i\n", VERSION);
@@ -392,21 +457,18 @@ namespace RawModel
 			fprintf(f, "BONES %" PRIuS "\n", bones_.size());
 			fputs("\n", f);
 
-			if (!WriteBones(f)) {
-				::fclose(f);
-				return false;
-			}
-
-			if (!WriteLods(f)) {
-				::fclose(f);
-				return false;
+			if (WriteBones(f)) 
+			{
+				if (WriteLods(f)) 
+				{
+					result = true;
+				}
 			}
 
 			::fclose(f);
-			return true;
 		}
 
-		return false;
+		return result;
 	}
 
 	bool Model::WriteBones(FILE* f) const
@@ -449,7 +511,7 @@ namespace RawModel
 
 			for (const auto& mesh : lod.meshes_)
 			{
-				if (!WriteMaterials(f, mesh.materials_)) {
+				if (!WriteMaterials(f, mesh.material_)) {
 					return false;
 				}
 			}

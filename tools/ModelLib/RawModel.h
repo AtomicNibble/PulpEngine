@@ -36,6 +36,8 @@ namespace RawModel
 		bool ReadBones(core::XLexer& lex, int32_t numBones);
 		bool ReadLods(core::XLexer& lex, int32_t numLods);
 		bool ReadMesh(core::XLexer& lex, Mesh& mesh);
+		bool ReadMaterial(core::XLexer& lex, Material& mat);
+		bool ReadMaterialCol(core::XLexer& lex, const char* pName, Color& col);
 
 		bool ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut);
 
