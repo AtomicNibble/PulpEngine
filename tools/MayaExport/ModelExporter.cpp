@@ -1114,7 +1114,7 @@ void MayaLOD::MergeMeshes(void)
 
 			// check it again others.
 			for (j = 0; j < meshes_.size(); j++) {
-				if (meshes_[j]->material == mesh->material) {
+				if (mesh != meshes_[j] && meshes_[j]->material == mesh->material) {
 					combine = meshes_[j];
 					break;
 				}
