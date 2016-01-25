@@ -3,6 +3,8 @@
 
 #include <String\Path.h>
 
+#include "RawModelTypes.h"
+
 X_NAMESPACE_DECLARE(core,
 class XLexer
 );
@@ -47,7 +49,7 @@ namespace RawModel
 		bool WriteMaterials(FILE* f, const Material& mat) const;
 		
 		
-	private:
+	protected:
 		core::MemoryArenaBase* arena_;
 
 		BoneArr bones_;
