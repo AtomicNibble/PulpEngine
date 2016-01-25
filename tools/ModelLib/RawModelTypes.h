@@ -76,6 +76,8 @@ namespace RawModel
 		Mesh(core::MemoryArenaBase* arena);
 		~Mesh() = default;
 
+		void merge(const Mesh& oth);
+
 		VertsArr verts_;
 		FaceArr face_;
 		Material material_;
