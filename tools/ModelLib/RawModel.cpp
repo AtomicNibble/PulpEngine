@@ -111,6 +111,11 @@ namespace RawModel
 				model::MODEL_MAX_LODS);
 			return true;
 		}
+		if (numBones > model::MODEL_MAX_BONES) {
+			X_ERROR("RaWModel", "model has too many bones: %i max: %i",
+				numBones, model::MODEL_MAX_BONES);
+			return false;
+		}
 
 		if (!ReadBones(lex, numBones)) {
 			X_ERROR("RawModel", "failed to parse bone data");
@@ -248,6 +253,12 @@ namespace RawModel
 			int32_t numMesh;
 
 			if (!ReadheaderToken(lex, "NUMMESH", numMesh)) {
+				return false;
+			}
+
+			if (numMesh > model::MODEL_MAX_MESH) {
+				X_ERROR("RaWModel", "lod has too many mesh: %i max: %i",
+					numMesh, model::MODEL_MAX_MESH);
 				return false;
 			}
 
