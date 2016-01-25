@@ -51,6 +51,8 @@ public:
 	// returns the number of elements this stack can currently hold.
 	inline size_t capacity() const;
 
+	inline bool isEmpty(void) const;
+	inline bool isNotEmpty(void) const;
 
 	// STL Iterators.
 	// TODO

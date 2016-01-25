@@ -119,8 +119,17 @@ inline size_t Stack<T>::capacity() const
 	return end_ - start_;
 }
 
+template<typename T>
+inline bool Stack<T>::isEmpty(void) const
+{
+	return size() == 0;
+}
 
-
+template<typename T>
+inline bool Stack<T>::isNotEmpty(void) const
+{
+	return size() > 0;
+}
 
 // allow for easy allocation custimisate later.
 template<typename T>
