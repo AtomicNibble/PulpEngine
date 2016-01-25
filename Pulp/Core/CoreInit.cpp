@@ -90,11 +90,9 @@ WIN_HMODULE XCore::LoadDLL(const char *dllName)
 		return 0;
 	}
 
-	// std::string moduleName = dllName; // PathUtil::GetFileName(dllName);
+	typedef core::traits::Function<void *(ICore *pSystem, const char *moduleName)> ModuleLinkfunc;
 
-	typedef void *(*PtrFunc_LinkModule)(ICore *pSystem, const char *moduleName);
-
-	PtrFunc_LinkModule pfnModuleInitISystem = reinterpret_cast<PtrFunc_LinkModule>(
+	ModuleLinkfunc::Pointer pfnModuleInitISystem = reinterpret_cast<ModuleLinkfunc::Pointer>(
 			PotatoGetProcAddress(handle, DLL_MODULE_INIT_ICORE));
 
 	if (pfnModuleInitISystem)
