@@ -41,7 +41,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 	params.bTesting = true;
 	params.bCoreOnly = true;
 	params.bEnableBasicConsole = false;
-	params.bEnableJobSystem = false; // no job system plz.
+	params.bEnableJobSystem = true; // some converters make use of the job system. 
 	params.pConsoleWnd = &Console;
 	params.pCoreArena = g_arena;
 
