@@ -15,6 +15,19 @@ namespace V2
 		return (count > count_);
 	}
 
+	// =============================================
+
+	X_INLINE CountSplitter32::CountSplitter32(uint32_t count)
+		: count_(count)
+	{
+	}
+
+	template <typename T>
+	X_INLINE bool CountSplitter32::Split(uint32_t count) const
+	{
+		return (count > count_);
+	}
+
 
 	// =============================================
 
@@ -87,6 +100,18 @@ namespace V2
 		JobData jobData(data, count, function, splitter);
 
 		Job* job = CreateJob<JobData>(&parallel_for_job<JobData>, jobData);
+
+		return job;
+	}
+
+	template <typename ClassType, typename T, typename SplitterT>
+	X_INLINE Job* JobSystem::parallel_for_member(typename parallel_for_member_job_data<ClassType, T, SplitterT>::FunctionDelagte del,
+		T* data, uint32_t count, const SplitterT& splitter)
+	{
+		typedef parallel_for_member_job_data<ClassType, T, SplitterT> JobData;
+		JobData jobData(del, data, count, splitter);
+
+		Job* job = CreateJob<JobData>(&parallel_for_member_job<JobData>, jobData);
 
 		return job;
 	}

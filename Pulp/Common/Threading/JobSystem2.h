@@ -14,6 +14,8 @@
 #include <Containers\FixedArray.h>
 #include <Containers\Freelist.h>
 
+#include <Util\Delegate.h>
+
 X_NAMESPACE_BEGIN(core)
 
 namespace V2
@@ -102,6 +104,18 @@ private:
 	size_t count_;
 };
 
+class CountSplitter32
+{
+public:
+	explicit CountSplitter32(uint32_t count);
+
+	template <typename T>
+	X_INLINE bool Split(uint32_t count) const;
+
+private:
+	uint32_t count_;
+};
+
 class DataSizeSplitter
 {
 public:
@@ -161,6 +175,57 @@ struct parallel_for_job_data
 	size_t count;
 	DataJobFunctionPtr pFunction;
 	SplitterType splitter;
+};
+
+template <typename JobData>
+static inline void parallel_for_member_job(JobSystem* pJobSys, size_t threadIdx, Job* job, void* jobData)
+{
+	const JobData* data = static_cast<const JobData*>(jobData);
+	const JobData::SplitterType& splitter = data->splitter;
+
+	if (splitter.Split<JobData::DataType>(data->count))
+	{
+		// split in two
+		const uint32_t leftCount = data->count / 2u;
+		const JobData leftData(data->delagte, data->data, leftCount, splitter);
+		Job* left = pJobSys->CreateJobAsChild(job, &parallel_for_member_job<JobData>, leftData);
+		pJobSys->Run(left);
+
+		const uint32_t rightCount = data->count - leftCount;
+		const JobData rightData(data->delagte, data->data + leftCount, rightCount, splitter);
+		Job* right = pJobSys->CreateJobAsChild(job, &parallel_for_member_job<JobData>, rightData);
+		pJobSys->Run(right);
+	}
+	else
+	{
+		data->delagte.Invoke(data->data, data->count);
+	}
+}
+
+template <typename C, typename T, typename S>
+struct parallel_for_member_job_data
+{
+	typedef C ClassType;
+	typedef T DataType;
+	typedef S SplitterType;
+	typedef traits::MemberFunction<C, void(DataType*, uint32_t)> DataJobMemberFunction;
+	typedef typename DataJobMemberFunction::Pointer DataJobMemberFunctionPtr;
+	typedef core::Delegate<void(DataType*, uint32_t)> FunctionDelagte;
+
+	parallel_for_member_job_data(FunctionDelagte delagte, DataType* data, uint32_t count,
+		 const SplitterType& splitter) :
+		data(data)
+		, delagte(delagte)
+		, count(count)
+		, splitter(splitter)
+	{
+
+	}
+
+	DataType* data; 
+	FunctionDelagte delagte;
+	uint32_t count; 
+	SplitterType splitter; 
 };
 
 template <typename JobData>
@@ -230,6 +295,11 @@ public:
 	template <typename T, typename SplitterT>
 	X_INLINE Job* parallel_for(T* data, size_t count, 
 		typename parallel_for_job_data<T,SplitterT>::DataJobFunctionPtr function, const SplitterT& splitter);
+
+	template <typename ClassType, typename T, typename SplitterT>
+	X_INLINE Job* parallel_for_member(typename parallel_for_member_job_data<ClassType, T, SplitterT>::FunctionDelagte del, 
+		T* data, uint32_t count, const SplitterT& splitter);
+
 
 	template<typename ClassType>
 	X_INLINE Job* CreateJobMemberFunc(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, 
