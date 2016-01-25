@@ -32,8 +32,9 @@ namespace RawModel
 		float weight_;
 	};
 
-	class Vert
+	X_ALIGNED_SYMBOL(class Vert, 64)
 	{
+	public:
 		typedef core::FixedArray<Bind, 12> BindsArr;
 	public:
 		Vert() = default;
@@ -46,6 +47,7 @@ namespace RawModel
 
 		BindsArr binds_;
 	};
+
 
 	typedef int32_t Index;
 	typedef Vec3<Index> Face;
