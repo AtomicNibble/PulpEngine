@@ -69,6 +69,7 @@ namespace RawModel
 
 	class Mesh
 	{
+	public:
 		typedef core::Array<Vert> VertsArr;
 		typedef core::Array<Face> FaceArr;
 
