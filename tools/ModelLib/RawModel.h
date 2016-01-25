@@ -5,6 +5,9 @@
 
 #include "RawModelTypes.h"
 
+#include <IModel.h>
+
+
 X_NAMESPACE_DECLARE(core,
 class XLexer
 );
@@ -16,7 +19,7 @@ namespace RawModel
 
 	class Model
 	{
-		typedef core::FixedArray<Lod, 4> LodArr;
+		typedef core::FixedArray<Lod, model::MODEL_MAX_LODS> LodArr;
 		typedef core::Array<Bone> BoneArr;
 
 		static const int32_t VERSION;
