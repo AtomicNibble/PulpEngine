@@ -27,6 +27,9 @@
     <Filter Include="Source Files\anim">
       <UniqueIdentifier>{20b4be40-ab10-4c26-85bf-dc35ef364ff2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Lib">
+      <UniqueIdentifier>{8ebc46e7-6180-4a1b-bb13-054b9b51ee1e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -49,9 +52,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="AnimLib.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="anim_inter.cpp">
       <Filter>Source Files\anim_inter</Filter>
     </ClCompile>
@@ -66,6 +66,9 @@
     </ClCompile>
     <ClCompile Include="AnimCompiler.cpp">
       <Filter>Source Files\anim</Filter>
+    </ClCompile>
+    <ClCompile Include="ConverterLib.cpp">
+      <Filter>Source Files\Lib</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

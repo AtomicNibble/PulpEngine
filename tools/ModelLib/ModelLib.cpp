@@ -1,5 +1,8 @@
 #include "stdafx.h"
 
+/*
+
+
 #include <IAnimation.h>
 #include <IEngineModule.h>
 
@@ -33,3 +36,5 @@ extern "C" DLL_EXPORT void FreeInterface(X_NAMESPACE_NAME::model::IModelLib* pMo
 	X_DELETE(pModelLib, g_ModelLibArena);
 	X_DELETE(g_ModelLibArena, gEnv->pArena);
 }
+
+*/

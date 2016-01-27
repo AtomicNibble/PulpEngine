@@ -206,6 +206,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>Debug</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -228,6 +229,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>Debug</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -328,9 +330,9 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ConverterLib.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="ModelCompiler.cpp" />
-    <ClCompile Include="ModelLib.cpp" />
     <ClCompile Include="RawModel.cpp" />
     <ClCompile Include="RawModelTypes.cpp" />
     <ClCompile Include="stdafx.cpp">
