@@ -23,6 +23,12 @@ X_LINK_LIB("engine_RenderNull")
 
 X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
 
+X_LINK_LIB("engine_ModelLib")
+X_LINK_LIB("engine_AnimLib")
+
+X_FORCE_SYMBOL_LINK("?factory__@XFactory@XConverterLib_Model@@0V12@A")
+X_FORCE_SYMBOL_LINK("?factory__@XFactory@XConverterLib_Anim@@0V12@A")
+
 
 #endif // !X_LIB
 
