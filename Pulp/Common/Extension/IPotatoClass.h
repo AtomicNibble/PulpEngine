@@ -9,8 +9,9 @@ struct IPotatoFactory;
 
 struct IPotatoClass
 {
+	virtual ~IPotatoClass() {}
 
-	virtual IPotatoFactory* GetFactory() const =0;
+	virtual IPotatoFactory* GetFactory() const X_ABSTRACT;
 
 };
 
