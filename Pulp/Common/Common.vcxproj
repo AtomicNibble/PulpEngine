@@ -123,6 +123,7 @@
     <ClInclude Include="IAssetPak.h" />
     <ClInclude Include="ICi.h" />
     <ClInclude Include="IConsole.h" />
+    <ClInclude Include="IConverterModule.h" />
     <ClInclude Include="ICore.h" />
     <ClInclude Include="IDirectoryWatcher.h" />
     <ClInclude Include="IEngineModule.h" />

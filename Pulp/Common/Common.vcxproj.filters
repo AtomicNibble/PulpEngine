@@ -1060,6 +1060,9 @@
     <ClInclude Include="Extension\PotatoCreateClass.h">
       <Filter>Headers\Extension</Filter>
     </ClInclude>
+    <ClInclude Include="IConverterModule.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
