@@ -14,7 +14,7 @@ X_NAMESPACE_BEGIN(converter)
 
 Converter::Converter()
 {
-	
+	core::zero_object(converters_);
 }
 
 Converter::~Converter()
@@ -31,22 +31,25 @@ void Converter::PrintBanner(void)
 
 bool Converter::Convert(AssetType::Enum type, ConvertArgs& args)
 {
-	if (!EnsureLibLoaded(type)) {
-		return false;
+	IConverter* pCon = GetConverter(type);
+
+	if (pCon) {
+		return pCon->Convert(args);
 	}
 
-	if (type == AssetType::ANIM) {
-		return libs_.pAnimLib->Convert(args);
-	}
-	if (type == AssetType::MODEL) {
-		return libs_.pModelLib->Convert(args);
-	}
-
-	X_ASSERT_NOT_IMPLEMENTED();
 	return false;
 }
 
 
+
+IConverter* Converter::GetConverter(AssetType::Enum type)
+{
+	if (!EnsureLibLoaded(type)) {
+		return false;
+	}
+
+	return converters_[type];
+}
 
 bool Converter::EnsureLibLoaded(AssetType::Enum type)
 {
@@ -74,6 +77,7 @@ bool Converter::LoadAnimLib(void)
 		return false;
 	}
 
+	converters_[AssetType::ANIM] = libs_.pAnimLib;
 	return true;
 }
 
@@ -87,6 +91,7 @@ bool Converter::LoadModelLib(void)
 		return false;
 	}
 
+	converters_[AssetType::MODEL] = libs_.pModelLib;
 	return true;
 }
 
