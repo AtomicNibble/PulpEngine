@@ -20,6 +20,11 @@ public:
 	X_INLINE size_t getArgc(void) const;
 	X_INLINE const TChar* getArgv(size_t arg) const;
 
+	// returns the value that follows a option.
+	X_INLINE const TChar* getOption(const TChar* pOptionName) const;
+	// check if a flag is present.
+	X_INLINE bool hasFlaag(const TChar* pFlag) const;
+
 	X_INLINE void AppendArg(const TChar* pArg);
 
 private:
@@ -43,10 +48,14 @@ public:
 	X_INLINE void clear(void);
 
 	X_INLINE size_t getArgc(void) const;
-	X_INLINE const wchar_t* getArgv(size_t arg) const;
+	X_INLINE const char* getArgv(size_t arg) const;
+
+	// returns the value that follows a option.
+	X_INLINE const char* getOption(const char* pOptionName) const;
+	// check if a flag is present.
+	X_INLINE bool hasFlaag(const char* pFlag) const;
 
 	X_INLINE void AppendArg(const char* pArg);
-
 
 private:
 	X_INLINE void tokenize(const char* pText);
@@ -70,6 +79,11 @@ public:
 
 	X_INLINE size_t getArgc(void) const;
 	X_INLINE const wchar_t* getArgv(size_t arg) const;
+
+	// returns the value that follows a option.
+	X_INLINE const wchar_t* getOption(const wchar_t* pOptionName) const;
+	// check if a flag is present.
+	X_INLINE bool hasFlaag(const wchar_t* pFlag) const;
 
 	X_INLINE void AppendArg(const wchar_t* pArg);
 

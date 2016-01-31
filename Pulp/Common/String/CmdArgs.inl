@@ -85,6 +85,39 @@ void CmdArgs<BUF_SIZE,char>::tokenize(const char* pText)
 }
 
 template<size_t BUF_SIZE>
+const char* CmdArgs<BUF_SIZE, char>::getOption(const char* pOptionName) const
+{
+	if (argc_ < 2) {
+		return nullptr;
+	}
+
+	for (size_t i = 0; i < argc_ - 1; i++)
+	{
+		if (core::strUtil::IsEqualCaseInsen(pOptionName, getArgv(i)))
+		{
+			return getArgv(i + 1);
+		}
+	}
+
+	return nullptr;
+}
+
+template<size_t BUF_SIZE>
+bool CmdArgs<BUF_SIZE, char>::hasFlaag(const char* pFlag) const
+{
+	for (size_t i = 0; i < argc_; i++)
+	{
+		if (core::strUtil::IsEqualCaseInsen(pOptionName, getArgv(i)))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
+
+
+template<size_t BUF_SIZE>
 void CmdArgs<BUF_SIZE, char>::AppendArg(const char* pArg)
 {
 	const size_t argLen = wcslen(pArg);
@@ -211,6 +244,38 @@ void CmdArgs<BUF_SIZE, wchar_t>::tokenize(const wchar_t* pText)
 	}
 }
 
+
+template<size_t BUF_SIZE>
+const wchar_t* CmdArgs<BUF_SIZE, wchar_t>::getOption(const wchar_t* pOptionName) const
+{
+	if (argc_ < 2) {
+		return nullptr;
+	}
+
+	for (size_t i = 0; i < argc_ - 1; i++)
+	{
+		if (core::strUtil::IsEqualCaseInsen(pOptionName, getArgv(i)))
+		{
+			return getArgv(i + 1);
+		}
+	}
+
+	return nullptr;
+}
+
+template<size_t BUF_SIZE>
+bool CmdArgs<BUF_SIZE, wchar_t>::hasFlaag(const wchar_t* pFlag) const
+{
+	for (size_t i = 0; i < argc_; i++)
+	{
+		if (core::strUtil::IsEqualCaseInsen(pOptionName, getArgv(i)))
+		{
+			return true;
+		}
+	}
+
+	return false;
+}
 
 template<size_t BUF_SIZE>
 void CmdArgs<BUF_SIZE, wchar_t>::AppendArg(const wchar_t* pArg)
