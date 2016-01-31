@@ -62,7 +62,8 @@ public:
 	void SetScale(float scale);
 	void setFlags(CompileFlags flags);
 
-	bool CompileModel(core::Path<char>& path);
+	bool CompileModel(core::Path<char>& outFile);
+	bool CompileModel(core::Path<wchar_t>& outFile);
 
 private:
 	bool ProcessModel(void);

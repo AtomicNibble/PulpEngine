@@ -71,9 +71,15 @@ void ModelCompiler::setFlags(CompileFlags flags)
 }
 
 
-bool ModelCompiler::CompileModel(core::Path<char>& path)
+bool ModelCompiler::CompileModel(core::Path<char>& outFile)
 {
-	path.setExtension(model::MODEL_FILE_EXTENSION);
+	return CompileModel(core::Path<wchar_t>(outFile));
+}
+
+
+bool ModelCompiler::CompileModel(core::Path<wchar_t>& outFile)
+{
+	outFile.setExtension(model::MODEL_FILE_EXTENSION_W);
 
 	// raw models are unprocessed and un optimised.
 	// if you want to make a engine model it must first be loaded into a raw model
@@ -82,7 +88,6 @@ bool ModelCompiler::CompileModel(core::Path<char>& path)
 	if (!ProcessModel()) {
 		return false;
 	}
-
 
 	return false;
 }
