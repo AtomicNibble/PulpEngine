@@ -40,10 +40,14 @@ class XConverterLib_Anim : public IConverterModule
 		return true;
 	}
 
-	virtual bool ShutDown(void) X_OVERRIDE
+	virtual bool ShutDown(ConverterLibs& libs) X_OVERRIDE
 	{
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pArena);
 
 
+		X_DELETE_AND_NULL(libs.pAnimLib, gEnv->pArena);
+		X_DELETE_AND_NULL(g_AnimLibArena, gEnv->pArena);
 		return true;
 	}
 };

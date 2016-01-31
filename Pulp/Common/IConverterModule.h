@@ -32,7 +32,7 @@ struct IConverterModule : public IPotatoClass
 	virtual const char* GetName(void) X_ABSTRACT;
 
 	virtual bool Initialize(ConverterLibs& libs) X_ABSTRACT;
-	virtual bool ShutDown(void) X_ABSTRACT;
+	virtual bool ShutDown(ConverterLibs& libs) X_ABSTRACT;
 };
 
 
