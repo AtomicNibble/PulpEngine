@@ -425,22 +425,25 @@ X_INLINE typename Array<T>::size_type Array<T>::insert(const Type& obj, size_typ
 template<typename T>
 X_INLINE typename Array<T>::size_type Array<T>::insert(Type&& obj, size_type index)
 {
-	if (!list_)
+	if (!list_) {
 		reserve(granularity_);
+	}
 
 	if (num_ == size_) {
 		size_type newsize = size_ + granularity_;
-
 		reserve(newsize);
 	}
 
-	if (index < 0)
+	if (index < 0) {
 		index = 0;
-	else if (index > num_)
+	}
+	else if (index > num_) {
 		index = num_;
+	}
 
-	for (size_type i = num_; i > index; --i)
+	for (size_type i = num_; i > index; --i) {
 		list_[i] = list_[i - 1];
+	}
 
 	num_++;
 	list_[index] = obj;
@@ -466,10 +469,24 @@ bool Array<T>::removeIndex(size_type idx)
 	}
 
 	num_--;
-	for (i = idx; i < num_; i++) 
+	for (i = idx; i < num_; i++) {
 		list_[i] = list_[i + 1];
+	}
 
 	return true;
+}
+
+template<typename T>
+void Array<T>::remove(const T& item)
+{
+	size_type idx = find(item);
+
+	if (idx != invalid_index) {
+		removeIndex(idx);
+		return;
+	}
+
+	X_ASSERT(false, "Item to remove could not be found.")(item);
 }
 
 template<typename T>
@@ -480,8 +497,9 @@ typename Array<T>::size_type Array<T>::find(const Type& val) const
 
 	for (i = 0; i < num; i++)
 	{
-		if (list_[i] == val)
+		if (list_[i] == val) {
 			return i;
+		}
 	}
 
 	return invalid_index;

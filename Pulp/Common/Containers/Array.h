@@ -91,6 +91,7 @@ public:
 	size_type insert(Type&& obj, size_type index = 0);
 	// remove the element at the given index
 	bool removeIndex(size_type idx);
+	void remove(const T& item);
 
 	// returns invalid_index when not found.
 	size_type find(const Type& val) const;
