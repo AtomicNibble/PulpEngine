@@ -313,6 +313,9 @@
     <ClCompile Include="UT_JobSystemV2.cpp">
       <Filter>Source Files\tests\Threading</Filter>
     </ClCompile>
+    <ClCompile Include="UT_Event.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">
