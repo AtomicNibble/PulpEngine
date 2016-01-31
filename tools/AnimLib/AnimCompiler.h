@@ -114,9 +114,10 @@ public:
 	~AnimCompiler();
 
 	bool compile(core::Path<char>& path, const float posError = DEFAULT_POS_ERRR, const float angError = DEFAULT_ANGLE_ERRR);
+	bool compile(core::Path<wchar_t>& path, const float posError = DEFAULT_POS_ERRR, const float angError = DEFAULT_ANGLE_ERRR);
 
 private:
-	bool save(core::Path<char>& path);
+	bool save(core::Path<wchar_t>& path);
 
 private:
 

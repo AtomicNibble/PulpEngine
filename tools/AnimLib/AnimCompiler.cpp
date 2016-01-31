@@ -323,7 +323,12 @@ AnimCompiler::~AnimCompiler()
 
 }
 
-bool AnimCompiler::compile(core::Path<char>& path, const float posError, const float angError)
+bool AnimCompiler::compile(core::Path<char>& filePath, const float posError, const float angError)
+{
+	return compile(core::Path<wchar_t>(filePath), posError, angError);
+}
+
+bool AnimCompiler::compile(core::Path<wchar_t>& path, const float posError, const float angError)
 {
 	// got any bones in the inter?
 	if (inter_.getNumBones() < 1) {
@@ -363,12 +368,12 @@ bool AnimCompiler::compile(core::Path<char>& path, const float posError, const f
 	return save(path);
 }
 
-bool AnimCompiler::save(core::Path<char>& path)
+bool AnimCompiler::save(core::Path<wchar_t>& path)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-	path.setExtension(anim::ANIM_FILE_EXTENSION);
+	path.setExtension(anim::ANIM_FILE_EXTENSION_W);
 
 	core::fileModeFlags mode;
 	mode.Set(core::fileMode::RECREATE);
