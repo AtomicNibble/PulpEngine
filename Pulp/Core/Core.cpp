@@ -461,6 +461,15 @@ const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
 				}
 			}
 		}
+		else if (arg.getArgc() == 2)
+		{
+			const wchar_t* pName = arg.getArgv(0);
+			if (core::strUtil::IsEqualCaseInsen(pName, pVarName))
+			{
+				const wchar_t* pValue = arg.getArgv(1);
+				return pValue;
+			}
+		}
 	}
 
 	return nullptr;
