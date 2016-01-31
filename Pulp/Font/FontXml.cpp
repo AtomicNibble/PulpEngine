@@ -4,7 +4,6 @@
 
 #include <IFileSys.h>
 
-#include <String\Path.h>
 #include <String\Xml.h>
 #include <String\StackString.h>
 

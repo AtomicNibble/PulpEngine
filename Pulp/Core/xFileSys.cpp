@@ -5,7 +5,6 @@
 
 #include <Util\LastError.h>
 #include <String\StackString.h>
-#include <String\Path.h>
 
 #include <direct.h>
 #include <io.h>

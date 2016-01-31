@@ -2,7 +2,6 @@
 #include "XModel.h"
 
 #include "IFileSys.h"
-#include "String\Path.h"
 #include "Memory\MemCursor.h"
 
 #include <IRender.h>

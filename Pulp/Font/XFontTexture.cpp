@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "XFontTexture.h"
 
-#include <String\Path.h>
 #include <IFileSys.h>
 
 X_NAMESPACE_BEGIN(font)

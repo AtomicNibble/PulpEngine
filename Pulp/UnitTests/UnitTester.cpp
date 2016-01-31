@@ -8,7 +8,6 @@
 
 #include <Threading\CriticalSection.h>
 
-#include <String\Path.h>
 
 // Google Test
 #if X_DEBUG == 1

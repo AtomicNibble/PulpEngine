@@ -35,7 +35,6 @@ X_ENABLE_WARNING(4702)
 
 #include <String\StringTokenizer.h>
 #include <String\StackString.h>
-#include <String\Path.h>
 #include <Containers\ByteStream.h>
 #include <Containers\FixedStack.h>
 

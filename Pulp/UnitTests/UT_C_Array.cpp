@@ -4,7 +4,6 @@
 
 #include <Containers\Array.h>
 
-#include <String\Path.h>
 
 #include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>

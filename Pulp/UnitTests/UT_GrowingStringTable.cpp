@@ -6,7 +6,6 @@
 #include <Memory/AllocationPolicies/StackAllocator.h>
 
 
-#include <String\Path.h>
 
 
 X_USING_NAMESPACE;

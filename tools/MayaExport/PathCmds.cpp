@@ -5,7 +5,6 @@
 #include <maya\MArgList.h>
 #include <maya\MSyntax.h>
 
-#include <String\Path.h>
 #include <String\Xml.h>
 
 #include "AppDataPath.h"

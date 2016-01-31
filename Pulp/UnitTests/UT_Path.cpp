@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 
-#include <String\Path.h>
 
 X_USING_NAMESPACE;
 

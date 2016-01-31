@@ -5,7 +5,6 @@
 #define X_TEXTURE_LOADER_JPG_H_
 
 #include "ITexture.h"
-#include <String\Path.h>
 
 X_NAMESPACE_BEGIN(texture)
 

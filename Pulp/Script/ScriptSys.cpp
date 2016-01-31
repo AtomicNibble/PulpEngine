@@ -9,7 +9,6 @@
 #include <IRender.h>
 
 #include <String\StackString.h>
-#include <String\Path.h>
 
 
 extern "C"
