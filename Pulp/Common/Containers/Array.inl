@@ -355,13 +355,16 @@ X_INLINE typename Array<T>::size_type Array<T>::append(const Array<T>& oth)
 }
 
 template<typename T>
-X_INLINE typename Array<T>::size_type Array<T>::push_back(T const& obj) {
+X_INLINE typename Array<T>::size_type Array<T>::push_back(T const& obj)
+{
 	// if list empty allocate it
-	if (!list_)
+	if (!list_) {
 		reserve(granularity_);
+	}
 	// grow if needs be.
-	if (num_ == size_)
+	if (num_ == size_) {
 		reserve(size_ + granularity_);
+	}
 
 	Mem::Construct(&list_[num_], obj);
 	num_++;
@@ -369,13 +372,16 @@ X_INLINE typename Array<T>::size_type Array<T>::push_back(T const& obj) {
 }
 
 template<typename T>
-X_INLINE typename Array<T>::size_type Array<T>::push_back(T&& obj) {
+X_INLINE typename Array<T>::size_type Array<T>::push_back(T&& obj)
+{
 	// if list empty allocate it
-	if (!list_)
+	if (!list_) {
 		reserve(granularity_);
+	}
 	// grow if needs be.
-	if (num_ == size_)
+	if (num_ == size_) {
 		reserve(size_ + granularity_);
+	}
 
 	Mem::Construct(&list_[num_], std::forward<T>(obj));
 	num_++;
@@ -399,8 +405,9 @@ X_INLINE void Array<T>::pop_back()
 template<typename T>
 X_INLINE typename Array<T>::size_type Array<T>::insert(const Type& obj, size_type index)
 {
-	if (!list_) 
+	if (!list_) {
 		reserve(granularity_);
+	}
 
 	if (num_ == size_) {
 		size_type newsize = size_ + granularity_;
@@ -408,13 +415,16 @@ X_INLINE typename Array<T>::size_type Array<T>::insert(const Type& obj, size_typ
 		reserve(newsize);
 	}
 
-	if (index < 0) 
+	if (index < 0) {
 		index = 0;
-	else if (index > num_) 
+	}
+	else if (index > num_) {
 		index = num_;
+	}
 
-	for (size_type i = num_; i > index; --i)
+	for (size_type i = num_; i > index; --i) {
 		list_[i] = list_[i - 1];
+	}
 
 	num_++;
 	list_[index] = obj;
@@ -446,7 +456,7 @@ X_INLINE typename Array<T>::size_type Array<T>::insert(Type&& obj, size_type ind
 	}
 
 	num_++;
-	list_[index] = obj;
+	Mem::Construct(&list_[index], std::forward<T>(obj));
 
 	return index;
 }
@@ -455,10 +465,9 @@ X_INLINE typename Array<T>::size_type Array<T>::insert(Type&& obj, size_type ind
 template<typename T>
 bool Array<T>::removeIndex(size_type idx)
 {
-	size_type i;
-
-	if (idx == (size_type)-1)
+	if (idx == (size_type)-1) {
 		return false;
+	}
 
 	X_ASSERT_NOT_NULL(list_);
 	X_ASSERT(idx >= 0, "index is invalid")(idx);
@@ -468,9 +477,20 @@ bool Array<T>::removeIndex(size_type idx)
 		return false;
 	}
 
+	T* pItem = &list_[idx];
+
+	Mem::Destruct(pItem);
+
 	num_--;
-	for (i = idx; i < num_; i++) {
-		list_[i] = list_[i + 1];
+
+	const bool itemsLeft = (num_ > 0);
+	const bool isLast = (idx == num_);
+
+	if (itemsLeft && !isLast)
+	{
+		// move end to idx we removed.
+		Mem::Construct<T>(pItem, list_[num_]);
+		Mem::Destruct(&list_[num_]);
 	}
 
 	return true;
