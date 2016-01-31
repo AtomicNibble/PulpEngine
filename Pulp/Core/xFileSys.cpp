@@ -4,7 +4,6 @@
 #include "DiskFileAsync.h"
 
 #include <Util\LastError.h>
-#include <String\StackString.h>
 
 #include <direct.h>
 #include <io.h>

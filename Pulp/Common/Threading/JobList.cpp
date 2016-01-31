@@ -1,7 +1,6 @@
 #include <EngineCommon.h>
 #include "JobList.h"
 
-#include "String\StackString.h"
 #include "Util\Cpu.h"
 
 #include "ICore.h"

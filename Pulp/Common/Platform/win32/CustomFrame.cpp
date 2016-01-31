@@ -4,7 +4,6 @@
 
 
 #include "CustomFrame.h"
-#include "String\StackString.h"
 
 #include "Util\BitUtil.h"
 

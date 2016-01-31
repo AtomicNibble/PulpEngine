@@ -3,7 +3,6 @@
 
 #include <String\StringRange.h>
 #include <String\StringTokenizer.h>
-#include <String\StackString.h>
 
 X_USING_NAMESPACE;
 

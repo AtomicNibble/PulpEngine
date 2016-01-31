@@ -1,6 +1,5 @@
 #include "EngineCommon.h"
 
-#include <String\StackString.h>
 
 X_NAMESPACE_BEGIN(core)
 

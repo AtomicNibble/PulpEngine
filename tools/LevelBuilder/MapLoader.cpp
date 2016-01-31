@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 #include <String\Lexer.h>
-#include <String\StackString.h>
 #include <String\HumanSize.h>
 
 #include <IFileSys.h>

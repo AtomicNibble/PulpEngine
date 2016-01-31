@@ -4,10 +4,7 @@
 
 #include "resource.h"
 
-#include <String\StackString.h>
-#include <String\Path.h>
 #include <String\Lexer.h>
-#include <String\StackString.h>
 #include <String\StrRef.h>
 
 #include <Math\XAabb.h>

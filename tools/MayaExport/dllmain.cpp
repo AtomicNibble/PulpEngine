@@ -11,7 +11,6 @@
 
 #include <IModel.h>
 #include <IAnimation.h>
-#include <String\StackString.h>
 
 #include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
 #include <Memory\MemoryTaggingPolicies\NoMemoryTagging.h>

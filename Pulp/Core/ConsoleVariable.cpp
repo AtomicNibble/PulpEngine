@@ -1,7 +1,6 @@
 #include "stdafx.h"
 
 // #include <String\xStr.h>
-#include <String\StackString.h>
 
 #include "Console.h"
 #include "ConsoleVariable.h"

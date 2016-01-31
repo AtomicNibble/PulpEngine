@@ -4,7 +4,6 @@
 #include "ConsoleNULL.h"
 #include "Log.h"
 
-#include <String\StackString.h>
 #include <String\CmdArgs.h>
 
 #include "NullImplementation/NullInput.h"

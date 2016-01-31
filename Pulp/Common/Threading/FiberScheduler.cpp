@@ -2,7 +2,6 @@
 #include "FiberScheduler.h"
 
 #include "Util\Cpu.h"
-#include "String\StackString.h"
 
 #include <Memory\VirtualMem.h>
 

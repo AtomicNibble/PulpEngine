@@ -119,6 +119,7 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <String\StrRef.h>
 #include <String\StringUtil.h>
 #include <String\Path.h>
+#include <String\StackString.h>
 
 // Math
 #include <Math\XMath.h>

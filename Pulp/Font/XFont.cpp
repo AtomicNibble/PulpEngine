@@ -4,7 +4,6 @@
 #include "Font.h"
 #include "XFontTexture.h"
 
-#include <String\StackString.h>
 
 #include <IConsole.h>
 

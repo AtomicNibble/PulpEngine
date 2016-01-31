@@ -4,7 +4,6 @@
 
 #include <String\Lexer.h>
 #include <String\StrRef.h>
-#include <String\StackString.h>
 
 #include <Util\ScopedPointer.h>
 

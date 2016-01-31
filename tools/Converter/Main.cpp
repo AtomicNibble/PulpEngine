@@ -7,7 +7,6 @@
 
 #include <Platform\Console.h>
 
-#include <String\StackString.h>
 #include <String\CmdArgs.h>
 
 

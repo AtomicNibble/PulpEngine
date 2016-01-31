@@ -8,7 +8,6 @@
 
 
 #include <IFileSys.h>
-#include <String\StackString.h>
 
 X_USING_NAMESPACE;
 

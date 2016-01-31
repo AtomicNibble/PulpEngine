@@ -8,7 +8,6 @@
 #include <IFileSys.h>
 #include <IRender.h>
 
-#include <String\StackString.h>
 
 
 extern "C"

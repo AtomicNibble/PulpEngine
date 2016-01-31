@@ -5,7 +5,6 @@
 #include <IFileSys.h>
 
 #include <String\Xml.h>
-#include <String\StackString.h>
 
 #include <Memory\AllocationPolicies\MallocFreeAllocator.h>
 

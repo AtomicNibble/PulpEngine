@@ -9,7 +9,6 @@ X_ENABLE_WARNING(4091)
 // #include "Debugging\SymbolInfo.h"
 #include "SymbolResolution.h"
 
-#include "String\StackString.h"
 
 #include "MiniDump.h"
 

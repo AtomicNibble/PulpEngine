@@ -1,7 +1,6 @@
 #include "EngineCommon.h"
 
 #include "LoggerDebuggerWritePolicy.h"
-#include "String\StackString.h"
 
 X_NAMESPACE_BEGIN(core)
 

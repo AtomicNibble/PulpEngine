@@ -14,7 +14,6 @@
 #include <IEngineModule.h>
 
 #include <Hashing\crc32.h>
-#include <String\StackString.h>
 #include <Platform\Window.h>
 #include <Platform\Console.h>
 #include <Debugging\InvalidParameterHandler.h>

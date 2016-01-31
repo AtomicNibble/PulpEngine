@@ -1,7 +1,6 @@
 #include "EngineCommon.h"
 #include "LoggerVerbosityFilterPolicy.h"
 
-#include <String\StackString.h>
 
 #include <IConsole.h>
 

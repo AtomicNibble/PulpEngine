@@ -2,7 +2,6 @@
 
 
 #include "LoggerSimpleFormatPolicy.h"
-#include "String\StackString.h"
 
 #include <stdio.h>
 
