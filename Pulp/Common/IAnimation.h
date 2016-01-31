@@ -64,6 +64,7 @@ static const uint32_t	 ANIM_MAX_NOTES = 255;
 static const uint32_t	 ANIM_MAX_NOT_NAME_LENGTH = 48; // the max lengt of each notes name
 static const uint32_t	 ANIM_MAX_NAME_LENGTH = 60;
 static const char*		 ANIM_FILE_EXTENSION = "anim";
+static const wchar_t*	 ANIM_FILE_EXTENSION_W = L"anim";
 
 // Intermidiate format stuff.
 // this is used for saving out animation data that is not relative.
