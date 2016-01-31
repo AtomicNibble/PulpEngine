@@ -1063,6 +1063,9 @@
     <ClInclude Include="IConverterModule.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
+    <ClInclude Include="Util\Event.gen.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1334,6 +1337,9 @@
     </None>
     <None Include="Time\StopWatch.inl">
       <Filter>Headers\Time</Filter>
+    </None>
+    <None Include="Util\Event.gen">
+      <Filter>Headers\Util</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

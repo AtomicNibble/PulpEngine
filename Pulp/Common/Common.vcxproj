@@ -321,6 +321,18 @@
     <ClInclude Include="Util\Delegate.h" />
     <ClInclude Include="Util\EndianUtil.h" />
     <ClInclude Include="Util\EnumMacros.h" />
+    <ClInclude Include="Util\Event.gen.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">true</ExcludedFromBuild>
+    </ClInclude>
     <ClInclude Include="Util\Event.h" />
     <ClInclude Include="Util\Flags.h" />
     <ClInclude Include="Util\FlagsMacros.h" />
@@ -458,6 +470,18 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Util\%(Filename).h</ObjectFileName>
     </ClCompile>
     <None Include="Util\EndianUtil.inl" />
+    <None Include="Util\Event.gen">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">true</ExcludedFromBuild>
+    </None>
     <None Include="Util\Flags.inl" />
     <None Include="Util\Pointer64.inl" />
     <None Include="Util\PointerFlags.inl" />
@@ -972,7 +996,9 @@
     </Lib>
     <PreBuildEvent>
       <Command>CL.exe /c /I$(ProjectDir) /Zi /nologo /W4 /WX /MP /Od /P /EP /C /GR- /Fo"Util\Delegate.h" Util\Delegate.gen
-move "Delegate.i" "Util\Delegate.h"</Command>
+move "Delegate.i" "Util\Delegate.h"
+CL.exe /c /I$(ProjectDir) /Zi /nologo /W4 /WX /MP /Od /P /EP /C /GR- /Fo"Util\Event.h" Util\Event.gen
+move "Event.i" "Util\Event.h"</Command>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">
