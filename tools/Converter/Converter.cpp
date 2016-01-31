@@ -1,94 +1,134 @@
 #include "stdafx.h"
 #include "Converter.h"
-#include "EngineApp.h"
 
-#include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
-#include <Memory\ThreadPolicies\MultiThreadPolicy.h>
-
-#include <Platform\Console.h>
-
-#define _LAUNCHER
-#include <ModuleExports.h>
-
+#include <IModel.h>
 #include <IAnimation.h>
+#include <IConverterModule.h>
 
-HINSTANCE g_hInstance = 0;
-
-#ifdef X_LIB
-
-struct XRegFactoryNode* g_pHeadToRegFactories = 0;
-
-X_LINK_LIB("engine_Core")
-X_LINK_LIB("engine_RenderNull")
-
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
-
-X_LINK_LIB("engine_ModelLib")
-X_LINK_LIB("engine_AnimLib")
-
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XConverterLib_Model@@0V12@A")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XConverterLib_Anim@@0V12@A")
+#include <Extension\IPotatoFactory.h>
+#include <Extension\PotatoCreateClass.h>
 
 
-#endif // !X_LIB
+X_NAMESPACE_BEGIN(converter)
 
 
-typedef core::MemoryArena<
-	core::MallocFreeAllocator,
-	core::SingleThreadPolicy,
-	core::SimpleBoundsChecking,
-	core::NoMemoryTracking,			
-	core::SimpleMemoryTagging
-> ConverterArena;
-
-
-core::MemoryArenaBase* g_arena = nullptr;
-
-
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+Converter::Converter()
 {
-	g_hInstance = hInstance;
-
-	EngineApp engine;
-
-	core::Console Console(L"Potato - Converter");
-	Console.RedirectSTD();
-	Console.SetSize(60, 40, 2000);
-	Console.MoveTo(10, 10);
-
-
-	core::MallocFreeAllocator allocator;
-	ConverterArena arena(&allocator, "ConverterArena");
-	g_arena = &arena;
-
-
-	if (engine.Init(lpCmdLine, Console))
-	{
-		{
-			HMODULE hAnimLib = PotatoLoadLibary("engine_AnimLib");
-			if (hAnimLib)
-			{
-				typedef core::traits::Function<anim::IAnimLib* (ICore *)> AnimLibInter;
-
-				AnimLibInter::Pointer pFunc = reinterpret_cast<AnimLibInter::Pointer>(PotatoGetProcAddress(hAnimLib, "CreateInterface"));
-				if (pFunc)
-				{
-					anim::IAnimLib* pLib = pFunc(gEnv->pCore);
-
-					const char* animInter = "C:\\Users\\WinCat\\Documents\\code\\WinCat\\engine\\potatoengine\\game_folder\\mod\\anims\\anim_test_01.anim_inter";
-					const char* pModel = "C:\\Users\\WinCat\\Documents\\code\\WinCat\\engine\\potatoengine\\game_folder\\mod\\models\\anim_test.model";
-					const char* pDest = "K:\\anim_test_01";
-
-					pLib->ConvertAnim(animInter, pModel, pDest);
-				}
-			}
-		}
-		system("PAUSE");
-	}
-
-    return 0;
+	
 }
 
+Converter::~Converter()
+{
+
+}
+
+void Converter::PrintBanner(void)
+{
+	X_LOG0("Converter", "=================== V0.1 ===================");
+
+}
+
+
+bool Converter::ConvertAnim(const char* pAnimInter,
+	const char* pModel, const char* pDest)
+{
+	if (!LoadAnimLib()) {
+		return false;
+	}
+
+	return libs_.pAnimLib->ConvertAnim(pAnimInter, pModel, pDest);
+}
+
+
+bool Converter::LoadAllLibs(void)
+{
+	if (!LoadAnimLib()) {
+		return false;
+	}
+	if (!LoadModelLib()) {
+		return false;
+	}
+
+	return true;
+}
+
+bool Converter::LoadAnimLib(void)
+{
+	if (libs_.pAnimLib) {
+		return true;
+	}
+
+	if (!IntializeConverterModule("Engine_AnimLib", "Engine_AnimLib")) {
+		return false;
+	}
+
+	return true;
+}
+
+bool Converter::LoadModelLib(void)
+{
+	if (libs_.pModelLib) {
+		return true;
+	}
+
+	if (!IntializeConverterModule("Engine_ModelLib", "Engine_ModelLib")) {
+		return false;
+	}
+
+	return true;
+}
+
+bool Converter::IntializeConverterModule(const char* dllName, const char* moduleClassName)
+{
+	bool res = false;
+
+	core::Path<char> path(dllName);
+
+	path.setExtension(".dll");
+
+#if !defined(X_LIB) 
+	void* hModule = LoadDLL(path.c_str());
+	if (!hModule) {
+		if (gEnv && gEnv->pLog) {
+			X_ERROR("Converter", "Failed to load converter module: %s", dllName);
+		}
+		return false;
+	}
+
+#endif // #if !defined(X_LIB) 
+
+
+	std::shared_ptr<IConverterModule> pModule;
+	if (PotatoCreateClassInstance(moduleClassName, pModule))
+	{
+		res = pModule->Initialize(libs_);
+	}
+	else
+	{
+		X_ERROR("Converter", "failed to find interface: %s -> %s", dllName, moduleClassName);
+		return false;
+	}
+
+	return res;
+}
+
+void* Converter::LoadDLL(const char* dllName)
+{
+	void* hDll = PotatoLoadLibary(dllName);
+
+	if (!hDll) {
+		return nullptr;
+	}
+
+	ModuleLinkfunc::Pointer pfnModuleInitISystem = reinterpret_cast<ModuleLinkfunc::Pointer>(
+		PotatoGetProcAddress(hDll, "LinkModule"));
+
+	if (pfnModuleInitISystem)
+	{
+		pfnModuleInitISystem(gEnv->pCore, dllName);
+	}
+
+	return hDll;
+}
+
+X_NAMESPACE_END
