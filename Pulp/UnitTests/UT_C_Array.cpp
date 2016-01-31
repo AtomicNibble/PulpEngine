@@ -129,6 +129,66 @@ TYPED_TEST(ArrayTest, Contruct)
 	EXPECT_EQ(345, list2.granularity());
 }
 
+TYPED_TEST(ArrayTest, Clear)
+{
+	CustomType::CONSRUCTION_COUNT = 0;
+	CustomType::DECONSRUCTION_COUNT = 0;
+
+
+	Array<TypeParam> list(g_arena);
+
+	list.setGranularity(128);
+
+	EXPECT_EQ(128, list.granularity());
+
+	// insert some items
+	for (int i = 0; i < 64; i++)
+	{
+		EXPECT_EQ(i, list.insert(i, i * 2));
+	}
+
+	EXPECT_EQ(64, list.size());
+	EXPECT_EQ(128, list.capacity());
+
+	list.clear();
+
+	EXPECT_EQ(0, list.size());
+	EXPECT_EQ(128, list.capacity());
+	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
+}
+
+TYPED_TEST(ArrayTest, Free)
+{
+	CustomType::CONSRUCTION_COUNT = 0;
+	CustomType::DECONSRUCTION_COUNT = 0;
+
+	{
+		Array<TypeParam> list(g_arena);
+
+		list.setGranularity(128);
+
+		EXPECT_EQ(0, list.size());
+		EXPECT_EQ(0, list.capacity());
+		EXPECT_EQ(128, list.granularity());
+
+		// insert some items
+		for (int i = 0; i < 64; i++)
+		{
+			EXPECT_EQ(i, list.insert(i, i * 2));
+		}
+
+		EXPECT_EQ(64, list.size());
+		EXPECT_EQ(128, list.capacity());
+
+		list.free();
+
+		EXPECT_EQ(0, list.size());
+		EXPECT_EQ(0, list.capacity());
+		EXPECT_EQ(nullptr, list.ptr());
+	}
+
+	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
+}
 
 TYPED_TEST(ArrayTest, Move)
 {
@@ -292,40 +352,47 @@ TYPED_TEST(ArrayTest, Insert)
 
 TYPED_TEST(ArrayTest, Remove)
 {
-	Array<TypeParam> list(g_arena);
+	CustomType::CONSRUCTION_COUNT = 0;
+	CustomType::DECONSRUCTION_COUNT = 0;
 
-	list.setGranularity(128);
-
-	EXPECT_EQ(128, list.granularity());
-
-	// insert some items
-	for (int i = 0; i < 64; i++)
 	{
-		EXPECT_EQ(i, list.insert(i, i*2));
+		Array<TypeParam> list(g_arena);
+
+		list.setGranularity(128);
+
+		EXPECT_EQ(128, list.granularity());
+
+		// insert some items
+		for (int i = 0; i < 64; i++)
+		{
+			EXPECT_EQ(i, list.insert(i, i * 2));
+		}
+
+		EXPECT_EQ(64, list.size());
+		EXPECT_EQ(128, list.capacity());
+
+		EXPECT_TRUE(list.removeIndex(4));
+		EXPECT_TRUE(list.removeIndex(10));
+		EXPECT_TRUE(list.removeIndex(16));
+		EXPECT_TRUE(list.removeIndex(28));
+
+		EXPECT_EQ(60, list.size());
+		EXPECT_EQ(128, list.capacity());
+
+		list.remove(20);
+		list.remove(40);
+
+		EXPECT_EQ(58, list.size());
+		EXPECT_EQ(128, list.capacity());
+
+		list.free();
+
+		EXPECT_EQ(0, list.size());
+		EXPECT_EQ(0, list.capacity());
+		EXPECT_EQ(nullptr, list.ptr());
 	}
 
-	EXPECT_EQ(64, list.size());
-	EXPECT_EQ(128, list.capacity());
-
-	EXPECT_TRUE(list.removeIndex(4));
-	EXPECT_TRUE(list.removeIndex(10));
-	EXPECT_TRUE(list.removeIndex(16));
-	EXPECT_TRUE(list.removeIndex(28));
-	
-	EXPECT_EQ(60, list.size());
-	EXPECT_EQ(128, list.capacity());
-
-	list.remove(20);
-	list.remove(40);
-
-	EXPECT_EQ(58, list.size());
-	EXPECT_EQ(128, list.capacity());
-
-	list.free();
-
-	EXPECT_EQ(0, list.size());
-	EXPECT_EQ(0, list.capacity());
-	EXPECT_EQ(nullptr, list.ptr());
+	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
 }
 
 
