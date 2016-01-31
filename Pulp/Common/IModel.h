@@ -104,6 +104,7 @@ static const uint32_t	 MODEL_MAX_LODS = 4;
 // legnth checks are done without extension, to make it include extension, simple reduce it by the length of ext.
 static const uint32_t	 MODEL_MAX_NAME_LENGTH = 60; 
 static const char*		 MODEL_FILE_EXTENSION = "model";
+static const wchar_t*	 MODEL_FILE_EXTENSION_W = L"model";
 
 // Intermidiate format stuff.
 // this is used for saving out raw un processed data. so no dropping of bones, or weights etc..
