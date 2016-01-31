@@ -43,18 +43,22 @@ ModelSkeleton::~ModelSkeleton()
 
 }
 
-
 bool ModelSkeleton::LoadSkelton(core::Path<char>& filePath)
+{
+	return LoadSkelton(core::Path<wchar_t>(filePath));
+}
+
+bool ModelSkeleton::LoadSkelton(core::Path<wchar_t>& filePath)
 {
 	if (filePath.isEmpty()) {
 		return false;
 	}
 
-	filePath.setExtension(model::MODEL_FILE_EXTENSION);
+	filePath.setExtension(model::MODEL_FILE_EXTENSION_W);
 
 	FILE* f = nullptr;
 
-	errno_t err = fopen_s(&f, filePath.c_str(), "rb");
+	errno_t err = _wfopen_s(&f, filePath.c_str(), L"rb");
 	if (!f) {
 		return false;
 	}

@@ -17,6 +17,7 @@ public:
 	~ModelSkeleton();
 
 	bool LoadSkelton(core::Path<char>& path);
+	bool LoadSkelton(core::Path<wchar_t>& path);
 
 	size_t getNumBones(void) const;
 
