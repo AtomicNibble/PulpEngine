@@ -31,20 +31,37 @@ void Converter::PrintBanner(void)
 
 bool Converter::Convert(AssetType::Enum type, ConvertArgs& args)
 {
+	if (!EnsureLibLoaded(type)) {
+		return false;
+	}
+
+	if (type == AssetType::ANIM) {
+		return libs_.pAnimLib->Convert(args);
+	}
+	if (type == AssetType::MODEL) {
+		return libs_.pModelLib->Convert(args);
+	}
+
+	X_ASSERT_NOT_IMPLEMENTED();
 	return false;
 }
 
 
-bool Converter::LoadAllLibs(void)
+
+bool Converter::EnsureLibLoaded(AssetType::Enum type)
 {
-	if (!LoadAnimLib()) {
-		return false;
+	// this needs to be more generic.
+	// might move to a single interface for all converter libs.
+
+	if (type == AssetType::ANIM) {
+		return LoadAnimLib();
 	}
-	if (!LoadModelLib()) {
-		return false;
+	if (type == AssetType::MODEL) {
+		return LoadModelLib();
 	}
 
-	return true;
+	X_ASSERT_NOT_IMPLEMENTED();
+	return false;;
 }
 
 bool Converter::LoadAnimLib(void)

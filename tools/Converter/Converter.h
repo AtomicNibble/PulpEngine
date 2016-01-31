@@ -29,10 +29,9 @@ public:
 
 	bool Convert(AssetType::Enum type, ConvertArgs& args);
 
-	// pre-load all libs.
-	bool LoadAllLibs(void);
 
 private:
+	bool EnsureLibLoaded(AssetType::Enum type);
 
 	bool LoadAnimLib(void);
 	bool LoadModelLib(void);
