@@ -7,6 +7,10 @@
 
 #include <Platform\Console.h>
 
+#include <String\StackString.h>
+#include <String\CmdArgs.h>
+
+
 #define _LAUNCHER
 #include <ModuleExports.h>
 
@@ -65,6 +69,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	ConverterArena arena(&allocator, "ConverterArena");
 	g_arena = &arena;
 
+	bool res = false;
 
 	if (engine.Init(lpCmdLine, Console))
 	{
@@ -72,10 +77,30 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		con.PrintBanner();
 
+		{
+			const wchar_t* pAssetType = gEnv->pCore->GetCommandLineArgForVarW(L"type");
+			if (pAssetType)
+			{
+				core::CmdArgs<4096, wchar_t> args(lpCmdLine);
+
+				if (core::strUtil::IsEqualCaseInsen(pAssetType, L"model"))
+				{
+					res = con.Convert(converter::AssetType::MODEL, args);
+				}
+				else if (core::strUtil::IsEqualCaseInsen(pAssetType, L"anim"))
+				{
+					res = con.Convert(converter::AssetType::ANIM, args);
+				}
+				else
+				{
+					X_ERROR("Converter", "Unkown asset type: \"%ls\"", pAssetType);
+				}
+			}
+		}
 
 		system("PAUSE");
 	}
 
-	return 0;
+	return res ? 0 : -1;
 }
 
