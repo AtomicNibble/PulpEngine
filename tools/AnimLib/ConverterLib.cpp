@@ -28,14 +28,14 @@ class XConverterLib_Anim : public IConverterModule
 		return "Anim";
 	}
 
-	virtual bool Initialize(void) X_OVERRIDE
+	virtual bool Initialize(ConverterLibs& libs) X_OVERRIDE
 	{
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 
 		g_AnimLibArena = X_NEW(AnimLibrena, gEnv->pArena, "AnimLibArena")(&g_AnimLibAlloc, "AnimLibArena");
 
-		anim::XAnimLib* pAnimLib = X_NEW(anim::XAnimLib, g_AnimLibArena, "AnimLib")();
+		libs.pAnimLib = X_NEW(anim::XAnimLib, g_AnimLibArena, "AnimLib")();
 
 		return true;
 	}

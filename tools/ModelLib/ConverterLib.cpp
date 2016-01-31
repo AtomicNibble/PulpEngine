@@ -26,14 +26,14 @@ class XConverterLib_Model : public IConverterModule
 		return "Model";
 	}
 
-	virtual bool Initialize(void) X_OVERRIDE
+	virtual bool Initialize(ConverterLibs& libs) X_OVERRIDE
 	{
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 
 		g_ModelLibArena = X_NEW(ModelLibrena, gEnv->pArena, "ModelLibrena")(&g_ModelLibAlloc, "ModelLibrena");
 
-		model::XModelLib* pModelLib = X_NEW(model::XModelLib, g_ModelLibArena, "ModelLib")();
+		libs.pModelLib = X_NEW(model::XModelLib, g_ModelLibArena, "ModelLib")();
 
 		return true;
 	}
