@@ -20,6 +20,7 @@
 #include <Time\CompressedStamps.h>
 
 #include <IMaterial.h>
+#include <IConverterModule.h>
 
 X_NAMESPACE_BEGIN(model)
 
@@ -116,15 +117,11 @@ static const uint32_t	 MODEL_RAW_VERSION = 1;
 static const char*		 MODEL_RAW_FILE_EXTENSION = "model_raw";
 
 
-struct IModelLib
+struct IModelLib : public IConverter
 {
-	typedef core::CmdArgs<4096, wchar_t> ConvertArgs;
-
-	virtual ~IModelLib() {}
-
-	virtual bool Convert(ConvertArgs& args) X_ABSTRACT;
 
 };
+
 
 
 // Flags:

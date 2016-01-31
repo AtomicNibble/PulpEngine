@@ -4,8 +4,9 @@
 #ifndef _X_ASSET_ANIM_H_
 #define _X_ASSET_ANIM_H_
 
+#include <IConverterModule.h>
+
 #include <Util\FlagsMacros.h>
-#include <String\CmdArgs.h>
 
 X_NAMESPACE_BEGIN(anim)
 
@@ -84,13 +85,8 @@ static const wchar_t*	 ANIM_INTER_FILE_EXTENSION_W = L"anim_inter";
 #endif
 
 
-struct IAnimLib
+struct IAnimLib : public IConverter
 {
-	typedef core::CmdArgs<4096, wchar_t> ConvertArgs;
-
-	virtual ~IAnimLib() {}
-
-	virtual bool Convert(ConvertArgs& args) X_ABSTRACT;
 
 };
 
