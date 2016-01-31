@@ -5,6 +5,7 @@
 #define _X_ASSET_ANIM_H_
 
 #include <Util\FlagsMacros.h>
+#include <String\CmdArgs.h>
 
 X_NAMESPACE_BEGIN(anim)
 
@@ -85,11 +86,11 @@ static const wchar_t*	 ANIM_INTER_FILE_EXTENSION_W = L"anim_inter";
 
 struct IAnimLib
 {
+	typedef core::CmdArgs<4096, wchar_t> ConvertArgs;
+
 	virtual ~IAnimLib() {}
 
-	virtual bool ConvertAnim(const char* pAnimInter,
-		const char* pModel, const char* pDest) X_ABSTRACT;
-
+	virtual bool Convert(ConvertArgs& args) X_ABSTRACT;
 
 };
 

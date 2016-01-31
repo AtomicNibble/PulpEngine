@@ -11,8 +11,7 @@ public:
 	XAnimLib();
 	~XAnimLib() X_OVERRIDE;
 
-	virtual bool ConvertAnim(const char* pAnimInter,
-		const char* pModel, const char* pDest) X_OVERRIDE;
+	virtual bool Convert(ConvertArgs& args) X_OVERRIDE;
 
 
 private:

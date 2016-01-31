@@ -14,6 +14,11 @@ XModelLib::~XModelLib()
 
 }
 
+bool XModelLib::Convert(ConvertArgs& args)
+{
+	X_UNUSED(args);
 
+	return false;
+}
 
 X_NAMESPACE_END

@@ -8,6 +8,7 @@
 #include <Util\Pointer64.h>
 
 #include <String\StackString.h>
+#include <String\CmdArgs.h>
 
 #include <Math\XVector.h>
 #include <Math\XAabb.h>
@@ -117,7 +118,11 @@ static const char*		 MODEL_RAW_FILE_EXTENSION = "model_raw";
 
 struct IModelLib
 {
+	typedef core::CmdArgs<4096, wchar_t> ConvertArgs;
+
 	virtual ~IModelLib() {}
+
+	virtual bool Convert(ConvertArgs& args) X_ABSTRACT;
 
 };
 

@@ -19,12 +19,44 @@ XAnimLib::~XAnimLib()
 }
 
 
-bool XAnimLib::ConvertAnim(const char* pAnimInter,
-	const char* pModel, const char* pDest)
+bool XAnimLib::Convert(ConvertArgs& args)
 {
-	core::Path<char> interPath(pAnimInter);
-	core::Path<char> modelPath(pModel);
-	core::Path<char> destPath(pDest);
+	core::Path<wchar_t> interPath;
+	core::Path<wchar_t> modelPath;
+	core::Path<wchar_t> destPath;
+
+	{
+		{
+			const wchar_t* pInterPath = args.getOption(L"inter_anim");
+			if (pInterPath) {
+				interPath = pInterPath;
+			}
+			else {
+				X_ERROR("AnimLib", "Missing 'inter_anim' option");
+				return false;
+			}
+		}
+		{
+			const wchar_t* pModelPath = args.getOption(L"model");
+			if (pModelPath) {
+				modelPath = pModelPath;
+			}
+			else {
+				X_ERROR("AnimLib", "Missing 'model' option");
+				return false;
+			}
+		}
+		{
+			const wchar_t* pDest = args.getOption(L"dest");
+			if (pDest) {
+				destPath = pDest;
+			}
+			else {
+				X_ERROR("AnimLib", "Missing 'dest' option");
+				return false;
+			}
+		}
+	}
 
 	InterAnim inter(g_AnimLibArena);
 

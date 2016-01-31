@@ -11,6 +11,7 @@ public:
 	XModelLib();
 	~XModelLib() X_OVERRIDE;
 
+	bool Convert(ConvertArgs& args) X_OVERRIDE;
 
 
 private:
