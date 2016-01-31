@@ -98,8 +98,11 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 // defaults.
 #include <Memory\AllocationPolicies\MallocFreeAllocator.h>
 #include <Memory\BoundsCheckingPolicies\SimpleBoundsChecking.h>
+#include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
 #include <Memory\MemoryTaggingPolicies\SimpleMemoryTagging.h>
+#include <Memory\MemoryTaggingPolicies\NoMemoryTagging.h>
 #include <Memory\MemoryTrackingPolicies\SimpleMemoryTracking.h>
+#include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
 #include <Memory\ThreadPolicies\SingleThreadPolicy.h>
 
 
