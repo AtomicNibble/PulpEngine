@@ -315,6 +315,12 @@ TYPED_TEST(ArrayTest, Remove)
 	EXPECT_EQ(60, list.size());
 	EXPECT_EQ(128, list.capacity());
 
+	list.remove(20);
+	list.remove(40);
+
+	EXPECT_EQ(58, list.size());
+	EXPECT_EQ(128, list.capacity());
+
 	list.free();
 
 	EXPECT_EQ(0, list.size());
