@@ -2,6 +2,7 @@
 
 
 #include <IConverterModule.h>
+#include <String\CmdArgs.h>
 
 X_NAMESPACE_DECLARE(anim,
 struct 	IAnimLib
@@ -18,6 +19,7 @@ X_DECLARE_ENUM(AssetType)(ANIM, MODEL);
 class Converter
 {
 	typedef core::traits::Function<void *(ICore *pSystem, const char *moduleName)> ModuleLinkfunc;
+	typedef core::CmdArgs<4096, wchar_t> ConvertArgs;
 
 public:
 	Converter();
@@ -25,8 +27,7 @@ public:
 
 	void PrintBanner(void);
 
-	bool ConvertAnim(const char* pAnimInter,
-		const char* pModel, const char* pDest);
+	bool Convert(AssetType::Enum type, ConvertArgs& args);
 
 	// pre-load all libs.
 	bool LoadAllLibs(void);

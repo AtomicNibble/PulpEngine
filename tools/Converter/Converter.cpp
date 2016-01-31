@@ -29,14 +29,9 @@ void Converter::PrintBanner(void)
 }
 
 
-bool Converter::ConvertAnim(const char* pAnimInter,
-	const char* pModel, const char* pDest)
+bool Converter::Convert(AssetType::Enum type, ConvertArgs& args)
 {
-	if (!LoadAnimLib()) {
-		return false;
-	}
-
-	return libs_.pAnimLib->ConvertAnim(pAnimInter, pModel, pDest);
+	return false;
 }
 
 
