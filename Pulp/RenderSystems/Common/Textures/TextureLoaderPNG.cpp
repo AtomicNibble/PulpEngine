@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "TextureLoaderPNG.h"
 
-#include <String\StringUtil.h>
 #include <IFileSys.h>
 
 #include <Memory\MemCursor.h>

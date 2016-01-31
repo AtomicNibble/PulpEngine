@@ -4,7 +4,6 @@
 
 #include "IFileSys.h"
 
-#include <String\StringUtil.h>
 
 
 X_NAMESPACE_BEGIN(core)

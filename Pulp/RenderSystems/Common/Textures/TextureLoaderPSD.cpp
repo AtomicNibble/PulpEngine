@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "TextureLoaderPSD.h"
 
-#include <String\StringUtil.h>
 #include <Util\EndianUtil.h>
 #include <Util\ScopedPointer.h>
 #include <IFileSys.h>

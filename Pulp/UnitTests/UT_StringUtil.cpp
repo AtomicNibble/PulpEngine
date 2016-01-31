@@ -2,7 +2,6 @@
 
 
 
-#include <String\StringUtil.h>
 #include <String\StackString.h>
 #include <String\StringHash.h>
 

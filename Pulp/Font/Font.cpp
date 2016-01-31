@@ -10,7 +10,6 @@
 
 #include <Math\VertexFormats.h>
 
-// #include <String\StringUtil.h>
 
 X_NAMESPACE_BEGIN(font)
 

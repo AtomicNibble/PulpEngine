@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "TextureLoaderJPG.h"
 
-#include <String\StringUtil.h>
 #include <IFileSys.h>
 
 #include "jpeg-6b\jpeglib.h"

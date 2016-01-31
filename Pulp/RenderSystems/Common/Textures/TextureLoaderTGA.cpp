@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "TextureLoaderTGA.h"
 
-#include <String\StringUtil.h>
 #include <IFileSys.h>
 
 
