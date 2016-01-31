@@ -515,6 +515,7 @@ struct IFileSys
 
 	// Open Files
 	virtual XFile* openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_ABSTRACT;
+	virtual XFile* openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_ABSTRACT;
 	virtual void closeFile(XFile* file) X_ABSTRACT;
 
 	// async

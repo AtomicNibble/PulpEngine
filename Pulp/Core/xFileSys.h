@@ -96,6 +96,7 @@ public:
 
 	// Open / Close
 	XFile* openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;
+	XFile* openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;
 	void closeFile(XFile* file) X_FINAL;
 
 	// async

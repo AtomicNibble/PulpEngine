@@ -258,6 +258,67 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 	return file;
 }
 
+XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location)
+{
+	X_ASSERT_NOT_NULL(path);
+
+	XDiskFile* file = nullptr;
+	core::Path<wchar_t> real_path;
+
+	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE))
+	{
+		_wfinddatai64_t findinfo;
+
+		XFindData FindData(path, this);
+		if (FindData.findnext(&findinfo))
+		{
+			FindData.getOSPath(real_path, &findinfo);
+
+			if (isDebug()) {
+				X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
+			}
+
+			// TODO: pool allocations.
+			file = X_NEW(XDiskFile, &filePoolArena_, "DiskFile")(real_path.c_str(), mode);
+
+			if (!file->valid()) {
+				closeFile(file);
+				file = nullptr;
+			}
+		}
+		else
+		{
+			fileModeFlags::Description Dsc;
+			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s",
+				path, mode.ToString(Dsc));
+		}
+	}
+	else
+	{
+		// TODO: make createOSPath variation that takes a VirtualDirectory arg
+		if (location == VirtualDirectory::GAME) {
+			createOSPath(gameDir_, path, real_path);
+		}
+		else
+		{
+			X_ASSERT_NOT_IMPLEMENTED();
+		}
+
+		if (isDebug()) {
+			X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
+		}
+
+		file = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path.c_str(), mode);
+
+		if (!file->valid()) {
+			closeFile(file);
+			file = nullptr;
+		}
+	}
+
+	return file;
+}
+
 void xFileSys::closeFile(XFile* file)
 {
 	X_ASSERT_NOT_NULL(file);
