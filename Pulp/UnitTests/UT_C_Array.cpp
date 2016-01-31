@@ -15,30 +15,27 @@ X_USING_NAMESPACE;
 using namespace core;
 
 
-typedef core::MemoryArena<
-	core::LinearAllocator,
-	core::SingleThreadPolicy,
-	core::NoBoundsChecking,
-	core::NoMemoryTracking,
-	core::NoMemoryTagging
-> LinearArea;
+namespace 
+{
 
-typedef ::testing::Types<short, int> MyTypes;
-TYPED_TEST_CASE(ArrayTest, MyTypes);
-
-template <typename T>
-class ArrayTest : public ::testing::Test {
-public:
-};
-
-namespace {
-	X_ALIGNED_SYMBOL(struct CustomType, 32)
+	struct CustomType
 	{
-		CustomType() : var_(16) {
+		CustomType() 
+			: var_(16) 
+		{
 			CONSRUCTION_COUNT++;
 		}
-
+		CustomType(size_t val) 
+			: var_(val) 
+		{
+			CONSRUCTION_COUNT++;
+		}
 		CustomType(const CustomType& oth)
+			: var_(oth.var_)
+		{
+			++CONSRUCTION_COUNT;
+		}
+		CustomType(CustomType&& oth)
 			: var_(oth.var_)
 		{
 			++CONSRUCTION_COUNT;
@@ -48,20 +45,63 @@ namespace {
 			DECONSRUCTION_COUNT++;
 		}
 
-		inline int GetVar() const {
+
+		CustomType& operator=(const CustomType& val) {
+			var_ = val.var_;
+			return *this;
+		}
+		CustomType& operator=(size_t val) {
+			var_ = val;
+			return *this;
+		}
+
+		bool operator==(const CustomType& oth) const {
+			return var_ == oth.var_;
+		}
+		bool operator==(const size_t& oth) const {
+			return var_ == oth;
+		}
+
+		inline size_t GetVar(void) const {
 			return var_;
 		}
 	private:
-		int var_;
+		size_t var_;
 
 	public:
 		static int CONSRUCTION_COUNT;
 		static int DECONSRUCTION_COUNT;
 	};
 
+
+	X_INLINE bool operator==(const CustomType& a, const size_t& b) {
+		return a.GetVar() == b;
+	}
+	X_INLINE bool operator==(const size_t& a, const CustomType& b) {
+		return a == b.GetVar();
+	}
+
+
 	int CustomType::CONSRUCTION_COUNT = 0;
 	int CustomType::DECONSRUCTION_COUNT = 0;
 }
+
+typedef core::MemoryArena<
+	core::LinearAllocator,
+	core::SingleThreadPolicy,
+	core::NoBoundsChecking,
+	core::NoMemoryTracking,
+	core::NoMemoryTagging
+> LinearArea;
+
+typedef ::testing::Types<short, int, CustomType> MyTypes;
+TYPED_TEST_CASE(ArrayTest, MyTypes);
+
+template <typename T>
+class ArrayTest : public ::testing::Test {
+public:
+};
+
 
 
 TYPED_TEST(ArrayTest, Contruct)
@@ -97,17 +137,24 @@ TYPED_TEST(ArrayTest, Move)
 	const size_t bytes = (sizeof(TypeParam) * (100 + 64)) + (sizeof(Array<TypeParam>) * 2) + 
 		(sizeof(size_t) * 3); // Linear header block.
 
-	X_ALIGNED_SYMBOL(char buf[bytes], 8) = {};
-	LinearAllocator allocator(buf, buf + bytes);
+	CustomType::CONSRUCTION_COUNT = 0;
+	CustomType::DECONSRUCTION_COUNT = 0;
 
-	LinearArea arena(&allocator, "MoveAllocator");
+	{
+		X_ALIGNED_SYMBOL(char buf[bytes], 8) = {};
+		LinearAllocator allocator(buf, buf + bytes);
 
-	Array<Array<TypeParam>> list(&arena);
-	list.setGranularity(2);
-	list.reserve(2);
+		LinearArea arena(&allocator, "MoveAllocator");
 
-	list.push_back(Array<TypeParam>(&arena, 100, TypeParam()));
-	list.push_back(Array<TypeParam>(&arena, 64, TypeParam()));
+		Array<Array<TypeParam>> list(&arena);
+		list.setGranularity(2);
+		list.reserve(2);
+
+		list.push_back(Array<TypeParam>(&arena, 100, TypeParam()));
+		list.push_back(Array<TypeParam>(&arena, 64, TypeParam()));
+	}
+
+	EXPECT_EQ(CustomType::CONSRUCTION_COUNT, CustomType::DECONSRUCTION_COUNT);
 }
 
 TYPED_TEST(ArrayTest, Append)
@@ -301,6 +348,10 @@ TYPED_TEST(ArrayTest, Iterator)
 
 TYPED_TEST(ArrayTest, Serialize)
 {
+	if (!compileTime::IsPOD<TypeParam>::Value) {
+		return;
+	}
+
 	Array<TypeParam> list(g_arena);
 
 	EXPECT_EQ(0, list.size());
@@ -370,27 +421,4 @@ TYPED_TEST(ArrayTest, Serialize)
 	}
 }
 
-TYPED_TEST(ArrayTest, CustomType)
-{
-	CustomType val;
-
-	Array<CustomType> list(g_arena);
-
-	list.setGranularity(1024);
-	list.reserve(120);
-
-	EXPECT_EQ( 0, list.size());
-	ASSERT_EQ(1024, list.capacity());
-	EXPECT_EQ(1024, list.granularity());
-	EXPECT_NE(nullptr, list.ptr());
-
-	for (int i = 0; i < 110; i++)
-	{
-		list.append(val);
-	}
-
-	EXPECT_EQ(110, list.size());
-	EXPECT_EQ(1024, list.capacity());
-
-}
 
