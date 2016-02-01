@@ -48,51 +48,51 @@ namespace
 	struct TestClass
 	{
 		TestClass(void)
-			: m_calledFunction(false)
-			, m_calledConstFunction(false)
-			, m_value(0)
-			, m_constValue(0)
-			, m_floatValue(0.0f)
-			, m_constFloatValue(0.0f)
+			: calledFunction_(false)
+			, calledConstFunction_(false)
+			, value_(0)
+			, constValue_(0)
+			, floatValue_(0.0f)
+			, constFloatValue_(0.0f)
 		{
 		}
 
 		void Function(void)
 		{
-			m_calledFunction = true;
+			calledFunction_ = true;
 		}
 
 		void FunctionConst(void) const
 		{
-			m_calledConstFunction = true;
+			calledConstFunction_ = true;
 		}
 
 		void FunctionSingleArgument(int value)
 		{
-			m_value = value;
+			value = value;
 		}
 
 		void FunctionSingleArgumentConst(int value) const
 		{
-			m_constValue = value;
+			constValue_ = value;
 		}
 
 		void FunctionComplex(float value, int)
 		{
-			m_floatValue = value;
+			floatValue_ = value;
 		}
 
 		void FunctionComplexConst(float value, int) const
 		{
-			m_constFloatValue = value;
+			constFloatValue_ = value;
 		}
 
-		bool m_calledFunction;
-		mutable bool m_calledConstFunction;
-		int m_value;
-		mutable int m_constValue;
-		float m_floatValue;
-		mutable float m_constFloatValue;
+		bool calledFunction_;
+		mutable bool calledConstFunction_;
+		int value_;
+		mutable int constValue_;
+		float floatValue_;
+		mutable float constFloatValue_;
 	};
 } // namespace
 
@@ -162,9 +162,9 @@ TEST(Event, NoArg)
 		testEvent.Signal();
 
 		EXPECT_TRUE(g_calledFreeFunction);
-		EXPECT_TRUE(instance.m_calledFunction);
-		EXPECT_TRUE(instance.m_calledConstFunction);
-		EXPECT_TRUE(constInstance.m_calledConstFunction);
+		EXPECT_TRUE(instance.calledFunction_);
+		EXPECT_TRUE(instance.calledConstFunction_);
+		EXPECT_TRUE(constInstance.calledConstFunction_);
 
 		EXPECT_EQ(4, sink.GetListenerCount());
 		sink.RemoveListener<&FreeFunction>();
@@ -206,9 +206,9 @@ TEST(Event, SingleArg)
 		testEvent.Signal(5);
 
 		EXPECT_EQ(5, g_value);
-		EXPECT_EQ(5, instance.m_value);
-		EXPECT_EQ(5, instance.m_constValue);
-		EXPECT_EQ(5, constInstance.m_constValue);
+		EXPECT_EQ(5, instance.value_);
+		EXPECT_EQ(5, instance.constValue_);
+		EXPECT_EQ(5, constInstance.constValue_);
 
 		EXPECT_EQ(4, sink.GetListenerCount());
 		sink.RemoveListener<&FreeFunctionSingleArgument>();
@@ -248,9 +248,9 @@ TEST(Event, MultiArg)
 		testEvent.Signal(5.f, 10);
 
 		EXPECT_EQ(5, g_floatValue);
-		EXPECT_EQ(5, instance.m_floatValue);
-		EXPECT_EQ(5, instance.m_constFloatValue);
-		EXPECT_EQ(5, constInstance.m_constFloatValue);
+		EXPECT_EQ(5, instance.floatValue_);
+		EXPECT_EQ(5, instance.constFloatValue_);
+		EXPECT_EQ(5, constInstance.constFloatValue_);
 
 		EXPECT_EQ(4, sink.GetListenerCount());
 		sink.RemoveListener<&FreeFunctionComplex>();
