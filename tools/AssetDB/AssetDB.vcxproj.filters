@@ -9,10 +9,19 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="Header Files\AssetDB">
+      <UniqueIdentifier>{1ab3af32-254e-4d0a-9112-a0c5a80a303f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AssetDB">
+      <UniqueIdentifier>{e25271b1-d938-405b-9ae4-65a6fc120c52}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetDB.h">
+      <Filter>Header Files\AssetDB</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -23,6 +32,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AssetDB.cpp">
+      <Filter>Source Files\AssetDB</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetDBLib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

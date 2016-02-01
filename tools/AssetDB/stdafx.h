@@ -24,3 +24,5 @@ typedef core::MemoryArena<
 > AssetDBArena;
 
 extern AssetDBArena* g_AssetDBArena;
+
+#include "../SqLite/SqlLib.h"
