@@ -55,6 +55,9 @@ bool Converter::EnsureLibLoaded(AssetType::Enum type)
 {
 	// this needs to be more generic.
 	// might move to a single interface for all converter libs.
+	if (converters_[type]) {
+		return true;
+	}
 
 	if (type == AssetType::ANIM) {
 		return LoadAnimLib();
@@ -64,7 +67,7 @@ bool Converter::EnsureLibLoaded(AssetType::Enum type)
 	}
 
 	X_ASSERT_NOT_IMPLEMENTED();
-	return false;;
+	return false;
 }
 
 bool Converter::LoadAnimLib(void)
