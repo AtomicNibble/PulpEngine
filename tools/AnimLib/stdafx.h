@@ -22,6 +22,6 @@ typedef core::MemoryArena<
 	core::NoMemoryTracking,
 	core::NoMemoryTagging
 #endif // !X_DEBUG
-> AnimLibrena;
+> AnimLibArena;
 
-extern AnimLibrena* g_AnimLibArena;
+extern AnimLibArena* g_AnimLibArena;

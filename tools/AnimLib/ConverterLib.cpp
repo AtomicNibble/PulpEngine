@@ -15,7 +15,7 @@ namespace
 
 } // namespace
 
-AnimLibrena* g_AnimLibArena = nullptr;
+AnimLibArena* g_AnimLibArena = nullptr;
 
 
 
@@ -33,7 +33,7 @@ class XConverterLib_Anim : public IConverterModule
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pArena);
 
-		g_AnimLibArena = X_NEW(AnimLibrena, gEnv->pArena, "AnimLibArena")(&g_AnimLibAlloc, "AnimLibArena");
+		g_AnimLibArena = X_NEW(AnimLibArena, gEnv->pArena, "AnimLibArena")(&g_AnimLibAlloc, "AnimLibArena");
 
 		libs.pAnimLib = X_NEW(anim::XAnimLib, g_AnimLibArena, "AnimLib")();
 
