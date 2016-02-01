@@ -21,11 +21,21 @@ AssetDB::~AssetDB()
 
 bool AssetDB::OpenDB(void)
 {
-	if (sqlite3_open(DB_NAME, &db_) == SQLITE_OK) {
-		return true;
+	int ret = 0;
+
+	if (SQLITE_OK != (ret = sqlite3_initialize()))
+	{
+		X_ERROR("AseetDB", "Failed to initialize library: %d", ret);
+		return false;
 	}
 
-	X_ERROR("AseetDB", "Failed to open db");
+	// open connection to a DB
+	if (SQLITE_OK != (ret = sqlite3_open_v2(DB_NAME, &db_, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, NULL)))
+	{
+		X_ERROR("AseetDB", "Failed to open conn: %d", ret);
+		return false;
+	}
+
 	return true;
 }
 
@@ -33,6 +43,8 @@ void AssetDB::CloseDB(void)
 {
 	if (IsDbOpen()) {
 		sqlite3_close(db_);
+
+		sqlite3_shutdown();
 	}
 
 	db_ = nullptr;
