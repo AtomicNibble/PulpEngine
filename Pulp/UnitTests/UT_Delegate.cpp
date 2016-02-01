@@ -9,6 +9,7 @@ X_USING_NAMESPACE;
 namespace
 {
 	typedef core::Delegate<void(void)> NoArgumentDelegate;
+	typedef core::Delegate<int(void)> ReturnValueDelegate;
 	typedef core::Delegate<void(int)> SingleArgumentDelegate;
 	typedef core::Delegate<int(float, int)> ComplexDelegate;
 
@@ -65,7 +66,7 @@ namespace
 
 		void FunctionSingleArgument(int value)
 		{
-			value = value;
+			value_ = value;
 		}
 
 		void FunctionSingleArgumentConst(int value) const
@@ -196,7 +197,7 @@ TEST(Delegate, ComplexArgMember)
 	complexgDel.Bind<TestClass, &TestClass::FunctionComplex>(&instance);
 
 	EXPECT_EQ(24, complexgDel.Invoke(16.f, 8));
-	EXPECT_EQ(8, instance.value_);
+	EXPECT_FLOAT_EQ(16.f, instance.floatValue_);
 }
 
 TEST(Delegate, ComplexMemberConst)
@@ -209,13 +210,13 @@ TEST(Delegate, ComplexMemberConst)
 		complexgDel.Bind<TestClass, &TestClass::FunctionComplexConst>(&instance);
 	
 		EXPECT_EQ(24,complexgDel.Invoke(32.f, 16));
-		EXPECT_EQ(16, instance.constValue_);
+		EXPECT_FLOAT_EQ(32.f, instance.constFloatValue_);
 	}
 	{
 		ComplexDelegate complexgDel;
 		complexgDel.Bind<TestClass, &TestClass::FunctionComplexConst>(&instanceConst);
 		
 		EXPECT_EQ(24, complexgDel.Invoke(64.f, 32));
-		EXPECT_EQ(32, instanceConst.constValue_);
+		EXPECT_FLOAT_EQ(64.f, instanceConst.constFloatValue_);
 	}
 }

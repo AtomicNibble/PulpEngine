@@ -69,7 +69,7 @@ namespace
 
 		void FunctionSingleArgument(int value)
 		{
-			value = value;
+			value_ = value;
 		}
 
 		void FunctionSingleArgumentConst(int value) const
