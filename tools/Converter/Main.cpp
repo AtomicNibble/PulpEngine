@@ -84,11 +84,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 				if (core::strUtil::IsEqualCaseInsen(pAssetType, L"model"))
 				{
-					res = con.Convert(converter::AssetType::MODEL, args);
+					res = con.Convert(converter::AssetType::Model, args);
 				}
 				else if (core::strUtil::IsEqualCaseInsen(pAssetType, L"anim"))
 				{
-					res = con.Convert(converter::AssetType::ANIM, args);
+					res = con.Convert(converter::AssetType::Anim, args);
 				}
 				else
 				{

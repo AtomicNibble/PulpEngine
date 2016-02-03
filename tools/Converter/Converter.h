@@ -14,7 +14,7 @@ struct IModelLib
 
 X_NAMESPACE_BEGIN(converter)
 
-X_DECLARE_ENUM(AssetType)(ANIM, MODEL);
+X_DECLARE_ENUM(AssetType)(Anim, Model);
 
 class Converter
 {
@@ -34,16 +34,12 @@ private:
 	IConverter* GetConverter(AssetType::Enum type);
 	bool EnsureLibLoaded(AssetType::Enum type);
 
-	bool LoadAnimLib(void);
-	bool LoadModelLib(void);
-
 	void* LoadDLL(const char* dllName);
-	bool IntializeConverterModule(const char* dllName, const char* moduleClassName);
+	bool IntializeConverterModule(AssetType::Enum assType);
+	bool IntializeConverterModule(AssetType::Enum assType, const char* dllName, const char* moduleClassName);
 
 private:
 	IConverter* converters_[AssetType::ENUM_COUNT];
-
-	ConverterLibs libs_;
 };
 
 

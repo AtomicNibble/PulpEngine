@@ -59,49 +59,26 @@ bool Converter::EnsureLibLoaded(AssetType::Enum type)
 		return true;
 	}
 
-	if (type == AssetType::ANIM) {
-		return LoadAnimLib();
-	}
-	if (type == AssetType::MODEL) {
-		return LoadModelLib();
-	}
 
-	X_ASSERT_NOT_IMPLEMENTED();
-	return false;
+	return IntializeConverterModule(type);
 }
 
-bool Converter::LoadAnimLib(void)
+
+bool Converter::IntializeConverterModule(AssetType::Enum assType)
 {
-	if (libs_.pAnimLib) {
-		return true;
-	}
+	const char* pAssTypeStr = AssetType::ToString(assType);
 
-	if (!IntializeConverterModule("Engine_AnimLib", "Engine_AnimLib")) {
-		return false;
-	}
+	core::StackString<64> dllName("Engine_");
+	dllName.append(pAssTypeStr);
+	dllName.append("Lib");
 
-	converters_[AssetType::ANIM] = libs_.pAnimLib;
-	return true;
+	core::StackString<64> className(dllName);
+
+	return IntializeConverterModule(assType, dllName.c_str(), className.c_str());
 }
 
-bool Converter::LoadModelLib(void)
+bool Converter::IntializeConverterModule(AssetType::Enum assType, const char* dllName, const char* moduleClassName)
 {
-	if (libs_.pModelLib) {
-		return true;
-	}
-
-	if (!IntializeConverterModule("Engine_ModelLib", "Engine_ModelLib")) {
-		return false;
-	}
-
-	converters_[AssetType::MODEL] = libs_.pModelLib;
-	return true;
-}
-
-bool Converter::IntializeConverterModule(const char* dllName, const char* moduleClassName)
-{
-	bool res = false;
-
 	core::Path<char> path(dllName);
 
 	path.setExtension(".dll");
@@ -121,7 +98,7 @@ bool Converter::IntializeConverterModule(const char* dllName, const char* module
 	std::shared_ptr<IConverterModule> pModule;
 	if (PotatoCreateClassInstance(moduleClassName, pModule))
 	{
-		res = pModule->Initialize(libs_);
+		converters_[assType] = pModule->Initialize();
 	}
 	else
 	{
@@ -129,7 +106,7 @@ bool Converter::IntializeConverterModule(const char* dllName, const char* module
 		return false;
 	}
 
-	return res;
+	return converters_[assType] != nullptr;
 }
 
 void* Converter::LoadDLL(const char* dllName)
