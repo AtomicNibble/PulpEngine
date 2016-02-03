@@ -150,7 +150,7 @@ int SqlLiteStateMnt::prepare(const char* pStmt)
 
 int SqlLiteStateMnt::prepare_impl(const char* pStmt)
 {
-	return sqlite3_prepare(db_.db_, pStmt, std::strlen(pStmt), &stmt_, &tail_);
+	return sqlite3_prepare(db_.db_, pStmt, safe_static_cast<int32,size_t>(std::strlen(pStmt)), &stmt_, &tail_);
 }
 
 int SqlLiteStateMnt::finish(void)
@@ -197,7 +197,7 @@ int SqlLiteStateMnt::bind(int idx, long long int value)
 
 int SqlLiteStateMnt::bind(int idx, const char* value, CopySemantic::Enum  fcopy)
 {
-	return sqlite3_bind_text(stmt_, idx, value, std::strlen(value), fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC);
+	return sqlite3_bind_text(stmt_, idx, value, safe_static_cast<int32, size_t>(std::strlen(value)), fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC);
 }
 
 int SqlLiteStateMnt::bind(int idx, void const* value, int n, CopySemantic::Enum  fcopy)
@@ -207,7 +207,7 @@ int SqlLiteStateMnt::bind(int idx, void const* value, int n, CopySemantic::Enum 
 
 int SqlLiteStateMnt::bind(int idx, std::string const& value, CopySemantic::Enum  fcopy)
 {
-	return sqlite3_bind_text(stmt_, idx, value.c_str(), value.size(), fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC);
+	return sqlite3_bind_text(stmt_, idx, value.c_str(), safe_static_cast<int32, size_t>(value.size()), fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC);
 }
 
 int SqlLiteStateMnt::bind(int idx)
