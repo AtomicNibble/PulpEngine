@@ -366,7 +366,7 @@ char const* SqlLiteQuery::rows::get(int idx, char const*) const
 
 std::string SqlLiteQuery::rows::get(int idx, std::string) const
 {
-	return get(idx, (char const*)0);
+	return get(idx, reinterpret_cast<const char*>(0));
 }
 
 void const* SqlLiteQuery::rows::get(int idx, void const*) const
