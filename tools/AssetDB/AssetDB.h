@@ -1,8 +1,8 @@
 #pragma once
 
 
-
 X_NAMESPACE_BEGIN(assetDb)
+
 
 
 class AssetDB
@@ -17,12 +17,11 @@ public:
 	void CloseDB(void);
 
 private:
-	bool IsDbOpen(void) const;
-	
+
 	bool CreateTables(void);
 
 private:
-	sqlite3* db_;
+	sql::SqlLiteCpp db_;
 };
 
 X_NAMESPACE_END
