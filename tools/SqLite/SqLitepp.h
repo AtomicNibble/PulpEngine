@@ -39,8 +39,8 @@ public:
 	int errorCode(void) const;
 	const char* errorMsg(void) const;
 
-	int execute(const char* sql);
-	int executef(const char* sql, ...);
+	bool execute(const char* sql);
+	bool executeFmt(const char* sql, ...);
 
 private:
 	sqlite3* db_;

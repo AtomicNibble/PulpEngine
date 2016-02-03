@@ -99,12 +99,18 @@ const char* SqlLiteDb::errorMsg(void) const
 }
 
 
-int SqlLiteDb::execute(const char* sql)
+bool SqlLiteDb::execute(const char* sql)
 {	
-	return sqlite3_exec(db_, sql, 0, 0, 0);
+	int res = sqlite3_exec(db_, sql, 0, 0, 0);
+	if (res == SQLITE_OK) {
+		return true;
+	}
+
+	X_ERROR("SqlDb", "execue failed for \"%s\" err(%i): %s", sql, res, errorMsg());
+	return false;
 }
 
-int SqlLiteDb::executef(const char* sql, ...)
+bool SqlLiteDb::executeFmt(const char* sql, ...)
 {
 	va_list ap;
 	va_start(ap, sql);
