@@ -19,6 +19,7 @@ public:
 private:
 
 	bool CreateTables(void);
+	bool DropTables(void);
 
 private:
 	sql::SqlLiteDb db_;
