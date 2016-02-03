@@ -9,30 +9,30 @@
 X_NAMESPACE_BEGIN(sql)
 
 
-SqlLiteCpp::SqlLiteCpp()
+SqlLiteDb::SqlLiteDb()
 {
 
 }
 
-SqlLiteCpp::~SqlLiteCpp()
+SqlLiteDb::~SqlLiteDb()
 {
 
 }
 
-bool SqlLiteCpp::connect(const char* pDb)
+bool SqlLiteDb::connect(const char* pDb)
 {
 	X_ASSERT_NOT_NULL(pDb);
 
 	int ret;
 
 	if (!disconnect()) {
-		X_ERROR("SqlLiteCpp", "Failed to disconeect beofre conencting to new db: \"%s\"", pDb);
+		X_ERROR("SqlLiteDb", "Failed to disconeect beofre conencting to new db: \"%s\"", pDb);
 		return false;
 	}
 
 	if (SQLITE_OK != (ret = sqlite3_initialize()))
 	{
-		X_ERROR("SqlLiteCpp", "Failed to initialize library: %d", ret);
+		X_ERROR("SqlLiteDb", "Failed to initialize library: %d", ret);
 		return false;
 	}
 
@@ -40,24 +40,24 @@ bool SqlLiteCpp::connect(const char* pDb)
 	if (SQLITE_OK != (ret = sqlite3_open_v2(pDb, &db_,
 		SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr)))
 	{
-		X_ERROR("SqlLiteCpp", "Failed to open conn: %d", ret);
+		X_ERROR("SqlLiteDb", "Failed to open conn: %d", ret);
 		return false;
 	}
 
 	return false;
 }
 
-bool SqlLiteCpp::disconnect(void)
+bool SqlLiteDb::disconnect(void)
 {
 	if (db_) 
 	{
 		int ret, ret2;
 		if (SQLITE_OK != (ret = sqlite3_close(db_))) {
-			X_ERROR("SqlLiteCpp", "Failed to close db");
+			X_ERROR("SqlLiteDb", "Failed to close db");
 		}
 
 		if(SQLITE_OK != (ret2 = sqlite3_shutdown())) {
-			X_ERROR("SqlLiteCpp", "Failed to shutdown sqLite");
+			X_ERROR("SqlLiteDb", "Failed to shutdown sqLite");
 		}
 
 		return ret == SQLITE_OK && ret2 == SQLITE_OK;
@@ -65,23 +65,23 @@ bool SqlLiteCpp::disconnect(void)
 	return true;
 }
 
-int SqlLiteCpp::errorCode(void) const
+int SqlLiteDb::errorCode(void) const
 {
 	return sqlite3_errcode(db_);
 }
 
-char const* SqlLiteCpp::errorMsg(void) const
+char const* SqlLiteDb::errorMsg(void) const
 {
 	return sqlite3_errmsg(db_);
 }
 
 
-int SqlLiteCpp::execute(char const* sql)
+int SqlLiteDb::execute(char const* sql)
 {	
 	return sqlite3_exec(db_, sql, 0, 0, 0);
 }
 
-int SqlLiteCpp::executef(char const* sql, ...)
+int SqlLiteDb::executef(char const* sql, ...)
 {
 	va_list ap;
 	va_start(ap, sql);

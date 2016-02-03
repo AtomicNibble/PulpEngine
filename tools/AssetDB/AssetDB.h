@@ -21,7 +21,7 @@ private:
 	bool CreateTables(void);
 
 private:
-	sql::SqlLiteCpp db_;
+	sql::SqlLiteDb db_;
 };
 
 X_NAMESPACE_END

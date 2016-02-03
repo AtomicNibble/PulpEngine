@@ -5,14 +5,14 @@ struct sqlite3;
 
 X_NAMESPACE_BEGIN(sql)
 
-class DLL_EXPORT SqlLiteCpp
+class DLL_EXPORT SqlLiteDb
 {
-	X_NO_COPY(SqlLiteCpp);
-	X_NO_ASSIGN(SqlLiteCpp);
+	X_NO_COPY(SqlLiteDb);
+	X_NO_ASSIGN(SqlLiteDb);
 
 public:
-	SqlLiteCpp();
-	~SqlLiteCpp();
+	SqlLiteDb();
+	~SqlLiteDb();
 
 	bool connect(const char* pDb);
 	bool disconnect(void);
