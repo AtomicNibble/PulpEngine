@@ -1,0 +1,32 @@
+#pragma once
+
+
+struct sqlite3;
+
+X_NAMESPACE_BEGIN(sql)
+
+class DLL_EXPORT SqlLiteCpp
+{
+	X_NO_COPY(SqlLiteCpp);
+	X_NO_ASSIGN(SqlLiteCpp);
+
+public:
+	SqlLiteCpp();
+	~SqlLiteCpp();
+
+	bool connect(const char* pDb);
+	bool disconnect(void);
+
+
+	int errorCode(void) const;
+	char const* errorMsg(void) const;
+
+	int execute(char const* sql);
+	int executef(char const* sql, ...);
+
+private:
+	sqlite3* db_;
+};
+
+
+X_NAMESPACE_END

@@ -21,12 +21,18 @@
     <ClInclude Include="SqlLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SqLitepp.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\3rdparty\source\sqlite-3.10.1\sqlite3.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SqLitepp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

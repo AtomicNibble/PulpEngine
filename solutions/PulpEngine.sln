@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "..\Pulp\Common\Common.vcxproj", "{07328CCB-F9CC-4967-861E-272BCA0CAB04}"
 EndProject
@@ -111,6 +111,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Converter", "..\tools\Conve
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SqLite", "..\tools\SqLite\SqLite.vcxproj", "{EADF2725-1E5E-40D3-A375-2DA5F02E5C33}"
+	ProjectSection(ProjectDependencies) = postProject
+		{07328CCB-F9CC-4967-861E-272BCA0CAB04} = {07328CCB-F9CC-4967-861E-272BCA0CAB04}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libs", "Libs", "{82394A53-778F-4F3C-845C-BA3940464D74}"
 EndProject

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "AssetDB.h"
 
-
+X_LINK_LIB("engine_SqLite")
 
 X_NAMESPACE_BEGIN(assetDb)
 
@@ -21,8 +21,12 @@ AssetDB::~AssetDB()
 
 bool AssetDB::OpenDB(void)
 {
-	int ret = 0;
+	sql::SqlLiteCpp db;
 
+	return db.connect(DB_NAME);
+
+	/*int ret = 0;
+	
 	if (SQLITE_OK != (ret = sqlite3_initialize()))
 	{
 		X_ERROR("AseetDB", "Failed to initialize library: %d", ret);
@@ -36,15 +40,15 @@ bool AssetDB::OpenDB(void)
 		return false;
 	}
 
-	return true;
+	return true; */
 }
 
 void AssetDB::CloseDB(void)
 {
 	if (IsDbOpen()) {
-		sqlite3_close(db_);
+	//	sqlite3_close(db_);
 
-		sqlite3_shutdown();
+//		sqlite3_shutdown();
 	}
 
 	db_ = nullptr;
