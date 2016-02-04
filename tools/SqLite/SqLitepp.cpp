@@ -124,8 +124,8 @@ bool SqlLiteDb::executeFmt(const char* sql, ...)
 
 SqlLiteStateMnt::SqlLiteStateMnt(SqlLiteDb& db, const char* pStmt) : 
 	db_(db), 
-	stmt_(0), 
-	tail_(0)
+	pStmt_(nullptr), 
+	pTail_(nullptr)
 {
 	if (pStmt) {
 		auto rc = prepare(pStmt);
@@ -156,18 +156,18 @@ int SqlLiteStateMnt::prepare(const char* pStmt)
 
 int SqlLiteStateMnt::prepare_impl(const char* pStmt)
 {
-	return sqlite3_prepare_v2(db_.db_, pStmt, safe_static_cast<int32,size_t>(std::strlen(pStmt)), &stmt_, &tail_);
+	return sqlite3_prepare_v2(db_.db_, pStmt, safe_static_cast<int32,size_t>(std::strlen(pStmt)), &pStmt_, &pTail_);
 }
 
 int SqlLiteStateMnt::finish(void)
 {
 	auto rc = SQLITE_OK;
-	if (stmt_) {
-		rc = finish_impl(stmt_);
-		stmt_ = nullptr;
+	if (pStmt_) {
+		rc = finish_impl(pStmt_);
+		pStmt_ = nullptr;
 	}
 
-	tail_ = nullptr;
+	pTail_ = nullptr;
 	return rc;
 }
 
@@ -178,88 +178,88 @@ int SqlLiteStateMnt::finish_impl(sqlite3_stmt* pStmt)
 
 int SqlLiteStateMnt::step(void)
 {
-	return sqlite3_step(stmt_);
+	return sqlite3_step(pStmt_);
 }
 
 int SqlLiteStateMnt::reset(void)
 {
-	return sqlite3_reset(stmt_);
+	return sqlite3_reset(pStmt_);
 }
 
 int SqlLiteStateMnt::bind(int idx, int value)
 {
-	return sqlite3_bind_int(stmt_, idx, value);
+	return sqlite3_bind_int(pStmt_, idx, value);
 }
 
 int SqlLiteStateMnt::bind(int idx, double value)
 {
-	return sqlite3_bind_double(stmt_, idx, value);
+	return sqlite3_bind_double(pStmt_, idx, value);
 }
 
 int SqlLiteStateMnt::bind(int idx, long long int value)
 {
-	return sqlite3_bind_int64(stmt_, idx, value);
+	return sqlite3_bind_int64(pStmt_, idx, value);
 }
 
 int SqlLiteStateMnt::bind(int idx, const char* value, CopySemantic::Enum  fcopy)
 {
-	return sqlite3_bind_text(stmt_, idx, value, safe_static_cast<int32, size_t>(std::strlen(value)), fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC);
+	return sqlite3_bind_text(pStmt_, idx, value, safe_static_cast<int32, size_t>(std::strlen(value)), fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC);
 }
 
 int SqlLiteStateMnt::bind(int idx, void const* value, int n, CopySemantic::Enum  fcopy)
 {
-	return sqlite3_bind_blob(stmt_, idx, value, n, fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC);
+	return sqlite3_bind_blob(pStmt_, idx, value, n, fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC);
 }
 
 int SqlLiteStateMnt::bind(int idx, std::string const& value, CopySemantic::Enum  fcopy)
 {
-	return sqlite3_bind_text(stmt_, idx, value.c_str(), safe_static_cast<int32, size_t>(value.size()), fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC);
+	return sqlite3_bind_text(pStmt_, idx, value.c_str(), safe_static_cast<int32, size_t>(value.size()), fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC);
 }
 
 int SqlLiteStateMnt::bind(int idx)
 {
-	return sqlite3_bind_null(stmt_, idx);
+	return sqlite3_bind_null(pStmt_, idx);
 }
 
 int SqlLiteStateMnt::bind(const char* pName, int value)
 {
-	auto idx = sqlite3_bind_parameter_index(stmt_, pName);
+	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
 	return bind(idx, value);
 }
 
 int SqlLiteStateMnt::bind(const char* pName, double value)
 {
-	auto idx = sqlite3_bind_parameter_index(stmt_, pName);
+	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
 	return bind(idx, value);
 }
 
 int SqlLiteStateMnt::bind(const char* pName, long long int value)
 {
-	auto idx = sqlite3_bind_parameter_index(stmt_, pName);
+	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
 	return bind(idx, value);
 }
 
 int SqlLiteStateMnt::bind(const char* pName, const char* value, CopySemantic::Enum  fcopy)
 {
-	auto idx = sqlite3_bind_parameter_index(stmt_, pName);
+	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
 	return bind(idx, value, fcopy);
 }
 
 int SqlLiteStateMnt::bind(const char* pName, void const* value, int n, CopySemantic::Enum  fcopy)
 {
-	auto idx = sqlite3_bind_parameter_index(stmt_, pName);
+	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
 	return bind(idx, value, n, fcopy);
 }
 
 int SqlLiteStateMnt::bind(const char* pName, std::string const& value, CopySemantic::Enum  fcopy)
 {
-	auto idx = sqlite3_bind_parameter_index(stmt_, pName);
+	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
 	return bind(idx, value, fcopy);
 }
 
 int SqlLiteStateMnt::bind(const char* pName)
 {
-	auto idx = sqlite3_bind_parameter_index(stmt_, pName);
+	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
 	return bind(idx);
 }
 
@@ -300,17 +300,17 @@ int SqlLiteCmd::executeAll(void)
 		return rc;
 	}
 
-	char const* sql = tail_;
+	char const* sql = pTail_;
 
 	while (std::strlen(sql) > 0) // sqlite3_complete() is broken.
 	{
-		sqlite3_stmt* old_stmt = stmt_;
+		sqlite3_stmt* old_stmt = pStmt_;
 
 		if ((rc = prepare_impl(sql)) != SQLITE_OK) {
 			return rc;
 		}
 
-		if ((rc = sqlite3_transfer_bindings(old_stmt, stmt_)) != SQLITE_OK) {
+		if ((rc = sqlite3_transfer_bindings(old_stmt, pStmt_)) != SQLITE_OK) {
 			return rc;
 		}
 
@@ -320,7 +320,7 @@ int SqlLiteCmd::executeAll(void)
 			return rc;
 		}
 
-		sql = tail_;
+		sql = pTail_;
 	}
 
 	return rc;
@@ -392,14 +392,14 @@ SqlLiteQuery::rows::getstream SqlLiteQuery::rows::getter(int idx)
 	return getstream(this, idx);
 }
 
-SqlLiteQuery::query_iterator::query_iterator() : cmd_(0)
+SqlLiteQuery::query_iterator::query_iterator() : pCmd_(0)
 {
 	rc_ = SQLITE_DONE;
 }
 
-SqlLiteQuery::query_iterator::query_iterator(SqlLiteQuery* cmd) : cmd_(cmd)
+SqlLiteQuery::query_iterator::query_iterator(SqlLiteQuery* cmd) : pCmd_(cmd)
 {
-	rc_ = cmd_->step();
+	rc_ = pCmd_->step();
 	if (rc_ != SQLITE_ROW && rc_ != SQLITE_DONE) {
 		X_ERROR("SqlDb", "query step err(%i)", rc_);
 	}
@@ -417,7 +417,7 @@ bool SqlLiteQuery::query_iterator::operator!=(SqlLiteQuery::query_iterator const
 
 SqlLiteQuery::query_iterator& SqlLiteQuery::query_iterator::operator++()
 {
-	rc_ = cmd_->step();
+	rc_ = pCmd_->step();
 	if (rc_ != SQLITE_ROW && rc_ != SQLITE_DONE) {
 		X_ERROR("SqlDb", "query step err(%i)", rc_);
 	}
@@ -426,7 +426,7 @@ SqlLiteQuery::query_iterator& SqlLiteQuery::query_iterator::operator++()
 
 SqlLiteQuery::query_iterator::value_type SqlLiteQuery::query_iterator::operator*() const
 {
-	return rows(cmd_->stmt_);
+	return rows(pCmd_->pStmt_);
 }
 
 
@@ -437,17 +437,17 @@ SqlLiteQuery::SqlLiteQuery(SqlLiteDb& db, char const* stmt) :
 
 int SqlLiteQuery::columnCount(void) const
 {
-	return sqlite3_column_count(stmt_);
+	return sqlite3_column_count(pStmt_);
 }
 
 char const* SqlLiteQuery::columnName(int idx) const
 {
-	return sqlite3_column_name(stmt_, idx);
+	return sqlite3_column_name(pStmt_, idx);
 }
 
 char const* SqlLiteQuery::columnDecltype(int idx) const
 {
-	return sqlite3_column_decltype(stmt_, idx);
+	return sqlite3_column_decltype(pStmt_, idx);
 }
 
 

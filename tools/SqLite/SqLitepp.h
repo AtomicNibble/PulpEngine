@@ -88,8 +88,8 @@ public:
 
 protected:
 	SqlLiteDb& db_;
-	sqlite3_stmt* stmt_;
-	const char* tail_;
+	sqlite3_stmt* pStmt_;
+	const char* pTail_;
 };
 
 class DLL_EXPORT SqlLiteCmd : public SqlLiteStateMnt
@@ -196,7 +196,7 @@ public:
 		value_type operator*() const;
 
 	private:
-		SqlLiteQuery* cmd_;
+		SqlLiteQuery* pCmd_;
 		int rc_;
 	};
 
