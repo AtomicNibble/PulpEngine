@@ -129,12 +129,18 @@ SqlLiteStateMnt::SqlLiteStateMnt(SqlLiteDb& db, const char* pStmt) :
 {
 	if (pStmt) {
 		auto rc = prepare(pStmt);
-
+		if (rc != SQLITE_OK) {
+			X_ERROR("SqlDb", "statement prepare failed for \"%s\" err(%i)", pStmt, rc);
+		}
 	}
 }
 
 SqlLiteStateMnt::~SqlLiteStateMnt()
 {
+	auto rc = finish();
+	if (rc != SQLITE_OK) {
+		X_ERROR("SqlDb", "statement finish failed err(%i)", rc);
+	}
 }
 
 int SqlLiteStateMnt::prepare(const char* pStmt)
@@ -395,7 +401,7 @@ SqlLiteQuery::query_iterator::query_iterator(SqlLiteQuery* cmd) : cmd_(cmd)
 {
 	rc_ = cmd_->step();
 	if (rc_ != SQLITE_ROW && rc_ != SQLITE_DONE) {
-		
+		X_ERROR("SqlDb", "query step err(%i)", rc_);
 	}
 }
 
@@ -413,7 +419,7 @@ SqlLiteQuery::query_iterator& SqlLiteQuery::query_iterator::operator++()
 {
 	rc_ = cmd_->step();
 	if (rc_ != SQLITE_ROW && rc_ != SQLITE_DONE) {
-
+		X_ERROR("SqlDb", "query step err(%i)", rc_);
 	}
 	return *this;
 }
@@ -469,7 +475,7 @@ SqlLiteTransaction::~SqlLiteTransaction()
 	if (pDb_) {
 		auto rc = pDb_->execute(fcommit_ ? "COMMIT" : "ROLLBACK");
 		if (rc != SQLITE_OK) {
-			
+			X_ERROR("SqlDb", "transaction err(%i)", rc);
 		}
 	}
 }
