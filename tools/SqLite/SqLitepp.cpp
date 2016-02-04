@@ -52,7 +52,7 @@ bool SqlLiteDb::disconnect(void)
 	if (db_) 
 	{
 		int ret, ret2;
-		if (SQLITE_OK != (ret = sqlite3_close(db_))) {
+		if (SQLITE_OK != (ret = sqlite3_close_v2(db_))) {
 			X_ERROR("SqlLiteDb", "Failed to close db");
 		}
 
@@ -150,7 +150,7 @@ int SqlLiteStateMnt::prepare(const char* pStmt)
 
 int SqlLiteStateMnt::prepare_impl(const char* pStmt)
 {
-	return sqlite3_prepare(db_.db_, pStmt, safe_static_cast<int32,size_t>(std::strlen(pStmt)), &stmt_, &tail_);
+	return sqlite3_prepare_v2(db_.db_, pStmt, safe_static_cast<int32,size_t>(std::strlen(pStmt)), &stmt_, &tail_);
 }
 
 int SqlLiteStateMnt::finish(void)
