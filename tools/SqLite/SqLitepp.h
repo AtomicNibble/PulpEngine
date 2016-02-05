@@ -128,7 +128,7 @@ public:
 
 
 
-class SqlLiteQuery : public SqlLiteStateMnt
+class DLL_EXPORT SqlLiteQuery : public SqlLiteStateMnt
 {
 public:
 	class rows
