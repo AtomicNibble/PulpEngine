@@ -13,6 +13,9 @@ struct convert {
 	using to_int = int;
 };
 
+class null_type {};
+extern null_type ignore;
+
 class DLL_EXPORT SqlLiteDb
 {
 	X_NO_COPY(SqlLiteDb);
@@ -73,18 +76,20 @@ public:
 	int bind(int idx, int value);
 	int bind(int idx, double value);
 	int bind(int idx, long long int value);
-	int bind(int idx, const char* value, CopySemantic::Enum fcopy);
-	int bind(int idx, void const* value, int n, CopySemantic::Enum fcopy);
-	int bind(int idx, std::string const& value, CopySemantic::Enum fcopy);
+	int bind(int idx, const char* value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+	int bind(int idx, void const* value, int n, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+	int bind(int idx, std::string const& value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
 	int bind(int idx);
+	int bind(int idx, null_type);
 
 	int bind(const char* pName, int value);
 	int bind(const char* pName, double value);
 	int bind(const char* pName, long long int value);
-	int bind(const char* pName, const char* value, CopySemantic::Enum fcopy);
-	int bind(const char* pName, void const* value, int n, CopySemantic::Enum fcopy);
-	int bind(const char* pName, std::string const& value, CopySemantic::Enum fcopy);
+	int bind(const char* pName, const char* value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+	int bind(const char* pName, void const* value, int n, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+	int bind(const char* pName, std::string const& value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
 	int bind(const char* pName);
+	int bind(const char* pName, null_type);
 
 protected:
 	SqlLiteDb& db_;
@@ -95,7 +100,7 @@ protected:
 class DLL_EXPORT SqlLiteCmd : public SqlLiteStateMnt
 {
 public:
-	class BindStream
+	class DLL_EXPORT BindStream
 	{
 	public:
 		BindStream(SqlLiteCmd& cmd, int idx);
@@ -131,10 +136,10 @@ public:
 class DLL_EXPORT SqlLiteQuery : public SqlLiteStateMnt
 {
 public:
-	class rows
+	class DLL_EXPORT rows
 	{
 	public:
-		class getstream
+		class DLL_EXPORT getstream
 		{
 		public:
 			getstream(rows* rws, int idx);
@@ -173,15 +178,16 @@ public:
 		int get(int idx, int) const;
 		double get(int idx, double) const;
 		long long int get(int idx, long long int) const;
-		char const* get(int idx, char const*) const;
+		const char* get(int idx, const char*) const;
 		std::string get(int idx, std::string) const;
 		void const* get(int idx, void const*) const;
+		null_type get(int idx, null_type) const;
 
 	private:
 		sqlite3_stmt* pStmt_;
 	};
 
-	class query_iterator
+	class DLL_EXPORT query_iterator
 		: public std::iterator<std::input_iterator_tag, rows>
 	{
 	public:

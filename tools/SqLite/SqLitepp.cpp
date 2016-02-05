@@ -9,7 +9,8 @@
 X_NAMESPACE_BEGIN(sql)
 
 
-SqlLiteDb::SqlLiteDb()
+SqlLiteDb::SqlLiteDb() :
+	db_(nullptr)
 {
 
 }
@@ -221,6 +222,11 @@ int SqlLiteStateMnt::bind(int idx)
 	return sqlite3_bind_null(pStmt_, idx);
 }
 
+int SqlLiteStateMnt::bind(int idx, null_type)
+{
+	return bind(idx);
+}
+
 int SqlLiteStateMnt::bind(const char* pName, int value)
 {
 	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
@@ -261,6 +267,11 @@ int SqlLiteStateMnt::bind(const char* pName)
 {
 	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
 	return bind(idx);
+}
+
+int SqlLiteStateMnt::bind(const char* pName, null_type)
+{
+	return bind(pName);
 }
 
 // ----------------------------------------------------
