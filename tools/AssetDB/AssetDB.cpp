@@ -38,7 +38,7 @@ bool AssetDB::CreateTables(void)
 		"name TEXT COLLATE NOCASE,"
 		"path TEXT,"
 		"type INTEGER,"
-		"write_time INTEGER,"
+		"write_time INTEGER"
 		");")) {
 		return false;
 	}
