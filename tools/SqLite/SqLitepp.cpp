@@ -323,6 +323,10 @@ int SqlLiteCmd::execute(void)
 		rc = SQLITE_OK;
 	}
 
+	if (rc != SQLITE_OK) {
+		X_ERROR("SqlDb", "query step err(%i): \"%s\"", rc, db_.errorMsg());
+	}
+
 	return rc;
 }
 
