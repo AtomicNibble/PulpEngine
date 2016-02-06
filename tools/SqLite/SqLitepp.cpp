@@ -121,6 +121,28 @@ bool SqlLiteDb::executeFmt(const char* sql, ...)
 	return execute(msql.get());
 }
 
+int32_t SqlLiteDb::executeRes(const char* sql)
+{
+	int32_t res = sqlite3_exec(db_, sql, 0, 0, 0);
+	if (res == SQLITE_OK) {
+		return res;
+	}
+
+	X_ERROR("SqlDb", "execue failed for \"%s\" err(%i): %s", sql, res, errorMsg());
+	return res;
+}
+
+int32_t SqlLiteDb::executeFmtRes(const char* sql, ...)
+{
+	va_list ap;
+	va_start(ap, sql);
+	std::shared_ptr<char> msql(sqlite3_vmprintf(sql, ap), sqlite3_free);
+	va_end(ap);
+
+	return execute(msql.get());
+}
+
+
 // ----------------------------------------------------
 
 SqlLiteStateMnt::SqlLiteStateMnt(SqlLiteDb& db, const char* pStmt) : 

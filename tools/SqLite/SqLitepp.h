@@ -45,6 +45,9 @@ public:
 	bool execute(const char* sql);
 	bool executeFmt(const char* sql, ...);
 
+	int32_t executeRes(const char* sql);
+	int32_t executeFmtRes(const char* sql, ...);
+
 private:
 	sqlite3* db_;
 };
