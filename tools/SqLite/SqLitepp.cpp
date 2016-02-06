@@ -503,8 +503,11 @@ SqlLiteQuery::iterator SqlLiteQuery::end(void)
 
 
 
-SqlLiteTransaction::SqlLiteTransaction(SqlLiteDb& db, bool fcommit, bool freserve)
+SqlLiteTransaction::SqlLiteTransaction(SqlLiteDb& db, bool fcommit, bool freserve) :
+	pDb_(&db),
+	fcommit_(fcommit)
 {
+	pDb_->execute(freserve ? "BEGIN IMMEDIATE" : "BEGIN");
 }
 
 SqlLiteTransaction::~SqlLiteTransaction()
