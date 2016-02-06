@@ -513,28 +513,34 @@ SqlLiteTransaction::SqlLiteTransaction(SqlLiteDb& db, bool fcommit, bool freserv
 SqlLiteTransaction::~SqlLiteTransaction()
 {
 	if (pDb_) {
-		auto rc = pDb_->execute(fcommit_ ? "COMMIT" : "ROLLBACK");
+		auto rc = pDb_->executeRes(fcommit_ ? "COMMIT" : "ROLLBACK");
 		if (rc != SQLITE_OK) {
-			X_ERROR("SqlDb", "transaction err(%i)", rc);
+			X_ERROR("SqlDb", "transaction err(%i): \"%s\"", rc, pDb_->errorMsg());
 		}
 	}
 }
 
-int SqlLiteTransaction::commit(void)
+int32_t SqlLiteTransaction::commit(void)
 {
 	auto db = pDb_;
 	pDb_ = nullptr;  // prevent execute on decon
 
-	int rc = db->execute("COMMIT");
+	int32_t rc = db->executeRes("COMMIT");
+	if (rc != SQLITE_OK) {
+		X_ERROR("SqlDb", "transaction commit err(%i): \"%s\"", rc, pDb_->errorMsg());
+	}
 	return rc;
 }
 
-int SqlLiteTransaction::rollback(void)
+int32_t SqlLiteTransaction::rollback(void)
 {
 	auto db = pDb_;
 	pDb_ = nullptr; // prevent execute on decon
 
-	int rc = db->execute("ROLLBACK");
+	int32_t rc = db->executeRes("ROLLBACK");
+	if (rc != SQLITE_OK) {
+		X_ERROR("SqlDb", "transaction rollback err(%i): \"%s\"", rc, pDb_->errorMsg());
+	}
 	return rc;
 }
 
