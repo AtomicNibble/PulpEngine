@@ -45,7 +45,7 @@ bool SqlLiteDb::connect(const char* pDb)
 		return false;
 	}
 
-	return false;
+	return true;
 }
 
 bool SqlLiteDb::disconnect(void)
