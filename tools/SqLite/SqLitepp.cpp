@@ -170,6 +170,7 @@ int SqlLiteStateMnt::prepare(const char* pStmt)
 {
 	auto rc = finish();
 	if (rc != SQLITE_OK) {
+		X_ERROR("SqlDb", "prepare err(%i): \"%s\"", rc, db_.errorMsg());
 		return rc;
 	}
 
@@ -188,6 +189,10 @@ int SqlLiteStateMnt::finish(void)
 	if (pStmt_) {
 		rc = finish_impl(pStmt_);
 		pStmt_ = nullptr;
+	}
+
+	if (rc != SQLITE_OK) {
+		X_ERROR("SqlDb", "finish err(%i): \"%s\"", rc, db_.errorMsg());
 	}
 
 	pTail_ = nullptr;
@@ -334,6 +339,7 @@ int SqlLiteCmd::executeAll(void)
 {
 	auto rc = execute();
 	if (rc != SQLITE_OK) {
+		X_ERROR("SqlDb", "executeAll err(%i): \"%s\"", rc, db_.errorMsg());
 		return rc;
 	}
 
@@ -344,16 +350,19 @@ int SqlLiteCmd::executeAll(void)
 		sqlite3_stmt* old_stmt = pStmt_;
 
 		if ((rc = prepare_impl(sql)) != SQLITE_OK) {
+			X_ERROR("SqlDb", "executeAll err(%i): \"%s\"", rc, db_.errorMsg());
 			return rc;
 		}
 
 		if ((rc = sqlite3_transfer_bindings(old_stmt, pStmt_)) != SQLITE_OK) {
+			X_ERROR("SqlDb", "executeAll err(%i): \"%s\"", rc, db_.errorMsg());
 			return rc;
 		}
 
 		finish_impl(old_stmt);
 
 		if ((rc = execute()) != SQLITE_OK) {
+			X_ERROR("SqlDb", "executeAll err(%i): \"%s\"", rc, db_.errorMsg());
 			return rc;
 		}
 
