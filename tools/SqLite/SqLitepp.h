@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Util\EnumMacros.h>
 
 struct sqlite3;
 struct sqlite3_stmt;
@@ -15,6 +16,58 @@ struct convert {
 
 class null_type {};
 extern null_type ignore;
+
+
+struct Result
+{
+	enum Enum
+	{
+		OK = 0,
+		ERROR = 1,
+		INTERNAL = 2,
+		PERM = 3,
+		ABORT = 4,
+		BUSY = 5,
+		LOCKED = 6,
+		NOMEM = 7,
+		READONLY = 8,
+		INTERRUPT = 9,
+		IOERR = 10,
+		CORRUPT = 11,
+		NOTFOUND = 12,
+		FULL = 13,
+		CANTOPEN = 14,
+		PROTOCOL = 15,
+		EMPTY = 16,
+		SCHEMA = 17,
+		TOOBIG = 18,
+		CONSTRAINT = 19,
+		MISMATCH = 20,
+		MISUSE = 21,
+		NOLFS = 22,
+		AUTH = 23,
+		FORMAT = 24,
+		RANGE = 25,
+		NOTADB = 26,
+		NOTICE = 27,
+		WARNING = 28,
+		ROW = 100,
+		DONE = 101,
+	};
+};
+
+struct ColumType
+{
+	enum Enum
+	{
+		INTEGER = 1, // SQLITE_INTEGER,
+		FLOAT = 2, // SQLITE_FLOAT,
+		TEXT = 3, // SQLITE_TEXT,
+		BLOB = 4, // SQLITE_BLOB,
+		SNULL = 5, // SQLITE_NULL
+	};
+};
+
 
 class DLL_EXPORT SqlLiteDb
 {
@@ -33,20 +86,20 @@ public:
 	bool connect(const char* pDb);
 	bool disconnect(void);
 
-	int enableForeignKeys(bool enable = true);
-	int enableTriggers(bool enable = true);
-	int enableExtendedResultCodes(bool enable = true);
+	Result::Enum enableForeignKeys(bool enable = true);
+	Result::Enum enableTriggers(bool enable = true);
+	Result::Enum enableExtendedResultCodes(bool enable = true);
 
 	RowId lastInsertRowid(void) const;
 
-	int errorCode(void) const;
+	Result::Enum errorCode(void) const;
 	const char* errorMsg(void) const;
 
 	bool execute(const char* sql);
 	bool executeFmt(const char* sql, ...);
 
-	int32_t executeRes(const char* sql);
-	int32_t executeFmtRes(const char* sql, ...);
+	Result::Enum executeRes(const char* sql);
+	Result::Enum executeFmtRes(const char* sql, ...);
 
 private:
 	sqlite3* db_;
@@ -63,36 +116,36 @@ protected:
 	explicit SqlLiteStateMnt(SqlLiteDb& db, const char* pStmt = nullptr);
 	~SqlLiteStateMnt();
 
-	int prepare_impl(const char* pStmt);
-	int finish_impl(sqlite3_stmt* pStmt);
+	Result::Enum prepare_impl(const char* pStmt);
+	Result::Enum finish_impl(sqlite3_stmt* pStmt);
 
 public:
 	X_DECLARE_ENUM(CopySemantic)(COPY,NOCOPY);
 
 public:
-	int prepare(const char* pStmt);
-	int finish(void);
+	Result::Enum prepare(const char* pStmt);
+	Result::Enum finish(void);
 
-	int step(void);
-	int reset(void);
+	Result::Enum step(void);
+	Result::Enum reset(void);
 
-	int bind(int idx, int value);
-	int bind(int idx, double value);
-	int bind(int idx, long long int value);
-	int bind(int idx, const char* value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
-	int bind(int idx, void const* value, int n, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
-	int bind(int idx, std::string const& value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
-	int bind(int idx);
-	int bind(int idx, null_type);
+	Result::Enum bind(int idx, int value);
+	Result::Enum bind(int idx, double value);
+	Result::Enum bind(int idx, long long int value);
+	Result::Enum bind(int idx, const char* value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+	Result::Enum bind(int idx, void const* value, int n, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+	Result::Enum bind(int idx, std::string const& value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+	Result::Enum bind(int idx);
+	Result::Enum bind(int idx, null_type);
 
-	int bind(const char* pName, int value);
-	int bind(const char* pName, double value);
-	int bind(const char* pName, long long int value);
-	int bind(const char* pName, const char* value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
-	int bind(const char* pName, void const* value, int n, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
-	int bind(const char* pName, std::string const& value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
-	int bind(const char* pName);
-	int bind(const char* pName, null_type);
+	Result::Enum bind(const char* pName, int value);
+	Result::Enum bind(const char* pName, double value);
+	Result::Enum bind(const char* pName, long long int value);
+	Result::Enum bind(const char* pName, const char* value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+	Result::Enum bind(const char* pName, void const* value, int n, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+	Result::Enum bind(const char* pName, std::string const& value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+	Result::Enum bind(const char* pName);
+	Result::Enum bind(const char* pName, null_type);
 
 protected:
 	SqlLiteDb& db_;
@@ -130,8 +183,8 @@ public:
 
 	BindStream binder(int idx = 1);
 
-	int execute(void);
-	int executeAll(void);
+	Result::Enum execute(void);
+	Result::Enum executeAll(void);
 };
 
 
@@ -235,8 +288,8 @@ public:
 	explicit SqlLiteTransaction(SqlLiteDb& db, bool fcommit = false, bool freserve = false);
 	~SqlLiteTransaction();
 
-	int commit(void);
-	int rollback(void);
+	Result::Enum commit(void);
+	Result::Enum rollback(void);
 
 private:
 	SqlLiteDb* pDb_;

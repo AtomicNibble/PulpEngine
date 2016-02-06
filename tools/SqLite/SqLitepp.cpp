@@ -31,14 +31,14 @@ bool SqlLiteDb::connect(const char* pDb)
 		return false;
 	}
 
-	if (SQLITE_OK != (ret = sqlite3_initialize()))
+	if (Result::OK != (ret = sqlite3_initialize()))
 	{
 		X_ERROR("SqlLiteDb", "Failed to initialize library: %d", ret);
 		return false;
 	}
 
 	// open connection to a DB
-	if (SQLITE_OK != (ret = sqlite3_open_v2(pDb, &db_,
+	if (Result::OK != (ret = sqlite3_open_v2(pDb, &db_,
 		SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr)))
 	{
 		X_ERROR("SqlLiteDb", "Failed to open conn: %d", ret);
@@ -53,33 +53,33 @@ bool SqlLiteDb::disconnect(void)
 	if (db_) 
 	{
 		int ret, ret2;
-		if (SQLITE_OK != (ret = sqlite3_close_v2(db_))) {
+		if (Result::OK != (ret = sqlite3_close_v2(db_))) {
 			X_ERROR("SqlLiteDb", "Failed to close db");
 		}
 
-		if(SQLITE_OK != (ret2 = sqlite3_shutdown())) {
+		if(Result::OK != (ret2 = sqlite3_shutdown())) {
 			X_ERROR("SqlLiteDb", "Failed to shutdown sqLite");
 		}
 
-		return ret == SQLITE_OK && ret2 == SQLITE_OK;
+		return ret == Result::OK && ret2 == Result::OK;
 	}
 	return true;
 }
 
 
-int SqlLiteDb::enableForeignKeys(bool enable)
+Result::Enum SqlLiteDb::enableForeignKeys(bool enable)
 {
-	return sqlite3_db_config(db_, SQLITE_DBCONFIG_ENABLE_FKEY, enable ? 1 : 0, nullptr);
+	return static_cast<Result::Enum>(sqlite3_db_config(db_, SQLITE_DBCONFIG_ENABLE_FKEY, enable ? 1 : 0, nullptr));
 }
 
-int SqlLiteDb::enableTriggers(bool enable)
+Result::Enum SqlLiteDb::enableTriggers(bool enable)
 {
-	return sqlite3_db_config(db_, SQLITE_DBCONFIG_ENABLE_TRIGGER, enable ? 1 : 0, nullptr);
+	return static_cast<Result::Enum>(sqlite3_db_config(db_, SQLITE_DBCONFIG_ENABLE_TRIGGER, enable ? 1 : 0, nullptr));
 }
 
-int SqlLiteDb::enableExtendedResultCodes(bool enable)
+Result::Enum SqlLiteDb::enableExtendedResultCodes(bool enable)
 {
-	return sqlite3_extended_result_codes(db_, enable ? 1 : 0);
+	return static_cast<Result::Enum>(sqlite3_extended_result_codes(db_, enable ? 1 : 0));
 }
 
 
@@ -89,9 +89,9 @@ SqlLiteDb::RowId SqlLiteDb::lastInsertRowid(void) const
 
 }
 
-int SqlLiteDb::errorCode(void) const
+Result::Enum SqlLiteDb::errorCode(void) const
 {
-	return sqlite3_errcode(db_);
+	return static_cast<Result::Enum>(sqlite3_errcode(db_));
 }
 
 const char* SqlLiteDb::errorMsg(void) const
@@ -102,8 +102,8 @@ const char* SqlLiteDb::errorMsg(void) const
 
 bool SqlLiteDb::execute(const char* sql)
 {	
-	int res = sqlite3_exec(db_, sql, 0, 0, 0);
-	if (res == SQLITE_OK) {
+	Result::Enum res = static_cast<Result::Enum>(sqlite3_exec(db_, sql, 0, 0, 0));
+	if (res == Result::OK) {
 		return true;
 	}
 
@@ -121,10 +121,10 @@ bool SqlLiteDb::executeFmt(const char* sql, ...)
 	return execute(msql.get());
 }
 
-int32_t SqlLiteDb::executeRes(const char* sql)
+Result::Enum SqlLiteDb::executeRes(const char* sql)
 {
-	int32_t res = sqlite3_exec(db_, sql, 0, 0, 0);
-	if (res == SQLITE_OK) {
+	Result::Enum res = static_cast<Result::Enum>(sqlite3_exec(db_, sql, 0, 0, 0));
+	if (res == Result::OK) {
 		return res;
 	}
 
@@ -132,14 +132,14 @@ int32_t SqlLiteDb::executeRes(const char* sql)
 	return res;
 }
 
-int32_t SqlLiteDb::executeFmtRes(const char* sql, ...)
+Result::Enum SqlLiteDb::executeFmtRes(const char* sql, ...)
 {
 	va_list ap;
 	va_start(ap, sql);
 	std::shared_ptr<char> msql(sqlite3_vmprintf(sql, ap), sqlite3_free);
 	va_end(ap);
 
-	return execute(msql.get());
+	return executeRes(msql.get());
 }
 
 
@@ -152,7 +152,7 @@ SqlLiteStateMnt::SqlLiteStateMnt(SqlLiteDb& db, const char* pStmt) :
 {
 	if (pStmt) {
 		auto rc = prepare(pStmt);
-		if (rc != SQLITE_OK) {
+		if (rc != Result::OK) {
 			X_ERROR("SqlDb", "statement prepare failed for \"%s\" err(%i)", pStmt, rc);
 		}
 	}
@@ -161,15 +161,15 @@ SqlLiteStateMnt::SqlLiteStateMnt(SqlLiteDb& db, const char* pStmt) :
 SqlLiteStateMnt::~SqlLiteStateMnt()
 {
 	auto rc = finish();
-	if (rc != SQLITE_OK) {
+	if (rc != Result::OK) {
 		X_ERROR("SqlDb", "statement finish failed err(%i)", rc);
 	}
 }
 
-int SqlLiteStateMnt::prepare(const char* pStmt)
+Result::Enum SqlLiteStateMnt::prepare(const char* pStmt)
 {
 	auto rc = finish();
-	if (rc != SQLITE_OK) {
+	if (rc != Result::OK) {
 		X_ERROR("SqlDb", "prepare err(%i): \"%s\"", rc, db_.errorMsg());
 		return rc;
 	}
@@ -178,20 +178,26 @@ int SqlLiteStateMnt::prepare(const char* pStmt)
 }
 
 
-int SqlLiteStateMnt::prepare_impl(const char* pStmt)
+Result::Enum SqlLiteStateMnt::prepare_impl(const char* pStmt)
 {
-	return sqlite3_prepare_v2(db_.db_, pStmt, safe_static_cast<int32,size_t>(std::strlen(pStmt)), &pStmt_, &pTail_);
+	return static_cast<Result::Enum>(sqlite3_prepare_v2(
+		db_.db_, 
+		pStmt, 
+		safe_static_cast<int32,size_t>(std::strlen(pStmt)),
+		&pStmt_, 
+		&pTail_
+	));
 }
 
-int SqlLiteStateMnt::finish(void)
+Result::Enum SqlLiteStateMnt::finish(void)
 {
-	auto rc = SQLITE_OK;
+	auto rc = Result::OK;
 	if (pStmt_) {
-		rc = finish_impl(pStmt_);
+		rc = static_cast<Result::Enum>(finish_impl(pStmt_));
 		pStmt_ = nullptr;
 	}
 
-	if (rc != SQLITE_OK) {
+	if (rc != Result::OK) {
 		X_ERROR("SqlDb", "finish err(%i): \"%s\"", rc, db_.errorMsg());
 	}
 
@@ -199,104 +205,122 @@ int SqlLiteStateMnt::finish(void)
 	return rc;
 }
 
-int SqlLiteStateMnt::finish_impl(sqlite3_stmt* pStmt)
+Result::Enum SqlLiteStateMnt::finish_impl(sqlite3_stmt* pStmt)
 {
-	return sqlite3_finalize(pStmt);
+	return static_cast<Result::Enum>(sqlite3_finalize(pStmt));
 }
 
-int SqlLiteStateMnt::step(void)
+Result::Enum SqlLiteStateMnt::step(void)
 {
-	return sqlite3_step(pStmt_);
+	return static_cast<Result::Enum>(sqlite3_step(pStmt_));
 }
 
-int SqlLiteStateMnt::reset(void)
+Result::Enum SqlLiteStateMnt::reset(void)
 {
-	return sqlite3_reset(pStmt_);
+	return static_cast<Result::Enum>(sqlite3_reset(pStmt_));
 }
 
-int SqlLiteStateMnt::bind(int idx, int value)
+Result::Enum SqlLiteStateMnt::bind(int idx, int value)
 {
-	return sqlite3_bind_int(pStmt_, idx, value);
+	return static_cast<Result::Enum>(sqlite3_bind_int(pStmt_, idx, value));
 }
 
-int SqlLiteStateMnt::bind(int idx, double value)
+Result::Enum SqlLiteStateMnt::bind(int idx, double value)
 {
-	return sqlite3_bind_double(pStmt_, idx, value);
+	return static_cast<Result::Enum>(sqlite3_bind_double(pStmt_, idx, value));
 }
 
-int SqlLiteStateMnt::bind(int idx, long long int value)
+Result::Enum SqlLiteStateMnt::bind(int idx, long long int value)
 {
-	return sqlite3_bind_int64(pStmt_, idx, value);
+	return static_cast<Result::Enum>(sqlite3_bind_int64(pStmt_, idx, value));
 }
 
-int SqlLiteStateMnt::bind(int idx, const char* value, CopySemantic::Enum  fcopy)
+Result::Enum SqlLiteStateMnt::bind(int idx, const char* value, CopySemantic::Enum  fcopy)
 {
-	return sqlite3_bind_text(pStmt_, idx, value, safe_static_cast<int32, size_t>(std::strlen(value)), fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC);
+	return static_cast<Result::Enum>(sqlite3_bind_text(
+		pStmt_, 
+		idx, 
+		value, 
+		safe_static_cast<int32, size_t>(std::strlen(value)), 
+		fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC
+	));
 }
 
-int SqlLiteStateMnt::bind(int idx, void const* value, int n, CopySemantic::Enum  fcopy)
+Result::Enum SqlLiteStateMnt::bind(int idx, void const* value, int n, CopySemantic::Enum  fcopy)
 {
-	return sqlite3_bind_blob(pStmt_, idx, value, n, fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC);
+	return static_cast<Result::Enum>(sqlite3_bind_blob(
+		pStmt_,
+		idx, 
+		value, 
+		n, 
+		fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC
+	));
 }
 
-int SqlLiteStateMnt::bind(int idx, std::string const& value, CopySemantic::Enum  fcopy)
+Result::Enum SqlLiteStateMnt::bind(int idx, std::string const& value, CopySemantic::Enum  fcopy)
 {
-	return sqlite3_bind_text(pStmt_, idx, value.c_str(), safe_static_cast<int32, size_t>(value.size()), fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC);
+	return static_cast<Result::Enum>(sqlite3_bind_text(
+		pStmt_, 
+		idx, 
+		value.c_str(), 
+		safe_static_cast<int32, size_t>(value.size()), 
+		fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC
+	));
 }
 
-int SqlLiteStateMnt::bind(int idx)
+Result::Enum SqlLiteStateMnt::bind(int idx)
 {
-	return sqlite3_bind_null(pStmt_, idx);
+	return static_cast<Result::Enum>(sqlite3_bind_null(pStmt_, idx));
 }
 
-int SqlLiteStateMnt::bind(int idx, null_type)
+Result::Enum SqlLiteStateMnt::bind(int idx, null_type)
 {
 	return bind(idx);
 }
 
-int SqlLiteStateMnt::bind(const char* pName, int value)
+Result::Enum SqlLiteStateMnt::bind(const char* pName, int value)
 {
 	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
 	return bind(idx, value);
 }
 
-int SqlLiteStateMnt::bind(const char* pName, double value)
+Result::Enum SqlLiteStateMnt::bind(const char* pName, double value)
 {
 	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
 	return bind(idx, value);
 }
 
-int SqlLiteStateMnt::bind(const char* pName, long long int value)
+Result::Enum SqlLiteStateMnt::bind(const char* pName, long long int value)
 {
 	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
 	return bind(idx, value);
 }
 
-int SqlLiteStateMnt::bind(const char* pName, const char* value, CopySemantic::Enum  fcopy)
+Result::Enum SqlLiteStateMnt::bind(const char* pName, const char* value, CopySemantic::Enum  fcopy)
 {
 	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
 	return bind(idx, value, fcopy);
 }
 
-int SqlLiteStateMnt::bind(const char* pName, void const* value, int n, CopySemantic::Enum  fcopy)
+Result::Enum SqlLiteStateMnt::bind(const char* pName, void const* value, int n, CopySemantic::Enum  fcopy)
 {
 	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
 	return bind(idx, value, n, fcopy);
 }
 
-int SqlLiteStateMnt::bind(const char* pName, std::string const& value, CopySemantic::Enum  fcopy)
+Result::Enum SqlLiteStateMnt::bind(const char* pName, std::string const& value, CopySemantic::Enum  fcopy)
 {
 	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
 	return bind(idx, value, fcopy);
 }
 
-int SqlLiteStateMnt::bind(const char* pName)
+Result::Enum SqlLiteStateMnt::bind(const char* pName)
 {
 	auto idx = sqlite3_bind_parameter_index(pStmt_, pName);
 	return bind(idx);
 }
 
-int SqlLiteStateMnt::bind(const char* pName, null_type)
+Result::Enum SqlLiteStateMnt::bind(const char* pName, null_type)
 {
 	return bind(pName);
 }
@@ -321,24 +345,24 @@ SqlLiteCmd::BindStream SqlLiteCmd::binder(int idx)
 	return BindStream(*this, idx);
 }
 
-int SqlLiteCmd::execute(void)
+Result::Enum SqlLiteCmd::execute(void)
 {
 	auto rc = step();
 	if (rc == SQLITE_DONE) {
-		rc = SQLITE_OK;
+		rc = Result::OK;
 	}
 
-	if (rc != SQLITE_OK) {
+	if (rc != Result::OK) {
 		X_ERROR("SqlDb", "query step err(%i): \"%s\"", rc, db_.errorMsg());
 	}
 
 	return rc;
 }
 
-int SqlLiteCmd::executeAll(void)
+Result::Enum SqlLiteCmd::executeAll(void)
 {
 	auto rc = execute();
-	if (rc != SQLITE_OK) {
+	if (rc != Result::OK) {
 		X_ERROR("SqlDb", "executeAll err(%i): \"%s\"", rc, db_.errorMsg());
 		return rc;
 	}
@@ -349,19 +373,19 @@ int SqlLiteCmd::executeAll(void)
 	{
 		sqlite3_stmt* old_stmt = pStmt_;
 
-		if ((rc = prepare_impl(sql)) != SQLITE_OK) {
+		if ((rc = prepare_impl(sql)) != Result::OK) {
 			X_ERROR("SqlDb", "executeAll err(%i): \"%s\"", rc, db_.errorMsg());
 			return rc;
 		}
 
-		if ((rc = sqlite3_transfer_bindings(old_stmt, pStmt_)) != SQLITE_OK) {
+		if ((rc = static_cast<Result::Enum>(sqlite3_transfer_bindings(old_stmt, pStmt_))) != Result::OK) {
 			X_ERROR("SqlDb", "executeAll err(%i): \"%s\"", rc, db_.errorMsg());
 			return rc;
 		}
 
 		finish_impl(old_stmt);
 
-		if ((rc = execute()) != SQLITE_OK) {
+		if ((rc = execute()) != Result::OK) {
 			X_ERROR("SqlDb", "executeAll err(%i): \"%s\"", rc, db_.errorMsg());
 			return rc;
 		}
@@ -523,31 +547,31 @@ SqlLiteTransaction::~SqlLiteTransaction()
 {
 	if (pDb_) {
 		auto rc = pDb_->executeRes(fcommit_ ? "COMMIT" : "ROLLBACK");
-		if (rc != SQLITE_OK) {
+		if (rc != Result::OK) {
 			X_ERROR("SqlDb", "transaction err(%i): \"%s\"", rc, pDb_->errorMsg());
 		}
 	}
 }
 
-int32_t SqlLiteTransaction::commit(void)
+Result::Enum SqlLiteTransaction::commit(void)
 {
 	auto db = pDb_;
 	pDb_ = nullptr;  // prevent execute on decon
 
-	int32_t rc = db->executeRes("COMMIT");
-	if (rc != SQLITE_OK) {
+	auto rc = db->executeRes("COMMIT");
+	if (rc != Result::OK) {
 		X_ERROR("SqlDb", "transaction commit err(%i): \"%s\"", rc, pDb_->errorMsg());
 	}
 	return rc;
 }
 
-int32_t SqlLiteTransaction::rollback(void)
+Result::Enum SqlLiteTransaction::rollback(void)
 {
 	auto db = pDb_;
 	pDb_ = nullptr; // prevent execute on decon
 
-	int32_t rc = db->executeRes("ROLLBACK");
-	if (rc != SQLITE_OK) {
+	auto rc = db->executeRes("ROLLBACK");
+	if (rc != Result::OK) {
 		X_ERROR("SqlDb", "transaction rollback err(%i): \"%s\"", rc, pDb_->errorMsg());
 	}
 	return rc;
