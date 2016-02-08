@@ -27,39 +27,46 @@ namespace
 	}
 
 
-	PathCache* gPatchCache = nullptr;
+	SettingsCache* gSettingsCache = nullptr;
 
 } // namespace
 
-const char* PathCache::SETTINGS_PATH = "PotatoEngine//MayaPlugin//settings.xml";
+const char* SettingsCache::SETTINGS_PATH = "PotatoEngine//MayaPlugin//settings.xml";
 
-PathCache::PathCache() : cacheLoaded_(false), PathCache_(g_arena)
+SettingsCache::SettingsCache() : 
+	cacheLoaded_(false), 
+	settingsCache_(g_arena)
 {
-	PathCache_.reserve(4);
+	settingsCache_.reserve(16);
 }
 
-PathCache::~PathCache()
+SettingsCache::~SettingsCache()
 {
 }
 
 
-void PathCache::Init(void)
+void SettingsCache::Init(void)
 {
-	gPatchCache = X_NEW(PathCache, g_arena, "PathCache");
+	gSettingsCache = X_NEW(SettingsCache, g_arena, "SettingsCache");
 }
 
-void PathCache::ShutDown(void)
+void SettingsCache::ShutDown(void)
 {
-	if (gPatchCache) {
-		X_DELETE_AND_NULL(gPatchCache, g_arena);
+	if (gSettingsCache) {
+		X_DELETE_AND_NULL(gSettingsCache, g_arena);
 	}
 }
 
-bool PathCache::SetValue(PathId::Enum id, core::Path<char> value)
+bool SettingsCache::SetValue(SettingId::Enum id, core::Path<char> value)
+{
+	value.replaceSeprators();
+
+	return SetValue(id, core::StackString512(value.begin(), value.end()));
+}
+
+bool SettingsCache::SetValue(SettingId::Enum id, const core::StackString512& value)
 {
 	core::StackString<64> name = core::StackString<64>(PathIdToStr(id));
-
-	value.replaceSeprators();
 
 	// load it if not already loaded.
 	// before we insert our value.
@@ -67,12 +74,12 @@ bool PathCache::SetValue(PathId::Enum id, core::Path<char> value)
 		ReloadCache();
 	}
 
-	PathCacheMap::const_iterator it = PathCache_.find(name);
-	if (it != PathCache_.end()) {
-		PathCache_[name] = value;
+	SettingsCacheMap::const_iterator it = settingsCache_.find(name);
+	if (it != settingsCache_.end()) {
+		settingsCache_[name] = value;
 	}
 	else {
-		PathCache_.insert(std::make_pair(name, value));
+		settingsCache_.insert(std::make_pair(name, value));
 	}
 
 	FlushCache();
@@ -80,7 +87,7 @@ bool PathCache::SetValue(PathId::Enum id, core::Path<char> value)
 	return true;
 }
 
-bool PathCache::GetValue(PathId::Enum id, core::Path<char>& value)
+bool SettingsCache::GetValue(SettingId::Enum id, core::Path<char>& value)
 {
 	const char* pName = PathIdToStr(id);
 
@@ -88,9 +95,9 @@ bool PathCache::GetValue(PathId::Enum id, core::Path<char>& value)
 		ReloadCache();
 	}
 
-	PathCacheMap::const_iterator it = PathCache_.find(core::StackString<64>(pName));
-	if (it != PathCache_.end()) {
-		value = it->second;
+	SettingsCacheMap::const_iterator it = settingsCache_.find(core::StackString<64>(pName));
+	if (it != settingsCache_.end()) {
+		value = core::Path<char>(it->second.c_str());
 		return true;
 	}
 
@@ -99,26 +106,27 @@ bool PathCache::GetValue(PathId::Enum id, core::Path<char>& value)
 	return true;
 }
 
-const char* PathCache::PathIdToStr(PathId::Enum id)
+const char* SettingsCache::PathIdToStr(SettingId::Enum id)
 {
-	if (id == PathId::ANIM_OUT)
+	if (id == SettingId::ANIM_OUT) {
 		return "AnimOut";
-	if (id == PathId::MODEL_OUT)
+	}
+	if (id == SettingId::MODEL_OUT) {
 		return "ModelOut";
+	}
 
 	X_ASSERT_NOT_IMPLEMENTED();
 	return "invalid";
 }
 
 
-bool PathCache::ReloadCache(void)
+bool SettingsCache::ReloadCache(void)
 {
 	core::Path<char> filePath = GetSettingsPath();
 
 	FILE* pFile;
 	fopen_s(&pFile, filePath.c_str(), "r+b");
-	if (!pFile)
-	{
+	if (!pFile) {
 		return false;
 	}
 
@@ -150,9 +158,9 @@ bool PathCache::ReloadCache(void)
 		doc.set_allocator(XmlAllocate, XmlFree);
 		doc.parse<0>(pText);    
 
-		PathCache_.clear();
+		settingsCache_.clear();
 
-		// parse paths.
+		// parse settings.
 		xml_node<>* paths = doc.first_node("paths");
 		if (paths)
 		{
@@ -165,9 +173,9 @@ bool PathCache::ReloadCache(void)
 				if (attr)
 				{
 					core::StackString<64> id(attr->value(), attr->value() + attr->value_size());
-					core::Path<char> path(pathNode->value(), pathNode->value() + pathNode->value_size());
+					core::StackString512 value(pathNode->value(), pathNode->value() + pathNode->value_size());
 
-					PathCache_.insert(std::make_pair(id, path));
+					settingsCache_.insert(std::make_pair(id, value));
 				}
 			}
 		}
@@ -179,7 +187,7 @@ bool PathCache::ReloadCache(void)
 }
 
 
-bool PathCache::FlushCache(void)
+bool SettingsCache::FlushCache(void)
 {
 	xml_document<> doc;
 	xml_node<>* decl = doc.allocate_node(node_declaration);
@@ -190,8 +198,8 @@ bool PathCache::FlushCache(void)
 	xml_node<>* paths = doc.allocate_node(node_element, "paths");
 	doc.append_node(paths);
 
-	PathCacheMap::const_iterator it = PathCache_.begin();
-	for (; it != PathCache_.end(); ++it)
+	SettingsCacheMap::const_iterator it = settingsCache_.begin();
+	for (; it != settingsCache_.end(); ++it)
 	{
 		xml_node<>* path = doc.allocate_node(node_element, "path", it->second.c_str());
 		path->append_attribute(doc.allocate_attribute("id", it->first.c_str()));
@@ -218,7 +226,7 @@ bool PathCache::FlushCache(void)
 	return false;
 }
 
-core::Path<char> PathCache::GetSettingsPath(void)
+core::Path<char> SettingsCache::GetSettingsPath(void)
 {
 	core::Path<char> path;
 
@@ -279,10 +287,10 @@ MStatus PathCmd::doIt(const MArgList & args)
 	MStatus status;
 
 	Mode::Enum mode;
-	PathId::Enum pathId;
+	SettingId::Enum pathId;
 
-	if (!gPatchCache) {
-		MayaUtil::MayaPrintError("PatchCache is invalid, Init must be called (source code error)");
+	if (!gSettingsCache) {
+		MayaUtil::MayaPrintError("SettingsCache is invalid, Init must be called (source code error)");
 		return MS::kFailure;
 	}
 
@@ -323,10 +331,10 @@ MStatus PathCmd::doIt(const MArgList & args)
 
 		// is it a valid path id?
 		if (core::strUtil::IsEqualCaseInsen(pathIdStr.asChar(), "animOut")) {
-			pathId = PathId::ANIM_OUT;
+			pathId = SettingId::ANIM_OUT;
 		}
 		else if (core::strUtil::IsEqualCaseInsen(pathIdStr.asChar(), "modelOut")) {
-			pathId = PathId::MODEL_OUT;
+			pathId = SettingId::MODEL_OUT;
 		}
 		else
 		{
@@ -356,7 +364,7 @@ MStatus PathCmd::doIt(const MArgList & args)
 		newValue.replaceSeprators();
 		newValue.ensureSlash();
 
-		if (!gPatchCache->SetValue(pathId, newValue)) {
+		if (!gSettingsCache->SetValue(pathId, newValue)) {
 			return MS::kFailure;
 		}
 	}
@@ -364,7 +372,7 @@ MStatus PathCmd::doIt(const MArgList & args)
 	{
 		core::Path<char> value;
 
-		if (!gPatchCache->GetValue(pathId, value)) {
+		if (!gSettingsCache->GetValue(pathId, value)) {
 			return MS::kFailure;
 		}
 

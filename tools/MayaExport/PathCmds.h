@@ -5,26 +5,29 @@
 
 #include <maya\MPxCommand.h>
 
-class PathCache
+class SettingsCache
 {
 	static const char* SETTINGS_PATH;
 
 public:
-	X_DECLARE_ENUM(PathId)(ANIM_OUT, MODEL_OUT);
+	X_DECLARE_ENUM(SettingId)(ANIM_OUT, MODEL_OUT);
 
 public:
-	PathCache();
-	~PathCache();
+	SettingsCache();
+	~SettingsCache();
 
 	static void Init(void);
 	static void ShutDown(void);
 
 public:
-	bool SetValue(PathId::Enum id, core::Path<char> value);
-	bool GetValue(PathId::Enum id, core::Path<char>& value);
+	bool SetValue(SettingId::Enum id, core::Path<char> value);
+	bool GetValue(SettingId::Enum id, core::Path<char>& value);
+
+	bool SetValue(SettingId::Enum id, const core::StackString512& value);
+	bool GetValue(SettingId::Enum id, core::StackString512& value);
 
 private:
-	const char* PathIdToStr(PathId::Enum id);
+	const char* PathIdToStr(SettingId::Enum id);
 
 	bool ReloadCache(void);
 	bool FlushCache(void);
@@ -32,19 +35,19 @@ private:
 	core::Path<char> GetSettingsPath(void);
 
 private:
-	typedef core::HashMap<core::StackString<64>, core::Path<char>> PathCacheMap;
+	typedef core::HashMap<core::StackString<64>, core::StackString<512,char>> SettingsCacheMap;
 
 	bool cacheLoaded_;
 	bool _pad_[3];
 
-	PathCacheMap PathCache_;
+	SettingsCacheMap settingsCache_;
 };
 
 
 class PathCmd : public MPxCommand
 {
 	X_DECLARE_ENUM(Mode)(SET, GET);
-	typedef PathCache::PathId PathId;
+	typedef SettingsCache::SettingId SettingId;
 
 public:
 	PathCmd();
