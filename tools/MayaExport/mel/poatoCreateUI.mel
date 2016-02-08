@@ -44,14 +44,14 @@ global proc potato_SelectAllMeshInScene()
 
 global proc savePathGlobal(string $pathId, string $value)
 {
-	string $command = "PotatoPath -set -path_id " + $pathId + " -value \"" + $value + "\"";
+	string $command = "PotatoSettings -set -set_id " + $pathId + " -value \"" + $value + "\"";
 	string $errorMsg;
 	$error = catch ( $errorMsg = eval( $command ) );
 }
 
 global proc string loadPathGlobal(string $pathId)
 {
-	string $command = "PotatoPath -get -path_id " + $pathId;
+	string $command = "PotatoSettings -get -set_id " + $pathId;
 	return eval( $command );
 }
 
