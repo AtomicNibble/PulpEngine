@@ -154,19 +154,20 @@ bool SettingsCache::ReloadCache(void)
 		settingsCache_.clear();
 
 		// parse settings.
-		xml_node<>* paths = doc.first_node("paths");
-		if (paths)
+		xml_node<>* pSettings = doc.first_node("settings");
+		if (pSettings)
 		{
-			xml_node<>* pathNode;
+			xml_node<>* pSetNode;
 
-			for (pathNode = paths->first_node("path"); pathNode;
-			pathNode = pathNode->next_sibling())
+			for (pSetNode = pSettings->first_node(""); pSetNode;
+			pSetNode = pSetNode->next_sibling())
 			{
-				xml_attribute<>* attr = pathNode->first_attribute("id");
-				if (attr)
+				xml_attribute<>* pAttr = pSetNode->first_attribute("id");
+				if (pAttr)
 				{
-					core::StackString<64> id(attr->value(), attr->value() + attr->value_size());
-					core::StackString512 value(pathNode->value(), pathNode->value() + pathNode->value_size());
+					core::StackString<64> id(pAttr->value(), pAttr->value() + pAttr->value_size());
+					core::StackString512 value(pSetNode->value(), 
+						pSetNode->value() + pSetNode->value_size());
 
 					settingsCache_.insert(std::make_pair(id, value));
 				}
@@ -188,15 +189,15 @@ bool SettingsCache::FlushCache(void)
 	decl->append_attribute(doc.allocate_attribute("encoding", "utf-8"));
 	doc.append_node(decl);
 
-	xml_node<>* paths = doc.allocate_node(node_element, "paths");
-	doc.append_node(paths);
+	xml_node<>* pSettings = doc.allocate_node(node_element, "settings");
+	doc.append_node(pSettings);
 
 	SettingsCacheMap::const_iterator it = settingsCache_.begin();
 	for (; it != settingsCache_.end(); ++it)
 	{
-		xml_node<>* path = doc.allocate_node(node_element, "path", it->second.c_str());
-		path->append_attribute(doc.allocate_attribute("id", it->first.c_str()));
-		paths->append_node(path);
+		xml_node<>* pEntry = doc.allocate_node(node_element, "entry", it->second.c_str());
+		pEntry->append_attribute(doc.allocate_attribute("id", it->first.c_str()));
+		pSettings->append_node(pEntry);
 	}
 
 	std::string xml_as_string;
