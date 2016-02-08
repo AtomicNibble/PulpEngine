@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "PathCmds.h"
+#include "SettingsCmd.h"
 #include "MayaUtil.h"
 
 #include <maya\MArgList.h>

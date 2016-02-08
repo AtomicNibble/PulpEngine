@@ -5,7 +5,7 @@
 
 #include "ModelExporter.h"
 #include "AnimExport.h"
-#include "PathCmds.h"
+#include "SettingsCmd.h"
 #include "AssetDB.h"
 #include "MayaUtil.h"
 

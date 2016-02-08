@@ -1172,7 +1172,7 @@
     <ClInclude Include="Hierarchy.h" />
     <ClInclude Include="MayaUtil.h" />
     <ClInclude Include="ModelExporter.h" />
-    <ClInclude Include="PathCmds.h" />
+    <ClInclude Include="SettingsCmd.h" />
     <ClInclude Include="Profiler.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -1269,7 +1269,7 @@
     <ClCompile Include="MayaExport.cpp" />
     <ClCompile Include="MayaUtil.cpp" />
     <ClCompile Include="ModelExporter.cpp" />
-    <ClCompile Include="PathCmds.cpp" />
+    <ClCompile Include="SettingsCmd.cpp" />
     <ClCompile Include="AppDataPath.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super_8.5|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_8.5|Win32'">NotUsing</PrecompiledHeader>
