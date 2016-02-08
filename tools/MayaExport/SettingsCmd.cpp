@@ -57,16 +57,9 @@ void SettingsCache::ShutDown(void)
 	}
 }
 
-bool SettingsCache::SetValue(SettingId::Enum id, core::Path<char> value)
-{
-	value.replaceSeprators();
-
-	return SetValue(id, core::StackString512(value.begin(), value.end()));
-}
-
 bool SettingsCache::SetValue(SettingId::Enum id, const core::StackString512& value)
 {
-	core::StackString<64> name = core::StackString<64>(PathIdToStr(id));
+	core::StackString<64> name = core::StackString<64>(SetIdToStr(id));
 
 	// load it if not already loaded.
 	// before we insert our value.
@@ -87,9 +80,9 @@ bool SettingsCache::SetValue(SettingId::Enum id, const core::StackString512& val
 	return true;
 }
 
-bool SettingsCache::GetValue(SettingId::Enum id, core::Path<char>& value)
+bool SettingsCache::GetValue(SettingId::Enum id, core::StackString512& value)
 {
-	const char* pName = PathIdToStr(id);
+	const char* pName = SetIdToStr(id);
 
 	if (!cacheLoaded_) {
 		ReloadCache();
@@ -97,7 +90,7 @@ bool SettingsCache::GetValue(SettingId::Enum id, core::Path<char>& value)
 
 	SettingsCacheMap::const_iterator it = settingsCache_.find(core::StackString<64>(pName));
 	if (it != settingsCache_.end()) {
-		value = core::Path<char>(it->second.c_str());
+		value = it->second;
 		return true;
 	}
 
@@ -106,7 +99,7 @@ bool SettingsCache::GetValue(SettingId::Enum id, core::Path<char>& value)
 	return true;
 }
 
-const char* SettingsCache::PathIdToStr(SettingId::Enum id)
+const char* SettingsCache::SetIdToStr(SettingId::Enum id)
 {
 	if (id == SettingId::ANIM_OUT) {
 		return "AnimOut";
@@ -272,22 +265,22 @@ core::Path<char> SettingsCache::GetSettingsPath(void)
 
 // -----------------------------------------------
 
-PathCmd::PathCmd()
+SettingsCmd::SettingsCmd()
 {
 }
 
-PathCmd::~PathCmd()
+SettingsCmd::~SettingsCmd()
 {
 }
 
 
-MStatus PathCmd::doIt(const MArgList & args)
+MStatus SettingsCmd::doIt(const MArgList & args)
 {
 	uint idx;
 	MStatus status;
 
 	Mode::Enum mode;
-	SettingId::Enum pathId;
+	SettingId::Enum setId;
 
 	if (!gSettingsCache) {
 		MayaUtil::MayaPrintError("SettingsCache is invalid, Init must be called (source code error)");
@@ -317,28 +310,30 @@ MStatus PathCmd::doIt(const MArgList & args)
 	// get the path id.
 	{
 
-		idx = args.flagIndex("pi", "path_id");
+		idx = args.flagIndex("pi", "set_id");
 		if (idx == MArgList::kInvalidArgIndex) {
-			MayaUtil::MayaPrintError("path_id flag missing");
+			MayaUtil::MayaPrintError("set_id flag missing");
 			return MS::kFailure;
 		}
 
-		MString pathIdStr;
-		if (!(status = args.get(++idx, pathIdStr))) {
-			MayaUtil::MayaPrintError("failed to get path_id flag value: %s", status.errorString().asChar());
+		MString setIdStr;
+		if (!(status = args.get(++idx, setIdStr))) {
+			MayaUtil::MayaPrintError("failed to get set_id flag value: %s", 
+				status.errorString().asChar());
 			return MS::kFailure;
 		}
 
 		// is it a valid path id?
-		if (core::strUtil::IsEqualCaseInsen(pathIdStr.asChar(), "animOut")) {
-			pathId = SettingId::ANIM_OUT;
+		if (core::strUtil::IsEqualCaseInsen(setIdStr.asChar(), "animOut")) {
+			setId = SettingId::ANIM_OUT;
 		}
-		else if (core::strUtil::IsEqualCaseInsen(pathIdStr.asChar(), "modelOut")) {
-			pathId = SettingId::MODEL_OUT;
+		else if (core::strUtil::IsEqualCaseInsen(setIdStr.asChar(), "modelOut")) {
+			setId = SettingId::MODEL_OUT;
 		}
 		else
 		{
-			MayaUtil::MayaPrintError("unkown path_id: '%s' valid id's: animOut, modelOut", pathIdStr.asChar());
+			MayaUtil::MayaPrintError("unkown set_id: '%s' valid id's: animOut, modelOut", 
+				setIdStr.asChar());
 			return MS::kFailure;
 		}
 	}
@@ -359,20 +354,32 @@ MStatus PathCmd::doIt(const MArgList & args)
 			return MS::kFailure;
 		}
 
-		core::Path<char> newValue;
-		newValue.append(valueStr.asChar());
-		newValue.replaceSeprators();
-		newValue.ensureSlash();
+		if (setId == SettingId::ANIM_OUT || setId == SettingId::MODEL_OUT)
+		{
+			core::Path<char> newValue;
+			newValue.append(valueStr.asChar());
+			newValue.replaceSeprators();
+			newValue.ensureSlash();
 
-		if (!gSettingsCache->SetValue(pathId, newValue)) {
-			return MS::kFailure;
+			if (!gSettingsCache->SetValue(setId, 
+				core::StackString512(newValue.begin(), newValue.end()))) {
+				return MS::kFailure;
+			}
+		}
+		else
+		{
+			core::StackString512 newValue(valueStr.asChar());
+
+			if (!gSettingsCache->SetValue(setId,newValue)) {
+				return MS::kFailure;
+			}
 		}
 	}
 	else
 	{
-		core::Path<char> value;
+		core::StackString512 value;
 
-		if (!gSettingsCache->GetValue(pathId, value)) {
+		if (!gSettingsCache->GetValue(setId, value)) {
 			return MS::kFailure;
 		}
 
@@ -384,12 +391,12 @@ MStatus PathCmd::doIt(const MArgList & args)
 }
 
 
-void* PathCmd::creator(void)
+void* SettingsCmd::creator(void)
 {
-	return new PathCmd;
+	return new SettingsCmd;
 }
 
-MSyntax PathCmd::newSyntax(void)
+MSyntax SettingsCmd::newSyntax(void)
 {
 	MSyntax syn;
 

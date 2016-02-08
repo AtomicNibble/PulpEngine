@@ -20,14 +20,11 @@ public:
 	static void ShutDown(void);
 
 public:
-	bool SetValue(SettingId::Enum id, core::Path<char> value);
-	bool GetValue(SettingId::Enum id, core::Path<char>& value);
-
 	bool SetValue(SettingId::Enum id, const core::StackString512& value);
 	bool GetValue(SettingId::Enum id, core::StackString512& value);
 
 private:
-	const char* PathIdToStr(SettingId::Enum id);
+	const char* SetIdToStr(SettingId::Enum id);
 
 	bool ReloadCache(void);
 	bool FlushCache(void);
@@ -44,14 +41,14 @@ private:
 };
 
 
-class PathCmd : public MPxCommand
+class SettingsCmd : public MPxCommand
 {
 	X_DECLARE_ENUM(Mode)(SET, GET);
 	typedef SettingsCache::SettingId SettingId;
 
 public:
-	PathCmd();
-	~PathCmd();
+	SettingsCmd();
+	~SettingsCmd();
 
 	virtual MStatus doIt(const MArgList &args) X_OVERRIDE;
 
