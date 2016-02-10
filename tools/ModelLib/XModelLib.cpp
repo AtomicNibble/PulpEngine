@@ -49,7 +49,53 @@ bool XModelLib::Convert(ConvertArgs& args)
 	}
 
 
-	model::ModelCompiler model(gEnv->pJobSys, g_ModelLibArena);
+	ModelCompiler model(gEnv->pJobSys, g_ModelLibArena);
+
+	// check for optional args.
+	{
+		ModelCompiler::CompileFlags flags;
+
+		if (args.hasFlag(L"zero_origin")) {
+			flags.Set(ModelCompiler::CompileFlag::ZERO_ORIGIN);
+		}
+		if (args.hasFlag(L"white_vert_col")) {
+			flags.Set(ModelCompiler::CompileFlag::WHITE_VERT_COL);
+		}
+		if (args.hasFlag(L"merge_mesh")) {
+			flags.Set(ModelCompiler::CompileFlag::MERGE_MESH);
+		}
+		if (args.hasFlag(L"merge_verts")) {
+			flags.Set(ModelCompiler::CompileFlag::MERGE_VERTS);
+		}
+
+		model.setFlags(flags);
+
+		{
+			const wchar_t* pScale = args.getOption(L"scale");
+			float scale = core::strUtil::StringToFloat<float>(pScale);
+
+			model.SetScale(scale);
+		}
+		{
+			const wchar_t* pWeightThresh = args.getOption(L"weight_thresh");
+			float thresh = core::strUtil::StringToFloat<float>(pWeightThresh);
+
+			model.SetJointWeightThreshold(thresh);
+		}
+		{
+			const wchar_t* pUvMergeThresh = args.getOption(L"uv_merge_thresh");
+			float thresh = core::strUtil::StringToFloat<float>(pUvMergeThresh);
+
+			model.SetVertexElipson(thresh);
+		}
+		{
+			const wchar_t* pVertMergeThresh = args.getOption(L"vert_merge_thresh");
+			float thresh = core::strUtil::StringToFloat<float>(pVertMergeThresh);
+
+			model.SetTexCoordElipson(thresh);
+		}
+
+	}
 
 	if (!model.LoadRawModel(rawModelPath)) {
 		return false;
