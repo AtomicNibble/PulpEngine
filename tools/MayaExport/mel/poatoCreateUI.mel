@@ -1117,9 +1117,9 @@ global proc potato_CreateExportWindow( string $name )
 			frameLayout -l "Info" -marginHeight 5 -marginWidth 5 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p About aboutTabFrame1;
 
 				string $info;
-				$info += "Potato Engine - Export Plugin\n";
+				$info += "Potato Engine - (Anim/Model) Export Plugin\n";
 				$info += " UI Version  :\t 1.1\n";
-				$info += " File Ext :\t .model\n";
+				$info += " File Ext :\t .model, .raw_model, .inter_anim\n";
 				$info += " Made By  :\t Tom Crowley\n\n";
 				scrollField -w 300 -h 100 -text $info -ed 0 -p aboutTabFrame1;
 
