@@ -78,8 +78,21 @@ namespace strUtil
 	}
 
 	template <typename T>
+	inline T StringToInt(const wchar_t* str)
+	{
+		return safe_static_cast<T>(_wtoi(str));
+	}
+
+
+	template <typename T>
 	inline T StringToFloat(const char* str)
 	{
 		return static_cast<T>(atof(str));
+	}
+
+	template <typename T>
+	inline T StringToFloat(const wchar_t* str)
+	{
+		return static_cast<T>(_wtof(str));
 	}
 }

@@ -183,9 +183,13 @@ namespace strUtil
 	/// \remark Returns 0 if the string does not represent a valid integer value.
 	template <typename T>
 	inline T StringToInt(const char* str);
+	template <typename T>
+	inline T StringToInt(const char* str);
 
 	/// \brief Converts a string into any floating-point type.
 	/// \remark Returns 0 if the string does not represent a valid floating-point value.
+	template <typename T>
+	inline T StringToFloat(const char* str);
 	template <typename T>
 	inline T StringToFloat(const char* str);
 
