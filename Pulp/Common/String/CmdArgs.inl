@@ -107,7 +107,7 @@ bool CmdArgs<BUF_SIZE, char>::hasFlag(const char* pFlag) const
 {
 	for (size_t i = 0; i < argc_; i++)
 	{
-		if (core::strUtil::IsEqualCaseInsen(pOptionName, getArgv(i)))
+		if (core::strUtil::IsEqualCaseInsen(pFlag, getArgv(i)))
 		{
 			return true;
 		}
@@ -268,7 +268,7 @@ bool CmdArgs<BUF_SIZE, wchar_t>::hasFlag(const wchar_t* pFlag) const
 {
 	for (size_t i = 0; i < argc_; i++)
 	{
-		if (core::strUtil::IsEqualCaseInsen(pOptionName, getArgv(i)))
+		if (core::strUtil::IsEqualCaseInsen(pFlag, getArgv(i)))
 		{
 			return true;
 		}
