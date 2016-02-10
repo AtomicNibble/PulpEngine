@@ -2,6 +2,8 @@
 
 #include <Util\EnumMacros.h>
 
+#include <Traits\FunctionTraits.h>
+
 struct sqlite3;
 struct sqlite3_stmt;
 
@@ -79,9 +81,18 @@ class DLL_EXPORT SqlLiteDb
 public:
 	typedef int64_t RowId;
 
+	typedef core::traits::Function<int(int)> BusyHandler;
+	typedef core::traits::Function<int(void)> CommitHandler;
+	typedef core::traits::Function<void(void)> RollBackHandler;
+	typedef core::traits::Function<int(int, const char *, const char *, long long int)> UpdateHandler;
+	typedef core::traits::Function<int(int, const char *, const char *, const char *, const char *)> AuthorizeHandler;
+
 public:
 	SqlLiteDb();
+	SqlLiteDb(SqlLiteDb&&);
 	~SqlLiteDb();
+
+	SqlLiteDb& operator=(SqlLiteDb&&);
 
 	bool connect(const char* pDb);
 	bool disconnect(void);
@@ -103,6 +114,12 @@ public:
 
 private:
 	sqlite3* db_;
+
+	BusyHandler::Pointer bh_;
+	CommitHandler::Pointer ch_;
+	RollBackHandler::Pointer rh_;
+	UpdateHandler::Pointer uh_;
+	AuthorizeHandler::Pointer ah_;
 };
 
 

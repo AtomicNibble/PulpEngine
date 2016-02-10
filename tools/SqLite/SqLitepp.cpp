@@ -10,14 +10,44 @@ X_NAMESPACE_BEGIN(sql)
 
 
 SqlLiteDb::SqlLiteDb() :
-	db_(nullptr)
+	db_(nullptr),
+	bh_(nullptr),
+	ch_(nullptr),
+	rh_(nullptr),
+	uh_(nullptr),
+	ah_(nullptr)
 {
 
 }
 
+SqlLiteDb::SqlLiteDb(SqlLiteDb&& oth) :
+	db_(nullptr),
+	bh_(oth.bh_),
+	ch_(oth.ch_),
+	rh_(oth.rh_),
+	uh_(oth.uh_),
+	ah_(oth.ah_)
+{
+
+}
+
+
 SqlLiteDb::~SqlLiteDb()
 {
 
+}
+
+SqlLiteDb& SqlLiteDb::operator=(SqlLiteDb&& oth)
+{
+	db_ = std::move(oth.db_);
+	oth.db_ = nullptr;
+
+	bh_ = std::move(oth.bh_);
+	ch_ = std::move(oth.ch_);
+	rh_ = std::move(oth.rh_);
+	uh_ = std::move(oth.uh_);
+	ah_ = std::move(oth.ah_);
+	return *this;
 }
 
 bool SqlLiteDb::connect(const char* pDb)
