@@ -23,7 +23,7 @@ public:
 	// returns the value that follows a option.
 	X_INLINE const TChar* getOption(const TChar* pOptionName) const;
 	// check if a flag is present.
-	X_INLINE bool hasFlaag(const TChar* pFlag) const;
+	X_INLINE bool hasFlag(const TChar* pFlag) const;
 
 	X_INLINE void AppendArg(const TChar* pArg);
 
@@ -53,7 +53,7 @@ public:
 	// returns the value that follows a option.
 	X_INLINE const char* getOption(const char* pOptionName) const;
 	// check if a flag is present.
-	X_INLINE bool hasFlaag(const char* pFlag) const;
+	X_INLINE bool hasFlag(const char* pFlag) const;
 
 	X_INLINE void AppendArg(const char* pArg);
 
@@ -83,7 +83,7 @@ public:
 	// returns the value that follows a option.
 	X_INLINE const wchar_t* getOption(const wchar_t* pOptionName) const;
 	// check if a flag is present.
-	X_INLINE bool hasFlaag(const wchar_t* pFlag) const;
+	X_INLINE bool hasFlag(const wchar_t* pFlag) const;
 
 	X_INLINE void AppendArg(const wchar_t* pArg);
 

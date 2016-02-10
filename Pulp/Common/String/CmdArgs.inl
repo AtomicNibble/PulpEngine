@@ -103,7 +103,7 @@ const char* CmdArgs<BUF_SIZE, char>::getOption(const char* pOptionName) const
 }
 
 template<size_t BUF_SIZE>
-bool CmdArgs<BUF_SIZE, char>::hasFlaag(const char* pFlag) const
+bool CmdArgs<BUF_SIZE, char>::hasFlag(const char* pFlag) const
 {
 	for (size_t i = 0; i < argc_; i++)
 	{
@@ -264,7 +264,7 @@ const wchar_t* CmdArgs<BUF_SIZE, wchar_t>::getOption(const wchar_t* pOptionName)
 }
 
 template<size_t BUF_SIZE>
-bool CmdArgs<BUF_SIZE, wchar_t>::hasFlaag(const wchar_t* pFlag) const
+bool CmdArgs<BUF_SIZE, wchar_t>::hasFlag(const wchar_t* pFlag) const
 {
 	for (size_t i = 0; i < argc_; i++)
 	{
