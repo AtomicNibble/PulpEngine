@@ -364,19 +364,52 @@ TEST(StringUtil, Int) {
 }
 
 
+TEST(StringUtil, IntW) {
+
+	EXPECT_TRUE(strUtil::StringToInt<int>(L"1") == 1);
+	EXPECT_TRUE(strUtil::StringToInt<int>(L"+1") == 1);
+	EXPECT_TRUE(strUtil::StringToInt<int>(L"-1") == -1);
+	EXPECT_TRUE(strUtil::StringToInt<int>(L"+-1") == 0);
+	EXPECT_TRUE(strUtil::StringToInt<int>(L"-+1") == 0);
+
+	EXPECT_TRUE(strUtil::StringToInt<int>(L"1.0") == 1);
+	EXPECT_TRUE(strUtil::StringToInt<int>(L"+1.0") == 1);
+	EXPECT_TRUE(strUtil::StringToInt<int>(L"-1.0") == -1);
+	EXPECT_TRUE(strUtil::StringToInt<int>(L"+-1.0") == 0);
+	EXPECT_TRUE(strUtil::StringToInt<int>(L"-+1.0") == 0);
+}
+
+
 TEST(StringUtil, Float) {
 
-	EXPECT_TRUE(strUtil::StringToFloat<int>("1") == 1.f);
-	EXPECT_TRUE(strUtil::StringToFloat<int>("+1") == 1.f);
-	EXPECT_TRUE(strUtil::StringToFloat<int>("-1") == -1.f);
-	EXPECT_TRUE(strUtil::StringToFloat<int>("+-1") == 0.f);
-	EXPECT_TRUE(strUtil::StringToFloat<int>("-+1") == 0.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>("1"), 1.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>("+1"), 1.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>("-1"), -1.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>("+-1"), 0.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>("-+1"), 0.f);
 
-	EXPECT_TRUE(strUtil::StringToFloat<int>("1.0") == 1.f);
-	EXPECT_TRUE(strUtil::StringToFloat<int>("+1.0") == 1.f);
-	EXPECT_TRUE(strUtil::StringToFloat<int>("-1.0") == -1.f);
-	EXPECT_TRUE(strUtil::StringToFloat<int>("+-1.0") == 0.f);
-	EXPECT_TRUE(strUtil::StringToFloat<int>("-+1.0") == 0.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>("1.0"), 1.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>("+1.0"), 1.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>("-1.0"), -1.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>("+-1.0"), 0.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>("-+1.0"), 0.f);
+
+}
+
+
+TEST(StringUtil, FloatW) {
+
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>(L"1"), 1.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>(L"+1"), 1.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>(L"-1"), -1.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>(L"+-1"), 0.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>(L"-+1"), 0.f);
+
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>(L"1.0"), 1.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>(L"+1.0"), 1.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>(L"-1.0"), -1.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>(L"+-1.0"), 0.f);
+	EXPECT_FLOAT_EQ(strUtil::StringToFloat<float>(L"-+1.0"), 0.f);
 
 }
 
