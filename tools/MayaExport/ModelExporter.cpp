@@ -322,7 +322,7 @@ void PotatoOptions::setcmdArgs(const MArgList &args)
 		}
 	}
 
-	idx = args.flagIndex("uv_merge_thresh");
+	idx = args.flagIndex("vert_merge_thresh");
 	if (idx != MArgList::kInvalidArgIndex) {
 		double temp;
 		if (!args.get(++idx, temp)) {
