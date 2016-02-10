@@ -86,6 +86,7 @@ bool ModelCompiler::CompileModel(core::Path<wchar_t>& outFile)
 	// that way the opermisation and format writer logic can all be in one place.
 	// So i don't have to update the maya plugin and the converter when i edit the model format or change optermisations.
 	if (!ProcessModel()) {
+		X_ERROR("Model", "Failed to compile model");
 		return false;
 	}
 
@@ -95,18 +96,22 @@ bool ModelCompiler::CompileModel(core::Path<wchar_t>& outFile)
 bool ModelCompiler::ProcessModel(void)
 {
 	if (!DropWeights()) {
+		X_ERROR("Model", "Failed to drop weights");
 		return false;
 	}
 
 	if (!MergMesh()) {
+		X_ERROR("Model", "Failed to merge mesh");
 		return false;
 	}
 
 	if (!SortVerts()) {
+		X_ERROR("Model", "Failed to sort verts");
 		return false;
 	}
 
 	if (!MergVerts()) {
+		X_ERROR("Model", "Failed to mergeverts");
 		return false;
 	}
 
