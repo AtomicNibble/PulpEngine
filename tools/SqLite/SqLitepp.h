@@ -112,6 +112,8 @@ public:
 	Result::Enum executeRes(const char* sql);
 	Result::Enum executeFmtRes(const char* sql, ...);
 
+	Result::Enum setBusyTimeout(int32_t ms);
+
 	void setBusyHandler(BusyHandler::Pointer h);
 	void setCommitHandler(CommmitHandler::Pointer h);
 	void setRollBackHandler(RollBackHandler::Pointer h);

@@ -206,6 +206,10 @@ Result::Enum SqlLiteDb::executeFmtRes(const char* sql, ...)
 	return executeRes(msql.get());
 }
 
+Result::Enum SqlLiteDb::setBusyTimeout(int32_t ms)
+{
+	return static_cast<Result::Enum>(sqlite3_busy_timeout(db_, ms));
+}
 
 void SqlLiteDb::setBusyHandler(BusyHandler::Pointer h)
 {
