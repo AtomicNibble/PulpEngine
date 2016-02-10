@@ -340,6 +340,10 @@ SqlLiteCmd::SqlLiteCmd(SqlLiteDb& db, char const* pStmt) :
 {
 }
 
+SqlLiteCmd::~SqlLiteCmd() 
+{
+}
+
 SqlLiteCmd::BindStream SqlLiteCmd::binder(int idx)
 {
 	return BindStream(*this, idx);
@@ -502,6 +506,10 @@ SqlLiteQuery::query_iterator::value_type SqlLiteQuery::query_iterator::operator*
 
 SqlLiteQuery::SqlLiteQuery(SqlLiteDb& db, char const* stmt) :
 	SqlLiteStateMnt(db, stmt)
+{
+}
+
+SqlLiteQuery::~SqlLiteQuery()
 {
 }
 

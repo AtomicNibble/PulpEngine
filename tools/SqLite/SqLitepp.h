@@ -114,7 +114,7 @@ class DLL_EXPORT SqlLiteStateMnt
 
 protected:
 	explicit SqlLiteStateMnt(SqlLiteDb& db, const char* pStmt = nullptr);
-	~SqlLiteStateMnt();
+	virtual ~SqlLiteStateMnt();
 
 	Result::Enum prepare_impl(const char* pStmt);
 	Result::Enum finish_impl(sqlite3_stmt* pStmt);
@@ -179,7 +179,7 @@ public:
 
 public:
 	explicit SqlLiteCmd(SqlLiteDb& db, const char* pStmt = nullptr);
-	~SqlLiteCmd() = default;
+	~SqlLiteCmd() X_OVERRIDE;
 
 	BindStream binder(int idx = 1);
 
@@ -267,7 +267,7 @@ public:
 
 public:
 	explicit SqlLiteQuery(SqlLiteDb& db, char const* pStmt = nullptr);
-	~SqlLiteQuery() = default;
+	~SqlLiteQuery() X_OVERRIDE;
 
 	int columnCount(void) const;
 
