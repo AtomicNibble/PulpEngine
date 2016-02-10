@@ -68,7 +68,7 @@ SqlLiteDb::SqlLiteDb(SqlLiteDb&& oth) :
 
 SqlLiteDb::~SqlLiteDb()
 {
-
+	disconnect();
 }
 
 SqlLiteDb& SqlLiteDb::operator=(SqlLiteDb&& oth)
