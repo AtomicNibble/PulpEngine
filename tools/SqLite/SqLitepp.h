@@ -82,10 +82,10 @@ public:
 	typedef int64_t RowId;
 
 	typedef core::traits::Function<int(int)> BusyHandler;
-	typedef core::traits::Function<int(void)> CommitHandler;
+	typedef core::traits::Function<int(void)> CommmitHandler;
 	typedef core::traits::Function<void(void)> RollBackHandler;
-	typedef core::traits::Function<int(int, const char *, const char *, long long int)> UpdateHandler;
-	typedef core::traits::Function<int(int, const char *, const char *, const char *, const char *)> AuthorizeHandler;
+	typedef core::traits::Function<int(int, const char*, const char*, long long int)> UpdateHandler;
+	typedef core::traits::Function<int(int, const char*, const char*, const char*, const char*)> AuthorizeHandler;
 
 public:
 	SqlLiteDb();
@@ -112,11 +112,18 @@ public:
 	Result::Enum executeRes(const char* sql);
 	Result::Enum executeFmtRes(const char* sql, ...);
 
+	void setBusyHandler(BusyHandler::Pointer h);
+	void setCommitHandler(CommmitHandler::Pointer h);
+	void setRollBackHandler(RollBackHandler::Pointer h);
+	void setUpdateHandler(UpdateHandler::Pointer h);
+	void setAuthorizeHandler(AuthorizeHandler::Pointer h);
+
+
 private:
 	sqlite3* db_;
 
 	BusyHandler::Pointer bh_;
-	CommitHandler::Pointer ch_;
+	CommmitHandler::Pointer ch_;
 	RollBackHandler::Pointer rh_;
 	UpdateHandler::Pointer uh_;
 	AuthorizeHandler::Pointer ah_;

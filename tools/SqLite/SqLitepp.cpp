@@ -8,6 +8,40 @@
 
 X_NAMESPACE_BEGIN(sql)
 
+namespace
+{
+	int32_t busyHandler_impl(void* p, int32_t cnt)
+	{
+		auto h = static_cast<SqlLiteDb::BusyHandler::Pointer*>(p);
+		return (*h)(cnt);
+	}
+
+	int32_t commitHook_impl(void* p)
+	{
+		auto h = static_cast<SqlLiteDb::CommmitHandler::Pointer*>(p);
+		return (*h)();
+	}
+
+	void rollbackHook_impl(void* p)
+	{
+		auto h = static_cast<SqlLiteDb::RollBackHandler::Pointer*>(p);
+		(*h)();
+	}
+
+	void updateHook_impl(void* p, int32_t opcode, const char* dbname, const char* tablename, long long int rowid)
+	{
+		auto h = static_cast<SqlLiteDb::UpdateHandler::Pointer*>(p);
+		(*h)(opcode, dbname, tablename, rowid);
+	}
+
+	int32_t authorizer_impl(void* p, int32_t evcode, const char* p1, const char* p2, const char* dbname, const char* tvname)
+	{
+		auto h = static_cast<SqlLiteDb::AuthorizeHandler::Pointer*>(p);
+		return (*h)(evcode, p1, p2, dbname, tvname);
+	}
+
+} // namespace
+
 
 SqlLiteDb::SqlLiteDb() :
 	db_(nullptr),
@@ -170,6 +204,37 @@ Result::Enum SqlLiteDb::executeFmtRes(const char* sql, ...)
 	va_end(ap);
 
 	return executeRes(msql.get());
+}
+
+
+void SqlLiteDb::setBusyHandler(BusyHandler::Pointer h)
+{
+	bh_ = h;
+	sqlite3_busy_handler(db_, bh_ ? busyHandler_impl : 0, &bh_);
+}
+
+void SqlLiteDb::setCommitHandler(CommmitHandler::Pointer h)
+{
+	ch_ = h;
+	sqlite3_commit_hook(db_, ch_ ? commitHook_impl : 0, &ch_);
+}
+
+void SqlLiteDb::setRollBackHandler(RollBackHandler::Pointer h)
+{
+	rh_ = h;
+	sqlite3_rollback_hook(db_, rh_ ? rollbackHook_impl : 0, &rh_);
+}
+
+void SqlLiteDb::setUpdateHandler(UpdateHandler::Pointer h)
+{
+	uh_ = h;
+	sqlite3_update_hook(db_, uh_ ? updateHook_impl : 0, &uh_);
+}
+
+void SqlLiteDb::setAuthorizeHandler(AuthorizeHandler::Pointer h)
+{
+	ah_ = h;
+	sqlite3_set_authorizer(db_, ah_ ? authorizer_impl : 0, &ah_);
 }
 
 
