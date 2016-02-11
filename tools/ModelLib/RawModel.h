@@ -36,6 +36,8 @@ namespace RawModel
 		bool SaveRawModel(core::Path<char>& path);
 		bool SaveRawModel(core::Path<wchar_t>& path);
 
+		size_t totalMeshes(void) const;
+
 	private:
 		bool ParseRawModel(core::XLexer& lex);
 		bool ReadBones(core::XLexer& lex, int32_t numBones);

@@ -66,6 +66,13 @@ public:
 	bool CompileModel(core::Path<wchar_t>& outFile);
 
 private:
+	bool SaveModel(core::Path<wchar_t>& outFile);
+
+	size_t calculateTagNameDataSize(void) const;
+	size_t calculateMaterialNameDataSize(void) const ;
+	size_t calculateSubDataSize(const Flags8<model::StreamType>& streams) const;
+	size_t calculateBoneDataSize(void) const;
+
 	bool ProcessModel(void);
 	bool DropWeights(void);
 	bool MergMesh(void);

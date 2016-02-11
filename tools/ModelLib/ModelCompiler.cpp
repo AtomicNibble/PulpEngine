@@ -90,8 +90,114 @@ bool ModelCompiler::CompileModel(core::Path<wchar_t>& outFile)
 		return false;
 	}
 
+	// save it.
+	if (!SaveModel(outFile)) {
+		X_ERROR("Model", "Failed to save compiled model to: \"%ls\"",
+			outFile.c_str());
+		return false;
+	}
+
+	return true;
+}
+
+bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
+{
+
+	// open da file!
+	core::fileModeFlags mode;
+	mode.Set(core::fileMode::WRITE);
+	mode.Set(core::fileMode::RECREATE);
+
+	core::XFile* pFile = gEnv->pFileSys->openFile(outFile.c_str(), mode);
+	if(!pFile) {
+		X_ERROR("Model", "Failed to open compile output file");
+		return false;
+	}
+
+
+	{
+		core::ByteStream stream(arena_);
+
+		model::ModelHeader header;
+		core::zero_object(header);
+
+		Flags8<model::StreamType> streamsFlags;
+		streamsFlags.Set(model::StreamType::COLOR);
+		streamsFlags.Set(model::StreamType::NORMALS);
+		streamsFlags.Set(model::StreamType::TANGENT_BI);
+
+		header.version = model::MODEL_VERSION;
+		header.flags.Set(model::ModelFlags::LOOSE);
+		header.flags.Set(model::ModelFlags::STREAMS);
+		header.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
+		header.numBlankBones = 0; //  tagOrigin_.keep ? 1 : 0;
+		header.numLod = safe_static_cast<uint8_t, size_t>(lods_.size());
+		header.numMesh = safe_static_cast<uint8_t, size_t>(totalMeshes());
+		header.modified = core::dateTimeStampSmall::systemDateTime();
+
+		// Sizes
+		header.tagNameDataSize = safe_static_cast<uint16_t, uint32_t>(
+			this->calculateTagNameDataSize());
+		header.materialNameDataSize = safe_static_cast<uint16_t, uint32_t>(
+			this->calculateMaterialNameDataSize());
+		header.boneDataSize = safe_static_cast<uint16_t, uint32_t>(
+			this->calculateBoneDataSize());
+		header.subDataSize = this->calculateSubDataSize(streamsFlags);
+		header.dataSize = (header.subDataSize +
+			header.tagNameDataSize + header.materialNameDataSize);
+
+
+
+	}
+
+	gEnv->pFileSys->closeFile(pFile);
 	return false;
 }
+
+size_t ModelCompiler::calculateTagNameDataSize(void) const
+{
+	size_t size = 0;
+
+	for (auto& bone : bones_) {
+		size += bone.name_.length() + 1; // nt
+	}
+
+	return size;
+}
+
+size_t ModelCompiler::calculateMaterialNameDataSize(void) const
+{
+	size_t size = 0;
+
+	for (auto& lod : lods_) {
+		for (auto& mesh : lod.meshes_) {
+			mesh.material_.name_.size() + 1; // nt
+		}
+	}
+
+	return size;
+}
+
+size_t ModelCompiler::calculateSubDataSize(const Flags8<model::StreamType>& streams) const
+{
+	size_t size = this->calculateBoneDataSize();
+
+	size += sizeof(model::SubMeshHeader) * totalMeshes();
+
+	for (auto& lod : lods_) {
+
+	}
+
+	return size;
+}
+
+size_t ModelCompiler::calculateBoneDataSize(void) const
+{
+	size_t size = 0;
+
+	return size;
+}
+
 
 bool ModelCompiler::ProcessModel(void)
 {

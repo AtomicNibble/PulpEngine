@@ -40,6 +40,15 @@ namespace RawModel
 		return SaveRawModel(narrowPath);
 	}
 
+	size_t Model::totalMeshes(void) const
+	{
+		size_t num = 0;
+		for (auto& lod : lods_) {
+			num += lod.meshes_.size();
+		}
+
+		return num;
+	}
 
 
 	bool Model::LoadRawModel(core::Path<char>& path)
