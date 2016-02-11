@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Containers\Array.h>
+#include <IModel.h>
 
 X_NAMESPACE_BEGIN(model)
 
@@ -79,10 +80,13 @@ namespace RawModel
 		~Mesh() = default;
 
 		void merge(const Mesh& oth);
+		void calBoundingbox(void);
 
+	public:
 		VertsArr verts_;
 		FaceArr face_;
 		Material material_;
+		AABB boundingBox_;
 	};
 
 	class Lod
@@ -93,6 +97,12 @@ namespace RawModel
 		Lod(core::MemoryArenaBase* arena);
 		~Lod() = default;
 
+		size_t getSubDataSize(const Flags8<model::StreamType>& streams) const;
+		size_t numMeshes(void) const;
+		size_t totalVerts(void) const;
+		size_t totalIndexs(void) const;
+
+	public:
 		float32_t distance_;
 		MeshArr meshes_;
 	};
