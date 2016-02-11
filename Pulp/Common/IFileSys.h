@@ -627,6 +627,11 @@ public:
 		pFile_ = pFileSys_->openFile(path, mode);
 		return pFile_ != nullptr;
 	}
+	inline bool openFile(const wchar_t* path, IFileSys::fileModeFlags mode) {
+		pFile_ = pFileSys_->openFile(path, mode);
+		return pFile_ != nullptr;
+	}
+
 
 	inline void close(void) {
 		if (pFile_) {
