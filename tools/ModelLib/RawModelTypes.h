@@ -42,12 +42,13 @@ namespace RawModel
 
 		Vec3f pos_;
 		Vec3f normal_;
+		Vec3f tangent_;
+		Vec3f biNormal_;
 		Color col_;
 		Vec2f uv_;
 
 		BindsArr binds_;
 	};
-
 
 	typedef int32_t Index;
 	typedef Vec3<Index> Face;

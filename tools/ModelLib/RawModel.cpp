@@ -310,6 +310,8 @@ namespace RawModel
 		/*  v
 			pos
 			normal
+			tan
+			biNorm
 			col
 			uv */
 			int32_t numBinds;
@@ -324,6 +326,14 @@ namespace RawModel
 			}
 			if (!lex.Parse1DMatrix(3, &vert.normal_[0])) {
 				X_ERROR("RawModel", "Failed to read vert normal");
+				return false;
+			}
+			if (!lex.Parse1DMatrix(3, &vert.tangent_[0])) {
+				X_ERROR("RawModel", "Failed to read vert tangent");
+				return false;
+			}
+			if (!lex.Parse1DMatrix(3, &vert.biNormal_[0])) {
+				X_ERROR("RawModel", "Failed to read vert bi-normal");
 				return false;
 			}
 			if (!lex.Parse1DMatrix(4, &vert.col_[0])) {
@@ -545,12 +555,16 @@ namespace RawModel
 		{
 			const Vec3f& pos = vert.pos_;
 			const Vec3f& normal = vert.normal_;
+			const Vec3f& tan = vert.tangent_;
+			const Vec3f& biNormal = vert.biNormal_;
 			const Color& col = vert.col_;
 			const Vec2f& uv = vert.uv_;
 
 			fprintf(f, "v %" PRIuS "\n", vert.binds_.size());
 			fprintf(f, "(%f,%f,%f)\n", pos.x, pos.y, pos.z);
 			fprintf(f, "(%f,%f,%f)\n", normal.x, normal.y, normal.z);
+			fprintf(f, "(%f,%f,%f)\n", tan.x, tan.y, tan.z);
+			fprintf(f, "(%f,%f,%f)\n", biNormal.x, biNormal.y, biNormal.z);
 			fprintf(f, "(%f,%f,%f,%f)\n", col.r, col.g, col.b, col.a);
 			fprintf(f, "(%f,%f)\n", uv.x, uv.y);
 
