@@ -282,7 +282,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 
 	for (size_t i = 0; i < lods_.size(); i++) {
 		model::LODHeader& lod = header.lodInfo[i];
-		lod.lodDistance = 10000.f;
+		lod.lodDistance = lods_[i].distance_;
 		lod.numSubMeshes = safe_static_cast<uint16_t, size_t>(lods_[i].numMeshes());
 		// we want to know the offset o.o
 		lod.subMeshHeads = meshHeadOffsets;
