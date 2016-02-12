@@ -37,6 +37,9 @@ public:
 	{
 		Stats(core::MemoryArenaBase* arena);
 
+		void clear(void);
+
+	public:
 		uint32_t totalLods;
 		uint32_t totalMesh;
 		uint32_t totalJoints;

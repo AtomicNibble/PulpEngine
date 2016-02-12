@@ -71,6 +71,22 @@ ModelCompiler::Stats::Stats(core::MemoryArenaBase* arena) :
 	totalWeightsDropped = 0;
 }
 
+void ModelCompiler::Stats::clear(void)
+{
+	totalLods = 0;
+	totalMesh = 0;
+	totalJoints = 0;
+	totalJointsDropped = 0;
+	totalVerts = 0;
+	totalFaces = 0;
+	totalWeightsDropped = 0;
+
+	droppedBoneNames.clear();
+	droppedBoneNames.setGranularity(16);
+
+	bounds.clear();
+}
+
 
 ModelCompiler::ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
 	RawModel::Model(arena),
@@ -118,6 +134,8 @@ bool ModelCompiler::CompileModel(core::Path<char>& outFile)
 
 bool ModelCompiler::CompileModel(core::Path<wchar_t>& outFile)
 {
+	stats_.clear();
+
 	outFile.setExtension(model::MODEL_FILE_EXTENSION_W);
 
 	// raw models are unprocessed and un optimised.
