@@ -573,6 +573,11 @@ bool ModelCompiler::ProcessModel(void)
 		return false;
 	}
 
+	if (!UpdateMeshBounds()) {
+		X_ERROR("Model", "Failed to update mesh bounds");
+		return false;
+	}
+
 	return true;
 }
 
