@@ -12,6 +12,45 @@ X_ENABLE_WARNING(4702)
 
 X_NAMESPACE_BEGIN(model)
 
+namespace
+{
+	uint32_t hashsingle(float f)
+	{
+		union {
+			unsigned int ui;
+			float fv;
+		};
+		fv = f;
+		return ((ui & 0xfffff000) >> 12);
+	}
+
+	int64 Hash(float x, float y, float z)
+	{
+		int64 h1 = hashsingle(x);
+		int64 h2 = hashsingle(y);
+		int64 h3 = hashsingle(z);
+		return (h1 << 40) | (h2 << 20) | h3;
+	}
+
+	int64 vertHash(const RawModel::Vert& vert)
+	{
+		return Hash(vert.pos_[0], vert.pos_[1], vert.pos_[2]);
+	}
+
+
+	struct Hashcontainer
+	{
+		Hashcontainer() {
+			pVert = nullptr;
+			idx = 0;
+		}
+
+		RawModel::Vert* pVert;
+		int32_t idx;
+	};
+
+} // namesace 
+
 const float ModelCompiler::MERGE_VERTEX_ELIPSION = 0.05f;
 const float ModelCompiler::MERGE_TEXCOORDS_ELIPSION = 0.02f;
 const float ModelCompiler::JOINT_WEIGHT_THRESHOLD = 0.005f;
@@ -684,45 +723,6 @@ bool ModelCompiler::UpdateMeshBounds(void)
 	return true;
 }
 
-namespace
-{
-
-	unsigned int hashsingle(float f)
-	{
-		union {
-			unsigned int ui;
-			float fv;
-		};
-		fv = f;
-		return ((ui & 0xfffff000) >> 12);
-	}
-
-	int64 Hash(float x, float y, float z)
-	{
-		int64 h1 = hashsingle(x);
-		int64 h2 = hashsingle(y);
-		int64 h3 = hashsingle(z);
-		return (h1 << 40) | (h2 << 20) | h3;
-	}
-
-	int64 vertHash(const RawModel::Vert& vert)
-	{
-		return Hash(vert.pos_[0], vert.pos_[1], vert.pos_[2]);
-	}
-
-
-	struct Hashcontainer
-	{
-		Hashcontainer() {
-			pVert = nullptr;
-			idx = 0;
-		}
-
-		RawModel::Vert* pVert;
-		int idx;
-	};
-
-}
 
 void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 {
