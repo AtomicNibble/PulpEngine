@@ -657,6 +657,33 @@ bool ModelCompiler::MergVerts(void)
 	return true;
 }
 
+bool ModelCompiler::UpdateMeshBounds(void)
+{
+	core::V2::Job* pJobs[model::MODEL_MAX_LODS] = { nullptr };
+
+	size_t i;
+	for (i = 0; i < lods_.size(); i++)
+	{
+		RawModel::Mesh* pMesh = lods_[i].meshes_.ptr();
+		uint32_t numMesh = safe_static_cast<uint32_t, size_t>(lods_[i].meshes_.size());
+
+		core::Delegate<void(RawModel::Mesh*, uint32_t)> del;
+		del.Bind<ModelCompiler, &ModelCompiler::UpdateBoundsJob>(this);
+
+		// create a job for each mesh.
+		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh, core::V2::CountSplitter32(1));
+		pJobSys_->Run(pJobs[i]);
+	}
+
+	for (i = 0; i < lods_.size(); i++)
+	{
+		pJobSys_->Wait(pJobs[i]);
+	}
+
+
+	return true;
+}
+
 namespace
 {
 
@@ -786,6 +813,16 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 				}
 			}
 		}
+	}
+}
+
+
+void ModelCompiler::UpdateBoundsJob(RawModel::Mesh* pMesh, uint32_t count)
+{
+	size_t i;
+
+	for (i = 0; i < count; i++) {
+		pMesh[i].calBoundingbox();
 	}
 }
 

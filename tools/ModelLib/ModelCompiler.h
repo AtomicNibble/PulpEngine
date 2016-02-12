@@ -78,9 +78,11 @@ private:
 	bool MergMesh(void);
 	bool SortVerts(void);
 	bool MergVerts(void);
+	bool UpdateMeshBounds(void);
 
 private:
 	void MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count);
+	void UpdateBoundsJob(RawModel::Mesh* pMesh, uint32_t count);
 	static void SortVertsJob(RawModel::Mesh* pMesh, size_t count);
 	static void DropWeightsJob(RawModel::Vert* pVerts, size_t count);
 
