@@ -240,7 +240,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		return false;
 	}
 
-	stats_.totalJoints = bones_.size();
+	stats_.totalJoints = safe_static_cast<uint8_t, size_t>(bones_.size());
 
 
 	core::ByteStream stream(arena_);
@@ -263,13 +263,14 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 	header.modified = core::dateTimeStampSmall::systemDateTime();
 
 	// Sizes
-	header.tagNameDataSize = safe_static_cast<uint16_t, uint32_t>(
+	header.tagNameDataSize = safe_static_cast<uint16_t, size_t>(
 		this->calculateTagNameDataSize());
-	header.materialNameDataSize = safe_static_cast<uint16_t, uint32_t>(
+	header.materialNameDataSize = safe_static_cast<uint16_t, size_t>(
 		this->calculateMaterialNameDataSize());
-	header.boneDataSize = safe_static_cast<uint16_t, uint32_t>(
+	header.boneDataSize = safe_static_cast<uint16_t, size_t>(
 		this->calculateBoneDataSize());
-	header.subDataSize = this->calculateSubDataSize(streamsFlags);
+	header.subDataSize = safe_static_cast<uint32_t, size_t>(
+		this->calculateSubDataSize(streamsFlags));
 	header.dataSize = (header.subDataSize +
 		header.tagNameDataSize + header.materialNameDataSize);
 
@@ -287,8 +288,8 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		lod.subMeshHeads = meshHeadOffsets;
 
 		// version 5.0 info
-		lod.numVerts = lods_[i].totalVerts();
-		lod.numIndexes = lods_[i].totalIndexs();
+		lod.numVerts = safe_static_cast<uint8_t, size_t>(lods_[i].totalVerts());
+		lod.numIndexes = safe_static_cast<uint8_t, size_t>(lods_[i].totalIndexs());
 
 		// Version 8.0 info
 		lod.streamsFlag = streamsFlags;
