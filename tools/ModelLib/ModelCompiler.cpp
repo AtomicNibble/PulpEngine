@@ -135,7 +135,7 @@ bool ModelCompiler::CompileModel(core::Path<char>& outFile)
 bool ModelCompiler::CompileModel(core::Path<wchar_t>& outFile)
 {
 	stats_.clear();
-
+		
 	outFile.setExtension(model::MODEL_FILE_EXTENSION_W);
 
 	// raw models are unprocessed and un optimised.
@@ -171,6 +171,8 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		X_ERROR("Model", "Failed to open compile output file");
 		return false;
 	}
+
+	stats_.totalJoints = bones_.size();
 
 
 	core::ByteStream stream(arena_);
@@ -246,6 +248,8 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		header.boundingBox.add(lod.boundingBox);
 	}
 
+	// update bounds in stats.
+	stats_.bounds = header.boundingBox;
 
 	if (file.writeObj(header) != sizeof(header)) {
 		X_ERROR("Modle", "Failed to write header");
@@ -334,6 +338,8 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		vertOffset = 0;
 		indexOffset = 0;
 
+		stats_.totalLods++;
+
 		for (auto& rawMesh : lods_[i].meshes_)
 		{
 			model::SubMeshHeader meshHdr;
@@ -358,6 +364,10 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 			// inc the offsets
 			vertOffset += meshHdr.numVerts;
 			indexOffset += meshHdr.numIndexes;
+
+			stats_.totalMesh++;
+			stats_.totalVerts += meshHdr.numVerts;
+			stats_.totalFaces += (meshHdr.numIndexes / 3);
 
 			if ((meshHdr.numIndexes % 3) != 0) {
 				X_ERROR("Model", "Mesh index count is not a multiple of 3, count: %i", meshHdr.numIndexes);
