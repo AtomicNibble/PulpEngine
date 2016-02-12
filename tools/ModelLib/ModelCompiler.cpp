@@ -108,50 +108,353 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 	mode.Set(core::fileMode::WRITE);
 	mode.Set(core::fileMode::RECREATE);
 
-	core::XFile* pFile = gEnv->pFileSys->openFile(outFile.c_str(), mode);
-	if(!pFile) {
+	core::XFileScoped file;
+		
+	if (file.openFile(outFile.c_str(), mode)) {
 		X_ERROR("Model", "Failed to open compile output file");
 		return false;
 	}
 
 
-	{
-		core::ByteStream stream(arena_);
+	core::ByteStream stream(arena_);
 
-		model::ModelHeader header;
-		core::zero_object(header);
+	model::ModelHeader header;
+	core::zero_object(header);
 
-		Flags8<model::StreamType> streamsFlags;
-		streamsFlags.Set(model::StreamType::COLOR);
-		streamsFlags.Set(model::StreamType::NORMALS);
-		streamsFlags.Set(model::StreamType::TANGENT_BI);
+	Flags8<model::StreamType> streamsFlags;
+	streamsFlags.Set(model::StreamType::COLOR);
+	streamsFlags.Set(model::StreamType::NORMALS);
+	streamsFlags.Set(model::StreamType::TANGENT_BI);
 
-		header.version = model::MODEL_VERSION;
-		header.flags.Set(model::ModelFlags::LOOSE);
-		header.flags.Set(model::ModelFlags::STREAMS);
-		header.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
-		header.numBlankBones = 0; //  tagOrigin_.keep ? 1 : 0;
-		header.numLod = safe_static_cast<uint8_t, size_t>(lods_.size());
-		header.numMesh = safe_static_cast<uint8_t, size_t>(totalMeshes());
-		header.modified = core::dateTimeStampSmall::systemDateTime();
+	header.version = model::MODEL_VERSION;
+	header.flags.Set(model::ModelFlags::LOOSE);
+	header.flags.Set(model::ModelFlags::STREAMS);
+	header.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
+	header.numBlankBones = 0; //  tagOrigin_.keep ? 1 : 0;
+	header.numLod = safe_static_cast<uint8_t, size_t>(lods_.size());
+	header.numMesh = safe_static_cast<uint8_t, size_t>(totalMeshes());
+	header.modified = core::dateTimeStampSmall::systemDateTime();
 
-		// Sizes
-		header.tagNameDataSize = safe_static_cast<uint16_t, uint32_t>(
-			this->calculateTagNameDataSize());
-		header.materialNameDataSize = safe_static_cast<uint16_t, uint32_t>(
-			this->calculateMaterialNameDataSize());
-		header.boneDataSize = safe_static_cast<uint16_t, uint32_t>(
-			this->calculateBoneDataSize());
-		header.subDataSize = this->calculateSubDataSize(streamsFlags);
-		header.dataSize = (header.subDataSize +
-			header.tagNameDataSize + header.materialNameDataSize);
-
+	// Sizes
+	header.tagNameDataSize = safe_static_cast<uint16_t, uint32_t>(
+		this->calculateTagNameDataSize());
+	header.materialNameDataSize = safe_static_cast<uint16_t, uint32_t>(
+		this->calculateMaterialNameDataSize());
+	header.boneDataSize = safe_static_cast<uint16_t, uint32_t>(
+		this->calculateBoneDataSize());
+	header.subDataSize = this->calculateSubDataSize(streamsFlags);
+	header.dataSize = (header.subDataSize +
+		header.tagNameDataSize + header.materialNameDataSize);
 
 
+	size_t meshHeadOffsets = sizeof(model::ModelHeader);
+	for (auto& bone : bones_) {
+		meshHeadOffsets += bone.name_.length() + sizeof(XQuatCompressedf) + sizeof(Vec3f) + 2;
 	}
 
-	gEnv->pFileSys->closeFile(pFile);
-	return false;
+	for (size_t i = 0; i < lods_.size(); i++) {
+		model::LODHeader& lod = header.lodInfo[i];
+		lod.lodDistance = 10000.f;
+		lod.numSubMeshes = safe_static_cast<uint16_t, size_t>(lods_[i].numMeshes());
+		// we want to know the offset o.o
+		lod.subMeshHeads = meshHeadOffsets;
+
+		// version 5.0 info
+		lod.numVerts = lods_[i].totalVerts();
+		lod.numIndexes = lods_[i].totalIndexs();
+
+		// Version 8.0 info
+		lod.streamsFlag = streamsFlags;
+
+		// work out bounds for all meshes.
+		lod.boundingBox.clear();
+		for (size_t x = 0; x < lods_[i].meshes_.size(); x++)
+		{
+			const RawModel::Mesh& mesh = lods_[i].meshes_[x];
+
+			lod.boundingBox.add(mesh.boundingBox_);
+		}
+		// create sphere.
+		lod.boundingSphere = Sphere(lod.boundingBox);
+
+
+		meshHeadOffsets += lod.numSubMeshes * sizeof(model::MeshHeader);
+	}
+
+	// create combined bounding box.
+	header.boundingBox.clear();
+	for (size_t i = 0; i < lods_.size(); i++)
+	{
+		model::LODHeader& lod = header.lodInfo[i];
+		header.boundingBox.add(lod.boundingBox);
+	}
+
+
+	if (file.writeObj(header) != sizeof(header)) {
+		X_ERROR("Modle", "Failed to write header");
+		return false;
+	}
+
+	// material names( ALL LOD)
+	{
+		for (size_t i = 0; i < lods_.size(); i++)
+		{
+			// meshes 
+			for (auto& mesh : lods_[i].meshes_)
+			{
+				RawModel::Material& mat = mesh.material_;
+
+#if defined(X_MODEL_MTL_LOWER_CASE_NAMES) && X_MODEL_MTL_LOWER_CASE_NAMES
+				mat.name_.toLower();
+#endif // ~X_MODEL_MTL_LOWER_CASE_NAMES
+
+				if (!file.writeString(mat.name_)) {
+					X_ERROR("Modle", "Failed to write material name");
+					return false;
+				}
+			}
+		}
+	}
+
+	// bone data.
+	{
+		for (auto& bone : bones_)
+		{
+#if defined(X_MODEL_BONES_LOWER_CASE_NAMES) && X_MODEL_BONES_LOWER_CASE_NAMES
+			bone.name_.toLower();
+#endif // ~X_MODEL_BONES_LOWER_CASE_NAMES
+			if (!file.writeString(bone.name_)) {
+				X_ERROR("Modle", "Failed to write bone name");
+				return false;
+			}
+		}
+
+		// space for name index data.
+		{
+			uint16_t blankData[255] = { 0 };
+			const size_t boneNameIndexBytes = sizeof(uint16_t) * (header.numBones + header.numBlankBones);
+
+			if (file.write(blankData, boneNameIndexBytes) != boneNameIndexBytes) {
+				X_ERROR("Model", "Failed to write bone index data");
+				return true;
+			}
+		}
+
+		// hierarchy
+		{
+
+
+		}
+
+		// angles.
+		for (auto& bone : bones_)
+		{
+			XQuatCompressedf quat(bone.rotation_);
+
+			if (file.writeObj(quat) != sizeof(quat)) {
+				X_ERROR("Model", "Failed to write bone angle");
+				return false;
+			}
+		}
+
+		// pos.
+		for (auto& bone : bones_)
+		{
+			const Vec3f& pos = bone.worldPos_;
+
+			if (file.writeObj(pos) != sizeof(pos)) {
+				X_ERROR("Model", "Failed to write bone pos");
+				return false;
+			}
+		}
+	}
+
+	// write mesh headers for each lod.
+	for (size_t i = 0; i < lods_.size(); i++)
+	{
+		uint32_t vertOffset, indexOffset;
+
+		vertOffset = 0;
+		indexOffset = 0;
+
+		for (auto& rawMesh : lods_[i].meshes_)
+		{
+			model::SubMeshHeader meshHdr;
+			core::zero_object(meshHdr);
+
+
+			meshHdr.numBinds = 0;
+			meshHdr.numVerts = safe_static_cast<uint16_t, size_t>(rawMesh.verts_.size());
+			meshHdr.numIndexes = safe_static_cast<uint16_t, size_t>(rawMesh.face_.size() * 3);
+			//		mesh.material = pMesh->material;
+	//		mesh.CompBinds = pMesh->CompBinds;
+			meshHdr.boundingBox = rawMesh.boundingBox_;
+			meshHdr.boundingSphere = Sphere(rawMesh.boundingBox_);
+
+			// Version 5.0 info
+			meshHdr.startVertex = vertOffset;
+			meshHdr.startIndex = indexOffset;
+
+			// Version 8.0 info
+			meshHdr.streamsFlag = streamsFlags; // currently a 3d model has identical flags for all meshes.
+
+			// inc the offsets
+			vertOffset += meshHdr.numVerts;
+			indexOffset += meshHdr.numIndexes;
+
+			if ((meshHdr.numIndexes % 3) != 0) {
+				X_ERROR("Model", "Mesh index count is not a multiple of 3, count: %i", meshHdr.numIndexes);
+				return false;
+			}
+
+			if (file.writeObj(meshHdr) != sizeof(meshHdr)) {
+				X_ERROR("Model", "Failed to write mesh header");
+				return false;
+			}
+		}
+	}
+
+	// now we write Vert + faces + bindData
+	// we convert them now to the real format.
+	// as processing the data in the commpressed state is slower.
+
+	for (size_t i = 0; i < lods_.size(); i++)
+	{
+		size_t requiredStreamSize = 0;
+
+		for (auto& rawMesh : lods_[i].meshes_)
+		{
+			//	requiredStreamSize += mesh->CompBinds.dataSizeTotal();
+			requiredStreamSize += (rawMesh.face_.size() * sizeof(model::Face));
+			requiredStreamSize += (rawMesh.verts_.size() * sizeof(model::Vertex));
+
+			if (streamsFlags.IsSet(model::StreamType::COLOR))
+			{
+				requiredStreamSize += (rawMesh.verts_.size() * sizeof(model::VertexColor));
+			}
+			if (streamsFlags.IsSet(model::StreamType::NORMALS))
+			{
+				requiredStreamSize += (rawMesh.verts_.size() * sizeof(model::VertexNormal));
+			}
+			if (streamsFlags.IsSet(model::StreamType::TANGENT_BI))
+			{
+				requiredStreamSize += (rawMesh.verts_.size() * sizeof(model::VertexTangentBi));
+			}
+		}
+
+		// writing this info to a stream makes write time 5x times faster.
+		stream.resize(requiredStreamSize);
+		stream.reset();
+
+		// write all the verts.
+		for (auto& rawMesh : lods_[i].meshes_)
+		{
+			model::Vertex vert;
+			core::zero_object(vert);
+
+			for (size_t x = 0; x < rawMesh.verts_.size(); x++)
+			{
+				const RawModel::Vert& rawVert = rawMesh.verts_[x];
+
+				vert.pos = rawVert.pos_;
+				vert.st[0] = XHalfCompressor::compress(rawVert.uv_[0]);
+				vert.st[1] = XHalfCompressor::compress(1.f - rawVert.uv_[1]);
+
+				stream.write(vert);
+			}
+		}
+
+		// write all the colors.
+		if (streamsFlags.IsSet(model::StreamType::COLOR))
+		{
+			for (auto& rawMesh : lods_[i].meshes_)
+			{
+				model::VertexColor col;
+				col.set(0xFF, 0xFF, 0xFF, 0xFF);
+
+				if (flags_.IsSet(CompileFlag::WHITE_VERT_COL))
+				{
+					for (size_t x = 0; x < rawMesh.verts_.size(); x++)
+					{
+						stream.write(col);
+					}
+				}
+				else
+				{
+					for (size_t x = 0; x < rawMesh.verts_.size(); x++)
+					{
+						const RawModel::Vert& rawVert = rawMesh.verts_[x];
+
+						col = rawVert.col_;
+						stream.write(col);
+					}
+				}
+			}
+		}
+
+		// write normals
+		if (streamsFlags.IsSet(model::StreamType::NORMALS))
+		{
+			for (auto& rawMesh : lods_[i].meshes_)
+			{
+				model::VertexNormal normal;
+
+				for (size_t x = 0; x < rawMesh.verts_.size(); x++)
+				{
+					const RawModel::Vert& rawVert = rawMesh.verts_[x];
+
+					normal = rawVert.normal_;
+					stream.write(normal);
+				}
+			}
+		}
+
+		// write tangents and bi-normals
+		if (streamsFlags.IsSet(model::StreamType::TANGENT_BI))
+		{
+			for (auto& rawMesh : lods_[i].meshes_)
+			{
+				model::VertexTangentBi tangent;
+
+				for (size_t x = 0; x < rawMesh.verts_.size(); x++)
+				{
+					const RawModel::Vert& rawVert = rawMesh.verts_[x];
+
+					tangent.binormal = rawVert.biNormal_;
+					tangent.tangent = rawVert.tangent_;
+					stream.write(tangent);
+				}
+			}
+		}
+
+		// write all the faces
+		for (auto& rawMesh : lods_[i].meshes_)
+		{
+			for (size_t x = 0; x < rawMesh.face_.size(); x++)
+			{
+				const RawModel::Face& face = rawMesh.face_[x];
+
+				stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[2]));
+				stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[1]));
+				stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[0]));
+			}
+		}
+
+		// write all the bind info.
+		for (auto& rawMesh : lods_[i].meshes_)
+		{
+
+		}
+
+		// Write the complete LOD's data all at once.
+		if (file.write(stream.begin(), stream.size()) != stream.size()) {
+			X_ERROR("Model", "Failed to write lod data");
+			return false;
+		}
+	}
+
+
+	return true;
 }
 
 size_t ModelCompiler::calculateTagNameDataSize(void) const
@@ -171,7 +474,7 @@ size_t ModelCompiler::calculateMaterialNameDataSize(void) const
 
 	for (auto& lod : lods_) {
 		for (auto& mesh : lod.meshes_) {
-			mesh.material_.name_.size() + 1; // nt
+			size += mesh.material_.name_.size() + 1; // nt
 		}
 	}
 
@@ -185,7 +488,7 @@ size_t ModelCompiler::calculateSubDataSize(const Flags8<model::StreamType>& stre
 	size += sizeof(model::SubMeshHeader) * totalMeshes();
 
 	for (auto& lod : lods_) {
-
+		size += lod.getSubDataSize(streams);
 	}
 
 	return size;
@@ -194,6 +497,16 @@ size_t ModelCompiler::calculateSubDataSize(const Flags8<model::StreamType>& stre
 size_t ModelCompiler::calculateBoneDataSize(void) const
 {
 	size_t size = 0;
+
+
+	size_t fullbones = bones_.size();
+	size_t totalbones = fullbones; // +(tagOrigin_.keep ? 1 : 0);
+
+	// don't store pos,angle,hier for blank bones currently.
+	size += (fullbones * sizeof(uint8_t)); // hierarchy
+	size += (fullbones * sizeof(XQuatCompressedf)); // angle
+	size += (fullbones * sizeof(Vec3f));	// pos.
+	size += (totalbones * sizeof(uint16_t));	// string table idx's
 
 	return size;
 }
