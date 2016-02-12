@@ -71,6 +71,70 @@ ModelCompiler::Stats::Stats(core::MemoryArenaBase* arena) :
 	totalWeightsDropped = 0;
 }
 
+void ModelCompiler::Stats::print(void) const
+{
+	X_LOG0("Model", "Model Info:");
+	X_LOG0("Model", "> Total Lods: %i", totalLods);
+	X_LOG0("Model", "> Total Mesh: %i", totalMesh);
+	X_LOG0("Model", "> Total Joints: %i", totalJoints);
+	X_LOG0("Model", "> Total Joints Dropped: %i", totalJointsDropped);
+
+	core::StackString<1024> info;
+
+	if (droppedBoneNames.size() > 0) {
+		info.append(" -> (");
+		for (uint i = 0; i < droppedBoneNames.size(); i++) {
+			info.append(droppedBoneNames[i].c_str());
+
+			if (i < (droppedBoneNames.size() - 1)) {
+				info.append(", ");
+			}
+
+			if (i > 9 && (i % 10) == 0) {
+				info.append("");
+			}
+		}
+		info.append(")");
+	}
+	if (droppedBoneNames.size() > 10) {
+		info.append("");
+	}
+
+	X_LOG0("Model", info.c_str());
+	X_LOG0("Model", "> Total Verts: %i", totalVerts);
+	X_LOG0("Model", "> Total Faces: %i", totalFaces);
+	X_LOG0("Model", "> Total eights Dropped: %i", totalWeightsDropped);
+
+	if (totalWeightsDropped > 0) {
+		X_LOG0("Model", "!> bind weights where dropped, consider binding with max influences: 4");
+	}
+
+	{
+		const AABB& b = bounds;
+		const auto min = b.min;
+		const auto max = b.max;
+		info.set("> Bounds: ");
+		info.appendFmt("(%g,%g,%g) <-> ", min[0], min[1], min[2]);
+		info.appendFmt("(%g,%g,%g)", max[0], max[1], max[2]);
+		X_LOG0("Model", info.c_str());
+
+		const auto size = b.size();
+		info.set("> Dimensions: ");
+		info.appendFmt("w: %g d: %g h: %g", size[0], size[1], size[2]);
+		X_LOG0("Model", info.c_str());
+
+/*
+		if (stats_.unitOfMeasurement_ == PotatoOptions::INCHES) {
+			info.append(" (inches)");
+		}
+		else {
+			info.append(" (cm)");
+		}
+		*/
+	}
+}
+
+
 void ModelCompiler::Stats::clear(void)
 {
 	totalLods = 0;
@@ -86,7 +150,6 @@ void ModelCompiler::Stats::clear(void)
 
 	bounds.clear();
 }
-
 
 ModelCompiler::ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
 	RawModel::Model(arena),
@@ -123,6 +186,11 @@ void ModelCompiler::SetScale(float scale)
 void ModelCompiler::setFlags(CompileFlags flags)
 {
 	flags_ = flags;
+}
+
+void ModelCompiler::PrintStats(void) const
+{
+	stats_.print();
 }
 
 

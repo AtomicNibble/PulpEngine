@@ -38,6 +38,7 @@ public:
 		Stats(core::MemoryArenaBase* arena);
 
 		void clear(void);
+		void print(void) const;
 
 	public:
 		uint32_t totalLods;
@@ -64,9 +65,12 @@ public:
 	void SetJointWeightThreshold(float elipson);
 	void SetScale(float scale);
 	void setFlags(CompileFlags flags);
+	void PrintStats(void) const;
+
 
 	bool CompileModel(core::Path<char>& outFile);
 	bool CompileModel(core::Path<wchar_t>& outFile);
+
 
 private:
 	bool SaveModel(core::Path<wchar_t>& outFile);
