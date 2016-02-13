@@ -33,6 +33,8 @@ namespace RawModel
 		float weight_;
 	};
 
+	X_DISABLE_WARNING(4324)
+
 	X_ALIGNED_SYMBOL(class Vert, 64)
 	{
 	public:
@@ -50,6 +52,8 @@ namespace RawModel
 
 		BindsArr binds_;
 	};
+
+	X_ENABLE_WARNING(4324)
 
 	typedef int32_t Index;
 	typedef Vec3<Index> Face;
