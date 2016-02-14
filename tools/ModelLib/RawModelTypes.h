@@ -75,6 +75,7 @@ namespace RawModel
 
 	class Mesh
 	{
+		typedef core::StackString<60> NameString;
 	public:
 		typedef core::Array<Vert> VertsArr;
 		typedef core::Array<Face> FaceArr;
@@ -87,6 +88,9 @@ namespace RawModel
 		void calBoundingbox(void);
 
 	public:
+		NameString name_;
+		NameString displayName_;
+
 		VertsArr verts_;
 		FaceArr face_;
 		Material material_;
