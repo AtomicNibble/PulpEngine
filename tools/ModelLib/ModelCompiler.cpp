@@ -726,7 +726,7 @@ bool ModelCompiler::MergMesh(void)
 
 				if (&mesh != &othMesh)
 				{
-					if (mesh.material_.name_ == mesh.material_.name_)
+					if (mesh.material_.name_ == othMesh.material_.name_)
 					{
 						// want to merge and remove.
 						mesh.merge(othMesh);
