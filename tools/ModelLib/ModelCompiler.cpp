@@ -851,7 +851,7 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 			size_t numUnique = 0;
 			size_t i, x;
 
-			size_t numVerts = v.size();
+			RawModel::Index numVerts = safe_static_cast<RawModel::Index,size_t>(v.size());
 
 			for (i = 0; i < mesh.face_.size(); i++)
 			{
