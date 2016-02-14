@@ -680,12 +680,12 @@ bool ModelCompiler::ProcessModel(void)
 
 bool ModelCompiler::DropWeights(void)
 {
-	core::Stack<core::V2::Job*> jobs(arena_);
+	core::Stack<core::V2::Job*> jobs(arena_, 512);
 
 	// create jobs for each mesh.
-	for (auto lod : lods_)
+	for (auto& lod : lods_)
 	{
-		for (auto mesh : lod.meshes_)
+		for (auto& mesh : lod.meshes_)
 		{
 			RawModel::Vert* pVerts = mesh.verts_.ptr();
 			size_t numVerts = mesh.verts_.size();
@@ -706,7 +706,7 @@ bool ModelCompiler::DropWeights(void)
 		jobs.pop();
 	}
 
-	return false;
+	return true;
 }
 
 bool ModelCompiler::MergMesh(void)
@@ -716,13 +716,13 @@ bool ModelCompiler::MergMesh(void)
 	}
 
 	// mesh with same materials can be merged.
-	for (auto lod : lods_)
+	for (auto& lod : lods_)
 	{
-		for (auto mesh : lod.meshes_)
+		for (auto& mesh : lod.meshes_)
 		{
 			for (size_t i = 0; i < lod.meshes_.size(); i++)
 			{
-				auto othMesh = lod.meshes_[i];
+				auto& othMesh = lod.meshes_[i];
 
 				if (&mesh != &othMesh)
 				{
@@ -851,6 +851,8 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 			size_t numUnique = 0;
 			size_t i, x;
 
+			size_t numVerts = mesh.verts_.size();
+
 			for (i = 0; i < mesh.face_.size(); i++)
 			{
 				RawModel::Face& face = mesh.face_[i];
@@ -858,7 +860,12 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 				for (x = 0; x < 3; x++) // for each face.
 				{
 					const RawModel::Index& idx = face[x];
-					const RawModel::Vert& vert = mesh.verts_[idx];
+					if (idx > numVerts) {
+						X_ERROR("Model", "Face index is invalid: %i verts: %" PRIuS, numVerts);
+						return;
+					}
+
+					const RawModel::Vert& vert = v[idx];
 
 					const uint64 vert_hash = vertHash(vert);
 
