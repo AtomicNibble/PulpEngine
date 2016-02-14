@@ -37,6 +37,10 @@ public:
 	{
 		Stats(core::MemoryArenaBase* arena);
 
+		void clear(void);
+		void print(void) const;
+
+	public:
 		uint32_t totalLods;
 		uint32_t totalMesh;
 		uint32_t totalJoints;
@@ -61,19 +65,30 @@ public:
 	void SetJointWeightThreshold(float elipson);
 	void SetScale(float scale);
 	void setFlags(CompileFlags flags);
+	void printStats(void) const;
 
 	bool CompileModel(core::Path<char>& outFile);
 	bool CompileModel(core::Path<wchar_t>& outFile);
 
+
 private:
+	bool SaveModel(core::Path<wchar_t>& outFile);
+
+	size_t calculateTagNameDataSize(void) const;
+	size_t calculateMaterialNameDataSize(void) const ;
+	size_t calculateSubDataSize(const Flags8<model::StreamType>& streams) const;
+	size_t calculateBoneDataSize(void) const;
+
 	bool ProcessModel(void);
 	bool DropWeights(void);
 	bool MergMesh(void);
 	bool SortVerts(void);
 	bool MergVerts(void);
+	bool UpdateMeshBounds(void);
 
 private:
 	void MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count);
+	void UpdateBoundsJob(RawModel::Mesh* pMesh, uint32_t count);
 	static void SortVertsJob(RawModel::Mesh* pMesh, size_t count);
 	static void DropWeightsJob(RawModel::Vert* pVerts, size_t count);
 
@@ -87,7 +102,7 @@ private:
 	float scale_;
 
 	CompileFlags flags_;
-
+protected:
 	Stats stats_;
 };
 

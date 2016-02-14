@@ -166,6 +166,87 @@ TEST(Path, Construct2W)
 }
 
 
+TEST(Path, ConstructConvert)
+{
+	{
+		core::Path<wchar_t> pathW(L"");
+		core::Path<char> path(pathW);
+
+		EXPECT_TRUE(path.isEmpty());
+		EXPECT_FALSE(path.isNotEmpty());
+		EXPECT_FALSE(path.isAbsolute());
+
+		EXPECT_EQ(260, path.capacity());
+		EXPECT_EQ(0, path.length());
+		EXPECT_STREQ("", path.c_str());
+	}
+	{
+		core::Path<wchar_t> pathW(L"camel");
+		core::Path<char> path(pathW);
+
+		EXPECT_FALSE(path.isEmpty());
+		EXPECT_TRUE(path.isNotEmpty());
+		EXPECT_FALSE(path.isAbsolute());
+
+		EXPECT_EQ(260, path.capacity());
+		EXPECT_EQ(5, path.length());
+		EXPECT_STREQ("camel", path.c_str());
+	}
+	{
+		core::Path<wchar_t> pathW(L"c:\\o_my\\goat");
+		core::Path<char> path(pathW);
+
+		EXPECT_FALSE(path.isEmpty());
+		EXPECT_TRUE(path.isNotEmpty());
+		EXPECT_TRUE(path.isAbsolute());
+
+		EXPECT_EQ(260, path.capacity());
+		EXPECT_EQ(12, path.length());
+		EXPECT_STREQ("c:\\o_my\\goat", path.c_str());
+	}
+}
+
+TEST(Path, ConstructConvertW)
+{
+	{
+		core::Path<char> pathN("");
+		core::Path<wchar_t> path(pathN);
+
+		EXPECT_TRUE(path.isEmpty());
+		EXPECT_FALSE(path.isNotEmpty());
+		EXPECT_FALSE(path.isAbsolute());
+
+		EXPECT_EQ(260, path.capacity());
+		EXPECT_EQ(0, path.length());
+		EXPECT_STREQ(L"", path.c_str());
+	}
+	{
+		core::Path<char> pathN("camel");
+		core::Path<wchar_t> path(pathN);
+
+		EXPECT_FALSE(path.isEmpty());
+		EXPECT_TRUE(path.isNotEmpty());
+		EXPECT_FALSE(path.isAbsolute());
+
+		EXPECT_EQ(260, path.capacity());
+		EXPECT_EQ(5, path.length());
+		EXPECT_STREQ(L"camel", path.c_str());
+	}
+	{
+		core::Path<char> pathN("c:\\o_my\\goat");
+		core::Path<wchar_t> path(pathN);
+
+		EXPECT_FALSE(path.isEmpty());
+		EXPECT_TRUE(path.isNotEmpty());
+		EXPECT_TRUE(path.isAbsolute());
+
+		EXPECT_EQ(260, path.capacity());
+		EXPECT_EQ(12, path.length());
+		EXPECT_STREQ(L"c:\\o_my\\goat", path.c_str());
+	}
+}
+
+
 TEST(Path, Copy)
 {
 	core::Path<char> path1;

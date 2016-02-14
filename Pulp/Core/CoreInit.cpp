@@ -164,8 +164,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	gEnv->uMainThreadId = core::Thread::GetCurrentID();			//Set this ASAP on startup
 
 	core::invalidParameterHandler::Startup(); 
-	core::symbolResolution::Startup();
-
+	if (startupParams.loadSymbols()) {
+		core::symbolResolution::Startup();
+	}
 	initParams_ = startupParams;
 
 #if defined(WIN32)
@@ -343,7 +344,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	hotReloadIgnores_.append(core::string("txt"));
 #endif // !X_DEBUG
 
-	core::symbolResolution::Refresh();
+	if (startupParams.loadSymbols()) {
+		core::symbolResolution::Refresh();
+	}
 
 	// show the window
 	if (pWindow_) {

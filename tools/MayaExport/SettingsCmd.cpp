@@ -159,7 +159,7 @@ bool SettingsCache::ReloadCache(void)
 		{
 			xml_node<>* pSetNode;
 
-			for (pSetNode = pSettings->first_node(""); pSetNode;
+			for (pSetNode = pSettings->first_node("entry"); pSetNode;
 			pSetNode = pSetNode->next_sibling())
 			{
 				xml_attribute<>* pAttr = pSetNode->first_attribute("id");
@@ -383,6 +383,9 @@ MStatus SettingsCmd::doIt(const MArgList & args)
 		if (!gSettingsCache->GetValue(setId, value)) {
 			return MS::kFailure;
 		}
+
+		// escale the slashes.
+		value.replaceAll("\\", "/");
 
 		MString mayaValue(value.c_str());
 		setResult(mayaValue);

@@ -371,13 +371,13 @@ global proc ModelEntryExport(int $index)
 	+ " -uv_merge_thresh " + $uvMergeThreshold
 	+ " -vert_merge_thresh " + $vertMergeThreshold
 	+ " -zero_origin " + $zeroOrigin
-	+ " -force_bones \"" + $forceBoneFilters + "\"";
+	+ " -force_bones \"" + $forceBoneFilters + "\" ";
 
 	if($verbose) {
 		$options += " -verbose";
 	}
 
-	string $command = "PotatoExportModel " + $args + " -f \"" + $filename + "\" "+ $options;
+	string $command = "PotatoExportModel " + $args + " -f \"" + $filename + "\" " + $options;
 
 //	print_Msg("cmd: " + $command);
 
@@ -1320,4 +1320,14 @@ global proc poatoCreateUI()
 	// show it for debug
 	potato_ShowModelExport();
 //	potato_ShowAnimExport();
+}
+
+global proc potatoAfterFileOpen()
+{
+	// called after a file has been opended.
+
+	// re fresh the export window, if it's open
+	if (`window -exists "potato_ExportWindow"`) {
+		potato_ShowModelExport();
+	}
 }

@@ -40,6 +40,15 @@ namespace RawModel
 		return SaveRawModel(narrowPath);
 	}
 
+	size_t Model::totalMeshes(void) const
+	{
+		size_t num = 0;
+		for (auto& lod : lods_) {
+			num += lod.meshes_.size();
+		}
+
+		return num;
+	}
 
 
 	bool Model::LoadRawModel(core::Path<char>& path)
@@ -296,6 +305,15 @@ namespace RawModel
 			X_ERROR("RawModel", "Failed to read 'MESH' token");
 			return false;
 		}
+
+		// optional name
+		core::XLexToken token(nullptr, nullptr);
+		if (lex.ReadToken(token)) {
+			if (token.GetType() == core::TokenType::STRING) {
+				mesh.name_ = Mesh::NameString(token.begin(), token.end());
+			}
+		}
+
 		if (!ReadheaderToken(lex, "VERTS", numVerts)) {
 			return false;
 		}
@@ -473,6 +491,7 @@ namespace RawModel
 
 		if (f)
 		{
+			fprintf(f, "// Potato engine RawModel.\n\n");
 			fprintf(f, "VERSION %i\n", VERSION);
 			fprintf(f, "LODS %" PRIuS "\n", lods_.size());
 			fprintf(f, "BONES %" PRIuS "\n", bones_.size());
@@ -546,7 +565,7 @@ namespace RawModel
 	{
 		X_ASSERT_NOT_NULL(f);
 
-		fprintf(f, "MESH\n");
+		fprintf(f, "MESH \"%s\"\n", mesh.name_.c_str());
 		fprintf(f, "VERTS %" PRIuS "\n", mesh.verts_.size());
 		fprintf(f, "FACES %" PRIuS "\n", mesh.face_.size());
 		fputs("\n", f);

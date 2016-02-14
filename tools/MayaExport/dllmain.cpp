@@ -1,13 +1,16 @@
 #include "stdafx.h"
 
+#include <maya/MGlobal.h>
 #include <maya/MObject.h>
 #include <maya/MFnPlugin.h>
+#include <maya/MSceneMessage.h>
 
 #include "ModelExporter.h"
 #include "AnimExport.h"
 #include "SettingsCmd.h"
 #include "AssetDB.h"
 #include "MayaUtil.h"
+#include "EngineApp.h"
 
 #include <IModel.h>
 #include <IAnimation.h>
@@ -20,6 +23,9 @@
 #include <Memory\MemoryTaggingPolicies\SimpleMemoryTagging.h>
 #include <Memory\MemoryTrackingPolicies\SimpleMemoryTracking.h>
 
+
+#include <Time\StopWatch.h>
+
 #if 1
 typedef core::MemoryArena<core::MallocFreeAllocator, core::SingleThreadPolicy,
 	core::NoBoundsChecking, core::NoMemoryTracking, core::NoMemoryTagging> Arena;
@@ -28,8 +34,6 @@ typedef core::MemoryArena<core::MallocFreeAllocator, core::SingleThreadPolicy,
 	core::SimpleBoundsChecking, core::SimpleMemoryTracking, core::SimpleMemoryTagging> Arena;
 #endif
 
-char* g_OptionScript = "PotatoPluginOptions";
-char* g_DefaultExportOptions = "";
 
 char* g_createUiScript = "poatoCreateUI";
 char* g_destroyUiScript = "poatoDestroyUI";
@@ -37,17 +41,28 @@ char* g_destroyUiScript = "poatoDestroyUI";
 namespace
 {
 	core::MallocFreeAllocator g_allocator;
+
+	EngineApp app;
+
+	MCallbackId AfterFileOpenCallBackId;
+
+	static void AfterFileOpen(void* pClientData)
+	{
+		X_UNUSED(pClientData);
+		MGlobal::executeCommandOnIdle("potatoAfterFileOpen();");
+	}
+
 }
 
 core::MemoryArenaBase* g_arena = nullptr;
 
-#define ADD_FILE_TRANS 0
-
 MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 {
+	core::StopWatch timer;
+
 	core::StackString<64> ver;
 	ver.appendFmt("1.1.0.1 ", model::MODEL_VERSION);
-	ver.appendFmt("(m:%i) ", model::MODEL_VERSION);
+	ver.appendFmt("(m:%i:%i) ", model::MODEL_VERSION, model::MODEL_RAW_VERSION);
 	ver.appendFmt("(a:%i:%i)", anim::ANIM_VERSION, anim::ANIM_INTER_VERSION);
 
 	g_arena = new Arena(&g_allocator, "ModelExporterArena");
@@ -60,20 +75,15 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 
 	MStatus stat;
 
-	MayaUtil::MayaPrintMsg("=== Potato Plugin Loaded (%s) ===", ver.c_str());
+	if (!app.Init()) {
+		MayaUtil::MayaPrintError("Failed to start engine core");
+		return MS::kFailure;
+	}
 
 	AssetDB::Init();
 	SettingsCache::Init();
 
 	plugin.registerUI(g_createUiScript, g_destroyUiScript);
-
-#if ADD_FILE_TRANS
-	stat = plugin.registerFileTranslator("Potato_model",
-		"none",
-		ModelExporter::creator,
-		(char*)g_OptionScript,
-		(char*)g_DefaultExportOptions);
-#endif
 
 	stat = plugin.registerCommand("PotatoExportModel",ModelExporterCmd::creator);
 
@@ -84,14 +94,35 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 
 	stat = plugin.registerCommand("PotatoExportAnim", AnimExporterCmd::creator);
 	
+	if (stat != MS::kSuccess) {
+		stat.perror("Error - initializePlugin");
+		return stat;
+	}
+
 	// path util
-	plugin.registerCommand("PotatoSettings", SettingsCmd::creator, SettingsCmd::newSyntax);
-	plugin.registerCommand("PotatoAssetDB", AssetDBCmd::creator, AssetDBCmd::newSyntax);
+	stat = plugin.registerCommand("PotatoSettings", SettingsCmd::creator, SettingsCmd::newSyntax);
+
+	if (stat != MS::kSuccess) {
+		stat.perror("Error - initializePlugin");
+		return stat;
+	}
+
+	stat =  plugin.registerCommand("PotatoAssetDB", AssetDBCmd::creator, AssetDBCmd::newSyntax);
 
 	// PotatoPath -get -path_id animout
 	if (stat != MS::kSuccess) {
 		stat.perror("Error - initializePlugin");
+		return stat;
 	}
+
+	AfterFileOpenCallBackId = MSceneMessage::addCallback(MSceneMessage::kAfterOpen, AfterFileOpen, nullptr, &stat);
+	if (stat != MS::kSuccess) {
+		stat.perror("Error - initializePlugin:OnSceneUpdate");
+		return stat;
+	}
+
+	MayaUtil::MayaPrintMsg("=== Potato Plugin Loaded (%s %gms) ===", ver.c_str(),
+		timer.GetMilliSeconds());
 
 	return stat;
 }
@@ -104,35 +135,38 @@ MODELEX_EXPORT MStatus uninitializePlugin(MObject obj)
 	// an error code
 	MStatus stat;
 
-	// de-register the file translator with Maya 
-#if ADD_FILE_TRANS
-	stat = plugin.deregisterFileTranslator("Potato_model");
-#endif
-
 	stat = plugin.deregisterCommand("PotatoExportModel");
 
 	if (stat != MS::kSuccess) {
-		stat.perror("Error - uninitializePlugin");
+		stat.perror("Error - uninitializePlugin:PotatoExportModel");
 		// should i return or try next :S
 	}
 
 	stat = plugin.deregisterCommand("PotatoExportAnim");
 
 	if (stat != MS::kSuccess) {
-		stat.perror("Error - uninitializePlugin");
+		stat.perror("Error - uninitializePlugin:PotatoExportAnim");
 	}
 
-	stat = plugin.deregisterCommand("PotatoPath");
+	stat = plugin.deregisterCommand("PotatoSettings");
 
 	if (stat != MS::kSuccess) {
-		stat.perror("Error - uninitializePlugin");
+		stat.perror("Error - uninitializePlugin:PotatoSettings");
 	}
 
 	stat = plugin.deregisterCommand("PotatoAssetDB");
 
 	if (stat != MS::kSuccess) {
-		stat.perror("Error - uninitializePlugin");
+		stat.perror("Error - uninitializePlugin:PotatoAssetDB");
 	}
+
+	// remove the callback
+	stat = MMessage::removeCallback(AfterFileOpenCallBackId);
+	
+	if (stat != MS::kSuccess) {
+		stat.perror("Error - uninitializePlugin:removeCallback");
+	}
+
 
 	AssetDB::ShutDown();
 	SettingsCache::ShutDown();
@@ -142,4 +176,3 @@ MODELEX_EXPORT MStatus uninitializePlugin(MObject obj)
 
 	return stat;
 }
-
