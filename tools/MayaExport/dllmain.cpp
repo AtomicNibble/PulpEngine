@@ -83,14 +83,27 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 
 	stat = plugin.registerCommand("PotatoExportAnim", AnimExporterCmd::creator);
 	
+	if (stat != MS::kSuccess) {
+		stat.perror("Error - initializePlugin");
+		return stat;
+	}
+
 	// path util
-	plugin.registerCommand("PotatoSettings", SettingsCmd::creator, SettingsCmd::newSyntax);
-	plugin.registerCommand("PotatoAssetDB", AssetDBCmd::creator, AssetDBCmd::newSyntax);
+	stat = plugin.registerCommand("PotatoSettings", SettingsCmd::creator, SettingsCmd::newSyntax);
+
+	if (stat != MS::kSuccess) {
+		stat.perror("Error - initializePlugin");
+		return stat;
+	}
+
+	stat =  plugin.registerCommand("PotatoAssetDB", AssetDBCmd::creator, AssetDBCmd::newSyntax);
 
 	// PotatoPath -get -path_id animout
 	if (stat != MS::kSuccess) {
 		stat.perror("Error - initializePlugin");
+		return stat;
 	}
+
 
 	return stat;
 }
