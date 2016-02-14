@@ -60,6 +60,7 @@ namespace RawModel
 	}
 
 	Lod::Lod(core::MemoryArenaBase* arena) :
+		distance_(0.f),
 		meshes_(arena)
 	{
 
