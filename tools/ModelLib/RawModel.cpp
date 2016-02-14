@@ -305,6 +305,15 @@ namespace RawModel
 			X_ERROR("RawModel", "Failed to read 'MESH' token");
 			return false;
 		}
+
+		// optional name
+		core::XLexToken token(nullptr, nullptr);
+		if (lex.ReadToken(token)) {
+			if (token.GetType() == core::TokenType::STRING) {
+				mesh.name_ = Mesh::NameString(token.begin(), token.end());
+			}
+		}
+
 		if (!ReadheaderToken(lex, "VERTS", numVerts)) {
 			return false;
 		}
@@ -555,7 +564,7 @@ namespace RawModel
 	{
 		X_ASSERT_NOT_NULL(f);
 
-		fprintf(f, "MESH\n");
+		fprintf(f, "MESH \"%s\"\n", mesh.name_.c_str());
 		fprintf(f, "VERTS %" PRIuS "\n", mesh.verts_.size());
 		fprintf(f, "FACES %" PRIuS "\n", mesh.face_.size());
 		fputs("\n", f);
