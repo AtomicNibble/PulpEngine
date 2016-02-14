@@ -159,7 +159,7 @@ bool SettingsCache::ReloadCache(void)
 		{
 			xml_node<>* pSetNode;
 
-			for (pSetNode = pSettings->first_node(""); pSetNode;
+			for (pSetNode = pSettings->first_node("entry"); pSetNode;
 			pSetNode = pSetNode->next_sibling())
 			{
 				xml_attribute<>* pAttr = pSetNode->first_attribute("id");
