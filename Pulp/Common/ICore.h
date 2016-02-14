@@ -183,6 +183,7 @@ struct SCoreInitParams
 	bool bCoreOnly;
 	bool bEnableBasicConsole; // when in core only mode, optional enable a basic console.
 	bool bEnableJobSystem;
+	bool bLoadSymbols;
 
 	const bool isCoreOnly(void) const {
 		return bCoreOnly;
@@ -196,6 +197,10 @@ struct SCoreInitParams
 		return bEnableJobSystem;
 	}
 
+	const bool loadSymbols(void) const {
+		return bLoadSymbols;
+	}
+
 	SCoreInitParams() :
 		hInstance(nullptr),
 		hWnd(nullptr),
@@ -207,6 +212,7 @@ struct SCoreInitParams
 		bCoreOnly(false),
 		bEnableBasicConsole(false),
 		bEnableJobSystem(true),
+		bLoadSymbols(true),
 
 #if X_SUPER == 0
 		bConsoleLog(true),
