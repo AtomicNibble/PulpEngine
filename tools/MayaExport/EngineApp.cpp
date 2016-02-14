@@ -60,6 +60,7 @@ bool EngineApp::Init(void)
 	params.bEnableJobSystem = true; // model compiler uses job system.
 	params.pConsoleWnd = nullptr;
 	params.pCoreArena = g_arena;
+	params.bLoadSymbols = false;
 
 #ifdef X_LIB
 
