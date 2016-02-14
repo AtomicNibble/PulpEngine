@@ -43,9 +43,6 @@ X_ENABLE_WARNING(4702)
 #include "Profiler.h"
 #include "MayaUtil.h"
 
-double MayaProfiler::s_frequency = 0.0;
-
-
 X_LINK_LIB(X_STRINGIZE(MAYA_SDK) "\\Foundation")
 X_LINK_LIB(X_STRINGIZE(MAYA_SDK) "\\OpenMaya")
 X_LINK_LIB(X_STRINGIZE(MAYA_SDK) "\\OpenMayaUI")
@@ -173,7 +170,6 @@ MStatus ModelExporter::getInputObjects(void)
 
 MStatus ModelExporter::getExportObjects(void)
 {
-	PROFILE_MAYA("get objects");
 	if (exportMode_ == ExpoMode::EXPORT_INPUT){
 		return getInputObjects();
 	} else {
@@ -188,6 +184,8 @@ MStatus ModelExporter::getExportObjects(void)
 
 MStatus ModelExporter::convert(const MArgList& args)
 {
+	PROFILE_MAYA_NAME("Export Time");
+
 	MStatus status;
 
 	status = parseArgs(args);
@@ -242,8 +240,12 @@ MStatus ModelExporter::convert(const MArgList& args)
 
 		MayaUtil::SetProgressText("Loading mesh data");
 
-		// load them baby
-		status = loadLODs();
+		{
+			PROFILE_MAYA_NAME("Load data");
+
+			// load them baby
+			status = loadLODs();
+		}
 
 		if (!status) {
 			MayaUtil::MayaPrintError("Failed to load meshes: %s", status.errorString().asChar());
@@ -255,16 +257,24 @@ MStatus ModelExporter::convert(const MArgList& args)
 		// time to slap a goat!
 		core::Path<char> outPath = getFilePath();
 
-		if (!SaveRawModel(outPath)) {
-			MayaUtil::MayaPrintError("Failed to save raw model");
-			return MS::kFailure;
+		{
+			PROFILE_MAYA_NAME("Save Raw");
+
+			if (!SaveRawModel(outPath)) {
+				MayaUtil::MayaPrintError("Failed to save raw model");
+				return MS::kFailure;
+			}
 		}
 
 		MayaUtil::SetProgressText("Compiling model");
 
-		if (!CompileModel(outPath)) {
-			MayaUtil::MayaPrintError("Failed to compile model");
-			return MS::kFailure;
+		{
+			PROFILE_MAYA_NAME("Save compiled");
+
+			if (!CompileModel(outPath)) {
+				MayaUtil::MayaPrintError("Failed to compile model");
+				return MS::kFailure;
+			}
 		}
 
 		saveOk = true;
@@ -1007,7 +1017,7 @@ MStatus ModelExporter::getBindPose(const MObject &jointNode, MayaBone* pBone, fl
 	// failed to get the bind pose :(
 	if (!set)
 	{
-		MayaUtil::MayaPrintError("failed to get bind pose for bone: %s",
+		MayaUtil::MayaPrintVerbose("failed to get bind pose for bone: %s",
 			pBone->name.c_str());
 
 		// try get world pos.
