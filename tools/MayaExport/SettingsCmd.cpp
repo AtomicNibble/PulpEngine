@@ -384,6 +384,9 @@ MStatus SettingsCmd::doIt(const MArgList & args)
 			return MS::kFailure;
 		}
 
+		// escale the slashes.
+		value.replaceAll("\\", "/");
+
 		MString mayaValue(value.c_str());
 		setResult(mayaValue);
 	}
