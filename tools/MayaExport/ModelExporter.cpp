@@ -2101,7 +2101,7 @@ MStatus ModelExporter::getInputObjects(void)
 	{
 		MDagPathArray pathArry;
 		MSelectionList list;
-		LODExportInfo& info = g_options.lodInfo_[i];
+		LODExportInfo& info = lodExpoInfo_[i];
 		
 		MStringArray nameArr;
 		info.objects.split(' ', nameArr);
@@ -2192,10 +2192,33 @@ MStatus ModelExporter::convert(const MArgList& args)
 
 #if 1
 	{
+		SetProgressText("Loading export list");
+
+		status = getExportObjects();
+
+		if (!status) {
+			MayaPrintError("Failed to collect export objects from maya: %s", status.errorString().asChar());
+			return status;
+		}
 
 
+		SetProgressText("Loading joints");
+		status = loadBones();
+		if (!status) {
+			MayaPrintError("Failed to load joints: %s", status.errorString().asChar());
+			return status;
+		}
 
 
+		SetProgressText("Loading mesh data");
+
+		// load them baby
+		status = lodLODs();
+
+		if (!status) {
+			MayaPrintError("Failed to load meshes: %s", status.errorString().asChar());
+			return status;
+		}
 	}
 
 #else
@@ -2471,6 +2494,44 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 		MayaUtil::SetProgressCtrl(progressCntl);
 	}
 
+	{
+		uint32_t currentLod = 0;
+
+		// get the LOD options.
+		for (uint32_t i = 0; i < model::MODEL_MAX_LODS; i++)
+		{
+			core::StackString<32> lodName;
+			lodName.appendFmt("LOD%i", i);
+			idx = args.flagIndex(lodName.c_str());
+			if (idx != MArgList::kInvalidArgIndex)
+			{
+				double temp;
+				LODExportInfo info;
+				info.idx = currentLod;
+				if (!args.get(++idx, temp) ||
+					!args.get(++idx, info.objects)) {
+					MayaPrintError("failed to parse LOD%i info", currentLod);
+					continue;
+				}
+				if (g_options.numLods() == model::MODEL_MAX_LODS) {
+					MayaPrintError("Exceeded max load count: %i", model::MODEL_MAX_LODS);
+					return MS::kFailure;
+				}
+
+				info.distance = static_cast<float>(temp);
+				lodExpoInfo_.append(info);
+
+				currentLod++;
+			}
+		}
+
+		//	MayaPrintMsg("Total LOD: %i", currentLod);
+		if (currentLod == 0) {
+			MayaPrintError("Failed to parse and LOD info");
+			return MS::kFailure;
+		}
+	}
+
 	// use the scale to make it cm -> inches.
 	// this applyies it post user scale.
 	if (unitOfMeasurement_ == UnitOfMeasureMent::INCHES) {
@@ -2735,66 +2796,8 @@ ModelExporterCmd::~ModelExporterCmd()
 
 MStatus ModelExporterCmd::doIt(const MArgList &args)
 {
-	MStatus status = MS::kFailure;
-	MString Mfilename;
-	uint currentLod = 0;
-	uint idx;
-
-//	g_options.reset();
-//	g_stats.clear();
-
-	idx = args.flagIndex("f");
-	if (idx == MArgList::kInvalidArgIndex) {
-		MayaPrintError("missing file argument");
-		return MS::kFailure;
-	}
-
-	status = args.get(++idx, Mfilename);
-	if (!status) {
-		MayaPrintError("missing filename");
-		return status;
-	}
-
-//	MayaPrintMsg("filename: %s", Mfilename.asChar());
-
-	// make sure we have correct extension.
-	g_options.setcmdArgs(args);
-	g_options.setFileName(Mfilename.asChar());
-
-	// get the LOD options.
-	for (uint i = 0; i < args.length(); i++)
-	{
-		core::StackString<32> lodName;
-		lodName.appendFmt("LOD%i", i);
-		idx = args.flagIndex(lodName.c_str());
-		if (idx != MArgList::kInvalidArgIndex) 
-		{
-			double temp;
-			LODExportInfo info;
-			info.idx = currentLod;
-			if (!args.get(++idx, temp) ||
-				!args.get(++idx, info.objects)) {
-				MayaPrintError("failed to parse LOD%i info", currentLod);
-				continue;
-			}
-			if (g_options.numLods() == model::MODEL_MAX_LODS) {
-				MayaPrintError("Exceeded max load count: %i", model::MODEL_MAX_LODS);
-				return MS::kFailure;
-			}
-
-			info.distance = static_cast<float>(temp);
-			g_options.AddLodInfo(info);
-
-	//		MayaPrintMsg("LOD%i distance: %f, objects: %s", currentLod, info.distance, info.objects.asChar());
-			currentLod++;
-		}
-	}
-
-//	MayaPrintMsg("Total LOD: %i", currentLod);
-	if (currentLod == 0) {
-		MayaPrintError("Failed to parse and LOD info");
-		return MS::kFailure;
-	}
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pJobSys);
 
 	ModelExporter exportModel(gEnv->pJobSys, g_arena);
 

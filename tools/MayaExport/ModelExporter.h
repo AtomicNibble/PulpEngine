@@ -324,6 +324,14 @@ struct MayaBone
 
 class ModelExporter : public model::ModelCompiler
 {
+	struct LODExportInfo
+	{
+		int idx;
+		float distance;
+		MString objects;
+	};
+
+
 	X_DECLARE_ENUM(ExpoMode)(EXPORT_ALL, EXPORT_SELECTED, EXPORT_INPUT);
 	X_DECLARE_ENUM(UnitOfMeasureMent)(INCHES, CM);
 
@@ -349,6 +357,8 @@ private:
 	static MStatus getBindPose(const MObject &jointNode, MayaBone* pBone, float scale);
 	
 private:
+	typedef core::FixedArray<LODExportInfo, model::MODEL_MAX_LODS> LodInfoArr;
+
 	core::Path<char> filePath_;
 	ExpoMode::Enum exportMode_;
 	UnitOfMeasureMent::Enum unitOfMeasurement_;
@@ -358,6 +368,8 @@ private:
 
 	Hierarchy<MayaBone>		mayaHead;
 	Hierarchy<MayaBone>		exportHead;
+
+	LodInfoArr lodExpoInfo_;
 };
 
 
