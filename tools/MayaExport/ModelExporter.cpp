@@ -2411,6 +2411,8 @@ MStatus ModelExporter::loadLODs(void)
 	PROFILE_MAYA("load LODS");
 	MStatus status;
 
+	lods_.resize(lodExpoInfo_.size(), model::RawModel::Lod(g_arena));
+
 	for (size_t i = 0; i < lodExpoInfo_.size(); i++)
 	{
 		LODExportInfo& info = lodExpoInfo_[i];
