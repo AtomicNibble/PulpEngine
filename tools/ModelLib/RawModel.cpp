@@ -491,6 +491,7 @@ namespace RawModel
 
 		if (f)
 		{
+			fprintf(f, "// Potato engine RawModel.\n\n");
 			fprintf(f, "VERSION %i\n", VERSION);
 			fprintf(f, "LODS %" PRIuS "\n", lods_.size());
 			fprintf(f, "BONES %" PRIuS "\n", bones_.size());
