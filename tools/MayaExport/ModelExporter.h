@@ -58,7 +58,7 @@ struct ModelStats
 };
 */
 
-
+/*
 struct LODExportInfo
 {
 	int idx;
@@ -128,7 +128,7 @@ public:
 	ExpoMode exportMode_;
 	UnitOfMeasureMent unitOfMeasurement_;
 };
-
+*/
 #if 0
 
 struct MayaBone

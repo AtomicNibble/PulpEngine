@@ -43,8 +43,6 @@ X_ENABLE_WARNING(4702)
 #include "Profiler.h"
 #include "MayaUtil.h"
 
-using namespace MayaUtil;
-
 double MayaProfiler::s_frequency = 0.0;
 
 struct SCoreGlobals* gEnv = nullptr;
@@ -59,9 +57,6 @@ X_USING_NAMESPACE;
 
 namespace
 {
-//	static ModelStats g_stats;
-	static PotatoOptions g_options;
-
 	static const float MERGE_VERTEX_EPSILON = 0.9f;
 	static const float MERGE_TEXCORDS_EPSILON = 0.02f;
 	static const float JOINT_WEIGHT_THRESHOLD = 0.005f;
@@ -240,125 +235,7 @@ namespace
 
 // ---------------------------------------------------
 
-PotatoOptions::PotatoOptions()
-{
-	reset();
-}
-
-void PotatoOptions::setcmdArgs(const MArgList &args)
-{
-	reset();
-
-	uint idx;
-
-	// allow for options to be parsed.
-	idx = args.flagIndex("verbose");
-	if (idx != MArgList::kInvalidArgIndex) {
-		MayaUtil::SetVerbose(true);
-	}
-
-	idx = args.flagIndex("scale");
-	if (idx != MArgList::kInvalidArgIndex) {
-		double temp;
-		if (!args.get(++idx, temp)) {
-			MayaPrintWarning("failed to get scale flag");
-		} else {
-			scale_ = static_cast<float>(temp);
-		}
-	}
-
-	idx = args.flagIndex("use_cm");
-	if (idx != MArgList::kInvalidArgIndex) {
-		bool useCm = false;
-		if (!args.get(++idx, useCm)) {
-			MayaPrintWarning("failed to get use_cm flag");
-		}
-		else {
-			if (useCm) {
-				unitOfMeasurement_ = CM;
-			}
-		}
-	}
-
-	idx = args.flagIndex("weight_thresh");
-	if (idx != MArgList::kInvalidArgIndex) {
-		double temp;
-		if (!args.get(++idx, temp)) {
-			MayaPrintWarning("failed to get weight_thresh flag");
-		}
-		else {
-			jointThreshold_ = static_cast<float>(temp);
-		}
-	}
-
-	idx = args.flagIndex("uv_merge_thresh");
-	if (idx != MArgList::kInvalidArgIndex) {
-		double temp;
-		if (!args.get(++idx, temp)) {
-			MayaPrintWarning("failed to get uv_merge_thresh flag");
-		}
-		else {
-			uvMergeThreshold_ = static_cast<float>(temp);
-		}
-	}
-
-	idx = args.flagIndex("vert_merge_thresh");
-	if (idx != MArgList::kInvalidArgIndex) {
-		double temp;
-		if (!args.get(++idx, temp)) {
-			MayaPrintWarning("failed to get vert_merge_thresh flag");
-		}
-		else {
-			vertThreshold_ = static_cast<float>(temp);
-		}
-	}
-	
-
-	idx = args.flagIndex("zero_origin");
-	if (idx != MArgList::kInvalidArgIndex) {
-		if (!args.get(++idx, zeroOrigin_)) {
-			MayaPrintWarning("failed to get zero_origin flag");
-		}
-	}
-
-	idx = args.flagIndex("dir");
-	if (idx != MArgList::kInvalidArgIndex) {
-		MString dir;
-		if (!args.get(++idx, dir)) {
-			MayaPrintWarning("failed to get dir flag");
-		}
-		else {
-			filePath_.append(dir.asChar());
-			filePath_.replaceSeprators();
-			filePath_.ensureSlash();
-		}
-	}
-
-	idx = args.flagIndex("force_bones");
-	if (idx != MArgList::kInvalidArgIndex) {
-		if (!args.get(++idx, forceBoneFilters_)) {
-			MayaPrintWarning("failed to get force_bones flag");
-		}
-	}
-
-	MString progressCntl;
-
-	idx = args.flagIndex("progress");
-	if (idx != MArgList::kInvalidArgIndex) {
-		if (!args.get(++idx, progressCntl)) {
-			MayaPrintWarning("failed to get progress cntl flag");
-		}
-	}
-
-	MayaUtil::SetProgressCtrl(progressCntl);
-
-	// use the scale to make it cm -> inches.
-	// this applyies it post user scale.
-	if (unitOfMeasurement_ == INCHES) {
-		scale_ = scale_ * 0.393700787f;
-	}
-}
-
+/*
 void PotatoOptions::reset(void)
 {
 	lodInfo_.clear();
@@ -373,6 +250,7 @@ void PotatoOptions::reset(void)
 	exportMode_ = EXPORT_INPUT;
 	unitOfMeasurement_ = INCHES;
 }
+*/
 
 // --------------------------------------------
 
@@ -2058,15 +1936,16 @@ bool MayaModel::save(const char *filename)
 
 ModelExporter::ModelExporter(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
 	model::ModelCompiler(pJobSys, arena),
-	mayaBones_(arena)
+	mayaBones_(arena),
+	unitOfMeasurement_(UnitOfMeasureMent::INCHES)
 {
-	MayaPrintMsg("=========== Exporting Model ===========");
+	MayaUtil::MayaPrintMsg("=========== Exporting Model ===========");
 }
 
 ModelExporter::~ModelExporter()
 {
-	HideProgressDlg();
-	MayaPrintMsg("================= End =================");
+	MayaUtil::HideProgressDlg();
+	MayaUtil::MayaPrintMsg("================= End =================");
 }
 
 
@@ -2097,7 +1976,7 @@ MStatus ModelExporter::getInputObjects(void)
 				pathArry.append(path);
 			}
 			else {
-				MayaPrintError("getDagPath failed: %s", status.errorString().asChar());
+				MayaUtil::MayaPrintError("getDagPath failed: %s", status.errorString().asChar());
 			}
 		}
 		
@@ -2119,7 +1998,7 @@ MStatus ModelExporter::getInputObjects(void)
 MStatus ModelExporter::getExportObjects(void)
 {
 	PROFILE_MAYA("get objects");
-	if (g_options.exportMode_ == PotatoOptions::EXPORT_INPUT){
+	if (exportMode_ == ExpoMode::EXPORT_INPUT){
 		return getInputObjects();
 	} else {
 	//	if (g_options.exportMode_ == PotatoOptions::EXPORT_SELECTED)
@@ -2137,65 +2016,65 @@ MStatus ModelExporter::convert(const MArgList& args)
 
 	status = parseArgs(args);
 	if (status != MS::kSuccess) {
-		MayaPrintError("Failed to parse arguments");
+		MayaUtil::MayaPrintError("Failed to parse arguments");
 		return status;
 	}
 
 
 
 
-	status = ShowProgressDlg(0, 7);
+	status = MayaUtil::ShowProgressDlg(0, 7);
 	bool saveOk = false;
 
 	{
-		float appliedScale = g_options.scale_;
-		float scale = g_options.scale_;
+	//	float appliedScale = scale_;
+	//	float scale = g_options.scale_;
 
-		if (g_options.unitOfMeasurement_ == PotatoOptions::INCHES) {
-			scale = appliedScale * 2.54f;
-		}
+	//	if (g_options.unitOfMeasurement_ == PotatoOptions::INCHES) {
+	//		scale = appliedScale * 2.54f;
+	//	}
 
-		MayaPrintMsg("Exporting to: '%s'", g_options.filePath_.c_str());
-		MayaPrintMsg("Scale: '%f' Applied: '%f'", scale, appliedScale);
-		MayaPrintMsg(""); // new line
+		MayaUtil::MayaPrintMsg("Exporting to: '%s'", filePath_.c_str());
+	//	MayaUtil::MayaPrintMsg("Scale: '%f' Applied: '%f'", scale, appliedScale);
+		MayaUtil::MayaPrintMsg(""); // new line
 	}
 
 
 	// name length check
-	if (strlen(g_options.filePath_.fileName()) > model::MODEL_MAX_NAME_LENGTH)
+	if (strlen(filePath_.fileName()) > model::MODEL_MAX_NAME_LENGTH)
 	{
-		MayaPrintError("Model name is too long. MAX: %i, provided: %i",
-			model::MODEL_MAX_NAME_LENGTH, g_options.filePath_.length());
+		MayaUtil::MayaPrintError("Model name is too long. MAX: %i, provided: %i",
+			model::MODEL_MAX_NAME_LENGTH, filePath_.length());
 		return MS::kFailure;;
 	}
 
 #if 1
 	{
-		SetProgressText("Loading export list");
+		MayaUtil::SetProgressText("Loading export list");
 
 		status = getExportObjects();
 
 		if (!status) {
-			MayaPrintError("Failed to collect export objects from maya: %s", status.errorString().asChar());
+			MayaUtil::MayaPrintError("Failed to collect export objects from maya: %s", status.errorString().asChar());
 			return status;
 		}
 
 
-		SetProgressText("Loading joints");
+		MayaUtil::SetProgressText("Loading joints");
 		status = loadBones();
 		if (!status) {
-			MayaPrintError("Failed to load joints: %s", status.errorString().asChar());
+			MayaUtil::MayaPrintError("Failed to load joints: %s", status.errorString().asChar());
 			return status;
 		}
 
 
-		SetProgressText("Loading mesh data");
+		MayaUtil::SetProgressText("Loading mesh data");
 
 		// load them baby
 		status = loadLODs();
 
 		if (!status) {
-			MayaPrintError("Failed to load meshes: %s", status.errorString().asChar());
+			MayaUtil::MayaPrintError("Failed to load meshes: %s", status.errorString().asChar());
 			return status;
 		}
 	}
@@ -2265,7 +2144,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 //		model_.printStats(g_options);
 	}
 	else {
-		MayaPrintError("Failed to write file");
+		MayaUtil::MayaPrintError("Failed to write file");
 		return MS::kFailure;
 	}
 	
@@ -2292,7 +2171,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 
 	idx = args.flagIndex("f");
 	if (idx == MArgList::kInvalidArgIndex) {
-		MayaPrintError("missing file argument");
+		MayaUtil::MayaPrintError("missing file argument");
 		return MS::kFailure;
 	}
 
@@ -2302,7 +2181,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 
 		status = args.get(++idx, Mfilename);
 		if (!status) {
-			MayaPrintError("missing filename");
+			MayaUtil::MayaPrintError("missing filename");
 			return status;
 		}
 
@@ -2319,7 +2198,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	if (idx != MArgList::kInvalidArgIndex) {
 		double temp;
 		if (!args.get(++idx, temp)) {
-			MayaPrintWarning("failed to get scale flag");
+			MayaUtil::MayaPrintWarning("failed to get scale flag");
 		}
 		else {
 			scale = static_cast<float>(temp);
@@ -2330,7 +2209,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	if (idx != MArgList::kInvalidArgIndex) {
 		bool useCm = false;
 		if (!args.get(++idx, useCm)) {
-			MayaPrintWarning("failed to get use_cm flag");
+			MayaUtil::MayaPrintWarning("failed to get use_cm flag");
 		}
 		else {
 			if (useCm) {
@@ -2343,7 +2222,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	if (idx != MArgList::kInvalidArgIndex) {
 		double temp;
 		if (!args.get(++idx, temp)) {
-			MayaPrintWarning("failed to get weight_thresh flag");
+			MayaUtil::MayaPrintWarning("failed to get weight_thresh flag");
 		}
 		else {
 			SetJointWeightThreshold(static_cast<float>(temp));
@@ -2355,7 +2234,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	if (idx != MArgList::kInvalidArgIndex) {
 		double temp;
 		if (!args.get(++idx, temp)) {
-			MayaPrintWarning("failed to get uv_merge_thresh flag");
+			MayaUtil::MayaPrintWarning("failed to get uv_merge_thresh flag");
 		}
 		else {
 			SetTexCoordElipson(static_cast<float>(temp));
@@ -2366,7 +2245,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	if (idx != MArgList::kInvalidArgIndex) {
 		double temp;
 		if (!args.get(++idx, temp)) {
-			MayaPrintWarning("failed to get vert_merge_thresh flag");
+			MayaUtil::MayaPrintWarning("failed to get vert_merge_thresh flag");
 		}
 		else {
 			SetVertexElipson(static_cast<float>(temp));
@@ -2378,7 +2257,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	if (idx != MArgList::kInvalidArgIndex) {
 		bool zeroOrigin = false;
 		if (!args.get(++idx, zeroOrigin)) {
-			MayaPrintWarning("failed to get zero_origin flag");
+			MayaUtil::MayaPrintWarning("failed to get zero_origin flag");
 		}
 		else {
 			if (zeroOrigin) {
@@ -2394,7 +2273,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	if (idx != MArgList::kInvalidArgIndex) {
 		bool whiteVert = false;
 		if (!args.get(++idx, whiteVert)) {
-			MayaPrintWarning("failed to get white_vert_col flag");
+			MayaUtil::MayaPrintWarning("failed to get white_vert_col flag");
 		}
 		else {
 			if (whiteVert) {
@@ -2410,7 +2289,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	if (idx != MArgList::kInvalidArgIndex) {
 		bool mergeMesh = false;
 		if (!args.get(++idx, mergeMesh)) {
-			MayaPrintWarning("failed to get white_vert_col flag");
+			MayaUtil::MayaPrintWarning("failed to get white_vert_col flag");
 		}
 		else {
 			if (mergeMesh) {
@@ -2426,7 +2305,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	if (idx != MArgList::kInvalidArgIndex) {
 		bool mergeMesh = false;
 		if (!args.get(++idx, mergeMesh)) {
-			MayaPrintWarning("failed to get merge_verts flag");
+			MayaUtil::MayaPrintWarning("failed to get merge_verts flag");
 		}
 		else {
 			if (mergeMesh) {
@@ -2442,7 +2321,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	if (idx != MArgList::kInvalidArgIndex) {
 		MString dir;
 		if (!args.get(++idx, dir)) {
-			MayaPrintWarning("failed to get dir flag");
+			MayaUtil::MayaPrintWarning("failed to get dir flag");
 		}
 		else {
 			filePath_.append(dir.asChar());
@@ -2455,7 +2334,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	if (idx != MArgList::kInvalidArgIndex) {
 		MString forceBoneFilters;
 		if (!args.get(++idx, forceBoneFilters)) {
-			MayaPrintWarning("failed to get force_bones flag");
+			MayaUtil::MayaPrintWarning("failed to get force_bones flag");
 		}
 		// TODO: use the forceBoneFilters.
 	}
@@ -2466,7 +2345,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 		idx = args.flagIndex("progress");
 		if (idx != MArgList::kInvalidArgIndex) {
 			if (!args.get(++idx, progressCntl)) {
-				MayaPrintWarning("failed to get progress cntl flag");
+				MayaUtil::MayaPrintWarning("failed to get progress cntl flag");
 			}
 		}
 
@@ -2489,11 +2368,11 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 				info.idx = currentLod;
 				if (!args.get(++idx, temp) ||
 					!args.get(++idx, info.objects)) {
-					MayaPrintError("failed to parse LOD%i info", currentLod);
+					MayaUtil::MayaPrintError("failed to parse LOD%i info", currentLod);
 					continue;
 				}
-				if (g_options.numLods() == model::MODEL_MAX_LODS) {
-					MayaPrintError("Exceeded max load count: %i", model::MODEL_MAX_LODS);
+				if (lodExpoInfo_.size() == model::MODEL_MAX_LODS) {
+					MayaUtil::MayaPrintError("Exceeded max load count: %i", model::MODEL_MAX_LODS);
 					return MS::kFailure;
 				}
 
@@ -2506,7 +2385,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 
 		//	MayaPrintMsg("Total LOD: %i", currentLod);
 		if (currentLod == 0) {
-			MayaPrintError("Failed to parse and LOD info");
+			MayaUtil::MayaPrintError("Failed to parse and LOD info");
 			return MS::kFailure;
 		}
 	}
@@ -2538,7 +2417,7 @@ MStatus ModelExporter::loadLODs(void)
 		uint32_t numMesh = info.exportObjects.length();
 
 		if (numMesh == 0) {
-			MayaPrintError("LOD%i failed to load meshes for lod no meshes found.", i);
+			MayaUtil::MayaPrintError("LOD%i failed to load meshes for lod no meshes found.", i);
 			return MS::kFailure;
 		}
 		
@@ -2574,7 +2453,7 @@ MStatus ModelExporter::loadLODs(void)
 			mesh.name_.set(fnmesh.name().asChar());
 
 			if (!getMeshMaterial(info.exportObjects[meshIdx], material)) {
-				MayaPrintError("Mesh(%s): failed to get material", fnmesh.name().asChar());
+				MayaUtil::MayaPrintError("Mesh(%s): failed to get material", fnmesh.name().asChar());
 				return MS::kFailure;
 			}
 
@@ -2582,13 +2461,13 @@ MStatus ModelExporter::loadLODs(void)
 			int numPoly = fnmesh.numPolygons(&status);
 
 			if (fnmesh.numUVSets() < 1) {
-				MayaPrintError("Mesh(%s): has no uv sets: %s", fnmesh.name().asChar());
+				MayaUtil::MayaPrintError("Mesh(%s): has no uv sets: %s", fnmesh.name().asChar());
 				return MS::kFailure;
 			}
 			//		int numNormals = fnmesh.numNormals(&status);
 
 			if (!status) {
-				MayaPrintError("Mesh(%s): failed to get mesh info (%s)", fnmesh.name().asChar(), status.errorString().asChar());
+				MayaUtil::MayaPrintError("Mesh(%s): failed to get mesh info (%s)", fnmesh.name().asChar(), status.errorString().asChar());
 				return status;
 			}
 
@@ -2599,7 +2478,7 @@ MStatus ModelExporter::loadLODs(void)
 
 			status = fnmesh.getUVSetNames(UVSets);
 			if (!status) {
-				MayaPrintError("Mesh(%s): failed to get UV set names (%s)",
+				MayaUtil::MayaPrintError("Mesh(%s): failed to get UV set names (%s)",
 					fnmesh.name().asChar(), status.errorString().asChar());
 				return status;
 			}
@@ -2613,7 +2492,7 @@ MStatus ModelExporter::loadLODs(void)
 			MString uvSet;
 			status = fnmesh.getCurrentUVSetName(uvSet);
 			if (!status) {
-				MayaPrintError("Mesh(%s): failed to get current UV set (%s)",
+				MayaUtil::MayaPrintError("Mesh(%s): failed to get current UV set (%s)",
 					fnmesh.name().asChar(), status.errorString().asChar());
 
 				if (UVSets.length() < 1) {
@@ -2622,7 +2501,7 @@ MStatus ModelExporter::loadLODs(void)
 
 				uvSet = UVSets[0];
 
-				MayaPrintWarning("Falling back to uv set: %s", uvSet.asChar());
+				MayaUtil::MayaPrintWarning("Falling back to uv set: %s", uvSet.asChar());
 			}
 			else
 			{
@@ -2662,12 +2541,12 @@ MStatus ModelExporter::loadLODs(void)
 			int32_t x;
 			for (x = 0; x < numVerts; x++) {
 				model::RawModel::Vert& vert = mesh.verts_[x];
-				vert.pos_ = ConvertToGameSpace(XVec(vertexArray[x]));
-				vert.normal_ = XVec(normalsArray[x]);
-				vert.tangent_ = XVec(tangentsArray[x]);
-				vert.biNormal_ = XVec(binormalsArray[x]);
+				vert.pos_ = MayaUtil::ConvertToGameSpace(MayaUtil::XVec(vertexArray[x]));
+				vert.normal_ = MayaUtil::XVec(normalsArray[x]);
+				vert.tangent_ = MayaUtil::XVec(tangentsArray[x]);
+				vert.biNormal_ = MayaUtil::XVec(binormalsArray[x]);
 				vert.uv_ = Vec2f(u[x], v[x]);
-				vert.col_ = XVec(vertColorsArray[x]);
+				vert.col_ = MayaUtil::XVec(vertColorsArray[x]);
 			}
 
 			// load the Faces and UV's
@@ -2707,7 +2586,7 @@ MStatus ModelExporter::loadBones(void)
 	MayaBone		*bone;
 	uint				i, j;
 
-	float scale = g_options.scale_;
+	float scale = 1.f; // g_options.scale_;
 
 
 	// allocate max.
@@ -2718,7 +2597,7 @@ MStatus ModelExporter::loadBones(void)
 	{
 		status = dagIterator.getPath(dagPath);
 		if (!status) {
-			MayaPrintError("Joint: MItDag::getPath failed (%s)", status.errorString().asChar());
+			MayaUtil::MayaPrintError("Joint: MItDag::getPath failed (%s)", status.errorString().asChar());
 			return status;
 		}
 
@@ -2731,20 +2610,20 @@ MStatus ModelExporter::loadBones(void)
 
 		if (!status) {
 			X_DELETE(new_bone.dagnode, g_arena);// dunno if maya returns null, don't matter tho.
-			MayaPrintError("Joint: MFnDagNode constructor failed (%s)", status.errorString().asChar());
+			MayaUtil::MayaPrintError("Joint: MFnDagNode constructor failed (%s)", status.errorString().asChar());
 			return status;
 		}
 
 		new_bone.name.append(new_bone.dagnode->name().asChar());
 
 		if (mayaBones_.size() == model::MODEL_MAX_BONES) {
-			MayaPrintError("Joints: max bones reached: %i", model::MODEL_MAX_BONES);
+			MayaUtil::MayaPrintError("Joints: max bones reached: %i", model::MODEL_MAX_BONES);
 			return MStatus::kFailure;
 		}
 
 		if (new_bone.name.length() > model::MODEL_MAX_BONE_NAME_LENGTH)
 		{
-			MayaPrintError("Joints: max bone name length exceeded, MAX: %i '%' -> %i",
+			MayaUtil::MayaPrintError("Joints: max bone name length exceeded, MAX: %i '%' -> %i",
 				model::MODEL_MAX_BONE_NAME_LENGTH, new_bone.name.c_str(), new_bone.name.length());
 			return MStatus::kFailure;
 		}
@@ -2874,7 +2753,7 @@ MStatus ModelExporter::getBindPose(const MObject &jointNode, MayaBone* pBone, fl
 					status = pWorldMatrix.getValue(worldMatrix);
 					if (MS::kSuccess != status) {
 						// Problem retrieving world matrix
-						MayaPrintError("failed to get world matrix for bone(1): %s",
+						MayaUtil::MayaPrintError("failed to get world matrix for bone(1): %s",
 							pBone->name.c_str());
 						return status;
 					}
@@ -2882,8 +2761,8 @@ MStatus ModelExporter::getBindPose(const MObject &jointNode, MayaBone* pBone, fl
 					MFnMatrixData	dMatrix(worldMatrix);
 					MMatrix			wMatrix = dMatrix.matrix(&status);
 
-					pBone->bindm33 = ConvertToGameSpace(XMat(wMatrix));
-					pBone->bindpos = ConvertToGameSpace(XVec(wMatrix)) * scale;
+					pBone->bindm33 = MayaUtil::ConvertToGameSpace(MayaUtil::XMat(wMatrix));
+					pBone->bindpos = MayaUtil::ConvertToGameSpace(MayaUtil::XVec(wMatrix)) * scale;
 
 					//if (!options.ignoreScale) {
 					//	joint->bindpos *= joint->scale;
@@ -2895,14 +2774,14 @@ MStatus ModelExporter::getBindPose(const MObject &jointNode, MayaBone* pBone, fl
 		}
 	}
 	else {
-		MayaPrintError("error getting bind pose for '%s' error: %s",
+		MayaUtil::MayaPrintError("error getting bind pose for '%s' error: %s",
 			pBone->name.c_str(), status.errorString().asChar());
 	}
 
 	// failed to get the bind pose :(
 	if (!set)
 	{
-		MayaPrintError("failed to get bind pose for bone: %s",
+		MayaUtil::MayaPrintError("failed to get bind pose for bone: %s",
 			pBone->name.c_str());
 
 		// try get world pos.
@@ -2910,14 +2789,14 @@ MStatus ModelExporter::getBindPose(const MObject &jointNode, MayaBone* pBone, fl
 		MDagPath path;
 		status = pBone->dagnode->getPath(path);
 		if (status != MS::kSuccess) {
-			MayaPrintError("Failed to get bone path: '%s'", pBone->name.c_str());
+			MayaUtil::MayaPrintError("Failed to get bone path: '%s'", pBone->name.c_str());
 			return MS::kFailure;
 		}
 
 		MTransformationMatrix worldMatrix = path.inclusiveMatrix();
 		MMatrix m = worldMatrix.asMatrix();
-		pBone->bindm33 = ConvertToGameSpace(XMat(m));
-		pBone->bindpos = ConvertToGameSpace(XVec(m)) * scale;
+		pBone->bindm33 = MayaUtil::ConvertToGameSpace(MayaUtil::XMat(m));
+		pBone->bindpos = MayaUtil::ConvertToGameSpace(MayaUtil::XVec(m)) * scale;
 	}
 
 	MayaUtil::MayaPrintVerbose("Bone '%s' pos: (%g,%g,%g)",
@@ -2969,7 +2848,7 @@ bool ModelExporter::getMeshMaterial(MDagPath &dagPath, model::RawModel::Material
 	MObjectArray comps;
 	status = fnMesh.getConnectedSetsAndMembers(instanceNum, sets, comps, true);
 	if (!status) {
-		MayaPrintError("MFnMesh::getConnectedSetsAndMembers failed (%s)", status.errorString().asChar());
+		MayaUtil::MayaPrintError("MFnMesh::getConnectedSetsAndMembers failed (%s)", status.errorString().asChar());
 	}
 
 	for (i = 0; i < (int)sets.length(); i++) {
@@ -2978,7 +2857,7 @@ bool ModelExporter::getMeshMaterial(MDagPath &dagPath, model::RawModel::Material
 
 		MFnSet fnSet(set, &status);
 		if (status == MS::kFailure) {
-			MayaPrintError("MFnSet constructor failed (%s)", status.errorString().asChar());
+			MayaUtil::MayaPrintError("MFnSet constructor failed (%s)", status.errorString().asChar());
 			continue;
 		}
 
@@ -2997,7 +2876,7 @@ bool ModelExporter::getMeshMaterial(MDagPath &dagPath, model::RawModel::Material
 
 		MPlug colorPlug = Shader.findPlug("color", &status);
 		if (status == MS::kFailure) {
-			MayaPrintError("material(%s) has no color channel", Shader.name().asChar());
+			MayaUtil::MayaPrintError("material(%s) has no color channel", Shader.name().asChar());
 			continue;
 		}
 
@@ -3039,7 +2918,7 @@ bool ModelExporter::getMeshMaterial(MDagPath &dagPath, model::RawModel::Material
 
 
 		if (Shader.name().length() > 64) {
-			MayaPrintError("Material name too long MAX(64): '%s'", Shader.name().asChar());
+			MayaUtil::MayaPrintError("Material name too long MAX(64): '%s'", Shader.name().asChar());
 			return false;
 		}
 
@@ -3064,7 +2943,7 @@ MObject ModelExporter::FindShader(MObject& setNode)
 		shaderPlug.connectedTo(connectedPlugs, asDst, asSrc, &status);
 
 		if (connectedPlugs.length() != 1) {
-			MayaPrintError("FindShader: Error getting shader (%s)", status.errorString().asChar());
+			MayaUtil::MayaPrintError("FindShader: Error getting shader (%s)", status.errorString().asChar());
 		}
 		else {
 			return connectedPlugs[0].node();
