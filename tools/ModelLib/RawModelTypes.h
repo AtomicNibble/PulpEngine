@@ -75,8 +75,8 @@ namespace RawModel
 
 	class Mesh
 	{
-		typedef core::StackString<60> NameString;
 	public:
+		typedef core::StackString<60> NameString;
 		typedef core::Array<Vert> VertsArr;
 		typedef core::Array<Face> FaceArr;
 
