@@ -8,6 +8,7 @@
 #include "SettingsCmd.h"
 #include "AssetDB.h"
 #include "MayaUtil.h"
+#include "EngineApp.h"
 
 #include <IModel.h>
 #include <IAnimation.h>
@@ -19,6 +20,9 @@
 #include <Memory\BoundsCheckingPolicies\SimpleBoundsChecking.h>
 #include <Memory\MemoryTaggingPolicies\SimpleMemoryTagging.h>
 #include <Memory\MemoryTrackingPolicies\SimpleMemoryTracking.h>
+
+
+
 
 #if 1
 typedef core::MemoryArena<core::MallocFreeAllocator, core::SingleThreadPolicy,
@@ -35,6 +39,8 @@ char* g_destroyUiScript = "poatoDestroyUI";
 namespace
 {
 	core::MallocFreeAllocator g_allocator;
+
+	EngineApp app;
 }
 
 core::MemoryArenaBase* g_arena = nullptr;
@@ -57,6 +63,11 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 	MStatus stat;
 
 	MayaUtil::MayaPrintMsg("=== Potato Plugin Loaded (%s) ===", ver.c_str());
+
+	if (!app.Init()) {
+		MayaUtil::MayaPrintError("Failed to start engine core");
+		return MS::kFailure;
+	}
 
 	AssetDB::Init();
 	SettingsCache::Init();
