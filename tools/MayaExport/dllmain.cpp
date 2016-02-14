@@ -106,26 +106,26 @@ MODELEX_EXPORT MStatus uninitializePlugin(MObject obj)
 	stat = plugin.deregisterCommand("PotatoExportModel");
 
 	if (stat != MS::kSuccess) {
-		stat.perror("Error - uninitializePlugin");
+		stat.perror("Error - uninitializePlugin:PotatoExportModel");
 		// should i return or try next :S
 	}
 
 	stat = plugin.deregisterCommand("PotatoExportAnim");
 
 	if (stat != MS::kSuccess) {
-		stat.perror("Error - uninitializePlugin");
+		stat.perror("Error - uninitializePlugin:PotatoExportAnim");
 	}
 
 	stat = plugin.deregisterCommand("PotatoPath");
 
 	if (stat != MS::kSuccess) {
-		stat.perror("Error - uninitializePlugin");
+		stat.perror("Error - uninitializePlugin:PotatoPath");
 	}
 
 	stat = plugin.deregisterCommand("PotatoAssetDB");
 
 	if (stat != MS::kSuccess) {
-		stat.perror("Error - uninitializePlugin");
+		stat.perror("Error - uninitializePlugin:PotatoAssetDB");
 	}
 
 	AssetDB::ShutDown();
