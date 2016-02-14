@@ -43,13 +43,17 @@ EngineApp::~EngineApp()
 
 bool EngineApp::Init(void)
 {
+	if (pICore_) {
+		return true; // already loaded.
+	}
+
 	SCoreInitParams params;
 	params.hInstance = nullptr;
 	params.pCmdLine = L"";
 	params.bSkipInput = true;
 	params.bSkipSound = true;
-	params.bVsLog = true;
-	params.bConsoleLog = true;
+	params.bVsLog = false;
+	params.bConsoleLog = false;
 	params.bTesting = false;
 	params.bCoreOnly = true;
 	params.bEnableBasicConsole = false;
@@ -92,7 +96,6 @@ bool EngineApp::Init(void)
 	}
 
 	LinkModule(pICore_, "Conveter");
-
 	return true;
 }
 
