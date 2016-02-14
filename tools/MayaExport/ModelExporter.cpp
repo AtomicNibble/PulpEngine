@@ -58,7 +58,7 @@ X_USING_NAMESPACE;
 
 namespace
 {
-	static ModelStats g_stats;
+//	static ModelStats g_stats;
 	static PotatoOptions g_options;
 
 	static const float MERGE_VERTEX_EPSILON = 0.9f;
@@ -90,6 +90,7 @@ namespace
 		return MObject::kNullObj;
 	}
 
+	/*
 	bool GetMeshMaterial(MayaMesh* mesh, MDagPath &dagPath)
 	{
 		MStatus	 status;
@@ -215,7 +216,7 @@ namespace
 	}
 
 	// ---------------------------------------------------
-
+	
 	bool vertSortByWeights(const MayaVertex& a, const MayaVertex& b) {
 		return (a.numWeights<b.numWeights);
 	}
@@ -254,7 +255,7 @@ namespace
 		MayaVertex* pVert;
 		int idx;
 	};
-
+	*/
 
 } // namespace
 
@@ -396,6 +397,7 @@ void PotatoOptions::reset(void)
 
 // --------------------------------------------
 
+
 MayaBone::MayaBone() : dagnode(nullptr)
 {
 	mayaNode.setOwner(this);
@@ -444,6 +446,9 @@ MayaBone& MayaBone::operator = (const MayaBone &oth)
 	exportNode.setOwner(this);
 	return *this;
 }
+
+#if 0
+
 
 // --------------------------------------------
 
@@ -2068,21 +2073,25 @@ bool MayaModel::save(const char *filename)
 	return false;
 }
 
+#endif 
+
 // --------------------------------------------
 
-PotatoExporter::PotatoExporter()
+ModelExporter::ModelExporter(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
+	model::ModelCompiler(pJobSys, arena),
+	mayaBones_(arena)
 {
 	MayaPrintMsg("=========== Exporting Model ===========");
 }
 
-PotatoExporter::~PotatoExporter()
+ModelExporter::~ModelExporter()
 {
 	HideProgressDlg();
 	MayaPrintMsg("================= End =================");
 }
 
 
-MStatus PotatoExporter::getInputObjects(void)
+MStatus ModelExporter::getInputObjects(void)
 {
 	// we just want to load all objects for every lod.
 	uint i, x;
@@ -2122,13 +2131,13 @@ MStatus PotatoExporter::getInputObjects(void)
 	//	MayaPrintMsg("TEST: %s", info.objects.asChar());
 	//	MayaPrintMsg("LOD%i object count: %i", i, pathArry.length());
 
-		model_.lods_[i].exportObjects_ = pathArry;
+	//	model_.lods_[i].exportObjects_ = pathArry;
 	}
 
 	return MS::kSuccess;
 }
 
-MStatus PotatoExporter::getExportObjects(void)
+MStatus ModelExporter::getExportObjects(void)
 {
 	PROFILE_MAYA("get objects");
 	if (g_options.exportMode_ == PotatoOptions::EXPORT_INPUT){
@@ -2143,9 +2152,20 @@ MStatus PotatoExporter::getExportObjects(void)
 }
 
 
-MStatus PotatoExporter::convert()
+MStatus ModelExporter::convert(const MArgList& args)
 {
-	MStatus status = ShowProgressDlg(0, 7);
+	MStatus status;
+
+	status = parseArgs(args);
+	if (status != MS::kSuccess) {
+		MayaPrintError("Failed to parse arguments");
+		return status;
+	}
+
+
+
+
+	status = ShowProgressDlg(0, 7);
 	bool saveOk = false;
 
 	{
@@ -2170,6 +2190,15 @@ MStatus PotatoExporter::convert()
 		return MS::kFailure;;
 	}
 
+#if 1
+	{
+
+
+
+
+	}
+
+#else
 	{
 		PROFILE_MAYA_NAME("Total Export time:");
 
@@ -2227,10 +2256,11 @@ MStatus PotatoExporter::convert()
 		saveOk = model_.save(g_options.filePath_.c_str());
 
 	}
+#endif
 
 	if (saveOk) {
 		status.setSuccess();
-		model_.printStats(g_options);
+//		model_.printStats(g_options);
 	}
 	else {
 		MayaPrintError("Failed to write file");
@@ -2241,48 +2271,459 @@ MStatus PotatoExporter::convert()
 	return status;
 }
 
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>|
-
-ModelExporter::ModelExporter()
+void ModelExporter::setFileName(const MString& path)
 {
+	core::StackString<512, char> temp(path.asChar());
+	temp.trim();
+
+	filePath_.append(temp.c_str());
+	filePath_.setExtension(model::MODEL_FILE_EXTENSION);
 }
 
-ModelExporter::~ModelExporter()
+MStatus ModelExporter::parseArgs(const MArgList& args)
 {
+	MStatus status;
+	uint32_t idx;
+
+	float scale = 1.f;
+	CompileFlags flags = (CompileFlag::MERGE_MESH | CompileFlag::MERGE_VERTS | CompileFlag::WHITE_VERT_COL);
+
+	idx = args.flagIndex("f");
+	if (idx == MArgList::kInvalidArgIndex) {
+		MayaPrintError("missing file argument");
+		return MS::kFailure;
+	}
+
+	// required
+	{
+		MString Mfilename;
+
+		status = args.get(++idx, Mfilename);
+		if (!status) {
+			MayaPrintError("missing filename");
+			return status;
+		}
+
+		setFileName(Mfilename);
+	}
+
+	// allow for options to be parsed.
+	idx = args.flagIndex("verbose");
+	if (idx != MArgList::kInvalidArgIndex) {
+		MayaUtil::SetVerbose(true);
+	}
+
+	idx = args.flagIndex("scale");
+	if (idx != MArgList::kInvalidArgIndex) {
+		double temp;
+		if (!args.get(++idx, temp)) {
+			MayaPrintWarning("failed to get scale flag");
+		}
+		else {
+			scale = static_cast<float>(temp);
+		}
+	}
+
+	idx = args.flagIndex("use_cm");
+	if (idx != MArgList::kInvalidArgIndex) {
+		bool useCm = false;
+		if (!args.get(++idx, useCm)) {
+			MayaPrintWarning("failed to get use_cm flag");
+		}
+		else {
+			if (useCm) {
+				unitOfMeasurement_ = UnitOfMeasureMent::CM;
+			}
+		}
+	}
+
+	idx = args.flagIndex("weight_thresh");
+	if (idx != MArgList::kInvalidArgIndex) {
+		double temp;
+		if (!args.get(++idx, temp)) {
+			MayaPrintWarning("failed to get weight_thresh flag");
+		}
+		else {
+			SetJointWeightThreshold(static_cast<float>(temp));
+		}
+	}
+
+
+	idx = args.flagIndex("uv_merge_thresh");
+	if (idx != MArgList::kInvalidArgIndex) {
+		double temp;
+		if (!args.get(++idx, temp)) {
+			MayaPrintWarning("failed to get uv_merge_thresh flag");
+		}
+		else {
+			SetTexCoordElipson(static_cast<float>(temp));
+		}
+	}
+
+	idx = args.flagIndex("vert_merge_thresh");
+	if (idx != MArgList::kInvalidArgIndex) {
+		double temp;
+		if (!args.get(++idx, temp)) {
+			MayaPrintWarning("failed to get vert_merge_thresh flag");
+		}
+		else {
+			SetVertexElipson(static_cast<float>(temp));
+		}
+	}
+
+
+	idx = args.flagIndex("zero_origin");
+	if (idx != MArgList::kInvalidArgIndex) {
+		bool zeroOrigin = false;
+		if (!args.get(++idx, zeroOrigin)) {
+			MayaPrintWarning("failed to get zero_origin flag");
+		}
+		else {
+			if (zeroOrigin) {
+				flags.Set(CompileFlag::ZERO_ORIGIN);
+			}
+			else {
+				flags.Remove(CompileFlag::ZERO_ORIGIN);
+			}
+		}
+	}
+
+	idx = args.flagIndex("white_vert_col");
+	if (idx != MArgList::kInvalidArgIndex) {
+		bool whiteVert = false;
+		if (!args.get(++idx, whiteVert)) {
+			MayaPrintWarning("failed to get white_vert_col flag");
+		}
+		else {
+			if (whiteVert) {
+				flags.Set(CompileFlag::WHITE_VERT_COL);
+			}
+			else {
+				flags.Remove(CompileFlag::WHITE_VERT_COL);
+			}
+		}
+	}
+
+	idx = args.flagIndex("merge_meshes");
+	if (idx != MArgList::kInvalidArgIndex) {
+		bool mergeMesh = false;
+		if (!args.get(++idx, mergeMesh)) {
+			MayaPrintWarning("failed to get white_vert_col flag");
+		}
+		else {
+			if (mergeMesh) {
+				flags.Set(CompileFlag::MERGE_MESH);
+			}
+			else {
+				flags.Remove(CompileFlag::MERGE_MESH);
+			}
+		}
+	}
+
+	idx = args.flagIndex("merge_verts");
+	if (idx != MArgList::kInvalidArgIndex) {
+		bool mergeMesh = false;
+		if (!args.get(++idx, mergeMesh)) {
+			MayaPrintWarning("failed to get merge_verts flag");
+		}
+		else {
+			if (mergeMesh) {
+				flags.Set(CompileFlag::MERGE_VERTS);
+			}
+			else {
+				flags.Remove(CompileFlag::MERGE_VERTS);
+			}
+		}
+	}
+
+	idx = args.flagIndex("dir");
+	if (idx != MArgList::kInvalidArgIndex) {
+		MString dir;
+		if (!args.get(++idx, dir)) {
+			MayaPrintWarning("failed to get dir flag");
+		}
+		else {
+			filePath_.append(dir.asChar());
+			filePath_.replaceSeprators();
+			filePath_.ensureSlash();
+		}
+	}
+
+	idx = args.flagIndex("force_bones");
+	if (idx != MArgList::kInvalidArgIndex) {
+		MString forceBoneFilters;
+		if (!args.get(++idx, forceBoneFilters)) {
+			MayaPrintWarning("failed to get force_bones flag");
+		}
+		// TODO: use the forceBoneFilters.
+	}
+
+	{
+		MString progressCntl;
+
+		idx = args.flagIndex("progress");
+		if (idx != MArgList::kInvalidArgIndex) {
+			if (!args.get(++idx, progressCntl)) {
+				MayaPrintWarning("failed to get progress cntl flag");
+			}
+		}
+
+		MayaUtil::SetProgressCtrl(progressCntl);
+	}
+
+	// use the scale to make it cm -> inches.
+	// this applyies it post user scale.
+	if (unitOfMeasurement_ == UnitOfMeasureMent::INCHES) {
+		scale = scale * 0.393700787f;
+	}
+
+	// set values.
+	if (scale != 1.f) {
+		SetScale(scale);
+	}
+
+	setFlags(flags);
+	return status;
 }
 
-MStatus ModelExporter::writer(const MFileObject& file, const MString& optionsString, FileAccessMode mode)
+
+MStatus ModelExporter::lodLODs(void)
 {
-	X_UNUSED(file);
-	X_UNUSED(optionsString);
-	X_UNUSED(mode);
 
-//	PotatoOptions options;
-//	options.setcmdArgs(optionsString.asChar());
-//	options.setMode(mode);
-//	options.setFileName(file.name());
-
-//	PotatoExporter exportModel;
-//	return exportModel.convert();
 	return MS::kFailure;
 }
 
-bool ModelExporter::haveWriteMethod() const
+MStatus ModelExporter::loadBones(void)
 {
-	return true;
+	PROFILE_MAYA("load joints");
+
+	MStatus			status;
+	MDagPath		dagPath;
+	MFnDagNode		*parentNode;
+	MayaBone		*bone;
+	uint				i, j;
+
+	float scale = g_options.scale_;
+
+
+	// allocate max.
+	mayaBones_.reserve(model::MODEL_MAX_BONES);
+
+	MItDag dagIterator(MItDag::kDepthFirst, MFn::kTransform, &status);
+	for (; !dagIterator.isDone(); dagIterator.next()) 
+	{
+		status = dagIterator.getPath(dagPath);
+		if (!status) {
+			MayaPrintError("Joint: MItDag::getPath failed (%s)", status.errorString().asChar());
+			return status;
+		}
+
+		if (!dagPath.hasFn(MFn::kJoint)) {
+			continue;
+		}
+
+		MayaBone new_bone;
+		new_bone.dagnode = X_NEW(MFnDagNode, g_arena, "BoneDagNode")(dagPath, &status);
+
+		if (!status) {
+			X_DELETE(new_bone.dagnode, g_arena);// dunno if maya returns null, don't matter tho.
+			MayaPrintError("Joint: MFnDagNode constructor failed (%s)", status.errorString().asChar());
+			return status;
+		}
+
+		new_bone.name.append(new_bone.dagnode->name().asChar());
+
+		if (mayaBones_.size() == model::MODEL_MAX_BONES) {
+			MayaPrintError("Joints: max bones reached: %i", model::MODEL_MAX_BONES);
+			return MStatus::kFailure;
+		}
+
+		if (new_bone.name.length() > model::MODEL_MAX_BONE_NAME_LENGTH)
+		{
+			MayaPrintError("Joints: max bone name length exceeded, MAX: %i '%' -> %i",
+				model::MODEL_MAX_BONE_NAME_LENGTH, new_bone.name.c_str(), new_bone.name.length());
+			return MStatus::kFailure;
+		}
+
+		size_t idx = mayaBones_.append(new_bone);
+
+		bone = &mayaBones_[idx];
+		bone->index = safe_static_cast<int, size_t>((mayaBones_.size() - 1));
+	}
+
+
+	// create hierarchy
+	bone = mayaBones_.ptr();
+	for (i = 0; i < mayaBones_.size(); i++, bone++) {
+		if (!bone->dagnode) {
+			continue;
+		}
+
+		bone->mayaNode.setParent(mayaHead);
+		bone->exportNode.setParent(exportHead);
+
+		parentNode = GetParentBone(bone->dagnode);
+		if (parentNode) {
+
+			// do we have this joint?
+			for (j = 0; j < mayaBones_.size(); j++) {
+				if (!mayaBones_[j].dagnode) {
+					continue;
+				}
+
+				if (mayaBones_[j].dagnode->name() == parentNode->name()) {
+					bone->mayaNode.setParent(mayaBones_[j].mayaNode);
+					bone->exportNode.setParent(mayaBones_[j].exportNode);
+					break;
+				}
+			}
+			X_DELETE(parentNode, g_arena);
+		}
+
+		bone->dagnode->getPath(dagPath);
+		status = getBindPose(dagPath.node(&status), bone, scale);
+		if (!status) {
+			return status;
+		}
+	}
+
+	return status;
 }
 
-MString ModelExporter::defaultExtension() const
+
+MFnDagNode* ModelExporter::GetParentBone(MFnDagNode* pBone)
 {
-	return "model";
+	X_ASSERT_NOT_NULL(pBone);
+
+	MStatus		status;
+	MObject		parentObject;
+
+	parentObject = pBone->parent(0, &status);
+	if (!status && status.statusCode() == MStatus::kInvalidParameter) {
+		return NULL;
+	}
+
+	while (!parentObject.hasFn(MFn::kTransform)) {
+		MFnDagNode parentNode(parentObject, &status);
+		if (!status) {
+			return NULL;
+		}
+
+		parentObject = parentNode.parent(0, &status);
+		if (!status && status.statusCode() == MStatus::kInvalidParameter) {
+			return NULL;
+		}
+	}
+
+	MFnDagNode *parentNode;
+
+	parentNode = X_NEW(MFnDagNode, g_arena, "ParentDagNode")(parentObject, &status);
+	if (!status) {
+		X_DELETE(parentNode, g_arena);
+		return NULL;
+	}
+
+	return parentNode;
 }
 
-void* ModelExporter::creator()
+
+MStatus ModelExporter::getBindPose(const MObject &jointNode, MayaBone* pBone, float scale)
 {
-	return new ModelExporter;
+	X_ASSERT_NOT_NULL(pBone);
+
+	MStatus				status;
+	MFnDependencyNode	fnJoint(jointNode);
+	MObject				aBindPose = fnJoint.attribute("bindPose", &status);
+
+	pBone->bindpos = Vec3f::zero();
+	pBone->bindm33 = Matrix33f::identity();
+
+	bool set = false;
+
+	if (MS::kSuccess == status) {
+		unsigned	ii;
+		unsigned	jointIndex;
+		unsigned	connLength;
+		MPlugArray	connPlugs;
+		MPlug		pBindPose(jointNode, aBindPose);
+
+		pBindPose.connectedTo(connPlugs, false, true);
+		connLength = connPlugs.length();
+		for (ii = 0; ii < connLength; ++ii) {
+			if (connPlugs[ii].node().apiType() == MFn::kDagPose) {
+				MObject			aMember = connPlugs[ii].attribute();
+				MFnAttribute	fnAttr(aMember);
+
+				if (fnAttr.name() == "worldMatrix") {
+					jointIndex = connPlugs[ii].logicalIndex();
+
+					MFnDependencyNode nDagPose(connPlugs[ii].node());
+
+					// construct plugs for this joint's world matrix
+					MObject aWorldMatrix = nDagPose.attribute("worldMatrix");
+					MPlug	pWorldMatrix(connPlugs[ii].node(), aWorldMatrix);
+
+					pWorldMatrix.selectAncestorLogicalIndex(jointIndex, aWorldMatrix);
+
+					// get the world matrix data
+					MObject worldMatrix;
+					status = pWorldMatrix.getValue(worldMatrix);
+					if (MS::kSuccess != status) {
+						// Problem retrieving world matrix
+						MayaPrintError("failed to get world matrix for bone(1): %s",
+							pBone->name.c_str());
+						return status;
+					}
+
+					MFnMatrixData	dMatrix(worldMatrix);
+					MMatrix			wMatrix = dMatrix.matrix(&status);
+
+					pBone->bindm33 = ConvertToGameSpace(XMat(wMatrix));
+					pBone->bindpos = ConvertToGameSpace(XVec(wMatrix)) * scale;
+
+					//if (!options.ignoreScale) {
+					//	joint->bindpos *= joint->scale;
+					//}
+					set = true;
+					break;
+				}
+			}
+		}
+	}
+	else {
+		MayaPrintError("error getting bind pose for '%s' error: %s",
+			pBone->name.c_str(), status.errorString().asChar());
+	}
+
+	// failed to get the bind pose :(
+	if (!set)
+	{
+		MayaPrintError("failed to get bind pose for bone: %s",
+			pBone->name.c_str());
+
+		// try get world pos.
+
+		MDagPath path;
+		status = pBone->dagnode->getPath(path);
+		if (status != MS::kSuccess) {
+			MayaPrintError("Failed to get bone path: '%s'", pBone->name.c_str());
+			return MS::kFailure;
+		}
+
+		MTransformationMatrix worldMatrix = path.inclusiveMatrix();
+		MMatrix m = worldMatrix.asMatrix();
+		pBone->bindm33 = ConvertToGameSpace(XMat(m));
+		pBone->bindpos = ConvertToGameSpace(XVec(m)) * scale;
+	}
+
+	MayaPrintVerbose("Bone '%s' pos: (%g,%g,%g)",
+		pBone->name.c_str(), pBone->bindpos.x, pBone->bindpos.y, pBone->bindpos.z);
+
+	return status;
 }
 
-// >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>|
+
+// -----------------------------------------------
 
 ModelExporterCmd::ModelExporterCmd()
 {
@@ -2299,14 +2740,8 @@ MStatus ModelExporterCmd::doIt(const MArgList &args)
 	uint currentLod = 0;
 	uint idx;
 
-	g_options.reset();
-	g_stats.clear();
-
-
-//	for (idx = 0; idx < args.length(); idx++) {
-//		MayaPrintMsg("arg(%i): %s", idx, args.asString(idx));
-//	}
-
+//	g_options.reset();
+//	g_stats.clear();
 
 	idx = args.flagIndex("f");
 	if (idx == MArgList::kInvalidArgIndex) {
@@ -2361,10 +2796,9 @@ MStatus ModelExporterCmd::doIt(const MArgList &args)
 		return MS::kFailure;
 	}
 
+	ModelExporter exportModel(gEnv->pJobSys, g_arena);
 
-	PotatoExporter exportModel;
-
-	return exportModel.convert();
+	return exportModel.convert(args);
 }
 
 void* ModelExporterCmd::creator()

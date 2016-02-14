@@ -14,9 +14,11 @@
 
 #include <IModel.h>
 
+#include <ModelCompiler.h>
 
 class MFnDagNode;
 
+/*
 struct ModelStats
 {
 	ModelStats() :
@@ -54,6 +56,7 @@ struct ModelStats
 
 	AABB bounds;
 };
+*/
 
 
 struct LODExportInfo
@@ -126,6 +129,7 @@ public:
 	UnitOfMeasureMent unitOfMeasurement_;
 };
 
+#if 0
 
 struct MayaBone
 {
@@ -290,38 +294,70 @@ public:
 	AABB					boundingBox;
 };
 
+#endif
 
-class PotatoExporter
+struct MayaBone
 {
-public:
-	PotatoExporter();
-	~PotatoExporter();
+	MayaBone();
+	MayaBone(const MayaBone& oth);
 
-	MStatus convert();
+	MayaBone& operator=(const MayaBone &oth);
+
+	size_t getDataSize() const {
+		return name.length() + sizeof(XQuatCompressedf) + sizeof(Vec3f) + 2;
+	}
+
+	core::StackString<128> name;
+	MFnDagNode* dagnode;
+
+	uint32_t index;
+	uint32_t exportIdx;
+
+	Vec3f		bindpos;
+	Matrix33f	bindm33;
+
+	Hierarchy<MayaBone> mayaNode;
+	Hierarchy<MayaBone> exportNode;
+
+	bool keep;
+};
+
+class ModelExporter : public model::ModelCompiler
+{
+	X_DECLARE_ENUM(ExpoMode)(EXPORT_ALL, EXPORT_SELECTED, EXPORT_INPUT);
+	X_DECLARE_ENUM(UnitOfMeasureMent)(INCHES, CM);
+
+public:
+	ModelExporter(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena);
+	~ModelExporter();
+
+	MStatus convert(const MArgList& args);
+
+private:
+	void setFileName(const MString& path);
+
+	MStatus parseArgs(const MArgList& args);
+	MStatus lodLODs(void);
+	MStatus loadBones(void);
 
 private:
 	MStatus getExportObjects(void);
 	MStatus getInputObjects(void);
-	
 
 private:
-	MayaModel  model_;
-};
+	static MFnDagNode* GetParentBone(MFnDagNode* pBone);
+	static MStatus getBindPose(const MObject &jointNode, MayaBone* pBone, float scale);
+	
+private:
+	core::Path<char> filePath_;
+	ExpoMode::Enum exportMode_;
+	UnitOfMeasureMent::Enum unitOfMeasurement_;
 
+	core::Array<MayaBone>	mayaBones_;
+	MayaBone				tagOrigin_;
 
-class ModelExporter : public MPxFileTranslator
-{
-public:
-	ModelExporter();
-	~ModelExporter();
-
-	MStatus writer(const MFileObject& file, const MString& optionsString, FileAccessMode mode);
-
-	bool haveWriteMethod() const;
-	MString defaultExtension() const;
-
-	static void* creator();
-
+	Hierarchy<MayaBone>		mayaHead;
+	Hierarchy<MayaBone>		exportHead;
 };
 
 
