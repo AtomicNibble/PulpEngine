@@ -188,7 +188,7 @@ void ModelCompiler::setFlags(CompileFlags flags)
 	flags_ = flags;
 }
 
-void ModelCompiler::PrintStats(void) const
+void ModelCompiler::printStats(void) const
 {
 	stats_.print();
 }

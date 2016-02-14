@@ -65,8 +65,7 @@ public:
 	void SetJointWeightThreshold(float elipson);
 	void SetScale(float scale);
 	void setFlags(CompileFlags flags);
-	void PrintStats(void) const;
-
+	void printStats(void) const;
 
 	bool CompileModel(core::Path<char>& outFile);
 	bool CompileModel(core::Path<wchar_t>& outFile);
@@ -103,7 +102,7 @@ private:
 	float scale_;
 
 	CompileFlags flags_;
-
+protected:
 	Stats stats_;
 };
 
