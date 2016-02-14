@@ -45,8 +45,6 @@ X_ENABLE_WARNING(4702)
 
 double MayaProfiler::s_frequency = 0.0;
 
-struct SCoreGlobals* gEnv = nullptr;
-
 
 X_LINK_LIB(X_STRINGIZE(MAYA_SDK) "\\Foundation")
 X_LINK_LIB(X_STRINGIZE(MAYA_SDK) "\\OpenMaya")
@@ -55,205 +53,8 @@ X_LINK_LIB(X_STRINGIZE(MAYA_SDK) "\\OpenMayaAnim")
 
 X_USING_NAMESPACE;
 
-namespace
-{
-	static const float MERGE_VERTEX_EPSILON = 0.9f;
-	static const float MERGE_TEXCORDS_EPSILON = 0.02f;
-	static const float JOINT_WEIGHT_THRESHOLD = 0.005f;
-	static const int   VERTEX_MAX_WEIGHTS = 4;
-
-	
-
-	/*
-	bool GetMeshMaterial(MayaMesh* mesh, MDagPath &dagPath)
-	{
-		MStatus	 status;
-		MDagPath path = dagPath;
-		int	i;
-		int	instanceNum;
-
-		path.extendToShape();
-
-		instanceNum = 0;
-		if (path.isInstanced()) {
-			instanceNum = path.instanceNumber();
-		}
-
-		MFnMesh fnMesh(path);
-		MObjectArray sets;
-		MObjectArray comps;
-		status = fnMesh.getConnectedSetsAndMembers(instanceNum, sets, comps, true);
-		if (!status) {
-			MayaPrintError("MFnMesh::getConnectedSetsAndMembers failed (%s)", status.errorString().asChar());
-		}
-
-		for (i = 0; i < (int)sets.length(); i++) {
-			MObject set = sets[i];
-			MObject comp = comps[i];
-
-			MFnSet fnSet(set, &status);
-			if (status == MS::kFailure) {
-				MayaPrintError("MFnSet constructor failed (%s)", status.errorString().asChar());
-				continue;
-			}
-
-			// Make sure the set is a polygonal set.  If not, continue.
-			MItMeshPolygon piter(path, comp, &status);
-			if (status == MS::kFailure) {
-				continue;
-			}
-
-			MObject shaderNode = FindShader(set);
-			if (shaderNode == MObject::kNullObj) {
-				continue;
-			}
-
-			MFnDependencyNode Shader(shaderNode);
-
-			MPlug colorPlug = Shader.findPlug("color", &status);
-			if (status == MS::kFailure) {
-				MayaPrintError("material(%s) has no color channel", Shader.name().asChar());
-				continue;
-			}
-
-			if (Shader.name().length() > 64) {
-				MayaPrintError("Material name too long MAX(64): '%s'", Shader.name().asChar());
-				return false;
-			}
-
-			mesh->material.append(Shader.name().asChar());
-			return true;
-		}
-		return false;
-	}
-
-
-	core::StackString<60> getMeshDisplayName(const MString& fullname)
-	{
-		typedef core::StackString<60> NameType;
-		core::FixedStack<NameType, 16> Stack;
-
-		core::StringTokenizer<char> tokens(fullname.asChar(), fullname.asChar() + fullname.length(), '|');
-		core::StringRange<char> range(nullptr, nullptr);
-
-		while (tokens.ExtractToken(range))
-		{
-			Stack.push(NameType(range.GetStart(), range.GetEnd()));
-		}
-
-		// ok the name is 2nd one.
-		// check we have 2 tho.
-		if (Stack.size() > 1) {
-			Stack.pop();
-		}
-
-		return Stack.top();
-	}
-
-
-	// ---------------------------------------------------
-
-
-	MFnDagNode* GetParent(MFnDagNode *bone)
-	{
-		X_ASSERT_NOT_NULL(bone);
-
-		MStatus		status;
-		MObject		parentObject;
-
-		parentObject = bone->parent(0, &status);
-		if (!status && status.statusCode() == MStatus::kInvalidParameter) {
-			return NULL;
-		}
-
-		while (!parentObject.hasFn(MFn::kTransform)) {
-			MFnDagNode parentNode(parentObject, &status);
-			if (!status) {
-				return NULL;
-			}
-
-			parentObject = parentNode.parent(0, &status);
-			if (!status && status.statusCode() == MStatus::kInvalidParameter) {
-				return NULL;
-			}
-		}
-
-		MFnDagNode *parentNode;
-
-		parentNode = X_NEW(MFnDagNode, g_arena, "ParentDagNode")(parentObject, &status);
-		if (!status) {
-			X_DELETE(parentNode, g_arena);
-			return NULL;
-		}
-
-		return parentNode;
-	}
-
-	// ---------------------------------------------------
-	
-	bool vertSortByWeights(const MayaVertex& a, const MayaVertex& b) {
-		return (a.numWeights<b.numWeights);
-	}
-
-	unsigned int hashsingle(float f)
-	{
-		union {
-			unsigned int ui;
-			float fv;
-		};
-		fv = f;
-		return ((ui & 0xfffff000) >> 12);
-	}
-
-	int64 Hash(float x, float y, float z)
-	{
-		int64 h1 = hashsingle(x);
-		int64 h2 = hashsingle(y);
-		int64 h3 = hashsingle(z);
-		return (h1 << 40) | (h2 << 20) | h3;
-	}
-
-	int64 vertHash(const MayaVertex& vert)
-	{
-		return Hash(vert.pos[0], vert.pos[1], vert.pos[2]);
-	}
-
-
-	struct Hashcontainer
-	{
-		Hashcontainer() {
-			pVert = nullptr;
-			idx = 0;
-		}
-
-		MayaVertex* pVert;
-		int idx;
-	};
-	*/
-
-} // namespace
-
-// ---------------------------------------------------
-
-/*
-void PotatoOptions::reset(void)
-{
-	lodInfo_.clear();
-	filePath_.clear();
-	scale_ = 1.0f;
-	jointThreshold_ = JOINT_WEIGHT_THRESHOLD;
-	uvMergeThreshold_ = MERGE_TEXCORDS_EPSILON;
-	vertThreshold_ = MERGE_VERTEX_EPSILON;
-	zeroOrigin_ = true;
-	whiteVertColors_ = true;
-	forceBoneFilters_.clear();
-	exportMode_ = EXPORT_INPUT;
-	unitOfMeasurement_ = INCHES;
-}
-*/
 
 // --------------------------------------------
-
 
 MayaBone::MayaBone() : dagnode(nullptr)
 {
@@ -275,9 +76,6 @@ exportNode(oth.exportNode)
 
 	bindpos = oth.bindpos;
 	bindm33 = oth.bindm33;
-
-//	mayaNode = oth.mayaNode;
-//	exportNode = oth.exportNode;
 
 	keep = oth.keep;
 
@@ -304,199 +102,8 @@ MayaBone& MayaBone::operator = (const MayaBone &oth)
 	return *this;
 }
 
+
 #if 0
-
-
-// --------------------------------------------
-
-MayaWeight::MayaWeight()
-{
-	bone = nullptr;
-	weight = 0.f;
-}
-
-// --------------------------------------------
-
-MayaVertex::MayaVertex() :
-numWeights(0), 
-startWeightIdx(0) 
-{
-
-}
-
-// --------------------------------------------
-
-MayaMesh::MayaMesh() :
-	verts(g_arena),
-	faces(g_arena),
-	weights(g_arena)
-{
-	hasBinds = false;
-}
-
-MayaMesh::~MayaMesh()
-{
-
-}
-
-void MayaMesh::clear(void)
-{
-	verts.clear();
-	faces.clear();
-	weights.clear();
-
-	hasBinds = false;
-}
-
-void MayaMesh::merge(MayaMesh *mesh)
-{
-	uint i;
-	uint numverts;
-	uint numtris;
-	uint numWeights;
-
-	numverts = (int)verts.size();
-	numtris = (int)faces.size();
-
-	verts.resize(numverts + mesh->verts.size());
-	faces.resize(numtris + mesh->faces.size());
-
-	// merge verts
-	for (i = 0; i < mesh->verts.size(); i++) {
-		verts[numverts + i] = mesh->verts[i];
-	}
-
-	// merge triangles
-	for (i = 0; i < mesh->faces.size(); i++) {
-		faces[numtris + i][0] = mesh->faces[i][0] + numverts;
-		faces[numtris + i][1] = mesh->faces[i][1] + numverts;
-		faces[numtris + i][2] = mesh->faces[i][2] + numverts;
-	}
-
-	// merge weights
-	numWeights = (int)weights.size();
-	weights.resize(numWeights + mesh->weights.size());
-	for (i = 0; i < mesh->weights.size(); i++) {
-		weights[numWeights + i] = mesh->weights[i];
-	}
-
-}
-
-void MayaMesh::shareVerts(void)
-{
-	//	PROFILE_MAYA_NAME("process verts");
-	// I use the multimap with a little hash i made.
-	// so that i can get a subset of any verts
-	// that are potentialy equal and test with elipsons against them.
-	// reduces the comparions down from O(N*N) O(N)(avg) 
-	typedef std::multimap<uint64_t, Hashcontainer> hashType;
-	hashType hash;
-
-	// we want to get rid of duplicate verts.
-	// so we just add the verts one by one, checking if they match.
-	// O(T*(3* V))
-	// then we update the triangles.
-	uint i, x; // , k;
-	core::Array<MayaVertex>	v(g_arena);
-
-	size_t before = verts.size();
-
-	v = verts;
-	verts.clear();
-
-	// sort the weights
-	// a vertex has 1-4 weights.
-	// so we need to sort the verts so that the weight groups are grouped.
-	// we sort now so that the face index are correct.
-	if (this->hasBinds) {
-		std::sort(v.begin(), v.end(), vertSortByWeights);
-	}
-
-	size_t numEqual = 0;
-	size_t numUnique = 0;
-
-	const float uvMergeThreshold_ = g_options.uvMergeThreshold_;
-	const float vertThreshold_ = g_options.vertThreshold_;
-
-	for (i = 0; i < faces.size(); i++)
-	{
-		for (x = 0; x < 3; x++) // for each face.
-		{
-			const MayaVertex& vert = v[faces[i][x]];
-			const uint64 vert_hash = vertHash(vert);
-
-			// is it unique?
-			std::pair <hashType::iterator, hashType::iterator> ret;
-			hashType::iterator it;
-			ret = hash.equal_range(vert_hash);
-
-			bool equal = false;
-
-			for (it = ret.first; it != ret.second; ++it)
-			{
-				const MayaVertex* vv = it->second.pVert;
-				
-				if (vert.numWeights != vv->numWeights) {
-					continue;
-				}
-				if (vert.startWeightIdx != vv->startWeightIdx) {
-					continue;
-				}
-				if (!vert.pos.compare(vv->pos, vertThreshold_)) {
-					continue; // not same
-				}
-				if (!vert.uv.compare(vv->uv, uvMergeThreshold_)) {
-					continue; // not same
-				}
-
-				equal = true;
-				break; // equal.
-			}
-
-			if (equal)
-			{
-				faces[i][x] = it->second.idx;
-
-				numEqual++;
-			}
-			else
-			{
-				numUnique++;
-
-
-				faces[i][x] = safe_static_cast<int,size_t>(verts.append(vert));
-				if (vert.numWeights > 0) {
-					CompBinds[vert.numWeights - 1]++;
-				}
-
-				Hashcontainer temp;
-				temp.pVert = &verts[verts.size() - 1];
-				temp.idx = faces[i][x];
-
-				// add hash.
-				hash.insert(hashType::value_type(vert_hash, temp));
-
-			}
-		}
-	}
-
-	MayaPrintMsg("num merged: %i -> unique: %i (%i,%i)", numEqual, numUnique, before, verts.size());
-}
-
-
-void MayaMesh::calBoundingbox()
-{
-	AABB aabb;
-
-	for (core::Array<MayaVertex>::ConstIterator
-		it = verts.begin(); it != verts.end(); ++it)
-	{
-		aabb.add(it->pos);
-	}
-
-	boundingBox = aabb;
-}
-
 
 // --------------------------------------------
 
@@ -543,32 +150,6 @@ void MayaLOD::pruneBones(void)
 		}
 	}
 }
-
-size_t MayaLOD::getSubDataSize(const Flags8<model::StreamType>& streams)
-{
-	size_t size = 0;
-	size_t i;
-	for (i = 0; i < meshes_.size(); i++)
-	{
-		const MayaMesh* mesh = meshes_[i];
-
-		size += sizeof(model::Face) * mesh->faces.size();
-		size += sizeof(model::Vertex) * mesh->verts.size();
-
-		// streams.
-		if (streams.IsSet(model::StreamType::COLOR))
-			size += sizeof(model::VertexColor) * mesh->verts.size();
-		if (streams.IsSet(model::StreamType::NORMALS))
-			size += sizeof(model::VertexNormal) * mesh->verts.size();
-		if (streams.IsSet(model::StreamType::TANGENT_BI))
-			size += sizeof(model::VertexTangentBi) * mesh->verts.size();
-
-		// bind data
-		size += safe_static_cast<size_t, size_t>(mesh->CompBinds.dataSizeTotal());
-	}
-	return size;
-}
-
 
 MStatus MayaLOD::LoadMeshes(void)
 {
@@ -939,104 +520,6 @@ MStatus MayaLOD::LoadMeshes(void)
 	return status;
 }
 
-core::Thread::ReturnValue mergeVertsThreadFnc(const core::Thread& thread)
-{
-	core::Array<MayaMesh*>* meshes = (core::Array<MayaMesh*>*)thread.getData();
-
-	for (uint i = 0; i < meshes->size(); i++) {
-		(*meshes)[i]->shareVerts();
-	}
-
-	return 0;
-}
-
-void MayaLOD::MergeMeshes(void)
-{
-	int	numMerged;
-	{
-	//	PROFILE_MAYA("merge meshes");
-
-		uint						i, j;
-
-		MayaMesh				*mesh;
-		MayaMesh				*combine;
-		core::Array<MayaMesh*>	meshes(g_arena);
-
-		meshes = meshes_;
-		meshes_.clear();
-
-		numMerged = 0;
-
-		for (i = 0; i < meshes.size(); i++) {
-
-			mesh = meshes[i];
-			combine = nullptr;
-
-			// check it again others.
-			for (j = 0; j < meshes_.size(); j++) {
-				if (mesh != meshes_[j] && meshes_[j]->material == mesh->material) {
-					combine = meshes_[j];
-					break;
-				}
-			}
-
-			if (combine) {
-				combine->merge(mesh);
-				X_DELETE(mesh, g_arena);
-				numMerged++;
-			}
-			else {
-				meshes_.append(mesh);
-			}
-		}
-
-		uint numMeshes = safe_static_cast<int32_t, size_t>(meshes_.size());
-
-		const int numThreads = 2;
-		if (numMeshes >= numThreads) // atleast 2 meshes, before we bother threading.
-		{
-			// thread it.
-			core::Thread threads[numThreads];
-			core::Array<MayaMesh*>	threadMeshes[numThreads] = { g_arena, g_arena };
-
-			uint numPerThread = numMeshes / numThreads;
-			uint currentThread = 0;
-			for (i = 0; i < numMeshes; i++) {
-				if (i >= numPerThread && (currentThread < numThreads - 1)) {
-					currentThread++;
-					numPerThread += (numMeshes / numThreads);
-				}
-				threadMeshes[currentThread].append(meshes_[i]);
-			}
-
-			for (i = 0; i < numThreads; i++) {
-				threads[i].Create("merge worker"); // default stack size
-				threads[i].setData(&threadMeshes[i]);
-			}
-
-			for (i = 0; i < numThreads; i++) {
-				threads[i].Start(mergeVertsThreadFnc);
-			}
-
-			for (i = 0; i < numThreads; i++) {
-				threads[i].Join();
-			}
-		}
-		else
-		{
-			for (i = 0; i < numMeshes; i++) {
-				meshes_[i]->shareVerts();
-			}
-		}
-	}
-
-	if (numMerged > 0) {
-		MayaPrintMsg("(%i) meshes merged", numMerged);
-	}
-}
-
-
-
 // --------------------------------------------
 
 MayaModel::MayaModel() :
@@ -1079,206 +562,6 @@ MayaBone *MayaModel::findJointReal(const char *name) {
 	return nullptr;
 }
 
-
-
-void MayaModel::getBindPose(const MObject &jointNode, MayaBone *bone, float scale) {
-	MStatus				status;
-	MFnDependencyNode	fnJoint(jointNode);
-	MObject				aBindPose = fnJoint.attribute("bindPose", &status);
-
-	bone->bindpos = Vec3f::zero();
-	bone->bindm33 = Matrix33f::identity();
-
-	bool set = false;
-
-	if (MS::kSuccess == status) {
-		unsigned	ii;
-		unsigned	jointIndex;
-		unsigned	connLength;
-		MPlugArray	connPlugs;
-		MPlug		pBindPose(jointNode, aBindPose);
-
-		pBindPose.connectedTo(connPlugs, false, true);
-		connLength = connPlugs.length();
-		for (ii = 0; ii < connLength; ++ii) {
-			if (connPlugs[ii].node().apiType() == MFn::kDagPose) {
-				MObject			aMember = connPlugs[ii].attribute();
-				MFnAttribute	fnAttr(aMember);
-
-				if (fnAttr.name() == "worldMatrix") {
-					jointIndex = connPlugs[ii].logicalIndex();
-
-					MFnDependencyNode nDagPose(connPlugs[ii].node());
-
-					// construct plugs for this joint's world matrix
-					MObject aWorldMatrix = nDagPose.attribute("worldMatrix");
-					MPlug	pWorldMatrix(connPlugs[ii].node(), aWorldMatrix);
-
-					pWorldMatrix.selectAncestorLogicalIndex(jointIndex, aWorldMatrix);
-
-					// get the world matrix data
-					MObject worldMatrix;
-					status = pWorldMatrix.getValue(worldMatrix);
-					if (MS::kSuccess != status) {
-						// Problem retrieving world matrix
-						MayaPrintError("failed to get world matrix for bone(1): %s", 
-							bone->name.c_str());
-						return;
-					}
-
-					MFnMatrixData	dMatrix(worldMatrix);
-					MMatrix			wMatrix = dMatrix.matrix(&status);
-
-					bone->bindm33 = ConvertToGameSpace(XMat(wMatrix));
-					bone->bindpos = ConvertToGameSpace(XVec(wMatrix)) * scale;
-						
-					//if (!options.ignoreScale) {
-					//	joint->bindpos *= joint->scale;
-					//}
-					set = true;
-					break;
-				}
-			}
-		}
-	}
-	else {
-		MayaPrintError("error getting bind pose for '%s' error: %s",
-			bone->name.c_str(), status.errorString().asChar());
-	}
-
-	// failed to get the bind pose :(
-	if (!set)
-	{
-		MayaPrintError("failed to get bind pose for bone: %s",
-			bone->name.c_str());
-
-		// try get world pos.
-
-		MDagPath path;
-		status = bone->dagnode->getPath(path);
-		if (status != MS::kSuccess) {
-			MayaPrintError("Failed to get bone path: '%s'", bone->name.c_str());
-			return;
-		}
-
-		MTransformationMatrix worldMatrix = path.inclusiveMatrix();
-		MMatrix m = worldMatrix.asMatrix();
-		bone->bindm33 = ConvertToGameSpace(XMat(m));
-		bone->bindpos = ConvertToGameSpace(XVec(m)) * scale;
-	}
-
-	MayaPrintVerbose("Bone '%s' pos: (%g,%g,%g)",
-		bone->name.c_str(), bone->bindpos.x, bone->bindpos.y, bone->bindpos.z);
-}
-
-
-MStatus MayaModel::lodLODs(void)
-{
-	PROFILE_MAYA("load LODS");
-
-	MStatus status;
-	for (uint i = 0; i < g_options.numLods(); i++)
-	{
-		status = lods_[i].LoadMeshes();
-		if (!status) {
-			break;
-		}
-	}
-	return status;
-}
-
-MStatus MayaModel::loadBones(void)
-{
-	PROFILE_MAYA("load joints");
-
-	MStatus			status;
-	MDagPath		dagPath;
-	MFnDagNode		*parentNode;
-	MayaBone		*bone;
-	uint				i, j;
-
-	float scale = g_options.scale_;
-
-
-	// allocate max.
-	bones_.reserve(model::MODEL_MAX_BONES);
-
-	MItDag dagIterator(MItDag::kDepthFirst, MFn::kTransform, &status);
-	for (; !dagIterator.isDone(); dagIterator.next()) {
-		status = dagIterator.getPath(dagPath);
-		if (!status) {
-			MayaPrintError("Joint: MItDag::getPath failed (%s)", status.errorString().asChar());
-			return status;
-		}
-
-		if (!dagPath.hasFn(MFn::kJoint)) {
-			continue;
-		}
-		
-		MayaBone new_bone;
-		new_bone.dagnode = X_NEW(MFnDagNode,g_arena, "BoneDagNode")(dagPath, &status);
-
-		if (!status) {
-			X_DELETE(new_bone.dagnode, g_arena);// dunno if maya returns null, don't matter tho.
-			MayaPrintError("Joint: MFnDagNode constructor failed (%s)", status.errorString().asChar());
-			return status;
-		}
-
-		new_bone.name.append(new_bone.dagnode->name().asChar());
-
-		if (bones_.size() == model::MODEL_MAX_BONES) {
-			MayaPrintError("Joints: max bones reached: %i", model::MODEL_MAX_BONES);
-			return MStatus::kFailure;
-		}
-
-		if (new_bone.name.length() > model::MODEL_MAX_BONE_NAME_LENGTH)
-		{
-			MayaPrintError("Joints: max bone name length exceeded, MAX: %i '%' -> %i", 
-				model::MODEL_MAX_BONE_NAME_LENGTH, new_bone.name.c_str(), new_bone.name.length());
-			return MStatus::kFailure;
-		}
-
-		size_t idx = bones_.append(new_bone);
-
-		bone = &bones_[idx];
-		bone->index = safe_static_cast<int,size_t>((bones_.size() - 1));
-	}
-
-
-	// create hierarchy
-	bone = bones_.ptr();
-	for (i = 0; i < bones_.size(); i++, bone++) {
-		if (!bone->dagnode)  {
-			continue;
-		}
-		
-		bone->mayaNode.setParent(mayaHead);
-		bone->exportNode.setParent(exportHead);
-
-		parentNode = GetParent(bone->dagnode);
-		if (parentNode) {
-
-			// do we have this joint?
-			for (j = 0; j < bones_.size(); j++) {
-				if (!bones_[j].dagnode)  {
-					continue;
-				}
-
-				if (bones_[j].dagnode->name() == parentNode->name()) {
-					bone->mayaNode.setParent(bones_[j].mayaNode);
-					bone->exportNode.setParent(bones_[j].exportNode);
-					break;
-				}
-			}
-			X_DELETE(parentNode, g_arena);
-		}
-
-		bone->dagnode->getPath(dagPath);
-		getBindPose(dagPath.node(&status), bone, scale);
-	}
-
-	return status;
-}
 
 
 void MayaModel::pruneBones(PotatoOptions& options)
@@ -1354,13 +637,6 @@ void MayaModel::pruneBones(PotatoOptions& options)
 	g_stats.totalJointsDropped = safe_static_cast<int32_t, size_t>(bones_.size() - numExportJoints_);
 }
 
-void MayaModel::MergeMeshes()
-{
-	PROFILE_MAYA("merge meshes");
-	for (int i = 0; i < 4; i++) {
-		lods_[i].MergeMeshes();
-	}
-}
 
 void MayaModel::printStats(PotatoOptions& options)
 {
@@ -1937,6 +1213,7 @@ bool MayaModel::save(const char *filename)
 ModelExporter::ModelExporter(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
 	model::ModelCompiler(pJobSys, arena),
 	mayaBones_(arena),
+	exportMode_(ExpoMode::EXPORT_INPUT),
 	unitOfMeasurement_(UnitOfMeasureMent::INCHES)
 {
 	MayaUtil::MayaPrintMsg("=========== Exporting Model ===========");
@@ -2034,17 +1311,17 @@ MStatus ModelExporter::convert(const MArgList& args)
 	//		scale = appliedScale * 2.54f;
 	//	}
 
-		MayaUtil::MayaPrintMsg("Exporting to: '%s'", filePath_.c_str());
+		MayaUtil::MayaPrintMsg("Exporting to: '%s'", getFilePath().c_str());
 	//	MayaUtil::MayaPrintMsg("Scale: '%f' Applied: '%f'", scale, appliedScale);
 		MayaUtil::MayaPrintMsg(""); // new line
 	}
 
 
 	// name length check
-	if (strlen(filePath_.fileName()) > model::MODEL_MAX_NAME_LENGTH)
+	if (fileName_.length() > model::MODEL_MAX_NAME_LENGTH)
 	{
 		MayaUtil::MayaPrintError("Model name is too long. MAX: %i, provided: %i",
-			model::MODEL_MAX_NAME_LENGTH, filePath_.length());
+			model::MODEL_MAX_NAME_LENGTH, fileName_.length());
 		return MS::kFailure;;
 	}
 
@@ -2077,6 +1354,15 @@ MStatus ModelExporter::convert(const MArgList& args)
 			MayaUtil::MayaPrintError("Failed to load meshes: %s", status.errorString().asChar());
 			return status;
 		}
+
+		// time to slap a goat!
+		core::Path<char> outPath = getFilePath();
+
+		if (!SaveRawModel(outPath)) {
+			MayaUtil::MayaPrintError("Failed to save raw model");
+			return MS::kFailure;
+		}
+
 	}
 
 #else
@@ -2157,8 +1443,23 @@ void ModelExporter::setFileName(const MString& path)
 	core::StackString<512, char> temp(path.asChar());
 	temp.trim();
 
-	filePath_.append(temp.c_str());
-	filePath_.setExtension(model::MODEL_FILE_EXTENSION);
+	fileName_.set(temp.c_str());
+	fileName_.setExtension(model::MODEL_FILE_EXTENSION);
+}
+
+void ModelExporter::setOutdir(const MString& path)
+{
+	core::StackString<512, char> temp(path.asChar());
+	temp.trim();
+
+	outDir_.set(temp.c_str());
+//	outDir_.ensureSlash();
+	outDir_.replaceSeprators();
+}
+
+core::Path<char> ModelExporter::getFilePath(void) const
+{
+	return outDir_ / fileName_;
 }
 
 MStatus ModelExporter::parseArgs(const MArgList& args)
@@ -2324,9 +1625,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 			MayaUtil::MayaPrintWarning("failed to get dir flag");
 		}
 		else {
-			filePath_.append(dir.asChar());
-			filePath_.replaceSeprators();
-			filePath_.ensureSlash();
+			setOutdir(dir);
 		}
 	}
 
@@ -2424,6 +1723,9 @@ MStatus ModelExporter::loadLODs(void)
 		}
 		
 		model::RawModel::Lod& lod = lods_[i];
+
+		// set lod distance.
+		lod.distance_ = info.distance;
 
 		// reserver the meshes.
 		lod.meshes_.resize(numMesh, model::RawModel::Mesh(g_arena));
