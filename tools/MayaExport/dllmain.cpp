@@ -1,7 +1,9 @@
 #include "stdafx.h"
 
+#include <maya/MGlobal.h>
 #include <maya/MObject.h>
 #include <maya/MFnPlugin.h>
+#include <maya/MSceneMessage.h>
 
 #include "ModelExporter.h"
 #include "AnimExport.h"
@@ -41,6 +43,15 @@ namespace
 	core::MallocFreeAllocator g_allocator;
 
 	EngineApp app;
+
+	MCallbackId AfterFileOpenCallBackId;
+
+	static void AfterFileOpen(void* pClientData)
+	{
+		X_UNUSED(pClientData);
+		MGlobal::executeCommandOnIdle("potatoAfterFileOpen();");
+	}
+
 }
 
 core::MemoryArenaBase* g_arena = nullptr;
@@ -104,6 +115,11 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 		return stat;
 	}
 
+	AfterFileOpenCallBackId = MSceneMessage::addCallback(MSceneMessage::kAfterOpen, AfterFileOpen, nullptr, &stat);
+	if (stat != MS::kSuccess) {
+		stat.perror("Error - initializePlugin:OnSceneUpdate");
+		return stat;
+	}
 
 	return stat;
 }
@@ -141,6 +157,14 @@ MODELEX_EXPORT MStatus uninitializePlugin(MObject obj)
 		stat.perror("Error - uninitializePlugin:PotatoAssetDB");
 	}
 
+	// remove the callback
+	stat = MMessage::removeCallback(AfterFileOpenCallBackId);
+	
+	if (stat != MS::kSuccess) {
+		stat.perror("Error - uninitializePlugin:removeCallback");
+	}
+
+
 	AssetDB::ShutDown();
 	SettingsCache::ShutDown();
 
@@ -149,4 +173,3 @@ MODELEX_EXPORT MStatus uninitializePlugin(MObject obj)
 
 	return stat;
 }
-
