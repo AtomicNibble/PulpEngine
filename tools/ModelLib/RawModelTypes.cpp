@@ -32,7 +32,7 @@ namespace RawModel
 		size_t newFaceNum = numFace + oth.face_.size();
 
 		verts_.resize(newVertNum);
-		face_.resize(newVertNum);
+		face_.resize(newFaceNum);
 
 		size_t i;
 		for (i = 0; i < oth.verts_.size(); i++)
