@@ -235,7 +235,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 
 	core::XFileScoped file;
 		
-	if (file.openFile(outFile.c_str(), mode)) {
+	if (!file.openFile(outFile.c_str(), mode)) {
 		X_ERROR("Model", "Failed to open compile output file");
 		return false;
 	}
