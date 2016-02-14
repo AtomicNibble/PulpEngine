@@ -49,7 +49,7 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 {
 	core::StackString<64> ver;
 	ver.appendFmt("1.1.0.1 ", model::MODEL_VERSION);
-	ver.appendFmt("(m:%i) ", model::MODEL_VERSION);
+	ver.appendFmt("(m:%i:%i) ", model::MODEL_VERSION, model::MODEL_RAW_VERSION);
 	ver.appendFmt("(a:%i:%i)", anim::ANIM_VERSION, anim::ANIM_INTER_VERSION);
 
 	g_arena = new Arena(&g_allocator, "ModelExporterArena");
