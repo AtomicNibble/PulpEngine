@@ -17,6 +17,7 @@ inline Path<char>::Path(const Path<wchar_t>& oth)
 {
 	strUtil::Convert(oth.c_str(), str_, capacity());
 	str_[oth.length()] = L'\0';
+	len_ = oth.length();
 }
 
 template<>
@@ -25,6 +26,7 @@ inline Path<wchar_t>::Path(const Path<char>& oth)
 {
 	strUtil::Convert(oth.c_str(), str_, capacity());
 	str_[oth.length()] = L'\0';
+	len_ = oth.length();
 }
 
 
