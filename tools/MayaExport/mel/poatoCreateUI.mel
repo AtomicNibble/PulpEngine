@@ -371,13 +371,13 @@ global proc ModelEntryExport(int $index)
 	+ " -uv_merge_thresh " + $uvMergeThreshold
 	+ " -vert_merge_thresh " + $vertMergeThreshold
 	+ " -zero_origin " + $zeroOrigin
-	+ " -force_bones \"" + $forceBoneFilters + "\"";
+	+ " -force_bones \"" + $forceBoneFilters + "\" ";
 
 	if($verbose) {
 		$options += " -verbose";
 	}
 
-	string $command = "PotatoExportModel " + $args + " -f \"" + $filename + "\" "+ $options;
+	string $command = "PotatoExportModel " + $args + " -f \"" + $filename + "\" " + $options;
 
 //	print_Msg("cmd: " + $command);
 
