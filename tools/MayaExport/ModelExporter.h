@@ -329,8 +329,8 @@ class ModelExporter : public model::ModelCompiler
 		int idx;
 		float distance;
 		MString objects;
+		MDagPathArray exportObjects;
 	};
-
 
 	X_DECLARE_ENUM(ExpoMode)(EXPORT_ALL, EXPORT_SELECTED, EXPORT_INPUT);
 	X_DECLARE_ENUM(UnitOfMeasureMent)(INCHES, CM);
@@ -345,7 +345,7 @@ private:
 	void setFileName(const MString& path);
 
 	MStatus parseArgs(const MArgList& args);
-	MStatus lodLODs(void);
+	MStatus loadLODs(void);
 	MStatus loadBones(void);
 
 private:
@@ -355,7 +355,10 @@ private:
 private:
 	static MFnDagNode* GetParentBone(MFnDagNode* pBone);
 	static MStatus getBindPose(const MObject &jointNode, MayaBone* pBone, float scale);
-	
+	static core::StackString<60> getMeshDisplayName(const MString& fullname);
+	static bool getMeshMaterial(MDagPath& dagPath, model::RawModel::Material& material);
+	static MObject FindShader(MObject& setNode);
+
 private:
 	typedef core::FixedArray<LODExportInfo, model::MODEL_MAX_LODS> LodInfoArr;
 

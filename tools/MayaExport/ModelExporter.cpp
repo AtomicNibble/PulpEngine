@@ -26,6 +26,7 @@
 #include <maya/MItGeometry.h>
 #include <maya/MArgList.h>
 #include <maya/MTransformationMatrix.h>
+#include <maya/MFnNumericData.h>
 
 
 X_DISABLE_WARNING(4702)
@@ -66,29 +67,7 @@ namespace
 	static const float JOINT_WEIGHT_THRESHOLD = 0.005f;
 	static const int   VERTEX_MAX_WEIGHTS = 4;
 
-	MObject FindShader(MObject& setNode)
-	{
-		MStatus				status;
-		MFnDependencyNode	fnNode(setNode);
-		MPlug				shaderPlug;
-
-		shaderPlug = fnNode.findPlug("surfaceShader");
-		if (!shaderPlug.isNull()) {
-			MPlugArray connectedPlugs;
-			bool asSrc = false;
-			bool asDst = true;
-			shaderPlug.connectedTo(connectedPlugs, asDst, asSrc, &status);
-
-			if (connectedPlugs.length() != 1) {
-				MayaPrintError("FindShader: Error getting shader (%s)", status.errorString().asChar());
-			}
-			else {
-				return connectedPlugs[0].node();
-			}
-		}
-
-		return MObject::kNullObj;
-	}
+	
 
 	/*
 	bool GetMeshMaterial(MayaMesh* mesh, MDagPath &dagPath)
@@ -2097,7 +2076,7 @@ MStatus ModelExporter::getInputObjects(void)
 	uint i, x;
 	MStatus status = MS::kSuccess;
 
-	for (i = 0; i < safe_static_cast<uint32_t, size_t>(g_options.numLods()); i++)
+	for (i = 0; i < safe_static_cast<uint32_t, size_t>(lodExpoInfo_.size()); i++)
 	{
 		MDagPathArray pathArry;
 		MSelectionList list;
@@ -2131,7 +2110,7 @@ MStatus ModelExporter::getInputObjects(void)
 	//	MayaPrintMsg("TEST: %s", info.objects.asChar());
 	//	MayaPrintMsg("LOD%i object count: %i", i, pathArry.length());
 
-	//	model_.lods_[i].exportObjects_ = pathArry;
+		info.exportObjects = pathArry;
 	}
 
 	return MS::kSuccess;
@@ -2213,7 +2192,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 		SetProgressText("Loading mesh data");
 
 		// load them baby
-		status = lodLODs();
+		status = loadLODs();
 
 		if (!status) {
 			MayaPrintError("Failed to load meshes: %s", status.errorString().asChar());
@@ -2548,10 +2527,174 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 }
 
 
-MStatus ModelExporter::lodLODs(void)
+MStatus ModelExporter::loadLODs(void)
 {
+	PROFILE_MAYA("load LODS");
+	MStatus status;
 
-	return MS::kFailure;
+	for (size_t i = 0; i < lodExpoInfo_.size(); i++)
+	{
+		LODExportInfo& info = lodExpoInfo_[i];
+		uint32_t numMesh = info.exportObjects.length();
+
+		if (numMesh == 0) {
+			MayaPrintError("LOD%i failed to load meshes for lod no meshes found.", i);
+			return MS::kFailure;
+		}
+		
+		model::RawModel::Lod& lod = lods_[i];
+
+		// reserver the meshes.
+		lod.meshes_.resize(numMesh, model::RawModel::Mesh(g_arena));
+
+	//	float scale = g_options.scale_;
+	//	float jointThreshold = g_options.jointThreshold_;
+
+		MFloatPointArray	vertexArray;
+		MFloatVectorArray	normalsArray, tangentsArray, binormalsArray;
+		MStringArray		UVSets;
+		MFloatArray			u, v;
+		MPointArray			points;
+		MIntArray			polygonVertices;
+		MIntArray			vertexList;
+		MColorArray			vertColorsArray;
+
+		for (uint32_t meshIdx = 0; meshIdx < numMesh; meshIdx++)
+		{
+			MFnMesh fnmesh(info.exportObjects[meshIdx], &status);
+
+			if (!status) {
+				continue;
+			}
+
+			model::RawModel::Mesh& mesh = lod.meshes_[meshIdx];
+			model::RawModel::Material& material = mesh.material_;
+
+			mesh.displayName_ = getMeshDisplayName(fnmesh.fullPathName());
+			mesh.name_.set(fnmesh.name().asChar());
+
+			if (!getMeshMaterial(info.exportObjects[meshIdx], material)) {
+				MayaPrintError("Mesh(%s): failed to get material", fnmesh.name().asChar());
+				return MS::kFailure;
+			}
+
+			int numVerts = fnmesh.numVertices(&status);
+			int numPoly = fnmesh.numPolygons(&status);
+
+			if (fnmesh.numUVSets() < 1) {
+				MayaPrintError("Mesh(%s): has no uv sets: %s", fnmesh.name().asChar());
+				return MS::kFailure;
+			}
+			//		int numNormals = fnmesh.numNormals(&status);
+
+			if (!status) {
+				MayaPrintError("Mesh(%s): failed to get mesh info (%s)", fnmesh.name().asChar(), status.errorString().asChar());
+				return status;
+			}
+
+			// resize baby.
+			mesh.verts_.resize(numVerts);
+			mesh.face_.setGranularity(numPoly * 3);
+		//	mesh->weights.setGranularity(2048 * 2);
+
+			status = fnmesh.getUVSetNames(UVSets);
+			if (!status) {
+				MayaPrintError("Mesh(%s): failed to get UV set names (%s)",
+					fnmesh.name().asChar(), status.errorString().asChar());
+				return status;
+			}
+
+			// print how many :Z
+			MayaUtil::MayaPrintVerbose("NumUvSets: %i", UVSets.length());
+			for (uint32_t x = 0; x < UVSets.length(); x++) {
+				MayaUtil::MayaPrintVerbose("-> Set(%i): %s", x, UVSets[static_cast<uint32_t>(i)].asChar());
+			}
+
+			MString uvSet;
+			status = fnmesh.getCurrentUVSetName(uvSet);
+			if (!status) {
+				MayaPrintError("Mesh(%s): failed to get current UV set (%s)",
+					fnmesh.name().asChar(), status.errorString().asChar());
+
+				if (UVSets.length() < 1) {
+					return status;
+				}
+
+				uvSet = UVSets[0];
+
+				MayaPrintWarning("Falling back to uv set: %s", uvSet.asChar());
+			}
+			else
+			{
+				MayaUtil::MayaPrintVerbose("Default uv set: %s", uvSet.asChar());
+			}
+
+
+			{
+				using std::cerr;
+				using std::endl;
+				CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getUVs(u, v, &uvSet));
+				CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getPoints(vertexArray, MSpace::kWorld));
+				CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getNormals(normalsArray, MSpace::kWorld));
+				CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getTangents(tangentsArray, MSpace::kWorld));
+				CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getBinormals(binormalsArray, MSpace::kWorld));
+
+				vertColorsArray.setSizeIncrement(numVerts);
+
+				if (fnmesh.numColorSets() > 0) {
+					CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getVertexColors(vertColorsArray));
+				}
+			}
+
+			MayaUtil::MayaPrintVerbose("u: %i v: %i", u.length(), v.length());
+			MayaUtil::MayaPrintVerbose("NumVerts: %i", numVerts);
+			MayaUtil::MayaPrintVerbose("NumPoly: %i", numPoly);
+
+			// some times we don't have vert colors it seams so.
+			// fill with white.
+			MColor white;
+			while (safe_static_cast<int, size_t>(vertColorsArray.length()) < numVerts)
+			{
+				vertColorsArray.append(white);
+			}
+
+			// verts
+			int32_t x;
+			for (x = 0; x < numVerts; x++) {
+				model::RawModel::Vert& vert = mesh.verts_[x];
+				vert.pos_ = ConvertToGameSpace(XVec(vertexArray[x]));
+				vert.normal_ = XVec(normalsArray[x]);
+				vert.tangent_ = XVec(tangentsArray[x]);
+				vert.biNormal_ = XVec(binormalsArray[x]);
+				vert.uv_ = Vec2f(u[x], v[x]);
+				vert.col_ = XVec(vertColorsArray[x]);
+			}
+
+			// load the Faces and UV's
+			MItMeshPolygon itPolygon(info.exportObjects[meshIdx], MObject::kNullObj);
+			for (; !itPolygon.isDone(); itPolygon.next())
+			{
+				int numTriangles;
+
+				itPolygon.numTriangles(numTriangles);
+				itPolygon.getVertices(polygonVertices);
+
+				while (numTriangles--)
+				{
+					status = itPolygon.getTriangle(numTriangles, points, vertexList, MSpace::kWorld);
+
+					mesh.face_.append(model::RawModel::Face(vertexList[0], vertexList[1], vertexList[2]));
+				}
+			}
+
+
+
+		}
+
+
+	}
+
+	return status;
 }
 
 MStatus ModelExporter::loadBones(void)
@@ -2777,12 +2920,159 @@ MStatus ModelExporter::getBindPose(const MObject &jointNode, MayaBone* pBone, fl
 		pBone->bindpos = ConvertToGameSpace(XVec(m)) * scale;
 	}
 
-	MayaPrintVerbose("Bone '%s' pos: (%g,%g,%g)",
+	MayaUtil::MayaPrintVerbose("Bone '%s' pos: (%g,%g,%g)",
 		pBone->name.c_str(), pBone->bindpos.x, pBone->bindpos.y, pBone->bindpos.z);
 
 	return status;
 }
 
+
+
+core::StackString<60> ModelExporter::getMeshDisplayName(const MString& fullname)
+{
+	typedef core::StackString<60> NameType;
+	core::FixedStack<NameType, 16> Stack;
+
+	core::StringTokenizer<char> tokens(fullname.asChar(), fullname.asChar() + fullname.length(), '|');
+	core::StringRange<char> range(nullptr, nullptr);
+
+	while (tokens.ExtractToken(range))
+	{
+		Stack.push(NameType(range.GetStart(), range.GetEnd()));
+	}
+
+	// ok the name is 2nd one.
+	// check we have 2 tho.
+	if (Stack.size() > 1) {
+		Stack.pop();
+	}
+
+	return Stack.top();
+}
+
+bool ModelExporter::getMeshMaterial(MDagPath &dagPath, model::RawModel::Material& material)
+{
+	MStatus	 status;
+	MDagPath path = dagPath;
+	int	i;
+	int	instanceNum;
+
+	path.extendToShape();
+
+	instanceNum = 0;
+	if (path.isInstanced()) {
+		instanceNum = path.instanceNumber();
+	}
+
+	MFnMesh fnMesh(path);
+	MObjectArray sets;
+	MObjectArray comps;
+	status = fnMesh.getConnectedSetsAndMembers(instanceNum, sets, comps, true);
+	if (!status) {
+		MayaPrintError("MFnMesh::getConnectedSetsAndMembers failed (%s)", status.errorString().asChar());
+	}
+
+	for (i = 0; i < (int)sets.length(); i++) {
+		MObject set = sets[i];
+		MObject comp = comps[i];
+
+		MFnSet fnSet(set, &status);
+		if (status == MS::kFailure) {
+			MayaPrintError("MFnSet constructor failed (%s)", status.errorString().asChar());
+			continue;
+		}
+
+		// Make sure the set is a polygonal set.  If not, continue.
+		MItMeshPolygon piter(path, comp, &status);
+		if (status == MS::kFailure) {
+			continue;
+		}
+
+		MObject shaderNode = FindShader(set);
+		if (shaderNode == MObject::kNullObj) {
+			continue;
+		}
+
+		MFnDependencyNode Shader(shaderNode);
+
+		MPlug colorPlug = Shader.findPlug("color", &status);
+		if (status == MS::kFailure) {
+			MayaPrintError("material(%s) has no color channel", Shader.name().asChar());
+			continue;
+		}
+
+		MPlug transparencyPlug = Shader.findPlug("transparency", &status);
+		{
+			MObject data;
+			transparencyPlug.getValue(data);
+			MFnNumericData val(data);
+			val.getData(material.tansparency_[0], 
+				material.tansparency_[1], 
+				material.tansparency_[2]);	
+
+			material.tansparency_[3] = 1.f;
+		}
+
+		MPlug specularColorPlug = Shader.findPlug("specularColor", &status);
+		{
+			MObject data;
+			specularColorPlug.getValue(data);
+			MFnNumericData val(data);
+			val.getData(material.specCol_[0],
+				material.specCol_[1],
+				material.specCol_[2]);
+
+			material.specCol_[3] = 1.f;
+		}
+
+		MPlug ambientColorPlug = Shader.findPlug("ambientColor", &status);
+		{
+			MObject data;
+			ambientColorPlug.getValue(data);
+			MFnNumericData val(data);
+			val.getData(material.ambientColor_[0],
+				material.ambientColor_[1],
+				material.ambientColor_[2]);
+
+			material.ambientColor_[3] = 1.f;
+		}
+
+
+		if (Shader.name().length() > 64) {
+			MayaPrintError("Material name too long MAX(64): '%s'", Shader.name().asChar());
+			return false;
+		}
+
+		material.name_.assign(Shader.name().asChar());
+		return true;
+	}
+
+	return false;
+}
+
+MObject ModelExporter::FindShader(MObject& setNode)
+{
+	MStatus				status;
+	MFnDependencyNode	fnNode(setNode);
+	MPlug				shaderPlug;
+
+	shaderPlug = fnNode.findPlug("surfaceShader");
+	if (!shaderPlug.isNull()) {
+		MPlugArray connectedPlugs;
+		bool asSrc = false;
+		bool asDst = true;
+		shaderPlug.connectedTo(connectedPlugs, asDst, asSrc, &status);
+
+		if (connectedPlugs.length() != 1) {
+			MayaPrintError("FindShader: Error getting shader (%s)", status.errorString().asChar());
+		}
+		else {
+			return connectedPlugs[0].node();
+		}
+	}
+
+	return MObject::kNullObj;
+}
 
 // -----------------------------------------------
 
