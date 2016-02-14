@@ -356,6 +356,8 @@ private:
 	MStatus getExportObjects(void);
 	MStatus getInputObjects(void);
 
+	MayaBone* findJointReal(const char* pName);
+
 private:
 	static MFnDagNode* GetParentBone(MFnDagNode* pBone);
 	static MStatus getBindPose(const MObject &jointNode, MayaBone* pBone, float scale);
