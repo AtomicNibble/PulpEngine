@@ -288,8 +288,8 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		lod.subMeshHeads = meshHeadOffsets;
 
 		// version 5.0 info
-		lod.numVerts = safe_static_cast<uint8_t, size_t>(lods_[i].totalVerts());
-		lod.numIndexes = safe_static_cast<uint8_t, size_t>(lods_[i].totalIndexs());
+		lod.numVerts = safe_static_cast<uint32_t, size_t>(lods_[i].totalVerts());
+		lod.numIndexes = safe_static_cast<uint32_t, size_t>(lods_[i].totalIndexs());
 
 		// Version 8.0 info
 		lod.streamsFlag = streamsFlags;
