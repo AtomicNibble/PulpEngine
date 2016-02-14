@@ -1321,3 +1321,13 @@ global proc poatoCreateUI()
 	potato_ShowModelExport();
 //	potato_ShowAnimExport();
 }
+
+global proc potatoAfterFileOpen()
+{
+	// called after a file has been opended.
+
+	// re fresh the export window, if it's open
+	if (`window -exists "potato_ExportWindow"`) {
+		potato_ShowModelExport();
+	}
+}
