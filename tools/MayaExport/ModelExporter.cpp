@@ -703,508 +703,6 @@ void MayaModel::printStats(PotatoOptions& options)
 	MayaUtil::MayaPrintMsg(info.c_str());
 }
 
-void MayaModel::calculateBoundingBox(void)
-{
-	PROFILE_MAYA("bounding box");
-
-	for (int i = 0; i < 4; i++)
-	{
-		lods_[i].calBoundingbox();
-
-		// add it to the model BB.
-		boundingBox.add(lods_[i].boundingBox);
-	}
-}
-
-
-uint32_t MayaModel::calculateTagNameDataSize(void)
-{
-	size_t size = 0;
-	MayaBone* bone;
-
-	for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next())
-	{
-		size += bone->name.length() + 1;
-	}
-
-	return safe_static_cast<uint32_t, size_t>(size);
-}
-
-uint32_t MayaModel::calculateMaterialNameDataSize(void)
-{
-	size_t size = 0;
-	size_t i, x;
-
-	for (i = 0; i < 4; i++) 
-	{
-		for (x = 0; x < lods_[i].meshes_.size(); x++)
-		{
-			size += lods_[i].meshes_[x]->material.length();
-			size++; // null-term.
-		}
-	}
-
-	return safe_static_cast<uint32_t, size_t>(size);
-}
-
-uint32_t MayaModel::calculateSubDataSize(const Flags8<model::StreamType>& streams)
-{
-	// gonna just calculate it.
-	// saves a tell and a seek on the file.
-	int i;
-	uint32_t size = this->calculateBoneDataSize();
-
-	// size of all the mesh headers.
-	size += sizeof(model::SubMeshHeader) * (uint32_t)totalMeshes();
-
-	for (i = 0; i < 4; i++)
-	{
-		// for each lod we have Vert, Face, bind
-		size += safe_static_cast<uint32_t,size_t>(lods_[i].getSubDataSize(streams));
-	}
-
-	return size;
-}
-
-
-uint32_t MayaModel::calculateBoneDataSize(void)
-{
-	uint32_t size = 0;
-	uint32_t totalbones = numExportJoints_ + (tagOrigin_.keep ? 1 : 0);
-
-	// don't store pos,angle,hier for blank bones currently.
-	size += (numExportJoints_ * sizeof(uint8_t)); // hierarchy
-	size += (numExportJoints_ * sizeof(XQuatCompressedf)); // angle
-	size += (numExportJoints_ * sizeof(Vec3f));	// pos.
-	size += (totalbones * sizeof(uint16_t));	// string table idx's
-
-	return size;
-}
-
-
-bool MayaModel::save(const char *filename)
-{
-	PROFILE_MAYA("save");
-
-	FILE* f;
-	size_t i, x, k, j;
-	size_t numMesh;
-	size_t meshHeadOffsets = sizeof(model::ModelHeader);
-	size_t numLods = g_options.numLods();
-
-	// place file data in a stream.
-	// much faster(benchmarked), since we are doing lots of small writes.
-	core::ByteStream stream(g_arena);
-
-	errno_t err = fopen_s(&f, filename, "wb");
-	if (f)
-	{
-		model::ModelHeader header;
-		core::zero_object(header);
-
-		g_stats.totalJoints = numExportJoints_;
-
-		Flags8<model::StreamType> streamsFlags;
-		streamsFlags.Set(model::StreamType::COLOR);
-		streamsFlags.Set(model::StreamType::NORMALS);
-		streamsFlags.Set(model::StreamType::TANGENT_BI);
-
-		header.version = model::MODEL_VERSION;
-		header.flags.Set(model::ModelFlags::LOOSE);
-		header.flags.Set(model::ModelFlags::STREAMS);
-		header.numBones = safe_static_cast<uint8_t, int>(numExportJoints_);
-		header.numBlankBones = tagOrigin_.keep ? 1:0;
-		header.numLod = safe_static_cast<uint8_t, size_t>(numLods);
-		header.numMesh = safe_static_cast<uint8_t, size_t>(totalMeshes());
-		header.modified = core::dateTimeStampSmall::systemDateTime();
-
-		// Sizes
-		header.tagNameDataSize = safe_static_cast<uint16_t, uint32_t>(this->calculateTagNameDataSize());
-		header.materialNameDataSize = safe_static_cast<uint16_t, uint32_t>(this->calculateMaterialNameDataSize());
-		header.boneDataSize = safe_static_cast<uint16_t, uint32_t>(this->calculateBoneDataSize());
-		header.subDataSize = this->calculateSubDataSize(streamsFlags);
-		header.dataSize = (header.subDataSize + 
-			header.tagNameDataSize + header.materialNameDataSize);
-
-		{
-			MayaBone* bone = nullptr;
-
-			for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next()) {
-				meshHeadOffsets += bone->getDataSize();
-			}
-		}
-
-		for (i = 0; i < numLods; i++)
-		{
-			model::LODHeader& lod = header.lodInfo[i];
-			lod.lodDistance = g_options.lodInfo_[i].distance;
-			lod.numSubMeshes = safe_static_cast<uint16_t,size_t>(lods_[i].numMeshes());
-			// we want to know the offset o.o
-			lod.subMeshHeads = meshHeadOffsets;
-
-			// version 5.0 info
-			lod.numVerts = lods_[i].totalVerts();
-			lod.numIndexes = lods_[i].totalIndexs();
-
-			// Version 8.0 info
-			lod.streamsFlag = streamsFlags;
-
-			// work out bounds for all meshes.
-			lod.boundingBox.clear();
-			for (x = 0; x < lods_[i].meshes_.size(); x++)
-			{
-				const MayaMesh* pMesh = lods_[i].meshes_[x];
-
-				lod.boundingBox.add(pMesh->boundingBox);
-			}
-			// create sphere.
-			lod.boundingSphere = Sphere(lod.boundingBox);
-
-
-			meshHeadOffsets += lod.numSubMeshes * sizeof(model::MeshHeader);
-		}
-
-		// create combined bounding box.
-		header.boundingBox.clear();
-		for (i = 0; i < numLods; i++)
-		{
-			model::LODHeader& lod = header.lodInfo[i];
-
-			header.boundingBox.add(lod.boundingBox);
-		}
-
-		// update bounds in stats.
-		g_stats.bounds = header.boundingBox;
-
-	//	const size_t temp = sizeof(header);
-
-		fwrite(&header, sizeof(header), 1, f);
-
-		// material names( ALL LOD)
-		{
-			for (i = 0; i < numLods; i++)
-			{
-				// meshes 
-				core::Array<MayaMesh*>*	meshes = &lods_[i].meshes_;
-				for (x = 0; x < meshes->size(); x++)
-				{
-					MayaMesh* pMesh = (*meshes)[x];
-
-#if defined(X_MODEL_MTL_LOWER_CASE_NAMES) && X_MODEL_MTL_LOWER_CASE_NAMES
-					pMesh->material.toLower();
-#endif // ~X_MODEL_MTL_LOWER_CASE_NAMES
-
-					fwrite(pMesh->material.c_str(), pMesh->material.length() + 1, 1, f);
-				}
-			}
-
-		}
-
-		// bone data.
-		{
-			MayaBone* bone = nullptr;
-
-			// TAG NAMES
-			for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next()) 
-			{
-#if defined(X_MODEL_BONES_LOWER_CASE_NAMES) && X_MODEL_BONES_LOWER_CASE_NAMES
-				bone->name.toLower();
-#endif // ~X_MODEL_BONES_LOWER_CASE_NAMES
-				fwrite(bone->name.begin(), 1, bone->name.length() + 1, f);
-			}
-
-			// space for name index data.
-			uint16_t blankData[255] = { 0 };
-			fwrite(blankData, 2, header.numBones + header.numBlankBones, f);
-
-
-			// hierarchy
-			for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next()) 
-			{
-				MayaBone* parent = bone->exportNode.parent();
-
-				uint8_t idx = 0;
-				if (parent) {
-					idx = safe_static_cast<uint8_t, uint32_t>(parent->exportIdx);
-
-					MayaPrintVerbose("%s parent -> %s", bone->name.c_str(), parent->name.c_str());
-				}
-				else {
-					MayaPrintVerbose("%s no-parent", bone->name.c_str());
-				}
-
-				fwrite(&idx, sizeof(idx), 1, f);
-			}
-
-			// angles.
-			for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next()) 
-			{
-				// compress me baby.
-				XQuatCompressedf quat(bone->bindm33);
-
-				fwrite(&quat, sizeof(quat), 1, f);
-			}
-
-			// pos.
-			for (bone = exportHead.next(); bone != nullptr; bone = bone->exportNode.next()) 
-			{
-				fwrite(&bone->bindpos, sizeof(bone->bindpos), 1, f);
-			}
-		}
-
-		// write mesh headers for each lod.
-		for (i = 0; i < numLods; i++)
-		{
-			// meshes 
-			core::Array<MayaMesh*>*	meshes = &lods_[i].meshes_;
-
-			if (meshes->size())
-			{
-				g_stats.totalLods++;
-
-				uint32_t vertOffset, indexOffset;
-
-				vertOffset = 0;
-				indexOffset = 0;
-
-				for (x = 0; x < meshes->size(); x++)
-				{
-					model::SubMeshHeader mesh;
-					core::zero_object(mesh);
-
-					MayaMesh* pMesh = (*meshes)[x];
-
-					mesh.numBinds = 0;
-					mesh.numVerts = safe_static_cast<uint16_t, size_t>(pMesh->verts.size());
-					mesh.numIndexes = safe_static_cast<uint16_t, size_t>(pMesh->faces.size() * 3);
-					//		mesh.material = pMesh->material;
-					mesh.CompBinds = pMesh->CompBinds;
-					mesh.boundingBox = pMesh->boundingBox;
-					mesh.boundingSphere = Sphere(pMesh->boundingBox);
-
-					// Version 5.0 info
-					mesh.startVertex = vertOffset;
-					mesh.startIndex = indexOffset;
-
-					// Version 8.0 info
-					mesh.streamsFlag = streamsFlags; // currently a 3d model has identical flags for all meshes.
-					mesh.boundingBox = pMesh->boundingBox;
-					mesh.boundingSphere = Sphere(pMesh->boundingBox);
-
-					// inc the offsets
-					vertOffset += mesh.numVerts;
-					indexOffset += mesh.numIndexes;
-
-					g_stats.totalMesh++;
-					g_stats.totalVerts += mesh.numVerts;
-					g_stats.totalFaces += (mesh.numIndexes / 3);
-
-					if ((mesh.numIndexes % 3) != 0) {
-						MayaUtil::MayaPrintError("Mesh index count is not a multipel of 3, count: %i", mesh.numIndexes);
-					}
-
-					fwrite(&mesh, sizeof(mesh), 1, f);
-				}
-			}
-		}
-
-		// now we write Vert + faces + bindData
-		// we convert them now to the real format.
-		// as processing the data in the commpressed state is slower.
-		// core::Array<model::Vertex>	verts;
-
-		for (j= 0; j < numLods; j++)
-		{
-			numMesh = lods_[j].numMeshes();
-
-			// work out a total steam size.
-			size_t requiredStreamSize = 0;
-			for (i = 0; i < numMesh; i++)
-			{
-				MayaMesh* mesh = lods_[j].meshes_[i];
-				
-				
-				requiredStreamSize += mesh->CompBinds.dataSizeTotal();
-				requiredStreamSize += (mesh->faces.size() * sizeof(model::Face));
-				requiredStreamSize += (mesh->verts.size() * sizeof(model::Vertex));
-
-				if (streamsFlags.IsSet(model::StreamType::COLOR))
-				{
-					requiredStreamSize += (mesh->verts.size() * sizeof(model::VertexColor));
-				}
-				if (streamsFlags.IsSet(model::StreamType::NORMALS))
-				{
-					requiredStreamSize += (mesh->verts.size() * sizeof(model::VertexNormal));
-				}
-				if (streamsFlags.IsSet(model::StreamType::TANGENT_BI))
-				{
-					requiredStreamSize += (mesh->verts.size() * sizeof(model::VertexTangentBi));
-				}
-			}
-
-			// writing this info to a stream makes write time 5x times faster.
-			stream.resize(requiredStreamSize);
-			stream.reset();
-
-			// write all the verts.
-			for (i = 0; i < numMesh; i++)
-			{
-				MayaMesh* mesh = lods_[j].meshes_[i];
-
-				model::Vertex vert;
-				core::zero_object(vert);
-
-				for (x = 0; x < mesh->verts.size(); x++)
-				{
-					const MayaVertex& Mvert = mesh->verts[x];
-
-					vert.pos = Mvert.pos;
-					vert.st[0] = XHalfCompressor::compress(Mvert.uv[0]);
-					vert.st[1] = XHalfCompressor::compress(1.f - Mvert.uv[1]);
-
-					stream.write(vert);
-				}
-			}
-
-
-			// write all the colors.
-			if (streamsFlags.IsSet(model::StreamType::COLOR))
-			{
-				for (i = 0; i < numMesh; i++)
-				{
-					MayaMesh* mesh = lods_[j].meshes_[i];
-
-					model::VertexColor col;
-					col.set(0xFF, 0xFF, 0xFF, 0xFF);
-
-					if (g_options.whiteVertColors_)
-					{
-						for (x = 0; x < mesh->verts.size(); x++)
-						{
-							stream.write(col);
-						}
-					}
-					else
-					{
-						for (x = 0; x < mesh->verts.size(); x++)
-						{
-							const MayaVertex Mvert = mesh->verts[x];
-							col = Mvert.col;
-							stream.write(col);
-						}
-					}
-				}
-			}
-
-			// write normals
-			if (streamsFlags.IsSet(model::StreamType::NORMALS))
-			{
-				for (i = 0; i < numMesh; i++)
-				{
-					MayaMesh* mesh = lods_[j].meshes_[i];
-
-					model::VertexNormal normal;
-
-					for (x = 0; x < mesh->verts.size(); x++)
-					{
-						const MayaVertex Mvert = mesh->verts[x];
-						normal = Mvert.normal;
-						stream.write(normal);
-					}
-				}
-			}
-
-			// write tangents and bi-normals
-			if (streamsFlags.IsSet(model::StreamType::TANGENT_BI))
-			{
-				for (i = 0; i < numMesh; i++)
-				{
-					MayaMesh* mesh = lods_[j].meshes_[i];
-
-					model::VertexTangentBi tangent;
-
-					for (x = 0; x < mesh->verts.size(); x++)
-					{
-						const MayaVertex Mvert = mesh->verts[x];
-
-						tangent.binormal = Mvert.binormal;
-						tangent.tangent = Mvert.tangent;
-
-						stream.write(tangent);
-					}
-				}
-			}
-
-
-			// write all the faces
-			for (i = 0; i < numMesh; i++)
-			{
-				MayaMesh* mesh = lods_[j].meshes_[i];
-		
-				for (x = 0; x < mesh->faces.size(); x++)
-				{
-					const Vec3<int32_t>& face = mesh->faces[x];
-
-#if 1 // flip winding.
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[2]));
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[1]));
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[0]));
-#else
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[0]));
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[1]));
-					stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[2]));
-#endif
-				}
-
-			}
-
-			// write all the bind info.
-			for (i = 0; i < numMesh; i++)
-			{
-				MayaMesh* mesh = lods_[j].meshes_[i];
-
-				if (mesh->CompBinds.dataSizeTotal())
-				{
-					for (x = 0; x < mesh->verts.size(); x++)
-					{
-						const MayaVertex Mvert = mesh->verts[x];
-						const MayaWeight* weights = &mesh->weights[Mvert.startWeightIdx];
-
-						const uint num = Mvert.numWeights;
-
-						if (num >= 1) // we always write one bone.
-						{
-							model::bindBone bone(safe_static_cast<uint16_t, uint32_t>(weights->bone->exportIdx));
-							stream.write(bone);
-						}
-
-
-						for (k = 1; k < num; k++) // for any weights greater than 1 we add a bone & weight, the base weight is 1 - (all others)
-						{
-							model::bindBone bone(safe_static_cast<uint16_t, uint32_t>(weights[k].bone->exportIdx));
-							model::bindWeight weight(weights[k].weight);
-
-							stream.write(bone);
-							stream.write(weight);
-						}
-					}
-
-				}
-			}
-
-			// Write the complete LOD's data all at once.
-			fwrite(stream.begin(), 1, stream.size(), f);
-		}
-
-		fclose(f);
-		return true;
-	}
-	else
-	{
-		MayaPrintError("Failed to open file for saving(%i): %s", err, filename);
-	}
-	return false;
-}
 
 #endif 
 
@@ -1363,6 +861,8 @@ MStatus ModelExporter::convert(const MArgList& args)
 			return MS::kFailure;
 		}
 
+
+		printStats();
 	}
 
 #else
@@ -1436,6 +936,69 @@ MStatus ModelExporter::convert(const MArgList& args)
 	
 //	SetProgressText("Finished"); // rekt
 	return status;
+}
+
+void ModelExporter::printStats(void) const
+{
+	core::StackString<2048> info;
+
+	info.append("\nModel Info:\n");
+	info.appendFmt("> Total Lods: %i", stats_.totalLods);
+	info.appendFmt("\n> Total Mesh: %i", stats_.totalMesh);
+	info.appendFmt("\n> Total Joints: %i", stats_.totalJoints);
+	info.appendFmt("\n> Total Joints Dropped: %i", stats_.totalJointsDropped);
+
+
+	if (stats_.droppedBoneNames.size() > 0) {
+		info.append(" -> (");
+		for (uint i = 0; i < stats_.droppedBoneNames.size(); i++) {
+			info.append(stats_.droppedBoneNames[i].c_str());
+
+			if (i < (stats_.droppedBoneNames.size() - 1)) {
+				info.append(", ");
+			}
+
+			if (i > 9 && (i % 10) == 0) {
+				info.append("\n");
+			}
+		}
+		info.append(")");
+	}
+	if (stats_.droppedBoneNames.size() > 10) {
+		info.append("\n");
+	}
+
+
+	info.appendFmt("\n> Total Verts: %i", stats_.totalVerts);
+	info.appendFmt("\n> Total Faces: %i", stats_.totalFaces);
+	info.appendFmt("\n> Total eights Dropped: %i", stats_.totalWeightsDropped);
+	info.append("\n");
+
+	if (stats_.totalWeightsDropped > 0) {
+		info.append("!> bind weights where dropped, consider binding with max influences: 4\n");
+	}
+
+	{
+		const AABB& b = stats_.bounds;
+		const auto min = b.min;
+		const auto max = b.max;
+		info.append("> Bounds: ");
+		info.appendFmt("(%g,%g,%g) <-> ", min[0], min[1], min[2]);
+		info.appendFmt("(%g,%g,%g)\n", max[0], max[1], max[2]);
+
+		const auto size = b.size();
+		info.append("> Dimensions: ");
+		info.appendFmt("w: %g d: %g h: %g", size[0], size[1], size[2]);
+
+		if (unitOfMeasurement_ == UnitOfMeasureMent::INCHES) {
+			info.append(" (inches)");
+		}
+		else {
+			info.append(" (cm)");
+		}
+	}
+
+	MayaUtil::MayaPrintMsg(info.c_str());
 }
 
 void ModelExporter::setFileName(const MString& path)

@@ -340,6 +340,7 @@ public:
 	~ModelExporter();
 
 	MStatus convert(const MArgList& args);
+	void printStats(void) const;
 
 private:
 	void setFileName(const MString& path);
