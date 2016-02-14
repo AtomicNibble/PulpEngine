@@ -795,10 +795,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 		return status;
 	}
 
-
-
-
-	status = MayaUtil::ShowProgressDlg(0, 7);
+	status = MayaUtil::ShowProgressDlg(0, 6);
 	bool saveOk = false;
 
 	{
@@ -823,7 +820,6 @@ MStatus ModelExporter::convert(const MArgList& args)
 		return MS::kFailure;;
 	}
 
-#if 1
 	{
 		MayaUtil::SetProgressText("Loading export list");
 
@@ -853,6 +849,8 @@ MStatus ModelExporter::convert(const MArgList& args)
 			return status;
 		}
 
+		MayaUtil::SetProgressText("Saving raw model");
+
 		// time to slap a goat!
 		core::Path<char> outPath = getFilePath();
 
@@ -861,80 +859,28 @@ MStatus ModelExporter::convert(const MArgList& args)
 			return MS::kFailure;
 		}
 
+		MayaUtil::SetProgressText("Compiling model");
+
+		if (!CompileModel(outPath)) {
+			MayaUtil::MayaPrintError("Failed to compile model");
+			return MS::kFailure;
+		}
+
+		saveOk = true;
+
+		MayaUtil::SetProgressText("Complete");
 
 		printStats();
 	}
 
-#else
-	{
-		PROFILE_MAYA_NAME("Total Export time:");
-
-		if (!status) {
-			MayaPrintError("Failed to create progress window: %s", status.errorString().asChar());
-			return status;
-		}
-
-		SetProgressText("Loading export list");
-
-		status = getExportObjects();
-
-		if (!status) {
-			MayaPrintError("Failed to collect export objects from maya: %s", status.errorString().asChar());
-			return status;
-		}
-
-
-		SetProgressText("Loading joints");
-		status = model_.loadBones();
-		if (!status) {
-			MayaPrintError("Failed to load joints: %s", status.errorString().asChar());
-			return status;
-		}
-
-		SetProgressText("Loading mesh data");
-
-		// load them baby
-		status = model_.lodLODs();
-
-		if (!status) {
-			MayaPrintError("Failed to load meshes: %s", status.errorString().asChar());
-			return status;
-		}
-
-		SetProgressText("Processing joints");
-
-		model_.pruneBones(g_options);
-
-		SetProgressText("Processing meshes");
-
-		// merge any meshes that share materials.
-		// MergeMeshes();
-	//	model_.MergeMeshes();
-
-		SetProgressText("Creating info");
-
-
-		// bounding boxes.
-		model_.calculateBoundingBox();
-
-		SetProgressText("Writing file");
-
-		// write the file.
-		saveOk = model_.save(g_options.filePath_.c_str());
-
-	}
-#endif
-
 	if (saveOk) {
 		status.setSuccess();
-//		model_.printStats(g_options);
 	}
 	else {
 		MayaUtil::MayaPrintError("Failed to write file");
 		return MS::kFailure;
 	}
 	
-//	SetProgressText("Finished"); // rekt
 	return status;
 }
 
@@ -1790,6 +1736,12 @@ bool ModelExporter::getMeshMaterial(MDagPath &dagPath, model::RawModel::Material
 		}
 
 		material.name_.assign(Shader.name().asChar());
+
+		if (material.name_.isEmpty()) {
+			MayaUtil::MayaPrintError("material name is empty");
+			return false;
+		}
+
 		return true;
 	}
 
