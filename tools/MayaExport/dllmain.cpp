@@ -24,7 +24,7 @@
 #include <Memory\MemoryTrackingPolicies\SimpleMemoryTracking.h>
 
 
-
+#include <Time\StopWatch.h>
 
 #if 1
 typedef core::MemoryArena<core::MallocFreeAllocator, core::SingleThreadPolicy,
@@ -58,6 +58,8 @@ core::MemoryArenaBase* g_arena = nullptr;
 
 MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 {
+	core::StopWatch timer;
+
 	core::StackString<64> ver;
 	ver.appendFmt("1.1.0.1 ", model::MODEL_VERSION);
 	ver.appendFmt("(m:%i:%i) ", model::MODEL_VERSION, model::MODEL_RAW_VERSION);
@@ -72,8 +74,6 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 	MFnPlugin plugin(obj, "WinCat - " X_ENGINE_NAME " Engine", ver.c_str(), "Any");
 
 	MStatus stat;
-
-	MayaUtil::MayaPrintMsg("=== Potato Plugin Loaded (%s) ===", ver.c_str());
 
 	if (!app.Init()) {
 		MayaUtil::MayaPrintError("Failed to start engine core");
@@ -120,6 +120,9 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 		stat.perror("Error - initializePlugin:OnSceneUpdate");
 		return stat;
 	}
+
+	MayaUtil::MayaPrintMsg("=== Potato Plugin Loaded (%s %gms) ===", ver.c_str(),
+		timer.GetMilliSeconds());
 
 	return stat;
 }
