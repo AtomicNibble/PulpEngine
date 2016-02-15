@@ -1209,6 +1209,8 @@
     <ClInclude Include="AssetDB.h" />
     <ClInclude Include="EngineApp.h" />
     <ClInclude Include="Hierarchy.h" />
+    <ClInclude Include="MayaLogger.h" />
+    <ClInclude Include="MayaLoggerFormat.h" />
     <ClInclude Include="MayaUtil.h" />
     <ClInclude Include="ModelExporter.h" />
     <ClInclude Include="SettingsCmd.h" />
@@ -1307,6 +1309,8 @@
     </ClCompile>
     <ClCompile Include="EngineApp.cpp" />
     <ClCompile Include="MayaExport.cpp" />
+    <ClCompile Include="MayaLogger.cpp" />
+    <ClCompile Include="MayaLoggerFormat.cpp" />
     <ClCompile Include="MayaUtil.cpp" />
     <ClCompile Include="ModelExporter.cpp" />
     <ClCompile Include="Profiler.cpp" />
