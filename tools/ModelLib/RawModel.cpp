@@ -476,6 +476,7 @@ namespace RawModel
 		return true;
 	}
 
+	X_DISABLE_WARNING(4267)
 
 	bool Model::SaveRawModel(core::Path<char>& path)
 	{
@@ -484,63 +485,92 @@ namespace RawModel
 
 		path.setExtension(model::MODEL_RAW_FILE_EXTENSION);
 
-		FILE* f;
-		errno_t err = fopen_s(&f, path.c_str(), "wb");
 
-		bool result = false;
+		core::XFileScoped file;
+		core::fileModeFlags mode;
+		mode.Set(core::fileMode::RECREATE);
+		mode.Set(core::fileMode::WRITE);
+		mode.Set(core::fileMode::SHARE);
 
-		if (f)
+		if (!file.openFile(path.c_str(), mode))
 		{
-			fprintf(f, "// Potato engine RawModel.\n\n");
-			fprintf(f, "VERSION %i\n", VERSION);
-			fprintf(f, "LODS %" PRIuS "\n", lods_.size());
-			fprintf(f, "BONES %" PRIuS "\n", bones_.size());
-			fputs("\n", f);
-
-			if (WriteBones(f)) 
-			{
-				if (WriteLods(f)) 
-				{
-					result = true;
-				}
-			}
-
-			::fclose(f);
+			X_ERROR("RawModel", "Failed to open file for rawmodel");
+			return false;
 		}
 
-		return result;
+		core::StackString<1024, char> buf;
+		buf.appendFmt("// Potato engine RawModel.\n\n");
+		buf.appendFmt("VERSION %i\n", VERSION);
+		buf.appendFmt("LODS %" PRIuS "\n", lods_.size());
+		buf.appendFmt("BONES %" PRIuS "\n", bones_.size());
+		buf.append("\n");
+
+		if (file.write(buf.c_str(), buf.length()) != 
+			safe_static_cast<uint32_t, size_t>(buf.length())) {
+			X_ERROR("RawModel", "Failed to write rawmodel header");
+			return false;
+		}
+
+		if (!WriteBones(file.GetFile()))
+		{
+			X_ERROR("RawModel", "Failed to write bones");
+			return false;
+		}
+		if (!WriteLods(file.GetFile()))
+		{
+			X_ERROR("RawModel", "Failed to write lods");
+			return false;
+		}
+
+
+		return true;
 	}
 
-	bool Model::WriteBones(FILE* f) const
+	bool Model::WriteBones(core::XFile* f) const
 	{
 		X_ASSERT_NOT_NULL(f);
+		core::StackString<1024, char> buf;
 
 		for (const auto& bone : bones_)
 		{
-			fprintf(f, "BONE %i \"%s\"\n", bone.parIndx_, bone.name_.c_str());
-			fprintf(f, "POS (%f,%f,%f)\n", bone.worldPos_.x, bone.worldPos_.y, bone.worldPos_.z);
+			buf.clear();
+			buf.appendFmt("BONE %i \"%s\"\n", bone.parIndx_, bone.name_.c_str());
+			buf.appendFmt("POS (%f,%f,%f)\n", bone.worldPos_.x, bone.worldPos_.y, bone.worldPos_.z);
 			auto ang = bone.rotation_;
-			fprintf(f, "ANG (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)\n", 
+			buf.appendFmt("ANG (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)\n", 
 				ang.m00, ang.m01, ang.m02, 
 				ang.m10, ang.m11, ang.m12, 
 				ang.m20, ang.m21, ang.m22);
 
-			fputs("\n", f);
+			buf.append("\n");
+
+			if (f->write(buf.c_str(), buf.length()) != buf.length()) {
+				X_ERROR("RawModel", "Failed to write mesh bone");
+				return false;
+			}
 		}
 
-		fputs("\n", f);
+		f->writeStringNNT("\n");
 		return true;
 	}
 
-	bool Model::WriteLods(FILE* f) const
+	bool Model::WriteLods(core::XFile* f) const
 	{
 		X_ASSERT_NOT_NULL(f);
 
 		for (const auto& lod : lods_)
 		{
-			fprintf(f, "LOD");
-			fprintf(f, "DISTANCE %f\n", lod.distance_);
-			fprintf(f, "NUMMESH %" PRIuS "\n", lod.meshes_.size());
+			core::StackString<1024, char> buf;
+
+			buf.appendFmt("LOD");
+			buf.appendFmt("DISTANCE %f\n", lod.distance_);
+			buf.appendFmt("NUMMESH %" PRIuS "\n", lod.meshes_.size());
+
+			if (f->write(buf.c_str(), buf.length()) != 
+				safe_static_cast<uint32_t, size_t>(buf.length())) {
+				X_ERROR("RawModel", "Failed to write mesh header");
+				return false;
+			}
 
 			for (const auto& mesh : lod.meshes_)
 			{
@@ -557,18 +587,25 @@ namespace RawModel
 			}
 		}
 
-		fputs("\n", f);
+		f->writeStringNNT("\n");
 		return true;
 	}
 
-	bool Model::WriteMesh(FILE* f, const Mesh& mesh) const
+	bool Model::WriteMesh(core::XFile* f, const Mesh& mesh) const
 	{
 		X_ASSERT_NOT_NULL(f);
+		core::StackString<1024, char> buf;
 
-		fprintf(f, "MESH \"%s\"\n", mesh.name_.c_str());
-		fprintf(f, "VERTS %" PRIuS "\n", mesh.verts_.size());
-		fprintf(f, "FACES %" PRIuS "\n", mesh.face_.size());
-		fputs("\n", f);
+		buf.appendFmt("MESH \"%s\"\n", mesh.name_.c_str());
+		buf.appendFmt("VERTS %" PRIuS "\n", mesh.verts_.size());
+		buf.appendFmt("FACES %" PRIuS "\n", mesh.face_.size());
+		buf.append("\n");
+
+		if (f->write(buf.c_str(), buf.length()) != 
+			safe_static_cast<uint32_t, size_t>(buf.length())) {
+			X_ERROR("RawModel", "Failed to write mesh header");
+			return false;
+		}
 
 		for (const auto& vert : mesh.verts_)
 		{
@@ -579,32 +616,48 @@ namespace RawModel
 			const Color& col = vert.col_;
 			const Vec2f& uv = vert.uv_;
 
-			fprintf(f, "v %" PRIuS "\n", vert.binds_.size());
-			fprintf(f, "(%f,%f,%f)\n", pos.x, pos.y, pos.z);
-			fprintf(f, "(%f,%f,%f)\n", normal.x, normal.y, normal.z);
-			fprintf(f, "(%f,%f,%f)\n", tan.x, tan.y, tan.z);
-			fprintf(f, "(%f,%f,%f)\n", biNormal.x, biNormal.y, biNormal.z);
-			fprintf(f, "(%f,%f,%f,%f)\n", col.r, col.g, col.b, col.a);
-			fprintf(f, "(%f,%f)\n", uv.x, uv.y);
+			buf.clear();
+
+			buf.appendFmt("v %" PRIuS "\n", vert.binds_.size());
+			buf.appendFmt("(%f,%f,%f)\n", pos.x, pos.y, pos.z);
+			buf.appendFmt("(%f,%f,%f)\n", normal.x, normal.y, normal.z);
+			buf.appendFmt("(%f,%f,%f)\n", tan.x, tan.y, tan.z);
+			buf.appendFmt("(%f,%f,%f)\n", biNormal.x, biNormal.y, biNormal.z);
+			buf.appendFmt("(%f,%f,%f,%f)\n", col.r, col.g, col.b, col.a);
+			buf.appendFmt("(%f,%f)\n", uv.x, uv.y);
 
 			for (const auto& bind : vert.binds_)
 			{
-				fprintf(f, "%i %f\n",bind.boneIdx_, bind.weight_);
+				buf.appendFmt("%i %f\n",bind.boneIdx_, bind.weight_);
 			}
 
-			fputs("\n", f);
+			buf.append("\n");
+
+			// write it.
+			if (f->write(buf.c_str(), buf.length()) != 
+				safe_static_cast<uint32_t, size_t>(buf.length())) {
+				X_ERROR("RawModel", "Failed to write mesh vert");
+				return false;
+			}
 		}
 
 		for (const auto& face : mesh.face_)
 		{
-			fprintf(f, "f (%i,%i,%i)\n", face[0], face[1], face[2]);
+			buf.clear();
+			buf.appendFmt("f (%i,%i,%i)\n", face[0], face[1], face[2]);
+
+			if (f->write(buf.c_str(), buf.length()) != 
+				safe_static_cast<uint32_t, size_t>(buf.length())) {
+				X_ERROR("RawModel", "Failed to write mesh face");
+				return false;
+			}
 		}
 
-		fputs("\n", f);
+		f->writeStringNNT("\n");
 		return true;
 	}
 
-	bool Model::WriteMaterials(FILE* f, const Material& mat) const
+	bool Model::WriteMaterials(core::XFile* f, const Material& mat) const
 	{
 		X_ASSERT_NOT_NULL(f);
 
@@ -614,16 +667,18 @@ namespace RawModel
 		const Color& specCol = mat.specCol_;
 		const Color& reflectiveCol = mat.reflectiveCol_;
 
+		core::StackString<1024, char> buf;
 
-		fprintf(f, "MATERIAL \"%s\"\n", mat.name_.c_str());
-		fprintf(f, "COL (%f,%f,%f,%f)\n", col.r, col.g, col.b, col.a);
-		fprintf(f, "TRANS (%f,%f,%f,%f)\n", tansparency.r, tansparency.g, tansparency.b, tansparency.a);
-		fprintf(f, "AMBIENTCOL (%f,%f,%f,%f)\n", ambientColor.r, ambientColor.g, ambientColor.b, ambientColor.a);
-		fprintf(f, "SPECCOL (%f,%f,%f,%f)\n", specCol.r, specCol.g, specCol.b, specCol.a);
-		fprintf(f, "REFLECTIVECOL (%f,%f,%f,%f)\n", reflectiveCol.r, reflectiveCol.g, reflectiveCol.b, reflectiveCol.a);
-
-		fputs("\n", f);
-		return true;
+		buf.appendFmt("MATERIAL \"%s\"\n", mat.name_.c_str());
+		buf.appendFmt("COL (%f,%f,%f,%f)\n", col.r, col.g, col.b, col.a);
+		buf.appendFmt("TRANS (%f,%f,%f,%f)\n", tansparency.r, tansparency.g, tansparency.b, tansparency.a);
+		buf.appendFmt("AMBIENTCOL (%f,%f,%f,%f)\n", ambientColor.r, ambientColor.g, ambientColor.b, ambientColor.a);
+		buf.appendFmt("SPECCOL (%f,%f,%f,%f)\n", specCol.r, specCol.g, specCol.b, specCol.a);
+		buf.appendFmt("REFLECTIVECOL (%f,%f,%f,%f)\n", reflectiveCol.r, reflectiveCol.g, reflectiveCol.b, reflectiveCol.a);
+		buf.append("\n");
+		
+		return f->write(buf.c_str(), buf.length()) == 
+			safe_static_cast<uint32_t, size_t>(buf.length());
 	}
 
 } // namespace RawModel

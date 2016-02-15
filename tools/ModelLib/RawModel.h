@@ -48,10 +48,10 @@ namespace RawModel
 
 		bool ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut);
 
-		bool WriteBones(FILE* f) const;
-		bool WriteLods(FILE* f) const;
-		bool WriteMesh(FILE* f, const Mesh& mesh) const;
-		bool WriteMaterials(FILE* f, const Material& mat) const;
+		bool WriteBones(core::XFile* f) const;
+		bool WriteLods(core::XFile* f) const;
+		bool WriteMesh(core::XFile* f, const Mesh& mesh) const;
+		bool WriteMaterials(core::XFile* f, const Material& mat) const;
 		
 		
 	protected:
