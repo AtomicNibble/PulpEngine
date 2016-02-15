@@ -12,6 +12,9 @@
 #include "MayaUtil.h"
 #include "EngineApp.h"
 
+#include "MayaLogger.h"
+#include "MayaLoggerFormat.h"
+
 #include <IModel.h>
 #include <IAnimation.h>
 
@@ -23,6 +26,10 @@
 #include <Memory\MemoryTaggingPolicies\SimpleMemoryTagging.h>
 #include <Memory\MemoryTrackingPolicies\SimpleMemoryTracking.h>
 
+#include "Logging\Logger.h"
+#include "Logging\FilterPolicies\LoggerNoFilterPolicy.h"
+#include "Logging\FilterPolicies\LoggerVerbosityFilterPolicy.h"
+#include "Logging\FormatPolicies\LoggerSimpleFormatPolicy.h"
 
 #include <Time\StopWatch.h>
 
@@ -52,6 +59,12 @@ namespace
 		MGlobal::executeCommandOnIdle("potatoAfterFileOpen();");
 	}
 
+	typedef core::Logger<
+		core::LoggerNoFilterPolicy,
+		maya::LoggerMayaFormatPolicy,
+		maya::LoggerMayaWritePolicy> MayaLogger;
+
+	MayaLogger logger;
 }
 
 core::MemoryArenaBase* g_arena = nullptr;
@@ -79,6 +92,8 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 		MayaUtil::MayaPrintError("Failed to start engine core");
 		return MS::kFailure;
 	}
+
+	gEnv->pLog->AddLogger(&logger);
 
 	AssetDB::Init();
 	SettingsCache::Init();
@@ -170,6 +185,8 @@ MODELEX_EXPORT MStatus uninitializePlugin(MObject obj)
 
 	AssetDB::ShutDown();
 	SettingsCache::ShutDown();
+
+	gEnv->pLog->RemoveLogger(&logger);
 
 	delete g_arena;
 	g_arena = nullptr;
