@@ -219,15 +219,12 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 
 	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE) )
 	{
-	//	_wfinddatai64_t findinfo;
+		_wfinddatai64_t findinfo;
 
-	//	XFindData FindData(path, this);
-	//	if (FindData.findnext(&findinfo))
-		if(1)
+		XFindData FindData(path, this);
+		if (FindData.findnext(&findinfo))
 		{
-	//		FindData.getOSPath(real_path, &findinfo);
-			createOSPath(gameDir_, path, real_path);
-
+			FindData.getOSPath(real_path, &findinfo);
 
 			if (isDebug()) {
 				X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
