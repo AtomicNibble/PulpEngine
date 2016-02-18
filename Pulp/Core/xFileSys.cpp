@@ -219,12 +219,15 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 
 	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE) )
 	{
-		_wfinddatai64_t findinfo;
+	//	_wfinddatai64_t findinfo;
 
-		XFindData FindData(path, this);
-		if (FindData.findnext(&findinfo))
+	//	XFindData FindData(path, this);
+	//	if (FindData.findnext(&findinfo))
+		if(1)
 		{
-			FindData.getOSPath(real_path, &findinfo);
+	//		FindData.getOSPath(real_path, &findinfo);
+			createOSPath(gameDir_, path, real_path);
+
 
 			if (isDebug()) {
 				X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
@@ -423,7 +426,7 @@ XFileMem* xFileSys::openFileMem(pathType path, fileModeFlags mode)
 
 			if (file.valid())
 			{
-				uint32_t size = safe_static_cast<uint32_t,size_t>(file.remainingBytes());
+				size_t size = safe_static_cast<size_t, int64_t>(file.remainingBytes());
 				char* pBuf = X_NEW_ARRAY(char, size, &memFileArena_, "MemBuffer");
 
 				if (file.read(pBuf, size) == size)
@@ -1181,7 +1184,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			XFileAsyncOperation operation = pFile->readAsync(
 				read.pBuf,
 				read.dataSize,
-				safe_static_cast<uint32_t, uint64_t>(read.offset)
+				read.offset
 			);
 
 			pendingOps.append(PendingOp(request,operation));
@@ -1194,7 +1197,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			XFileAsyncOperation operation = pFile->readAsync(
 				write.pBuf,
 				write.dataSize,
-				safe_static_cast<uint32_t, uint64_t>(write.offset)
+				write.offset
 			);
 
 			pendingOps.append(PendingOp(request, operation));

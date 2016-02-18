@@ -249,7 +249,7 @@ namespace JPG
 		jpeg_destroy_decompress(&cinfo);
 
 #if X_DEBUG == 1
-		size_t left = file->remainingBytes();
+		uint64_t left = file->remainingBytes();
 		X_WARNING_IF(left > 0, "TextureJPG", "potential read fail, bytes left in file: %i", left);
 #endif
 

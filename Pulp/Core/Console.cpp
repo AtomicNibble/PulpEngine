@@ -1735,7 +1735,7 @@ bool XConsole::LoadConfig(const char* fileName)
 
 	if (file.openFile(path.c_str(), fileMode::READ))
 	{
-		bytes = file.remainingBytes();
+		bytes = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 
 		if (bytes > 0)
 		{

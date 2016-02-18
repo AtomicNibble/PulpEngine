@@ -104,18 +104,18 @@ struct XFileAsync
 {
 	virtual ~XFileAsync() {};
 
-	virtual XFileAsyncOperation readAsync(void* pBuffer, size_t length, size_t position) X_ABSTRACT;
+	virtual XFileAsyncOperation readAsync(void* pBuffer, size_t length, uint64_t position) X_ABSTRACT;
 
 	/// Asynchronously writes from a buffer into the file.
-	virtual XFileAsyncOperation writeAsync(const void* pBuffer, size_t length, size_t position) X_ABSTRACT;
+	virtual XFileAsyncOperation writeAsync(const void* pBuffer, size_t length, uint64_t position) X_ABSTRACT;
 
 	/// Waits until the asynchronous operation has finished, and returns the number of transferred bytes.
 	virtual size_t WaitUntilFinished(const XFileAsyncOperation& operation) X_ABSTRACT;
 
 	// always returns total bytes.
 	// you can't seek.
-	virtual size_t remainingBytes(void) const X_ABSTRACT;
-	virtual void setSize(size_t numBytes) X_ABSTRACT;
+	virtual uint64_t remainingBytes(void) const X_ABSTRACT;
+	virtual void setSize(int64_t numBytes) X_ABSTRACT;
 };
 
 
@@ -125,7 +125,7 @@ struct XFile
 	virtual size_t read(void* pBuf, size_t Len) X_ABSTRACT;
 	virtual size_t write(const void* pBuf, size_t Len) X_ABSTRACT;
 
-	virtual void seek(size_t position, SeekMode::Enum origin) X_ABSTRACT;
+	virtual void seek(int64_t position, SeekMode::Enum origin) X_ABSTRACT;
 
 	template <typename T>
 	inline size_t readObj(T& object) {
@@ -198,9 +198,9 @@ struct XFile
 		return remainingBytes() == 0;
 	}
 
-	virtual size_t remainingBytes(void) const X_ABSTRACT;
-	virtual size_t tell(void) const X_ABSTRACT;
-	virtual void setSize(size_t numBytes) X_ABSTRACT;
+	virtual uint64_t remainingBytes(void) const X_ABSTRACT;
+	virtual uint64_t tell(void) const X_ABSTRACT;
+	virtual void setSize(int64_t numBytes) X_ABSTRACT;
 };
 
 struct XFileMem : public XFile
@@ -218,7 +218,7 @@ struct XFileMem : public XFile
 	}
 
 	virtual size_t read(void* pBuf, size_t Len) X_FINAL{
-		size_t size = core::Min<size_t>(Len, remainingBytes());
+		size_t size = core::Min<size_t>(Len, safe_static_cast<size_t, uint64_t>(remainingBytes()));
 
 		memcpy(pBuf, current_, size);
 		current_ += size;
@@ -233,27 +233,36 @@ struct XFileMem : public XFile
 		return 0;
 	}
 
-	virtual void seek(size_t position, SeekMode::Enum origin) X_FINAL{
+	virtual void seek(int64_t position, SeekMode::Enum origin) X_FINAL{
 		switch (origin)
 		{
 			case SeekMode::CUR:
-			current_ += core::Min<size_t>(position, remainingBytes());
+			current_ += core::Min<int64_t>(position, remainingBytes());
+			if (current_ < begin_) {
+				current_ = begin_;
+			}
 			break;
 			case SeekMode::SET:
-			current_ = begin_ + core::Min<size_t>(position, getSize());
+			current_ = begin_ + core::Min<int64_t>(position, getSize());
+			if (current_ < begin_) {
+				current_ = begin_;
+			}
+			if (current_ > end_) {
+				current_ = end_;
+			}
 			break;
 			case SeekMode::END:
 				X_ASSERT_NOT_IMPLEMENTED();
 			break;
 		}
 	}
-	virtual size_t remainingBytes(void) const X_FINAL {
+	virtual uint64_t remainingBytes(void) const X_FINAL {
 		return static_cast<size_t>(end_ - current_);
 	}
-	virtual size_t tell(void) const X_FINAL {
+	virtual uint64_t tell(void) const X_FINAL {
 		return static_cast<size_t>(current_ - begin_);
 	}
-	virtual void setSize(size_t numBytes) X_FINAL {
+	virtual void setSize(int64_t numBytes) X_FINAL {
 		X_UNUSED(numBytes);
 		X_ASSERT_UNREACHABLE();
 	}
@@ -264,7 +273,7 @@ struct XFileMem : public XFile
 	inline char* getBufferEnd(void) { return end_; }
 	inline const char* getBufferEnd(void) const { return end_; }
 
-	inline size_t getSize(void) const {
+	inline uint64_t getSize(void) const {
 		return static_cast<size_t>(end_ - begin_);
 	}
 
@@ -298,7 +307,7 @@ struct XFileBuf : public XFile
 	}
 
 	virtual size_t read(void* pBuf, size_t Len) X_FINAL{
-		size_t size = core::Min<size_t>(Len, remainingBytes());
+		size_t size = core::Min<size_t>(Len, safe_static_cast<size_t, uint64_t>(remainingBytes()));
 
 		memcpy(pBuf, current_, size);
 		current_ += size;
@@ -313,27 +322,36 @@ struct XFileBuf : public XFile
 		return 0;
 	}
 
-	virtual void seek(size_t position, SeekMode::Enum origin) X_FINAL{
+	virtual void seek(int64_t position, SeekMode::Enum origin) X_FINAL{
 		switch (origin)
 		{
 			case SeekMode::CUR:
-				current_ += core::Min<size_t>(position, remainingBytes());
+				current_ += core::Min<int64_t>(position, remainingBytes());
+				if (current_ < begin_) {
+					current_ = begin_;
+				}
 				break;
 			case SeekMode::SET:
-				current_ = begin_ + core::Min<size_t>(position, getSize());
+				current_ = begin_ + core::Min<int64_t>(position, getSize());
+				if (current_ < begin_) {
+					current_ = begin_;
+				}
+				if (current_ > end_) {
+					current_ = end_;
+				}
 				break;
 			case SeekMode::END:
 				X_ASSERT_NOT_IMPLEMENTED();
 				break;
 		}
 	}
-	virtual size_t remainingBytes(void) const X_FINAL{
+	virtual uint64_t remainingBytes(void) const X_FINAL{
 		return static_cast<size_t>(end_ - current_);
 	}
-	virtual size_t tell(void) const X_FINAL{
+	virtual uint64_t tell(void) const X_FINAL{
 		return static_cast<size_t>(current_ - begin_);
 	}
-	virtual void setSize(size_t numBytes) X_FINAL{
+	virtual void setSize(int64_t numBytes) X_FINAL{
 		X_UNUSED(numBytes);
 		X_ASSERT_UNREACHABLE();
 	}
@@ -344,8 +362,8 @@ struct XFileBuf : public XFile
 	inline uint8_t* getBufferEnd(void) { return end_; }
 	inline const uint8_t* getBufferEnd(void) const { return end_; }
 
-	inline size_t getSize(void) const {
-		return static_cast<size_t>(end_ - begin_);
+	inline uint64_t getSize(void) const {
+		return static_cast<uint64_t>(end_ - begin_);
 	}
 
 	inline bool isEof(void) const X_FINAL{
@@ -732,22 +750,22 @@ public:
 		return write(buf, length);
 	}
 
-	inline void seek(size_t position, SeekMode::Enum origin) {
+	inline void seek(int64_t position, SeekMode::Enum origin) {
 		X_ASSERT_NOT_NULL(pFile_);
 		pFile_->seek(position, origin);
 	}
 
-	inline size_t tell(void) const {
+	inline uint64_t tell(void) const {
 		X_ASSERT_NOT_NULL(pFile_);
 		return pFile_->tell();
 	}
 
-	inline size_t remainingBytes(void) const {
+	inline uint64_t remainingBytes(void) const {
 		X_ASSERT_NOT_NULL(pFile_);
 		return pFile_->remainingBytes();
 	}
 
-	inline XFile* GetFile() const {
+	inline XFile* GetFile(void) const {
 		return pFile_;
 	}
 

@@ -127,7 +127,7 @@ bool XFFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 
 	if (file.openFile(path.c_str(), core::fileModeFlags::READ))
 	{
-		len = file.remainingBytes();
+		len = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 		if (len > 0) {
 			pBuffer = X_NEW_ARRAY(uint8_t,len,g_fontArena, "FontTTFBuffer");
 			file.read(pBuffer, len);

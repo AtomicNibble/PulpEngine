@@ -63,7 +63,7 @@ OsFileAsync::~OsFileAsync(void)
 		CloseHandle(file_);
 }
 
-XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, size_t position)
+XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position)
 {
 	XOsFileAsyncOperation op(gEnv->pArena, file_, position);
 
@@ -76,13 +76,11 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, size_
 
 	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
-#if X_64
 	if (length > std::numeric_limits<uint32_t>::max()) {
 		core::HumanSize::Str humanStr;
 		X_ERROR("AsyncFile", "Can't make a read request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
 		return op;
 	}
-#endif // X_64
 
 	if (::ReadFile(file_, pBuffer, length32, nullptr, op.getOverlapped()))
 	{
@@ -99,19 +97,17 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, size_
 	return op;
 }
 
-XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length, size_t position)
+XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length, uint64_t position)
 {
 	XOsFileAsyncOperation op(gEnv->pArena, file_, position);
 
 	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
-#if X_64
 	if (length > std::numeric_limits<uint32_t>::max()) {
 		core::HumanSize::Str humanStr;
 		X_ERROR("AsyncFile", "Can't make a write request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
 		return op;
 	}
-#endif // X_64
 
 	if (::WriteFile(file_, pBuffer, length32, nullptr, op.getOverlapped()))
 	{
@@ -129,7 +125,7 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length
 }
 
 
-size_t OsFileAsync::tell(void) const
+uint64_t OsFileAsync::tell(void) const
 {
 	LARGE_INTEGER Move, current;
 	Move.QuadPart = 0;
@@ -144,14 +140,10 @@ size_t OsFileAsync::tell(void) const
 		X_ERROR("AsyncFile", "Failed to tell() file. Error: %s", lastError::ToString(dsc));
 	}
 
-#if X_64 == 1
 	return current.QuadPart;
-#else
-	return current.LowPart;
-#endif
 }
 
-size_t OsFileAsync::remainingBytes(void) const
+uint64_t OsFileAsync::remainingBytes(void) const
 {
 	_BY_HANDLE_FILE_INFORMATION info;
 
@@ -165,17 +157,12 @@ size_t OsFileAsync::remainingBytes(void) const
 		X_ERROR("AsyncFile", "Can't Get file information. Error: %s", lastError::ToString(dsc));
 	}
 
-#if X_64 == 1
 	return MAKEQWORD(info.nFileSizeHigh, info.nFileSizeLow) - tell();
-#else
-	X_ASSERT(info.nFileSizeHigh == 0, "tell was called on a file larger than 1 << 32 not supported in 32bit build")(info.nFileSizeHigh);
-	return info.nFileSizeLow - tell();
-#endif
 }
 
-void OsFileAsync::setSize(size_t numBytes)
+void OsFileAsync::setSize(int64_t numBytes)
 {
-	size_t currentPos = tell();
+	uint64_t currentPos = tell();
 
 	seek(numBytes, SeekMode::SET);
 
@@ -204,7 +191,7 @@ XFileStats& OsFileAsync::fileStats(void)
 #endif // !X_ENABLE_FILE_STATS
 }
 
-void OsFileAsync::seek(size_t position, IFileSys::SeekMode::Enum origin)
+void OsFileAsync::seek(int64_t position, IFileSys::SeekMode::Enum origin)
 {
 	// is this condition correct?
 	if (!mode_.IsSet(fileMode::RANDOM_ACCESS) && !mode_.IsSet(fileMode::APPEND)) {

@@ -1352,7 +1352,7 @@ SourceFile* XShaderManager::loadRawSourceFile(const char* name, bool reload)
 
 	if (file.openFile(path.c_str(), fileMode::READ))
 	{
-		size_t size = file.remainingBytes();
+		size_t size = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 
 		// load into a string for now!
 		core::string str;

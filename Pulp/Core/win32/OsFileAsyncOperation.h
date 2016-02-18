@@ -18,7 +18,7 @@ struct XOsFileAsyncOperation
 
 
 public:
-	XOsFileAsyncOperation(MemoryArenaBase* arena, HANDLE hFile, size_t position);
+	XOsFileAsyncOperation(MemoryArenaBase* arena, HANDLE hFile, uint64_t position);
 
 #if X_64
 	bool hasFinished(size_t* pNumBytes = nullptr) const;

@@ -5,7 +5,7 @@
 
 X_NAMESPACE_BEGIN(core)
 
-X_INLINE XOsFileAsyncOperation::XOsFileAsyncOperation(MemoryArenaBase* arena, HANDLE hFile, size_t position) :
+X_INLINE XOsFileAsyncOperation::XOsFileAsyncOperation(MemoryArenaBase* arena, HANDLE hFile, uint64_t position) :
 hFile_(hFile),
 overlapped_(X_NEW(ReferenceCountedOverlapped, arena, "OVERLAPPED"), arena)
 {
@@ -13,11 +13,7 @@ overlapped_(X_NEW(ReferenceCountedOverlapped, arena, "OVERLAPPED"), arena)
 	core::zero_this(pOverlapped);
 
 	pOverlapped->Offset = safe_static_cast<DWORD>(position & 0xFFFFFFFF);
-#if X_64 == 1
 	pOverlapped->OffsetHigh = safe_static_cast<DWORD>(((position >> 32) & 0xFFFFFFFF));
-#else
-	pOverlapped->OffsetHigh = 0;
-#endif
 }
 
 
