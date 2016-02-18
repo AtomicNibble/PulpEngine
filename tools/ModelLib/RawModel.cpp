@@ -7,6 +7,8 @@
 
 #include <String\Lexer.h>
 
+#include <Time\StopWatch.h>
+
 
 X_NAMESPACE_BEGIN(model)
 
@@ -74,7 +76,7 @@ namespace RawModel
 
 		core::Array<char> fileData(arena_);
 		{
-			size_t fileSize = file.remainingBytes();
+			size_t fileSize = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 
 			fileData.resize(fileSize);
 
@@ -115,7 +117,7 @@ namespace RawModel
 			X_WARNING("RawModel", "RawModel has no lods");
 			return true;
 		}
-		if (numLods < model::MODEL_MAX_LODS) {
+		if (numLods > model::MODEL_MAX_LODS) {
 			X_WARNING("RawModel", "RawModel has no many lods: %i max", 
 				model::MODEL_MAX_LODS);
 			return true;
@@ -128,6 +130,10 @@ namespace RawModel
 
 		if (!ReadBones(lex, numBones)) {
 			X_ERROR("RawModel", "failed to parse bone data");
+			return false;
+		}
+		if (!ReadLods(lex, numLods)) {
+			X_ERROR("RawModel", "failed to parse lod data");
 			return false;
 		}
 
@@ -383,8 +389,8 @@ namespace RawModel
 		mesh.face_.resize(numFaces);
 		for (auto& face : mesh.face_)
 		{
-			if (!lex.ExpectTokenString("v")) {
-				X_ERROR("RawModel", "Failed to read 'v' token");
+			if (!lex.ExpectTokenString("f")) {
+				X_ERROR("RawModel", "Failed to read 'f' token");
 				return false;
 			}
 
@@ -476,8 +482,6 @@ namespace RawModel
 		return true;
 	}
 
-	X_DISABLE_WARNING(4267)
-
 	bool Model::SaveRawModel(core::Path<char>& path)
 	{
 		X_ASSERT_NOT_NULL(gEnv);
@@ -485,43 +489,52 @@ namespace RawModel
 
 		path.setExtension(model::MODEL_RAW_FILE_EXTENSION);
 
-
-		core::XFileScoped file;
-		core::fileModeFlags mode;
-		mode.Set(core::fileMode::RECREATE);
-		mode.Set(core::fileMode::WRITE);
-		mode.Set(core::fileMode::SHARE);
-
-		if (!file.openFile(path.c_str(), mode))
 		{
-			X_ERROR("RawModel", "Failed to open file for rawmodel");
-			return false;
-		}
+			core::XFileScoped file;
+			core::fileModeFlags mode;
+			mode.Set(core::fileMode::RECREATE);
+			mode.Set(core::fileMode::WRITE);
+			mode.Set(core::fileMode::SHARE);
 
-		core::StackString<1024, char> buf;
-		buf.appendFmt("// Potato engine RawModel.\n\n");
-		buf.appendFmt("VERSION %i\n", VERSION);
-		buf.appendFmt("LODS %" PRIuS "\n", lods_.size());
-		buf.appendFmt("BONES %" PRIuS "\n", bones_.size());
-		buf.append("\n");
+			{
+				if (!file.openFile(path.c_str(), mode))
+				{
+					X_ERROR("RawModel", "Failed to open file for rawmodel");
+					return false;
+				}
+			}
 
-		if (file.write(buf.c_str(), buf.length()) != 
-			safe_static_cast<uint32_t, size_t>(buf.length())) {
-			X_ERROR("RawModel", "Failed to write rawmodel header");
-			return false;
-		}
+			core::StackString<1024, char> buf;
+			buf.appendFmt("// Potato engine RawModel.\n\n");
+			buf.appendFmt("VERSION %i\n", VERSION);
+			buf.appendFmt("LODS %" PRIuS "\n", lods_.size());
+			buf.appendFmt("BONES %" PRIuS "\n", bones_.size());
+			buf.append("\n");
 
-		if (!WriteBones(file.GetFile()))
-		{
-			X_ERROR("RawModel", "Failed to write bones");
-			return false;
-		}
-		if (!WriteLods(file.GetFile()))
-		{
-			X_ERROR("RawModel", "Failed to write lods");
-			return false;
-		}
+			{
+				if (file.write(buf.c_str(), buf.length()) !=
+					safe_static_cast<uint32_t, size_t>(buf.length())) {
+					X_ERROR("RawModel", "Failed to write rawmodel header");
+					return false;
+				}
+			}
 
+			{
+				if (!WriteBones(file.GetFile()))
+				{
+					X_ERROR("RawModel", "Failed to write bones");
+					return false;
+				}
+			}
+			{
+				if (!WriteLods(file.GetFile()))
+				{
+					X_ERROR("RawModel", "Failed to write lods");
+					return false;
+				}
+			}
+
+		}
 
 		return true;
 	}
@@ -535,9 +548,9 @@ namespace RawModel
 		{
 			buf.clear();
 			buf.appendFmt("BONE %i \"%s\"\n", bone.parIndx_, bone.name_.c_str());
-			buf.appendFmt("POS (%f,%f,%f)\n", bone.worldPos_.x, bone.worldPos_.y, bone.worldPos_.z);
+			buf.appendFmt("POS (%f %f %f)\n", bone.worldPos_.x, bone.worldPos_.y, bone.worldPos_.z);
 			auto ang = bone.rotation_;
-			buf.appendFmt("ANG (%f,%f,%f) (%f,%f,%f) (%f,%f,%f)\n", 
+			buf.appendFmt("ANG (%f %f %f) (%f %f %f) (%f %f %f)\n", 
 				ang.m00, ang.m01, ang.m02, 
 				ang.m10, ang.m11, ang.m12, 
 				ang.m20, ang.m21, ang.m22);
@@ -562,7 +575,7 @@ namespace RawModel
 		{
 			core::StackString<1024, char> buf;
 
-			buf.appendFmt("LOD");
+			buf.appendFmt("LOD\n");
 			buf.appendFmt("DISTANCE %f\n", lod.distance_);
 			buf.appendFmt("NUMMESH %" PRIuS "\n", lod.meshes_.size());
 
@@ -619,12 +632,12 @@ namespace RawModel
 			buf.clear();
 
 			buf.appendFmt("v %" PRIuS "\n", vert.binds_.size());
-			buf.appendFmt("(%f,%f,%f)\n", pos.x, pos.y, pos.z);
-			buf.appendFmt("(%f,%f,%f)\n", normal.x, normal.y, normal.z);
-			buf.appendFmt("(%f,%f,%f)\n", tan.x, tan.y, tan.z);
-			buf.appendFmt("(%f,%f,%f)\n", biNormal.x, biNormal.y, biNormal.z);
-			buf.appendFmt("(%f,%f,%f,%f)\n", col.r, col.g, col.b, col.a);
-			buf.appendFmt("(%f,%f)\n", uv.x, uv.y);
+			buf.appendFmt("(%f %f %f)\n", pos.x, pos.y, pos.z);
+			buf.appendFmt("(%f %f %f)\n", normal.x, normal.y, normal.z);
+			buf.appendFmt("(%f %f %f)\n", tan.x, tan.y, tan.z);
+			buf.appendFmt("(%f %f %f)\n", biNormal.x, biNormal.y, biNormal.z);
+			buf.appendFmt("(%f %f %f %f)\n", col.r, col.g, col.b, col.a);
+			buf.appendFmt("(%f %f)\n", uv.x, uv.y);
 
 			for (const auto& bind : vert.binds_)
 			{
@@ -644,7 +657,7 @@ namespace RawModel
 		for (const auto& face : mesh.face_)
 		{
 			buf.clear();
-			buf.appendFmt("f (%i,%i,%i)\n", face[0], face[1], face[2]);
+			buf.appendFmt("f %i %i %i\n", face[0], face[1], face[2]);
 
 			if (f->write(buf.c_str(), buf.length()) != 
 				safe_static_cast<uint32_t, size_t>(buf.length())) {
@@ -670,11 +683,11 @@ namespace RawModel
 		core::StackString<1024, char> buf;
 
 		buf.appendFmt("MATERIAL \"%s\"\n", mat.name_.c_str());
-		buf.appendFmt("COL (%f,%f,%f,%f)\n", col.r, col.g, col.b, col.a);
-		buf.appendFmt("TRANS (%f,%f,%f,%f)\n", tansparency.r, tansparency.g, tansparency.b, tansparency.a);
-		buf.appendFmt("AMBIENTCOL (%f,%f,%f,%f)\n", ambientColor.r, ambientColor.g, ambientColor.b, ambientColor.a);
-		buf.appendFmt("SPECCOL (%f,%f,%f,%f)\n", specCol.r, specCol.g, specCol.b, specCol.a);
-		buf.appendFmt("REFLECTIVECOL (%f,%f,%f,%f)\n", reflectiveCol.r, reflectiveCol.g, reflectiveCol.b, reflectiveCol.a);
+		buf.appendFmt("COL (%f %f %f %f)\n", col.r, col.g, col.b, col.a);
+		buf.appendFmt("TRANS (%f %f %f %f)\n", tansparency.r, tansparency.g, tansparency.b, tansparency.a);
+		buf.appendFmt("AMBIENTCOL (%f %f %f %f)\n", ambientColor.r, ambientColor.g, ambientColor.b, ambientColor.a);
+		buf.appendFmt("SPECCOL (%f %f %f %f)\n", specCol.r, specCol.g, specCol.b, specCol.a);
+		buf.appendFmt("REFLECTIVECOL (%f %f %f %f)\n", reflectiveCol.r, reflectiveCol.g, reflectiveCol.b, reflectiveCol.a);
 		buf.append("\n");
 		
 		return f->write(buf.c_str(), buf.length()) == 
