@@ -54,11 +54,16 @@ struct XFileAsyncOperation
 
 	}
 
+#if X_64
+	inline bool hasFinished(size_t* pNumBytes = nullptr) const {
+		return operation_.hasFinished(pNumBytes);
+	}
+#endif // !X_64
 
 	inline bool hasFinished(uint32_t* pNumBytes = nullptr) const {
 		return operation_.hasFinished(pNumBytes);
 	}
-	inline uint32_t waitUntilFinished(void) const {
+	inline size_t waitUntilFinished(void) const {
 		return operation_.waitUntilFinished();
 	}
 	inline void cancel(void) {
@@ -99,13 +104,13 @@ struct XFileAsync
 {
 	virtual ~XFileAsync() {};
 
-	virtual XFileAsyncOperation readAsync(void* pBuffer, uint32_t length, uint32_t position) X_ABSTRACT;
+	virtual XFileAsyncOperation readAsync(void* pBuffer, size_t length, size_t position) X_ABSTRACT;
 
 	/// Asynchronously writes from a buffer into the file.
-	virtual XFileAsyncOperation writeAsync(const void* pBuffer, uint32_t length, uint32_t position) X_ABSTRACT;
+	virtual XFileAsyncOperation writeAsync(const void* pBuffer, size_t length, size_t position) X_ABSTRACT;
 
 	/// Waits until the asynchronous operation has finished, and returns the number of transferred bytes.
-	virtual uint32_t WaitUntilFinished(const XFileAsyncOperation& operation) X_ABSTRACT;
+	virtual size_t WaitUntilFinished(const XFileAsyncOperation& operation) X_ABSTRACT;
 
 	// always returns total bytes.
 	// you can't seek.
@@ -117,22 +122,22 @@ struct XFileAsync
 struct XFile
 {
 	virtual ~XFile() {};
-	virtual uint32_t read(void* pBuf, uint32_t Len) X_ABSTRACT;
-	virtual uint32_t write(const void* pBuf, uint32_t Len) X_ABSTRACT;
+	virtual size_t read(void* pBuf, size_t Len) X_ABSTRACT;
+	virtual size_t write(const void* pBuf, size_t Len) X_ABSTRACT;
 
 	virtual void seek(size_t position, SeekMode::Enum origin) X_ABSTRACT;
 
 	template <typename T>
-	inline uint32_t readObj(T& object) {
+	inline size_t readObj(T& object) {
 		return read(&object, sizeof(T));
 	}
 
 	template <typename T>
-	inline uint32_t readObj(T* objects, size_t num) {
-		return read(objects, safe_static_cast<uint32_t, size_t>(sizeof(T)* num));
+	inline size_t readObj(T* objects, size_t num) {
+		return read(objects, sizeof(T)* num);
 	}
 
-	inline uint32_t readString(core::string& str) {
+	inline size_t readString(core::string& str) {
 		// uggh
 		char Char;
 		str.clear();
@@ -142,37 +147,37 @@ struct XFile
 				break;
 			str += Char;
 		}
-		return safe_static_cast<uint32_t, size_t>(str.length());
+		return str.length();
 	}
 
 	template <typename T>
-	inline uint32_t writeObj(const T& object) {
+	inline size_t writeObj(const T& object) {
 		return write(&object, sizeof(T));
 	}
 
 	template <typename T>
-	inline uint32_t writeObj(const T* objects, size_t num) {
-		return write(objects, safe_static_cast<uint32_t, size_t>(sizeof(T)* num));
+	inline size_t writeObj(const T* objects, size_t num) {
+		return write(objects,(sizeof(T)* num));
 	}
-	inline uint32_t writeString(core::string& str) {
-		return write(str.c_str(), safe_static_cast<uint32_t, size_t>(str.length() + 1));
+	inline size_t writeString(core::string& str) {
+		return write(str.c_str(), str.length() + 1);
 	}
-	inline uint32_t writeString(const char* str) {
-		return write(str, safe_static_cast<uint32_t, size_t>(strlen(str) + 1));
+	inline size_t writeString(const char* str) {
+		return write(str, (strlen(str) + 1));
 	}
-	inline uint32_t writeString(const char* str, uint32_t Length) {
+	inline size_t writeString(const char* str, size_t Length) {
 		return write(str, Length);
 	}
 
-	inline uint32_t writeStringNNT(core::string& str) {
-		return write(str.c_str(), safe_static_cast<uint32_t, size_t>(str.length()));
+	inline size_t writeStringNNT(core::string& str) {
+		return write(str.c_str(), (str.length()));
 	}
-	inline uint32_t writeStringNNT(const char* str) {
-		return write(str, safe_static_cast<uint32_t, size_t>(strlen(str)));
+	inline size_t writeStringNNT(const char* str) {
+		return write(str, (strlen(str)));
 	}
 
 
-	inline uint32_t printf(const char *fmt, ...) {
+	inline size_t printf(const char *fmt, ...) {
 		char buf[2048]; // more? i think not!
 		int length;
 
@@ -186,7 +191,7 @@ struct XFile
 			return 0;
 		}
 
-		return write(buf, static_cast<uint32_t>(length));
+		return write(buf, length);
 	}
 
 	virtual inline bool isEof(void) const {
@@ -212,16 +217,16 @@ struct XFileMem : public XFile
 		X_DELETE_ARRAY(begin_,arena_);
 	}
 
-	virtual uint32_t read(void* pBuf, uint32_t Len) X_FINAL{
+	virtual size_t read(void* pBuf, size_t Len) X_FINAL{
 		size_t size = core::Min<size_t>(Len, remainingBytes());
 
 		memcpy(pBuf, current_, size);
 		current_ += size;
 
-		return safe_static_cast<uint32_t,size_t>(size);
+		return size;
 	}
 
-	virtual uint32_t write(const void* pBuf, uint32_t Len) X_FINAL{
+	virtual size_t write(const void* pBuf, size_t Len) X_FINAL{
 		X_UNUSED(pBuf);
 		X_UNUSED(Len);
 		X_ASSERT_NOT_IMPLEMENTED();
@@ -292,16 +297,16 @@ struct XFileBuf : public XFile
 	~XFileBuf() X_OVERRIDE {
 	}
 
-	virtual uint32_t read(void* pBuf, uint32_t Len) X_FINAL{
+	virtual size_t read(void* pBuf, size_t Len) X_FINAL{
 		size_t size = core::Min<size_t>(Len, remainingBytes());
 
 		memcpy(pBuf, current_, size);
 		current_ += size;
 
-		return safe_static_cast<uint32_t, size_t>(size);
+		return size;
 	}
 
-	virtual uint32_t write(const void* pBuf, uint32_t Len) X_FINAL {
+	virtual size_t write(const void* pBuf, size_t Len) X_FINAL {
 		X_UNUSED(pBuf);
 		X_UNUSED(Len);
 		X_ASSERT_NOT_IMPLEMENTED();
@@ -644,86 +649,73 @@ public:
 		return pFile_ != nullptr;
 	}
 
-	inline uint32_t read(void* pBuf, uint32_t Len) {
+	inline size_t read(void* pBuf, size_t Len) {
 		X_ASSERT_NOT_NULL(pFile_); // catch bad use of this class. "not checking open return val"
 		return pFile_->read(pBuf, Len);
 	}
-#if X_64
-	inline uint32_t read(void* pBuf, size_t Len) {
-		X_ASSERT_NOT_NULL(pFile_); // catch bad use of this class. "not checking open return val"
-		return pFile_->read(pBuf, safe_static_cast<uint32_t,size_t>(Len));
-	}
-#endif
 
 	template <typename T>
-	inline uint32_t read(T& object) {
+	inline size_t read(T& object) {
 		return read(&object, sizeof(T));
 	}
 
 	template <typename T>
-	inline uint32_t readObj(T& object) {
+	inline size_t readObj(T& object) {
 		return read(&object, sizeof(T));
 	}
 
 	template <typename T>
-	inline uint32_t readObjs(T* objects, uint32_t num) {
+	inline size_t readObjs(T* objects, size_t num) {
 		return read(objects, sizeof(T)* num) / sizeof(T);
 	}
 
 
-	inline uint32_t readString(core::string& str) {
+	inline size_t readString(core::string& str) {
 		return pFile_->readString(str);
 	}
 
-
-#if X_64
-	inline uint32_t write(const void* pBuf, size_t Len) {
-		X_ASSERT_NOT_NULL(pFile_);
-		return pFile_->write(pBuf, safe_static_cast<uint32_t, size_t>(Len));
-	}
-#endif // !X_64
-	inline uint32_t write(const void* pBuf, uint32_t Len) {
+	inline size_t write(const void* pBuf, size_t Len) {
 		X_ASSERT_NOT_NULL(pFile_);
 		return pFile_->write(pBuf, Len);
 	}
 
-	inline uint32_t writeString(core::string& str) {
+	inline size_t writeString(core::string& str) {
 		return pFile_->writeString(str);
 	}
-	inline uint32_t writeString(const char* str) {
+	inline size_t writeString(const char* str) {
 		return pFile_->writeString(str);
 	}
-	inline uint32_t writeString(const char* str, uint32_t Length) {
+	inline size_t writeString(const char* str, size_t Length) {
 		return pFile_->writeString(str, Length);
 	}
 
-	inline uint32_t writeStringNNT(core::string& str) {
+	inline size_t writeStringNNT(core::string& str) {
 		return pFile_->writeStringNNT(str);
 	}
-	inline uint32_t writeStringNNT(const char* str) {
+	inline size_t writeStringNNT(const char* str) {
 		return pFile_->writeStringNNT(str);
 	}
 
 	template <typename T>
-	inline uint32_t writeObj(T& object) {
+	inline size_t writeObj(T& object) {
 		return write(&object, sizeof(T));
 	}
 	template <typename T>
-	inline uint32_t writeObj(const T* objects, size_t num) {
-		return write(objects, safe_static_cast<uint32_t, size_t>(sizeof(T)* num));
+	inline size_t writeObj(const T* objects, size_t num) {
+		return write(objects, (sizeof(T)* num));
 	}
 
 	template <typename T>
-	inline uint32_t writeObjs(T* objects, uint32_t num) {
+	inline size_t writeObjs(T* objects, size_t num) {
 		return write(objects, sizeof(T)* num) / sizeof(T);
 	}
 
 	template <typename T>
-	inline uint32_t write(const T& object) {
+	inline size_t write(const T& object) {
 		return write(&object, sizeof(T));
 	}
 
-	uint32_t printf(const char *fmt, ...) {
+	size_t printf(const char *fmt, ...) {
 		char buf[2048];
 		int32_t length;
 
@@ -737,7 +729,7 @@ public:
 			return 0;
 		}
 
-		return write(buf, safe_static_cast<uint32_t,int32_t>(length));
+		return write(buf, length);
 	}
 
 	inline void seek(size_t position, SeekMode::Enum origin) {

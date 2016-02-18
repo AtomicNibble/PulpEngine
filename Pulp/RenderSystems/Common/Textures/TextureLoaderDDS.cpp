@@ -972,7 +972,7 @@ namespace DDS
 		{
 			img->pFaces[i] = X_NEW_ARRAY_ALIGNED(uint8_t, total_bytes_per_face, g_textureDataArena, "DDSFaceBuffer", 8);
 
-			bytes_read = file->read(img->pFaces[i], total_bytes_per_face);
+			bytes_read = safe_static_cast<uint32_t, size_t>(file->read(img->pFaces[i], total_bytes_per_face));
 
 			if (bytes_read != total_bytes_per_face)
 			{

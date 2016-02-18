@@ -3,6 +3,9 @@
 #include "OsFileModeFlags.h"
 
 
+#include <String\HumanSize.h>
+
+
 X_NAMESPACE_BEGIN(core)
 
 #ifndef MAKEQWORD
@@ -60,7 +63,7 @@ OsFileAsync::~OsFileAsync(void)
 		CloseHandle(file_);
 }
 
-XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, uint32_t length, size_t position)
+XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, size_t position)
 {
 	XOsFileAsyncOperation op(gEnv->pArena, file_, position);
 
@@ -71,7 +74,17 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, uint32_t length, siz
 	pOverlapped->Offset = large.LowPart;
 	pOverlapped->OffsetHigh = large.HighPart;
 
-	if (::ReadFile(file_, pBuffer, length, nullptr, op.getOverlapped()))
+	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
+
+#if X_64
+	if (length > std::numeric_limits<uint32_t>::max()) {
+		core::HumanSize::Str humanStr;
+		X_ERROR("AsyncFile", "Can't make a read request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
+		return op;
+	}
+#endif // X_64
+
+	if (::ReadFile(file_, pBuffer, length32, nullptr, op.getOverlapped()))
 	{
 
 	}
@@ -86,11 +99,21 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, uint32_t length, siz
 	return op;
 }
 
-XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, uint32_t length, size_t position)
+XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length, size_t position)
 {
 	XOsFileAsyncOperation op(gEnv->pArena, file_, position);
 
-	if (::WriteFile(file_, pBuffer, length, nullptr, op.getOverlapped()))
+	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
+
+#if X_64
+	if (length > std::numeric_limits<uint32_t>::max()) {
+		core::HumanSize::Str humanStr;
+		X_ERROR("AsyncFile", "Can't make a write request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
+		return op;
+	}
+#endif // X_64
+
+	if (::WriteFile(file_, pBuffer, length32, nullptr, op.getOverlapped()))
 	{
 
 	}

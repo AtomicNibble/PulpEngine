@@ -497,7 +497,7 @@ bool XModel::LoadModel(core::XFile* file)
 	// which we can load all at once and just set pointers.
 	//	char* pData = X_NEW_ARRAY_ALIGNED(char, hdr_.dataSize, g_3dEngineArena, "ModelBuffer", 8);
 	char* pData = X_NEW_ARRAY_ALIGNED(char, hdr_.dataSize, gEnv->pArena, "ModelBuffer", 8);
-	uint32_t readSize;
+	size_t readSize;
 
 	if ((readSize = file->read(pData, hdr_.dataSize)) != hdr_.dataSize)
 	{

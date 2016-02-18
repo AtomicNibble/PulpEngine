@@ -82,7 +82,7 @@ namespace CI
 		}
 
 		uint8_t* pImgBuf = X_NEW_ARRAY_ALIGNED(uint8_t, hdr.DataSize, g_textureDataArena, "CIImgBuffer", 8);
-		uint32_t bytesRead = file->read(pImgBuf, hdr.DataSize);
+		size_t bytesRead = file->read(pImgBuf, hdr.DataSize);
 
 		if (bytesRead != hdr.DataSize)
 		{

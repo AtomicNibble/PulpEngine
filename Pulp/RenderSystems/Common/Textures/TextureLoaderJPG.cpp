@@ -48,11 +48,11 @@ namespace JPG
 		{
 			jpeg_xfile_src_mgr* src = reinterpret_cast<jpeg_xfile_src_mgr*>(cinfo->src);
 
-			uint32 bytes_read;
+			size_t bytes_read;
 			bytes_read = src->file->read(src->buffer, JPEG_MGR_BUFFER_SIZE);
 
 			src->mgr.next_input_byte = src->buffer;
-			src->mgr.bytes_in_buffer = (size_t)bytes_read;
+			src->mgr.bytes_in_buffer = bytes_read;
 			if (0 == src->mgr.bytes_in_buffer)
 			{
 				/* The image file is truncated. We insert EOI marker to tell the library to stop processing. */

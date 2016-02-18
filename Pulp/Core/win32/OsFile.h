@@ -13,8 +13,8 @@ struct OsFile
 	OsFile(const wchar_t* path, IFileSys::fileModeFlags mode);
 	~OsFile(void);
 
-	uint32_t read(void* buffer, uint32_t length);
-	uint32_t write(const void* buffer, uint32_t length);
+	size_t read(void* buffer, size_t length);
+	size_t write(const void* buffer, size_t length);
 
 	void seek(size_t position, IFileSys::SeekMode::Enum origin);
 

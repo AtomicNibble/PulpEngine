@@ -20,8 +20,8 @@ public:
 		return file_.valid();
 	}
 
-	virtual uint32_t read(void* buffer, uint32_t length) X_OVERRIDE;
-	virtual uint32_t write(const void* buffer, uint32_t length) X_OVERRIDE;
+	virtual size_t read(void* buffer, size_t length) X_OVERRIDE;
+	virtual size_t write(const void* buffer, size_t length) X_OVERRIDE;
 	virtual void seek(size_t position, SeekMode::Enum origin) X_OVERRIDE;
 	virtual size_t remainingBytes(void) const X_OVERRIDE;
 	virtual size_t tell(void) const X_OVERRIDE;

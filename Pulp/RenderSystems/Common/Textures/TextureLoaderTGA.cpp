@@ -139,7 +139,7 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 
 	// read the image data.
 
-	uint32_t bytes_read = file->read(img->pFaces[0], DataSize);
+	size_t bytes_read = file->read(img->pFaces[0], DataSize);
 
 	if (bytes_read != DataSize)
 	{

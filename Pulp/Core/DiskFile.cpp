@@ -15,12 +15,12 @@ XDiskFile::~XDiskFile()
 
 }
 
-uint32_t XDiskFile::read(void* buffer, uint32_t length)
+size_t XDiskFile::read(void* buffer, size_t length)
 {
 	return file_.read(buffer, length);
 }
 
-uint32_t XDiskFile::write(const void* buffer, uint32_t length)
+size_t XDiskFile::write(const void* buffer, size_t length)
 {
 	return file_.write(buffer, length);
 }

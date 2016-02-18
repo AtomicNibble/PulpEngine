@@ -14,8 +14,8 @@ struct OsFileAsync
 	OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode);
 	~OsFileAsync(void);
 
-	XOsFileAsyncOperation readAsync(void* pBuffer, uint32_t length, size_t position);
-	XOsFileAsyncOperation writeAsync(const void* pBuffer, uint32_t length, size_t position);
+	XOsFileAsyncOperation readAsync(void* pBuffer, size_t length, size_t position);
+	XOsFileAsyncOperation writeAsync(const void* pBuffer, size_t length, size_t position);
 
 	size_t tell(void) const;
 	size_t remainingBytes(void) const;

@@ -20,11 +20,14 @@ struct XOsFileAsyncOperation
 public:
 	XOsFileAsyncOperation(MemoryArenaBase* arena, HANDLE hFile, size_t position);
 
+#if X_64
+	bool hasFinished(size_t* pNumBytes = nullptr) const;
+#endif // !X_64
 	bool hasFinished(uint32_t* pNumBytes = nullptr) const;
 
 	// Waits until the asynchronous operation has finished
 	// returns the number of transferred bytes.
-	uint32_t waitUntilFinished(void) const;
+	size_t waitUntilFinished(void) const;
 
 	void cancel(void);
 

@@ -4,6 +4,7 @@
 
 #include "IFileSys.h"
 
+#include <String\HumanSize.h>
 
 
 X_NAMESPACE_BEGIN(core)
@@ -64,7 +65,7 @@ OsFile::~OsFile(void)
 
 
 
-uint32_t OsFile::read(void* buffer, uint32_t length)
+size_t OsFile::read(void* buffer, size_t length)
 {
 	if (!mode_.IsSet(fileMode::READ)) {
 		IFileSys::fileModeFlags::Description Dsc;
@@ -72,8 +73,18 @@ uint32_t OsFile::read(void* buffer, uint32_t length)
 		return 0;
 	}
 
+	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
+
+#if X_64
+	if (length > std::numeric_limits<uint32_t>::max()) {
+		core::HumanSize::Str humanStr;
+		X_ERROR("AsyncFile", "Can't make a read request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
+		return 0;
+	}
+#endif // X_64
+
 	DWORD NumRead = 0;
-	if (::ReadFile(file_, buffer, length, &NumRead, 0)) {
+	if (::ReadFile(file_, buffer, length32, &NumRead, 0)) {
 #if X_ENABLE_FILE_STATS
 		s_stats.NumBytesRead += NumRead;
 #endif // !X_ENABLE_FILE_STATS
@@ -89,7 +100,7 @@ uint32_t OsFile::read(void* buffer, uint32_t length)
 }
 
 
-uint32_t OsFile::write(const void* buffer, uint32_t length)
+size_t OsFile::write(const void* buffer, size_t length)
 {
 	if (!mode_.IsSet(fileMode::WRITE)) {
 		IFileSys::fileModeFlags::Description Dsc;
@@ -97,8 +108,18 @@ uint32_t OsFile::write(const void* buffer, uint32_t length)
 		return 0;
 	}
 
+	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
+
+#if X_64
+	if (length > std::numeric_limits<uint32_t>::max()) {
+		core::HumanSize::Str humanStr;
+		X_ERROR("AsyncFile", "Can't make a write request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
+		return 0;
+	}
+#endif // X_64
+
 	DWORD NumWrite = 0;
-	if (::WriteFile(file_, buffer, length, &NumWrite, 0)) {
+	if (::WriteFile(file_, buffer, length32, &NumWrite, 0)) {
 #if X_ENABLE_FILE_STATS
 		s_stats.NumBytesWrite += NumWrite;
 #endif // !X_ENABLE_FILE_STATS

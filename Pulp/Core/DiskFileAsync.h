@@ -24,13 +24,13 @@ public:
 		return file_.valid();
 	}
 
-	XFileAsyncOperation readAsync(void* pBuffer, uint32_t length, uint32_t position) X_FINAL;
+	XFileAsyncOperation readAsync(void* pBuffer, size_t length, size_t position) X_FINAL;
 
 	// Asynchronously writes from a buffer into the file.
-	XFileAsyncOperation writeAsync(const void* pBuffer, uint32_t length, uint32_t position) X_FINAL;
+	XFileAsyncOperation writeAsync(const void* pBuffer, size_t length, size_t position) X_FINAL;
 
 	// Waits until the asynchronous operation has finished, and returns the number of transferred bytes.
-	uint32_t WaitUntilFinished(const XFileAsyncOperation& operation) X_FINAL;
+	size_t WaitUntilFinished(const XFileAsyncOperation& operation) X_FINAL;
 	
 	size_t remainingBytes(void) const X_FINAL;
 
