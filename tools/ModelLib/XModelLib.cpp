@@ -72,27 +72,35 @@ bool XModelLib::Convert(ConvertArgs& args)
 
 		{
 			const wchar_t* pScale = args.getOption(L"scale");
-			float scale = core::strUtil::StringToFloat<float>(pScale);
+			if (pScale) {
+				float scale = core::strUtil::StringToFloat<float>(pScale);
 
-			model.SetScale(scale);
+				model.SetScale(scale);
+			}
 		}
 		{
 			const wchar_t* pWeightThresh = args.getOption(L"weight_thresh");
-			float thresh = core::strUtil::StringToFloat<float>(pWeightThresh);
+			if (pWeightThresh) {
+				float thresh = core::strUtil::StringToFloat<float>(pWeightThresh);
 
-			model.SetJointWeightThreshold(thresh);
+				model.SetJointWeightThreshold(thresh);
+			}
 		}
 		{
 			const wchar_t* pUvMergeThresh = args.getOption(L"uv_merge_thresh");
-			float thresh = core::strUtil::StringToFloat<float>(pUvMergeThresh);
+			if (pUvMergeThresh) {
+				float thresh = core::strUtil::StringToFloat<float>(pUvMergeThresh);
 
-			model.SetVertexElipson(thresh);
+				model.SetVertexElipson(thresh);
+			}
 		}
 		{
 			const wchar_t* pVertMergeThresh = args.getOption(L"vert_merge_thresh");
-			float thresh = core::strUtil::StringToFloat<float>(pVertMergeThresh);
+			if (pVertMergeThresh) {
+				float thresh = core::strUtil::StringToFloat<float>(pVertMergeThresh);
 
-			model.SetTexCoordElipson(thresh);
+				model.SetTexCoordElipson(thresh);
+			}
 		}
 
 	}
