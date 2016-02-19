@@ -76,6 +76,7 @@ void ModelCompiler::Stats::print(void) const
 	X_LOG0("Model", "Model Info:");
 	X_LOG0("Model", "> Total Lods: %i", totalLods);
 	X_LOG0("Model", "> Total Mesh: %i", totalMesh);
+	X_LOG0("Model", "> Total Mesh Merged: %i", totalMeshMerged);
 	X_LOG0("Model", "> Total Joints: %i", totalJoints);
 	X_LOG0("Model", "> Total Joints Dropped: %i", totalJointsDropped);
 
