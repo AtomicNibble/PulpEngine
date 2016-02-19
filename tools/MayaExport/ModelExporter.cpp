@@ -302,8 +302,9 @@ void ModelExporter::printStats(void) const
 	info.append("\nModel Info:\n");
 	info.appendFmt("> Total Lods: %i", stats_.totalLods);
 	info.appendFmt("\n> Total Mesh: %i", stats_.totalMesh);
+	info.appendFmt("\n> Total Mesh merged: %i", stats_.totalMeshMerged);
 	info.appendFmt("\n> Total Joints: %i", stats_.totalJoints);
-	info.appendFmt("\n> Total Joints Dropped: %i", stats_.totalJointsDropped);
+	info.appendFmt("\n> Total Joints dropped: %i", stats_.totalJointsDropped);
 
 
 	if (stats_.droppedBoneNames.size() > 0) {
@@ -328,7 +329,7 @@ void ModelExporter::printStats(void) const
 
 	info.appendFmt("\n> Total Verts: %i", stats_.totalVerts);
 	info.appendFmt("\n> Total Faces: %i", stats_.totalFaces);
-	info.appendFmt("\n> Total eights Dropped: %i", stats_.totalWeightsDropped);
+	info.appendFmt("\n> Total Weights dropped: %i", stats_.totalWeightsDropped);
 	info.append("\n");
 
 	if (stats_.totalWeightsDropped > 0) {
