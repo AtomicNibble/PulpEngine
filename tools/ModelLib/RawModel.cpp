@@ -161,12 +161,12 @@ namespace RawModel
 
 			// read the parent idx.
 			if (!lex.ReadTokenOnLine(token)) {
-				X_ERROR("RawModel", "Failed to read 'BONE' token");
+				X_ERROR("RawModel", "Failed to read parent index token");
 				return false;
 			}
 
 			if (token.GetType() != core::TokenType::NUMBER) {
-				X_ERROR("RawModel", "Failed to read 'BONE' token");
+				X_ERROR("RawModel", "Parent index token is invalid");
 				return false;
 			}
 
@@ -174,12 +174,12 @@ namespace RawModel
 
 			// read the string
 			if (!lex.ReadTokenOnLine(token)) {
-				X_ERROR("RawModel", "Failed to read 'BONE' token");
+				X_ERROR("RawModel", "Failed to read bone name token");
 				return false;
 			}
 
 			if (token.GetType() != core::TokenType::STRING) {
-				X_ERROR("RawModel", "Failed to read 'BONE' token");
+				X_ERROR("RawModel", "Bone name token is invalid");
 				return false;
 			}
 
@@ -212,7 +212,7 @@ namespace RawModel
 				return false;
 			}
 
-			if(lex.Parse2DMatrix(3, 3, &bone.rotation_[0])) {
+			if(!lex.Parse2DMatrix(3, 3, &bone.rotation_[0])) {
 				X_ERROR("RawModel", "Failed to read 'ANG' token data");
 				return false;
 			}
@@ -550,7 +550,7 @@ namespace RawModel
 			buf.appendFmt("BONE %i \"%s\"\n", bone.parIndx_, bone.name_.c_str());
 			buf.appendFmt("POS (%f %f %f)\n", bone.worldPos_.x, bone.worldPos_.y, bone.worldPos_.z);
 			auto ang = bone.rotation_;
-			buf.appendFmt("ANG (%f %f %f) (%f %f %f) (%f %f %f)\n", 
+			buf.appendFmt("ANG ((%f %f %f) (%f %f %f) (%f %f %f))\n", 
 				ang.m00, ang.m01, ang.m02, 
 				ang.m10, ang.m11, ang.m12, 
 				ang.m20, ang.m21, ang.m22);
