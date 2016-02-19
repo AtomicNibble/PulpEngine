@@ -505,7 +505,18 @@ namespace RawModel
 			}
 
 			core::StackString<1024, char> buf;
-			buf.appendFmt("// Potato engine RawModel.\n\n");
+			buf.appendFmt("// Potato engine RawModel.\n");
+
+			// save some info it's not part of format
+			for (size_t i = 0; i < lods_.size(); i++)
+			{
+				const model::RawModel::Lod& lod = lods_[i];
+
+				buf.appendFmt("// LOD%" PRIuS " dis: %f numMesh: %" PRIuS " verts: %" PRIuS " faces: %" PRIuS " \n",
+					i, lod.distance_, lod.meshes_.size(), lod.totalVerts(), lod.totalIndexs());
+			}
+
+			buf.append("\n");
 			buf.appendFmt("VERSION %i\n", VERSION);
 			buf.appendFmt("LODS %" PRIuS "\n", lods_.size());
 			buf.appendFmt("BONES %" PRIuS "\n", bones_.size());
