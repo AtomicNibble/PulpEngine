@@ -287,8 +287,9 @@ namespace strUtil
 		const char* Start = startInclusive;
 
 		for (i = 0; Start < endExclusive; ++Start) {
-			if (*Start == what)
+			if (*Start == what) {
 				++i;
+			}
 		}
 
 		return i;
@@ -315,8 +316,9 @@ namespace strUtil
 		size_t Len = endExclusiveS1 - startInclusiveS1;
 		size_t Len2 = strlen(startInclusiveS2);
 
-		if(Len == Len2)
+		if (Len == Len2) {
 			return memcmp(startInclusiveS1, startInclusiveS2, Len) == 0;
+		}
 
 		return false;
 	}
@@ -325,8 +327,9 @@ namespace strUtil
 	{
 		ptrdiff_t Len = endExclusiveS1 - startInclusiveS1;
 
-		if (Len == (endExclusiveS2 - startInclusiveS2))
+		if (Len == (endExclusiveS2 - startInclusiveS2)) {
 			return memcmp(startInclusiveS1, startInclusiveS2, Len) == 0;
+		}
 
 		return false;
 	}
@@ -334,8 +337,13 @@ namespace strUtil
 
 	bool IsEqualCaseInsen(const char* str1, const char* str2)
 	{
-		while (*str1 && (::tolower(*str1) == ::tolower(*str2)))
+		X_ASSERT_NOT_NULL(str1);
+		X_ASSERT_NOT_NULL(str2);
+
+
+		while (*str1 && (::tolower(*str1) == ::tolower(*str2))) {
 			str1++, str2++;
+		}
 
 		// are they both null ?
 		return (*(const uint8_t*)str1 - *(const uint8_t*)str2) == 0;
@@ -380,16 +388,18 @@ namespace strUtil
 	/// \remark Returns a \c nullptr if the character could not be found.
 	const char* FindNon(const char* startInclusive, const char* endExclusive, char what)
 	{
-		if (startInclusive >= endExclusive)
+		if (startInclusive >= endExclusive) {
 			return nullptr;
+		}
 
 		const char* result = startInclusive;
 
 		while (*result == what)
 		{
 			++result;
-			if (result >= endExclusive)
+			if (result >= endExclusive) {
 				return nullptr;
+			}
 		}
 
 		return result;
@@ -401,14 +411,16 @@ namespace strUtil
 	{
 		const char* result = endExclusive - 1;
 
-		if (startInclusive >= result)
+		if (startInclusive >= result) {
 			return nullptr;
+		}
 
 		while (*result != what)
 		{
 			--result;
-			if (startInclusive >= result)
+			if (startInclusive >= result) {
 				return nullptr;
+			}
 		}
 
 		return result;
@@ -420,14 +432,16 @@ namespace strUtil
 	{
 		const char* result = endExclusive - 1;
 
-		if (startInclusive >= result)
+		if (startInclusive >= result) {
 			return nullptr;
+		}
 
 		while (*result == what)
 		{
 			--result;
-			if (startInclusive >= result)
+			if (startInclusive >= result) {
 				return nullptr;
+			}
 		}
 
 		return result;
@@ -439,8 +453,9 @@ namespace strUtil
 	{
 		while (startInclusive < endExclusive)
 		{
-			if (*startInclusive == ' ')
+			if (*startInclusive == ' ') {
 				return startInclusive;
+			}
 			++startInclusive;
 		}
 
@@ -453,11 +468,13 @@ namespace strUtil
 		{
 			--endExclusive;
 			// reached the end ?
-			if (endExclusive < startInclusive)
+			if (endExclusive < startInclusive) {
 				break;
+			}
 			// if whitespace return it.
-			if (IsWhitespace(*endExclusive))
+			if (IsWhitespace(*endExclusive)) {
 				return endExclusive;
+			}
 		}
 		X_DISABLE_WARNING(4127)
 		while (1);		
@@ -472,11 +489,13 @@ namespace strUtil
 		{
 			--endExclusive;
 			// reached the end ?
-			if (endExclusive < startInclusive)
+			if (endExclusive < startInclusive) {
 				break;
+			}
 			// if not whitespace return it.
-			if (!IsWhitespace(*endExclusive))
+			if (!IsWhitespace(*endExclusive)) {
 				return endExclusive;
+			}
 		}
 		X_DISABLE_WARNING(4127)
 			while (1);
@@ -490,8 +509,9 @@ namespace strUtil
 		while (startInclusive < endExclusive)
 		{
 			// if not whitespace return it.
-			if (!IsWhitespace(*startInclusive))
+			if (!IsWhitespace(*startInclusive)) {
 				return startInclusive;
+			}
 
 			++startInclusive;
 		}
@@ -512,8 +532,9 @@ namespace strUtil
 	{
 		while (startInclusive < endExclusive)
 		{
-			if (*startInclusive == what)
+			if (*startInclusive == what) {
 				return startInclusive;
+			}
 			++startInclusive;
 		}
 
@@ -534,8 +555,9 @@ namespace strUtil
 
 	const char* Find(const char* startInclusive, const char* endExclusive, const char* what, size_t whatLength)
 	{
-		if (whatLength == 0)
+		if (whatLength == 0) {
 			return startInclusive;
+		}
 
 #if 0 
 		// should check how much these aligne ment checks take.
@@ -558,8 +580,9 @@ namespace strUtil
 #endif 
 		size_t len = endExclusive - startInclusive;
 
-		if (whatLength > len)
+		if (whatLength > len) {
 			return nullptr;
+		}
 
 		while (startInclusive < endExclusive)
 		{
@@ -574,19 +597,22 @@ namespace strUtil
 				size_t i = 0;
 				for (; i < (whatLength - 1); i++)
 				{
-					if (*current != *currentWhat)
+					if (*current != *currentWhat) {
 						break;
+					}
 
 					++current;
 					++currentWhat;
 				}
 
-				if (i == (whatLength - 1))
+				if (i == (whatLength - 1)) {
 					return startInclusive;
+				}
 			}
 
-			if (len == whatLength) // sub string can't fit anymore.
+			if (len == whatLength) { // sub string can't fit anymore.
 				return nullptr;
+			}
 
 			--len;
 			++startInclusive;
@@ -615,8 +641,9 @@ namespace strUtil
 	{
 		size_t len = endExclusive - startInclusive;
 
-		if (whatLength > len)
+		if (whatLength > len) {
 			return nullptr;
+		}
 		
 		while (startInclusive < endExclusive)
 		{
@@ -631,19 +658,22 @@ namespace strUtil
 				size_t i = 0;
 				for (; i < (whatLength-1); i++)
 				{
-					if (upperCaseSIMD(*current) != upperCaseSIMD(*currentWhat))
+					if (upperCaseSIMD(*current) != upperCaseSIMD(*currentWhat)) {
 						break;
+					}
 
 					++current;
 					++currentWhat;
 				}
 
-				if (i == (whatLength - 1))
+				if (i == (whatLength - 1)) {
 					return startInclusive;
+				}
 			}
 
-			if (len == whatLength) // sub string can't fit anymore.
+			if (len == whatLength) {// sub string can't fit anymore.
 				return nullptr;
+			}
 
 			--len;
 			++startInclusive;
@@ -661,8 +691,9 @@ namespace strUtil
 	{
 		size_t len = endExclusive - startInclusive;
 
-		if (len == 0)
+		if (len == 0) {
 			return nullptr;
+		}
 
 		uint32_t upperWhat = upperCaseSIMD(what);
 
@@ -705,8 +736,9 @@ namespace strUtil
 	{
 		const char* res = strUtil::FindLast(startInclusive, endExclusive, '.');
 		// I think it might be better to return null here, instead of start.
-		if (!res || res == (endExclusive - 1))
+		if (!res || res == (endExclusive - 1)) {
 			return nullptr;
+		}
 		return res + 1;
 	}
 
@@ -724,8 +756,9 @@ namespace strUtil
 
 		const char* res = strUtil::FindLast(startInclusive, endExclusive, Path<char>::NATIVE_SLASH);
 
-		if (!res || res == (endExclusive-1))
+		if (!res || res == (endExclusive - 1)) {
 			return startInclusive; // might just be file name.
+		}
 		return res + 1;
 	}
 
