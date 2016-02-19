@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Time\StopWatch.h>
+#include <Prepro\PreproUniqueName.h>
 
 class MayaProfiler
 {
@@ -14,7 +15,7 @@ private:
 };
 
 #define PROFILE_MAYA(name) \
-	MayaProfiler ___profile_scope__(nullptr);
+	MayaProfiler X_PP_UNIQUE_NAME(___profile_scope__)(nullptr);
 
 #define PROFILE_MAYA_NAME(name) \
-	MayaProfiler ___profile_scope__(name);
+	MayaProfiler X_PP_UNIQUE_NAME(___profile_scope__)(name);
