@@ -866,8 +866,8 @@ MStatus ModelExporter::loadBones(void)
 			continue;
 		}
 
-		bone->mayaNode.setParent(mayaHead);
-		bone->exportNode.setParent(exportHead);
+		bone->mayaNode.setParent(mayaHead_);
+		bone->exportNode.setParent(exportHead_);
 
 		parentNode = GetParentBone(bone->dagnode);
 		if (parentNode) {
@@ -891,6 +891,34 @@ MStatus ModelExporter::loadBones(void)
 		status = getBindPose(dagPath.node(&status), bone, scale);
 		if (!status) {
 			return status;
+		}
+	}
+
+	// fill in the raw bones.
+	{
+		bones_.reserve(mayaBones_.size());
+
+		MayaBone* pMayaBone = nullptr;
+		for (pMayaBone = exportHead_.next(); pMayaBone != nullptr;
+				pMayaBone = pMayaBone->exportNode.next())
+		{
+			model::RawModel::Bone bone;
+			bone.name_ = pMayaBone->name.c_str();
+			bone.rotation_ = pMayaBone->bindm33;
+			bone.worldPos_ = pMayaBone->bindpos;
+			
+			MayaBone* pParent = pMayaBone->exportNode.parent();
+
+			if (pParent)
+			{
+				bone.parIndx_ = pParent->index;
+			}
+			else
+			{
+				bone.parIndx_ = 0;
+			}
+
+			bones_.append(bone);
 		}
 	}
 
