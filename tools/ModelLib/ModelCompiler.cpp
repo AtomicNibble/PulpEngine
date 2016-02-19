@@ -144,6 +144,7 @@ void ModelCompiler::Stats::clear(void)
 	totalVerts = 0;
 	totalFaces = 0;
 	totalWeightsDropped = 0;
+	totalMeshMerged = 0;
 
 	droppedBoneNames.clear();
 	droppedBoneNames.setGranularity(16);
@@ -718,8 +719,10 @@ bool ModelCompiler::MergMesh(void)
 	// mesh with same materials can be merged.
 	for (auto& lod : lods_)
 	{
-		for (auto& mesh : lod.meshes_)
+		for (size_t j = 0; j < lod.meshes_.size(); j++)
 		{
+			auto& mesh = lod.meshes_[j];
+
 			for (size_t i = 0; i < lod.meshes_.size(); i++)
 			{
 				auto& othMesh = lod.meshes_[i];
@@ -732,6 +735,11 @@ bool ModelCompiler::MergMesh(void)
 						mesh.merge(othMesh);
 
 						lod.meshes_.removeIndex(i);
+
+						// reset search, since remove can re-order.
+						i = 0;
+
+						stats_.totalMeshMerged++;
 					}
 				}
 			}
@@ -846,6 +854,8 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 			RawModel::Mesh::VertsArr v(arena_);
 
 			v.swap(mesh.verts_);
+			// prevent resize in 
+			mesh.verts_.reserve(v.size());
 
 			size_t numEqual = 0;
 			size_t numUnique = 0;
@@ -906,13 +916,15 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 					{
 						numUnique++;
 
-						face[x] = safe_static_cast<int, size_t>(mesh.verts_.append(vert));
+						size_t vertIdx = mesh.verts_.append(vert);
+
+						face[x] = safe_static_cast<int, size_t>(vertIdx);
 					//	if (vert.numWeights > 0) {
 					//		CompBinds[vert.numWeights - 1]++;
 					//	}
 
 						Hashcontainer temp;
-						temp.pVert = &mesh.verts_[mesh.verts_.size() - 1];
+						temp.pVert = &mesh.verts_[vertIdx];
 						temp.idx = face[x];
 
 						// add hash.

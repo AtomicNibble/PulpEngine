@@ -48,6 +48,7 @@ public:
 		uint32_t totalVerts;
 		uint32_t totalFaces;
 		uint32_t totalWeightsDropped;
+		uint32_t totalMeshMerged;
 
 		core::Array<core::StackString<128>>
 			droppedBoneNames;
