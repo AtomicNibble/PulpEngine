@@ -807,7 +807,7 @@ MStatus ModelExporter::loadBones(void)
 	MStatus			status;
 	MDagPath		dagPath;
 	MFnDagNode		*parentNode;
-	MayaBone		*bone;
+	MayaBone		*pMayaBone;
 	uint				i, j;
 
 	float scale = 1.f; // g_options.scale_;
@@ -847,29 +847,29 @@ MStatus ModelExporter::loadBones(void)
 
 		if (new_bone.name.length() > model::MODEL_MAX_BONE_NAME_LENGTH)
 		{
-			MayaUtil::MayaPrintError("Joints: max bone name length exceeded, MAX: %i '%' -> %i",
+			MayaUtil::MayaPrintError("Joints: max pMayaBone name length exceeded, MAX: %i '%' -> %i",
 				model::MODEL_MAX_BONE_NAME_LENGTH, new_bone.name.c_str(), new_bone.name.length());
 			return MStatus::kFailure;
 		}
 
 		size_t idx = mayaBones_.append(new_bone);
 
-		bone = &mayaBones_[idx];
-		bone->index = safe_static_cast<int, size_t>((mayaBones_.size() - 1));
+		pMayaBone = &mayaBones_[idx];
+		pMayaBone->index = safe_static_cast<int, size_t>((mayaBones_.size() - 1));
 	}
 
 
 	// create hierarchy
-	bone = mayaBones_.ptr();
-	for (i = 0; i < mayaBones_.size(); i++, bone++) {
-		if (!bone->dagnode) {
+	pMayaBone = mayaBones_.ptr();
+	for (i = 0; i < mayaBones_.size(); i++, pMayaBone++) {
+		if (!pMayaBone->dagnode) {
 			continue;
 		}
 
-		bone->mayaNode.setParent(mayaHead_);
-		bone->exportNode.setParent(exportHead_);
+		pMayaBone->mayaNode.setParent(mayaHead_);
+		pMayaBone->exportNode.setParent(exportHead_);
 
-		parentNode = GetParentBone(bone->dagnode);
+		parentNode = GetParentBone(pMayaBone->dagnode);
 		if (parentNode) {
 
 			// do we have this joint?
@@ -879,16 +879,16 @@ MStatus ModelExporter::loadBones(void)
 				}
 
 				if (mayaBones_[j].dagnode->name() == parentNode->name()) {
-					bone->mayaNode.setParent(mayaBones_[j].mayaNode);
-					bone->exportNode.setParent(mayaBones_[j].exportNode);
+					pMayaBone->mayaNode.setParent(mayaBones_[j].mayaNode);
+					pMayaBone->exportNode.setParent(mayaBones_[j].exportNode);
 					break;
 				}
 			}
 			X_DELETE(parentNode, g_arena);
 		}
 
-		bone->dagnode->getPath(dagPath);
-		status = getBindPose(dagPath.node(&status), bone, scale);
+		pMayaBone->dagnode->getPath(dagPath);
+		status = getBindPose(dagPath.node(&status), pMayaBone, scale);
 		if (!status) {
 			return status;
 		}
@@ -898,7 +898,7 @@ MStatus ModelExporter::loadBones(void)
 	{
 		bones_.reserve(mayaBones_.size());
 
-		MayaBone* pMayaBone = nullptr;
+		pMayaBone = nullptr;
 		for (pMayaBone = exportHead_.next(); pMayaBone != nullptr;
 				pMayaBone = pMayaBone->exportNode.next())
 		{
