@@ -894,6 +894,12 @@ MStatus ModelExporter::loadBones(void)
 		}
 	}
 
+	// update idx's
+	uint32_t index = 0;
+	for (pMayaBone = exportHead_.next(); pMayaBone != nullptr; pMayaBone = pMayaBone->exportNode.next()) {
+		pMayaBone->index = index++;
+	}
+
 	// fill in the raw bones.
 	{
 		bones_.reserve(mayaBones_.size());
@@ -915,7 +921,7 @@ MStatus ModelExporter::loadBones(void)
 			}
 			else
 			{
-				bone.parIndx_ = 0;
+				bone.parIndx_ = -1;
 			}
 
 			bones_.append(bone);
