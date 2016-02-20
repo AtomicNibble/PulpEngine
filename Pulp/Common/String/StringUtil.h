@@ -50,6 +50,14 @@ namespace strUtil
 
 	inline bool IsNumeric(const char* str);
 
+	bool IsLower(const char character);
+	bool IsLowerW(const wchar_t character);
+
+	bool IsLower(const char* startInclusive);
+	bool IsLower(const char* startInclusive, const char* endExclusive);
+
+	bool IsLower(const wchar_t* startInclusive);
+	bool IsLower(const wchar_t* startInclusive, const wchar_t* endExclusive);
 
 	/// Converts a wide-character string into a single-byte character string, and returns the converted string.
 	template <size_t N>

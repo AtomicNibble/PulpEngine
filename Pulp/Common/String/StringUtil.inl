@@ -35,7 +35,6 @@ namespace strUtil
 		return ((character >= '0') && (character <= '9'));
 	}
 
-
 	inline bool IsNumeric(const char* str)
 	{
 		size_t	i;

@@ -4,6 +4,7 @@
 
 #include "StrRef.h"	
 #include <string>
+#include <locale>
 
 #include <direct.h>
 
@@ -255,6 +256,28 @@ namespace strUtil
 		}
 
 	} // namespace
+
+
+	bool IsLower(const char character)
+	{
+		std::locale loc;
+		return std::islower(character, loc);
+	}
+
+	bool IsLower(const char* startInclusive)
+	{
+		return IsLower(startInclusive, startInclusive + strlen(startInclusive));
+	}
+
+	bool IsLower(const char* startInclusive, const char* endExclusive)
+	{
+		std::locale loc;
+
+		return std::find_if(startInclusive, endExclusive, [&](char c) { 
+			return std::islower(c, loc);
+		}) != endExclusive;
+	}
+
 
 	size_t strlen(const char* str)
 	{

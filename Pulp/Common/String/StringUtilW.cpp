@@ -4,6 +4,7 @@
 #include "StrRef.h"	
 
 #include <direct.h>
+#include <locale>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -53,6 +54,27 @@ namespace strUtil
 
 		return buf;
 	}
+
+	bool IsLowerW(const wchar_t character)
+	{
+		std::locale loc;
+		return std::islower(character, loc);
+	}
+
+	bool IsLower(const wchar_t* startInclusive)
+	{
+		return IsLower(startInclusive, startInclusive + strlen(startInclusive));
+	}
+
+	bool IsLower(const wchar_t* startInclusive, const wchar_t* endExclusive)
+	{
+		std::locale loc;
+
+		return std::find_if(startInclusive, endExclusive, [&](wchar_t c) {
+			return std::islower(c, loc);
+		}) != endExclusive;
+	}
+
 
 	unsigned int Count(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what)
 	{
