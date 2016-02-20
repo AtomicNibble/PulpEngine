@@ -156,7 +156,7 @@ void ModelCompiler::Stats::clear(void)
 }
 
 ModelCompiler::ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
-	RawModel::Model(arena),
+	RawModel::Model(arena, pJobSys),
 	pJobSys_(pJobSys),
 	vertexElipsion_(MERGE_VERTEX_ELIPSION),
 	texcoordElipson_(MERGE_TEXCOORDS_ELIPSION),
