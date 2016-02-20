@@ -801,6 +801,8 @@ namespace RawModel
 			}
 		}
 
+		pCurBuf->append("\n");
+
 		dataArr.append(pCurBuf);
 	}
 
