@@ -99,7 +99,9 @@ static const uint32_t	 MODEL_MAX_BONES = 255;
 static const uint32_t	 MODEL_MAX_BONE_NAME_LENGTH = 64;
 static const uint32_t	 MODEL_MAX_MESH = 64;
 static const uint32_t	 MODEL_MAX_VERTS = (1 << 16) - 1;
-static const uint32_t	 MODEL_MAX_FACES = MODEL_MAX_VERTS;
+static const uint32_t	 MODEL_MAX_INDEXS = MODEL_MAX_VERTS;
+static const uint32_t	 MODEL_MAX_FACES = MODEL_MAX_INDEXS / 3;
+
 // humm might make this 8 (would be for faces, probs make it a option)
 static const uint32_t	 MODEL_MAX_VERT_BINDS = 4; 
 static const uint32_t	 MODEL_MAX_LODS = 4;
