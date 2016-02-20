@@ -269,7 +269,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 		MayaUtil::SetProgressText("Compiling model");
 
 		{
-			PROFILE_MAYA_NAME("Save compiled");
+			PROFILE_MAYA_NAME("Compile and save");
 
 			if (!CompileModel(outPath)) {
 				MayaUtil::MayaPrintError("Failed to compile model");
@@ -300,10 +300,12 @@ void ModelExporter::printStats(void) const
 	core::StackString<2048> info;
 
 	info.append("\nModel Info:\n");
-	info.appendFmt("> Total Lods: %i", stats_.totalLods);
+	info.appendFmt("> Compile Time: %fms", stats_.compileTime.GetMilliSeconds());
+	info.appendFmt("\n> Total Lods: %i", stats_.totalLods);
 	info.appendFmt("\n> Total Mesh: %i", stats_.totalMesh);
+	info.appendFmt("\n> Total Mesh merged: %i", stats_.totalMeshMerged);
 	info.appendFmt("\n> Total Joints: %i", stats_.totalJoints);
-	info.appendFmt("\n> Total Joints Dropped: %i", stats_.totalJointsDropped);
+	info.appendFmt("\n> Total Joints dropped: %i", stats_.totalJointsDropped);
 
 
 	if (stats_.droppedBoneNames.size() > 0) {
@@ -328,7 +330,7 @@ void ModelExporter::printStats(void) const
 
 	info.appendFmt("\n> Total Verts: %i", stats_.totalVerts);
 	info.appendFmt("\n> Total Faces: %i", stats_.totalFaces);
-	info.appendFmt("\n> Total eights Dropped: %i", stats_.totalWeightsDropped);
+	info.appendFmt("\n> Total Weights dropped: %i", stats_.totalWeightsDropped);
 	info.append("\n");
 
 	if (stats_.totalWeightsDropped > 0) {
@@ -807,7 +809,7 @@ MStatus ModelExporter::loadBones(void)
 	MStatus			status;
 	MDagPath		dagPath;
 	MFnDagNode		*parentNode;
-	MayaBone		*bone;
+	MayaBone		*pMayaBone;
 	uint				i, j;
 
 	float scale = 1.f; // g_options.scale_;
@@ -847,29 +849,29 @@ MStatus ModelExporter::loadBones(void)
 
 		if (new_bone.name.length() > model::MODEL_MAX_BONE_NAME_LENGTH)
 		{
-			MayaUtil::MayaPrintError("Joints: max bone name length exceeded, MAX: %i '%' -> %i",
+			MayaUtil::MayaPrintError("Joints: max pMayaBone name length exceeded, MAX: %i '%' -> %i",
 				model::MODEL_MAX_BONE_NAME_LENGTH, new_bone.name.c_str(), new_bone.name.length());
 			return MStatus::kFailure;
 		}
 
 		size_t idx = mayaBones_.append(new_bone);
 
-		bone = &mayaBones_[idx];
-		bone->index = safe_static_cast<int, size_t>((mayaBones_.size() - 1));
+		pMayaBone = &mayaBones_[idx];
+		pMayaBone->index = safe_static_cast<int, size_t>((mayaBones_.size() - 1));
 	}
 
 
 	// create hierarchy
-	bone = mayaBones_.ptr();
-	for (i = 0; i < mayaBones_.size(); i++, bone++) {
-		if (!bone->dagnode) {
+	pMayaBone = mayaBones_.ptr();
+	for (i = 0; i < mayaBones_.size(); i++, pMayaBone++) {
+		if (!pMayaBone->dagnode) {
 			continue;
 		}
 
-		bone->mayaNode.setParent(mayaHead);
-		bone->exportNode.setParent(exportHead);
+		pMayaBone->mayaNode.setParent(mayaHead_);
+		pMayaBone->exportNode.setParent(exportHead_);
 
-		parentNode = GetParentBone(bone->dagnode);
+		parentNode = GetParentBone(pMayaBone->dagnode);
 		if (parentNode) {
 
 			// do we have this joint?
@@ -879,18 +881,52 @@ MStatus ModelExporter::loadBones(void)
 				}
 
 				if (mayaBones_[j].dagnode->name() == parentNode->name()) {
-					bone->mayaNode.setParent(mayaBones_[j].mayaNode);
-					bone->exportNode.setParent(mayaBones_[j].exportNode);
+					pMayaBone->mayaNode.setParent(mayaBones_[j].mayaNode);
+					pMayaBone->exportNode.setParent(mayaBones_[j].exportNode);
 					break;
 				}
 			}
 			X_DELETE(parentNode, g_arena);
 		}
 
-		bone->dagnode->getPath(dagPath);
-		status = getBindPose(dagPath.node(&status), bone, scale);
+		pMayaBone->dagnode->getPath(dagPath);
+		status = getBindPose(dagPath.node(&status), pMayaBone, scale);
 		if (!status) {
 			return status;
+		}
+	}
+
+	// update idx's
+	uint32_t index = 0;
+	for (pMayaBone = exportHead_.next(); pMayaBone != nullptr; pMayaBone = pMayaBone->exportNode.next()) {
+		pMayaBone->index = index++;
+	}
+
+	// fill in the raw bones.
+	{
+		bones_.reserve(mayaBones_.size());
+
+		pMayaBone = nullptr;
+		for (pMayaBone = exportHead_.next(); pMayaBone != nullptr;
+				pMayaBone = pMayaBone->exportNode.next())
+		{
+			model::RawModel::Bone bone;
+			bone.name_ = pMayaBone->name.c_str();
+			bone.rotation_ = pMayaBone->bindm33;
+			bone.worldPos_ = pMayaBone->bindpos;
+			
+			MayaBone* pParent = pMayaBone->exportNode.parent();
+
+			if (pParent)
+			{
+				bone.parIndx_ = pParent->index;
+			}
+			else
+			{
+				bone.parIndx_ = -1;
+			}
+
+			bones_.append(bone);
 		}
 	}
 

@@ -15,33 +15,33 @@ XDiskFile::~XDiskFile()
 
 }
 
-uint32_t XDiskFile::read(void* buffer, uint32_t length)
+size_t XDiskFile::read(void* buffer, size_t length)
 {
 	return file_.read(buffer, length);
 }
 
-uint32_t XDiskFile::write(const void* buffer, uint32_t length)
+size_t XDiskFile::write(const void* buffer, size_t length)
 {
 	return file_.write(buffer, length);
 }
 
 
-void XDiskFile::seek(size_t position, SeekMode::Enum origin)
+void XDiskFile::seek(int64_t position, SeekMode::Enum origin)
 {
-	return file_.seek(position, origin);
+	file_.seek(position, origin);
 }
 
-size_t XDiskFile::remainingBytes(void) const
+uint64_t XDiskFile::remainingBytes(void) const
 {
 	return file_.remainingBytes();
 }
 
-size_t XDiskFile::tell(void) const
+uint64_t XDiskFile::tell(void) const
 {
 	return file_.tell();
 }
 
-void XDiskFile::setSize(size_t numBytes)
+void XDiskFile::setSize(int64_t numBytes)
 {
 	file_.setSize(numBytes);
 }

@@ -311,7 +311,6 @@ struct MayaBone
 	MFnDagNode* dagnode;
 
 	uint32_t index;
-	uint32_t exportIdx;
 
 	Vec3f		bindpos;
 	Matrix33f	bindm33;
@@ -376,8 +375,8 @@ private:
 	core::Array<MayaBone>	mayaBones_;
 	MayaBone				tagOrigin_;
 
-	Hierarchy<MayaBone>		mayaHead;
-	Hierarchy<MayaBone>		exportHead;
+	Hierarchy<MayaBone>		mayaHead_;
+	Hierarchy<MayaBone>		exportHead_;
 
 	LodInfoArr lodExpoInfo_;
 };

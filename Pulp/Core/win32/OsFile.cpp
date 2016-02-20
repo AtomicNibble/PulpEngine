@@ -4,6 +4,7 @@
 
 #include "IFileSys.h"
 
+#include <String\HumanSize.h>
 
 
 X_NAMESPACE_BEGIN(core)
@@ -47,16 +48,18 @@ mode_(mode)
 		s_stats.NumFilesOpened++;
 #endif // !X_ENABLE_FILE_STATS
 
-		if (mode.IsSet(IFileSys::fileModeFlags::APPEND))
+		if (mode.IsSet(IFileSys::fileModeFlags::APPEND)) {
 			this->seek(0, SeekMode::END);
+		}
 	}
 }
 
 
 OsFile::~OsFile(void)
 {
-	if (valid())
+	if (valid()) {
 		CloseHandle(file_);
+	}
 }
 
 // ------------------------------------------------------------------------------------------
@@ -64,7 +67,7 @@ OsFile::~OsFile(void)
 
 
 
-uint32_t OsFile::read(void* buffer, uint32_t length)
+size_t OsFile::read(void* buffer, size_t length)
 {
 	if (!mode_.IsSet(fileMode::READ)) {
 		IFileSys::fileModeFlags::Description Dsc;
@@ -72,8 +75,16 @@ uint32_t OsFile::read(void* buffer, uint32_t length)
 		return 0;
 	}
 
+	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
+
+	if (length > std::numeric_limits<uint32_t>::max()) {
+		core::HumanSize::Str humanStr;
+		X_ERROR("AsyncFile", "Can't make a read request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
+		return 0;
+	}
+
 	DWORD NumRead = 0;
-	if (::ReadFile(file_, buffer, length, &NumRead, 0)) {
+	if (::ReadFile(file_, buffer, length32, &NumRead, 0)) {
 #if X_ENABLE_FILE_STATS
 		s_stats.NumBytesRead += NumRead;
 #endif // !X_ENABLE_FILE_STATS
@@ -89,7 +100,7 @@ uint32_t OsFile::read(void* buffer, uint32_t length)
 }
 
 
-uint32_t OsFile::write(const void* buffer, uint32_t length)
+size_t OsFile::write(const void* buffer, size_t length)
 {
 	if (!mode_.IsSet(fileMode::WRITE)) {
 		IFileSys::fileModeFlags::Description Dsc;
@@ -97,8 +108,16 @@ uint32_t OsFile::write(const void* buffer, uint32_t length)
 		return 0;
 	}
 
+	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
+
+	if (length > std::numeric_limits<uint32_t>::max()) {
+		core::HumanSize::Str humanStr;
+		X_ERROR("AsyncFile", "Can't make a write request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
+		return 0;
+	}
+
 	DWORD NumWrite = 0;
-	if (::WriteFile(file_, buffer, length, &NumWrite, 0)) {
+	if (::WriteFile(file_, buffer, length32, &NumWrite, 0)) {
 #if X_ENABLE_FILE_STATS
 		s_stats.NumBytesWrite += NumWrite;
 #endif // !X_ENABLE_FILE_STATS
@@ -114,7 +133,7 @@ uint32_t OsFile::write(const void* buffer, uint32_t length)
 }
 
 
-void OsFile::seek(size_t position, IFileSys::SeekMode::Enum origin)
+void OsFile::seek(int64_t position, IFileSys::SeekMode::Enum origin)
 {
 	// is this condition correct?
 	if (!mode_.IsSet(fileMode::RANDOM_ACCESS) && !mode_.IsSet(fileMode::APPEND)) {
@@ -137,7 +156,7 @@ void OsFile::seek(size_t position, IFileSys::SeekMode::Enum origin)
 	}
 }
 
-size_t OsFile::tell(void) const
+uint64_t OsFile::tell(void) const
 {
 	LARGE_INTEGER Move, current;
 	Move.QuadPart = 0;
@@ -152,15 +171,11 @@ size_t OsFile::tell(void) const
 		X_ERROR("File", "Failed to tell() file. Error: %s", lastError::ToString(dsc));
 	}
 
-#if X_64 == 1
 	return current.QuadPart;
-#else
-	return current.LowPart;
-#endif
 }
 
 
-size_t OsFile::remainingBytes(void) const
+uint64_t OsFile::remainingBytes(void) const
 {
 	_BY_HANDLE_FILE_INFORMATION info;
 
@@ -174,17 +189,12 @@ size_t OsFile::remainingBytes(void) const
 		X_ERROR("File", "Can't Get file information. Error: %s", lastError::ToString(dsc));
 	}
 
-#if X_64 == 1
 	return MAKEQWORD(info.nFileSizeHigh, info.nFileSizeLow) - tell();
-#else
-	X_ASSERT(info.nFileSizeHigh == 0, "tell was called on a file larger than 1 << 32 not supported in 32bit build")(info.nFileSizeHigh);
-	return info.nFileSizeLow - tell();
-#endif
 }
 
-void OsFile::setSize(size_t numBytes)
+void OsFile::setSize(int64_t numBytes)
 {
-	size_t currentPos = tell();
+	uint64_t currentPos = tell();
 
 	seek(numBytes, SeekMode::SET);
 

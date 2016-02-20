@@ -58,7 +58,7 @@ bool XRender::LoadResourceDeffintion(void)
 
 	if (file.openFile(path.c_str(), core::fileMode::READ))
 	{
-		length = file.remainingBytes();
+		length = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 
 		char* pText = X_NEW_ARRAY_ALIGNED(char, length + 1, g_rendererArena, "RenderXMLBuf", 4);
 

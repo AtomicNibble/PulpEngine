@@ -12,6 +12,14 @@ X_NAMESPACE_DECLARE(core,
 class XLexer
 );
 
+X_NAMESPACE_DECLARE(core,
+	namespace V2 {
+		class JobSystem;
+		struct Job;
+	}
+);
+
+
 X_NAMESPACE_BEGIN(model)
 
 namespace RawModel
@@ -25,7 +33,7 @@ namespace RawModel
 		static const int32_t VERSION;
 
 	public:
-		Model(core::MemoryArenaBase* arena);
+		Model(core::MemoryArenaBase* arena, core::V2::JobSystem* pJobSys = nullptr);
 		~Model() = default;
 
 		void Clear(void);
@@ -48,13 +56,37 @@ namespace RawModel
 
 		bool ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut);
 
-		bool WriteBones(FILE* f) const;
-		bool WriteLods(FILE* f) const;
-		bool WriteMesh(FILE* f, const Mesh& mesh) const;
-		bool WriteMaterials(FILE* f, const Material& mat) const;
+		bool WriteBones(core::XFile* f) const;
+		bool WriteLods(core::XFile* f) const;
+		bool WriteMeshes(core::XFile* f, const Lod& lod) const;
+		bool WriteMesh(core::XFile* f, const Mesh& mesh) const;
+		bool WriteMaterials(core::XFile* f, const Material& mat) const;
 		
-		
+	private:
+		typedef core::StackString<262144, char> MeshDataStr;
+		typedef core::Array<MeshDataStr*> MeshDataStrArr;
+
+		struct MeshWriteData
+		{
+			X_INLINE MeshWriteData(core::MemoryArenaBase* arena_) :
+				arena(arena_),
+				data(arena), 
+				pMesh(nullptr),
+				pJob(nullptr)
+			{}
+
+			core::MemoryArenaBase* arena;
+			MeshDataStrArr data;
+			const RawModel::Mesh* pMesh;
+			core::V2::Job* pJob;
+		};
+
+		typedef core::Array<MeshWriteData> MeshWriteDataArr;
+
+		static void WriteMeshDataJob(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData);
+
 	protected:
+		core::V2::JobSystem* pJobSys_;
 		core::MemoryArenaBase* arena_;
 
 		BoneArr bones_;

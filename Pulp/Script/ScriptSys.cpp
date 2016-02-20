@@ -385,7 +385,8 @@ bool XScriptSys::ExecuteFile_Internal(const core::Path<char>& path, bool silent)
 
 	if (file)
 	{
-		res = ExecuteBuffer(file->getBufferStart(), file->getSize(), path.c_str());
+		res = ExecuteBuffer(file->getBufferStart(), 
+			safe_static_cast<size_t, uint64_t>(file->getSize()), path.c_str());
 
 		pFileSys_->closeFileMem(file);
 	}

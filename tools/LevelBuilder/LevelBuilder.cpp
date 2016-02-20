@@ -177,7 +177,7 @@ void CompileLevel(core::Path<char>& path)
 		LvlBuilder lvl;
 
 		//	parse the map file.
-		if (map.Parse(pFile->getBufferStart(),pFile->getSize()))
+		if (map.Parse(pFile->getBufferStart(), safe_static_cast<size_t, uint64_t>(pFile->getSize())))
 		{
 			core::TimeVal elapsed = stopwatch.GetTimeVal();
 			{

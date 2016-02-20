@@ -311,7 +311,7 @@ int XBinds_Io_File::readBytes(IFunctionHandler* pH, core::XFile* pFile, uint32_t
 	core::Array<char> temp(g_ScriptArena);
 	temp.resize(readSize + 1);
 
-	numRead = pFile->read(temp.ptr(), readSize);
+	numRead = safe_static_cast<uint32_t, size_t>(pFile->read(temp.ptr(), readSize));
 
 	temp[numRead] = '\0';
 

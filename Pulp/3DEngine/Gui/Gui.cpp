@@ -185,7 +185,7 @@ bool XGui::InitFromFile(const char* name)
 			if(file.openFile(path.c_str(), mode))
 			{
 				sourceCrc32_ = pCrc32->GetCRC32(file->getBufferStart(), 
-					safe_static_cast<int32_t, size_t>(file->getSize()));
+					safe_static_cast<size_t, uint64_t>(file->getSize()));
 
 				if(hdr.crc32 != sourceCrc32_)
 				{
@@ -221,7 +221,7 @@ SourceLoad:
 	if(sourceCrc32_ == 0)
 	{
 		sourceCrc32_ = pCrc32->GetCRC32(file->getBufferStart(), 
-			file->getSize());
+			safe_static_cast<size_t, uint64_t>(file->getSize()));
 	}
 
 	X_LOG0("Gui", "parsing: \"%s\"", path.c_str());
@@ -304,7 +304,7 @@ bool XGui::SaveBinaryVersion(void)
 			return false;
 		}
 
-		hdr.fileSize = safe_static_cast<uint32_t, size_t>(file.tell());
+		hdr.fileSize = safe_static_cast<uint32_t, uint64_t>(file.tell());
 
 		file.seek(0, core::SeekMode::SET);
 

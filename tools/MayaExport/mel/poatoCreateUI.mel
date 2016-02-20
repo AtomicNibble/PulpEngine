@@ -149,7 +149,7 @@ global proc uvMergeThresholdUpdate()
 
 global proc vertMergeThresholdUpdate()
 {
-	float $val = `floatSliderGrp -q -v vertMergeThresholdCntl`;
+	float $val = `floatSliderGrp -q -v vertMergeThreshCntl`;
 	setAttr ("PotatoGNode.vertMergeThreshold") $val;
 }
 

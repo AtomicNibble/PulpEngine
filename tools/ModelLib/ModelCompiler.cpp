@@ -2,6 +2,7 @@
 #include "ModelCompiler.h"
 
 #include <Threading\JobSystem2.h>
+#include <Time\StopWatch.h>
 
 #include <IModel.h>
 
@@ -74,8 +75,10 @@ ModelCompiler::Stats::Stats(core::MemoryArenaBase* arena) :
 void ModelCompiler::Stats::print(void) const
 {
 	X_LOG0("Model", "Model Info:");
+	X_LOG0("Model", "> Compile Time: %fms", compileTime.GetMilliSeconds());
 	X_LOG0("Model", "> Total Lods: %i", totalLods);
 	X_LOG0("Model", "> Total Mesh: %i", totalMesh);
+	X_LOG0("Model", "> Total Mesh Merged: %i", totalMeshMerged);
 	X_LOG0("Model", "> Total Joints: %i", totalJoints);
 	X_LOG0("Model", "> Total Joints Dropped: %i", totalJointsDropped);
 
@@ -144,6 +147,7 @@ void ModelCompiler::Stats::clear(void)
 	totalVerts = 0;
 	totalFaces = 0;
 	totalWeightsDropped = 0;
+	totalMeshMerged = 0;
 
 	droppedBoneNames.clear();
 	droppedBoneNames.setGranularity(16);
@@ -152,7 +156,7 @@ void ModelCompiler::Stats::clear(void)
 }
 
 ModelCompiler::ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
-	RawModel::Model(arena),
+	RawModel::Model(arena, pJobSys),
 	pJobSys_(pJobSys),
 	vertexElipsion_(MERGE_VERTEX_ELIPSION),
 	texcoordElipson_(MERGE_TEXCOORDS_ELIPSION),
@@ -210,9 +214,15 @@ bool ModelCompiler::CompileModel(core::Path<wchar_t>& outFile)
 	// if you want to make a engine model it must first be loaded into a raw model
 	// that way the opermisation and format writer logic can all be in one place.
 	// So i don't have to update the maya plugin and the converter when i edit the model format or change optermisations.
-	if (!ProcessModel()) {
-		X_ERROR("Model", "Failed to compile model");
-		return false;
+	{
+		core::StopWatch timer;
+
+		if (!ProcessModel()) {
+			X_ERROR("Model", "Failed to compile model");
+			return false;
+		}
+
+		stats_.compileTime = timer.GetTimeVal();
 	}
 
 	// save it.
@@ -718,8 +728,10 @@ bool ModelCompiler::MergMesh(void)
 	// mesh with same materials can be merged.
 	for (auto& lod : lods_)
 	{
-		for (auto& mesh : lod.meshes_)
+		for (size_t j = 0; j < lod.meshes_.size(); j++)
 		{
+			auto& mesh = lod.meshes_[j];
+
 			for (size_t i = 0; i < lod.meshes_.size(); i++)
 			{
 				auto& othMesh = lod.meshes_[i];
@@ -732,6 +744,11 @@ bool ModelCompiler::MergMesh(void)
 						mesh.merge(othMesh);
 
 						lod.meshes_.removeIndex(i);
+
+						// reset search, since remove can re-order.
+						i = 0;
+
+						stats_.totalMeshMerged++;
 					}
 				}
 			}
@@ -846,6 +863,8 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 			RawModel::Mesh::VertsArr v(arena_);
 
 			v.swap(mesh.verts_);
+			// prevent resize in 
+			mesh.verts_.reserve(v.size());
 
 			size_t numEqual = 0;
 			size_t numUnique = 0;
@@ -906,13 +925,15 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 					{
 						numUnique++;
 
-						face[x] = safe_static_cast<int, size_t>(mesh.verts_.append(vert));
+						size_t vertIdx = mesh.verts_.append(vert);
+
+						face[x] = safe_static_cast<int, size_t>(vertIdx);
 					//	if (vert.numWeights > 0) {
 					//		CompBinds[vert.numWeights - 1]++;
 					//	}
 
 						Hashcontainer temp;
-						temp.pVert = &mesh.verts_[mesh.verts_.size() - 1];
+						temp.pVert = &mesh.verts_[vertIdx];
 						temp.idx = face[x];
 
 						// add hash.
