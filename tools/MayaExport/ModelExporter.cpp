@@ -416,6 +416,9 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	if (idx != MArgList::kInvalidArgIndex) {
 		MayaUtil::SetVerbose(true);
 	}
+	else {
+		MayaUtil::SetVerbose(false);
+	}
 
 	idx = args.flagIndex("scale");
 	if (idx != MArgList::kInvalidArgIndex) {
@@ -651,9 +654,6 @@ MStatus ModelExporter::loadLODs(void)
 
 		// reserver the meshes.
 		lod.meshes_.resize(numMesh, model::RawModel::Mesh(g_arena));
-
-	//	float scale = g_options.scale_;
-	//	float jointThreshold = g_options.jointThreshold_;
 
 		MFloatPointArray	vertexArray;
 		MFloatVectorArray	normalsArray, tangentsArray, binormalsArray;
