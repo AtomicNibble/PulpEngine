@@ -5,6 +5,7 @@
 #include <Time\StopWatch.h>
 
 #include <IModel.h>
+#include <IMaterial.h>
 
 X_DISABLE_WARNING(4702)
 #include <algorithm>
@@ -125,15 +126,6 @@ void ModelCompiler::Stats::print(void) const
 		info.set("> Dimensions: ");
 		info.appendFmt("w: %g d: %g h: %g", size[0], size[1], size[2]);
 		X_LOG0("Model", info.c_str());
-
-/*
-		if (stats_.unitOfMeasurement_ == PotatoOptions::INCHES) {
-			info.append(" (inches)");
-		}
-		else {
-			info.append(" (cm)");
-		}
-		*/
 	}
 }
 
@@ -685,6 +677,11 @@ bool ModelCompiler::ProcessModel(void)
 		return false;
 	}
 
+	if (!CheckLimits()) {
+		X_ERROR("Model", "Model exceeds limits");
+		return false;
+	}
+
 	return true;
 }
 
@@ -843,6 +840,108 @@ bool ModelCompiler::UpdateMeshBounds(void)
 }
 
 
+bool ModelCompiler::CheckLimits(void)
+{
+	// check the model is below the engines limits.
+	// we do this after merging, since if you create 80 meshes with all the same texture and they only added 
+	// up to 2k verts there is no reason we can't support that even tho mesh limit is 64.
+
+	if (bones_.size() > model::MODEL_MAX_BONES) {
+		X_ERROR("Model", "Bone count '%" PRIuS "' exceeds limit of: %i",
+			bones_.size(), model::MODEL_MAX_BONES);
+		return false;
+	}
+
+	// check the bone name lengths
+	for (const auto& bone : bones_)
+	{
+		if (bone.name_.length() > model::MODEL_MAX_BONE_NAME_LENGTH) {
+			X_ERROR("Model", "Bone name length '%s(%" PRIuS ")' exceeds limit of: %i",
+				bone.name_.c_str(), bone.name_.length(), model::MODEL_MAX_BONE_NAME_LENGTH);
+			return false;
+		}	
+
+		// ensure we are lower case if it's turned on.
+#if X_MODEL_BONES_LOWER_CASE_NAMES
+		if (!core::strUtil::IsLower(bone.name_.begin(), bone.name_.end())) {
+			X_ERROR("Model", "Source code defect bone name is not lowercase '%s'",
+				bone.name_.c_str());
+			return false;
+		}
+#endif // !X_MODEL_BONES_LOWER_CASE_NAMES
+	}
+
+	for (size_t i = 0; i < lods_.size(); i++)
+	{
+		const auto& lod = lods_[i];
+
+		// check vert / face limits.
+		size_t numVerts = lod.totalVerts();
+		size_t numIndex = lod.totalIndexs();
+
+		// print both vert and index limit issues to give more of info about the problem.
+		bool invalid = false;
+
+		if (numVerts > model::MODEL_MAX_VERTS) {
+			X_ERROR("Model", "LOD(%" PRIuS ") vert count '%" PRIuS "' exceeds limit of: %i",
+				i, numVerts, model::MODEL_MAX_VERTS);
+			invalid = false;
+		}
+		// index not face!
+		if (numIndex > model::MODEL_MAX_INDEXS) {
+			X_ERROR("Model", "LOD(%" PRIuS ") index count '%" PRIuS "' exceeds limit of: %i",
+				i, numIndex, model::MODEL_MAX_INDEXS);
+			invalid = false;
+		}
+
+		if (invalid) {
+			return false;
+		}
+
+		for (const auto& mesh : lod.meshes_)
+		{
+			const auto& mat = mesh.material_;
+
+			if (mat.name_.length() > engine::MTL_MATERIAL_MAX_LEN) {
+				X_ERROR("Model", "Material name length '%s(%" PRIuS ")' exceeds limit of: %i mesh: \"%s:%s\"",
+					mat.name_.c_str(), mat.name_.length(), engine::MTL_MATERIAL_MAX_LEN,
+					// so some potentially helpful info.
+					mesh.name_.c_str(), mesh.displayName_.c_str());
+				return false;
+			}
+
+			// ensure we are lower case if it's turned on.
+#if X_MODEL_MTL_LOWER_CASE_NAMES
+			if (!core::strUtil::IsLower(mat.name_.begin(), mat.name_.end())) {
+				X_ERROR("Model", "Source code defect material name is not lowercase '%s'",
+					mat.name_.c_str());
+				return false;
+			}
+#endif // !X_MODEL_MTL_LOWER_CASE_NAMES
+		}
+	}
+
+	// check each lods.
+	if (bones_.size() > model::MODEL_MAX_BONES) {
+		X_ERROR("Model", "Bone count '%" PRIuS "' exceeds limit of: %i",
+			bones_.size(), model::MODEL_MAX_BONES);
+		return false;
+	}
+
+
+	// basically impossible, but check it anyway.
+	if (lods_.size() > model::MODEL_MAX_LODS) {
+		X_ERROR("Model", "Bone count '%" PRIuS "' exceeds limit of: %i",
+			lods_.size(), model::MODEL_MAX_LODS);
+
+		// notify me we did something impossible.
+		X_ASSERT_UNREACHABLE();
+		return false;
+	}
+
+	return true;
+}
+
 void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 {
 	size_t meshIdx;
@@ -927,7 +1026,7 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 
 						size_t vertIdx = mesh.verts_.append(vert);
 
-						face[x] = safe_static_cast<int, size_t>(vertIdx);
+						face[x] = safe_static_cast<RawModel::Index, size_t>(vertIdx);
 					//	if (vert.numWeights > 0) {
 					//		CompBinds[vert.numWeights - 1]++;
 					//	}

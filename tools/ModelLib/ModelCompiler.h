@@ -89,6 +89,7 @@ private:
 	bool SortVerts(void);
 	bool MergVerts(void);
 	bool UpdateMeshBounds(void);
+	bool CheckLimits(void);
 
 private:
 	void MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count);
