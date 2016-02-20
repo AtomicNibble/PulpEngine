@@ -9,6 +9,10 @@
 
 #include <Time\StopWatch.h>
 
+#include <Threading\JobSystem2.h>
+#include <Threading\Spinlock.h>
+#include <Memory\ThreadPolicies\MultiThreadPolicy.h>
+
 
 X_NAMESPACE_BEGIN(model)
 
@@ -17,7 +21,8 @@ namespace RawModel
 	const int32_t Model::VERSION = MODEL_RAW_VERSION;
 
 
-	Model::Model(core::MemoryArenaBase* arena) :
+	Model::Model(core::MemoryArenaBase* arena, core::V2::JobSystem* pJobSys) :
+		pJobSys_(pJobSys),
 		arena_(arena),
 		bones_(arena)
 	{
@@ -523,8 +528,7 @@ namespace RawModel
 			buf.append("\n");
 
 			{
-				if (file.write(buf.c_str(), buf.length()) !=
-					safe_static_cast<uint32_t, size_t>(buf.length())) {
+				if (file.write(buf.c_str(), buf.length()) != buf.length()) {
 					X_ERROR("RawModel", "Failed to write rawmodel header");
 					return false;
 				}
@@ -590,17 +594,13 @@ namespace RawModel
 			buf.appendFmt("DISTANCE %f\n", lod.distance_);
 			buf.appendFmt("NUMMESH %" PRIuS "\n", lod.meshes_.size());
 
-			if (f->write(buf.c_str(), buf.length()) != 
-				safe_static_cast<uint32_t, size_t>(buf.length())) {
+			if (f->write(buf.c_str(), buf.length()) != buf.length()) {
 				X_ERROR("RawModel", "Failed to write mesh header");
 				return false;
 			}
 
-			for (const auto& mesh : lod.meshes_)
-			{
-				if (!WriteMesh(f, mesh)) {
-					return false;
-				}
+			if (!WriteMeshes(f, lod)) {
+				return false;
 			}
 
 			for (const auto& mesh : lod.meshes_)
@@ -615,22 +615,112 @@ namespace RawModel
 		return true;
 	}
 
-	bool Model::WriteMesh(core::XFile* f, const Mesh& mesh) const
+	bool Model::WriteMeshes(core::XFile* f, const Lod& lod) const
 	{
-		X_ASSERT_NOT_NULL(f);
-		core::StackString<1024, char> buf;
+		// if no job system use single threaded.
+		if (!pJobSys_) {
+			for (const auto& mesh : lod.meshes_) {
+				if (!WriteMesh(f, mesh)) {
+					return false;
+				}
+			}
 
-		buf.appendFmt("MESH \"%s\"\n", mesh.name_.c_str());
-		buf.appendFmt("VERTS %" PRIuS "\n", mesh.verts_.size());
-		buf.appendFmt("FACES %" PRIuS "\n", mesh.face_.size());
-		buf.append("\n");
-
-		if (f->write(buf.c_str(), buf.length()) != 
-			safe_static_cast<uint32_t, size_t>(buf.length())) {
-			X_ERROR("RawModel", "Failed to write mesh header");
-			return false;
+			return true;
 		}
 
+
+		typedef core::MemoryArena<
+			core::MallocFreeAllocator,
+			core::MultiThreadPolicy<core::Spinlock>,
+#if X_DEBUG
+			core::SimpleBoundsChecking,
+			core::SimpleMemoryTracking,
+			core::SimpleMemoryTagging
+#else
+			core::NoBoundsChecking,
+			core::NoMemoryTracking,
+			core::NoMemoryTagging
+#endif // !X_DEBUG
+		> MultiThreadedArena;
+
+		const size_t numMesh = lod.meshes_.size();
+		bool result = true;
+
+		{
+			core::MallocFreeAllocator allocator;
+			MultiThreadedArena arena(&allocator, "RawModelMeshArena");
+
+			MeshWriteDataArr data(&arena);
+			data.setGranularity(numMesh);
+			data.resize(numMesh, MeshWriteData(&arena));
+
+			const RawModel::Mesh* pMesh = lod.meshes_.ptr();
+
+			// generate the data for each mesh.
+			for (size_t i = 0; i < numMesh; i++)
+			{
+				data[i].pMesh = &pMesh[i];
+
+				core::V2::Job* pJob = pJobSys_->CreateJob(&WriteMeshDataJob, static_cast<void*>(&data[i]));
+				pJobSys_->Run(pJob);
+				
+				data[i].pJob = pJob;
+			}
+
+			// wait for them to complete.
+			for (size_t i = 0; i < data.size(); i++)
+			{
+				const MeshWriteData& jobData = data[i];
+
+				pJobSys_->Wait(jobData.pJob);
+
+				// we can write this job without waiting for the others since we are waiting in order.
+				for (const auto& buf : jobData.data)
+				{
+					if (f->write(buf->c_str(), buf->length()) != buf->length()) {
+						X_ERROR("RawModel", "Failed to write mesh data");
+						result = false;
+					}
+				}
+
+				// delete them
+				for (const auto& buf : jobData.data)
+				{
+					X_DELETE(buf, &arena);
+				}
+			}
+
+			data.clear();
+		}
+
+		return result;
+	}
+
+	void Model::WriteMeshDataJob(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData)
+	{
+		X_UNUSED(pJobSys);
+		X_UNUSED(threadIdx);
+		X_UNUSED(pJob);
+
+		MeshWriteData& data = *reinterpret_cast<MeshWriteData*>(pJobData);
+
+		const size_t numVerts = data.pMesh->verts_.size();
+		const size_t numFace = data.pMesh->face_.size();
+
+
+		data.data.setGranularity(4);
+
+		const Mesh& mesh = *data.pMesh;
+		MeshDataStrArr& dataArr = data.data;
+
+		MeshDataStr* pCurBuf = X_NEW(MeshDataStr, data.arena, "MeshDataStr");
+
+		pCurBuf->appendFmt("MESH \"%s\"\n", mesh.name_.c_str());
+		pCurBuf->appendFmt("VERTS %" PRIuS "\n", mesh.verts_.size());
+		pCurBuf->appendFmt("FACES %" PRIuS "\n", mesh.face_.size());
+		pCurBuf->append("\n");
+
+		// ok now we start writing the data.
 		for (const auto& vert : mesh.verts_)
 		{
 			const Vec3f& pos = vert.pos_;
@@ -640,7 +730,105 @@ namespace RawModel
 			const Color& col = vert.col_;
 			const Vec2f& uv = vert.uv_;
 
-			buf.clear();
+			pCurBuf->appendFmt("v %" PRIuS "\n(%f %f %f)\n(%f %f %f)\n(%f %f %f)\n(%f %f %f)\n(%f %f %f %f)\n(%f %f)\n",
+				vert.binds_.size(), 
+				pos.x, pos.y, pos.z,
+				normal.x, normal.y, normal.z,
+				tan.x, tan.y, tan.z,
+				biNormal.x, biNormal.y, biNormal.z,
+				col.r, col.g, col.b, col.a,
+				uv.x, uv.y
+			);
+
+
+			for (const auto& bind : vert.binds_)
+			{
+				pCurBuf->appendFmt("%i %f\n", bind.boneIdx_, bind.weight_);
+			}
+
+			pCurBuf->append("\n");
+
+			if ((pCurBuf->length() + 500) > pCurBuf->capacity())
+			{
+				dataArr.append(pCurBuf);
+				pCurBuf = X_NEW(MeshDataStr, data.arena, "MeshDataStr");
+			}
+		}
+
+		if ((pCurBuf->length() + 64) > pCurBuf->capacity())
+		{
+			dataArr.append(pCurBuf);
+			pCurBuf = X_NEW(MeshDataStr, data.arena, "MeshDataStr");
+		}
+
+		// lets unroll this a bit.
+		const size_t unrollNum = 4;
+		const size_t numLoops = mesh.face_.size() / unrollNum;
+		const size_t trailing = mesh.face_.size() % unrollNum;
+
+		for (size_t i = 0; i < numLoops; i++)
+		{
+			const Index* pFaceIdx = &mesh.face_[i * unrollNum][0];
+
+			// write 4 out
+			pCurBuf->appendFmt("f %i %i %i\n"
+				"f %i %i %i\n"
+				"f %i %i %i\n"
+				"f %i %i %i\n", 
+				pFaceIdx[0], pFaceIdx[1], pFaceIdx[2],
+				pFaceIdx[3], pFaceIdx[4], pFaceIdx[5],
+				pFaceIdx[6], pFaceIdx[7], pFaceIdx[8],
+				pFaceIdx[9], pFaceIdx[10], pFaceIdx[11]
+			);
+
+			if ((pCurBuf->length() + 128) > pCurBuf->capacity())
+			{
+				dataArr.append(pCurBuf);
+				pCurBuf = X_NEW(MeshDataStr, data.arena, "MeshDataStr");
+			}
+		}
+
+		for (size_t i = 0; i < trailing; i++)
+		{
+			const Face& face = mesh.face_[(unrollNum * numLoops) + i];
+
+			pCurBuf->appendFmt("f %i %i %i\n", face[0], face[1], face[2]);
+
+			if ((pCurBuf->length() + 64) > pCurBuf->capacity())
+			{
+				dataArr.append(pCurBuf);
+				pCurBuf = X_NEW(MeshDataStr, data.arena, "MeshDataStr");
+			}
+		}
+
+		dataArr.append(pCurBuf);
+	}
+
+	bool Model::WriteMesh(core::XFile* f, const Mesh& mesh) const
+	{
+		X_ASSERT_NOT_NULL(f);
+		core::StackString<1024 * 16, char> buf;
+
+		buf.appendFmt("MESH \"%s\"\n", mesh.name_.c_str());
+		buf.appendFmt("VERTS %" PRIuS "\n", mesh.verts_.size());
+		buf.appendFmt("FACES %" PRIuS "\n", mesh.face_.size());
+		buf.append("\n");
+
+		if (f->write(buf.c_str(), buf.length()) != buf.length()) {
+			X_ERROR("RawModel", "Failed to write mesh header");
+			return false;
+		}
+
+		buf.clear();
+
+		for (const auto& vert : mesh.verts_)
+		{
+			const Vec3f& pos = vert.pos_;
+			const Vec3f& normal = vert.normal_;
+			const Vec3f& tan = vert.tangent_;
+			const Vec3f& biNormal = vert.biNormal_;
+			const Color& col = vert.col_;
+			const Vec2f& uv = vert.uv_;
 
 			buf.appendFmt("v %" PRIuS "\n", vert.binds_.size());
 			buf.appendFmt("(%f %f %f)\n", pos.x, pos.y, pos.z);
@@ -657,25 +845,46 @@ namespace RawModel
 
 			buf.append("\n");
 
-			// write it.
-			if (f->write(buf.c_str(), buf.length()) != 
-				safe_static_cast<uint32_t, size_t>(buf.length())) {
-				X_ERROR("RawModel", "Failed to write mesh vert");
-				return false;
+			// write it, if less that 1024 bytes free.
+			if (buf.length() + 1024 > buf.capacity())
+			{
+				if (f->write(buf.c_str(), buf.length()) != buf.length()) {
+					X_ERROR("RawModel", "Failed to write mesh vert");
+					return false;
+				}
+
+				buf.clear();
 			}
 		}
+
+		// buf might not be empty.
 
 		for (const auto& face : mesh.face_)
-		{
-			buf.clear();
+		{		
 			buf.appendFmt("f %i %i %i\n", face[0], face[1], face[2]);
 
-			if (f->write(buf.c_str(), buf.length()) != 
-				safe_static_cast<uint32_t, size_t>(buf.length())) {
-				X_ERROR("RawModel", "Failed to write mesh face");
-				return false;
+			// write it, if less that 256 bytes free.
+			if (buf.length() + 256 > buf.capacity())
+			{
+				if (f->write(buf.c_str(), buf.length()) != buf.length()) {
+					X_ERROR("RawModel", "Failed to write mesh face");
+					return false;
+				}
+
+				buf.clear();
 			}
 		}
+
+		// flush
+		if (buf.isNotEmpty()) {
+			if (f->write(buf.c_str(), buf.length()) != buf.length()) {
+				X_ERROR("RawModel", "Failed to flush mesh buf");
+				return false;
+			}
+
+			buf.clear();
+		}
+
 
 		f->writeStringNNT("\n");
 		return true;
@@ -701,8 +910,7 @@ namespace RawModel
 		buf.appendFmt("REFLECTIVECOL (%f %f %f %f)\n", reflectiveCol.r, reflectiveCol.g, reflectiveCol.b, reflectiveCol.a);
 		buf.append("\n");
 		
-		return f->write(buf.c_str(), buf.length()) == 
-			safe_static_cast<uint32_t, size_t>(buf.length());
+		return f->write(buf.c_str(), buf.length()) == buf.length();
 	}
 
 } // namespace RawModel
