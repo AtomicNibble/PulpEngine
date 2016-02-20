@@ -269,7 +269,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 		MayaUtil::SetProgressText("Compiling model");
 
 		{
-			PROFILE_MAYA_NAME("Save compiled");
+			PROFILE_MAYA_NAME("Compile and save");
 
 			if (!CompileModel(outPath)) {
 				MayaUtil::MayaPrintError("Failed to compile model");
