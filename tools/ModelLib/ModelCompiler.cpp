@@ -2,6 +2,7 @@
 #include "ModelCompiler.h"
 
 #include <Threading\JobSystem2.h>
+#include <Time\StopWatch.h>
 
 #include <IModel.h>
 
@@ -74,6 +75,7 @@ ModelCompiler::Stats::Stats(core::MemoryArenaBase* arena) :
 void ModelCompiler::Stats::print(void) const
 {
 	X_LOG0("Model", "Model Info:");
+	X_LOG0("Model", "> Compile Time: %fms", compileTime.GetMilliSeconds());
 	X_LOG0("Model", "> Total Lods: %i", totalLods);
 	X_LOG0("Model", "> Total Mesh: %i", totalMesh);
 	X_LOG0("Model", "> Total Mesh Merged: %i", totalMeshMerged);
@@ -212,9 +214,15 @@ bool ModelCompiler::CompileModel(core::Path<wchar_t>& outFile)
 	// if you want to make a engine model it must first be loaded into a raw model
 	// that way the opermisation and format writer logic can all be in one place.
 	// So i don't have to update the maya plugin and the converter when i edit the model format or change optermisations.
-	if (!ProcessModel()) {
-		X_ERROR("Model", "Failed to compile model");
-		return false;
+	{
+		core::StopWatch timer;
+
+		if (!ProcessModel()) {
+			X_ERROR("Model", "Failed to compile model");
+			return false;
+		}
+
+		stats_.compileTime = timer.GetTimeVal();
 	}
 
 	// save it.

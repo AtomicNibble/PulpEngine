@@ -2,6 +2,7 @@
 
 #include <String\Path.h>
 #include <Containers\Array.h>
+#include <Time\TimeVal.h>
 
 #include "RawModel.h"
 
@@ -49,6 +50,8 @@ public:
 		uint32_t totalFaces;
 		uint32_t totalWeightsDropped;
 		uint32_t totalMeshMerged;
+
+		core::TimeVal compileTime;
 
 		core::Array<core::StackString<128>>
 			droppedBoneNames;

@@ -300,7 +300,8 @@ void ModelExporter::printStats(void) const
 	core::StackString<2048> info;
 
 	info.append("\nModel Info:\n");
-	info.appendFmt("> Total Lods: %i", stats_.totalLods);
+	info.appendFmt("> Compile Time: %fms", stats_.compileTime.GetMilliSeconds());
+	info.appendFmt("\n> Total Lods: %i", stats_.totalLods);
 	info.appendFmt("\n> Total Mesh: %i", stats_.totalMesh);
 	info.appendFmt("\n> Total Mesh merged: %i", stats_.totalMeshMerged);
 	info.appendFmt("\n> Total Joints: %i", stats_.totalJoints);
