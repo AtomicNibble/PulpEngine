@@ -71,6 +71,7 @@ ModelCompiler::Stats::Stats(core::MemoryArenaBase* arena) :
 	totalVerts = 0;
 	totalFaces = 0;
 	totalWeightsDropped = 0;
+	totalMeshMerged = 0;
 }
 
 void ModelCompiler::Stats::print(void) const
