@@ -6,6 +6,42 @@ X_NAMESPACE_BEGIN(core)
 
 namespace IPC
 {
+	namespace
+	{
+		DWORD GetOpenMode(Pipe::OpenMode::Enum mode)
+		{
+			if (mode == Pipe::OpenMode::DUPLEX) {
+				return PIPE_ACCESS_DUPLEX;
+			}
+			if (mode == Pipe::OpenMode::INBOUND) {
+				return PIPE_ACCESS_INBOUND;
+			}
+			if (mode == Pipe::Pipe::OpenMode::OUTBOUND) {
+				return PIPE_ACCESS_OUTBOUND;
+			}
+
+			X_ASSERT_UNREACHABLE();
+			return 0;
+		}
+
+		DWORD GetPipeMode(Pipe::PipeMode::Enum mode)
+		{
+			if (mode == Pipe::PipeMode::BYTE) {
+				return PIPE_WAIT;
+			}
+			if (mode == Pipe::PipeMode::MESSAGE_W) {
+				return PIPE_TYPE_MESSAGE | PIPE_WAIT;
+			}
+			if (mode == Pipe::PipeMode::MESSAGE_RW) {
+				return PIPE_TYPE_MESSAGE | PIPE_READMODE_MESSAGE | PIPE_WAIT;
+			}
+
+			X_ASSERT_UNREACHABLE();
+			return 0;
+		}
+
+
+	} // namespace 
 
 
 	Pipe::Pipe()
@@ -37,8 +73,8 @@ namespace IPC
 		DWORD timeoutMs = safe_static_cast<DWORD, size_t>(defaultTimeOut.GetMilliSecondsAsInt64());
 
 		hPipe_ = CreateNamedPipeW(name,
-			openMode, 
-			pipeMode,
+			GetOpenMode(openMode),
+			GetPipeMode(pipeMode),
 			safe_static_cast<DWORD,size_t>(maxInstances), 
 			safe_static_cast<DWORD, size_t>(outBufferSize),
 			safe_static_cast<DWORD, size_t>(inBufferSize),
@@ -86,6 +122,46 @@ namespace IPC
 		return true;
 	}
 
+
+	bool Pipe::connect(void)
+	{
+		X_ASSERT(isOpen(), "Pipe must be open to cionnect")(isOpen());
+
+		if (!ConnectNamedPipe(hPipe_, nullptr)) {
+			core::lastError::Description Dsc;
+			X_ERROR("Pipe", "Failed to connect to pipe. Err: %s", core::lastError::ToString(Dsc));
+			return false;
+		}
+
+		return true;
+	}
+
+	bool Pipe::disconnect(void)
+	{
+		X_ASSERT(isOpen(), "Pipe must be open to disconnect")(isOpen());
+
+		if (!DisconnectNamedPipe(hPipe_)) {
+			core::lastError::Description Dsc;
+			X_ERROR("Pipe", "Failed to disconnect from pipe. Err: %s", core::lastError::ToString(Dsc));
+			return false;
+		}
+
+		return true;
+	}
+
+	bool Pipe::flush(void)
+	{
+		X_ASSERT(isOpen(), "Pipe must be open to flush")(isOpen());
+
+		if (!FlushFileBuffers(hPipe_)) {
+			core::lastError::Description Dsc;
+			X_ERROR("Pipe", "Failed to flush pipe. Err: %s", core::lastError::ToString(Dsc));
+			return false;
+		}
+
+		return true;
+	}
+
 	void Pipe::close(void)
 	{
 		if (isOpen()) {
@@ -103,18 +179,6 @@ namespace IPC
 		return hPipe_ != INVALID_HANDLE_VALUE;
 	}
 
-	bool Pipe::flush(void)
-	{
-		X_ASSERT(isOpen(), "Pipe must be open to flush")(isOpen());
-
-		if (!FlushFileBuffers(hPipe_)) {
-			core::lastError::Description Dsc;
-			X_ERROR("Pipe", "Failed to flush pipe. Err: %s", core::lastError::ToString(Dsc));
-			return false;
-		}
-
-		return true;
-	}
 
 	bool Pipe::Write(const void* pBuffer, size_t numBytesToWrite, size_t* pNumberBytesWritten)
 	{

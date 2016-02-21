@@ -11,8 +11,16 @@ namespace IPC
 	{
 	public:
 
-		X_DECLARE_ENUM(OpenMode)(DUPLEX, INBOUND, OUTBOUND);
-		X_DECLARE_ENUM(PipeMode)(BYTE, MESSAGE);
+		X_DECLARE_ENUM(OpenMode)(
+			DUPLEX,			// The pipe is bi-directional; both server and client processes can read from and write to the pipe. 
+			INBOUND,		// The flow of data in the pipe goes from client to server only.
+			OUTBOUND		// The flow of data in the pipe goes from server to client only.
+		);
+		X_DECLARE_ENUM(PipeMode)(
+			BYTE,			// data write / read as byte 
+			MESSAGE_W,		// data sent as msg but read as byte
+			MESSAGE_RW		// data write / read as msg
+		);
 		X_DECLARE_ENUM(Access)(OPEN);
 		X_DECLARE_ENUM(ShareMode)(OPEN);
 
@@ -30,9 +38,12 @@ namespace IPC
 		bool open(const char* name, Access::Enum desiredAccess, ShareMode::Enum shareMode);
 		bool open(const wchar_t* name, Access::Enum desiredAccess, ShareMode::Enum shareMode);
 
+		bool connect(void);
+		bool disconnect(void);
+		bool flush(void);
+
 		void close(void);
 		bool isOpen(void) const;
-		bool flush(void);
 
 		bool Write(const void* pBuffer, size_t numBytesToWrite, size_t* pNumberBytesWritten = nullptr);
 		bool Read(void* pBuffer, size_t numBytesToRead, size_t* pNumberBytesRead = nullptr);
