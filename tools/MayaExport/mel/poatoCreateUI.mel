@@ -44,14 +44,24 @@ global proc potato_SelectAllMeshInScene()
 
 global proc savePathGlobal(string $pathId, string $value)
 {
-	string $command = "PotatoSettings -set -set_id " + $pathId + " -value \"" + $value + "\"";
-	string $errorMsg;
-	$error = catch ( $errorMsg = eval( $command ) );
+	saveSettingGlobal($pathId, $value);
 }
 
 global proc string loadPathGlobal(string $pathId)
 {
-	string $command = "PotatoSettings -get -set_id " + $pathId;
+	return loadSettingGlobal($pathId);
+}
+
+global proc saveSettingGlobal(string $setId, string $value)
+{
+	string $command = "PotatoSettings -set -set_id " + $setId + " -value \"" + $value + "\"";
+	string $errorMsg;
+	$error = catch ( $errorMsg = eval( $command ) );
+}
+
+global proc string loadSettingGlobal(string $setId)
+{
+	string $command = "PotatoSettings -get -set_id " + $setId;
 	return eval( $command );
 }
 
@@ -95,6 +105,14 @@ global proc string getOutputDir() {
 
 global proc string getOutputDirAnims() {
   	return loadPathGlobal("animOut");
+}
+
+global proc string getExportMode() {
+  	string $exportMode = loadSettingGlobal("exportMode");
+	if(int(`size $exportMode`) < 1) {
+		return "server";
+	}
+  	return $exportMode;
 }
 
 global proc string modelGetName(int $index) {
@@ -163,6 +181,13 @@ global proc verboseUpdate()
 {
 	int $val = `checkBoxGrp -q -v1 verboseCntrl`;
 	setAttr ("PotatoGNode.verbose") $val;
+}
+
+global proc exportModeUpdate()
+{
+	string $val = `optionMenuGrp -q -v exportModeCntrl`;
+
+	saveSettingGlobal("exportMode", $val);
 }
 
 global proc forceBoneFiltersUpdate()
@@ -366,11 +391,13 @@ global proc ModelEntryExport(int $index)
 	string $zeroOrigin = `getAttr ("PotatoGNode.zeroOrigin")`;
 	string $forceBoneFilters = substituteAllString(`getAttr ("PotatoGNode.forceBoneFilters")`, "\n", " ");
 	string $verbose = `getAttr ("PotatoGNode.verbose")`;
+	string $mode = getExportMode();
 	string $options = "-progress PotatoExportProgress -dir \"" + $Dir + "\" -scale " + $scale
 	+ " -weight_thresh " + $weightThreshold
 	+ " -uv_merge_thresh " + $uvMergeThreshold
 	+ " -vert_merge_thresh " + $vertMergeThreshold
 	+ " -zero_origin " + $zeroOrigin
+	+ " -mode \"" + $mode + "\" "
 	+ " -force_bones \"" + $forceBoneFilters + "\" ";
 
 	if($verbose) {
@@ -1045,11 +1072,17 @@ global proc potato_CreateExportWindow( string $name )
 						text -w 137 -l "Force Include bones" -al "right" -p colLayoutBone;
 					scrollField -w 160 -h 60 -tx `getAttr PotatoGNode.forceBoneFilters` -cc forceBoneFiltersUpdate -p boneForceRow forceBoneFiltersCntrl;
 
-					frameLayout -l "Misc" -marginHeight 2 -marginWidth 2 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p Settings setTabFrame3;
-						columnLayout -adj 1 -cal "center" -p setTabFrame3 setcolLayout2;
+			frameLayout -l "Misc" -marginHeight 4 -marginWidth 2 -w 200 -bs "etchedOut" -bv on -collapsable true -cl false -p Settings setTabFrame3;
+				columnLayout -adj 1 -cal "center" -p setTabFrame3 setcolLayout2;
 
-							checkBoxGrp -l "Verbose" -value1 `getAttr PotatoGNode.verbose` -cc verboseUpdate -p setcolLayout2 verboseCntrl;
+					checkBoxGrp -l "Verbose" -value1 `getAttr PotatoGNode.verbose` -cc verboseUpdate -p setcolLayout2 verboseCntrl;
 
+					optionMenuGrp -l "Export Mode" -p setcolLayout2  -cc exportModeUpdate exportModeCntrl;
+						menuItem -label "Server";
+						menuItem -label "RawModel";
+
+					string $exportMode = getExportMode();
+					optionMenuGrp -e -v $exportMode exportModeCntrl;
 // Help Tab
 		string $help;
 		$help += "How To Export:\n";
