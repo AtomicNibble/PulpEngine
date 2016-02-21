@@ -9,6 +9,7 @@
 #include <io.h>
 #include <stdio.h>
 #include <fstream>
+#include <conio.h>
 
 #include <ICore.h>
 
@@ -229,7 +230,7 @@ void Console::MoveTo(int x, int y)
 }
 
 /// Moves the console window to a certain position, in pixel units.
-void Console::MoveTo(const Vec2i& position)
+void Console::MoveTo(const Position& position)
 {
 	MoveTo( position.x, position.y );
 }
@@ -329,6 +330,14 @@ void Console::RedirectSTD(void)
 
 	std::ios::sync_with_stdio();
 #endif // !_MSC_FULL_VER
+}
+
+void Console::PressToContinue(void) const
+{
+	if (gEnv && gEnv->pLog) {
+		X_LOG0("Console", "Press to continue");
+	}
+	_getch();
 }
 
 X_NAMESPACE_END

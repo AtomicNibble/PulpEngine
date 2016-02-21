@@ -62,6 +62,8 @@ public:
 	/// Redirects the std logging (output,error)
 	void RedirectSTD(void);
 
+	void PressToContinue(void) const;
+
 	/// \brief Returns the native console object.
 	/// \remark For internal use only.
 	inline HANDLE GetNativeConsole(void) const;
@@ -69,6 +71,7 @@ public:
 	/// \brief Returns the native console window handle.
 	/// \remark For internal use only.
 	inline HWND GetNativeConsoleWindow(void) const;
+
 
 private:
 	X_NO_COPY(Console);
