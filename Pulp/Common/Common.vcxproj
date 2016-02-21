@@ -225,12 +225,14 @@
     <ClInclude Include="Platform\Compiler.h" />
     <ClInclude Include="Platform\Console.h" />
     <ClInclude Include="Platform\DirectoryWatcher.h" />
+    <ClInclude Include="Platform\Pipe.h" />
     <ClInclude Include="Platform\Types.h" />
     <ClInclude Include="Platform\win32\ClipBoard.h" />
     <ClInclude Include="Platform\win32\Compiler.h" />
     <ClInclude Include="Platform\win32\Console.h" />
     <ClInclude Include="Platform\win32\CustomFrame.h" />
     <ClInclude Include="Platform\win32\DirectoryWatcher.h" />
+    <ClInclude Include="Platform\win32\Pipe.h" />
     <ClInclude Include="Platform\win32\Types.h" />
     <ClInclude Include="Platform\win32\Window.h" />
     <ClInclude Include="Platform\Window.h" />
@@ -439,6 +441,7 @@
     <None Include="Util\BitUtil.inl" />
     <None Include="Util\Cpu.inl" />
     <ClCompile Include="Math\XAabb.cpp" />
+    <ClCompile Include="Platform\win32\Pipe.cpp" />
     <ClCompile Include="Time\win32\StopWatch.cpp" />
     <ClCompile Include="Util\Delegate.gen">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

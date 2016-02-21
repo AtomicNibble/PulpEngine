@@ -1066,6 +1066,12 @@
     <ClInclude Include="Util\Event.gen.h">
       <Filter>Headers\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\Pipe.h">
+      <Filter>Headers\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\win32\Pipe.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1628,6 +1634,9 @@
     </ClCompile>
     <ClCompile Include="Math\XAabb.cpp">
       <Filter>SourceFiles\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\win32\Pipe.cpp">
+      <Filter>SourceFiles\Platform\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
