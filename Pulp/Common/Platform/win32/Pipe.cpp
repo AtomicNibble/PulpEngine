@@ -70,7 +70,7 @@ namespace IPC
 			return false;
 		}
 
-		DWORD timeoutMs = safe_static_cast<DWORD, size_t>(defaultTimeOut.GetMilliSecondsAsInt64());
+		DWORD timeoutMs = safe_static_cast<DWORD, int64_t>(defaultTimeOut.GetMilliSecondsAsInt64());
 
 		hPipe_ = CreateNamedPipeW(name,
 			GetOpenMode(openMode),
