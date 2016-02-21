@@ -17,7 +17,6 @@ public:
 	~AssetDB();
 
 	bool AddAsset(AssetType::Enum type, const core::string& name);
-	bool SetMod(const core::string& name);
 
 	bool OpenDB(void);
 	void CloseDB(void);
@@ -25,10 +24,6 @@ public:
 	bool DropTables(void);
 
 private:
-	bool isModSet(void) const;
-
-private:
-	int32_t modId_;
 
 	sql::SqlLiteDb db_;
 };
