@@ -107,6 +107,9 @@ const char* SettingsCache::SetIdToStr(SettingId::Enum id)
 	if (id == SettingId::MODEL_OUT) {
 		return "ModelOut";
 	}
+	if (id == SettingId::EXPORTMODE) {
+		return "exportMode";
+	}
 
 	X_ASSERT_NOT_IMPLEMENTED();
 	return "invalid";
@@ -331,9 +334,12 @@ MStatus SettingsCmd::doIt(const MArgList & args)
 		else if (core::strUtil::IsEqualCaseInsen(setIdStr.asChar(), "modelOut")) {
 			setId = SettingId::MODEL_OUT;
 		}
+		else if (core::strUtil::IsEqualCaseInsen(setIdStr.asChar(), "exportMode")) {
+			setId = SettingId::EXPORTMODE;
+		}
 		else
 		{
-			MayaUtil::MayaPrintError("unkown set_id: '%s' valid id's: animOut, modelOut", 
+			MayaUtil::MayaPrintError("unkown set_id: '%s' valid id's: animOut, modelOut, exportMode", 
 				setIdStr.asChar());
 			return MS::kFailure;
 		}
