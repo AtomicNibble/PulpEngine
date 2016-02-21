@@ -265,22 +265,31 @@ MStatus ModelExporter::convert(const MArgList& args)
 			}
 		}
 
-		MayaUtil::SetProgressText("Compiling model");
-
+		if (exportMode_ == ExpoMode::SERVER)
 		{
-			PROFILE_MAYA_NAME("Compile and save");
+			MayaUtil::SetProgressText("Compiling model");
 
-			if (!CompileModel(outPath)) {
-				MayaUtil::MayaPrintError("Failed to compile model");
-				return MS::kFailure;
+			{
+				PROFILE_MAYA_NAME("Compile and save");
+
+				if (!CompileModel(outPath)) {
+					MayaUtil::MayaPrintError("Failed to compile model");
+					return MS::kFailure;
+				}
 			}
+		}
+		else {
+			MayaUtil::IncProcess();
 		}
 
 		saveOk = true;
 
 		MayaUtil::SetProgressText("Complete");
 
-		printStats();
+		if (exportMode_ == ExpoMode::SERVER)
+		{
+			printStats();
+		}
 	}
 
 	if (saveOk) {
@@ -417,6 +426,28 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	}
 	else {
 		MayaUtil::SetVerbose(false);
+	}
+
+	idx = args.flagIndex("mode");
+	if (idx != MArgList::kInvalidArgIndex) {
+		MString modeStr;
+		if (!args.get(++idx, modeStr)) {
+			MayaUtil::MayaPrintWarning("failed to get export mode");
+		}
+		else {
+			if (core::strUtil::IsEqualCaseInsen(modeStr.asChar(), "RawModel")) {
+				exportMode_ = ExpoMode::RAW;
+			}
+			else if (core::strUtil::IsEqualCaseInsen(modeStr.asChar(), "Server")) {
+				exportMode_ = ExpoMode::SERVER;
+			} else {
+				MayaUtil::MayaPrintWarning("Unknown export mode: \"%s\"",
+					modeStr.asChar());
+			}
+		}
+	}
+	else {
+		exportMode_ = ExpoMode::SERVER;
 	}
 
 	idx = args.flagIndex("scale");
