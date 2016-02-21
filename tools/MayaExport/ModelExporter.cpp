@@ -104,7 +104,8 @@ MayaBone& MayaBone::operator = (const MayaBone &oth)
 ModelExporter::ModelExporter(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
 	model::ModelCompiler(pJobSys, arena),
 	mayaBones_(arena),
-	exportMode_(ExpoMode::EXPORT_INPUT),
+	exportMode_(ExpoMode::SERVER),
+	meshExportMode_(MeshExpoMode::EXPORT_INPUT),
 	unitOfMeasurement_(UnitOfMeasureMent::INCHES)
 {
 	tagOrigin_.index = 0;
@@ -170,12 +171,10 @@ MStatus ModelExporter::getInputObjects(void)
 
 MStatus ModelExporter::getExportObjects(void)
 {
-	if (exportMode_ == ExpoMode::EXPORT_INPUT){
+	if (meshExportMode_ == MeshExpoMode::EXPORT_INPUT){
 		return getInputObjects();
 	} else {
-	//	if (g_options.exportMode_ == PotatoOptions::EXPORT_SELECTED)
-	//		return getSelectedObjects();
-	//	return getAllObjects();
+		MayaUtil::MayaPrintWarning("Exporting selection or all is not currently supported");
 	}
 
 	return MS::kFailure;

@@ -53,7 +53,8 @@ class ModelExporter : public model::ModelCompiler
 		MDagPathArray exportObjects;
 	};
 
-	X_DECLARE_ENUM(ExpoMode)(EXPORT_ALL, EXPORT_SELECTED, EXPORT_INPUT);
+	X_DECLARE_ENUM(ExpoMode)(SERVER, RAW);
+	X_DECLARE_ENUM(MeshExpoMode)(EXPORT_ALL, EXPORT_SELECTED, EXPORT_INPUT);
 	X_DECLARE_ENUM(UnitOfMeasureMent)(INCHES, CM);
 
 public:
@@ -77,6 +78,7 @@ private:
 	MStatus getExportObjects(void);
 	MStatus getInputObjects(void);
 
+
 	MayaBone* findJointReal(const char* pName);
 
 private:
@@ -92,6 +94,7 @@ private:
 	core::Path<char> fileName_;
 	core::Path<char> outDir_;
 	ExpoMode::Enum exportMode_;
+	MeshExpoMode::Enum meshExportMode_;
 	UnitOfMeasureMent::Enum unitOfMeasurement_;
 
 	core::Array<MayaBone>	mayaBones_;
