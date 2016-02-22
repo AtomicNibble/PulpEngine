@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "EngineApp.h"
 
+#include <Platform\Pipe.h>
+
 #include <ModuleExports.h>
 
 HINSTANCE g_hInstance = 0;
@@ -52,6 +54,27 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	if (engine.Init(lpCmdLine, Console))
 	{
 		X_LOG0("AssetServer", "Hello :)");
+
+		// alright then shitface, we want to start a pipe for now.
+
+		core::IPC::Pipe pipe;
+
+		if (pipe.create("Potato\\AssetServer",
+			core::IPC::Pipe::OpenMode::DUPLEX,
+			core::IPC::Pipe::PipeMode::MESSAGE_RW,
+			10,
+			1024,
+			1024,
+			core::TimeVal::fromMS(100)
+			))
+		{
+			// connect to me baby.
+			if (pipe.connect())
+			{
+
+
+			}
+		}
 	}
 
 	return 0;
