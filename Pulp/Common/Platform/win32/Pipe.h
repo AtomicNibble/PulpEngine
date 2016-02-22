@@ -45,8 +45,8 @@ namespace IPC
 		void close(void);
 		bool isOpen(void) const;
 
-		bool Write(const void* pBuffer, size_t numBytesToWrite, size_t* pNumberBytesWritten = nullptr);
-		bool Read(void* pBuffer, size_t numBytesToRead, size_t* pNumberBytesRead = nullptr);
+		bool write(const void* pBuffer, size_t numBytesToWrite, size_t* pNumberBytesWritten = nullptr);
+		bool read(void* pBuffer, size_t numBytesToRead, size_t* pNumberBytesRead = nullptr);
 		bool peek(void* pBuffer, size_t bufferSizeBytes, size_t* pNumberBytesRead = nullptr,
 			size_t* pTotalBytesAvail = nullptr, size_t* pBytesLeftThisMsg = nullptr);
 

@@ -180,7 +180,7 @@ namespace IPC
 	}
 
 
-	bool Pipe::Write(const void* pBuffer, size_t numBytesToWrite, size_t* pNumberBytesWritten)
+	bool Pipe::write(const void* pBuffer, size_t numBytesToWrite, size_t* pNumberBytesWritten)
 	{
 		X_ASSERT(isOpen(), "Pipe must be open to write")(isOpen());
 		X_ASSERT_NOT_NULL(pBuffer);
@@ -206,7 +206,7 @@ namespace IPC
 		return true;
 	}
 
-	bool Pipe::Read(void* pBuffer, size_t numBytesToRead, size_t* pNumberBytesRead)
+	bool Pipe::read(void* pBuffer, size_t numBytesToRead, size_t* pNumberBytesRead)
 	{
 		X_ASSERT(isOpen(), "Pipe must be open to read")(isOpen());
 		X_ASSERT_NOT_NULL(pBuffer);
