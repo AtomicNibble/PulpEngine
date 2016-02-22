@@ -3,6 +3,7 @@
 
 #include <Platform\Pipe.h>
 
+#define _LAUNCHER
 #include <ModuleExports.h>
 
 HINSTANCE g_hInstance = 0;
