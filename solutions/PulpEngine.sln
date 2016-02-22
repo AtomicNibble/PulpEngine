@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.24720.0
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Common", "..\Pulp\Common\Common.vcxproj", "{07328CCB-F9CC-4967-861E-272BCA0CAB04}"
 EndProject
@@ -138,6 +138,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MaterialLib", "..\tools\Mat
 	ProjectSection(ProjectDependencies) = postProject
 		{07328CCB-F9CC-4967-861E-272BCA0CAB04} = {07328CCB-F9CC-4967-861E-272BCA0CAB04}
 	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AssetServer", "..\tools\AssetServer\AssetServer.vcxproj", "{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -581,6 +583,26 @@ Global
 		{CA54AF85-49FD-4F07-903C-E3EEBAA28612}.Super|Win32.Build.0 = Super|Win32
 		{CA54AF85-49FD-4F07-903C-E3EEBAA28612}.Super|x64.ActiveCfg = Super|x64
 		{CA54AF85-49FD-4F07-903C-E3EEBAA28612}.Super|x64.Build.0 = Super|x64
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Debug|Win32.Build.0 = Debug|Win32
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Debug|x64.ActiveCfg = Debug|x64
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Debug|x64.Build.0 = Debug|x64
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Release|Win32.ActiveCfg = Release|Win32
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Release|Win32.Build.0 = Release|Win32
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Release|x64.ActiveCfg = Release|x64
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Release|x64.Build.0 = Release|x64
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Super Dynamic|Win32.ActiveCfg = Super Dynamic|Win32
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Super Dynamic|Win32.Build.0 = Super Dynamic|Win32
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Super Dynamic|x64.ActiveCfg = Super Dynamic|x64
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Super Dynamic|x64.Build.0 = Super Dynamic|x64
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Super|Win32.ActiveCfg = Super|Win32
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Super|Win32.Build.0 = Super|Win32
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Super|x64.ActiveCfg = Super|x64
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Super|x64.Build.0 = Super|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -609,5 +631,6 @@ Global
 		{14D227D8-81ED-4F89-9D44-FC6068AB3F84} = {82394A53-778F-4F3C-845C-BA3940464D74}
 		{81DDBFCE-ED72-413D-9A37-7AC108039CE2} = {82394A53-778F-4F3C-845C-BA3940464D74}
 		{CA54AF85-49FD-4F07-903C-E3EEBAA28612} = {82394A53-778F-4F3C-845C-BA3940464D74}
+		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3} = {24E6CBB2-B9F1-4F1D-8C4F-3C5CBA4459C1}
 	EndGlobalSection
 EndGlobal
