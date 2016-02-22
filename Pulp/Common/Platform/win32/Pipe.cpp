@@ -46,7 +46,7 @@ namespace IPC
 
 	Pipe::Pipe()
 	{
-
+		hPipe_ == INVALID_HANDLE_VALUE;
 	}
 
 	Pipe::~Pipe()
