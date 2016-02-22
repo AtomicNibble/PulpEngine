@@ -172,3 +172,10 @@ X_INLINE bool TimeVal::operator!=(const TimeVal &inRhs) const
 { 
 	return time_ != inRhs.time_; 
 }
+
+X_INLINE core::TimeVal TimeVal::fromMS(TimeType ms)
+{
+	TimeVal val;
+	val.SetMilliSeconds(ms);
+	return val;
+}

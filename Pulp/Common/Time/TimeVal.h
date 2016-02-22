@@ -58,6 +58,9 @@ public:
 	X_INLINE bool operator==(const TimeVal &inRhs) const;
 	X_INLINE bool operator!=(const TimeVal &inRhs) const;
 
+	// create a time value that contains a given number of ms.
+	X_INLINE static core::TimeVal fromMS(TimeType ms);
+
 private:
 	TimeType time_;
 
