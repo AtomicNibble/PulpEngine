@@ -147,6 +147,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AssetServer", "..\tools\Ass
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F6416BBE-53A3-432C-A110-0EDA8BDBBB6E}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AssetServerClientTest", "..\tools\AssetServerClientTest\AssetServerClientTest.vcxproj", "{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}"
+	ProjectSection(ProjectDependencies) = postProject
+		{07328CCB-F9CC-4967-861E-272BCA0CAB04} = {07328CCB-F9CC-4967-861E-272BCA0CAB04}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Dynamic|Win32 = Debug Dynamic|Win32
@@ -609,6 +614,26 @@ Global
 		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Super|Win32.Build.0 = Super|Win32
 		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Super|x64.ActiveCfg = Super|x64
 		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3}.Super|x64.Build.0 = Super|x64
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Debug|Win32.Build.0 = Debug|Win32
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Debug|x64.ActiveCfg = Debug|x64
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Debug|x64.Build.0 = Debug|x64
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Release|Win32.ActiveCfg = Release|Win32
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Release|Win32.Build.0 = Release|Win32
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Release|x64.ActiveCfg = Release|x64
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Release|x64.Build.0 = Release|x64
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Super Dynamic|Win32.ActiveCfg = Super Dynamic|Win32
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Super Dynamic|Win32.Build.0 = Super Dynamic|Win32
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Super Dynamic|x64.ActiveCfg = Super Dynamic|x64
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Super Dynamic|x64.Build.0 = Super Dynamic|x64
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Super|Win32.ActiveCfg = Super|Win32
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Super|Win32.Build.0 = Super|Win32
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Super|x64.ActiveCfg = Super|x64
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}.Super|x64.Build.0 = Super|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -638,5 +663,6 @@ Global
 		{81DDBFCE-ED72-413D-9A37-7AC108039CE2} = {82394A53-778F-4F3C-845C-BA3940464D74}
 		{CA54AF85-49FD-4F07-903C-E3EEBAA28612} = {82394A53-778F-4F3C-845C-BA3940464D74}
 		{3D48A0DE-8E60-4CF4-A6E8-770E8FCA35A3} = {24E6CBB2-B9F1-4F1D-8C4F-3C5CBA4459C1}
+		{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF} = {F6416BBE-53A3-432C-A110-0EDA8BDBBB6E}
 	EndGlobalSection
 EndGlobal
