@@ -49,6 +49,59 @@ typedef core::MemoryArena<
 core::MemoryArenaBase* g_arena = nullptr;
 
 
+namespace
+{
+	bool GetAssetType(converter::AssetType::Enum& assType)
+	{
+		const wchar_t* pAssetType = gEnv->pCore->GetCommandLineArgForVarW(L"type");
+		if (pAssetType)
+		{
+			if (core::strUtil::IsEqualCaseInsen(pAssetType, L"model"))
+			{
+				assType = converter::AssetType::Model;
+			}
+			else if (core::strUtil::IsEqualCaseInsen(pAssetType, L"anim"))
+			{
+				assType = converter::AssetType::Anim;
+			}
+			else
+			{		
+				X_ERROR("Converter", "Unknown asset type: \"%ls\"", pAssetType);
+				return false;
+			}
+
+			return true;
+		}
+	
+		X_ERROR("Converter", "missing asset type");
+		return false;
+	}
+
+	bool GetAssetName(core::string& name)
+	{
+		const wchar_t* pAssetName = gEnv->pCore->GetCommandLineArgForVarW(L"name");
+		if (pAssetName)
+		{
+			char buf[512];	
+			name = core::strUtil::Convert(pAssetName, buf);;
+			return true;
+		}
+
+		X_ERROR("Converter", "missing asset name");
+		return false;
+	}
+
+}// namespace 
+
+
+
+ //{
+ //	core::CmdArgs<4096, wchar_t> args(lpCmdLine);
+
+ //	res = con.Convert(assType, args);
+ //}
+
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
@@ -73,31 +126,26 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	if (engine.Init(lpCmdLine, Console))
 	{
 		converter::Converter con;
+		converter::AssetType::Enum assType;
 
 		con.PrintBanner();
 
 		{
-			const wchar_t* pAssetType = gEnv->pCore->GetCommandLineArgForVarW(L"type");
-			if (pAssetType)
+			if (GetAssetType(assType))
 			{
-				core::CmdArgs<4096, wchar_t> args(lpCmdLine);
+				core::string name;
+				if (GetAssetName(name))
+				{
+					// right now we lookup the asset from the asset db.
+					// only if we can find it do we convert.
+					// the info in the asset db will be used to convert it.
 
-				if (core::strUtil::IsEqualCaseInsen(pAssetType, L"model"))
-				{
-					res = con.Convert(converter::AssetType::Model, args);
-				}
-				else if (core::strUtil::IsEqualCaseInsen(pAssetType, L"anim"))
-				{
-					res = con.Convert(converter::AssetType::Anim, args);
-				}
-				else
-				{
-					X_ERROR("Converter", "Unkown asset type: \"%ls\"", pAssetType);
+
 				}
 			}
 		}
-
-		system("PAUSE");
+		
+		Console.PressToContinue();
 	}
 
 	return res ? 0 : -1;
