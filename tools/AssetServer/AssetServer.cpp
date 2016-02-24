@@ -61,7 +61,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		core::IPC::Pipe pipe;
 
 		if (pipe.create(R"(\\.\pipe\\Potato_AssetServer)",
-			core::IPC::Pipe::OpenMode::DUPLEX,
+			core::IPC::Pipe::CreateMode::DUPLEX,
 			core::IPC::Pipe::PipeMode::MESSAGE_RW,
 			10,
 			1024,
