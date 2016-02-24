@@ -11,7 +11,8 @@ public:
 	~EngineApp();
 
 	bool Init(const wchar_t* sInCmdLine, core::Console& Console);
-	int	MainLoop();
+	bool ShutDown(void);
+	int	MainLoop(void);
 
 private:
 

@@ -23,6 +23,8 @@ EngineApp::EngineApp() :
 
 EngineApp::~EngineApp()
 {
+	ShutDown();
+
 	if (hSystemHandle_) {
 		PotatoFreeLibrary(hSystemHandle_);
 	}
@@ -84,6 +86,16 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 
 	return true;
 }
+
+bool EngineApp::ShutDown(void)
+{
+	if (pICore_) {
+		pICore_->Release();
+	}
+	pICore_ = nullptr;
+	return true;
+}
+
 
 LRESULT CALLBACK EngineApp::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
