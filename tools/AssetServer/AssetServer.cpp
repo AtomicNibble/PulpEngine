@@ -60,7 +60,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		core::IPC::Pipe pipe;
 
-		if (pipe.create("Potato\\AssetServer",
+		if (pipe.create(R"(\\.\pipe\\Potato_AssetServer)",
 			core::IPC::Pipe::OpenMode::DUPLEX,
 			core::IPC::Pipe::PipeMode::MESSAGE_RW,
 			10,
@@ -72,7 +72,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			// connect to me baby.
 			if (pipe.connect())
 			{
-
+				// create a thread to service this client.
 
 			}
 		}
