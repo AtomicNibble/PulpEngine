@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Time\TimeVal.h>
+#include <Util\Flags.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -11,7 +12,7 @@ namespace IPC
 	{
 	public:
 
-		X_DECLARE_ENUM(OpenMode)(
+		X_DECLARE_ENUM(CreateMode)(
 			DUPLEX,			// The pipe is bi-directional; both server and client processes can read from and write to the pipe. 
 			INBOUND,		// The flow of data in the pipe goes from client to server only.
 			OUTBOUND		// The flow of data in the pipe goes from server to client only.
@@ -21,22 +22,24 @@ namespace IPC
 			MESSAGE_W,		// data sent as msg but read as byte
 			MESSAGE_RW		// data write / read as msg
 		);
-		X_DECLARE_ENUM(Access)(OPEN);
-		X_DECLARE_ENUM(ShareMode)(OPEN);
+
+		X_DECLARE_FLAGS(OpenMode)(READ, WRITE, APPEND, WRITE_FLUSH, RECREATE, SHARE, RANDOM_ACCESS);
+
+		typedef Flags<OpenMode> OpenModeFlags;
 
 	public:
 		Pipe();
 		~Pipe();
 
-		bool create(const char* name, OpenMode::Enum openMode, PipeMode::Enum pipeMode,
+		bool create(const char* name, CreateMode::Enum openMode, PipeMode::Enum pipeMode,
 			size_t maxInstances, size_t outBufferSize,
 			size_t inBufferSize, core::TimeVal defaultTimeOut);
-		bool create(const wchar_t* name, OpenMode::Enum openMode, PipeMode::Enum pipeMode,
+		bool create(const wchar_t* name, CreateMode::Enum openMode, PipeMode::Enum pipeMode,
 			size_t maxInstances, size_t outBufferSize,
 			size_t inBufferSize, core::TimeVal defaultTimeOut);
 
-		bool open(const char* name, Access::Enum desiredAccess, ShareMode::Enum shareMode);
-		bool open(const wchar_t* name, Access::Enum desiredAccess, ShareMode::Enum shareMode);
+		bool open(const char* name, OpenModeFlags openflags);
+		bool open(const wchar_t* name, OpenModeFlags openflags);
 
 		bool connect(void);
 		bool disconnect(void);

@@ -8,15 +8,15 @@ namespace IPC
 {
 	namespace
 	{
-		DWORD GetOpenMode(Pipe::OpenMode::Enum mode)
+		DWORD GetCreateMode(Pipe::CreateMode::Enum mode)
 		{
-			if (mode == Pipe::OpenMode::DUPLEX) {
+			if (mode == Pipe::CreateMode::DUPLEX) {
 				return PIPE_ACCESS_DUPLEX;
 			}
-			if (mode == Pipe::OpenMode::INBOUND) {
+			if (mode == Pipe::CreateMode::INBOUND) {
 				return PIPE_ACCESS_INBOUND;
 			}
-			if (mode == Pipe::Pipe::OpenMode::OUTBOUND) {
+			if (mode == Pipe::Pipe::CreateMode::OUTBOUND) {
 				return PIPE_ACCESS_OUTBOUND;
 			}
 
@@ -40,6 +40,28 @@ namespace IPC
 			return 0;
 		}
 
+		DWORD GetAccess(Pipe::OpenModeFlags mode)
+		{
+			DWORD val = 0;
+
+			if (mode.IsSet(Pipe::OpenMode::WRITE))
+				val |= FILE_WRITE_DATA;
+			if (mode.IsSet(Pipe::OpenMode::READ))
+				val |= FILE_READ_DATA;
+			if (mode.IsSet(Pipe::OpenMode::APPEND))
+				val |= FILE_APPEND_DATA;
+
+			X_ASSERT(val != 0, "Pipe must have one of the following modes, READ, WRITE, APPEND")(mode.ToInt());
+			return val;
+		}
+
+		DWORD GetShareMode(Pipe::OpenModeFlags mode)
+		{
+			if (mode.IsSet(Pipe::OpenMode::SHARE))
+				return FILE_WRITE_DATA;
+			return 0;
+		}
+
 
 	} // namespace 
 
@@ -54,15 +76,15 @@ namespace IPC
 		close();
 	}
 
-	bool Pipe::create(const char * name, OpenMode::Enum openMode, PipeMode::Enum pipeMode,
+	bool Pipe::create(const char * name, CreateMode::Enum createMode, PipeMode::Enum pipeMode,
 		size_t maxInstances, size_t outBufferSize, size_t inBufferSize, core::TimeVal defaultTimeOut)
 	{
 		wchar_t buf[256];
-		return create(core::strUtil::Convert(name, buf), openMode, pipeMode,
+		return create(core::strUtil::Convert(name, buf), createMode, pipeMode,
 			maxInstances, outBufferSize, inBufferSize, defaultTimeOut);
 	}
 
-	bool Pipe::create(const wchar_t* name, OpenMode::Enum openMode, PipeMode::Enum pipeMode,
+	bool Pipe::create(const wchar_t* name, CreateMode::Enum createMode, PipeMode::Enum pipeMode,
 		size_t maxInstances, size_t outBufferSize, size_t inBufferSize, core::TimeVal defaultTimeOut)
 	{
 		if (isOpen()) {
@@ -73,7 +95,7 @@ namespace IPC
 		DWORD timeoutMs = safe_static_cast<DWORD, int64_t>(defaultTimeOut.GetMilliSecondsAsInt64());
 
 		hPipe_ = CreateNamedPipeW(name,
-			GetOpenMode(openMode),
+			GetCreateMode(createMode),
 			GetPipeMode(pipeMode),
 			safe_static_cast<DWORD,size_t>(maxInstances), 
 			safe_static_cast<DWORD, size_t>(outBufferSize),
@@ -91,13 +113,13 @@ namespace IPC
 		return true;
 	}
 
-	bool Pipe::open(const char* name, Access::Enum desiredAccess, ShareMode::Enum shareMode)
+	bool Pipe::open(const char* name, OpenModeFlags openflags)
 	{
 		wchar_t buf[256];
-		return open(core::strUtil::Convert(name, buf), desiredAccess, shareMode);
+		return open(core::strUtil::Convert(name, buf), openflags);
 	}
 
-	bool Pipe::open(const wchar_t* name, Access::Enum desiredAccess, ShareMode::Enum shareMode)
+	bool Pipe::open(const wchar_t* name, OpenModeFlags openflags)
 	{
 		if (isOpen()) {
 			X_ERROR("Pipe", "Failed to open pipe: \"%ls\" a pipe is already open", name);
@@ -105,8 +127,8 @@ namespace IPC
 		}
 
 		hPipe_ = CreateFileW(name,
-			desiredAccess,
-			shareMode,
+			GetAccess(openflags),
+			GetShareMode(openflags),
 			nullptr, 
 			OPEN_EXISTING,
 			0,  // flags
@@ -213,7 +235,7 @@ namespace IPC
 
 		DWORD bytesRead = 0;
 
-		if (!::WriteFile(hPipe_,
+		if (!::ReadFile(hPipe_,
 			pBuffer,
 			safe_static_cast<DWORD, size_t>(numBytesToRead),
 			&bytesRead,
