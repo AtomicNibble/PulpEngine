@@ -20,6 +20,14 @@ X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
 #endif // !X_LIB
 
 
+#include "proto\assetdb.pb.h"
+
+#if X_DEBUG
+X_LINK_LIB("libprotobufd")
+#else
+X_LINK_LIB("libprotobuf")
+#endif // !X_DEBUG
+
 
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
@@ -51,7 +59,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	g_arena = &arena;
 
 	bool res = false;
-
+	 
 	if (engine.Init(lpCmdLine, Console))
 	{
 		X_LOG0("AssetServer", "Hello :)");
@@ -61,6 +69,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		core::IPC::Pipe pipe;
 
 		if (pipe.create(R"(\\.\pipe\\Potato_AssetServer)",
+
 			core::IPC::Pipe::CreateMode::DUPLEX,
 			core::IPC::Pipe::PipeMode::MESSAGE_RW,
 			10,
@@ -72,10 +81,27 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			// connect to me baby.
 			if (pipe.connect())
 			{
-				// create a thread to service this client.
+				GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+				ProtoBuf::AssetDB::Asset asset;
+
+		//		asset.ParsePartialFromString();
+				// create a thread to service this client.
+				char buf[1024];
+				size_t bytesRead;
+
+				pipe.read(buf, sizeof(buf), &bytesRead);
+
+				asset.ParsePartialFromString(std::string(buf));
+
+				buf[0] = 0;
 			}
 		}
+
+		// shut down the slut.
+		google::protobuf::ShutdownProtobufLibrary();
+
+		engine.ShutDown();
 	}
 
 	return 0;
