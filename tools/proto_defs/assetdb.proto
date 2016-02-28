@@ -1,0 +1,16 @@
+option cc_enable_arenas = true;
+
+package Potato.ProtoBuf.AssetDB;
+
+message Asset {
+  required string name = 1;
+  required int32 id = 2;
+
+    enum AssetType {
+      MODEL = 0;
+      ANIM = 1;
+      MATERIAL = 2;
+    }
+
+  optional AssetType type = 3;
+}
