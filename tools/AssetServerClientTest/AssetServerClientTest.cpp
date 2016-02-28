@@ -39,6 +39,10 @@ typedef core::MemoryArena<
 
 core::MemoryArenaBase* g_arena = nullptr;
 
+X_DISABLE_WARNING(4244)
+#include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/io/coded_stream.h>
+X_ENABLE_WARNING(4244)
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
@@ -88,6 +92,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				asset.SerializePartialToString(&msgStr);
 
 				pipe.write(msgStr.data(), msgStr.size());
+
+				{
+					const unsigned bufLength = 256;
+					unsigned char buffer[bufLength];
+				//	ProtoBuf::AssetDB::Asset asset;
+
+					google::protobuf::io::ArrayOutputStream arrayOutput(buffer, bufLength);
+					google::protobuf::io::CodedOutputStream codedOutput(&arrayOutput);
+
+					codedOutput.WriteLittleEndian32(asset.ByteSize());
+					asset.SerializeToCodedStream(&codedOutput);
+
+				}
+
 
 				pipe.flush();
 
