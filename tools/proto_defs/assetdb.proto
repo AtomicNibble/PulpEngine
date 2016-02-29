@@ -1,16 +1,47 @@
-option cc_enable_arenas = true;
 
 package Potato.ProtoBuf.AssetDB;
 
-message Asset {
-  required string name = 1;
-  required int32 id = 2;
+// we want to be able to make requests to the asset db
+// todo the following:
+// add a new asset.
+// delete a asset.
+// rename a asset.
+// get the info about a asset?
+// update asset info.
 
-    enum AssetType {
-      MODEL = 0;
-      ANIM = 1;
-      MATERIAL = 2;
+enum AssetType {
+    MODEL = 1;
+    ANIM = 2;
+}
+
+message Reponse {
+    enum Result { OK = 1; FAIL = 2; }
+
+    required Result result = 1;
+    required string error = 2;
+}
+
+message AddAsset {
+    required string name = 1;
+    required AssetType type = 2;
+}
+
+message DeleteAsset {
+    required string name = 1;
+    required AssetType type = 2;
+}
+
+message RenameAsset {
+    required string name = 1;
+    required string newName = 2;
+    required AssetType type = 3;
+}
+
+message Request {
+
+    oneof msg {
+        AddAsset add = 1;
+        DeleteAsset del = 2;
+        RenameAsset rename = 3;
     }
-
-  optional AssetType type = 3;
 }
