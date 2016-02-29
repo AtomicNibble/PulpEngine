@@ -83,18 +83,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			{
 				GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-				ProtoBuf::AssetDB::Asset asset;
-
-		//		asset.ParsePartialFromString();
-				// create a thread to service this client.
-				char buf[1024];
-				size_t bytesRead;
-
-				pipe.read(buf, sizeof(buf), &bytesRead);
-
-				asset.ParsePartialFromString(std::string(buf));
-
-				buf[0] = 0;
+	
 			}
 		}
 

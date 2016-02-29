@@ -83,29 +83,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				pipe.getServerProcessId(&serverId);
 				pipe.getServerSessionId(&serverSessionId);
 
-				std::string msgStr;
-
-				ProtoBuf::AssetDB::Asset asset;
-				asset.set_id(4);
-				asset.set_name("test_model");
-				asset.set_type(ProtoBuf::AssetDB::Asset_AssetType_MODEL);
-				asset.SerializePartialToString(&msgStr);
-
-				pipe.write(msgStr.data(), msgStr.size());
-
-				{
-					const unsigned bufLength = 256;
-					unsigned char buffer[bufLength];
-				//	ProtoBuf::AssetDB::Asset asset;
-
-					google::protobuf::io::ArrayOutputStream arrayOutput(buffer, bufLength);
-					google::protobuf::io::CodedOutputStream codedOutput(&arrayOutput);
-
-					codedOutput.WriteLittleEndian32(asset.ByteSize());
-					asset.SerializeToCodedStream(&codedOutput);
-
-				}
-
 
 				pipe.flush();
 
