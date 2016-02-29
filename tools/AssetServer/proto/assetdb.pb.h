@@ -36,38 +36,60 @@ void  protobuf_AddDesc_assetdb_2eproto();
 void protobuf_AssignDesc_assetdb_2eproto();
 void protobuf_ShutdownFile_assetdb_2eproto();
 
-class Asset;
+class Reponse;
+class AddAsset;
+class DeleteAsset;
+class RenameAsset;
+class Request;
 
-enum Asset_AssetType {
-  Asset_AssetType_MODEL = 0,
-  Asset_AssetType_ANIM = 1,
-  Asset_AssetType_MATERIAL = 2
+enum Reponse_Result {
+  Reponse_Result_OK = 1,
+  Reponse_Result_FAIL = 2
 };
-bool Asset_AssetType_IsValid(int value);
-const Asset_AssetType Asset_AssetType_AssetType_MIN = Asset_AssetType_MODEL;
-const Asset_AssetType Asset_AssetType_AssetType_MAX = Asset_AssetType_MATERIAL;
-const int Asset_AssetType_AssetType_ARRAYSIZE = Asset_AssetType_AssetType_MAX + 1;
+bool Reponse_Result_IsValid(int value);
+const Reponse_Result Reponse_Result_Result_MIN = Reponse_Result_OK;
+const Reponse_Result Reponse_Result_Result_MAX = Reponse_Result_FAIL;
+const int Reponse_Result_Result_ARRAYSIZE = Reponse_Result_Result_MAX + 1;
 
-const ::google::protobuf::EnumDescriptor* Asset_AssetType_descriptor();
-inline const ::std::string& Asset_AssetType_Name(Asset_AssetType value) {
+const ::google::protobuf::EnumDescriptor* Reponse_Result_descriptor();
+inline const ::std::string& Reponse_Result_Name(Reponse_Result value) {
   return ::google::protobuf::internal::NameOfEnum(
-    Asset_AssetType_descriptor(), value);
+    Reponse_Result_descriptor(), value);
 }
-inline bool Asset_AssetType_Parse(
-    const ::std::string& name, Asset_AssetType* value) {
-  return ::google::protobuf::internal::ParseNamedEnum<Asset_AssetType>(
-    Asset_AssetType_descriptor(), name, value);
+inline bool Reponse_Result_Parse(
+    const ::std::string& name, Reponse_Result* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<Reponse_Result>(
+    Reponse_Result_descriptor(), name, value);
+}
+enum AssetType {
+  MODEL = 1,
+  ANIM = 2
+};
+bool AssetType_IsValid(int value);
+const AssetType AssetType_MIN = MODEL;
+const AssetType AssetType_MAX = ANIM;
+const int AssetType_ARRAYSIZE = AssetType_MAX + 1;
+
+const ::google::protobuf::EnumDescriptor* AssetType_descriptor();
+inline const ::std::string& AssetType_Name(AssetType value) {
+  return ::google::protobuf::internal::NameOfEnum(
+    AssetType_descriptor(), value);
+}
+inline bool AssetType_Parse(
+    const ::std::string& name, AssetType* value) {
+  return ::google::protobuf::internal::ParseNamedEnum<AssetType>(
+    AssetType_descriptor(), name, value);
 }
 // ===================================================================
 
-class Asset : public ::google::protobuf::Message {
+class Reponse : public ::google::protobuf::Message {
  public:
-  Asset();
-  virtual ~Asset();
+  Reponse();
+  virtual ~Reponse();
 
-  Asset(const Asset& from);
+  Reponse(const Reponse& from);
 
-  inline Asset& operator=(const Asset& from) {
+  inline Reponse& operator=(const Reponse& from) {
     CopyFrom(from);
     return *this;
   }
@@ -81,17 +103,17 @@ class Asset : public ::google::protobuf::Message {
   }
 
   static const ::google::protobuf::Descriptor* descriptor();
-  static const Asset& default_instance();
+  static const Reponse& default_instance();
 
-  void Swap(Asset* other);
+  void Swap(Reponse* other);
 
   // implements Message ----------------------------------------------
 
-  Asset* New() const;
+  Reponse* New() const;
   void CopyFrom(const ::google::protobuf::Message& from);
   void MergeFrom(const ::google::protobuf::Message& from);
-  void CopyFrom(const Asset& from);
-  void MergeFrom(const Asset& from);
+  void CopyFrom(const Reponse& from);
+  void MergeFrom(const Reponse& from);
   void Clear();
   bool IsInitialized() const;
 
@@ -111,30 +133,123 @@ class Asset : public ::google::protobuf::Message {
 
   // nested types ----------------------------------------------------
 
-  typedef Asset_AssetType AssetType;
-  static const AssetType MODEL = Asset_AssetType_MODEL;
-  static const AssetType ANIM = Asset_AssetType_ANIM;
-  static const AssetType MATERIAL = Asset_AssetType_MATERIAL;
-  static inline bool AssetType_IsValid(int value) {
-    return Asset_AssetType_IsValid(value);
+  typedef Reponse_Result Result;
+  static const Result OK = Reponse_Result_OK;
+  static const Result FAIL = Reponse_Result_FAIL;
+  static inline bool Result_IsValid(int value) {
+    return Reponse_Result_IsValid(value);
   }
-  static const AssetType AssetType_MIN =
-    Asset_AssetType_AssetType_MIN;
-  static const AssetType AssetType_MAX =
-    Asset_AssetType_AssetType_MAX;
-  static const int AssetType_ARRAYSIZE =
-    Asset_AssetType_AssetType_ARRAYSIZE;
+  static const Result Result_MIN =
+    Reponse_Result_Result_MIN;
+  static const Result Result_MAX =
+    Reponse_Result_Result_MAX;
+  static const int Result_ARRAYSIZE =
+    Reponse_Result_Result_ARRAYSIZE;
   static inline const ::google::protobuf::EnumDescriptor*
-  AssetType_descriptor() {
-    return Asset_AssetType_descriptor();
+  Result_descriptor() {
+    return Reponse_Result_descriptor();
   }
-  static inline const ::std::string& AssetType_Name(AssetType value) {
-    return Asset_AssetType_Name(value);
+  static inline const ::std::string& Result_Name(Result value) {
+    return Reponse_Result_Name(value);
   }
-  static inline bool AssetType_Parse(const ::std::string& name,
-      AssetType* value) {
-    return Asset_AssetType_Parse(name, value);
+  static inline bool Result_Parse(const ::std::string& name,
+      Result* value) {
+    return Reponse_Result_Parse(name, value);
   }
+
+  // accessors -------------------------------------------------------
+
+  // required .Potato.ProtoBuf.AssetDB.Reponse.Result result = 1;
+  inline bool has_result() const;
+  inline void clear_result();
+  static const int kResultFieldNumber = 1;
+  inline ::Potato::ProtoBuf::AssetDB::Reponse_Result result() const;
+  inline void set_result(::Potato::ProtoBuf::AssetDB::Reponse_Result value);
+
+  // required string error = 2;
+  inline bool has_error() const;
+  inline void clear_error();
+  static const int kErrorFieldNumber = 2;
+  inline const ::std::string& error() const;
+  inline void set_error(const ::std::string& value);
+  inline void set_error(const char* value);
+  inline void set_error(const char* value, size_t size);
+  inline ::std::string* mutable_error();
+  inline ::std::string* release_error();
+  inline void set_allocated_error(::std::string* error);
+
+  // @@protoc_insertion_point(class_scope:Potato.ProtoBuf.AssetDB.Reponse)
+ private:
+  inline void set_has_result();
+  inline void clear_has_result();
+  inline void set_has_error();
+  inline void clear_has_error();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::std::string* error_;
+  int result_;
+  friend void  protobuf_AddDesc_assetdb_2eproto();
+  friend void protobuf_AssignDesc_assetdb_2eproto();
+  friend void protobuf_ShutdownFile_assetdb_2eproto();
+
+  void InitAsDefaultInstance();
+  static Reponse* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class AddAsset : public ::google::protobuf::Message {
+ public:
+  AddAsset();
+  virtual ~AddAsset();
+
+  AddAsset(const AddAsset& from);
+
+  inline AddAsset& operator=(const AddAsset& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const AddAsset& default_instance();
+
+  void Swap(AddAsset* other);
+
+  // implements Message ----------------------------------------------
+
+  AddAsset* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const AddAsset& from);
+  void MergeFrom(const AddAsset& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
 
   // accessors -------------------------------------------------------
 
@@ -150,26 +265,17 @@ class Asset : public ::google::protobuf::Message {
   inline ::std::string* release_name();
   inline void set_allocated_name(::std::string* name);
 
-  // required int32 id = 2;
-  inline bool has_id() const;
-  inline void clear_id();
-  static const int kIdFieldNumber = 2;
-  inline ::google::protobuf::int32 id() const;
-  inline void set_id(::google::protobuf::int32 value);
-
-  // optional .Potato.ProtoBuf.AssetDB.Asset.AssetType type = 3;
+  // required .Potato.ProtoBuf.AssetDB.AssetType type = 2;
   inline bool has_type() const;
   inline void clear_type();
-  static const int kTypeFieldNumber = 3;
-  inline ::Potato::ProtoBuf::AssetDB::Asset_AssetType type() const;
-  inline void set_type(::Potato::ProtoBuf::AssetDB::Asset_AssetType value);
+  static const int kTypeFieldNumber = 2;
+  inline ::Potato::ProtoBuf::AssetDB::AssetType type() const;
+  inline void set_type(::Potato::ProtoBuf::AssetDB::AssetType value);
 
-  // @@protoc_insertion_point(class_scope:Potato.ProtoBuf.AssetDB.Asset)
+  // @@protoc_insertion_point(class_scope:Potato.ProtoBuf.AssetDB.AddAsset)
  private:
   inline void set_has_name();
   inline void clear_has_name();
-  inline void set_has_id();
-  inline void clear_has_id();
   inline void set_has_type();
   inline void clear_has_type();
 
@@ -178,75 +284,500 @@ class Asset : public ::google::protobuf::Message {
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
   ::std::string* name_;
-  ::google::protobuf::int32 id_;
   int type_;
   friend void  protobuf_AddDesc_assetdb_2eproto();
   friend void protobuf_AssignDesc_assetdb_2eproto();
   friend void protobuf_ShutdownFile_assetdb_2eproto();
 
   void InitAsDefaultInstance();
-  static Asset* default_instance_;
+  static AddAsset* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class DeleteAsset : public ::google::protobuf::Message {
+ public:
+  DeleteAsset();
+  virtual ~DeleteAsset();
+
+  DeleteAsset(const DeleteAsset& from);
+
+  inline DeleteAsset& operator=(const DeleteAsset& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const DeleteAsset& default_instance();
+
+  void Swap(DeleteAsset* other);
+
+  // implements Message ----------------------------------------------
+
+  DeleteAsset* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const DeleteAsset& from);
+  void MergeFrom(const DeleteAsset& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required string name = 1;
+  inline bool has_name() const;
+  inline void clear_name();
+  static const int kNameFieldNumber = 1;
+  inline const ::std::string& name() const;
+  inline void set_name(const ::std::string& value);
+  inline void set_name(const char* value);
+  inline void set_name(const char* value, size_t size);
+  inline ::std::string* mutable_name();
+  inline ::std::string* release_name();
+  inline void set_allocated_name(::std::string* name);
+
+  // required .Potato.ProtoBuf.AssetDB.AssetType type = 2;
+  inline bool has_type() const;
+  inline void clear_type();
+  static const int kTypeFieldNumber = 2;
+  inline ::Potato::ProtoBuf::AssetDB::AssetType type() const;
+  inline void set_type(::Potato::ProtoBuf::AssetDB::AssetType value);
+
+  // @@protoc_insertion_point(class_scope:Potato.ProtoBuf.AssetDB.DeleteAsset)
+ private:
+  inline void set_has_name();
+  inline void clear_has_name();
+  inline void set_has_type();
+  inline void clear_has_type();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::std::string* name_;
+  int type_;
+  friend void  protobuf_AddDesc_assetdb_2eproto();
+  friend void protobuf_AssignDesc_assetdb_2eproto();
+  friend void protobuf_ShutdownFile_assetdb_2eproto();
+
+  void InitAsDefaultInstance();
+  static DeleteAsset* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class RenameAsset : public ::google::protobuf::Message {
+ public:
+  RenameAsset();
+  virtual ~RenameAsset();
+
+  RenameAsset(const RenameAsset& from);
+
+  inline RenameAsset& operator=(const RenameAsset& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const RenameAsset& default_instance();
+
+  void Swap(RenameAsset* other);
+
+  // implements Message ----------------------------------------------
+
+  RenameAsset* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const RenameAsset& from);
+  void MergeFrom(const RenameAsset& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // required string name = 1;
+  inline bool has_name() const;
+  inline void clear_name();
+  static const int kNameFieldNumber = 1;
+  inline const ::std::string& name() const;
+  inline void set_name(const ::std::string& value);
+  inline void set_name(const char* value);
+  inline void set_name(const char* value, size_t size);
+  inline ::std::string* mutable_name();
+  inline ::std::string* release_name();
+  inline void set_allocated_name(::std::string* name);
+
+  // required string newName = 2;
+  inline bool has_newname() const;
+  inline void clear_newname();
+  static const int kNewNameFieldNumber = 2;
+  inline const ::std::string& newname() const;
+  inline void set_newname(const ::std::string& value);
+  inline void set_newname(const char* value);
+  inline void set_newname(const char* value, size_t size);
+  inline ::std::string* mutable_newname();
+  inline ::std::string* release_newname();
+  inline void set_allocated_newname(::std::string* newname);
+
+  // required .Potato.ProtoBuf.AssetDB.AssetType type = 3;
+  inline bool has_type() const;
+  inline void clear_type();
+  static const int kTypeFieldNumber = 3;
+  inline ::Potato::ProtoBuf::AssetDB::AssetType type() const;
+  inline void set_type(::Potato::ProtoBuf::AssetDB::AssetType value);
+
+  // @@protoc_insertion_point(class_scope:Potato.ProtoBuf.AssetDB.RenameAsset)
+ private:
+  inline void set_has_name();
+  inline void clear_has_name();
+  inline void set_has_newname();
+  inline void clear_has_newname();
+  inline void set_has_type();
+  inline void clear_has_type();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  ::std::string* name_;
+  ::std::string* newname_;
+  int type_;
+  friend void  protobuf_AddDesc_assetdb_2eproto();
+  friend void protobuf_AssignDesc_assetdb_2eproto();
+  friend void protobuf_ShutdownFile_assetdb_2eproto();
+
+  void InitAsDefaultInstance();
+  static RenameAsset* default_instance_;
+};
+// -------------------------------------------------------------------
+
+class Request : public ::google::protobuf::Message {
+ public:
+  Request();
+  virtual ~Request();
+
+  Request(const Request& from);
+
+  inline Request& operator=(const Request& from) {
+    CopyFrom(from);
+    return *this;
+  }
+
+  inline const ::google::protobuf::UnknownFieldSet& unknown_fields() const {
+    return _unknown_fields_;
+  }
+
+  inline ::google::protobuf::UnknownFieldSet* mutable_unknown_fields() {
+    return &_unknown_fields_;
+  }
+
+  static const ::google::protobuf::Descriptor* descriptor();
+  static const Request& default_instance();
+
+  enum MsgCase {
+    kAdd = 1,
+    kDel = 2,
+    kRename = 3,
+    MSG_NOT_SET = 0,
+  };
+
+  void Swap(Request* other);
+
+  // implements Message ----------------------------------------------
+
+  Request* New() const;
+  void CopyFrom(const ::google::protobuf::Message& from);
+  void MergeFrom(const ::google::protobuf::Message& from);
+  void CopyFrom(const Request& from);
+  void MergeFrom(const Request& from);
+  void Clear();
+  bool IsInitialized() const;
+
+  int ByteSize() const;
+  bool MergePartialFromCodedStream(
+      ::google::protobuf::io::CodedInputStream* input);
+  void SerializeWithCachedSizes(
+      ::google::protobuf::io::CodedOutputStream* output) const;
+  ::google::protobuf::uint8* SerializeWithCachedSizesToArray(::google::protobuf::uint8* output) const;
+  int GetCachedSize() const { return _cached_size_; }
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const;
+  public:
+  ::google::protobuf::Metadata GetMetadata() const;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // optional .Potato.ProtoBuf.AssetDB.AddAsset add = 1;
+  inline bool has_add() const;
+  inline void clear_add();
+  static const int kAddFieldNumber = 1;
+  inline const ::Potato::ProtoBuf::AssetDB::AddAsset& add() const;
+  inline ::Potato::ProtoBuf::AssetDB::AddAsset* mutable_add();
+  inline ::Potato::ProtoBuf::AssetDB::AddAsset* release_add();
+  inline void set_allocated_add(::Potato::ProtoBuf::AssetDB::AddAsset* add);
+
+  // optional .Potato.ProtoBuf.AssetDB.DeleteAsset del = 2;
+  inline bool has_del() const;
+  inline void clear_del();
+  static const int kDelFieldNumber = 2;
+  inline const ::Potato::ProtoBuf::AssetDB::DeleteAsset& del() const;
+  inline ::Potato::ProtoBuf::AssetDB::DeleteAsset* mutable_del();
+  inline ::Potato::ProtoBuf::AssetDB::DeleteAsset* release_del();
+  inline void set_allocated_del(::Potato::ProtoBuf::AssetDB::DeleteAsset* del);
+
+  // optional .Potato.ProtoBuf.AssetDB.RenameAsset rename = 3;
+  inline bool has_rename() const;
+  inline void clear_rename();
+  static const int kRenameFieldNumber = 3;
+  inline const ::Potato::ProtoBuf::AssetDB::RenameAsset& rename() const;
+  inline ::Potato::ProtoBuf::AssetDB::RenameAsset* mutable_rename();
+  inline ::Potato::ProtoBuf::AssetDB::RenameAsset* release_rename();
+  inline void set_allocated_rename(::Potato::ProtoBuf::AssetDB::RenameAsset* rename);
+
+  inline MsgCase msg_case() const;
+  // @@protoc_insertion_point(class_scope:Potato.ProtoBuf.AssetDB.Request)
+ private:
+  inline void set_has_add();
+  inline void set_has_del();
+  inline void set_has_rename();
+
+  inline bool has_msg();
+  void clear_msg();
+  inline void clear_has_msg();
+
+  ::google::protobuf::UnknownFieldSet _unknown_fields_;
+
+  ::google::protobuf::uint32 _has_bits_[1];
+  mutable int _cached_size_;
+  union MsgUnion {
+    ::Potato::ProtoBuf::AssetDB::AddAsset* add_;
+    ::Potato::ProtoBuf::AssetDB::DeleteAsset* del_;
+    ::Potato::ProtoBuf::AssetDB::RenameAsset* rename_;
+  } msg_;
+  ::google::protobuf::uint32 _oneof_case_[1];
+
+  friend void  protobuf_AddDesc_assetdb_2eproto();
+  friend void protobuf_AssignDesc_assetdb_2eproto();
+  friend void protobuf_ShutdownFile_assetdb_2eproto();
+
+  void InitAsDefaultInstance();
+  static Request* default_instance_;
 };
 // ===================================================================
 
 
 // ===================================================================
 
-// Asset
+// Reponse
 
-// required string name = 1;
-inline bool Asset::has_name() const {
+// required .Potato.ProtoBuf.AssetDB.Reponse.Result result = 1;
+inline bool Reponse::has_result() const {
   return (_has_bits_[0] & 0x00000001u) != 0;
 }
-inline void Asset::set_has_name() {
+inline void Reponse::set_has_result() {
   _has_bits_[0] |= 0x00000001u;
 }
-inline void Asset::clear_has_name() {
+inline void Reponse::clear_has_result() {
   _has_bits_[0] &= ~0x00000001u;
 }
-inline void Asset::clear_name() {
+inline void Reponse::clear_result() {
+  result_ = 1;
+  clear_has_result();
+}
+inline ::Potato::ProtoBuf::AssetDB::Reponse_Result Reponse::result() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.Reponse.result)
+  return static_cast< ::Potato::ProtoBuf::AssetDB::Reponse_Result >(result_);
+}
+inline void Reponse::set_result(::Potato::ProtoBuf::AssetDB::Reponse_Result value) {
+  assert(::Potato::ProtoBuf::AssetDB::Reponse_Result_IsValid(value));
+  set_has_result();
+  result_ = value;
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.Reponse.result)
+}
+
+// required string error = 2;
+inline bool Reponse::has_error() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void Reponse::set_has_error() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void Reponse::clear_has_error() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void Reponse::clear_error() {
+  if (error_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    error_->clear();
+  }
+  clear_has_error();
+}
+inline const ::std::string& Reponse::error() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.Reponse.error)
+  return *error_;
+}
+inline void Reponse::set_error(const ::std::string& value) {
+  set_has_error();
+  if (error_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    error_ = new ::std::string;
+  }
+  error_->assign(value);
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.Reponse.error)
+}
+inline void Reponse::set_error(const char* value) {
+  set_has_error();
+  if (error_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    error_ = new ::std::string;
+  }
+  error_->assign(value);
+  // @@protoc_insertion_point(field_set_char:Potato.ProtoBuf.AssetDB.Reponse.error)
+}
+inline void Reponse::set_error(const char* value, size_t size) {
+  set_has_error();
+  if (error_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    error_ = new ::std::string;
+  }
+  error_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:Potato.ProtoBuf.AssetDB.Reponse.error)
+}
+inline ::std::string* Reponse::mutable_error() {
+  set_has_error();
+  if (error_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    error_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:Potato.ProtoBuf.AssetDB.Reponse.error)
+  return error_;
+}
+inline ::std::string* Reponse::release_error() {
+  clear_has_error();
+  if (error_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = error_;
+    error_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void Reponse::set_allocated_error(::std::string* error) {
+  if (error_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete error_;
+  }
+  if (error) {
+    set_has_error();
+    error_ = error;
+  } else {
+    clear_has_error();
+    error_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.Reponse.error)
+}
+
+// -------------------------------------------------------------------
+
+// AddAsset
+
+// required string name = 1;
+inline bool AddAsset::has_name() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void AddAsset::set_has_name() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void AddAsset::clear_has_name() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void AddAsset::clear_name() {
   if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     name_->clear();
   }
   clear_has_name();
 }
-inline const ::std::string& Asset::name() const {
-  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.Asset.name)
+inline const ::std::string& AddAsset::name() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.AddAsset.name)
   return *name_;
 }
-inline void Asset::set_name(const ::std::string& value) {
+inline void AddAsset::set_name(const ::std::string& value) {
   set_has_name();
   if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     name_ = new ::std::string;
   }
   name_->assign(value);
-  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.Asset.name)
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AddAsset.name)
 }
-inline void Asset::set_name(const char* value) {
+inline void AddAsset::set_name(const char* value) {
   set_has_name();
   if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     name_ = new ::std::string;
   }
   name_->assign(value);
-  // @@protoc_insertion_point(field_set_char:Potato.ProtoBuf.AssetDB.Asset.name)
+  // @@protoc_insertion_point(field_set_char:Potato.ProtoBuf.AssetDB.AddAsset.name)
 }
-inline void Asset::set_name(const char* value, size_t size) {
+inline void AddAsset::set_name(const char* value, size_t size) {
   set_has_name();
   if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     name_ = new ::std::string;
   }
   name_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:Potato.ProtoBuf.AssetDB.Asset.name)
+  // @@protoc_insertion_point(field_set_pointer:Potato.ProtoBuf.AssetDB.AddAsset.name)
 }
-inline ::std::string* Asset::mutable_name() {
+inline ::std::string* AddAsset::mutable_name() {
   set_has_name();
   if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     name_ = new ::std::string;
   }
-  // @@protoc_insertion_point(field_mutable:Potato.ProtoBuf.AssetDB.Asset.name)
+  // @@protoc_insertion_point(field_mutable:Potato.ProtoBuf.AssetDB.AddAsset.name)
   return name_;
 }
-inline ::std::string* Asset::release_name() {
+inline ::std::string* AddAsset::release_name() {
   clear_has_name();
   if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     return NULL;
@@ -256,7 +787,7 @@ inline ::std::string* Asset::release_name() {
     return temp;
   }
 }
-inline void Asset::set_allocated_name(::std::string* name) {
+inline void AddAsset::set_allocated_name(::std::string* name) {
   if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     delete name_;
   }
@@ -267,58 +798,462 @@ inline void Asset::set_allocated_name(::std::string* name) {
     clear_has_name();
     name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
-  // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.Asset.name)
+  // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.AddAsset.name)
 }
 
-// required int32 id = 2;
-inline bool Asset::has_id() const {
+// required .Potato.ProtoBuf.AssetDB.AssetType type = 2;
+inline bool AddAsset::has_type() const {
   return (_has_bits_[0] & 0x00000002u) != 0;
 }
-inline void Asset::set_has_id() {
+inline void AddAsset::set_has_type() {
   _has_bits_[0] |= 0x00000002u;
 }
-inline void Asset::clear_has_id() {
+inline void AddAsset::clear_has_type() {
   _has_bits_[0] &= ~0x00000002u;
 }
-inline void Asset::clear_id() {
-  id_ = 0;
-  clear_has_id();
-}
-inline ::google::protobuf::int32 Asset::id() const {
-  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.Asset.id)
-  return id_;
-}
-inline void Asset::set_id(::google::protobuf::int32 value) {
-  set_has_id();
-  id_ = value;
-  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.Asset.id)
-}
-
-// optional .Potato.ProtoBuf.AssetDB.Asset.AssetType type = 3;
-inline bool Asset::has_type() const {
-  return (_has_bits_[0] & 0x00000004u) != 0;
-}
-inline void Asset::set_has_type() {
-  _has_bits_[0] |= 0x00000004u;
-}
-inline void Asset::clear_has_type() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void Asset::clear_type() {
-  type_ = 0;
+inline void AddAsset::clear_type() {
+  type_ = 1;
   clear_has_type();
 }
-inline ::Potato::ProtoBuf::AssetDB::Asset_AssetType Asset::type() const {
-  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.Asset.type)
-  return static_cast< ::Potato::ProtoBuf::AssetDB::Asset_AssetType >(type_);
+inline ::Potato::ProtoBuf::AssetDB::AssetType AddAsset::type() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.AddAsset.type)
+  return static_cast< ::Potato::ProtoBuf::AssetDB::AssetType >(type_);
 }
-inline void Asset::set_type(::Potato::ProtoBuf::AssetDB::Asset_AssetType value) {
-  assert(::Potato::ProtoBuf::AssetDB::Asset_AssetType_IsValid(value));
+inline void AddAsset::set_type(::Potato::ProtoBuf::AssetDB::AssetType value) {
+  assert(::Potato::ProtoBuf::AssetDB::AssetType_IsValid(value));
   set_has_type();
   type_ = value;
-  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.Asset.type)
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.AddAsset.type)
 }
 
+// -------------------------------------------------------------------
+
+// DeleteAsset
+
+// required string name = 1;
+inline bool DeleteAsset::has_name() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void DeleteAsset::set_has_name() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void DeleteAsset::clear_has_name() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void DeleteAsset::clear_name() {
+  if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    name_->clear();
+  }
+  clear_has_name();
+}
+inline const ::std::string& DeleteAsset::name() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.DeleteAsset.name)
+  return *name_;
+}
+inline void DeleteAsset::set_name(const ::std::string& value) {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    name_ = new ::std::string;
+  }
+  name_->assign(value);
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.DeleteAsset.name)
+}
+inline void DeleteAsset::set_name(const char* value) {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    name_ = new ::std::string;
+  }
+  name_->assign(value);
+  // @@protoc_insertion_point(field_set_char:Potato.ProtoBuf.AssetDB.DeleteAsset.name)
+}
+inline void DeleteAsset::set_name(const char* value, size_t size) {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    name_ = new ::std::string;
+  }
+  name_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:Potato.ProtoBuf.AssetDB.DeleteAsset.name)
+}
+inline ::std::string* DeleteAsset::mutable_name() {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    name_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:Potato.ProtoBuf.AssetDB.DeleteAsset.name)
+  return name_;
+}
+inline ::std::string* DeleteAsset::release_name() {
+  clear_has_name();
+  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = name_;
+    name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void DeleteAsset::set_allocated_name(::std::string* name) {
+  if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete name_;
+  }
+  if (name) {
+    set_has_name();
+    name_ = name;
+  } else {
+    clear_has_name();
+    name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.DeleteAsset.name)
+}
+
+// required .Potato.ProtoBuf.AssetDB.AssetType type = 2;
+inline bool DeleteAsset::has_type() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void DeleteAsset::set_has_type() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void DeleteAsset::clear_has_type() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void DeleteAsset::clear_type() {
+  type_ = 1;
+  clear_has_type();
+}
+inline ::Potato::ProtoBuf::AssetDB::AssetType DeleteAsset::type() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.DeleteAsset.type)
+  return static_cast< ::Potato::ProtoBuf::AssetDB::AssetType >(type_);
+}
+inline void DeleteAsset::set_type(::Potato::ProtoBuf::AssetDB::AssetType value) {
+  assert(::Potato::ProtoBuf::AssetDB::AssetType_IsValid(value));
+  set_has_type();
+  type_ = value;
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.DeleteAsset.type)
+}
+
+// -------------------------------------------------------------------
+
+// RenameAsset
+
+// required string name = 1;
+inline bool RenameAsset::has_name() const {
+  return (_has_bits_[0] & 0x00000001u) != 0;
+}
+inline void RenameAsset::set_has_name() {
+  _has_bits_[0] |= 0x00000001u;
+}
+inline void RenameAsset::clear_has_name() {
+  _has_bits_[0] &= ~0x00000001u;
+}
+inline void RenameAsset::clear_name() {
+  if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    name_->clear();
+  }
+  clear_has_name();
+}
+inline const ::std::string& RenameAsset::name() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.RenameAsset.name)
+  return *name_;
+}
+inline void RenameAsset::set_name(const ::std::string& value) {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    name_ = new ::std::string;
+  }
+  name_->assign(value);
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.RenameAsset.name)
+}
+inline void RenameAsset::set_name(const char* value) {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    name_ = new ::std::string;
+  }
+  name_->assign(value);
+  // @@protoc_insertion_point(field_set_char:Potato.ProtoBuf.AssetDB.RenameAsset.name)
+}
+inline void RenameAsset::set_name(const char* value, size_t size) {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    name_ = new ::std::string;
+  }
+  name_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:Potato.ProtoBuf.AssetDB.RenameAsset.name)
+}
+inline ::std::string* RenameAsset::mutable_name() {
+  set_has_name();
+  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    name_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:Potato.ProtoBuf.AssetDB.RenameAsset.name)
+  return name_;
+}
+inline ::std::string* RenameAsset::release_name() {
+  clear_has_name();
+  if (name_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = name_;
+    name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void RenameAsset::set_allocated_name(::std::string* name) {
+  if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete name_;
+  }
+  if (name) {
+    set_has_name();
+    name_ = name;
+  } else {
+    clear_has_name();
+    name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.RenameAsset.name)
+}
+
+// required string newName = 2;
+inline bool RenameAsset::has_newname() const {
+  return (_has_bits_[0] & 0x00000002u) != 0;
+}
+inline void RenameAsset::set_has_newname() {
+  _has_bits_[0] |= 0x00000002u;
+}
+inline void RenameAsset::clear_has_newname() {
+  _has_bits_[0] &= ~0x00000002u;
+}
+inline void RenameAsset::clear_newname() {
+  if (newname_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    newname_->clear();
+  }
+  clear_has_newname();
+}
+inline const ::std::string& RenameAsset::newname() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.RenameAsset.newName)
+  return *newname_;
+}
+inline void RenameAsset::set_newname(const ::std::string& value) {
+  set_has_newname();
+  if (newname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    newname_ = new ::std::string;
+  }
+  newname_->assign(value);
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.RenameAsset.newName)
+}
+inline void RenameAsset::set_newname(const char* value) {
+  set_has_newname();
+  if (newname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    newname_ = new ::std::string;
+  }
+  newname_->assign(value);
+  // @@protoc_insertion_point(field_set_char:Potato.ProtoBuf.AssetDB.RenameAsset.newName)
+}
+inline void RenameAsset::set_newname(const char* value, size_t size) {
+  set_has_newname();
+  if (newname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    newname_ = new ::std::string;
+  }
+  newname_->assign(reinterpret_cast<const char*>(value), size);
+  // @@protoc_insertion_point(field_set_pointer:Potato.ProtoBuf.AssetDB.RenameAsset.newName)
+}
+inline ::std::string* RenameAsset::mutable_newname() {
+  set_has_newname();
+  if (newname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    newname_ = new ::std::string;
+  }
+  // @@protoc_insertion_point(field_mutable:Potato.ProtoBuf.AssetDB.RenameAsset.newName)
+  return newname_;
+}
+inline ::std::string* RenameAsset::release_newname() {
+  clear_has_newname();
+  if (newname_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    return NULL;
+  } else {
+    ::std::string* temp = newname_;
+    newname_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+    return temp;
+  }
+}
+inline void RenameAsset::set_allocated_newname(::std::string* newname) {
+  if (newname_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
+    delete newname_;
+  }
+  if (newname) {
+    set_has_newname();
+    newname_ = newname;
+  } else {
+    clear_has_newname();
+    newname_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  }
+  // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.RenameAsset.newName)
+}
+
+// required .Potato.ProtoBuf.AssetDB.AssetType type = 3;
+inline bool RenameAsset::has_type() const {
+  return (_has_bits_[0] & 0x00000004u) != 0;
+}
+inline void RenameAsset::set_has_type() {
+  _has_bits_[0] |= 0x00000004u;
+}
+inline void RenameAsset::clear_has_type() {
+  _has_bits_[0] &= ~0x00000004u;
+}
+inline void RenameAsset::clear_type() {
+  type_ = 1;
+  clear_has_type();
+}
+inline ::Potato::ProtoBuf::AssetDB::AssetType RenameAsset::type() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.RenameAsset.type)
+  return static_cast< ::Potato::ProtoBuf::AssetDB::AssetType >(type_);
+}
+inline void RenameAsset::set_type(::Potato::ProtoBuf::AssetDB::AssetType value) {
+  assert(::Potato::ProtoBuf::AssetDB::AssetType_IsValid(value));
+  set_has_type();
+  type_ = value;
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.RenameAsset.type)
+}
+
+// -------------------------------------------------------------------
+
+// Request
+
+// optional .Potato.ProtoBuf.AssetDB.AddAsset add = 1;
+inline bool Request::has_add() const {
+  return msg_case() == kAdd;
+}
+inline void Request::set_has_add() {
+  _oneof_case_[0] = kAdd;
+}
+inline void Request::clear_add() {
+  if (has_add()) {
+    delete msg_.add_;
+    clear_has_msg();
+  }
+}
+inline const ::Potato::ProtoBuf::AssetDB::AddAsset& Request::add() const {
+  return has_add() ? *msg_.add_
+                      : ::Potato::ProtoBuf::AssetDB::AddAsset::default_instance();
+}
+inline ::Potato::ProtoBuf::AssetDB::AddAsset* Request::mutable_add() {
+  if (!has_add()) {
+    clear_msg();
+    set_has_add();
+    msg_.add_ = new ::Potato::ProtoBuf::AssetDB::AddAsset;
+  }
+  return msg_.add_;
+}
+inline ::Potato::ProtoBuf::AssetDB::AddAsset* Request::release_add() {
+  if (has_add()) {
+    clear_has_msg();
+    ::Potato::ProtoBuf::AssetDB::AddAsset* temp = msg_.add_;
+    msg_.add_ = NULL;
+    return temp;
+  } else {
+    return NULL;
+  }
+}
+inline void Request::set_allocated_add(::Potato::ProtoBuf::AssetDB::AddAsset* add) {
+  clear_msg();
+  if (add) {
+    set_has_add();
+    msg_.add_ = add;
+  }
+}
+
+// optional .Potato.ProtoBuf.AssetDB.DeleteAsset del = 2;
+inline bool Request::has_del() const {
+  return msg_case() == kDel;
+}
+inline void Request::set_has_del() {
+  _oneof_case_[0] = kDel;
+}
+inline void Request::clear_del() {
+  if (has_del()) {
+    delete msg_.del_;
+    clear_has_msg();
+  }
+}
+inline const ::Potato::ProtoBuf::AssetDB::DeleteAsset& Request::del() const {
+  return has_del() ? *msg_.del_
+                      : ::Potato::ProtoBuf::AssetDB::DeleteAsset::default_instance();
+}
+inline ::Potato::ProtoBuf::AssetDB::DeleteAsset* Request::mutable_del() {
+  if (!has_del()) {
+    clear_msg();
+    set_has_del();
+    msg_.del_ = new ::Potato::ProtoBuf::AssetDB::DeleteAsset;
+  }
+  return msg_.del_;
+}
+inline ::Potato::ProtoBuf::AssetDB::DeleteAsset* Request::release_del() {
+  if (has_del()) {
+    clear_has_msg();
+    ::Potato::ProtoBuf::AssetDB::DeleteAsset* temp = msg_.del_;
+    msg_.del_ = NULL;
+    return temp;
+  } else {
+    return NULL;
+  }
+}
+inline void Request::set_allocated_del(::Potato::ProtoBuf::AssetDB::DeleteAsset* del) {
+  clear_msg();
+  if (del) {
+    set_has_del();
+    msg_.del_ = del;
+  }
+}
+
+// optional .Potato.ProtoBuf.AssetDB.RenameAsset rename = 3;
+inline bool Request::has_rename() const {
+  return msg_case() == kRename;
+}
+inline void Request::set_has_rename() {
+  _oneof_case_[0] = kRename;
+}
+inline void Request::clear_rename() {
+  if (has_rename()) {
+    delete msg_.rename_;
+    clear_has_msg();
+  }
+}
+inline const ::Potato::ProtoBuf::AssetDB::RenameAsset& Request::rename() const {
+  return has_rename() ? *msg_.rename_
+                      : ::Potato::ProtoBuf::AssetDB::RenameAsset::default_instance();
+}
+inline ::Potato::ProtoBuf::AssetDB::RenameAsset* Request::mutable_rename() {
+  if (!has_rename()) {
+    clear_msg();
+    set_has_rename();
+    msg_.rename_ = new ::Potato::ProtoBuf::AssetDB::RenameAsset;
+  }
+  return msg_.rename_;
+}
+inline ::Potato::ProtoBuf::AssetDB::RenameAsset* Request::release_rename() {
+  if (has_rename()) {
+    clear_has_msg();
+    ::Potato::ProtoBuf::AssetDB::RenameAsset* temp = msg_.rename_;
+    msg_.rename_ = NULL;
+    return temp;
+  } else {
+    return NULL;
+  }
+}
+inline void Request::set_allocated_rename(::Potato::ProtoBuf::AssetDB::RenameAsset* rename) {
+  clear_msg();
+  if (rename) {
+    set_has_rename();
+    msg_.rename_ = rename;
+  }
+}
+
+inline bool Request::has_msg() {
+  return msg_case() != MSG_NOT_SET;
+}
+inline void Request::clear_has_msg() {
+  _oneof_case_[0] = MSG_NOT_SET;
+}
+inline Request::MsgCase Request::msg_case() const {
+  return Request::MsgCase(_oneof_case_[0]);
+}
 
 // @@protoc_insertion_point(namespace_scope)
 
@@ -330,10 +1265,15 @@ inline void Asset::set_type(::Potato::ProtoBuf::AssetDB::Asset_AssetType value) 
 namespace google {
 namespace protobuf {
 
-template <> struct is_proto_enum< ::Potato::ProtoBuf::AssetDB::Asset_AssetType> : ::google::protobuf::internal::true_type {};
+template <> struct is_proto_enum< ::Potato::ProtoBuf::AssetDB::Reponse_Result> : ::google::protobuf::internal::true_type {};
 template <>
-inline const EnumDescriptor* GetEnumDescriptor< ::Potato::ProtoBuf::AssetDB::Asset_AssetType>() {
-  return ::Potato::ProtoBuf::AssetDB::Asset_AssetType_descriptor();
+inline const EnumDescriptor* GetEnumDescriptor< ::Potato::ProtoBuf::AssetDB::Reponse_Result>() {
+  return ::Potato::ProtoBuf::AssetDB::Reponse_Result_descriptor();
+}
+template <> struct is_proto_enum< ::Potato::ProtoBuf::AssetDB::AssetType> : ::google::protobuf::internal::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Potato::ProtoBuf::AssetDB::AssetType>() {
+  return ::Potato::ProtoBuf::AssetDB::AssetType_descriptor();
 }
 
 }  // namespace google
