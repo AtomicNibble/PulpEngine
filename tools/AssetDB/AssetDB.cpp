@@ -54,8 +54,9 @@ bool AssetDB::CreateTables(void)
 		"args TEXT,"
 		"type INTEGER,"
 		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,"
-		"lastUpdateTime TIMESTAMP,"
+		"lastUpdateTime TIMESTAMP"
 		");")) {
+		X_ERROR("AssetDB", "Failed to create 'file_ids' table");
 		return false;
 	}
 
