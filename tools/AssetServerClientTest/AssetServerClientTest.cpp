@@ -122,7 +122,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		EngineApp engine;
 
-		core::Console Console(L"Potato - Converter");
+		core::Console Console(L"Potato - AssetServer Test Client");
 		Console.RedirectSTD();
 		Console.SetSize(60, 40, 2000);
 		Console.MoveTo(10, 10);
@@ -137,7 +137,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		{
 			core::IPC::Pipe pipe;
 
-			if (pipe.open(R"(\\.\pipe\\Potato_AssetServer)",
+			if (pipe.open("\\\\.\\pipe\\" X_ENGINE_NAME "_AssetServer",
 				core::IPC::Pipe::OpenMode::READ | core::IPC::Pipe::OpenMode::WRITE |
 				core::IPC::Pipe::OpenMode::SHARE
 				))
@@ -154,14 +154,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				X_LOG0("AssetClientTest", "ServerId: %i", serverId);
 				X_LOG0("AssetClientTest", "ServerSessionId: %i", serverSessionId);
 
-
-				ProtoBuf::AssetDB::AddAsset* pAdd = new ProtoBuf::AssetDB::AddAsset();
-				pAdd->set_name("test_model");
-				pAdd->set_type(ProtoBuf::AssetDB::AssetType::MODEL);
-
-				ProtoBuf::AssetDB::Request request;
-				request.set_allocated_add(pAdd);
-
 				size_t bytesRead;
 				const size_t bufLength = 0x200;
 				uint8_t buffer[bufLength];
@@ -170,14 +162,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 				// write the delimited msg to the buffer.
 				{		
+					ProtoBuf::AssetDB::AddAsset* pAdd = new ProtoBuf::AssetDB::AddAsset();
+					pAdd->set_name("test_model");
+					pAdd->set_type(ProtoBuf::AssetDB::AssetType::MODEL);
+
+					ProtoBuf::AssetDB::Request request;
+					request.set_allocated_add(pAdd);
 			
 					google::protobuf::io::ArrayOutputStream arrayOutput(buffer, bufLength);
 					WriteDelimitedTo(request, &arrayOutput);
 				
 					if (!pipe.write(buffer, safe_static_cast<size_t, int64_t>(arrayOutput.ByteCount()))) {
-
+						X_ERROR("AssetClientTest", "failed to write buffer");
 					}
 					if (!pipe.flush()) {
+						X_ERROR("AssetClientTest", "failed to flush pipe");
 
 					}
 				}
@@ -185,15 +184,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				// wait for the response.
 				{
 					if (!pipe.read(buffer, sizeof(buffer), &bytesRead)) {
-
+						X_ERROR("AssetClientTest", "failed to read response");
 					}
 
 					google::protobuf::io::ArrayInputStream arrayInput(buffer, bytesRead);
 
 					ProtoBuf::AssetDB::Reponse response;
 
-					if (!ReadDelimitedFrom(&arrayInput, &response, &cleanEof))
-					{
+					if (!ReadDelimitedFrom(&arrayInput, &response, &cleanEof)) {
 						X_ERROR("AssetClientTest", "Failed to read response msg");
 					}
 
@@ -202,6 +200,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 						// error.
 						const std::string err = response.error();
 						X_ERROR("AssetClientTest", "Request failed: %s", err.c_str());
+					}
+					else {
+						X_LOG0("AssetClientTest", "Reponse returned OK");
 					}
 				}
 
