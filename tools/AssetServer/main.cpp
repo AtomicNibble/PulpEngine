@@ -42,7 +42,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	EngineApp engine;
 
-	core::Console Console(L"Potato - Converter");
+	core::Console Console(L"Potato - AssetServer");
 	Console.RedirectSTD();
 	Console.SetSize(60, 40, 2000);
 	Console.MoveTo(10, 10);
@@ -57,7 +57,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		assetServer::AssetServer as;
 
-
+		// blocking, listining for connections.
+		// in most cases this will never return.
+		as.Run();
 
 		engine.ShutDown();
 	}
