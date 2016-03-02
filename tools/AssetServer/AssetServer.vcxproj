@@ -383,6 +383,7 @@
   <ItemGroup>
     <ClCompile Include="AssetServer.cpp" />
     <ClCompile Include="EngineApp.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="proto\assetdb.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">NotUsing</PrecompiledHeader>

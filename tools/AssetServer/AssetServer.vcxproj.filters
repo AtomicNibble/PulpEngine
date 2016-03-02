@@ -47,6 +47,9 @@
     <ClCompile Include="proto\assetdb.pb.cc">
       <Filter>proto</Filter>
     </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AssetServer.rc">

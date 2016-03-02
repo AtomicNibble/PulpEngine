@@ -44,6 +44,74 @@ X_DISABLE_WARNING(4244)
 #include <google/protobuf/io/coded_stream.h>
 X_ENABLE_WARNING(4244)
 
+
+bool ReadDelimitedFrom(google::protobuf::io::ZeroCopyInputStream* rawInput,
+	google::protobuf::MessageLite* message, bool* cleanEof)
+{
+	google::protobuf::io::CodedInputStream input(rawInput);
+	const int start = input.CurrentPosition();
+	if (cleanEof) {
+		*cleanEof = false;
+	}
+
+	// Read the size.
+	uint32_t size;
+	if (!input.ReadVarint32(&size))
+	{
+		if (cleanEof) {
+			*cleanEof = input.CurrentPosition() == start;
+		}
+		return false;
+	}
+	// Tell the stream not to read beyond that size.
+	google::protobuf::io::CodedInputStream::Limit limit = input.PushLimit(size);
+
+	// Parse the message.
+	if (!message->MergeFromCodedStream(&input)) {
+		return false;
+	}
+	if (!input.ConsumedEntireMessage()) {
+		return false;
+	}
+
+	// Release the limit.
+	input.PopLimit(limit);
+	return true;
+}
+
+
+bool WriteDelimitedTo(const google::protobuf::MessageLite& message,
+	google::protobuf::io::ZeroCopyOutputStream* rawOutput)
+{
+	// We create a new coded stream for each message. 
+	google::protobuf::io::CodedOutputStream output(rawOutput);
+
+	// Write the size.
+	const int size = message.ByteSize();
+	output.WriteVarint32(size);
+
+	uint8_t* buffer = output.GetDirectBufferForNBytesAndAdvance(size);
+	if (buffer != nullptr)
+	{
+		// Optimization:  The message fits in one buffer, so use the faster
+		// direct-to-array serialization path.
+		message.SerializeWithCachedSizesToArray(buffer);
+	}
+
+	else
+	{
+		// Slightly-slower path when the message is multiple buffers.
+		message.SerializeWithCachedSizes(&output);
+		if (output.HadError()) {
+			X_ERROR("Proto", "Failed to write msg to output stream");
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
@@ -83,8 +151,59 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				pipe.getServerProcessId(&serverId);
 				pipe.getServerSessionId(&serverSessionId);
 
+				X_LOG0("AssetClientTest", "ServerId: %i", serverId);
+				X_LOG0("AssetClientTest", "ServerSessionId: %i", serverSessionId);
 
-				pipe.flush();
+
+				ProtoBuf::AssetDB::AddAsset* pAdd = new ProtoBuf::AssetDB::AddAsset();
+				pAdd->set_name("test_model");
+				pAdd->set_type(ProtoBuf::AssetDB::AssetType::MODEL);
+
+				ProtoBuf::AssetDB::Request request;
+				request.set_allocated_add(pAdd);
+
+				size_t bytesRead;
+				const size_t bufLength = 0x200;
+				uint8_t buffer[bufLength];
+
+				bool cleanEof;
+
+				// write the delimited msg to the buffer.
+				{		
+			
+					google::protobuf::io::ArrayOutputStream arrayOutput(buffer, bufLength);
+					WriteDelimitedTo(request, &arrayOutput);
+				
+					if (!pipe.write(buffer, safe_static_cast<size_t, int64_t>(arrayOutput.ByteCount()))) {
+
+					}
+					if (!pipe.flush()) {
+
+					}
+				}
+				
+				// wait for the response.
+				{
+					if (!pipe.read(buffer, sizeof(buffer), &bytesRead)) {
+
+					}
+
+					google::protobuf::io::ArrayInputStream arrayInput(buffer, bytesRead);
+
+					ProtoBuf::AssetDB::Reponse response;
+
+					if (!ReadDelimitedFrom(&arrayInput, &response, &cleanEof))
+					{
+						X_ERROR("AssetClientTest", "Failed to read response msg");
+					}
+
+					if (response.result() != ProtoBuf::AssetDB::Reponse_Result_OK)
+					{
+						// error.
+						const std::string err = response.error();
+						X_ERROR("AssetClientTest", "Request failed: %s", err.c_str());
+					}
+				}
 
 			}
 			
