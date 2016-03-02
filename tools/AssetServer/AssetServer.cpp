@@ -16,6 +16,10 @@ X_LINK_LIB("libprotobuf")
 #endif // !X_DEBUG
 
 
+// need assetDB.
+X_LINK_LIB("engine_AssetDb")
+
+
 X_NAMESPACE_BEGIN(assetServer)
 
 namespace
@@ -139,17 +143,19 @@ bool AssetServer::Client::listen(void)
 		bool ok = false;
 		std::string err;
 
+		// have the asset server do the work of hte request.
+		// it may also set hte error string to return extra info.
 		ProtoBuf::AssetDB::Request::MsgCase type = request.msg_case();
 		switch (type)
 		{
 		case ProtoBuf::AssetDB::Request::kAdd:
-			ok = as_.AddAsset(request.add());
+			ok = as_.AddAsset(request.add(), err);
 			break;
 		case ProtoBuf::AssetDB::Request::kDel:
-			ok = as_.DeleteAsset(request.del());
+			ok = as_.DeleteAsset(request.del(), err);
 			break;
 		case ProtoBuf::AssetDB::Request::kRename:
-			ok = as_.RenameAsset(request.rename());
+			ok = as_.RenameAsset(request.rename(), err);
 			break;
 		default:
 			err = "Unkown request msg type";
@@ -174,7 +180,7 @@ bool AssetServer::Client::listen(void)
 	// disconnect.
 	pipe_.disconnect();
 
-	X_WARNING("AssetSever", "Dropped client connection..");
+	X_WARNING("AssetServer", "Dropped client connection..");
 	return true;
 }
 
@@ -255,7 +261,8 @@ bool AssetServer::Client::writeAndFlushBuf(const uint8_t* pBuf, size_t len)
 // -------------------------------------------
 
 
-AssetServer::AssetServer()
+AssetServer::AssetServer() :
+	lock_(50)
 {
 
 }
@@ -271,6 +278,9 @@ void AssetServer::Run(void)
 {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 
+	db_.OpenDB();
+	db_.CreateTables();
+
 	while (1)
 	{
 		Client client(*this);
@@ -278,26 +288,53 @@ void AssetServer::Run(void)
 		client.connect();
 		client.listen();
 	}
+
+	db_.CloseDB();
 }
 
 
 
-bool AssetServer::AddAsset(const ProtoBuf::AssetDB::AddAsset& add)
+bool AssetServer::AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& errOut)
 {
+	core::CriticalSection::ScopedLock slock(lock_);
 
+	// map type.
+	assetDb::AssetDB::AssetType::Enum type;
+
+	switch (add.type())
+	{
+	case ProtoBuf::AssetDB::AssetType::ANIM:
+		type = assetDb::AssetDB::AssetType::ANIM;
+		break;
+	case ProtoBuf::AssetDB::AssetType::MODEL:
+		type = assetDb::AssetDB::AssetType::MODEL;
+		break;
+	default:
+		errOut = "Unknown asset type in AddAsset()";
+		X_ERROR("Assetserver", errOut.c_str());
+		return false;
+	}
+	
+	core::string name(add.name().data(), add.name().length());
+
+	if (!db_.AddAsset(type, name)) {
+		errOut = "Failed to add asset";
+		return false;
+	}
 
 	return true;
 }
 
-bool AssetServer::DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del)
+bool AssetServer::DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::string& errOut)
 {
+	core::CriticalSection::ScopedLock slock(lock_);
 
 	return true;
-
 }
 
-bool AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename)
+bool AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std::string& errOut)
 {
+	core::CriticalSection::ScopedLock slock(lock_);
 
 
 	return true;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Platform\Pipe.h>
+#include <../AssetDB/AssetDB.h>
 
 
 X_NAMESPACE_DECLARE(ProtoBuf,
@@ -48,11 +49,14 @@ public:
 	void Run(void);
 
 private:
+	bool AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& errOut);
+	bool DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::string& errOut);
+	bool RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std::string& errOut);
 
-	bool AddAsset(const ProtoBuf::AssetDB::AddAsset& add);
-	bool DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del);
-	bool RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename);
+private:
+	core::CriticalSection lock_;
 
+	assetDb::AssetDB db_;
 };
 
 
