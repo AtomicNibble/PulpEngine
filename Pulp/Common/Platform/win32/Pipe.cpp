@@ -209,6 +209,10 @@ namespace IPC
 
 		DWORD bytesWritten = 0;
 
+		if (pNumberBytesWritten) {
+			*pNumberBytesWritten = 0;
+		}
+
 		if (!::WriteFile(hPipe_,
 			pBuffer,
 			safe_static_cast<DWORD, size_t>(numBytesToWrite),
@@ -218,6 +222,18 @@ namespace IPC
 		{
 			core::lastError::Description Dsc;
 			X_ERROR("Pipe", "Failed to write to pipe. Err: %s", core::lastError::ToString(Dsc));
+			return false;
+		}
+
+		if (bytesWritten == 0) {
+			core::lastError::Description Dsc;
+			uint32_t lastErr = core::lastError::Get();
+			if (lastErr == ERROR_BROKEN_PIPE) {
+				X_ERROR("Pipe", "Failed to write to a broken pipe. Err: %s", core::lastError::ToString(lastErr, Dsc));
+			}
+			else {
+				X_ERROR("Pipe", "Failed to write to pipe. Err: %s", core::lastError::ToString(lastErr, Dsc));
+			}
 			return false;
 		}
 
@@ -235,6 +251,10 @@ namespace IPC
 
 		DWORD bytesRead = 0;
 
+		if (pNumberBytesRead) {
+			*pNumberBytesRead = 0;
+		}
+
 		if (!::ReadFile(hPipe_,
 			pBuffer,
 			safe_static_cast<DWORD, size_t>(numBytesToRead),
@@ -244,6 +264,18 @@ namespace IPC
 		{
 			core::lastError::Description Dsc;
 			X_ERROR("Pipe", "Failed to read from pipe. Err: %s", core::lastError::ToString(Dsc));
+			return false;
+		}
+
+		if (bytesRead == 0) {
+			core::lastError::Description Dsc;
+			uint32_t lastErr = core::lastError::Get();
+			if (lastErr == ERROR_BROKEN_PIPE) {
+				X_ERROR("Pipe", "Failed to read from a broken pipe. Err: %s", core::lastError::ToString(lastErr, Dsc));
+			}
+			else {
+				X_ERROR("Pipe", "Failed to read from pipe. Err: %s", core::lastError::ToString(lastErr, Dsc));
+			}
 			return false;
 		}
 
