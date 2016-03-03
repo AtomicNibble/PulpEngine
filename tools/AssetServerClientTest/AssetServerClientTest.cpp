@@ -164,7 +164,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				// write the delimited msg to the buffer.
 				{		
 					ProtoBuf::AssetDB::AddAsset* pAdd = new ProtoBuf::AssetDB::AddAsset();
-					pAdd->set_name("test_model");
+					pAdd->set_name("test_asset");
 					pAdd->set_type(ProtoBuf::AssetDB::AssetType::MODEL);
 
 					ProtoBuf::AssetDB::Request request;
@@ -197,9 +197,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 						X_ERROR("AssetClientTest", "Failed to read response msg");
 					}
 
-					if (response.result() != ProtoBuf::AssetDB::Reponse_Result_OK)
-					{
-						// error.
+					if (response.result() != ProtoBuf::AssetDB::Reponse_Result_OK) {
 						const std::string err = response.error();
 						X_ERROR("AssetClientTest", "Request failed: %s", err.c_str());
 					}
@@ -208,12 +206,150 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					}
 				}
 
+
+				// write the delimited msg to the buffer.
+				{
+					ProtoBuf::AssetDB::AddAsset* pAdd = new ProtoBuf::AssetDB::AddAsset();
+					pAdd->set_name("test_asset");
+					pAdd->set_type(ProtoBuf::AssetDB::AssetType::ANIM);
+
+					ProtoBuf::AssetDB::Request request;
+					request.set_allocated_add(pAdd);
+
+					google::protobuf::io::ArrayOutputStream arrayOutput(buffer, bufLength);
+					WriteDelimitedTo(request, &arrayOutput);
+
+					if (!pipe.write(buffer, safe_static_cast<size_t, int64_t>(arrayOutput.ByteCount()))) {
+						X_ERROR("AssetClientTest", "failed to write buffer");
+					}
+					if (!pipe.flush()) {
+						X_ERROR("AssetClientTest", "failed to flush pipe");
+
+					}
+				}
+
+				// wait for the response.
+				{
+					if (!pipe.read(buffer, sizeof(buffer), &bytesRead)) {
+						X_ERROR("AssetClientTest", "failed to read response");
+					}
+
+					google::protobuf::io::ArrayInputStream arrayInput(buffer,
+						safe_static_cast<int32_t, size_t>(bytesRead));
+
+					ProtoBuf::AssetDB::Reponse response;
+
+					if (!ReadDelimitedFrom(&arrayInput, &response, &cleanEof)) {
+						X_ERROR("AssetClientTest", "Failed to read response msg");
+					}
+
+					if (response.result() != ProtoBuf::AssetDB::Reponse_Result_OK) {
+						const std::string err = response.error();
+						X_ERROR("AssetClientTest", "Request failed: %s", err.c_str());
+					}
+					else {
+						X_LOG0("AssetClientTest", "Reponse returned OK");
+					}
+				}
+
+				// write the delimited msg to the buffer.
+				{
+					ProtoBuf::AssetDB::AddAsset* pAdd = new ProtoBuf::AssetDB::AddAsset();
+					pAdd->set_name("dance_sexy");
+					pAdd->set_type(ProtoBuf::AssetDB::AssetType::ANIM);
+
+					ProtoBuf::AssetDB::Request request;
+					request.set_allocated_add(pAdd);
+
+					google::protobuf::io::ArrayOutputStream arrayOutput(buffer, bufLength);
+					WriteDelimitedTo(request, &arrayOutput);
+
+					if (!pipe.write(buffer, safe_static_cast<size_t, int64_t>(arrayOutput.ByteCount()))) {
+						X_ERROR("AssetClientTest", "failed to write buffer");
+					}
+					if (!pipe.flush()) {
+						X_ERROR("AssetClientTest", "failed to flush pipe");
+
+					}
+				}
+
+				// wait for the response.
+				{
+					if (!pipe.read(buffer, sizeof(buffer), &bytesRead)) {
+						X_ERROR("AssetClientTest", "failed to read response");
+					}
+
+					google::protobuf::io::ArrayInputStream arrayInput(buffer,
+						safe_static_cast<int32_t, size_t>(bytesRead));
+
+					ProtoBuf::AssetDB::Reponse response;
+
+					if (!ReadDelimitedFrom(&arrayInput, &response, &cleanEof)) {
+						X_ERROR("AssetClientTest", "Failed to read response msg");
+					}
+
+					if (response.result() != ProtoBuf::AssetDB::Reponse_Result_OK) {
+						const std::string err = response.error();
+						X_ERROR("AssetClientTest", "Request failed: %s", err.c_str());
+					}
+					else {
+						X_LOG0("AssetClientTest", "Reponse returned OK");
+					}
+				}
+
+				// write the delimited msg to the buffer.
+				{
+					ProtoBuf::AssetDB::RenameAsset* pRename = new ProtoBuf::AssetDB::RenameAsset();
+					pRename->set_name("dance_sexy");
+					pRename->set_newname("dance_sexy_new");
+					pRename->set_type(ProtoBuf::AssetDB::AssetType::ANIM);
+
+					ProtoBuf::AssetDB::Request request;
+					request.set_allocated_rename(pRename);
+
+					google::protobuf::io::ArrayOutputStream arrayOutput(buffer, bufLength);
+					WriteDelimitedTo(request, &arrayOutput);
+
+					if (!pipe.write(buffer, safe_static_cast<size_t, int64_t>(arrayOutput.ByteCount()))) {
+						X_ERROR("AssetClientTest", "failed to write buffer");
+					}
+					if (!pipe.flush()) {
+						X_ERROR("AssetClientTest", "failed to flush pipe");
+
+					}
+				}
+
+				// wait for the response.
+				{
+					if (!pipe.read(buffer, sizeof(buffer), &bytesRead)) {
+						X_ERROR("AssetClientTest", "failed to read response");
+					}
+
+					google::protobuf::io::ArrayInputStream arrayInput(buffer,
+						safe_static_cast<int32_t, size_t>(bytesRead));
+
+					ProtoBuf::AssetDB::Reponse response;
+
+					if (!ReadDelimitedFrom(&arrayInput, &response, &cleanEof)) {
+						X_ERROR("AssetClientTest", "Failed to read response msg");
+					}
+
+					if (response.result() != ProtoBuf::AssetDB::Reponse_Result_OK) {
+						const std::string err = response.error();
+						X_ERROR("AssetClientTest", "Request failed: %s", err.c_str());
+					}
+					else {
+						X_LOG0("AssetClientTest", "Reponse returned OK");
+					}
+				}
 			}
 			
 		}
 
 		// shut down the slut.
 		google::protobuf::ShutdownProtobufLibrary();
+
+		Console.PressToContinue();
 
 		engine.ShutDown();
 	}
