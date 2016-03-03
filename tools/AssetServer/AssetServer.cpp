@@ -317,8 +317,6 @@ void AssetServer::Run(void)
 
 bool AssetServer::AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& errOut)
 {
-	core::CriticalSection::ScopedLock slock(lock_);
-
 	// map type.
 	assetDb::AssetDB::AssetType::Enum type;
 
@@ -330,6 +328,8 @@ bool AssetServer::AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& 
 	
 	core::string name(add.name().data(), add.name().length());
 
+	core::CriticalSection::ScopedLock slock(lock_);
+
 	if (!db_.AddAsset(type, name)) {
 		errOut = "Failed to add asset";
 		return false;
@@ -340,8 +340,6 @@ bool AssetServer::AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& 
 
 bool AssetServer::DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::string& errOut)
 {
-	core::CriticalSection::ScopedLock slock(lock_);
-
 	// map type.
 	assetDb::AssetDB::AssetType::Enum type;
 
@@ -353,6 +351,8 @@ bool AssetServer::DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::st
 
 	core::string name(del.name().data(), del.name().length());
 
+	core::CriticalSection::ScopedLock slock(lock_);
+
 	if (!db_.DeleteAsset(type, name)) {
 		errOut = "Failed to add asset";
 		return false;
@@ -363,8 +363,6 @@ bool AssetServer::DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::st
 
 bool AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std::string& errOut)
 {
-	core::CriticalSection::ScopedLock slock(lock_);
-
 	// map type.
 	assetDb::AssetDB::AssetType::Enum type;
 
@@ -376,6 +374,8 @@ bool AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std:
 
 	core::string name(rename.name().data(), rename.name().length());
 	core::string newName(rename.newname().data(), rename.newname().length());
+
+	core::CriticalSection::ScopedLock slock(lock_);
 
 	if (!db_.RenameAsset(type, name, newName)) {
 		errOut = "Failed to add asset";
