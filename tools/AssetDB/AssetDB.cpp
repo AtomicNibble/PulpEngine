@@ -20,17 +20,35 @@ AssetDB::~AssetDB()
 
 bool AssetDB::AddAsset(AssetType::Enum type, const core::string& name)
 {
+	if (AssetExsists(type, name)) {
+		return false;
+	}
+
 	sql::SqlLiteTransaction trans(db_);
 	sql::SqlLiteCmd cmd(db_, "INSERT INTO file_ids (name, type) VALUES(?,?)");
 	cmd.bind(1, name.c_str());
 	cmd.bind(2, type);
 
-	int32_t res = cmd.execute();
-	if (res != 0) {
+	sql::Result::Enum res = cmd.execute();
+	if (res != sql::Result::OK) {
 		return false;
 	}
 
 	trans.commit();
+	return true;
+}
+
+bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name)
+{
+	sql::SqlLiteTransaction trans(db_, true);
+	sql::SqlLiteQuery qry(db_, "SELECT name, type FROM file_ids WHERE type = ? AND name = ?");
+	qry.bind(1, type);
+	qry.bind(2, name.c_str());
+
+	if (qry.begin() == qry.end()) {
+		return false;
+	}
+
 	return true;
 }
 
@@ -49,7 +67,7 @@ bool AssetDB::CreateTables(void)
 {
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS file_ids ("
 		" file_id INTEGER PRIMARY KEY,"
-		"name TEXT COLLATE NOCASE,"
+		"name TEXT UNIQUE COLLATE NOCASE,"
 		"path TEXT,"
 		"args TEXT,"
 		"type INTEGER,"

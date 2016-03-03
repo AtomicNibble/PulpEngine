@@ -17,6 +17,7 @@ public:
 	~AssetDB();
 
 	bool AddAsset(AssetType::Enum type, const core::string& name);
+	bool AssetExsists(AssetType::Enum type, const core::string& name);
 
 	bool OpenDB(void);
 	void CloseDB(void);
