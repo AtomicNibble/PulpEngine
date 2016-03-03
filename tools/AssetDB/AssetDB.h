@@ -11,14 +11,20 @@ class AssetDB
 
 public:
 	X_DECLARE_ENUM(AssetType)(MODEL, ANIM);
+	X_DECLARE_ENUM(Result)(
+		OK, 
+		NOT_FOUND,
+		NAME_TAKEN,
+		ERROR
+	);
 
 public:
 	AssetDB();
 	~AssetDB();
 
-	bool AddAsset(AssetType::Enum type, const core::string& name);
-	bool DeleteAsset(AssetType::Enum type, const core::string& name);
-	bool RenameAsset(AssetType::Enum type, const core::string& name, 
+	Result::Enum AddAsset(AssetType::Enum type, const core::string& name);
+	Result::Enum DeleteAsset(AssetType::Enum type, const core::string& name);
+	Result::Enum RenameAsset(AssetType::Enum type, const core::string& name,
 		const core::string& newName);
 
 	bool AssetExsists(AssetType::Enum type, const core::string& name);

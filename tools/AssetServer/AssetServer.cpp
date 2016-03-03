@@ -330,8 +330,10 @@ bool AssetServer::AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& 
 
 	core::CriticalSection::ScopedLock slock(lock_);
 
-	if (!db_.AddAsset(type, name)) {
-		errOut = "Failed to add asset";
+	assetDb::AssetDB::Result::Enum res = db_.AddAsset(type, name);
+	if (res != assetDb::AssetDB::Result::OK) {
+		errOut = "Failed to add asset. Err: ";
+		errOut += assetDb::AssetDB::Result::ToString(res);
 		return false;
 	}
 
@@ -353,8 +355,10 @@ bool AssetServer::DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::st
 
 	core::CriticalSection::ScopedLock slock(lock_);
 
-	if (!db_.DeleteAsset(type, name)) {
-		errOut = "Failed to add asset";
+	assetDb::AssetDB::Result::Enum res = db_.DeleteAsset(type, name);
+	if (res != assetDb::AssetDB::Result::OK) {
+		errOut = "Failed to delete asset. Err: ";
+		errOut += assetDb::AssetDB::Result::ToString(res);
 		return false;
 	}
 
@@ -377,11 +381,13 @@ bool AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std:
 
 	core::CriticalSection::ScopedLock slock(lock_);
 
-	if (!db_.RenameAsset(type, name, newName)) {
-		errOut = "Failed to add asset";
+	assetDb::AssetDB::Result::Enum res = db_.RenameAsset(type, name, newName);
+	if (res != assetDb::AssetDB::Result::OK) {
+		errOut = "Failed to rename asset. Err: ";
+		errOut += assetDb::AssetDB::Result::ToString(res);
 		return false;
 	}
-
+	
 	return true;
 }
 

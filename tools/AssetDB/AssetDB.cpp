@@ -18,10 +18,10 @@ AssetDB::~AssetDB()
 
 }
 
-bool AssetDB::AddAsset(AssetType::Enum type, const core::string& name)
+AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string& name)
 {
 	if (AssetExsists(type, name)) {
-		return false;
+		return Result::NAME_TAKEN;
 	}
 
 	sql::SqlLiteTransaction trans(db_);
@@ -31,15 +31,15 @@ bool AssetDB::AddAsset(AssetType::Enum type, const core::string& name)
 
 	sql::Result::Enum res = cmd.execute();
 	if (res != sql::Result::OK) {
-		return false;
+		return Result::ERROR;
 	}
 
 	trans.commit();
-	return true;
+	return Result::OK;
 }
 
 
-bool AssetDB::DeleteAsset(AssetType::Enum type, const core::string& name)
+AssetDB::Result::Enum AssetDB::DeleteAsset(AssetType::Enum type, const core::string& name)
 {
 	sql::SqlLiteTransaction trans(db_);
 	sql::SqlLiteCmd cmd(db_, "DELETE FROM file_ids WHERE type = ? AND name = ?");
@@ -48,19 +48,23 @@ bool AssetDB::DeleteAsset(AssetType::Enum type, const core::string& name)
 
 	sql::Result::Enum res = cmd.execute();
 	if (res != sql::Result::OK) {
-		return false;
+		return Result::ERROR;
 	}
 
 	trans.commit();
-	return true;
+	return Result::OK;
 }
 
 
-bool AssetDB::RenameAsset(AssetType::Enum type, const core::string& name,
+AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::string& name,
 	const core::string& newName)
 {
 	if (!AssetExsists(type, name)) {
-		return false;
+		return Result::NOT_FOUND;
+	}
+	// check if asset of same type already has new name
+	if (!AssetExsists(type, newName)) {
+		return Result::NAME_TAKEN; 
 	}
 
 	sql::SqlLiteTransaction trans(db_);
@@ -71,11 +75,11 @@ bool AssetDB::RenameAsset(AssetType::Enum type, const core::string& name,
 
 	sql::Result::Enum res = cmd.execute();
 	if (res != sql::Result::OK) {
-		return false;
+		return Result::ERROR;
 	}
 
 	trans.commit();
-	return true;
+	return Result::OK;
 }
 
 
