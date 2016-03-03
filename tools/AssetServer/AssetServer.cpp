@@ -197,7 +197,8 @@ bool AssetServer::Client::readRequest(ProtoBuf::AssetDB::Request& request)
 		return false;
 	}
 
-	google::protobuf::io::ArrayInputStream arrayInput(buffer, bytesRead);
+	google::protobuf::io::ArrayInputStream arrayInput(buffer, 
+		safe_static_cast<int32_t, size_t>(bytesRead));
 
 	if (!ReadDelimitedFrom(&arrayInput, &request, &cleanEof)) {
 		X_ERROR("AssetServer", "Failed to parse msg");

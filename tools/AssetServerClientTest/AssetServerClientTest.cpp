@@ -187,7 +187,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 						X_ERROR("AssetClientTest", "failed to read response");
 					}
 
-					google::protobuf::io::ArrayInputStream arrayInput(buffer, bytesRead);
+					google::protobuf::io::ArrayInputStream arrayInput(buffer,
+						safe_static_cast<int32_t, size_t>(bytesRead));
 
 					ProtoBuf::AssetDB::Reponse response;
 
