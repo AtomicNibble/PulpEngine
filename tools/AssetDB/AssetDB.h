@@ -5,7 +5,7 @@
 X_NAMESPACE_BEGIN(assetDb)
 
 
-class AssetDB
+class DLL_EXPORT AssetDB
 {
 	static const char* DB_NAME;
 
