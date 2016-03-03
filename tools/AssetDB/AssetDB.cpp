@@ -38,6 +38,47 @@ bool AssetDB::AddAsset(AssetType::Enum type, const core::string& name)
 	return true;
 }
 
+
+bool AssetDB::DeleteAsset(AssetType::Enum type, const core::string& name)
+{
+	sql::SqlLiteTransaction trans(db_);
+	sql::SqlLiteCmd cmd(db_, "DELETE FROM file_ids WHERE type = ? AND name = ?");
+	cmd.bind(1, type);
+	cmd.bind(2, name.c_str());
+
+	sql::Result::Enum res = cmd.execute();
+	if (res != sql::Result::OK) {
+		return false;
+	}
+
+	trans.commit();
+	return true;
+}
+
+
+bool AssetDB::RenameAsset(AssetType::Enum type, const core::string& name,
+	const core::string& newName)
+{
+	if (!AssetExsists(type, name)) {
+		return false;
+	}
+
+	sql::SqlLiteTransaction trans(db_);
+	sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET name = ? WHERE type = ? AND name = ?");
+	cmd.bind(1, newName);
+	cmd.bind(2, type);
+	cmd.bind(3, name.c_str());
+
+	sql::Result::Enum res = cmd.execute();
+	if (res != sql::Result::OK) {
+		return false;
+	}
+
+	trans.commit();
+	return true;
+}
+
+
 bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name)
 {
 	sql::SqlLiteTransaction trans(db_, true);
@@ -67,7 +108,7 @@ bool AssetDB::CreateTables(void)
 {
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS file_ids ("
 		" file_id INTEGER PRIMARY KEY,"
-		"name TEXT UNIQUE COLLATE NOCASE,"
+		"name TEXT COLLATE NOCASE," // names are not unique since we allow same name for diffrent type.
 		"path TEXT,"
 		"args TEXT,"
 		"type INTEGER,"
