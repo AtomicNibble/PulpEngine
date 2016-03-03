@@ -149,6 +149,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{F6416BBE
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "AssetServerClientTest", "..\tools\AssetServerClientTest\AssetServerClientTest.vcxproj", "{E45580F5-7A0E-45B1-8BC6-BB12D048BAEF}"
 	ProjectSection(ProjectDependencies) = postProject
+		{0D5772AB-8569-4802-B751-42C67275B1A2} = {0D5772AB-8569-4802-B751-42C67275B1A2}
 		{07328CCB-F9CC-4967-861E-272BCA0CAB04} = {07328CCB-F9CC-4967-861E-272BCA0CAB04}
 	EndProjectSection
 EndProject
