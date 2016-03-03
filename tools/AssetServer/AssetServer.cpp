@@ -60,36 +60,56 @@ namespace
 	}
 
 
-bool WriteDelimitedTo(const google::protobuf::MessageLite& message,
-	google::protobuf::io::ZeroCopyOutputStream* rawOutput)
-{
-	// We create a new coded stream for each message. 
-	google::protobuf::io::CodedOutputStream output(rawOutput);
-
-	// Write the size.
-	const int size = message.ByteSize();
-	output.WriteVarint32(size);
-
-	uint8_t* buffer = output.GetDirectBufferForNBytesAndAdvance(size);
-	if (buffer != nullptr)
+	bool WriteDelimitedTo(const google::protobuf::MessageLite& message,
+		google::protobuf::io::ZeroCopyOutputStream* rawOutput)
 	{
-		// Optimization:  The message fits in one buffer, so use the faster
-		// direct-to-array serialization path.
-		message.SerializeWithCachedSizesToArray(buffer);
-	}
+		// We create a new coded stream for each message. 
+		google::protobuf::io::CodedOutputStream output(rawOutput);
 
-	else
-	{
-		// Slightly-slower path when the message is multiple buffers.
-		message.SerializeWithCachedSizes(&output);
-		if (output.HadError()) {
-			X_ERROR("Proto", "Failed to write msg to output stream");
-			return false;
+		// Write the size.
+		const int size = message.ByteSize();
+		output.WriteVarint32(size);
+
+		uint8_t* buffer = output.GetDirectBufferForNBytesAndAdvance(size);
+		if (buffer != nullptr)
+		{
+			// Optimization:  The message fits in one buffer, so use the faster
+			// direct-to-array serialization path.
+			message.SerializeWithCachedSizesToArray(buffer);
 		}
+
+		else
+		{
+			// Slightly-slower path when the message is multiple buffers.
+			message.SerializeWithCachedSizes(&output);
+			if (output.HadError()) {
+				X_ERROR("Proto", "Failed to write msg to output stream");
+				return false;
+			}
+		}
+
+		return true;
 	}
 
-	return true;
-}
+
+	bool MapAssetType(ProtoBuf::AssetDB::AssetType type, assetDb::AssetDB::AssetType::Enum& typeOut)
+	{
+		switch (type)
+		{
+		case ProtoBuf::AssetDB::AssetType::ANIM:
+			typeOut = assetDb::AssetDB::AssetType::ANIM;
+			break;
+		case ProtoBuf::AssetDB::AssetType::MODEL:
+			typeOut = assetDb::AssetDB::AssetType::MODEL;
+			break;
+		default:
+			X_ASSERT_UNREACHABLE();
+			return false;
+			break;
+		}
+
+		return true;
+	}
 
 } // namespace
 
@@ -302,15 +322,7 @@ bool AssetServer::AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& 
 	// map type.
 	assetDb::AssetDB::AssetType::Enum type;
 
-	switch (add.type())
-	{
-	case ProtoBuf::AssetDB::AssetType::ANIM:
-		type = assetDb::AssetDB::AssetType::ANIM;
-		break;
-	case ProtoBuf::AssetDB::AssetType::MODEL:
-		type = assetDb::AssetDB::AssetType::MODEL;
-		break;
-	default:
+	if (!MapAssetType(add.type(), type)) {
 		errOut = "Unknown asset type in AddAsset()";
 		X_ERROR("Assetserver", errOut.c_str());
 		return false;
@@ -330,6 +342,22 @@ bool AssetServer::DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::st
 {
 	core::CriticalSection::ScopedLock slock(lock_);
 
+	// map type.
+	assetDb::AssetDB::AssetType::Enum type;
+
+	if (!MapAssetType(del.type(), type)) {
+		errOut = "Unknown asset type in DeleteAsset()";
+		X_ERROR("Assetserver", errOut.c_str());
+		return false;
+	}
+
+	core::string name(del.name().data(), del.name().length());
+
+	if (!db_.DeleteAsset(type, name)) {
+		errOut = "Failed to add asset";
+		return false;
+	}
+
 	return true;
 }
 
@@ -337,6 +365,22 @@ bool AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std:
 {
 	core::CriticalSection::ScopedLock slock(lock_);
 
+	// map type.
+	assetDb::AssetDB::AssetType::Enum type;
+
+	if (!MapAssetType(rename.type(), type)) {
+		errOut = "Unknown asset type in RenameAsset()";
+		X_ERROR("Assetserver", errOut.c_str());
+		return false;
+	}
+
+	core::string name(rename.name().data(), rename.name().length());
+	core::string newName(rename.newname().data(), rename.newname().length());
+
+	if (!db_.RenameAsset(type, name, newName)) {
+		errOut = "Failed to add asset";
+		return false;
+	}
 
 	return true;
 }
