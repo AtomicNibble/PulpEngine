@@ -334,37 +334,58 @@ Result::Enum SqlLiteStateMnt::bind(int idx, long long int value)
 	return static_cast<Result::Enum>(sqlite3_bind_int64(pStmt_, idx, value));
 }
 
-Result::Enum SqlLiteStateMnt::bind(int idx, const char* value, CopySemantic::Enum  fcopy)
+Result::Enum SqlLiteStateMnt::bind(int idx, const char* value, CopySemantic::Enum fcopy)
 {
-	return static_cast<Result::Enum>(sqlite3_bind_text(
+	Result::Enum res = static_cast<Result::Enum>(sqlite3_bind_text(
 		pStmt_, 
 		idx, 
 		value, 
 		safe_static_cast<int32, size_t>(std::strlen(value)), 
 		fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC
 	));
+
+	if (res != Result::OK) {
+		X_ERROR("", "bind(%i)-> \"%s\" failed. Err: %i",
+			idx, value, res);
+	}
+
+	return res;
 }
 
-Result::Enum SqlLiteStateMnt::bind(int idx, void const* value, int n, CopySemantic::Enum  fcopy)
+Result::Enum SqlLiteStateMnt::bind(int idx, const void* value, int n, CopySemantic::Enum fcopy)
 {
-	return static_cast<Result::Enum>(sqlite3_bind_blob(
+	Result::Enum res = static_cast<Result::Enum>(sqlite3_bind_blob(
 		pStmt_,
 		idx, 
 		value, 
 		n, 
 		fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC
 	));
+
+	if (res != Result::OK) {
+		X_ERROR("", "bind(%i)-> %p failed. Err: %i",
+			idx, value, res);
+	}
+	
+	return res;
 }
 
-Result::Enum SqlLiteStateMnt::bind(int idx, std::string const& value, CopySemantic::Enum  fcopy)
+Result::Enum SqlLiteStateMnt::bind(int idx, std::string const& value, CopySemantic::Enum fcopy)
 {
-	return static_cast<Result::Enum>(sqlite3_bind_text(
+	Result::Enum res = static_cast<Result::Enum>(sqlite3_bind_text(
 		pStmt_, 
 		idx, 
 		value.c_str(), 
 		safe_static_cast<int32, size_t>(value.size()), 
 		fcopy == CopySemantic::COPY ? SQLITE_TRANSIENT : SQLITE_STATIC
 	));
+
+	if (res != Result::OK) {
+		X_ERROR("", "bind(%i)-> \"%s\" failed. Err: %i",
+			idx, value.c_str(), res);
+	}
+
+	return res;
 }
 
 Result::Enum SqlLiteStateMnt::bind(int idx)
@@ -451,7 +472,7 @@ SqlLiteCmd::BindStream SqlLiteCmd::binder(int idx)
 Result::Enum SqlLiteCmd::execute(void)
 {
 	auto rc = step();
-	if (rc == SQLITE_DONE) {
+	if (rc == Result::DONE) {
 		rc = Result::OK;
 	}
 
@@ -567,13 +588,13 @@ SqlLiteQuery::rows::getstream SqlLiteQuery::rows::getter(int idx)
 
 SqlLiteQuery::query_iterator::query_iterator() : pCmd_(0)
 {
-	rc_ = SQLITE_DONE;
+	rc_ = Result::DONE;
 }
 
 SqlLiteQuery::query_iterator::query_iterator(SqlLiteQuery* cmd) : pCmd_(cmd)
 {
 	rc_ = pCmd_->step();
-	if (rc_ != SQLITE_ROW && rc_ != SQLITE_DONE) {
+	if (rc_ != Result::ROW && rc_ != Result::DONE) {
 		X_ERROR("SqlDb", "query step err(%i)", rc_);
 	}
 }
@@ -591,7 +612,7 @@ bool SqlLiteQuery::query_iterator::operator!=(SqlLiteQuery::query_iterator const
 SqlLiteQuery::query_iterator& SqlLiteQuery::query_iterator::operator++()
 {
 	rc_ = pCmd_->step();
-	if (rc_ != SQLITE_ROW && rc_ != SQLITE_DONE) {
+	if (rc_ != Result::ROW && rc_ != Result::DONE) {
 		X_ERROR("SqlDb", "query step err(%i)", rc_);
 	}
 	return *this;
