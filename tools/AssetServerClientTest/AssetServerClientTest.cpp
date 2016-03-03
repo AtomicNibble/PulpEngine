@@ -21,7 +21,8 @@ X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
 #endif // !X_LIB
 
 
-#include "proto\assetdb.pb.h"
+#include "..\protobuf\src\assetdb.pb.h"
+
 
 #if X_DEBUG
 X_LINK_LIB("libprotobufd")

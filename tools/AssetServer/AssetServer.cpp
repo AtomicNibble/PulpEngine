@@ -7,7 +7,7 @@ X_DISABLE_WARNING(4244)
 X_ENABLE_WARNING(4244)
 
 
-#include "proto\assetdb.pb.h"
+#include "..\protobuf\src\assetdb.pb.h"
 
 #if X_DEBUG
 X_LINK_LIB("libprotobufd")

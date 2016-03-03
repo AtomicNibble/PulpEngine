@@ -30,7 +30,7 @@
     <ClInclude Include="EngineApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="proto\assetdb.pb.h">
+    <ClInclude Include="..\protobuf\src\assetdb.pb.h">
       <Filter>proto</Filter>
     </ClInclude>
   </ItemGroup>
@@ -44,11 +44,11 @@
     <ClCompile Include="EngineApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="proto\assetdb.pb.cc">
-      <Filter>proto</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\protobuf\src\assetdb.pb.cc">
+      <Filter>proto</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
