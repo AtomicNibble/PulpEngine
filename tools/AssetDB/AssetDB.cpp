@@ -63,7 +63,7 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 		return Result::NOT_FOUND;
 	}
 	// check if asset of same type already has new name
-	if (!AssetExsists(type, newName)) {
+	if (AssetExsists(type, newName)) {
 		return Result::NAME_TAKEN; 
 	}
 
