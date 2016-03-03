@@ -91,7 +91,8 @@ namespace symbolResolution
 
 		HANDLE hProcess = GetCurrentProcess();
 
-		if( SymFromAddr( hProcess, (DWORD64)address, &displacement64, &sip.si ) && SymGetLineFromAddr64( hProcess, (DWORD64)address, &displacement, &line  ) )
+		if( SymFromAddr( hProcess, reinterpret_cast<DWORD64>(address), &displacement64, &sip.si ) && 
+			SymGetLineFromAddr64( hProcess, reinterpret_cast<DWORD64>(address), &displacement, &line  ) )
 		{
 			return SymbolInfo( sip.si.Name, line.FileName, line.LineNumber);
 		}
