@@ -7,3 +7,6 @@
 [submodule "game_folder/art_source"]
 	path = game_folder/art_source
 	url = git@www.touchingclothgames.com:root/PotatoEngine-ArtSource.git
+[submodule "3rdparty/Wwise_libs"]
+	path = 3rdparty/Wwise_libs
+	url = git@www.touchingclothgames.com:root/WwiseLibs.git
