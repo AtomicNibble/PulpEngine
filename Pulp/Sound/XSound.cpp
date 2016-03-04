@@ -63,7 +63,6 @@ X_LINK_LIB("AkExpanderFX");
 
 X_LINK_LIB("IOSONOProximityMixer");
 X_LINK_LIB("CrankcaseAudioREVModelPlayerFX");
-X_LINK_LIB("CommunicationCentral");
 
 X_LINK_LIB("iZTrashBoxModelerFX");
 X_LINK_LIB("iZTrashDelayFX");
@@ -77,6 +76,10 @@ X_LINK_LIB("ws2_32");
 X_LINK_LIB("msacm32");
 X_LINK_LIB("dxguid");
 
+
+#if X_SUPER == 0
+X_LINK_LIB("CommunicationCentral");
+#endif // !X_SUPER
 
 namespace AK
 {
@@ -186,6 +189,8 @@ bool XSound::Init(void)
 		return false;
 	}
 
+#if X_SUPER == 0
+
 	// Initialize communication.
 	AkCommSettings settingsComm;
 	AK::Comm::GetDefaultInitSettings(settingsComm);
@@ -195,6 +200,7 @@ bool XSound::Init(void)
 		AKASSERT(!"Cannot initialize music communication");
 		return false;
 	}
+#endif // !X_SUPER
 
 	// Register plugins
 	/// Note: This a convenience method for rapid prototyping. 
@@ -211,8 +217,9 @@ bool XSound::Init(void)
 void XSound::ShutDown(void)
 {
 	X_LOG0("SoundSys", "Shutting Down");
-
+#if X_SUPER == 0
 	Comm::Term();
+#endif // !X_SUPER
 
 	MusicEngine::Term();
 
