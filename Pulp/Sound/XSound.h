@@ -4,6 +4,7 @@
 #ifndef _X_SOUNG_I_H_
 #define _X_SOUNG_I_H_
 
+#include "IO\AkIoHook.h"
 
 X_NAMESPACE_BEGIN(sound)
 
@@ -29,8 +30,7 @@ public:
 	virtual float GetMasterVolume(void) const X_OVERRIDE;
 
 private:
-
-
+	IOhook ioHook_;
 };
 
 X_NAMESPACE_END

@@ -140,9 +140,8 @@ bool XSound::Init(void)
 	AkStreamMgrSettings stmSettings;
 	StreamMgr::GetDefaultSettings(stmSettings);
 
-//	AkDeviceSettings deviceSettings;
-//	deviceSettings.
-//	StreamMgr::GetDefaultDeviceSettings(deviceSettings);
+	AkDeviceSettings deviceSettings;
+	StreamMgr::GetDefaultDeviceSettings(deviceSettings);
 
 	AkInitSettings l_InitSettings;
 	AkPlatformInitSettings l_platInitSetings;
@@ -166,14 +165,12 @@ bool XSound::Init(void)
 		return false;
 	}
 
-#if 0
 	// Create an IO device.
-	if (g_lowLevelIO.Init(deviceSettings) != AK_Success)
+	if (ioHook_.Init(deviceSettings) != AK_Success)
 	{
 		AKASSERT(!"Cannot create streaming I/O device");
 		return false;
 	}
-#endif
 
 	// Initialize sound engine.
 	if (SoundEngine::Init(&l_InitSettings, &l_platInitSetings) != AK_Success)
@@ -225,7 +222,7 @@ void XSound::ShutDown(void)
 
 	SoundEngine::Term();
 
-//	g_lowLevelIO.Term();
+	ioHook_.Term();
 
 	if (IAkStreamMgr::Get()) {
 		IAkStreamMgr::Get()->Destroy();
