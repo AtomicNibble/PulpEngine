@@ -353,11 +353,13 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="IO\AkIoHook.h" />
     <ClInclude Include="IPSound.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XSound.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="IO\AkIoHook.cpp" />
     <ClCompile Include="IPSound.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

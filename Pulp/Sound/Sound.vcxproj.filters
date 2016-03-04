@@ -9,6 +9,12 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="Header Files\IO">
+      <UniqueIdentifier>{b3091297-1b95-4493-9dd0-8fd7b0a33c82}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\IO">
+      <UniqueIdentifier>{c7afaa5c-c162-4123-9cc9-04f46165e41a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -20,6 +26,9 @@
     <ClInclude Include="IPSound.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="IO\AkIoHook.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -30,6 +39,9 @@
     </ClCompile>
     <ClCompile Include="IPSound.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\AkIoHook.cpp">
+      <Filter>Source Files\IO</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
