@@ -357,7 +357,7 @@ namespace
 
 		size_t Num = Cmd->GetArgCount();
 
-		if (Num != 3)
+		if (Num != 3 && Num != 5 && Num != 6)
 		{
 			X_WARNING("Console", "seta <var> <val>");
 			return;
@@ -365,7 +365,31 @@ namespace
 
 		if (ICVar* pCBar = pConsole->GetCVar(Cmd->GetArg(1)))
 		{
-			pCBar->Set(Cmd->GetArg(2));
+			VarFlag::Enum type = pCBar->GetType();
+			if (type == VarFlag::COLOR || type == VarFlag::VECTOR)
+			{
+				// just concat themm all into a string
+				core::StackString512 merged;
+
+				for (size_t i = 2; i < Num; i++)
+				{
+					merged.append(Cmd->GetArg(i));
+					merged.append(" ");
+				}
+
+
+				pCBar->Set(merged.c_str());
+			}
+			else
+			{
+				if (Num != 3)
+				{
+					X_WARNING("Console", "seta <var> <val>");
+					return;
+				}
+
+				pCBar->Set(Cmd->GetArg(2));
+			}
 
 			pCBar->SetFlags(pCBar->GetFlags() | VarFlag::ARCHIVE);
 		}
