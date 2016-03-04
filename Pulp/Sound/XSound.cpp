@@ -154,35 +154,35 @@ bool XSound::Init(void)
 	// Create and initialise an instance of our memory manager.
 	if (MemoryMgr::Init(&memSettings) != AK_Success)
 	{
-		AKASSERT(!"Could not create the memory manager.");
+		X_ERROR("SoundSys", "Could not create the memory manager.");
 		return false;
 	}
 
 	// Create and initialise an instance of the default stream manager.
 	if (!StreamMgr::Create(stmSettings))
 	{
-		AKASSERT(!"Could not create the Stream Manager");
+		X_ERROR("SoundSys", "Could not create the Stream Manager");
 		return false;
 	}
 
 	// Create an IO device.
 	if (ioHook_.Init(deviceSettings) != AK_Success)
 	{
-		AKASSERT(!"Cannot create streaming I/O device");
+		X_ERROR("SoundSys", "Cannot create streaming I/O device");
 		return false;
 	}
 
 	// Initialize sound engine.
 	if (SoundEngine::Init(&l_InitSettings, &l_platInitSetings) != AK_Success)
 	{
-		AKASSERT(!"Cannot initialize sound engine");
+		X_ERROR("SoundSys", "Cannot initialize sound engine");
 		return false;
 	}
 
 	// Initialize music engine.
 	if (MusicEngine::Init(&musicInit) != AK_Success)
 	{
-		AKASSERT(!"Cannot initialize music engine");
+		X_ERROR("SoundSys", "Cannot initialize music engine");
 		return false;
 	}
 
@@ -194,7 +194,7 @@ bool XSound::Init(void)
 	AKPLATFORM::SafeStrCpy(settingsComm.szAppNetworkName, X_ENGINE_NAME, AK_COMM_SETTINGS_MAX_STRING_SIZE);
 	if (AK::Comm::Init(settingsComm) != AK_Success)
 	{
-		AKASSERT(!"Cannot initialize music communication");
+		X_ERROR("SoundSys", "Cannot initialize music communication");
 		return false;
 	}
 #endif // !X_SUPER
@@ -204,7 +204,7 @@ bool XSound::Init(void)
 	/// To reduce executable code size register/link only the plug-ins required by your game 
 	if (AK::SoundEngine::RegisterAllPlugins() != AK_Success)
 	{
-		AKASSERT(!"Error while registering plug-ins");
+		X_ERROR("SoundSys", "Error while registering plug-ins");
 		return false;
 	}
 
