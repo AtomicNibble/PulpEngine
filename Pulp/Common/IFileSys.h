@@ -411,11 +411,19 @@ struct IoRequestOpen
 
 struct IoRequestClose
 {
+	IoRequestClose() {
+		core::zero_object(this);
+	}
+
 	XFileAsync* pFile;
 };
 
 struct IoRequestRead
 {
+	IoRequestRead() {
+		core::zero_object(this);
+	}
+
 	XFileAsync* pFile;
 	void* pBuf;
 	uint64_t offset;	// support files >4gb.
