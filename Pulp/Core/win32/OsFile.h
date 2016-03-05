@@ -8,8 +8,18 @@
 X_NAMESPACE_BEGIN(core)
 
 
-struct OsFile
+
+class OsFile
 {
+public:
+	struct DiskInfo
+	{
+		size_t physicalSectorSize;
+		size_t logicalSectorSize;
+		size_t cacheLaneSize;
+	};
+
+public:
 	OsFile(const wchar_t* path, IFileSys::fileModeFlags mode);
 	~OsFile(void);
 
@@ -25,6 +35,8 @@ struct OsFile
 	bool valid(void) const;
 
 	static XFileStats& fileStats(void);
+
+	static bool getDiskInfo(const wchar_t* pDevie, DiskInfo& info);
 
 private:
 	IFileSys::fileModeFlags mode_;

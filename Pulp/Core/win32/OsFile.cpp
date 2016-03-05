@@ -6,6 +6,7 @@
 
 #include <String\HumanSize.h>
 
+#include <WinIoCtl.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -221,6 +222,63 @@ XFileStats& OsFile::fileStats(void)
 	core::zero_object(blank);
 	return blank;
 #endif // !X_ENABLE_FILE_STATS
+}
+
+
+bool OsFile::getDiskInfo(const wchar_t* pDevie, DiskInfo& info)
+{
+	core::zero_object(info);
+
+	HANDLE hDevice = CreateFileW(pDevie,
+		0, 
+		0, 
+		NULL, 
+		OPEN_EXISTING,
+		0,
+		NULL
+	);
+
+	if (hDevice == INVALID_HANDLE_VALUE)
+	{
+		lastError::Description Dsc;
+		{
+			X_LOG_BULLET;
+			X_ERROR("File", "Failed to open disk device. Error: %s", lastError::ToString(Dsc));
+			X_ERROR("File", "DevicePath: %ls", pDevie);
+		}
+		return false;
+	}
+
+	DWORD outsize;
+	STORAGE_PROPERTY_QUERY storageQuery;
+	core::zero_object(storageQuery);
+
+	STORAGE_ACCESS_ALIGNMENT_DESCRIPTOR diskAlignment;
+	core::zero_object(diskAlignment);
+
+	storageQuery.PropertyId = StorageAccessAlignmentProperty;
+	storageQuery.QueryType = PropertyStandardQuery;
+
+	if (!DeviceIoControl(hDevice,
+		IOCTL_STORAGE_QUERY_PROPERTY,
+		&storageQuery,
+		sizeof(storageQuery),
+		&diskAlignment,
+		sizeof(diskAlignment),
+		&outsize,
+		NULL)
+		)
+	{
+		lastError::Description Dsc;
+		X_ERROR("File", "Failed to query disk info. Error: %s", lastError::ToString(Dsc));
+		X_ERROR("File", "DevicePath: %ls", pDevie);
+		return false;
+	}
+
+	info.logicalSectorSize = diskAlignment.BytesPerLogicalSector;
+	info.physicalSectorSize = diskAlignment.BytesPerPhysicalSector;
+	info.cacheLaneSize = diskAlignment.BytesPerCacheLine;
+	return true;
 }
 
 X_NAMESPACE_END
