@@ -43,7 +43,7 @@ public:
 		) X_OVERRIDE;
 
 	// Notifies that a transfer request is cancelled. It will be flushed by the streaming device when completed.
-	virtual void Cancel(AkFileDesc&	fileDesc, AkAsyncIOTransferInfo& io_transferInfo,	// Transfer info to cancel.
+	virtual void Cancel(AkFileDesc&	fileDesc, AkAsyncIOTransferInfo& transferInfo,	// Transfer info to cancel.
 		bool& io_bCancelAllTransfersForThisFile	// Flag indicating whether all transfers should be cancelled for this file (see notes in function description).
 		) X_OVERRIDE;
 

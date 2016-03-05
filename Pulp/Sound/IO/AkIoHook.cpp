@@ -1,11 +1,47 @@
 #include "stdafx.h"
 #include "AkIoHook.h"
 
+#include <IFileSys.h>
 
 X_NAMESPACE_BEGIN(sound)
 
-const wchar_t* IOhook::DEVICE_NAME = L"Engine VFS wrap";
+namespace
+{
+	core::fileModeFlags AKModeToEngineMode(AkOpenMode openMode)
+	{
+		core::fileModeFlags mode;
 
+		switch (openMode)
+		{
+		case AK_OpenModeRead:
+			mode.Set(core::fileMode::READ);
+			mode.Set(core::fileMode::SHARE);
+			mode.Set(core::fileMode::RANDOM_ACCESS);
+			break;
+		case AK_OpenModeWrite:
+			mode.Set(core::fileMode::WRITE);
+			mode.Set(core::fileMode::SHARE);
+			break;
+		case AK_OpenModeWriteOvrwr:
+			mode.Set(core::fileMode::WRITE);
+			mode.Set(core::fileMode::RECREATE);
+			break;
+		case AK_OpenModeReadWrite:
+			mode.Set(core::fileMode::READ);
+			mode.Set(core::fileMode::WRITE);
+			break;
+		default:
+			X_ASSERT_UNREACHABLE();
+			return core::fileModeFlags();
+		}
+
+		return mode;
+	}
+
+
+} // namespace
+
+const wchar_t* IOhook::DEVICE_NAME = L"Engine VFS wrap";
 
 IOhook::IOhook() :
 	pFileSys_(nullptr),
@@ -22,6 +58,11 @@ IOhook::~IOhook()
 
 AKRESULT IOhook::Init(const AkDeviceSettings& deviceSettings, bool AsyncOpen)
 {
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pFileSys);
+
+	pFileSys_ = gEnv->pFileSys;
+
 	if (deviceSettings.uSchedulerTypeFlags != AK_SCHEDULER_DEFERRED_LINED_UP) {
 		X_ERROR("SoundIO", "I/O hook only works with AK_SCHEDULER_DEFERRED_LINED_UP devices");
 		return AK_Fail;
@@ -39,8 +80,6 @@ AKRESULT IOhook::Init(const AkDeviceSettings& deviceSettings, bool AsyncOpen)
 		X_ERROR("SoundIO", "Failed to create device");
 		return AK_Fail;
 	}
-
-
 
 	return AK_Success;
 }
@@ -72,6 +111,37 @@ AKRESULT IOhook::Open(const AkOSChar* pszFileName, AkOpenMode eOpenMode,
 	X_UNUSED(SyncOpen);
 	X_UNUSED(outFileDesc);
 
+	if (SyncOpen || !asyncOpen_)
+	{
+		// sync open
+		SyncOpen = true;
+
+		core::fileModeFlags mode = AKModeToEngineMode(eOpenMode);
+		if (!mode.IsAnySet()) {
+			return AK_InvalidParameter;
+		}
+
+		core::XFileAsync* pFile = pFileSys_->openFileAsync(pszFileName, mode);
+		if (!pFile) {
+			return AK_Fail;
+		}
+
+		outFileDesc.hFile = pFile;
+		outFileDesc.iFileSize = pFile->remainingBytes();
+		outFileDesc.uSector = 0;
+		outFileDesc.deviceID = deviceID_;
+		outFileDesc.pCustomParam = (eOpenMode == AK_OpenModeRead) ? nullptr : (void*)1;
+		outFileDesc.uCustomParamSize = 0;
+		return AK_Success;
+	}
+	
+	// async open.
+	// We only need to specify the deviceID, and leave the boolean to false.
+	outFileDesc.iFileSize = 0;
+	outFileDesc.uSector = 0;
+	outFileDesc.deviceID = deviceID_;
+	outFileDesc.pCustomParam = nullptr;
+	outFileDesc.uCustomParamSize = 0;
 	return AK_Success;
 }
 
@@ -86,8 +156,26 @@ AKRESULT IOhook::Open(AkFileID fileID, AkOpenMode eOpenMode,
 	X_UNUSED(SyncOpen);
 	X_UNUSED(outFileDesc);
 
+	if (SyncOpen || !asyncOpen_)
+	{
+		// sync open
+		SyncOpen = true;
 
+		X_ASSERT_NOT_IMPLEMENTED();
+
+
+		return AK_Success;
+	}
+
+	// async open.
+	// We only need to specify the deviceID, and leave the boolean to false.
+	outFileDesc.iFileSize = 0;
+	outFileDesc.uSector = 0;
+	outFileDesc.deviceID = deviceID_;
+	outFileDesc.pCustomParam = nullptr;
+	outFileDesc.uCustomParamSize = 0;
 	return AK_Success;
+	
 }
 
 // ~IAkFileLocationAware
@@ -99,20 +187,40 @@ AKRESULT IOhook::Open(AkFileID fileID, AkOpenMode eOpenMode,
 AKRESULT IOhook::Read(AkFileDesc& fileDesc, const AkIoHeuristics& heuristics,	
 	AkAsyncIOTransferInfo& transferInfo)
 {
-	X_UNUSED(fileDesc);
 	X_UNUSED(heuristics);
-	X_UNUSED(transferInfo);
+	X_ASSERT_NOT_NULL(fileDesc.hFile);
+	X_ASSERT(transferInfo.uRequestedSize > 0, "")(transferInfo.uRequestedSize);
+	X_ASSERT(transferInfo.uBufferSize >= transferInfo.uRequestedSize,"")(transferInfo.uBufferSize, transferInfo.uRequestedSize);
+
+	core::XFileAsync* pFile = reinterpret_cast<core::XFileAsync*>(fileDesc.hFile);
+
+	core::XFileAsyncOperation op = pFile->readAsync(transferInfo.pBuffer,
+		transferInfo.uRequestedSize,
+		transferInfo.uFilePosition);
+	
+//	transferInfo.pUserData = op;
+	X_ASSERT_NOT_IMPLEMENTED();
 
 	return AK_Success;
 }
 
 // Writes data to a file (asynchronous).
 AKRESULT IOhook::Write(AkFileDesc&fileDesc, const AkIoHeuristics& heuristics, 
-	AkAsyncIOTransferInfo& io_transferInfo)
+	AkAsyncIOTransferInfo& transferInfo)
 {
-	X_UNUSED(fileDesc);
 	X_UNUSED(heuristics);
-	X_UNUSED(io_transferInfo);
+	X_ASSERT_NOT_NULL(fileDesc.hFile);
+	X_ASSERT(transferInfo.uRequestedSize > 0, "")(transferInfo.uRequestedSize);
+	X_ASSERT(transferInfo.uBufferSize >= transferInfo.uRequestedSize, "")(transferInfo.uBufferSize, transferInfo.uRequestedSize);
+
+	core::XFileAsync* pFile = reinterpret_cast<core::XFileAsync*>(fileDesc.hFile);
+
+	core::XFileAsyncOperation op = pFile->writeAsync(transferInfo.pBuffer,
+		transferInfo.uRequestedSize,
+		transferInfo.uFilePosition);
+
+	//	transferInfo.pUserData = op;
+	X_ASSERT_NOT_IMPLEMENTED();
 
 	return AK_Success;
 }
@@ -121,25 +229,32 @@ AKRESULT IOhook::Write(AkFileDesc&fileDesc, const AkIoHeuristics& heuristics,
 void IOhook::Cancel(AkFileDesc&	fileDesc, AkAsyncIOTransferInfo& transferInfo,
 	bool& bCancelAllTransfersForThisFile)
 {
-	X_UNUSED(fileDesc);
 	X_UNUSED(transferInfo);
-	X_UNUSED(bCancelAllTransfersForThisFile);
+	X_ASSERT_NOT_NULL(fileDesc.hFile);
+//	core::XFileAsync* pFile = reinterpret_cast<core::XFileAsync*>(fileDesc.hFile);
+
+	X_ASSERT_NOT_IMPLEMENTED();
+
+	bCancelAllTransfersForThisFile = false;
 }
 
 // Cleans up a file.
 AKRESULT IOhook::Close(AkFileDesc& fileDesc)
 {
-	X_UNUSED(fileDesc);
+	X_ASSERT_NOT_NULL(fileDesc.hFile);
+	core::XFileAsync* pFile = reinterpret_cast<core::XFileAsync*>(fileDesc.hFile);
 
+	pFileSys_->closeFileAsync(pFile);
 	return AK_Success;
 }
 
 // Returns the block size for the file or its storage device. 
 AkUInt32 IOhook::GetBlockSize(AkFileDesc& fileDesc)
 {
-	X_UNUSED(fileDesc);
-
-	return AK_Success;
+	if (fileDesc.pCustomParam == 0) {
+		return safe_static_cast<AkUInt32,size_t>(pFileSys_->getMinimumSectorSize());
+	}
+	return 1;
 }
 
 // Returns a description for the streaming device above this low-level hook.
