@@ -228,3 +228,12 @@ inline bool Path<TChar>::isAbsolute(void) const
 		str_[1] == ':';
 }
 
+template<typename TChar>
+inline int8_t Path<TChar>::getDriveNumber(void) const
+{
+	if (length() > 1 && str_[1] == ':') {
+		return safe_static_cast<int8_t,int32_t>(str_[0] - 'A');
+	}
+
+	return -1;
+}

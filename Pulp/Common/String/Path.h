@@ -63,6 +63,8 @@ public:
 
 	inline bool isAbsolute(void) const;
 
+	inline int8_t getDriveNumber(void) const;
+
 };
 
 
