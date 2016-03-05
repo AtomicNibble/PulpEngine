@@ -412,7 +412,7 @@ struct IoRequestOpen
 struct IoRequestClose
 {
 	IoRequestClose() {
-		core::zero_object(this);
+		core::zero_this(this);
 	}
 
 	XFileAsync* pFile;
@@ -421,7 +421,7 @@ struct IoRequestClose
 struct IoRequestRead
 {
 	IoRequestRead() {
-		core::zero_object(this);
+		core::zero_this(this);
 	}
 
 	XFileAsync* pFile;
