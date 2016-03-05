@@ -543,10 +543,12 @@ struct IFileSys
 
 	// async
 	virtual XFileAsync* openFileAsync(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_ABSTRACT;
+	virtual XFileAsync* openFileAsync(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_ABSTRACT;
 	virtual void closeFileAsync(XFileAsync* file) X_ABSTRACT;
 
 	// loads the whole file into memory.
 	virtual XFileMem* openFileMem(pathType path, fileModeFlags mode) X_ABSTRACT;
+	virtual XFileMem* openFileMem(pathTypeW path, fileModeFlags mode) X_ABSTRACT;
 	virtual void closeFileMem(XFileMem* file) X_ABSTRACT;
 
 	// Find util
@@ -571,6 +573,11 @@ struct IFileSys
 	// does not error, when it's a file or not exsist.
 	virtual bool isDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
 	virtual bool isDirectory(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
+
+	// returns the min sector size for all virtual directories.
+	// so if game folder is drive A and mod is drive B
+	// yet drive B has a larger sector size, it will return the largest.
+	virtual size_t getMinimumSectorSize(void) const X_ABSTRACT;
 
 	// stats
 	virtual XFileStats& getStats(void) const X_ABSTRACT;

@@ -100,11 +100,13 @@ public:
 	void closeFile(XFile* file) X_FINAL;
 
 	// async
-	virtual XFileAsync* openFileAsync(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;
-	virtual void closeFileAsync(XFileAsync* file) X_FINAL;
+	XFileAsync* openFileAsync(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;
+	XFileAsync* openFileAsync(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;
+	void closeFileAsync(XFileAsync* file) X_FINAL;
 
 	// Mem
 	XFileMem* openFileMem(pathType path, fileModeFlags mode) X_FINAL;
+	XFileMem* openFileMem(pathTypeW path, fileModeFlags mode) X_FINAL;
 	void closeFileMem(XFileMem* file) X_FINAL;
 
 	// folders
@@ -135,8 +137,10 @@ public:
 	bool isDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
 	bool isDirectory(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
 
+	size_t getMinimumSectorSize(void) const X_FINAL;
+
 	// settings baby
-	const XFileSysVars* getVars() const { return &vars_; }
+	const XFileSysVars* getVars(void) const { return &vars_; }
 
 	// stats
 	virtual XFileStats& getStats(void) const X_FINAL;

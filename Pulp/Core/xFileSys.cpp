@@ -370,6 +370,57 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 		else
 		{
 			fileModeFlags::Description Dsc;
+			X_WARNING("FileSys", "Failed to find file: %s, Flags: %s",
+				path, mode.ToString(Dsc));
+		}
+	}
+	else
+	{
+		if (location == VirtualDirectory::GAME)
+			createOSPath(gameDir_, path, real_path);
+		else
+		{
+			X_ASSERT_NOT_IMPLEMENTED();
+		}
+
+		pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode);
+
+		if (!pFile->valid()) {
+			closeFileAsync(pFile);
+			pFile = nullptr;
+		}
+	}
+
+	return pFile;
+}
+
+XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location)
+{
+	X_ASSERT_NOT_NULL(path);
+
+	XDiskFileAsync* pFile = nullptr;
+	core::Path<wchar_t> real_path;
+
+	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE))
+	{
+		_wfinddatai64_t findinfo;
+
+		XFindData FindData(path, this);
+		if (FindData.findnext(&findinfo))
+		{
+			FindData.getOSPath(real_path, &findinfo);
+
+			// TODO: pool allocations.
+			pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode);
+
+			if (!pFile->valid()) {
+				closeFileAsync(pFile);
+				pFile = nullptr;
+			}
+		}
+		else
+		{
+			fileModeFlags::Description Dsc;
 			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s",
 				path, mode.ToString(Dsc));
 		}
@@ -442,6 +493,59 @@ XFileMem* xFileSys::openFileMem(pathType path, fileModeFlags mode)
 		{
 			fileModeFlags::Description Dsc;
 			X_WARNING("FileSys", "Failed to find file: %s, Flags: %s",
+				path, mode.ToString(Dsc));
+		}
+	}
+	else
+	{
+		X_ASSERT_NOT_IMPLEMENTED();
+
+		X_ERROR("FileSys", "can't open a memory file for writing.");
+	}
+
+	return pFile;
+}
+
+
+XFileMem* xFileSys::openFileMem(pathTypeW path, fileModeFlags mode)
+{
+	X_ASSERT_NOT_NULL(path);
+
+	XFileMem* pFile = nullptr;
+
+	if (mode.IsSet(fileMode::READ))
+	{
+		_wfinddatai64_t findinfo;
+
+		XFindData FindData(path, this);
+		if (FindData.findnext(&findinfo))
+		{
+			core::Path<wchar_t> real_path;
+			FindData.getOSPath(real_path, &findinfo);
+
+			OsFile file(real_path.c_str(), mode);
+
+			if (file.valid())
+			{
+				size_t size = safe_static_cast<size_t, int64_t>(file.remainingBytes());
+				char* pBuf = X_NEW_ARRAY(char, size, &memFileArena_, "MemBuffer");
+
+				if (file.read(pBuf, size) == size)
+				{
+					pFile = X_NEW(XFileMem, &filePoolArena_, "MemFile")(pBuf, pBuf + size, &memFileArena_);
+
+				}
+				else
+				{
+					X_DELETE_ARRAY(pBuf, &memFileArena_);
+				}
+
+			}
+		}
+		else
+		{
+			fileModeFlags::Description Dsc;
+			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s",
 				path, mode.ToString(Dsc));
 		}
 	}
@@ -823,6 +927,58 @@ bool xFileSys::isDirectory(pathTypeW path, VirtualDirectory::Enum location) cons
 	return isDirectoryOS(buf.c_str());
 }
 
+
+size_t xFileSys::getMinimumSectorSize(void) const
+{
+	// get all the driver letters.
+	size_t sectorSize = 0;
+	fileModeFlags mode(fileMode::READ);
+
+	core::FixedArray<wchar_t, 128> DriveLettters;
+
+
+	for (search_s* s = searchPaths_; s; s = s->next_)
+	{
+		if (s->dir)
+		{
+			const core::Path<wchar_t>& path = s->dir->path;	
+			int8_t driveIdx = path.getDriveNumber(); // watch this be a bug at somepoint.
+			if(driveIdx >= 0)
+			{
+				wchar_t driveLetter = (L'A' + driveIdx);
+
+				if (std::find(DriveLettters.begin(), DriveLettters.end(), driveLetter) == DriveLettters.end()) {
+					DriveLettters.append(driveLetter);
+				}		
+			}
+		}
+	}
+
+	for (const auto d : DriveLettters)
+	{
+		core::StackString<64, wchar_t> device(L"\\\\.\\");
+
+		device.append(d, 1);
+		device.append(L":");
+
+		OsFile::DiskInfo info;
+		if (OsFile::getDiskInfo(device.c_str(), info)) {
+			sectorSize = core::Max(sectorSize, info.physicalSectorSize);
+		}
+		else {
+			// if we fail to query bump it up to 4096 incase the one that failed needed 4096.
+			sectorSize = core::Max<size_t>(sectorSize, 0x4096);
+		}
+	}
+
+
+	if (sectorSize == 0) {
+		sectorSize = 4096;
+	}
+
+	X_LOG2("FileSys", "Minimumsector size for all virtual dir: %" PRIuS, sectorSize);
+	return sectorSize;
+}
 
 
 // --------------------------------------------------
