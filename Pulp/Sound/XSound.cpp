@@ -166,6 +166,7 @@ bool XSound::Init(void)
 	}
 
 	// Create an IO device.
+	deviceSettings.uSchedulerTypeFlags = AK_SCHEDULER_DEFERRED_LINED_UP;
 	if (ioHook_.Init(deviceSettings) != AK_Success)
 	{
 		X_ERROR("SoundSys", "Cannot create streaming I/O device");
