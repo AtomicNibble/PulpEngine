@@ -819,7 +819,7 @@ bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum locati
 				if (!::CreateDirectoryW(Path.c_str(), NULL))
 				{
 					lastError::Description Dsc;
-					X_ERROR("xDir", "Failed to create directory. Error: %s",
+					X_ERROR("FileSys", "Failed to create directory. Error: %s",
 						lastError::ToString(Dsc));
 					return false;
 				}
