@@ -420,6 +420,7 @@ struct IoRequestRead
 	void* pBuf;
 	uint64_t offset;	// support files >4gb.
 	uint32_t dataSize; // don't support reading >4gb at once.
+	void* pUserData;
 };
 
 typedef IoRequestRead IoRequestWrite;

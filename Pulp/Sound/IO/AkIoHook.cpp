@@ -183,6 +183,22 @@ AKRESULT IOhook::Open(AkFileID fileID, AkOpenMode eOpenMode,
 
 // IAkIOHookDeferred
 
+void IOhook::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequestData& request,
+	core::XFileAsync* pFile, uint32_t bytesTransferred)
+{
+	X_UNUSED(pFileSys);
+	X_UNUSED(pFile);
+
+	AkAsyncIOTransferInfo* transferInfo = reinterpret_cast<AkAsyncIOTransferInfo*>(request.readInfo.pUserData);
+
+	AKRESULT eResult = AK_Fail;
+
+	if (request.readInfo.dataSize == bytesTransferred) {
+		eResult = AK_Success;
+	}
+
+	transferInfo->pCallback(transferInfo, eResult);
+}
 
 AKRESULT IOhook::Read(AkFileDesc& fileDesc, const AkIoHeuristics& heuristics,	
 	AkAsyncIOTransferInfo& transferInfo)
@@ -194,12 +210,18 @@ AKRESULT IOhook::Read(AkFileDesc& fileDesc, const AkIoHeuristics& heuristics,
 
 	core::XFileAsync* pFile = reinterpret_cast<core::XFileAsync*>(fileDesc.hFile);
 
-	core::XFileAsyncOperation op = pFile->readAsync(transferInfo.pBuffer,
-		transferInfo.uRequestedSize,
-		transferInfo.uFilePosition);
-	
-//	transferInfo.pUserData = op;
-	X_ASSERT_NOT_IMPLEMENTED();
+	core::IoRequestData req;
+	req.setType(core::IoRequest::READ);
+	req.callback.Bind<IOhook, &IOhook::IoRequestCallback>(this);
+
+	core::IoRequestRead& read = req.readInfo;
+	read.dataSize = transferInfo.uRequestedSize;
+	read.offset = transferInfo.uFilePosition;
+	read.pBuf = transferInfo.pBuffer;
+	read.pFile = pFile;
+	read.pUserData = &transferInfo;
+
+	pFileSys_->AddIoRequestToQue(req);
 
 	return AK_Success;
 }
@@ -215,12 +237,18 @@ AKRESULT IOhook::Write(AkFileDesc&fileDesc, const AkIoHeuristics& heuristics,
 
 	core::XFileAsync* pFile = reinterpret_cast<core::XFileAsync*>(fileDesc.hFile);
 
-	core::XFileAsyncOperation op = pFile->writeAsync(transferInfo.pBuffer,
-		transferInfo.uRequestedSize,
-		transferInfo.uFilePosition);
+	core::IoRequestData req;
+	req.setType(core::IoRequest::WRITE);
+	req.callback.Bind<IOhook, &IOhook::IoRequestCallback>(this);
 
-	//	transferInfo.pUserData = op;
-	X_ASSERT_NOT_IMPLEMENTED();
+	core::IoRequestRead& write = req.writeInfo;
+	write.dataSize = transferInfo.uRequestedSize;
+	write.offset = transferInfo.uFilePosition;
+	write.pBuf = transferInfo.pBuffer;
+	write.pFile = pFile;
+	write.pUserData = &transferInfo;
+
+	pFileSys_->AddIoRequestToQue(req);
 
 	return AK_Success;
 }

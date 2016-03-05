@@ -3,6 +3,11 @@
 
 #include <AK/SoundEngine/Common/AkStreamMgrModule.h>
 
+X_NAMESPACE_DECLARE(core,
+struct XFileAsync;
+class IoRequestData;
+)
+
 X_NAMESPACE_BEGIN(sound)
 
 class IOhook : public AK::StreamMgr::IAkFileLocationResolver,
@@ -57,6 +62,9 @@ public:
 	virtual AkUInt32 GetDeviceData(void) X_OVERRIDE;
 
 	// ~IAkIOHookDeferred
+private:
+	void IOhook::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequestData& request,
+		core::XFileAsync* pFile, uint32_t bytesTransferred);
 
 private:
 	core::IFileSys* pFileSys_;
