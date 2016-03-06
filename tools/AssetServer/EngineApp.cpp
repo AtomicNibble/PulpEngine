@@ -82,6 +82,8 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 		return false;
 	}
 
+	pICore_->RegisterAssertHandler(this);
+
 	LinkModule(pICore_, "Conveter");
 
 	return true;
@@ -90,12 +92,24 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 bool EngineApp::ShutDown(void)
 {
 	if (pICore_) {
+		pICore_->UnRegisterAssertHandler(this);
 		pICore_->Release();
 	}
 	pICore_ = nullptr;
 	return true;
 }
 
+void EngineApp::OnAssert(const core::SourceInfo& sourceInfo)
+{
+	X_UNUSED(sourceInfo);
+
+}
+
+void EngineApp::OnAssertVariable(const core::SourceInfo& sourceInfo)
+{
+	X_UNUSED(sourceInfo);
+
+}
 
 LRESULT CALLBACK EngineApp::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
