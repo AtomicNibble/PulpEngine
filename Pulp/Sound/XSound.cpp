@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "XSound.h"
 
+X_DISABLE_WARNING(4505)
+
 // Sound Engine
 #include <AK/SoundEngine/Common/AkSoundEngine.h>
 #include <AK/SoundEngine/Common/AkModule.h>
@@ -20,6 +22,8 @@
 
 // Plugin
 #include <AK/Plugin/AllPluginsRegistrationHelpers.h>
+
+X_ENABLE_WARNING(4505)
 
 // link the libs..
 X_LINK_LIB("AkSoundEngine");
@@ -76,6 +80,16 @@ X_LINK_LIB("ws2_32");
 X_LINK_LIB("msacm32");
 X_LINK_LIB("dxguid");
 
+// link all plugins
+#define PLUGIN_All 0
+
+#if PLUGIN_All == 0
+#define PLUGIN_Codec 1
+#define PLUGIN_Effect 1
+#define PLUGIN_Rumble 0
+#define PLUGIN_Source 1
+#define PLUGIN_Auro 0
+#endif // !PLUGIN_All
 
 #if X_SUPER == 0
 X_LINK_LIB("CommunicationCentral");
@@ -148,6 +162,7 @@ bool XSound::Init(void)
 	SoundEngine::GetDefaultInitSettings(l_InitSettings);
 	SoundEngine::GetDefaultPlatformInitSettings(l_platInitSetings);
 
+
 	AkMusicSettings musicInit;
 	MusicEngine::GetDefaultInitSettings(musicInit);
 
@@ -201,6 +216,51 @@ bool XSound::Init(void)
 #endif // !X_SUPER
 
 	// Register plugins
+#if !PLUGIN_All
+
+	// what ones do i even want o.o
+
+#if PLUGIN_Codec
+	if (AK::SoundEngine::RegisterAllCodecPlugins() != AK_Success)
+	{
+		X_ERROR("SoundSys", "Error while registering codec plug-ins");
+		return false;
+	}
+#endif // !PLUGIN_Codec
+
+#if PLUGIN_Effect
+	if (AK::SoundEngine::RegisterAllEffectPlugins() != AK_Success)
+	{
+		X_ERROR("SoundSys", "Error while registering effect plug-ins");
+		return false;
+	}
+#endif // !PLUGIN_Effect
+
+#if PLUGIN_Rumble
+	if (AK::SoundEngine::RegisterAllRumblePlugins() != AK_Success)
+	{
+		X_ERROR("SoundSys", "Error while registering rumble plug-ins");
+		return false;
+	}
+#endif // !PLUGIN_Rumble
+
+#if PLUGIN_Source
+	if (AK::SoundEngine::RegisterAllSourcePlugins() != AK_Success)
+	{
+		X_ERROR("SoundSys", "Error while registering souce plug-ins");
+		return false;
+	}
+#endif // !PLUGIN_Source
+
+#if PLUGIN_Auro
+	if (AK::SoundEngine::RegisterAuroPlugins() != AK_Success)
+	{
+		X_ERROR("SoundSys", "Error while registering auro plug-ins");
+		return false;
+	}
+#endif // !PLUGIN_Auro
+
+#else
 	/// Note: This a convenience method for rapid prototyping. 
 	/// To reduce executable code size register/link only the plug-ins required by your game 
 	if (AK::SoundEngine::RegisterAllPlugins() != AK_Success)
@@ -208,6 +268,7 @@ bool XSound::Init(void)
 		X_ERROR("SoundSys", "Error while registering plug-ins");
 		return false;
 	}
+#endif
 
 	return true;
 }
