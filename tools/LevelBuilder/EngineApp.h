@@ -6,13 +6,18 @@
 
 #define WIN_ENGINE_WINDOW_CLASSNAME "WinCatEngine"
 
-class EngineApp
+class EngineApp : public IAssertHandler
 {
 public:
 	EngineApp();
-	~EngineApp();
+	~EngineApp() X_OVERRIDE;
 
 	bool Init(const wchar_t* sInCmdLine, core::Console& Console);
+	bool ShutDown(void);
+
+private:
+	virtual void OnAssert(const core::SourceInfo& sourceInfo) X_OVERRIDE;
+	virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_OVERRIDE;
 
 private:
 
