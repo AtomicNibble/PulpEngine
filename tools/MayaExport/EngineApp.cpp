@@ -100,7 +100,7 @@ bool EngineApp::Init(void)
 
 	pICore_->RegisterAssertHandler(this);
 
-	LinkModule(pICore_, "Conveter");
+	LinkModule(pICore_, "MayaExport");
 	return true;
 }
 
