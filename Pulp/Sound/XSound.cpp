@@ -25,60 +25,6 @@ X_DISABLE_WARNING(4505)
 
 X_ENABLE_WARNING(4505)
 
-// link the libs..
-X_LINK_LIB("AkSoundEngine");
-X_LINK_LIB("AkMemoryMgr");
-X_LINK_LIB("AkMusicEngine");
-X_LINK_LIB("AkStreamMgr");
-X_LINK_LIB("AkConvolutionReverbFX");
-X_LINK_LIB("AkFlangerFX");
-X_LINK_LIB("AkTremoloFX");
-X_LINK_LIB("AuroHeadphoneFX");
-X_LINK_LIB("AkMotionGenerator");
-X_LINK_LIB("AkSineSource");
-X_LINK_LIB("AkSoundSeedWind");
-X_LINK_LIB("AkStereoDelayFX");
-X_LINK_LIB("AkGuitarDistortionFX");
-X_LINK_LIB("AkRumble");
-X_LINK_LIB("AkSilenceSource");
-X_LINK_LIB("AkSoundSeedImpactFX");
-X_LINK_LIB("AkRoomVerbFX");
-X_LINK_LIB("McDSPFutzBoxFX");
-X_LINK_LIB("AkParametricEQFX");
-X_LINK_LIB("AuroPannerMixer");
-X_LINK_LIB("AkToneSource");
-X_LINK_LIB("McDSPLimiterFX");
-X_LINK_LIB("AkCompressorFX");
-X_LINK_LIB("AkAudioInputSource");
-X_LINK_LIB("AkMusicEngine");
-X_LINK_LIB("AkSoundSeedWoosh");
-X_LINK_LIB("AkPitchShifterFX");
-X_LINK_LIB("AkPeakLimiterFX");
-X_LINK_LIB("AkDelayFX");
-X_LINK_LIB("AkGainFX");
-X_LINK_LIB("AkVorbisDecoder");
-X_LINK_LIB("AkMeterFX");
-X_LINK_LIB("AkMatrixReverbFX");
-X_LINK_LIB("AkSynthOne");
-X_LINK_LIB("AkMP3Source");
-X_LINK_LIB("AkHarmonizerFX");
-X_LINK_LIB("AkTimeStretchFX");
-X_LINK_LIB("AkExpanderFX");
-
-X_LINK_LIB("IOSONOProximityMixer");
-X_LINK_LIB("CrankcaseAudioREVModelPlayerFX");
-
-X_LINK_LIB("iZTrashBoxModelerFX");
-X_LINK_LIB("iZTrashDelayFX");
-X_LINK_LIB("iZTrashMultibandDistortionFX");
-X_LINK_LIB("iZHybridReverbFX");
-X_LINK_LIB("iZTrashDynamicsFX");
-X_LINK_LIB("iZTrashDistortionFX");
-X_LINK_LIB("iZTrashFiltersFX");
-
-X_LINK_LIB("ws2_32");
-X_LINK_LIB("msacm32");
-X_LINK_LIB("dxguid");
 
 // link all plugins
 #define PLUGIN_All 0
@@ -89,9 +35,98 @@ X_LINK_LIB("dxguid");
 #define PLUGIN_Rumble 0
 #define PLUGIN_Source 1
 #define PLUGIN_Auro 0
+#else
+#define PLUGIN_Codec 1
+#define PLUGIN_Effect 1
+#define PLUGIN_Rumble 1
+#define PLUGIN_Source 1
+#define PLUGIN_Auro 1
 #endif // !PLUGIN_All
 
+// link the libs..
+
+// engine
+X_LINK_LIB("AkMusicEngine");
+X_LINK_LIB("AkSoundEngine");
+X_LINK_LIB("AkMusicEngine");
+
+// managers
+X_LINK_LIB("AkMemoryMgr");
+X_LINK_LIB("AkStreamMgr");
+
+
+// decoeer / source?
+#if PLUGIN_Codec
+X_LINK_LIB("AkVorbisDecoder");
+#endif // !PLUGIN_Codec
+
+// source
+X_LINK_LIB("AkSilenceSource");
+X_LINK_LIB("AkMP3Source");
+X_LINK_LIB("AkToneSource");
+X_LINK_LIB("AkAudioInputSource");
+X_LINK_LIB("AkSineSource");
+
+// fx
+X_LINK_LIB("AkConvolutionReverbFX");
+X_LINK_LIB("AkFlangerFX");
+X_LINK_LIB("AkTremoloFX");
+#if PLUGIN_Auro
+X_LINK_LIB("AuroHeadphoneFX");
+#endif // !PLUGIN_Auro
+X_LINK_LIB("AkStereoDelayFX");
+X_LINK_LIB("AkGuitarDistortionFX");
+X_LINK_LIB("AkSoundSeedImpactFX");
+X_LINK_LIB("AkRoomVerbFX");
+X_LINK_LIB("AkParametricEQFX");
+X_LINK_LIB("AkCompressorFX");
+X_LINK_LIB("AkPitchShifterFX");
+X_LINK_LIB("AkPeakLimiterFX");
+X_LINK_LIB("AkDelayFX");
+X_LINK_LIB("AkGainFX");
+X_LINK_LIB("AkMeterFX");
+X_LINK_LIB("AkMatrixReverbFX");
+X_LINK_LIB("AkHarmonizerFX");
+X_LINK_LIB("AkTimeStretchFX");
+X_LINK_LIB("AkExpanderFX");
+X_LINK_LIB("McDSPFutzBoxFX");
+X_LINK_LIB("McDSPLimiterFX");
+X_LINK_LIB("CrankcaseAudioREVModelPlayerFX");
+
+// fx2
+#if 0 
+X_LINK_LIB("iZTrashBoxModelerFX");
+X_LINK_LIB("iZTrashDelayFX");
+X_LINK_LIB("iZTrashMultibandDistortionFX");
+X_LINK_LIB("iZHybridReverbFX");
+X_LINK_LIB("iZTrashDynamicsFX");
+X_LINK_LIB("iZTrashDistortionFX");
+X_LINK_LIB("iZTrashFiltersFX");
+#endif
+
+// misc
+#if PLUGIN_Auro
+X_LINK_LIB("AuroPannerMixer");
+#endif // !PLUGIN_Auro
+X_LINK_LIB("AkSoundSeedWoosh");
+X_LINK_LIB("AkSynthOne");
+X_LINK_LIB("AkMotionGenerator");
+X_LINK_LIB("AkSoundSeedWind");
+X_LINK_LIB("IOSONOProximityMixer");
+
+// rumble
+#if PLUGIN_Rumble == 0
+X_LINK_LIB("AkRumble");
+#endif // !PLUGIN_Rumble
+
+
+// devices
+X_LINK_LIB("msacm32");
+X_LINK_LIB("dxguid");
+
+
 #if X_SUPER == 0
+X_LINK_LIB("ws2_32"); // used for winsock
 X_LINK_LIB("CommunicationCentral");
 #endif // !X_SUPER
 
@@ -124,6 +159,19 @@ namespace AK
 		::VirtualFree(in_pMemAddress, in_size, in_dwFreeType);
 	}
 
+	void akAssertHook(const char* pszExpression, const char* pszFileName, int lineNumber)
+	{
+#if X_ENABLE_ASSERTIONS
+		core::SourceInfo sourceInfo("SoundSys", pszFileName, lineNumber, "", "");
+		core::Assert(sourceInfo, "Assertion \"%s\" failed.", pszExpression)
+			.Variable("FileName", pszFileName)
+			.Variable("LineNumber", lineNumber);
+
+#else
+		X_ERROR("SoundSys", "Sound system threw a assert: Exp: \"%s\" file: \"%s\" line: \"%s\"", 
+			pszExpression, pszFileName, lineNumber);
+#endif
+	}
 
 }
 
@@ -162,7 +210,6 @@ bool XSound::Init(void)
 	SoundEngine::GetDefaultInitSettings(l_InitSettings);
 	SoundEngine::GetDefaultPlatformInitSettings(l_platInitSetings);
 
-
 	AkMusicSettings musicInit;
 	MusicEngine::GetDefaultInitSettings(musicInit);
 
@@ -189,6 +236,36 @@ bool XSound::Init(void)
 	}
 
 	// Initialize sound engine.
+	l_InitSettings.pfnAssertHook = akAssertHook;
+	l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_Default;
+	{
+		const wchar_t* pOutputDevice = gEnv->pCore->GetCommandLineArgForVarW(L"snd_output_device");
+		if (pOutputDevice)
+		{
+			if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"xaudio2")) {
+				l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_XAudio2;
+				X_LOG1("SoundSys", "using output device: XAudio2");
+			}
+			else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"directsound")) {
+				l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_DirectSound;
+				X_LOG1("SoundSys", "using output device: directsound (DirectX Sound)");
+			}
+			else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"wasapi")) {
+				l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_Wasapi;
+				X_LOG1("SoundSys", "using output device: Wasapi (Windows Audio Session)");
+			}
+			else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"none")) {
+				l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_Dummy;
+				X_LOG1("SoundSys", "using output device: none (no sound)");
+			}
+			else {
+				X_ERROR("SoundSys", "Unknown output device \"%ls\" using default instead. valid options: "
+					"xaudio2, directsound, wasapi, none",
+					pOutputDevice);
+			}
+		}
+	}
+
 	if (SoundEngine::Init(&l_InitSettings, &l_platInitSetings) != AK_Success)
 	{
 		X_ERROR("SoundSys", "Cannot initialize sound engine");
