@@ -4,14 +4,19 @@
 #include <ICore.h>
 #include <Platform\Console.h>
 
-class EngineApp
+class EngineApp : public IAssertHandler
 {
 public:
 	EngineApp();
-	~EngineApp();
+	~EngineApp() X_OVERRIDE;
 
 	bool Init(const wchar_t* sInCmdLine, core::Console& Console);
-	int	MainLoop();
+	bool ShutDown(void);
+	int	MainLoop(void);
+
+private:
+	virtual void OnAssert(const core::SourceInfo& sourceInfo) X_OVERRIDE;
+	virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_OVERRIDE;
 
 private:
 
