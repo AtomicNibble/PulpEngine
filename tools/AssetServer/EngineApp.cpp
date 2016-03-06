@@ -84,7 +84,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 
 	pICore_->RegisterAssertHandler(this);
 
-	LinkModule(pICore_, "Conveter");
+	LinkModule(pICore_, "AssetServer");
 
 	return true;
 }
