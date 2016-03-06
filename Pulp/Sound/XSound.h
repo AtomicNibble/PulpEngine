@@ -6,9 +6,11 @@
 
 #include "IO\AkIoHook.h"
 
+#include <ICore.h>
+
 X_NAMESPACE_BEGIN(sound)
 
-class XSound : public ISound
+class XSound : public ISound, public ICoreEventListener
 {
 public:
 	XSound();
@@ -20,14 +22,16 @@ public:
 
 	virtual void Update(void) X_OVERRIDE;
 
-
-
 	// Shut up!
 	virtual void Mute(bool mute) X_OVERRIDE;
 
 	// Volume
 	virtual void SetMasterVolume(float v) X_OVERRIDE;
 	virtual float GetMasterVolume(void) const X_OVERRIDE;
+
+private:
+	void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_OVERRIDE;
+
 
 private:
 	IOhook ioHook_;

@@ -245,6 +245,29 @@ void XSound::Update(void)
 }
 
 
+void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
+{
+	X_UNUSED(lparam);
+
+	if (event == CoreEvent::CHANGE_FOCUS)
+	{
+		if (wparam == 1) // activated
+		{
+			X_LOG2("SoundSys", "Suspending sound system");
+			AK::SoundEngine::Suspend(false);
+		}
+		else
+		{
+			X_LOG2("SoundSys", "Waking sound system from syspend");
+
+			AK::SoundEngine::WakeupFromSuspend();
+			// might need to be called here not sure.
+			// SoundEngine::RenderAudio();
+		}
+	}
+}
+
+
 // Shut up!
 void XSound::Mute(bool mute)
 {
