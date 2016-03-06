@@ -132,13 +132,15 @@ X_LINK_LIB("CommunicationCentral");
 
 namespace AK
 {
+	core::MallocFreeAllocator akAlloca;
+
 	void* AllocHook(size_t in_size)
 	{
-		return malloc(in_size);
+		return akAlloca.allocate(in_size, 0, 0);
 	}
 	void FreeHook(void * in_ptr)
 	{
-		free(in_ptr);
+		akAlloca.free(in_ptr);
 	}
 
 	void* VirtualAllocHook(
