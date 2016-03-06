@@ -35,6 +35,8 @@ EngineApp::EngineApp() :
 
 EngineApp::~EngineApp()
 {
+	ShutDown();
+
 	if (hSystemHandle_) {
 		PotatoFreeLibrary(hSystemHandle_);
 	}
@@ -96,8 +98,31 @@ bool EngineApp::Init(void)
 		return false;
 	}
 
+	pICore_->RegisterAssertHandler(this);
+
 	LinkModule(pICore_, "Conveter");
 	return true;
 }
 
+bool EngineApp::ShutDown(void)
+{
+	if (pICore_) {
+		pICore_->UnRegisterAssertHandler(this);
+		pICore_->Release();
+	}
+	pICore_ = nullptr;
+	return true;
+}
 
+
+void EngineApp::OnAssert(const core::SourceInfo& sourceInfo)
+{
+	X_UNUSED(sourceInfo);
+
+}
+
+void EngineApp::OnAssertVariable(const core::SourceInfo& sourceInfo)
+{
+	X_UNUSED(sourceInfo);
+
+}
