@@ -21,6 +21,7 @@
 
 #include "Profiler.h"
 
+X_NAMESPACE_BEGIN(maya)
 
 
 Bone::Bone() : data(g_arena)
@@ -544,3 +545,6 @@ void* AnimExporterCmd::creator(void)
 {
 	return new AnimExporterCmd;
 }
+
+
+X_NAMESPACE_END

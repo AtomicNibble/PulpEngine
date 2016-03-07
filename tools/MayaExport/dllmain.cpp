@@ -69,6 +69,10 @@ namespace
 
 core::MemoryArenaBase* g_arena = nullptr;
 
+X_USING_NAMESPACE;
+
+using namespace maya;
+
 MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 {
 	core::StopWatch timer;

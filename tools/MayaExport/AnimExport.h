@@ -11,6 +11,8 @@
 
 #include <Containers\Array.h>
 
+X_NAMESPACE_BEGIN(maya)
+
 
 struct FrameData
 {
@@ -95,3 +97,5 @@ public:
 
 	static void* creator(void);
 };
+
+X_NAMESPACE_END

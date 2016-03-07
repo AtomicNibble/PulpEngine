@@ -5,6 +5,8 @@
 
 #include <maya\MPxCommand.h>
 
+X_NAMESPACE_BEGIN(maya)
+
 class SettingsCache
 {
 	static const char* SETTINGS_PATH;
@@ -56,3 +58,4 @@ public:
 	static MSyntax newSyntax(void);
 };
 
+X_NAMESPACE_END

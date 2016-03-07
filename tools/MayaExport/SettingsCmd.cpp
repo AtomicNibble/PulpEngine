@@ -11,7 +11,10 @@
 
 #include <FileAPI.h>
 
+
 using namespace core::xml::rapidxml;
+
+X_NAMESPACE_BEGIN(maya)
 
 namespace
 {
@@ -417,3 +420,5 @@ MSyntax SettingsCmd::newSyntax(void)
 
 	return syn;
 }
+
+X_NAMESPACE_END
