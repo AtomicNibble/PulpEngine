@@ -44,12 +44,15 @@ namespace IPC
 		{
 			DWORD val = 0;
 
-			if (mode.IsSet(Pipe::OpenMode::WRITE))
+			if (mode.IsSet(Pipe::OpenMode::WRITE)) {
 				val |= FILE_WRITE_DATA;
-			if (mode.IsSet(Pipe::OpenMode::READ))
+			}
+			if (mode.IsSet(Pipe::OpenMode::READ)) {
 				val |= FILE_READ_DATA;
-			if (mode.IsSet(Pipe::OpenMode::APPEND))
+			}
+			if (mode.IsSet(Pipe::OpenMode::APPEND)) {
 				val |= FILE_APPEND_DATA;
+			}
 
 			X_ASSERT(val != 0, "Pipe must have one of the following modes, READ, WRITE, APPEND")(mode.ToInt());
 			return val;
@@ -57,8 +60,9 @@ namespace IPC
 
 		DWORD GetShareMode(Pipe::OpenModeFlags mode)
 		{
-			if (mode.IsSet(Pipe::OpenMode::SHARE))
+			if (mode.IsSet(Pipe::OpenMode::SHARE)) {
 				return FILE_WRITE_DATA;
+			}
 			return 0;
 		}
 
