@@ -34,7 +34,7 @@ X_ENABLE_WARNING(4505)
 #define PLUGIN_Effect 1
 #define PLUGIN_Rumble 0
 #define PLUGIN_Source 1
-#define PLUGIN_Source_mp3 1
+#define PLUGIN_Source_mp3 0
 #define PLUGIN_Auro 0
 #else
 #define PLUGIN_Codec 1
