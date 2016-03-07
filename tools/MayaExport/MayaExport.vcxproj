@@ -340,6 +340,7 @@
     <Import Project="..\..\solutions\_engine_debug.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_debughelp.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_2013|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -349,6 +350,7 @@
     <Import Project="..\..\solutions\_engine_debug.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_debughelp.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_8.5|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -358,6 +360,7 @@
     <Import Project="..\..\solutions\_engine_debug.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_debughelp.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_2015|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -367,6 +370,7 @@
     <Import Project="..\..\solutions\_engine_debug.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_debughelp.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_2016|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -376,6 +380,7 @@
     <Import Project="..\..\solutions\_engine_debug.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_debughelp.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_2012|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -385,6 +390,7 @@
     <Import Project="..\..\solutions\_engine_debug.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_debughelp.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_2013|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -394,6 +400,7 @@
     <Import Project="..\..\solutions\_engine_debug.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_debughelp.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_8.5|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -403,6 +410,7 @@
     <Import Project="..\..\solutions\_engine_debug.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_debughelp.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_2015|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -412,6 +420,7 @@
     <Import Project="..\..\solutions\_engine_debug.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_debughelp.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug_2016|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -421,6 +430,7 @@
     <Import Project="..\..\solutions\_engine_debug.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_debughelp.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release_2012|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -429,6 +439,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_2013|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -437,6 +448,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_8.5|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -445,6 +457,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_2015|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -453,6 +466,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_2016|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -461,6 +475,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2015|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -469,6 +484,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2013|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -477,6 +493,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2016|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -485,6 +502,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2012|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -493,6 +511,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_8.5|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -501,6 +520,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_2012|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -509,6 +529,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_2013|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -517,6 +538,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_8.5|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -525,6 +547,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_2015|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -533,6 +556,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_2016|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -541,6 +565,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2015|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -549,6 +574,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2013|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -557,6 +583,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2016|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -565,6 +592,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2012|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -573,6 +601,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_8.5|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -581,6 +610,7 @@
     <Import Project="..\..\solutions\_engine.props" />
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
+    <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_2012|Win32'">
@@ -1290,6 +1320,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="..\protobuf\src\assetdb.pb.h" />
     <ClInclude Include="AnimExport.h" />
     <ClInclude Include="AppDataPath.h" />
     <ClInclude Include="AssetDB.h" />
@@ -1305,6 +1336,38 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\protobuf\src\assetdb.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super_8.5|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_8.5|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_2012|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_2013|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super_2012|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_8.5|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super_2013|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_2015|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_2016|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super_2015|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_2012|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super_2016|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_2013|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_2015|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_2016|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super_8.5|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_8.5|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_2012|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_2013|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super_2012|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_8.5|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super_2013|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_2015|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release_2016|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super_2015|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_2012|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super_2016|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_2013|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_2015|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug_2016|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="AnimExport.cpp" />
     <ClCompile Include="AssetDB.cpp" />
     <ClCompile Include="dllmain.cpp">

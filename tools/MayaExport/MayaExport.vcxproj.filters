@@ -27,6 +27,9 @@
     <Filter Include="Source Files\Util">
       <UniqueIdentifier>{e39669bd-4134-499f-b92a-b1ad46d4c936}</UniqueIdentifier>
     </Filter>
+    <Filter Include="proto">
+      <UniqueIdentifier>{74bc2f62-26be-46da-b6da-30a74ac7f4f9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -68,6 +71,9 @@
     <ClInclude Include="MayaLoggerFormat.h">
       <Filter>Header Files\Logger</Filter>
     </ClInclude>
+    <ClInclude Include="..\protobuf\src\assetdb.pb.h">
+      <Filter>proto</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -108,6 +114,9 @@
     </ClCompile>
     <ClCompile Include="MayaLoggerFormat.cpp">
       <Filter>Source Files\Logger</Filter>
+    </ClCompile>
+    <ClCompile Include="..\protobuf\src\assetdb.pb.cc">
+      <Filter>proto</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
