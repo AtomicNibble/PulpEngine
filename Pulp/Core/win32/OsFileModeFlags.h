@@ -46,10 +46,20 @@ namespace mode
 
 	static DWORD GetShareMode(IFileSys::fileModeFlags mode)
 	{
+		DWORD val = 0;
+
 		if (mode.IsSet(fileMode::SHARE)) {
-			return FILE_WRITE_DATA;
+			if (mode.IsSet(fileMode::READ)) {
+				val |= FILE_SHARE_READ;
+			}
+			if (mode.IsSet(fileMode::WRITE)) {
+				val |= FILE_SHARE_WRITE;
+			}
+
+			// would i even want delete, or should i always included?
+			val |= FILE_SHARE_DELETE;
 		}
-		return 0;
+		return val;
 	}
 
 	static DWORD GetCreationDispo(IFileSys::fileModeFlags mode)

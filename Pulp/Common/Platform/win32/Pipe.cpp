@@ -60,10 +60,20 @@ namespace IPC
 
 		DWORD GetShareMode(Pipe::OpenModeFlags mode)
 		{
+			DWORD val = 0;
+
 			if (mode.IsSet(Pipe::OpenMode::SHARE)) {
-				return FILE_WRITE_DATA;
+				if (mode.IsSet(Pipe::OpenMode::READ)) {
+					val |= FILE_SHARE_READ;
+				}
+				if (mode.IsSet(Pipe::OpenMode::WRITE)) {
+					val |= FILE_SHARE_WRITE;
+				}
+
+				// would i even want delete, or should i always included?
+				val |= FILE_SHARE_DELETE;
 			}
-			return 0;
+			return val;
 		}
 
 
