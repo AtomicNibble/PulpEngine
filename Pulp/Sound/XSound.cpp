@@ -173,6 +173,8 @@ namespace AK
 		X_ERROR("SoundSys", "Sound system threw a assert: Exp: \"%s\" file: \"%s\" line: \"%s\"", 
 			pszExpression, pszFileName, lineNumber);
 #endif
+
+		X_BREAKPOINT;
 	}
 
 }
