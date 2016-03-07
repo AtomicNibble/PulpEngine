@@ -34,12 +34,14 @@ X_ENABLE_WARNING(4505)
 #define PLUGIN_Effect 1
 #define PLUGIN_Rumble 0
 #define PLUGIN_Source 1
+#define PLUGIN_Source_mp3 1
 #define PLUGIN_Auro 0
 #else
 #define PLUGIN_Codec 1
 #define PLUGIN_Effect 1
 #define PLUGIN_Rumble 1
 #define PLUGIN_Source 1
+#define PLUGIN_Source_mp3 1
 #define PLUGIN_Auro 1
 #endif // !PLUGIN_All
 
@@ -62,7 +64,9 @@ X_LINK_LIB("AkVorbisDecoder");
 
 // source
 X_LINK_LIB("AkSilenceSource");
+#if PLUGIN_Source_mp3
 X_LINK_LIB("AkMP3Source");
+#endif // !PLUGIN_Source_mp3
 X_LINK_LIB("AkToneSource");
 X_LINK_LIB("AkAudioInputSource");
 X_LINK_LIB("AkSineSource");
@@ -121,7 +125,9 @@ X_LINK_LIB("AkRumble");
 
 
 // devices
+#if PLUGIN_Source_mp3
 X_LINK_LIB("msacm32");
+#endif // !PLUGIN_Source_mp3
 X_LINK_LIB("dxguid");
 
 
@@ -136,7 +142,7 @@ namespace AK
 
 	void* AllocHook(size_t in_size)
 	{
-		return akAlloca.allocate(in_size, 0, 0);
+		return akAlloca.allocate(in_size, 1, 0);
 	}
 	void FreeHook(void * in_ptr)
 	{
@@ -326,11 +332,66 @@ bool XSound::Init(void)
 #endif // !PLUGIN_Rumble
 
 #if PLUGIN_Source
-	if (AK::SoundEngine::RegisterAllSourcePlugins() != AK_Success)
 	{
-		X_ERROR("SoundSys", "Error while registering souce plug-ins");
-		return false;
+		if(AK::SoundEngine::RegisterPlugin(
+			AkPluginTypeSource,
+			AKCOMPANYID_AUDIOKINETIC,
+			AKSOURCEID_SILENCE,
+			CreateSilenceSource,
+			CreateSilenceSourceParams))
+		{
+			X_ERROR("SoundSys", "Error while registering silence souce plug-in");
+			return false;
+		}
+
+		if(AK::SoundEngine::RegisterPlugin(
+			AkPluginTypeSource,
+			AKCOMPANYID_AUDIOKINETIC,
+			AKSOURCEID_SINE,
+			CreateSineSource,
+			CreateSineSourceParams))
+		{
+			X_ERROR("SoundSys", "Error while registering sine souce plug-in");
+			return false;
+		}
+
+		if(AK::SoundEngine::RegisterPlugin(
+			AkPluginTypeSource,
+			AKCOMPANYID_AUDIOKINETIC,
+			AKSOURCEID_TONE,
+			CreateToneSource,
+			CreateToneSourceParams))
+		{
+			X_ERROR("SoundSys", "Error while registering tone souce plug-in");
+			return false;
+		}
+
+#if defined( AK_WIN ) && !defined( AK_USE_METRO_API ) && PLUGIN_Source_mp3 
+		if(AK::SoundEngine::RegisterPlugin(
+			AkPluginTypeSource,
+			AKCOMPANYID_AUDIOKINETIC,
+			AKSOURCEID_MP3,
+			CreateMP3Source,
+			CreateMP3SourceParams))
+		{
+			X_ERROR("SoundSys", "Error while registering mp3 souce plug-in");
+			return false;
+		}
+#endif
+
+		if(AK::SoundEngine::RegisterPlugin(
+			AkPluginTypeSource,
+			AKCOMPANYID_AUDIOKINETIC,
+			AKSOURCEID_SYNTHONE,
+			CreateSynthOne,
+			CreateSynthOneParams))
+		{
+			X_ERROR("SoundSys", "Error while registering synthone souce plug-in");
+			return false;
+		}
 	}
+
+
 #endif // !PLUGIN_Source
 
 #if PLUGIN_Auro
