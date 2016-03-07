@@ -30,12 +30,15 @@ namespace mode
 	{
 		DWORD val = 0;
 
-		if (mode.IsSet(fileMode::WRITE))
+		if (mode.IsSet(fileMode::WRITE)) {
 			val |= FILE_WRITE_DATA;
-		if (mode.IsSet(fileMode::READ))
+		}
+		if (mode.IsSet(fileMode::READ)) {
 			val |= FILE_READ_DATA;
-		if (mode.IsSet(fileMode::APPEND))
+		}
+		if (mode.IsSet(fileMode::APPEND)) {
 			val |= FILE_APPEND_DATA;
+		}
 
 		X_ASSERT(val != 0, "File must have one of the following modes, READ, WRITE, APPEND")(mode.ToInt());
 		return val;
@@ -43,21 +46,26 @@ namespace mode
 
 	static DWORD GetShareMode(IFileSys::fileModeFlags mode)
 	{
-		if (mode.IsSet(fileMode::SHARE))
+		if (mode.IsSet(fileMode::SHARE)) {
 			return FILE_WRITE_DATA;
+		}
 		return 0;
 	}
 
 	static DWORD GetCreationDispo(IFileSys::fileModeFlags mode)
 	{
-		if (mode.IsSet(fileMode::RECREATE))
+		if (mode.IsSet(fileMode::RECREATE)) {
 			return CREATE_ALWAYS;
-		if (mode.IsSet(fileMode::READ))
+		}
+		if (mode.IsSet(fileMode::READ)) {
 			return OPEN_EXISTING;
-		if (mode.IsSet(fileMode::APPEND))
+		}
+		if (mode.IsSet(fileMode::APPEND)) {
 			return OPEN_EXISTING;
-		if (mode.IsSet(fileMode::WRITE))
+		}
+		if (mode.IsSet(fileMode::WRITE)) {
 			return CREATE_NEW;
+		}
 
 		X_ASSERT(false, "Creation mode unkown one of the following must be set: READ, WRITE, RECREATE, APPEND")(mode.ToInt());
 		return 0;
@@ -67,14 +75,15 @@ namespace mode
 	{
 		DWORD flag = FILE_FLAG_SEQUENTIAL_SCAN;
 
-		if (mode.IsSet(fileMode::RANDOM_ACCESS))
+		if (mode.IsSet(fileMode::RANDOM_ACCESS)) {
 			flag = FILE_FLAG_RANDOM_ACCESS;
-		if (mode.IsSet(fileMode::WRITE_FLUSH))
+		}
+		if (mode.IsSet(fileMode::WRITE_FLUSH)) {
 			flag |= FILE_FLAG_WRITE_THROUGH;
-
-		if (async) // dirty potato !
+		}
+		if (async) { // dirty potato !
 			flag |= FILE_FLAG_OVERLAPPED;
-
+		}
 		//	if (flag == FILE_FLAG_SEQUENTIAL_SCAN && mode.IsSet(fileMode::WRITE))
 		//		return FILE_ATTRIBUTE_NORMAL;
 
