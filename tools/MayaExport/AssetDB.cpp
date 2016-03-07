@@ -5,8 +5,111 @@
 #include <maya\MSyntax.h>
 #include <maya\MArgDatabase.h>
 
+
+X_DISABLE_WARNING(4244)
+X_DISABLE_WARNING(4100)
+#include "..\protobuf\src\assetdb.pb.h"
+
+#include <google/protobuf/io/zero_copy_stream_impl.h>
+#include <google/protobuf/io/coded_stream.h>
+X_ENABLE_WARNING(4244)
+X_ENABLE_WARNING(4100)
+
+#if X_DEBUG
+X_LINK_LIB("libprotobufd")
+#else
+X_LINK_LIB("libprotobuf")
+#endif // !X_DEBUG
+
+
+X_NAMESPACE_BEGIN(maya)
+
+
 namespace
 {
+	bool ReadDelimitedFrom(google::protobuf::io::ZeroCopyInputStream* rawInput,
+		google::protobuf::MessageLite* message, bool* cleanEof)
+	{
+		google::protobuf::io::CodedInputStream input(rawInput);
+		const int start = input.CurrentPosition();
+		if (cleanEof) {
+			*cleanEof = false;
+		}
+
+		// Read the size.
+		uint32_t size;
+		if (!input.ReadVarint32(&size))
+		{
+			if (cleanEof) {
+				*cleanEof = input.CurrentPosition() == start;
+			}
+			return false;
+		}
+		// Tell the stream not to read beyond that size.
+		google::protobuf::io::CodedInputStream::Limit limit = input.PushLimit(size);
+
+		// Parse the message.
+		if (!message->MergeFromCodedStream(&input)) {
+			return false;
+		}
+		if (!input.ConsumedEntireMessage()) {
+			return false;
+		}
+
+		// Release the limit.
+		input.PopLimit(limit);
+		return true;
+	}
+
+
+	bool WriteDelimitedTo(const google::protobuf::MessageLite& message,
+		google::protobuf::io::ZeroCopyOutputStream* rawOutput)
+	{
+		// We create a new coded stream for each message. 
+		google::protobuf::io::CodedOutputStream output(rawOutput);
+
+		// Write the size.
+		const int size = message.ByteSize();
+		output.WriteVarint32(size);
+
+		uint8_t* buffer = output.GetDirectBufferForNBytesAndAdvance(size);
+		if (buffer != nullptr)
+		{
+			// Optimization:  The message fits in one buffer, so use the faster
+			// direct-to-array serialization path.
+			message.SerializeWithCachedSizesToArray(buffer);
+		}
+
+		else
+		{
+			// Slightly-slower path when the message is multiple buffers.
+			message.SerializeWithCachedSizes(&output);
+			if (output.HadError()) {
+				X_ERROR("Proto", "Failed to write msg to output stream");
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+
+	ProtoBuf::AssetDB::AssetType AssetTypeToProtoType(AssetDB::AssetType::Enum type)
+	{
+		switch (type)
+		{
+		case AssetDB::AssetType::ANIM:
+			return ProtoBuf::AssetDB::ANIM;
+		case AssetDB::AssetType::MODEL:
+			return ProtoBuf::AssetDB::MODEL;
+		default:
+			break;
+		}
+		// you STUPID TWAT!
+		X_ASSERT_UNREACHABLE();
+		return ProtoBuf::AssetDB::ANIM;
+	}
+
 
 	AssetDB* gAssetDb = nullptr;
 
@@ -36,28 +139,151 @@ void AssetDB::ShutDown(void)
 }
 
 
+bool AssetDB::Connect(void)
+{
+	GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+	pipe_.close();
+
+	if (!pipe_.open("\\\\.\\pipe\\" X_ENGINE_NAME "_AssetServer",
+		core::IPC::Pipe::OpenMode::READ | core::IPC::Pipe::OpenMode::WRITE |
+		core::IPC::Pipe::OpenMode::SHARE
+		))
+	{
+		X_ERROR("AssetDB", "Failed to connect to AssetServer");
+		return false;
+	}
+
+	return true;
+}
+
+
+
 MStatus AssetDB::AddAsset(AssetType::Enum type, const MString & name)
 {
-	X_UNUSED(type);
-	X_UNUSED(name);
-	return MStatus();
+	{
+		// YEeeeeEEeeeEEee foooking WUT!
+		ProtoBuf::AssetDB::AddAsset* pAdd = new ProtoBuf::AssetDB::AddAsset();
+		pAdd->set_type(AssetTypeToProtoType(type));
+		pAdd->set_name(name.asChar());
+
+		ProtoBuf::AssetDB::Request request;
+		request.set_allocated_add(pAdd);
+
+		if (!sendRequest(request)) {
+			return MS::kFailure;
+		}
+	}
+	
+	ProtoBuf::AssetDB::Reponse response;
+
+	if (!getResponse(response)) {
+		// well fuck.
+		return MS::kFailure;
+	}
+
+	return MS::kSuccess;
 }
 
 MStatus AssetDB::RemoveAsset(AssetType::Enum type, const MString & name)
 {
-	X_UNUSED(type);
-	X_UNUSED(name);
-	return MStatus();
+	{
+		ProtoBuf::AssetDB::DeleteAsset* pDel = new ProtoBuf::AssetDB::DeleteAsset();
+		pDel->set_type(AssetTypeToProtoType(type));
+		pDel->set_name(name.asChar());
+
+		ProtoBuf::AssetDB::Request request;
+		request.set_allocated_del(pDel);
+
+		if (!sendRequest(request)) {
+			return MS::kFailure;
+		}
+	}
+
+	ProtoBuf::AssetDB::Reponse response;
+
+	if (!getResponse(response)) {
+		return MS::kFailure;
+	}
+
+	return MS::kSuccess;
 }
 
 MStatus AssetDB::RenameAsset(AssetType::Enum type, const MString & name, const MString & oldName)
 {
-	X_UNUSED(type);
-	X_UNUSED(name);
-	X_UNUSED(oldName);
-	return MStatus();
+	{
+		ProtoBuf::AssetDB::RenameAsset* pRename = new ProtoBuf::AssetDB::RenameAsset();
+		pRename->set_type(AssetTypeToProtoType(type));
+		pRename->set_name(oldName.asChar());
+		pRename->set_newname(name.asChar());
+
+		ProtoBuf::AssetDB::Request request;
+		request.set_allocated_rename(pRename);
+
+		if (!sendRequest(request)) {
+			return MS::kFailure;
+		}
+	}
+
+	ProtoBuf::AssetDB::Reponse response;
+
+	if (!getResponse(response)) {
+		return MS::kFailure;
+	}
+
+	return MS::kSuccess;
 }
 
+
+bool AssetDB::sendRequest(ProtoBuf::AssetDB::Request& request)
+{
+	const size_t bufLength = 0x200;
+	uint8_t buffer[bufLength];
+
+	google::protobuf::io::ArrayOutputStream arrayOutput(buffer, bufLength);
+	WriteDelimitedTo(request, &arrayOutput);
+
+	if (!pipe_.write(buffer, safe_static_cast<size_t, int64_t>(arrayOutput.ByteCount()))) {
+		X_ERROR("AssetDB", "failed to write buffer");
+		return false;
+	}
+	if (!pipe_.flush()) {
+		X_ERROR("AssetDB", "failed to flush pipe");
+		return false;
+	}
+
+	return true;
+}
+
+bool AssetDB::getResponse(ProtoBuf::AssetDB::Reponse& response)
+{
+	const size_t bufLength = 0x200;
+	uint8_t buffer[bufLength];
+	size_t bytesRead;
+	bool cleanEof;
+
+	if (!pipe_.read(buffer, sizeof(buffer), &bytesRead)) {
+		X_ERROR("AssetDB", "failed to read response");
+		return false;
+	}
+
+	google::protobuf::io::ArrayInputStream arrayInput(buffer,
+		safe_static_cast<int32_t, size_t>(bytesRead));
+
+
+	if (!ReadDelimitedFrom(&arrayInput, &response, &cleanEof)) {
+		X_ERROR("AssetDB", "Failed to read response msg");
+		return false;
+	}
+
+	if (response.result() != ProtoBuf::AssetDB::Reponse_Result_OK) {
+		const std::string err = response.error();
+		X_ERROR("AssetDB", "Request failed: %s", err.c_str());
+		return false;
+	}
+
+	return true;
+}
 
 
 // ------------------------------------------------------------------
@@ -223,3 +449,4 @@ MSyntax AssetDBCmd::newSyntax(void)
 	return syn;
 }
 
+X_NAMESPACE_END

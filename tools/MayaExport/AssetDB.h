@@ -2,6 +2,16 @@
 
 #include <maya\MPxCommand.h>
 
+#include <Platform\Pipe.h>
+
+X_NAMESPACE_DECLARE(ProtoBuf,
+namespace AssetDB {
+	class Request;
+	class Reponse;
+}
+);
+
+X_NAMESPACE_BEGIN(maya)
 
 class AssetDB
 {
@@ -15,12 +25,18 @@ public:
 	static void Init(void);
 	static void ShutDown(void);
 
+	bool Connect(void);
+
 	MStatus AddAsset(AssetType::Enum type, const MString& name);
 	MStatus RemoveAsset(AssetType::Enum type, const MString& name);
 	MStatus RenameAsset(AssetType::Enum type, const MString& name, const MString& oldName);
 
 private:
+	bool sendRequest(ProtoBuf::AssetDB::Request& request);
+	bool getResponse(ProtoBuf::AssetDB::Reponse& response);
 
+private:
+	core::IPC::Pipe pipe_;
 };
 
 
@@ -41,3 +57,5 @@ public:
 
 private:
 };
+
+X_NAMESPACE_END
