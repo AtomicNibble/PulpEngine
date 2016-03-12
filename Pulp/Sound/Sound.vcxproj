@@ -353,6 +353,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="IDs\Wwise_IDs.h" />
     <ClInclude Include="IO\AkIoHook.h" />
     <ClInclude Include="IPSound.h" />
     <ClInclude Include="stdafx.h" />

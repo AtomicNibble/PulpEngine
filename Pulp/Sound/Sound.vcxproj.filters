@@ -15,6 +15,9 @@
     <Filter Include="Source Files\IO">
       <UniqueIdentifier>{c7afaa5c-c162-4123-9cc9-04f46165e41a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\IDs">
+      <UniqueIdentifier>{c251b189-58d4-451d-b8dc-e6817f420917}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -28,6 +31,9 @@
     </ClInclude>
     <ClInclude Include="IO\AkIoHook.h">
       <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="IDs\Wwise_IDs.h">
+      <Filter>Header Files\IDs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

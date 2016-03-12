@@ -8,6 +8,10 @@
 
 #include <ICore.h>
 
+X_NAMESPACE_DECLARE(core,
+struct ICVar;
+)
+
 X_NAMESPACE_BEGIN(sound)
 
 class XSound : public ISound, public ICoreEventListener
@@ -27,7 +31,12 @@ public:
 
 	// Volume
 	virtual void SetMasterVolume(float v) X_OVERRIDE;
-	virtual float GetMasterVolume(void) const X_OVERRIDE;
+	virtual void SetMusicVolume(float vol) X_OVERRIDE;
+	virtual void SetVoiceVolume(float vol) X_OVERRIDE;
+	virtual void SetSFXVolume(float vol) X_OVERRIDE;
+
+private:
+	void RegisterVars(void);
 
 private:
 	void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_OVERRIDE;
@@ -35,6 +44,13 @@ private:
 
 private:
 	IOhook ioHook_;
+
+private:
+	core::ICVar* var_vol_master_;
+	core::ICVar* var_vol_music_;
+	core::ICVar* var_vol_sfx_;
+	core::ICVar* var_vol_voice_;
+
 };
 
 X_NAMESPACE_END

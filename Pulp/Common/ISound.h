@@ -23,8 +23,11 @@ struct ISound
 	virtual void Mute(bool mute) X_ABSTRACT;
 
 	// Volume
-	virtual void SetMasterVolume(float v) X_ABSTRACT;
-	virtual float GetMasterVolume() const X_ABSTRACT;
+	virtual void SetMasterVolume(float vol) X_ABSTRACT;
+	virtual void SetMusicVolume(float vol) X_ABSTRACT;
+	virtual void SetVoiceVolume(float vol) X_ABSTRACT;
+	virtual void SetSFXVolume(float vol) X_ABSTRACT;
+
 
 };
 

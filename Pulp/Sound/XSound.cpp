@@ -1,6 +1,11 @@
 #include "stdafx.h"
 #include "XSound.h"
 
+// id's
+#include "IDs\Wwise_IDs.h"
+
+#include <IConsole.h>
+
 X_DISABLE_WARNING(4505)
 
 // Sound Engine
@@ -189,10 +194,50 @@ using namespace AK;
 
 X_NAMESPACE_BEGIN(sound)
 
+namespace
+{
+
+	void Var_MasterVolChanged(core::ICVar* pVar)
+	{
+		float vol = pVar->GetFloat();
+		vol *= 255.f;
+
+		SoundEngine::SetRTPCValue(GAME_PARAMETERS::MASTERVOLUME, vol);
+	}
+
+	void Var_MusicVolChanged(core::ICVar* pVar)
+	{
+		float vol = pVar->GetFloat();
+		vol *= 255.f;
+
+		SoundEngine::SetRTPCValue(GAME_PARAMETERS::MUSICVOLUME, vol);
+	}
+
+	void Var_SFXVolChanged(core::ICVar* pVar)
+	{
+		float vol = pVar->GetFloat();
+		vol *= 255.f;
+
+		SoundEngine::SetRTPCValue(GAME_PARAMETERS::SFXVOLUME, vol);
+	}
+
+	void Var_VoiceVolChanged(core::ICVar* pVar)
+	{
+		float vol = pVar->GetFloat();
+		vol *= 255.f;
+
+		SoundEngine::SetRTPCValue(GAME_PARAMETERS::VOICEVOLUME, vol);
+	}
+	
+
+} // namespace
 
 XSound::XSound()
 {
-
+	var_vol_master_ = nullptr;
+	var_vol_music_ = nullptr;
+	var_vol_sfx_ = nullptr;
+	var_vol_voice_ = nullptr;
 }
 
 XSound::~XSound()
@@ -338,7 +383,7 @@ bool XSound::Init(void)
 			AKCOMPANYID_AUDIOKINETIC,
 			AKSOURCEID_SILENCE,
 			CreateSilenceSource,
-			CreateSilenceSourceParams))
+			CreateSilenceSourceParams) != AK_Success)
 		{
 			X_ERROR("SoundSys", "Error while registering silence souce plug-in");
 			return false;
@@ -349,7 +394,7 @@ bool XSound::Init(void)
 			AKCOMPANYID_AUDIOKINETIC,
 			AKSOURCEID_SINE,
 			CreateSineSource,
-			CreateSineSourceParams))
+			CreateSineSourceParams) != AK_Success)
 		{
 			X_ERROR("SoundSys", "Error while registering sine souce plug-in");
 			return false;
@@ -360,7 +405,7 @@ bool XSound::Init(void)
 			AKCOMPANYID_AUDIOKINETIC,
 			AKSOURCEID_TONE,
 			CreateToneSource,
-			CreateToneSourceParams))
+			CreateToneSourceParams) != AK_Success)
 		{
 			X_ERROR("SoundSys", "Error while registering tone souce plug-in");
 			return false;
@@ -372,7 +417,7 @@ bool XSound::Init(void)
 			AKCOMPANYID_AUDIOKINETIC,
 			AKSOURCEID_MP3,
 			CreateMP3Source,
-			CreateMP3SourceParams))
+			CreateMP3SourceParams) != AK_Success)
 		{
 			X_ERROR("SoundSys", "Error while registering mp3 souce plug-in");
 			return false;
@@ -384,7 +429,7 @@ bool XSound::Init(void)
 			AKCOMPANYID_AUDIOKINETIC,
 			AKSOURCEID_SYNTHONE,
 			CreateSynthOne,
-			CreateSynthOneParams))
+			CreateSynthOneParams) != AK_Success)
 		{
 			X_ERROR("SoundSys", "Error while registering synthone souce plug-in");
 			return false;
@@ -412,6 +457,29 @@ bool XSound::Init(void)
 	}
 #endif
 
+
+	// load init bank.
+	AkBankID bankID;
+	AKRESULT retValue;
+	retValue = SoundEngine::LoadBank("sound/Init.bnk", AK_DEFAULT_POOL_ID, bankID);
+	if (retValue != AK_Success) {
+		X_ERROR("SoundSys", "Error loading required sound-bank: init.bnk");
+		return false;
+	}
+
+#if 0
+	retValue = SoundEngine::LoadBank("sound/Music.bnk", AK_DEFAULT_POOL_ID, bankID);
+	if (retValue != AK_Success) {
+		X_ERROR("SoundSys", "Error loading required sound-bank: init.bnk");
+		return false;
+	}
+
+	AkGameObjectID m_GlobalID = 0x1;
+	AK::SoundEngine::RegisterGameObj(m_GlobalID);
+	SoundEngine::PostEvent("Play_ambient", m_GlobalID);
+#endif
+
+	RegisterVars();
 	return true;
 }
 
@@ -448,6 +516,25 @@ void XSound::Update(void)
 }
 
 
+void XSound::RegisterVars(void)
+{
+	var_vol_master_ = ADD_CVAR_FLOAT("snd_vol_master", 1.f, 0.f, 1.f,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Master volume");
+	var_vol_music_ = ADD_CVAR_FLOAT("snd_vol_music", 1.f, 0.f, 1.f,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Music volume");
+	var_vol_sfx_ = ADD_CVAR_FLOAT("snd_vol_sfx", 1.f, 0.f, 1.f,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "SFX volume");
+	var_vol_voice_ = ADD_CVAR_FLOAT("snd_vol_voice", 1.f, 0.f, 1.f,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Voice volume");
+
+
+	var_vol_master_->SetOnChangeCallback(Var_MasterVolChanged);
+	var_vol_music_->SetOnChangeCallback(Var_MusicVolChanged);
+	var_vol_sfx_->SetOnChangeCallback(Var_SFXVolChanged);
+	var_vol_voice_->SetOnChangeCallback(Var_VoiceVolChanged);
+
+}
+
 void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {
 	X_UNUSED(lparam);
@@ -478,16 +565,39 @@ void XSound::Mute(bool mute)
 }
 
 // Volume
-void XSound::SetMasterVolume(float v)
+void XSound::SetMasterVolume(float vol)
 {
-	// nope
-	X_UNUSED(v);
+	// cap it between 0-1
+	vol = core::Max(0.f, core::Min(1.f, vol));
+	// turn 0-1 into 0-255
+	vol *= 255.f;
+
+	SoundEngine::SetRTPCValue(GAME_PARAMETERS::MASTERVOLUME, vol);
 }
 
-float XSound::GetMasterVolume(void) const
+
+void XSound::SetMusicVolume(float vol)
 {
-	return 1.f; // MAX VOLUME ALL THE TIME!!!
+	vol = core::Max(0.f, core::Min(1.f, vol));
+	vol *= 255.f;
+
+	SoundEngine::SetRTPCValue(GAME_PARAMETERS::MUSICVOLUME, vol);
 }
 
+void XSound::SetVoiceVolume(float vol)
+{
+	vol = core::Max(0.f, core::Min(1.f, vol));
+	vol *= 255.f;
+
+	SoundEngine::SetRTPCValue(GAME_PARAMETERS::VOICEVOLUME, vol);
+}
+
+void XSound::SetSFXVolume(float vol)
+{
+	vol = core::Max(0.f, core::Min(1.f, vol));
+	vol *= 255.f;
+
+	SoundEngine::SetRTPCValue(GAME_PARAMETERS::SFXVOLUME, vol);
+}
 
 X_NAMESPACE_END
