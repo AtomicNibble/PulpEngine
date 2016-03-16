@@ -30,15 +30,18 @@
     <Filter Include="proto">
       <UniqueIdentifier>{74bc2f62-26be-46da-b6da-30a74ac7f4f9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Anim">
+      <UniqueIdentifier>{62a0f111-5589-41e2-8341-0d1058f508b9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Anim">
+      <UniqueIdentifier>{03d6783b-6cff-4db2-9360-078596d62859}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="targetver.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="AnimExport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="AssetDB.h">
@@ -74,6 +77,9 @@
     <ClInclude Include="..\protobuf\src\assetdb.pb.h">
       <Filter>proto</Filter>
     </ClInclude>
+    <ClInclude Include="AnimExport.h">
+      <Filter>Header Files\Anim</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -83,9 +89,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AnimExport.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AssetDB.cpp">
@@ -117,6 +120,9 @@
     </ClCompile>
     <ClCompile Include="..\protobuf\src\assetdb.pb.cc">
       <Filter>proto</Filter>
+    </ClCompile>
+    <ClCompile Include="AnimExport.cpp">
+      <Filter>Source Files\Anim</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
