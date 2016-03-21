@@ -64,7 +64,9 @@ namespace
 		maya::LoggerMayaFormatPolicy,
 		maya::LoggerMayaWritePolicy> MayaLogger;
 
-	MayaLogger logger;
+	// this global is removed before engine app does shutdown
+	// as the uninitializePlugin is never called :/
+	MayaLogger* pLogger;
 }
 
 core::MemoryArenaBase* g_arena = nullptr;
@@ -97,7 +99,9 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 		return MS::kFailure;
 	}
 
-	gEnv->pLog->AddLogger(&logger);
+	pLogger = X_NEW(MayaLogger, g_arena, "MayaLogger");
+
+	gEnv->pLog->AddLogger(pLogger);
 
 	AssetDB::Init();
 	SettingsCache::Init();
@@ -190,7 +194,9 @@ MODELEX_EXPORT MStatus uninitializePlugin(MObject obj)
 	AssetDB::ShutDown();
 	SettingsCache::ShutDown();
 
-	gEnv->pLog->RemoveLogger(&logger);
+	gEnv->pLog->RemoveLogger(pLogger);
+
+	X_DELETE_AND_NULL(pLogger, g_arena);
 
 	delete g_arena;
 	g_arena = nullptr;
