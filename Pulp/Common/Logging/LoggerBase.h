@@ -19,12 +19,12 @@ public:
 	/// Destructor.
 	virtual ~LoggerBase(void);
 
-	virtual void Log(const SourceInfo& sourceInfo, const char* channel, int verbosity, const char* foramt, va_list args);
-	virtual void Warning(const SourceInfo& sourceInfo, const char* channel, const char* foramt, va_list args);
-	virtual void Error(const SourceInfo& sourceInfo, const char* channel, const char* foramt, va_list args);
-	virtual void Fatal(const SourceInfo& sourceInfo, const char* channel, const char* foramt, va_list args);
-	virtual void Assert(const SourceInfo& sourceInfo, const char* format, va_list args);
-	virtual void AssertVariable(const SourceInfo& sourceInfo, const char* format, va_list args);
+	void Log(const SourceInfo& sourceInfo, const char* channel, int verbosity, const char* foramt, va_list args);
+	void Warning(const SourceInfo& sourceInfo, const char* channel, const char* foramt, va_list args);
+	void Error(const SourceInfo& sourceInfo, const char* channel, const char* foramt, va_list args);
+	void Fatal(const SourceInfo& sourceInfo, const char* channel, const char* foramt, va_list args);
+	void Assert(const SourceInfo& sourceInfo, const char* format, va_list args);
+	void AssertVariable(const SourceInfo& sourceInfo, const char* format, va_list args);
 
 
 	/// \brief intrusive linked-list.
