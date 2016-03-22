@@ -660,6 +660,28 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 }
 
 
+MIntArray GetLocalIndex(MIntArray & getVertices, MIntArray & getTriangle)
+{
+	MIntArray   localIndex;
+
+//	assert(getTriangle.length() == 3);    // Should always deal with a triangle
+
+	for (unsigned gt = 0; gt < getTriangle.length(); gt++)
+	{
+		for (unsigned gv = 0; gv < getVertices.length(); gv++)
+		{
+			if (getTriangle[gt] == getVertices[gv])
+			{
+				localIndex.append(gv);
+				break;
+			}
+		}
+	}
+
+	return localIndex;
+}
+
+
 MStatus ModelExporter::loadLODs(void)
 {
 	PROFILE_MAYA("load LODS");
@@ -690,7 +712,6 @@ MStatus ModelExporter::loadLODs(void)
 		MStringArray		UVSets;
 		MFloatArray			u, v;
 		MPointArray			points;
-		MIntArray			polygonVertices;
 		MIntArray			vertexList;
 		MColorArray			vertColorsArray;
 
@@ -720,7 +741,6 @@ MStatus ModelExporter::loadLODs(void)
 				MayaUtil::MayaPrintError("Mesh(%s): has no uv sets: %s", fnmesh.name().asChar());
 				return MS::kFailure;
 			}
-			//		int numNormals = fnmesh.numNormals(&status);
 
 			if (!status) {
 				MayaUtil::MayaPrintError("Mesh(%s): failed to get mesh info (%s)", fnmesh.name().asChar(), status.errorString().asChar());
@@ -728,9 +748,9 @@ MStatus ModelExporter::loadLODs(void)
 			}
 
 			// resize baby.
-			mesh.verts_.resize(numVerts);
+			mesh.verts_.reserve(numVerts);
+			mesh.verts_.setGranularity(2048);
 			mesh.face_.setGranularity(numPoly * 3);
-		//	mesh->weights.setGranularity(2048 * 2);
 
 			status = fnmesh.getUVSetNames(UVSets);
 			if (!status) {
@@ -782,51 +802,99 @@ MStatus ModelExporter::loadLODs(void)
 			}
 
 			MayaUtil::MayaPrintVerbose("u: %i v: %i", u.length(), v.length());
-			MayaUtil::MayaPrintVerbose("NumVerts: %i", numVerts);
+			MayaUtil::MayaPrintVerbose("VertexArray: %i", vertexArray.length());
+			MayaUtil::MayaPrintVerbose("NormalsArray: %i", normalsArray.length());
+			MayaUtil::MayaPrintVerbose("TangentsArray: %i", tangentsArray.length());
+			MayaUtil::MayaPrintVerbose("BinormalsArray: %i", binormalsArray.length());
+			MayaUtil::MayaPrintVerbose("VertColorsArray: %i", vertColorsArray.length());
 			MayaUtil::MayaPrintVerbose("NumPoly: %i", numPoly);
 
-			// some times we don't have vert colors it seams so.
-			// fill with white.
-			MColor white;
-			while (safe_static_cast<int, size_t>(vertColorsArray.length()) < numVerts)
-			{
-				vertColorsArray.append(white);
-			}
+			MIntArray polygonVertices;
 
-			// verts
-			int32_t x;
-			for (x = 0; x < numVerts; x++) {
-				model::RawModel::Vert& vert = mesh.verts_[x];
-				vert.pos_ = MayaUtil::ConvertToGameSpace(MayaUtil::XVec(vertexArray[x]));
-				vert.normal_ = MayaUtil::XVec(normalsArray[x]);
-				vert.tangent_ = MayaUtil::XVec(tangentsArray[x]);
-				vert.biNormal_ = MayaUtil::XVec(binormalsArray[x]);
-				vert.uv_ = Vec2f(u[x], v[x]);
-				vert.col_ = MayaUtil::XVec(vertColorsArray[x]);
-			}
-
-			// load the Faces and UV's
+			// for each polygon we might have multiple triangles.
 			MItMeshPolygon itPolygon(info.exportObjects[meshIdx], MObject::kNullObj);
 			for (; !itPolygon.isDone(); itPolygon.next())
 			{
-				int numTriangles;
+				int32_t numTriangles;
 
 				itPolygon.numTriangles(numTriangles);
 				itPolygon.getVertices(polygonVertices);
 
 				while (numTriangles--)
 				{
-					status = itPolygon.getTriangle(numTriangles, points, vertexList, MSpace::kWorld);
+					status = itPolygon.getTriangle(numTriangles, points, vertexList, MSpace::kObject);
 
-					mesh.face_.append(model::RawModel::Face(vertexList[0], vertexList[1], vertexList[2]));
+					// triangles!
+					if (points.length() != 3) {
+						continue;
+					}
+
+					model::RawModel::Vert verts[3];
+
+					// positions.
+					for (uint32_t j = 0; j < vertexList.length(); j++)
+					{
+						uint32_t vertIdx = vertexList[j];
+
+						model::RawModel::Vert& vert = verts[j];
+						vert.pos_ = MayaUtil::ConvertToGameSpace(MayaUtil::XVec(vertexArray[vertIdx]));
+					}
+
+					MIntArray localIndex = GetLocalIndex(polygonVertices, vertexList);
+
+					// Uv's
+					for (uint32_t j = 0; j < vertexList.length(); j++)
+					{
+						int uvID;
+
+						itPolygon.getUVIndex(localIndex[j], uvID, &uvSet);
+
+						model::RawModel::Vert& vert = verts[j];
+
+						vert.uv_.x = u[uvID];
+						vert.uv_.y = 1.f - v[uvID];
+					}
+
+					// normals.
+					for (uint32_t j = 0; j < vertexList.length(); j++)
+					{
+						uint32_t normalIdx = itPolygon.normalIndex(j);
+
+						model::RawModel::Vert& vert = verts[j];
+						vert.normal_ = MayaUtil::XVec(normalsArray[normalIdx]);
+						vert.tangent_ = MayaUtil::XVec(tangentsArray[normalIdx]);
+						vert.biNormal_ = MayaUtil::XVec(binormalsArray[normalIdx]);
+					}
+
+					// col
+					for (uint32_t j = 0; j < vertexList.length(); j++)
+					{
+						model::RawModel::Vert& vert = verts[j];
+
+						int32_t colIdx;
+						if (vertColorsArray.length() > 0 && 
+							itPolygon.getColorIndex(localIndex[j], colIdx) == MS::kSuccess)
+						{
+							vert.col_ = MayaUtil::XVec(vertColorsArray[colIdx]);
+						}
+						else
+						{
+							vert.col_ = Color(1.f,1.f,1.f,1.f);
+						}
+					}
+
+					uint32_t vertIdx = safe_static_cast<uint32_t, size_t>(mesh.verts_.size());
+
+					// we can just write verts in index order.
+					// since we extracted the faces into index order.
+					mesh.face_.append(model::RawModel::Face(vertIdx, vertIdx + 1, vertIdx + 2));
+
+					mesh.verts_.append(verts[0]);
+					mesh.verts_.append(verts[1]);
+					mesh.verts_.append(verts[2]);
 				}
 			}
-
-
-
 		}
-
-
 	}
 
 	return status;
