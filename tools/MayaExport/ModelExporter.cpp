@@ -545,7 +545,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 	if (idx != MArgList::kInvalidArgIndex) {
 		bool mergeMesh = false;
 		if (!args.get(++idx, mergeMesh)) {
-			MayaUtil::MayaPrintWarning("failed to get white_vert_col flag");
+			MayaUtil::MayaPrintWarning("failed to get merge_meshes flag");
 		}
 		else {
 			if (mergeMesh) {
