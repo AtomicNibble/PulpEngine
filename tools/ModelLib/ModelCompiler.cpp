@@ -497,7 +497,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 
 				vert.pos = rawVert.pos_;
 				vert.st[0] = XHalfCompressor::compress(rawVert.uv_[0]);
-				vert.st[1] = XHalfCompressor::compress(1.f - rawVert.uv_[1]);
+				vert.st[1] = XHalfCompressor::compress(rawVert.uv_[1]);
 
 				stream.write(vert);
 			}
