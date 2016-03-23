@@ -26,10 +26,10 @@ namespace RawModel
 
 	void Mesh::merge(const Mesh& oth)
 	{
-		size_t numVert = verts_.size();
-		size_t numFace = face_.size();
-		size_t newVertNum = numVert + oth.verts_.size();
-		size_t newFaceNum = numFace + oth.face_.size();
+		const size_t numVert = verts_.size();
+		const size_t numFace = face_.size();
+		const size_t newVertNum = numVert + oth.verts_.size();
+		const size_t newFaceNum = numFace + oth.face_.size();
 
 		verts_.resize(newVertNum);
 		face_.resize(newFaceNum);
@@ -40,9 +40,14 @@ namespace RawModel
 			verts_[numVert + i] = oth.verts_[i];
 		}
 
+		const Face::value_type faceOffset = safe_static_cast<Face::value_type, size_t>(numVert);
 		for (i = 0; i < oth.face_.size(); i++)
 		{
-			face_[numFace + i] = oth.face_[i];
+			Face& f = face_[numFace + i];
+			f = oth.face_[i];
+			f.x += faceOffset;
+			f.y += faceOffset;
+			f.z += faceOffset;
 		}
 	}
 
