@@ -260,7 +260,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 	header.flags.Set(model::ModelFlags::LOOSE);
 	header.flags.Set(model::ModelFlags::STREAMS);
 	header.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
-	header.numBlankBones = 0; //  tagOrigin_.keep ? 1 : 0;
+	header.numBlankBones = bones_.isEmpty() ? 1 : 0; // add blank if no bones.
 	header.numLod = safe_static_cast<uint8_t, size_t>(lods_.size());
 	header.numMesh = safe_static_cast<uint8_t, size_t>(totalMeshes());
 	header.modified = core::dateTimeStampSmall::systemDateTime();
