@@ -1010,6 +1010,9 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 						if (!vert.uv_.compare(vv->uv_, texcoordElipson)) {
 							continue; // not same
 						}
+						if (!vert.normal_.compare(vv->normal_, vertexElipsion)) {
+							continue; // not same
+						}
 
 						equal = true;
 						break; // equal.
