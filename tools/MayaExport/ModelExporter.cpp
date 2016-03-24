@@ -785,6 +785,15 @@ MStatus ModelExporter::loadLODs(void)
 			}
 
 
+			vertexArray.clear();
+			normalsArray.clear();
+			tangentsArray.clear();
+			binormalsArray.clear();
+			u.clear();
+			v.clear();
+			vertColorsArray.clear();
+
+
 			{
 				using std::cerr;
 				using std::endl;
