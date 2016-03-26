@@ -69,6 +69,7 @@ ModelCompiler::Stats::Stats(core::MemoryArenaBase* arena) :
 	totalJoints = 0;
 	totalJointsDropped = 0;
 	totalVerts = 0;
+	totalVertsMerged = 0;
 	totalFaces = 0;
 	totalWeightsDropped = 0;
 	totalMeshMerged = 0;
@@ -107,6 +108,7 @@ void ModelCompiler::Stats::print(void) const
 
 	X_LOG0("Model", info.c_str());
 	X_LOG0("Model", "> Total Verts: %i", totalVerts);
+	X_LOG0("Model", "> Total Verts Merged: %i", totalVertsMerged);
 	X_LOG0("Model", "> Total Faces: %i", totalFaces);
 	X_LOG0("Model", "> Total eights Dropped: %i", totalWeightsDropped);
 
@@ -138,6 +140,7 @@ void ModelCompiler::Stats::clear(void)
 	totalJoints = 0;
 	totalJointsDropped = 0;
 	totalVerts = 0;
+	totalVertsMerged = 0;
 	totalFaces = 0;
 	totalWeightsDropped = 0;
 	totalMeshMerged = 0;
@@ -797,6 +800,12 @@ bool ModelCompiler::MergVerts(void)
 	core::V2::Job* pJobs[model::MODEL_MAX_LODS] = { nullptr };
 
 	size_t i;
+	size_t totalVerts = 0;
+
+	for (i = 0; i < lods_.size(); i++) {
+		totalVerts += lods_[i].totalVerts();
+	}
+
 	for (i = 0; i < lods_.size(); i++)
 	{
 		RawModel::Mesh* pMesh = lods_[i].meshes_.ptr();
@@ -815,6 +824,13 @@ bool ModelCompiler::MergVerts(void)
 		pJobSys_->Wait(pJobs[i]);
 	}
 
+
+	size_t totalVertsPostMerge = 0;
+	for (i = 0; i < lods_.size(); i++) {
+		totalVertsPostMerge += lods_[i].totalVerts();
+	}
+
+	stats_.totalVertsMerged = safe_static_cast<uint32_t,size_t>(totalVerts - totalVertsPostMerge);
 	return true;
 }
 

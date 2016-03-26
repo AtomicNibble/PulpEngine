@@ -337,6 +337,7 @@ void ModelExporter::printStats(void) const
 
 
 	info.appendFmt("\n> Total Verts: %i", stats_.totalVerts);
+	info.appendFmt("\n> Total Verts Merged: %i", stats_.totalVertsMerged);
 	info.appendFmt("\n> Total Faces: %i", stats_.totalFaces);
 	info.appendFmt("\n> Total Weights dropped: %i", stats_.totalWeightsDropped);
 	info.append("\n");

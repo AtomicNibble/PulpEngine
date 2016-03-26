@@ -47,6 +47,7 @@ public:
 		uint32_t totalJoints;
 		uint32_t totalJointsDropped;
 		uint32_t totalVerts;
+		uint32_t totalVertsMerged;
 		uint32_t totalFaces;
 		uint32_t totalWeightsDropped;
 		uint32_t totalMeshMerged;
