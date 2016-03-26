@@ -3,6 +3,7 @@
 
 #include <Threading\JobSystem2.h>
 #include <Time\StopWatch.h>
+#include <Util\Cpu.h>
 
 #include <IModel.h>
 #include <IMaterial.h>
@@ -681,6 +682,11 @@ bool ModelCompiler::ProcessModel(void)
 		return false;
 	}
 
+	if (!ScaleModel()) {
+		X_ERROR("Model", "Failed to mergeverts");
+		return false;
+	}
+
 	if (!UpdateMeshBounds()) {
 		X_ERROR("Model", "Failed to update mesh bounds");
 		return false;
@@ -834,6 +840,72 @@ bool ModelCompiler::MergVerts(void)
 	return true;
 }
 
+bool ModelCompiler::ScaleModel(void)
+{
+	// skip if no change.
+	if (math<float>::abs(scale_ - 1.f) < EPSILON_VALUEf) {
+		return true;
+	}
+
+	core::Stack<core::V2::Job*> jobs(arena_, 1024);
+	uint32_t batchSize = 1024;
+
+	{
+		core::CpuInfo* pInfo = gEnv->pCore->GetCPUInfo();
+
+		size_t numL2info = pInfo->GetL2CacheCount();
+		if (numL2info > 0)
+		{
+			// just use first info.
+			const core::CpuInfo::CacheInfo& cacheInfo = pInfo->GetL2CacheInfo(0);
+
+			batchSize = (cacheInfo.size_ / sizeof(RawModel::Vert));
+			if (batchSize < 128) {
+				batchSize = 128;
+			}
+			X_LOG2("Model", "using batch size of %" PRIuS, batchSize);
+		}
+	}
+
+	// create jobs for each mesh.
+	for (auto& lod : lods_)
+	{
+		for (auto& mesh : lod.meshes_)
+		{
+			RawModel::Vert* pVerts = mesh.verts_.ptr();
+			uint32_t numVerts = safe_static_cast<uint32_t, size_t>(mesh.verts_.size());
+
+			core::Delegate<void(RawModel::Vert*, uint32_t)> del;
+			del.Bind<ModelCompiler, &ModelCompiler::ScaleVertsJob>(this);
+
+			core::V2::Job* pJob = pJobSys_->parallel_for_member<ModelCompiler>(del,
+				pVerts, numVerts, core::V2::CountSplitter32(batchSize));
+
+			pJobSys_->Run(pJob);
+
+			// handle the rare case stack is full
+			if (jobs.size() == jobs.capacity()) 
+			{		
+				core::V2::Job* pJob = jobs.top();
+				pJobSys_->Wait(pJob);
+				jobs.pop();
+			}
+
+			jobs.push(pJob);
+		}
+	}
+
+	while (jobs.isNotEmpty())
+	{
+		core::V2::Job* pJob = jobs.top();
+		pJobSys_->Wait(pJob);
+		jobs.pop();
+	}
+
+
+	return ScaleBones();
+}
+
 bool ModelCompiler::UpdateMeshBounds(void)
 {
 	core::V2::Job* pJobs[model::MODEL_MAX_LODS] = { nullptr };
@@ -964,6 +1036,19 @@ bool ModelCompiler::CheckLimits(void)
 	return true;
 }
 
+bool ModelCompiler::ScaleBones(void)
+{
+	const float scale = scale_;
+
+	for (auto& bone : bones_)
+	{
+		bone.worldPos_ *= scale;
+	}
+
+	return true;
+}
+
+
 void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 {
 	size_t meshIdx;
@@ -1077,6 +1162,19 @@ void ModelCompiler::UpdateBoundsJob(RawModel::Mesh* pMesh, uint32_t count)
 
 	for (i = 0; i < count; i++) {
 		pMesh[i].calBoundingbox();
+	}
+}
+
+void ModelCompiler::ScaleVertsJob(RawModel::Vert* pVerts, uint32_t count)
+{
+	size_t i;
+	const float scale = scale_;
+
+	for (i = 0; i < count; i++)
+	{
+		RawModel::Vert& vert = pVerts[i];
+
+		vert.pos_ *= scale;
 	}
 }
 
