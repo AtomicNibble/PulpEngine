@@ -1242,7 +1242,7 @@ size_t ModelCompiler::getBatchSize(size_t elementSizeBytes)
 		// just use first info.
 		const core::CpuInfo::CacheInfo& cacheInfo = pInfo->GetL2CacheInfo(0);
 
-		batchSize = (cacheInfo.size_ / sizeof(RawModel::Vert));
+		batchSize = (cacheInfo.size_ / elementSizeBytes);
 	}
 	else {
 		batchSize = 1024;
