@@ -526,6 +526,7 @@ void XMaterialManager::InitDefaults(void)
 		XShaderItem item = gEnv->pRender->LoadShaderItem(input);
 
 		pDefaultMtl_->setShaderItem(item);
+		pDefaultMtl_->setCoverage(MaterialCoverage::OPAQUE);
 	}
 }
 
