@@ -374,9 +374,14 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		}
 
 		// hierarchy
+		for (auto& bone : bones_)
 		{
+			uint8_t parent = 0;
 
-
+			if (file.writeObj(parent) != sizeof(parent)) {
+				X_ERROR("Model", "Failed to write bone parent");
+				return false;
+			}
 		}
 
 		// angles.
