@@ -380,7 +380,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		// hierarchy
 		for (auto& bone : bones_)
 		{
-			uint8_t parent = 0;
+			uint8_t parent = safe_static_cast<uint8_t, uint32_t>(bone.parIndx_);
 
 			if (file.writeObj(parent) != sizeof(parent)) {
 				X_ERROR("Model", "Failed to write bone parent");
