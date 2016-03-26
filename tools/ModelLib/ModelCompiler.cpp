@@ -855,6 +855,7 @@ bool ModelCompiler::ScaleModel(void)
 {
 	// skip if no change.
 	if (math<float>::abs(scale_ - 1.f) < EPSILON_VALUEf) {
+		X_LOG2("Model", "Skipping model scaling, scale is 1: %f", scale_);
 		return true;
 	}
 
