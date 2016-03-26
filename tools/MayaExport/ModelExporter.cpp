@@ -713,7 +713,7 @@ MStatus ModelExporter::loadLODs(void)
 		MFloatArray			u, v;
 		MPointArray			points;
 		MIntArray			vertexList;
-		MColorArray			vertColorsArray;
+		MColorArray			colorsArray;
 
 		for (uint32_t meshIdx = 0; meshIdx < numMesh; meshIdx++)
 		{
@@ -791,8 +791,7 @@ MStatus ModelExporter::loadLODs(void)
 			binormalsArray.clear();
 			u.clear();
 			v.clear();
-			vertColorsArray.clear();
-
+			colorsArray.clear();
 
 			{
 				using std::cerr;
@@ -803,10 +802,13 @@ MStatus ModelExporter::loadLODs(void)
 				CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getTangents(tangentsArray, MSpace::kWorld));
 				CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getBinormals(binormalsArray, MSpace::kWorld));
 
-				vertColorsArray.setSizeIncrement(numVerts);
-
 				if (fnmesh.numColorSets() > 0) {
-					CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getVertexColors(vertColorsArray));
+
+					MStringArray colorSetNames;
+					CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getColorSetNames(colorSetNames));
+					MColor defaultCol(1.f,1.f,1.f,1.f);
+
+					CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getColors(colorsArray, nullptr, &defaultCol));
 				}
 			}
 
@@ -815,7 +817,7 @@ MStatus ModelExporter::loadLODs(void)
 			MayaUtil::MayaPrintVerbose("NormalsArray: %i", normalsArray.length());
 			MayaUtil::MayaPrintVerbose("TangentsArray: %i", tangentsArray.length());
 			MayaUtil::MayaPrintVerbose("BinormalsArray: %i", binormalsArray.length());
-			MayaUtil::MayaPrintVerbose("VertColorsArray: %i", vertColorsArray.length());
+			MayaUtil::MayaPrintVerbose("ColorsArray: %i", colorsArray.length());
 			MayaUtil::MayaPrintVerbose("NumPoly: %i", numPoly);
 
 			MIntArray polygonVertices;
@@ -881,10 +883,16 @@ MStatus ModelExporter::loadLODs(void)
 						model::RawModel::Vert& vert = verts[j];
 
 						int32_t colIdx;
-						if (vertColorsArray.length() > 0 && 
-							itPolygon.getColorIndex(localIndex[j], colIdx) == MS::kSuccess)
+						if (colorsArray.length() > 0 &&
+							itPolygon.getColorIndex(localIndex[j], colIdx, nullptr) == MS::kSuccess)
 						{
-							vert.col_ = MayaUtil::XVec(vertColorsArray[colIdx]);
+							if (colIdx > safe_static_cast<int32_t,uint32_t>(colorsArray.length())) {
+								vert.col_ = Color(1.f, 1.f, 1.f, 1.f);
+								X_ERROR("ModelExport", "Invalid colidx: %i max: %i", colIdx, colorsArray.length());
+							}
+							else {
+								vert.col_ = MayaUtil::XVec(colorsArray[colIdx]);
+							}
 						}
 						else
 						{
