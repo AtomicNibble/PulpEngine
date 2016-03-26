@@ -720,6 +720,14 @@ bool ModelCompiler::DropWeights(void)
 
 			pJobSys_->Run(pJob);
 
+			// handle the rare case stack is full
+			if (jobs.size() == jobs.capacity())
+			{
+				core::V2::Job* pJob = jobs.top();
+				pJobSys_->Wait(pJob);
+				jobs.pop();
+			}
+
 			jobs.push(pJob);
 		}
 	}
@@ -850,7 +858,7 @@ bool ModelCompiler::ScaleModel(void)
 		return true;
 	}
 
-	core::Stack<core::V2::Job*> jobs(arena_, 1024);
+	core::Stack<core::V2::Job*> jobs(arena_, 512);
 
 	uint32_t batchSize = safe_static_cast<uint32_t, size_t>(getBatchSize(sizeof(RawModel::Vert)));
 	X_LOG2("Model", "using batch size of %" PRIuS, batchSize);
