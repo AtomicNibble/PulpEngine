@@ -704,6 +704,9 @@ bool ModelCompiler::DropWeights(void)
 {
 	core::Stack<core::V2::Job*> jobs(arena_, 512);
 
+	uint32_t batchSize = safe_static_cast<uint32_t,size_t>(getBatchSize(sizeof(RawModel::Vert)));
+	X_LOG2("Model", "using batch size of %" PRIuS, batchSize);
+
 	// create jobs for each mesh.
 	for (auto& lod : lods_)
 	{
@@ -713,7 +716,7 @@ bool ModelCompiler::DropWeights(void)
 			size_t numVerts = mesh.verts_.size();
 
 			core::V2::Job* pJob = pJobSys_->parallel_for(pVerts, numVerts,
-				&DropWeightsJob, core::V2::CountSplitter(1024));
+				&DropWeightsJob, core::V2::CountSplitter(batchSize));
 
 			pJobSys_->Run(pJob);
 
@@ -848,24 +851,9 @@ bool ModelCompiler::ScaleModel(void)
 	}
 
 	core::Stack<core::V2::Job*> jobs(arena_, 1024);
-	uint32_t batchSize = 1024;
 
-	{
-		core::CpuInfo* pInfo = gEnv->pCore->GetCPUInfo();
-
-		size_t numL2info = pInfo->GetL2CacheCount();
-		if (numL2info > 0)
-		{
-			// just use first info.
-			const core::CpuInfo::CacheInfo& cacheInfo = pInfo->GetL2CacheInfo(0);
-
-			batchSize = (cacheInfo.size_ / sizeof(RawModel::Vert));
-			if (batchSize < 128) {
-				batchSize = 128;
-			}
-			X_LOG2("Model", "using batch size of %" PRIuS, batchSize);
-		}
-	}
+	uint32_t batchSize = safe_static_cast<uint32_t, size_t>(getBatchSize(sizeof(RawModel::Vert)));
+	X_LOG2("Model", "using batch size of %" PRIuS, batchSize);
 
 	// create jobs for each mesh.
 	for (auto& lod : lods_)
@@ -1232,6 +1220,32 @@ void ModelCompiler::DropWeightsJob(RawModel::Vert* pVerts, size_t count)
 		vert.binds_ = finalBinds;
 	}
 }
+
+
+size_t ModelCompiler::getBatchSize(size_t elementSizeBytes)
+{
+	size_t batchSize = 0;
+
+	core::CpuInfo* pInfo = gEnv->pCore->GetCPUInfo();
+
+	size_t numL2info = pInfo->GetL2CacheCount();
+	if (numL2info > 0) {
+		// just use first info.
+		const core::CpuInfo::CacheInfo& cacheInfo = pInfo->GetL2CacheInfo(0);
+
+		batchSize = (cacheInfo.size_ / sizeof(RawModel::Vert));
+	}
+	else {
+		batchSize = 1024;
+	}
+
+	if (batchSize < 16) {
+		batchSize = 16;
+	}
+
+	return batchSize;
+}
+
 
 
 X_NAMESPACE_END

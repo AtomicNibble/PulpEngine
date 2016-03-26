@@ -102,6 +102,8 @@ private:
 	static void SortVertsJob(RawModel::Mesh* pMesh, size_t count);
 	static void DropWeightsJob(RawModel::Vert* pVerts, size_t count);
 
+	static size_t getBatchSize(size_t elementSizeBytes);
+
 private:
 	core::V2::JobSystem* pJobSys_;
 
