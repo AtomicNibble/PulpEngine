@@ -23,6 +23,11 @@ ByteStream::ByteStream(MemoryArenaBase* arena, size_t numBytes) :
 
 ByteStream::ByteStream(const ByteStream& oth)
 {
+	// make null incase oth is empty.
+	current_ = nullptr;
+	start_ = nullptr;
+	end_ = nullptr;
+
 	arena_ = oth.arena_;
 
 	resize(oth.capacity());
