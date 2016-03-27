@@ -234,7 +234,7 @@ bool ModelCompiler::CompileModel(core::Path<wchar_t>& outFile)
 
 bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 {
-
+#if 0
 	// open da file!
 	core::fileModeFlags mode;
 	mode.Set(core::fileMode::WRITE);
@@ -606,6 +606,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		}
 	}
 
+#endif
 
 	return true;
 }
@@ -1067,6 +1068,7 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 
 		{
 			hash.clear();
+#if 0
 
 			RawModel::Mesh::VertsArr v(arena_);
 
@@ -1079,7 +1081,7 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 			size_t i, x;
 
 			RawModel::Index numVerts = safe_static_cast<RawModel::Index,size_t>(v.size());
-
+	
 			for (i = 0; i < mesh.face_.size(); i++)
 			{
 				RawModel::Face& face = mesh.face_[i];
@@ -1153,6 +1155,7 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 
 				}
 			}
+#endif
 		}
 	}
 }

@@ -58,7 +58,6 @@ MayaBone::MayaBone() : dagnode(nullptr)
 	mayaNode.setOwner(this);
 	exportNode.setOwner(this);
 
-	keep = false;
 	bindpos = Vec3f::zero();
 	bindm33 = Matrix33f::identity();
 }
@@ -73,8 +72,6 @@ exportNode(oth.exportNode)
 
 	bindpos = oth.bindpos;
 	bindm33 = oth.bindm33;
-
-	keep = oth.keep;
 
 	mayaNode.setOwner(this);
 	exportNode.setOwner(this);
@@ -91,8 +88,6 @@ MayaBone& MayaBone::operator = (const MayaBone &oth)
 
 	mayaNode = oth.mayaNode;
 	exportNode = oth.exportNode;
-
-	keep = oth.keep;
 
 	mayaNode.setOwner(this);
 	exportNode.setOwner(this);
@@ -111,7 +106,6 @@ ModelExporter::ModelExporter(core::V2::JobSystem* pJobSys, core::MemoryArenaBase
 	tagOrigin_.index = 0;
 	tagOrigin_.name.append("tag_origin");
 	tagOrigin_.dagnode = nullptr;
-	tagOrigin_.keep = false;
 
 	MayaUtil::MayaPrintMsg("=========== Exporting Model ===========");
 }
@@ -265,7 +259,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 			}
 		}
 
-		if (exportMode_ == ExpoMode::SERVER)
+		if (exportMode_ == ExpoMode::SERVER && 0)
 		{
 			MayaUtil::SetProgressText("Compiling model");
 
@@ -735,8 +729,8 @@ MStatus ModelExporter::loadLODs(void)
 				return MS::kFailure;
 			}
 
-			int numVerts = fnmesh.numVertices(&status);
-			int numPoly = fnmesh.numPolygons(&status);
+			int32_t numVerts = fnmesh.numVertices(&status);
+			int32_t numPoly = fnmesh.numPolygons(&status);
 
 			if (fnmesh.numUVSets() < 1) {
 				MayaUtil::MayaPrintError("Mesh(%s): has no uv sets: %s", fnmesh.name().asChar());
@@ -749,9 +743,9 @@ MStatus ModelExporter::loadLODs(void)
 			}
 
 			// resize baby.
-			mesh.verts_.reserve(numVerts);
-			mesh.verts_.setGranularity(2048);
-			mesh.face_.setGranularity(numPoly * 3);
+			mesh.verts_.resize(numVerts);
+			mesh.tris_.reserve(numPoly);
+			mesh.tris_.setGranularity(numPoly);
 
 			status = fnmesh.getUVSetNames(UVSets);
 			if (!status) {
@@ -821,10 +815,17 @@ MStatus ModelExporter::loadLODs(void)
 			MayaUtil::MayaPrintVerbose("ColorsArray: %i", colorsArray.length());
 			MayaUtil::MayaPrintVerbose("NumPoly: %i", numPoly);
 
+			// verts
+			for (int32_t x = 0; x < numVerts; x++) {
+				model::RawModel::Vert& vert = mesh.verts_[x];
+				vert.pos_ = MayaUtil::ConvertToGameSpace(MayaUtil::XVec(vertexArray[x]));
+			}
+
 			MIntArray polygonVertices;
 
 			// for each polygon we might have multiple triangles.
 			MItMeshPolygon itPolygon(info.exportObjects[meshIdx], MObject::kNullObj);
+
 			for (; !itPolygon.isDone(); itPolygon.next())
 			{
 				int32_t numTriangles;
@@ -841,75 +842,180 @@ MStatus ModelExporter::loadLODs(void)
 						continue;
 					}
 
-					model::RawModel::Vert verts[3];
+					model::RawModel::Tri& tri = mesh.tris_.AddOne();
 
-					// positions.
-					for (uint32_t j = 0; j < vertexList.length(); j++)
+					for (uint32_t t = 0; t < 3; t++)
 					{
-						uint32_t vertIdx = vertexList[j];
+						int32_t index = vertexList[t];
+						int32_t uvID, colIdx;
 
-						model::RawModel::Vert& vert = verts[j];
-						vert.pos_ = MayaUtil::ConvertToGameSpace(MayaUtil::XVec(vertexArray[vertIdx]));
-					}
+						itPolygon.getUVIndex(t, uvID, &uvSet);
+						// fucking maya make your mind up about signed or unsiged index's
+						uint32_t normalIdx = itPolygon.normalIndex(t);
 
-					MIntArray localIndex = GetLocalIndex(polygonVertices, vertexList);
 
-					// Uv's
-					for (uint32_t j = 0; j < vertexList.length(); j++)
-					{
-						int uvID;
+						model::RawModel::TriVert& face = tri[t];
 
-						itPolygon.getUVIndex(localIndex[j], uvID, &uvSet);
+						face.index_ = index;
+						face.normal_ = MayaUtil::XVec(normalsArray[normalIdx]);
+						face.tangent_ = MayaUtil::XVec(tangentsArray[normalIdx]);
+						face.biNormal_ = MayaUtil::XVec(binormalsArray[normalIdx]);
+						face.uv_.x = u[uvID];
+						face.uv_.y = 1.f - v[uvID]; // flip a camel
 
-						model::RawModel::Vert& vert = verts[j];
-
-						vert.uv_.x = u[uvID];
-						vert.uv_.y = 1.f - v[uvID];
-					}
-
-					// normals.
-					for (uint32_t j = 0; j < vertexList.length(); j++)
-					{
-						uint32_t normalIdx = itPolygon.normalIndex(j);
-
-						model::RawModel::Vert& vert = verts[j];
-						vert.normal_ = MayaUtil::XVec(normalsArray[normalIdx]);
-						vert.tangent_ = MayaUtil::XVec(tangentsArray[normalIdx]);
-						vert.biNormal_ = MayaUtil::XVec(binormalsArray[normalIdx]);
-					}
-
-					// col
-					for (uint32_t j = 0; j < vertexList.length(); j++)
-					{
-						model::RawModel::Vert& vert = verts[j];
-
-						int32_t colIdx;
-						if (colorsArray.length() > 0 &&
-							itPolygon.getColorIndex(localIndex[j], colIdx, nullptr) == MS::kSuccess)
+						if (colorsArray.length() > 0 &&	itPolygon.getColorIndex(t, colIdx, nullptr) == MS::kSuccess)
 						{
-							if (colIdx > safe_static_cast<int32_t,uint32_t>(colorsArray.length())) {
-								vert.col_ = Color(1.f, 1.f, 1.f, 1.f);
-								X_ERROR("ModelExport", "Invalid colidx: %i max: %i", colIdx, colorsArray.length());
-							}
-							else {
-								vert.col_ = MayaUtil::XVec(colorsArray[colIdx]);
-							}
+							face.col_ = MayaUtil::XVec(colorsArray[colIdx]);
 						}
 						else
 						{
-							vert.col_ = Color(1.f,1.f,1.f,1.f);
+							face.col_ = Color(1.f, 1.f, 1.f, 1.f);
 						}
 					}
+				}
+			}
 
-					uint32_t vertIdx = safe_static_cast<uint32_t, size_t>(mesh.verts_.size());
+			// weights
 
-					// we can just write verts in index order.
-					// since we extracted the faces into index order.
-					mesh.face_.append(model::RawModel::Face(vertIdx, vertIdx + 1, vertIdx + 2));
+			//search the skin cluster affecting this geometry
+			MItDependencyNodes kDepNodeIt(MFn::kSkinClusterFilter);
 
-					mesh.verts_.append(verts[0]);
-					mesh.verts_.append(verts[1]);
-					mesh.verts_.append(verts[2]);
+			// Get any attached skin cluster
+			bool hasSkinCluster = false;
+
+			// Go through each skin cluster in the scene until we find the one connected to this mesh.
+			for (; !kDepNodeIt.isDone() && !hasSkinCluster; kDepNodeIt.next())
+			{
+				MObject kObject = kDepNodeIt.item();
+				MFnSkinCluster kSkinClusterFn(kObject, &status);
+				if (status != MS::kSuccess) {
+					continue;
+				}
+
+				uint32_t uiNumGeometries = kSkinClusterFn.numOutputConnections();
+
+				// go through each connection on the skin cluster until we get the one connecting to this mesh.
+				// pretty sure maya api dose not let me get this info without checking.
+				// might be wrong.
+				for (uint32_t uiGeometry = 0; uiGeometry < uiNumGeometries && !hasSkinCluster; ++uiGeometry)
+				{
+					uint32_t uiIndex = kSkinClusterFn.indexForOutputConnection(uiGeometry, &status);
+
+					MObject kInputObject = kSkinClusterFn.inputShapeAtIndex(uiIndex, &status);
+					MObject kOutputObject = kSkinClusterFn.outputShapeAtIndex(uiIndex, &status);
+
+					if (kOutputObject == fnmesh.object())
+					{
+						hasSkinCluster = true;
+
+						MDagPath path = info.exportObjects[meshIdx];
+						MDagPathArray infs;
+						MFloatArray wts;
+						uint32_t nInfs, infCount;
+
+						nInfs = kSkinClusterFn.influenceObjects(infs, &status);
+
+						if (!status) {
+							MayaUtil::MayaPrintError("Mesh '%s': Error getting influence objects (%s)",
+								mesh.displayName_.c_str(), status.errorString().asChar());
+							continue;
+						}
+
+
+						// work out bones indexes.
+						core::Array<MayaBone*> joints(g_arena);
+						joints.reserve(nInfs);
+
+						for (uint32_t x = 0; x < nInfs; ++x) 
+						{
+							const char* pName;
+							MString s;
+							MayaBone* pJoint;
+
+							s = infs[x].partialPathName();
+							pName = s.asChar();
+
+							pJoint = findJointReal(pName);
+							if (!pJoint) {
+								MayaUtil::MayaPrintError("Mesh '%s': joint %s not found", mesh.displayName_.c_str(), pName);
+							}
+
+							joints.append(pJoint);
+						}
+
+
+						MItGeometry kGeometryIt(kInputObject);
+						for (; !kGeometryIt.isDone(); kGeometryIt.next())
+						{
+							MObject comp = kGeometryIt.component(&status);
+							if (!status) {
+								MayaUtil::MayaPrintError("Mesh '%s': Error getting component (%s)", 
+									mesh.displayName_.c_str(), status.errorString().asChar());
+								continue;
+							}
+
+							// Get the weights for this vertex (one per influence object)
+							status = kSkinClusterFn.getWeights(path, comp, wts, infCount);
+
+							if (!status) {
+								MayaUtil::MayaPrintError("Mesh '%s': Error getting weights (%s)", 
+									mesh.displayName_.c_str(), status.errorString().asChar());
+								continue;
+							}
+							if (0 == infCount) {
+								MayaUtil::MayaPrintError("Mesh '%s': Error: 0 influence objects.", 
+									mesh.displayName_.c_str());
+								continue;
+							}
+
+
+							int32_t idx = kGeometryIt.index();	
+							model::RawModel::Vert& vert = mesh.verts_[idx];
+
+							for (uint32_t x = 0; x < infCount; x++)
+							{
+								float w = static_cast<float>(wts[x]);
+
+								if (w > EPSILON_VALUEf)
+								{
+									MayaBone* pBone = joints[x];
+
+									// full?
+									if (vert.binds_.size() == vert.binds_.capacity())
+									{
+										size_t smallest = std::numeric_limits<size_t>::max();
+										for (size_t j = 0; j < vert.binds_.size(); j++)
+										{
+											const float checkWeight = vert.binds_[j].weight_;
+											if (checkWeight < w) {
+												smallest = j; // save the index.
+											}
+										}
+
+										if (smallest < std::numeric_limits<size_t>::max()) {
+											model::RawModel::Bind& bind = vert.binds_[smallest];
+											bind.weight_ = w;
+											bind.boneIdx_ = pBone->index;
+										}
+										else {
+											// don't add
+										}
+									}
+									else
+									{
+										model::RawModel::Bind& bind = vert.binds_.AddOne();
+										bind.weight_ = w;
+										bind.boneIdx_ = pBone->index;
+									}
+								}
+							}
+						}
+					}
+				}
+
+				if (!hasSkinCluster) {
+					MayaUtil::MayaPrintWarning("No bindInfo found for mesh: '%s' binding to root.", 
+						mesh.displayName_.c_str());
 				}
 			}
 		}

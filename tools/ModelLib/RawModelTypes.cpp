@@ -19,7 +19,7 @@ namespace RawModel
 
 	Mesh::Mesh(core::MemoryArenaBase* arena) :
 		verts_(arena),
-		face_(arena)
+		tris_(arena)
 	{
 
 	}
@@ -27,12 +27,12 @@ namespace RawModel
 	void Mesh::merge(const Mesh& oth)
 	{
 		const size_t numVert = verts_.size();
-		const size_t numFace = face_.size();
+		const size_t numTris = tris_.size();
 		const size_t newVertNum = numVert + oth.verts_.size();
-		const size_t newFaceNum = numFace + oth.face_.size();
+		const size_t newTrisNum = numTris + oth.tris_.size();
 
 		verts_.resize(newVertNum);
-		face_.resize(newFaceNum);
+		tris_.resize(newTrisNum);
 
 		size_t i;
 		for (i = 0; i < oth.verts_.size(); i++)
@@ -41,13 +41,16 @@ namespace RawModel
 		}
 
 		const Face::value_type faceOffset = safe_static_cast<Face::value_type, size_t>(numVert);
-		for (i = 0; i < oth.face_.size(); i++)
+		for (i = 0; i < oth.tris_.size(); i++)
 		{
-			Face& f = face_[numFace + i];
-			f = oth.face_[i];
-			f.x += faceOffset;
-			f.y += faceOffset;
-			f.z += faceOffset;
+			Tri& tri = tris_[numTris + i];
+			tri = oth.tris_[i];
+
+			for (size_t x = 0; x < 3; x++)
+			{
+				TriVert& triVert = tri[x];
+				triVert.index_ += faceOffset;
+			}
 		}
 	}
 
@@ -78,7 +81,7 @@ namespace RawModel
 		for (auto& mesh : meshes_)
 		{
 
-			size += sizeof(model::Face) * mesh.face_.size();
+			size += sizeof(model::Face) * mesh.tris_.size();
 			size += sizeof(model::Vertex) * mesh.verts_.size();
 
 			// streams.
@@ -121,7 +124,7 @@ namespace RawModel
 		size_t total = 0;
 
 		for (const auto& mesh : meshes_) {
-			total += mesh.face_.size();
+			total += mesh.tris_.size();
 		}
 
 		return total * 3;

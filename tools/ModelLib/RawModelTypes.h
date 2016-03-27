@@ -44,6 +44,18 @@ namespace RawModel
 		~Vert() = default;
 
 		Vec3f pos_;
+		BindsArr binds_;
+	};
+
+	X_ALIGNED_SYMBOL(class FullVert, 64)
+	{
+	public:
+		typedef core::FixedArray<Bind, 12> BindsArr;
+	public:
+		FullVert() = default;
+		~FullVert() = default;
+
+		Vec3f pos_;
 		Vec3f normal_;
 		Vec3f tangent_;
 		Vec3f biNormal_;
@@ -53,10 +65,26 @@ namespace RawModel
 		BindsArr binds_;
 	};
 
-	X_ENABLE_WARNING(4324)
-
 	typedef int32_t Index;
 	typedef Vec3<Index> Face;
+
+	X_ALIGNED_SYMBOL(class TriVert, 64)
+	{
+	public:
+		TriVert() = default;
+		~TriVert() = default;
+
+		Index index_;
+		Vec3f normal_;
+		Vec3f tangent_;
+		Vec3f biNormal_;
+		Color col_;
+		Vec2f uv_;
+	};
+
+	typedef std::array<TriVert, 3> Tri;
+
+	X_ENABLE_WARNING(4324)
 
 
 	class Material
@@ -78,7 +106,7 @@ namespace RawModel
 	public:
 		typedef core::StackString<60> NameString;
 		typedef core::Array<Vert> VertsArr;
-		typedef core::Array<Face> FaceArr;
+		typedef core::Array<Tri> TriArr;
 
 	public:
 		Mesh(core::MemoryArenaBase* arena);
@@ -92,7 +120,7 @@ namespace RawModel
 		NameString displayName_;
 
 		VertsArr verts_;
-		FaceArr face_;
+		TriArr tris_;
 		Material material_;
 		AABB boundingBox_;
 	};

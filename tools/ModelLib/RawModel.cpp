@@ -308,9 +308,9 @@ namespace RawModel
 	{
 	 /* MESH
 		VERTS
-		FACES */
+		TRIS */
 		// read the mesh count.
-		int32_t numVerts, numFaces;
+		int32_t numVerts, numTris;
 
 		if (!lex.ExpectTokenString("MESH")) {
 			X_ERROR("RawModel", "Failed to read 'MESH' token");
@@ -328,7 +328,7 @@ namespace RawModel
 		if (!ReadheaderToken(lex, "VERTS", numVerts)) {
 			return false;
 		}
-		if (!ReadheaderToken(lex, "FACES", numFaces)) {
+		if (!ReadheaderToken(lex, "TRIS", numTris)) {
 			return false;
 		}
 
@@ -338,11 +338,8 @@ namespace RawModel
 		{
 		/*  v
 			pos
-			normal
-			tan
-			biNorm
-			col
-			uv */
+			binds
+		 */
 			int32_t numBinds;
 
 			if (!ReadheaderToken(lex, "v", numBinds)) {
@@ -351,26 +348,6 @@ namespace RawModel
 
 			if (!lex.Parse1DMatrix(3, &vert.pos_[0])) {
 				X_ERROR("RawModel", "Failed to read vert pos");
-				return false;
-			}
-			if (!lex.Parse1DMatrix(3, &vert.normal_[0])) {
-				X_ERROR("RawModel", "Failed to read vert normal");
-				return false;
-			}
-			if (!lex.Parse1DMatrix(3, &vert.tangent_[0])) {
-				X_ERROR("RawModel", "Failed to read vert tangent");
-				return false;
-			}
-			if (!lex.Parse1DMatrix(3, &vert.biNormal_[0])) {
-				X_ERROR("RawModel", "Failed to read vert bi-normal");
-				return false;
-			}
-			if (!lex.Parse1DMatrix(4, &vert.col_[0])) {
-				X_ERROR("RawModel", "Failed to read vert col");
-				return false;
-			}
-			if (!lex.Parse1DMatrix(2, &vert.uv_[0])) {
-				X_ERROR("RawModel", "Failed to read vert uv");
 				return false;
 			}
 
@@ -390,18 +367,60 @@ namespace RawModel
 			}
 		}
 
-		// all the faces
-		mesh.face_.resize(numFaces);
-		for (auto& face : mesh.face_)
+
+		// all the tri's
+		mesh.tris_.resize(numTris);
+		for (size_t i = 0; i < mesh.tris_.size(); i++)
 		{
-			if (!lex.ExpectTokenString("f")) {
-				X_ERROR("RawModel", "Failed to read 'f' token");
+			if (!lex.ExpectTokenString("TRI")) {
+				X_ERROR("RawModel", "Failed to read 'TRI' token");
 				return false;
 			}
 
-			face[0] = lex.ParseInt();
-			face[1] = lex.ParseInt();
-			face[2] = lex.ParseInt();
+			Tri& tri = mesh.tris_[i];
+
+			// now we have a tri.
+			for (size_t t = 0; t < 3; t++)
+			{
+				/* 
+				index
+				norn
+				tan
+				biNorm
+				col
+				uv
+				*/
+
+				TriVert& vert = tri[t];
+				vert.index_ = lex.ParseInt();
+
+				// validate the index.
+				if (vert.index_ > numVerts) {
+					X_ERROR("RawModel", "Tri(%" PRIuS ":%" PRIuS ") has invalid index of: %i max: %i", i, t, vert.index_, numVerts);
+					return false;
+				}
+
+				if (!lex.Parse1DMatrix(3, &vert.normal_[0])) {
+					X_ERROR("RawModel", "Failed to read tri normal");
+					return false;
+				}
+				if (!lex.Parse1DMatrix(3, &vert.tangent_[0])) {
+					X_ERROR("RawModel", "Failed to read tri tangent");
+					return false;
+				}
+				if (!lex.Parse1DMatrix(3, &vert.biNormal_[0])) {
+					X_ERROR("RawModel", "Failed to read tri bi-normal");
+					return false;
+				}
+				if (!lex.Parse1DMatrix(4, &vert.col_[0])) {
+					X_ERROR("RawModel", "Failed to read tri col");
+					return false;
+				}
+				if (!lex.Parse1DMatrix(2, &vert.uv_[0])) {
+					X_ERROR("RawModel", "Failed to read tri uv");
+					return false;
+				}
+			}
 		}
 
 		return true;
@@ -704,10 +723,6 @@ namespace RawModel
 
 		MeshWriteData& data = *reinterpret_cast<MeshWriteData*>(pJobData);
 
-		const size_t numVerts = data.pMesh->verts_.size();
-		const size_t numFace = data.pMesh->face_.size();
-
-
 		data.data.setGranularity(4);
 
 		const Mesh& mesh = *data.pMesh;
@@ -717,29 +732,18 @@ namespace RawModel
 
 		pCurBuf->appendFmt("MESH \"%s\"\n", mesh.name_.c_str());
 		pCurBuf->appendFmt("VERTS %" PRIuS "\n", mesh.verts_.size());
-		pCurBuf->appendFmt("FACES %" PRIuS "\n", mesh.face_.size());
+		pCurBuf->appendFmt("TRIS %" PRIuS "\n", mesh.tris_.size());
 		pCurBuf->append("\n");
 
 		// ok now we start writing the data.
 		for (const auto& vert : mesh.verts_)
 		{
 			const Vec3f& pos = vert.pos_;
-			const Vec3f& normal = vert.normal_;
-			const Vec3f& tan = vert.tangent_;
-			const Vec3f& biNormal = vert.biNormal_;
-			const Color& col = vert.col_;
-			const Vec2f& uv = vert.uv_;
 
-			pCurBuf->appendFmt("v %" PRIuS "\n(%f %f %f)\n(%f %f %f)\n(%f %f %f)\n(%f %f %f)\n(%f %f %f %f)\n(%f %f)\n",
-				vert.binds_.size(), 
-				pos.x, pos.y, pos.z,
-				normal.x, normal.y, normal.z,
-				tan.x, tan.y, tan.z,
-				biNormal.x, biNormal.y, biNormal.z,
-				col.r, col.g, col.b, col.a,
-				uv.x, uv.y
+			pCurBuf->appendFmt("v %" PRIuS "\n(%f %f %f)\n",
+				vert.binds_.size(),
+				pos.x, pos.y, pos.z
 			);
-
 
 			for (const auto& bind : vert.binds_)
 			{
@@ -761,43 +765,36 @@ namespace RawModel
 			pCurBuf = X_NEW(MeshDataStr, data.arena, "MeshDataStr");
 		}
 
-		// lets unroll this a bit.
-		const size_t unrollNum = 4;
-		const size_t numLoops = mesh.face_.size() / unrollNum;
-		const size_t trailing = mesh.face_.size() % unrollNum;
 
-		for (size_t i = 0; i < numLoops; i++)
+		for (const auto& tri : mesh.tris_)
 		{
-			const Index* pFaceIdx = &mesh.face_[i * unrollNum][0];
+			pCurBuf->append("TRI\n");
 
-			// write 4 out
-			pCurBuf->appendFmt("f %i %i %i\n"
-				"f %i %i %i\n"
-				"f %i %i %i\n"
-				"f %i %i %i\n", 
-				pFaceIdx[0], pFaceIdx[1], pFaceIdx[2],
-				pFaceIdx[3], pFaceIdx[4], pFaceIdx[5],
-				pFaceIdx[6], pFaceIdx[7], pFaceIdx[8],
-				pFaceIdx[9], pFaceIdx[10], pFaceIdx[11]
-			);
-
-			if ((pCurBuf->length() + 128) > pCurBuf->capacity())
+			for (size_t i = 0; i < 3; i++)
 			{
-				dataArr.append(pCurBuf);
-				pCurBuf = X_NEW(MeshDataStr, data.arena, "MeshDataStr");
-			}
-		}
+				const TriVert& triVert = tri[i];
 
-		for (size_t i = 0; i < trailing; i++)
-		{
-			const Face& face = mesh.face_[(unrollNum * numLoops) + i];
+				const Index& index = triVert.index_;
+				const Vec3f& normal = triVert.normal_;
+				const Vec3f& tan = triVert.tangent_;
+				const Vec3f& biNormal = triVert.biNormal_;
+				const Color& col = triVert.col_;
+				const Vec2f& uv = triVert.uv_;
 
-			pCurBuf->appendFmt("f %i %i %i\n", face[0], face[1], face[2]);
+				pCurBuf->appendFmt("%i\n(%f %f %f)\n(%f %f %f)\n(%f %f %f)\n(%f %f %f %f)\n(%f %f)\n\n",
+					index,
+					normal.x, normal.y, normal.z,
+					tan.x, tan.y, tan.z,
+					biNormal.x, biNormal.y, biNormal.z,
+					col.r, col.g, col.b, col.a,
+					uv.x, uv.y
+				);
 
-			if ((pCurBuf->length() + 64) > pCurBuf->capacity())
-			{
-				dataArr.append(pCurBuf);
-				pCurBuf = X_NEW(MeshDataStr, data.arena, "MeshDataStr");
+				if ((pCurBuf->length() + 256) > pCurBuf->capacity())
+				{
+					dataArr.append(pCurBuf);
+					pCurBuf = X_NEW(MeshDataStr, data.arena, "MeshDataStr");
+				}
 			}
 		}
 
@@ -813,7 +810,7 @@ namespace RawModel
 
 		buf.appendFmt("MESH \"%s\"\n", mesh.name_.c_str());
 		buf.appendFmt("VERTS %" PRIuS "\n", mesh.verts_.size());
-		buf.appendFmt("FACES %" PRIuS "\n", mesh.face_.size());
+		buf.appendFmt("TRIS %" PRIuS "\n", mesh.tris_.size());
 		buf.append("\n");
 
 		if (f->write(buf.c_str(), buf.length()) != buf.length()) {
@@ -826,29 +823,19 @@ namespace RawModel
 		for (const auto& vert : mesh.verts_)
 		{
 			const Vec3f& pos = vert.pos_;
-			const Vec3f& normal = vert.normal_;
-			const Vec3f& tan = vert.tangent_;
-			const Vec3f& biNormal = vert.biNormal_;
-			const Color& col = vert.col_;
-			const Vec2f& uv = vert.uv_;
 
 			buf.appendFmt("v %" PRIuS "\n", vert.binds_.size());
 			buf.appendFmt("(%f %f %f)\n", pos.x, pos.y, pos.z);
-			buf.appendFmt("(%f %f %f)\n", normal.x, normal.y, normal.z);
-			buf.appendFmt("(%f %f %f)\n", tan.x, tan.y, tan.z);
-			buf.appendFmt("(%f %f %f)\n", biNormal.x, biNormal.y, biNormal.z);
-			buf.appendFmt("(%f %f %f %f)\n", col.r, col.g, col.b, col.a);
-			buf.appendFmt("(%f %f)\n", uv.x, uv.y);
 
 			for (const auto& bind : vert.binds_)
 			{
-				buf.appendFmt("%i %f\n",bind.boneIdx_, bind.weight_);
+				buf.appendFmt("%i %f\n", bind.boneIdx_, bind.weight_);
 			}
 
 			buf.append("\n");
 
-			// write it, if less that 1024 bytes free.
-			if (buf.length() + 1024 > buf.capacity())
+			// write it, if less that 256 bytes free.
+			if (buf.length() + 256 > buf.capacity())
 			{
 				if (f->write(buf.c_str(), buf.length()) != buf.length()) {
 					X_ERROR("RawModel", "Failed to write mesh vert");
@@ -859,21 +846,41 @@ namespace RawModel
 			}
 		}
 
-		// buf might not be empty.
+		for (const auto& tri : mesh.tris_)
+		{
+			buf.append("TRI\n");
 
-		for (const auto& face : mesh.face_)
-		{		
-			buf.appendFmt("f %i %i %i\n", face[0], face[1], face[2]);
-
-			// write it, if less that 256 bytes free.
-			if (buf.length() + 256 > buf.capacity())
+			for (size_t i = 0; i < 3; i++)
 			{
-				if (f->write(buf.c_str(), buf.length()) != buf.length()) {
-					X_ERROR("RawModel", "Failed to write mesh face");
-					return false;
-				}
+				const TriVert& triVert = tri[i];
 
-				buf.clear();
+				const Index& index = triVert.index_;
+				const Vec3f& normal = triVert.normal_;
+				const Vec3f& tan = triVert.tangent_;
+				const Vec3f& biNormal = triVert.biNormal_;
+				const Color& col = triVert.col_;
+				const Vec2f& uv = triVert.uv_;
+
+
+				buf.appendFmt("%i\n(%f %f %f)\n(%f %f %f)\n(%f %f %f)\n(%f %f %f %f)\n(%f %f)\n\n",
+					index,
+					normal.x, normal.y, normal.z,
+					tan.x, tan.y, tan.z,
+					biNormal.x, biNormal.y, biNormal.z,
+					col.r, col.g, col.b, col.a,
+					uv.x, uv.y
+					);
+
+				// write it, if less that 512 bytes free.
+				if (buf.length() + 512 > buf.capacity())
+				{
+					if (f->write(buf.c_str(), buf.length()) != buf.length()) {
+						X_ERROR("RawModel", "Failed to write mesh face");
+						return false;
+					}
+
+					buf.clear();
+				}
 			}
 		}
 

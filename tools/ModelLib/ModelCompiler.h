@@ -114,6 +114,9 @@ private:
 	float scale_;
 
 	CompileFlags flags_;
+
+
+
 protected:
 	Stats stats_;
 };

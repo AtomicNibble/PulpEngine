@@ -39,8 +39,6 @@ struct MayaBone
 
 	Hierarchy<MayaBone> mayaNode;
 	Hierarchy<MayaBone> exportNode;
-
-	bool keep;
 };
 
 class ModelExporter : public model::ModelCompiler
