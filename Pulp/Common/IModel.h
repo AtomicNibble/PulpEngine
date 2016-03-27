@@ -275,34 +275,46 @@ typedef Vec3<Index> Face;
 
 struct CompbindInfo
 {
-	CompbindInfo() {
-		core::zero_object(CompBinds_);
+	typedef std::array<uint16_t, MODEL_MAX_VERT_BINDS> BindCountsArr;
+
+	X_INLINE CompbindInfo() {
+		core::zero_object(compBinds_);
 	}
 
-	uint16_t& operator[](int idx) {
-		X_ASSERT(idx >= 0 && idx < MODEL_MAX_VERT_BINDS, "index out of range")(idx, MODEL_MAX_VERT_BINDS);
-		return CompBinds_[idx]; 
-	}
-	const uint16_t operator[](int idx) const {
-		X_ASSERT(idx >= 0 && idx < MODEL_MAX_VERT_BINDS, "index out of range")(idx, MODEL_MAX_VERT_BINDS);
-		return CompBinds_[idx]; 
+	X_INLINE void set(const BindCountsArr& counts) {
+		compBinds_ = counts;
 	}
 
-	X_INLINE size_t dataSize(int idx) const {
+	X_INLINE uint16_t& operator[](int idx) {
+		X_ASSERT(idx >= 0 && idx < MODEL_MAX_VERT_BINDS, "index out of range")(idx, MODEL_MAX_VERT_BINDS);
+		return compBinds_[idx];
+	}
+
+	X_INLINE const uint16_t operator[](int idx) const {
+		X_ASSERT(idx >= 0 && idx < MODEL_MAX_VERT_BINDS, "index out of range")(idx, MODEL_MAX_VERT_BINDS);
+		return compBinds_[idx];
+	}
+
+	X_INLINE const size_t dataSize(int idx) const {
 		X_ASSERT(idx >= 0 && idx < MODEL_MAX_VERT_BINDS, "index out of range")(idx, MODEL_MAX_VERT_BINDS);
 		// size is (idx * (bindBone + bindWeight)) + bindBone
-		return CompBinds_[idx] * ((idx * 4) + 2);
+		return compBinds_[idx] * (idx * (sizeof(bindBone) + sizeof(bindWeight))) + sizeof(bindBone);
 	}
 
-	X_INLINE size_t dataSizeTotal(void) const {
+	X_INLINE const size_t dataSizeTotal(void) const {
 		size_t size = 0; int i;
-		for (i = 0; i < MODEL_MAX_VERT_BINDS; i++)
+		for (i = 0; i < MODEL_MAX_VERT_BINDS; i++) {
 			size += dataSize(i);
+		}
 		return size;
 	}
 
+	X_INLINE const BindCountsArr& getBindCounts(void) const {
+		return compBinds_;
+	}
+
 private:
-	uint16_t CompBinds_[MODEL_MAX_VERT_BINDS];
+	BindCountsArr compBinds_;
 };
 
 // SubMeshHeader is part of a single mesh.
