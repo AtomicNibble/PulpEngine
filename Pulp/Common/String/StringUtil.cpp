@@ -273,6 +273,12 @@ namespace strUtil
 	{
 		std::locale loc;
 
+		// return true if empty.
+		size_t Len = endExclusive - startInclusive;
+		if (Len == 0) {
+			return true; 
+		}
+
 		return std::find_if(startInclusive, endExclusive, [&](char c) { 
 			return std::islower(c, loc);
 		}) != endExclusive;
