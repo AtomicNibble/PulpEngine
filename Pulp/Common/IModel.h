@@ -103,7 +103,8 @@ static const uint32_t	 MODEL_MAX_INDEXS = MODEL_MAX_VERTS;
 static const uint32_t	 MODEL_MAX_FACES = MODEL_MAX_INDEXS / 3;
 
 // humm might make this 8 (would be for faces, probs make it a option)
-static const uint32_t	 MODEL_MAX_VERT_BINDS = 4; 
+// I've made it 8 for the format, but i'm gonna make it so you need to turn on 8vert mode for compiler.
+static const uint32_t	 MODEL_MAX_VERT_BINDS = 8; 
 static const uint32_t	 MODEL_MAX_LODS = 4;
 // legnth checks are done without extension, to make it include extension, simple reduce it by the length of ext.
 static const uint32_t	 MODEL_MAX_NAME_LENGTH = 60; 
@@ -142,17 +143,17 @@ X_DECLARE_FLAGS8(StreamType)(COLOR, NORMALS, TANGENT_BI);
 X_DECLARE_ENUM8(StreamFmt)(VERT,VERT_FULL,VEC2,VEC216,VEC3,VEC3COMP);
 
 
+X_PACK_PUSH(1)
+
 struct bindWeight
 {
-	bindWeight(float val) {
+	X_INLINE bindWeight() : compressed_(0) {}
+
+	X_INLINE bindWeight(float val) {
 		compressed_ = static_cast<uint16_t>(val * 65535.f);
 	}
 
-	operator float() const {
-		return static_cast<float>(compressed_) / 65535.0f;
-	}
-
-	X_INLINE float weight() const {
+	X_INLINE float getWeight(void) const {
 		return static_cast<float>(compressed_) / 65535.0f;
 	}
 private:
@@ -161,21 +162,21 @@ private:
 
 struct bindBone
 {
-	bindBone() {}
-	bindBone(uint16_t id) : compressed_(id * 128) {
+	X_INLINE bindBone() : compressed_(0) {}
+	X_INLINE bindBone(uint16_t id) : compressed_(id * 128) {
 		X_ASSERT(static_cast<uint32_t>(id) * 128 < std::numeric_limits<uint16_t>::max(), 
 			"Bone id scaled exceeds type limits")(id);
 	}
 
-	X_INLINE uint16_t index() const {
+	X_INLINE uint16_t getIndex(void) const {
 		return compressed_ / 128;
 	}
 
 	// used for sorting
-	const int operator-(const bindBone& tag) const {
+	X_INLINE const int operator-(const bindBone& tag) const {
 		return compressed_ - tag.compressed_;
 	}
-	bool operator==(const bindBone& tag) const {
+	X_INLINE bool operator==(const bindBone& tag) const {
 		return tag.compressed_ == compressed_;
 	}
 private:
@@ -183,13 +184,61 @@ private:
 };
 
 
-struct singleBind
+// used for when the mesh has no complex binds.
+// a mesh can have 1 or more of these allowing for multiple simple binds to a mesh
+struct simpleBind
 {
 	uint16_t jointIdx; // 16bit for padding.
 	uint16_t numVerts;
 	uint16_t numFaces;
 	uint16_t faceOffset;
 };
+
+// each vertex supports between 1-8 binds.
+struct doubleBind
+{
+	bindBone	bone1;
+	bindBone	bone2;
+	bindWeight	weight2;
+};
+
+struct trippleBind : public doubleBind
+{
+	bindBone	bone3;
+	bindWeight	weight3;
+};
+
+struct quadBind : public trippleBind
+{
+	bindBone	bone4;
+	bindWeight	weight4;
+};
+
+struct fiveBind : public quadBind
+{
+	bindBone	bone5;
+	bindWeight	weight5;
+};
+
+struct sixBind : public fiveBind
+{
+	bindBone	bone6;
+	bindWeight	weight6;
+};
+
+struct sevenBind : public sixBind
+{
+	bindBone	bone7;
+	bindWeight	weight7;
+};
+
+struct eightBind : public sevenBind
+{
+	bindBone	bone8;
+	bindWeight	weight8;
+};
+
+X_PACK_POP
 
 
 // base vertex is just pos + texcords.
@@ -270,8 +319,6 @@ struct SubMeshHeader
 
 		startVertex = (uint32_t)-1;
 		startIndex = (uint32_t)-1;
-
-		core::zero_object(_pad);
 	}
 
 	// sizes
@@ -304,8 +351,6 @@ struct SubMeshHeader
 	AABB boundingBox;
 	Sphere boundingSphere;
 
-	uint32_t _pad[1]; // pad to 128
-	
 //	X_NO_COPY(SubMeshHeader);
 //	X_NO_ASSIGN(SubMeshHeader);
 }; // 128
@@ -526,7 +571,19 @@ struct ModelHeader // File header.
 // so models work in both 32/64bit engine.
 // while also allows the tool making the file to be 32bit.
 X_ENSURE_SIZE(compressedVec3, 4);
-X_ENSURE_SIZE(singleBind, 8);
+X_ENSURE_SIZE(simpleBind, 8);
+
+X_ENSURE_SIZE(bindBone, 2);
+X_ENSURE_SIZE(bindWeight, 2);
+
+X_ENSURE_SIZE(doubleBind, 6);
+X_ENSURE_SIZE(trippleBind, 10);
+X_ENSURE_SIZE(quadBind, 14);
+X_ENSURE_SIZE(fiveBind, 18);
+X_ENSURE_SIZE(sixBind, 22);
+X_ENSURE_SIZE(sevenBind, 26);
+X_ENSURE_SIZE(eightBind, 30);
+
 
 X_ENSURE_SIZE(Vertex, 16);
 X_ENSURE_SIZE(Face, 6);
