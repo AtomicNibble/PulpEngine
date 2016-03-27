@@ -518,7 +518,7 @@ namespace RawModel
 				const model::RawModel::Lod& lod = lods_[i];
 
 				buf.appendFmt("// LOD%" PRIuS " dis: %f numMesh: %" PRIuS " verts: %" PRIuS " faces: %" PRIuS " \n",
-					i, lod.distance_, lod.meshes_.size(), lod.totalVerts(), lod.totalIndexs());
+					i, lod.distance_, lod.meshes_.size(), lod.totalVerts(), lod.totalIndexs() / 3);
 			}
 
 			buf.append("\n");
