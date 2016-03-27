@@ -191,18 +191,9 @@ MStatus ModelExporter::convert(const MArgList& args)
 	bool saveOk = false;
 
 	{
-	//	float appliedScale = scale_;
-	//	float scale = g_options.scale_;
-
-	//	if (g_options.unitOfMeasurement_ == PotatoOptions::INCHES) {
-	//		scale = appliedScale * 2.54f;
-	//	}
-
 		MayaUtil::MayaPrintMsg("Exporting to: '%s'", getFilePath().c_str());
-	//	MayaUtil::MayaPrintMsg("Scale: '%f' Applied: '%f'", scale, appliedScale);
 		MayaUtil::MayaPrintMsg(""); // new line
 	}
-
 
 	// name length check
 	if (fileName_.length() > model::MODEL_MAX_NAME_LENGTH)
@@ -259,7 +250,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 			}
 		}
 
-		if (exportMode_ == ExpoMode::SERVER && 0)
+		if (exportMode_ == ExpoMode::SERVER)
 		{
 			MayaUtil::SetProgressText("Compiling model");
 
