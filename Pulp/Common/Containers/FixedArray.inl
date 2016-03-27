@@ -13,8 +13,10 @@ FixedArray<T, N>::FixedArray(const T& initial) :
 {
 	T* pArr = begin();
 
-	for (size_type i = 0; i < N; ++i)
-		pArr[i] = initial;
+	for (size_type i = 0; i < N; ++i) {
+		Mem::Construct(&pArr[i], initial);
+	}
+
 	size_ = N;
 }
 
