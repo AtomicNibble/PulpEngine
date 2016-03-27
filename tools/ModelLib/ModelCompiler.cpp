@@ -1223,7 +1223,7 @@ void ModelCompiler::DropWeightsJob(RawModel::Vert* pVerts, size_t count)
 		}
 
 		// always sort them?
-		std::sort(finalBinds.begin(), finalBinds.end(), [](const RawModel::Bind& a, const RawModel::Bind b) {
+		std::sort(finalBinds.begin(), finalBinds.end(), [](const RawModel::Bind& a, const RawModel::Bind& b) {
 				return a.weight_ < b.weight_; 
 			}
 		);
