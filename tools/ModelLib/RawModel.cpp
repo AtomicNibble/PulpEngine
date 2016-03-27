@@ -332,16 +332,19 @@ namespace RawModel
 			return false;
 		}
 
+		const int32_t numBones = safe_static_cast<int32_t, size_t>(bones_.size());
+
 		// all the verts
 		mesh.verts_.resize(numVerts);
-		for (auto& vert : mesh.verts_)
+		for (size_t i = 0; i < mesh.verts_.size(); i++)
 		{
 		/*  v
 			pos
 			binds
 		 */
-			int32_t numBinds;
+			auto& vert = mesh.verts_[i];
 
+			int32_t numBinds;
 			if (!ReadheaderToken(lex, "v", numBinds)) {
 				return false;
 			}
@@ -351,10 +354,10 @@ namespace RawModel
 				return false;
 			}
 
-			// read bines.
+			// read binds.
 			if (numBinds > safe_static_cast<int32_t, size_t>(vert.binds_.capacity())) {
-				X_ERROR("RawModel", "Vert has too many binds. max: %" PRIuS,
-					vert.binds_.capacity());
+				X_ERROR("RawModel", "Vert(%" PRIuS ") has too many binds. max: %" PRIuS,
+					i, vert.binds_.capacity());
 				return false;
 			}
 
@@ -364,6 +367,13 @@ namespace RawModel
 				// boneIDx + weigth
 				bind.boneIdx_ = lex.ParseInt();
 				bind.weight_ = lex.ParseFloat();
+
+				// check the bone idx is valid
+				if (bind.boneIdx_ > numBones) {
+					X_ERROR("RawModel", "Vert(%s" PRIuS ") bind has invalid bone idx: %i max: %i",
+						i, bind.boneIdx_, numBones);
+					return false;
+				}
 			}
 		}
 
