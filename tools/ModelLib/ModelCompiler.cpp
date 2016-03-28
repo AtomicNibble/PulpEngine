@@ -965,6 +965,9 @@ bool ModelCompiler::DropWeights(void)
 
 	droppedWeights_ = 0;
 
+	core::Delegate<void(RawModel::Vert*, uint32_t)> del;
+	del.Bind<ModelCompiler, &ModelCompiler::DropWeightsJob>(this);
+
 	// create jobs for each mesh.
 	for (auto& lod : lods_)
 	{
@@ -972,9 +975,6 @@ bool ModelCompiler::DropWeights(void)
 		{
 			RawModel::Vert* pVerts = mesh.verts_.ptr();
 			uint32_t numVerts = safe_static_cast<uint32_t,size_t>(mesh.verts_.size());
-
-			core::Delegate<void(RawModel::Vert*, uint32_t)> del;
-			del.Bind<ModelCompiler, &ModelCompiler::DropWeightsJob>(this);
 
 			core::V2::Job* pJob = pJobSys_->parallel_for_member<ModelCompiler>(del, pVerts, numVerts,
 				core::V2::CountSplitter32(batchSize));
@@ -1126,15 +1126,14 @@ bool ModelCompiler::CreateBindData(void)
 {
 	core::V2::Job* pJobs[model::MODEL_MAX_LODS] = { nullptr };
 
-	size_t i;
+	core::Delegate<void(Mesh*, uint32_t)> del;
+	del.Bind<ModelCompiler, &ModelCompiler::CreateBindDataJob>(this);
 
+	size_t i;
 	for (i = 0; i < compiledLods_.size(); i++)
 	{
 		Mesh* pMesh = compiledLods_[i].meshes_.ptr();
 		uint32_t numMesh = safe_static_cast<uint32_t, size_t>(compiledLods_[i].numMeshes());
-
-		core::Delegate<void(Mesh*, uint32_t)> del;
-		del.Bind<ModelCompiler, &ModelCompiler::CreateBindDataJob>(this);
 
 		// create a job for each mesh.
 		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh, core::V2::CountSplitter32(1));
@@ -1164,13 +1163,13 @@ bool ModelCompiler::MergVerts(void)
 		totalVerts += compiledLods_[i].totalVerts();
 	}
 
+	core::Delegate<void(Mesh*, uint32_t)> del;
+	del.Bind<ModelCompiler, &ModelCompiler::MergeVertsJob>(this);
+
 	for (i = 0; i < compiledLods_.size(); i++)
 	{
 		Mesh* pMesh = compiledLods_[i].meshes_.ptr();
 		uint32_t numMesh = safe_static_cast<uint32_t,size_t>(compiledLods_[i].numMeshes());
-
-		core::Delegate<void(Mesh*, uint32_t)> del;
-		del.Bind<ModelCompiler, &ModelCompiler::MergeVertsJob>(this);
 
 		// create a job for each mesh.
 		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh, core::V2::CountSplitter32(1));
@@ -1203,6 +1202,9 @@ bool ModelCompiler::ScaleModel(void)
 	uint32_t batchSize = safe_static_cast<uint32_t, size_t>(getBatchSize(sizeof(Vert)));
 	X_LOG2("Model", "using batch size of %i", batchSize);
 
+	core::Delegate<void(Vert*, uint32_t)> del;
+	del.Bind<ModelCompiler, &ModelCompiler::ScaleVertsJob>(this);
+
 	// create jobs for each mesh.
 	for (auto& lod : compiledLods_)
 	{
@@ -1210,9 +1212,6 @@ bool ModelCompiler::ScaleModel(void)
 		{
 			Vert* pVerts = mesh.verts_.ptr();
 			uint32_t numVerts = safe_static_cast<uint32_t, size_t>(mesh.verts_.size());
-
-			core::Delegate<void(Vert*, uint32_t)> del;
-			del.Bind<ModelCompiler, &ModelCompiler::ScaleVertsJob>(this);
 
 			core::V2::Job* pJob = pJobSys_->parallel_for_member<ModelCompiler>(del,
 				pVerts, numVerts, core::V2::CountSplitter32(batchSize));
@@ -1245,14 +1244,14 @@ bool ModelCompiler::UpdateMeshBounds(void)
 {
 	core::V2::Job* pJobs[model::MODEL_MAX_LODS] = { nullptr };
 
+	core::Delegate<void(Mesh*, uint32_t)> del;
+	del.Bind<ModelCompiler, &ModelCompiler::UpdateBoundsJob>(this);
+
 	size_t i;
 	for (i = 0; i < compiledLods_.size(); i++)
 	{
 		Mesh* pMesh = compiledLods_[i].meshes_.ptr();
 		uint32_t numMesh = safe_static_cast<uint32_t, size_t>(compiledLods_[i].numMeshes());
-
-		core::Delegate<void(Mesh*, uint32_t)> del;
-		del.Bind<ModelCompiler, &ModelCompiler::UpdateBoundsJob>(this);
 
 		// create a job for each mesh.
 		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh, core::V2::CountSplitter32(1));
