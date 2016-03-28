@@ -700,7 +700,7 @@ MStatus ModelExporter::loadLODs(void)
 				return MS::kFailure;
 			}
 
-			MayaUtil::MayaPrintVerbose("Material: %s", material.name_.c_str());
+			MayaUtil::MayaPrintVerbose("Material: '%s'", material.name_.c_str());
 
 
 			int32_t numVerts = fnmesh.numVertices(&status);
@@ -993,11 +993,11 @@ MStatus ModelExporter::loadLODs(void)
 						}
 					}
 				}
+			}
 
-				if (!hasSkinCluster) {
-					MayaUtil::MayaPrintWarning("No bindInfo found for mesh: '%s' binding to root.", 
-						mesh.displayName_.c_str());
-				}
+			if (!hasSkinCluster) {
+				MayaUtil::MayaPrintWarning("No bindInfo found for mesh: '%s' binding to root.",
+					mesh.displayName_.c_str());
 			}
 		}
 	}
