@@ -204,9 +204,9 @@ private:
 	void UpdateBoundsJob(Mesh* pMesh, uint32_t count);
 	void ScaleVertsJob(Vert* pVerts, uint32_t count);
 	void CreateBindDataJob(Mesh* pMesh, uint32_t count);
+	void DropWeightsJob(RawModel::Vert* pVerts, uint32_t count);
 	static void CreateDataJob(CreateDataJobData* pData, size_t count);
 	static void SortVertsJob(Mesh* pMesh, size_t count);
-	static void DropWeightsJob(RawModel::Vert* pVerts, size_t count);
 
 	static size_t getBatchSize(size_t elementSizeBytes);
 
@@ -216,12 +216,12 @@ private:
 	float vertexElipsion_;
 	float texcoordElipson_;
 	float jointWeightThreshold_;
-
 	float scale_;
 
 	CompileFlags flags_;
-
 	CompiledLodArr compiledLods_;
+
+	core::AtomicInt droppedWeights_;
 
 protected:
 	Stats stats_;

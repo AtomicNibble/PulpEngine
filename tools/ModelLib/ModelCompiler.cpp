@@ -962,16 +962,21 @@ bool ModelCompiler::DropWeights(void)
 	uint32_t batchSize = safe_static_cast<uint32_t,size_t>(getBatchSize(sizeof(RawModel::Vert)));
 	X_LOG2("Model", "using batch size of %i", batchSize);
 
+	droppedWeights_ = 0;
+
 	// create jobs for each mesh.
 	for (auto& lod : lods_)
 	{
 		for (auto& mesh : lod.meshes_)
 		{
 			RawModel::Vert* pVerts = mesh.verts_.ptr();
-			size_t numVerts = mesh.verts_.size();
+			uint32_t numVerts = safe_static_cast<uint32_t,size_t>(mesh.verts_.size());
 
-			core::V2::Job* pJob = pJobSys_->parallel_for(pVerts, numVerts,
-				&DropWeightsJob, core::V2::CountSplitter(batchSize));
+			core::Delegate<void(RawModel::Vert*, uint32_t)> del;
+			del.Bind<ModelCompiler, &ModelCompiler::DropWeightsJob>(this);
+
+			core::V2::Job* pJob = pJobSys_->parallel_for_member<ModelCompiler>(del, pVerts, numVerts,
+				core::V2::CountSplitter32(batchSize));
 
 			pJobSys_->Run(pJob);
 
@@ -993,6 +998,9 @@ bool ModelCompiler::DropWeights(void)
 		pJobSys_->Wait(pJob);
 		jobs.pop();
 	}
+
+	// update stats
+	stats_.totalWeightsDropped = droppedWeights_;
 
 	return true;
 }
@@ -1537,6 +1545,50 @@ void ModelCompiler::CreateBindDataJob(Mesh* pMesh, uint32_t count)
 	}
 }
 
+void ModelCompiler::DropWeightsJob(RawModel::Vert* pVerts, uint32_t count)
+{
+	const size_t num = count;
+	const size_t maxWeights = ModelCompiler::VERTEX_MAX_WEIGHTS;
+	const float32_t threshold = ModelCompiler::JOINT_WEIGHT_THRESHOLD;
+
+	int32_t droppedWeights = 0;
+	size_t i;
+	for (i = 0; i < num; i++)
+	{
+		RawModel::Vert& vert = pVerts[i];
+		RawModel::Vert::BindsArr& binds = vert.binds_;
+
+		RawModel::Vert::BindsArr finalBinds;
+
+		for (auto bind : binds)
+		{
+			if (bind.weight_ > threshold)
+			{
+				finalBinds.append(bind);
+			}
+		}
+
+		// always sort them?
+		std::sort(finalBinds.begin(), finalBinds.end(), [](const RawModel::Bind& a, const RawModel::Bind& b) {
+			return a.weight_ < b.weight_;
+		}
+		);
+
+		while (finalBinds.size() > maxWeights)
+		{
+			// drop the last
+			finalBinds.removeIndex(finalBinds.size() - 1);
+
+			droppedWeights++;
+		}
+
+		vert.binds_ = finalBinds;
+	}
+
+	// update value in class.
+	droppedWeights_ += droppedWeights;
+}
+
 void ModelCompiler::CreateDataJob(CreateDataJobData* pData, size_t count)
 {
 	size_t meshIdx;
@@ -1605,46 +1657,6 @@ void ModelCompiler::SortVertsJob(Mesh* pMesh, size_t count)
 		);
 	}
 }
-
-void ModelCompiler::DropWeightsJob(RawModel::Vert* pVerts, size_t count)
-{
-	const size_t num = count;
-	size_t i;
-
-	size_t maxWeights = ModelCompiler::VERTEX_MAX_WEIGHTS;
-	float32_t threshold = ModelCompiler::JOINT_WEIGHT_THRESHOLD;
-
-	for (i = 0; i < num; i++)
-	{
-		RawModel::Vert& vert = pVerts[i];
-		RawModel::Vert::BindsArr& binds = vert.binds_;
-
-		RawModel::Vert::BindsArr finalBinds;
-
-		for (auto bind : binds)
-		{
-			if (bind.weight_ > threshold)
-			{
-				finalBinds.append(bind);
-			}
-		}
-
-		// always sort them?
-		std::sort(finalBinds.begin(), finalBinds.end(), [](const RawModel::Bind& a, const RawModel::Bind& b) {
-				return a.weight_ < b.weight_; 
-			}
-		);
-
-		while (finalBinds.size() > maxWeights)
-		{
-			// drop the last
-			finalBinds.removeIndex(finalBinds.size() - 1);
-		}
-
-		vert.binds_ = finalBinds;
-	}
-}
-
 
 size_t ModelCompiler::getBatchSize(size_t elementSizeBytes)
 {
