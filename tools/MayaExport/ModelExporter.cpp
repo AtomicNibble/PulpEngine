@@ -1007,8 +1007,6 @@ MStatus ModelExporter::loadLODs(void)
 
 MStatus ModelExporter::loadBones(void)
 {
-	PROFILE_MAYA("load joints");
-
 	MStatus			status;
 	MDagPath		dagPath;
 	MFnDagNode		*parentNode;
