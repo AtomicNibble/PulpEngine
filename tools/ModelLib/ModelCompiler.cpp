@@ -66,15 +66,7 @@ const ModelCompiler::CompileFlags ModelCompiler::DEFAULT_FLAGS = ModelCompiler::
 ModelCompiler::Stats::Stats(core::MemoryArenaBase* arena) :
 	droppedBoneNames(arena)
 {
-	totalLods = 0;
-	totalMesh = 0;
-	totalJoints = 0;
-	totalJointsDropped = 0;
-	totalVerts = 0;
-	totalVertsMerged = 0;
-	totalFaces = 0;
-	totalWeightsDropped = 0;
-	totalMeshMerged = 0;
+	clear();
 }
 
 void ModelCompiler::Stats::print(void) const
