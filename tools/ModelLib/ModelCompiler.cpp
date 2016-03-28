@@ -812,9 +812,9 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 			{
 				const RawModel::Face& face = compiledMesh.faces_[x];
 
-				stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[2]));
-				stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[1]));
-				stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[0]));
+				stream.write<model::Index>(safe_static_cast<model::Index, RawModel::Index>(face[2]));
+				stream.write<model::Index>(safe_static_cast<model::Index, RawModel::Index>(face[1]));
+				stream.write<model::Index>(safe_static_cast<model::Index, RawModel::Index>(face[0]));
 			}
 		}
 
