@@ -648,7 +648,6 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 
 MStatus ModelExporter::loadLODs(void)
 {
-	PROFILE_MAYA("load LODS");
 	MStatus status;
 
 	lods_.resize(lodExpoInfo_.size(), model::RawModel::Lod(g_arena));
@@ -693,10 +692,16 @@ MStatus ModelExporter::loadLODs(void)
 			mesh.displayName_ = getMeshDisplayName(fnmesh.fullPathName());
 			mesh.name_.set(fnmesh.name().asChar());
 
+			MayaUtil::MayaPrintVerbose("\n ------ Processing (%s) -------", mesh.displayName_.c_str());
+
+
 			if (!getMeshMaterial(info.exportObjects[meshIdx], material)) {
 				MayaUtil::MayaPrintError("Mesh(%s): failed to get material", fnmesh.name().asChar());
 				return MS::kFailure;
 			}
+
+			MayaUtil::MayaPrintVerbose("Material: %s", material.name_.c_str());
+
 
 			int32_t numVerts = fnmesh.numVertices(&status);
 			int32_t numPoly = fnmesh.numPolygons(&status);
@@ -710,6 +715,9 @@ MStatus ModelExporter::loadLODs(void)
 				MayaUtil::MayaPrintError("Mesh(%s): failed to get mesh info (%s)", fnmesh.name().asChar(), status.errorString().asChar());
 				return status;
 			}
+
+			MayaUtil::MayaPrintVerbose("NumVerts: %i", numVerts);
+			MayaUtil::MayaPrintVerbose("NumPoly: %i", numPoly);
 
 			// resize baby.
 			mesh.verts_.resize(numVerts);
@@ -785,7 +793,6 @@ MStatus ModelExporter::loadLODs(void)
 			MayaUtil::MayaPrintVerbose("TangentsArray: %i", tangentsArray.length());
 			MayaUtil::MayaPrintVerbose("BinormalsArray: %i", binormalsArray.length());
 			MayaUtil::MayaPrintVerbose("ColorsArray: %i", colorsArray.length());
-			MayaUtil::MayaPrintVerbose("NumPoly: %i", numPoly);
 
 			// verts
 			for (int32_t x = 0; x < numVerts; x++) {
