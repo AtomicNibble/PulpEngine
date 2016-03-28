@@ -1147,10 +1147,11 @@ global proc potato_CreateExportWindow( string $name )
 		$help += " 	-Meshes with no binds are automatically binded to the root bone\n";
 		$help += "\n";
 		$help += "Limits:\n";
-		$help += " 	Max Verts:  	65535 (per mesh)\n";
-		$help += " 	Max Triangles:  65535 (per mesh)\n";
-		$help += " 	Max Meshes:  	64 (per a LOD)\n";
-		$help += " 	Max Bones:  	255\n";
+		$help += " 	Max Verts:  			65535 (per LOD)\n";
+		$help += " 	Max Triangles:  		65535 (per LOD)\n";
+		$help += " 	Max Meshes:  			64 (per a LOD)\n";
+		$help += " 	Max Bones:  			255\n";
+		$help += " 	Max binds per vert:  	8\n";
 		$help += "\n";
 		$help += "Jargon:\n";
 		$help += " 	LOD:			'Level of Detail' LOD0 should the highest quality version of the model,\n";
