@@ -791,7 +791,7 @@ namespace RawModel
 				const Color& col = triVert.col_;
 				const Vec2f& uv = triVert.uv_;
 
-				pCurBuf->appendFmt("%i\n(%f %f %f)\n(%f %f %f)\n(%f %f %f)\n(%f %f %f %f)\n(%f %f)\n\n",
+				pCurBuf->appendFmt("%i\n(%f %f %f)\n(%f %f %f)\n(%f %f %f)\n(%f %f %f %f)\n(%f %f)\n",
 					index,
 					normal.x, normal.y, normal.z,
 					tan.x, tan.y, tan.z,
@@ -806,6 +806,8 @@ namespace RawModel
 					pCurBuf = X_NEW(MeshDataStr, data.arena, "MeshDataStr");
 				}
 			}
+
+			pCurBuf->append("\n");
 		}
 
 		pCurBuf->append("\n");
