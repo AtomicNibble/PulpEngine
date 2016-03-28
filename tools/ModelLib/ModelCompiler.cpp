@@ -810,7 +810,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		{
 			for (size_t x = 0; x < compiledMesh.faces_.size(); x++)
 			{
-				const Face& face = compiledMesh.faces_[x];
+				const RawModel::Face& face = compiledMesh.faces_[x];
 
 				stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[2]));
 				stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[1]));
@@ -1415,11 +1415,11 @@ void ModelCompiler::MergeVertsJob(Mesh* pMesh, uint32_t count)
 	
 			for (i = 0; i < mesh.faces_.size(); i++)
 			{
-				Face& face = mesh.faces_[i];
+				RawModel::Face& face = mesh.faces_[i];
 
 				for (x = 0; x < 3; x++) // for each face.
 				{
-					const Index& idx = face[x];
+					const RawModel::Index& idx = face[x];
 					if (idx > numVerts) {
 						X_ERROR("Model", "Face index is invalid: %i verts: %" PRIuS, numVerts);
 						return;
@@ -1567,7 +1567,7 @@ void ModelCompiler::CreateDataJob(CreateDataJobData* pData, size_t count)
 		{
 			const RawModel::Tri& tri = rawMesh.tris_[j];
 
-			const Index faceStartIdx = safe_static_cast<Index, size_t>(mesh.verts_.size());
+			const RawModel::Index faceStartIdx = safe_static_cast<RawModel::Index, size_t>(mesh.verts_.size());
 
 			for (size_t t = 0; t < 3; t++)
 			{
@@ -1587,7 +1587,7 @@ void ModelCompiler::CreateDataJob(CreateDataJobData* pData, size_t count)
 			}
 
 			// make face.
-			mesh.faces_.append(Face(
+			mesh.faces_.append(RawModel::Face(
 				faceStartIdx,
 				faceStartIdx + 1,
 				faceStartIdx + 2

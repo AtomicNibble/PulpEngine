@@ -112,7 +112,7 @@ public:
 	public:
 		typedef core::StackString<60> NameString;
 		typedef core::Array<Vert> VertsArr;
-		typedef core::Array<Face> FaceArr;
+		typedef core::Array<RawModel::Face> FaceArr;
 
 	public:
 		Mesh(core::MemoryArenaBase* arena);
