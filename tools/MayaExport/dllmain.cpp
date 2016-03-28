@@ -25,6 +25,7 @@
 #include <Memory\BoundsCheckingPolicies\SimpleBoundsChecking.h>
 #include <Memory\MemoryTaggingPolicies\SimpleMemoryTagging.h>
 #include <Memory\MemoryTrackingPolicies\SimpleMemoryTracking.h>
+#include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
 #include "Logging\Logger.h"
 #include "Logging\FilterPolicies\LoggerNoFilterPolicy.h"
@@ -34,10 +35,10 @@
 #include <Time\StopWatch.h>
 
 #if 1
-typedef core::MemoryArena<core::MallocFreeAllocator, core::SingleThreadPolicy,
+typedef core::MemoryArena<core::MallocFreeAllocator, core::MultiThreadPolicy<core::Spinlock>,
 	core::NoBoundsChecking, core::NoMemoryTracking, core::NoMemoryTagging> Arena;
 #else
-typedef core::MemoryArena<core::MallocFreeAllocator, core::SingleThreadPolicy,
+typedef core::MemoryArena<core::MallocFreeAllocator, core::MultiThreadPolicy<core::Spinlock>,
 	core::SimpleBoundsChecking, core::SimpleMemoryTracking, core::SimpleMemoryTagging> Arena;
 #endif
 
