@@ -205,8 +205,8 @@ private:
 	void ScaleVertsJob(Vert* pVerts, uint32_t count);
 	void CreateBindDataJob(Mesh* pMesh, uint32_t count);
 	void DropWeightsJob(RawModel::Vert* pVerts, uint32_t count);
+	void SortVertsJob(Mesh* pMesh, uint32_t count);
 	static void CreateDataJob(CreateDataJobData* pData, size_t count);
-	static void SortVertsJob(Mesh* pMesh, size_t count);
 
 	static size_t getBatchSize(size_t elementSizeBytes);
 

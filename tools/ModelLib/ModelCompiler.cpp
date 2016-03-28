@@ -11,6 +11,7 @@
 X_DISABLE_WARNING(4702)
 #include <algorithm>
 #include <map>
+#include <numeric>
 X_ENABLE_WARNING(4702)
 
 X_NAMESPACE_BEGIN(model)
@@ -1098,16 +1099,18 @@ bool ModelCompiler::SortVerts(void)
 {
 	core::V2::Job* pJobs[model::MODEL_MAX_LODS] = { nullptr };
 	
+	core::Delegate<void(Mesh*, uint32_t)> del;
+	del.Bind<ModelCompiler, &ModelCompiler::CreateBindDataJob>(this);
+
 	// create a job to sort each meshes verts.
 	size_t i;
 	for (i = 0; i < compiledLods_.size(); i++)
 	{
 		Mesh* pMesh = compiledLods_[i].meshes_.ptr();
-		size_t numMesh = compiledLods_[i].meshes_.size();
+		uint32_t numMesh = safe_static_cast<uint32_t, size_t>(compiledLods_[i].numMeshes());
 
 		// create a job for each mesh.
-		pJobs[i] = pJobSys_->parallel_for(pMesh, numMesh,
-			&SortVertsJob,core::V2::CountSplitter(1));
+		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh,core::V2::CountSplitter32(1));
 
 		pJobSys_->Run(pJobs[i]);
 	}
@@ -1556,7 +1559,7 @@ void ModelCompiler::DropWeightsJob(RawModel::Vert* pVerts, uint32_t count)
 	for (i = 0; i < num; i++)
 	{
 		RawModel::Vert& vert = pVerts[i];
-		RawModel::Vert::BindsArr& binds = vert.binds_;
+		const RawModel::Vert::BindsArr& binds = vert.binds_;
 
 		RawModel::Vert::BindsArr finalBinds;
 
@@ -1642,19 +1645,50 @@ void ModelCompiler::CreateDataJob(CreateDataJobData* pData, size_t count)
 }
 
 
-void ModelCompiler::SortVertsJob(Mesh* pMesh, size_t count)
+void ModelCompiler::SortVertsJob(Mesh* pMesh, uint32_t count)
 {
 	size_t i;
+	size_t num = count;
+
+	typedef core::Array<RawModel::Index> IndexArray;
+
+	// requires thread safe allocator.
+	IndexArray indexs(arena_);
 
 	for (i = 0; i < count; i++)
 	{
 		auto& mesh = pMesh[i];
 		auto& verts = mesh.verts_;
+		auto& faces = mesh.faces_;
 
-		std::sort(verts.begin(), verts.end(), [](const Vert& a, const Vert& b) {
-				return a.binds_.size() < b.binds_.size();
-			}
+		indexs.clear();
+		indexs.resize(verts.size());
+		std::iota(indexs.begin(), indexs.end(), 0);
+
+		// sort the index's based on bounds of verts.
+		std::sort(indexs.begin(), indexs.end(), [&](const IndexArray::Type& idx1, const  IndexArray::Type& idx2) {
+			const auto& vert1 = verts[idx1];
+			const auto& vert2 = verts[idx2];
+			return vert1.binds_.size() < vert2.binds_.size();
+		}
 		);
+
+		// now sort the verts.
+		std::sort(verts.begin(), verts.end(), [](const Vert& a, const Vert& b) {
+			return a.binds_.size() < b.binds_.size();
+		}
+		);
+
+		// update all the face index's
+		for (auto& f : faces)
+		{
+			for (size_t x = 0; x < 3; x++)// un-roll for me baby.
+			{
+				const IndexArray::Type origIdx = f[x];
+				const IndexArray::Type newIdx = indexs[origIdx];;
+				f[0] = newIdx;
+			}
+		}
 	}
 }
 
