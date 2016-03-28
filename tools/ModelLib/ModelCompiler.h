@@ -152,6 +152,17 @@ public:
 
 	typedef core::FixedArray<Lod, model::MODEL_MAX_LODS> CompiledLodArr;
 
+	struct CreateDataJobData
+	{
+		CreateDataJobData() {
+			core::zero_this(this);
+		}
+
+		Mesh* pMesh;
+		RawModel::Mesh* pRawMesh;
+	};
+
+
 public:
 	ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena);
 	~ModelCompiler() = default;
@@ -188,13 +199,6 @@ private:
 
 private:
 	bool ScaleBones(void);
-
-	struct CreateDataJobData
-	{
-		Mesh* pMesh;
-		RawModel::Mesh* pRawMesh;
-	};
-	
 
 	void MergeVertsJob(Mesh* pMesh, uint32_t count);
 	void UpdateBoundsJob(Mesh* pMesh, uint32_t count);
