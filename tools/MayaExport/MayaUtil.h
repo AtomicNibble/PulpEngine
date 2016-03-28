@@ -10,6 +10,7 @@ namespace MayaUtil
 {
 	void SetStartOfBlock(bool start);
 	void SetVerbose(bool verbose);
+	bool IsVerbose(void);
 
 	void MayaPrintError(const char *fmt, ...);
 	void MayaPrintWarning(const char *fmt, ...);

@@ -29,6 +29,11 @@ namespace MayaUtil
 		g_Verbose = verbose;
 	}
 
+	bool IsVerbose(void)
+	{
+		return g_Verbose;
+	}
+
 	void MayaPrintError(const char *fmt, ...)
 	{
 		va_list	argptr;
