@@ -1089,7 +1089,7 @@ global proc potato_CreateExportWindow( string $name )
 				checkBoxGrp -l "Merge Mesh" -value1 `getAttr PotatoGNode.mergeMesh` -cc mergeMeshUpdate -p setTabFrame1 mergeMeshCntrl;
 				checkBoxGrp -l "Merge Verts" -value1 `getAttr PotatoGNode.mergeVerts` -cc mergeVertsUpdate -p setTabFrame1 mergeVertsCntrl;
 
-				floatFieldGrp -l "Scale" -nf 1 -v1 `getAttr PotatoGNode.scale` -cc ScaleUpdate -p setTabFrame1 ScaleCntrl;
+				floatFieldGrp -l "Scale" -nf 1 -pre 3  -v1 `getAttr PotatoGNode.scale` -cc ScaleUpdate -p setTabFrame1 ScaleCntrl;
 				floatSliderGrp -l "Uv Merge Threshold" -min 0 -max 0.999 -s 0.00001 -v `getAttr PotatoGNode.uvMergeThreshold` -f true -cc uvMergeThresholdUpdate -p setTabFrame1 uvMergeThreshCntl;
 				floatSliderGrp -l "Vert Merge Threshold" -min 0 -max 0.999 -s 0.00001 -v `getAttr PotatoGNode.vertMergeThreshold` -f true -cc vertMergeThresholdUpdate -p setTabFrame1 vertMergeThreshCntl;
 
