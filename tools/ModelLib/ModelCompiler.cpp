@@ -1197,7 +1197,7 @@ bool ModelCompiler::ScaleModel(void)
 
 	core::Stack<core::V2::Job*> jobs(arena_, 512);
 
-	uint32_t batchSize = safe_static_cast<uint32_t, size_t>(getBatchSize(sizeof(RawModel::Vert)));
+	uint32_t batchSize = safe_static_cast<uint32_t, size_t>(getBatchSize(sizeof(Vert)));
 	X_LOG2("Model", "using batch size of %i", batchSize);
 
 	// create jobs for each mesh.
