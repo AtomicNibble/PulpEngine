@@ -716,6 +716,9 @@ MStatus ModelExporter::loadLODs(void)
 			mesh.tris_.reserve(numPoly);
 			mesh.tris_.setGranularity(numPoly);
 
+			// need to be cleared.
+			UVSets.clear();
+
 			status = fnmesh.getUVSetNames(UVSets);
 			if (!status) {
 				MayaUtil::MayaPrintError("Mesh(%s): failed to get UV set names (%s)",
