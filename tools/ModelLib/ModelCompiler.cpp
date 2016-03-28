@@ -1533,6 +1533,17 @@ void ModelCompiler::ScaleVertsJob(Vert* pVerts, uint32_t count)
 	}
 }
 
+void ModelCompiler::CreateBindDataJob(Mesh* pMesh, uint32_t count)
+{
+	size_t meshIdx;
+
+	for (meshIdx = 0; meshIdx < count; meshIdx++)
+	{
+		auto& mesh = pMesh[meshIdx];
+
+		mesh.binds_.populate(mesh.verts_);
+	}
+}
 
 void ModelCompiler::CreateDataJob(CreateDataJobData* pData, size_t count)
 {
@@ -1586,17 +1597,6 @@ void ModelCompiler::CreateDataJob(CreateDataJobData* pData, size_t count)
 	}
 }
 
-void ModelCompiler::CreateBindDataJob(Mesh* pMesh, uint32_t count)
-{
-	size_t meshIdx;
-
-	for (meshIdx = 0; meshIdx < count; meshIdx++)
-	{
-		auto& mesh = pMesh[meshIdx];
-
-		mesh.binds_.populate(mesh.verts_);
-	}
-}
 
 void ModelCompiler::SortVertsJob(Mesh* pMesh, size_t count)
 {
