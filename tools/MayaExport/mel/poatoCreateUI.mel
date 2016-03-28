@@ -131,6 +131,9 @@ global proc ModelEntryNameChanged(int $index)
 {
 	string $name = `textFieldGrp -q -fi ("modelName" + $index)`;
 	frameLayout -e -l $name ("exportFrame" + $index);
+
+	// node needs updating
+	setAttr -type "string" ("PotatoGNode.ModelName" + $index) $name;
 }
 
 global proc ModelEntryLODIncludeChanged(int $lod_number, int $index)
