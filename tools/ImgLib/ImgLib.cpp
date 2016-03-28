@@ -12,4 +12,4 @@ namespace
 
 } // namespace
 
-ImgLibrena* g_ModelLibArena = nullptr;
+ImgLibrena* g_ImgLibArena = nullptr;
