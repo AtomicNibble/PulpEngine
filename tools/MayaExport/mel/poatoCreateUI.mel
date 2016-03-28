@@ -819,6 +819,15 @@ global proc string animGetName(int $index) {
 	return `textFieldGrp -q -fi ("animName" + $index)`;
 }
 
+global proc AnimEntryNameChanged(int $index)
+{
+	string $name = `textFieldGrp -q -fi ("animName" + $index)`;
+	frameLayout -e -l $name ("exportAnimFrame" + $index);
+
+	// node needs updating
+	setAttr -type "string" ("PotatoGNode.AnimName" + $index) $name;
+}
+
 global proc AnimEntryExport(int $index)
 {
 	string $nodes = `getAttr ("PotatoGNode.AnimNodes" + $index)`;
