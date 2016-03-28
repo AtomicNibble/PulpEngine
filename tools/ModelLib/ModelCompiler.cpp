@@ -35,7 +35,7 @@ namespace
 		return (h1 << 40) | (h2 << 20) | h3;
 	}
 
-	int64 vertHash(const RawModel::Vert& vert)
+	int64 vertHash(const ModelCompiler::Vert& vert)
 	{
 		return Hash(vert.pos_[0], vert.pos_[1], vert.pos_[2]);
 	}
@@ -48,7 +48,7 @@ namespace
 			idx = 0;
 		}
 
-		RawModel::Vert* pVert;
+		ModelCompiler::Vert* pVert;
 		int32_t idx;
 	};
 
@@ -60,6 +60,7 @@ const float ModelCompiler::JOINT_WEIGHT_THRESHOLD = 0.005f;
 const int32_t ModelCompiler::VERTEX_MAX_WEIGHTS = model::MODEL_MAX_VERT_BINDS;
 const ModelCompiler::CompileFlags ModelCompiler::DEFAULT_FLAGS = ModelCompiler::CompileFlag::WHITE_VERT_COL |
 	ModelCompiler::CompileFlag::MERGE_MESH;
+
 
 
 ModelCompiler::Stats::Stats(core::MemoryArenaBase* arena) :
@@ -152,6 +153,228 @@ void ModelCompiler::Stats::clear(void)
 	bounds.clear();
 }
 
+
+// ---------------------------------------------------------------
+
+
+ModelCompiler::Binds::Binds(core::MemoryArenaBase* arena) :
+	simple_(arena),
+	stream_(arena)
+{
+}
+
+
+bool ModelCompiler::Binds::write(core::XFileScoped& file)
+{
+	if (simple_.isNotEmpty())
+	{
+		return file.writeObjs(simple_.ptr(), simple_.size()) == simple_.size();
+	}
+	else if(stream_.size() > 0)
+	{
+		return file.write(stream_.begin(), stream_.size()) == stream_.size();
+	}
+
+	// no binds.
+	return true;
+}
+
+
+void ModelCompiler::Binds::populate(const VertsArr& verts)
+{
+	CompbindInfo::BindCountsArr bindCounts;
+
+	if (verts.isEmpty()) {
+		return;
+	}
+
+	// work out the bind counts
+	for (const auto& vert : verts) {
+
+		const size_t numBinds = vert.binds_.size();
+		if (numBinds > 0) { // fucking branch, maybe I should force binds.
+			bindCounts[numBinds - 1]++;
+		}
+	}
+
+	bindInfo_.set(bindCounts);
+
+	// work out the size of the stream
+	size_t streamSize = bindInfo_.dataSizeTotal();
+
+	stream_.free();
+	stream_.resize(streamSize);
+
+	// simple binds?
+	if (bindCounts[0] == verts.size())
+	{
+		int32_t curBoneIdx = verts[0].binds_[0].boneIdx_; // safe
+		size_t i, lastVertIdx = 0;
+
+		// setup first vert.
+		simpleBind sb;
+		sb.jointIdx = safe_static_cast<uint16_t,int32_t>(curBoneIdx);
+		sb.faceOffset = 0;
+		sb.numFaces = 0;
+		sb.numVerts = 0;
+
+		for (i = 1; i < verts.size(); i++)
+		{
+			const Vert& vert = verts[i];
+			const RawModel::Bind& bind = vert.binds_[0];
+
+			if (bind.boneIdx_ != curBoneIdx)
+			{
+				size_t numVerts = i - lastVertIdx;
+				sb.faceOffset = 0;
+				sb.numFaces = 0;
+				sb.numVerts = safe_static_cast<uint16_t, size_t>(numVerts);
+
+				simple_.append(sb);
+
+				lastVertIdx = i;
+				sb.jointIdx = bind.boneIdx_;
+			}
+		}
+
+		// trailing?
+		if (lastVertIdx != (verts.size() - 1))
+		{
+			size_t numVerts = i - lastVertIdx;
+
+			sb.faceOffset = 0;
+			sb.numFaces = 0;
+			sb.numVerts = safe_static_cast<uint16_t, size_t>(numVerts);
+			simple_.append(sb);
+		}
+	}
+	else
+	{
+		for (const auto& vert : verts)
+		{
+			for (size_t i = 0; i < vert.binds_.size(); i++)
+			{
+				const RawModel::Bind& bind = vert.binds_[i];
+
+				bindBone boneIdx(bind.boneIdx_);
+				bindWeight weight(bind.weight_);
+
+				stream_.write(boneIdx);
+
+				// only write weight if idx > 0
+				if (i > 0) {
+					stream_.write(weight);
+				}
+			}
+		}
+	}
+}
+
+const size_t ModelCompiler::Binds::numSimpleBinds(void) const
+{
+	return simple_.size();
+}
+
+const CompbindInfo::BindCountsArr& ModelCompiler::Binds::getBindCounts(void) const
+{
+	return bindInfo_.getBindCounts();
+}
+
+const size_t ModelCompiler::Binds::dataSizeTotal(void) const
+{
+	return bindInfo_.dataSizeTotal();
+}
+
+
+// ---------------------------------------------------------------
+
+ModelCompiler::Mesh::Mesh(core::MemoryArenaBase* arena) :
+	verts_(arena),
+	faces_(arena),
+	binds_(arena)
+{
+
+}
+
+void ModelCompiler::Mesh::calBoundingbox(void)
+{
+	AABB aabb;
+
+	aabb.clear();
+
+	for (const auto& vert : verts_) {
+		aabb.add(vert.pos_);
+	}
+
+	boundingBox_ = aabb;
+}
+
+// ---------------------------------------------------------------
+
+ModelCompiler::Lod::Lod(core::MemoryArenaBase* arena) :
+	distance_(0.f),
+	meshes_(arena)
+{
+
+}
+
+size_t ModelCompiler::Lod::getSubDataSize(const Flags8<model::StreamType>& streams) const
+{
+	size_t size = 0;
+
+	for (auto& mesh : meshes_)
+	{
+
+		size += sizeof(model::Face) * mesh.faces_.size();
+		size += sizeof(model::Vertex) * mesh.verts_.size();
+
+		// streams.
+		if (streams.IsSet(model::StreamType::COLOR)) {
+			size += sizeof(model::VertexColor) * mesh.verts_.size();
+		}
+		if (streams.IsSet(model::StreamType::NORMALS)) {
+			size += sizeof(model::VertexNormal) * mesh.verts_.size();
+		}
+		if (streams.IsSet(model::StreamType::TANGENT_BI)) {
+			size += sizeof(model::VertexTangentBi) * mesh.verts_.size();
+		}
+
+		// bind data
+		size += safe_static_cast<size_t, size_t>(mesh.binds_.dataSizeTotal());
+	}
+
+	return size;
+}
+
+size_t ModelCompiler::Lod::numMeshes(void) const
+{
+	return meshes_.size();
+}
+
+size_t ModelCompiler::Lod::totalVerts(void) const
+{
+	size_t total = 0;
+
+	for (const auto& mesh : meshes_) {
+		total += mesh.verts_.size();
+	}
+
+	return total;
+}
+
+size_t ModelCompiler::Lod::totalIndexs(void) const
+{
+	size_t total = 0;
+
+	for (const auto& mesh : meshes_) {
+		total += mesh.faces_.size();
+	}
+
+	return total * 3;
+}
+
+// ---------------------------------------------------------------
+
 ModelCompiler::ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
 	RawModel::Model(arena, pJobSys),
 	pJobSys_(pJobSys),
@@ -229,12 +452,12 @@ bool ModelCompiler::CompileModel(core::Path<wchar_t>& outFile)
 		return false;
 	}
 
+	compiledLods_.clear();
 	return true;
 }
 
 bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 {
-#if 0
 	// open da file!
 	core::fileModeFlags mode;
 	mode.Set(core::fileMode::WRITE);
@@ -265,7 +488,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 	header.flags.Set(model::ModelFlags::STREAMS);
 	header.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
 	header.numBlankBones = bones_.isEmpty() ? 1 : 0; // add blank if no bones.
-	header.numLod = safe_static_cast<uint8_t, size_t>(lods_.size());
+	header.numLod = safe_static_cast<uint8_t, size_t>(compiledLods_.size());
 	header.numMesh = safe_static_cast<uint8_t, size_t>(totalMeshes());
 	header.modified = core::dateTimeStampSmall::systemDateTime();
 
@@ -287,25 +510,25 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		meshHeadOffsets += bone.name_.length() + sizeof(XQuatCompressedf) + sizeof(Vec3f) + 2;
 	}
 
-	for (size_t i = 0; i < lods_.size(); i++) {
+	for (size_t i = 0; i < compiledLods_.size(); i++) {
 		model::LODHeader& lod = header.lodInfo[i];
-		lod.lodDistance = lods_[i].distance_;
-		lod.numSubMeshes = safe_static_cast<uint16_t, size_t>(lods_[i].numMeshes());
+		lod.lodDistance = compiledLods_[i].distance_;
+		lod.numSubMeshes = safe_static_cast<uint16_t, size_t>(compiledLods_[i].numMeshes());
 		// we want to know the offset o.o
 		lod.subMeshHeads = meshHeadOffsets;
 
 		// version 5.0 info
-		lod.numVerts = safe_static_cast<uint32_t, size_t>(lods_[i].totalVerts());
-		lod.numIndexes = safe_static_cast<uint32_t, size_t>(lods_[i].totalIndexs());
+		lod.numVerts = safe_static_cast<uint32_t, size_t>(compiledLods_[i].totalVerts());
+		lod.numIndexes = safe_static_cast<uint32_t, size_t>(compiledLods_[i].totalIndexs());
 
 		// Version 8.0 info
 		lod.streamsFlag = streamsFlags;
 
 		// work out bounds for all meshes.
 		lod.boundingBox.clear();
-		for (size_t x = 0; x < lods_[i].meshes_.size(); x++)
+		for (size_t x = 0; x < compiledLods_[i].meshes_.size(); x++)
 		{
-			const RawModel::Mesh& mesh = lods_[i].meshes_[x];
+			const Mesh& mesh = compiledLods_[i].meshes_[x];
 
 			lod.boundingBox.add(mesh.boundingBox_);
 		}
@@ -318,7 +541,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 
 	// create combined bounding box.
 	header.boundingBox.clear();
-	for (size_t i = 0; i < lods_.size(); i++)
+	for (size_t i = 0; i < compiledLods_.size(); i++)
 	{
 		model::LODHeader& lod = header.lodInfo[i];
 		header.boundingBox.add(lod.boundingBox);
@@ -334,10 +557,10 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 
 	// material names( ALL LOD)
 	{
-		for (size_t i = 0; i < lods_.size(); i++)
+		for (size_t i = 0; i < compiledLods_.size(); i++)
 		{
 			// meshes 
-			for (auto& mesh : lods_[i].meshes_)
+			for (auto& mesh : compiledLods_[i].meshes_)
 			{
 				RawModel::Material& mat = mesh.material_;
 
@@ -417,7 +640,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 	}
 
 	// write mesh headers for each lod.
-	for (size_t i = 0; i < lods_.size(); i++)
+	for (size_t i = 0; i < compiledLods_.size(); i++)
 	{
 		uint32_t vertOffset, indexOffset;
 
@@ -426,19 +649,21 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 
 		stats_.totalLods++;
 
-		for (auto& rawMesh : lods_[i].meshes_)
+		for (auto& compiledMesh : compiledLods_[i].meshes_)
 		{
 			model::SubMeshHeader meshHdr;
 			core::zero_object(meshHdr);
 
+			// bind info.
+			meshHdr.numBinds = safe_static_cast<uint16_t, size_t>(compiledMesh.binds_.numSimpleBinds());
+			meshHdr.CompBinds.set(compiledMesh.binds_.getBindCounts());
 
-			meshHdr.numBinds = 0;
-			meshHdr.numVerts = safe_static_cast<uint16_t, size_t>(rawMesh.verts_.size());
-			meshHdr.numIndexes = safe_static_cast<uint16_t, size_t>(rawMesh.face_.size() * 3);
+			meshHdr.numVerts = safe_static_cast<uint16_t, size_t>(compiledMesh.verts_.size());
+			meshHdr.numIndexes = safe_static_cast<uint16_t, size_t>(compiledMesh.faces_.size() * 3);
 			//		mesh.material = pMesh->material;
 	//		mesh.CompBinds = pMesh->CompBinds;
-			meshHdr.boundingBox = rawMesh.boundingBox_;
-			meshHdr.boundingSphere = Sphere(rawMesh.boundingBox_);
+			meshHdr.boundingBox = compiledMesh.boundingBox_;
+			meshHdr.boundingSphere = Sphere(compiledMesh.boundingBox_);
 
 			// Version 5.0 info
 			meshHdr.startVertex = vertOffset;
@@ -471,27 +696,27 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 	// we convert them now to the real format.
 	// as processing the data in the commpressed state is slower.
 
-	for (size_t i = 0; i < lods_.size(); i++)
+	for (size_t i = 0; i < compiledLods_.size(); i++)
 	{
 		size_t requiredStreamSize = 0;
 
-		for (auto& rawMesh : lods_[i].meshes_)
+		for (auto& compiledMesh : compiledLods_[i].meshes_)
 		{
 			//	requiredStreamSize += mesh->CompBinds.dataSizeTotal();
-			requiredStreamSize += (rawMesh.face_.size() * sizeof(model::Face));
-			requiredStreamSize += (rawMesh.verts_.size() * sizeof(model::Vertex));
+			requiredStreamSize += (compiledMesh.faces_.size() * sizeof(model::Face));
+			requiredStreamSize += (compiledMesh.verts_.size() * sizeof(model::Vertex));
 
 			if (streamsFlags.IsSet(model::StreamType::COLOR))
 			{
-				requiredStreamSize += (rawMesh.verts_.size() * sizeof(model::VertexColor));
+				requiredStreamSize += (compiledMesh.verts_.size() * sizeof(model::VertexColor));
 			}
 			if (streamsFlags.IsSet(model::StreamType::NORMALS))
 			{
-				requiredStreamSize += (rawMesh.verts_.size() * sizeof(model::VertexNormal));
+				requiredStreamSize += (compiledMesh.verts_.size() * sizeof(model::VertexNormal));
 			}
 			if (streamsFlags.IsSet(model::StreamType::TANGENT_BI))
 			{
-				requiredStreamSize += (rawMesh.verts_.size() * sizeof(model::VertexTangentBi));
+				requiredStreamSize += (compiledMesh.verts_.size() * sizeof(model::VertexTangentBi));
 			}
 		}
 
@@ -500,18 +725,18 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		stream.reset();
 
 		// write all the verts.
-		for (auto& rawMesh : lods_[i].meshes_)
+		for (auto& compiledMesh : compiledLods_[i].meshes_)
 		{
 			model::Vertex vert;
 			core::zero_object(vert);
 
-			for (size_t x = 0; x < rawMesh.verts_.size(); x++)
+			for (size_t x = 0; x < compiledMesh.verts_.size(); x++)
 			{
-				const RawModel::Vert& rawVert = rawMesh.verts_[x];
+				const Vert& compiledVert = compiledMesh.verts_[x];
 
-				vert.pos = rawVert.pos_;
-				vert.st[0] = XHalfCompressor::compress(rawVert.uv_[0]);
-				vert.st[1] = XHalfCompressor::compress(rawVert.uv_[1]);
+				vert.pos = compiledVert.pos_;
+				vert.st[0] = XHalfCompressor::compress(compiledVert.uv_[0]);
+				vert.st[1] = XHalfCompressor::compress(compiledVert.uv_[1]);
 
 				stream.write(vert);
 			}
@@ -520,25 +745,25 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		// write all the colors.
 		if (streamsFlags.IsSet(model::StreamType::COLOR))
 		{
-			for (auto& rawMesh : lods_[i].meshes_)
+			for (auto& compiledMesh : compiledLods_[i].meshes_)
 			{
 				model::VertexColor col;
 				col.set(0xFF, 0xFF, 0xFF, 0xFF);
 
 				if (flags_.IsSet(CompileFlag::WHITE_VERT_COL))
 				{
-					for (size_t x = 0; x < rawMesh.verts_.size(); x++)
+					for (size_t x = 0; x < compiledMesh.verts_.size(); x++)
 					{
 						stream.write(col);
 					}
 				}
 				else
 				{
-					for (size_t x = 0; x < rawMesh.verts_.size(); x++)
+					for (size_t x = 0; x < compiledMesh.verts_.size(); x++)
 					{
-						const RawModel::Vert& rawVert = rawMesh.verts_[x];
+						const Vert& compiledVert = compiledMesh.verts_[x];
 
-						col = rawVert.col_;
+						col = compiledVert.col_;
 						stream.write(col);
 					}
 				}
@@ -548,13 +773,13 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		// write normals
 		if (streamsFlags.IsSet(model::StreamType::NORMALS))
 		{
-			for (auto& rawMesh : lods_[i].meshes_)
+			for (auto& compiledMesh : compiledLods_[i].meshes_)
 			{
 				model::VertexNormal normal;
 
-				for (size_t x = 0; x < rawMesh.verts_.size(); x++)
+				for (size_t x = 0; x < compiledMesh.verts_.size(); x++)
 				{
-					const RawModel::Vert& rawVert = rawMesh.verts_[x];
+					const Vert& rawVert = compiledMesh.verts_[x];
 
 					normal = rawVert.normal_;
 					stream.write(normal);
@@ -565,13 +790,13 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		// write tangents and bi-normals
 		if (streamsFlags.IsSet(model::StreamType::TANGENT_BI))
 		{
-			for (auto& rawMesh : lods_[i].meshes_)
+			for (auto& compiledMesh : compiledLods_[i].meshes_)
 			{
 				model::VertexTangentBi tangent;
 
-				for (size_t x = 0; x < rawMesh.verts_.size(); x++)
+				for (size_t x = 0; x < compiledMesh.verts_.size(); x++)
 				{
-					const RawModel::Vert& rawVert = rawMesh.verts_[x];
+					const Vert& rawVert = compiledMesh.verts_[x];
 
 					tangent.binormal = rawVert.biNormal_;
 					tangent.tangent = rawVert.tangent_;
@@ -581,11 +806,11 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 		}
 
 		// write all the faces
-		for (auto& rawMesh : lods_[i].meshes_)
+		for (auto& compiledMesh : compiledLods_[i].meshes_)
 		{
-			for (size_t x = 0; x < rawMesh.face_.size(); x++)
+			for (size_t x = 0; x < compiledMesh.faces_.size(); x++)
 			{
-				const RawModel::Face& face = rawMesh.face_[x];
+				const Face& face = compiledMesh.faces_[x];
 
 				stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[2]));
 				stream.write<model::Index>(safe_static_cast<model::Index, int32_t>(face[1]));
@@ -593,20 +818,22 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 			}
 		}
 
-		// write all the bind info.
-		for (auto& rawMesh : lods_[i].meshes_)
-		{
-
-		}
-
 		// Write the complete LOD's data all at once.
 		if (file.write(stream.begin(), stream.size()) != stream.size()) {
 			X_ERROR("Model", "Failed to write lod data");
 			return false;
 		}
-	}
 
-#endif
+		// write all the bind info.
+		for (auto& compiledMesh : compiledLods_[i].meshes_)
+		{
+			if (!compiledMesh.binds_.write(file)) {
+				X_ERROR("Model", "Failed to write bind data");
+				return false;
+			}
+		}
+
+	}
 
 	return true;
 }
@@ -641,7 +868,7 @@ size_t ModelCompiler::calculateSubDataSize(const Flags8<model::StreamType>& stre
 
 	size += sizeof(model::SubMeshHeader) * totalMeshes();
 
-	for (auto& lod : lods_) {
+	for (auto& lod : compiledLods_) {
 		size += lod.getSubDataSize(streams);
 	}
 
@@ -668,6 +895,26 @@ size_t ModelCompiler::calculateBoneDataSize(void) const
 
 bool ModelCompiler::ProcessModel(void)
 {
+	// ok so things are a little strange now, since rawmodel format is differnt style to 
+	// compiled model, meaning we have to create diffrent representation of the data.
+
+	// we need to create the compiled verts from the tris at somepoint
+	// when is best time todo that.
+	// 
+
+
+	// steps:
+	// 1. drop weights from the raw model verts 
+	// 2. merge raw mesh that share materials
+	// 3. create the verts in compiledLods_ from tris.
+	// 4. merge verts
+	// 5. sort the verts by bind counts.
+	// 6. create bind data
+	// 7. scale the model.
+	// 8. calculate bounds.
+	// 9. check limits
+	// 10. done
+
 	if (!DropWeights()) {
 		X_ERROR("Model", "Failed to drop weights");
 		return false;
@@ -678,13 +925,23 @@ bool ModelCompiler::ProcessModel(void)
 		return false;
 	}
 
+	if (!CreateData()) {
+		X_ERROR("Model", "Failed to create mesh data");
+		return true;
+	}
+
+	if (!MergVerts()) {
+		X_ERROR("Model", "Failed to mergeverts");
+		return false;
+	}
+
 	if (!SortVerts()) {
 		X_ERROR("Model", "Failed to sort verts");
 		return false;
 	}
 
-	if (!MergVerts()) {
-		X_ERROR("Model", "Failed to mergeverts");
+	if (!CreateBindData()) {
+		X_ERROR("Model", "Failed to create bind data");
 		return false;
 	}
 
@@ -787,6 +1044,55 @@ bool ModelCompiler::MergMesh(void)
 	return true;
 }
 
+bool ModelCompiler::CreateData(void)
+{
+	core::V2::Job* pJobs[model::MODEL_MAX_LODS] = { nullptr };
+
+	// we need to make verts for each tri.
+	compiledLods_.resize(lods_.size(), Lod(arena_));
+	
+	size_t i;
+	for (i = 0; i < lods_.size(); i++)
+	{
+		const RawModel::Lod& rawLod = lods_[i];
+		Lod& lod = compiledLods_[i];
+
+		lod.meshes_.resize(rawLod.numMeshes(), Mesh(arena_));
+		lod.distance_ = rawLod.distance_;
+	}
+
+	// we need job info for every mesh.
+	core::FixedArray<CreateDataJobData, MODEL_MAX_MESH> jobData[MODEL_MAX_LODS];
+
+	for (i = 0; i < compiledLods_.size(); i++)
+	{
+		RawModel::Mesh* pRawMesh = lods_[i].meshes_.ptr();
+		Mesh* pMesh = compiledLods_[i].meshes_.ptr();
+		size_t numMesh = compiledLods_[i].meshes_.size();
+
+		for (size_t x = 0; x < numMesh; x++) {
+
+			CreateDataJobData data;
+			data.pMesh = &pMesh[x];
+			data.pRawMesh = &pRawMesh[x];
+
+			jobData[i].append(data);
+		}
+
+		// create a job for each mesh.
+		pJobs[i] = pJobSys_->parallel_for(jobData[i].ptr(), numMesh,
+			&CreateDataJob, core::V2::CountSplitter(1));
+
+		pJobSys_->Run(pJobs[i]);
+	}
+
+	for (i = 0; i < compiledLods_.size(); i++) {
+		pJobSys_->Wait(pJobs[i]);
+	}
+
+	return true;
+}
+
 
 bool ModelCompiler::SortVerts(void)
 {
@@ -794,10 +1100,10 @@ bool ModelCompiler::SortVerts(void)
 	
 	// create a job to sort each meshes verts.
 	size_t i;
-	for (i = 0; i < lods_.size(); i++)
+	for (i = 0; i < compiledLods_.size(); i++)
 	{
-		RawModel::Mesh* pMesh = lods_[i].meshes_.ptr();
-		size_t numMesh = lods_[i].meshes_.size();
+		Mesh* pMesh = compiledLods_[i].meshes_.ptr();
+		size_t numMesh = compiledLods_[i].meshes_.size();
 
 		// create a job for each mesh.
 		pJobs[i] = pJobSys_->parallel_for(pMesh, numMesh,
@@ -806,13 +1112,39 @@ bool ModelCompiler::SortVerts(void)
 		pJobSys_->Run(pJobs[i]);
 	}
 
-	for (i = 0; i < lods_.size(); i++)
-	{
+	for (i = 0; i < compiledLods_.size(); i++) {
 		pJobSys_->Wait(pJobs[i]);
 	}
 
 	return true;
 }
+
+bool ModelCompiler::CreateBindData(void)
+{
+	core::V2::Job* pJobs[model::MODEL_MAX_LODS] = { nullptr };
+
+	size_t i;
+
+	for (i = 0; i < compiledLods_.size(); i++)
+	{
+		Mesh* pMesh = compiledLods_[i].meshes_.ptr();
+		uint32_t numMesh = safe_static_cast<uint32_t, size_t>(compiledLods_[i].numMeshes());
+
+		core::Delegate<void(Mesh*, uint32_t)> del;
+		del.Bind<ModelCompiler, &ModelCompiler::CreateBindDataJob>(this);
+
+		// create a job for each mesh.
+		pJobs[i] = pJobSys_->parallel_for_member<ModelCompiler>(del, pMesh, numMesh, core::V2::CountSplitter32(1));
+		pJobSys_->Run(pJobs[i]);
+	}
+
+	for (i = 0; i < compiledLods_.size(); i++) {
+		pJobSys_->Wait(pJobs[i]);
+	}
+
+	return true;
+}
+
 
 bool ModelCompiler::MergVerts(void)
 {
@@ -825,16 +1157,16 @@ bool ModelCompiler::MergVerts(void)
 	size_t i;
 	size_t totalVerts = 0;
 
-	for (i = 0; i < lods_.size(); i++) {
-		totalVerts += lods_[i].totalVerts();
+	for (i = 0; i < compiledLods_.size(); i++) {
+		totalVerts += compiledLods_[i].totalVerts();
 	}
 
-	for (i = 0; i < lods_.size(); i++)
+	for (i = 0; i < compiledLods_.size(); i++)
 	{
-		RawModel::Mesh* pMesh = lods_[i].meshes_.ptr();
-		uint32_t numMesh = safe_static_cast<uint32_t,size_t>(lods_[i].meshes_.size());
+		Mesh* pMesh = compiledLods_[i].meshes_.ptr();
+		uint32_t numMesh = safe_static_cast<uint32_t,size_t>(compiledLods_[i].numMeshes());
 
-		core::Delegate<void(RawModel::Mesh*, uint32_t)> del;
+		core::Delegate<void(Mesh*, uint32_t)> del;
 		del.Bind<ModelCompiler, &ModelCompiler::MergeVertsJob>(this);
 
 		// create a job for each mesh.
@@ -842,15 +1174,13 @@ bool ModelCompiler::MergVerts(void)
 		pJobSys_->Run(pJobs[i]);
 	}
 
-	for (i = 0; i < lods_.size(); i++)
-	{
+	for (i = 0; i < compiledLods_.size(); i++) {
 		pJobSys_->Wait(pJobs[i]);
 	}
 
-
 	size_t totalVertsPostMerge = 0;
-	for (i = 0; i < lods_.size(); i++) {
-		totalVertsPostMerge += lods_[i].totalVerts();
+	for (i = 0; i < compiledLods_.size(); i++) {
+		totalVertsPostMerge += compiledLods_[i].totalVerts();
 	}
 
 	stats_.totalVertsMerged = safe_static_cast<uint32_t,size_t>(totalVerts - totalVertsPostMerge);
@@ -871,14 +1201,14 @@ bool ModelCompiler::ScaleModel(void)
 	X_LOG2("Model", "using batch size of %i", batchSize);
 
 	// create jobs for each mesh.
-	for (auto& lod : lods_)
+	for (auto& lod : compiledLods_)
 	{
 		for (auto& mesh : lod.meshes_)
 		{
-			RawModel::Vert* pVerts = mesh.verts_.ptr();
+			Vert* pVerts = mesh.verts_.ptr();
 			uint32_t numVerts = safe_static_cast<uint32_t, size_t>(mesh.verts_.size());
 
-			core::Delegate<void(RawModel::Vert*, uint32_t)> del;
+			core::Delegate<void(Vert*, uint32_t)> del;
 			del.Bind<ModelCompiler, &ModelCompiler::ScaleVertsJob>(this);
 
 			core::V2::Job* pJob = pJobSys_->parallel_for_member<ModelCompiler>(del,
@@ -905,7 +1235,6 @@ bool ModelCompiler::ScaleModel(void)
 		jobs.pop();
 	}
 
-
 	return ScaleBones();
 }
 
@@ -914,12 +1243,12 @@ bool ModelCompiler::UpdateMeshBounds(void)
 	core::V2::Job* pJobs[model::MODEL_MAX_LODS] = { nullptr };
 
 	size_t i;
-	for (i = 0; i < lods_.size(); i++)
+	for (i = 0; i < compiledLods_.size(); i++)
 	{
-		RawModel::Mesh* pMesh = lods_[i].meshes_.ptr();
-		uint32_t numMesh = safe_static_cast<uint32_t, size_t>(lods_[i].meshes_.size());
+		Mesh* pMesh = compiledLods_[i].meshes_.ptr();
+		uint32_t numMesh = safe_static_cast<uint32_t, size_t>(compiledLods_[i].numMeshes());
 
-		core::Delegate<void(RawModel::Mesh*, uint32_t)> del;
+		core::Delegate<void(Mesh*, uint32_t)> del;
 		del.Bind<ModelCompiler, &ModelCompiler::UpdateBoundsJob>(this);
 
 		// create a job for each mesh.
@@ -927,11 +1256,9 @@ bool ModelCompiler::UpdateMeshBounds(void)
 		pJobSys_->Run(pJobs[i]);
 	}
 
-	for (i = 0; i < lods_.size(); i++)
-	{
+	for (i = 0; i < lods_.size(); i++) {
 		pJobSys_->Wait(pJobs[i]);
 	}
-
 
 	return true;
 }
@@ -968,9 +1295,9 @@ bool ModelCompiler::CheckLimits(void)
 #endif // !X_MODEL_BONES_LOWER_CASE_NAMES
 	}
 
-	for (size_t i = 0; i < lods_.size(); i++)
+	for (size_t i = 0; i < compiledLods_.size(); i++)
 	{
-		const auto& lod = lods_[i];
+		const auto& lod = compiledLods_[i];
 
 		// check vert / face limits.
 		size_t numVerts = lod.totalVerts();
@@ -998,6 +1325,11 @@ bool ModelCompiler::CheckLimits(void)
 		for (const auto& mesh : lod.meshes_)
 		{
 			const auto& mat = mesh.material_;
+
+			if (mat.name_.isEmpty()) {
+				X_ERROR("Model", "Source code defect material name is empty");
+				return false;
+			}
 
 			if (mat.name_.length() > engine::MTL_MATERIAL_MAX_LEN) {
 				X_ERROR("Model", "Material name length '%s(%" PRIuS ")' exceeds limit of: %i mesh: \"%s:%s\"",
@@ -1027,9 +1359,9 @@ bool ModelCompiler::CheckLimits(void)
 
 
 	// basically impossible, but check it anyway.
-	if (lods_.size() > model::MODEL_MAX_LODS) {
+	if (compiledLods_.size() > model::MODEL_MAX_LODS) {
 		X_ERROR("Model", "Bone count '%" PRIuS "' exceeds limit of: %i",
-			lods_.size(), model::MODEL_MAX_LODS);
+			compiledLods_.size(), model::MODEL_MAX_LODS);
 
 		// notify me we did something impossible.
 		X_ASSERT_UNREACHABLE();
@@ -1052,7 +1384,7 @@ bool ModelCompiler::ScaleBones(void)
 }
 
 
-void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
+void ModelCompiler::MergeVertsJob(Mesh* pMesh, uint32_t count)
 {
 	size_t meshIdx;
 
@@ -1064,13 +1396,12 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 
 	for (meshIdx = 0; meshIdx < count; meshIdx++)
 	{
-		RawModel::Mesh& mesh = pMesh[meshIdx];
+		auto& mesh = pMesh[meshIdx];
 
 		{
 			hash.clear();
-#if 0
 
-			RawModel::Mesh::VertsArr v(arena_);
+			Mesh::VertsArr v(arena_);
 
 			v.swap(mesh.verts_);
 			// prevent resize in 
@@ -1082,20 +1413,19 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 
 			RawModel::Index numVerts = safe_static_cast<RawModel::Index,size_t>(v.size());
 	
-			for (i = 0; i < mesh.face_.size(); i++)
+			for (i = 0; i < mesh.faces_.size(); i++)
 			{
-				RawModel::Face& face = mesh.face_[i];
+				Face& face = mesh.faces_[i];
 
 				for (x = 0; x < 3; x++) // for each face.
 				{
-					const RawModel::Index& idx = face[x];
+					const Index& idx = face[x];
 					if (idx > numVerts) {
 						X_ERROR("Model", "Face index is invalid: %i verts: %" PRIuS, numVerts);
 						return;
 					}
 
-					const RawModel::Vert& vert = v[idx];
-
+					const Vert& vert = v[idx];
 					const uint64 vert_hash = vertHash(vert);
 
 
@@ -1108,8 +1438,9 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 
 					for (it = ret.first; it != ret.second; ++it)
 					{
-						const RawModel::Vert* vv = it->second.pVert;
+						const Vert* vv = it->second.pVert;
 
+						// quick to check size and early out.
 						if (vert.binds_.size() != vv->binds_.size()) {
 							continue;
 						}
@@ -1117,11 +1448,34 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 						if (!vert.pos_.compare(vv->pos_, vertexElipsion)) {
 							continue; // not same
 						}
+						if (!vert.normal_.compare(vv->normal_, vertexElipsion)) {
+							continue; // not same
+						}
 						if (!vert.uv_.compare(vv->uv_, texcoordElipson)) {
 							continue; // not same
 						}
-						if (!vert.normal_.compare(vv->normal_, vertexElipsion)) {
-							continue; // not same
+
+						// now check if the binds are really the same.
+						{
+							const float32_t threshold = ModelCompiler::JOINT_WEIGHT_THRESHOLD;
+
+							size_t x;
+							for (x = 0; x < vert.binds_.size(); x++)
+							{
+								const RawModel::Bind& b1 = vert.binds_[x];
+								const RawModel::Bind& b2 = vv->binds_[x];
+
+								if (b1.boneIdx_ != b2.boneIdx_) {
+									break;
+								}
+								if (math<float>::abs(b1.weight_ - b2.weight_) > threshold) {
+									break;
+								}
+							}
+
+							if (x != vert.binds_.size()) {
+								continue;
+							}
 						}
 
 						equal = true;
@@ -1141,9 +1495,6 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 						size_t vertIdx = mesh.verts_.append(vert);
 
 						face[x] = safe_static_cast<RawModel::Index, size_t>(vertIdx);
-					//	if (vert.numWeights > 0) {
-					//		CompBinds[vert.numWeights - 1]++;
-					//	}
 
 						Hashcontainer temp;
 						temp.pVert = &mesh.verts_[vertIdx];
@@ -1155,13 +1506,12 @@ void ModelCompiler::MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count)
 
 				}
 			}
-#endif
 		}
 	}
 }
 
 
-void ModelCompiler::UpdateBoundsJob(RawModel::Mesh* pMesh, uint32_t count)
+void ModelCompiler::UpdateBoundsJob(Mesh* pMesh, uint32_t count)
 {
 	size_t i;
 
@@ -1170,29 +1520,94 @@ void ModelCompiler::UpdateBoundsJob(RawModel::Mesh* pMesh, uint32_t count)
 	}
 }
 
-void ModelCompiler::ScaleVertsJob(RawModel::Vert* pVerts, uint32_t count)
+void ModelCompiler::ScaleVertsJob(Vert* pVerts, uint32_t count)
 {
 	size_t i;
 	const float scale = scale_;
 
 	for (i = 0; i < count; i++)
 	{
-		RawModel::Vert& vert = pVerts[i];
+		auto& vert = pVerts[i];
 
 		vert.pos_ *= scale;
 	}
 }
 
-void ModelCompiler::SortVertsJob(RawModel::Mesh* pMesh, size_t count)
+
+void ModelCompiler::CreateDataJob(CreateDataJobData* pData, size_t count)
+{
+	size_t meshIdx;
+
+	for (meshIdx = 0; meshIdx < count; meshIdx++)
+	{
+		Mesh& mesh = *pData[meshIdx].pMesh;
+		const RawModel::Mesh& rawMesh = *pData[meshIdx].pRawMesh;
+
+		mesh.material_ = rawMesh.material_;
+		mesh.name_ = rawMesh.name_;
+		mesh.displayName_ = rawMesh.displayName_;
+
+		// 3 verts for each tris.
+		mesh.verts_.reserve(rawMesh.tris_.size() * 3);
+		// face for each tri
+		mesh.faces_.reserve(rawMesh.tris_.size());
+
+		for (size_t j = 0; j < rawMesh.tris_.size(); j++)
+		{
+			const RawModel::Tri& tri = rawMesh.tris_[j];
+
+			const Index faceStartIdx = safe_static_cast<Index, size_t>(mesh.verts_.size());
+
+			for (size_t t = 0; t < 3; t++)
+			{
+				const RawModel::TriVert& tv = tri[t];
+
+				// look up the vert.
+				const RawModel::Vert& rv = rawMesh.verts_[tv.index_];
+
+				Vert& vert = mesh.verts_.AddOne();
+				vert.pos_ = rv.pos_;
+				vert.normal_ = tv.normal_;
+				vert.biNormal_ = tv.biNormal_;
+				vert.tangent_ = tv.tangent_;
+				vert.col_ = tv.col_;
+				vert.uv_ = tv.uv_;
+				vert.binds_ = rv.binds_;
+			}
+
+			// make face.
+			mesh.faces_.append(Face(
+				faceStartIdx,
+				faceStartIdx + 1,
+				faceStartIdx + 2
+			));
+		}
+		
+	}
+}
+
+void ModelCompiler::CreateBindDataJob(Mesh* pMesh, uint32_t count)
+{
+	size_t meshIdx;
+
+	for (meshIdx = 0; meshIdx < count; meshIdx++)
+	{
+		auto& mesh = pMesh[meshIdx];
+
+		mesh.binds_.populate(mesh.verts_);
+	}
+}
+
+void ModelCompiler::SortVertsJob(Mesh* pMesh, size_t count)
 {
 	size_t i;
 
 	for (i = 0; i < count; i++)
 	{
-		RawModel::Mesh& mesh = pMesh[i];
+		auto& mesh = pMesh[i];
 		auto& verts = mesh.verts_;
 
-		std::sort(verts.begin(), verts.end(), [](const RawModel::Vert& a, const RawModel::Vert& b) {
+		std::sort(verts.begin(), verts.end(), [](const Vert& a, const Vert& b) {
 				return a.binds_.size() < b.binds_.size();
 			}
 		);

@@ -546,8 +546,8 @@ namespace RawModel
 			{
 				const model::RawModel::Lod& lod = lods_[i];
 
-				buf.appendFmt("// LOD%" PRIuS " dis: %f numMesh: %" PRIuS " verts: %" PRIuS " faces: %" PRIuS " \n",
-					i, lod.distance_, lod.meshes_.size(), lod.totalVerts(), lod.totalIndexs() / 3);
+				buf.appendFmt("// LOD%" PRIuS " dis: %f numMesh: %" PRIuS " verts: %" PRIuS " tris: %" PRIuS " \n",
+					i, lod.distance_, lod.meshes_.size(), lod.totalVerts(), lod.totalTris());
 			}
 
 			buf.append("\n");
@@ -858,7 +858,7 @@ namespace RawModel
 
 		for (const auto& tri : mesh.tris_)
 		{
-			buf.append("TRI\n");
+			buf.append("\nTRI\n");
 
 			for (size_t i = 0; i < 3; i++)
 			{
@@ -872,7 +872,7 @@ namespace RawModel
 				const Vec2f& uv = triVert.uv_;
 
 
-				buf.appendFmt("%i\n(%f %f %f)\n(%f %f %f)\n(%f %f %f)\n(%f %f %f %f)\n(%f %f)\n\n",
+				buf.appendFmt("%i\n(%f %f %f)\n(%f %f %f)\n(%f %f %f)\n(%f %f %f %f)\n(%f %f)\n",
 					index,
 					normal.x, normal.y, normal.z,
 					tan.x, tan.y, tan.z,

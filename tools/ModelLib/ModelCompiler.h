@@ -21,7 +21,8 @@ public:
 		ZERO_ORIGIN,
 		WHITE_VERT_COL,
 		MERGE_MESH,
-		MERGE_VERTS
+		MERGE_VERTS,
+		EXT_WEIGHTS // allow 8 inf per vert.
 	);
 
 	typedef Flags<CompileFlag> CompileFlags;
@@ -60,6 +61,96 @@ public:
 		AABB bounds;
 	};
 
+	X_DISABLE_WARNING(4324)
+
+	X_ALIGNED_SYMBOL(class Vert, 64)
+	{
+	public:
+		typedef core::FixedArray<RawModel::Bind, 12> BindsArr;
+	public:
+		Vert() = default;
+		~Vert() = default;
+
+		Vec3f pos_;
+		Vec3f normal_;
+		Vec3f tangent_;
+		Vec3f biNormal_;
+		Color col_;
+		Vec2f uv_;
+
+		BindsArr binds_;
+	};
+
+	X_ENABLE_WARNING(4324)
+
+	class Binds
+	{
+	public:
+		typedef core::Array<Vert> VertsArr;
+
+	public:
+		Binds(core::MemoryArenaBase* arena);
+		~Binds() = default;
+
+		bool write(core::XFileScoped& file);
+		void populate(const VertsArr& verts);
+
+		const size_t numSimpleBinds(void) const;
+		const CompbindInfo::BindCountsArr& getBindCounts(void) const;
+		const size_t dataSizeTotal(void) const;
+
+	private:
+		core::Array<simpleBind>	simple_;
+		// for complex binds.
+		core::ByteStream stream_;
+
+		CompbindInfo bindInfo_;
+	};
+
+	class Mesh
+	{
+	public:
+		typedef core::StackString<60> NameString;
+		typedef core::Array<Vert> VertsArr;
+		typedef core::Array<Face> FaceArr;
+
+	public:
+		Mesh(core::MemoryArenaBase* arena);
+		~Mesh() = default;
+
+		void calBoundingbox(void);
+
+	public:
+		NameString name_;
+		NameString displayName_;
+
+		VertsArr verts_;
+		FaceArr faces_;
+		Binds binds_;
+
+		RawModel::Material material_;
+		AABB boundingBox_;
+	};
+
+	class Lod
+	{
+		typedef core::Array<Mesh> MeshArr;
+
+	public:
+		Lod(core::MemoryArenaBase* arena);
+		~Lod() = default;
+
+		size_t getSubDataSize(const Flags8<model::StreamType>& streams) const;
+		size_t numMeshes(void) const;
+		size_t totalVerts(void) const;
+		size_t totalIndexs(void) const;
+
+	public:
+		float32_t distance_;
+		MeshArr meshes_;
+	};
+
+	typedef core::FixedArray<Lod, model::MODEL_MAX_LODS> CompiledLodArr;
 
 public:
 	ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena);
@@ -87,7 +178,9 @@ private:
 	bool ProcessModel(void);
 	bool DropWeights(void);
 	bool MergMesh(void);
+	bool CreateData(void);
 	bool SortVerts(void);
+	bool CreateBindData(void);
 	bool MergVerts(void);
 	bool ScaleModel(void);
 	bool UpdateMeshBounds(void);
@@ -96,10 +189,19 @@ private:
 private:
 	bool ScaleBones(void);
 
-	void MergeVertsJob(RawModel::Mesh* pMesh, uint32_t count);
-	void UpdateBoundsJob(RawModel::Mesh* pMesh, uint32_t count);
-	void ScaleVertsJob(RawModel::Vert* pVerts, uint32_t count);
-	static void SortVertsJob(RawModel::Mesh* pMesh, size_t count);
+	struct CreateDataJobData
+	{
+		Mesh* pMesh;
+		RawModel::Mesh* pRawMesh;
+	};
+	
+
+	void MergeVertsJob(Mesh* pMesh, uint32_t count);
+	void UpdateBoundsJob(Mesh* pMesh, uint32_t count);
+	void ScaleVertsJob(Vert* pVerts, uint32_t count);
+	void CreateBindDataJob(Mesh* pMesh, uint32_t count);
+	static void CreateDataJob(CreateDataJobData* pData, size_t count);
+	static void SortVertsJob(Mesh* pMesh, size_t count);
 	static void DropWeightsJob(RawModel::Vert* pVerts, size_t count);
 
 	static size_t getBatchSize(size_t elementSizeBytes);
@@ -115,7 +217,7 @@ private:
 
 	CompileFlags flags_;
 
-
+	CompiledLodArr compiledLods_;
 
 protected:
 	Stats stats_;

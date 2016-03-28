@@ -47,6 +47,7 @@ namespace RawModel
 		BindsArr binds_;
 	};
 
+	/*
 	X_ALIGNED_SYMBOL(class FullVert, 64)
 	{
 	public:
@@ -64,6 +65,7 @@ namespace RawModel
 
 		BindsArr binds_;
 	};
+	*/
 
 	typedef int32_t Index;
 	typedef Vec3<Index> Face;
@@ -113,7 +115,6 @@ namespace RawModel
 		~Mesh() = default;
 
 		void merge(const Mesh& oth);
-		void calBoundingbox(void);
 
 	public:
 		NameString name_;
@@ -122,7 +123,6 @@ namespace RawModel
 		VertsArr verts_;
 		TriArr tris_;
 		Material material_;
-		AABB boundingBox_;
 	};
 
 	class Lod
@@ -133,10 +133,9 @@ namespace RawModel
 		Lod(core::MemoryArenaBase* arena);
 		~Lod() = default;
 
-		size_t getSubDataSize(const Flags8<model::StreamType>& streams) const;
 		size_t numMeshes(void) const;
 		size_t totalVerts(void) const;
-		size_t totalIndexs(void) const;
+		size_t totalTris(void) const;
 
 	public:
 		float32_t distance_;
