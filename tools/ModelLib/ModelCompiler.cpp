@@ -1591,6 +1591,54 @@ void ModelCompiler::DropWeightsJob(RawModel::Vert* pVerts, uint32_t count)
 	droppedWeights_ += droppedWeights;
 }
 
+
+void ModelCompiler::SortVertsJob(Mesh* pMesh, uint32_t count)
+{
+	size_t i;
+	size_t num = count;
+
+	typedef core::Array<RawModel::Index> IndexArray;
+
+	// requires thread safe allocator.
+	IndexArray indexs(arena_);
+
+	for (i = 0; i < count; i++)
+	{
+		auto& mesh = pMesh[i];
+		auto& verts = mesh.verts_;
+		auto& faces = mesh.faces_;
+
+		indexs.clear();
+		indexs.resize(verts.size());
+		std::iota(indexs.begin(), indexs.end(), 0);
+
+		// sort the index's based on bounds of verts.
+		std::sort(indexs.begin(), indexs.end(), [&](const IndexArray::Type& idx1, const  IndexArray::Type& idx2) {
+			const auto& vert1 = verts[idx1];
+			const auto& vert2 = verts[idx2];
+			return vert1.binds_.size() < vert2.binds_.size();
+		}
+		);
+
+		// now sort the verts.
+		std::sort(verts.begin(), verts.end(), [](const Vert& a, const Vert& b) {
+			return a.binds_.size() < b.binds_.size();
+		}
+		);
+
+		// update all the face index's
+		for (auto& f : faces)
+		{
+			for (size_t x = 0; x < 3; x++)// un-roll for me baby.
+			{
+				const IndexArray::Type origIdx = f[x];
+				const IndexArray::Type newIdx = indexs[origIdx];;
+				f[0] = newIdx;
+			}
+		}
+	}
+}
+
 void ModelCompiler::CreateDataJob(CreateDataJobData* pData, size_t count)
 {
 	size_t meshIdx;
@@ -1640,54 +1688,6 @@ void ModelCompiler::CreateDataJob(CreateDataJobData* pData, size_t count)
 			));
 		}
 		
-	}
-}
-
-
-void ModelCompiler::SortVertsJob(Mesh* pMesh, uint32_t count)
-{
-	size_t i;
-	size_t num = count;
-
-	typedef core::Array<RawModel::Index> IndexArray;
-
-	// requires thread safe allocator.
-	IndexArray indexs(arena_);
-
-	for (i = 0; i < count; i++)
-	{
-		auto& mesh = pMesh[i];
-		auto& verts = mesh.verts_;
-		auto& faces = mesh.faces_;
-
-		indexs.clear();
-		indexs.resize(verts.size());
-		std::iota(indexs.begin(), indexs.end(), 0);
-
-		// sort the index's based on bounds of verts.
-		std::sort(indexs.begin(), indexs.end(), [&](const IndexArray::Type& idx1, const  IndexArray::Type& idx2) {
-			const auto& vert1 = verts[idx1];
-			const auto& vert2 = verts[idx2];
-			return vert1.binds_.size() < vert2.binds_.size();
-		}
-		);
-
-		// now sort the verts.
-		std::sort(verts.begin(), verts.end(), [](const Vert& a, const Vert& b) {
-			return a.binds_.size() < b.binds_.size();
-		}
-		);
-
-		// update all the face index's
-		for (auto& f : faces)
-		{
-			for (size_t x = 0; x < 3; x++)// un-roll for me baby.
-			{
-				const IndexArray::Type origIdx = f[x];
-				const IndexArray::Type newIdx = indexs[origIdx];;
-				f[0] = newIdx;
-			}
-		}
 	}
 }
 
