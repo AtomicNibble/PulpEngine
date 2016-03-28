@@ -801,6 +801,7 @@ MStatus ModelExporter::loadLODs(void)
 			}
 
 			MIntArray polygonVertices;
+			core::FixedArray<uint32_t, 8> localIndex;
 
 			// for each polygon we might have multiple triangles.
 			MItMeshPolygon itPolygon(info.exportObjects[meshIdx], MObject::kNullObj);
@@ -821,7 +822,7 @@ MStatus ModelExporter::loadLODs(void)
 						continue;
 					}
 
-					MIntArray localIndex = GetLocalIndex(polygonVertices, vertexList);
+					GetLocalIndex(polygonVertices, vertexList, localIndex);
 
 					model::RawModel::Tri& tri = mesh.tris_.AddOne();
 
@@ -1147,9 +1148,9 @@ MayaBone* ModelExporter::findJointReal(const char* pName)
 }
 
 
-MIntArray ModelExporter::GetLocalIndex(MIntArray& getVertices, MIntArray& getTriangle)
+void ModelExporter::GetLocalIndex(MIntArray& getVertices, MIntArray& getTriangle, core::FixedArray<uint32_t, 8>& indexOut)
 {
-	MIntArray localIndex;
+	indexOut.clear();
 
 	for (uint32_t gt = 0; gt < getTriangle.length(); gt++)
 	{
@@ -1157,13 +1158,11 @@ MIntArray ModelExporter::GetLocalIndex(MIntArray& getVertices, MIntArray& getTri
 		{
 			if (getTriangle[gt] == getVertices[gv])
 			{
-				localIndex.append(gv);
+				indexOut.append(gv);
 				break;
 			}
 		}
 	}
-
-	return localIndex;
 }
 
 MFnDagNode* ModelExporter::GetParentBone(MFnDagNode* pBone)
