@@ -646,28 +646,6 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 }
 
 
-MIntArray GetLocalIndex(MIntArray & getVertices, MIntArray & getTriangle)
-{
-	MIntArray   localIndex;
-
-//	assert(getTriangle.length() == 3);    // Should always deal with a triangle
-
-	for (unsigned gt = 0; gt < getTriangle.length(); gt++)
-	{
-		for (unsigned gv = 0; gv < getVertices.length(); gv++)
-		{
-			if (getTriangle[gt] == getVertices[gv])
-			{
-				localIndex.append(gv);
-				break;
-			}
-		}
-	}
-
-	return localIndex;
-}
-
-
 MStatus ModelExporter::loadLODs(void)
 {
 	PROFILE_MAYA("load LODS");
@@ -833,6 +811,8 @@ MStatus ModelExporter::loadLODs(void)
 						continue;
 					}
 
+					MIntArray localIndex = GetLocalIndex(polygonVertices, vertexList);
+
 					model::RawModel::Tri& tri = mesh.tris_.AddOne();
 
 					for (uint32_t t = 0; t < 3; t++)
@@ -840,9 +820,9 @@ MStatus ModelExporter::loadLODs(void)
 						int32_t index = vertexList[t];
 						int32_t uvID, colIdx;
 
-						itPolygon.getUVIndex(t, uvID, &uvSet);
+						itPolygon.getUVIndex(localIndex[t], uvID, &uvSet);
 						// fucking maya make your mind up about signed or unsiged index's
-						uint32_t normalIdx = itPolygon.normalIndex(t);
+						uint32_t normalIdx = itPolygon.normalIndex(localIndex[t]);
 
 
 						model::RawModel::TriVert& face = tri[t];
@@ -1158,6 +1138,25 @@ MayaBone* ModelExporter::findJointReal(const char* pName)
 	return nullptr;
 }
 
+
+MIntArray ModelExporter::GetLocalIndex(MIntArray& getVertices, MIntArray& getTriangle)
+{
+	MIntArray localIndex;
+
+	for (uint32_t gt = 0; gt < getTriangle.length(); gt++)
+	{
+		for (uint32_t gv = 0; gv < getVertices.length(); gv++)
+		{
+			if (getTriangle[gt] == getVertices[gv])
+			{
+				localIndex.append(gv);
+				break;
+			}
+		}
+	}
+
+	return localIndex;
+}
 
 MFnDagNode* ModelExporter::GetParentBone(MFnDagNode* pBone)
 {

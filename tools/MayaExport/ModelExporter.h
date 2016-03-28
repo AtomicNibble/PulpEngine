@@ -80,6 +80,7 @@ private:
 	MayaBone* findJointReal(const char* pName);
 
 private:
+	static MIntArray GetLocalIndex(MIntArray& getVertices, MIntArray& getTriangle);
 	static MFnDagNode* GetParentBone(MFnDagNode* pBone);
 	static MStatus getBindPose(const MObject &jointNode, MayaBone* pBone, float scale);
 	static core::StackString<60> getMeshDisplayName(const MString& fullname);
