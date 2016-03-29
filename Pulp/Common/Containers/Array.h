@@ -82,6 +82,9 @@ public:
 	size_type push_back(const T& obj);
 	size_type push_back(T&& obj);
 
+	template<class... _T>
+	size_type emplace_back(_T&&... obj);
+
 	// Removes the last element, it is deconstructed
 	void pop_back(void);
 

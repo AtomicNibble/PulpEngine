@@ -388,6 +388,23 @@ X_INLINE typename Array<T>::size_type Array<T>::push_back(T&& obj)
 	return num_ - 1;
 }
 
+template<typename T>
+template<class... _T>
+X_INLINE typename Array<T>::size_type Array<T>::emplace_back(_T&&... obj)
+{
+	if (!list) {
+		reserve(granularity_);
+	}
+
+	if (num_ == size_) {
+		reserve(size_ + granularity_);
+	}
+
+	Mem::Construct(&list_[num_], std::forward<_T>(obj)...);
+	num_++;
+	return num_ - 1;
+}
+
 // -----------------------------------------------
 
 template<typename T>
