@@ -99,6 +99,18 @@ typename FixedArray<T, N>::size_type FixedArray<T, N>::append(const T& obj)
 	return size_ - 1;
 }
 
+template<typename T, size_t N>
+typename FixedArray<T, N>::size_type FixedArray<T, N>::append(T&& obj)
+{
+	X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
+	T* pArr = begin();
+
+	Mem::Construct(&pArr[size_], std::forward<T>(obj));
+
+	size_++;
+	return size_ - 1;
+}
+
 // appends a item to the end, resizing if required.
 template<typename T, size_t N>
 typename FixedArray<T, N>::size_type FixedArray<T, N>::push_back(const T& obj)

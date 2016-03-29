@@ -36,6 +36,7 @@ public:
 
 	// append element (same as push_back)
 	inline size_type append(const T& obj);
+	inline size_type append(T&& obj);
 	// appends a item to the end, resizing if required.
 	inline size_type push_back(const T& obj);
 	inline size_type push_back(T&& obj);
