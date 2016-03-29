@@ -45,7 +45,19 @@ arena_(arena)
 		Mem::Construct<T>(list_ + i, initialValue);
 }
 
+template<typename T>
+X_INLINE Array<T>::Array(MemoryArenaBase* arena, std::initializer_list<T> iList) :
+	Array(arena)
+{
+	constexpr size_t size = iList.size();
+	const T* pList = iList.begin();
 
+	list_ = Allocate(size);
+
+	for (size_type i = 0; i < size; ++i) {
+		Mem::Construct<T>(list_ + i, std::forward<T>(pList[i]));
+	}
+}
 
 template<typename T>
 X_INLINE Array<T>::Array(const Array<T>& oth) :

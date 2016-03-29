@@ -29,6 +29,7 @@ public:
 	Array(MemoryArenaBase* arena);
 	Array(MemoryArenaBase* arena, size_type size);
 	Array(MemoryArenaBase* arena, size_type size, const T& initialValue);
+	Array(MemoryArenaBase* arena, std::initializer_list<T> iList);
 	Array(const Array& oth);
 	Array(Array&& oth);
 	virtual ~Array(void);
@@ -36,6 +37,7 @@ public:
 	void setArena(MemoryArenaBase* arena);
 	void setArena(MemoryArenaBase* arena, size_type capacity);
 
+	Array<T>& operator=(std::initializer_list<T> iList);
 	Array<T>& operator=(const Array<T>& oth);
 	Array<T>& operator=(Array<T>&& oth);
 
