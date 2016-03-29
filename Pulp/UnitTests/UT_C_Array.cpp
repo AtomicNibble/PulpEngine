@@ -704,7 +704,7 @@ TEST(ArrayTest, EmplaceBackComplex)
 
 	EXPECT_EQ(64, CustomTypeComplex::CONSRUCTION_COUNT);
 	EXPECT_EQ(32, CustomTypeComplex::MOVE_COUNT);
-	EXPECT_EQ(0, CustomTypeComplex::DECONSRUCTION_COUNT);
+	EXPECT_EQ(32, CustomTypeComplex::DECONSRUCTION_COUNT);
 
 
 	EXPECT_EQ(64, list.size());
@@ -713,7 +713,7 @@ TEST(ArrayTest, EmplaceBackComplex)
 	for (int i = 0; i < 64; i++)
 	{
 		EXPECT_EQ(i * 4, list[i].GetVar());
-		EXPECT_STREQ("Hello", list[i].GetName());
+		EXPECT_STREQ("HEllo", list[i].GetName());
 	}
 
 
