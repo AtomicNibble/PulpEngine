@@ -426,9 +426,9 @@ X_INLINE typename Array<T>::size_type Array<T>::push_back(T&& obj)
 
 template<typename T>
 template<class... ArgsT>
-X_INLINE typename Array<T>::size_type Array<T>::emplace_back(ArgsT&&... obj)
+X_INLINE typename Array<T>::size_type Array<T>::emplace_back(ArgsT&&... args)
 {
-	if (!list) {
+	if (!list_) {
 		reserve(granularity_);
 	}
 
@@ -436,7 +436,8 @@ X_INLINE typename Array<T>::size_type Array<T>::emplace_back(ArgsT&&... obj)
 		reserve(size_ + granularity_);
 	}
 
-	Mem::Construct(&list_[num_], std::forward<ArgsT>(obj)...);
+	Mem::Construct<T>(&list_[num_], std::forward<ArgsT>(args)...);
+
 	num_++;
 	return num_ - 1;
 }
