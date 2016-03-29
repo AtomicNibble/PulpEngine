@@ -81,9 +81,61 @@ namespace
 		return a == b.GetVar();
 	}
 
-
 	int CustomType::CONSRUCTION_COUNT = 0;
 	int CustomType::DECONSRUCTION_COUNT = 0;
+
+
+	struct CustomTypeComplex
+	{
+		CustomTypeComplex(size_t val, const char* pName) :
+			var_(val),
+			pName_(pName)
+		{
+			CONSRUCTION_COUNT++;
+		}
+		CustomTypeComplex(const CustomTypeComplex& oth) :
+			var_(oth.var_),
+			pName_(oth.pName_)
+		{
+			++CONSRUCTION_COUNT;
+		}
+		CustomTypeComplex(CustomTypeComplex&& oth) :
+			var_(oth.var_),
+			pName_(oth.pName_)
+		{
+			++MOVE_COUNT;
+		}
+
+		~CustomTypeComplex() {
+			DECONSRUCTION_COUNT++;
+		}
+
+		CustomTypeComplex& operator=(const CustomTypeComplex& val) {
+			var_ = val.var_;
+			return *this;
+		}
+
+		inline size_t GetVar(void) const {
+			return var_;
+		}
+		inline const char* GetName(void) const {
+			return pName_;
+		}
+
+	private:
+		size_t var_;
+		const char* pName_;
+		
+
+	public:
+		static int CONSRUCTION_COUNT;
+		static int MOVE_COUNT;
+		static int DECONSRUCTION_COUNT;
+	};
+
+	int CustomTypeComplex::CONSRUCTION_COUNT = 0;
+	int CustomTypeComplex::MOVE_COUNT = 0;
+	int CustomTypeComplex::DECONSRUCTION_COUNT = 0;
 }
 
 typedef core::MemoryArena<
@@ -494,7 +546,6 @@ TYPED_TEST(ArrayTest, Serialize)
 	}
 }
 
-
 TYPED_TEST(ArrayTest, InitializerConstruct)
 {
 	Array<TypeParam> list(g_arena, {
@@ -560,3 +611,127 @@ TYPED_TEST(ArrayTest, InitializerAsing)
 	EXPECT_EQ(1, list[5]);
 	EXPECT_EQ(2, list[6]);
 }
+
+
+TYPED_TEST(ArrayTest, EmplaceBack)
+{
+	Array<TypeParam> list(g_arena);
+
+	EXPECT_EQ(0, list.size());
+	EXPECT_EQ(0, list.capacity());
+	EXPECT_LT(static_cast<Array<TypeParam>::size_type>(0), list.granularity()); // gran should be above 0.
+
+	EXPECT_EQ(nullptr, list.ptr());
+
+	list.reserve(64);
+
+	EXPECT_EQ(0, list.size());
+	ASSERT_EQ(64, list.capacity());
+	EXPECT_NE(nullptr, list.ptr());
+
+	for (int i = 0; i < 64; i++)
+	{
+		list.emplace_back(static_cast<Array<TypeParam>::Type>(i * 4));
+	}
+
+	EXPECT_EQ(64, list.size());
+	ASSERT_EQ(64, list.capacity());
+
+	for (int i = 0; i < 64; i++)
+	{
+		EXPECT_EQ(i * 4, list[i]);
+	}
+
+	// test the memory block it gives us.
+	Array<TypeParam>::Type* pArr = list.ptr();
+	for (int i = 0; i < 64; i++)
+	{
+		EXPECT_EQ(i * 4, pArr[i]);
+	}
+
+	list.clear();
+
+	EXPECT_EQ(0, list.size());
+	ASSERT_EQ(64, list.capacity());
+
+	list.reserve(128);
+
+	EXPECT_EQ(0, list.size());
+	EXPECT_EQ(128, list.capacity());
+	EXPECT_NE(nullptr, list.ptr());
+
+	list.free();
+
+	EXPECT_EQ(0, list.size());
+	EXPECT_EQ(0, list.capacity());
+	EXPECT_EQ(nullptr, list.ptr());
+}
+
+TEST(ArrayTest, EmplaceBackComplex)
+{
+	Array<CustomTypeComplex> list(g_arena);
+
+	EXPECT_EQ(0, list.size());
+	EXPECT_EQ(0, list.capacity());
+	EXPECT_LT(static_cast<Array<CustomTypeComplex>::size_type>(0), list.granularity()); // gran should be above 0.
+
+	EXPECT_EQ(nullptr, list.ptr());
+
+	list.reserve(64);
+
+	EXPECT_EQ(0, list.size());
+	ASSERT_EQ(64, list.capacity());
+	EXPECT_NE(nullptr, list.ptr());
+
+	EXPECT_EQ(0, CustomTypeComplex::CONSRUCTION_COUNT);
+	EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
+	EXPECT_EQ(0, CustomTypeComplex::DECONSRUCTION_COUNT);
+
+
+	for (int i = 0; i < 32; i++)
+	{
+		list.emplace_back(i * 4, "HEllo");
+	}
+
+	EXPECT_EQ(32, CustomTypeComplex::CONSRUCTION_COUNT);
+	EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
+	EXPECT_EQ(0, CustomTypeComplex::DECONSRUCTION_COUNT);
+
+	for (int i = 32; i < 64; i++)
+	{
+		list.push_back(CustomTypeComplex(i * 4, "HEllo"));
+	}
+
+	EXPECT_EQ(64, CustomTypeComplex::CONSRUCTION_COUNT);
+	EXPECT_EQ(32, CustomTypeComplex::MOVE_COUNT);
+	EXPECT_EQ(0, CustomTypeComplex::DECONSRUCTION_COUNT);
+
+
+	EXPECT_EQ(64, list.size());
+	ASSERT_EQ(64, list.capacity());
+
+	for (int i = 0; i < 64; i++)
+	{
+		EXPECT_EQ(i * 4, list[i].GetVar());
+		EXPECT_STREQ("Hello", list[i].GetName());
+	}
+
+
+	list.clear();
+
+	EXPECT_EQ(0, list.size());
+	ASSERT_EQ(64, list.capacity());
+
+	list.reserve(128);
+
+	EXPECT_EQ(0, list.size());
+	EXPECT_EQ(128, list.capacity());
+	EXPECT_NE(nullptr, list.ptr());
+
+	list.free();
+
+	EXPECT_EQ(0, list.size());
+	EXPECT_EQ(0, list.capacity());
+	EXPECT_EQ(nullptr, list.ptr());
+}
+
