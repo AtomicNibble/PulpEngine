@@ -41,22 +41,25 @@ arena_(arena)
 
 	list_ = Allocate(size);
 
-	for (size_type i = 0; i<size; ++i)
+	for (size_type i = 0; i < size; ++i) {
 		Mem::Construct<T>(list_ + i, initialValue);
+	}
 }
 
 template<typename T>
 X_INLINE Array<T>::Array(MemoryArenaBase* arena, std::initializer_list<T> iList) :
 	Array(arena)
 {
-	constexpr size_t size = iList.size();
-	const T* pList = iList.begin();
+	size_t size = iList.size();
+	std::initializer_list<T>::const_iterator pList = iList.begin();
 
-	list_ = Allocate(size);
+	ensureSize(size);
 
 	for (size_type i = 0; i < size; ++i) {
-		Mem::Construct<T>(list_ + i, std::forward<T>(pList[i]));
+		Mem::Construct<T>(list_ + i, pList[i]);
 	}
+
+	num_ = size;
 }
 
 template<typename T>
@@ -113,6 +116,27 @@ X_INLINE void Array<T>::setArena(MemoryArenaBase* arena, size_type capacity)
 }
 
 // ---------------------------------------------------------
+
+template<typename T>
+Array<T>& Array<T>::operator=(std::initializer_list<T> iList)
+{
+	size_type i;
+	free();
+
+	size_t size = iList.size();
+	std::initializer_list<T>::const_iterator pList = iList.begin();
+
+	if (size) {
+		ensureSize(size);
+		for (i = 0; i < size; i++) {
+			Mem::Construct(&list_[i], pList[i]);
+		}
+	}
+
+	num_ = size;
+	return *this;
+}
+
 template<typename T>
 Array<T>& Array<T>::operator=(const Array<T> &oth)
 {
