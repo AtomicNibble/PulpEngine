@@ -196,3 +196,30 @@ TEST(ByteStreamTest, MoveAssign)
 	EXPECT_EQ(0, stream.size());
 	EXPECT_EQ(64, stream.capacity());
 }
+
+TEST(ByteStreamTest, EmptyCopyCon)
+{
+	// check that constructing a stream from a empty stream is valid.
+
+	ByteStream empty(g_arena);
+	ByteStream strm(empty);
+
+	ASSERT_EQ(0, strm.size());
+	ASSERT_EQ(0, strm.capacity());
+	ASSERT_EQ(0, strm.freeSpace());
+
+	ASSERT_TRUE(strm.begin() == nullptr);
+
+	strm.free();
+	strm.resize(16);
+
+	ASSERT_EQ(0, strm.size());
+	ASSERT_EQ(16, strm.capacity());
+	ASSERT_EQ(16, strm.freeSpace());
+
+	strm.write<uint8_t>(0xff);
+
+	ASSERT_EQ(1, strm.size());
+	ASSERT_EQ(16, strm.capacity());
+	ASSERT_EQ(15, strm.freeSpace());
+}
