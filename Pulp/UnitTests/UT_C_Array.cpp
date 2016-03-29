@@ -495,3 +495,68 @@ TYPED_TEST(ArrayTest, Serialize)
 }
 
 
+TYPED_TEST(ArrayTest, InitializerConstruct)
+{
+	Array<TypeParam> list(g_arena, {
+		static_cast<TypeParam>(4),
+		static_cast<TypeParam>(8),
+		static_cast<TypeParam>(1),
+		static_cast<TypeParam>(2)
+	});
+
+
+	EXPECT_EQ(4, list.size());
+	ASSERT_EQ(list.granularity(), list.capacity());
+
+	EXPECT_EQ(4, list[0]);
+	EXPECT_EQ(8, list[1]);
+	EXPECT_EQ(1, list[2]);
+	EXPECT_EQ(2, list[3]);
+}
+
+TYPED_TEST(ArrayTest, InitializerAsing)
+{
+	Array<TypeParam> list(g_arena);
+	
+	EXPECT_EQ(0, list.size());
+	EXPECT_EQ(0, list.capacity());
+	EXPECT_LT(static_cast<Array<TypeParam>::size_type>(0), list.granularity()); 
+
+	EXPECT_EQ(nullptr, list.ptr());
+
+	list = {
+		static_cast<TypeParam>(4),
+		static_cast<TypeParam>(8),
+		static_cast<TypeParam>(1),
+		static_cast<TypeParam>(2)
+	};
+
+	EXPECT_EQ(4, list.size());
+	ASSERT_EQ(list.granularity(), list.capacity());
+
+	EXPECT_EQ(4, list[0]);
+	EXPECT_EQ(8, list[1]);
+	EXPECT_EQ(1, list[2]);
+	EXPECT_EQ(2, list[3]);
+
+	list = {
+		static_cast<TypeParam>(4),
+		static_cast<TypeParam>(8),
+		static_cast<TypeParam>(1),
+		static_cast<TypeParam>(1),
+		static_cast<TypeParam>(1),
+		static_cast<TypeParam>(1),
+		static_cast<TypeParam>(2)
+	};
+
+	EXPECT_EQ(7, list.size());
+	ASSERT_EQ(list.granularity(), list.capacity());
+
+	EXPECT_EQ(4, list[0]);
+	EXPECT_EQ(8, list[1]);
+	EXPECT_EQ(1, list[2]);
+	EXPECT_EQ(1, list[3]);
+	EXPECT_EQ(1, list[4]);
+	EXPECT_EQ(1, list[5]);
+	EXPECT_EQ(2, list[6]);
+}
