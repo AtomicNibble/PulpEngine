@@ -30,6 +30,59 @@ namespace
 		int val_;
 		char unusedPadding[64 - sizeof(int)];
 	};
+
+
+	struct CustomTypeComplex
+	{
+		CustomTypeComplex(size_t val, const char* pName) :
+			var_(val),
+			pName_(pName)
+		{
+			CONSRUCTION_COUNT++;
+		}
+		CustomTypeComplex(const CustomTypeComplex& oth) :
+			var_(oth.var_),
+			pName_(oth.pName_)
+		{
+			++CONSRUCTION_COUNT;
+		}
+		CustomTypeComplex(CustomTypeComplex&& oth) :
+			var_(oth.var_),
+			pName_(oth.pName_)
+		{
+			++MOVE_COUNT;
+		}
+
+		~CustomTypeComplex() {
+			DECONSRUCTION_COUNT++;
+		}
+
+		CustomTypeComplex& operator=(const CustomTypeComplex& val) {
+			var_ = val.var_;
+			return *this;
+		}
+
+		inline size_t GetVar(void) const {
+			return var_;
+		}
+		inline const char* GetName(void) const {
+			return pName_;
+		}
+
+	private:
+		size_t var_;
+		const char* pName_;
+
+
+	public:
+		static int CONSRUCTION_COUNT;
+		static int MOVE_COUNT;
+		static int DECONSRUCTION_COUNT;
+	};
+
+	int CustomTypeComplex::CONSRUCTION_COUNT = 0;
+	int CustomTypeComplex::MOVE_COUNT = 0;
+	int CustomTypeComplex::DECONSRUCTION_COUNT = 0;
 }
 
 
@@ -117,3 +170,53 @@ TYPED_TEST(FixedArrayTest, UserType)
 	ASSERT_EQ(32, array.capacity());
 	ASSERT_EQ(29, array.size());
 }
+
+
+TEST(FixedArrayTest, EmplaceBackComplex)
+{
+	FixedArray<CustomTypeComplex,64> list;
+
+	EXPECT_EQ(0, list.size());
+	ASSERT_EQ(64, list.capacity());
+	EXPECT_NE(nullptr, list.ptr());
+
+	EXPECT_EQ(0, CustomTypeComplex::CONSRUCTION_COUNT);
+	EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
+	EXPECT_EQ(0, CustomTypeComplex::DECONSRUCTION_COUNT);
+
+
+	for (int i = 0; i < 32; i++)
+	{
+		list.emplace_back(i * 4, "HEllo");
+	}
+
+	EXPECT_EQ(32, CustomTypeComplex::CONSRUCTION_COUNT);
+	EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);
+	EXPECT_EQ(0, CustomTypeComplex::DECONSRUCTION_COUNT);
+
+	for (int i = 32; i < 64; i++)
+	{
+		list.push_back(CustomTypeComplex(i * 4, "HEllo"));
+	}
+
+	EXPECT_EQ(64, CustomTypeComplex::CONSRUCTION_COUNT);
+	EXPECT_EQ(32, CustomTypeComplex::MOVE_COUNT);
+	EXPECT_EQ(32, CustomTypeComplex::DECONSRUCTION_COUNT);
+
+
+	EXPECT_EQ(64, list.size());
+	ASSERT_EQ(64, list.capacity());
+
+	for (int i = 0; i < 64; i++)
+	{
+		EXPECT_EQ(i * 4, list[i].GetVar());
+		EXPECT_STREQ("HEllo", list[i].GetName());
+	}
+
+
+	list.clear();
+
+	EXPECT_EQ(0, list.size());
+	ASSERT_EQ(64, list.capacity());
+}
+
