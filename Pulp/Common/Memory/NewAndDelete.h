@@ -98,6 +98,10 @@ namespace Mem
 	template <typename T>
 	inline T* Construct(void* where, T&& what);
 
+	/// Construct an instance from args
+	template <typename T, class... _Types>
+	inline T* Construct(void* where, _Types&&... _Args);
+
 	/// Constructs N instances in memory at the given address, and returns a pointer to the first instance.
 	template <typename T>
 	inline T* ConstructArray(void* where, size_t N);
