@@ -38,6 +38,10 @@ public:
 	inline size_type append(const T& obj);
 	// appends a item to the end, resizing if required.
 	inline size_type push_back(const T& obj);
+	inline size_type push_back(T&& obj);
+
+	template<class... ArgsT>
+	inline size_type emplace_back(ArgsT&&... args);
 
 	inline iterator insert(iterator position, const T& val);
 

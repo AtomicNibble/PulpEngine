@@ -113,6 +113,31 @@ typename FixedArray<T, N>::size_type FixedArray<T, N>::push_back(const T& obj)
 }
 
 template<typename T, size_t N>
+typename FixedArray<T, N>::size_type FixedArray<T, N>::push_back(T&& obj)
+{
+	X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
+	T* pArr = begin();
+
+	Mem::Construct(&pArr[size_], std::forward<T>(obj));
+
+	size_++;
+	return size_ - 1;
+}
+
+template<typename T, size_t N>
+template<class... ArgsT>
+typename FixedArray<T, N>::size_type FixedArray<T, N>::emplace_back(ArgsT&&... args)
+{
+	X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
+	T* pArr = begin();
+
+	Mem::Construct<T>(&pArr[size_], std::forward<ArgsT>(args)...);
+
+	size_++;
+	return size_ - 1;
+}
+
+template<typename T, size_t N>
 typename FixedArray<T, N>::iterator FixedArray<T, N>::insert(iterator position, const T& val)
 {
 	size_type off = position - begin();
