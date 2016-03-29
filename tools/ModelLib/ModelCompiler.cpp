@@ -1550,8 +1550,9 @@ void ModelCompiler::CreateBindDataJob(Mesh* pMesh, uint32_t count)
 void ModelCompiler::DropWeightsJob(RawModel::Vert* pVerts, uint32_t count)
 {
 	const size_t num = count;
-	const size_t maxWeights = ModelCompiler::VERTEX_MAX_WEIGHTS;
+	const size_t maxWeights = flags_.IsSet(CompileFlag::EXT_WEIGHTS) ? ModelCompiler::VERTEX_MAX_WEIGHTS : 4;
 	const float32_t threshold = ModelCompiler::JOINT_WEIGHT_THRESHOLD;
+
 
 	int32_t droppedWeights = 0;
 	size_t i;
