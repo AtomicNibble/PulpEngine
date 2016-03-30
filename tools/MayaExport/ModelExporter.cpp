@@ -564,6 +564,22 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 		}
 	}
 
+	idx = args.flagIndex("ext_weights");
+	if (idx != MArgList::kInvalidArgIndex) {
+		bool extWeights = false;
+		if (!args.get(++idx, extWeights)) {
+			MayaUtil::MayaPrintWarning("failed to get ext_weights flag");
+		}
+		else {
+			if (extWeights) {
+				flags.Set(CompileFlag::EXT_WEIGHTS);
+			}
+			else {
+				flags.Remove(CompileFlag::EXT_WEIGHTS);
+			}
+		}
+	}
+
 	idx = args.flagIndex("dir");
 	if (idx != MArgList::kInvalidArgIndex) {
 		MString dir;
