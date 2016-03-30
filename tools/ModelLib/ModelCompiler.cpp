@@ -70,7 +70,7 @@ ModelCompiler::Stats::Stats(core::MemoryArenaBase* arena) :
 	clear();
 }
 
-void ModelCompiler::Stats::print(void) const
+void ModelCompiler::Stats::print(CompileFlags flags) const
 {
 	X_LOG0("Model", "Model Info:");
 	X_LOG0("Model", "> Compile Time: %fms", compileTime.GetMilliSeconds());
@@ -108,7 +108,12 @@ void ModelCompiler::Stats::print(void) const
 	X_LOG0("Model", "> Total eights Dropped: %i", totalWeightsDropped);
 
 	if (totalWeightsDropped > 0) {
-		X_LOG0("Model", "!> bind weights where dropped, consider binding with max influences: 4");
+		uint32_t maxWeights = model::MODEL_MAX_VERT_BINDS_NONE_EXT;
+		if (flags.IsSet(model::ModelCompiler::CompileFlag::EXT_WEIGHTS)) {
+			maxWeights = model::MODEL_MAX_VERT_BINDS;
+		}
+
+		X_LOG0("Model", "!> bind weights where dropped, consider binding with max influences: %i", maxWeights);
 	}
 
 	{
@@ -407,7 +412,7 @@ void ModelCompiler::setFlags(CompileFlags flags)
 
 void ModelCompiler::printStats(void) const
 {
-	stats_.print();
+	stats_.print(flags_);
 }
 
 

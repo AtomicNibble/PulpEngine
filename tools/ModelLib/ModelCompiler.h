@@ -40,7 +40,7 @@ public:
 		Stats(core::MemoryArenaBase* arena);
 
 		void clear(void);
-		void print(void) const;
+		void print(CompileFlags flags) const;
 
 	public:
 		uint32_t totalLods;

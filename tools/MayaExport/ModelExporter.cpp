@@ -328,7 +328,12 @@ void ModelExporter::printStats(void) const
 	info.append("\n");
 
 	if (stats_.totalWeightsDropped > 0) {
-		info.append("!> bind weights where dropped, consider binding with max influences: 4\n");
+		uint32_t maxWeights = model::MODEL_MAX_VERT_BINDS_NONE_EXT;
+		if (getFlags().IsSet(model::ModelCompiler::CompileFlag::EXT_WEIGHTS)) {
+			maxWeights = model::MODEL_MAX_VERT_BINDS;
+		}
+
+		info.appendFmt("!> bind weights where dropped, consider binding with max influences: %i\n", maxWeights);
 	}
 
 	{
