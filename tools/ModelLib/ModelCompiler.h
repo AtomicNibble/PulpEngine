@@ -174,6 +174,13 @@ public:
 	void setFlags(CompileFlags flags);
 	void printStats(void) const;
 
+	float getVertexElipson(void) const;
+	float getTexCoordElipson(void) const;
+	float getJointWeightThreshold(void) const;
+	float getScale(void) const;
+	CompileFlags getFlags(void) const;
+
+
 	bool CompileModel(core::Path<char>& outFile);
 	bool CompileModel(core::Path<wchar_t>& outFile);
 

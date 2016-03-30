@@ -411,6 +411,32 @@ void ModelCompiler::printStats(void) const
 }
 
 
+float ModelCompiler::getVertexElipson(void) const
+{
+	return vertexElipsion_;
+}
+
+float ModelCompiler::getTexCoordElipson(void) const
+{
+	return texcoordElipson_;
+}
+
+float ModelCompiler::getJointWeightThreshold(void) const
+{
+	return jointWeightThreshold_;
+}
+
+float ModelCompiler::getScale(void) const
+{
+	return scale_;
+}
+
+ModelCompiler::CompileFlags ModelCompiler::getFlags(void) const
+{
+	return flags_;
+}
+
+
 bool ModelCompiler::CompileModel(core::Path<char>& outFile)
 {
 	return CompileModel(core::Path<wchar_t>(outFile));
