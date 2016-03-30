@@ -67,6 +67,9 @@ bool XModelLib::Convert(ConvertArgs& args)
 		if (args.hasFlag(L"merge_verts")) {
 			flags.Set(ModelCompiler::CompileFlag::MERGE_VERTS);
 		}
+		if (args.hasFlag(L"ext_weights")) {
+			flags.Set(ModelCompiler::CompileFlag::EXT_WEIGHTS);
+		}
 
 		model.setFlags(flags);
 
