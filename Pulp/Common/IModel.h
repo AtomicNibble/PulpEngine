@@ -104,7 +104,9 @@ static const uint32_t	 MODEL_MAX_FACES = MODEL_MAX_INDEXS / 3;
 
 // humm might make this 8 (would be for faces, probs make it a option)
 // I've made it 8 for the format, but i'm gonna make it so you need to turn on 8vert mode for compiler.
-static const uint32_t	 MODEL_MAX_VERT_BINDS = 8; 
+static const uint32_t	 MODEL_MAX_VERT_BINDS = 8;
+static const uint32_t	 MODEL_MAX_VERT_BINDS_NONE_EXT = 4;
+
 static const uint32_t	 MODEL_MAX_LODS = 4;
 // legnth checks are done without extension, to make it include extension, simple reduce it by the length of ext.
 static const uint32_t	 MODEL_MAX_NAME_LENGTH = 60; 
