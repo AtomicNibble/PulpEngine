@@ -40,6 +40,18 @@ inline void Stack<T>::push(const T& val)
 	++current_;
 }
 
+// emplace a value onto the stack
+template<typename T>
+template<class... ArgsT>
+inline void Stack<T>::emplace(ArgsT&&... args)
+{
+	X_ASSERT(size() < capacity(), "can't push value onto stack, no room.")(size(), capacity());
+
+	Mem::Construct<T>(current_, std::forward<ArgsT>(args)...);
+	++current_;
+}
+
+
 // pop a value of the stack
 template<typename T>
 inline void Stack<T>::pop(void)

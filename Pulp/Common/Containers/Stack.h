@@ -31,6 +31,9 @@ public:
 
 	// push a value onto the stack
 	inline void push(const T& val);
+	// emplace a value onto the stack
+	template<class... ArgsT>
+	inline void emplace(ArgsT&&... args);
 	// pop a value of the stack
 	inline void pop(void);
 	// get the top item without removing
