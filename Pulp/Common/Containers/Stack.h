@@ -31,6 +31,8 @@ public:
 
 	// push a value onto the stack
 	inline void push(const T& val);
+	inline void push(T&& obj);
+
 	// emplace a value onto the stack
 	template<class... ArgsT>
 	inline void emplace(ArgsT&&... args);
@@ -43,8 +45,7 @@ public:
 
 
 	// resizes the object
-	inline void resize(size_type size);
-	inline void resize(size_type size, const T&);
+	inline void reserve(size_type size);
 	// free's the memory associated with the stack.
 	inline void free(void);
 	// clears all objects but dose not free memory.
@@ -59,7 +60,6 @@ public:
 	inline bool isNotEmpty(void) const;
 
 	// STL Iterators.
-	// TODO
 	inline Iterator begin(void);
 	inline ConstIterator begin(void) const;
 	inline Iterator end(void);

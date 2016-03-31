@@ -19,7 +19,7 @@ start_(nullptr),
 arena_(arena)
 {
 	X_ASSERT_NOT_NULL(arena);
-	resize(numElements);
+	reserve(numElements);
 }
 
 
@@ -37,6 +37,15 @@ inline void Stack<T>::push(const T& val)
 	X_ASSERT(size() < capacity(), "can't push value onto stack, no room.")(size(), capacity());
 
 	Mem::Construct<T>(current_, val);
+	++current_;
+}
+
+template<typename T>
+inline void Stack<T>::push(T&& val)
+{
+	X_ASSERT(size() < capacity(), "can't push value onto stack, no room.")(size(), capacity());
+
+	Mem::Construct<T>(current_, std::forward<T>(val));
 	++current_;
 }
 
@@ -83,35 +92,28 @@ inline const T& Stack<T>::top(void) const
 
 // resizes the object
 template<typename T>
-inline void Stack<T>::resize(size_type size)
+inline void Stack<T>::reserve(size_type newSize)
 {
-	// same amount of items?
-	if (newNum == num_)
-		return;
-
 	// grow?
-	if (size > capacity()) 
+	if (newSize > capacity())
 	{
-		Delete(start_);
-		current_ = start_ = Allocate(size);
-		end_ = (start_ + size);
-	}
-	else
-	{
-		// shrink.
+		Type* pOldList = start_;
+		const size_type oldSize = size();
 
+		start_ = Allocate(newSize);
 
-	}
-}
+		if (pOldList)
+		{
+			for (size_type i = 0; i < oldSize; i++) {
+				Mem::Construct(&start_[i], pOldList[i]);
+			}
 
-template<typename T>
-void Stack<T>::resize(size_type size, const T&)
-{
-	if (size > capacity()) // we need to resize?
-	{
-		Delete(start_);
-		current_ = start_ = Allocate(size);
-		end_ = (start_ + size);
+			Delete(pOldList);
+		}
+
+		// update pointers.
+		current_ = start_ + oldSize;
+		end_ = (start_ + newSize);
 	}
 }
 
@@ -133,11 +135,8 @@ inline void Stack<T>::free(void)
 template<typename T>
 inline void Stack<T>::clear(void)
 {
-	size_type Size = size();
-	for (size_t i = 0; i < Size; ++i) {
-		Mem::Destruct<T>(start_ + i);
-	}
-
+	size_type num = size();
+	Mem::DestructArray<T>(start_, num);
 	current_ = start_;
 }
 
