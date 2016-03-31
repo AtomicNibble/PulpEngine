@@ -20,12 +20,12 @@ public:
 	typedef const T* ConstTypePtr;
 	typedef T* Iterator;
 	typedef const T* ConstIterator;
-
+	typedef size_t size_type;
 
 	// constructs the Stack no memory is allocated.
 	inline Stack(MemoryArenaBase* arena);
 	// constast stack with space for numElements
-	inline Stack(MemoryArenaBase* arena, size_t numElements);
+	inline Stack(MemoryArenaBase* arena, size_type numElements);
 
 	inline void SetArena(MemoryArenaBase* arena);
 
@@ -43,16 +43,17 @@ public:
 
 
 	// resizes the object
-	inline void resize(size_t size);
+	inline void resize(size_type size);
+	inline void resize(size_type size, const T&);
 	// free's the memory associated with the stack.
 	inline void free(void);
 	// clears all objects but dose not free memory.
 	inline void clear(void);
 
 	// returns the number of elemets in the stack currently
-	inline size_t size() const;
+	inline size_type size(void) const;
 	// returns the number of elements this stack can currently hold.
-	inline size_t capacity() const;
+	inline size_type capacity(void) const;
 
 	inline bool isEmpty(void) const;
 	inline bool isNotEmpty(void) const;
@@ -69,7 +70,7 @@ private:
 	X_NO_ASSIGN(Stack);
 
 	inline void Delete(T* pData);
-	inline T* Allocate(size_t num);
+	inline T* Allocate(size_type num);
 
 	T* current_;
 	T* start_;

@@ -12,7 +12,7 @@ arena_(arena)
 }
 
 template<typename T>
-Stack<T>::Stack(MemoryArenaBase* arena, size_t numElements) :
+Stack<T>::Stack(MemoryArenaBase* arena, size_type numElements) :
 current_(nullptr),
 end_(nullptr),
 start_(nullptr),
@@ -83,7 +83,29 @@ inline const T& Stack<T>::top(void) const
 
 // resizes the object
 template<typename T>
-inline void Stack<T>::resize(size_t size)
+inline void Stack<T>::resize(size_type size)
+{
+	// same amount of items?
+	if (newNum == num_)
+		return;
+
+	// grow?
+	if (size > capacity()) 
+	{
+		Delete(start_);
+		current_ = start_ = Allocate(size);
+		end_ = (start_ + size);
+	}
+	else
+	{
+		// shrink.
+
+
+	}
+}
+
+template<typename T>
+void Stack<T>::resize(size_type size, const T&)
 {
 	if (size > capacity()) // we need to resize?
 	{
@@ -92,7 +114,6 @@ inline void Stack<T>::resize(size_t size)
 		end_ = (start_ + size);
 	}
 }
-
 
 // free's the memory associated with the stack.
 template<typename T>
@@ -112,21 +133,22 @@ inline void Stack<T>::free(void)
 template<typename T>
 inline void Stack<T>::clear(void)
 {
-	size_t Size = size();
-	for (size_t i = 0; i<Size; ++i)
+	size_type Size = size();
+	for (size_t i = 0; i < Size; ++i) {
 		Mem::Destruct<T>(start_ + i);
+	}
 
 	current_ = start_;
 }
 
 template<typename T>
-inline size_t Stack<T>::size() const
+inline typename Stack<T>::size_type Stack<T>::size() const
 {
 	return current_ - start_;
 }
 
 template<typename T>
-inline size_t Stack<T>::capacity() const
+inline typename Stack<T>::size_type Stack<T>::capacity() const
 {
 	return end_ - start_;
 }
@@ -143,17 +165,42 @@ inline bool Stack<T>::isNotEmpty(void) const
 	return size() > 0;
 }
 
+template<typename T>
+inline typename Stack<T>::Iterator Stack<T>::begin(void)
+{
+	return start_;
+}
+
+template<typename T>
+inline typename Stack<T>::ConstIterator Stack<T>::begin(void) const
+{
+	return start_;
+}
+
+template<typename T>
+inline typename Stack<T>::Iterator Stack<T>::end(void)
+{
+	return current_;
+}
+
+template<typename T>
+inline typename Stack<T>::ConstIterator Stack<T>::end(void) const
+{
+	return current_;
+}
+
+
 // allow for easy allocation custimisate later.
 template<typename T>
 inline void Stack<T>::Delete(T* pData)
 {
-	X_DELETE_ARRAY(pData, arena_);
-	//::free(pData);
+	arena_->free(pData);
 }
 
 template<typename T>
-inline T* Stack<T>::Allocate(size_t num)
+inline T* Stack<T>::Allocate(size_type num)
 {
-	return X_NEW_ARRAY(T, num, arena_, "Stack<"X_PP_STRINGIZE(T)">");
-//	return (T*)malloc(sizeof(T)*num);
+	return static_cast<T*>(arena_->allocate(sizeof(T)*num,
+		X_ALIGN_OF(T), 0, "Stack", "T[]", X_SOURCE_INFO));
 }
+
