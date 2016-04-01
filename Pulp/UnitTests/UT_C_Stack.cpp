@@ -263,6 +263,19 @@ TEST(StackTest, Move)
 	EXPECT_EQ(180, CustomType::DECONSRUCTION_COUNT);
 }
 
+TEST(StackTest, AlignMentCustom)
+{
+	FixedStack<CustomType, 16> stack;
+
+	for (int i = 0; i < 16; i++) {
+		stack.emplace(CustomType(0x400, "meow"));
+	}
+
+	for (FixedStack<CustomType, 16>::const_iterator it = stack.begin(); it != stack.end(); ++it) {
+		X_ASSERT_ALIGNMENT(&(*it), X_ALIGN_OF(CustomType), 0);
+	}
+}
+
 TYPED_TEST(StackTest, reserve)
 {
 	Stack<TypeParam> stack(g_arena);
@@ -293,8 +306,6 @@ TYPED_TEST(StackTest, reserve)
 	EXPECT_EQ(0x1337, stack.top());
 }
 
-
-
 TYPED_TEST(StackTest, Iterator)
 {
 	Stack<TypeParam> list(g_arena);
@@ -322,3 +333,15 @@ TYPED_TEST(StackTest, Iterator)
 }
 
 
+TYPED_TEST(StackTest, AlignMent)
+{
+	FixedStack<TypeParam, 16> stack;
+
+	for (int i = 0; i < 16; i++) {
+		stack.push(0x173263);
+	}
+
+	for (FixedStack<TypeParam, 16>::const_iterator it = stack.begin(); it != stack.end(); ++it) {
+		X_ASSERT_ALIGNMENT(&(*it), X_ALIGN_OF(TypeParam), 0);
+	}
+}
