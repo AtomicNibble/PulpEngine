@@ -110,6 +110,8 @@ public:
 	inline ConstIterator begin(void) const;
 	inline Iterator end(void);
 	inline ConstIterator end(void) const;
+	inline Reference front(void);
+	inline ConstReference front(void) const;
 	inline Reference back(void);
 	inline ConstReference back(void) const;
 

@@ -620,6 +620,19 @@ inline typename Array<T>::ConstIterator Array<T>::end(void) const
 
 
 template<typename T>
+inline typename Array<T>::Reference Array<T>::front(void)
+{
+	return *list_;
+}
+
+template<typename T>
+inline typename Array<T>::ConstReference Array<T>::front(void) const
+{
+	return *list_;
+}
+
+
+template<typename T>
 inline typename Array<T>::Reference Array<T>::back(void)
 {
 	return (*(end() - 1));
