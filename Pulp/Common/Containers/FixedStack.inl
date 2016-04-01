@@ -2,8 +2,14 @@
 
 template <typename T, size_t N>
 inline FixedStack<T, N>::FixedStack(void)
-: current_(array_)
+: current_(reinterpret_cast<T*>(array_))
 {
+}
+
+template <typename T, size_t N>
+inline FixedStack<T, N>::~FixedStack(void)
+{
+	clear();
 }
 
 
@@ -11,16 +17,33 @@ template <typename T, size_t N>
 void FixedStack<T, N>::push(const T& value)
 {
 	X_ASSERT(size() < capacity(), "can't push value on to full stack.")(size(), capacity());
-	*current_++ = value;
+	Mem::Construct<T>(current_++, value);
 }
 
+template <typename T, size_t N>
+inline void FixedStack<T, N>::push(T&& value)
+{
+	X_ASSERT(size() < capacity(), "can't push value on to full stack.")(size(), capacity());
+
+	Mem::Construct<T>(current_++, std::forward<T>(value));
+}
 
 template <typename T, size_t N>
-void FixedStack<T, N>::pop(void)
+template<class... ArgsT>
+inline void FixedStack<T, N>::emplace(ArgsT&&... args)
+{
+	X_ASSERT(size() < capacity(), "can't push value on to full stack.")(size(), capacity());
+
+	Mem::Construct<T>(current_++, std::forward<ArgsT>(args)...);
+}
+
+template <typename T, size_t N>
+inline void FixedStack<T, N>::pop(void)
 {
 	X_ASSERT(size() > 0, "can't pop value from a empty stack.")(size(), capacity());
 
 	--current_;
+	Mem::Destruct<T>(current_);
 }
 
 
@@ -48,7 +71,8 @@ inline bool FixedStack<T, N>::isEmpty(void) const
 template <typename T, size_t N>
 inline void FixedStack<T, N>::clear(void)
 {
-	current_ = array_; // move to start
+	Mem::DestructArray<T>(begin(), size());
+	current_ = reinterpret_cast<T*>(array_); // move to start
 }
 
 
@@ -56,7 +80,7 @@ inline void FixedStack<T, N>::clear(void)
 template <typename T, size_t N>
 inline size_t FixedStack<T, N>::size(void) const
 {
-	return safe_static_cast<size_t>(current_ - array_);
+	return safe_static_cast<size_t>(current_ - reinterpret_cast<const T*>(array_));
 }
 
 template <typename T, size_t N>
@@ -69,13 +93,13 @@ inline size_t FixedStack<T, N>::capacity(void) const
 template <typename T, size_t N>
 inline typename FixedStack<T, N>::iterator FixedStack<T, N>::begin(void)
 {
-	return array_;
+	return reinterpret_cast<T*>(array_);
 }
 
 template <typename T, size_t N>
 inline typename FixedStack<T, N>::const_iterator FixedStack<T, N>::begin(void) const
 {
-	return array_;
+	return reinterpret_cast<const T*>(array_);
 }
 
 template <typename T, size_t N>

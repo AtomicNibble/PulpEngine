@@ -10,13 +10,27 @@ template <typename T, size_t N>
 class FixedStack
 {
 public:
+	typedef T  Type;
+	typedef T* TypePtr;
+	typedef T* iterator;
+	typedef const T* const_iterator;
+	typedef size_t size_type;
+
+
 	// Constructs a stack which is capable of holding \a capacity items.
 	inline FixedStack(void);
+	inline ~FixedStack(void);
 
 	// Pushes a new value onto the stack.
-	void push(const T& value);
+	inline void push(const T& value);
+	inline void push(T&& value);
+
+	// emplace a value onto the stack
+	template<class... ArgsT>
+	inline void emplace(ArgsT&&... args);
+
 	// Pops a value from the stack.
-	void pop(void);
+	inline void pop(void);
 	// Returns the topmost value on the stack.
 	inline T& top(void);
 	// Returns the topmost value on the stack.
@@ -29,13 +43,9 @@ public:
 	inline void clear(void);
 
 	// returns the number of elemets in the stack currently
-	inline size_t size() const;
+	inline size_type size(void) const;
 	// returns the number of elements this stack can currently hold.
-	inline size_t capacity() const;
-
-	/// Defines an iterator for STL-style iteration.
-	typedef T* iterator;
-	typedef const T* const_iterator;
+	inline size_type capacity(void) const;
 
 	inline iterator begin(void);
 	inline const_iterator begin(void) const;
@@ -46,7 +56,8 @@ private:
 	X_NO_COPY(FixedStack);
 	X_NO_ASSIGN(FixedStack);
 
-	T	array_[N];
+//	T	array_[N];
+	uint8_t	array_[N * sizeof(T)];
 	T*	current_;					
 };
 
