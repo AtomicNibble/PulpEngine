@@ -622,12 +622,14 @@ inline typename Array<T>::ConstIterator Array<T>::end(void) const
 template<typename T>
 inline typename Array<T>::Reference Array<T>::front(void)
 {
+	X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")(isNotEmpty());
 	return *list_;
 }
 
 template<typename T>
 inline typename Array<T>::ConstReference Array<T>::front(void) const
 {
+	X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")(isNotEmpty());
 	return *list_;
 }
 
@@ -635,12 +637,14 @@ inline typename Array<T>::ConstReference Array<T>::front(void) const
 template<typename T>
 inline typename Array<T>::Reference Array<T>::back(void)
 {
+	X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")(isNotEmpty());
 	return (*(end() - 1));
 }
 
 template<typename T>
 inline typename Array<T>::ConstReference Array<T>::back(void) const
 {
+	X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")(isNotEmpty());
 	return (*(end() - 1));
 }
 
