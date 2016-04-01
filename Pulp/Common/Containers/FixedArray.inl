@@ -285,3 +285,32 @@ inline typename FixedArray<T, N>::const_iterator FixedArray<T, N>::end(void) con
 	return begin() + size_;
 }
 
+
+template<typename T, size_t N>
+inline typename FixedArray<T, N>::Reference FixedArray<T, N>::front(void)
+{
+	X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")(isNotEmpty());
+	return *begin();
+}
+
+template<typename T, size_t N>
+inline typename FixedArray<T, N>::ConstReference FixedArray<T, N>::front(void) const
+{
+	X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")(isNotEmpty());
+	return *begin();
+}
+
+
+template<typename T, size_t N>
+inline typename FixedArray<T, N>::Reference FixedArray<T, N>::back(void)
+{
+	X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")(isNotEmpty());
+	return (*(end() - 1));
+}
+
+template<typename T, size_t N>
+inline typename FixedArray<T, N>::ConstReference FixedArray<T, N>::back(void) const
+{
+	X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")(isNotEmpty());
+	return (*(end() - 1));
+}

@@ -18,6 +18,8 @@ public:
 	typedef T* iterator;
 	typedef const T* const_iterator;
 	typedef size_t size_type;
+	typedef T& Reference;
+	typedef const T& ConstReference;
 
 	FixedArray();
 	FixedArray(const T& initalval);
@@ -68,7 +70,10 @@ public:
 	inline const_iterator begin(void) const;
 	inline iterator end(void);
 	inline const_iterator end(void) const;
-
+	inline Reference front(void);
+	inline ConstReference front(void) const;
+	inline Reference back(void);
+	inline ConstReference back(void) const;
 
 private:
 	size_type size_;
