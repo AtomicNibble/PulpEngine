@@ -56,8 +56,7 @@ private:
 	X_NO_COPY(FixedStack);
 	X_NO_ASSIGN(FixedStack);
 
-//	T	array_[N];
-	uint8_t	array_[N * sizeof(T)];
+	uint8_t	X_ALIGNED_SYMBOL(array_[N * sizeof(T)], X_ALIGN_OF(T));
 	T*	current_;					
 };
 
