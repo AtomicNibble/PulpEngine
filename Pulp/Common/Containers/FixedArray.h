@@ -6,6 +6,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
+X_DISABLE_WARNING(4324) // structure was padded due to alignment specifier
+
 template <typename T, size_t N>
 class FixedArray
 {
@@ -70,8 +72,10 @@ public:
 
 private:
 	size_type size_;
-	uint8_t	array_[N * sizeof(T)];
+	uint8_t	X_ALIGNED_SYMBOL(array_[N * sizeof(T)], X_ALIGN_OF(T));
 };
+
+X_ENABLE_WARNING(4324)
 
 #include "FixedArray.inl"
 
