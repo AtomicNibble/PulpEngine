@@ -31,8 +31,7 @@ namespace
 		char unusedPadding[64 - sizeof(int)];
 	};
 
-
-	struct CustomTypeComplex
+	X_ALIGNED_SYMBOL(struct CustomTypeComplex, 64)
 	{
 		CustomTypeComplex(size_t val, const char* pName) :
 			var_(val),
@@ -218,5 +217,26 @@ TEST(FixedArrayTest, EmplaceBackComplex)
 
 	EXPECT_EQ(0, list.size());
 	ASSERT_EQ(64, list.capacity());
+}
+
+
+TEST(FixedArrayTest, AlignMentComplex)
+{
+	FixedArray<CustomTypeComplex, 64> array;
+
+	for (int i = 0; i < 32; i++)
+	{
+		array.emplace_back(i * 4, "HEllo");
+	}
+
+	for (FixedArray<CustomTypeComplex, 32>::iterator it = array.begin(); it != array.end(); ++it)
+	{
+		X_ASSERT_ALIGNMENT(&(*it), X_ALIGN_OF(CustomTypeComplex), 0);
+	}
+
+	for (FixedArray<CustomTypeComplex, 32>::const_iterator it = array.begin(); it != array.end(); ++it)
+	{
+		X_ASSERT_ALIGNMENT(&(*it), X_ALIGN_OF(CustomTypeComplex), 0);
+	}
 }
 
