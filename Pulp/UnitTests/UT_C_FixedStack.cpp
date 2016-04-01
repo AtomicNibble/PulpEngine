@@ -100,6 +100,32 @@ TYPED_TEST(FixedStackTest, DefaultTypes)
 
 }
 
+
+TYPED_TEST(FixedStackTest, Iterator)
+{
+	FixedStack<TypeParam, 16> stack;
+
+	for (int i = 0; i < 16; i++) {
+		stack.push((TypeParam)i + 1);
+	}
+
+	size_t numValues = 0;
+	for (FixedStack<TypeParam, 16>::iterator it = stack.begin(); it != stack.end(); ++it){
+		numValues++;
+	}
+
+	ASSERT_EQ(16, numValues);
+
+	numValues = 0;
+	for (FixedStack<TypeParam, 16>::const_iterator it = stack.begin(); it != stack.end(); ++it) {
+		numValues++;
+	}
+
+	ASSERT_EQ(16, numValues);
+}
+
+
+
 TEST(FixedStackTest, CustomTypes)
 {
 	CustomType2::MOVE_COUNT = 0;
@@ -191,3 +217,18 @@ TEST(FixedStackTest, CustomTypes)
 	EXPECT_EQ(CustomType2::CONSRUCTION_COUNT + CustomType2::MOVE_COUNT, CustomType2::DECONSRUCTION_COUNT);
 }
 
+
+
+TEST(FixedStackTest, AlignMent)
+{
+	FixedStack<CustomType2, 16> stack;
+
+	for (int i = 0; i < 16; i++) {
+		stack.emplace(0x173263, "meow");
+	}
+
+	for (FixedStack<CustomType2, 16>::const_iterator it = stack.begin(); it != stack.end(); ++it) {
+		X_ASSERT_ALIGNMENT(&(*it), 32, 0);
+	}
+
+}
