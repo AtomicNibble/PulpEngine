@@ -32,7 +32,7 @@ public:
 	Array(MemoryArenaBase* arena, std::initializer_list<T> iList);
 	Array(const Array& oth);
 	Array(Array&& oth);
-	virtual ~Array(void);
+	~Array(void);
 
 	void setArena(MemoryArenaBase* arena);
 	void setArena(MemoryArenaBase* arena, size_type capacity);
@@ -116,8 +116,8 @@ public:
 	inline ConstReference back(void) const;
 
 	// ISerialize
-	virtual bool SSave(XFile* pFile) const X_FINAL;
-	virtual bool SLoad(XFile* pFile) X_FINAL;
+	bool SSave(XFile* pFile) const;
+	bool SLoad(XFile* pFile);
 	// ~ISerialize
 
 private:

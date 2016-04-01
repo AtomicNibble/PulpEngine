@@ -704,6 +704,7 @@ bool Array<T>::SLoad(XFile* pFile)
 	return pFile->readObj(list_, num_) == (num_ * sizeof(T));
 }
 
+
 // ~ISerialize
 
 // -----------------------------------------------
