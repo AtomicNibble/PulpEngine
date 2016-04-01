@@ -240,3 +240,74 @@ TEST(FixedArrayTest, AlignMentComplex)
 	}
 }
 
+TYPED_TEST(FixedArrayTest, front)
+{
+	FixedArray<TypeParam, 16> array;
+
+	array.append(static_cast<TypeParam>(5));
+	array.append(static_cast<TypeParam>(6));
+	EXPECT_EQ(5, array.front());
+
+	FixedArray<TypeParam, 16>::ConstReference constRef = array.front();
+
+	EXPECT_EQ(5, constRef);
+}
+
+TYPED_TEST(FixedArrayTest, back)
+{
+	FixedArray<TypeParam, 16> array;
+
+	array.append(static_cast<TypeParam>(5));
+	array.append(static_cast<TypeParam>(6));
+	EXPECT_EQ(6, array.back());
+
+	FixedArray<TypeParam, 16>::ConstReference constRef = array.back();
+	EXPECT_EQ(6, constRef);
+}
+
+X_PRAGMA(optimize("", off))
+
+TYPED_TEST(FixedArrayTest, front_fail)
+{
+	FixedArray<TypeParam, 16> array;
+	const FixedArray<TypeParam, 16> const_array;
+
+	core::debugging::EnableBreakpoints(false);
+		g_AssetChecker.ExpectAssertion(true);
+
+		// should throw assert.
+		array.front();
+		EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
+
+		g_AssetChecker.ExpectAssertion(true);
+
+		const_array.front();
+		EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
+
+		g_AssetChecker.ExpectAssertion(false);
+	core::debugging::EnableBreakpoints(true);
+}
+
+TYPED_TEST(FixedArrayTest, back_fail)
+{
+	FixedArray<TypeParam, 16> array;
+	const FixedArray<TypeParam, 16> const_array;
+
+	core::debugging::EnableBreakpoints(false);
+		g_AssetChecker.ExpectAssertion(true);
+
+		// should throw assert.
+		array.back();
+		EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
+
+		g_AssetChecker.ExpectAssertion(true);
+
+		const_array.back();
+		EXPECT_TRUE(g_AssetChecker.HadCorrectAssertions());
+
+
+		g_AssetChecker.ExpectAssertion(false);
+	core::debugging::EnableBreakpoints(true);
+}
+
+X_PRAGMA(optimize("", on))
