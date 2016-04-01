@@ -229,12 +229,12 @@ TEST(FixedArrayTest, AlignMentComplex)
 		array.emplace_back(i * 4, "HEllo");
 	}
 
-	for (FixedArray<CustomTypeComplex, 32>::iterator it = array.begin(); it != array.end(); ++it)
+	for (FixedArray<CustomTypeComplex, 64>::iterator it = array.begin(); it != array.end(); ++it)
 	{
 		X_ASSERT_ALIGNMENT(&(*it), X_ALIGN_OF(CustomTypeComplex), 0);
 	}
 
-	for (FixedArray<CustomTypeComplex, 32>::const_iterator it = array.begin(); it != array.end(); ++it)
+	for (FixedArray<CustomTypeComplex, 64>::const_iterator it = array.begin(); it != array.end(); ++it)
 	{
 		X_ASSERT_ALIGNMENT(&(*it), X_ALIGN_OF(CustomTypeComplex), 0);
 	}
