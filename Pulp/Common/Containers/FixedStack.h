@@ -5,6 +5,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
+X_DISABLE_WARNING(4324) // structure was padded due to alignment specifier
+
 
 template <typename T, size_t N>
 class FixedStack
@@ -59,6 +61,9 @@ private:
 	uint8_t	X_ALIGNED_SYMBOL(array_[N * sizeof(T)], X_ALIGN_OF(T));
 	T*	current_;					
 };
+
+X_ENABLE_WARNING(4324)
+
 
 #include "FixedStack.inl"
 
