@@ -69,8 +69,8 @@ private:
 	void IoRequestCallback(core::IFileSys& fileSys, core::IoRequestData& request,
 		core::XFileAsync* pFile, uint32_t bytesTransferred);
 
-	void ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* job, void* pData);
-	void ProcessData_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* job, void* pData);
+	void ProcessHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* job, void* pData);
+	void ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* job, void* pData);
 
 
 	static bool ReadHeader(ModelHeader& hdr, core::XFile* file);

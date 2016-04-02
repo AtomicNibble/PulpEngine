@@ -83,7 +83,7 @@ namespace RawModel
 
 		typedef core::Array<MeshWriteData> MeshWriteDataArr;
 
-		static void WriteMeshDataJob(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData);
+		static void WriteMeshDataJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData);
 
 	protected:
 		core::V2::JobSystem* pJobSys_;

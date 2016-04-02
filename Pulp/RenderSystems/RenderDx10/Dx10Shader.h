@@ -240,7 +240,7 @@ private:
 	void getShaderCompileDest(core::Path<char>& dest);
 	bool compileFromSource(core::string& source);
 
-	void CompileShader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+	void CompileShader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 	bool uploadtoHW(void);
 

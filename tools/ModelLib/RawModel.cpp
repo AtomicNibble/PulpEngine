@@ -725,9 +725,9 @@ namespace RawModel
 		return result;
 	}
 
-	void Model::WriteMeshDataJob(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData)
+	void Model::WriteMeshDataJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pJobData)
 	{
-		X_UNUSED(pJobSys);
+		X_UNUSED(jobSys);
 		X_UNUSED(threadIdx);
 		X_UNUSED(pJob);
 

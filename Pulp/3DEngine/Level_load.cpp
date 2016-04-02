@@ -60,9 +60,9 @@ void Level::IoRequestCallback(core::IFileSys& fileSys, core::IoRequestData& requ
 
 
 
-void Level::ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+void Level::ProcessHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
 {
-	X_UNUSED(pJobSys);
+	X_UNUSED(jobSys);
 	X_UNUSED(threadIdx);
 	X_UNUSED(pJob);
 
@@ -94,9 +94,9 @@ void Level::ProcessHeader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, co
 	}
 }
 
-void Level::ProcessData_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+void Level::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
 {
-	X_UNUSED(pJobSys);
+	X_UNUSED(jobSys);
 	X_UNUSED(threadIdx);
 	X_UNUSED(pJob);
 	X_UNUSED(pData);

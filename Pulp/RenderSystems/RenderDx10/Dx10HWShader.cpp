@@ -655,9 +655,9 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 	return true;
 }
 
-void XHWShader_Dx10::CompileShader_job(core::V2::JobSystem* pJobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+void XHWShader_Dx10::CompileShader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
 {
-	X_UNUSED(pJobSys);
+	X_UNUSED(jobSys);
 	X_UNUSED(threadIdx);
 	X_UNUSED(pJob);
 	X_UNUSED(pData);

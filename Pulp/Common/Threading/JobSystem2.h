@@ -45,7 +45,7 @@ class JobSystem;
 struct Job;
 
 
-typedef core::traits::Function<void(JobSystem*, size_t, Job*, void*)> JobFunction;
+typedef core::traits::Function<void(JobSystem&, size_t, Job*, void*)> JobFunction;
 
 struct Job
 {
@@ -130,7 +130,7 @@ private:
 
 
 template <typename JobData>
-static inline void parallel_for_job(JobSystem* pJobSys, size_t threadIdx, Job* job, void* jobData)
+static inline void parallel_for_job(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
 {
 	const JobData* data = static_cast<const JobData*>(jobData);
 	const JobData::SplitterType& splitter = data->splitter;
@@ -140,13 +140,13 @@ static inline void parallel_for_job(JobSystem* pJobSys, size_t threadIdx, Job* j
 		// split in two
 		const size_t leftCount = data->count / 2u;
 		const JobData leftData(data->data, leftCount, data->pFunction, splitter);
-		Job* left = pJobSys->CreateJobAsChild(job, &parallel_for_job<JobData>, leftData);
-		pJobSys->Run(left);
+		Job* left = jobSys.CreateJobAsChild(job, &parallel_for_job<JobData>, leftData);
+		jobSys.Run(left);
 
 		const size_t rightCount = data->count - leftCount;
 		const JobData rightData(data->data + leftCount, rightCount, data->pFunction, splitter);
-		Job* right = pJobSys->CreateJobAsChild(job, &parallel_for_job<JobData>, rightData);
-		pJobSys->Run(right);
+		Job* right = jobSys.CreateJobAsChild(job, &parallel_for_job<JobData>, rightData);
+		jobSys.Run(right);
 	}
 	else
 	{
@@ -178,7 +178,7 @@ struct parallel_for_job_data
 };
 
 template <typename JobData>
-static inline void parallel_for_member_job(JobSystem* pJobSys, size_t threadIdx, Job* job, void* jobData)
+static inline void parallel_for_member_job(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
 {
 	const JobData* data = static_cast<const JobData*>(jobData);
 	const JobData::SplitterType& splitter = data->splitter;
@@ -188,13 +188,13 @@ static inline void parallel_for_member_job(JobSystem* pJobSys, size_t threadIdx,
 		// split in two
 		const uint32_t leftCount = data->count / 2u;
 		const JobData leftData(data->delagte, data->data, leftCount, splitter);
-		Job* left = pJobSys->CreateJobAsChild(job, &parallel_for_member_job<JobData>, leftData);
-		pJobSys->Run(left);
+		Job* left = jobSys.CreateJobAsChild(job, &parallel_for_member_job<JobData>, leftData);
+		jobSys.Run(left);
 
 		const uint32_t rightCount = data->count - leftCount;
 		const JobData rightData(data->delagte, data->data + leftCount, rightCount, splitter);
-		Job* right = pJobSys->CreateJobAsChild(job, &parallel_for_member_job<JobData>, rightData);
-		pJobSys->Run(right);
+		Job* right = jobSys.CreateJobAsChild(job, &parallel_for_member_job<JobData>, rightData);
+		jobSys.Run(right);
 	}
 	else
 	{
@@ -229,10 +229,10 @@ struct parallel_for_member_job_data
 };
 
 template <typename JobData>
-static inline void member_function_job(JobSystem* pJobSys, size_t threadIdx, Job* job, void* jobData)
+static inline void member_function_job(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
 {
 	JobData* data = static_cast<JobData*>(jobData);
-	(*data->pInst.*data->pFunction)(pJobSys, threadIdx, job, data->pJobData);
+	(*data->pInst.*data->pFunction)(jobSys, threadIdx, job, data->pJobData);
 }
 
 
@@ -240,7 +240,7 @@ template<typename C>
 struct member_function_job_data
 {
 	typedef C ClassType;
-	typedef traits::MemberFunction<C, void(JobSystem*, size_t, Job*, void*)> MemberFunction;
+	typedef traits::MemberFunction<C, void(JobSystem&, size_t, Job*, void*)> MemberFunction;
 	typedef typename MemberFunction::Pointer MemberFunctionPtr;
 
 	member_function_job_data(ClassType* pInst, MemberFunctionPtr function, void* jobData) :

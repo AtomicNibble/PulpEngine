@@ -398,7 +398,7 @@ namespace V2
 
 	void JobSystem::Execute(Job* pJob, size_t threadIdx) 
 	{
-		(pJob->pFunction)(this, threadIdx, pJob, pJob->pArgData);
+		(pJob->pFunction)(*this, threadIdx, pJob, pJob->pArgData);
 		Finish(pJob);
 	}
 

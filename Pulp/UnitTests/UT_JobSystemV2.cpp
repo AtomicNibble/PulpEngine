@@ -17,7 +17,7 @@ namespace
 {
 	core::AtomicInt numJobsRan(0);
 
-	static void EmptyJob(JobSystem* pJobSys, size_t threadIdx, Job* job, void* pParam)
+	static void EmptyJob(JobSystem& jobSys, size_t threadIdx, Job* job, void* pParam)
 	{
 //		++numJobsRan;
 
@@ -87,7 +87,7 @@ namespace Data
 
 	}
 
-	static void parallel_for_job(JobSystem* pJobSys, size_t threadIdx, Job* pJob, void* pArg)
+	static void parallel_for_job(JobSystem& jobSys, size_t threadIdx, Job* pJob, void* pArg)
 	{
 		const parallel_for_job_data* data = static_cast<const parallel_for_job_data*>(pArg);
 
@@ -98,12 +98,12 @@ namespace Data
 			const unsigned int rightCount = data->count - leftCount;
 
 			const parallel_for_job_data leftData(data->data, leftCount, data->function);
-			Job* left = pJobSys->CreateJobAsChild(pJob, parallel_for_job, leftData);
-			pJobSys->Run(left);
+			Job* left = jobSys.CreateJobAsChild(pJob, parallel_for_job, leftData);
+			jobSys.Run(left);
 
 			const parallel_for_job_data rightData(data->data, leftCount, data->function);
-			Job* right = pJobSys->CreateJobAsChild(pJob, parallel_for_job, rightData);
-			pJobSys->Run(right);
+			Job* right = jobSys.CreateJobAsChild(pJob, parallel_for_job, rightData);
+			jobSys.Run(right);
 		}
 		else
 		{
@@ -149,7 +149,7 @@ namespace NoData
 
 	}
 
-	static void parallel_for_job(JobSystem* pJobSys, size_t threadIdx, Job* pJob, void* pArg)
+	static void parallel_for_job(JobSystem& jobSys, size_t threadIdx, Job* pJob, void* pArg)
 	{
 		uintptr_t count = union_cast<uintptr_t, void*>(pArg);
 
@@ -160,15 +160,15 @@ namespace NoData
 			const uintptr_t rightCount = count - leftCount;
 
 
-			Job* left = pJobSys->CreateJobAsChild(pJob, parallel_for_job,
+			Job* left = jobSys.CreateJobAsChild(pJob, parallel_for_job,
 				union_cast<void*, uintptr_t>(leftCount));
 
-			pJobSys->Run(left);
+			jobSys.Run(left);
 
-			Job* right = pJobSys->CreateJobAsChild(pJob, parallel_for_job,
+			Job* right = jobSys.CreateJobAsChild(pJob, parallel_for_job,
 				union_cast<void*, uintptr_t>(rightCount));
 
-			pJobSys->Run(right);
+			jobSys.Run(right);
 		}
 		else
 		{
@@ -241,9 +241,9 @@ namespace Member
 	class JobClass
 	{
 	public:
-		void job(JobSystem* pJobSys, size_t threadIdx, Job* pJob, void* pData)
+		void job(JobSystem& jobSys, size_t threadIdx, Job* pJob, void* pData)
 		{
-			X_UNUSED(pJobSys);
+			X_UNUSED(jobSys);
 			X_UNUSED(threadIdx);
 			X_UNUSED(pJob);
 
