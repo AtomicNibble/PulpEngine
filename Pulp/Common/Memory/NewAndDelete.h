@@ -105,7 +105,9 @@ namespace Mem
 	/// Constructs N instances in memory at the given address, and returns a pointer to the first instance.
 	template <typename T>
 	inline T* ConstructArray(void* where, size_t N);
-
+	/// Copy array into uninitaliazlied memory.
+	template <typename T>
+	inline T* CopyArrayUninitialized(void* where, const T* fromBegin, const T* fromEnd);
 
 	/// \brief Destructs an instance in memory.
 	/// \details The function delegates the actual destruction of the instance to the proper function based on the type of \a T.
