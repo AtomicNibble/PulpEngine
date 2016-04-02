@@ -21,15 +21,19 @@ FixedFifo<T, N>::~FixedFifo()
 template<typename T, size_t N>
 void FixedFifo<T, N>::push(const T& v)
 {
-	if (num_ == capacity())
+	X_ASSERT(size() < capacity(), "Cannot push another value into an already full FIFO.")(size(), capacity());
+
+	if (num_ == capacity()) {
 		Mem::Destruct<T>(write_);
+	}
 
 	Mem::Construct<T>(write_, v);
 
 	++write_;
 
-	if (write_ == end_)
+	if (write_ == end_) {
 		write_ = array_;
+	}
 
 	num_ = core::Min(++num_, capacity());
 }
@@ -37,12 +41,15 @@ void FixedFifo<T, N>::push(const T& v)
 template<typename T, size_t N>
 void FixedFifo<T, N>::pop(void)
 {
+	X_ASSERT(!isEmpty(), "Cannot pop value of an empty FIFO.")(size(), capacity());
+
 	Mem::Destruct<T>(read_);
 
 	++read_;
 
-	if (read_ == end_)
+	if (read_ == end_) {
 		read_ = array_;
+	}
 
 	--num_;
 }
@@ -50,12 +57,14 @@ void FixedFifo<T, N>::pop(void)
 template<typename T, size_t N>
 T& FixedFifo<T, N>::peek(void)
 {
+	X_ASSERT(!isEmpty(), "Cannot access the frontmost value of an empty FIFO.")(size(), capacity());
 	return *read_;
 }
 
 template<typename T, size_t N>
 const T& FixedFifo<T, N>::peek(void) const
 {
+	X_ASSERT(!isEmpty(), "Cannot access the frontmost value of an empty FIFO.")(size(), capacity());
 	return *read_;
 }
 
