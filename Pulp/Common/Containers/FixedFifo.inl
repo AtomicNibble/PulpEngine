@@ -23,9 +23,6 @@ void FixedFifo<T, N>::push(const T& v)
 {
 	X_ASSERT(size() < capacity(), "Cannot push another value into an already full FIFO.")(size(), capacity());
 
-	if (num_ == capacity()) {
-		Mem::Destruct<T>(write_);
-	}
 
 	Mem::Construct<T>(write_, v);
 
@@ -35,8 +32,42 @@ void FixedFifo<T, N>::push(const T& v)
 		write_ = array_;
 	}
 
-	num_ = core::Min(++num_, capacity());
+	++num_;
 }
+
+template<typename T, size_t N>
+void FixedFifo<T, N>::push(T&& v)
+{
+	X_ASSERT(size() < capacity(), "Cannot push another value into an already full FIFO.")(size(), capacity());
+
+	Mem::Construct<T>(write_, std::forward<T>(v));
+
+	++write_;
+
+	if (write_ == end_) {
+		write_ = array_;
+	}
+
+	++num_;
+}
+
+template<typename T, size_t N>
+template<class... ArgsT>
+void FixedFifo<T, N>::emplace(ArgsT&&... args)
+{
+	X_ASSERT(size() < capacity(), "Cannot push another value into an already full FIFO.")(size(), capacity());
+
+	Mem::Construct<T>(write_, std::forward<ArgsT>(args)...);
+
+	++write_;
+
+	if (write_ == end_) {
+		write_ = array_;
+	}
+
+	++num_;
+}
+
 
 template<typename T, size_t N>
 void FixedFifo<T, N>::pop(void)
@@ -94,13 +125,13 @@ typename FixedFifo<T, N>::size_type FixedFifo<T, N>::capacity(void) const
 }
 
 template<typename T, size_t N>
-bool FixedFifo<T, N>::IsEmpty(void) const
+bool FixedFifo<T, N>::isEmpty(void) const
 {
 	return num_ == 0;
 }
 
 template<typename T, size_t N>
-bool FixedFifo<T, N>::IsNotEmpty(void) const
+bool FixedFifo<T, N>::isNotEmpty(void) const
 {
 	return num_ > 0;
 }

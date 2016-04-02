@@ -77,6 +77,11 @@ public:
 
 	// push a item on to the internal ring buffer
 	X_INLINE void push(const T& v);
+	X_INLINE void push(T&& v);
+
+	template<class... ArgsT>
+	X_INLINE void emplace(ArgsT&&... args);
+
 	// pop a item from the buffer
 	X_INLINE void pop(void);
 
@@ -96,8 +101,8 @@ public:
 	X_INLINE size_type capacity(void) const;
 
 
-	X_INLINE bool IsEmpty(void) const;
-	X_INLINE bool IsNotEmpty(void) const;
+	X_INLINE bool isEmpty(void) const;
+	X_INLINE bool isNotEmpty(void) const;
 
 
 	// STL iterators.
