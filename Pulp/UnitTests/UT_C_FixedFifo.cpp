@@ -120,6 +120,8 @@ TYPED_TEST(FixedFifoTest, Iteration)
 		fifo.push(16);
 		fifo.push(32);
 		fifo.push(48);
+
+		fifo.pop();
 		fifo.push(128);
 
 		int numvalues = 0;
