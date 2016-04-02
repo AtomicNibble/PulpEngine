@@ -27,13 +27,10 @@ Fifo<T>::Fifo(MemoryArenaBase* arena, size_type size) :
 }
 
 template<typename T>
-Fifo<T>::Fifo(const Fifo& oth)
+Fifo<T>::Fifo(const Fifo& oth) : Fifo<T>(oth.arena_, oth.capacity())
 {
-	arena_ = oth.arena_;
-
-	reserve(oth.capacity());
-
-	::memcpy(start_, oth.start_, oth.capacity());
+	// support nonePod
+	Mem::CopyArrayUninitialized(start_, oth.start_, oth.start_ + oth.size());
 
 	// set read/write/num
 	read_ = start_ + (oth.read_ - oth.start_);
@@ -78,7 +75,7 @@ Fifo<T>& Fifo<T>::operator = (const Fifo<T>& oth)
 
 		reserve(oth.capacity());
 
-		::memcpy(start_, oth.start_, oth.capacity());
+		Mem::CopyArrayUninitialized(start_, oth.start_, oth.start_ + oth.size());
 
 		// set read/write/num
 		read_ = start_ + (oth.read_ - oth.start_);
@@ -125,8 +122,8 @@ void Fifo<T>::setArena(MemoryArenaBase* arena)
 template<typename T>
 void Fifo<T>::push(const T& v)
 {
-	if (num_ == capacity())
-		Mem::Destruct<T>(write_);
+	X_ASSERT(size() < capacity(), "Cannot push another value into an already full FIFO.")(size(), capacity());
+
 
 	Mem::Construct<T>(write_, v);
 
@@ -134,37 +131,82 @@ void Fifo<T>::push(const T& v)
 
 	num_ = core::Min(++num_, capacity());
 
-	if (write_ == end_)
+	if (write_ == end_) {
 		write_ = start_;
+	}
 }
+
+
+template<typename T>
+void Fifo<T>::push(T&& v)
+{
+	X_ASSERT(size() < capacity(), "Cannot push another value into an already full FIFO.")(size(), capacity());
+
+	Mem::Construct<T>(write_, std::forward<T>(v));
+
+	++write_;
+
+	num_ = core::Min(++num_, capacity());
+
+	if (write_ == end_) {
+		write_ = start_;
+	}
+}
+
+template<typename T>
+template<class... ArgsT>
+void Fifo<T>::emplace(ArgsT&&... args)
+{
+	X_ASSERT(size() < capacity(), "Cannot emplace another value into an already full FIFO.")(size(), capacity());
+
+	Mem::Construct<T>(write_, std::forward<ArgsT>(args)...);
+
+	++write_;
+
+	num_ = core::Min(++num_, capacity());
+
+	if (write_ == end_) {
+		write_ = start_;
+	}
+}
+
 
 template<typename T>
 void Fifo<T>::pop(void)
 {
+	X_ASSERT(!isEmpty(), "Cannot pop value of an empty FIFO.")(size(), capacity());
+
 	Mem::Destruct<T>(read_);
 
 	++read_;
 	--num_;
 
-	if (read_ == end_)
+	if (read_ == end_) {
 		read_ = start_;
+	}
 }
 
 template<typename T>
 T& Fifo<T>::peek(void)
 {
+	X_ASSERT(!isEmpty(), "Cannot access the frontmost value of an empty FIFO.")(size(), capacity());
 	return *read_;
 }
 
 template<typename T>
 const T& Fifo<T>::peek(void) const
 {
+	X_ASSERT(!isEmpty(), "Cannot access the frontmost value of an empty FIFO.")(size(), capacity());
 	return *read_;
 }
 
 template<typename T>
 void Fifo<T>::reserve(size_type num)
 {
+	X_ASSERT(start_ == nullptr, "Cannot reserve additional memory. free() the FIFO first.")(
+		size(), capacity(), start_, end_, num);
+
+
 	start_ = Allocate(num);
 	end_ = start_ + num;
 	read_ = start_;

@@ -86,6 +86,11 @@ public:
 
 	// push a item on to the internal ring buffer
 	X_INLINE void push(const T& v);
+	X_INLINE void push(T&& v);
+
+	template<class... ArgsT>
+	X_INLINE void emplace(ArgsT&&... args);
+
 	// pop a item from the buffer
 	X_INLINE void pop(void);
 
