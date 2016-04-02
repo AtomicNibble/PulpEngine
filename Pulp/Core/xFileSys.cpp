@@ -1239,6 +1239,8 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 	gEnv->pJobSys->CreateQueForCurrentThread();
 
+	xFileSys& fileSys = *this;
+
 	while (thread.ShouldRun())
 	{
 		if (pendingOps.isEmpty())
@@ -1286,7 +1288,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 						pReqFile = asyncReq.writeInfo.pFile;
 					}
 
-					asyncReq.callback.Invoke(this, asyncOp.request,
+					asyncReq.callback.Invoke(fileSys, asyncOp.request,
 						pReqFile, bytesTransferd);
 
 					pendingOps.removeIndex(i);
@@ -1305,7 +1307,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			IoRequestOpen& open = request.openInfo;
 			XFileAsync* pFile =	openFileAsync(open.name.c_str(), open.mode);
 
-			request.callback.Invoke(this, request, pFile, 0);
+			request.callback.Invoke(fileSys, request, pFile, 0);
 		}
 		else if (request.getType() == IoRequest::OPEN_READ_ALL)
 		{

@@ -183,10 +183,10 @@ AKRESULT IOhook::Open(AkFileID fileID, AkOpenMode eOpenMode,
 
 // IAkIOHookDeferred
 
-void IOhook::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequestData& request,
+void IOhook::IoRequestCallback(core::IFileSys& fileSys, core::IoRequestData& request,
 	core::XFileAsync* pFile, uint32_t bytesTransferred)
 {
-	X_UNUSED(pFileSys);
+	X_UNUSED(fileSys);
 	X_UNUSED(pFile);
 
 	AkAsyncIOTransferInfo* transferInfo = reinterpret_cast<AkAsyncIOTransferInfo*>(request.readInfo.pUserData);

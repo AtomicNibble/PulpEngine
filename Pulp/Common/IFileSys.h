@@ -506,7 +506,7 @@ private:
 	IoRequest::Enum type;
 
 public:
-	core::Delegate<void(core::IFileSys*, IoRequestData&,
+	core::Delegate<void(core::IFileSys&, IoRequestData&,
 		core::XFileAsync*, uint32_t)> callback;
 
 	union

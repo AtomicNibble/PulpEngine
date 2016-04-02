@@ -63,7 +63,7 @@ public:
 
 	// ~IAkIOHookDeferred
 private:
-	void IOhook::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequestData& request,
+	void IOhook::IoRequestCallback(core::IFileSys& pFileSys, core::IoRequestData& request,
 		core::XFileAsync* pFile, uint32_t bytesTransferred);
 
 private:

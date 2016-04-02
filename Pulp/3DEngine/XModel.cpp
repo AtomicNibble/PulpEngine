@@ -265,7 +265,7 @@ void XModel::AssignDefault(void)
 // load it and set the data pointers.
 //
 
-void XModel::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequestData& request,
+void XModel::IoRequestCallback(core::IFileSys& fileSys, core::IoRequestData& request,
 	core::XFileAsync* pFile, uint32_t bytesTransferred)
 {
 	core::IoRequest::Enum requestType = request.getType();
@@ -287,7 +287,7 @@ void XModel::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequestData& re
 		read.offset = 0;
 		read.pBuf = &hdr_;
 
-		pFileSys->AddIoRequestToQue(req);
+		fileSys.AddIoRequestToQue(req);
 
 	}
 	else if (requestType == core::IoRequest::READ)

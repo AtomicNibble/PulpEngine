@@ -15,7 +15,7 @@
 X_NAMESPACE_BEGIN(level)
 
 
-void Level::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequestData& request,
+void Level::IoRequestCallback(core::IFileSys& fileSys, core::IoRequestData& request,
 	core::XFileAsync* pFile, uint32_t bytesTransferred)
 {
 	core::IoRequest::Enum requestType = request.getType();
@@ -37,7 +37,7 @@ void Level::IoRequestCallback(core::IFileSys* pFileSys, core::IoRequestData& req
 		read.offset = 0;
 		read.pBuf = &fileHdr_;
 
-		pFileSys->AddIoRequestToQue(req);
+		fileSys.AddIoRequestToQue(req);
 	}
 	else if (requestType == core::IoRequest::READ)
 	{
