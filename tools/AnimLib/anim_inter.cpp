@@ -6,32 +6,6 @@
 
 X_NAMESPACE_BEGIN(anim)
 
-namespace
-{
-	// advert your eyes!
-	size_t getFileSize(FILE* pFile)
-	{
-		X_ASSERT_NOT_NULL(pFile);
-		int32_t pos, len;
-
-		pos = ftell(pFile);
-		if (pos == -1) {
-			return 0;
-		}
-
-		fseek(pFile, 0, SEEK_END);
-
-		len = ftell(pFile);
-		if (len == -1) {
-			return 0;
-		}
-		fseek(pFile, pos, SEEK_SET);
-
-		return len;
-	}
-
-
-} // namespace
 
 Bone::Bone(core::MemoryArenaBase* arena) :
 	data(arena)
@@ -64,49 +38,44 @@ bool InterAnim::LoadFile(core::Path<char>& file)
 
 bool InterAnim::LoadFile(core::Path<wchar_t>& filePath)
 {
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pFileSys);
+
 	// swap a woggle watch it toggle!
 	if (filePath.isEmpty()) {
+		X_ERROR("InterAnim", "invalid path");
 		return false;
 	}
 
 	filePath.setExtension(anim::ANIM_INTER_FILE_EXTENSION_W);
 
-	// Lets assume we don't have a vaild engine file system ;(
-	// What do we want to use instead?
-	// I kinda need to use the file system tho, since this lib needs to be goat platform.
-	// wait lol I can just use the c io shit.
-	FILE* f = nullptr;
+	core::fileModeFlags mode;
+	mode.Set(core::fileMode::READ);
 
-	errno_t err = _wfopen_s(&f, filePath.c_str(), L"r");
-	if (!f)
-	{
+	core::XFileScoped file;
+	if (file.openFile(filePath.c_str(), mode)) {
 		X_ERROR("InterAnim", "failed to open file(%i): %ls", filePath.c_str());
 		return false;
 	}
 
-	size_t fileSize = getFileSize(f);
+	const size_t fileSize = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 	if (fileSize < 1) {
-		::fclose(f);
-		X_ERROR("InterAnim", "failed to get file size");
+		X_ERROR("InterAnim", "file size invalid");
 		return false;
 	}
 
 	core::Array<char> fileData(arena_);
 	fileData.resize(fileSize);
 
-	size_t bytesRead = fread(fileData.ptr(), 1, fileSize, f);
+	const size_t bytesRead = file.read(fileData.ptr(), fileSize);
 	if (bytesRead != fileSize) {
-		::fclose(f);
 		X_ERROR("InterAnim", "failed to read file data. got: %" PRIuS " requested: %" PRIuS, bytesRead, fileSize);
 		return false;
 	}
 
 	core::XLexer lex(fileData.begin(), fileData.end());
 
-	bool result = ParseData(lex);
-
-	::fclose(f);
-	return result;
+	return ParseData(lex);
 }
 
 
