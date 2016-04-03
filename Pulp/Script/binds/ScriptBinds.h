@@ -7,13 +7,18 @@
 #include <Containers\FixedArray.h>
 #include <String\StackString.h>
 
+#include <Util\SmartPointer.h>
+#include <Util\ScopedPointer.h>
+
 X_NAMESPACE_BEGIN(script)
 
 
-struct IScriptableBase;
+class XScriptableBase;
 
 class XScriptBinds
 {
+	typedef core::FixedArray<core::ScopedPointer<XScriptableBase>, ScriptMoudles::ENUM_COUNT> ScriptModels;
+
 public:
 	XScriptBinds();
 	~XScriptBinds();
@@ -22,7 +27,7 @@ public:
 	void Shutdown(void);
 
 private:
-	typedef core::FixedArray<IScriptableBase*, ScriptMoudles::ENUM_COUNT> ScriptModels;
+
 	ScriptModels modules_;
 };
 

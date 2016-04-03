@@ -16,17 +16,28 @@ X_NAMESPACE_BEGIN(script)
 	RegisterFunction(#func, Delegate); }
 
 
-XBinds_Core::XBinds_Core(IScriptSys* pScriptSystem, ICore* pCore)
+XBinds_Core::XBinds_Core()
 {
-	pCore_ = pCore;
+
+}
+
+XBinds_Core::~XBinds_Core()
+{
+
+}
+
+
+void XBinds_Core::Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
+{
+	XScriptableBase::Init(pSS, pCore, paramIdOffset);
+
+	X_ASSERT_NOT_NULL(pCore->GetIConsole());
+	X_ASSERT_NOT_NULL(pCore->GetITimer());
+
 	pConsole_ = pCore->GetIConsole();
 	pTimer_ = pCore->GetITimer();
 
-	X_ASSERT_NOT_NULL(pCore_);
-	X_ASSERT_NOT_NULL(pConsole_);
-	X_ASSERT_NOT_NULL(pTimer_);
-
-	XScriptableBase::Init(pScriptSystem, pCore);
+	XScriptableBase::Init(pSS, pCore);
 	SetGlobalName("Core");
 
 	X_CORE_REG_FUNC(GetDvarInt);
@@ -48,15 +59,7 @@ XBinds_Core::XBinds_Core(IScriptSys* pScriptSystem, ICore* pCore)
 	X_CORE_REG_FUNC(GetCurrAsyncTime);
 	X_CORE_REG_FUNC(GetFrameTime);
 	X_CORE_REG_FUNC(GetTimeScale);
-
-
 }
-
-XBinds_Core::~XBinds_Core()
-{
-
-}
-
 
 
 int XBinds_Core::GetDvarInt(IFunctionHandler* pH)

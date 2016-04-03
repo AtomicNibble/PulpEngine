@@ -12,30 +12,26 @@ struct ISound;
 
 X_NAMESPACE_BEGIN(script)
 
-class XBinds_Sound : public XScriptableBase, public IScriptableBase
+class XBinds_Sound : public XScriptableBase
 {
 public:
-	XBinds_Sound(IScriptSys* pScriptSystem, ICore* pCore);
+	XBinds_Sound();
 	~XBinds_Sound() X_OVERRIDE;
 
+	void Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
 
-	sound::ISound* GetSoundPtr(IFunctionHandler* pH, int index);
+	int32_t PostEvent(IFunctionHandler* pH);
+	int32_t SetSwitch(IFunctionHandler* pH);
+	int32_t SetStages(IFunctionHandler* pH);
+	int32_t SetParam(IFunctionHandler* pH);
 
-	int Precache(IFunctionHandler* pH);
-	int Play(IFunctionHandler* pH);
-	int PlayEx(IFunctionHandler* pH);
-
-	int IsPlaying(IFunctionHandler* pH);
-	int SetSoundVolume(IFunctionHandler* pH);
-	int GetSoundVolume(IFunctionHandler* pH);
-	int SetSoundLoop(IFunctionHandler* pH);
-	int SetSoundPaused(IFunctionHandler* pH);
-
-	int StopSound(IFunctionHandler* pH);
-	int SetSoundPosition(IFunctionHandler* pH);
+	int32_t SetMasterVol(IFunctionHandler* pH);
+	int32_t SetMusicVol(IFunctionHandler* pH);
+	int32_t SetVoiceVol(IFunctionHandler* pH);
+	int32_t SetSFXVol(IFunctionHandler* pH);
 
 private:
-	ICore* pCore_;
+	sound::ISound* pSoundSys_;
 };
 
 X_NAMESPACE_END

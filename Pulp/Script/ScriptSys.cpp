@@ -261,8 +261,10 @@ void XScriptSys::InitCommands()
 
 void XScriptSys::ShutDown()
 {
-	if (!initialised_)
+	if (!initialised_) {
 		return;
+	}
+
 	X_LOG0("ScriptSys", "Shutting Down");
 
 	gEnv->pHotReload->addfileType(nullptr, X_SCRIPT_FILE_EXTENSION);

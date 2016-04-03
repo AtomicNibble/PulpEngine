@@ -13,22 +13,9 @@ X_NAMESPACE_BEGIN(script)
 
 
 
-XBinds_Script::XBinds_Script(IScriptSys* pScriptSystem, ICore* pCore)
+XBinds_Script::XBinds_Script()
 {
-	pScriptSystem_ = pScriptSystem;
-	pCore_ = pCore;
 
-	X_ASSERT_NOT_NULL(pScriptSystem_);
-	X_ASSERT_NOT_NULL(pCore_);
-
-	XScriptableBase::Init(pScriptSystem, pCore);
-	SetGlobalName("Script");
-
-	X_SCRIPT_REG_FUNC(Load);
-	X_SCRIPT_REG_FUNC(ReLoad);
-	X_SCRIPT_REG_FUNC(UnLoad);
-
-	X_SCRIPT_REG_FUNC(ListLoaded);
 
 }
 
@@ -37,6 +24,19 @@ XBinds_Script::~XBinds_Script()
 
 }
 
+
+void XBinds_Script::Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
+{
+	XScriptableBase::Init(pSS, pCore, paramIdOffset);
+
+	SetGlobalName("Script");
+
+	X_SCRIPT_REG_FUNC(Load);
+	X_SCRIPT_REG_FUNC(ReLoad);
+	X_SCRIPT_REG_FUNC(UnLoad);
+
+	X_SCRIPT_REG_FUNC(ListLoaded);
+}
 
 int XBinds_Script::Load(IFunctionHandler* pH)
 {
@@ -47,8 +47,9 @@ int XBinds_Script::Load(IFunctionHandler* pH)
 	const char* fileName = nullptr;
 	if (pH->GetParam(1, fileName))
 	{
-		if(pScriptSystem_->ExecuteFile(fileName, raiseError, reload))
+		if (pScriptSystem_->ExecuteFile(fileName, raiseError, reload)) {
 			return pH->EndFunction(1);
+		}
 	}
 	return pH->EndFunction();
 }
@@ -60,8 +61,9 @@ int XBinds_Script::ReLoad(IFunctionHandler* pH)
 	const char* fileName = nullptr;
 	if (pH->GetParam(1, fileName))
 	{
-		if (pScriptSystem_->ReloadScript(fileName, true))
+		if (pScriptSystem_->ReloadScript(fileName, true)) {
 			return pH->EndFunction(1);
+		}
 	}
 	return pH->EndFunction();
 }
@@ -73,8 +75,9 @@ int XBinds_Script::UnLoad(IFunctionHandler* pH)
 	const char* fileName = nullptr;
 	if (pH->GetParam(1, fileName))
 	{
-		if(pScriptSystem_->UnLoadScript(fileName))
+		if (pScriptSystem_->UnLoadScript(fileName)) {
 			return pH->EndFunction(1);
+		}
 	}
 
 	return pH->EndFunction();

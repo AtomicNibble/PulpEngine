@@ -379,6 +379,7 @@
     <ClInclude Include="TableDump.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="binds\ScriptableBase.cpp" />
     <ClCompile Include="binds\ScriptBinds.cpp" />
     <ClCompile Include="binds\ScriptBinds_core.cpp" />
     <ClCompile Include="binds\ScriptBinds_io.cpp" />

@@ -259,5 +259,8 @@
     <ClCompile Include="lua\Vector.c">
       <Filter>Lua\src</Filter>
     </ClCompile>
+    <ClCompile Include="binds\ScriptableBase.cpp">
+      <Filter>Binds</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

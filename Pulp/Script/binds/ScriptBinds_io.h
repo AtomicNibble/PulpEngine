@@ -13,13 +13,14 @@ struct XFile;
 X_NAMESPACE_BEGIN(script)
 
 class XBinds_Io;
-class XBinds_Io_File : public XScriptableBase, public IScriptableBase
+class XBinds_Io_File : public XScriptableBase
 {
-public:
 	friend class XBinds_Io;
-
-	XBinds_Io_File(IScriptSys* pScriptSystem, ICore* pCore);
+public:
+	XBinds_Io_File();
 	~XBinds_Io_File() X_OVERRIDE;
+
+	void Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
 
 	int write(IFunctionHandler* pH);
 	int read(IFunctionHandler* pH);
@@ -40,12 +41,13 @@ protected:
 };
 
 
-class XBinds_Io : public XScriptableBase, public IScriptableBase
+class XBinds_Io : public XScriptableBase
 {
 public:
-	XBinds_Io(IScriptSys* pScriptSystem, ICore* pCore);
+	XBinds_Io();
 	~XBinds_Io() X_OVERRIDE;
 
+	void Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
 
 	int openFile(IFunctionHandler* pH);
 	int closeFile(IFunctionHandler* pH);
@@ -53,7 +55,6 @@ public:
 	SmartScriptTable WrapFileReturn(core::XFile* pFile);
 
 private:
-	ICore* pCore_;
 	core::IFileSys* pFileSys_;
 
 	XBinds_Io_File file_;

@@ -22,29 +22,21 @@ XScriptBinds::~XScriptBinds()
 
 void XScriptBinds::Init(IScriptSys* pScriptSystem, ICore* pCore)
 {
-	modules_.append(X_NEW(XBinds_Core, g_ScriptArena, "CoreBinds")(pScriptSystem, pCore));
-	modules_.append(X_NEW(XBinds_Script, g_ScriptArena, "ScriptBinds")(pScriptSystem, pCore));
-	modules_.append(X_NEW(XBinds_Sound, g_ScriptArena, "SoundBinds")(pScriptSystem, pCore));
-	modules_.append(X_NEW(XBinds_Io, g_ScriptArena, "IoBinds")(pScriptSystem, pCore));
+	modules_.emplace_back(X_NEW(XBinds_Core, g_ScriptArena, "CoreBinds")(), g_ScriptArena);
+	modules_.emplace_back(X_NEW(XBinds_Script, g_ScriptArena, "ScriptBinds")(), g_ScriptArena);
+	modules_.emplace_back(X_NEW(XBinds_Sound, g_ScriptArena, "SoundBinds")(), g_ScriptArena);
+	modules_.emplace_back(X_NEW(XBinds_Io, g_ScriptArena, "IoBinds")(), g_ScriptArena);
+
+	for (auto& m : modules_) {
+		m->Init(pScriptSystem, pCore, 0);
+	}
 
 }
 
 
 void XScriptBinds::Shutdown(void)
 {
-	ScriptModels::iterator it = modules_.begin();
-
-	for (; it != modules_.end();)
-	{
-		IScriptableBase* pBase = *it;
-
-		++it;
-
-		if (pBase)
-		{
-			X_DELETE(pBase,g_ScriptArena);
-		}
-	}
+	modules_.clear();
 
 }
 

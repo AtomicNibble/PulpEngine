@@ -16,30 +16,8 @@ using namespace sound;
 }
 
 
-XBinds_Sound::XBinds_Sound(IScriptSys* pScriptSystem, ICore* pCore)
+XBinds_Sound::XBinds_Sound()
 {
-	pCore_ = pCore;
-
-	X_ASSERT_NOT_NULL(pCore_);
-
-	XScriptableBase::Init(pScriptSystem, pCore);
-	SetGlobalName("Sound");
-
-
-	X_SOUND_REG_FUNC(Precache);
-	X_SOUND_REG_FUNC(Play);
-	X_SOUND_REG_FUNC(PlayEx);
-
-
-	X_SOUND_REG_FUNC(IsPlaying);
-	X_SOUND_REG_FUNC(SetSoundVolume);
-	X_SOUND_REG_FUNC(GetSoundVolume);
-	X_SOUND_REG_FUNC(SetSoundLoop);
-	X_SOUND_REG_FUNC(SetSoundPaused);
-
-	X_SOUND_REG_FUNC(StopSound);
-	X_SOUND_REG_FUNC(SetSoundPosition);
-
 }
 
 XBinds_Sound::~XBinds_Sound()
@@ -47,53 +25,104 @@ XBinds_Sound::~XBinds_Sound()
 
 }
 
-ISound* XBinds_Sound::GetSoundPtr(IFunctionHandler* pH, int index)
+void XBinds_Sound::Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
 {
-	X_UNUSED(pH);
-	X_UNUSED(index);
-	X_ASSERT_NOT_IMPLEMENTED();
-/*
-	ScriptValueType::Enum type = pH->GetParamType(index);
+	XScriptableBase::Init(pSS, pCore, paramIdOffset);
+	
+	X_ASSERT_NOT_NULL(pCore->GetISound());
 
-	if (type == svtPointer) // this is a script handle
-	{
-		ScriptHandle soundID;
-		if (!pH->GetParam(index, soundID))
-			return 0;
+	pSoundSys_ = pCore->GetISound();
 
-		return m_pSoundSystem->GetSound((tSoundID)soundID.n);
-	}
-	else if (vType != svtNull)
-	{
-		SmartScriptTable tbl;
-		if (!pH->GetParam(index, tbl))
-			return 0;
+	XScriptableBase::Init(pSS, pCore);
+	SetGlobalName("Sound");
 
-		void * ptr = ((CScriptTable*)tbl.GetPtr())->GetUserDataValue();
-		if (!ptr)
-			return 0;
 
-		return *static_cast<ISound**>(ptr);
-	}
-	*/
+	X_SOUND_REG_FUNC(PostEvent);
+	X_SOUND_REG_FUNC(SetSwitch);
+	X_SOUND_REG_FUNC(SetStages);
+	X_SOUND_REG_FUNC(SetParam);
 
-	return nullptr;
+	X_SOUND_REG_FUNC(SetMasterVol);
+	X_SOUND_REG_FUNC(SetMusicVol);
+	X_SOUND_REG_FUNC(SetVoiceVol);
+	X_SOUND_REG_FUNC(SetSFXVol);
 }
 
+int32_t XBinds_Sound::PostEvent(IFunctionHandler* pH)
+{
+	return pH->EndFunction();
+}
 
-int XBinds_Sound::Precache(IFunctionHandler* pH)
+int32_t XBinds_Sound::SetSwitch(IFunctionHandler* pH)
+{
+	return pH->EndFunction();
+}
+
+int32_t XBinds_Sound::SetStages(IFunctionHandler* pH)
+{
+	return pH->EndFunction();
+}
+
+int32_t XBinds_Sound::SetParam(IFunctionHandler* pH)
+{
+	return pH->EndFunction();
+}
+
+int32_t XBinds_Sound::SetMasterVol(IFunctionHandler* pH)
 {
 	SCRIPT_CHECK_PARAMETERS(1);
-	// <sound_name>
+	float vol;
 
+	if (pH->GetParam(0, vol)) {
+		pSoundSys_->SetMasterVolume(vol);
+	}
 
 	return pH->EndFunction();
 }
 
+int32_t XBinds_Sound::SetMusicVol(IFunctionHandler* pH)
+{
+	SCRIPT_CHECK_PARAMETERS(1);
+	float vol;
+
+	if (pH->GetParam(0, vol)) {
+		pSoundSys_->SetMusicVolume(vol);
+	}
+
+	return pH->EndFunction();
+}
+
+int32_t XBinds_Sound::SetVoiceVol(IFunctionHandler* pH)
+{
+	SCRIPT_CHECK_PARAMETERS(1);
+	float vol;
+
+	if (pH->GetParam(0, vol)) {
+		pSoundSys_->SetVoiceVolume(vol);
+	}
+
+	return pH->EndFunction();
+}
+
+int32_t XBinds_Sound::SetSFXVol(IFunctionHandler* pH)
+{
+	SCRIPT_CHECK_PARAMETERS(1);
+	float vol;
+
+	if (pH->GetParam(0, vol)) {
+		pSoundSys_->SetSFXVolume(vol);
+	}
+
+	return pH->EndFunction();
+}
+
+
+/*
+
 int XBinds_Sound::Play(IFunctionHandler* pH)
 {
 	SCRIPT_CHECK_PARAMETERS(1);
-	// <sound_name>
+	// <sound_event>
 
 
 	return pH->EndFunction();
@@ -102,69 +131,12 @@ int XBinds_Sound::Play(IFunctionHandler* pH)
 int XBinds_Sound::PlayEx(IFunctionHandler* pH)
 {
 	SCRIPT_CHECK_PARAMETERS(1);
+	// <sound_event>
 
 	return pH->EndFunction();
 }
+*/
 
-int XBinds_Sound::IsPlaying(IFunctionHandler* pH)
-{
-	SCRIPT_CHECK_PARAMETERS(1);
-	// <sound_id>
-
-	return pH->EndFunction();
-}
-
-int XBinds_Sound::SetSoundVolume(IFunctionHandler* pH)
-{
-	SCRIPT_CHECK_PARAMETERS(2);
-	// <sound_id> <vol>
-
-
-	return pH->EndFunction();
-}
-
-int XBinds_Sound::GetSoundVolume(IFunctionHandler* pH)
-{
-	SCRIPT_CHECK_PARAMETERS(1);
-	// <sound_id>
-
-
-	return pH->EndFunction();
-}
-
-int XBinds_Sound::SetSoundLoop(IFunctionHandler* pH)
-{
-	SCRIPT_CHECK_PARAMETERS(1);
-	// <sound_id> <loop>
-
-
-	return pH->EndFunction();
-}
-
-int XBinds_Sound::SetSoundPaused(IFunctionHandler* pH)
-{
-	SCRIPT_CHECK_PARAMETERS(2);
-	// <sound_id> <paused>
-
-	return pH->EndFunction();
-}
-
-int XBinds_Sound::StopSound(IFunctionHandler* pH)
-{
-	SCRIPT_CHECK_PARAMETERS(1);
-	// <sound_id> 
-
-
-	return pH->EndFunction();
-}
-
-int XBinds_Sound::SetSoundPosition(IFunctionHandler* pH)
-{
-	SCRIPT_CHECK_PARAMETERS(2);
-	// <sound_id> <pos>
-
-	return pH->EndFunction();
-}
 
 
 X_NAMESPACE_END

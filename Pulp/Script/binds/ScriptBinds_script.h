@@ -7,11 +7,13 @@
 
 X_NAMESPACE_BEGIN(script)
 
-class XBinds_Script : public XScriptableBase, public IScriptableBase
+class XBinds_Script : public XScriptableBase
 {
 public:
-	XBinds_Script(IScriptSys* pScriptSystem, ICore* pCore);
+	XBinds_Script();
 	~XBinds_Script() X_OVERRIDE;
+
+	void Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
 
 	int Load(IFunctionHandler* pH);
 	int ReLoad(IFunctionHandler* pH);
@@ -21,7 +23,6 @@ public:
 
 private:
 	IScriptSys* pScriptSystem_;
-	ICore* pCore_;
 };
 
 X_NAMESPACE_END

@@ -25,13 +25,23 @@ X_NAMESPACE_BEGIN(script)
 	RegisterFunction(#func, Delegate); \
 }
 
-XBinds_Io_File::XBinds_Io_File(IScriptSys* pScriptSystem, ICore* pCore)
+XBinds_Io_File::XBinds_Io_File()
 {
-	XScriptableBase::Init(pScriptSystem, pCore);
+
+}
+
+XBinds_Io_File::~XBinds_Io_File()
+{
+
+}
+
+void XBinds_Io_File::Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
+{
+	XScriptableBase::Init(pSS, pCore, paramIdOffset);
+
+	X_ASSERT_NOT_NULL(pCore->GetIFileSys());
 
 	pFileSys_ = pCore->GetIFileSys();
-
-	X_ASSERT_NOT_NULL(pFileSys_);
 
 	X_IO_FILE_REG_FUNC(write);
 	X_IO_FILE_REG_FUNC(read);
@@ -50,12 +60,6 @@ XBinds_Io_File::XBinds_Io_File(IScriptSys* pScriptSystem, ICore* pCore)
 #endif
 }
 
-XBinds_Io_File::~XBinds_Io_File()
-{
-
-}
-
-
 core::XFile* XBinds_Io_File::getFile(IFunctionHandler* pH, int index, bool nullPointer)
 {
 	X_ASSERT_NOT_NULL(pH);
@@ -66,21 +70,24 @@ core::XFile* XBinds_Io_File::getFile(IFunctionHandler* pH, int index, bool nullP
 	if (type == ScriptValueType::POINTER) // this is a script handle
 	{
 		ScriptHandle fileHandle;
-		if (!pH->GetParam(index, fileHandle))
+		if (!pH->GetParam(index, fileHandle)) {
 			return nullptr;
+		}
 
 		return static_cast<core::XFile*>(fileHandle.ptr);
 	}
 	else if (pH->GetParam(1, tbl))
 	{
-		void* ptr = ((XScriptTable*)tbl.GetPtr())->GetUserDataValue();
-		if (!ptr)
+		void* ptr = (static_cast<XScriptTable*>(tbl.GetPtr()))->GetUserDataValue();
+		if (!ptr) {
 			return nullptr;
+		}
 
 		core::XFile* pFile = *static_cast<core::XFile**>(ptr);
 
-		if (nullPointer)
+		if (nullPointer) {
 			*static_cast<core::XFile**>(ptr) = nullptr;
+		}
 
 		return pFile;
 	}
@@ -271,8 +278,9 @@ int XBinds_Io_File::close(IFunctionHandler* pH)
 
 	if ((pFile = getFile(pH,1,true)) != nullptr)
 	{
-		if (pFile)
+		if (pFile) {
 			pFileSys_->closeFile(pFile);
+		}
 	}
 
 	return pH->EndFunction();
@@ -330,8 +338,9 @@ int XBinds_Io_File::garbageCollect(IFunctionHandler* pH, void* pBuffer, int size
 	{
 		core::XFile* pfile = *static_cast<core::XFile**>(pBuffer);
 
-		if (gEnv && gEnv->pFileSys)
+		if (gEnv && gEnv->pFileSys) {
 			gEnv->pFileSys->closeFile(pfile);
+		}
 		else
 		{
 
@@ -345,31 +354,36 @@ int XBinds_Io_File::garbageCollect(IFunctionHandler* pH, void* pBuffer, int size
 
 // --------------------------------------------------
 
-XBinds_Io::XBinds_Io(IScriptSys* pScriptSystem, ICore* pCore) :
-	file_(pScriptSystem, pCore)
+XBinds_Io::XBinds_Io()
 {
-	pCore_ = pCore;
-	pFileSys_ = pCore->GetIFileSys();
-
-	X_ASSERT_NOT_NULL(pCore_);
-	X_ASSERT_NOT_NULL(pFileSys_);
-
-
-	XScriptableBase::Init(pScriptSystem, pCore);
-	SetGlobalName("io");
-
-//	Delegate(&file_);
-
-	X_IO_REG_FUNC(openFile);
-	X_IO_REG_FUNC(closeFile);
-
-
 
 }
 
 XBinds_Io::~XBinds_Io()
 {
 
+}
+
+void XBinds_Io::Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
+{
+	XScriptableBase::Init(pSS, pCore, paramIdOffset);
+
+	X_ASSERT_NOT_NULL(pCore_);
+	X_ASSERT_NOT_NULL(pCore->GetIFileSys());
+
+	pCore_ = pCore;
+	pFileSys_ = pCore->GetIFileSys();
+
+
+	XScriptableBase::Init(pSS, pCore);
+	SetGlobalName("io");
+
+
+	X_IO_REG_FUNC(openFile);
+	X_IO_REG_FUNC(closeFile);
+
+
+	file_.Init(pSS, pCore, paramIdOffset);
 }
 
 
@@ -460,8 +474,7 @@ int XBinds_Io::openFile(IFunctionHandler* pH)
 
 	XFile* pFile = pFileSys_->openFile(path.c_str(), flags);
 
-	if (pFile)
-	{
+	if (pFile) {
 		return pH->EndFunction(WrapFileReturn(pFile));
 	}
 
@@ -489,7 +502,7 @@ SmartScriptTable XBinds_Io::WrapFileReturn(core::XFile* pFile)
 #endif
 
 
-	((XScriptTable*)userData.GetPtr())->Delegate(file_.GetMethodsTable());
+	(static_cast<XScriptTable*>(userData.GetPtr()))->Delegate(file_.GetMethodsTable());
 
 	return userData;
 }

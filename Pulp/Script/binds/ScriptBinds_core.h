@@ -16,11 +16,13 @@ struct ITimer;
 
 X_NAMESPACE_BEGIN(script)
 
-class XBinds_Core : public XScriptableBase, public IScriptableBase
+class XBinds_Core : public XScriptableBase
 {
 public:
-	XBinds_Core(IScriptSys* pScriptSystem, ICore* pCore);
+	XBinds_Core();
 	~XBinds_Core() X_OVERRIDE;
+
+	void Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
 
 	int GetDvarInt(IFunctionHandler* pH);
 	int GetDvarFloat(IFunctionHandler* pH);
@@ -43,7 +45,6 @@ public:
 	int GetTimeScale(IFunctionHandler *pH);
 
 private:
-	ICore* pCore_;
 	core::IConsole* pConsole_;
 	core::ITimer* pTimer_;
 };
