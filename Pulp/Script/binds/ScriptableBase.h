@@ -41,7 +41,7 @@ public:
 	typedef IScriptTable::ScriptFunction ScriptFunction;
 
 	X_INLINE XScriptableBase();
-	X_INLINE ~XScriptableBase();
+	X_INLINE virtual ~XScriptableBase();
 
 	X_INLINE void Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0);
 	X_INLINE void SetGlobalName(const char* GlobalName);
