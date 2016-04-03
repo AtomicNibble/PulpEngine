@@ -440,6 +440,7 @@
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_2013|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -449,6 +450,7 @@
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_8.5|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -458,6 +460,7 @@
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_2015|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -467,6 +470,7 @@
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_2016|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -476,6 +480,7 @@
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2015|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -485,6 +490,7 @@
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2013|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -494,6 +500,7 @@
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2016|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -503,6 +510,7 @@
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2012|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -512,6 +520,7 @@
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_8.5|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -521,6 +530,7 @@
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_2012|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -530,6 +540,7 @@
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_2013|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -539,6 +550,7 @@
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_8.5|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -548,6 +560,7 @@
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_2015|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -557,6 +570,7 @@
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release_2016|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -566,6 +580,7 @@
     <Import Project="..\..\solutions\_engine_release.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2015|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -575,6 +590,7 @@
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2013|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -584,6 +600,7 @@
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2016|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -593,6 +610,7 @@
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_2012|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -602,6 +620,7 @@
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super_8.5|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -611,6 +630,7 @@
     <Import Project="..\..\solutions\_engine_super.props" />
     <Import Project="..\..\solutions\_engine_link_modellib.props" />
     <Import Project="..\..\solutions\_engine_inc_3rdparty.props" />
+    <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug_2012|Win32'">
