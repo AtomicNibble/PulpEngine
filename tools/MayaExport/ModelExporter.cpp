@@ -804,10 +804,14 @@ MStatus ModelExporter::loadLODs(void)
 					CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getColorSetNames(colorSetNames));
 					MColor defaultCol(1.f,1.f,1.f,1.f);
 
+#if MAYA_API_VERSION == 850
+					CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getColors(colorsArray, nullptr));
+#else
 					CHECK_MSTATUS_AND_RETURN_IT(fnmesh.getColors(colorsArray, nullptr, &defaultCol));
+#endif // !MAYA_SDK
 				}
 			}
-
+			
 			MayaUtil::MayaPrintVerbose("u: %i v: %i", u.length(), v.length());
 			MayaUtil::MayaPrintVerbose("VertexArray: %i", vertexArray.length());
 			MayaUtil::MayaPrintVerbose("NormalsArray: %i", normalsArray.length());
