@@ -57,8 +57,8 @@ bool ModelSkeleton::LoadSkelton(core::Path<wchar_t>& filePath)
 	filePath.setExtension(model::MODEL_FILE_EXTENSION_W);
 
 	core::fileModeFlags mode;
-	mode.Set(core::fileMode::RECREATE);
-	mode.Set(core::fileMode::WRITE);
+	mode.Set(core::fileMode::READ);
+	mode.Set(core::fileMode::RANDOM_ACCESS);
 
 
 	core::XFileScoped file;
