@@ -56,25 +56,27 @@ bool ModelSkeleton::LoadSkelton(core::Path<wchar_t>& filePath)
 
 	filePath.setExtension(model::MODEL_FILE_EXTENSION_W);
 
-	FILE* f = nullptr;
+	core::fileModeFlags mode;
+	mode.Set(core::fileMode::RECREATE);
+	mode.Set(core::fileMode::WRITE);
 
-	errno_t err = _wfopen_s(&f, filePath.c_str(), L"rb");
-	if (!f) {
+
+	core::XFileScoped file;
+	if (!file.openFile(filePath.c_str(), mode)) {
+		X_ERROR("Model", "Failed to open model for skelton load");
 		return false;
 	}
-
 
 	ModelHeader hdr;
 
 	// read header;
-	if (fread(&hdr, 1, sizeof(hdr), f) != sizeof(hdr)) {
+	if(file.readObj(hdr) != sizeof(hdr)) {
 		X_ERROR("Model", "failed to read model header");
 		return false;
 	}
 
 	if (!hdr.isValid()) {
 		X_ERROR("Model", "model header is invalid");
-		::fclose(f);
 		return false;
 	}
 
@@ -101,8 +103,11 @@ bool ModelSkeleton::LoadSkelton(core::Path<wchar_t>& filePath)
 
 		char TagNameBuf[model::MODEL_MAX_BONE_NAME_LENGTH * model::MODEL_MAX_BONES];
 
-		::fseek(f, tagNameOffset, SEEK_SET);
-		::fread(TagNameBuf, 1, hdr.tagNameDataSize, f);
+		file.seek(tagNameOffset, core::SeekMode::SET);
+		if (!file.read(TagNameBuf, hdr.tagNameDataSize) != hdr.tagNameDataSize) {
+			X_ERROR("Model", "failed to read tag buf");
+			return false;
+		}
 
 		core::MemCursor<char> tag_name_cursor(TagNameBuf, hdr.tagNameDataSize);
 		core::StackString<MODEL_MAX_BONE_NAME_LENGTH> name;
@@ -113,24 +118,35 @@ bool ModelSkeleton::LoadSkelton(core::Path<wchar_t>& filePath)
 				name.append(tag_name_cursor.getSeek<char>(), 1);
 			}
 
-			if (!tag_name_cursor.isEof())
+			if (!tag_name_cursor.isEof()) {
 				++tag_name_cursor;
+			}
 
 			tagNames_.append(name);
 
 			name.clear();
 		}
 
-		::fseek(f, tagDataOffset, SEEK_SET);
-		::fread(nameIdx_.ptr(), sizeof(TagNameIdx::Type), nameIdx_.size(), f);
-		::fread(tree_.ptr(), sizeof(TagTree::Type), tree_.size(), f);
-		::fread(angles_.ptr(), sizeof(TagAngles::Type), angles_.size(), f);
-		::fread(positions_.ptr(), sizeof(TagPos::Type), positions_.size(), f);
+		file.seek(tagDataOffset, core::SeekMode::SET);
 
-
+		if (!file.readObjs(nameIdx_.ptr(), nameIdx_.size())) {
+			X_ERROR("Model", "failed to read name indexes");
+			return false;
+		}
+		if (!file.readObjs(tree_.ptr(), tree_.size())) {
+			X_ERROR("Model", "failed to read tree");
+			return false;
+		}
+		if (!file.readObjs(angles_.ptr(), angles_.size())) {
+			X_ERROR("Model", "failed to read angles");
+			return false;
+		}
+		if (!file.readObjs(positions_.ptr(), positions_.size())) {
+			X_ERROR("Model", "failed to read pos data");
+			return false;
+		}
 	}
 
-	::fclose(f);
 	return true;
 }
 
