@@ -379,8 +379,8 @@ bool AnimCompiler::save(core::Path<wchar_t>& path)
 	mode.Set(core::fileMode::RECREATE);
 	mode.Set(core::fileMode::WRITE);
 
-	core::XFile* pFile = gEnv->pFileSys->openFile(path.c_str(), mode);
-	if (!pFile) {
+	core::XFileScoped file;
+	if (!file.openFile(path.c_str(), mode)) {
 		X_ERROR("Anim", "Failed to open output file for compiled animation: \"%s\"",
 			path.c_str());
 		return false;
@@ -400,22 +400,21 @@ bool AnimCompiler::save(core::Path<wchar_t>& path)
 	hdr.numFrames = safe_static_cast<uint16_t, uint32_t>(inter_.getNumFrames());
 	hdr.fps = safe_static_cast<uint16_t, uint32_t>(inter_.getFps());
 
-	pFile->writeObj(hdr);
+	file.writeObj(hdr);
 
 	// write the bone names.
 	for (const auto& bone : bones_)
 	{
-		pFile->writeString(bone.name);
+		file.writeString(bone.name);
 	}
 
 	// now we save the data.
 	for (const auto& bone : bones_)
 	{
-		bone.ang.save(pFile);
-		bone.pos.save(pFile);
+		bone.ang.save(file.GetFile());
+		bone.pos.save(file.GetFile());
 	}
 
-	gEnv->pFileSys->closeFile(pFile);
 	return true;
 }
 
