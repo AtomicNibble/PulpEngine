@@ -285,9 +285,9 @@ void XScriptSys::ShutDown()
 
 	XScriptTable::s_allTables_.clear();
 
-	if (L != NULL) {
+	if (L != nullptr) {
 		lua_close(L);
-		L = NULL;
+		L = nullptr;
 	}
 
 
@@ -458,7 +458,7 @@ HSCRIPTFUNCTION XScriptSys::GetFunctionPtr(const char* sFuncName)
 	if (lua_isnil(L, -1) || (!lua_isfunction(L, -1)))
 	{
 		lua_pop(L, 1);
-		return NULL;
+		return nullptr;
 	}
 	func = (HSCRIPTFUNCTION)(INT_PTR)lua_ref(L, 1);
 
@@ -919,12 +919,12 @@ bool XScriptSys::GetRecursiveAny(IScriptTable* pTable, const core::StackString<2
 	if (!pTable->GetValueAny(key1.c_str(), localAny))
 		return false;
 
-	if (localAny.getType() == ScriptValueType::FUNCTION && NULL == sep)
+	if (localAny.getType() == ScriptValueType::FUNCTION && nullptr == sep)
 	{
 		any = localAny;
 		return true;
 	}
-	else if (localAny.getType() == ScriptValueType::TABLE && NULL != sep)
+	else if (localAny.getType() == ScriptValueType::TABLE && nullptr != sep)
 	{
 		return GetRecursiveAny(localAny.pTable, key2, any);
 	}
