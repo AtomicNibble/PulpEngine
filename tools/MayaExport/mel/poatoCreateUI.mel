@@ -42,6 +42,43 @@ global proc potato_SelectAllMeshInScene()
 }
 
 
+global proc int assetDB_add(string $type, string $name)
+{
+	string $command = "PotatoAssetDB -action add -type " + $type + " -name \"" + $name + "\"";
+	string $errorMsg;
+	$error = catch ( $errorMsg = eval( $command ) );
+
+	if($error == "0" && $errorMsg == "1") {
+		return 0;
+	}
+	return -1;
+}
+
+global proc int assetDB_rename(string $type, string $old_name, string $newName)
+{
+	string $command = "PotatoAssetDB -action rename -type " + $type + " -old_name \"" + $old_name + "\" -new_name" +$newName + "\"";
+	string $errorMsg;
+	$error = catch ( $errorMsg = eval( $command ) );
+
+	if($error == "0" && $errorMsg == "1") {
+		return 0;
+	}
+	return -1;
+}
+
+global proc int assetDB_remove(string $type, string $name)
+{
+	string $command = "PotatoAssetDB -action remove -type " + $type + " -name \"" + $name + "\"";
+	string $errorMsg;
+	$error = catch ( $errorMsg = eval( $command ) );
+
+	if($error == "0" && $errorMsg == "1") {
+		return 0;
+	}
+	return -1;
+}
+
+
 global proc savePathGlobal(string $pathId, string $value)
 {
 	saveSettingGlobal($pathId, $value);
