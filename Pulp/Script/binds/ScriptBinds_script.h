@@ -22,7 +22,6 @@ public:
 	int ListLoaded(IFunctionHandler* pH);
 
 private:
-	IScriptSys* pScriptSystem_;
 };
 
 X_NAMESPACE_END
