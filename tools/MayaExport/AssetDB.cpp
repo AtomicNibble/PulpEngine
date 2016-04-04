@@ -129,6 +129,8 @@ AssetDB::~AssetDB()
 void AssetDB::Init(void)
 {
 	gAssetDb = X_NEW(AssetDB, g_arena, "AssetDB");
+	// don't matter if we connect or not still launch.
+	gAssetDb->Connect();
 }
 
 void AssetDB::ShutDown(void)
@@ -161,6 +163,11 @@ bool AssetDB::Connect(void)
 
 MStatus AssetDB::AddAsset(AssetType::Enum type, const MString & name)
 {
+	if (!pipe_.isOpen() && !Connect()) {
+		MayaUtil::MayaPrintError("Failed to AddAsset pipe is invlaid");
+		return MS::kFailure;
+	}
+
 	{
 		// YEeeeeEEeeeEEee foooking WUT!
 		ProtoBuf::AssetDB::AddAsset* pAdd = new ProtoBuf::AssetDB::AddAsset();
@@ -187,6 +194,11 @@ MStatus AssetDB::AddAsset(AssetType::Enum type, const MString & name)
 
 MStatus AssetDB::RemoveAsset(AssetType::Enum type, const MString & name)
 {
+	if (!pipe_.isOpen() && !Connect()) {
+		MayaUtil::MayaPrintError("Failed to RemoveAsset pipe is invlaid");
+		return MS::kFailure;
+	}
+
 	{
 		ProtoBuf::AssetDB::DeleteAsset* pDel = new ProtoBuf::AssetDB::DeleteAsset();
 		pDel->set_type(AssetTypeToProtoType(type));
@@ -211,6 +223,11 @@ MStatus AssetDB::RemoveAsset(AssetType::Enum type, const MString & name)
 
 MStatus AssetDB::RenameAsset(AssetType::Enum type, const MString & name, const MString & oldName)
 {
+	if (!pipe_.isOpen() && !Connect()) {
+		MayaUtil::MayaPrintError("Failed to RenameAsset pipe is invlaid");
+		return MS::kFailure;
+	}
+
 	{
 		ProtoBuf::AssetDB::RenameAsset* pRename = new ProtoBuf::AssetDB::RenameAsset();
 		pRename->set_type(AssetTypeToProtoType(type));
