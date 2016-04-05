@@ -44,6 +44,10 @@ global proc potato_SelectAllMeshInScene()
 
 global proc int assetDB_add(string $type, string $name)
 {
+	if(getExportMode() == "RawModel") { // don't ask db in raw mode.
+		return 0;
+	}
+
 	string $command = "PotatoAssetDB -action add -type " + $type + " -name \"" + $name + "\"";
 	string $errorMsg;
 	$error = catch ( $errorMsg = eval( $command ) );
@@ -51,23 +55,36 @@ global proc int assetDB_add(string $type, string $name)
 	if($error == "0" && $errorMsg == "1") {
 		return 0;
 	}
+	confirmDialog -title "Ralied to add" -message ("Can't add asset \"" + $name + "\" unless asset server is running.")
+		-button "Ok" -defaultButton "Ok";
 	return -1;
 }
 
 global proc int assetDB_rename(string $type, string $old_name, string $newName)
 {
-	string $command = "PotatoAssetDB -action rename -type " + $type + " -old_name \"" + $old_name + "\" -new_name" +$newName + "\"";
+	if(getExportMode() == "RawModel") { // don't ask db in raw mode.
+		return 0;
+	}
+
+	string $command = "PotatoAssetDB -action rename -type " + $type + " -old_name \"" + $old_name + "\" -new_name \"" +$newName + "\" ";
 	string $errorMsg;
 	$error = catch ( $errorMsg = eval( $command ) );
 
 	if($error == "0" && $errorMsg == "1") {
 		return 0;
 	}
+
+	confirmDialog -title "Ralied to rename" -message ("Can't rename \"" + $old_name + "\" unless asset server is running.")
+		-button "Ok" -defaultButton "Ok";
 	return -1;
 }
 
 global proc int assetDB_remove(string $type, string $name)
 {
+	if(getExportMode() == "RawModel") { // don't ask db in raw mode.
+		return 0;
+	}
+
 	string $command = "PotatoAssetDB -action remove -type " + $type + " -name \"" + $name + "\"";
 	string $errorMsg;
 	$error = catch ( $errorMsg = eval( $command ) );
@@ -75,6 +92,8 @@ global proc int assetDB_remove(string $type, string $name)
 	if($error == "0" && $errorMsg == "1") {
 		return 0;
 	}
+	confirmDialog -title "Ralied to delete" -message ("Can't delete asset \"" + $name + "\" unless asset server is running.")
+		-button "Ok" -defaultButton "Ok";
 	return -1;
 }
 
@@ -167,6 +186,14 @@ global proc float modelGetLODDistance(int $lod_number, int $index) {
 global proc ModelEntryNameChanged(int $index)
 {
 	string $name = `textFieldGrp -q -fi ("modelName" + $index)`;
+	string $nameOld = `getAttr ("PotatoGNode.ModelName" + $index)`;
+
+	if(assetDB_rename("model", $name, $nameOld) != 0) {
+		// reset the name
+ 		textFieldGrp -e -fi $nameOld ("modelName" + $index);
+		return;
+	}
+
 	frameLayout -e -l $name ("exportFrame" + $index);
 
 	// node needs updating
@@ -631,6 +658,10 @@ global proc potato_AddModel()
 			print_Error("Name must be at least 3 chars long.");
 		} else {
 
+			if(assetDB_add("model", $name) != 0) {
+				return;
+			}
+
 			unlockPotatoNode();
 
 			int $numModels = `getAttr PotatoGNode.numModels`;
@@ -649,6 +680,10 @@ global proc potato_AddModel()
 
 global proc potato_removeModel(string $name)
 {
+	if(assetDB_remove("model", $name) != 0) {
+		return;
+	}
+
 	// we must remove from gui and settings o.o
 	// first get the index.
 	int $numModels = `getAttr PotatoGNode.numModels`;
@@ -859,6 +894,14 @@ global proc string animGetName(int $index) {
 global proc AnimEntryNameChanged(int $index)
 {
 	string $name = `textFieldGrp -q -fi ("animName" + $index)`;
+	string $nameOld = `getAttr ("PotatoGNode.AnimName" + $index)`;
+
+	if(assetDB_rename("anim", $name, $nameOld) != 0) {
+		// reset the name
+ 		textFieldGrp -e -fi $nameOld ("animName" + $index);
+		return;
+	}
+
 	frameLayout -e -l $name ("exportAnimFrame" + $index);
 
 	// node needs updating
@@ -873,7 +916,7 @@ global proc AnimEntryExport(int $index)
 	int $numFrames =  $end -  $start;
 
 	if($numFrames < 1) {
-		print_Error("Can't export anim " + animGetName($index) + " has zero frames");
+		print_Error("Can't export anim \"" + animGetName($index) + "\" has zero frames");
 		return;
 	}
 
@@ -1004,6 +1047,10 @@ global proc potato_AddAnim()
 		if(int(`size $name`) < 3){
 			print_Error("Name must be at least 3 chars long.");
 		} else {
+
+			if(assetDB_add("anim", $name) != 0) {
+				return;
+			}
 
 			unlockPotatoNode();
 
