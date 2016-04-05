@@ -308,7 +308,9 @@ private:
 	Logger					logger_;
 
 	ConsoleBuffer			CmdHistory_;
-	ConsoleBuffer			ConsoleLog_;
+	// some sort of lock free ring buffer might work better for this log.
+	ConsoleBuffer			ConsoleLog_; 
+	core::Spinlock			logLock_;
 
 	ConsoleVarMap			VarMap_;
 	ConsoleCmdMap			CmdMap_;
