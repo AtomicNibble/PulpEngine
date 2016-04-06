@@ -399,15 +399,23 @@ namespace V2
 	void JobSystem::Execute(Job* pJob, size_t threadIdx) 
 	{
 		(pJob->pFunction)(*this, threadIdx, pJob, pJob->pArgData);
-		Finish(pJob);
+		Finish(pJob, threadIdx);
 	}
 
-	void JobSystem::Finish(Job* pJob) const
+	void JobSystem::Finish(Job* pJob, size_t threadIdx) const
 	{
 		const int32_t unfinishedJobs = --pJob->unfinishedJobs;
 		if (unfinishedJobs == 0 && pJob->pParent)
 		{
-			Finish(pJob->pParent);
+			Finish(pJob->pParent, threadIdx);
+		}
+
+		ThreadQue* queue = GetWorkerThreadQueue(threadIdx);
+
+		const int32_t continuationCount = pJob->continuationCount;
+		for (int32_t i = 0; i < continuationCount; i++)
+		{
+			queue->Push(pJob->continuations[i]);
 		}
 	}
 

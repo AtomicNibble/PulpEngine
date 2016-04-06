@@ -49,10 +49,11 @@ typedef core::traits::Function<void(JobSystem&, size_t, Job*, void*)> JobFunctio
 
 struct Job
 {
-	static const size_t PAD_SIZE = (64 - ((sizeof(void*) * 3) + (sizeof(core::AtomicInt) + sizeof(int32_t))));
+	static const size_t MAX_CONTINUATIONS = 7;
+	static const size_t PAD_SIZE = (128 - ((sizeof(void*) * 3) + (sizeof(core::AtomicInt) * 2) + (sizeof(Job*) * MAX_CONTINUATIONS)));
 public:
 	core::AtomicInt unfinishedJobs;
-	int32_t pad_;
+	core::AtomicInt continuationCount;
 	JobFunction::Pointer pFunction;
 	Job* pParent;
 	void* pArgData;
@@ -61,9 +62,11 @@ public:
 	{
 		char pad[PAD_SIZE];
 	};
+
+	Job* continuations[MAX_CONTINUATIONS];
 };
 
-X_ENSURE_SIZE(Job, 64);
+X_ENSURE_SIZE(Job, 128);
 
 X_DISABLE_WARNING(4324)
 X_ALIGNED_SYMBOL(class ThreadQue, 64)
@@ -128,6 +131,12 @@ private:
 	size_t size_;
 };
 
+X_INLINE void AddContinuation(Job* ancestor, Job* continuation)
+{
+	const int32_t count = ++ancestor->continuationCount;
+	X_ASSERT(count < Job::MAX_CONTINUATIONS, "Can't add conitnation, list is full")(Job::MAX_CONTINUATIONS, count);
+	ancestor->continuations[count - 1] = continuation;
+}
 
 template <typename JobData>
 static inline void parallel_for_job(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
@@ -326,7 +335,7 @@ private:
 	Job* GetJob(void);
 	Job* GetJob(ThreadQue& queue);
 	void Execute(Job* pJob, size_t theadIdx);
-	void Finish(Job* pJob) const;
+	void Finish(Job* pJob, size_t threadIdx) const;
 
 	size_t GetThreadIndex(void) const;
 
