@@ -50,7 +50,13 @@ typedef core::traits::Function<void(JobSystem&, size_t, Job*, void*)> JobFunctio
 struct Job
 {
 	static const size_t MAX_CONTINUATIONS = 7;
-	static const size_t PAD_SIZE = (128 - ((sizeof(void*) * 3) + (sizeof(core::AtomicInt) * 2) + (sizeof(Job*) * MAX_CONTINUATIONS)));
+	static const size_t PAD_SIZE = (128 - 
+		(sizeof(JobFunction::Pointer) 
+		+ sizeof(Job*)
+		+ sizeof(void*)
+		+ (sizeof(core::AtomicInt) * 2)
+		+ (sizeof(Job*) * MAX_CONTINUATIONS) 
+		+ sizeof(uint32_t)));
 public:
 	core::AtomicInt unfinishedJobs;
 	core::AtomicInt continuationCount;
@@ -63,6 +69,7 @@ public:
 		char pad[PAD_SIZE];
 	};
 
+	uint32_t runFlags;
 	Job* continuations[MAX_CONTINUATIONS];
 };
 
@@ -131,11 +138,15 @@ private:
 	size_t size_;
 };
 
-X_INLINE void AddContinuation(Job* ancestor, Job* continuation)
+X_INLINE void AddContinuation(Job* ancestor, Job* continuation, bool runInline = false)
 {
 	const int32_t count = ++ancestor->continuationCount;
 	X_ASSERT(count < Job::MAX_CONTINUATIONS, "Can't add conitnation, list is full")(Job::MAX_CONTINUATIONS, count);
 	ancestor->continuations[count - 1] = continuation;
+
+	if (runInline) {
+		ancestor->runFlags = core::bitUtil::SetBit(ancestor->runFlags, count - 1);
+	}
 }
 
 template <typename JobData>
