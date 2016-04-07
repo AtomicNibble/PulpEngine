@@ -346,7 +346,7 @@ private:
 	Job* GetJob(void);
 	Job* GetJob(ThreadQue& queue);
 	void Execute(Job* pJob, size_t theadIdx);
-	void Finish(Job* pJob, size_t threadIdx) const;
+	void Finish(Job* pJob, size_t threadIdx);
 
 	size_t GetThreadIndex(void) const;
 

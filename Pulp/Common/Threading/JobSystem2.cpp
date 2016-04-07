@@ -416,7 +416,7 @@ namespace V2
 		Finish(pJob, threadIdx);
 	}
 
-	void JobSystem::Finish(Job* pJob, size_t threadIdx) const
+	void JobSystem::Finish(Job* pJob, size_t threadIdx)
 	{
 		const int32_t unfinishedJobs = --pJob->unfinishedJobs;
 		if (unfinishedJobs == 0 && pJob->pParent)
@@ -427,9 +427,17 @@ namespace V2
 		ThreadQue* queue = GetWorkerThreadQueue(threadIdx);
 
 		const int32_t continuationCount = pJob->continuationCount;
+		const int32_t flags = pJob->runFlags;
+
 		for (int32_t i = 0; i < continuationCount; i++)
 		{
-			queue->Push(pJob->continuations[i]);
+			// run inline?
+			if (core::bitUtil::IsBitSet(flags, i)) {
+				Execute(pJob->continuations[i], threadIdx);
+			}
+			else {
+				queue->Push(pJob->continuations[i]);
+			}
 		}
 	}
 
