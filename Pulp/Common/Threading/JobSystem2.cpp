@@ -267,6 +267,13 @@ namespace V2
 		job->pFunction = function;
 		job->pParent = nullptr;
 		job->unfinishedJobs = 1;
+		job->continuationCount = 0;
+		job->runFlags = 0;
+
+#if X_DEBUG
+		core::zero_object(job->continuations);
+#endif // X_DEBUG
+
 		return job;
 	}
 
@@ -278,6 +285,13 @@ namespace V2
 		job->pFunction = function;
 		job->pParent = pParent;
 		job->unfinishedJobs = 1;
+		job->continuationCount = 0;
+		job->runFlags = 0;
+
+#if X_DEBUG
+		core::zero_object(job->continuations);
+#endif // X_DEBUG
+
 		return job;
 	}
 
