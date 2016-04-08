@@ -140,12 +140,12 @@ private:
 
 X_INLINE void AddContinuation(Job* ancestor, Job* continuation, bool runInline = false)
 {
-	const int32_t count = ++ancestor->continuationCount;
+	const int32_t count = (++ancestor->continuationCount - 1);
 	X_ASSERT(count < Job::MAX_CONTINUATIONS, "Can't add conitnation, list is full")(Job::MAX_CONTINUATIONS, count);
-	ancestor->continuations[count - 1] = continuation;
+	ancestor->continuations[count] = continuation;
 
 	if (runInline) {
-		ancestor->runFlags = core::bitUtil::SetBit(ancestor->runFlags, count - 1);
+		ancestor->runFlags = core::bitUtil::SetBit(ancestor->runFlags, count);
 	}
 }
 
