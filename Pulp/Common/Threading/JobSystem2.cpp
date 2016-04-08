@@ -419,20 +419,26 @@ namespace V2
 	void JobSystem::Finish(Job* pJob, size_t threadIdx)
 	{
 		const int32_t unfinishedJobs = --pJob->unfinishedJobs;
-		if (unfinishedJobs == 0 && pJob->pParent)
+		if (unfinishedJobs == 0 
+			// if we are child of a job, dec parents counter.
+			// when all child jobs are done the parent becomes complete.
+			&& pJob->pParent) 
 		{
 			Finish(pJob->pParent, threadIdx);
 		}
 
-		ThreadQue* queue = GetWorkerThreadQueue(threadIdx);
-
 		const int32_t continuationCount = pJob->continuationCount;
+		if (continuationCount == 0) {
+			return;
+		}
+
+		ThreadQue* queue = GetWorkerThreadQueue(threadIdx);
 		const int32_t flags = pJob->runFlags;
 
 		for (int32_t i = 0; i < continuationCount; i++)
 		{
 			// run inline?
-			if (core::bitUtil::IsBitSet(flags, i)) {
+			if (flags != 0 && core::bitUtil::IsBitSet(flags, i)) {
 				Execute(pJob->continuations[i], threadIdx);
 			}
 			else {
