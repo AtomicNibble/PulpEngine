@@ -67,7 +67,7 @@ TrayIcon::~TrayIcon()
 	UnRegisterClass();
 }
 
-bool TrayIcon::Create(HWND hParent, LPCTSTR toolTip, uint32_t iconId, uint32_t menuID, bool bHidden)
+bool TrayIcon::CreateIcon(HWND hParent, LPCTSTR toolTip, uint32_t iconId, uint32_t menuID, bool bHidden)
 {
 	HICON icon = ::LoadIcon(hInstance_, MAKEINTRESOURCE(iconId));
 	if (!icon) {
