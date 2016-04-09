@@ -42,6 +42,8 @@ X_ENABLE_WARNING(4702)
 
 #include "Profiler.h"
 #include "MayaUtil.h"
+#include "AssetDB.h"
+
 
 X_LINK_LIB(X_STRINGIZE(MAYA_SDK) "\\Foundation")
 X_LINK_LIB(X_STRINGIZE(MAYA_SDK) "\\OpenMaya")
@@ -261,6 +263,12 @@ MStatus ModelExporter::convert(const MArgList& args)
 					MayaUtil::MayaPrintError("Failed to compile model");
 					return MS::kFailure;
 				}
+
+				maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::MODEL, 
+					MString(getName()),
+					MString(outPath.c_str()),
+					args
+				);
 			}
 		}
 		else {
@@ -364,6 +372,7 @@ void ModelExporter::setFileName(const MString& path)
 	core::StackString<512, char> temp(path.asChar());
 	temp.trim();
 
+	name_ = temp.c_str();
 	fileName_.set(temp.c_str());
 	fileName_.setExtension(model::MODEL_FILE_EXTENSION);
 }
@@ -381,6 +390,11 @@ void ModelExporter::setOutdir(const MString& path)
 core::Path<char> ModelExporter::getFilePath(void) const
 {
 	return outDir_ / fileName_;
+}
+
+core::string ModelExporter::getName(void) const
+{
+	return name_;
 }
 
 MStatus ModelExporter::parseArgs(const MArgList& args)

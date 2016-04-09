@@ -67,6 +67,7 @@ private:
 	void setOutdir(const MString& path);
 
 	core::Path<char> getFilePath(void) const;
+	core::string getName(void) const;
 
 	MStatus parseArgs(const MArgList& args);
 	MStatus loadLODs(void);
@@ -90,6 +91,7 @@ private:
 private:
 	typedef core::FixedArray<LODExportInfo, model::MODEL_MAX_LODS> LodInfoArr;
 
+	core::string name_;
 	core::Path<char> fileName_;
 	core::Path<char> outDir_;
 	ExpoMode::Enum exportMode_;
