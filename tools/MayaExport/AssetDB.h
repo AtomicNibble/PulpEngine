@@ -2,6 +2,7 @@
 
 #include <maya\MPxCommand.h>
 
+
 #include <Platform\Pipe.h>
 
 X_NAMESPACE_DECLARE(ProtoBuf,
@@ -31,7 +32,7 @@ public:
 	MStatus AddAsset(AssetType::Enum type, const MString& name);
 	MStatus RemoveAsset(AssetType::Enum type, const MString& name);
 	MStatus RenameAsset(AssetType::Enum type, const MString& name, const MString& oldName);
-	MStatus UpdateAsset(AssetType::Enum type, const MString& name, const MString& path, const MArgList& args);
+	MStatus UpdateAsset(AssetType::Enum type, const MString& name, const MString& path, const MString& args);
 
 private:
 	bool sendRequest(ProtoBuf::AssetDB::Request& request);
