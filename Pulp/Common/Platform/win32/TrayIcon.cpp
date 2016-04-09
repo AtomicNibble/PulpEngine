@@ -206,7 +206,7 @@ LRESULT TrayIcon::OnTaskbarCreated(WPARAM wParam, LPARAM lParam)
 
 LRESULT TrayIcon::OnTrayNotification(WPARAM uID, LPARAM lEvent)
 {
-	if (uID != tnd_.uID) {
+	if (tnd_.uID == 0 || uID != tnd_.uID) {
 		return 0L;
 	}
 
