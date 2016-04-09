@@ -96,7 +96,7 @@ bool TrayIcon::Create(HWND hParent, LPCTSTR toolTip, uint32_t iconId, uint32_t m
 	tnd_.uID = menuID;
 	tnd_.hIcon = icon;
 	tnd_.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
-	tnd_.uCallbackMessage = WM_APP + 0x1337;
+	tnd_.uCallbackMessage = ::RegisterWindowMessage(L"WM_TRAYICON");
 
 	wcsncpy_s(tnd_.szTip, toolTip, 128);
 
