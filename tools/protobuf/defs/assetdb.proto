@@ -37,11 +37,19 @@ message RenameAsset {
     required AssetType type = 3;
 }
 
+message UpdateAsset {
+    required string name = 1;
+    required AssetType type = 2;
+    optional string path = 3;
+    optional string args= 4;
+}
+
 message Request {
 
     oneof msg {
         AddAsset add = 1;
         DeleteAsset del = 2;
         RenameAsset rename = 3;
+        UpdateAsset update = 4;
     }
 }
