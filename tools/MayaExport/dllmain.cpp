@@ -109,7 +109,7 @@ MODELEX_EXPORT MStatus initializePlugin(MObject obj)
 
 	plugin.registerUI(g_createUiScript, g_destroyUiScript);
 
-	stat = plugin.registerCommand("PotatoExportModel",ModelExporterCmd::creator);
+	stat = plugin.registerCommand("PotatoExportModel",ModelExporterCmd::creator, ModelExporterCmd::newSyntax);
 
 	if (stat != MS::kSuccess) {
 		stat.perror("Error - initializePlugin");

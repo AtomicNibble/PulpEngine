@@ -27,6 +27,8 @@
 #include <maya/MArgList.h>
 #include <maya/MTransformationMatrix.h>
 #include <maya/MFnNumericData.h>
+#include <maya/MArgDatabase.h>
+#include <maya\MSyntax.h>
 
 
 X_DISABLE_WARNING(4702)
@@ -264,10 +266,12 @@ MStatus ModelExporter::convert(const MArgList& args)
 					return MS::kFailure;
 				}
 
+				MString argsStr;
+
 				maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::MODEL, 
 					MString(getName()),
 					MString(outPath.c_str()),
-					args
+					argsStr
 				);
 			}
 		}
@@ -1507,6 +1511,44 @@ MStatus ModelExporterCmd::doIt(const MArgList &args)
 	ModelExporter exportModel(gEnv->pJobSys, g_arena);
 
 	return exportModel.convert(args);
+}
+
+bool ModelExporterCmd::hasSyntax(void) const
+{
+	return true;
+}
+
+MSyntax ModelExporterCmd::newSyntax(void)
+{
+	MSyntax syn;
+	syn.enableEdit(false);
+	syn.enableQuery(false);
+
+	syn.addFlag("f", "file", MSyntax::kString);
+	syn.addFlag("v", "verbose");
+	syn.addFlag("m", "mode", MSyntax::kString);
+	syn.addFlag("s", "scale", MSyntax::kDouble);
+
+	syn.addFlag("wt", "weight_thresh", MSyntax::kDouble);
+	syn.addFlag("umt", "uv_merge_thresh", MSyntax::kDouble);
+	syn.addFlag("vmt", "vert_merge_thresh", MSyntax::kDouble);
+
+	syn.addFlag("zo", "zero_origin", MSyntax::kBoolean);
+	syn.addFlag("wvc", "white_vert_col", MSyntax::kBoolean);
+	syn.addFlag("mm", "merge_meshes", MSyntax::kBoolean);
+	syn.addFlag("mv", "merge_verts", MSyntax::kBoolean);
+	syn.addFlag("ew", "ext_weights", MSyntax::kBoolean);
+	syn.addFlag("fb", "force_bones", MSyntax::kBoolean);
+
+	syn.addFlag("dir", "dir_path", MSyntax::kString);
+	syn.addFlag("p", "progress", MSyntax::kString);
+
+	syn.addFlag("l0", "LOD0", MSyntax::kString);
+	syn.addFlag("l1", "LOD1", MSyntax::kString);
+	syn.addFlag("l2", "LOD2", MSyntax::kString);
+	syn.addFlag("l3", "LOD3", MSyntax::kString);
+
+	return syn;
 }
 
 void* ModelExporterCmd::creator()

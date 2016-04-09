@@ -114,7 +114,9 @@ public:
 	ModelExporterCmd();
 	~ModelExporterCmd();
 
-	virtual MStatus doIt(const MArgList &args);
+	virtual MStatus doIt(const MArgList &args) X_FINAL;
+	virtual bool hasSyntax(void) const X_FINAL;
 
+	static MSyntax newSyntax();
 	static void* creator();
 };
