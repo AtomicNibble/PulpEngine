@@ -32,7 +32,7 @@
 
 // We don't want all your shit!
 #define NOGDICAPMASKS
-#define NOMENUS			// add for custom frame
+// #define NOMENUS			// add for custom frame
 #define NOSYSCOMMANDS
 #define NORASTEROPS
 #define NOATOM

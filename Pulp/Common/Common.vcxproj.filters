@@ -1072,6 +1072,12 @@
     <ClInclude Include="Platform\win32\Pipe.h">
       <Filter>Headers\Platform\win32</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\TrayIcon.h">
+      <Filter>Headers\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\win32\TrayIcon.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1636,6 +1642,9 @@
       <Filter>SourceFiles\Math</Filter>
     </ClCompile>
     <ClCompile Include="Platform\win32\Pipe.cpp">
+      <Filter>SourceFiles\Platform\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\win32\TrayIcon.cpp">
       <Filter>SourceFiles\Platform\win32</Filter>
     </ClCompile>
   </ItemGroup>
