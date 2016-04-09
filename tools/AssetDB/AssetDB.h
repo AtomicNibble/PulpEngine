@@ -27,6 +27,9 @@ public:
 	Result::Enum RenameAsset(AssetType::Enum type, const core::string& name,
 		const core::string& newName);
 
+	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, 
+		const core::string& pathOpt, const core::string& argsOpt);
+
 	bool AssetExsists(AssetType::Enum type, const core::string& name);
 
 	bool OpenDB(void);

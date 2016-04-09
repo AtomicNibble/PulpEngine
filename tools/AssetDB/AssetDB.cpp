@@ -82,6 +82,44 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 	return Result::OK;
 }
 
+AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::string& name,
+	const core::string& pathOpt, const core::string& argsOpt)
+{
+	sql::SqlLiteTransaction trans(db_);
+
+	core::string stmt;
+	
+	stmt = "UPDATE file_ids SET lastUpdateTime = NOW()";
+
+	if (pathOpt.isNotEmpty()) {
+		stmt += " path = :p";
+	}
+	if (argsOpt.isNotEmpty()) {
+		stmt += " args = :a";
+	}
+	
+	stmt += " WHERE type = :t AND name = :n ";
+
+	sql::SqlLiteCmd cmd(db_, stmt.c_str());
+	if (pathOpt.isNotEmpty()) {
+		cmd.bind("p", pathOpt.c_str());
+	}
+	if (argsOpt.isNotEmpty()) {
+		cmd.bind("a", argsOpt.c_str());
+	}
+
+	cmd.bind("t", type);
+	cmd.bind("n", name.c_str());
+
+	sql::Result::Enum res = cmd.execute();
+	if (res != sql::Result::OK) {
+		return Result::ERROR;
+	}
+
+	trans.commit();
+	return Result::OK;
+}
+ 
 
 bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name)
 {
