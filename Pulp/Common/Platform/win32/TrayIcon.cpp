@@ -46,7 +46,7 @@ TrayIcon::TrayIcon() :
 	hidden_(false),
 	created_(false),
 
-	defaultMenuItemByPos_(0),
+	defaultMenuItemByPos_(1),
 	defaultMenuItemID_(0),
 
 	hWnd_(nullptr),
