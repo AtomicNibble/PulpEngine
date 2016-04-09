@@ -40,7 +40,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	g_hInstance = hInstance;
 
-	EngineApp engine;
 
 	core::Console Console(L"Potato - AssetServer");
 	Console.RedirectSTD();
@@ -53,13 +52,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	bool res = false;
 
-	if (engine.Init(lpCmdLine, Console))
 	{
-		assetServer::AssetServer as;
+		EngineApp engine;
 
-		as.Run(false);
+		if (engine.Init(lpCmdLine, Console))
+		{
+			assetServer::AssetServer as;
 
-		engine.PumpMessages();
+			as.Run(false);
+
+			engine.PumpMessages();
+		}
 	}
 
 	return 0;
