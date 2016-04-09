@@ -295,6 +295,7 @@ AssetServer::AssetServer() :
 AssetServer::~AssetServer()
 {
 	if (threadStarted_) {
+		CancelSynchronousIo();
 		Stop();
 		Join();
 	}
@@ -337,7 +338,20 @@ void AssetServer::Run_Internal(void)
 
 core::Thread::ReturnValue AssetServer::ThreadRun(const core::Thread& thread)
 {
-	Run_Internal();
+	GOOGLE_PROTOBUF_VERIFY_VERSION;
+
+	db_.OpenDB();
+	db_.CreateTables();
+
+	while (thread.ShouldRun())
+	{
+		Client client(*this);
+
+		client.connect();
+		client.listen();
+	}
+
+	db_.CloseDB();
 
 	return core::Thread::ReturnValue(0);
 }
