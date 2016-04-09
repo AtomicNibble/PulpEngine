@@ -177,6 +177,9 @@ bool AssetServer::Client::listen(void)
 		case ProtoBuf::AssetDB::Request::kRename:
 			ok = as_.RenameAsset(request.rename(), err);
 			break;
+		case ProtoBuf::AssetDB::Request::kUpdate:
+			ok = as_.UpdateAsset(request.update(), err);
+			break;
 		default:
 			err = "Unkown request msg type";
 			X_ERROR("AssetServer", "Unknown request msg type");
@@ -391,5 +394,37 @@ bool AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std:
 	return true;
 }
 
+bool AssetServer::UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, std::string& errOut)
+{
+	// map type.
+	assetDb::AssetDB::AssetType::Enum type;
+
+	if (!MapAssetType(update.type(), type)) {
+		errOut = "Unknown asset type in RenameAsset()";
+		X_ERROR("Assetserver", errOut.c_str());
+		return false;
+	}
+
+	core::string name(update.name().data(), update.name().length());
+	core::string path, args;
+	if (update.has_path()) {
+		path = core::string(update.path().data(), update.path().length());
+	}
+	if (update.has_args()) {
+		args = core::string(update.args().data(), update.args().length());
+	}
+
+
+	core::CriticalSection::ScopedLock slock(lock_);
+
+	assetDb::AssetDB::Result::Enum res = db_.UpdateAsset(type, name, path, args);
+	if (res != assetDb::AssetDB::Result::OK) {
+		errOut = "Failed to update asset. Err: ";
+		errOut += assetDb::AssetDB::Result::ToString(res);
+		return false;
+	}
+
+	return true;
+}
 
 X_NAMESPACE_END

@@ -10,6 +10,7 @@ X_NAMESPACE_DECLARE(ProtoBuf,
 		class AddAsset;
 		class DeleteAsset;
 		class RenameAsset;
+		class UpdateAsset;
 	}
 );
 
@@ -52,6 +53,7 @@ private:
 	bool AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& errOut);
 	bool DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::string& errOut);
 	bool RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std::string& errOut);
+	bool UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, std::string& errOut);
 
 private:
 	core::CriticalSection lock_;
