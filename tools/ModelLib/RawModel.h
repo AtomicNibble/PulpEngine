@@ -47,10 +47,13 @@ namespace RawModel
 
 		bool SaveRawModel(core::Path<char>& path);
 		bool SaveRawModel(core::Path<wchar_t>& path);
+		// save to a buffer
+		bool SaveRawModel(core::Array<uint8_t>& data);
 
 		size_t totalMeshes(void) const;
 
 	private:
+
 		bool ParseRawModel(core::XLexer& lex);
 		bool ReadBones(core::XLexer& lex, int32_t numBones);
 		bool ReadLods(core::XLexer& lex, int32_t numLods);
@@ -60,6 +63,7 @@ namespace RawModel
 
 		bool ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut);
 
+		bool SaveRawModel_Int(ModelDataStrArr& dataArr) const;
 		bool WriteBones(ModelDataStrArr& arr) const;
 		bool WriteLods(ModelDataStrArr& arr) const;
 		bool WriteMeshes(ModelDataStrArr& arr, const Lod& lod) const;

@@ -530,51 +530,17 @@ namespace RawModel
 			mode.Set(core::fileMode::WRITE);
 			mode.Set(core::fileMode::SHARE);
 
-			{
-				if (!file.openFile(path.c_str(), mode))
-				{
-					X_ERROR("RawModel", "Failed to open file for rawmodel");
-					return false;
-				}
+			if (!file.openFile(path.c_str(), mode)) {
+				X_ERROR("RawModel", "Failed to open file for rawmodel");
+				return false;
 			}
-
-			ModelDataStrArr dataArr(arena_);
-
-			ModelDataStr* pCurBuf = X_NEW(ModelDataStr, arena_, "MeshDataStr");
-			dataArr.append(pCurBuf);
-
-			pCurBuf->appendFmt("// Potato engine RawModel.\n");
-
-			// save some info it's not part of format
-			for (size_t i = 0; i < lods_.size(); i++)
-			{
-				const model::RawModel::Lod& lod = lods_[i];
-
-				pCurBuf->appendFmt("// LOD%" PRIuS " dis: %f numMesh: %" PRIuS " verts: %" PRIuS " tris: %" PRIuS " \n",
-					i, lod.distance_, lod.meshes_.size(), lod.totalVerts(), lod.totalTris());
-			}
-
-			pCurBuf->append("\n");
-			pCurBuf->appendFmt("VERSION %i\n", VERSION);
-			pCurBuf->appendFmt("LODS %" PRIuS "\n", lods_.size());
-			pCurBuf->appendFmt("BONES %" PRIuS "\n", bones_.size());
-			pCurBuf->append("\n");
-
 			
-			if (!WriteBones(dataArr))
-			{
-				X_ERROR("RawModel", "Failed to write bones");
+			ModelDataStrArr dataArr(arena_);
+			if (!SaveRawModel_Int(dataArr)) {
 				return false;
 			}
 
-			if (!WriteLods(dataArr))
-			{
-				X_ERROR("RawModel", "Failed to write lods");
-				return false;
-			}
-
-			for(auto& buf : dataArr)
-			{
+			for(auto& buf : dataArr) {
 				if (file.write(buf->c_str(), buf->length()) != buf->length()) {
 					X_ERROR("RawModel", "Failed to write rawmodel header");
 					break;
@@ -585,6 +551,73 @@ namespace RawModel
 				X_DELETE(buf, arena_);
 			}
 
+		}
+
+		return true;
+	}
+
+	bool Model::SaveRawModel(core::Array<uint8_t>& data)
+	{
+		ModelDataStrArr dataArr(arena_);
+
+		if (!SaveRawModel_Int(dataArr)) {
+			return false;
+		}
+
+		size_t totalBytes = 0;
+		for (auto& buf : dataArr) {
+			totalBytes += buf->length();
+		}
+
+		data.clear();
+		data.resize(totalBytes);
+
+		uint8_t* pBuf = data.ptr();
+		for (auto& buf : dataArr) {		
+			std::memcmp(pBuf, buf->c_str(), buf->length());
+			pBuf += buf->length();
+		}
+
+		for (auto& buf : dataArr) {
+			X_DELETE(buf, arena_);
+		}
+
+		return true;
+	}
+
+	bool Model::SaveRawModel_Int(ModelDataStrArr& dataArr) const
+	{
+		ModelDataStr* pCurBuf = X_NEW(ModelDataStr, arena_, "MeshDataStr");
+		dataArr.append(pCurBuf);
+
+		pCurBuf->appendFmt("// Potato engine RawModel.\n");
+
+		// save some info it's not part of format
+		for (size_t i = 0; i < lods_.size(); i++)
+		{
+			const model::RawModel::Lod& lod = lods_[i];
+
+			pCurBuf->appendFmt("// LOD%" PRIuS " dis: %f numMesh: %" PRIuS " verts: %" PRIuS " tris: %" PRIuS " \n",
+				i, lod.distance_, lod.meshes_.size(), lod.totalVerts(), lod.totalTris());
+		}
+
+		pCurBuf->append("\n");
+		pCurBuf->appendFmt("VERSION %i\n", VERSION);
+		pCurBuf->appendFmt("LODS %" PRIuS "\n", lods_.size());
+		pCurBuf->appendFmt("BONES %" PRIuS "\n", bones_.size());
+		pCurBuf->append("\n");
+
+
+		if (!WriteBones(dataArr))
+		{
+			X_ERROR("RawModel", "Failed to write bones");
+			return false;
+		}
+
+		if (!WriteLods(dataArr))
+		{
+			X_ERROR("RawModel", "Failed to write lods");
+			return false;
 		}
 
 		return true;
