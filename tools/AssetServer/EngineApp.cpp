@@ -1,9 +1,11 @@
 #include "stdafx.h"
 #include "EngineApp.h"
+#include "Resource.h"
 
 #include "ITimer.h"
 
 #include <Debugging\DebuggerConnection.h>
+
 
 
 
@@ -15,6 +17,7 @@ void Error(const char* sErrorText)
 }
 
 EngineApp::EngineApp() :
+	run_(true),
 	pICore_(nullptr),
 	hSystemHandle_(NULL)
 {
@@ -86,11 +89,14 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 
 	LinkModule(pICore_, "AssetServer");
 
+	CreateIcon(0, L"Potato - AssetServer", IDI_ASSETSERVER, IDR_MENU1);
 	return true;
 }
 
 bool EngineApp::ShutDown(void)
 {
+	this->Destory();
+
 	if (pICore_) {
 		pICore_->UnRegisterAssertHandler(this);
 		pICore_->Release();
@@ -111,25 +117,28 @@ void EngineApp::OnAssertVariable(const core::SourceInfo& sourceInfo)
 
 }
 
-LRESULT CALLBACK EngineApp::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT EngineApp::OnTrayCmd(WPARAM wParam, LPARAM lParam)
 {
-	switch (msg)
+	switch (LOWORD(wParam))
 	{
-	case WM_CLOSE:
-		return 0;
-
+	case ID_MENU_EXIT:
+		run_ = false;
+		break;
 	}
-	return DefWindowProc(hWnd, msg, wParam, lParam);
+
+	return 0;
 }
 
 
-bool EngineApp::PumpMessages()
+bool EngineApp::PumpMessages(void)
 {
 	MSG msg;
-	while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
+	while (GetMessageW(&msg, 0, 0, 0) > 0 && run_)
 	{
-		if (msg.message == WM_QUIT)
+		if (msg.message == WM_QUIT) {
 			return false;
+		}
+
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
 	}

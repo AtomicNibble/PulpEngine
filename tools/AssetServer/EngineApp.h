@@ -3,8 +3,9 @@
 
 #include <ICore.h>
 #include <Platform\Console.h>
+#include <Platform\TrayIcon.h>
 
-class EngineApp : public IAssertHandler
+class EngineApp : public IAssertHandler, public core::TrayIcon
 {
 public:
 	EngineApp();
@@ -12,7 +13,7 @@ public:
 
 	bool Init(const wchar_t* sInCmdLine, core::Console& Console);
 	bool ShutDown(void);
-	int	MainLoop(void);
+	bool PumpMessages(void);
 
 private:
 	virtual void OnAssert(const core::SourceInfo& sourceInfo) X_OVERRIDE;
@@ -20,11 +21,11 @@ private:
 
 private:
 
-	static LRESULT CALLBACK	WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-	bool PumpMessages();
+	virtual LRESULT OnTrayCmd(WPARAM wParam, LPARAM lParam) X_FINAL;
 
 private:
+	bool run_;
+
 	HMODULE hSystemHandle_;
 	ICore* pICore_;
 };
