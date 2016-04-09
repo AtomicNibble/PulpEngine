@@ -95,6 +95,8 @@ public:
 
 	uint32_t GetID(void) const;
 
+	void CancelSynchronousIo(void);
+
 	X_INLINE void setData(void* pData) {
 		pData_ = pData;
 	}
@@ -135,6 +137,7 @@ public:
 	void Join(void); // waits till thread has finished.
 
 	uint32_t GetID(void) const;
+	void CancelSynchronousIo(void);
 
 protected:
 	virtual ~ThreadAbstract();

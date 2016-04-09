@@ -135,7 +135,7 @@ bool Thread::SetThreadAffinity(const AffinityFlags flags)
 	if (SetThreadAffinityMask(handle_, mask) == 0)
 	{
 		lastError::Description Dsc;
-		X_ERROR("Failed to set thread affinity. Error: %s", lastError::ToString(Dsc));
+		X_ERROR("Thread", "Failed to set thread affinity. Error: %s", lastError::ToString(Dsc));
 		return false;
 	}
 
@@ -145,6 +145,14 @@ bool Thread::SetThreadAffinity(const AffinityFlags flags)
 uint32_t Thread::GetID(void) const
 {
 	return ::GetThreadId(handle_);
+}
+
+void Thread::CancelSynchronousIo(void)
+{
+	if (!::CancelSynchronousIo(handle_)) {
+		lastError::Description Dsc;
+		X_ERROR("Thread", "Failed to cancel sync io. Error: %s", lastError::ToString(Dsc));
+	}
 }
 
 // static
@@ -229,6 +237,11 @@ void ThreadAbstract::Join(void)
 uint32_t ThreadAbstract::GetID(void) const
 {
 	return thread_.GetID();
+}
+
+void ThreadAbstract::CancelSynchronousIo(void)
+{
+	thread_.CancelSynchronousIo();
 }
 
 Thread::ReturnValue ThreadAbstract::ThreadFunc(const Thread& thread)
