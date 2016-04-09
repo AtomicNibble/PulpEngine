@@ -27,12 +27,16 @@ namespace RawModel
 
 	class Model
 	{
+		typedef core::StackString<0x20000, char> ModelDataStr;
+		typedef core::Array<ModelDataStr*> ModelDataStrArr;
+
 		typedef core::FixedArray<Lod, model::MODEL_MAX_LODS> LodArr;
 		typedef core::Array<Bone> BoneArr;
 
 		static const int32_t VERSION;
 
 	public:
+		// need to be a thread safe arena if jobsystem provided.
 		Model(core::MemoryArenaBase* arena, core::V2::JobSystem* pJobSys = nullptr);
 		~Model() = default;
 
@@ -56,15 +60,14 @@ namespace RawModel
 
 		bool ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut);
 
-		bool WriteBones(core::XFile* f) const;
-		bool WriteLods(core::XFile* f) const;
-		bool WriteMeshes(core::XFile* f, const Lod& lod) const;
-		bool WriteMesh(core::XFile* f, const Mesh& mesh) const;
-		bool WriteMaterials(core::XFile* f, const Material& mat) const;
+		bool WriteBones(ModelDataStrArr& arr) const;
+		bool WriteLods(ModelDataStrArr& arr) const;
+		bool WriteMeshes(ModelDataStrArr& arr, const Lod& lod) const;
+		// static as job version makes use of it, to reduce code duplication.
+		static bool WriteMesh(ModelDataStrArr& arr, const Mesh& mesh, core::MemoryArenaBase* arena);
+		bool WriteMaterials(ModelDataStrArr& arr, const Material& mat) const;
 		
 	private:
-		typedef core::StackString<262144, char> MeshDataStr;
-		typedef core::Array<MeshDataStr*> MeshDataStrArr;
 
 		struct MeshWriteData
 		{
@@ -76,7 +79,7 @@ namespace RawModel
 			{}
 
 			core::MemoryArenaBase* arena;
-			MeshDataStrArr data;
+			ModelDataStrArr data;
 			const RawModel::Mesh* pMesh;
 			core::V2::Job* pJob;
 		};
