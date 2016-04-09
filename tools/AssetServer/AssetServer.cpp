@@ -286,19 +286,38 @@ bool AssetServer::Client::writeAndFlushBuf(const uint8_t* pBuf, size_t len)
 
 
 AssetServer::AssetServer() :
-	lock_(50)
+	lock_(50),
+	threadStarted_(false)
 {
 
 }
 
 AssetServer::~AssetServer()
 {
+	if (threadStarted_) {
+		Stop();
+		Join();
+	}
+
 	// shut down the slut.
 	google::protobuf::ShutdownProtobufLibrary();
 }
 
 
-void AssetServer::Run(void)
+void AssetServer::Run(bool blocking)
+{
+	if (blocking) {
+		Run_Internal();
+	}
+	else {	
+		Create("AssetServerWorker");
+		Start();
+
+		threadStarted_ = true;
+	}
+}
+
+void AssetServer::Run_Internal(void)
 {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 
@@ -316,6 +335,12 @@ void AssetServer::Run(void)
 	db_.CloseDB();
 }
 
+core::Thread::ReturnValue AssetServer::ThreadRun(const core::Thread& thread)
+{
+	Run_Internal();
+
+	return core::Thread::ReturnValue(0);
+}
 
 
 bool AssetServer::AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& errOut)

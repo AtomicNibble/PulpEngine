@@ -18,7 +18,7 @@ X_NAMESPACE_DECLARE(ProtoBuf,
 X_NAMESPACE_BEGIN(assetServer)
 
 
-class AssetServer
+class AssetServer : public core::ThreadAbstract
 {
 	class Client
 	{
@@ -47,9 +47,13 @@ public:
 	AssetServer();
 	~AssetServer();
 
-	void Run(void);
+	void Run(bool blocking = true);
 
 private:
+	void Run_Internal(void);
+
+	core::Thread::ReturnValue ThreadRun(const core::Thread& thread) X_FINAL;
+
 	bool AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& errOut);
 	bool DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::string& errOut);
 	bool RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std::string& errOut);
@@ -57,8 +61,9 @@ private:
 
 private:
 	core::CriticalSection lock_;
-
 	assetDb::AssetDB db_;
+
+	bool threadStarted_;
 };
 
 
