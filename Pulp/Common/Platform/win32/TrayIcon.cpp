@@ -44,7 +44,7 @@ core::AtomicInt TrayIcon::classRegisterd_;
 TrayIcon::TrayIcon() :
 	showIconPending_(false),
 	hidden_(false),
-	removed_(false),
+	created_(false),
 
 	defaultMenuItemByPos_(0),
 	defaultMenuItemID_(0),
@@ -115,7 +115,8 @@ bool TrayIcon::Create(HWND hParent, LPCTSTR toolTip, uint32_t iconId, uint32_t m
 		return false;
 	}
 
-	showIconPending_ = hidden_ ;
+	created_ = true;
+	showIconPending_ = hidden_;
 	return true;
 }
 
@@ -135,12 +136,14 @@ void TrayIcon::RemoveIcon(void)
 {
 	showIconPending_ = false;
 
-	tnd_.uFlags = 0;
-	if (Shell_NotifyIcon(NIM_DELETE, &tnd_)) {
-		core::lastError::Description Dsc;
-		X_ERROR("TrayIcon", "Failed to remove icon. Err: %s", core::lastError::ToString(Dsc));
+	if (created_) {
+		created_ = false;
+		tnd_.uFlags = 0;
+		if (!Shell_NotifyIcon(NIM_DELETE, &tnd_)) {
+			core::lastError::Description Dsc;
+			X_ERROR("TrayIcon", "Failed to remove icon. Err: %s", core::lastError::ToString(Dsc));
+		}
 	}
-
 	core::zero_object(tnd_);
 }
 

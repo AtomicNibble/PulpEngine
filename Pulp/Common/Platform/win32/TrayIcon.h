@@ -40,7 +40,7 @@ private:
 
 	bool showIconPending_;	// Show the icon once tha taskbar has been created
 	bool hidden_;			// Has the icon been hidden?
-	bool removed_;			// Has the icon been removed?
+	bool created_;			
 	uint32_t defaultMenuItemByPos_;
 	uint32_t defaultMenuItemID_;
 
