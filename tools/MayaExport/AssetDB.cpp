@@ -128,6 +128,10 @@ AssetDB::~AssetDB()
 
 void AssetDB::Init(void)
 {
+	if (gAssetDb) {
+		return;
+	}
+
 	gAssetDb = X_NEW(AssetDB, g_arena, "AssetDB");
 	// don't matter if we connect or not still launch.
 	gAssetDb->Connect();
@@ -140,6 +144,11 @@ void AssetDB::ShutDown(void)
 	}
 }
 
+AssetDB* AssetDB::Get(void)
+{
+	X_ASSERT_NOT_NULL(gAssetDb);
+	return gAssetDb;
+}
 
 bool AssetDB::Connect(void)
 {
@@ -251,10 +260,43 @@ MStatus AssetDB::RenameAsset(AssetType::Enum type, const MString & name, const M
 	return MS::kSuccess;
 }
 
+MStatus AssetDB::UpdateAsset(AssetType::Enum type, const MString& name, 
+	const MString& path, const MArgList& args)
+{
+	X_UNUSED(args);
+
+	if (!pipe_.isOpen() && !Connect()) {
+		MayaUtil::MayaPrintError("Failed to UpdateAsset pipe is invalid");
+		return MS::kFailure;
+	}
+
+	{
+		ProtoBuf::AssetDB::UpdateAsset* pUpdate = new ProtoBuf::AssetDB::UpdateAsset();
+		pUpdate->set_type(AssetTypeToProtoType(type));
+		pUpdate->set_name(name.asChar());
+		pUpdate->set_path(path.asChar());
+	//	pUpdate->set_args(args.asChar());
+
+		ProtoBuf::AssetDB::Request request;
+		request.set_allocated_update(pUpdate);
+
+		if (!sendRequest(request)) {
+			return MS::kFailure;
+		}
+	}
+
+	ProtoBuf::AssetDB::Reponse response;
+
+	if (!getResponse(response)) {
+		return MS::kFailure;
+	}
+
+	return MS::kSuccess;
+}
 
 bool AssetDB::sendRequest(ProtoBuf::AssetDB::Request& request)
 {
-	const size_t bufLength = 0x200;
+	const size_t bufLength = 0x1000;
 	uint8_t buffer[bufLength];
 
 	google::protobuf::io::ArrayOutputStream arrayOutput(buffer, bufLength);
@@ -281,6 +323,7 @@ bool AssetDB::getResponse(ProtoBuf::AssetDB::Reponse& response)
 
 	if (!pipe_.read(buffer, sizeof(buffer), &bytesRead)) {
 		X_ERROR("AssetDB", "failed to read response");
+		pipe_.close(); // close it so we can open a new one
 		return false;
 	}
 
@@ -290,6 +333,7 @@ bool AssetDB::getResponse(ProtoBuf::AssetDB::Reponse& response)
 
 	if (!ReadDelimitedFrom(&arrayInput, &response, &cleanEof)) {
 		X_ERROR("AssetDB", "Failed to read response msg");
+		pipe_.close(); // close it so we can open a new one
 		return false;
 	}
 

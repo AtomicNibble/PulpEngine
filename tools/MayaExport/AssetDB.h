@@ -24,12 +24,14 @@ public:
 
 	static void Init(void);
 	static void ShutDown(void);
+	static AssetDB* Get(void);
 
 	bool Connect(void);
 
 	MStatus AddAsset(AssetType::Enum type, const MString& name);
 	MStatus RemoveAsset(AssetType::Enum type, const MString& name);
 	MStatus RenameAsset(AssetType::Enum type, const MString& name, const MString& oldName);
+	MStatus UpdateAsset(AssetType::Enum type, const MString& name, const MString& path, const MArgList& args);
 
 private:
 	bool sendRequest(ProtoBuf::AssetDB::Request& request);
