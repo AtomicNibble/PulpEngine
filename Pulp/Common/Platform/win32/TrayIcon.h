@@ -20,6 +20,9 @@ public:
 	void Destory(void);
 	void RemoveIcon(void);
 
+	virtual LRESULT OnTrayNotification(UINT msg, WPARAM wParam, LPARAM lParam);
+	virtual LRESULT OnTrayCmd(WPARAM wParam, LPARAM lParam);
+
 private:
 	void RegisterClass(void);
 	void UnRegisterClass(void);
@@ -29,7 +32,6 @@ private:
 public:
 	LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 	LRESULT OnTaskbarCreated(WPARAM wParam, LPARAM lParam);
-	LRESULT OnTrayNotification(WPARAM uID, LPARAM lEvent);
 
 private:
 	X_NO_COPY(TrayIcon);

@@ -207,8 +207,10 @@ LRESULT TrayIcon::OnTaskbarCreated(WPARAM wParam, LPARAM lParam)
 	return 0L;
 }
 
-LRESULT TrayIcon::OnTrayNotification(WPARAM uID, LPARAM lEvent)
+LRESULT TrayIcon::OnTrayNotification(UINT msg, WPARAM uID, LPARAM lEvent)
 {
+	X_UNUSED(msg);
+
 	if (tnd_.uID == 0 || uID != tnd_.uID) {
 		return 0L;
 	}
@@ -296,15 +298,25 @@ LRESULT TrayIcon::OnTrayNotification(WPARAM uID, LPARAM lEvent)
 	return 1;
 }
 
+LRESULT TrayIcon::OnTrayCmd(WPARAM wParam, LPARAM lParam)
+{
+	X_UNUSED(wParam);
+	X_UNUSED(lParam); 
+	return 0;
+}
 
 LRESULT TrayIcon::WndProc(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
 	if (msg == GetCallbackMessage()) {
-		return OnTrayNotification(wp, lp);
+		return OnTrayNotification(msg, wp, lp);
 	}
 
 	if (msg == TrayIcon::CREATED_MSG) {
 		return OnTaskbarCreated(wp, lp);
+	}
+
+	if (msg == WM_COMMAND && hWnd == targetWnd_) {
+		OnTrayCmd(wp, lp);
 	}
 
 	return ::DefWindowProc(hWnd, msg, wp, lp);
