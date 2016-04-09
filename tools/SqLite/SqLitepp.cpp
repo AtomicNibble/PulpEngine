@@ -125,6 +125,7 @@ bool SqlLiteDb::disconnect(void)
 			X_ERROR("SqlLiteDb", "Failed to shutdown sqLite");
 		}
 
+		db_ = nullptr;
 		return ret == Result::OK && ret2 == Result::OK;
 	}
 	return true;
