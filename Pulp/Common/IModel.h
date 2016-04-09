@@ -300,7 +300,7 @@ struct CompbindInfo
 	X_INLINE const size_t dataSize(int idx) const {
 		X_ASSERT(idx >= 0 && idx < MODEL_MAX_VERT_BINDS, "index out of range")(idx, MODEL_MAX_VERT_BINDS);
 		// size is (idx * (bindBone + bindWeight)) + bindBone
-		return compBinds_[idx] * (idx * (sizeof(bindBone) + sizeof(bindWeight))) + sizeof(bindBone);
+		return compBinds_[idx] * ((idx * (sizeof(bindBone) + sizeof(bindWeight))) + sizeof(bindBone));
 	}
 
 	X_INLINE const size_t dataSizeTotal(void) const {
