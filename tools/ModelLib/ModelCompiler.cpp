@@ -180,7 +180,7 @@ bool ModelCompiler::Binds::write(core::XFileScoped& file)
 
 void ModelCompiler::Binds::populate(const VertsArr& verts)
 {
-	CompbindInfo::BindCountsArr bindCounts;
+	CompbindInfo::BindCountsArr bindCounts{};
 
 	if (verts.isEmpty()) {
 		return;
