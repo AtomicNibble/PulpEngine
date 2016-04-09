@@ -57,11 +57,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		assetServer::AssetServer as;
 
-		// blocking, listining for connections.
-		// in most cases this will never return.
-		as.Run();
+		as.Run(false);
 
-		engine.ShutDown();
+		engine.PumpMessages();
 	}
 
 	return 0;
