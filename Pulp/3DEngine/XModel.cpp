@@ -609,7 +609,7 @@ void XModel::ProcessData(char* pData)
 		{
 			SubMeshHeader& mesh = meshHeads[x];
 
-			uint32_t size = (uint32_t)mesh.CompBinds.dataSizeTotal();
+			uint32_t size = safe_static_cast<uint32_t, size_t>(mesh.CompBinds.dataSizeTotal());
 
 			cursor.SeekBytes(size);
 		}
