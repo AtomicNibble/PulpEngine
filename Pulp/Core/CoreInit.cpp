@@ -68,6 +68,12 @@ X_USING_NAMESPACE;
 #endif
 
 
+namespace
+{
+	typedef core::traits::Function<void *(ICore *pSystem, const char *moduleName)> ModuleLinkfunc;
+
+} // namespace
+
 //////////////////////////////////////////////////////////////////////////
 #if !defined(X_LIB)
 WIN_HMODULE XCore::LoadDynamiclibrary(const char *dllName) const
@@ -89,8 +95,6 @@ WIN_HMODULE XCore::LoadDLL(const char *dllName)
 		return 0;
 	}
 
-	typedef core::traits::Function<void *(ICore *pSystem, const char *moduleName)> ModuleLinkfunc;
-
 	ModuleLinkfunc::Pointer pfnModuleInitISystem = reinterpret_cast<ModuleLinkfunc::Pointer>(
 			PotatoGetProcAddress(handle, DLL_MODULE_INIT_ICORE));
 
@@ -103,6 +107,39 @@ WIN_HMODULE XCore::LoadDLL(const char *dllName)
 }
 #endif //#if !defined(X_LIB) 
 
+
+bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName)
+{
+#if defined(X_LIB)
+	return false;
+#else
+
+	HMODULE handle = PotatoGetLibaryHandleA(pDllName);
+
+	ModuleLinkfunc::Pointer pfnModuleInitISystem = reinterpret_cast<ModuleLinkfunc::Pointer>(
+		PotatoGetProcAddress(handle, DLL_MODULE_INIT_ICORE));
+
+	if (pfnModuleInitISystem) {
+		pfnModuleInitISystem(this, pDllName);
+	}
+
+	std::shared_ptr<IEngineModule> pModule;
+	if (PotatoCreateClassInstance(pModuleClassName, pModule))
+	{
+		if (!pModule->Initialize(env_, initParams_)) {
+			X_ERROR("Core", "failed to initialize: %s -> %s", pDllName, pModuleClassName);
+			return false;
+		}
+	}
+	else
+	{
+		X_ERROR("Core", "failed to find interface: %s -> %s", pDllName, pModuleClassName);
+		return false;
+	}
+
+	return true;
+#endif
+}
 
 bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassName, const SCoreInitParams &initParams)
 {

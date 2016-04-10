@@ -119,6 +119,8 @@ public:
 
 	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_OVERRIDE;
 
+	virtual bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_OVERRIDE;
+
 
 	core::ITimer		*GetITimer(void) X_OVERRIDE{ return env_.pTimer; }
 	input::IInput		*GetIInput(void) X_OVERRIDE{ return env_.pInput; }
