@@ -722,27 +722,9 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 
 	for (size_t i = 0; i < compiledLods_.size(); i++)
 	{
-		size_t requiredStreamSize = 0;
+		size_t requiredStreamSize;
 
-		for (auto& compiledMesh : compiledLods_[i].meshes_)
-		{
-			//	requiredStreamSize += mesh->CompBinds.dataSizeTotal();
-			requiredStreamSize += (compiledMesh.faces_.size() * sizeof(model::Face));
-			requiredStreamSize += (compiledMesh.verts_.size() * sizeof(model::Vertex));
-
-			if (streamsFlags.IsSet(model::StreamType::COLOR))
-			{
-				requiredStreamSize += (compiledMesh.verts_.size() * sizeof(model::VertexColor));
-			}
-			if (streamsFlags.IsSet(model::StreamType::NORMALS))
-			{
-				requiredStreamSize += (compiledMesh.verts_.size() * sizeof(model::VertexNormal));
-			}
-			if (streamsFlags.IsSet(model::StreamType::TANGENT_BI))
-			{
-				requiredStreamSize += (compiledMesh.verts_.size() * sizeof(model::VertexTangentBi));
-			}
-		}
+		requiredStreamSize = compiledLods_[i].getSubDataSize(streamsFlags);
 
 		// writing this info to a stream makes write time 5x times faster.
 		stream.resize(requiredStreamSize);
