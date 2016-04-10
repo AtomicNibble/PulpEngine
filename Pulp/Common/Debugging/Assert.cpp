@@ -21,7 +21,7 @@ Assert::Assert( const SourceInfo& sourceInfo, const char* fmt, ... )
 	else
 	{
 		// shieeeeet
-#if X_DEBUG || 1
+#if X_DEBUG && X_PLATFORM_WIN32
 		core::StackString<2048> temp;
 		temp.append("ASSERT: ");
 		temp.appendFmt(fmt, ap);
