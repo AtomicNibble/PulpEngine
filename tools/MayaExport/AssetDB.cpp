@@ -302,6 +302,7 @@ bool AssetDB::sendRequest(ProtoBuf::AssetDB::Request& request)
 
 	if (!pipe_.write(buffer, safe_static_cast<size_t, int64_t>(arrayOutput.ByteCount()))) {
 		X_ERROR("AssetDB", "failed to write buffer");
+		pipe_.close();
 		return false;
 	}
 	if (!pipe_.flush()) {
