@@ -263,6 +263,7 @@
     <ClInclude Include="String\FormatMacros.h" />
     <ClInclude Include="String\GrowingStringTable.h" />
     <ClInclude Include="String\HumanSize.h" />
+    <ClInclude Include="String\Json.h" />
     <ClInclude Include="String\Lexer.h" />
     <ClInclude Include="String\StackString.h" />
     <ClInclude Include="String\Path.h" />

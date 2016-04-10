@@ -1078,6 +1078,9 @@
     <ClInclude Include="Platform\win32\TrayIcon.h">
       <Filter>Headers\Platform\win32</Filter>
     </ClInclude>
+    <ClInclude Include="String\Json.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
