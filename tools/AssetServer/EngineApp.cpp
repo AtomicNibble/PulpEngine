@@ -89,6 +89,14 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 
 	LinkModule(pICore_, "AssetServer");
 
+
+	// AssetDB
+#if !defined(X_LIB) 
+	if (!pICore_->IntializeLoadedEngineModule("Engine_AssetDB", "Engine_AssetDB")) {
+		return false;
+	}
+#endif
+
 	CreateIcon(0, L"Potato - AssetServer", IDI_ASSETSERVER, IDR_MENU1);
 	return true;
 }
