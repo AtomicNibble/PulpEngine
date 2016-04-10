@@ -266,12 +266,10 @@ MStatus ModelExporter::convert(const MArgList& args)
 					return MS::kFailure;
 				}
 
-				MString argsStr;
-
-				maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::MODEL, 
+				maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::MODEL,
 					MString(getName()),
 					MString(outPath.c_str()),
-					argsStr
+					argsToJson()
 				);
 			}
 		}
@@ -399,6 +397,64 @@ core::Path<char> ModelExporter::getFilePath(void) const
 core::string ModelExporter::getName(void) const
 {
 	return name_;
+}
+
+
+
+MString ModelExporter::argsToJson(void) const
+{
+	core::json::StringBuffer s;
+	core::json::Writer<core::json::StringBuffer> writer(s);
+
+
+	writer.StartObject();
+	writer.Key("verbose");
+	writer.Bool(MayaUtil::IsVerbose());
+	writer.Key("mode");
+	writer.String(ExpoMode::ToString(exportMode_));
+
+	writer.Key("scale");
+	writer.Double(this->getScale());
+	writer.Key("weight_thresh");
+	writer.Double(this->getJointWeightThreshold());
+	writer.Key("uv_merge_thresh");
+	writer.Double(this->getTexCoordElipson());
+	writer.Key("vert_merge_thresh");
+	writer.Double(this->getVertexElipson());
+	writer.Key("vert_merge_thresh");
+	writer.Double(this->getVertexElipson());
+
+	const CompileFlags flags = getFlags();
+	writer.Key("zero_origin");
+	writer.Bool(flags.IsSet(CompileFlag::ZERO_ORIGIN));
+	writer.Key("white_vert_col");
+	writer.Bool(flags.IsSet(CompileFlag::WHITE_VERT_COL));
+	writer.Key("merge_meshes");
+	writer.Bool(flags.IsSet(CompileFlag::MERGE_MESH));
+	writer.Key("merge_verts");
+	writer.Bool(flags.IsSet(CompileFlag::MERGE_VERTS));
+	writer.Key("ext_weights");
+	writer.Bool(flags.IsSet(CompileFlag::EXT_WEIGHTS));
+
+	// lods.
+	for (size_t i = 0; i < model::MODEL_MAX_LODS; i++)
+	{
+		core::StackString<32> buf;
+		buf.appendFmt("lod%i_dis", i);
+
+		writer.Key(buf.c_str());
+
+		if ((i+1) > lodExpoInfo_.size()) {
+			writer.Double(0);
+		}
+		else {
+			writer.Double(lodExpoInfo_[i].distance);
+		}
+	}
+
+	writer.EndObject();
+
+	return MString(s.GetString());
 }
 
 MStatus ModelExporter::parseArgs(const MArgList& args)

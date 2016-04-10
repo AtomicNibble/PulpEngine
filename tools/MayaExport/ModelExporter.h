@@ -69,6 +69,7 @@ private:
 	core::Path<char> getFilePath(void) const;
 	core::string getName(void) const;
 
+	MString argsToJson(void) const;
 	MStatus parseArgs(const MArgList& args);
 	MStatus loadLODs(void);
 	MStatus loadBones(void);
@@ -76,7 +77,6 @@ private:
 private:
 	MStatus getExportObjects(void);
 	MStatus getInputObjects(void);
-
 
 	MayaBone* findJointReal(const char* pName);
 
