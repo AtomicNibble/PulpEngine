@@ -111,6 +111,8 @@ WIN_HMODULE XCore::LoadDLL(const char *dllName)
 bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName)
 {
 #if defined(X_LIB)
+	X_UNUSED(pDllName);
+	X_UNUSED(pModuleClassName);
 	return false;
 #else
 
