@@ -89,27 +89,27 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 
 	core::string stmt;
 	
-	stmt = "UPDATE file_ids SET lastUpdateTime = NOW()";
+	stmt = "UPDATE file_ids SET lastUpdateTime = DateTime('now')";
 
 	if (pathOpt.isNotEmpty()) {
-		stmt += " path = :p";
+		stmt += ", path = :p";
 	}
 	if (argsOpt.isNotEmpty()) {
-		stmt += " args = :a";
+		stmt += ", args = :a";
 	}
 	
 	stmt += " WHERE type = :t AND name = :n ";
 
 	sql::SqlLiteCmd cmd(db_, stmt.c_str());
 	if (pathOpt.isNotEmpty()) {
-		cmd.bind("p", pathOpt.c_str());
+		cmd.bind(":p", pathOpt.c_str());
 	}
 	if (argsOpt.isNotEmpty()) {
-		cmd.bind("a", argsOpt.c_str());
+		cmd.bind(":a", argsOpt.c_str());
 	}
 
-	cmd.bind("t", type);
-	cmd.bind("n", name.c_str());
+	cmd.bind(":t", type);
+	cmd.bind(":n", name.c_str());
 
 	sql::Result::Enum res = cmd.execute();
 	if (res != sql::Result::OK) {
