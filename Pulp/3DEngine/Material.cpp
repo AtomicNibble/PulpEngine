@@ -2,7 +2,6 @@
 #include "Material.h"
 
 
-#include <String\Xml.h>
 
 
 X_NAMESPACE_BEGIN(engine)

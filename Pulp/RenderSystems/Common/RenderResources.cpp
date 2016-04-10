@@ -6,7 +6,6 @@
 #include <../Common/Textures/XTexture.h>
 
 #include <IFileSys.h>
-#include <String\Xml.h>
 
 #include <Memory\AllocationPolicies\MallocFreeAllocator.h>
 

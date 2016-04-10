@@ -4,8 +4,6 @@
 
 #include <IFileSys.h>
 
-#include <String\Xml.h>
-
 #include <Memory\AllocationPolicies\MallocFreeAllocator.h>
 
 X_NAMESPACE_BEGIN(font)

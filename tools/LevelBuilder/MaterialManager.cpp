@@ -3,7 +3,6 @@
 
 #include "../3DEngine/Material.h"
 
-#include <String\Xml.h>
 
 
 

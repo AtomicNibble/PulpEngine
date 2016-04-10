@@ -9,7 +9,6 @@
 #include <IConsole.h>
 #include <ITexture.h>
 
-#include <String\Xml.h>
 
 #include <Memory\AllocationPolicies\MallocFreeAllocator.h>
 
