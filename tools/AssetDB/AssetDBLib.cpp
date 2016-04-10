@@ -19,9 +19,9 @@ namespace
 AssetDBArena* g_AssetDBArena = nullptr;
 
 
-class XEngineModile_AssetDB : public IEngineModule
+class XEngineModule_AssetDB : public IEngineModule
 {
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModile_AssetDB, "Engine_AssetDB");
+	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_AssetDB, "Engine_AssetDB");
 
 	virtual const char* GetName(void) X_OVERRIDE
 	{
@@ -49,13 +49,13 @@ class XEngineModile_AssetDB : public IEngineModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XEngineModile_AssetDB);
+X_POTATO_REGISTER_CLASS(XEngineModule_AssetDB);
 
 
-XEngineModile_AssetDB::XEngineModile_AssetDB()
+XEngineModule_AssetDB::XEngineModule_AssetDB()
 {
 }
 
-XEngineModile_AssetDB::~XEngineModile_AssetDB()
+XEngineModule_AssetDB::~XEngineModule_AssetDB()
 {
 }
