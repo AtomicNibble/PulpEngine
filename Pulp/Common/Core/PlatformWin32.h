@@ -123,6 +123,8 @@ X_POP_WARNING_LEVEL
 #define PotatoFreeLibrary(libHandle) ::FreeLibrary((HMODULE)(libHandle))
 #define PotatoLoadLibary(libname) ::LoadLibraryA(libname);
 #define PotatoLoadLibaryW(libname) ::LoadLibraryW(libname);
+#define PotatoGetLibaryHandleA(libname) ::GetModuleHandleA(libname);
+#define PotatoGetLibaryHandleW(libname) ::GetModuleHandleW(libname);
 
 #define PotatoSleep(ms) ::Sleep(ms)
 
