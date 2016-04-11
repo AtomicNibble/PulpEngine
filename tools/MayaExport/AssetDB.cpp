@@ -300,9 +300,19 @@ bool AssetDB::sendRequest(ProtoBuf::AssetDB::Request& request)
 	google::protobuf::io::ArrayOutputStream arrayOutput(buffer, bufLength);
 	WriteDelimitedTo(request, &arrayOutput);
 
+	bool firstAttempt = true;
+
+rety:
+
 	if (!pipe_.write(buffer, safe_static_cast<size_t, int64_t>(arrayOutput.ByteCount()))) {
 		X_ERROR("AssetDB", "failed to write buffer");
 		pipe_.close();
+
+		// if first try and we can re-connect, try send again.
+		if (firstAttempt && Connect()) {
+			firstAttempt = false;
+			goto rety;
+		}
 		return false;
 	}
 	if (!pipe_.flush()) {
