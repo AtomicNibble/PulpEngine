@@ -91,7 +91,7 @@ namespace Compression
 		return false;
 	}
 
-	bool LZMA::inflate(void* pSrcBuf, size_t srcBufLen,
+	bool LZMA::inflate(const void* pSrcBuf, size_t srcBufLen,
 		void* pDstBuf, size_t destBufLen)
 	{
 		const uint8_t* pSrc = reinterpret_cast<const uint8_t*>(pSrcBuf);
