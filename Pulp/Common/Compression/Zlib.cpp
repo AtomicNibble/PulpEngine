@@ -189,7 +189,7 @@ namespace Compression
 		return true;
 	}
 
-	bool Zlib::inflate(void* pSrcBuf, size_t srcBufLen, 
+	bool Zlib::inflate(const void* pSrcBuf, size_t srcBufLen,
 		void* pDstBuf, size_t destBufLen)
 	{
 		// required
