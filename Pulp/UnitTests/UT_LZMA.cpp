@@ -34,7 +34,7 @@ TEST(LZMA, Unbuffered)
 	uint8_t* pCompressed = X_NEW_ARRAY(uint8_t, DestbufSize, g_arena, "LZMACompressed");
 	memset(pCompressed, 0, DestbufSize);
 
-	bool deflateOk = LZMA::deflate(pUncompressed, srcBufSize, pCompressed, DestbufSize, deflatedSize);
+	bool deflateOk = LZMA::deflate(g_arena, pUncompressed, srcBufSize, pCompressed, DestbufSize, deflatedSize);
 	EXPECT_TRUE(deflateOk);
 
 	if (deflateOk)
@@ -42,7 +42,7 @@ TEST(LZMA, Unbuffered)
 		uint8_t* pUncompressed2 = X_NEW_ARRAY(uint8_t, srcBufSize, g_arena, "LZMAUncompressed2");
 		memset(pUncompressed2, 0, srcBufSize);
 
-		bool inflateOk = LZMA::inflate(pCompressed, deflatedSize,
+		bool inflateOk = LZMA::inflate(g_arena, pCompressed, deflatedSize,
 			pUncompressed2, srcBufSize);
 
 		EXPECT_TRUE(inflateOk);

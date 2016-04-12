@@ -99,7 +99,7 @@ namespace PNG
 
 			using namespace core::Compression;
 
-			ZlibInflate inflater(inflated_data, InfaltedSize);
+			ZlibInflate inflater(g_rendererArena, inflated_data, InfaltedSize);
 			ZlibInflate::InflateResult::Enum zRes;
 
 			do

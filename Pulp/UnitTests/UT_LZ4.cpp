@@ -34,7 +34,7 @@ TEST(LZ4, Unbuffered)
 	uint8_t* pCompressed = X_NEW_ARRAY(uint8_t, DestbufSize, g_arena, "LZ4Compressed");
 	memset(pCompressed, 0, DestbufSize);
 
-	bool deflateOk = LZ4::deflate(pUncompressed, srcBufSize, pCompressed, DestbufSize, deflatedSize);
+	bool deflateOk = LZ4::deflate(g_arena, pUncompressed, srcBufSize, pCompressed, DestbufSize, deflatedSize);
 	EXPECT_TRUE(deflateOk);
 
 	if (deflateOk)
@@ -42,7 +42,7 @@ TEST(LZ4, Unbuffered)
 		uint8_t* pUncompressed2 = X_NEW_ARRAY(uint8_t, srcBufSize, g_arena, "LZ4bUncompressed2");
 		memset(pUncompressed2, 0, srcBufSize);
 
-		bool inflateOk = LZ4::inflate(pCompressed, deflatedSize,
+		bool inflateOk = LZ4::inflate(g_arena, pCompressed, deflatedSize,
 			pUncompressed2, srcBufSize);
 
 		EXPECT_TRUE(inflateOk);

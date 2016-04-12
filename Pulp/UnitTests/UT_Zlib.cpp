@@ -34,7 +34,7 @@ TEST(Zlib, Unbuffered)
 	uint8_t* pCompressed = X_NEW_ARRAY(uint8_t, DestbufSize, g_arena, "ZlibCompressed");
 	memset(pCompressed, 0, DestbufSize);
 
-	bool deflateOk = Zlib::deflate(pUncompressed, srcBufSize, pCompressed, DestbufSize, deflatedSize);
+	bool deflateOk = Zlib::deflate(g_arena, pUncompressed, srcBufSize, pCompressed, DestbufSize, deflatedSize);
 	EXPECT_TRUE(deflateOk);
 
 	if (deflateOk)
@@ -42,7 +42,7 @@ TEST(Zlib, Unbuffered)
 		uint8_t* pUncompressed2 = X_NEW_ARRAY(uint8_t, srcBufSize, g_arena, "ZlibUncompressed2");
 		memset(pUncompressed2, 0, srcBufSize);
 
-		bool inflateOk = Zlib::inflate(pCompressed, deflatedSize,
+		bool inflateOk = Zlib::inflate(g_arena, pCompressed, deflatedSize,
 			pUncompressed2, srcBufSize);
 
 		EXPECT_TRUE(inflateOk);
@@ -75,7 +75,7 @@ TEST(Zlib, buffered)
 	uint8_t* pCompressed = X_NEW_ARRAY(uint8_t, DestbufSize, g_arena, "ZlibCompressed");
 	memset(pCompressed, 0, DestbufSize);
 
-	bool deflateOk = Zlib::deflate(pUncompressed, srcBufSize, pCompressed, DestbufSize, deflatedSize);
+	bool deflateOk = Zlib::deflate(g_arena, pUncompressed, srcBufSize, pCompressed, DestbufSize, deflatedSize);
 	EXPECT_TRUE(deflateOk);
 
 	if (deflateOk)
@@ -84,7 +84,7 @@ TEST(Zlib, buffered)
 		memset(pUncompressed2, 0, srcBufSize);
 
 		// do it in steps.
-		ZlibInflate inflater(pUncompressed2, srcBufSize);
+		ZlibInflate inflater(g_arena, pUncompressed2, srcBufSize);
 		ZlibInflate::InflateResult::Enum res;
 
 		const size_t bufSize = 256;
