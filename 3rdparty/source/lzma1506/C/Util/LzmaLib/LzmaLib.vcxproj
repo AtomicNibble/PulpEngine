@@ -100,7 +100,7 @@
       <Optimization>Disabled</Optimization>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <WarningLevel>Level3</WarningLevel>
-      <MinimalRebuild>true</MinimalRebuild>
+      <MinimalRebuild>false</MinimalRebuild>
       <DebugInformationFormat>OldStyle</DebugInformationFormat>
       <PreprocessorDefinitions>_DEBUG;WIN32;_WINDOWS;_USRDLL;LZMALIB_EXPORTS;COMPRESS_MF_MT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AssemblerListingLocation>Debug\</AssemblerListingLocation>
