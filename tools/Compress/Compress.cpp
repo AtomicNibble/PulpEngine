@@ -80,7 +80,7 @@ namespace
 		virtual bool inflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data, 
 			const FileInfo& info, core::Array<uint8_t>& out) X_FINAL
 		{
-			out.resize(info.inflatedSize);
+			out.resize(safe_static_cast<size_t, uint64_t>(info.inflatedSize));
 
 			return T::inflate(arena, data, out);
 		}
@@ -103,7 +103,7 @@ namespace
 			size -= sizeof(*pFinfo);
 		}
 
-		bufOut.resize(size);
+		bufOut.resize(safe_static_cast<size_t,std::streamsize>(size));
 
 		if (file.read(reinterpret_cast<char*>(bufOut.ptr()), size))
 		{
