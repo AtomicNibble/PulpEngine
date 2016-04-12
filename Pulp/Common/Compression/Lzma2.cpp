@@ -2,8 +2,6 @@
 #include "Lzma2.h"
 
 #include <../../3rdparty/source/lzma1506/LzmaLib.h>
-#include <../../3rdparty/source/lzma1506/C/LzmaEnc.h>
-#include <../../3rdparty/source/lzma1506/C/LzmaDec.h>
 
 #if X_DEBUG
 X_LINK_LIB("LzmaLibd");
@@ -118,27 +116,23 @@ namespace Compression
 		size_t propsSize = LZMA_PROPS_SIZE;
 		size_t destLenTemp = destBufLen;
 
-
-		CLzmaEncProps props;
-		LzmaEncProps_Init(&props);
-		props.level = compressLevelToLevel(lvl);
-		props.algo = compressLevelToAlgo(lvl);
-		props.dictSize = compressLevelToDictSize(lvl);
-		props.writeEndMark = 1; // 0 or 1
-		props.numThreads = 1;
-
-		LzmaEncProps_Normalize(&props);
-
 		ArenaAlloc allocForLzma(arena);
 
-		int res = LzmaEncode(
+		int res = LzmaCompress(
 			&pDst[propsSize], &destLenTemp,
 			pSrc, srcBufLen,
-			&props, pDst, &propsSize, 1,
-			nullptr,
+			pDst, &propsSize,
+			compressLevelToLevel(lvl),
+			compressLevelToAlgo(lvl),
+			compressLevelToDictSize(lvl),
+			-1,  // lc
+			-1,  // lp
+			-1,  // pb
+			-1,  // fb
+			1,    // numthreads
 			&allocForLzma,
-			&allocForLzma);
-
+			&allocForLzma
+		);
 
 		if (res == SZ_OK) {
 			destLenOut = destLenTemp + propsSize;
@@ -174,21 +168,15 @@ namespace Compression
 		size_t srcLenTemp = srcBufLen - propsSize;
 
 		ArenaAlloc allocForLzma(arena);
-		ELzmaStatus status;
 
-		int res = LzmaDecode(pDst, &destLenTemp,
+		int res = LzmaUncompress(
+			pDst, &destLenTemp,
 			&pSrc[propsSize], &srcLenTemp,
-			pSrc, LZMA_PROPS_SIZE,
-			LZMA_FINISH_ANY,
-			&status,
+			pSrc, propsSize,
 			&allocForLzma
 		);
 
 		if (res == SZ_OK) {
-			// status is one of following:
-			// LZMA_STATUS_FINISHED_WITH_MARK
-			// LZMA_STATUS_NOT_FINISHED
-			// LZMA_STATUS_MAYBE_FINISHED_WITHOUT_MARK
 			return true;
 		}
 
