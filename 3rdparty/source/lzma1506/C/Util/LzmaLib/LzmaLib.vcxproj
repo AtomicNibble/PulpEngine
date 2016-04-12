@@ -107,6 +107,7 @@
       <AdditionalIncludeDirectories>
       </AdditionalIncludeDirectories>
       <ExceptionHandling>false</ExceptionHandling>
+      <CallingConvention>FastCall</CallingConvention>
     </ClCompile>
     <Midl>
       <SuppressStartupBanner>true</SuppressStartupBanner>

@@ -128,17 +128,17 @@ typedef int Bool;
 
 typedef struct
 {
-  Byte (*Read)(void *p); /* reads one byte, returns 0 in case of EOF or error */
+  Byte (MY_FAST_CALL*Read)(void *p); /* reads one byte, returns 0 in case of EOF or error */
 } IByteIn;
 
 typedef struct
 {
-  void (*Write)(void *p, Byte b);
+  void (MY_FAST_CALL*Write)(void *p, Byte b);
 } IByteOut;
 
 typedef struct
 {
-  SRes (*Read)(void *p, void *buf, size_t *size);
+  SRes (MY_FAST_CALL*Read)(void *p, void *buf, size_t *size);
     /* if (input(*size) != 0 && output(*size) == 0) means end_of_stream.
        (output(*size) < input(*size)) is allowed */
 } ISeqInStream;
@@ -150,7 +150,7 @@ SRes SeqInStream_ReadByte(ISeqInStream *stream, Byte *buf);
 
 typedef struct
 {
-  size_t (*Write)(void *p, const void *buf, size_t size);
+  size_t (MY_FAST_CALL*Write)(void *p, const void *buf, size_t size);
     /* Returns: result - the number of actually written bytes.
        (result < size) means error */
 } ISeqOutStream;
@@ -164,22 +164,22 @@ typedef enum
 
 typedef struct
 {
-  SRes (*Read)(void *p, void *buf, size_t *size);  /* same as ISeqInStream::Read */
-  SRes (*Seek)(void *p, Int64 *pos, ESzSeek origin);
+  SRes (MY_FAST_CALL*Read)(void *p, void *buf, size_t *size);  /* same as ISeqInStream::Read */
+  SRes (MY_FAST_CALL*Seek)(void *p, Int64 *pos, ESzSeek origin);
 } ISeekInStream;
 
 typedef struct
 {
-  SRes (*Look)(void *p, const void **buf, size_t *size);
+  SRes (MY_FAST_CALL*Look)(void *p, const void **buf, size_t *size);
     /* if (input(*size) != 0 && output(*size) == 0) means end_of_stream.
        (output(*size) > input(*size)) is not allowed
        (output(*size) < input(*size)) is allowed */
-  SRes (*Skip)(void *p, size_t offset);
+  SRes (MY_FAST_CALL*Skip)(void *p, size_t offset);
     /* offset must be <= output(*size) of Look */
 
-  SRes (*Read)(void *p, void *buf, size_t *size);
+  SRes (MY_FAST_CALL*Read)(void *p, void *buf, size_t *size);
     /* reads directly (without buffer). It's same as ISeqInStream::Read */
-  SRes (*Seek)(void *p, Int64 *pos, ESzSeek origin);
+  SRes (MY_FAST_CALL*Seek)(void *p, Int64 *pos, ESzSeek origin);
 } ILookInStream;
 
 SRes LookInStream_LookRead(ILookInStream *stream, void *buf, size_t *size);
@@ -221,15 +221,15 @@ void SecToRead_CreateVTable(CSecToRead *p);
 
 typedef struct
 {
-  SRes (*Progress)(void *p, UInt64 inSize, UInt64 outSize);
+  SRes (MY_FAST_CALL*Progress)(void *p, UInt64 inSize, UInt64 outSize);
     /* Returns: result. (result != SZ_OK) means break.
        Value (UInt64)(Int64)-1 for size means unknown value. */
 } ICompressProgress;
 
 typedef struct
 {
-  void *(*Alloc)(void *p, size_t size);
-  void (*Free)(void *p, void *address); /* address can be 0 */
+  void *(MY_FAST_CALL*Alloc)(void *p, size_t size);
+  void (MY_FAST_CALL*Free)(void *p, void *address); /* address can be 0 */
 } ISzAlloc;
 
 #define IAlloc_Alloc(p, size) (p)->Alloc((p), size)
