@@ -36,14 +36,17 @@ namespace Compression
 			void* pDstBuf, size_t destBufLen, size_t& destLenOut, 
 			CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
+		static bool inflate(const void* pSrcBuf, size_t srcBufLen,
+			void* pDstBuf, size_t destBufLen);
+
 		template<typename T>
-		static bool deflate(const core::Array<T>& data, 
+		static bool deflate(const core::Array<T>& data,
 			core::Array<uint8_t>& compressed,
 			CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
-
-		static bool inflate(void* pSrcBuf, size_t srcBufLen,
-			void* pDstBuf, size_t destBufLen);
+		template<typename T>
+		static bool inflate(const core::Array<T>& data,
+			core::Array<uint8_t>& inflated);
 
 
 	private:
@@ -68,6 +71,13 @@ namespace Compression
 		compressed.resize(compressedSize);
 		return res;
 	}
+
+	template<typename T>
+	X_INLINE bool LZ4::inflate(const core::Array<T>& data, core::Array<uint8_t>& inflated)
+	{
+		return inflate(data.ptr(), data.size(), inflated.ptr(), inflated.size());
+	}
+
 
 } // namespace Compression
 

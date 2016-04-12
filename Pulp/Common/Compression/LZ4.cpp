@@ -58,7 +58,7 @@ namespace Compression
 		return true;
 	}
 
-	bool LZ4::inflate(void* pSrcBuf, size_t srcBufLen,
+	bool LZ4::inflate(const void* pSrcBuf, size_t srcBufLen,
 		void* pDstBuf, size_t destBufLen)
 	{
 		X_UNUSED(srcBufLen);
