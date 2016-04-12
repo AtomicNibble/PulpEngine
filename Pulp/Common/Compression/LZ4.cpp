@@ -36,9 +36,11 @@ namespace Compression
 		return static_cast<size_t>(LZ4_compressBound(safe_static_cast<int,size_t>(sourceLen)));
 	}
 
-	bool LZ4::deflate(const void* pSrcBuf, size_t srcBufLen,
+	bool LZ4::deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
 		void* pDstBuf, size_t destBufLen, size_t& destLenOut, CompressLevel::Enum lvl)
 	{
+		X_UNUSED(arena);
+
 		const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
 		char* pDst = reinterpret_cast<char*>(pDstBuf);
 
@@ -58,9 +60,10 @@ namespace Compression
 		return true;
 	}
 
-	bool LZ4::inflate(const void* pSrcBuf, size_t srcBufLen,
+	bool LZ4::inflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
 		void* pDstBuf, size_t destBufLen)
 	{
+		X_UNUSED(arena);
 		X_UNUSED(srcBufLen);
 
 		const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);

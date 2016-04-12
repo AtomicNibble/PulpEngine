@@ -34,20 +34,20 @@ namespace Compression
 		// none buffed single step inflate / deflate.
 		static size_t requiredDeflateDestBuf(size_t sourceLen);
 
-		static bool deflate(const void* pSrcBuf, size_t srcBufLen, 
+		static bool deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
 			void* pDstBuf, size_t destBufLen, size_t& destLenOut, CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
-		static bool inflate(const void* pSrcBuf, size_t srcBufLen,
+		static bool inflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
 			void* pDstBuf, size_t destBufLen);
 
 
 		template<typename T>
-		static bool deflate(const core::Array<T>& data,
+		static bool deflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
 			core::Array<uint8_t>& compressed,
 			CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
 		template<typename T>
-		static bool inflate(const core::Array<T>& data,
+		static bool inflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
 			core::Array<uint8_t>& inflated);
 
 
@@ -58,7 +58,7 @@ namespace Compression
 	};
 
 	template<typename T>
-	X_INLINE bool Zlib::deflate(const core::Array<T>& data, core::Array<uint8_t>& compressed,
+	X_INLINE bool Zlib::deflate(core::MemoryArenaBase* arena, const core::Array<T>& data, core::Array<uint8_t>& compressed,
 		CompressLevel::Enum lvl)
 	{
 		size_t compressedSize = 0;
@@ -66,7 +66,7 @@ namespace Compression
 
 		compressed.resize(bufSize);
 
-		bool res = deflate(data.ptr(), data.size(),
+		bool res = deflate(arena, data.ptr(), data.size(),
 			compressed.ptr(), compressed.size(), compressedSize, lvl);
 
 		compressed.resize(compressedSize);
@@ -74,9 +74,9 @@ namespace Compression
 	}
 
 	template<typename T>
-	X_INLINE bool Zlib::inflate(const core::Array<T>& data, core::Array<uint8_t>& inflated)
+	X_INLINE bool Zlib::inflate(core::MemoryArenaBase* arena, const core::Array<T>& data, core::Array<uint8_t>& inflated)
 	{
-		return inflate(data.ptr(), data.size(), inflated.ptr(), inflated.size());
+		return inflate(arena, data.ptr(), data.size(), inflated.ptr(), inflated.size());
 	}
 
 
@@ -89,7 +89,7 @@ namespace Compression
 		X_DECLARE_ENUM(InflateResult)(ERROR,OK,DONE);
 
 	public:
-		ZlibInflate(void* pDst, size_t destLen);
+		ZlibInflate(core::MemoryArenaBase* arena, void* pDst, size_t destLen);
 		~ZlibInflate();
 
 		InflateResult::Enum Inflate(const void* pCompessedData, size_t len);
@@ -98,9 +98,11 @@ namespace Compression
 		X_NO_COPY(ZlibInflate);
 		X_NO_ASSIGN(ZlibInflate);
 	private:
+		core::MemoryArenaBase* arena_;
+		z_stream_s* stream_;
+
 		const void* pDst_;
 		size_t destLen_;
-		z_stream_s* stream_;
 	};
 
 

@@ -102,14 +102,12 @@ namespace Compression
 		return deflateBound(nullptr, safe_static_cast<uint32_t, size_t>(sourceLen));
 	}
 
-	bool Zlib::deflate(const void* pSrcBuf, size_t srcBufLen, 
+	bool Zlib::deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
 		void* pDstBuf, size_t destBufLen, size_t& destLenOut, CompressLevel::Enum lvl)
 	{
 		// required
 		X_ASSERT_NOT_NULL(pSrcBuf);
 		X_ASSERT_NOT_NULL(pDstBuf);
-		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pArena);
 
 		// early out.
 		if (srcBufLen == 0) {
@@ -149,7 +147,7 @@ namespace Compression
 
 		stream.zalloc = StaticAlloc;
 		stream.zfree = StaticFree;
-		stream.opaque = gEnv->pArena;
+		stream.opaque = arena;
 
 		::deflateInit(&stream, CompLvlToZliblvl(lvl));
 
@@ -173,14 +171,12 @@ namespace Compression
 		return true;
 	}
 
-	bool Zlib::inflate(const void* pSrcBuf, size_t srcBufLen,
+	bool Zlib::inflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
 		void* pDstBuf, size_t destBufLen)
 	{
 		// required
 		X_ASSERT_NOT_NULL(pSrcBuf);
 		X_ASSERT_NOT_NULL(pDstBuf);
-		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pArena);
 
 		z_stream stream;
 		core::zero_object(stream);
@@ -195,7 +191,7 @@ namespace Compression
 
 		stream.zalloc = StaticAlloc;
 		stream.zfree = StaticFree;
-		stream.opaque = gEnv->pArena;
+		stream.opaque = arena;
 
 		::inflateInit(&stream);
 
@@ -215,19 +211,20 @@ namespace Compression
 
 	// --------------------------------------
 
-	ZlibInflate::ZlibInflate(void* pDst, size_t destLen) :
-		pDst_(pDst), destLen_(destLen), stream_(nullptr)
+	ZlibInflate::ZlibInflate(core::MemoryArenaBase* arena, void* pDst, size_t destLen) :
+		arena_(arena),
+		stream_(nullptr),
+		pDst_(pDst), 
+		destLen_(destLen)
 	{
-		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pArena);
-		stream_ = X_NEW(z_stream, gEnv->pArena, "ZlibStream");
+		stream_ = X_NEW(z_stream, arena_, "ZlibStream");
 		core::zero_this(stream_);
 
 		X_ASSERT_NOT_NULL(stream_);
 
 		stream_->zalloc = StaticAlloc;
 		stream_->zfree = StaticFree;
-		stream_->opaque = gEnv->pArena;
+		stream_->opaque = arena_;
 	
 		::inflateInit(stream_);
 
@@ -239,10 +236,7 @@ namespace Compression
 	ZlibInflate::~ZlibInflate()
 	{
 		::inflateEnd(stream_);
-
-		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pArena);
-		X_DELETE_AND_NULL(stream_, gEnv->pArena);
+		X_DELETE_AND_NULL(stream_, arena_);
 	}
 
 
