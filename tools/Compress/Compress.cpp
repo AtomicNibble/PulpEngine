@@ -12,6 +12,10 @@
 
 #include <Time\StopWatch.h>
 
+#include <istream>
+#include <iostream>
+#include <fstream>
+
 namespace
 {
 
@@ -24,42 +28,106 @@ namespace
 	> CompressorArena;
 
 
+	struct FileInfo
+	{
+		FileInfo() {
+			core::zero_this(this);
+		}
+		uint64_t deflatedSize;
+		uint64_t inflatedSize;
+	};
+
 
 	struct ICompressor
 	{
+		 ICompressor() : lvl_(5) {}
 		virtual ~ICompressor() {}
 
-		virtual bool deflate(const core::Array<uint8_t>& data, core::Array<uint8_t>& out) X_ABSTRACT;
-		virtual bool inflate(const core::Array<uint8_t>& data, core::Array<uint8_t>& out) X_ABSTRACT;
+		virtual void setLvl(int32_t lvl) {
+			lvl_ = lvl;
+		}
+
+		virtual bool deflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data,
+			FileInfo& info, core::Array<uint8_t>& out) X_ABSTRACT;
+		virtual bool inflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data,
+			const FileInfo& info, core::Array<uint8_t>& out) X_ABSTRACT;
+
+	protected:
+		int32_t lvl_;
 	};
 
-
-	class LZ4 : public ICompressor
+	template<typename T>
+	struct Compressor : public ICompressor
 	{
-		virtual bool deflate(const core::Array<uint8_t>& data, core::Array<uint8_t>& out) X_FINAL
+		virtual bool deflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data, 
+			FileInfo& info, core::Array<uint8_t>& out) X_FINAL
 		{
-			return core::Compression::LZ4::deflate(data, out, core::Compression::LZ4::CompressLevel::LOW);
+			T::CompressLevel::Enum lvl = T::CompressLevel::LOW;
+			if (lvl_ > 3) {
+				lvl = T::CompressLevel::NORMAL;
+			}
+			else if (lvl_ > 6) {
+				lvl = T::CompressLevel::HIGH;
+			}
+
+			bool res = T::deflate(arena, data, out, lvl);
+			if (res) {
+				info.deflatedSize = out.size();
+			}
+			return res;
 		}
 
-		virtual bool inflate(const core::Array<uint8_t>& data, core::Array<uint8_t>& out) X_FINAL
+		virtual bool inflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data, 
+			const FileInfo& info, core::Array<uint8_t>& out) X_FINAL
 		{
-			return core::Compression::LZ4::inflate(data, out);
+			out.resize(info.inflatedSize);
+
+			return T::inflate(arena, data, out);
 		}
+
 	};
 
-	class LZMA : public ICompressor
+	X_DECLARE_ENUM(Algo)(LZ4, LZMA, ZLIB);
+
+	bool ReadFileToBuf(const std::string& filePath, core::Array<uint8_t>& bufOut, FileInfo* pFinfo = nullptr)
 	{
-		virtual bool deflate(const core::Array<uint8_t>& data, core::Array<uint8_t>& out) X_FINAL
-		{
-			return core::Compression::LZMA::deflate(data, out, core::Compression::LZMA::CompressLevel::LOW);
+		std::ifstream file(filePath, std::ios::binary | std::ios::ate);
+		std::streamsize size = file.tellg();
+		file.seekg(0, std::ios::beg);
+
+		if (pFinfo) {
+			if (!file.read(reinterpret_cast<char*>(pFinfo), sizeof(*pFinfo))) {
+				return false;
+			}
+
+			size -= sizeof(*pFinfo);
 		}
 
-		virtual bool inflate(const core::Array<uint8_t>& data, core::Array<uint8_t>& out) X_FINAL
-		{
-			return core::Compression::LZMA::inflate(data, out);
-		}
-	};
+		bufOut.resize(size);
 
+		if (file.read(reinterpret_cast<char*>(bufOut.ptr()), size))
+		{
+			return true;
+		}
+		return false;
+	}
+
+	bool WriteFileToBuf(const std::string& filePath, const core::Array<uint8_t>& buf, FileInfo* pInfo)
+	{
+		std::ofstream file(filePath, std::ios::binary | std::ios::out);
+
+		if (pInfo) {
+			pInfo->deflatedSize = buf.size();
+
+			file.write(reinterpret_cast<const char*>(pInfo), sizeof(*pInfo));
+		}
+
+		if (file.write(reinterpret_cast<const char*>(buf.ptr()), buf.size()))
+		{
+			return true;
+		}
+		return false;
+	}
 
 } // namespace 
 
@@ -92,10 +160,68 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// algo: lz4, lzma, zlib
 	// lvl: 1-9
 
-	std::string inFile;
-	std::string outFile;
+	std::string inFile = R"(C:\Users\WinCat\Documents\code\WinCat\engine\potatoengine\game_folder\mod\models\mech_body.model_raw.lz4)";
+	std::string outFile = R"(C:\Users\WinCat\Documents\code\WinCat\engine\potatoengine\game_folder\mod\models\mech_body.model_raw)";
 
+	bool defalte = false;
+	int32_t lvl = 5;
 
+	Algo::Enum algo = Algo::LZ4;
+	ICompressor* pCompressor = nullptr;
+
+	if (algo == Algo::LZ4) {
+		pCompressor = X_NEW(Compressor<core::Compression::LZ4>, g_arena, "LZ4");
+		if (defalte) {
+			outFile += ".lz4";
+		}
+	}
+	else if (algo == Algo::LZMA) {
+		pCompressor = X_NEW(Compressor<core::Compression::LZMA>, g_arena, "LZMA");
+		if (defalte) {
+			outFile += ".lzma";
+		}
+	}
+	else if (algo == Algo::ZLIB) {
+		pCompressor = X_NEW(Compressor<core::Compression::Zlib>, g_arena, "ZLIB");
+		if (defalte) {
+			outFile += ".zlib";
+		}
+	}
+	else {
+		return -1;
+	}
  
+	core::Array<uint8_t> inFileData(g_arena);
+	core::Array<uint8_t> outfileData(g_arena);
+
+	FileInfo info;
+	if (!ReadFileToBuf(inFile, inFileData, defalte ? nullptr : &info)) {
+		return -1;
+	}
+
+	bool res = false;
+
+	core::StopWatch timer;
+
+	if (defalte) {
+		pCompressor->setLvl(lvl);
+		res = pCompressor->deflate(g_arena, inFileData, info, outfileData);
+	}
+	else {
+		res = pCompressor->inflate(g_arena, inFileData, info, outfileData);
+	}
+
+	float elapsedMS = timer.GetMilliSeconds();
+
+	if (!res) {
+		return -1;
+	}
+
+	if (!WriteFileToBuf(outFile, outfileData, defalte ? &info : nullptr)) {
+		return -1;
+	}
+
+
+	X_DELETE(pCompressor, g_arena);
     return 0;
 }
