@@ -22,6 +22,7 @@
     <SccProjectName />
     <SccLocalPath />
     <ProjectGuid>{A2AB5B95-0F2F-4A75-90E3-00E088B39E83}</ProjectGuid>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
@@ -69,23 +70,27 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>Debug\</IntDir>
+    <OutDir>$(ProjectDir)..\..\..\..\..\$(PlatformToolset)\$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\..\..\..\..\..\..\Temp\3rdparty\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)d</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>$(ProjectName)d</TargetName>
+    <OutDir>$(ProjectDir)..\..\..\..\..\$(PlatformToolset)\$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\..\..\..\..\..\..\Temp\3rdparty\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <OutDir>$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
-    <IntDir>.\Release\</IntDir>
+    <OutDir>$(ProjectDir)..\..\..\..\..\$(PlatformToolset)\$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\..\..\..\..\..\..\Temp\3rdparty\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
     <TargetName>$(ProjectName)</TargetName>
+    <OutDir>$(ProjectDir)..\..\..\..\..\$(PlatformToolset)\$(Platform)\</OutDir>
+    <IntDir>$(ProjectDir)..\..\..\..\..\..\..\Temp\3rdparty\$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
