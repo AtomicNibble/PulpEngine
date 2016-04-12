@@ -29,9 +29,6 @@ namespace Compression
 			NORMAL, // normal
 			HIGH // best
 			);
-	protected:
-		Zlib();
-		virtual ~Zlib();
 
 	public:
 		// none buffed single step inflate / deflate.
@@ -55,10 +52,9 @@ namespace Compression
 
 
 	private:
+		X_NO_CREATE(Zlib);
 		X_NO_COPY(Zlib);
 		X_NO_ASSIGN(Zlib);
-	protected:
-		z_stream_s* stream_;
 	};
 
 	template<typename T>
@@ -85,13 +81,16 @@ namespace Compression
 
 
 	// can take one or many inputs and inflate them into dest.
-	struct ZlibInflate : public Zlib
+	class ZlibInflate
 	{
 	public:
+		typedef Zlib::CompressLevel CompressLevel;
+
 		X_DECLARE_ENUM(InflateResult)(ERROR,OK,DONE);
+
 	public:
 		ZlibInflate(void* pDst, size_t destLen);
-		virtual ~ZlibInflate() X_FINAL;
+		~ZlibInflate();
 
 		InflateResult::Enum Inflate(const void* pCompessedData, size_t len);
 
@@ -101,6 +100,7 @@ namespace Compression
 	private:
 		const void* pDst_;
 		size_t destLen_;
+		z_stream_s* stream_;
 	};
 
 

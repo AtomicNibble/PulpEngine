@@ -95,22 +95,6 @@ namespace Compression
 	} // namespace
 
 
-	Zlib::Zlib()
-	{
-		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pArena);
-		stream_ = X_NEW(z_stream,gEnv->pArena,"ZlibStream");
-		core::zero_this(stream_);
-	}
-
-	Zlib::~Zlib()
-	{
-		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pArena);
-		X_DELETE_AND_NULL(stream_, gEnv->pArena);
-	}
-
-
 	// -------------------------------------------------------------
 
 	size_t Zlib::requiredDeflateDestBuf(size_t sourceLen)
@@ -228,11 +212,17 @@ namespace Compression
 		return true;
 	}
 
+
 	// --------------------------------------
 
 	ZlibInflate::ZlibInflate(void* pDst, size_t destLen) :
-		pDst_(pDst), destLen_(destLen)
+		pDst_(pDst), destLen_(destLen), stream_(nullptr)
 	{
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pArena);
+		stream_ = X_NEW(z_stream, gEnv->pArena, "ZlibStream");
+		core::zero_this(stream_);
+
 		X_ASSERT_NOT_NULL(stream_);
 
 		stream_->zalloc = StaticAlloc;
@@ -243,11 +233,16 @@ namespace Compression
 
 		stream_->next_out = reinterpret_cast<uint8_t*>(pDst);
 		stream_->avail_out = safe_static_cast<uint32_t>(destLen);
+
 	}
 
 	ZlibInflate::~ZlibInflate()
 	{
 		::inflateEnd(stream_);
+
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pArena);
+		X_DELETE_AND_NULL(stream_, gEnv->pArena);
 	}
 
 
