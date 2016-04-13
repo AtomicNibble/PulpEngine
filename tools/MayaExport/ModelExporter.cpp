@@ -261,7 +261,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 			{
 				PROFILE_MAYA_NAME("Deflate Raw");
 
-				if (!core::Compression::LZ4::deflate(g_arena, rawModel, compressed, core::Compression::LZ4::CompressLevel::LOW))
+				if (!core::Compression::LZ4::deflate(g_arena, rawModel, compressed, core::Compression::LZ4::CompressLevel::NORMAL))
 				{
 					X_ERROR("Model", "Failed to defalte raw model");
 				}
