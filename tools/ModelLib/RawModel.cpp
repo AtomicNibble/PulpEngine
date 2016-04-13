@@ -574,7 +574,7 @@ namespace RawModel
 
 		uint8_t* pBuf = data.ptr();
 		for (auto& buf : dataArr) {		
-			std::memcmp(pBuf, buf->c_str(), buf->length());
+			std::memcpy(pBuf, buf->c_str(), buf->length());
 			pBuf += buf->length();
 		}
 
