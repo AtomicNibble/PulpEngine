@@ -41,6 +41,8 @@ X_ENABLE_WARNING(4702)
 #include <Containers\FixedStack.h>
 
 #include <Threading\Thread.h>
+#include <String\HumanSize.h>
+#include <Compression\LZ4.h>
 
 #include "Profiler.h"
 #include "MayaUtil.h"
@@ -248,9 +250,28 @@ MStatus ModelExporter::convert(const MArgList& args)
 		{
 			PROFILE_MAYA_NAME("Save Raw");
 
-			if (!SaveRawModel(outPath)) {
+			core::Array<uint8_t> rawModel(g_arena);
+			core::Array<uint8_t> compressed(g_arena);
+
+			if (!SaveRawModel(rawModel)) {
 				MayaUtil::MayaPrintError("Failed to save raw model");
 				return MS::kFailure;
+			}
+
+			{
+				PROFILE_MAYA_NAME("Deflate Raw");
+
+				if (!core::Compression::LZ4::deflate(g_arena, rawModel, compressed, core::Compression::LZ4::CompressLevel::LOW))
+				{
+					X_ERROR("Model", "Failed to defalte raw model");
+				}
+				else
+				{
+					core::HumanSize::Str sizeStr, sizeStr2;
+					X_LOG0("Model", "Defalated %s -> %s", 
+						core::HumanSize::toString(sizeStr, rawModel.size()),
+						core::HumanSize::toString(sizeStr2, compressed.size()));
+				}
 			}
 		}
 
