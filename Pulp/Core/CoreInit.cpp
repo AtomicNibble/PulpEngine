@@ -418,7 +418,7 @@ bool XCore::ParseCmdArgs(const wchar_t* pArgs)
 		}
 
 		const wchar_t* pArg = args.getArgv(i);
-		if (*pArg == L'+' && core::strUtil::strlen(pArg) > 1)
+		if ((*pArg == L'+' || *pArg == L'-') && core::strUtil::strlen(pArg) > 1)
 		{
 			numArgs_++;
 			args_[numArgs_ - 1].AppendArg(args.getArgv(i) + 1);
