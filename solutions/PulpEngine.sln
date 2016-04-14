@@ -170,6 +170,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Network", "..\Pulp\Network\
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Compress", "..\tools\Compress\Compress.vcxproj", "{303FAF11-6EBF-4992-9DDD-2706F2A273A4}"
 	ProjectSection(ProjectDependencies) = postProject
+		{0D5772AB-8569-4802-B751-42C67275B1A2} = {0D5772AB-8569-4802-B751-42C67275B1A2}
 		{07328CCB-F9CC-4967-861E-272BCA0CAB04} = {07328CCB-F9CC-4967-861E-272BCA0CAB04}
 	EndProjectSection
 EndProject
