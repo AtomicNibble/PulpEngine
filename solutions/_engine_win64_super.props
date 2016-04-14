@@ -28,9 +28,6 @@
     <Lib>
       <LinkTimeCodeGeneration>true</LinkTimeCodeGeneration>
     </Lib>
-    <Link>
-       <ImageHasSafeExceptionHandlers>true</ImageHasSafeExceptionHandlers>
-     </Link>
   </ItemDefinitionGroup>
   <ItemGroup />
 </Project>
