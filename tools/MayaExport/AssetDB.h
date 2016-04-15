@@ -12,6 +12,13 @@ namespace AssetDB {
 }
 );
 
+
+X_NAMESPACE_DECLARE(core,
+	template<typename T>
+	class Array;
+);
+
+
 X_NAMESPACE_BEGIN(maya)
 
 class AssetDB
@@ -32,10 +39,12 @@ public:
 	MStatus AddAsset(AssetType::Enum type, const MString& name);
 	MStatus RemoveAsset(AssetType::Enum type, const MString& name);
 	MStatus RenameAsset(AssetType::Enum type, const MString& name, const MString& oldName);
-	MStatus UpdateAsset(AssetType::Enum type, const MString& name, const MString& path, const MString& args);
+	MStatus UpdateAsset(AssetType::Enum type, const MString& name, const MString& path,
+		const MString& args, const core::Array<uint8_t>& data);
 
 private:
 	bool sendRequest(ProtoBuf::AssetDB::Request& request);
+	bool sendBuf(const core::Array<uint8_t>& data);
 	bool getResponse(ProtoBuf::AssetDB::Reponse& response);
 
 private:

@@ -2,6 +2,8 @@
 #include "AssetDB.h"
 #include "MayaUtil.h"
 
+#include <Containers\Array.h>
+
 #include <maya\MSyntax.h>
 #include <maya\MArgDatabase.h>
 
@@ -261,7 +263,7 @@ MStatus AssetDB::RenameAsset(AssetType::Enum type, const MString & name, const M
 }
 
 MStatus AssetDB::UpdateAsset(AssetType::Enum type, const MString& name, 
-	const MString& path, const MString& args)
+	const MString& path, const MString& args, const core::Array<uint8_t>& data)
 {
 	if (!pipe_.isOpen() && !Connect()) {
 		MayaUtil::MayaPrintError("Failed to UpdateAsset pipe is invalid");
@@ -269,16 +271,24 @@ MStatus AssetDB::UpdateAsset(AssetType::Enum type, const MString& name,
 	}
 
 	{
+		uint32_t dataSize = safe_static_cast<uint32_t, size_t>(data.size());
+
 		ProtoBuf::AssetDB::UpdateAsset* pUpdate = new ProtoBuf::AssetDB::UpdateAsset();
 		pUpdate->set_type(AssetTypeToProtoType(type));
 		pUpdate->set_name(name.asChar());
 		pUpdate->set_path(path.asChar());
 		pUpdate->set_args(args.asChar());
+		pUpdate->set_datasize(dataSize);
 
 		ProtoBuf::AssetDB::Request request;
 		request.set_allocated_update(pUpdate);
 
 		if (!sendRequest(request)) {
+			return MS::kFailure;
+		}
+
+		// now send the buffer.
+		if (!sendBuf(data)) {
 			return MS::kFailure;
 		}
 	}
@@ -315,6 +325,38 @@ rety:
 		}
 		return false;
 	}
+	if (!pipe_.flush()) {
+		X_ERROR("AssetDB", "failed to flush pipe");
+		return false;
+	}
+
+	return true;
+}
+
+bool AssetDB::sendBuf(const core::Array<uint8_t>& data)
+{
+	size_t bytesWritten;
+	size_t totalBytesWritten = 0;
+
+	while (1)
+	{
+		const size_t bytesLeft = data.size() - totalBytesWritten;
+
+		bytesWritten = 0;
+		if (!pipe_.write(&data[bytesWritten], bytesLeft, &bytesWritten)) {
+			X_ERROR("AssetDB", "failed to write buffer");
+			pipe_.close();
+
+			// don't think we wan't to rety in this case.
+			return false;
+		}
+
+		totalBytesWritten += bytesWritten;
+		if (totalBytesWritten >= data.size()) {
+			break;
+		}
+	}
+
 	if (!pipe_.flush()) {
 		X_ERROR("AssetDB", "failed to flush pipe");
 		return false;

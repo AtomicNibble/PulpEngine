@@ -193,7 +193,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 		return status;
 	}
 
-	status = MayaUtil::ShowProgressDlg(0, 6);
+	status = MayaUtil::ShowProgressDlg(0, (exportMode_ == ExpoMode::RAW) ? 6 : 7);
 	bool saveOk = false;
 
 	{
@@ -242,56 +242,76 @@ MStatus ModelExporter::convert(const MArgList& args)
 			return status;
 		}
 
-		MayaUtil::SetProgressText("Saving raw model");
 
 		// time to slap a goat!
 		core::Path<char> outPath = getFilePath();
 
+		if (exportMode_ == ExpoMode::RAW)
 		{
 			PROFILE_MAYA_NAME("Save Raw");
 
-			core::Array<uint8_t> rawModel(g_arena);
-			core::Array<uint8_t> compressed(g_arena);
+			MayaUtil::SetProgressText("Saving raw model");
 
-			if (!SaveRawModel(rawModel)) {
+			if (!SaveRawModel(outPath)) {
 				MayaUtil::MayaPrintError("Failed to save raw model");
 				return MS::kFailure;
 			}
+		}
+		else if (exportMode_ == ExpoMode::SERVER)
+		{
+			MayaUtil::SetProgressText("Saving raw model");
+
+			core::Array<uint8_t> compressed(g_arena);
 
 			{
+				PROFILE_MAYA_NAME("Save Raw");
+
+				core::Array<uint8_t> rawModel(g_arena);
+
+				if (!SaveRawModel(rawModel)) {
+					MayaUtil::MayaPrintError("Failed to save raw model");
+					return MS::kFailure;
+				}
+
 				PROFILE_MAYA_NAME("Deflate Raw");
 
 				if (!core::Compression::LZ4::deflate(g_arena, rawModel, compressed, core::Compression::LZ4::CompressLevel::NORMAL))
 				{
 					X_ERROR("Model", "Failed to defalte raw model");
+					return MS::kFailure;
 				}
 				else
 				{
 					core::HumanSize::Str sizeStr, sizeStr2;
-					X_LOG0("Model", "Defalated %s -> %s", 
+					X_LOG0("Model", "Defalated %s -> %s",
 						core::HumanSize::toString(sizeStr, rawModel.size()),
 						core::HumanSize::toString(sizeStr2, compressed.size()));
 				}
-			}
-		}
 
-		if (exportMode_ == ExpoMode::SERVER)
-		{
-			MayaUtil::SetProgressText("Compiling model");
+			}
 
 			{
+				MayaUtil::SetProgressText("Syncing data to AssetServer");
+
+				PROFILE_MAYA_NAME("Sync To Server");
+
+				// send to asset server.
+				maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::MODEL,
+					MString(getName()),
+					MString(outPath.c_str()),
+					argsToJson(),
+					compressed
+				);
+			}
+			{
+				MayaUtil::SetProgressText("Compiling model");
+
 				PROFILE_MAYA_NAME("Compile and save");
 
 				if (!CompileModel(outPath)) {
 					MayaUtil::MayaPrintError("Failed to compile model");
 					return MS::kFailure;
-				}
-
-				maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::MODEL,
-					MString(getName()),
-					MString(outPath.c_str()),
-					argsToJson()
-				);
+				}			
 			}
 		}
 		else {
