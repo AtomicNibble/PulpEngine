@@ -800,13 +800,15 @@ bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum locati
 	const wchar_t* Start = buf.begin();
 	const wchar_t* End = buf.begin();
 
-	lopi(MAX_PATH)
+	for(size_t i=0; i< MAX_PATH; i++)
 	{
-		if (*End == '\0')
+		if (*End == '\0' || *Start == '\0') {
 			break;
+		}
 
-		if (*End == ':')
+		if (*End == ':') {
 			End += 2;
+		}
 
 		if (*End == '\\')
 		{
