@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "AssetServer.h"
 
+#include <Containers\Array.h>
+
 X_DISABLE_WARNING(4244)
 #include <google/protobuf/io/zero_copy_stream_impl.h>
 #include <google/protobuf/io/coded_stream.h>
@@ -178,7 +180,22 @@ bool AssetServer::Client::listen(void)
 			ok = as_.RenameAsset(request.rename(), err);
 			break;
 		case ProtoBuf::AssetDB::Request::kUpdate:
-			ok = as_.UpdateAsset(request.update(), err);
+		{
+			// not sure where is best place to put this is.
+			// here or inside UpdateAsset() :Z
+			core::Array<uint8_t> buf(g_arena);
+			if (request.update().has_datasize()) 
+			{
+				uint32_t dataSize = request.update().datasize();
+
+				if (!readBuf(buf, dataSize)) {
+					err = "Failed to read buffer after UpdateAssert Msg.";
+					goto fail;
+				}
+			}
+			ok = as_.UpdateAsset(request.update(), buf, err);
+		fail:;
+		}
 			break;
 		default:
 			err = "Unkown request msg type";
@@ -226,6 +243,37 @@ bool AssetServer::Client::readRequest(ProtoBuf::AssetDB::Request& request)
 	if (!ReadDelimitedFrom(&arrayInput, &request, &cleanEof)) {
 		X_ERROR("AssetServer", "Failed to parse msg");
 		return false;
+	}
+
+	return true;
+}
+
+bool AssetServer::Client::readBuf(core::Array<uint8_t>& buf, size_t size)
+{
+	size_t bytesRead, bytesReadTotal;
+
+	if (size == 0) {
+		return true;
+	}
+
+	buf.resize(size);
+	bytesReadTotal = 0;
+
+	while (true)
+	{
+		const size_t bufSpace = size - bytesReadTotal;
+
+		bytesRead = 0;
+		if (!pipe_.read(&buf[bytesReadTotal], bufSpace, &bytesRead)) {
+			X_ERROR("AssetServer", "Failed to read msg-buf");
+			buf.clear();
+			return false;
+		}
+
+		bytesReadTotal += bytesRead;
+		if (bytesReadTotal >= size) {
+			break;
+		}
 	}
 
 	return true;
@@ -440,8 +488,10 @@ bool AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std:
 	return true;
 }
 
-bool AssetServer::UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, std::string& errOut)
+bool AssetServer::UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core::Array<uint8_t>& data, std::string& errOut)
 {
+	X_UNUSED(data);
+
 	// map type.
 	assetDb::AssetDB::AssetType::Enum type;
 
@@ -459,6 +509,7 @@ bool AssetServer::UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, std:
 	if (update.has_args()) {
 		args = core::string(update.args().data(), update.args().length());
 	}
+
 
 	X_LOG1("AssetServer", "UpdateAsset: %s name: \"%s\"",
 		assetDb::AssetDB::AssetType::ToString(type), name.c_str());

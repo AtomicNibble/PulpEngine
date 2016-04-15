@@ -14,6 +14,10 @@ X_NAMESPACE_DECLARE(ProtoBuf,
 	}
 );
 
+X_NAMESPACE_DECLARE(core,
+	template<typename T>
+class Array;
+);
 
 X_NAMESPACE_BEGIN(assetServer)
 
@@ -32,6 +36,7 @@ class AssetServer : public core::ThreadAbstract
 
 	private:
 		bool readRequest(ProtoBuf::AssetDB::Request& request);
+		bool AssetServer::Client::readBuf(core::Array<uint8_t>& buf, size_t size);
 
 		bool sendRequestFail(std::string& errMsg);
 		bool sendRequestOk(void);
@@ -57,7 +62,7 @@ private:
 	bool AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& errOut);
 	bool DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::string& errOut);
 	bool RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std::string& errOut);
-	bool UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, std::string& errOut);
+	bool UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core::Array<uint8_t>& data, std::string& errOut);
 
 private:
 	core::CriticalSection lock_;
