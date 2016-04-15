@@ -17,6 +17,13 @@ inline uint32_t Crc32::GetCRC32(const char *data, size_t size) const
 	return Finish(crc);
 }
 
+inline uint32_t Crc32::GetCRC32(const uint8_t* data, size_t size) const
+{
+	uint32_t crc = Begin();
+	Update(reinterpret_cast<const char*>(data), size, crc);
+	return Finish(crc);
+}
+
 template<typename T>
 uint32_t Crc32::GetCRC32OfObject(const T& obj)
 {

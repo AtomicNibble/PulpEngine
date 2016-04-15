@@ -19,6 +19,7 @@ public:
 
 	uint32_t GetCRC32(const char* text) const;
 	uint32_t GetCRC32(const char* data, size_t size) const;
+	uint32_t GetCRC32(const uint8_t* data, size_t size) const;
 
 	template<typename T>
 	X_INLINE uint32_t GetCRC32OfObject(const T& obj);
