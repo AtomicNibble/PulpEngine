@@ -1333,10 +1333,10 @@ inline StringRef<T> operator+(const StringRef<T>& str1, const typename StringRef
 template <class T>
 inline StringRef<T> operator+(const typename StringRef<T>::value_type* str1, const StringRef<T>& str2)
 {
-	X_ASSERT_NOT_NULL(str);
+	X_ASSERT_NOT_NULL(str1);
 
 	StringRef<T> s;
-	s.reserve(StringRef<T>::strlen(str1) + str2.size());
+	s.reserve(core::strUtil::strlen(str1) + str2.size());
 	s.append(str1);
 	s.append(str2);
 	return s;
