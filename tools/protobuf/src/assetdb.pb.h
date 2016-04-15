@@ -595,6 +595,13 @@ class UpdateAsset : public ::google::protobuf::Message {
   inline ::std::string* release_args();
   inline void set_allocated_args(::std::string* args);
 
+  // optional uint32 dataSize = 5;
+  inline bool has_datasize() const;
+  inline void clear_datasize();
+  static const int kDataSizeFieldNumber = 5;
+  inline ::google::protobuf::uint32 datasize() const;
+  inline void set_datasize(::google::protobuf::uint32 value);
+
   // @@protoc_insertion_point(class_scope:Potato.ProtoBuf.AssetDB.UpdateAsset)
  private:
   inline void set_has_name();
@@ -605,6 +612,8 @@ class UpdateAsset : public ::google::protobuf::Message {
   inline void clear_has_path();
   inline void set_has_args();
   inline void clear_has_args();
+  inline void set_has_datasize();
+  inline void clear_has_datasize();
 
   ::google::protobuf::UnknownFieldSet _unknown_fields_;
 
@@ -612,8 +621,9 @@ class UpdateAsset : public ::google::protobuf::Message {
   mutable int _cached_size_;
   ::std::string* name_;
   ::std::string* path_;
-  ::std::string* args_;
   int type_;
+  ::google::protobuf::uint32 datasize_;
+  ::std::string* args_;
   friend void  protobuf_AddDesc_assetdb_2eproto();
   friend void protobuf_AssignDesc_assetdb_2eproto();
   friend void protobuf_ShutdownFile_assetdb_2eproto();
@@ -1505,6 +1515,30 @@ inline void UpdateAsset::set_allocated_args(::std::string* args) {
     args_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   }
   // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.UpdateAsset.args)
+}
+
+// optional uint32 dataSize = 5;
+inline bool UpdateAsset::has_datasize() const {
+  return (_has_bits_[0] & 0x00000010u) != 0;
+}
+inline void UpdateAsset::set_has_datasize() {
+  _has_bits_[0] |= 0x00000010u;
+}
+inline void UpdateAsset::clear_has_datasize() {
+  _has_bits_[0] &= ~0x00000010u;
+}
+inline void UpdateAsset::clear_datasize() {
+  datasize_ = 0u;
+  clear_has_datasize();
+}
+inline ::google::protobuf::uint32 UpdateAsset::datasize() const {
+  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.UpdateAsset.dataSize)
+  return datasize_;
+}
+inline void UpdateAsset::set_datasize(::google::protobuf::uint32 value) {
+  set_has_datasize();
+  datasize_ = value;
+  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.UpdateAsset.dataSize)
 }
 
 // -------------------------------------------------------------------

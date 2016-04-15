@@ -42,6 +42,7 @@ message UpdateAsset {
     required AssetType type = 2;
     optional string path = 3;
     optional string args= 4;
+    optional  uint32 dataSize = 5;
 }
 
 message Request {

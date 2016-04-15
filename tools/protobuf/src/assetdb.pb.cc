@@ -125,11 +125,12 @@ void protobuf_AssignDesc_assetdb_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(RenameAsset));
   UpdateAsset_descriptor_ = file->message_type(4);
-  static const int UpdateAsset_offsets_[4] = {
+  static const int UpdateAsset_offsets_[5] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UpdateAsset, name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UpdateAsset, type_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UpdateAsset, path_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UpdateAsset, args_),
+    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UpdateAsset, datasize_),
   };
   UpdateAsset_reflection_ =
     new ::google::protobuf::internal::GeneratedMessageReflection(
@@ -225,16 +226,16 @@ void protobuf_AddDesc_assetdb_2eproto() {
     "ProtoBuf.AssetDB.AssetType\"^\n\013RenameAsse"
     "t\022\014\n\004name\030\001 \002(\t\022\017\n\007newName\030\002 \002(\t\0220\n\004type"
     "\030\003 \002(\0162\".Potato.ProtoBuf.AssetDB.AssetTy"
-    "pe\"i\n\013UpdateAsset\022\014\n\004name\030\001 \002(\t\0220\n\004type\030"
+    "pe\"{\n\013UpdateAsset\022\014\n\004name\030\001 \002(\t\0220\n\004type\030"
     "\002 \002(\0162\".Potato.ProtoBuf.AssetDB.AssetTyp"
-    "e\022\014\n\004path\030\003 \001(\t\022\014\n\004args\030\004 \001(\t\"\347\001\n\007Reques"
-    "t\0220\n\003add\030\001 \001(\0132!.Potato.ProtoBuf.AssetDB"
-    ".AddAssetH\000\0223\n\003del\030\002 \001(\0132$.Potato.ProtoB"
-    "uf.AssetDB.DeleteAssetH\000\0226\n\006rename\030\003 \001(\013"
-    "2$.Potato.ProtoBuf.AssetDB.RenameAssetH\000"
-    "\0226\n\006update\030\004 \001(\0132$.Potato.ProtoBuf.Asset"
-    "DB.UpdateAssetH\000B\005\n\003msg* \n\tAssetType\022\t\n\005"
-    "MODEL\020\001\022\010\n\004ANIM\020\002", 777);
+    "e\022\014\n\004path\030\003 \001(\t\022\014\n\004args\030\004 \001(\t\022\020\n\010dataSiz"
+    "e\030\005 \001(\r\"\347\001\n\007Request\0220\n\003add\030\001 \001(\0132!.Potat"
+    "o.ProtoBuf.AssetDB.AddAssetH\000\0223\n\003del\030\002 \001"
+    "(\0132$.Potato.ProtoBuf.AssetDB.DeleteAsset"
+    "H\000\0226\n\006rename\030\003 \001(\0132$.Potato.ProtoBuf.Ass"
+    "etDB.RenameAssetH\000\0226\n\006update\030\004 \001(\0132$.Pot"
+    "ato.ProtoBuf.AssetDB.UpdateAssetH\000B\005\n\003ms"
+    "g* \n\tAssetType\022\t\n\005MODEL\020\001\022\010\n\004ANIM\020\002", 795);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "assetdb.proto", &protobuf_RegisterTypes);
   Reponse::default_instance_ = new Reponse();
@@ -1525,6 +1526,7 @@ const int UpdateAsset::kNameFieldNumber;
 const int UpdateAsset::kTypeFieldNumber;
 const int UpdateAsset::kPathFieldNumber;
 const int UpdateAsset::kArgsFieldNumber;
+const int UpdateAsset::kDataSizeFieldNumber;
 #endif  // !_MSC_VER
 
 UpdateAsset::UpdateAsset()
@@ -1550,6 +1552,7 @@ void UpdateAsset::SharedCtor() {
   type_ = 1;
   path_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   args_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
+  datasize_ = 0u;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
 }
 
@@ -1594,7 +1597,7 @@ UpdateAsset* UpdateAsset::New() const {
 }
 
 void UpdateAsset::Clear() {
-  if (_has_bits_[0 / 32] & 15) {
+  if (_has_bits_[0 / 32] & 31) {
     if (has_name()) {
       if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
         name_->clear();
@@ -1611,6 +1614,7 @@ void UpdateAsset::Clear() {
         args_->clear();
       }
     }
+    datasize_ = 0u;
   }
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
   mutable_unknown_fields()->Clear();
@@ -1692,6 +1696,21 @@ bool UpdateAsset::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
+        if (input->ExpectTag(40)) goto parse_dataSize;
+        break;
+      }
+
+      // optional uint32 dataSize = 5;
+      case 5: {
+        if (tag == 40) {
+         parse_dataSize:
+          DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
+                   ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
+                 input, &datasize_)));
+          set_has_datasize();
+        } else {
+          goto handle_unusual;
+        }
         if (input->ExpectAtEnd()) goto success;
         break;
       }
@@ -1757,6 +1776,11 @@ void UpdateAsset::SerializeWithCachedSizes(
       4, this->args(), output);
   }
 
+  // optional uint32 dataSize = 5;
+  if (has_datasize()) {
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(5, this->datasize(), output);
+  }
+
   if (!unknown_fields().empty()) {
     ::google::protobuf::internal::WireFormat::SerializeUnknownFields(
         unknown_fields(), output);
@@ -1806,6 +1830,11 @@ void UpdateAsset::SerializeWithCachedSizes(
         4, this->args(), target);
   }
 
+  // optional uint32 dataSize = 5;
+  if (has_datasize()) {
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(5, this->datasize(), target);
+  }
+
   if (!unknown_fields().empty()) {
     target = ::google::protobuf::internal::WireFormat::SerializeUnknownFieldsToArray(
         unknown_fields(), target);
@@ -1843,6 +1872,13 @@ int UpdateAsset::ByteSize() const {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
           this->args());
+    }
+
+    // optional uint32 dataSize = 5;
+    if (has_datasize()) {
+      total_size += 1 +
+        ::google::protobuf::internal::WireFormatLite::UInt32Size(
+          this->datasize());
     }
 
   }
@@ -1884,6 +1920,9 @@ void UpdateAsset::MergeFrom(const UpdateAsset& from) {
     if (from.has_args()) {
       set_args(from.args());
     }
+    if (from.has_datasize()) {
+      set_datasize(from.datasize());
+    }
   }
   mutable_unknown_fields()->MergeFrom(from.unknown_fields());
 }
@@ -1912,6 +1951,7 @@ void UpdateAsset::Swap(UpdateAsset* other) {
     std::swap(type_, other->type_);
     std::swap(path_, other->path_);
     std::swap(args_, other->args_);
+    std::swap(datasize_, other->datasize_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);
     _unknown_fields_.Swap(&other->_unknown_fields_);
     std::swap(_cached_size_, other->_cached_size_);
