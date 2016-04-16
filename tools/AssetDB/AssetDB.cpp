@@ -206,7 +206,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 			filePath.ensureSlash();
 			filePath /= name;
 
-			if (gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
+			if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
 				X_ERROR("AssetDB", "Failed to create dir to save raw asset");
 				return Result::ERROR;
 			}
@@ -229,9 +229,10 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 
 			// insert entry
 			{
-				sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, hash) VALUES(?,?)");
+				sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, hash, args) VALUES(?,?,?)");
 				cmd.bind(1, name.c_str());
 				cmd.bind(2, static_cast<int32_t>(mergedCrc));
+				cmd.bind(3, argsOpt.c_str());
 
 				sql::Result::Enum res = cmd.execute();
 				if (res != sql::Result::OK) {
@@ -246,7 +247,6 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 				sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET raw_file = ? WHERE file_id = ?");
 				cmd.bind(1, safe_static_cast<int32_t, sql::SqlLiteDb::RowId>(lastRowId));
 				cmd.bind(2, assetId);
-				cmd.bind(3, argsOpt.c_str());
 
 				sql::Result::Enum res = cmd.execute();
 				if (res != sql::Result::OK) {
@@ -257,7 +257,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 		else
 		{
 			// just update.
-			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, args = ? add_time = DateTime('now') WHERE file_id = ?");
+			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, args = ?, add_time = DateTime('now') WHERE file_id = ?");
 			cmd.bind(1, name.c_str());
 			cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
 			cmd.bind(3, static_cast<int32_t>(mergedCrc));
