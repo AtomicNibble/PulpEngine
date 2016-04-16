@@ -41,7 +41,6 @@ bool AssetDB::CreateTables(void)
 		" file_id INTEGER PRIMARY KEY,"
 		"name TEXT COLLATE NOCASE," // names are not unique since we allow same name for diffrent type.
 		"path TEXT,"
-		"args TEXT,"
 		"type INTEGER,"
 		"raw_file INTEGER,"
 		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,"
@@ -56,6 +55,7 @@ bool AssetDB::CreateTables(void)
 		"path TEXT,"
 		"size INTEGER,"
 		"hash INTEGER,"
+		"args TEXT,"
 		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL"
 		");")) {
 		X_ERROR("AssetDB", "Failed to create 'raw_files' table");
@@ -163,7 +163,11 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 
 	// work out crc for the data.
 	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
-	uint32_t crc32 = pCrc32->GetCRC32(data.ptr(), data.size());
+
+	const uint32_t crc = pCrc32->GetCRC32(data.ptr(), data.size());
+	const uint32_t argsCrc = pCrc32->GetCRC32(argsOpt.c_str(), argsOpt.length());
+	const uint32_t mergedCrc = pCrc32->Combine(crc, argsCrc, safe_static_cast<uint32_t, size_t>(argsOpt.length()));
+
 
 	rawId = std::numeric_limits<uint32_t>::max();
 
@@ -174,7 +178,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 		if (GetRawfileForId(assetId, rawData, &rawId))
 		{
 			// same?
-			if (rawData.hash == crc32) { 
+			if (rawData.hash == mergedCrc) {
 				X_LOG0("AssetDB", "Skipping updates asset unchanged");
 				return Result::UNCHANGED;
 			}
@@ -227,7 +231,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 			{
 				sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, hash) VALUES(?,?)");
 				cmd.bind(1, name.c_str());
-				cmd.bind(2, static_cast<int32_t>(crc32));
+				cmd.bind(2, static_cast<int32_t>(mergedCrc));
 
 				sql::Result::Enum res = cmd.execute();
 				if (res != sql::Result::OK) {
@@ -242,6 +246,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 				sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET raw_file = ? WHERE file_id = ?");
 				cmd.bind(1, safe_static_cast<int32_t, sql::SqlLiteDb::RowId>(lastRowId));
 				cmd.bind(2, assetId);
+				cmd.bind(3, argsOpt.c_str());
 
 				sql::Result::Enum res = cmd.execute();
 				if (res != sql::Result::OK) {
@@ -252,11 +257,12 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 		else
 		{
 			// just update.
-			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, add_time = DateTime('now') WHERE file_id = ?");
+			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, args = ? add_time = DateTime('now') WHERE file_id = ?");
 			cmd.bind(1, name.c_str());
 			cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
-			cmd.bind(3, static_cast<int32_t>(crc32));
-			cmd.bind(4, rawId);
+			cmd.bind(3, static_cast<int32_t>(mergedCrc));
+			cmd.bind(4, argsOpt.c_str());
+			cmd.bind(5, rawId);
 
 			sql::Result::Enum res = cmd.execute();
 			if (res != sql::Result::OK) {
@@ -277,20 +283,12 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	if (pathOpt.isNotEmpty()) {
 		stmt += ", path = :p";
 	}
-	if (argsOpt.isNotEmpty()) {
-		stmt += ", args = :a";
-	}
-	
 	stmt += " WHERE type = :t AND name = :n ";
 
 	sql::SqlLiteCmd cmd(db_, stmt.c_str());
 	if (pathOpt.isNotEmpty()) {
 		cmd.bind(":p", pathOpt.c_str());
 	}
-	if (argsOpt.isNotEmpty()) {
-		cmd.bind(":a", argsOpt.c_str());
-	}
-
 	cmd.bind(":t", type);
 	cmd.bind(":n", name.c_str());
 
