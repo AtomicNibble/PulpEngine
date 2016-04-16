@@ -16,7 +16,7 @@ X_NAMESPACE_DECLARE(ProtoBuf,
 
 X_NAMESPACE_DECLARE(core,
 	template<typename T>
-class Array;
+	class Array;
 );
 
 X_NAMESPACE_BEGIN(assetServer)

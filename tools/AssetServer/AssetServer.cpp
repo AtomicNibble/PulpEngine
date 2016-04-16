@@ -490,8 +490,6 @@ bool AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std:
 
 bool AssetServer::UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core::Array<uint8_t>& data, std::string& errOut)
 {
-	X_UNUSED(data);
-
 	// map type.
 	assetDb::AssetDB::AssetType::Enum type;
 
@@ -516,7 +514,7 @@ bool AssetServer::UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core
 
 	core::CriticalSection::ScopedLock slock(lock_);
 
-	assetDb::AssetDB::Result::Enum res = db_.UpdateAsset(type, name, path, args);
+	assetDb::AssetDB::Result::Enum res = db_.UpdateAsset(type, name, data, path, args);
 	if (res != assetDb::AssetDB::Result::OK) {
 		errOut = "Failed to update asset. Err: ";
 		errOut += assetDb::AssetDB::Result::ToString(res);
