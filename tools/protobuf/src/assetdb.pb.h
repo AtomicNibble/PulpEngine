@@ -46,11 +46,12 @@ class Request;
 
 enum Reponse_Result {
   Reponse_Result_OK = 1,
-  Reponse_Result_FAIL = 2
+  Reponse_Result_FAIL = 2,
+  Reponse_Result_UNCHANGED = 3
 };
 bool Reponse_Result_IsValid(int value);
 const Reponse_Result Reponse_Result_Result_MIN = Reponse_Result_OK;
-const Reponse_Result Reponse_Result_Result_MAX = Reponse_Result_FAIL;
+const Reponse_Result Reponse_Result_Result_MAX = Reponse_Result_UNCHANGED;
 const int Reponse_Result_Result_ARRAYSIZE = Reponse_Result_Result_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* Reponse_Result_descriptor();
@@ -138,6 +139,7 @@ class Reponse : public ::google::protobuf::Message {
   typedef Reponse_Result Result;
   static const Result OK = Reponse_Result_OK;
   static const Result FAIL = Reponse_Result_FAIL;
+  static const Result UNCHANGED = Reponse_Result_UNCHANGED;
   static inline bool Result_IsValid(int value) {
     return Reponse_Result_IsValid(value);
   }

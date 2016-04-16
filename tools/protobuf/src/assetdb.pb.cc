@@ -217,25 +217,26 @@ void protobuf_AddDesc_assetdb_2eproto() {
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\rassetdb.proto\022\027Potato.ProtoBuf.AssetDB"
-    "\"m\n\007Reponse\0227\n\006result\030\001 \002(\0162\'.Potato.Pro"
+    "\"|\n\007Reponse\0227\n\006result\030\001 \002(\0162\'.Potato.Pro"
     "toBuf.AssetDB.Reponse.Result\022\r\n\005error\030\002 "
-    "\002(\t\"\032\n\006Result\022\006\n\002OK\020\001\022\010\n\004FAIL\020\002\"J\n\010AddAs"
-    "set\022\014\n\004name\030\001 \002(\t\0220\n\004type\030\002 \002(\0162\".Potato"
-    ".ProtoBuf.AssetDB.AssetType\"M\n\013DeleteAss"
-    "et\022\014\n\004name\030\001 \002(\t\0220\n\004type\030\002 \002(\0162\".Potato."
-    "ProtoBuf.AssetDB.AssetType\"^\n\013RenameAsse"
-    "t\022\014\n\004name\030\001 \002(\t\022\017\n\007newName\030\002 \002(\t\0220\n\004type"
-    "\030\003 \002(\0162\".Potato.ProtoBuf.AssetDB.AssetTy"
-    "pe\"{\n\013UpdateAsset\022\014\n\004name\030\001 \002(\t\0220\n\004type\030"
+    "\002(\t\")\n\006Result\022\006\n\002OK\020\001\022\010\n\004FAIL\020\002\022\r\n\tUNCHA"
+    "NGED\020\003\"J\n\010AddAsset\022\014\n\004name\030\001 \002(\t\0220\n\004type"
+    "\030\002 \002(\0162\".Potato.ProtoBuf.AssetDB.AssetTy"
+    "pe\"M\n\013DeleteAsset\022\014\n\004name\030\001 \002(\t\0220\n\004type\030"
     "\002 \002(\0162\".Potato.ProtoBuf.AssetDB.AssetTyp"
-    "e\022\014\n\004path\030\003 \001(\t\022\014\n\004args\030\004 \001(\t\022\020\n\010dataSiz"
-    "e\030\005 \001(\r\"\347\001\n\007Request\0220\n\003add\030\001 \001(\0132!.Potat"
-    "o.ProtoBuf.AssetDB.AddAssetH\000\0223\n\003del\030\002 \001"
-    "(\0132$.Potato.ProtoBuf.AssetDB.DeleteAsset"
-    "H\000\0226\n\006rename\030\003 \001(\0132$.Potato.ProtoBuf.Ass"
-    "etDB.RenameAssetH\000\0226\n\006update\030\004 \001(\0132$.Pot"
-    "ato.ProtoBuf.AssetDB.UpdateAssetH\000B\005\n\003ms"
-    "g* \n\tAssetType\022\t\n\005MODEL\020\001\022\010\n\004ANIM\020\002", 795);
+    "e\"^\n\013RenameAsset\022\014\n\004name\030\001 \002(\t\022\017\n\007newNam"
+    "e\030\002 \002(\t\0220\n\004type\030\003 \002(\0162\".Potato.ProtoBuf."
+    "AssetDB.AssetType\"{\n\013UpdateAsset\022\014\n\004name"
+    "\030\001 \002(\t\0220\n\004type\030\002 \002(\0162\".Potato.ProtoBuf.A"
+    "ssetDB.AssetType\022\014\n\004path\030\003 \001(\t\022\014\n\004args\030\004"
+    " \001(\t\022\020\n\010dataSize\030\005 \001(\r\"\347\001\n\007Request\0220\n\003ad"
+    "d\030\001 \001(\0132!.Potato.ProtoBuf.AssetDB.AddAss"
+    "etH\000\0223\n\003del\030\002 \001(\0132$.Potato.ProtoBuf.Asse"
+    "tDB.DeleteAssetH\000\0226\n\006rename\030\003 \001(\0132$.Pota"
+    "to.ProtoBuf.AssetDB.RenameAssetH\000\0226\n\006upd"
+    "ate\030\004 \001(\0132$.Potato.ProtoBuf.AssetDB.Upda"
+    "teAssetH\000B\005\n\003msg* \n\tAssetType\022\t\n\005MODEL\020\001"
+    "\022\010\n\004ANIM\020\002", 810);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "assetdb.proto", &protobuf_RegisterTypes);
   Reponse::default_instance_ = new Reponse();
@@ -285,6 +286,7 @@ bool Reponse_Result_IsValid(int value) {
   switch(value) {
     case 1:
     case 2:
+    case 3:
       return true;
     default:
       return false;
@@ -294,6 +296,7 @@ bool Reponse_Result_IsValid(int value) {
 #ifndef _MSC_VER
 const Reponse_Result Reponse::OK;
 const Reponse_Result Reponse::FAIL;
+const Reponse_Result Reponse::UNCHANGED;
 const Reponse_Result Reponse::Result_MIN;
 const Reponse_Result Reponse::Result_MAX;
 const int Reponse::Result_ARRAYSIZE;
