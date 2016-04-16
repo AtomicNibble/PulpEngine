@@ -24,6 +24,64 @@ AssetDB::~AssetDB()
 
 }
 
+
+bool AssetDB::OpenDB(void)
+{
+	return db_.connect(DB_NAME);
+}
+
+void AssetDB::CloseDB(void)
+{
+	db_.disconnect();
+}
+
+bool AssetDB::CreateTables(void)
+{
+	if (!db_.execute("CREATE TABLE IF NOT EXISTS file_ids ("
+		" file_id INTEGER PRIMARY KEY,"
+		"name TEXT COLLATE NOCASE," // names are not unique since we allow same name for diffrent type.
+		"path TEXT,"
+		"args TEXT,"
+		"type INTEGER,"
+		"raw_file INTEGER,"
+		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,"
+		"lastUpdateTime TIMESTAMP"
+		");")) {
+		X_ERROR("AssetDB", "Failed to create 'file_ids' table");
+		return false;
+	}
+
+	if (!db_.execute("CREATE TABLE IF NOT EXISTS raw_files ("
+		"file_id INTEGER PRIMARY KEY,"
+		"path TEXT,"
+		"size INTEGER,"
+		"hash INTEGER,"
+		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL"
+		");")) {
+		X_ERROR("AssetDB", "Failed to create 'raw_files' table");
+		return false;
+	}
+
+
+	return true;
+}
+
+bool AssetDB::DropTables(void)
+{
+	if (!db_.execute("DROP TABLE IF EXISTS raw_files_link;")) {
+		return false;
+	}
+	if (!db_.execute("DROP TABLE IF EXISTS gdt_files;")) {
+		return false;
+	}
+	if (!db_.execute("DROP TABLE IF EXISTS raw_files;")) {
+		return false;
+	}
+
+	return true;
+}
+
+
 AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string& name)
 {
 	if (AssetExsists(type, name)) {
@@ -88,32 +146,6 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 	return Result::OK;
 }
 
-bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
-{
-	// we get the raw_id from the asset.
-	// and get the data.
-	// Select Id from CheckList INNER JOIN CheckRow on CheckList.Id = CheckRow.ListId where CheckRow.Custom='0'
-
-	sql::SqlLiteTransaction trans(db_, true);
-	sql::SqlLiteQuery qry(db_, "SELECT raw_files.file_id, raw_files.path, raw_files.hash FROM raw_files "
-		"INNER JOIN file_ids on raw_files.file_id = file_ids.raw_file WHERE file_ids.file_id = ?");
-	qry.bind(1, assetId);
-
-	const auto it = qry.begin();
-
-	if (it == qry.end()) {
-		return false;
-	}
-
-	if (pId) {
-		*pId = (*it).get<int32_t>(0);
-	}
-
-	dataOut.path = (*it).get< const char*>(1);
-	dataOut.hash = static_cast<uint32_t>((*it).get<int32_t>(2));
-	return true;
-}
-
 AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::string& name, core::Array<uint8_t>& data,
 	const core::string& pathOpt, const core::string& argsOpt)
 {
@@ -156,14 +188,17 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 		{
 			core::XFileScoped file;
 			core::fileModeFlags mode;
-			core::string filePath;
+			core::Path<char> filePath;
 
 			mode.Set(core::fileMode::WRITE);
 			mode.Set(core::fileMode::RECREATE);
 
-			filePath = RAW_FILES_FOLDER + name;
+			filePath = RAW_FILES_FOLDER;
+			filePath /= AssetTypeRawFolder(type);
+			filePath.ensureSlash();
+			filePath /= name;
 
-			gEnv->pFileSys->createDirectoryTree(RAW_FILES_FOLDER);
+			gEnv->pFileSys->createDirectoryTree(filePath.c_str());
 
 			if (!file.openFile(filePath.c_str(), mode)) {
 				return Result::ERROR;
@@ -281,60 +316,33 @@ bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, int32
 }
 
 
-bool AssetDB::OpenDB(void)
+bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
 {
-	return db_.connect(DB_NAME);
-}
+	// we get the raw_id from the asset.
+	// and get the data.
+	sql::SqlLiteTransaction trans(db_, true);
+	sql::SqlLiteQuery qry(db_, "SELECT raw_files.file_id, raw_files.path, raw_files.hash FROM raw_files "
+		"INNER JOIN file_ids on raw_files.file_id = file_ids.raw_file WHERE file_ids.file_id = ?");
+	qry.bind(1, assetId);
 
-void AssetDB::CloseDB(void)
-{
-	db_.disconnect();
-}
+	const auto it = qry.begin();
 
-bool AssetDB::CreateTables(void)
-{
-	if (!db_.execute("CREATE TABLE IF NOT EXISTS file_ids ("
-		" file_id INTEGER PRIMARY KEY,"
-		"name TEXT COLLATE NOCASE," // names are not unique since we allow same name for diffrent type.
-		"path TEXT,"
-		"args TEXT,"
-		"type INTEGER,"
-		"raw_file INTEGER,"
-		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,"
-		"lastUpdateTime TIMESTAMP"
-		");")) {
-		X_ERROR("AssetDB", "Failed to create 'file_ids' table");
+	if (it == qry.end()) {
 		return false;
 	}
 
-	if (!db_.execute("CREATE TABLE IF NOT EXISTS raw_files ("
-		"file_id INTEGER PRIMARY KEY,"
-		"path TEXT,"
-		"size INTEGER,"
-		"hash INTEGER,"
-		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL"
-		");")) {
-		X_ERROR("AssetDB", "Failed to create 'raw_files' table");
-		return false;
+	if (pId) {
+		*pId = (*it).get<int32_t>(0);
 	}
 
-
+	dataOut.path = (*it).get< const char*>(1);
+	dataOut.hash = static_cast<uint32_t>((*it).get<int32_t>(2));
 	return true;
 }
 
-bool AssetDB::DropTables(void)
+const char* AssetDB::AssetTypeRawFolder(AssetType::Enum type)
 {
-	if (!db_.execute("DROP TABLE IF EXISTS raw_files_link;")) {
-		return false;
-	}
-	if (!db_.execute("DROP TABLE IF EXISTS gdt_files;")) {
-		return false;
-	}
-	if (!db_.execute("DROP TABLE IF EXISTS raw_files;")) {
-		return false;
-	}
-
-	return true;
+	return AssetType::ToString(type);
 }
 
 

@@ -16,7 +16,6 @@ class DLL_EXPORT AssetDB
 	static const char* DB_NAME;
 	static const char* RAW_FILES_FOLDER;
 
-
 	struct RawFile
 	{
 		int32_t file_id;
@@ -38,6 +37,12 @@ public:
 	AssetDB();
 	~AssetDB();
 
+	bool OpenDB(void);
+	void CloseDB(void);
+	bool CreateTables(void);
+	bool DropTables(void);
+
+public:
 	Result::Enum AddAsset(AssetType::Enum type, const core::string& name);
 	Result::Enum DeleteAsset(AssetType::Enum type, const core::string& name);
 	Result::Enum RenameAsset(AssetType::Enum type, const core::string& name,
@@ -48,14 +53,10 @@ public:
 
 	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
 
-	bool OpenDB(void);
-	void CloseDB(void);
-	bool CreateTables(void);
-	bool DropTables(void);
-
 private:
-
 	bool GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId = nullptr);
+
+	static const char* AssetTypeRawFolder(AssetType::Enum type);
 
 private:
 	sql::SqlLiteDb db_;
