@@ -1,11 +1,17 @@
 #include "stdafx.h"
 #include "AssetDB.h"
 
+#include <Containers\Array.h>
+#include <Hashing\crc32.h>
+
+#include <IFileSys.h>
+
 X_LINK_LIB("engine_SqLite")
 
 X_NAMESPACE_BEGIN(assetDb)
 
 const char* AssetDB::DB_NAME = X_ENGINE_NAME"_asset.db";
+const char* AssetDB::RAW_FILES_FOLDER = "raw_files/";
 
 
 AssetDB::AssetDB()
@@ -82,13 +88,142 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 	return Result::OK;
 }
 
-AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::string& name,
+bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
+{
+	// we get the raw_id from the asset.
+	// and get the data.
+	// Select Id from CheckList INNER JOIN CheckRow on CheckList.Id = CheckRow.ListId where CheckRow.Custom='0'
+
+	sql::SqlLiteTransaction trans(db_, true);
+	sql::SqlLiteQuery qry(db_, "SELECT raw_files.file_id, raw_files.path, raw_files.hash FROM raw_files "
+		"INNER JOIN file_ids on raw_files.file_id = file_ids.raw_file WHERE file_ids.file_id = ?");
+	qry.bind(1, assetId);
+
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
+		return false;
+	}
+
+	if (pId) {
+		*pId = (*it).get<int32_t>(0);
+	}
+
+	dataOut.path = (*it).get< const char*>(1);
+	dataOut.hash = static_cast<uint32_t>((*it).get<int32_t>(2));
+	return true;
+}
+
+AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::string& name, core::Array<uint8_t>& data,
 	const core::string& pathOpt, const core::string& argsOpt)
 {
-	sql::SqlLiteTransaction trans(db_);
+	int32_t assetId, rawId;
 
+	if (!AssetExsists(type, name, &assetId)) {
+
+		// add it?
+		if (!AddAsset(type, name)) {
+			return Result::NOT_FOUND;
+
+		}
+	}
+
+	// work out crc for the data.
+	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
+	uint32_t crc32 = pCrc32->GetCRC32(data.ptr(), data.size());
+
+	rawId = std::numeric_limits<uint32_t>::max();
+
+	if (data.isNotEmpty())
+	{
+		RawFile rawData;
+
+		if (GetRawfileForId(assetId, rawData, &rawId))
+		{
+			// same?
+			if (rawData.hash == crc32) { 
+				return Result::UNCHANGED;
+			}
+		}
+	}
+
+	// start the transaction.
+	sql::SqlLiteTransaction trans(db_);
 	core::string stmt;
-	
+
+	// ok we have updated rawdata.
+	if (data.isNotEmpty())
+	{
+		// save the file.
+		{
+			core::XFileScoped file;
+			core::fileModeFlags mode;
+			core::string filePath;
+
+			mode.Set(core::fileMode::WRITE);
+			mode.Set(core::fileMode::RECREATE);
+
+			filePath = RAW_FILES_FOLDER + name;
+
+			gEnv->pFileSys->createDirectoryTree(RAW_FILES_FOLDER);
+
+			if (!file.openFile(filePath.c_str(), mode)) {
+				return Result::ERROR;
+			}
+
+			if (file.write(data.ptr(), data.size()) != data.size()) {
+				return Result::ERROR;
+			}
+		}
+
+
+		if (rawId == std::numeric_limits<uint32_t>::max())
+		{
+			sql::SqlLiteDb::RowId lastRowId;
+
+			// insert entry
+			{
+				sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, hash) VALUES(?,?)");
+				cmd.bind(1, name.c_str());
+				cmd.bind(2, static_cast<int32_t>(crc32));
+
+				sql::Result::Enum res = cmd.execute();
+				if (res != sql::Result::OK) {
+					return Result::ERROR;
+				}
+
+				lastRowId = db_.lastInsertRowid();
+			}
+
+			// update asset row.
+			{
+				sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET raw_file = ? WHERE file_id = ?");
+				cmd.bind(1, safe_static_cast<int32_t, sql::SqlLiteDb::RowId>(lastRowId));
+				cmd.bind(2, assetId);
+
+				sql::Result::Enum res = cmd.execute();
+				if (res != sql::Result::OK) {
+					return Result::ERROR;
+				}
+			}
+		}
+		else
+		{
+			// just update.
+			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, hash = ?, add_time = DateTime('now') WHERE file_id = ?");
+			cmd.bind(1, name.c_str());
+			cmd.bind(2, static_cast<int32_t>(crc32));
+			cmd.bind(3, rawId);
+
+			sql::Result::Enum res = cmd.execute();
+			if (res != sql::Result::OK) {
+				return Result::ERROR;
+			}
+		}
+
+	}
+
+	// now update file info.
 	stmt = "UPDATE file_ids SET lastUpdateTime = DateTime('now')";
 
 	if (pathOpt.isNotEmpty()) {
@@ -121,15 +256,21 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 }
  
 
-bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name)
+bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pId)
 {
 	sql::SqlLiteTransaction trans(db_, true);
-	sql::SqlLiteQuery qry(db_, "SELECT name, type FROM file_ids WHERE type = ? AND name = ?");
+	sql::SqlLiteQuery qry(db_, "SELECT file_id, name, type FROM file_ids WHERE type = ? AND name = ?");
 	qry.bind(1, type);
 	qry.bind(2, name.c_str());
 
-	if (qry.begin() == qry.end()) {
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
 		return false;
+	}
+
+	if (pId){
+		*pId = (*it).get<int32_t>(0);
 	}
 
 	return true;
@@ -154,10 +295,21 @@ bool AssetDB::CreateTables(void)
 		"path TEXT,"
 		"args TEXT,"
 		"type INTEGER,"
+		"raw_file INTEGER,"
 		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,"
 		"lastUpdateTime TIMESTAMP"
 		");")) {
 		X_ERROR("AssetDB", "Failed to create 'file_ids' table");
+		return false;
+	}
+
+	if (!db_.execute("CREATE TABLE IF NOT EXISTS raw_files ("
+		"file_id INTEGER PRIMARY KEY,"
+		"path TEXT,"
+		"hash INTEGER,"
+		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL"
+		");")) {
+		X_ERROR("AssetDB", "Failed to create 'raw_files' table");
 		return false;
 	}
 
@@ -167,11 +319,15 @@ bool AssetDB::CreateTables(void)
 
 bool AssetDB::DropTables(void)
 {
-
+	if (!db_.execute("DROP TABLE IF EXISTS raw_files_link;")) {
+		return false;
+	}
 	if (!db_.execute("DROP TABLE IF EXISTS gdt_files;")) {
 		return false;
 	}
-
+	if (!db_.execute("DROP TABLE IF EXISTS raw_files;")) {
+		return false;
+	}
 
 	return true;
 }

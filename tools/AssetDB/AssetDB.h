@@ -2,12 +2,27 @@
 
 #include "../SqLite/SqlLib.h"
 
+
+X_NAMESPACE_DECLARE(core,
+	template<typename T>
+	class Array;
+);
+
 X_NAMESPACE_BEGIN(assetDb)
 
 
 class DLL_EXPORT AssetDB
 {
 	static const char* DB_NAME;
+	static const char* RAW_FILES_FOLDER;
+
+
+	struct RawFile
+	{
+		int32_t file_id;
+		core::string path;
+		uint32_t hash;
+	};
 
 public:
 	X_DECLARE_ENUM(AssetType)(MODEL, ANIM);
@@ -15,6 +30,7 @@ public:
 		OK, 
 		NOT_FOUND,
 		NAME_TAKEN,
+		UNCHANGED,
 		ERROR
 	);
 
@@ -28,9 +44,9 @@ public:
 		const core::string& newName);
 
 	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, 
-		const core::string& pathOpt, const core::string& argsOpt);
+		core::Array<uint8_t>& data, const core::string& pathOpt, const core::string& argsOpt);
 
-	bool AssetExsists(AssetType::Enum type, const core::string& name);
+	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
 
 	bool OpenDB(void);
 	void CloseDB(void);
@@ -39,6 +55,9 @@ public:
 
 private:
 
+	bool GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId = nullptr);
+
+private:
 	sql::SqlLiteDb db_;
 };
 
