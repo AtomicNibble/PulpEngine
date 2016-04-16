@@ -245,6 +245,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 
 		// time to slap a goat!
 		core::Path<char> outPath = getFilePath();
+		bool changed = true;
 
 		if (exportMode_ == ExpoMode::RAW)
 		{
@@ -300,18 +301,26 @@ MStatus ModelExporter::convert(const MArgList& args)
 					MString(getName()),
 					MString(outPath.c_str()),
 					argsToJson(),
-					compressed
+					compressed,
+					&changed
 				);
 			}
 			{
 				MayaUtil::SetProgressText("Compiling model");
 
-				PROFILE_MAYA_NAME("Compile and save");
+				if (changed)
+				{
+					PROFILE_MAYA_NAME("Compile and save");
 
-				if (!CompileModel(outPath)) {
-					MayaUtil::MayaPrintError("Failed to compile model");
-					return MS::kFailure;
-				}			
+					if (!CompileModel(outPath)) {
+						MayaUtil::MayaPrintError("Failed to compile model");
+						return MS::kFailure;
+					}
+				}
+				else
+				{
+					MayaUtil::MayaPrintMsg("Skiping compile asset unchanged");
+				}
 			}
 		}
 		else {
@@ -322,7 +331,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 
 		MayaUtil::SetProgressText("Complete");
 
-		if (exportMode_ == ExpoMode::SERVER)
+		if (exportMode_ == ExpoMode::SERVER && changed)
 		{
 			printStats();
 		}
