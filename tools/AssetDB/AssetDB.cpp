@@ -120,11 +120,9 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	int32_t assetId, rawId;
 
 	if (!AssetExsists(type, name, &assetId)) {
-
 		// add it?
 		if (!AddAsset(type, name)) {
 			return Result::NOT_FOUND;
-
 		}
 	}
 
@@ -210,16 +208,22 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 		else
 		{
 			// just update.
-			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, hash = ?, add_time = DateTime('now') WHERE file_id = ?");
+			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, add_time = DateTime('now') WHERE file_id = ?");
 			cmd.bind(1, name.c_str());
-			cmd.bind(2, static_cast<int32_t>(crc32));
-			cmd.bind(3, rawId);
+			cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
+			cmd.bind(3, static_cast<int32_t>(crc32));
+			cmd.bind(4, rawId);
 
 			sql::Result::Enum res = cmd.execute();
 			if (res != sql::Result::OK) {
 				return Result::ERROR;
 			}
 		}
+	}
+	else
+	{
+		// humm
+
 
 	}
 
@@ -306,6 +310,7 @@ bool AssetDB::CreateTables(void)
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS raw_files ("
 		"file_id INTEGER PRIMARY KEY,"
 		"path TEXT,"
+		"size INTEGER,"
 		"hash INTEGER,"
 		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL"
 		");")) {
