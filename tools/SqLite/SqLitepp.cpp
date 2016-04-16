@@ -253,7 +253,7 @@ SqlLiteStateMnt::SqlLiteStateMnt(SqlLiteDb& db, const char* pStmt) :
 	if (pStmt) {
 		auto rc = prepare(pStmt);
 		if (rc != Result::OK) {
-			X_ERROR("SqlDb", "statement prepare failed for \"%s\" err(%i)", pStmt, rc);
+			X_ERROR("SqlDb", "statement prepare failed for \"%s\" err(%i): \"%s\"", pStmt, rc, db.errorMsg());
 		}
 	}
 }
@@ -262,7 +262,7 @@ SqlLiteStateMnt::~SqlLiteStateMnt()
 {
 	auto rc = finish();
 	if (rc != Result::OK) {
-		X_ERROR("SqlDb", "statement finish failed err(%i)", rc);
+		X_ERROR("SqlDb", "statement finish failed err(%i): \"%s\"", rc, db_.errorMsg());
 	}
 }
 
@@ -322,17 +322,29 @@ Result::Enum SqlLiteStateMnt::reset(void)
 
 Result::Enum SqlLiteStateMnt::bind(int idx, int value)
 {
-	return static_cast<Result::Enum>(sqlite3_bind_int(pStmt_, idx, value));
+	Result::Enum result =  static_cast<Result::Enum>(sqlite3_bind_int(pStmt_, idx, value));
+	if (result != Result::OK) {
+		X_ERROR("SqLite", "Bind <int32_t> failed. err(%i): \"%s\"", result, db_.errorMsg());
+	}
+	return result;
 }
 
 Result::Enum SqlLiteStateMnt::bind(int idx, double value)
 {
-	return static_cast<Result::Enum>(sqlite3_bind_double(pStmt_, idx, value));
+	Result::Enum result = static_cast<Result::Enum>(sqlite3_bind_double(pStmt_, idx, value));
+	if (result != Result::OK) {
+		X_ERROR("SqLite", "Bind <double> failed. err(%i): \"%s\"", result, db_.errorMsg());
+	}
+	return result;
 }
 
 Result::Enum SqlLiteStateMnt::bind(int idx, long long int value)
 {
-	return static_cast<Result::Enum>(sqlite3_bind_int64(pStmt_, idx, value));
+	Result::Enum result = static_cast<Result::Enum>(sqlite3_bind_int64(pStmt_, idx, value));
+	if (result != Result::OK) {
+		X_ERROR("SqLite", "Bind <int64_t> failed. err(%i): \"%s\"", result, db_.errorMsg());
+	}
+	return result;
 }
 
 Result::Enum SqlLiteStateMnt::bind(int idx, const char* value, CopySemantic::Enum fcopy)
@@ -346,8 +358,8 @@ Result::Enum SqlLiteStateMnt::bind(int idx, const char* value, CopySemantic::Enu
 	));
 
 	if (res != Result::OK) {
-		X_ERROR("", "bind(%i)-> \"%s\" failed. Err: %i",
-			idx, value, res);
+		X_ERROR("", "bind(%i)-> \"%s\" failed. err(%i): \"%s\"",
+			idx, value, res, db_.errorMsg());
 	}
 
 	return res;
@@ -364,8 +376,8 @@ Result::Enum SqlLiteStateMnt::bind(int idx, const void* value, int n, CopySemant
 	));
 
 	if (res != Result::OK) {
-		X_ERROR("", "bind(%i)-> %p failed. Err: %i",
-			idx, value, res);
+		X_ERROR("", "bind(%i)-> %p failed. err(%i): \"%s\"",
+			idx, value, res, db_.errorMsg());
 	}
 	
 	return res;
@@ -382,8 +394,8 @@ Result::Enum SqlLiteStateMnt::bind(int idx, std::string const& value, CopySemant
 	));
 
 	if (res != Result::OK) {
-		X_ERROR("", "bind(%i)-> \"%s\" failed. Err: %i",
-			idx, value.c_str(), res);
+		X_ERROR("", "bind(%i)-> \"%s\" failed. err(%i): \"%s\"",
+			idx, value.c_str(), res, db_.errorMsg());
 	}
 
 	return res;
@@ -553,7 +565,14 @@ int SqlLiteQuery::rows::columnBytes(int idx) const
 
 int SqlLiteQuery::rows::get(int idx, int) const
 {
-	return sqlite3_column_int(pStmt_, idx);
+	int res =  sqlite3_column_int(pStmt_, idx);
+	if (res == 0) {
+		int type = columnType(idx);
+		if (type != SQLITE_INTEGER) {
+			X_ERROR("SqlDb", "Index is is not a int: %i type: %i", idx, type);
+		}
+	}
+	return res;
 }
 
 double SqlLiteQuery::rows::get(int idx, double) const
