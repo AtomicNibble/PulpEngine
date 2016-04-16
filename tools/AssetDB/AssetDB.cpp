@@ -154,8 +154,11 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	if (!AssetExsists(type, name, &assetId)) {
 		// add it?
 		if (!AddAsset(type, name)) {
+			X_ERROR("AssetDB", "Failed to add assert when trying to update a asset that did not exsists.");
 			return Result::NOT_FOUND;
 		}
+
+		X_WARNING("AssetDB", "Added asset to db as it didnt exists when trying to update the asset");
 	}
 
 	// work out crc for the data.
@@ -172,6 +175,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 		{
 			// same?
 			if (rawData.hash == crc32) { 
+				X_LOG0("AssetDB", "Skipping updates asset unchanged");
 				return Result::UNCHANGED;
 			}
 		}
@@ -199,14 +203,17 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 			filePath /= name;
 
 			if (gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
+				X_ERROR("AssetDB", "Failed to create dir to save raw asset");
 				return Result::ERROR;
 			}
 
 			if (!file.openFile(filePath.c_str(), mode)) {
+				X_ERROR("AssetDB", "Failed to write raw asset");
 				return Result::ERROR;
 			}
 
 			if (file.write(data.ptr(), data.size()) != data.size()) {
+				X_ERROR("AssetDB", "Failed to write raw asset data");
 				return Result::ERROR;
 			}
 		}
