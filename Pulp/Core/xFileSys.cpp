@@ -790,8 +790,14 @@ bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum locati
 
 	createOSPath(gameDir_, _path, buf);
 
+	buf.removeFileName();
+
 	if (isDebug()) {
 		X_LOG0("FileSys", "CreateDirectoryTree: \"%ls\"", buf.c_str());
+	}
+
+	if (directoryExistsOS(buf.c_str())) {
+		return true;
 	}
 
 	// c:\\dir\\goat\\win\\bin
