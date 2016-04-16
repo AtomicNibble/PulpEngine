@@ -198,7 +198,9 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 			filePath.ensureSlash();
 			filePath /= name;
 
-			gEnv->pFileSys->createDirectoryTree(filePath.c_str());
+			if (gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
+				return Result::ERROR;
+			}
 
 			if (!file.openFile(filePath.c_str(), mode)) {
 				return Result::ERROR;
