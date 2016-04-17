@@ -209,9 +209,13 @@ namespace Compression
 
 		::inflateEnd(&stream);
 
+		// If res == Z_OK that means we ran out of dest buffer beffore infalte all of src buffer.
 		if (res != Z_STREAM_END)
 		{
 			X_ERROR("Zlib", "inflate error: %i -> %s", res, ZlibErrToStr(res));
+			if (res == Z_OK) {
+				X_ERROR("Zlib", "dest buffer is too small %i bytes left in src.", stream.avail_in);
+			}
 			return false;
 		}
 
