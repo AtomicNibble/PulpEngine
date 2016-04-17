@@ -122,6 +122,7 @@
     <ClInclude Include="IAnimation.h" />
     <ClInclude Include="IAssetPak.h" />
     <ClInclude Include="ICi.h" />
+    <ClInclude Include="ICompression.h" />
     <ClInclude Include="IConsole.h" />
     <ClInclude Include="IConverterModule.h" />
     <ClInclude Include="ICore.h" />
