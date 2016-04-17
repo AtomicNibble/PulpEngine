@@ -276,7 +276,9 @@ MStatus ModelExporter::convert(const MArgList& args)
 
 				PROFILE_MAYA_NAME("Deflate Raw");
 
-				if (!core::Compression::LZ4::deflate(g_arena, rawModel, compressed, core::Compression::LZ4::CompressLevel::NORMAL))
+				core::Compression::Compressor<core::Compression::LZ4> comp;
+
+				if (!comp.deflate(g_arena, rawModel, compressed, core::Compression::CompressLevel::NORMAL))
 				{
 					X_ERROR("Model", "Failed to defalte raw model");
 					return MS::kFailure;
@@ -297,13 +299,18 @@ MStatus ModelExporter::convert(const MArgList& args)
 				PROFILE_MAYA_NAME("Sync To Server");
 
 				// send to asset server.
-				maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::MODEL,
+				status = maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::MODEL,
 					MString(getName()),
 					MString(outPath.c_str()),
 					argsToJson(),
 					compressed,
 					&changed
 				);
+
+				if (!status) {
+					X_ERROR("Model", "Failed to connect to server to update AssetDB");
+					return status;
+				}
 			}
 			{
 				MayaUtil::SetProgressText("Compiling model");
