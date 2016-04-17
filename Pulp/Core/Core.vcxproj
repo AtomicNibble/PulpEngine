@@ -373,6 +373,7 @@
     <ClInclude Include="DiskFile.h" />
     <ClInclude Include="DiskFileAsync.h" />
     <ClInclude Include="FileSysVars.h" />
+    <ClInclude Include="PathUtil.h" />
     <ClInclude Include="PotatoFactoryRegistryImpl.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="NullImplementation\NullInput.h" />
@@ -384,6 +385,7 @@
     <ClInclude Include="win32\OsFileAsync.h" />
     <ClInclude Include="win32\OsFileAsyncOperation.h" />
     <ClInclude Include="win32\OsFileModeFlags.h" />
+    <ClInclude Include="win32\PathUtil.h" />
     <ClInclude Include="win32\SystemTimer.h" />
     <ClInclude Include="xFileSys.h" />
     <ClInclude Include="XFindData.h" />
@@ -420,6 +422,7 @@
     <ClInclude Include="win32\OsFileAsyncOperation.inl">
       <FileType>CppCode</FileType>
     </ClInclude>
+    <ClCompile Include="win32\PathUtil.cpp" />
     <ClCompile Include="win32\SystemTimer.cpp" />
     <ClCompile Include="xFileSys.cpp" />
     <ClCompile Include="XProfile.cpp" />

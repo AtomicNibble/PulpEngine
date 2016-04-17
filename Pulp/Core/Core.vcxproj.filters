@@ -116,6 +116,12 @@
     <ClInclude Include="PotatoFactoryRegistryImpl.h">
       <Filter>ExtensionSystem</Filter>
     </ClInclude>
+    <ClInclude Include="PathUtil.h">
+      <Filter>FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\PathUtil.h">
+      <Filter>FileSys\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -177,6 +183,9 @@
     </ClCompile>
     <ClCompile Include="PotatoFactoryRegistryImpl.cpp">
       <Filter>ExtensionSystem</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\PathUtil.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
