@@ -174,18 +174,18 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 
 				data.scale = MVector::one;
 
-#if 0
+
+				if(MayaUtil::IsVerbose())
 				{
 					MEulerRotation euler = data.rotation.asEulerRotation();
 					const MQuaternion& q = data.rotation;
 
-					MayaUtil::MayaPrintMsg("pos: (%g,%g,%g)",
+					MayaUtil::MayaPrintVerbose("pos: (%g,%g,%g)",
 						data.position.x, data.position.y, data.position.z);
-					MayaUtil::MayaPrintMsg("ang: (%g,%g,%g) quat: (%g,%g,%g,%g)",
+					MayaUtil::MayaPrintVerbose("ang: (%g,%g,%g) quat: (%g,%g,%g,%g)",
 						::toDegrees(euler.x), ::toDegrees(euler.y), ::toDegrees(euler.z),
 						q.x, q.y, q.z, q.w);
 				}
-#endif
 			}
 		}
 		MayaUtil::IncProcess();
@@ -266,7 +266,7 @@ MStatus PotatoAnimExporter::writeIntermidiate(void)
 				core::StackString<maxSizePerEntry> buf;
 
 				buf.append("POS ");
-				buf.appendFmt("( %.4g %.4g %.4g )\n", 
+				buf.appendFmt("( %f %f %f )\n", 
 					data.position.x,
 					data.position.y,
 					data.position.z);
@@ -384,10 +384,8 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 		}
 		else
 		{
-
-
+			X_ASSERT_NOT_IMPLEMENTED();
 		}
-
 	}
 
 
