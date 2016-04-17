@@ -5,10 +5,20 @@
 
 X_NAMESPACE_BEGIN(core)
 
+#ifdef DeleteFile
+#undef DeleteFile
+#endif // !DeleteFile
+
 namespace PathUtil
 {
 
 	core::Path<wchar_t> GetCurrentDirectory(void);
+
+	bool DeleteFile(const core::Path<wchar_t>& filePath);
+	bool DeleteFile(const wchar_t* pFilePath);
+
+	bool DeleteDirectory(const core::Path<wchar_t>& dir);
+	bool DeleteDirectory(const wchar_t* pDir);
 
 	bool CreateDirectory(const core::Path<wchar_t>& dir);
 	bool CreateDirectory(const wchar_t* pDir);

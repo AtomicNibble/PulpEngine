@@ -2,12 +2,12 @@
 #include "PathUtil.h"
 
 #include <String\StringTokenizer.h>
+#include <Shellapi.h>
 
 X_NAMESPACE_BEGIN(core)
 
 namespace PathUtil
 {
-
 
 	core::Path<wchar_t> GetCurrentDirectory(void)
 	{
@@ -24,6 +24,54 @@ namespace PathUtil
 		}
 
 		return dir;
+	}
+
+	// ------------------------------------------------
+
+
+	bool DeleteFile(const core::Path<wchar_t>& filePath)
+	{
+		return DeleteFile(filePath.c_str());
+	}
+
+	bool DeleteFile(const wchar_t* pFilePath)
+	{
+		if (!::DeleteFileW(pFilePath)) {
+			core::lastError::Description Dsc;
+			X_ERROR("FileSys", "DeleteFile failed. Error: %s", lastError::ToString(Dsc));
+			return false;
+		}
+
+		return true;
+	}
+
+	// ------------------------------------------------
+
+
+	bool DeleteDirectory(const core::Path<wchar_t>& dir)
+	{
+		return DeleteDirectory(dir.c_str());
+	}
+
+	bool DeleteDirectory(const wchar_t* pDir)
+	{
+		SHFILEOPSTRUCTW file_op = {
+			NULL,
+			FO_DELETE,
+			pDir,
+			L"",
+			FOF_NOCONFIRMATION |
+			FOF_NOERRORUI |
+			FOF_SILENT,
+			false,
+			0,
+			L"" };
+
+		int ret = SHFileOperationW(&file_op);
+
+		X_ERROR_IF(ret != 0, "FileSys", "Failed to delete directory: \"%ls\"", pDir);
+
+		return ret == 0; // returns 0 on success, non zero on failure.
 	}
 
 	// ------------------------------------------------
