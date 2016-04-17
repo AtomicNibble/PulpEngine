@@ -39,15 +39,15 @@ namespace Compression
 		}
 
 
-		int32_t CompLvlToZliblvl(Zlib::CompressLevel::Enum lvl)
+		int32_t CompLvlToZliblvl(CompressLevel::Enum lvl)
 		{
 			switch (lvl)
 			{
-			case Zlib::CompressLevel::LOW:
+			case CompressLevel::LOW:
 				return Z_BEST_SPEED;
-			case Zlib::CompressLevel::NORMAL:
+			case CompressLevel::NORMAL:
 				return Z_DEFAULT_COMPRESSION;
-			case Zlib::CompressLevel::HIGH:
+			case CompressLevel::HIGH:
 				return Z_BEST_COMPRESSION;
 #if X_DEBUG
 			default:
@@ -96,6 +96,16 @@ namespace Compression
 
 
 	// -------------------------------------------------------------
+	Algo::Enum Zlib::getAlgo(void)
+	{
+		return Algo::ZLIB;
+	}
+
+	size_t Zlib::maxSourceSize(void)
+	{
+		// could not find real vlaue, so this may be wrong
+		return std::numeric_limits<int32_t>::max();
+	}
 
 	size_t Zlib::requiredDeflateDestBuf(size_t sourceLen)
 	{

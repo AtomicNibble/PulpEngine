@@ -17,15 +17,15 @@ namespace Compression
 	namespace
 	{
 		// 0 <= level <= 9, default = 5
-		int32_t compressLevelToLevel(LZMA::CompressLevel::Enum lvl)
+		int32_t compressLevelToLevel(CompressLevel::Enum lvl)
 		{
-			if (lvl == LZMA::CompressLevel::LOW) {
+			if (lvl == CompressLevel::LOW) {
 				return 1;
 			}
-			if (lvl == LZMA::CompressLevel::NORMAL) {
+			if (lvl == CompressLevel::NORMAL) {
 				return 5;
 			}
-			if (lvl == LZMA::CompressLevel::HIGH) {
+			if (lvl == CompressLevel::HIGH) {
 				return 7;
 			}
 
@@ -34,15 +34,15 @@ namespace Compression
 		}
 
 		// 0 - fast, 1 - normal, default = 1 
-		int32_t compressLevelToAlgo(LZMA::CompressLevel::Enum lvl)
+		int32_t compressLevelToAlgo(CompressLevel::Enum lvl)
 		{
-			if (lvl == LZMA::CompressLevel::LOW) {
+			if (lvl == CompressLevel::LOW) {
 				return 0;
 			}
-			if (lvl == LZMA::CompressLevel::NORMAL) {
+			if (lvl == CompressLevel::NORMAL) {
 				return 1;
 			}
-			if (lvl == LZMA::CompressLevel::HIGH) {
+			if (lvl == CompressLevel::HIGH) {
 				return 1;
 			}
 
@@ -50,15 +50,15 @@ namespace Compression
 			return 1;
 		}
 		
-		int32_t compressLevelToDictSize(LZMA::CompressLevel::Enum lvl)
+		int32_t compressLevelToDictSize(CompressLevel::Enum lvl)
 		{
-			if (lvl == LZMA::CompressLevel::LOW) {
+			if (lvl == CompressLevel::LOW) {
 				return 1 << 14; // 16kb
 			}
-			if (lvl == LZMA::CompressLevel::NORMAL) {
+			if (lvl == CompressLevel::NORMAL) {
 				return 1 << 16; // 64kb
 			}
-			if (lvl == LZMA::CompressLevel::HIGH) {
+			if (lvl == CompressLevel::HIGH) {
 				return 1 << 20; // 1024kb
 			}
 
@@ -92,6 +92,11 @@ namespace Compression
 			core::MemoryArenaBase* arena_;
 		};
 
+	}
+
+	Algo::Enum LZMA::getAlgo(void)
+	{
+		return Algo::LZMA;
 	}
 
 	size_t LZMA::maxSourceSize(void)

@@ -9,6 +9,7 @@ extern "C" {
 };
 
 #include <Containers\Array.h>
+#include <ICompression.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -24,13 +25,10 @@ namespace Compression
 	class Zlib
 	{
 	public:
-		X_DECLARE_ENUM(CompressLevel)(
-			LOW, // speed
-			NORMAL, // normal
-			HIGH // best
-			);
+		static Algo::Enum getAlgo(void);
 
-	public:
+		static size_t maxSourceSize(void);
+
 		// none buffed single step inflate / deflate.
 		static size_t requiredDeflateDestBuf(size_t sourceLen);
 
@@ -84,7 +82,7 @@ namespace Compression
 	class ZlibInflate
 	{
 	public:
-		typedef Zlib::CompressLevel CompressLevel;
+		typedef CompressLevel CompressLevel;
 
 		X_DECLARE_ENUM(InflateResult)(ERROR,OK,DONE);
 

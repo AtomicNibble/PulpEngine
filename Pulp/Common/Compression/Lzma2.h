@@ -5,6 +5,7 @@
 #define X_COMPRESSION_LZMA2_H_
 
 #include <Containers\Array.h>
+#include <ICompression.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -14,15 +15,8 @@ namespace Compression
 	class LZMA
 	{
 	public:
-		X_DECLARE_ENUM(CompressLevel)(
-			LOW, // speed
-			NORMAL, // normal
-			HIGH // best
-		);
+		static Algo::Enum getAlgo(void);
 
-	protected:
-
-	public:
 		// max source buffer size.
 		static size_t maxSourceSize(void);
 		// buffer than source is garanted to fit into.

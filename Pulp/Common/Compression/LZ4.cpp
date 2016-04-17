@@ -9,21 +9,26 @@ namespace Compression
 {
 	namespace
 	{
-		int compressLevelToAcceleration(LZ4::CompressLevel::Enum lvl)
+		int compressLevelToAcceleration(CompressLevel::Enum lvl)
 		{
-			if (lvl == LZ4::CompressLevel::LOW) {
+			if (lvl == CompressLevel::LOW) {
 				return 8;
 			}
-			if (lvl == LZ4::CompressLevel::NORMAL) {
+			if (lvl == CompressLevel::NORMAL) {
 				return 3;
 			}
-			if (lvl == LZ4::CompressLevel::HIGH) {
+			if (lvl == CompressLevel::HIGH) {
 				return 1;
 			}
 
 			X_ASSERT_UNREACHABLE();
 			return 1;
 		}
+	} // namespace
+
+	Algo::Enum LZ4::getAlgo(void)
+	{
+		return Algo::LZ4;
 	}
 
 	size_t LZ4::maxSourceSize(void)

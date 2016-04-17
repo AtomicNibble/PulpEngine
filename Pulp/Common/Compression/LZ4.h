@@ -6,26 +6,18 @@
 
 #include <Containers\Array.h>
 
+#include <ICompression.h>
+
 X_NAMESPACE_BEGIN(core)
 
 namespace Compression
 {
-
-
+	// this a struct not a namespace so it can be wrapped.
 	class LZ4
 	{
 	public:
-		X_DECLARE_ENUM(CompressLevel)(
-			LOW, // speed
-			NORMAL, // normal
-			HIGH // best
-		);
+		static Algo::Enum getAlgo(void);
 
-
-	protected:
-	//	virtual ~LZ4();
-
-	public:
 		// max source buffer size.
 		static size_t maxSourceSize(void);
 		// buffer than source is garanted to fit into.
@@ -33,7 +25,7 @@ namespace Compression
 
 		// none buffed single step inflate / deflate.
 		static bool deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
-			void* pDstBuf, size_t destBufLen, size_t& destLenOut, 
+			void* pDstBuf, size_t destBufLen, size_t& destLenOut,
 			CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
 		static bool inflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
