@@ -3,13 +3,11 @@
 #include "DiskFile.h"
 #include "DiskFileAsync.h"
 
+#include "PathUtil.h"
+
 #include <Util\LastError.h>
 
-#include <direct.h>
-#include <io.h>
 #include <IConsole.h>
-
-#include <Shellapi.h>
 
 #include "XFindData.h"
 
@@ -18,7 +16,6 @@
 #include <IAnimation.h>
 
 #include <Memory\VirtualMem.h>
-
 #include <Threading\JobSystem2.h>
 
 X_NAMESPACE_BEGIN(core)
@@ -716,7 +713,7 @@ bool xFileSys::deleteFile(pathType path, VirtualDirectory::Enum location) const
 		X_LOG0("FileSys", "deleteFile: \"%ls\"", buf.c_str());
 	}
 
-	return ::DeleteFileW(buf.c_str()) == TRUE;
+	return PathUtil::DeleteFile(buf);
 }
 
 bool xFileSys::deleteDirectory(pathType path, bool recursive) const
@@ -734,23 +731,7 @@ bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 		X_LOG0("FileSys", "deleteDirectory: \"%ls\"", temp.c_str());
 	}
 
-	SHFILEOPSTRUCTW file_op = {
-		NULL,
-		FO_DELETE,
-		temp.c_str(),
-		L"",
-		FOF_NOCONFIRMATION |
-		FOF_NOERRORUI |
-		FOF_SILENT,
-		false,
-		0,
-		L"" };
-
-	int ret = SHFileOperationW(&file_op);
-
-	X_ERROR_IF(ret != 0, "FileSys", "Failed to delete directory: %ls", path);
-
-	return ret == 0; // returns 0 on success, non zero on failure.
+	return PathUtil::DeleteDirectory(temp);
 }
 
 
@@ -768,16 +749,7 @@ bool xFileSys::createDirectory(pathType path, VirtualDirectory::Enum location) c
 		X_LOG0("FileSys", "createDirectory: \"%ls\"", buf.c_str());
 	}
 
-	DWORD lastErr = lastError::Get();
-	if (!::CreateDirectoryW(buf.c_str(), NULL) && lastErr != ERROR_ALREADY_EXISTS)
-	{
-		lastError::Description Dsc;
-		X_ERROR("FileSys", "Failed to create directory. Error: %s", 
-			lastError::ToString(lastErr,Dsc));
-		return false;
-	}
-
-	return true;
+	return PathUtil::CreateDirectory(buf);
 }
 
 bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum location) const
@@ -796,48 +768,7 @@ bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum locati
 		X_LOG0("FileSys", "CreateDirectoryTree: \"%ls\"", buf.c_str());
 	}
 
-	if (directoryExistsOS(buf.c_str())) {
-		return true;
-	}
-
-	// c:\\dir\\goat\\win\\bin
-	Path<wchar_t> Path(L"");
-
-	const wchar_t* Start = buf.begin();
-	const wchar_t* End = buf.begin();
-
-	for(size_t i=0; i< MAX_PATH; i++)
-	{
-		if (*End == '\0' || *Start == '\0') {
-			break;
-		}
-
-		if (*End == ':') {
-			End += 2;
-		}
-
-		if (*End == '\\')
-		{
-			Path.append(Start, ++End);
-
-			Start = End;
-
-			if (!directoryExistsOS(Path.c_str()))
-			{
-				if (!::CreateDirectoryW(Path.c_str(), NULL))
-				{
-					lastError::Description Dsc;
-					X_ERROR("FileSys", "Failed to create directory. Error: %s",
-						lastError::ToString(Dsc));
-					return false;
-				}
-			}
-		}
-
-		++End;
-	}
-
-	return true;
+	return PathUtil::CreateDirectoryTree(buf);
 }
 
 
@@ -856,7 +787,7 @@ bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
-	return fileExistsOS(buf.c_str());
+	return fileExistsOS(buf);
 }
 
 bool xFileSys::fileExists(pathTypeW path, VirtualDirectory::Enum location) const
@@ -871,7 +802,7 @@ bool xFileSys::fileExists(pathTypeW path, VirtualDirectory::Enum location) const
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
-	return fileExistsOS(buf.c_str());
+	return fileExistsOS(buf);
 }
 
 bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) const
@@ -886,7 +817,7 @@ bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) c
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
-	return directoryExistsOS(buf.c_str());
+	return directoryExistsOS(buf);
 }
 
 bool xFileSys::directoryExists(pathTypeW path, VirtualDirectory::Enum location) const
@@ -901,7 +832,7 @@ bool xFileSys::directoryExists(pathTypeW path, VirtualDirectory::Enum location) 
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
-	return directoryExistsOS(buf.c_str());
+	return directoryExistsOS(buf);
 }
 
 
@@ -917,7 +848,7 @@ bool xFileSys::isDirectory(pathType path, VirtualDirectory::Enum location) const
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
-	return isDirectoryOS(buf.c_str());
+	return isDirectoryOS(buf);
 }
 
 bool xFileSys::isDirectory(pathTypeW path, VirtualDirectory::Enum location) const
@@ -932,7 +863,7 @@ bool xFileSys::isDirectory(pathTypeW path, VirtualDirectory::Enum location) cons
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
-	return isDirectoryOS(buf.c_str());
+	return isDirectoryOS(buf);
 }
 
 
@@ -991,110 +922,52 @@ size_t xFileSys::getMinimumSectorSize(void) const
 
 // --------------------------------------------------
 
-bool xFileSys::fileExistsOS(pathTypeW fullPath) const
+bool xFileSys::fileExistsOS(const core::Path<wchar_t>& fullPath) const
 {
-	X_ASSERT_NOT_NULL(fullPath);
+	return core::PathUtil::DoesFileExist(fullPath);
+}
+
+bool xFileSys::directoryExistsOS(const core::Path<wchar_t>& fullPath) const
+{
+	return core::PathUtil::DoesDirectoryExist(fullPath);
+}
 
 
-	DWORD dwAttrib = GetFileAttributesW(fullPath);
-
-	bool result = false;
-
-	if (dwAttrib != INVALID_FILE_ATTRIBUTES) // make sure we did not fail for some shit, like permissions
-	{
-		if (dwAttrib & FILE_ATTRIBUTE_DIRECTORY) // herp derp.
-		{
-			X_ERROR("FileSys", "FileExsits check was ran on a directory");
-		}
-		else
-		{
-			// hi there Mr File
-			result = true;
-		}
-	}
-
-	if (!result)
-	{
-		DWORD err = lastError::Get();
-		// This means we checked for a file in a directory that don't exsists.
-		if (err == ERROR_PATH_NOT_FOUND)
-		{
-			X_LOG2("FileSys", "FileExsits failed, the target directory does not exsist: \"%ls\"",
-				fullPath);
-		}
-		else if (err != ERROR_FILE_NOT_FOUND)
-		{
-			lastError::Description Dsc;
-			X_ERROR("FileSys", "FileExsits failed. Error: %s", lastError::ToString(err, Dsc));
-		}
-	}
+bool xFileSys::isDirectoryOS(const core::Path<wchar_t>& fullPath) const
+{
+	bool result = core::PathUtil::IsDirectory(fullPath);
 
 	if (isDebug()) {
-		X_LOG0("FileSys", "fileExists: \"%ls\" result ^6%s",
-			fullPath, result? "TRUE" : "FALSE");
+		X_LOG0("FileSys", "isDirectory: \"%ls\" res: ^6%s",
+			fullPath.c_str(), result ? "TRUE" : "FALSE");
 	}
 
 	return result;
 }
 
-bool xFileSys::directoryExistsOS(pathTypeW fullPath) const
+bool xFileSys::fileExistsOS(const wchar_t* pFullPath) const
 {
-	X_ASSERT_NOT_NULL(fullPath);
+	return core::PathUtil::DoesFileExist(pFullPath);
+}
 
-	DWORD dwAttrib = GetFileAttributesW(fullPath);
-
-	if (dwAttrib != INVALID_FILE_ATTRIBUTES) // make sure we did not fail for some shit, like permissions
-	{
-		if ((dwAttrib & FILE_ATTRIBUTE_DIRECTORY))
-		{
-			// found
-			return true;
-		}
-
-		X_ERROR("FileSys", "DirectoryExists check was ran on a File: \"%ls\"", fullPath);
-		return false;
-	}
-
-	DWORD err = lastError::Get();
-	if (err != ERROR_PATH_NOT_FOUND && err != ERROR_FILE_NOT_FOUND)
-	{
-		lastError::Description Dsc;
-		X_ERROR("FileSys", "DirectoryExists failed. Error: %s", lastError::ToString(err, Dsc));
-	}
-
-	return false;
+bool xFileSys::directoryExistsOS(const wchar_t* pFullPath) const
+{
+	return core::PathUtil::DoesDirectoryExist(pFullPath);
 }
 
 
-bool xFileSys::isDirectoryOS(pathTypeW fullPath) const
+bool xFileSys::isDirectoryOS(const wchar_t* pFullPath) const
 {
-	X_ASSERT_NOT_NULL(fullPath);
+	bool result = core::PathUtil::IsDirectory(pFullPath);
 
-	bool result = false;
-
-	DWORD dwAttrib = GetFileAttributesW(fullPath);
-
-	if (dwAttrib != INVALID_FILE_ATTRIBUTES) {
-		if ((dwAttrib & FILE_ATTRIBUTE_DIRECTORY)) {
-			result = true;
-		}
-
-		if (isDebug()) {
-			X_LOG0("FileSys", "isDirectory: \"%ls\" res: ^6%s",
-				fullPath, result? "TRUE":"FALSE");
-		}
-
-		return result;
+	if (isDebug()) {
+		X_LOG0("FileSys", "isDirectory: \"%ls\" res: ^6%s",
+			pFullPath, result ? "TRUE" : "FALSE");
 	}
 
-	if (dwAttrib != INVALID_FILE_ATTRIBUTES)
-	{
-		lastError::Description Dsc;
-		X_ERROR("FileSys", "isDirectory failed. Error: %s", lastError::ToString(Dsc));
-	}
-
-	return false;
+	return result;
 }
+
 
 // --------------------------------------------------
 

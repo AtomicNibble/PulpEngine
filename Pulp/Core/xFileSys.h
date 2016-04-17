@@ -160,9 +160,14 @@ public:
 
 private:
 
-	bool fileExistsOS(pathTypeW fullPath) const;
-	bool directoryExistsOS(pathTypeW fullPath) const;
-	bool isDirectoryOS(pathTypeW fullPath) const;
+	bool fileExistsOS(const core::Path<wchar_t>& fullPath) const;
+	bool directoryExistsOS(const core::Path<wchar_t>& fullPath) const;
+	bool isDirectoryOS(const core::Path<wchar_t>& fullPath) const;
+
+	bool fileExistsOS(const wchar_t* pFullPath) const;
+	bool directoryExistsOS(const wchar_t* pFullPath) const;
+	bool isDirectoryOS(const wchar_t* pFullPath) const;
+
 
 	// Ajust path
 	const wchar_t* createOSPath(directory_s* dir, pathType path, Path<wchar_t>& buffer) const;
