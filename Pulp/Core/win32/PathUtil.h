@@ -10,17 +10,26 @@ namespace PathUtil
 
 	core::Path<wchar_t> GetCurrentDirectory(void);
 
-	bool CreateDirectory(core::Path<wchar_t>& dir);
+	bool CreateDirectory(const core::Path<wchar_t>& dir);
+	bool CreateDirectory(const wchar_t* pDir);
 
-	bool CreateDirectoryTree(core::Path<wchar_t>& dir);
+	bool CreateDirectoryTree(const core::Path<wchar_t>& dir);
+	bool CreateDirectoryTree(const wchar_t* pDir);
 
-	uint64_t GetFileSize(core::Path<wchar_t>& filePath);
+	uint64_t GetFileSize(const core::Path<wchar_t>& filePath);
+	uint64_t GetFileSize(const wchar_t* pFilePath);
 
-	bool DoesDirectoryExist(core::Path<wchar_t>& dirPath);
+	bool DoesDirectoryExist(const core::Path<wchar_t>& dirPath);
+	bool DoesDirectoryExist(const wchar_t* pDir);
 
-	bool DoesFileExist(core::Path<wchar_t>& filePath);
+	bool DoesFileExist(const core::Path<wchar_t>& filePath);
+	bool DoesFileExist(const wchar_t* pFilePath);
 
-	bool DoesPathExist(core::Path<wchar_t>& path);
+	bool DoesPathExist(const core::Path<wchar_t>& path);
+	bool DoesPathExist(const wchar_t* pDir);
+
+	bool IsDirectory(const core::Path<wchar_t>& path);
+	bool IsDirectory(const wchar_t* pDir);
 
 
 } // namespace PathUtil
