@@ -10,13 +10,27 @@ using namespace core::Compression;
 
 namespace
 {
+
+	template<typename T>
+	void FillBufRand(T* pBuf, size_t len)
+	{
+		FillBufRand(reinterpret_cast<uint8_t*>(pBuf), len * sizeof(T));
+	}
+
 	void FillBufRand(uint8_t* pBuf, size_t len)
 	{
 		for (size_t i = 0; i < len; i++)
 			pBuf[i] = rand() % 256;
 	}
 
-}
+
+	struct PodType
+	{
+		uint32_t meow;
+		uint32_t meow1;
+	};
+
+} // namespace
 
 TEST(Zlib, Unbuffered)
 {
@@ -113,4 +127,48 @@ TEST(Zlib, buffered)
 
 		X_DELETE_ARRAY(pUncompressed2, g_arena);
 	}
+}
+
+
+TEST(Zlib, Array)
+{
+	core::Array<uint8_t> data(g_arena);
+	core::Array<uint8_t> deflated(g_arena);
+
+	data.resize(4096);
+	FillBufRand(data.ptr(), data.size());
+
+	bool deflateOk = Zlib::deflate(g_arena, data, deflated);
+	ASSERT_TRUE(deflateOk);
+
+	core::Array<uint8_t> inflated(g_arena, data.size());
+
+	bool inflateOk = Zlib::inflate(g_arena, deflated, inflated);
+	ASSERT_TRUE(inflateOk);
+
+	// check it's the same
+	ASSERT_EQ(data.size(), inflated.size());
+	EXPECT_EQ(0, memcmp(data.ptr(), inflated.ptr(), inflated.size()));
+}
+
+TEST(Zlib, ArrayCustomType)
+{
+
+	core::Array<PodType> data(g_arena);
+	core::Array<uint8_t> deflated(g_arena);
+
+	data.resize(4096);
+	FillBufRand(data.ptr(), data.size());
+
+	bool deflateOk = Zlib::deflate(g_arena, data, deflated);
+	ASSERT_TRUE(deflateOk);
+
+	core::Array<PodType> inflated(g_arena, data.size());
+
+	bool inflateOk = Zlib::inflate(g_arena, deflated, inflated);
+	ASSERT_TRUE(inflateOk);
+
+	// check it's the same
+	ASSERT_EQ(data.size(), inflated.size());
+	EXPECT_EQ(0, memcmp(data.ptr(), inflated.ptr(), inflated.size() * sizeof(PodType)));
 }
