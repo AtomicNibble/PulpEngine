@@ -153,7 +153,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 
 	if (!AssetExsists(type, name, &assetId)) {
 		// add it?
-		if (!AddAsset(type, name)) {
+		if (AddAsset(type, name) != Result::OK) {
 			X_ERROR("AssetDB", "Failed to add assert when trying to update a asset that did not exsists.");
 			return Result::NOT_FOUND;
 		}
