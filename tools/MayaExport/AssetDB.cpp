@@ -265,10 +265,6 @@ MStatus AssetDB::RenameAsset(AssetType::Enum type, const MString & name, const M
 MStatus AssetDB::UpdateAsset(AssetType::Enum type, const MString& name, 
 	const MString& path, const MString& args, const core::Array<uint8_t>& data, bool* pUnchanged)
 {
-	if (pUnchanged) {
-		*pUnchanged = false;
-	}
-
 	if (!pipe_.isOpen() && !Connect()) {
 		MayaUtil::MayaPrintError("Failed to UpdateAsset pipe is invalid");
 		return MS::kFailure;
