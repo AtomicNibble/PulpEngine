@@ -8,6 +8,7 @@ extern "C" {
 	struct z_stream_s;
 };
 
+#include <CompileTime\IsPOD.h>
 #include <Containers\Array.h>
 #include <ICompression.h>
 
@@ -45,8 +46,8 @@ namespace Compression
 			CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
 		template<typename T>
-		static bool inflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
-			core::Array<uint8_t>& inflated);
+		static bool inflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data,
+			core::Array<T>& inflated);
 
 
 	private:
@@ -59,12 +60,14 @@ namespace Compression
 	X_INLINE bool Zlib::deflate(core::MemoryArenaBase* arena, const core::Array<T>& data, core::Array<uint8_t>& compressed,
 		CompressLevel::Enum lvl)
 	{
+		static_assert(compileTime::IsPOD<T>::Value, "T must be a POD type.");
+
 		size_t compressedSize = 0;
-		size_t bufSize = requiredDeflateDestBuf(data.size());
+		size_t bufSize = requiredDeflateDestBuf(data.size() * sizeof(T));
 
 		compressed.resize(bufSize);
 
-		bool res = deflate(arena, data.ptr(), data.size(),
+		bool res = deflate(arena, data.ptr(), data.size() * sizeof(T),
 			compressed.ptr(), compressed.size(), compressedSize, lvl);
 
 		compressed.resize(compressedSize);
@@ -72,9 +75,11 @@ namespace Compression
 	}
 
 	template<typename T>
-	X_INLINE bool Zlib::inflate(core::MemoryArenaBase* arena, const core::Array<T>& data, core::Array<uint8_t>& inflated)
+	X_INLINE bool Zlib::inflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data, core::Array<T>& inflated)
 	{
-		return inflate(arena, data.ptr(), data.size(), inflated.ptr(), inflated.size());
+		static_assert(compileTime::IsPOD<T>::Value, "T must be a POD type.");
+
+		return inflate(arena, data.ptr(), data.size(), inflated.ptr(), inflated.size() * sizeof(T));
 	}
 
 

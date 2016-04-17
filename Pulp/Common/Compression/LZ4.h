@@ -4,6 +4,7 @@
 #ifndef X_COMPRESSION_LZ4_H_
 #define X_COMPRESSION_LZ4_H_
 
+#include <CompileTime\IsPOD.h>
 #include <Containers\Array.h>
 
 #include <ICompression.h>
@@ -33,13 +34,11 @@ namespace Compression
 
 		template<typename T>
 		static bool deflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
-			core::Array<uint8_t>& compressed,
-			CompressLevel::Enum lvl = CompressLevel::NORMAL);
+			core::Array<uint8_t>& compressed, CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
 		template<typename T>
-		static bool inflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
-			core::Array<uint8_t>& inflated);
-
+		static bool inflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data,
+			core::Array<T>& inflated);
 
 	private:
 		X_NO_CREATE(LZ4);
@@ -47,17 +46,18 @@ namespace Compression
 		X_NO_ASSIGN(LZ4);
 	};
 
-
 	template<typename T>
-	X_INLINE bool LZ4::deflate(core::MemoryArenaBase* arena, const core::Array<T>& data, 
+	X_INLINE bool LZ4::deflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
 		core::Array<uint8_t>& compressed, CompressLevel::Enum lvl)
 	{
+		static_assert(compileTime::IsPOD<T>::Value, "T must be a POD type.");
+
 		size_t compressedSize = 0;
-		size_t bufSize = requiredDeflateDestBuf(data.size());
+		size_t bufSize = requiredDeflateDestBuf((data.size() * sizeof(T)));
 
 		compressed.resize(bufSize);
 
-		bool res =  deflate(arena, data.ptr(), data.size(),
+		bool res = deflate(arena, data.ptr(), data.size() * sizeof(T),
 			compressed.ptr(), compressed.size(), compressedSize, lvl);
 
 		compressed.resize(compressedSize);
@@ -65,11 +65,14 @@ namespace Compression
 	}
 
 	template<typename T>
-	X_INLINE bool LZ4::inflate(core::MemoryArenaBase* arena, const core::Array<T>& data, core::Array<uint8_t>& inflated)
+	X_INLINE bool LZ4::inflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data, core::Array<T>& inflated)
 	{
-		return inflate(arena, data.ptr(), data.size(), inflated.ptr(), inflated.size());
+		static_assert(compileTime::IsPOD<T>::Value, "T must be a POD type.");
+
+		return inflate(arena, data.ptr(), data.size(), inflated.ptr(), inflated.size() * sizeof(T));
 	}
 
+	
 
 } // namespace Compression
 
