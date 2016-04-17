@@ -185,21 +185,13 @@ bool xFileSys::InitDirectorys(void)
 			addModDir(testAssets.c_str());
 			return true;
 		}
-#if WIN32
 		else
 		{
+			core::Path<wchar_t> path = PathUtil::GetCurrentDirectory();
+
 			// set as working.
-			WCHAR workingDir[_MAX_PATH] = { 0 };
-
-			if (GetCurrentDirectoryW(sizeof(workingDir), workingDir))
-			{
-				base = core::Path<wchar_t>(workingDir);
-				base.ensureSlash();
-
-				return setGameDir(base.c_str());
-			}
+			return setGameDir(path.c_str());
 		}
-#endif // !X_WIN32
 	}
 
 	return false;
