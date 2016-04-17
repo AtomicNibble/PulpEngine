@@ -17,6 +17,8 @@
 #include <iostream>
 #include <fstream>
 
+#include <ICompression.h>
+
 #ifdef X_LIB
 
 struct XRegFactoryNode* g_pHeadToRegFactories = 0;
@@ -36,82 +38,19 @@ namespace
 		core::SimpleMemoryTagging
 	> CompressorArena;
 
-	X_DECLARE_ENUM(Algo)(LZ4, LZMA, ZLIB);
-
-	struct FileInfo
-	{
-		FileInfo() {
-			core::zero_this(this);
-		}
-		uint64_t deflatedSize;
-		uint64_t inflatedSize;
-		Algo::Enum algo;
-	};
+	using core::Compression::CompressLevel;
+	using core::Compression::Algo;
+	using core::Compression::BufferHdr;
+	using core::Compression::ICompressor;
+	using core::Compression::Compressor;
 
 
-	struct ICompressor
-	{
-		 ICompressor() : lvl_(5) {}
-		virtual ~ICompressor() {}
 
-		virtual void setLvl(int32_t lvl) {
-			lvl_ = lvl;
-		}
-
-		virtual bool deflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data,
-			FileInfo& info, core::Array<uint8_t>& out) X_ABSTRACT;
-		virtual bool inflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data,
-			const FileInfo& info, core::Array<uint8_t>& out) X_ABSTRACT;
-
-	protected:
-		int32_t lvl_;
-	};
-
-	template<typename T>
-	struct Compressor : public ICompressor
-	{
-		virtual bool deflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data, 
-			FileInfo& info, core::Array<uint8_t>& out) X_FINAL
-		{
-			T::CompressLevel::Enum lvl = T::CompressLevel::LOW;
-			if (lvl_ > 3) {
-				lvl = T::CompressLevel::NORMAL;
-			}
-			else if (lvl_ > 6) {
-				lvl = T::CompressLevel::HIGH;
-			}
-
-			bool res = T::deflate(arena, data, out, lvl);
-			if (res) {
-				info.deflatedSize = out.size();
-			}
-			return res;
-		}
-
-		virtual bool inflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data, 
-			const FileInfo& info, core::Array<uint8_t>& out) X_FINAL
-		{
-			out.resize(safe_static_cast<size_t, uint64_t>(info.inflatedSize));
-
-			return T::inflate(arena, data, out);
-		}
-
-	};
-
-
-	bool ReadFileToBuf(const std::wstring& filePath, core::Array<uint8_t>& bufOut, FileInfo* pFinfo = nullptr)
+	bool ReadFileToBuf(const std::wstring& filePath, core::Array<uint8_t>& bufOut)
 	{
 		std::ifstream file(filePath, std::ios::binary | std::ios::ate);
 		std::streamsize size = file.tellg();
 		file.seekg(0, std::ios::beg);
-
-		if (pFinfo) {
-			if (!file.read(reinterpret_cast<char*>(pFinfo), sizeof(*pFinfo))) {
-				return false;
-			}
-
-			size -= sizeof(*pFinfo);
-		}
 
 		bufOut.resize(safe_static_cast<size_t,std::streamsize>(size));
 
@@ -122,15 +61,9 @@ namespace
 		return false;
 	}
 
-	bool WriteFileToBuf(const std::wstring& filePath, const core::Array<uint8_t>& buf, FileInfo* pInfo)
+	bool WriteFileToBuf(const std::wstring& filePath, const core::Array<uint8_t>& buf)
 	{
 		std::ofstream file(filePath, std::ios::binary | std::ios::out);
-
-		if (pInfo) {
-			pInfo->deflatedSize = buf.size();
-
-			file.write(reinterpret_cast<const char*>(pInfo), sizeof(*pInfo));
-		}
 
 		if (file.write(reinterpret_cast<const char*>(buf.ptr()), buf.size()))
 		{
@@ -182,7 +115,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	// out: file out
 	// mode: defalte infalte
 	// algo: lz4, lzma, zlib
-	// lvl: 1-9
+	// lvl: 1-3
 
 	EngineApp app;
 
@@ -196,7 +129,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	Algo::Enum algo = Algo::LZ4;
 	bool defalte = true;
-	int32_t lvl = 5;
+	CompressLevel::Enum lvl = CompressLevel::NORMAL;
 
 	// args
 	{
@@ -207,6 +140,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		}
 
 		inFile = pInFile;
+
+		const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
+		if (pMode) {
+			if (core::strUtil::IsEqualCaseInsen(pMode, L"inflate")) {
+				defalte = false;
+			}
+		}
 
 		const wchar_t* pOutFile = gEnv->pCore->GetCommandLineArgForVarW(L"of");
 		if (pOutFile) {
@@ -236,18 +176,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		const wchar_t* pLvl = gEnv->pCore->GetCommandLineArgForVarW(L"lvl");
 		if (pLvl) {
 			int32_t lvlArg = core::strUtil::StringToInt<int32_t>(pLvl);
+			lvlArg = constrain<int32_t>(lvlArg, 1, CompressLevel::ENUM_COUNT);
 
-			lvl = constrain<int32_t>(lvlArg, 1, 9);		
+			lvl = static_cast<CompressLevel::Enum>(lvlArg);
 		}
+	}
+
+	if (!defalte && outFile.empty()) {
+		X_ERROR("Compress", "Output file name missing.");
+		return 1;
 	}
 
 	core::Array<uint8_t> inFileData(g_arena);
 	core::Array<uint8_t> outfileData(g_arena);
 
 	core::StopWatch timer;
-	FileInfo info;
 
-	if (!ReadFileToBuf(inFile, inFileData, defalte ? nullptr : &info)) {
+	if (!ReadFileToBuf(inFile, inFileData)) {
 		X_ERROR("Compress", "Failed to read input file");
 		return -1;
 	}
@@ -255,9 +200,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	const float loadTime = timer.GetMilliSeconds();
 	X_LOG0("Compress", "loadTime: ^2%fms", loadTime);
 
-	// if infalting get algo from file.
+	// if infalting get algo from buf.
 	if (!defalte) {
-		algo = info.algo;
+		algo = ICompressor::getAlgo(inFileData);
 	}
 
 	ICompressor* pCompressor = nullptr;
@@ -266,21 +211,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		pCompressor = X_NEW(Compressor<core::Compression::LZ4>, g_arena, "LZ4");
 		if (defalte && outFile.empty()) {
 			outFile = inFile + L".lz4";
-			info.algo = Algo::LZ4;
 		}
 	}
 	else if (algo == Algo::LZMA) {
 		pCompressor = X_NEW(Compressor<core::Compression::LZMA>, g_arena, "LZMA");
 		if (defalte && outFile.empty()) {
 			outFile = inFile + L".lzma";
-			info.algo = Algo::LZ4;
 		}
 	}
 	else if (algo == Algo::ZLIB) {
 		pCompressor = X_NEW(Compressor<core::Compression::Zlib>, g_arena, "ZLIB");
 		if (defalte && outFile.empty()) {
 			outFile = inFile + L".zlib";
-			info.algo = Algo::LZ4;
 		}
 	}
 	else {
@@ -294,11 +236,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	timer.Start();
 
 	if (defalte) {
-		pCompressor->setLvl(lvl);
-		res = pCompressor->deflate(g_arena, inFileData, info, outfileData);
+		res = pCompressor->deflate(g_arena, inFileData, outfileData, lvl);
 	}
 	else {
-		res = pCompressor->inflate(g_arena, inFileData, info, outfileData);
+		res = pCompressor->inflate(g_arena, inFileData, outfileData);
 	}
 
 	const float compressTime = timer.GetMilliSeconds();
@@ -311,7 +252,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	timer.Start();
 
-	if (!WriteFileToBuf(outFile, outfileData, defalte ? &info : nullptr)) {
+	if (!WriteFileToBuf(outFile, outfileData)) {
 		X_ERROR("Compress", "Failed to write output file");
 		return -1;
 	}
