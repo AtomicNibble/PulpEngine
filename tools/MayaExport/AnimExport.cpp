@@ -18,8 +18,11 @@
 #include <maya\MEulerRotation.h>
 #include <maya\MFileIO.h>
 
+#include <Compression\LZ4.h>
 
 #include "Profiler.h"
+#include "AssetDB.h"
+
 
 X_NAMESPACE_BEGIN(maya)
 
@@ -200,111 +203,148 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 MStatus PotatoAnimExporter::writeIntermidiate(void)
 {
 	PROFILE_MAYA_NAME("Write intermidiate:");
-	FILE* f;
 
+	core::Array<uint8_t> anim(g_arena);
 
-	errno_t err = fopen_s(&f, filePath_.c_str(), "wb");
-	if (f)
+	MStatus status = writeIntermidiate_int(anim);
+
+	if (status)
 	{
-		// going to be writing lots of text out.
-		// building the text in memory will be better.
-		// how big to make the buffer tho?
-		// what about making it big enougth to store any frame.
+		// compress the data.
+		core::Array<uint8_t> compressed(g_arena);
+		bool changed = true;
 
-		// I will store each tags data.
-		// for each frame there will be a position and a quat.
-		const int32_t numBones = safe_static_cast<int32_t,size_t>(bones_.size());
-		const int32_t numFrames = getNumFrames();
-		const int32_t fps = static_cast<int32_t>(fps_);
 
-		MString cuirrentFile = MFileIO::currentFile();
-
-		fprintf(f, "// Potato intermidiate animation format\n");
-		fprintf(f, "// Source: \"%s\"\n", cuirrentFile.asChar());
-		fprintf(f, "// TimeLine range: %i <-> %i\n", startFrame_, endFrame_);
-		fprintf(f, "\n");
-		fprintf(f, "VERSION %i\n", anim::ANIM_INTER_VERSION);
-		fprintf(f, "BONES %i\n", numBones);
-		fprintf(f, "FRAMES %i\n", numFrames);
-		fprintf(f, "FPS %i\n", fps);
-		fprintf(f, "\n");
-
-		// list the bones.
-		for (const auto& bone : bones_)
+		core::Compression::Compressor<core::Compression::LZ4> comp;
+		if (!comp.deflate(g_arena, anim, compressed, core::Compression::CompressLevel::NORMAL))
 		{
-			const char* pName = bone.name.asChar();
-			fprintf(f, "BONE \"%s\"\n", pName);
+			X_ERROR("Anim", "Failed to defalte inter anim");
+			return MS::kFailure;
 		}
 
-		fprintf(f, "\n");
+		// hellllo asset server :D
+		status = maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::ANIM,
+			MString(fileName_.c_str()),
+			MString(filePath_.c_str()),
+			MString(),
+			compressed,
+			&changed
+		);
 
-		// work out max possible size bufffer needed.
-		const size_t maxFloatBytes = 24; // -6.4
-		const size_t numFloatsPerEntry = 3 + 3 + 4;
-		const size_t tagSizes = sizeof("POS ") + sizeof("SCALE ") + sizeof("ANG ");
-		const size_t paddingSize = 10 * 6; // more than needed 
-		const size_t maxSizePerEntry = (maxFloatBytes * numFloatsPerEntry) +
-			tagSizes + paddingSize;
-
-		const size_t requiredSize = maxSizePerEntry * numFrames;
-
-
-		core::ByteStream stream(g_arena);
-		stream.resize(requiredSize);
-
-		// write each bones data.
-		for (const auto& bone : bones_)
-		{
-			stream.reset();
-
-			fprintf(f, "BONE_DATA\n");
-
-			for (int32_t i = 0; i < numFrames; i++)
-			{
-				const FrameData& data = bone.data[i];
-
-				core::StackString<maxSizePerEntry> buf;
-
-				buf.append("POS ");
-				buf.appendFmt("( %f %f %f )\n", 
-					data.position.x,
-					data.position.y,
-					data.position.z);
-
-				buf.append("SCALE ");
-				buf.appendFmt("( %.4g %.4g %.4g )\n",
-					data.scale.x,
-					data.scale.y,
-					data.scale.z);
-
-				buf.append("ANG ");
-				buf.appendFmt("( %.8g %.8g %.4g %.8g )\n",
-					data.rotation.x,
-					data.rotation.y,
-					data.rotation.z,
-					data.rotation.w);
-
-				buf.append("\n");
-
-				stream.write(buf.c_str(), buf.length());
-			}
-
-			// save stream
-			fwrite(stream.begin(), 1, stream.size(), f);
-
-			MayaUtil::IncProcess();
+		if (!status) {
+			X_ERROR("Anim", "Failed to connect to server to update AssetDB");
+			return status;
 		}
 
-		fclose(f);
-		return MS::kSuccess;
-	}
-	else
-	{
-		MayaUtil::MayaPrintError("Failed to open file for saving(%i): %s", err, filePath_.c_str());
+		// write the file.
+		FILE* f;
+		errno_t err = fopen_s(&f, filePath_.c_str(), "wb");
+		if (f)
+		{
+			fwrite(anim.begin(), 1, anim.size(), f);
+			fclose(f);
+		}
+		else
+		{
+			MayaUtil::MayaPrintError("Failed to open file for saving(%i): %s", err, filePath_.c_str());
+			return MS::kFailure;
+		}
 	}
 
-	return MS::kFailure;
+	return status;
 }
+
+MStatus PotatoAnimExporter::writeIntermidiate_int(core::Array<uint8_t>& anim)
+{
+	// I will store each tags data.
+	// for each frame there will be a position and a quat.
+	const int32_t numBones = safe_static_cast<int32_t, size_t>(bones_.size());
+	const int32_t numFrames = getNumFrames();
+	const int32_t fps = static_cast<int32_t>(fps_);
+
+	MString cuirrentFile = MFileIO::currentFile();
+
+	// work out max possible size bufffer needed.
+	const size_t maxFloatBytes = 24; // -6.4
+	const size_t numFloatsPerEntry = 3 + 3 + 4;
+	const size_t tagSizes = sizeof("POS ") + sizeof("SCALE ") + sizeof("ANG ");
+	const size_t paddingSize = 10 * 6; // more than needed 
+	const size_t maxSizePerEntry = (maxFloatBytes * numFloatsPerEntry) +
+		tagSizes + paddingSize;
+
+	const size_t headerSize = 8096; // plenty for shiz
+	const size_t requiredSize = ((maxSizePerEntry * numFrames) * numBones) + headerSize;
+
+	core::ByteStream stream(g_arena);
+	stream.resize(requiredSize);
+
+	core::StackString<4096> buf;
+	buf.clear();
+	buf.appendFmt("// Potato intermidiate animation format\n");
+	buf.appendFmt("// Source: \"%s\"\n", cuirrentFile.asChar());
+	buf.appendFmt("// TimeLine range: %i <-> %i\n", startFrame_, endFrame_);
+	buf.appendFmt("\n");
+	buf.appendFmt("VERSION %i\n", anim::ANIM_INTER_VERSION);
+	buf.appendFmt("BONES %i\n", numBones);
+	buf.appendFmt("FRAMES %i\n", numFrames);
+	buf.appendFmt("FPS %i\n", fps);
+	buf.appendFmt("\n");
+
+	// list the bones.
+	for (const auto& bone : bones_) {
+		const char* pName = bone.name.asChar();
+		buf.appendFmt("BONE \"%s\"\n", pName);
+	}
+
+	buf.append("\n");
+
+	stream.write(buf.c_str(), buf.length());
+	buf.clear();
+
+	// write each bones data.
+	for (const auto& bone : bones_)
+	{
+		buf.append("BONE_DATA\n");
+		stream.write(buf.c_str(), buf.length());
+
+		for (int32_t i = 0; i < numFrames; i++)
+		{
+			const FrameData& data = bone.data[i];
+
+			buf.clear();
+			buf.append("POS ");
+			buf.appendFmt("( %f %f %f )\n",
+				data.position.x,
+				data.position.y,
+				data.position.z);
+
+			buf.append("SCALE ");
+			buf.appendFmt("( %.4g %.4g %.4g )\n",
+				data.scale.x,
+				data.scale.y,
+				data.scale.z);
+
+			buf.append("ANG ");
+			buf.appendFmt("( %.8g %.8g %.4g %.8g )\n",
+				data.rotation.x,
+				data.rotation.y,
+				data.rotation.z,
+				data.rotation.w);
+
+			buf.append("\n");
+
+			stream.write(buf.c_str(), buf.length());
+		}
+
+		MayaUtil::IncProcess();
+	}
+
+	anim.resize(stream.size());
+	memcpy(anim.ptr(), stream.begin(), stream.size());
+	return MS::kSuccess;
+}
+
+
 
 MStatus PotatoAnimExporter::convert(const MArgList &args)
 {
