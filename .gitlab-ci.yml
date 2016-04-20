@@ -17,7 +17,7 @@ build:
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=win32
   artifacts:
    paths:
-    - %CI_PROJECT_DIR%/../build/
+    - ../build/
     - .xml
   tags:
     - windows
