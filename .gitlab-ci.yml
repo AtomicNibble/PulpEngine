@@ -14,12 +14,11 @@ build:
   stage: build
   script:
     - echo building...
-    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=win32
-    -  robocopy ../build build /S /E
+    -  robocopy ../build build *.xml *.exe *.dll /S /E
   artifacts:
    paths:
-    - build/
-    - .xml
+    - build/*.xml
+    - .
   tags:
     - windows
 
