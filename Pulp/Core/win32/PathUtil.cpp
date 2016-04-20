@@ -122,7 +122,7 @@ namespace PathUtil
 
 			if (!DoesDirectoryExist(path))
 			{
-				if (CreateDirectory(path)) {
+				if (!CreateDirectory(path)) {
 					return false;
 				}
 			}
