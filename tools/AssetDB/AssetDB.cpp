@@ -11,7 +11,7 @@ X_LINK_LIB("engine_SqLite")
 X_NAMESPACE_BEGIN(assetDb)
 
 const char* AssetDB::DB_NAME = X_ENGINE_NAME"_asset.db";
-const char* AssetDB::RAW_FILES_FOLDER = "raw_files/";
+const char* AssetDB::RAW_FILES_FOLDER = "raw_files";
 
 
 AssetDB::AssetDB()
@@ -202,6 +202,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 			mode.Set(core::fileMode::RECREATE);
 
 			filePath = RAW_FILES_FOLDER;
+			filePath.ensureSlash();
 			filePath /= AssetTypeRawFolder(type);
 			filePath.ensureSlash();
 			filePath /= name;
