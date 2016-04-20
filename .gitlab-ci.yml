@@ -15,9 +15,10 @@ build:
   script:
     - echo building...
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=win32
+    -  robocopy ../build build /S /E
   artifacts:
    paths:
-    - ../build/
+    - build/
     - .xml
   tags:
     - windows
