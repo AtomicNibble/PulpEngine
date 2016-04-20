@@ -15,14 +15,9 @@ build:
   script:
     - echo building...
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=win32
-    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Release;Platform=win32
-    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Super;Platform=win32
-    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=x64
-    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Release;Platform=x64
-    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Super;Platform=x64
   artifacts:
    paths:
-    - build/
+    - %CI_PROJECT_DIR%/../build/
     - .xml
   tags:
     - windows
