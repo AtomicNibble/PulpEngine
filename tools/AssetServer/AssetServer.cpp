@@ -418,7 +418,7 @@ bool AssetServer::AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& 
 	
 	core::string name(add.name().data(), add.name().length());
 
-	X_LOG1("AssetServer", "AddAsset: %s name: \"%s\"", assetDb::AssetDB::AssetType::ToString(type), name.c_str());
+	X_LOG1("AssetServer", "AddAsset: \"%s\" name: \"%s\"", assetDb::AssetDB::AssetType::ToString(type), name.c_str());
 
 	core::CriticalSection::ScopedLock slock(lock_);
 
@@ -445,7 +445,7 @@ bool AssetServer::DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::st
 
 	core::string name(del.name().data(), del.name().length());
 
-	X_LOG1("AssetServer", "DeleteAsset: %s name: \"%s\"", assetDb::AssetDB::AssetType::ToString(type), name.c_str());
+	X_LOG1("AssetServer", "DeleteAsset: \"%s\" name: \"%s\"", assetDb::AssetDB::AssetType::ToString(type), name.c_str());
 
 	core::CriticalSection::ScopedLock slock(lock_);
 
@@ -473,7 +473,7 @@ bool AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std:
 	core::string name(rename.name().data(), rename.name().length());
 	core::string newName(rename.newname().data(), rename.newname().length());
 
-	X_LOG1("AssetServer", "RenameAsset: %s name: \"%s\" newName: \"%s\"",
+	X_LOG1("AssetServer", "RenameAsset: \"%s\" name: \"%s\" newName: \"%s\"",
 		assetDb::AssetDB::AssetType::ToString(type), name.c_str(), newName.c_str());
 
 	core::CriticalSection::ScopedLock slock(lock_);
@@ -509,7 +509,7 @@ bool AssetServer::UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core
 	}
 
 
-	X_LOG1("AssetServer", "UpdateAsset: %s name: \"%s\"",
+	X_LOG1("AssetServer", "UpdateAsset: \"%s\" name: \"%s\"",
 		assetDb::AssetDB::AssetType::ToString(type), name.c_str());
 
 	core::CriticalSection::ScopedLock slock(lock_);
