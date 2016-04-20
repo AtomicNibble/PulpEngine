@@ -20,6 +20,10 @@ build:
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=x64
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Release;Platform=x64
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Super;Platform=x64
+  artifacts:
+   paths:
+    - build/
+    - .xml
   tags:
     - windows
 
