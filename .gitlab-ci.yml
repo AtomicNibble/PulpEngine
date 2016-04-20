@@ -17,5 +17,6 @@ build:
   artifacts:
    paths:
     - build/
+    - .xml
   tags:
     - windows
