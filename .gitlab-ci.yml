@@ -91,7 +91,7 @@ test:win32_debug:
   script:
    - echo testing (win32 Debug)
    -  'cd "build/win32/Debug/'
-   - engine_UnitTester.exe -CI --gtest_output="xml:report.xml"
+   - engine_UnitTester.exe +fs_basepath "..\..\..\game_folder" -CI --gtest_output="xml:report.xml"
   artifacts:
     paths:
     - build/Win32/Debug/*.xml
@@ -106,7 +106,7 @@ test:win32_release:
   script:
    - echo testing (win32 Release)
    -  'cd "build/win32/Release/'
-   - engine_UnitTester.exe -CI --gtest_output="xml:report.xml"
+   - engine_UnitTester.exe +fs_basepath "..\..\..\game_folder" -CI --gtest_output="xml:report.xml"
   artifacts:
     paths:
     - build/Win32/Release/*.xml
@@ -121,7 +121,7 @@ test:win32_super:
   script:
    - echo testing (win32 Super)
    -  'cd "build/win32/Super/'
-   - engine_UnitTester.exe -CI --gtest_output="xml:report.xml"
+   - engine_UnitTester.exe +fs_basepath "..\..\..\game_folder" -CI --gtest_output="xml:report.xml"
   artifacts:
     paths:
     - build/Win32/Super/*.xml
@@ -136,7 +136,7 @@ test:x64_debug:
   script:
    - echo testing (x64 Debug)
    -  'cd "build/x64/Debug/'
-   - engine_UnitTester.exe -CI --gtest_output="xml:report.xml"
+   - engine_UnitTester.exe +fs_basepath "..\..\..\game_folder" -CI --gtest_output="xml:report.xml"
   artifacts:
     paths:
     - build/x64/Debug/*.xml
@@ -151,7 +151,7 @@ test:x64_release:
   script:
    - echo testing (x64 Release)
    -  'cd "build/x64/Release/'
-   - engine_UnitTester.exe -CI --gtest_output="xml:report.xml"
+   - engine_UnitTester.exe +fs_basepath "..\..\..\game_folder" -CI --gtest_output="xml:report.xml"
   artifacts:
     paths:
     - build/x64/Release/*.xml
@@ -166,7 +166,7 @@ test:x64_super:
   script:
    - echo testing (x64 Super)
    -  'cd "build/x64/Super/'
-   - engine_UnitTester.exe -CI --gtest_output="xml:report.xml"
+   - engine_UnitTester.exe +fs_basepath "..\..\..\game_folder" -CI --gtest_output="xml:report.xml"
   artifacts:
     paths:
     - build/x64/Super/*.xml
