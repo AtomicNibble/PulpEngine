@@ -98,7 +98,7 @@ namespace symbolResolution
 		}
 		if (!SymGetLineFromAddr64(hProcess, reinterpret_cast<DWORD64>(address), &displacement, &line)) {
 			core::lastError::Description Dsc;
-			X_ERROR("Symbols", "SymFromAddr failed. Err: %s", core::lastError::ToString(Dsc));
+			X_ERROR("Symbols", "SymGetLineFromAddr64 failed. Err: %s", core::lastError::ToString(Dsc));
 			return SymbolInfo("function", "filename", 0);
 		}
 
