@@ -17,8 +17,7 @@ build:
     -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
   artifacts:
    paths:
-    - build/*.exe
-    - build/*.dll
+    - build/Win32/Debug/*.exe
   tags:
     - windows
 
@@ -26,7 +25,7 @@ test:
   stage: test
   script:
    - echo testing (win32 Debug)
-   -  'cd ".build/win32/Debug/'
+   -  'cd "build/win32/Debug/'
    - engine_UnitTester.exe -CI --gtest_output="xml:report.xml"
    - echo testing (win32 Release)
    -  'cd "../Release/'
