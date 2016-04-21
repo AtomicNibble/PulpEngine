@@ -87,12 +87,12 @@ public:
 	xFileSys();
 	~xFileSys() X_FINAL;
 
-	bool Init(void) X_FINAL;
+	bool Init(const SCoreInitParams& params) X_FINAL;
 	bool InitWorker(void) X_FINAL;
 	void ShutDown(void) X_FINAL;
 	void CreateVars(void) X_FINAL;
 
-	bool InitDirectorys(void);
+	bool InitDirectorys(bool workingDir);
 
 	// Open / Close
 	XFile* openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;

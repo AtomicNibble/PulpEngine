@@ -535,7 +535,7 @@ struct IFileSys
 
 	virtual ~IFileSys(){}
 
-	virtual bool Init(void) X_ABSTRACT;
+	virtual bool Init(const SCoreInitParams& params) X_ABSTRACT;
 	virtual bool InitWorker(void) X_ABSTRACT;
 	virtual void ShutDown(void) X_ABSTRACT;
 	virtual void CreateVars(void) X_ABSTRACT;

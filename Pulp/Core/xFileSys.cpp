@@ -68,12 +68,12 @@ xFileSys::~xFileSys()
 }
 
 
-bool xFileSys::Init()
+bool xFileSys::Init(const SCoreInitParams& params)
 {
 	X_ASSERT_NOT_NULL(gEnv->pCore);
 	X_LOG0("FileSys", "Starting Filesys..");
 
-	if (!InitDirectorys()) {
+	if (!InitDirectorys(params.FileSysWorkingDir())) {
 		X_ERROR("FileSys", "Failed to set game directories");
 		return false;
 	}
@@ -134,7 +134,7 @@ void xFileSys::CreateVars(void)
 	}
 }
 
-bool xFileSys::InitDirectorys(void)
+bool xFileSys::InitDirectorys(bool working)
 {
 	// check if game dir set via cmd line.
 	const wchar_t* pGameDir = gEnv->pCore->GetCommandLineArgForVarW(L"fs_basepath");
@@ -159,6 +159,12 @@ bool xFileSys::InitDirectorys(void)
 			addModDir(testAssets.c_str());
 			return true;
 		}
+	}
+	else if (working)
+	{
+		// working dir added.
+		core::Path<wchar_t> path = PathUtil::GetCurrentDirectory();
+		return setGameDir(path.c_str());
 	}
 	else
 	{

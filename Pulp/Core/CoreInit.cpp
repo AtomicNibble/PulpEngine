@@ -442,7 +442,7 @@ bool XCore::InitFileSys(const SCoreInitParams &initParams)
 	env_.pFileSys = X_NEW_ALIGNED( core::xFileSys, g_coreArena, "FileSys", 8);
 
 	if (env_.pFileSys) {
-		if (!env_.pFileSys->Init()) {
+		if (!env_.pFileSys->Init(initParams)) {
 			X_ERROR("Core", "Failed to init filesystem");
 			return false;
 		}
