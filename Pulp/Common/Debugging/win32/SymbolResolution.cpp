@@ -103,9 +103,10 @@ namespace symbolResolution
 		}
 
 		return SymbolInfo( sip.si.Name, line.FileName, line.LineNumber);
-	
+
 #else
 		X_UNUSED(address);
+		return SymbolInfo("function", "filename", 0);
 #endif
 	}
 }
