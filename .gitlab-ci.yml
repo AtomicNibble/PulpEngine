@@ -49,6 +49,11 @@ test:
    - engine_UnitTester.exe -CI --gtest_output="xml:report.xml"
   artifacts:
     paths:
-    - build/*.xml
+    - build/Win32/Debug/*.xml
+    - build/Win32/Release/*.xml
+    - build/Win32/Super/*.xml
+    - build/x64/Debug/*.xml
+    - build/x64/Release/*.xml
+    - build/x64/Super/*.xml
   tags:
    - windows
