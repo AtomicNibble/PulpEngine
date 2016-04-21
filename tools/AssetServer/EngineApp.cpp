@@ -49,6 +49,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 	params.bEnableJobSystem = true; // some converters make use of the job system. 
 	params.pConsoleWnd = &Console;
 	params.pCoreArena = g_arena;
+	params.bFileSysWorkingDir = true;
 
 
 #ifdef X_LIB

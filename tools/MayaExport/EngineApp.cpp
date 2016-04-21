@@ -63,6 +63,7 @@ bool EngineApp::Init(void)
 	params.pConsoleWnd = nullptr;
 	params.pCoreArena = g_arena;
 	params.bLoadSymbols = false;
+	params.bFileSysWorkingDir = true;
 
 #ifdef X_LIB
 
