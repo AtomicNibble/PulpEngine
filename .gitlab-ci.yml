@@ -19,6 +19,7 @@ build:win32_debug:
   artifacts:
    paths:
     - build/Win32/Debug/*.exe
+    - build/Win32/Debug/*.pdb
   tags:
     - windows
 
@@ -56,6 +57,7 @@ build:x64_debug:
   artifacts:
    paths:
     - build/x64/Debug/*.exe
+    - build/x64/Debug/*.pdb
   tags:
     - windows
 
