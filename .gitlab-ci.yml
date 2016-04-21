@@ -99,7 +99,7 @@ test:win32_debug:
     - build:win32_debug
   tags:
    - windows
-
+   - test
 
 test:win32_release:
   stage: test
@@ -114,6 +114,7 @@ test:win32_release:
     - build:win32_release
   tags:
    - windows
+   - test
 
 test:win32_super:
   stage: test
@@ -128,7 +129,7 @@ test:win32_super:
     - build:win32_super
   tags:
    - windows
-
+   - test
 
 test:x64_debug:
   stage: test
@@ -143,7 +144,7 @@ test:x64_debug:
     - build:x64_debug
   tags:
    - windows
-
+   - test
 
 test:x64_release:
   stage: test
@@ -158,6 +159,7 @@ test:x64_release:
     - build:x64_release
   tags:
    - windows
+   - test
 
 test:x64_super:
   stage: test
@@ -172,4 +174,5 @@ test:x64_super:
     - build:x64_super
   tags:
    - windows
+   - test
 
