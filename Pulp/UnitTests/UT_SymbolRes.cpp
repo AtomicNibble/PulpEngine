@@ -27,7 +27,7 @@ TEST(Debug, SymbolRes) {
 	const CallStack& stack = Foo1();
 	const SymbolInfo info = symbolResolution::ResolveSymbolsForAddress(stack.GetFrame(0));
 
-	EXPECT_TRUE(info.GetLine() == 18);
+	EXPECT_EQ(18, info.GetLine());
 
 #endif
 }
