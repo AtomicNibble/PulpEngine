@@ -10,50 +10,56 @@ stages:
  - test
 
 
-build:
+build:win32_debug:
   stage: build
   script:
     - echo building...
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=win32
     -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
   artifacts:
    paths:
     - build/Win32/Debug/*.exe
-    - build/Win32/Release/*.exe
-    - build/Win32/Super/*.exe
-    - build/x64/Debug/*.exe
-    - build/x64/Release/*.exe
-    - build/x64/Super/*.exe
   tags:
     - windows
 
-test:
+build:win32_release:
+  stage: build
+  script:
+    - echo building...
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Release;Platform=win32
+    -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
+  artifacts:
+   paths:
+    - build/Win32/Release/*.exe
+  tags:
+    - windows
+
+
+test:win32_debug:
   stage: test
   script:
    - echo testing (win32 Debug)
    -  'cd "build/win32/Debug/'
    - engine_UnitTester.exe -CI --gtest_output="xml:report.xml"
-   - echo testing (win32 Release)
-   -  'cd "../Release/'
-   - engine_UnitTester.exe -CI --gtest_output="xml:report.xml"
-   - echo testing (win32 Super)
-   -  'cd "../Super/'
-   - engine_UnitTester.exe -CI --gtest_output="xml:report.xml"
-   - echo testing (x64 Debug)
-   -  'cd "../../x64/Debug/'
-   - engine_UnitTester.exe -CI --gtest_output="xml:report.xml"
-   - echo testing (x64 Release)
-   -  'cd "../Release/'
-   - engine_UnitTester.exe -CI --gtest_output="xml:report.xml"
-   - echo testing (x64 Super)
-   -  'cd "../Super/'
-   - engine_UnitTester.exe -CI --gtest_output="xml:report.xml"
   artifacts:
     paths:
     - build/Win32/Debug/*.xml
+  dependencies:
+    - build:win32_debug
+  tags:
+   - windows
+
+
+test:win32_release:
+  stage: test
+  script:
+   - echo testing (win32 Release)
+   -  'cd "build/win32/Release/'
+   - engine_UnitTester.exe -CI --gtest_output="xml:report.xml"
+  artifacts:
+    paths:
     - build/Win32/Release/*.xml
-    - build/Win32/Super/*.xml
-    - build/x64/Debug/*.xml
-    - build/x64/Release/*.xml
-    - build/x64/Super/*.xml
+  dependencies:
+    - build:win32_release
   tags:
    - windows
