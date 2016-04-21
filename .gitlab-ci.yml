@@ -13,8 +13,7 @@ build:
   stage: build
   script:
     - echo building...
-    -  robocopy ../build build *.xml *.exe *.dll /S /E
-    -  ver > nul
+    -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
   artifacts:
    paths:
     - build/
