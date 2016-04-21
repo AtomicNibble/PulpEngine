@@ -14,7 +14,7 @@ build:
   script:
     - echo building...
     -  robocopy ../build build *.xml *.exe *.dll /S /E
-    -  IF %ERRORLEVEL% LEQ 1 ver > nul
+    -  ver > nul
   artifacts:
    paths:
     - build/
