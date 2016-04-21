@@ -15,7 +15,7 @@ build:win32_debug:
   script:
     - echo building...
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=win32
-    -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
+    -  (robocopy ../build build *.xml *.exe *.dll *.pdb /S /E)  ^& exit /b 0
   artifacts:
    paths:
     - build/Win32/Debug/*.exe
@@ -53,7 +53,7 @@ build:x64_debug:
   script:
     - echo building...
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=x64
-    -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
+    -  (robocopy ../build build *.xml *.exe *.dll *.pdb /S /E)  ^& exit /b 0
   artifacts:
    paths:
     - build/x64/Debug/*.exe
