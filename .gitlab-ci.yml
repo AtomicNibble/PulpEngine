@@ -18,6 +18,11 @@ build:
   artifacts:
    paths:
     - build/Win32/Debug/*.exe
+    - build/Win32/Release/*.exe
+    - build/Win32/Super/*.exe
+    - build/x64/Debug/*.exe
+    - build/x64/Release/*.exe
+    - build/x64/Super/*.exe
   tags:
     - windows
 
