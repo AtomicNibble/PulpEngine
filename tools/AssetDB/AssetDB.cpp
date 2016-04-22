@@ -68,9 +68,6 @@ bool AssetDB::CreateTables(void)
 
 bool AssetDB::DropTables(void)
 {
-	if (!db_.execute("DROP TABLE IF EXISTS raw_files_link;")) {
-		return false;
-	}
 	if (!db_.execute("DROP TABLE IF EXISTS gdt_files;")) {
 		return false;
 	}
