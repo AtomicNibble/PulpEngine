@@ -613,6 +613,13 @@ SqlLiteQuery::query_iterator::query_iterator() : pCmd_(0)
 
 SqlLiteQuery::query_iterator::query_iterator(SqlLiteQuery* cmd) : pCmd_(cmd)
 {
+	// if the query failed, make this same as end.
+	if (!cmd->ps) {
+		pCmd_ = nullptr;
+		rc_ = Result::DONE;
+		return;
+	}
+
 	rc_ = pCmd_->step();
 	if (rc_ != Result::ROW && rc_ != Result::DONE) {
 		X_ERROR("SqlDb", "query step err(%i)", rc_);
