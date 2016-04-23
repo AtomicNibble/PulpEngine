@@ -7,10 +7,6 @@
 
 #include <Platform\Console.h>
 
-#include <String\CmdArgs.h>
-
-#include <../AssetDB/AssetDB.h>
-
 
 #define _LAUNCHER
 #include <ModuleExports.h>
@@ -49,6 +45,7 @@ typedef core::MemoryArena<
 > ConverterArena;
 
 core::MemoryArenaBase* g_arena = nullptr;
+
 
 
 namespace
@@ -96,14 +93,6 @@ namespace
 }// namespace 
 
 
-
- //{
- //	core::CmdArgs<4096, wchar_t> args(lpCmdLine);
-
- //	res = con.Convert(assType, args);
- //}
-
-
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
@@ -111,7 +100,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	g_hInstance = hInstance;
 
-	EngineApp engine;
+	EngineApp app;
 
 	core::Console Console(L"Potato - Converter");
 	Console.RedirectSTD();
@@ -125,27 +114,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	bool res = false;
 
-	if (engine.Init(lpCmdLine, Console))
+	if (app.Init(lpCmdLine, Console))
 	{
 		converter::Converter con;
 		converter::AssetType::Enum assType;
+		core::string assName;
 
 		con.PrintBanner();
 
-		{
-			if (GetAssetType(assType))
-			{
-				core::string name;
-				if (GetAssetName(name))
-				{
-					// right now we lookup the asset from the asset db.
-					// only if we can find it do we convert.
-					// the info in the asset db will be used to convert it.
-
-
-				}
-			}
-		}
+		if (GetAssetType(assType) && GetAssetName(assName)) {
+			con.Convert(assType, assName);
+		}	
 		
 		Console.PressToContinue();
 	}

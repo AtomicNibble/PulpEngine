@@ -31,12 +31,13 @@ public:
 
 	void PrintBanner(void);
 
-	bool Convert(AssetType::Enum type, ConvertArgs& args);
-
+	bool Convert(AssetType::Enum assType, core::string& name);
 
 private:
-	IConverter* GetConverter(AssetType::Enum type);
-	bool EnsureLibLoaded(AssetType::Enum type);
+	bool Convert_int(AssetType::Enum assType, ConvertArgs& args);
+
+	IConverter* GetConverter(AssetType::Enum assType);
+	bool EnsureLibLoaded(AssetType::Enum assType);
 
 	void* LoadDLL(const char* dllName);
 	bool IntializeConverterModule(AssetType::Enum assType);
@@ -44,6 +45,7 @@ private:
 
 private:
 	IConverter* converters_[AssetType::ENUM_COUNT];
+	assetDb::AssetDB db_;
 };
 
 

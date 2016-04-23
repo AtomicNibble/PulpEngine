@@ -8,6 +8,8 @@
 #include <Extension\IPotatoFactory.h>
 #include <Extension\PotatoCreateClass.h>
 
+// need assetDB.
+X_LINK_LIB("engine_AssetDb")
 
 X_NAMESPACE_BEGIN(converter)
 
@@ -28,10 +30,30 @@ void Converter::PrintBanner(void)
 
 }
 
-
-bool Converter::Convert(AssetType::Enum type, ConvertArgs& args)
+bool Converter::Convert(AssetType::Enum assType, core::string& name)
 {
-	IConverter* pCon = GetConverter(type);
+	if (!db_.OpenDB()) {
+		return false;
+	}
+
+	int32_t assetId = -1;
+	if (db_.AssetExsists(assType, name, &assetId)) {
+		return false;
+	}
+
+	core::string argsStr;
+	if (db_.GetArgsForAsset(assetId, argsStr)) {
+		return false;
+	}
+
+
+	return Convert_int(assType, argsStr);
+}
+
+
+bool Converter::Convert_int(AssetType::Enum assType, ConvertArgs& args)
+{
+	IConverter* pCon = GetConverter(assType);
 
 	if (pCon) {
 		return pCon->Convert(args);
@@ -42,25 +64,25 @@ bool Converter::Convert(AssetType::Enum type, ConvertArgs& args)
 
 
 
-IConverter* Converter::GetConverter(AssetType::Enum type)
+IConverter* Converter::GetConverter(AssetType::Enum assType)
 {
-	if (!EnsureLibLoaded(type)) {
+	if (!EnsureLibLoaded(assType)) {
 		return false;
 	}
 
-	return converters_[type];
+	return converters_[assType];
 }
 
-bool Converter::EnsureLibLoaded(AssetType::Enum type)
+bool Converter::EnsureLibLoaded(AssetType::Enum assType)
 {
 	// this needs to be more generic.
 	// might move to a single interface for all converter libs.
-	if (converters_[type]) {
+	if (converters_[assType]) {
 		return true;
 	}
 
 
-	return IntializeConverterModule(type);
+	return IntializeConverterModule(assType);
 }
 
 
