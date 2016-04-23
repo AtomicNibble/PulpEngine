@@ -4,6 +4,8 @@
 #include <IConverterModule.h>
 #include <String\CmdArgs.h>
 
+#include <../AssetDB/AssetDB.h>
+
 X_NAMESPACE_DECLARE(anim,
 struct 	IAnimLib
 )
@@ -14,11 +16,13 @@ struct IModelLib
 
 X_NAMESPACE_BEGIN(converter)
 
-X_DECLARE_ENUM(AssetType)(Anim, Model);
+
+typedef assetDb::AssetDB::AssetType AssetType;
 
 class Converter
 {
 	typedef core::traits::Function<void *(ICore *pSystem, const char *moduleName)> ModuleLinkfunc;
+public:
 	typedef core::CmdArgs<4096, wchar_t> ConvertArgs;
 
 public:
