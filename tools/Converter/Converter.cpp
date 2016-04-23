@@ -66,7 +66,17 @@ bool Converter::EnsureLibLoaded(AssetType::Enum type)
 
 bool Converter::IntializeConverterModule(AssetType::Enum assType)
 {
-	const char* pAssTypeStr = AssetType::ToString(assType);
+	const char* pAssTypeStr = nullptr;
+	
+	if (assType == AssetType::ANIM) {
+		pAssTypeStr = "Anim";
+	}
+	else if (assType == AssetType::MODEL) {
+		pAssTypeStr = "Model";
+	}
+	else {
+		X_ASSERT_UNREACHABLE();
+	}
 
 	core::StackString<64> dllName("Engine_");
 	dllName.append(pAssTypeStr);

@@ -5,7 +5,6 @@
 #define X_CONVETER_MODULE_I_H_
 
 #include <Extension\IPotatoClass.h>
-#include <String\CmdArgs.h>
 
 X_NAMESPACE_DECLARE(anim,
 struct 	IAnimLib
@@ -28,7 +27,7 @@ struct IConverterModule : public IPotatoClass
 
 struct IConverter
 {
-	typedef core::CmdArgs<4096, wchar_t> ConvertArgs;
+	typedef core::string ConvertArgs;
 
 	virtual ~IConverter() {}
 

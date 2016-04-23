@@ -23,7 +23,7 @@ class Converter
 {
 	typedef core::traits::Function<void *(ICore *pSystem, const char *moduleName)> ModuleLinkfunc;
 public:
-	typedef core::CmdArgs<4096, wchar_t> ConvertArgs;
+	typedef IConverter::ConvertArgs ConvertArgs;
 
 public:
 	Converter();
