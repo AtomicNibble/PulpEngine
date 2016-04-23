@@ -370,8 +370,9 @@ void AssetServer::Run_Internal(void)
 {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-	db_.OpenDB();
-	db_.CreateTables();
+	if (!db_.OpenDB()) {
+		return;
+	}
 
 	while (1)
 	{
@@ -388,8 +389,9 @@ core::Thread::ReturnValue AssetServer::ThreadRun(const core::Thread& thread)
 {
 	GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-	db_.OpenDB();
-	db_.CreateTables();
+	if (!db_.OpenDB()) {
+		return core::Thread::ReturnValue(-1);
+	}
 
 	while (thread.ShouldRun())
 	{
