@@ -21,42 +21,40 @@ XAnimLib::~XAnimLib()
 
 bool XAnimLib::Convert(ConvertArgs& args)
 {
-	core::Path<wchar_t> interPath;
-	core::Path<wchar_t> modelPath;
-	core::Path<wchar_t> destPath;
+	core::Path<char> interPath;
+	core::Path<char> modelPath;
+	core::Path<char> destPath;
 
-	{
-		{
-			const wchar_t* pInterPath = args.getOption(L"inter_anim");
-			if (pInterPath) {
-				interPath = pInterPath;
-			}
-			else {
-				X_ERROR("AnimLib", "Missing 'inter_anim' option");
-				return false;
-			}
-		}
-		{
-			const wchar_t* pModelPath = args.getOption(L"model");
-			if (pModelPath) {
-				modelPath = pModelPath;
-			}
-			else {
-				X_ERROR("AnimLib", "Missing 'model' option");
-				return false;
-			}
-		}
-		{
-			const wchar_t* pDest = args.getOption(L"dest");
-			if (pDest) {
-				destPath = pDest;
-			}
-			else {
-				X_ERROR("AnimLib", "Missing 'dest' option");
-				return false;
-			}
-		}
+
+	core::json::Document d;
+	d.Parse(args.c_str());
+
+	if (d.HasMember("inter_anim")) {
+		interPath = d["inter_anim"].GetString();
 	}
+	if (d.HasMember("model")) {
+		modelPath = d["model"].GetString();
+	}
+	if (d.HasMember("dest")) {
+		destPath = d["dest"].GetString();
+	}
+
+
+	// log all that are missing then return.
+	if(interPath.isEmpty()) {
+		X_ERROR("AnimLib", "Missing 'inter_anim' option");
+	}
+	if (modelPath.isEmpty()) {
+		X_ERROR("AnimLib", "Missing 'model' option");
+	}
+	if (destPath.isEmpty()) {
+		X_ERROR("AnimLib", "Missing 'dest' option");
+	}
+
+	if (interPath.isEmpty() || interPath.isEmpty() || interPath.isEmpty()) {
+		return false;
+	}
+
 
 	InterAnim inter(g_AnimLibArena);
 
