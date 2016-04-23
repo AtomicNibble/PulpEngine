@@ -86,6 +86,13 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 
 	LinkModule(pICore_, "Conveter");
 
+	// AssetDB
+#if !defined(X_LIB) 
+	if (!pICore_->IntializeLoadedEngineModule("Engine_AssetDB", "Engine_AssetDB")) {
+		return false;
+	}
+#endif
+
 	return true;
 }
 
