@@ -323,6 +323,7 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::operator=(value_type ch)
 template<typename CharT>
 typename StringRef<CharT>::StrT& StringRef<CharT>::operator=(const_str str)
 {
+	// we don't allow null pointer to be assigned 
 	X_ASSERT_NOT_NULL(str);
 
 	_Assign(str, strlen(str));
