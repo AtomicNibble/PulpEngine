@@ -27,7 +27,11 @@ AssetDB::~AssetDB()
 
 bool AssetDB::OpenDB(void)
 {
-	return db_.connect(DB_NAME);
+	if (!db_.connect(DB_NAME)) {
+		return false;
+	}
+	
+	return CreateTables();
 }
 
 void AssetDB::CloseDB(void)
