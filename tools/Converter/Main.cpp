@@ -9,6 +9,8 @@
 
 #include <String\CmdArgs.h>
 
+#include <../AssetDB/AssetDB.h>
+
 
 #define _LAUNCHER
 #include <ModuleExports.h>
@@ -58,11 +60,11 @@ namespace
 		{
 			if (core::strUtil::IsEqualCaseInsen(pAssetType, L"model"))
 			{
-				assType = converter::AssetType::Model;
+				assType = converter::AssetType::MODEL;
 			}
 			else if (core::strUtil::IsEqualCaseInsen(pAssetType, L"anim"))
 			{
-				assType = converter::AssetType::Anim;
+				assType = converter::AssetType::ANIM;
 			}
 			else
 			{		
