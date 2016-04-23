@@ -241,7 +241,7 @@ public:
 		explicit rows(sqlite3_stmt* pStmt);
 
 		int dataCount(void) const;
-		int columnType(int idx) const;
+		ColumType::Enum columnType(int idx) const;
 		int columnBytes(int idx) const;
 
 		template <class T> 

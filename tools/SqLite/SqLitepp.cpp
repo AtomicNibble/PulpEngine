@@ -553,9 +553,9 @@ int SqlLiteQuery::rows::dataCount(void) const
 	return sqlite3_data_count(pStmt_);
 }
 
-int SqlLiteQuery::rows::columnType(int idx) const
+ColumType::Enum SqlLiteQuery::rows::columnType(int idx) const
 {
-	return sqlite3_column_type(pStmt_, idx);
+	return static_cast<ColumType::Enum>(sqlite3_column_type(pStmt_, idx));
 }
 
 int SqlLiteQuery::rows::columnBytes(int idx) const
