@@ -46,6 +46,7 @@ bool AssetDB::CreateTables(void)
 		"name TEXT COLLATE NOCASE," // names are not unique since we allow same name for diffrent type.
 		"path TEXT,"
 		"type INTEGER,"
+		"args TEXT,"
 		"raw_file INTEGER,"
 		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,"
 		"lastUpdateTime TIMESTAMP"
@@ -59,7 +60,6 @@ bool AssetDB::CreateTables(void)
 		"path TEXT,"
 		"size INTEGER,"
 		"hash INTEGER,"
-		"args TEXT,"
 		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL"
 		");")) {
 		X_ERROR("AssetDB", "Failed to create 'raw_files' table");
@@ -165,9 +165,8 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	// work out crc for the data.
 	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 
-	const uint32_t crc = pCrc32->GetCRC32(data.ptr(), data.size());
+	const uint32_t dataCrc = pCrc32->GetCRC32(data.ptr(), data.size());
 	const uint32_t argsCrc = pCrc32->GetCRC32(argsOpt.c_str(), argsOpt.length());
-	const uint32_t mergedCrc = pCrc32->Combine(crc, argsCrc, safe_static_cast<uint32_t, size_t>(argsOpt.length()));
 
 
 	rawId = std::numeric_limits<uint32_t>::max();
@@ -179,7 +178,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 		if (GetRawfileForId(assetId, rawData, &rawId))
 		{
 			// same?
-			if (rawData.hash == mergedCrc) {
+			if (rawData.hash == dataCrc) {
 				X_LOG0("AssetDB", "Skipping updates asset unchanged");
 				return Result::UNCHANGED;
 			}
@@ -231,11 +230,10 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 
 			// insert entry
 			{
-				sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, size, hash, args) VALUES(?,?,?,?)");
+				sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, size, hash) VALUES(?,?,?)");
 				cmd.bind(1, name.c_str());
 				cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
-				cmd.bind(3, static_cast<int32_t>(mergedCrc));
-				cmd.bind(4, argsOpt.c_str());
+				cmd.bind(3, static_cast<int32_t>(dataCrc));
 
 				sql::Result::Enum res = cmd.execute();
 				if (res != sql::Result::OK) {
@@ -260,11 +258,10 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 		else
 		{
 			// just update.
-			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, args = ?, add_time = DateTime('now') WHERE file_id = ?");
+			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, add_time = DateTime('now') WHERE file_id = ?");
 			cmd.bind(1, name.c_str());
 			cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
-			cmd.bind(3, static_cast<int32_t>(mergedCrc));
-			cmd.bind(4, argsOpt.c_str());
+			cmd.bind(3, static_cast<int32_t>(dataCrc));
 			cmd.bind(5, rawId);
 
 			sql::Result::Enum res = cmd.execute();
@@ -281,7 +278,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	}
 
 	// now update file info.
-	stmt = "UPDATE file_ids SET lastUpdateTime = DateTime('now')";
+	stmt = "UPDATE file_ids SET lastUpdateTime = DateTime('now'), args = :args";
 
 	if (pathOpt.isNotEmpty()) {
 		stmt += ", path = :p";
@@ -294,6 +291,8 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	}
 	cmd.bind(":t", type);
 	cmd.bind(":n", name.c_str());
+	cmd.bind(":args", argsOpt.c_str());
+
 
 	sql::Result::Enum res = cmd.execute();
 	if (res != sql::Result::OK) {
@@ -326,22 +325,29 @@ bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, int32
 
 bool AssetDB::GetArgsForAsset(int32_t assetId, core::string& argsOut)
 {
-	RawFile raw;
+	sql::SqlLiteQuery qry(db_, "SELECT args FROM file_ids WHERE file_ids.file_id = ?");
+	qry.bind(1, assetId);
 
-	if (GetRawfileForId(assetId, raw))
-	{
-		argsOut = raw.args;
-		return true;
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
+		return false;
 	}
 
-	return false;
+	if ((*it).columnType(0) != sql::ColumType::SNULL) {
+		argsOut = (*it).get<const char*>(0);
+	}
+	else {
+		argsOut.clear();
+	}
+	return true;
 }
 
 bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
 {
 	// we get the raw_id from the asset.
 	// and get the data.
-	sql::SqlLiteQuery qry(db_, "SELECT raw_files.file_id, raw_files.path, raw_files.hash, raw_files.args FROM raw_files "
+	sql::SqlLiteQuery qry(db_, "SELECT raw_files.file_id, raw_files.path, raw_files.hash FROM raw_files "
 		"INNER JOIN file_ids on raw_files.file_id = file_ids.raw_file WHERE file_ids.file_id = ?");
 	qry.bind(1, assetId);
 
@@ -363,7 +369,6 @@ bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
 	}
 
 	dataOut.hash = static_cast<uint32_t>((*it).get<int32_t>(2));
-	dataOut.args = (*it).get<const char*>(3);
 	return true;
 }
 

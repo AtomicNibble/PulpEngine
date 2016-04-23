@@ -20,7 +20,6 @@ class DLL_EXPORT AssetDB
 	{
 		int32_t file_id;
 		core::string path;
-		core::string args;
 		uint32_t hash;
 	};
 
