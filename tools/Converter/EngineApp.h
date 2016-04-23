@@ -12,17 +12,12 @@ public:
 
 	bool Init(const wchar_t* sInCmdLine, core::Console& Console);
 	bool ShutDown(void);
-	int	MainLoop(void);
 
 private:
 	virtual void OnAssert(const core::SourceInfo& sourceInfo) X_OVERRIDE;
 	virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_OVERRIDE;
 
 private:
-
-	static LRESULT CALLBACK	WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-
-	bool PumpMessages();
 
 private:
 	HMODULE hSystemHandle_;

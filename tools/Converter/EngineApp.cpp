@@ -106,6 +106,7 @@ bool EngineApp::ShutDown(void)
 	return true;
 }
 
+
 void EngineApp::OnAssert(const core::SourceInfo& sourceInfo)
 {
 	X_UNUSED(sourceInfo);
@@ -117,30 +118,3 @@ void EngineApp::OnAssertVariable(const core::SourceInfo& sourceInfo)
 	X_UNUSED(sourceInfo);
 
 }
-
-LRESULT CALLBACK EngineApp::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg)
-	{
-	case WM_CLOSE:
-		return 0;
-
-	}
-	return DefWindowProc(hWnd, msg, wParam, lParam);
-}
-
-
-bool EngineApp::PumpMessages(void)
-{
-	MSG msg;
-	while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE))
-	{
-		if (msg.message == WM_QUIT)
-			return false;
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
-	}
-	return true;
-}
-
-
