@@ -324,13 +324,24 @@ bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, int32
 	return true;
 }
 
+bool AssetDB::GetArgsForAsset(int32_t assetId, core::string& argsOut)
+{
+	RawFile raw;
+
+	if (GetRawfileForId(assetId, raw))
+	{
+		argsOut = raw.args;
+		return true;
+	}
+
+	return false;
+}
 
 bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
 {
 	// we get the raw_id from the asset.
 	// and get the data.
-	sql::SqlLiteTransaction trans(db_, true);
-	sql::SqlLiteQuery qry(db_, "SELECT raw_files.file_id, raw_files.path, raw_files.hash FROM raw_files "
+	sql::SqlLiteQuery qry(db_, "SELECT raw_files.file_id, raw_files.path, raw_files.hash, raw_files.args FROM raw_files "
 		"INNER JOIN file_ids on raw_files.file_id = file_ids.raw_file WHERE file_ids.file_id = ?");
 	qry.bind(1, assetId);
 
@@ -344,8 +355,15 @@ bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
 		*pId = (*it).get<int32_t>(0);
 	}
 
-	dataOut.path = (*it).get< const char*>(1);
+	if ((*it).columnType(1) != sql::ColumType::SNULL) {
+		dataOut.path = (*it).get<const char*>(1);
+	}
+	else {
+		dataOut.path.clear();
+	}
+
 	dataOut.hash = static_cast<uint32_t>((*it).get<int32_t>(2));
+	dataOut.args = (*it).get<const char*>(3);
 	return true;
 }
 

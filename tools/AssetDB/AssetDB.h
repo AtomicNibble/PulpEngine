@@ -20,6 +20,7 @@ class DLL_EXPORT AssetDB
 	{
 		int32_t file_id;
 		core::string path;
+		core::string args;
 		uint32_t hash;
 	};
 
@@ -52,6 +53,8 @@ public:
 		core::Array<uint8_t>& data, const core::string& pathOpt, const core::string& argsOpt);
 
 	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
+
+	bool GetArgsForAsset(int32_t id, core::string& argsOut);
 
 private:
 	bool GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId = nullptr);
