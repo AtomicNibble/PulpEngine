@@ -227,7 +227,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 
 			// insert entry
 			{
-				sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, size, hash, args) VALUES(?,?,?)");
+				sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, size, hash, args) VALUES(?,?,?,?)");
 				cmd.bind(1, name.c_str());
 				cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
 				cmd.bind(3, static_cast<int32_t>(mergedCrc));
