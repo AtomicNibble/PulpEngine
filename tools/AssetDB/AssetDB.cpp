@@ -10,6 +10,7 @@ X_LINK_LIB("engine_SqLite")
 
 X_NAMESPACE_BEGIN(assetDb)
 
+const char* AssetDB::ASSET_DB_FOLDER = "asset_db";
 const char* AssetDB::DB_NAME = X_ENGINE_NAME"_asset.db";
 const char* AssetDB::RAW_FILES_FOLDER = "raw_files";
 
@@ -27,7 +28,18 @@ AssetDB::~AssetDB()
 
 bool AssetDB::OpenDB(void)
 {
-	if (!db_.connect(DB_NAME)) {
+	core::Path<char> dbPath;
+	dbPath.append(ASSET_DB_FOLDER);
+	dbPath.ensureSlash();
+	dbPath.append(DB_NAME);
+
+
+	if (!gEnv->pFileSys->createDirectoryTree(dbPath.c_str())) {
+		X_ERROR("AssetDB", "Failed to create dir for asset_db");
+		return false;
+	}
+
+	if (!db_.connect(dbPath.c_str())) {
 		return false;
 	}
 	
@@ -201,7 +213,9 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 			mode.Set(core::fileMode::WRITE);
 			mode.Set(core::fileMode::RECREATE);
 
-			filePath = RAW_FILES_FOLDER;
+			filePath = ASSET_DB_FOLDER;
+			filePath.ensureSlash();
+			filePath /= RAW_FILES_FOLDER;
 			filePath.ensureSlash();
 			filePath /= AssetTypeRawFolder(type);
 			filePath.ensureSlash();

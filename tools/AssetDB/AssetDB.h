@@ -13,6 +13,7 @@ X_NAMESPACE_BEGIN(assetDb)
 
 class DLL_EXPORT AssetDB
 {
+	static const char* ASSET_DB_FOLDER;
 	static const char* DB_NAME;
 	static const char* RAW_FILES_FOLDER;
 
