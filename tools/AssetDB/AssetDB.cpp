@@ -15,7 +15,8 @@ const char* AssetDB::DB_NAME = X_ENGINE_NAME"_asset.db";
 const char* AssetDB::RAW_FILES_FOLDER = "raw_files";
 
 
-AssetDB::AssetDB()
+AssetDB::AssetDB() :
+	open_(false)
 {
 
 }
@@ -28,6 +29,10 @@ AssetDB::~AssetDB()
 
 bool AssetDB::OpenDB(void)
 {
+	if (open_) {
+		return true;
+	}
+
 	core::Path<char> dbPath;
 	dbPath.append(ASSET_DB_FOLDER);
 	dbPath.ensureSlash();
@@ -48,6 +53,7 @@ bool AssetDB::OpenDB(void)
 
 void AssetDB::CloseDB(void)
 {
+	open_ = false;
 	db_.disconnect();
 }
 

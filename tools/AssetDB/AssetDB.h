@@ -63,6 +63,7 @@ private:
 
 private:
 	sql::SqlLiteDb db_;
+	bool open_;
 };
 
 X_NAMESPACE_END
