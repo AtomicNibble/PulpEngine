@@ -224,6 +224,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 			filePath /= RAW_FILES_FOLDER;
 			filePath.ensureSlash();
 			filePath /= AssetTypeRawFolder(type);
+			filePath.toLower();
 			filePath.ensureSlash();
 			filePath /= name;
 
