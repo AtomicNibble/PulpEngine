@@ -614,7 +614,7 @@ SqlLiteQuery::query_iterator::query_iterator() : pCmd_(0)
 SqlLiteQuery::query_iterator::query_iterator(SqlLiteQuery* cmd) : pCmd_(cmd)
 {
 	// if the query failed, make this same as end.
-	if (!cmd->ps) {
+	if (!cmd->pStmt_) {
 		pCmd_ = nullptr;
 		rc_ = Result::DONE;
 		return;
