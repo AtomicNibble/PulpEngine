@@ -80,4 +80,4 @@
 *.app binary
 
 # debug db's
-*.pdb
+*.pdb binary
