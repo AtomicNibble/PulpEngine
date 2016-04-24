@@ -1,14 +1,14 @@
-#include "stdafx.h"
-#include "AssetManager.h"
+#include "assetmanager.h"
+#include "ui_assetmanager.h"
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPWSTR    lpCmdLine,
-	_In_ int       nCmdShow)
+AssetManager::AssetManager(QWidget *parent) :
+    QMainWindow(parent),
+    ui(new Ui::AssetManager)
 {
-   
-
-	return 0;
+    ui->setupUi(this);
 }
 
-
+AssetManager::~AssetManager()
+{
+    delete ui;
+}
