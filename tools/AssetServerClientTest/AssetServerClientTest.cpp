@@ -121,7 +121,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	g_hInstance = hInstance;
 
 	{
-		EngineApp engine;
 
 		core::Console Console(L"Potato - AssetServer Test Client");
 		Console.RedirectSTD();
@@ -133,6 +132,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		g_arena = &arena;
 
 		bool res = false;
+
+		EngineApp engine;
 
 		if (engine.Init(lpCmdLine, Console))
 		{

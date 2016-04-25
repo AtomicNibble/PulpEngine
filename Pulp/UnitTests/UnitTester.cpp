@@ -86,7 +86,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 //	InitRootDir();
 
 	int nRes = -1; // if we never run the tests that is also a fail.
-	EngineApp engine;
 
 	core::Console Console(L"Engine Uint Test Log");
 	Console.RedirectSTD();
@@ -97,6 +96,8 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 	UnitTestArena arena(&allocator,"UintTestArena");
 
 	g_arena = &arena;
+
+	EngineApp engine;
 
 	if (engine.Init(lpCmdLine, Console))
 	{		
