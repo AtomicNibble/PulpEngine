@@ -33,19 +33,19 @@ void Converter::PrintBanner(void)
 bool Converter::Convert(AssetType::Enum assType, core::string& name)
 {
 	if (!db_.OpenDB()) {
-		X_LOG0("Converter", "Failed to open AssetDb");
+		X_ERROR("Converter", "Failed to open AssetDb");
 		return false;
 	}
 
 	int32_t assetId = -1;
 	if (db_.AssetExsists(assType, name, &assetId)) {
-		X_LOG0("Converter", "Asset does not exists");
+		X_ERROR("Converter", "Asset does not exists");
 		return false;
 	}
 
 	core::string argsStr;
 	if (db_.GetArgsForAsset(assetId, argsStr)) {
-		X_LOG0("Converter", "Failed to get conversion args");
+		X_ERROR("Converter", "Failed to get conversion args");
 		return false;
 	}
 
@@ -70,7 +70,7 @@ bool Converter::Convert_int(AssetType::Enum assType, ConvertArgs& args)
 IConverter* Converter::GetConverter(AssetType::Enum assType)
 {
 	if (!EnsureLibLoaded(assType)) {
-		X_LOG0("Converter", "Failed to load convert for asset type: \"%s\"", AssetType::ToString(assType));
+		X_ERROR("Converter", "Failed to load convert for asset type: \"%s\"", AssetType::ToString(assType));
 		return false;
 	}
 
