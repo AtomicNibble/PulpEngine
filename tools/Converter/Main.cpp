@@ -125,7 +125,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			con.PrintBanner();
 
 			if (GetAssetType(assType) && GetAssetName(assName)) {
-				con.Convert(assType, assName);
+				if (!con.Convert(assType, assName)) {
+					X_ERROR("Convert", "Conversion falid..");
+				}
 			}
 
 			Console.PressToContinue();
