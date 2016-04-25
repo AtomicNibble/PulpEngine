@@ -100,7 +100,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	g_hInstance = hInstance;
 
-	EngineApp app;
 
 	core::Console Console(L"Potato - Converter");
 	Console.RedirectSTD();
@@ -114,19 +113,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	bool res = false;
 
-	if (app.Init(lpCmdLine, Console))
 	{
-		converter::Converter con;
-		converter::AssetType::Enum assType;
-		core::string assName;
+		EngineApp app; // needs to clear up before arena.
 
-		con.PrintBanner();
+		if (app.Init(lpCmdLine, Console))
+		{
+			converter::Converter con;
+			converter::AssetType::Enum assType;
+			core::string assName;
 
-		if (GetAssetType(assType) && GetAssetName(assName)) {
-			con.Convert(assType, assName);
-		}	
-		
-		Console.PressToContinue();
+			con.PrintBanner();
+
+			if (GetAssetType(assType) && GetAssetName(assName)) {
+				con.Convert(assType, assName);
+			}
+
+			Console.PressToContinue();
+		}
 	}
 
 	return res ? 0 : -1;
