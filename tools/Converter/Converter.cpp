@@ -38,13 +38,13 @@ bool Converter::Convert(AssetType::Enum assType, core::string& name)
 	}
 
 	int32_t assetId = -1;
-	if (db_.AssetExsists(assType, name, &assetId)) {
+	if (!db_.AssetExsists(assType, name, &assetId)) {
 		X_ERROR("Converter", "Asset does not exists");
 		return false;
 	}
 
 	core::string argsStr;
-	if (db_.GetArgsForAsset(assetId, argsStr)) {
+	if (!db_.GetArgsForAsset(assetId, argsStr)) {
 		X_ERROR("Converter", "Failed to get conversion args");
 		return false;
 	}
