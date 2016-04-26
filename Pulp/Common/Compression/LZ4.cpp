@@ -162,7 +162,7 @@ namespace Compression
 
 		int res = LZ4_decompress_fast_continue(pStream, pSrc, pDst, origSize);
 
-		if (res != originalSize) {
+		if (res != origSize) {
 			X_ERROR("LZ4", "Failed to decompress buffer");
 		}
 
