@@ -9,11 +9,11 @@ X_NAMESPACE_BEGIN(core)
 
 class MemoryArenaBase;
 
-template<class T> X_INLINE T Max( T x, T y ) { return ( x > y ) ? x : y; }
-template<class T> X_INLINE T Min( T x, T y ) { return ( x < y ) ? x : y; }
+template<class T> X_INLINE constexpr const T& Max( const T& x, const T& y ) { return ( x > y ) ? x : y; }
+template<class T> X_INLINE constexpr const T& Min( const T& x, const T& y ) { return ( x < y ) ? x : y; }
 
-template<class T> X_INLINE T Max( T x, T y, T c ) { return Max(Max(x, y), c); }
-template<class T> X_INLINE T Min( T x, T y, T c ) { return Min(Min(x, y), c); }
+template<class T> X_INLINE constexpr const T& Max( const T& x, const T& y, const T& c ) { return Max(Max(x, y), c); }
+template<class T> X_INLINE constexpr const T& Min(const T& x, const T& y, const T& c ) { return Min(Min(x, y), c); }
 
 
 template <uint32_t val1, uint32_t val2 >
