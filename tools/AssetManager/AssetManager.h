@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 
+#include "assetdb.h"
+
 namespace Ui {
 class AssetManager;
 }
@@ -17,6 +19,7 @@ public:
 
 private:
     Ui::AssetManager *ui;
+    AssetDB db_;
 };
 
 #endif // ASSETMANAGER_H

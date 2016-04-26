@@ -6,6 +6,8 @@ AssetManager::AssetManager(QWidget *parent) :
     ui(new Ui::AssetManager)
 {
     ui->setupUi(this);
+
+    db_.connect("database.db")
 }
 
 AssetManager::~AssetManager()

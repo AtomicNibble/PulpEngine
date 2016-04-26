@@ -13,12 +13,16 @@ TEMPLATE = app
 
 
 SOURCES += main.cpp\
-        assetmanager.cpp
+        assetmanager.cpp \
+    assetdb.cpp
 
-HEADERS  += assetmanager.h
+HEADERS  += assetmanager.h \
+    assetdb.h
 
 FORMS    += assetmanager.ui
 
+
+INCLUDEPATH += "../../"
 
 
 contains(QT_ARCH, i386) {
