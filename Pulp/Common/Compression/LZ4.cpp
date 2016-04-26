@@ -52,7 +52,7 @@ namespace Compression
 		int srcSize = safe_static_cast<int, size_t>(srcBufLen);
 		int detSize = safe_static_cast<int, size_t>(destBufLen);
 
-		int res = LZ4_compress_fast(pSrc, pDst, srcSize, detSize, 
+		int res = LZ4_compress_fast(pSrc, pDst, srcSize, detSize,
 			compressLevelToAcceleration(lvl));
 
 		if (res <= 0) {
@@ -85,7 +85,90 @@ namespace Compression
 		return true;
 	}
 
-	
+
+	// ---------------------------------------
+
+	// check the helpers are correct.
+
+	static_assert(LZ4Stream::maxSourceSize() == LZ4_MAX_INPUT_SIZE, "LZ4 max source size helper don't match lib value");
+	static_assert(LZ4Stream::requiredDeflateDestBuf(0x1223345) == LZ4_COMPRESSBOUND(0x1223345), "LZ4 compressbound helper don't match lib result");
+
+
+	LZ4Stream::LZ4Stream(core::MemoryArenaBase* arena) : 
+		arena_(arena),
+		stream_(nullptr)
+	{
+		LZ4_stream_t* pStream = X_NEW(LZ4_stream_t, arena, "LZ4Stream");
+		LZ4_resetStream(pStream);
+
+		stream_ = pStream;
+	}
+
+	LZ4Stream::~LZ4Stream()
+	{
+		if (stream_) {
+			X_DELETE(stream_, arena_);
+		}
+	}
+
+	size_t LZ4Stream::compressContinue(const void* pSrcBuf, size_t srcBufLen, void* pDstBuf, size_t destBufLen,
+		CompressLevel::Enum lvl)
+	{
+		X_ASSERT_NOT_NULL(stream_);
+		LZ4_stream_t* pStream = reinterpret_cast<LZ4_stream_t*>(stream_);
+
+		const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
+		char* pDst = reinterpret_cast<char*>(pDstBuf);
+		int srcSize = safe_static_cast<int, size_t>(srcBufLen);
+		int dstSize = safe_static_cast<int, size_t>(destBufLen);
+
+		int res = LZ4_compress_fast_continue(pStream, pSrc, pDst, srcSize, dstSize,
+			compressLevelToAcceleration(lvl));
+
+		if (res == 0) {
+			X_ERROR("LZ4", "Failed to compress buffer");
+		}
+
+		return res;
+	}
+
+	// ---------------------------------------
+
+
+	LZ4StreamDecode::LZ4StreamDecode()
+	{
+		static_assert(sizeof(decodeStream_) == sizeof(LZ4_streamDecode_t), "");
+		LZ4_streamDecode_t* pStream = reinterpret_cast<LZ4_streamDecode_t*>(decodeStream_);
+
+		LZ4_setStreamDecode(pStream, nullptr, 0);
+	}
+
+	LZ4StreamDecode::~LZ4StreamDecode()
+	{
+#if X_DEBUG
+		core::zero_object(decodeStream_);
+#endif // !X_DEBUG
+	}
+
+
+	size_t LZ4StreamDecode::decompressContinue(const void* pSrcBuf, void* pDstBuf, size_t originalSize)
+	{
+		LZ4_streamDecode_t* pStream = reinterpret_cast<LZ4_streamDecode_t*>(decodeStream_);
+
+		const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
+		char* pDst = reinterpret_cast<char*>(pDstBuf);
+		int origSize = safe_static_cast<int, size_t>(originalSize);
+
+
+		int res = LZ4_decompress_fast_continue(pStream, pSrc, pDst, origSize);
+
+		if (res != originalSize) {
+			X_ERROR("LZ4", "Failed to decompress buffer");
+		}
+
+		return res;
+	}
+
 
 } // namespace Compression
 

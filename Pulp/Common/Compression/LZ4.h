@@ -46,6 +46,52 @@ namespace Compression
 		X_NO_ASSIGN(LZ4);
 	};
 
+
+	/*
+		This is for streaming raw data to compressed blocks.
+		this allows for compressing large blocks with low overhead.
+
+	*/
+	class LZ4Stream
+	{
+	public:
+		LZ4Stream(core::MemoryArenaBase* arena);
+		~LZ4Stream();
+
+		// this are validated by static asset in source file.
+		X_INLINE static constexpr size_t maxSourceSize(void) {
+			return 0x7E000000;
+		}
+		X_INLINE static constexpr size_t requiredDeflateDestBuf(size_t size) {
+			return (size > maxSourceSize() ? 0 : (size)+((size) / 255) + 16);
+		}
+
+
+		size_t compressContinue(const void* pSrcBuf, size_t srcBufLen, void* pDstBuf, size_t destBufLen,
+			CompressLevel::Enum lvl = CompressLevel::NORMAL);
+
+
+	private:
+		core::MemoryArenaBase* arena_;
+		void* stream_;
+	};
+
+
+	class LZ4StreamDecode
+	{
+	public:
+		LZ4StreamDecode();
+		~LZ4StreamDecode();
+
+		// originalSize is the size of the decompressed data.
+		size_t decompressContinue(const void* pSrcBuf, void* pDstBuf, size_t originalSize);
+
+	private:
+		uint64_t decodeStream_[4];
+	};
+
+
+
 	template<typename T>
 	X_INLINE bool LZ4::deflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
 		core::Array<uint8_t>& compressed, CompressLevel::Enum lvl)
