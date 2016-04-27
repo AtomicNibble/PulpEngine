@@ -85,6 +85,7 @@ namespace Compression
 
 		// originalSize is the size of the decompressed data.
 		size_t decompressContinue(const void* pSrcBuf, void* pDstBuf, size_t originalSize);
+		size_t decompressContinue(const void* pSrcBuf, void* pDstBuf, size_t compressedSize, size_t maxDecompressedSize);
 
 	private:
 		uint64_t decodeStream_[4];

@@ -169,6 +169,22 @@ namespace Compression
 		return res;
 	}
 
+	size_t LZ4StreamDecode::decompressContinue(const void* pSrcBuf, void* pDstBuf, size_t compressedSize, size_t maxDecompressedSize)
+	{
+		LZ4_streamDecode_t* pStream = reinterpret_cast<LZ4_streamDecode_t*>(decodeStream_);
+
+		const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
+		char* pDst = reinterpret_cast<char*>(pDstBuf);
+		int cmpSize = safe_static_cast<int, size_t>(compressedSize);
+		int maxDecSize = safe_static_cast<int, size_t>(maxDecompressedSize);
+
+
+		int res = LZ4_decompress_safe_continue(pStream, pSrc, pDst, cmpSize, maxDecSize);
+
+
+		return res;
+	}
+
 
 } // namespace Compression
 
