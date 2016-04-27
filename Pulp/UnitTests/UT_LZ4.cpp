@@ -4,6 +4,8 @@
 
 #include <Compression\LZ4.h>
 
+#include <Memory\MemCursor.h>
+
 X_USING_NAMESPACE;
 
 using namespace core::Compression;
@@ -20,6 +22,21 @@ namespace
 	{
 		for (size_t i = 0; i < len; i++)
 			pBuf[i] = rand() % 256;
+	}
+
+
+	template<size_t N>
+	void FillBufRandDupes(uint8_t* pBuf, size_t len)
+	{
+		std::array<uint8_t, N> vals;
+
+		for (size_t i = 0; i < N; i++) {
+			vals[i] = rand() % 256;
+		}
+
+		for (size_t i = 0; i < len; i++) {
+			pBuf[i] = vals[rand() % N];
+		}
 	}
 
 
@@ -114,4 +131,82 @@ TEST(LZ4, ArrayCustomType)
 	// check it's the same
 	ASSERT_EQ(data.size(), inflated.size());
 	EXPECT_EQ(0, memcmp(data.ptr(), inflated.ptr(), inflated.size() * sizeof(PodType)));
+}
+
+
+TEST(LZ4, Stream)
+{
+	const size_t BUF_SIZE = 4096;
+	const size_t NUM = 64;
+
+	core::Array<uint8_t> data(g_arena);
+	core::Array<uint8_t> dataOut(g_arena);
+
+	std::vector<uint8_t> compData;
+	std::vector<uint8_t> deCompData;
+
+	{
+		char buf[2][BUF_SIZE];
+		char cmpBuf[LZ4Stream::requiredDeflateDestBuf(BUF_SIZE)];
+
+		int32_t bufIdx = 0;
+
+		// the input data.
+		data.resize(BUF_SIZE * NUM);
+		FillBufRandDupes<4>(data.ptr(), data.size());
+
+
+		LZ4Stream stream(g_arena);
+
+		for (size_t i = 0; i < NUM; i++)
+		{
+			// simulate streaming it in.
+			::memcpy(buf[bufIdx], &data[i * BUF_SIZE], BUF_SIZE);
+
+			size_t compSize = stream.compressContinue(buf[bufIdx], BUF_SIZE, cmpBuf, sizeof(cmpBuf),
+				core::Compression::CompressLevel::NORMAL);
+
+			// write the size.
+			uint32_t size = safe_static_cast<uint32_t, size_t>(compSize);
+			uint8_t* pSize = reinterpret_cast<uint8_t*>(&size);
+
+			compData.insert(compData.end(), pSize, pSize + sizeof(size));
+			compData.insert(compData.end(), cmpBuf, cmpBuf + compSize);
+
+			bufIdx = (bufIdx + 1) % 2;
+		}
+
+	}
+
+	{
+		char cmpbuf[LZ4Stream::requiredDeflateDestBuf(BUF_SIZE)];
+		char decBuf[2][BUF_SIZE];
+
+		int32_t bufIdx = 0;
+
+		LZ4StreamDecode streamDe;
+
+		// we read the sizes and decompress.
+		core::MemCursor<uint8_t> memCur(compData.data(), compData.size());
+
+		for (size_t i = 0; i < NUM; i++)
+		{
+			uint32_t compSize = memCur.getSeek<uint32_t>();
+			::memcpy(cmpbuf, memCur.postSeekPtr<uint8_t>(compSize), compSize);
+
+			char* const pDec = decBuf[bufIdx];
+
+			size_t decSize = streamDe.decompressContinue(cmpbuf, pDec, compSize, BUF_SIZE);
+
+
+			deCompData.insert(deCompData.end(), pDec, pDec + decSize);
+
+			bufIdx = (bufIdx + 1) % 2;
+		}
+	}
+
+	// check same.
+	ASSERT_EQ(deCompData.size(), data.size());
+	EXPECT_TRUE(memcmp(deCompData.data(), data.ptr(), data.size()) == 0);
+
 }
