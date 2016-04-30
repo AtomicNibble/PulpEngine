@@ -419,8 +419,6 @@ MStatus AssetDBCmd::doIt(const MArgList &args)
 	MStatus stat;
 	MArgDatabase parser(syntax(), args, &stat);
 
-	setResult(false);
-
 	if (stat != MS::kSuccess) {
 		return stat;
 	}
@@ -435,8 +433,8 @@ MStatus AssetDBCmd::doIt(const MArgList &args)
 		MString actionStr;
 
 		if (!parser.getFlagArgument("-a", 0, actionStr)) {
-			MayaUtil::MayaPrintError("failed to get argument: -action(-a)");
-			return MS::kFailure;
+			setResult("failed to get argument: -action(-a)");
+			return MS::kSuccess;
 		}
 
 		// work out action type.
@@ -451,14 +449,16 @@ MStatus AssetDBCmd::doIt(const MArgList &args)
 			action = Action::RENAME;
 		}
 		else {
-			MayaUtil::MayaPrintError("unkown action: '%s' valid action's: add, remove, rename", actionStr.asChar());
-			return MS::kFailure;
+			core::StackString512 msg;
+			msg.appendFmt("unkown action: '%s' valid action's: add, remove, rename", actionStr.asChar());
+			setResult(msg.c_str());
+			return MS::kSuccess;
 		}
 	}	
 	else
 	{
-		MayaUtil::MayaPrintError("missing required argument: -action(-a)");
-		return MS::kFailure;
+		setResult("missing required argument: -action(-a)");
+		return MS::kSuccess;
 	}
 
 	if (parser.isFlagSet("-t"))
@@ -466,8 +466,8 @@ MStatus AssetDBCmd::doIt(const MArgList &args)
 		MString typeStr;
 
 		if (!parser.getFlagArgument("-t", 0, typeStr)) {
-			MayaUtil::MayaPrintError("failed to get argument: -type(-t)");
-			return MS::kFailure;
+			setResult("failed to get argument: -type(-t)");
+			return MS::kSuccess;
 		}
 
 		// work out action type.
@@ -482,27 +482,29 @@ MStatus AssetDBCmd::doIt(const MArgList &args)
 			assetType = AssetType::MATERIAL;
 		}
 		else {
-			MayaUtil::MayaPrintError("unkown type: '%s' valid type's: model, anim", typeStr.asChar());
-			return MS::kFailure;
+			core::StackString512 msg;
+			msg.appendFmt("unkown type: '%s' valid type's: model, anim, material", typeStr.asChar());
+			setResult(msg.c_str());
+			return MS::kSuccess;
 		}
 	}
 	else
 	{
-		MayaUtil::MayaPrintError("missing required argument: -type(-t)");
-		return MS::kFailure;
+		setResult("missing required argument: -type(-t)");
+		return MS::kSuccess;
 	}
 
 	if (parser.isFlagSet("-n"))
 	{
 		if (!parser.getFlagArgument("-n", 0, name)) {
-			MayaUtil::MayaPrintError("failed to get argument: -name(-n)");
-			return MS::kFailure;
+			setResult("failed to get argument: -name(-n)");
+			return MS::kSuccess;
 		}
 	}
 	else
 	{
-		MayaUtil::MayaPrintError("missing required argument: -name(-n)");
-		return MS::kFailure;
+		setResult("missing required argument: -name(-n)");
+		return MS::kSuccess;
 	}
 
 	if (action == Action::RENAME)
@@ -510,20 +512,20 @@ MStatus AssetDBCmd::doIt(const MArgList &args)
 		if (parser.isFlagSet("-on"))
 		{
 			if (!parser.getFlagArgument("-on", 0, oldName)) {
-				MayaUtil::MayaPrintError("failed to get argument: -old_name(-on)");
-				return MS::kFailure;
+				setResult("failed to get argument: -old_name(-on)");
+				return MS::kSuccess;
 			}
 		}
 		else
 		{
-			MayaUtil::MayaPrintError("missing required argument: -old_name(-on)");
-			return MS::kFailure;
+			setResult("missing required argument: -old_name(-on)");
+			return MS::kSuccess;
 		}
 	}
 
 	if (!gAssetDb) {
-		MayaUtil::MayaPrintError("AssetDB is invalid, Init must be called (source code error)");
-		return MS::kFailure;
+		setResult("AssetDB is invalid, Init must be called (source code error)");
+		return MS::kSuccess;
 	}
 
 	stat = MS::kFailure;
@@ -547,10 +549,14 @@ MStatus AssetDBCmd::doIt(const MArgList &args)
 	}
 
 	if (stat == MS::kSuccess) {
-		setResult(true);
+		setResult("ok");
+	}
+	else {
+		setResult("DB action failed, check log for more info");
 	}
 
-	return stat;
+	// we return kSuccess otherwise setResult is not passed back :(
+	return MS::kSuccess;
 }
 
 void* AssetDBCmd::creator(void)
