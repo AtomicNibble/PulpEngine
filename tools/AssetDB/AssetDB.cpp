@@ -207,7 +207,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	sql::SqlLiteTransaction trans(db_);
 	core::string stmt;
 
-	core::Path<char> filePath;
+	core::Path<char> path;
 
 	// ok we have updated rawdata.
 	if (data.isNotEmpty())
@@ -216,6 +216,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 		{
 			core::XFileScoped file;
 			core::fileModeFlags mode;
+			core::Path<char> filePath;
 
 			mode.Set(core::fileMode::WRITE);
 			mode.Set(core::fileMode::RECREATE);
@@ -228,6 +229,9 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 			filePath.toLower();
 			filePath.ensureSlash();
 			filePath /= name;
+
+			// set path as just the name.
+			path = name;
 
 			if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
 				X_ERROR("AssetDB", "Failed to create dir to save raw asset");
@@ -302,14 +306,14 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	// now update file info.
 	stmt = "UPDATE file_ids SET lastUpdateTime = DateTime('now'), args = :args";
 
-	if (filePath.isNotEmpty()) {
+	if (path.isNotEmpty()) {
 		stmt += ", path = :p";
 	}
 	stmt += " WHERE type = :t AND name = :n ";
 
 	sql::SqlLiteCmd cmd(db_, stmt.c_str());
-	if (filePath.isNotEmpty()) {
-		cmd.bind(":p", filePath.c_str());
+	if (path.isNotEmpty()) {
+		cmd.bind(":p", path.c_str());
 	}
 	cmd.bind(":t", type);
 	cmd.bind(":n", name.c_str());
