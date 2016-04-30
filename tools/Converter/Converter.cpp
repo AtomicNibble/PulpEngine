@@ -100,6 +100,9 @@ bool Converter::IntializeConverterModule(AssetType::Enum assType)
 	else if (assType == AssetType::MODEL) {
 		pAssTypeStr = "Model";
 	}
+	else if (assType == AssetType::MATERIAL) {
+		pAssTypeStr = "Material";
+	}
 	else {
 		X_ASSERT_UNREACHABLE();
 	}

@@ -63,6 +63,10 @@ namespace
 			{
 				assType = converter::AssetType::ANIM;
 			}
+			else if (core::strUtil::IsEqualCaseInsen(pAssetType, L"material"))
+			{
+				assType = converter::AssetType::MATERIAL;
+			}
 			else
 			{		
 				X_ERROR("Converter", "Unknown asset type: \"%ls\"", pAssetType);

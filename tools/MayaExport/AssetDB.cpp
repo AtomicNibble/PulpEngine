@@ -104,6 +104,8 @@ namespace
 			return ProtoBuf::AssetDB::ANIM;
 		case AssetDB::AssetType::MODEL:
 			return ProtoBuf::AssetDB::MODEL;
+		case AssetDB::AssetType::MATERIAL:
+			return ProtoBuf::AssetDB::MATERIAL;
 		default:
 			break;
 		}
@@ -475,6 +477,9 @@ MStatus AssetDBCmd::doIt(const MArgList &args)
 		}
 		else if (core::strUtil::IsEqualCaseInsen(typeStr.asChar(), "anim")) {
 			assetType = AssetType::ANIM;
+		}
+		else if (core::strUtil::IsEqualCaseInsen(typeStr.asChar(), "material")) {
+			assetType = AssetType::MATERIAL;
 		}
 		else {
 			MayaUtil::MayaPrintError("unkown type: '%s' valid type's: model, anim", typeStr.asChar());

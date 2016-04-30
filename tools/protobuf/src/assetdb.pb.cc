@@ -235,8 +235,8 @@ void protobuf_AddDesc_assetdb_2eproto() {
     "tDB.DeleteAssetH\000\0226\n\006rename\030\003 \001(\0132$.Pota"
     "to.ProtoBuf.AssetDB.RenameAssetH\000\0226\n\006upd"
     "ate\030\004 \001(\0132$.Potato.ProtoBuf.AssetDB.Upda"
-    "teAssetH\000B\005\n\003msg* \n\tAssetType\022\t\n\005MODEL\020\001"
-    "\022\010\n\004ANIM\020\002", 810);
+    "teAssetH\000B\005\n\003msg*.\n\tAssetType\022\t\n\005MODEL\020\001"
+    "\022\010\n\004ANIM\020\002\022\014\n\010MATERIAL\020\003", 824);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "assetdb.proto", &protobuf_RegisterTypes);
   Reponse::default_instance_ = new Reponse();
@@ -269,6 +269,7 @@ bool AssetType_IsValid(int value) {
   switch(value) {
     case 1:
     case 2:
+    case 3:
       return true;
     default:
       return false;
