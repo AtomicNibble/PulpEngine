@@ -276,7 +276,30 @@ namespace PathUtil
 		return false;
 	}
 
+	// ------------------------------------------------
 
+
+
+	bool MoveFile(const core::Path<wchar_t>& fullPath, const core::Path<wchar_t>& fullPathNew)
+	{
+		return MoveFile(fullPath.c_str(), fullPathNew.c_str());
+	}
+
+	bool MoveFile(const wchar_t* pFullPath, const wchar_t* pFullPathNew)
+	{
+		BOOL res = MoveFileExW(
+			pFullPath,
+			pFullPathNew,
+			MOVEFILE_REPLACE_EXISTING
+		);
+
+		if (res == 0) {
+			lastError::Description Dsc;
+			X_ERROR("FileSys", "RenameFile failed. Error: %s", lastError::ToString(Dsc));
+		}
+
+		return res != 0;
+	}
 
 } // namespace PathUtil
 
