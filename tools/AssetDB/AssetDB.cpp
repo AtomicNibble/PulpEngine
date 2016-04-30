@@ -265,6 +265,14 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 				return Result::ERROR;
 			}
 
+			// does the file already exsists?
+			// how do we want to handle that?
+			// for now error.
+			if (gEnv->pFileSys->fileExists(filePath.c_str())) {
+				X_ERROR("AssetDB", "Failed to write raw asset, file name taken");
+				return Result::ERROR;
+			}
+
 			if (!file.openFile(filePath.c_str(), mode)) {
 				X_ERROR("AssetDB", "Failed to write raw asset");
 				return Result::ERROR;
