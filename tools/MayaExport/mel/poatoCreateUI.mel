@@ -52,10 +52,10 @@ global proc int assetDB_add(string $type, string $name)
 	string $errorMsg;
 	$error = catch ( $errorMsg = eval( $command ) );
 
-	if($error == "0" && $errorMsg == "1") {
+	if($error == "0" && $errorMsg == "ok") {
 		return 0;
 	}
-	confirmDialog -title "Ralied to add" -message ("Can't add asset \"" + $name + "\" unless asset server is running.")
+	confirmDialog -title "Falied to add" -message ("Can't add asset \"" + $name + "\". Error: " + $errorMsg)
 		-button "Ok" -defaultButton "Ok";
 	return -1;
 }
@@ -66,15 +66,15 @@ global proc int assetDB_rename(string $type, string $old_name, string $newName)
 		return 0;
 	}
 
-	string $command = "PotatoAssetDB -action rename -type " + $type + " -old_name \"" + $old_name + "\" -new_name \"" +$newName + "\" ";
+	string $command = "PotatoAssetDB -action rename -type " + $type + " -old_name \"" + $old_name + "\" -name \"" +$newName + "\" ";
 	string $errorMsg;
 	$error = catch ( $errorMsg = eval( $command ) );
 
-	if($error == "0" && $errorMsg == "1") {
+	if($error == "0" && $errorMsg == "ok") {
 		return 0;
 	}
 
-	confirmDialog -title "Ralied to rename" -message ("Can't rename \"" + $old_name + "\" unless asset server is running.")
+	confirmDialog -title "Falied to rename" -message ("Can't rename \"" + $old_name + "\" to \"" + $newName + "\". Error: " + $errorMsg)
 		-button "Ok" -defaultButton "Ok";
 	return -1;
 }
@@ -89,10 +89,10 @@ global proc int assetDB_remove(string $type, string $name)
 	string $errorMsg;
 	$error = catch ( $errorMsg = eval( $command ) );
 
-	if($error == "0" && $errorMsg == "1") {
+	if($error == "0" && $errorMsg == "ok") {
 		return 0;
 	}
-	confirmDialog -title "Ralied to delete" -message ("Can't delete asset \"" + $name + "\" unless asset server is running.")
+	confirmDialog -title "Falied to delete" -message ("Can't delete asset \"" + $name + "\". Error: " + $errorMsg)
 		-button "Ok" -defaultButton "Ok";
 	return -1;
 }
@@ -188,7 +188,7 @@ global proc ModelEntryNameChanged(int $index)
 	string $name = `textFieldGrp -q -fi ("modelName" + $index)`;
 	string $nameOld = `getAttr ("PotatoGNode.ModelName" + $index)`;
 
-	if(assetDB_rename("model", $name, $nameOld) != 0) {
+	if(assetDB_rename("model", $nameOld, $name) != 0) {
 		// reset the name
  		textFieldGrp -e -fi $nameOld ("modelName" + $index);
 		return;
@@ -896,7 +896,7 @@ global proc AnimEntryNameChanged(int $index)
 	string $name = `textFieldGrp -q -fi ("animName" + $index)`;
 	string $nameOld = `getAttr ("PotatoGNode.AnimName" + $index)`;
 
-	if(assetDB_rename("anim", $name, $nameOld) != 0) {
+	if(assetDB_rename("anim", $nameOld, $name) != 0) {
 		// reset the name
  		textFieldGrp -e -fi $nameOld ("animName" + $index);
 		return;
