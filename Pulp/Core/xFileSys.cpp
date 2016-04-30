@@ -864,6 +864,26 @@ bool xFileSys::isDirectory(pathTypeW path, VirtualDirectory::Enum location) cons
 	return isDirectoryOS(buf);
 }
 
+bool xFileSys::moveFile(pathType path, pathType newPath) const
+{
+	Path<wchar_t> pathOs, newPathOs;
+
+	createOSPath(gameDir_, path, pathOs);
+	createOSPath(gameDir_, newPath, newPathOs);
+
+	return moveFileOS(pathOs, newPathOs);
+}
+
+bool xFileSys::moveFile(pathTypeW path, pathTypeW newPath) const
+{
+	Path<wchar_t> pathOs, newPathOs;
+
+	createOSPath(gameDir_, path, pathOs);
+	createOSPath(gameDir_, newPath, newPathOs);
+
+	return moveFileOS(pathOs, newPathOs);
+}
+
 
 size_t xFileSys::getMinimumSectorSize(void) const
 {
@@ -938,6 +958,19 @@ bool xFileSys::isDirectoryOS(const core::Path<wchar_t>& fullPath) const
 	if (isDebug()) {
 		X_LOG0("FileSys", "isDirectory: \"%ls\" res: ^6%s",
 			fullPath.c_str(), result ? "TRUE" : "FALSE");
+	}
+
+	return result;
+}
+
+
+bool xFileSys::moveFileOS(const core::Path<wchar_t>& fullPath, const core::Path<wchar_t>& fullPathNew) const
+{
+	bool result = core::PathUtil::MoveFile(fullPath, fullPathNew);
+
+	if (isDebug()) {
+		X_LOG0("FileSys", "moveFile: \"%ls\" -> \"%ls\" res: ^6%s",
+			fullPath.c_str(), fullPathNew.c_str(), result ? "TRUE" : "FALSE");
 	}
 
 	return result;

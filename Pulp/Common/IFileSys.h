@@ -583,6 +583,10 @@ struct IFileSys
 	virtual bool isDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
 	virtual bool isDirectory(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
 
+	// rename
+	virtual bool moveFile(pathType path, pathType newPath) const X_ABSTRACT;
+	virtual bool moveFile(pathTypeW path, pathTypeW newPath) const X_ABSTRACT;
+
 	// returns the min sector size for all virtual directories.
 	// so if game folder is drive A and mod is drive B
 	// yet drive B has a larger sector size, it will return the largest.

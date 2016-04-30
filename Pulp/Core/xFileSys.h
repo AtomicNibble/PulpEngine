@@ -137,6 +137,11 @@ public:
 	bool isDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
 	bool isDirectory(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
 
+	// rename
+	bool moveFile(pathType path, pathType newPath) const X_FINAL;
+	bool moveFile(pathTypeW path, pathTypeW newPath) const X_FINAL;
+
+
 	size_t getMinimumSectorSize(void) const X_FINAL;
 
 	// settings baby
@@ -163,10 +168,12 @@ private:
 	bool fileExistsOS(const core::Path<wchar_t>& fullPath) const;
 	bool directoryExistsOS(const core::Path<wchar_t>& fullPath) const;
 	bool isDirectoryOS(const core::Path<wchar_t>& fullPath) const;
+	bool moveFileOS(const core::Path<wchar_t>& fullPath, const core::Path<wchar_t>& fullPathNew) const;
 
 	bool fileExistsOS(const wchar_t* pFullPath) const;
 	bool directoryExistsOS(const wchar_t* pFullPath) const;
 	bool isDirectoryOS(const wchar_t* pFullPath) const;
+	bool moveFileOS(const wchar_t* pFullPath, const wchar_t* pFullPathNew) const;
 
 
 	// Ajust path
