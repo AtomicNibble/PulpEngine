@@ -225,7 +225,6 @@ MStatus PotatoAnimExporter::writeIntermidiate(void)
 		// hellllo asset server :D
 		status = maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::ANIM,
 			MString(fileName_.c_str()),
-			MString(filePath_.c_str()),
 			MString(),
 			compressed,
 			&changed

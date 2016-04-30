@@ -574,22 +574,10 @@ class UpdateAsset : public ::google::protobuf::Message {
   inline ::Potato::ProtoBuf::AssetDB::AssetType type() const;
   inline void set_type(::Potato::ProtoBuf::AssetDB::AssetType value);
 
-  // optional string path = 3;
-  inline bool has_path() const;
-  inline void clear_path();
-  static const int kPathFieldNumber = 3;
-  inline const ::std::string& path() const;
-  inline void set_path(const ::std::string& value);
-  inline void set_path(const char* value);
-  inline void set_path(const char* value, size_t size);
-  inline ::std::string* mutable_path();
-  inline ::std::string* release_path();
-  inline void set_allocated_path(::std::string* path);
-
-  // optional string args = 4;
+  // optional string args = 3;
   inline bool has_args() const;
   inline void clear_args();
-  static const int kArgsFieldNumber = 4;
+  static const int kArgsFieldNumber = 3;
   inline const ::std::string& args() const;
   inline void set_args(const ::std::string& value);
   inline void set_args(const char* value);
@@ -598,10 +586,10 @@ class UpdateAsset : public ::google::protobuf::Message {
   inline ::std::string* release_args();
   inline void set_allocated_args(::std::string* args);
 
-  // optional uint32 dataSize = 5;
+  // optional uint32 dataSize = 4;
   inline bool has_datasize() const;
   inline void clear_datasize();
-  static const int kDataSizeFieldNumber = 5;
+  static const int kDataSizeFieldNumber = 4;
   inline ::google::protobuf::uint32 datasize() const;
   inline void set_datasize(::google::protobuf::uint32 value);
 
@@ -611,8 +599,6 @@ class UpdateAsset : public ::google::protobuf::Message {
   inline void clear_has_name();
   inline void set_has_type();
   inline void clear_has_type();
-  inline void set_has_path();
-  inline void clear_has_path();
   inline void set_has_args();
   inline void clear_has_args();
   inline void set_has_datasize();
@@ -623,10 +609,9 @@ class UpdateAsset : public ::google::protobuf::Message {
   ::google::protobuf::uint32 _has_bits_[1];
   mutable int _cached_size_;
   ::std::string* name_;
-  ::std::string* path_;
+  ::std::string* args_;
   int type_;
   ::google::protobuf::uint32 datasize_;
-  ::std::string* args_;
   friend void  protobuf_AddDesc_assetdb_2eproto();
   friend void protobuf_AssignDesc_assetdb_2eproto();
   friend void protobuf_ShutdownFile_assetdb_2eproto();
@@ -1368,91 +1353,15 @@ inline void UpdateAsset::set_type(::Potato::ProtoBuf::AssetDB::AssetType value) 
   // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.UpdateAsset.type)
 }
 
-// optional string path = 3;
-inline bool UpdateAsset::has_path() const {
+// optional string args = 3;
+inline bool UpdateAsset::has_args() const {
   return (_has_bits_[0] & 0x00000004u) != 0;
 }
-inline void UpdateAsset::set_has_path() {
+inline void UpdateAsset::set_has_args() {
   _has_bits_[0] |= 0x00000004u;
 }
-inline void UpdateAsset::clear_has_path() {
-  _has_bits_[0] &= ~0x00000004u;
-}
-inline void UpdateAsset::clear_path() {
-  if (path_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    path_->clear();
-  }
-  clear_has_path();
-}
-inline const ::std::string& UpdateAsset::path() const {
-  // @@protoc_insertion_point(field_get:Potato.ProtoBuf.AssetDB.UpdateAsset.path)
-  return *path_;
-}
-inline void UpdateAsset::set_path(const ::std::string& value) {
-  set_has_path();
-  if (path_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    path_ = new ::std::string;
-  }
-  path_->assign(value);
-  // @@protoc_insertion_point(field_set:Potato.ProtoBuf.AssetDB.UpdateAsset.path)
-}
-inline void UpdateAsset::set_path(const char* value) {
-  set_has_path();
-  if (path_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    path_ = new ::std::string;
-  }
-  path_->assign(value);
-  // @@protoc_insertion_point(field_set_char:Potato.ProtoBuf.AssetDB.UpdateAsset.path)
-}
-inline void UpdateAsset::set_path(const char* value, size_t size) {
-  set_has_path();
-  if (path_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    path_ = new ::std::string;
-  }
-  path_->assign(reinterpret_cast<const char*>(value), size);
-  // @@protoc_insertion_point(field_set_pointer:Potato.ProtoBuf.AssetDB.UpdateAsset.path)
-}
-inline ::std::string* UpdateAsset::mutable_path() {
-  set_has_path();
-  if (path_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    path_ = new ::std::string;
-  }
-  // @@protoc_insertion_point(field_mutable:Potato.ProtoBuf.AssetDB.UpdateAsset.path)
-  return path_;
-}
-inline ::std::string* UpdateAsset::release_path() {
-  clear_has_path();
-  if (path_ == &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    return NULL;
-  } else {
-    ::std::string* temp = path_;
-    path_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-    return temp;
-  }
-}
-inline void UpdateAsset::set_allocated_path(::std::string* path) {
-  if (path_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    delete path_;
-  }
-  if (path) {
-    set_has_path();
-    path_ = path;
-  } else {
-    clear_has_path();
-    path_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
-  }
-  // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.UpdateAsset.path)
-}
-
-// optional string args = 4;
-inline bool UpdateAsset::has_args() const {
-  return (_has_bits_[0] & 0x00000008u) != 0;
-}
-inline void UpdateAsset::set_has_args() {
-  _has_bits_[0] |= 0x00000008u;
-}
 inline void UpdateAsset::clear_has_args() {
-  _has_bits_[0] &= ~0x00000008u;
+  _has_bits_[0] &= ~0x00000004u;
 }
 inline void UpdateAsset::clear_args() {
   if (args_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
@@ -1520,15 +1429,15 @@ inline void UpdateAsset::set_allocated_args(::std::string* args) {
   // @@protoc_insertion_point(field_set_allocated:Potato.ProtoBuf.AssetDB.UpdateAsset.args)
 }
 
-// optional uint32 dataSize = 5;
+// optional uint32 dataSize = 4;
 inline bool UpdateAsset::has_datasize() const {
-  return (_has_bits_[0] & 0x00000010u) != 0;
+  return (_has_bits_[0] & 0x00000008u) != 0;
 }
 inline void UpdateAsset::set_has_datasize() {
-  _has_bits_[0] |= 0x00000010u;
+  _has_bits_[0] |= 0x00000008u;
 }
 inline void UpdateAsset::clear_has_datasize() {
-  _has_bits_[0] &= ~0x00000010u;
+  _has_bits_[0] &= ~0x00000008u;
 }
 inline void UpdateAsset::clear_datasize() {
   datasize_ = 0u;

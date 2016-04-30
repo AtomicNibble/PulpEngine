@@ -50,7 +50,7 @@ public:
 		const core::string& newName);
 
 	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, 
-		core::Array<uint8_t>& data, const core::string& pathOpt, const core::string& argsOpt);
+		core::Array<uint8_t>& data, const core::string& argsOpt);
 
 	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
 

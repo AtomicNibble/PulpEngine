@@ -165,8 +165,8 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 	return Result::OK;
 }
 
-AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::string& name, core::Array<uint8_t>& data,
-	const core::string& pathOpt, const core::string& argsOpt)
+AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::string& name, 
+	core::Array<uint8_t>& data, const core::string& argsOpt)
 {
 	int32_t assetId, rawId;
 
@@ -207,6 +207,8 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	sql::SqlLiteTransaction trans(db_);
 	core::string stmt;
 
+	core::Path<char> filePath;
+
 	// ok we have updated rawdata.
 	if (data.isNotEmpty())
 	{
@@ -214,7 +216,6 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 		{
 			core::XFileScoped file;
 			core::fileModeFlags mode;
-			core::Path<char> filePath;
 
 			mode.Set(core::fileMode::WRITE);
 			mode.Set(core::fileMode::RECREATE);
@@ -301,14 +302,14 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	// now update file info.
 	stmt = "UPDATE file_ids SET lastUpdateTime = DateTime('now'), args = :args";
 
-	if (pathOpt.isNotEmpty()) {
+	if (filePath.isNotEmpty()) {
 		stmt += ", path = :p";
 	}
 	stmt += " WHERE type = :t AND name = :n ";
 
 	sql::SqlLiteCmd cmd(db_, stmt.c_str());
-	if (pathOpt.isNotEmpty()) {
-		cmd.bind(":p", pathOpt.c_str());
+	if (filePath.isNotEmpty()) {
+		cmd.bind(":p", filePath.c_str());
 	}
 	cmd.bind(":t", type);
 	cmd.bind(":n", name.c_str());

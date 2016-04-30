@@ -125,10 +125,9 @@ void protobuf_AssignDesc_assetdb_2eproto() {
       ::google::protobuf::MessageFactory::generated_factory(),
       sizeof(RenameAsset));
   UpdateAsset_descriptor_ = file->message_type(4);
-  static const int UpdateAsset_offsets_[5] = {
+  static const int UpdateAsset_offsets_[4] = {
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UpdateAsset, name_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UpdateAsset, type_),
-    GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UpdateAsset, path_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UpdateAsset, args_),
     GOOGLE_PROTOBUF_GENERATED_MESSAGE_FIELD_OFFSET(UpdateAsset, datasize_),
   };
@@ -226,17 +225,17 @@ void protobuf_AddDesc_assetdb_2eproto() {
     "\002 \002(\0162\".Potato.ProtoBuf.AssetDB.AssetTyp"
     "e\"^\n\013RenameAsset\022\014\n\004name\030\001 \002(\t\022\017\n\007newNam"
     "e\030\002 \002(\t\0220\n\004type\030\003 \002(\0162\".Potato.ProtoBuf."
-    "AssetDB.AssetType\"{\n\013UpdateAsset\022\014\n\004name"
+    "AssetDB.AssetType\"m\n\013UpdateAsset\022\014\n\004name"
     "\030\001 \002(\t\0220\n\004type\030\002 \002(\0162\".Potato.ProtoBuf.A"
-    "ssetDB.AssetType\022\014\n\004path\030\003 \001(\t\022\014\n\004args\030\004"
-    " \001(\t\022\020\n\010dataSize\030\005 \001(\r\"\347\001\n\007Request\0220\n\003ad"
-    "d\030\001 \001(\0132!.Potato.ProtoBuf.AssetDB.AddAss"
-    "etH\000\0223\n\003del\030\002 \001(\0132$.Potato.ProtoBuf.Asse"
-    "tDB.DeleteAssetH\000\0226\n\006rename\030\003 \001(\0132$.Pota"
-    "to.ProtoBuf.AssetDB.RenameAssetH\000\0226\n\006upd"
-    "ate\030\004 \001(\0132$.Potato.ProtoBuf.AssetDB.Upda"
-    "teAssetH\000B\005\n\003msg*.\n\tAssetType\022\t\n\005MODEL\020\001"
-    "\022\010\n\004ANIM\020\002\022\014\n\010MATERIAL\020\003", 824);
+    "ssetDB.AssetType\022\014\n\004args\030\003 \001(\t\022\020\n\010dataSi"
+    "ze\030\004 \001(\r\"\347\001\n\007Request\0220\n\003add\030\001 \001(\0132!.Pota"
+    "to.ProtoBuf.AssetDB.AddAssetH\000\0223\n\003del\030\002 "
+    "\001(\0132$.Potato.ProtoBuf.AssetDB.DeleteAsse"
+    "tH\000\0226\n\006rename\030\003 \001(\0132$.Potato.ProtoBuf.As"
+    "setDB.RenameAssetH\000\0226\n\006update\030\004 \001(\0132$.Po"
+    "tato.ProtoBuf.AssetDB.UpdateAssetH\000B\005\n\003m"
+    "sg*.\n\tAssetType\022\t\n\005MODEL\020\001\022\010\n\004ANIM\020\002\022\014\n\010"
+    "MATERIAL\020\003", 810);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "assetdb.proto", &protobuf_RegisterTypes);
   Reponse::default_instance_ = new Reponse();
@@ -1528,7 +1527,6 @@ void RenameAsset::Swap(RenameAsset* other) {
 #ifndef _MSC_VER
 const int UpdateAsset::kNameFieldNumber;
 const int UpdateAsset::kTypeFieldNumber;
-const int UpdateAsset::kPathFieldNumber;
 const int UpdateAsset::kArgsFieldNumber;
 const int UpdateAsset::kDataSizeFieldNumber;
 #endif  // !_MSC_VER
@@ -1554,7 +1552,6 @@ void UpdateAsset::SharedCtor() {
   _cached_size_ = 0;
   name_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   type_ = 1;
-  path_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   args_ = const_cast< ::std::string*>(&::google::protobuf::internal::GetEmptyStringAlreadyInited());
   datasize_ = 0u;
   ::memset(_has_bits_, 0, sizeof(_has_bits_));
@@ -1568,9 +1565,6 @@ UpdateAsset::~UpdateAsset() {
 void UpdateAsset::SharedDtor() {
   if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     delete name_;
-  }
-  if (path_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-    delete path_;
   }
   if (args_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
     delete args_;
@@ -1601,18 +1595,13 @@ UpdateAsset* UpdateAsset::New() const {
 }
 
 void UpdateAsset::Clear() {
-  if (_has_bits_[0 / 32] & 31) {
+  if (_has_bits_[0 / 32] & 15) {
     if (has_name()) {
       if (name_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
         name_->clear();
       }
     }
     type_ = 1;
-    if (has_path()) {
-      if (path_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
-        path_->clear();
-      }
-    }
     if (has_args()) {
       if (args_ != &::google::protobuf::internal::GetEmptyStringAlreadyInited()) {
         args_->clear();
@@ -1666,30 +1655,13 @@ bool UpdateAsset::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(26)) goto parse_path;
+        if (input->ExpectTag(26)) goto parse_args;
         break;
       }
 
-      // optional string path = 3;
+      // optional string args = 3;
       case 3: {
         if (tag == 26) {
-         parse_path:
-          DO_(::google::protobuf::internal::WireFormatLite::ReadString(
-                input, this->mutable_path()));
-          ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-            this->path().data(), this->path().length(),
-            ::google::protobuf::internal::WireFormat::PARSE,
-            "path");
-        } else {
-          goto handle_unusual;
-        }
-        if (input->ExpectTag(34)) goto parse_args;
-        break;
-      }
-
-      // optional string args = 4;
-      case 4: {
-        if (tag == 34) {
          parse_args:
           DO_(::google::protobuf::internal::WireFormatLite::ReadString(
                 input, this->mutable_args()));
@@ -1700,13 +1672,13 @@ bool UpdateAsset::MergePartialFromCodedStream(
         } else {
           goto handle_unusual;
         }
-        if (input->ExpectTag(40)) goto parse_dataSize;
+        if (input->ExpectTag(32)) goto parse_dataSize;
         break;
       }
 
-      // optional uint32 dataSize = 5;
-      case 5: {
-        if (tag == 40) {
+      // optional uint32 dataSize = 4;
+      case 4: {
+        if (tag == 32) {
          parse_dataSize:
           DO_((::google::protobuf::internal::WireFormatLite::ReadPrimitive<
                    ::google::protobuf::uint32, ::google::protobuf::internal::WireFormatLite::TYPE_UINT32>(
@@ -1760,29 +1732,19 @@ void UpdateAsset::SerializeWithCachedSizes(
       2, this->type(), output);
   }
 
-  // optional string path = 3;
-  if (has_path()) {
-    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->path().data(), this->path().length(),
-      ::google::protobuf::internal::WireFormat::SERIALIZE,
-      "path");
-    ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      3, this->path(), output);
-  }
-
-  // optional string args = 4;
+  // optional string args = 3;
   if (has_args()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->args().data(), this->args().length(),
       ::google::protobuf::internal::WireFormat::SERIALIZE,
       "args");
     ::google::protobuf::internal::WireFormatLite::WriteStringMaybeAliased(
-      4, this->args(), output);
+      3, this->args(), output);
   }
 
-  // optional uint32 dataSize = 5;
+  // optional uint32 dataSize = 4;
   if (has_datasize()) {
-    ::google::protobuf::internal::WireFormatLite::WriteUInt32(5, this->datasize(), output);
+    ::google::protobuf::internal::WireFormatLite::WriteUInt32(4, this->datasize(), output);
   }
 
   if (!unknown_fields().empty()) {
@@ -1812,18 +1774,7 @@ void UpdateAsset::SerializeWithCachedSizes(
       2, this->type(), target);
   }
 
-  // optional string path = 3;
-  if (has_path()) {
-    ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
-      this->path().data(), this->path().length(),
-      ::google::protobuf::internal::WireFormat::SERIALIZE,
-      "path");
-    target =
-      ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        3, this->path(), target);
-  }
-
-  // optional string args = 4;
+  // optional string args = 3;
   if (has_args()) {
     ::google::protobuf::internal::WireFormat::VerifyUTF8StringNamedField(
       this->args().data(), this->args().length(),
@@ -1831,12 +1782,12 @@ void UpdateAsset::SerializeWithCachedSizes(
       "args");
     target =
       ::google::protobuf::internal::WireFormatLite::WriteStringToArray(
-        4, this->args(), target);
+        3, this->args(), target);
   }
 
-  // optional uint32 dataSize = 5;
+  // optional uint32 dataSize = 4;
   if (has_datasize()) {
-    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(5, this->datasize(), target);
+    target = ::google::protobuf::internal::WireFormatLite::WriteUInt32ToArray(4, this->datasize(), target);
   }
 
   if (!unknown_fields().empty()) {
@@ -1864,21 +1815,14 @@ int UpdateAsset::ByteSize() const {
         ::google::protobuf::internal::WireFormatLite::EnumSize(this->type());
     }
 
-    // optional string path = 3;
-    if (has_path()) {
-      total_size += 1 +
-        ::google::protobuf::internal::WireFormatLite::StringSize(
-          this->path());
-    }
-
-    // optional string args = 4;
+    // optional string args = 3;
     if (has_args()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::StringSize(
           this->args());
     }
 
-    // optional uint32 dataSize = 5;
+    // optional uint32 dataSize = 4;
     if (has_datasize()) {
       total_size += 1 +
         ::google::protobuf::internal::WireFormatLite::UInt32Size(
@@ -1918,9 +1862,6 @@ void UpdateAsset::MergeFrom(const UpdateAsset& from) {
     if (from.has_type()) {
       set_type(from.type());
     }
-    if (from.has_path()) {
-      set_path(from.path());
-    }
     if (from.has_args()) {
       set_args(from.args());
     }
@@ -1953,7 +1894,6 @@ void UpdateAsset::Swap(UpdateAsset* other) {
   if (other != this) {
     std::swap(name_, other->name_);
     std::swap(type_, other->type_);
-    std::swap(path_, other->path_);
     std::swap(args_, other->args_);
     std::swap(datasize_, other->datasize_);
     std::swap(_has_bits_[0], other->_has_bits_[0]);

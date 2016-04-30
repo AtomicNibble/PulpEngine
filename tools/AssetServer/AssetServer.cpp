@@ -505,10 +505,7 @@ bool AssetServer::UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core
 	}
 
 	core::string name(update.name().data(), update.name().length());
-	core::string path, args;
-	if (update.has_path()) {
-		path = core::string(update.path().data(), update.path().length());
-	}
+	core::string args;
 	if (update.has_args()) {
 		args = core::string(update.args().data(), update.args().length());
 	}
@@ -519,7 +516,7 @@ bool AssetServer::UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core
 
 	core::CriticalSection::ScopedLock slock(lock_);
 
-	assetDb::AssetDB::Result::Enum res = db_.UpdateAsset(type, name, data, path, args);
+	assetDb::AssetDB::Result::Enum res = db_.UpdateAsset(type, name, data, args);
 	if (res != assetDb::AssetDB::Result::OK) {
 		errOut = "Failed to update asset. Err: ";
 		errOut += assetDb::AssetDB::Result::ToString(res);

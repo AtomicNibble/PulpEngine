@@ -301,7 +301,6 @@ MStatus ModelExporter::convert(const MArgList& args)
 				// send to asset server.
 				status = maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::MODEL,
 					MString(getName()),
-					MString(outPath.c_str()),
 					argsToJson(),
 					compressed,
 					&changed

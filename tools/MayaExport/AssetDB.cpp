@@ -265,7 +265,7 @@ MStatus AssetDB::RenameAsset(AssetType::Enum type, const MString & name, const M
 }
 
 MStatus AssetDB::UpdateAsset(AssetType::Enum type, const MString& name, 
-	const MString& path, const MString& args, const core::Array<uint8_t>& data, bool* pUnchanged)
+	const MString& args, const core::Array<uint8_t>& data, bool* pUnchanged)
 {
 	if (!pipe_.isOpen() && !Connect()) {
 		MayaUtil::MayaPrintError("Failed to UpdateAsset pipe is invalid");
@@ -278,7 +278,6 @@ MStatus AssetDB::UpdateAsset(AssetType::Enum type, const MString& name,
 		ProtoBuf::AssetDB::UpdateAsset* pUpdate = new ProtoBuf::AssetDB::UpdateAsset();
 		pUpdate->set_type(AssetTypeToProtoType(type));
 		pUpdate->set_name(name.asChar());
-		pUpdate->set_path(path.asChar());
 		pUpdate->set_args(args.asChar());
 		pUpdate->set_datasize(dataSize);
 

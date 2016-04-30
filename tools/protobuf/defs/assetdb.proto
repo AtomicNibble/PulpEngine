@@ -41,9 +41,8 @@ message RenameAsset {
 message UpdateAsset {
     required string name = 1;
     required AssetType type = 2;
-    optional string path = 3;
-    optional string args= 4;
-    optional  uint32 dataSize = 5;
+    optional string args= 3;
+    optional  uint32 dataSize = 4;
 }
 
 message Request {
