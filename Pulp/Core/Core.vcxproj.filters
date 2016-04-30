@@ -185,7 +185,7 @@
       <Filter>ExtensionSystem</Filter>
     </ClCompile>
     <ClCompile Include="win32\PathUtil.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>FileSys\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
