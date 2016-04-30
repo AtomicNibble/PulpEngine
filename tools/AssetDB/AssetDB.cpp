@@ -62,7 +62,6 @@ bool AssetDB::CreateTables(void)
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS file_ids ("
 		" file_id INTEGER PRIMARY KEY,"
 		"name TEXT COLLATE NOCASE," // names are not unique since we allow same name for diffrent type.
-		"path TEXT,"
 		"type INTEGER,"
 		"args TEXT,"
 		"raw_file INTEGER,"
@@ -142,12 +141,47 @@ AssetDB::Result::Enum AssetDB::DeleteAsset(AssetType::Enum type, const core::str
 AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::string& name,
 	const core::string& newName)
 {
-	if (!AssetExsists(type, name)) {
+	int32_t assetId;
+
+	if (!AssetExsists(type, name, &assetId)) {
 		return Result::NOT_FOUND;
 	}
 	// check if asset of same type already has new name
 	if (AssetExsists(type, newName)) {
 		return Result::NAME_TAKEN; 
+	}
+
+	// check for raw assets that need renaming to keep things neat.
+	{
+		RawFile rawData;
+		int32_t rawId;
+		if (GetRawfileForId(assetId, rawData, &rawId))
+		{
+			sql::SqlLiteTransaction trans(db_);
+			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ? WHERE file_id = ?");
+			cmd.bind(1, newName.c_str());
+			cmd.bind(2, rawId);
+
+			sql::Result::Enum res = cmd.execute();
+			if (res != sql::Result::OK) {
+				return Result::ERROR;
+			}
+
+			// now move the file.
+			core::Path<char> newFilePath, oldFilePath;
+			AssetPathForName(type, newName, newFilePath);
+			AssetPathForName(type, rawData.path, oldFilePath);
+
+			// if this fails, we return and the update is not commited.
+			if (!gEnv->pFileSys->moveFile(oldFilePath.c_str(), newFilePath.c_str())) {
+				X_ERROR("AssetDB", "Failed to move asset raw file");
+				return Result::ERROR;
+			}
+
+			// we commit this even tho cmd below might fail, since the raw file has now moved..
+			trans.commit();
+		}
+
 	}
 
 	sql::SqlLiteTransaction trans(db_);
@@ -207,12 +241,12 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	sql::SqlLiteTransaction trans(db_);
 	core::string stmt;
 
-	core::Path<char> path;
-
 	// ok we have updated rawdata.
 	if (data.isNotEmpty())
 	{
 		// save the file.
+		core::Path<char> path;
+
 		{
 			core::XFileScoped file;
 			core::fileModeFlags mode;
@@ -221,14 +255,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 			mode.Set(core::fileMode::WRITE);
 			mode.Set(core::fileMode::RECREATE);
 
-			filePath = ASSET_DB_FOLDER;
-			filePath.ensureSlash();
-			filePath /= RAW_FILES_FOLDER;
-			filePath.ensureSlash();
-			filePath /= AssetTypeRawFolder(type);
-			filePath.toLower();
-			filePath.ensureSlash();
-			filePath /= name;
+			AssetPathForName(type, name, filePath);
 
 			// set path as just the name.
 			path = name;
@@ -257,7 +284,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 			// insert entry
 			{
 				sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, size, hash) VALUES(?,?,?)");
-				cmd.bind(1, name.c_str());
+				cmd.bind(1, path.c_str());
 				cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
 				cmd.bind(3, static_cast<int32_t>(dataCrc));
 
@@ -285,7 +312,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 		{
 			// just update.
 			sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, add_time = DateTime('now') WHERE file_id = ?");
-			cmd.bind(1, name.c_str());
+			cmd.bind(1, path.c_str());
 			cmd.bind(2, safe_static_cast<int32_t, size_t>(data.size()));
 			cmd.bind(3, static_cast<int32_t>(dataCrc));
 			cmd.bind(5, rawId);
@@ -305,16 +332,9 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 
 	// now update file info.
 	stmt = "UPDATE file_ids SET lastUpdateTime = DateTime('now'), args = :args";
-
-	if (path.isNotEmpty()) {
-		stmt += ", path = :p";
-	}
 	stmt += " WHERE type = :t AND name = :n ";
 
 	sql::SqlLiteCmd cmd(db_, stmt.c_str());
-	if (path.isNotEmpty()) {
-		cmd.bind(":p", path.c_str());
-	}
 	cmd.bind(":t", type);
 	cmd.bind(":n", name.c_str());
 	cmd.bind(":args", argsOpt.c_str());
@@ -401,6 +421,18 @@ bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
 const char* AssetDB::AssetTypeRawFolder(AssetType::Enum type)
 {
 	return AssetType::ToString(type);
+}
+
+void AssetDB::AssetPathForName(AssetType::Enum type, const core::string& name, core::Path<char>& pathOut)
+{
+	pathOut = ASSET_DB_FOLDER;
+	pathOut.ensureSlash();
+	pathOut /= RAW_FILES_FOLDER;
+	pathOut.ensureSlash();
+	pathOut /= AssetTypeRawFolder(type);
+	pathOut.toLower();
+	pathOut.ensureSlash();
+	pathOut /= name;
 }
 
 

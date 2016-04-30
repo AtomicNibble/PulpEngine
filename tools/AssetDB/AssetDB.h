@@ -60,6 +60,7 @@ private:
 	bool GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId = nullptr);
 
 	static const char* AssetTypeRawFolder(AssetType::Enum type);
+	static void AssetPathForName(AssetType::Enum type, const core::string& name, core::Path<char>& pathOut);
 
 private:
 	sql::SqlLiteDb db_;
