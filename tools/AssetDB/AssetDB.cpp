@@ -64,6 +64,7 @@ bool AssetDB::CreateTables(void)
 		"name TEXT COLLATE NOCASE," // names are not unique since we allow same name for diffrent type.
 		"type INTEGER,"
 		"args TEXT,"
+		"argsHash INTEGER,"
 		"raw_file INTEGER,"
 		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,"
 		"lastUpdateTime TIMESTAMP"
@@ -388,6 +389,25 @@ bool AssetDB::GetArgsForAsset(int32_t assetId, core::string& argsOut)
 	}
 	return true;
 }
+
+
+bool AssetDB::GetArgsHashForAsset(int32_t assetId, uint32_t& argsHashOut)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT argsHash FROM file_ids WHERE file_ids.file_id = ?");
+	qry.bind(1, assetId);
+
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
+		return false;
+	}
+
+	if ((*it).columnType(0) != sql::ColumType::SNULL) {
+		argsHashOut = static_cast<uint32_t>((*it).get<int32_t>(0));
+	}
+	return true;
+}
+
 
 bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
 {

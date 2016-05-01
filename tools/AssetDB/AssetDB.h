@@ -55,6 +55,7 @@ public:
 	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
 
 	bool GetArgsForAsset(int32_t id, core::string& argsOut);
+	bool GetArgsHashForAsset(int32_t id, uint32_t& argsHashOut);
 
 private:
 	bool GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId = nullptr);
