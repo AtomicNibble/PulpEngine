@@ -209,16 +209,22 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	core::Array<uint8_t>& data, const core::string& argsOpt)
 {
 	int32_t assetId, rawId;
+	
+#if X_ENABLE_ASSERTIONS
+	assetId = std::numeric_limits<int32_t>::max();
+#endif // !X_ENABLE_ASSERTIONS
 
 	if (!AssetExsists(type, name, &assetId)) {
 		// add it?
-		if (AddAsset(type, name) != Result::OK) {
+		if (AddAsset(type, name, &assetId) != Result::OK) {
 			X_ERROR("AssetDB", "Failed to add assert when trying to update a asset that did not exsists.");
 			return Result::NOT_FOUND;
 		}
 
 		X_WARNING("AssetDB", "Added asset to db as it didnt exists when trying to update the asset");
 	}
+
+	X_ASSERT(assetId != std::numeric_limits<int32_t>::max(), "AssetId is invalid")();
 
 	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 	const uint32_t dataCrc = pCrc32->GetCRC32(data.ptr(), data.size());
