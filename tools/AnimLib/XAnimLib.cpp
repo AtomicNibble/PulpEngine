@@ -49,6 +49,7 @@ bool XAnimLib::Convert(ConvertArgs& args, const core::Array<uint8_t>& fileData,
 	InterAnim inter(g_AnimLibArena);
 
 	if (!inter.LoadFile(fileData)) {
+		X_ERROR("AnimLib", "Failed to load inter anim");
 		return false;
 	}
 
@@ -56,6 +57,7 @@ bool XAnimLib::Convert(ConvertArgs& args, const core::Array<uint8_t>& fileData,
 	model::ModelSkeleton model(g_AnimLibArena);
 
 	if (!model.LoadSkelton(modelPath)) {
+		X_ERROR("AnimLib", "Failed to load skelton: \"%s\"", modelPath.c_str());
 		return false;
 	}
 
