@@ -178,6 +178,14 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 			AssetPathForName(type, newName, newFilePath);
 			AssetPathForName(type, rawData.path, oldFilePath);
 
+
+			// make sure dir tree for new name is valid.
+			if (!gEnv->pFileSys->createDirectoryTree(newFilePath.c_str())) {
+				X_ERROR("AssetDB", "Failed to create dir to move raw asset");
+				return Result::ERROR;
+			}
+
+
 			// if this fails, we return and the update is not commited.
 			if (!gEnv->pFileSys->moveFile(oldFilePath.c_str(), newFilePath.c_str())) {
 				X_ERROR("AssetDB", "Failed to move asset raw file");
