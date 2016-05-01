@@ -454,6 +454,7 @@ bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
 		dataOut.path.clear();
 	}
 
+	dataOut.file_id = (*it).get<int32_t>(0);
 	dataOut.hash = static_cast<uint32_t>((*it).get<int32_t>(2));
 	return true;
 }
