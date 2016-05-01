@@ -27,7 +27,7 @@ typedef core::MemoryArena<
 	core::SimpleBoundsChecking,
 	core::NoMemoryTracking,
 	core::SimpleMemoryTagging
-> ConverterArena;
+> AssertServerArena;
 
 core::MemoryArenaBase* g_arena = nullptr;
 
@@ -47,7 +47,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	Console.MoveTo(10, 10);
 
 	core::MallocFreeAllocator allocator;
-	ConverterArena arena(&allocator, "AssetServerArena");
+	AssertServerArena arena(&allocator, "AssetServerArena");
 	g_arena = &arena;
 
 	bool res = false;
