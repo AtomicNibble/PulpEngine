@@ -24,6 +24,7 @@ class Converter
 	typedef core::traits::Function<void *(ICore *pSystem, const char *moduleName)> ModuleLinkfunc;
 public:
 	typedef IConverter::ConvertArgs ConvertArgs;
+	typedef IConverter::OutPath OutPath;
 
 public:
 	Converter();
@@ -31,10 +32,11 @@ public:
 
 	void PrintBanner(void);
 
-	bool Convert(AssetType::Enum assType, core::string& name);
+	bool Convert(AssetType::Enum assType, const core::string& name);
 
 private:
-	bool Convert_int(AssetType::Enum assType, ConvertArgs& args);
+	bool Convert_int(AssetType::Enum assType, ConvertArgs& args, const core::Array<uint8_t>& fileData,
+		const OutPath& pathOut);
 
 	IConverter* GetConverter(AssetType::Enum assType);
 	bool EnsureLibLoaded(AssetType::Enum assType);
@@ -42,6 +44,9 @@ private:
 	void* LoadDLL(const char* dllName);
 	bool IntializeConverterModule(AssetType::Enum assType);
 	bool IntializeConverterModule(AssetType::Enum assType, const char* dllName, const char* moduleClassName);
+
+private:
+	static void GetOutputPathForAsset(AssetType::Enum assType, const core::string& name, core::Path<char>& pathOut);
 
 private:
 	IConverter* converters_[AssetType::ENUM_COUNT];

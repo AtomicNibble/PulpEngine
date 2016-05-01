@@ -5,6 +5,7 @@
 #define X_CONVETER_MODULE_I_H_
 
 #include <Extension\IPotatoClass.h>
+#include <Containers\Array.h>
 
 X_NAMESPACE_DECLARE(anim,
 struct 	IAnimLib
@@ -12,7 +13,7 @@ struct 	IAnimLib
 
 X_NAMESPACE_DECLARE(model,
 struct IModelLib
-	)
+)
 
 
 struct IConverter;
@@ -24,14 +25,15 @@ struct IConverterModule : public IPotatoClass
 	virtual bool ShutDown(IConverter* pCon) X_ABSTRACT;
 };
 
-
 struct IConverter
 {
 	typedef core::string ConvertArgs;
+	typedef core::Path<char> OutPath;
 
 	virtual ~IConverter() {}
 
-	virtual bool Convert(ConvertArgs& args) X_ABSTRACT;
+	virtual bool Convert(ConvertArgs& args, const core::Array<uint8_t>& fileData, 
+		const OutPath& destPath) X_ABSTRACT;
 };
 
 

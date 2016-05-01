@@ -8,6 +8,10 @@
 #include <Extension\IPotatoFactory.h>
 #include <Extension\PotatoCreateClass.h>
 
+#include <Containers\Array.h>
+
+#include <Time\StopWatch.h>
+
 // need assetDB.
 X_LINK_LIB("engine_AssetDb")
 
@@ -30,7 +34,7 @@ void Converter::PrintBanner(void)
 
 }
 
-bool Converter::Convert(AssetType::Enum assType, core::string& name)
+bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 {
 	if (!db_.OpenDB()) {
 		X_ERROR("Converter", "Failed to open AssetDb");
@@ -49,17 +53,35 @@ bool Converter::Convert(AssetType::Enum assType, core::string& name)
 		return false;
 	}
 
+	core::StopWatch timer;
 
-	return Convert_int(assType, argsStr);
+	core::Array<uint8_t> data(g_arena);
+	if(!db_.GetRawFileDataForAsset(assetId, data)) {
+		return false;
+	}
+
+	X_LOG1("Converter", "Loaded rawfile in: ^6%gms", timer.GetMilliSeconds());
+
+	core::Path<char> pathOut;
+	GetOutputPathForAsset(assType, name, pathOut);
+
+	timer.Start();
+
+	bool res = Convert_int(assType, argsStr, data, pathOut);
+	if (res) {
+		X_LOG1("Converter", "processing took: ^6%gms", timer.GetMilliSeconds());
+	}
+	return res;
 }
 
 
-bool Converter::Convert_int(AssetType::Enum assType, ConvertArgs& args)
+bool Converter::Convert_int(AssetType::Enum assType, ConvertArgs& args, const core::Array<uint8_t>& fileData,
+	const OutPath& pathOut)
 {
 	IConverter* pCon = GetConverter(assType);
 
 	if (pCon) {
-		return pCon->Convert(args);
+		return pCon->Convert(args, fileData, pathOut);
 	}
 
 	return false;
@@ -165,6 +187,21 @@ void* Converter::LoadDLL(const char* dllName)
 	}
 
 	return hDll;
+}
+
+void Converter::GetOutputPathForAsset(AssetType::Enum assType, const core::string& name,
+	core::Path<char>& pathOut)
+{
+	pathOut.clear();
+	pathOut /= AssetType::ToString(assType);
+	pathOut /= "s";
+	pathOut.toLower();
+	pathOut.ensureSlash();
+
+	// make sure output folder is valid.
+	gEnv->pFileSys->createDirectoryTree(pathOut.c_str());
+
+	pathOut /= name;
 }
 
 X_NAMESPACE_END

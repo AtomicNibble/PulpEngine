@@ -19,7 +19,8 @@ XAnimLib::~XAnimLib()
 }
 
 
-bool XAnimLib::Convert(ConvertArgs& args)
+bool XAnimLib::Convert(ConvertArgs& args, const core::Array<uint8_t>& fileData,
+	const OutPath& destPath_)
 {
 	core::Path<char> interPath;
 	core::Path<char> modelPath;
