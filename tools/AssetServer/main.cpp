@@ -47,7 +47,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	Console.MoveTo(10, 10);
 
 	core::MallocFreeAllocator allocator;
-	ConverterArena arena(&allocator, "ConverterArena");
+	ConverterArena arena(&allocator, "AssetServerArena");
 	g_arena = &arena;
 
 	bool res = false;
