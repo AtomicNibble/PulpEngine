@@ -215,25 +215,29 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 		X_WARNING("AssetDB", "Added asset to db as it didnt exists when trying to update the asset");
 	}
 
-	// work out crc for the data.
 	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
-
 	const uint32_t dataCrc = pCrc32->GetCRC32(data.ptr(), data.size());
 	const uint32_t argsCrc = pCrc32->GetCRC32(argsOpt.c_str(), argsOpt.length());
 
+	bool dataChanged = true;
 
 	rawId = std::numeric_limits<uint32_t>::max();
-
 	if (data.isNotEmpty())
 	{
 		RawFile rawData;
 
 		if (GetRawfileForId(assetId, rawData, &rawId))
 		{
-			// same?
-			if (rawData.hash == dataCrc) {
-				X_LOG0("AssetDB", "Skipping updates asset unchanged");
-				return Result::UNCHANGED;
+			if (rawData.hash == dataCrc) 
+			{
+				dataChanged = false;
+
+				uint32_t argsHash;
+				if (GetArgsHashForAsset(assetId, argsHash) && argsHash == argsCrc)
+				{
+					X_LOG0("AssetDB", "Skipping updates asset unchanged");
+					return Result::UNCHANGED;
+				}
 			}
 		}
 	}
@@ -242,8 +246,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	sql::SqlLiteTransaction trans(db_);
 	core::string stmt;
 
-	// ok we have updated rawdata.
-	if (data.isNotEmpty())
+	if (data.isNotEmpty() && dataChanged)
 	{
 		// save the file.
 		core::Path<char> path;
@@ -323,12 +326,6 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 				return Result::ERROR;
 			}
 		}
-	}
-	else
-	{
-		// humm
-
-
 	}
 
 	// now update file info.
