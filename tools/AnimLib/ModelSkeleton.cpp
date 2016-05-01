@@ -43,18 +43,19 @@ ModelSkeleton::~ModelSkeleton()
 
 }
 
-bool ModelSkeleton::LoadSkelton(core::Path<char>& filePath)
+bool ModelSkeleton::LoadSkelton(const core::Path<char>& filePath)
 {
 	return LoadSkelton(core::Path<wchar_t>(filePath));
 }
 
-bool ModelSkeleton::LoadSkelton(core::Path<wchar_t>& filePath)
+bool ModelSkeleton::LoadSkelton(const core::Path<wchar_t>& filePath)
 {
 	if (filePath.isEmpty()) {
 		return false;
 	}
 
-	filePath.setExtension(model::MODEL_FILE_EXTENSION_W);
+	core::Path<wchar_t> path(filePath);
+	path.setExtension(model::MODEL_FILE_EXTENSION_W);
 
 	core::fileModeFlags mode;
 	mode.Set(core::fileMode::READ);
@@ -62,7 +63,7 @@ bool ModelSkeleton::LoadSkelton(core::Path<wchar_t>& filePath)
 
 
 	core::XFileScoped file;
-	if (!file.openFile(filePath.c_str(), mode)) {
+	if (!file.openFile(path.c_str(), mode)) {
 		X_ERROR("Model", "Failed to open model for skelton load");
 		return false;
 	}
