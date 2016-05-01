@@ -472,5 +472,16 @@ void AssetDB::AssetPathForName(AssetType::Enum type, const core::string& name, c
 	pathOut /= name;
 }
 
+void AssetDB::AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut)
+{
+	pathOut = ASSET_DB_FOLDER;
+	pathOut.ensureSlash();
+	pathOut /= RAW_FILES_FOLDER;
+	pathOut.ensureSlash();
+	pathOut /= raw.path;
+}
+
+
+
 
 X_NAMESPACE_END
