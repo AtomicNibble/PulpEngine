@@ -462,7 +462,7 @@ MString ModelExporter::argsToJson(void) const
 	core::json::StringBuffer s;
 	core::json::Writer<core::json::StringBuffer> writer(s);
 
-
+	writer.SetMaxDecimalPlaces(5);
 	writer.StartObject();
 	writer.Key("verbose");
 	writer.Bool(MayaUtil::IsVerbose());
