@@ -346,6 +346,11 @@ bool AnimCompiler::compile(const core::Path<char>& filePath, const float posErro
 
 bool AnimCompiler::compile(const core::Path<wchar_t>& path, const float posError, const float angError)
 {
+	if (type_ != AnimType::RELATIVE) {
+		X_ERROR("Anim", "Compiling of none relative animations is not yet supported");
+		return false;
+	}
+
 	// got any bones in the inter?
 	if (inter_.getNumBones() < 1) {
 		X_WARNING("Anim", "skipping compile of anim, source inter anim has no bones");
