@@ -20,46 +20,35 @@ XAnimLib::~XAnimLib()
 
 
 bool XAnimLib::Convert(ConvertArgs& args, const core::Array<uint8_t>& fileData,
-	const OutPath& destPath_)
+	const OutPath& destPath)
 {
-	core::Path<char> interPath;
 	core::Path<char> modelPath;
-	core::Path<char> destPath;
-
 
 	core::json::Document d;
 	d.Parse(args.c_str());
 
-	if (d.HasMember("inter_anim")) {
-		interPath = d["inter_anim"].GetString();
-	}
 	if (d.HasMember("model")) {
 		modelPath = d["model"].GetString();
 	}
-	if (d.HasMember("dest")) {
-		destPath = d["dest"].GetString();
-	}
 
 
-	// log all that are missing then return.
-	if(interPath.isEmpty()) {
-		X_ERROR("AnimLib", "Missing 'inter_anim' option");
-	}
-	if (modelPath.isEmpty()) {
-		X_ERROR("AnimLib", "Missing 'model' option");
+	if (fileData.isEmpty()) {
+		X_ERROR("AnimLib", "File data is empty");
+		return false;
 	}
 	if (destPath.isEmpty()) {
 		X_ERROR("AnimLib", "Missing 'dest' option");
+		return false;
 	}
-
-	if (interPath.isEmpty() || interPath.isEmpty() || interPath.isEmpty()) {
+	if (modelPath.isEmpty()) {
+		X_ERROR("AnimLib", "Missing 'model' option");
 		return false;
 	}
 
 
 	InterAnim inter(g_AnimLibArena);
 
-	if (!inter.LoadFile(interPath)) {
+	if (!inter.LoadFile(fileData)) {
 		return false;
 	}
 
