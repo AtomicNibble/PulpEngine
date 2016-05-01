@@ -105,6 +105,11 @@ class AnimCompiler
 
 	typedef core::Array<Bone> BoneArr;
 
+
+	X_DECLARE_FLAGS(CompileFlag)(
+		LOOPING
+	);
+
 public:
 	static const float DEFAULT_POS_ERRR;
 	static const float DEFAULT_ANGLE_ERRR;
@@ -112,6 +117,9 @@ public:
 public:
 	AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter, const model::ModelSkeleton& skelton);
 	~AnimCompiler();
+
+	void setLooping(bool loop);
+	void setAnimType(AnimType::Enum type);
 
 	bool compile(const core::Path<char>& path, const float posError = DEFAULT_POS_ERRR, const float angError = DEFAULT_ANGLE_ERRR);
 	bool compile(const core::Path<wchar_t>& path, const float posError = DEFAULT_POS_ERRR, const float angError = DEFAULT_ANGLE_ERRR);
@@ -132,7 +140,8 @@ private:
 	const InterAnim& inter_;
 	const model::ModelSkeleton& skelton_;
 private:
-
+	Flags<CompileFlag> flags_;
+	AnimType::Enum type_;
 	BoneArr bones_;
 };
 

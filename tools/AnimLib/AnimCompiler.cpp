@@ -312,6 +312,7 @@ AnimCompiler::AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter,
 	arena_(arena),
 	inter_(inter),
 	skelton_(skelton),
+	type_(AnimType::RELATIVE),
 	bones_(arena)
 {
 
@@ -321,6 +322,21 @@ AnimCompiler::AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter,
 AnimCompiler::~AnimCompiler()
 {
 
+}
+
+void AnimCompiler::setLooping(bool loop)
+{
+	if (loop) {
+		flags_.Set(CompileFlag::LOOPING);
+	}
+	else {
+		flags_.Remove(CompileFlag::LOOPING);
+	}
+}
+
+void AnimCompiler::setAnimType(AnimType::Enum type)
+{
+	type_ = type;
 }
 
 bool AnimCompiler::compile(const core::Path<char>& filePath, const float posError, const float angError)
@@ -387,16 +403,15 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 		return false;
 	}
 
-	const bool loop = false;
 
 	anim::AnimHeader hdr;
 	hdr.version = anim::ANIM_VERSION;
 
-	if (loop) {
+	if (flags_.IsSet(CompileFlag::LOOPING)) {
 		hdr.flags.Set(AnimFlag::LOOP);
 	}
 
-	hdr.type = AnimType::RELATIVE;
+	hdr.type = type_;
 	hdr.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
 	hdr.numFrames = safe_static_cast<uint16_t, uint32_t>(inter_.getNumFrames());
 	hdr.fps = safe_static_cast<uint16_t, uint32_t>(inter_.getFps());
