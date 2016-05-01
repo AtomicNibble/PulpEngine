@@ -57,6 +57,9 @@ public:
 	bool GetArgsForAsset(int32_t assetId, core::string& argsOut);
 	bool GetArgsHashForAsset(int32_t idassetId, uint32_t& argsHashOut);
 
+	bool GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& dataOut);
+
+
 private:
 	bool GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId = nullptr);
 

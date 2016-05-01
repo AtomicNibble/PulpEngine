@@ -5,6 +5,12 @@
 #include <Hashing\crc32.h>
 
 #include <IFileSys.h>
+#include <ICompression.h>
+
+#include <Compression\LZ4.h>
+#include <Compression\Lzma2.h>
+#include <Compression\Zlib.h>
+
 
 X_LINK_LIB("engine_SqLite")
 
@@ -428,6 +434,61 @@ bool AssetDB::GetArgsHashForAsset(int32_t assetId, uint32_t& argsHashOut)
 	return true;
 }
 
+bool AssetDB::GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& dataOut)
+{
+	using namespace core::Compression;
+
+	RawFile raw;
+
+	if (!GetRawfileForId(assetId, raw)) {
+		X_ERROR("AssetDB", "Failed to get rawfile info for data reterival");
+		return false;
+	}
+
+	// load the file.
+	core::XFileScoped file;
+	core::fileModeFlags mode;
+	core::Path<char> filePath;
+
+	mode.Set(core::fileMode::READ);
+	mode.Set(core::fileMode::SHARE);
+
+	AssetPathForRawFile(raw, filePath);
+
+	if (!file.openFile(filePath.c_str(), mode)) {
+		X_ERROR("AssetDB", "Failed to open rawfile");
+		return false;
+	}
+
+	size_t size = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
+
+	core::Array<uint8_t> compressedData(g_AssetDBArena);
+	compressedData.resize(size);
+
+	if (file.read(compressedData.ptr(), size) != size) {
+		X_ERROR("AssetDB", "Failed to read rawfile contents");
+		return false;
+	}
+
+	// decompress it.
+	Algo::Enum algo = ICompressor::getAlgo(compressedData);
+
+	if (algo == Algo::LZ4) {
+		Compressor<LZ4> def;
+		return def.inflate(g_AssetDBArena, compressedData, dataOut);
+	}
+	else if (algo == Algo::LZMA) {
+		Compressor<LZMA> def;
+		return def.inflate(g_AssetDBArena, compressedData, dataOut);
+	}
+	else if (algo == Algo::ZLIB) {
+		Compressor<Zlib> def;
+		return def.inflate(g_AssetDBArena, compressedData, dataOut);
+	}
+
+	X_ERROR("AssetDB", "Failed to read rawfile, unkown compression algo");
+	return false;
+}
 
 bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
 {
