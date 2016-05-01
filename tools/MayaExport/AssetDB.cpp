@@ -177,7 +177,7 @@ bool AssetDB::Connect(void)
 MStatus AssetDB::AddAsset(AssetType::Enum type, const MString & name)
 {
 	if (!pipe_.isOpen() && !Connect()) {
-		MayaUtil::MayaPrintError("Failed to AddAsset pipe is invalid");
+		MayaUtil::MayaPrintError("Failed to 'AddAsset' pipe is invalid");
 		return MS::kFailure;
 	}
 
@@ -208,7 +208,7 @@ MStatus AssetDB::AddAsset(AssetType::Enum type, const MString & name)
 MStatus AssetDB::RemoveAsset(AssetType::Enum type, const MString & name)
 {
 	if (!pipe_.isOpen() && !Connect()) {
-		MayaUtil::MayaPrintError("Failed to RemoveAsset pipe is invalid");
+		MayaUtil::MayaPrintError("Failed to 'RemoveAsset' pipe is invalid");
 		return MS::kFailure;
 	}
 
@@ -237,7 +237,7 @@ MStatus AssetDB::RemoveAsset(AssetType::Enum type, const MString & name)
 MStatus AssetDB::RenameAsset(AssetType::Enum type, const MString & name, const MString & oldName)
 {
 	if (!pipe_.isOpen() && !Connect()) {
-		MayaUtil::MayaPrintError("Failed to RenameAsset pipe is invalid");
+		MayaUtil::MayaPrintError("Failed to 'RenameAsset' pipe is invalid");
 		return MS::kFailure;
 	}
 
@@ -268,7 +268,7 @@ MStatus AssetDB::UpdateAsset(AssetType::Enum type, const MString& name,
 	const MString& args, const core::Array<uint8_t>& data, bool* pUnchanged)
 {
 	if (!pipe_.isOpen() && !Connect()) {
-		MayaUtil::MayaPrintError("Failed to UpdateAsset pipe is invalid");
+		MayaUtil::MayaPrintError("Failed to 'UpdateAsset' pipe is invalid");
 		return MS::kFailure;
 	}
 
