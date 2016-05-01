@@ -101,7 +101,7 @@ bool AssetDB::DropTables(void)
 }
 
 
-AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string& name)
+AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId)
 {
 	if (AssetExsists(type, name)) {
 		return Result::NAME_TAKEN;
@@ -118,6 +118,11 @@ AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string
 	}
 
 	trans.commit();
+
+	if (pId) {
+		*pId = safe_static_cast<int32_t, sql::SqlLiteDb::RowId>(db_.lastInsertRowid());
+	}
+
 	return Result::OK;
 }
 

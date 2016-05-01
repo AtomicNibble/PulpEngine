@@ -44,7 +44,7 @@ public:
 	bool DropTables(void);
 
 public:
-	Result::Enum AddAsset(AssetType::Enum type, const core::string& name);
+	Result::Enum AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
 	Result::Enum DeleteAsset(AssetType::Enum type, const core::string& name);
 	Result::Enum RenameAsset(AssetType::Enum type, const core::string& name,
 		const core::string& newName);
