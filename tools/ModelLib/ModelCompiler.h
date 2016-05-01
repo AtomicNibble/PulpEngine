@@ -181,8 +181,8 @@ public:
 	CompileFlags getFlags(void) const;
 
 
-	bool CompileModel(core::Path<char>& outFile);
-	bool CompileModel(core::Path<wchar_t>& outFile);
+	bool CompileModel(const core::Path<char>& outFile);
+	bool CompileModel(const core::Path<wchar_t>& outFile);
 
 
 private:

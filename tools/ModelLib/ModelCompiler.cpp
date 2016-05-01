@@ -442,17 +442,18 @@ ModelCompiler::CompileFlags ModelCompiler::getFlags(void) const
 }
 
 
-bool ModelCompiler::CompileModel(core::Path<char>& outFile)
+bool ModelCompiler::CompileModel(const core::Path<char>& outFile)
 {
 	return CompileModel(core::Path<wchar_t>(outFile));
 }
 
 
-bool ModelCompiler::CompileModel(core::Path<wchar_t>& outFile)
+bool ModelCompiler::CompileModel(const core::Path<wchar_t>& outFile)
 {
 	stats_.clear();
 		
-	outFile.setExtension(model::MODEL_FILE_EXTENSION_W);
+	core::Path<wchar_t> path(outFile);
+	path.setExtension(model::MODEL_FILE_EXTENSION_W);
 
 	// raw models are unprocessed and un optimised.
 	// if you want to make a engine model it must first be loaded into a raw model
@@ -470,9 +471,9 @@ bool ModelCompiler::CompileModel(core::Path<wchar_t>& outFile)
 	}
 
 	// save it.
-	if (!SaveModel(outFile)) {
+	if (!SaveModel(path)) {
 		X_ERROR("Model", "Failed to save compiled model to: \"%ls\"",
-			outFile.c_str());
+			path.c_str());
 		return false;
 	}
 
