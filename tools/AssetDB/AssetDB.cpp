@@ -332,13 +332,14 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	}
 
 	// now update file info.
-	stmt = "UPDATE file_ids SET lastUpdateTime = DateTime('now'), args = :args";
+	stmt = "UPDATE file_ids SET lastUpdateTime = DateTime('now'), args = :args, argsHash = :argsHash";
 	stmt += " WHERE type = :t AND name = :n ";
 
 	sql::SqlLiteCmd cmd(db_, stmt.c_str());
 	cmd.bind(":t", type);
 	cmd.bind(":n", name.c_str());
 	cmd.bind(":args", argsOpt.c_str());
+	cmd.bind(":argsHash", static_cast<int32_t>(argsCrc));
 
 
 	sql::Result::Enum res = cmd.execute();
