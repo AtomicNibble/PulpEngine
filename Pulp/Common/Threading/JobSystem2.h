@@ -78,7 +78,9 @@ X_ENSURE_SIZE(Job, 128);
 X_DISABLE_WARNING(4324)
 X_ALIGNED_SYMBOL(class ThreadQue, 64)
 {
-	static const unsigned int MAX_NUMBER_OF_JOBS = 1 << 16;
+public:
+	static const unsigned int MAX_NUMBER_OF_JOBS = 1 << 12;
+private:
 	static const unsigned int MASK = MAX_NUMBER_OF_JOBS - 1u;
 
 public:
@@ -287,6 +289,9 @@ public:
 	// 68kb(72kb x64) per 1024 jobs per thread
 	// so for 4096 jobs with 6 threads it's: 1728kb ~1.7mb
 	static const size_t MEMORY_PER_THREAD = (MAX_JOBS * sizeof(Job)) + (MAX_JOBS * sizeof(Job*));
+
+	static_assert(ThreadQue::MAX_NUMBER_OF_JOBS == MAX_JOBS, "ThreadQue max jobs is not equal");
+
 public:
 	JobSystem();
 	~JobSystem();
