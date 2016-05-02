@@ -289,7 +289,8 @@ const size_t ModelCompiler::Binds::dataSizeTotal(void) const
 ModelCompiler::Mesh::Mesh(core::MemoryArenaBase* arena) :
 	verts_(arena),
 	faces_(arena),
-	binds_(arena)
+	binds_(arena),
+	colMeshes_(arena)
 {
 
 }
@@ -953,7 +954,12 @@ bool ModelCompiler::ProcessModel(void)
 	}
 
 	if (!ScaleModel()) {
-		X_ERROR("Model", "Failed to mergeverts");
+		X_ERROR("Model", "Failed to scale model");
+		return false;
+	}
+
+	if (!PrcoessCollisionMeshes()) {
+		X_ERROR("Model", "Failed to process collision mesh");
 		return false;
 	}
 
@@ -1032,6 +1038,10 @@ bool ModelCompiler::MergMesh(void)
 		for (size_t j = 0; j < lod.meshes_.size(); j++)
 		{
 			auto& mesh = lod.meshes_[j];
+
+			if (isColisionMesh(mesh.name_)) {
+				continue;
+			}
 
 			for (size_t i = 0; i < lod.meshes_.size(); i++)
 			{
@@ -1253,6 +1263,71 @@ bool ModelCompiler::ScaleModel(void)
 
 	return ScaleBones();
 }
+
+
+bool ModelCompiler::PrcoessCollisionMeshes(void)
+{
+	if (compiledLods_.isEmpty()) {
+		return true;
+	}
+
+	auto& lod = compiledLods_[0];
+
+	// look for any collision meshes in LOD0
+	for (auto& mesh : lod.meshes_)
+	{
+		if (!isColisionMesh(mesh.name_))
+		{
+			// this is not a collision mesh, lets try find some collision mehes for it.
+			for (size_t i = 0; i < lod.meshes_.size(); i++)
+			{
+				auto& othMesh = lod.meshes_[i];
+				if (&mesh != &othMesh)
+				{
+					if (isColisionMesh(othMesh.name_))
+					{
+						const auto colMeshMame = StripColisionPrefix(othMesh.name_);
+
+						// we have a collision mesh
+						// lets see if we can find this meshes name in it.
+						if (colMeshMame.find(mesh.name_.c_str()))
+						{
+							// ok so this is a colmesh for Mesh.
+							// lets validate it.
+							// the only trailing chars we allow are _01, _02
+
+							// move it into the meshes col meshes.
+							mesh.colMeshes_.append(othMesh);
+
+							lod.meshes_.removeIndex(i);
+
+							// reset search, since remove can re-order.
+							i = 0;
+						}
+					}
+				}
+			}
+		}
+	}
+
+	// check we still don't have any.
+	for (size_t i = 0; i < compiledLods_.size(); i++) {
+		for (auto& mesh : compiledLods_[i].meshes_) {
+			if (isColisionMesh(mesh.name_)) {
+				if (i == 0) {
+					X_ERROR("Model", "Failed to remove collision mesh. \"%s\"", mesh.name_.c_str());
+				}
+				else {
+					X_ERROR("Model", "Collision meshes are only support on LOD0. \"LOG%i:%s\"", i, mesh.name_.c_str());
+				}
+				return false;
+			}
+		}
+	}
+	return true;
+}
+
+
 
 bool ModelCompiler::UpdateMeshBounds(void)
 {
@@ -1730,6 +1805,59 @@ size_t ModelCompiler::getBatchSize(size_t elementSizeBytes)
 	return batchSize;
 }
 
+bool ModelCompiler::isColisionMesh(const RawModel::Mesh::NameString& name)
+{
+	const char* pFind = nullptr;
+
+	// PBX_ * _ *
+	if ((pFind = name.find(MODEL_MESH_COL_BOX_PREFIX)) != nullptr)
+	{
+		if (pFind != name.begin()) {
+			goto ignore;
+		}
+		return true;
+	}
+	// PSP_ * _ *
+	if ((pFind = name.find(MODEL_MESH_COL_SPHERE_PREFIX)) != nullptr)
+	{
+		if (pFind != name.begin()) {
+			goto ignore;
+		}
+		return true;
+	}
+	// PCX_ * _ *
+	if ((pFind = name.find(MODEL_MESH_COL_CONVEX_PREFIX)) != nullptr)
+	{
+		if (pFind != name.begin()) {
+			goto ignore;
+		}
+		return true;
+	}
+
+	return false;
+
+ignore:
+	X_WARNING("Model", "Mesh name \"%s\" contains collision prefix that is not leading, ignoring", name.c_str());
+	return false;
+}
+
+RawModel::Mesh::NameString ModelCompiler::StripColisionPrefix(const RawModel::Mesh::NameString& colMeshName)
+{
+	if (!isColisionMesh(colMeshName)) {
+		return colMeshName;
+	}
+
+	if (colMeshName.length() < 4) {
+		return colMeshName;
+	}
+
+	// lets check my + 4 logic is not broken.
+	static_assert(sizeof(model::MODEL_MESH_COL_BOX_PREFIX) == 5, "MODEL_MESH_COL_BOX_PREFIX size changed");
+	static_assert(sizeof(model::MODEL_MESH_COL_SPHERE_PREFIX) == 5, "MODEL_MESH_COL_SPHERE_PREFIX size changed");
+	static_assert(sizeof(model::MODEL_MESH_COL_CONVEX_PREFIX) == 5, "MODEL_MESH_COL_CONVEX_PREFIX size changed");
+
+	return RawModel::Mesh::NameString(colMeshName.begin() + 4, colMeshName.end());
+}
 
 
 X_NAMESPACE_END
