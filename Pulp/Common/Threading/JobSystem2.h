@@ -61,7 +61,7 @@ struct Job
 	X_PACK_POP
 	X_ENSURE_SIZE(JobId, 2);
 
-	static const size_t MAX_CONTINUATIONS = 7;
+	static const size_t MAX_CONTINUATIONS = 8;
 	static const size_t PAD_SIZE = (128 - 
 		(sizeof(JobFunction::Pointer) 
 		+ sizeof(Job*)
