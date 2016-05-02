@@ -49,14 +49,27 @@ typedef core::traits::Function<void(JobSystem&, size_t, Job*, void*)> JobFunctio
 
 struct Job
 {
+	static const size_t THREAD_IDX_BITS = 4; // 16 threads
+	static const size_t JOB_IDX_BITS = 12;  // 4096
+
+	X_PACK_PUSH(2)
+	struct JobId
+	{
+		uint16_t threadIdx : THREAD_IDX_BITS;
+		uint16_t jobIdx : JOB_IDX_BITS;
+	};
+	X_PACK_POP
+	X_ENSURE_SIZE(JobId, 2);
+
 	static const size_t MAX_CONTINUATIONS = 7;
 	static const size_t PAD_SIZE = (128 - 
 		(sizeof(JobFunction::Pointer) 
 		+ sizeof(Job*)
 		+ sizeof(void*)
 		+ (sizeof(core::AtomicInt) * 2)
-		+ (sizeof(Job*) * MAX_CONTINUATIONS) 
-		+ sizeof(uint32_t)));
+		+ (sizeof(JobId) * MAX_CONTINUATIONS)
+		+ sizeof(uint8_t)));
+
 public:
 	core::AtomicInt unfinishedJobs;
 	core::AtomicInt continuationCount;
@@ -69,8 +82,8 @@ public:
 		char pad[PAD_SIZE];
 	};
 
-	uint32_t runFlags;
-	Job* continuations[MAX_CONTINUATIONS];
+	uint8_t runFlags;
+	JobId continuations[MAX_CONTINUATIONS];
 };
 
 X_ENSURE_SIZE(Job, 128);
@@ -139,17 +152,6 @@ public:
 private:
 	size_t size_;
 };
-
-X_INLINE void AddContinuation(Job* ancestor, Job* continuation, bool runInline = false)
-{
-	const int32_t count = (++ancestor->continuationCount - 1);
-	X_ASSERT(count < Job::MAX_CONTINUATIONS, "Can't add conitnation, list is full")(Job::MAX_CONTINUATIONS, count);
-	ancestor->continuations[count] = continuation;
-
-	if (runInline) {
-		ancestor->runFlags = core::bitUtil::SetBit(ancestor->runFlags, count);
-	}
-}
 
 template <typename JobData>
 static inline void parallel_for_job(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
@@ -330,6 +332,7 @@ public:
 	X_INLINE Job* CreateJobMemberFunc(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, 
 		void* pJobData);
 
+	X_INLINE void AddContinuation(Job* ancestor, Job* continuation, bool runInline = false);
 
 	void Run(Job* pJob);
 	void Wait(Job* pJob);

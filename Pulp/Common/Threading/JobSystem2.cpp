@@ -433,16 +433,22 @@ namespace V2
 		}
 
 		ThreadQue* queue = GetWorkerThreadQueue(threadIdx);
+
 		const int32_t flags = pJob->runFlags;
 
 		for (int32_t i = 0; i < continuationCount; i++)
 		{
+			const Job::JobId& id = pJob->continuations[i];
+			ThreadJobAllocator* pThreadAlloc = GetWorkerThreadAllocator(id.threadIdx);
+
+			Job* pContinuation = &pThreadAlloc->jobs[id.jobIdx];
+
 			// run inline?
 			if (flags != 0 && core::bitUtil::IsBitSet(flags, i)) {
-				Execute(pJob->continuations[i], threadIdx);
+				Execute(pContinuation, threadIdx);
 			}
 			else {
-				queue->Push(pJob->continuations[i]);
+				queue->Push(pContinuation);
 			}
 		}
 	}

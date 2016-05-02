@@ -128,6 +128,31 @@ namespace V2
 		return job;
 	}
 
+	// =============================================
+
+	X_INLINE void JobSystem::AddContinuation(Job* ancestor, Job* continuation, bool runInline)
+	{
+		const int32_t count = (++ancestor->continuationCount - 1);
+		X_ASSERT(count < Job::MAX_CONTINUATIONS, "Can't add conitnation, list is full")(Job::MAX_CONTINUATIONS, count);
+
+
+		size_t threadIdx = GetThreadIndex();
+		ThreadJobAllocator* pThreadAlloc = GetWorkerThreadAllocator(threadIdx);
+
+		size_t jobIdx = continuation - pThreadAlloc->jobs;
+
+		X_ASSERT(jobIdx < ThreadQue::MAX_NUMBER_OF_JOBS, "Job index is invalid")(jobIdx, ThreadQue::MAX_NUMBER_OF_JOBS);
+
+		Job::JobId id;
+		id.threadIdx = threadIdx;
+		id.jobIdx = jobIdx;
+		ancestor->continuations[count] = id;
+
+		if (runInline) {
+			ancestor->runFlags = core::bitUtil::SetBit(ancestor->runFlags, count);
+		}
+	}
+
 } // namespace V2
 
 X_NAMESPACE_END
