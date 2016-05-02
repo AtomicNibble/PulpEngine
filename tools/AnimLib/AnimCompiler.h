@@ -1,7 +1,7 @@
 #pragma once
 
 #include "anim_inter.h"
-#include "ModelSkeleton.h"
+#include "../ModelLib/ModelSkeleton.h"
 
 X_NAMESPACE_BEGIN(anim)
 

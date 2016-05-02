@@ -366,11 +366,11 @@
   <ItemGroup>
     <ClInclude Include="AnimCompiler.h" />
     <ClInclude Include="anim_inter.h" />
-    <ClInclude Include="ModelSkeleton.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XAnimLib.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\ModelLib\ModelSkeleton.cpp" />
     <ClCompile Include="AnimCompiler.cpp" />
     <ClCompile Include="anim_inter.cpp" />
     <ClCompile Include="ConverterLib.cpp" />
@@ -406,7 +406,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">
       </PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="ModelSkeleton.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>

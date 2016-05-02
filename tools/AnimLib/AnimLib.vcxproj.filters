@@ -15,9 +15,6 @@
     <Filter Include="Source Files\anim_inter">
       <UniqueIdentifier>{ede01363-2ba7-470d-a735-ceb7f4b100c6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\model">
-      <UniqueIdentifier>{92e81150-86fc-4159-92f5-7c69bb359eeb}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\model">
       <UniqueIdentifier>{bcbb4e71-9311-4df2-8ae4-8e895b974893}</UniqueIdentifier>
     </Filter>
@@ -41,9 +38,6 @@
     <ClInclude Include="XAnimLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ModelSkeleton.h">
-      <Filter>Header Files\model</Filter>
-    </ClInclude>
     <ClInclude Include="AnimCompiler.h">
       <Filter>Header Files\anim</Filter>
     </ClInclude>
@@ -61,14 +55,14 @@
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ModelSkeleton.cpp">
-      <Filter>Source Files\model</Filter>
-    </ClCompile>
     <ClCompile Include="AnimCompiler.cpp">
       <Filter>Source Files\anim</Filter>
     </ClCompile>
     <ClCompile Include="ConverterLib.cpp">
       <Filter>Source Files\Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="..\ModelLib\ModelSkeleton.cpp">
+      <Filter>Source Files\model</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
