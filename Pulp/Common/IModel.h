@@ -122,6 +122,11 @@ static const uint32_t	 MODEL_RAW_VERSION = 1;
 static const char*		 MODEL_RAW_FILE_EXTENSION = "model_raw";
 
 
+static const char*		 MODEL_MESH_COL_BOX_PREFIX = "PBX_";
+static const char*		 MODEL_MESH_COL_SPHERE_PREFIX = "PSP_";
+static const char*		 MODEL_MESH_COL_CONVEX_PREFIX = "PCX_";
+
+
 struct IModelLib : public IConverter
 {
 
