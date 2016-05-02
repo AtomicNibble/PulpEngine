@@ -422,6 +422,25 @@ namespace bitUtil
 				return ((static_cast<uint16_t>(value) & (1u << whichBit)) != 0);
 			}
 
+			/// Internal function used by bitUtil::SetBit.
+			template <typename T>
+			static inline T SetBit(T value, unsigned int whichBit)
+			{
+				static_assert(sizeof(T) == 2, "sizeof(T) is not 2 bytes.");
+
+				return (static_cast<T>(static_cast<uint16_t>(value) | (1u << whichBit)));
+			}
+
+			/// Internal function used by bitUtil::ClearBit.
+			template <typename T>
+			static inline T ClearBit(T value, unsigned int whichBit)
+			{
+				static_assert(sizeof(T) == 2, "sizeof(T) is not 2 bytes.");
+
+				return (static_cast<T>(static_cast<uint16_t>(value) & (~(1u << whichBit))));
+			}
+
+
 			template<typename T>
 			static inline bool isSignBitSet(T value)
 			{
@@ -438,6 +457,81 @@ namespace bitUtil
 				return IsBitSet<T>(value, 15) == false;
 			}
 			
+		};
+
+		template <>
+		struct Implementation<1u>
+		{
+			template <typename T>
+			static inline bool IsBitFlagSet(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+			{
+				static_assert(sizeof(T) == 1, "sizeof(T) is not 1 bytes.");
+				static_assert(sizeof(flag) == 1, "sizeof(flag) is not 1 bytes.");
+
+				return (static_cast<uint8_t>(value) & flag) == flag;
+			}
+
+			template <typename T>
+			static inline T ClearBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+			{
+				static_assert(sizeof(T) == 1, "sizeof(T) is not 1 bytes.");
+				static_assert(sizeof(flag) == 1, "sizeof(flag) is not 1 bytes.");
+
+				return (static_cast<uint8_t>(value) & (~flag));
+			}
+
+			template <typename T>
+			static inline T SetBitFlag(T value, typename FlagType::bytetype<sizeof(T)>::type flag)
+			{
+				static_assert(sizeof(T) == 1, "sizeof(T) is not 1 bytes.");
+				static_assert(sizeof(flag) == 1, "sizeof(flag) is not 1 bytes.");
+
+				return (static_cast<uint8_t>(value) | flag);
+			}
+
+			/// Internal function used by bitUtil::IsBitSet.
+			template <typename T>
+			static inline bool IsBitSet(T value, unsigned int whichBit)
+			{
+				static_assert(sizeof(T) == 1, "sizeof(T) is not 1 bytes.");
+
+				return ((static_cast<uint8_t>(value) & (1u << whichBit)) != 0);
+			}
+
+			/// Internal function used by bitUtil::SetBit.
+			template <typename T>
+			static inline T SetBit(T value, unsigned int whichBit)
+			{
+				static_assert(sizeof(T) == 1, "sizeof(T) is not 1 bytes.");
+
+				return (static_cast<T>(static_cast<uint8_t>(value) | (1u << whichBit)));
+			}
+
+			/// Internal function used by bitUtil::ClearBit.
+			template <typename T>
+			static inline T ClearBit(T value, unsigned int whichBit)
+			{
+				static_assert(sizeof(T) == 1, "sizeof(T) is not 1 bytes.");
+
+				return (static_cast<T>(static_cast<uint8_t>(value) & (~(1u << whichBit))));
+			}
+
+			template<typename T>
+			static inline bool isSignBitSet(T value)
+			{
+				static_assert(sizeof(T) == 1, "sizeof(T) is not 1 bytes.");
+
+				return IsBitSet<T>(value, 7);
+			}
+
+			template<typename T>
+			static inline bool isSignBitNotSet(T value)
+			{
+				static_assert(sizeof(T) == 1, "sizeof(T) is not 1 bytes.");
+
+				return IsBitSet<T>(value, 7) == false;
+			}
+
 		};
 	}
 
