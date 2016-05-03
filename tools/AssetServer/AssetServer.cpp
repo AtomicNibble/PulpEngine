@@ -292,7 +292,7 @@ bool AssetServer::Client::sendRequestFail(std::string& errMsg)
 
 	ProtoBuf::AssetDB::Reponse response;
 	response.set_error(errMsg);
-	response.set_result(ProtoBuf::AssetDB::Reponse_Result_FAIL);
+	response.set_result(ProtoBuf::AssetDB::Reponse_Result_ERROR);
 
 	google::protobuf::io::ArrayOutputStream arrayOutput(buffer, bufLength);
 	if (!WriteDelimitedTo(response, &arrayOutput)) {

@@ -17,7 +17,7 @@ enum AssetType {
 }
 
 message Reponse {
-    enum Result { OK = 1; FAIL = 2; UNCHANGED = 3; }
+    enum Result { OK = 1; NOT_FOUND = 2; NAME_TAKEN = 3; UNCHANGED = 4; ERROR = 5; }
 
     required Result result = 1;
     required string error = 2;

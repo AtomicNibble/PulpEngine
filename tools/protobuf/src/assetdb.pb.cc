@@ -216,26 +216,27 @@ void protobuf_AddDesc_assetdb_2eproto() {
 
   ::google::protobuf::DescriptorPool::InternalAddGeneratedFile(
     "\n\rassetdb.proto\022\027Potato.ProtoBuf.AssetDB"
-    "\"|\n\007Reponse\0227\n\006result\030\001 \002(\0162\'.Potato.Pro"
-    "toBuf.AssetDB.Reponse.Result\022\r\n\005error\030\002 "
-    "\002(\t\")\n\006Result\022\006\n\002OK\020\001\022\010\n\004FAIL\020\002\022\r\n\tUNCHA"
-    "NGED\020\003\"J\n\010AddAsset\022\014\n\004name\030\001 \002(\t\0220\n\004type"
-    "\030\002 \002(\0162\".Potato.ProtoBuf.AssetDB.AssetTy"
-    "pe\"M\n\013DeleteAsset\022\014\n\004name\030\001 \002(\t\0220\n\004type\030"
-    "\002 \002(\0162\".Potato.ProtoBuf.AssetDB.AssetTyp"
-    "e\"^\n\013RenameAsset\022\014\n\004name\030\001 \002(\t\022\017\n\007newNam"
-    "e\030\002 \002(\t\0220\n\004type\030\003 \002(\0162\".Potato.ProtoBuf."
-    "AssetDB.AssetType\"m\n\013UpdateAsset\022\014\n\004name"
-    "\030\001 \002(\t\0220\n\004type\030\002 \002(\0162\".Potato.ProtoBuf.A"
-    "ssetDB.AssetType\022\014\n\004args\030\003 \001(\t\022\020\n\010dataSi"
-    "ze\030\004 \001(\r\"\347\001\n\007Request\0220\n\003add\030\001 \001(\0132!.Pota"
-    "to.ProtoBuf.AssetDB.AddAssetH\000\0223\n\003del\030\002 "
-    "\001(\0132$.Potato.ProtoBuf.AssetDB.DeleteAsse"
-    "tH\000\0226\n\006rename\030\003 \001(\0132$.Potato.ProtoBuf.As"
-    "setDB.RenameAssetH\000\0226\n\006update\030\004 \001(\0132$.Po"
-    "tato.ProtoBuf.AssetDB.UpdateAssetH\000B\005\n\003m"
-    "sg*7\n\tAssetType\022\t\n\005MODEL\020\001\022\010\n\004ANIM\020\002\022\014\n\010"
-    "MATERIAL\020\003\022\007\n\003IMG\020\004", 819);
+    "\"\234\001\n\007Reponse\0227\n\006result\030\001 \002(\0162\'.Potato.Pr"
+    "otoBuf.AssetDB.Reponse.Result\022\r\n\005error\030\002"
+    " \002(\t\"I\n\006Result\022\006\n\002OK\020\001\022\r\n\tNOT_FOUND\020\002\022\016\n"
+    "\nNAME_TAKEN\020\003\022\r\n\tUNCHANGED\020\004\022\t\n\005ERROR\020\005\""
+    "J\n\010AddAsset\022\014\n\004name\030\001 \002(\t\0220\n\004type\030\002 \002(\0162"
+    "\".Potato.ProtoBuf.AssetDB.AssetType\"M\n\013D"
+    "eleteAsset\022\014\n\004name\030\001 \002(\t\0220\n\004type\030\002 \002(\0162\""
+    ".Potato.ProtoBuf.AssetDB.AssetType\"^\n\013Re"
+    "nameAsset\022\014\n\004name\030\001 \002(\t\022\017\n\007newName\030\002 \002(\t"
+    "\0220\n\004type\030\003 \002(\0162\".Potato.ProtoBuf.AssetDB"
+    ".AssetType\"m\n\013UpdateAsset\022\014\n\004name\030\001 \002(\t\022"
+    "0\n\004type\030\002 \002(\0162\".Potato.ProtoBuf.AssetDB."
+    "AssetType\022\014\n\004args\030\003 \001(\t\022\020\n\010dataSize\030\004 \001("
+    "\r\"\347\001\n\007Request\0220\n\003add\030\001 \001(\0132!.Potato.Prot"
+    "oBuf.AssetDB.AddAssetH\000\0223\n\003del\030\002 \001(\0132$.P"
+    "otato.ProtoBuf.AssetDB.DeleteAssetH\000\0226\n\006"
+    "rename\030\003 \001(\0132$.Potato.ProtoBuf.AssetDB.R"
+    "enameAssetH\000\0226\n\006update\030\004 \001(\0132$.Potato.Pr"
+    "otoBuf.AssetDB.UpdateAssetH\000B\005\n\003msg*7\n\tA"
+    "ssetType\022\t\n\005MODEL\020\001\022\010\n\004ANIM\020\002\022\014\n\010MATERIA"
+    "L\020\003\022\007\n\003IMG\020\004", 852);
   ::google::protobuf::MessageFactory::InternalRegisterGeneratedFile(
     "assetdb.proto", &protobuf_RegisterTypes);
   Reponse::default_instance_ = new Reponse();
@@ -288,6 +289,8 @@ bool Reponse_Result_IsValid(int value) {
     case 1:
     case 2:
     case 3:
+    case 4:
+    case 5:
       return true;
     default:
       return false;
@@ -296,8 +299,10 @@ bool Reponse_Result_IsValid(int value) {
 
 #ifndef _MSC_VER
 const Reponse_Result Reponse::OK;
-const Reponse_Result Reponse::FAIL;
+const Reponse_Result Reponse::NOT_FOUND;
+const Reponse_Result Reponse::NAME_TAKEN;
 const Reponse_Result Reponse::UNCHANGED;
+const Reponse_Result Reponse::ERROR;
 const Reponse_Result Reponse::Result_MIN;
 const Reponse_Result Reponse::Result_MAX;
 const int Reponse::Result_ARRAYSIZE;
