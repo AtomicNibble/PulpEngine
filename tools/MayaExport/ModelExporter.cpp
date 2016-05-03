@@ -307,7 +307,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 				);
 
 				if (!status) {
-					X_ERROR("Model", "Failed to connect to server to update AssetDB");
+					X_ERROR("Model", "Failed update AssetDB");
 					return status;
 				}
 			}
