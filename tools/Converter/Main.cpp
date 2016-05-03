@@ -6,7 +6,7 @@
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
 #include <Platform\Console.h>
-
+#include <Time\StopWatch.h>
 
 #define _LAUNCHER
 #include <ModuleExports.h>
@@ -129,9 +129,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 			con.PrintBanner();
 
 			if (GetAssetType(assType) && GetAssetName(assName)) {
+
+				core::StopWatch timer;
+
 				if (!con.Convert(assType, assName)) {
 					X_ERROR("Convert", "Conversion falid..");
 				}
+
+				X_LOG0("Convert", "Elapsed time: ^6%gms", timer.GetMilliSeconds());
 			}
 
 			Console.PressToContinue();

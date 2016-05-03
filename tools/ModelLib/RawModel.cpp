@@ -97,6 +97,13 @@ namespace RawModel
 		return ParseRawModel(lex);
 	}
 
+	bool Model::LoadRawModel(const core::Array<uint8_t>& data)
+	{
+		core::XLexer lex(reinterpret_cast<const char*>(data.begin()), reinterpret_cast<const char*>(data.end()));
+
+		return ParseRawModel(lex);
+	}
+
 	bool Model::ParseRawModel(core::XLexer& lex)
 	{
 		int32_t version, numLods, numBones;

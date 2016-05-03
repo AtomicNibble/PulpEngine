@@ -111,6 +111,7 @@ public:
 	{
 	public:
 		typedef core::StackString<60> NameString;
+		typedef core::Array<Mesh> MeshArr;
 		typedef core::Array<Vert> VertsArr;
 		typedef core::Array<RawModel::Face> FaceArr;
 
@@ -127,6 +128,7 @@ public:
 		VertsArr verts_;
 		FaceArr faces_;
 		Binds binds_;
+		MeshArr colMeshes_;
 
 		RawModel::Material material_;
 		AABB boundingBox_;
@@ -181,8 +183,8 @@ public:
 	CompileFlags getFlags(void) const;
 
 
-	bool CompileModel(core::Path<char>& outFile);
-	bool CompileModel(core::Path<wchar_t>& outFile);
+	bool CompileModel(const core::Path<char>& outFile);
+	bool CompileModel(const core::Path<wchar_t>& outFile);
 
 
 private:
@@ -194,6 +196,7 @@ private:
 	size_t calculateBoneDataSize(void) const;
 
 	bool ProcessModel(void);
+	bool PrcoessCollisionMeshes(void);
 	bool DropWeights(void);
 	bool MergMesh(void);
 	bool CreateData(void);
@@ -216,6 +219,8 @@ private:
 	static void CreateDataJob(CreateDataJobData* pData, size_t count);
 
 	static size_t getBatchSize(size_t elementSizeBytes);
+	static bool isColisionMesh(const RawModel::Mesh::NameString& name);
+	static RawModel::Mesh::NameString StripColisionPrefix(const RawModel::Mesh::NameString& name);
 
 private:
 	core::V2::JobSystem* pJobSys_;

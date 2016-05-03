@@ -44,7 +44,7 @@ global proc potato_SelectAllMeshInScene()
 
 global proc int assetDB_add(string $type, string $name)
 {
-	if(getExportMode() == "RawModel") { // don't ask db in raw mode.
+	if(getExportMode() == "Raw") { // don't ask db in raw mode.
 		return 0;
 	}
 
@@ -62,7 +62,7 @@ global proc int assetDB_add(string $type, string $name)
 
 global proc int assetDB_rename(string $type, string $old_name, string $newName)
 {
-	if(getExportMode() == "RawModel") { // don't ask db in raw mode.
+	if(getExportMode() == "Raw") { // don't ask db in raw mode.
 		return 0;
 	}
 
@@ -81,7 +81,7 @@ global proc int assetDB_rename(string $type, string $old_name, string $newName)
 
 global proc int assetDB_remove(string $type, string $name)
 {
-	if(getExportMode() == "RawModel") { // don't ask db in raw mode.
+	if(getExportMode() == "Raw") { // don't ask db in raw mode.
 		return 0;
 	}
 
@@ -168,6 +168,11 @@ global proc string getExportMode() {
 	if(int(`size $exportMode`) < 1) {
 		return "server";
 	}
+
+	if($exportMode == "RawModel") {
+		$exportMode = "Raw";
+	}
+
   	return $exportMode;
 }
 
@@ -1194,7 +1199,7 @@ global proc potato_CreateExportWindow( string $name )
 
 					optionMenuGrp -l "Export Mode" -p setcolLayout2  -cc exportModeUpdate exportModeCntrl;
 						menuItem -label "Server";
-						menuItem -label "RawModel";
+						menuItem -label "Raw";
 
 					string $exportMode = getExportMode();
 					optionMenuGrp -e -v $exportMode exportModeCntrl;

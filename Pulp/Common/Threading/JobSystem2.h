@@ -49,14 +49,27 @@ typedef core::traits::Function<void(JobSystem&, size_t, Job*, void*)> JobFunctio
 
 struct Job
 {
-	static const size_t MAX_CONTINUATIONS = 7;
+	static const size_t THREAD_IDX_BITS = 4; // 16 threads
+	static const size_t JOB_IDX_BITS = 12;  // 4096
+
+	X_PACK_PUSH(2)
+	struct JobId
+	{
+		uint16_t threadIdx : THREAD_IDX_BITS;
+		uint16_t jobIdx : JOB_IDX_BITS;
+	};
+	X_PACK_POP
+	X_ENSURE_SIZE(JobId, 2);
+
+	static const size_t MAX_CONTINUATIONS = 8;
 	static const size_t PAD_SIZE = (128 - 
 		(sizeof(JobFunction::Pointer) 
 		+ sizeof(Job*)
 		+ sizeof(void*)
 		+ (sizeof(core::AtomicInt) * 2)
-		+ (sizeof(Job*) * MAX_CONTINUATIONS) 
-		+ sizeof(uint32_t)));
+		+ (sizeof(JobId) * MAX_CONTINUATIONS)
+		+ sizeof(uint8_t)));
+
 public:
 	core::AtomicInt unfinishedJobs;
 	core::AtomicInt continuationCount;
@@ -69,8 +82,8 @@ public:
 		char pad[PAD_SIZE];
 	};
 
-	uint32_t runFlags;
-	Job* continuations[MAX_CONTINUATIONS];
+	uint8_t runFlags;
+	JobId continuations[MAX_CONTINUATIONS];
 };
 
 X_ENSURE_SIZE(Job, 128);
@@ -78,7 +91,9 @@ X_ENSURE_SIZE(Job, 128);
 X_DISABLE_WARNING(4324)
 X_ALIGNED_SYMBOL(class ThreadQue, 64)
 {
-	static const unsigned int MAX_NUMBER_OF_JOBS = 1 << 16;
+public:
+	static const unsigned int MAX_NUMBER_OF_JOBS = 1 << 12;
+private:
 	static const unsigned int MASK = MAX_NUMBER_OF_JOBS - 1u;
 
 public:
@@ -137,17 +152,6 @@ public:
 private:
 	size_t size_;
 };
-
-X_INLINE void AddContinuation(Job* ancestor, Job* continuation, bool runInline = false)
-{
-	const int32_t count = (++ancestor->continuationCount - 1);
-	X_ASSERT(count < Job::MAX_CONTINUATIONS, "Can't add conitnation, list is full")(Job::MAX_CONTINUATIONS, count);
-	ancestor->continuations[count] = continuation;
-
-	if (runInline) {
-		ancestor->runFlags = core::bitUtil::SetBit(ancestor->runFlags, count);
-	}
-}
 
 template <typename JobData>
 static inline void parallel_for_job(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
@@ -287,6 +291,9 @@ public:
 	// 68kb(72kb x64) per 1024 jobs per thread
 	// so for 4096 jobs with 6 threads it's: 1728kb ~1.7mb
 	static const size_t MEMORY_PER_THREAD = (MAX_JOBS * sizeof(Job)) + (MAX_JOBS * sizeof(Job*));
+
+	static_assert(ThreadQue::MAX_NUMBER_OF_JOBS == MAX_JOBS, "ThreadQue max jobs is not equal");
+
 public:
 	JobSystem();
 	~JobSystem();
@@ -325,6 +332,7 @@ public:
 	X_INLINE Job* CreateJobMemberFunc(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, 
 		void* pJobData);
 
+	X_INLINE void AddContinuation(Job* ancestor, Job* continuation, bool runInline = false);
 
 	void Run(Job* pJob);
 	void Wait(Job* pJob);

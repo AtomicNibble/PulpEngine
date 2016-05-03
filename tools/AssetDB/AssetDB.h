@@ -54,14 +54,18 @@ public:
 
 	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
 
-	bool GetArgsForAsset(int32_t id, core::string& argsOut);
-	bool GetArgsHashForAsset(int32_t id, uint32_t& argsHashOut);
+	bool GetArgsForAsset(int32_t assetId, core::string& argsOut);
+	bool GetArgsHashForAsset(int32_t idassetId, uint32_t& argsHashOut);
+
+	bool GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& dataOut);
+
 
 private:
 	bool GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId = nullptr);
 
 	static const char* AssetTypeRawFolder(AssetType::Enum type);
 	static void AssetPathForName(AssetType::Enum type, const core::string& name, core::Path<char>& pathOut);
+	static void AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut);
 
 private:
 	sql::SqlLiteDb db_;

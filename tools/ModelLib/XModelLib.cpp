@@ -17,36 +17,22 @@ XModelLib::~XModelLib()
 
 }
 
-bool XModelLib::Convert(ConvertArgs& args)
+bool XModelLib::Convert(ConvertArgs& args, const core::Array<uint8_t>& fileData, 
+	const OutPath& destPath)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pJobSys);
 
-	core::Path<char> rawModelPath;
-	core::Path<char> destPath;
 	ModelCompiler::CompileFlags flags;
-
 
 	core::json::Document d;
 	d.Parse(args.c_str());
 
-	if (d.HasMember("raw_model")) {
-		rawModelPath = d["raw_model"].GetString();
-	}
-	if (d.HasMember("dest")) {
-		destPath = d["dest"].GetString();
-	}
 
-	if (rawModelPath.isEmpty()) {
-		X_ERROR("ModelLib", "Missing 'raw_model' option");
-	}
-	if (destPath.isEmpty()) {
-		X_ERROR("ModelLib", "Missing 'dest' option");
-	}
-	if (rawModelPath.isEmpty() || destPath.isEmpty()) {
+	if (fileData.isEmpty()) {
+		X_ERROR("ModelLib", "File data is empty");
 		return false;
 	}
-
 
 	if (d.HasMember("zero_origin")) {
 		if (d["zero_origin"].GetBool()) {
@@ -91,7 +77,7 @@ bool XModelLib::Convert(ConvertArgs& args)
 		model.SetScale(d["vert_merge_thresh"].GetFloat());
 	}
 
-	if (!model.LoadRawModel(rawModelPath)) {
+	if (!model.LoadRawModel(fileData)) {
 		return false;
 	}
 

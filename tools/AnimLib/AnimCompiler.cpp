@@ -312,6 +312,7 @@ AnimCompiler::AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter,
 	arena_(arena),
 	inter_(inter),
 	skelton_(skelton),
+	type_(AnimType::RELATIVE),
 	bones_(arena)
 {
 
@@ -323,13 +324,33 @@ AnimCompiler::~AnimCompiler()
 
 }
 
-bool AnimCompiler::compile(core::Path<char>& filePath, const float posError, const float angError)
+void AnimCompiler::setLooping(bool loop)
+{
+	if (loop) {
+		flags_.Set(CompileFlag::LOOPING);
+	}
+	else {
+		flags_.Remove(CompileFlag::LOOPING);
+	}
+}
+
+void AnimCompiler::setAnimType(AnimType::Enum type)
+{
+	type_ = type;
+}
+
+bool AnimCompiler::compile(const core::Path<char>& filePath, const float posError, const float angError)
 {
 	return compile(core::Path<wchar_t>(filePath), posError, angError);
 }
 
-bool AnimCompiler::compile(core::Path<wchar_t>& path, const float posError, const float angError)
+bool AnimCompiler::compile(const core::Path<wchar_t>& path, const float posError, const float angError)
 {
+	if (type_ != AnimType::RELATIVE) {
+		X_ERROR("Anim", "Compiling of none relative animations is not yet supported");
+		return false;
+	}
+
 	// got any bones in the inter?
 	if (inter_.getNumBones() < 1) {
 		X_WARNING("Anim", "skipping compile of anim, source inter anim has no bones");
@@ -368,34 +389,34 @@ bool AnimCompiler::compile(core::Path<wchar_t>& path, const float posError, cons
 	return save(path);
 }
 
-bool AnimCompiler::save(core::Path<wchar_t>& path)
+bool AnimCompiler::save(const core::Path<wchar_t>& path)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-	path.setExtension(anim::ANIM_FILE_EXTENSION_W);
+	core::Path<wchar_t> fullPath(path);
+	fullPath.setExtension(anim::ANIM_FILE_EXTENSION_W);
 
 	core::fileModeFlags mode;
 	mode.Set(core::fileMode::RECREATE);
 	mode.Set(core::fileMode::WRITE);
 
 	core::XFileScoped file;
-	if (!file.openFile(path.c_str(), mode)) {
+	if (!file.openFile(fullPath.c_str(), mode)) {
 		X_ERROR("Anim", "Failed to open output file for compiled animation: \"%s\"",
-			path.c_str());
+			fullPath.c_str());
 		return false;
 	}
 
-	const bool loop = false;
 
 	anim::AnimHeader hdr;
 	hdr.version = anim::ANIM_VERSION;
 
-	if (loop) {
+	if (flags_.IsSet(CompileFlag::LOOPING)) {
 		hdr.flags.Set(AnimFlag::LOOP);
 	}
 
-	hdr.type = AnimType::RELATIVE;
+	hdr.type = type_;
 	hdr.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
 	hdr.numFrames = safe_static_cast<uint16_t, uint32_t>(inter_.getNumFrames());
 	hdr.fps = safe_static_cast<uint16_t, uint32_t>(inter_.getFps());

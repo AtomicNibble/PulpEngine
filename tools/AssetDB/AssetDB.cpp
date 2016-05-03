@@ -5,6 +5,12 @@
 #include <Hashing\crc32.h>
 
 #include <IFileSys.h>
+#include <ICompression.h>
+
+#include <Compression\LZ4.h>
+#include <Compression\Lzma2.h>
+#include <Compression\Zlib.h>
+
 
 X_LINK_LIB("engine_SqLite")
 
@@ -178,6 +184,14 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 			AssetPathForName(type, newName, newFilePath);
 			AssetPathForName(type, rawData.path, oldFilePath);
 
+
+			// make sure dir tree for new name is valid.
+			if (!gEnv->pFileSys->createDirectoryTree(newFilePath.c_str())) {
+				X_ERROR("AssetDB", "Failed to create dir to move raw asset");
+				return Result::ERROR;
+			}
+
+
 			// if this fails, we return and the update is not commited.
 			if (!gEnv->pFileSys->moveFile(oldFilePath.c_str(), newFilePath.c_str())) {
 				X_ERROR("AssetDB", "Failed to move asset raw file");
@@ -272,8 +286,11 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 
 			AssetPathForName(type, name, filePath);
 
-			// set path as just the name.
-			path = name;
+			// path include folder, so don't need type to load it.
+			path = AssetTypeRawFolder(type);
+			path.toLower();
+			path.ensureSlash();
+			path /= name;
 
 			if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
 				X_ERROR("AssetDB", "Failed to create dir to save raw asset");
@@ -417,6 +434,61 @@ bool AssetDB::GetArgsHashForAsset(int32_t assetId, uint32_t& argsHashOut)
 	return true;
 }
 
+bool AssetDB::GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& dataOut)
+{
+	using namespace core::Compression;
+
+	RawFile raw;
+
+	if (!GetRawfileForId(assetId, raw)) {
+		X_ERROR("AssetDB", "Failed to get rawfile info for data reterival");
+		return false;
+	}
+
+	// load the file.
+	core::XFileScoped file;
+	core::fileModeFlags mode;
+	core::Path<char> filePath;
+
+	mode.Set(core::fileMode::READ);
+	mode.Set(core::fileMode::SHARE);
+
+	AssetPathForRawFile(raw, filePath);
+
+	if (!file.openFile(filePath.c_str(), mode)) {
+		X_ERROR("AssetDB", "Failed to open rawfile");
+		return false;
+	}
+
+	size_t size = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
+
+	core::Array<uint8_t> compressedData(g_AssetDBArena);
+	compressedData.resize(size);
+
+	if (file.read(compressedData.ptr(), size) != size) {
+		X_ERROR("AssetDB", "Failed to read rawfile contents");
+		return false;
+	}
+
+	// decompress it.
+	Algo::Enum algo = ICompressor::getAlgo(compressedData);
+
+	if (algo == Algo::LZ4) {
+		Compressor<LZ4> def;
+		return def.inflate(g_AssetDBArena, compressedData, dataOut);
+	}
+	else if (algo == Algo::LZMA) {
+		Compressor<LZMA> def;
+		return def.inflate(g_AssetDBArena, compressedData, dataOut);
+	}
+	else if (algo == Algo::ZLIB) {
+		Compressor<Zlib> def;
+		return def.inflate(g_AssetDBArena, compressedData, dataOut);
+	}
+
+	X_ERROR("AssetDB", "Failed to read rawfile, unkown compression algo");
+	return false;
+}
 
 bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
 {
@@ -443,6 +515,7 @@ bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
 		dataOut.path.clear();
 	}
 
+	dataOut.file_id = (*it).get<int32_t>(0);
 	dataOut.hash = static_cast<uint32_t>((*it).get<int32_t>(2));
 	return true;
 }
@@ -463,6 +536,17 @@ void AssetDB::AssetPathForName(AssetType::Enum type, const core::string& name, c
 	pathOut.ensureSlash();
 	pathOut /= name;
 }
+
+void AssetDB::AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut)
+{
+	pathOut = ASSET_DB_FOLDER;
+	pathOut.ensureSlash();
+	pathOut /= RAW_FILES_FOLDER;
+	pathOut.ensureSlash();
+	pathOut /= raw.path;
+}
+
+
 
 
 X_NAMESPACE_END

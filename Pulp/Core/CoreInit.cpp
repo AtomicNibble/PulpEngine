@@ -110,12 +110,7 @@ WIN_HMODULE XCore::LoadDLL(const char *dllName)
 
 bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName)
 {
-#if defined(X_LIB)
-	X_UNUSED(pDllName);
-	X_UNUSED(pModuleClassName);
-	return false;
-#else
-
+#if !defined(X_LIB)
 	HMODULE handle = PotatoGetLibaryHandleA(pDllName);
 
 	ModuleLinkfunc::Pointer pfnModuleInitISystem = reinterpret_cast<ModuleLinkfunc::Pointer>(
@@ -124,6 +119,8 @@ bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModul
 	if (pfnModuleInitISystem) {
 		pfnModuleInitISystem(this, pDllName);
 	}
+
+#endif
 
 	std::shared_ptr<IEngineModule> pModule;
 	if (PotatoCreateClassInstance(pModuleClassName, pModule))
@@ -140,7 +137,6 @@ bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModul
 	}
 
 	return true;
-#endif
 }
 
 bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassName, const SCoreInitParams &initParams)

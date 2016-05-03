@@ -556,7 +556,7 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 			MayaUtil::MayaPrintWarning("failed to get export mode");
 		}
 		else {
-			if (core::strUtil::IsEqualCaseInsen(modeStr.asChar(), "RawModel")) {
+			if (core::strUtil::IsEqualCaseInsen(modeStr.asChar(), "Raw")) {
 				exportMode_ = ExpoMode::RAW;
 			}
 			else if (core::strUtil::IsEqualCaseInsen(modeStr.asChar(), "Server")) {
