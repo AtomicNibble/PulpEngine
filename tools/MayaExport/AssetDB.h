@@ -24,7 +24,7 @@ X_NAMESPACE_BEGIN(maya)
 class AssetDB
 {
 public:
-	X_DECLARE_ENUM(AssetType)(MODEL, ANIM, MATERIAL);
+	X_DECLARE_ENUM(AssetType)(MODEL, ANIM, MATERIAL, IMG);
 
 public:
 	AssetDB();

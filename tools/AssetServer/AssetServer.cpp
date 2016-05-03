@@ -107,6 +107,9 @@ namespace
 		case ProtoBuf::AssetDB::AssetType::MATERIAL:
 			typeOut = assetDb::AssetDB::AssetType::MATERIAL;
 			break;
+		case ProtoBuf::AssetDB::AssetType::IMG:
+			typeOut = assetDb::AssetDB::AssetType::IMG;
+			break;
 		default:
 			X_ASSERT_UNREACHABLE();
 			return false;

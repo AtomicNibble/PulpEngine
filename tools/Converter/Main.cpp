@@ -67,6 +67,10 @@ namespace
 			{
 				assType = converter::AssetType::MATERIAL;
 			}
+			else if (core::strUtil::IsEqualCaseInsen(pAssetType, L"img"))
+			{
+				assType = converter::AssetType::IMG;
+			}
 			else
 			{		
 				X_ERROR("Converter", "Unknown asset type: \"%ls\"", pAssetType);

@@ -25,7 +25,7 @@ class DLL_EXPORT AssetDB
 	};
 
 public:
-	X_DECLARE_ENUM(AssetType)(MODEL, ANIM, MATERIAL);
+	X_DECLARE_ENUM(AssetType)(MODEL, ANIM, MATERIAL, IMG);
 	X_DECLARE_ENUM(Result)(
 		OK, 
 		NOT_FOUND,

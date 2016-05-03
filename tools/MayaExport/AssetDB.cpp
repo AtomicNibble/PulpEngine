@@ -106,6 +106,8 @@ namespace
 			return ProtoBuf::AssetDB::MODEL;
 		case AssetDB::AssetType::MATERIAL:
 			return ProtoBuf::AssetDB::MATERIAL;
+		case AssetDB::AssetType::IMG:
+			return ProtoBuf::AssetDB::IMG;
 		default:
 			break;
 		}

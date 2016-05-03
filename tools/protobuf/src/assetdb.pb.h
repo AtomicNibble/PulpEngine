@@ -67,11 +67,12 @@ inline bool Reponse_Result_Parse(
 enum AssetType {
   MODEL = 1,
   ANIM = 2,
-  MATERIAL = 3
+  MATERIAL = 3,
+  IMG = 4
 };
 bool AssetType_IsValid(int value);
 const AssetType AssetType_MIN = MODEL;
-const AssetType AssetType_MAX = MATERIAL;
+const AssetType AssetType_MAX = IMG;
 const int AssetType_ARRAYSIZE = AssetType_MAX + 1;
 
 const ::google::protobuf::EnumDescriptor* AssetType_descriptor();

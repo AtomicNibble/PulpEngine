@@ -13,6 +13,7 @@ enum AssetType {
     MODEL = 1;
     ANIM = 2;
     MATERIAL = 3;
+    IMG = 4;
 }
 
 message Reponse {
