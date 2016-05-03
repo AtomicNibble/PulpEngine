@@ -24,7 +24,8 @@ namespace RawModel
 	Model::Model(core::MemoryArenaBase* arena, core::V2::JobSystem* pJobSys) :
 		pJobSys_(pJobSys),
 		arena_(arena),
-		bones_(arena)
+		bones_(arena),
+		hasColisionMeshes_(false)
 	{
 
 	}
@@ -33,6 +34,7 @@ namespace RawModel
 	{
 		bones_.clear();
 		lods_.clear();
+		hasColisionMeshes_ = false;
 	}
 
 	bool Model::LoadRawModel(core::Path<wchar_t>& path)
@@ -55,6 +57,11 @@ namespace RawModel
 		}
 
 		return num;
+	}
+
+	bool Model::hasColMeshes(void) const
+	{
+		return hasColisionMeshes_;
 	}
 
 
@@ -149,6 +156,14 @@ namespace RawModel
 			return false;
 		}
 
+		for (auto lod : lods_) {
+			for (auto mesh : lod.meshes_) {
+				if (isColisionMesh(mesh.displayName_)) {
+					hasColisionMeshes_ = true;
+					break;
+				}
+			}
+		}
 
 		return true;
 	}
@@ -843,6 +858,42 @@ namespace RawModel
 		pCurBuf->appendFmt("REFLECTIVECOL (%f %f %f %f)\n", reflectiveCol.r, reflectiveCol.g, reflectiveCol.b, reflectiveCol.a);
 		pCurBuf->append("\n");
 		return true;
+	}
+
+	bool Model::isColisionMesh(const RawModel::Mesh::NameString& name)
+	{
+		const char* pFind = nullptr;
+
+		// PBX_ * _ *
+		if ((pFind = name.find(MODEL_MESH_COL_BOX_PREFIX)) != nullptr)
+		{
+			if (pFind != name.begin()) {
+				goto ignore;
+			}
+			return true;
+		}
+		// PSP_ * _ *
+		if ((pFind = name.find(MODEL_MESH_COL_SPHERE_PREFIX)) != nullptr)
+		{
+			if (pFind != name.begin()) {
+				goto ignore;
+			}
+			return true;
+		}
+		// PCX_ * _ *
+		if ((pFind = name.find(MODEL_MESH_COL_CONVEX_PREFIX)) != nullptr)
+		{
+			if (pFind != name.begin()) {
+				goto ignore;
+			}
+			return true;
+		}
+
+		return false;
+
+	ignore:
+		X_WARNING("Model", "Mesh name \"%s\" contains collision prefix that is not leading, ignoring", name.c_str());
+		return false;
 	}
 
 } // namespace RawModel

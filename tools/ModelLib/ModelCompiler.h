@@ -219,7 +219,7 @@ private:
 	static void CreateDataJob(CreateDataJobData* pData, size_t count);
 
 	static size_t getBatchSize(size_t elementSizeBytes);
-	static bool isColisionMesh(const RawModel::Mesh::NameString& name);
+	// static bool isColisionMesh(const RawModel::Mesh::NameString& name);
 	static RawModel::Mesh::NameString StripColisionPrefix(const RawModel::Mesh::NameString& name);
 
 private:

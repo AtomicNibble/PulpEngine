@@ -1032,16 +1032,17 @@ bool ModelCompiler::MergMesh(void)
 		return true;
 	}
 
+	if (hasColMeshes()) {
+		X_LOG2("Model", "Skipping mesh merge, col meshes present.");
+		return true;
+	}
+
 	// mesh with same materials can be merged.
 	for (auto& lod : lods_)
 	{
 		for (size_t j = 0; j < lod.meshes_.size(); j++)
 		{
 			auto& mesh = lod.meshes_[j];
-
-			if (isColisionMesh(mesh.name_)) {
-				continue;
-			}
 
 			for (size_t i = 0; i < lod.meshes_.size(); i++)
 			{
@@ -1803,42 +1804,6 @@ size_t ModelCompiler::getBatchSize(size_t elementSizeBytes)
 	}
 
 	return batchSize;
-}
-
-bool ModelCompiler::isColisionMesh(const RawModel::Mesh::NameString& name)
-{
-	const char* pFind = nullptr;
-
-	// PBX_ * _ *
-	if ((pFind = name.find(MODEL_MESH_COL_BOX_PREFIX)) != nullptr)
-	{
-		if (pFind != name.begin()) {
-			goto ignore;
-		}
-		return true;
-	}
-	// PSP_ * _ *
-	if ((pFind = name.find(MODEL_MESH_COL_SPHERE_PREFIX)) != nullptr)
-	{
-		if (pFind != name.begin()) {
-			goto ignore;
-		}
-		return true;
-	}
-	// PCX_ * _ *
-	if ((pFind = name.find(MODEL_MESH_COL_CONVEX_PREFIX)) != nullptr)
-	{
-		if (pFind != name.begin()) {
-			goto ignore;
-		}
-		return true;
-	}
-
-	return false;
-
-ignore:
-	X_WARNING("Model", "Mesh name \"%s\" contains collision prefix that is not leading, ignoring", name.c_str());
-	return false;
 }
 
 RawModel::Mesh::NameString ModelCompiler::StripColisionPrefix(const RawModel::Mesh::NameString& colMeshName)

@@ -52,6 +52,7 @@ namespace RawModel
 		bool SaveRawModel(core::Array<uint8_t>& data);
 
 		size_t totalMeshes(void) const;
+		bool hasColMeshes(void) const;
 
 	private:
 
@@ -72,6 +73,9 @@ namespace RawModel
 		static bool WriteMesh(ModelDataStrArr& arr, const Mesh& mesh, core::MemoryArenaBase* arena);
 		bool WriteMaterials(ModelDataStrArr& arr, const Material& mat) const;
 		
+	protected:
+		static bool isColisionMesh(const RawModel::Mesh::NameString& name);
+
 	private:
 
 		struct MeshWriteData
@@ -99,6 +103,8 @@ namespace RawModel
 
 		BoneArr bones_;
 		LodArr lods_;
+
+		bool hasColisionMeshes_;
 	};
 
 } // namespace RawModel
