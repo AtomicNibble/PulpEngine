@@ -150,7 +150,7 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 		time.setValue(curFrame);
 		MAnimControl::setCurrentTime(time);
 
-		MayaUtil::MayaPrintMsg("Loading frame: %i", curFrame);
+		MayaUtil::MayaPrintVerbose("Loading frame: %i", curFrame);
 		{
 			MVector position;
 
@@ -192,7 +192,7 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 			}
 		}
 		MayaUtil::IncProcess();
-		MayaUtil::MayaPrintMsg("=========================");
+		MayaUtil::MayaPrintVerbose("=========================");
 
 		curFrame++;
 	}
