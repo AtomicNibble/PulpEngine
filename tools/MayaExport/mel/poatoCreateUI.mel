@@ -924,7 +924,10 @@ global proc AnimEntryExport(int $index)
 		print_Error("Can't export anim \"" + animGetName($index) + "\" has zero frames");
 		return;
 	}
-
+	if(int(`size $nodes`) < 1) {
+		print_Error("Can't export anim \"" + animGetName($index) + "\" has zero nodes");
+		return;
+	}
 	string $args;
 
 	$args += "Nodes \"" + $nodes + "\"";
