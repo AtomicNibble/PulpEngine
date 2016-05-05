@@ -33,6 +33,8 @@ struct Bone
 
 class PotatoAnimExporter
 {
+	X_DECLARE_ENUM(ExpoMode)(SERVER, RAW);
+
 public:
 	PotatoAnimExporter();
 	~PotatoAnimExporter();
@@ -65,6 +67,8 @@ private:
 
 	core::Path<char> fileName_;
 	core::Path<char> filePath_;
+
+	ExpoMode::Enum exportMode_;
 
 	MDagPathArray exportObjects_;
 	core::Array<Bone> bones_;

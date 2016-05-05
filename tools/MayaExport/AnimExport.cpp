@@ -23,7 +23,6 @@
 #include "Profiler.h"
 #include "AssetDB.h"
 
-
 X_NAMESPACE_BEGIN(maya)
 
 
@@ -210,43 +209,48 @@ MStatus PotatoAnimExporter::writeIntermidiate(void)
 
 	if (status)
 	{
-		// compress the data.
-		core::Array<uint8_t> compressed(g_arena);
-		bool changed = true;
-
-
-		core::Compression::Compressor<core::Compression::LZ4> comp;
-		if (!comp.deflate(g_arena, anim, compressed, core::Compression::CompressLevel::NORMAL))
+		if (exportMode_ == ExpoMode::SERVER)
 		{
-			X_ERROR("Anim", "Failed to defalte inter anim");
-			return MS::kFailure;
-		}
+			// compress the data.
+			core::Array<uint8_t> compressed(g_arena);
+			bool unChanged = false;
 
-		// hellllo asset server :D
-		status = maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::ANIM,
-			MString(fileName_.c_str()),
-			MString(),
-			compressed,
-			&changed
-		);
 
-		if (!status) {
-			X_ERROR("Anim", "Failed to connect to server to update AssetDB");
-			return status;
-		}
+			core::Compression::Compressor<core::Compression::LZ4> comp;
+			if (!comp.deflate(g_arena, anim, compressed, core::Compression::CompressLevel::NORMAL))
+			{
+				X_ERROR("Anim", "Failed to defalte inter anim");
+				return MS::kFailure;
+			}
 
-		// write the file.
-		FILE* f;
-		errno_t err = fopen_s(&f, filePath_.c_str(), "wb");
-		if (f)
-		{
-			fwrite(anim.begin(), 1, anim.size(), f);
-			fclose(f);
+			// hellllo asset server :D
+			status = maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::ANIM,
+				MString(fileName_.c_str()),
+				MString(),
+				compressed,
+				&unChanged
+			);
+
+			if (!status) {
+				X_ERROR("Anim", "Failed to connect to server to update AssetDB");
+				return status;
+			}
 		}
 		else
 		{
-			MayaUtil::MayaPrintError("Failed to open file for saving(%i): %s", err, filePath_.c_str());
-			return MS::kFailure;
+			// write the file.
+			FILE* f;
+			errno_t err = fopen_s(&f, filePath_.c_str(), "wb");
+			if (f)
+			{
+				fwrite(anim.begin(), 1, anim.size(), f);
+				fclose(f);
+			}
+			else
+			{
+				MayaUtil::MayaPrintError("Failed to open file for saving(%i): %s", err, filePath_.c_str());
+				return MS::kFailure;
+			}
 		}
 	}
 
@@ -463,6 +467,29 @@ MStatus PotatoAnimExporter::processArgs(const MArgList &args)
 	}
 	else {
 		MayaUtil::SetVerbose(false);
+	}
+
+	idx = args.flagIndex("mode");
+	if (idx != MArgList::kInvalidArgIndex) {
+		MString modeStr;
+		if (!args.get(++idx, modeStr)) {
+			MayaUtil::MayaPrintWarning("failed to get export mode");
+		}
+		else {
+			if (core::strUtil::IsEqualCaseInsen(modeStr.asChar(), "Raw")) {
+				exportMode_ = ExpoMode::RAW;
+			}
+			else if (core::strUtil::IsEqualCaseInsen(modeStr.asChar(), "Server")) {
+				exportMode_ = ExpoMode::SERVER;
+			}
+			else {
+				MayaUtil::MayaPrintWarning("Unknown export mode: \"%s\"",
+					modeStr.asChar());
+			}
+		}
+	}
+	else {
+		exportMode_ = ExpoMode::SERVER;
 	}
 
 	idx = args.flagIndex("dir");
