@@ -919,6 +919,7 @@ global proc AnimEntryExport(int $index)
 	int $start = `getAttr ("PotatoGNode.AnimStart" + $index)`;
 	int $end = `getAttr ("PotatoGNode.AnimEnd" + $index)`;
 	int $numFrames =  $end -  $start;
+	string $mode = getExportMode();
 
 	if($numFrames < 1) {
 		print_Error("Can't export anim \"" + animGetName($index) + "\" has zero frames");
@@ -933,6 +934,7 @@ global proc AnimEntryExport(int $index)
 	$args += "Nodes \"" + $nodes + "\"";
 	$args += " Start " + $start;
 	$args += " End " + $end;
+	$args += " -mode \"" + $mode + "\"";
 
 	// make the command
 	string $filename = animGetName($index);
