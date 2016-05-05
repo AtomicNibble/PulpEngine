@@ -245,7 +245,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 
 		// time to slap a goat!
 		core::Path<char> outPath = getFilePath();
-		bool changed = true;
+		bool unChanged = false;
 
 		if (exportMode_ == ExpoMode::RAW)
 		{
@@ -303,7 +303,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 					MString(getName()),
 					argsToJson(),
 					compressed,
-					&changed
+					&unChanged
 				);
 
 				if (!status) {
@@ -314,7 +314,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 			{
 				MayaUtil::SetProgressText("Compiling model");
 
-				if (changed)
+				if (!unChanged)
 				{
 					PROFILE_MAYA_NAME("Compile and save");
 
@@ -337,7 +337,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 
 		MayaUtil::SetProgressText("Complete");
 
-		if (exportMode_ == ExpoMode::SERVER && changed)
+		if (exportMode_ == ExpoMode::SERVER && !unChanged)
 		{
 			printStats();
 		}
