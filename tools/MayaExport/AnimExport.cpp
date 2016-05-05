@@ -457,6 +457,13 @@ MStatus PotatoAnimExporter::processArgs(const MArgList &args)
 		return status;
 	}
 
+	idx = args.flagIndex("verbose");
+	if (idx != MArgList::kInvalidArgIndex) {
+		MayaUtil::SetVerbose(true);
+	}
+	else {
+		MayaUtil::SetVerbose(false);
+	}
 
 	idx = args.flagIndex("dir");
 	if (idx != MArgList::kInvalidArgIndex) {
