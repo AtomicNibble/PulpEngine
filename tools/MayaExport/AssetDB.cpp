@@ -395,7 +395,7 @@ bool AssetDB::getResponse(ProtoBuf::AssetDB::Reponse& response)
 		return false;
 	}
 
-	if (response.result() != ProtoBuf::AssetDB::Reponse_Result_OK) {
+	if (response.result() == ProtoBuf::AssetDB::Reponse_Result_ERROR) {
 		const std::string err = response.error();
 		X_ERROR("AssetDB", "Request failed: %s", err.c_str());
 		return false;
