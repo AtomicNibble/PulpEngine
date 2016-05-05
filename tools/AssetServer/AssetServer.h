@@ -11,6 +11,7 @@ X_NAMESPACE_DECLARE(ProtoBuf,
 		class DeleteAsset;
 		class RenameAsset;
 		class UpdateAsset;
+		enum Reponse_Result;
 	}
 );
 
@@ -39,7 +40,7 @@ class AssetServer : public core::ThreadAbstract
 		bool AssetServer::Client::readBuf(core::Array<uint8_t>& buf, size_t size);
 
 		bool sendRequestFail(std::string& errMsg);
-		bool sendRequestOk(void);
+		bool sendRequestOk(ProtoBuf::AssetDB::Reponse_Result res);
 
 		bool writeAndFlushBuf(const uint8_t* pBuf, size_t len);
 
@@ -59,10 +60,10 @@ private:
 
 	core::Thread::ReturnValue ThreadRun(const core::Thread& thread) X_FINAL;
 
-	bool AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& errOut);
-	bool DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::string& errOut);
-	bool RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std::string& errOut);
-	bool UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core::Array<uint8_t>& data, std::string& errOut);
+	bool AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& errOut, ProtoBuf::AssetDB::Reponse_Result& res);
+	bool DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::string& errOut, ProtoBuf::AssetDB::Reponse_Result& res);
+	bool RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std::string& errOut, ProtoBuf::AssetDB::Reponse_Result& res);
+	bool UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core::Array<uint8_t>& data, std::string& errOut, ProtoBuf::AssetDB::Reponse_Result& res);
 
 private:
 	core::CriticalSection lock_;

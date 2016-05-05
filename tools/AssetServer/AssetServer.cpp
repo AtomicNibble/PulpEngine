@@ -119,6 +119,30 @@ namespace
 		return true;
 	}
 
+	ProtoBuf::AssetDB::Reponse_Result MapReturnType(assetDb::AssetDB::Result::Enum res)
+	{
+		switch (res)
+		{
+		case assetDb::AssetDB::Result::OK:
+			return ProtoBuf::AssetDB::Reponse_Result::Reponse_Result_OK;
+		case assetDb::AssetDB::Result::NAME_TAKEN:
+			return ProtoBuf::AssetDB::Reponse_Result::Reponse_Result_NAME_TAKEN;
+		case assetDb::AssetDB::Result::NOT_FOUND:
+			return ProtoBuf::AssetDB::Reponse_Result::Reponse_Result_NOT_FOUND;
+		case assetDb::AssetDB::Result::UNCHANGED:
+			return ProtoBuf::AssetDB::Reponse_Result::Reponse_Result_UNCHANGED;
+		case assetDb::AssetDB::Result::ERROR:
+			return ProtoBuf::AssetDB::Reponse_Result::Reponse_Result_ERROR;
+
+		default:
+			X_ASSERT_UNREACHABLE();
+			break;
+		}
+
+		return ProtoBuf::AssetDB::Reponse_Result::Reponse_Result_ERROR;
+	}
+
+
 } // namespace
 
 
@@ -170,6 +194,7 @@ bool AssetServer::Client::listen(void)
 
 		bool ok = false;
 		std::string err;
+		ProtoBuf::AssetDB::Reponse_Result res = ProtoBuf::AssetDB::Reponse_Result_ERROR;
 
 		// have the asset server do the work of hte request.
 		// it may also set hte error string to return extra info.
@@ -177,13 +202,13 @@ bool AssetServer::Client::listen(void)
 		switch (type)
 		{
 		case ProtoBuf::AssetDB::Request::kAdd:
-			ok = as_.AddAsset(request.add(), err);
+			ok = as_.AddAsset(request.add(), err, res);
 			break;
 		case ProtoBuf::AssetDB::Request::kDel:
-			ok = as_.DeleteAsset(request.del(), err);
+			ok = as_.DeleteAsset(request.del(), err, res);
 			break;
 		case ProtoBuf::AssetDB::Request::kRename:
-			ok = as_.RenameAsset(request.rename(), err);
+			ok = as_.RenameAsset(request.rename(), err, res);
 			break;
 		case ProtoBuf::AssetDB::Request::kUpdate:
 		{
@@ -199,7 +224,7 @@ bool AssetServer::Client::listen(void)
 					goto fail;
 				}
 			}
-			ok = as_.UpdateAsset(request.update(), buf, err);
+			ok = as_.UpdateAsset(request.update(), buf, err, res);
 		fail:;
 		}
 			break;
@@ -211,7 +236,7 @@ bool AssetServer::Client::listen(void)
 
 		// send response.
 		if (ok) {
-			if(!sendRequestOk()) {
+			if(!sendRequestOk(res)) {
 				break;
 			}
 		}
@@ -303,14 +328,14 @@ bool AssetServer::Client::sendRequestFail(std::string& errMsg)
 	return writeAndFlushBuf(buffer, safe_static_cast<size_t, int64_t>(arrayOutput.ByteCount()));
 }
 
-bool AssetServer::Client::sendRequestOk(void)
+bool AssetServer::Client::sendRequestOk(ProtoBuf::AssetDB::Reponse_Result res)
 {
 	const size_t bufLength = 0x200;
 	uint8_t buffer[bufLength];
 
 	ProtoBuf::AssetDB::Reponse response;
 	response.set_error("");
-	response.set_result(ProtoBuf::AssetDB::Reponse_Result_OK);
+	response.set_result(res);
 
 	google::protobuf::io::ArrayOutputStream arrayOutput(buffer, bufLength);
 	if (!WriteDelimitedTo(response, &arrayOutput)) {
@@ -413,7 +438,7 @@ core::Thread::ReturnValue AssetServer::ThreadRun(const core::Thread& thread)
 }
 
 
-bool AssetServer::AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& errOut)
+bool AssetServer::AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& errOut, ProtoBuf::AssetDB::Reponse_Result& res)
 {
 	// map type.
 	assetDb::AssetDB::AssetType::Enum type;
@@ -430,17 +455,11 @@ bool AssetServer::AddAsset(const ProtoBuf::AssetDB::AddAsset& add, std::string& 
 
 	core::CriticalSection::ScopedLock slock(lock_);
 
-	assetDb::AssetDB::Result::Enum res = db_.AddAsset(type, name);
-	if (res != assetDb::AssetDB::Result::OK) {
-		errOut = "Failed to add asset. Err: ";
-		errOut += assetDb::AssetDB::Result::ToString(res);
-		return false;
-	}
-
+	res = MapReturnType(db_.AddAsset(type, name));
 	return true;
 }
 
-bool AssetServer::DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::string& errOut)
+bool AssetServer::DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::string& errOut, ProtoBuf::AssetDB::Reponse_Result& res)
 {
 	// map type.
 	assetDb::AssetDB::AssetType::Enum type;
@@ -457,17 +476,11 @@ bool AssetServer::DeleteAsset(const ProtoBuf::AssetDB::DeleteAsset& del, std::st
 
 	core::CriticalSection::ScopedLock slock(lock_);
 
-	assetDb::AssetDB::Result::Enum res = db_.DeleteAsset(type, name);
-	if (res != assetDb::AssetDB::Result::OK) {
-		errOut = "Failed to delete asset. Err: ";
-		errOut += assetDb::AssetDB::Result::ToString(res);
-		return false;
-	}
-
+	res = MapReturnType(db_.DeleteAsset(type, name));
 	return true;
 }
 
-bool AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std::string& errOut)
+bool AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std::string& errOut, ProtoBuf::AssetDB::Reponse_Result& res)
 {
 	// map type.
 	assetDb::AssetDB::AssetType::Enum type;
@@ -486,17 +499,12 @@ bool AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, std:
 
 	core::CriticalSection::ScopedLock slock(lock_);
 
-	assetDb::AssetDB::Result::Enum res = db_.RenameAsset(type, name, newName);
-	if (res != assetDb::AssetDB::Result::OK) {
-		errOut = "Failed to rename asset. Err: ";
-		errOut += assetDb::AssetDB::Result::ToString(res);
-		return false;
-	}
-	
+	res = MapReturnType(db_.RenameAsset(type, name, newName));
 	return true;
 }
 
-bool AssetServer::UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core::Array<uint8_t>& data, std::string& errOut)
+bool AssetServer::UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core::Array<uint8_t>& data, 
+	std::string& errOut, ProtoBuf::AssetDB::Reponse_Result& res)
 {
 	// map type.
 	assetDb::AssetDB::AssetType::Enum type;
@@ -513,19 +521,12 @@ bool AssetServer::UpdateAsset(const ProtoBuf::AssetDB::UpdateAsset& update, core
 		args = core::string(update.args().data(), update.args().length());
 	}
 
-
 	X_LOG1("AssetServer", "UpdateAsset: \"%s\" name: \"%s\"",
 		assetDb::AssetDB::AssetType::ToString(type), name.c_str());
 
 	core::CriticalSection::ScopedLock slock(lock_);
 
-	assetDb::AssetDB::Result::Enum res = db_.UpdateAsset(type, name, data, args);
-	if (res != assetDb::AssetDB::Result::OK) {
-		errOut = "Failed to update asset. Err: ";
-		errOut += assetDb::AssetDB::Result::ToString(res);
-		return false;
-	}
-
+	res = MapReturnType(db_.UpdateAsset(type, name, data, args));
 	return true;
 }
 
