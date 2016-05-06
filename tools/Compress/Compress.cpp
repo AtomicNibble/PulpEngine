@@ -49,13 +49,17 @@ namespace
 	bool ReadFileToBuf(const std::wstring& filePath, core::Array<uint8_t>& bufOut)
 	{
 		std::ifstream file(filePath, std::ios::binary | std::ios::ate);
+		if (!file.is_open()) {
+			X_ERROR("Compress", "Failed to open input file: \"%ls\"", filePath.c_str());
+			return false;
+		}
+
 		std::streamsize size = file.tellg();
 		file.seekg(0, std::ios::beg);
 
 		bufOut.resize(safe_static_cast<size_t,std::streamsize>(size));
 
-		if (file.read(reinterpret_cast<char*>(bufOut.ptr()), size))
-		{
+		if (file.read(reinterpret_cast<char*>(bufOut.ptr()), size)) {
 			return true;
 		}
 		return false;
@@ -64,9 +68,12 @@ namespace
 	bool WriteFileToBuf(const std::wstring& filePath, const core::Array<uint8_t>& buf)
 	{
 		std::ofstream file(filePath, std::ios::binary | std::ios::out);
+		if (!file.is_open()) {
+			X_ERROR("Compress", "Failed to open output file: \"%ls\"", filePath.c_str());
+			return false;
+		}
 
-		if (file.write(reinterpret_cast<const char*>(buf.ptr()), buf.size()))
-		{
+		if (file.write(reinterpret_cast<const char*>(buf.ptr()), buf.size())) {
 			return true;
 		}
 		return false;
@@ -106,7 +113,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	CompressorArena arena(&allocator, "CompressorArena");
 	g_arena = &arena;
 
-
 	// this tool is just going to wrap engine compression functionality.
 	// basically just glue code, can be useful.
 
@@ -135,8 +141,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		const wchar_t* pInFile = gEnv->pCore->GetCommandLineArgForVarW(L"if");
 		if (!pInFile) {
-			X_ERROR("Compress", "Missing required arg -if");
-			return -1;
+
+			int32_t numArgs = __argc;
+			if (numArgs == 2) {
+				pInFile = __wargv[1];
+				outFile = pInFile;
+				outFile += L".out";
+				defalte = false;
+			}
+			else {
+				X_ERROR("Compress", "Missing required arg -if");
+				return -1;
+			}
 		}
 
 		inFile = pInFile;
@@ -243,7 +259,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	}
 
 	const float compressTime = timer.GetMilliSeconds();
-	X_LOG0("Compress", "compressTime: ^2%fms", compressTime);
+	X_LOG0("Compress", "%s: ^2%fms", defalte ? "deflateTime" : "inflateTime", compressTime);
 
 	if (!res) {
 		X_ERROR("Compress", "%s failed.", defalte ? "deflation" : "inflation");
