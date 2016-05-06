@@ -384,6 +384,7 @@ ModelCompiler::ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase
 	flags_(DEFAULT_FLAGS),
 	stats_(arena)
 {
+	core::zero_object(lodDistances_);
 }
 
 void ModelCompiler::SetVertexElipson(float elipson)
@@ -409,6 +410,12 @@ void ModelCompiler::SetScale(float scale)
 void ModelCompiler::setFlags(CompileFlags flags)
 {
 	flags_ = flags;
+}
+
+void ModelCompiler::setLodDistance(float32_t dis, size_t lodIdx)
+{
+	X_ASSERT(lodIdx < model::MODEL_MAX_LODS, "Invalid lod index")(lodIdx, model::MODEL_MAX_LODS);
+	lodDistances_[lodIdx] = dis;
 }
 
 void ModelCompiler::printStats(void) const
@@ -938,6 +945,11 @@ bool ModelCompiler::ProcessModel(void)
 		return true;
 	}
 
+	if (!ValidateLodDistances()) {
+		X_ERROR("Model", "Lod distances are invalid");
+		return false;
+	}
+
 	if (!MergVerts()) {
 		X_ERROR("Model", "Failed to mergeverts");
 		return false;
@@ -1083,6 +1095,7 @@ bool ModelCompiler::CreateData(void)
 		const RawModel::Lod& rawLod = lods_[i];
 		Lod& lod = compiledLods_[i];
 
+		lod.distance_ = lodDistances_[i];
 		lod.meshes_.resize(rawLod.numMeshes(), Mesh(arena_));
 	}
 
@@ -1117,6 +1130,35 @@ bool ModelCompiler::CreateData(void)
 
 	return true;
 }
+
+
+bool ModelCompiler::ValidateLodDistances(void)
+{
+	if (compiledLods_.size() == 1) {
+		// is this right? maybe I do wnat to allow it.
+		if (compiledLods_[0].distance_ != 0.f) {
+			X_ERROR("Model", "LOD0 distance must be zero when only one lod");
+			return false;
+		}
+
+		return true;
+	}
+
+	// check each lod distance is increasing.
+	float lastDistance = compiledLods_[0].distance_;
+	for (size_t i = 1; i < compiledLods_.size(); i++)
+	{
+		if (compiledLods_[i].distance_ <= lastDistance) {
+			X_ERROR("Model", "LOD%i has a distance less or euqal to LOD%i", i, i-1);
+			return false;
+		}
+
+		lastDistance = compiledLods_[i].distance_;
+	}
+
+	return true;
+}
+
 
 
 bool ModelCompiler::SortVerts(void)

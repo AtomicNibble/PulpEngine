@@ -174,6 +174,7 @@ public:
 	void SetJointWeightThreshold(float elipson);
 	void SetScale(float scale);
 	void setFlags(CompileFlags flags);
+	void setLodDistance(float32_t dis, size_t lodIdx);
 	void printStats(void) const;
 
 	float getVertexElipson(void) const;
@@ -200,6 +201,7 @@ private:
 	bool DropWeights(void);
 	bool MergMesh(void);
 	bool CreateData(void);
+	bool ValidateLodDistances(void);
 	bool SortVerts(void);
 	bool CreateBindData(void);
 	bool MergVerts(void);
@@ -232,6 +234,8 @@ private:
 
 	CompileFlags flags_;
 	CompiledLodArr compiledLods_;
+
+	float lodDistances_[model::MODEL_MAX_LODS];
 
 	core::AtomicInt droppedWeights_;
 

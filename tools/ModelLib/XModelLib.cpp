@@ -81,6 +81,17 @@ bool XModelLib::Convert(ConvertArgs& args, const core::Array<uint8_t>& fileData,
 		return false;
 	}
 
+	// set lod distances.
+	for (size_t i = 0; i < model::MODEL_MAX_LODS; i++)
+	{
+		core::StackString<32> buf;
+		buf.appendFmt("lod%i_dis", i);
+
+		if (d.HasMember(buf.c_str())) {
+			model.setLodDistance(d[buf.c_str()].GetFloat(), i);
+		}
+	}
+
 	return model.CompileModel(destPath);
 }
 
