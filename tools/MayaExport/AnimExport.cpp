@@ -226,7 +226,7 @@ MStatus PotatoAnimExporter::writeIntermidiate(void)
 			// hellllo asset server :D
 			status = maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::ANIM,
 				MString(fileName_.c_str()),
-				MString(),
+				argsToJson(),
 				compressed,
 				&unChanged
 			);
@@ -554,6 +554,28 @@ MStatus PotatoAnimExporter::processArgs(const MArgList &args)
 	}
 
 	return status;
+}
+
+MString PotatoAnimExporter::argsToJson(void) const
+{
+	core::json::StringBuffer s;
+	core::json::Writer<core::json::StringBuffer> writer(s);
+
+	writer.SetMaxDecimalPlaces(5);
+
+	writer.StartObject();
+	writer.Key("verbose");
+	writer.Bool(MayaUtil::IsVerbose());
+	writer.Key("mode");
+	writer.String(ExpoMode::ToString(exportMode_));
+	writer.Key("start");
+	writer.Int(startFrame_);
+	writer.Key("end");
+	writer.Int(endFrame_);
+
+	writer.EndObject();
+
+	return MString(s.GetString());
 }
 
 // ======================================================

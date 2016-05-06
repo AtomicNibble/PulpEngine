@@ -51,6 +51,7 @@ private:
 	MStatus writeIntermidiate_int(core::Array<uint8_t>& anim);
 
 	MStatus processArgs(const MArgList &args);
+	MString argsToJson(void) const;
 
 private:
 	const int32_t getNumFrames(void) const {
