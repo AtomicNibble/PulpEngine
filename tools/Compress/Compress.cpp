@@ -78,7 +78,7 @@ namespace
 		X_LOG0("Compressor", "Args:");
 		X_LOG0("Compressor", "^6-if^7		(input file) ^1required");
 		X_LOG0("Compressor", "^6-of^7		(output file, default: file + algo) ^9not-required");
-		X_LOG0("Compressor", "^6-a^7		(algo 1:lz4 2:lzma 3:zlib, default: lza) ^1not-required");
+		X_LOG0("Compressor", "^6-a^7		(algo 1:lz4 2:lzma 3:zlib, default: lza) ^9not-required");
 		X_LOG0("Compressor", "^6-d^7		(deflate 1/0, default: 1) ^9not-required");
 		X_LOG0("Compressor", "^6-lvl^7		(lvl 1-9, default: 5) ^9not-required");
 	}
