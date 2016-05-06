@@ -11,6 +11,8 @@
 
 #include <Containers\Array.h>
 
+#include <IAnimation.h>
+
 X_NAMESPACE_BEGIN(maya)
 
 
@@ -64,6 +66,7 @@ private:
 	int32_t startFrame_;
 	int32_t endFrame_;
 	uint32_t fps_;
+	anim::AnimType::Enum type_;
 	MString nodes_;
 
 	core::Path<char> fileName_;

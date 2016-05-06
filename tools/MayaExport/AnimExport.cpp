@@ -42,7 +42,8 @@ Bone::~Bone()
 PotatoAnimExporter::PotatoAnimExporter() : 
 	fps_(anim::ANIM_DEFAULT_FPS),
 	intermidiate_(false),
-	bones_(g_arena)
+	bones_(g_arena),
+	type_(anim::AnimType::RELATIVE)
 {
 	MayaUtil::MayaPrintMsg("=========== Exporting Anim ===========");
 }
@@ -492,6 +493,37 @@ MStatus PotatoAnimExporter::processArgs(const MArgList &args)
 		exportMode_ = ExpoMode::SERVER;
 	}
 
+
+	idx = args.flagIndex("type");
+	if (idx != MArgList::kInvalidArgIndex) {
+		MString typeStr;
+		if (!args.get(++idx, typeStr)) {
+			MayaUtil::MayaPrintWarning("failed to get type");
+		}
+		else {
+			if (core::strUtil::IsEqualCaseInsen(typeStr.asChar(), "Relative")) {
+				type_ = anim::AnimType::RELATIVE;
+			}
+			else if (core::strUtil::IsEqualCaseInsen(typeStr.asChar(), "Absolute")) {
+				type_ = anim::AnimType::ABSOLUTE;
+			}
+			else if (core::strUtil::IsEqualCaseInsen(typeStr.asChar(), "Additive")) {
+				type_ = anim::AnimType::ADDITIVE;
+			}
+			else if (core::strUtil::IsEqualCaseInsen(typeStr.asChar(), "Delta")) {
+				type_ = anim::AnimType::DELTA;
+			}
+			else {
+				MayaUtil::MayaPrintWarning("Unknown type: \"%s\"",
+					typeStr.asChar());
+			}
+		}
+	}
+	else {
+		type_ = anim::AnimType::RELATIVE;
+	}
+
+
 	idx = args.flagIndex("dir");
 	if (idx != MArgList::kInvalidArgIndex) {
 		MString dir;
@@ -568,6 +600,8 @@ MString PotatoAnimExporter::argsToJson(void) const
 	writer.Bool(MayaUtil::IsVerbose());
 	writer.Key("mode");
 	writer.String(ExpoMode::ToString(exportMode_));
+	writer.Key("type");
+	writer.String(anim::AnimType::ToString(type_));
 	writer.Key("start");
 	writer.Int(startFrame_);
 	writer.Key("end");
