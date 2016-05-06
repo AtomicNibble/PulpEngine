@@ -107,6 +107,24 @@ bool AssetDB::DropTables(void)
 }
 
 
+bool AssetDB::ListAssets(void)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT name, type, lastUpdateTime FROM file_ids");
+
+	auto it = qry.begin();
+	for (; it != qry.end(); ++it)
+	{
+		auto row = *it;
+
+		const char* pName = row.get<const char*>(0);
+		const int32_t type = row.get<int32_t>(1);
+
+		X_LOG0("AssetDB", "name: ^6%s^0 type: ^6%s", pName, AssetType::ToString(type));
+	}
+	
+	return true;
+}
+
 AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId)
 {
 	if (AssetExsists(type, name)) {
