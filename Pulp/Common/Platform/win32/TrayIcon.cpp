@@ -62,7 +62,7 @@ TrayIcon::TrayIcon() :
 
 TrayIcon::~TrayIcon()
 {
-	Destory();
+	DestoryIcon();
 
 	UnRegisterClass();
 }
@@ -120,7 +120,7 @@ bool TrayIcon::CreateIcon(HWND hParent, LPCTSTR toolTip, uint32_t iconId, uint32
 	return true;
 }
 
-void TrayIcon::Destory(void)
+void TrayIcon::DestoryIcon(void)
 {
 	RemoveIcon();
 

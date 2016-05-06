@@ -102,7 +102,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 
 bool EngineApp::ShutDown(void)
 {
-	this->Destory();
+	this->DestoryIcon();
 
 	if (pICore_) {
 		pICore_->UnRegisterAssertHandler(this);

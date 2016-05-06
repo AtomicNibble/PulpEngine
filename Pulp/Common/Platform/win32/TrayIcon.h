@@ -17,7 +17,7 @@ public:
 	~TrayIcon();
 
 	bool CreateIcon(HWND hParent, LPCTSTR toolTip, uint32_t iconId, uint32_t menuID, bool bHidden = false);
-	void Destory(void);
+	void DestoryIcon(void);
 	void RemoveIcon(void);
 
 	virtual LRESULT OnTrayNotification(UINT msg, WPARAM wParam, LPARAM lParam);
