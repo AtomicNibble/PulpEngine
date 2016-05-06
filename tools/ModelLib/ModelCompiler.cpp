@@ -1084,7 +1084,6 @@ bool ModelCompiler::CreateData(void)
 		Lod& lod = compiledLods_[i];
 
 		lod.meshes_.resize(rawLod.numMeshes(), Mesh(arena_));
-		lod.distance_ = rawLod.distance_;
 	}
 
 	// we need job info for every mesh.

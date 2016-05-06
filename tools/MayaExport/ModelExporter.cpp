@@ -815,9 +815,6 @@ MStatus ModelExporter::loadLODs(void)
 		
 		model::RawModel::Lod& lod = lods_[i];
 
-		// set lod distance.
-		lod.distance_ = info.distance;
-
 		// reserver the meshes.
 		lod.meshes_.resize(numMesh, model::RawModel::Mesh(g_arena));
 

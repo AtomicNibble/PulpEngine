@@ -273,24 +273,6 @@ namespace RawModel
 				return false;
 			}
 
-			if (!token.isEqual("DISTANCE")) {
-				X_ERROR("RawModel", "Failed to read 'DISTANCE' token");
-				return false;
-			}
-
-			// read the distance value
-			if (!lex.ReadTokenOnLine(token)) {
-				X_ERROR("RawModel", "Failed to read 'DISTANCE' token");
-				return false;
-			}
-
-			if (token.GetType() != core::TokenType::NUMBER) {
-				X_ERROR("RawModel", "Failed to read 'DISTANCE' token");
-				return false;
-			}
-
-			lod.distance_ = token.GetFloatValue();
-
 			// read the mesh count.
 			int32_t numMesh;
 
@@ -619,8 +601,8 @@ namespace RawModel
 		{
 			const model::RawModel::Lod& lod = lods_[i];
 
-			pCurBuf->appendFmt("// LOD%" PRIuS " dis: %f numMesh: %" PRIuS " verts: %" PRIuS " tris: %" PRIuS " \n",
-				i, lod.distance_, lod.meshes_.size(), lod.totalVerts(), lod.totalTris());
+			pCurBuf->appendFmt("// LOD%" PRIuS " numMesh: %" PRIuS " verts: %" PRIuS " tris: %" PRIuS " \n",
+				i, lod.meshes_.size(), lod.totalVerts(), lod.totalTris());
 		}
 
 		pCurBuf->append("\n");
@@ -675,7 +657,6 @@ namespace RawModel
 			dataArr.append(pCurBuf);
 
 			pCurBuf->appendFmt("LOD\n");
-			pCurBuf->appendFmt("DISTANCE %f\n", lod.distance_);
 			pCurBuf->appendFmt("NUMMESH %" PRIuS "\n", lod.meshes_.size());
 
 			if (!WriteMeshes(dataArr, lod)) {

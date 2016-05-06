@@ -138,7 +138,6 @@ namespace RawModel
 		size_t totalTris(void) const;
 
 	public:
-		float32_t distance_;
 		MeshArr meshes_;
 	};
 
