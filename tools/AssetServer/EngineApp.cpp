@@ -43,7 +43,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 	params.bSkipSound = true;
 	params.bVsLog = false;
 	params.bConsoleLog = true;
-	params.bTesting = true;
+	params.bTesting = false;
 	params.bCoreOnly = true;
 	params.bEnableBasicConsole = false;
 	params.bEnableJobSystem = true; // some converters make use of the job system. 
