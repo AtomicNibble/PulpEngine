@@ -785,12 +785,14 @@ global proc addAnimToNode(int $index, string $name)
 	addAttr -ln ("AnimStart" + $index) -at long PotatoGNode;
 	addAttr -ln ("AnimEnd" + $index) -at long PotatoGNode;
 	addAttr -ln ("AnimNodes" + $index) -dt "string" PotatoGNode;
+	addAttr -ln ("AnimType" + $index) -dt "string" PotatoGNode;
 
 	// assign defaults.
 	setAttr ("PotatoGNode.AnimName" + $index) -type "string" $name;
 	setAttr ("PotatoGNode.AnimStart" + $index) 0;
 	setAttr ("PotatoGNode.AnimEnd" + $index) 0;
 	setAttr ("PotatoGNode.AnimNodes" + $index) -type "string" "";
+	setAttr ("PotatoGNode.AnimType" + $index) -type "string" "Relative";
 }
 
 
@@ -913,9 +915,17 @@ global proc AnimEntryNameChanged(int $index)
 	setAttr -type "string" ("PotatoGNode.AnimName" + $index) $name;
 }
 
+global proc animTypeChangedUpdate(int $index)
+{
+	string $type = `optionMenuGrp -q -v ("exportAnimType" + $index)`;
+
+	setAttr -type "string" ("PotatoGNode.AnimType" + $index) $type;
+}
+
 global proc AnimEntryExport(int $index)
 {
 	string $nodes = `getAttr ("PotatoGNode.AnimNodes" + $index)`;
+	string $type = `getAttr ("PotatoGNode.AnimType" + $index)`;
 	int $start = `getAttr ("PotatoGNode.AnimStart" + $index)`;
 	int $end = `getAttr ("PotatoGNode.AnimEnd" + $index)`;
 	int $numFrames =  $end -  $start;
@@ -935,6 +945,7 @@ global proc AnimEntryExport(int $index)
 	$args += " Start " + $start;
 	$args += " End " + $end;
 	$args += " -mode \"" + $mode + "\"";
+	$args += " -type \"" + $type + "\"";
 
 	// make the command
 	string $filename = animGetName($index);
@@ -985,6 +996,13 @@ global proc potato_AddAnimEntry( int $index )
 		button -label "Select export nodes" -bgc 0.4 0.4 0.4 -w 110 -c ("AnimEntrySelectNodes " + $index) ("exportAnimSelectNodes" + $index);
 		intFieldGrp -cw 2 40 -enable1 false -label "Nodes" ("exportAnimNodes" + $index);
 
+		// Type
+		optionMenuGrp -l "Anim Type" -cc ("animTypeChangedUpdate " + $index) ("exportAnimType" + $index);
+			menuItem -label "Relative";
+			menuItem -label "Absolute";
+			menuItem -label "Additive";
+			menuItem -label "Delta";
+
 
 	formLayout -edit
 		-attachForm ("animName" + $index) "top" 5
@@ -1010,6 +1028,9 @@ global proc potato_AddAnimEntry( int $index )
 		-attachForm ("exportAnimSelectNodes" + $index) "left"  125
 		-attachForm ("exportAnimNodes" + $index) "top" 60
 		-attachForm ("exportAnimNodes" + $index) "left"  130
+
+		-attachForm ("exportAnimType" + $index) "top" 60
+		-attachForm ("exportAnimType" + $index) "left"  230
 	myForm;
 
 	// what we need
@@ -1040,6 +1061,9 @@ global proc potato_AddAnimEntry( int $index )
 	string $nodes = `getAttr ("PotatoGNode.AnimNodes" + $index)`;
 	string $nodes_array[] = stringToStringArray($nodes, " ");
 	AnimEntrySetNodes_internal($index, $nodes_array);
+
+	string $type = `getAttr ("PotatoGNode.AnimType" + $index)`;
+	optionMenuGrp -e -v $type ("exportAnimType" + $index);
 }
 
 global proc potato_AddAnim()
