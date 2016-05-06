@@ -11,6 +11,8 @@
 #include <Compression\Lzma2.h>
 #include <Compression\Zlib.h>
 
+#include <String\Json.h>
+
 
 X_LINK_LIB("engine_SqLite")
 
@@ -237,11 +239,11 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 	return Result::OK;
 }
 
-AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::string& name, 
+AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::string& name,
 	core::Array<uint8_t>& data, const core::string& argsOpt)
 {
 	int32_t assetId, rawId;
-	
+
 #if X_ENABLE_ASSERTIONS
 	assetId = std::numeric_limits<int32_t>::max();
 #endif // !X_ENABLE_ASSERTIONS
@@ -258,9 +260,16 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 
 	X_ASSERT(assetId != std::numeric_limits<int32_t>::max(), "AssetId is invalid")();
 
+	core::string args(argsOpt);
+
+	if(!MergeArgs(assetId, args)) {
+		X_WARNING("AssetDB", "Failed to merge args");
+		return Result::ERROR;
+	}
+
 	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 	const uint32_t dataCrc = pCrc32->GetCRC32(data.ptr(), data.size());
-	const uint32_t argsCrc = pCrc32->GetCRC32(argsOpt.c_str(), argsOpt.length());
+	const uint32_t argsCrc = pCrc32->GetCRC32(args.c_str(), args.length());
 
 	bool dataChanged = true;
 
@@ -381,7 +390,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	sql::SqlLiteCmd cmd(db_, stmt.c_str());
 	cmd.bind(":t", type);
 	cmd.bind(":n", name.c_str());
-	cmd.bind(":args", argsOpt.c_str());
+	cmd.bind(":args", args.c_str());
 	cmd.bind(":argsHash", static_cast<int32_t>(argsCrc));
 
 
@@ -535,6 +544,61 @@ bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
 
 	dataOut.file_id = (*it).get<int32_t>(0);
 	dataOut.hash = static_cast<uint32_t>((*it).get<int32_t>(2));
+	return true;
+}
+
+bool AssetDB::MergeArgs(int32_t assetId, core::string& argsInOut)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT args FROM file_ids WHERE file_ids.file_id = ?");
+	qry.bind(1, assetId);
+
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
+		X_ERROR("AssetDB", "Failed to find asset for merging conversion args");
+		return false;
+	}
+
+	if ((*it).columnType(0) == sql::ColumType::SNULL) {
+		return true;
+	}
+	const char* pArgs = (*it).get<const char*>(0);
+	if (!pArgs) {
+		X_ERROR("AssetDB", "Asset args are null");
+		return false;
+	}
+
+	size_t argsLen = core::strUtil::strlen(pArgs);
+	if (argsLen < 1) {
+		return true;
+	}
+	if (argsInOut.isEmpty()) {
+		argsInOut = pArgs;
+		return true;
+	}
+
+	core::json::Document dDb, dArgs(&dDb.GetAllocator());
+
+	dDb.Parse(pArgs, argsLen);
+	dArgs.Parse(argsInOut.c_str(), argsInOut.length());
+
+	// we want to use the ones from args, and add in any from db.
+	for (auto it = dDb.MemberBegin(); it != dDb.MemberEnd(); ++it)
+	{
+		if (dArgs.FindMember(it->name) == dArgs.MemberEnd()) {
+			dArgs.AddMember(it->name, it->value, dArgs.GetAllocator());
+		}
+	}
+
+	core::json::StringBuffer s;
+	core::json::Writer<core::json::StringBuffer> writer(s);
+
+	if (!dArgs.Accept(writer)) {
+		X_ERROR("AssetDB", "Failed to generate merged conversion args");
+		return false;
+	}
+
+	argsInOut = core::string(s.GetString(), s.GetSize());
 	return true;
 }
 
