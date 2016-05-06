@@ -33,6 +33,26 @@ core::MemoryArenaBase* g_arena = nullptr;
 
 X_USING_NAMESPACE;
 
+#if X_PLATFORM_WIN32
+namespace
+{
+	EngineApp* pEngine = nullptr;
+
+	BOOL WINAPI HandlerRoutine(DWORD dwCtrlType)
+	{
+		if (dwCtrlType == CTRL_CLOSE_EVENT || dwCtrlType == CTRL_C_EVENT)
+		{
+			if (pEngine) {
+				pEngine->DestoryIcon();
+				pEngine = nullptr;
+			}
+		}
+
+		return FALSE;
+	}
+}
+#endif // !X_PLATFORM_WIN32
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	_In_opt_ HINSTANCE hPrevInstance,
 	_In_ LPWSTR    lpCmdLine,
@@ -57,12 +77,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		if (engine.Init(lpCmdLine, Console))
 		{
+#if X_PLATFORM_WIN32
+			pEngine = &engine;
+			if (!SetConsoleCtrlHandler(HandlerRoutine, TRUE)) {
+				return -1;
+			}
+#endif // !X_PLATFORM_WIN32
+
 			assetServer::AssetServer as;
 
 			as.Run(false);
 
 			engine.PumpMessages();
 		}
+
+#if X_PLATFORM_WIN32
+		pEngine = nullptr;
+#endif // !X_PLATFORM_WIN32
 	}
 
 	return 0;
