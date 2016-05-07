@@ -23,15 +23,17 @@ public:
 
 	const char* getBoneName(size_t idx) const;
 
-	const XQuatCompressedf getBoneAngle(size_t idx) const;
+	const Quatf getBoneAngle(size_t idx) const;
 	const Vec3f getBonePos(size_t idx) const;
 
 private:
 	typedef core::Array<core::StackString<model::MODEL_MAX_BONE_NAME_LENGTH>> TagNames;
 	typedef core::Array<uint16_t> TagNameIdx;
 	typedef core::Array<uint8_t> TagTree;
-	typedef core::Array<XQuatCompressedf> TagAngles;
+	typedef core::Array<Quatf> TagAngles;
 	typedef core::Array<Vec3f> TagPos;
+
+	core::MemoryArenaBase* arena_;
 
 	size_t numBones_;
 

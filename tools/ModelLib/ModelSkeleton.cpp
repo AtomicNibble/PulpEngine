@@ -43,9 +43,9 @@ ModelSkeleton::~ModelSkeleton()
 
 }
 
-bool ModelSkeleton::LoadSkelton(const core::Path<char>& filePath)
+bool ModelSkeleton::LoadCompiledSkelton(const core::Path<char>& filePath)
 {
-	return LoadSkelton(core::Path<wchar_t>(filePath));
+	return LoadCompiledSkelton(core::Path<wchar_t>(filePath));
 }
 
 bool ModelSkeleton::LoadCompiledSkelton(const core::Path<wchar_t>& filePath)
@@ -138,10 +138,21 @@ bool ModelSkeleton::LoadCompiledSkelton(const core::Path<wchar_t>& filePath)
 			X_ERROR("Model", "failed to read tree");
 			return false;
 		}
-		if (!file.readObjs(angles_.ptr(), angles_.size())) {
+
+		core::Array<XQuatCompressedf> compressedAngles(arena_, hdr.numBones);
+		if (!file.readObjs(compressedAngles.ptr(), compressedAngles.size())) {
 			X_ERROR("Model", "failed to read angles");
 			return false;
 		}
+
+		// uncompress them
+		X_ASSERT(angles_.size() == compressedAngles.size(), "Angle arrays size should match, source code erorr")(
+			angles_.size(), compressedAngles.size());
+
+		for (size_t i = 0; i < compressedAngles.size(); i++) {
+			angles_[i] = compressedAngles[i].asQuat();
+		}
+
 		if (!file.readObjs(positions_.ptr(), positions_.size())) {
 			X_ERROR("Model", "failed to read pos data");
 			return false;
@@ -162,7 +173,7 @@ const char* ModelSkeleton::getBoneName(size_t idx) const
 	return tagNames_[idx].c_str();
 }
 
-const XQuatCompressedf ModelSkeleton::getBoneAngle(size_t idx) const
+const Quatf ModelSkeleton::getBoneAngle(size_t idx) const
 {
 	return angles_[idx];
 }
