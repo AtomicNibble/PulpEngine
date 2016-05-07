@@ -834,7 +834,7 @@
     <TargetExt>.mll</TargetExt>
     <LibraryPath>$(LibraryPath)</LibraryPath>
     <IncludePath>$(solutiondir)..\3rdparty\source\maya\Maya2012;$(IncludePath)</IncludePath>
-    <TargetName>engine_$(ProjectName)2015$(PlatformName)</TargetName>
+    <TargetName>engine_$(ProjectName)2012$(PlatformName)</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Super_8.5|x64'">
     <LinkIncremental>false</LinkIncremental>
