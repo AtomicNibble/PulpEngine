@@ -16,8 +16,8 @@ public:
 	ModelSkeleton(core::MemoryArenaBase* arena);
 	~ModelSkeleton();
 
-	bool LoadSkelton(const core::Path<char>& path);
-	bool LoadSkelton(const core::Path<wchar_t>& path);
+	bool LoadCompiledSkelton(const core::Path<char>& path);
+	bool LoadCompiledSkelton(const core::Path<wchar_t>& path);
 
 	size_t getNumBones(void) const;
 

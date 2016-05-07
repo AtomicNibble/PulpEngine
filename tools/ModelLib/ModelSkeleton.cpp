@@ -48,7 +48,7 @@ bool ModelSkeleton::LoadSkelton(const core::Path<char>& filePath)
 	return LoadSkelton(core::Path<wchar_t>(filePath));
 }
 
-bool ModelSkeleton::LoadSkelton(const core::Path<wchar_t>& filePath)
+bool ModelSkeleton::LoadCompiledSkelton(const core::Path<wchar_t>& filePath)
 {
 	if (filePath.isEmpty()) {
 		return false;
