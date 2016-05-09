@@ -994,7 +994,7 @@ global proc potato_AddAnimEntry( int $index )
 		// nodes
 		button -label "Set from selected" -bgc 0.4 0.4 0.4 -w 110 -c ("AnimEntrySetNodes " + $index) ("exportAnimSetNodes" + $index);
 		button -label "Select export nodes" -bgc 0.4 0.4 0.4 -w 110 -c ("AnimEntrySelectNodes " + $index) ("exportAnimSelectNodes" + $index);
-		intFieldGrp -cw 2 40 -enable1 false -label "Nodes" ("exportAnimNodes" + $index);
+		intFieldGrp -cw 1 40 -cw 2 40 -enable1 false -label "Nodes" ("exportAnimNodes" + $index);
 
 		// Type
 		optionMenuGrp -l "Anim Type" -cc ("animTypeChangedUpdate " + $index) ("exportAnimType" + $index);
@@ -1027,7 +1027,7 @@ global proc potato_AddAnimEntry( int $index )
 		-attachForm ("exportAnimSelectNodes" + $index) "top" 60
 		-attachForm ("exportAnimSelectNodes" + $index) "left"  125
 		-attachForm ("exportAnimNodes" + $index) "top" 60
-		-attachForm ("exportAnimNodes" + $index) "left"  130
+		-attachForm ("exportAnimNodes" + $index) "left"  230
 
 		-attachForm ("exportAnimType" + $index) "top" 60
 		-attachForm ("exportAnimType" + $index) "left"  230
