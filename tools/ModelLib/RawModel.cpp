@@ -287,12 +287,6 @@ namespace RawModel
 				return false;
 			}
 
-			// read the distance.
-			if (!lex.ReadToken(token)) {
-				X_ERROR("RawModel", "Failed to read 'DISTANCE' token");
-				return false;
-			}
-
 			// read the mesh count.
 			int32_t numMesh;
 
