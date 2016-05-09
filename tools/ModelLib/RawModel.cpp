@@ -64,6 +64,26 @@ namespace RawModel
 		return hasColisionMeshes_;
 	}
 
+	size_t Model::getNumBones(void) const
+	{
+		return bones_.size();
+	}
+
+	const char* Model::getBoneName(size_t idx) const
+	{
+		return bones_[idx].name_;
+	}
+
+	const Quatf Model::getBoneAngle(size_t idx) const
+	{
+		return Quatf(bones_[idx].rotation_);
+	}
+
+	const Vec3f Model::getBonePos(size_t idx) const
+	{
+		return bones_[idx].worldPos_;
+	}
+
 
 	bool Model::LoadRawModel(core::Path<char>& path)
 	{
