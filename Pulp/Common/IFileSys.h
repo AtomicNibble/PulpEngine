@@ -296,7 +296,7 @@ private:
 
 struct XFileBuf : public XFile
 {
-	XFileBuf(uint8_t* begin, uint8_t* end) :
+	XFileBuf(const uint8_t* begin, const uint8_t* end) :
 	begin_(begin), current_(begin), end_(end)
 	{
 		X_ASSERT_NOT_NULL(begin);
@@ -356,10 +356,8 @@ struct XFileBuf : public XFile
 		X_ASSERT_UNREACHABLE();
 	}
 
-	inline uint8_t* getBufferStart(void) { return begin_; }
 	inline const uint8_t* getBufferStart(void) const { return begin_; }
 
-	inline uint8_t* getBufferEnd(void) { return end_; }
 	inline const uint8_t* getBufferEnd(void) const { return end_; }
 
 	inline uint64_t getSize(void) const {
@@ -371,9 +369,9 @@ struct XFileBuf : public XFile
 	}
 
 private:
-	uint8_t* begin_;
-	uint8_t* current_;
-	uint8_t* end_;
+	const uint8_t* begin_;
+	const uint8_t* current_;
+	const uint8_t* end_;
 };
 
 
