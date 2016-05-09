@@ -273,16 +273,16 @@ bool InterAnim::ReadFrameData(core::XLexer& lex, int32_t numBones)
 {
 	X_ASSERT(numBones == bones_.size(), "bones size should alread equal numbones")(numBones, bones_.size());
 
-	// data has a start tag.
-	if (!lex.SkipUntilString("BONE_DATA")) {
-		X_ERROR("InterAnim", "missing BONE_DATA tag");
-		return false;
-	}
-
 	// for each bone there is numFrames worth of data.
 	// in bone order.
 	for (auto& bone : bones_)
 	{
+		// data has a start tag.
+		if (!lex.SkipUntilString("BONE_DATA")) {
+			X_ERROR("InterAnim", "missing BONE_DATA tag");
+			return false;
+		}
+
 		/*
 		Example:
 		POS 0 0 0
@@ -302,7 +302,7 @@ bool InterAnim::ReadFrameData(core::XLexer& lex, int32_t numBones)
 			FrameData& fd = data.AddOne();
 
 			// pos
-			if (!lex.SkipUntilString("POS")) {
+			if (!lex.ExpectTokenString("POS")) {
 				return false;
 			}
 			if (!lex.Parse1DMatrix(3, &fd.position[0])) {
@@ -310,7 +310,7 @@ bool InterAnim::ReadFrameData(core::XLexer& lex, int32_t numBones)
 			}
 
 			// scale
-			if (!lex.SkipUntilString("SCALE")) {
+			if (!lex.ExpectTokenString("SCALE")) {
 				return false;
 			}
 			if (!lex.Parse1DMatrix(3, &fd.scale[0])) {
@@ -318,7 +318,7 @@ bool InterAnim::ReadFrameData(core::XLexer& lex, int32_t numBones)
 			}
 
 			// angles
-			if (!lex.SkipUntilString("ANG")) {
+			if (!lex.ExpectTokenString("ANG")) {
 				return false;
 			}
 			if (!lex.Parse1DMatrix(4, &fd.rotation[0])) {
