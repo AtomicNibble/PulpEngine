@@ -159,7 +159,7 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 			{
 				Bone& bone = bones_[i];
 
-				MayaUtil::MayaPrintMsg("Bone(%i): %s", i, bone.name.asChar());
+				MayaUtil::MayaPrintVerbose("Bone(%i): %s", i, bone.name.asChar());
 
 
 				MTransformationMatrix worldMatrix = bone.dag.inclusiveMatrix();
