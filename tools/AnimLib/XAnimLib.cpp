@@ -87,6 +87,7 @@ bool XAnimLib::Convert(IConverterHost& host, ConvertArgs& args,
 	// we now need to load the models skelton.
 	core::Array<uint8_t> modelFile(g_AnimLibArena);
 	if (!host.GetAssetData(modelName, assetDb::AssetType::MODEL, modelFile)) {
+		X_ERROR("AnimLib", "Failed to load model for skelton: \"%s\"", modelName.c_str());
 		return false;
 	}
 
