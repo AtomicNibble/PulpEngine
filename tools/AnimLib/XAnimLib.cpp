@@ -19,8 +19,8 @@ XAnimLib::~XAnimLib()
 }
 
 
-bool XAnimLib::Convert(ConvertArgs& args, const core::Array<uint8_t>& fileData,
-	const OutPath& destPath)
+bool XAnimLib::Convert(IConverterHost& host, ConvertArgs& args, 
+	const core::Array<uint8_t>& fileData, const OutPath& destPath)
 {
 	if (fileData.isEmpty()) {
 		X_ERROR("AnimLib", "File data is empty");
@@ -85,15 +85,19 @@ bool XAnimLib::Convert(ConvertArgs& args, const core::Array<uint8_t>& fileData,
 	}
 
 	// we now need to load the models skelton.
-	model::ModelSkeleton model(g_AnimLibArena);
+	core::Array<uint8_t> modelFile(g_AnimLibArena);
+	if (!host.GetAssetData(modelName, assetDb::AssetType::MODEL, modelFile)) {
+		return false;
+	}
 
-//	if (!model.LoadSkelton(modelName)) {
-//		X_ERROR("AnimLib", "Failed to load skelton for model: \"%s\"", modelName.c_str());
-//		return false;
-//	}
+	model::ModelSkeleton skelton(g_AnimLibArena);
+	if (!skelton.LoadRawModelSkelton(modelFile)) {
+		X_ERROR("AnimLib", "Failed to load skelton for model: \"%s\"", modelName.c_str());
+		return false;
+	}
 
 	// right now it's time to process the anim :S
-	AnimCompiler compiler(g_AnimLibArena, inter, model);
+	AnimCompiler compiler(g_AnimLibArena, inter, skelton);
 	compiler.setLooping(looping);
 	compiler.setAnimType(type);
 

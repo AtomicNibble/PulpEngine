@@ -11,7 +11,7 @@ public:
 	XAnimLib();
 	~XAnimLib() X_OVERRIDE;
 
-	virtual bool Convert(ConvertArgs& args, const core::Array<uint8_t>& fileData, 
+	virtual bool Convert(IConverterHost& host, ConvertArgs& args, const core::Array<uint8_t>& fileData,
 		const OutPath& destPath) X_OVERRIDE;
 
 

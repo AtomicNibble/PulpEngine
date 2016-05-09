@@ -19,7 +19,7 @@ X_NAMESPACE_BEGIN(converter)
 
 typedef assetDb::AssetDB::AssetType AssetType;
 
-class Converter
+class Converter : public IConverterHost
 {
 	typedef core::traits::Function<void *(ICore *pSystem, const char *moduleName)> ModuleLinkfunc;
 public:
@@ -33,6 +33,10 @@ public:
 	void PrintBanner(void);
 
 	bool Convert(AssetType::Enum assType, const core::string& name);
+
+	// IConverterHost
+	virtual bool GetAssetData(const char* pAssetName, AssetType::Enum assType, core::Array<uint8_t>& dataOut) X_OVERRIDE;
+	// ~IConverterHost
 
 private:
 	bool Convert_int(AssetType::Enum assType, ConvertArgs& args, const core::Array<uint8_t>& fileData,

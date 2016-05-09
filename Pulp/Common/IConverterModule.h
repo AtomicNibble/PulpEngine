@@ -7,6 +7,8 @@
 #include <Extension\IPotatoClass.h>
 #include <Containers\Array.h>
 
+#include <IAssetDb.h>
+
 X_NAMESPACE_DECLARE(anim,
 struct 	IAnimLib
 )
@@ -25,6 +27,14 @@ struct IConverterModule : public IPotatoClass
 	virtual bool ShutDown(IConverter* pCon) X_ABSTRACT;
 };
 
+struct IConverterHost
+{
+	virtual ~IConverterHost() {}
+
+	virtual bool GetAssetData(const char* pAssetName, assetDb::AssetType::Enum assType, core::Array<uint8_t>& dataOut) X_ABSTRACT;
+
+};
+
 struct IConverter
 {
 	typedef core::string ConvertArgs;
@@ -32,7 +42,7 @@ struct IConverter
 
 	virtual ~IConverter() {}
 
-	virtual bool Convert(ConvertArgs& args, const core::Array<uint8_t>& fileData, 
+	virtual bool Convert(IConverterHost& host, ConvertArgs& args, const core::Array<uint8_t>& fileData,
 		const OutPath& destPath) X_ABSTRACT;
 };
 

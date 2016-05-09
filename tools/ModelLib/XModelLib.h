@@ -11,7 +11,7 @@ public:
 	XModelLib();
 	~XModelLib() X_OVERRIDE;
 
-	bool Convert(ConvertArgs& args, const core::Array<uint8_t>& fileData, 
+	bool Convert(IConverterHost& host, ConvertArgs& args, const core::Array<uint8_t>& fileData,
 		const OutPath& destPath) X_OVERRIDE;
 
 

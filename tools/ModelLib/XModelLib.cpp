@@ -17,9 +17,10 @@ XModelLib::~XModelLib()
 
 }
 
-bool XModelLib::Convert(ConvertArgs& args, const core::Array<uint8_t>& fileData, 
-	const OutPath& destPath)
+bool XModelLib::Convert(IConverterHost& host, ConvertArgs& args, 
+	const core::Array<uint8_t>& fileData, const OutPath& destPath)
 {
+	X_UNUSED(host);
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pJobSys);
 

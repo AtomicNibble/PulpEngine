@@ -81,13 +81,27 @@ bool Converter::Convert_int(AssetType::Enum assType, ConvertArgs& args, const co
 	IConverter* pCon = GetConverter(assType);
 
 	if (pCon) {
-		return pCon->Convert(args, fileData, pathOut);
+		return pCon->Convert(*this, args, fileData, pathOut);
 	}
 
 	return false;
 }
 
+bool Converter::GetAssetData(const char* pAssetName, AssetType::Enum assType, core::Array<uint8_t>& dataOut)
+{
+	int32_t assetId = -1;
+	if (!db_.AssetExsists(assType, core::string(pAssetName), &assetId)) {
+		X_ERROR("Converter", "Asset does not exists: \"%s\"", pAssetName);
+		return false;
+	}
 
+	if (!db_.GetRawFileDataForAsset(assetId, dataOut)) {
+		X_ERROR("Converter", "Failed to get raw data for: \"%s\"", pAssetName);
+		return false;
+	}
+
+	return true;
+}
 
 IConverter* Converter::GetConverter(AssetType::Enum assType)
 {
