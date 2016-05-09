@@ -27,6 +27,7 @@ bool ModelHeader::isValid(void) const
 
 
 ModelSkeleton::ModelSkeleton(core::MemoryArenaBase* arena) :
+	arena_(arena),
 	tagNames_(arena),
 
 	nameIdx_(arena),
@@ -159,6 +160,198 @@ bool ModelSkeleton::LoadCompiledSkelton(const core::Path<wchar_t>& filePath)
 		}
 	}
 
+	return true;
+}
+
+
+bool ModelSkeleton::LoadRawModelSkelton(const core::Path<char>& filePath)
+{
+	return LoadCompiledSkelton(core::Path<wchar_t>(filePath));
+}
+
+bool ModelSkeleton::LoadRawModelSkelton(const core::Path<wchar_t>& filePath)
+{
+	if (filePath.isEmpty()) {
+		return false;
+	}
+
+	core::Path<wchar_t> path(filePath);
+	path.setExtension(model::MODEL_FILE_EXTENSION_W);
+
+	core::fileModeFlags mode;
+	mode.Set(core::fileMode::READ);
+
+
+	core::XFileScoped file;
+	if (!file.openFile(path.c_str(), mode)) {
+		X_ERROR("Model", "Failed to open raw model for skelton load");
+		return false;
+	}
+
+
+	return LoadRawModelSkelton_int(file.GetFile());
+}
+
+bool ModelSkeleton::LoadRawModelSkelton(const core::Array<uint8_t>& data)
+{
+	core::XFileBuf file(data.begin(), data.end());
+
+	return LoadRawModelSkelton_int(&file);
+}
+
+bool ModelSkeleton::LoadRawModelSkelton_int(core::XFile* pFile)
+{
+	core::Array<char> fileData(arena_);
+	{
+		size_t fileSize = safe_static_cast<size_t, uint64_t>(pFile->remainingBytes());
+
+		// lets limit it to 10kb
+		fileSize = core::Min<size_t>(fileSize, 1024 * 10);
+
+		fileData.resize(fileSize);
+
+		size_t bytesRead = pFile->read(fileData.ptr(), fileSize);
+		if (bytesRead != fileSize) {
+			X_ERROR("RawModel", "failed to read file data. got: %" PRIuS " requested: %" PRIuS, bytesRead, fileSize);
+			return false;
+		}
+	}
+
+	core::XLexer lex(fileData.begin(), fileData.end());
+
+
+	int32_t version, numLods, numBones;
+
+	if (!ReadheaderToken(lex, "VERSION", version)) {
+		return false;
+	}
+	if (!ReadheaderToken(lex, "LODS", numLods)) {
+		return false;
+	}
+	if (!ReadheaderToken(lex, "BONES", numBones)) {
+		return false;
+	}
+
+
+	if (!ReadBones(lex, numBones)) {
+		X_ERROR("RawModel", "failed to parse bone data");
+		return false;
+	}
+
+	return true;
+}
+
+bool ModelSkeleton::ReadBones(core::XLexer& lex, int32_t numBones)
+{
+	numBones_ = numBones;
+	nameIdx_.resize(numBones);
+	tree_.resize(numBones);
+	angles_.resize(numBones);
+	positions_.resize(numBones);
+	tagNames_.resize(numBones);
+
+	core::XLexToken token(nullptr, nullptr);
+
+	for (size_t i=0; i<numBones; i++)
+	{
+		if (!lex.ReadToken(token)) {
+			X_ERROR("RawModel", "Failed to read 'BONE' token");
+			return false;
+		}
+
+		if (!token.isEqual("BONE")) {
+			X_ERROR("RawModel", "Failed to read 'BONE' token");
+			return false;
+		}
+
+		// read the parent idx.
+		if (!lex.ReadTokenOnLine(token)) {
+			X_ERROR("RawModel", "Failed to read parent index token");
+			return false;
+		}
+
+		if (token.GetType() != core::TokenType::NUMBER) {
+			X_ERROR("RawModel", "Parent index token is invalid");
+			return false;
+		}
+
+		tree_[i] = token.GetIntValue();
+
+		// read the string
+		if (!lex.ReadTokenOnLine(token)) {
+			X_ERROR("RawModel", "Failed to read bone name token");
+			return false;
+		}
+
+		if (token.GetType() != core::TokenType::STRING) {
+			X_ERROR("RawModel", "Bone name token is invalid");
+			return false;
+		}
+
+		tagNames_[i] = core::StackString<model::MODEL_MAX_BONE_NAME_LENGTH>(token.begin(), token.end());
+
+		// pos
+		if (!lex.ReadToken(token)) {
+			X_ERROR("RawModel", "Failed to read 'POS' token");
+			return false;
+		}
+
+		if (!token.isEqual("POS")) {
+			X_ERROR("RawModel", "Failed to read 'POS' token");
+			return false;
+		}
+
+		if (!lex.Parse1DMatrix(3, &positions_[0][0])) {
+			X_ERROR("RawModel", "Failed to read 'POS' token data");
+			return false;
+		}
+
+		// ang
+		if (!lex.ReadToken(token)) {
+			X_ERROR("RawModel", "Failed to read 'ANG' token");
+			return false;
+		}
+
+		if (!token.isEqual("ANG")) {
+			X_ERROR("RawModel", "Failed to read 'ANG' token");
+			return false;
+		}
+
+		Matrix33f rot;
+		if (!lex.Parse2DMatrix(3, 3, &rot[0])) {
+			X_ERROR("RawModel", "Failed to read 'ANG' token data");
+			return false;
+		}
+
+		angles_[i] = Quatf(rot);
+	}
+
+	return true;
+}
+
+bool ModelSkeleton::ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut)
+{
+	core::XLexToken token(nullptr, nullptr);
+
+	valOut = 0;
+
+	if (!lex.SkipUntilString(pName)) {
+		X_ERROR("RawModel", "Failed to find '%s' token", pName);
+		return false;
+	}
+
+	// get value
+	if (!lex.ReadToken(token)) {
+		X_ERROR("RawModel", "Failed to read '%s' value", pName);
+		return false;
+	}
+
+	if (token.GetType() != core::TokenType::NUMBER) {
+		X_ERROR("RawModel", "Failed to read '%s' value, it's not of interger type", pName);
+		return false;
+	}
+
+	valOut = token.GetIntValue();
 	return true;
 }
 

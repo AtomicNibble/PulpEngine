@@ -18,6 +18,9 @@ public:
 
 	bool LoadCompiledSkelton(const core::Path<char>& path);
 	bool LoadCompiledSkelton(const core::Path<wchar_t>& path);
+	bool LoadRawModelSkelton(const core::Path<char>& path);
+	bool LoadRawModelSkelton(const core::Path<wchar_t>& path);
+	bool LoadRawModelSkelton(const core::Array<uint8_t>& data);
 
 	size_t getNumBones(void) const;
 
@@ -25,6 +28,12 @@ public:
 
 	const Quatf getBoneAngle(size_t idx) const;
 	const Vec3f getBonePos(size_t idx) const;
+
+private:
+	bool LoadRawModelSkelton_int(core::XFile* pFile);
+
+	bool ReadBones(core::XLexer& lex, int32_t numBones);
+	bool ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut);
 
 private:
 	typedef core::Array<core::StackString<model::MODEL_MAX_BONE_NAME_LENGTH>> TagNames;
