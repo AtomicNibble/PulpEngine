@@ -2,6 +2,7 @@
 
 #include "../SqLite/SqlLib.h"
 
+#include <IAssetDb.h>
 
 X_NAMESPACE_DECLARE(core,
 	template<typename T>
@@ -25,7 +26,7 @@ class DLL_EXPORT AssetDB
 	};
 
 public:
-	X_DECLARE_ENUM(AssetType)(MODEL, ANIM, MATERIAL, IMG);
+	typedef assetDb::AssetType AssetType;
 	X_DECLARE_ENUM(Result)(
 		OK, 
 		NOT_FOUND,

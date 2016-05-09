@@ -1,0 +1,10 @@
+#pragma once
+
+
+
+X_NAMESPACE_BEGIN(assetDb)
+
+
+X_DECLARE_ENUM(AssetType)(MODEL, ANIM, MATERIAL, IMG);
+
+X_NAMESPACE_END

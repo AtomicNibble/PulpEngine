@@ -1084,6 +1084,9 @@
     <ClInclude Include="ICompression.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
+    <ClInclude Include="IAssetDb.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
