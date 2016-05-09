@@ -36,6 +36,8 @@ void Converter::PrintBanner(void)
 
 bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 {
+	X_LOG0("Converter", "Converting \"%s\" type: \"%s\"", name.c_str(), AssetType::ToString(assType));
+
 	if (!db_.OpenDB()) {
 		X_ERROR("Converter", "Failed to open AssetDb");
 		return false;
@@ -72,6 +74,26 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 		X_LOG1("Converter", "processing took: ^6%gms", timer.GetMilliSeconds());
 	}
 	return res;
+}
+
+bool Converter::ConvertAll(void)
+{
+	X_LOG0("Converter", "Converting all assets...");
+
+	if (!db_.OpenDB()) {
+		X_ERROR("Converter", "Failed to open AssetDb");
+		return false;
+	}
+
+	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
+	func.Bind<Converter, &Converter::Convert>(this);
+
+	if (!db_.IterateAssets(func)) {
+		X_ERROR("Converter", "Failed to convert all assets");
+		return false;
+	}
+
+	return true;
 }
 
 

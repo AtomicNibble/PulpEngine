@@ -33,6 +33,7 @@ public:
 	void PrintBanner(void);
 
 	bool Convert(AssetType::Enum assType, const core::string& name);
+	bool ConvertAll(void);
 
 	// IConverterHost
 	virtual bool GetAssetData(const char* pAssetName, AssetType::Enum assType, core::Array<uint8_t>& dataOut) X_OVERRIDE;
