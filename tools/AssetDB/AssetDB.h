@@ -2,6 +2,8 @@
 
 #include "../SqLite/SqlLib.h"
 
+#include <Util\Delegate.h>
+
 #include <IAssetDb.h>
 
 X_NAMESPACE_DECLARE(core,
@@ -45,6 +47,8 @@ public:
 	bool DropTables(void);
 
 public:
+	bool IterateAssets(core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
+
 	bool ListAssets(void);
 	Result::Enum AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
 	Result::Enum DeleteAsset(AssetType::Enum type, const core::string& name);
