@@ -50,6 +50,34 @@ core::MemoryArenaBase* g_arena = nullptr;
 
 namespace
 {
+	X_DECLARE_ENUM(ConvertMode)(SINGLE, ALL);
+
+
+	bool GetMode(ConvertMode::Enum& mode)
+	{
+		const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
+		if (pMode)
+		{
+			if (core::strUtil::IsEqualCaseInsen(pMode, L"single"))
+			{
+				mode = ConvertMode::SINGLE;
+			}
+			else if (core::strUtil::IsEqualCaseInsen(pMode, L"all"))
+			{
+				mode = ConvertMode::ALL;
+			}
+			else
+			{
+				X_ERROR("Converter", "Unknown mode: \"%ls\"", pMode);
+				return false;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
 	bool GetAssetType(converter::AssetType::Enum& assType)
 	{
 		const wchar_t* pAssetType = gEnv->pCore->GetCommandLineArgForVarW(L"type");
@@ -128,20 +156,31 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		{
 			converter::Converter con;
 			converter::AssetType::Enum assType;
+			ConvertMode::Enum mode;
 			core::string assName;
 
 			con.PrintBanner();
 
-			if (GetAssetType(assType) && GetAssetName(assName)) {
-
-				core::StopWatch timer;
-
-				if (!con.Convert(assType, assName)) {
-					X_ERROR("Convert", "Conversion falid..");
-				}
-
-				X_LOG0("Convert", "Elapsed time: ^6%gms", timer.GetMilliSeconds());
+			if (!GetMode(mode)) {
+				mode = ConvertMode::SINGLE;
 			}
+
+			core::StopWatch timer;
+
+			if (mode == ConvertMode::ALL)
+			{
+				if (!con.ConvertAll()) {
+					X_ERROR("Convert", "Conversion failed..");
+				}
+			}
+			else if (GetAssetType(assType) && GetAssetName(assName)) 
+			{
+				if (!con.Convert(assType, assName)) {
+					X_ERROR("Convert", "Conversion failed..");
+				}
+			}
+
+			X_LOG0("Convert", "Elapsed time: ^6%gms", timer.GetMilliSeconds());
 
 			Console.PressToContinue();
 		}
