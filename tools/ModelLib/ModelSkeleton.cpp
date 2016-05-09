@@ -252,7 +252,7 @@ bool ModelSkeleton::ReadBones(core::XLexer& lex, int32_t numBones)
 
 	core::XLexToken token(nullptr, nullptr);
 
-	for (size_t i=0; i<numBones; i++)
+	for (int32_t i=0; i<numBones; i++)
 	{
 		if (!lex.ReadToken(token)) {
 			X_ERROR("RawModel", "Failed to read 'BONE' token");
