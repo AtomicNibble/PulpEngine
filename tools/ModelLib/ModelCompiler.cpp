@@ -858,7 +858,7 @@ size_t ModelCompiler::calculateTagNameDataSize(void) const
 	size_t size = 0;
 
 	for (auto& bone : bones_) {
-		size += bone.name_.length() + 1; // nt
+		size += core::strUtil::StringBytesIncNull(bone.name_); 
 	}
 
 	return size;
@@ -870,7 +870,7 @@ size_t ModelCompiler::calculateMaterialNameDataSize(void) const
 
 	for (auto& lod : lods_) {
 		for (auto& mesh : lod.meshes_) {
-			size += mesh.material_.name_.size() + 1; // nt
+			size += core::strUtil::StringBytesIncNull(mesh.material_.name_); 
 		}
 	}
 
