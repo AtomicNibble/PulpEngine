@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui sql
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -14,10 +14,22 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         assetmanager.cpp \
-    assetdb.cpp
+    assetdbnodes.cpp \
+    assert.cpp \
+    assetdbmodel.cpp \
+    assetdbwidget.cpp \
+    session.cpp \
+    project.cpp \
+    assetdbexplorer.cpp
 
 HEADERS  += assetmanager.h \
-    assetdb.h
+    assetdbnodes.h \
+    assert.h \
+    assetdbmodel.h \
+    assetdbwidget.h \
+    session.h \
+    project.h \
+    assetdbexplorer.h
 
 FORMS    += assetmanager.ui
 

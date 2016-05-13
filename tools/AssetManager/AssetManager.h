@@ -3,10 +3,11 @@
 
 #include <QMainWindow>
 
-#include "assetdb.h"
+class QGridLayout;
 
-namespace Ui {
-class AssetManager;
+namespace AssetExplorer {
+    class AssetDbViewWidget;
+    class AssetExplorer;
 }
 
 class AssetManager : public QMainWindow
@@ -18,8 +19,11 @@ public:
     ~AssetManager();
 
 private:
-    Ui::AssetManager *ui;
-    AssetDB db_;
+    QGridLayout* layout_;
+
+    AssetExplorer::AssetDbViewWidget* assetViewWidget_;
+    AssetExplorer::AssetExplorer* assetDbexplorer_;
+
 };
 
 #endif // ASSETMANAGER_H
