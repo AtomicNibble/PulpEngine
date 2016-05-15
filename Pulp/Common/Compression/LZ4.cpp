@@ -2,6 +2,7 @@
 #include "LZ4.h"
 
 #include <../../3rdparty/source/lz4-r131/lz4_lib.h>
+#include <../../3rdparty/source/lz4-r131/lz4hc.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -52,8 +53,17 @@ namespace Compression
 		int srcSize = safe_static_cast<int, size_t>(srcBufLen);
 		int detSize = safe_static_cast<int, size_t>(destBufLen);
 
-		int res = LZ4_compress_fast(pSrc, pDst, srcSize, detSize,
-			compressLevelToAcceleration(lvl));
+		int res = 0;
+
+		if (CompressLevel::HIGH == lvl)
+		{
+			res = LZ4_compress_HC(pSrc, pDst, srcSize, detSize, 0);
+		}
+		else
+		{
+			res = LZ4_compress_fast(pSrc, pDst, srcSize, detSize,
+				compressLevelToAcceleration(lvl));
+		}
 
 		if (res <= 0) {
 			X_ERROR("LZ4", "Failed to compress buffer: %i", res);
