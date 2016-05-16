@@ -57,7 +57,7 @@ namespace Compression
 
 		if (CompressLevel::HIGH == lvl)
 		{
-			res = LZ4_compress_HC(pSrc, pDst, srcSize, detSize, 0);
+			res = LZ4_compress_HC(pSrc, pDst, srcSize, detSize, 16);
 		}
 		else
 		{
