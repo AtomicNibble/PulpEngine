@@ -10,6 +10,7 @@
 #include <Hashing\sha512.h>
 #include <Hashing\MD5.h>
 #include "Hashing\Adler32.h"
+#include <Hashing\xxHash.h>
 
 #include <Util\EndianUtil.h>
 
@@ -272,3 +273,20 @@ TEST(Hash, Adler32)
 
 	EXPECT_EQ(val, 0xa3050a5e);
 }
+
+
+TEST(Hash, xxhash32)
+{
+	Hash::xxHash32 hasher;
+
+	hasher.reset(12345);
+	hasher.update("test", 4);
+
+	EXPECT_EQ(3834992036, hasher.finalize());
+
+	hasher.reset(123);
+	hasher.update("test", 4);
+
+	EXPECT_EQ(2758658570, hasher.finalize());
+}
+
