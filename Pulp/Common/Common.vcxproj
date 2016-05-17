@@ -119,6 +119,7 @@
     <ClInclude Include="Hashing\MurmurHash.h" />
     <ClInclude Include="Hashing\sha1.h" />
     <ClInclude Include="Hashing\SHA512.h" />
+    <ClInclude Include="Hashing\xxHash.h" />
     <ClInclude Include="IAnimation.h" />
     <ClInclude Include="IAssetDb.h" />
     <ClInclude Include="IAssetPak.h" />
@@ -457,6 +458,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Hashing\xxHash.cpp" />
     <ClCompile Include="Math\XAabb.cpp" />
     <ClCompile Include="Platform\win32\Pipe.cpp" />
     <ClCompile Include="Platform\win32\TrayIcon.cpp" />
