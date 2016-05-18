@@ -25,6 +25,23 @@ namespace Compression
 			X_ASSERT_UNREACHABLE();
 			return 1;
 		}
+
+		int compressLevelToAccelerationHC(CompressLevel::Enum lvl)
+		{
+			if (lvl == CompressLevel::LOW) {
+				return 4;
+			}
+			if (lvl == CompressLevel::NORMAL) {
+				return 8;
+			}
+			if (lvl == CompressLevel::HIGH) {
+				return 16;
+			}
+
+			X_ASSERT_UNREACHABLE();
+			return 1;
+		}
+
 	} // namespace
 
 	Algo::Enum LZ4::getAlgo(void)
@@ -53,17 +70,8 @@ namespace Compression
 		int srcSize = safe_static_cast<int, size_t>(srcBufLen);
 		int detSize = safe_static_cast<int, size_t>(destBufLen);
 
-		int res = 0;
-
-		if (CompressLevel::HIGH == lvl)
-		{
-			res = LZ4_compress_HC(pSrc, pDst, srcSize, detSize, 16);
-		}
-		else
-		{
-			res = LZ4_compress_fast(pSrc, pDst, srcSize, detSize,
+		int res = LZ4_compress_fast(pSrc, pDst, srcSize, detSize,
 				compressLevelToAcceleration(lvl));
-		}
 
 		if (res <= 0) {
 			X_ERROR("LZ4", "Failed to compress buffer: %i", res);
@@ -92,6 +100,34 @@ namespace Compression
 			X_ERROR("LZ4", "Failed to decompress buffer: %i", res);
 			return false;
 		}
+		return true;
+	}
+
+	// ---------------------------------------
+
+
+	bool LZ4HC::deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
+		void* pDstBuf, size_t destBufLen, size_t& destLenOut, CompressLevel::Enum lvl)
+	{
+		X_UNUSED(arena);
+
+		const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
+		char* pDst = reinterpret_cast<char*>(pDstBuf);
+
+		int srcSize = safe_static_cast<int, size_t>(srcBufLen);
+		int detSize = safe_static_cast<int, size_t>(destBufLen);
+
+
+		int res = LZ4_compress_HC(pSrc, pDst, srcSize, detSize, compressLevelToAccelerationHC(lvl));
+	
+
+		if (res <= 0) {
+			X_ERROR("LZ4", "Failed to compress buffer: %i", res);
+			destLenOut = 0;
+			return false;
+		}
+
+		destLenOut = res;
 		return true;
 	}
 
