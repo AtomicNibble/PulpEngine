@@ -33,7 +33,7 @@ namespace Hash
 		xxHash64();
 		~xxHash64() = default;
 
-		void reset(uint32_t seed);
+		void reset(uint64_t seed);
 		bool update(const void* pBuf, size_t length);
 		uint64_t finalize(void);
 
