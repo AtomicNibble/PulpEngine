@@ -278,7 +278,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 
 				core::Compression::Compressor<core::Compression::LZ4> comp;
 
-				if (!comp.deflate(g_arena, rawModel, compressed, core::Compression::CompressLevel::NORMAL))
+				if (!comp.deflate(g_arena, rawModel, compressed, core::Compression::CompressLevel::HIGH))
 				{
 					X_ERROR("Model", "Failed to defalte raw model");
 					return MS::kFailure;
