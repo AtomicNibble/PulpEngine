@@ -6,10 +6,6 @@ X_NAMESPACE_BEGIN(core)
 namespace Hash
 {
 
-//	uint32_t xxHash32(const void* pInput, size_t length, uint32_t seed);
-//	uint64_t xxHash64(const void* pInput, size_t length, uint64_t seed);
-
-
 	class xxHash32
 	{
 	public:
