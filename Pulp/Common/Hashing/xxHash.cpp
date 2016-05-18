@@ -53,14 +53,14 @@ namespace Hash
 
 		enum class Endianes
 		{
-			LITTLE,
-			BIG
+			BIG = 0,
+			LITTLE = 1
 		};
 
 		enum class Alignment
 		{
-			ALIGNED,
-			UNALIGNED
+			ALIGNED = 1,
+			UNALIGNED = 2
 		};
 
 
