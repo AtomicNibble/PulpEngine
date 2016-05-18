@@ -19,6 +19,8 @@ namespace Hash
 		void reset(uint32_t seed);
 		bool update(const void* pBuf, size_t length);
 		uint32_t finalize(void);
+
+		static uint32_t getHash(const void* pInput, size_t length, uint32_t seed);
 	
 	private:
 		struct { long long ll[6]; } state_;
@@ -34,6 +36,8 @@ namespace Hash
 		void reset(uint32_t seed);
 		bool update(const void* pBuf, size_t length);
 		uint64_t finalize(void);
+
+		static uint64_t getHash(const void* pInput, size_t length, uint64_t seed);
 
 	private:
 		struct { long long ll[11]; } state_;
