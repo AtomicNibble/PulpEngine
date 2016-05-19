@@ -332,6 +332,11 @@ public:
 	X_INLINE Job* CreateJobMemberFunc(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, 
 		void* pJobData);
 
+	template<typename ClassType>
+	X_INLINE Job* CreateJobMemberFuncasChild(Job* pParent, ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction,
+		void* pJobData);
+
+
 	X_INLINE void AddContinuation(Job* ancestor, Job* continuation, bool runInline = false);
 
 	void Run(Job* pJob);

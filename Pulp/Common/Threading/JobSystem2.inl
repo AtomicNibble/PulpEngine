@@ -128,6 +128,19 @@ namespace V2
 		return job;
 	}
 
+	template<typename ClassType>
+	X_INLINE Job* JobSystem::CreateJobMemberFuncasChild(Job* pParent, ClassType* pInst,
+		typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, void* pJobData)
+	{
+		typedef member_function_job_data<ClassType> MemberCallerData;
+		MemberCallerData jobData(pInst, pFunction, pJobData);
+
+		Job* job = CreateJobAsChild<MemberCallerData>(pParent, &member_function_job<MemberCallerData>, jobData);
+
+		return job;
+
+	}
+
 	// =============================================
 
 	X_INLINE void JobSystem::AddContinuation(Job* ancestor, Job* continuation, bool runInline)
