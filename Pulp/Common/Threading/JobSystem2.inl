@@ -117,7 +117,7 @@ namespace V2
 	}
 
 	template<typename ClassType>
-	X_INLINE Job* JobSystem::CreateJobMemberFunc(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction,
+	X_INLINE Job* JobSystem::CreateMemberJob(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction,
 		void* pJobData)
 	{
 		typedef member_function_job_data<ClassType> MemberCallerData;
@@ -129,7 +129,7 @@ namespace V2
 	}
 
 	template<typename ClassType>
-	X_INLINE Job* JobSystem::CreateJobMemberFuncasChild(Job* pParent, ClassType* pInst,
+	X_INLINE Job* JobSystem::CreateMemberJobAsChild(Job* pParent, ClassType* pInst,
 		typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, void* pJobData)
 	{
 		typedef member_function_job_data<ClassType> MemberCallerData;
@@ -138,7 +138,6 @@ namespace V2
 		Job* job = CreateJobAsChild<MemberCallerData>(pParent, &member_function_job<MemberCallerData>, jobData);
 
 		return job;
-
 	}
 
 	// =============================================

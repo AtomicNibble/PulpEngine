@@ -329,11 +329,11 @@ public:
 
 
 	template<typename ClassType>
-	X_INLINE Job* CreateJobMemberFunc(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, 
+	X_INLINE Job* CreateMemberJob(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, 
 		void* pJobData);
 
 	template<typename ClassType>
-	X_INLINE Job* CreateJobMemberFuncasChild(Job* pParent, ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction,
+	X_INLINE Job* CreateMemberJobAsChild(Job* pParent, ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction,
 		void* pJobData);
 
 

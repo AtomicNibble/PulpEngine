@@ -313,14 +313,14 @@ void XModel::IoRequestCallback(core::IFileSys& fileSys, core::IoRequestData& req
 				return;
 			}
 
-			pJob = pJobSys->CreateJobMemberFunc<XModel>(this, &XModel::ProcessHeader_job, pFile);
+			pJob = pJobSys->CreateMemberJob<XModel>(this, &XModel::ProcessHeader_job, pFile);
 		}
 		else {
 			
 			// pData_ should not be null as we are reading into it.
 			X_ASSERT_NOT_NULL(pData_);
 
-			pJob = pJobSys->CreateJobMemberFunc<XModel>(this, &XModel::ProcessData_job, pFile);
+			pJob = pJobSys->CreateMemberJob<XModel>(this, &XModel::ProcessData_job, pFile);
 		}
 
 		pJobSys->Run(pJob);

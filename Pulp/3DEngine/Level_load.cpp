@@ -48,10 +48,10 @@ void Level::IoRequestCallback(core::IFileSys& fileSys, core::IoRequestData& requ
 		core::V2::Job* pJob = nullptr;
 
 		if (!headerLoaded_) {
-			pJob = pJobSys_->CreateJobMemberFunc<Level>(this, &Level::ProcessHeader_job, pFile);
+			pJob = pJobSys_->CreateMemberJob<Level>(this, &Level::ProcessHeader_job, pFile);
 		}
 		else {
-			pJob = pJobSys_->CreateJobMemberFunc<Level>(this, &Level::ProcessData_job, pFile);
+			pJob = pJobSys_->CreateMemberJob<Level>(this, &Level::ProcessData_job, pFile);
 		}
 		
 		pJobSys_->Run(pJob);
