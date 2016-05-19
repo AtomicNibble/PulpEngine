@@ -677,15 +677,13 @@ namespace Hash
 	{
 		Endianes endian_detected = (Endianes)XXH_CPU_LITTLE_ENDIAN;
 
-#  if !defined(XXH_USE_UNALIGNED_ACCESS)
-		if ((((size_t)input) & 3) == 0)   /* Input is 4-bytes aligned, leverage the speed benefit */
+		if ((((size_t)pInput) & 3) == 0)   /* Input is 4-bytes aligned, leverage the speed benefit */
 		{
 			if ((endian_detected == Endianes::LITTLE) || XXH_FORCE_NATIVE_FORMAT)
-				return XXH32_endian_align(input, len, seed, Endianes::LITTLE, Alignment::ALIGNED);
+				return XXH32_endian_align(pInput, length, seed, Endianes::LITTLE, Alignment::ALIGNED);
 			else
-				return XXH32_endian_align(input, len, seed, Endianes::BIG, Alignment::ALIGNED);
+				return XXH32_endian_align(pInput, length, seed, Endianes::BIG, Alignment::ALIGNED);
 		}
-#  endif
 
 		if ((endian_detected == Endianes::LITTLE) || XXH_FORCE_NATIVE_FORMAT)
 			return XXH32_endian_align(pInput, length, seed, Endianes::LITTLE, Alignment::UNALIGNED);
@@ -739,15 +737,13 @@ namespace Hash
 	{
 		Endianes endian_detected = (Endianes)XXH_CPU_LITTLE_ENDIAN;
 
-#  if !defined(XXH_USE_UNALIGNED_ACCESS)
-		if ((((size_t)input) & 7) == 0)   /* Input is aligned, let's leverage the speed advantage */
+		if ((((size_t)pInput) & 7) == 0)   /* Input is aligned, let's leverage the speed advantage */
 		{
 			if ((endian_detected == Endianes::LITTLE) || XXH_FORCE_NATIVE_FORMAT)
-				return XXH64_endian_align(input, len, seed, Endianes::LITTLE, Alignment::ALIGNED);
+				return XXH64_endian_align(pInput, length, seed, Endianes::LITTLE, Alignment::ALIGNED);
 			else
-				return XXH64_endian_align(input, len, seed, Endianes::BIG, Alignment::ALIGNED);
+				return XXH64_endian_align(pInput, length, seed, Endianes::BIG, Alignment::ALIGNED);
 		}
-#  endif
 
 		if ((endian_detected == Endianes::LITTLE) || XXH_FORCE_NATIVE_FORMAT)
 			return XXH64_endian_align(pInput, length, seed, Endianes::LITTLE, Alignment::UNALIGNED);
