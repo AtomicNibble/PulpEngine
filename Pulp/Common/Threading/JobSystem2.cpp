@@ -435,6 +435,9 @@ namespace V2
 			return;
 		}
 
+		// reset so we don't get run twice when child calls finish for parent.
+		pJob->continuationCount = 0;
+
 		ThreadQue* queue = GetWorkerThreadQueue(threadIdx);
 
 		const int32_t flags = pJob->runFlags;
