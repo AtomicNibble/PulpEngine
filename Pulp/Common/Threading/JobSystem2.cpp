@@ -255,6 +255,9 @@ namespace V2
 		pThreadQues_[idx] = X_NEW(ThreadQue, gEnv->pArena, "JobThreadQue");
 		pJobAllocators_[idx] = X_NEW(ThreadJobAllocator, gEnv->pArena, "JobThreadAllocator");
 		threadIdToIndex_.push_back(std::make_pair(threadId, idx));
+
+		X_ASSERT_ALIGNMENT(pThreadQues_[idx], 64, 0);
+		X_ASSERT_ALIGNMENT(&pJobAllocators_[idx]->jobs, 64, 0);
 	}
 
 
