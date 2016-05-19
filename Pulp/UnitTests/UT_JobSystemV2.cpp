@@ -19,10 +19,16 @@ namespace
 
 	static void EmptyJob(JobSystem& jobSys, size_t threadIdx, Job* job, void* pParam)
 	{
-//		++numJobsRan;
 
 	}
-}
+
+	static void UpdateCamel(uint32_t*, size_t count)
+	{
+		++numJobsRan;
+	}
+
+
+} // namespace
 
 
 
@@ -144,7 +150,7 @@ TEST(Threading, JobSystem2Empty_parallel_data)
 
 namespace NoData
 {
-	void UpdateParticles(uintptr_t count)
+	static void UpdateParticles(uintptr_t count)
 	{
 
 	}
@@ -202,10 +208,6 @@ TEST(Threading, JobSystem2Empty_parallel)
 	jobSys.ShutDown();
 }
 
-void UpdateCamel(uint32_t*, size_t count)
-{
-	++numJobsRan;
-}
 
 TEST(Threading, JobSystem2Empty_parallel_for)
 {
@@ -287,5 +289,48 @@ TEST(Threading, JobSystem2Empty_member_func)
 
 	jobSys.ShutDown();
 }
+
+
+
+TEST(Threading, JobSystem2Empty_continuations)
+{
+	JobSystem jobSys;
+	jobSys.StartUp();
+
+
+	core::TimeVal MultiElapsed;
+	core::StopWatch timer;
+	{
+		timer.Start();
+
+		Member::JobClass inst;
+
+		Job* pJob = jobSys.CreateJobMemberFunc<Member::JobClass>(&inst, &Member::JobClass::job, nullptr);
+
+		jobSys.AddContinuation(pJob, jobSys.CreateJobMemberFuncasChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr));
+		jobSys.AddContinuation(pJob, jobSys.CreateJobMemberFuncasChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr));
+		jobSys.AddContinuation(pJob, jobSys.CreateJobMemberFuncasChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr));
+		jobSys.AddContinuation(pJob, jobSys.CreateJobMemberFuncasChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr), true);
+		jobSys.AddContinuation(pJob, jobSys.CreateJobMemberFuncasChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr));
+		jobSys.AddContinuation(pJob, jobSys.CreateJobMemberFuncasChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr));
+	
+		jobSys.AddContinuation(pJob, jobSys.CreateJobMemberFuncasChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr));	
+
+		// if i make a job and it has child jobs
+		// how do i wait for them all to finish?
+
+		jobSys.Run(pJob);
+		jobSys.Wait(pJob);
+
+		EXPECT_EQ(8, inst.GetCallCount());
+
+		MultiElapsed = timer.GetTimeVal();
+	}
+
+	X_LOG0("JobSystem", "Member Function %gms", MultiElapsed.GetMilliSeconds());
+
+	jobSys.ShutDown();
+}
+
 
 
