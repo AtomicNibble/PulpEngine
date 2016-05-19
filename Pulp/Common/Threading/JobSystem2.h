@@ -47,7 +47,7 @@ struct Job;
 
 typedef core::traits::Function<void(JobSystem&, size_t, Job*, void*)> JobFunction;
 
-struct Job
+X_ALIGNED_SYMBOL(struct Job, 64)
 {
 	static const size_t THREAD_IDX_BITS = 4; // 16 threads
 	static const size_t JOB_IDX_BITS = 12;  // 4096
@@ -388,6 +388,8 @@ private:
 		JobArena			jobPoolArena;
 #endif
 		uint32_t allocated;
+
+		// there should be 60 byes of padding.
 
 		Job jobs[JobSystem::MAX_JOBS];
 	};
