@@ -45,6 +45,7 @@ public:
 	public:
 		uint32_t totalLods;
 		uint32_t totalMesh;
+		uint32_t totalColMesh;
 		uint32_t totalJoints;
 		uint32_t totalJointsDropped;
 		uint32_t totalVerts;

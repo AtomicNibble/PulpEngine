@@ -363,6 +363,7 @@ void ModelExporter::printStats(void) const
 	info.appendFmt("\n> Total Lods: %i", stats_.totalLods);
 	info.appendFmt("\n> Total Mesh: %i", stats_.totalMesh);
 	info.appendFmt("\n> Total Mesh merged: %i", stats_.totalMeshMerged);
+	info.appendFmt("\n> Total Col Mesh: %i", stats_.totalColMesh);
 	info.appendFmt("\n> Total Joints: %i", stats_.totalJoints);
 	info.appendFmt("\n> Total Joints dropped: %i", stats_.totalJointsDropped);
 

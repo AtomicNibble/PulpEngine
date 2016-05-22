@@ -77,6 +77,7 @@ void ModelCompiler::Stats::print(CompileFlags flags) const
 	X_LOG0("Model", "> Total Lods: %i", totalLods);
 	X_LOG0("Model", "> Total Mesh: %i", totalMesh);
 	X_LOG0("Model", "> Total Mesh Merged: %i", totalMeshMerged);
+	X_LOG0("Model", "> Total Col Mesh: %i", totalColMesh);
 	X_LOG0("Model", "> Total Joints: %i", totalJoints);
 	X_LOG0("Model", "> Total Joints Dropped: %i", totalJointsDropped);
 
@@ -137,6 +138,7 @@ void ModelCompiler::Stats::clear(void)
 {
 	totalLods = 0;
 	totalMesh = 0;
+	totalColMesh = 0;
 	totalJoints = 0;
 	totalJointsDropped = 0;
 	totalVerts = 0;
@@ -1345,6 +1347,8 @@ bool ModelCompiler::PrcoessCollisionMeshes(void)
 
 							// reset search, since remove can re-order.
 							i = 0;
+
+							stats_.totalColMesh++;
 						}
 					}
 				}
