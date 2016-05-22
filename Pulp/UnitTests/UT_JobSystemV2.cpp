@@ -142,7 +142,7 @@ TEST(Threading, JobSystem2Empty_parallel_data)
 		MultiElapsed = timer.GetTimeVal();
 	}
 
-	X_LOG0("JobSystem", "%i count: %gms", count, MultiElapsed.GetMilliSeconds());
+	X_LOG0("JobSystem", "count: %i elapsed: %gms", count, MultiElapsed.GetMilliSeconds());
 	jobSys.ShutDown();
 }
 
