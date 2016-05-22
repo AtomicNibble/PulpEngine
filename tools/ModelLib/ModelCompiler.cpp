@@ -451,6 +451,16 @@ ModelCompiler::CompileFlags ModelCompiler::getFlags(void) const
 	return flags_;
 }
 
+size_t ModelCompiler::totalMeshes(void) const
+{
+	size_t num = 0;
+	for (auto& lod : compiledLods_) {
+		num += lod.meshes_.size();
+	}
+
+	return num;
+}
+
 
 bool ModelCompiler::CompileModel(const core::Path<char>& outFile)
 {
@@ -870,7 +880,7 @@ size_t ModelCompiler::calculateMaterialNameDataSize(void) const
 {
 	size_t size = 0;
 
-	for (auto& lod : lods_) {
+	for (auto& lod : compiledLods_) {
 		for (auto& mesh : lod.meshes_) {
 			size += core::strUtil::StringBytesIncNull(mesh.material_.name_); 
 		}
@@ -1402,7 +1412,7 @@ bool ModelCompiler::UpdateMeshBounds(void)
 		pJobSys_->Run(pJobs[i]);
 	}
 
-	for (i = 0; i < lods_.size(); i++) {
+	for (i = 0; i < compiledLods_.size(); i++) {
 		pJobSys_->Wait(pJobs[i]);
 	}
 

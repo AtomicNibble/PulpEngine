@@ -184,6 +184,7 @@ public:
 	float getScale(void) const;
 	CompileFlags getFlags(void) const;
 
+	size_t totalMeshes(void) const;
 
 	bool CompileModel(const core::Path<char>& outFile);
 	bool CompileModel(const core::Path<wchar_t>& outFile);
