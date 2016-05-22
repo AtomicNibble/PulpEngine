@@ -1273,28 +1273,37 @@ bool ModelCompiler::ScaleModel(void)
 	core::Delegate<void(Vert*, uint32_t)> del;
 	del.Bind<ModelCompiler, &ModelCompiler::ScaleVertsJob>(this);
 
+	auto addScaleJobForMesh = [&](auto& m) {
+		Vert* pVerts = m.verts_.ptr();
+		uint32_t numVerts = safe_static_cast<uint32_t, size_t>(m.verts_.size());
+
+		core::V2::Job* pJob = pJobSys_->parallel_for_member<ModelCompiler>(del,
+			pVerts, numVerts, core::V2::CountSplitter32(batchSize));
+
+		pJobSys_->Run(pJob);
+
+		// handle the rare case stack is full
+		if (jobs.size() == jobs.capacity())
+		{
+			core::V2::Job* pJob = jobs.top();
+			pJobSys_->Wait(pJob);
+			jobs.pop();
+		}
+
+		jobs.push(pJob);
+	};
+
 	// create jobs for each mesh.
 	for (auto& lod : compiledLods_)
 	{
 		for (auto& mesh : lod.meshes_)
 		{
-			Vert* pVerts = mesh.verts_.ptr();
-			uint32_t numVerts = safe_static_cast<uint32_t, size_t>(mesh.verts_.size());
+			addScaleJobForMesh(mesh);
 
-			core::V2::Job* pJob = pJobSys_->parallel_for_member<ModelCompiler>(del,
-				pVerts, numVerts, core::V2::CountSplitter32(batchSize));
-
-			pJobSys_->Run(pJob);
-
-			// handle the rare case stack is full
-			if (jobs.size() == jobs.capacity()) 
-			{		
-				core::V2::Job* pJob = jobs.top();
-				pJobSys_->Wait(pJob);
-				jobs.pop();
+			for (auto& colMesh : mesh.colMeshes_)
+			{
+				addScaleJobForMesh(colMesh);
 			}
-
-			jobs.push(pJob);
 		}
 	}
 
