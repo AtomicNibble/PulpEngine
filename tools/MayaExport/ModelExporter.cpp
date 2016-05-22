@@ -840,8 +840,13 @@ MStatus ModelExporter::loadLODs(void)
 			mesh.displayName_ = getMeshDisplayName(fnmesh.fullPathName());
 			mesh.name_.set(fnmesh.name().asChar());
 
-			MayaUtil::MayaPrintVerbose("\n ------ Processing (%s) -------", mesh.displayName_.c_str());
-
+			if (isColisionMesh(mesh.name_)) {
+				hasColisionMeshes_ = true;
+				MayaUtil::MayaPrintVerbose("\n ------ Processing (%s : Collision) -------", mesh.displayName_.c_str());
+			}
+			else {
+				MayaUtil::MayaPrintVerbose("\n ------ Processing (%s) -------", mesh.displayName_.c_str());
+			}
 
 			if (!getMeshMaterial(info.exportObjects[meshIdx], material)) {
 				MayaUtil::MayaPrintError("Mesh(%s): failed to get material", fnmesh.name().asChar());
