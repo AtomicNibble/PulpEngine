@@ -93,7 +93,7 @@ X_DISABLE_WARNING(4324)
 X_ALIGNED_SYMBOL(class ThreadQue, 64)
 {
 public:
-	static const unsigned int MAX_NUMBER_OF_JOBS = 1 << 12;
+	static const unsigned int MAX_NUMBER_OF_JOBS = 1 << Job::JOB_IDX_BITS;
 private:
 	static const unsigned int MASK = MAX_NUMBER_OF_JOBS - 1u;
 
@@ -286,9 +286,9 @@ class JobSystem
 	struct ThreadJobAllocator;
 
 public:
-	static const uint32_t HW_THREAD_MAX = 16; // max even if hardware supports more.
+	static const uint32_t HW_THREAD_MAX = 1 << Job::THREAD_IDX_BITS; // max even if hardware supports more.
 	static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
-	static const size_t MAX_JOBS = 1 << 12;
+	static const size_t MAX_JOBS = 1 << Job::JOB_IDX_BITS;
 	// 68kb(72kb x64) per 1024 jobs per thread
 	// so for 4096 jobs with 6 threads it's: 1728kb ~1.7mb
 	static const size_t MEMORY_PER_THREAD = (MAX_JOBS * sizeof(Job)) + (MAX_JOBS * sizeof(Job*));
