@@ -157,24 +157,24 @@ template <typename JobData>
 static inline void parallel_for_job(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
 {
 	const JobData* data = static_cast<const JobData*>(jobData);
-	const JobData::SplitterType& splitter = data->splitter;
+	const JobData::SplitterType& splitter = data->splitter_;
 
-	if (splitter.Split<JobData::DataType>(data->count))
+	if (splitter.Split<JobData::DataType>(data->count_))
 	{
 		// split in two
-		const size_t leftCount = data->count / 2u;
-		const JobData leftData(data->data, leftCount, data->pFunction, splitter);
+		const size_t leftCount = data->count_ / 2u;
+		const JobData leftData(data->data_, leftCount, data->pFunction_, splitter);
 		Job* left = jobSys.CreateJobAsChild(job, &parallel_for_job<JobData>, leftData);
 		jobSys.Run(left);
 
-		const size_t rightCount = data->count - leftCount;
-		const JobData rightData(data->data + leftCount, rightCount, data->pFunction, splitter);
+		const size_t rightCount = data->count_ - leftCount;
+		const JobData rightData(data->data_ + leftCount, rightCount, data->pFunction_, splitter);
 		Job* right = jobSys.CreateJobAsChild(job, &parallel_for_job<JobData>, rightData);
 		jobSys.Run(right);
 	}
 	else
 	{
-		(data->pFunction)(data->data, data->count);
+		(data->pFunction_)(data->data_, data->count_);
 	}
 }
 
@@ -188,41 +188,41 @@ struct parallel_for_job_data
 	typedef typename DataJobFunction::Pointer DataJobFunctionPtr;
 
 	parallel_for_job_data(DataType* data, size_t count, DataJobFunctionPtr function, const SplitterType& splitter): 
-		data(data)
-		, count(count)
-		, pFunction(function)
-		, splitter(splitter)
+		data_(data),
+		count_(count),
+		pFunction_(function),
+		splitter_(splitter)
 	{
 	}
 
-	DataType* data;
-	size_t count;
-	DataJobFunctionPtr pFunction;
-	SplitterType splitter;
+	DataType* data_;
+	size_t count_;
+	DataJobFunctionPtr pFunction_;
+	SplitterType splitter_;
 };
 
 template <typename JobData>
 static inline void parallel_for_member_job(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
 {
 	const JobData* data = static_cast<const JobData*>(jobData);
-	const JobData::SplitterType& splitter = data->splitter;
+	const JobData::SplitterType& splitter = data->splitter_;
 
-	if (splitter.Split<JobData::DataType>(data->count))
+	if (splitter.Split<JobData::DataType>(data->count_))
 	{
 		// split in two
-		const uint32_t leftCount = data->count / 2u;
-		const JobData leftData(data->delagte, data->data, leftCount, splitter);
+		const uint32_t leftCount = data->count_ / 2u;
+		const JobData leftData(data->delagte_, data->data_, leftCount, splitter);
 		Job* left = jobSys.CreateJobAsChild(job, &parallel_for_member_job<JobData>, leftData);
 		jobSys.Run(left);
 
-		const uint32_t rightCount = data->count - leftCount;
-		const JobData rightData(data->delagte, data->data + leftCount, rightCount, splitter);
+		const uint32_t rightCount = data->count_ - leftCount;
+		const JobData rightData(data->delagte_, data->data_ + leftCount, rightCount, splitter);
 		Job* right = jobSys.CreateJobAsChild(job, &parallel_for_member_job<JobData>, rightData);
 		jobSys.Run(right);
 	}
 	else
 	{
-		data->delagte.Invoke(data->data, data->count);
+		data->delagte_.Invoke(data->data_, data->count_);
 	}
 }
 
@@ -238,25 +238,25 @@ struct parallel_for_member_job_data
 
 	parallel_for_member_job_data(FunctionDelagte delagte, DataType* data, uint32_t count,
 		 const SplitterType& splitter) :
-		data(data)
-		, delagte(delagte)
-		, count(count)
-		, splitter(splitter)
+		data_(data),
+		delagte_(delagte),
+		count_(count),
+		splitter_(splitter)
 	{
 
 	}
 
-	DataType* data; 
-	FunctionDelagte delagte;
-	uint32_t count; 
-	SplitterType splitter; 
+	DataType* data_; 
+	FunctionDelagte delagte_;
+	uint32_t count_; 
+	SplitterType splitter_; 
 };
 
 template <typename JobData>
 static inline void member_function_job(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
 {
 	JobData* data = static_cast<JobData*>(jobData);
-	(*data->pInst.*data->pFunction)(jobSys, threadIdx, job, data->pJobData);
+	(*data->pInst_.*data->pFunction_)(jobSys, threadIdx, job, data->pJobData_);
 }
 
 
@@ -268,16 +268,16 @@ struct member_function_job_data
 	typedef typename MemberFunction::Pointer MemberFunctionPtr;
 
 	member_function_job_data(ClassType* pInst, MemberFunctionPtr function, void* jobData) :
-		pInst(pInst),
-		pFunction(function),
-		pJobData(jobData)
+		pInst_(pInst),
+		pFunction_(function),
+		pJobData_(jobData)
 	{
 
 	}
 
-	ClassType* pInst;
-	MemberFunctionPtr pFunction;
-	void* pJobData;
+	ClassType* pInst_;
+	MemberFunctionPtr pFunction_;
+	void* pJobData_;
 };
 
 class JobSystem
