@@ -393,8 +393,8 @@ namespace V2
 
 	Job* JobSystem::GetJob(ThreadQue& queue)
 	{
-		Job* job = queue.Pop();
-		if (IsEmptyJob(job))
+		Job* pJob = queue.Pop();
+		if (IsEmptyJob(pJob))
 		{
 			// this is not a valid job because our own queue is empty, so try stealing from some other queue
 			uint32_t randomIndex = random::MultiplyWithCarry(0u, numQues_);
@@ -417,7 +417,7 @@ namespace V2
 			return stolenJob;
 		}
 
-		return job;
+		return pJob;
 	}
 
 	Job* JobSystem::GetJobCheckAllQues(ThreadQue& queue)
