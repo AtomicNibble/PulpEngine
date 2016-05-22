@@ -108,15 +108,17 @@ public:
 		CompbindInfo bindInfo_;
 	};
 
+	class ColMesh;
 	class Mesh
 	{
 	public:
 		typedef core::StackString<60> NameString;
-		typedef core::Array<Mesh> MeshArr;
+		typedef core::Array<ColMesh> ColMeshArr;
 		typedef core::Array<Vert> VertsArr;
 		typedef core::Array<RawModel::Face> FaceArr;
 
 	public:
+		Mesh(const Mesh& mesh);
 		Mesh(core::MemoryArenaBase* arena);
 		~Mesh() = default;
 
@@ -129,10 +131,30 @@ public:
 		VertsArr verts_;
 		FaceArr faces_;
 		Binds binds_;
-		MeshArr colMeshes_;
+		ColMeshArr colMeshes_;
 
 		RawModel::Material material_;
 		AABB boundingBox_;
+	};
+
+	class ColMesh : public Mesh
+	{
+		X_DECLARE_ENUM(ColMeshType)(SPHERE, BOX, CONVEX);
+
+	public:
+		ColMesh(core::MemoryArenaBase* arena);
+		ColMesh(const ColMesh& oth);
+		ColMesh(const Mesh& oth);
+		~ColMesh() = default;
+
+
+	private:
+		ColMeshType::Enum type_;
+
+		union {
+			AABB box_;
+			Sphere sphere_;
+		};
 	};
 
 	class Lod

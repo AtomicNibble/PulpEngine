@@ -288,6 +288,19 @@ const size_t ModelCompiler::Binds::dataSizeTotal(void) const
 
 // ---------------------------------------------------------------
 
+ModelCompiler::Mesh::Mesh(const Mesh& mesh) :
+	name_(mesh.name_),
+	displayName_(mesh.displayName_),
+	verts_(mesh.verts_),
+	faces_(mesh.faces_),
+	binds_(mesh.binds_),
+	colMeshes_(mesh.colMeshes_),
+	material_(mesh.material_),
+	boundingBox_(mesh.boundingBox_)
+{
+
+}
+
 ModelCompiler::Mesh::Mesh(core::MemoryArenaBase* arena) :
 	verts_(arena),
 	faces_(arena),
@@ -311,6 +324,37 @@ void ModelCompiler::Mesh::calBoundingbox(void)
 }
 
 // ---------------------------------------------------------------
+
+ModelCompiler::ColMesh::ColMesh(core::MemoryArenaBase* arena) :
+	Mesh(arena),
+	type_(ColMeshType::CONVEX)
+{
+
+}
+
+ModelCompiler::ColMesh::ColMesh(const ColMesh& oth) :
+	Mesh(oth),
+	type_(oth.type_)
+{
+	if (type_ == ColMeshType::SPHERE) {
+		sphere_ = oth.sphere_;
+	} else 	if (type_ == ColMeshType::BOX) {
+		box_ = oth.box_;
+	}
+}
+
+
+
+ModelCompiler::ColMesh::ColMesh(const Mesh& oth) : 
+	Mesh(nullptr),
+	type_(ColMeshType::CONVEX)
+{
+
+}
+
+
+// ---------------------------------------------------------------
+
 
 ModelCompiler::Lod::Lod(core::MemoryArenaBase* arena) :
 	distance_(0.f),
@@ -938,6 +982,7 @@ bool ModelCompiler::ProcessModel(void)
 	// 5. sort the verts by bind counts.
 	// 6. create bind data
 	// 7. scale the model.
+	//  - check for collision meshes and move them.
 	// 8. calculate bounds.
 	// 9. check limits
 	// 10. done
