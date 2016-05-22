@@ -42,7 +42,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 	params.pConsoleWnd = &Console;
 	params.pCoreArena = g_arena;
 	params.bEnableBasicConsole = true;
-	params.bFileSysWorkingDir = true;
+//	params.bFileSysWorkingDir = true;
 
 #ifdef X_LIB
 
