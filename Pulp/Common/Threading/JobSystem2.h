@@ -10,6 +10,7 @@
 #include <Traits\FunctionTraits.h>
 
 #include <Threading\ThreadLocalStorage.h>
+#include <Threading\ConditionVariable.h>
 
 #include <Containers\FixedArray.h>
 #include <Containers\Freelist.h>
@@ -358,12 +359,13 @@ private:
 
 	Job* GetJob(void);
 	Job* GetJob(ThreadQue& queue);
+	Job* GetJobCheckAllQues(ThreadQue& queue);
 	void Execute(Job* pJob, size_t theadIdx);
 	void Finish(Job* pJob, size_t threadIdx);
 
 	size_t GetThreadIndex(void) const;
 
-	static void ThreadBackOff(int32_t backoff);
+	void ThreadBackOff(int32_t backoff);
 	static Thread::ReturnValue ThreadRun_s(const Thread& thread);
 	Thread::ReturnValue ThreadRun(const Thread& thread);
 
@@ -379,6 +381,10 @@ private:
 	Thread threads_[HW_THREAD_MAX];
 	ThreadIdToIndex threadIdToIndex_;
 	uint32_t numThreads_;
+	uint32_t numQues_;
+
+	core::ConditionVariable cond_;
+	core::CriticalSection condCS_;
 
 	ThreadQue* pThreadQues_[HW_THREAD_MAX];
 

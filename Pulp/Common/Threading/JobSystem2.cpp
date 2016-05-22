@@ -129,6 +129,7 @@ namespace V2
 	JobSystem::JobSystem() 
 	{
 		numThreads_ = 0;
+		numQues_ = 0;
 		core::zero_object(pThreadQues_);
 		core::zero_object(pJobAllocators_);
 	}
@@ -169,6 +170,9 @@ namespace V2
 		{
 			threads_[i].Stop();
 		}
+
+		cond_.NotifyAll();
+
 		for (i = 0; i < numThreads_; i++)
 		{
 			threads_[i].Join();
@@ -258,6 +262,8 @@ namespace V2
 
 		X_ASSERT_ALIGNMENT(pThreadQues_[idx], 64, 0);
 		X_ASSERT_ALIGNMENT(&pJobAllocators_[idx]->jobs, 64, 0);
+
+		numQues_ = idx + 1;
 	}
 
 
@@ -304,6 +310,8 @@ namespace V2
 	{
 		ThreadQue* queue = GetWorkerThreadQueue();
 		queue->Push(pJob);
+
+		cond_.NotifyAll();
 	}
 
 	void JobSystem::Wait(Job* pJob)
@@ -389,7 +397,7 @@ namespace V2
 		if (IsEmptyJob(job))
 		{
 			// this is not a valid job because our own queue is empty, so try stealing from some other queue
-			uint32_t randomIndex = random::MultiplyWithCarry(0u, numThreads_ + 1);
+			uint32_t randomIndex = random::MultiplyWithCarry(0u, numQues_);
 
 			ThreadQue* stealQueue = pThreadQues_[randomIndex];
 			if (stealQueue == &queue)
@@ -412,6 +420,27 @@ namespace V2
 		return job;
 	}
 
+	Job* JobSystem::GetJobCheckAllQues(ThreadQue& queue)
+	{
+		Job* pJob = queue.Pop();
+		if (!IsEmptyJob(pJob)) {
+			return pJob;
+		}
+		for (uint32_t i = 0; i < numQues_; i++)
+		{
+			ThreadQue* stealQueue = pThreadQues_[i];
+			if (stealQueue == &queue) {
+				continue;
+			}
+
+			Job* stolenJob = stealQueue->Steal();
+			if (!IsEmptyJob(stolenJob)) {
+				return stolenJob;
+			}
+		}
+
+		return nullptr;
+	}
 
 	void JobSystem::Execute(Job* pJob, size_t threadIdx) 
 	{
@@ -501,7 +530,7 @@ namespace V2
 			Thread::Sleep(1);
 		}
 		else {
-			Thread::Sleep(5);
+			Thread::Sleep(1);
 		}
 	}
 
@@ -518,16 +547,31 @@ namespace V2
 
 		while (thread.ShouldRun())
 		{
-			Job* job = GetJob(threadQue);
-			if (job)
+			Job* pJob = GetJob(threadQue);
+			if (pJob)
 			{
 				backoff = 0;
-				Execute(job, threadIdx);
+				Execute(pJob, threadIdx);
 			}
 			else
 			{
 				ThreadBackOff(backoff);
 				backoff++;
+
+				if (backoff > 10)
+				{
+					// if we not had a job for a while, ensure all que's are empty
+					// if so wait on the consition.
+					pJob = GetJobCheckAllQues(threadQue);
+					if (pJob) {
+						backoff = 0;
+						Execute(pJob, threadIdx);
+					}
+					else {
+						CriticalSection::ScopedLock lock(condCS_);
+						cond_.Wait(condCS_);
+					}
+				}
 			}
 		}
 
