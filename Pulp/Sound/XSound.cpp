@@ -487,6 +487,13 @@ void XSound::ShutDown(void)
 
 	if (AK::SoundEngine::IsInitialized())
 	{
+
+		AKRESULT retValue = AK::SoundEngine::ClearBanks();
+		if (retValue != AK_Success) {
+			X_ERROR("SoundSys", "Error clearing banks. Err: %i", retValue);
+		}
+
+
 		SoundEngine::Term();
 	}
 
