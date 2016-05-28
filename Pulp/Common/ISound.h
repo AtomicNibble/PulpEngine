@@ -10,6 +10,8 @@ struct ISound
 {
 	virtual ~ISound(){};
 
+	virtual void RegisterVars(void) X_ABSTRACT;
+
 	virtual bool Init(void) X_ABSTRACT;
 	virtual void ShutDown(void) X_ABSTRACT;
 	virtual void release(void) X_ABSTRACT;

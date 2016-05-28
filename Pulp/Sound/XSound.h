@@ -21,8 +21,7 @@ public:
 	XSound();
 	virtual ~XSound();
 
-	void RegisterVars(void);
-
+	virtual void RegisterVars(void) X_OVERRIDE;
 
 	virtual bool Init(void) X_OVERRIDE;
 	virtual void ShutDown(void) X_OVERRIDE;
