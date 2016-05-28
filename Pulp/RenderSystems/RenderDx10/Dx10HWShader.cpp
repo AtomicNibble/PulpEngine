@@ -540,7 +540,7 @@ bool XHWShader_Dx10::loadFromSource(void)
 		source_ = source;
 
 		core::V2::JobSystem* pJobSys = gEnv->pJobSys;
-		core::V2::Job* pJob = pJobSys->CreateJobMemberFunc<XHWShader_Dx10>(this,
+		core::V2::Job* pJob = pJobSys->CreateMemberJob<XHWShader_Dx10>(this,
 			&XHWShader_Dx10::CompileShader_job, nullptr);
 		pJobSys->Run(pJob);
 

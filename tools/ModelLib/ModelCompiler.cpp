@@ -77,6 +77,7 @@ void ModelCompiler::Stats::print(CompileFlags flags) const
 	X_LOG0("Model", "> Total Lods: %i", totalLods);
 	X_LOG0("Model", "> Total Mesh: %i", totalMesh);
 	X_LOG0("Model", "> Total Mesh Merged: %i", totalMeshMerged);
+	X_LOG0("Model", "> Total Col Mesh: %i", totalColMesh);
 	X_LOG0("Model", "> Total Joints: %i", totalJoints);
 	X_LOG0("Model", "> Total Joints Dropped: %i", totalJointsDropped);
 
@@ -137,6 +138,7 @@ void ModelCompiler::Stats::clear(void)
 {
 	totalLods = 0;
 	totalMesh = 0;
+	totalColMesh = 0;
 	totalJoints = 0;
 	totalJointsDropped = 0;
 	totalVerts = 0;
@@ -286,6 +288,19 @@ const size_t ModelCompiler::Binds::dataSizeTotal(void) const
 
 // ---------------------------------------------------------------
 
+ModelCompiler::Mesh::Mesh(const Mesh& mesh) :
+	name_(mesh.name_),
+	displayName_(mesh.displayName_),
+	verts_(mesh.verts_),
+	faces_(mesh.faces_),
+	binds_(mesh.binds_),
+	colMeshes_(mesh.colMeshes_),
+	material_(mesh.material_),
+	boundingBox_(mesh.boundingBox_)
+{
+
+}
+
 ModelCompiler::Mesh::Mesh(core::MemoryArenaBase* arena) :
 	verts_(arena),
 	faces_(arena),
@@ -309,6 +324,37 @@ void ModelCompiler::Mesh::calBoundingbox(void)
 }
 
 // ---------------------------------------------------------------
+
+ModelCompiler::ColMesh::ColMesh(core::MemoryArenaBase* arena) :
+	Mesh(arena),
+	type_(ColMeshType::CONVEX)
+{
+
+}
+
+ModelCompiler::ColMesh::ColMesh(const ColMesh& oth) :
+	Mesh(oth),
+	type_(oth.type_)
+{
+	if (type_ == ColMeshType::SPHERE) {
+		sphere_ = oth.sphere_;
+	} else 	if (type_ == ColMeshType::BOX) {
+		box_ = oth.box_;
+	}
+}
+
+
+
+ModelCompiler::ColMesh::ColMesh(const Mesh& oth) : 
+	Mesh(nullptr),
+	type_(ColMeshType::CONVEX)
+{
+
+}
+
+
+// ---------------------------------------------------------------
+
 
 ModelCompiler::Lod::Lod(core::MemoryArenaBase* arena) :
 	distance_(0.f),
@@ -447,6 +493,16 @@ float ModelCompiler::getScale(void) const
 ModelCompiler::CompileFlags ModelCompiler::getFlags(void) const
 {
 	return flags_;
+}
+
+size_t ModelCompiler::totalMeshes(void) const
+{
+	size_t num = 0;
+	for (auto& lod : compiledLods_) {
+		num += lod.meshes_.size();
+	}
+
+	return num;
 }
 
 
@@ -868,7 +924,7 @@ size_t ModelCompiler::calculateMaterialNameDataSize(void) const
 {
 	size_t size = 0;
 
-	for (auto& lod : lods_) {
+	for (auto& lod : compiledLods_) {
 		for (auto& mesh : lod.meshes_) {
 			size += core::strUtil::StringBytesIncNull(mesh.material_.name_); 
 		}
@@ -926,6 +982,7 @@ bool ModelCompiler::ProcessModel(void)
 	// 5. sort the verts by bind counts.
 	// 6. create bind data
 	// 7. scale the model.
+	//  - check for collision meshes and move them.
 	// 8. calculate bounds.
 	// 9. check limits
 	// 10. done
@@ -1271,28 +1328,37 @@ bool ModelCompiler::ScaleModel(void)
 	core::Delegate<void(Vert*, uint32_t)> del;
 	del.Bind<ModelCompiler, &ModelCompiler::ScaleVertsJob>(this);
 
+	auto addScaleJobForMesh = [&](auto& m) {
+		Vert* pVerts = m.verts_.ptr();
+		uint32_t numVerts = safe_static_cast<uint32_t, size_t>(m.verts_.size());
+
+		core::V2::Job* pJob = pJobSys_->parallel_for_member<ModelCompiler>(del,
+			pVerts, numVerts, core::V2::CountSplitter32(batchSize));
+
+		pJobSys_->Run(pJob);
+
+		// handle the rare case stack is full
+		if (jobs.size() == jobs.capacity())
+		{
+			core::V2::Job* pJob = jobs.top();
+			pJobSys_->Wait(pJob);
+			jobs.pop();
+		}
+
+		jobs.push(pJob);
+	};
+
 	// create jobs for each mesh.
 	for (auto& lod : compiledLods_)
 	{
 		for (auto& mesh : lod.meshes_)
 		{
-			Vert* pVerts = mesh.verts_.ptr();
-			uint32_t numVerts = safe_static_cast<uint32_t, size_t>(mesh.verts_.size());
+			addScaleJobForMesh(mesh);
 
-			core::V2::Job* pJob = pJobSys_->parallel_for_member<ModelCompiler>(del,
-				pVerts, numVerts, core::V2::CountSplitter32(batchSize));
-
-			pJobSys_->Run(pJob);
-
-			// handle the rare case stack is full
-			if (jobs.size() == jobs.capacity()) 
-			{		
-				core::V2::Job* pJob = jobs.top();
-				pJobSys_->Wait(pJob);
-				jobs.pop();
+			for (auto& colMesh : mesh.colMeshes_)
+			{
+				addScaleJobForMesh(colMesh);
 			}
-
-			jobs.push(pJob);
 		}
 	}
 
@@ -1345,6 +1411,8 @@ bool ModelCompiler::PrcoessCollisionMeshes(void)
 
 							// reset search, since remove can re-order.
 							i = 0;
+
+							stats_.totalColMesh++;
 						}
 					}
 				}
@@ -1389,7 +1457,7 @@ bool ModelCompiler::UpdateMeshBounds(void)
 		pJobSys_->Run(pJobs[i]);
 	}
 
-	for (i = 0; i < lods_.size(); i++) {
+	for (i = 0; i < compiledLods_.size(); i++) {
 		pJobSys_->Wait(pJobs[i]);
 	}
 

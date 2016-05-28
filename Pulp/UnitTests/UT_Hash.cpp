@@ -10,6 +10,7 @@
 #include <Hashing\sha512.h>
 #include <Hashing\MD5.h>
 #include "Hashing\Adler32.h"
+#include <Hashing\xxHash.h>
 
 #include <Util\EndianUtil.h>
 
@@ -271,4 +272,49 @@ TEST(Hash, Adler32)
 	val = Adler32("hello, can you fart in a cart?");
 
 	EXPECT_EQ(val, 0xa3050a5e);
+}
+
+
+TEST(Hash, xxhash32)
+{
+	Hash::xxHash32 hasher;
+
+	hasher.reset(12345);
+	hasher.update("test", 4);
+
+	EXPECT_EQ(3834992036, hasher.finalize());
+
+	hasher.reset(123);
+	hasher.update("test", 4);
+
+	EXPECT_EQ(2758658570, hasher.finalize());
+}
+
+TEST(Hash, xxhash64)
+{
+	Hash::xxHash64 hasher;
+
+	hasher.reset(123);
+	hasher.update("test", 4);
+
+	EXPECT_EQ(3134990500624303823, hasher.finalize());
+
+	hasher.reset(0);
+	hasher.update("test", 4);
+
+	EXPECT_EQ(5754696928334414137, hasher.finalize());
+}
+
+
+
+TEST(Hash, xxhash32_simple)
+{
+	EXPECT_EQ(3834992036, Hash::xxHash32::getHash("test", 4, 12345));
+	EXPECT_EQ(2758658570, Hash::xxHash32::getHash("test", 4, 123));
+}
+
+TEST(Hash, xxhash64_simple)
+{
+	EXPECT_EQ(3134990500624303823, Hash::xxHash64::getHash("test", 4, 123));
+	EXPECT_EQ(5754696928334414137, Hash::xxHash64::getHash("test", 4, 0));
 }

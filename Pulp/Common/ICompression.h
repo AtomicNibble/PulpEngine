@@ -10,7 +10,7 @@ X_NAMESPACE_BEGIN(core)
 namespace Compression
 {
 
-	X_DECLARE_ENUM8(Algo)(LZ4, LZMA, ZLIB);
+	X_DECLARE_ENUM8(Algo)(LZ4, LZ4HC, LZMA, ZLIB);
 	X_DECLARE_ENUM(CompressLevel)(
 		LOW, // speed
 		NORMAL, // normal

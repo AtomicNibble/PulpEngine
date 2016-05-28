@@ -10,6 +10,7 @@
 #include <Traits\FunctionTraits.h>
 
 #include <Threading\ThreadLocalStorage.h>
+#include <Threading\ConditionVariable.h>
 
 #include <Containers\FixedArray.h>
 #include <Containers\Freelist.h>
@@ -47,7 +48,7 @@ struct Job;
 
 typedef core::traits::Function<void(JobSystem&, size_t, Job*, void*)> JobFunction;
 
-struct Job
+X_ALIGNED_SYMBOL(struct Job, 64)
 {
 	static const size_t THREAD_IDX_BITS = 4; // 16 threads
 	static const size_t JOB_IDX_BITS = 12;  // 4096
@@ -92,7 +93,7 @@ X_DISABLE_WARNING(4324)
 X_ALIGNED_SYMBOL(class ThreadQue, 64)
 {
 public:
-	static const unsigned int MAX_NUMBER_OF_JOBS = 1 << 12;
+	static const unsigned int MAX_NUMBER_OF_JOBS = 1 << Job::JOB_IDX_BITS;
 private:
 	static const unsigned int MASK = MAX_NUMBER_OF_JOBS - 1u;
 
@@ -157,24 +158,24 @@ template <typename JobData>
 static inline void parallel_for_job(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
 {
 	const JobData* data = static_cast<const JobData*>(jobData);
-	const JobData::SplitterType& splitter = data->splitter;
+	const JobData::SplitterType& splitter = data->splitter_;
 
-	if (splitter.Split<JobData::DataType>(data->count))
+	if (splitter.Split<JobData::DataType>(data->count_))
 	{
 		// split in two
-		const size_t leftCount = data->count / 2u;
-		const JobData leftData(data->data, leftCount, data->pFunction, splitter);
+		const size_t leftCount = data->count_ / 2u;
+		const JobData leftData(data->data_, leftCount, data->pFunction_, splitter);
 		Job* left = jobSys.CreateJobAsChild(job, &parallel_for_job<JobData>, leftData);
 		jobSys.Run(left);
 
-		const size_t rightCount = data->count - leftCount;
-		const JobData rightData(data->data + leftCount, rightCount, data->pFunction, splitter);
+		const size_t rightCount = data->count_ - leftCount;
+		const JobData rightData(data->data_ + leftCount, rightCount, data->pFunction_, splitter);
 		Job* right = jobSys.CreateJobAsChild(job, &parallel_for_job<JobData>, rightData);
 		jobSys.Run(right);
 	}
 	else
 	{
-		(data->pFunction)(data->data, data->count);
+		(data->pFunction_)(data->data_, data->count_);
 	}
 }
 
@@ -188,41 +189,41 @@ struct parallel_for_job_data
 	typedef typename DataJobFunction::Pointer DataJobFunctionPtr;
 
 	parallel_for_job_data(DataType* data, size_t count, DataJobFunctionPtr function, const SplitterType& splitter): 
-		data(data)
-		, count(count)
-		, pFunction(function)
-		, splitter(splitter)
+		data_(data),
+		count_(count),
+		pFunction_(function),
+		splitter_(splitter)
 	{
 	}
 
-	DataType* data;
-	size_t count;
-	DataJobFunctionPtr pFunction;
-	SplitterType splitter;
+	DataType* data_;
+	size_t count_;
+	DataJobFunctionPtr pFunction_;
+	SplitterType splitter_;
 };
 
 template <typename JobData>
 static inline void parallel_for_member_job(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
 {
 	const JobData* data = static_cast<const JobData*>(jobData);
-	const JobData::SplitterType& splitter = data->splitter;
+	const JobData::SplitterType& splitter = data->splitter_;
 
-	if (splitter.Split<JobData::DataType>(data->count))
+	if (splitter.Split<JobData::DataType>(data->count_))
 	{
 		// split in two
-		const uint32_t leftCount = data->count / 2u;
-		const JobData leftData(data->delagte, data->data, leftCount, splitter);
+		const uint32_t leftCount = data->count_ / 2u;
+		const JobData leftData(data->delagte_, data->data_, leftCount, splitter);
 		Job* left = jobSys.CreateJobAsChild(job, &parallel_for_member_job<JobData>, leftData);
 		jobSys.Run(left);
 
-		const uint32_t rightCount = data->count - leftCount;
-		const JobData rightData(data->delagte, data->data + leftCount, rightCount, splitter);
+		const uint32_t rightCount = data->count_ - leftCount;
+		const JobData rightData(data->delagte_, data->data_ + leftCount, rightCount, splitter);
 		Job* right = jobSys.CreateJobAsChild(job, &parallel_for_member_job<JobData>, rightData);
 		jobSys.Run(right);
 	}
 	else
 	{
-		data->delagte.Invoke(data->data, data->count);
+		data->delagte_.Invoke(data->data_, data->count_);
 	}
 }
 
@@ -238,25 +239,25 @@ struct parallel_for_member_job_data
 
 	parallel_for_member_job_data(FunctionDelagte delagte, DataType* data, uint32_t count,
 		 const SplitterType& splitter) :
-		data(data)
-		, delagte(delagte)
-		, count(count)
-		, splitter(splitter)
+		data_(data),
+		delagte_(delagte),
+		count_(count),
+		splitter_(splitter)
 	{
 
 	}
 
-	DataType* data; 
-	FunctionDelagte delagte;
-	uint32_t count; 
-	SplitterType splitter; 
+	DataType* data_; 
+	FunctionDelagte delagte_;
+	uint32_t count_; 
+	SplitterType splitter_; 
 };
 
 template <typename JobData>
 static inline void member_function_job(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
 {
 	JobData* data = static_cast<JobData*>(jobData);
-	(*data->pInst.*data->pFunction)(jobSys, threadIdx, job, data->pJobData);
+	(*data->pInst_.*data->pFunction_)(jobSys, threadIdx, job, data->pJobData_);
 }
 
 
@@ -268,16 +269,16 @@ struct member_function_job_data
 	typedef typename MemberFunction::Pointer MemberFunctionPtr;
 
 	member_function_job_data(ClassType* pInst, MemberFunctionPtr function, void* jobData) :
-		pInst(pInst),
-		pFunction(function),
-		pJobData(jobData)
+		pInst_(pInst),
+		pFunction_(function),
+		pJobData_(jobData)
 	{
 
 	}
 
-	ClassType* pInst;
-	MemberFunctionPtr pFunction;
-	void* pJobData;
+	ClassType* pInst_;
+	MemberFunctionPtr pFunction_;
+	void* pJobData_;
 };
 
 class JobSystem
@@ -285,9 +286,9 @@ class JobSystem
 	struct ThreadJobAllocator;
 
 public:
-	static const uint32_t HW_THREAD_MAX = 16; // max even if hardware supports more.
+	static const uint32_t HW_THREAD_MAX = 1 << Job::THREAD_IDX_BITS; // max even if hardware supports more.
 	static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
-	static const size_t MAX_JOBS = 1 << 12;
+	static const size_t MAX_JOBS = 1 << Job::JOB_IDX_BITS;
 	// 68kb(72kb x64) per 1024 jobs per thread
 	// so for 4096 jobs with 6 threads it's: 1728kb ~1.7mb
 	static const size_t MEMORY_PER_THREAD = (MAX_JOBS * sizeof(Job)) + (MAX_JOBS * sizeof(Job*));
@@ -329,8 +330,13 @@ public:
 
 
 	template<typename ClassType>
-	X_INLINE Job* CreateJobMemberFunc(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, 
+	X_INLINE Job* CreateMemberJob(ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, 
 		void* pJobData);
+
+	template<typename ClassType>
+	X_INLINE Job* CreateMemberJobAsChild(Job* pParent, ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction,
+		void* pJobData);
+
 
 	X_INLINE void AddContinuation(Job* ancestor, Job* continuation, bool runInline = false);
 
@@ -353,12 +359,13 @@ private:
 
 	Job* GetJob(void);
 	Job* GetJob(ThreadQue& queue);
+	Job* GetJobCheckAllQues(ThreadQue& queue);
 	void Execute(Job* pJob, size_t theadIdx);
 	void Finish(Job* pJob, size_t threadIdx);
 
 	size_t GetThreadIndex(void) const;
 
-	static void ThreadBackOff(int32_t backoff);
+	void ThreadBackOff(int32_t backoff);
 	static Thread::ReturnValue ThreadRun_s(const Thread& thread);
 	Thread::ReturnValue ThreadRun(const Thread& thread);
 
@@ -374,6 +381,10 @@ private:
 	Thread threads_[HW_THREAD_MAX];
 	ThreadIdToIndex threadIdToIndex_;
 	uint32_t numThreads_;
+	uint32_t numQues_;
+
+	core::ConditionVariable cond_;
+	core::CriticalSection condCS_;
 
 	ThreadQue* pThreadQues_[HW_THREAD_MAX];
 
@@ -388,6 +399,8 @@ private:
 		JobArena			jobPoolArena;
 #endif
 		uint32_t allocated;
+
+		// there should be 60 byes of padding.
 
 		Job jobs[JobSystem::MAX_JOBS];
 	};

@@ -218,7 +218,7 @@ MStatus PotatoAnimExporter::writeIntermidiate(void)
 
 
 			core::Compression::Compressor<core::Compression::LZ4> comp;
-			if (!comp.deflate(g_arena, anim, compressed, core::Compression::CompressLevel::NORMAL))
+			if (!comp.deflate(g_arena, anim, compressed, core::Compression::CompressLevel::HIGH))
 			{
 				X_ERROR("Anim", "Failed to defalte inter anim");
 				return MS::kFailure;

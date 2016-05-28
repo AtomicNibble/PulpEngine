@@ -278,7 +278,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 
 				core::Compression::Compressor<core::Compression::LZ4> comp;
 
-				if (!comp.deflate(g_arena, rawModel, compressed, core::Compression::CompressLevel::NORMAL))
+				if (!comp.deflate(g_arena, rawModel, compressed, core::Compression::CompressLevel::HIGH))
 				{
 					X_ERROR("Model", "Failed to defalte raw model");
 					return MS::kFailure;
@@ -363,6 +363,7 @@ void ModelExporter::printStats(void) const
 	info.appendFmt("\n> Total Lods: %i", stats_.totalLods);
 	info.appendFmt("\n> Total Mesh: %i", stats_.totalMesh);
 	info.appendFmt("\n> Total Mesh merged: %i", stats_.totalMeshMerged);
+	info.appendFmt("\n> Total Col Mesh: %i", stats_.totalColMesh);
 	info.appendFmt("\n> Total Joints: %i", stats_.totalJoints);
 	info.appendFmt("\n> Total Joints dropped: %i", stats_.totalJointsDropped);
 
@@ -840,8 +841,13 @@ MStatus ModelExporter::loadLODs(void)
 			mesh.displayName_ = getMeshDisplayName(fnmesh.fullPathName());
 			mesh.name_.set(fnmesh.name().asChar());
 
-			MayaUtil::MayaPrintVerbose("\n ------ Processing (%s) -------", mesh.displayName_.c_str());
-
+			if (isColisionMesh(mesh.name_)) {
+				hasColisionMeshes_ = true;
+				MayaUtil::MayaPrintVerbose("\n ------ Processing (%s : Collision) -------", mesh.displayName_.c_str());
+			}
+			else {
+				MayaUtil::MayaPrintVerbose("\n ------ Processing (%s) -------", mesh.displayName_.c_str());
+			}
 
 			if (!getMeshMaterial(info.exportObjects[meshIdx], material)) {
 				MayaUtil::MayaPrintError("Mesh(%s): failed to get material", fnmesh.name().asChar());

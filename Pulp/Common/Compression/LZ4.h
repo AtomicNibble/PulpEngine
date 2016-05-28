@@ -47,6 +47,22 @@ namespace Compression
 	};
 
 
+	class LZ4HC : public LZ4
+	{
+	public:
+	
+		// none buffed single step inflate / deflate.
+		static bool deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
+			void* pDstBuf, size_t destBufLen, size_t& destLenOut,
+			CompressLevel::Enum lvl = CompressLevel::NORMAL);
+
+	private:
+		X_NO_CREATE(LZ4HC);
+		X_NO_COPY(LZ4HC);
+		X_NO_ASSIGN(LZ4HC);
+	};
+
+
 	/*
 		This is for streaming raw data to compressed blocks.
 		this allows for compressing large blocks with low overhead.

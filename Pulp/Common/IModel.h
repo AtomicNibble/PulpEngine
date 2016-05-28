@@ -113,6 +113,10 @@ static const uint32_t	 MODEL_MAX_NAME_LENGTH = 60;
 static const char*		 MODEL_FILE_EXTENSION = "model";
 static const wchar_t*	 MODEL_FILE_EXTENSION_W = L"model";
 
+// max col meshes per mesh
+static const uint32_t	MODEL_MAX_COL_MESH = 8;
+
+
 // Intermidiate format stuff.
 // this is used for saving out raw un processed data. so no dropping of bones, or weights etc..
 // Also text based allowing for other tools to create it with ease.

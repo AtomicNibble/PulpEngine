@@ -1,16 +1,34 @@
 #include "assetmanager.h"
-#include "ui_assetmanager.h"
+#include "assetdbwidget.h"
+
+#include "assetdbexplorer.h"
+
+#include <QtWidgets>
+#include <QColor.h>
+#include <QGridLayout>
+
 
 AssetManager::AssetManager(QWidget *parent) :
-    QMainWindow(parent),
-    ui(new Ui::AssetManager)
+    QMainWindow(parent)
 {
-    ui->setupUi(this);
+    assetDbexplorer_ = new AssetExplorer::AssetExplorer();
 
-    db_.connect("database.db")
+    QString errorMessage;
+    assetDbexplorer_->init(&errorMessage);
+
+    // add base project.
+
+
+    layout_ = new QGridLayout();
+    layout_->addWidget(new AssetExplorer::AssetDbViewWidget());
+
+    QWidget *window = new QWidget();
+    window->setLayout(layout_);
+
+    setCentralWidget(window);
 }
 
 AssetManager::~AssetManager()
 {
-    delete ui;
+
 }
