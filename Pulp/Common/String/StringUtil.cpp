@@ -739,14 +739,6 @@ namespace strUtil
 		return nullptr;
 	}
 
-	const char* workingDir(WorkingDirStr& buf)
-	{
-		_getcwd(buf, sizeof(buf)-1);
-		buf[MAX_PATH - 1] = 0;
-
-		return buf;
-	}
-
 	bool HasFileExtension(const char* path)
 	{
 		return FileExtension(path) != nullptr;

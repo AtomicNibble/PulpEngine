@@ -20,11 +20,6 @@ namespace strUtil
 	//	extern "C" int x_strcmp(const char* str1, const char* str2);
 	}
 
-	
-	typedef char WorkingDirStr[512];
-	const char* workingDir(WorkingDirStr& buf);
-	typedef wchar_t WorkingDirStrW[512];
-	const wchar_t* workingDir(WorkingDirStrW& buf);
 
 	size_t strlen(const char* str);
 	size_t strlen(const wchar_t* str);

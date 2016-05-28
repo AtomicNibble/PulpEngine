@@ -168,10 +168,10 @@ bool xFileSys::InitDirectorys(bool working)
 	}
 	else
 	{
-		strUtil::WorkingDirStrW buf;
-		strUtil::workingDir(buf);
+		core::Path<wchar_t> curDir = PathUtil::GetCurrentDirectory();
 
-		core::Path<wchar_t> base(buf);
+
+		core::Path<wchar_t> base(curDir);
 		base /= L"\\..\\..\\..\\potatoengine\\game_folder\\";
 
 		core::Path<wchar_t> core(base);
@@ -193,10 +193,9 @@ bool xFileSys::InitDirectorys(bool working)
 		}
 		else
 		{
-			core::Path<wchar_t> path = PathUtil::GetCurrentDirectory();
 
 			// set as working.
-			return setGameDir(path.c_str());
+			return setGameDir(curDir.c_str());
 		}
 	}
 
