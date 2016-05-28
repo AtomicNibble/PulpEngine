@@ -22,6 +22,7 @@ public:
 	virtual ~XSound();
 
 	virtual void RegisterVars(void) X_OVERRIDE;
+	virtual void RegisterCmds(void) X_OVERRIDE;
 
 	virtual bool Init(void) X_OVERRIDE;
 	virtual void ShutDown(void) X_OVERRIDE;
@@ -50,6 +51,7 @@ private:
 
 private:
 	AkGameObjectID globalObjID_;
+	AkBankID initBankID_;
 
 	SoundVars vars_;
 
