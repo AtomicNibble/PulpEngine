@@ -2522,8 +2522,8 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				if (pCvar->GetType() == VarFlag::INT)
 				{
 					domain.appendFmt("Domain is any interger between: %d and %d",
-						static_cast<int>(pCvar->GetMin()),
-						static_cast<int>(pCvar->GetMax()));
+						pCvar->GetMinInt(),
+						pCvar->GetMaxInt());
 				}
 				else if (pCvar->GetType() == VarFlag::FLOAT)
 				{
