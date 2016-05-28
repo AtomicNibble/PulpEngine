@@ -47,12 +47,15 @@ class XEngineModule_Sound : public IEngineModule
 	{
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pArena);
+		X_ASSERT_NOT_NULL(gEnv->pConsole);
 		X_UNUSED(initParams);
 
 		sound::ISound* pSound = nullptr;
 
 		g_SoundArena = X_NEW(SoundArena, gEnv->pArena, "SoundArena")(&g_SoundAlloc, "SoundArena");
 		pSound = X_NEW(sound::XSound, g_SoundArena, "SoundSys");
+
+		pSound->RegisterVars();
 
 		if (!pSound->Init()) {
 			X_DELETE(pSound, g_SoundArena);
