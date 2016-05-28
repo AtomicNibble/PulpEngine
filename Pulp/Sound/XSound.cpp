@@ -200,7 +200,8 @@ namespace
 } // namespace
 
 XSound::XSound() :
-	comsSysInit_(false)
+	comsSysInit_(false),
+	outputCaptureEnabled_(false)
 {
 
 }
@@ -492,7 +493,33 @@ void XSound::Update(void)
 {
 	X_PROFILE_BEGIN("SoundUpdate", core::ProfileSubSys::SOUND);
 
-	SoundEngine::RenderAudio();
+	if (AK::SoundEngine::IsInitialized())
+	{
+
+		if (vars_.EnableOutputCapture() && !outputCaptureEnabled_)
+		{
+			AkOSChar const* pFileName = L"audio_capture.wav";
+
+			AKRESULT retValue = AK::SoundEngine::StartOutputCapture(pFileName);
+			if (retValue != AK_Success) {
+				X_ERROR("SoundSys", "Error starting output capture. Err %i", retValue);
+			}
+
+			outputCaptureEnabled_ = true;
+		}
+		else if (!vars_.EnableOutputCapture() && outputCaptureEnabled_)
+		{
+			AKRESULT retValue = AK::SoundEngine::StopOutputCapture();
+			if (retValue != AK_Success) {
+				X_ERROR("SoundSys", "Error stopping output capture. Err %i", retValue);
+			}
+
+			outputCaptureEnabled_ = false;
+		}
+
+
+		SoundEngine::RenderAudio();
+	}
 }
 
 void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)

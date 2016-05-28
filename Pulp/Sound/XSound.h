@@ -52,6 +52,7 @@ private:
 	SoundVars vars_;
 
 	bool comsSysInit_;
+	bool outputCaptureEnabled_;
 
 };
 
