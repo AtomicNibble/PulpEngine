@@ -107,20 +107,20 @@ void SoundVars::RegisterVars(void)
 	ADD_CVAR_REF("snd_mem_engine_lower_default_pool", soundEngineLowerDefaultPoolSize_, soundEngineLowerDefaultPoolSize_, 0, maxVal,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Sound engine lower default memory pool size (KiB).");
-	ADD_CVAR_REF("snd_mem_engine_stream_pool_size", streamManagerMemoryPoolSize_, streamManagerMemoryPoolSize_, 0, maxVal,
+	ADD_CVAR_REF("snd_mem_engine_stream_pool", streamManagerMemoryPoolSize_, streamManagerMemoryPoolSize_, 0, maxVal,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Sound engine stream memory pool size (KiB).");
-	ADD_CVAR_REF("snd_mem_engine_stream_device_pool_size", streamDeviceMemoryPoolSize_, streamDeviceMemoryPoolSize_, 0, maxVal,
+	ADD_CVAR_REF("snd_mem_engine_stream_device_pool", streamDeviceMemoryPoolSize_, streamDeviceMemoryPoolSize_, 0, maxVal,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Sound engine stream device memory pool size (KiB).");
-	ADD_CVAR_REF("snd_mem_engine_command_queue_pool_size", commandQueueMemoryPoolSize_, commandQueueMemoryPoolSize_, 0, maxVal,
+	ADD_CVAR_REF("snd_mem_engine_command_queue_pool", commandQueueMemoryPoolSize_, commandQueueMemoryPoolSize_, 0, maxVal,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Sound engine command queue memory pool size (KiB).");
 
-	ADD_CVAR_REF("snd_mem_engine_monitor_pool_size", monitorMemoryPoolSize_, monitorMemoryPoolSize_, 0, maxVal,
+	ADD_CVAR_REF("snd_mem_engine_monitor_pool", monitorMemoryPoolSize_, monitorMemoryPoolSize_, 0, maxVal,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Sound engine monitor memory pool size (KiB).");
-	ADD_CVAR_REF("snd_mem_engine_monitor_queue_pool_size", monitorQueueMemoryPoolSize_, monitorQueueMemoryPoolSize_, 0, maxVal,
+	ADD_CVAR_REF("snd_mem_engine_monitor_queue_pool", monitorQueueMemoryPoolSize_, monitorQueueMemoryPoolSize_, 0, maxVal,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Sound engine monitor queue memory pool size (KiB).");
 }
