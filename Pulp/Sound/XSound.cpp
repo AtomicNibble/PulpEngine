@@ -485,7 +485,10 @@ void XSound::ShutDown(void)
 
 	MusicEngine::Term();
 
-	SoundEngine::Term();
+	if (AK::SoundEngine::IsInitialized())
+	{
+		SoundEngine::Term();
+	}
 
 	ioHook_.Term();
 
@@ -493,7 +496,10 @@ void XSound::ShutDown(void)
 		IAkStreamMgr::Get()->Destroy();
 	}
 
-	MemoryMgr::Term();
+	if (AK::MemoryMgr::IsInitialized())
+	{
+		MemoryMgr::Term();
+	}
 }
 
 void XSound::release(void)
