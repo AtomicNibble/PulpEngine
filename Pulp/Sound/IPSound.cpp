@@ -56,6 +56,7 @@ class XEngineModule_Sound : public IEngineModule
 		pSound = X_NEW(sound::XSound, g_SoundArena, "SoundSys");
 
 		pSound->RegisterVars();
+		pSound->RegisterCmds();
 
 		if (!pSound->Init()) {
 			X_DELETE(pSound, g_SoundArena);
