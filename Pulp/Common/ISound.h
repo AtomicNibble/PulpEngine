@@ -17,7 +17,8 @@ struct ISound
 	virtual void release(void) X_ABSTRACT;
 
 	// ting tong wong, sing me a song in a thong!
-	virtual void Update() X_ABSTRACT;
+	virtual void Update(void) X_ABSTRACT;
+	virtual void StopAll(void) X_ABSTRACT;
 
 
 

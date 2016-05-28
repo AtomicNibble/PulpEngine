@@ -200,6 +200,7 @@ namespace
 } // namespace
 
 XSound::XSound() :
+	globalObjID_(static_cast<AkGameObjectID>(-1)),
 	comsSysInit_(false),
 	outputCaptureEnabled_(false)
 {
@@ -465,10 +466,17 @@ bool XSound::Init(void)
 		return false;
 	}
 
-	AkGameObjectID m_GlobalID = 0x1;
-	AK::SoundEngine::RegisterGameObj(m_GlobalID);
+
 	SoundEngine::PostEvent("Play_ambient", m_GlobalID);
 #endif
+
+	// register a object for stuff with no position.
+	retValue = AK::SoundEngine::RegisterGameObj(globalObjID_, "GlobalObject");
+	if (retValue != AK_Success) {
+		X_ERROR("SoundSys", "Error creating global object. Err: %i", retValue);
+		return false;
+	}
+
 
 	return true;
 }
@@ -487,8 +495,14 @@ void XSound::ShutDown(void)
 
 	if (AK::SoundEngine::IsInitialized())
 	{
+		AKRESULT retValue;
 
-		AKRESULT retValue = AK::SoundEngine::ClearBanks();
+		retValue = AK::SoundEngine::UnregisterGameObj(globalObjID_);
+		if (retValue != AK_Success) {
+			X_ERROR("SoundSys", "Error unregistering global objects. Err: %i", retValue);
+		}
+
+		retValue = AK::SoundEngine::ClearBanks();
 		if (retValue != AK_Success) {
 			X_ERROR("SoundSys", "Error clearing banks. Err: %i", retValue);
 		}
@@ -574,6 +588,13 @@ void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam
 void XSound::Mute(bool mute)
 {
 	X_UNUSED(mute);
+}
+
+void XSound::StopAll(void)
+{
+	SoundEngine::StopAll();
+
+
 }
 
 // Volume

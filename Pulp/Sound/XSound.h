@@ -28,6 +28,7 @@ public:
 	virtual void release(void) X_OVERRIDE;
 
 	virtual void Update(void) X_OVERRIDE;
+	virtual void StopAll(void) X_OVERRIDE;
 
 	// Shut up!
 	virtual void Mute(bool mute) X_OVERRIDE;
@@ -48,6 +49,8 @@ private:
 	IOhook ioHook_;
 
 private:
+	AkGameObjectID globalObjID_;
+
 	SoundVars vars_;
 
 	bool comsSysInit_;
