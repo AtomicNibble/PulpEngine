@@ -200,7 +200,7 @@ namespace
 } // namespace
 
 XSound::XSound() :
-	globalObjID_(static_cast<AkGameObjectID>(-1)),
+	globalObjID_(static_cast<AkGameObjectID>(-2)), // 0 & -1  are reserved.
 	comsSysInit_(false),
 	outputCaptureEnabled_(false)
 {
