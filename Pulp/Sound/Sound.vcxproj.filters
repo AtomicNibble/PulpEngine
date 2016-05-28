@@ -62,4 +62,9 @@
       <Filter>Source Files\Vars</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Vars\SoundVars.inl">
+      <Filter>Header Files\Vars</Filter>
+    </None>
+  </ItemGroup>
 </Project>

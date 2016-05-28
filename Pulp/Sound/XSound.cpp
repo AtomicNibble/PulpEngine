@@ -248,7 +248,10 @@ bool XSound::Init(void)
 		return false;
 	}
 
+
+
 	// Create and initialise an instance of the default stream manager.
+	stmSettings.uMemorySize = vars_.StreamManagerMemoryPoolBytes();
 	if (!StreamMgr::Create(stmSettings))
 	{
 		X_ERROR("SoundSys", "Could not create the Stream Manager");
@@ -257,6 +260,7 @@ bool XSound::Init(void)
 
 	// Create an IO device.
 	deviceSettings.uSchedulerTypeFlags = AK_SCHEDULER_DEFERRED_LINED_UP;
+	deviceSettings.uIOMemorySize = vars_.StreamDeviceMemoryPoolBytes();
 	if (ioHook_.Init(deviceSettings) != AK_Success)
 	{
 		X_ERROR("SoundSys", "Cannot create streaming I/O device");
@@ -293,6 +297,14 @@ bool XSound::Init(void)
 			}
 		}
 	}
+
+
+	l_InitSettings.uDefaultPoolSize = vars_.SoundEngineDefaultMemoryPoolBytes();
+	l_InitSettings.uCommandQueueSize = vars_.CommandQueueMemoryPoolBytes();
+	l_InitSettings.uMonitorPoolSize = vars_.MonitorMemoryPoolBytes();
+	l_InitSettings.uMonitorQueuePoolSize = vars_.MonitorQueueMemoryPoolBytes();
+
+	l_platInitSetings.uLEngineDefaultPoolSize = vars_.SoundEngineLowerDefaultMemoryPoolBytes();
 
 	if (SoundEngine::Init(&l_InitSettings, &l_platInitSetings) != AK_Success)
 	{

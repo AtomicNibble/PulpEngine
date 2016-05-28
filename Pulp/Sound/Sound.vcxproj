@@ -378,6 +378,9 @@
     <ClCompile Include="Vars\SoundVars.cpp" />
     <ClCompile Include="XSound.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="Vars\SoundVars.inl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
