@@ -93,7 +93,7 @@ void SoundVars::RegisterVars(void)
 	var_vol_sfx_->SetOnChangeCallback(Var_SFXVolChanged);
 	var_vol_voice_->SetOnChangeCallback(Var_VoiceVolChanged);
 
-	const uint32_t maxVal = std::numeric_limits<int32_t>::max();
+	const int32_t maxVal = std::numeric_limits<int32_t>::max();
 
 	ADD_CVAR_REF("snd_enable_coms", enableCommSys_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"initialize Wwise Comm system on startup");
