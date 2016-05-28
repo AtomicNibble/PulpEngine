@@ -222,7 +222,7 @@ public:
 		XWinVar::Init(_name, win);
 	}
 	virtual void Set(const char* val) X_OVERRIDE {
-		value = static_cast<float>(::atof(val));
+		value = core::strUtil::StringToFloat<float>(val);
 	}
 	virtual void Update(void) X_OVERRIDE {
 //		const char* s = getName();

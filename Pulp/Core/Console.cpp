@@ -276,7 +276,7 @@ namespace
 		}
 
 
-		pConsole->WaitSeconds_.SetSeconds(atof(Cmd->GetArg(1)));
+		pConsole->WaitSeconds_.SetSeconds(core::strUtil::StringToFloat<float32_t>(Cmd->GetArg(1)));
 		pConsole->WaitSeconds_ += gEnv->pTimer->GetFrameStartTime();
 	}
 

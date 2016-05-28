@@ -223,7 +223,7 @@ bool XWindow::Parse(core::XParser& lex)
 
 			core::StackString<64> temp(token.begin(), token.end());
 
-			event->time.SetMilliSeconds( ::atof(temp.c_str()) );
+			event->time.SetMilliSeconds(core::strUtil::StringToFloat<float>(temp.c_str()) );
 
 			if (!ParseScript(lex, *event->script))
 			{
@@ -717,7 +717,7 @@ void XWindow::EvaluateRegisters(float* registers)
 
 				if (op->a) {
 					XWinStr* var = reinterpret_cast<XWinStr*>(op->a);
-					registers[op->c] = static_cast<float>(::atof(var->c_str()));
+					registers[op->c] = core::strUtil::StringToFloat<float>(var->c_str());
 				}
 				else {
 					registers[op->c] = 0;
