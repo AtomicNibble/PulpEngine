@@ -357,6 +357,7 @@
     <ClInclude Include="IO\AkIoHook.h" />
     <ClInclude Include="IPSound.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Vars\SoundVars.h" />
     <ClInclude Include="XSound.h" />
   </ItemGroup>
   <ItemGroup>
@@ -374,6 +375,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Vars\SoundVars.cpp" />
     <ClCompile Include="XSound.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -5,6 +5,7 @@
 #define _X_SOUNG_I_H_
 
 #include "IO\AkIoHook.h"
+#include "Vars\SoundVars.h"
 
 #include <ICore.h>
 
@@ -19,6 +20,9 @@ class XSound : public ISound, public ICoreEventListener
 public:
 	XSound();
 	virtual ~XSound();
+
+	void RegisterVars(void);
+
 
 	virtual bool Init(void) X_OVERRIDE;
 	virtual void ShutDown(void) X_OVERRIDE;
@@ -36,7 +40,6 @@ public:
 	virtual void SetSFXVolume(float vol) X_OVERRIDE;
 
 private:
-	void RegisterVars(void);
 
 private:
 	void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_OVERRIDE;
@@ -46,10 +49,9 @@ private:
 	IOhook ioHook_;
 
 private:
-	core::ICVar* var_vol_master_;
-	core::ICVar* var_vol_music_;
-	core::ICVar* var_vol_sfx_;
-	core::ICVar* var_vol_voice_;
+	SoundVars vars_;
+
+	bool comsSysInit_;
 
 };
 

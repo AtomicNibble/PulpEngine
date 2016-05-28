@@ -18,6 +18,12 @@
     <Filter Include="Header Files\IDs">
       <UniqueIdentifier>{c251b189-58d4-451d-b8dc-e6817f420917}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Vars">
+      <UniqueIdentifier>{4a41ff39-c74e-4c4c-b1eb-5259d6e0e2f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vars">
+      <UniqueIdentifier>{b872ce1c-4554-4f09-8dcf-cd05dd133261}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -35,6 +41,9 @@
     <ClInclude Include="IDs\Wwise_IDs.h">
       <Filter>Header Files\IDs</Filter>
     </ClInclude>
+    <ClInclude Include="Vars\SoundVars.h">
+      <Filter>Header Files\Vars</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -48,6 +57,9 @@
     </ClCompile>
     <ClCompile Include="IO\AkIoHook.cpp">
       <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Vars\SoundVars.cpp">
+      <Filter>Source Files\Vars</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

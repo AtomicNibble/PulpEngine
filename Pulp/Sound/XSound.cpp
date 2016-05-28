@@ -197,51 +197,23 @@ X_NAMESPACE_BEGIN(sound)
 namespace
 {
 
-	void Var_MasterVolChanged(core::ICVar* pVar)
-	{
-		float vol = pVar->GetFloat();
-		vol *= 255.f;
-
-		SoundEngine::SetRTPCValue(GAME_PARAMETERS::MASTERVOLUME, vol);
-	}
-
-	void Var_MusicVolChanged(core::ICVar* pVar)
-	{
-		float vol = pVar->GetFloat();
-		vol *= 255.f;
-
-		SoundEngine::SetRTPCValue(GAME_PARAMETERS::MUSICVOLUME, vol);
-	}
-
-	void Var_SFXVolChanged(core::ICVar* pVar)
-	{
-		float vol = pVar->GetFloat();
-		vol *= 255.f;
-
-		SoundEngine::SetRTPCValue(GAME_PARAMETERS::SFXVOLUME, vol);
-	}
-
-	void Var_VoiceVolChanged(core::ICVar* pVar)
-	{
-		float vol = pVar->GetFloat();
-		vol *= 255.f;
-
-		SoundEngine::SetRTPCValue(GAME_PARAMETERS::VOICEVOLUME, vol);
-	}
-	
-
 } // namespace
 
-XSound::XSound()
+XSound::XSound() :
+	comsSysInit_(false)
 {
-	var_vol_master_ = nullptr;
-	var_vol_music_ = nullptr;
-	var_vol_sfx_ = nullptr;
-	var_vol_voice_ = nullptr;
+
 }
 
 XSound::~XSound()
 {
+}
+
+
+
+void XSound::RegisterVars(void)
+{
+	vars_.RegisterVars();
 }
 
 
@@ -336,16 +308,22 @@ bool XSound::Init(void)
 
 #if X_SUPER == 0
 
-	// Initialize communication.
-	AkCommSettings settingsComm;
-	AK::Comm::GetDefaultInitSettings(settingsComm);
-	AKPLATFORM::SafeStrCpy(settingsComm.szAppNetworkName, X_ENGINE_NAME, AK_COMM_SETTINGS_MAX_STRING_SIZE);
-	if (AK::Comm::Init(settingsComm) != AK_Success)
+	if (vars_.EnableComs())
 	{
-		X_ERROR("SoundSys", "Cannot initialize music communication");
-		return false;
+		// Initialize communication.
+		AkCommSettings settingsComm;
+		AK::Comm::GetDefaultInitSettings(settingsComm);
+		AKPLATFORM::SafeStrCpy(settingsComm.szAppNetworkName, X_ENGINE_NAME, AK_COMM_SETTINGS_MAX_STRING_SIZE);
+		if (AK::Comm::Init(settingsComm) != AK_Success)
+		{
+			X_ERROR("SoundSys", "Cannot initialize Wwise communication");
+			return false;
+		}
+
+		comsSysInit_ = true;
 	}
 #endif // !X_SUPER
+
 
 	// Register plugins
 #if !PLUGIN_All
@@ -479,7 +457,6 @@ bool XSound::Init(void)
 	SoundEngine::PostEvent("Play_ambient", m_GlobalID);
 #endif
 
-	RegisterVars();
 	return true;
 }
 
@@ -487,7 +464,10 @@ void XSound::ShutDown(void)
 {
 	X_LOG0("SoundSys", "Shutting Down");
 #if X_SUPER == 0
-	Comm::Term();
+	if (comsSysInit_) {
+		Comm::Term();
+		comsSysInit_ = false;
+	}
 #endif // !X_SUPER
 
 	MusicEngine::Term();
@@ -513,26 +493,6 @@ void XSound::Update(void)
 	X_PROFILE_BEGIN("SoundUpdate", core::ProfileSubSys::SOUND);
 
 	SoundEngine::RenderAudio();
-}
-
-
-void XSound::RegisterVars(void)
-{
-	var_vol_master_ = ADD_CVAR_FLOAT("snd_vol_master", 1.f, 0.f, 1.f,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Master volume");
-	var_vol_music_ = ADD_CVAR_FLOAT("snd_vol_music", 1.f, 0.f, 1.f,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Music volume");
-	var_vol_sfx_ = ADD_CVAR_FLOAT("snd_vol_sfx", 1.f, 0.f, 1.f,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "SFX volume");
-	var_vol_voice_ = ADD_CVAR_FLOAT("snd_vol_voice", 1.f, 0.f, 1.f,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Voice volume");
-
-
-	var_vol_master_->SetOnChangeCallback(Var_MasterVolChanged);
-	var_vol_music_->SetOnChangeCallback(Var_MusicVolChanged);
-	var_vol_sfx_->SetOnChangeCallback(Var_SFXVolChanged);
-	var_vol_voice_->SetOnChangeCallback(Var_VoiceVolChanged);
-
 }
 
 void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
