@@ -136,6 +136,18 @@ float CVarString<T>::GetMax(void)
 	return 0.f; 
 }
 
+template<class T>
+int32_t CVarString<T>::GetMinInt(void)
+{
+	return 0;
+}
+
+template<class T>
+int32_t CVarString<T>::GetMaxInt(void)
+{
+	return 0;
+}
+
 // ------------------------------------------------------------
 
 template<class T>
@@ -253,6 +265,19 @@ template<class T>
 float CVarInt<T>::GetMax(void)
 { 
 	return static_cast<float>(IntMax_);
+}
+
+
+template<class T>
+int32_t CVarInt<T>::GetMinInt(void)
+{
+	return IntMin_;
+}
+
+template<class T>
+int32_t CVarInt<T>::GetMaxInt(void)
+{
+	return IntMax_;
 }
 
 // ------------------------------------------------------------
@@ -421,6 +446,18 @@ float CVarFloat<T>::GetMax(void)
 	return fMax_; 
 }
 
+template<class T>
+int32_t CVarFloat<T>::GetMinInt(void)
+{
+	return static_cast<int32_t>(fMin_);
+}
+
+template<class T>
+int32_t CVarFloat<T>::GetMaxInt(void)
+{
+	return static_cast<int32_t>(fMax_);
+}
+
 // ------------------------------------------------------------
 
 
@@ -534,6 +571,19 @@ float CVarIntRef::GetMax(void)
 { 
 	return static_cast<float>(IntMax_); 
 }
+
+
+int32_t CVarIntRef::GetMinInt(void)
+{
+	return IntMin_;
+}
+
+
+int32_t CVarIntRef::GetMaxInt(void)
+{
+	return IntMax_;
+}
+
 
 // ------------------------------------------------------------
 
@@ -684,6 +734,19 @@ float CVarFloatRef::GetMax(void)
 	return fMax_; 
 }
 
+int32_t CVarFloatRef::GetMinInt(void)
+{
+	return static_cast<int32_t>(fMin_);
+}
+
+
+int32_t CVarFloatRef::GetMaxInt(void)
+{
+	return static_cast<int32_t>(fMax_);
+}
+
+
+
 // ------------------------------------------------------------
 
 
@@ -764,6 +827,19 @@ float CVarColRef::GetMax(void)
 { 
 	return 1.f; 
 }
+
+
+int32_t CVarColRef::GetMinInt(void)
+{
+	return 0;
+}
+
+
+int32_t CVarColRef::GetMaxInt(void)
+{
+	return 1;
+}
+
 
 const Color& CVarColRef::GetColor(void) const
 {
@@ -854,6 +930,17 @@ float CVarVec3Ref::GetMax(void)
 { 
 	return 1.f; 
 }
+
+int32_t CVarVec3Ref::GetMinInt(void)
+{
+	return 0;
+}
+
+int32_t CVarVec3Ref::GetMaxInt(void)
+{
+	return 1;
+}
+
 
 const Vec3f& CVarVec3Ref::GetVal(void) const
 {

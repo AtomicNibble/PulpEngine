@@ -103,6 +103,8 @@ public:
 
 	X_INLINE virtual float GetMin(void) X_OVERRIDE;
 	X_INLINE virtual float GetMax(void) X_OVERRIDE;
+	X_INLINE virtual int32_t GetMinInt(void) X_OVERRIDE;
+	X_INLINE virtual int32_t GetMaxInt(void) X_OVERRIDE;
 
 private:
 	string String_;
@@ -133,6 +135,8 @@ public:
 	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
 	X_INLINE virtual float GetMin(void) X_OVERRIDE;
 	X_INLINE virtual float GetMax(void) X_OVERRIDE;
+	X_INLINE virtual int32_t GetMinInt(void) X_OVERRIDE;
+	X_INLINE virtual int32_t GetMaxInt(void) X_OVERRIDE;
 
 protected:
 	int 		IntValue_;
@@ -166,6 +170,8 @@ public:
 	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
 	X_INLINE virtual float GetMin(void) X_OVERRIDE;
 	X_INLINE virtual float GetMax(void) X_OVERRIDE;
+	X_INLINE virtual int32_t GetMinInt(void) X_OVERRIDE;
+	X_INLINE virtual int32_t GetMaxInt(void) X_OVERRIDE;
 
 private:
 	float 		fValue_;
@@ -197,6 +203,9 @@ public:
 	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
 	X_INLINE virtual float GetMin(void) X_OVERRIDE;
 	X_INLINE virtual float GetMax(void) X_OVERRIDE;
+	X_INLINE virtual int32_t GetMinInt(void) X_OVERRIDE;
+	X_INLINE virtual int32_t GetMaxInt(void) X_OVERRIDE;
+
 protected:
 	X_NO_ASSIGN(CVarIntRef);
 
@@ -229,6 +238,8 @@ public:
 	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
 	X_INLINE virtual float GetMin(void) X_OVERRIDE;
 	X_INLINE virtual float GetMax(void) X_OVERRIDE;
+	X_INLINE virtual int32_t GetMinInt(void) X_OVERRIDE;
+	X_INLINE virtual int32_t GetMaxInt(void) X_OVERRIDE;
 
 private:
 	X_NO_ASSIGN(CVarFloatRef);
@@ -263,6 +274,9 @@ public:
 	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;
 	X_INLINE virtual float GetMin(void) X_OVERRIDE;
 	X_INLINE virtual float GetMax(void) X_OVERRIDE;
+	X_INLINE virtual int32_t GetMinInt(void) X_OVERRIDE;
+	X_INLINE virtual int32_t GetMaxInt(void) X_OVERRIDE;
+
 	X_INLINE const Color& GetColor(void) const;
 	X_INLINE const Color& GetDefaultColor(void) const;
 
@@ -300,6 +314,8 @@ public:
 	X_INLINE virtual VarFlag::Enum GetType(void) X_OVERRIDE;
 	X_INLINE virtual float GetMin(void) X_OVERRIDE;
 	X_INLINE virtual float GetMax(void) X_OVERRIDE;
+	X_INLINE virtual int32_t GetMinInt(void) X_OVERRIDE;
+	X_INLINE virtual int32_t GetMaxInt(void) X_OVERRIDE;
 
 	X_INLINE const Vec3f& GetVal(void) const;
 	X_INLINE const Vec3f& GetDefaultVal(void) const;

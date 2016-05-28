@@ -148,6 +148,8 @@ struct ICVar
 	virtual void SetModified(void) X_ABSTRACT;
 	virtual float GetMin(void) X_ABSTRACT;
 	virtual float GetMax(void) X_ABSTRACT;
+	virtual int32_t GetMinInt(void) X_ABSTRACT;
+	virtual int32_t GetMaxInt(void) X_ABSTRACT;
 
 	virtual VarFlag::Enum GetType(void) X_ABSTRACT;
 
