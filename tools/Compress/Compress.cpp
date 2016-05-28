@@ -85,7 +85,7 @@ namespace
 		X_LOG0("Compressor", "Args:");
 		X_LOG0("Compressor", "^6-if^7		(input file) ^1required");
 		X_LOG0("Compressor", "^6-of^7		(output file, default: file + algo) ^9not-required");
-		X_LOG0("Compressor", "^6-a^7		(algo 1:lz4 2:lzma 3:zlib, default: lza) ^9not-required");
+		X_LOG0("Compressor", "^6-a^7		(algo 1:lz4 2:lz4hc 3:lzma 4:zlib, default: lza) ^9not-required");
 		X_LOG0("Compressor", "^6-d^7		(deflate 1/0, default: 1) ^9not-required");
 		X_LOG0("Compressor", "^6-lvl^7		(lvl 1-9, default: 5) ^9not-required");
 	}
@@ -178,9 +178,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				algo = Algo::LZ4;
 			}
 			else if (iAlgo == 2) {
-				algo = Algo::LZMA;
+				algo = Algo::LZ4HC;
 			}
 			else if (iAlgo == 3) {
+				algo = Algo::LZMA;
+			}
+			else if (iAlgo == 4) {
 				algo = Algo::ZLIB;
 			}
 			else {
@@ -192,7 +195,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		const wchar_t* pLvl = gEnv->pCore->GetCommandLineArgForVarW(L"lvl");
 		if (pLvl) {
 			int32_t lvlArg = core::strUtil::StringToInt<int32_t>(pLvl);
-			lvlArg = constrain<int32_t>(lvlArg, 1, CompressLevel::ENUM_COUNT);
+			lvlArg = constrain<int32_t>(lvlArg, 1, CompressLevel::ENUM_COUNT) - 1;
 
 			lvl = static_cast<CompressLevel::Enum>(lvlArg);
 		}
@@ -225,6 +228,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 	if (algo == Algo::LZ4) {
 		pCompressor = X_NEW(Compressor<core::Compression::LZ4>, g_arena, "LZ4");
+		if (defalte && outFile.empty()) {
+			outFile = inFile + L".lz4";
+		}
+	}
+	else if (algo == Algo::LZ4HC) {
+		pCompressor = X_NEW(Compressor<core::Compression::LZ4HC>, g_arena, "LZ4HC");
 		if (defalte && outFile.empty()) {
 			outFile = inFile + L".lz4";
 		}
