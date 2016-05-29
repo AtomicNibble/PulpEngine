@@ -191,6 +191,7 @@ private:
 
 	void HotReloadListExts(void);
 	void ListProgramArgs(void);
+	void LogSystemInfo(void) const;
 
 private:
 

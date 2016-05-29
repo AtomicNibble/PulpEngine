@@ -16,9 +16,11 @@
 #include <Hashing\crc32.h>
 #include <Platform\Window.h>
 #include <Platform\Console.h>
+#include <Platform\SystemInfo.h>
 #include <Debugging\InvalidParameterHandler.h>
 #include <Debugging\CallStack.h>
 #include <Memory\VirtualMem.h>
+#include <String\HumanSize.h>
 
 #include <Console.h>
 
@@ -635,6 +637,37 @@ void XCore::ListProgramArgs(void)
 	}
 
 	X_LOG0("AppArgs", "------ ^8Program Args End^7 -----");
+}
+
+
+void XCore::LogSystemInfo(void) const
+{
+	core::SysInfo::UserNameStr userName;
+	core::SysInfo::LanguageStr lang;
+	core::SysInfo::MemInfo memInfo;
+	core::SysInfo::DisplayInfo displayInfo;
+
+	core::SysInfo::GetUserName(userName);
+	core::SysInfo::GetLanguage(lang);
+	core::SysInfo::GetSystemMemInfo(memInfo);
+	core::SysInfo::GetDisplayInfo(displayInfo);
+
+	core::HumanSize::Str s1, s2, s3;
+
+	X_LOG0("SysInfo", "UserName: \"%ls\"", userName);
+	X_LOG0("SysInfo", "Language: \"%ls\"", lang);
+	X_LOG0("SysInfo", "PhysicalMem %s available %s virtual %s used %ld%%",
+		core::HumanSize::toString(s1, memInfo.TotalPhys),
+		core::HumanSize::toString(s2, memInfo.AvailPhys),
+		core::HumanSize::toString(s3, memInfo.TotalVirtual),
+		memInfo.dwMemoryLoad
+	);
+	X_LOG0("SysInfo", "Display: %dx%dx%d",
+		displayInfo.pelsWidth,
+		displayInfo.pelsHeight,
+		displayInfo.bitsPerPel
+	);
+
 }
 
 X_NAMESPACE_BEGIN(core)
