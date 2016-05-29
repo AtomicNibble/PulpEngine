@@ -281,6 +281,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	// Call init on objects from before so they can register vars.
 	env_.pLog->Init();
 
+	if (!startupParams.isCoreOnly() && !startupParams.basicConsole()) {
+		LogSystemInfo();
+	}
 
 	// #------------------------- TIMER ------------------------
 	if (!time_.Init(this))
