@@ -1090,6 +1090,12 @@
     <ClInclude Include="Hashing\xxHash.h">
       <Filter>Headers\Hashing</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\SystemInfo.h">
+      <Filter>Headers\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\win32\SystemInfo.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1664,6 +1670,9 @@
     </ClCompile>
     <ClCompile Include="Hashing\xxHash.cpp">
       <Filter>SourceFiles\Hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\win32\SystemInfo.cpp">
+      <Filter>SourceFiles\Platform\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
