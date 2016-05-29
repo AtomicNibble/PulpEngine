@@ -142,6 +142,11 @@ bool Thread::SetThreadAffinity(const AffinityFlags flags)
 	return true;
 }
 
+void Thread::SetFPE(FPE::Enum fpe)
+{
+	SetFPE(GetID(), fpe);
+}
+
 uint32_t Thread::GetID(void) const
 {
 	return ::GetThreadId(handle_);
@@ -188,6 +193,133 @@ void Thread::SetName(uint32_t threadId, const char* name)
 	SetThreadName(threadId, name);
 }
 
+void Thread::SetFPE(uint32_t threadId, FPE::Enum fpe)
+{
+	// Enable:
+	// - _EM_ZERODIVIDE
+	// - _EM_INVALID
+	//
+	// Disable:
+	// - _EM_DENORMAL
+	// - _EM_OVERFLOW
+	// - _EM_UNDERFLOW
+	// - _EM_INEXACT
+	const uint32_t BASIC_DISABLE = _EM_INEXACT | _EM_DENORMAL | _EM_UNDERFLOW | _EM_OVERFLOW;
+	const uint32_t BASIC_MM_DISABLE = _MM_MASK_DENORM | _MM_MASK_INEXACT | _MM_MASK_UNDERFLOW | _MM_MASK_OVERFLOW;
+
+	// Enable:
+	// - _EM_ZERODIVIDE
+	// - _EM_INVALID
+	// - _EM_UNDERFLOW
+	// - _EM_OVERFLOW
+	//
+	// Disable:
+	// - _EM_INEXACT
+	// - _EM_DENORMAL
+	const uint32_t ALL_DISABLE = _EM_INEXACT | _EM_DENORMAL;
+	const uint32_t ALL_MM_DISABLE = _MM_MASK_INEXACT | _MM_MASK_DENORM;
+
+
+	if (threadId == 0 || threadId == GetCurrentID())
+	{
+		_controlfp(_DN_FLUSH, _MCW_DN);
+		_mm_setcsr(_mm_getcsr() | _MM_FLUSH_ZERO_ON);
+
+		if (fpe == FPE::NONE)
+		{
+			// mask all floating exceptions off.
+			_controlfp(_MCW_EM, _MCW_EM);
+			_mm_setcsr(_mm_getcsr() | _MM_MASK_MASK);
+		}
+		else
+		{
+			// Clear pending exceptions
+			_fpreset();
+
+			if (fpe == FPE::BASIC)
+			{
+				_controlfp(BASIC_DISABLE, _MCW_EM);
+				_mm_setcsr((_mm_getcsr() & ~_MM_MASK_MASK) | BASIC_MM_DISABLE);
+			}
+
+			if (fpe == FPE::ALL)
+			{
+				_controlfp(ALL_DISABLE, _MCW_EM);
+				_mm_setcsr((_mm_getcsr() & ~_MM_MASK_MASK) | ALL_MM_DISABLE);
+			}
+		}
+		return;
+	}
+
+	HANDLE hThread = OpenThread(THREAD_ALL_ACCESS, true, threadId);
+	if (hThread == 0)
+	{
+		core::lastError::Description Dsc;
+		X_WARNING("Thread", "Unable to open thread: %p Err: %s", hThread, core::lastError::ToString(Dsc));
+		return;
+	}
+
+	SuspendThread(hThread);
+
+	CONTEXT ctx;
+	memset(&ctx, sizeof(ctx), 0);
+	ctx.ContextFlags = CONTEXT_ALL;
+	if (GetThreadContext(hThread, &ctx) == 0)
+	{
+		core::lastError::Description Dsc;
+		X_WARNING("Thread", "Failed to get thread contex: %p Err: %s", hThread, core::lastError::ToString(Dsc));
+		ResumeThread(hThread);
+		CloseHandle(hThread);
+		return;
+	}
+
+
+#if X_64
+	DWORD& floatMxCsr = ctx.MxCsr;  // Hold FPE Mask and Status for MMX (SSE) floating point registers
+	typedef WORD ControlType;
+#else
+	DWORD& floatMxCsr = *reinterpret_cast<DWORD*>(&ctx.ExtendedRegisters[24]); 
+	typedef DWORD ControlType;
+#endif
+
+	ControlType& floatControlWord = ctx.FltSave.ControlWord; // Hold FPE Mask for floating point registers
+	ControlType& floatStatuslWord = ctx.FltSave.StatusWord;  // Holds FPE Status for floating point registers
+
+	// Set flush mode to zero mode
+	floatControlWord = static_cast<ControlType>((floatControlWord & ~_MCW_DN) | _DN_FLUSH);
+	floatMxCsr = static_cast<ControlType>((floatMxCsr & ~_MM_FLUSH_ZERO_MASK) | (_MM_FLUSH_ZERO_ON));
+
+	// Reset FPE bits
+	floatControlWord = static_cast<ControlType>(floatControlWord | _MCW_EM);
+	floatMxCsr = floatMxCsr | _MM_MASK_MASK;
+
+	// Clear pending exceptions
+	floatStatuslWord = floatStatuslWord & ~(_SW_INEXACT | _SW_UNDERFLOW | _SW_OVERFLOW | _SW_ZERODIVIDE | _SW_INVALID | _SW_DENORMAL);
+	floatMxCsr = floatMxCsr & ~(_MM_EXCEPT_INEXACT | _MM_EXCEPT_UNDERFLOW | _MM_EXCEPT_OVERFLOW | _MM_EXCEPT_DIV_ZERO | _MM_EXCEPT_INVALID | _MM_EXCEPT_DENORM);
+
+	if (fpe == FPE::BASIC)
+	{
+		floatControlWord = static_cast<ControlType>((floatControlWord & ~_MCW_EM) | BASIC_DISABLE);
+		floatMxCsr = (floatMxCsr & ~_MM_MASK_MASK) | BASIC_MM_DISABLE;
+	}
+
+	if (fpe == FPE::ALL)
+	{
+		floatControlWord = static_cast<ControlType>((floatControlWord & ~_MCW_EM) | ALL_DISABLE);
+		floatMxCsr = (floatMxCsr & ~_MM_MASK_MASK) | ALL_MM_DISABLE;
+	}
+
+	ctx.ContextFlags = CONTEXT_ALL;
+	if (SetThreadContext(hThread, &ctx) == 0)
+	{
+		core::lastError::Description Dsc;
+		X_WARNING("Thread", "Failed to set thread contex: %p Err: %s", hThread, core::lastError::ToString(Dsc));
+		// fall through and resume.
+	}
+
+	ResumeThread(hThread);
+	CloseHandle(hThread);
+}
 
 uint32_t __stdcall Thread::ThreadFunction_(void* threadInstance)
 {

@@ -70,6 +70,12 @@ X_ALIGNED_SYMBOL(class Thread, 64)
 		CORE3,CORE4,CORE5,CORE6,CORE7
 	);
 
+	X_DECLARE_ENUM(FPE)(
+		NONE,	// nope . nope
+		BASIC,  // Invalid operation, Div by Zero!
+		ALL		// Invalid operation, Div by Zero, Denormalized operand, Overflow, UnuderFlow, Unexact
+	);
+
 public:
 	typedef Flags<CpuCore> AffinityFlags;
 	typedef uint32_t ReturnValue;
@@ -92,6 +98,7 @@ public:
 	bool HasFinished(void) const volatile;
 
 	bool SetThreadAffinity(const AffinityFlags flags);
+	void SetFPE(FPE::Enum fpe);
 
 	uint32_t GetID(void) const;
 
@@ -110,6 +117,8 @@ public:
 	static void YieldProcessor(void);
 	static uint32_t GetCurrentID(void);
 	static void SetName(uint32_t threadId, const char* name);
+
+	static void SetFPE(uint32_t threadId, FPE::Enum fpe);
 
 private:
 	static uint32_t __stdcall ThreadFunction_(void* threadInstance);
