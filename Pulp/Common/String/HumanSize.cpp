@@ -7,7 +7,7 @@ X_NAMESPACE_BEGIN(core)
 namespace HumanSize
 {
 
-	const char* toString(Str& str, size_t numBytes)
+	const char* toString(Str& str, uint64_t numBytes)
 	{
 		str.clear();
 
@@ -20,15 +20,23 @@ namespace HumanSize
 		}
 		else if (numBytes <= 10485760)
 		{
-			str.appendFmt("%.2fKB", static_cast<float>(numBytes) / 1024);
+			str.appendFmt("%.2fKB", static_cast<double>(numBytes) / 1024);
 		}
 		else if (numBytes <= 10737418240)
 		{
-			str.appendFmt("%.2fMB", (static_cast<float>(numBytes) / 1024) / 1024);
+			str.appendFmt("%.2fMB", (static_cast<double>(numBytes) / 1024) / 1024);
+		}
+		else if (numBytes <= 10995116277760)
+		{
+			str.appendFmt("%.2fGB", ((static_cast<double>(numBytes) / 1024) / 1024) / 1024);
+		}	
+		else if (numBytes <= 11258999068426240)
+		{
+			str.appendFmt("%.2fTB", (((static_cast<double>(numBytes) / 1024) / 1024) / 1024) / 1024);
 		}
 		else
 		{
-			str.appendFmt("%.2fMB", (static_cast<float>(numBytes) / 1024) / 1024);
+			str.appendFmt("%.2fGB", (((static_cast<double>(numBytes) / 1024) / 1024) / 1024) / 1024);
 		}
 
 
