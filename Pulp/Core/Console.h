@@ -287,6 +287,8 @@ private:
 	typedef core::HashMap<string, ConsoleCommand, core::hash<const char*>, equal_to_case_insen> ConsoleCmdMap;
 	typedef ConsoleCmdMap::iterator ConsoleCmdMapItor;
 
+	typedef core::HashMap<string, string, core::hash<const char*>, equal_to_case_insen> ConfigCmdsMap;
+
 	typedef core::HashMap<string, string> ConsoleBindMap;
 	typedef ConsoleBindMap::iterator ConsoleBindMapItor;
 
@@ -315,6 +317,7 @@ private:
 	ConsoleVarMap			VarMap_;
 	ConsoleCmdMap			CmdMap_;
 	ConsoleBindMap			Binds_; // support sexy bind.
+	ConfigCmdsMap			configCmds_;
 
 	DeferredCmdList			deferredCmds_;
 

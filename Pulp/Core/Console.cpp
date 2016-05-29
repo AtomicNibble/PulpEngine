@@ -623,6 +623,7 @@ XConsole::XConsole() :
 	VarMap_(g_coreArena),
 	CmdMap_(g_coreArena),
 	Binds_(g_coreArena),
+	configCmds_(g_coreArena),
 	varHeap_(
 		bitUtil::RoundUpToMultiple<size_t>(
 			VarPool::getMemoryRequirement(VAR_ALLOCATION_SIZE) * VAR_MAX,
@@ -659,6 +660,7 @@ XConsole::XConsole() :
 	VarMap_.reserve(4096);
 	CmdMap_.reserve(1024);
 	Binds_.reserve(128);
+	configCmds_.reserve(128);
 
 
 	repeatEventTimer_ = 0.f;
@@ -1957,6 +1959,26 @@ void XConsole::ExecuteStringInternal(const char* pCommand, ExecSource::Enum sour
 			continue;
 		}
 
+		// if this was from config, add it to list.
+		// so vars not yet registerd can get the value
+		if (source == ExecSource::CONFIG && pPos)
+		{
+			value.set(pPos + 1, range.GetEnd());
+			value.trim();
+
+			auto it = configCmds_.find(X_CONST_STRING(name.c_str()));
+			if (it == configCmds_.end()) {
+
+				configCmds_.insert(ConfigCmdsMap::iterator::value_type(name.c_str(),
+					string(value.begin(), value.end())));
+
+			}
+			else {
+				it->second = string(value.begin(), value.end());
+			}
+
+		}
+
 		if (!bSilentMode)
 		{
 			if (source == ExecSource::CONFIG) {
@@ -2040,10 +2062,22 @@ ICVar* XConsole::GetCVarForRegistration(const char* Name)
 }
 
 
-void XConsole::RegisterVar(ICVar *pCVar, ConsoleVarFunc pChangeFunc)
+void XConsole::RegisterVar(ICVar* pCVar, ConsoleVarFunc pChangeFunc)
 {
 	if (pChangeFunc) {
 		pCVar->SetOnChangeCallback(pChangeFunc);
+	}
+
+	auto it = configCmds_.find(X_CONST_STRING(pCVar->GetName()));
+	if (it != configCmds_.end()) {
+
+		ICVar::FlagType flags = pCVar->GetFlags();
+
+		if (CvarModifyBegin(pCVar, ExecSource::CONFIG)) {
+			pCVar->Set(it->second);
+		}
+
+		X_LOG2("Console", "Var \"%s\" was set by config on registeration", pCVar->GetName());
 	}
 
 	VarMap_.insert(ConsoleVarMapItor::value_type(pCVar->GetName(), pCVar));
