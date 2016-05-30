@@ -56,6 +56,7 @@ X_USING_NAMESPACE;
 #define DLL_RENDER_NULL		"Engine_RenderNull"
 #define DLL_3D_ENGINE		"Engine_3DEngine"
 #define DLL_GAME_DLL		"Engine_GameDLL"
+#define DLL_PHYSICS			"Engine_Physics"
 
 
 
@@ -318,6 +319,10 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		if (!InitSound(startupParams))
 			return false;
 
+		// #------------------------- Physics -------------------------
+		if (!InitPhysics(startupParams))
+			return false;
+
 		// #------------------------- ScriptSys -------------------------
 		if (!InitScriptSys(startupParams))
 			return false;
@@ -550,6 +555,15 @@ bool XCore::InitSound(const SCoreInitParams& initParams)
 		return false;
 
 	return env_.pSound != nullptr;
+}
+
+bool XCore::InitPhysics(const SCoreInitParams& initParams)
+{
+	if (!IntializeEngineModule(DLL_PHYSICS, "Engine_Physics", initParams)) {
+		return false;
+	}
+
+	return env_.pPhysics != nullptr;
 }
 
 bool XCore::InitScriptSys(const SCoreInitParams& initParams)
