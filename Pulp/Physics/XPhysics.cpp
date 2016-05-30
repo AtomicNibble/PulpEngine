@@ -1,68 +1,51 @@
 #include "stdafx.h"
-#include <ModuleExports.h>
-
-#include <ICore.h>
-#include <IEngineModule.h>
-
-#include <Extension\XExtensionMacros.h>
+#include "XPhysics.h"
 
 
-X_USING_NAMESPACE;
-
-PhysicsArena* g_PhysicsArena = nullptr;
+X_NAMESPACE_BEGIN(physics)
 
 
-namespace {
-	core::MallocFreeAllocator g_PhysicsAlloc;
+
+XPhysics::XPhysics()
+{
+
+}
+
+XPhysics::~XPhysics()
+{
+
+
+}
+
+// IPhysics
+void XPhysics::RegisterVars(void)
+{
+
+
+}
+
+void XPhysics::RegisterCmds(void)
+{
+
+
+}
+
+bool XPhysics::Init(void)
+{
+
+	return true;
+}
+
+void XPhysics::ShutDown(void)
+{
+
+
+}
+
+void XPhysics::release(void)
+{
+
 }
 
 
-
-
-//////////////////////////////////////////////////////////////////////////
-class XEngineModule_Physics : public IEngineModule
-{
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Physics, "Engine_Physics");
-
-	//////////////////////////////////////////////////////////////////////////
-	virtual const char *GetName() X_OVERRIDE { return "Physics"; };
-
-	//////////////////////////////////////////////////////////////////////////
-	virtual bool Initialize(SCoreGlobals &env, const SCoreInitParams &initParams) X_OVERRIDE
-	{
-		X_UNUSED(initParams);
-		ICore* pCore = env.pCore;
-
-
-		LinkModule(pCore, "Physics");
-
-		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pArena);
-
-		// kinky shit.
-		g_PhysicsArena = X_NEW(PhysicsArena, gEnv->pArena, "PhysicsArena")(&g_PhysicsAlloc, "PhysicsArena");
-
-
-		return true;
-	}
-
-	virtual bool ShutDown(void) X_OVERRIDE
-	{
-		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pArena);
-
-		X_DELETE_AND_NULL(g_PhysicsArena, gEnv->pArena);
-		return true;
-	}
-};
-
-X_POTATO_REGISTER_CLASS(XEngineModule_Physics);
-
-XEngineModule_Physics::XEngineModule_Physics()
-{
-};
-
-XEngineModule_Physics::~XEngineModule_Physics()
-{
-
-};
+X_NAMESPACE_END
