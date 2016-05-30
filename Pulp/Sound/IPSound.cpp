@@ -60,7 +60,7 @@ class XEngineModule_Sound : public IEngineModule
 
 		if (!pSound->Init()) {
 			X_DELETE(pSound, g_SoundArena);
-			return true;
+			return false;
 		}
 
 		env.pSound = pSound;
