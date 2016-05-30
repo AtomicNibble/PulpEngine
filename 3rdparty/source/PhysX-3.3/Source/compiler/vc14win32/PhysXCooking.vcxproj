@@ -59,7 +59,7 @@
     <OutDir>./../../../bin/vc14win32\</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
-    <TargetName>PhysX3CookingDEBUG_x86</TargetName>
+    <TargetName>$(ProjectName)DEBUG</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
     <CodeAnalysisRuleAssemblies />
@@ -85,9 +85,9 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalOptions>/MAP /MACHINE:x86 /DEBUG /DELAYLOAD:PhysX3CommonDEBUG_x86.dll</AdditionalOptions>
+      <AdditionalOptions>/MAP /MACHINE:x86 /DEBUG /DELAYLOAD:PhysX3CommonDEBUG.dll</AdditionalOptions>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)PhysX3CookingDEBUG_x86.dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -104,7 +104,7 @@
     <OutDir>./../../../bin/vc14win32\</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
-    <TargetName>PhysX3CookingCHECKED_x86</TargetName>
+    <TargetName>$(ProjectName)CHECKED</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
     <CodeAnalysisRuleAssemblies />
@@ -129,9 +129,9 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalOptions>/MAP /MACHINE:x86 /DELAYLOAD:PhysX3CommonCHECKED_x86.dll</AdditionalOptions>
+      <AdditionalOptions>/MAP /MACHINE:x86 /DELAYLOAD:PhysX3CommonCHECKED.dll</AdditionalOptions>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)PhysX3CookingCHECKED_x86.dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -148,7 +148,7 @@
     <OutDir>./../../../bin/vc14win32\</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
-    <TargetName>PhysX3CookingPROFILE_x86</TargetName>
+    <TargetName>$(ProjectName)PROFILE</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
     <CodeAnalysisRuleAssemblies />
@@ -173,9 +173,9 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalOptions>/MAP /MACHINE:x86 /INCREMENTAL:NO /DEBUG /DELAYLOAD:PhysX3CommonPROFILE_x86.dll</AdditionalOptions>
+      <AdditionalOptions>/MAP /MACHINE:x86 /INCREMENTAL:NO /DEBUG /DELAYLOAD:PhysX3CommonPROFILE.dll</AdditionalOptions>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)PhysX3CookingPROFILE_x86.dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -192,7 +192,7 @@
     <OutDir>./../../../bin/vc14win32\</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
-    <TargetName>PhysX3Cooking_x86</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
     <CodeAnalysisRuleAssemblies />
@@ -217,9 +217,9 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalOptions>/MAP /MACHINE:x86 /INCREMENTAL:NO /DELAYLOAD:PhysX3Common_x86.dll</AdditionalOptions>
+      <AdditionalOptions>/MAP /MACHINE:x86 /INCREMENTAL:NO /DELAYLOAD:PhysX3Common.dll</AdditionalOptions>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)PhysX3Cooking_x86.dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
