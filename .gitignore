@@ -168,3 +168,4 @@ $RECYCLE.BIN/
 user_config.cfg
 *.idb
 /3rdparty/v140/x64/Physx
+/3rdparty/v140/Win32/Physx
