@@ -21,6 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{653CC2CD-99F5-48D8-0E9C-46FA10B26447}</ProjectGuid>
     <RootNamespace>PhysXCommon</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
@@ -56,7 +57,7 @@
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
     <OutDir>./../../../bin/vc14win32\</OutDir>
-    <IntDir>./Win32/PhysXCommon/debug\</IntDir>
+    <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
     <TargetName>PhysX3CommonDEBUG_x86</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -90,7 +91,7 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>./../../../Lib/vc14win32/$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/$(TargetName).lib</ImportLibrary>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -101,7 +102,7 @@
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">
     <OutDir>./../../../bin/vc14win32\</OutDir>
-    <IntDir>./Win32/PhysXCommon/checked\</IntDir>
+    <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
     <TargetName>PhysX3CommonCHECKED_x86</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -134,7 +135,7 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>./../../../Lib/vc14win32/$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/$(TargetName).lib</ImportLibrary>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -145,7 +146,7 @@
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">
     <OutDir>./../../../bin/vc14win32\</OutDir>
-    <IntDir>./Win32/PhysXCommon/profile\</IntDir>
+    <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
     <TargetName>PhysX3CommonPROFILE_x86</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -178,7 +179,7 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>./../../../Lib/vc14win32/$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/$(TargetName).lib</ImportLibrary>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -189,7 +190,7 @@
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
     <OutDir>./../../../bin/vc14win32\</OutDir>
-    <IntDir>./Win32/PhysXCommon/release\</IntDir>
+    <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
     <TargetName>PhysX3Common_x86</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -222,7 +223,7 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>./../../../Lib/vc14win32/$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/$(TargetName).lib</ImportLibrary>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>

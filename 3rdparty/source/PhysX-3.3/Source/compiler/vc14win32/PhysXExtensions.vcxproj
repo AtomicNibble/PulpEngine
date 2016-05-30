@@ -21,6 +21,7 @@
   <PropertyGroup Label="Globals">
     <ProjectGuid>{2C6C10D1-F63D-B7F0-8390-AFC3DC10EC90}</ProjectGuid>
     <RootNamespace>PhysXExtensions</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'" Label="Configuration">
@@ -55,8 +56,8 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
-    <OutDir>./../../../Lib/vc14win32\</OutDir>
-    <IntDir>./Win32/PhysXExtensions/debug\</IntDir>
+    <OutDir>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/</OutDir>
+    <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.lib</TargetExt>
     <TargetName>PhysX3ExtensionsDEBUG</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -96,8 +97,8 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">
-    <OutDir>./../../../Lib/vc14win32\</OutDir>
-    <IntDir>./Win32/PhysXExtensions/checked\</IntDir>
+    <OutDir>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/</OutDir>
+    <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.lib</TargetExt>
     <TargetName>PhysX3ExtensionsCHECKED</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -136,8 +137,8 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">
-    <OutDir>./../../../Lib/vc14win32\</OutDir>
-    <IntDir>./Win32/PhysXExtensions/profile\</IntDir>
+    <OutDir>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/</OutDir>
+    <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.lib</TargetExt>
     <TargetName>PhysX3ExtensionsPROFILE</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
@@ -177,8 +178,8 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
-    <OutDir>./../../../Lib/vc14win32\</OutDir>
-    <IntDir>./Win32/PhysXExtensions/release\</IntDir>
+    <OutDir>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/</OutDir>
+    <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.lib</TargetExt>
     <TargetName>PhysX3Extensions</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
