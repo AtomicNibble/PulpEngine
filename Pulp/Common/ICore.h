@@ -55,8 +55,9 @@ struct I3DEngine;
 X_NAMESPACE_DECLARE(game,
 struct IGame;
 )
-
-
+X_NAMESPACE_DECLARE(physics,
+	struct IPhysics;
+)
 
 X_USING_NAMESPACE;
 
@@ -250,6 +251,7 @@ struct SCoreGlobals
 	script::IScriptSys*			pScriptSys;
 	render::IRender*			pRender;
 	engine::I3DEngine*			p3DEngine;
+	physics::IPhysics*			pPhysics;
 	game::IGame*				pGame;
 //	core::IJobSystem*			pJobSys;
 	core::V2::JobSystem*		pJobSys;
@@ -329,6 +331,7 @@ struct ICore
 	virtual render::IRender		*GetIRender() X_ABSTRACT;
 	virtual font::IXFontSys		*GetIFontSys() X_ABSTRACT;
 //	virtual core::IJobSystem	*GetJobSystem() X_ABSTRACT;
+	virtual physics::IPhysics*	 GetPhysics() X_ABSTRACT;
 
 	virtual core::IProfileSys	*GetIProfileSys() X_ABSTRACT;
 	virtual core::ILog			*GetILog() X_ABSTRACT;

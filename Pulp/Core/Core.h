@@ -131,6 +131,8 @@ public:
 	render::IRender		*GetIRender(void) X_OVERRIDE{ return env_.pRender; }
 	font::IXFontSys		*GetIFontSys(void) X_OVERRIDE{ return env_.pFont; }
 //	core::IJobSystem	*GetJobSystem(void) X_OVERRIDE{ return env_.pJobSys; }
+	physics::IPhysics*	 GetPhysics(void) X_OVERRIDE { return env_.pPhysics; };
+
 	core::IProfileSys	*GetIProfileSys(void) X_OVERRIDE{ return &profileSys_; }
 	core::IXDirectoryWatcher *GetDirWatcher(void) X_OVERRIDE{ return env_.pDirWatcher; }
 	core::IXHotReloadManager*   GetHotReloadMan(void) X_OVERRIDE{ return this; };
@@ -181,6 +183,7 @@ private:
 	bool InitRenderSys(const SCoreInitParams &startupParams);
 	bool Init3DEngine(const SCoreInitParams &startupParams);
 	bool InitGameDll(const SCoreInitParams &startupParams);
+	bool InitPhysics(const SCoreInitParams &startupParams);
 	
 	
 	void CreateSystemVars(void);
