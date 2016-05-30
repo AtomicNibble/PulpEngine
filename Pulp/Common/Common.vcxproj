@@ -140,6 +140,7 @@
     <ClInclude Include="ILog.h" />
     <ClInclude Include="IMaterial.h" />
     <ClInclude Include="IModel.h" />
+    <ClInclude Include="IPhysics.h" />
     <ClInclude Include="IProfile.h" />
     <ClInclude Include="IRender.h" />
     <ClInclude Include="I3DEngine.h" />

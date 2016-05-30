@@ -1096,6 +1096,9 @@
     <ClInclude Include="Platform\win32\SystemInfo.h">
       <Filter>Headers\Platform\win32</Filter>
     </ClInclude>
+    <ClInclude Include="IPhysics.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
