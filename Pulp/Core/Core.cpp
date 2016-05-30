@@ -11,6 +11,7 @@
 #include <IScriptSys.h>
 #include <IFont.h>
 #include <IGame.h>
+#include <IPhysics.h>
 #include <IEngineModule.h>
 
 #include <Hashing\crc32.h>
@@ -151,6 +152,12 @@ void XCore::ShutDown()
 
 	if (env_.pRender) {
 	//	env_.pRender->ShutDown();
+	}
+
+	if (env_.pPhysics)
+	{
+		env_.pPhysics->ShutDown();
+		core::SafeRelease(env_.pPhysics);
 	}
 
 	if (env_.pSound)
