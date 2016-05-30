@@ -167,3 +167,4 @@ $RECYCLE.BIN/
 /game_folder/core_assets/cmdHistory.txt
 user_config.cfg
 *.idb
+/3rdparty/v140/x64/Physx
