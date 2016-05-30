@@ -275,15 +275,20 @@ void Thread::SetFPE(uint32_t threadId, FPE::Enum fpe)
 
 
 #if X_64
-	DWORD& floatMxCsr = ctx.MxCsr;  // Hold FPE Mask and Status for MMX (SSE) floating point registers
 	typedef WORD ControlType;
-#else
-	DWORD& floatMxCsr = *reinterpret_cast<DWORD*>(&ctx.ExtendedRegisters[24]); 
-	typedef DWORD ControlType;
-#endif
 
+	DWORD& floatMxCsr = ctx.MxCsr;  // Hold FPE Mask and Status for MMX (SSE) floating point registers
 	ControlType& floatControlWord = ctx.FltSave.ControlWord; // Hold FPE Mask for floating point registers
 	ControlType& floatStatuslWord = ctx.FltSave.StatusWord;  // Holds FPE Status for floating point registers
+
+#else
+	typedef DWORD ControlType;
+
+	DWORD& floatMxCsr = *reinterpret_cast<DWORD*>(&ctx.ExtendedRegisters[24]); 
+	ControlType& floatControlWord = ctx.FloatSave.ControlWord; // Hold FPE Mask for floating point registers
+	ControlType& floatStatuslWord = ctx.FloatSave.StatusWord;  // Holds FPE Status for floating point registers
+
+#endif
 
 	// Set flush mode to zero mode
 	floatControlWord = static_cast<ControlType>((floatControlWord & ~_MCW_DN) | _DN_FLUSH);
