@@ -34,6 +34,13 @@
 
 #include <Time\StopWatch.h>
 
+
+X_LINK_LIB(X_STRINGIZE(MAYA_SDK) "\\Foundation")
+X_LINK_LIB(X_STRINGIZE(MAYA_SDK) "\\OpenMaya")
+X_LINK_LIB(X_STRINGIZE(MAYA_SDK) "\\OpenMayaUI")
+X_LINK_LIB(X_STRINGIZE(MAYA_SDK) "\\OpenMayaAnim")
+
+
 #if 1
 typedef core::MemoryArena<core::MallocFreeAllocator, core::MultiThreadPolicy<core::Spinlock>,
 	core::NoBoundsChecking, core::NoMemoryTracking, core::NoMemoryTagging> Arena;
