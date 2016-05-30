@@ -59,7 +59,7 @@
     <OutDir>./../../../bin/vc14win64\</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
-    <TargetName>PhysX3CommonDEBUG_x64</TargetName>
+    <TargetName>$(ProjectName)DEBUG</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
     <CodeAnalysisRuleAssemblies />
@@ -87,7 +87,7 @@
     <Link>
       <AdditionalOptions>/MAP /MACHINE:x64 /DEBUG</AdditionalOptions>
       <AdditionalDependencies>./../../../externals/nvToolsExt/1/lib/x64/nvToolsExt64_1.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)PhysX3CommonDEBUG_x64.dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -104,7 +104,7 @@
     <OutDir>./../../../bin/vc14win64\</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
-    <TargetName>PhysX3CommonCHECKED_x64</TargetName>
+    <TargetName>$(ProjectName)CHECKED</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
     <CodeAnalysisRuleAssemblies />
@@ -131,7 +131,7 @@
     <Link>
       <AdditionalOptions>/MAP /MACHINE:x64</AdditionalOptions>
       <AdditionalDependencies>./../../../externals/nvToolsExt/1/lib/x64/nvToolsExt64_1.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)PhysX3CommonCHECKED_x64.dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -148,7 +148,7 @@
     <OutDir>./../../../bin/vc14win64\</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
-    <TargetName>PhysX3CommonPROFILE_x64</TargetName>
+    <TargetName>$(ProjectName)PROFILE</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
     <CodeAnalysisRuleAssemblies />
@@ -175,7 +175,7 @@
     <Link>
       <AdditionalOptions>/MAP /MACHINE:x64 /INCREMENTAL:NO /DEBUG</AdditionalOptions>
       <AdditionalDependencies>./../../../externals/nvToolsExt/1/lib/x64/nvToolsExt64_1.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)PhysX3CommonPROFILE_x64.dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
@@ -192,7 +192,7 @@
     <OutDir>./../../../bin/vc14win64\</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
-    <TargetName>PhysX3Common_x64</TargetName>
+    <TargetName>$(ProjectName)</TargetName>
     <CodeAnalysisRuleSet>AllRules.ruleset</CodeAnalysisRuleSet>
     <CodeAnalysisRules />
     <CodeAnalysisRuleAssemblies />
@@ -219,7 +219,7 @@
     <Link>
       <AdditionalOptions>/MAP /MACHINE:x64 /INCREMENTAL:NO</AdditionalOptions>
       <AdditionalDependencies>./../../../externals/nvToolsExt/1/lib/x64/nvToolsExt64_1.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <OutputFile>$(OutDir)PhysX3Common_x64.dll</OutputFile>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
