@@ -85,7 +85,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalOptions>/MAP /MACHINE:x64 /DEBUG /DELAYLOAD:PhysX3CommonDEBUG.dll</AdditionalOptions>
+      <AdditionalOptions>/MAP /MACHINE:x64 /DEBUG /DELAYLOAD:PhysXCommonDEBUG.dll</AdditionalOptions>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -129,7 +129,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalOptions>/MAP /MACHINE:x64 /DELAYLOAD:PhysX3CommonCHECKED.dll</AdditionalOptions>
+      <AdditionalOptions>/MAP /MACHINE:x64 /DELAYLOAD:PhysXCommonCHECKED.dll</AdditionalOptions>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -173,7 +173,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalOptions>/MAP /MACHINE:x64 /INCREMENTAL:NO /DEBUG /DELAYLOAD:PhysX3CommonPROFILE.dll</AdditionalOptions>
+      <AdditionalOptions>/MAP /MACHINE:x64 /INCREMENTAL:NO /DEBUG /DELAYLOAD:PhysXCommonPROFILE.dll</AdditionalOptions>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -217,7 +217,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalOptions>/MAP /MACHINE:x64 /INCREMENTAL:NO /DELAYLOAD:PhysX3Common.dll</AdditionalOptions>
+      <AdditionalOptions>/MAP /MACHINE:x64 /INCREMENTAL:NO /DELAYLOAD:PhysXCommon.dll</AdditionalOptions>
       <AdditionalDependencies>%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
