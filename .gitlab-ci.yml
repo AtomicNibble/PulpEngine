@@ -97,7 +97,7 @@ build:x64_release:
   artifacts:
    paths:
     - build/x64/Release/*.exe
-     dependencies:
+   dependencies:
     - build:build_3rdparty
   tags:
     - windows
