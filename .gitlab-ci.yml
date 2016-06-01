@@ -9,29 +9,6 @@ stages:
  - build
  - test
 
-build:build_3rdparty:
-  stage: build
-  script:
-    - echo building x86...
-    - msbuild 3rdparty/source/PhysX86.sln /t:build /p:Configuration=debug;Platform=win32
-    - msbuild 3rdparty/source/PhysX86.sln /t:build /p:Configuration=checked;Platform=win32
-    - msbuild 3rdparty/source/PhysX86.sln /t:build /p:Configuration=profile;Platform=win32
-    - msbuild 3rdparty/source/PhysX86.sln /t:build /p:Configuration=release;Platform=win32
-    - echo building x64...
-    - msbuild 3rdparty/source/PhysX64.sln /t:build /p:Configuration=debug;Platform=x64
-    - msbuild 3rdparty/source/PhysX64.sln /t:build /p:Configuration=checked;Platform=x64
-    - msbuild 3rdparty/source/PhysX64.sln /t:build /p:Configuration=profile;Platform=x64
-    - msbuild 3rdparty/source/PhysX64.sln /t:build /p:Configuration=release;Platform=x64
-  artifacts:
-   paths:
-    - 3rdparty/bin/*.exe
-    - 3rdparty/bin/*.pdb
-    - 3rdparty/v140/x64/Physx/*.pdb
-    - 3rdparty/v140/x64/Physx/*.lib
-    - 3rdparty/v140/Win32/Physx/*.pdb
-    - 3rdparty/v140/Win32/Physx/*.lib
-  tags:
-    - windows
 
 build:win32_debug:
   stage: build
@@ -43,8 +20,6 @@ build:win32_debug:
    paths:
     - build/Win32/Debug/*.exe
     - build/Win32/Debug/*.pdb
-   dependencies:
-    - build:build_3rdparty
   tags:
     - windows
 
@@ -57,8 +32,6 @@ build:win32_release:
   artifacts:
    paths:
     - build/Win32/Release/*.exe
-   dependencies:
-    - build:build_3rdparty
   tags:
     - windows
 
@@ -71,8 +44,6 @@ build:win32_super:
   artifacts:
    paths:
     - build/Win32/Super/*.exe
-   dependencies:
-    - build:build_3rdparty
   tags:
     - windows
 
@@ -87,8 +58,6 @@ build:x64_debug:
    paths:
     - build/x64/Debug/*.exe
     - build/x64/Debug/*.pdb
-   dependencies:
-    - build:build_3rdparty
   tags:
     - windows
 
@@ -101,8 +70,6 @@ build:x64_release:
   artifacts:
    paths:
     - build/x64/Release/*.exe
-   dependencies:
-    - build:build_3rdparty
   tags:
     - windows
 
@@ -115,8 +82,6 @@ build:x64_super:
   artifacts:
    paths:
     - build/x64/Super/*.exe
-   dependencies:
-    - build:build_3rdparty
   tags:
     - windows
 
