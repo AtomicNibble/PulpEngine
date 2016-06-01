@@ -13,10 +13,10 @@ build:build_3rdparty:
   stage: build
   script:
     - echo building x86...
-    - msbuild 3rdparty/source/PhysX86.sln /t:build /p:Configuration=debug;Platform=x86
-    - msbuild 3rdparty/source/PhysX86.sln /t:build /p:Configuration=checked;Platform=x86
-    - msbuild 3rdparty/source/PhysX86.sln /t:build /p:Configuration=profile;Platform=x86
-    - msbuild 3rdparty/source/PhysX86.sln /t:build /p:Configuration=release;Platform=x86
+    - msbuild 3rdparty/source/PhysX86.sln /t:build /p:Configuration=debug;Platform=win32
+    - msbuild 3rdparty/source/PhysX86.sln /t:build /p:Configuration=checked;Platform=win32
+    - msbuild 3rdparty/source/PhysX86.sln /t:build /p:Configuration=profile;Platform=win32
+    - msbuild 3rdparty/source/PhysX86.sln /t:build /p:Configuration=release;Platform=win32
     - echo building x64...
     - msbuild 3rdparty/source/PhysX64.sln /t:build /p:Configuration=debug;Platform=x64
     - msbuild 3rdparty/source/PhysX64.sln /t:build /p:Configuration=checked;Platform=x64
