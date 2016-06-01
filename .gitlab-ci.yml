@@ -26,6 +26,10 @@ build:build_3rdparty:
    paths:
     - 3rdparty/bin/*.exe
     - 3rdparty/bin/*.pdb
+    - 3rdparty/v140/x64/Physx/*.pdb
+    - 3rdparty/v140/x64/Physx/*.lib
+    - 3rdparty/v140/Win32/Physx/*.pdb
+    - 3rdparty/v140/Win32/Physx/*.lib
   tags:
     - windows
 
