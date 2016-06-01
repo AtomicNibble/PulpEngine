@@ -5,6 +5,9 @@
 #include "extensions/PxExtensionsAPI.h"
 #include "physxvisualdebuggersdk/PvdConnectionManager.h"
 
+#include "Allocator.h"
+#include "Logger.h"
+
 namespace PVD {
 	using namespace physx::debugger;
 	using namespace physx::debugger::comm;
@@ -17,8 +20,19 @@ class XPhysics : public IPhysics,
 	public PVD::PvdConnectionHandler, //receive notifications when pvd is connected and disconnected.
 	public physx::PxDeletionListener
 {
+	X_DECLARE_ENUM(StepperType) (
+		DEFAULT_STEPPER,
+		FIXED_STEPPER,
+		INVERTED_FIXED_STEPPER,
+		VARIABLE_STEPPER
+	);
+
+
+	X_NO_COPY(XPhysics);
+	X_NO_ASSIGN(XPhysics);
+
 public:
-	XPhysics();
+	XPhysics(core::MemoryArenaBase* arena);
 	~XPhysics() X_OVERRIDE;
 
 	// IPhysics
@@ -42,14 +56,26 @@ private:
 	// ~PxDeletionListener
 
 
+	void getDefaultSceneDesc(physx::PxSceneDesc&);
+	void customizeSceneDesc(physx::PxSceneDesc&);
+	void customizeTolerances(physx::PxTolerancesScale&);
+
 private:
+	PhysxArenaAllocator	allocator_;
+	PhysxLogger logger_;
+
 	physx::PxFoundation*				foundation_;
 	physx::PxProfileZoneManager*		profileZoneManager_;
 	physx::PxPhysics*					physics_;
 	physx::PxCooking*					cooking_;
 	physx::PxScene*						scene_;
+	physx::PxMaterial*					material_;
+	physx::PxDefaultCpuDispatcher*		cpuDispatcher_;
 
+	bool initialDebugRender_;
+	physx::PxReal debugRenderScale_;
 
+	StepperType::Enum stepperType_;
 };
 
 

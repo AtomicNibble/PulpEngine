@@ -66,7 +66,7 @@ class XEngineModule_Physics : public IEngineModule
 
 		// kinky shit.
 		g_PhysicsArena = X_NEW(PhysicsArena, gEnv->pArena, "PhysicsArena")(&g_PhysicsAlloc, "PhysicsArena");
-		pPhysics = X_NEW(physics::XPhysics, g_PhysicsArena, "PhysicisSys");
+		pPhysics = X_NEW(physics::XPhysics, g_PhysicsArena, "PhysicisSys")(g_PhysicsArena);
 
 		pPhysics->RegisterVars();
 		pPhysics->RegisterCmds();

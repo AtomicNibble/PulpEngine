@@ -23,3 +23,7 @@ namespace physx
 
 
 extern core::MemoryArenaBase* g_PhysicsArena;
+
+
+
+#define PHYSX_DEFAULT_ALLOCATOR 0

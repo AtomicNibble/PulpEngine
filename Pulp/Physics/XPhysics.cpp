@@ -38,20 +38,28 @@ X_NAMESPACE_BEGIN(physics)
 
 namespace
 {
+#if PHYSX_DEFAULT_ALLOCATOR
 	physx::PxDefaultAllocator gDefaultAllocatorCallback;
-	physx::PxDefaultErrorCallback gDefaultErrorCallback;
+#endif // !PHYSX_DEFAULT_ALLOCATOR
+
 
 } // namespace
 
 
-XPhysics::XPhysics() :
+XPhysics::XPhysics(core::MemoryArenaBase* arena) :
+	allocator_(arena),
 	foundation_(nullptr),
 	profileZoneManager_(nullptr),
 	physics_(nullptr),
 	cooking_(nullptr),
-	scene_(nullptr)
+	scene_(nullptr),
+	material_(nullptr),
+	cpuDispatcher_(nullptr),
+	initialDebugRender_(false),
+	debugRenderScale_(1.f),
+	stepperType_(StepperType::FIXED_STEPPER)
 {
-
+	X_ASSERT_NOT_NULL(arena);
 }
 
 XPhysics::~XPhysics()
@@ -77,7 +85,15 @@ bool XPhysics::Init(void)
 {
 	X_LOG0("PhysicsSys", "Starting");
 
-	foundation_ = PxCreateFoundation(PX_PHYSICS_VERSION, gDefaultAllocatorCallback, gDefaultErrorCallback);
+	foundation_ = PxCreateFoundation(PX_PHYSICS_VERSION, 
+#if PHYSX_DEFAULT_ALLOCATOR
+		gDefaultAllocatorCallback,
+#else
+		allocator_,
+#endif // !PHYSX_DEFAULT_ALLOCATOR
+		logger_
+	);
+
 	if (!foundation_) {
 		X_ERROR("Physics", "Failed to create foundation");
 		return false;
@@ -95,7 +111,7 @@ bool XPhysics::Init(void)
 	bool recordMemoryAllocations = true;
 
 	physx::PxTolerancesScale scale;
-	//customizeTolerances(scale);
+	customizeTolerances(scale);
 
 
 	physics_ = PxCreatePhysics(PX_PHYSICS_VERSION, *foundation_,
@@ -106,6 +122,11 @@ bool XPhysics::Init(void)
 		return false;
 	}	
 
+
+	if (!PxInitExtensions(*physics_)) {
+		X_ERROR("Physics", "Failed to init extensions");
+		return false;
+	}
 
 	physx::PxCookingParams params(scale);
 	params.meshWeldTolerance = 0.001f;
@@ -128,6 +149,56 @@ bool XPhysics::Init(void)
 	physics_->registerDeletionListener(*this, physx::PxDeletionEventFlag::eUSER_RELEASE);
 
 
+	material_ = physics_->createMaterial(0.5f, 0.5f, 0.1f);
+	if (!material_) {
+		X_ERROR("Physics", "Failed to create material");
+		return false;
+	}
+
+
+
+	physx::PxSceneDesc sceneDesc(physics_->getTolerancesScale());
+	sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
+	getDefaultSceneDesc(sceneDesc);
+	customizeSceneDesc(sceneDesc);
+
+	if (!sceneDesc.cpuDispatcher)
+	{
+		cpuDispatcher_ = physx::PxDefaultCpuDispatcherCreate(1);
+		if (!cpuDispatcher_) {
+			X_ERROR("PhysicsSys", "PxDefaultCpuDispatcherCreate failed!");
+			return false;
+		}
+		sceneDesc.cpuDispatcher = cpuDispatcher_;
+	}
+
+	if (!sceneDesc.filterShader) {
+		sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
+	}
+
+
+
+	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_TWO_DIRECTIONAL_FRICTION;
+	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_PCM;
+	//sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ONE_DIRECTIONAL_FRICTION;  
+	//sceneDesc.flags |= physx::PxSceneFlag::eADAPTIVE_FORCE;
+	sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS;
+	//sceneDesc.flags |= physx::PxSceneFlag::eDISABLE_CONTACT_CACHE;
+
+
+	if (stepperType_ == StepperType::INVERTED_FIXED_STEPPER) {
+		sceneDesc.simulationOrder = physx::PxSimulationOrder::eSOLVE_COLLIDE;
+	}
+
+	scene_ = physics_->createScene(sceneDesc);
+	if (!scene_) {
+		X_ERROR("PhysicsSys", "Failed to create scene");
+		return false;
+	}
+
+	physx::PxSceneWriteLock scopedLock(*scene_);
+	scene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, initialDebugRender_ ? debugRenderScale_ : 0.0f);
+	scene_->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
 
 
 	return true;
@@ -140,10 +211,17 @@ void XPhysics::ShutDown(void)
 	if (scene_) {
 		scene_->fetchResults(true);
 	}
-
+	if (physics_) {
+		physics_->unregisterDeletionListener(*this);
+	}
 
 	core::SafeRelease(scene_);
+	core::SafeRelease(cpuDispatcher_);
+	core::SafeRelease(material_);
 	core::SafeRelease(cooking_);
+
+	PxCloseExtensions();
+
 	core::SafeRelease(physics_);
 	core::SafeRelease(profileZoneManager_);
 	core::SafeRelease(foundation_);
@@ -196,6 +274,23 @@ void XPhysics::onRelease(const physx::PxBase* pObserved, void* pUserData,
 		}
 #endif
 	}
+}
+
+
+void XPhysics::getDefaultSceneDesc(physx::PxSceneDesc&)
+{
+
+}
+
+void XPhysics::customizeSceneDesc(physx::PxSceneDesc&)
+{
+
+}
+
+void XPhysics::customizeTolerances(physx::PxTolerancesScale&)
+{
+
+
 }
 
 
