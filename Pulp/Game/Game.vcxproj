@@ -339,7 +339,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dlll;PhysXCommon.dll;PhysXCooking.dll</DelayLoadDLLs>
+      <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysXCommon.dll;PhysXCooking.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Super|x64'">
