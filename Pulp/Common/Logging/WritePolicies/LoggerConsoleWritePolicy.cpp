@@ -206,21 +206,25 @@ namespace {
 							SectionSize = 0;
 						}
 					}
-					else if (!hasCoolorCode && curChar == L'\"')
+					else if (curChar == L'\"')
 					{
-						// still make text green.
 						if (isString)
 						{
 							++SectionSize;
-							SetConsoleTextAttribute( console, STRING_COLOR );
 						}
-						else
-						{
-							SetConsoleTextAttribute( console, color );
-						}	
 
 						NumberOfCharsWritten = 0;
 						WriteConsoleW(console, pCur, SectionSize, &NumberOfCharsWritten, 0);
+
+						// still make text green.
+						if (!isString)
+						{
+							SetConsoleTextAttribute(console, STRING_COLOR);
+						}
+						else
+						{
+							SetConsoleTextAttribute(console, color);
+						}
 
 						length -= SectionSize;
 						pCur = pCur + SectionSize;
