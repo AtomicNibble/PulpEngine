@@ -56,7 +56,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
-    <OutDir>../.././../../../bin/$(PlatformName)/</OutDir>
+    <OutDir>./../../../../../Physx_libs/bin/$(PlatformName)/</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
     <TargetName>$(ProjectName)DEBUG</TargetName>
@@ -91,7 +91,7 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>./../../../../../Physx_libs/lib/$(PlatformName)/$(TargetName).lib</ImportLibrary>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -101,7 +101,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">
-    <OutDir>../.././../../../bin/$(PlatformName)/</OutDir>
+    <OutDir>./../../../../../Physx_libs/bin/$(PlatformName)/</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
     <TargetName>$(ProjectName)CHECKED</TargetName>
@@ -135,7 +135,7 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>./../../../../../Physx_libs/lib/$(PlatformName)/$(TargetName).lib</ImportLibrary>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -145,7 +145,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">
-    <OutDir>../.././../../../bin/$(PlatformName)/</OutDir>
+    <OutDir>./../../../../../Physx_libs/bin/$(PlatformName)/</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
     <TargetName>$(ProjectName)PROFILE</TargetName>
@@ -179,7 +179,7 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>./../../../../../Physx_libs/lib/$(PlatformName)/$(TargetName).lib</ImportLibrary>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
@@ -189,7 +189,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
-    <OutDir>../.././../../../bin/$(PlatformName)/</OutDir>
+    <OutDir>./../../../../../Physx_libs/bin/$(PlatformName)/</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.dll</TargetExt>
     <TargetName>$(ProjectName)</TargetName>
@@ -223,7 +223,7 @@
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <ProgramDatabaseFile>$(TargetDir)\$(TargetName).pdb</ProgramDatabaseFile>
       <SubSystem>Console</SubSystem>
-      <ImportLibrary>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>./../../../../../Physx_libs/lib/$(PlatformName)/$(TargetName).lib</ImportLibrary>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>

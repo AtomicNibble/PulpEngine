@@ -56,7 +56,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|Win32'">
-    <OutDir>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/</OutDir>
+    <OutDir>./../../../../../Physx_libs/lib/$(PlatformName)/</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.lib</TargetExt>
     <TargetName>$(ProjectName)DEBUG</TargetName>
@@ -97,7 +97,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='checked|Win32'">
-    <OutDir>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/</OutDir>
+    <OutDir>./../../../../../Physx_libs/lib/$(PlatformName)/</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.lib</TargetExt>
     <TargetName>$(ProjectName)CHECKED</TargetName>
@@ -137,7 +137,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile|Win32'">
-    <OutDir>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/</OutDir>
+    <OutDir>./../../../../../Physx_libs/lib/$(PlatformName)/</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.lib</TargetExt>
     <TargetName>$(ProjectName)PROFILE</TargetName>
@@ -178,7 +178,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|Win32'">
-    <OutDir>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/</OutDir>
+    <OutDir>./../../../../../Physx_libs/lib/$(PlatformName)/</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.lib</TargetExt>
     <TargetName>$(ProjectName)</TargetName>
