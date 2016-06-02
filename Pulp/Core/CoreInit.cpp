@@ -145,7 +145,6 @@ bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModul
 bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassName, const SCoreInitParams &initParams)
 {
 	core::Path<char> path(dllName);
-	
 	path.setExtension(".dll");
 
 	core::StopWatch time;
@@ -190,7 +189,7 @@ bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassNa
 	uint64 memUsed = memEnd.WorkingSetSize - memStart.WorkingSetSize;
 	X_LOG0("Engine", "Init \"%s\", MemUsage=%dKb ^6%gms", name ? (name+1) : dllName, uint32(memUsed / 1024), time.GetMilliSeconds());
 #else
-	X_LOG0("Engine", "Init \"%s\": %s %gms", name ? (name + 1) : dllName, res ? "OK" : "Fail", time.GetMilliSeconds());
+	X_LOG0("Engine", "Init \"%s\": %s ^6%gms", name ? (name + 1) : dllName, res ? "OK" : "Fail", time.GetMilliSeconds());
 #endif // #if !defined(X_LIB) 
 
 	return res;
@@ -200,6 +199,8 @@ bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassNa
 //////////////////////////////////////////////////////////////////////////
 bool XCore::Init(const SCoreInitParams &startupParams)
 {
+	core::StopWatch time;
+
 	// init the system baby!
 	gEnv->uMainThreadId = core::Thread::GetCurrentID();			//Set this ASAP on startup
 
@@ -401,6 +402,8 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	//	No longer needed since I call this on window activate events.
 	//	pWindow_->ClipCursorToWindow();
 	}
+
+	X_LOG1("Core", "Core startup: ^6%gms", time.GetMilliSeconds());
 
 	return true;
 }
@@ -618,6 +621,8 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 			X_ERROR("Core", "Failed to init render system");
 			return false;
 		}
+
+		X_LOG0("Core", "render init: ^6%gms");
 	}
 
 	return true;
