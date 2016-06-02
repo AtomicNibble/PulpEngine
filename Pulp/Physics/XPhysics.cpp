@@ -3,6 +3,7 @@
 
 
 #include <pvd\PxVisualDebugger.h>
+#include <common\windows\PxWindowsDelayLoadHook.h>
 
 #if X_DEBUG
 #define PHYS_LIB_SUFFIX "DEBUG"
@@ -42,6 +43,28 @@ namespace
 	physx::PxDefaultAllocator gDefaultAllocatorCallback;
 #endif // !PHYSX_DEFAULT_ALLOCATOR
 
+
+	class SampleDelayLoadHook : public physx::PxDelayLoadHook
+	{
+	public:
+
+		virtual const char* getPhysXCommonDEBUGDllName(void) const X_FINAL
+		{
+			return "PhysXCommonDEBUG.dll";
+		}
+		virtual const char* getPhysXCommonCHECKEDDllName(void) const X_FINAL
+		{
+			return "PhysXCommonCHECKED.dll";
+		}
+		virtual const char* getPhysXCommonPROFILEDllName(void) const X_FINAL
+		{
+			return "PhysXCommonPROFILE.dll";
+		}
+		virtual const char* getPhysXCommonDllName(void) const X_FINAL
+		{
+			return "PhysXCommon.dll";
+		}
+	} gDelayLoadHook;
 
 } // namespace
 
@@ -84,6 +107,9 @@ void XPhysics::RegisterCmds(void)
 bool XPhysics::Init(void)
 {
 	X_LOG0("PhysicsSys", "Starting");
+
+	physx::PxSetPhysXDelayLoadHook(&gDelayLoadHook);
+	physx::PxSetPhysXCookingDelayLoadHook(&gDelayLoadHook);
 
 	foundation_ = PxCreateFoundation(PX_PHYSICS_VERSION, 
 #if PHYSX_DEFAULT_ALLOCATOR
