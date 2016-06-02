@@ -56,7 +56,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='debug|x64'">
-    <OutDir>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/</OutDir>
+    <OutDir>./../../../../../Physx_libs/lib/$(PlatformName)</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.lib</TargetExt>
     <TargetName>$(ProjectName)DEBUG</TargetName>
@@ -69,7 +69,7 @@
       <TreatWarningAsError>true</TreatWarningAsError>
       <BufferSecurityCheck>false</BufferSecurityCheck>
       <FloatingPointModel>Fast</FloatingPointModel>
-      <BasicRuntimeChecks>UninitializedLocalUsageCheck</BasicRuntimeChecks>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
       <AdditionalOptions>/GR- /GF /MP /Wall /wd4514 /wd4820 /wd4127 /wd4710 /wd4711 /wd4577 /wd4774 /wd4464 /Zi /d2Zi+</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>./../../../Include/foundation;./../../foundation/include;./../../../Include/physxprofilesdk;./../../../Include/physxvisualdebuggersdk;./../../../externals/nvToolsExt/1/include;./../../../externals/nvToolsExt/1/include/stdint;./../../../Include/common;./../../../Include/geometry;./../../../Include/pvd;./../../../Include/pxtask;./../../../Include;./../../Common/src;./../../Common/src/windows;./../../GeomUtils/headers;./../../GeomUtils/src;./../../GeomUtils/src/contact;./../../GeomUtils/src/common;./../../GeomUtils/src/convex;./../../GeomUtils/src/distance;./../../GeomUtils/src/sweep;./../../GeomUtils/src/gjk;./../../GeomUtils/src/intersection;./../../GeomUtils/src/mesh;./../../GeomUtils/src/hf;./../../GeomUtils/src/pcm;./../../SceneQuery;./../../SimulationController/include;./../../LowLevel/API/include;./../../LowLevel/ps3/include;./../../PhysX/src;./../../PhysX/src/buffering;./../../PvdRuntime/src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -97,7 +97,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='checked|x64'">
-    <OutDir>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/</OutDir>
+    <OutDir>./../../../../../Physx_libs/lib/$(PlatformName)</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.lib</TargetExt>
     <TargetName>$(ProjectName)CHECKED</TargetName>
@@ -137,7 +137,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='profile|x64'">
-    <OutDir>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/</OutDir>
+    <OutDir>./../../../../../Physx_libs/lib/$(PlatformName)</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.lib</TargetExt>
     <TargetName>$(ProjectName)PROFILE</TargetName>
@@ -178,7 +178,7 @@
     </ProjectReference>
   </ItemDefinitionGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='release|x64'">
-    <OutDir>./../../../../../$(PlatformToolset)/$(PlatformName)/Physx/</OutDir>
+    <OutDir>./../../../../../Physx_libs/lib/$(PlatformName)</OutDir>
     <IntDir>../.././../../../../../Temp/3rdparty/$(PlatformName)/$(Configuration)/$(ProjectName)/</IntDir>
     <TargetExt>.lib</TargetExt>
     <TargetName>$(ProjectName)</TargetName>
