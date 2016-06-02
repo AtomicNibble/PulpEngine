@@ -10,3 +10,6 @@
 [submodule "3rdparty/Wwise_libs"]
 	path = 3rdparty/Wwise_libs
 	url = git@www.touchingclothgames.com:root/WwiseLibs.git
+[submodule "3rdparty/Physx_libs"]
+	path = 3rdparty/Physx_libs
+	url = git@www.touchingclothgames.com:root/Physx.git
