@@ -8,7 +8,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\3rdparty\source\PhysX-3.3\Include\;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ClCompile>
   <Link>
-    <AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\$(PlatformToolset)\$(PlatformName)\Physx\;;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    <AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\$(PlatformToolset)\$(PlatformName)\Physx\;$(SolutionDir)..\3rdparty\Physx_libs\lib\$(PlatformName)\;;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
   </Link>
   </ItemDefinitionGroup>
 </Project>
