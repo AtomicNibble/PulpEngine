@@ -85,7 +85,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalOptions>/MAP /MACHINE:x86 /DELAYLOAD:PhysX3CommonDEBUG.dll /DEBUG</AdditionalOptions>
+      <AdditionalOptions>/MAP /MACHINE:x86 /DELAYLOAD:PhysXCommonDEBUG.dll /DEBUG</AdditionalOptions>
       <AdditionalDependencies>./../../../externals/nvToolsExt/1/lib/Win32/nvToolsExt32_1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)PhysXDEBUG.dll</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -129,7 +129,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalOptions>/MAP /MACHINE:x86 /DELAYLOAD:PhysX3CommonCHECKED.dll</AdditionalOptions>
+      <AdditionalOptions>/MAP /MACHINE:x86 /DELAYLOAD:PhysXCommonCHECKED.dll</AdditionalOptions>
       <AdditionalDependencies>./../../../externals/nvToolsExt/1/lib/Win32/nvToolsExt32_1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)PhysXCHECKED.dll</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -173,7 +173,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalOptions>/MAP /MACHINE:x86 /DELAYLOAD:PhysX3CommonPROFILE.dll /INCREMENTAL:NO /DEBUG</AdditionalOptions>
+      <AdditionalOptions>/MAP /MACHINE:x86 /DELAYLOAD:PhysXCommonPROFILE.dll /INCREMENTAL:NO /DEBUG</AdditionalOptions>
       <AdditionalDependencies>./../../../externals/nvToolsExt/1/lib/Win32/nvToolsExt32_1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)PhysXPROFILE.dll</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -217,7 +217,7 @@
       <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
-      <AdditionalOptions>/MAP /MACHINE:x86 /DELAYLOAD:PhysX3Common.dll /INCREMENTAL:NO</AdditionalOptions>
+      <AdditionalOptions>/MAP /MACHINE:x86 /DELAYLOAD:PhysXCommon.dll /INCREMENTAL:NO</AdditionalOptions>
       <AdditionalDependencies>./../../../externals/nvToolsExt/1/lib/Win32/nvToolsExt32_1.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)PhysX.dll</OutputFile>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
