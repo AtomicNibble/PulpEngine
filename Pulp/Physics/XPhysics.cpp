@@ -7,7 +7,7 @@
 #if X_DEBUG
 #define PHYS_LIB_SUFFIX "DEBUG"
 #elif X_RELEASE
-#define PHYS_LIB_SUFFIX "PROFILE"
+#define PHYS_LIB_SUFFIX "CHECKED"
 #elif X_SUPER
 #define PHYS_LIB_SUFFIX "" // no suffix.
 #else
