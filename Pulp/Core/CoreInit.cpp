@@ -12,6 +12,7 @@
 #include <Debugging\SymbolResolution.h>
 
 #include <Threading\JobSystem2.h>
+#include <Time\StopWatch.h>
 
 #include <IInput.h>
 #include <IEngineModule.h>
@@ -28,6 +29,7 @@
 #include <Extension\PotatoCreateClass.h>
 
 #include <Memory\MemInfo.h>
+
 
 #include "PotatoFactoryRegistryImpl.h"
 
@@ -146,6 +148,8 @@ bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassNa
 	
 	path.setExtension(".dll");
 
+	core::StopWatch time;
+
 #if !defined(X_LIB)
 	core::XProcessMemInfo memStart, memEnd;
 	core::GetProcessMemInfo(memStart);
@@ -184,9 +188,9 @@ bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassNa
 #if !defined(X_LIB)
 	core::GetProcessMemInfo(memEnd);
 	uint64 memUsed = memEnd.WorkingSetSize - memStart.WorkingSetSize;
-	X_LOG0("Engine", "Init \"%s\", MemUsage=%dKb", name ? (name+1) : dllName, uint32(memUsed / 1024));
+	X_LOG0("Engine", "Init \"%s\", MemUsage=%dKb ^6%gms", name ? (name+1) : dllName, uint32(memUsed / 1024), time.GetMilliSeconds());
 #else
-	X_LOG0("Engine", "Init \"%s\": %s", name ? (name + 1) : dllName, res ? "OK" : "Fail");
+	X_LOG0("Engine", "Init \"%s\": %s %gms", name ? (name + 1) : dllName, res ? "OK" : "Fail", time.GetMilliSeconds());
 #endif // #if !defined(X_LIB) 
 
 	return res;
