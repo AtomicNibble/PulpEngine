@@ -30,22 +30,17 @@ namespace shdfnd
 	EXTERN_C IMAGE_DOS_HEADER __ImageBase;
 
 	// PhysXCommon x64 dll name 
-	static const char* physXCommonDebugx64 = "PhysX3CommonDEBUG_x64.dll";
-	static const char* physXCommonCheckedx64 = "PhysX3CommonCHECKED_x64.dll";
-	static const char* physXCommonProfilex64 = "PhysX3CommonPROFILE_x64.dll";
-	static const char* physXCommonReleasex64 = "PhysX3Common_x64.dll";
+	static const char* physXCommonDebugx64 = "PhysXCommonDEBUG.dll";
+	static const char* physXCommonCheckedx64 = "PhysXCommonCHECKED.dll";
+	static const char* physXCommonProfilex64 = "PhysXCommonPROFILE.dll";
+	static const char* physXCommonReleasex64 = "PhysXCommon.dll";
 
 	// PhysXCommon x86 dll name 
-	static const char* physXCommonDebugx86 = "PhysX3CommonDEBUG_x86.dll";
-	static const char* physXCommonCheckedx86= "PhysX3CommonCHECKED_x86.dll";
-	static const char* physXCommonProfilex86 = "PhysX3CommonPROFILE_x86.dll";
-	static const char* physXCommonReleasex86 = "PhysX3Common_x86.dll";
+	static const char* physXCommonDebugx86 = "PhysXCommonDEBUG.dll";
+	static const char* physXCommonCheckedx86= "PhysXCommonCHECKED.dll";
+	static const char* physXCommonProfilex86 = "PhysXCommonPROFILE.dll";
+	static const char* physXCommonReleasex86 = "PhysXCommon.dll";
 
-	// PhysXCommon ARM dll name 
-	static const char* physXCommonDebugARM = "PhysX3CommonDEBUG_arm.dll";
-	static const char* physXCommonCheckedARM= "PhysX3CommonCHECKED_arm.dll";
-	static const char* physXCommonProfileARM = "PhysX3CommonPROFILE_arm.dll";
-	static const char* physXCommonReleaseARM = "PhysX3Common_arm.dll";
 
 	PX_INLINE HMODULE WINAPI loadLibrary(const char* name)
 	{
@@ -141,46 +136,6 @@ namespace shdfnd
 			}
 
 			if( strcmp( libraryName, shdfnd::physXCommonReleasex64 ) == 0 )
-			{
-				return  (FARPROC)shdfnd::loadLibrary( delayLoadHook->getPhysXCommonDllName() );
-			}
-
-			if( strcmp( libraryName, shdfnd::physXCommonDebugx86 ) == 0 )
-			{
-				return  (FARPROC)shdfnd::loadLibrary( delayLoadHook->getPhysXCommonDEBUGDllName());
-			}
-
-			if( strcmp( libraryName, shdfnd::physXCommonCheckedx86 ) == 0 )
-			{
-				return  (FARPROC)shdfnd::loadLibrary( delayLoadHook->getPhysXCommonCHECKEDDllName() );
-			}
-
-			if( strcmp( libraryName, shdfnd::physXCommonProfilex86 ) == 0 )
-			{
-				return  (FARPROC)shdfnd::loadLibrary( delayLoadHook->getPhysXCommonPROFILEDllName() );
-			}
-
-			if( strcmp( libraryName, shdfnd::physXCommonReleasex86 ) == 0 )
-			{
-				return  (FARPROC)shdfnd::loadLibrary( delayLoadHook->getPhysXCommonDllName() );
-			}
-
-			if( strcmp( libraryName, shdfnd::physXCommonDebugARM ) == 0 )
-			{
-				return (FARPROC)shdfnd::loadLibrary(delayLoadHook->getPhysXCommonDEBUGDllName());
-			}
-
-			if( strcmp( libraryName, shdfnd::physXCommonCheckedARM ) == 0 )
-			{
-				return (FARPROC)shdfnd::loadLibrary( delayLoadHook->getPhysXCommonCHECKEDDllName() );
-			}
-
-			if( strcmp( libraryName, shdfnd::physXCommonProfileARM ) == 0 )
-			{
-				return  (FARPROC)shdfnd::loadLibrary( delayLoadHook->getPhysXCommonPROFILEDllName() );
-			}
-
-			if( strcmp( libraryName, shdfnd::physXCommonReleaseARM ) == 0 )
 			{
 				return  (FARPROC)shdfnd::loadLibrary( delayLoadHook->getPhysXCommonDllName() );
 			}
