@@ -304,9 +304,12 @@ public:
 
 	void CreateQueForCurrentThread(void);
 
+	uint32_t GetThreadCount(void) const;
+
 private:
 	bool StartThreads(void);
 	void CreateThreadObjects(uint32_t threadId);
+
 
 public:
 	Job* CreateJob(JobFunction::Pointer function);

@@ -217,6 +217,11 @@ namespace V2
 		numThreads_++;
 	}
 
+	uint32_t JobSystem::GetThreadCount(void) const
+	{
+		return numThreads_;
+	}
+
 	/// ===============================================
 
 
