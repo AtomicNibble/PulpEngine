@@ -59,6 +59,7 @@ class XEngineModule_Physics : public IEngineModule
 
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pArena);
+		X_ASSERT_NOT_NULL(gEnv->pJobSys);
 		X_UNUSED(initParams);
 
 		physics::IPhysics* pPhysics = nullptr;
@@ -66,7 +67,7 @@ class XEngineModule_Physics : public IEngineModule
 
 		// kinky shit.
 		g_PhysicsArena = X_NEW(PhysicsArena, gEnv->pArena, "PhysicsArena")(&g_PhysicsAlloc, "PhysicsArena");
-		pPhysics = X_NEW(physics::XPhysics, g_PhysicsArena, "PhysicisSys")(g_PhysicsArena);
+		pPhysics = X_NEW(physics::XPhysics, g_PhysicsArena, "PhysicisSys")(env.pJobSys, g_PhysicsArena);
 
 		pPhysics->RegisterVars();
 		pPhysics->RegisterCmds();

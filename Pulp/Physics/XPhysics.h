@@ -7,6 +7,7 @@
 
 #include "Allocator.h"
 #include "Logger.h"
+#include "CpuDispatcher.h"
 
 namespace PVD {
 	using namespace physx::debugger;
@@ -32,7 +33,7 @@ class XPhysics : public IPhysics,
 	X_NO_ASSIGN(XPhysics);
 
 public:
-	XPhysics(core::MemoryArenaBase* arena);
+	XPhysics(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena);
 	~XPhysics() X_OVERRIDE;
 
 	// IPhysics
@@ -61,6 +62,7 @@ private:
 	void customizeTolerances(physx::PxTolerancesScale&);
 
 private:
+	PhysxCpuDispacher jobDispatcher_;
 	PhysxArenaAllocator	allocator_;
 	PhysxLogger logger_;
 

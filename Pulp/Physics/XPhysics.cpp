@@ -69,7 +69,8 @@ namespace
 } // namespace
 
 
-XPhysics::XPhysics(core::MemoryArenaBase* arena) :
+XPhysics::XPhysics(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
+	jobDispatcher_(*pJobSys),
 	allocator_(arena),
 	foundation_(nullptr),
 	profileZoneManager_(nullptr),
@@ -182,21 +183,12 @@ bool XPhysics::Init(void)
 	}
 
 
-
 	physx::PxSceneDesc sceneDesc(physics_->getTolerancesScale());
 	sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
 	getDefaultSceneDesc(sceneDesc);
 	customizeSceneDesc(sceneDesc);
 
-	if (!sceneDesc.cpuDispatcher)
-	{
-		cpuDispatcher_ = physx::PxDefaultCpuDispatcherCreate(1);
-		if (!cpuDispatcher_) {
-			X_ERROR("PhysicsSys", "PxDefaultCpuDispatcherCreate failed!");
-			return false;
-		}
-		sceneDesc.cpuDispatcher = cpuDispatcher_;
-	}
+	sceneDesc.cpuDispatcher = &jobDispatcher_;
 
 	if (!sceneDesc.filterShader) {
 		sceneDesc.filterShader = physx::PxDefaultSimulationFilterShader;
