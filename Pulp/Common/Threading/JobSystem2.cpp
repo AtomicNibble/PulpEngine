@@ -207,6 +207,11 @@ namespace V2
 
 		uint32_t threadId = Thread::GetCurrentID();
 
+		if (GetWorkerThreadQueue(threadId)) {
+			X_WARNING("JobSys", "Thread 0x%x already has a que", threadId);
+			return;
+		}
+
 		CreateThreadObjects(threadId);
 		{
 			size_t threadIdx = GetThreadIndex();
@@ -214,7 +219,7 @@ namespace V2
 			ThreadAllocator_.SetValue(pJobAllocators_[threadIdx]);
 		}
 
-		numThreads_++;
+		numQues_++;
 	}
 
 	uint32_t JobSystem::GetThreadCount(void) const
