@@ -295,6 +295,56 @@ void XPhysics::onRelease(const physx::PxBase* pObserved, void* pUserData,
 }
 
 
+void XPhysics::togglePvdConnection(void)
+{
+	if (!physics_->getPvdConnectionManager())
+		return;
+
+	if (physics_->getPvdConnectionManager()->isConnected()) {
+		physics_->getPvdConnectionManager()->disconnect();
+	}
+	else {
+		createPvdConnection();
+	}
+}
+
+void XPhysics::createPvdConnection(void)
+{
+	physx::PxVisualDebuggerConnectionManager* pvd = physics_->getPvdConnectionManager();
+	if (!pvd) {
+		return;
+	}
+
+	//The connection flags state overall what data is to be sent to PVD.  Currently
+	//the Debug connection flag requires support from the implementation (don't send
+	//the data when debug isn't set) but the other two flags, profile and memory
+	//are taken care of by the PVD SDK.
+
+	//Use these flags for a clean profile trace with minimal overhead
+	physx::PxVisualDebuggerConnectionFlags theConnectionFlags(
+		physx::PxVisualDebuggerConnectionFlag::eDEBUG | 
+		physx::PxVisualDebuggerConnectionFlag::ePROFILE | 
+		physx::PxVisualDebuggerConnectionFlag::eMEMORY);
+
+	if (!pvdParams_.useFullPvdConnection) {
+		theConnectionFlags = physx::PxVisualDebuggerConnectionFlag::ePROFILE;
+	}
+
+	//Create a pvd connection that writes data straight to the filesystem.  This is
+	//the fastest connection on windows for various reasons.  First, the transport is quite fast as
+	//pvd writes data in blocks and filesystems work well with that abstraction.
+	//Second, you don't have the PVD application parsing data and using CPU and memory bandwidth
+	//while your application is running.
+	//PxVisualDebuggerExt::createConnection(mPhysics->getPvdConnectionManager(), "c:\\temp.pxd2", theConnectionFlags);
+
+	//The normal way to connect to pvd.  PVD needs to be running at the time this function is called.
+	//We don't worry about the return value because we are already registered as a listener for connections
+	//and thus our onPvdConnected call will take care of setting up our basic connection state.
+
+	physx::PxVisualDebuggerExt::createConnection(pvd, pvdParams_.ip.c_str(), pvdParams_.port, pvdParams_.timeout, theConnectionFlags);
+}
+
+
 void XPhysics::getDefaultSceneDesc(physx::PxSceneDesc&)
 {
 

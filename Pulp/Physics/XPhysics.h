@@ -28,6 +28,21 @@ class XPhysics : public IPhysics,
 		VARIABLE_STEPPER
 	);
 
+	struct PvdParameters
+	{
+		PvdParameters() :
+			ip("127.0.0.1"),
+			port(5425),
+			timeout(10),
+			useFullPvdConnection(true)
+		{
+		}
+
+		core::StackString<128>	ip;
+		uint32_t	port;
+		uint32_t	timeout;
+		bool	useFullPvdConnection;
+	};
 
 	X_NO_COPY(XPhysics);
 	X_NO_ASSIGN(XPhysics);
@@ -56,6 +71,9 @@ private:
 	virtual void onRelease(const physx::PxBase* observed, void* userData, physx::PxDeletionEventFlag::Enum deletionEvent) X_FINAL;
 	// ~PxDeletionListener
 
+	void togglePvdConnection(void);
+	void createPvdConnection(void);
+
 
 	void getDefaultSceneDesc(physx::PxSceneDesc&);
 	void customizeSceneDesc(physx::PxSceneDesc&);
@@ -78,6 +96,8 @@ private:
 	physx::PxReal debugRenderScale_;
 
 	StepperType::Enum stepperType_;
+
+	PvdParameters pvdParams_;
 };
 
 
