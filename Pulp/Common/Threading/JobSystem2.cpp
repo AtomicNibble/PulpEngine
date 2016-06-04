@@ -107,26 +107,26 @@ namespace V2
 
 	// ===================================
 
-	JobSystem::ThreadJobAllocator::ThreadJobAllocator() 
+	JobSystem::ThreadJobAllocator::ThreadJobAllocator()
 #if 0
 		: jobPoolHeap(
 			bitUtil::RoundUpToMultiple<size_t>(
 				JobArena::getMemoryRequirement(sizeof(Job)) * MAX_JOBS,
 				VirtualMem::GetPageSize()
 				)
-			),
+		),
 		jobPoolAllocator(jobPoolHeap.start(), jobPoolHeap.end(),
 			JobArena::getMemoryRequirement(sizeof(Job)),
 			JobArena::getMemoryAlignmentRequirement(X_ALIGN_OF(Job)),
 			JobArena::getMemoryOffsetRequirement()
-			),
+		),
 		jobPoolArena(&jobPoolAllocator, "JobPool")
 #endif
 	{
 		allocated = 0;
 	}
 
-	JobSystem::JobSystem() 
+	JobSystem::JobSystem()
 	{
 		numThreads_ = 0;
 		numQues_ = 0;
@@ -207,7 +207,7 @@ namespace V2
 
 		uint32_t threadId = Thread::GetCurrentID();
 
-		if (GetWorkerThreadQueue(threadId)) {
+		if (CurrentThreadHasWorkerQueue()) {
 			X_WARNING("JobSys", "Thread 0x%x already has a que", threadId);
 			return;
 		}
@@ -339,7 +339,7 @@ namespace V2
 		}
 	}
 
-	void JobSystem::WaitWithoutHelp(Job* pJob) const 
+	void JobSystem::WaitWithoutHelp(Job* pJob) const
 	{
 		while (!HasJobCompleted(pJob))
 		{
@@ -372,6 +372,15 @@ namespace V2
 	}
 
 	/// ===============================================
+
+	bool JobSystem::CurrentThreadHasWorkerQueue(void) const
+	{
+		if (!CurrentThreadHasIndex()) {
+			return false;
+		}
+
+		return GetWorkerThreadQueue() != nullptr;
+	}
 
 	ThreadQue* JobSystem::GetWorkerThreadQueue(void) const
 	{
@@ -452,7 +461,7 @@ namespace V2
 		return nullptr;
 	}
 
-	void JobSystem::Execute(Job* pJob, size_t threadIdx) 
+	void JobSystem::Execute(Job* pJob, size_t threadIdx)
 	{
 		(pJob->pFunction)(*this, threadIdx, pJob, pJob->pArgData);
 		Finish(pJob, threadIdx);
@@ -461,10 +470,10 @@ namespace V2
 	void JobSystem::Finish(Job* pJob, size_t threadIdx)
 	{
 		const int32_t unfinishedJobs = --pJob->unfinishedJobs;
-		if (unfinishedJobs == 0 
+		if (unfinishedJobs == 0
 			// if we are child of a job, dec parents counter.
 			// when all child jobs are done the parent becomes complete.
-			&& pJob->pParent) 
+			&& pJob->pParent)
 		{
 			Finish(pJob->pParent, threadIdx);
 		}
@@ -511,6 +520,19 @@ namespace V2
 
 		X_ASSERT_UNREACHABLE();
 		return 0;
+	}
+
+	bool JobSystem::CurrentThreadHasIndex(void) const
+	{
+		uint32_t threadId = Thread::GetCurrentID();
+
+		for (auto id : threadIdToIndex_) {
+			if (id.first == threadId) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	Thread::ReturnValue JobSystem::ThreadRun_s(const Thread& thread)

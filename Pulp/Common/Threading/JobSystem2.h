@@ -352,6 +352,7 @@ private:
 	Job* AllocateJob(size_t threadIdx);
 	void FreeJob(Job* pJob);
 
+	bool CurrentThreadHasWorkerQueue(void) const;
 	ThreadQue* GetWorkerThreadQueue(void) const;
 	ThreadQue* GetWorkerThreadQueue(size_t threadIdx) const;
 	ThreadJobAllocator* GetWorkerThreadAllocator(void) const;
@@ -367,6 +368,7 @@ private:
 	void Finish(Job* pJob, size_t threadIdx);
 
 	size_t GetThreadIndex(void) const;
+	bool CurrentThreadHasIndex(void) const;
 
 	void ThreadBackOff(int32_t backoff);
 	static Thread::ReturnValue ThreadRun_s(const Thread& thread);
