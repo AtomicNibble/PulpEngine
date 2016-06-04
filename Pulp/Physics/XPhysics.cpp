@@ -173,6 +173,8 @@ bool XPhysics::Init(void)
 		physics_->getPvdConnectionManager()->addHandler(*this);
 	}
 
+	togglePvdConnection();
+
 	physics_->registerDeletionListener(*this, physx::PxDeletionEventFlag::eUSER_RELEASE);
 
 
@@ -312,6 +314,7 @@ void XPhysics::createPvdConnection(void)
 {
 	physx::PxVisualDebuggerConnectionManager* pvd = physics_->getPvdConnectionManager();
 	if (!pvd) {
+		X_ERROR("PhysicsSys", "Failed to get PVD connection manager");
 		return;
 	}
 
@@ -341,7 +344,10 @@ void XPhysics::createPvdConnection(void)
 	//We don't worry about the return value because we are already registered as a listener for connections
 	//and thus our onPvdConnected call will take care of setting up our basic connection state.
 
-	physx::PxVisualDebuggerExt::createConnection(pvd, pvdParams_.ip.c_str(), pvdParams_.port, pvdParams_.timeout, theConnectionFlags);
+	physx::PxVisualDebuggerConnection* pCon = physx::PxVisualDebuggerExt::createConnection(pvd, pvdParams_.ip.c_str(), pvdParams_.port, pvdParams_.timeout, theConnectionFlags);
+	if (pCon->isConnected()) {
+		X_LOG1("PhysicsSys", "Connected to PVD");
+	}
 }
 
 
