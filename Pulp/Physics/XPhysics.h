@@ -62,11 +62,10 @@ public:
 	bool Init(void) X_FINAL;
 	void ShutDown(void) X_FINAL;
 	void release(void) X_FINAL;
+
+	void onTickPreRender(float dtime) X_FINAL;
+	void onTickPostRender(float dtime) X_FINAL;
 	// ~IPhysics
-
-
-	virtual	void onTickPreRender(float dtime);
-	virtual	void onTickPostRender(float dtime);
 
 
 private:
