@@ -341,6 +341,7 @@
     <ClInclude Include="CpuDispatcher.h" />
     <ClInclude Include="Logger.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Stepper.h" />
     <ClInclude Include="XPhysics.h" />
   </ItemGroup>
   <ItemGroup>
@@ -360,6 +361,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Stepper.cpp" />
     <ClCompile Include="XPhysics.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
