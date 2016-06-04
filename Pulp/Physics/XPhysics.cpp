@@ -416,7 +416,7 @@ void XPhysics::createPvdConnection(void)
 	//and thus our onPvdConnected call will take care of setting up our basic connection state.
 
 	physx::PxVisualDebuggerConnection* pCon = physx::PxVisualDebuggerExt::createConnection(pvd, pvdParams_.ip.c_str(), pvdParams_.port, pvdParams_.timeout, theConnectionFlags);
-	if (pCon->isConnected()) {
+	if (pCon && pCon->isConnected()) {
 		X_LOG1("PhysicsSys", "Connected to PVD");
 	}
 }
