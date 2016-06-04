@@ -79,6 +79,8 @@ XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::Mem
 	scene_(nullptr),
 	material_(nullptr),
 	cpuDispatcher_(nullptr),
+	pScratchBlock_(nullptr),
+	scratchBlockSize_(0),
 	initialDebugRender_(false),
 	debugRenderScale_(1.f),
 	stepperType_(StepperType::FIXED_STEPPER),
@@ -90,6 +92,7 @@ XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::Mem
 {
 	X_ASSERT_NOT_NULL(arena);
 
+	setSctrachBlock(SCRATCH_BLOCK_SIZE);
 
 	debugStepper_.setHandler(this);
 	fixedStepper_.setHandler(this);
@@ -99,7 +102,7 @@ XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::Mem
 
 XPhysics::~XPhysics()
 {
-
+	X_DELETE_ARRAY(pScratchBlock_, g_PhysicsArena);
 
 }
 
@@ -451,5 +454,21 @@ Stepper* XPhysics::getStepper(void)
 	};
 
 }
+
+
+void XPhysics::setSctrachBlock(size_t size)
+{
+	if (size == scratchBlockSize_) {
+		return;
+	}
+
+	if (pScratchBlock_) {
+		X_DELETE_ARRAY(pScratchBlock_, g_PhysicsArena);
+	}
+
+	pScratchBlock_ = X_NEW_ARRAY_ALIGNED(uint8_t, size, g_PhysicsArena, "ScratchBlock", 16);
+	scratchBlockSize_ = size;
+}
+
 
 X_NAMESPACE_END

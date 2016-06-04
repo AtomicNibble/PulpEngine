@@ -46,7 +46,7 @@ class XPhysics : public IPhysics,
 		bool	useFullPvdConnection;
 	};
 
-	static const size_t SCRATCH_BLOCK_SIZE = 1024;
+	static const size_t SCRATCH_BLOCK_SIZE = 1024 * 8;
 
 	X_NO_COPY(XPhysics);
 	X_NO_ASSIGN(XPhysics);
@@ -89,12 +89,13 @@ private:
 	void togglePvdConnection(void);
 	void createPvdConnection(void);
 
-
 	void getDefaultSceneDesc(physx::PxSceneDesc&);
 	void customizeSceneDesc(physx::PxSceneDesc&);
 	void customizeTolerances(physx::PxTolerancesScale&);
 
 	Stepper* getStepper(void);
+
+	void setSctrachBlock(size_t size);
 
 private:
 	PhysxCpuDispacher jobDispatcher_;
@@ -109,7 +110,8 @@ private:
 	physx::PxMaterial*					material_;
 	physx::PxDefaultCpuDispatcher*		cpuDispatcher_;
 
-	void* pScratchBlock_;
+	uint8_t* pScratchBlock_;
+	size_t scratchBlockSize_;
 
 	bool initialDebugRender_;
 	bool waitForResults_;
