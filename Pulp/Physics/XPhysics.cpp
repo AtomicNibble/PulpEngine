@@ -69,7 +69,7 @@ namespace
 } // namespace
 
 
-XPhysics::XPhysics(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
+XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
 	jobDispatcher_(*pJobSys),
 	allocator_(arena),
 	foundation_(nullptr),
@@ -81,9 +81,20 @@ XPhysics::XPhysics(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
 	cpuDispatcher_(nullptr),
 	initialDebugRender_(false),
 	debugRenderScale_(1.f),
-	stepperType_(StepperType::FIXED_STEPPER)
+	stepperType_(StepperType::FIXED_STEPPER),
+
+	debugStepper_(0.016666660f),
+	fixedStepper_(0.016666660f, maxSubSteps),
+	invertedFixedStepper_(0.016666660f, maxSubSteps),
+	variableStepper_(1.0f / 80.0f, 1.0f / 40.0f, maxSubSteps)
 {
 	X_ASSERT_NOT_NULL(arena);
+
+
+	debugStepper_.setHandler(this);
+	fixedStepper_.setHandler(this);
+	invertedFixedStepper_.setHandler(this);
+	variableStepper_.setHandler(this);
 }
 
 XPhysics::~XPhysics()
@@ -228,6 +239,11 @@ void XPhysics::ShutDown(void)
 {
 	X_LOG0("PhysicsSys", "Shutting Down");
 
+	debugStepper_.shutdown();
+	fixedStepper_.shutdown();
+	invertedFixedStepper_.shutdown();
+	variableStepper_.shutdown();
+
 	if (scene_) {
 		scene_->fetchResults(true);
 	}
@@ -250,6 +266,39 @@ void XPhysics::ShutDown(void)
 void XPhysics::release(void)
 {
 	X_DELETE(this, g_PhysicsArena);
+}
+
+
+void XPhysics::onTickPreRender(float dtime)
+{
+	Stepper* pStepper = getStepper();
+
+	waitForResults_ = false;
+
+	if (scene_)
+	{
+
+		waitForResults_ = pStepper->advance(scene_, dtime, pScratchBlock_, SCRATCH_BLOCK_SIZE);
+
+		pStepper->renderDone();
+
+
+	}
+}
+
+
+void XPhysics::onTickPostRender(float dtime)
+{
+	if (scene_ && waitForResults_)
+	{
+		Stepper* pStepper = getStepper();
+		pStepper->wait(scene_);
+
+
+		if (stepperType_ == StepperType::INVERTED_FIXED_STEPPER) {
+			pStepper->postRender(dtime);
+		}
+	}
 }
 
 
@@ -294,6 +343,25 @@ void XPhysics::onRelease(const physx::PxBase* pObserved, void* pUserData,
 		}
 #endif
 	}
+}
+
+
+void XPhysics::onSubstepPreFetchResult(void)
+{
+
+}
+
+void XPhysics::onSubstep(float32_t dtTime)
+{
+	X_UNUSED(dtTime);
+
+}
+
+void XPhysics::onSubstepSetup(float dtime, physx::PxBaseTask* cont)
+{
+	X_UNUSED(dtime);
+	X_UNUSED(cont);
+
 }
 
 
@@ -367,5 +435,21 @@ void XPhysics::customizeTolerances(physx::PxTolerancesScale&)
 
 }
 
+
+Stepper* XPhysics::getStepper(void)
+{
+	switch (stepperType_)
+	{
+	case StepperType::DEFAULT_STEPPER:
+		return &debugStepper_;
+	case StepperType::FIXED_STEPPER:
+		return &fixedStepper_;
+	case StepperType::INVERTED_FIXED_STEPPER:
+		return &invertedFixedStepper_;
+	default:
+		return &variableStepper_;
+	};
+
+}
 
 X_NAMESPACE_END

@@ -8,6 +8,7 @@
 #include "Allocator.h"
 #include "Logger.h"
 #include "CpuDispatcher.h"
+#include "Stepper.h"
 
 namespace PVD {
 	using namespace physx::debugger;
@@ -19,7 +20,8 @@ X_NAMESPACE_BEGIN(physics)
 
 class XPhysics : public IPhysics,
 	public PVD::PvdConnectionHandler, //receive notifications when pvd is connected and disconnected.
-	public physx::PxDeletionListener
+	public physx::PxDeletionListener,
+	public IStepperHandler
 {
 	X_DECLARE_ENUM(StepperType) (
 		DEFAULT_STEPPER,
@@ -44,11 +46,13 @@ class XPhysics : public IPhysics,
 		bool	useFullPvdConnection;
 	};
 
+	static const size_t SCRATCH_BLOCK_SIZE = 1024;
+
 	X_NO_COPY(XPhysics);
 	X_NO_ASSIGN(XPhysics);
 
 public:
-	XPhysics(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena);
+	XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena);
 	~XPhysics() X_OVERRIDE;
 
 	// IPhysics
@@ -59,6 +63,11 @@ public:
 	void ShutDown(void) X_FINAL;
 	void release(void) X_FINAL;
 	// ~IPhysics
+
+
+	virtual	void onTickPreRender(float dtime);
+	virtual	void onTickPostRender(float dtime);
+
 
 private:
 	// PvdConnectionHandler
@@ -71,6 +80,12 @@ private:
 	virtual void onRelease(const physx::PxBase* observed, void* userData, physx::PxDeletionEventFlag::Enum deletionEvent) X_FINAL;
 	// ~PxDeletionListener
 
+	// IStepperHandler
+	virtual void onSubstepPreFetchResult(void) X_FINAL;
+	virtual void onSubstep(float32_t dtTime) X_FINAL;
+	virtual void onSubstepSetup(float dtime, physx::PxBaseTask* cont) X_FINAL;
+	// ~IStepperHandler
+
 	void togglePvdConnection(void);
 	void createPvdConnection(void);
 
@@ -78,6 +93,8 @@ private:
 	void getDefaultSceneDesc(physx::PxSceneDesc&);
 	void customizeSceneDesc(physx::PxSceneDesc&);
 	void customizeTolerances(physx::PxTolerancesScale&);
+
+	Stepper* getStepper(void);
 
 private:
 	PhysxCpuDispacher jobDispatcher_;
@@ -92,12 +109,20 @@ private:
 	physx::PxMaterial*					material_;
 	physx::PxDefaultCpuDispatcher*		cpuDispatcher_;
 
+	void* pScratchBlock_;
+
 	bool initialDebugRender_;
+	bool waitForResults_;
 	physx::PxReal debugRenderScale_;
 
-	StepperType::Enum stepperType_;
-
 	PvdParameters pvdParams_;
+
+	// Steppers
+	StepperType::Enum		stepperType_;
+	DebugStepper			debugStepper_;
+	FixedStepper			fixedStepper_;
+	InvertedFixedStepper	invertedFixedStepper_;
+	VariableStepper			variableStepper_;
 };
 
 
