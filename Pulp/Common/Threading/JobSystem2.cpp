@@ -218,8 +218,6 @@ namespace V2
 			ThreadQue_.SetValue(pThreadQues_[threadIdx]);
 			ThreadAllocator_.SetValue(pJobAllocators_[threadIdx]);
 		}
-
-		numQues_++;
 	}
 
 	uint32_t JobSystem::GetThreadCount(void) const
