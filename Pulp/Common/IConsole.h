@@ -30,6 +30,7 @@ MODIFIED,		// set when the variable is modified
 CONFIG,			// loaded or set from a config file.
 
 SAVE_IF_CHANGED, // saved to config if changed.
+RESTART_REQUIRED,
 
 SYSTEM,			// system related
 TOOL,			// tool related
