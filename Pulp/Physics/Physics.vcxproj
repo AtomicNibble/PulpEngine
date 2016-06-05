@@ -368,6 +368,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="PhysicsVars.inl" />
+    <None Include="XPhysics.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

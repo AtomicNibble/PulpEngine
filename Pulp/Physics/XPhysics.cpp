@@ -72,6 +72,16 @@ namespace
 } // namespace
 
 
+XPhysics::PvdParameters::PvdParameters() :
+	ip("127.0.0.1"),
+	port(5425),
+	timeout(10),
+	useFullPvdConnection(true)
+{
+}
+
+// ---------------------------------
+
 XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
 	jobDispatcher_(*pJobSys),
 	allocator_(arena),
@@ -85,6 +95,9 @@ XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::Mem
 	pScratchBlock_(nullptr),
 	scratchBlockSize_(0),
 	initialDebugRender_(false),
+	waitForResults_(false),
+	pause_(false),
+	oneFrameUpdate_(false),
 	debugRenderScale_(1.f),
 	stepperType_(StepperType::FIXED_STEPPER),
 
@@ -117,6 +130,12 @@ void XPhysics::RegisterCmds(void)
 {
 	ADD_COMMAND_MEMBER("phys_toggle_pvd", this, XPhysics, &XPhysics::cmd_TogglePvd, core::VarFlag::SYSTEM,
 		"Toggles PVD connection");
+
+	ADD_COMMAND_MEMBER("phys_toggle_pause", this, XPhysics, &XPhysics::cmd_TogglePause, core::VarFlag::SYSTEM,
+		"Toggles pausing physics simulation");
+
+	ADD_COMMAND_MEMBER("phys_step_one", this, XPhysics, &XPhysics::cmd_StepOne, core::VarFlag::SYSTEM,
+		"Steps one frame in the simulation");
 
 
 }
@@ -281,28 +300,35 @@ void XPhysics::onTickPreRender(float dtime)
 {
 	stepperType_ = vars_.GetStepperType();
 
-	Stepper* pStepper = getStepper();
+	if (oneFrameUpdate_) {
+		pause_ = false;
+	}
 
-	waitForResults_ = false;
-
-	if (scene_)
+	if (!IsPaused())
 	{
+		Stepper* pStepper = getStepper();
 
-		waitForResults_ = pStepper->advance(scene_, dtime, pScratchBlock_, 
-			safe_static_cast<uint32_t, size_t>(scratchBlockSize_));
+		waitForResults_ = false;
 
-		// tells the stepper shape data is not going to be accessed until next frame 
-		// (frame ends with stepper->wait(mScene))
-		pStepper->renderDone();
+		if (scene_)
+		{
+
+			waitForResults_ = pStepper->advance(scene_, dtime, pScratchBlock_,
+				safe_static_cast<uint32_t, size_t>(scratchBlockSize_));
+
+			// tells the stepper shape data is not going to be accessed until next frame 
+			// (frame ends with stepper->wait(mScene))
+			pStepper->renderDone();
 
 
+		}
 	}
 }
 
 
 void XPhysics::onTickPostRender(float dtime)
 {
-	if (scene_ && waitForResults_)
+	if (!IsPaused() && scene_ && waitForResults_)
 	{
 		Stepper* pStepper = getStepper();
 		pStepper->wait(scene_);
@@ -310,6 +336,15 @@ void XPhysics::onTickPostRender(float dtime)
 
 		if (stepperType_ == StepperType::INVERTED_FIXED_STEPPER) {
 			pStepper->postRender(dtime);
+		}
+	}
+
+	// pause if one frame update.
+	if (oneFrameUpdate_)
+	{
+		oneFrameUpdate_ = false;
+		if (!IsPaused()) {
+			togglePause();
 		}
 	}
 }
@@ -494,6 +529,23 @@ void XPhysics::cmd_TogglePvd(core::IConsoleCmdArgs* pArgs)
 
 	togglePvdConnection();
 }
+
+
+void XPhysics::cmd_TogglePause(core::IConsoleCmdArgs* pArgs)
+{
+	X_UNUSED(pArgs);
+
+	togglePause();
+}
+
+
+void XPhysics::cmd_StepOne(core::IConsoleCmdArgs* pArgs)
+{
+	X_UNUSED(pArgs);
+
+	oneFrameUpdate_ = true;
+}
+
 
 
 X_NAMESPACE_END

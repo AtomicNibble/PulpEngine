@@ -31,13 +31,7 @@ class XPhysics : public IPhysics,
 
 	struct PvdParameters
 	{
-		PvdParameters() :
-			ip("127.0.0.1"),
-			port(5425),
-			timeout(10),
-			useFullPvdConnection(true)
-		{
-		}
+		PvdParameters();
 
 		core::StackString<128>	ip;
 		uint32_t	port;
@@ -88,6 +82,7 @@ private:
 	void togglePvdConnection(void);
 	void createPvdConnection(void);
 
+
 	void getDefaultSceneDesc(physx::PxSceneDesc&);
 	void customizeSceneDesc(physx::PxSceneDesc&);
 	void customizeTolerances(physx::PxTolerancesScale&);
@@ -97,7 +92,13 @@ private:
 	void setScratchBlockSize(size_t size);
 
 private:
+	X_INLINE bool IsPaused(void) const;
+	X_INLINE void togglePause(void);
+
+private:
 	void cmd_TogglePvd(core::IConsoleCmdArgs* pArgs);
+	void cmd_TogglePause(core::IConsoleCmdArgs* pArgs);
+	void cmd_StepOne(core::IConsoleCmdArgs* pArgs);
 
 private:
 	PhysxCpuDispacher jobDispatcher_;
@@ -117,6 +118,8 @@ private:
 
 	bool initialDebugRender_;
 	bool waitForResults_;
+	bool pause_;
+	bool oneFrameUpdate_;
 	physx::PxReal debugRenderScale_;
 
 	PvdParameters pvdParams_;
@@ -133,3 +136,5 @@ private:
 
 
 X_NAMESPACE_END
+
+#include "XPhysics.inl"
