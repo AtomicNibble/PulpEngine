@@ -20,6 +20,8 @@ public:
 	uint32_t ScratchBufferSize(void) const;
 	StepperType::Enum GetStepperType(void) const;
 
+	int32_t DebugDrawEnabled(void) const;
+
 private:
 	void Var_OnStepperStyleChange(core::ICVar* pVar);
 
@@ -29,6 +31,8 @@ private:
 
 	int32_t scratchBufferDefaultSize_;
 	StepperType::Enum stepperType_;
+
+	int32_t debugDraw_;
 };
 
 

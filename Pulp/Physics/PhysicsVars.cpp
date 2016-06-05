@@ -32,6 +32,10 @@ void PhysXVars::RegisterVars(void)
 	core::ConsoleVarFunc del;
 	del.Bind<PhysXVars, &PhysXVars::Var_OnStepperStyleChange>(this);
 	pVarStepperType_->SetOnChangeCallback(del);
+
+
+	ADD_CVAR_REF("physx_draw_debug_shapes", debugDraw_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, 
+		"Enable drawing of physics debug shapes");
 }
 
 
