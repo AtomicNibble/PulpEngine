@@ -67,17 +67,17 @@ void MultiThreadStepper::solveStep(physx::PxBaseTask* ownerTask)
 	physx::PxSceneWriteLock writeLock(*pScene_);
 
 #if PX_ENABLE_INVERTED_STEPPER_FEATURE
-	mScene->solve(mSubStepSize, ownerTask, mScratchBlock, mScratchBlockSize);
+	pScene_->solve(subStepSize_, ownerTask, scratchBlock_, scratchBlockSize_);
 #else
-	pScene_->simulate(subStepSize_, ownerTask, scratchBlock_, firstCompletionPending_);
+	pScene_->simulate(subStepSize_, ownerTask, scratchBlock_, scratchBlockSize_);
 #endif
 }
 
 void MultiThreadStepper::collisionStep(physx::PxBaseTask* ownerTask)
 {
 #if PX_ENABLE_INVERTED_STEPPER_FEATURE
-	PxSceneWriteLock writeLock(*mScene);
-	mScene->collide(mSubStepSize, ownerTask);
+	PxSceneWriteLock writeLock(*pScene_);
+	pScene_->collide(subStepSize_, ownerTask);
 #endif
 }
 
