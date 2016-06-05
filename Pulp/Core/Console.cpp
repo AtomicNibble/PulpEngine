@@ -1479,7 +1479,7 @@ void XConsole::Listbinds(IKeyBindDumpSink* CallBack)
 }
 
 ICVar* XConsole::RegisterString(const char* Name, const char* Value, 
-	int Flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
+	int Flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(Name);
 
@@ -1499,12 +1499,12 @@ ICVar* XConsole::RegisterString(const char* Name, const char* Value,
 		pCVar = X_NEW(CVarString<CVarBaseConst>, &varArena_, 
 			"CVarString")(this, Name, Value, Flags, desc);
 	}
-	RegisterVar(pCVar, pChangeFunc);
+	RegisterVar(pCVar);
 	return pCVar;
 }
 
 ICVar* XConsole::RegisterInt(const char* Name, int Value, int Min, 
-	int Max, int Flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
+	int Max, int Flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(Name);
 
@@ -1514,12 +1514,12 @@ ICVar* XConsole::RegisterInt(const char* Name, int Value, int Min,
 	}
 
 	pCVar = X_NEW(CVarInt<CVarBaseConst>, &varArena_, "CVarInt")(this, Name, Value, Min, Max, Flags, desc);
-	RegisterVar(pCVar, pChangeFunc);
+	RegisterVar(pCVar);
 	return pCVar;
 }
 
 ICVar* XConsole::RegisterFloat(const char* Name, float Value, float Min,
-	float Max, int Flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
+	float Max, int Flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(Name);
 
@@ -1529,7 +1529,7 @@ ICVar* XConsole::RegisterFloat(const char* Name, float Value, float Min,
 	}
 
 	pCVar = X_NEW(CVarFloat<CVarBaseConst>, &varArena_, "CVarFloat")(this, Name, Value, Min, Max, Flags, desc);
-	RegisterVar(pCVar, pChangeFunc);
+	RegisterVar(pCVar);
 	return pCVar;
 }
 
@@ -1544,7 +1544,7 @@ ICVar* XConsole::ConfigRegisterString(const char* Name, const char* Value, int f
 	}
 
 	pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, "CVarStringConfig")(this, Name, Value, flags, desc);
-	RegisterVar(pCVar, nullptr);
+	RegisterVar(pCVar);
 	return pCVar;
 }
 
@@ -1559,7 +1559,7 @@ ICVar* XConsole::ConfigRegisterInt(const char* Name, int Value, int Min,
 	}
 
 	pCVar = X_NEW(CVarInt<CVarBaseHeap>, &varArena_, "CVarIntConfig")(this, Name, Value, Min, Max, flags, desc);
-	RegisterVar(pCVar, nullptr);
+	RegisterVar(pCVar);
 	return pCVar;
 }
 
@@ -1574,13 +1574,13 @@ ICVar* XConsole::ConfigRegisterFloat(const char* Name, float Value, float Min,
 	}
 
 	pCVar = X_NEW(CVarFloat<CVarBaseHeap>, &varArena_, "CVarFloatConfig")(this, Name, Value, Min, Max, flags, desc);
-	RegisterVar(pCVar, nullptr);
+	RegisterVar(pCVar);
 	return pCVar;
 }
 
 
 ICVar* XConsole::Register(const char* Name, float* src, float defaultvalue, 
-	float Min, float Max, int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
+	float Min, float Max, int flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(Name);
 	X_ASSERT_NOT_NULL(src);
@@ -1593,12 +1593,12 @@ ICVar* XConsole::Register(const char* Name, float* src, float defaultvalue,
 	*src = defaultvalue;
 
 	pCVar = X_NEW(CVarFloatRef, &varArena_, "CVarRefFloat")(this, Name, src, Min, Max, flags, desc);
-	RegisterVar(pCVar, pChangeFunc);
+	RegisterVar(pCVar);
 	return pCVar;
 }
 
 ICVar* XConsole::Register(const char* Name, int* src, int defaultvalue, 
-	int Min, int Max, int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
+	int Min, int Max, int flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(Name);
 	X_ASSERT_NOT_NULL(src);
@@ -1611,12 +1611,12 @@ ICVar* XConsole::Register(const char* Name, int* src, int defaultvalue,
 	*src = defaultvalue;
 
 	pCVar = X_NEW(CVarIntRef, &varArena_, "CVarRefInt")(this, Name, src, Min, Max, flags, desc);
-	RegisterVar(pCVar, pChangeFunc);
+	RegisterVar(pCVar);
 	return pCVar;
 }
 
 ICVar* XConsole::Register(const char* Name, Color* src, Color defaultvalue, 
-	int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
+	int flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(Name);
 	X_ASSERT_NOT_NULL(src);
@@ -1629,13 +1629,13 @@ ICVar* XConsole::Register(const char* Name, Color* src, Color defaultvalue,
 	*src = defaultvalue;
 
 	pCVar = X_NEW(CVarColRef, &varArena_, "CVarRefCol")(this, Name, src, flags, desc);
-	RegisterVar(pCVar, pChangeFunc);
+	RegisterVar(pCVar);
 	return pCVar;
 	
 }
 
 ICVar* XConsole::Register(const char* Name, Vec3f* src, Vec3f defaultvalue, 
-	int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
+	int flags, const char* desc)
 {
 	X_ASSERT_NOT_NULL(Name);
 	X_ASSERT_NOT_NULL(src);
@@ -1648,7 +1648,7 @@ ICVar* XConsole::Register(const char* Name, Vec3f* src, Vec3f defaultvalue,
 	*src = defaultvalue;
 
 	pCVar = X_NEW(CVarVec3Ref, &varArena_, "CVarRefVec3")(this, Name, src, flags, desc);
-	RegisterVar(pCVar, pChangeFunc);
+	RegisterVar(pCVar);
 	return pCVar;
 
 }
@@ -2064,12 +2064,8 @@ ICVar* XConsole::GetCVarForRegistration(const char* Name)
 }
 
 
-void XConsole::RegisterVar(ICVar* pCVar, ConsoleVarFunc::Pointer pChangeFunc)
+void XConsole::RegisterVar(ICVar* pCVar)
 {
-	if (pChangeFunc) {
-		pCVar->SetOnChangeCallback(pChangeFunc);
-	}
-
 	auto it = configCmds_.find(X_CONST_STRING(pCVar->GetName()));
 	if (it != configCmds_.end()) {
 
@@ -2997,18 +2993,17 @@ consoleState::Enum XConsoleNULL::getVisState(void) const
 }
 
 ICVar* XConsoleNULL::RegisterString(const char* Name, const char* Value, int Flags, 
-	const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
+	const char* desc)
 {
 	X_UNUSED(Name);
 	X_UNUSED(Value);
 	X_UNUSED(Flags);
 	X_UNUSED(desc);
-	X_UNUSED(pChangeFunc);
 	return nullptr;
 }
 
 ICVar* XConsoleNULL::RegisterInt(const char* Name, int Value, int Min, int Max, 
-	int Flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
+	int Flags, const char* desc)
 {
 	X_UNUSED(Name);
 	X_UNUSED(Value);
@@ -3016,12 +3011,11 @@ ICVar* XConsoleNULL::RegisterInt(const char* Name, int Value, int Min, int Max,
 	X_UNUSED(Max);
 	X_UNUSED(Flags);
 	X_UNUSED(desc);
-	X_UNUSED(pChangeFunc);
 	return nullptr;
 }
 
 ICVar* XConsoleNULL::RegisterFloat(const char* Name, float Value, float Min, float Max,
-	int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
+	int flags, const char* desc)
 {
 	X_UNUSED(Name);
 	X_UNUSED(Value);
@@ -3029,7 +3023,6 @@ ICVar* XConsoleNULL::RegisterFloat(const char* Name, float Value, float Min, flo
 	X_UNUSED(Max);
 	X_UNUSED(flags);
 	X_UNUSED(desc);
-	X_UNUSED(pChangeFunc);
 	return nullptr;
 }
 
@@ -3072,7 +3065,7 @@ ICVar* XConsoleNULL::ConfigRegisterFloat(const char* Name, float Value, float Mi
 
 	// refrenced based, these are useful if we want to use the value alot so we just register it's address.
 ICVar* XConsoleNULL::Register(const char* name, float* src, float defaultvalue, 
-	float Min, float Max, int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
+	float Min, float Max, int flags, const char* desc)
 {
 	X_UNUSED(name);
 	X_UNUSED(src);
@@ -3081,13 +3074,12 @@ ICVar* XConsoleNULL::Register(const char* name, float* src, float defaultvalue,
 	X_UNUSED(Max);
 	X_UNUSED(flags);
 	X_UNUSED(desc);
-	X_UNUSED(pChangeFunc);
 
 	return nullptr;
 }
 
 ICVar* XConsoleNULL::Register(const char* name, int* src, int defaultvalue, 
-	int Min, int Max, int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
+	int Min, int Max, int flags, const char* desc)
 {
 	X_UNUSED(name);
 	X_UNUSED(src);
@@ -3096,33 +3088,30 @@ ICVar* XConsoleNULL::Register(const char* name, int* src, int defaultvalue,
 	X_UNUSED(Max);
 	X_UNUSED(flags);
 	X_UNUSED(desc);
-	X_UNUSED(pChangeFunc);
 
 	return nullptr;
 }
 
 ICVar* XConsoleNULL::Register(const char* name, Color* src, Color defaultvalue, 
-	int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
+	int flags, const char* desc)
 {
 	X_UNUSED(name);
 	X_UNUSED(src);
 	X_UNUSED(defaultvalue);
 	X_UNUSED(flags);
 	X_UNUSED(desc);
-	X_UNUSED(pChangeFunc);
 
 	return nullptr;
 }
 
 ICVar* XConsoleNULL::Register(const char* name, Vec3f* src, Vec3f defaultvalue, 
-	int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
+	int flags, const char* desc)
 {
 	X_UNUSED(name);
 	X_UNUSED(src);
 	X_UNUSED(defaultvalue);
 	X_UNUSED(flags);
 	X_UNUSED(desc);
-	X_UNUSED(pChangeFunc);
 
 	return nullptr;
 }

@@ -87,11 +87,18 @@ void SoundVars::RegisterVars(void)
 	var_vol_voice_ = ADD_CVAR_FLOAT("snd_vol_voice", 1.f, 0.f, 1.f,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Voice volume");
 
+	core::ConsoleVarFunc del;
+	del.Bind<Var_MasterVolChanged>();
+	var_vol_master_->SetOnChangeCallback(del);
 
-	var_vol_master_->SetOnChangeCallback(Var_MasterVolChanged);
-	var_vol_music_->SetOnChangeCallback(Var_MusicVolChanged);
-	var_vol_sfx_->SetOnChangeCallback(Var_SFXVolChanged);
-	var_vol_voice_->SetOnChangeCallback(Var_VoiceVolChanged);
+	del.Bind<Var_MusicVolChanged>();
+	var_vol_music_->SetOnChangeCallback(del);
+
+	del.Bind<Var_SFXVolChanged>();
+	var_vol_sfx_->SetOnChangeCallback(del);
+
+	del.Bind<Var_VoiceVolChanged>();
+	var_vol_voice_->SetOnChangeCallback(del);
 
 	const int32_t maxVal = std::numeric_limits<int32_t>::max();
 

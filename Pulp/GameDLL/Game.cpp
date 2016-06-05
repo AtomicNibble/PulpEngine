@@ -50,7 +50,9 @@ bool XGame::Init(void)
 	pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.0001f, ::toDegrees(PIf), 
 		core::VarFlag::SAVE_IF_CHANGED, "camera fov");
 
-	pFovVar_->SetOnChangeCallback(s_OnFovChanged);
+	core::ConsoleVarFunc del;
+	del.Bind<s_OnFovChanged>();
+	pFovVar_->SetOnChangeCallback(del);
 
 	uint32_t width, height;
 

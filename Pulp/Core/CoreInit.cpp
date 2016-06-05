@@ -719,15 +719,24 @@ void XCore::CreateSystemVars(void)
 	var_win_height = ADD_CVAR_REF("win_height", g_coreVars.win_height, 600, 600, 1, 
 		VarFlag::SYSTEM , "Game window height");
 
-	var_win_pos_x->SetOnChangeCallback(WindowPosVarChange);
-	var_win_pos_y->SetOnChangeCallback(WindowPosVarChange);
-	var_win_width->SetOnChangeCallback(WindowSizeVarChange);
-	var_win_height->SetOnChangeCallback(WindowSizeVarChange);
+	core::ConsoleVarFunc del;
+	del.Bind<WindowPosVarChange>();
+	var_win_pos_x->SetOnChangeCallback(del);
+
+	del.Bind<WindowPosVarChange>();
+	var_win_pos_y->SetOnChangeCallback(del);
+
+	del.Bind<WindowSizeVarChange>();
+	var_win_width->SetOnChangeCallback(del);
+
+	del.Bind<WindowSizeVarChange>();
+	var_win_height->SetOnChangeCallback(del);
 
 	var_win_custom_Frame = ADD_CVAR_INT("win_custom_Frame", 1, 0, 1,
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Enable / disable the windows custom frame");
 
-	var_win_custom_Frame->SetOnChangeCallback(WindowCustomFrameVarChange);
+	del.Bind<WindowCustomFrameVarChange>();
+	var_win_custom_Frame->SetOnChangeCallback(del);
 
 
 	var_profile = ADD_CVAR_INT("profile", 1, 0, 1, VarFlag::SYSTEM, "Enable Profiling");

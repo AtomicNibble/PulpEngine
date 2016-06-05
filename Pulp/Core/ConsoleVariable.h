@@ -32,8 +32,8 @@ public:
 	virtual void ForceSet(const char* s) X_OVERRIDE;
 	virtual void SetDefault(const char* s) X_OVERRIDE;
 
-	virtual void SetOnChangeCallback(ConsoleVarFunc::Pointer pChangeFunc) X_OVERRIDE;
-	virtual ConsoleVarFunc::Pointer GetOnChangeCallback(void) X_OVERRIDE;
+	virtual void SetOnChangeCallback(ConsoleVarFunc pChangeFunc) X_OVERRIDE;
+	virtual ConsoleVarFunc GetOnChangeCallback(void) X_OVERRIDE;
 
 	virtual void OnModified(void);
 
@@ -46,7 +46,7 @@ protected:
 
 	FlagType				Flags_;
 
-	ConsoleVarFunc::Pointer	pChangeFunc_;
+	ConsoleVarFunc			changeFunc_;
 	XConsole*				pConsole_;
 };
 

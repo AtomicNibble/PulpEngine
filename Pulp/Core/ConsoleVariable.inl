@@ -86,8 +86,8 @@ void CVarString<T>::Set(const char* s)
 
 	String_ = s;
 
-	if (pChangeFunc_) {
-		pChangeFunc_(this); // change callback.
+	if (changeFunc_) {
+		changeFunc_.Invoke(this); // change callback.
 	}
 }
 
@@ -229,8 +229,8 @@ void CVarInt<T>::Set(const int i)
 			IntValue_ = IntMax_;
 	}
 
-	if (pChangeFunc_) {
-		pChangeFunc_(this); // change callback.	
+	if (changeFunc_) {
+		changeFunc_.Invoke(this); // change callback.	
 	}
 }
 
@@ -360,8 +360,8 @@ void CVarFloat<T>::Set(const char* s)
 	OnModified();
 	fValue_ = fValue;
 
-	if (pChangeFunc_) {
-		pChangeFunc_(this); // change callback.	
+	if (changeFunc_) {
+		changeFunc_.Invoke(this); // change callback.	
 	}
 }
 
@@ -384,8 +384,8 @@ void CVarFloat<T>::Set(const float f)
 			fValue_ = fMax_;
 	}
 
-	if (pChangeFunc_) {
-		pChangeFunc_(this); // change callback.	
+	if (changeFunc_) {
+		changeFunc_.Invoke(this); // change callback.	
 	}
 }
 
@@ -410,8 +410,8 @@ void CVarFloat<T>::Set(const int i)
 			fValue_ = fMax_;
 	}
 
-	if (pChangeFunc_) {
-		pChangeFunc_(this); // change callback.	
+	if (changeFunc_) {
+		changeFunc_.Invoke(this); // change callback.	
 	}
 }
 
@@ -530,8 +530,8 @@ void CVarIntRef::Set(const int i)
 			IntValue_ = IntMax_;
 	}
 
-	if (pChangeFunc_) {
-		pChangeFunc_(this); // change callback.	
+	if (changeFunc_) {
+		changeFunc_.Invoke(this); // change callback.	
 	}
 }
 
@@ -548,8 +548,8 @@ void CVarIntRef::Reset(void)
 
 	IntValue_ = DefaultVal_;
 
-	if (changed && pChangeFunc_) {
-		pChangeFunc_(this); // change callback.	
+	if (changed && changeFunc_) {
+		changeFunc_.Invoke(this); // change callback.	
 	}
 }
 
@@ -657,8 +657,8 @@ void CVarFloatRef::Set(const char* s)
 
 	fValue_ = fValue;
 
-	if (pChangeFunc_) {
-		pChangeFunc_(this); // change callback.	
+	if (changeFunc_) {
+		changeFunc_.Invoke(this); // change callback.	
 	}
 }
 
@@ -672,8 +672,8 @@ void CVarFloatRef::Set(const float f)
 	OnModified();
 	fValue_ = f;
 
-	if (pChangeFunc_) {
-		pChangeFunc_(this); // change callback.	
+	if (changeFunc_) {
+		changeFunc_.Invoke(this); // change callback.	
 	}
 }
 
@@ -698,8 +698,8 @@ void CVarFloatRef::Set(const int i)
 			fValue_ = fMax_;
 	}
 
-	if (pChangeFunc_) {
-		pChangeFunc_(this); // change callback.	
+	if (changeFunc_) {
+		changeFunc_.Invoke(this); // change callback.	
 	}
 }
 

@@ -112,14 +112,14 @@ void CVarBase::Release()
 	this->pConsole_->UnregisterVariable(GetName());
 }
 
-void CVarBase::SetOnChangeCallback(ConsoleVarFunc::Pointer pChangeFunc)
+void CVarBase::SetOnChangeCallback(ConsoleVarFunc changeFunc)
 {
-	pChangeFunc_ = pChangeFunc;
+	changeFunc_ = changeFunc;
 }
 
-ConsoleVarFunc::Pointer CVarBase::GetOnChangeCallback()
+ConsoleVarFunc CVarBase::GetOnChangeCallback()
 {
-	return pChangeFunc_;
+	return changeFunc_;
 }
 
 void CVarBase::OnModified()
@@ -236,8 +236,9 @@ void CVarColRef::Set(const char* s)
 
 	OnModified();
 
-	if (pChangeFunc_)
-		pChangeFunc_(this); // change callback.	
+	if (changeFunc_) {
+		changeFunc_.Invoke(this); // change callback.
+	}
 }
 
 
@@ -308,8 +309,9 @@ void CVarVec3Ref::Set(const char* s)
 
 	OnModified();
 
-	if (pChangeFunc_)
-		pChangeFunc_(this); // change callback.	
+	if (changeFunc_) {
+		changeFunc_.Invoke(this); // change callback.	
+	}
 }
 
 

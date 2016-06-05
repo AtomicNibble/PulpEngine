@@ -66,8 +66,10 @@ struct IKeyBindDumpSink
 };
 
 
-typedef core::traits::Function<void(ICVar*)> ConsoleVarFunc;
+// typedef core::traits::Function<void(ICVar*)> ConsoleVarFunc;
 typedef core::traits::Function<void(IConsoleCmdArgs*)> ConsoleCmdOldFunc;
+
+typedef core::Delegate<void(ICVar*)> ConsoleVarFunc;
 typedef core::Delegate<void(IConsoleCmdArgs*)> ConsoleCmdFunc;
 
 // The console interface
@@ -87,19 +89,19 @@ struct IConsole
 	virtual consoleState::Enum getVisState(void) const X_ABSTRACT;
 
 	// Register variables.
-	virtual ICVar* RegisterString(const char* Name, const char* Value, int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc = nullptr) X_ABSTRACT;
-	virtual ICVar* RegisterInt(const char* Name, int Value, int Min, int Max, int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc = 0) X_ABSTRACT;
-	virtual ICVar* RegisterFloat(const char* Name, float Value, float Min, float Max, int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc = 0) X_ABSTRACT;
+	virtual ICVar* RegisterString(const char* Name, const char* Value, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* RegisterInt(const char* Name, int Value, int Min, int Max, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* RegisterFloat(const char* Name, float Value, float Min, float Max, int flags, const char* desc) X_ABSTRACT;
 
 	virtual ICVar* ConfigRegisterString(const char* Name, const char* Value, int flags, const char* desc) X_ABSTRACT;
 	virtual ICVar* ConfigRegisterInt(const char* Name, int Value, int Min, int Max, int flags, const char* desc) X_ABSTRACT;
 	virtual ICVar* ConfigRegisterFloat(const char* Name, float Value, float Min, float Max, int flags, const char* desc) X_ABSTRACT;
 
 	// refrenced based, these are useful if we want to use the value alot so we just register it's address.
-	virtual ICVar* Register(const char* name, float* src, float defaultvalue, float Min, float Max, int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc = 0) X_ABSTRACT;
-	virtual ICVar* Register(const char* name, int* src, int defaultvalue, int Min, int Max, int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc = 0) X_ABSTRACT;
-	virtual ICVar* Register(const char* name, Color* src, Color defaultvalue, int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc = 0) X_ABSTRACT;
-	virtual ICVar* Register(const char* name, Vec3f* src, Vec3f defaultvalue, int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc = 0) X_ABSTRACT;
+	virtual ICVar* Register(const char* name, float* src, float defaultvalue, float Min, float Max, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* Register(const char* name, int* src, int defaultvalue, int Min, int Max, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* Register(const char* name, Color* src, Color defaultvalue, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* Register(const char* name, Vec3f* src, Vec3f defaultvalue, int flags, const char* desc) X_ABSTRACT;
 
 
 	virtual ICVar* GetCVar(const char* name) X_ABSTRACT;
@@ -160,8 +162,8 @@ struct ICVar
 	virtual void Release(void) X_ABSTRACT;
 	virtual void Reset(void) X_ABSTRACT; // reset to default value.
 
-	virtual void SetOnChangeCallback(ConsoleVarFunc::Pointer pChangeFunc) X_ABSTRACT;
-	virtual ConsoleVarFunc::Pointer GetOnChangeCallback(void) X_ABSTRACT;
+	virtual void SetOnChangeCallback(ConsoleVarFunc pChangeFunc) X_ABSTRACT;
+	virtual ConsoleVarFunc GetOnChangeCallback(void) X_ABSTRACT;
 };
 
 
