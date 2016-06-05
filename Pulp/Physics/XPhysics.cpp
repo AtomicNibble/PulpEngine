@@ -238,6 +238,7 @@ bool XPhysics::Init(void)
 
 
 	setScratchBlockSize(vars_.ScratchBufferSize());
+	stepperType_ = vars_.GetStepperType();
 
 	return true;
 }
@@ -278,6 +279,8 @@ void XPhysics::release(void)
 
 void XPhysics::onTickPreRender(float dtime)
 {
+	stepperType_ = vars_.GetStepperType();
+
 	Stepper* pStepper = getStepper();
 
 	waitForResults_ = false;
