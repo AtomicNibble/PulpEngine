@@ -14,6 +14,8 @@ PhysXVars::PhysXVars() :
 {
 
 	scratchBufferDefaultSize_ = 16; // 16 KiB
+
+	stepperType_ = StepperType::DEFAULT_STEPPER;
 }
 
 
