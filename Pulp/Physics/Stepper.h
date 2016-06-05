@@ -34,20 +34,20 @@ public:
 
 	virtual	bool advance(physx::PxScene* scene, float32_t dt, void* scratchBlock, uint32_t scratchBlockSize) X_ABSTRACT;
 	virtual	void wait(physx::PxScene* scene) X_ABSTRACT;
-	virtual void substepStrategy(const float32_t stepSize, uint32_t& substepCount, float32_t& substepSize) X_ABSTRACT;
 	virtual void postRender(const float32_t stepSize) X_ABSTRACT;
 
-	X_INLINE virtual void setSubStepper(const float32_t stepSize, const uint32_t maxSteps) {}
-	X_INLINE virtual void renderDone(void) {}
-	X_INLINE virtual void shutdown(void) {}
+	X_INLINE virtual void renderDone(void);
+	X_INLINE virtual void shutdown(void);
 
-	X_INLINE core::TimeVal getSimulationTime(void) const { return simulationTime_; }
+	X_INLINE core::TimeVal getSimulationTime(void) const;
 
+	X_INLINE IStepperHandler& getHandler(void);
+	X_INLINE const IStepperHandler&	getHandler(void) const;
+	X_INLINE void setHandler(IStepperHandler* pHanlder);
 
-	X_INLINE IStepperHandler&		getHandler(void) { return *pHandler_; }
-	X_INLINE const IStepperHandler&	getHandler(void) const { return *pHandler_; }
-	X_INLINE void					setHandler(IStepperHandler* pHanlder) { pHandler_ = pHanlder; }
-
+protected:
+	virtual void substepStrategy(const float32_t stepSize, uint32_t& substepCount, float32_t& substepSize) X_ABSTRACT;
+	X_INLINE virtual void setSubStepper(const float32_t stepSize, const uint32_t maxSteps);
 
 protected:
 	IStepperHandler* pHandler_;
@@ -63,11 +63,11 @@ public:
 	StepperTask();
 
 public:
-	X_INLINE void						setStepper(MultiThreadStepper* stepper) { pStepper_ = stepper; }
-	X_INLINE MultiThreadStepper*		getStepper(void) { return pStepper_; }
-	X_INLINE const MultiThreadStepper*	getStepper(void) const { return pStepper_; }
-	X_INLINE const char*				getName(void) const { return "Stepper Task"; }
-	X_INLINE void						run(void);
+	X_INLINE void setStepper(MultiThreadStepper* stepper);
+	X_INLINE MultiThreadStepper* getStepper(void);
+	X_INLINE const MultiThreadStepper* getStepper(void) const;
+	X_INLINE const char* getName(void) const;
+	void run(void);
 
 protected:
 	MultiThreadStepper*	pStepper_;
@@ -79,17 +79,16 @@ public:
 	StepperTaskCollide() = default;
 
 public:
-	void run();
+	void run(void);
 };
 
 class StepperTaskSolve : public StepperTask
 {
-
 public:
 	StepperTaskSolve() = default;
 
 public:
-	void run();
+	void run(void);
 };
 
 class MultiThreadStepper : public Stepper
@@ -101,21 +100,23 @@ public:
 	virtual bool advance(physx::PxScene* scene, float32_t dt, void* scratchBlock, uint32_t scratchBlockSize);
 	virtual void substepDone(StepperTask* ownerTask);
 	virtual void renderDone();
-	X_INLINE virtual void postRender(const float32_t stepSize) {}
+	X_INLINE virtual void postRender(const float32_t stepSize);
 
-	// if mNbSubSteps is 0 then the sync will never 
-	// be set so waiting would cause a deadlock
-	X_INLINE virtual void wait(physx::PxScene* scene) X_OVERRIDE { if (nbSubSteps_) { sync_.wait(); } }
-	X_INLINE virtual void shutdown(void) X_OVERRIDE { }
+	X_INLINE virtual void wait(physx::PxScene* scene) X_OVERRIDE;
+	X_INLINE virtual void shutdown(void) X_OVERRIDE;
 	virtual void reset() X_ABSTRACT;
-	virtual void substepStrategy(const float32_t stepSize, uint32_t& substepCount, float32_t& substepSize) X_ABSTRACT;
+	X_INLINE float32_t getSubStepSize(void) const;
+
+public:
+	// public for the task's to call.
 	virtual void solveStep(physx::PxBaseTask* ownerTask);
 	virtual void collisionStep(physx::PxBaseTask* ownerTask);
-	X_INLINE float32_t getSubStepSize(void) const { return subStepSize_; }
 
 protected:
+	void substepStrategy(const float32_t stepSize, uint32_t& substepCount, float32_t& substepSize) X_ABSTRACT;
 	void substep(StepperTask& completionTask);
 
+protected:
 	// we need two completion tasks because when multistepping we can't submit completion0 from the
 	// substepDone function which is running inside completion0
 	bool				firstCompletionPending_;
@@ -137,11 +138,13 @@ class DebugStepper : public Stepper
 public:
 	DebugStepper(const float32_t stepSize);
 
-	virtual void substepStrategy(const float32_t stepSize, uint32_t& substepCount, float32_t& substepSize) X_OVERRIDE;
-	virtual bool advance(physx::PxScene* scene, float32_t dt, void* scratchBlock, uint32_t scratchBlockSize) X_OVERRIDE;
-	X_INLINE virtual void postRender(const float32_t stepSize) X_OVERRIDE {}
-	virtual void setSubStepper(const float32_t stepSize, const uint32_t maxSteps) X_OVERRIDE;
-	virtual void wait(physx::PxScene* scene) X_OVERRIDE;
+	bool advance(physx::PxScene* scene, float32_t dt, void* scratchBlock, uint32_t scratchBlockSize) X_OVERRIDE;
+	X_INLINE void postRender(const float32_t stepSize) X_OVERRIDE;
+	void wait(physx::PxScene* scene) X_OVERRIDE;
+	void setSubStepper(const float32_t stepSize, const uint32_t maxSteps) X_OVERRIDE;
+
+protected:
+	void substepStrategy(const float32_t stepSize, uint32_t& substepCount, float32_t& substepSize) X_OVERRIDE;
 
 private:
 	float32_t stepSize_;
@@ -153,10 +156,12 @@ class FixedStepper : public MultiThreadStepper
 public:
 	FixedStepper(const float32_t subStepSize, const uint32_t maxSubSteps);
 
-	void substepStrategy(const float32_t stepSize, uint32_t& substepCount, float32_t& substepSize) X_OVERRIDE;
-	X_INLINE void reset(void)  X_FINAL { accumulator_ = 0.0f; }
+	X_INLINE void reset(void)  X_FINAL;
+	X_INLINE void postRender(const float32_t stepSize) X_OVERRIDE;
 	void setSubStepper(const float32_t stepSize, const uint32_t maxSteps) X_OVERRIDE;
-	void postRender(const float32_t stepSize) X_OVERRIDE {};
+
+protected:
+	void substepStrategy(const float32_t stepSize, uint32_t& substepCount, float32_t& substepSize) X_OVERRIDE;
 
 private:
 	float32_t	accumulator_;
@@ -182,8 +187,10 @@ class VariableStepper : public MultiThreadStepper
 public:
 	VariableStepper(const float32_t minSubStepSize, const float32_t maxSubStepSize, const uint32_t maxSubSteps);
 
+	X_INLINE void reset(void) X_FINAL;
+
+private:
 	void substepStrategy(const float32_t stepSize, uint32_t& substepCount, float32_t& substepSize) X_FINAL;
-	X_INLINE void reset(void) X_FINAL { accumulator_ = 0.0f; }
 
 private:
 	X_NO_ASSIGN(VariableStepper);
@@ -196,3 +203,5 @@ private:
 
 
 X_NAMESPACE_END
+
+#include "Stepper.inl"

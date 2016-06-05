@@ -18,7 +18,7 @@ StepperTask::StepperTask() :
 {
 }
 
-void StepperTask::run()
+void StepperTask::run(void)
 {
 	pStepper_->substepDone(this);
 	release();
@@ -62,33 +62,6 @@ MultiThreadStepper::MultiThreadStepper() :
 	solveTask_.setStepper(this);
 }
 
-void MultiThreadStepper::solveStep(physx::PxBaseTask* ownerTask)
-{
-	physx::PxSceneWriteLock writeLock(*pScene_);
-
-#if PX_ENABLE_INVERTED_STEPPER_FEATURE
-	pScene_->solve(subStepSize_, ownerTask, scratchBlock_, scratchBlockSize_);
-#else
-	pScene_->simulate(subStepSize_, ownerTask, scratchBlock_, scratchBlockSize_);
-#endif
-}
-
-void MultiThreadStepper::collisionStep(physx::PxBaseTask* ownerTask)
-{
-#if PX_ENABLE_INVERTED_STEPPER_FEATURE
-	PxSceneWriteLock writeLock(*pScene_);
-	pScene_->collide(subStepSize_, ownerTask);
-#endif
-}
-
-void MultiThreadStepper::renderDone(void)
-{
-	if (firstCompletionPending_)
-	{
-		completion0_.removeReference();
-		firstCompletionPending_ = false;
-	}
-}
 
 bool MultiThreadStepper::advance(physx::PxScene* scene, float32_t dt, void* scratchBlock, uint32_t scratchBlockSize)
 {
@@ -119,6 +92,7 @@ bool MultiThreadStepper::advance(physx::PxScene* scene, float32_t dt, void* scra
 
 	return true;
 }
+
 
 void MultiThreadStepper::substepDone(StepperTask* ownerTask)
 {
@@ -154,6 +128,14 @@ void MultiThreadStepper::substepDone(StepperTask* ownerTask)
 	}
 }
 
+void MultiThreadStepper::renderDone(void)
+{
+	if (firstCompletionPending_)
+	{
+		completion0_.removeReference();
+		firstCompletionPending_ = false;
+	}
+}
 
 void MultiThreadStepper::substep(StepperTask& completionTask)
 {
@@ -170,6 +152,26 @@ void MultiThreadStepper::substep(StepperTask& completionTask)
 	}
 
 	// parallel sample tasks are started in mSolveTask (after solve was called which acquires a write lock).
+}
+
+
+void MultiThreadStepper::solveStep(physx::PxBaseTask* ownerTask)
+{
+	physx::PxSceneWriteLock writeLock(*pScene_);
+
+#if PX_ENABLE_INVERTED_STEPPER_FEATURE
+	pScene_->solve(subStepSize_, ownerTask, scratchBlock_, scratchBlockSize_);
+#else
+	pScene_->simulate(subStepSize_, ownerTask, scratchBlock_, scratchBlockSize_);
+#endif
+}
+
+void MultiThreadStepper::collisionStep(physx::PxBaseTask* ownerTask)
+{
+#if PX_ENABLE_INVERTED_STEPPER_FEATURE
+	PxSceneWriteLock writeLock(*pScene_);
+	pScene_->collide(subStepSize_, ownerTask);
+#endif
 }
 
 // -----------------------------------
