@@ -137,7 +137,8 @@ void XPhysics::RegisterCmds(void)
 	ADD_COMMAND_MEMBER("phys_step_one", this, XPhysics, &XPhysics::cmd_StepOne, core::VarFlag::SYSTEM,
 		"Steps one frame in the simulation");
 
-
+	ADD_COMMAND_MEMBER("phys_toggle_visualization", this, XPhysics, &XPhysics::cmd_ToggleVis, core::VarFlag::SYSTEM,
+		"Toggles physics visualization");
 }
 
 bool XPhysics::Init(void)
@@ -333,6 +334,9 @@ void XPhysics::onTickPostRender(float dtime)
 		Stepper* pStepper = getStepper();
 		pStepper->wait(scene_);
 
+		core::TimeVal simTime = pStepper->getSimulationTime();
+
+		X_LOG0("Phys", "Sim time: %gms", simTime.GetMilliSeconds());
 
 		if (stepperType_ == StepperType::INVERTED_FIXED_STEPPER) {
 			pStepper->postRender(dtime);
@@ -524,6 +528,16 @@ void XPhysics::setScratchBlockSize(size_t size)
 }
 
 
+void XPhysics::toggleVisualizationParam(physx::PxVisualizationParameter::Enum param)
+{
+	if (scene_) {
+		physx::PxSceneWriteLock scopedLock(*scene_);
+		const bool visualization = scene_->getVisualizationParameter(param) == 1.0f;
+		scene_->setVisualizationParameter(param, visualization ? 0.0f : 1.0f);
+	}
+}
+
+
 void XPhysics::cmd_TogglePvd(core::IConsoleCmdArgs* pArgs)
 {
 	X_UNUSED(pArgs);
@@ -547,6 +561,12 @@ void XPhysics::cmd_StepOne(core::IConsoleCmdArgs* pArgs)
 	oneFrameUpdate_ = true;
 }
 
+void XPhysics::cmd_ToggleVis(core::IConsoleCmdArgs* pArgs)
+{
+	X_UNUSED(pArgs);
+
+	toggleVisualizationParam(physx::PxVisualizationParameter::eSCALE);
+}
 
 
 X_NAMESPACE_END

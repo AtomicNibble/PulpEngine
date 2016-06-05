@@ -90,6 +90,7 @@ private:
 	Stepper* getStepper(void);
 
 	void setScratchBlockSize(size_t size);
+	void toggleVisualizationParam(physx::PxVisualizationParameter::Enum param);
 
 private:
 	X_INLINE bool IsPaused(void) const;
@@ -101,6 +102,7 @@ private:
 	void cmd_TogglePvd(core::IConsoleCmdArgs* pArgs);
 	void cmd_TogglePause(core::IConsoleCmdArgs* pArgs);
 	void cmd_StepOne(core::IConsoleCmdArgs* pArgs);
+	void cmd_ToggleVis(core::IConsoleCmdArgs* pArgs);
 
 private:
 	PhysxCpuDispacher jobDispatcher_;
