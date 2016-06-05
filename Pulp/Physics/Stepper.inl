@@ -58,7 +58,8 @@ X_INLINE const MultiThreadStepper* StepperTask::getStepper(void) const
 }
 
 X_INLINE const char* StepperTask::getName(void) const
-{ return "Stepper Task"; 
+{ 
+	return "Stepper Task"; 
 }
 
 
