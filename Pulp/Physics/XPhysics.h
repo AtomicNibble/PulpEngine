@@ -46,7 +46,7 @@ class XPhysics : public IPhysics,
 		bool	useFullPvdConnection;
 	};
 
-	static const size_t SCRATCH_BLOCK_SIZE = 1024 * 8;
+	static const size_t SCRATCH_BLOCK_SIZE = 1024 * 16;
 
 	X_NO_COPY(XPhysics);
 	X_NO_ASSIGN(XPhysics);

@@ -398,8 +398,8 @@ void XPhysics::createPvdConnection(void)
 
 	//Use these flags for a clean profile trace with minimal overhead
 	physx::PxVisualDebuggerConnectionFlags theConnectionFlags(
-		physx::PxVisualDebuggerConnectionFlag::eDEBUG | 
-		physx::PxVisualDebuggerConnectionFlag::ePROFILE | 
+		physx::PxVisualDebuggerConnectionFlag::eDEBUG |
+		physx::PxVisualDebuggerConnectionFlag::ePROFILE |
 		physx::PxVisualDebuggerConnectionFlag::eMEMORY);
 
 	if (!pvdParams_.useFullPvdConnection) {
@@ -461,6 +461,13 @@ Stepper* XPhysics::getStepper(void)
 void XPhysics::setSctrachBlock(size_t size)
 {
 	if (size == scratchBlockSize_) {
+		return;
+	}
+
+	static const size_t MULTIPLE_OF = 1024 * 16;
+
+	if ((size % MULTIPLE_OF) != 0) {
+		X_ERROR("PhysicsSys", "Scratch block must be a multiple of %i. requested size: %i", MULTIPLE_OF, size);
 		return;
 	}
 
