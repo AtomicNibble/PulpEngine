@@ -21,13 +21,12 @@ void PhysXVars::RegisterVars(void)
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED, 
 		"Size of the scratch buffer in kib, must be a multiple of 16.");
 
-
 }
 
 
 uint32_t PhysXVars::ScratchBufferSize(void) const
 {
-	return safe_static_cast<uint32_t, int32_t>(pVarScratchBufSize_->GetInteger());
+	return safe_static_cast<uint32_t, int32_t>(pVarScratchBufSize_->GetInteger() << 10);
 }
 
 
