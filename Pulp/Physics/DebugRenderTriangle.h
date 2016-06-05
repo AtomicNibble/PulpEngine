@@ -5,8 +5,10 @@ X_NAMESPACE_BEGIN(physics)
 
 class TriangleDebugRender
 {
+	X_NO_COPY(TriangleDebugRender);
+
 public:
-	TriangleDebugRender() = default;
+	TriangleDebugRender();
 	~TriangleDebugRender() = default;
 
 public:
@@ -18,6 +20,13 @@ public:
 
 	void checkResizeTriangle(size_t maxVerts);
 	void clearTriangle(void);
+
+private:
+	void addVert(const Vec3f& p, const Vec3f& n, const Color8u& color);
+
+private:
+	size_t numVerts_;
+	size_t maxVerts_;
 };
 
 

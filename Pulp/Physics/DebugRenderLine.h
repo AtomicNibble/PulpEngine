@@ -7,8 +7,10 @@ X_NAMESPACE_BEGIN(physics)
 
 class LineDebugRender
 {
+	X_NO_COPY(LineDebugRender);
+
 public:
-	LineDebugRender() = default;
+	LineDebugRender();
 	~LineDebugRender() = default;
 
 public:
@@ -16,6 +18,14 @@ public:
 	void checkResizeLine(size_t maxVerts);
 	void queueForRenderLine(void);
 	void clearLine(void);
+
+private:
+	void addVert(const Vec3f& p, const Color8u& color);
+
+
+private:
+	size_t numVerts_;
+	size_t maxVerts_;
 };
 
 
