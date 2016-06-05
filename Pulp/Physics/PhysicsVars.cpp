@@ -18,7 +18,8 @@ PhysXVars::PhysXVars() :
 void PhysXVars::RegisterVars(void)
 {
 	pVarScratchBufSize_ = ADD_CVAR_INT("phys_scratch_buf_size", scratchBufferDefaultSize_, 0, std::numeric_limits<int32_t>::max(),
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Size of the scratch buffer in kib, must be a multiple of 16.");
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED, 
+		"Size of the scratch buffer in kib, must be a multiple of 16.");
 
 
 }
