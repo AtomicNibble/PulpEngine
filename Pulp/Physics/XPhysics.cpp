@@ -281,7 +281,7 @@ void XPhysics::onTickPreRender(float dtime)
 	if (scene_)
 	{
 
-		waitForResults_ = pStepper->advance(scene_, dtime, pScratchBlock_, SCRATCH_BLOCK_SIZE);
+		waitForResults_ = pStepper->advance(scene_, dtime, pScratchBlock_, scratchBlockSize_);
 
 		// tells the stepper shape data is not going to be accessed until next frame 
 		// (frame ends with stepper->wait(mScene))
