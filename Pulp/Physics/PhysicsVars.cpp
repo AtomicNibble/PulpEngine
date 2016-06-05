@@ -23,7 +23,7 @@ void PhysXVars::RegisterVars(void)
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED, 
 		"Size of the scratch buffer in kib, must be a multiple of 16.");
 
-	pVarStepperType_ = ADD_CVAR_INT("phys_stepper_style", 0, StepperType::DEFAULT_STEPPER, StepperType::ENUM_COUNT,
+	pVarStepperType_ = ADD_CVAR_INT("phys_stepper_style", 0, StepperType::DEFAULT_STEPPER - 1, StepperType::ENUM_COUNT,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Stepper style for physics update. 0=default, 1=fixed, 2=inverted-fixed, 3=variable.");
 
