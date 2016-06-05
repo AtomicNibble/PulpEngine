@@ -364,6 +364,13 @@ void XPhysics::onTickPostRender(float dtime)
 	}
 }
 
+void XPhysics::render(void)
+{
+	if (vars_.DebugDrawEnabled())
+	{
+		debugRender_.queueForRender();
+	}
+}
 
 void XPhysics::onPvdSendClassDescriptions(PVD::PvdConnection& conn)
 {

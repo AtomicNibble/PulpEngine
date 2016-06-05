@@ -21,6 +21,8 @@ struct IPhysics
 
 	virtual void onTickPreRender(float dtime) X_ABSTRACT;
 	virtual void onTickPostRender(float dtime) X_ABSTRACT;
+	virtual void render(void) X_ABSTRACT; // render stuff like debug shapes.
+
 };
 
 

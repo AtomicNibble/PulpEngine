@@ -60,6 +60,7 @@ public:
 
 	void onTickPreRender(float dtime) X_FINAL;
 	void onTickPostRender(float dtime) X_FINAL;
+	void render(void) X_FINAL;
 	// ~IPhysics
 
 
