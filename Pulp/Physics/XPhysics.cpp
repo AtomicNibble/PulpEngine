@@ -343,6 +343,17 @@ void XPhysics::onTickPostRender(float dtime)
 		}
 	}
 
+	// debug Vis
+	if (scene_ && vars_.DebugDrawEnabled())
+	{
+		const physx::PxRenderBuffer& debugRenderable = scene_->getRenderBuffer();
+
+		debugRender_.clear();
+		debugRender_.update(debugRenderable);
+
+		updateRenderObjectsDebug(dtime);
+	}
+
 	// pause if one frame update.
 	if (oneFrameUpdate_)
 	{
@@ -471,6 +482,8 @@ void XPhysics::createPvdConnection(void)
 }
 
 
+// --------------------------------------------------------
+
 void XPhysics::getDefaultSceneDesc(physx::PxSceneDesc&)
 {
 
@@ -484,8 +497,26 @@ void XPhysics::customizeSceneDesc(physx::PxSceneDesc&)
 void XPhysics::customizeTolerances(physx::PxTolerancesScale&)
 {
 
-
 }
+
+// --------------------------------------------------------
+
+
+void XPhysics::updateRenderObjectsDebug(float dtime)
+{
+	X_UNUSED(dtime);
+}
+
+void XPhysics::updateRenderObjectsSync(float dtime)
+{
+	X_UNUSED(dtime);
+}
+
+void XPhysics::updateRenderObjectsAsync(float dtime)
+{
+	X_UNUSED(dtime);
+}
+
 
 
 Stepper* XPhysics::getStepper(void)

@@ -10,6 +10,7 @@
 #include "CpuDispatcher.h"
 #include "Stepper.h"
 #include "PhysicsVars.h"
+#include "DebugRender.h"
 
 namespace PVD {
 	using namespace physx::debugger;
@@ -87,6 +88,10 @@ private:
 	void customizeSceneDesc(physx::PxSceneDesc&);
 	void customizeTolerances(physx::PxTolerancesScale&);
 
+	void updateRenderObjectsDebug(float dtime); // update of render actors debug draw information, will be called while the simulation is NOT running
+	void updateRenderObjectsSync(float dtime);  // update of render objects while the simulation is NOT running (for particles, cloth etc. because data is not double buffered)
+	void updateRenderObjectsAsync(float dtime); // update of render objects, potentially while the simulation is running (for rigid bodies etc. because data is double buffered)
+
 	Stepper* getStepper(void);
 
 	void setScratchBlockSize(size_t size);
@@ -136,6 +141,8 @@ private:
 	VariableStepper			variableStepper_;
 
 	PhysXVars vars_;
+
+	DebugRender debugRender_;
 };
 
 
