@@ -21,6 +21,12 @@
     <Filter Include="Source Files\Vars">
       <UniqueIdentifier>{c156cc61-a510-43d4-a89c-5b3075dc8797}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\DebugRender">
+      <UniqueIdentifier>{6158b7a6-7b2f-4f67-a22a-b4bc0662ede2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\DebugRender">
+      <UniqueIdentifier>{0509623a-efb0-4c19-ac28-4031c29b8d0c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -43,6 +49,18 @@
     </ClInclude>
     <ClInclude Include="PhysicsVars.h">
       <Filter>Header Files\Vars</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugRender.h">
+      <Filter>Header Files\DebugRender</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugRenderPoints.h">
+      <Filter>Header Files\DebugRender</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugRenderLine.h">
+      <Filter>Header Files\DebugRender</Filter>
+    </ClInclude>
+    <ClInclude Include="DebugRenderTriangle.h">
+      <Filter>Header Files\DebugRender</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +87,18 @@
     </ClCompile>
     <ClCompile Include="PhysicsVars.cpp">
       <Filter>Source Files\Vars</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugRender.cpp">
+      <Filter>Source Files\DebugRender</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugRenderPoints.cpp">
+      <Filter>Source Files\DebugRender</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugRenderLine.cpp">
+      <Filter>Source Files\DebugRender</Filter>
+    </ClCompile>
+    <ClCompile Include="DebugRenderTriangle.cpp">
+      <Filter>Source Files\DebugRender</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
