@@ -103,8 +103,7 @@ private:
 	void setScratchBlockSize(size_t size);
 
 private:
-
-	friend void cmd_TogglePvd(core::IConsoleCmdArgs* pArgs);
+	void cmd_TogglePvd(core::IConsoleCmdArgs* pArgs);
 
 private:
 	PhysxCpuDispacher jobDispatcher_;

@@ -72,15 +72,6 @@ namespace
 } // namespace
 
 
-void cmd_TogglePvd(core::IConsoleCmdArgs* pArgs)
-{
-	X_UNUSED(pArgs);
-
-	XPhysics* pPhysics = static_cast<XPhysics*>(gEnv->pPhysics);
-
-	pPhysics->togglePvdConnection();
-}
-
 XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
 	jobDispatcher_(*pJobSys),
 	allocator_(arena),
@@ -124,7 +115,7 @@ void XPhysics::RegisterVars(void)
 
 void XPhysics::RegisterCmds(void)
 {
-	ADD_COMMAND("phys_toggle_pvd", cmd_TogglePvd, core::VarFlag::SYSTEM,
+	ADD_COMMAND_MEMBER("phys_toggle_pvd", this, XPhysics, &XPhysics::cmd_TogglePvd, core::VarFlag::SYSTEM,
 		"Toggles PVD connection");
 
 
@@ -491,6 +482,14 @@ void XPhysics::setScratchBlockSize(size_t size)
 
 	pScratchBlock_ = X_NEW_ARRAY_ALIGNED(uint8_t, size, g_PhysicsArena, "ScratchBlock", 16);
 	scratchBlockSize_ = size;
+}
+
+
+void XPhysics::cmd_TogglePvd(core::IConsoleCmdArgs* pArgs)
+{
+	X_UNUSED(pArgs);
+
+	togglePvdConnection();
 }
 
 
