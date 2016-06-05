@@ -9,6 +9,7 @@
 #include "Logger.h"
 #include "CpuDispatcher.h"
 #include "Stepper.h"
+#include "PhysicsVars.h"
 
 namespace PVD {
 	using namespace physx::debugger;
@@ -46,10 +47,11 @@ class XPhysics : public IPhysics,
 		bool	useFullPvdConnection;
 	};
 
-	static const size_t SCRATCH_BLOCK_SIZE = 1024 * 16;
-
 	X_NO_COPY(XPhysics);
 	X_NO_ASSIGN(XPhysics);
+
+public:
+	static const size_t SCRATCH_BLOCK_SIZE = 1024 * 16;
 
 public:
 	XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena);
@@ -94,7 +96,7 @@ private:
 
 	Stepper* getStepper(void);
 
-	void setSctrachBlock(size_t size);
+	void setScratchBlockSize(size_t size);
 
 private:
 	PhysxCpuDispacher jobDispatcher_;
@@ -124,6 +126,8 @@ private:
 	FixedStepper			fixedStepper_;
 	InvertedFixedStepper	invertedFixedStepper_;
 	VariableStepper			variableStepper_;
+
+	PhysXVars vars_;
 };
 
 

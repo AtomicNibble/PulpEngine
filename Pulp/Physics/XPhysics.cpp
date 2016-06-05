@@ -92,8 +92,6 @@ XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::Mem
 {
 	X_ASSERT_NOT_NULL(arena);
 
-	setSctrachBlock(SCRATCH_BLOCK_SIZE);
-
 	debugStepper_.setHandler(this);
 	fixedStepper_.setHandler(this);
 	invertedFixedStepper_.setHandler(this);
@@ -109,8 +107,7 @@ XPhysics::~XPhysics()
 // IPhysics
 void XPhysics::RegisterVars(void)
 {
-
-
+	vars_.RegisterVars();
 }
 
 void XPhysics::RegisterCmds(void)
@@ -234,6 +231,8 @@ bool XPhysics::Init(void)
 	scene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, initialDebugRender_ ? debugRenderScale_ : 0.0f);
 	scene_->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
 
+
+	setScratchBlockSize(vars_.ScratchBufferSize());
 
 	return true;
 }
@@ -459,7 +458,7 @@ Stepper* XPhysics::getStepper(void)
 }
 
 
-void XPhysics::setSctrachBlock(size_t size)
+void XPhysics::setScratchBlockSize(size_t size)
 {
 	if (size == scratchBlockSize_) {
 		return;
