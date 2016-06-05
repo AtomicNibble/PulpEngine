@@ -488,16 +488,17 @@ Stepper* XPhysics::getStepper(void)
 {
 	switch (stepperType_)
 	{
-	case StepperType::DEFAULT_STEPPER:
+	case StepperType::DEBUG_STEPPER:
 		return &debugStepper_;
 	case StepperType::FIXED_STEPPER:
 		return &fixedStepper_;
 	case StepperType::INVERTED_FIXED_STEPPER:
 		return &invertedFixedStepper_;
+	case StepperType::VARIABLE_STEPPER:
+		return &variableStepper_;
 	default:
 		return &variableStepper_;
 	};
-
 }
 
 

@@ -95,6 +95,8 @@ private:
 	X_INLINE bool IsPaused(void) const;
 	X_INLINE void togglePause(void);
 
+	X_INLINE void setSubStepper(const float32_t stepSize, const uint32_t maxSteps);
+
 private:
 	void cmd_TogglePvd(core::IConsoleCmdArgs* pArgs);
 	void cmd_TogglePause(core::IConsoleCmdArgs* pArgs);
@@ -105,16 +107,16 @@ private:
 	PhysxArenaAllocator	allocator_;
 	PhysxLogger logger_;
 
-	physx::PxFoundation*				foundation_;
-	physx::PxProfileZoneManager*		profileZoneManager_;
-	physx::PxPhysics*					physics_;
-	physx::PxCooking*					cooking_;
-	physx::PxScene*						scene_;
-	physx::PxMaterial*					material_;
-	physx::PxDefaultCpuDispatcher*		cpuDispatcher_;
+	physx::PxFoundation*			foundation_;
+	physx::PxProfileZoneManager*	profileZoneManager_;
+	physx::PxPhysics*				physics_;
+	physx::PxCooking*				cooking_;
+	physx::PxScene*					scene_;
+	physx::PxMaterial*				material_;
+	physx::PxDefaultCpuDispatcher*	cpuDispatcher_;
 
-	uint8_t* pScratchBlock_;
-	size_t scratchBlockSize_;
+	uint8_t*	pScratchBlock_;
+	size_t		scratchBlockSize_;
 
 	bool initialDebugRender_;
 	bool waitForResults_;
