@@ -102,26 +102,26 @@ void SoundVars::RegisterVars(void)
 
 	// LEEERORRRY Jenkins!!
 	ADD_CVAR_REF("snd_mem_engine_default_pool", soundEngineDefaultMemoryPoolSize_, soundEngineDefaultMemoryPoolSize_, 0, maxVal, 
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 		"Sound engine default memory pool size (KiB).");
 	ADD_CVAR_REF("snd_mem_engine_lower_default_pool", soundEngineLowerDefaultPoolSize_, soundEngineLowerDefaultPoolSize_, 0, maxVal,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 		"Sound engine lower default memory pool size (KiB).");
 	ADD_CVAR_REF("snd_mem_engine_stream_pool", streamManagerMemoryPoolSize_, streamManagerMemoryPoolSize_, 0, maxVal,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 		"Sound engine stream memory pool size (KiB).");
 	ADD_CVAR_REF("snd_mem_engine_stream_device_pool", streamDeviceMemoryPoolSize_, streamDeviceMemoryPoolSize_, 0, maxVal,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 		"Sound engine stream device memory pool size (KiB).");
 	ADD_CVAR_REF("snd_mem_engine_command_queue_pool", commandQueueMemoryPoolSize_, commandQueueMemoryPoolSize_, 0, maxVal,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 		"Sound engine command queue memory pool size (KiB).");
 
 	ADD_CVAR_REF("snd_mem_engine_monitor_pool", monitorMemoryPoolSize_, monitorMemoryPoolSize_, 0, maxVal,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 		"Sound engine monitor memory pool size (KiB).");
 	ADD_CVAR_REF("snd_mem_engine_monitor_queue_pool", monitorQueueMemoryPoolSize_, monitorQueueMemoryPoolSize_, 0, maxVal,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 		"Sound engine monitor queue memory pool size (KiB).");
 }
 
