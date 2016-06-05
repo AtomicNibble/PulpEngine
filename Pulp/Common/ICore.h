@@ -377,7 +377,19 @@ extern core::MallocFreeAllocator* gMalloc;
 #define ADD_CVAR_FLOAT(_name,_val,_Min,_Max,_flags,_Desc)				gEnv->pConsole->RegisterFloat(_name, (_val), (_Min), (_Max), (_flags), CVARTEXT(_Desc))
 #define ADD_CVAR_STRING(_name,_val,_flags,_Desc)						gEnv->pConsole->RegisterString(_name, (_val), (_flags), CVARTEXT(_Desc))
 
-#define ADD_COMMAND(_name,_func,_flags,_Desc)	gEnv->pConsole->AddCommand(_name,_func,(_flags), CVARTEXT(_Desc))
+#define ADD_COMMAND(_name,_func,_flags,_Desc) \
+X_MULTILINE_MACRO_BEGIN \
+core::ConsoleCmdFunc del; \
+del.Bind<_func>(); \
+gEnv->pConsole->AddCommand(_name, del, (_flags), CVARTEXT(_Desc)); \
+X_MULTILINE_MACRO_END
+
+#define ADD_COMMAND_MEMBER(_name, __inst, __class, _func,_flags,_Desc) \
+X_MULTILINE_MACRO_BEGIN \
+core::ConsoleCmdFunc del; \
+del.Bind<__class, _func>(__inst); \
+gEnv->pConsole->AddCommand(_name, del, (_flags), CVARTEXT(_Desc)); \
+X_MULTILINE_MACRO_END
 
 
 

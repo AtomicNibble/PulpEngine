@@ -61,7 +61,6 @@ namespace
 CVarBase::CVarBase(XConsole* pConsole, int nFlags, const char* desc) :
 Desc_(desc),
 Flags_(nFlags),
-pChangeFunc_(nullptr),
 pConsole_(pConsole)
 {
 	//	Name_ = sName;
@@ -113,12 +112,12 @@ void CVarBase::Release()
 	this->pConsole_->UnregisterVariable(GetName());
 }
 
-void CVarBase::SetOnChangeCallback(ConsoleVarFunc pChangeFunc)
+void CVarBase::SetOnChangeCallback(ConsoleVarFunc::Pointer pChangeFunc)
 {
 	pChangeFunc_ = pChangeFunc;
 }
 
-ConsoleVarFunc CVarBase::GetOnChangeCallback()
+ConsoleVarFunc::Pointer CVarBase::GetOnChangeCallback()
 {
 	return pChangeFunc_;
 }

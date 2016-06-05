@@ -458,7 +458,7 @@ namespace
 
 // ==================================================
 
-ConsoleCommand::ConsoleCommand() : pFunc(0) // flags default con is (0)
+ConsoleCommand::ConsoleCommand()  // flags default con is (0)
 {
 
 }
@@ -774,6 +774,7 @@ void XConsole::RegisterInputListener(void)
 
 void XConsole::RegisterCommnads(void)
 {
+#if 0
 	AddCommand("exec", Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
 	AddCommand("help", Command_Help, VarFlag::SYSTEM, "displays help info");
 	AddCommand("listCmds", Command_ListCmd, VarFlag::SYSTEM, "lists avaliable commands");
@@ -794,6 +795,7 @@ void XConsole::RegisterCommnads(void)
 	AddCommand("consoleShow", Command_ConsoleShow, VarFlag::SYSTEM, "opens the console");
 	AddCommand("consoleHide", Command_ConsoleHide, VarFlag::SYSTEM, "hides the console");
 	AddCommand("consoleToggle", Command_ConsoleToggle, VarFlag::SYSTEM, "toggle the console");
+#endif
 }
 
 void XConsole::ShutDown(void)
@@ -1477,7 +1479,7 @@ void XConsole::Listbinds(IKeyBindDumpSink* CallBack)
 }
 
 ICVar* XConsole::RegisterString(const char* Name, const char* Value, 
-	int Flags, const char* desc, ConsoleVarFunc pChangeFunc)
+	int Flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
 {
 	X_ASSERT_NOT_NULL(Name);
 
@@ -1502,7 +1504,7 @@ ICVar* XConsole::RegisterString(const char* Name, const char* Value,
 }
 
 ICVar* XConsole::RegisterInt(const char* Name, int Value, int Min, 
-	int Max, int Flags, const char* desc, ConsoleVarFunc pChangeFunc)
+	int Max, int Flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
 {
 	X_ASSERT_NOT_NULL(Name);
 
@@ -1517,7 +1519,7 @@ ICVar* XConsole::RegisterInt(const char* Name, int Value, int Min,
 }
 
 ICVar* XConsole::RegisterFloat(const char* Name, float Value, float Min,
-	float Max, int Flags, const char* desc, ConsoleVarFunc pChangeFunc)
+	float Max, int Flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
 {
 	X_ASSERT_NOT_NULL(Name);
 
@@ -1578,7 +1580,7 @@ ICVar* XConsole::ConfigRegisterFloat(const char* Name, float Value, float Min,
 
 
 ICVar* XConsole::Register(const char* Name, float* src, float defaultvalue, 
-	float Min, float Max, int flags, const char* desc, ConsoleVarFunc pChangeFunc)
+	float Min, float Max, int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
 {
 	X_ASSERT_NOT_NULL(Name);
 	X_ASSERT_NOT_NULL(src);
@@ -1596,7 +1598,7 @@ ICVar* XConsole::Register(const char* Name, float* src, float defaultvalue,
 }
 
 ICVar* XConsole::Register(const char* Name, int* src, int defaultvalue, 
-	int Min, int Max, int flags, const char* desc, ConsoleVarFunc pChangeFunc)
+	int Min, int Max, int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
 {
 	X_ASSERT_NOT_NULL(Name);
 	X_ASSERT_NOT_NULL(src);
@@ -1614,7 +1616,7 @@ ICVar* XConsole::Register(const char* Name, int* src, int defaultvalue,
 }
 
 ICVar* XConsole::Register(const char* Name, Color* src, Color defaultvalue, 
-	int flags, const char* desc, ConsoleVarFunc pChangeFunc)
+	int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
 {
 	X_ASSERT_NOT_NULL(Name);
 	X_ASSERT_NOT_NULL(src);
@@ -1633,7 +1635,7 @@ ICVar* XConsole::Register(const char* Name, Color* src, Color defaultvalue,
 }
 
 ICVar* XConsole::Register(const char* Name, Vec3f* src, Vec3f defaultvalue, 
-	int flags, const char* desc, ConsoleVarFunc pChangeFunc)
+	int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
 {
 	X_ASSERT_NOT_NULL(Name);
 	X_ASSERT_NOT_NULL(src);
@@ -1689,7 +1691,7 @@ void XConsole::AddCommand(const char* Name, ConsoleCmdFunc func, int Flags, cons
 
 	cmd.Name = Name;
 	cmd.Flags = Flags;
-	cmd.pFunc = func;
+	cmd.func = func;
 	if (desc) {
 		cmd.Desc = desc;
 	}
@@ -2029,7 +2031,7 @@ void XConsole::ExecuteCommand(ConsoleCommand &cmd,
 		return;
 	}
 
-	if (cmd.pFunc)
+	if (cmd.func)
 	{
 		// This is function command, execute it with a list of parameters.
 		ConsoleCommandArgs cmdArgs(str);
@@ -2037,7 +2039,7 @@ void XConsole::ExecuteCommand(ConsoleCommand &cmd,
 		if (console_debug)
 			X_LOG0("Console", "Running command \"%s\"", cmdArgs.GetArg(0));
 
-		cmd.pFunc(&cmdArgs);
+		cmd.func.Invoke(&cmdArgs);
 		return;
 	}
 }
@@ -2062,7 +2064,7 @@ ICVar* XConsole::GetCVarForRegistration(const char* Name)
 }
 
 
-void XConsole::RegisterVar(ICVar* pCVar, ConsoleVarFunc pChangeFunc)
+void XConsole::RegisterVar(ICVar* pCVar, ConsoleVarFunc::Pointer pChangeFunc)
 {
 	if (pChangeFunc) {
 		pCVar->SetOnChangeCallback(pChangeFunc);
@@ -2995,7 +2997,7 @@ consoleState::Enum XConsoleNULL::getVisState(void) const
 }
 
 ICVar* XConsoleNULL::RegisterString(const char* Name, const char* Value, int Flags, 
-	const char* desc, ConsoleVarFunc pChangeFunc)
+	const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
 {
 	X_UNUSED(Name);
 	X_UNUSED(Value);
@@ -3006,7 +3008,7 @@ ICVar* XConsoleNULL::RegisterString(const char* Name, const char* Value, int Fla
 }
 
 ICVar* XConsoleNULL::RegisterInt(const char* Name, int Value, int Min, int Max, 
-	int Flags, const char* desc, ConsoleVarFunc pChangeFunc)
+	int Flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
 {
 	X_UNUSED(Name);
 	X_UNUSED(Value);
@@ -3019,7 +3021,7 @@ ICVar* XConsoleNULL::RegisterInt(const char* Name, int Value, int Min, int Max,
 }
 
 ICVar* XConsoleNULL::RegisterFloat(const char* Name, float Value, float Min, float Max,
-	int flags, const char* desc, ConsoleVarFunc pChangeFunc)
+	int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
 {
 	X_UNUSED(Name);
 	X_UNUSED(Value);
@@ -3070,7 +3072,7 @@ ICVar* XConsoleNULL::ConfigRegisterFloat(const char* Name, float Value, float Mi
 
 	// refrenced based, these are useful if we want to use the value alot so we just register it's address.
 ICVar* XConsoleNULL::Register(const char* name, float* src, float defaultvalue, 
-	float Min, float Max, int flags, const char* desc, ConsoleVarFunc pChangeFunc)
+	float Min, float Max, int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
 {
 	X_UNUSED(name);
 	X_UNUSED(src);
@@ -3085,7 +3087,7 @@ ICVar* XConsoleNULL::Register(const char* name, float* src, float defaultvalue,
 }
 
 ICVar* XConsoleNULL::Register(const char* name, int* src, int defaultvalue, 
-	int Min, int Max, int flags, const char* desc, ConsoleVarFunc pChangeFunc)
+	int Min, int Max, int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
 {
 	X_UNUSED(name);
 	X_UNUSED(src);
@@ -3100,7 +3102,7 @@ ICVar* XConsoleNULL::Register(const char* name, int* src, int defaultvalue,
 }
 
 ICVar* XConsoleNULL::Register(const char* name, Color* src, Color defaultvalue, 
-	int flags, const char* desc, ConsoleVarFunc pChangeFunc)
+	int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
 {
 	X_UNUSED(name);
 	X_UNUSED(src);
@@ -3113,7 +3115,7 @@ ICVar* XConsoleNULL::Register(const char* name, Color* src, Color defaultvalue,
 }
 
 ICVar* XConsoleNULL::Register(const char* name, Vec3f* src, Vec3f defaultvalue, 
-	int flags, const char* desc, ConsoleVarFunc pChangeFunc)
+	int flags, const char* desc, ConsoleVarFunc::Pointer pChangeFunc)
 {
 	X_UNUSED(name);
 	X_UNUSED(src);
