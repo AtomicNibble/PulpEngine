@@ -661,37 +661,31 @@ bool XCore::InitGameDll(const SCoreInitParams& initParams)
 
 
 // ->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->
-void WindowPosVarChange(core::ICVar* pVar)
+void XCore::WindowPosVarChange(core::ICVar* pVar)
 {
 	X_UNUSED(pVar);
 
 	int x_pos = g_coreVars.win_x_pos;
 	int y_pos = g_coreVars.win_y_pos;
 
-	core::xWindow* pWin = gEnv->pCore->GetGameWindow();
+	core::xWindow* pWin = GetGameWindow();
 	if (pWin) {
 		pWin->MoveTo(x_pos, y_pos);
 	}
 }
 
-void WindowSizeVarChange(core::ICVar* pVar)
+void XCore::WindowSizeVarChange(core::ICVar* pVar)
 {
 	X_UNUSED(pVar);
 
 }
 
-void WindowCustomFrameVarChange(core::ICVar* pVar)
+void XCore::WindowCustomFrameVarChange(core::ICVar* pVar)
 {
 	bool enabled = (pVar->GetInteger() == 1);
 
-	XCore* pCore = static_cast<XCore*>(gEnv->pCore);
-	if (!pCore) {
-		X_WARNING("Core", "Can't update custom frame as core is not initialized yet");
-		return;
-	}
-
-	if (pCore->pWindow_) {
-		pCore->pWindow_->CustomFrame(enabled);
+	if (pWindow_) {
+		pWindow_->CustomFrame(enabled);
 	}
 }
 
@@ -720,22 +714,22 @@ void XCore::CreateSystemVars(void)
 		VarFlag::SYSTEM , "Game window height");
 
 	core::ConsoleVarFunc del;
-	del.Bind<WindowPosVarChange>();
+	del.Bind<XCore, &XCore::WindowPosVarChange>(this);
 	var_win_pos_x->SetOnChangeCallback(del);
 
-	del.Bind<WindowPosVarChange>();
+	del.Bind<XCore, &XCore::WindowPosVarChange>(this);
 	var_win_pos_y->SetOnChangeCallback(del);
 
-	del.Bind<WindowSizeVarChange>();
+	del.Bind<XCore, &XCore::WindowSizeVarChange>(this);
 	var_win_width->SetOnChangeCallback(del);
 
-	del.Bind<WindowSizeVarChange>();
+	del.Bind<XCore, &XCore::WindowSizeVarChange>(this);
 	var_win_height->SetOnChangeCallback(del);
 
 	var_win_custom_Frame = ADD_CVAR_INT("win_custom_Frame", 1, 0, 1,
 		VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Enable / disable the windows custom frame");
 
-	del.Bind<WindowCustomFrameVarChange>();
+	del.Bind<XCore, &XCore::WindowCustomFrameVarChange>(this);
 	var_win_custom_Frame->SetOnChangeCallback(del);
 
 

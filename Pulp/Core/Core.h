@@ -265,7 +265,9 @@ private:
 
 public:
 	// All the vars
-	friend void WindowCustomFrameVarChange(core::ICVar* pVar);
+	void WindowPosVarChange(core::ICVar* pVar);
+	void WindowSizeVarChange(core::ICVar* pVar);
+	void WindowCustomFrameVarChange(core::ICVar* pVar);
 
 
 	core::ICVar* var_win_pos_x;
