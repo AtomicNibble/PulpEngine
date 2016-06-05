@@ -648,9 +648,9 @@ bool DebugRender::generateSphere(size_t numSeg, size_t& numVertsOut, Vec3f* pVer
 
 	numVertsOut = 0;
 	// now create triangle soup data
-	for (int i = 0; i < numSeg; i++)
+	for (size_t i = 0; i < numSeg; i++)
 	{
-		for (int j = 0; j < numSeg; j++)
+		for (size_t j = 0; j < numSeg; j++)
 		{
 			// add one triangle
 			pVerts[numVertsOut] = tempVertexBuffer[(numSeg + 1) * i + j];
