@@ -8,7 +8,7 @@
 X_NAMESPACE_BEGIN(physics)
 
 X_DECLARE_ENUM(StepperType) (
-	DEFAULT_STEPPER,
+	DEBUG_STEPPER,
 	FIXED_STEPPER,
 	INVERTED_FIXED_STEPPER,
 	VARIABLE_STEPPER
@@ -30,24 +30,30 @@ class Stepper
 {
 public:
 	Stepper();
-	virtual	 ~Stepper() {}
+	virtual ~Stepper() {}
 
+	// run the simulartion, passing how much time to progress the simulation by.
 	virtual	bool advance(physx::PxScene* scene, float32_t dt, void* scratchBlock, uint32_t scratchBlockSize) X_ABSTRACT;
+	// blocks till all simulation substeps have finished.
 	virtual	void wait(physx::PxScene* scene) X_ABSTRACT;
+	// called after render done, used by inverted stepper.
 	virtual void postRender(const float32_t stepSize) X_ABSTRACT;
 
+	// tells stepper shape data is not going to be accessed until next frame.
 	X_INLINE virtual void renderDone(void);
 	X_INLINE virtual void shutdown(void);
 
+	// total simulation time, call after return from wait, to get last frame time.
 	X_INLINE core::TimeVal getSimulationTime(void) const;
 
 	X_INLINE IStepperHandler& getHandler(void);
 	X_INLINE const IStepperHandler&	getHandler(void) const;
 	X_INLINE void setHandler(IStepperHandler* pHanlder);
 
+	X_INLINE virtual void setSubStepper(const float32_t stepSize, const uint32_t maxSteps);
+
 protected:
 	virtual void substepStrategy(const float32_t stepSize, uint32_t& substepCount, float32_t& substepSize) X_ABSTRACT;
-	X_INLINE virtual void setSubStepper(const float32_t stepSize, const uint32_t maxSteps);
 
 protected:
 	IStepperHandler* pHandler_;
@@ -77,6 +83,7 @@ class StepperTaskCollide : public StepperTask
 {
 public:
 	StepperTaskCollide() = default;
+	~StepperTaskCollide() X_OVERRIDE = default;
 
 public:
 	void run(void);
@@ -86,6 +93,7 @@ class StepperTaskSolve : public StepperTask
 {
 public:
 	StepperTaskSolve() = default;
+	~StepperTaskSolve() X_OVERRIDE  = default;
 
 public:
 	void run(void);
@@ -95,16 +103,16 @@ class MultiThreadStepper : public Stepper
 {
 public:
 	MultiThreadStepper();
-	~MultiThreadStepper() X_OVERRIDE {}
+	~MultiThreadStepper() X_OVERRIDE = default;
 
 	virtual bool advance(physx::PxScene* scene, float32_t dt, void* scratchBlock, uint32_t scratchBlockSize);
 	virtual void substepDone(StepperTask* ownerTask);
-	virtual void renderDone();
+	virtual void renderDone(void);
 	X_INLINE virtual void postRender(const float32_t stepSize);
 
 	X_INLINE virtual void wait(physx::PxScene* scene) X_OVERRIDE;
 	X_INLINE virtual void shutdown(void) X_OVERRIDE;
-	virtual void reset() X_ABSTRACT;
+	virtual void reset(void) X_ABSTRACT;
 	X_INLINE float32_t getSubStepSize(void) const;
 
 public:

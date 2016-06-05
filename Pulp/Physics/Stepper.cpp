@@ -68,7 +68,7 @@ bool MultiThreadStepper::advance(physx::PxScene* scene, float32_t dt, void* scra
 	scratchBlock_ = scratchBlock;
 	scratchBlockSize_ = scratchBlockSize;
 
-
+	// calculate the num subSteps and the size.
 	substepStrategy(dt, nbSubSteps_, subStepSize_);
 
 	if (nbSubSteps_ == 0) {
@@ -109,16 +109,19 @@ void MultiThreadStepper::substepDone(StepperTask* ownerTask)
 
 	pHandler_->onSubstep(subStepSize_);
 
+	// finished all the steps we are going to perform?
 	if (currentSubStep_ >= nbSubSteps_)
 	{
 		sync_.raise();
 	}
 	else
 	{
+		// set off another subStep task.
 		StepperTask &s = ownerTask == &completion0_ ? completion1_ : completion0_;
 		s.setContinuation(*pScene_->getTaskManager(), nullptr);
 		currentSubStep_++;
 
+		// time this substep
 		timer_.Start();
 
 		substep(s);
