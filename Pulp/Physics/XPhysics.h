@@ -16,6 +16,10 @@ namespace PVD {
 	using namespace physx::debugger::comm;
 }
 
+X_NAMESPACE_DECLARE(core,
+	struct IConsoleCmdArgs;
+)
+
 
 X_NAMESPACE_BEGIN(physics)
 
@@ -97,6 +101,10 @@ private:
 	Stepper* getStepper(void);
 
 	void setScratchBlockSize(size_t size);
+
+private:
+
+	friend void cmd_TogglePvd(core::IConsoleCmdArgs* pArgs);
 
 private:
 	PhysxCpuDispacher jobDispatcher_;

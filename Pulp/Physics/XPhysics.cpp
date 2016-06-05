@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "XPhysics.h"
 
+#include <IConsole.h>
 
 #include <pvd\PxVisualDebugger.h>
 #include <common\windows\PxWindowsDelayLoadHook.h>
@@ -66,8 +67,19 @@ namespace
 		}
 	} gDelayLoadHook;
 
+
+
 } // namespace
 
+
+void cmd_TogglePvd(core::IConsoleCmdArgs* pArgs)
+{
+	X_UNUSED(pArgs);
+
+	XPhysics* pPhysics = static_cast<XPhysics*>(gEnv->pPhysics);
+
+	pPhysics->togglePvdConnection();
+}
 
 XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
 	jobDispatcher_(*pJobSys),
@@ -112,6 +124,8 @@ void XPhysics::RegisterVars(void)
 
 void XPhysics::RegisterCmds(void)
 {
+	ADD_COMMAND("phys_toggle_pvd", cmd_TogglePvd, core::VarFlag::SYSTEM,
+		"Toggles PVD connection");
 
 
 }
