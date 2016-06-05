@@ -7,6 +7,13 @@
 
 X_NAMESPACE_BEGIN(physics)
 
+X_DECLARE_ENUM(StepperType) (
+	DEFAULT_STEPPER,
+	FIXED_STEPPER,
+	INVERTED_FIXED_STEPPER,
+	VARIABLE_STEPPER
+);
+
 
 struct IStepperHandler
 {
@@ -37,9 +44,9 @@ public:
 	X_INLINE core::TimeVal getSimulationTime(void) const { return simulationTime_; }
 
 
-	IStepperHandler&		getHandler(void) { return *pHandler_; }
-	const IStepperHandler&	getHandler(void)	const { return *pHandler_; }
-	void					setHandler(IStepperHandler* pHanlder) { pHandler_ = pHanlder; }
+	X_INLINE IStepperHandler&		getHandler(void) { return *pHandler_; }
+	X_INLINE const IStepperHandler&	getHandler(void) const { return *pHandler_; }
+	X_INLINE void					setHandler(IStepperHandler* pHanlder) { pHandler_ = pHanlder; }
 
 
 protected:

@@ -28,12 +28,6 @@ class XPhysics : public IPhysics,
 	public physx::PxDeletionListener,
 	public IStepperHandler
 {
-	X_DECLARE_ENUM(StepperType) (
-		DEFAULT_STEPPER,
-		FIXED_STEPPER,
-		INVERTED_FIXED_STEPPER,
-		VARIABLE_STEPPER
-	);
 
 	struct PvdParameters
 	{
