@@ -379,16 +379,16 @@ extern core::MallocFreeAllocator* gMalloc;
 
 #define ADD_COMMAND(_name,_func,_flags,_Desc) \
 X_MULTILINE_MACRO_BEGIN \
-core::ConsoleCmdFunc del; \
-del.Bind<_func>(); \
-gEnv->pConsole->AddCommand(_name, del, (_flags), CVARTEXT(_Desc)); \
+core::ConsoleCmdFunc X_PP_UNIQUE_NAME(del); \
+X_PP_UNIQUE_NAME(del).Bind<_func>(); \
+gEnv->pConsole->AddCommand(_name, X_PP_UNIQUE_NAME(del), (_flags), CVARTEXT(_Desc)); \
 X_MULTILINE_MACRO_END
 
 #define ADD_COMMAND_MEMBER(_name, __inst, __class, _func,_flags,_Desc) \
 X_MULTILINE_MACRO_BEGIN \
-core::ConsoleCmdFunc del; \
-del.Bind<__class, _func>(__inst); \
-gEnv->pConsole->AddCommand(_name, del, (_flags), CVARTEXT(_Desc)); \
+core::ConsoleCmdFunc X_PP_UNIQUE_NAME(del); \
+X_PP_UNIQUE_NAME(del).Bind<__class, _func>(__inst); \
+gEnv->pConsole->AddCommand(_name, X_PP_UNIQUE_NAME(del), (_flags), CVARTEXT(_Desc)); \
 X_MULTILINE_MACRO_END
 
 
