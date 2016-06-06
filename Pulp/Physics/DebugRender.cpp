@@ -1,16 +1,11 @@
 #include "stdafx.h"
 #include "DebugRender.h"
+#include "MathHelpers.h"
 
 X_NAMESPACE_BEGIN(physics)
 
 namespace
 {
-
-	X_INLINE Vec3f Vec3FromPhysx(const physx::PxVec3& vec)
-	{
-		return Vec3f(vec.x, vec.y, vec.z);
-	}
-
 	static const Vec3f gCapsuleVertices[] =
 	{
 		Vec3f(0.0000f, -2.0000f, -0.0000f),
