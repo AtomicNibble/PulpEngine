@@ -6,6 +6,7 @@
 
 #include <pvd\PxVisualDebugger.h>
 #include <common\windows\PxWindowsDelayLoadHook.h>
+#include <characterkinematic\PxControllerManager.h>
 
 #if X_DEBUG
 #define PHYS_LIB_SUFFIX "DEBUG"
@@ -88,6 +89,7 @@ XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::Mem
 	allocator_(arena),
 	foundation_(nullptr),
 	profileZoneManager_(nullptr),
+	controllerManager_(nullptr),
 	physics_(nullptr),
 	cooking_(nullptr),
 	scene_(nullptr),
@@ -258,6 +260,13 @@ bool XPhysics::Init(void)
 	scene_->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
 
 
+	controllerManager_ = PxCreateControllerManager(*scene_);
+	if (!controllerManager_) {
+		X_ERROR("PhysicsSys", "Failed to create controller manager");
+		return false;
+	}
+
+
 	setScratchBlockSize(vars_.ScratchBufferSize());
 	stepperType_ = vars_.GetStepperType();
 
@@ -279,6 +288,8 @@ void XPhysics::ShutDown(void)
 	if (physics_) {
 		physics_->unregisterDeletionListener(*this);
 	}
+
+	core::SafeRelease(controllerManager_);
 
 	core::SafeRelease(scene_);
 	core::SafeRelease(cpuDispatcher_);

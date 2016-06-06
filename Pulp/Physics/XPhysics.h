@@ -118,6 +118,8 @@ private:
 
 	physx::PxFoundation*			foundation_;
 	physx::PxProfileZoneManager*	profileZoneManager_;
+	physx::PxControllerManager*		controllerManager_;
+
 	physx::PxPhysics*				physics_;
 	physx::PxCooking*				cooking_;
 	physx::PxScene*					scene_;
