@@ -344,6 +344,7 @@
     <ClInclude Include="DebugRenderPoints.h" />
     <ClInclude Include="DebugRenderTriangle.h" />
     <ClInclude Include="Logger.h" />
+    <ClInclude Include="MathHelpers.h" />
     <ClInclude Include="PhysicsVars.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Stepper.h" />
