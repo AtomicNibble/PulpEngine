@@ -97,6 +97,7 @@ private:
 
 	void setScratchBlockSize(size_t size);
 	void toggleVisualizationParam(physx::PxVisualizationParameter::Enum param);
+	void setVisualizationCullingBox(AABB& box);
 
 private:
 	X_INLINE bool IsPaused(void) const;

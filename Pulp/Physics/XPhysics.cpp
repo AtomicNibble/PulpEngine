@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "XPhysics.h"
+#include "MathHelpers.h"
 
 #include <IConsole.h>
 
@@ -575,6 +576,18 @@ void XPhysics::toggleVisualizationParam(physx::PxVisualizationParameter::Enum pa
 	}
 }
 
+void XPhysics::setVisualizationCullingBox(AABB& box)
+{
+	if (scene_) {
+
+		physx::PxBounds3 bounds;
+		bounds.minimum = Px3FromVec3(box.min);
+		bounds.maximum = Px3FromVec3(box.max);
+
+		scene_->setVisualizationCullingBox(bounds);
+		scene_->setVisualizationParameter(physx::PxVisualizationParameter::eCULL_BOX, 1.0f);
+	}
+}
 
 void XPhysics::cmd_TogglePvd(core::IConsoleCmdArgs* pArgs)
 {
