@@ -101,6 +101,8 @@ void XProfileSys::Init(ICore* pCore)
 	subSystemInfo_[ProfileSubSys::SCRIPT].name = "Script";
 	subSystemInfo_[ProfileSubSys::SOUND].name = "Sound";
 	subSystemInfo_[ProfileSubSys::GAME].name = "Game";
+	subSystemInfo_[ProfileSubSys::PHYSICS].name = "Physics";
+	subSystemInfo_[ProfileSubSys::NETWORK].name = "Network";
 	subSystemInfo_[ProfileSubSys::UNCLASSIFIED].name = "UnClassified";
 
 #if X_DEBUG
