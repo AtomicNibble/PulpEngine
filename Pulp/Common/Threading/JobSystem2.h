@@ -72,8 +72,8 @@ X_ALIGNED_SYMBOL(struct Job, 64)
 		+ sizeof(uint8_t)));
 
 public:
-	core::AtomicInt unfinishedJobs;
-	core::AtomicInt continuationCount;
+	int32_t unfinishedJobs; // not using AtomicInt so Job is pod bitches.
+	int32_t continuationCount;
 	JobFunction::Pointer pFunction;
 	Job* pParent;
 	void* pArgData;
@@ -86,6 +86,8 @@ public:
 	uint8_t runFlags;
 	JobId continuations[MAX_CONTINUATIONS];
 };
+
+static_assert(core::compileTime::IsPOD<Job>::Value, "Job must POD");
 
 X_ENSURE_SIZE(Job, 128);
 

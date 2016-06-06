@@ -283,8 +283,10 @@ namespace V2
 		Job* job = AllocateJob();
 		job->pFunction = function;
 		job->pParent = nullptr;
-		job->unfinishedJobs = 1;
-		job->continuationCount = 0;
+		// does this need to be atomic?
+		// i think so since second time it's used the value might be stale.
+		atomic::Exchange(&job->unfinishedJobs, 1);
+		atomic::Exchange(&job->continuationCount, 0); 
 		job->runFlags = 0;
 
 #if X_DEBUG
@@ -296,13 +298,13 @@ namespace V2
 
 	Job* JobSystem::CreateJobAsChild(Job* pParent, JobFunction::Pointer function)
 	{
-		++pParent->unfinishedJobs;
+		atomic::Increment(&pParent->unfinishedJobs);
 
 		Job* job = AllocateJob();
 		job->pFunction = function;
 		job->pParent = pParent;
-		job->unfinishedJobs = 1;
-		job->continuationCount = 0;
+		atomic::Exchange(&job->unfinishedJobs, 1);
+		atomic::Exchange(&job->continuationCount, 0);
 		job->runFlags = 0;
 
 #if X_DEBUG
@@ -467,7 +469,7 @@ namespace V2
 
 	void JobSystem::Finish(Job* pJob, size_t threadIdx)
 	{
-		const int32_t unfinishedJobs = --pJob->unfinishedJobs;
+		const int32_t unfinishedJobs = atomic::Decrement(&pJob->unfinishedJobs);
 		if (unfinishedJobs == 0
 			// if we are child of a job, dec parents counter.
 			// when all child jobs are done the parent becomes complete.
@@ -482,7 +484,7 @@ namespace V2
 		}
 
 		// reset so we don't get run twice when child calls finish for parent.
-		pJob->continuationCount = 0;
+		atomic::Exchange(&pJob->continuationCount, 0);
 
 		ThreadQue* queue = GetWorkerThreadQueue(threadIdx);
 

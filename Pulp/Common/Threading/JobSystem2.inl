@@ -144,7 +144,7 @@ namespace V2
 
 	X_INLINE void JobSystem::AddContinuation(Job* ancestor, Job* continuation, bool runInline)
 	{
-		const int32_t count = (++ancestor->continuationCount - 1);
+		const int32_t count = (atomic::Increment(&ancestor->continuationCount) - 1);
 		X_ASSERT(count < Job::MAX_CONTINUATIONS, "Can't add conitnation, list is full")(Job::MAX_CONTINUATIONS, count);
 
 
