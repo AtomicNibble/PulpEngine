@@ -774,28 +774,26 @@ void XConsole::RegisterInputListener(void)
 
 void XConsole::RegisterCommnads(void)
 {
-#if 0
-	AddCommand("exec", Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
-	AddCommand("help", Command_Help, VarFlag::SYSTEM, "displays help info");
-	AddCommand("listCmds", Command_ListCmd, VarFlag::SYSTEM, "lists avaliable commands");
-	AddCommand("listDvars", Command_ListDvars, VarFlag::SYSTEM, "lists dvars");
-	AddCommand("exit", Command_Exit, VarFlag::SYSTEM, "closes the game");
-	AddCommand("quit", Command_Exit, VarFlag::SYSTEM, "closes the game");
-	AddCommand("echo", Command_Echo, VarFlag::SYSTEM, "prints text in argument, prefix dvar's with # to print value");
-	AddCommand("wait", Command_Wait, VarFlag::SYSTEM, "waits a given number of seconds before processing the next commands");
-	AddCommand("vreset", Command_VarReset, VarFlag::SYSTEM, "resets a variable to it's default value");
-	AddCommand("seta", Command_SetVarArchive, VarFlag::SYSTEM, "set a var and flagging it to be archived");
+	ADD_COMMAND("exec", Command_Exec, VarFlag::SYSTEM, "executes a file(.cfg)");
+	ADD_COMMAND("help", Command_Help, VarFlag::SYSTEM, "displays help info");
+	ADD_COMMAND("listCmds", Command_ListCmd, VarFlag::SYSTEM, "lists avaliable commands");
+	ADD_COMMAND("listDvars", Command_ListDvars, VarFlag::SYSTEM, "lists dvars");
+	ADD_COMMAND("exit", Command_Exit, VarFlag::SYSTEM, "closes the game");
+	ADD_COMMAND("quit", Command_Exit, VarFlag::SYSTEM, "closes the game");
+	ADD_COMMAND("echo", Command_Echo, VarFlag::SYSTEM, "prints text in argument, prefix dvar's with # to print value");
+	ADD_COMMAND("wait", Command_Wait, VarFlag::SYSTEM, "waits a given number of seconds before processing the next commands");
+	ADD_COMMAND("vreset", Command_VarReset, VarFlag::SYSTEM, "resets a variable to it's default value");
+	ADD_COMMAND("seta", Command_SetVarArchive, VarFlag::SYSTEM, "set a var and flagging it to be archived");
 
-	AddCommand("bind", Command_Bind, VarFlag::SYSTEM, "binds a key to a action Eg: bind shift a 'echo hello';");
-	AddCommand("clearBinds", Command_BindsClear, VarFlag::SYSTEM, "clears all binds");
-	AddCommand("listBinds", Command_BindsList, VarFlag::SYSTEM, "lists all the binds");
+	ADD_COMMAND("bind", Command_Bind, VarFlag::SYSTEM, "binds a key to a action Eg: bind shift a 'echo hello';");
+	ADD_COMMAND("clearBinds", Command_BindsClear, VarFlag::SYSTEM, "clears all binds");
+	ADD_COMMAND("listBinds", Command_BindsList, VarFlag::SYSTEM, "lists all the binds");
 
-	AddCommand("saveModifiedVars", Command_SaveModifiedVars, VarFlag::SYSTEM, "Saves modifed vars");
+	ADD_COMMAND("saveModifiedVars", Command_SaveModifiedVars, VarFlag::SYSTEM, "Saves modifed vars");
 
-	AddCommand("consoleShow", Command_ConsoleShow, VarFlag::SYSTEM, "opens the console");
-	AddCommand("consoleHide", Command_ConsoleHide, VarFlag::SYSTEM, "hides the console");
-	AddCommand("consoleToggle", Command_ConsoleToggle, VarFlag::SYSTEM, "toggle the console");
-#endif
+	ADD_COMMAND("consoleShow", Command_ConsoleShow, VarFlag::SYSTEM, "opens the console");
+	ADD_COMMAND("consoleHide", Command_ConsoleHide, VarFlag::SYSTEM, "hides the console");
+	ADD_COMMAND("consoleToggle", Command_ConsoleToggle, VarFlag::SYSTEM, "toggle the console");
 }
 
 void XConsole::ShutDown(void)
