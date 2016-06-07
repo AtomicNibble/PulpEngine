@@ -33,7 +33,21 @@ namespace TGA
 		};
 		X_PRAGMA(pack(pop))
 
-	}
+		struct ImageType
+		{
+			enum Enum
+			{
+				COLORMAP,
+				BGR,
+				MONO,
+				// run length enc
+				COLORMAP_RLE,
+				BGR_RLE,
+				MONO_RLE
+			};
+		};
+
+	} // namespace
 
 
 
@@ -60,7 +74,10 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 	Tga_Header hdr;
 	uint8_t buf[18];
 
-	file->readObj(buf);
+	if (file->readObj(buf) != sizeof(buf)) {
+		X_ERROR("Tga", "Failed to read header");
+		return nullptr;
+	}
 
 	hdr.IDLength = (uint32_t)buf[0];
 	hdr.ColorMapType = (uint32_t)buf[1];
@@ -83,11 +100,36 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 		return nullptr;
 	}
 
-	if (!((hdr.ImageType >= 1 && hdr.ImageType <= 3) || (hdr.ImageType >= 9 && hdr.ImageType <= 11)))
+	if (!isValidImageType(hdr.ImageType))
 	{
 		X_ERROR("TextureTGA", "invalid image type. provided: %i expected: 1-3 | 9-11", hdr.ImageType);
 		return nullptr;
 	}
+
+	if (!isColorMap(hdr.ImageType))
+	{
+		X_ERROR("TextureTGA", "invalid image type. only color maps allowed", hdr.ImageType);
+		return nullptr;
+	}
+
+	if (isRle(hdr.ImageType))
+	{
+		X_ERROR("TextureTGA", "rle images are not supported", hdr.ImageType);
+		return nullptr;
+	}
+
+	if (isRightToLeft(hdr.ImageDescriptor))
+	{
+		X_ERROR("TextureTGA", "right to left images are not supported", hdr.ImageType);
+		return nullptr;
+	}
+
+	if (isTopToBottom(hdr.ImageDescriptor))
+	{
+		X_ERROR("TextureTGA", "top to bottom images are not supported", hdr.ImageType);
+		return nullptr;
+	}
+
 
 	if (!(hdr.PixelDepth == 8 || hdr.PixelDepth == 24 || hdr.PixelDepth == 32))
 	{
@@ -157,7 +199,88 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 
 	return img;
 }
+
 // ~ITextureLoader
+
+
+bool XTexLoaderTGA::isValidImageType(uint32_t type)
+{
+	switch (type)
+	{
+	case ImageType::COLORMAP:
+	case ImageType::COLORMAP_RLE:
+	case ImageType::BGR:
+	case ImageType::BGR_RLE:
+	case ImageType::MONO:
+	case ImageType::MONO_RLE:
+		return true;
+
+	default:
+		break;
+	}
+	return false;
+}
+
+bool XTexLoaderTGA::isColorMap(uint32_t type)
+{
+	X_ASSERT(isValidImageType(type), "Invalid format passed")();
+
+	switch (type)
+	{
+	case ImageType::COLORMAP:
+	case ImageType::COLORMAP_RLE:
+		return true;
+
+	default:
+		break;
+	}
+	return false;
+}
+
+bool XTexLoaderTGA::isMono(uint32_t type)
+{
+	X_ASSERT(isValidImageType(type), "Invalid format passed")();
+
+	switch (type)
+	{
+	case ImageType::MONO:
+	case ImageType::MONO_RLE:
+		return true;
+
+	default:
+		break;
+	}
+	return false;
+}
+
+bool XTexLoaderTGA::isRle(uint32_t type)
+{
+	X_ASSERT(isValidImageType(type), "Invalid format passed")();
+
+	switch (type)
+	{
+	case ImageType::COLORMAP_RLE:
+	case ImageType::BGR_RLE:
+	case ImageType::MONO_RLE:
+		return true;
+
+	default:
+		break;
+	}
+	return false;
+}
+
+
+bool XTexLoaderTGA::isRightToLeft(uint32_t descriptor)
+{
+	return core::bitUtil::IsBitSet( descriptor, 4);
+}
+
+bool XTexLoaderTGA::isTopToBottom(uint32_t descriptor)
+{
+	return core::bitUtil::IsBitSet(descriptor, 5);
+}
+
 
 
 } // namespace TGA
