@@ -13,6 +13,13 @@ namespace random
 
 //	const float XOR_SHIFT_ONE_BY_MAX_UINT32 = 1.0f / 0xffffffff;
 
+	void XorShiftSeed(Vec4i& seed)
+	{
+		xorShift_x = seed[0];
+		xorShift_y = seed[1];
+		xorShift_z = seed[2];
+		xorShift_w = seed[3];
+	}
 }
 
 

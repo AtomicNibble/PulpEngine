@@ -11,6 +11,11 @@ namespace random
 
 	const float MWC_ONE_BY_MAX_UINT32 = 1 / 0xffffffff;
 
+	void MultiplyWithCarrySeed(Vec4i& seed)
+	{
+		mwc_z = seed[0] ^ seed[1]; 
+		mwc_w = seed[2] ^ seed[3];
+	}
 }
 
 
