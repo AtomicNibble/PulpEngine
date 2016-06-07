@@ -7,6 +7,8 @@
 #include <Traits\FunctionSignatureTraits.h>
 // #include <Util/SourceInfo.h>
 
+#include <Math\XVector.h>
+
 // defaults.
 // #include <Memory\MemoryArenaBase.h>
 
@@ -186,6 +188,8 @@ struct SCoreInitParams
 	bool bEnableJobSystem;
 	bool bLoadSymbols;
 	bool bFileSysWorkingDir;
+
+	Vec4i seed;
 
 	const bool isCoreOnly(void) const {
 		return bCoreOnly;
