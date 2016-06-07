@@ -1,6 +1,6 @@
 #include "stdafx.h"
-#include "Core.h"
 #include "Console.h"
+#include "Core.h"
 #include "ConsoleNULL.h"
 #include "Log.h"
 
@@ -12,6 +12,8 @@
 #include <Debugging\SymbolResolution.h>
 #include <Debugging\ExceptionHandler.h>
 
+#include <Random\MultiplyWithCarry.h>
+#include <Random\XorShift.h>
 
 #include <Threading\JobSystem2.h>
 #include <Time\StopWatch.h>
@@ -232,6 +234,8 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		return false;
 	}
 
+	parseSeed(startupParams.seed);
+
 	hInst_ = static_cast<WIN_HINSTANCE>(startupParams.hInstance);
 	hWnd_ = static_cast<WIN_HWND>(startupParams.hWnd);
 
@@ -445,6 +449,16 @@ bool XCore::ParseCmdArgs(const wchar_t* pArgs)
 			}
 			args_[numArgs_ - 1].AppendArg(args.getArgv(i));
 		}
+	}
+
+	return true;
+}
+
+bool XCore::parseSeed(const Vec4i& seed)
+{
+	if (seed != Vec4i::zero()) {
+		core::random::MultiplyWithCarrySeed(seed);
+		core::random::XorShiftSeed(seed);
 	}
 
 	return true;
