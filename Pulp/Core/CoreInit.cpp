@@ -10,6 +10,8 @@
 
 #include <Debugging\InvalidParameterHandler.h>
 #include <Debugging\SymbolResolution.h>
+#include <Debugging\ExceptionHandler.h>
+
 
 #include <Threading\JobSystem2.h>
 #include <Time\StopWatch.h>
@@ -205,6 +207,8 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	gEnv->uMainThreadId = core::Thread::GetCurrentID();			//Set this ASAP on startup
 
 	core::invalidParameterHandler::Startup(); 
+	core::exceptionHandler::Startup();
+
 	if (startupParams.loadSymbols()) {
 		core::symbolResolution::Startup();
 	}

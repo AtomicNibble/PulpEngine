@@ -12,7 +12,6 @@
 
 #include <Debugging\InvalidParameterHandler.h>
 #include <Debugging\PureVirtualFunctionCallHandler.h>
-#include <Debugging\ExceptionHandler.h>
 #include <Debugging\AbortHandler.h>
 // #include <Debugging\SymbolResolution.h>
 
@@ -38,7 +37,6 @@ extern "C" DLL_EXPORT void LinkModule(ICore* pCore, const char* moduleName)
 //	core::symbolResolution::Startup();
 	core::invalidParameterHandler::Startup();
 	core::pureVirtualFunctionCallHandler::Startup();
-	core::exceptionHandler::Startup();
 	core::abortHandler::Startup();
 
 	if (gEnv) // Already registered.
