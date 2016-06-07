@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(core)
 
 namespace random
 {
-	void MultiplyWithCarrySeed(Vec4i& seed);
+	void MultiplyWithCarrySeed(const Vec4i& seed);
 	X_INLINE uint32_t MultiplyWithCarry(void);
 	X_INLINE uint32_t MultiplyWithCarry(uint32_t minValue, uint32_t maxValue);
 	X_INLINE float MultiplyWithCarry(float minValue, float maxValue);

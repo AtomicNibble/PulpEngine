@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(core)
 
 namespace random
 {
-	void XorShiftSeed(Vec4i& seed);
+	void XorShiftSeed(const Vec4i& seed);
 	inline uint32_t XorShift(void);
 	inline uint32_t XorShift(uint32_t minValue, uint32_t maxValue);
 	inline float XorShift(float minValue, float maxValue);
