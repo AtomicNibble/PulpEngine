@@ -70,6 +70,7 @@ X_USING_NAMESPACE;
 #define DLL_MODULE_INIT_ICORE	"LinkModule"
 #define DLL_INITFUNC_INPUT		"CreateInput"
 #else
+#error "wut.. is this below?"
 #define DLL_MODULE_INIT_ICORE (LPCSTR)2
 #define DLL_INITFUNC_INPUT     (LPCSTR)1
 #endif
