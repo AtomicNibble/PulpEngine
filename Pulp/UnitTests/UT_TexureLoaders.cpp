@@ -137,6 +137,7 @@ TEST(DDS, LoadBroken)
 TEST(TGA, Load)
 {
 	EXPECT_TRUE(LoadValid<TGA::XTexLoaderTGA>(Texturefmt::R8G8B8A8, Path<char>("test_img_load_32.tga")));
+	EXPECT_TRUE(LoadValid<TGA::XTexLoaderTGA>(Texturefmt::R8G8B8A8, Path<char>("test_img_load_32_rle.tga")));
 }
 
 TEST(JPG, Load)
