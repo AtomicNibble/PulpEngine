@@ -112,12 +112,6 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 		return nullptr;
 	}
 
-	if (isRle(hdr.ImageType))
-	{
-		X_ERROR("TextureTGA", "rle encoded images are not supported", hdr.ImageType);
-		return nullptr;
-	}
-
 	if (isRightToLeft(hdr.ImageDescriptor))
 	{
 		X_ERROR("TextureTGA", "right to left images are not supported", hdr.ImageType);
@@ -129,7 +123,6 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 		X_ERROR("TextureTGA", "top to bottom images are not supported", hdr.ImageType);
 		return nullptr;
 	}
-
 
 	if (!(hdr.PixelDepth == 8 || hdr.PixelDepth == 24 || hdr.PixelDepth == 32))
 	{
@@ -180,16 +173,92 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 	}
 
 	// read the image data.
-
-	size_t bytes_read = file->read(img->pFaces[0], DataSize);
-
-	if (bytes_read != DataSize)
+	if (isRle(hdr.ImageType))
 	{
-		X_ERROR("TextureTGA", "failed to read image data from. requested: %i bytes recivied: %i bytes",
-			DataSize, bytes_read);
+		//some goaty shit.
+		uint8_t bpp = safe_static_cast<uint8_t,uint32_t>(hdr.PixelDepth / 8); // bytes per pixel 
+		uint32_t loaded = 0;
+		uint32_t expected = hdr.Width * hdr.Height;
 
-		X_DELETE(img, g_textureDataArena);
-		img = nullptr;
+		if (bpp > 4) {
+			X_ERROR("TextureTGA", "Invalid bpp for rle, max 4. got: %i", static_cast<int32_t>(bpp));
+			goto failed;
+		}
+
+		uint8_t* pCur = img->pFaces[0];
+		uint8_t* pEnd = pCur + DataSize;
+
+		while (loaded < expected)
+		{
+			uint8_t b;
+			if (file->readObj(b) != sizeof(b)) {
+				X_ERROR("TextureTGA", "Failed to read rle header byte");
+				goto failed;
+			}
+
+			uint8_t num = (b & ~BIT(7)) + 1;
+
+			if (core::bitUtil::IsBitSet(b, 7))
+			{
+				// rle
+				uint8_t tmp[4];
+
+				if (file->read(tmp, bpp) != bpp) {
+					X_ERROR("TextureTGA", "failed to read rle bytes");
+					goto failed;
+				}
+
+				for (uint8_t i = 0; i < num; i++)
+				{
+					++loaded;
+					if (loaded > expected) {
+						// too many
+						X_ERROR("TextureTGA", "Raw packet is too big");
+						goto failed;
+					}
+
+					std::memcpy(pCur, tmp, bpp);
+					pCur += bpp;
+				}
+			}
+			else
+			{
+				if (loaded + num > expected) {
+					// too many
+					X_ERROR("TextureTGA", "Raw packet is too big");
+					goto failed;
+				}
+
+				const uint32_t readSize = num * bpp;
+				if (file->read(pCur, readSize) != readSize) {
+					X_ERROR("TextureTGA", "Failed to read raw packet");
+					goto failed;
+				}
+
+				loaded += num;
+				pCur += readSize;
+			}
+		}
+
+		// check all data is valid for the face.
+		if (pCur != pEnd) {
+			const size_t bytesLeft = pEnd - pCur;
+			X_ERROR("TextureTGA", "Failed to correctly read rle incoded image. bytes left: %" PRIuS);
+			goto failed;
+		}
+	}
+	else
+	{
+		size_t bytes_read = file->read(img->pFaces[0], DataSize);
+
+		if (bytes_read != DataSize)
+		{
+			X_ERROR("TextureTGA", "failed to read image data from. requested: %i bytes recivied: %i bytes",
+				DataSize, bytes_read);
+
+			X_DELETE(img, g_textureDataArena);
+			goto failed;
+		}
 	}
 
 #if X_DEBUG == 1
@@ -198,6 +267,11 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 #endif
 
 	return img;
+
+failed:
+
+	X_DELETE(img, g_textureDataArena);
+	return nullptr;
 }
 
 // ~ITextureLoader
