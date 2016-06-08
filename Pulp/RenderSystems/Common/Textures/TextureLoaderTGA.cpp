@@ -37,13 +37,13 @@ namespace TGA
 		{
 			enum Enum
 			{
-				COLORMAP,
-				BGR,
-				MONO,
+				COLORMAP = 1,
+				BGR = 2,
+				MONO = 3,
 				// run length enc
-				COLORMAP_RLE,
-				BGR_RLE,
-				MONO_RLE
+				COLORMAP_RLE = 9,
+				BGR_RLE = 10,
+				MONO_RLE = 11
 			};
 		};
 
