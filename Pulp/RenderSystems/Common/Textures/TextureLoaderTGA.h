@@ -27,6 +27,7 @@ namespace TGA
 	private:
 		static bool isValidImageType(uint32_t type);
 		static bool isColorMap(uint32_t type);
+		static bool isBGR(uint32_t type);
 		static bool isMono(uint32_t type);
 		static bool isRle(uint32_t type);
 

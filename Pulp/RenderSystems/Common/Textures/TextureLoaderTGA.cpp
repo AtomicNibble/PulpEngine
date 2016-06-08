@@ -106,15 +106,15 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 		return nullptr;
 	}
 
-	if (!isColorMap(hdr.ImageType))
+	if (!isBGR(hdr.ImageType))
 	{
-		X_ERROR("TextureTGA", "invalid image type. only color maps allowed", hdr.ImageType);
+		X_ERROR("TextureTGA", "invalid image type. only rgb maps allowed", hdr.ImageType);
 		return nullptr;
 	}
 
 	if (isRle(hdr.ImageType))
 	{
-		X_ERROR("TextureTGA", "rle images are not supported", hdr.ImageType);
+		X_ERROR("TextureTGA", "rle encoded images are not supported", hdr.ImageType);
 		return nullptr;
 	}
 
@@ -229,6 +229,22 @@ bool XTexLoaderTGA::isColorMap(uint32_t type)
 	{
 	case ImageType::COLORMAP:
 	case ImageType::COLORMAP_RLE:
+		return true;
+
+	default:
+		break;
+	}
+	return false;
+}
+
+bool XTexLoaderTGA::isBGR(uint32_t type)
+{
+	X_ASSERT(isValidImageType(type), "Invalid format passed")();
+
+	switch (type)
+	{
+	case ImageType::BGR:
+	case ImageType::BGR_RLE:
 		return true;
 
 	default:
