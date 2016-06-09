@@ -303,6 +303,7 @@ public:
 
 	bool StartUp(void);
 	void ShutDown(void);
+	void OnFrameBegin(void);
 
 	void CreateQueForCurrentThread(void);
 

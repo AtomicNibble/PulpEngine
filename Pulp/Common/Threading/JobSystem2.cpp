@@ -199,6 +199,12 @@ namespace V2
 		ThreadAllocator_.SetValue(nullptr);
 	}
 
+	void JobSystem::OnFrameBegin(void)
+	{
+
+
+	}
+
 	/// ===============================================
 
 	void JobSystem::CreateQueForCurrentThread(void)
