@@ -396,7 +396,7 @@
     <ClCompile Include="Core.cpp" />
     <ClCompile Include="CoreEventDispatcher.cpp" />
     <ClCompile Include="CoreInit.cpp" />
-    <ClCompile Include="CoreRender.cpp" />
+    <ClCompile Include="CoreUpdate.cpp" />
     <ClCompile Include="DiskFile.cpp" />
     <ClCompile Include="DiskFileAsync.cpp" />
     <ClCompile Include="DllMain.cpp" />
