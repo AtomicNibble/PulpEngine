@@ -112,10 +112,7 @@ public:
 	virtual void ShutDown(void); // not part of ICore currently
 	virtual void Release(void) X_OVERRIDE;
 
-	virtual bool PumpMessages(void) X_OVERRIDE;
-	virtual bool Update(void) X_OVERRIDE;
-	virtual void RenderBegin(void) X_OVERRIDE;
-	virtual void RenderEnd(void) X_OVERRIDE;
+	virtual bool RunGameLoop(void) X_FINAL;
 
 	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_OVERRIDE;
 
@@ -155,8 +152,6 @@ public:
 	static core::MallocFreeAllocator malloc_;
 
 public:
-
-
 	virtual void RegisterAssertHandler(IAssertHandler* errorHandler) X_OVERRIDE;
 	virtual void UnRegisterAssertHandler(IAssertHandler* errorHandler) X_OVERRIDE;
 	virtual void OnAssert(const core::SourceInfo& sourceInfo) X_OVERRIDE;
@@ -165,6 +160,12 @@ public:
 	virtual void OnFatalError(const char* format, va_list args) X_OVERRIDE;
 
 private:
+	bool PumpMessages(void);
+	bool Update(void);
+	void RenderBegin(void);
+	void RenderEnd(void);
+
+
 	WIN_HMODULE LoadDynamiclibrary(const char *dllName) const;
 	WIN_HMODULE LoadDLL(const char *dllName);
 

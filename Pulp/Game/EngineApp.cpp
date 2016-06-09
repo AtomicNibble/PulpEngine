@@ -148,30 +148,9 @@ bool EngineApp::PumpMessages()
 
 int EngineApp::MainLoop()
 {
-	while (pICore_->PumpMessages())
-	{
-		X_PROFILE_BEGIN("GameLoop", core::ProfileSubSys::GAME);
-		
-		pICore_->Update();
-		pICore_->RenderBegin();
-		pICore_->RenderEnd();
-
-#if 0
-		const float time = gEnv->pTimer->GetCurrTime();
-		const float FrameTime = gEnv->pTimer->GetFrameTime();
-		const float FrameRate = gEnv->pTimer->GetFrameRate();
-
-
-		X_LOG0_EVERY_N(30, "Frame", "Time: %f FrameTime: %f FPS: %f",
-			time,
-			FrameTime,
-			FrameRate);
-#endif
-	}
-
+	pICore_->RunGameLoop();
 	pICore_->UnRegisterAssertHandler(&assertCallback_);
 	pICore_->Release();
-
 	return 0;
 }
 

@@ -19,8 +19,20 @@
 X_USING_NAMESPACE;
 
 
+bool XCore::RunGameLoop(void)
+{
+	while (PumpMessages())
+	{
+		X_PROFILE_BEGIN("GameLoop", core::ProfileSubSys::GAME);
 
-bool XCore::Update()
+		Update();
+		RenderBegin();
+		RenderEnd();
+	}
+	return true;
+}
+
+bool XCore::Update(void)
 {
 	X_PROFILE_BEGIN("CoreUpdate", core::ProfileSubSys::CORE);
 	profileSys_.OnFrameBegin();
@@ -94,7 +106,7 @@ bool XCore::Update()
 
 
 
-void XCore::RenderBegin()
+void XCore::RenderBegin(void)
 {
 	X_PROFILE_BEGIN("CoreRenderBegin", core::ProfileSubSys::CORE);
 
@@ -104,7 +116,7 @@ void XCore::RenderBegin()
 }
 
 
-void XCore::RenderEnd()
+void XCore::RenderEnd(void)
 {
 	{
 		X_PROFILE_BEGIN("CoreRenderEnd", core::ProfileSubSys::CORE);

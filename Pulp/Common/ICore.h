@@ -310,10 +310,7 @@ struct ICore
 	virtual void Release() X_ABSTRACT;
 
 	// Update all the systems.
-	virtual bool PumpMessages() X_ABSTRACT;
-	virtual bool Update() X_ABSTRACT;
-	virtual void RenderBegin() X_ABSTRACT;
-	virtual void RenderEnd() X_ABSTRACT;
+	virtual bool RunGameLoop(void) X_ABSTRACT;
 
 	// cmd-line util
 	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_ABSTRACT;
