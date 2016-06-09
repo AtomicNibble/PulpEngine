@@ -366,19 +366,12 @@ void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 bool XCore::Update()
 {
 	X_PROFILE_BEGIN("CoreUpdate", core::ProfileSubSys::CORE);
-
-	profileSys_.FrameBegin();
+	profileSys_.OnFrameBegin();
 	time_.OnFrameBegin();
-
-	// how do I want to handle file updates.
-	// we will use file extensions.
-	// what the sub systems register themself with the watcher.
-	// or:
-	// the sub systems can register what file types they can deal with.
-	// i think i like the 2nd way
-	// means i can use a map to find load function.
-	// and check if two sub systems register same foramt.
-	// which will stop potential silent eating.
+	
+	if (env_.pJobSys) {
+		env_.pJobSys->OnFrameBegin();
+	}
 
 	dirWatcher_.tick();
 

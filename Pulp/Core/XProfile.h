@@ -24,8 +24,8 @@ public:
 
 	virtual void AddProfileData(XProfileData* pData) X_FINAL;
 
-	virtual void FrameBegin(void) X_FINAL;
-	virtual void FrameEnd(void) X_FINAL;
+	virtual void OnFrameBegin(void) X_FINAL;
+	virtual void OnFrameEnd(void) X_FINAL;
 
 private:
 	void UpdateProfileData(void);

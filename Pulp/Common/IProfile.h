@@ -17,8 +17,8 @@ struct IProfileSys
 
 	virtual void AddProfileData(XProfileData* pData) X_ABSTRACT;
 
-	virtual void FrameBegin() X_ABSTRACT;
-	virtual void FrameEnd() X_ABSTRACT;
+	virtual void OnFrameBegin(void) X_ABSTRACT;
+	virtual void OnFrameEnd(void) X_ABSTRACT;
 
 };
 

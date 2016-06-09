@@ -150,7 +150,7 @@ void XProfileSys::AddProfileData(XProfileData* pData)
 	profiles_.push_back(pData);
 }
 
-void XProfileSys::FrameBegin(void)
+void XProfileSys::OnFrameBegin(void)
 {
 	if (!isEnabled()) {
 		return;
@@ -160,7 +160,7 @@ void XProfileSys::FrameBegin(void)
 	frameStartTime_ = ProfileTimer::getTicks();
 }
 
-void XProfileSys::FrameEnd(void)
+void XProfileSys::OnFrameEnd(void)
 {
 	if (!isEnabled()) {
 		return;

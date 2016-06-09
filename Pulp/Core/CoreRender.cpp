@@ -40,7 +40,7 @@ void XCore::RenderEnd()
 		env_.pRender->RenderEnd();
 	}
 	// End
-	profileSys_.FrameEnd();
+	profileSys_.OnFrameEnd();
 
 
 	bool enabled = var_profile->GetInteger() > 0;
