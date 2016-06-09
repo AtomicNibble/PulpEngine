@@ -15,12 +15,6 @@
     <Filter Include="ExtensionSystem">
       <UniqueIdentifier>{2e7d6035-ee5e-4181-acdd-748e67aeec35}</UniqueIdentifier>
     </Filter>
-    <Filter Include="FileSys">
-      <UniqueIdentifier>{6235cefa-4126-4ed5-911c-956a56658cd3}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="FileSys\win32">
-      <UniqueIdentifier>{b1377700-dc67-40b3-8fe8-f8ae2432d432}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Profile">
       <UniqueIdentifier>{e6a198f6-b7fe-4943-afa8-bde28cb2a259}</UniqueIdentifier>
     </Filter>
@@ -38,6 +32,12 @@
     </Filter>
     <Filter Include="Source Files\Scheduler">
       <UniqueIdentifier>{c0c6f97f-4828-407e-9955-ae02a257d073}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\FileSys">
+      <UniqueIdentifier>{d182db23-54c6-474a-8e1b-b6764a5d0d8c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FileSys">
+      <UniqueIdentifier>{c16af5aa-9d77-466b-b4a8-f296de522ba7}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -65,21 +65,6 @@
     <ClInclude Include="Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="xFileSys.h">
-      <Filter>FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="OsFile.h">
-      <Filter>FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\OsFile.h">
-      <Filter>FileSys\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="FileSysVars.h">
-      <Filter>FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="XFindData.h">
-      <Filter>FileSys</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\ModuleExports.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -92,35 +77,50 @@
     <ClInclude Include="XProfile.h">
       <Filter>Header Files\Profile</Filter>
     </ClInclude>
-    <ClInclude Include="DiskFile.h">
-      <Filter>FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="DiskFileAsync.h">
-      <Filter>FileSys</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\OsFileAsync.h">
-      <Filter>FileSys\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\OsFileModeFlags.h">
-      <Filter>FileSys\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\OsFileAsyncOperation.h">
-      <Filter>FileSys\win32</Filter>
-    </ClInclude>
     <ClInclude Include="win32\SystemTimer.h">
       <Filter>Header Files\win32</Filter>
-    </ClInclude>
-    <ClInclude Include="win32\OsFileAsyncOperation.inl">
-      <Filter>FileSys\win32</Filter>
     </ClInclude>
     <ClInclude Include="PotatoFactoryRegistryImpl.h">
       <Filter>ExtensionSystem</Filter>
     </ClInclude>
+    <ClInclude Include="DiskFile.h">
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="DiskFileAsync.h">
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="FileSysVars.h">
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
     <ClInclude Include="PathUtil.h">
-      <Filter>FileSys</Filter>
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="OsFile.h">
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="xFileSys.h">
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="XFindData.h">
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\OsFile.h">
+      <Filter>Header Files\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\OsFileAsync.h">
+      <Filter>Header Files\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\OsFileAsyncOperation.h">
+      <Filter>Header Files\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\OsFileAsyncOperation.inl">
+      <Filter>Header Files\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\OsFileModeFlags.h">
+      <Filter>Header Files\win32</Filter>
     </ClInclude>
     <ClInclude Include="win32\PathUtil.h">
-      <Filter>FileSys\win32</Filter>
+      <Filter>Header Files\win32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -151,12 +151,6 @@
     <ClCompile Include="CoreRender.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="xFileSys.cpp">
-      <Filter>FileSys</Filter>
-    </ClCompile>
-    <ClCompile Include="win32\OsFile.cpp">
-      <Filter>FileSys\win32</Filter>
-    </ClCompile>
     <ClCompile Include="CoreEventDispatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -166,17 +160,8 @@
     <ClCompile Include="XProfileRender.cpp">
       <Filter>Source Files\Profile</Filter>
     </ClCompile>
-    <ClCompile Include="win32\OsFileAsync.cpp">
-      <Filter>FileSys\win32</Filter>
-    </ClCompile>
     <ClCompile Include="win32\SystemTimer.cpp">
       <Filter>Source Files\win32</Filter>
-    </ClCompile>
-    <ClCompile Include="DiskFileAsync.cpp">
-      <Filter>FileSys</Filter>
-    </ClCompile>
-    <ClCompile Include="DiskFile.cpp">
-      <Filter>FileSys</Filter>
     </ClCompile>
     <ClCompile Include="NullImplementation\NullInput.cpp">
       <Filter>NullImplementation</Filter>
@@ -184,8 +169,23 @@
     <ClCompile Include="PotatoFactoryRegistryImpl.cpp">
       <Filter>ExtensionSystem</Filter>
     </ClCompile>
+    <ClCompile Include="DiskFile.cpp">
+      <Filter>Source Files\FileSys</Filter>
+    </ClCompile>
+    <ClCompile Include="xFileSys.cpp">
+      <Filter>Source Files\FileSys</Filter>
+    </ClCompile>
+    <ClCompile Include="DiskFileAsync.cpp">
+      <Filter>Header Files\win32</Filter>
+    </ClCompile>
     <ClCompile Include="win32\PathUtil.cpp">
-      <Filter>FileSys\win32</Filter>
+      <Filter>Source Files\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\OsFileAsync.cpp">
+      <Filter>Source Files\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\OsFile.cpp">
+      <Filter>Source Files\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
