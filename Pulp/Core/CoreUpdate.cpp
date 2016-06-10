@@ -12,6 +12,7 @@
 
 
 #include <IRenderAux.h>
+#include <IFrameData.h>
 
 #include <Threading\JobSystem2.h>
 #include <Platform\Window.h>
@@ -42,7 +43,46 @@ bool XCore::Update(void)
 		env_.pJobSys->OnFrameBegin();
 	}
 
-	dirWatcher_.tick();
+#if 1
+
+	// we want to do everything via jobs. :D 
+	// we also want frame data.
+	core::FrameData frameData;
+	frameData.startTime = time_.GetFrameStartTime();
+	frameData.delta = time_.GetFrameTime();
+
+	// we have a load of things todo.
+	/*
+		Get input. (input events)
+		Check dir watcher for changed files.
+		Console?
+		3dEngine:
+			animations
+			loading of assets
+			culling
+			greating drawcalls.
+		sounds
+		scripts sys
+		physics
+
+	
+		Do we want to be fancy and depending on how much spare frame tiem we have for the target fps, allow more streaming jobs to happen.
+
+	*/
+
+
+	core::V2::JobSystem& jobSys = *env_.pJobSys;
+
+	// start a job to handler any file chnages and create relaod child jobs.
+	core::V2::Job* pJob = jobSys.CreateMemberJob<XCore>(this, &XCore::Job_DirectoryWatcher, nullptr);
+	jobSys.Run(pJob);
+	jobSys.Wait(pJob);
+
+
+	int goat = 0;
+	goat = 2;
+
+#else
 
 	if (env_.pGame)
 	{
@@ -100,7 +140,7 @@ bool XCore::Update(void)
 		pWindow_->SetTitle(title.c_str());
 	}
 #endif
-
+#endif
 	return true;
 }
 

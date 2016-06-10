@@ -434,52 +434,6 @@ bool XCore::addfileType(core::IXHotReload* pHotReload, const char* extension)
 
 // ~IXHotReloadManager
 
-// XDirectoryWatcherListener
-bool XCore::OnFileChange(core::XDirectoryWatcher::Action::Enum action,
-	const char* name, const char* oldName, bool isDirectory)
-{
-	X_UNUSED(oldName);
-	const char* ext = nullptr;
-	const char* fileName = nullptr;
-	hotReloadMap::const_iterator it;
-
-	if (isDirectory)
-		return false;
-
-	if (action == core::XDirectoryWatcher::Action::MODIFIED)
-	{
-		fileName = core::strUtil::FileName(name);
-
-		ext = core::strUtil::FileExtension(name);
-		if (ext)
-		{
-			it = hotReloadExtMap_.find(X_CONST_STRING(ext));
-			if (it != hotReloadExtMap_.end())
-			{
-				return it->second->OnFileChange(name);
-			}
-			else
-			{
-#if X_DEBUG
-				// before we log a warning check to see if it's in the hotreload ignore list.
-				if (hotRelodIgnoreList::invalid_index == 
-					hotReloadIgnores_.find(core::string(ext)))
-				{
-					X_WARNING("hotReload", "file extension '%s' has no reload handle.", ext);
-				}
-#endif // !X_DEBUG
-			}
-		}
-		else
-		{
-			if (this->dirWatcher_.isDebugEnabled())
-				X_LOG1("hotReload", "No file extension ignoring: %s", fileName);
-		}
-	}
-	return true;
-}
-
-// ~XDirectoryWatcherListener
 
 
 void XCore::OnFatalError(const char* format, va_list args)

@@ -26,6 +26,7 @@ struct IXHotReload
 {
 	virtual bool OnFileChange(const char* name) X_ABSTRACT;
 
+
 protected:
 	virtual ~IXHotReload() {}
 };
@@ -33,6 +34,8 @@ protected:
 
 struct IXHotReloadManager
 {
+	// needs to be done before startup finished.
+	// after that it's not thread safe.
 	virtual bool addfileType(IXHotReload* pHotReload, const char* extension) X_ABSTRACT;
 
 protected:
