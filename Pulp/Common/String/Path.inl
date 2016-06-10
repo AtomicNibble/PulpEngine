@@ -70,13 +70,18 @@ const TChar* Path<TChar>::fileName(void) const
 }
 
 template<typename TChar>
-const TChar* Path<TChar>::extension(void) const
+const TChar* Path<TChar>::extension(bool incDot) const
 {
 	const TChar* res = findLast('.');
 
-	if (!res)
+	if (!res) {
 		return str_;
-	return res;
+	}
+
+	if (incDot) {
+		return res;
+	}
+	return res + 1;
 }
 
 template<typename TChar>

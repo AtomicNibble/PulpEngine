@@ -41,7 +41,7 @@ public:
 	Path(const TChar* const beginInclusive, const TChar* const endExclusive);
 
 	inline const TChar* fileName(void) const;
-	inline const TChar* extension(void) const;
+	inline const TChar* extension(bool incDot = true) const;
 
 	inline void setExtension(const TChar* extension);
 	inline void setFileName(const TChar* filename);
