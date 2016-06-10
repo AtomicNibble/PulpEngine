@@ -504,22 +504,18 @@ void XCore::OnFatalError(const char* format, va_list args)
 }
 
 
-void Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd)
+void XCore::Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd)
 {
 	X_UNUSED(Cmd);
 
-	XCore* pCore = static_cast<XCore*>(gEnv->pCore);
-
-	pCore->HotReloadListExts();
+	HotReloadListExts();
 }
 
-void Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd)
+void XCore::Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd)
 {
 	X_UNUSED(Cmd);
 
-	XCore* pCore = static_cast<XCore*>(gEnv->pCore);
-
-	pCore->ListProgramArgs();
+	ListProgramArgs();
 }
 
 void XCore::HotReloadListExts(void)

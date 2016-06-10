@@ -757,10 +757,10 @@ void XCore::CreateSystemVars(void)
 
 	ADD_CVAR_STRING("version", X_ENGINE_NAME "Engine " X_BUILD_STRING " Version " X_ENGINE_VERSION_STR, VarFlag::SYSTEM | VarFlag::STATIC, "Engine Version");
 
-	ADD_COMMAND("filesysHotReloadEtxList", Command_HotReloadListExts, VarFlag::SYSTEM,
+	ADD_COMMAND_MEMBER("filesysHotReloadEtxList", this, XCore, &XCore::Command_HotReloadListExts, VarFlag::SYSTEM,
 		"Display all registered file extensions in the hotreload system");
 	
-	ADD_COMMAND("listProgramArgs", Command_ListProgramArgs, VarFlag::SYSTEM,
+	ADD_COMMAND_MEMBER("listProgramArgs", this, XCore, &XCore::Command_ListProgramArgs, VarFlag::SYSTEM,
 		"Lists the processed command line arguments parsed to the program");
 
 	dirWatcher_.Init();
