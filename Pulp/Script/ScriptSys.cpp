@@ -961,9 +961,9 @@ void XScriptSys::OnScriptError(const char* fmt, ...)
 
 // IXHotReload
 
-bool XScriptSys::OnFileChange(const char* name)
+void XScriptSys::OnFileChange(const core::Path<char>& name)
 {
-
+#if 0
 	ScriptFileList::iterator it = fileList_.find(X_CONST_STRING(name));
 
 	if (it != fileList_.end())
@@ -972,6 +972,9 @@ bool XScriptSys::OnFileChange(const char* name)
 	}
 
 	return true;
+#else 
+	X_UNUSED(name);
+#endif
 }
 
 // ~IXHotReload

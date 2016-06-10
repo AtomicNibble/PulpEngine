@@ -30,7 +30,7 @@ public:
 
 	// IXHotReload
 	// returns true if it action was eaten.
-	virtual bool OnFileChange(const char* name) X_OVERRIDE;
+	virtual void OnFileChange(const core::Path<char>& name) X_OVERRIDE;
 	// ~IXHotReload
 
 private:

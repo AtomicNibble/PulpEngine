@@ -61,9 +61,10 @@ namespace {
 
 	class ImgHotReload : public core::IXHotReload
 	{
-		bool OnFileChange(const char* name) X_OVERRIDE
+		void OnFileChange(const core::Path<char>& name) X_OVERRIDE
 		{
-			return XTexture::reloadForName(name);
+			X_UNUSED(name);
+		//	return XTexture::reloadForName(name);
 		}
 
 	};

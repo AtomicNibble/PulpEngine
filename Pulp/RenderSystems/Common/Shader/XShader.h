@@ -5,6 +5,8 @@
 #define X_SHADER_H_
 
 #include <IShader.h>
+#include <IDirectoryWatcher.h>
+
 #include <String\StrRef.h>
 #include <String\Lexer.h>
 #include <String\StringHash.h>
@@ -454,7 +456,7 @@ public:
 	bool sourceToString(core::string& str, const char* name);
 
 	// IXHotReload
-	virtual bool OnFileChange(const char* name) X_OVERRIDE;
+	virtual void OnFileChange(const core::Path<char>& name) X_OVERRIDE;
 	// ~IXHotReload
 
 	XShaderResources* createShaderResources(const XInputShaderResources& input);

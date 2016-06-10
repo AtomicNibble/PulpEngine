@@ -9,6 +9,8 @@
 
 #include "EngineBase.h"
 
+#include <IDirectoryWatcher.h>
+
 struct IMaterial;
 
 X_NAMESPACE_DECLARE(engine,
@@ -46,7 +48,7 @@ public:
 	// ~ICoreEventListener
 
 	// IXHotReload
-	virtual bool OnFileChange(const char* name) X_OVERRIDE;
+	virtual void OnFileChange(const core::Path<char>& name) X_OVERRIDE;
 	// ~IXHotReload
 
 	void ListMaterials(const char* searchPatten = nullptr) const;

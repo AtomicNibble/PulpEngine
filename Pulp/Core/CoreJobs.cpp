@@ -34,7 +34,7 @@ void XCore::Job_OnFileChange(core::V2::JobSystem& jobSys, size_t threadIdx,
 	X_UNUSED(pJob);
 	FileChangeJobData* pFileChangeData = reinterpret_cast<FileChangeJobData*>(pData);
 
-	core::Path<char>& name = pFileChangeData->name;
+	const core::Path<char>& name = pFileChangeData->name;
 	const char* pFileName = name.fileName();
 	const char* pExtention = name.extension(false);
 
@@ -43,7 +43,7 @@ void XCore::Job_OnFileChange(core::V2::JobSystem& jobSys, size_t threadIdx,
 		auto it = hotReloadExtMap_.find(X_CONST_STRING(pExtention));
 		if (it != hotReloadExtMap_.end())
 		{
-			it->second->OnFileChange(name.c_str());
+			it->second->OnFileChange(name);
 		}
 		else
 		{

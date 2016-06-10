@@ -36,7 +36,7 @@ public:
 	//~IGuiManger
 
 	// IXHotReload
-	bool OnFileChange(const char* name) X_FINAL;
+	void OnFileChange(const core::Path<char>& name) X_FINAL;
 	// ~IXHotReload
 
 	// IInputEventListner

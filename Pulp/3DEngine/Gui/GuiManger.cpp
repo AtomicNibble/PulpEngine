@@ -182,8 +182,9 @@ void XGuiManager::listGuis(const char* wildcardSearch) const
 
 
 // IXHotReload
-bool XGuiManager::OnFileChange(const char* name)
+void XGuiManager::OnFileChange(const core::Path<char>& name)
 {
+#if 0
 	core::Path<char> path(name);
 	XGui* pGui = nullptr;
 
@@ -213,6 +214,9 @@ bool XGuiManager::OnFileChange(const char* name)
 	}
 
 	return false;
+#else
+	X_UNUSED(name);
+#endif
 }
 // ~IXHotReload
 

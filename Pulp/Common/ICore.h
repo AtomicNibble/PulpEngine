@@ -20,7 +20,6 @@
 
 #include <ILog.h>
 #include <IProfile.h>
-#include <IDirectoryWatcher.h>
 
 struct ICore;
 struct IPotatoFactoryRegistry;
@@ -33,6 +32,8 @@ struct SourceInfo;
 struct IConsole; 
 struct IFileSys;
 struct IJobSystem;
+struct IXHotReloadManager;
+struct IXDirectoryWatcher;
 class XProfileScope;
 class Crc32;
 class CpuInfo;

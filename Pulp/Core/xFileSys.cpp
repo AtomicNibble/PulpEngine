@@ -8,6 +8,7 @@
 #include <Util\LastError.h>
 
 #include <IConsole.h>
+#include <IDirectoryWatcher.h>
 
 #include "XFindData.h"
 

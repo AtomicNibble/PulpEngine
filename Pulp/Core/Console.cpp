@@ -1836,9 +1836,9 @@ bool XConsole::LoadConfig(const char* fileName)
 }
 
 // IXHotReload
-bool XConsole::OnFileChange(const char* name)
+void XConsole::OnFileChange(const core::Path<char>& name)
 {
-#if X_ENABLE_CONFIG_HOT_RELOAD
+#if X_ENABLE_CONFIG_HOT_RELOAD && 0
 	if (!ignoreHotReload_)
 	{
 		core::Path<char> temp(name);
@@ -1851,7 +1851,6 @@ bool XConsole::OnFileChange(const char* name)
 #else
 	X_UNUSED(name);
 #endif // !X_ENABLE_CONFIG_HOT_RELOAD
-	return true;
 }
 // ~IXHotReload
 

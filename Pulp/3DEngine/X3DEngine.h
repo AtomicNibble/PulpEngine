@@ -30,7 +30,7 @@ struct X3DEngine : public I3DEngine, public XEngineBase, public core::IXHotReloa
 
 
 	// IXHotReload
-	virtual bool OnFileChange(const char* name) X_FINAL;
+	virtual void OnFileChange(const core::Path<char>& name) X_FINAL;
 	// ~IXHotReload
 
 private:

@@ -485,8 +485,9 @@ void XMaterialManager::ShutDown(void)
 	}
 }
 
-bool XMaterialManager::OnFileChange(const char* name)
+void XMaterialManager::OnFileChange(const core::Path<char>& name)
 {
+#if 0
 	const char* fileExt;		
 
 	fileExt = core::strUtil::FileExtension(name);
@@ -506,6 +507,9 @@ bool XMaterialManager::OnFileChange(const char* name)
 		}
 	}
 	return true;
+#else
+	X_UNUSED(name);
+#endif
 }
 
 

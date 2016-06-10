@@ -4,6 +4,8 @@
 #define X_DIRECTORY_WATCHER_I_H_
 
 
+#include <String\Path.h>
+
 X_NAMESPACE_BEGIN(core)
 
 class XDirectoryWatcherListener;
@@ -24,7 +26,7 @@ protected:
 
 struct IXHotReload
 {
-	virtual bool OnFileChange(const char* name) X_ABSTRACT;
+	virtual void OnFileChange(const core::Path<char>& path) X_ABSTRACT;
 
 
 protected:

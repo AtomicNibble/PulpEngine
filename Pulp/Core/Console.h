@@ -6,6 +6,7 @@
 #include <IConsole.h>
 #include <IInput.h>
 #include <ITexture.h>
+#include <IDirectoryWatcher.h>
 
 X_DISABLE_WARNING(4702)
 #include <map>
@@ -173,7 +174,7 @@ public:
 	virtual bool LoadConfig(const char* fileName) X_FINAL;
 
 	// IXHotReload
-	virtual bool OnFileChange(const char* name) X_FINAL;
+	virtual void OnFileChange(const core::Path<char>& name) X_FINAL;
 	// ~IXHotReload
 
 	void OnFrameBegin(void) X_FINAL;

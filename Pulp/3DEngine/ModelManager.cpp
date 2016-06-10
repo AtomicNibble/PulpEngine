@@ -253,8 +253,9 @@ IModel* XModelManager::getDefaultModel(void)
 	return pDefaultModel_;
 }
 
-bool XModelManager::OnFileChange(const char* name)
+void XModelManager::OnFileChange(const core::Path<char>& name)
 {
+#if 0
 	const char* fileExt;
 
 	fileExt = core::strUtil::FileExtension(name);
@@ -272,6 +273,9 @@ bool XModelManager::OnFileChange(const char* name)
 		}
 	}
 	return false;
+#else
+	X_UNUSED(name);
+#endif
 }
 
 void XModelManager::ListModels(const char* searchPatten) const

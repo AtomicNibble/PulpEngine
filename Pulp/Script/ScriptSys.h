@@ -12,6 +12,7 @@ extern "C"
 #include "binds\ScriptBinds.h"
 #include <String\Path.h>
 
+#include <IDirectoryWatcher.h>
 
 // TODO: temp
 X_DISABLE_WARNING(4702)
@@ -115,7 +116,7 @@ public:
 
 	// IXHotReload
 	
-	virtual bool OnFileChange(const char* name) X_OVERRIDE;
+	virtual void OnFileChange(const core::Path<char>& name) X_OVERRIDE;
 
 	// ~IXHotReload
 

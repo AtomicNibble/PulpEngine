@@ -32,7 +32,7 @@ public:
 	// ~IModelManager
 
 	// IXHotReload
-	virtual bool OnFileChange(const char* name) X_OVERRIDE;
+	virtual void OnFileChange(const core::Path<char>& name) X_OVERRIDE;
 	// ~IXHotReload
 
 	void ListModels(const char* searchPatten = nullptr) const;

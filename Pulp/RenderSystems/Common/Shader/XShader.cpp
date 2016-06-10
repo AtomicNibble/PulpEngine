@@ -381,8 +381,9 @@ bool XShaderManager::Shutdown(void)
 }
 
 
-bool XShaderManager::OnFileChange(const char* name)
+void XShaderManager::OnFileChange(const core::Path<char>& name)
 {
+#if 0
 	const char* ext;
 	if ((ext = core::strUtil::FileExtension(name)) != nullptr)
 	{
@@ -443,6 +444,9 @@ bool XShaderManager::OnFileChange(const char* name)
 		}
 	}
 	return true;
+#else
+	X_UNUSED(name);
+#endif
 }
 
 XShader* XShaderManager::reloadShader(const char* name)

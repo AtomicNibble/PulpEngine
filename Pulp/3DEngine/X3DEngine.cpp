@@ -163,14 +163,11 @@ void X3DEngine::Update(void)
 
 }
 
-bool X3DEngine::OnFileChange(const char* name)
+void X3DEngine::OnFileChange(const core::Path<char>& name)
 {
-	X_ASSERT_NOT_NULL(name);
-
 	// do nothing for now.
+	X_UNUSED(name);
 
-
-	return true;
 }
 
 // =======================================

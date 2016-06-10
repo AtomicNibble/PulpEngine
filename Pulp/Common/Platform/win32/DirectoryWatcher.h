@@ -10,6 +10,8 @@
 
 #include <set>
 
+#include <IDirectoryWatcher.h>
+
 X_NAMESPACE_BEGIN(core)
 
 class XDirectoryWatcher : public IXDirectoryWatcher

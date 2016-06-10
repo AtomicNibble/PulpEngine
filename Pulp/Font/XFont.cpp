@@ -136,10 +136,9 @@ void XFont::ListFontNames(void) const
 	X_LOG0("Fonts", "-------------- ^8Fonts End^7 --------------");
 }
 
-bool XFont::OnFileChange(const char* name)
+void XFont::OnFileChange(const core::Path<char>& name)
 {
-	using namespace core;
-
+#if 0
 	Path<char> path(name);
 	if (strUtil::IsEqual(".font", path.extension()))
 	{
@@ -154,6 +153,9 @@ bool XFont::OnFileChange(const char* name)
 	}
 
 	return false;
+#else 
+	X_UNUSED(name);
+#endif
 }
 
 X_NAMESPACE_END
