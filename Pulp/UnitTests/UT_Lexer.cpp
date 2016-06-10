@@ -526,7 +526,7 @@ bool XMapFile::Parse(core::XFile* file)
 
 	entities.reserve(2048);
 
-	gEnv->pCore->GetIProfileSys()->FrameBegin();
+	gEnv->pCore->GetIProfileSys()->OnFrameBegin();
 
 
 	if (file->read(pData.get(), (uint32_t)size) == size)
@@ -560,7 +560,7 @@ bool XMapFile::Parse(core::XFile* file)
 
 	}
 
-	gEnv->pCore->GetIProfileSys()->FrameEnd();
+	gEnv->pCore->GetIProfileSys()->OnFrameEnd();
 
 	return true;
 }
