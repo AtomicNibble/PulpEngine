@@ -1099,6 +1099,9 @@
     <ClInclude Include="IPhysics.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
+    <ClInclude Include="IFrameData.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
