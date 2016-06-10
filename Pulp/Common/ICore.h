@@ -43,6 +43,7 @@ class MemoryArenaBase;
 
 namespace V2 {
 	class JobSystem;
+	struct Job;
 }
 )
 X_NAMESPACE_DECLARE(font, struct IXFontSys; struct IFFont)
