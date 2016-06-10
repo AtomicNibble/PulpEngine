@@ -8,10 +8,11 @@ X_USING_NAMESPACE;
 
 #include "Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.h"
 #include "Memory\MemoryTrackingPolicies\FullMemoryTracking.h"
+#include "Memory\ThreadPolicies\MultiThreadPolicy.h"
 
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
-	core::SingleThreadPolicy,
+	core::MultiThreadPolicy<core::Spinlock>,
 	core::SimpleBoundsChecking,
 #if X_SUPER || 1
 	core::SimpleMemoryTracking,
