@@ -791,7 +791,7 @@ void XCore::RegisterAssertHandler(IAssertHandler* errorHandler)
 
 void XCore::UnRegisterAssertHandler(IAssertHandler* errorHandler)
 {
-	assertHandlers_.removeIndex(assertHandlers_.find(errorHandler));
+	assertHandlers_.remove(errorHandler);
 }
 
 void XCore::OnAssert(const core::SourceInfo& sourceInfo)
