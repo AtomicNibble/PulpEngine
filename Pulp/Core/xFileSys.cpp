@@ -669,7 +669,7 @@ bool xFileSys::findnext(uintptr_t handle, _wfinddatai64_t* findinfo)
 	X_ASSERT_NOT_NULL(findinfo);
 
 #if X_DEBUG == 1
-	if (findData_.find((XFindData*)handle) == findData_.end()) {
+	if (findData_.find(reinterpret_cast<XFindData*>(handle)) == findData_.end()) {
 		X_ERROR("FileSys", "FindData is not a valid handle.");
 		return false;
 	}
@@ -1175,15 +1175,6 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 					if (vars_.QueDebug)
 					{
 						uint32_t threadId = core::Thread::GetCurrentID();
-
-						void* pBuf = nullptr;
-
-						if (asyncReq.getType() == IoRequest::READ) {
-							pBuf = asyncReq.readInfo.pBuf;
-						}
-						else {
-							pBuf = asyncReq.writeInfo.pBuf;
-						}
 
 						X_LOG0("FileSys", "IoRequest(0x%x) '%s' async request complete. "
 							"bytesTrans: 0x%x pBuf: %p", 
