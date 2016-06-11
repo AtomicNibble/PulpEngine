@@ -127,7 +127,7 @@ public:
 	script::IScriptSys  *GetISscriptSys(void) X_OVERRIDE{ return env_.pScriptSys; }
 	render::IRender		*GetIRender(void) X_OVERRIDE{ return env_.pRender; }
 	font::IXFontSys		*GetIFontSys(void) X_OVERRIDE{ return env_.pFont; }
-//	core::IJobSystem	*GetJobSystem(void) X_OVERRIDE{ return env_.pJobSys; }
+	core::V2::JobSystem	*GetJobSystem(void) X_OVERRIDE{ return env_.pJobSys; }
 	physics::IPhysics*	 GetPhysics(void) X_OVERRIDE { return env_.pPhysics; };
 
 	core::IProfileSys	*GetIProfileSys(void) X_OVERRIDE{ return &profileSys_; }

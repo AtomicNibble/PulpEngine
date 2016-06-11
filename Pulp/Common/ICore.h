@@ -34,6 +34,7 @@ struct IFileSys;
 struct IJobSystem;
 struct IXHotReloadManager;
 struct IXDirectoryWatcher;
+struct FrameData;
 class XProfileScope;
 class Crc32;
 class CpuInfo;
@@ -333,7 +334,7 @@ struct ICore
 	virtual script::IScriptSys  *GetISscriptSys() X_ABSTRACT;
 	virtual render::IRender		*GetIRender() X_ABSTRACT;
 	virtual font::IXFontSys		*GetIFontSys() X_ABSTRACT;
-//	virtual core::IJobSystem	*GetJobSystem() X_ABSTRACT;
+	virtual core::V2::JobSystem	*GetJobSystem() X_ABSTRACT;
 	virtual physics::IPhysics*	 GetPhysics() X_ABSTRACT;
 
 	virtual core::IProfileSys	*GetIProfileSys() X_ABSTRACT;
