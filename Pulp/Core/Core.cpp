@@ -73,7 +73,9 @@ XCore::XCore() :
 {
 	X_ASSERT_NOT_NULL(g_coreArena);
 
-	memset(&env_, 0, sizeof(env_));
+	// make sure it's ok to null.
+	static_assert(std::is_trivially_constructible<SCoreGlobals>::value, "Global enviroment needs to be triv con");
+	core::zero_object(env_);
 
 	hotReloadExtMap_.reserve(32);
 
