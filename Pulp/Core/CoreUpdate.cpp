@@ -50,6 +50,7 @@ bool XCore::Update(void)
 	core::FrameData frameData;
 	frameData.startTime = time_.GetFrameStartTime();
 	frameData.delta = time_.GetFrameTime();
+	frameData.flags.Set(core::FrameFlag::HAS_FOCUS);
 
 	// we have a load of things todo.
 	/*
@@ -73,10 +74,18 @@ bool XCore::Update(void)
 
 	core::V2::JobSystem& jobSys = *env_.pJobSys;
 
+	// top job that we can use to wait for the chain of jobs to complete.
+	core::V2::Job* pSyncJob = jobSys.CreateJob(&core::V2::JobSystem::EmptyJob, nullptr);
+
 	// start a job to handler any file chnages and create relaod child jobs.
-	core::V2::Job* pJob = jobSys.CreateMemberJob<XCore>(this, &XCore::Job_DirectoryWatcher, nullptr);
-	jobSys.Run(pJob);
-	jobSys.Wait(pJob);
+	jobSys.AddContinuation(pSyncJob, jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_DirectoryWatcher, nullptr));
+	jobSys.AddContinuation(pSyncJob, jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_ProcessInput, &frameData));
+
+	jobSys.Run(pSyncJob);
+	jobSys.Wait(pSyncJob);
+
+
+
 
 
 	int goat = 0;
