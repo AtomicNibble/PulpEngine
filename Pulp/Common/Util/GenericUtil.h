@@ -16,6 +16,7 @@ template<class T> X_INLINE constexpr const T& Max( const T& x, const T& y, const
 template<class T> X_INLINE constexpr const T& Min(const T& x, const T& y, const T& c ) { return Min(Min(x, y), c); }
 
 
+// these are not needed now that Min and Max above are constexpr.
 template <uint32_t val1, uint32_t val2 >
 struct Max_static_unsigned
 {
