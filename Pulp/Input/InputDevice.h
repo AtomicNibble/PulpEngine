@@ -22,22 +22,22 @@ public:
 	virtual ~XInputDevice() X_OVERRIDE;
 
 	// IInputDevice
-	virtual const char* GetDeviceName(void) const		X_OVERRIDE{ return deviceName_.c_str(); }
-	virtual bool Init(void)	X_OVERRIDE{ return true; }
-	virtual void PostInit(void) X_OVERRIDE{}
-	virtual void ShutDown(void) X_OVERRIDE{}
-	virtual void Update(bool focus) X_OVERRIDE;
-	virtual void Enable(bool enable) X_OVERRIDE;
-	virtual bool IsEnabled() const X_OVERRIDE{ return enabled_; }
-	virtual void ClearKeyState(void) X_OVERRIDE;
-	virtual bool SetExclusiveMode(bool value) X_OVERRIDE { X_UNUSED(value); return true; }
-	virtual InputSymbol* LookupSymbol(KeyId::Enum id) const X_OVERRIDE;
+	X_INLINE const char* GetDeviceName(void) const;
+	X_INLINE bool Init(void) X_OVERRIDE;
+	X_INLINE void PostInit(void) X_OVERRIDE;
+	X_INLINE void ShutDown(void) X_OVERRIDE;
+	void Update(bool focus) X_OVERRIDE;
+	void Enable(bool enable) X_OVERRIDE;
+	X_INLINE bool IsEnabled(void) const X_OVERRIDE;
+	void ClearKeyState(void) X_OVERRIDE;
+	X_INLINE bool SetExclusiveMode(bool value) X_OVERRIDE;
+	InputSymbol* LookupSymbol(KeyId::Enum id) const X_OVERRIDE;
 	// ~IInputDevice
 
 protected:
-	X_INLINE IInput& GetIInput(void) const { return input_; }
+	X_INLINE IInput& GetIInput(void) const;
 
-	InputSymbol*				IdToSymbol(KeyId::Enum id) const;
+	InputSymbol* IdToSymbol(KeyId::Enum id) const;
 
 protected:
 	InputDeviceType::Enum		deviceType_;
@@ -54,8 +54,8 @@ private:
 	X_NO_ASSIGN(XInputDevice);
 };
 
-
-
 X_NAMESPACE_END
+
+#include "InputDevice.inl"
 
 #endif // !_X_INPUTDEVICE_H_

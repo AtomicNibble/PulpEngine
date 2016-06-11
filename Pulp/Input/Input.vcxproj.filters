@@ -91,5 +91,8 @@
     <None Include="win32\Keyboard.inl">
       <Filter>Header Files\win32</Filter>
     </None>
+    <None Include="InputDevice.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

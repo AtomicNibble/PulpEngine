@@ -369,6 +369,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="BaseInput.inl" />
+    <None Include="InputDevice.inl" />
     <None Include="win32\Keyboard.inl" />
     <None Include="win32\Mouse.inl" />
     <None Include="win32\Win32Input.inl" />
