@@ -54,6 +54,9 @@ namespace
 
 SoundVars::SoundVars()
 {
+	enableCommSys_ = 0;
+	enableOutputCapture_ = 0;
+
 	var_vol_master_ = nullptr;
 	var_vol_music_ = nullptr;
 	var_vol_sfx_ = nullptr;
