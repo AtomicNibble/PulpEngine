@@ -28,6 +28,7 @@ public:
 
 private:
 	X_NO_ASSIGN(XInputDeviceWin32);
+	X_NO_COPY(XInputDeviceWin32);
 };
 
 X_NAMESPACE_END
