@@ -68,26 +68,28 @@ namespace V2
 		return job;
 	}
 
-	template<typename T>
-	X_INLINE Job* JobSystem::CreateJob(JobFunction::Pointer function, const T& data)
+	template<typename DataT, typename>
+	X_INLINE Job* JobSystem::CreateJob(JobFunction::Pointer function, const DataT& data)
 	{
-		static_assert((sizeof(T) <= Job::PAD_SIZE), " does not fit in job data, pass as void");
+		static_assert((sizeof(DataT) <= Job::PAD_SIZE), " does not fit in job data, pass as void");
+		static_assert(std::is_trivially_destructible<DataT>::value, " type is not trivially destructible");
 
 		Job* job = CreateJob(function);
 		job->pArgData = &job->pad;
-		::memcpy(job->pad, &data, sizeof(T));
+		::memcpy(job->pad, &data, sizeof(DataT));
 		return job;
 	}
 
 
-	template<typename T>
-	X_INLINE Job* JobSystem::CreateJobAsChild(Job* pParent, JobFunction::Pointer function, const T& data)
+	template<typename DataT, typename>
+	X_INLINE Job* JobSystem::CreateJobAsChild(Job* pParent, JobFunction::Pointer function, const DataT& data)
 	{
-		static_assert((sizeof(T) <= Job::PAD_SIZE), " does not fit in job data, pass as void");
+		static_assert((sizeof(DataT) <= Job::PAD_SIZE), " does not fit in job data, pass as void");
+		static_assert(std::is_trivially_destructible<DataT>::value, " type is not trivially destructible");
 
 		Job* job = CreateJobAsChild(pParent, function);
 		job->pArgData = &job->pad;
-		::memcpy(job->pad, &data, sizeof(T));
+		::memcpy(job->pad, &data, sizeof(DataT));
 		return job;
 	}
 
@@ -139,6 +141,24 @@ namespace V2
 
 		return job;
 	}
+
+	template<typename ClassType, typename DataT, typename>
+	X_INLINE Job* JobSystem::CreateMemberJobAsChild(Job* pParent, ClassType* pInst,
+		typename member_function_job_copy_data<ClassType, DataT>::MemberFunctionPtr pFunction, 
+		typename DataT& data)
+	{
+		typedef member_function_job_copy_data<ClassType, DataT> MemberCallerData;
+
+		static_assert((sizeof(DataT) <= MemberCallerData::PAD_SIZE), " does not fit in job data, pass as void");
+		static_assert(std::is_trivially_destructible<DataT>::value, " type is not trivially destructible");
+
+		MemberCallerData jobData(pInst, pFunction, data);
+
+		Job* job = CreateJobAsChild<MemberCallerData>(pParent, &member_function_job_copy<MemberCallerData>, jobData);
+
+		return job;
+	}
+
 
 	// =============================================
 

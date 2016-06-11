@@ -283,6 +283,35 @@ struct member_function_job_data
 	void* pJobData_;
 };
 
+template <typename JobData>
+static inline void member_function_job_copy(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
+{
+	JobData* pData = static_cast<JobData*>(jobData);
+	(*pData->pInst_.*pData->pFunction_)(jobSys, threadIdx, job, pData->data_);
+}
+
+
+template<typename C, typename DataT>
+struct member_function_job_copy_data
+{
+	typedef C ClassType;
+	typedef traits::MemberFunction<C, void(JobSystem&, size_t, Job*, void*)> MemberFunction;
+	typedef typename MemberFunction::Pointer MemberFunctionPtr;
+	static const size_t PAD_SIZE = 0x30;
+
+	member_function_job_copy_data(ClassType* pInst, MemberFunctionPtr function, const DataT& jobData) :
+		pInst_(pInst),
+		pFunction_(function)
+	{
+		memcpy(data_, &jobData, sizeof(DataT));
+	}
+
+	ClassType* pInst_;
+	MemberFunctionPtr pFunction_;
+	uint8_t data_[PAD_SIZE];
+};
+
+
 class JobSystem
 {
 	struct ThreadJobAllocator;
@@ -321,10 +350,10 @@ public:
 	X_INLINE Job* CreateJob(JobFunction::Pointer function, void* pData);
 	X_INLINE Job* CreateJobAsChild(Job* pParent, JobFunction::Pointer function, void* pData);
 
-	template<typename T>
-	X_INLINE Job* CreateJob(JobFunction::Pointer function, const T& data);
-	template<typename T>
-	X_INLINE Job* CreateJobAsChild(Job* pParent, JobFunction::Pointer function, const T& data);
+	template<typename DataT, typename = std::enable_if_t<!std::is_pointer<DataT>::value>>
+	X_INLINE Job* CreateJob(JobFunction::Pointer function, const DataT& data);
+	template<typename DataT, typename = std::enable_if_t<!std::is_pointer<DataT>::value>>
+	X_INLINE Job* CreateJobAsChild(Job* pParent, JobFunction::Pointer function, const DataT& data);
 
 	template <typename T, typename SplitterT>
 	X_INLINE Job* parallel_for(T* data, size_t count, 
@@ -340,9 +369,12 @@ public:
 		void* pJobData);
 
 	template<typename ClassType>
-	X_INLINE Job* CreateMemberJobAsChild(Job* pParent, ClassType* pInst, typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction,
-		void* pJobData);
+	X_INLINE Job* CreateMemberJobAsChild(Job* pParent, ClassType* pInst, 
+		typename member_function_job_data<ClassType>::MemberFunctionPtr pFunction, void* pJobData);
 
+	template<typename ClassType, typename DataT, typename = std::enable_if_t<!std::is_pointer<DataT>::value>>
+	X_INLINE Job* CreateMemberJobAsChild(Job* pParent, ClassType* pInst, 
+		typename member_function_job_copy_data<ClassType,DataT>::MemberFunctionPtr pFunction, typename DataT& jobData);
 
 	X_INLINE void AddContinuation(Job* ancestor, Job* continuation, bool runInline = false);
 
