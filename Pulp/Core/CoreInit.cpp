@@ -15,6 +15,8 @@
 #include <Random\MultiplyWithCarry.h>
 #include <Random\XorShift.h>
 
+#include <Hashing\crc32.h>
+
 #include <Threading\JobSystem2.h>
 #include <Time\StopWatch.h>
 
@@ -291,7 +293,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	}
 
 	// #------------------------- CPU Info ----------------------
-	pCpuInfo_ = X_NEW( core::CpuInfo, g_coreArena, "CpuInfo");
+	pCpuInfo_ = X_NEW(core::CpuInfo, g_coreArena, "CpuInfo");
+	// #------------------------- Crc32 ----------------------
+	pCrc32_ = X_NEW( core::Crc32, g_coreArena, "Crc32");
 
 	// Call init on objects from before so they can register vars.
 	env_.pLog->Init();
@@ -433,22 +437,21 @@ bool XCore::ParseCmdArgs(const wchar_t* pArgs)
 
 	for (i = 0; i < num; i++)
 	{
-		if (numArgs_ >= MAX_CMD_ARS) {
+		if (args_.size() >= args_.capacity()) {
 			break;
 		}
 
 		const wchar_t* pArg = args.getArgv(i);
 		if ((*pArg == L'+' || *pArg == L'-') && core::strUtil::strlen(pArg) > 1)
 		{
-			numArgs_++;
-			args_[numArgs_ - 1].AppendArg(args.getArgv(i) + 1);
+			args_.AddOne().AppendArg(args.getArgv(i) + 1);
 		}
 		else
 		{
-			if (!numArgs_) {
-				numArgs_++;
+			if (args_.isEmpty()) {
+				args_.AddOne();
 			}
-			args_[numArgs_ - 1].AppendArg(args.getArgv(i));
+			args_[args_.size() - 1].AppendArg(args.getArgv(i));
 		}
 	}
 

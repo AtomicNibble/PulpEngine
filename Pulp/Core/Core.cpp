@@ -43,6 +43,7 @@ XCore::XCore() :
 	pWindow_(nullptr),
 	pConsole_(nullptr),
 	pCpuInfo_(nullptr),
+	pCrc32_(nullptr),
 	pVsLogger_(nullptr),
 	pConsoleLogger_(nullptr),
 	pEventDispatcher_(nullptr),
@@ -61,8 +62,6 @@ XCore::XCore() :
 	strAlloc_(1 << 24, core::VirtualMem::GetPageSize() * 2, 
 	StrArena::getMemoryAlignmentRequirement(8), 
 	StrArena::getMemoryOffsetRequirement() + 12),
-
-	numArgs_(0),
 
 	var_win_pos_x(nullptr),
 	var_win_pos_y(nullptr),
@@ -189,6 +188,11 @@ void XCore::ShutDown()
 		core::Mem::DeleteAndNull(pCpuInfo_, g_coreArena);
 	}
 
+	if (pCrc32_)
+	{
+		core::Mem::DeleteAndNull(pCrc32_, g_coreArena);
+	}
+
 	if (env_.p3DEngine)
 	{
 		env_.p3DEngine->ShutDown();
@@ -296,12 +300,6 @@ void XCore::ShutDown()
 }
 
 
-core::Crc32* XCore::GetCrc32()
-{
-	static core::Crc32 crcGen;
-	return &crcGen;
-}
-
 bool XCore::PumpMessages()
 {
 	if (pWindow_) {
@@ -368,12 +366,12 @@ const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
 {
 	X_ASSERT_NOT_NULL(pVarName);
 
-	if (numArgs_ == 0) {
+	if (args_.isEmpty()) {
 		return nullptr;
 	}
 
 	size_t i;
-	for (i = 0; i < numArgs_; i++)
+	for (i = 0; i < args_.size(); i++)
 	{
 		const CmdArg& arg = args_[i];
 
@@ -490,7 +488,7 @@ void XCore::HotReloadListExts(void)
 
 void XCore::ListProgramArgs(void)
 {
-	size_t i, num = numArgs_;
+	size_t i, num = args_.size();
 
 	X_LOG0("AppArgs", "------ ^8Program Args(%" PRIuS ")^7 ------", num);
 

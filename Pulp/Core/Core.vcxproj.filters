@@ -201,5 +201,8 @@
     <None Include="ConsoleVariable.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="Core.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

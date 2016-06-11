@@ -113,41 +113,38 @@ public:
 	virtual void Release(void) X_OVERRIDE;
 
 	virtual bool RunGameLoop(void) X_FINAL;
-
 	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_OVERRIDE;
-
 	virtual bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_OVERRIDE;
 
 
-	core::ITimer		*GetITimer(void) X_OVERRIDE{ return env_.pTimer; }
-	input::IInput		*GetIInput(void) X_OVERRIDE{ return env_.pInput; }
-	core::IConsole		*GetIConsole(void) X_OVERRIDE{ return env_.pConsole; }
-	core::IFileSys		*GetIFileSys(void) X_OVERRIDE{ return env_.pFileSys; }
-	sound::ISound		*GetISound(void) X_OVERRIDE{ return env_.pSound; }
-	script::IScriptSys  *GetISscriptSys(void) X_OVERRIDE{ return env_.pScriptSys; }
-	render::IRender		*GetIRender(void) X_OVERRIDE{ return env_.pRender; }
-	font::IXFontSys		*GetIFontSys(void) X_OVERRIDE{ return env_.pFont; }
-	core::V2::JobSystem	*GetJobSystem(void) X_OVERRIDE{ return env_.pJobSys; }
-	physics::IPhysics*	 GetPhysics(void) X_OVERRIDE { return env_.pPhysics; };
+	X_INLINE core::ITimer* GetITimer(void) X_OVERRIDE;
+	X_INLINE input::IInput* GetIInput(void) X_OVERRIDE;
+	X_INLINE core::IConsole* GetIConsole(void) X_OVERRIDE;
+	X_INLINE core::IFileSys* GetIFileSys(void) X_OVERRIDE;
+	X_INLINE sound::ISound* GetISound(void) X_OVERRIDE;
+	X_INLINE script::IScriptSys* GetISscriptSys(void) X_OVERRIDE;
+	X_INLINE render::IRender* GetIRender(void) X_OVERRIDE;
+	X_INLINE font::IXFontSys* GetIFontSys(void) X_OVERRIDE;
+	X_INLINE core::V2::JobSystem* GetJobSystem(void) X_OVERRIDE;
+	X_INLINE physics::IPhysics* GetPhysics(void) X_OVERRIDE;
 
-	core::IProfileSys	*GetIProfileSys(void) X_OVERRIDE{ return &profileSys_; }
-	core::IXDirectoryWatcher *GetDirWatcher(void) X_OVERRIDE{ return env_.pDirWatcher; }
-	core::IXHotReloadManager*   GetHotReloadMan(void) X_OVERRIDE{ return this; };
+	X_INLINE core::IProfileSys* GetIProfileSys(void) X_OVERRIDE;
+	X_INLINE core::IXDirectoryWatcher* GetDirWatcher(void) X_OVERRIDE;
+	X_INLINE core::IXHotReloadManager* GetHotReloadMan(void) X_OVERRIDE;
+	
+	X_INLINE ICoreEventDispatcher* GetCoreEventDispatcher(void) X_OVERRIDE;
+	X_INLINE core::ILog* GetILog(void) X_OVERRIDE;
+	X_INLINE core::Crc32* GetCrc32(void) X_OVERRIDE;
+	X_INLINE core::CpuInfo*	GetCPUInfo(void) X_OVERRIDE;
+	
+	X_INLINE core::xWindow* GetGameWindow(void) X_OVERRIDE;
 
-	ICoreEventDispatcher* GetCoreEventDispatcher(void) X_OVERRIDE{ return pEventDispatcher_; }
-	core::ILog			*GetILog(void) X_OVERRIDE{ return env_.pLog; };
-	core::Crc32			*GetCrc32(void) X_OVERRIDE;
-	core::CpuInfo*	GetCPUInfo(void) X_OVERRIDE { return pCpuInfo_; };
+	X_INLINE SCoreGlobals* GetGlobalEnv(void) X_OVERRIDE;
+	X_INLINE core::MallocFreeAllocator* GetGlobalMalloc(void) X_OVERRIDE;
 
+	IPotatoFactoryRegistry* GetFactoryRegistry(void) const X_OVERRIDE;
 
-	core::xWindow* GetGameWindow(void) X_OVERRIDE { return pWindow_; }
-
-	virtual IPotatoFactoryRegistry* GetFactoryRegistry(void) const X_OVERRIDE;
-
-
-	virtual SCoreGlobals* GetGlobalEnv(void) X_OVERRIDE{ return &env_; }
-	virtual core::MallocFreeAllocator* GetGlobalMalloc(void) X_OVERRIDE{ return &malloc_; }
-
+private:
 	static SCoreGlobals env_;
 	static core::MallocFreeAllocator malloc_;
 
@@ -201,8 +198,6 @@ private:
 	void Job_OnFileChange(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 	void Job_ProcessInput(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
-
-
 private:
 
 	// IXHotReloadManager
@@ -220,7 +215,23 @@ private:
 	// ~ICoreEventListener
 
 private:
-//	GlobalArena						arena_;
+	// var callbacks.
+	void WindowPosVarChange(core::ICVar* pVar);
+	void WindowSizeVarChange(core::ICVar* pVar);
+	void WindowCustomFrameVarChange(core::ICVar* pVar);
+
+
+
+private:
+	typedef core::Array<WIN_HMODULE> ModuleHandlesArr;
+	typedef core::Array<std::shared_ptr<IEngineModule>> ModuleInterfacesArr;
+	typedef core::Array<IAssertHandler*> ArrsetHandlersArr;
+	// I think i can just use stack strings, since all handlers are hard coded.
+	typedef core::HashMap<const char* const, core::IXHotReload*> hotReloadMap;
+	typedef core::Array<core::string> hotRelodIgnoreArr;
+	typedef core::CmdArgs<1024, wchar_t> CmdArg;
+	typedef core::FixedArray<CmdArg, MAX_CMD_ARS> CmdArgs;
+
 
 	core::xWindow*				    pWindow_;
 	core::Console*					pConsole_;
@@ -231,11 +242,11 @@ private:
 
 	core::XTimer					time_;
 	core::CpuInfo*					pCpuInfo_;
+	core::Crc32*					pCrc32_;
 
-	core::Array<WIN_HMODULE>		moduleDLLHandles_;
-	core::Array<std::shared_ptr<IEngineModule>>    
-									moduleInterfaces_;
-	core::Array<IAssertHandler*>	assertHandlers_;
+	ModuleHandlesArr				moduleDLLHandles_;
+	ModuleInterfacesArr				moduleInterfaces_;
+	ArrsetHandlersArr				assertHandlers_;
 
 	core::XProfileSys				profileSys_;
 
@@ -244,15 +255,10 @@ private:
 
 	ICoreEventDispatcher*			pEventDispatcher_;
 
-	// I think i can just use stack strings, since all handlers are hard coded.
-	typedef core::HashMap<const char* const, core::IXHotReload*> hotReloadMap;
-
 	hotReloadMap					hotReloadExtMap_;
 
 #if X_DEBUG
-	typedef core::Array<core::string> hotRelodIgnoreList;
-
-	hotRelodIgnoreList hotReloadIgnores_;
+	hotRelodIgnoreArr hotReloadIgnores_;
 #endif // !X_DEBUG
 	// ~Hotreload
 
@@ -262,21 +268,12 @@ private:
 
 	SCoreInitParams initParams_;
 
-	core::GrowingGenericAllocator	strAlloc_;
+	core::GrowingGenericAllocator strAlloc_;
 
 	// args
-	typedef core::CmdArgs<1024, wchar_t> CmdArg;
+	CmdArgs args_;
 
-	size_t numArgs_;
-	CmdArg args_[MAX_CMD_ARS];
-
-public:
-	// All the vars
-	void WindowPosVarChange(core::ICVar* pVar);
-	void WindowSizeVarChange(core::ICVar* pVar);
-	void WindowCustomFrameVarChange(core::ICVar* pVar);
-
-
+private:
 	core::ICVar* var_win_pos_x;
 	core::ICVar* var_win_pos_y;
 	core::ICVar* var_win_width;
@@ -284,7 +281,6 @@ public:
 	core::ICVar* var_win_custom_Frame;
 
 	core::ICVar* var_profile;
-
 };
 
 X_NAMESPACE_BEGIN(core)
@@ -293,5 +289,7 @@ X_NAMESPACE_BEGIN(core)
 
 X_NAMESPACE_END
 
+
+#include "Core.inl"
 
 #endif // !_X_CORE_H_

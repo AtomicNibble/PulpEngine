@@ -310,7 +310,7 @@ struct ICore
 	virtual ~ICore(){}
 
 	virtual bool Init(const SCoreInitParams &startupParams) X_ABSTRACT;
-	virtual void Release() X_ABSTRACT;
+	virtual void Release(void) X_ABSTRACT;
 
 	// Update all the systems.
 	virtual bool RunGameLoop(void) X_ABSTRACT;
