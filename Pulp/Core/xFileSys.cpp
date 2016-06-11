@@ -27,12 +27,12 @@ namespace
 	static const size_t MAX_FILE_HANDLES = 1024;
 
 
-	static const size_t FILE_ALLOCATION_SIZE = core::Max_static_size<sizeof(XDiskFile), 
-		core::Max_static_size<sizeof(XDiskFileAsync), sizeof(XFileMem)>::value>::value;
+	static const size_t FILE_ALLOCATION_SIZE = core::Max(sizeof(XDiskFile), 
+		core::Max(sizeof(XDiskFileAsync), sizeof(XFileMem)));
 
 
-	static const size_t FILE_ALLOCATION_ALIGN = core::Max_static_size< X_ALIGN_OF(XDiskFile),
-		core::Max_static_size<X_ALIGN_OF(XDiskFileAsync), X_ALIGN_OF(XFileMem)>::value>::value;
+	static const size_t FILE_ALLOCATION_ALIGN = core::Max( X_ALIGN_OF(XDiskFile),
+		core::Max(X_ALIGN_OF(XDiskFileAsync), X_ALIGN_OF(XFileMem)));
 
 
 }

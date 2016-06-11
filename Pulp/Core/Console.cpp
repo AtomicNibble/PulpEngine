@@ -29,42 +29,42 @@ X_NAMESPACE_BEGIN(core)
 namespace
 {
 	static const size_t VAR_ALLOCATION_SIZE =
-		core::Max_static_size<
-		core::Max_static_size<
-		core::Max_static_size<
-		core::Max_static_size<
-		core::Max_static_size<
-		core::Max_static_size<
-		core::Max_static_size<
-		core::Max_static_size<
+		core::Max(
+		core::Max(
+		core::Max(
+		core::Max(
+		core::Max(
+		core::Max(
+		core::Max(
+		core::Max(
 		sizeof(CVarString<CVarBaseConst>),
-		sizeof(CVarInt<CVarBaseConst>)>::value,
-		sizeof(CVarFloat<CVarBaseConst>)>::value,
-		sizeof(CVarString<CVarBaseHeap>)>::value,
-		sizeof(CVarInt<CVarBaseHeap>)>::value,
-		sizeof(CVarFloat<CVarBaseHeap>)>::value,
-		sizeof(CVarFloatRef)>::value,
-		sizeof(CVarIntRef)>::value,
-		sizeof(CVarColRef)>::value;
+		sizeof(CVarInt<CVarBaseConst>)),
+		sizeof(CVarFloat<CVarBaseConst>)),
+		sizeof(CVarString<CVarBaseHeap>)),
+		sizeof(CVarInt<CVarBaseHeap>)),
+		sizeof(CVarFloat<CVarBaseHeap>)),
+		sizeof(CVarFloatRef)),
+		sizeof(CVarIntRef)),
+		sizeof(CVarColRef));
 
 	static const size_t VAR_ALLOCATION_ALIGNMENT = 
-		core::Max_static_size<
-		core::Max_static_size<
-		core::Max_static_size<
-		core::Max_static_size<
-		core::Max_static_size<
-		core::Max_static_size<
-		core::Max_static_size<
-		core::Max_static_size<
+		core::Max(
+		core::Max(
+		core::Max(
+		core::Max(
+		core::Max(
+		core::Max(
+		core::Max(
+		core::Max(
 		X_ALIGN_OF(CVarString<CVarBaseConst>),
-		X_ALIGN_OF(CVarInt<CVarBaseConst>)>::value,
-		X_ALIGN_OF(CVarFloat<CVarBaseConst>)>::value,
-		X_ALIGN_OF(CVarString<CVarBaseHeap>)>::value,
-		X_ALIGN_OF(CVarInt<CVarBaseHeap>)>::value,
-		X_ALIGN_OF(CVarFloat<CVarBaseHeap>)>::value,
-		X_ALIGN_OF(CVarFloatRef)>::value,
-		X_ALIGN_OF(CVarIntRef)>::value,
-		X_ALIGN_OF(CVarColRef)>::value;
+		X_ALIGN_OF(CVarInt<CVarBaseConst>)),
+		X_ALIGN_OF(CVarFloat<CVarBaseConst>)),
+		X_ALIGN_OF(CVarString<CVarBaseHeap>)),
+		X_ALIGN_OF(CVarInt<CVarBaseHeap>)),
+		X_ALIGN_OF(CVarFloat<CVarBaseHeap>)),
+		X_ALIGN_OF(CVarFloatRef)),
+		X_ALIGN_OF(CVarIntRef)),
+		X_ALIGN_OF(CVarColRef));
 
 
 	static void sortVarsByName(core::Array<core::ICVar*>& vars)

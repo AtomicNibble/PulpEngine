@@ -16,25 +16,6 @@ template<class T> X_INLINE constexpr const T& Max( const T& x, const T& y, const
 template<class T> X_INLINE constexpr const T& Min(const T& x, const T& y, const T& c ) { return Min(Min(x, y), c); }
 
 
-// these are not needed now that Min and Max above are constexpr.
-template <uint32_t val1, uint32_t val2 >
-struct Max_static_unsigned
-{
-	static const uint32_t value = ((val1 < val2) ? val2 : val1);
-};
-
-template <int32_t val1, int32_t val2 >
-struct Max_static_signed
-{
-	static const int32_t value = ((val1 < val2) ? val2 : val1);
-};
-
-template <size_t val1, size_t val2 >
-struct Max_static_size
-{
-	static const size_t value = ((val1 < val2) ? val2 : val1);
-};
-
 
 
 #define X_TAG(a,b,c,d)	(uint32_t)((d << 24) | (c << 16) | (b << 8) | a);
