@@ -400,10 +400,7 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 	if (!InitConsole(startupParams))
 		return false;
 
-#if X_DEBUG
-	// don't warn about shit like .txt!
-	hotReloadIgnores_.append(core::string("txt"));
-#endif // !X_DEBUG
+	AddIgnoredHotReloadExtensions();
 
 	if (startupParams.loadSymbols()) {
 		core::symbolResolution::Refresh();
@@ -770,6 +767,16 @@ void XCore::CreateSystemVars(void)
 		"Lists the processed command line arguments parsed to the program");
 
 	dirWatcher_.Init();
+}
+
+void XCore::AddIgnoredHotReloadExtensions(void)
+{
+#if X_DEBUG
+
+	// don't warn about shit like .txt!
+	hotReloadIgnores_.append(core::string("txt"));
+
+#endif // !X_DEBUG
 }
 
 // ->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->

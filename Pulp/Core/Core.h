@@ -186,6 +186,7 @@ private:
 	
 	
 	void CreateSystemVars(void);
+	void AddIgnoredHotReloadExtensions(void);
 
 	void Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd);
 	void Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd);
