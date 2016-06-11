@@ -22,7 +22,7 @@ X_USING_NAMESPACE;
 
 bool XCore::RunGameLoop(void)
 {
-	X_ASSERT(env_.initComplete_, "Game loop called without startup been completed successfully")(env_.initComplete_);
+	X_ASSERT(!env_.IsPostInit(), "Game loop called without startup been completed successfully")(env_.IsPostInit());
 
 	while (PumpMessages())
 	{
