@@ -911,13 +911,13 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 	if (event.action != input::InputState::PRESSED)
 	{
 		// if open we eat all none mouse
-		if (event.deviceId == input::InputDeviceType::KEYBOARD) {
+		if (event.deviceType == input::InputDeviceType::KEYBOARD) {
 			return isVisable();
 		}
 
 		// eat mouse move?
 		// Stops the camera moving around when we have console open.
-		if (event.deviceId == input::InputDevice::MOUSE)
+		if (event.deviceType == input::InputDeviceType::MOUSE)
 		{
 			if (event.keyId != input::KeyId::MOUSE_Z)
 			{

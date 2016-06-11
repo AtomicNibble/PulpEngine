@@ -13,7 +13,7 @@ InputSymbol*	XMouse::Symbol_[MAX_MOUSE_SYMBOLS] = { 0 };
 XMouse::XMouse(XWinInput& input) :
 	XInputDeviceWin32(input, "mouse")
 {
-	deviceId_ = InputDevice::MOUSE;
+	deviceType_ = InputDeviceType::MOUSE;
 	mouseWheel_ = 0.f;
 }
 
@@ -59,7 +59,7 @@ bool XMouse::Init()
 
 	// init the symbols
 #define DEFINE_SYM(id,name) \
-	Symbol_[id - KeyId::INPUT_MOUSE_BASE] = input.DefineSymbol(InputDevice::MOUSE, id, name);
+	Symbol_[id - KeyId::INPUT_MOUSE_BASE] = input.DefineSymbol(InputDeviceType::MOUSE, id, name);
 
 	DEFINE_SYM(KeyId::MOUSE_LEFT, "MOUSE LEFT");
 	DEFINE_SYM(KeyId::MOUSE_MIDDLE, "MOUSE_MIDDLE");

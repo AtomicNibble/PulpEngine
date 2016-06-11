@@ -25,28 +25,28 @@ public:
 
 	virtual bool Init(void) X_OVERRIDE;
 	virtual void PostInit(void) X_OVERRIDE;
-	virtual void Update(bool bFocus) X_OVERRIDE;
 	virtual void ShutDown(void) X_OVERRIDE;
 	virtual void release(void) X_OVERRIDE;
+	virtual void Update(core::V2::Job* pInputJob, core::FrameData& frameData) X_OVERRIDE;
 
 	
 	virtual void ClearKeyState(void) X_OVERRIDE;
 
 	virtual void RetriggerKeyState(void) X_OVERRIDE;
 
-	virtual bool Retriggering(void) X_OVERRIDE;
+	virtual bool Retriggering(void) const X_OVERRIDE;
 
 	virtual bool HasInputDeviceOfType(InputDeviceType::Enum type) const X_OVERRIDE;
 
-	virtual void EnableDevice(InputDevice::Enum deviceId, bool enable) X_OVERRIDE;
+	virtual void EnableDevice(InputDeviceType::Enum deviceType, bool enable) X_OVERRIDE;
 
 	virtual ModifierFlags GetModifiers(void) X_OVERRIDE;
 	virtual void SetModifiers(ModifierFlags flags) X_OVERRIDE;
 
-	virtual InputSymbol* DefineSymbol(InputDevice::Enum device,
+	virtual InputSymbol* DefineSymbol(InputDeviceType::Enum device,
 		KeyId::Enum id_, const KeyName& name_,
 		InputSymbol::Type type_ = InputSymbol::Type::Button,
-		ModifiersMasks::Enum  mod_mask = ModifiersMasks::NONE) X_OVERRIDE;
+		ModifiersMasks::Enum mod_mask = ModifiersMasks::NONE) X_OVERRIDE;
 
 };
 

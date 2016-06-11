@@ -17,8 +17,8 @@ public:
 
 	// IInputDevice overrides
 	virtual int GetDeviceIndex() const X_OVERRIDE{ return 0; }	//Assume only one device of this type
-	virtual bool Init() X_OVERRIDE;
-	virtual void ShutDown() X_OVERRIDE;
+	virtual bool Init(void) X_OVERRIDE;
+	virtual void ShutDown(void) X_OVERRIDE;
 	virtual void Update(bool bFocus) X_OVERRIDE;
 	virtual bool SetExclusiveMode(bool value) X_OVERRIDE;
 	virtual bool IsOfDeviceType(InputDeviceType::Enum type) const X_OVERRIDE {
@@ -43,7 +43,7 @@ private:
 	}
 
 private:
-	float	mouseWheel_;
+	float mouseWheel_;
 
 	const static int MAX_MOUSE_SYMBOLS = KeyId::MOUSE_LAST - KeyId::INPUT_MOUSE_BASE;
 	static InputSymbol*	Symbol_[MAX_MOUSE_SYMBOLS];

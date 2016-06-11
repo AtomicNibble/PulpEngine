@@ -75,4 +75,12 @@
       <Filter>Win32</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="BaseInput.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Win32Input.inl">
+      <Filter>Win32</Filter>
+    </None>
+  </ItemGroup>
 </Project>

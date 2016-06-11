@@ -104,22 +104,13 @@ struct InputState
 	}
 };
 
-struct InputDevice
-{
-	enum Enum
-	{
-		KEYBOARD,
-		MOUSE,
-		UNKNOWN = 0xff
-	};
-};
-
 struct InputDeviceType
 {
 	enum Enum
 	{
 		KEYBOARD,
 		MOUSE,
+		UNKNOWN
 	};
 };
 
@@ -316,7 +307,7 @@ struct InputEvent
 {
 	typedef Flags<ModifiersMasks> ModiferType;
 
-	InputDevice::Enum		deviceId;		// keyboard, mouse etc
+	InputDeviceType::Enum	deviceType;		// keyboard, mouse etc
 	InputState::Enum		action;			//
 	KeyId::Enum				keyId;			// id for the event.
 	ModiferType				modifiers;		// Key modifiers enabled at the time of this event.
@@ -327,7 +318,6 @@ struct InputEvent
 
 	InputEvent()
 	{
-		deviceId = InputDevice::UNKNOWN;
 		action = InputState::UNKNOWN;
 		keyId = KeyId::UNKNOWN;
 		modifiers = ModifiersMasks::NONE;
@@ -345,8 +335,11 @@ struct InputSymbol
 		Toggle
 	};
 
-	InputSymbol() : type(Button), value(0.f), state(InputState::UNKNOWN), keyId(KeyId::UNKNOWN),
-		deviceId(InputDevice::UNKNOWN)
+	InputSymbol() : 
+		type(Button), 
+		value(0.f), 
+		state(InputState::UNKNOWN), 
+		keyId(KeyId::UNKNOWN)
 	{}
 
 	InputSymbol(const KeyName& name_, Type type_ = Type::Button) :
@@ -364,7 +357,6 @@ struct InputSymbol
 		event.value = value;
 		event.name = name;
 		event.keyId = keyId;
-		event.deviceId = deviceId;
 	}
 
 
@@ -372,8 +364,8 @@ struct InputSymbol
 	Type					type;
 	KeyName					name;
 	KeyId::Enum				keyId;
-	InputDevice::Enum		deviceId;
 	InputState::Enum		state; // the state of the key, UP, DOWN
+	InputDeviceType::Enum	deviceType;
 	ModifiersMasks::Enum	modifer_mask; // if modifier has it's mask
 };
 
@@ -399,7 +391,6 @@ struct IInputDevice
 	virtual void ShutDown() X_ABSTRACT;
 
 	virtual const char* GetDeviceName() const X_ABSTRACT;
-	virtual InputDevice::Enum GetDeviceId() const X_ABSTRACT;
 	virtual int GetDeviceIndex() const X_ABSTRACT;
 
 	// Update.
@@ -416,82 +407,55 @@ struct IInputDevice
 };
 
 
-
-// Description:
-//	 Interface to the Input system.
-//	 The input system give access and initialize Keyboard,Mouse and Joystick SubSystems.
-// Summary:
-//	 Main Input system interface.
 struct IInput
 {
 	typedef Flags<ModifiersMasks> ModifierFlags;
 
 	virtual ~IInput(){}
 
-	// Summary:
-	//	 Registers new input events listener.
+	// Registers new input events listener.
 	virtual void AddEventListener(IInputEventListner *pListener) X_ABSTRACT;
 	virtual void RemoveEventListener(IInputEventListner *pListener) X_ABSTRACT;
 
-	// Description:
-	//	 Registers new console input event listeners. console input listeners receive all events, no matter what.
+	// Registers new console input event listeners. console input listeners receive all events, no matter what.
 	virtual void AddConsoleEventListener(IInputEventListner *pListener) X_ABSTRACT;
 	virtual void RemoveConsoleEventListener(IInputEventListner *pListener) X_ABSTRACT;
 
 	virtual bool AddInputDevice(IInputDevice* pDevice) X_ABSTRACT;
-	// Description:
-	//	 Registers an exclusive listener which has the ability to filter out events before they arrive at the normal
-	//	 listeners.
+
 	virtual void EnableEventPosting(bool bEnable) X_ABSTRACT;
-	virtual bool IsEventPostingEnabled() const X_ABSTRACT;
+	virtual bool IsEventPostingEnabled(void) const X_ABSTRACT;
 	virtual bool PostInputEvent(const InputEvent &event, bool bForce = false) X_ABSTRACT;
 
-	// Summary
-	//	 Initializes input system.
-	// Note:
-	//	 Required params should be passed through constructor
-	virtual bool	Init(void) X_ABSTRACT;
-	// Summary
-	//	 Post Initialization called at end of initialization
-	virtual void	PostInit(void) X_ABSTRACT;
-	// Description:
-	//	 Updates Keyboard, Mouse and Joystick. Sets bFocus to true if window has focus and input is enabled.
-	virtual void	Update(bool bFocus) X_ABSTRACT;
-	// Summary:
-	//	 Clears all subsystems.
-	virtual void	ShutDown(void) X_ABSTRACT;
-
+	virtual bool Init(void) X_ABSTRACT;
+	virtual void PostInit(void) X_ABSTRACT;
+	virtual void ShutDown(void) X_ABSTRACT;
 	virtual void release(void) X_ABSTRACT;
 
-	// Summary:
-	//	 Clears key states of all devices.
-	virtual void ClearKeyState() X_ABSTRACT;
+	// called with frame data and parent job calling, if you create jobs add them as children.
+	virtual void Update(core::V2::Job* pInputJob, core::FrameData& frameData) X_ABSTRACT;
 
-	// Summary:
-	//	 Re-triggers pressed keys. 
-	// Note:
-	//	 Used for transitioning action maps.
-	virtual void RetriggerKeyState() X_ABSTRACT;
 
-	// Summary:
-	//	 Gets if we are currently re-triggering. 
-	// Note:
-	//	 Needed to filter out actions.
-	virtual bool Retriggering() X_ABSTRACT;
+	virtual void ClearKeyState(void) X_ABSTRACT;
 
-	// Description:
-	//	 Queries to see if this machine has some kind of input device connected.
+	// Re-triggers pressed keys. 
+	virtual void RetriggerKeyState(void) X_ABSTRACT;
+
+	// true if currently re-triggering. 
+	virtual bool Retriggering(void) const X_ABSTRACT;
+
+	//	Queries to see if this machine has some kind of input device connected.
 	virtual bool HasInputDeviceOfType(InputDeviceType::Enum type) const X_ABSTRACT;
 
-	// Summary:
-	//	 Tells devices whether to report input or not.
-	virtual void EnableDevice(InputDevice::Enum deviceId, bool enable) X_ABSTRACT;
+	// Tells devices whether to report input or not.
+	virtual void EnableDevice(InputDeviceType::Enum type, bool enable) X_ABSTRACT;
 
-	virtual ModifierFlags GetModifiers() X_ABSTRACT;
+
+	virtual ModifierFlags GetModifiers(void) X_ABSTRACT;
 	virtual void SetModifiers(ModifierFlags flags) X_ABSTRACT;
 
-	virtual InputSymbol* DefineSymbol(InputDevice::Enum device, KeyId::Enum id_, const KeyName& name_, InputSymbol::Type type_ = InputSymbol::Type::Button, ModifiersMasks::Enum  mod_mask = ModifiersMasks::NONE) X_ABSTRACT;
-
+	virtual InputSymbol* DefineSymbol(InputDeviceType::Enum deviceType, KeyId::Enum id_, const KeyName& name_,
+		InputSymbol::Type type_ = InputSymbol::Type::Button, ModifiersMasks::Enum  mod_mask = ModifiersMasks::NONE) X_ABSTRACT;
 };
 
 

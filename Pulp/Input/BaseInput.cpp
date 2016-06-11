@@ -34,7 +34,7 @@ namespace {
 
 XBaseInput::XBaseInput() :
 	pCVars_(X_NEW(XInputCVars,g_InputArena,"InputCvars")),
-	Devices_(g_InputArena),
+	devices_(g_InputArena),
 	holdSymbols_(g_InputArena),
 	enableEventPosting_(true),
 	hasFocus_(false),
@@ -68,11 +68,12 @@ void XBaseInput::ShutDown()
 
 	gEnv->pCore->GetCoreEventDispatcher()->RemoveListener(this);
 
-	for (TInputDevices::Iterator i = Devices_.begin(); i != Devices_.end(); ++i)
-		(*i)->ShutDown();
+	for (TInputDevices::Iterator it = devices_.begin(); it != devices_.end(); ++it) {
+		(*it)->ShutDown();
+	}
 
-	std::for_each(Devices_.begin(), Devices_.end(), delete_ptr());
-	Devices_.clear();
+	std::for_each(devices_.begin(), devices_.end(), delete_ptr());
+	devices_.clear();
 
 
 	if (!Listners_.empty())
@@ -96,33 +97,26 @@ void XBaseInput::release(void)
 
 void XBaseInput::PostInit()
 {
-	for (TInputDevices::Iterator i = Devices_.begin(); i != Devices_.end(); ++i)
+	for (TInputDevices::Iterator it = devices_.begin(); it != devices_.end(); ++it)
 	{
-		(*i)->PostInit();
+		(*it)->PostInit();
 	}
 }
 
-void XBaseInput::Update(bool bFocus)
+void XBaseInput::Update(core::V2::Job* pInputJob, core::FrameData& frameData)
 {
-	hasFocus_ = bFocus;
+	X_UNUSED(pInputJob);
+
+	hasFocus_ = frameData.flags.IsSet(core::FrameFlag::HAS_FOCUS);
 
 	PostHoldEvents();
 
-	for (TInputDevices::Iterator i = Devices_.begin(); i != Devices_.end(); ++i)
+	for (TInputDevices::Iterator it = devices_.begin(); it != devices_.end(); ++it)
 	{
-		if ((*i)->IsEnabled()) {
-			(*i)->Update(bFocus);
+		if ((*it)->IsEnabled()) {
+			(*it)->Update(hasFocus_);
 		}
 	}
-
-	// send commit event after all input processing for this frame has finished
-	InputEvent event;
-	event.modifiers = modifiers_;
-	event.deviceId = InputDevice::UNKNOWN;
-	event.value = 0;
-	event.name = "final";
-	event.keyId = KeyId::UNKNOWN;
-	PostInputEvent(event);
 }
 
 
@@ -137,9 +131,9 @@ void XBaseInput::ClearKeyState()
 
 	modifiers_.Clear();
 
-	for (TInputDevices::Iterator i = Devices_.begin(); i != Devices_.end(); ++i)
+	for (TInputDevices::Iterator it = devices_.begin(); it != devices_.end(); ++it)
 	{
-		(*i)->ClearKeyState();
+		(*it)->ClearKeyState();
 	}
 
 	retriggering_ = false;
@@ -147,7 +141,7 @@ void XBaseInput::ClearKeyState()
 }
 
 
-void XBaseInput::RetriggerKeyState()
+void XBaseInput::RetriggerKeyState(void)
 {
 	retriggering_ = true;
 	InputEvent event;
@@ -197,7 +191,9 @@ void XBaseInput::AddConsoleEventListener(IInputEventListner *pListener)
 void XBaseInput::RemoveConsoleEventListener(IInputEventListner *pListener)
 {
 	TInputEventListeners::iterator it = std::find(consoleListeners_.begin(), consoleListeners_.end(), pListener);
-	if (it != consoleListeners_.end()) consoleListeners_.erase(it);
+	if (it != consoleListeners_.end()) {
+		consoleListeners_.erase(it);
+	}
 }
 
 
@@ -208,10 +204,10 @@ bool XBaseInput::AddInputDevice(IInputDevice* pDevice)
 	{
 		if (pDevice->Init())
 		{
-			Devices_.push_back(pDevice);
+			devices_.push_back(pDevice);
 			return true;
 		}
-		X_DELETE( pDevice, g_InputArena);
+		X_DELETE(pDevice, g_InputArena);
 	}
 	return false;
 }
@@ -225,7 +221,7 @@ void XBaseInput::EnableEventPosting(bool bEnable)
 	}
 }
 
-bool XBaseInput::IsEventPostingEnabled() const
+bool XBaseInput::IsEventPostingEnabled(void) const
 {
 	return enableEventPosting_;
 }
@@ -249,25 +245,31 @@ bool XBaseInput::PostInputEvent(const InputEvent &event, bool bForce)
 	return true;
 }
 
-void XBaseInput::EnableDevice(InputDevice::Enum deviceId, bool enable)
+void XBaseInput::EnableDevice(InputDeviceType::Enum deviceType, bool enable)
 {
-	if (deviceId < (int)Devices_.size())
+	for (TInputDevices::ConstIterator it = devices_.begin(); it != devices_.end(); ++it)
 	{
-		// try to flush the device ... perform a dry update
-		EnableEventPosting(false);
-		Devices_[deviceId]->Update(hasFocus_);
-		EnableEventPosting(true);
-		Devices_[deviceId]->Enable(enable);
+		if ((*it)->IsOfDeviceType(deviceType))
+		{
+			IInputDevice* pDevice = (*it);
+
+			EnableEventPosting(false);
+			pDevice->Update(hasFocus_);
+			EnableEventPosting(true);
+			pDevice->Enable(enable);
+			break;
+		}
 	}
 }
 
 
 bool XBaseInput::HasInputDeviceOfType(InputDeviceType::Enum type) const
 {
-	for (TInputDevices::ConstIterator i = Devices_.begin(); i != Devices_.end(); ++i)
+	for (TInputDevices::ConstIterator i = devices_.begin(); i != devices_.end(); ++i)
 	{
-		if ((*i)->IsOfDeviceType(type))
+		if ((*i)->IsOfDeviceType(type)) {
 			return true;
+		}
 	}
 	return false;
 }

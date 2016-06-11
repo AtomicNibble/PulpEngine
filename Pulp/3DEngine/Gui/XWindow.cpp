@@ -1652,7 +1652,7 @@ bool XWindow::OnInputEvent(const input::InputEvent& event)
 
 	if (visable_)
 	{
-		if (event.deviceId == InputDevice::MOUSE)
+		if (event.deviceType == InputDeviceType::MOUSE)
 		{
 			Childit it = children_.begin();
 

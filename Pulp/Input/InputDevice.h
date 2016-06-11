@@ -15,13 +15,14 @@ X_NAMESPACE_BEGIN(input)
 
 class XInputDevice : public IInputDevice
 {
+	typedef core::HashMap<KeyId::Enum, InputSymbol*> TIdToSymbolMap;
+
 public:
 	XInputDevice(IInput& input, const char* deviceName);
 	virtual ~XInputDevice() X_OVERRIDE;
 
 	// IInputDevice
 	virtual const char* GetDeviceName(void) const		X_OVERRIDE{ return deviceName_.c_str(); }
-	virtual InputDevice::Enum GetDeviceId(void) const	X_OVERRIDE{ return deviceId_; };
 	virtual bool Init(void)	X_OVERRIDE{ return true; }
 	virtual void PostInit(void) X_OVERRIDE{}
 	virtual void ShutDown(void) X_OVERRIDE{}
@@ -34,12 +35,12 @@ public:
 	// ~IInputDevice
 
 protected:
-	IInput& GetIInput(void) const	{ return input_; }
+	X_INLINE IInput& GetIInput(void) const { return input_; }
 
 	InputSymbol*				IdToSymbol(KeyId::Enum id) const;
 
 protected:
-	InputDevice::Enum			deviceId_;
+	InputDeviceType::Enum		deviceType_;
 	bool						enabled_;
 
 private:
@@ -47,9 +48,8 @@ private:
 	core::string				deviceName_;	// name of the device (used for input binding)
 
 private:
-	typedef core::HashMap<KeyId::Enum, InputSymbol*>		TIdToSymbolMap;
-
 	TIdToSymbolMap				idToInfo_;
+
 private:
 	X_NO_ASSIGN(XInputDevice);
 };

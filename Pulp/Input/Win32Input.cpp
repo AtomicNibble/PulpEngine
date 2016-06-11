@@ -8,31 +8,29 @@
 #include "InputDeviceWin32.h"
 
 #include <Util\LastError.h>
-
 #include "InputCVars.h"
+
+#include <Threading\JobSystem2.h>
 
 X_NAMESPACE_BEGIN(input)
 
 
-XWinInput* XWinInput::s_pThis = 0;
 
-XWinInput::XWinInput(ICore* pSystem, HWND hwnd) : XBaseInput()
+XWinInput::XWinInput(ICore* pSystem, HWND hWnd) :
+	XBaseInput(),
+	isWow64_(FALSE),
+	hWnd_(hWnd),
+	pKeyBoard_(nullptr),
+	pMouse_(nullptr),
+	pJobSystem_(nullptr)
 {
-	X_UNUSED(pSystem);
+	pJobSystem_ = pSystem->GetJobSystem();
 
-	X_ASSERT(s_pThis == nullptr, "Only one instance of XWinInput currently supported")(s_pThis);
-
-	isWow64_ = FALSE;
-	hwnd_ = hwnd;
-	prevWndProc_ = 0;
-	s_pThis = this;
-
-	Devices_.reserve(2);
+	devices_.reserve(2);
 };
 
 XWinInput::~XWinInput()
 {
-	s_pThis = nullptr;
 }
 
 
@@ -47,13 +45,17 @@ bool XWinInput::Init(void)
 		return false;
 	}
 
+	pKeyBoard_ = X_NEW_ALIGNED(XKeyboard, g_InputArena, "Keyboard", 8)(*this);
+	pMouse_ = X_NEW_ALIGNED(XMouse, g_InputArena, "Mouse", 8)(*this);
+
+
 	// o baby!
-	if (!AddInputDevice(X_NEW_ALIGNED(XKeyboard, g_InputArena, "Keyboard", 8)(*this))) {
+	if (!AddInputDevice(pKeyBoard_)) {
 		X_ERROR("Input", "Failed to add keyboard input device");
 		return false;
 	}
 
-	if (!AddInputDevice(X_NEW_ALIGNED(XMouse, g_InputArena, "Mouse", 8)(*this))) {
+	if (!AddInputDevice(pMouse_)) {
 		X_ERROR("Input", "Failed to add mouse input device");
 		return false;
 	}
@@ -63,55 +65,63 @@ bool XWinInput::Init(void)
 }
 
 
-bool XWinInput::AddInputDevice(IInputDevice* pDevice)
+
+void XWinInput::PostInit(void)
 {
-	X_UNUSED(pDevice);
-	return false;
-}
-bool XWinInput::AddInputDevice(XInputDeviceWin32* pDevice)
-{
-	return XBaseInput::AddInputDevice(pDevice);
+	XBaseInput::PostInit();
 }
 
 
-void XWinInput::Update(bool bFocus)
+void XWinInput::ShutDown(void)
+{
+	XBaseInput::ShutDown();
+}
+
+void XWinInput::release(void)
+{
+	X_DELETE(this, g_InputArena);
+}
+
+
+void XWinInput::Update(core::V2::Job* pInputJob, core::FrameData& frameData)
 {
 	X_PROFILE_BEGIN("Win32RawInput", core::ProfileSubSys::INPUT);
 
 	PostHoldEvents();
 
-	hasFocus_ = bFocus;
+	hasFocus_ = frameData.flags.IsSet(core::FrameFlag::HAS_FOCUS);
 
-	const size_t BufSize = 0x80;
-	const size_t HeaderSize = sizeof(RAWINPUTHEADER);
+	RAWINPUT X_ALIGNED_SYMBOL(input[BUF_NUM], 8);
 
-	RAWINPUT X_ALIGNED_SYMBOL(input[BufSize], 8);
 	UINT size;
 	UINT num;
+
+	const bool debug = (g_pInputCVars->input_debug > 1);
 
 	for (;;)
 	{
 		size = sizeof(input);
+		num = GetRawInputBuffer(input, &size, static_cast<UINT>(ENTRY_HDR_SIZE));
 
-		num = GetRawInputBuffer(input, &size, HeaderSize);
-
-		if (num == 0)
+		if (num == 0) {
 			break;
+		}
 
-		if (g_pInputCVars->input_debug > 1)
-		{
+		if (debug) {
 			X_LOG0("Input", "Buffer size: %i", num);
 		}
 			
-		if (num == (UINT)-1)
-		{
+		if (num == static_cast<UINT>(-1)) {
 			core::lastError::Description Dsc;
 			X_ERROR("Input", "Failed to get input. Error: %s", core::lastError::ToString(Dsc));
 			break;
 		}
 
-		PRAWINPUT rawInput = input;
+		// now lets create jobs for each.
+		core::V2::JobSystem& jobSys = *pJobSystem_;
+		core::V2::Job* pJob = nullptr;
 
+		PRAWINPUT rawInput = input;
 		for (UINT i = 0; i < num; ++i)
 		{
 			const uint8_t* pData = reinterpret_cast<const uint8_t*>(&rawInput->data);
@@ -120,79 +130,75 @@ void XWinInput::Update(bool bFocus)
 				pData += 8;
 			}
 
-			for (TInputDevices::Iterator it = Devices_.begin(); it != Devices_.end(); ++it)
+			if (rawInput->header.dwType == RIM_TYPEKEYBOARD)
 			{
-				XInputDeviceWin32* pDevice = (XInputDeviceWin32*)(*it	);
-				if (pDevice->IsEnabled())
-				{
-					pDevice->ProcessInput(rawInput->header, pData);
-				}
+				const RAWMOUSE& mouseData = *reinterpret_cast<const RAWMOUSE*>(pData);
+
+				pJob = jobSys.CreateMemberJobAsChild<XWinInput>(pInputJob, this, &XWinInput::Job_ProcessMouseEvents, mouseData);
+				jobSys.Run(pJob);
+			}
+			else if(rawInput->header.dwType == RIM_TYPEMOUSE)
+			{
+				const RAWKEYBOARD& keyboardData = *reinterpret_cast<const RAWKEYBOARD*>(pData);
+
+				pJob = jobSys.CreateMemberJobAsChild<XWinInput>(pInputJob, this, &XWinInput::Job_ProcessKeyboardEvents, keyboardData);
+				jobSys.Run(pJob);
 			}
 
 			rawInput = NEXTRAWINPUTBLOCK(rawInput);
 		}
-		// to clean the buffer
-		// DefRawInputProc(&pInput, num, sizeof(RAWINPUTHEADER));
-	}
 
-
-	// send commit event after all input processing for this frame has finished
-	InputEvent event;
-	event.modifiers = modifiers_;
-	event.deviceId = InputDevice::UNKNOWN;
-	event.value = 0;
-	event.name = "final";
-	event.keyId = KeyId::UNKNOWN;
-	PostInputEvent(event);
-
-	if (g_pInputCVars->input_debug > 1)
-	{
-	//	X_LOG0("Input", "-- Frame --");
+		// since we make copyies of the data for each job.
+		// we don't need to wait before asking GetRawInputBuffer again and reusing 'input'
+		// we can also leave this function after since all the job's are children and must complete
+		// before the base inoput job will be marked as completed.
 	}
 }
 
-
-void XWinInput::ShutDown(void)
-{
-	XBaseInput::ShutDown();
-
-
-}
-
-void XWinInput::release(void)
-{
-	X_DELETE(this, g_InputArena);
-}
 
 void XWinInput::ClearKeyState()
 {
 	XBaseInput::ClearKeyState();
+}
+
+
+bool XWinInput::AddInputDevice(IInputDevice* pDevice)
+{
+	X_UNUSED(pDevice);
+	return false;
+}
+
+bool XWinInput::AddInputDevice(XInputDeviceWin32* pDevice)
+{
+	return XBaseInput::AddInputDevice(pDevice);
+}
+
+
+void XWinInput::Job_ProcessMouseEvents(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+{
+	X_ASSERT_NOT_NULL(pMouse_);
+	X_ASSERT_NOT_NULL(pData);
+	X_UNUSED(jobSys);
+	X_UNUSED(threadIdx);
+	X_UNUSED(pJob);
+
+//	const RAWMOUSE& mouseData = *reinterpret_cast<const RAWMOUSE*>(pData);
 
 
 
 }
 
-
-// reroute to instance function
-LRESULT CALLBACK XWinInput::InputWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+void XWinInput::Job_ProcessKeyboardEvents(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
 {
-	return s_pThis->OnInputWndProc(hWnd, message, wParam, lParam);
-}
+	X_ASSERT_NOT_NULL(pKeyBoard_);
+	X_ASSERT_NOT_NULL(pData);
+	X_UNUSED(jobSys);
+	X_UNUSED(threadIdx);
+	X_UNUSED(pJob);
 
-LRESULT XWinInput::OnInputWndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
-{
-	if (message == WM_INPUT)
-	{
-		// message filter must filter them like so:
-		// while (PeekMessage (&amp;msg, NULL, WM_INPUT + 1, 0xffffffff, PM_REMOVE)
-		X_ERROR("Window", "Window is reciving WM_INPUT messages, need to be filterd for input systems.");
-	}
-	else if (message == WM_CHAR)
-	{
+//	const RAWKEYBOARD& keyboardData = *reinterpret_cast<const RAWKEYBOARD*>(pData);
 
-	}
 
-	return ::CallWindowProc(prevWndProc_, hWnd, message, wParam, lParam);
 }
 
 

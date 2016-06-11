@@ -60,9 +60,10 @@ void XNullInput::PostInit(void)
 
 }
 
-void XNullInput::Update(bool bFocus)
+void XNullInput::Update(core::V2::Job* pInputJob, core::FrameData& frameData)
 {
-	X_UNUSED(bFocus);
+	X_UNUSED(pInputJob);
+	X_UNUSED(frameData);
 }
 
 void XNullInput::ShutDown(void)
@@ -88,21 +89,21 @@ void XNullInput::RetriggerKeyState(void)
 
 }
 
-bool XNullInput::Retriggering(void)
+bool XNullInput::Retriggering(void) const
 { 
 	return false;
 }
 
 
-bool XNullInput::HasInputDeviceOfType(InputDeviceType::Enum type) const
+bool XNullInput::HasInputDeviceOfType(InputDeviceType::Enum deviceType) const
 { 
-	X_UNUSED(type);
+	X_UNUSED(deviceType);
 	return false; 
 }
 
-void XNullInput::EnableDevice(InputDevice::Enum deviceId, bool enable)
+void XNullInput::EnableDevice(InputDeviceType::Enum deviceType, bool enable)
 {
-	X_UNUSED(deviceId);
+	X_UNUSED(deviceType);
 	X_UNUSED(enable);
 }
 
@@ -116,10 +117,10 @@ void XNullInput::SetModifiers(ModifierFlags flags)
 	X_UNUSED(flags);
 }
 
-InputSymbol* XNullInput::DefineSymbol(InputDevice::Enum device, KeyId::Enum id_, const KeyName& name_,
+InputSymbol* XNullInput::DefineSymbol(InputDeviceType::Enum deviceType, KeyId::Enum id_, const KeyName& name_,
 InputSymbol::Type type_, ModifiersMasks::Enum mod_mask)
 {
-	X_UNUSED(device);
+	X_UNUSED(deviceType);
 	X_UNUSED(id_);
 	X_UNUSED(name_);
 	X_UNUSED(type_);

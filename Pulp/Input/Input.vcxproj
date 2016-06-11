@@ -367,6 +367,10 @@
     </ClCompile>
     <ClCompile Include="Win32Input.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="BaseInput.inl" />
+    <None Include="Win32Input.inl" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

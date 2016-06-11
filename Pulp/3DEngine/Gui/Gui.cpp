@@ -74,7 +74,7 @@ const char* XGui::Activate(bool activate, int time)
 
 bool XGui::OnInputEvent(const input::InputEvent& event)
 {
-	if (event.deviceId == InputDevice::MOUSE)
+	if (event.deviceType == InputDeviceType::MOUSE)
 	{
 		if (event.action == InputState::CHANGED)
 		{
