@@ -24,7 +24,7 @@ XMouse::~XMouse()
 
 
 ///////////////////////////////////////////
-bool XMouse::Init()
+bool XMouse::Init(void)
 {
 	X_ASSERT_NOT_NULL(g_pInputCVars);
 
@@ -84,7 +84,7 @@ bool XMouse::Init()
 	return res;
 }
 
-void XMouse::ShutDown()
+void XMouse::ShutDown(void)
 {
 	RAWINPUTDEVICE Mouse;
 	Mouse.hwndTarget = 0;
