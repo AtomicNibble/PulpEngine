@@ -5,7 +5,7 @@
 #include <IEngineModule.h>
 
 #include "BaseInput.h"
-#include "Win32Input.h"
+#include "win32/Win32Input.h"
 
 #include <Extension\XExtensionMacros.h>
 
