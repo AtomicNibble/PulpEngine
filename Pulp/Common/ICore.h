@@ -329,35 +329,29 @@ struct ICore
 
 	virtual bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_ABSTRACT;
 
-	virtual IPotatoFactoryRegistry* GetFactoryRegistry() const X_ABSTRACT;
+	virtual IPotatoFactoryRegistry* GetFactoryRegistry(void) const X_ABSTRACT;
 
+	virtual SCoreGlobals* GetGlobalEnv(void) X_ABSTRACT;
+	virtual core::MallocFreeAllocator* GetGlobalMalloc(void) X_ABSTRACT;
 
-	virtual SCoreGlobals* GetGlobalEnv() X_ABSTRACT;
-	virtual core::MallocFreeAllocator* GetGlobalMalloc() X_ABSTRACT;
-
-	virtual core::ITimer		*GetITimer() X_ABSTRACT;
-	virtual input::IInput		*GetIInput() X_ABSTRACT;
-	virtual core::IConsole		*GetIConsole() X_ABSTRACT;
-	virtual core::IFileSys		*GetIFileSys() X_ABSTRACT;
-	virtual sound::ISound		*GetISound() X_ABSTRACT;
-	virtual script::IScriptSys  *GetISscriptSys() X_ABSTRACT;
-	virtual render::IRender		*GetIRender() X_ABSTRACT;
-	virtual font::IXFontSys		*GetIFontSys() X_ABSTRACT;
-	virtual core::V2::JobSystem	*GetJobSystem() X_ABSTRACT;
-	virtual physics::IPhysics*	 GetPhysics() X_ABSTRACT;
-
-	virtual core::IProfileSys	*GetIProfileSys() X_ABSTRACT;
-	virtual core::ILog			*GetILog() X_ABSTRACT;
-	virtual core::IXDirectoryWatcher *GetDirWatcher() X_ABSTRACT;
-
-	virtual core::IXHotReloadManager*   GetHotReloadMan() X_ABSTRACT;
-	virtual ICoreEventDispatcher* GetCoreEventDispatcher() X_ABSTRACT;
-
-	virtual core::Crc32			*GetCrc32() X_ABSTRACT;
-	virtual core::CpuInfo		*GetCPUInfo() X_ABSTRACT;
-
-	virtual core::xWindow* GetGameWindow() X_ABSTRACT;
-
+	virtual core::ITimer* GetITimer(void) X_ABSTRACT;
+	virtual input::IInput* GetIInput(void) X_ABSTRACT;
+	virtual core::IConsole* GetIConsole(void) X_ABSTRACT;
+	virtual core::IFileSys* GetIFileSys(void) X_ABSTRACT;
+	virtual sound::ISound* GetISound(void) X_ABSTRACT;
+	virtual script::IScriptSys* GetISscriptSys(void) X_ABSTRACT;
+	virtual render::IRender* GetIRender(void) X_ABSTRACT;
+	virtual font::IXFontSys* GetIFontSys(void) X_ABSTRACT;
+	virtual core::V2::JobSystem* GetJobSystem(void) X_ABSTRACT;
+	virtual physics::IPhysics* GetPhysics(void) X_ABSTRACT;
+	virtual core::IProfileSys* GetIProfileSys(void) X_ABSTRACT;
+	virtual core::ILog* GetILog(void) X_ABSTRACT;
+	virtual core::IXDirectoryWatcher* GetDirWatcher(void) X_ABSTRACT;
+	virtual core::IXHotReloadManager* GetHotReloadMan(void) X_ABSTRACT;
+	virtual ICoreEventDispatcher* GetCoreEventDispatcher(void) X_ABSTRACT;
+	virtual core::Crc32* GetCrc32(void) X_ABSTRACT;
+	virtual core::CpuInfo* GetCPUInfo(void) X_ABSTRACT;
+	virtual core::xWindow* GetGameWindow(void) X_ABSTRACT;
 
 	// ~Assert
 	virtual void RegisterAssertHandler(IAssertHandler* errorHandler) X_ABSTRACT;
