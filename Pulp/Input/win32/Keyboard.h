@@ -17,20 +17,18 @@ public:
 	~XKeyboard() X_OVERRIDE;
 
 	// IInputDevice overrides
-	virtual int GetDeviceIndex() const X_OVERRIDE { return 0; }	// Assume only one keyboard
-	virtual bool Init() X_OVERRIDE;
-	virtual void ShutDown() X_OVERRIDE;
-	virtual void Update(bool bFocus) X_OVERRIDE;
-	virtual void ClearKeyState() X_OVERRIDE;
-	virtual bool IsOfDeviceType(InputDeviceType::Enum type) const X_OVERRIDE{ 
-		return type == InputDeviceType::KEYBOARD; 
-	}
+	X_INLINE int GetDeviceIndex(void) const X_OVERRIDE;
+	bool Init(void) X_OVERRIDE;
+	void ShutDown(void) X_OVERRIDE;
+	void Update(bool bFocus) X_OVERRIDE;
+	void ClearKeyState(void) X_OVERRIDE;
+	X_INLINE bool IsOfDeviceType(InputDeviceType::Enum type) const X_OVERRIDE;
 	// ~IInputDevice
 
 	void ProcessInput(const RAWINPUTHEADER& header, const uint8_t* pData);
 
 private:
-	void initAsciiCache();
+	void initAsciiCache(void);
 
 	char Event2Char(const InputEvent& event);
 	inline bool IsCHAR(const InputEvent& event);
@@ -57,5 +55,7 @@ private:
 
 
 X_NAMESPACE_END
+
+#include "Keyboard.inl"
 
 #endif // !_X_KEYBOARD_DEVICE_H_

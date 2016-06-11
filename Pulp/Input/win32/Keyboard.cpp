@@ -22,7 +22,7 @@ namespace
 		else
 			return 0;
 	}
-}
+} // namespace
 
 
 #define ASSCI_CACHE_TABLE 1
@@ -42,7 +42,7 @@ XKeyboard::~XKeyboard()
 }
 
 ///////////////////////////////////////////
-bool XKeyboard::Init()
+bool XKeyboard::Init(void)
 {
 	RAWINPUTDEVICE Keyboard;
 	Keyboard.hwndTarget = 0;
@@ -201,7 +201,7 @@ bool XKeyboard::Init()
 	return res;
 }
 
-void XKeyboard::initAsciiCache()
+void XKeyboard::initAsciiCache(void)
 {
 	// ascii_cache
 	core::zero_object(ascii_cache);
@@ -244,7 +244,7 @@ void XKeyboard::initAsciiCache()
 
 }
 
-void XKeyboard::ShutDown()
+void XKeyboard::ShutDown(void)
 {
 	RAWINPUTDEVICE Keyboard;
 	Keyboard.hwndTarget = 0;
@@ -604,7 +604,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb)
 }
 
 //////////////////////////////////////////////////////////////////////////
-void XKeyboard::ClearKeyState()
+void XKeyboard::ClearKeyState(void)
 {
 	IInput& input = GetIInput();
 
