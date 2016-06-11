@@ -26,7 +26,7 @@ public:
 	X_INLINE bool IsOfDeviceType(InputDeviceType::Enum type) const X_OVERRIDE;
 	// ~IInputDevice
 
-	void ProcessInput(const RAWINPUTHEADER& header, const uint8_t* pData);
+	void ProcessInput(const uint8_t* pData);
 
 private:
 	void PostEvent(InputSymbol* pSymbol);

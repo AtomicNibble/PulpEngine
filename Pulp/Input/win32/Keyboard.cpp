@@ -351,13 +351,11 @@ void XKeyboard::Update(bool focus)
 	X_UNUSED(focus);
 }
 
-void XKeyboard::ProcessInput(const RAWINPUTHEADER& header, const uint8_t* pData)
+void XKeyboard::ProcessInput(const uint8_t* pData)
 {
-	if (header.dwType == RIM_TYPEKEYBOARD)
-	{
-		const RAWKEYBOARD* pKeyboard = reinterpret_cast<const RAWKEYBOARD*>(pData);
-		ProcessKeyboardData(*pKeyboard);
-	}
+	const RAWKEYBOARD& RawKb = *reinterpret_cast<const RAWKEYBOARD*>(pData);
+
+	ProcessKeyboardData(RawKb);
 }
 
 void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb)

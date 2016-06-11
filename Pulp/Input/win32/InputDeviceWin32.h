@@ -21,7 +21,7 @@ public:
 
 
 	virtual void Update(bool focus)X_OVERRIDE;
-	virtual void ProcessInput(const RAWINPUTHEADER& header, const uint8_t* pData) X_ABSTRACT;
+	virtual void ProcessInput(const uint8_t* pData) X_ABSTRACT;
 	virtual void ShutDown(void) X_ABSTRACT;
 
 	// ~IInputDevice

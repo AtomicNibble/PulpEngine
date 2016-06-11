@@ -106,13 +106,10 @@ void XMouse::Update(bool focus)
 	X_UNUSED(focus);
 }
 
-void XMouse::ProcessInput(const RAWINPUTHEADER& header, const uint8_t* pData)
+void XMouse::ProcessInput(const uint8_t* pData)
 {
-	if (header.dwType == RIM_TYPEMOUSE)
-	{
-		const RAWMOUSE* pMouse = reinterpret_cast<const RAWMOUSE*>(pData);
-		ProcessMouseData(*pMouse);
-	}
+	const RAWMOUSE& mouse = *reinterpret_cast<const RAWMOUSE*>(pData);
+	ProcessMouseData(mouse);
 }
 
 
