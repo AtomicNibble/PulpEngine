@@ -86,6 +86,8 @@ void XWinInput::release(void)
 void XWinInput::Update(core::V2::Job* pInputJob, core::FrameData& frameData)
 {
 	X_PROFILE_BEGIN("Win32RawInput", core::ProfileSubSys::INPUT);
+	X_ASSERT_NOT_NULL(pMouse_);
+	X_ASSERT_NOT_NULL(pKeyBoard_);
 
 	PostHoldEvents();
 
@@ -97,6 +99,8 @@ void XWinInput::Update(core::V2::Job* pInputJob, core::FrameData& frameData)
 	UINT num;
 
 	const bool debug = (g_pInputCVars->input_debug > 1);
+	const bool mouseEnabled = pMouse_->IsEnabled();
+	const bool keyboardEnabled = pKeyBoard_->IsEnabled();
 
 	for (;;)
 	{
@@ -130,14 +134,14 @@ void XWinInput::Update(core::V2::Job* pInputJob, core::FrameData& frameData)
 				pData += 8;
 			}
 
-			if (rawInput->header.dwType == RIM_TYPEKEYBOARD)
+			if (rawInput->header.dwType == RIM_TYPEKEYBOARD && keyboardEnabled)
 			{
 				const RAWMOUSE& mouseData = *reinterpret_cast<const RAWMOUSE*>(pData);
 
 				pJob = jobSys.CreateMemberJobAsChild<XWinInput>(pInputJob, this, &XWinInput::Job_ProcessMouseEvents, mouseData);
 				jobSys.Run(pJob);
 			}
-			else if(rawInput->header.dwType == RIM_TYPEMOUSE)
+			else if(rawInput->header.dwType == RIM_TYPEMOUSE && mouseEnabled)
 			{
 				const RAWKEYBOARD& keyboardData = *reinterpret_cast<const RAWKEYBOARD*>(pData);
 
