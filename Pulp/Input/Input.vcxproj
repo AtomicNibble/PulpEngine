@@ -338,21 +338,18 @@
     <ClInclude Include="BaseInput.h" />
     <ClInclude Include="InputCVars.h" />
     <ClInclude Include="InputDevice.h" />
-    <ClInclude Include="InputDeviceWin32.h" />
     <ClInclude Include="IPInput.h" />
-    <ClInclude Include="Keyboard.h" />
-    <ClInclude Include="Mouse.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Win32Input.h" />
+    <ClInclude Include="win32\InputDeviceWin32.h" />
+    <ClInclude Include="win32\Keyboard.h" />
+    <ClInclude Include="win32\Mouse.h" />
+    <ClInclude Include="win32\Win32Input.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BaseInput.cpp" />
     <ClCompile Include="InputCVars.cpp" />
     <ClCompile Include="InputDevice.cpp" />
-    <ClCompile Include="InputDeviceWin32.cpp" />
     <ClCompile Include="IPInput.cpp" />
-    <ClCompile Include="Keyboard.cpp" />
-    <ClCompile Include="Mouse.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>
@@ -365,11 +362,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Win32Input.cpp" />
+    <ClCompile Include="win32\InputDeviceWin32.cpp" />
+    <ClCompile Include="win32\Keyboard.cpp" />
+    <ClCompile Include="win32\Mouse.cpp" />
+    <ClCompile Include="win32\Win32Input.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="BaseInput.inl" />
-    <None Include="Win32Input.inl" />
+    <None Include="win32\Win32Input.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

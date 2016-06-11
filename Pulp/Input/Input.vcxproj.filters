@@ -13,8 +13,11 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Win32">
-      <UniqueIdentifier>{4253da1b-a726-4402-80ec-2adfcb604325}</UniqueIdentifier>
+    <Filter Include="Header Files\win32">
+      <UniqueIdentifier>{53426f87-cf67-4231-82ee-d970b2300c87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\win32">
+      <UniqueIdentifier>{31bf5c31-32f1-4c43-b82b-5d2c5f4fdaa6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -30,20 +33,20 @@
     <ClInclude Include="BaseInput.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Mouse.h">
-      <Filter>Win32</Filter>
-    </ClInclude>
-    <ClInclude Include="Keyboard.h">
-      <Filter>Win32</Filter>
-    </ClInclude>
     <ClInclude Include="InputDevice.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="InputDeviceWin32.h">
-      <Filter>Win32</Filter>
+    <ClInclude Include="win32\InputDeviceWin32.h">
+      <Filter>Header Files\win32</Filter>
     </ClInclude>
-    <ClInclude Include="Win32Input.h">
-      <Filter>Win32</Filter>
+    <ClInclude Include="win32\Keyboard.h">
+      <Filter>Header Files\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\Mouse.h">
+      <Filter>Header Files\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="win32\Win32Input.h">
+      <Filter>Header Files\win32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -59,28 +62,28 @@
     <ClCompile Include="BaseInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Win32Input.cpp">
-      <Filter>Win32</Filter>
-    </ClCompile>
-    <ClCompile Include="Mouse.cpp">
-      <Filter>Win32</Filter>
-    </ClCompile>
-    <ClCompile Include="Keyboard.cpp">
-      <Filter>Win32</Filter>
-    </ClCompile>
     <ClCompile Include="InputDevice.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="InputDeviceWin32.cpp">
-      <Filter>Win32</Filter>
+    <ClCompile Include="win32\InputDeviceWin32.cpp">
+      <Filter>Source Files\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\Keyboard.cpp">
+      <Filter>Source Files\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\Mouse.cpp">
+      <Filter>Source Files\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="win32\Win32Input.cpp">
+      <Filter>Source Files\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="BaseInput.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="Win32Input.inl">
-      <Filter>Win32</Filter>
+    <None Include="win32\Win32Input.inl">
+      <Filter>Header Files\win32</Filter>
     </None>
   </ItemGroup>
 </Project>
