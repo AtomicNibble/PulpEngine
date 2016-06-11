@@ -80,6 +80,9 @@ XCore::XCore() :
 	pEventDispatcher_ = X_NEW( core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch");
 	pEventDispatcher_->RegisterListener(this);
 
+#if X_DEBUG
+	env_.initComplete_ = false;
+#endif // !X_DEBUG
 	env_.pCore = this;
 	env_.pTimer = &time_;
 	env_.pDirWatcher = &dirWatcher_;

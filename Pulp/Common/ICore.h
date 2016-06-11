@@ -244,7 +244,7 @@ struct SCoreInitParams
 };
 
 
-struct SCoreGlobals
+struct SCoreGlobals // obbject is zerod on start.
 {
 	ICore*						pCore;
 	input::IInput*				pInput;
@@ -277,12 +277,17 @@ struct SCoreGlobals
 	pProfileScopeCall			profileScopeStart;
 	pProfileScopeCall			profileScopeEnd;
 
+#if X_DEBUG
+	X_INLINE const bool IsPostInit(void) const {
+		return initComplete_;
+	}
+#endif // !X_DEBUG
 
 	X_INLINE const bool IsClient(void) const {
 		return client_;
 	}
 
-	X_INLINE const bool IsDedicated() const
+	X_INLINE const bool IsDedicated(void) const
 	{
 #if defined(X_DEDICATED_SERVER)
 		return true;
@@ -302,6 +307,10 @@ protected:
 	bool client_;
 	bool dedicated_;			// Engine is in dedicated 
 	bool profilerEnabled_;
+
+#if X_DEBUG
+	bool initComplete_; // set after init has finished.
+#endif // !X_DEBUG
 };
 
 

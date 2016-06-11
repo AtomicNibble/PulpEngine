@@ -418,6 +418,9 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 	X_LOG1("Core", "Core startup: ^6%gms", time.GetMilliSeconds());
 
+#if X_DEBUG
+
+#endif // !X_DEBUG
 	return true;
 }
 
