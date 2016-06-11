@@ -22,6 +22,8 @@ X_USING_NAMESPACE;
 
 bool XCore::RunGameLoop(void)
 {
+	X_ASSERT(env_.initComplete_, "Game loop called without startup been completed successfully")(env_.initComplete_);
+
 	while (PumpMessages())
 	{
 		X_PROFILE_BEGIN("GameLoop", core::ProfileSubSys::GAME);
@@ -86,7 +88,50 @@ bool XCore::Update(void)
 
 
 
+	if (env_.pGame) {
+		env_.pGame->Update();
+	}
 
+	if (env_.p3DEngine) {
+		env_.p3DEngine->Update();
+	}
+
+	if (env_.pConsole) {
+		env_.pConsole->OnFrameBegin();
+	}
+
+	if (env_.pSound) {
+		env_.pSound->Update();
+	}
+
+	if (env_.pScriptSys){
+		env_.pScriptSys->Update();
+	}
+
+
+	static core::TimeVal start = time_.GetAsyncTime();
+	core::TimeVal time = time_.GetAsyncTime();
+
+	float val = time.GetDifferenceInSeconds(start);
+	if (val >= 0.95f)
+	{
+		start = time;
+
+		float fps = time_.GetFrameRate();
+		float frametime = time_.GetFrameTime();
+
+		core::StackString<128> title;
+		title.clear();
+		title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%i, %ims) Time: %I64u(x%g) UI: %I64u",
+			static_cast<int>(fps),
+			static_cast<int>(frametime * 1000.f),
+			static_cast<__int64>(time_.GetFrameStartTime(core::ITimer::Timer::GAME).GetMilliSeconds()),
+			time_.GetTimeScale(),
+			static_cast<__int64>(time_.GetFrameStartTime(core::ITimer::Timer::UI).GetMilliSeconds())
+		);
+
+		pWindow_->SetTitle(title.c_str());
+	}
 
 	int goat = 0;
 	goat = 2;
