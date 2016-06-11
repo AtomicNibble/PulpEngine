@@ -277,11 +277,11 @@ struct SCoreGlobals // obbject is zerod on start.
 	pProfileScopeCall			profileScopeStart;
 	pProfileScopeCall			profileScopeEnd;
 
-#if X_DEBUG
+#if X_ENABLE_ASSERTIONS
 	X_INLINE const bool IsPostInit(void) const {
 		return initComplete_;
 	}
-#endif // !X_DEBUG
+#endif // !X_ENABLE_ASSERTIONS
 
 	X_INLINE const bool IsClient(void) const {
 		return client_;
@@ -308,9 +308,9 @@ protected:
 	bool dedicated_;			// Engine is in dedicated 
 	bool profilerEnabled_;
 
-#if X_DEBUG
+#if X_ENABLE_ASSERTIONS
 	bool initComplete_; // set after init has finished.
-#endif // !X_DEBUG
+#endif // !X_ENABLE_ASSERTIONS
 };
 
 
