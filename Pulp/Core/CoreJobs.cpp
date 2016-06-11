@@ -3,6 +3,9 @@
 
 #include <Threading\JobSystem2.h>
 
+#include <IInput.h>
+#include <IFrameData.h>
+
 namespace
 {
 	struct FileChangeJobData
@@ -66,6 +69,25 @@ void XCore::Job_OnFileChange(core::V2::JobSystem& jobSys, size_t threadIdx,
 
 	X_DELETE(pData, g_coreArena);
 }
+
+
+void XCore::Job_ProcessInput(core::V2::JobSystem& jobSys, size_t threadIdx,
+	core::V2::Job* pJob, void* pData)
+{
+	X_UNUSED(jobSys);
+	X_UNUSED(threadIdx);
+	X_UNUSED(pJob);
+
+	// we can't really turns this into lots of jobs since the order of input is important.
+	// we can do it per a device tho.
+	core::FrameData& frameData = *reinterpret_cast<core::FrameData*>(pData);
+
+	if (env_.pInput) {
+		env_.pInput->Update(pJob, frameData);
+	}
+}
+
+
 
 // XDirectoryWatcherListener
 
