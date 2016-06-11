@@ -412,7 +412,8 @@ const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
 // IXHotReloadManager
 bool XCore::addfileType(core::IXHotReload* pHotReload, const char* extension)
 {
-//	X_ASSERT_NOT_NULL(pHotReload);
+	X_ASSERT(env_.IsPostInit(), "File types must be registerd during startup")(env_.IsPostInit());
+
 	X_ASSERT_NOT_NULL(extension);
 	
 	if (core::strUtil::Find(extension, '.')) {
