@@ -346,9 +346,14 @@ public:
 
 	X_INLINE void AddContinuation(Job* ancestor, Job* continuation, bool runInline = false);
 
+	// empty job used for sync.
+	X_INLINE static void EmptyJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+
 	void Run(Job* pJob);
 	void Wait(Job* pJob);
 	void WaitWithoutHelp(Job* pJob) const;
+
+
 
 private:
 	Job* AllocateJob(void);
