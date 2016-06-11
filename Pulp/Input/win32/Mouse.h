@@ -11,19 +11,19 @@ class XWinInput;
 
 class XMouse : public XInputDeviceWin32
 {
+	const static int MAX_MOUSE_SYMBOLS = KeyId::MOUSE_LAST - KeyId::INPUT_MOUSE_BASE;
+
 public:
 	XMouse(XWinInput& input);
 	~XMouse() X_OVERRIDE;
 
 	// IInputDevice overrides
-	virtual int GetDeviceIndex() const X_OVERRIDE{ return 0; }	//Assume only one device of this type
-	virtual bool Init(void) X_OVERRIDE;
-	virtual void ShutDown(void) X_OVERRIDE;
-	virtual void Update(bool bFocus) X_OVERRIDE;
-	virtual bool SetExclusiveMode(bool value) X_OVERRIDE;
-	virtual bool IsOfDeviceType(InputDeviceType::Enum type) const X_OVERRIDE {
-		return type == InputDeviceType::MOUSE; 
-	}
+	X_INLINE int32_t GetDeviceIndex() const X_OVERRIDE; 
+	bool Init(void) X_OVERRIDE;
+	void ShutDown(void) X_OVERRIDE;
+	void Update(bool bFocus) X_OVERRIDE;
+	bool SetExclusiveMode(bool value) X_OVERRIDE;
+	X_INLINE bool IsOfDeviceType(InputDeviceType::Enum type) const X_OVERRIDE;
 	// ~IInputDevice
 
 	void ProcessInput(const RAWINPUTHEADER& header, const uint8_t* pData);
@@ -37,15 +37,10 @@ private:
 
 	void ProcessMouseData(const RAWMOUSE& mouse);
 
-	InputSymbol* GetSymbol(KeyId::Enum id)
-	{
-		return Symbol_[id - KeyId::INPUT_MOUSE_BASE];
-	}
+	X_INLINE InputSymbol* GetSymbol(KeyId::Enum id);
 
 private:
 	float mouseWheel_;
-
-	const static int MAX_MOUSE_SYMBOLS = KeyId::MOUSE_LAST - KeyId::INPUT_MOUSE_BASE;
 	static InputSymbol*	Symbol_[MAX_MOUSE_SYMBOLS];
 
 private:
@@ -53,8 +48,8 @@ private:
 	X_NO_COPY(XMouse);
 };
 
-
-
 X_NAMESPACE_END
+
+#include "Mouse.inl"
 
 #endif // !_X_MOUSE_DEVICE_H_

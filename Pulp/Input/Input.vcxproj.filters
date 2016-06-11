@@ -85,5 +85,8 @@
     <None Include="win32\Win32Input.inl">
       <Filter>Header Files\win32</Filter>
     </None>
+    <None Include="win32\Mouse.inl">
+      <Filter>Header Files\win32</Filter>
+    </None>
   </ItemGroup>
 </Project>
