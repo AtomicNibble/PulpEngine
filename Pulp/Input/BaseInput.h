@@ -100,6 +100,10 @@ protected:
 	ModifierFlags						modifiers_;	// caps ALT, SHIFT etc.
 
 	InputSymbol InputSymbols_[input::KeyId::MOUSE_LAST];
+
+private:
+	X_NO_ASSIGN(XBaseInput);
+	X_NO_COPY(XBaseInput);
 };
 
 
