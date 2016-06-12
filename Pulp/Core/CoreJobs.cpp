@@ -88,6 +88,45 @@ void XCore::Job_ProcessInput(core::V2::JobSystem& jobSys, size_t threadIdx,
 }
 
 
+void XCore::Job_PostInputFrame(core::V2::JobSystem& jobSys, size_t threadIdx,
+	core::V2::Job* pJob, void* pData)
+{
+	X_UNUSED(jobSys);
+	X_UNUSED(threadIdx);
+	X_UNUSED(pJob);
+
+	// we can't really turns this into lots of jobs since the order of input is important.
+	// we can do it per a device tho.
+	core::FrameData& frameData = *reinterpret_cast<core::FrameData*>(pData);
+
+
+	if (env_.pInput) {
+		// during the running of this is when command and Var callbacks will be run.
+		env_.pInput->PostInputFrame(frameData);
+	}
+}
+
+
+void XCore::Job_ConsoleUpdates(core::V2::JobSystem& jobSys, size_t threadIdx,
+	core::V2::Job* pJob, void* pData)
+{
+	X_UNUSED(jobSys);
+	X_UNUSED(threadIdx);
+	X_UNUSED(pJob);
+	X_UNUSED(pData);
+
+	if (env_.pConsole) {
+		// this should not run any commands as it's just repeating a key
+		env_.pConsole->dispatchRepeateInputEvents();
+
+		// this may cause cmd / var callbacks to be run.
+		// will also edit the repeate event.
+		env_.pConsole->runDeferredCmds();
+	}
+}
+
+
+
 
 // XDirectoryWatcherListener
 
