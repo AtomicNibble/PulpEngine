@@ -95,7 +95,7 @@ void XBaseInput::release(void)
 	X_DELETE(this,g_InputArena);
 }
 
-void XBaseInput::PostInit()
+void XBaseInput::PostInit(void)
 {
 	for (TInputDevices::Iterator it = devices_.begin(); it != devices_.end(); ++it)
 	{
@@ -122,7 +122,7 @@ void XBaseInput::Update(core::V2::Job* pInputJob, core::FrameData& frameData)
 
 
 
-void XBaseInput::ClearKeyState()
+void XBaseInput::ClearKeyState(void)
 {
 	if (g_pInputCVars->input_debug)
 	{
@@ -289,7 +289,7 @@ void XBaseInput::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lp
 
 
 // Hold symbols shizzz
-void XBaseInput::PostHoldEvents()
+void XBaseInput::PostHoldEvents(void)
 {
 	X_PROFILE_BEGIN("PostHoldEvents", core::ProfileSubSys::INPUT);
 
@@ -393,7 +393,7 @@ void XBaseInput::ClearHoldEvent(InputSymbol* pSymbol)
 	}
 }
 
-XBaseInput::ModifierFlags XBaseInput::GetModifiers()
+XBaseInput::ModifierFlags XBaseInput::GetModifiers(void)
 {
 	return modifiers_;
 }

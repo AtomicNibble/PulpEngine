@@ -65,8 +65,7 @@ public:
 		ModifiersMasks::Enum mod_mask = ModifiersMasks::NONE) X_OVERRIDE;
 
 protected:
-
-	void PostHoldEvents();
+	void PostHoldEvents(void);
 
 private:
 
