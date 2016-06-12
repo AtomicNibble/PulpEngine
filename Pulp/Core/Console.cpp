@@ -882,7 +882,15 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 	{
 		if (CursorPos_) {  // can we go left?
 			CursorPos_--;
-		
+
+			// support moving whole words
+			if (event.modifiers.IsSet(input::ModifiersMasks::Shift))
+			{
+				while (CursorPos_ && InputBuffer_[CursorPos_] != ' ') {
+					CursorPos_--;
+				}
+			}
+
 			// disable blinking while moving.
 			cursor_.curTime = 0.f; 
 			cursor_.draw = true;
@@ -916,6 +924,15 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 		// are we pre end ?
 		if (CursorPos_ < safe_static_cast<int32_t, size_t>(InputBuffer_.length())) {
 			CursorPos_++;
+
+			// support moving whole words
+			if (event.modifiers.IsSet(input::ModifiersMasks::Shift))
+			{
+				while (CursorPos_ < safe_static_cast<int32_t, size_t>(InputBuffer_.length())
+					&& InputBuffer_[CursorPos_] != ' ') {
+					CursorPos_++;
+				}
+			}
 
 			// disable blinking while moving.
 			cursor_.curTime = 0.f;
