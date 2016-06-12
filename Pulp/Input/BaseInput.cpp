@@ -361,7 +361,6 @@ bool XBaseInput::SendEventToListeners(const InputEvent &event)
 
 void XBaseInput::AddEventToHoldSymbols(const InputEvent& event)
 {
-#if 1
 	if (!retriggering_ && event.pSymbol)
 	{
 		if (event.pSymbol->state == InputState::PRESSED)
@@ -374,7 +373,6 @@ void XBaseInput::AddEventToHoldSymbols(const InputEvent& event)
 			ClearHoldEvent(event.pSymbol);
 		}
 	}
-#endif
 }
 
 
