@@ -24,16 +24,16 @@ namespace
 	// or swap it for a growing pool.
 	static const size_t MAX_PRIMATIVES = 1 << 17; 
 
-	static const size_t PRIMATIVE_ALLOC_SIZE = core::Max_static_size<sizeof(XMapBrush),
-		core::Max_static_size<sizeof(XMapPatch), 
-		core::Max_static_size<sizeof(XMapBrushSide), 
-		sizeof(XMapEntity)>::value>::value>::value;
+	static const size_t PRIMATIVE_ALLOC_SIZE = core::Max(sizeof(XMapBrush),
+		core::Max(sizeof(XMapPatch),
+		core::Max(sizeof(XMapBrushSide),
+		sizeof(XMapEntity))));
 
 	
-	static const size_t PRIMATIVE_ALLOC_ALIGN = core::Max_static_size<X_ALIGN_OF(XMapBrush),
-		core::Max_static_size<X_ALIGN_OF(XMapPatch),
-		core::Max_static_size<X_ALIGN_OF(XMapBrushSide),
-		X_ALIGN_OF(XMapPatch)>::value>::value>::value;
+	static const size_t PRIMATIVE_ALLOC_ALIGN = core::Max(X_ALIGN_OF(XMapBrush),
+		core::Max(X_ALIGN_OF(XMapPatch),
+		core::Max(X_ALIGN_OF(XMapBrushSide),
+		X_ALIGN_OF(XMapPatch))));
 
 }
 
