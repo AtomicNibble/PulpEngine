@@ -11,13 +11,8 @@ XInputCVars* g_pInputCVars = 0;
 
 XInputCVars::XInputCVars()
 {
-	ADD_CVAR_REF_NO_NAME(input_debug, 0, 0, 3, 0,
-		"Input debugging");
-
-	ADD_CVAR_REF_NO_NAME(input_mouse_pos_debug, 0, 0, 1, 0,
-		"Input mouse position debugging");
-
-	
+	input_debug = 0;
+	input_mouse_pos_debug = 0;
 	scrollLines = 1;
 }
 
@@ -25,8 +20,17 @@ XInputCVars::~XInputCVars()
 {
 	gEnv->pConsole->UnregisterVariable("input_debug");
 
-
 }
 
+
+void XInputCVars::registerVars(void)
+{
+	ADD_CVAR_REF_NO_NAME(input_debug, 0, 0, 3, 0,
+		"Input debugging");
+
+	ADD_CVAR_REF_NO_NAME(input_mouse_pos_debug, 0, 0, 1, 0,
+		"Input mouse position debugging");
+
+}
 
 X_NAMESPACE_END

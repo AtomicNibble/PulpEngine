@@ -35,6 +35,7 @@ XBaseInput::XBaseInput() :
 	hasFocus_(false),
 	retriggering_(false)
 {
+	X_ASSERT(g_pInputCVars == nullptr, "InputCvars pointer not null")();
 	g_pInputCVars = pCVars_;
 
 	holdSymbols_.setGranularity(32);
@@ -54,9 +55,15 @@ XBaseInput::~XBaseInput(void)
 
 bool XBaseInput::Init(void)
 {
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pCore);
+	X_ASSERT_NOT_NULL(g_pInputCVars);
+
 	// register even listner.
 	gEnv->pCore->GetCoreEventDispatcher()->RegisterListener(this);
 	
+	g_pInputCVars->registerVars();
+
 	return true;
 }
 
