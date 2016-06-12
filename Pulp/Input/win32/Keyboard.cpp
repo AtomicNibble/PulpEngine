@@ -506,7 +506,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
 		InputState::Enum newstate;
 
 		// get the modifiers.
-		IInput::ModifierFlags Lflags = input.GetModifiers();
+		IInput::ModifierFlags modifierFlags = input.GetModifiers();
 
 		if (IsDown)
 		{
@@ -522,14 +522,14 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
 
 			if (pSymbol->type == InputSymbol::Toggle)
 			{
-				if (Lflags.IsSet(pSymbol->modifer_mask))
-					Lflags.Remove(pSymbol->modifer_mask);
+				if (modifierFlags.IsSet(pSymbol->modifer_mask))
+					modifierFlags.Remove(pSymbol->modifer_mask);
 				else
-					Lflags.Set(pSymbol->modifer_mask);
+					modifierFlags.Set(pSymbol->modifer_mask);
 			}
 			else if (pSymbol->modifer_mask != ModifiersMasks::NONE)
 			{
-				Lflags.Set(pSymbol->modifer_mask);
+				modifierFlags.Set(pSymbol->modifer_mask);
 			}
 
 			newstate = InputState::PRESSED;
@@ -540,14 +540,14 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
 			if (pSymbol->modifer_mask != ModifiersMasks::NONE && pSymbol->type == InputSymbol::Button)
 			{
 				// this key is a modifer but is not togle type :)
-				Lflags.Remove(pSymbol->modifer_mask);
+				modifierFlags.Remove(pSymbol->modifer_mask);
 			}
 
 			newstate = InputState::RELEASED;
 			pSymbol->value = 0.f;
 		}
 
-		input.SetModifiers(Lflags);
+		input.SetModifiers(modifierFlags);
 
 
 		if (newstate == pSymbol->state)
@@ -555,7 +555,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
 			if (g_pInputCVars->input_debug)
 			{
 				X_LOG0("Keyboard", "Skipped (%s) state has not changed: %s, flags: %i, value: %f", 
-					pSymbol->name.c_str(), InputState::toString(newstate), Lflags.ToInt(), pSymbol->value);
+					pSymbol->name.c_str(), InputState::toString(newstate), modifierFlags.ToInt(), pSymbol->value);
 			}
 			return;
 		}
@@ -567,7 +567,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
 		InputEvent& event = inputFrame.events.AddOne();
 		event.deviceType = InputDeviceType::KEYBOARD;
 		event.keyId = (KeyId::Enum)virtualKey;
-		event.modifiers = Lflags;
+		event.modifiers = modifierFlags;
 		event.name = pSymbol->name;
 		event.action = newstate;
 		event.pSymbol = pSymbol;
