@@ -25,7 +25,7 @@ public:
 	X_INLINE int GetDeviceIndex(void) const X_OVERRIDE;
 	bool Init(void) X_OVERRIDE;
 	void ShutDown(void) X_OVERRIDE;
-	void Update(bool bFocus) X_OVERRIDE;
+	void Update(core::FrameData& frameData) X_OVERRIDE;
 	void ClearKeyState(void) X_OVERRIDE;
 	X_INLINE bool IsOfDeviceType(InputDeviceType::Enum type) const X_OVERRIDE;
 	// ~IInputDevice

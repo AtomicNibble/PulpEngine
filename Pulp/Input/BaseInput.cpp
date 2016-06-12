@@ -114,7 +114,7 @@ void XBaseInput::Update(core::V2::Job* pInputJob, core::FrameData& frameData)
 	for (TInputDevices::Iterator it = devices_.begin(); it != devices_.end(); ++it)
 	{
 		if ((*it)->IsEnabled()) {
-			(*it)->Update(hasFocus_);
+			(*it)->Update(frameData);
 		}
 	}
 }
@@ -252,10 +252,6 @@ void XBaseInput::EnableDevice(InputDeviceType::Enum deviceType, bool enable)
 		if ((*it)->IsOfDeviceType(deviceType))
 		{
 			IInputDevice* pDevice = (*it);
-
-			EnableEventPosting(false);
-			pDevice->Update(hasFocus_);
-			EnableEventPosting(true);
 			pDevice->Enable(enable);
 			break;
 		}

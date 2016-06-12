@@ -19,9 +19,9 @@ XInputDevice::~XInputDevice()
 	idToInfo_.free();
 }
 
-void XInputDevice::Update(bool focus)
+void XInputDevice::Update(core::FrameData& frameData)
 {
-	X_UNUSED(focus);
+	X_UNUSED(frameData);
 }
 
 void XInputDevice::ClearKeyState(void)

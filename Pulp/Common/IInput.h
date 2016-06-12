@@ -17,6 +17,11 @@
 
 struct ICore;
 
+
+X_NAMESPACE_DECLARE(core,
+	struct FrameInput;
+);
+
 X_NAMESPACE_BEGIN(input)
 
 // the mask's they set.
@@ -391,20 +396,20 @@ struct IInputDevice
 {
 	virtual ~IInputDevice() {}
 
-	virtual bool Init() X_ABSTRACT;
-	virtual void PostInit() X_ABSTRACT;
-	virtual void ShutDown() X_ABSTRACT;
+	virtual bool Init(void) X_ABSTRACT;
+	virtual void PostInit(void) X_ABSTRACT;
+	virtual void ShutDown(void) X_ABSTRACT;
 
-	virtual const char* GetDeviceName() const X_ABSTRACT;
-	virtual int GetDeviceIndex() const X_ABSTRACT;
+	virtual const char* GetDeviceName(void) const X_ABSTRACT;
+	virtual int GetDeviceIndex(void) const X_ABSTRACT;
 
 	// Update.
-	virtual void Update(bool bFocus) X_ABSTRACT;
+	virtual void Update(core::FrameData& frameData) X_ABSTRACT;
 
 	virtual void Enable(bool enable) X_ABSTRACT;
-	virtual bool IsEnabled() const X_ABSTRACT;
+	virtual bool IsEnabled(void) const X_ABSTRACT;
 
-	virtual void ClearKeyState() X_ABSTRACT;
+	virtual void ClearKeyState(void) X_ABSTRACT;
 
 	virtual bool IsOfDeviceType(InputDeviceType::Enum type) const X_ABSTRACT;
 	virtual bool SetExclusiveMode(bool value) X_ABSTRACT;
@@ -430,14 +435,14 @@ struct IInput
 
 	virtual void EnableEventPosting(bool bEnable) X_ABSTRACT;
 	virtual bool IsEventPostingEnabled(void) const X_ABSTRACT;
-	virtual bool PostInputEvent(const InputEvent &event, bool bForce = false) X_ABSTRACT;
+	virtual bool PostInputEvent(const InputEvent& event, bool bForce = false) X_ABSTRACT;
 
 	virtual bool Init(void) X_ABSTRACT;
 	virtual void PostInit(void) X_ABSTRACT;
 	virtual void ShutDown(void) X_ABSTRACT;
 	virtual void release(void) X_ABSTRACT;
 
-	// called with frame data and parent job calling, if you create jobs add them as children.
+	// called with frame data and parent job calling.
 	virtual void Update(core::V2::Job* pInputJob, core::FrameData& frameData) X_ABSTRACT;
 
 

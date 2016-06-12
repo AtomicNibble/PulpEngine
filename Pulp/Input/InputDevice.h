@@ -26,7 +26,7 @@ public:
 	X_INLINE bool Init(void) X_OVERRIDE;
 	X_INLINE void PostInit(void) X_OVERRIDE;
 	X_INLINE void ShutDown(void) X_OVERRIDE;
-	void Update(bool focus) X_OVERRIDE;
+	void Update(core::FrameData& frameData) X_OVERRIDE;
 	void Enable(bool enable) X_OVERRIDE;
 	X_INLINE bool IsEnabled(void) const X_OVERRIDE;
 	void ClearKeyState(void) X_OVERRIDE;

@@ -100,10 +100,10 @@ void XMouse::ShutDown(void)
 }
 
 ///////////////////////////////////////////
-void XMouse::Update(bool focus)
+void XMouse::Update(core::FrameData& frameData)
 {
 	X_ASSERT_UNREACHABLE();
-	X_UNUSED(focus);
+	X_UNUSED(frameData);
 }
 
 void XMouse::ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame)

@@ -345,10 +345,10 @@ char XKeyboard::Event2Char(const InputEvent& event)
 
 
 ///////////////////////////////////////////
-void XKeyboard::Update(bool focus)
+void XKeyboard::Update(core::FrameData& frameData)
 {
 	X_ASSERT_UNREACHABLE();
-	X_UNUSED(focus);
+	X_UNUSED(frameData);
 }
 
 void XKeyboard::ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame)
