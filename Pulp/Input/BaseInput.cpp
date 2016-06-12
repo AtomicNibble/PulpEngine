@@ -230,10 +230,6 @@ void XBaseInput::EnableEventPosting(bool bEnable)
 	}
 }
 
-bool XBaseInput::IsEventPostingEnabled(void) const
-{
-	return enableEventPosting_;
-}
 
 bool XBaseInput::PostInputEvent(const InputEvent &event)
 {
@@ -436,21 +432,6 @@ void XBaseInput::ClearHoldEvent(InputSymbol* pSymbol)
 		// pop last ... which is now the one we want to get rid of
 		holdSymbols_.pop_back();
 	}
-}
-
-XBaseInput::ModifierFlags XBaseInput::GetModifiers(void)
-{
-	return modifiers_;
-}
-
-void XBaseInput::SetModifiers(ModifierFlags flags)
-{
-	this->modifiers_ = flags;
-}
-
-void XBaseInput::ClearModifiers(void)
-{
-	this->modifiers_.Clear();
 }
 
 X_NAMESPACE_END

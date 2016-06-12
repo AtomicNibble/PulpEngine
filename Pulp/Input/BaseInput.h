@@ -37,7 +37,7 @@ public:
 	bool HasInputDeviceOfType(InputDeviceType::Enum type) const X_OVERRIDE;
 	bool AddInputDevice(IInputDevice* pDevice) X_OVERRIDE;
 	void EnableEventPosting(bool bEnable)X_OVERRIDE;
-	bool IsEventPostingEnabled(void) const X_OVERRIDE;
+	X_INLINE bool IsEventPostingEnabled(void) const X_OVERRIDE;
 	bool PostInputFrame(core::FrameData& frameData) X_OVERRIDE;
 
 
@@ -57,9 +57,9 @@ public:
 
 	X_INLINE bool HasFocus(void) const;
 
-	ModifierFlags GetModifiers(void) X_OVERRIDE;
-	void SetModifiers(ModifierFlags flags) X_OVERRIDE;
-	void ClearModifiers(void);
+	X_INLINE ModifierFlags GetModifiers(void) X_OVERRIDE;
+	X_INLINE void SetModifiers(ModifierFlags flags) X_OVERRIDE;
+	X_INLINE void ClearModifiers(void);
 
 	X_INLINE InputSymbol* DefineSymbol(InputDeviceType::Enum deviceType, KeyId::Enum id_,
 		const KeyName& name_, InputSymbol::Type type_ = InputSymbol::Type::Button,
