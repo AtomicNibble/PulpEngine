@@ -325,35 +325,34 @@ void XBaseInput::AddHoldEvents(core::FrameInput& inputFrame)
 
 bool XBaseInput::SendEventToListeners(const InputEvent &event)
 {
-	// console listeners get to process the event first
-	for (TInputEventListeners::const_iterator it = consoleListeners_.begin(); it != consoleListeners_.end(); ++it)
+	// return true if add to hold.
+
+	if (event.action == InputState::CHAR)
 	{
-		bool ret = false;
-		if (event.action != InputState::CHAR)
-			ret = (*it)->OnInputEvent(event);
-		else
-			ret = (*it)->OnInputEventChar(event);
-
-		if (ret)
-			return false;
-	}
-
-
-	// Don't post events if input is being blocked
-	// but still need to update held inputs
-	bool bInputBlocked = false; // ShouldBlockInputEventPosting(event.keyId, event.deviceId);
-	if (!bInputBlocked)
-	{
-		// Send this event to all listeners until the first one returns true.
+		for (TInputEventListeners::const_iterator it = consoleListeners_.begin(); it != consoleListeners_.end(); ++it)
+		{
+			if ((*it)->OnInputEventChar(event)) {
+				return false;
+			}
+		}
 		for (TInputEventListeners::const_iterator it = listners_.begin(); it != listners_.end(); ++it)
 		{
-			bool ret = false;
-			if (event.action != InputState::CHAR)
-				ret = (*it)->OnInputEvent(event);
-			else
-				ret = (*it)->OnInputEventChar(event);
-
-			if (ret) {
+			if ((*it)->OnInputEventChar(event)) {
+				break;
+			}
+		}
+	}
+	else
+	{
+		for (TInputEventListeners::const_iterator it = consoleListeners_.begin(); it != consoleListeners_.end(); ++it)
+		{
+			if ((*it)->OnInputEvent(event)) {
+				return false;
+			}
+		}
+		for (TInputEventListeners::const_iterator it = listners_.begin(); it != listners_.end(); ++it)
+		{
+			if ((*it)->OnInputEvent(event)) {
 				break;
 			}
 		}
