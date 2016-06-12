@@ -26,7 +26,7 @@ public:
 	bool Init(void) X_OVERRIDE;
 	void ShutDown(void) X_OVERRIDE;
 	void Update(core::FrameData& frameData) X_OVERRIDE;
-	void ClearKeyState(void) X_OVERRIDE;
+	void ClearKeyState(InputEventArr& clearEvents) X_OVERRIDE;
 	X_INLINE bool IsOfDeviceType(InputDeviceType::Enum type) const X_OVERRIDE;
 	// ~IInputDevice
 

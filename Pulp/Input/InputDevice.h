@@ -29,7 +29,7 @@ public:
 	void Update(core::FrameData& frameData) X_OVERRIDE;
 	void Enable(bool enable) X_OVERRIDE;
 	X_INLINE bool IsEnabled(void) const X_OVERRIDE;
-	void ClearKeyState(void) X_OVERRIDE;
+	void ClearKeyState(InputEventArr& clearEvents) X_OVERRIDE;
 	InputSymbol* LookupSymbol(KeyId::Enum id) const X_OVERRIDE;
 	// ~IInputDevice
 

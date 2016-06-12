@@ -66,6 +66,7 @@ public:
 		ModifiersMasks::Enum mod_mask = ModifiersMasks::NONE) X_OVERRIDE;
 
 protected:
+	void AddClearEvents(core::FrameInput& inputFrame);
 	void AddHoldEvents(core::FrameInput& inputFrame);
 
 private:
@@ -78,10 +79,12 @@ protected:
 	typedef core::Array<IInputDevice*>		TInputDevices;
 	typedef std::list<IInputEventListner*>	TInputEventListeners;
 	typedef core::Array<InputSymbol*>		TInputSymbols;
+	typedef core::Array<InputEvent>			InputEventArr;
 
 	TInputSymbols						holdSymbols_;
 	TInputEventListeners				listners_;
 	TInputEventListeners				consoleListeners_;
+	InputEventArr						clearStateEvents_;
 
 	// input device management
 	TInputDevices						devices_;
@@ -91,7 +94,6 @@ protected:
 
 	bool								enableEventPosting_;
 	bool								retriggering_;
-
 	bool								hasFocus_;
 
 	ModifierFlags						modifiers_;	// caps ALT, SHIFT etc.

@@ -36,13 +36,17 @@ XBaseInput::XBaseInput() :
 	pCVars_(X_NEW(XInputCVars,g_InputArena,"InputCvars")),
 	devices_(g_InputArena),
 	holdSymbols_(g_InputArena),
+	clearStateEvents_(g_InputArena), 
 	enableEventPosting_(true),
 	hasFocus_(false),
 	retriggering_(false)
 {
 	g_pInputCVars = pCVars_;
 
+	holdSymbols_.setGranularity(32);
 	holdSymbols_.reserve(64);
+	clearStateEvents_.reserve(16);
+	clearStateEvents_.setGranularity(16);
 }
 
 
@@ -109,6 +113,8 @@ void XBaseInput::Update(core::V2::Job* pInputJob, core::FrameData& frameData)
 
 	hasFocus_ = frameData.flags.IsSet(core::FrameFlag::HAS_FOCUS);
 
+
+	AddClearEvents(frameData.input);
 	AddHoldEvents(frameData.input);
 
 	for (TInputDevices::Iterator it = devices_.begin(); it != devices_.end(); ++it)
@@ -129,11 +135,14 @@ void XBaseInput::ClearKeyState(void)
 		X_LOG0("Input", "clearing key states.");
 	}
 
+	// clear the modifiers, devices will restore current modifiers values that are set, like capslock.
 	modifiers_.Clear();
 
+	// when we clear states some devices might want to broadcast release events.
+	// we store them to be picked up by the next frame.
 	for (TInputDevices::Iterator it = devices_.begin(); it != devices_.end(); ++it)
 	{
-		(*it)->ClearKeyState();
+		(*it)->ClearKeyState(clearStateEvents_);
 	}
 
 	retriggering_ = false;
@@ -296,6 +305,34 @@ void XBaseInput::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lp
 	}
 }
 
+
+void XBaseInput::AddClearEvents(core::FrameInput& inputFrame)
+{
+	if (clearStateEvents_.isEmpty()) {
+		return;
+	}
+
+	size_t num = clearStateEvents_.size();
+	if (g_pInputCVars->input_debug > 0)
+	{
+		X_LOG0("Input", "posting %i clear events", num);
+	}
+
+	const size_t eventSpace = inputFrame.events.capacity() - inputFrame.events.size();
+	if (eventSpace < num) {
+		// this is bad, since clear events are important.
+		X_ERROR("Input", "Input frame buffer full ignoring %i clear events", num - eventSpace);
+		num = eventSpace;
+	}
+
+	for (size_t i = 0; i < num; ++i)
+	{
+		InputEvent& event = inputFrame.events.AddOne();
+		event = clearStateEvents_[i];
+	}
+
+	clearStateEvents_.clear();
+}
 
 // Hold symbols shizzz
 void XBaseInput::AddHoldEvents(core::FrameInput& inputFrame)

@@ -24,9 +24,9 @@ void XInputDevice::Update(core::FrameData& frameData)
 	X_UNUSED(frameData);
 }
 
-void XInputDevice::ClearKeyState(void)
+void XInputDevice::ClearKeyState(InputEventArr& clearEvents)
 {
-
+	X_UNUSED(clearEvents);
 }
 
 void XInputDevice::Enable(bool enable)

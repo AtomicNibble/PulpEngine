@@ -601,7 +601,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
 }
 
 //////////////////////////////////////////////////////////////////////////
-void XKeyboard::ClearKeyState(void)
+void XKeyboard::ClearKeyState(InputEventArr& clearEvents)
 {
 	IInput& input = GetIInput();
 
@@ -638,7 +638,7 @@ void XKeyboard::ClearKeyState(void)
 			if (pSymbol->value > 0.f)
 			{
 				// broadcast a release event and reset it etc.
-				InputEvent event;
+				InputEvent& event = clearEvents.AddOne();
 				event.deviceType = InputDeviceType::KEYBOARD;
 				event.name = pSymbol->name;
 				event.keyId = pSymbol->keyId;
@@ -652,7 +652,6 @@ void XKeyboard::ClearKeyState(void)
 
 				pSymbol->value = 0.0f;
 				pSymbol->state = InputState::RELEASED;
-			//	input.PostInputEvent(event);
 			}
 		}
 	}

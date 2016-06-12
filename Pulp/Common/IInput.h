@@ -6,6 +6,8 @@
 #include <Core\Platform.h>
 
 #include <Util\Flags.h>
+#include <Containers\Array.h>
+
 // #include <Util\FlagsMacros.h>
 
 
@@ -389,6 +391,9 @@ struct IInputEventListner
 
 struct IInputDevice
 {
+	typedef core::Array<InputEvent>	InputEventArr;
+
+public:
 	virtual ~IInputDevice() {}
 
 	virtual bool Init(void) X_ABSTRACT;
@@ -404,7 +409,7 @@ struct IInputDevice
 	virtual void Enable(bool enable) X_ABSTRACT;
 	virtual bool IsEnabled(void) const X_ABSTRACT;
 
-	virtual void ClearKeyState(void) X_ABSTRACT;
+	virtual void ClearKeyState(InputEventArr& clearEvents) X_ABSTRACT;
 
 	virtual bool IsOfDeviceType(InputDeviceType::Enum type) const X_ABSTRACT;
 	virtual InputSymbol* LookupSymbol(KeyId::Enum id) const X_ABSTRACT;
