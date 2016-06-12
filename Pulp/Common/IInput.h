@@ -303,6 +303,7 @@ struct KeyName
 };
 
 struct InputSymbol;
+X_DISABLE_WARNING(4324);
 
 X_ALIGNED_SYMBOL(struct InputEvent,32)
 {
@@ -327,6 +328,7 @@ X_ALIGNED_SYMBOL(struct InputEvent,32)
 		pSymbol = nullptr;
 	}
 };
+X_ENABLE_WARNING(4324);
 
 
 struct InputSymbol
