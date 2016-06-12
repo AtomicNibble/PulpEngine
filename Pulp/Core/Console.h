@@ -371,23 +371,23 @@ private:
 	// some behaviour options.
 	static int		console_disable_mouse;
 
-
-	friend void Command_Exit(IConsoleCmdArgs* Cmd);
-	friend void Command_Exec(IConsoleCmdArgs* Cmd);
-	friend void Command_Help(IConsoleCmdArgs* Cmd);
-	friend void Command_ListCmd(IConsoleCmdArgs* Cmd);
-	friend void Command_ListDvars(IConsoleCmdArgs* Cmd);
-	friend void Command_Echo(IConsoleCmdArgs* Cmd);
-	friend void Command_Wait(IConsoleCmdArgs* Cmd);
-	friend void Command_VarReset(IConsoleCmdArgs* Cmd);
-	friend void Command_Bind(IConsoleCmdArgs* Cmd);
-	friend void Command_BindsClear(IConsoleCmdArgs* Cmd);
-	friend void Command_BindsList(IConsoleCmdArgs* Cmd);
-	friend void Command_SetVarArchive(IConsoleCmdArgs* Cmd);
-	friend void Command_ConsoleShow(IConsoleCmdArgs* Cmd);
-	friend void Command_ConsoleHide(IConsoleCmdArgs* Cmd);
-	friend void Command_ConsoleToggle(IConsoleCmdArgs* Cmd);
-	friend void Command_SaveModifiedVars(IConsoleCmdArgs* Cmd);
+private:
+	void Command_Exit(IConsoleCmdArgs* Cmd);
+	void Command_Exec(IConsoleCmdArgs* Cmd);
+	void Command_Help(IConsoleCmdArgs* Cmd);
+	void Command_ListCmd(IConsoleCmdArgs* Cmd);
+	void Command_ListDvars(IConsoleCmdArgs* Cmd);
+	void Command_Echo(IConsoleCmdArgs* Cmd);
+	void Command_Wait(IConsoleCmdArgs* Cmd);
+	void Command_VarReset(IConsoleCmdArgs* Cmd);
+	void Command_Bind(IConsoleCmdArgs* Cmd);
+	void Command_BindsClear(IConsoleCmdArgs* Cmd);
+	void Command_BindsList(IConsoleCmdArgs* Cmd);
+	void Command_SetVarArchive(IConsoleCmdArgs* Cmd);
+	void Command_ConsoleShow(IConsoleCmdArgs* Cmd);
+	void Command_ConsoleHide(IConsoleCmdArgs* Cmd);
+	void Command_ConsoleToggle(IConsoleCmdArgs* Cmd);
+	void Command_SaveModifiedVars(IConsoleCmdArgs* Cmd);
 
 };
 
