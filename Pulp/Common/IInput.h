@@ -319,6 +319,7 @@ X_ALIGNED_SYMBOL(struct InputEvent,32)
 
 	InputEvent()
 	{
+		deviceType = InputDeviceType::UNKNOWN;
 		action = InputState::UNKNOWN;
 		keyId = KeyId::UNKNOWN;
 		modifiers = ModifiersMasks::NONE;
@@ -358,6 +359,7 @@ struct InputSymbol
 		event.value = value;
 		event.name = name;
 		event.keyId = keyId;
+		event.deviceType = deviceType;
 	}
 
 
