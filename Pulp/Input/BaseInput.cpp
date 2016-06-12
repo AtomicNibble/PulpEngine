@@ -109,7 +109,7 @@ void XBaseInput::Update(core::V2::Job* pInputJob, core::FrameData& frameData)
 
 	hasFocus_ = frameData.flags.IsSet(core::FrameFlag::HAS_FOCUS);
 
-	PostHoldEvents();
+	AddHoldEvents(frameData.input);
 
 	for (TInputDevices::Iterator it = devices_.begin(); it != devices_.end(); ++it)
 	{
@@ -285,22 +285,27 @@ void XBaseInput::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lp
 
 
 // Hold symbols shizzz
-void XBaseInput::PostHoldEvents(void)
+void XBaseInput::AddHoldEvents(core::FrameInput& inputFrame)
 {
 	X_PROFILE_BEGIN("PostHoldEvents", core::ProfileSubSys::INPUT);
 
-	InputEvent event;
-	const size_t count = holdSymbols_.size();
+	size_t count = holdSymbols_.size();
 
 	if (g_pInputCVars->input_debug > 2)
 	{ 
 		X_LOG0("Input", "posting %i hold symbols", count);
 	}
 
+	const size_t eventSpace = inputFrame.events.capacity() - inputFrame.events.size();
+	if (eventSpace < count) {
+		X_WARNING("Input", "Input frame buffer full ignoring %i hold events", count - eventSpace);
+		count = eventSpace;
+	}
+
 	for (size_t i = 0; i < count; ++i)
 	{
+		InputEvent event = inputFrame.events.AddOne();
 		holdSymbols_[i]->AssignToEvent(event, GetModifiers());
-		PostInputEvent(event);
 	}
 }
 

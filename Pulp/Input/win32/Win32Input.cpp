@@ -91,7 +91,7 @@ void XWinInput::Update(core::V2::Job* pInputJob, core::FrameData& frameData)
 	X_UNUSED(pInputJob);
 
 
-	PostHoldEvents();
+	AddHoldEvents(frameData.input);
 
 	hasFocus_ = frameData.flags.IsSet(core::FrameFlag::HAS_FOCUS);
 
