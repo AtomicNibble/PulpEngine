@@ -307,6 +307,8 @@ TEST(Threading, JobSystem2Empty_continuations)
 
 		Job* pJob = jobSys.CreateMemberJob<Member::JobClass>(&inst, &Member::JobClass::job, nullptr);
 
+		// adds jobs that are run after the job above finished.
+		// they are also creatd as childs so the parent job waits for them.
 		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr));
 		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr));
 		jobSys.AddContinuation(pJob, jobSys.CreateMemberJobAsChild<Member::JobClass>(pJob, &inst, &Member::JobClass::job, nullptr));
