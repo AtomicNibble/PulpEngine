@@ -1830,7 +1830,7 @@ void XConsole::RegisterVar(ICVar* pCVar)
 }
 
 
-void XConsole::ExecuteDeferredCommands()
+void XConsole::ExecuteDeferredCommands(void)
 {
 	if (WaitSeconds_.GetValue())
 	{
@@ -1842,16 +1842,12 @@ void XConsole::ExecuteDeferredCommands()
 		WaitSeconds_.SetValue(0);
 	}
 
-	DeferredCmdList::iterator it;
-
-	while (!deferredCmds_.empty())
+	for(const auto& dc : deferredCmds_)
 	{
-		it = deferredCmds_.begin();
-
-		ExecuteStringInternal(it->command.c_str(), ExecSource::SYSTEM, it->silentMode);
-
-		deferredCmds_.pop_front();
+		ExecuteStringInternal(dc.command.c_str(), ExecSource::SYSTEM, dc.silentMode);
 	}
+
+	deferredCmds_.clear();
 }
 
 
