@@ -869,7 +869,7 @@ CVarVec3Ref::~CVarVec3Ref()
 
 int CVarVec3Ref::GetInteger(void) const
 { 
-	return static_cast<int>(0.f);
+	return 0;
 }
 
 float CVarVec3Ref::GetFloat(void) const
