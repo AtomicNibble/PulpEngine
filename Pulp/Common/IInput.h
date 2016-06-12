@@ -303,7 +303,8 @@ struct KeyName
 };
 
 struct InputSymbol;
-struct InputEvent
+
+X_ALIGNED_SYMBOL(struct InputEvent,32)
 {
 	typedef Flags<ModifiersMasks> ModiferType;
 
