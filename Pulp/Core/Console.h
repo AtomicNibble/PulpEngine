@@ -332,7 +332,10 @@ private:
 	string					InputBuffer_;
 	string                  RefString_;
 
+	X_DISABLE_WARNING(4324);
 	input::InputEvent		repeatEvent_;
+	X_ENABLE_WARNING(4324);
+
 	float					repeatEventInterval_;
 	float					repeatEventInitialDelay_;
 	float					repeatEventTimer_;
