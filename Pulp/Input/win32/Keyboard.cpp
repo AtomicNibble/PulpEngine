@@ -657,7 +657,7 @@ void XKeyboard::ClearKeyState(void)
 
 				pSymbol->value = 0.0f;
 				pSymbol->state = InputState::RELEASED;
-				input.PostInputEvent(event);
+			//	input.PostInputEvent(event);
 			}
 		}
 	}
