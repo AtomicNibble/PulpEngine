@@ -92,7 +92,7 @@ namespace
 	class CommandParser
 	{
 	public:
-		CommandParser(const char* cmd) :
+		explicit CommandParser(const char* cmd) :
 			begin_(cmd),
 			end_(cmd + core::strUtil::strlen(cmd))
 		{}
