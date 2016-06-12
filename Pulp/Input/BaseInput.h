@@ -37,7 +37,7 @@ public:
 	bool HasInputDeviceOfType(InputDeviceType::Enum type) const X_OVERRIDE;
 	bool AddInputDevice(IInputDevice* pDevice) X_OVERRIDE;
 	void EnableEventPosting(bool bEnable)X_OVERRIDE;
-	bool IsEventPostingEnabled() const X_OVERRIDE;
+	bool IsEventPostingEnabled(void) const X_OVERRIDE;
 	bool PostInputEvent(const InputEvent &event, bool bForce = false);
 
 	// listener functions (implemented)
