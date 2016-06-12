@@ -230,7 +230,7 @@ bool XBaseInput::PostInputEvent(const InputEvent &event)
 {
 	if (event.keyId == KeyId::UNKNOWN) {
 		if (g_pInputCVars->input_debug > 1) {
-			X_LOG0("Input", "Ingoring unkown event key from device: %s", InputDeviceType::ToString(event.deviceType));
+			X_WARNING("Input", "Ingoring unkown event key from device: %s", InputDeviceType::ToString(event.deviceType));
 		}
 		return false;
 	}
