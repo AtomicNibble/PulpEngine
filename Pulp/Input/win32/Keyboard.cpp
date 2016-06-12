@@ -563,39 +563,34 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
 		pSymbol->state = newstate;
 
 		bool isChar = false;
-		{
-			InputEvent& event = inputFrame.events.AddOne();
-			event.deviceType = InputDeviceType::KEYBOARD;
-			event.keyId = (KeyId::Enum)virtualKey;
-			event.modifiers = Lflags;
-			event.name = pSymbol->name;
-			event.action = newstate;
-			event.pSymbol = pSymbol;
+		
+		InputEvent& event = inputFrame.events.AddOne();
+		event.deviceType = InputDeviceType::KEYBOARD;
+		event.keyId = (KeyId::Enum)virtualKey;
+		event.modifiers = Lflags;
+		event.name = pSymbol->name;
+		event.action = newstate;
+		event.pSymbol = pSymbol;
 
-			isChar = IsCHAR(event);
+		isChar = IsCHAR(event);
 
-			if (isChar) {
-				event.inputchar = Event2Char(event);
-			}
-
-			if (g_pInputCVars->input_debug)
-			{
-				X_LOG0("Keyboard", "VK: %i, state: %s, name: %s", virtualKey, InputState::toString(newstate),
-					event.name.c_str());
-			}
+		if (isChar) {
+			event.inputchar = Event2Char(event);
 		}
 
+		if (g_pInputCVars->input_debug)
+		{
+			X_LOG0("Keyboard", "VK: %i, state: %s, name: %s", virtualKey, InputState::toString(newstate),
+				event.name.c_str());
+		}
+		
 		// if it's a char post it again.
 		if (newstate == InputState::PRESSED && isChar)
 		{
-			InputEvent& event = inputFrame.events.AddOne();
-			event.deviceType = InputDeviceType::KEYBOARD;
-			event.keyId = (KeyId::Enum)virtualKey;
-			event.modifiers = Lflags;
-			event.name = pSymbol->name;
-			event.pSymbol = pSymbol;
-			event.action = InputState::CHAR;
-			event.value = 1.f;
+			InputEvent& charEvent = inputFrame.events.AddOne();
+			charEvent = event;
+			charEvent.action = InputState::CHAR;
+			charEvent.value = 1.f;
 		}
 	}
 	else if (g_pInputCVars->input_debug)
