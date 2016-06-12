@@ -1456,7 +1456,7 @@ void XConsole::Exec(const char* command, const bool DeferExecution)
 	}
 	else
 	{
-		deferredCmds_.push_back(DeferredCommand(core::string(temp.c_str()), false));
+		deferredCmds_.emplace_back(core::string(temp.c_str()), false);
 	}
 }
 
@@ -2136,7 +2136,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 			// we search same length.
 			if (pComparison(Name, Name + inputLen, inputBegin, inputEnd))
 			{
-				results.push_back(AutoResult(Name, it->second, nullptr));
+				results.emplace_back(Name, it->second, nullptr);
 			}
 
 			if (results.size() == results.capacity()) {
@@ -2161,7 +2161,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				// we search same length.
 				if (pComparison(Name, Name + inputLen, inputBegin, inputEnd))
 				{
-					results.push_back(AutoResult(Name, nullptr, &cmdIt->second));
+					results.emplace_back(Name, nullptr, &cmdIt->second);
 				}
 
 				if (results.size() == results.capacity()) {
@@ -2558,7 +2558,7 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
 
 	core::Spinlock::ScopedLock lock(logLock_);
 
-	ConsoleLog_.push_back(core::string(pStr));
+	ConsoleLog_.emplace_back(pStr);
 
 	int bufferSize = console_buffer_size;
 
@@ -2640,7 +2640,7 @@ void XConsole::ListVariables(const char* searchPatten)
 
 		if (!searchPatten || strUtil::WildCompare(searchPatten, var->GetName()))
 		{
-			sorted_vars.push_back(var);
+			sorted_vars.emplace_back(var);
 		}
 	}
 
