@@ -89,7 +89,7 @@
 #	define X_ENABLE_LOGGING 1
 #   define X_ENABLE_FILE_STATS 1
 #	define X_ENABLE_DIR_WATCHER_LOGGING 1
-#	define X_ENABLE_PROFILER 1
+#	define X_ENABLE_PROFILER 0
 #elif X_RELEASE
 #   define X_BUILD_TYPE "-release" 
 #	define X_ENABLE_SAFE_STATIC_CAST 1
@@ -105,7 +105,7 @@
 #	define X_ENABLE_LOGGING 1
 #   define X_ENABLE_FILE_STATS 0
 #	define X_ENABLE_DIR_WATCHER_LOGGING 0
-#	define X_ENABLE_PROFILER 1
+#	define X_ENABLE_PROFILER 0
 #elif X_SUPER
 #   define X_BUILD_TYPE "-ship" 
 #	define X_ENABLE_SAFE_STATIC_CAST 0
