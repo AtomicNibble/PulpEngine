@@ -76,18 +76,18 @@ private:
 	void AddEventToHoldSymbols(const InputEvent &event);
 protected:
 	// listener functionality
-	typedef core::Array<IInputDevice*>		TInputDevices;
-	typedef std::list<IInputEventListner*>	TInputEventListeners;
-	typedef core::Array<InputSymbol*>		TInputSymbols;
+	typedef core::Array<IInputDevice*>		InputDevicesArr;
+	typedef std::list<IInputEventListner*>	InputEventListenersList;
+	typedef core::Array<InputSymbol*>		InputSymbolsArr;
 	typedef core::Array<InputEvent>			InputEventArr;
 
-	TInputSymbols						holdSymbols_;
-	TInputEventListeners				listners_;
-	TInputEventListeners				consoleListeners_;
+	InputSymbolsArr						holdSymbols_;
+	InputEventListenersList				listners_;
+	InputEventListenersList				consoleListeners_;
 	InputEventArr						clearStateEvents_;
 
 	// input device management
-	TInputDevices						devices_;
+	InputDevicesArr						devices_;
 
 	// CVars
 	XInputCVars*						pCVars_;

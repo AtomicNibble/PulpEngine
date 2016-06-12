@@ -50,7 +50,7 @@ XBaseInput::XBaseInput() :
 }
 
 
-XBaseInput::~XBaseInput()
+XBaseInput::~XBaseInput(void)
 {
 	X_DELETE(pCVars_, g_InputArena);
 	pCVars_ = nullptr;
@@ -58,7 +58,7 @@ XBaseInput::~XBaseInput()
 }
 
 
-bool XBaseInput::Init()
+bool XBaseInput::Init(void)
 {
 	// register even listner.
 	gEnv->pCore->GetCoreEventDispatcher()->RegisterListener(this);
@@ -66,14 +66,14 @@ bool XBaseInput::Init()
 	return true;
 }
 
-void XBaseInput::ShutDown()
+void XBaseInput::ShutDown(void)
 {
 	X_LOG0("InputSys", "Shutting Down");
 
 	gEnv->pCore->GetCoreEventDispatcher()->RemoveListener(this);
 
-	for (TInputDevices::Iterator it = devices_.begin(); it != devices_.end(); ++it) {
-		(*it)->ShutDown();
+	for (auto& device : devices_) {
+		device->ShutDown();
 	}
 
 	std::for_each(devices_.begin(), devices_.end(), delete_ptr());
@@ -101,9 +101,9 @@ void XBaseInput::release(void)
 
 void XBaseInput::PostInit(void)
 {
-	for (TInputDevices::Iterator it = devices_.begin(); it != devices_.end(); ++it)
+	for (auto& device : devices_)
 	{
-		(*it)->PostInit();
+		device->PostInit();
 	}
 }
 
@@ -117,16 +117,13 @@ void XBaseInput::Update(core::V2::Job* pInputJob, core::FrameData& frameData)
 	AddClearEvents(frameData.input);
 	AddHoldEvents(frameData.input);
 
-	for (TInputDevices::Iterator it = devices_.begin(); it != devices_.end(); ++it)
+	for (auto& device : devices_)
 	{
-		if ((*it)->IsEnabled()) {
-			(*it)->Update(frameData);
+		if (device->IsEnabled()) {
+			device->Update(frameData);
 		}
 	}
 }
-
-
-
 
 void XBaseInput::ClearKeyState(void)
 {
@@ -140,9 +137,9 @@ void XBaseInput::ClearKeyState(void)
 
 	// when we clear states some devices might want to broadcast release events.
 	// we store them to be picked up by the next frame.
-	for (TInputDevices::Iterator it = devices_.begin(); it != devices_.end(); ++it)
+	for(auto& device : devices_)
 	{
-		(*it)->ClearKeyState(clearStateEvents_);
+		device->ClearKeyState(clearStateEvents_);
 	}
 
 	retriggering_ = false;
@@ -181,7 +178,7 @@ void XBaseInput::AddEventListener(IInputEventListner *pListener)
 void XBaseInput::RemoveEventListener(IInputEventListner *pListener)
 {
 	// Remove listener if it is in list.
-	TInputEventListeners::iterator it = std::find(listners_.begin(), listners_.end(), pListener);
+	auto it = std::find(listners_.begin(), listners_.end(), pListener);
 	if (it != listners_.end())
 	{
 		listners_.erase(it);
@@ -199,7 +196,7 @@ void XBaseInput::AddConsoleEventListener(IInputEventListner *pListener)
 
 void XBaseInput::RemoveConsoleEventListener(IInputEventListner *pListener)
 {
-	TInputEventListeners::iterator it = std::find(consoleListeners_.begin(), consoleListeners_.end(), pListener);
+	auto it = std::find(consoleListeners_.begin(), consoleListeners_.end(), pListener);
 	if (it != consoleListeners_.end()) {
 		consoleListeners_.erase(it);
 	}
@@ -265,23 +262,21 @@ bool XBaseInput::PostInputFrame(core::FrameData& frameData)
 
 void XBaseInput::EnableDevice(InputDeviceType::Enum deviceType, bool enable)
 {
-	for (TInputDevices::ConstIterator it = devices_.begin(); it != devices_.end(); ++it)
+	for (auto& device : devices_)
 	{
-		if ((*it)->IsOfDeviceType(deviceType))
+		if (device->IsOfDeviceType(deviceType))
 		{
-			IInputDevice* pDevice = (*it);
-			pDevice->Enable(enable);
+			device->Enable(enable);
 			break;
 		}
 	}
 }
 
-
 bool XBaseInput::HasInputDeviceOfType(InputDeviceType::Enum type) const
 {
-	for (TInputDevices::ConstIterator i = devices_.begin(); i != devices_.end(); ++i)
+	for (const auto& device : devices_)
 	{
-		if ((*i)->IsOfDeviceType(type)) {
+		if (device->IsOfDeviceType(type)) {
 			return true;
 		}
 	}
@@ -362,13 +357,13 @@ bool XBaseInput::SendEventToListeners(const InputEvent &event)
 
 	if (event.action == InputState::CHAR)
 	{
-		for (TInputEventListeners::const_iterator it = consoleListeners_.begin(); it != consoleListeners_.end(); ++it)
+		for (InputEventListenersList::const_iterator it = consoleListeners_.begin(); it != consoleListeners_.end(); ++it)
 		{
 			if ((*it)->OnInputEventChar(event)) {
 				return false;
 			}
 		}
-		for (TInputEventListeners::const_iterator it = listners_.begin(); it != listners_.end(); ++it)
+		for (InputEventListenersList::const_iterator it = listners_.begin(); it != listners_.end(); ++it)
 		{
 			if ((*it)->OnInputEventChar(event)) {
 				break;
@@ -377,13 +372,13 @@ bool XBaseInput::SendEventToListeners(const InputEvent &event)
 	}
 	else
 	{
-		for (TInputEventListeners::const_iterator it = consoleListeners_.begin(); it != consoleListeners_.end(); ++it)
+		for (InputEventListenersList::const_iterator it = consoleListeners_.begin(); it != consoleListeners_.end(); ++it)
 		{
 			if ((*it)->OnInputEvent(event)) {
 				return false;
 			}
 		}
-		for (TInputEventListeners::const_iterator it = listners_.begin(); it != listners_.end(); ++it)
+		for (InputEventListenersList::const_iterator it = listners_.begin(); it != listners_.end(); ++it)
 		{
 			if ((*it)->OnInputEvent(event)) {
 				break;
