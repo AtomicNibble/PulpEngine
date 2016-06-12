@@ -76,16 +76,16 @@ void XBaseInput::ShutDown()
 	devices_.clear();
 
 
-	if (!Listners_.empty())
+	if (!listners_.empty())
 	{
-		X_WARNING("InputSys", "%i listners still registered", Listners_.size());
+		X_WARNING("InputSys", "%i listners still registered", listners_.size());
 	}
 	if (!consoleListeners_.empty())
 	{
 		X_WARNING("InputSys", "%i console listners still registered", consoleListeners_.size());
 	}
 
-	Listners_.clear();
+	listners_.clear();
 	consoleListeners_.clear();
 }
 
@@ -162,20 +162,20 @@ void XBaseInput::RetriggerKeyState(void)
 void XBaseInput::AddEventListener(IInputEventListner *pListener)
 {
 	// Add new listener to list if not added yet.
-	if (std::find(Listners_.begin(), Listners_.end(), pListener) == Listners_.end())
+	if (std::find(listners_.begin(), listners_.end(), pListener) == listners_.end())
 	{
-		Listners_.push_back(pListener);
-		Listners_.sort(compareInputListener);
+		listners_.push_back(pListener);
+		listners_.sort(compareInputListener);
 	}
 }
 
 void XBaseInput::RemoveEventListener(IInputEventListner *pListener)
 {
 	// Remove listener if it is in list.
-	TInputEventListeners::iterator it = std::find(Listners_.begin(), Listners_.end(), pListener);
-	if (it != Listners_.end())
+	TInputEventListeners::iterator it = std::find(listners_.begin(), listners_.end(), pListener);
+	if (it != listners_.end())
 	{
-		Listners_.erase(it);
+		listners_.erase(it);
 	}
 }
 
@@ -330,12 +330,8 @@ bool XBaseInput::SendEventToListeners(const InputEvent &event)
 	if (!bInputBlocked)
 	{
 		// Send this event to all listeners until the first one returns true.
-		for (TInputEventListeners::const_iterator it = Listners_.begin(); it != Listners_.end(); ++it)
+		for (TInputEventListeners::const_iterator it = listners_.begin(); it != listners_.end(); ++it)
 		{
-		//	assert(*it);
-			if (*it == NULL)
-				continue;
-
 			bool ret = false;
 			if (event.action != InputState::CHAR)
 				ret = (*it)->OnInputEvent(event);
@@ -403,7 +399,7 @@ void XBaseInput::SetModifiers(ModifierFlags flags)
 	this->modifiers_ = flags;
 }
 
-void XBaseInput::ClearModifiers()
+void XBaseInput::ClearModifiers(void)
 {
 	this->modifiers_.Clear();
 }

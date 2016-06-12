@@ -33,7 +33,7 @@ public:
 		 
 	void ClearKeyState(void) X_OVERRIDE;
 	void RetriggerKeyState(void) X_OVERRIDE;
-	X_INLINE bool	Retriggering(void) const X_OVERRIDE;
+	X_INLINE bool Retriggering(void) const X_OVERRIDE;
 	bool HasInputDeviceOfType(InputDeviceType::Enum type) const X_OVERRIDE;
 	bool AddInputDevice(IInputDevice* pDevice) X_OVERRIDE;
 	void EnableEventPosting(bool bEnable)X_OVERRIDE;
@@ -82,7 +82,7 @@ protected:
 	typedef core::Array<InputSymbol*>		TInputSymbols;
 
 	TInputSymbols						holdSymbols_;
-	TInputEventListeners				Listners_;
+	TInputEventListeners				listners_;
 	TInputEventListeners				consoleListeners_;
 
 	// input device management
