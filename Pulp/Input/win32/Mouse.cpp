@@ -115,10 +115,7 @@ void XMouse::ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame)
 
 void XMouse::PostEvent(InputSymbol* pSymbol, core::FrameInput& inputFrame)
 {
-	if (pSymbol)
-	{
-		pSymbol->AssignToEvent(inputFrame.events.AddOne(), GetIInput().GetModifiers());
-	}
+	pSymbol->AssignToEvent(inputFrame.events.AddOne(), GetIInput().GetModifiers());
 }
 
 void XMouse::PostOnlyIfChanged(InputSymbol* pSymbol, InputState::Enum newState, core::FrameInput& inputFrame)
