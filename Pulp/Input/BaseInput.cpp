@@ -24,12 +24,6 @@ namespace {
 		return false;
 	}
 
-	struct delete_ptr { // Helper function to ease cleanup of container
-		template <typename P>
-		void operator () (P p) {
-			X_DELETE(p, g_InputArena);
-		}
-	};
 }
 
 XBaseInput::XBaseInput() :
@@ -76,7 +70,7 @@ void XBaseInput::ShutDown(void)
 		device->ShutDown();
 	}
 
-	std::for_each(devices_.begin(), devices_.end(), delete_ptr());
+	std::for_each(devices_.begin(), devices_.end(), [](IInputDevice* pDevice) { X_DELETE(pDevice, g_InputArena); });
 	devices_.clear();
 
 
