@@ -1122,13 +1122,13 @@ void XConsole::AddCmdToHistory(const char* Command)
 	{
 		// make sure it's not same as last command 
 		if (CmdHistory_.front() != Command) {
-			CmdHistory_.push_front(core::string(Command));
+			CmdHistory_.emplace_front(Command);
 		}
 	}
 	else
 	{
 		// 1st commnd :D
-		CmdHistory_.push_front(core::string(Command));
+		CmdHistory_.emplace_front(Command);
 	}
 
 	// limit hte history.
