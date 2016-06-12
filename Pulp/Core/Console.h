@@ -179,13 +179,16 @@ public:
 	virtual void OnFileChange(const core::Path<char>& name) X_FINAL;
 	// ~IXHotReload
 
+	virtual void addLineToLog(const char* pStr, uint32_t length) X_FINAL;
+	virtual int getLineCount(void) const X_FINAL;
+
 
 	X_INLINE void ShowConsole(consoleState::Enum state);
 	X_INLINE bool isVisable(void) const;
 	X_INLINE bool isExpanded(void) const;
 	X_INLINE void ToggleConsole(bool expand = false);
 
-protected:
+private:
 	void LoadRenderResources(void);
 	void RegisterInputListener(void);
 
@@ -232,11 +235,11 @@ protected:
 
 	void ConfigExec(const char* command);
 
-public:
-
-	virtual void addLineToLog(const char* pStr, uint32_t length) X_FINAL;
-	virtual int getLineCount(void) const X_FINAL;
-
+	// scrool helpers
+private:
+	void PageUp(void);
+	void PageDown(void);
+	void ValidateScrollPos(void);
 
 private:
 	// AutoComplete

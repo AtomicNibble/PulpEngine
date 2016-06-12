@@ -708,23 +708,17 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 				}
 
 				ScrollPos_ += scaled;
-				if (ScrollPos_ < 0) {
-					ScrollPos_ = 0;
-				}
-				else
-				{
-					int32_t logSize = static_cast<int32_t>(ConsoleLog_.size());
-					int32_t visibleNum = static_cast<int32_t>(MaxVisibleLogLines());
-
-					logSize -= visibleNum;
-					logSize += 2;
-
-					if (ScrollPos_ > logSize) {
-						ScrollPos_ = logSize;
-					}
-				}
-
+				
+				ValidateScrollPos();
 				return true;
+			}
+			else if (event.keyId == input::KeyId::PAGE_UP)
+			{
+				PageUp();
+			}
+			else if (event.keyId == input::KeyId::PAGE_DOWN)
+			{
+				PageDown();
 			}
 		}
 
@@ -1564,6 +1558,43 @@ void XConsole::ConfigExec(const char* command)
 
 	ExecuteStringInternal(command, ExecSource::CONFIG, false);
 }
+
+
+void XConsole::PageUp(void)
+{
+	int32_t visibleNum = static_cast<int32_t>(MaxVisibleLogLines());
+	ScrollPos_ += visibleNum;
+
+	ValidateScrollPos();
+}
+
+void XConsole::PageDown(void)
+{
+	int32_t visibleNum = static_cast<int32_t>(MaxVisibleLogLines());
+	ScrollPos_ -= visibleNum;
+
+	ValidateScrollPos();
+}
+
+void XConsole::ValidateScrollPos(void)
+{
+	if (ScrollPos_ < 0) {
+		ScrollPos_ = 0;
+	}
+	else
+	{
+		int32_t logSize = static_cast<int32_t>(ConsoleLog_.size());
+		int32_t visibleNum = static_cast<int32_t>(MaxVisibleLogLines());
+
+		logSize -= visibleNum;
+		logSize += 2;
+
+		if (ScrollPos_ > logSize) {
+			ScrollPos_ = logSize;
+		}
+	}
+}
+
 
 bool XConsole::CvarModifyBegin(ICVar* pCVar, ExecSource::Enum source)
 {
