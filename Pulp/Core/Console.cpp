@@ -96,6 +96,10 @@ namespace
 			end_(cmd + core::strUtil::strlen(cmd))
 		{}
 
+		CommandParser(const char* pBegin, const char* pEnd) :
+			begin_(pBegin),
+			end_(pEnd)
+		{}
 
 		bool extractCommand(core::StringRange<char>& cmd)
 		{
