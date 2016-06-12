@@ -461,6 +461,27 @@ void StackString<N, wchar_t>::stripTrailing(const wchar_t c)
 	}
 }
 
+template <size_t N>
+void StackString<N, wchar_t>::stripColorCodes(void)
+{
+	// when we find color codes we wnat to just shift remaning chars.
+	size_t i;
+	size_t shiftSize = 0;
+
+	for (i = 0; i < len_; i++)
+	{
+		const char& cur = str_[i];
+		if (cur == L'^' && (i + 1) < len_ && core::strUtil::IsDigitW(str_[i + 1])) {
+			// ok we want to shift up two.
+			shiftSize += 4;
+			len_ -= 2;
+		}
+
+		if (shiftSize) {
+			std::memmove(&str_[i], &str_[i + shiftSize], shiftSize);
+		}
+	}
+}
 
 template <size_t N>
 void StackString<N, wchar_t>::trimRight(const wchar_t* pos)

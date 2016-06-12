@@ -98,6 +98,8 @@ public:
 	/// \brief strip char from end as many times as the char occurs
 	inline void stripTrailing(const TChar c);
 
+	/// removes the color codes ^1 ..
+	inline void stripColorCodes(void);
 
 	/// \brief Clears the string such that GetLength() yields 0.
 	/// \remark No assumptions about the characters stored in the internal array should be made.
@@ -224,6 +226,8 @@ public:
 	/// \brief strip char from end as many times as the char occurs
 	inline void stripTrailing(const wchar_t c);
 
+	/// removes the color codes ^1 ..
+	inline void stripColorCodes(void);
 
 	/// \brief Clears the string such that GetLength() yields 0.
 	/// \remark No assumptions about the characters stored in the internal array should be made.
