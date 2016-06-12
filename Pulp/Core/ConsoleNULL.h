@@ -24,8 +24,9 @@ public:
 	virtual void unregisterInputListener(void) X_FINAL;
 	virtual void freeRenderResources(void) X_FINAL;
 
-
-	virtual void Draw(void) X_FINAL;
+	virtual void dispatchRepeateInputEvents(void) X_FINAL;
+	virtual void runDeferredCmds(void) X_FINAL;
+	virtual void draw(void) X_FINAL;
 
 	virtual consoleState::Enum getVisState(void) const X_FINAL;
 
@@ -56,8 +57,6 @@ public:
 
 //	virtual void ConfigExec(const char* command) X_FINAL;
 	virtual bool LoadConfig(const char* fileName) X_FINAL;
-
-	void OnFrameBegin(void) X_FINAL;
 
 	// Loggging
 	virtual void addLineToLog(const char* pStr, uint32_t length) X_FINAL;

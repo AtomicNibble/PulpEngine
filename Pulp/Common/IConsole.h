@@ -84,7 +84,10 @@ struct IConsole
 	virtual void unregisterInputListener(void) X_ABSTRACT;
 	virtual void freeRenderResources(void) X_ABSTRACT;
 
-	virtual void Draw(void) X_ABSTRACT;
+	// console set's it's own input repeat rate, that's timed instead of every frame.
+	virtual void dispatchRepeateInputEvents(void) X_ABSTRACT; 
+	virtual void runDeferredCmds(void) X_ABSTRACT;
+	virtual void draw(void) X_ABSTRACT;
 
 	virtual consoleState::Enum getVisState(void) const X_ABSTRACT;
 
@@ -117,7 +120,6 @@ struct IConsole
 //	virtual void ConfigExec(const char* command) X_ABSTRACT;
 	virtual bool LoadConfig(const char* fileName) X_ABSTRACT;
 
-	virtual void OnFrameBegin(void) X_ABSTRACT;
 
 	// Logging
 	virtual void addLineToLog(const char* pStr, uint32_t length) X_ABSTRACT;

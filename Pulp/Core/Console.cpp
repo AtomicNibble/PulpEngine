@@ -1807,15 +1807,17 @@ void XConsole::ExecuteDeferredCommands()
 	}
 }
 
-void XConsole::OnFrameBegin(void)
-{
-	ExecuteDeferredCommands();
 
-	if (!isVisable())
-	{
+void XConsole::dispatchRepeateInputEvents(void)
+{
+	// we must be open to accept input.
+	// cancel any repeat events when we close.
+	if (!isVisable()) {
 		repeatEvent_.keyId = input::KeyId::UNKNOWN;
+		return;
 	}
-	else if (repeatEvent_.keyId != input::KeyId::UNKNOWN)
+
+	if (repeatEvent_.keyId != input::KeyId::UNKNOWN)
 	{
 		repeatEventTimer_ -= gEnv->pTimer->GetFrameTime();
 
@@ -1825,17 +1827,21 @@ void XConsole::OnFrameBegin(void)
 				OnInputEventChar(repeatEvent_);
 			}
 			else {
+				// do we even want to repeat none char events?
 				ProcessInput(repeatEvent_);
 			}
 
 			repeatEventTimer_ = repeatEventInterval_;
-
 		}
 	}
 }
 
+void XConsole::runDeferredCmds(void)
+{
+	ExecuteDeferredCommands();
+}
 
-void XConsole::Draw()
+void XConsole::draw(void)
 {
 	cursor_.curTime += gEnv->pTimer->GetFrameTime();
 
@@ -2953,7 +2959,17 @@ void XConsoleNULL::freeRenderResources(void)
 
 }
 
-void XConsoleNULL::Draw(void)
+void XConsoleNULL::dispatchRepeateInputEvents(void)
+{
+
+}
+
+void XConsoleNULL::runDeferredCmds(void)
+{
+
+}
+
+void XConsoleNULL::draw(void)
 {
 
 }
@@ -3140,12 +3156,6 @@ void XConsoleNULL::ConfigExec(const char* command)
 	X_UNUSED(command);
 
 }*/
-
-
-void XConsoleNULL::OnFrameBegin()
-{
-
-}
 
 
 // Loggging

@@ -99,7 +99,7 @@ bool XCore::Update(void)
 	}
 
 	if (env_.pConsole) {
-		env_.pConsole->OnFrameBegin();
+//		env_.pConsole->OnFrameBegin();
 	}
 
 	if (env_.pSound) {
@@ -225,7 +225,7 @@ void XCore::RenderEnd(void)
 		profileSys_.Render();
 
 		if (core::IConsole* pConsole = GetIConsole()) {
-			pConsole->Draw();
+			pConsole->draw();
 		}
 		
 		env_.pRender->RenderEnd();

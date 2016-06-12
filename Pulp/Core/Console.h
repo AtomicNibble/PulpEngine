@@ -134,7 +134,9 @@ public:
 	virtual void unregisterInputListener(void) X_FINAL;
 	virtual void freeRenderResources(void) X_FINAL;
 
-	virtual void Draw(void) X_FINAL;
+	virtual void dispatchRepeateInputEvents(void) X_FINAL;
+	virtual void runDeferredCmds(void) X_FINAL;
+	virtual void draw(void) X_FINAL;
 
 	virtual consoleState::Enum getVisState(void) const X_FINAL;
 
@@ -177,7 +179,6 @@ public:
 	virtual void OnFileChange(const core::Path<char>& name) X_FINAL;
 	// ~IXHotReload
 
-	void OnFrameBegin(void) X_FINAL;
 
 	X_INLINE void ShowConsole(consoleState::Enum state);
 	X_INLINE bool isVisable(void) const;
