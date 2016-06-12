@@ -1665,6 +1665,7 @@ void XConsole::ExecuteStringInternal(const char* pCommand, ExecSource::Enum sour
 		}
 
 		name.trim();
+		name.stripColorCodes();
 
 		if (name.isEmpty())
 			continue;
