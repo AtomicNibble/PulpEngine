@@ -226,22 +226,32 @@ bool XBaseInput::IsEventPostingEnabled(void) const
 	return enableEventPosting_;
 }
 
-bool XBaseInput::PostInputEvent(const InputEvent &event, bool bForce)
+bool XBaseInput::PostInputEvent(const InputEvent &event)
 {
-	if (!bForce && !enableEventPosting_)
-	{
+	if (event.keyId == KeyId::UNKNOWN) {
 		return false;
 	}
 
-	if (event.keyId == KeyId::UNKNOWN)
-	{
+	if (!SendEventToListeners(event)) {
 		return false;
 	}
-
-	if (!SendEventToListeners(event))
-		return false;
 
 	AddEventToHoldSymbols(event);
+	return true;
+}
+
+bool XBaseInput::PostInputFrame(core::FrameData& frameData)
+{
+	if (!enableEventPosting_) {
+		X_LOG2("Input", "Input posting is disable");
+		return false;
+	}
+
+	const auto& input = frameData.input;
+	for (const auto& e : input.events) {
+		PostInputEvent(e);
+	}
+
 	return true;
 }
 

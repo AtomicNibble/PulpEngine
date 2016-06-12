@@ -38,7 +38,8 @@ public:
 	bool AddInputDevice(IInputDevice* pDevice) X_OVERRIDE;
 	void EnableEventPosting(bool bEnable)X_OVERRIDE;
 	bool IsEventPostingEnabled(void) const X_OVERRIDE;
-	bool PostInputEvent(const InputEvent &event, bool bForce = false);
+	bool PostInputFrame(core::FrameData& frameData) X_OVERRIDE;
+
 
 	// listener functions (implemented)
 	void AddEventListener(IInputEventListner* pListener) X_OVERRIDE;
@@ -68,7 +69,7 @@ protected:
 	void AddHoldEvents(core::FrameInput& inputFrame);
 
 private:
-
+	bool PostInputEvent(const InputEvent &event);
 	void ClearHoldEvent(InputSymbol* pSymbol);
 	bool SendEventToListeners(const InputEvent &event);
 	void AddEventToHoldSymbols(const InputEvent &event);

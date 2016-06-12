@@ -20,7 +20,7 @@ public:
 
 	virtual void EnableEventPosting(bool bEnable)  X_OVERRIDE;
 	virtual bool IsEventPostingEnabled(void) const X_OVERRIDE;
-	virtual bool PostInputEvent(const InputEvent &event, bool bForce = false) X_OVERRIDE;
+	virtual bool PostInputFrame(core::FrameData& frameData) X_OVERRIDE;
 
 
 	virtual bool Init(void) X_OVERRIDE;

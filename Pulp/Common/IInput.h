@@ -435,7 +435,7 @@ struct IInput
 
 	virtual void EnableEventPosting(bool bEnable) X_ABSTRACT;
 	virtual bool IsEventPostingEnabled(void) const X_ABSTRACT;
-	virtual bool PostInputEvent(const InputEvent& event, bool bForce = false) X_ABSTRACT;
+	virtual bool PostInputFrame(core::FrameData& frameData) X_ABSTRACT;
 
 	virtual bool Init(void) X_ABSTRACT;
 	virtual void PostInit(void) X_ABSTRACT;

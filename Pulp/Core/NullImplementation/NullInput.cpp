@@ -42,11 +42,10 @@ bool XNullInput::IsEventPostingEnabled(void) const
 	return false;
 }
 
-bool XNullInput::PostInputEvent(const InputEvent &event, bool bForce)
+bool XNullInput::PostInputFrame(core::FrameData& frameData)
 {
-	X_UNUSED(event);
-	X_UNUSED(bForce);
-	return false; 
+	X_UNUSED(frameData);
+	return false;
 }
 
 
