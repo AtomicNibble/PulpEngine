@@ -109,16 +109,11 @@ struct InputState
 	}
 };
 
-struct InputDeviceType
-{
-	enum Enum
-	{
-		KEYBOARD,
-		MOUSE,
-		UNKNOWN
-	};
-};
-
+X_DECLARE_ENUM(InputDeviceType)(
+	KEYBOARD,
+	MOUSE,
+	UNKNOWN
+);
 
 
 // both keyboard and mouse map to this data
