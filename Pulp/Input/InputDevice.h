@@ -30,7 +30,6 @@ public:
 	void Enable(bool enable) X_OVERRIDE;
 	X_INLINE bool IsEnabled(void) const X_OVERRIDE;
 	void ClearKeyState(void) X_OVERRIDE;
-	X_INLINE bool SetExclusiveMode(bool value) X_OVERRIDE;
 	InputSymbol* LookupSymbol(KeyId::Enum id) const X_OVERRIDE;
 	// ~IInputDevice
 

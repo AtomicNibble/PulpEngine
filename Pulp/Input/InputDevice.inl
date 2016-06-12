@@ -29,12 +29,6 @@ bool XInputDevice::IsEnabled(void) const
 	return enabled_; 
 }
 
-bool XInputDevice::SetExclusiveMode(bool value)
-{
-	X_UNUSED(value);
-	return true;
-}
-
 IInput& XInputDevice::GetIInput(void) const 
 {
 	return input_; 

@@ -26,7 +26,6 @@ public:
 	bool Init(void) X_OVERRIDE;
 	void ShutDown(void) X_OVERRIDE;
 	void Update(core::FrameData& frameData) X_OVERRIDE;
-	bool SetExclusiveMode(bool value) X_OVERRIDE;
 	X_INLINE bool IsOfDeviceType(InputDeviceType::Enum type) const X_OVERRIDE;
 	// ~IInputDevice
 

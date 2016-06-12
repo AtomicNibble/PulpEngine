@@ -73,9 +73,6 @@ private:
 	void ClearHoldEvent(InputSymbol* pSymbol);
 	bool SendEventToListeners(const InputEvent &event);
 	void AddEventToHoldSymbols(const InputEvent &event);
-
-//	void RemoveDeviceHoldSymbols(EDeviceId deviceId, uint8 deviceIndex);
-
 protected:
 	// listener functionality
 	typedef core::Array<IInputDevice*>		TInputDevices;

@@ -298,12 +298,4 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse, core::FrameInput& inputFram
 	// input_mouse_pos_debug
 }
 
-///////////////////////////////////////////
-bool XMouse::SetExclusiveMode(bool value)
-{
-	X_ASSERT_NOT_IMPLEMENTED();
-	X_UNUSED(value);
-	return true;
-}
-
 X_NAMESPACE_END

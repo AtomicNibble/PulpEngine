@@ -407,7 +407,6 @@ struct IInputDevice
 	virtual void ClearKeyState(void) X_ABSTRACT;
 
 	virtual bool IsOfDeviceType(InputDeviceType::Enum type) const X_ABSTRACT;
-	virtual bool SetExclusiveMode(bool value) X_ABSTRACT;
 	virtual InputSymbol* LookupSymbol(KeyId::Enum id) const X_ABSTRACT;
 };
 
