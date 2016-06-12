@@ -886,7 +886,6 @@ const char* CVarVec3Ref::GetString(CVarBase::StrBuf& buf)
 
 const char* CVarVec3Ref::GetDefaultStr(CVarBase::StrBuf& buf) const
 {
-	static char szReturnString[64];
 	sprintf_s(buf, "%g %g %g", Default_.x,
 		Default_.y, Default_.z);
 	return buf;
