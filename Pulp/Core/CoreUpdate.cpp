@@ -20,6 +20,29 @@
 X_USING_NAMESPACE;
 
 
+
+// we have a load of things todo.
+/*
+Get input. (input events)
+Check dir watcher for changed files.
+Console?
+3dEngine:
+animations
+loading of assets
+culling
+greating drawcalls.
+sounds
+scripts sys
+physics
+
+
+Do we want to be fancy and depending on how much spare frame tiem we have for the target fps, allow more streaming jobs to happen.
+Also instead of sleeping we could be running physcis steps...
+*/
+
+
+
+
 bool XCore::RunGameLoop(void)
 {
 #if X_ENABLE_ASSERTIONS
@@ -40,6 +63,8 @@ bool XCore::RunGameLoop(void)
 bool XCore::Update(void)
 {
 	X_PROFILE_BEGIN("CoreUpdate", core::ProfileSubSys::CORE);
+	using namespace core::V2;
+
 	profileSys_.OnFrameBegin();
 	time_.OnFrameBegin();
 
@@ -49,45 +74,42 @@ bool XCore::Update(void)
 
 #if 1
 
-	// we want to do everything via jobs. :D 
-	// we also want frame data.
+	// Core events like windows move or resize & focus will have been dispatched during PumpMessages
+	// so the happen at a defined time before a frame starts.
+
+
 	core::FrameData frameData;
 	frameData.startTime = time_.GetFrameStartTime();
 	frameData.delta = time_.GetFrameTime();
 	frameData.flags.Set(core::FrameFlag::HAS_FOCUS);
 
-	// we have a load of things todo.
-	/*
-		Get input. (input events)
-		Check dir watcher for changed files.
-		Console?
-		3dEngine:
-			animations
-			loading of assets
-			culling
-			greating drawcalls.
-		sounds
-		scripts sys
-		physics
 
-	
-		Do we want to be fancy and depending on how much spare frame tiem we have for the target fps, allow more streaming jobs to happen.
-
-	*/
-
-
-	core::V2::JobSystem& jobSys = *env_.pJobSys;
+	JobSystem& jobSys = *env_.pJobSys;
 
 	// top job that we can use to wait for the chain of jobs to complete.
-	core::V2::Job* pSyncJob = jobSys.CreateJob(&core::V2::JobSystem::EmptyJob, nullptr);
+	Job* pSyncJob = jobSys.CreateJob(&core::V2::JobSystem::EmptyJob, nullptr);
 
 	// start a job to handler any file chnages and create relaod child jobs.
 	jobSys.AddContinuation(pSyncJob, jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_DirectoryWatcher, nullptr));
-	jobSys.AddContinuation(pSyncJob, jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_ProcessInput, &frameData));
+
+	Job* pInputJob = jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_ProcessInput, &frameData);
+	{
+		Job* pPostInputFrame = jobSys.CreateMemberJobAsChild<XCore>(pInputJob, this, &XCore::Job_PostInputFrame, &frameData);
+
+		// post the input frame after processing the inputs.
+		jobSys.AddContinuation(pInputJob, pPostInputFrame);
+
+		Job* pConsoleUpdates = jobSys.CreateMemberJob<XCore>(this, &XCore::Job_ConsoleUpdates, nullptr);
+
+		// we run console updates after input events have been posted.
+		jobSys.AddContinuation(pInputJob, pConsoleUpdates);
+	}
+
+
+	jobSys.AddContinuation(pSyncJob, pInputJob);
 
 	jobSys.Run(pSyncJob);
 	jobSys.Wait(pSyncJob);
-
 
 
 	if (env_.pGame) {
@@ -98,10 +120,7 @@ bool XCore::Update(void)
 		env_.p3DEngine->Update();
 	}
 
-	if (env_.pConsole) {
-//		env_.pConsole->OnFrameBegin();
-	}
-
+	// we could update the sound system while rendering on gpu.
 	if (env_.pSound) {
 		env_.pSound->Update();
 	}
