@@ -53,11 +53,6 @@ public:
 
 	X_INLINE HWND GetHWnd(void) const;
 
-
-private:
-	void Job_ProcessMouseEvents(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-	void Job_ProcessKeyboardEvents(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-
 private:
 	BOOL isWow64_;
 	HWND hWnd_;
