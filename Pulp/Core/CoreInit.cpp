@@ -1,11 +1,11 @@
 #include "stdafx.h"
 #include "Console.h"
 #include "Core.h"
-#include "ConsoleNULL.h"
 #include "Log.h"
 
 #include <String\CmdArgs.h>
 
+#include "NullImplementation\ConsoleNULL.h"
 #include "NullImplementation/NullInput.h"
 
 #include <Debugging\InvalidParameterHandler.h>
