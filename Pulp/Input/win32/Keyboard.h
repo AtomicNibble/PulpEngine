@@ -5,6 +5,11 @@
 
 #include "InputDeviceWin32.h"
 
+X_NAMESPACE_DECLARE(core,
+	struct FrameInput;
+);
+
+
 X_NAMESPACE_BEGIN(input)
 
 class XWinInput;
@@ -25,7 +30,7 @@ public:
 	X_INLINE bool IsOfDeviceType(InputDeviceType::Enum type) const X_OVERRIDE;
 	// ~IInputDevice
 
-	void ProcessInput(const uint8_t* pData);
+	void ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame);
 
 private:
 	void initAsciiCache(void);
@@ -33,7 +38,7 @@ private:
 	char Event2Char(const InputEvent& event);
 	inline bool IsCHAR(const InputEvent& event);
 
-	void ProcessKeyboardData(const RAWKEYBOARD&);
+	void ProcessKeyboardData(const RAWKEYBOARD& rawKb, core::FrameInput& inputFrame);
 
 	struct AsciiVal
 	{

@@ -5,6 +5,10 @@
 
 #include "InputDeviceWin32.h"
 
+X_NAMESPACE_DECLARE(core,
+	struct FrameInput;
+);
+
 X_NAMESPACE_BEGIN(input)
 
 class XWinInput;
@@ -26,16 +30,16 @@ public:
 	X_INLINE bool IsOfDeviceType(InputDeviceType::Enum type) const X_OVERRIDE;
 	// ~IInputDevice
 
-	void ProcessInput(const uint8_t* pData);
+	void ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame);
 
 private:
-	void PostEvent(InputSymbol* pSymbol);
-	void PostOnlyIfChanged(InputSymbol* pSymbol, InputState::Enum newState);
+	void PostEvent(InputSymbol* pSymbol, core::FrameInput& inputFrame);
+	void PostOnlyIfChanged(InputSymbol* pSymbol, InputState::Enum newState, core::FrameInput& inputFrame);
 
-	void OnButtonDown(KeyId::Enum id);
-	void OnButtonUP(KeyId::Enum id);
+	void OnButtonDown(KeyId::Enum id, core::FrameInput& inputFrame);
+	void OnButtonUP(KeyId::Enum id, core::FrameInput& inputFrame);
 
-	void ProcessMouseData(const RAWMOUSE& mouse);
+	void ProcessMouseData(const RAWMOUSE& mouse, core::FrameInput& inputFrame);
 
 	X_INLINE InputSymbol* GetSymbol(KeyId::Enum id);
 

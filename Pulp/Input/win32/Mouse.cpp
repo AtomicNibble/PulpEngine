@@ -106,24 +106,22 @@ void XMouse::Update(bool focus)
 	X_UNUSED(focus);
 }
 
-void XMouse::ProcessInput(const uint8_t* pData)
+void XMouse::ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame)
 {
 	const RAWMOUSE& mouse = *reinterpret_cast<const RAWMOUSE*>(pData);
-	ProcessMouseData(mouse);
+	ProcessMouseData(mouse, inputFrame);
 }
 
 
-void XMouse::PostEvent(InputSymbol* pSymbol)
+void XMouse::PostEvent(InputSymbol* pSymbol, core::FrameInput& inputFrame)
 {
 	if (pSymbol)
 	{
-		InputEvent event;
-		pSymbol->AssignToEvent(event, GetIInput().GetModifiers());
-		GetIInput().PostInputEvent(event);
+		pSymbol->AssignToEvent(inputFrame.events.AddOne(), GetIInput().GetModifiers());
 	}
 }
 
-void XMouse::PostOnlyIfChanged(InputSymbol* pSymbol, InputState::Enum newState)
+void XMouse::PostOnlyIfChanged(InputSymbol* pSymbol, InputState::Enum newState, core::FrameInput& inputFrame)
 {
 	if (pSymbol->state != InputState::RELEASED && newState == InputState::RELEASED)
 	{
@@ -140,11 +138,11 @@ void XMouse::PostOnlyIfChanged(InputSymbol* pSymbol, InputState::Enum newState)
 		return;
 	}
 
-	PostEvent(pSymbol);
+	PostEvent(pSymbol, inputFrame);
 }
 
 
-void XMouse::OnButtonDown(KeyId::Enum id)
+void XMouse::OnButtonDown(KeyId::Enum id, core::FrameInput& inputFrame)
 {
 	InputSymbol* pSymbol = GetSymbol(id);
 
@@ -156,10 +154,10 @@ void XMouse::OnButtonDown(KeyId::Enum id)
 		X_LOG0("Mouse", "Button Down: \"%s\"", pSymbol->name.c_str());
 	}
 
-	PostEvent(pSymbol);
+	PostEvent(pSymbol, inputFrame);
 }
 
-void XMouse::OnButtonUP(KeyId::Enum id)
+void XMouse::OnButtonUP(KeyId::Enum id, core::FrameInput& inputFrame)
 {
 	InputSymbol* pSymbol = GetSymbol(id);
 
@@ -171,61 +169,61 @@ void XMouse::OnButtonUP(KeyId::Enum id)
 		X_LOG0("Mouse", "Button Up: \"%s\"", pSymbol->name.c_str());
 	}
 
-	PostEvent(pSymbol);
+	PostEvent(pSymbol, inputFrame);
 }
 
-void XMouse::ProcessMouseData(const RAWMOUSE& mouse)
+void XMouse::ProcessMouseData(const RAWMOUSE& mouse, core::FrameInput& inputFrame)
 {
 
 	// i think i can get all info from raw input tbh.
 	// get rekt.
 	if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN)
 	{
-		OnButtonDown(KeyId::MOUSE_LEFT);
+		OnButtonDown(KeyId::MOUSE_LEFT, inputFrame);
 	}
 	else if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_UP)
 	{
-		OnButtonUP(KeyId::MOUSE_LEFT);
+		OnButtonUP(KeyId::MOUSE_LEFT, inputFrame);
 	}
 
 	// Right Mouse
 	if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN)
 	{
-		OnButtonDown(KeyId::MOUSE_RIGHT);
+		OnButtonDown(KeyId::MOUSE_RIGHT, inputFrame);
 	}
 	else if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_UP)
 	{
-		OnButtonUP(KeyId::MOUSE_RIGHT);
+		OnButtonUP(KeyId::MOUSE_RIGHT, inputFrame);
 	}
 
 	// Middle Mouse
 	if (mouse.usButtonFlags & RI_MOUSE_MIDDLE_BUTTON_DOWN)
 	{
-		OnButtonDown(KeyId::MOUSE_MIDDLE);
+		OnButtonDown(KeyId::MOUSE_MIDDLE, inputFrame);
 	}
 	else if (mouse.usButtonFlags & RI_MOUSE_MIDDLE_BUTTON_UP)
 	{
-		OnButtonUP(KeyId::MOUSE_MIDDLE);
+		OnButtonUP(KeyId::MOUSE_MIDDLE, inputFrame);
 	}
 
 	// aux 4
 	if (mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN)
 	{
-		OnButtonDown(KeyId::MOUSE_AUX_4);
+		OnButtonDown(KeyId::MOUSE_AUX_4, inputFrame);
 	}
 	else if (mouse.usButtonFlags & RI_MOUSE_BUTTON_4_UP)
 	{
-		OnButtonUP(KeyId::MOUSE_AUX_4);
+		OnButtonUP(KeyId::MOUSE_AUX_4, inputFrame);
 	}
 
 	// aux 5
 	if (mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN)
 	{
-		OnButtonDown(KeyId::MOUSE_AUX_5);
+		OnButtonDown(KeyId::MOUSE_AUX_5, inputFrame);
 	}
 	else if (mouse.usButtonFlags & RI_MOUSE_BUTTON_5_UP)
 	{
-		OnButtonUP(KeyId::MOUSE_AUX_5);
+		OnButtonUP(KeyId::MOUSE_AUX_5, inputFrame);
 	}
 
 	if (mouse.usButtonFlags & RI_MOUSE_WHEEL)
@@ -247,7 +245,7 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse)
 			X_LOG0("Mouse", "ScrollUp(%g)", mouseWheel_);
 		}
 
-		PostOnlyIfChanged(GetSymbol(KeyId::MOUSE_WHEELUP), newState);
+		PostOnlyIfChanged(GetSymbol(KeyId::MOUSE_WHEELUP), newState, inputFrame);
 
 		newState = (mouseWheel_ < 0.0f) ? InputState::PRESSED : InputState::RELEASED;
 
@@ -256,7 +254,7 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse)
 			X_LOG0("Mouse", "ScrollDown(%g)", mouseWheel_);
 		}
 
-		PostOnlyIfChanged(GetSymbol(KeyId::MOUSE_WHEELDOWN), newState);
+		PostOnlyIfChanged(GetSymbol(KeyId::MOUSE_WHEELDOWN), newState, inputFrame);
 
 		// we post scrool direction events.
 		InputSymbol* pSymbol = GetSymbol(KeyId::MOUSE_Z);
@@ -265,7 +263,7 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse)
 		pSymbol->state = InputState::CHANGED;
 
 
-		PostEvent(pSymbol);
+		PostEvent(pSymbol, inputFrame);
 	}
 
 	if (mouse.usFlags == MOUSE_MOVE_RELATIVE)
@@ -282,7 +280,7 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse)
 				X_LOG0("Mouse", "posX: \"%g\"", pSymbol->value);
 			}
 
-			PostEvent(pSymbol);
+			PostEvent(pSymbol, inputFrame);
 		}
 		if (mouse.lLastY != 0)
 		{
@@ -296,7 +294,7 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse)
 				X_LOG0("Mouse", "posY: \"%g\"", pSymbol->value);
 			}
 
-			PostEvent(pSymbol);
+			PostEvent(pSymbol, inputFrame);
 		}
 	}
 

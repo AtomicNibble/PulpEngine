@@ -6,9 +6,9 @@
 #include <IInput.h>
 #include "InputDevice.h"
 
-// #include <string>
-// #include <map>
-
+X_NAMESPACE_DECLARE(core,
+	struct FrameInput;
+);
 
 
 X_NAMESPACE_BEGIN(input)
@@ -21,7 +21,7 @@ public:
 
 
 	virtual void Update(bool focus)X_OVERRIDE;
-	virtual void ProcessInput(const uint8_t* pData) X_ABSTRACT;
+	virtual void ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame) X_ABSTRACT;
 	virtual void ShutDown(void) X_ABSTRACT;
 
 	// ~IInputDevice
