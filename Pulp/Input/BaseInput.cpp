@@ -312,10 +312,11 @@ void XBaseInput::AddHoldEvents(core::FrameInput& inputFrame)
 		count = eventSpace;
 	}
 
+	ModifierFlags modifiers = GetModifiers();
 	for (size_t i = 0; i < count; ++i)
 	{
-		InputEvent event = inputFrame.events.AddOne();
-		holdSymbols_[i]->AssignToEvent(event, GetModifiers());
+		InputEvent& event = inputFrame.events.AddOne();
+		holdSymbols_[i]->AssignToEvent(event, modifiers);
 	}
 }
 
