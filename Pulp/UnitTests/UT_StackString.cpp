@@ -4,6 +4,40 @@
 
 X_USING_NAMESPACE;
 
+TEST(StackString, stripColorCodes)
+{
+	core::StackString<64> str_1("hel^1lo ^8bob");
+	core::StackString<64> str_2("hello bob^1^what^9 is your ^1name");
+	core::StackString<64> str_3("hello  2goat cow boat bob^");
+	core::StackString<64> str_4("hello^4 sfs sebob");
+	core::StackString<64> str_5("^1hello adad a abob^2");
+	core::StackString<64> str_6("hellof^4sf se bob");
+	core::StackString<64> str_7("helf fsel^8o bob");
+	core::StackString<64> str_8("hellfsf ^7^&^&^9fso bob");
+	core::StackString<64> str_9("hellofse bob^^^^^");
+
+	str_1.stripColorCodes();
+	str_2.stripColorCodes();
+	str_3.stripColorCodes();
+	str_4.stripColorCodes();
+	str_5.stripColorCodes();
+	str_6.stripColorCodes();
+	str_7.stripColorCodes();
+	str_8.stripColorCodes();
+	str_9.stripColorCodes();
+
+
+	EXPECT_STREQ("hello bob", str_1.c_str());
+	EXPECT_STREQ("hello bob^what is your name", str_2.c_str());
+	EXPECT_STREQ("hello  2goat cow boat bob^", str_3.c_str());
+	EXPECT_STREQ("hello sfs sebob", str_4.c_str());
+	EXPECT_STREQ("hello adad a abob", str_5.c_str());
+	EXPECT_STREQ("hellofsf se bob", str_6.c_str());
+	EXPECT_STREQ("helf fselo bob", str_7.c_str());
+	EXPECT_STREQ("hellfsf ^&^&fso bob", str_8.c_str());
+	EXPECT_STREQ("hellofse bob^^^^^", str_9.c_str());
+
+}
 
 TEST(StackString, Construct)
 {
