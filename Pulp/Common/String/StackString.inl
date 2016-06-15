@@ -460,24 +460,23 @@ template <size_t N, typename TChar>
 void StackString<N, TChar>::stripColorCodes(void)
 {
 	// when we find color codes we wnat to just shift remaning chars.
+	StackString<N, TChar> buf(*this);
+	
+	clear();
 
-	size_t i;
-	size_t shiftSize = 0;
-
-	for (i = 0; i < len_; i++)
+	const size_t len = buf.length();
+	for (size_t i = 0; i < len; i++)
 	{
-		const char& cur = str_[i];
-		if (cur == '^' && (i+1) < len_ && core::strUtil::IsDigit(str_[i+1])) {
-			// ok we want to shift up two.
-			shiftSize += 2;
-			len_ -= 2;
+		const char& cur = buf.str_[i];
+		if (cur == '^' && (i+1) < len && core::strUtil::IsDigit(buf.str_[i+1])) {
+			i += 1;
 		}
-
-		if (shiftSize) {
-			std::memmove(&str_[i], &str_[i + shiftSize], shiftSize);
+		else {
+			str_[len_++] = cur;
 		}
 	}
 
+	str_[len_] = '\0';
 }
 
 

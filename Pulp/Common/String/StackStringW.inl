@@ -464,23 +464,23 @@ void StackString<N, wchar_t>::stripTrailing(const wchar_t c)
 template <size_t N>
 void StackString<N, wchar_t>::stripColorCodes(void)
 {
-	// when we find color codes we wnat to just shift remaning chars.
-	size_t i;
-	size_t shiftSize = 0;
+	StackString<N, wchar_t> buf(*this);
 
-	for (i = 0; i < len_; i++)
+	clear();
+
+	const size_t len = buf.length();
+	for (size_t i = 0; i < len; i++)
 	{
-		const char& cur = str_[i];
-		if (cur == L'^' && (i + 1) < len_ && core::strUtil::IsDigitW(str_[i + 1])) {
-			// ok we want to shift up two.
-			shiftSize += 4;
-			len_ -= 2;
+		const wchar_t& cur = buf.str_[i];
+		if (cur == L'^' && (i + 1) < len && core::strUtil::IsDigitW(buf.str_[i + 1])) {
+			i += 1;
 		}
-
-		if (shiftSize) {
-			std::memmove(&str_[i], &str_[i + shiftSize], shiftSize);
+		else {
+			str_[len_++] = cur;
 		}
 	}
+
+	str_[len_] = L'\0';
 }
 
 template <size_t N>
