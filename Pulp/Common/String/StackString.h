@@ -29,6 +29,9 @@ public:
 	/// Constructs an empty string.
 	inline StackString(void);
 
+
+	inline StackString(const StackString<N,TChar>& oth);
+
 	/// Constructs a string by copying the given string.
 	explicit StackString(const wchar_t* const str);
 	explicit StackString(const char* const str);
