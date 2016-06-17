@@ -117,7 +117,4 @@ X_POP_WARNING_LEVEL
 #endif // !X_LIB
 
 
-
-#define PotatoSleep(ms) ::Sleep(ms)
-
 #endif // !_X_PLATFORM_WIN32_H_

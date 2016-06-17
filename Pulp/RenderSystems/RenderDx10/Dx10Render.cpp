@@ -1331,7 +1331,7 @@ ID3D11InputLayout* DX11XRender::CreateILFromDesc(const shader::VertexFormat::Enu
 
 		// sleep in debug mode
 #if X_DEBUG
-		PotatoSleep(500);
+		core::Thread::Sleep(500);
 #endif // !X_DEBUG
 		return nullptr;
 	}

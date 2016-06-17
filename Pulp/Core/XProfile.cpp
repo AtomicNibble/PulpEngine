@@ -34,10 +34,10 @@ namespace
 			int nPriority = GetThreadPriority(GetCurrentThread());
 			SetPriorityClass(GetCurrentProcess(), REALTIME_PRIORITY_CLASS);
 			SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL);
-			PotatoSleep(0);	// Give up the rest of our timeslice so we don't get a context switch
+			core::Thread::Sleep(0);	// Give up the rest of our timeslice so we don't get a context switch
 
 			start = getTicks();
-			PotatoSleep(dwDelay);
+			core::Thread::Sleep(dwDelay);
 			elapsed = (getTicks() - start);
 
 			// Reset priority and get speed

@@ -163,7 +163,7 @@ void Thread::CancelSynchronousIo(void)
 // static
 void Thread::Sleep(uint32_t milliSeconds)
 {
-	PotatoSleep(milliSeconds);
+	::Sleep(milliSeconds);
 }
 
 void Thread::Yield(void)
