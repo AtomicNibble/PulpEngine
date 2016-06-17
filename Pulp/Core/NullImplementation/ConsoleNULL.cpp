@@ -51,7 +51,7 @@ void XConsoleNULL::dispatchRepeateInputEvents(void)
 
 }
 
-void XConsoleNULL::runDeferredCmds(void)
+void XConsoleNULL::runCmds(void)
 {
 
 }
@@ -223,10 +223,9 @@ void XConsoleNULL::RemoveCommand(const char* Name)
 }
 
 
-void XConsoleNULL::Exec(const char* command, const bool DeferExecution)
+void XConsoleNULL::Exec(const char* command)
 {
 	X_UNUSED(command);
-	X_UNUSED(DeferExecution);
 
 }
 

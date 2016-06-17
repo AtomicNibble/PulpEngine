@@ -308,9 +308,10 @@ int XConsole::console_cursor_skip_color_codes = 0;
 //////////////////////////////////////////////////////////////////////////
 
 
-XConsole::DeferredCommand::DeferredCommand(const string& command, bool silentMode) :
-	command(command), 
-	silentMode(silentMode)
+XConsole::ExecCommand::ExecCommand(const string& cmd, ExecSource::Enum src, bool sm) :
+	command(cmd),
+	source(src),
+	silentMode(sm)
 {
 
 }
@@ -488,7 +489,6 @@ void XConsole::RegisterCommnads(void)
 	ADD_COMMAND_MEMBER("exit", this, XConsole, &XConsole::Command_Exit, VarFlag::SYSTEM, "closes the game");
 	ADD_COMMAND_MEMBER("quit", this, XConsole, &XConsole::Command_Exit, VarFlag::SYSTEM, "closes the game");
 	ADD_COMMAND_MEMBER("echo", this, XConsole, &XConsole::Command_Echo, VarFlag::SYSTEM, "prints text in argument, prefix dvar's with # to print value");
-	ADD_COMMAND_MEMBER("wait", this, XConsole, &XConsole::Command_Wait, VarFlag::SYSTEM, "waits a given number of seconds before processing the next commands");
 	ADD_COMMAND_MEMBER("vreset", this, XConsole, &XConsole::Command_VarReset, VarFlag::SYSTEM, "resets a variable to it's default value");
 	ADD_COMMAND_MEMBER("seta", this, XConsole, &XConsole::Command_SetVarArchive, VarFlag::SYSTEM, "set a var and flagging it to be archived");
 	
@@ -652,11 +652,11 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 	// process key binds when console is hidden
 	if (this->consoleState_ == consoleState::CLOSED)
 	{
-		const char* cmd = 0;
+		const char* pCmdStr = 0;
 
 		if (!event.modifiers.IsAnySet())
 		{
-			cmd = FindBind(event.name);
+			pCmdStr = FindBind(event.name);
 		}
 		else
 		{
@@ -682,12 +682,12 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
 
 			bind_name.append(event.name);
 
-			cmd = FindBind(bind_name.c_str());
+			pCmdStr = FindBind(bind_name.c_str());
 		}
 
-		if (cmd)
+		if (pCmdStr)
 		{
-			ExecuteStringInternal(cmd, ExecSource::CONSOLE);
+			AddCmd(pCmdStr, ExecSource::CONSOLE, false);
 			return true;
 		}
 	}
@@ -848,9 +848,9 @@ void XConsole::ExecuteInputBuffer(void)
 
 	ClearInputBuffer();
 
-	AddCmdToHistory(Temp.c_str());
+	AddCmdToHistory(Temp);
 
-	ExecuteStringInternal(Temp.c_str(), ExecSource::CONSOLE);
+	AddCmd(Temp, ExecSource::CONSOLE, false);
 }
 
 bool XConsole::ProcessInput(const input::InputEvent& event)
@@ -1117,7 +1117,12 @@ void XConsole::ResetHistoryPos(void)
 	HistoryPos_ = -1;
 }
 
-void XConsole::AddCmdToHistory(const char* Command)
+void XConsole::AddCmdToHistory(const char* pCommand)
+{
+	AddCmdToHistory(string(pCommand));
+}
+
+void XConsole::AddCmdToHistory(const string& command)
 {
 	// so we can scroll through past commands.
 	ResetHistoryPos();
@@ -1125,14 +1130,14 @@ void XConsole::AddCmdToHistory(const char* Command)
 	if (!CmdHistory_.empty())
 	{
 		// make sure it's not same as last command 
-		if (CmdHistory_.front() != Command) {
-			CmdHistory_.emplace_front(Command);
+		if (CmdHistory_.front() != command) {
+			CmdHistory_.emplace_front(command);
 		}
 	}
 	else
 	{
 		// 1st commnd :D
-		CmdHistory_.emplace_front(Command);
+		CmdHistory_.emplace_front(command);
 	}
 
 	// limit hte history.
@@ -1431,37 +1436,11 @@ void XConsole::RemoveCommand(const char* Name)
 }
 
 
-void XConsole::Exec(const char* command, const bool DeferExecution)
+void XConsole::Exec(const char* pCommand)
 {
-	X_ASSERT_NOT_NULL(command);
+	X_ASSERT_NOT_NULL(pCommand);
 
-	if (!DeferExecution)
-	{
-		ExecuteStringInternal(command, ExecSource::SYSTEM, false);
-		return;
-	}
-
-	core::StackString<1024> temp(command);
-	temp.trimLeft();
-
-	// Unroll the exec command
-	bool unroll = false; 
-
-	if (temp.length() >= 4)
-	{
-		if (core::strUtil::FindCaseInsensitive(temp.begin(), temp.begin() + 4, "exec")) {
-			unroll = true;
-		}
-	}
-
-	if (unroll)
-	{
-		ExecuteStringInternal(temp.c_str(), ExecSource::SYSTEM, false);
-	}
-	else
-	{
-		deferredCmds_.emplace_back(core::string(temp.c_str()), false);
-	}
+	AddCmd(pCommand, ExecSource::SYSTEM, false);
 }
 
 bool XConsole::LoadConfig(const char* fileName)
@@ -1572,14 +1551,24 @@ void XConsole::OnFileChange(const core::Path<char>& name)
 }
 // ~IXHotReload
 
-void XConsole::ConfigExec(const char* command)
+void XConsole::ConfigExec(const char* pCommand)
 {
 	// if it's from config, should i limit what commands can be used?
 	// for now i'll let any be used
 
-	ExecuteStringInternal(command, ExecSource::CONFIG, false);
-}
+	if (gEnv->IsPostInit()) {
+		AddCmd(pCommand, ExecSource::CONFIG, false);
+	}
+	else {
+		// we run the command now.
+		ExecCommand cmd;
+		cmd.command = X_CONST_STRING(pCommand);
+		cmd.source = ExecSource::CONFIG;
+		cmd.silentMode = false;
 
+		ExecuteStringInternal(cmd);
+	}
+}
 
 void XConsole::PageUp(void)
 {
@@ -1637,18 +1626,26 @@ bool XConsole::CvarModifyBegin(ICVar* pCVar, ExecSource::Enum source)
 	return true;
 }
 
-void XConsole::ExecuteStringInternal(const char* pCommand, ExecSource::Enum source,
-	const bool bSilentMode)
-{
-	X_ASSERT_NOT_NULL(pCommand);
 
+void XConsole::AddCmd(const char* pCommand, ExecSource::Enum src, bool silent)
+{
+	AddCmd(string(pCommand), src, silent);
+}
+
+void XConsole::AddCmd(const string& command, ExecSource::Enum src, bool silent)
+{
+	cmds_.emplace_back(command, src, silent);
+}
+
+void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
+{
 	ConsoleCmdMapItor itrCmd;
 	ConsoleVarMapItor itrVar;
 
 	core::StackString512 name;
 	core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS> value;
 	core::StringRange<char> range(nullptr, nullptr);
-	CommandParser parser(pCommand);
+	CommandParser parser(cmd.command.begin());
 	const char* pPos;
 
 	while (parser.extractCommand(range))
@@ -1700,7 +1697,7 @@ void XConsole::ExecuteStringInternal(const char* pCommand, ExecSource::Enum sour
 					// to print the value.
 					DisplayVarInfo(pCVar);
 				}
-				else if (CvarModifyBegin(pCVar, source))
+				else if (CvarModifyBegin(pCVar, cmd.source))
 				{
 					pCVar->Set(value.c_str());
 					DisplayVarValue(pCVar);
@@ -1716,7 +1713,7 @@ void XConsole::ExecuteStringInternal(const char* pCommand, ExecSource::Enum sour
 
 		// if this was from config, add it to list.
 		// so vars not yet registerd can get the value
-		if (source == ExecSource::CONFIG && pPos)
+		if (cmd.source == ExecSource::CONFIG && pPos)
 		{
 			value.set(pPos + 1, range.GetEnd());
 			value.trim();
@@ -1734,9 +1731,9 @@ void XConsole::ExecuteStringInternal(const char* pCommand, ExecSource::Enum sour
 
 		}
 
-		if (!bSilentMode)
+		if (!cmd.silentMode)
 		{
-			if (source == ExecSource::CONFIG) {
+			if (cmd.source == ExecSource::CONFIG) {
 				X_WARNING("Config", "Unknown command/var: %s", name.c_str());
 			}
 			else {
@@ -1771,8 +1768,8 @@ void XConsole::DisplayVarInfo(ICVar* pVar)
 }
 
 
-void XConsole::ExecuteCommand(ConsoleCommand &cmd, 
-	core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& str)
+void XConsole::ExecuteCommand(const ConsoleCommand &cmd,
+	core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& str) const
 {
 	str.replace('"', '\'');
 
@@ -1789,8 +1786,9 @@ void XConsole::ExecuteCommand(ConsoleCommand &cmd,
 		// This is function command, execute it with a list of parameters.
 		ConsoleCommandArgs cmdArgs(str);
 
-		if (console_debug)
+		if (console_debug) {
 			X_LOG0("Console", "Running command \"%s\"", cmdArgs.GetArg(0));
+		}
 
 		cmd.func.Invoke(&cmdArgs);
 		return;
@@ -1835,26 +1833,6 @@ void XConsole::RegisterVar(ICVar* pCVar)
 }
 
 
-void XConsole::ExecuteDeferredCommands(void)
-{
-	if (WaitSeconds_.GetValue())
-	{
-		if (WaitSeconds_ > gEnv->pTimer->GetFrameStartTime())
-		{
-			return;
-		}
-
-		WaitSeconds_.SetValue(0);
-	}
-
-	for(const auto& dc : deferredCmds_)
-	{
-		ExecuteStringInternal(dc.command.c_str(), ExecSource::SYSTEM, dc.silentMode);
-	}
-
-	deferredCmds_.clear();
-}
-
 
 void XConsole::dispatchRepeateInputEvents(void)
 {
@@ -1884,10 +1862,16 @@ void XConsole::dispatchRepeateInputEvents(void)
 	}
 }
 
-void XConsole::runDeferredCmds(void)
+void XConsole::runCmds(void)
 {
-	ExecuteDeferredCommands();
+	for (const auto& c : cmds_)
+	{
+		ExecuteStringInternal(c);
+	}
+
+	cmds_.clear();
 }
+
 
 void XConsole::draw(void)
 {
@@ -2783,18 +2767,6 @@ void XConsole::Command_Echo(IConsoleCmdArgs* pCmd)
 	}
 
 	X_LOG0("echo", txt.c_str());
-}
-
-void XConsole::Command_Wait(IConsoleCmdArgs* pCmd)
-{
-	if (pCmd->GetArgCount() != 2)
-	{
-		X_WARNING("Console", "wait <seconds>");
-		return;
-	}
-
-	WaitSeconds_.SetSeconds(core::strUtil::StringToFloat<float32_t>(pCmd->GetArg(1)));
-	WaitSeconds_ += gEnv->pTimer->GetFrameStartTime();
 }
 
 void XConsole::Command_VarReset(IConsoleCmdArgs* pCmd)

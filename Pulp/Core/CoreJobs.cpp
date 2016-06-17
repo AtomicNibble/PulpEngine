@@ -25,6 +25,7 @@ void XCore::Job_DirectoryWatcher(core::V2::JobSystem& jobSys, size_t threadIdx,
 	X_UNUSED(pData);
 
 	// will cause  OnFileChange below to get called from this job.
+	// which then makes jobs for each change calling Job_OnFileChange
 	dirWatcher_.tick();
 }
 
@@ -95,10 +96,7 @@ void XCore::Job_PostInputFrame(core::V2::JobSystem& jobSys, size_t threadIdx,
 	X_UNUSED(threadIdx);
 	X_UNUSED(pJob);
 
-	// we can't really turns this into lots of jobs since the order of input is important.
-	// we can do it per a device tho.
 	core::FrameData& frameData = *reinterpret_cast<core::FrameData*>(pData);
-
 
 	if (env_.pInput) {
 		// during the running of this is when command and Var callbacks will be run.
@@ -119,9 +117,9 @@ void XCore::Job_ConsoleUpdates(core::V2::JobSystem& jobSys, size_t threadIdx,
 		// this should not run any commands as it's just repeating a key
 		env_.pConsole->dispatchRepeateInputEvents();
 
-		// this may cause cmd / var callbacks to be run.
-		// will also edit the repeate event.
-		env_.pConsole->runDeferredCmds();
+		// runs any commands that got submitted via input or config / other things.
+		// so basically this is the only place that triggers command callbacks and modified callbacks.
+		env_.pConsole->runCmds();
 	}
 }
 

@@ -86,39 +86,39 @@ struct IConsole
 
 	// console set's it's own input repeat rate, that's timed instead of every frame.
 	virtual void dispatchRepeateInputEvents(void) X_ABSTRACT; 
-	virtual void runDeferredCmds(void) X_ABSTRACT;
+	virtual void runCmds(void) X_ABSTRACT;
 	virtual void draw(void) X_ABSTRACT;
 
 	virtual consoleState::Enum getVisState(void) const X_ABSTRACT;
 
 	// Register variables.
-	virtual ICVar* RegisterString(const char* Name, const char* Value, int flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* RegisterInt(const char* Name, int Value, int Min, int Max, int flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* RegisterFloat(const char* Name, float Value, float Min, float Max, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* RegisterString(const char* pName, const char* Value, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* RegisterInt(const char* pName, int Value, int Min, int Max, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* RegisterFloat(const char* pName, float Value, float Min, float Max, int flags, const char* desc) X_ABSTRACT;
 
-	virtual ICVar* ConfigRegisterString(const char* Name, const char* Value, int flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* ConfigRegisterInt(const char* Name, int Value, int Min, int Max, int flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* ConfigRegisterFloat(const char* Name, float Value, float Min, float Max, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* ConfigRegisterString(const char* pName, const char* Value, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* ConfigRegisterInt(const char* pName, int Value, int Min, int Max, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* ConfigRegisterFloat(const char* pName, float Value, float Min, float Max, int flags, const char* desc) X_ABSTRACT;
 
 	// refrenced based, these are useful if we want to use the value alot so we just register it's address.
-	virtual ICVar* Register(const char* name, float* src, float defaultvalue, float Min, float Max, int flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* Register(const char* name, int* src, int defaultvalue, int Min, int Max, int flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* Register(const char* name, Color* src, Color defaultvalue, int flags, const char* desc) X_ABSTRACT;
-	virtual ICVar* Register(const char* name, Vec3f* src, Vec3f defaultvalue, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* Register(const char* pName, float* src, float defaultvalue, float Min, float Max, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* Register(const char* pName, int* src, int defaultvalue, int Min, int Max, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* Register(const char* pName, Color* src, Color defaultvalue, int flags, const char* desc) X_ABSTRACT;
+	virtual ICVar* Register(const char* pName, Vec3f* src, Vec3f defaultvalue, int flags, const char* desc) X_ABSTRACT;
 
 
-	virtual ICVar* GetCVar(const char* name) X_ABSTRACT;
+	virtual ICVar* GetCVar(const char* pName) X_ABSTRACT;
 
-	virtual void UnregisterVariable(const char* sVarName) X_ABSTRACT;
+	virtual void UnregisterVariable(const char* pVarName) X_ABSTRACT;
 
-	virtual void AddCommand(const char* Name, ConsoleCmdFunc func, int Flags, const char* desc) X_ABSTRACT;
+	virtual void AddCommand(const char* pName, ConsoleCmdFunc func, int Flags, const char* desc) X_ABSTRACT;
 
-	virtual void RemoveCommand(const char* sName) X_ABSTRACT;
+	virtual void RemoveCommand(const char* pName) X_ABSTRACT;
 
-	virtual void Exec(const char* command, const bool DeferExecution = false) X_ABSTRACT;
+	virtual void Exec(const char* pCommand) X_ABSTRACT;
 
 //	virtual void ConfigExec(const char* command) X_ABSTRACT;
-	virtual bool LoadConfig(const char* fileName) X_ABSTRACT;
+	virtual bool LoadConfig(const char* pFileName) X_ABSTRACT;
 
 
 	// Logging

@@ -25,7 +25,7 @@ public:
 	virtual void freeRenderResources(void) X_FINAL;
 
 	virtual void dispatchRepeateInputEvents(void) X_FINAL;
-	virtual void runDeferredCmds(void) X_FINAL;
+	virtual void runCmds(void) X_FINAL;
 	virtual void draw(void) X_FINAL;
 
 	virtual consoleState::Enum getVisState(void) const X_FINAL;
@@ -53,7 +53,7 @@ public:
 
 	virtual void RemoveCommand(const char* Name) X_FINAL;
 
-	virtual void Exec(const char* command, const bool DeferExecution) X_FINAL;
+	virtual void Exec(const char* command) X_FINAL;
 
 //	virtual void ConfigExec(const char* command) X_FINAL;
 	virtual bool LoadConfig(const char* fileName) X_FINAL;

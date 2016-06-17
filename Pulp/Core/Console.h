@@ -112,6 +112,18 @@ class XConsole :
 	public input::IInputEventListner,
 	public core::IXHotReload
 {
+
+	struct ExecCommand
+	{
+		ExecCommand(const string& command, ExecSource::Enum src, bool silentMode);
+		ExecCommand() = default;
+
+		string command;
+		ExecSource::Enum source;
+		bool silentMode;
+	};
+
+
 public:
 	static const size_t MAX_HISTORY_ENTRIES = 64;
 	static const size_t CONSOLE_LOG_LINE_HIEGHT = 20;
@@ -135,7 +147,7 @@ public:
 	virtual void freeRenderResources(void) X_FINAL;
 
 	virtual void dispatchRepeateInputEvents(void) X_FINAL;
-	virtual void runDeferredCmds(void) X_FINAL;
+	virtual void runCmds(void) X_FINAL;
 	virtual void draw(void) X_FINAL;
 
 	virtual consoleState::Enum getVisState(void) const X_FINAL;
@@ -146,34 +158,33 @@ public:
 	virtual bool OnInputEventChar(const input::InputEvent& event) X_FINAL;
 
 
-	virtual ICVar* RegisterString(const char* Name, const char* Value, int Flags, const char* desc) X_FINAL;
-	virtual ICVar* RegisterInt(const char* Name, int Value, int Min, int Max, int Flags, const char* desc) X_FINAL;
-	virtual ICVar* RegisterFloat(const char* Name, float Value, float Min, float Max, int Flags, const char* desc) X_FINAL;
+	virtual ICVar* RegisterString(const char* pName, const char* Value, int Flags, const char* desc) X_FINAL;
+	virtual ICVar* RegisterInt(const char* pName, int Value, int Min, int Max, int Flags, const char* desc) X_FINAL;
+	virtual ICVar* RegisterFloat(const char* pName, float Value, float Min, float Max, int Flags, const char* desc) X_FINAL;
 
-	virtual ICVar* ConfigRegisterString(const char* Name, const char* Value, int Flags, const char* desc) X_FINAL;
-	virtual ICVar* ConfigRegisterInt(const char* Name, int Value, int Min, int Max, int Flags, const char* desc) X_FINAL;
-	virtual ICVar* ConfigRegisterFloat(const char* Name, float Value, float Min, float Max, int Flags, const char* desc) X_FINAL;
+	virtual ICVar* ConfigRegisterString(const char* pName, const char* Value, int Flags, const char* desc) X_FINAL;
+	virtual ICVar* ConfigRegisterInt(const char* pName, int Value, int Min, int Max, int Flags, const char* desc) X_FINAL;
+	virtual ICVar* ConfigRegisterFloat(const char* pName, float Value, float Min, float Max, int Flags, const char* desc) X_FINAL;
 
 
 	// refrenced based, these are useful if we want to use the value alot so we just register it's address.
-	virtual ICVar* Register(const char* name, float* src, float defaultvalue, float Min, float Max, int nFlags, const char* desc) X_FINAL;
-	virtual ICVar* Register(const char* name, int* src, int defaultvalue, int Min, int Max, int nFlags, const char* desc) X_FINAL;
-	virtual ICVar* Register(const char* name, Color* src, Color defaultvalue, int nFlags, const char* desc) X_FINAL;
-	virtual ICVar* Register(const char* name, Vec3f* src, Vec3f defaultvalue, int flags, const char* desc) X_FINAL;
+	virtual ICVar* Register(const char* pName, float* src, float defaultvalue, float Min, float Max, int nFlags, const char* desc) X_FINAL;
+	virtual ICVar* Register(const char* pName, int* src, int defaultvalue, int Min, int Max, int nFlags, const char* desc) X_FINAL;
+	virtual ICVar* Register(const char* pName, Color* src, Color defaultvalue, int nFlags, const char* desc) X_FINAL;
+	virtual ICVar* Register(const char* pName, Vec3f* src, Vec3f defaultvalue, int flags, const char* desc) X_FINAL;
 
 
-	virtual ICVar* GetCVar(const char* name) X_FINAL;
+	virtual ICVar* GetCVar(const char* pName) X_FINAL;
 
-	virtual void UnregisterVariable(const char* sVarName) X_FINAL;
+	virtual void UnregisterVariable(const char* pVarName) X_FINAL;
 
-	virtual void AddCommand(const char* Name, ConsoleCmdFunc func, int Flags, const char* desc) X_FINAL;
+	virtual void AddCommand(const char* pName, ConsoleCmdFunc func, int Flags, const char* pDesc) X_FINAL;
 
-	virtual void RemoveCommand(const char* Name) X_FINAL;
+	virtual void RemoveCommand(const char* pName) X_FINAL;
 
-	virtual void Exec(const char* command, const bool DeferExecution) X_FINAL;
+	virtual void Exec(const char* pCommand) X_FINAL;
 
-//	virtual void ConfigExec(const char* command) X_FINAL;
-	virtual bool LoadConfig(const char* fileName) X_FINAL;
+	virtual bool LoadConfig(const char* pFileName) X_FINAL;
 
 	// IXHotReload
 	virtual void OnFileChange(const core::Path<char>& name) X_FINAL;
@@ -192,8 +203,11 @@ private:
 	void LoadRenderResources(void);
 	void RegisterInputListener(void);
 
-	void ExecuteStringInternal(const char* command, ExecSource::Enum source = ExecSource::CONSOLE, const bool bSilentMode = false);
-	void ExecuteCommand(ConsoleCommand &cmd, core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& str);
+	void AddCmd(const char* pCommand, ExecSource::Enum src, bool silent);
+	void AddCmd(const string& command, ExecSource::Enum src, bool silent);
+	void ExecuteStringInternal(const ExecCommand& cmd); // executes a command string, may contain multiple commands	
+	// runs a single cmd. even tho it's 'const' a command may alter the consoles state. :| aka 'clearBinds', 'consoleHide', ...
+	void ExecuteCommand(const ConsoleCommand &cmd, core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& str) const; 
 
 	ICVar* GetCVarForRegistration(const char* Name);
 
@@ -205,8 +219,6 @@ private:
 	void DisplayVarValue(ICVar* pVar);
 	void DisplayVarInfo(ICVar* pVar);
 
-	void ExecuteDeferredCommands();
-
 	void AddInputChar(const char c);
 	void RemoveInputChar(bool bBackSpace);
 	void ClearInputBuffer(void);
@@ -217,7 +229,8 @@ private:
 
 	void SaveCmdHistory(void) const;
 	void LoadCmdHistory(void);
-	void AddCmdToHistory(const char* Command);
+	void AddCmdToHistory(const char* pCommand);
+	void AddCmdToHistory(const string& command);
 	void ResetHistoryPos(void);
 	const char* GetHistory(CmdHistory::Enum direction);
 
@@ -233,7 +246,7 @@ private:
 
 	void Listbinds(IKeyBindDumpSink* CallBack);
 
-	void ConfigExec(const char* command);
+	void ConfigExec(const char* pCommand);
 
 	// scrool helpers
 private:
@@ -267,14 +280,6 @@ private:
 			
 private:
 
-	struct DeferredCommand
-	{
-		DeferredCommand(const string& command, bool silentMode);
-
-		string		command;
-		bool		silentMode;
-	};
-
 	struct Cursor
 	{
 		Cursor();
@@ -297,7 +302,7 @@ private:
 	typedef core::HashMap<string, string> ConsoleBindMap;
 	typedef ConsoleBindMap::iterator ConsoleBindMapItor;
 
-	typedef std::list<DeferredCommand> DeferredCmdList;
+	typedef std::deque<ExecCommand> ExecCmdList;
 
 	typedef std::deque<string> ConsoleBuffer;
 	typedef ConsoleBuffer::iterator ConsoleBufferItor;
@@ -324,9 +329,8 @@ private:
 	ConsoleBindMap			Binds_; // support sexy bind.
 	ConfigCmdsMap			configCmds_;
 
-	DeferredCmdList			deferredCmds_;
+	ExecCmdList				cmds_;
 
-	TimeVal					WaitSeconds_;
 
 	consoleState::Enum		consoleState_;
 
@@ -382,7 +386,6 @@ private:
 	void Command_ListCmd(IConsoleCmdArgs* Cmd);
 	void Command_ListDvars(IConsoleCmdArgs* Cmd);
 	void Command_Echo(IConsoleCmdArgs* Cmd);
-	void Command_Wait(IConsoleCmdArgs* Cmd);
 	void Command_VarReset(IConsoleCmdArgs* Cmd);
 	void Command_Bind(IConsoleCmdArgs* Cmd);
 	void Command_BindsClear(IConsoleCmdArgs* Cmd);
