@@ -1556,7 +1556,7 @@ void XConsole::ConfigExec(const char* pCommand)
 	// if it's from config, should i limit what commands can be used?
 	// for now i'll let any be used
 
-	if (gEnv->IsPostInit()) {
+	if (gEnv->isRunning()) {
 		AddCmd(pCommand, ExecSource::CONFIG, false);
 	}
 	else {

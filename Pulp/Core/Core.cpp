@@ -83,9 +83,7 @@ XCore::XCore() :
 	pEventDispatcher_ = X_NEW( core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch");
 	pEventDispatcher_->RegisterListener(this);
 
-#if X_ENABLE_ASSERTIONS
-	env_.initComplete_ = false;
-#endif // !X_ENABLE_ASSERTIONS
+	env_.state_ = SCoreGlobals::State::STARTING;
 	env_.pCore = this;
 	env_.pTimer = &time_;
 	env_.pDirWatcher = &dirWatcher_;
@@ -131,6 +129,7 @@ void XCore::Release()
 void XCore::ShutDown()
 {
 	X_LOG0("Core", "Shutting Down");
+	env_.state_ = SCoreGlobals::State::CLOSING;
 
 #if X_DEBUG
 	hotReloadIgnores_.free();
@@ -413,7 +412,7 @@ const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
 // IXHotReloadManager
 bool XCore::addfileType(core::IXHotReload* pHotReload, const char* extension)
 {
-	X_ASSERT(pHotReload && !env_.IsPostInit(), "File types must be registerd during startup")(pHotReload, env_.IsPostInit());
+	X_ASSERT(!env_.isRunning(), "File types must only be registerd in startup / shutdown")(pHotReload, env_.isRunning());
 
 	X_ASSERT_NOT_NULL(extension);
 	

@@ -45,9 +45,7 @@ Also instead of sleeping we could be running physcis steps...
 
 bool XCore::RunGameLoop(void)
 {
-#if X_ENABLE_ASSERTIONS
-	env_.initComplete_ = true;
-#endif // !X_ENABLE_ASSERTIONS
+	env_.state_ = SCoreGlobals::State::RUNNING;
 
 	while (PumpMessages())
 	{

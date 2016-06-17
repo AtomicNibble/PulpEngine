@@ -246,6 +246,8 @@ struct SCoreInitParams
 
 struct SCoreGlobals // obbject is zerod on start.
 {
+	X_DECLARE_ENUM8(State)(STARTING, RUNNING, CLOSING);
+
 	ICore*						pCore;
 	input::IInput*				pInput;
 	core::ITimer*				pTimer;
@@ -277,8 +279,14 @@ struct SCoreGlobals // obbject is zerod on start.
 	pProfileScopeCall			profileScopeStart;
 	pProfileScopeCall			profileScopeEnd;
 
-	X_INLINE const bool IsPostInit(void) const {
-		return initComplete_;
+	X_INLINE const bool isStarting(void) const {
+		return state_ != State::STARTING;
+	}
+	X_INLINE const bool isRunning(void) const {
+		return state_ == State::RUNNING;
+	}
+	X_INLINE const bool isClosing(void) const {
+		return state_ == State::CLOSING;
 	}
 
 	X_INLINE const bool IsClient(void) const {
@@ -305,7 +313,7 @@ protected:
 	bool client_;
 	bool dedicated_;			// Engine is in dedicated 
 	bool profilerEnabled_;
-	bool initComplete_; // set after init has finished.
+	State::Enum state_; 
 };
 
 
