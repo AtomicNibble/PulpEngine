@@ -2,6 +2,8 @@
 #include "EngineApp.h"
 
 
+#include <Platform\Module.h>
+
 #ifdef X_LIB
 #undef X_LIB
 #define X_AS_LIB
@@ -38,7 +40,7 @@ EngineApp::~EngineApp()
 	ShutDown();
 
 	if (hSystemHandle_) {
-		PotatoFreeLibrary(hSystemHandle_);
+		core::Module::UnLoad(hSystemHandle_);
 	}
 }
 
@@ -71,7 +73,7 @@ bool EngineApp::Init(void)
 
 #else
 	// load the dll.
-	hSystemHandle_ = PotatoLoadLibary(CORE_DLL_NAME);
+	hSystemHandle_ = core::Module::Load(CORE_DLL_NAME);
 
 	if (!hSystemHandle_)
 	{
@@ -81,7 +83,7 @@ bool EngineApp::Init(void)
 
 	CreateCoreInfterFaceFunc::Pointer pfnCreateCoreInterface =
 		reinterpret_cast<CreateCoreInfterFaceFunc::Pointer>(
-			PotatoGetProcAddress(hSystemHandle_, CORE_DLL_INITFUNC));
+			core::Module::GetProc(hSystemHandle_, CORE_DLL_INITFUNC));
 
 	if (!pfnCreateCoreInterface)
 	{

@@ -5,6 +5,7 @@
 #include <ICore.h>
 
 #include <Psapi.h>
+#include <Platform\Module.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -14,7 +15,7 @@ namespace
 
 	core::CriticalSection g_lock;
 
-	HMODULE g_hPSAPI = 0;
+	core::Module::Handle g_hPSAPI = 0;
 	GetProcessMemoryInfoProc g_pGetProcessMemoryInfo = nullptr;
 }
 
@@ -38,14 +39,14 @@ bool GetProcessMemInfo(XProcessMemInfo &info)
 	core::CriticalSection::ScopedLock lock(g_lock);
 
 	if (!g_hPSAPI) {
-		g_hPSAPI = PotatoLoadLibaryW(L"psapi.dll");
+		g_hPSAPI = core::Module::Load(L"psapi.dll");
 	}
 
 	if (g_hPSAPI)
 	{
 		if (!g_pGetProcessMemoryInfo) {
 			g_pGetProcessMemoryInfo = reinterpret_cast<GetProcessMemoryInfoProc>(
-				PotatoGetProcAddress(g_hPSAPI,"GetProcessMemoryInfo"));
+				core::Module::GetProc(g_hPSAPI,"GetProcessMemoryInfo"));
 		}
 
 		if (g_pGetProcessMemoryInfo)

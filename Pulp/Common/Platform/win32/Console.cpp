@@ -13,6 +13,8 @@
 
 #include <ICore.h>
 
+#include <Platform\Module.h>
+
 // #include "resource.h"
 
 #include "resource.h"
@@ -38,10 +40,10 @@ namespace {
 		SetConsoleIcon_t pSetConsoleIcon;
 
 		
-		HMODULE hDll = GetModuleHandleA( "kernel32" );
+		core::Module::Handle hDll = core::Module::Load( "kernel32" );
 		if( hDll )
 		{
-			pSetConsoleIcon = (SetConsoleIcon_t)PotatoGetProcAddress(hDll, "SetConsoleIcon");
+			pSetConsoleIcon = (SetConsoleIcon_t)core::Module::GetProc(hDll, "SetConsoleIcon");
 			if( pSetConsoleIcon )
 				return pSetConsoleIcon( hIcon );
 		}

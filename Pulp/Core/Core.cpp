@@ -18,6 +18,7 @@
 #include <Platform\Window.h>
 #include <Platform\Console.h>
 #include <Platform\SystemInfo.h>
+#include <Platform\Module.h>
 #include <Debugging\InvalidParameterHandler.h>
 #include <Debugging\CallStack.h>
 #include <Memory\VirtualMem.h>
@@ -295,7 +296,7 @@ void XCore::ShutDown()
 
 
 	for (size_t i = 0; i < moduleDLLHandles_.size(); i++) {
-		PotatoFreeLibrary(moduleDLLHandles_[i]);
+		core::Module::UnLoad(moduleDLLHandles_[i]);
 	}
 
 	moduleDLLHandles_.free();

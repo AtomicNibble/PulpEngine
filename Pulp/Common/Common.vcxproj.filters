@@ -1102,6 +1102,12 @@
     <ClInclude Include="IFrameData.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\Module.h">
+      <Filter>Headers\Platform</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\win32\Module.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1678,6 +1684,9 @@
       <Filter>SourceFiles\Hashing</Filter>
     </ClCompile>
     <ClCompile Include="Platform\win32\SystemInfo.cpp">
+      <Filter>SourceFiles\Platform\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\win32\Module.cpp">
       <Filter>SourceFiles\Platform\win32</Filter>
     </ClCompile>
   </ItemGroup>

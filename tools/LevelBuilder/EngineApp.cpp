@@ -26,7 +26,7 @@ EngineApp::~EngineApp()
 	ShutDown();
 
 	if (hSystemHandle_) {
-		PotatoFreeLibrary(hSystemHandle_);
+		core::Module::UnLoad(hSystemHandle_);
 	}
 }
 
@@ -50,7 +50,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 
 #else
 	// load the dll.
-	hSystemHandle_ = PotatoLoadLibary(CORE_DLL_NAME);
+	hSystemHandle_ = core::Module::Load(CORE_DLL_NAME);
 
 	if (!hSystemHandle_)
 	{
@@ -59,7 +59,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 	}
 
 	PFNCREATECOREINTERFACE pfnCreateCoreInterface =
-		(PFNCREATECOREINTERFACE)PotatoGetProcAddress(hSystemHandle_, CORE_DLL_INITFUNC);
+		(PFNCREATECOREINTERFACE)core::Module::GetProc(hSystemHandle_, CORE_DLL_INITFUNC);
 
 	if (!pfnCreateCoreInterface)
 	{

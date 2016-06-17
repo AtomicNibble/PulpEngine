@@ -5,7 +5,7 @@
 
 #include <Debugging\DebuggerConnection.h>
 #include "Platform\Window.h"
-
+#include <Platform\Module.h>
 
 
 extern HINSTANCE g_hInstance;
@@ -59,7 +59,7 @@ EngineApp::~EngineApp()
 	allocator_.free(pArena_);
 
 	if (hSystemHandle_) {
-		PotatoFreeLibrary(hSystemHandle_);
+		core::Module::UnLoad(hSystemHandle_);
 	}
 }
 
@@ -84,7 +84,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 
 #else
 	// load the dll.
-	hSystemHandle_ = PotatoLoadLibary(CORE_DLL_NAME);
+	hSystemHandle_ = core::Module::Load(CORE_DLL_NAME);
 
 	if (!hSystemHandle_)
 	{
@@ -94,7 +94,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 
 	CreateCoreInfterFaceFunc::Pointer pfnCreateCoreInterface =
 		reinterpret_cast<CreateCoreInfterFaceFunc::Pointer>(
-			PotatoGetProcAddress(hSystemHandle_, CORE_DLL_INITFUNC));
+			core::Module::GetProc(hSystemHandle_, CORE_DLL_INITFUNC));
 
 	if (!pfnCreateCoreInterface)
 	{

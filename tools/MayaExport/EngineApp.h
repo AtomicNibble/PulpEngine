@@ -3,6 +3,7 @@
 
 #include <ICore.h>
 #include <Platform\Console.h>
+#include <Platform\Module.h>
 
 class EngineApp : public IAssertHandler
 {
@@ -18,7 +19,7 @@ private:
 	virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_OVERRIDE;
 
 private:
-	HMODULE hSystemHandle_;
+	core::Module::Handle hSystemHandle_;
 	ICore* pICore_;
 };
 

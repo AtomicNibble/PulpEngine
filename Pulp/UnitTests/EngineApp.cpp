@@ -4,6 +4,7 @@
 #include "ITimer.h"
 
 #include <Debugging\DebuggerConnection.h>
+#include <Platform\Module.h>
 
 
 
@@ -48,7 +49,7 @@ hSystemHandle_(NULL)
 EngineApp::~EngineApp()
 {
 	if (hSystemHandle_)
-		PotatoFreeLibrary(hSystemHandle_);
+		core::Module::UnLoad(hSystemHandle_);
 }
 
 
@@ -73,7 +74,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 
 #else
 	// load the dll.
-	hSystemHandle_ = PotatoLoadLibary(CORE_DLL_NAME);
+	hSystemHandle_ = core::Module::Load(CORE_DLL_NAME);
 
 	if (!hSystemHandle_)
 	{
@@ -83,7 +84,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
 
 	CreateCoreInfterFaceFunc::Pointer pfnCreateCoreInterface =
 		reinterpret_cast<CreateCoreInfterFaceFunc::Pointer>(
-			PotatoGetProcAddress(hSystemHandle_, CORE_DLL_INITFUNC));
+			core::Module::GetProc(hSystemHandle_, CORE_DLL_INITFUNC));
 
 	if (!pfnCreateCoreInterface)
 	{

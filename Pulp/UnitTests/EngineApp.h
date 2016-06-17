@@ -3,6 +3,7 @@
 
 #include <ICore.h>
 #include <Platform\Console.h>
+#include <Platform\Module.h>
 
 #define WIN_ENGINE_WINDOW_CLASSNAME "WinCatEngine"
 
@@ -35,7 +36,7 @@ private:
 
 private:
 	AssetHandler assertCallback_;
-	HMODULE hSystemHandle_;
+	core::Module::Handle hSystemHandle_;
 	ICore* pICore_;
 };
 

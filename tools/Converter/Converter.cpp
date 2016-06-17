@@ -9,6 +9,7 @@
 #include <Extension\PotatoCreateClass.h>
 
 #include <Containers\Array.h>
+#include <Platform\Module.h>
 
 #include <Time\StopWatch.h>
 
@@ -211,14 +212,14 @@ bool Converter::IntializeConverterModule(AssetType::Enum assType, const char* dl
 
 void* Converter::LoadDLL(const char* dllName)
 {
-	void* hDll = PotatoLoadLibary(dllName);
+	void* hDll = core::Module::Load(dllName);
 
 	if (!hDll) {
 		return nullptr;
 	}
 
 	ModuleLinkfunc::Pointer pfnModuleInitISystem = reinterpret_cast<ModuleLinkfunc::Pointer>(
-		PotatoGetProcAddress(hDll, "LinkModule"));
+		core::Module::GetProc(hDll, "LinkModule"));
 
 	if (pfnModuleInitISystem)
 	{

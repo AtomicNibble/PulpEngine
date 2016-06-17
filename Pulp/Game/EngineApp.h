@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ICore.h>
+#include <Platform\Module.h>
 
 #define WIN_ENGINE_WINDOW_CLASSNAME "WinCatEngine"
 
@@ -56,7 +57,7 @@ private:
 	bool PumpMessages();
 private:
 	AssetHandler assertCallback_;
-	HMODULE hSystemHandle_;
+	core::Module::Handle hSystemHandle_;
 	ICore* pICore_;
 
 	core::MallocFreeAllocator allocator_;

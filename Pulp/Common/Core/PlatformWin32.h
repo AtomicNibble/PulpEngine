@@ -117,14 +117,6 @@ X_POP_WARNING_LEVEL
 #endif // !X_LIB
 
 
-#define PotatoSharedLibraySupported true
-#define PotatoSharedLibrayExtension ".dll"
-#define PotatoGetProcAddress(libHandle, procName) ::GetProcAddress((HMODULE)(libHandle), procName)
-#define PotatoFreeLibrary(libHandle) ::FreeLibrary((HMODULE)(libHandle))
-#define PotatoLoadLibary(libname) ::LoadLibraryA(libname);
-#define PotatoLoadLibaryW(libname) ::LoadLibraryW(libname);
-#define PotatoGetLibaryHandleA(libname) ::GetModuleHandleA(libname);
-#define PotatoGetLibaryHandleW(libname) ::GetModuleHandleW(libname);
 
 #define PotatoSleep(ms) ::Sleep(ms)
 

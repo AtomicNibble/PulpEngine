@@ -35,6 +35,7 @@
 #include <Extension\PotatoCreateClass.h>
 
 #include <Memory\MemInfo.h>
+#include <Platform\Module.h>
 
 
 #include "PotatoFactoryRegistryImpl.h"
@@ -90,7 +91,7 @@ WIN_HMODULE XCore::LoadDynamiclibrary(const char *dllName) const
 {
 	WIN_HMODULE handle = NULL;
 
-	handle = PotatoLoadLibary(dllName);
+	handle = core::Module::Load(dllName);
 
 	return handle;
 }
@@ -106,7 +107,7 @@ WIN_HMODULE XCore::LoadDLL(const char *dllName)
 	}
 
 	ModuleLinkfunc::Pointer pfnModuleInitISystem = reinterpret_cast<ModuleLinkfunc::Pointer>(
-			PotatoGetProcAddress(handle, DLL_MODULE_INIT_ICORE));
+		core::Module::GetProc(handle, DLL_MODULE_INIT_ICORE));
 
 	if (pfnModuleInitISystem)
 	{
@@ -121,10 +122,10 @@ WIN_HMODULE XCore::LoadDLL(const char *dllName)
 bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName)
 {
 #if !defined(X_LIB)
-	HMODULE handle = PotatoGetLibaryHandleA(pDllName);
+	core::Module::Handle handle = core::Module::Load(pDllName);
 
 	ModuleLinkfunc::Pointer pfnModuleInitISystem = reinterpret_cast<ModuleLinkfunc::Pointer>(
-		PotatoGetProcAddress(handle, DLL_MODULE_INIT_ICORE));
+		core::Module::GetProc(handle, DLL_MODULE_INIT_ICORE));
 
 	if (pfnModuleInitISystem) {
 		pfnModuleInitISystem(this, pDllName);
