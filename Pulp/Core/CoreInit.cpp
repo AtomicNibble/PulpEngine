@@ -783,9 +783,7 @@ void XCore::AddIgnoredHotReloadExtensions(void)
 
 void XCore::RegisterAssertHandler(IAssertHandler* errorHandler)
 {
-#if X_ENABLE_ASSERTIONS
 	X_ASSERT(!env_.IsPostInit(), "Assert handlers must be registerd at statup")(env_.IsPostInit(), errorHandler);
-#endif // !X_ENABLE_ASSERTIONS
 
 	assertHandlers_.push_back(errorHandler);
 }
