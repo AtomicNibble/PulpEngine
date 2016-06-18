@@ -2,6 +2,7 @@
 #include "JobList.h"
 
 #include "Util\Cpu.h"
+#include <Time\StopWatch.h>
 
 #include "ICore.h"
 #include "ITimer.h"
@@ -82,7 +83,7 @@ void JobList::Wait(void)
 		}
 #endif 
 
-		TimeVal waitStart = GetTimeReal();
+		core::StopWatch timer;
 		bool waited = false;
 
 		while (syncCount_ > 0) {
@@ -98,7 +99,7 @@ void JobList::Wait(void)
 		}
 
 		if(waited) {
-			stats_.waitTime = GetTimeReal() - waitStart;
+			stats_.waitTime = timer.GetTimeVal();
 		} else {
 			// if some goat calls wait twice it will set it to zero.
 			// if first time it's already goingto be zero.
@@ -146,14 +147,14 @@ JobListPriority::Enum JobList::getPriority(void) const
 
 JobList::RunFlags JobList::RunJobs(uint32_t threadIdx, JobListThreadState& state, bool singleJob)
 {
-	TimeVal start = GetTimeReal();
+	core::StopWatch timer;
 	JobList::RunFlags res;
 
 	++numThreadsExecuting_;
 
 	res = RunJobsInternal(threadIdx, state, singleJob);
 
-	stats_.threadTotalTime[threadIdx] += (GetTimeReal() - start);
+	stats_.threadTotalTime[threadIdx] += timer.GetTimeVal();
 
 	// do it after we got the time.
 	--numThreadsExecuting_;
@@ -237,7 +238,7 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 		{
 			JobData& job = jobs_[state.nextJobIndex];
 
-			TimeVal jobStart = GetTimeReal();
+			core::StopWatch timer;
 
 			job.pJobRun(job.pData, 
 				job.batchOffset, 
@@ -246,8 +247,7 @@ JobList::RunFlags JobList::RunJobsInternal(uint32_t threadIdx, JobListThreadStat
 
 			job.done = true;
 
-			TimeVal jobEnd = GetTimeReal();
-			TimeVal elapsed = jobEnd - jobStart;
+			const TimeVal elapsed = timer.GetTimeVal();
 
 			job.execTime = elapsed;
 			stats_.threadExecTime[threadIdx] += elapsed;
@@ -404,13 +404,11 @@ X_ENABLE_WARNING(4127)
 				signalWorkerDone_.raise();
 				signalCritical_.Leave();
 
-				TimeVal start = GetTimeReal();
+				core::StopWatch timer;
 
 				signalMoreWorkToDo_.wait();
 
-				TimeVal end = GetTimeReal();
-
-				stats_.waitforJobTime += (end - start);
+				stats_.waitforJobTime += timer.GetTimeVal();
 				continue;
 			}
 		}
