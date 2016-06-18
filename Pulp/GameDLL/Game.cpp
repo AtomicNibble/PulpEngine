@@ -3,6 +3,7 @@
 
 #include <IRender.h>
 #include <IConsole.h>
+#include <IFrameData.h>
 
 X_NAMESPACE_BEGIN(game)
 
@@ -80,11 +81,25 @@ bool XGame::ShutDown(void)
 	return true;
 }
 
-bool XGame::Update(void)
+bool XGame::Update(core::FrameData& frame)
 {
 	X_PROFILE_BEGIN("Update", core::ProfileSubSys::GAME);
-
-
+	X_UNUSED(frame);
+	// how todo this camera move shit.
+	// when the input frames are been called
+	// the frame data has valid times.
+	// we just don't have the data in the input callback.
+	
+	// the real issue is that input callbacks are global events, when this update
+	// is a data based call.
+	// but i have all the input events in this 
+	// but they are no use since i don't know if i'm allowed to use them all.
+	// i likethe input sinks tho
+	// as things are registerd with priority
+	// and each devices gets input events it's allowed to use.
+	// the problem is this data not linked to framedata
+	// so 
+	ProcessInput(frame.timeInfo);
 
 	cam_.setAngles(cameraAngle_);
 	cam_.setPosition(cameraPos_);
@@ -100,80 +115,85 @@ void XGame::release(void)
 	X_DELETE(this, g_gameArena);
 }
 
+
+void XGame::ProcessInput(core::FrameTimeData& timeInfo)
+{
+	X_UNUSED(timeInfo);
+
+	const float speed = 250.f;
+	const float timeScale = speed * timeInfo.deltas[core::ITimer::Timer::GAME].GetSeconds();
+
+	for (const auto& e : inputEvents_)
+	{
+		Vec3f posDelta;
+
+		// rotate.
+		switch (e.keyId)
+		{
+		case input::KeyId::MOUSE_X:
+			cameraAngle_.z += -(e.value * 0.002f);
+			continue;
+		case input::KeyId::MOUSE_Y:
+			cameraAngle_.x += -(e.value * 0.002f);
+			continue;
+		default:
+			break;
+		}
+
+		float scale = 1.f;
+		if (e.modifiers.IsSet(input::InputEvent::ModiferType::LSHIFT)) {
+			scale = 2.f;
+		}
+
+		scale *= timeScale;
+
+		switch (e.keyId)
+		{
+			// forwards.
+		case input::KeyId::W:
+			posDelta.y = scale;
+			break;
+			// backwards
+		case input::KeyId::A:
+			posDelta.x = -scale;
+			break;
+
+			// Left
+		case input::KeyId::S:
+			posDelta.y = -scale;
+			break;
+			// right
+		case input::KeyId::D:
+			posDelta.x = scale;
+			break;
+
+			// up / Down
+		case input::KeyId::Q:
+			posDelta.z = -scale;
+			break;
+		case input::KeyId::E:
+			posDelta.z = scale;
+			break;
+
+		default:
+			continue;
+		}
+
+		// I want movement to be relative to the way the camera is facing.
+		// so if i'm looking 90 to the right the direction also needs to be rotated.
+		Matrix33f angle = Matrix33f::createRotation(cameraAngle_);
+
+		cameraPos_ += (angle * posDelta);
+	}
+
+	inputEvents_.clear();
+}
+
 bool XGame::OnInputEvent(const input::InputEvent& event)
 {
-	X_UNUSED(event);
-	using namespace input;
-
-	Vec3f posDelta;
-	bool dontUpdate = false;
-
-	// rotate.
-	switch (event.keyId)
-	{
-		case KeyId::MOUSE_X:
-			cameraAngle_.z += -(event.value * 0.005f);
-			return false;
-		case KeyId::MOUSE_Y:
-			cameraAngle_.x += -(event.value * 0.005f);
-			return false;
-		default:
-			break;
-	}
-
-	// we want to move a fixed amount of time.
-	// we track how much time has passed since that last update.
-	// and use that for delta.
-
-	// timeLast_ = pTimer_->GetAsyncTime() - timeLast_;
-
-	float speed = 250.f;
-	if (event.modifiers.IsSet(InputEvent::ModiferType::LSHIFT)) {
-		speed *= 2.f;
-	}
-
-	float moveDelta = speed * pTimer_->GetFrameTime();
-	switch (event.keyId)		
-	{
-		// forwards.
-		case KeyId::W:
-		posDelta.y = moveDelta;
-		break;
-		// backwards
-		case KeyId::A:
-		posDelta.x = -moveDelta;
-		break;
-
-		// Left
-		case KeyId::S:
-		posDelta.y = -moveDelta;
-		break;
-		// right
-		case KeyId::D:
-		posDelta.x = moveDelta;
-		break;
-	
-		// up / Down
-		case KeyId::Q:
-		posDelta.z = -moveDelta;
-		break;
-		case KeyId::E:
-		posDelta.z = moveDelta;
-		break;
-
-		default:
-		dontUpdate = true;
-			break;
-	}
-
-	if (dontUpdate)
-		return false;
-
-	// I want movement to be relative to the way the camera is facing.
-	// so if i'm looking 90 to the right the direction also needs to be rotated.
-	Matrix33f angle = Matrix33f::createRotation(cameraAngle_);
-
-	cameraPos_ +=  (angle * posDelta);
+	// theses event have pointers to symbols that will change in next input poll
+	// but we don't use any of the data from symbol.
+	inputEvents_.emplace_back(event);
 	return false;
 }
 

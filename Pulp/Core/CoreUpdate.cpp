@@ -64,7 +64,6 @@ bool XCore::Update(void)
 	using namespace core::V2;
 
 	profileSys_.OnFrameBegin();
-	time_.OnFrameBegin();
 
 	if (env_.pJobSys) {
 		env_.pJobSys->OnFrameBegin();
@@ -78,6 +77,9 @@ bool XCore::Update(void)
 
 	core::FrameData frameData;
 	frameData.flags.Set(core::FrameFlag::HAS_FOCUS);
+
+	// get time deltas for this frame.
+	time_.OnFrameBegin(frameData.timeInfo);
 
 
 	JobSystem& jobSys = *env_.pJobSys;
@@ -109,7 +111,7 @@ bool XCore::Update(void)
 
 
 	if (env_.pGame) {
-		env_.pGame->Update();
+		env_.pGame->Update(frameData);
 	}
 
 	if (env_.p3DEngine) {
@@ -126,6 +128,7 @@ bool XCore::Update(void)
 	}
 
 
+#if 0
 	static core::TimeVal start = time_.GetAsyncTime();
 	core::TimeVal time = time_.GetAsyncTime();
 
@@ -152,6 +155,7 @@ bool XCore::Update(void)
 
 	int goat = 0;
 	goat = 2;
+#endif
 
 #else
 

@@ -4,6 +4,10 @@
 #ifndef X_GAME_I_H_
 #define X_GAME_I_H_
 
+X_NAMESPACE_DECLARE(core,
+	struct FrameData;
+);
+
 X_NAMESPACE_BEGIN(game)
 
 struct IGame
@@ -13,7 +17,7 @@ struct IGame
 
 	virtual bool Init(void) X_ABSTRACT;
 	virtual bool ShutDown(void) X_ABSTRACT;
-	virtual bool Update(void) X_ABSTRACT;
+	virtual bool Update(core::FrameData& frame) X_ABSTRACT;
 
 	virtual void release(void) X_ABSTRACT;
 

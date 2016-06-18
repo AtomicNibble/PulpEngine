@@ -27,7 +27,7 @@ public:
 	// IGame
 	bool Init(void) X_FINAL;
 	bool ShutDown(void) X_FINAL;
-	bool Update(void) X_FINAL;
+	bool Update(core::FrameData& frame) X_FINAL;
 	void release(void) X_FINAL;
 	// ~IGame
 
@@ -37,22 +37,23 @@ public:
 	// ~IInputEventListner
 		
 private:
-
 	static void s_OnFovChanged(core::ICVar* pVar);
 	void OnFovChanged(float fov);
+	void ProcessInput(core::FrameTimeData& timeInfo);
 
 private:
 	ICore* pCore_;
-	render::IRender* pRender_;
 
+	render::IRender* pRender_;
 	core::ITimer* pTimer_;
+	core::ICVar* pFovVar_;
 
 	core::TimeVal timeLast_;
 
 	Vec3f cameraPos_;
-	Vec3f cameraAngle_; // radins
+	Vec3f cameraAngle_;
 
-	core::ICVar* pFovVar_;
+	core::FixedArray<input::InputEvent, 256> inputEvents_;
 
 	XCamera cam_;
 };
