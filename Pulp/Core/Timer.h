@@ -26,27 +26,16 @@ public:
 
 	void OnFrameBegin(core::FrameTimeData& frameTime) X_FINAL;
 
+	// returns the absolute time right now, not delta from base time.
+	TimeVal GetTimeNow(Timer::Enum timer = Timer::GAME) const X_FINAL;
+	TimeVal GetTimeNowNoScale(void) const X_FINAL;
 
+	// returns the time now relative to base time.
+	TimeVal GetTimeNowReal(void) const X_FINAL;
 
-	// gets the time right now.
-	TimeVal GetAsyncTime(void) const X_FINAL;
+	float GetAvgFrameTime(void) const X_FINAL;
+	float GetAvgFrameRate(void) X_FINAL;
 
-	// returns the time unscaled. (same as above)
-	TimeVal GetTimeReal(void) const X_FINAL;
-
-	// gets the time right now as seconds.
-	float GetAsyncCurTime(void) X_FINAL;
-
-	// gets avg frame time.
-	float GetFrameTime(void) const X_FINAL;
-
-	// get the time scale
-	float GetTimeScale(void) X_FINAL;
-	// set hte time scale
-	void SetTimeScale(float scale) X_FINAL;
-
-	// returns the current frame weight
-	float GetFrameRate(void) X_FINAL;
 
 private:
 	void RefreshTime(Timer::Enum which, int64 curTime);
@@ -61,21 +50,10 @@ private:
 	int64_t timeScale_;				// scale for game
 	int64_t timeScaleUi_;			// scale for ui	  
 	int64_t maxFrameTimeDelta_;		// cap delta's that exceed this value.
-
+	int64_t ticksPerSec_;
 
 	int32_t	debugTime_;
-
-
 	int32_t	maxFps_;
-
-
-	int64_t ticksPerSec_;
-	float FrameTime_;			// scaled 
-	float FrameTimeActual_;	// frame time without scaling	
-
-
-
-
 };
 
 

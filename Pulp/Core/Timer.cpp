@@ -5,7 +5,6 @@
 #include <IConsole.h>
 #include <IFrameData.h>
 
-#include <math.h> // TEMP!!
 
 #include "SystemTimer.h"
 
@@ -20,18 +19,13 @@ X_NAMESPACE_BEGIN(core)
 XTimer::XTimer() :
 	timeScale_(1),
 	timeScaleUi_(1),
-FrameTime_(0.f),
-FrameTimeActual_(0.f),
-maxFrameTimeDelta_(0),
-ticksPerSec_(0),
-maxFps_(0),
-debugTime_(0)
+	maxFrameTimeDelta_(0),
+	ticksPerSec_(0),
+	maxFps_(0),
+	debugTime_(0)
 {
-//	AvgFrameTime_ = 1.0f / 60.0f;
-//	for (int i = 0; i<MAX_FRAME_AVERAGE; i++)
-//		arrFrameTimes_[i] = AvgFrameTime_;
 
-//	smooth_time_ = fDEFAULT_PROFILE_SMOOTHING;
+
 }
 
 
@@ -185,50 +179,39 @@ void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
 }
 
 
-TimeVal XTimer::GetAsyncTime(void) const
+TimeVal XTimer::GetTimeNow(Timer::Enum timer) const
+{
+	X_UNUSED(timer);
+	int64 now = SysTimer::Get();
+	// TODO add scale.
+
+	return TimeVal(now - baseTime_);
+}
+
+
+TimeVal XTimer::GetTimeNowNoScale(void) const
+{
+	int64 now = SysTimer::Get();
+
+	return TimeVal(now - baseTime_);
+}
+
+
+TimeVal XTimer::GetTimeNowReal(void) const
 {
 	int64 now = SysTimer::Get();
 
 	return TimeVal(now);
 }
 
-TimeVal XTimer::GetTimeReal(void) const
-{
-	int64 now = SysTimer::Get();
 
-	return TimeVal(now);
+float XTimer::GetAvgFrameTime(void) const
+{
+	return 0.1f;
 }
 
-float XTimer::GetAsyncCurTime(void)
+float XTimer::GetAvgFrameRate(void)
 {
-	
-	return 0.f;
-}
-
-
-float XTimer::GetFrameTime(void) const
-{
-	return FrameTimeActual_;
-}
-
-
-float XTimer::GetTimeScale(void)
-{
-	return 1.f;
-}
-
-void XTimer::SetTimeScale(float scale)
-{
-	X_UNUSED(scale);
-}
-
-
-// we should avg this.
-float XTimer::GetFrameRate(void)
-{
-	// the frame rate is 1 / the frame time
-	if (FrameTimeActual_ != 0.f) // prevent devide by zero.
-		return 1.f / FrameTimeActual_;
 	return 0.f;
 }
 
