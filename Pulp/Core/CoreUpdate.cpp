@@ -77,8 +77,6 @@ bool XCore::Update(void)
 
 
 	core::FrameData frameData;
-	frameData.startTime = time_.GetFrameStartTime();
-	frameData.delta = time_.GetFrameTime();
 	frameData.flags.Set(core::FrameFlag::HAS_FOCUS);
 
 

@@ -3,6 +3,7 @@
 #include <Time\TimeVal.h>
 
 #include <IInput.h>
+#include <ITimer.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -21,12 +22,20 @@ struct FrameInput
 };
 
 
+struct FrameTimeData
+{
+	TimeVal startTimeReal; // unscaled relative time to start of timer.
+
+	TimeVal deltas[ITimer::Timer::ENUM_COUNT];
+	TimeVal unscaledDeltas[ITimer::Timer::ENUM_COUNT];
+};
+
+
 struct FrameData
 {
 	typedef Flags<FrameFlag> FrameFlags;
 
-	TimeVal startTime;
-	float delta;
+	FrameTimeData timeInfo;
 
 	FrameFlags flags;
 
