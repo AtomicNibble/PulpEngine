@@ -19,6 +19,8 @@ X_NAMESPACE_BEGIN(core)
 
 class XTimer : public ITimer
 {
+	static const size_t NUM_DELTAS = 64;
+
 public:
 	XTimer();
 	~XTimer() X_OVERRIDE = default;
@@ -30,21 +32,20 @@ public:
 
 	void OnFrameBegin(core::FrameTimeData& frameTime) X_FINAL;
 
-	// returns the absolute time right now, not delta from base time.
-	TimeVal GetTimeNow(Timer::Enum timer = Timer::GAME) const X_FINAL;
 	TimeVal GetTimeNowNoScale(void) const X_FINAL;
 
 	// returns the time now relative to base time.
 	TimeVal GetTimeNowReal(void) const X_FINAL;
 
-	float GetAvgFrameTime(void) const X_FINAL;
+	TimeVal GetAvgFrameTime(void) const X_FINAL;
 	float GetAvgFrameRate(void) X_FINAL;
 
+	float GetScale(Timer::Enum timer) X_FINAL;
 
 private:
 	void OnMaxFrameTimeChanged(core::ICVar* pVar);
 	
-	float GetAverageFrameTime(float sec, float FrameTime, float LastAverageFrameTime);
+	void updateAvgFrameTime(TimeVal delta);
 
 private:
 	int64_t baseTime_;				// time we started / reset
@@ -58,6 +59,11 @@ private:
 
 	int32_t	debugTime_;
 	int32_t	maxFps_;
+
+	size_t deltaBufIdx_;
+	TimeVal avgTime_;
+	TimeVal deltaSum_;
+	TimeVal deltaBuf_[NUM_DELTAS];
 };
 
 

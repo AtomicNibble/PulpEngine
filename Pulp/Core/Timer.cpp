@@ -38,7 +38,8 @@ XTimer::XTimer() :
 	maxFrameTimeDelta_(0),
 	ticksPerSec_(0),
 	maxFps_(0),
-	debugTime_(0)
+	debugTime_(0),
+	deltaBufIdx_(0)
 {
 
 
@@ -118,8 +119,7 @@ void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
 		frameTime.deltas[Timer::UI].SetValue(uiTime);
 	}
 
-	// when scaling this should work correct since none of the members get scaled only values in frame delta.
-
+	updateAvgFrameTime(TimeVal(frameDeltaCapped));
 
 	// set last time for use next frame.
 	lastFrameStartTime_ = currentTime_;
@@ -135,15 +135,6 @@ void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
 	}
 }
 
-
-TimeVal XTimer::GetTimeNow(Timer::Enum timer) const
-{
-	X_UNUSED(timer);
-	int64 now = SysTimer::Get();
-	// TODO add scale.
-
-	return TimeVal(now - baseTime_);
-}
 
 
 TimeVal XTimer::GetTimeNowNoScale(void) const
@@ -162,13 +153,26 @@ TimeVal XTimer::GetTimeNowReal(void) const
 }
 
 
-float XTimer::GetAvgFrameTime(void) const
+TimeVal XTimer::GetAvgFrameTime(void) const
 {
-	return 0.1f;
+	return avgTime_;
 }
 
 float XTimer::GetAvgFrameRate(void)
 {
+	return 1.f / avgTime_.GetSeconds();
+}
+
+float XTimer::GetScale(Timer::Enum timer)
+{
+	if (timer == Timer::GAME) {
+		return timeScale_;
+	}
+	else if (timer == Timer::UI) {
+		return timeScaleUi_;
+	}
+
+	X_ASSERT_UNREACHABLE();
 	return 0.f;
 }
 
@@ -180,5 +184,19 @@ void XTimer::OnMaxFrameTimeChanged(core::ICVar* pVar)
 	maxFrameTimeDelta_ = static_cast<int64_t>(ticksPerSec_ * val);
 }
 
+
+void XTimer::updateAvgFrameTime(TimeVal delta)
+{
+	deltaSum_ -= deltaBuf_[deltaBufIdx_];
+	deltaSum_ += delta;
+
+	deltaBuf_[deltaBufIdx_] = delta;
+
+	if (++deltaBufIdx_ == NUM_DELTAS) {
+		deltaBufIdx_ = 0;
+	}	
+
+	avgTime_.SetValue(static_cast<int64_t>(static_cast<double>(deltaSum_.GetValue()) / NUM_DELTAS));
+}
 
 X_NAMESPACE_END

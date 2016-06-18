@@ -25,8 +25,7 @@ struct ITimer
 	// start of frame sets the timers values.
 	virtual void OnFrameBegin(core::FrameTimeData& frameTime) X_ABSTRACT;
 
-	// returns the time now relative to base time, includes scaling.
-	virtual TimeVal GetTimeNow(Timer::Enum timer = Timer::GAME) const X_ABSTRACT;
+
 	// returns the time now relative to base time, no scaling
 	virtual TimeVal GetTimeNowNoScale(void) const X_ABSTRACT;
 
@@ -34,8 +33,11 @@ struct ITimer
 	// do i even have use for this, since all these are time stamps.
 	virtual TimeVal GetTimeNowReal(void) const X_ABSTRACT;
 
-	virtual float GetAvgFrameTime(void) const X_ABSTRACT;
+	virtual TimeVal GetAvgFrameTime(void) const X_ABSTRACT;
 	virtual float GetAvgFrameRate(void) X_ABSTRACT;
+
+	virtual float GetScale(Timer::Enum timer) X_ABSTRACT;
+
 
 };
 
