@@ -3,6 +3,7 @@
 
 #include <ICore.h>
 #include <IConsole.h>
+#include <IFrameData.h>
 
 #include <math.h> // TEMP!!
 
@@ -17,13 +18,13 @@ X_NAMESPACE_BEGIN(core)
 
 
 XTimer::XTimer() :
-time_scale_(1.0f),
-FrameCounter_(0),
+	timeScale_(1),
+	timeScaleUi_(1),
 FrameTime_(0.f),
 FrameTimeActual_(0.f),
-max_frame_time_(0.f),
-TicksPerSec_(0),
-max_fps_(0),
+maxFrameTimeDelta_(0),
+ticksPerSec_(0),
+maxFps_(0),
 debugTime_(0)
 {
 //	AvgFrameTime_ = 1.0f / 60.0f;
@@ -39,13 +40,16 @@ bool XTimer::Init(ICore* pCore)
 	X_UNUSED(pCore);
 	SysTimer::Startup();
 
-	TicksPerSec_ = SysTimer::GetTickPerSec();
+	ticksPerSec_ = SysTimer::GetTickPerSec();
+	maxFrameTimeDelta_ = ticksPerSec_ / 5; // 0.2
+
 	Reset();
 
 	ADD_CVAR_REF("time_debug", debugTime_, 0, 0, 1, 0, "Time debugging");
-	ADD_CVAR_REF("time_max_frametime", max_frame_time_, 0.20f, 0.f, 10000.f, 0, "max time a frame can take");
-	ADD_CVAR_REF("time_scale", time_scale_, 1.f, 0, 2000.f, 0, "scale time of each frame");
-	ADD_CVAR_REF("maxfps", max_fps_, 24, 0, 1000, 0, "Max fps 0=unlimated");
+//	ADD_CVAR_REF("time_max_frametime", max_frame_time_, 0.20f, 0.f, 10000.f, 0, "max time a frame can take");
+//	ADD_CVAR_REF("time_scale", timeScale_, 1.f, 0, 2000.f, 0, "scale time of each frame");
+//	ADD_CVAR_REF("time_scale_ui", timeScaleUi_, 1.f, 0, 2000.f, 0, "scale time of each UI frame");
+//	ADD_CVAR_REF("maxfps", maxFps_, 24, 0, 1000, 0, "Max fps 0=unlimated");
 
 	return true; 
 }
@@ -57,24 +61,54 @@ bool XTimer::Init(ICore* pCore)
 
 void XTimer::Reset(void)
 {
-	BaseTime_ = SysTimer::Get();
-	LastTime_ = 0;
-	CurrentTime_ = 0;
+	baseTime_ = SysTimer::Get();
+	lastFrameStartTime_ = 0;
+	currentTime_ = 0;
 
-	RefreshTime(Timer::GAME, CurrentTime_);
-	RefreshTime(Timer::UI, CurrentTime_);
+//	RefreshTime(Timer::GAME, 0);
+//	RefreshTime(Timer::UI, 0);
 }
 
 
 //////////////////////////////////////////////////
 
-void XTimer::OnFrameBegin(void)
+void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
 {
-	X_PROFILE_BEGIN("GameTimer", core::ProfileSubSys::CORE);
+	const int64_t now = SysTimer::Get();
 
-	// inc the counter
-	FrameCounter_++;
+	currentTime_ = now - baseTime_;
 
+	const int64_t frameDelta = currentTime_ - lastFrameStartTime_;
+	const int64_t frameDeltaCapped = core::Min(frameDelta, maxFrameTimeDelta_);
+
+	if (frameDelta != frameDeltaCapped && debugTime_)
+	{
+		const float32_t deltaMs = SysTimer::ToMilliSeconds(frameDelta);
+		const float32_t cappedDeltaMs = SysTimer::ToMilliSeconds(frameDeltaCapped);
+		X_LOG0("Time", "Frame delta was capped. delta: %f cappedDelta: %f", deltaMs, cappedDeltaMs);
+	}
+
+	frameTime.startTimeReal.SetValue(currentTime_);
+
+	// set the unscaled timers
+	frameTime.unscaledDeltas[Timer::GAME].SetValue(frameDeltaCapped);
+	frameTime.unscaledDeltas[Timer::UI].SetValue(frameDeltaCapped);
+
+	// now we need to scale each of the timers.
+	{
+		const int64_t gameTime = frameDeltaCapped / timeScale_;
+		frameTime.deltas[Timer::GAME].SetValue(frameDeltaCapped);
+	}
+	{
+		const int64_t uiTime = frameDeltaCapped / timeScaleUi_;
+		frameTime.deltas[Timer::UI].SetValue(uiTime);
+	}
+
+
+	// set last time for use next frame.
+	lastFrameStartTime_ = currentTime_;
+
+#if 0
 	int64 now = SysTimer::Get();
 
 	// time since base.
@@ -145,8 +179,9 @@ void XTimer::OnFrameBegin(void)
 			GetCurrTime(Timer::GAME),
 			GetCurrTime(Timer::UI)
 			);
-
 	}
+
+#endif
 }
 
 
@@ -166,13 +201,8 @@ TimeVal XTimer::GetTimeReal(void) const
 
 float XTimer::GetAsyncCurTime(void)
 {
-	int64 now = SysTimer::Get();
-
-	// turn it into seconds
-	double dtime = (double)now;
-	float ftime = (float)(dtime / (double)this->TicksPerSec_);
-
-	return ftime;
+	
+	return 0.f;
 }
 
 
@@ -184,12 +214,12 @@ float XTimer::GetFrameTime(void) const
 
 float XTimer::GetTimeScale(void)
 {
-	return this->time_scale_;
+	return 1.f;
 }
 
 void XTimer::SetTimeScale(float scale)
 {
-	this->time_scale_ = scale;
+	X_UNUSED(scale);
 }
 
 
@@ -208,9 +238,10 @@ float XTimer::GetFrameRate(void)
 // updates the timer, 
 void XTimer::RefreshTime(Timer::Enum which, int64 curTime)
 {
-	double dVal = (double)(curTime);
+	X_UNUSED(which);
+	X_UNUSED(curTime);
 
-	Timers_[which].SetSeconds((float)(dVal / (double)(TicksPerSec_)));
+//	Timers_[which].SetValue(curTime);
 }
 
 

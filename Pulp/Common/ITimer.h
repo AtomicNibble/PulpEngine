@@ -4,32 +4,27 @@
 #define _X_TIMER_I_H_
 
 #include <Time\TimeVal.h>
-
 #include <Util\FlagsMacros.h>
+
+
+X_NAMESPACE_DECLARE(core,
+	struct FrameTimeData;
+);
 
 X_NAMESPACE_BEGIN(core)
 
 struct ITimer
 {
-	X_DECLARE_FLAGS(Timer)(GAME, UI);
+	X_DECLARE_ENUM(Timer)(GAME, UI);
 
 	virtual ~ITimer() {};
 
-//	virtual void StartUp() X_ABSTRACT;
-//	virtual void ShutDown() X_ABSTRACT;
-
-	virtual bool Init(ICore *pCore) X_ABSTRACT;
-
+	virtual bool Init(ICore* pCore) X_ABSTRACT;
 	virtual void Reset(void) X_ABSTRACT;
 
 	// start of frame sets the timers values.
-	virtual void OnFrameBegin(void) X_ABSTRACT;
+	virtual void OnFrameBegin(core::FrameTimeData& frameTime) X_ABSTRACT;
 
-	// returns the start time of the frame for the respective timer
-	virtual float GetCurrTime(Timer::Enum which = Timer::GAME) X_ABSTRACT;
-
-	// returns the start time of the frame for the respective timer
-	virtual const TimeVal& GetFrameStartTime(Timer::Enum which = Timer::GAME) X_ABSTRACT;
 
 	// returns the absolute time right now
 	virtual TimeVal GetAsyncTime(void) const X_ABSTRACT;
@@ -52,10 +47,6 @@ struct ITimer
 	// Returns the current fps.
 	virtual float GetFrameRate(void) X_ABSTRACT;
 
-
-protected:
-
-	TimeVal Timers_[Timer::FLAGS_COUNT + 1];
 
 };
 
