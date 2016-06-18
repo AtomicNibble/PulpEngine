@@ -6,6 +6,7 @@
 #include <ITimer.h>
 #include <IConsole.h>
 #include <Util\BitUtil.h>
+#include <Time\StopWatch.h>
 
 #include <Threading\JobSystem2.h>
 
@@ -139,13 +140,15 @@ namespace
 	X_INLINE void getTime(render::DX11XRender* r)
 	{
 		X_UNUSED(r);
-		vecTemp[0][0] = 1.f / gEnv->pTimer->GetFrameTime();
+		X_ASSERT_NOT_IMPLEMENTED();
+		vecTemp[0][0] = 1.f; // / gEnv->pTimer->GetFrameTime();
 	}
 
 	X_INLINE void getFrameTime(render::DX11XRender* r)
 	{
 		X_UNUSED(r);
-		vecTemp[0][0] = 1.f / gEnv->pTimer->GetFrameTime();
+		X_ASSERT_NOT_IMPLEMENTED();
+		vecTemp[0][0] = 1.f; // / gEnv->pTimer->GetFrameTime();
 	}
 
 	X_INLINE void getCameraPos(render::DX11XRender* r)

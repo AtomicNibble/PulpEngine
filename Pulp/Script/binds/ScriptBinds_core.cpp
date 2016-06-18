@@ -369,6 +369,11 @@ int XBinds_Core::DrawCone(IFunctionHandler *pH)
 // -----------------------------------------------
 
 
+// alot of these should be removed.
+// and we should not really expose all these values it's confusing.
+// we just want to give them: real time, and unscaled time.
+
+
 int XBinds_Core::GetCurrTime(IFunctionHandler *pH)
 {
 	SCRIPT_CHECK_PARAMETERS(0);
@@ -381,24 +386,27 @@ int XBinds_Core::GetCurrTime(IFunctionHandler *pH)
 int XBinds_Core::GetCurrAsyncTime(IFunctionHandler *pH)
 {
 	SCRIPT_CHECK_PARAMETERS(0);
+	X_ASSERT_NOT_IMPLEMENTED();
 
-	float fTime = pTimer_->GetAsyncCurTime();
+	float fTime = 0.f; // pTimer_->GetAsyncCurTime();
 	return pH->EndFunction(fTime);
 }
 
 int XBinds_Core::GetFrameTime(IFunctionHandler *pH)
 {
 	SCRIPT_CHECK_PARAMETERS(0);
+	X_ASSERT_NOT_IMPLEMENTED();
 
-	float fTime = pTimer_->GetFrameTime();
+	float fTime = 0.f; // pTimer_->GetFrameTime();
 	return pH->EndFunction(fTime);
 }
 
 int XBinds_Core::GetTimeScale(IFunctionHandler *pH)
 {
 	SCRIPT_CHECK_PARAMETERS(0);
+	X_ASSERT_NOT_IMPLEMENTED();
 
-	float scale = pTimer_->GetTimeScale();
+	float scale = 0.f; // pTimer_->GetTimeScale();
 	return pH->EndFunction(scale);
 }
 
