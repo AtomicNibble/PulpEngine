@@ -2,6 +2,7 @@
 #include "JobSystem.h"
 
 #include "Util\Cpu.h"
+#include "Time\StopWatch.h"
 
 #include "ICore.h"
 #include "ITimer.h"
@@ -114,7 +115,7 @@ void JobThread::WaitForThread(void)
 
 TimeVal JobThread::GetTimeReal(void) const
 {
-	return pTimer_->GetTimeReal();
+	return pTimer_->GetTimeNow();
 }
 
 Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
@@ -139,13 +140,11 @@ X_ENABLE_WARNING(4127)
 				signalWorkerDone_.raise();
 				signalCritical_.Leave();
 
-				TimeVal start = gEnv->pTimer->GetTimeReal();
+				core::StopWatch timer;
 
 				signalMoreWorkToDo_.wait();
 
-				TimeVal end = gEnv->pTimer->GetTimeReal();
-
-				stats_.waitforJobTime += (end - start);
+				stats_.waitforJobTime += timer.GetTimeVal();
 				continue;
 			}
 		}
@@ -184,26 +183,23 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 		}
 
 		{
-			TimeVal jobStart = GetTimeReal();
+			core::StopWatch timer;
 
 			// run it.
 			job.pJobFunc(job.pParam, threadIdx_);
 
-			TimeVal jobEnd = GetTimeReal();
-			TimeVal elapsed = jobEnd - jobStart;
-
-			job.execTime = elapsed;
+			job.execTime = timer.GetTimeVal();
 
 			if (JobSystem::var_LongJobMs > 0)
 			{
 				// we allow jobs with no priority to run as long as they want
-				if (elapsed.GetMilliSeconds() > JobSystem::var_LongJobMs
+				if (job.execTime.GetMilliSeconds() > JobSystem::var_LongJobMs
 					&& i != JobPriority::NONE)
 				{
 					X_WARNING("JobSystem", "a single job took more than: %ims elapsed: %gms "
 						"pFunc: %p pData: %p",
 						JobSystem::var_LongJobMs,
-						elapsed.GetMilliSeconds(),
+						job.execTime.GetMilliSeconds(),
 						job.pJobFunc,
 						job.pParam
 					);
