@@ -115,7 +115,7 @@ void JobThread::WaitForThread(void)
 
 TimeVal JobThread::GetTimeReal(void) const
 {
-	return pTimer_->GetTimeNow();
+	return pTimer_->GetTimeNowNoScale();
 }
 
 Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
