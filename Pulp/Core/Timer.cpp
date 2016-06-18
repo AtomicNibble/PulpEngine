@@ -58,10 +58,15 @@ bool XTimer::Init(ICore* pCore)
 	Reset();
 
 	ADD_CVAR_REF("time_debug", debugTime_, 0, 0, 1, 0, "Time debugging");
-	ADD_CVAR_FLOAT("time_max_frametime", 0.20f, 0.f, 10000.f, 0, "max time a frame can take (unscaled)");
+	core::ICVar* pVar = ADD_CVAR_FLOAT("time_max_frametime", 0.20f, 0.f, 10000.f, 0, "max time a frame can take (unscaled)");
 	ADD_CVAR_REF("time_scale", timeScale_, 1.f, 0, 2000.f, 0, "scale time of each frame");
 	ADD_CVAR_REF("time_scale_ui", timeScaleUi_, 1.f, 0, 2000.f, 0, "scale time of each UI frame");
 //	ADD_CVAR_REF("maxfps", maxFps_, 24, 0, 1000, 0, "Max fps 0=unlimated");
+
+
+	core::ConsoleVarFunc del;
+	del.Bind<XTimer, &XTimer::OnMaxFrameTimeChanged>(this);
+	pVar->SetOnChangeCallback(del);
 
 	return true; 
 }
@@ -167,7 +172,13 @@ float XTimer::GetAvgFrameRate(void)
 	return 0.f;
 }
 
+void XTimer::OnMaxFrameTimeChanged(core::ICVar* pVar)
+{
+	const float val = pVar->GetFloat();
 
+	// turn it into ticks.
+	maxFrameTimeDelta_ = static_cast<int64_t>(ticksPerSec_ * val);
+}
 
 
 X_NAMESPACE_END

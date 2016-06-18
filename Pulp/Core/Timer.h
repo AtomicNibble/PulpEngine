@@ -6,6 +6,10 @@
 
 #include <ITimer.h>
 
+X_NAMESPACE_DECLARE(core,
+	struct ICVar;
+);
+
 X_NAMESPACE_BEGIN(core)
 
 // set the frame range.
@@ -38,6 +42,8 @@ public:
 
 
 private:
+	void OnMaxFrameTimeChanged(core::ICVar* pVar);
+	
 	float GetAverageFrameTime(float sec, float FrameTime, float LastAverageFrameTime);
 
 private:
