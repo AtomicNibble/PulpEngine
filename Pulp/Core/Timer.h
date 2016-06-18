@@ -38,8 +38,6 @@ public:
 
 
 private:
-	void RefreshTime(Timer::Enum which, int64 curTime);
-
 	float GetAverageFrameTime(float sec, float FrameTime, float LastAverageFrameTime);
 
 private:
@@ -47,8 +45,8 @@ private:
 	int64_t lastFrameStartTime_;	// start time relative to base time
 	int64_t currentTime_;			// relative to base.
 
-	int64_t timeScale_;				// scale for game
-	int64_t timeScaleUi_;			// scale for ui	  
+	float32_t timeScale_;				// scale for game
+	float32_t timeScaleUi_;			// scale for ui	  
 	int64_t maxFrameTimeDelta_;		// cap delta's that exceed this value.
 	int64_t ticksPerSec_;
 
