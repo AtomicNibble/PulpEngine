@@ -961,6 +961,14 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 		}
 		return true;
 	}
+	else if (event.keyId == KeyId::HOME)
+	{
+		CursorPos_ = 0;
+	}
+	else if (event.keyId == KeyId::END)
+	{
+		CursorPos_ = safe_static_cast<int32_t, size_t>(InputBuffer_.length());
+	}
 	else if (event.keyId == KeyId::UP_ARROW)
 	{
 		if (isAutocompleteVis() && autoCompleteIdx_ >= 0)
