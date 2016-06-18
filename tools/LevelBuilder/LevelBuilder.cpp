@@ -193,11 +193,11 @@ void CompileLevel(core::Path<char>& path)
 			{
 				if (lvl.ProcessModels())
 				{
-					core::TimeVal saveStart = pTimer->GetAsyncTime();
+					core::StopWatch timer;
 
 					if (lvl.save(path.fileName()))
 					{
-						core::TimeVal saveElapsed = (pTimer->GetAsyncTime() - saveStart);
+						core::TimeVal saveElapsed = timer.GetTimeVal();
 
 						X_LOG0("Level", "Success. saved in: ^6%gms",
 							saveElapsed.GetMilliSeconds());
