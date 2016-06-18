@@ -603,9 +603,9 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 
 	ID3DBlob* error;
 
-	core::TimeVal start = gEnv->pTimer->GetAsyncTime();
+	core::StopWatch timer;
 
-	core::string sourcName = name_ + ".fxcb.hlsl";
+	core::string sourcName = name_ + ".fxcb.hlsl";	
 
 	hr = D3DCompile(
 		source,
@@ -648,7 +648,7 @@ bool XHWShader_Dx10::compileFromSource(core::string& source)
 		return false;
 	}
 
-	float elapsed = (gEnv->pTimer->GetAsyncTime() - start).GetMilliSeconds();
+	float elapsed = timer.GetMilliSeconds();
 
 	X_LOG0("Shader", "Compile complete: %.3fms", elapsed);
 
