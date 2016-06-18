@@ -52,8 +52,6 @@ bool XCore::RunGameLoop(void)
 		X_PROFILE_BEGIN("GameLoop", core::ProfileSubSys::GAME);
 
 		Update();
-		RenderBegin();
-		RenderEnd();
 	}
 	return true;
 }
@@ -97,7 +95,7 @@ bool XCore::Update(void)
 		// post the input frame after processing the inputs.
 		jobSys.AddContinuation(pInputJob, pPostInputFrame);
 
-		Job* pConsoleUpdates = jobSys.CreateMemberJob<XCore>(this, &XCore::Job_ConsoleUpdates, nullptr);
+		Job* pConsoleUpdates = jobSys.CreateMemberJob<XCore>(this, &XCore::Job_ConsoleUpdates, &frameData.timeInfo);
 
 		// we run console updates after input events have been posted.
 		jobSys.AddContinuation(pInputJob, pConsoleUpdates);
@@ -127,6 +125,8 @@ bool XCore::Update(void)
 		env_.pScriptSys->Update();
 	}
 
+	RenderBegin(frameData);
+	RenderEnd(frameData);
 
 #if 0
 	static core::TimeVal start = time_.GetAsyncTime();
@@ -221,17 +221,17 @@ bool XCore::Update(void)
 
 
 
-void XCore::RenderBegin(void)
+void XCore::RenderBegin(core::FrameData& frameData)
 {
 	X_PROFILE_BEGIN("CoreRenderBegin", core::ProfileSubSys::CORE);
-
+	X_UNUSED(frameData);
 
 	env_.pRender->RenderBegin();
 	env_.p3DEngine->OnFrameBegin();
 }
 
 
-void XCore::RenderEnd(void)
+void XCore::RenderEnd(core::FrameData& frameData)
 {
 	{
 		X_PROFILE_BEGIN("CoreRenderEnd", core::ProfileSubSys::CORE);
@@ -244,7 +244,7 @@ void XCore::RenderEnd(void)
 		profileSys_.Render();
 
 		if (core::IConsole* pConsole = GetIConsole()) {
-			pConsole->draw();
+			pConsole->draw(frameData.timeInfo);
 		}
 		
 		env_.pRender->RenderEnd();

@@ -46,9 +46,9 @@ void XConsoleNULL::freeRenderResources(void)
 
 }
 
-void XConsoleNULL::dispatchRepeateInputEvents(void)
+void XConsoleNULL::dispatchRepeateInputEvents(core::FrameTimeData& time)
 {
-
+	X_UNUSED(time);
 }
 
 void XConsoleNULL::runCmds(void)
@@ -56,9 +56,9 @@ void XConsoleNULL::runCmds(void)
 
 }
 
-void XConsoleNULL::draw(void)
+void XConsoleNULL::draw(core::FrameTimeData& time)
 {
-
+	X_UNUSED(time);
 }
 
 consoleState::Enum XConsoleNULL::getVisState(void) const

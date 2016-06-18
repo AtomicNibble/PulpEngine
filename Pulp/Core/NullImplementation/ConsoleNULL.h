@@ -24,9 +24,9 @@ public:
 	virtual void unregisterInputListener(void) X_FINAL;
 	virtual void freeRenderResources(void) X_FINAL;
 
-	virtual void dispatchRepeateInputEvents(void) X_FINAL;
+	virtual void dispatchRepeateInputEvents(core::FrameTimeData& time) X_FINAL;
 	virtual void runCmds(void) X_FINAL;
-	virtual void draw(void) X_FINAL;
+	virtual void draw(core::FrameTimeData& time) X_FINAL;
 
 	virtual consoleState::Enum getVisState(void) const X_FINAL;
 

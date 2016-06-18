@@ -12,6 +12,10 @@
 
 struct ICore;
 
+X_NAMESPACE_DECLARE(core,
+	struct FrameTimeData;
+);
+
 X_NAMESPACE_BEGIN(core)
 
 
@@ -85,9 +89,9 @@ struct IConsole
 	virtual void freeRenderResources(void) X_ABSTRACT;
 
 	// console set's it's own input repeat rate, that's timed instead of every frame.
-	virtual void dispatchRepeateInputEvents(void) X_ABSTRACT; 
+	virtual void dispatchRepeateInputEvents(core::FrameTimeData& time) X_ABSTRACT;
 	virtual void runCmds(void) X_ABSTRACT;
-	virtual void draw(void) X_ABSTRACT;
+	virtual void draw(core::FrameTimeData& time) X_ABSTRACT;
 
 	virtual consoleState::Enum getVisState(void) const X_ABSTRACT;
 

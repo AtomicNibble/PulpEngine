@@ -159,8 +159,8 @@ public:
 private:
 	bool PumpMessages(void);
 	bool Update(void);
-	void RenderBegin(void);
-	void RenderEnd(void);
+	void RenderBegin(core::FrameData& frameData);
+	void RenderEnd(core::FrameData& frameData);
 
 
 	WIN_HMODULE LoadDynamiclibrary(const char *dllName) const;

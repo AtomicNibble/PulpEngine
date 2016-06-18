@@ -16,6 +16,7 @@
 #include <ILog.h>
 #include <ICore.h>
 #include <IFileSys.h>
+#include <IFrameData.h>
 
 #include "Platform\Window.h"
 
@@ -371,9 +372,9 @@ XConsole::XConsole() :
 	configCmds_.reserve(128);
 
 
-	repeatEventTimer_ = 0.f;
-	repeatEventInterval_ = 0.025f;
-	repeatEventInitialDelay_ = 0.5f;
+	repeatEventTimer_ = TimeVal(0ll);
+	repeatEventInterval_ = TimeVal(0.025f);
+	repeatEventInitialDelay_ = TimeVal(0.5f);
 
 #if X_ENABLE_CONFIG_HOT_RELOAD
 	ignoreHotReload_ = false;
@@ -896,7 +897,7 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 			}
 
 			// disable blinking while moving.
-			cursor_.curTime = 0.f; 
+			cursor_.curTime = TimeVal(0ll);
 			cursor_.draw = true;
 
 			if (console_cursor_skip_color_codes)
@@ -939,7 +940,7 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 			}
 
 			// disable blinking while moving.
-			cursor_.curTime = 0.f;
+			cursor_.curTime = TimeVal(0ll);
 			cursor_.draw = true;
 
 			if (console_cursor_skip_color_codes)
@@ -1842,7 +1843,7 @@ void XConsole::RegisterVar(ICVar* pCVar)
 
 
 
-void XConsole::dispatchRepeateInputEvents(void)
+void XConsole::dispatchRepeateInputEvents(core::FrameTimeData& time)
 {
 	// we must be open to accept input.
 	// cancel any repeat events when we close.
@@ -1853,9 +1854,10 @@ void XConsole::dispatchRepeateInputEvents(void)
 
 	if (repeatEvent_.keyId != input::KeyId::UNKNOWN)
 	{
-		repeatEventTimer_ -= gEnv->pTimer->GetFrameTime();
+		// we want to be able to de increment the time.
+		repeatEventTimer_ -= time.unscaledDeltas[ITimer::Timer::UI];
 
-		if (repeatEventTimer_ <= 0.0f)
+		if (repeatEventTimer_.GetValue() < 0)
 		{
 			if (repeatEvent_.action == input::InputState::CHAR) {
 				OnInputEventChar(repeatEvent_);
@@ -1881,14 +1883,14 @@ void XConsole::runCmds(void)
 }
 
 
-void XConsole::draw(void)
+void XConsole::draw(core::FrameTimeData& time)
 {
-	cursor_.curTime += gEnv->pTimer->GetFrameTime();
+	cursor_.curTime += time.unscaledDeltas[ITimer::Timer::UI];
 
 	if (cursor_.curTime > cursor_.displayTime)
 	{
 		cursor_.draw = !cursor_.draw; // toggle it
-		cursor_.curTime = 0.f; // reset
+		cursor_.curTime = TimeVal(0ll);; // reset
 	}
 
 	DrawBuffer();

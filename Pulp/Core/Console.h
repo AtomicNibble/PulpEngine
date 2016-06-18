@@ -146,9 +146,9 @@ public:
 	virtual void unregisterInputListener(void) X_FINAL;
 	virtual void freeRenderResources(void) X_FINAL;
 
-	virtual void dispatchRepeateInputEvents(void) X_FINAL;
+	virtual void dispatchRepeateInputEvents(core::FrameTimeData& time) X_FINAL;
 	virtual void runCmds(void) X_FINAL;
-	virtual void draw(void) X_FINAL;
+	virtual void draw(core::FrameTimeData& time) X_FINAL;
 
 	virtual consoleState::Enum getVisState(void) const X_FINAL;
 
@@ -284,9 +284,10 @@ private:
 	{
 		Cursor();
 
-		float curTime;
-		float displayTime;
+		TimeVal curTime;
+		TimeVal displayTime;
 		bool draw;
+		bool _pad[3];
 	};
 
 
@@ -344,9 +345,9 @@ private:
 	input::InputEvent		repeatEvent_;
 	X_ENABLE_WARNING(4324);
 
-	float					repeatEventInterval_;
-	float					repeatEventInitialDelay_;
-	float					repeatEventTimer_;
+	TimeVal					repeatEventInterval_;
+	TimeVal					repeatEventInitialDelay_;
+	TimeVal					repeatEventTimer_; // the time a repeat event will be trigger.
 
 	ICore*					pCore_;
 	font::IFFont*			pFont_;

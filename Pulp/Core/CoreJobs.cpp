@@ -114,8 +114,10 @@ void XCore::Job_ConsoleUpdates(core::V2::JobSystem& jobSys, size_t threadIdx,
 	X_UNUSED(pData);
 
 	if (env_.pConsole) {
+		core::FrameTimeData& time = *reinterpret_cast<core::FrameTimeData*>(pData);
+		
 		// this should not run any commands as it's just repeating a key
-		env_.pConsole->dispatchRepeateInputEvents();
+		env_.pConsole->dispatchRepeateInputEvents(time);
 
 		// runs any commands that got submitted via input or config / other things.
 		// so basically this is the only place that triggers command callbacks and modified callbacks.
