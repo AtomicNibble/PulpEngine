@@ -198,12 +198,13 @@ protected:
 	virtual Thread::ReturnValue ThreadRun(const Thread& thread) X_FINAL;
 	Thread::ReturnValue ThreadRunInternal(const Thread& thread);
 
+	TimeVal GetTimeReal(void) const;
+
 private:
 	core::Signal signalWorkerDone_;
 	core::Signal signalMoreWorkToDo_;
 	core::CriticalSection signalCritical_;
 	volatile bool moreWorkToDo_;
-
 
 	ThreadStats stats_;
 

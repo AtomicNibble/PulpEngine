@@ -320,7 +320,7 @@ void JobList::PreSubmit(JobList* pWaitFor)
 
 TimeVal JobList::GetTimeReal(void) const
 {
-	return pTimer_->GetTimeReal();
+	return pTimer_->GetTimeNowNoScale();
 }
 // ----------------------------------
 
@@ -404,11 +404,11 @@ X_ENABLE_WARNING(4127)
 				signalWorkerDone_.raise();
 				signalCritical_.Leave();
 
-				TimeVal start = gEnv->pTimer->GetTimeReal();
+				TimeVal start = GetTimeReal();
 
 				signalMoreWorkToDo_.wait();
 
-				TimeVal end = gEnv->pTimer->GetTimeReal();
+				TimeVal end = GetTimeReal();
 
 				stats_.waitforJobTime += (end - start);
 				continue;
@@ -521,6 +521,11 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
 	} 
 
 	return Thread::ReturnValue(0);
+}
+
+TimeVal JobThread::GetTimeReal(void) const
+{
+	return gEnv->pTimer->GetTimeNowNoScale();
 }
 
 
