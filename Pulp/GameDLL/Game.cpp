@@ -41,7 +41,6 @@ bool XGame::Init(void)
 	pTimer_ = gEnv->pTimer;
 	pRender_ = gEnv->pRender;
 
-	timeLast_ = pTimer_->GetAsyncTime();
 
 	// register some vars
 	ADD_CVAR_REF_VEC3("cam_pos", cameraPos_, s_DefaultCamPosition, core::VarFlag::STATIC, 

@@ -48,7 +48,6 @@ private:
 	core::ITimer* pTimer_;
 	core::ICVar* pFovVar_;
 
-	core::TimeVal timeLast_;
 
 	Vec3f cameraPos_;
 	Vec3f cameraAngle_;
