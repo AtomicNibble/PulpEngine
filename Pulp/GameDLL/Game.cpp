@@ -102,7 +102,6 @@ bool XGame::Update(core::FrameData& frame)
 
 	cam_.setAngles(cameraAngle_);
 	cam_.setPosition(cameraPos_);
-//	cam_.setFov(cameraFov_);
 
 	pRender_->SetCamera(cam_);
 
