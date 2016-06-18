@@ -128,7 +128,7 @@ bool Level::Load(const char* mapName)
 
 	X_LOG0("Level", "Loading level: %s", mapName);
 	loadStats_ = LoadStats();
-	loadStats_.startTime = pTimer_->GetTimeReal();
+	loadStats_.startTime = pTimer_->GetTimeNowNoScale();
 
 	// clear it.
 	core::zero_object(fileHdr_);
@@ -510,7 +510,7 @@ bool Level::ProcessData(void)
 
 
 	// stats.
-	loadStats_.elapse = pTimer_->GetTimeReal() - loadStats_.startTime;
+	loadStats_.elapse = pTimer_->GetTimeNowNoScale() - loadStats_.startTime;
 
 	// safe to render?
 	canRender_ = true;
