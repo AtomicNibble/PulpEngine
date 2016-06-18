@@ -52,7 +52,7 @@ bool XGame::Init(void)
 		core::VarFlag::SAVE_IF_CHANGED, "camera fov");
 
 	core::ConsoleVarFunc del;
-	del.Bind<s_OnFovChanged>();
+	del.Bind<XGame, &XGame::OnFovChanged>(this);
 	pFovVar_->SetOnChangeCallback(del);
 
 	uint32_t width, height;
@@ -204,17 +204,11 @@ bool XGame::OnInputEventChar(const input::InputEvent& event)
 	return false;
 }
 
-void XGame::s_OnFovChanged(core::ICVar* pVar)
+void XGame::OnFovChanged(core::ICVar* pVar)
 {
 	float fovDegress = pVar->GetFloat();
 	float fov = ::toRadians(fovDegress);
 
-	XGame* pGame = static_cast<XGame*>(gEnv->pGame);
-	pGame->OnFovChanged(fov);
-}
-
-void XGame::OnFovChanged(float fov)
-{
 	cam_.setFov(fov);
 }
 

@@ -37,9 +37,9 @@ public:
 	// ~IInputEventListner
 		
 private:
-	static void s_OnFovChanged(core::ICVar* pVar);
-	void OnFovChanged(float fov);
 	void ProcessInput(core::FrameTimeData& timeInfo);
+	
+	void OnFovChanged(core::ICVar* pVar);
 
 private:
 	ICore* pCore_;
