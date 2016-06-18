@@ -372,8 +372,9 @@ int XBinds_Core::DrawCone(IFunctionHandler *pH)
 int XBinds_Core::GetCurrTime(IFunctionHandler *pH)
 {
 	SCRIPT_CHECK_PARAMETERS(0);
+	X_ASSERT_NOT_IMPLEMENTED();
 
-	float fTime = pTimer_->GetCurrTime();
+	float fTime = 0.f; // pTimer_->GetCurrTime();
 	return pH->EndFunction(fTime);
 }
 

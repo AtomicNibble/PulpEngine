@@ -304,7 +304,7 @@ void XScriptSys::Update()
 {
 	X_PROFILE_BEGIN("ScriptUpdate", core::ProfileSubSys::SCRIPT);
 
-	float time = gEnv->pTimer->GetCurrTime();
+	float time = 0.f; //  gEnv->pTimer->GetCurrTime();
 
 	SetGlobalValue("_time", time);
 

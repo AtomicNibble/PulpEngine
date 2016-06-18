@@ -459,7 +459,8 @@ void XWindow::AddTransition(XWinVar* dest, Vec4f from, Vec4f to,
 
 void XWindow::ResetTime(int timeMs)
 {
-	core::TimeVal time = pTimer_->GetFrameStartTime(core::ITimer::Timer::UI);
+	X_ASSERT_NOT_IMPLEMENTED();
+	core::TimeVal time(0ll); //  pTimer_->GetFrameStartTime(core::ITimer::Timer::UI);
 	core::TimeVal temp;
 
 	int UItimeMs = static_cast<int>(time.GetMilliSeconds());
@@ -1281,8 +1282,9 @@ XWinVar* XWindow::GetWinVarByName(const char* name)
 void XWindow::reDraw(void)
 {
 	X_PROFILE_BEGIN("GuiDraw", core::ProfileSubSys::ENGINE3D);
+	X_ASSERT_NOT_IMPLEMENTED();
 
-	core::TimeVal time = pTimer_->GetFrameStartTime(core::ITimer::Timer::UI);
+	core::TimeVal time = core::TimeVal(0ll); // pTimer_->GetFrameStartTime(core::ITimer::Timer::UI);
 
 	if (flags_.IsSet(WindowFlag::DESKTOP)) {
 		RunTimeEvents(time);
