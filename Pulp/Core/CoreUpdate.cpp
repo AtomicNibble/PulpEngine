@@ -128,26 +128,25 @@ bool XCore::Update(void)
 	RenderBegin(frameData);
 	RenderEnd(frameData);
 
-#if 0
-	static core::TimeVal start = time_.GetAsyncTime();
-	core::TimeVal time = time_.GetAsyncTime();
+#if 1
+	static core::TimeVal start = time_.GetTimeNowNoScale();
+	core::TimeVal time = time_.GetTimeNowNoScale();
 
 	float val = time.GetDifferenceInSeconds(start);
 	if (val >= 0.95f)
 	{
 		start = time;
 
-		float fps = time_.GetFrameRate();
-		float frametime = time_.GetFrameTime();
+		float fps = time_.GetAvgFrameRate();
+		core::TimeVal frametime = time_.GetAvgFrameTime();
 
 		core::StackString<128> title;
 		title.clear();
-		title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%i, %ims) Time: %I64u(x%g) UI: %I64u",
+		title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%i, %gms) Game: (x%g) UI: (x%g)",
 			static_cast<int>(fps),
-			static_cast<int>(frametime * 1000.f),
-			static_cast<__int64>(time_.GetFrameStartTime(core::ITimer::Timer::GAME).GetMilliSeconds()),
-			time_.GetTimeScale(),
-			static_cast<__int64>(time_.GetFrameStartTime(core::ITimer::Timer::UI).GetMilliSeconds())
+			frametime.GetMilliSeconds(),
+			time_.GetScale(core::ITimer::Timer::GAME),
+			time_.GetScale(core::ITimer::Timer::UI)
 		);
 
 		pWindow_->SetTitle(title.c_str());
