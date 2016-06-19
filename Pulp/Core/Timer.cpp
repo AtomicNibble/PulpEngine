@@ -65,9 +65,12 @@ bool XTimer::Init(ICore* pCore)
 //	ADD_CVAR_REF("maxfps", maxFps_, 24, 0, 1000, 0, "Max fps 0=unlimated");
 
 
-	core::ConsoleVarFunc del;
-	del.Bind<XTimer, &XTimer::OnMaxFrameTimeChanged>(this);
-	pVar->SetOnChangeCallback(del);
+	if (pVar)
+	{
+		core::ConsoleVarFunc del;
+		del.Bind<XTimer, &XTimer::OnMaxFrameTimeChanged>(this);
+		pVar->SetOnChangeCallback(del);
+	}
 
 	return true; 
 }
