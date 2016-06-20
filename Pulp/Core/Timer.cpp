@@ -58,7 +58,7 @@ bool XTimer::Init(ICore* pCore)
 	core::ICVar* pVar = ADD_CVAR_FLOAT("time_max_frametime", 0.20f, 0.f, 10000.f, 0, "max time a frame can take (unscaled)");
 	ADD_CVAR_REF("time_scale", timeScale_, 1.f, 0, 2000.f, 0, "scale time of each frame");
 	ADD_CVAR_REF("time_scale_ui", timeScaleUi_, 1.f, 0, 2000.f, 0, "scale time of each UI frame");
-//	ADD_CVAR_REF("maxfps", maxFps_, 24, 0, 1000, 0, "Max fps 0=unlimated");
+	ADD_CVAR_REF("maxfps", maxFps_, 24, 0, 1000, 0, "Max fps 0=unlimated");
 
 
 	if (pVar)
@@ -92,14 +92,35 @@ void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
 
 	currentTime_ = now - baseTime_;
 
-	const int64_t frameDelta = currentTime_ - lastFrameStartTime_;
-	const int64_t frameDeltaCapped = core::Min(frameDelta, maxFrameTimeDelta_);
+	int64_t frameDelta = currentTime_ - lastFrameStartTime_;
+	int64_t frameDeltaCapped = core::Min(frameDelta, maxFrameTimeDelta_);
 
 	if (frameDelta != frameDeltaCapped && debugTime_)
 	{
 		const float32_t deltaMs = SysTimer::ToMilliSeconds(frameDelta);
 		const float32_t cappedDeltaMs = SysTimer::ToMilliSeconds(frameDeltaCapped);
 		X_LOG0("Time", "Frame delta was capped. delta: %f cappedDelta: %f", deltaMs, cappedDeltaMs);
+	}
+
+	if (maxFps_ != 0)
+	{
+		// sleep the diffrence.
+		const int64_t targetTicks = (ticksPerSec_ / maxFps_);
+
+		if (frameDelta < targetTicks)
+		{
+			const int64_t sleepTicks = targetTicks - frameDelta;
+			const float sleepMs = math<float>::abs(SysTimer::ToMilliSeconds(sleepTicks));
+
+			if (debugTime_) {
+				X_LOG0("Timer", "Sleeping for %gms to limit frame rate.", sleepMs);
+			}
+
+			core::Thread::Sleep(static_cast<uint32_t>(sleepMs));
+
+			frameDelta = targetTicks;
+			frameDeltaCapped = targetTicks;
+		}
 	}
 
 	frameTime.startTimeReal.SetValue(currentTime_);
