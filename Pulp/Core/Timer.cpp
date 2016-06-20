@@ -8,10 +8,6 @@
 
 #include "SystemTimer.h"
 
-//! Profile smoothing time in seconds (original default was .8 / log(10) ~= .35 s)
-static const float fDEFAULT_PROFILE_SMOOTHING = 1.0f;
-static const float fMAX_BLEND_FRAME_TIME = 1.0f;
-
 
 X_NAMESPACE_BEGIN(core)
 
