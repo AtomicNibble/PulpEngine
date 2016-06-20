@@ -12,9 +12,6 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(core)
 
-// set the frame range.
-#define FPS_FRAMES 16
-#define MAX_FRAME_AVERAGE 100
 
 
 class XTimer : public ITimer
