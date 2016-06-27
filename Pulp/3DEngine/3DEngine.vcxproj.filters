@@ -3,121 +3,136 @@
   <ItemGroup>
     <ClCompile Include="RenderEngine.cpp" />
     <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="Material.cpp">
-      <Filter>Material</Filter>
-    </ClCompile>
-    <ClCompile Include="MaterialManager.cpp">
-      <Filter>Material</Filter>
-    </ClCompile>
-    <ClCompile Include="X3DEngine.cpp">
-      <Filter>Engine</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\XWindow.cpp">
-      <Filter>Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\SimpleWindow.cpp">
-      <Filter>Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\GuiManger.cpp">
-      <Filter>Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\Gui.cpp">
-      <Filter>Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\WinVar.cpp">
-      <Filter>Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\RegExp.cpp">
-      <Filter>Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\GuiScript.cpp">
-      <Filter>Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="Level.cpp">
-      <Filter>Level</Filter>
-    </ClCompile>
-    <ClCompile Include="Level_load.cpp">
-      <Filter>Level</Filter>
-    </ClCompile>
-    <ClCompile Include="Level_portal.cpp">
-      <Filter>Level</Filter>
-    </ClCompile>
     <ClCompile Include="ModelManager.cpp">
-      <Filter>Model</Filter>
+      <Filter>Source Files\Model</Filter>
     </ClCompile>
     <ClCompile Include="XModel.cpp">
-      <Filter>Model</Filter>
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="MaterialManager.cpp">
+      <Filter>Source Files\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="Level_portal.cpp">
+      <Filter>Source Files\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Level_load.cpp">
+      <Filter>Source Files\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Level.cpp">
+      <Filter>Source Files\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Gui.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\GuiManger.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\GuiScript.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\RegExp.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\SimpleWindow.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\WinVar.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\XWindow.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="X3DEngine.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="Material.h">
-      <Filter>Material</Filter>
-    </ClInclude>
-    <ClInclude Include="MaterialManager.h">
-      <Filter>Material</Filter>
-    </ClInclude>
-    <ClInclude Include="XModel.h">
-      <Filter>Model</Filter>
-    </ClInclude>
-    <ClInclude Include="X3DEngine.h">
-      <Filter>Engine</Filter>
-    </ClInclude>
     <ClInclude Include="EngineBase.h" />
-    <ClInclude Include="Gui\XWindow.h">
-      <Filter>Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="Gui\SimpleWindow.h">
-      <Filter>Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="Gui\GuiManger.h">
-      <Filter>Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="Gui\Gui.h">
-      <Filter>Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="Gui\WinVar.h">
-      <Filter>Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="Gui\RegExp.h">
-      <Filter>Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="Gui\GuiScript.h">
-      <Filter>Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="Level.h">
-      <Filter>Level</Filter>
+    <ClInclude Include="XModel.h">
+      <Filter>Header Files\Model</Filter>
     </ClInclude>
     <ClInclude Include="ModelManager.h">
-      <Filter>Model</Filter>
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="MaterialManager.h">
+      <Filter>Header Files\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.h">
+      <Filter>Header Files\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Level.h">
+      <Filter>Header Files\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui\XWindow.h">
+      <Filter>Header Files\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui\WinVar.h">
+      <Filter>Header Files\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui\SimpleWindow.h">
+      <Filter>Header Files\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui\RegExp.h">
+      <Filter>Header Files\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui\GuiScript.h">
+      <Filter>Header Files\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui\GuiManger.h">
+      <Filter>Header Files\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui\Gui.h">
+      <Filter>Header Files\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="X3DEngine.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Filter Include="Material">
-      <UniqueIdentifier>{837bf555-33f5-48ac-81e4-b129441b18b3}</UniqueIdentifier>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{fdd07de1-0d35-4c87-8985-6f3f930f18c8}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Model">
-      <UniqueIdentifier>{99d35eff-241a-423e-89a4-fdefd680f967}</UniqueIdentifier>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{22d50922-3d14-4b76-b33a-82f4a6b989a5}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Engine">
-      <UniqueIdentifier>{253c833b-0a18-47f4-912e-9a19fba55b61}</UniqueIdentifier>
+    <Filter Include="Source Files\Model">
+      <UniqueIdentifier>{8ce7dd93-7d86-423f-9559-3416974b0fbf}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Level">
-      <UniqueIdentifier>{689f5c3d-f3d7-46f5-94d9-b78b112d39fb}</UniqueIdentifier>
+    <Filter Include="Header Files\Model">
+      <UniqueIdentifier>{e839fd1d-98cd-43d3-ade3-e1a716f4c966}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Gui">
-      <UniqueIdentifier>{088ce574-42cf-4f73-b7e5-f88a3c8ac886}</UniqueIdentifier>
+    <Filter Include="Header Files\Material">
+      <UniqueIdentifier>{bed31ded-5182-40a6-b1f5-abe33ba3bb7a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Material">
+      <UniqueIdentifier>{26182522-16e9-44a5-aa08-0328c341000e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Level">
+      <UniqueIdentifier>{7728791d-f38a-48c2-9018-d664de721dd3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Level">
+      <UniqueIdentifier>{230c3920-fd26-4326-9ef0-6f50c8b95acc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Gui">
+      <UniqueIdentifier>{465beb4f-f5cf-494a-a960-888c1b62f5f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Gui">
+      <UniqueIdentifier>{3f5cb7f3-cfa7-4d7a-b5ee-bd2722091137}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Gui\XWindow.inl">
-      <Filter>Gui</Filter>
+      <Filter>Header Files\Gui</Filter>
     </None>
     <None Include="Gui\SimpleWindow.inl">
-      <Filter>Gui</Filter>
+      <Filter>Header Files\Gui</Filter>
     </None>
     <None Include="Gui\Gui.inl">
-      <Filter>Gui</Filter>
+      <Filter>Header Files\Gui</Filter>
     </None>
   </ItemGroup>
 </Project>
