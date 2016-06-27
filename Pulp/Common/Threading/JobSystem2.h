@@ -317,7 +317,7 @@ class JobSystem
 	struct ThreadJobAllocator;
 
 public:
-	static const uint32_t HW_THREAD_MAX = 1 << Job::THREAD_IDX_BITS; // max even if hardware supports more.
+	static const uint32_t HW_THREAD_MAX = core::Min(1 << Job::THREAD_IDX_BITS, 8); // max even if hardware supports more.
 	static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
 	static const size_t MAX_JOBS = 1 << Job::JOB_IDX_BITS;
 	// 68kb(72kb x64) per 1024 jobs per thread
