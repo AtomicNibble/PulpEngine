@@ -11,8 +11,8 @@
 
 #include <IGui.h>
 
-#include "MaterialManager.h"
-#include "ModelManager.h"
+#include "Material\MaterialManager.h"
+#include "Model\ModelManager.h"
 
 X_NAMESPACE_BEGIN(engine)
 

@@ -1,5 +1,5 @@
 #include <stdafx.h>
-#include <ModelManager.h>
+#include <Model\ModelManager.h>
 
 #include <IConsole.h>
 

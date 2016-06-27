@@ -9,11 +9,8 @@
 
 
 #include "IMaterial.h"
-#include "Material.h"
-
-#include "MaterialManager.h"
-
-
+#include "Material\Material.h"
+#include "Material\MaterialManager.h"
 
 
 
