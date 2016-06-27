@@ -83,11 +83,12 @@ void XWinInput::release(void)
 }
 
 
-void XWinInput::Update(core::V2::Job* pInputJob, core::FrameData& frameData)
+void XWinInput::Job_Update(core::V2::JobSystem& jobSys, core::V2::Job* pInputJob, core::FrameData& frameData)
 {
 	X_PROFILE_BEGIN("Win32RawInput", core::ProfileSubSys::INPUT);
 	X_ASSERT_NOT_NULL(pMouse_);
 	X_ASSERT_NOT_NULL(pKeyBoard_);
+	X_UNUSED(jobSys);
 	X_UNUSED(pInputJob);
 
 

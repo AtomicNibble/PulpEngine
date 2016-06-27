@@ -1542,8 +1542,10 @@ bool XConsole::LoadConfig(const char* fileName)
 }
 
 // IXHotReload
-void XConsole::OnFileChange(const core::Path<char>& name)
+void XConsole::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {
+	X_UNUSED(jobSys);
+
 #if X_ENABLE_CONFIG_HOT_RELOAD && 0
 	if (!ignoreHotReload_)
 	{
@@ -1843,7 +1845,7 @@ void XConsole::RegisterVar(ICVar* pCVar)
 
 
 
-void XConsole::dispatchRepeateInputEvents(core::FrameTimeData& time)
+void XConsole::Job_dispatchRepeateInputEvents(core::FrameTimeData& time)
 {
 	// we must be open to accept input.
 	// cancel any repeat events when we close.
@@ -1872,7 +1874,7 @@ void XConsole::dispatchRepeateInputEvents(core::FrameTimeData& time)
 	}
 }
 
-void XConsole::runCmds(void)
+void XConsole::Job_runCmds(void)
 {
 	for (const auto& c : cmds_)
 	{

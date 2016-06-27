@@ -42,8 +42,9 @@ bool XNullInput::IsEventPostingEnabled(void) const
 	return false;
 }
 
-bool XNullInput::PostInputFrame(core::FrameData& frameData)
+bool XNullInput::Job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData)
 {
+	X_UNUSED(jobSys);
 	X_UNUSED(frameData);
 	return false;
 }
@@ -59,8 +60,9 @@ void XNullInput::PostInit(void)
 
 }
 
-void XNullInput::Update(core::V2::Job* pInputJob, core::FrameData& frameData)
+void XNullInput::Job_Update(core::V2::JobSystem& jobSys, core::V2::Job* pInputJob, core::FrameData& frameData)
 {
+	X_UNUSED(jobSys);
 	X_UNUSED(pInputJob);
 	X_UNUSED(frameData);
 }

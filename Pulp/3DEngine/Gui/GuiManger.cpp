@@ -182,8 +182,9 @@ void XGuiManager::listGuis(const char* wildcardSearch) const
 
 
 // IXHotReload
-void XGuiManager::OnFileChange(const core::Path<char>& name)
+void XGuiManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {
+	X_UNUSED(jobSys);
 #if 0
 	core::Path<char> path(name);
 	XGui* pGui = nullptr;

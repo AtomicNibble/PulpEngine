@@ -26,7 +26,7 @@ protected:
 
 struct IXHotReload
 {
-	virtual void OnFileChange(const core::Path<char>& path) X_ABSTRACT;
+	virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& path) X_ABSTRACT;
 
 
 protected:

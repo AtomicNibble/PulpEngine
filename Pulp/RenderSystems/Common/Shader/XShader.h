@@ -456,7 +456,7 @@ public:
 	bool sourceToString(core::string& str, const char* name);
 
 	// IXHotReload
-	virtual void OnFileChange(const core::Path<char>& name) X_OVERRIDE;
+	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
 	// ~IXHotReload
 
 	XShaderResources* createShaderResources(const XInputShaderResources& input);

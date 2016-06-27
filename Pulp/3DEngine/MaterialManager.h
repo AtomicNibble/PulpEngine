@@ -48,7 +48,7 @@ public:
 	// ~ICoreEventListener
 
 	// IXHotReload
-	virtual void OnFileChange(const core::Path<char>& name) X_OVERRIDE;
+	virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
 	// ~IXHotReload
 
 	void ListMaterials(const char* searchPatten = nullptr) const;

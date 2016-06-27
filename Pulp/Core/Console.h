@@ -146,8 +146,8 @@ public:
 	virtual void unregisterInputListener(void) X_FINAL;
 	virtual void freeRenderResources(void) X_FINAL;
 
-	virtual void dispatchRepeateInputEvents(core::FrameTimeData& time) X_FINAL;
-	virtual void runCmds(void) X_FINAL;
+	virtual void Job_dispatchRepeateInputEvents(core::FrameTimeData& time) X_FINAL;
+	virtual void Job_runCmds(void) X_FINAL;
 	virtual void draw(core::FrameTimeData& time) X_FINAL;
 
 	virtual consoleState::Enum getVisState(void) const X_FINAL;
@@ -187,7 +187,7 @@ public:
 	virtual bool LoadConfig(const char* pFileName) X_FINAL;
 
 	// IXHotReload
-	virtual void OnFileChange(const core::Path<char>& name) X_FINAL;
+	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
 	// ~IXHotReload
 
 	virtual void addLineToLog(const char* pStr, uint32_t length) X_FINAL;

@@ -19,9 +19,9 @@ public:
 	virtual ~XFont();
 
 	// IXFont
-	virtual void Init() X_OVERRIDE;
-	virtual void ShutDown() X_OVERRIDE;
-	virtual void release() X_OVERRIDE;
+	virtual void Init(void) X_OVERRIDE;
+	virtual void ShutDown(void) X_OVERRIDE;
+	virtual void release(void) X_OVERRIDE;
 
 	virtual IFFont* NewFont(const char* pFontName) X_OVERRIDE;
 	virtual IFFont* GetFont(const char* pFontName) const X_OVERRIDE;
@@ -30,7 +30,7 @@ public:
 
 	// IXHotReload
 	// returns true if it action was eaten.
-	virtual void OnFileChange(const core::Path<char>& name) X_OVERRIDE;
+	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
 	// ~IXHotReload
 
 private:

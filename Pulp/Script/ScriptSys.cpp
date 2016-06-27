@@ -961,8 +961,9 @@ void XScriptSys::OnScriptError(const char* fmt, ...)
 
 // IXHotReload
 
-void XScriptSys::OnFileChange(const core::Path<char>& name)
+void XScriptSys::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {
+	X_UNUSED(jobSys);
 #if 0
 	ScriptFileList::iterator it = fileList_.find(X_CONST_STRING(name));
 

@@ -36,7 +36,7 @@ public:
 	//~IGuiManger
 
 	// IXHotReload
-	void OnFileChange(const core::Path<char>& name) X_FINAL;
+	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
 	// ~IXHotReload
 
 	// IInputEventListner

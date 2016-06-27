@@ -46,12 +46,12 @@ void XConsoleNULL::freeRenderResources(void)
 
 }
 
-void XConsoleNULL::dispatchRepeateInputEvents(core::FrameTimeData& time)
+void XConsoleNULL::Job_dispatchRepeateInputEvents(core::FrameTimeData& time)
 {
 	X_UNUSED(time);
 }
 
-void XConsoleNULL::runCmds(void)
+void XConsoleNULL::Job_runCmds(void)
 {
 
 }

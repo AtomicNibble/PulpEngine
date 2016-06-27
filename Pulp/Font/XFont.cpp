@@ -65,13 +65,13 @@ XFont::~XFont()
 
 }
 
-void XFont::release()
+void XFont::release(void)
 {
 	X_DELETE(this,g_fontArena);
 }
 
 
-void XFont::Init()
+void XFont::Init(void)
 {
 	// add font commands
 	ADD_COMMAND("fontListLoaded", Command_ListFonts, core::VarFlag::SYSTEM, 
@@ -83,7 +83,7 @@ void XFont::Init()
 	gEnv->pHotReload->addfileType(this, "font");
 }
 
-void XFont::ShutDown()
+void XFont::ShutDown(void)
 {
 	X_LOG0("FontSys", "Shutting Down");
 
@@ -136,8 +136,9 @@ void XFont::ListFontNames(void) const
 	X_LOG0("Fonts", "-------------- ^8Fonts End^7 --------------");
 }
 
-void XFont::OnFileChange(const core::Path<char>& name)
+void XFont::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {
+	X_UNUSED(jobSys);
 #if 0
 	Path<char> path(name);
 	if (strUtil::IsEqual(".font", path.extension()))

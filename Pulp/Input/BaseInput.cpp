@@ -108,8 +108,9 @@ void XBaseInput::PostInit(void)
 	}
 }
 
-void XBaseInput::Update(core::V2::Job* pInputJob, core::FrameData& frameData)
+void XBaseInput::Job_Update(core::V2::JobSystem& jobSys, core::V2::Job* pInputJob, core::FrameData& frameData)
 {
+	X_UNUSED(jobSys);
 	X_UNUSED(pInputJob);
 
 	hasFocus_ = frameData.flags.IsSet(core::FrameFlag::HAS_FOCUS);
@@ -246,8 +247,10 @@ bool XBaseInput::PostInputEvent(const InputEvent &event)
 	return true;
 }
 
-bool XBaseInput::PostInputFrame(core::FrameData& frameData)
+bool XBaseInput::Job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData)
 {
+	X_UNUSED(jobSys);
+
 	if (!enableEventPosting_) {
 		X_LOG2("Input", "Input posting is disable");
 		return false;

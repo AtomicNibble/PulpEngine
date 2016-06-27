@@ -434,7 +434,7 @@ struct IInput
 
 	virtual void EnableEventPosting(bool bEnable) X_ABSTRACT;
 	virtual bool IsEventPostingEnabled(void) const X_ABSTRACT;
-	virtual bool PostInputFrame(core::FrameData& frameData) X_ABSTRACT;
+	virtual bool Job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData) X_ABSTRACT;
 
 	virtual bool Init(void) X_ABSTRACT;
 	virtual void PostInit(void) X_ABSTRACT;
@@ -442,7 +442,7 @@ struct IInput
 	virtual void release(void) X_ABSTRACT;
 
 	// called with frame data and parent job calling.
-	virtual void Update(core::V2::Job* pInputJob, core::FrameData& frameData) X_ABSTRACT;
+	virtual void Job_Update(core::V2::JobSystem& jobSys, core::V2::Job* pInputJob, core::FrameData& frameData) X_ABSTRACT;
 
 
 	virtual void ClearKeyState(void) X_ABSTRACT;

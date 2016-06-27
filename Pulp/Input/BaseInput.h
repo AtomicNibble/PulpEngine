@@ -27,7 +27,7 @@ public:
 	// stub implementation
 	bool Init(void) X_OVERRIDE;
 	void PostInit(void) X_OVERRIDE;
-	void Update(core::V2::Job* pInputJob, core::FrameData& frameData) X_OVERRIDE;
+	void Job_Update(core::V2::JobSystem& jobSys, core::V2::Job* pInputJob, core::FrameData& frameData) X_OVERRIDE;
 	void ShutDown(void) X_OVERRIDE;
 	void release(void) X_OVERRIDE;
 		 
@@ -38,7 +38,7 @@ public:
 	bool AddInputDevice(IInputDevice* pDevice) X_OVERRIDE;
 	void EnableEventPosting(bool bEnable)X_OVERRIDE;
 	X_INLINE bool IsEventPostingEnabled(void) const X_OVERRIDE;
-	bool PostInputFrame(core::FrameData& frameData) X_OVERRIDE;
+	bool Job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData) X_OVERRIDE;
 
 
 	// listener functions (implemented)

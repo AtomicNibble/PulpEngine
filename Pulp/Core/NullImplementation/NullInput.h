@@ -20,14 +20,14 @@ public:
 
 	virtual void EnableEventPosting(bool bEnable)  X_OVERRIDE;
 	virtual bool IsEventPostingEnabled(void) const X_OVERRIDE;
-	virtual bool PostInputFrame(core::FrameData& frameData) X_OVERRIDE;
+	virtual bool Job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData) X_OVERRIDE;
 
 
 	virtual bool Init(void) X_OVERRIDE;
 	virtual void PostInit(void) X_OVERRIDE;
 	virtual void ShutDown(void) X_OVERRIDE;
 	virtual void release(void) X_OVERRIDE;
-	virtual void Update(core::V2::Job* pInputJob, core::FrameData& frameData) X_OVERRIDE;
+	virtual void Job_Update(core::V2::JobSystem& jobSys, core::V2::Job* pInputJob, core::FrameData& frameData) X_OVERRIDE;
 
 	
 	virtual void ClearKeyState(void) X_OVERRIDE;

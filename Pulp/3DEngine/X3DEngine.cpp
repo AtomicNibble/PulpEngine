@@ -71,7 +71,7 @@ void Command_DevMap(core::IConsoleCmdArgs* Cmd)
 
 // ~Commands
 
-bool X3DEngine::Init()
+bool X3DEngine::Init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pCore);
@@ -110,7 +110,7 @@ bool X3DEngine::Init()
 	return true;
 }
 
-void X3DEngine::ShutDown()
+void X3DEngine::ShutDown(void)
 {
 	X_LOG0("3DEngine", "Shutting Down");
 
@@ -163,9 +163,10 @@ void X3DEngine::Update(void)
 
 }
 
-void X3DEngine::OnFileChange(const core::Path<char>& name)
+void X3DEngine::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {
 	// do nothing for now.
+	X_UNUSED(jobSys);
 	X_UNUSED(name);
 
 }

@@ -47,7 +47,7 @@ void XCore::Job_OnFileChange(core::V2::JobSystem& jobSys, size_t threadIdx,
 		auto it = hotReloadExtMap_.find(X_CONST_STRING(pExtention));
 		if (it != hotReloadExtMap_.end())
 		{
-			it->second->OnFileChange(name);
+			it->second->Job_OnFileChange(jobSys, name);
 		}
 		else
 		{
@@ -84,7 +84,7 @@ void XCore::Job_ProcessInput(core::V2::JobSystem& jobSys, size_t threadIdx,
 	core::FrameData& frameData = *reinterpret_cast<core::FrameData*>(pData);
 
 	if (env_.pInput) {
-		env_.pInput->Update(pJob, frameData);
+		env_.pInput->Job_Update(jobSys, pJob, frameData);
 	}
 }
 
@@ -100,7 +100,7 @@ void XCore::Job_PostInputFrame(core::V2::JobSystem& jobSys, size_t threadIdx,
 
 	if (env_.pInput) {
 		// during the running of this is when command and Var callbacks will be run.
-		env_.pInput->PostInputFrame(frameData);
+		env_.pInput->Job_PostInputFrame(jobSys, frameData);
 	}
 }
 
@@ -117,11 +117,11 @@ void XCore::Job_ConsoleUpdates(core::V2::JobSystem& jobSys, size_t threadIdx,
 		core::FrameTimeData& time = *reinterpret_cast<core::FrameTimeData*>(pData);
 		
 		// this should not run any commands as it's just repeating a key
-		env_.pConsole->dispatchRepeateInputEvents(time);
+		env_.pConsole->Job_dispatchRepeateInputEvents(time);
 
 		// runs any commands that got submitted via input or config / other things.
 		// so basically this is the only place that triggers command callbacks and modified callbacks.
-		env_.pConsole->runCmds();
+		env_.pConsole->Job_runCmds();
 	}
 }
 
