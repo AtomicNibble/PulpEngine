@@ -1,29 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="RenderEngine.cpp" />
-    <ClCompile Include="stdafx.cpp" />
-    <ClCompile Include="ModelManager.cpp">
-      <Filter>Source Files\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="XModel.cpp">
-      <Filter>Source Files\Model</Filter>
-    </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>Source Files\Material</Filter>
-    </ClCompile>
-    <ClCompile Include="MaterialManager.cpp">
-      <Filter>Source Files\Material</Filter>
-    </ClCompile>
-    <ClCompile Include="Level_portal.cpp">
-      <Filter>Source Files\Level</Filter>
-    </ClCompile>
-    <ClCompile Include="Level_load.cpp">
-      <Filter>Source Files\Level</Filter>
-    </ClCompile>
-    <ClCompile Include="Level.cpp">
-      <Filter>Source Files\Level</Filter>
-    </ClCompile>
     <ClCompile Include="Gui\Gui.cpp">
       <Filter>Source Files\Gui</Filter>
     </ClCompile>
@@ -48,25 +25,35 @@
     <ClCompile Include="X3DEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RenderEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\ModelManager.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Model\XModel.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
+    <ClCompile Include="Material\Material.cpp">
+      <Filter>Source Files\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="Material\MaterialManager.cpp">
+      <Filter>Source Files\Material</Filter>
+    </ClCompile>
+    <ClCompile Include="Level\Level.cpp">
+      <Filter>Source Files\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Level\Level_load.cpp">
+      <Filter>Source Files\Level</Filter>
+    </ClCompile>
+    <ClCompile Include="Level\Level_portal.cpp">
+      <Filter>Source Files\Level</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="stdafx.h" />
-    <ClInclude Include="EngineBase.h" />
-    <ClInclude Include="XModel.h">
-      <Filter>Header Files\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="ModelManager.h">
-      <Filter>Header Files\Model</Filter>
-    </ClInclude>
-    <ClInclude Include="MaterialManager.h">
-      <Filter>Header Files\Material</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.h">
-      <Filter>Header Files\Material</Filter>
-    </ClInclude>
-    <ClInclude Include="Level.h">
-      <Filter>Header Files\Level</Filter>
-    </ClInclude>
     <ClInclude Include="Gui\XWindow.h">
       <Filter>Header Files\Gui</Filter>
     </ClInclude>
@@ -90,6 +77,27 @@
     </ClInclude>
     <ClInclude Include="X3DEngine.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\ModelManager.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\XModel.h">
+      <Filter>Header Files\Model</Filter>
+    </ClInclude>
+    <ClInclude Include="Material\Material.h">
+      <Filter>Header Files\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Material\MaterialManager.h">
+      <Filter>Header Files\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="Level\Level.h">
+      <Filter>Header Files\Level</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
