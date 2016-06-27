@@ -1,4 +1,9 @@
 
+template<typename T>
+XQuatCompressed<T>::XQuatCompressed() : 
+	w_(0) 
+{
+}
 
 template<typename T>
 XQuatCompressed<T>::XQuatCompressed(const Quat<T>& q)
@@ -35,8 +40,8 @@ void XQuatCompressed<T>::set(const Quat<T>& q_)
 
 	q *= scale;
 
-	v.set((comp_type)q.v.x, (comp_type)q.v.y, (comp_type)q.v.z);
-	w = (comp_type)q.w;
+	v_.set(static_cast<comp_type>(q.v.x), static_cast<comp_type>(q.v.y), static_cast<comp_type>(q.v.z));
+	w_ = static_cast<comp_type>(q.w);
 }
 
 template<typename T>
@@ -55,10 +60,10 @@ void XQuatCompressed<T>::set(T aW, T x, T y, T z)
 
 
 template<class T>
-Quat<T> XQuatCompressed<T>::asQuat() const
+Quat<T> XQuatCompressed<T>::asQuat(void) const
 {
 	Quat<T> q;
-	q.set(w,v.x,v.y,v.z);
+	q.set(w_,v_.x,v_.y,v_.z);
 
 	q.v /= 32766.5;
 	q.w /= 32766.5;
@@ -67,7 +72,7 @@ Quat<T> XQuatCompressed<T>::asQuat() const
 }
 
 template<class T>
-Matrix33<T> XQuatCompressed<T>::asMatrix33() const
+Matrix33<T> XQuatCompressed<T>::asMatrix33(void) const
 {
 	return asQuat().toMatrix33();
 }
@@ -75,19 +80,37 @@ Matrix33<T> XQuatCompressed<T>::asMatrix33() const
 template<typename T>
 XQuatCompressed<T>& XQuatCompressed<T>::operator=(const XQuatCompressed<T> &rhs)
 {
-	v = rhs.v;
-	w = rhs.w;
+	v_ = rhs.v_;
+	w_ = rhs.w_;
 	return *this;
 }
 
 template<typename T>
 bool XQuatCompressed<T>::operator==(const XQuatCompressed<T> &rhs) const
 {
-	return v = rhs.v && w == rhs.w;
+	return v_ = rhs.v_ && w_ == rhs.w_;
 }
 
 template<typename T>
 bool XQuatCompressed<T>::operator!=(const XQuatCompressed<T> &rhs) const
 {
 	return !(*this == rhs);
+}
+
+template<typename T>
+T& XQuatCompressed<T>::operator[](size_t i)
+{
+	return (&v_.x)[i]; 
+}
+
+template<typename T>
+const T& XQuatCompressed<T>::operator[](size_t i) const
+{ 
+	return (&v_.x)[i]; 
+}
+
+template<typename T>
+XQuatCompressed<T> XQuatCompressed<T>::identity(void)
+{
+	return XQuatCompressed();
 }

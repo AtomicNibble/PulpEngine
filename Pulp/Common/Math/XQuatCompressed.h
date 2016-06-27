@@ -15,10 +15,8 @@ public:
 	typedef T	value_type;
 	typedef int16_t comp_type;
 
-	Vec3<comp_type>		v;
-	int16_t				w;
-
-	XQuatCompressed() : w(0) {};
+public:
+	XQuatCompressed();
 	XQuatCompressed(const Quat<T>& q);
 	XQuatCompressed(const Matrix33<T>& m);
 	XQuatCompressed(T aW, T x, T y, T z);
@@ -28,8 +26,8 @@ public:
 	void set(T aW, T x, T y, T z);
 
 
-	Quat<T>	asQuat() const;
-	Matrix33<T> asMatrix33() const;
+	Quat<T>	asQuat(void) const;
+	Matrix33<T> asMatrix33(void) const;
 
 	// Operators
 	XQuatCompressed<T>& operator=(const XQuatCompressed<T> &rhs);
@@ -37,16 +35,14 @@ public:
 	bool operator==(const XQuatCompressed<T> &rhs) const;
 	bool operator!=(const XQuatCompressed<T> &rhs) const;
 
-	X_INLINE T& operator[](unsigned int i) { return (&v.x)[i]; }
-	X_INLINE const T& operator[](unsigned int i) const { return (&v.x)[i]; }
+	X_INLINE T& operator[](size_t i);
+	X_INLINE const T& operator[](size_t i) const;
 
-	static XQuatCompressed<T> identity()
-	{
-		return XQuatCompressed();
-	}
+	X_INLINE static XQuatCompressed<T> identity(void);
 
 private:
-
+	Vec3<comp_type>	v_;
+	comp_type		w_;
 };
 
 #include "XQuatCompressed.inl"
