@@ -9,7 +9,7 @@
 #include "String\StrRef.h"
 #include "Assets\AssertContainer.h"
 
-#include "EngineBase.h"
+#include "..\EngineBase.h"
 
 
 X_NAMESPACE_DECLARE(core,

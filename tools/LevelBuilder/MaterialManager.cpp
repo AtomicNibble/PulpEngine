@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MaterialManager.h"
 
-#include "../3DEngine/Material.h"
+#include "../3DEngine/Material/Material.h"
 
 
 
