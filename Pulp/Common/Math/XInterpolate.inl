@@ -64,10 +64,15 @@ X_INLINE void XInterpolateAccelDecelLinear<type>::Init(const int startTime,
 		return;
 	}
 
-	if (this->accelTime_ + this->decelTime_ > duration) {
-		this->accelTime_ = this->accelTime_ * duration / (this->accelTime_ + this->decelTime_);
-		this->decelTime_ = duration - this->accelTime_;
+	{
+		const int transTime = accelTime_ + decelTime_;
+
+		if (transTime > duration && transTime > 0) {
+			this->accelTime_ = this->accelTime_ * duration / transTime;
+			this->decelTime_ = duration - this->accelTime_;
+		}
 	}
+
 	this->linearTime_ = duration - this->accelTime_ - this->decelTime_;
 	const type speed = (endValue_ - startValue_) * (1000.0f / ((float) this->linearTime_ + (this->accelTime_ + this->decelTime_) * 0.5f));
 
