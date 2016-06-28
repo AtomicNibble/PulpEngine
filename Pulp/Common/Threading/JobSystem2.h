@@ -326,6 +326,7 @@ public:
 
 	static_assert(ThreadQue::MAX_NUMBER_OF_JOBS == MAX_JOBS, "ThreadQue max jobs is not equal");
 
+	typedef core::FixedArray<uint32_t, HW_THREAD_MAX > ThreadIdArray;
 public:
 	JobSystem();
 	~JobSystem();
@@ -335,8 +336,8 @@ public:
 	void OnFrameBegin(void);
 
 	void CreateQueForCurrentThread(void);
-
 	uint32_t GetThreadCount(void) const;
+	ThreadIdArray getThreadIds(void);
 
 private:
 	bool StartThreads(void);

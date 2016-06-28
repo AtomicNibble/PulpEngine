@@ -231,6 +231,17 @@ namespace V2
 		return numThreads_;
 	}
 
+	JobSystem::ThreadIdArray JobSystem::getThreadIds(void)
+	{
+		ThreadIdArray arr;
+
+		for (uint32_t i = 0; i < numThreads_; i++) {
+			arr.push_back(threads_[i].GetID());
+		}
+
+		return arr;
+	}
+
 	/// ===============================================
 
 
