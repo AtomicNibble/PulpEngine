@@ -52,6 +52,9 @@
     <ClCompile Include="Level\Level_portal.cpp">
       <Filter>Source Files\Level</Filter>
     </ClCompile>
+    <ClCompile Include="Drawing\CmdBucket.cpp">
+      <Filter>Source Files\Drawing</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gui\XWindow.h">
@@ -99,6 +102,9 @@
     <ClInclude Include="Level\Level.h">
       <Filter>Header Files\Level</Filter>
     </ClInclude>
+    <ClInclude Include="Drawing\CmdBucket.h">
+      <Filter>Header Files\Drawing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -131,6 +137,12 @@
     <Filter Include="Source Files\Gui">
       <UniqueIdentifier>{3f5cb7f3-cfa7-4d7a-b5ee-bd2722091137}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Drawing">
+      <UniqueIdentifier>{677522fe-f2c2-42b7-9e04-e9e680d17ac0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Drawing">
+      <UniqueIdentifier>{876cd417-e7a9-4f96-b538-6d48eeea928d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="Gui\XWindow.inl">
@@ -141,6 +153,9 @@
     </None>
     <None Include="Gui\Gui.inl">
       <Filter>Header Files\Gui</Filter>
+    </None>
+    <None Include="Drawing\CmdBucket.inl">
+      <Filter>Header Files\Drawing</Filter>
     </None>
   </ItemGroup>
 </Project>

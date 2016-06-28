@@ -368,6 +368,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Drawing\CmdBucket.h" />
     <ClInclude Include="EngineBase.h" />
     <ClInclude Include="Gui\Gui.h" />
     <ClInclude Include="Gui\GuiManger.h" />
@@ -385,6 +386,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Drawing\CmdBucket.cpp" />
     <ClCompile Include="Gui\Gui.cpp" />
     <ClCompile Include="Gui\GuiManger.cpp" />
     <ClCompile Include="Gui\GuiScript.cpp" />
@@ -415,6 +417,7 @@
     <ClCompile Include="X3DEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Drawing\CmdBucket.inl" />
     <None Include="Gui\Gui.inl" />
     <None Include="Gui\SimpleWindow.inl" />
     <None Include="Gui\XWindow.inl" />
