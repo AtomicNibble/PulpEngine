@@ -76,12 +76,12 @@ X_INLINE CommandT* CommandBucket<KeyT>::addCommand(Key key, size_t auxMemorySize
 {
 	size_t threadIdx = packetAlloc_.getThreadIdx();
 
-	Packet pPacket = packetAlloc_.create<CommandT>(threadIdx, auxMemorySize);
+	CommandPacket::Packet pPacket = packetAlloc_.create<CommandT>(threadIdx, auxMemorySize);
 
 	// store key and pointer to the data
 	{
-		int32_t remaining = slotsLeft_[threadIdx].val;
-		int32_t offset = offsets_[threadIdx].val;
+		int32_t remaining = threadSlotsInfo_[threadIdx].remaining;
+		int32_t offset = threadSlotsInfo_[threadIdx].offset;
 
 		if (remaining == 0)
 		{
@@ -90,7 +90,7 @@ X_INLINE CommandT* CommandBucket<KeyT>::addCommand(Key key, size_t auxMemorySize
 			remaining = FETCH_SIZE;
 
 			// write back
-			offsets_[threadIdx].val = offset;
+			threadSlotsInfo_[threadIdx].offset = offset;
 		}
 
 		const int32_t current = offset + (FETCH_SIZE - remaining);
@@ -99,7 +99,7 @@ X_INLINE CommandT* CommandBucket<KeyT>::addCommand(Key key, size_t auxMemorySize
 		--remaining;
 
 		// write back
-		slotsLeft_[threadIdx].val = remaining;
+		threadSlotsInfo_[threadIdx].remaining = remaining;
 	}
 
 	CommandPacket::storeNextCommandPacket(pPacket, nullptr);
@@ -115,7 +115,7 @@ X_INLINE CommandT* CommandBucket<KeyT>::appendCommand(ParentCmdT* pCommand, size
 {
 	uint32_t threadIdx = packetAlloc_.getThreadIdx();
 
-	Packet pPacket = packetAlloc_.create<CommandT>(threadIdx, auxMemorySize);
+	CommandPacket::Packet pPacket = packetAlloc_.create<CommandT>(threadIdx, auxMemorySize);
 
 	// append this command to the given one
 	CommandPacket::storeNextCommandPacket<ParentCmdT>(pCommand, pPacket);

@@ -135,8 +135,7 @@ CommandBucket<KeyT>::CommandBucket(core::MemoryArenaBase* arena, CmdPacketAlloca
 {
 	X_UNUSED(cam);
 
-	X_ASSERT_ALIGNMENT(&offsets_, 64, 0);
-	X_ASSERT_ALIGNMENT(&slotsLeft_, 64, 0);
+	X_ASSERT_ALIGNMENT(&threadSlotsInfo_, 64, 0);
 
 	// null all the packet pointers.
 	// needed since a thread may take some slots but never fill them.

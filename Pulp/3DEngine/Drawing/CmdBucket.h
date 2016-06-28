@@ -161,15 +161,16 @@ class CommandBucket : private CommandPacket
 
 private:
 	X_DISABLE_WARNING(4324)
-	struct X_ALIGNED_SYMBOL(AlignedInt, 64)
+	struct X_ALIGNED_SYMBOL(ThreadSlotInfo, 64)
 	{
-		X_INLINE AlignedInt() : val(0) {};
+		X_INLINE ThreadSlotInfo() : offset(0), remaining(0) {};
 
-		uint32_t val;
+		uint32_t offset;
+		uint32_t remaining;
 	};
 	X_ENABLE_WARNING(4324)
 
-	typedef std::array<AlignedInt, CmdPacketAllocator::MAX_THREAD_COUNT> AlignedIntArr;
+	typedef std::array<ThreadSlotInfo, CmdPacketAllocator::MAX_THREAD_COUNT> AlignedIntArr;
 
 public:
 	typedef KeyT Key;
@@ -203,8 +204,7 @@ private:
 	core::AtomicInt current_;	
 
 	// offset and coutns for each thread adding commands
-	X_ALIGNED_SYMBOL(AlignedIntArr, 64) offsets_;
-	X_ALIGNED_SYMBOL(AlignedIntArr, 64) slotsLeft_;
+	X_ALIGNED_SYMBOL(AlignedIntArr, 64) threadSlotsInfo_;
 
 	core::Array<Key> keys_;
 	core::Array<CommandPacket::Packet> packets_;
