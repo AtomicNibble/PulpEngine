@@ -3,37 +3,40 @@
 
 X_NAMESPACE_BEGIN(engine)
 
-template <typename CommandT>
-X_INLINE size_t CommandPacket::getPacketSize(size_t auxMemorySize)
+
+namespace CommandPacket
 {
-	return OFFSET_COMMAND + sizeof(CommandT) + auxMemorySize;
-}
+	template <typename CommandT>
+	X_INLINE size_t getPacketSize(size_t auxMemorySize)
+	{
+		return OFFSET_COMMAND + sizeof(CommandT) + auxMemorySize;
+	}
 
-template <typename CommandT>
-X_INLINE CommandPacket::Packet* CommandPacket::getNextCommandPacket(CommandT* command)
-{
-	return union_cast<Packet*>(reinterpret_cast<char*>(command) - OFFSET_COMMAND + OFFSET_NEXT_COMMAND_PACKET);
-}
+	template <typename CommandT>
+	X_INLINE Packet* getNextCommandPacket(CommandT* command)
+	{
+		return union_cast<Packet*>(reinterpret_cast<char*>(command) - OFFSET_COMMAND + OFFSET_NEXT_COMMAND_PACKET);
+	}
 
-template <typename CommandT>
-X_INLINE CommandT* CommandPacket::getCommand(Packet packet)
-{
-	return union_cast<CommandT*>(reinterpret_cast<char*>(packet) + OFFSET_COMMAND);
-}
+	template <typename CommandT>
+	X_INLINE CommandT* getCommand(Packet packet)
+	{
+		return union_cast<CommandT*>(reinterpret_cast<char*>(packet) + OFFSET_COMMAND);
+	}
 
-template <typename CommandT>
-X_INLINE char* CommandPacket::getAuxiliaryMemory(CommandT* command)
-{
-	return reinterpret_cast<char*>(command) + sizeof(CommandT);
-}
+	template <typename CommandT>
+	X_INLINE char* getAuxiliaryMemory(CommandT* command)
+	{
+		return reinterpret_cast<char*>(command) + sizeof(CommandT);
+	}
 
-template <typename CommandT>
-X_INLINE void CommandPacket::storeNextCommandPacket(CommandT* command, Packet nextPacket)
-{
-	*commandPacket::GetNextCommandPacket<CommandT>(command) = nextPacket;
-}
+	template <typename CommandT>
+	X_INLINE void storeNextCommandPacket(CommandT* command, Packet nextPacket)
+	{
+		*getNextCommandPacket<CommandT>(command) = nextPacket;
+	}
 
-
+} // namespace CommandPacket
 
 
 

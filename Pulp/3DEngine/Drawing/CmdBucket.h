@@ -3,8 +3,8 @@
 #include <Traits\FunctionTraits.h>
 #include <Traits\MemberFunctionTraits.h>
 
-#include <threading\AtomicInt.h>
-#include <threading\ThreadLocalStorage.h>
+#include <Threading\AtomicInt.h>
+#include <Threading\ThreadLocalStorage.h>
 #include <Threading\JobSystem2.h>
 
 #include <Memory\AllocationPolicies\LinearAllocator.h>
@@ -64,47 +64,44 @@ namespace Commands
 
 
 
-class CommandPacket
+namespace CommandPacket
 {
-public:
 	typedef void* Packet;
-
-private:
 	typedef Commands::BackendDispatchFunction BackendDispatchFunction;
-	static const size_t OFFSET_NEXT_COMMAND_PACKET = 0u;
-	static const size_t OFFSET_BACKEND_DISPATCH_FUNCTION = OFFSET_NEXT_COMMAND_PACKET + sizeof(Packet);
-	static const size_t OFFSET_COMMAND = OFFSET_BACKEND_DISPATCH_FUNCTION + sizeof(BackendDispatchFunction::Pointer);
-
-protected:
-	template <typename CommandT>
-	static X_INLINE size_t getPacketSize(size_t auxMemorySize);
-
-	static Packet* getNextCommandPacket(Packet pPacket);
+	const size_t OFFSET_NEXT_COMMAND_PACKET = 0u;
+	const size_t OFFSET_BACKEND_DISPATCH_FUNCTION = OFFSET_NEXT_COMMAND_PACKET + sizeof(Packet);
+	const size_t OFFSET_COMMAND = OFFSET_BACKEND_DISPATCH_FUNCTION + sizeof(BackendDispatchFunction::Pointer);
 
 	template <typename CommandT>
-	static X_INLINE Packet* getNextCommandPacket(CommandT* command);
+	X_INLINE size_t getPacketSize(size_t auxMemorySize);
 
-	static BackendDispatchFunction::Pointer* getBackendDispatchFunction(Packet pPacket);
-
-	template <typename CommandT>
-	static X_INLINE CommandT* getCommand(Packet packet);
+	Packet* getNextCommandPacket(Packet pPacket);
 
 	template <typename CommandT>
-	static X_INLINE char* getAuxiliaryMemory(CommandT* command);
-	static void storeNextCommandPacket(Packet pPacket, Packet nextPacket);
+	X_INLINE Packet* getNextCommandPacket(CommandT* command);
+
+	BackendDispatchFunction::Pointer* getBackendDispatchFunction(Packet pPacket);
 
 	template <typename CommandT>
-	static X_INLINE void storeNextCommandPacket(CommandT* command, Packet nextPacket);
+	X_INLINE CommandT* getCommand(Packet packet);
 
-	static void storeBackendDispatchFunction(Packet pPacket, BackendDispatchFunction::Pointer dispatchFunction);
-	static const Packet loadNextCommandPacket(const Packet pPacket);
-	static const BackendDispatchFunction::Pointer loadBackendDispatchFunction(const Packet pPacket);
-	static const void* loadCommand(const Packet pPacket);
-};
+	template <typename CommandT>
+	X_INLINE char* getAuxiliaryMemory(CommandT* command);
+	void storeNextCommandPacket(Packet pPacket, Packet nextPacket);
+
+	template <typename CommandT>
+	X_INLINE void storeNextCommandPacket(CommandT* command, Packet nextPacket);
+
+	void storeBackendDispatchFunction(Packet pPacket, BackendDispatchFunction::Pointer dispatchFunction);
+	const Packet loadNextCommandPacket(const Packet pPacket);
+	const BackendDispatchFunction::Pointer loadBackendDispatchFunction(const Packet pPacket);
+	const void* loadCommand(const Packet pPacket);
+
+} // namespace CommandPacket
 
 
 
-class CmdPacketAllocator : private CommandPacket
+class CmdPacketAllocator 
 {
 public:
 	static const size_t MAX_THREAD_COUNT = core::V2::JobSystem::HW_THREAD_MAX + 1; // job system + main
@@ -153,7 +150,7 @@ private:
 };
 
 template <typename KeyT>
-class CommandBucket : private CommandPacket
+class CommandBucket
 {
 	// number of slots to fetch for each thread, should be atleast 32 to prevent fales sharing.
 	// could make this number based on the size of KeyT.

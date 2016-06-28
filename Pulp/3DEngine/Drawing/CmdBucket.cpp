@@ -40,42 +40,45 @@ namespace Commands
 } // namespace Commands
 
 
-
-CommandPacket::Packet* CommandPacket::getNextCommandPacket(Packet pPacket)
+namespace CommandPacket
 {
-	return union_cast<Packet*>(reinterpret_cast<char*>(pPacket) + OFFSET_NEXT_COMMAND_PACKET);
-}
 
-CommandPacket::BackendDispatchFunction::Pointer* CommandPacket::getBackendDispatchFunction(Packet pPacket)
-{
-	return union_cast<BackendDispatchFunction::Pointer*>(reinterpret_cast<char*>(pPacket) + OFFSET_BACKEND_DISPATCH_FUNCTION);
-}
+	Packet* CommandPacket::getNextCommandPacket(Packet pPacket)
+	{
+		return union_cast<Packet*>(reinterpret_cast<char*>(pPacket) + OFFSET_NEXT_COMMAND_PACKET);
+	}
 
-void CommandPacket::storeNextCommandPacket(Packet pPacket, Packet nextPacket)
-{
-	*getNextCommandPacket(pPacket) = nextPacket;
-}
+	BackendDispatchFunction::Pointer* CommandPacket::getBackendDispatchFunction(Packet pPacket)
+	{
+		return union_cast<BackendDispatchFunction::Pointer*>(reinterpret_cast<char*>(pPacket) + OFFSET_BACKEND_DISPATCH_FUNCTION);
+	}
 
-void CommandPacket::storeBackendDispatchFunction(Packet pPacket, BackendDispatchFunction::Pointer dispatchFunction)
-{
-	*getBackendDispatchFunction(pPacket) = dispatchFunction;
-}
+	void storeNextCommandPacket(Packet pPacket, Packet nextPacket)
+	{
+		*getNextCommandPacket(pPacket) = nextPacket;
+	}
 
-const CommandPacket::Packet CommandPacket::loadNextCommandPacket(const Packet pPacket)
-{
-	return *getNextCommandPacket(pPacket);
-}
+	void storeBackendDispatchFunction(CommandPacket::Packet pPacket, BackendDispatchFunction::Pointer dispatchFunction)
+	{
+		*getBackendDispatchFunction(pPacket) = dispatchFunction;
+	}
 
-const CommandPacket::BackendDispatchFunction::Pointer CommandPacket::loadBackendDispatchFunction(const Packet pPacket)
-{
-	return *getBackendDispatchFunction(pPacket);
-}
+	const Packet loadNextCommandPacket(const Packet pPacket)
+	{
+		return *getNextCommandPacket(pPacket);
+	}
 
-const void* CommandPacket::loadCommand(const Packet pPacket)
-{
-	return reinterpret_cast<char*>(pPacket) + OFFSET_COMMAND;
-}
+	const BackendDispatchFunction::Pointer loadBackendDispatchFunction(const Packet pPacket)
+	{
+		return *getBackendDispatchFunction(pPacket);
+	}
 
+	const void* loadCommand(const Packet pPacket)
+	{
+		return reinterpret_cast<char*>(pPacket) + OFFSET_COMMAND;
+	}
+
+}
 
 // -------------------------------------------------------
 CmdPacketAllocator::CmdPacketAllocator(core::MemoryArenaBase* arena, size_t threadAllocatorSize) :
@@ -168,7 +171,7 @@ void CommandBucket<KeyT>::submit(void)
 
 	for (int32_t i = 0; i < current_; ++i)
 	{
-		Packet pPacket = packets_[i];
+		CommandPacket::Packet pPacket = packets_[i];
 		while (pPacket != nullptr)
 		{
 			submitPacket(pPacket);
@@ -190,9 +193,9 @@ void CommandBucket<KeyT>::setMatrices(void)
 }
 
 template <typename KeyT>
-void CommandBucket<KeyT>::submitPacket(const Packet pPacket)
+void CommandBucket<KeyT>::submitPacket(const CommandPacket::Packet pPacket)
 {
-	const BackendDispatchFunction::Pointer pFunc = CommandPacket::loadBackendDispatchFunction(pPacket);
+	const CommandPacket::BackendDispatchFunction::Pointer pFunc = CommandPacket::loadBackendDispatchFunction(pPacket);
 	const void* pCmd = CommandPacket::loadCommand(pPacket);
 	pFunc(pCmd);
 }
