@@ -10,33 +10,50 @@ X_NAMESPACE_BEGIN(font)
 class XFontNull : public IFFont
 {
 public:
-	virtual void Release() {};
-	virtual void Free() {};
+	~XFontNull() X_OVERRIDE = default;
 
-	virtual bool load(const char* pFilePath, uint32_t width, uint32_t height) { return true; };
+	void Release(void) X_OVERRIDE;	// release the object
+	void Free(void) X_OVERRIDE;		// free internal memory
+	void FreeBuffers(void) X_OVERRIDE;		// free texture buffers
+	void FreeTexture(void) X_OVERRIDE;
 
-	// expose drawing shit baby.
-	virtual void DrawString(const Vec2f& pos, const char* pStr, const XTextDrawConect& contex) {};
-	virtual void DrawString(const Vec3f& pos, const char* pStr, const XTextDrawConect& contex) {};
+	bool loadFont(void) X_OVERRIDE;
 
-	// calculate the size.
-	virtual Vec2f GetTextSize(const char* pStr, const XTextDrawConect& contex) {
-		return Vec2f::zero();
-	}
+	void DrawString(const Vec2f& pos, const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
+	void DrawString(float x, float y, const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
+	void DrawString(const Vec3f& pos, const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
 
+	void DrawStringW(const Vec2f& pos, const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
+	void DrawStringW(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
+
+
+	size_t GetTextLength(const char* pStr, const bool asciiMultiLine) const X_OVERRIDE;
+	size_t GetTextLengthW(const wchar_t* pStr, const bool asciiMultiLine) const X_OVERRIDE;
+
+	Vec2f GetTextSize(const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
+	Vec2f GetTextSizeW(const wchar_t* pStr, const XTextDrawConect& contex) X_OVERRIDE;
+
+	uint32_t GetEffectId(const char* pEffectName) const X_OVERRIDE;
+
+	void GetGradientTextureCoord(float& minU, float& minV,
+		float& maxU, float& maxV) const X_OVERRIDE;
 };
 
 
 class XFontSysNull : public IXFontSys
 {
 public:
-	virtual void Init() X_OVERRIDE {}
-	virtual void ShutDown() X_OVERRIDE{}
-	virtual void release() X_OVERRIDE { X_DELETE(this, g_fontArena); }
+	~XFontSysNull() X_OVERRIDE = default;
+
+	virtual bool Init(void) X_OVERRIDE;
+	virtual void ShutDown(void) X_OVERRIDE;
+	virtual void release(void) X_OVERRIDE;
 
 
-	virtual IFFont* NewFont(const char* pFontName) X_OVERRIDE { return &nullFont_; };
-	virtual IFFont* GetFont(const char* pFontName) const X_OVERRIDE { return &nullFont_; };
+	virtual IFFont* NewFont(const char* pFontName) X_OVERRIDE;
+	virtual IFFont* GetFont(const char* pFontName) const X_OVERRIDE;
+
+	virtual void ListFontNames(void) const X_OVERRIDE;
 
 private:
 	static XFontNull nullFont_;
