@@ -267,6 +267,7 @@
     <ClInclude Include="Random\MultiplyWithCarry.h" />
     <ClInclude Include="Random\XorShift.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="Sorting\RadixSort.h" />
     <ClInclude Include="String\Base64.h" />
     <ClInclude Include="String\CmdArgs.h" />
     <ClInclude Include="String\FormatMacros.h" />

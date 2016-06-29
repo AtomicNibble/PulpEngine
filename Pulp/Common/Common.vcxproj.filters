@@ -202,6 +202,9 @@
     <Filter Include="Natvis">
       <UniqueIdentifier>{a5bcf281-a42f-44b2-9bff-fc5ce022c151}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headers\Sorting">
+      <UniqueIdentifier>{606c6d95-146f-4382-94c2-011809357955}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -1107,6 +1110,9 @@
     </ClInclude>
     <ClInclude Include="Platform\win32\Module.h">
       <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Sorting\RadixSort.h">
+      <Filter>Headers\Sorting</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
