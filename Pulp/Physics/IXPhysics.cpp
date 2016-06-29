@@ -73,6 +73,7 @@ class XEngineModule_Physics : public IEngineModule
 		pPhysics->RegisterCmds();
 
 		if (!pPhysics->Init()) {
+			pPhysics->ShutDown();
 			X_DELETE(pPhysics, g_PhysicsArena);
 			return false;
 		}
