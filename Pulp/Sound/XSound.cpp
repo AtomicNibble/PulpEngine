@@ -586,13 +586,14 @@ bool XSound::Init(void)
 		return false;
 	}
 
+#if SOUND_INIT_BANK_REQUIRED
 	// load init bank.
 	retValue = SoundEngine::LoadBank("sound/Init.bnk", AK_DEFAULT_POOL_ID, initBankID_);
 	if (retValue != AK_Success) {
 		X_ERROR("SoundSys", "Error loading required sound-bank: init.bnk");
 		return false;
 	}
-
+#endif // !SOUND_INIT_BANK_REQUIRED
 
 	return true;
 }
