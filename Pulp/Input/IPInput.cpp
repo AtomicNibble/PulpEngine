@@ -67,6 +67,7 @@ class XEngineModule_Input : public IEngineModule
 
 		if (!pInput->Init())
 		{
+			pInput->ShutDown();
 			X_DELETE(pInput, g_InputArena);
 			return false;
 		}
