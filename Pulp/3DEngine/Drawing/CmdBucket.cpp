@@ -78,7 +78,9 @@ namespace CommandPacket
 		return reinterpret_cast<char*>(pPacket) + OFFSET_COMMAND;
 	}
 
-}
+
+} // namespace CommandPacket
+
 
 // -------------------------------------------------------
 CmdPacketAllocator::CmdPacketAllocator(core::MemoryArenaBase* arena, size_t threadAllocatorSize) :
@@ -90,7 +92,12 @@ CmdPacketAllocator::CmdPacketAllocator(core::MemoryArenaBase* arena, size_t thre
 
 CmdPacketAllocator::~CmdPacketAllocator()
 {
-
+	// free all the allocators
+	for (size_t i = 0; i < MAX_THREAD_COUNT; i++) {
+		if (allocators_[i]) {
+			X_DELETE(allocators_[i], arena_);
+		}
+	}
 }
 
 void CmdPacketAllocator::createAllocaotrsForThreads(core::V2::JobSystem& jobSys)
@@ -108,12 +115,12 @@ void CmdPacketAllocator::createAllocaotrsForThreads(core::V2::JobSystem& jobSys)
 	const size_t numAllocators = threadIdToIndex_.size();
 	const size_t totalBufSize = numAllocators * threadAllocatorSize_;
 
-	pBuf_ = X_NEW_ARRAY(uint8_t, totalBufSize, arena_, "");
+	pBuf_ = X_NEW_ARRAY(uint8_t, totalBufSize, arena_, "CmdPcketAllocatorBuf");
 
 	for (size_t i = 0; i < numAllocators; i++)
 	{
 		uint8_t* pAllocatorBuf = pBuf_ + (threadAllocatorSize_ * i);
-		allocators_[i] = X_NEW(ThreadAllocator, arena_, "")(pAllocatorBuf, pAllocatorBuf + threadAllocatorSize_);
+		allocators_[i] = X_NEW(ThreadAllocator, arena_, "CmdPacketThreadAllocator")(pAllocatorBuf, pAllocatorBuf + threadAllocatorSize_);
 	}
 }
 
