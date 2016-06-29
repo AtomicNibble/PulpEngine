@@ -52,9 +52,9 @@ class XEngineModule_Input : public IEngineModule
 		ICore* pCore = env.pCore;
 		input::IInput *pInput = 0;
 
+		LinkModule(pCore, "Input");
 
 		g_InputArena = X_NEW_ALIGNED(InputArena, gEnv->pArena, "InputArena", 8)(&g_InputAlloc, "InputArena");
-
 
 		if (!gEnv->IsDedicated())
 		{
