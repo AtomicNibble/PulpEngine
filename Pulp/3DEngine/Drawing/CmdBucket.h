@@ -154,7 +154,7 @@ class CommandBucket
 {
 	// number of slots to fetch for each thread, should be atleast 32 to prevent fales sharing.
 	// could make this number based on the size of KeyT.
-	static const size_t FETCH_SIZE = 32; 
+	static const size_t FETCH_SIZE = 64 / sizeof(KeyT); 
 
 private:
 	X_DISABLE_WARNING(4324)
