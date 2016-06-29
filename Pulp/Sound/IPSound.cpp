@@ -59,6 +59,7 @@ class XEngineModule_Sound : public IEngineModule
 		pSound->RegisterCmds();
 
 		if (!pSound->Init()) {
+			pSound->ShutDown();
 			X_DELETE(pSound, g_SoundArena);
 			return false;
 		}
