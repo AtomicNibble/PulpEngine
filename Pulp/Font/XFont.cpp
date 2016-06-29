@@ -71,8 +71,10 @@ void XFont::release(void)
 }
 
 
-void XFont::Init(void)
+bool XFont::Init(void)
 {
+	X_LOG0("FontSys", "Starting");
+
 	// add font commands
 	ADD_COMMAND("fontListLoaded", Command_ListFonts, core::VarFlag::SYSTEM, 
 		"Lists all the loaded fonts");
@@ -81,6 +83,8 @@ void XFont::Init(void)
 		"Dumps the font texture for a given font name");
 
 	gEnv->pHotReload->addfileType(this, "font");
+
+	return true;
 }
 
 void XFont::ShutDown(void)

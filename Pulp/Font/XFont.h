@@ -19,7 +19,7 @@ public:
 	virtual ~XFont();
 
 	// IXFont
-	virtual void Init(void) X_OVERRIDE;
+	virtual bool Init(void) X_OVERRIDE;
 	virtual void ShutDown(void) X_OVERRIDE;
 	virtual void release(void) X_OVERRIDE;
 

@@ -34,9 +34,9 @@ struct IXFontSys
 {
 	virtual ~IXFontSys(){}
 	
-	virtual void Init() X_ABSTRACT;
-	virtual void ShutDown() X_ABSTRACT;
-	virtual void release() X_ABSTRACT;
+	virtual bool Init(void) X_ABSTRACT;
+	virtual void ShutDown(void) X_ABSTRACT;
+	virtual void release(void) X_ABSTRACT;
 
 
 	// Summary:
@@ -46,6 +46,7 @@ struct IXFontSys
 	//	 Gets a named font (case sensitive)
 	virtual IFFont* GetFont(const char* pFontName) const X_ABSTRACT;
 
+	// this should really take a sink no?
 	virtual void ListFontNames(void) const X_ABSTRACT;
 };
 
@@ -115,7 +116,7 @@ struct IFFont
 //	virtual bool load(const char* pFilePath, uint32_t width, uint32_t height) X_ABSTRACT;
 
 //	virtual bool loadTTF(const char* pFilePath, uint32_t width, uint32_t height) X_ABSTRACT;
-	virtual bool loadFont() X_ABSTRACT;
+	virtual bool loadFont(void) X_ABSTRACT;
 
 	// expose drawing shit baby.
 	virtual void DrawString(const Vec2f& pos, const char* pStr, const XTextDrawConect& contex) X_ABSTRACT;
