@@ -20,37 +20,6 @@ namespace {
 	core::MallocFreeAllocator g_fontAlloc;
 }
 
-X_NAMESPACE_NAME::font::IXFontSys* CreateFontInterface(ICore *pCore)
-{
-	LinkModule(pCore, "XFont");
- 
-	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->pArena);
-//	X_ASSERT_NOT_NULL(gEnv->pMalloc);
-
-	// kinky shit.
-	g_fontArena = X_NEW(FontArena, gEnv->pArena, "InputArena")(&g_fontAlloc, "InputArena");
-
-
-
-
-	if (gEnv->IsDedicated())
-	{
-#if defined(X_USE_NULLFONT)
-		return X_NEW(font::XFontSysNull,g_fontArena, "FontSysNull")();
-#else
-		return nullptr;
-#endif // !X_USE_NULLFONT
-	}
-
-#if defined(X_USE_NULLFONT)
-	return X_NEW(font::XFontSysNull,g_fontArena, "FontSysNull")();
-#else
-
-	return X_NEW(font::XFont,g_fontArena,"fontSys")(pCore);
-#endif // !X_USE_NULLFONT
-}
-
 
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Font : public IEngineModule
@@ -63,10 +32,50 @@ class XEngineModule_Font : public IEngineModule
 	//////////////////////////////////////////////////////////////////////////
 	virtual bool Initialize(SCoreGlobals &env, const SCoreInitParams &initParams) X_OVERRIDE
 	{
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pArena);
 		X_UNUSED(initParams);
+
 		ICore* pCore = env.pCore;
-		env.pFont = CreateFontInterface(pCore);
-		return env.pFont != 0;
+		env.pFont = nullptr;
+
+
+		LinkModule(pCore, "XFont");
+
+		// kinky shit.
+		g_fontArena = X_NEW(FontArena, gEnv->pArena, "InputArena")(&g_fontAlloc, "InputArena");
+
+
+		font::IXFontSys* pFontSys = nullptr;
+
+		if (gEnv->IsDedicated())
+		{
+#if defined(X_USE_NULLFONT)
+			pFontSys = X_NEW(font::XFontSysNull, g_fontArena, "FontSysNull")();
+#else
+			// we just say ok.
+			return true;
+#endif // !X_USE_NULLFONT
+		}
+
+#if defined(X_USE_NULLFONT)
+		pFontSys = X_NEW(font::XFontSysNull, g_fontArena, "FontSysNull")();
+#else
+
+		pFontSys = X_NEW(font::XFont, g_fontArena, "fontSys")(pCore);
+#endif // !X_USE_NULLFONT
+
+		if (!pFontSys) {
+			return false;
+		}
+
+		if (!pFontSys->Init()) {
+			X_DELETE(pFontSys, g_fontArena);
+			return false;
+		}
+
+		env.pFont = pFontSys;
+		return true;
 	}
 
 	virtual bool ShutDown(void) X_OVERRIDE
