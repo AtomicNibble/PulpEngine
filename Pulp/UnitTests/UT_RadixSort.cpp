@@ -1,0 +1,48 @@
+#include "stdafx.h"
+
+#include <Sorting\RadixSort.h>
+
+X_USING_NAMESPACE;
+
+using namespace core;
+
+
+typedef ::testing::Types<uint8_t, uint16_t, uint32_t> MyTypes;
+TYPED_TEST_CASE(RadixSort, MyTypes);
+
+template <typename T>
+class RadixSort: public ::testing::Test {
+public:
+};
+
+
+TYPED_TEST(RadixSort, index32_8bit)
+{
+	core::Array<uint8_t> vec(gEnv->pArena);
+	core::Array<TypeParam> indexes(gEnv->pArena);
+
+	// 4096 or the max of type if lower.
+	const TypeParam num = static_cast<TypeParam>(core::Min<size_t>(4096, 
+		std::numeric_limits<TypeParam>::max()));
+
+	vec.resize(num);
+	for (auto& v : vec) {
+		v = rand() % 0xff;
+	}
+
+	// create sorted indexes's.
+	core::Sorting::radix_sort_uint8_fast(vec, indexes);
+
+	// it should ensure the sizes match
+	ASSERT_EQ(vec.size(), indexes.size());
+
+	// validate the indexes give us sorted data.
+	TypeParam lastValue = std::numeric_limits<TypeParam>::min();
+	for (const auto idx : indexes)
+	{
+		const TypeParam val = vec[idx];
+
+		ASSERT_GE(val, lastValue);
+		lastValue = val;
+	}
+}
