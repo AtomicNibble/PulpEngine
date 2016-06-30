@@ -8,6 +8,15 @@ X_NAMESPACE_BEGIN(core)
 namespace Sorting
 {
 
+	// This returns a index list.
+	// after sortedIndexes[0] contains the index in in[] for the lowest value.
+	// 
+	// Example:
+	// 
+	//	in[]:			43, 6, 12, 85, 35
+	// 
+	//	SortedIndex[]:	1,  2, 4,  0,  3
+	// 
 	template<typename IndexType>
 	X_INLINE void radix_sort_uint8_fast(core::Array<uint8_t>& in, core::Array<IndexType>& sortedIndexes)
 	{
