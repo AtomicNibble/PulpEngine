@@ -32,7 +32,8 @@ namespace Sorting
 
 		IndexType* pBucketDest = sortedIndexes.ptr();
 
-		for (IndexType i = 0; i < 0x100; pBucketDest += count[i++]) {
+		// can't be index type if in.size == index::max()
+		for (uint16_t i = 0; i < 0x100; pBucketDest += count[i++]) {
 			pBuckets[i] = pBucketDest;
 		}
 
