@@ -17,7 +17,7 @@ namespace Sorting
 
 		sortedIndexes.resize(num);
 
-		for (uint32_t i = 0; i < num; i++) {
+		for (IndexType i = 0; i < num; i++) {
 			count[in[i] & 0xFF]++;
 		}
 
