@@ -31,7 +31,7 @@ TYPED_TEST(RadixSort, index32_8bit)
 	}
 
 	// create sorted indexes's.
-	core::Sorting::radix_sort_uint8_fast(vec, indexes);
+	core::Sorting::radix_sort_buf(vec, indexes);
 
 	// it should ensure the sizes match
 	ASSERT_EQ(vec.size(), indexes.size());
@@ -64,7 +64,7 @@ TYPED_TEST(RadixSort, index32_16bit)
 	}
 
 	// create sorted indexes's.
-	core::Sorting::radix_sort_uint16_buf(vec, indexes, gEnv->pArena);
+	core::Sorting::radix_sort_buf(vec, indexes, gEnv->pArena);
 
 	// it should ensure the sizes match
 	ASSERT_EQ(vec.size(), indexes.size());
@@ -96,7 +96,7 @@ TYPED_TEST(RadixSort, index32_32bit)
 	}
 
 	// create sorted indexes's.
-	core::Sorting::radix_sort_uint32_buf(vec, indexes, gEnv->pArena);
+	core::Sorting::radix_sort_buf(vec, indexes, gEnv->pArena);
 
 	// it should ensure the sizes match
 	ASSERT_EQ(vec.size(), indexes.size());
@@ -132,7 +132,7 @@ TYPED_TEST(RadixSort, index32_64bit)
 	}
 
 	// create sorted indexes's.
-	core::Sorting::radix_sort_uint64_buf(vec, indexes, gEnv->pArena);
+	core::Sorting::radix_sort_buf(vec, indexes, gEnv->pArena);
 
 	// it should ensure the sizes match
 	ASSERT_EQ(vec.size(), indexes.size());
