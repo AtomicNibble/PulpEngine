@@ -18,16 +18,16 @@ namespace Sorting
 	//	SortedIndex[]:	1,  2, 4,  0,  3
 	// 
 	template<typename IndexType>
-	X_INLINE void radix_sort_uint8_fast(core::Array<uint8_t>& in, core::Array<IndexType>& sortedIndexes)
+	X_INLINE void radix_sort_uint8_fast(const uint8_t* pInBegin, const uint8_t* pInEnd, core::Array<IndexType>& sortedIndexes)
 	{
-		const IndexType num = safe_static_cast<IndexType, size_t>(in.size());
+		const IndexType num = safe_static_cast<IndexType, uintptr_t>(pInEnd - pInBegin);
 		size_t count[0x100] = {};
 		IndexType* pBuckets[0x100];
 
 		sortedIndexes.resize(num);
 
 		for (IndexType i = 0; i < num; i++) {
-			count[in[i] & 0xFF]++;
+			count[pInBegin[i] & 0xFF]++;
 		}
 
 		IndexType* pBucketDest = sortedIndexes.ptr();
@@ -38,17 +38,17 @@ namespace Sorting
 		}
 
 		for (IndexType i = 0; i < num; i++) {
-			*pBuckets[in[i] & 0xFF]++ = i;
+			*pBuckets[pInBegin[i] & 0xFF]++ = i;
 		}
 	}
 
 
 	// one for 16 bit :D 
 	template<typename IndexType>
-	X_INLINE void radix_sort_uint16_buf(core::Array<uint16_t>& in, 
+	X_INLINE void radix_sort_uint16_buf(const uint16_t* pInBegin, const uint16_t* pInEnd,
 		core::Array<IndexType>& sortedIndexes, core::MemoryArenaBase* tempIndexArena)
 	{
-		const IndexType num = safe_static_cast<IndexType, size_t>(in.size());
+		const IndexType num = safe_static_cast<IndexType, uintptr_t>(pInEnd - pInBegin);
 		size_t count[0x100] = {};
 		IndexType* pBuckets[0x100];
 
@@ -58,7 +58,7 @@ namespace Sorting
 		indexTemp.resize(num);
 
 		for (IndexType i = 0; i < num; i++) {
-			count[in[i] & 0xFF]++;
+			count[pInBegin[i] & 0xFF]++;
 		}
 
 		IndexType* pBucketDest = sortedIndexes.ptr();
@@ -68,7 +68,7 @@ namespace Sorting
 		}
 
 		for (IndexType i = 0; i < num; i++) {
-			*pBuckets[in[i] & 0xFF]++ = i;
+			*pBuckets[pInBegin[i] & 0xFF]++ = i;
 		}
 
 		// Handle the upper 8 bits...
@@ -76,7 +76,7 @@ namespace Sorting
 		core::zero_object(count);
 
 		for (IndexType i = 0; i < num; i++) {
-			count[(in[i] >> 8) & 0xFF]++;
+			count[(pInBegin[i] >> 8) & 0xFF]++;
 		}
 
 		for (uint16_t i = 0; i < 0x100; pBucketDest += count[i++]) {
@@ -85,7 +85,7 @@ namespace Sorting
 
 		for (IndexType i = 0; i < num; i++) {
 			const IndexType sortedIdx = sortedIndexes[i];
-			*pBuckets[(in[sortedIdx] >> 8) & 0xFF]++ = sortedIdx;
+			*pBuckets[(pInBegin[sortedIdx] >> 8) & 0xFF]++ = sortedIdx;
 		}
 
 		sortedIndexes.swap(indexTemp);
@@ -93,10 +93,10 @@ namespace Sorting
 
 
 	template<typename IndexType>
-	X_INLINE void radix_sort_uint32_buf(core::Array<uint32_t>& in,
+	X_INLINE void radix_sort_uint32_buf(const uint32_t* pInBegin, const uint32_t* pInEnd,
 		core::Array<IndexType>& sortedIndexes, core::MemoryArenaBase* tempIndexArena)
 	{
-		const IndexType num = safe_static_cast<IndexType, size_t>(in.size());
+		const IndexType num = safe_static_cast<IndexType, uintptr_t>(pInEnd - pInBegin);
 		size_t count[0x100] = {};
 		IndexType* pBuckets[0x100];
 
@@ -106,7 +106,7 @@ namespace Sorting
 		indexTemp.resize(num);
 
 		for (IndexType i = 0; i < num; i++) {
-			count[in[i] & 0xFF]++;
+			count[pInBegin[i] & 0xFF]++;
 		}
 
 		IndexType* pBucketDest = indexTemp.ptr();
@@ -116,7 +116,7 @@ namespace Sorting
 		}
 
 		for (IndexType i = 0; i < num; i++) {
-			*pBuckets[in[i] & 0xFF]++ = i;
+			*pBuckets[pInBegin[i] & 0xFF]++ = i;
 		}
 
 		pBucketDest = sortedIndexes.ptr();
@@ -127,7 +127,7 @@ namespace Sorting
 			core::zero_object(count);
 
 			for (IndexType i = 0; i < num; i++) {
-				count[(in[i] >> shift) & 0xFF]++;
+				count[(pInBegin[i] >> shift) & 0xFF]++;
 			}
 
 			IndexType* pBucketDestStart = pBucketDest;
@@ -139,7 +139,7 @@ namespace Sorting
 
 			for (IndexType i = 0; i < num; i++) {
 				const IndexType sortedIdx = pSrc[i];
-				*pBuckets[(in[sortedIdx] >> shift) & 0xFF]++ = sortedIdx;
+				*pBuckets[(pInBegin[sortedIdx] >> shift) & 0xFF]++ = sortedIdx;
 			}
 
 
@@ -148,10 +148,10 @@ namespace Sorting
 	}
 
 	template<typename IndexType>
-	X_INLINE void radix_sort_uint64_buf(core::Array<uint64_t>& in,
+	X_INLINE void radix_sort_uint64_buf(const uint64_t* pInBegin, const uint64_t* pInEnd,
 		core::Array<IndexType>& sortedIndexes, core::MemoryArenaBase* tempIndexArena)
 	{
-		const IndexType num = safe_static_cast<IndexType, size_t>(in.size());
+		const IndexType num = safe_static_cast<IndexType, uintptr_t>(pInEnd - pInBegin);
 		size_t count[0x100] = {};
 		IndexType* pBuckets[0x100];
 
@@ -161,7 +161,7 @@ namespace Sorting
 		indexTemp.resize(num);
 
 		for (IndexType i = 0; i < num; i++) {
-			count[in[i] & 0xFF]++;
+			count[pInBegin[i] & 0xFF]++;
 		}
 
 		IndexType* pBucketDest = indexTemp.ptr();
@@ -171,7 +171,7 @@ namespace Sorting
 		}
 
 		for (IndexType i = 0; i < num; i++) {
-			*pBuckets[in[i] & 0xFF]++ = i;
+			*pBuckets[pInBegin[i] & 0xFF]++ = i;
 		}
 
 		pBucketDest = sortedIndexes.ptr();
@@ -182,7 +182,7 @@ namespace Sorting
 			core::zero_object(count);
 
 			for (IndexType i = 0; i < num; i++) {
-				count[(in[i] >> shift) & 0xFF]++;
+				count[(pInBegin[i] >> shift) & 0xFF]++;
 			}
 
 			IndexType* pBucketDestStart = pBucketDest;
@@ -194,13 +194,74 @@ namespace Sorting
 
 			for (IndexType i = 0; i < num; i++) {
 				const IndexType sortedIdx = pSrc[i];
-				*pBuckets[(in[sortedIdx] >> shift) & 0xFF]++ = sortedIdx;
+				*pBuckets[(pInBegin[sortedIdx] >> shift) & 0xFF]++ = sortedIdx;
 			}
 
 			core::Swap(pSrc, pBucketDest);
 		}
+
 	}
 
+
+	template<typename IndexType>
+	X_INLINE void radix_sort_buf(const core::Array<uint8_t>& in,
+		core::Array<IndexType>& sortedIndexes)
+	{
+		radix_sort_uint8_fast<IndexType>(in.begin(), in.end(), sortedIndexes);
+	}
+
+	template<typename IndexType>
+	X_INLINE void radix_sort_buf(const core::Array<uint16_t>& in,
+		core::Array<IndexType>& sortedIndexes, core::MemoryArenaBase* tempIndexArena)
+	{
+		radix_sort_uint16_buf<IndexType>(in.begin(), in.end(), sortedIndexes, tempIndexArena);
+	}
+
+	template<typename IndexType>
+	X_INLINE void radix_sort_buf(const core::Array<uint32_t>& in,
+		core::Array<IndexType>& sortedIndexes, core::MemoryArenaBase* tempIndexArena)
+	{
+		radix_sort_uint32_buf<IndexType>(in.begin(), in.end(), sortedIndexes, tempIndexArena);
+	}
+
+	template<typename IndexType>
+	X_INLINE void radix_sort_buf(const core::Array<uint64_t>& in,
+		core::Array<IndexType>& sortedIndexes, core::MemoryArenaBase* tempIndexArena)
+	{
+		radix_sort_uint64_buf<IndexType>(in.begin(), in.end(), sortedIndexes, tempIndexArena);
+	}
+
+
+
+	template<typename IndexType>
+	X_INLINE void radix_sort_buf(const uint8_t* pIn, const uint8_t* pEnd,
+		core::Array<IndexType>& sortedIndexes, core::MemoryArenaBase* tempIndexArena)
+	{
+		X_UNUSED(tempIndexArena);
+		radix_sort_uint8_fast(pIn, pEnd, sortedIndexes);
+	}
+
+	template<typename IndexType>
+	X_INLINE void radix_sort_buf(const uint16_t* pIn, const uint16_t* pEnd,
+		core::Array<IndexType>& sortedIndexes, core::MemoryArenaBase* tempIndexArena)
+	{
+		radix_sort_uint16_buf(pIn, pEnd, sortedIndexes, tempIndexArena);
+	}
+
+	template<typename IndexType>
+	X_INLINE void radix_sort_buf(const uint32_t* pIn, const uint32_t* pEnd,
+		core::Array<IndexType>& sortedIndexes, core::MemoryArenaBase* tempIndexArena)
+	{
+		radix_sort_uint32_buf(pIn, pEnd, sortedIndexes, tempIndexArena);
+	}
+
+
+	template<typename IndexType>
+	X_INLINE void radix_sort_buf(const uint64_t* pIn, const uint64_t* pEnd,
+		core::Array<IndexType>& sortedIndexes, core::MemoryArenaBase* tempIndexArena)
+	{
+		radix_sort_uint64_buf(pIn, pEnd, sortedIndexes, tempIndexArena);
+	}
 
 } // namespace Sorting
 
