@@ -7,9 +7,6 @@
     <Filter Include="SourceFiles">
       <UniqueIdentifier>{8eeb3a8a-c0f4-455c-86fb-498b808c1f41}</UniqueIdentifier>
     </Filter>
-    <Filter Include="SourceFiles\win32">
-      <UniqueIdentifier>{0c7100fa-b5fb-44bb-8e44-37cbc3e595e2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="SourceFiles\Logging">
       <UniqueIdentifier>{9c16086b-b413-491d-a978-f8f058a8fb46}</UniqueIdentifier>
     </Filter>
@@ -1469,9 +1466,6 @@
     <ClCompile Include="Memory\MemInfo.cpp">
       <Filter>SourceFiles\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="Util\win32\LastError.cpp">
-      <Filter>SourceFiles\win32</Filter>
-    </ClCompile>
     <ClCompile Include="Platform\win32\Console.cpp">
       <Filter>SourceFiles\Platform\win32</Filter>
     </ClCompile>
@@ -1694,6 +1688,9 @@
     </ClCompile>
     <ClCompile Include="Platform\win32\Module.cpp">
       <Filter>SourceFiles\Platform\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Util\win32\LastError.cpp">
+      <Filter>SourceFiles\Util\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
