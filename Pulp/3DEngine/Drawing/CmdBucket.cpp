@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "CmdBucket.h"
 
+#include <Sorting\RadixSort.h>
+
 X_NAMESPACE_BEGIN(engine)
 
 
@@ -141,7 +143,8 @@ CommandBucket<KeyT>::CommandBucket(core::MemoryArenaBase* arena, CmdPacketAlloca
 	packetAlloc_(packetAlloc),
 	arena_(arena),
 	keys_(arena, size),
-	packets_(arena, size)
+	packets_(arena, size),
+	sortedIdx_(arena, size)
 {
 	X_UNUSED(cam);
 
@@ -165,7 +168,9 @@ CommandBucket<KeyT>::~CommandBucket()
 template <typename KeyT>
 void CommandBucket<KeyT>::sort(void)
 {
+	const int32_t current = current_;
 
+	core::Sorting::radix_sort_buf<uint32_t>(keys_.begin(), keys_.begin() + current, sortedIdx_, arena_);
 }
 
 template <typename KeyT>
@@ -178,7 +183,7 @@ void CommandBucket<KeyT>::submit(void)
 
 	for (int32_t i = 0; i < current_; ++i)
 	{
-		CommandPacket::Packet pPacket = packets_[i];
+		CommandPacket::Packet pPacket = packets_[sortedIdx_[i]];
 		while (pPacket != nullptr)
 		{
 			submitPacket(pPacket);

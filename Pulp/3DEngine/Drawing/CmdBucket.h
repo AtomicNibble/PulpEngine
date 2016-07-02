@@ -205,6 +205,7 @@ private:
 
 	core::Array<Key> keys_;
 	core::Array<CommandPacket::Packet> packets_;
+	core::Array<uint32_t> sortedIdx_;
 
 	CmdPacketAllocator& packetAlloc_;
 	core::MemoryArenaBase* arena_;
