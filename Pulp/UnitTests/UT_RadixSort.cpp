@@ -79,3 +79,35 @@ TYPED_TEST(RadixSort, index32_16bit)
 		lastValue = val;
 	}
 }
+
+
+TYPED_TEST(RadixSort, index32_32bit)
+{
+	core::Array<uint32_t> vec(gEnv->pArena);
+	core::Array<TypeParam> indexes(gEnv->pArena);
+
+	// 4096 or the max of type if lower.
+	const TypeParam num = static_cast<TypeParam>(core::Min<size_t>(4096 * 4,
+		std::numeric_limits<TypeParam>::max()));
+
+	vec.resize(num);
+	for (auto& v : vec) {
+		v = ((rand() & 0xFFFF) << 16) | (rand() % 0xFFFF);
+	}
+
+	// create sorted indexes's.
+	core::Sorting::radix_sort_uint32_buf(vec, indexes, gEnv->pArena);
+
+	// it should ensure the sizes match
+	ASSERT_EQ(vec.size(), indexes.size());
+
+	// validate the indexes give us sorted data.
+	uint32_t lastValue = std::numeric_limits<uint32_t>::min();
+	for (const auto idx : indexes)
+	{
+		const auto val = vec[idx];
+
+		ASSERT_GE(val, lastValue);
+		lastValue = val;
+	}
+}
