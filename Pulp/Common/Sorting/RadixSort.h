@@ -232,6 +232,12 @@ namespace Sorting
 	}
 
 
+	template<typename IndexType>
+	X_INLINE void radix_sort_buf(const uint8_t* pIn, const uint8_t* pEnd,
+		core::Array<IndexType>& sortedIndexes)
+	{
+		radix_sort_uint8_fast(pIn, pEnd, sortedIndexes);
+	}
 
 	template<typename IndexType>
 	X_INLINE void radix_sort_buf(const uint8_t* pIn, const uint8_t* pEnd,
