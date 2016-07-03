@@ -68,46 +68,14 @@ static const float  DEFAULT_FOV		= (75.0f*((float32_t)PI) / 180.0f);
 class XCamera : public XFrustum
 {
 public:
-	XCamera()	{ 
-
-	}
-	~XCamera() {}
+	XCamera() = default;
+	~XCamera() = default;
 
 	X_INLINE void SetFrustum(uint32_t width, uint32_t height, 
 		float32_t fov = DEFAULT_FOV, float32_t nearplane = DEFAULT_NEAR, 
 		float32_t farpane = DEFAULT_FAR, float32_t pixelAspectRatio = 1.0f);
-	/*
-	X_INLINE void UpdateFrustum();
-
-	X_INLINE uint32_t GetViewSurfaceX() const { return width_; }
-	X_INLINE uint32_t GetViewSurfaceZ() const { return height_; }
-
-	X_INLINE float32_t GetFov() const { return fov_; }
-
-	X_INLINE Matrix34f GetMatrix() const { return matrix_; }
-	X_INLINE Matrix34f GetViewMatrix() const { return matrix_.inverted(); }
-	X_INLINE Vec3f GetPosition() const { return matrix_.getTranslate(); }
-	X_INLINE void SetPosition(const Vec3f& vec) { matrix_.setTranslate(vec); UpdateFrustum(); }
-
-	X_INLINE void SetAngles(const Vec3f& angles)	{
-		matrix_ = Matrix34f::createRotation(angles);
-		UpdateFrustum();
-	}
 
 
-	// planes
-	X_INLINE float32_t GetNearPlane() const { return edge_nlt_.y; }
-	X_INLINE float32_t GetFarPlane() const { return edge_flt_.y; }
-	X_INLINE float32_t GetProjectionRatio() const { return projectionRatio_; }
-
-	X_INLINE Planef GetFrustumPlane(FrustumPlanes::Enum pl) {
-		return fp_[pl];
-	}
-
-	X_INLINE const Planef& GetFrustumPlane(FrustumPlanes::Enum pl) const {
-		return fp_[pl];
-	}
-	*/
 protected:
 
 };
