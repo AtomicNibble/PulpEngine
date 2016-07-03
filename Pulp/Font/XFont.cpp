@@ -57,7 +57,6 @@ XFont::XFont(ICore* pCore) :
 	X_ASSERT_NOT_NULL(pCore);
 	X_ASSERT_NOT_NULL(g_fontArena);
 
-	Init();
 }
 
 XFont::~XFont()
