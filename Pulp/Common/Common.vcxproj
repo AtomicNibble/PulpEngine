@@ -195,6 +195,7 @@
     <ClInclude Include="Math\XVecCompressed.h" />
     <ClInclude Include="Math\XVector.h" />
     <ClInclude Include="Math\XVectorAligned.h" />
+    <ClInclude Include="Math\XViewPort.h" />
     <ClInclude Include="Math\XWinding.h" />
     <ClInclude Include="Memory\AllocationPolicies\GrowingBlockAllocator.h" />
     <ClInclude Include="Memory\AllocationPolicies\GrowingGenericAllocator.h" />
@@ -408,6 +409,7 @@
     <None Include="Math\XQuatCompressed.inl" />
     <None Include="Math\XRect.inl" />
     <None Include="Math\XSphere.inl" />
+    <None Include="Math\XViewPort.inl" />
     <None Include="Math\XWinding.inl" />
     <None Include="Memory\AllocationPolicies\GrowingBlockAllocator.inl" />
     <None Include="Memory\AllocationPolicies\GrowingGenericAllocator.inl" />

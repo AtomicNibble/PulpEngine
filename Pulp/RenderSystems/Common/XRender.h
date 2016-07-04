@@ -8,6 +8,7 @@
 #include "ReaderThread.h"
 #include "TextDrawList.h"
 #include "Math\XMatrix44.h"
+#include "Math\XViewPort.h"
 
 #include <Containers\Array.h>
 
@@ -24,64 +25,6 @@ struct RenderResource
 	Vec2f scale;
 };
 
-struct XViewPort
-{
-	X_INLINE bool operator==(const XViewPort& oth) const {
-		return z == oth.z; // && view == oth.view;
-	}
-
-	void setZ(float32_t near_, float32_t far_) {
-		z.x = near_;
-		z.y = far_;
-	}
-
-	void set(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom) {
-		view.set(left, top, right, bottom);
-		viewf.set(
-			static_cast<float>(left),
-			static_cast<float>(top),
-			static_cast<float>(right),
-			static_cast<float>(bottom));
-
-	}
-	void set(uint32_t width, uint32_t height) {
-		set(0, 0, width, height);
-	}
-	void set(const Vec2<uint32_t>& wh) {
-		set(wh.x,wh.y);
-	}
-
-	X_INLINE int getWidth(void) const {
-		return view.getWidth();
-	}
-	X_INLINE int getHeight(void) const {
-		return view.getHeight();
-	}
-	X_INLINE float getWidthf(void) const {
-		return viewf.getWidth();
-	}
-	X_INLINE float getHeightf(void) const {
-		return viewf.getHeight();
-	}
-
-	X_INLINE Recti getRect(void) {
-		return view; 
-	}
-	X_INLINE const Recti& getRect(void) const {
-		return view;
-	} 
-
-	X_INLINE float getZNear(void) const {
-		return z.x;
-	}
-	X_INLINE float getZFar(void) const {
-		return z.y;
-	}
-private:
-	Recti view;
-	Rectf viewf;
-	Vec2f z;
-};
 
 class XRender : public IRender
 {

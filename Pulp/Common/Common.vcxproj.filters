@@ -1111,6 +1111,9 @@
     <ClInclude Include="Sorting\RadixSort.h">
       <Filter>Headers\Sorting</Filter>
     </ClInclude>
+    <ClInclude Include="Math\XViewPort.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1385,6 +1388,9 @@
     </None>
     <None Include="Util\Event.gen">
       <Filter>Headers\Util</Filter>
+    </None>
+    <None Include="Math\XViewPort.inl">
+      <Filter>Headers\Math</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
