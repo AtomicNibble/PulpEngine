@@ -5,6 +5,8 @@
 #include <IInput.h>
 #include <ITimer.h>
 
+#include <Math\XViewPort.h>
+
 X_NAMESPACE_BEGIN(core)
 
 X_DECLARE_FLAGS(FrameFlag)(
@@ -30,11 +32,11 @@ struct FrameTimeData
 	TimeVal unscaledDeltas[ITimer::Timer::ENUM_COUNT];
 };
 
+X_DISABLE_WARNING(4324)
 
 struct FrameView
 {
-
-	X_DISABLE_WARNING(4324)
+	XViewPort viewport;
 
 	XCamera cam; // camera pos for this frame.
 
@@ -43,9 +45,13 @@ struct FrameView
 	X_ALIGN16_MATRIX44F(viewProjMatrix);
 	X_ALIGN16_MATRIX44F(viewProjInvMatrix);
 
-	X_ENABLE_WARNING(4324)
+	// for 2d
+	X_ALIGN16_MATRIX44F(viewMatrixOrtho);
+	X_ALIGN16_MATRIX44F(projMatrixOrtho);
+
 };
 
+X_ENABLE_WARNING(4324)
 
 struct FrameData
 {
