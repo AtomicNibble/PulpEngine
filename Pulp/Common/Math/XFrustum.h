@@ -42,38 +42,33 @@ public:
 		float32_t farpane, float32_t fPixelAspectRatio);
 
 	// set some data
-	void setPosition(const Vec3f& pos);
-	void setAxis(const Matrix33f& mat);
-	void setSize(float dNear, float dFar, float dLeft, float dUp);
+	X_INLINE void setPosition(const Vec3f& pos);
+	X_INLINE void setAxis(const Matrix33f& mat);
+	X_INLINE void setSize(float dNear, float dFar, float dLeft, float dUp);
 	void setFov(float fov);
 
 	// get a goat
-	const Vec3f& getPosition(void) const;
-	const Matrix33f getAxis(void) const;
-	const Matrix34f& getMatrix(void) const;
-	Vec3f getCenter(void) const;
+	X_INLINE Vec3f getPosition(void) const;
+	X_INLINE Matrix33f getAxis(void) const;
+	X_INLINE const Matrix34f& getMatrix(void) const;
+	X_INLINE Vec3f getCenter(void) const;
 
-	bool isValid(void) const;					// returns true if the frustum is valid
-//	float getNearDistance(void) const;			// returns distance to near plane
-//	float getFarDistance(void) const;			// returns distance to far plane
-	float getLeft(void) const;					// returns left vector length
-	float getUp(void) const;					// returns up vector length
-	float getFov(void) const;
-	float getAspectRatio(void) const;
+	X_INLINE bool isValid(void) const;					// returns true if the frustum is valid
+	X_INLINE float32_t getLeft(void) const;					// returns left vector length
+	X_INLINE float32_t getUp(void) const;					// returns up vector length
+	X_INLINE float32_t getFov(void) const;
+	X_INLINE float32_t getAspectRatio(void) const;
+	X_INLINE float32_t getProjectionRatio(void) const;
 
-	float32_t getNearPlane(void) const;
-	float32_t getFarPlane(void) const;
-	Vec3f getEdgeP(void) const;
-	Vec3f getEdgeN(void) const;
-	Vec3f getEdgeF(void) const;
+	X_INLINE float32_t getNearPlane(void) const;
+	X_INLINE float32_t getFarPlane(void) const;
+	X_INLINE Vec3f getEdgeP(void) const;
+	X_INLINE Vec3f getEdgeN(void) const;
+	X_INLINE Vec3f getEdgeF(void) const;
 
-	X_INLINE void getNearPlaneCoordinates(Vec3f* pTopLeft, Vec3f* pTopRight,
-		Vec3f* pBottomLeft, Vec3f* pBottomRight) const;
-	X_INLINE void getProPlaneCoordinates(Vec3f* pTopLeft, Vec3f* pTopRight,
-		Vec3f* pBottomLeft, Vec3f* pBottomRight) const;
-	X_INLINE void getFarPlaneCoordinates(Vec3f * pTopLeft, Vec3f* pTopRight,
-		Vec3f* pBottomLeft, Vec3f* pBottomRight) const;
-
+	X_INLINE void setAngles(const Vec3f& angles);
+	X_INLINE Planef getFrustumPlane(FrustumPlane::Enum pl);
+	X_INLINE const Planef& getFrustumPlane(FrustumPlane::Enum pl) const;
 
 	// fast culling but might not cull everything outside the frustum
 	bool cullPoint(const Vec3f& point) const;
@@ -99,12 +94,12 @@ public:
 	void GetFrustumVertices(std::array<Vec3f, 8>& verts) const;
 	void GetFrustumVertices(std::array<Vec3f, 12>& verts) const;
 
-	X_INLINE float32_t getFov(void) const;
-	X_INLINE float32_t getProjectionRatio(void) const;
-
-	X_INLINE void setAngles(const Vec3f& angles);
-	X_INLINE Planef getFrustumPlane(FrustumPlane::Enum pl);
-	X_INLINE const Planef& getFrustumPlane(FrustumPlane::Enum pl) const;
+	void getNearPlaneCoordinates(Vec3f* pTopLeft, Vec3f* pTopRight,
+		Vec3f* pBottomLeft, Vec3f* pBottomRight) const;
+	void getProPlaneCoordinates(Vec3f* pTopLeft, Vec3f* pTopRight,
+		Vec3f* pBottomLeft, Vec3f* pBottomRight) const;
+	void getFarPlaneCoordinates(Vec3f * pTopLeft, Vec3f* pTopRight,
+		Vec3f* pBottomLeft, Vec3f* pBottomRight) const;
 
 private:
 	CullType::Enum AdditionalCheck(const AABB& aabb) const;

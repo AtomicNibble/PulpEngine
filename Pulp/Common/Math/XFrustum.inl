@@ -49,14 +49,14 @@ X_INLINE void XFrustum::setSize(float dNear, float dFar, float dLeft, float dUp)
 }
 
 // get a goat
-X_INLINE const Vec3f& XFrustum::getPosition(void) const
+X_INLINE Vec3f XFrustum::getPosition(void) const
 {
 	return mat_.getTranslate();
 }
 
-X_INLINE const Matrix33f XFrustum::getAxis(void) const
+X_INLINE Matrix33f XFrustum::getAxis(void) const
 {
-	mat_;
+	return Matrix33f(mat_);
 }
 
 X_INLINE const Matrix34f& XFrustum::getMatrix(void) const
@@ -77,17 +77,17 @@ X_INLINE bool XFrustum::isValid(void) const
 }
 					
 
-X_INLINE float XFrustum::getLeft(void) const
+X_INLINE float32_t XFrustum::getLeft(void) const
 {
 	return left_;
 }
 
-X_INLINE float XFrustum::getUp(void) const
+X_INLINE float32_t XFrustum::getUp(void) const
 {
 	return up_;
 }
 
-X_INLINE float XFrustum::getFov(void) const
+X_INLINE float32_t XFrustum::getFov(void) const
 {
 	return fov_;
 }
@@ -97,6 +97,10 @@ X_INLINE float XFrustum::getAspectRatio(void) const
 	return pixelAspectRatio_;
 }
 
+X_INLINE float32_t XFrustum::getProjectionRatio(void) const
+{
+	return projectionRatio_;
+}
 
 // --------------------------------
 
@@ -126,37 +130,6 @@ X_INLINE Vec3f XFrustum::getEdgeN(void) const
 X_INLINE Vec3f XFrustum::getEdgeF(void) const
 {
 	return edge_flt_; 
-}
-
-// --------------------------------
-
-
-
-X_INLINE void XFrustum::getNearPlaneCoordinates(Vec3f* pTopLeft, Vec3f* pTopRight,
-	Vec3f* pBottomLeft, Vec3f* pBottomRight) const
-{
-	*pTopLeft = npVerts[PlaneVert::TLEFT];
-	*pTopRight = npVerts[PlaneVert::TRIGHT];
-	*pBottomLeft = npVerts[PlaneVert::BLEFT];
-	*pBottomRight = npVerts[PlaneVert::BRIGHT];
-}
-
-X_INLINE void XFrustum::getProPlaneCoordinates(Vec3f * pTopLeft, Vec3f* pTopRight,
-	Vec3f* pBottomLeft, Vec3f* pBottomRight) const
-{
-	*pTopLeft = proVerts[PlaneVert::TLEFT];
-	*pTopRight = proVerts[PlaneVert::TRIGHT];
-	*pBottomLeft = proVerts[PlaneVert::BLEFT];
-	*pBottomRight = proVerts[PlaneVert::BRIGHT];
-}
-
-X_INLINE void XFrustum::getFarPlaneCoordinates(Vec3f * pTopLeft, Vec3f* pTopRight,
-	Vec3f* pBottomLeft, Vec3f* pBottomRight) const
-{
-	*pTopLeft = fpVerts[PlaneVert::TLEFT];
-	*pTopRight = fpVerts[PlaneVert::TRIGHT];
-	*pBottomLeft = fpVerts[PlaneVert::BLEFT];
-	*pBottomRight = fpVerts[PlaneVert::BRIGHT];
 }
 
 
@@ -757,17 +730,6 @@ X_INLINE CullType::Enum XFrustum::AdditionalCheck(const OBB& obb, float32_t scal
 	return CullType::OVERLAP;
 }
 
-
-
-X_INLINE float32_t XFrustum::getFov(void) const
-{ 
-	return fov_;
-}
-
-X_INLINE float32_t XFrustum::getProjectionRatio(void) const
-{
-	return projectionRatio_; 
-}
 
 X_INLINE void XFrustum::setAngles(const Vec3f& angles)
 {

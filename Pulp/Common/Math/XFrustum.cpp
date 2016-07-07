@@ -120,7 +120,7 @@ void XFrustum::SetFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV, floa
 	UpdateFrustum();
 }
 
-void XFrustum::setFov(float fov)
+void XFrustum::setFov(float32_t fov)
 {
 	X_ASSERT(fov >= 0.000001f && fov<X_PI, "invalid fov")(fov);		  //check if specified FOV is valid
 
@@ -205,4 +205,35 @@ void XFrustum::UpdateFrustum(void)
 		idy_[i] = bitY * 3 + 1;
 		idz_[i] = bitZ * 3 + 2;
 	}
+}
+
+// --------------------------------
+
+
+
+void XFrustum::getNearPlaneCoordinates(Vec3f* pTopLeft, Vec3f* pTopRight,
+	Vec3f* pBottomLeft, Vec3f* pBottomRight) const
+{
+	*pTopLeft = npVerts[PlaneVert::TLEFT];
+	*pTopRight = npVerts[PlaneVert::TRIGHT];
+	*pBottomLeft = npVerts[PlaneVert::BLEFT];
+	*pBottomRight = npVerts[PlaneVert::BRIGHT];
+}
+
+void XFrustum::getProPlaneCoordinates(Vec3f* pTopLeft, Vec3f* pTopRight,
+	Vec3f* pBottomLeft, Vec3f* pBottomRight) const
+{
+	*pTopLeft = proVerts[PlaneVert::TLEFT];
+	*pTopRight = proVerts[PlaneVert::TRIGHT];
+	*pBottomLeft = proVerts[PlaneVert::BLEFT];
+	*pBottomRight = proVerts[PlaneVert::BRIGHT];
+}
+
+void XFrustum::getFarPlaneCoordinates(Vec3f* pTopLeft, Vec3f* pTopRight,
+	Vec3f* pBottomLeft, Vec3f* pBottomRight) const
+{
+	*pTopLeft = fpVerts[PlaneVert::TLEFT];
+	*pTopRight = fpVerts[PlaneVert::TRIGHT];
+	*pBottomLeft = fpVerts[PlaneVert::BLEFT];
+	*pBottomRight = fpVerts[PlaneVert::BRIGHT];
 }
