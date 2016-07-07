@@ -103,6 +103,13 @@ bool XGame::Update(core::FrameData& frame)
 	cam_.setAngles(cameraAngle_);
 	cam_.setPosition(cameraPos_);
 
+	frame.view.cam = cam_;
+	frame.view.projMatrix = cam_.getProjectionMatrix();
+	frame.view.viewMatrix = cam_.getViewMatrix();
+	frame.view.viewProjMatrix = frame.view.projMatrix * frame.view.viewMatrix;
+	frame.view.viewProjInvMatrix = frame.view.viewProjMatrix.inverted();
+
+
 	pRender_->SetCamera(cam_);
 
 	return true;
