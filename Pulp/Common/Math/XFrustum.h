@@ -106,8 +106,8 @@ private:
 	CullType::Enum AdditionalCheck(const OBB& obb, float32_t scale) const;
 
 
-private:
-	void UpdateFrustum(void);
+protected:
+	virtual void UpdateFrustum(void);
 
 protected:
 	// pos + ang
