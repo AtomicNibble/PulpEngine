@@ -474,6 +474,7 @@
     </ClCompile>
     <ClCompile Include="Hashing\xxHash.cpp" />
     <ClCompile Include="Math\XAabb.cpp" />
+    <ClCompile Include="Math\XCamera.cpp" />
     <ClCompile Include="Platform\win32\Module.cpp" />
     <ClCompile Include="Platform\win32\Pipe.cpp" />
     <ClCompile Include="Platform\win32\SystemInfo.cpp" />

@@ -1698,6 +1698,9 @@
     <ClCompile Include="Util\win32\LastError.cpp">
       <Filter>SourceFiles\Util\win32</Filter>
     </ClCompile>
+    <ClCompile Include="Math\XCamera.cpp">
+      <Filter>SourceFiles\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Array.natvis">
