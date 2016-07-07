@@ -49,7 +49,7 @@ X_INLINE void XFrustum::setSize(float dNear, float dFar, float dLeft, float dUp)
 }
 
 // get a goat
-X_INLINE const Vec3f XFrustum::getPosition(void) const
+X_INLINE const Vec3f& XFrustum::getPosition(void) const
 {
 	return mat_.getTranslate();
 }

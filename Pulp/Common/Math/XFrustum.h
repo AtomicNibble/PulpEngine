@@ -48,7 +48,7 @@ public:
 	void setFov(float fov);
 
 	// get a goat
-	const Vec3f getPosition(void) const;
+	const Vec3f& getPosition(void) const;
 	const Matrix33f getAxis(void) const;
 	const Matrix34f& getMatrix(void) const;
 	Vec3f getCenter(void) const;
