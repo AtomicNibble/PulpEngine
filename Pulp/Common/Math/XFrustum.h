@@ -58,12 +58,22 @@ public:
 //	float getFarDistance(void) const;			// returns distance to far plane
 	float getLeft(void) const;					// returns left vector length
 	float getUp(void) const;					// returns up vector length
+	float getFov(void) const;
+	float getAspectRatio(void) const;
 
 	float32_t getNearPlane(void) const;
 	float32_t getFarPlane(void) const;
 	Vec3f getEdgeP(void) const;
 	Vec3f getEdgeN(void) const;
 	Vec3f getEdgeF(void) const;
+
+	X_INLINE void getNearPlaneCoordinates(Vec3f* pTopLeft, Vec3f* pTopRight,
+		Vec3f* pBottomLeft, Vec3f* pBottomRight) const;
+	X_INLINE void getProPlaneCoordinates(Vec3f* pTopLeft, Vec3f* pTopRight,
+		Vec3f* pBottomLeft, Vec3f* pBottomRight) const;
+	X_INLINE void getFarPlaneCoordinates(Vec3f * pTopLeft, Vec3f* pTopRight,
+		Vec3f* pBottomLeft, Vec3f* pBottomRight) const;
+
 
 	// fast culling but might not cull everything outside the frustum
 	bool cullPoint(const Vec3f& point) const;
@@ -104,7 +114,7 @@ private:
 private:
 	void UpdateFrustum(void);
 
-
+protected:
 	// pos + ang
 	Matrix34f mat_;
 	float near_;

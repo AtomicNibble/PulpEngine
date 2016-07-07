@@ -77,6 +77,29 @@ X_INLINE bool XFrustum::isValid(void) const
 }
 					
 
+X_INLINE float XFrustum::getLeft(void) const
+{
+	return left_;
+}
+
+X_INLINE float XFrustum::getUp(void) const
+{
+	return up_;
+}
+
+X_INLINE float XFrustum::getFov(void) const
+{
+	return fov_;
+}
+
+X_INLINE float XFrustum::getAspectRatio(void) const
+{
+	return pixelAspectRatio_;
+}
+
+
+// --------------------------------
+
 X_INLINE float32_t XFrustum::getNearPlane(void) const
 { 
 	return edge_nlt_.y;
@@ -86,6 +109,9 @@ X_INLINE float32_t XFrustum::getFarPlane(void) const
 { 
 	return edge_flt_.y;
 }
+
+// --------------------------------
+
 
 X_INLINE Vec3f XFrustum::getEdgeP(void) const
 { 
@@ -102,14 +128,35 @@ X_INLINE Vec3f XFrustum::getEdgeF(void) const
 	return edge_flt_; 
 }
 
-X_INLINE float XFrustum::getLeft(void) const
+// --------------------------------
+
+
+
+X_INLINE void XFrustum::getNearPlaneCoordinates(Vec3f* pTopLeft, Vec3f* pTopRight,
+	Vec3f* pBottomLeft, Vec3f* pBottomRight) const
 {
-	return left_;
+	*pTopLeft = npVerts[PlaneVert::TLEFT];
+	*pTopRight = npVerts[PlaneVert::TRIGHT];
+	*pBottomLeft = npVerts[PlaneVert::BLEFT];
+	*pBottomRight = npVerts[PlaneVert::BRIGHT];
 }
-					
-X_INLINE float XFrustum::getUp(void) const
+
+X_INLINE void XFrustum::getProPlaneCoordinates(Vec3f * pTopLeft, Vec3f* pTopRight,
+	Vec3f* pBottomLeft, Vec3f* pBottomRight) const
 {
-	return up_;
+	*pTopLeft = proVerts[PlaneVert::TLEFT];
+	*pTopRight = proVerts[PlaneVert::TRIGHT];
+	*pBottomLeft = proVerts[PlaneVert::BLEFT];
+	*pBottomRight = proVerts[PlaneVert::BRIGHT];
+}
+
+X_INLINE void XFrustum::getFarPlaneCoordinates(Vec3f * pTopLeft, Vec3f* pTopRight,
+	Vec3f* pBottomLeft, Vec3f* pBottomRight) const
+{
+	*pTopLeft = fpVerts[PlaneVert::TLEFT];
+	*pTopRight = fpVerts[PlaneVert::TRIGHT];
+	*pBottomLeft = fpVerts[PlaneVert::BLEFT];
+	*pBottomRight = fpVerts[PlaneVert::BRIGHT];
 }
 
 
