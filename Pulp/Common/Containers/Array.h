@@ -48,6 +48,9 @@ public:
 	// returns a pointer to the list
 	T* ptr(void);									
 	const T* ptr(void) const;
+	T* data(void);
+	const T* data(void) const;
+
 
 	X_INLINE const bool isEmpty(void) const;
 	X_INLINE const bool isNotEmpty(void) const;

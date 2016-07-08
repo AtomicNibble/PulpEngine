@@ -205,6 +205,25 @@ const X_INLINE T *Array<T>::ptr(void) const {
 	return list_;
 }
 
+template<typename T>
+X_INLINE T *Array<T>::data(void) {
+	if (isNotEmpty()) {
+		return &front();
+	}
+
+	return nullptr;
+}
+
+
+template<typename T>
+const X_INLINE T *Array<T>::data(void) const {
+	if (isNotEmpty()) {
+		return &front();
+	}
+
+	return nullptr;
+}
+
 // ---------------------------------------------------------
 
 template<typename T>
