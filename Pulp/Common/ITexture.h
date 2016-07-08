@@ -26,7 +26,7 @@ static const uint32_t	 TEX_MAX_DEPTH = 1;
 
 struct TextureType
 {
-	enum Enum
+	enum Enum : uint8_t
 	{
 		TCube = 1,
 		T1D,
@@ -277,6 +277,24 @@ struct ITextureLoader
 	virtual bool canLoadFile(const core::Path<char>& path) const X_ABSTRACT;
 	virtual XTextureFile* loadTexture(core::XFile* file) X_ABSTRACT;
 };
+
+
+struct ITextureFmt
+{
+	virtual ~ITextureFmt() {}
+
+	virtual bool canLoadFile(const core::Path<char>& path) const X_ABSTRACT;
+	virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_ABSTRACT;
+
+	virtual bool canWrite(void) const { return false; }
+	virtual bool saveTexture(core::XFile* file, const XTextureFile& imgFile) {
+		X_UNUSED(file);
+		X_UNUSED(imgFile);
+		X_ASSERT_UNREACHABLE();
+		return false;
+	};
+};
+
 
 
 X_NAMESPACE_END

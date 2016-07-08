@@ -10,7 +10,7 @@
 
 #include <Compression\Zlib.h>
 
-#include "XTextureFile.h"
+#include "TextureFile.h"
 
 
 X_NAMESPACE_BEGIN(texture)
@@ -87,11 +87,12 @@ namespace PNG
 		};
 
 
-		bool LoadChucksIDAT(core::XFile* file, uint32_t length, uint32_t InfaltedSize, uint8_t* inflated_data)
+		bool LoadChucksIDAT(core::MemoryArenaBase* swapArea, core::XFile* file,
+			uint32_t length, uint32_t InfaltedSize, uint8_t* inflated_data)
 		{
 			X_ASSERT_NOT_NULL(file);
 
-			core::Array<uint8_t> ZlibData(g_textureDataArena);
+			core::Array<uint8_t> ZlibData(swapArea);
 			ZlibData.reserve(length);
 
 			uint32_t tagName;
@@ -99,7 +100,7 @@ namespace PNG
 
 			using namespace core::Compression;
 
-			ZlibInflate inflater(g_rendererArena, inflated_data, InfaltedSize);
+			ZlibInflate inflater(swapArea, inflated_data, InfaltedSize);
 			ZlibInflate::InflateResult::Enum zRes;
 
 			do
@@ -177,13 +178,13 @@ namespace PNG
 
 	}
 
-	// ITextureLoader
+	// ITextureFmt
 	bool XTexLoaderPNG::canLoadFile(const core::Path<char>& path) const
 	{
 		return  core::strUtil::IsEqual(PNG_FILE_EXTENSION, path.extension());
 	}
 
-	XTextureFile* XTexLoaderPNG::loadTexture(core::XFile* file)
+	bool XTexLoaderPNG::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
 	{
 		X_ASSERT_NOT_NULL(file);
 
@@ -207,7 +208,7 @@ namespace PNG
 		if (length != 13)
 		{
 			X_ERROR("TexturePNG", "invalid png length. provided: %i required: 13", length);
-			return nullptr;
+			return false;
 		}
 
 		file->readObj(ihdr);
@@ -218,7 +219,7 @@ namespace PNG
 		if (cursor.getSeek<uint32_t>() != PNG_TAG_IHDR)
 		{
 			X_ERROR("TexturePNG", "invalid sub tag. expoected: IHDR");
-			return nullptr;
+			return false;
 		}
 
 		width = core::Endian::swap(cursor.getSeek<uint32_t>());
@@ -235,32 +236,32 @@ namespace PNG
 		{
 			X_ERROR("TexturePNG", "invalid image dimensions. provided: %ix%i max: %ix%i", 
 				height, width, TEX_MAX_DIMENSIONS, TEX_MAX_DIMENSIONS);
-			return nullptr;
+			return false;
 		}
 
 		if (!core::bitUtil::IsPowerOfTwo(height) || !core::bitUtil::IsPowerOfTwo(width))
 		{
 			X_ERROR("TexturePNG", "invalid image dimensions, must be power of two. provided: %ix%i", 
 				height, width);
-			return nullptr;
+			return false;
 		}
 
 		if (color_type == PngColorType::INDEXED)
 		{
 			X_ERROR("TexturePNG", "invalud color type. expected: TRUECOLOR | TRUECOLOR_ALPHA");
-			return nullptr;
+			return false;
 		}
 
 		if (depth != 8 && depth != 16)
 		{
 			X_ERROR("TexturePNG", "invalud depth. provided: %i expected: 8 | 16", depth);
-			return nullptr;
+			return false;
 		}
 	
 		if (interlace_method > 0)
 		{
 			X_ERROR("TexturePNG", "interlace not supported");
-			return nullptr;
+			return false;
 		}
 		
 		bpp = png_get_bpp(depth,color_type);
@@ -270,7 +271,7 @@ namespace PNG
 		{
 			if (file->readObj(length) != sizeof(length)) {
 				X_ERROR("TexturePNG", "failed to read TAG length");
-				return nullptr;
+				return false;
 			}
 
 			length = core::Endian::swap(length);
@@ -288,47 +289,43 @@ namespace PNG
 
 		if (tagName != PNG_TAG_IDAT) {
 			X_ERROR("TexturePNG", "failed to find IDAT tag in file");
-			return nullptr;
+			return false;
 		}
+
+
+		// inflated_data is the uncompressed image data.
+		// make img info.
+		TextureFlags flags;
+		flags.Set(TextureFlags::NOMIPS);
+
+		if (color_type == PngColorType::TRUECOLOR_ALPHA) {
+			flags.Set(TextureFlags::ALPHA);
+		}
+
+		imgFile.setFormat(map_png_format(color_type));
+		imgFile.setNumFaces(1);
+		imgFile.setNumMips(1);
+		imgFile.setDepth(1);
+		imgFile.setFlags(flags);
+		imgFile.setType(TextureType::T2D);
+		imgFile.setHeigth(safe_static_cast<uint16_t,uint32_t>(height));
+		imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(width));
+		imgFile.resize();
 
 		// ok so the length is the size of the compreseed block we need to read.
 		// it is possible to have multiple IDAT blocks.
 		uint32_t inflated_size = (width * height * bpp);
-		uint8_t* inflated_data = X_NEW_ARRAY_ALIGNED(uint8_t, inflated_size, g_textureDataArena, "PngFaceBuffer", 8);
 
-
-		if (!LoadChucksIDAT(file, length, inflated_size, inflated_data))
+		if (!LoadChucksIDAT(swapArena, file, length, inflated_size, imgFile.getFace(0)))
 		{
 			X_ERROR("TexturePNG", "failed to load PNG chunks");
-			X_DELETE_ARRAY(inflated_data, g_textureDataArena);
-			return nullptr;
+			return false;
 		}
 
-		// inflated_data is the uncompressed image data.
-		// make img info.
-		XTextureFile* img = X_NEW_ALIGNED(XTextureFile, g_textureDataArena, "TextureFile", 8);
-		TextureFlags flags;
-		flags.Set(TextureFlags::NOMIPS);
-
-		if (color_type == PngColorType::TRUECOLOR_ALPHA)
-			flags.Set(TextureFlags::ALPHA);
-
-		img->setFormat(map_png_format(color_type));
-
-		img->pFaces[0] = inflated_data;
-		img->setNumFaces(1);
-		img->setNumMips(1);
-		img->setDepth(1);
-		img->setFlags(flags);
-		img->setType(TextureType::T2D);
-		img->setHeigth(safe_static_cast<uint16_t,uint32_t>(height));
-		img->setWidth(safe_static_cast<uint16_t, uint32_t>(width));
-		img->setDataSize(inflated_size);
-
-		return img;
+		return true;
 	}
 
-	// ~ITextureLoader
+	// ~ITextureFmt
 
 
 

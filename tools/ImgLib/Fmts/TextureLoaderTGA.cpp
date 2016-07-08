@@ -4,7 +4,7 @@
 #include <IFileSys.h>
 
 
-#include "XTextureFile.h"
+#include "TextureFile.h"
 
 X_NAMESPACE_BEGIN(texture)
 
@@ -61,114 +61,115 @@ XTexLoaderTGA::~XTexLoaderTGA()
 
 }
 
-// ITextureLoader
+// ITextureFmt
 bool XTexLoaderTGA::canLoadFile(const core::Path<char>& path) const
 {
-	return  core::strUtil::IsEqual(TGA_FILE_EXTENSION, path.extension());
+	return core::strUtil::IsEqual(TGA_FILE_EXTENSION, path.extension());
 }
 
-XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
+bool XTexLoaderTGA::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
 {
 	X_ASSERT_NOT_NULL(file);
+	X_UNUSED(swapArena);
 
 	Tga_Header hdr;
 	uint8_t buf[18];
 
 	if (file->readObj(buf) != sizeof(buf)) {
 		X_ERROR("Tga", "Failed to read header");
-		return nullptr;
+		return false;
 	}
 
-	hdr.IDLength = (uint32_t)buf[0];
-	hdr.ColorMapType = (uint32_t)buf[1];
-	hdr.ImageType = (uint32_t)buf[2];
-	hdr.CMapStart = (uint32_t)buf[3] | (((uint32_t)buf[4]) << 8);
-	hdr.CMapLength = (uint32_t)buf[5] | (((uint32_t)buf[6]) << 8);
-	hdr.CMapDepth = (uint32_t)buf[7];
-	hdr.XOffset = (uint32_t)buf[8] | (((uint32_t)buf[9]) << 8);
-	hdr.YOffset = (uint32_t)buf[10] | (((uint32_t)buf[11]) << 8);
-	hdr.Width = (uint32_t)buf[12] | (((uint32_t)buf[13]) << 8);
-	hdr.Height = (uint32_t)buf[14] | (((uint32_t)buf[15]) << 8);
-	hdr.PixelDepth = (uint32_t)buf[16];
-	hdr.ImageDescriptor = (uint32_t)buf[17];
+	hdr.IDLength = static_cast<uint32_t>(buf[0]);
+	hdr.ColorMapType = static_cast<uint32_t>(buf[1]);
+	hdr.ImageType = static_cast<uint32_t>(buf[2]);
+	hdr.CMapStart = static_cast<uint32_t>(buf[3]) | static_cast<uint32_t>((buf[4]) << 8);
+	hdr.CMapLength = static_cast<uint32_t>(buf[5]) | static_cast<uint32_t>((buf[6]) << 8);
+	hdr.CMapDepth = static_cast<uint32_t>(buf[7]);
+	hdr.XOffset = static_cast<uint32_t>(buf[8]) | static_cast<uint32_t>((buf[9]) << 8);
+	hdr.YOffset = static_cast<uint32_t>(buf[10]) | static_cast<uint32_t>((buf[11]) << 8);
+	hdr.Width = static_cast<uint32_t>(buf[12]) | static_cast<uint32_t>((buf[13]) << 8);
+	hdr.Height = static_cast<uint32_t>(buf[14]) | static_cast<uint32_t>((buf[15]) << 8);
+	hdr.PixelDepth = static_cast<uint32_t>(buf[16]);
+	hdr.ImageDescriptor = static_cast<uint32_t>(buf[17]);
 
 
 	// Validate TGA header (is this a TGA file?)
 	if (hdr.ColorMapType != 0 && hdr.ColorMapType != 1)
 	{
 		X_ERROR("TextureTGA", "invalid color map type. provided: %i expected: 0 | 1", hdr.ColorMapType);
-		return nullptr;
+		return false;
 	}
 
 	if (!isValidImageType(hdr.ImageType))
 	{
 		X_ERROR("TextureTGA", "invalid image type. provided: %i expected: 1-3 | 9-11", hdr.ImageType);
-		return nullptr;
+		return false;
 	}
 
 	if (!isBGR(hdr.ImageType))
 	{
 		X_ERROR("TextureTGA", "invalid image type. only rgb maps allowed", hdr.ImageType);
-		return nullptr;
+		return false;
 	}
 
 	if (isRightToLeft(hdr.ImageDescriptor))
 	{
 		X_ERROR("TextureTGA", "right to left images are not supported", hdr.ImageType);
-		return nullptr;
+		return false;
 	}
 
 	if (isTopToBottom(hdr.ImageDescriptor))
 	{
 		X_ERROR("TextureTGA", "top to bottom images are not supported", hdr.ImageType);
-		return nullptr;
+		return false;
 	}
 
 	if (!(hdr.PixelDepth == 8 || hdr.PixelDepth == 24 || hdr.PixelDepth == 32))
 	{
 		X_ERROR("TextureTGA", "invalid pixeldepth. provided: %i expected: 8 | 24 | 32", hdr.PixelDepth);
-		return nullptr;
+		return false;
 	}
 
 	if (hdr.Height < 1 || hdr.Height > TEX_MAX_DIMENSIONS || hdr.Width < 1 || hdr.Width > TEX_MAX_DIMENSIONS)
 	{
 		X_ERROR("TextureTGA", "invalid image dimensions. provided: %ix%i max: %ix%i", hdr.Height, hdr.Width, TEX_MAX_DIMENSIONS, TEX_MAX_DIMENSIONS);
-		return nullptr;
+		return false;
 	}
 
 	if (!core::bitUtil::IsPowerOfTwo(hdr.Height) || !core::bitUtil::IsPowerOfTwo(hdr.Width))
 	{
 		X_ERROR("TextureTGA", "invalid image dimensions, must be power of two. provided: %ix%i", hdr.Height, hdr.Width);
-		return nullptr;
+		return false;
 	}
 
 	// load the data.
-	XTextureFile* img = X_NEW_ALIGNED(XTextureFile, g_textureDataArena, "TextureFile", 8);
 	TextureFlags flags;
 	flags.Set(TextureFlags::NOMIPS);
 	flags.Set(TextureFlags::ALPHA);
 
 	uint32_t DataSize = hdr.Width * hdr.Height * (hdr.PixelDepth / 8);
 
-	img->pFaces[0] = X_NEW_ARRAY_ALIGNED(uint8_t, DataSize, g_textureDataArena, "TgaFaceBuffer", 8);
-	img->setDataSize(DataSize);
-	img->setWidth(safe_static_cast<uint16_t, uint32_t>(hdr.Width));
-	img->setHeigth(safe_static_cast<uint16_t, uint32_t>(hdr.Height));
-	img->setNumFaces(1);
-	img->setDepth(1);
-	img->setNumMips(1);
-	img->setType(TextureType::T2D);
+	// pImg->pFaces[0] = X_NEW_ARRAY_ALIGNED(uint8_t, DataSize, g_textureDataArena, "TgaFaceBuffer", 8);
+	imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(hdr.Width));
+	imgFile.setHeigth(safe_static_cast<uint16_t, uint32_t>(hdr.Height));
+	imgFile.setNumFaces(1);
+	imgFile.setDepth(1);
+	imgFile.setNumMips(1);
+	imgFile.setType(TextureType::T2D);
+	// allocate memory for all faces / mips.
+	imgFile.resize();
 
 	switch (hdr.PixelDepth)
 	{
 	case 8:
-		img->setFormat(Texturefmt::A8);
+		imgFile.setFormat(Texturefmt::A8);
 		break;
 	case 24:
-		img->setFormat(Texturefmt::R8G8B8);
+		imgFile.setFormat(Texturefmt::R8G8B8);
 		break;
 	case 32:
-		img->setFormat(Texturefmt::R8G8B8A8);
+		imgFile.setFormat(Texturefmt::R8G8B8A8);
 		break;
 	}
 
@@ -182,10 +183,10 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 
 		if (bpp > 4) {
 			X_ERROR("TextureTGA", "Invalid bpp for rle, max 4. got: %i", static_cast<int32_t>(bpp));
-			goto failed;
+			return false;
 		}
 
-		uint8_t* pCur = img->pFaces[0];
+		uint8_t* pCur = imgFile.getFace(0);
 		uint8_t* pEnd = pCur + DataSize;
 
 		while (loaded < expected)
@@ -193,7 +194,7 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 			uint8_t b;
 			if (file->readObj(b) != sizeof(b)) {
 				X_ERROR("TextureTGA", "Failed to read rle header byte");
-				goto failed;
+				return false;
 			}
 
 			uint8_t num = (b & ~BIT(7)) + 1;
@@ -205,7 +206,7 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 
 				if (file->read(tmp, bpp) != bpp) {
 					X_ERROR("TextureTGA", "failed to read rle bytes");
-					goto failed;
+					return false;
 				}
 
 				for (uint8_t i = 0; i < num; i++)
@@ -214,7 +215,7 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 					if (loaded > expected) {
 						// too many
 						X_ERROR("TextureTGA", "Raw packet is too big");
-						goto failed;
+						return false;
 					}
 
 					std::memcpy(pCur, tmp, bpp);
@@ -226,13 +227,13 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 				if (loaded + num > expected) {
 					// too many
 					X_ERROR("TextureTGA", "Raw packet is too big");
-					goto failed;
+					return false;
 				}
 
 				const uint32_t readSize = num * bpp;
 				if (file->read(pCur, readSize) != readSize) {
 					X_ERROR("TextureTGA", "Failed to read raw packet");
-					goto failed;
+					return false;
 				}
 
 				loaded += num;
@@ -244,20 +245,19 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 		if (pCur != pEnd) {
 			const size_t bytesLeft = pEnd - pCur;
 			X_ERROR("TextureTGA", "Failed to correctly read rle incoded image. bytes left: %" PRIuS);
-			goto failed;
+			return false;
 		}
 	}
 	else
 	{
-		size_t bytes_read = file->read(img->pFaces[0], DataSize);
+		size_t bytes_read = file->read(imgFile.getFace(0), DataSize);
 
 		if (bytes_read != DataSize)
 		{
 			X_ERROR("TextureTGA", "failed to read image data from. requested: %i bytes recivied: %i bytes",
 				DataSize, bytes_read);
 
-			X_DELETE(img, g_textureDataArena);
-			goto failed;
+			return false;
 		}
 	}
 
@@ -266,15 +266,10 @@ XTextureFile* XTexLoaderTGA::loadTexture(core::XFile* file)
 	X_WARNING_IF(left > 0, "TextureTGA", "potential read fail, bytes left in file: %i", left);
 #endif
 
-	return img;
-
-failed:
-
-	X_DELETE(img, g_textureDataArena);
-	return nullptr;
+	return true;
 }
 
-// ~ITextureLoader
+// ~ITextureFmt
 
 
 bool XTexLoaderTGA::isValidImageType(uint32_t type)

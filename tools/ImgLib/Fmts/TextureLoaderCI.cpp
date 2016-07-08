@@ -5,7 +5,7 @@
 #include <ITexture.h>
 #include <ICi.h>
 
-#include "XTextureFile.h"
+#include "TextureFile.h"
 
 X_NAMESPACE_BEGIN(texture)
 
@@ -30,31 +30,33 @@ namespace CI
 
 	}
 
-	// ITextureLoader
+	// ITextureFmt
 	bool XTexLoaderCI::canLoadFile(const core::Path<char>& path) const
 	{
 		return  core::strUtil::IsEqual(CI_FILE_EXTENSION, path.extension());
 	}
 
-	XTextureFile* XTexLoaderCI::loadTexture(core::XFile* file)
+	bool XTexLoaderCI::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
 	{
 		X_ASSERT_NOT_NULL(file);
+		X_UNUSED(swapArena);
 
 		CITexureHeader hdr;
 
 		// file system will report read error in log.
 		// but lets return here also.
-		if (file->readObj(hdr) != sizeof(hdr))
-			return nullptr;
+		if (file->readObj(hdr) != sizeof(hdr)) {
+			return false;
+		}
 		
 		if (hdr.isValid()) {
 			X_ERROR("TextureCI", "header is not valid");
-			return nullptr;
+			return false;
 		}
 
 		if (hdr.version != CI_VERSION) {
 			X_ERROR("TextureCI", "version is invalid. provided: %i expected: %i", hdr.version, CI_VERSION);
-			return nullptr;
+			return false;
 		}
 
 		// ok that's all the checks we need to do
@@ -65,42 +67,21 @@ namespace CI
 		{
 			X_ERROR("TextureCI", "invalid image dimensions. provided: %ix%i max: %ix%i", 
 				hdr.height, hdr.width, TEX_MAX_DIMENSIONS, TEX_MAX_DIMENSIONS);
-			return nullptr;
+			return false;
 		}
 
 		if (!core::bitUtil::IsPowerOfTwo(hdr.height) || !core::bitUtil::IsPowerOfTwo(hdr.width))
 		{
 			X_ERROR("TextureCI", "invalid image dimensions, must be power of two. provided: %ix%i", 
 				hdr.height, hdr.width);
-			return nullptr;
+			return false;
 		}
 
 		if ((hdr.DataSize % hdr.FaceSize) != 0)
 		{
 			X_ERROR("TextureCI", "data size is not a multiple of facesize");
-			return nullptr;
+			return false;
 		}
-
-		uint8_t* pImgBuf = X_NEW_ARRAY_ALIGNED(uint8_t, hdr.DataSize, g_textureDataArena, "CIImgBuffer", 8);
-		size_t bytesRead = file->read(pImgBuf, hdr.DataSize);
-
-		if (bytesRead != hdr.DataSize)
-		{
-			X_ERROR("TextureCI", "failed to read image data from CIImage. got: %x wanted: %x bytes",
-				bytesRead, hdr.DataSize);
-
-			X_DELETE_ARRAY(pImgBuf, g_textureDataArena);
-			return nullptr;
-		}
-
-		if (file->remainingBytes() != 0)
-		{
-			X_ERROR("TextureCI", "read fail, bytes left in file: %i", file->remainingBytes());
-			return nullptr;
-		}
-
-		// Load the data.
-		XTextureFile* img = X_NEW(XTextureFile, g_textureDataArena, "TextureFile");
 
 		// flags
 		TextureFlags flags = hdr.Flags;
@@ -109,36 +90,34 @@ namespace CI
 		// since this is the only place it matters.
 		flags.Set(TexFlag::CI_IMG);
 
-
 		// set the info
-		img->setWidth(hdr.width);
-		img->setHeigth(hdr.height);
-		img->setNumMips(hdr.Mips);
-		img->setNumFaces(hdr.Faces); // 1 for 2D 6 for a cube.
-		img->setDepth(1); /// We Don't allow volume texture loading yet.
-		img->setFlags(flags);
-		img->setFormat(hdr.format);
+		imgFile.setWidth(hdr.width);
+		imgFile.setHeigth(hdr.height);
+		imgFile.setNumMips(hdr.Mips);
+		imgFile.setNumFaces(hdr.Faces); // 1 for 2D 6 for a cube.
+		imgFile.setDepth(1); /// We Don't allow volume texture loading yet.
+		imgFile.setFlags(flags);
+		imgFile.setFormat(hdr.format);
+		imgFile.resize();
 
-		uint32_t offset = 0;
-		for (uint32_t i = 0; i < hdr.Faces; i++)
+		size_t bytesRead = file->read(imgFile.getFace(0), hdr.DataSize);
+
+		if (bytesRead != hdr.DataSize)
 		{
-			img->pFaces[i] = &pImgBuf[offset];
-
-			// add offset.
-			offset += hdr.FaceSize;
+			X_ERROR("TextureCI", "failed to read image data from CIImage. got: %x wanted: %x bytes",
+				bytesRead, hdr.DataSize);
+			return false;
 		}
 
-		// check offfset is same as size.
-		if (offset != hdr.DataSize) {
-			X_ERROR("TextureCI", "error setting face pointers, "
-				"img data is not equal to expected face size. Delta: %i",
-				hdr.DataSize - offset);
-			return nullptr;
+		if (file->remainingBytes() != 0)
+		{
+			X_ERROR("TextureCI", "read fail, bytes left in file: %i", file->remainingBytes());
+			return false;
 		}
 
-		return img;
+		return true;
 	}
-	// ~ITextureLoader
+	// ~ITextureFmt
 
 
 } // namespace CI

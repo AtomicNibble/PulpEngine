@@ -11,19 +11,18 @@ X_NAMESPACE_BEGIN(texture)
 namespace DDS
 {
 
-	class XTexLoaderDDS : public ITextureLoader
+	class XTexLoaderDDS : public ITextureFmt
 	{
 	public:
 		XTexLoaderDDS();
 		~XTexLoaderDDS();
 
-		// ITextureLoader
+		// ITextureFmt
 
 		virtual bool canLoadFile(const core::Path<char>& path) const X_OVERRIDE;
-		virtual XTextureFile* loadTexture(core::XFile* file) X_OVERRIDE;
+		virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_OVERRIDE;
 
-		// ~ITextureLoader
-
+		// ~ITextureFmt
 
 	private:
 

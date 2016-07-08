@@ -1,0 +1,88 @@
+#pragma once
+
+#ifndef X_TEXTURE_FILE_H_
+#define X_TEXTURE_FILE_H_
+
+#include <ITexture.h>
+
+#include <Containers\Array.h>
+
+X_NAMESPACE_BEGIN(texture)
+
+
+struct XTextureFile
+{
+	XTextureFile(core::MemoryArenaBase* arena);
+	~XTextureFile();
+
+public:
+	// allocatos memory to hold (N mips) * N faces
+	void resize(void);
+	void clear(void);
+	void free(void);
+	const bool isValid(void) const;
+
+	X_INLINE const Vec2<uint16_t>& getSize(void) const;
+	X_INLINE const int getWidth(void) const;
+	X_INLINE const int getHeight(void) const;
+	X_INLINE const uint8_t getNumFaces(void) const;
+	X_INLINE const uint8_t getDepth(void) const;
+	X_INLINE const uint8_t getNumMips(void) const;
+	X_INLINE const uint32_t getDataSize(void) const;
+	X_INLINE TextureFlags getFlags(void) const;
+	X_INLINE Texturefmt::Enum getFormat(void) const;
+	X_INLINE TextureType::Enum getType(void) const;
+
+	X_INLINE const uint8_t* getFace(size_t face) const;
+	X_INLINE uint8_t* getFace(size_t face);
+
+	X_INLINE const uint8_t* getLevel(size_t face, size_t mip) const;
+	X_INLINE uint8_t* getLevel(size_t face, size_t mip);
+
+	X_INLINE void setSize(const Vec2<uint16_t> size);
+	X_INLINE void setWidth(const uint16_t width);
+	X_INLINE void setHeigth(const uint16_t height);
+	X_INLINE void setFlags(TextureFlags	flags);
+	X_INLINE void setType(TextureType::Enum type);
+	X_INLINE void setFormat(Texturefmt::Enum format);
+
+	void setNumFaces(const int32_t num);
+	void setDepth(const int32_t depth);
+	void setNumMips(const int32_t num);
+
+	X_NO_COPY(XTextureFile);
+	X_NO_ASSIGN(XTextureFile);
+
+private:
+	uint32_t mipOffsets_[TEX_MAX_MIPS];
+	uint32_t faceOffsets_[TEX_MAX_FACES];
+
+	// 4
+	Vec2<uint16_t>		size_; // 4
+	uint32_t			datasize_; // size of whole image / 1 face.
+	TextureFlags		flags_;
+	TextureType::Enum	type_;
+	Texturefmt::Enum 	format_;
+	uint8_t				numMips_;
+	uint8_t				depth_;	// Volume x,y,w
+	uint8_t				numFaces_;  // Cube maps aka 6 faces.
+	bool				sizeValid_;
+	uint8_t				_PAD[2];
+
+	core::Array<uint8_t> data_;
+
+	// pad to 128 bytes.
+//	uint8_t				__PAD[12];
+
+};
+
+static const size_t size_check = sizeof(XTextureFile);
+
+// X_ENSURE_SIZE(XTextureFile, 128);
+
+
+X_NAMESPACE_END
+
+#include "TextureFile.inl"
+
+#endif // !X_TEXTURE_FILE_H_

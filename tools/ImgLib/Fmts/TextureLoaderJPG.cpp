@@ -3,9 +3,10 @@
 
 #include <IFileSys.h>
 
-#include "jpeg-6b\jpeglib.h"
+// #include "jpeg-6b\jpeglib.h"
+#include <../../3rdparty/source/jpeg-6b/jpeglib.h>
 
-#include "XTextureFile.h"
+#include "TextureFile.h"
 
 
 
@@ -72,8 +73,8 @@ namespace JPG
 
 			if (num_bytes <= safe_static_cast<long,size_t>(src->mgr.bytes_in_buffer))
 			{
-				src->mgr.next_input_byte += (size_t)num_bytes;
-				src->mgr.bytes_in_buffer -= (size_t)num_bytes;
+				src->mgr.next_input_byte += static_cast<uintptr_t>(num_bytes);
+				src->mgr.bytes_in_buffer -= static_cast<size_t>(num_bytes);
 			}
 			else
 			{
@@ -147,15 +148,16 @@ namespace JPG
 		
 	}
 
-	// ITextureLoader
+	// ITextureFmt
 	bool XTexLoaderJPG::canLoadFile(const core::Path<char>& path) const
 	{
 		return  core::strUtil::IsEqual(JPG_FILE_EXTENSION, path.extension());
 	}
 
-	XTextureFile* XTexLoaderJPG::loadTexture(core::XFile* file)
+	bool XTexLoaderJPG::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
 	{
 		X_ASSERT_NOT_NULL(file);
+		X_UNUSED(swapArena);
 
 		struct jpeg_decompress_struct cinfo;
 		struct my_error_mgr jerr;
@@ -173,7 +175,7 @@ namespace JPG
 		if (setjmp(jerr.setjmp_buffer)) {
 			jpeg_finish_decompress(&cinfo);
 			jpeg_destroy_decompress(&cinfo);
-			return nullptr;
+			return false;
 		}
 
 		jpeg_create_decompress(&cinfo);
@@ -219,22 +221,20 @@ namespace JPG
 		}
 
 		// create the img obj.
-		XTextureFile* img = X_NEW_ALIGNED(XTextureFile, g_textureDataArena, "TextureFile", 8);
 		TextureFlags flags;
 		flags.Set(TextureFlags::NOMIPS);
 
-		img->pFaces[0] = X_NEW_ARRAY_ALIGNED(uint8_t, inflated_size, g_textureDataArena, "JpgFaceBuffer", 8);
-		img->setNumFaces(1);
-		img->setNumMips(1);
-		img->setDepth(1);
-		img->setFlags(flags);
-		img->setFormat(Texturefmt::R8G8B8);
-		img->setType(TextureType::T2D);
-		img->setHeigth(safe_static_cast<uint16_t, uint32_t>(cinfo.output_height));
-		img->setWidth(safe_static_cast<uint16_t, uint32_t>(cinfo.output_width));
-		img->setDataSize(inflated_size);
+		imgFile.setNumFaces(1);
+		imgFile.setNumMips(1);
+		imgFile.setDepth(1);
+		imgFile.setFlags(flags);
+		imgFile.setFormat(Texturefmt::R8G8B8);
+		imgFile.setType(TextureType::T2D);
+		imgFile.setHeigth(safe_static_cast<uint16_t, uint32_t>(cinfo.output_height));
+		imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(cinfo.output_width));
+		imgFile.resize();
 
-		uint8_t* pBuffer = img->pFaces[0];
+		uint8_t* pBuffer = imgFile.getFace(0);
 		while (cinfo.output_scanline < cinfo.output_height)
 		{
 			jpeg_read_scanlines(&cinfo, row_pointer, 1);
@@ -253,9 +253,9 @@ namespace JPG
 		X_WARNING_IF(left > 0, "TextureJPG", "potential read fail, bytes left in file: %i", left);
 #endif
 
-		return img;
+		return true;
 	}
-	// ~ITextureLoader
+	// ~ITextureFmt
 
 } // namespace JPG
 

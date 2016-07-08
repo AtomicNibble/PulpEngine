@@ -323,9 +323,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Fmts\TextureLoaderCI.h" />
+    <ClInclude Include="Fmts\TextureLoaderDDS.h" />
+    <ClInclude Include="Fmts\TextureLoaderJPG.h" />
+    <ClInclude Include="Fmts\TextureLoaderPNG.h" />
+    <ClInclude Include="Fmts\TextureLoaderPSD.h" />
+    <ClInclude Include="Fmts\TextureLoaderTGA.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="TextureFile.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Fmts\TextureLoaderCI.cpp" />
+    <ClCompile Include="Fmts\TextureLoaderDDS.cpp" />
+    <ClCompile Include="Fmts\TextureLoaderJPG.cpp" />
+    <ClCompile Include="Fmts\TextureLoaderPNG.cpp" />
+    <ClCompile Include="Fmts\TextureLoaderPSD.cpp" />
+    <ClCompile Include="Fmts\TextureLoaderTGA.cpp" />
     <ClCompile Include="ImgLib.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -339,6 +352,10 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TextureFile.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TextureFile.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

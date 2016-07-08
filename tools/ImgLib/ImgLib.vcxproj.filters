@@ -9,9 +9,36 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="Header Files\Fmts">
+      <UniqueIdentifier>{d5f5c4a9-b1dc-4e12-ac8d-f9320183c5c1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Fmts">
+      <UniqueIdentifier>{bb08fbc9-612b-4e90-9f5a-c5d30c892cdc}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Fmts\TextureLoaderCI.h">
+      <Filter>Header Files\Fmts</Filter>
+    </ClInclude>
+    <ClInclude Include="Fmts\TextureLoaderDDS.h">
+      <Filter>Header Files\Fmts</Filter>
+    </ClInclude>
+    <ClInclude Include="Fmts\TextureLoaderJPG.h">
+      <Filter>Header Files\Fmts</Filter>
+    </ClInclude>
+    <ClInclude Include="Fmts\TextureLoaderPNG.h">
+      <Filter>Header Files\Fmts</Filter>
+    </ClInclude>
+    <ClInclude Include="Fmts\TextureLoaderPSD.h">
+      <Filter>Header Files\Fmts</Filter>
+    </ClInclude>
+    <ClInclude Include="Fmts\TextureLoaderTGA.h">
+      <Filter>Header Files\Fmts</Filter>
+    </ClInclude>
+    <ClInclude Include="TextureFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -22,5 +49,31 @@
     <ClCompile Include="ImgLib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Fmts\TextureLoaderCI.cpp">
+      <Filter>Source Files\Fmts</Filter>
+    </ClCompile>
+    <ClCompile Include="Fmts\TextureLoaderDDS.cpp">
+      <Filter>Source Files\Fmts</Filter>
+    </ClCompile>
+    <ClCompile Include="Fmts\TextureLoaderJPG.cpp">
+      <Filter>Source Files\Fmts</Filter>
+    </ClCompile>
+    <ClCompile Include="Fmts\TextureLoaderPNG.cpp">
+      <Filter>Source Files\Fmts</Filter>
+    </ClCompile>
+    <ClCompile Include="Fmts\TextureLoaderPSD.cpp">
+      <Filter>Source Files\Fmts</Filter>
+    </ClCompile>
+    <ClCompile Include="Fmts\TextureLoaderTGA.cpp">
+      <Filter>Source Files\Fmts</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="TextureFile.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

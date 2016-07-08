@@ -11,18 +11,18 @@ X_NAMESPACE_BEGIN(texture)
 namespace PSD
 {
 
-	class XTexLoaderPSD : public ITextureLoader
+	class XTexLoaderPSD : public ITextureFmt
 	{
 	public:
 		XTexLoaderPSD();
 		~XTexLoaderPSD();
 
-		// ITextureLoader
+		// ITextureFmt
 
 		virtual bool canLoadFile(const core::Path<char>& path) const X_OVERRIDE;
-		virtual XTextureFile* loadTexture(core::XFile* file) X_OVERRIDE;
+		virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_OVERRIDE;
 
-		// ~ITextureLoader
+		// ~ITextureFmt
 
 
 	private:

@@ -5,7 +5,6 @@
 #include <ITexture.h>
 #include <ICi.h>
 
-#include "XTextureFile.h"
 
 #include "Hashing\crc32.h"
 

@@ -11,18 +11,18 @@ X_NAMESPACE_BEGIN(texture)
 namespace PNG
 {
 
-	class XTexLoaderPNG : public ITextureLoader
+	class XTexLoaderPNG : public ITextureFmt
 	{
 	public:
 		XTexLoaderPNG();
 		~XTexLoaderPNG();
 
-		// ITextureLoader
+		// ITextureFmt
 
 		virtual bool canLoadFile(const core::Path<char>& path) const X_OVERRIDE;
-		virtual XTextureFile* loadTexture(core::XFile* file) X_OVERRIDE;
+		virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_OVERRIDE;
 
-		// ~ITextureLoader
+		// ~ITextureFmt
 
 	private:
 

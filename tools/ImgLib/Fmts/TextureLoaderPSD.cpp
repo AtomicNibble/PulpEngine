@@ -5,7 +5,7 @@
 #include <Util\ScopedPointer.h>
 #include <IFileSys.h>
 
-#include "XTextureFile.h"
+#include "TextureFile.h"
 
 X_NAMESPACE_BEGIN(texture)
 
@@ -74,7 +74,7 @@ namespace PSD
 			return 0;
 		}
 
-		bool readRLEImageData(core::XFile* file, const PsdHeader& header, uint32_t* imageData)
+		bool readRLEImageData(core::MemoryArenaBase* swapArena, core::XFile* file, const PsdHeader& header, uint32_t* imageData)
 		{
 			/*	If the compression code is 1, the image data
 			starts with the byte counts for all the scan lines in the channel
@@ -112,11 +112,11 @@ namespace PSD
 			type 1 (no compression).
 			*/
 			
-			int8_t* tmpData = X_NEW_ARRAY_ALIGNED(int8_t, header.width * header.height, g_textureDataArena, "PsdTmpbuf", 8);
-			uint16_t* rleCount = X_NEW_ARRAY_ALIGNED(uint16_t, header.width * header.channels, g_textureDataArena, "PsdTmpRowbuf", 8);
+			int8_t* tmpData = X_NEW_ARRAY_ALIGNED(int8_t, header.width * header.height, swapArena, "PsdTmpbuf", 8);
+			uint16_t* rleCount = X_NEW_ARRAY_ALIGNED(uint16_t, header.width * header.channels, swapArena, "PsdTmpRowbuf", 8);
 
-			core::ScopedPointer<int8_t[]> scoped_tmpData(tmpData, g_textureDataArena);
-			core::ScopedPointer<uint16_t[]> scoped_rleCount(rleCount, g_textureDataArena);
+			core::ScopedPointer<int8_t[]> scoped_tmpData(tmpData, swapArena);
+			core::ScopedPointer<uint16_t[]> scoped_rleCount(rleCount, swapArena);
 
 			uint32_t size = 0;
 
@@ -135,9 +135,9 @@ namespace PSD
 				size += rleCount[y];
 			}
 
-			int8_t* buf = X_NEW_ARRAY_ALIGNED(int8_t, size, g_textureDataArena, "PsdTmpBuf", 8);
+			int8_t* buf = X_NEW_ARRAY_ALIGNED(int8_t, size, swapArena, "PsdTmpBuf", 8);
 
-			core::ScopedPointer<int8_t[]> scoped_buf(buf, g_textureDataArena);
+			core::ScopedPointer<int8_t[]> scoped_buf(buf, swapArena);
 
 			if (!file->read(buf, size))
 			{
@@ -213,10 +213,10 @@ namespace PSD
 		}
 
 
-		bool readRawImageData(core::XFile* file, const PsdHeader& header, uint32_t* imageData)
+		bool readRawImageData(core::MemoryArenaBase* swapArena, core::XFile* file, const PsdHeader& header, uint32_t* imageData)
 		{
-			uint8_t* tmpData = X_NEW_ARRAY_ALIGNED(uint8_t, header.width * header.height, g_textureDataArena, "PsdTempBuf", 8);
-			core::ScopedPointer<uint8_t[]> scoped_tmpData(tmpData, g_textureDataArena);
+			uint8_t* tmpData = X_NEW_ARRAY_ALIGNED(uint8_t, header.width * header.height, swapArena, "PsdTempBuf", 8);
+			core::ScopedPointer<uint8_t[]> scoped_tmpData(tmpData, swapArena);
 
 			for (int32_t channel = 0; channel<header.channels && channel < 3; ++channel)
 			{
@@ -258,14 +258,14 @@ namespace PSD
 
 	}
 
-	// ITextureLoader
+	// ITextureFmt
 
 	bool XTexLoaderPSD::canLoadFile(const core::Path<char>& path) const
 	{
 		return  core::strUtil::IsEqual(PSD_FILE_EXTENSION, path.extension());
 	}
 
-	XTextureFile* XTexLoaderPSD::loadTexture(core::XFile* file)
+	bool XTexLoaderPSD::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
 	{
 		X_ASSERT_NOT_NULL(file);
 
@@ -279,34 +279,34 @@ namespace PSD
 
 		if (!hdr.isValid()) {
 			X_ERROR("TexturePSD", "PSD file is not valid");
-			return nullptr;
+			return false;
 		}
 
 		if (hdr.version != 1) {
 			X_ERROR("TexturePSD", "PSD file version must be 1");
-			return nullptr;
+			return false;
 		}
 
 		if (hdr.mode != 3) {
 			X_ERROR("TexturePSD", "PSD color mode is not supported. providied: %i required: 3", hdr.mode);
-			return nullptr;
+			return false;
 		}
 
 		if (hdr.depth != 8) {
 			X_ERROR("TexturePSD", "PSD depth is not supported. providied: %i required: 8", hdr.depth);
-			return nullptr;
+			return false;
 		}
 
 		if (hdr.height < 1 || hdr.height > TEX_MAX_DIMENSIONS || hdr.width < 1 || hdr.width > TEX_MAX_DIMENSIONS)
 		{
 			X_ERROR("TexturePSD", "invalid image dimensions. provided: %ix%i max: %ix%i", hdr.height, hdr.width, TEX_MAX_DIMENSIONS, TEX_MAX_DIMENSIONS);
-			return nullptr;
+			return false;
 		}
 
 		if (!core::bitUtil::IsPowerOfTwo(hdr.height) || !core::bitUtil::IsPowerOfTwo(hdr.width))
 		{
 			X_ERROR("TexturePSD", "invalid image dimensions, must be power of two. provided: %ix%i", hdr.height, hdr.width);
-			return nullptr;
+			return false;
 		}
 
 
@@ -324,16 +324,22 @@ namespace PSD
 		if (CompressionType != 1 && CompressionType != 0)
 		{
 			X_ERROR("TexturePSD", "PSD compression mode is not supported. provided: %i required: 1 | 2", CompressionType);
-			return nullptr;
+			return false;
 		}
 
-		XTextureFile* img = X_NEW_ALIGNED(XTextureFile, g_textureDataArena, "TextureFile", 8);
 		TextureFlags flags;
-		img->pFaces[0] = X_NEW_ARRAY_ALIGNED(uint8_t, hdr.width * hdr.height * 4, g_textureDataArena, "PsdFaceBuffer", 8);
-
-
 		flags.Set(TextureFlags::NOMIPS);
 		flags.Set(TextureFlags::ALPHA);
+
+		imgFile.setType(TextureType::T2D);
+		imgFile.setFormat(Texturefmt::A8R8G8B8);
+		imgFile.setHeigth(safe_static_cast<uint16_t, uint32_t>(hdr.height));
+		imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(hdr.width));
+		imgFile.setDepth(1);
+		imgFile.setNumMips(1);
+		imgFile.setNumFaces(1);
+		imgFile.setFlags(flags);
+		imgFile.resize();
 
 
 		bool res = false;
@@ -341,11 +347,11 @@ namespace PSD
 		// load the image data.
 		if (CompressionType == 1)
 		{
-			res = readRLEImageData(file, hdr, (uint32_t*)img->pFaces[0]); // RLE compressed data
+			res = readRLEImageData(swapArena, file, hdr, union_cast<uint32_t*, uint8_t*>(imgFile.getFace(0))); // RLE compressed data
 		}
 		else
 		{
-			res = readRawImageData(file, hdr, (uint32_t*)img->pFaces[0]); // RAW image data
+			res = readRawImageData(swapArena, file, hdr, union_cast<uint32_t*, uint8_t*>(imgFile.getFace(0))); // RAW image data
 		}
 
 
@@ -354,29 +360,15 @@ namespace PSD
 		X_WARNING_IF(left > 0, "TexturePSD", "potential read fail, bytes left in file: %i", left);
 #endif
 
-		if (res)
-		{
-			img->setType(TextureType::T2D);
-			img->setFormat(Texturefmt::A8R8G8B8);
-			img->setDataSize(hdr.width * hdr.height * 4);
-			img->setHeigth(safe_static_cast<uint16_t, uint32_t>(hdr.height));
-			img->setWidth(safe_static_cast<uint16_t, uint32_t>(hdr.width));
-			img->setDepth(1);
-			img->setNumMips(1);
-			img->setNumFaces(1);
-			img->setFlags(flags);
-
-			return img;
-		}
-		else
-		{
-			X_DELETE(img, g_textureDataArena);
+		if (!res) {
+			return false;
 		}
 
-		return nullptr;
+
+		return true;
 	}
 
-	// ~ITextureLoader
+	// ~ITextureFmt
 
 
 } // namespace PSD

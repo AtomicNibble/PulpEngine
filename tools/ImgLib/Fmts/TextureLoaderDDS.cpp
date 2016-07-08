@@ -3,7 +3,7 @@
 
 #include <IFileSys.h>
 
-#include "XTextureFile.h"
+#include "TextureFile.h"
 
 X_NAMESPACE_BEGIN(texture)
 
@@ -566,16 +566,17 @@ namespace DDS
 
 	}
 
-	// ITextureLoader
+	// ITextureFmt
 
 	bool XTexLoaderDDS::canLoadFile(const core::Path<char>& path) const
 	{
 		return core::strUtil::IsEqual(DDS_FILE_EXTENSION, path.extension());
 	}
 
-	XTextureFile* XTexLoaderDDS::loadTexture(core::XFile* file)
+	bool XTexLoaderDDS::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
 	{
 		X_ASSERT_NOT_NULL(file);
+		X_UNUSED(swapArena);
 
 		DDS_header hdr;
 		DDS_DX10_header dx10Hdr;
@@ -588,32 +589,32 @@ namespace DDS
 		if (file->readObj(hdr) != DDSHeaderSize)
 		{
 			X_ERROR("DDSLoader", "failed to read image header");
-			return nullptr;
+			return false;
 		}
 
 		if (!hdr.isValid())
 		{
 			X_ERROR("DDSLoader", "image head is invalid");
-			return nullptr;
+			return false;
 		}
 
 		if (hdr.dwSize != DDSSizeofDDSurfaceDesc2)
 		{
 			X_ERROR("DDSLoader", "image header surface size is invalid. provided: %i epected: 124", hdr.dwSize);
-			return nullptr;
+			return false;
 		}
 
 		if (hdr.dwHeight > DDSMaxImageDimensions && hdr.dwWidth > DDSMaxImageDimensions)
 		{
 			X_ERROR("DDSLoader", "image dimensions exceed the max. provided: %ix%i max: %ix%i",
 				hdr.dwHeight, hdr.dwWidth, DDSMaxImageDimensions, DDSMaxImageDimensions);
-			return nullptr;
+			return false;
 		}
 
 		if (!core::bitUtil::IsPowerOfTwo(hdr.dwHeight) || !core::bitUtil::IsPowerOfTwo(hdr.dwWidth))
 		{
 			X_ERROR("DDSLoader", "invalid image dimensions, must be power of two. provided: %ix%i", hdr.dwHeight, hdr.dwWidth);
-			return nullptr;
+			return false;
 		}
 		
 
@@ -629,7 +630,7 @@ namespace DDS
 			if (num_mip_maps != ComputMaxMips(hdr.dwWidth, hdr.dwHeight)) {
 				X_ERROR("DDSLoader", "mip map count is incorrect. provided: %i expected: %i", num_mip_maps,
 					ComputMaxMips(hdr.dwWidth, hdr.dwHeight));
-				return nullptr;
+				return false;
 			}
 		}
 
@@ -638,11 +639,11 @@ namespace DDS
 		{
 			if (hdr.sCaps.dwCaps2 & DDSCAPS2_CUBEMAP)
 			{
-				const unsigned all_faces_mask = DDSCAPS2_CUBEMAP_POSITIVEX | DDSCAPS2_CUBEMAP_NEGATIVEX | DDSCAPS2_CUBEMAP_POSITIVEY | DDSCAPS2_CUBEMAP_NEGATIVEY | DDSCAPS2_CUBEMAP_POSITIVEZ | DDSCAPS2_CUBEMAP_NEGATIVEZ;
+				const uint32_t all_faces_mask = DDSCAPS2_CUBEMAP_POSITIVEX | DDSCAPS2_CUBEMAP_NEGATIVEX | DDSCAPS2_CUBEMAP_POSITIVEY | DDSCAPS2_CUBEMAP_NEGATIVEY | DDSCAPS2_CUBEMAP_POSITIVEZ | DDSCAPS2_CUBEMAP_NEGATIVEZ;
 				if ((hdr.sCaps.dwCaps2 & all_faces_mask) != all_faces_mask)
 				{
 					X_ERROR("DDSLoader", "cubemaps must have 6 faces");
-					return nullptr;
+					return false;
 				}
 
 				num_faces = 6; // cubemap :)
@@ -741,7 +742,7 @@ namespace DDS
 					if (file->readObj(dx10Hdr) != sizeof(dx10Hdr))
 					{
 						X_ERROR("DDSLoader", "Failed to read DX10 Header");
-						return nullptr;
+						return false;
 					}
 
 					format = PIXEL_FMT_DX10_HEADER;
@@ -770,7 +771,7 @@ namespace DDS
 
 						default:
 							X_ERROR("DDSLoader", "Unsupported DX10 format: 0x%08X", dx10Hdr.dxgiFormat);
-							return nullptr;
+							return false;
 							break;
 					}
 
@@ -779,14 +780,14 @@ namespace DDS
 				default:
 				{				
 					X_ERROR("DDSLoader", "Unsupported DDS FOURCC format: 0x%08X", hdr.sPixelFormat.dwFourCC);	
-					return nullptr;
+					return false;
 				}
 			}
 		}
 		else if ((hdr.sPixelFormat.dwRGBBitCount < 8) || (hdr.sPixelFormat.dwRGBBitCount > 32) || (hdr.sPixelFormat.dwRGBBitCount & 7))
 		{
 			X_ERROR("DDSLoader", "Unsupported bit count: %i", hdr.sPixelFormat.dwRGBBitCount);
-			return nullptr;
+			return false;
 		}
 		else if (hdr.sPixelFormat.dwFlags & DDPF_RGB)
 		{
@@ -794,21 +795,26 @@ namespace DDS
 			{
 				if (hdr.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS) {
 					format = PIXEL_FMT_A8L8;
-				}
-				else
+				} 
+				else {
 					format = PIXEL_FMT_L8;
+				}
 			}
-			else if (hdr.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS) 
+			else if (hdr.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS) {
 				format = PIXEL_FMT_A8R8G8B8;
-			else
+			}
+			else {
 				format = PIXEL_FMT_R8G8B8;
+			}
 		}
 		else if (hdr.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS)
 		{
-			if (hdr.sPixelFormat.dwFlags & DDPF_LUMINANCE)
+			if (hdr.sPixelFormat.dwFlags & DDPF_LUMINANCE) {
 				format = PIXEL_FMT_A8L8;
-			else
+			}
+			else {
 				format = PIXEL_FMT_A8;
+			}
 		}
 		else if (hdr.sPixelFormat.dwFlags & DDPF_LUMINANCE)
 		{
@@ -821,7 +827,7 @@ namespace DDS
 		else
 		{
 			X_ERROR("DDSLoader", "Unsupported format");
-			return nullptr;
+			return false;
 		}
 
 		uint32_t bits_per_pixel = hdr.sPixelFormat.dwRGBBitCount;
@@ -843,7 +849,7 @@ namespace DDS
 		else if (pitch > default_pitch * 8)
 		{
 			X_ERROR("DDSLoader", "Pitch Error");
-			return nullptr;
+			return false;
 		}
 
 		mask_size[0] = core::bitUtil::CountBits(hdr.sPixelFormat.dwRBitMask);
@@ -867,7 +873,6 @@ namespace DDS
 		// out the format.
 
 
-
 		// map the format
 		Texturefmt::Enum mapped_format = Texturefmt::UNKNOWN;
 		mapped_format = pixel_util::get_text_fnt_from_pixel(format, dxt_fmt);
@@ -875,7 +880,7 @@ namespace DDS
 		if (mapped_format == Texturefmt::UNKNOWN)
 		{
 			X_ERROR("DDSLoader", "Unsupported supported.");
-			return nullptr;
+			return false;
 		}
 
 
@@ -891,7 +896,7 @@ namespace DDS
 				{
 					X_ERROR("DDSLoader", "Invalid mask sizes expected 8. (%i,%i,%i,%i)",
 						mask_size[0], mask_size[1], mask_size[2], mask_size[3]);
-					return nullptr;
+					return false;
 				}
 			}
 
@@ -911,7 +916,7 @@ namespace DDS
 					// this is not a valid RGBA
 					X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8A8 expected(0,8,16,24) provided(%i,%i,%i,%i)",
 						mask_ofs[0], mask_ofs[1], mask_ofs[2], mask_ofs[3]);
-					return nullptr;
+					return false;
 				}
 			}
 			else if (mapped_format == Texturefmt::R8G8B8)
@@ -927,60 +932,58 @@ namespace DDS
 					// this is not a valid RGB
 					X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8 expected(0,8,16) provided(%i,%i,%i)",
 						mask_ofs[0], mask_ofs[1], mask_ofs[2]);
-					return nullptr;
+					return false;
 				}
 			}
 		}
 
 
 		// load the image data.
-		XTextureFile* img = X_NEW(XTextureFile, g_textureDataArena, "TextureFile");
 		TextureFlags flags;
 
-		if (pixel_util::has_alpha(format, dxt_fmt))
+		if (pixel_util::has_alpha(format, dxt_fmt)) {
 			flags.Set(TextureFlags::ALPHA);
-
-		if (pixel_util::is_normal_map(format))
+		}
+		if (pixel_util::is_normal_map(format)) {
 			flags.Set(TextureFlags::NORMAL);
-
-		if (num_mip_maps == 1)
+		}
+		if (num_mip_maps == 1) {
 			flags.Set(TextureFlags::NOMIPS);
-
-		if (num_faces == 1)
-			img->setType(TextureType::T2D);
-		else
-			img->setType(TextureType::TCube);
+		}
+		if (num_faces == 1) {
+			imgFile.setType(TextureType::T2D);
+		}
+		else {
+			imgFile.setType(TextureType::TCube);
+		}
 
 
 		// set the info
-		img->setWidth(safe_static_cast<uint16_t,uint32_t>(hdr.dwWidth));
-		img->setHeigth(safe_static_cast<uint16_t, uint32_t>(hdr.dwHeight));
-		img->setNumMips(safe_static_cast<int32_t, uint32_t>(num_mip_maps));
-		img->setNumFaces(safe_static_cast<int32_t, uint32_t>(num_faces)); // 1 for 2D 6 for a cube.
-		img->setDepth(1); /// We Don't allow volume texture loading yet.
-		img->setFlags(flags);
-		img->setFormat(mapped_format);
+		imgFile.setWidth(safe_static_cast<uint16_t,uint32_t>(hdr.dwWidth));
+		imgFile.setHeigth(safe_static_cast<uint16_t, uint32_t>(hdr.dwHeight));
+		imgFile.setNumMips(safe_static_cast<int32_t, uint32_t>(num_mip_maps));
+		imgFile.setNumFaces(safe_static_cast<int32_t, uint32_t>(num_faces)); // 1 for 2D 6 for a cube.
+		imgFile.setDepth(1); /// We Don't allow volume texture loading yet.
+		imgFile.setFlags(flags);
+		imgFile.setFormat(mapped_format);
+		imgFile.resize();
 
 		uint32_t i, bytes_read;
 		uint32_t total_bytes_per_face = pixel_util::get_data_size(hdr.dwWidth, hdr.dwHeight, 1, num_mip_maps, format, dxt_fmt);
 
-		img->setDataSize(total_bytes_per_face);
 
 		// allocate memory / read.
 		// no idear if allocating then reading has any benfits for cube maps.
 		for (i = 0; i < num_faces; i++)
 		{
-			img->pFaces[i] = X_NEW_ARRAY_ALIGNED(uint8_t, total_bytes_per_face, g_textureDataArena, "DDSFaceBuffer", 8);
-
-			bytes_read = safe_static_cast<uint32_t, size_t>(file->read(img->pFaces[i], total_bytes_per_face));
+		
+			bytes_read = safe_static_cast<uint32_t, size_t>(file->read(imgFile.getFace(i), total_bytes_per_face));
 
 			if (bytes_read != total_bytes_per_face)
 			{
 				X_ERROR("DDSLoader", "failed to read all mips. requested: %i bytes got: %i bytes", 
 					total_bytes_per_face, bytes_read);
-
-				X_DELETE(img, g_textureDataArena);
-				return nullptr;
+				return false;
 			}
 
 		}
@@ -990,10 +993,10 @@ namespace DDS
 		X_WARNING_IF(left > 0, "DDSLoader", "potential read fail, bytes left in file: %i", left);
 #endif
 
-		return img;
+		return true;
 	}
 
-	// ~ITextureLoader
+	// ~ITextureFmt
 
 
 } // namespace DDS
