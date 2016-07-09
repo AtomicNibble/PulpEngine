@@ -5,14 +5,14 @@
 
 #include "DeviceManager\DeviceManager.h"
 #include "DeviceManager\VidMemManager.h"
-#include "ReaderThread.h"
 #include "TextDrawList.h"
-#include "Math\XMatrix44.h"
-#include "Math\XViewPort.h"
 
 #include <Containers\Array.h>
 
 #include <Math\XRect.h>
+#include <Math\XMatrix44.h>
+#include <Math\XViewPort.h>
+#include <Math\VertexFormats.h>
 
 #include "Shader\XShader.h"
 
