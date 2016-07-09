@@ -11,7 +11,7 @@ X_NAMESPACE_BEGIN(texture)
 namespace TGA
 {
 
-	class XTexLoaderTGA : public ITextureFmt
+	class IMGLIB_EXPORT XTexLoaderTGA : public ITextureFmt
 	{
 	public:
 		XTexLoaderTGA();

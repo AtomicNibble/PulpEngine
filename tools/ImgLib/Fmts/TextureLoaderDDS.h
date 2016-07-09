@@ -11,7 +11,7 @@ X_NAMESPACE_BEGIN(texture)
 namespace DDS
 {
 
-	class XTexLoaderDDS : public ITextureFmt
+	class IMGLIB_EXPORT XTexLoaderDDS : public ITextureFmt
 	{
 	public:
 		XTexLoaderDDS();

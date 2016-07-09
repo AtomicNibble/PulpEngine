@@ -11,7 +11,7 @@ X_NAMESPACE_BEGIN(texture)
 namespace CI
 {
 
-	class XTexLoaderCI : public ITextureFmt
+	class IMGLIB_EXPORT XTexLoaderCI : public ITextureFmt
 	{
 	public:
 		XTexLoaderCI();

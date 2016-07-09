@@ -11,7 +11,7 @@ X_NAMESPACE_BEGIN(texture)
 namespace PNG
 {
 
-	class XTexLoaderPNG : public ITextureFmt
+	class IMGLIB_EXPORT XTexLoaderPNG : public ITextureFmt
 	{
 	public:
 		XTexLoaderPNG();

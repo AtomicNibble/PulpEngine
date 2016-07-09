@@ -11,7 +11,7 @@ X_NAMESPACE_BEGIN(texture)
 namespace PSD
 {
 
-	class XTexLoaderPSD : public ITextureFmt
+	class IMGLIB_EXPORT XTexLoaderPSD : public ITextureFmt
 	{
 	public:
 		XTexLoaderPSD();
