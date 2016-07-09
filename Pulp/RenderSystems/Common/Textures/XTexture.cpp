@@ -24,7 +24,7 @@ namespace {
 	PSD::XTexLoaderPSD psd;
 	TGA::XTexLoaderTGA tga;
 
-	static ITextureLoader* image_file_loaders[] =
+	static ITextureFmt* image_file_loaders[] =
 	{
 		&ci,
 		&dds,
