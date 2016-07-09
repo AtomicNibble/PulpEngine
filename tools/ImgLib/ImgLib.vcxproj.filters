@@ -41,6 +41,9 @@
     <ClInclude Include="TextureFile.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="TextureUtil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -68,6 +71,9 @@
       <Filter>Source Files\Fmts</Filter>
     </ClCompile>
     <ClCompile Include="TextureFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TextureUtil.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

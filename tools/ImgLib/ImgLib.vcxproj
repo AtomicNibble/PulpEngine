@@ -331,6 +331,7 @@
     <ClInclude Include="Fmts\TextureLoaderTGA.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TextureFile.h" />
+    <ClInclude Include="TextureUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Fmts\TextureLoaderCI.cpp" />
@@ -353,6 +354,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TextureFile.cpp" />
+    <ClCompile Include="TextureUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="TextureFile.inl" />
