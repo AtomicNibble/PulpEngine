@@ -7,7 +7,7 @@ X_NAMESPACE_BEGIN(texture)
 namespace Util
 {
 
-	uint32_t numMipsMips(uint32_t Width, uint32_t Height)
+	uint32_t maxMipsForSize(uint32_t Width, uint32_t Height)
 	{
 		uint32_t Biggest = core::Max<uint32_t>(Width, Height);
 		uint32_t mips = 0;
