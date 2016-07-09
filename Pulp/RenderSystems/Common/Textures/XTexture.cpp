@@ -144,7 +144,7 @@ DXGI_FORMAT XTexture::DCGIFormatFromTexFmt(Texturefmt::Enum fmt)
 			return DXGI_FORMAT_R8G8B8A8_UNORM;
 
 		case Texturefmt::B8G8R8A8:
-		return DXGI_FORMAT_B8G8R8A8_UNORM;
+			return DXGI_FORMAT_B8G8R8A8_UNORM;
 
 		case Texturefmt::A8:
 			return DXGI_FORMAT_A8_UNORM;
@@ -170,20 +170,20 @@ DXGI_FORMAT XTexture::DCGIFormatFromTexFmt(Texturefmt::Enum fmt)
 			return DXGI_FORMAT_BC5_SNORM;
 
 		case Texturefmt::BC6:
-			return DXGI_FORMAT_BC6H_TYPELESS; // HDR BAbbbbbbbbby!
-		case Texturefmt::BC6_UF16:
-			return DXGI_FORMAT_BC6H_UF16;
+			return DXGI_FORMAT_BC6H_UF16; // HDR BAbbbbbbbbby!
 		case Texturefmt::BC6_SF16:
 			return DXGI_FORMAT_BC6H_SF16;
+		case Texturefmt::BC6_TYPELESS:
+			return DXGI_FORMAT_BC6H_TYPELESS;
 
 		case Texturefmt::BC7:
-			return DXGI_FORMAT_BC7_TYPELESS;
-		case Texturefmt::BC7_UNORM:
 			return DXGI_FORMAT_BC7_UNORM;
-		case Texturefmt::BC7_UNORM_SRGB:
+		case Texturefmt::BC7_SRGB:
 			return DXGI_FORMAT_BC7_UNORM_SRGB;
+		case Texturefmt::BC7_TYPELESS:
+			return DXGI_FORMAT_BC7_TYPELESS;
 
-		case Texturefmt::R16G16F:
+		case Texturefmt::R16G16_FLOAT:
 			return DXGI_FORMAT_R16G16_FLOAT;
 		case Texturefmt::R10G10B10A2:
 			return DXGI_FORMAT_R10G10B10A2_TYPELESS;
