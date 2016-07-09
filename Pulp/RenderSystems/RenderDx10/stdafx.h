@@ -30,7 +30,10 @@ X_ENABLE_WARNING(4005)
 #include "../Common/MatrixStack.h"
 
 
+// Img Lib
+#include <../../tools/ImgLib/ImgLib.h>
 
+X_LINK_LIB("engine_ImgLib");
 
 extern core::MemoryArenaBase* g_rendererArena;
 extern core::MemoryArenaBase* g_textureDataArena;
