@@ -26,7 +26,7 @@ typedef core::MemoryArena<
 extern ImgLibArena* g_ImgLibArena;
 
 
-#ifdef _LIB
+#ifdef X_LIB
 #define IMGLIB_EXPORT
 #else
 #ifdef IMG_LIB_EXPORT
@@ -34,5 +34,5 @@ extern ImgLibArena* g_ImgLibArena;
 #else
 #define IMGLIB_EXPORT X_IMPORT
 #endif // !IMG_LIB_EXPORT
-#endif // _LIB
+#endif // X_LIB
 

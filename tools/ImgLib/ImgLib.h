@@ -7,7 +7,7 @@
 #include <Platform\Compiler.h>
 
 #ifndef IMGLIB_EXPORT
-#ifdef _LIB
+#ifdef X_LIB
 	#define IMGLIB_EXPORT
 #else
 	#ifdef IMG_LIB_EXPORT
@@ -15,7 +15,7 @@
 	#else
 		#define IMGLIB_EXPORT X_IMPORT
 	#endif // !IMG_LIB_EXPORT
-#endif // _LIB
+#endif // X_LIB
 #endif // !IMGLIB_EXPORT
 
 
