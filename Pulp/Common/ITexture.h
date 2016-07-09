@@ -307,7 +307,7 @@ struct ITexture
 };
 
 
-struct XTextureFile;
+class XTextureFile;
 
 // Interface for a texture loader.
 // allows me to add / remove diffrent texture loaders with ease.

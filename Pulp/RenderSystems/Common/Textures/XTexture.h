@@ -27,7 +27,7 @@ struct IConsoleCmdArgs;
 X_NAMESPACE_BEGIN(texture)
 
 
-struct XTextureFile;
+class XTextureFile;
 
 
 static const size_t TEX_MAX_SLOTS = 8;

@@ -10,10 +10,11 @@
 X_NAMESPACE_BEGIN(texture)
 
 
-struct XTextureFile
+class XTextureFile
 {
-	XTextureFile(core::MemoryArenaBase* arena);
-	~XTextureFile();
+public:
+	X_INLINE XTextureFile(core::MemoryArenaBase* arena);
+	X_INLINE ~XTextureFile();
 
 public:
 	// allocatos memory to hold (N mips) * N faces
