@@ -38,9 +38,6 @@
     <ClInclude Include="..\Common\Textures\XTexture.h">
       <Filter>Common\Textures</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\Textures\XTextureFile.h">
-      <Filter>Common\Textures</Filter>
-    </ClInclude>
     <ClInclude Include="..\Common\XRender.h">
       <Filter>Common</Filter>
     </ClInclude>
@@ -49,24 +46,6 @@
     </ClInclude>
     <ClInclude Include="DeviceManager\DeviceManager.h">
       <Filter>DeviceManager</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\Textures\TextureLoaderCI.h">
-      <Filter>Common\Textures\Loaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\Textures\TextureLoaderDDS.h">
-      <Filter>Common\Textures\Loaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\Textures\TextureLoaderJPG.h">
-      <Filter>Common\Textures\Loaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\Textures\TextureLoaderPNG.h">
-      <Filter>Common\Textures\Loaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\Textures\TextureLoaderPSD.h">
-      <Filter>Common\Textures\Loaders</Filter>
-    </ClInclude>
-    <ClInclude Include="..\Common\Textures\TextureLoaderTGA.h">
-      <Filter>Common\Textures\Loaders</Filter>
     </ClInclude>
     <ClInclude Include="..\Common\Shader\XShader.h">
       <Filter>Common\Shader</Filter>
@@ -104,9 +83,6 @@
     <ClInclude Include="..\Common\RenderAux.h">
       <Filter>Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\Common\Textures\CI_Img.h">
-      <Filter>Common\Textures</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -126,24 +102,6 @@
     </ClCompile>
     <ClCompile Include="Dx10Texture.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\Textures\TextureLoaderCI.cpp">
-      <Filter>Common\Textures\Loaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\Textures\TextureLoaderDDS.cpp">
-      <Filter>Common\Textures\Loaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\Textures\TextureLoaderJPG.cpp">
-      <Filter>Common\Textures\Loaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\Textures\TextureLoaderPNG.cpp">
-      <Filter>Common\Textures\Loaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\Textures\TextureLoaderPSD.cpp">
-      <Filter>Common\Textures\Loaders</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\Textures\TextureLoaderTGA.cpp">
-      <Filter>Common\Textures\Loaders</Filter>
     </ClCompile>
     <ClCompile Include="Dx10RenderThread.cpp">
       <Filter>Source Files</Filter>
@@ -198,12 +156,6 @@
     </ClCompile>
     <ClCompile Include="Dx10HWShader.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\Textures\XTextureFile.cpp">
-      <Filter>Common\Textures</Filter>
-    </ClCompile>
-    <ClCompile Include="..\Common\Textures\CI_Img.cpp">
-      <Filter>Common\Textures</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
