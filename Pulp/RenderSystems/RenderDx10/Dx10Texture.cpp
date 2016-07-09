@@ -208,7 +208,7 @@ void XTexture::RT_UpdateTextureRegion(byte* data, int nX, int nY, int USize, int
 
 	if (!texture::Util::isDxt(srcFmt))
 	{
-		int rowPitch = texture::Util::dataSize(USize, 1, 1, 1, srcFmt);
+		int rowPitch = texture::Util::dataSize(USize, 1, 1, srcFmt);
 
 		render::g_Dx11D3D.DxDeviceContext()->UpdateSubresource(
 			DeviceTexture.get2DTexture(),
