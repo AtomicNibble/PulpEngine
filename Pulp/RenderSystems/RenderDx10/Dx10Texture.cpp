@@ -3,7 +3,7 @@
 #include "IShader.h"
 #include "ITexture.h"
 #include "../Common/Textures/XTexture.h"
-#include "../Common/Textures/XTextureFile.h"
+//#include "../Common/Textures/XTextureFile.h"
 
 #include "Dx10Render.h"
 
@@ -20,7 +20,7 @@ XTexture* XTexture::s_pCurrentTexture[TEX_MAX_SLOTS] = { nullptr };
 bool XTexture::createDeviceTexture(core::ReferenceCountedOwner<XTextureFile>& image_data)
 {
 #if X_DEBUG
-	image_data->pName_ = this->FileName.c_str();
+//	image_data->pName_ = this->FileName.c_str();
 #endif // !X_DEBUG
 
 	return RT_CreateDeviceTexture(image_data.instance());
@@ -206,9 +206,9 @@ void XTexture::RT_UpdateTextureRegion(byte* data, int nX, int nY, int USize, int
 	D3D11_BOX rc = { nX, nY, 0, nX + USize, nY + VSize, 1 };
 	X_ENABLE_WARNING(4838);
 
-	if (!is_dxt(srcFmt))
+	if (!texture::Util::isDxt(srcFmt))
 	{
-		int rowPitch = get_data_size(USize, 1, 1, 1, srcFmt);
+		int rowPitch = texture::Util::dataSize(USize, 1, 1, 1, srcFmt);
 
 		render::g_Dx11D3D.DxDeviceContext()->UpdateSubresource(
 			DeviceTexture.get2DTexture(),

@@ -3,7 +3,7 @@
 
 #include "Util\ToggleChecker.h"
 
-#include "../Common/Textures/XTextureFile.h"
+// #include "../Common/Textures/XTextureFile.h"
 #include "../Common/Textures/XTexture.h"
 #include "../Common/Shader/XShader.h"
 #include "Dx10Shader.h"
@@ -894,10 +894,15 @@ bool DX11XRender::Create2DTexture(texture::XTextureFile* img_data, texture::XDev
 		pSubResource = &SubResource[0];
 		for (i = 0; i < img_data->getNumFaces(); i++)
 		{
+#if 1
+			X_ASSERT_NOT_IMPLEMENTED();
+#else
 			X_ASSERT(img_data->SubInfo[i].pSysMem != nullptr, "system mem must be set for all faces")();
+
 			SubResource[i].pSysMem = img_data->SubInfo[i].pSysMem;
 			SubResource[i].SysMemPitch = img_data->SubInfo[i].SysMemPitch;
 			SubResource[i].SysMemSlicePitch = 0; // img_data->SubInfo[0].SysMemSlicePitch;
+#endif
 		}
 	}
 	else
@@ -905,9 +910,14 @@ bool DX11XRender::Create2DTexture(texture::XTextureFile* img_data, texture::XDev
 		pSubResource = &SubResource[0];
 		for (i = 0; i < img_data->getNumMips(); i++)
 		{
+#if 1
+			X_ASSERT_NOT_IMPLEMENTED();
+#else
 			SubResource[i].pSysMem = img_data->SubInfo[i].pSysMem;
 			SubResource[i].SysMemPitch = img_data->SubInfo[i].SysMemPitch;
 			SubResource[i].SysMemSlicePitch = img_data->SubInfo[i].SysMemSlicePitch;
+#endif
+
 		}
 	}
 
@@ -919,7 +929,9 @@ bool DX11XRender::Create2DTexture(texture::XTextureFile* img_data, texture::XDev
 	{
 		dev_tex.setTexture(pTexture2D);
 #if X_DEBUG
-		D3DDebug::SetDebugObjectName(pTexture2D, img_data->getName());
+		X_ASSERT_NOT_IMPLEMENTED();
+
+//		D3DDebug::SetDebugObjectName(pTexture2D, img_data->getName());
 #endif // !X_DEBUG
 
 		return true;

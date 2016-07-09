@@ -241,7 +241,7 @@ bool XTexture::LoadFromFile(const char* path_)
 			core::XFile* file = gEnv->pFileSys->openFile(path.c_str(), mode);
 			if (file)
 			{
-				image_data = image_file_loaders[i]->loadTexture(file);
+			//	image_data = image_file_loaders[i]->loadTexture(file);
 				gEnv->pFileSys->closeFile(file);
 			}
 			break;
@@ -259,6 +259,11 @@ bool XTexture::LoadFromFile(const char* path_)
 
 bool XTexture::createTexture(XTextureFile* pImagedata)
 {
+#if 1
+	X_UNUSED(pImagedata);
+	return false;
+#else
+
 	core::ReferenceCountedOwner<XTextureFile> image_data(pImagedata, g_textureDataArena);
 	bool res = false;
 	{
@@ -291,11 +296,16 @@ bool XTexture::createTexture(XTextureFile* pImagedata)
 		res = createDeviceTexture(image_data);
 	}
 	return res;
+#endif
 }
 
 
 void XTexture::preProcessImage(core::ReferenceCountedOwner<XTextureFile>& image_data)
 {
+#if 1
+	X_UNUSED(image_data);
+	X_ASSERT_NOT_IMPLEMENTED();
+#else
 	// check if we need to change the format or make it power of 2.
 	if (image_data->pFaces[0] == nullptr)
 		return;
@@ -314,7 +324,7 @@ void XTexture::preProcessImage(core::ReferenceCountedOwner<XTextureFile>& image_
 		{
 			XTextureFile::MipInfo& sub = image_data->SubInfo[i];
 
-			size = get_data_size(width,height, 1, 1, getFormat());
+			size = texture::Util::dataSize(width,height, 1, 1, getFormat());
 
 			sub.pSysMem = &image_data->pFaces[i][Offset];
 			sub.SysMemPitch = get_data_size(width, 1, 1, 1, getFormat());
@@ -328,7 +338,7 @@ void XTexture::preProcessImage(core::ReferenceCountedOwner<XTextureFile>& image_
 		{
 			XTextureFile::MipInfo& sub = image_data->SubInfo[i];
 
-			size = get_data_size(width,
+			size = texture::Util::dataSize(width,
 				height, 1, 1, getFormat());
 
 
@@ -351,8 +361,10 @@ void XTexture::preProcessImage(core::ReferenceCountedOwner<XTextureFile>& image_
 		outPath = "compiled_images/";
 		outPath /= FileName.c_str();
 
-		CI::WriteCIImgAsync(outPath, image_data, g_textureDataArena);
+		X_ASSERT_NOT_IMPLEMENTED();
+	//	CI::WriteCIImgAsync(outPath, image_data, g_textureDataArena);
 	}
+#endif
 }
 
 
@@ -402,6 +414,11 @@ XTexture* XTexture::Create2DTexture(const char* name, const Vec2i& size, size_t 
 
 	pTex = XTexture::NewTexture(name, size, Flags, textureFmt);
 
+#if 1
+	X_UNUSED(numMips);
+	X_UNUSED(Flags);
+	X_UNUSED(pData);
+#else
 	XTextureFile file;
 	file.pFaces[0] = pData;
 	file.depth_ = 1;
@@ -411,13 +428,15 @@ XTexture* XTexture::Create2DTexture(const char* name, const Vec2i& size, size_t 
 	file.flags_ = Flags;
 	file.size_ = size;
 	file.type_ = TextureType::T2D;
-	file.datasize_ = get_data_size(size[0], size[1], 1, 
+	file.datasize_ = texture::Util::dataSize(size[0], size[1], 1,
 		safe_static_cast<uint32_t, size_t>(numMips), textureFmt);
 	file.bDontDelete_ = true;
 	file.addReference();
 
-	if (file.isValid())
+	if (file.isValid()) {
 		pTex->createTexture(&file);
+	}
+#endif
 
 	return pTex;
 }
@@ -437,7 +456,10 @@ XTexture* XTexture::CreateRenderTarget(const char* name, uint32_t width, uint32_
 	pTex = XTexture::NewTexture(name, size, Flags, fmt);
 	X_ASSERT_NOT_NULL(pTex);
 
-	XTextureFile file;
+#if 1
+	X_UNUSED(type);
+#else
+	XTextureFile file(g_textureDataArena);
 	file.pFaces[0] = nullptr;
 	file.depth_ = 1;
 	file.numFaces_ = 1;
@@ -446,16 +468,19 @@ XTexture* XTexture::CreateRenderTarget(const char* name, uint32_t width, uint32_
 	file.flags_ = Flags;
 	file.size_ = size;
 	file.type_ = type;
-	file.datasize_ = get_data_size(size[0], size[1], 1, 1, fmt);
+	file.datasize_ = texture::Util::dataSize(size[0], size[1], 1, 1, fmt);
 	file.bDontDelete_ = true;
 	file.addReference();
 
-	if (file.isValid())
+	if (file.isValid()) {
 		pTex->createTexture(&file);
+	}
 	else
 	{
 		X_ASSERT_UNREACHABLE();
 	}
+#endif
+
 
 #if X_DEBUG
 	// also add a debug name to the RTV
