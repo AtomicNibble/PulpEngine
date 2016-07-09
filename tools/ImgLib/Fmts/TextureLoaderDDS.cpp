@@ -521,7 +521,7 @@ namespace DDS
 
 
 
-			inline uint32_t get_data_size(uint32_t width, uint32_t height, uint32_t depth,
+			inline uint32_t get_data_size(uint32_t width, uint32_t height,
 				uint32_t mips, pixel_format fmt, dxt_format dxFmt)
 			{
 				uint32_t size = 0;
@@ -535,7 +535,6 @@ namespace DDS
 				{
 					width = core::Max(1u, width);
 					height = core::Max(1u, height);
-					depth = core::Max(1u, depth);
 
 					// work out total pixels.
 					if (isDXT)
@@ -546,7 +545,6 @@ namespace DDS
 					// shift
 					width >>= 1;
 					height >>= 1;
-					depth--;
 				}
 
 				return size;
@@ -969,14 +967,13 @@ namespace DDS
 		imgFile.resize();
 
 		uint32_t i, bytes_read;
-		uint32_t total_bytes_per_face = pixel_util::get_data_size(hdr.dwWidth, hdr.dwHeight, 1, num_mip_maps, format, dxt_fmt);
+		uint32_t total_bytes_per_face = pixel_util::get_data_size(hdr.dwWidth, hdr.dwHeight, num_mip_maps, format, dxt_fmt);
 
 
 		// allocate memory / read.
 		// no idear if allocating then reading has any benfits for cube maps.
 		for (i = 0; i < num_faces; i++)
-		{
-		
+		{	
 			bytes_read = safe_static_cast<uint32_t, size_t>(file->read(imgFile.getFace(i), total_bytes_per_face));
 
 			if (bytes_read != total_bytes_per_face)
