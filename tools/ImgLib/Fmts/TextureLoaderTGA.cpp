@@ -157,7 +157,6 @@ bool XTexLoaderTGA::loadTexture(core::XFile* file, XTextureFile& imgFile, core::
 	imgFile.setNumMips(1);
 	imgFile.setType(TextureType::T2D);
 	// allocate memory for all faces / mips.
-	imgFile.resize();
 
 	switch (hdr.PixelDepth)
 	{
@@ -171,6 +170,8 @@ bool XTexLoaderTGA::loadTexture(core::XFile* file, XTextureFile& imgFile, core::
 		imgFile.setFormat(Texturefmt::R8G8B8A8);
 		break;
 	}
+
+	imgFile.resize();
 
 	// read the image data.
 	if (isRle(hdr.ImageType))
