@@ -4,8 +4,9 @@
 #define X_TEXTURE_FILE_H_
 
 #include <ITexture.h>
-
 #include <Containers\Array.h>
+
+#include "TextureUtil.h"
 
 X_NAMESPACE_BEGIN(texture)
 

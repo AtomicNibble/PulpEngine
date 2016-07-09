@@ -27,8 +27,38 @@ X_INLINE XTextureFile::~XTextureFile()
 
 X_INLINE void XTextureFile::resize(void)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
+	// work out the size needed.
+	const uint32_t faceSize = Util::dataSize(size_.x, size_.y, depth_, format_);
+	const uint32_t requiredBytes = faceSize * numFaces_;
 
+	if (depth_ > 1) {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	data_.resize(requiredBytes);
+
+	mipOffsets_[0] = 0;
+	faceOffsets_[0] = 0;
+
+
+	{
+		uint32_t width = core::Max<uint32_t>(1u, size_.x);
+		uint32_t height = core::Max<uint32_t>(1u, size_.y);
+
+		// 0 is higest.
+		for (uint32_t i = 1; i < numMips_; i++)
+		{
+			mipOffsets_[i] = (mipOffsets_[i - 1] + Util::dataSize(width, height, depth_, format_));
+
+			width >>= 1;
+			height >>= 1;
+		}
+	}
+
+	for (uint32_t i = 0; i < numFaces_; i++)
+	{
+
+	}
 }
 
 X_INLINE void XTextureFile::clear(void)
