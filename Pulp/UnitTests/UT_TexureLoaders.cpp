@@ -27,7 +27,6 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path)
 	mode.Set(IFileSys::fileMode::READ);
 	mode.Set(IFileSys::fileMode::RANDOM_ACCESS);
 
-	bool result = false;
 
 	core::XFileScoped file;
 	
@@ -63,12 +62,15 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path)
 					Texturefmt::ToString(texFile.getFormat()),
 					Texturefmt::ToString(fmt),
 					testFolder.c_str());
+
+				return false;
 			}
 
+			return true;
 		}
 	}
 
-	return result;
+	return false;
 }
 
 
