@@ -150,7 +150,6 @@ bool XTexLoaderTGA::loadTexture(core::XFile* file, XTextureFile& imgFile, core::
 
 	uint32_t DataSize = hdr.Width * hdr.Height * (hdr.PixelDepth / 8);
 
-	// pImg->pFaces[0] = X_NEW_ARRAY_ALIGNED(uint8_t, DataSize, g_textureDataArena, "TgaFaceBuffer", 8);
 	imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(hdr.Width));
 	imgFile.setHeigth(safe_static_cast<uint16_t, uint32_t>(hdr.Height));
 	imgFile.setNumFaces(1);
