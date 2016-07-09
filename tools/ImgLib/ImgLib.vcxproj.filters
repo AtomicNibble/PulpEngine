@@ -15,6 +15,9 @@
     <Filter Include="Source Files\Fmts">
       <UniqueIdentifier>{bb08fbc9-612b-4e90-9f5a-c5d30c892cdc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Lib">
+      <UniqueIdentifier>{48127ffc-e9ee-4429-97a2-b27fa56be898}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -43,6 +46,9 @@
     </ClInclude>
     <ClInclude Include="TextureUtil.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImgLib.h">
+      <Filter>Header Files\Lib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

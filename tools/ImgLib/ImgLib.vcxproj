@@ -329,6 +329,7 @@
     <ClInclude Include="Fmts\TextureLoaderPNG.h" />
     <ClInclude Include="Fmts\TextureLoaderPSD.h" />
     <ClInclude Include="Fmts\TextureLoaderTGA.h" />
+    <ClInclude Include="ImgLib.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TextureFile.h" />
     <ClInclude Include="TextureUtil.h" />
