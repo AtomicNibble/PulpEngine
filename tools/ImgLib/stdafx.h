@@ -24,3 +24,15 @@ typedef core::MemoryArena<
 > ImgLibArena;
 
 extern ImgLibArena* g_ImgLibArena;
+
+
+#ifdef _LIB
+#define IMGLIB_EXPORT
+#else
+#ifdef IMG_LIB_EXPORT
+#define IMGLIB_EXPORT X_EXPORT
+#else
+#define IMGLIB_EXPORT X_IMPORT
+#endif // !IMG_LIB_EXPORT
+#endif // _LIB
+
