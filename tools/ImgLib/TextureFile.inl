@@ -26,7 +26,7 @@ X_INLINE XTextureFile::~XTextureFile()
 
 X_INLINE void XTextureFile::resize(void)
 {
-	X_ASSERT(format_ != Texturefmt::UNKNOWN, "format must be set")(fmt);
+	X_ASSERT(format_ != Texturefmt::UNKNOWN, "format must be set")(format_);
 
 	// work out the size needed.
 	const uint32_t faceSize = Util::dataSize(size_.x, size_.y, numMips_, format_);
