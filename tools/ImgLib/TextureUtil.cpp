@@ -174,7 +174,7 @@ namespace Util
 	}
 
 	uint32_t dataSize(uint32_t width, uint32_t height,
-		uint32_t depth, uint32_t mips, Texturefmt::Enum fmt)
+		uint32_t mips, Texturefmt::Enum fmt)
 	{
 		unsigned size = 0;
 		unsigned i;
@@ -192,7 +192,6 @@ namespace Util
 		{
 			width = core::Max(1u, width);
 			height = core::Max(1u, height);
-			depth = core::Max(1u, depth);
 
 			// work out total pixels.
 			if (isDXT)
@@ -206,7 +205,6 @@ namespace Util
 			// shift
 			width >>= 1;
 			height >>= 1;
-			depth--;
 		}
 
 		return size;
