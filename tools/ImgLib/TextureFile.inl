@@ -27,7 +27,7 @@ X_INLINE XTextureFile::~XTextureFile()
 X_INLINE void XTextureFile::resize(void)
 {
 	// work out the size needed.
-	const uint32_t faceSize = Util::dataSize(size_.x, size_.y, depth_, format_);
+	const uint32_t faceSize = Util::dataSize(size_.x, size_.y, numMips_, format_);
 	const uint32_t requiredBytes = faceSize * numFaces_;
 
 	if (depth_ > 1) {
