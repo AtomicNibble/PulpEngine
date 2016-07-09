@@ -94,7 +94,7 @@ bool XRender::LoadResourceDeffintion(void)
 						}
 						else if (strUtil::IsEqualCaseInsen("format", attr->name()))
 						{
-							res.fmt = texture::XTexture::TexFmtFromStr(attr->value());
+							res.fmt = texture::Util::TexFmtFromStr(attr->value());
 							if (res.fmt == texture::Texturefmt::UNKNOWN) {
 								X_ERROR("Render", "render resource format is not valid: %s", attr->value());
 							}
