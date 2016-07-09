@@ -18,10 +18,10 @@ public:
 
 public:
 	// allocatos memory to hold (N mips) * N faces
-	void resize(void);
-	void clear(void);
-	void free(void);
-	const bool isValid(void) const;
+	X_INLINE void resize(void);
+	X_INLINE void clear(void);
+	X_INLINE void free(void);
+	X_INLINE const bool isValid(void) const;
 
 	X_INLINE const Vec2<uint16_t>& getSize(void) const;
 	X_INLINE const int getWidth(void) const;
@@ -47,9 +47,9 @@ public:
 	X_INLINE void setType(TextureType::Enum type);
 	X_INLINE void setFormat(Texturefmt::Enum format);
 
-	void setNumFaces(const int32_t num);
-	void setDepth(const int32_t depth);
-	void setNumMips(const int32_t num);
+	X_INLINE void setNumFaces(const int32_t num);
+	X_INLINE void setDepth(const int32_t depth);
+	X_INLINE void setNumMips(const int32_t num);
 
 	X_NO_COPY(XTextureFile);
 	X_NO_ASSIGN(XTextureFile);
