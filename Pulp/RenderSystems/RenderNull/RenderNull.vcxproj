@@ -342,24 +342,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\Textures\TextureLoaderCI.h" />
-    <ClInclude Include="..\Common\Textures\TextureLoaderDDS.h" />
-    <ClInclude Include="..\Common\Textures\TextureLoaderJPG.h" />
-    <ClInclude Include="..\Common\Textures\TextureLoaderPNG.h" />
-    <ClInclude Include="..\Common\Textures\TextureLoaderPSD.h" />
-    <ClInclude Include="..\Common\Textures\TextureLoaderTGA.h" />
-    <ClInclude Include="..\Common\Textures\XTextureFile.h" />
     <ClInclude Include="RenderNull.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Common\Textures\TextureLoaderCI.cpp" />
-    <ClCompile Include="..\Common\Textures\TextureLoaderDDS.cpp" />
-    <ClCompile Include="..\Common\Textures\TextureLoaderJPG.cpp" />
-    <ClCompile Include="..\Common\Textures\TextureLoaderPNG.cpp" />
-    <ClCompile Include="..\Common\Textures\TextureLoaderPSD.cpp" />
-    <ClCompile Include="..\Common\Textures\TextureLoaderTGA.cpp" />
-    <ClCompile Include="..\Common\Textures\XTextureFile.cpp" />
     <ClCompile Include="RenderNull.cpp" />
     <ClCompile Include="RenderNullLink.cpp" />
     <ClCompile Include="stdafx.cpp">
