@@ -8,7 +8,6 @@
 #include <ITexture.h>
 #include <IConsole.h>
 
-#include "ReaderThread.h"
 #include "Textures\XTexture.h"
 #include "Model\XRenderMesh.h"
 
