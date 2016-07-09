@@ -173,6 +173,36 @@ namespace Util
 		return 0;
 	}
 
+	uint32_t dataSize(uint32_t width, uint32_t height, Texturefmt::Enum fmt)
+	{
+
+		const uint32_t bits_per_pixel = bitsPerPixel(fmt);
+		const bool isDXT = isDxt(fmt);
+
+		uint32_t bytes_per_block = 0;
+		uint32_t size = 0;
+
+		if (isDXT) {
+			bytes_per_block = dxtBytesPerBlock(fmt);
+		}
+
+		width = core::Max(1u, width);
+		height = core::Max(1u, height);
+
+		// work out total pixels.
+		if (isDXT)
+		{
+			// scale to 4x4 pixel blocks.
+			size = core::Max(bytes_per_block, ((width + 3) / 4) * ((height + 3) / 4) * bytes_per_block);
+		}
+		else {
+			size = ((bits_per_pixel * width) * height) / 8;
+		}
+
+		return size;
+	}
+
+
 	uint32_t dataSize(uint32_t width, uint32_t height,
 		uint32_t mips, Texturefmt::Enum fmt)
 	{
