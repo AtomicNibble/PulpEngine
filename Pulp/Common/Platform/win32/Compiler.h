@@ -38,9 +38,12 @@ extern "C" void* _ReturnAddress(void);
 #define X_LINK_LIB(libName)							X_PRAGMA(comment(lib, libName))
 #define X_MULTILINE_MACRO_BEGIN						X_DISABLE_WARNING(4127) do {
 #define X_MULTILINE_MACRO_END						} while (0) X_ENABLE_WARNING(4127)
+#define X_IMPORT									__declspec(dllimport)
+#define X_EXPORT									__declspec(dllexport)
 
 #define X_PATHSEPERATOR_STR							"\\"
 #define X_PATHSEPERATOR_CHAR						'\\'
+
 
 
 #define X_PACK_PUSH(val)							X_PRAGMA(pack(push,val))
