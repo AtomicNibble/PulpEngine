@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "BaseRenderAsset.h"
-#include "../ReaderThread.h"
 #include "../XRender.h"
 
 X_NAMESPACE_BEGIN(render)
@@ -12,6 +11,7 @@ bool XRenderResourceContainer::removeAsset(core::XBaseAsset* pAsset)
 
 	if (XResourceContainer::removeAsset(pAsset))
 	{
+		X_ASSERT_NOT_IMPLEMENTED();
 		/*
 		if (gRenDev && gRenDev->rThread())
 			gRenDev->rThread()->RC_ReleaseBaseResource(pAsset);
