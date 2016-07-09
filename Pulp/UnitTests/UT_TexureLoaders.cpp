@@ -9,16 +9,10 @@
 // hum how to include the loader code.
 // it's part of common Render dll.
 // Umm. #yolo
-#ifdef X_LIB
 
-#include "../RenderSystems/Common/Textures/TextureLoaderDDS.h"
-#include "../RenderSystems/Common/Textures/TextureLoaderTGA.h"
-#include "../RenderSystems/Common/Textures/TextureLoaderPSD.h"
-#include "../RenderSystems/Common/Textures/TextureLoaderJPG.h"
-#include "../RenderSystems/Common/Textures/TextureLoaderPNG.h"
-#include "../RenderSystems/Common/Textures/XTextureFile.h"
+#include <../../tools/ImgLib/ImgLib.h>
 
-// X_LINK_LIB("engine_RenderDx10")
+X_LINK_LIB("engine_ImgLib")
 
 
 X_USING_NAMESPACE;
@@ -49,29 +43,28 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path)
 		EXPECT_TRUE(canLoad);
 		if (canLoad)
 		{
-			texture::XTextureFile* loaded = loader.loadTexture(file.GetFile());
+			texture::XTextureFile texFile(g_arena);
 
-			if (loaded)
-			{
-				const bool isValid = loaded->isValid();
-
-				if (!isValid) {
-					X_ERROR("UT", "TextureFile is not valid");
-					texture::XTextureFile::freeTextureFile(loaded);
-					return false;
-				}
-
-				EXPECT_EQ(fmt, loaded->getFormat());
-				if (fmt != loaded->getFormat()) {
-					X_ERROR("UT", "ReturnFmt: %s ExpectedFmt: %s Path<char>: %s", 
-						Texturefmt::ToString(loaded->getFormat()),
-						Texturefmt::ToString(fmt),
-						testFolder.c_str());
-				}
-
-				texture::XTextureFile::freeTextureFile(loaded);
-				result = true;
+			if (!loader.loadTexture(file.GetFile(), texFile, g_arena)) {
+				X_ERROR("UT", "Failed to load texture");
+				return false;
 			}
+
+			const bool isValid = texFile.isValid();
+
+			if (!isValid) {
+				X_ERROR("UT", "TextureFile is not valid");
+				return false;
+			}
+
+			EXPECT_EQ(fmt, texFile.getFormat());
+			if (fmt != texFile.getFormat()) {
+				X_ERROR("UT", "ReturnFmt: %s ExpectedFmt: %s Path<char>: %s", 
+					Texturefmt::ToString(texFile.getFormat()),
+					Texturefmt::ToString(fmt),
+					testFolder.c_str());
+			}
+
 		}
 	}
 
@@ -82,8 +75,8 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path)
 TEST(DDS, BC7)
 {
 //	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::BC7_UNORM, Path<char>("bc7_froth2_d.dds")));
-	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::BC7_UNORM, Path<char>("bc7_mainudun01_p.dds")));
-	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::BC7_UNORM, Path<char>("bc7_softsquar01_p.dds")));
+	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::BC7, Path<char>("bc7_mainudun01_p.dds")));
+	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::BC7, Path<char>("bc7_softsquar01_p.dds")));
 }
 
 TEST(DDS, ati2)
@@ -155,7 +148,4 @@ TEST(PSD, Load)
 {
 	EXPECT_TRUE(LoadValid<PSD::XTexLoaderPSD>(Texturefmt::A8R8G8B8, Path<char>("test_img_load.psd")));
 }
-
-
-#endif // !X_LIB
 
