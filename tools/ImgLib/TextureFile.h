@@ -25,12 +25,12 @@ public:
 	X_INLINE const bool isValid(void) const;
 
 	X_INLINE const Vec2<uint16_t>& getSize(void) const;
-	X_INLINE const int getWidth(void) const;
-	X_INLINE const int getHeight(void) const;
-	X_INLINE const uint8_t getNumFaces(void) const;
-	X_INLINE const uint8_t getDepth(void) const;
-	X_INLINE const uint8_t getNumMips(void) const;
-	X_INLINE const uint32_t getDataSize(void) const;
+	X_INLINE int32_t getWidth(void) const;
+	X_INLINE int32_t getHeight(void) const;
+	X_INLINE uint8_t getNumFaces(void) const;
+	X_INLINE uint8_t getDepth(void) const;
+	X_INLINE uint8_t getNumMips(void) const;
+	X_INLINE size_t getDataSize(void) const;
 	X_INLINE TextureFlags getFlags(void) const;
 	X_INLINE Texturefmt::Enum getFormat(void) const;
 	X_INLINE TextureType::Enum getType(void) const;
@@ -40,6 +40,8 @@ public:
 
 	X_INLINE const uint8_t* getLevel(size_t face, size_t mip) const;
 	X_INLINE uint8_t* getLevel(size_t face, size_t mip);
+
+	X_INLINE size_t getFaceSize(void) const;
 
 	X_INLINE void setSize(const Vec2<uint16_t> size);
 	X_INLINE void setWidth(const uint16_t width);
@@ -61,7 +63,6 @@ private:
 
 	// 4
 	Vec2<uint16_t>		size_; // 4
-	uint32_t			datasize_; // size of whole image / 1 face.
 	TextureFlags		flags_;
 	TextureType::Enum	type_;
 	Texturefmt::Enum 	format_;

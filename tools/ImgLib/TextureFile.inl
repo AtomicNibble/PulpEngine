@@ -12,7 +12,6 @@ X_INLINE XTextureFile::XTextureFile(core::MemoryArenaBase* arena) :
 	format_ = Texturefmt::UNKNOWN;
 	type_ = TextureType::UNKNOWN;
 
-	datasize_ = 0;
 	numMips_ = 0;
 	depth_ = 0;
 	numFaces_ = 0;
@@ -83,7 +82,7 @@ X_INLINE const bool XTextureFile::isValid(void) const
 	return size_.x > 0 && size_.y > 0 &&
 		depth_ > 0 &&
 		numMips_ > 0 &&
-		datasize_ > 0 &&
+		data_.isNotEmpty() &&
 		numFaces_ > 0 &&
 		format_ != Texturefmt::UNKNOWN &&
 		type_ != TextureType::UNKNOWN;
@@ -94,38 +93,47 @@ X_INLINE const Vec2<uint16_t>& XTextureFile::getSize(void) const
 { 
 	return size_; 
 }
-X_INLINE const int XTextureFile::getWidth(void) const
+
+X_INLINE int32_t XTextureFile::getWidth(void) const
 { 
 	return size_.x; 
 }
-X_INLINE const int XTextureFile::getHeight(void) const
+
+X_INLINE int32_t XTextureFile::getHeight(void) const
 { 
 	return size_.y; 
 }
-X_INLINE const uint8_t XTextureFile::getNumFaces(void) const
+
+X_INLINE uint8_t XTextureFile::getNumFaces(void) const
 { 
 	return numFaces_; 
 }
-X_INLINE const uint8_t XTextureFile::getDepth(void) const
+
+X_INLINE uint8_t XTextureFile::getDepth(void) const
 { 
 	return depth_; 
 }
-X_INLINE const uint8_t XTextureFile::getNumMips(void) const
+
+X_INLINE uint8_t XTextureFile::getNumMips(void) const
 { 
 	return numMips_; 
 }
-X_INLINE const uint32_t XTextureFile::getDataSize(void) const
+
+X_INLINE size_t XTextureFile::getDataSize(void) const
 { 
-	return datasize_; 
+	return data_.size(); 
 }
+
 X_INLINE TextureFlags XTextureFile::getFlags(void) const
 {
 	return flags_; 
 }
+
 X_INLINE Texturefmt::Enum XTextureFile::getFormat(void) const
 { 
 	return format_; 
 }
+
 X_INLINE TextureType::Enum XTextureFile::getType(void) const
 {
 	return type_; 
@@ -150,6 +158,15 @@ X_INLINE const uint8_t* XTextureFile::getLevel(size_t face, size_t mip) const
 X_INLINE uint8_t* XTextureFile::getLevel(size_t face, size_t mip)
 {
 	return data_.ptr() + (faceOffsets_[face] + mipOffsets_[mip]);
+}
+
+X_INLINE size_t XTextureFile::getFaceSize(void) const
+{
+	if (depth_ > 1) {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	return data_.size();
 }
 
 
