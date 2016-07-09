@@ -26,6 +26,14 @@ void XMatrixStack::SetDepth(uint32_t maxDepth)
 	maxDpeth_ = maxDepth;
 }
 
+void XMatrixStack::SetArena(core::MemoryArenaBase* arena)
+{
+	X_ASSERT(pTop_ == nullptr, "Can't set matrix stack arena that has a depth call clear()")(maxDpeth_);
+	X_ASSERT(pStack_ == nullptr, "Can't set matrix stack arena that has a depth call clear()")(maxDpeth_);
+
+	arena_ = arena;
+}
+
 void XMatrixStack::Clear(void)
 {
 	X_DELETE_ARRAY(pStack_, arena_);
@@ -35,7 +43,7 @@ void XMatrixStack::Clear(void)
 	curDpeth_ = 0;
 }
 
-bool XMatrixStack::LoadIdentity()
+bool XMatrixStack::LoadIdentity(void)
 {
 	pTop_->setToIdentity();
 	return true;
@@ -62,7 +70,7 @@ bool XMatrixStack::MultMatrixLocal(const Matrix44f* pMat)
 	return true;
 }
 
-bool XMatrixStack::Pop()
+bool XMatrixStack::Pop(void)
 {
 	if (curDpeth_ == 0) {
 		X_ASSERT(curDpeth_ > 0, "can't pop matrix off stack, none left")(curDpeth_);
@@ -75,7 +83,7 @@ bool XMatrixStack::Pop()
 	return true;
 }
 
-bool XMatrixStack::Push()
+bool XMatrixStack::Push(void)
 {
 	if ((curDpeth_ +1) >= maxDpeth_) {
 		X_ASSERT((curDpeth_+1) < maxDpeth_, "can't push matrix onto stack, at max depth")(curDpeth_, maxDpeth_);

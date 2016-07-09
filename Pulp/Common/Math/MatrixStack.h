@@ -15,23 +15,22 @@ public:
 	~XMatrixStack();
 
 	void SetDepth(uint32_t maxDepth);
+	void SetArena(core::MemoryArenaBase* arena);
 	void Clear(void);
 
-	X_INLINE Matrix44f* GetTop();
+	X_INLINE Matrix44f* GetTop(void);
 
-	bool LoadIdentity();
+	bool LoadIdentity(void);
 	bool LoadMatrix(const Matrix44f* pMat);
 
 	bool MultMatrix(const Matrix44f* pMat);
 	bool MultMatrixLocal(const Matrix44f* pMat);
 
-	bool Pop();
-	bool Push();
+	bool Pop(void);
+	bool Push(void);
 
 	bool RotateAxis(const Vec3f* pV, float32_t Angle);
 	bool RotateAxisLocal(const Vec3f* pV, float32_t Angle);
-//	bool RotateYawPitchRoll();
-//	bool RotateYawPitchRollLocal();
 
 	bool Scale(float yaw, float pitch, float roll);
 	bool ScaleLocal(float yaw, float pitch, float roll);
@@ -53,7 +52,7 @@ private:
 };
 
 
-X_INLINE Matrix44f* XMatrixStack::GetTop()
+X_INLINE Matrix44f* XMatrixStack::GetTop(void)
 {
 	return pTop_;
 }
