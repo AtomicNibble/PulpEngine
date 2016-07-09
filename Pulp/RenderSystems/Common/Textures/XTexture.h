@@ -79,14 +79,7 @@ public:
 	X_INLINE const TextureFlags getFlags() const X_OVERRIDE { return flags; }
 	X_INLINE const Texturefmt::Enum getFormat() const X_OVERRIDE { return format; }
 
-	static bool is_dxt(Texturefmt::Enum fmt);
-	static uint32_t NumMipsMips(uint32_t Width, uint32_t Height);
-	static uint32_t get_bpp(Texturefmt::Enum fmt);
-	static uint32_t get_dxt_bytes_per_block(Texturefmt::Enum fmt);
-	static uint32_t get_data_size(uint32_t width, uint32_t height, uint32_t depth, uint32_t mips, Texturefmt::Enum fmt);
-
 	static DXGI_FORMAT DCGIFormatFromTexFmt(Texturefmt::Enum fmt);
-	static Texturefmt::Enum TexFmtFromStr(const char* pStr);
 
 	static XTexture* FromName(const char *name, TextureFlags Flags);
 	static XTexture *getByID(TexID tex_id);
