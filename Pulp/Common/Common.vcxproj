@@ -165,6 +165,7 @@
     <ClInclude Include="Logging\WritePolicies\LoggerConsoleWritePolicy.h" />
     <ClInclude Include="Logging\WritePolicies\LoggerDebuggerWritePolicy.h" />
     <ClInclude Include="Logging\WritePolicies\LoggerInternalConsoleWritePolicy.h" />
+    <ClInclude Include="Math\MatrixStack.h" />
     <ClInclude Include="Math\VertexFormats.h" />
     <ClInclude Include="Math\XAabb.h" />
     <ClInclude Include="Math\XAlignment.h" />
@@ -473,6 +474,7 @@
       <SmallerTypeCheck Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</SmallerTypeCheck>
     </ClCompile>
     <ClCompile Include="Hashing\xxHash.cpp" />
+    <ClCompile Include="Math\MatrixStack.cpp" />
     <ClCompile Include="Math\XAabb.cpp" />
     <ClCompile Include="Math\XCamera.cpp" />
     <ClCompile Include="Platform\win32\Module.cpp" />

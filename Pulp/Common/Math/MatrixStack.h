@@ -11,7 +11,7 @@
 class XMatrixStack
 {
 public:
-	XMatrixStack();
+	XMatrixStack(core::MemoryArenaBase* arena);
 	~XMatrixStack();
 
 	void SetDepth(uint32_t maxDepth);
@@ -48,6 +48,8 @@ private:
 	Matrix44f* pStack_;
 	uint32_t curDpeth_;
 	uint32_t maxDpeth_;
+
+	core::MemoryArenaBase* arena_;
 };
 
 

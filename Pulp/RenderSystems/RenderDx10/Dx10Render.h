@@ -5,8 +5,6 @@
 #define _X_RENDER_DX10_H_
 
 #include "../Common/XRender.h"
-#include "../Common/VertexFormat.h"
-#include "../Common/MatrixStack.h"
 
 #include "DeviceManager\DeviceManager.h"
 #include <Hashing\Fnva1Hash.h>

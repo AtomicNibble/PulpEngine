@@ -1,13 +1,14 @@
-#include "stdafx.h"
+#include "EngineCommon.h"
 #include "MatrixStack.h"
 
 
 
-XMatrixStack::XMatrixStack() :
+XMatrixStack::XMatrixStack(core::MemoryArenaBase* arena) :
 	curDpeth_(0),
 	maxDpeth_(0),
 	pTop_(nullptr),
-	pStack_(nullptr)
+	pStack_(nullptr),
+	arena_(arena)
 { 
 
 }
@@ -21,13 +22,13 @@ void XMatrixStack::SetDepth(uint32_t maxDepth)
 {
 	Clear();
 
-	pTop_ = pStack_ = X_NEW_ARRAY_ALIGNED(Matrix44f, maxDepth, g_rendererArena, "MatrixStack", X_ALIGN_OF(Matrix44f));
+	pTop_ = pStack_ = X_NEW_ARRAY_ALIGNED(Matrix44f, maxDepth, arena_, "MatrixStack", X_ALIGN_OF(Matrix44f));
 	maxDpeth_ = maxDepth;
 }
 
 void XMatrixStack::Clear(void)
 {
-	X_DELETE_ARRAY(pStack_, g_rendererArena);
+	X_DELETE_ARRAY(pStack_, arena_);
 	pTop_ = nullptr;
 	pStack_ = nullptr;
 	maxDpeth_ = 0;

@@ -398,7 +398,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="..\Common\MatrixStack.h" />
     <ClInclude Include="..\Common\Model\XRenderMesh.h" />
     <ClInclude Include="..\Common\RenderAux.h" />
     <ClInclude Include="..\Common\Resources\BaseRenderAsset.h" />
@@ -417,7 +416,6 @@
     <ClInclude Include="XShaderBin.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\Common\MatrixStack.cpp" />
     <ClCompile Include="..\Common\Model\XRenderMesh.cpp" />
     <ClCompile Include="..\Common\RenderAux.cpp" />
     <ClCompile Include="..\Common\RenderResources.cpp" />

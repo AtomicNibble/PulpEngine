@@ -31,8 +31,9 @@ DX11XRender::DX11XRender()  :
 
 	CurTopology_(D3D_PRIMITIVE_TOPOLOGY_UNDEFINED),
 
-	ViewMat_(),
-	ProMat_(),
+	ViewMat_(nullptr),
+	ProMat_(nullptr),
+
 	BlendStates_(nullptr),
 	RasterStates_(nullptr),
 	DepthStates_(nullptr),

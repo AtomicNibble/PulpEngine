@@ -1114,6 +1114,9 @@
     <ClInclude Include="Math\XViewPort.h">
       <Filter>Headers\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Math\MatrixStack.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1699,6 +1702,9 @@
       <Filter>SourceFiles\Util\win32</Filter>
     </ClCompile>
     <ClCompile Include="Math\XCamera.cpp">
+      <Filter>SourceFiles\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\MatrixStack.cpp">
       <Filter>SourceFiles\Math</Filter>
     </ClCompile>
   </ItemGroup>

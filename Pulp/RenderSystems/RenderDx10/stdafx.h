@@ -25,9 +25,9 @@ X_ENABLE_WARNING(4005)
 
 
 #include <IFont.h>
+#include <Math\MatrixStack.h>
 
 #include "DX10Util.h"
-#include "../Common/MatrixStack.h"
 
 
 // Img Lib
