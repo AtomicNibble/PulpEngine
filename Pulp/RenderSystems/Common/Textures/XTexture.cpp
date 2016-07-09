@@ -1,23 +1,13 @@
 #include "stdafx.h"
 #include "XTexture.h"
 
-#include "TextureLoaderCI.h"
-#include "TextureLoaderDDS.h"
-#include "TextureLoaderJPG.h"
-#include "TextureLoaderPNG.h"
-#include "TextureLoaderPSD.h"
-#include "TextureLoaderTGA.h"
-
-#include "CI_Img.h"
 
 #include "Hashing\Fnva1Hash.h"
 #include "Containers\HashMap.h"
 #include "Util\ReferenceCountedOwner.h"
 
 #include "IFileSys.h"
-#include "XTextureFile.h"
 
-#include "../ReaderThread.h"
 #include "../XRender.h"
 
 #include <IConsole.h>
