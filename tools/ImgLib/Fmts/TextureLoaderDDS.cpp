@@ -503,16 +503,16 @@ namespace DDS
 						case dxt_format::BC6_TYPELESS:
 							return Texturefmt::BC6;
 						case dxt_format::BC6_UF16:
-							return Texturefmt::BC6_UF16;
+							return Texturefmt::BC6;
 						case dxt_format::BC6_SF16:
 							return Texturefmt::BC6_SF16;
 
 						case dxt_format::BC7_TYPELESS:
 							return Texturefmt::BC7;
 						case dxt_format::BC7_UNORM:
-							return Texturefmt::BC7_UNORM;
+							return Texturefmt::BC7;
 						case dxt_format::BC7_UNORM_SRGB:
-							return Texturefmt::BC7_UNORM_SRGB;
+							return Texturefmt::BC7_SRGB;
 					}
 				}
 
