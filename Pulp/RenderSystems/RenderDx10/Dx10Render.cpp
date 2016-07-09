@@ -64,6 +64,9 @@ void DX11XRender::SetArenas(core::MemoryArenaBase* arena)
 	RasterStates_.setArena(arena);
 	DepthStates_.setArena(arena);
 
+	ViewMat_.SetArena(arena);
+	ProMat_.SetArena(arena);
+
 //	for (i = 0; i < shader::VertexFormat::Num; i++)
 //		State_.vertexLayoutDescriptions[i].setArena(arena);
 
