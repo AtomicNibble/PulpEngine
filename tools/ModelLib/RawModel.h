@@ -69,6 +69,7 @@ namespace RawModel
 		bool ReadMaterialCol(core::XLexer& lex, const char* pName, Color& col);
 
 		bool ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut);
+		bool ReadheaderToken(core::XLexer& lex, const char* pName, uint32_t& valOut);
 
 		bool SaveRawModel_Int(ModelDataStrArr& dataArr) const;
 		bool WriteBones(ModelDataStrArr& arr) const;

@@ -67,7 +67,7 @@ namespace RawModel
 	};
 	*/
 
-	typedef int32_t Index;
+	typedef uint32_t Index;
 	typedef Vec3<Index> Face;
 
 	X_ALIGNED_SYMBOL(class TriVert, 64)

@@ -328,7 +328,7 @@ namespace RawModel
 		VERTS
 		TRIS */
 		// read the mesh count.
-		int32_t numVerts, numTris;
+		uint32_t numVerts, numTris;
 
 		if (!lex.ExpectTokenString("MESH")) {
 			X_ERROR("RawModel", "Failed to read 'MESH' token");
@@ -531,6 +531,32 @@ namespace RawModel
 		}
 
 		valOut = token.GetIntValue();
+		return true;
+	}
+
+	bool Model::ReadheaderToken(core::XLexer& lex, const char* pName, uint32_t& valOut)
+	{
+		core::XLexToken token(nullptr, nullptr);
+
+		valOut = 0;
+
+		if (!lex.SkipUntilString(pName)) {
+			X_ERROR("RawModel", "Failed to find '%s' token", pName);
+			return false;
+		}
+
+		// get value
+		if (!lex.ReadToken(token)) {
+			X_ERROR("RawModel", "Failed to read '%s' value", pName);
+			return false;
+		}
+
+		if (token.GetType() != core::TokenType::NUMBER) {
+			X_ERROR("RawModel", "Failed to read '%s' value, it's not of interger type", pName);
+			return false;
+		}
+
+		valOut = static_cast<uint32_t>(token.GetIntValue());
 		return true;
 	}
 
