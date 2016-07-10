@@ -50,6 +50,9 @@
     <ClInclude Include="ImgLib.h">
       <Filter>Header Files\Lib</Filter>
     </ClInclude>
+    <ClInclude Include="Fmts\CI_Img.h">
+      <Filter>Header Files\Fmts</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -81,6 +84,9 @@
     </ClCompile>
     <ClCompile Include="TextureUtil.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Fmts\CIWritter.cpp">
+      <Filter>Source Files\Fmts</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

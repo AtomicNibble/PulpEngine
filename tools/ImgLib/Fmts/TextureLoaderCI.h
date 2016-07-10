@@ -23,6 +23,9 @@ namespace CI
 		virtual bool canLoadFile(const core::Path<char>& path) const X_OVERRIDE;
 		virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_OVERRIDE;
 
+		virtual bool canWrite(void) const X_OVERRIDE { return true; }
+		virtual bool saveTexture(core::XFile* file, const XTextureFile& imgFile) X_OVERRIDE;
+
 		// ~ITextureFmt
 
 	private:

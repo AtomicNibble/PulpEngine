@@ -323,6 +323,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Fmts\CI_Img.h" />
     <ClInclude Include="Fmts\TextureLoaderCI.h" />
     <ClInclude Include="Fmts\TextureLoaderDDS.h" />
     <ClInclude Include="Fmts\TextureLoaderJPG.h" />
@@ -335,6 +336,7 @@
     <ClInclude Include="TextureUtil.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Fmts\CIWritter.cpp" />
     <ClCompile Include="Fmts\TextureLoaderCI.cpp" />
     <ClCompile Include="Fmts\TextureLoaderDDS.cpp" />
     <ClCompile Include="Fmts\TextureLoaderJPG.cpp" />
