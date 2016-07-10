@@ -22,7 +22,8 @@ public:
 		WHITE_VERT_COL,
 		MERGE_MESH,
 		MERGE_VERTS,
-		EXT_WEIGHTS // allow 8 inf per vert.
+		EXT_WEIGHTS, // allow 8 inf per vert.
+		OPTERMIZE_FACES
 	);
 
 	typedef Flags<CompileFlag> CompileFlags;
@@ -227,6 +228,7 @@ private:
 	bool CreateData(void);
 	bool ValidateLodDistances(void);
 	bool SortVerts(void);
+	bool OptermizeFaces(void);
 	bool CreateBindData(void);
 	bool MergVerts(void);
 	bool ScaleModel(void);

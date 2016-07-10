@@ -8,6 +8,8 @@
 #include <IModel.h>
 #include <IMaterial.h>
 
+#include "FaceOptermize.h"
+
 X_DISABLE_WARNING(4702)
 #include <algorithm>
 #include <map>
@@ -980,6 +982,8 @@ bool ModelCompiler::ProcessModel(void)
 	// 3. create the verts in compiledLods_ from tris.
 	// 4. merge verts
 	// 5. sort the verts by bind counts.
+	//		sort the faces
+	//		if not a animated model sort verts for linera access?
 	// 6. create bind data
 	// 7. scale the model.
 	//  - check for collision meshes and move them.
@@ -1014,6 +1018,11 @@ bool ModelCompiler::ProcessModel(void)
 
 	if (!SortVerts()) {
 		X_ERROR("Model", "Failed to sort verts");
+		return false;
+	}
+
+	if (!OptermizeFaces()) {
+		X_ERROR("Model", "Failed to optermize faces");
 		return false;
 	}
 
@@ -1244,6 +1253,38 @@ bool ModelCompiler::SortVerts(void)
 
 	return true;
 }
+
+bool ModelCompiler::OptermizeFaces(void)
+{
+	if (!flags_.IsSet(CompileFlag::OPTERMIZE_FACES)) {
+		return true;
+	}
+
+	FaceOptimize<uint32_t> faceOpt(arena_);
+
+	for (size_t i = 0; i < compiledLods_.size(); i++)
+	{
+		Lod& lod = compiledLods_[i];
+
+		for (size_t x = 0; x < lod.numMeshes(); x++)
+		{
+			Mesh& mesh = lod.meshes_[x];
+			Mesh::FaceArr& faces = mesh.faces_;
+			Mesh::FaceArr tmp(arena_, faces.size());
+
+			if (faces.isEmpty()) {
+				continue;
+			}
+
+			std::memcpy(tmp.data(), faces.data(), faces.size() * sizeof(Mesh::FaceArr::Type));
+
+			faceOpt.OptimizeFaces(&tmp[0][0], faces.size() * 3, &faces[0][0], 64);
+		}
+	}
+
+	return true;
+}
+
 
 bool ModelCompiler::CreateBindData(void)
 {
