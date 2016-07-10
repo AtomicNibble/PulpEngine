@@ -12,7 +12,7 @@ struct SCoreInitParams;
 struct IEngineModule : public IPotatoClass
 {
 	// Retrieve name of the extension module.
-	virtual const char *GetName() X_ABSTRACT;
+	virtual const char* GetName(void) X_ABSTRACT;
 
 	// This is called to initialize the new module.
 	virtual bool Initialize(SCoreGlobals &env, const SCoreInitParams &initParams) X_ABSTRACT;
