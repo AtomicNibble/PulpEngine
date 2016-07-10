@@ -850,25 +850,6 @@ namespace DDS
 			return false;
 		}
 
-		mask_size[0] = core::bitUtil::CountBits(hdr.sPixelFormat.dwRBitMask);
-		mask_size[1] = core::bitUtil::CountBits(hdr.sPixelFormat.dwGBitMask);
-		mask_size[2] = core::bitUtil::CountBits(hdr.sPixelFormat.dwBBitMask);
-		mask_size[3] = core::bitUtil::CountBits(hdr.sPixelFormat.dwAlphaBitMask);
-
-		mask_ofs[0] = core::bitUtil::ScanBitsForward(hdr.sPixelFormat.dwRBitMask);
-		mask_ofs[1] = core::bitUtil::ScanBitsForward(hdr.sPixelFormat.dwGBitMask);
-		mask_ofs[2] = core::bitUtil::ScanBitsForward(hdr.sPixelFormat.dwBBitMask);
-		mask_ofs[3] = core::bitUtil::ScanBitsForward(hdr.sPixelFormat.dwAlphaBitMask);
-
-		if ((hdr.sPixelFormat.dwFlags & DDPF_LUMINANCE) && (!mask_size[0]))
-		{
-			mask_size[0] = hdr.sPixelFormat.dwRGBBitCount >> 3;
-			if (hdr.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS)
-				mask_size[0] /= 2;
-		}
-
-		// do i want todo anything with this mask data, or should i just use it above to work.
-		// out the format.
 
 
 		// map the format
@@ -881,60 +862,79 @@ namespace DDS
 			return false;
 		}
 
-
-		// check mask sizes.
-		if (mapped_format == Texturefmt::A8R8G8B8 || 
-			mapped_format == Texturefmt::R8G8B8)
+		if (core::bitUtil::IsBitFlagSet(hdr.sPixelFormat.dwFlags, DDPF_RGB))
 		{
-			if (mask_size[0] != 8 || mask_size[1] != 8 ||
-				mask_size[2] != 8 || mask_size[3] != 8)
+			mask_size[0] = core::bitUtil::CountBits(hdr.sPixelFormat.dwRBitMask);
+			mask_size[1] = core::bitUtil::CountBits(hdr.sPixelFormat.dwGBitMask);
+			mask_size[2] = core::bitUtil::CountBits(hdr.sPixelFormat.dwBBitMask);
+			mask_size[3] = core::bitUtil::CountBits(hdr.sPixelFormat.dwAlphaBitMask);
+
+			mask_ofs[0] = core::bitUtil::ScanBitsForward(hdr.sPixelFormat.dwRBitMask);
+			mask_ofs[1] = core::bitUtil::ScanBitsForward(hdr.sPixelFormat.dwGBitMask);
+			mask_ofs[2] = core::bitUtil::ScanBitsForward(hdr.sPixelFormat.dwBBitMask);
+			mask_ofs[3] = core::bitUtil::ScanBitsForward(hdr.sPixelFormat.dwAlphaBitMask);
+
+			if ((hdr.sPixelFormat.dwFlags & DDPF_LUMINANCE) && (!mask_size[0]))
 			{
-				bool ValidRGB = (mapped_format == Texturefmt::R8G8B8 && mask_size[3] == 0);
-				if (!ValidRGB)
+				mask_size[0] = hdr.sPixelFormat.dwRGBBitCount >> 3;
+				if (hdr.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS)
+					mask_size[0] /= 2;
+			}
+
+			// check mask sizes.
+			if (mapped_format == Texturefmt::A8R8G8B8 ||
+				mapped_format == Texturefmt::R8G8B8)
+			{
+				if (mask_size[0] != 8 || mask_size[1] != 8 ||
+					mask_size[2] != 8 || mask_size[3] != 8)
 				{
-					X_ERROR("DDSLoader", "Invalid mask sizes expected 8. (%i,%i,%i,%i)",
-						mask_size[0], mask_size[1], mask_size[2], mask_size[3]);
-					return false;
+					bool ValidRGB = (mapped_format == Texturefmt::R8G8B8 && mask_size[3] == 0);
+					if (!ValidRGB)
+					{
+						X_ERROR("DDSLoader", "Invalid mask sizes expected 8. (%i,%i,%i,%i)",
+							mask_size[0], mask_size[1], mask_size[2], mask_size[3]);
+						return false;
+					}
+				}
+
+
+				// check for swizle
+				if (mapped_format == Texturefmt::A8R8G8B8)
+				{
+					if (mask_ofs[0] == 16 && mask_ofs[1] == 8 && mask_ofs[2] == 0
+						&& mask_ofs[3] == 24)
+					{
+						// this is BGRA
+						mapped_format = Texturefmt::B8G8R8A8;
+					}
+					else if (mask_ofs[0] != 0 || mask_ofs[1] != 8 || mask_ofs[2] != 16
+						|| mask_ofs[3] != 24)
+					{
+						// this is not a valid RGBA
+						X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8A8 expected(0,8,16,24) provided(%i,%i,%i,%i)",
+							mask_ofs[0], mask_ofs[1], mask_ofs[2], mask_ofs[3]);
+						return false;
+					}
+				}
+				else if (mapped_format == Texturefmt::R8G8B8)
+				{
+					if (mask_ofs[0] == 16 && mask_ofs[1] == 8 && mask_ofs[2] == 0)
+					{
+						// this is BGR
+						mapped_format = Texturefmt::B8G8R8;
+					}
+					else if (mask_ofs[0] != 0 || mask_ofs[1] == 8 || mask_ofs[2] == 16
+						|| mask_ofs[3] != 24)
+					{
+						// this is not a valid RGB
+						X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8 expected(0,8,16) provided(%i,%i,%i)",
+							mask_ofs[0], mask_ofs[1], mask_ofs[2]);
+						return false;
+					}
 				}
 			}
 
-
-			// check for swizle
-			if (mapped_format == Texturefmt::A8R8G8B8)
-			{
-				if (mask_ofs[0] == 16 && mask_ofs[1] == 8 && mask_ofs[2] == 0
-					&& mask_ofs[3] == 24)
-				{
-					// this is BGRA
-					mapped_format = Texturefmt::B8G8R8A8;
-				}
-				else if (mask_ofs[0] != 0 || mask_ofs[1] != 8 || mask_ofs[2] != 16
-					|| mask_ofs[3] != 24)
-				{
-					// this is not a valid RGBA
-					X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8A8 expected(0,8,16,24) provided(%i,%i,%i,%i)",
-						mask_ofs[0], mask_ofs[1], mask_ofs[2], mask_ofs[3]);
-					return false;
-				}
-			}
-			else if (mapped_format == Texturefmt::R8G8B8)
-			{
-				if (mask_ofs[0] == 16 && mask_ofs[1] == 8 && mask_ofs[2] == 0)
-				{
-					// this is BGR
-					mapped_format = Texturefmt::B8G8R8;
-				}
-				else if (mask_ofs[0] != 0 || mask_ofs[1] == 8 || mask_ofs[2] == 16
-					|| mask_ofs[3] != 24)
-				{
-					// this is not a valid RGB
-					X_ERROR("DDSLoader", "Invalid pixel offsets for R8G8B8 expected(0,8,16) provided(%i,%i,%i)",
-						mask_ofs[0], mask_ofs[1], mask_ofs[2]);
-					return false;
-				}
-			}
 		}
-
 
 		// load the image data.
 		TextureFlags flags;
