@@ -7,9 +7,6 @@
 #include <IRender.h>
 
 
-
-
-
 X_DISABLE_WARNING(4005)
 
 
@@ -21,3 +18,13 @@ X_ENABLE_WARNING(4005)
 
 
 X_LINK_LIB("D3D12.lib")
+
+
+
+// Img Lib
+#include <../../tools/ImgLib/ImgLib.h>
+
+X_LINK_LIB("engine_ImgLib");
+
+extern core::MemoryArenaBase* g_rendererArena;
+extern core::MemoryArenaBase* g_textureDataArena;
