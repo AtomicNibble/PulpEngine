@@ -1278,7 +1278,7 @@ bool ModelCompiler::OptermizeFaces(void)
 
 			std::memcpy(tmp.data(), faces.data(), faces.size() * sizeof(Mesh::FaceArr::Type));
 
-			faceOpt.OptimizeFaces(&tmp[0][0], faces.size() * 3, &faces[0][0], 64);
+			faceOpt.OptimizeFaces(&tmp[0][0], faces.size() * 3, &faces[0][0], 32);
 		}
 	}
 
