@@ -56,9 +56,10 @@ X_INLINE void XTextureFile::resize(void)
 		}
 	}
 
-	for (uint32_t i = 0; i < numFaces_; i++)
+	const uint32_t facesize = safe_static_cast<uint32_t, size_t>(getFaceSize());
+	for (uint32_t i = 1; i < numFaces_; i++)
 	{
-
+		faceOffsets_[i] = faceOffsets_[i - 1] + facesize;
 	}
 }
 
@@ -168,7 +169,9 @@ X_INLINE size_t XTextureFile::getFaceSize(void) const
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
-	return data_.size();
+	// devide by zero.
+	X_ASSERT(numFaces_ > 0, "Face count must be greater than 1")(numFaces_);
+	return data_.size() / numFaces_;
 }
 
 
