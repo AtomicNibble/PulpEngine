@@ -1,0 +1,75 @@
+#pragma once
+
+
+X_NAMESPACE_BEGIN(model)
+
+template <typename IndexType>
+class FaceOptimize
+{
+	static const uint32_t MAX_VERTEX_CACHE_SIZE = 64;
+	static const uint32_t MAX_PRECOMPUTED_VERTEX_VALENCE_SCORES = 64;
+
+
+	struct OptimizeVertexData
+	{
+		OptimizeVertexData();
+
+		float32_t	score;
+		uint32_t    activeFaceListStart;
+		uint32_t    activeFaceListSize;
+		IndexType	cachePos0;
+		IndexType	cachePos1;
+	};
+
+	template <typename T>
+	struct IndexSortCompareIndexed
+	{
+		IndexSortCompareIndexed(const IndexType* pIndexData);
+
+		bool operator()(T a, T b) const;
+
+		const IndexType* pIndexData_;
+	};
+
+	template <typename T>
+	struct FaceValenceSort
+	{
+		FaceValenceSort(const OptimizeVertexData* pVertexData);
+
+		bool operator()(T a, T b) const;
+
+		const OptimizeVertexData* pVertexData_;
+	};
+
+
+public:
+	FaceOptimize(core::MemoryArenaBase* arena);
+	~FaceOptimize() = default;
+
+	bool OptimizeFaces(const IndexType* indexList, uint32_t indexCount, IndexType* newIndexList, uint16_t lruCacheSize);
+
+
+private:
+	bool ComputeVertexScores(void);
+
+	float32_t FindVertexScore(uint32_t numActiveFaces, uint32_t cachePosition, uint32_t vertexCacheSize);
+
+	X_INLINE float32_t FindVertexCacheScore(uint32_t cachePosition, uint32_t maxSizeVertexCache);
+	X_INLINE float32_t FindVertexValenceScore(uint32_t numActiveTris);
+
+	static float32_t ComputeVertexCacheScore(int cachePosition, uint32_t vertexCacheSize);
+	static float32_t ComputeVertexValenceScore(uint32_t numActiveFaces);
+
+private:
+	float32_t vertexCacheScores_[MAX_VERTEX_CACHE_SIZE + 1][MAX_VERTEX_CACHE_SIZE];
+	float32_t vertexValenceScores_[MAX_PRECOMPUTED_VERTEX_VALENCE_SCORES];
+
+	core::MemoryArenaBase* arena_;
+};
+
+
+template class FaceOptimize<uint16_t>;
+template class FaceOptimize<uint32_t>;
+
+
+X_NAMESPACE_END

@@ -44,6 +44,9 @@
     <ClInclude Include="ModelSkeleton.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="FaceOptermize.h">
+      <Filter>Header Files\model</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -69,6 +72,9 @@
     </ClCompile>
     <ClCompile Include="ModelSkeleton.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FaceOptermize.cpp">
+      <Filter>Source Files\model</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
