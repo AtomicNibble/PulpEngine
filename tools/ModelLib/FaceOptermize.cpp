@@ -8,6 +8,17 @@ X_NAMESPACE_BEGIN(model)
 
 
 template <typename IndexType>
+const float32_t FaceOptimize<IndexType>::FindVertexScore_CacheDecayPower = 1.5f;
+template <typename IndexType>
+const float32_t FaceOptimize<IndexType>::FindVertexScore_LastTriScore = 0.75f;
+template <typename IndexType>
+const float32_t FaceOptimize<IndexType>::FindVertexScore_ValenceBoostScale = 2.0f;
+template <typename IndexType>
+const float32_t FaceOptimize<IndexType>::FindVertexScore_ValenceBoostPower = 0.5f;
+
+
+
+template <typename IndexType>
 FaceOptimize<IndexType>::OptimizeVertexData::OptimizeVertexData() : 
 	score(0.f),
 	activeFaceListStart(0), 
@@ -399,9 +410,6 @@ X_INLINE float32_t FaceOptimize<IndexType>::FindVertexValenceScore(uint32_t numA
 template <typename IndexType>
 float32_t FaceOptimize<IndexType>::ComputeVertexCacheScore(int cachePosition, uint32_t vertexCacheSize)
 {
-	const float32_t FindVertexScore_CacheDecayPower = 1.5f;
-	const float32_t FindVertexScore_LastTriScore = 0.75f;
-
 	float32_t score = 0.0f;
 	if (cachePosition < 0)
 	{
@@ -434,9 +442,6 @@ float32_t FaceOptimize<IndexType>::ComputeVertexCacheScore(int cachePosition, ui
 template <typename IndexType>
 float32_t FaceOptimize<IndexType>::ComputeVertexValenceScore(uint32_t numActiveFaces)
 {
-	const float32_t FindVertexScore_ValenceBoostScale = 2.0f;
-	const float32_t FindVertexScore_ValenceBoostPower = 0.5f;
-
 	float32_t score = 0.f;
 
 	// Bonus points for having a low number of tris still to

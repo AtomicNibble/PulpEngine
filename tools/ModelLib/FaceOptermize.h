@@ -9,6 +9,10 @@ class FaceOptimize
 	static const uint32_t MAX_VERTEX_CACHE_SIZE = 64;
 	static const uint32_t MAX_PRECOMPUTED_VERTEX_VALENCE_SCORES = 64;
 
+	static const float32_t FindVertexScore_CacheDecayPower;
+	static const float32_t FindVertexScore_LastTriScore;
+	static const float32_t FindVertexScore_ValenceBoostScale;
+	static const float32_t FindVertexScore_ValenceBoostPower;
 
 	struct OptimizeVertexData
 	{
