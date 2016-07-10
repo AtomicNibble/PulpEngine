@@ -83,10 +83,10 @@ FaceOptimize<IndexType>::FaceOptimize(core::MemoryArenaBase* arena) :
 }
 
 template <typename IndexType>
-bool FaceOptimize<IndexType>::OptimizeFaces(const IndexType* indexList, uint32_t indexCount, 
+bool FaceOptimize<IndexType>::OptimizeFaces(const IndexType* indexList, size_t indexCount_,
 	IndexType* newIndexList, uint16_t lruCacheSize)
 {
-	if ((indexCount % 3) != 0) {
+	if ((indexCount_ % 3) != 0) {
 		X_ERROR("FaceOptimize", "index count must be a multiple of 3");
 		return false;
 	}
@@ -95,12 +95,12 @@ bool FaceOptimize<IndexType>::OptimizeFaces(const IndexType* indexList, uint32_t
 		return false;
 	}
 
+	const uint32_t indexCount = safe_static_cast<uint32_t, size_t>(indexCount_);
+	const uint32_t faceCount = (indexCount / 3);
 
 	core::Array<OptimizeVertexData> vertexDataList(arena_, indexCount);
 	core::Array<IndexType> vertexRemap(arena_, indexCount);
 	core::Array<uint32_t> activeFaceList(arena_, indexCount);
-
-	const uint32_t faceCount = (indexCount / 3);
 
 	core::Array<uint8_t> processedFaceList(arena_, faceCount);
 	core::Array<uint32_t> faceSorted(arena_, faceCount);

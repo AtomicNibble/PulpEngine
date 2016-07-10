@@ -46,7 +46,7 @@ public:
 	FaceOptimize(core::MemoryArenaBase* arena);
 	~FaceOptimize() = default;
 
-	bool OptimizeFaces(const IndexType* indexList, uint32_t indexCount, IndexType* newIndexList, uint16_t lruCacheSize);
+	bool OptimizeFaces(const IndexType* indexList, size_t indexCount, IndexType* newIndexList, uint16_t lruCacheSize);
 
 
 private:
