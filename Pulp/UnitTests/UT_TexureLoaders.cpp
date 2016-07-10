@@ -123,6 +123,13 @@ TEST(DDS, dxt5)
 	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::BC3, Path<char>("test_img_load_dxt5_nomips.dds")));
 }
 
+
+TEST(DDS, Cube)
+{
+	EXPECT_TRUE(LoadValid<DDS::XTexLoaderDDS>(Texturefmt::B8G8R8A8, Path<char>("skybox_sky_cube.dds")));
+}
+
+
 TEST(DDS, LoadBroken)
 {
 	X_LOG0("DDS", "Expect incorrect mip map count");
