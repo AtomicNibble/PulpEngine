@@ -309,17 +309,6 @@ struct ITexture
 
 class XTextureFile;
 
-// Interface for a texture loader.
-// allows me to add / remove diffrent texture loaders with ease.
-struct ITextureLoader
-{
-	virtual ~ITextureLoader() {}
-
-	virtual bool canLoadFile(const core::Path<char>& path) const X_ABSTRACT;
-	virtual XTextureFile* loadTexture(core::XFile* file) X_ABSTRACT;
-};
-
-
 struct ITextureFmt
 {
 	virtual ~ITextureFmt() {}
