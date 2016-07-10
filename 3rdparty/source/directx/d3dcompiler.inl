@@ -21,21 +21,21 @@
 //----------------------------------------------------------------------------
 
 FORCEINLINE HRESULT
-D3D11Reflect(_In_reads_bytes_(SrcDataSize) LPCVOID pSrcData,
+D3D12Reflect(_In_reads_bytes_(SrcDataSize) LPCVOID pSrcData,
              _In_ SIZE_T SrcDataSize,
              _Out_ ID3D11ShaderReflection** ppReflector)
 {
     return D3DReflect(pSrcData, SrcDataSize,
-                      IID_ID3D11ShaderReflection, (void**)ppReflector);
+                      IID_ID3D12ShaderReflection, (void**)ppReflector);
 }
 
 FORCEINLINE HRESULT
-D3D11ReflectLibrary(_In_reads_bytes_(SrcDataSize) LPCVOID pSrcData,
+D3D12ReflectLibrary(_In_reads_bytes_(SrcDataSize) LPCVOID pSrcData,
                     _In_ SIZE_T SrcDataSize,
-                    _Out_ ID3D11LibraryReflection ** ppReflector)
+                    _Out_ ID3D12LibraryReflection ** ppReflector)
 {
     return D3DReflectLibrary(pSrcData, SrcDataSize,
-                             IID_ID3D11LibraryReflection, (void**)ppReflector);
+                             IID_ID3D12LibraryReflection, (void**)ppReflector);
 }
 
 #endif // #ifndef __D3DCOMPILER_INL__

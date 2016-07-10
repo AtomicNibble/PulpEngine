@@ -13,6 +13,7 @@ import "ocidl.idl";
 import "dxgi.idl";
 import "d3dcommon.idl";
 
+
 // NOTE: The following constants are generated from the D3D11 hardware spec.  Do not edit these values directly.
 cpp_quote( "#ifndef _D3D11_CONSTANTS" )
 cpp_quote( "#define _D3D11_CONSTANTS" )
@@ -395,6 +396,7 @@ cpp_quote( "#define _D3D11_2_CONSTANTS" )
 const UINT D3D11_2_TILED_RESOURCE_TILE_SIZE_IN_BYTES = 65536;
 cpp_quote( "#endif" )
 
+
 const UINT _FACD3D11 = 0x87c;
 const UINT _FACD3D11DEBUG = _FACD3D11 + 1;
 
@@ -479,6 +481,23 @@ cpp_quote( "inline bool operator!=( const D3D11_VIEWPORT& l, const D3D11_VIEWPOR
 cpp_quote( "{ return !( l == r ); }" )
 cpp_quote( "extern \"C\"{" )
 cpp_quote( "#endif" )
+
+typedef struct D3D11_DRAW_INSTANCED_INDIRECT_ARGS 
+{ 
+    UINT VertexCountPerInstance; 
+    UINT InstanceCount; 
+    UINT StartVertexLocation; 
+    UINT StartInstanceLocation; 
+} D3D11_DRAW_INSTANCED_INDIRECT_ARGS; 
+
+typedef struct D3D11_DRAW_INDEXED_INSTANCED_INDIRECT_ARGS 
+{ 
+    UINT IndexCountPerInstance; 
+    UINT InstanceCount; 
+    UINT StartIndexLocation; 
+    INT BaseVertexLocation; 
+    UINT StartInstanceLocation; 
+} D3D11_DRAW_INDEXED_INSTANCED_INDIRECT_ARGS; 
 
 typedef enum D3D11_RESOURCE_DIMENSION
 {
@@ -572,6 +591,7 @@ typedef enum D3D11_RESOURCE_MISC_FLAG
     D3D11_RESOURCE_MISC_GUARDED                         = 0x00008000L,
     D3D11_RESOURCE_MISC_TILE_POOL                       = 0x00020000L,
     D3D11_RESOURCE_MISC_TILED                           = 0x00040000L,
+    D3D11_RESOURCE_MISC_HW_PROTECTED                    = 0x00080000L,
 } D3D11_RESOURCE_MISC_FLAG;
 
 typedef enum D3D11_MAP // for calling ID3D11Resource::Map()
@@ -696,7 +716,7 @@ interface ID3D11ClassLinkage;
 interface ID3D11DeviceChild
     : IUnknown
 {
-    void GetDevice( [annotation("_Out_")] ID3D11Device** ppDevice );
+    void GetDevice( [annotation("_Outptr_")] ID3D11Device** ppDevice );
     HRESULT GetPrivateData(
         [annotation("_In_")] REFGUID guid,
         [annotation("_Inout_")] UINT* pDataSize,
@@ -1064,7 +1084,7 @@ typedef struct D3D11_BUFFER_DESC
     UINT ByteWidth;
     D3D11_USAGE Usage;
     UINT BindFlags;
-    UINT CPUAccessFlags;
+    UINT CPUAccessFlags;    
     UINT MiscFlags;
     UINT StructureByteStride; // Stride of Structured Buffer; ignored if STRUCTURED MiscFlag not set
 } D3D11_BUFFER_DESC;
@@ -1119,7 +1139,7 @@ typedef struct D3D11_TEXTURE1D_DESC
     DXGI_FORMAT Format;
     D3D11_USAGE Usage;
     UINT BindFlags;
-    UINT CPUAccessFlags;
+    UINT CPUAccessFlags;    
     UINT MiscFlags;
 } D3D11_TEXTURE1D_DESC;
 
@@ -1179,7 +1199,7 @@ typedef struct D3D11_TEXTURE2D_DESC
     DXGI_SAMPLE_DESC SampleDesc;
     D3D11_USAGE Usage;
     UINT BindFlags;
-    UINT CPUAccessFlags;
+    UINT CPUAccessFlags;    
     UINT MiscFlags;
 } D3D11_TEXTURE2D_DESC;
 
@@ -1242,9 +1262,9 @@ typedef struct D3D11_TEXTURE3D_DESC
     UINT Depth;
     UINT MipLevels;
     DXGI_FORMAT Format;
-    D3D11_USAGE Usage;
+    D3D11_USAGE Usage;    
     UINT BindFlags;
-    UINT CPUAccessFlags;
+    UINT CPUAccessFlags;    
     UINT MiscFlags;
 } D3D11_TEXTURE3D_DESC;
 
@@ -1311,7 +1331,7 @@ typedef enum D3D11_TEXTURECUBE_FACE
 interface ID3D11View
     : ID3D11DeviceChild
 {
-    void GetResource( [annotation("_Out_")] ID3D11Resource** ppResource );
+    void GetResource( [annotation("_Outptr_")] ID3D11Resource** ppResource );
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -2806,6 +2826,7 @@ typedef enum D3D11_FORMAT_SUPPORT2
     D3D11_FORMAT_SUPPORT2_OUTPUT_MERGER_LOGIC_OP                            = 0x00000100,
     D3D11_FORMAT_SUPPORT2_TILED                                             = 0x00000200,
     D3D11_FORMAT_SUPPORT2_SHAREABLE                                         = 0x00000400,
+    D3D11_FORMAT_SUPPORT2_MULTIPLANE_OVERLAY                                = 0x00004000,
 } D3D11_FORMAT_SUPPORT2;
 
 
@@ -3008,7 +3029,7 @@ interface ID3D11ClassInstance
     : ID3D11DeviceChild
 {
     void GetClassLinkage(
-        [annotation("_Out_")] ID3D11ClassLinkage** ppLinkage);
+        [annotation("_Outptr_")] ID3D11ClassLinkage** ppLinkage);
     void GetDesc(
         [annotation("_Out_")] D3D11_CLASS_INSTANCE_DESC* pDesc);
     void GetInstanceName(
@@ -3030,7 +3051,7 @@ interface ID3D11ClassLinkage
     HRESULT GetClassInstance(
         [annotation("_In_")] LPCSTR pClassInstanceName,
         [annotation("_In_")] UINT InstanceIndex,
-        [annotation("_Out_")] ID3D11ClassInstance** ppInstance);
+        [annotation("_COM_Outptr_")] ID3D11ClassInstance** ppInstance);
 
     // Create a class instance reference that is the combination of a class
     // type and the location of the data to use for the class instance
@@ -3042,7 +3063,7 @@ interface ID3D11ClassLinkage
         [annotation("_In_")] UINT ConstantVectorOffset,
         [annotation("_In_")] UINT TextureOffset,
         [annotation("_In_")] UINT SamplerOffset,
-        [annotation("_Out_")] ID3D11ClassInstance** ppInstance);
+        [annotation("_COM_Outptr_")] ID3D11ClassInstance** ppInstance);
 };
 
 [ uuid( a24bc4d1-769e-43f7-8013-98ff566c18e2 ), object, local, pointer_default( unique ) ]
@@ -3068,6 +3089,9 @@ typedef enum D3D11_FEATURE
     D3D11_FEATURE_D3D9_SIMPLE_INSTANCING_SUPPORT, /* D3D11_FEATURE_DATA_D3D9_SIMPLE_INSTANCING_SUPPORT */
     D3D11_FEATURE_MARKER_SUPPORT, /* D3D11_FEATURE_DATA_MARKER_SUPPORT */
     D3D11_FEATURE_D3D9_OPTIONS1, /* D3D11_FEATURE_DATA_D3D9_OPTIONS1 */
+    D3D11_FEATURE_D3D11_OPTIONS2, /* D3D11_FEATURE_DATA_D3D11_OPTIONS2 */
+    D3D11_FEATURE_D3D11_OPTIONS3, /* D3D11_FEATURE_DATA_D3D11_OPTIONS3 */
+    D3D11_FEATURE_GPU_VIRTUAL_ADDRESS_SUPPORT, /* D3D11_FEATURE_DATA_GPU_VIRTUAL_ADDRESS_SUPPORT */
 } D3D11_FEATURE;
 
 typedef struct D3D11_FEATURE_DATA_THREADING
@@ -3167,6 +3191,7 @@ typedef enum D3D11_TILED_RESOURCES_TIER
     D3D11_TILED_RESOURCES_NOT_SUPPORTED = 0,
     D3D11_TILED_RESOURCES_TIER_1 = 1,
     D3D11_TILED_RESOURCES_TIER_2 = 2,
+    D3D11_TILED_RESOURCES_TIER_3 = 3,
 } D3D11_TILED_RESOURCES_TIER;
 
 typedef struct D3D11_FEATURE_DATA_D3D11_OPTIONS1
@@ -3194,6 +3219,38 @@ typedef struct D3D11_FEATURE_DATA_D3D9_OPTIONS1
     BOOL SimpleInstancingSupported;
     BOOL TextureCubeFaceRenderTargetWithNonCubeDepthStencilSupported;
 } D3D11_FEATURE_DATA_D3D9_OPTIONS1;
+
+typedef enum D3D11_CONSERVATIVE_RASTERIZATION_TIER { 
+  D3D11_CONSERVATIVE_RASTERIZATION_NOT_SUPPORTED  = 0,
+  D3D11_CONSERVATIVE_RASTERIZATION_TIER_1         = 1,
+  D3D11_CONSERVATIVE_RASTERIZATION_TIER_2         = 2,
+  D3D11_CONSERVATIVE_RASTERIZATION_TIER_3         = 3,
+} D3D11_CONSERVATIVE_RASTERIZATION_TIER;
+
+
+typedef struct D3D11_FEATURE_DATA_D3D11_OPTIONS2
+{    
+    BOOL PSSpecifiedStencilRefSupported;
+    BOOL TypedUAVLoadAdditionalFormats;
+    BOOL ROVsSupported;
+    D3D11_CONSERVATIVE_RASTERIZATION_TIER ConservativeRasterizationTier;
+    D3D11_TILED_RESOURCES_TIER TiledResourcesTier;
+    BOOL MapOnDefaultTextures;
+    BOOL StandardSwizzle;
+    BOOL UnifiedMemoryArchitecture;
+} D3D11_FEATURE_DATA_D3D11_OPTIONS2;
+
+
+typedef struct D3D11_FEATURE_DATA_D3D11_OPTIONS3
+{    
+    BOOL VPAndRTArrayIndexFromAnyShaderFeedingRasterizer;
+} D3D11_FEATURE_DATA_D3D11_OPTIONS3;
+
+typedef struct D3D11_FEATURE_DATA_GPU_VIRTUAL_ADDRESS_SUPPORT
+{
+    UINT MaxGPUVirtualAddressBitsPerResource;
+    UINT MaxGPUVirtualAddressBitsPerProcess;
+} D3D11_FEATURE_DATA_GPU_VIRTUAL_ADDRESS_SUPPORT;
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -3239,7 +3296,7 @@ interface ID3D11DeviceContext
         [annotation("_In_")] UINT Subresource,
         [annotation("_In_")] D3D11_MAP MapType,
         [annotation("_In_")] UINT MapFlags,
-        [annotation("_Out_")] D3D11_MAPPED_SUBRESOURCE* pMappedResource );
+        [annotation("_Out_opt_")] D3D11_MAPPED_SUBRESOURCE* pMappedResource );
     void Unmap(
         [annotation("_In_")] ID3D11Resource* pResource,
         [annotation("_In_")] UINT Subresource );
@@ -3465,7 +3522,7 @@ interface ID3D11DeviceContext
         [annotation("_In_range_( 0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT - StartSlot )")] UINT NumViews,
         [annotation("_Out_writes_opt_(NumViews)")] ID3D11ShaderResourceView** ppShaderResourceViews );
     void PSGetShader(
-        [annotation("_Out_")] ID3D11PixelShader** ppPixelShader,
+        [annotation("_Outptr_result_maybenull_")] ID3D11PixelShader** ppPixelShader,
         [annotation("_Out_writes_opt_(*pNumClassInstances)")] ID3D11ClassInstance** ppClassInstances,
         [annotation("_Inout_opt_")] UINT* pNumClassInstances);
     void PSGetSamplers(
@@ -3473,14 +3530,14 @@ interface ID3D11DeviceContext
         [annotation("_In_range_( 0, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT - StartSlot )")] UINT NumSamplers,
         [annotation("_Out_writes_opt_(NumSamplers)")] ID3D11SamplerState** ppSamplers );
     void VSGetShader(
-        [annotation("_Out_")] ID3D11VertexShader** ppVertexShader,
+        [annotation("_Outptr_result_maybenull_")] ID3D11VertexShader** ppVertexShader,
         [annotation("_Out_writes_opt_(*pNumClassInstances)")] ID3D11ClassInstance** ppClassInstances,
         [annotation("_Inout_opt_")] UINT* pNumClassInstances);
     void PSGetConstantBuffers(
         [annotation("_In_range_( 0, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT - 1 )")] UINT StartSlot,
         [annotation("_In_range_( 0, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT - StartSlot )")] UINT NumBuffers,
         [annotation("_Out_writes_opt_(NumBuffers)")] ID3D11Buffer** ppConstantBuffers );
-    void IAGetInputLayout( [annotation("_Out_")] ID3D11InputLayout** ppInputLayout );
+    void IAGetInputLayout( [annotation("_Outptr_result_maybenull_")] ID3D11InputLayout** ppInputLayout );
     void IAGetVertexBuffers(
         [annotation("_In_range_( 0, D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT - 1 )")] UINT StartSlot,
         [annotation("_In_range_( 0, D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT - StartSlot )")] UINT NumBuffers,
@@ -3488,7 +3545,7 @@ interface ID3D11DeviceContext
         [annotation("_Out_writes_opt_(NumBuffers)")] UINT* pStrides,
         [annotation("_Out_writes_opt_(NumBuffers)")] UINT* pOffsets );
     void IAGetIndexBuffer(
-        [annotation("_Out_opt_")] ID3D11Buffer** pIndexBuffer,
+        [annotation("_Outptr_opt_result_maybenull_")] ID3D11Buffer** pIndexBuffer,
         [annotation("_Out_opt_")] DXGI_FORMAT* Format,
         [annotation("_Out_opt_")] UINT* Offset );
     void GSGetConstantBuffers(
@@ -3496,7 +3553,7 @@ interface ID3D11DeviceContext
         [annotation("_In_range_( 0, D3D11_COMMONSHADER_CONSTANT_BUFFER_API_SLOT_COUNT - StartSlot )")] UINT NumBuffers,
         [annotation("_Out_writes_opt_(NumBuffers)")] ID3D11Buffer** ppConstantBuffers );
     void GSGetShader(
-        [annotation("_Out_")] ID3D11GeometryShader** ppGeometryShader,
+        [annotation("_Outptr_result_maybenull_")] ID3D11GeometryShader** ppGeometryShader,
         [annotation("_Out_writes_opt_(*pNumClassInstances)")] ID3D11ClassInstance** ppClassInstances,
         [annotation("_Inout_opt_")] UINT* pNumClassInstances);
     void IAGetPrimitiveTopology( [annotation("_Out_")] D3D11_PRIMITIVE_TOPOLOGY* pTopology );
@@ -3509,7 +3566,7 @@ interface ID3D11DeviceContext
         [annotation("_In_range_( 0, D3D11_COMMONSHADER_SAMPLER_SLOT_COUNT - StartSlot )")] UINT NumSamplers,
         [annotation("_Out_writes_opt_(NumSamplers)")] ID3D11SamplerState** ppSamplers );
     void GetPredication(
-        [annotation("_Out_opt_")] ID3D11Predicate** ppPredicate,
+        [annotation("_Outptr_opt_result_maybenull_")] ID3D11Predicate** ppPredicate,
         [annotation("_Out_opt_")] BOOL* pPredicateValue );
     void GSGetShaderResources(
         [annotation("_In_range_( 0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT - 1 )")] UINT StartSlot,
@@ -3522,25 +3579,25 @@ interface ID3D11DeviceContext
     void OMGetRenderTargets(
         [annotation("_In_range_( 0, D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT )")] UINT NumViews,
         [annotation("_Out_writes_opt_(NumViews)")] ID3D11RenderTargetView** ppRenderTargetViews,
-        [annotation("_Out_opt_")] ID3D11DepthStencilView** ppDepthStencilView );
+        [annotation("_Outptr_opt_result_maybenull_")] ID3D11DepthStencilView** ppDepthStencilView );
     void OMGetRenderTargetsAndUnorderedAccessViews(
         [annotation("_In_range_( 0, D3D11_SIMULTANEOUS_RENDER_TARGET_COUNT )")] UINT NumRTVs,
         [annotation("_Out_writes_opt_(NumRTVs)")] ID3D11RenderTargetView** ppRenderTargetViews,
-        [annotation("_Out_opt_")] ID3D11DepthStencilView** ppDepthStencilView,
+        [annotation("_Outptr_opt_result_maybenull_")] ID3D11DepthStencilView** ppDepthStencilView,
         [annotation("_In_range_( 0, D3D11_PS_CS_UAV_REGISTER_COUNT - 1 )")] UINT UAVStartSlot,
         [annotation("_In_range_( 0, D3D11_PS_CS_UAV_REGISTER_COUNT - UAVStartSlot )")] UINT NumUAVs,
         [annotation("_Out_writes_opt_(NumUAVs)")] ID3D11UnorderedAccessView** ppUnorderedAccessViews );
     void OMGetBlendState( 
-        [annotation("_Out_opt_")] ID3D11BlendState** ppBlendState,
+        [annotation("_Outptr_opt_result_maybenull_")] ID3D11BlendState** ppBlendState,
         [annotation("_Out_opt_")] FLOAT BlendFactor[ 4 ], //4
-        [annotation("_Out_opt_")] UINT* pSampleMask );
+        [annotation("_Out_opt_")] UINT* pSampleMask);
     void OMGetDepthStencilState(
-        [annotation("_Out_opt_")] ID3D11DepthStencilState** ppDepthStencilState,
+        [annotation("_Outptr_opt_result_maybenull_")] ID3D11DepthStencilState** ppDepthStencilState,
         [annotation("_Out_opt_")] UINT* pStencilRef );
     void SOGetTargets(
         [annotation("_In_range_( 0, D3D11_SO_BUFFER_SLOT_COUNT )")] UINT NumBuffers,
         [annotation("_Out_writes_opt_(NumBuffers)")] ID3D11Buffer** ppSOTargets );
-    void RSGetState( [annotation("_Out_")] ID3D11RasterizerState** ppRasterizerState );
+    void RSGetState( [annotation("_Outptr_result_maybenull_")] ID3D11RasterizerState** ppRasterizerState );
     void RSGetViewports(
         [annotation("_Inout_ /*_range(0, D3D11_VIEWPORT_AND_SCISSORRECT_OBJECT_COUNT_PER_PIPELINE )*/ ")] UINT* pNumViewports,
         [annotation("_Out_writes_opt_(*pNumViewports)")] D3D11_VIEWPORT* pViewports );
@@ -3552,7 +3609,7 @@ interface ID3D11DeviceContext
         [annotation("_In_range_( 0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT - StartSlot )")] UINT NumViews,
         [annotation("_Out_writes_opt_(NumViews)")] ID3D11ShaderResourceView** ppShaderResourceViews );
     void HSGetShader(
-        [annotation("_Out_")] ID3D11HullShader** ppHullShader,
+        [annotation("_Outptr_result_maybenull_")] ID3D11HullShader** ppHullShader,
         [annotation("_Out_writes_opt_(*pNumClassInstances)")] ID3D11ClassInstance** ppClassInstances,
         [annotation("_Inout_opt_")] UINT* pNumClassInstances);
     void HSGetSamplers(
@@ -3568,7 +3625,7 @@ interface ID3D11DeviceContext
         [annotation("_In_range_( 0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT - StartSlot )")] UINT NumViews,
         [annotation("_Out_writes_opt_(NumViews)")] ID3D11ShaderResourceView** ppShaderResourceViews );
     void DSGetShader(
-        [annotation("_Out_")] ID3D11DomainShader** ppDomainShader,
+        [annotation("_Outptr_result_maybenull_")] ID3D11DomainShader** ppDomainShader,
         [annotation("_Out_writes_opt_(*pNumClassInstances)")] ID3D11ClassInstance** ppClassInstances,
         [annotation("_Inout_opt_")] UINT* pNumClassInstances);
     void DSGetSamplers(
@@ -3584,11 +3641,11 @@ interface ID3D11DeviceContext
         [annotation("_In_range_( 0, D3D11_COMMONSHADER_INPUT_RESOURCE_SLOT_COUNT - StartSlot )")] UINT NumViews,
         [annotation("_Out_writes_opt_(NumViews)")] ID3D11ShaderResourceView** ppShaderResourceViews );
     void CSGetUnorderedAccessViews(
-        [annotation("_In_range_( 0, D3D11_PS_CS_UAV_REGISTER_COUNT - 1 )")] UINT StartSlot,
-        [annotation("_In_range_( 0, D3D11_PS_CS_UAV_REGISTER_COUNT - StartSlot )")] UINT NumUAVs,
+        [annotation("_In_range_( 0, D3D11_1_UAV_SLOT_COUNT - 1 )")] UINT StartSlot,
+        [annotation("_In_range_( 0, D3D11_1_UAV_SLOT_COUNT - StartSlot )")] UINT NumUAVs,
         [annotation("_Out_writes_opt_(NumUAVs)")] ID3D11UnorderedAccessView** ppUnorderedAccessViews );
     void CSGetShader(
-        [annotation("_Out_")] ID3D11ComputeShader** ppComputeShader,
+        [annotation("_Outptr_result_maybenull_")] ID3D11ComputeShader** ppComputeShader,
         [annotation("_Out_writes_opt_(*pNumClassInstances)")] ID3D11ClassInstance** ppClassInstances,
         [annotation("_Inout_opt_")] UINT* pNumClassInstances);
     void CSGetSamplers(
@@ -3611,7 +3668,7 @@ interface ID3D11DeviceContext
     UINT GetContextFlags();
     HRESULT FinishCommandList(
         BOOL RestoreDeferredContextState,
-        [annotation("_Out_opt_")] ID3D11CommandList** ppCommandList );
+        [annotation("_COM_Outptr_opt_")] ID3D11CommandList** ppCommandList );
     
     // !!! END LOW-FREQUENCY !!!
 };
@@ -3806,7 +3863,9 @@ typedef enum D3D11_VIDEO_PROCESSOR_FEATURE_CAPS
     D3D11_VIDEO_PROCESSOR_FEATURE_CAPS_STEREO                 = 0x20,
     D3D11_VIDEO_PROCESSOR_FEATURE_CAPS_ROTATION               = 0x40,
     D3D11_VIDEO_PROCESSOR_FEATURE_CAPS_ALPHA_STREAM           = 0x80,
-    D3D11_VIDEO_PROCESSOR_FEATURE_CAPS_PIXEL_ASPECT_RATIO     = 0x100 
+    D3D11_VIDEO_PROCESSOR_FEATURE_CAPS_PIXEL_ASPECT_RATIO     = 0x100,
+    D3D11_VIDEO_PROCESSOR_FEATURE_CAPS_MIRROR                 = 0x200,
+    D3D11_VIDEO_PROCESSOR_FEATURE_CAPS_SHADER_USAGE           = 0x400,
 } D3D11_VIDEO_PROCESSOR_FEATURE_CAPS;
 
 typedef enum D3D11_VIDEO_PROCESSOR_FILTER_CAPS
@@ -3908,10 +3967,18 @@ typedef enum D3D11_CONTENT_PROTECTION_CAPS
     D3D11_CONTENT_PROTECTION_CAPS_ENCRYPTED_READ_BACK_KEY = 0x00000080,
     D3D11_CONTENT_PROTECTION_CAPS_SEQUENTIAL_CTR_IV       = 0x00000100,
     D3D11_CONTENT_PROTECTION_CAPS_ENCRYPT_SLICEDATA_ONLY  = 0x00000200,
-    D3D11_CONTENT_PROTECTION_CAPS_DECRYPTION_BLT          = 0x00000400
+    D3D11_CONTENT_PROTECTION_CAPS_DECRYPTION_BLT          = 0x00000400,
+    D3D11_CONTENT_PROTECTION_CAPS_HARDWARE_PROTECT_UNCOMPRESSED = 0x00000800,
+    D3D11_CONTENT_PROTECTION_CAPS_HARDWARE_PROTECTED_MEMORY_PAGEABLE = 0x00001000,
+    D3D11_CONTENT_PROTECTION_CAPS_HARDWARE_TEARDOWN          = 0x00002000,
+    D3D11_CONTENT_PROTECTION_CAPS_HARDWARE_DRM_COMMUNICATION = 0x00004000
 } D3D11_CONTENT_PROTECTION_CAPS;
 
 cpp_quote("DEFINE_GUID(D3D11_CRYPTO_TYPE_AES128_CTR, 0x9b6bd711, 0x4f74, 0x41c9, 0x9e, 0x7b, 0xb, 0xe2, 0xd7, 0xd9, 0x3b, 0x4f );")
+
+cpp_quote("DEFINE_GUID(D3D11_DECODER_ENCRYPTION_HW_CENC, 0x89d6ac4f, 0x9f2, 0x4229, 0xb2, 0xcd, 0x37, 0x74, 0xa, 0x6d, 0xfd, 0x81);")
+
+cpp_quote("DEFINE_GUID(D3D11_KEY_EXCHANGE_HW_PROTECTION, 0xb1170d8a, 0x628d, 0x4da3, 0xad, 0x3b, 0x82, 0xdd, 0xb0, 0x8b, 0x49, 0x70);")
 
 typedef struct D3D11_VIDEO_CONTENT_PROTECTION_CAPS
 {
@@ -4891,43 +4958,43 @@ interface ID3D11VideoDevice
     HRESULT CreateVideoDecoder( 
         [annotation("_In_")] const D3D11_VIDEO_DECODER_DESC *pVideoDesc,
         [annotation("_In_")] const D3D11_VIDEO_DECODER_CONFIG *pConfig,
-        [annotation("_Out_")] ID3D11VideoDecoder **ppDecoder);
+        [annotation("_COM_Outptr_")] ID3D11VideoDecoder **ppDecoder);
 
     HRESULT CreateVideoProcessor( 
         [annotation("_In_")] ID3D11VideoProcessorEnumerator* pEnum,
         [annotation("_In_")] UINT RateConversionIndex,
-        [annotation("_Out_")] ID3D11VideoProcessor **ppVideoProcessor);
+        [annotation("_COM_Outptr_")] ID3D11VideoProcessor **ppVideoProcessor);
 
     HRESULT CreateAuthenticatedChannel( 
         [annotation("_In_")] D3D11_AUTHENTICATED_CHANNEL_TYPE ChannelType,
-        [annotation("_Out_")] ID3D11AuthenticatedChannel** ppAuthenticatedChannel);
+        [annotation("_COM_Outptr_")] ID3D11AuthenticatedChannel** ppAuthenticatedChannel);
 
     HRESULT CreateCryptoSession( 
         [annotation("_In_")] const GUID* pCryptoType,
         [annotation("_In_opt_")] const GUID* pDecoderProfile,
         [annotation("_In_")] const GUID* pKeyExchangeType,
-        [annotation("_Outptr_")] ID3D11CryptoSession** ppCryptoSession);
+        [annotation("_COM_Outptr_")] ID3D11CryptoSession** ppCryptoSession);
 
     HRESULT CreateVideoDecoderOutputView(
         [annotation("_In_")] ID3D11Resource* pResource,
         [annotation("_In_")] const D3D11_VIDEO_DECODER_OUTPUT_VIEW_DESC* pDesc,
-        [annotation("_Out_opt_")] ID3D11VideoDecoderOutputView** ppVDOVView );
+        [annotation("_COM_Outptr_opt_")] ID3D11VideoDecoderOutputView** ppVDOVView );
 
     HRESULT CreateVideoProcessorInputView(
         [annotation("_In_")] ID3D11Resource* pResource,
         [annotation("_In_")] ID3D11VideoProcessorEnumerator* pEnum,
         [annotation("_In_")] const D3D11_VIDEO_PROCESSOR_INPUT_VIEW_DESC* pDesc,
-        [annotation("_Out_opt_")] ID3D11VideoProcessorInputView** ppVPIView );
+        [annotation("_COM_Outptr_opt_")] ID3D11VideoProcessorInputView** ppVPIView );
 
     HRESULT CreateVideoProcessorOutputView(
         [annotation("_In_")] ID3D11Resource* pResource,
         [annotation("_In_")] ID3D11VideoProcessorEnumerator* pEnum,
         [annotation("_In_")] const D3D11_VIDEO_PROCESSOR_OUTPUT_VIEW_DESC* pDesc,
-        [annotation("_Out_opt_")] ID3D11VideoProcessorOutputView** ppVPOView );
+        [annotation("_COM_Outptr_opt_")] ID3D11VideoProcessorOutputView** ppVPOView );
 
     HRESULT CreateVideoProcessorEnumerator(
         [annotation("_In_")] const D3D11_VIDEO_PROCESSOR_CONTENT_DESC* pDesc,
-        [annotation("_Out_")] ID3D11VideoProcessorEnumerator** ppEnum );
+        [annotation("_COM_Outptr_")] ID3D11VideoProcessorEnumerator** ppEnum );
 
     // Check
     UINT GetVideoDecoderProfileCount( void );
@@ -4989,51 +5056,51 @@ interface ID3D11Device
     HRESULT CreateBuffer(
         [annotation("_In_")] const D3D11_BUFFER_DESC* pDesc,
         [annotation("_In_opt_")] const D3D11_SUBRESOURCE_DATA* pInitialData,
-        [annotation("_Out_opt_")] ID3D11Buffer** ppBuffer );
+        [annotation("_COM_Outptr_opt_")] ID3D11Buffer** ppBuffer );
     HRESULT CreateTexture1D(
         [annotation("_In_")] const D3D11_TEXTURE1D_DESC* pDesc,
         [annotation("_In_reads_opt_(_Inexpressible_(pDesc->MipLevels * pDesc->ArraySize))")] const D3D11_SUBRESOURCE_DATA* pInitialData,
-        [annotation("_Out_opt_")] ID3D11Texture1D** ppTexture1D );
+        [annotation("_COM_Outptr_opt_")] ID3D11Texture1D** ppTexture1D );
     HRESULT CreateTexture2D(
         [annotation("_In_")] const D3D11_TEXTURE2D_DESC* pDesc,
         [annotation("_In_reads_opt_(_Inexpressible_(pDesc->MipLevels * pDesc->ArraySize))")] const D3D11_SUBRESOURCE_DATA* pInitialData,
-        [annotation("_Out_opt_")] ID3D11Texture2D** ppTexture2D );
+        [annotation("_COM_Outptr_opt_")] ID3D11Texture2D** ppTexture2D );
     HRESULT CreateTexture3D(
         [annotation("_In_")] const D3D11_TEXTURE3D_DESC* pDesc,
         [annotation("_In_reads_opt_(_Inexpressible_(pDesc->MipLevels))")] const D3D11_SUBRESOURCE_DATA* pInitialData,
-        [annotation("_Out_opt_")] ID3D11Texture3D** ppTexture3D );
+        [annotation("_COM_Outptr_opt_")] ID3D11Texture3D** ppTexture3D );
     HRESULT CreateShaderResourceView(
         [annotation("_In_")] ID3D11Resource* pResource,
         [annotation("_In_opt_")] const D3D11_SHADER_RESOURCE_VIEW_DESC* pDesc,
-        [annotation("_Out_opt_")] ID3D11ShaderResourceView** ppSRView );
+        [annotation("_COM_Outptr_opt_")] ID3D11ShaderResourceView** ppSRView );
     HRESULT CreateUnorderedAccessView(
         [annotation("_In_")] ID3D11Resource* pResource,
         [annotation("_In_opt_")] const D3D11_UNORDERED_ACCESS_VIEW_DESC* pDesc,
-        [annotation("_Out_opt_")] ID3D11UnorderedAccessView** ppUAView );
+        [annotation("_COM_Outptr_opt_")] ID3D11UnorderedAccessView** ppUAView );
     HRESULT CreateRenderTargetView(
         [annotation("_In_")] ID3D11Resource* pResource,
         [annotation("_In_opt_")] const D3D11_RENDER_TARGET_VIEW_DESC* pDesc,
-        [annotation("_Out_opt_")] ID3D11RenderTargetView** ppRTView );
+        [annotation("_COM_Outptr_opt_")] ID3D11RenderTargetView** ppRTView );
     HRESULT CreateDepthStencilView(
         [annotation("_In_")] ID3D11Resource* pResource,
         [annotation("_In_opt_")] const D3D11_DEPTH_STENCIL_VIEW_DESC* pDesc,
-        [annotation("_Out_opt_")] ID3D11DepthStencilView** ppDepthStencilView );
+        [annotation("_COM_Outptr_opt_")] ID3D11DepthStencilView** ppDepthStencilView );
     HRESULT CreateInputLayout(
         [annotation("_In_reads_(NumElements)")] const D3D11_INPUT_ELEMENT_DESC* pInputElementDescs,
         [annotation("_In_range_( 0, D3D11_IA_VERTEX_INPUT_STRUCTURE_ELEMENT_COUNT )")] UINT NumElements,
         [annotation("_In_reads_(BytecodeLength)")] const void* pShaderBytecodeWithInputSignature,
         [annotation("_In_")] SIZE_T BytecodeLength,
-        [annotation("_Out_opt_")] ID3D11InputLayout** ppInputLayout );
+        [annotation("_COM_Outptr_opt_")] ID3D11InputLayout** ppInputLayout );
     HRESULT CreateVertexShader(
         [annotation("_In_reads_(BytecodeLength)")] const void* pShaderBytecode,
         [annotation("_In_")] SIZE_T BytecodeLength,
         [annotation("_In_opt_")] ID3D11ClassLinkage* pClassLinkage,
-        [annotation("_Out_opt_")] ID3D11VertexShader** ppVertexShader );
+        [annotation("_COM_Outptr_opt_")] ID3D11VertexShader** ppVertexShader );
     HRESULT CreateGeometryShader(
         [annotation("_In_reads_(BytecodeLength)")] const void* pShaderBytecode,
         [annotation("_In_")] SIZE_T BytecodeLength,
         [annotation("_In_opt_")] ID3D11ClassLinkage* pClassLinkage,
-        [annotation("_Out_opt_")] ID3D11GeometryShader** ppGeometryShader );
+        [annotation("_COM_Outptr_opt_")] ID3D11GeometryShader** ppGeometryShader );
     HRESULT CreateGeometryShaderWithStreamOutput(
         [annotation("_In_reads_(BytecodeLength)")] const void* pShaderBytecode,
         [annotation("_In_")] SIZE_T BytecodeLength,
@@ -5043,57 +5110,57 @@ interface ID3D11Device
         [annotation("_In_range_( 0, D3D11_SO_BUFFER_SLOT_COUNT )")] UINT NumStrides,
         [annotation("_In_")] UINT RasterizedStream,
         [annotation("_In_opt_")] ID3D11ClassLinkage* pClassLinkage,
-        [annotation("_Out_opt_")] ID3D11GeometryShader** ppGeometryShader );
+        [annotation("_COM_Outptr_opt_")] ID3D11GeometryShader** ppGeometryShader );
     HRESULT CreatePixelShader(
         [annotation("_In_reads_(BytecodeLength)")] const void* pShaderBytecode,
         [annotation("_In_")] SIZE_T BytecodeLength,
         [annotation("_In_opt_")] ID3D11ClassLinkage* pClassLinkage,
-        [annotation("_Out_opt_")] ID3D11PixelShader** ppPixelShader );
+        [annotation("_COM_Outptr_opt_")] ID3D11PixelShader** ppPixelShader );
     HRESULT CreateHullShader(
         [annotation("_In_reads_(BytecodeLength)")] const void* pShaderBytecode,
         [annotation("_In_")] SIZE_T BytecodeLength,
         [annotation("_In_opt_")] ID3D11ClassLinkage* pClassLinkage,
-        [annotation("_Out_opt_")] ID3D11HullShader** ppHullShader );
+        [annotation("_COM_Outptr_opt_")] ID3D11HullShader** ppHullShader );
     HRESULT CreateDomainShader(
         [annotation("_In_reads_(BytecodeLength)")] const void* pShaderBytecode,
         [annotation("_In_")] SIZE_T BytecodeLength,
         [annotation("_In_opt_")] ID3D11ClassLinkage* pClassLinkage,
-        [annotation("_Out_opt_")] ID3D11DomainShader** ppDomainShader );
+        [annotation("_COM_Outptr_opt_")] ID3D11DomainShader** ppDomainShader );
     HRESULT CreateComputeShader(
         [annotation("_In_reads_(BytecodeLength)")] const void* pShaderBytecode,
         [annotation("_In_")] SIZE_T BytecodeLength,
         [annotation("_In_opt_")] ID3D11ClassLinkage* pClassLinkage,
-        [annotation("_Out_opt_")] ID3D11ComputeShader** ppComputeShader );
+        [annotation("_COM_Outptr_opt_")] ID3D11ComputeShader** ppComputeShader );
     HRESULT CreateClassLinkage(
-        [annotation("_Out_")] ID3D11ClassLinkage** ppLinkage);
+        [annotation("_COM_Outptr_")] ID3D11ClassLinkage** ppLinkage);
     HRESULT CreateBlendState(
         [annotation("_In_")] const D3D11_BLEND_DESC* pBlendStateDesc,
-        [annotation("_Out_opt_")] ID3D11BlendState** ppBlendState );
+        [annotation("_COM_Outptr_opt_")] ID3D11BlendState** ppBlendState );
     HRESULT CreateDepthStencilState(
         [annotation("_In_")] const D3D11_DEPTH_STENCIL_DESC* pDepthStencilDesc,
-        [annotation("_Out_opt_")] ID3D11DepthStencilState** ppDepthStencilState );
+        [annotation("_COM_Outptr_opt_")] ID3D11DepthStencilState** ppDepthStencilState );
     HRESULT CreateRasterizerState(
         [annotation("_In_")] const D3D11_RASTERIZER_DESC* pRasterizerDesc,
-        [annotation("_Out_opt_")] ID3D11RasterizerState** ppRasterizerState );
+        [annotation("_COM_Outptr_opt_")] ID3D11RasterizerState** ppRasterizerState );
     HRESULT CreateSamplerState(
         [annotation("_In_")] const D3D11_SAMPLER_DESC* pSamplerDesc,
-        [annotation("_Out_opt_")] ID3D11SamplerState** ppSamplerState );
+        [annotation("_COM_Outptr_opt_")] ID3D11SamplerState** ppSamplerState );
     HRESULT CreateQuery(
         [annotation("_In_")] const D3D11_QUERY_DESC* pQueryDesc,
-        [annotation("_Out_opt_")] ID3D11Query** ppQuery );
+        [annotation("_COM_Outptr_opt_")] ID3D11Query** ppQuery );
     HRESULT CreatePredicate(
         [annotation("_In_")] const D3D11_QUERY_DESC* pPredicateDesc,
-        [annotation("_Out_opt_")] ID3D11Predicate** ppPredicate );
+        [annotation("_COM_Outptr_opt_")] ID3D11Predicate** ppPredicate );
     HRESULT CreateCounter(
         [annotation("_In_")] const D3D11_COUNTER_DESC* pCounterDesc,
-        [annotation("_Out_opt_")] ID3D11Counter** ppCounter );
+        [annotation("_COM_Outptr_opt_")] ID3D11Counter** ppCounter );
     HRESULT CreateDeferredContext(
         UINT ContextFlags, // Reserved parameter; must be 0
-        [annotation("_Out_opt_")] ID3D11DeviceContext** ppDeferredContext );
+        [annotation("_COM_Outptr_opt_")] ID3D11DeviceContext** ppDeferredContext );
     HRESULT OpenSharedResource(
         [annotation("_In_")] HANDLE hResource,
         [annotation("_In_")] REFIID ReturnedInterface,
-        [annotation("_Out_opt_")] void ** ppResource);
+        [annotation("_COM_Outptr_opt_")] void ** ppResource);
 
     // Check*
     HRESULT CheckFormatSupport(
@@ -5130,11 +5197,11 @@ interface ID3D11Device
     HRESULT SetPrivateDataInterface(
         [annotation("_In_")] REFGUID guid,
         [annotation("_In_opt_")] const IUnknown* pData );
-    
+
     D3D_FEATURE_LEVEL GetFeatureLevel();
     UINT GetCreationFlags();
     HRESULT GetDeviceRemovedReason();
-    void GetImmediateContext( [annotation("_Out_")] ID3D11DeviceContext** ppImmediateContext );
+    void GetImmediateContext( [annotation("_Outptr_")] ID3D11DeviceContext** ppImmediateContext );
     HRESULT SetExceptionMode( UINT RaiseFlags );
     UINT GetExceptionMode();
 };
@@ -5219,8 +5286,8 @@ cpp_quote( "////////////////////////////////////////////////////////////////////
 cpp_quote( "typedef HRESULT (WINAPI* PFN_D3D11_CREATE_DEVICE)( _In_opt_ IDXGIAdapter*, " )
 cpp_quote( "    D3D_DRIVER_TYPE, HMODULE, UINT, " )
 cpp_quote( "    _In_reads_opt_( FeatureLevels ) CONST D3D_FEATURE_LEVEL*, " )
-cpp_quote( "    UINT FeatureLevels, UINT, _Out_opt_ ID3D11Device**, " )
-cpp_quote( "    _Out_opt_ D3D_FEATURE_LEVEL*, _Out_opt_ ID3D11DeviceContext** );" )
+cpp_quote( "    UINT FeatureLevels, UINT, _COM_Outptr_opt_ ID3D11Device**, " )
+cpp_quote( "    _Out_opt_ D3D_FEATURE_LEVEL*, _COM_Outptr_opt_ ID3D11DeviceContext** );" )
 cpp_quote( "" )
 cpp_quote( "HRESULT WINAPI D3D11CreateDevice(" )
 cpp_quote( "    _In_opt_ IDXGIAdapter* pAdapter," )
@@ -5230,9 +5297,9 @@ cpp_quote( "    UINT Flags," )
 cpp_quote( "    _In_reads_opt_( FeatureLevels ) CONST D3D_FEATURE_LEVEL* pFeatureLevels," )
 cpp_quote( "    UINT FeatureLevels," )
 cpp_quote( "    UINT SDKVersion," )
-cpp_quote( "    _Out_opt_ ID3D11Device** ppDevice," )
+cpp_quote( "    _COM_Outptr_opt_ ID3D11Device** ppDevice," )
 cpp_quote( "    _Out_opt_ D3D_FEATURE_LEVEL* pFeatureLevel," )
-cpp_quote( "    _Out_opt_ ID3D11DeviceContext** ppImmediateContext );" )
+cpp_quote( "    _COM_Outptr_opt_ ID3D11DeviceContext** ppImmediateContext );" )
 cpp_quote( "" )
 
 #pragma region Desktop Family
@@ -5295,8 +5362,8 @@ cpp_quote( "typedef HRESULT (WINAPI* PFN_D3D11_CREATE_DEVICE_AND_SWAP_CHAIN)( _I
 cpp_quote( "    D3D_DRIVER_TYPE, HMODULE, UINT, " )
 cpp_quote( "    _In_reads_opt_( FeatureLevels ) CONST D3D_FEATURE_LEVEL*, " )
 cpp_quote( "    UINT FeatureLevels, UINT, _In_opt_ CONST DXGI_SWAP_CHAIN_DESC*, " )
-cpp_quote( "    _Out_opt_ IDXGISwapChain**, _Out_opt_ ID3D11Device**, " )
-cpp_quote( "    _Out_opt_ D3D_FEATURE_LEVEL*, _Out_opt_ ID3D11DeviceContext** );" )
+cpp_quote( "    _COM_Outptr_opt_ IDXGISwapChain**, _COM_Outptr_opt_ ID3D11Device**, " )
+cpp_quote( "    _Out_opt_ D3D_FEATURE_LEVEL*, _COM_Outptr_opt_ ID3D11DeviceContext** );" )
 cpp_quote( "" )
 cpp_quote( "HRESULT WINAPI D3D11CreateDeviceAndSwapChain(" )
 cpp_quote( "    _In_opt_ IDXGIAdapter* pAdapter," )
@@ -5307,10 +5374,10 @@ cpp_quote( "    _In_reads_opt_( FeatureLevels ) CONST D3D_FEATURE_LEVEL* pFeatur
 cpp_quote( "    UINT FeatureLevels," )
 cpp_quote( "    UINT SDKVersion," )
 cpp_quote( "    _In_opt_ CONST DXGI_SWAP_CHAIN_DESC* pSwapChainDesc," )
-cpp_quote( "    _Out_opt_ IDXGISwapChain** ppSwapChain," )
-cpp_quote( "    _Out_opt_ ID3D11Device** ppDevice," )
+cpp_quote( "    _COM_Outptr_opt_ IDXGISwapChain** ppSwapChain," )
+cpp_quote( "    _COM_Outptr_opt_ ID3D11Device** ppDevice," )
 cpp_quote( "    _Out_opt_ D3D_FEATURE_LEVEL* pFeatureLevel," )
-cpp_quote( "    _Out_opt_ ID3D11DeviceContext** ppImmediateContext );" )
+cpp_quote( "    _COM_Outptr_opt_ ID3D11DeviceContext** ppImmediateContext );" )
 cpp_quote( "" )
 
 cpp_quote( "#endif /* WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP) */")

@@ -47,8 +47,8 @@ const UINT D3D10_1_VS_OUTPUT_REGISTER_COUNT = 32;
 cpp_quote( "#endif" )
 cpp_quote("#include <winapifamily.h>")
 
-import "d3d10.idl"; //
-cpp_quote( "#include \"d3d10.h\" //") //
+import "d3d10.idl";
+cpp_quote( "#include \"d3d10.h\" //")
 
 #pragma region Desktop Family
 cpp_quote("#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)")

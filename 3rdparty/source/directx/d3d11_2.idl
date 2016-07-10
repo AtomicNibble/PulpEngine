@@ -13,6 +13,8 @@ import "ocidl.idl";
 import "dxgi1_3.idl";
 import "d3dcommon.idl";
 
+
+
 import "d3d11_1.idl"; //
 cpp_quote( "#ifdef __cplusplus" )
 cpp_quote( "}" ) // extern C
@@ -147,11 +149,11 @@ interface ID3D11DeviceContext2
 interface ID3D11Device2
     : ID3D11Device1
 {
-    void GetImmediateContext2( [annotation("_Out_")] ID3D11DeviceContext2** ppImmediateContext );
+    void GetImmediateContext2( [annotation("_Outptr_")] ID3D11DeviceContext2** ppImmediateContext );
 
     HRESULT CreateDeferredContext2(
             UINT ContextFlags, 
-            [annotation("_Out_opt_")] ID3D11DeviceContext2** ppDeferredContext );
+            [annotation("_COM_Outptr_opt_")] ID3D11DeviceContext2** ppDeferredContext );
 
     void GetResourceTiling( 
             [annotation("_In_")] ID3D11Resource* pTiledResource,
