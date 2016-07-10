@@ -68,8 +68,7 @@ private:
 };
 
 
-template class FaceOptimize<uint16_t>;
-template class FaceOptimize<uint32_t>;
+
 
 
 X_NAMESPACE_END
