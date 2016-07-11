@@ -14,11 +14,14 @@ X_DISABLE_WARNING(4005)
 #include <../../3rdparty/source/directx/D3D11.h>
 #include <../../3rdparty/source/directx/d3dx10.h>
 
+#include <dxgi1_4.h>
+
 X_ENABLE_WARNING(4005)
 
 
 X_LINK_LIB("D3D12.lib")
-
+X_LINK_LIB("dxgi.lib")
+X_LINK_LIB("d3dcompiler.lib")
 
 
 // Img Lib

@@ -46,7 +46,7 @@
     <ProjectGuid>{45C7F424-D380-4454-A26C-127A1BE7FEDD}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>RenderDx12</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.10240.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -328,6 +328,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="XRender.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Module.cpp" />
@@ -343,6 +344,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="XRender.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

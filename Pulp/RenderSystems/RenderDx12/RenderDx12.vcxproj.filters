@@ -17,6 +17,9 @@
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="XRender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -24,6 +27,9 @@
     </ClCompile>
     <ClCompile Include="Module.cpp">
       <Filter>Source Files\EngineModule</Filter>
+    </ClCompile>
+    <ClCompile Include="XRender.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
