@@ -64,7 +64,7 @@ class XEngineModule_Render : public IEngineModule
 		g_rendererArena = X_NEW_ALIGNED(RendererArena, gEnv->pArena, "RendererArena", 8)(&g_RenderAlloc, "RendererArena");
 		g_textureDataArena = X_NEW(TextureArena, gEnv->pArena, "TextureArena")(&g_TextureDataAlloc, "TextureArena");
 
-		pRender = X_NEW(XRender, gEnv->pArena, "XRender")();
+		pRender = X_NEW(XRender, gEnv->pArena, "XRender")(g_rendererArena);
 
 		if (!pRender) {
 			return false;

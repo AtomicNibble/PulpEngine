@@ -6,6 +6,8 @@
 
 #include <IRender.h>
 
+#include "CommandList.h"
+
 X_NAMESPACE_BEGIN(render)
 
 
@@ -14,7 +16,7 @@ class XRender : public IRender2
 	static const uint32_t SWAP_CHAIN_BUFFER_COUNT = 3;
 
 public:
-	XRender();
+	XRender(core::MemoryArenaBase* arena);
 	~XRender();
 
 	bool Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height) X_OVERRIDE;
@@ -33,6 +35,7 @@ private:
 	ID3D12Device* pDevice_;
 	ID3D12Debug* pDebug_;
 
+	CommandListManger cmdListManager_;
 
 	core::StackString<128, wchar_t> deviceName_;
 	size_t dedicatedvideoMemory_;

@@ -5,9 +5,10 @@
 X_NAMESPACE_BEGIN(render)
 
 
-XRender::XRender() :
+XRender::XRender(core::MemoryArenaBase* arena) :
 	pDevice_(nullptr),
 	pDebug_(nullptr),
+	cmdListManager_(arena),
 	dedicatedvideoMemory_(0)
 {
 
