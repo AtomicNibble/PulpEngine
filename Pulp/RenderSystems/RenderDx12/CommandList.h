@@ -61,6 +61,8 @@ public:
 	X_INLINE CommandQue& getCopyQueue(void);
 	X_INLINE CommandQue& getQueue(D3D12_COMMAND_LIST_TYPE Type = D3D12_COMMAND_LIST_TYPE_DIRECT);
 
+	X_INLINE ID3D12CommandQueue* getCommandQueue(void);
+
 
 	bool isFenceComplete(uint64_t fenceValue);
 	void waitForFence(uint64_t fenceValue);

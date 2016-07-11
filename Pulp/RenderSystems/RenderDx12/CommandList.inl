@@ -53,4 +53,9 @@ X_INLINE CommandQue& CommandListManger::getQueue(D3D12_COMMAND_LIST_TYPE Type)
 
 }
 
+X_INLINE ID3D12CommandQueue* CommandListManger::getCommandQueue(void)
+{
+	return graphicsQueue_.getCommandQueue();
+}
+
 X_NAMESPACE_END
