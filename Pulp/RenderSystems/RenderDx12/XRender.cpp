@@ -57,7 +57,8 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 				continue;
 			}
 
-			if (SUCCEEDED(D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice_))))
+			hr = D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice_));
+			if (SUCCEEDED(hr))
 			{
 				pAdapter->GetDesc1(&desc);
 				X_LOG0("Dx12", "D3D12-capable hardware found: %ls (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
@@ -68,13 +69,13 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 			}
 			else
 			{
-
+				X_WARNING("Dx12", "Failed to create device for adpater index %" PRIu32 " res: %" PRIu32, Idx, hr);
 			}
 		}
 	}
 
 	if (!pDevice_) {
-		X_ERROR("Dx12", "Failed to CreateDevice: 0x%x", hr);
+		X_ERROR("Dx12", "Failed to CreateDevice: %" PRIu32, hr);
 		return false;
 	}
 
@@ -99,7 +100,7 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 			hr = pInfoQueue->PushStorageFilter(&NewFilter);
 			if (FAILED(hr)) {
-				X_ERROR("Dx12", "failed to push storage filter");
+				X_ERROR("Dx12", "failed to push storage filter: %" PRId32, hr);
 			}
 
 			pInfoQueue->Release();
