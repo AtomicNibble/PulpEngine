@@ -12,6 +12,8 @@
 #include <Memory\AllocationPolicies\GrowingBlockAllocator.h>
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
+#include "XRender.h"
+
 X_NAMESPACE_BEGIN(render)
 
 
@@ -57,15 +59,18 @@ class XEngineModule_Render : public IEngineModule
 		X_UNUSED(initParams);
 
 		ICore* pCore = env.pCore;
-		IRender* pRender = nullptr;
+		IRender2* pRender = nullptr;
 
-		
+		g_rendererArena = X_NEW_ALIGNED(RendererArena, gEnv->pArena, "RendererArena", 8)(&g_RenderAlloc, "RendererArena");
+		g_textureDataArena = X_NEW(TextureArena, gEnv->pArena, "TextureArena")(&g_TextureDataAlloc, "TextureArena");
+
+		pRender = X_NEW(XRender, gEnv->pArena, "XRender")();
 
 		if (!pRender) {
 			return false;
 		}
 
-		env.pRender = pRender;
+	//	env.pRender = pRender;
 		return true;
 	}
 
