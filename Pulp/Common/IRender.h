@@ -399,6 +399,22 @@ struct IRender
 };
 
 
+typedef HWND PLATFORM_HWND;
+
+struct IRender2
+{
+	virtual ~IRender2() {};
+
+	virtual bool Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height) X_ABSTRACT;
+	virtual void ShutDown(void) X_ABSTRACT;
+	virtual void freeResources(void) X_ABSTRACT;
+
+	virtual void RenderBegin(void) X_ABSTRACT;
+	virtual void RenderEnd(void) X_ABSTRACT;
+
+};
+
+
 X_NAMESPACE_END
 
 #endif // !_X_RENDER_I_H_
