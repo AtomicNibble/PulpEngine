@@ -162,6 +162,9 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 void XRender::ShutDown(void)
 {
+	cmdListManager_.shutdown();
+
+
 	ID3D12DebugDevice* pDebugInterface;
 	if (SUCCEEDED(pDevice_->QueryInterface(&pDebugInterface)))
 	{
