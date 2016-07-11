@@ -131,6 +131,10 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	swapChainDesc.SampleDesc.Quality = 0;
 
 
+	if (!cmdListManager_.create(pDevice_)) {
+		X_ERROR("Dx12", "Failed to init cmd list");
+		return false;
+	}
 
 
 
