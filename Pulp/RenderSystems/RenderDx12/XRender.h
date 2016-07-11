@@ -34,6 +34,7 @@ private:
 private:
 	ID3D12Device* pDevice_;
 	ID3D12Debug* pDebug_;
+	IDXGISwapChain1* pSwapChain_;
 
 	CommandListManger cmdListManager_;
 

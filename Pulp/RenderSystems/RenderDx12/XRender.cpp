@@ -8,6 +8,7 @@ X_NAMESPACE_BEGIN(render)
 XRender::XRender(core::MemoryArenaBase* arena) :
 	pDevice_(nullptr),
 	pDebug_(nullptr),
+	pSwapChain_(nullptr),
 	cmdListManager_(arena),
 	dedicatedvideoMemory_(0)
 {
@@ -137,9 +138,23 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	}
 
 
+	hr = pDxgiFactory->CreateSwapChainForHwnd(cmdListManager_.getCommandQueue(), hWnd,
+		&swapChainDesc, nullptr, nullptr, &pSwapChain_);
+	if (FAILED(hr)) {
+		X_ERROR("Dx12", "failed to create swap chain: %" PRId32, hr);
+		return false;
+	}
 
-//	hr = pDxgiFactory->CreateSwapChainForHwnd(g_CommandManager.GetCommandQueue(), hWnd,
-//		&swapChainDesc, nullptr, nullptr, &s_SwapChain1));
+	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i)
+	{
+		ID3D12Resource* pDisplayPlane;
+		hr = pSwapChain_->GetBuffer(i, IID_PPV_ARGS(&pDisplayPlane));
+		if (FAILED(hr)) {
+			X_ERROR("Dx12", "failed to get swap chain buffer: %" PRId32, hr);
+			return false;
+		}
+
+	}
 
 
 	return true;
