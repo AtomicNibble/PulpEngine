@@ -32,6 +32,9 @@
     <ClInclude Include="RootSignature.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GpuResource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -55,6 +58,9 @@
     <ClCompile Include="RootSignature.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GpuResource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
@@ -67,6 +73,9 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="RootSignature.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="GpuResource.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
