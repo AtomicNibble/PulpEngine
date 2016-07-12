@@ -1,0 +1,69 @@
+#pragma once
+
+
+
+X_NAMESPACE_BEGIN(render)
+
+
+class DescriptorCache;
+
+class RootParameter
+{
+public:
+	X_INLINE RootParameter();
+	X_INLINE ~RootParameter();
+
+	X_INLINE void clear(void);
+
+	// lower case Register is reserved keyword.
+	X_INLINE void initAsConstants(uint32_t Register, uint32_t NumDwords, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
+	X_INLINE void initAsConstantBuffer(uint32_t Register, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
+	X_INLINE void initAsBufferSRV(uint32_t Register, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
+	X_INLINE void initAsBufferUAV(uint32_t Register, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
+	X_INLINE void initAsDescriptorRange(core::MemoryArenaBase* arena, D3D12_DESCRIPTOR_RANGE_TYPE type, uint32_t Register,
+		 	uint32_t Count, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
+	X_INLINE void initAsDescriptorTable(core::MemoryArenaBase* arena, uint32_t rangeCount, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
+	X_INLINE void setTableRange(uint32_t rangeIndex, D3D12_DESCRIPTOR_RANGE_TYPE type,
+		uint32_t Register, uint32_t Count, uint32_t space = 0);
+	 
+	X_INLINE const D3D12_ROOT_PARAMETER& operator() (void) const;
+
+protected:
+	D3D12_ROOT_PARAMETER rootParam_;
+	core::MemoryArenaBase* arena_;
+};
+
+
+class RootSignature
+{
+public:
+	X_INLINE RootSignature(core::MemoryArenaBase* arena, size_t numRootParams = 0, size_t numStaticSamplers = 0);
+	X_INLINE ~RootSignature();
+
+	void clear(void); // keeps param memory.
+	void free(void);
+	void reset(size_t numRootParams, size_t numStaticSamplers = 0);
+
+	void initStaticSampler(uint32_t Register, const D3D12_SAMPLER_DESC& nonStaticSamplerDesc,
+		D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
+
+	void finalize(ID3D12Device* pDevice, D3D12_ROOT_SIGNATURE_FLAGS flags = D3D12_ROOT_SIGNATURE_FLAG_NONE);
+
+
+	X_INLINE RootParameter& operator[] (size_t idx);
+	X_INLINE const RootParameter& operator[] (size_t idx) const;
+	X_INLINE ID3D12RootSignature* getSignature(void) const;
+
+protected:
+	core::Array<RootParameter> params_;
+	core::Array<D3D12_STATIC_SAMPLER_DESC> samplers_;
+
+	uint32_t samplesInitCount_;
+	ID3D12RootSignature* pSignature_;
+};
+
+
+X_NAMESPACE_END
+
+
+#include "RootSignature.inl"
