@@ -36,15 +36,17 @@ protected:
 class CommandSignature
 {
 public:
-	CommandSignature(core::MemoryArenaBase* arena, uint32_t numParams = 0);
+	CommandSignature(core::MemoryArenaBase* arena, size_t numParams = 0);
+	~CommandSignature();
 
-	void destroy(void);
-	void reset(uint32_t numParams);
+	void clear(void); // keeps param memory.
+	void free(void);
+	void reset(size_t numParams);
 
 	X_INLINE IndirectParameter& operator[] (size_t idx);
 	X_INLINE const IndirectParameter& operator[] (size_t idx) const;
 
-	void finalize(const RootSignature* pRootSignature = nullptr);
+	void finalize(ID3D12Device* pDevice, const RootSignature* pRootSignature = nullptr);
 
 	// only valid after finalize.
 	X_INLINE ID3D12CommandSignature* getSignature(void) const;
