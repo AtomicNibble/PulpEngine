@@ -26,6 +26,9 @@
     <ClInclude Include="CommandAllocatorPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CommandSignature.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -43,12 +46,18 @@
     <ClCompile Include="CommandAllocatorPool.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CommandSignature.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
       <Filter>Header Files</Filter>
     </None>
     <None Include="CommandAllocatorPool.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="CommandSignature.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

@@ -329,12 +329,14 @@
   <ItemGroup>
     <ClInclude Include="CommandAllocatorPool.h" />
     <ClInclude Include="CommandList.h" />
+    <ClInclude Include="CommandSignature.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XRender.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommandAllocatorPool.cpp" />
     <ClCompile Include="CommandList.cpp" />
+    <ClCompile Include="CommandSignature.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -353,6 +355,7 @@
   <ItemGroup>
     <None Include="CommandAllocatorPool.inl" />
     <None Include="CommandList.inl" />
+    <None Include="CommandSignature.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
