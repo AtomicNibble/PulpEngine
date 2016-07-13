@@ -63,13 +63,14 @@ public:
 
 	X_INLINE ID3D12CommandQueue* getCommandQueue(void);
 
+	void createNewCommandList(D3D12_COMMAND_LIST_TYPE type,
+		ID3D12GraphicsCommandList** pListOut, ID3D12CommandAllocator** pAllocatorOut);
 
 	bool isFenceComplete(uint64_t fenceValue);
 	void waitForFence(uint64_t fenceValue);
 	void idleGPU(void);
 
 private:
-
 	ID3D12Device* pDevice_;
 
 	CommandQue graphicsQueue_;

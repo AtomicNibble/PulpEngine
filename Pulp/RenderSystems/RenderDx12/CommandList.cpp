@@ -207,6 +207,27 @@ void CommandListManger::shutdown(void)
 	copyQueue_.shutdown();
 }
 
+void CommandListManger::createNewCommandList(D3D12_COMMAND_LIST_TYPE type,
+	ID3D12GraphicsCommandList** pListOut, ID3D12CommandAllocator** pAllocatorOut)
+{
+	X_ASSERT(type != D3D12_COMMAND_LIST_TYPE_BUNDLE, "Bundles are not yet supported")(type);
+
+	switch (type)
+	{
+	case D3D12_COMMAND_LIST_TYPE_DIRECT: *pAllocatorOut = graphicsQueue_.requestAllocator(); break;
+	case D3D12_COMMAND_LIST_TYPE_BUNDLE: break;
+	case D3D12_COMMAND_LIST_TYPE_COMPUTE: *pAllocatorOut = computeQueue_.requestAllocator(); break;
+	case D3D12_COMMAND_LIST_TYPE_COPY: *pAllocatorOut = copyQueue_.requestAllocator(); break;
+	}
+
+	HRESULT hr = pDevice_->CreateCommandList(1, type, *pAllocatorOut, nullptr, IID_PPV_ARGS(pListOut));
+	if (FAILED(hr)) {
+		X_FATAL("Dx12", "Failed to create command list: %" PRIu32, hr);
+	}
+
+	(*pListOut)->SetName(L"CommandList");
+}
+
 bool CommandListManger::isFenceComplete(uint64_t fenceValue)
 {
 	CommandQue& que = getQueue(D3D12_COMMAND_LIST_TYPE(fenceValue >> 56));
