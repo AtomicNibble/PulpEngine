@@ -3,13 +3,15 @@
 
 X_NAMESPACE_BEGIN(render)
 
+static const D3D12_GPU_VIRTUAL_ADDRESS D3D12_GPU_VIRTUAL_ADDRESS_NULL = static_cast<D3D12_GPU_VIRTUAL_ADDRESS>(0);
+static const D3D12_GPU_VIRTUAL_ADDRESS D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN = static_cast<D3D12_GPU_VIRTUAL_ADDRESS>(-1);
 
 class GpuResource
 {
 public:
 	X_INLINE GpuResource();
 	X_INLINE GpuResource(ID3D12Resource* pResource, D3D12_RESOURCE_STATES currentState);
-	X_INLINE ~GpuResource();
+	X_INLINE virtual ~GpuResource();
 
 	X_INLINE void destroy(void);
 
