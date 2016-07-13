@@ -21,14 +21,17 @@ public:
 
 	X_INLINE D3D12_GPU_VIRTUAL_ADDRESS getGpuVirtualAddress(void) const;
 
+	X_INLINE D3D12_RESOURCE_STATES getUsageState(void) const;
+	X_INLINE D3D12_RESOURCE_STATES getTransitioningStateState(void) const;
+	X_INLINE void setUsageState(D3D12_RESOURCE_STATES state);
+	X_INLINE void setTransitioningStateState(D3D12_RESOURCE_STATES state);
+
 protected:
 	ID3D12Resource* pResource_;
 	D3D12_RESOURCE_STATES usageState_;
 	D3D12_RESOURCE_STATES transitioningState_;
 	D3D12_GPU_VIRTUAL_ADDRESS gpuVirtualAddress_;
 };
-
-
 
 
 X_NAMESPACE_END

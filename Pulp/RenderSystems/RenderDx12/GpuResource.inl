@@ -53,6 +53,25 @@ X_INLINE D3D12_GPU_VIRTUAL_ADDRESS GpuResource::getGpuVirtualAddress(void) const
 	return gpuVirtualAddress_;
 }
 
+X_INLINE D3D12_RESOURCE_STATES GpuResource::getUsageState(void) const
+{
+	return usageState_;
+}
+
+X_INLINE D3D12_RESOURCE_STATES GpuResource::getTransitioningStateState(void) const
+{
+	return transitioningState_;
+}
+
+X_INLINE void GpuResource::setUsageState(D3D12_RESOURCE_STATES state)
+{
+	usageState_ = state;
+}
+
+X_INLINE void GpuResource::setTransitioningStateState(D3D12_RESOURCE_STATES state)
+{
+	transitioningState_ = state;
+}
 
 X_NAMESPACE_END
 
