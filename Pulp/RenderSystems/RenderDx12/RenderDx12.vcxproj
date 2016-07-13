@@ -332,6 +332,7 @@
     <ClInclude Include="CommandSignature.h" />
     <ClInclude Include="DescriptorAllocator.h" />
     <ClInclude Include="GpuResource.h" />
+    <ClInclude Include="PipelineState.h" />
     <ClInclude Include="RootSignature.h" />
     <ClInclude Include="SamplerDesc.h" />
     <ClInclude Include="stdafx.h" />
@@ -344,6 +345,7 @@
     <ClCompile Include="DescriptorAllocator.cpp" />
     <ClCompile Include="GpuResource.cpp" />
     <ClCompile Include="Module.cpp" />
+    <ClCompile Include="PipelineState.cpp" />
     <ClCompile Include="RootSignature.cpp" />
     <ClCompile Include="SampleDesc.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -365,6 +367,7 @@
     <None Include="CommandList.inl" />
     <None Include="CommandSignature.inl" />
     <None Include="GpuResource.inl" />
+    <None Include="PipelineState.inl" />
     <None Include="RootSignature.inl" />
     <None Include="SamplerDesc.inl" />
   </ItemGroup>

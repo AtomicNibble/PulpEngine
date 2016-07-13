@@ -41,6 +41,9 @@
     <ClInclude Include="DescriptorAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PipelineState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -73,6 +76,9 @@
     <ClCompile Include="DescriptorAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="PipelineState.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
@@ -91,6 +97,9 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="SamplerDesc.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="PipelineState.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

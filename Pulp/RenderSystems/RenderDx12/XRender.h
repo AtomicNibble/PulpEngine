@@ -7,6 +7,7 @@
 #include <IRender.h>
 
 #include "CommandList.h"
+#include "SamplerDesc.h"
 
 X_NAMESPACE_BEGIN(render)
 
@@ -40,6 +41,17 @@ private:
 
 	core::StackString<128, wchar_t> deviceName_;
 	size_t dedicatedvideoMemory_;
+
+
+	SamplerDesc samplerLinearWrapDesc_;
+	SamplerDesc samplerAnisoWrapDesc_;
+	SamplerDesc samplerShadowDesc_;
+	SamplerDesc samplerLinearClampDesc_;
+	SamplerDesc samplerVolumeWrapDesc_;
+	SamplerDesc samplerPointClampDesc_;
+	SamplerDesc samplerPointBorderDesc_;
+	SamplerDesc samplerLinearBorderDesc_;
+
 };
 
 
