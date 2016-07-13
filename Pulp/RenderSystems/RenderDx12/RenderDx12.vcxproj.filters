@@ -35,6 +35,12 @@
     <ClInclude Include="GpuResource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SamplerDesc.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DescriptorAllocator.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -61,6 +67,12 @@
     <ClCompile Include="GpuResource.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="SampleDesc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="DescriptorAllocator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
@@ -76,6 +88,9 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="GpuResource.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="SamplerDesc.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

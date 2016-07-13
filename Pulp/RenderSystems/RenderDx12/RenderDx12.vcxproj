@@ -330,8 +330,10 @@
     <ClInclude Include="CommandAllocatorPool.h" />
     <ClInclude Include="CommandList.h" />
     <ClInclude Include="CommandSignature.h" />
+    <ClInclude Include="DescriptorAllocator.h" />
     <ClInclude Include="GpuResource.h" />
     <ClInclude Include="RootSignature.h" />
+    <ClInclude Include="SamplerDesc.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XRender.h" />
   </ItemGroup>
@@ -339,9 +341,11 @@
     <ClCompile Include="CommandAllocatorPool.cpp" />
     <ClCompile Include="CommandList.cpp" />
     <ClCompile Include="CommandSignature.cpp" />
+    <ClCompile Include="DescriptorAllocator.cpp" />
     <ClCompile Include="GpuResource.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="RootSignature.cpp" />
+    <ClCompile Include="SampleDesc.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>
@@ -362,6 +366,7 @@
     <None Include="CommandSignature.inl" />
     <None Include="GpuResource.inl" />
     <None Include="RootSignature.inl" />
+    <None Include="SamplerDesc.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
