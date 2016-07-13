@@ -57,6 +57,25 @@ private:
 	core::Array<D3D12_INPUT_ELEMENT_DESC> inputLayouts_;
 };
 
+
+
+class ComputePSO : public PSO
+{
+public:
+	X_INLINE ComputePSO();
+	X_INLINE ~ComputePSO();
+
+	void finalize(ID3D12Device* pDevice);
+
+	void setComputeShader(const void* pBinary, size_t size);
+	X_INLINE void setComputeShader(const D3D12_SHADER_BYTECODE& binary);
+
+private:
+
+	D3D12_COMPUTE_PIPELINE_STATE_DESC PSODesc_;
+};
+
+
 X_NAMESPACE_END
 
 #include "PipelineState.inl"

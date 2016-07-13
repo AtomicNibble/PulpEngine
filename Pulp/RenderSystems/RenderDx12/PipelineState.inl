@@ -46,6 +46,24 @@ X_INLINE void GraphicsPSO::setDomainShader(const D3D12_SHADER_BYTECODE& binary)
 }
 
 
+// ----------------------------------------
+
+X_INLINE ComputePSO::ComputePSO()
+{
+	core::zero_object(PSODesc_);
+	PSODesc_.NodeMask = 1;
+}
+
+X_INLINE ComputePSO::~ComputePSO()
+{
+
+}
+
+
+X_INLINE void ComputePSO::setComputeShader(const D3D12_SHADER_BYTECODE& binary)
+{
+	PSODesc_.CS = binary; 
+}
 
 
 X_NAMESPACE_END

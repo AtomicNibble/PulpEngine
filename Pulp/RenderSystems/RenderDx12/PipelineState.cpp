@@ -67,7 +67,7 @@ void GraphicsPSO::finalize(ID3D12Device* pDevice)
 
 	HRESULT hr = pDevice->CreateGraphicsPipelineState(&PSODesc_, IID_PPV_ARGS(&pPSO_));
 	if (FAILED(hr)) {
-		X_FATAL("Dx12", "Failed to create root signature: %" PRIu32, hr);
+		X_FATAL("Dx12", "Failed to create graphics PSO: %" PRIu32, hr);
 	}
 }
 
@@ -145,7 +145,6 @@ void GraphicsPSO::setPrimitiveRestart(D3D12_INDEX_BUFFER_STRIP_CUT_VALUE IBProps
 
 
 
-
 void GraphicsPSO::setVertexShader(const void* pBinary, size_t Size)
 {
 	PSODesc_.VS = CD3D12_SHADER_BYTECODE(pBinary, Size);
@@ -169,6 +168,29 @@ void GraphicsPSO::setHullShader(const void* pBinary, size_t Size)
 void GraphicsPSO::setDomainShader(const void* pBinary, size_t Size)
 {
 	PSODesc_.DS = CD3D12_SHADER_BYTECODE(pBinary, Size);
+}
+
+
+// ----------------------------------------
+
+void ComputePSO::finalize(ID3D12Device* pDevice)
+{
+	// Make sure the root signature is finalized first
+	PSODesc_.pRootSignature = pRootSignature_->getSignature();
+
+	X_ASSERT(PSODesc_.pRootSignature != nullptr, "root signature must be finalized before finalize PSO")();
+
+
+	HRESULT hr = pDevice->CreateComputePipelineState(&PSODesc_, IID_PPV_ARGS(&pPSO_));
+	if (FAILED(hr)) {
+		X_FATAL("Dx12", "Failed to create compute PSO: %" PRIu32, hr);
+	}
+}
+
+
+void ComputePSO::setComputeShader(const void* pBinary, size_t size)
+{
+	PSODesc_.CS = CD3D12_SHADER_BYTECODE(pBinary, size);
 }
 
 
