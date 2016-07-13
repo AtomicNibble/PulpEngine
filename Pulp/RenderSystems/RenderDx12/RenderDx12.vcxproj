@@ -328,9 +328,11 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="CommandAllocatorPool.h" />
+    <ClInclude Include="CommandContex.h" />
     <ClInclude Include="CommandList.h" />
     <ClInclude Include="CommandSignature.h" />
     <ClInclude Include="DescriptorAllocator.h" />
+    <ClInclude Include="GpuBuffer.h" />
     <ClInclude Include="GpuResource.h" />
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="RootSignature.h" />
@@ -340,9 +342,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CommandAllocatorPool.cpp" />
+    <ClCompile Include="CommandContex.cpp" />
     <ClCompile Include="CommandList.cpp" />
     <ClCompile Include="CommandSignature.cpp" />
     <ClCompile Include="DescriptorAllocator.cpp" />
+    <ClCompile Include="GpuBuffer.cpp" />
     <ClCompile Include="GpuResource.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="PipelineState.cpp" />
@@ -364,8 +368,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandAllocatorPool.inl" />
+    <None Include="CommandContex.inl" />
     <None Include="CommandList.inl" />
     <None Include="CommandSignature.inl" />
+    <None Include="GpuBuffer.inl" />
     <None Include="GpuResource.inl" />
     <None Include="PipelineState.inl" />
     <None Include="RootSignature.inl" />

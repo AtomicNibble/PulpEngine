@@ -44,6 +44,12 @@
     <ClInclude Include="PipelineState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CommandContex.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GpuBuffer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -79,6 +85,12 @@
     <ClCompile Include="PipelineState.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CommandContex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GpuBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
@@ -100,6 +112,12 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="PipelineState.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="CommandContex.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="GpuBuffer.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
