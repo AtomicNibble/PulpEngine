@@ -8,6 +8,7 @@ X_NAMESPACE_BEGIN(render)
 class CommandListManger;
 class CommandContext;
 class RootSignature;
+class GpuBuffer;
 
 struct Param
 {
@@ -123,7 +124,7 @@ public:
 	~GraphicsContext() X_OVERRIDE;
 
 
-//	void clearUAV(GpuBuffer& Target);
+	void clearUAV(GpuBuffer& Target);
 //	void clearUAV(ColorBuffer& Target);
 //	void clearColor(ColorBuffer& Target);
 //	void clearDepth(DepthBuffer& Target);

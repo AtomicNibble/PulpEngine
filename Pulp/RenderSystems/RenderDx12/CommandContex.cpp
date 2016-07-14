@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "CommandContex.h"
-
 #include "CommandList.h"
+#include "GpuBuffer.h"
 
 X_NAMESPACE_BEGIN(render)
 
@@ -371,6 +371,51 @@ GraphicsContext::~GraphicsContext()
 
 }
 
+
+void GraphicsContext::clearUAV(GpuBuffer& target)
+{
+	// After binding a UAV, we can get a GPU handle that is required to clear it as a UAV 
+	// (because it essentially runs a shader to set all of the values).
+
+#if 0
+	D3D12_GPU_DESCRIPTOR_HANDLE gpuVisibleHandle = dynamicDescriptorHeap_.UploadDirect(
+		target.getUAV());
+	
+	uint32_t clearColor[4];
+	core::zero_object(clearColor);
+	
+	pCommandList_->ClearUnorderedAccessViewUint(gpuVisibleHandle, target.getUAV(), 
+		target.getResource(), clearColor, 0, nullptr);
+#endif
+}
+
+#if 0
+void GraphicsContext::clearUAV(ColorBuffer& Target)
+{
+
+}
+
+void GraphicsContext::clearColor(ColorBuffer& Target)
+{
+
+}
+
+void GraphicsContext::clearDepth(DepthBuffer& Target)
+{
+
+}
+
+void GraphicsContext::clearStencil(DepthBuffer& Target)
+{
+
+}
+
+void GraphicsContext::clearDepthAndStencil(DepthBuffer& Target)
+{
+
+}
+#endif 
+
 void GraphicsContext::beginQuery(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE type, 
 	uint32_t heapIndex)
 {
@@ -469,7 +514,8 @@ void GraphicsContext::setViewportAndScissor(const D3D12_VIEWPORT& vp, const D3D1
 
 void GraphicsContext::setViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
 {
-	setViewport((float)x, (float)y, (float)w, (float)h);
+	setViewport(static_cast<float32_t>(x), static_cast<float32_t>(y),
+		static_cast<float32_t>(w), static_cast<float32_t>(h));
 	setScissor(x, y, x + w, y + h);
 }
 
