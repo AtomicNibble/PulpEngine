@@ -7,6 +7,7 @@ X_NAMESPACE_BEGIN(render)
 
 class CommandListManger;
 class CommandContext;
+class RootSignature;
 
 struct Param
 {
@@ -77,7 +78,7 @@ class CommandContext
 
 public:
 	CommandContext(D3D12_COMMAND_LIST_TYPE type);
-	~CommandContext(void);
+	virtual ~CommandContext(void);
 
 
 	// Flush existing commands to the GPU but keep the context alive
@@ -138,6 +139,80 @@ protected:
 };
 
 
-X_NAMESPACE_END
+class GraphicsContext : public CommandContext
+{
+public:
+	GraphicsContext();
+	~GraphicsContext() X_OVERRIDE;
+
+
+//	void clearUAV(GpuBuffer& Target);
+//	void clearUAV(ColorBuffer& Target);
+//	void clearColor(ColorBuffer& Target);
+//	void clearDepth(DepthBuffer& Target);
+//	void clearStencil(DepthBuffer& Target);
+//	void clearDepthAndStencil(DepthBuffer& Target);
+
+	void beginQuery(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE type, uint32_t heapIndex);
+	void endQuery(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE type, uint32_t heapIndex);
+	void resolveQueryData(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE type, uint32_t startIndex, 
+		uint32_t numQueries, ID3D12Resource* pDestinationBuffer, uint64_t destinationBufferOffset);
+
+	void setRootSignature(const RootSignature& rootSig);
+
+	void setRenderTargets(uint32_t numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE* pRTVs);
+	void setRenderTargets(uint32_t numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE* pRTVs, D3D12_CPU_DESCRIPTOR_HANDLE DSV);
+	void setRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE RTV);
+	void setRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE RTV, D3D12_CPU_DESCRIPTOR_HANDLE DSV);
+	void setDepthStencilTarget(D3D12_CPU_DESCRIPTOR_HANDLE DSV);
+
+	void setViewport(const D3D12_VIEWPORT& vp);
+	void setViewport(float32_t x, float32_t y, float32_t w, float32_t h, float32_t minDepth = 0.0f, float32_t maxDepth = 1.0f);
+	void setScissor(const D3D12_RECT& rect);
+	void setScissor(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom);
+	void setViewportAndScissor(const D3D12_VIEWPORT& vp, const D3D12_RECT& rect);
+	void setViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
+	void setStencilRef(uint32_t stencilRef);
+	void setBlendFactor(Color8u blendFactor);
+	void setBlendFactor(const Colorf& blendFactor);
+	void setPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology);
+
+//	void setPipelineState(const GraphicsPSO& PSO);
+	void setConstants(uint32_t rootIndex, uint32_t numConstants, const void* pConstants);
+	void setConstants(uint32_t rootIndex, Param X);
+	void setConstants(uint32_t rootIndex, Param X, Param Y);
+	void setConstants(uint32_t rootIndex, Param X, Param Y, Param Z);
+	void setConstants(uint32_t rootIndex, Param X, Param Y, Param Z, Param W);
+	void setConstantBuffer(uint32_t rootIndex, D3D12_GPU_VIRTUAL_ADDRESS CBV);
+	void setDynamicConstantBufferView(uint32_t RootIndex, size_t BufferSize, const void* pBufferData);
+//	void setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset = 0);
+//	void setBufferUAV(uint32_t rootIndex, const GpuBuffer& UAV, uint64_t offset = 0);
+	void setDescriptorTable(uint32_t rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE firstHandle);
+
+	void setDynamicDescriptor(uint32_t rootIndex, uint32_t offset, D3D12_CPU_DESCRIPTOR_HANDLE handle);
+	void setDynamicDescriptors(uint32_t rootIndex, uint32_t offset, uint32_t count, const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles);
+
+	void setIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& IBView);
+	void setVertexBuffer(uint32_t slot, const D3D12_VERTEX_BUFFER_VIEW& VBView);
+	void setVertexBuffers(uint32_t startSlot, uint32_t count, const D3D12_VERTEX_BUFFER_VIEW* pVBViews);
+	void setDynamicVB(uint32_t slot, size_t numVertices, size_t vertexStride, const void* pVBData);
+	void setDynamicIB(size_t indexCount, const uint16_t* pIBData);
+	void setDynamicSRV(uint32_t rootIndex, size_t bufferSize, const void* pBufferData);
+
+	void draw(uint32_t vertexCount, uint32_t vertexStartOffset = 0);
+	void drawIndexed(uint32_t indexCount, uint32_t startIndexLocation = 0, int32_t baseVertexLocation = 0);
+	void drawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount,
+		uint32_t startVertexLocation = 0, uint32_t startInstanceLocation = 0);
+	void drawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation,
+		int32_t baseVertexLocation, uint32_t startInstanceLocation);
+//	void drawIndirect(GpuBuffer& argumentBuffer, size_t argumentBufferOffset = 0);
+
+private:
+
+
+};
+	
+	
+	X_NAMESPACE_END
 
 #include "CommandContex.inl"

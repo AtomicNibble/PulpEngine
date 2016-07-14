@@ -362,4 +362,240 @@ void CommandContext::bindDescriptorHeaps(void)
 	}
 }
 
+// --------------------------------------------------------
+
+
+
+GraphicsContext::~GraphicsContext()
+{
+
+}
+
+
+
+void GraphicsContext::beginQuery(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE type, uint32_t heapIndex)
+{
+
+}
+
+void GraphicsContext::endQuery(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE type, uint32_t heapIndex)
+{
+
+}
+
+void GraphicsContext::resolveQueryData(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE type, uint32_t startIndex,
+		uint32_t numQueries, ID3D12Resource* pDestinationBuffer, uint64_t destinationBufferOffset)
+{
+
+}
+
+	 
+void GraphicsContext::setRootSignature(const RootSignature& rootSig)
+{
+
+}
+
+	 
+void GraphicsContext::setRenderTargets(uint32_t numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE* pRTVs)
+{
+
+}
+
+void GraphicsContext::setRenderTargets(uint32_t numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE* pRTVs, 
+	D3D12_CPU_DESCRIPTOR_HANDLE DSV)
+{
+
+}
+
+void GraphicsContext::setRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE RTV)
+{
+
+}
+
+void GraphicsContext::setRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE RTV, D3D12_CPU_DESCRIPTOR_HANDLE DSV)
+{
+
+}
+
+void GraphicsContext::setDepthStencilTarget(D3D12_CPU_DESCRIPTOR_HANDLE DSV)
+{
+
+}
+
+	 
+void GraphicsContext::setViewport(const D3D12_VIEWPORT& vp)
+{
+
+}
+
+void GraphicsContext::setViewport(float32_t x, float32_t y, float32_t w, float32_t h, 
+	float32_t minDepth, float32_t maxDepth)
+{
+
+}
+
+void GraphicsContext::setScissor(const D3D12_RECT& rect)
+{
+
+}
+
+void GraphicsContext::setScissor(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom)
+{
+
+}
+
+void GraphicsContext::setViewportAndScissor(const D3D12_VIEWPORT& vp, const D3D12_RECT& rect)
+{
+
+}
+
+void GraphicsContext::setViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
+{
+
+}
+
+void GraphicsContext::setStencilRef(uint32_t stencilRef)
+{
+
+}
+
+void GraphicsContext::setBlendFactor(Color8u blendFactor)
+{
+
+}
+
+void GraphicsContext::setBlendFactor(const Colorf& blendFactor)
+{
+
+}
+
+void GraphicsContext::setPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology)
+{
+
+}
+
+
+void GraphicsContext::setConstants(uint32_t rootIndex, uint32_t numConstants, const void* pConstants)
+{
+
+}
+
+void GraphicsContext::setConstants(uint32_t rootIndex, Param X)
+{
+
+}
+
+void GraphicsContext::setConstants(uint32_t rootIndex, Param X, Param Y)
+{
+
+}
+
+void GraphicsContext::setConstants(uint32_t rootIndex, Param X, Param Y, Param Z)
+{
+
+}
+
+void GraphicsContext::setConstants(uint32_t rootIndex, Param X, Param Y, Param Z, Param W)
+{
+
+}
+
+void GraphicsContext::setConstantBuffer(uint32_t rootIndex, D3D12_GPU_VIRTUAL_ADDRESS CBV)
+{
+
+}
+
+void GraphicsContext::setDynamicConstantBufferView(uint32_t RootIndex, size_t BufferSize, const void* pBufferData)
+{
+
+}
+
+//void GraphicsContext::setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset = 0)
+//{
+//
+//}
+//
+//void GraphicsContext::setBufferUAV(uint32_t rootIndex, const GpuBuffer& UAV, uint64_t offset = 0)
+//{
+//
+//}
+
+void GraphicsContext::setDescriptorTable(uint32_t rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE firstHandle)
+{
+
+}
+
+	 
+void GraphicsContext::setDynamicDescriptor(uint32_t rootIndex, uint32_t offset, D3D12_CPU_DESCRIPTOR_HANDLE handle)
+{
+
+}
+
+void GraphicsContext::setDynamicDescriptors(uint32_t rootIndex, uint32_t offset, uint32_t count, 
+	const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles)
+{
+
+}
+
+	 
+void GraphicsContext::setIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& IBView)
+{
+
+}
+
+void GraphicsContext::setVertexBuffer(uint32_t slot, const D3D12_VERTEX_BUFFER_VIEW& VBView)
+{
+
+}
+
+void GraphicsContext::setVertexBuffers(uint32_t startSlot, uint32_t count, const D3D12_VERTEX_BUFFER_VIEW* pVBViews)
+{
+
+}
+
+void GraphicsContext::setDynamicVB(uint32_t slot, size_t numVertices, size_t vertexStride, const void* pVBData)
+{
+
+}
+
+void GraphicsContext::setDynamicIB(size_t indexCount, const uint16_t* pIBData)
+{
+
+}
+
+void GraphicsContext::setDynamicSRV(uint32_t rootIndex, size_t bufferSize, const void* pBufferData)
+{
+
+}
+
+	 
+void GraphicsContext::draw(uint32_t vertexCount, uint32_t vertexStartOffset)
+{
+
+}
+
+void GraphicsContext::drawIndexed(uint32_t indexCount, uint32_t startIndexLocation, 
+	int32_t baseVertexLocation)
+{
+
+}
+
+void GraphicsContext::drawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount,
+		uint32_t startVertexLocation, uint32_t startInstanceLocation)
+{
+
+}
+
+void GraphicsContext::drawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation,
+		int32_t baseVertexLocation, uint32_t startInstanceLocation)
+{
+
+}
+
+//void GraphicsContext::drawIndirect(GpuBuffer& argumentBuffer, size_t argumentBufferOffset = 0)
+//{
+//
+//}
+
+
 X_NAMESPACE_END
