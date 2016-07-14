@@ -12,6 +12,12 @@
     <Filter Include="Source Files\EngineModule">
       <UniqueIdentifier>{57993920-8f75-41bd-a939-aacec3520a97}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Buffers">
+      <UniqueIdentifier>{5c0654b2-a937-46ff-a48c-2929207be108}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Buffers">
+      <UniqueIdentifier>{4fc52ba4-49a9-4df5-9e05-20bf34aca748}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -48,7 +54,13 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GpuBuffer.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="ColorBuffer.h">
+      <Filter>Header Files\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelBuffer.h">
+      <Filter>Header Files\Buffers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -88,8 +100,14 @@
     <ClCompile Include="CommandContex.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ColorBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
     <ClCompile Include="GpuBuffer.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -118,6 +136,12 @@
       <Filter>Header Files</Filter>
     </None>
     <None Include="GpuBuffer.inl">
+      <Filter>Header Files\Buffers</Filter>
+    </None>
+    <None Include="ColorBuffer.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="PixelBuffer.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>

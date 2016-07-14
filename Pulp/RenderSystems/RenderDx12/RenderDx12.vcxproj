@@ -327,6 +327,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ColorBuffer.h" />
     <ClInclude Include="CommandAllocatorPool.h" />
     <ClInclude Include="CommandContex.h" />
     <ClInclude Include="CommandList.h" />
@@ -335,12 +336,14 @@
     <ClInclude Include="GpuBuffer.h" />
     <ClInclude Include="GpuResource.h" />
     <ClInclude Include="PipelineState.h" />
+    <ClInclude Include="PixelBuffer.h" />
     <ClInclude Include="RootSignature.h" />
     <ClInclude Include="SamplerDesc.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XRender.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ColorBuffer.cpp" />
     <ClCompile Include="CommandAllocatorPool.cpp" />
     <ClCompile Include="CommandContex.cpp" />
     <ClCompile Include="CommandList.cpp" />
@@ -350,6 +353,7 @@
     <ClCompile Include="GpuResource.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="PipelineState.cpp" />
+    <ClCompile Include="PixelBuffer.cpp" />
     <ClCompile Include="RootSignature.cpp" />
     <ClCompile Include="SampleDesc.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -367,6 +371,7 @@
     <ClCompile Include="XRender.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ColorBuffer.inl" />
     <None Include="CommandAllocatorPool.inl" />
     <None Include="CommandContex.inl" />
     <None Include="CommandList.inl" />
@@ -374,6 +379,7 @@
     <None Include="GpuBuffer.inl" />
     <None Include="GpuResource.inl" />
     <None Include="PipelineState.inl" />
+    <None Include="PixelBuffer.inl" />
     <None Include="RootSignature.inl" />
     <None Include="SamplerDesc.inl" />
   </ItemGroup>
