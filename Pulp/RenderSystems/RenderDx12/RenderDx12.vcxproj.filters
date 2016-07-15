@@ -62,6 +62,12 @@
     <ClInclude Include="PixelBuffer.h">
       <Filter>Header Files\Buffers</Filter>
     </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="DepthBuffer.h">
+      <Filter>Header Files\Buffers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -109,6 +115,9 @@
     <ClCompile Include="PixelBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
     </ClCompile>
+    <ClCompile Include="DepthBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
@@ -138,11 +147,14 @@
     <None Include="GpuBuffer.inl">
       <Filter>Header Files\Buffers</Filter>
     </None>
-    <None Include="ColorBuffer.inl">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="PixelBuffer.inl">
       <Filter>Header Files</Filter>
+    </None>
+    <None Include="ColorBuffer.inl">
+      <Filter>Header Files\Buffers</Filter>
+    </None>
+    <None Include="DepthBuffer.inl">
+      <Filter>Header Files\Buffers</Filter>
     </None>
   </ItemGroup>
 </Project>
