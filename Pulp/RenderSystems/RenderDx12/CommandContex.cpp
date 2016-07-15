@@ -2,6 +2,7 @@
 #include "CommandContex.h"
 #include "CommandList.h"
 #include "CommandSignature.h"
+#include "RootSignature.h"
 #include "GpuBuffer.h"
 #include "ColorBuffer.h"
 #include "DepthBuffer.h"
@@ -181,6 +182,8 @@ void CommandContext::writeBuffer(GpuResource& dest, size_t destOffset, const voi
 	X_ASSERT_NOT_NULL(pData);
 	X_ASSERT_ALIGNMENT(pData, 16, 0);
 
+	X_ASSERT_NOT_IMPLEMENTED();
+
 //	DynAlloc tempSpace = m_CpuLinearAllocator.Allocate(NumBytes, 512);
 //	SIMDMemCopy(tempSpace.DataPtr, BufferData, Math::DivideByMultiple(NumBytes, 16));
 //	copyBufferRegion(dest, destOffset, tempSpace.Buffer, tempSpace.Offset, numBytes);
@@ -188,6 +191,8 @@ void CommandContext::writeBuffer(GpuResource& dest, size_t destOffset, const voi
 
 void CommandContext::fillBuffer(GpuResource& dest, size_t destOffset, Param val, size_t numBytes)
 {
+	X_ASSERT_NOT_IMPLEMENTED();
+
 //	DynAlloc tempSpace = m_CpuLinearAllocator.Allocate(NumBytes, 512);
 //	__m128 VectorValue = _mm_set1_ps(val.fval);
 //	SIMDMemFill(tempSpace.DataPtr, VectorValue, Math::DivideByMultiple(NumBytes, 16));
@@ -460,7 +465,13 @@ void GraphicsContext::resolveQueryData(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_
 	 
 void GraphicsContext::setRootSignature(const RootSignature& rootSig)
 {
+	if (rootSig.getSignature() == pCurGraphicsRootSignature_) {
+		return;
+	}
 
+	pCommandList_->SetGraphicsRootSignature(pCurGraphicsRootSignature_ = rootSig.getSignature());
+
+	dynamicDescriptorHeap_.parseGraphicsRootSignature(rootSig);
 }
 
 	 
@@ -644,13 +655,14 @@ void GraphicsContext::setDescriptorTable(uint32_t rootIndex, D3D12_GPU_DESCRIPTO
 void GraphicsContext::setDynamicDescriptor(uint32_t rootIndex, uint32_t offset, 
 	D3D12_CPU_DESCRIPTOR_HANDLE handle)
 {
+	setDynamicDescriptors(rootIndex, offset, 1, &handle);
 }
 
 
 void GraphicsContext::setDynamicDescriptors(uint32_t rootIndex, uint32_t offset, uint32_t count, 
 	const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles)
 {
-
+	dynamicDescriptorHeap_.setGraphicsDescriptorHandles(rootIndex, offset, count, pHandles);
 }
 
 	 
@@ -673,16 +685,19 @@ void GraphicsContext::setVertexBuffers(uint32_t startSlot, uint32_t count,
 void GraphicsContext::setDynamicVB(uint32_t slot, size_t numVertices, size_t vertexStride, 
 	const void* pVBData)
 {
+	X_ASSERT_NOT_IMPLEMENTED();
 
 }
 
 void GraphicsContext::setDynamicIB(size_t indexCount, const uint16_t* pIBData)
 {
+	X_ASSERT_NOT_IMPLEMENTED();
 
 }
 
 void GraphicsContext::setDynamicSRV(uint32_t rootIndex, size_t bufferSize, const void* pBufferData)
 {
+	X_ASSERT_NOT_IMPLEMENTED();
 
 }
 
