@@ -37,6 +37,8 @@ protected:
 class RootSignature
 {
 public:
+
+public:
 	X_INLINE RootSignature(core::MemoryArenaBase* arena, size_t numRootParams = 0, size_t numStaticSamplers = 0);
 	X_INLINE ~RootSignature();
 
@@ -49,18 +51,26 @@ public:
 
 	void finalize(ID3D12Device* pDevice, D3D12_ROOT_SIGNATURE_FLAGS flags = D3D12_ROOT_SIGNATURE_FLAG_NONE);
 
-
+	X_INLINE size_t numParams(void) const;
 	X_INLINE RootParameter& operator[] (size_t idx);
 	X_INLINE const RootParameter& operator[] (size_t idx) const;
 	X_INLINE ID3D12RootSignature* getSignature(void) const;
+
+	X_INLINE uint32_t descriptorTableBitMap(void) const;
+	X_INLINE uint32_t descriptorTableSize(size_t idx) const;
 
 protected:
 	core::Array<RootParameter> params_;
 	core::Array<D3D12_STATIC_SAMPLER_DESC> samplers_;
 
+	uint32_t descriptorTableBitMap_;			// One bit is set for root parameters that are (non-sampler) descriptor tables
+	uint32_t descriptorTableSize_[16];			// Non-sampler descriptor tables need to know their descriptor count
+	uint32_t maxDescriptorCacheHandleCount_;	// The sum of all non-sampler descriptor table counts
+
 	uint32_t samplesInitCount_;
 	ID3D12RootSignature* pSignature_;
 };
+
 
 
 X_NAMESPACE_END

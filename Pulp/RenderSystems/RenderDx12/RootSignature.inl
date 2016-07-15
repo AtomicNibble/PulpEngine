@@ -118,6 +118,13 @@ X_INLINE void RootSignature::reset(size_t numRootParams, size_t numStaticSampler
 	samplesInitCount_ = 0;
 }
 
+
+
+X_INLINE size_t RootSignature::numParams(void) const
+{
+	return params_.size();
+}
+
 X_INLINE RootParameter& RootSignature::operator[] (size_t idx)
 {
 	return params_[idx];
@@ -128,12 +135,19 @@ X_INLINE const RootParameter& RootSignature::operator[] (size_t idx) const
 	return params_[idx];
 }
 
-
 X_INLINE ID3D12RootSignature* RootSignature::getSignature(void) const
 {
 	return pSignature_;
 }
 
+X_INLINE uint32_t RootSignature::descriptorTableBitMap(void) const
+{
+	return descriptorTableBitMap_;
+}
 
+X_INLINE uint32_t RootSignature::descriptorTableSize(size_t idx) const
+{
+	return descriptorTableSize_[idx];
+}
 
 X_NAMESPACE_END
