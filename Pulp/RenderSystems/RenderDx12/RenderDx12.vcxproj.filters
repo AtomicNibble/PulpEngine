@@ -24,6 +24,9 @@
     <Filter Include="Source Files\Allocators">
       <UniqueIdentifier>{1b591469-342e-4977-a81f-f38f2b181ad6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{c77f5de2-967d-45ba-a9a2-af4b31a51b1c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -62,9 +65,6 @@
     <ClInclude Include="PixelBuffer.h">
       <Filter>Header Files\Buffers</Filter>
     </ClInclude>
-    <ClInclude Include="Constants.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="DepthBuffer.h">
       <Filter>Header Files\Buffers</Filter>
     </ClInclude>
@@ -77,8 +77,11 @@
     <ClInclude Include="DynamicDescriptorHeap.h">
       <Filter>Header Files\Allocators</Filter>
     </ClInclude>
+    <ClInclude Include="Constants.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
     <ClInclude Include="DxTypeHelpers.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
