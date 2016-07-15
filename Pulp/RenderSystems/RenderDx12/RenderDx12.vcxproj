@@ -335,6 +335,7 @@
     <ClInclude Include="Constants.h" />
     <ClInclude Include="DepthBuffer.h" />
     <ClInclude Include="DescriptorAllocator.h" />
+    <ClInclude Include="DynamicDescriptorHeap.h" />
     <ClInclude Include="GpuBuffer.h" />
     <ClInclude Include="GpuResource.h" />
     <ClInclude Include="PipelineState.h" />
@@ -352,6 +353,7 @@
     <ClCompile Include="CommandSignature.cpp" />
     <ClCompile Include="DepthBuffer.cpp" />
     <ClCompile Include="DescriptorAllocator.cpp" />
+    <ClCompile Include="DynamicDescriptorHeap.cpp" />
     <ClCompile Include="GpuBuffer.cpp" />
     <ClCompile Include="GpuResource.cpp" />
     <ClCompile Include="Module.cpp" />
@@ -380,6 +382,7 @@
     <None Include="CommandList.inl" />
     <None Include="CommandSignature.inl" />
     <None Include="DepthBuffer.inl" />
+    <None Include="DynamicDescriptorHeap.inl" />
     <None Include="GpuBuffer.inl" />
     <None Include="GpuResource.inl" />
     <None Include="PipelineState.inl" />
