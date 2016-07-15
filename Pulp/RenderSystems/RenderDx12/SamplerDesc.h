@@ -52,7 +52,7 @@ public:
 	SamplerDescriptor() = default;
 	X_INLINE SamplerDescriptor(D3D12_CPU_DESCRIPTOR_HANDLE hCpuDescriptor);
 
-	void create(ID3D12Device* pDevice, DescriptorAllocator* pAllocator, const D3D12_SAMPLER_DESC& Desc);
+	void create(ID3D12Device* pDevice, DescriptorAllocator& allocator, const D3D12_SAMPLER_DESC& Desc);
 
 	X_INLINE D3D12_CPU_DESCRIPTOR_HANDLE getCpuDescriptorHandle(void) const;
 
