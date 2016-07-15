@@ -18,6 +18,12 @@
     <Filter Include="Source Files\Buffers">
       <UniqueIdentifier>{4fc52ba4-49a9-4df5-9e05-20bf34aca748}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Allocators">
+      <UniqueIdentifier>{cb611c04-94d7-42c9-94d6-6d6521662035}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Allocators">
+      <UniqueIdentifier>{1b591469-342e-4977-a81f-f38f2b181ad6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -27,9 +33,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CommandList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CommandAllocatorPool.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="CommandSignature.h">
@@ -42,9 +45,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="SamplerDesc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DescriptorAllocator.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="PipelineState.h">
@@ -68,6 +68,12 @@
     <ClInclude Include="DepthBuffer.h">
       <Filter>Header Files\Buffers</Filter>
     </ClInclude>
+    <ClInclude Include="DescriptorAllocator.h">
+      <Filter>Header Files\Allocators</Filter>
+    </ClInclude>
+    <ClInclude Include="CommandAllocatorPool.h">
+      <Filter>Header Files\Allocators</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -82,9 +88,6 @@
     <ClCompile Include="CommandList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="CommandAllocatorPool.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="CommandSignature.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -95,9 +98,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SampleDesc.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DescriptorAllocator.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PipelineState.cpp">
@@ -118,12 +118,15 @@
     <ClCompile Include="DepthBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
     </ClCompile>
+    <ClCompile Include="DescriptorAllocator.cpp">
+      <Filter>Source Files\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="CommandAllocatorPool.cpp">
+      <Filter>Source Files\Allocators</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
-      <Filter>Header Files</Filter>
-    </None>
-    <None Include="CommandAllocatorPool.inl">
       <Filter>Header Files</Filter>
     </None>
     <None Include="CommandSignature.inl">
@@ -155,6 +158,9 @@
     </None>
     <None Include="DepthBuffer.inl">
       <Filter>Header Files\Buffers</Filter>
+    </None>
+    <None Include="CommandAllocatorPool.inl">
+      <Filter>Header Files\Allocators</Filter>
     </None>
   </ItemGroup>
 </Project>
