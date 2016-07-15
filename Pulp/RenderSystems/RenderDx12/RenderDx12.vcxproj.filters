@@ -77,6 +77,9 @@
     <ClInclude Include="DynamicDescriptorHeap.h">
       <Filter>Header Files\Allocators</Filter>
     </ClInclude>
+    <ClInclude Include="DxTypeHelpers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -156,9 +159,6 @@
     <None Include="GpuBuffer.inl">
       <Filter>Header Files\Buffers</Filter>
     </None>
-    <None Include="PixelBuffer.inl">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="ColorBuffer.inl">
       <Filter>Header Files\Buffers</Filter>
     </None>
@@ -173,6 +173,9 @@
     </None>
     <None Include="DescriptorAllocator.inl">
       <Filter>Header Files\Allocators</Filter>
+    </None>
+    <None Include="PixelBuffer.inl">
+      <Filter>Header Files\Buffers</Filter>
     </None>
   </ItemGroup>
 </Project>

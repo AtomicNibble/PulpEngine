@@ -19,7 +19,7 @@ X_DISABLE_WARNING(4005)
 X_ENABLE_WARNING(4005)
 
 #include "Constants.h"
-
+#include "DxTypeHelpers.h"
 
 
 X_LINK_LIB("D3D12.lib")
