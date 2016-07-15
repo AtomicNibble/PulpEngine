@@ -7,6 +7,9 @@
 #include "DepthBuffer.h"
 #include "PipelineState.h"
 
+#include "DynamicDescriptorHeap.h"
+
+
 X_NAMESPACE_BEGIN(render)
 
 
@@ -15,7 +18,11 @@ const uint32_t CommandContext::VALID_COMPUTE_QUEUE_RESOURCE_STATES = (D3D12_RESO
 	D3D12_RESOURCE_STATE_COPY_DEST |
 	D3D12_RESOURCE_STATE_COPY_SOURCE);
 
-CommandContext::CommandContext(D3D12_COMMAND_LIST_TYPE type) :
+
+X_DISABLE_WARNING(4355) // 'this': used in base member initializer list
+
+CommandContext::CommandContext(core::MemoryArenaBase* arena, ID3D12Device* pDevice, 
+		DescriptorAllocatorPool& pool, D3D12_COMMAND_LIST_TYPE type) :
 	type_(type),
 	pCommandList_(nullptr),
 	pCurrentAllocator_(nullptr),
@@ -23,10 +30,13 @@ CommandContext::CommandContext(D3D12_COMMAND_LIST_TYPE type) :
 	pCurGraphicsPipelineState_(nullptr),
 	pCurComputeRootSignature_(nullptr),
 	pCurComputePipelineState_(nullptr),
+	dynamicDescriptorHeap_(arena, pDevice, pool, *this),
 	numBarriersToFlush_(0)
 {
 	core::zero_object(pCurrentDescriptorHeaps_);
 }
+
+X_ENABLE_WARNING(4355)
 
 CommandContext::~CommandContext(void)
 {
@@ -83,7 +93,7 @@ uint64_t CommandContext::finish(CommandListManger& cmdMng, bool waitForCompletio
 
 //	m_CpuLinearAllocator.CleanupUsedPages(fenceValue);
 //	m_GpuLinearAllocator.CleanupUsedPages(fenceValue);
-//	m_DynamicDescriptorHeap.CleanupUsedHeaps(fenceValue);
+	dynamicDescriptorHeap_.cleanupUsedHeaps(fenceValue);
 
 	if (waitForCompletion) {
 		cmdMng.waitForFence(fenceValue);
@@ -399,11 +409,11 @@ void GraphicsContext::clearUAV(ColorBuffer& target)
 	// After binding a UAV, we can get a GPU handle that is required to clear it as a UAV (because it essentially runs
 	// a shader to set all of the values).
 
-#if 0
-	D3D12_GPU_DESCRIPTOR_HANDLE GpuVisibleHandle = dynamicDescriptorHeap_.UploadDirect(target.getUAV());
-	CD3DX12_RECT ClearRect(0, 0, (LONG)Target.GetWidth(), (LONG)Target.GetHeight());
+#if 1
+	D3D12_GPU_DESCRIPTOR_HANDLE gpuVisibleHandle = dynamicDescriptorHeap_.uploadDirect(target.getUAV());
+	CD3DX12_RECT ClearRect(0, 0, target.getWidth(), target.getHeight());
 
-	pCommandList_->ClearUnorderedAccessViewFloat(GpuVisibleHandle, target.getUAV(), target.getResource(),
+	pCommandList_->ClearUnorderedAccessViewFloat(gpuVisibleHandle, target.getUAV(), target.getResource(),
 		target.getClearColor(), 1, &ClearRect);
 #endif
 }

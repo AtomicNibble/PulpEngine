@@ -2,6 +2,7 @@
 
 
 #include "GpuResource.h"
+#include "DynamicDescriptorHeap.h"
 
 X_NAMESPACE_BEGIN(render)
 
@@ -13,6 +14,7 @@ class GpuBuffer;
 class ColorBuffer;
 class DepthBuffer;
 class GraphicsPSO;
+class DescriptorAllocatorPool;
 
 struct Param
 {
@@ -59,7 +61,8 @@ class CommandContext
 
 
 public:
-	CommandContext(D3D12_COMMAND_LIST_TYPE type);
+	CommandContext(core::MemoryArenaBase* arena, ID3D12Device* pDevice, 
+		DescriptorAllocatorPool& pool, D3D12_COMMAND_LIST_TYPE type);
 	virtual ~CommandContext(void);
 
 
@@ -111,6 +114,9 @@ protected:
 	// compute
 	ID3D12RootSignature* pCurComputeRootSignature_;
 	ID3D12PipelineState* pCurComputePipelineState_;
+
+	DynamicDescriptorHeap dynamicDescriptorHeap_;
+
 
 	uint32_t numBarriersToFlush_;
 	D3D12_RESOURCE_BARRIER resourceBarrierBuffer[RESOURCE_BARRIER_BUF];
