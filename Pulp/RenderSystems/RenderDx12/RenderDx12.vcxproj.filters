@@ -171,5 +171,8 @@
     <None Include="DynamicDescriptorHeap.inl">
       <Filter>Header Files\Allocators</Filter>
     </None>
+    <None Include="DescriptorAllocator.inl">
+      <Filter>Header Files\Allocators</Filter>
+    </None>
   </ItemGroup>
 </Project>

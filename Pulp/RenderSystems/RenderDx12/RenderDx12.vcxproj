@@ -382,6 +382,7 @@
     <None Include="CommandList.inl" />
     <None Include="CommandSignature.inl" />
     <None Include="DepthBuffer.inl" />
+    <None Include="DescriptorAllocator.inl" />
     <None Include="DynamicDescriptorHeap.inl" />
     <None Include="GpuBuffer.inl" />
     <None Include="GpuResource.inl" />
