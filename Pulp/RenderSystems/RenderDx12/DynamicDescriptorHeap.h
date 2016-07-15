@@ -63,6 +63,10 @@ class DynamicDescriptorHeap
 		void stageDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles);
 		void parseRootSignature(const RootSignature& rootSig);
 
+		X_INLINE uint32_t rootDescriptorTablesBitMap(void) const;
+		X_INLINE uint32_t staleRootParamsBitMap(void) const;
+		X_INLINE uint32_t maxCachedDescriptors(void) const;
+
 	private:
 		uint32_t rootDescriptorTablesBitMap_;
 		uint32_t staleRootParamsBitMap_;
