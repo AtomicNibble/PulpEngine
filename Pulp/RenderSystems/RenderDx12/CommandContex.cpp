@@ -1,9 +1,11 @@
 #include "stdafx.h"
 #include "CommandContex.h"
 #include "CommandList.h"
+#include "CommandSignature.h"
 #include "GpuBuffer.h"
 #include "ColorBuffer.h"
 #include "DepthBuffer.h"
+#include "PipelineState.h"
 
 X_NAMESPACE_BEGIN(render)
 
@@ -554,6 +556,16 @@ void GraphicsContext::setPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology)
 	pCommandList_->IASetPrimitiveTopology(topology);
 }
 
+void GraphicsContext::setPipelineState(const GraphicsPSO& PSO)
+{
+	ID3D12PipelineState* pPipelineState = PSO.getPipelineStateObject();
+	if (pPipelineState == pCurComputePipelineState_) {
+		return;
+	}
+
+	pCommandList_->SetPipelineState(pPipelineState);
+	pCurComputePipelineState_ = pPipelineState;
+}
 
 void GraphicsContext::setConstants(uint32_t rootIndex, uint32_t numConstants, 
 	const void* pConstants)
@@ -600,15 +612,24 @@ void GraphicsContext::setDynamicConstantBufferView(uint32_t RootIndex, size_t Bu
 
 }
 
-//void GraphicsContext::setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset = 0)
-//{
-//
-//}
-//
-//void GraphicsContext::setBufferUAV(uint32_t rootIndex, const GpuBuffer& UAV, uint64_t offset = 0)
-//{
-//
-//}
+void GraphicsContext::setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset)
+{
+	X_ASSERT(core::bitUtil::IsBitFlagSet(SRV.getUsageState(), D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE), "UNORDERED_ACCESS flag missing")(SRV.getUsageState());
+	X_ASSERT(core::bitUtil::IsBitFlagSet(SRV.getUsageState(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE), "NON_PIXEL_SHADER_RESOURCE flag missing")(SRV.getUsageState());
+
+	pCommandList_->SetGraphicsRootShaderResourceView(rootIndex, SRV.getGpuVirtualAddress() + offset);
+}
+
+void GraphicsContext::setBufferUAV(uint32_t rootIndex, const GpuBuffer& UAV, uint64_t offset)
+{
+	X_ASSERT(core::bitUtil::IsBitFlagSet(UAV.getUsageState(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS), "UNORDERED_ACCESS flag missing")(UAV.getUsageState());
+
+	if (offset != 0) {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	pCommandList_->SetGraphicsRootUnorderedAccessView(rootIndex, UAV.getGpuVirtualAddress());
+}
 
 void GraphicsContext::setDescriptorTable(uint32_t rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE firstHandle)
 {
@@ -690,10 +711,15 @@ void GraphicsContext::drawIndexedInstanced(uint32_t indexCountPerInstance, uint3
 		startIndexLocation, baseVertexLocation, startInstanceLocation);
 }
 
-//void GraphicsContext::drawIndirect(GpuBuffer& argumentBuffer, size_t argumentBufferOffset = 0)
-//{
-//
-//}
+void GraphicsContext::drawIndirect(CommandSignature& drawIndirectCmdSig, GpuBuffer& argumentBuffer, size_t argumentBufferOffset)
+{
+	flushResourceBarriers();
+	// dynamicDescriptorHeap_.CommitGraphicsRootDescriptorTables(pCommandList_);
+
+	pCommandList_->ExecuteIndirect(drawIndirectCmdSig.getSignature(), 1, argumentBuffer.getResource(),
+		static_cast<uint64_t>(argumentBufferOffset), nullptr, 0);
+
+}
 
 
 X_NAMESPACE_END

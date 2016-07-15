@@ -7,10 +7,12 @@ X_NAMESPACE_BEGIN(render)
 
 class CommandListManger;
 class CommandContext;
+class CommandSignature;
 class RootSignature;
 class GpuBuffer;
 class ColorBuffer;
 class DepthBuffer;
+class GraphicsPSO;
 
 struct Param
 {
@@ -156,8 +158,8 @@ public:
 	void setBlendFactor(Color8u blendFactor);
 	void setBlendFactor(const Colorf& blendFactor);
 	void setPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology);
-
-//	void setPipelineState(const GraphicsPSO& PSO);
+	
+	void setPipelineState(const GraphicsPSO& PSO);
 	void setConstants(uint32_t rootIndex, uint32_t numConstants, const void* pConstants);
 	void setConstants(uint32_t rootIndex, Param X);
 	void setConstants(uint32_t rootIndex, Param X, Param Y);
@@ -165,8 +167,8 @@ public:
 	void setConstants(uint32_t rootIndex, Param X, Param Y, Param Z, Param W);
 	void setConstantBuffer(uint32_t rootIndex, D3D12_GPU_VIRTUAL_ADDRESS CBV);
 	void setDynamicConstantBufferView(uint32_t RootIndex, size_t BufferSize, const void* pBufferData);
-//	void setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset = 0);
-//	void setBufferUAV(uint32_t rootIndex, const GpuBuffer& UAV, uint64_t offset = 0);
+	void setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset = 0);
+	void setBufferUAV(uint32_t rootIndex, const GpuBuffer& UAV, uint64_t offset = 0);
 	void setDescriptorTable(uint32_t rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE firstHandle);
 
 	void setDynamicDescriptor(uint32_t rootIndex, uint32_t offset, D3D12_CPU_DESCRIPTOR_HANDLE handle);
@@ -185,7 +187,7 @@ public:
 		uint32_t startVertexLocation = 0, uint32_t startInstanceLocation = 0);
 	void drawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, uint32_t startIndexLocation,
 		int32_t baseVertexLocation, uint32_t startInstanceLocation);
-//	void drawIndirect(GpuBuffer& argumentBuffer, size_t argumentBufferOffset = 0);
+	void drawIndirect(CommandSignature& drawIndirectCmdSig, GpuBuffer& argumentBuffer, size_t argumentBufferOffset = 0);
 
 private:
 
