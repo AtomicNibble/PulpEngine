@@ -74,7 +74,7 @@ class DynamicDescriptorHeap
 
 
 public:
-	DynamicDescriptorHeap(core::MemoryArenaBase* arena, DescriptorAllocatorPool& pool, CommandContext& owningContext);
+	DynamicDescriptorHeap(core::MemoryArenaBase* arena, ID3D12Device* pDevice, DescriptorAllocatorPool& pool, CommandContext& owningContext);
 	~DynamicDescriptorHeap();
 
 
@@ -85,7 +85,7 @@ public:
 	void setComputeDescriptorHandles(uint32_t rootIndex, uint32_t offset, uint32_t numHandles, const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles);
 
 	// Bypass the cache and upload directly to the shader-visible heap
-	D3D12_GPU_DESCRIPTOR_HANDLE uploadDirect(ID3D12Device* pDevice, D3D12_CPU_DESCRIPTOR_HANDLE handle);
+	D3D12_GPU_DESCRIPTOR_HANDLE uploadDirect(D3D12_CPU_DESCRIPTOR_HANDLE handle);
 
 	// Deduce cache layout needed to support the descriptor tables needed by the root signature.
 	void parseGraphicsRootSignature(const RootSignature& rootSig);
@@ -110,10 +110,12 @@ private:
 	// Mark all descriptors in the cache as stale and in need of re-uploading.
 	void unbindAllValid(void);
 
-	uint32_t getDescriptorSize(ID3D12Device* pDevice);
+	uint32_t getDescriptorSize(void);
 
 
 private:
+	ID3D12Device* pDevice_;
+
 	DescriptorHandleCache graphicsHandleCache_;
 	DescriptorHandleCache computeHandleCache_;
 

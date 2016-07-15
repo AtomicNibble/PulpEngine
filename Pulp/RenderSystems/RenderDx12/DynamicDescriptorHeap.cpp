@@ -190,7 +190,9 @@ void DynamicDescriptorHeap::DescriptorHandleCache::parseRootSignature(const Root
 // ---------------------------------------------------------------------
 
 
-DynamicDescriptorHeap::DynamicDescriptorHeap(core::MemoryArenaBase* arena, DescriptorAllocatorPool& pool, CommandContext& owningContext) :
+DynamicDescriptorHeap::DynamicDescriptorHeap(core::MemoryArenaBase* arena, ID3D12Device* pDevice, 
+		DescriptorAllocatorPool& pool, CommandContext& owningContext) :
+	pDevice_(pDevice),
 	retiredHeaps_(arena),
 	owningContext_(owningContext),
 	pool_(pool),
@@ -226,7 +228,7 @@ void DynamicDescriptorHeap::setComputeDescriptorHandles(uint32_t rootIndex, uint
 	computeHandleCache_.stageDescriptorHandles(rootIndex, offset, numHandles, pHandles);
 }
 
-D3D12_GPU_DESCRIPTOR_HANDLE DynamicDescriptorHeap::uploadDirect(ID3D12Device* pDevice, D3D12_CPU_DESCRIPTOR_HANDLE handle)
+D3D12_GPU_DESCRIPTOR_HANDLE DynamicDescriptorHeap::uploadDirect(D3D12_CPU_DESCRIPTOR_HANDLE handle)
 {
 	if (!hasSpace(1)) {
 		retireCurrentHeap();
@@ -235,10 +237,10 @@ D3D12_GPU_DESCRIPTOR_HANDLE DynamicDescriptorHeap::uploadDirect(ID3D12Device* pD
 
 	owningContext_.setDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, getHeapPointer());
 
-	DescriptorHandle destHandle = firstDescriptor_ + currentOffset_ * getDescriptorSize(pDevice);
+	DescriptorHandle destHandle = firstDescriptor_ + currentOffset_ * getDescriptorSize();
 	currentOffset_ += 1;
 
-	pDevice->CopyDescriptorsSimple(1, destHandle.getCpuHandle(), handle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	pDevice_->CopyDescriptorsSimple(1, destHandle.getCpuHandle(), handle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	return destHandle.getGpuHandle();
 }
@@ -297,7 +299,7 @@ ID3D12DescriptorHeap* DynamicDescriptorHeap::getHeapPointer(void)
 
 DescriptorHandle DynamicDescriptorHeap::allocate(uint32_t count)
 {
-	DescriptorHandle ret = firstDescriptor_ + currentOffset_ * getDescriptorSize(nullptr);
+	DescriptorHandle ret = firstDescriptor_ + currentOffset_ * getDescriptorSize();
 	currentOffset_ += count;
 	return ret;
 }
@@ -316,13 +318,12 @@ void DynamicDescriptorHeap::unbindAllValid(void)
 	computeHandleCache_.unbindAllValid();
 }
 
-uint32_t DynamicDescriptorHeap::getDescriptorSize(ID3D12Device* pDevice)
+uint32_t DynamicDescriptorHeap::getDescriptorSize()
 {
 	if (descriptorSize_ == 0) {
-		descriptorSize_ = pDevice->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		descriptorSize_ = pDevice_->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 	}
 	return descriptorSize_;
-
 }
 
 X_NAMESPACE_END
