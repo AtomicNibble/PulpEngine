@@ -9,6 +9,8 @@ class CommandListManger;
 class CommandContext;
 class RootSignature;
 class GpuBuffer;
+class ColorBuffer;
+class DepthBuffer;
 
 struct Param
 {
@@ -32,11 +34,11 @@ struct Param
 class ContextManager
 {
 public:
-	ContextManager(void) {}
+	ContextManager(void);
 
-	CommandContext* AllocateContext(D3D12_COMMAND_LIST_TYPE Type);
-	void FreeContext(CommandContext*);
-	void DestroyAllContexts();
+	CommandContext* allocateContext(D3D12_COMMAND_LIST_TYPE type);
+	void freeContext(CommandContext* pContex);
+	void destroyAllContexts(void);
 
 private:
 //	std::vector<std::unique_ptr<CommandContext> > sm_ContextPool[4];
@@ -124,12 +126,12 @@ public:
 	~GraphicsContext() X_OVERRIDE;
 
 
-	void clearUAV(GpuBuffer& Target);
-//	void clearUAV(ColorBuffer& Target);
-//	void clearColor(ColorBuffer& Target);
-//	void clearDepth(DepthBuffer& Target);
-//	void clearStencil(DepthBuffer& Target);
-//	void clearDepthAndStencil(DepthBuffer& Target);
+	void clearUAV(GpuBuffer& target);
+	void clearUAV(ColorBuffer& target);
+	void clearColor(ColorBuffer& target);
+	void clearDepth(DepthBuffer& target);
+	void clearStencil(DepthBuffer& target);
+	void clearDepthAndStencil(DepthBuffer& target);
 
 	void beginQuery(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE type, uint32_t heapIndex);
 	void endQuery(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE type, uint32_t heapIndex);

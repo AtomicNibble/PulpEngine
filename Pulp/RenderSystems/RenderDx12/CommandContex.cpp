@@ -2,6 +2,8 @@
 #include "CommandContex.h"
 #include "CommandList.h"
 #include "GpuBuffer.h"
+#include "ColorBuffer.h"
+#include "DepthBuffer.h"
 
 X_NAMESPACE_BEGIN(render)
 
@@ -389,32 +391,44 @@ void GraphicsContext::clearUAV(GpuBuffer& target)
 #endif
 }
 
-#if 0
-void GraphicsContext::clearUAV(ColorBuffer& Target)
-{
 
+void GraphicsContext::clearUAV(ColorBuffer& target)
+{
+	// After binding a UAV, we can get a GPU handle that is required to clear it as a UAV (because it essentially runs
+	// a shader to set all of the values).
+
+#if 0
+	D3D12_GPU_DESCRIPTOR_HANDLE GpuVisibleHandle = dynamicDescriptorHeap_.UploadDirect(target.getUAV());
+	CD3DX12_RECT ClearRect(0, 0, (LONG)Target.GetWidth(), (LONG)Target.GetHeight());
+
+	pCommandList_->ClearUnorderedAccessViewFloat(GpuVisibleHandle, target.getUAV(), target.getResource(),
+		target.getClearColor(), 1, &ClearRect);
+#endif
 }
 
-void GraphicsContext::clearColor(ColorBuffer& Target)
+void GraphicsContext::clearColor(ColorBuffer& target)
 {
-
+	pCommandList_->ClearRenderTargetView(target.getRTV(), target.getClearColor(), 0, nullptr);
 }
 
 void GraphicsContext::clearDepth(DepthBuffer& Target)
 {
-
+	pCommandList_->ClearDepthStencilView(Target.getDSV(), D3D12_CLEAR_FLAG_DEPTH,
+		Target.getClearDepth(), Target.getClearStencil(), 0, nullptr);
 }
 
 void GraphicsContext::clearStencil(DepthBuffer& Target)
 {
-
+	pCommandList_->ClearDepthStencilView(Target.getDSV(), D3D12_CLEAR_FLAG_STENCIL,
+		Target.getClearDepth(), Target.getClearStencil(), 0, nullptr);
 }
 
-void GraphicsContext::clearDepthAndStencil(DepthBuffer& Target)
+void GraphicsContext::clearDepthAndStencil(DepthBuffer& target)
 {
-
+	pCommandList_->ClearDepthStencilView(target.getDSV(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
+		target.getClearDepth(), target.getClearStencil(), 0, nullptr);
 }
-#endif 
+
 
 void GraphicsContext::beginQuery(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE type, 
 	uint32_t heapIndex)
