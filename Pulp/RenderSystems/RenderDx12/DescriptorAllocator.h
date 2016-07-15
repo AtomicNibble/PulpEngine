@@ -42,7 +42,7 @@ protected:
 	ID3D12DescriptorHeap* requestNewHeap(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t num);
 
 private:
-	std::array<DescriptorTypeAllocator, 4> allocators_;
+	std::array<DescriptorTypeAllocator, D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES> allocators_;
 	ID3D12Device* pDevice_;
 
 	core::CriticalSection cs_;
@@ -56,4 +56,29 @@ X_INLINE D3D12_CPU_DESCRIPTOR_HANDLE DescriptorAllocator::allocateDescriptor(D3D
 }
 
 
+
+class DescriptorHandle
+{
+public:
+	X_INLINE DescriptorHandle();
+	X_INLINE explicit DescriptorHandle(D3D12_CPU_DESCRIPTOR_HANDLE CpuHandle);
+	X_INLINE DescriptorHandle(D3D12_CPU_DESCRIPTOR_HANDLE CpuHandle, D3D12_GPU_DESCRIPTOR_HANDLE GpuHandle);
+
+	X_INLINE DescriptorHandle operator+ (int32_t offsetScaledByDescriptorSize) const;
+
+	X_INLINE void operator += (int32_t offsetScaledByDescriptorSize);
+
+	X_INLINE D3D12_CPU_DESCRIPTOR_HANDLE getCpuHandle(void) const;
+	X_INLINE D3D12_GPU_DESCRIPTOR_HANDLE getGpuHandle(void) const;
+
+	X_INLINE bool isNull(void) const;
+	X_INLINE bool isShaderVisible(void) const;
+
+private:
+	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle_;
+	D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle_;
+};
+
 X_NAMESPACE_END
+
+#include "DescriptorAllocator.inl"
