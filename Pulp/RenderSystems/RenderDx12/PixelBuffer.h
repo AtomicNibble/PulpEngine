@@ -48,7 +48,7 @@ protected:
 
 	uint32_t width_;
 	uint32_t height_;
-	uint32_t arraySize_;
+	uint32_t arraySize_; // depth
 	DXGI_FORMAT format_;
 };
 
