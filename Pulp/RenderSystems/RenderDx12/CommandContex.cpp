@@ -391,16 +391,13 @@ void GraphicsContext::clearUAV(GpuBuffer& target)
 	// After binding a UAV, we can get a GPU handle that is required to clear it as a UAV 
 	// (because it essentially runs a shader to set all of the values).
 
-#if 0
-	D3D12_GPU_DESCRIPTOR_HANDLE gpuVisibleHandle = dynamicDescriptorHeap_.UploadDirect(
-		target.getUAV());
+	D3D12_GPU_DESCRIPTOR_HANDLE gpuVisibleHandle = dynamicDescriptorHeap_.uploadDirect(target.getUAV());
 	
 	uint32_t clearColor[4];
 	core::zero_object(clearColor);
 	
 	pCommandList_->ClearUnorderedAccessViewUint(gpuVisibleHandle, target.getUAV(), 
 		target.getResource(), clearColor, 0, nullptr);
-#endif
 }
 
 
@@ -409,13 +406,11 @@ void GraphicsContext::clearUAV(ColorBuffer& target)
 	// After binding a UAV, we can get a GPU handle that is required to clear it as a UAV (because it essentially runs
 	// a shader to set all of the values).
 
-#if 1
 	D3D12_GPU_DESCRIPTOR_HANDLE gpuVisibleHandle = dynamicDescriptorHeap_.uploadDirect(target.getUAV());
 	CD3DX12_RECT ClearRect(0, 0, target.getWidth(), target.getHeight());
 
 	pCommandList_->ClearUnorderedAccessViewFloat(gpuVisibleHandle, target.getUAV(), target.getResource(),
 		target.getClearColor(), 1, &ClearRect);
-#endif
 }
 
 void GraphicsContext::clearColor(ColorBuffer& target)
@@ -707,7 +702,7 @@ void GraphicsContext::drawInstanced(uint32_t vertexCountPerInstance, uint32_t in
 		uint32_t startVertexLocation, uint32_t startInstanceLocation)
 {
 	flushResourceBarriers();
-	// dynamicDescriptorHeap_.CommitGraphicsRootDescriptorTables(pCommandList_);
+	dynamicDescriptorHeap_.commitGraphicsRootDescriptorTables(pCommandList_);
 	pCommandList_->DrawInstanced(vertexCountPerInstance, instanceCount, 
 		startVertexLocation, startInstanceLocation);
 }
@@ -716,7 +711,7 @@ void GraphicsContext::drawIndexedInstanced(uint32_t indexCountPerInstance, uint3
 	uint32_t startIndexLocation, int32_t baseVertexLocation, uint32_t startInstanceLocation)
 {
 	flushResourceBarriers();
-	// dynamicDescriptorHeap_.CommitGraphicsRootDescriptorTables(pCommandList_);
+	dynamicDescriptorHeap_.commitGraphicsRootDescriptorTables(pCommandList_);
 	pCommandList_->DrawIndexedInstanced(indexCountPerInstance, instanceCount,
 		startIndexLocation, baseVertexLocation, startInstanceLocation);
 }
@@ -724,7 +719,7 @@ void GraphicsContext::drawIndexedInstanced(uint32_t indexCountPerInstance, uint3
 void GraphicsContext::drawIndirect(CommandSignature& drawIndirectCmdSig, GpuBuffer& argumentBuffer, size_t argumentBufferOffset)
 {
 	flushResourceBarriers();
-	// dynamicDescriptorHeap_.CommitGraphicsRootDescriptorTables(pCommandList_);
+	dynamicDescriptorHeap_.commitGraphicsRootDescriptorTables(pCommandList_);
 
 	pCommandList_->ExecuteIndirect(drawIndirectCmdSig.getSignature(), 1, argumentBuffer.getResource(),
 		static_cast<uint64_t>(argumentBufferOffset), nullptr, 0);
