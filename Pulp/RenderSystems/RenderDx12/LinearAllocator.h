@@ -20,7 +20,7 @@ struct DynAlloc
 {
 	DynAlloc(GpuResource& baseResource, size_t offset, size_t size);
 
-	void setData(void* pData, D3D12_GPU_VIRTUAL_ADDRESS gpuAddress);
+	X_INLINE void setData(void* pData, D3D12_GPU_VIRTUAL_ADDRESS gpuAddress);
 
 private:
 	GpuResource& buffer_;	// The D3D buffer associated with this memory.
@@ -109,16 +109,6 @@ private:
 	core::Array<LinearAllocationPage*> retiredPages_;
 };
 
-
-X_INLINE LinearAllocationPage* LinearAllocatorManager::requestPage(LinearAllocatorType::Enum type)
-{
-	return pageAllocators_[type].requestPage();
-}
-
-X_INLINE void LinearAllocatorManager::discardPages(LinearAllocatorType::Enum type, uint64_t fenceID, const core::Array<LinearAllocationPage*>& pages)
-{
-	return pageAllocators_[type].discardPages(fenceID, pages);
-}
 
 X_NAMESPACE_END
 
