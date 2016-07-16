@@ -23,7 +23,7 @@ const uint32_t CommandContext::VALID_COMPUTE_QUEUE_RESOURCE_STATES = (D3D12_RESO
 X_DISABLE_WARNING(4355) // 'this': used in base member initializer list
 
 CommandContext::CommandContext(core::MemoryArenaBase* arena, ID3D12Device* pDevice, 
-		DescriptorAllocatorPool& pool, D3D12_COMMAND_LIST_TYPE type) :
+		DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan, D3D12_COMMAND_LIST_TYPE type) :
 	type_(type),
 	pCommandList_(nullptr),
 	pCurrentAllocator_(nullptr),
@@ -32,6 +32,8 @@ CommandContext::CommandContext(core::MemoryArenaBase* arena, ID3D12Device* pDevi
 	pCurComputeRootSignature_(nullptr),
 	pCurComputePipelineState_(nullptr),
 	dynamicDescriptorHeap_(arena, pDevice, pool, *this),
+	cpuLinearAllocator_(arena, linAllocMan, LinearAllocatorType::CPU_WRITABLE),
+	gpuLinearAllocator_(arena, linAllocMan, LinearAllocatorType::GPU_EXCLUSIVE),
 	numBarriersToFlush_(0)
 {
 	core::zero_object(pCurrentDescriptorHeaps_);

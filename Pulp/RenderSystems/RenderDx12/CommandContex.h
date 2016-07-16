@@ -3,6 +3,7 @@
 
 #include "GpuResource.h"
 #include "DynamicDescriptorHeap.h"
+#include "LinearAllocator.h"
 
 X_NAMESPACE_BEGIN(render)
 
@@ -62,7 +63,7 @@ class CommandContext
 
 public:
 	CommandContext(core::MemoryArenaBase* arena, ID3D12Device* pDevice, 
-		DescriptorAllocatorPool& pool, D3D12_COMMAND_LIST_TYPE type);
+		DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan, D3D12_COMMAND_LIST_TYPE type);
 	virtual ~CommandContext(void);
 
 
@@ -117,6 +118,8 @@ protected:
 
 	DynamicDescriptorHeap dynamicDescriptorHeap_;
 
+	LinearAllocator cpuLinearAllocator_;
+	LinearAllocator gpuLinearAllocator_;
 
 	uint32_t numBarriersToFlush_;
 	D3D12_RESOURCE_BARRIER resourceBarrierBuffer[RESOURCE_BARRIER_BUF];
