@@ -1,7 +1,8 @@
 #include "stdafx.h"
+#include "CommandList.h"
+
 #include "LinearAllocator.h"
 
-#include "CommandList.h"
 
 X_NAMESPACE_BEGIN(render)
 

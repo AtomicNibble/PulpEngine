@@ -3,8 +3,7 @@
 #include "GpuResource.h"
 #include <queue>
 
-// class CommandListManger;
-#include "CommandList.h"
+class CommandListManger;
 
 X_NAMESPACE_BEGIN(render)
 
