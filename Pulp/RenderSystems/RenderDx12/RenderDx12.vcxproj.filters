@@ -83,6 +83,9 @@
     <ClInclude Include="DxTypeHelpers.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="LinearAllocator.h">
+      <Filter>Header Files\Allocators</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -136,6 +139,9 @@
     <ClCompile Include="DynamicDescriptorHeap.cpp">
       <Filter>Source Files\Allocators</Filter>
     </ClCompile>
+    <ClCompile Include="LinearAllocator.cpp">
+      <Filter>Source Files\Allocators</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
@@ -179,6 +185,9 @@
     </None>
     <None Include="PixelBuffer.inl">
       <Filter>Header Files\Buffers</Filter>
+    </None>
+    <None Include="LinearAllocator.inl">
+      <Filter>Header Files\Allocators</Filter>
     </None>
   </ItemGroup>
 </Project>
