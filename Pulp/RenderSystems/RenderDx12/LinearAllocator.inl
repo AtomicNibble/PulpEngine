@@ -8,6 +8,38 @@ X_INLINE void DynAlloc::setData(void* pData, D3D12_GPU_VIRTUAL_ADDRESS gpuAddres
 	gpuAddress_ = gpuAddress;
 }
 
+
+X_INLINE size_t DynAlloc::getOffset(void) const
+{
+	return offset_;
+}
+
+X_INLINE size_t DynAlloc::getSize(void) const
+{
+	return size_;
+}
+
+X_INLINE void* DynAlloc::getCpuData(void) const
+{
+	return pData_;
+}
+
+X_INLINE const GpuResource& DynAlloc::getBuffer(void) const
+{
+	return buffer_;
+}
+
+X_INLINE GpuResource& DynAlloc::getBuffer(void)
+{
+	return buffer_;
+}
+
+X_INLINE D3D12_GPU_VIRTUAL_ADDRESS DynAlloc::getGpuAddress(void)
+{
+	return gpuAddress_;
+}
+
+
 // ------------------------------------------------------------------
 
 X_INLINE void* LinearAllocationPage::cpuVirtualAddress(void) const

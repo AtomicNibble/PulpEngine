@@ -21,6 +21,14 @@ struct DynAlloc
 
 	X_INLINE void setData(void* pData, D3D12_GPU_VIRTUAL_ADDRESS gpuAddress);
 
+
+	X_INLINE size_t getOffset(void) const;
+	X_INLINE size_t getSize(void) const;
+	X_INLINE void* getCpuData(void) const;
+	X_INLINE const GpuResource& getBuffer(void) const;
+	X_INLINE GpuResource& getBuffer(void);
+	X_INLINE D3D12_GPU_VIRTUAL_ADDRESS getGpuAddress(void);
+
 private:
 	GpuResource& buffer_;	// The D3D buffer associated with this memory.
 	size_t offset_;			// Offset from start of buffer resource
