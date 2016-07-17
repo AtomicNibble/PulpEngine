@@ -19,11 +19,74 @@ const uint32_t CommandContext::VALID_COMPUTE_QUEUE_RESOURCE_STATES = (D3D12_RESO
 	D3D12_RESOURCE_STATE_COPY_DEST |
 	D3D12_RESOURCE_STATE_COPY_SOURCE);
 
-
 X_DISABLE_WARNING(4355) // 'this': used in base member initializer list
 
-CommandContext::CommandContext(core::MemoryArenaBase* arena, ID3D12Device* pDevice, 
+
+ContextManager::ContextManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
+		DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan) :
+	arena_(arena),
+	pDevice_(pDevice),
+	pool_(pool),
+	linAllocMan_(linAllocMan),
+	contextPool_{ arena, arena, arena, arena }
+{
+
+}
+
+ContextManager::~ContextManager()
+{
+
+}
+
+CommandContext* ContextManager::allocateContext(CommandListManger& cmdListMan, D3D12_COMMAND_LIST_TYPE type)
+{
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	auto& availableContexts = availableContexts_[type];
+
+	CommandContext* pRet = nullptr;
+	if (availableContexts.empty())
+	{
+		pRet = X_NEW(CommandContext, arena_, "CmdContex")(*this, arena_, pDevice_, pool_, linAllocMan_, type);
+		contextPool_[type].emplace_back(pRet);
+		pRet->initialize(cmdListMan);
+	}
+	else
+	{
+		pRet = availableContexts.front();
+		availableContexts.pop();
+		pRet->reset(cmdListMan);
+	}
+
+	X_ASSERT_NOT_NULL(pRet);
+	X_ASSERT(pRet->getType() == type, "contex tpye mismatch")(pRet->getType(), type);
+
+	return pRet;
+}
+
+void ContextManager::freeContext(CommandContext* pContex)
+{
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	availableContexts_[pContex->getType()].push(pContex);
+}
+
+void ContextManager::destroyAllContexts(void)
+{
+	for (size_t i = 0; i < COMMAND_LIST_TYPE_NUM; ++i) {
+		for (auto pCon : contextPool_[i]) {
+			X_DELETE(pCon, arena_);
+		}
+		contextPool_[i].clear();
+	}
+}
+
+// --------------------------------------------------------------------
+
+
+CommandContext::CommandContext(ContextManager& contexMan, core::MemoryArenaBase* arena, ID3D12Device* pDevice,
 		DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan, D3D12_COMMAND_LIST_TYPE type) :
+	contextManager_(contexMan),
 	type_(type),
 	pCommandList_(nullptr),
 	pCurrentAllocator_(nullptr),
@@ -102,7 +165,7 @@ uint64_t CommandContext::finish(CommandListManger& cmdMng, bool waitForCompletio
 		cmdMng.waitForFence(fenceValue);
 	}
 
-//	g_ContextManager.FreeContext(this);
+	contextManager_.freeContext(this);
 
 	return fenceValue;
 }

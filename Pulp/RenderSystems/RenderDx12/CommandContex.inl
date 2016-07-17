@@ -30,4 +30,12 @@ X_INLINE void Param::operator= (int32_t i)
 }
 
 
+// ----------------------------------
+
+
+X_INLINE D3D12_COMMAND_LIST_TYPE CommandContext::getType(void) const
+{
+	return type_;
+}
+
 X_NAMESPACE_END

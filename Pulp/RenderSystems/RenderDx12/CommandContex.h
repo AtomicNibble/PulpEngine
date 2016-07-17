@@ -38,17 +38,26 @@ struct Param
 
 class ContextManager
 {
-public:
-	ContextManager(void);
+	static const size_t COMMAND_LIST_TYPE_NUM = 4; // num D3D12_COMMAND_LIST_TYPE
 
-	CommandContext* allocateContext(D3D12_COMMAND_LIST_TYPE type);
+public:
+	ContextManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
+		DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan);
+	~ContextManager();
+
+	CommandContext* allocateContext(CommandListManger& cmdListMan, D3D12_COMMAND_LIST_TYPE type);
 	void freeContext(CommandContext* pContex);
 	void destroyAllContexts(void);
 
 private:
-//	std::vector<std::unique_ptr<CommandContext> > sm_ContextPool[4];
-//	std::queue<CommandContext*> sm_AvailableContexts[4];
-//	std::mutex sm_ContextAllocationMutex;
+	core::MemoryArenaBase* arena_;
+	ID3D12Device* pDevice_;
+	DescriptorAllocatorPool& pool_;
+	LinearAllocatorManager& linAllocMan_;
+
+	core::CriticalSection cs_;
+	core::Array<CommandContext*> contextPool_[COMMAND_LIST_TYPE_NUM];
+	std::queue<CommandContext*> availableContexts_[COMMAND_LIST_TYPE_NUM];
 };
 
 class CommandContext
@@ -57,15 +66,14 @@ class CommandContext
 	X_NO_ASSIGN(CommandContext);
 
 	static const size_t RESOURCE_BARRIER_BUF = 16;
-
 	static const uint32_t VALID_COMPUTE_QUEUE_RESOURCE_STATES;
 
-
 public:
-	CommandContext(core::MemoryArenaBase* arena, ID3D12Device* pDevice, 
-		DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan, D3D12_COMMAND_LIST_TYPE type);
+	CommandContext(ContextManager& contexMan, core::MemoryArenaBase* arena, ID3D12Device* pDevice,
+		 DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan, D3D12_COMMAND_LIST_TYPE type);
 	virtual ~CommandContext(void);
 
+	X_INLINE D3D12_COMMAND_LIST_TYPE getType(void) const;
 
 	// Flush existing commands to the GPU but keep the context alive
 	uint64_t flush(CommandListManger& cmdMng, bool waitForCompletion = false);
@@ -106,6 +114,8 @@ protected:
 	void bindDescriptorHeaps(void);
 
 protected:
+	ContextManager& contextManager_;
+
 	ID3D12GraphicsCommandList* pCommandList_;
 	ID3D12CommandAllocator* pCurrentAllocator_;
 
