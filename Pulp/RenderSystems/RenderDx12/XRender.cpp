@@ -218,11 +218,14 @@ void XRender::ShutDown(void)
 	}
 
 	if (pDescriptorAllocator_) {
+		pDescriptorAllocator_->destoryAllHeaps();
 		X_DELETE_AND_NULL(pDescriptorAllocator_, arena_);
 	}
 	if (pDescriptorAllocatorPool_) {
 		X_DELETE_AND_NULL(pDescriptorAllocatorPool_, arena_);
 	}
+
+	core::SafeReleaseDX(pSwapChain_);
 
 	ID3D12DebugDevice* pDebugInterface;
 	if (SUCCEEDED(pDevice_->QueryInterface(&pDebugInterface)))
@@ -235,14 +238,8 @@ void XRender::ShutDown(void)
 		X_ERROR("dx12", "Failed to get debug device interface");
 	}
 
-	if (pDevice_) {
-		pDevice_->Release();
-	}
-
-	if (pDebug_) {
-		pDebug_->Release();
-	}
-
+	core::SafeReleaseDX(pDevice_);
+	core::SafeReleaseDX(pDebug_);
 }
 
 void XRender::freeResources(void)
