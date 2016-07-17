@@ -5,6 +5,8 @@
 #include "DynamicDescriptorHeap.h"
 #include "LinearAllocator.h"
 
+#include <Math\XViewPort.h>
+
 X_NAMESPACE_BEGIN(render)
 
 class CommandListManger;
@@ -167,10 +169,12 @@ public:
 	void setRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE RTV, D3D12_CPU_DESCRIPTOR_HANDLE DSV);
 	void setDepthStencilTarget(D3D12_CPU_DESCRIPTOR_HANDLE DSV);
 
+	void setViewport(const XViewPort& vp);
 	void setViewport(const D3D12_VIEWPORT& vp);
 	void setViewport(float32_t x, float32_t y, float32_t w, float32_t h, float32_t minDepth = 0.0f, float32_t maxDepth = 1.0f);
 	void setScissor(const D3D12_RECT& rect);
 	void setScissor(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom);
+	void setViewportAndScissor(const XViewPort& vp, const D3D12_RECT& rect);
 	void setViewportAndScissor(const D3D12_VIEWPORT& vp, const D3D12_RECT& rect);
 	void setViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h);
 	void setStencilRef(uint32_t stencilRef);

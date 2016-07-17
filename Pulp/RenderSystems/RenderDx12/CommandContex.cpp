@@ -566,6 +566,19 @@ void GraphicsContext::setDepthStencilTarget(D3D12_CPU_DESCRIPTOR_HANDLE DSV)
 	setRenderTargets(0, nullptr, DSV);
 }
 
+
+void GraphicsContext::setViewport(const XViewPort& vp)
+{
+	D3D12_VIEWPORT dvp;
+	dvp.Width = vp.getWidthf();
+	dvp.Height = vp.getHeightf();
+	dvp.TopLeftX = 0;
+	dvp.TopLeftY = 0;
+	dvp.MinDepth = vp.getZNear();
+	dvp.MaxDepth = vp.getZFar();
+
+	pCommandList_->RSSetViewports(1, &dvp);
+}
 	 
 void GraphicsContext::setViewport(const D3D12_VIEWPORT& vp)
 {
@@ -600,6 +613,14 @@ void GraphicsContext::setScissor(uint32_t left, uint32_t top, uint32_t right, ui
 	rect.bottom = bottom;
 	setScissor(rect);
 }
+
+void GraphicsContext::setViewportAndScissor(const XViewPort& vp, const D3D12_RECT& rect)
+{
+	X_ASSERT(rect.left < rect.right && rect.top < rect.bottom, "Invalid rect")();
+	setViewport(vp);
+	pCommandList_->RSSetScissorRects(1, &rect);
+}
+
 
 void GraphicsContext::setViewportAndScissor(const D3D12_VIEWPORT& vp, const D3D12_RECT& rect)
 {
