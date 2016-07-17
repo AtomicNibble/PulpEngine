@@ -65,8 +65,13 @@ DescriptorAllocator::~DescriptorAllocator()
 
 void DescriptorAllocator::destoryAllHeaps(void)
 {
+	core::CriticalSection::ScopedLock lock(cs_);
 
+	for (auto dh : descriptorHeaps_) {
+		core::SafeReleaseDX(dh);
+	}
 
+	descriptorHeaps_.clear();
 }
 
 uint32_t DescriptorAllocator::getDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE type)
