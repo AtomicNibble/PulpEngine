@@ -44,7 +44,7 @@ public:
 
 	void clear(void); // keeps param memory.
 	void free(void);
-	void reset(size_t numRootParams, size_t numStaticSamplers = 0);
+	X_INLINE void reset(size_t numRootParams, size_t numStaticSamplers = 0);
 
 	void initStaticSampler(uint32_t Register, const D3D12_SAMPLER_DESC& nonStaticSamplerDesc,
 		D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);

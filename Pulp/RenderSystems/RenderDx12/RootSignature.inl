@@ -68,6 +68,7 @@ X_INLINE void RootParameter::initAsDescriptorRange(core::MemoryArenaBase* arena,
 X_INLINE void RootParameter::initAsDescriptorTable(core::MemoryArenaBase* arena, uint32_t rangeCount, D3D12_SHADER_VISIBILITY visibility)
 {
 	X_ASSERT(arena_ == nullptr, "Arena must already be null")();
+	X_ASSERT_NOT_NULL(arena);
 
 	arena_ = arena;
 	rootParam_.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
