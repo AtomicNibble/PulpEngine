@@ -5,7 +5,8 @@
 X_NAMESPACE_BEGIN(render)
 
 ColorBuffer::ColorBuffer(Colorf clearCol) :
-	clearColor_(clearCol)
+	clearColor_(clearCol),
+	numMipMaps_(0)
 {
 	SRVHandle_.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 	RTVHandle_.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
