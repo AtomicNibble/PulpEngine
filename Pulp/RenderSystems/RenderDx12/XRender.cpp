@@ -6,11 +6,14 @@ X_NAMESPACE_BEGIN(render)
 
 
 XRender::XRender(core::MemoryArenaBase* arena) :
+	arena_(arena),
 	pDevice_(nullptr),
 	pDebug_(nullptr),
 	pSwapChain_(nullptr),
 	cmdListManager_(arena),
-	dedicatedvideoMemory_(0)
+	dedicatedvideoMemory_(0),
+	pDescriptorAllocator_(nullptr),
+	pDescriptorAllocatorPool_(nullptr)
 {
 
 }
@@ -26,6 +29,9 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 		X_ERROR("dx10", "target window is not valid");
 		return false;
 	}
+
+	currentNativeRes_ = Vec2<uint32_t>(width, height);
+	displayRes_ = Vec2<uint32_t>(width, height);
 
 	HRESULT hr;
 
@@ -112,13 +118,18 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 		}
 	}
 
+	pDescriptorAllocator_ = X_NEW(DescriptorAllocator, arena_, "DescriptorAllocator")(arena_, pDevice_);
+	pDescriptorAllocatorPool_ = X_NEW(DescriptorAllocatorPool, arena_, "DescriptorAllocatorPool")(arena_, pDevice_, cmdListManager_);
+
+	DescriptorAllocator& descriptorAllocator = *pDescriptorAllocator_;
+
 
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
 	core::zero_object(swapChainDesc);
 
 	swapChainDesc.Width = width;
 	swapChainDesc.Height = height;
-	swapChainDesc.Format = DXGI_FORMAT_R10G10B10A2_UNORM;
+	swapChainDesc.Format = SWAP_CHAIN_FORMAT;
 	swapChainDesc.Scaling = DXGI_SCALING_NONE;
 	swapChainDesc.SampleDesc.Quality = 0;
 	swapChainDesc.SampleDesc.Count = 1;
@@ -154,7 +165,46 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 			return false;
 		}
 
+		displayPlane_[i].createFromSwapChain(pDevice_, descriptorAllocator, pDisplayPlane);
 	}
+
+
+	// Samplers.
+	samplerLinearWrapDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerLinearWrap_.create(pDevice_, descriptorAllocator, samplerLinearWrapDesc_);
+
+	samplerAnisoWrapDesc_.MaxAnisotropy = 8;
+	samplerAnisoWrap_.create(pDevice_, descriptorAllocator, samplerAnisoWrapDesc_);
+
+	samplerShadowDesc_.Filter = D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
+	samplerShadowDesc_.ComparisonFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+	samplerShadowDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
+	samplerShadow_.create(pDevice_, descriptorAllocator, samplerShadowDesc_);
+
+	samplerLinearClampDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerLinearClampDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
+	samplerLinearClamp_.create(pDevice_, descriptorAllocator, samplerLinearClampDesc_);
+
+	samplerVolumeWrapDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	samplerVolumeWrap_.create(pDevice_, descriptorAllocator, samplerVolumeWrapDesc_);
+
+	samplerPointClampDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	samplerPointClampDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
+	samplerPointClamp_.create(pDevice_, descriptorAllocator, samplerPointClampDesc_);
+
+	samplerPointBorderDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
+	samplerPointBorderDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_BORDER);
+	samplerPointBorderDesc_.setBorderColor(Colorf(0.0f, 0.0f, 0.0f, 0.0f));
+	samplerPointBorder_.create(pDevice_, descriptorAllocator, samplerPointBorderDesc_);
+
+	samplerLinearBorderDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
+	samplerLinearBorderDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_BORDER);
+	samplerLinearBorderDesc_.setBorderColor(Colorf(0.0f, 0.0f, 0.0f, 0.0f));
+	samplerLinearBorder_.create(pDevice_, descriptorAllocator, samplerLinearBorderDesc_);
+
+
+
+
 
 
 	return true;
@@ -164,6 +214,16 @@ void XRender::ShutDown(void)
 {
 	cmdListManager_.shutdown();
 
+	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i) {
+		displayPlane_[i].destroy();
+	}
+
+	if (pDescriptorAllocator_) {
+		X_DELETE_AND_NULL(pDescriptorAllocator_, arena_);
+	}
+	if (pDescriptorAllocatorPool_) {
+		X_DELETE_AND_NULL(pDescriptorAllocatorPool_, arena_);
+	}
 
 	ID3D12DebugDevice* pDebugInterface;
 	if (SUCCEEDED(pDevice_->QueryInterface(&pDebugInterface)))
@@ -198,11 +258,19 @@ void XRender::RenderBegin(void)
 
 void XRender::RenderEnd(void)
 {
+	currentBufferIdx_ = (currentBufferIdx_ + 1) % SWAP_CHAIN_BUFFER_COUNT;
 
+
+	HRESULT hr = pSwapChain_->Present(0, 0);
+	if (FAILED(hr)) {
+		X_ERROR("Dx12", "Present failed. err: %" PRIu32, hr);
+	}
+
+	HandleResolutionChange();
 }
 
 
-bool XRender::InitRenderBuffers(uint32_t width, uint32_t hegith)
+bool XRender::InitRenderBuffers(Vec2<uint32_t> res)
 {
 
 
@@ -210,11 +278,52 @@ bool XRender::InitRenderBuffers(uint32_t width, uint32_t hegith)
 }
 
 
-bool XRender::Resize(uint32_t width, uint32_t hegith)
+bool XRender::Resize(uint32_t width, uint32_t height)
 {
+	X_LOG1("Dx12", "Resizing display res to: x:%x y:%x", width, height);
+	X_ASSERT_NOT_NULL(pDescriptorAllocator_);
 
+	displayRes_.x = width;
+	displayRes_.y = height;
+
+	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i) {
+		displayPlane_[i].destroy();
+	}
+
+	pSwapChain_->ResizeBuffers(SWAP_CHAIN_BUFFER_COUNT, displayRes_.x, displayRes_.y, SWAP_CHAIN_FORMAT, 0);
+
+	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i)
+	{
+		ID3D12Resource* pDisplayPlane;
+		HRESULT hr = pSwapChain_->GetBuffer(i, IID_PPV_ARGS(&pDisplayPlane));
+		if (FAILED(hr)) {
+			X_ERROR("Dx12", "failed to get swap chain buffer: %" PRId32, hr);
+			return false;
+		}
+
+		displayPlane_[i].createFromSwapChain(pDevice_, *pDescriptorAllocator_, pDisplayPlane);
+	}
 
 	return true;
+}
+
+void XRender::HandleResolutionChange(void)
+{
+	if (currentNativeRes_ == targetNativeRes_) {
+		return;
+	}
+
+	X_LOG1("Dx12", "Changing native res from: x:%x y:%x to: x:%x y:%x", 
+		currentNativeRes_.x, currentNativeRes_.y,
+		targetNativeRes_.x, targetNativeRes_.y);
+
+	currentNativeRes_ = targetNativeRes_;
+
+	// wait till gpu idle.
+	cmdListManager_.idleGPU();
+
+	// re int buffers
+	InitRenderBuffers(targetNativeRes_);
 }
 
 X_NAMESPACE_END

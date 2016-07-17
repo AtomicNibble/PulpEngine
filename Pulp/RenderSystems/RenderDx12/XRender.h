@@ -8,6 +8,10 @@
 
 #include "CommandList.h"
 #include "SamplerDesc.h"
+#include "DescriptorAllocator.h"
+#include "DynamicDescriptorHeap.h"
+
+#include "ColorBuffer.h"
 
 X_NAMESPACE_BEGIN(render)
 
@@ -15,6 +19,8 @@ X_NAMESPACE_BEGIN(render)
 class XRender : public IRender2
 {
 	static const uint32_t SWAP_CHAIN_BUFFER_COUNT = 3;
+
+	static const DXGI_FORMAT SWAP_CHAIN_FORMAT = DXGI_FORMAT_R10G10B10A2_UNORM;
 
 public:
 	XRender(core::MemoryArenaBase* arena);
@@ -28,11 +34,13 @@ public:
 	void RenderEnd(void) X_OVERRIDE;
 
 private:
-	bool InitRenderBuffers(uint32_t width, uint32_t hegith);
-	bool Resize(uint32_t width, uint32_t hegith);
+	bool InitRenderBuffers(Vec2<uint32_t> res);
+	bool Resize(uint32_t width, uint32_t height);
+	void HandleResolutionChange(void);
 
 
 private:
+	core::MemoryArenaBase* arena_;
 	ID3D12Device* pDevice_;
 	ID3D12Debug* pDebug_;
 	IDXGISwapChain1* pSwapChain_;
@@ -42,6 +50,14 @@ private:
 	core::StackString<128, wchar_t> deviceName_;
 	size_t dedicatedvideoMemory_;
 
+	DescriptorAllocator* pDescriptorAllocator_;
+	DescriptorAllocatorPool* pDescriptorAllocatorPool_;
+
+	Vec2<uint32_t> currentNativeRes_;
+	Vec2<uint32_t> targetNativeRes_;
+	Vec2<uint32_t> displayRes_;
+	ColorBuffer displayPlane_[SWAP_CHAIN_BUFFER_COUNT];
+	uint32_t currentBufferIdx_;
 
 	SamplerDesc samplerLinearWrapDesc_;
 	SamplerDesc samplerAnisoWrapDesc_;
@@ -52,6 +68,14 @@ private:
 	SamplerDesc samplerPointBorderDesc_;
 	SamplerDesc samplerLinearBorderDesc_;
 
+	SamplerDescriptor samplerLinearWrap_;
+	SamplerDescriptor samplerAnisoWrap_;
+	SamplerDescriptor samplerShadow_;
+	SamplerDescriptor samplerLinearClamp_;
+	SamplerDescriptor samplerVolumeWrap_;
+	SamplerDescriptor samplerPointClamp_;
+	SamplerDescriptor samplerPointBorder_;
+	SamplerDescriptor samplerLinearBorder_;
 };
 
 
