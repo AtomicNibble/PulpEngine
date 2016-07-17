@@ -1117,6 +1117,9 @@
     <ClInclude Include="Math\MatrixStack.h">
       <Filter>Headers\Math</Filter>
     </ClInclude>
+    <ClInclude Include="Memory\MemUtil.h">
+      <Filter>Headers\Memory</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1706,6 +1709,9 @@
     </ClCompile>
     <ClCompile Include="Math\MatrixStack.cpp">
       <Filter>SourceFiles\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\MemUtil.cpp">
+      <Filter>SourceFiles\Memory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

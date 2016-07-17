@@ -94,6 +94,7 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <Memory\NewAndDeleteMacros.h>
 #include <Memory\HeapArea.h>
 #include <Memory\MemoryArena.h>
+#include <Memory\MemUtil.h>
 
 // defaults.
 #include <Memory\AllocationPolicies\MallocFreeAllocator.h>
