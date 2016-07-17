@@ -70,7 +70,7 @@ class XEngineModule_Render : public IEngineModule
 			return false;
 		}
 
-	//	env.pRender = pRender;
+		env.pRender2 = pRender;
 		return true;
 	}
 

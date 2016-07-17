@@ -609,6 +609,47 @@ bool XCore::InitScriptSys(const SCoreInitParams& initParams)
 
 bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 {
+#if 1
+	if (initParams.bTesting)
+	{
+		if (!IntializeEngineModule(DLL_RENDER_NULL, "Engine_RenderNull", initParams))
+			return false;
+	}
+	else
+	{
+		if (!IntializeEngineModule("Engine_RenderDx12", "Engine_RenderDx12", initParams))
+			return false;
+	}
+
+	if (!env_.pRender2)
+		return false;
+
+	if (initParams.bTesting)
+	{
+		env_.pRender->Init(NULL, 0, 0);
+
+	}
+	else
+	{
+		if (!pWindow_) {
+			return false;
+		}
+
+		HWND hWnd = pWindow_->GetNativeWindow();
+		uint32_t width = pWindow_->GetClientWidth();
+		uint32_t height = pWindow_->GetClientHeight();
+
+		if (!env_.pRender2->Init(hWnd, width, height)) {
+			X_ERROR("Core", "Failed to init render system");
+			return false;
+		}
+
+		env_.pRender2->ShutDown();
+
+		X_LOG0("Core", "render init: ^6%gms");
+	}
+
+#else
 	if (initParams.bTesting)
 	{
 		if (!IntializeEngineModule(DLL_RENDER_NULL, "Engine_RenderNull", initParams))
@@ -645,6 +686,7 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 
 		X_LOG0("Core", "render init: ^6%gms");
 	}
+#endif
 
 	return true;
 }
