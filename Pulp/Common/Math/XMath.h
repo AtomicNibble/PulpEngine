@@ -181,6 +181,13 @@ inline double toDegrees(double x)
 	return x * 57.295779513082321; // ( x * 180 / PI )
 }
 
+
+template <typename T> 
+inline T divideByMultiple(T value, size_t alignment)
+{
+	return static_cast<T>((value + alignment - 1) / alignment);
+}
+
 template<typename T, typename L>
 T lerp(const T &a, const T &b, L factor)
 {
