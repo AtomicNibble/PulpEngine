@@ -171,8 +171,8 @@ struct IMaterial
 	virtual MaterialCoverage::Enum getCoverage(void) const X_ABSTRACT;
 	virtual void setCoverage(MaterialCoverage::Enum coverage) X_ABSTRACT;
 
-	virtual void setShaderItem(shader::XShaderItem& item) X_ABSTRACT;
-	virtual shader::XShaderItem& getShaderItem(void) X_ABSTRACT;
+	virtual void setShaderItem(render::shader::XShaderItem& item) X_ABSTRACT;
+	virtual render::shader::XShaderItem& getShaderItem(void) X_ABSTRACT;
 
 	virtual bool isDefault() const X_ABSTRACT;
 
@@ -214,7 +214,7 @@ struct MaterialHeader
 
 struct MaterialTexture
 {
-	shader::ShaderTextureIdx::Enum type;
+	render::shader::ShaderTextureIdx::Enum type;
 	core::StackString<MTL_MATERIAL_MAX_LEN> name;
 
 };

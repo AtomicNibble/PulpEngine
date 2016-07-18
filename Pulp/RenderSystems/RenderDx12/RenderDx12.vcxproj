@@ -344,6 +344,12 @@
     <ClInclude Include="PixelBuffer.h" />
     <ClInclude Include="RootSignature.h" />
     <ClInclude Include="SamplerDesc.h" />
+    <ClInclude Include="Shader\HWShader.h" />
+    <ClInclude Include="Shader\ILTree.h" />
+    <ClInclude Include="Shader\Shader.h" />
+    <ClInclude Include="Shader\ShaderBin.h" />
+    <ClInclude Include="Shader\ShaderManager.h" />
+    <ClInclude Include="Shader\ShaderSourceTypes.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="XRender.h" />
   </ItemGroup>
@@ -364,6 +370,11 @@
     <ClCompile Include="PixelBuffer.cpp" />
     <ClCompile Include="RootSignature.cpp" />
     <ClCompile Include="SampleDesc.cpp" />
+    <ClCompile Include="Shader\HWShader.cpp" />
+    <ClCompile Include="Shader\Shader.cpp" />
+    <ClCompile Include="Shader\ShaderBin.cpp" />
+    <ClCompile Include="Shader\ShaderManager.cpp" />
+    <ClCompile Include="Shader\ShaderSourceTypes.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>
@@ -394,6 +405,8 @@
     <None Include="PixelBuffer.inl" />
     <None Include="RootSignature.inl" />
     <None Include="SamplerDesc.inl" />
+    <None Include="Shader\HWShader.inl" />
+    <None Include="Shader\ShaderSourceTypes.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

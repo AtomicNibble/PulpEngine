@@ -24,6 +24,7 @@ X_ENABLE_WARNING(4005)
 
 X_LINK_LIB("D3D12.lib")
 X_LINK_LIB("dxgi.lib")
+X_LINK_LIB("dxguid")
 X_LINK_LIB("d3dcompiler.lib")
 
 
@@ -32,5 +33,9 @@ X_LINK_LIB("d3dcompiler.lib")
 
 X_LINK_LIB("engine_ImgLib");
 
+X_NAMESPACE_BEGIN(render)
+
 extern core::MemoryArenaBase* g_rendererArena;
 extern core::MemoryArenaBase* g_textureDataArena;
+
+X_NAMESPACE_END

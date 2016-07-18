@@ -14,7 +14,11 @@ X_NAMESPACE_DECLARE(texture, class XTexture);
 
 #include <ITexture.h>
 
-X_NAMESPACE_BEGIN(shader)
+X_NAMESPACE_BEGIN(render)
+
+namespace shader
+{
+
 
 struct BlendType
 {
@@ -451,6 +455,7 @@ struct XShaderItem
 	int32_t	 technique_;
 };
 
+} // namespace shader
 
 X_NAMESPACE_END
 

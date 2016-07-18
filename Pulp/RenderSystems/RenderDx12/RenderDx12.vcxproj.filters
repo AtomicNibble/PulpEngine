@@ -27,6 +27,12 @@
     <Filter Include="Header Files\Util">
       <UniqueIdentifier>{c77f5de2-967d-45ba-a9a2-af4b31a51b1c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Shader">
+      <UniqueIdentifier>{b7ac7e45-6f9c-4319-b61f-ec943c143cd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Shader">
+      <UniqueIdentifier>{3455b46d-5722-4d83-ad88-db8e4a050c30}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -86,6 +92,24 @@
     <ClInclude Include="LinearAllocator.h">
       <Filter>Header Files\Allocators</Filter>
     </ClInclude>
+    <ClInclude Include="Shader\Shader.h">
+      <Filter>Header Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\ShaderBin.h">
+      <Filter>Header Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\HWShader.h">
+      <Filter>Header Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\ILTree.h">
+      <Filter>Header Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\ShaderManager.h">
+      <Filter>Header Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader\ShaderSourceTypes.h">
+      <Filter>Header Files\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -142,6 +166,21 @@
     <ClCompile Include="LinearAllocator.cpp">
       <Filter>Source Files\Allocators</Filter>
     </ClCompile>
+    <ClCompile Include="Shader\Shader.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\ShaderBin.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\HWShader.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\ShaderManager.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader\ShaderSourceTypes.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
@@ -188,6 +227,12 @@
     </None>
     <None Include="LinearAllocator.inl">
       <Filter>Header Files\Allocators</Filter>
+    </None>
+    <None Include="Shader\HWShader.inl">
+      <Filter>Header Files\Shader</Filter>
+    </None>
+    <None Include="Shader\ShaderSourceTypes.inl">
+      <Filter>Header Files\Shader</Filter>
     </None>
   </ItemGroup>
 </Project>
