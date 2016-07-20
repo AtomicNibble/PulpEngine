@@ -110,6 +110,9 @@
     <ClInclude Include="Shader\ShaderSourceTypes.h">
       <Filter>Header Files\Shader</Filter>
     </ClInclude>
+    <ClInclude Include="DebugNameUtil.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
