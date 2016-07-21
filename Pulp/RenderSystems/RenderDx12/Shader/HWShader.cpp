@@ -254,10 +254,6 @@ namespace shader
 		return true;
 	}
 
-
-	int32_t writeMergedSource_ = 0;
-	int32_t asyncShaderCompile_ = 0;
-
 	bool XHWShader::loadFromSource(void)
 	{
 		core::string source;
@@ -269,8 +265,10 @@ namespace shader
 			return false;
 		}
 
+		ShaderVars& vars = shaderMan_.getShaderVars();
+
 		// save copy of merged shader for debugging.
-		if (writeMergedSource_ == 1)
+		if (vars.writeMergedSource())
 		{
 			core::Path<char> src;
 			getShaderCompileSrc(src);
@@ -285,7 +283,7 @@ namespace shader
 			}
 		}
 
-		if (asyncShaderCompile_)
+		if (vars.asyncCompile())
 		{
 			source_ = source;
 
