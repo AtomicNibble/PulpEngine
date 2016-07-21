@@ -131,6 +131,7 @@ namespace
 
 
 
+#if 0
 
 XShaderTechnique& XShaderTechnique::operator=(const ShaderSourceFile::Technique& srcTech)
 {
@@ -158,6 +159,7 @@ XShaderTechnique& XShaderTechnique::operator=(const ShaderSourceFile::Technique&
 	return *this;
 }
 
+#endif
 
 // -------------------------------------------
 
@@ -179,7 +181,7 @@ XShader::~XShader()
 	numTecs = techs_.size();
 	for (i = 0; i < numTecs; i++)
 	{
-		techs_[i].release();
+//		techs_[i].release();
 	}
 }
 
