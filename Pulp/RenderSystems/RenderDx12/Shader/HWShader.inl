@@ -40,12 +40,25 @@ namespace shader
 		return numInputParams_;
 	}
 
-	X_INLINE bool XHWShader::compile(void) {
-		return Compile(this);
+	X_INLINE bool XHWShader::isValid(void) const
+	{
+		return status_ == ShaderStatus::ReadyToRock;
 	}
 
+	X_INLINE bool XHWShader::FailedtoCompile(void) const
+	{
+		return status_ == ShaderStatus::FailedToCompile;
+	}
 
+	X_INLINE bool XHWShader::isCompiling(void) const
+	{
+		return status_ == ShaderStatus::Compiling || status_ == ShaderStatus::AsyncCompileDone;
+	}
 
+	X_INLINE ID3DBlob* XHWShader::getshaderBlob(void) const
+	{
+		return pBlob_;
+	}
 
 #if 0
 
@@ -67,20 +80,7 @@ namespace shader
 		return status_;
 	}
 
-	bool XHWShader_Dx10::isValid(void) const
-	{
-		return status_ == ShaderStatus::ReadyToRock;
-	}
 
-	bool XHWShader_Dx10::FailedtoCompile(void) const
-	{
-		return status_ == ShaderStatus::FailedToCompile;
-	}
-
-	bool XHWShader_Dx10::isCompiling(void) const
-	{
-		return status_ == ShaderStatus::Compiling || status_ == ShaderStatus::AsyncCompileDone;
-	}
 
 	void XHWShader_Dx10::setShader()
 	{

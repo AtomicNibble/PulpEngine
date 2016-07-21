@@ -18,9 +18,9 @@ namespace shader
 
 	X_DECLARE_FLAGS(ParamFlags)(FLOAT, INT, BOOL, MATRIX, VEC2, VEC3, VEC4);
 	X_DECLARE_FLAGS(ShaderStatus) (NotCompiled, Compiling, AsyncCompileDone, UploadedToHW, ReadyToRock, FailedToCompile);
-
 	X_DECLARE_ENUM(ConstbufType)(PER_FRAME,	PER_BATCH, PER_INSTANCE);
 
+	class ShaderBin;
 
 	// PF = PerFrame
 	// PI = Per Instance
@@ -83,6 +83,11 @@ namespace shader
 
 	struct XShaderParam
 	{
+		XShaderParam();
+		XShaderParam(const XShaderParam& sb) = default;
+		XShaderParam& operator = (const XShaderParam& sb) = default;
+
+
 		core::string		name;
 		core::StrHash		nameHash;
 		Flags<ParamFlags>	flags;
@@ -90,16 +95,6 @@ namespace shader
 		int16_t				bind;
 		int16_t				constBufferSlot;
 		int32_t				numParameters;
-
-		XShaderParam()
-		{
-			type = ParamType::Unknown;
-			bind = -2;
-			constBufferSlot = 0;
-			numParameters = 1;
-		}
-		XShaderParam(const XShaderParam& sb) = default;
-		XShaderParam& operator = (const XShaderParam& sb) = default;
 	};
 
 	X_ENSURE_SIZE(ParamType::Enum, 1);
@@ -109,18 +104,11 @@ namespace shader
 	class XHWShader
 	{
 	public:
-		XHWShader();
-
-		static XHWShader* forName(const char* shader_name, const char* entry,
-			const char* sourceFile, const Flags<TechFlag>& techFlag,
-			ShaderType::Enum type, Flags<ILFlag> ILFlag, uint32_t sourceCrc);
-
-		static const char* getProfileFromType(ShaderType::Enum type);
+		XHWShader(core::MemoryArenaBase* arena, XShaderManager& shaderMan);
 
 		const int32_t release(void) {
 			return 0;
 		}
-
 
 		X_INLINE const char* getName(void) const;
 		X_INLINE const char* getSourceFileName(void) const;
@@ -132,7 +120,6 @@ namespace shader
 		X_INLINE uint32_t getNumSamplers(void) const;
 		X_INLINE uint32_t getNumConstantBuffers(void) const;
 		X_INLINE uint32_t getNumInputParams(void) const;
-		X_INLINE bool compile(void);
 
 		X_INLINE ShaderStatus::Enum getStatus(void) const;
 		X_INLINE bool isValid(void) const;
@@ -140,26 +127,33 @@ namespace shader
 		X_INLINE bool isCompiling(void) const;
 		X_INLINE ID3DBlob* getshaderBlob(void) const;
 
-	private:
-		static bool Compile(XHWShader* pShader);
+	public:
+		bool compile(ShaderBin& shaderBin);
 
 	private:
-		bool loadFromSource(void);
-		bool loadFromCache(void);
 		void getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest);
 		void getShaderCompileSrc(core::Path<char>& src);
 		void getShaderCompileDest(core::Path<char>& dest);
+
+		bool loadFromCache(ShaderBin& shaderBin);
+		bool saveToCache(ShaderBin& shaderBin);
+
+		bool loadFromSource(void);
 		bool compileFromSource(core::string& source);
-
 		void CompileShader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-
 		bool reflectShader(void);
-		bool saveToCache(void);
+
+	private:
+		static const char* getProfileFromType(ShaderType::Enum type);
 
 	protected:
+		XShaderManager& shaderMan_;
+
 		core::string name_;
 		core::string sourceFileName_;
 		core::string entryPoint_;
+		core::string source_;
+
 		uint32_t sourceCrc32_; // the crc of the source this was compiled from.
 
 		// status
@@ -177,12 +171,12 @@ namespace shader
 		uint32_t numConstBuffers_;
 		uint32_t numInputParams_;
 
+		core::Array<XShaderParam> bindVars_;
+		int32_t maxVecs_[3];
 
 		ID3DBlob* pBlob_;
 		// the flags it was compiled with: DEBUG | OPT_LEVEL1 etc.
 		uint32_t D3DCompileflags_;
-
-	//	core::Array<XShaderParam> bindVars_;
 	};
 
 
