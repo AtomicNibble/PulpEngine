@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ShaderManager.h"
 #include "ShaderSourceTypes.h"
+#include "Shader.h"
 
 #include <Hashing\crc32.h>
 #include <String\Lexer.h>
@@ -310,21 +311,23 @@ namespace shader
 				return nullptr;
 			}
 
+			core::string name(pName);
+
 			// add the refrences.
-			for (auto f : pShaderSource->pHlslFile_->includedFiles) {
-				f->refrences.insert(core::string(name));
+			for (auto f : pShaderSource->pHlslFile_->getIncludeArr()) {
+				f->addRefrence(name);
 			}
-			pShaderSource->pHlslFile_->refrences.insert(core::string(name));
+			pShaderSource->pHlslFile_->addRefrence(name);
 
 
 			pShaderSource->pFile_ = pSourceFile;
 			pShaderSource->name_ = name;
 			// don't combine these, I want to check if just the .shader has changed.
 			// seprate to the .hlsl source.
-			pShaderSource->sourceCrc32_ = pSourceFile->sourceCrc32;
-			pShaderSource->hlslSourceCrc32_ = pCrc32_->Combine(pfile->sourceCrc32,
-				pShaderSource->pHlslFile_->sourceCrc32,
-				safe_static_cast<uint32_t, size_t>(pShaderSource->pHlslFile_->fileData.size()));
+			pShaderSource->sourceCrc32_ = pSourceFile->getSourceCrc32();
+			pShaderSource->hlslSourceCrc32_ = pCrc32_->Combine(pSourceFile->getSourceCrc32(),
+				pShaderSource->pHlslFile_->getSourceCrc32(),
+				safe_static_cast<uint32_t, size_t>(pShaderSource->pHlslFile_->getFileData().size()));
 
 		}
 
@@ -394,7 +397,7 @@ namespace shader
 				else
 				{
 
-					pSourceFile = X_NEW_ALIGNED(SourceFile, g_rendererArena, "SourceFile", 8);
+					pSourceFile = X_NEW_ALIGNED(SourceFile, arena_, "SourceFile", 8)(arena_);
 					pSourceFile->setName(core::string(pName));
 					pSourceFile->setFileName(core::string(path.fileName()));
 					pSourceFile->setFileData(str);
@@ -444,20 +447,20 @@ namespace shader
 					{
 						if (prepro.type == PreProType::Include)
 						{
-							const char* start = token.begin() - 1;
+							const char* pStart = token.begin() - 1;
 							if (lexer.ReadTokenOnLine(token))
 							{
 								// get the file name, then remove it from the buffer
 								// to stop Dx compiler trying to include it.
 								fileName.set(token.begin(), token.end());
-								memset((char*)start, ' ', (token.end() - start) + 1);
+								memset(const_cast<char*>(pStart), ' ', (token.end() - pStart) + 1);
 							}
 
 							// you silly hoe!
 							if (fileName.isEmpty())
 							{
 								X_WARNING("Shader", "invalid #include in: \"%s\" line: %i",
-									pSourceFile->name.c_str(), token.GetLine());
+									pSourceFile->getName().c_str(), token.GetLine());
 								return;
 							}
 
@@ -557,6 +560,8 @@ namespace shader
 		}
 		else
 		{
+			core::string name(pName);
+
 			pShader = X_NEW_ALIGNED(XShader, g_rendererArena, "Shader", 16);
 			pShader->name_ = name;
 			shaders_.AddAsset(name, pShader);
@@ -599,13 +604,13 @@ namespace shader
 			// uint32_t crc = source->pHlslFile->sourceCrc32;
 			Flags<TechFlag> techFlags;
 			Flags<ILFlag> ILFlags;
-			Flags<ILFlag> ILFlagSrc = pSource->pHlslFile_->ILFlags;
+			Flags<ILFlag> ILFlagSrc = pSource->pHlslFile_->getILFlags();
 
 			for (j = 0; j < numTecs; j++)
 			{
 				XShaderTechnique& tech = pShader->techs_[j];
 				ShaderSourceFile::Technique& srcTech = pSource->techniques_[j];
-				tech = srcTech;
+			//	tech = srcTech;
 
 				// for every input layout we compile all the techFlags 
 				// plus one without flags passed.
@@ -618,18 +623,19 @@ namespace shader
 
 					for (x = 0; x < numTechFlags + 1; x++)
 					{
+#if 0
 						XShaderTechniqueHW hwTech;
 
 						// create the hardware shaders.
 						hwTech.pVertexShader = XHWShader::forName(name,
 							srcTech.vertex_func_,
 							pSource->pHlslFile_->fileName.c_str(), techFlags,
-							ShaderType::Vertex, ILFlags, source->pHlslFile_->sourceCrc32);
+							ShaderType::Vertex, ILFlags, source->pHlslFile_->getSourceCrc32());
 
 						hwTech.pPixelShader = XHWShader::forName(name,
 							srcTech.pixel_func_,
 							pSource->pHlslFile_->fileName.c_str(), techFlags,
-							ShaderType::Pixel, ILFlags, source->pHlslFile_->sourceCrc32);
+							ShaderType::Pixel, ILFlags, source->pHlslFile_->getSourceCrc32());
 
 						hwTech.techFlags = techFlags;
 						hwTech.ILFlags = ILFlags;
@@ -638,13 +644,14 @@ namespace shader
 
 						// add tech flag
 						AppendFlagTillEqual(tech.techFlags, techFlags);
+#endif
 					}
 
 					// add in the next flag.
 					AppendFlagTillEqual(ILFlagSrc, ILFlags);
 				}
 
-				tech.resetCurHWTech();
+			//	tech.resetCurHWTech();
 			}
 
 			X_DELETE(pSource, g_rendererArena);
@@ -690,12 +697,12 @@ namespace shader
 						ShaderSourceFile::Technique& srcTech = pShaderSource->techniques_[i];
 
 						tech.hwTechs.clear();
-						tech = srcTech;
+				//		tech = srcTech;
 						// tech flags may have changed.
 						// IL flags won't have tho.
 						Flags<TechFlag> techFlags;
 						Flags<ILFlag> ILFlags;
-						Flags<ILFlag> ILFlagSrc = pShaderSource->pHlslFile_->ILFlags;
+						Flags<ILFlag> ILFlagSrc = pShaderSource->pHlslFile_->getILFlags();
 
 						// for every input layout we compile all the techFlags 
 						// plus one without flags passed.
@@ -708,18 +715,19 @@ namespace shader
 
 							for (j = 0; j < numTechFlags + 1; j++)
 							{
+#if 0
 								XShaderTechniqueHW hwTech;
 
 								// create the hardware shaders.
 								hwTech.pVertexShader = XHWShader::forName(name,
 									srcTech.vertex_func_,
 									pShaderSource->pHlslFile_->fileName.c_str(), techFlags,
-									ShaderType::Vertex, ILFlags, pShaderSource->pHlslFile_->sourceCrc32);
+									ShaderType::Vertex, ILFlags, pShaderSource->pHlslFile_->getSourceCrc32());
 
 								hwTech.pPixelShader = XHWShader::forName(name,
 									srcTech.pixel_func_,
 									pShaderSource->pHlslFile_->fileName.c_str(), techFlags,
-									ShaderType::Pixel, ILFlags, pShaderSource->pHlslFile_->sourceCrc32);
+									ShaderType::Pixel, ILFlags, pShaderSource->pHlslFile_->getSourceCrc32());
 
 								hwTech.techFlags = techFlags;
 								hwTech.ILFlags = ILFlags;
@@ -728,20 +736,20 @@ namespace shader
 
 								// add tech flag
 								AppendFlagTillEqual(tech.techFlags, techFlags);
+#endif
 							}
 
 							// add in the next flag.
 							AppendFlagTillEqual(ILFlagSrc, ILFlags);
 						}
 
-						tech.resetCurHWTech();
-
+					//	tech.resetCurHWTech();
 					}
 				}
 				else if (pShader->hlslSourceCrc32_ != pShaderSource->hlslSourceCrc32_)
 				{
 					X_LOG0("Shader", "reloading shader source: %s",
-						shader->pHlslFile_->name.c_str());
+						pShader->pHlslFile_->getName().c_str());
 					if (pShaderSource)
 					{
 						numTecs = pShader->numTechs();
@@ -755,6 +763,7 @@ namespace shader
 
 							for (x = 0; x < tech.hwTechs.size(); x++)
 							{
+#if 0
 								XShaderTechniqueHW& hwTech = tech.hwTechs[x];
 
 								const char* vertEntry = hwTech.pVertexShader->getEntryPoint();
@@ -766,26 +775,27 @@ namespace shader
 
 								hwTech.pVertexShader = XHWShader::forName(name, vertEntry,
 									pShaderSource->pHlslFile_->fileName.c_str(), techFlags,
-									ShaderType::Vertex, ILFlags, pShaderSource->pHlslFile_->sourceCrc32);
+									ShaderType::Vertex, ILFlags, pShaderSource->pHlslFile_->getSourceCrc32());
 
 								hwTech.pPixelShader = XHWShader::forName(name, pixelEntry,
 									pShaderSource->pHlslFile_->fileName.c_str(), techFlags,
-									ShaderType::Pixel, ILFlags, pShaderSource->pHlslFile_->sourceCrc32);
+									ShaderType::Pixel, ILFlags, pShaderSource->pHlslFile_->getSourceCrc32());
+#endif
 							}
 						}
 					}
 				}
 				else
 				{
-					uint32_t lastCrc32 = pShader->pHlslFile_->sourceCrc32;
+					uint32_t lastCrc32 = pShader->pHlslFile_->getSourceCrc32();
 
-					SourceFile* Hlslsource = loadRawSourceFile(pShader->pHlslFile_->fileName.c_str(), true);
+					SourceFile* Hlslsource = loadRawSourceFile(pShader->pHlslFile_->getFileName().c_str(), true);
 
 					if (Hlslsource)
 					{
-						if (lastCrc32 != Hlslsource->sourceCrc32)
+						if (lastCrc32 != Hlslsource->getSourceCrc32())
 						{
-							X_LOG0("Shader", "reloading shader source: %s", pShader->pHlslFile_->name.c_str());
+							X_LOG0("Shader", "reloading shader source: %s", pShader->pHlslFile_->getName().c_str());
 
 							// the shaders source has changed.
 							// we end up here typically when a source file included by 
@@ -799,6 +809,7 @@ namespace shader
 								XShaderTechnique& tech = pShader->techs_[i];
 								for (x = 0; x < tech.hwTechs.size(); x++)
 								{
+#if 0
 									XShaderTechniqueHW& hwTech = tech.hwTechs[x];
 
 									const char* vertEntry = hwTech.pVertexShader->getEntryPoint();
@@ -809,11 +820,12 @@ namespace shader
 
 									hwTech.pVertexShader = XHWShader::forName(name, vertEntry,
 										pShaderSource->pHlslFile_->fileName.c_str(), techFlags,
-										ShaderType::Vertex, ILFlags, pShaderSource->pHlslFile_->sourceCrc32);
+										ShaderType::Vertex, ILFlags, pShaderSource->pHlslFile_->getSourceCrc32());
 
 									hwTech.pPixelShader = XHWShader::forName(name, pixelEntry,
 										pShaderSource->pHlslFile_->fileName.c_str(), techFlags,
-										ShaderType::Pixel, ILFlags, pShaderSource->pHlslFile_->sourceCrc32);
+										ShaderType::Pixel, ILFlags, pShaderSource->pHlslFile_->getSourceCrc32());
+#endif
 								}
 
 							}
@@ -821,7 +833,7 @@ namespace shader
 						else
 						{
 							X_LOG0("Shader", "shader source: %s has not changed, reload skipped",
-								pShader->pHlslFile_->name.c_str());
+								pShader->pHlslFile_->getName().c_str());
 						}
 					}
 				}
