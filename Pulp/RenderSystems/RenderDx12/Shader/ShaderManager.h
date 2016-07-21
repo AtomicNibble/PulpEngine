@@ -63,8 +63,8 @@ namespace shader
 
 	private:
 		bool freeSourcebin(void);
-		void listShaders(void);
-		void listShaderSources(void);
+		void listShaders(const char* pSarchPatten = nullptr);
+		void listShaderSources(const char* pSarchPatten = nullptr);
 
 		void createInputLayoutTree(void);
 

@@ -875,8 +875,10 @@ namespace shader
 		return true;
 	}
 
-	void XShaderManager::listShaders(void)
+	void XShaderManager::listShaders(const char* searchPatten)
 	{
+		X_UNUSED(searchPatten);
+
 #if 0
 		render::XRenderResourceContainer::ResourceConstItor it = shaders_.begin();
 		XShader* pShader;
@@ -897,20 +899,33 @@ namespace shader
 #endif
 	}
 
-	void XShaderManager::listShaderSources(void)
+	void XShaderManager::listShaderSources(const char* pSarchPatten)
 	{
-		ShaderSourceMap::const_iterator it = sourcebin_.begin();
-		const SourceFile* pSource;
-
 		X_LOG0("Shader", "--------- ^8Shader Sources(%" PRIuS ")^7 ---------", sourcebin_.size());
 
-		for (; it != sourcebin_.end(); ++it)
-		{
-			pSource = it->second;
-
+		auto printfunc = [](const SourceFile* pSource) {
 			X_LOG0("Shader", "Name: ^2\"%s\"^7 crc: ^10x%08x^7",
 				pSource->getFileName().c_str(),
 				pSource->getSourceCrc32());
+		};
+
+		ShaderSourceMap::const_iterator it = sourcebin_.begin();
+
+		if (!pSarchPatten) {
+			for (; it != sourcebin_.end(); ++it) {
+				printfunc(it->second);
+			}
+		}
+		else
+		{
+			const SourceFile* pSource = nullptr;
+
+			for (; it != sourcebin_.end(); ++it) {
+				pSource = it->second;
+				if (core::strUtil::WildCompare(pSarchPatten, pSource->getName())) {
+					printfunc(pSource);
+				}
+			}
 		}
 
 		X_LOG0("Shader", "--------- ^8Shader Sources End^7 ---------");
@@ -984,16 +999,26 @@ namespace shader
 
 	void XShaderManager::Cmd_ListShaders(core::IConsoleCmdArgs* pArgs)
 	{
-		X_UNUSED(pArgs);
+		// optional search criteria
+		const char* pSearchPatten = nullptr;
 
-		listShaders();
+		if (pArgs->GetArgCount() >= 2) {
+			pSearchPatten = pArgs->GetArg(1);
+		}
+
+		listShaders(pSearchPatten);
 	}
 
 	void XShaderManager::Cmd_ListShaderSources(core::IConsoleCmdArgs* pArgs)
 	{
-		X_UNUSED(pArgs);
+		// optional search criteria
+		const char* pSearchPatten = nullptr;
 
-		listShaderSources();
+		if (pArgs->GetArgCount() >= 2) {
+			pSearchPatten = pArgs->GetArg(1);
+		}
+
+		listShaderSources(pSearchPatten);
 	}
 
 
