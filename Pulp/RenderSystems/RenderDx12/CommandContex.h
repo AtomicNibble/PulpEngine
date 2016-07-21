@@ -17,6 +17,7 @@ class GpuBuffer;
 class ColorBuffer;
 class DepthBuffer;
 class GraphicsPSO;
+class ComputePSO;
 class DescriptorAllocatorPool;
 
 struct Param
@@ -145,7 +146,7 @@ protected:
 class GraphicsContext : public CommandContext
 {
 public:
-	GraphicsContext();
+//	GraphicsContext();
 	~GraphicsContext() X_OVERRIDE;
 
 
@@ -216,6 +217,45 @@ private:
 
 
 };
+
+class ComputeContext : public CommandContext
+{
+public:
+//	ComputeContext();
+	~ComputeContext() X_OVERRIDE;
+
+	void clearUAV(GpuBuffer& target);
+	void clearUAV(ColorBuffer& target);
+
+	void setRootSignature(const RootSignature& rootSig);
+
+	void setPipelineState(const ComputePSO& PSO);
+	void setConstants(uint32_t rootIndex, uint32_t numConstants, const void* pConstants);
+	void setConstants(uint32_t rootIndex, Param X);
+	void setConstants(uint32_t rootIndex, Param X, Param Y);
+	void setConstants(uint32_t rootIndex, Param X, Param Y, Param Z);
+	void setConstants(uint32_t rootIndex, Param X, Param Y, Param Z, Param W);
+	void setConstantBuffer(uint32_t rootIndex, D3D12_GPU_VIRTUAL_ADDRESS CBV);
+	void setDynamicConstantBufferView(uint32_t rootIndex, size_t bufferSize, const void* pBufferData);
+	void setDynamicSRV(uint32_t rootIndex, size_t bufferSize, const void* pBufferData);
+	void setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset = 0);
+	void setBufferUAV(uint32_t rootIndex, const GpuBuffer& UAV, uint64_t offset = 0);
+	void setDescriptorTable(uint32_t rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE firstHandle);
+
+	void setDynamicDescriptor(uint32_t rootIndex, uint32_t offset, D3D12_CPU_DESCRIPTOR_HANDLE handle);
+	void setDynamicDescriptors(uint32_t rootIndex, uint32_t offset, uint32_t count, const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles);
+
+	void dispatch(size_t groupCountX = 1, size_t groupCountY = 1, size_t groupCountZ = 1);
+	void dispatch1D(size_t threadCountX, size_t groupSizeX = 64);
+	void dispatch2D(size_t threadCountX, size_t threadCountY, size_t groupSizeX = 8, size_t groupSizeY = 8);
+	void dispatch3D(size_t threadCountX, size_t threadCountY, size_t threadCountZ, size_t groupSizeX, size_t groupSizeY, size_t groupSizeZ);
+	void dispatchIndirect(CommandSignature& dispatchCmdSig, GpuBuffer& argumentBuffer, size_t argumentBufferOffset = 0);
+
+private:
+
+};
+
+
 	
 	
 X_NAMESPACE_END

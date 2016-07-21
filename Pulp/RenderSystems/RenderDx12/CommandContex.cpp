@@ -858,4 +858,189 @@ void GraphicsContext::drawIndirect(CommandSignature& drawIndirectCmdSig, GpuBuff
 }
 
 
+// ------------------------------------------------------
+
+
+
+ComputeContext::~ComputeContext()
+{
+
+}
+
+void ComputeContext::clearUAV(GpuBuffer& target)
+{
+	// After binding a UAV, we can get a GPU handle that is required to clear it as a UAV (because it essentially runs
+	// a shader to set all of the values).
+	D3D12_GPU_DESCRIPTOR_HANDLE GpuVisibleHandle = dynamicDescriptorHeap_.uploadDirect(target.getUAV());
+	const UINT clearColor[4] = {};
+	pCommandList_->ClearUnorderedAccessViewUint(GpuVisibleHandle, target.getUAV(), target.getResource(), clearColor, 0, nullptr);
+}
+
+void ComputeContext::clearUAV(ColorBuffer& target)
+{
+	// After binding a UAV, we can get a GPU handle that is required to clear it as a UAV (because it essentially runs
+	// a shader to set all of the values).
+	D3D12_GPU_DESCRIPTOR_HANDLE GpuVisibleHandle = dynamicDescriptorHeap_.uploadDirect(target.getUAV());
+	CD3DX12_RECT ClearRect(0, 0, target.getWidth(), target.getHeight());
+
+	pCommandList_->ClearUnorderedAccessViewFloat(GpuVisibleHandle, target.getUAV(), target.getResource(), 
+		target.getClearColor(), 1, &ClearRect);
+}
+
+void ComputeContext::setRootSignature(const RootSignature& rootSig)
+{
+	if (rootSig.getSignature() == pCurComputeRootSignature_) {
+		return;
+	}
+
+	pCommandList_->SetComputeRootSignature(pCurComputeRootSignature_ = rootSig.getSignature());
+
+	dynamicDescriptorHeap_.parseComputeRootSignature(rootSig);
+}
+
+void ComputeContext::setPipelineState(const ComputePSO& PSO)
+{
+	ID3D12PipelineState* pPipelineState = PSO.getPipelineStateObject();
+	if (pPipelineState == pCurComputePipelineState_) {
+		return;
+	}
+
+	pCommandList_->SetPipelineState(pPipelineState);
+	pCurComputePipelineState_ = pPipelineState;
+}
+
+void ComputeContext::setConstants(uint32_t rootIndex, uint32_t numConstants, const void* pConstants)
+{
+	pCommandList_->SetComputeRoot32BitConstants(rootIndex, numConstants, pConstants, 0);
+}
+
+void ComputeContext::setConstants(uint32_t rootIndex, Param X)
+{
+	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
+}
+
+void ComputeContext::setConstants(uint32_t rootIndex, Param X, Param Y)
+{
+	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
+	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Y.uint, 1);
+}
+
+void ComputeContext::setConstants(uint32_t rootIndex, Param X, Param Y, Param Z)
+{
+	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
+	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Y.uint, 1);
+	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Z.uint, 2);
+}
+
+void ComputeContext::setConstants(uint32_t rootIndex, Param X, Param Y, Param Z, Param W)
+{
+	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
+	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Y.uint, 1);
+	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Z.uint, 2);
+	pCommandList_->SetComputeRoot32BitConstant(rootIndex, W.uint, 3);
+}
+
+void ComputeContext::setConstantBuffer(uint32_t rootIndex, D3D12_GPU_VIRTUAL_ADDRESS CBV)
+{
+	pCommandList_->SetComputeRootConstantBufferView(rootIndex, CBV);
+}
+
+void ComputeContext::setDynamicConstantBufferView(uint32_t rootIndex, size_t bufferSize, const void* pBufferData)
+{
+	X_ASSERT_NOT_NULL(pBufferData);
+	X_ASSERT_ALIGNMENT(pBufferData, 16, 0);
+
+	DynAlloc cb = cpuLinearAllocator_.allocate(bufferSize);
+	//core::SIMDMemCopy(cb.DataPtr, BufferData, core::bitUtil::RoundUpToMultiple(BufferSize, 16) >> 4);
+	std::memcpy(cb.getCpuData(), pBufferData, bufferSize);
+	pCommandList_->SetComputeRootConstantBufferView(rootIndex, cb.getGpuAddress());
+}
+
+void ComputeContext::setDynamicSRV(uint32_t rootIndex, size_t bufferSize, const void* pBufferData)
+{
+	X_ASSERT_NOT_NULL(pBufferData);
+	X_ASSERT_ALIGNMENT(pBufferData, 16, 0);
+
+	DynAlloc cb = cpuLinearAllocator_.allocate(bufferSize);
+	core::SIMDMemCopy(cb.getCpuData(), pBufferData, core::bitUtil::RoundUpToMultiple<size_t>(bufferSize, 16u) >> 4);
+	pCommandList_->SetComputeRootShaderResourceView(rootIndex, cb.getGpuAddress());
+}
+
+void ComputeContext::setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset)
+{
+	X_ASSERT(core::bitUtil::IsBitFlagSet(SRV.getUsageState(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE), "NON_PIXEL_SHADER_RESOURCE flag missing")(SRV.getUsageState());
+
+	pCommandList_->SetComputeRootShaderResourceView(rootIndex, SRV.getGpuVirtualAddress() + offset);
+}
+
+void ComputeContext::setBufferUAV(uint32_t rootIndex, const GpuBuffer& UAV, uint64_t offset)
+{
+	X_ASSERT(core::bitUtil::IsBitFlagSet(UAV.getUsageState(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS), "UNORDERED_ACCESS flag missing")(UAV.getUsageState());
+
+	pCommandList_->SetComputeRootUnorderedAccessView(rootIndex, UAV.getGpuVirtualAddress());
+}
+
+void ComputeContext::setDescriptorTable(uint32_t rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE firstHandle)
+{
+	pCommandList_->SetComputeRootDescriptorTable(rootIndex, firstHandle);
+}
+
+	 
+void ComputeContext::setDynamicDescriptor(uint32_t rootIndex, uint32_t offset, D3D12_CPU_DESCRIPTOR_HANDLE handle)
+{
+	setDynamicDescriptors(rootIndex, offset, 1, &handle);
+}
+
+void ComputeContext::setDynamicDescriptors(uint32_t rootIndex, uint32_t offset, uint32_t count, const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles)
+{
+	dynamicDescriptorHeap_.setGraphicsDescriptorHandles(rootIndex, offset, count, pHandles);
+}
+
+	 
+void ComputeContext::dispatch(size_t groupCountX, size_t groupCountY, size_t groupCountZ)
+{
+	flushResourceBarriers();
+	
+	dynamicDescriptorHeap_.commitComputeRootDescriptorTables(pCommandList_);
+
+	pCommandList_->Dispatch(
+		safe_static_cast<uint32_t, size_t>(groupCountX),
+		safe_static_cast<uint32_t, size_t>(groupCountY),
+		safe_static_cast<uint32_t, size_t>(groupCountZ)
+	);
+}
+
+void ComputeContext::dispatch1D(size_t threadCountX, size_t groupSizeX)
+{
+	dispatch(divideByMultiple(threadCountX, groupSizeX), 1, 1);
+}
+
+void ComputeContext::dispatch2D(size_t threadCountX, size_t threadCountY, size_t groupSizeX, size_t groupSizeY )
+{
+	dispatch(
+		divideByMultiple(threadCountX, groupSizeX),
+		divideByMultiple(threadCountY, groupSizeY), 1);
+}
+
+void ComputeContext::dispatch3D(size_t threadCountX, size_t threadCountY, size_t threadCountZ,
+	size_t groupSizeX, size_t groupSizeY, size_t groupSizeZ)
+{
+	dispatch(
+		divideByMultiple(threadCountX, groupSizeX),
+		divideByMultiple(threadCountY, groupSizeY),
+		divideByMultiple(threadCountZ, groupSizeZ));
+}
+
+void ComputeContext::dispatchIndirect(CommandSignature& dispatchCmdSig, GpuBuffer& argumentBuffer, size_t argumentBufferOffset)
+{
+	flushResourceBarriers();
+
+	dynamicDescriptorHeap_.commitComputeRootDescriptorTables(pCommandList_);
+
+	pCommandList_->ExecuteIndirect(dispatchCmdSig.getSignature(), 1, argumentBuffer.getResource(),
+		static_cast<uint64_t>(argumentBufferOffset), nullptr, 0);
+}
+
+
+
 X_NAMESPACE_END
