@@ -15,9 +15,6 @@ X_NAMESPACE_BEGIN(render)
 namespace shader
 {
 
-//	render::XRenderResourceContainer* XHWShader::s_pHWshaders = nullptr;
-
-
 	XHWShader::XHWShader() :
 		sourceCrc32_(0),
 		status_(ShaderStatus::NotCompiled),
