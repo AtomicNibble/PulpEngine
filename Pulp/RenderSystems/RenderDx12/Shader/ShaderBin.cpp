@@ -28,7 +28,7 @@ XShaderBin::~XShaderBin()
 bool XShaderBin::saveShader(const char* pPath, uint32_t sourceCRC,
 	const XHWShader* pShader)
 {
-	X_ASSERT_NOT_NULL(path);
+	X_ASSERT_NOT_NULL(pPath);
 	X_ASSERT_NOT_NULL(pShader);
 
 #if 1
@@ -104,11 +104,11 @@ bool XShaderBin::saveShader(const char* pPath, uint32_t sourceCRC,
 
 bool XShaderBin::loadShader(const char* pPath, uint32_t sourceCRC, XHWShader* pShader)
 {
-	X_ASSERT_NOT_NULL(path);
+	X_ASSERT_NOT_NULL(pPath);
 	X_ASSERT_NOT_NULL(pShader);
 
-	if (!gEnv->pFileSys->fileExists(path)) {
-		X_LOG1("Shader", "no cache exsits for: \"%s\"", path);
+	if (!gEnv->pFileSys->fileExists(pPath)) {
+		X_LOG1("Shader", "no cache exsits for: \"%s\"", pPath);
 		return false;
 	}
 
