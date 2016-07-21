@@ -47,77 +47,7 @@ namespace shader
 
 namespace 
 {
-	// must be prefixed with IL_ (Input Layout)
-	InputLayoutEntry g_ILFlags[] = {
-		{ "Normal", ILFlag::Normal },
-		{ "BiNornmal", ILFlag::BiNormal },
-		{ "Color", ILFlag::Color },
-	};
-
-
-	bool ILFlagFromStr(const char* pStr, Flags<ILFlag>& flagOut)
-	{
-		const size_t num = sizeof(g_ILFlags) / sizeof(const char*);
-		size_t i;
-		for (i = 0; i < num; i++)
-		{
-			if (strUtil::IsEqualCaseInsen(pStr, g_ILFlags[i].name))
-			{
-				flagOut.Set(g_ILFlags[i].flag);
-				return true;
-			}
-		}
-		return false;
-	}
-
-	TechFlagEntry g_TechFlags[] = {
-		{ "Color", TechFlag::Color },
-		{ "Textured", TechFlag::Textured },
-		{ "Skinned", TechFlag::Skinned },
-		{ "Instanced", TechFlag::Instanced },
-	};
-
-	bool TechFlagFromStr(const char* pStr, Flags<TechFlag>& flagOut)
-	{
-		const size_t num = sizeof(g_TechFlags) / sizeof(const char*);
-		size_t i;
-		for (i = 0; i < num; i++)
-		{
-			if (strUtil::IsEqualCaseInsen(pStr, g_TechFlags[i].name))
-			{
-				flagOut.Set(g_TechFlags[i].flag);
-				return true;
-			}
-		}
-		return false;
-	}
-
-	PreProEntry g_ProPros[] =
-	{
-		{ "include", PreProType::Include },
-		{ "define", PreProType::Define },
-		{ "undef", PreProType::Undef },
-		{ "if", PreProType::If },
-		{ "ifdef", PreProType::IfDef },
-		{ "ifndef", PreProType::IfNDef },
-		{ "else", PreProType::Else },
-		{ "endif", PreProType::EndIF },
-	};
-
-	bool PreProFromStr(core::XLexToken& token, PreProType::Enum& typeOut)
-	{
-		const size_t num = sizeof(g_ProPros) / sizeof(PreProEntry);
-		size_t i;
-		for (i = 0; i < num; i++)
-		{
-			if (strUtil::IsEqualCaseInsen(token.begin(), token.end(), g_ProPros[i].name))
-			{
-				typeOut = g_ProPros[i].type;
-				return true;
-			}
-		}
-		return false;
-	}
+	
 
 	template<typename TFlags>
 	void AppendFlagTillEqual(const Flags<TFlags>& srcflags, Flags<TFlags>& dest)
