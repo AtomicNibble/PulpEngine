@@ -113,8 +113,7 @@ void RootSignature::finalize(ID3D12Device* pDevice, D3D12_ROOT_SIGNATURE_FLAGS f
 		X_FATAL("Dx12", "Failed to create root signature: %" PRIu32, hr);
 	}
 
-	pSignature_->SetName(L"RootSignature");
-
+	D3DDebug::SetDebugObjectName(pSignature_, L"RootSignature");
 }
 
 

@@ -72,7 +72,7 @@ ID3D12CommandAllocator* CommandAllocatorPool::requestAllocator(uint64_t Complete
 		core::StackString<32, wchar_t> name;
 		name.appendFmt(L"CommandAllocator %" PRIuS , allocatorPool_.size());
 
-		pAllocator->SetName(name.c_str());
+		D3DDebug::SetDebugObjectName(pAllocator,name.c_str());
 		allocatorPool_.push_back(pAllocator);
 	}
 

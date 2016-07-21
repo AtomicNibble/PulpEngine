@@ -146,9 +146,7 @@ LinearAllocationPage* LinearAllocatorPageManager::createNewPage(void)
 		X_FATAL("Dx12", "Failed to create commited resource: err: %" PRIu32, hr);
 	}
 
-#if X_DEBUG
-	pBuffer->SetName(L"LinearAllocator Page");
-#endif // X_DEBUG
+	D3DDebug::SetDebugObjectName(pBuffer,L"LinearAllocator Page");
 
 	return X_NEW(LinearAllocationPage, arena_, "GpuLinAllocPage")(pBuffer, defaultUsage);
 }

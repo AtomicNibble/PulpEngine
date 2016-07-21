@@ -68,7 +68,7 @@ void CommandSignature::finalize(ID3D12Device* pDevice, const RootSignature* pRoo
 		return;
 	}
 
-	pSignature_->SetName(L"CommandSignature");
+	D3DDebug::SetDebugObjectName(pSignature_,L"CommandSignature");
 }
 
 

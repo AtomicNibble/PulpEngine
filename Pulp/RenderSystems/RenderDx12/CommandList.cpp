@@ -37,7 +37,7 @@ bool CommandQue::create(ID3D12Device* pDevice)
 			return false;
 		}
 
-		pCommandQueue_->SetName(L"CommandListManager::m_CommandQueue");
+		D3DDebug::SetDebugObjectName(pCommandQueue_, L"CommandListManager::m_CommandQueue");
 	}
 
 	HRESULT hr = pDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&pFence_));
@@ -46,7 +46,7 @@ bool CommandQue::create(ID3D12Device* pDevice)
 		return false;
 	}
 
-	pFence_->SetName(L"CommandListManager::m_pFence");
+	D3DDebug::SetDebugObjectName(pFence_, L"CommandListManager::m_pFence");
 	pFence_->Signal((uint64_t)type_ << 56);
 
 
@@ -225,7 +225,7 @@ void CommandListManger::createNewCommandList(D3D12_COMMAND_LIST_TYPE type,
 		X_FATAL("Dx12", "Failed to create command list: %" PRIu32, hr);
 	}
 
-	(*pListOut)->SetName(L"CommandList");
+	D3DDebug::SetDebugObjectName((*pListOut), L"CommandList");
 }
 
 bool CommandListManger::isFenceComplete(uint64_t fenceValue)
