@@ -130,38 +130,6 @@ namespace
 // ----------------------------------------------------
 
 
-XShader* XShaderManager::s_pDefaultShader_ =nullptr;
-XShader* XShaderManager::s_pDebugShader_ =nullptr;
-XShader* XShaderManager::s_pFixedFunction_ =nullptr;
-XShader* XShaderManager::s_pFont_ =nullptr;
-XShader* XShaderManager::s_pGui_ =nullptr;
-XShader* XShaderManager::s_pDefferedShader_ =nullptr;
-XShader* XShaderManager::s_pDefferedShaderVis_ =nullptr;
-XShader* XShaderManager::s_pWordShader_ =nullptr;
-XShader* XShaderManager::s_pModelShader_ = nullptr;
-
-
-XShaderManager::XShaderManager() : 
-Sourcebin_(nullptr), 
-pCrc32_(nullptr)
-{
-
-
-}
-
-XShaderManager::~XShaderManager()
-{
-	ShaderSourceMap::iterator it = Sourcebin_.begin();
-
-	for (; it != Sourcebin_.end(); ++it)
-	{
-		X_DELETE(it->second, g_rendererArena);
-	}
-
-	Sourcebin_.clear();
-}
-
-// -------------------------------------------
 
 
 XShaderTechnique& XShaderTechnique::operator=(const ShaderSourceFile::Technique& srcTech)
