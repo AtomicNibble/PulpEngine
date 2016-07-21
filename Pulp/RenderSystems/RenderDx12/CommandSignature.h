@@ -54,7 +54,6 @@ public:
 protected:
 	core::Array<IndirectParameter> params_;
 
-	// std::unique_ptr<IndirectParameter[]> m_ParamArray;
 	ID3D12CommandSignature* pSignature_;
 };
 
