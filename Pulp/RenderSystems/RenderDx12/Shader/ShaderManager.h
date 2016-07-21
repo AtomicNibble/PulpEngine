@@ -8,6 +8,9 @@
 
 #include <Assets\AssertContainer.h>
 
+#include "ShaderBin.h"
+#include "ILTree.h"
+
 X_NAMESPACE_DECLARE(core,
 	struct IConsoleCmdArgs;
 )
@@ -17,14 +20,16 @@ X_NAMESPACE_BEGIN(render)
 namespace shader
 {
 
-	class XShader;
 	class SourceFile;
 	class ShaderSourceFile;
+	class XShader;
+	class XHWShader;
 
 
 	class XShaderManager : public core::IXHotReload
 	{
 		typedef core::HashMap<core::string, SourceFile*> ShaderSourceMap;
+		typedef core::HashMap<core::string, XHWShader*> HWShaderMap;
 		typedef core::XResourceContainer ShaderCon;
 
 	public:
@@ -39,6 +44,8 @@ namespace shader
 
 		// returns merged source.
 		bool sourceToString(const char* pName, core::string& strOut);
+
+		ILTreeNode& getILTree(void);
 
 	private:
 		// returns a loaded shader, null if not fnd.
@@ -59,6 +66,7 @@ namespace shader
 		void listShaders(void);
 		void listShaderSources(void);
 
+		void createInputLayoutTree(void);
 
 	private:
 		// IXHotReload
@@ -75,7 +83,11 @@ namespace shader
 		core::MemoryArenaBase* arena_;
 		core::Crc32* pCrc32_;
 		ShaderSourceMap sourcebin_;
+		ShaderBin shaderBin_;
 		ShaderCon shaders_;
+		HWShaderMap hwShaders_;
+
+		ILTreeNode ilRoot_;	
 	};
 
 

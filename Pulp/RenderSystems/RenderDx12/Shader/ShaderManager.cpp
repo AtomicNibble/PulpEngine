@@ -2,6 +2,7 @@
 #include "ShaderManager.h"
 #include "ShaderSourceTypes.h"
 #include "Shader.h"
+#include "ILTree.h"
 
 #include <Hashing\crc32.h>
 #include <String\Lexer.h>
@@ -100,7 +101,9 @@ namespace shader
 		arena_(arena),
 		pCrc32_(nullptr),
 		sourcebin_(arena, 128),
-		shaders_(arena, 256)
+		shaders_(arena, 256),
+		hwShaders_(arena, 256),
+		ilRoot_(arena)
 	{
 
 	}
@@ -139,6 +142,8 @@ namespace shader
 			"lists the loaded shaders");
 		ADD_COMMAND_MEMBER("listShaderSource", this, XShaderManager, &XShaderManager::Cmd_ListShaderSources, core::VarFlag::SYSTEM,
 			"lists the loaded shaders sources");
+
+		createInputLayoutTree();
 
 		return true;
 	}
@@ -187,6 +192,11 @@ namespace shader
 			return true;
 		}
 		return false;
+	}
+
+	ILTreeNode& XShaderManager::getILTree(void)
+	{
+		return ilRoot_;
 	}
 
 	XShader* XShaderManager::getLoadedShader(const char* pName)
@@ -562,7 +572,7 @@ namespace shader
 		{
 			core::string name(pName);
 
-			pShader = X_NEW_ALIGNED(XShader, g_rendererArena, "Shader", 16);
+			pShader = X_NEW_ALIGNED(XShader, arena_, "Shader", 16)(arena_);
 			pShader->name_ = name;
 			shaders_.AddAsset(name, pShader);
 		}
@@ -594,7 +604,7 @@ namespace shader
 			numTecs = pSource->numTechs();
 
 			pShader = createShader(pName);
-			pShader->techs_.resize(pSource->numTechs());
+			pShader->techs_.resize(pSource->numTechs(), XShaderTechnique(arena_));
 			pShader->sourceCrc32_ = pSource->sourceCrc32_;
 			pShader->hlslSourceCrc32_ = pSource->hlslSourceCrc32_;
 			pShader->pHlslFile_ = pSource->pHlslFile_;
@@ -687,7 +697,7 @@ namespace shader
 					numTecs = pShaderSource->numTechs();
 
 					// might be more techs etc..
-					pShader->techs_.resize(numTecs);
+					pShader->techs_.resize(numTecs, XShaderTechnique(arena_));
 					pShader->sourceCrc32_ = pShaderSource->sourceCrc32_;
 					pShader->hlslSourceCrc32_ = pShaderSource->hlslSourceCrc32_;
 
@@ -904,6 +914,53 @@ namespace shader
 		}
 
 		X_LOG0("Shader", "--------- ^8Shader Sources End^7 ---------");
+	}
+
+	void XShaderManager::createInputLayoutTree(void)
+	{
+		// all the posible node types.
+		ILTreeNode blank(arena_);
+		ILTreeNode pos(arena_, "POSITION");
+		ILTreeNode uv(arena_, "TEXCOORD");
+		ILTreeNode col(arena_, "COLOR");
+		ILTreeNode nor(arena_, "NORMAL");
+		ILTreeNode tan(arena_, "TANGENT");
+		ILTreeNode bin(arena_, "BINORMAL");
+
+		// for shader input layouts the format is not given since the shader
+		// don't care what the format comes in as.
+		// so how can i work out what the formats are since i support identical sematic layouts
+		// with diffrent foramts :(
+		//
+		// maybe i should just have a sematic format, which can be used to tell if the current input
+		// layout will work with the shader :)
+		//
+		//        .
+		//        |
+		//       P3F_____
+		//       / \     \
+		//     T2S  T4F  T3F
+		//      |    |__
+		//     C4B	    |
+		//	  __|	   C4B 
+		//	 /  |       |
+		// N3F N10	   N3F
+		//  |    \
+		// TB3F  TB10
+		//
+
+		ILTreeNode& uvBase = blank.AddChild(pos).AddChild(uv, InputLayoutFormat::POS_UV);
+		uvBase.AddChild(col, InputLayoutFormat::POS_UV_COL).
+			AddChild(nor, InputLayoutFormat::POS_UV_COL_NORM).
+			AddChild(tan, InputLayoutFormat::POS_UV_COL_NORM_TAN).
+			AddChild(bin, InputLayoutFormat::POS_UV_COL_NORM_TAN_BI);
+
+		// double text coords.
+		uvBase.AddChild(uv).
+			AddChild(col).
+			AddChild(nor, InputLayoutFormat::POS_UV2_COL_NORM);
+
+		ilRoot_ = blank;
 	}
 
 
