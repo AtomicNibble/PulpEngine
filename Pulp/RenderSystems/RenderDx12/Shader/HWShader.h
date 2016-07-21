@@ -16,8 +16,10 @@ X_NAMESPACE_BEGIN(render)
 namespace shader
 {
 
-	// No float flag, it's float by default.
 	X_DECLARE_FLAGS(ParamFlags)(FLOAT, INT, BOOL, MATRIX, VEC2, VEC3, VEC4);
+	X_DECLARE_FLAGS(ShaderStatus) (NotCompiled, Compiling, AsyncCompileDone, UploadedToHW, ReadyToRock, FailedToCompile);
+
+	X_DECLARE_ENUM(ConstbufType)(PER_FRAME,	PER_BATCH, PER_INSTANCE);
 
 
 	// PF = PerFrame
@@ -85,9 +87,9 @@ namespace shader
 		core::StrHash		nameHash;
 		Flags<ParamFlags>	flags;
 		ParamType::Enum		type;
-		short				bind;
-		short				constBufferSlot;
-		int					numParameters;
+		int16_t				bind;
+		int16_t				constBufferSlot;
+		int32_t				numParameters;
 
 		XShaderParam()
 		{
@@ -114,6 +116,10 @@ namespace shader
 			ShaderType::Enum type, Flags<ILFlag> ILFlag, uint32_t sourceCrc);
 
 		static const char* getProfileFromType(ShaderType::Enum type);
+
+		const int32_t release(void) {
+			return 0;
+		}
 
 
 		X_INLINE const char* getName(void) const;

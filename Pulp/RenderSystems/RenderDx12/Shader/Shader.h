@@ -30,26 +30,11 @@ namespace shader
 {
 
 class XShaderManager;
-struct ShaderSourceFile;
-struct SourceFile;
-
-#define SHADER_BIND_SAMPLER 0x4000
+class ShaderSourceFile;
+class SourceFile;
 
 
-struct ConstbufType
-{
-	enum Enum
-	{
-		PER_FRAME,
-		PER_BATCH,
-		PER_INSTANCE,
-		Num
-	};
-};
-
-
-
-X_DECLARE_FLAGS(ShaderStatus) (NotCompiled, Compiling, AsyncCompileDone, UploadedToHW, ReadyToRock, FailedToCompile);
+// #define SHADER_BIND_SAMPLER 0x4000
 
 
 class XShaderResources : public IRenderShaderResources
@@ -113,35 +98,14 @@ class XShaderTechniqueHW;
 
 
 
-
-
 struct XShaderTechnique
 {
 	static const size_t TECH_MAX_SUB = 6;
-
 	typedef core::FixedArray<XShaderTechniqueHW*, TECH_MAX_SUB> TechHWList;
 
 	XShaderTechnique() :
 		pCurHwTech(nullptr)
 	{}
-
-	XShaderTechnique& operator=(const ShaderSourceFile::Technique& srcTech);
-
-	void release(void) {
-		TechHWList::iterator it;
-		for (it = hwTechs.begin(); it != hwTechs.end(); ++it) {
-//			it->release();
-		}
-	}
-
-	void append(const XShaderTechniqueHW& hwTech) {
-//		hwTechs.append(&hwTech);
-//		pCurHwTech = hwTechs.end() - 1;
-	}
-
-	void resetCurHWTech(void) {
-//		pCurHwTech = hwTechs.begin();
-	}
 
 public:
 	core::string name;
@@ -157,6 +121,8 @@ public:
 
 	Flags<TechFlag> techFlags;
 };
+
+
 
 class XShader : public IShader, public core::XBaseAsset
 {
@@ -189,7 +155,6 @@ private:
 	X_INLINE size_t numTechs(void) const { return techs_.size(); }
 
 private:
-
 	core::string name_;
 	uint32_t sourceCrc32_;
 	uint32_t hlslSourceCrc32_;
