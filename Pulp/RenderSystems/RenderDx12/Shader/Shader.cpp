@@ -384,24 +384,6 @@ void XShaderResources::freeAssets(void)
 
 // -----------------------------------------------
 
-const char* XHWShader::getProfileFromType(ShaderType::Enum type)
-{
-	switch (type)
-	{
-		case ShaderType::Vertex:
-			return "vs_4_0";
-		case ShaderType::Pixel:
-			return "ps_4_0";
-		case ShaderType::Geometry:
-			return "gs_4_0";
-
-		case ShaderType::UnKnown:
-			break;
-	}
-
-	X_ASSERT_UNREACHABLE();
-	return "";
-}
 
 
 } // namespace shader
