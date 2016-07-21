@@ -119,7 +119,7 @@ public:
 
 
 
-class XShader : public IShader, public core::XBaseAsset
+X_ALIGNED_SYMBOL(class XShader, 16) : public IShader, public core::XBaseAsset
 {
 	friend class XShaderManager;
 

@@ -571,7 +571,7 @@ namespace shader
 		{
 			core::string name(pName);
 
-			pShader = X_NEW_ALIGNED(XShader, arena_, "Shader", 16)(arena_);
+			pShader = X_NEW(XShader, arena_, "Shader")(arena_);
 			pShader->name_ = name;
 			shaders_.AddAsset(name, pShader);
 		}
