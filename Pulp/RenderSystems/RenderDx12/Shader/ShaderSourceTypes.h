@@ -63,6 +63,7 @@ namespace shader
 		X_INLINE void setFileData(const core::string& name);
 		X_INLINE void setSourceCrc32(uint32_t crc);
 
+		X_INLINE void addRefrence(const core::string& name);
 
 	protected:
 		core::string name_;

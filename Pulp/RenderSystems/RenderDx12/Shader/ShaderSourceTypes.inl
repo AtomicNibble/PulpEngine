@@ -62,7 +62,10 @@ namespace shader
 		sourceCrc32_ = crc;
 	}
 
-
+	X_INLINE void SourceFile::addRefrence(const core::string& name)
+	{
+		refrences_.insert(name);
+	}
 
 	// -------------------------------------------
 
