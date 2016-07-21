@@ -32,9 +32,10 @@ namespace shader
 		core::StackString<64> sematicName_;
 		InputLayoutFormat::Enum fmt_;
 		childVec children_; // never gonna be that many children.
-		bool ___pad[3];
+		bool ___pad[8];
 	};
 
+	X_ENSURE_SIZE(ILTreeNode, 128);
 
 } // namespace shader
 
