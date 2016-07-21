@@ -103,7 +103,11 @@ namespace shader
 		sourcebin_(arena, 128),
 		shaders_(arena, 256),
 		hwShaders_(arena, 256),
-		ilRoot_(arena)
+		ilRoot_(arena),
+		pDefaultShader_(nullptr),
+		pFixedFunction_(nullptr),
+		pFont_(nullptr),
+		pGui_(nullptr)
 	{
 
 	}
@@ -144,8 +148,11 @@ namespace shader
 			"lists the loaded shaders sources");
 
 		createInputLayoutTree();
-
 		vars_.RegisterVars();
+
+		if (!loadCoreShaders()) {
+			return false;
+		}
 
 		return true;
 	}
@@ -162,6 +169,7 @@ namespace shader
 		gEnv->pHotReload->addfileType(nullptr, "shader");
 		gEnv->pHotReload->addfileType(nullptr, "fxcb");
 
+		freeCoreShaders();
 		freeSourcebin();
 
 		return true;
@@ -205,6 +213,39 @@ namespace shader
 	{
 		return vars_;
 	}
+
+
+	bool XShaderManager::loadCoreShaders(void)
+	{
+		// not loaded, just a blank shader instance
+		pDefaultShader_ = createShader("default");
+
+		if ((pFixedFunction_ = forName("ffe")) == nullptr) {
+			X_ERROR("Shader", "Failed to load ffe shader");
+			return false;
+		}
+		if ((pFont_ = forName("font")) == nullptr) {
+			X_ERROR("Shader", "Failed to load font shader");
+			return false;
+		}
+		if ((pGui_ = forName("gui")) == nullptr) {
+			X_ERROR("Shader", "Failed to load gui shader");
+			return false;
+		}
+
+		return true;
+	}
+
+	bool XShaderManager::freeCoreShaders(void)
+	{
+		core::SafeRelease(pDefaultShader_);
+		core::SafeRelease(pFixedFunction_);
+		core::SafeRelease(pFont_);
+		core::SafeRelease(pGui_);
+
+		return true;
+	}
+
 
 	XShader* XShaderManager::getLoadedShader(const char* pName)
 	{
@@ -989,7 +1030,70 @@ namespace shader
 	{
 		X_UNUSED(jobSys);
 
+#if 0
+		const char* ext;
+		if ((ext = core::strUtil::FileExtension(name)) != nullptr)
+		{
 
+			// this is just a cache update ignore this.
+			if (core::strUtil::IsEqualCaseInsen(ext, "fxcb")) {
+				return true;
+			}
+
+			// ignore .fxcb.hlsl which are merged sources saved out for debuggin.
+			if (core::strUtil::FindCaseInsensitive(name, ".fxcb.hlsl")) {
+				return true;
+			}
+
+			// is it source?
+			bool isSource = true;
+
+			if (core::strUtil::IsEqualCaseInsen(ext, "shader")) {
+				isSource = false;
+			}
+
+
+			if (isSource)
+			{
+				// if source has changed we need to recompile any shader that uses
+				// that source file.
+				// how to find the shaders that it uses?
+				// if i have some sort of reffrence hirarcy
+				// i can take any file and know what shaders use it.
+				core::Path<char> temp(name);
+				temp.toLower(); // all source is lower case
+
+				ShaderSourceMap::const_iterator it = Sourcebin_.find(core::string(temp.fileName()));
+				if (it != Sourcebin_.end())
+				{
+					// reload the source file.
+					loadRawSourceFile(temp.fileName(), true);
+
+					SourceFile* src = it->second;
+					for (auto refName : src->refrences)
+					{
+						reloadShader(refName.c_str());
+					}
+				}
+				else
+				{
+					// log as not found.
+					X_WARNING("Shader", "\"%s\" not used, skipping reload", name);
+				}
+			}
+			else
+			{
+				core::Path<char> temp(name);
+				temp.setExtension("");
+				temp.toLower();
+
+				reloadShader(temp.fileName());
+			}
+		}
+		return true;
+#else
+		X_UNUSED(name);
+#endif
 	}
 
 	void XShaderManager::writeSourceToFile(core::XFile* pFile, const SourceFile* pSourceFile)

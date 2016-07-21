@@ -50,6 +50,10 @@ namespace shader
 		ShaderVars& getShaderVars(void);
 
 	private:
+		bool loadCoreShaders(void);
+		bool freeCoreShaders(void);
+
+
 		// returns a loaded shader, null if not fnd.
 		XShader* getLoadedShader(const char* pName);
 
@@ -91,6 +95,12 @@ namespace shader
 
 		ILTreeNode ilRoot_;	
 		ShaderVars vars_;
+
+	private:
+		XShader* pDefaultShader_;
+		XShader* pFixedFunction_;
+		XShader* pFont_;
+		XShader* pGui_;
 	};
 
 
