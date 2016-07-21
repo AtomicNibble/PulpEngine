@@ -17,7 +17,7 @@ namespace shader
 
 	class XHWShader;
 
-	struct XShaderBinHeader
+	struct ShaderBinHeader
 	{
 		uint32_t forcc;
 		uint8_t version;
@@ -45,11 +45,11 @@ namespace shader
 	};
 
 
-	class XShaderBin
+	class ShaderBin
 	{
 	public:
-		XShaderBin();
-		~XShaderBin();
+		ShaderBin();
+		~ShaderBin();
 
 
 		bool saveShader(const char* pPath, uint32_t sourceCRC, const XHWShader* pShader);

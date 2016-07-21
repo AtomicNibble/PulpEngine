@@ -13,19 +13,19 @@ namespace shader
 {
 
 
-XShaderBin::XShaderBin()
+	ShaderBin::ShaderBin()
 {
 
 }
 
-XShaderBin::~XShaderBin()
+ShaderBin::~ShaderBin()
 {
 
 }
 
 
 
-bool XShaderBin::saveShader(const char* pPath, uint32_t sourceCRC,
+bool ShaderBin::saveShader(const char* pPath, uint32_t sourceCRC,
 	const XHWShader* pShader)
 {
 	X_ASSERT_NOT_NULL(pPath);
@@ -51,7 +51,7 @@ bool XShaderBin::saveShader(const char* pPath, uint32_t sourceCRC,
 	
 	const core::Array<XShaderParam>& bindVars = pShader->getBindVars();
 
-	XShaderBinHeader hdr;
+	ShaderBinHeader hdr;
 	core::zero_object(hdr);
 	hdr.forcc = X_SHADER_BIN_FOURCC;
 	hdr.version = X_SHADER_BIN_VERSION;
@@ -102,7 +102,7 @@ bool XShaderBin::saveShader(const char* pPath, uint32_t sourceCRC,
 }
 
 
-bool XShaderBin::loadShader(const char* pPath, uint32_t sourceCRC, XHWShader* pShader)
+bool ShaderBin::loadShader(const char* pPath, uint32_t sourceCRC, XHWShader* pShader)
 {
 	X_ASSERT_NOT_NULL(pPath);
 	X_ASSERT_NOT_NULL(pShader);
@@ -119,7 +119,7 @@ bool XShaderBin::loadShader(const char* pPath, uint32_t sourceCRC, XHWShader* pS
 #else
 
 	ID3DBlob* pBlob = nullptr;
-	XShaderBinHeader hdr;
+	ShaderBinHeader hdr;
 	core::zero_object(hdr);
 
 	core::XFileScoped file;
