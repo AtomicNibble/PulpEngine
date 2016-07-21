@@ -372,6 +372,7 @@
     <ClCompile Include="RootSignature.cpp" />
     <ClCompile Include="SampleDesc.cpp" />
     <ClCompile Include="Shader\HWShader.cpp" />
+    <ClCompile Include="Shader\ILTree.cpp" />
     <ClCompile Include="Shader\Shader.cpp" />
     <ClCompile Include="Shader\ShaderBin.cpp" />
     <ClCompile Include="Shader\ShaderManager.cpp" />
@@ -407,6 +408,7 @@
     <None Include="RootSignature.inl" />
     <None Include="SamplerDesc.inl" />
     <None Include="Shader\HWShader.inl" />
+    <None Include="Shader\ILTree.inl" />
     <None Include="Shader\ShaderSourceTypes.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
