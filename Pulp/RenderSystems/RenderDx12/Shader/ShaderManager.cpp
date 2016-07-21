@@ -222,20 +222,19 @@ namespace shader
 
 			if (lex.SkipUntilString("shader"))
 			{
-				if (!lex.ReadToken(token))
-				{
+				if (!lex.ReadToken(token)) {
 					X_ERROR("Shader", "unexpected EOF");
 					return nullptr;
 				}
 
-				if (!token.isEqual("{"))
-				{
+				if (!token.isEqual("{")) {
 					X_ERROR("Shader", "expected { on line: %i", token.GetLine());
 				}
 
 				{
-					if (!lex.ExpectTokenString("source"))
+					if (!lex.ExpectTokenString("source")) {
 						return nullptr;
+					}
 
 					// read the source file name.
 					if (!lex.ReadToken(token))
@@ -875,9 +874,9 @@ namespace shader
 		return true;
 	}
 
-	void XShaderManager::listShaders(const char* searchPatten)
+	void XShaderManager::listShaders(const char* pSarchPatten)
 	{
-		X_UNUSED(searchPatten);
+		X_UNUSED(pSarchPatten);
 
 #if 0
 		render::XRenderResourceContainer::ResourceConstItor it = shaders_.begin();
