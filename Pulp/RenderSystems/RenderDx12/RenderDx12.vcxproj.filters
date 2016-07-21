@@ -240,6 +240,9 @@
     <None Include="Shader\ShaderSourceTypes.inl">
       <Filter>Header Files\Shader</Filter>
     </None>
+    <None Include="Shader\Shader.inl">
+      <Filter>Header Files\Shader</Filter>
+    </None>
     <None Include="Shader\ILTree.inl">
       <Filter>Header Files\Shader</Filter>
     </None>

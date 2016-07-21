@@ -120,14 +120,57 @@ BlendType::Enum BlendType::typeFromStr(const char* _str)
 	return INVALID;
 }
 
-namespace
+
+
+// ----------------------------------------------------
+
+
+XShaderTechnique::XShaderTechnique(core::MemoryArenaBase* arena) : 
+	hwTechs(arena)
 {
-
-
 
 }
 
+
+
+
 // ----------------------------------------------------
+
+
+XShader::XShader(core::MemoryArenaBase* arena) :
+	techs_(arena)
+{
+	sourceCrc32_ = 0;
+	hlslSourceCrc32_ = 0;
+
+	vertexFmt_ = VertexFormat::P3F_T2F_C4B;
+
+	pHlslFile_ = nullptr;
+}
+
+XShader::~XShader()
+{
+	size_t i, numTecs;
+	numTecs = techs_.size();
+	for (i = 0; i < numTecs; i++)
+	{
+		//		techs_[i].release();
+	}
+}
+
+const int32_t XShader::release(void)
+{
+	int32_t ref = XBaseAsset::release();
+	if (ref == 0)
+	{
+		X_DELETE(this, g_rendererArena);
+	}
+
+	return ref;
+}
+
+
+
 
 
 
@@ -162,39 +205,6 @@ XShaderTechnique& XShaderTechnique::operator=(const ShaderSourceFile::Technique&
 #endif
 
 // -------------------------------------------
-
-
-XShader::XShader() :
-	techs_(g_rendererArena)
-{
-	sourceCrc32_ = 0;
-	hlslSourceCrc32_ = 0;
-
-	vertexFmt_ = VertexFormat::P3F_T2F_C4B;
-
-	pHlslFile_ = nullptr;
-}
-
-XShader::~XShader()
-{
-	size_t i, numTecs;
-	numTecs = techs_.size();
-	for (i = 0; i < numTecs; i++)
-	{
-//		techs_[i].release();
-	}
-}
-
-const int XShader::release()
-{ 
-	int ref = XBaseAsset::release();
-	if (ref == 0)
-	{
-		X_DELETE(this, g_rendererArena);
-	}
-
-	return ref;
-}
 
 
 // --------------------------- Shader Manager --------------------------- 
@@ -343,6 +353,8 @@ XShaderResources* XShaderManager::createShaderResources(const XInputShaderResour
 
 // -----------------------------------------------
 
+#if 0
+
 XShaderResources::XShaderResources()
 {
 	core::zero_object(pTextures);
@@ -383,6 +395,7 @@ void XShaderResources::freeAssets(void)
 	}
 }
 
+#endif
 
 // -----------------------------------------------
 

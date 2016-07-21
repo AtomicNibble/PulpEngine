@@ -29,11 +29,14 @@ X_NAMESPACE_BEGIN(render)
 namespace shader
 {
 
-class XShaderManager;
-class ShaderSourceFile;
 class SourceFile;
+class ShaderSourceFile;
+class XShaderTechniqueHW;
+class XHWShader;
+class XShaderManager;
 
 
+#if 0
 // #define SHADER_BIND_SAMPLER 0x4000
 
 
@@ -91,21 +94,15 @@ protected:
 };
 
 
-class XShader;
-class XHWShader;
-class XShaderTechniqueHW;
+#endif
 
 
-
-
-struct XShaderTechnique
+class XShaderTechnique
 {
-	static const size_t TECH_MAX_SUB = 6;
-	typedef core::FixedArray<XShaderTechniqueHW*, TECH_MAX_SUB> TechHWList;
+	typedef core::Array<XShaderTechniqueHW*> HWTechArr;
 
-	XShaderTechnique() :
-		pCurHwTech(nullptr)
-	{}
+public:
+	XShaderTechnique(core::MemoryArenaBase* arena);
 
 public:
 	core::string name;
@@ -116,9 +113,7 @@ public:
 	BlendInfo src;
 	BlendInfo dst;
 
-	XShaderTechniqueHW* pCurHwTech;
-	TechHWList hwTechs;
-
+	HWTechArr hwTechs;
 	Flags<TechFlag> techFlags;
 };
 
@@ -129,30 +124,17 @@ class XShader : public IShader, public core::XBaseAsset
 	friend class XShaderManager;
 
 public:
-	XShader();
+	XShader(core::MemoryArenaBase* arena);
 	~XShader();
 
-	virtual ShaderID getID() X_OVERRIDE{ return XBaseAsset::getID(); }
-	virtual const int addRef() X_OVERRIDE{ return XBaseAsset::addRef(); }
-	virtual const int release() X_OVERRIDE;
+	X_INLINE ShaderID getID(void) X_OVERRIDE;
+	X_INLINE const int32_t addRef(void) X_OVERRIDE;
+	const int32_t release(void) X_OVERRIDE;
+	
+	X_INLINE const char* getName(void) const X_OVERRIDE;
+	X_INLINE VertexFormat::Enum getVertexFmt(void) X_OVERRIDE;
 
-	virtual const char* getName() const X_OVERRIDE{ return name_.c_str(); }
-	virtual VertexFormat::Enum getVertexFmt() X_OVERRIDE{ return vertexFmt_; }
-
-	// D3D Effects interface
-	bool FXSetTechnique(const char* name, const TechFlags flag = TechFlags());
-	bool FXSetTechnique(const core::StrHash& name, const TechFlags flag = TechFlags());
-	bool FXBegin(uint32 *uiPassCount, uint32 nFlags);
-	bool FXBeginPass(uint32 uiPass);
-	bool FXCommit(const uint32 nFlags);
-	bool FXEndPass();
-	bool FXEnd();
-
-	bool FXSetVSFloat(const core::StrHash& NameParam, const Vec4f* pVecs, uint32_t numVecs);
-
-private:
-
-	X_INLINE size_t numTechs(void) const { return techs_.size(); }
+	X_INLINE size_t numTechs(void) const;
 
 private:
 	core::string name_;
@@ -170,6 +152,9 @@ private:
 } // namespace shader
 
 X_NAMESPACE_END
+
+
+#include "Shader.inl"
 
 
 #endif // !X_SHADER_H_

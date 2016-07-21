@@ -409,6 +409,7 @@
     <None Include="SamplerDesc.inl" />
     <None Include="Shader\HWShader.inl" />
     <None Include="Shader\ILTree.inl" />
+    <None Include="Shader\Shader.inl" />
     <None Include="Shader\ShaderSourceTypes.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
