@@ -113,6 +113,9 @@
     <ClInclude Include="DebugNameUtil.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Shader\ShaderVars.h">
+      <Filter>Header Files\Shader</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -187,6 +190,9 @@
     <ClCompile Include="Shader\ILTree.cpp">
       <Filter>Source Files\Shader</Filter>
     </ClCompile>
+    <ClCompile Include="Shader\ShaderVars.cpp">
+      <Filter>Source Files\Shader</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
@@ -244,6 +250,9 @@
       <Filter>Header Files\Shader</Filter>
     </None>
     <None Include="Shader\ILTree.inl">
+      <Filter>Header Files\Shader</Filter>
+    </None>
+    <None Include="Shader\ShaderVars.inl">
       <Filter>Header Files\Shader</Filter>
     </None>
   </ItemGroup>
