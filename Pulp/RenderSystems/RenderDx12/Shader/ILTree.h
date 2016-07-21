@@ -35,6 +35,8 @@ namespace shader
 		bool ___pad[8];
 	};
 
+	// it's so close to 128 might as well pad it.
+	// just cus i like power of 2, these are pretty much read only post creation.
 	X_ENSURE_SIZE(ILTreeNode, 128);
 
 } // namespace shader
