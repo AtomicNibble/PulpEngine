@@ -31,7 +31,12 @@ namespace shader
 	}
 
 
+	bool XHWShader::Compile(XHWShader* pShader)
+	{
+		X_ASSERT_NOT_NULL(pShader);
 
+		return true;
+	}
 
 
 
