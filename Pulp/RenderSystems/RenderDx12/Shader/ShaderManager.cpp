@@ -145,6 +145,8 @@ namespace shader
 
 		createInputLayoutTree();
 
+		vars_.RegisterVars();
+
 		return true;
 	}
 
@@ -197,6 +199,11 @@ namespace shader
 	ILTreeNode& XShaderManager::getILTree(void)
 	{
 		return ilRoot_;
+	}
+
+	ShaderVars& XShaderManager::getShaderVars(void)
+	{
+		return vars_;
 	}
 
 	XShader* XShaderManager::getLoadedShader(const char* pName)

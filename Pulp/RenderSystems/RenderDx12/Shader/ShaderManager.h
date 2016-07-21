@@ -9,6 +9,7 @@
 #include <Assets\AssertContainer.h>
 
 #include "ShaderBin.h"
+#include "ShaderVars.h"
 #include "ILTree.h"
 
 X_NAMESPACE_DECLARE(core,
@@ -46,6 +47,7 @@ namespace shader
 		bool sourceToString(const char* pName, core::string& strOut);
 
 		ILTreeNode& getILTree(void);
+		ShaderVars& getShaderVars(void);
 
 	private:
 		// returns a loaded shader, null if not fnd.
@@ -88,6 +90,7 @@ namespace shader
 		HWShaderMap hwShaders_;
 
 		ILTreeNode ilRoot_;	
+		ShaderVars vars_;
 	};
 
 
