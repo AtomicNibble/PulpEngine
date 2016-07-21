@@ -54,6 +54,16 @@ struct BlendType
 	static Enum typeFromStr(const char* _str);
 };
 
+struct BlendInfo
+{
+	BlendInfo() = default;
+
+public:
+	BlendType::Enum color;
+	BlendType::Enum alpha;
+};
+
+
 // we have shader params that will need to be updated at diffrent rates.
 // so we should group them.
 // 

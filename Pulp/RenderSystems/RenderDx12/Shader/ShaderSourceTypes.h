@@ -18,19 +18,6 @@ namespace shader
 	X_DECLARE_FLAGS(TechniquePrams) (NAME, VERTEX_FNC, PIXEL_FNC);
 
 
-	struct BlendInfo
-	{
-		BlendInfo() = default;
-
-		bool Parse(const char* name,
-			const core::StackString512& key, const core::StackString512& value);
-
-	public:
-		BlendType::Enum color;
-		BlendType::Enum alpha;
-	};
-
-
 	struct PrePro
 	{
 		PreProType::Enum type;
@@ -84,11 +71,16 @@ namespace shader
 		class Technique
 		{
 		public:
-			Technique() = default;
+			Technique();
 			~Technique() = default;
 
 			bool parse(core::XLexer& lex);
 			bool processName(void);
+
+		private:
+			bool parseBlend(BlendInfo& blend, const char* name,
+				const core::StackString512& key, const core::StackString512& value);
+
 
 		private:
 			core::string name_;
@@ -114,7 +106,7 @@ namespace shader
 
 		void addTech(const Technique& tech);
 
-	protected:
+	public:
 		core::string name_;
 		SourceFile* pFile_;
 		SourceFile* pHlslFile_;

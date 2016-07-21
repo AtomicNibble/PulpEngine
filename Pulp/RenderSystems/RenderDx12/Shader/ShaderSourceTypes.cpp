@@ -43,41 +43,6 @@ namespace shader
 
 
 
-
-	bool BlendInfo::Parse(const char* pName,
-		const core::StackString512& key, const core::StackString512& value)
-	{
-		X_ASSERT_NOT_NULL(pName);
-
-		core::StackString<64> color_str(pName);
-		core::StackString<64> alpha_str(pName);
-
-		color_str.append("_color");
-		alpha_str.append("_alpha");
-
-		if (color_str.isEqual(key.c_str()))
-		{
-			color = BlendType::typeFromStr(value.c_str());
-			if (color == BlendType::INVALID) {
-				X_ERROR("Shader", "invalid %s type: %s", color_str.c_str(), value.c_str());
-				return false; // invalid
-			}
-		}
-		else if (alpha_str.isEqual(key.c_str()))
-		{
-			alpha = BlendType::typeFromStr(value.c_str());
-			if (alpha == BlendType::INVALID) {
-				X_ERROR("Shader", "invalid %s type: %s", alpha_str.c_str(), value.c_str());
-				return false; // invalid
-			}
-		}
-		else {
-			return false;
-		}
-
-		return true;
-	}
-
 	// -------------------------------------------------------------
 
 	SourceFile::SourceFile(core::MemoryArenaBase* arena) :
@@ -207,8 +172,8 @@ namespace shader
 			}
 
 			// we could have blend functions.
-			else if (src_.ParseBlendInfo("src_blend", key, value) ||
-				dst_.ParseBlendInfo("dst_blend", key, value))
+			else if (parseBlend(src_, "src_blend", key, value) ||
+				parseBlend(dst_, "dst_blend", key, value))
 			{
 				// valid.
 			}
@@ -328,6 +293,41 @@ namespace shader
 		return processName();
 	}
 
+
+
+	bool ShaderSourceFile::Technique::parseBlend(BlendInfo& blend, const char* pName,
+		const core::StackString512& key, const core::StackString512& value)
+	{
+		X_ASSERT_NOT_NULL(pName);
+
+		core::StackString<64> color_str(pName);
+		core::StackString<64> alpha_str(pName);
+
+		color_str.append("_color");
+		alpha_str.append("_alpha");
+
+		if (color_str.isEqual(key.c_str()))
+		{
+			blend.color = BlendType::typeFromStr(value.c_str());
+			if (blend.color == BlendType::INVALID) {
+				X_ERROR("Shader", "invalid %s type: %s", color_str.c_str(), value.c_str());
+				return false; // invalid
+			}
+		}
+		else if (alpha_str.isEqual(key.c_str()))
+		{
+			blend.alpha = BlendType::typeFromStr(value.c_str());
+			if (blend.alpha == BlendType::INVALID) {
+				X_ERROR("Shader", "invalid %s type: %s", alpha_str.c_str(), value.c_str());
+				return false; // invalid
+			}
+		}
+		else {
+			return false;
+		}
+
+		return true;
+	}
 
 	bool ShaderSourceFile::Technique::processName(void)
 	{
