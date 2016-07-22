@@ -10,8 +10,9 @@
 #include "SamplerDesc.h"
 #include "DescriptorAllocator.h"
 #include "DynamicDescriptorHeap.h"
-
 #include "ColorBuffer.h"
+
+#include "Shader\ShaderManager.h"
 
 X_NAMESPACE_BEGIN(render)
 
@@ -44,6 +45,8 @@ private:
 	ID3D12Device* pDevice_;
 	ID3D12Debug* pDebug_;
 	IDXGISwapChain1* pSwapChain_;
+
+	shader::XShaderManager shaderMan_;
 
 	CommandListManger cmdListManager_;
 

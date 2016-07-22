@@ -10,6 +10,7 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	pDevice_(nullptr),
 	pDebug_(nullptr),
 	pSwapChain_(nullptr),
+	shaderMan_(arena),
 	cmdListManager_(arena),
 	dedicatedvideoMemory_(0),
 	pDescriptorAllocator_(nullptr),
@@ -205,12 +206,18 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 
 
+	if (!shaderMan_.Init()) {
+		X_ERROR("Render", "failed to init shader system");
+		return false;
+	}
 
 	return true;
 }
 
 void XRender::ShutDown(void)
 {
+	shaderMan_.Shutdown();
+
 	cmdListManager_.shutdown();
 
 	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i) {
