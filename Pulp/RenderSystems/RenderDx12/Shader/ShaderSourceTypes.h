@@ -52,7 +52,7 @@ namespace shader
 
 		X_INLINE void addRefrence(const core::string& name);
 
-	protected:
+	private:
 		core::string name_;
 		core::string fileName_;
 		core::string fileData_;
@@ -64,39 +64,49 @@ namespace shader
 	};
 
 
-	class ShaderSourceFile
+	class ShaderSourceFileTechnique
 	{
 	public:
+		ShaderSourceFileTechnique();
+		~ShaderSourceFileTechnique() = default;
 
-		class Technique
-		{
-		public:
-			Technique();
-			~Technique() = default;
+		bool parse(core::XLexer& lex);
 
-			bool parse(core::XLexer& lex);
-			bool processName(void);
+		X_INLINE const core::string& getName(void) const;
+		X_INLINE const core::string& getVertexFunc(void) const;
+		X_INLINE const core::string& getPixelFunc(void) const;
 
-		private:
-			bool parseBlend(BlendInfo& blend, const char* name,
-				const core::StackString512& key, const core::StackString512& value);
+		X_INLINE const BlendInfo& getSrcBlendInfo(void) const;
+		X_INLINE const BlendInfo& getDstBlendInfo(void) const;
 
+		X_INLINE const render::CullMode::Enum getCullMode(void) const;
+		X_INLINE const render::StateFlag getStateFlag(void) const;
+		X_INLINE const TechFlags getTechFlags(void) const;
 
-		private:
-			core::string name_;
-			core::string vertex_func_;
-			core::string pixel_func_;
+	private:
+		bool processName(void);
+		bool parseBlend(BlendInfo& blend, const char* name,
+			const core::StackString512& key, const core::StackString512& value);
 
-			BlendInfo src_;
-			BlendInfo dst_;
+	private:
+		core::string name_;
+		core::string vertex_func_;
+		core::string pixel_func_;
 
-			render::CullMode::Enum cullMode_;
-			bool depth_write_;
+		BlendInfo src_;
+		BlendInfo dst_;
 
-			render::StateFlag state_;
-			Flags<TechniquePrams> flags_;
-			Flags<TechFlag> techFlags_;
-		};
+		render::CullMode::Enum cullMode_;
+		bool depth_write_;
+
+		render::StateFlag state_;
+		Flags<TechniquePrams> flags_;
+		TechFlags techFlags_;
+	};
+
+	class ShaderSourceFile
+	{
+		typedef core::Array<ShaderSourceFileTechnique> TechArr;
 
 	public:
 		ShaderSourceFile(core::MemoryArenaBase* arena);
@@ -104,7 +114,7 @@ namespace shader
 
 		X_INLINE size_t numTechs(void) const;
 
-		void addTech(const Technique& tech);
+		void addTech(const ShaderSourceFileTechnique& tech);
 
 	public:
 		core::string name_;
@@ -112,7 +122,7 @@ namespace shader
 		SourceFile* pHlslFile_;
 		uint32_t sourceCrc32_;
 		uint32_t hlslSourceCrc32_;
-		core::Array<Technique> techniques_;
+		TechArr techniques_;
 	};
 
 } // namespace shader

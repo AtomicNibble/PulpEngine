@@ -69,12 +69,56 @@ namespace shader
 
 	// -------------------------------------------
 
+	X_INLINE const core::string& ShaderSourceFileTechnique::getName(void) const
+	{
+		return name_;
+	}
+
+	X_INLINE const core::string& ShaderSourceFileTechnique::getVertexFunc(void) const
+	{
+		return vertex_func_;
+	}
+
+	X_INLINE const core::string& ShaderSourceFileTechnique::getPixelFunc(void) const
+	{
+		return pixel_func_;
+	}
+
+	X_INLINE const BlendInfo& ShaderSourceFileTechnique::getSrcBlendInfo(void) const
+	{
+		return src_;
+	}
+
+	X_INLINE const BlendInfo& ShaderSourceFileTechnique::getDstBlendInfo(void) const
+	{
+		return dst_;
+	}
+
+	X_INLINE const render::CullMode::Enum ShaderSourceFileTechnique::getCullMode(void) const
+	{
+		return cullMode_;
+	}
+
+	X_INLINE const render::StateFlag ShaderSourceFileTechnique::getStateFlag(void) const
+	{
+		return state_;
+	}
+
+	X_INLINE const TechFlags ShaderSourceFileTechnique::getTechFlags(void) const
+	{
+		return techFlags_;
+	}
+
+
+	// -------------------------------------------
+
+
 	X_INLINE size_t ShaderSourceFile::numTechs(void) const
 	{
 		return techniques_.size();
 	}
 
-	X_INLINE void ShaderSourceFile::addTech(const Technique& tech)
+	X_INLINE void ShaderSourceFile::addTech(const ShaderSourceFileTechnique& tech)
 	{
 		techniques_.emplace_back(tech);
 	}

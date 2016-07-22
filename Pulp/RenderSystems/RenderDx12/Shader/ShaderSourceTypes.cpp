@@ -24,7 +24,7 @@ namespace shader
 		};
 
 
-		static bool TechFlagFromStr(const char* pStr, Flags<TechFlag>& flagOut)
+		static bool TechFlagFromStr(const char* pStr, TechFlags& flagOut)
 		{
 			const size_t num = sizeof(g_TechFlags) / sizeof(const char*);
 			size_t i;
@@ -66,12 +66,12 @@ namespace shader
 	// -------------------------------------------------------------
 
 
-	ShaderSourceFile::Technique::Technique()
+	ShaderSourceFileTechnique::ShaderSourceFileTechnique()
 	{
 		depth_write_ = true;
 	}
 
-	bool ShaderSourceFile::Technique::parse(core::XLexer& lex)
+	bool ShaderSourceFileTechnique::parse(core::XLexer& lex)
 	{
 		using namespace render;
 
@@ -295,7 +295,7 @@ namespace shader
 
 
 
-	bool ShaderSourceFile::Technique::parseBlend(BlendInfo& blend, const char* pName,
+	bool ShaderSourceFileTechnique::parseBlend(BlendInfo& blend, const char* pName,
 		const core::StackString512& key, const core::StackString512& value)
 	{
 		X_ASSERT_NOT_NULL(pName);
@@ -329,7 +329,7 @@ namespace shader
 		return true;
 	}
 
-	bool ShaderSourceFile::Technique::processName(void)
+	bool ShaderSourceFileTechnique::processName(void)
 	{
 		const char* pBrace, *pCloseBrace;
 		if ((pBrace = name_.find('(')) != nullptr)
