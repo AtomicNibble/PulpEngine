@@ -3,6 +3,7 @@
 #include "Shader.h"
 #include "HWShader.h"
 #include "ShaderManager.h"
+#include "ShaderSourceTypes.h"
 
 #include <IConsole.h>
 #include <Threading\JobSystem2.h>
@@ -145,21 +146,29 @@ namespace shader
 
 	// -------------------------------------------------------------------
 
-	XHWShader::XHWShader(core::MemoryArenaBase* arena, XShaderManager& shaderMan) :
+	XHWShader::XHWShader(core::MemoryArenaBase* arena, XShaderManager& shaderMan,
+			ShaderType::Enum type, const char* pName, const core::string& entry,
+			SourceFile* pSourceFile, TechFlags techFlags) :
 		shaderMan_(shaderMan),
-		sourceCrc32_(0),
+		name_(pName),
+		entryPoint_(entry),
 		status_(ShaderStatus::NotCompiled),
-		type_(ShaderType::UnKnown),
+		type_(type),
 		IlFmt_(InputLayoutFormat::POS_UV),
 		numRenderTargets_(0),
 		numSamplers_(0),
 		numConstBuffers_(0),
 		numInputParams_(0),
 		bindVars_(arena),
-		pBlob_(nullptr),
+		bytecode_(arena),
 		D3DCompileflags_(0)
 	{
+		X_ASSERT_NOT_NULL(pSourceFile);
 
+		sourceFileName_ = pSourceFile->getName();
+		sourceCrc32_ = pSourceFile->getSourceCrc32();
+
+		core::zero_object(maxVecs_);
 	}
 
 
@@ -185,6 +194,27 @@ namespace shader
 
 		return true;
 	}
+
+	bool XHWShader::invalidateIfChanged(uint32_t newSourceCrc32)
+	{
+		if (sourceCrc32_ != newSourceCrc32)
+		{
+			sourceCrc32_ = newSourceCrc32;
+
+			// what todo if the status is compiling?
+			// potentially we have a pending job that's about to run.
+			// which would still use the old source.
+			if (status_ == ShaderStatus::Compiling) {
+				X_ASSERT_NOT_IMPLEMENTED();
+			}
+
+			status_ = ShaderStatus::NotCompiled;
+			return true;
+		}
+
+		return false;
+	}
+
 
 	void XHWShader::getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest)
 	{
@@ -226,7 +256,7 @@ namespace shader
 		getShaderCompileDest(dest);
 
 		// we should check if a compiled version already exsists!
-		if (shaderBin.loadShader(dest.c_str(), sourceCrc32_, this))
+		if (shaderBin.loadShader(dest.c_str(), this))
 		{
 			X_LOG0("Shader", "shader loaded from cache: \"%s\"", name_.c_str());
 			return true;
@@ -241,7 +271,7 @@ namespace shader
 		getShaderCompileDest(dest);
 
 		// write the compiled version.
-		if (shaderBin.saveShader(dest.c_str(), sourceCrc32_, this))
+		if (shaderBin.saveShader(dest.c_str(), this))
 		{
 			X_LOG1("Shader", "saved shader to cache file: \"%s\"", dest.c_str());
 		}
@@ -344,6 +374,7 @@ namespace shader
 			}
 		}
 
+		ID3DBlob* pBlob = nullptr;
 		ID3DBlob* pErrorBlob = nullptr;
 
 		core::StopWatch timer;
@@ -360,11 +391,11 @@ namespace shader
 			getProfileFromType(type_),
 			D3DCompileflags_, // Flags
 			0, // Flags2
-			&pBlob_,
+			&pBlob,
 			&pErrorBlob
 		);
 
-		if (FAILED(hr) || pErrorBlob || !pBlob_)
+		if (FAILED(hr) || pErrorBlob || !pBlob)
 		{
 			if (pErrorBlob)
 			{
@@ -388,8 +419,18 @@ namespace shader
 
 			}
 
+			core::SafeReleaseDX(pErrorBlob);
+			core::SafeReleaseDX(pBlob);
 			return false;
 		}
+
+		// copy the byte code.
+		bytecode_.resize(pBlob->GetBufferSize());
+		std::memcpy(bytecode_.data(), pBlob->GetBufferPointer(), pBlob->GetBufferSize());
+
+		// release 
+		core::SafeReleaseDX(pErrorBlob);
+		core::SafeReleaseDX(pBlob);
 
 		const float elapsed = timer.GetMilliSeconds();
 		X_LOG0("Shader", "Compile complete: %.3fms", elapsed);
@@ -419,15 +460,11 @@ namespace shader
 		ID3D12ShaderReflection* pShaderReflection;
 		ID3D12ShaderReflectionConstantBuffer* pCB;
 		D3D12_SHADER_DESC shaderDesc;
-
-
-		const void* pBuf = pBlob_->GetBufferPointer();
-		size_t nSize = pBlob_->GetBufferSize();
 		uint32 i, n;
 
 		core::Array<XShaderParam> BindVars(g_rendererArena);
 
-		if (FAILED(D3DReflect(pBuf, nSize, IID_ID3D12ShaderReflection, (void **)&pShaderReflection)))
+		if (FAILED(D3DReflect(bytecode_.data(), bytecode_.size(), IID_ID3D12ShaderReflection, (void **)&pShaderReflection)))
 		{
 			X_ERROR("Shader", "failed to reflect shader: %s", name_.c_str());
 			return false;

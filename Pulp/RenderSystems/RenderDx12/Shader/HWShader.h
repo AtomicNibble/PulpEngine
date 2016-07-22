@@ -2,6 +2,7 @@
 
 
 #include "ILTree.h"
+#include <String\StringHash.h>
 
 X_NAMESPACE_DECLARE(core,
 	namespace V2 {
@@ -21,6 +22,8 @@ namespace shader
 	X_DECLARE_ENUM(ConstbufType)(PER_FRAME,	PER_BATCH, PER_INSTANCE);
 
 	class ShaderBin;
+	class XShaderManager;
+	class SourceFile;
 
 	// PF = PerFrame
 	// PI = Per Instance
@@ -101,18 +104,26 @@ namespace shader
 
 
 
-	class XHWShader
+	X_ALIGNED_SYMBOL(class XHWShader, 64)
 	{
+		typedef core::Array<XShaderParam> ParamArr;
+		typedef core::Array<uint8_t> ByteArr;
+
+		friend class ShaderBin;
+
 	public:
-		XHWShader(core::MemoryArenaBase* arena, XShaderManager& shaderMan);
+		XHWShader(core::MemoryArenaBase* arena, XShaderManager& shaderMan,
+			ShaderType::Enum type, const char* pName, const core::string& entry,
+			SourceFile* pSourceFile, TechFlags techFlags);
 
 		const int32_t release(void) {
 			return 0;
 		}
 
-		X_INLINE const char* getName(void) const;
-		X_INLINE const char* getSourceFileName(void) const;
-		X_INLINE const char* getEntryPoint(void) const;
+
+		X_INLINE const core::string& getName(void) const;
+		X_INLINE const core::string& getSourceFileName(void) const;
+		X_INLINE const core::string& getEntryPoint(void) const;
 		X_INLINE TechFlags getTechFlags(void) const;
 		X_INLINE ShaderType::Enum getType(void) const;
 		X_INLINE InputLayoutFormat::Enum getILFormat(void) const;
@@ -120,15 +131,20 @@ namespace shader
 		X_INLINE uint32_t getNumSamplers(void) const;
 		X_INLINE uint32_t getNumConstantBuffers(void) const;
 		X_INLINE uint32_t getNumInputParams(void) const;
+		X_INLINE uint32_t getSourceCrc32(void) const;
+		X_INLINE uint32_t getD3DCompileFlags(void) const;
 
 		X_INLINE ShaderStatus::Enum getStatus(void) const;
 		X_INLINE bool isValid(void) const;
 		X_INLINE bool FailedtoCompile(void) const;
 		X_INLINE bool isCompiling(void) const;
-		X_INLINE ID3DBlob* getshaderBlob(void) const;
+
+		X_INLINE const core::Array<XShaderParam> getBindVars(void) const;
+		X_INLINE const core::Array<uint8_t>& getShaderByteCode(void) const;
 
 	public:
 		bool compile(ShaderBin& shaderBin);
+		bool invalidateIfChanged(uint32_t newSourceCrc32);
 
 	private:
 		void getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest);
@@ -170,36 +186,12 @@ namespace shader
 		uint32_t numSamplers_;
 		uint32_t numConstBuffers_;
 		uint32_t numInputParams_;
-
-		core::Array<XShaderParam> bindVars_;
-		int32_t maxVecs_[3];
-
-		ID3DBlob* pBlob_;
 		// the flags it was compiled with: DEBUG | OPT_LEVEL1 etc.
 		uint32_t D3DCompileflags_;
-	};
+		int32_t maxVecs_[3];
 
-
-
-	class XShaderTechniqueHW
-	{
-	public:
-		XShaderTechniqueHW() {
-			core::zero_this(this);
-		}
-
-		void release(void);
-		bool canDraw(void) const;
-		void tryCompile(void);
-
-	public:
-		Flags<TechFlag> techFlags;
-		Flags<ILFlag> ILFlags;
-		InputLayoutFormat::Enum IlFmt;
-
-		XHWShader* pVertexShader;
-		XHWShader* pPixelShader;
-		XHWShader* pGeoShader;
+		ParamArr bindVars_;
+		ByteArr bytecode_;
 	};
 
 

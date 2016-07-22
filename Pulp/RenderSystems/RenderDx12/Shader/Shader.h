@@ -97,6 +97,27 @@ protected:
 #endif
 
 
+class XShaderTechniqueHW
+{
+public:
+	XShaderTechniqueHW() {
+		core::zero_this(this);
+	}
+
+	void release(void);
+	bool canDraw(void) const;
+	void tryCompile(void);
+
+public:
+	TechFlags techFlags;
+	Flags<ILFlag> ILFlags;
+	InputLayoutFormat::Enum IlFmt;
+
+	XHWShader* pVertexShader;
+	XHWShader* pPixelShader;
+	XHWShader* pGeoShader;
+};
+
 class XShaderTechnique
 {
 	typedef core::Array<XShaderTechniqueHW*> HWTechArr;

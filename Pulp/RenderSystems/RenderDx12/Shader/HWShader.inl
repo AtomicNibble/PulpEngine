@@ -4,14 +4,14 @@ X_NAMESPACE_BEGIN(render)
 
 namespace shader
 {
-	X_INLINE const char* XHWShader::getName(void) const {
-		return name_.c_str();
+	X_INLINE const core::string& XHWShader::getName(void) const {
+		return name_;
 	}
-	X_INLINE const char* XHWShader::getSourceFileName(void) const {
-		return sourceFileName_.c_str();
+	X_INLINE const core::string& XHWShader::getSourceFileName(void) const {
+		return sourceFileName_;
 	}
-	X_INLINE const char* XHWShader::getEntryPoint(void) const {
-		return entryPoint_.c_str();
+	X_INLINE const core::string& XHWShader::getEntryPoint(void) const {
+		return entryPoint_;
 	}
 
 	X_INLINE ShaderStatus::Enum XHWShader::getStatus(void) const {
@@ -39,6 +39,13 @@ namespace shader
 	X_INLINE uint32_t XHWShader::getNumInputParams(void) const {
 		return numInputParams_;
 	}
+	X_INLINE uint32_t XHWShader::getSourceCrc32(void) const {
+		return sourceCrc32_;
+	}
+	X_INLINE uint32_t XHWShader::getD3DCompileFlags(void) const {
+		return D3DCompileflags_;
+	}
+
 
 	X_INLINE bool XHWShader::isValid(void) const
 	{
@@ -55,31 +62,17 @@ namespace shader
 		return status_ == ShaderStatus::Compiling || status_ == ShaderStatus::AsyncCompileDone;
 	}
 
-	X_INLINE ID3DBlob* XHWShader::getshaderBlob(void) const
+	X_INLINE const core::Array<XShaderParam> XHWShader::getBindVars(void) const
 	{
-		return pBlob_;
+		return bindVars_;
+	}
+
+	X_INLINE const core::Array<uint8_t>& XHWShader::getShaderByteCode(void) const
+	{
+		return bytecode_;
 	}
 
 #if 0
-
-	bool XHWShader_Dx10::bind()
-	{
-		if (this->type_ == ShaderType::Vertex)
-			return bindVS();
-		if (this->type_ == ShaderType::Pixel)
-			return bindPS();
-		if (this->type_ == ShaderType::Geometry)
-			return bindGS();
-		X_ASSERT_UNREACHABLE();
-		return false;
-	}
-
-
-	ShaderStatus::Enum XHWShader_Dx10::getStatus(void) const
-	{
-		return status_;
-	}
-
 
 
 	void XHWShader_Dx10::setShader()
@@ -156,48 +149,11 @@ namespace shader
 		setParameterRegA(nReg, pParam->constBufferSlot, shaderType, pData, pParam->numParameters, maxVecs);
 	}
 
-
-	int XHWShader_Dx10::getMaxVecs(XShaderParam* pParam) const
-	{
-		return maxVecs_[pParam->constBufferSlot];
-	}
-
-	ID3DBlob* XHWShader_Dx10::getshaderBlob(void) const
-	{
-		X_ASSERT_NOT_NULL(pBlob_);
-		return pBlob_;
-	}
-
-
 	void XHWShader_Dx10::setMaxVecs(int maxVecs[3])
 	{
 		memcpy(maxVecs_, maxVecs, sizeof(maxVecs_));
 	}
 
-	const core::Array<XShaderParam>& XHWShader_Dx10::getBindVars(void) const
-	{
-		return bindVars_;
-	}
-
-	void XHWShader_Dx10::setBindVars(core::Array<XShaderParam>& vars)
-	{
-		bindVars_ = vars;
-	}
-
-	uint32_t XHWShader_Dx10::getD3DCompileFlags(void) const
-	{
-		return D3DCompileflags_;
-	}
-
-	void XHWShader_Dx10::setBlob(ID3DBlob* pBlob)
-	{
-		pBlob_ = pBlob;
-	}
-
-	void XHWShader_Dx10::setStatus(ShaderStatus::Enum status)
-	{
-		status_ = status;
-	}
 
 #endif 
 
