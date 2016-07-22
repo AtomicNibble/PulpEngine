@@ -2,6 +2,7 @@
 #include "ShaderManager.h"
 #include "ShaderSourceTypes.h"
 #include "Shader.h"
+#include "HWShader.h"
 #include "ILTree.h"
 
 #include <Hashing\crc32.h>
@@ -910,7 +911,65 @@ namespace shader
 	}
 
 
+	XHWShader* XShaderManager::hwForName(ShaderType::Enum type, const char* pShaderName, 
+		const core::string& entry, SourceFile* pSourceFile,
+		const Flags<TechFlag> techFlags, Flags<ILFlag> ILFlags)
+	{
+		X_ASSERT_NOT_NULL(pShaderName);
+		X_ASSERT_NOT_NULL(pSourceFile);
 
+		core::StackString512 name;
+
+		name.appendFmt("%s@%s", pShaderName, entry);
+
+		// macros are now part of the name.
+		name.appendFmt("_%x", techFlags.ToInt());
+
+		// input layout flags are also part of the name.
+		name.appendFmt("_%x", ILFlags.ToInt());
+
+
+#if X_DEBUG
+		X_LOG1("Shader", "HWS for name: \"%s\"", name.c_str());
+#endif // !X_DEBUG
+
+		XHWShader* pShader = nullptr;
+
+		auto it = hwShaders_.find(X_CONST_STRING(name.c_str()));
+		if (it != hwShaders_.end())
+		{
+			pShader = it->second;
+
+		//	pShader->addRef();
+
+			if (pShader->invalidateIfChanged(pSourceFile->getSourceCrc32()))
+			{
+				// shieeet, the shader needs updating.
+				// we have to relase the old one and set it up fresh.
+
+				// remove the cache file, to save a file load / crc check.
+			//	core::Path<char> path;
+			//	pShader->getShaderCompileDest(path);
+
+				// delete it!
+			//	gEnv->pFileSys->deleteFile(path.c_str());
+
+				// temp
+				//	pShader->activate();
+			}
+		}
+		else
+		{
+			pShader = X_NEW(XHWShader, arena_, "HWShader")(arena_, *this, type,
+				name.c_str(), entry, pSourceFile, techFlags);
+
+
+			hwShaders_.insert(std::make_pair(core::string(name.c_str()), pShader));
+		}
+
+
+		return pShader;
+	}
 
 	bool XShaderManager::freeSourcebin(void)
 	{

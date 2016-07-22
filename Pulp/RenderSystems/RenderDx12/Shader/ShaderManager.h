@@ -67,6 +67,10 @@ namespace shader
 		XShader* loadShader(const char* pName);
 		XShader* reloadShader(const char* pName);
 
+		XHWShader* hwForName(ShaderType::Enum type, const char* pShaderName, const core::string& entry,
+			SourceFile* pSourceFile, const TechFlags techFlags,
+			 Flags<ILFlag> ILFlags);
+
 	private:
 		bool freeSourcebin(void);
 		void listShaders(const char* pSarchPatten = nullptr);
