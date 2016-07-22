@@ -17,7 +17,7 @@ namespace shader
 {
 
 	X_DECLARE_FLAGS(ParamFlags)(FLOAT, INT, BOOL, MATRIX, VEC2, VEC3, VEC4);
-	X_DECLARE_FLAGS(ShaderStatus) (NotCompiled, Compiling, AsyncCompileDone, UploadedToHW, ReadyToRock, FailedToCompile);
+	X_DECLARE_FLAGS(ShaderStatus) (NotCompiled, Compiling, AsyncCompileDone, ReadyToRock, FailedToCompile);
 	X_DECLARE_ENUM(ConstbufType)(PER_FRAME,	PER_BATCH, PER_INSTANCE);
 
 	class ShaderBin;
