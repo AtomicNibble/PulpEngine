@@ -16,7 +16,6 @@
 #include <Util\Flags.h>
 
 #include <../Common/Resources/BaseRenderAsset.h>
-#include "ShaderBin.h"
 
 #include <unordered_set>
 
@@ -31,6 +30,7 @@ namespace shader
 
 class SourceFile;
 class ShaderSourceFile;
+class ShaderSourceFileTechnique;
 class XShaderTechniqueHW;
 class XHWShader;
 class XShaderManager;
@@ -120,10 +120,13 @@ public:
 
 class XShaderTechnique
 {
-	typedef core::Array<XShaderTechniqueHW*> HWTechArr;
+	typedef core::Array<XShaderTechniqueHW> HWTechArr;
 
 public:
 	XShaderTechnique(core::MemoryArenaBase* arena);
+
+	void assignSourceTech(const ShaderSourceFileTechnique& srcTech);
+	void append(const XShaderTechniqueHW& hwTech);
 
 public:
 	core::string name;
@@ -161,11 +164,8 @@ private:
 	core::string name_;
 	uint32_t sourceCrc32_;
 	uint32_t hlslSourceCrc32_;
-
-	SourceFile* pHlslFile_;
-
 	VertexFormat::Enum vertexFmt_;
-
+	SourceFile* pHlslFile_;
 	core::Array<XShaderTechnique> techs_;
 };
 

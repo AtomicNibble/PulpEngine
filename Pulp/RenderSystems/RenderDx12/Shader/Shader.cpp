@@ -11,9 +11,9 @@
 
 #include <Hashing\crc32.h>
 
-
-
 #include "XRender.h"
+
+#include "ShaderSourceTypes.h"
 
 X_NAMESPACE_BEGIN(render)
 
@@ -132,7 +132,26 @@ XShaderTechnique::XShaderTechnique(core::MemoryArenaBase* arena) :
 }
 
 
+void XShaderTechnique::assignSourceTech(const ShaderSourceFileTechnique& srcTech)
+{
+	name = srcTech.getName();
+	nameHash = core::StrHash(srcTech.getName());
+	// Blend info
+	src = srcTech.getSrcBlendInfo();
+	dst = srcTech.getDstBlendInfo();
+	// State
+	state = srcTech.getStateFlag();
+	// Cullmode
+	cullMode = srcTech.getCullMode();
 
+	// compileflags
+	techFlags = srcTech.getTechFlags();
+}
+
+void XShaderTechnique::append(const XShaderTechniqueHW& hwTech)
+{
+	hwTechs.emplace_back(hwTech);
+}
 
 // ----------------------------------------------------
 
@@ -176,31 +195,7 @@ const int32_t XShader::release(void)
 
 #if 0
 
-XShaderTechnique& XShaderTechnique::operator=(const ShaderSourceFile::Technique& srcTech)
-{
-	name = srcTech.name_;
-	nameHash = core::StrHash(srcTech.name_);
-	// Blend info
-	src = srcTech.src_;
-	dst = srcTech.dst_;
-	// State
-	state = srcTech.state_;
-	// Cullmode
-	cullMode = srcTech.cullMode_;
 
-	// blend info
-	src = srcTech.src_;
-	dst = srcTech.dst_;
-
-	// hw tech
-//	pCurHwTech = srcTech.pCurHwTech;
-//	hwTechs = srcTech.hwTechs;
-
-	// compileflags
-	techFlags = srcTech.techFlags_;
-
-	return *this;
-}
 
 #endif
 
