@@ -332,7 +332,7 @@ namespace shader
 							}
 
 							// read a technique
-							ShaderSourceFile::Technique tech;
+							ShaderSourceFileTechnique tech;
 
 							if (!tech.parse(lex))
 							{
@@ -668,8 +668,8 @@ namespace shader
 			for (j = 0; j < numTecs; j++)
 			{
 				XShaderTechnique& tech = pShader->techs_[j];
-				ShaderSourceFile::Technique& srcTech = pSource->techniques_[j];
-			//	tech = srcTech;
+				ShaderSourceFileTechnique& srcTech = pSource->techniques_[j];
+				tech.assignSourceTech(srcTech);
 
 				// for every input layout we compile all the techFlags 
 				// plus one without flags passed.
@@ -682,19 +682,16 @@ namespace shader
 
 					for (x = 0; x < numTechFlags + 1; x++)
 					{
-#if 0
 						XShaderTechniqueHW hwTech;
 
 						// create the hardware shaders.
-						hwTech.pVertexShader = XHWShader::forName(name,
-							srcTech.vertex_func_,
-							pSource->pHlslFile_->fileName.c_str(), techFlags,
-							ShaderType::Vertex, ILFlags, source->pHlslFile_->getSourceCrc32());
+						hwTech.pVertexShader = hwForName(ShaderType::Vertex, pName,
+							srcTech.getVertexFunc(),
+							pSource->pHlslFile_, techFlags, ILFlags);
 
-						hwTech.pPixelShader = XHWShader::forName(name,
-							srcTech.pixel_func_,
-							pSource->pHlslFile_->fileName.c_str(), techFlags,
-							ShaderType::Pixel, ILFlags, source->pHlslFile_->getSourceCrc32());
+						hwTech.pPixelShader = hwForName(ShaderType::Pixel, pName,
+							srcTech.getPixelFunc(),
+							pSource->pHlslFile_, techFlags,  ILFlags);
 
 						hwTech.techFlags = techFlags;
 						hwTech.ILFlags = ILFlags;
@@ -703,14 +700,12 @@ namespace shader
 
 						// add tech flag
 						AppendFlagTillEqual(tech.techFlags, techFlags);
-#endif
 					}
 
 					// add in the next flag.
 					AppendFlagTillEqual(ILFlagSrc, ILFlags);
 				}
 
-			//	tech.resetCurHWTech();
 			}
 
 			X_DELETE(pSource, g_rendererArena);
@@ -753,13 +748,14 @@ namespace shader
 					for (i = 0; i < numTecs; i++)
 					{
 						XShaderTechnique& tech = pShader->techs_[i];
-						ShaderSourceFile::Technique& srcTech = pShaderSource->techniques_[i];
+						ShaderSourceFileTechnique& srcTech = pShaderSource->techniques_[i];
 
 						tech.hwTechs.clear();
-				//		tech = srcTech;
+						tech.assignSourceTech(srcTech);
+
 						// tech flags may have changed.
 						// IL flags won't have tho.
-						Flags<TechFlag> techFlags;
+						TechFlags techFlags;
 						Flags<ILFlag> ILFlags;
 						Flags<ILFlag> ILFlagSrc = pShaderSource->pHlslFile_->getILFlags();
 
