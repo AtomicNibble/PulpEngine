@@ -30,7 +30,7 @@ struct IRenderMesh
 	virtual int getNumIndexes(void) const X_ABSTRACT;
 	virtual int getNumSubMesh(void) const X_ABSTRACT;
 
-	virtual shader::VertexFormat::Enum getVertexFmt(void) const X_ABSTRACT;
+	virtual render::shader::VertexFormat::Enum getVertexFmt(void) const X_ABSTRACT;
 
 	// Mem Info
 	virtual int MemoryUsageTotal(void) const X_ABSTRACT;
