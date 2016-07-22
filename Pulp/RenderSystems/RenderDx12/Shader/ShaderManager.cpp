@@ -770,19 +770,14 @@ namespace shader
 
 							for (j = 0; j < numTechFlags + 1; j++)
 							{
-#if 0
 								XShaderTechniqueHW hwTech;
 
 								// create the hardware shaders.
-								hwTech.pVertexShader = XHWShader::forName(name,
-									srcTech.vertex_func_,
-									pShaderSource->pHlslFile_->fileName.c_str(), techFlags,
-									ShaderType::Vertex, ILFlags, pShaderSource->pHlslFile_->getSourceCrc32());
+								hwTech.pVertexShader = hwForName(ShaderType::Vertex, name, srcTech.getVertexFunc(),
+									pShaderSource->pHlslFile_, techFlags, ILFlags);
 
-								hwTech.pPixelShader = XHWShader::forName(name,
-									srcTech.pixel_func_,
-									pShaderSource->pHlslFile_->fileName.c_str(), techFlags,
-									ShaderType::Pixel, ILFlags, pShaderSource->pHlslFile_->getSourceCrc32());
+								hwTech.pPixelShader = hwForName(ShaderType::Pixel, name, srcTech.getPixelFunc(), 
+									pShaderSource->pHlslFile_, techFlags, ILFlags);
 
 								hwTech.techFlags = techFlags;
 								hwTech.ILFlags = ILFlags;
@@ -791,14 +786,11 @@ namespace shader
 
 								// add tech flag
 								AppendFlagTillEqual(tech.techFlags, techFlags);
-#endif
 							}
 
 							// add in the next flag.
 							AppendFlagTillEqual(ILFlagSrc, ILFlags);
 						}
-
-					//	tech.resetCurHWTech();
 					}
 				}
 				else if (pShader->hlslSourceCrc32_ != pShaderSource->hlslSourceCrc32_)
@@ -818,24 +810,20 @@ namespace shader
 
 							for (x = 0; x < tech.hwTechs.size(); x++)
 							{
-#if 0
 								XShaderTechniqueHW& hwTech = tech.hwTechs[x];
 
-								const char* vertEntry = hwTech.pVertexShader->getEntryPoint();
-								const char* pixelEntry = hwTech.pPixelShader->getEntryPoint();
+								const auto& vertEntry = hwTech.pVertexShader->getEntryPoint();
+								const auto& pixelEntry = hwTech.pPixelShader->getEntryPoint();
 
-								TechFlags techFlags = hwTech.techFlags;
-								ILFlags ILFlags = hwTech.ILFlags;
+								const TechFlags techFlags = hwTech.techFlags;
+								const ILFlags ILFlags = hwTech.ILFlags;
 
+								hwTech.pVertexShader = hwForName(ShaderType::Vertex, name, vertEntry,
+									pShaderSource->pHlslFile_, techFlags, ILFlags);
 
-								hwTech.pVertexShader = XHWShader::forName(name, vertEntry,
-									pShaderSource->pHlslFile_->fileName.c_str(), techFlags,
-									ShaderType::Vertex, ILFlags, pShaderSource->pHlslFile_->getSourceCrc32());
+								hwTech.pPixelShader = hwForName(ShaderType::Pixel, name, pixelEntry,
+									pShaderSource->pHlslFile_, techFlags, ILFlags);
 
-								hwTech.pPixelShader = XHWShader::forName(name, pixelEntry,
-									pShaderSource->pHlslFile_->fileName.c_str(), techFlags,
-									ShaderType::Pixel, ILFlags, pShaderSource->pHlslFile_->getSourceCrc32());
-#endif
 							}
 						}
 					}
@@ -864,23 +852,19 @@ namespace shader
 								XShaderTechnique& tech = pShader->techs_[i];
 								for (x = 0; x < tech.hwTechs.size(); x++)
 								{
-#if 0
 									XShaderTechniqueHW& hwTech = tech.hwTechs[x];
 
-									const char* vertEntry = hwTech.pVertexShader->getEntryPoint();
-									const char* pixelEntry = hwTech.pPixelShader->getEntryPoint();
+									const auto& vertEntry = hwTech.pVertexShader->getEntryPoint();
+									const auto& pixelEntry = hwTech.pPixelShader->getEntryPoint();
 
-									TechFlags techFlags = hwTech.techFlags;
-									ILFlags ILFlags = hwTech.ILFlags;
+									const TechFlags techFlags = hwTech.techFlags;
+									const ILFlags ILFlags = hwTech.ILFlags;
 
-									hwTech.pVertexShader = XHWShader::forName(name, vertEntry,
-										pShaderSource->pHlslFile_->fileName.c_str(), techFlags,
-										ShaderType::Vertex, ILFlags, pShaderSource->pHlslFile_->getSourceCrc32());
+									hwTech.pVertexShader = hwForName(ShaderType::Vertex, name, vertEntry,
+										pShaderSource->pHlslFile_, techFlags, ILFlags);
 
-									hwTech.pPixelShader = XHWShader::forName(name, pixelEntry,
-										pShaderSource->pHlslFile_->fileName.c_str(), techFlags,
-										ShaderType::Pixel, ILFlags, pShaderSource->pHlslFile_->getSourceCrc32());
-#endif
+									hwTech.pPixelShader = hwForName(ShaderType::Pixel, name, pixelEntry,
+										pShaderSource->pHlslFile_, techFlags, ILFlags);
 								}
 
 							}
@@ -940,18 +924,8 @@ namespace shader
 
 			if (pShader->invalidateIfChanged(pSourceFile->getSourceCrc32()))
 			{
-				// shieeet, the shader needs updating.
-				// we have to relase the old one and set it up fresh.
-
-				// remove the cache file, to save a file load / crc check.
-			//	core::Path<char> path;
-			//	pShader->getShaderCompileDest(path);
-
-				// delete it!
-			//	gEnv->pFileSys->deleteFile(path.c_str());
-
-				// temp
-				//	pShader->activate();
+				// we don't need to do anything currently.
+				
 			}
 		}
 		else
