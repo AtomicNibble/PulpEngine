@@ -2,9 +2,9 @@
 #include "ShaderBin.h"
 
 #include <IFileSys.h>
-
 #include <Hashing\crc32.h>
 
+#include "HWShader.h"
 
 
 X_NAMESPACE_BEGIN(render)
@@ -12,8 +12,44 @@ X_NAMESPACE_BEGIN(render)
 namespace shader
 {
 
+	namespace
+	{
 
-	ShaderBin::ShaderBin()
+		struct ShaderBinHeader
+		{
+			static const uint32_t X_SHADER_BIN_FOURCC = X_TAG('X', 'S', 'C', 'B');
+			static const uint32_t X_SHADER_BIN_VERSION = 3; // change this to force all shaders to be recompiled.
+
+
+			uint32_t forcc;
+			uint8_t version;
+			uint8_t unused[3];
+			uint32_t crc32;
+			uint32_t sourceCRC32;
+			uint32_t blobLength;
+			uint32_t compileFlags;
+			core::dateTimeStampSmall modifed;
+
+			// i now save reflection info.
+			uint32_t numBindVars;
+			uint32_t numSamplers;
+			uint32_t numConstBuffers;
+			uint32_t numInputParams;
+			uint32_t numRenderTargets;
+
+			TechFlags techFlags;
+			ShaderType::Enum type;
+			InputLayoutFormat::Enum ILFmt;
+
+			X_INLINE const bool isValid(void) const {
+				return forcc == X_SHADER_BIN_FOURCC;
+			}
+		};
+
+	} // namespace
+
+ShaderBin::ShaderBin(core::MemoryArenaBase* arena) :
+	cache_(arena, 32)
 {
 
 }
@@ -25,16 +61,10 @@ ShaderBin::~ShaderBin()
 
 
 
-bool ShaderBin::saveShader(const char* pPath, uint32_t sourceCRC,
-	const XHWShader* pShader)
+bool ShaderBin::saveShader(const char* pPath, const XHWShader* pShader)
 {
 	X_ASSERT_NOT_NULL(pPath);
 	X_ASSERT_NOT_NULL(pShader);
-
-#if 1
-	X_ASSERT_NOT_IMPLEMENTED();
-	return false;
-#else
 
 	if (!pShader->isValid())
 	{
@@ -42,24 +72,18 @@ bool ShaderBin::saveShader(const char* pPath, uint32_t sourceCRC,
 		return false;
 	}
 
-	ID3DBlob* pBlob = pShader->getshaderBlob();
-	const char* pData;
-	uint32_t blobLen;
-
-	pData = reinterpret_cast<char*>(pBlob->GetBufferPointer());
-	blobLen = safe_static_cast<uint32_t, size_t>(pBlob->GetBufferSize());
-	
-	const core::Array<XShaderParam>& bindVars = pShader->getBindVars();
+	const auto& byteCode = pShader->getShaderByteCode();
+	const auto& bindVars = pShader->getBindVars();
 
 	ShaderBinHeader hdr;
 	core::zero_object(hdr);
-	hdr.forcc = X_SHADER_BIN_FOURCC;
-	hdr.version = X_SHADER_BIN_VERSION;
+	hdr.forcc = ShaderBinHeader::X_SHADER_BIN_FOURCC;
+	hdr.version = ShaderBinHeader::X_SHADER_BIN_VERSION;
 	hdr.modifed = core::dateTimeStampSmall::systemDateTime();
-	hdr.crc32 = gEnv->pCore->GetCrc32()->GetCRC32(pData, blobLen);
-	hdr.sourceCRC32 = sourceCRC;
+	hdr.crc32 = gEnv->pCore->GetCrc32()->GetCRC32(byteCode.data(), byteCode.size());
+	hdr.sourceCRC32 = pShader->getSourceCrc32();
 	hdr.compileFlags = pShader->getD3DCompileFlags();
-	hdr.blobLength = blobLen;
+	hdr.blobLength = safe_static_cast<uint32_t, size_t>(byteCode.size());
 
 	// shader reflection info.
 	hdr.numBindVars = safe_static_cast<uint32_t, size_t>(bindVars.size());
@@ -73,7 +97,7 @@ bool ShaderBin::saveShader(const char* pPath, uint32_t sourceCRC,
 	hdr.ILFmt = pShader->getILFormat();
 
 	core::XFileScoped file;
-	if (file.openFile(path, core::fileMode::WRITE | core::fileMode::RECREATE))
+	if (file.openFile(pPath, core::fileMode::WRITE | core::fileMode::RECREATE))
 	{
 		file.write(hdr);
 
@@ -88,7 +112,9 @@ bool ShaderBin::saveShader(const char* pPath, uint32_t sourceCRC,
 			file.write(bind.numParameters);
 		}
 
-		file.write(pData, blobLen);
+		if (file.write(byteCode.data(), byteCode.size()) != byteCode.size()) {
+			return false;
+		}
 	}
 	else
 	{
@@ -97,42 +123,39 @@ bool ShaderBin::saveShader(const char* pPath, uint32_t sourceCRC,
 		return false;
 	}
 
+	updateCacheCrc(pPath, pShader->getSourceCrc32());
 	return true;
-#endif
 }
 
 
-bool ShaderBin::loadShader(const char* pPath, uint32_t sourceCRC, XHWShader* pShader)
+bool ShaderBin::loadShader(const char* pPath, XHWShader* pShader)
 {
 	X_ASSERT_NOT_NULL(pPath);
 	X_ASSERT_NOT_NULL(pShader);
+
+	if (cacheNotValid(pPath, pShader->getSourceCrc32())) {
+		return false;
+	}
 
 	if (!gEnv->pFileSys->fileExists(pPath)) {
 		X_LOG1("Shader", "no cache exsits for: \"%s\"", pPath);
 		return false;
 	}
 
-
-#if 1
-	X_ASSERT_NOT_IMPLEMENTED();
-	return false;
-#else
-
-	ID3DBlob* pBlob = nullptr;
 	ShaderBinHeader hdr;
 	core::zero_object(hdr);
 
 	core::XFileScoped file;
-	if (file.openFile(path, core::fileMode::READ))
+	if (file.openFile(pPath, core::fileMode::READ))
 	{
 		file.readObj(hdr);
 
 		if (hdr.isValid())
 		{
-			if (hdr.version != X_SHADER_BIN_VERSION)
+			if (hdr.version != ShaderBinHeader::X_SHADER_BIN_VERSION)
 			{
 				X_WARNING("Shader", "bin shader \"%s\" version is invalid. provided: %i, required: %i",
-					path, hdr.version, X_SHADER_BIN_VERSION);
+					pPath, hdr.version, ShaderBinHeader::X_SHADER_BIN_VERSION);
 				return false;
 			}
 
@@ -142,16 +165,18 @@ bool ShaderBin::loadShader(const char* pPath, uint32_t sourceCRC, XHWShader* pSh
 				return false;
 			}
 
-			if (hdr.sourceCRC32 != sourceCRC)
+			if (hdr.sourceCRC32 != pShader->getSourceCrc32())
 			{
 				X_WARNING("Shader", "bin shader is stale, recompile needed.");
 				return false;
 			}
 
+			// clear status, as we edit members.
+			pShader->status_ = ShaderStatus::NotCompiled;
 
-			core::Array<XShaderParam> bindvars(g_rendererArena);
+
+			auto& bindvars = pShader->bindVars_; 
 			bindvars.reserve(hdr.numBindVars);
-			int maxVecs[3] = { 0 };
 
 			// load bind vars.
 			uint32_t i;
@@ -170,10 +195,10 @@ bool ShaderBin::loadShader(const char* pPath, uint32_t sourceCRC, XHWShader* pSh
 				bindvars.append(bind);
 			}
 
+			int32_t maxVecs[3] = {};
 			for (i = 0; i < bindvars.size(); i++)
 			{
 				XShaderParam* pB = &bindvars[i];
-			//	const char *param = pB->name.c_str();
 
 				// set max slots
 				if (pB->constBufferSlot < 3)
@@ -183,48 +208,55 @@ bool ShaderBin::loadShader(const char* pPath, uint32_t sourceCRC, XHWShader* pSh
 				}
 			}
 
-			// load the shader blob.
-			if (SUCCEEDED(D3DCreateBlob(hdr.blobLength, &pBlob)))
-			{
-				if (file.read(pBlob->GetBufferPointer(),
-					(uint32_t)pBlob->GetBufferSize()))
-				{
-					// set the values.
-					pShader->setBlob(pBlob);
-					pShader->setBindVars(bindvars);
-					pShader->setMaxVecs(maxVecs);
+			pShader->bytecode_.resize(hdr.blobLength);
 
-					pShader->numSamplers_ = hdr.numSamplers;
-					pShader->numConstBuffers_ = hdr.numConstBuffers;
-					pShader->numInputParams_ = hdr.numInputParams;
-					pShader->numRenderTargets_ = hdr.numRenderTargets;
-
-					pShader->techFlags_ = hdr.techFlags;
-					pShader->IlFmt_ = hdr.ILFmt;
-
-					// type should already be set.
-					// so we just use it as a sanity check.
-					if (pShader->getType() != hdr.type)
-					{
-						X_WARNING("Shader", "Shader type is diffrent to that of the cache file for: \"%s\"",
-							pShader->getName());
-					}
-
-					return true;
-				}
-				 
-				X_ERROR("ShaderBin", "failed to read shader from bin");
+			if (file.read(pShader->bytecode_.data(), hdr.blobLength) != hdr.blobLength) {
+				X_ERROR("Shader", "Failed to read shader byte code");
+				return false;
 			}
-			else
+
+			std::memcpy(pShader->maxVecs_, maxVecs, sizeof(maxVecs));
+			pShader->numSamplers_ = hdr.numSamplers;
+			pShader->numConstBuffers_ = hdr.numConstBuffers;
+			pShader->numInputParams_ = hdr.numInputParams;
+			pShader->numRenderTargets_ = hdr.numRenderTargets;
+
+			pShader->techFlags_ = hdr.techFlags;
+			pShader->IlFmt_ = hdr.ILFmt;
+
+			// type should already be set.
+			// so we just use it as a sanity check.
+			if (pShader->getType() != hdr.type)
 			{
-				X_ERROR("ShaderBin", "failed to create blob");
+				X_WARNING("Shader", "Shader type is diffrent to that of the cache file for: \"%s\"",
+					pShader->getName());
 			}
+
+			// ready to use.
+			pShader->status_ = ShaderStatus::ReadyToRock;
+			return true;
 		}
 	}
 	return false;
-#endif
 }
 
+
+bool ShaderBin::cacheNotValid(const char* pPath, uint32_t sourceCrc32) const
+{
+	auto it = cache_.find(X_CONST_STRING(pPath));
+	if (it != cache_.end()) {
+		if (it->second != sourceCrc32) {
+			// we have a cache file, but it was compiled with source that had diffrent crc.
+			return true;
+		}
+	}
+	return false;
+}
+
+void ShaderBin::updateCacheCrc(const char* pPath, uint32_t sourceCrc32)
+{
+	cache_.insert(std::make_pair(core::string(pPath), sourceCrc32));
+}
 
 } // namespace shader
 
