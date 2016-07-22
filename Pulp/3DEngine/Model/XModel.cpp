@@ -126,7 +126,7 @@ void XModel::Render(void)
 {
 	if (pLodRenderMeshes_[0] == nullptr) {
 		pLodRenderMeshes_[0] = getRender()->createRenderMesh(&getLodMeshHdr(0),
-			shader::VertexFormat::P3F_T2S_C4B, getName());
+			render::shader::VertexFormat::P3F_T2S_C4B, getName());
 
 		pLodRenderMeshes_[0]->uploadToGpu();
 	}

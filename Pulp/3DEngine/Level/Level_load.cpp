@@ -310,7 +310,7 @@ bool Level::ProcessData(void)
 			area.areaNum = i;
 			area.pMesh = pMesh;
 			area.pRenderMesh = gEnv->pRender->createRenderMesh(pMesh,
-				shader::VertexFormat::P3F_T4F_C4B_N3F, meshName.c_str());
+				render::shader::VertexFormat::P3F_T4F_C4B_N3F, meshName.c_str());
 
 			// upload to gpu now.
 			area.pRenderMesh->uploadToGpu();
