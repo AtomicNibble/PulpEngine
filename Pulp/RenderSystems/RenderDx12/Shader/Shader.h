@@ -109,12 +109,12 @@ public:
 	core::StrHash nameHash;
 	render::StateFlag state;
 	render::CullMode::Enum cullMode;
+	TechFlags techFlags;
 
 	BlendInfo src;
 	BlendInfo dst;
 
 	HWTechArr hwTechs;
-	Flags<TechFlag> techFlags;
 };
 
 
