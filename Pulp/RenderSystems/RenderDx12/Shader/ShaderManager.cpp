@@ -101,6 +101,7 @@ namespace shader
 		arena_(arena),
 		pCrc32_(nullptr),
 		sourcebin_(arena, 128),
+		shaderBin_(arena),
 		shaders_(arena, 256),
 		hwShaders_(arena, 256),
 		ilRoot_(arena),
