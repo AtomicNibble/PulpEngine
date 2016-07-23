@@ -108,6 +108,11 @@ X_NAMESPACE_BEGIN(texture)
 		return nullptr;
 	}
 
+	Texture* TextureManager::getDefault(void)
+	{
+		return pTexDefault_;
+	}
+
 	Texture* TextureManager::findTexture(const char* pName)
 	{
 		auto it = textures_.find(X_CONST_STRING(pName));

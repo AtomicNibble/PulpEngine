@@ -30,6 +30,7 @@ public:
 
 	Texture* forName(const char* pName, TextureFlags flags);
 	Texture* getByID(TexID texId);
+	Texture* getDefault(void);
 
 private:
 	Texture* findTexture(const char* pName);
