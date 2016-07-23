@@ -49,7 +49,7 @@ public:
 
 private:
 	void* pCpuVirtualAddress_;
-	D3D12_GPU_VIRTUAL_ADDRESS gpuVirtualAddress_;
+	D3D12_GPU_VIRTUAL_ADDRESS gpuVirtualAddress_; // this overloads the member in GpuResource do i want that?
 };
 
 
