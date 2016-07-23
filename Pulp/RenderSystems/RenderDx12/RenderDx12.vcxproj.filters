@@ -128,6 +128,9 @@
     <ClInclude Include="Texture\Texture.h">
       <Filter>Header Files\Texture</Filter>
     </ClInclude>
+    <ClInclude Include="Texture\TextureVars.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -211,6 +214,9 @@
     <ClCompile Include="Texture\Texture.cpp">
       <Filter>Source Files\Texture</Filter>
     </ClCompile>
+    <ClCompile Include="Texture\TextureVars.cpp">
+      <Filter>Source Files\Texture</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
@@ -274,6 +280,9 @@
       <Filter>Header Files\Shader</Filter>
     </None>
     <None Include="Texture\Texture.inl">
+      <Filter>Header Files\Texture</Filter>
+    </None>
+    <None Include="Texture\TextureVars.inl">
       <Filter>Header Files\Texture</Filter>
     </None>
   </ItemGroup>

@@ -352,6 +352,7 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="Texture\Texture.h" />
     <ClInclude Include="Texture\TextureManager.h" />
+    <ClInclude Include="Texture\TextureVars.h" />
     <ClInclude Include="Util\Constants.h" />
     <ClInclude Include="Util\DebugNameUtil.h" />
     <ClInclude Include="Util\DxTypeHelpers.h" />
@@ -395,6 +396,7 @@
     </ClCompile>
     <ClCompile Include="Texture\Texture.cpp" />
     <ClCompile Include="Texture\TextureManager.cpp" />
+    <ClCompile Include="Texture\TextureVars.cpp" />
     <ClCompile Include="XRender.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -419,6 +421,7 @@
     <None Include="Shader\ShaderSourceTypes.inl" />
     <None Include="Shader\ShaderVars.inl" />
     <None Include="Texture\Texture.inl" />
+    <None Include="Texture\TextureVars.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
