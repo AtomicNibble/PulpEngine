@@ -102,6 +102,12 @@ X_INLINE RootSignature::RootSignature(core::MemoryArenaBase* arena, size_t numRo
 	samplesInitCount_(0),
 	pSignature_(nullptr)
 {
+	// should be safe to leave these un-init.
+	descriptorTableBitMap_ = 0;
+	maxDescriptorCacheHandleCount_ = 0;
+	core::zero_object(descriptorTableSize_);
+	// ~
+
 	reset(numRootParams, numStaticSamplers);
 }
 
