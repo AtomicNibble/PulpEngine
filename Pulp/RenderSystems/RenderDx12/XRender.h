@@ -35,6 +35,8 @@ public:
 	void RenderEnd(void) X_OVERRIDE;
 
 private:
+	bool FreeSwapChainResources(void);
+
 	bool InitRenderBuffers(Vec2<uint32_t> res);
 	bool Resize(uint32_t width, uint32_t height);
 	void HandleResolutionChange(void);

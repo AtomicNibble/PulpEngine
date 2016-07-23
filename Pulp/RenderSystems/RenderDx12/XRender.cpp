@@ -220,9 +220,7 @@ void XRender::ShutDown(void)
 
 	cmdListManager_.shutdown();
 
-	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i) {
-		displayPlane_[i].destroy();
-	}
+	FreeSwapChainResources();
 
 	if (pDescriptorAllocator_) {
 		pDescriptorAllocator_->destoryAllHeaps();
@@ -273,6 +271,17 @@ void XRender::RenderEnd(void)
 }
 
 
+
+bool XRender::FreeSwapChainResources(void)
+{
+	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i) {
+		displayPlane_[i].destroy();
+	}
+
+	return true;
+}
+
+
 bool XRender::InitRenderBuffers(Vec2<uint32_t> res)
 {
 
@@ -284,14 +293,13 @@ bool XRender::InitRenderBuffers(Vec2<uint32_t> res)
 bool XRender::Resize(uint32_t width, uint32_t height)
 {
 	X_LOG1("Dx12", "Resizing display res to: x:%x y:%x", width, height);
+	X_ASSERT_NOT_NULL(pSwapChain_);
 	X_ASSERT_NOT_NULL(pDescriptorAllocator_);
 
 	displayRes_.x = width;
 	displayRes_.y = height;
 
-	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i) {
-		displayPlane_[i].destroy();
-	}
+	FreeSwapChainResources();
 
 	pSwapChain_->ResizeBuffers(SWAP_CHAIN_BUFFER_COUNT, displayRes_.x, displayRes_.y, SWAP_CHAIN_FORMAT, 0);
 
