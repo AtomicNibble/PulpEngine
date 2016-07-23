@@ -350,6 +350,7 @@
     <ClInclude Include="Shader\ShaderSourceTypes.h" />
     <ClInclude Include="Shader\ShaderVars.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Texture\Texture.h" />
     <ClInclude Include="Texture\TextureManager.h" />
     <ClInclude Include="Util\Constants.h" />
     <ClInclude Include="Util\DebugNameUtil.h" />
@@ -392,6 +393,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Texture\Texture.cpp" />
     <ClCompile Include="Texture\TextureManager.cpp" />
     <ClCompile Include="XRender.cpp" />
   </ItemGroup>
@@ -416,6 +418,7 @@
     <None Include="Shader\Shader.inl" />
     <None Include="Shader\ShaderSourceTypes.inl" />
     <None Include="Shader\ShaderVars.inl" />
+    <None Include="Texture\Texture.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
