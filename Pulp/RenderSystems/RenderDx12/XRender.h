@@ -15,10 +15,8 @@
 #include "Shader\ShaderManager.h"
 
 
-X_NAMESPACE_DECLARE(render,
-	namespace texture {
-		class TextureManager;
-	}
+X_NAMESPACE_DECLARE(texture,
+	class TextureManager;
 )
 
 X_NAMESPACE_BEGIN(render)
