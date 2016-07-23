@@ -14,14 +14,14 @@ namespace
 	struct TextureType
 	{
 		const char* name;
-		shader::ShaderTextureIdx::Enum type;
+		render::shader::ShaderTextureIdx::Enum type;
 	};
 
 	TextureType g_textTypes[] = {
-		{ "albedo", shader::ShaderTextureIdx::DIFFUSE },
-		{ "diffuse", shader::ShaderTextureIdx::DIFFUSE },
-		{ "bump", shader::ShaderTextureIdx::BUMP },
-		{ "spec", shader::ShaderTextureIdx::SPEC },
+		{ "albedo", render::shader::ShaderTextureIdx::DIFFUSE },
+		{ "diffuse", render::shader::ShaderTextureIdx::DIFFUSE },
+		{ "bump", render::shader::ShaderTextureIdx::BUMP },
+		{ "spec", render::shader::ShaderTextureIdx::SPEC },
 	};
 
 	static const int g_textTypesNum = (sizeof(g_textTypes) / sizeof(g_textTypes[0]));
