@@ -252,7 +252,9 @@ namespace shader
 
 	XShader* XShaderManager::getLoadedShader(const char* pName)
 	{
-		return nullptr;
+		auto shader = shaders_.findAsset(pName);
+		
+		return static_cast<XShader*>(shader);
 	}
 
 
