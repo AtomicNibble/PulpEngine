@@ -83,12 +83,6 @@
     <ClInclude Include="DynamicDescriptorHeap.h">
       <Filter>Header Files\Allocators</Filter>
     </ClInclude>
-    <ClInclude Include="Constants.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="DxTypeHelpers.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="LinearAllocator.h">
       <Filter>Header Files\Allocators</Filter>
     </ClInclude>
@@ -110,11 +104,17 @@
     <ClInclude Include="Shader\ShaderSourceTypes.h">
       <Filter>Header Files\Shader</Filter>
     </ClInclude>
-    <ClInclude Include="DebugNameUtil.h">
-      <Filter>Header Files\Util</Filter>
-    </ClInclude>
     <ClInclude Include="Shader\ShaderVars.h">
       <Filter>Header Files\Shader</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Constants.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\DebugNameUtil.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\DxTypeHelpers.h">
+      <Filter>Header Files\Util</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

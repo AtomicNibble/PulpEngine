@@ -332,11 +332,8 @@
     <ClInclude Include="CommandContex.h" />
     <ClInclude Include="CommandList.h" />
     <ClInclude Include="CommandSignature.h" />
-    <ClInclude Include="Constants.h" />
-    <ClInclude Include="DebugNameUtil.h" />
     <ClInclude Include="DepthBuffer.h" />
     <ClInclude Include="DescriptorAllocator.h" />
-    <ClInclude Include="DxTypeHelpers.h" />
     <ClInclude Include="DynamicDescriptorHeap.h" />
     <ClInclude Include="GpuBuffer.h" />
     <ClInclude Include="GpuResource.h" />
@@ -353,6 +350,9 @@
     <ClInclude Include="Shader\ShaderSourceTypes.h" />
     <ClInclude Include="Shader\ShaderVars.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Util\Constants.h" />
+    <ClInclude Include="Util\DebugNameUtil.h" />
+    <ClInclude Include="Util\DxTypeHelpers.h" />
     <ClInclude Include="XRender.h" />
   </ItemGroup>
   <ItemGroup>
