@@ -14,6 +14,13 @@
 
 #include "Shader\ShaderManager.h"
 
+
+X_NAMESPACE_DECLARE(render,
+	namespace texture {
+		class TextureManager;
+	}
+)
+
 X_NAMESPACE_BEGIN(render)
 
 
@@ -48,7 +55,8 @@ private:
 	ID3D12Debug* pDebug_;
 	IDXGISwapChain1* pSwapChain_;
 
-	shader::XShaderManager shaderMan_;
+	shader::XShaderManager shaderMan_; // might make this allocoated, just so can forward declare like tex man.
+	texture::TextureManager* pTextureMan_;
 
 	CommandListManger cmdListManager_;
 

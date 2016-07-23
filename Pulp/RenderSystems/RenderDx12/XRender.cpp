@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "XRender.h"
 
+#include "Texture\TextureManager.h"
+
 
 X_NAMESPACE_BEGIN(render)
 
@@ -10,6 +12,7 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	pDevice_(nullptr),
 	pDebug_(nullptr),
 	pSwapChain_(nullptr),
+	pTextureMan_(nullptr),
 	shaderMan_(arena),
 	cmdListManager_(arena),
 	dedicatedvideoMemory_(0),
@@ -21,7 +24,9 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 
 XRender::~XRender()
 {
-
+	if (pTextureMan_) {
+		X_DELETE(pTextureMan_, arena_);
+	}
 }
 
 bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
@@ -204,9 +209,13 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 
 
-
-
 	if (!shaderMan_.Init()) {
+		X_ERROR("Render", "failed to init shader system");
+		return false;
+	}
+
+	pTextureMan_ = X_NEW(texture::TextureManager, arena_, "TexMan")(arena_);
+	if (!pTextureMan_->init()) {
 		X_ERROR("Render", "failed to init shader system");
 		return false;
 	}
@@ -216,6 +225,11 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 void XRender::ShutDown(void)
 {
+	if (pTextureMan_) {
+		pTextureMan_->shutDown();
+		X_DELETE_AND_NULL(pTextureMan_, arena_);
+	}
+
 	shaderMan_.Shutdown();
 
 	cmdListManager_.shutdown();
