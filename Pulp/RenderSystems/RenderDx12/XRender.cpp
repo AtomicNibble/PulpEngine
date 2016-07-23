@@ -216,7 +216,7 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 	pTextureMan_ = X_NEW(texture::TextureManager, arena_, "TexMan")(arena_);
 	if (!pTextureMan_->init()) {
-		X_ERROR("Render", "failed to init shader system");
+		X_ERROR("Render", "failed to init texture system");
 		return false;
 	}
 
