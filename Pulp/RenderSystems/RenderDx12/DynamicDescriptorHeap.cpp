@@ -197,7 +197,8 @@ DynamicDescriptorHeap::DynamicDescriptorHeap(core::MemoryArenaBase* arena, ID3D1
 	owningContext_(owningContext),
 	pool_(pool),
 	pCurrentHeapPtr_(nullptr),
-	currentOffset_(0)
+	currentOffset_(0),
+	descriptorSize_(0)
 {
 
 }
