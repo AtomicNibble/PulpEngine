@@ -215,6 +215,18 @@ namespace shader
 		return false;
 	}
 
+	XShaderParam* XHWShader::getParameter(const core::StrHash& nameHash)
+	{
+		for (size_t i = 0; i < bindVars_.size(); i++)
+		{
+			if (bindVars_[i].nameHash == nameHash) {
+				return &bindVars_[i];
+			}
+		}
+
+		return nullptr;
+	}
+
 
 	void XHWShader::getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest)
 	{
@@ -814,81 +826,6 @@ namespace shader
 #if 0
 
 
-	XHWShader* XHWShader::forName(const char* shader_name, const char* entry,
-		const char* sourceFile, const Flags<TechFlag>& techFlags,
-		ShaderType::Enum type, Flags<ILFlag> ILFlags, uint32_t sourceCrc)
-	{
-	//	X_ASSERT_NOT_NULL(s_pHWshaders);
-		X_ASSERT_NOT_NULL(shader_name);
-		X_ASSERT_NOT_NULL(entry);
-		X_ASSERT_NOT_NULL(sourceFile);
-
-		XHWShader_Dx10* pShader = nullptr;
-		core::StackString512 name;
-
-		name.appendFmt("%s@%s", shader_name, entry);
-
-		// macros are now part of the name.
-		name.appendFmt("_%x", techFlags.ToInt());
-
-		// input layout flags are also part of the name.
-		name.appendFmt("_%x", ILFlags.ToInt());
-
-
-#if X_DEBUG
-		X_LOG1("Shader", "HWS for name: \"%s\"", name.c_str());
-#endif // !X_DEBUG
-
-#if 0
-		pShader = static_cast<XHWShader_Dx10*>(s_pHWshaders->findAsset(name.c_str()));
-#endif
-
-		if (pShader)
-		{
-			pShader->addRef();
-
-			if (pShader->sourceCrc32_ != sourceCrc)
-			{
-				// shieeet, the shader needs updating.
-				// we have to relase the old one and set it up fresh.
-				pShader->releaseHW();
-				pShader->sourceCrc32_ = sourceCrc;
-				pShader->setStatus(ShaderStatus::NotCompiled);
-
-				// remove the cache file, to save a file load / crc check.
-				core::Path<char> path;
-				pShader->getShaderCompileDest(path);
-
-				// delete it!
-				gEnv->pFileSys->deleteFile(path.c_str());
-
-				// temp
-				//	pShader->activate();
-			}
-		}
-		else
-		{
-			pShader = X_NEW_ALIGNED(XHWShader_Dx10, g_rendererArena, "HWShader", X_ALIGN_OF(XHWShader_Dx10));
-			pShader->name_ = name.c_str();
-			pShader->type_ = type;
-			pShader->sourceFileName_ = sourceFile;
-			pShader->entryPoint_ = entry;
-			pShader->sourceCrc32_ = sourceCrc;
-
-			// save macros
-			pShader->techFlags_ = techFlags;
-
-			// temp
-			//	pShader->activate();
-
-			// register it.
-		//	s_pHWshaders->AddAsset(name.c_str(), pShader);
-		}
-
-
-		return pShader;
-	}
-
 	void XHWShader_Dx10::InitBufferPointers(void)
 	{
 		// already allocated?
@@ -925,136 +862,8 @@ namespace shader
 
 	}
 
-	void XHWShader_Dx10::FreeHWShaders(void)
-	{
-#if 0
-		// null on start up failed.
-		X_ASSERT_NOT_NULL(s_pHWshaders);
-
-		// NOTE: there should be none, since shaders that use them should release them.
-		// so if there are any here there is a problem.
-		// but we still clean up like a good boy.
-		if (s_pHWshaders)
-		{
-			core::XResourceContainer::ResourceItor it = s_pHWshaders->begin();
-			XHWShader_Dx10* pShader;
-
-			for (; it != s_pHWshaders->end();)
-			{
-				pShader = static_cast<XHWShader_Dx10*>(it->second);
-				++it;
-
-				if (!pShader)
-					continue;
-
-				X_WARNING("HWShaders", "\"%s\" was not deleted", pShader->name_.c_str());
-
-				pShader->release();
-			}
-		}
-#endif
-	}
-
-
-	void XHWShader_Dx10::FreeParams(void)
-	{
-		int i;
-		for (i = 0; i < ShaderType::ENUM_COUNT; i++) {
-			perFrameParams_[i].free();
-			perInstantParams_[i].free();
-		}
-	}
-
-
-
 
 	// ------------------------------------------------------------------
-
-
-
-
-	bool XHWShader_Dx10::activate(void)
-	{
-		if (!isValid())
-		{
-			if (isCompiling())
-			{
-				if (status_ == ShaderStatus::AsyncCompileDone)
-				{
-					if (uploadtoHW())
-					{
-						if (reflectShader())
-						{
-							status_ = ShaderStatus::ReadyToRock;
-							saveToCache();
-							return true;
-						}
-					}
-				}
-
-				return false;
-			}
-
-			if (FailedtoCompile())
-				return false;
-
-			if (loadFromCache())
-			{
-				if (uploadtoHW())
-				{
-					// reflection not required for cache loaded.
-					status_ = ShaderStatus::ReadyToRock;
-					return true;
-				}
-				else
-				{
-					// fall throught and load from source.
-				}
-			}
-
-			if (!loadFromSource())
-			{
-				// we need to set this shader as broken.
-				// instead of trying to compile it all the time.
-				status_ = ShaderStatus::FailedToCompile;
-				X_LOG0("Shader", "Failed to activate shader: \"%s\"", getName());
-				return false;
-			}
-
-			if (isCompiling()) {
-				X_LOG0("Shader", "shader: \"%s\" is compiling", getName());
-				return false;
-			}
-
-			if (uploadtoHW())
-			{
-				if (reflectShader())
-				{
-					status_ = ShaderStatus::ReadyToRock;
-					saveToCache();
-					return true;
-				}
-			}
-
-			X_LOG0_EVERY_N(10, "Shader", "Failed to activate shader: \"%s\"", getName());
-			return false;
-		}
-		return true;
-	}
-
-
-	const int XHWShader_Dx10::release(void)
-	{
-		int res = XHWShader::release();
-		if (res)
-			return res;
-
-		releaseHW();
-
-		X_DELETE(this, g_rendererArena);
-
-		return 0;
-	}
 
 
 	XShaderParam* XHWShader_Dx10::getParameter(const core::StrHash& nameHash)

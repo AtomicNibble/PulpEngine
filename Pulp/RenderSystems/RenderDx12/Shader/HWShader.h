@@ -146,6 +146,8 @@ namespace shader
 		bool compile(ShaderBin& shaderBin);
 		bool invalidateIfChanged(uint32_t newSourceCrc32);
 
+		XShaderParam* getParameter(const core::StrHash& nameHash);
+
 	private:
 		void getShaderCompilePaths(core::Path<char>& src, core::Path<char>& dest);
 		void getShaderCompileSrc(core::Path<char>& src);
