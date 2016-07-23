@@ -128,6 +128,7 @@ namespace shader
 		X_ASSERT_NOT_NULL(gEnv->pCore);
 		X_ASSERT_NOT_NULL(gEnv->pHotReload);
 		X_ASSERT_NOT_NULL(g_rendererArena);
+		X_LOG1("ShadersManager", "Starting");
 
 
 		pCrc32_ = gEnv->pCore->GetCrc32();
@@ -161,7 +162,7 @@ namespace shader
 
 	bool XShaderManager::shutdown(void)
 	{
-		X_LOG0("ShadersManager", "Shutting Down");
+		X_LOG1("ShadersManager", "Shutting Down");
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pHotReload);
 
