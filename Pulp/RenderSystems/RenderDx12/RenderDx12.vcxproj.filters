@@ -33,6 +33,12 @@
     <Filter Include="Source Files\Shader">
       <UniqueIdentifier>{3455b46d-5722-4d83-ad88-db8e4a050c30}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Texture">
+      <UniqueIdentifier>{b33293fd-f26d-4e46-b888-6f4e4163a08a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Texture">
+      <UniqueIdentifier>{2b92c334-4bfc-4797-bc8b-d27c649bda7d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -116,6 +122,9 @@
     <ClInclude Include="Util\DxTypeHelpers.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Texture\TextureManager.h">
+      <Filter>Header Files\Texture</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -192,6 +201,9 @@
     </ClCompile>
     <ClCompile Include="Shader\ShaderVars.cpp">
       <Filter>Source Files\Shader</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture\TextureManager.cpp">
+      <Filter>Source Files\Texture</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
