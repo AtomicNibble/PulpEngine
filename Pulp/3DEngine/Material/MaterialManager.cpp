@@ -18,21 +18,21 @@
 X_NAMESPACE_BEGIN(engine)
 
 using namespace core::xml::rapidxml;
-using namespace shader;
+using namespace render::shader;
 
 namespace {
 
 	struct TextureType
 	{
 		const char* name;
-		shader::ShaderTextureIdx::Enum type;
+		ShaderTextureIdx::Enum type;
 	};
 
 	TextureType g_textTypes[] = {
-		{ "albedo", shader::ShaderTextureIdx::DIFFUSE },
-		{ "diffuse", shader::ShaderTextureIdx::DIFFUSE },
-		{ "bump", shader::ShaderTextureIdx::BUMP },
-		{ "spec", shader::ShaderTextureIdx::SPEC },
+		{ "albedo", ShaderTextureIdx::DIFFUSE },
+		{ "diffuse", ShaderTextureIdx::DIFFUSE },
+		{ "bump", ShaderTextureIdx::BUMP },
+		{ "spec", ShaderTextureIdx::SPEC },
 	};
 
 	static const int g_textTypesNum = (sizeof(g_textTypes) / sizeof(g_textTypes[0]));
@@ -250,7 +250,7 @@ namespace {
 			for (texture = textures->first_node("texture"); texture;
 				texture = texture->next_sibling())
 			{
-				shader::ShaderTextureIdx::Enum texId;
+				render::shader::ShaderTextureIdx::Enum texId;
 				core::StackString<256> name;
 
 				attr = texture->first_attribute("type", 4);
@@ -325,13 +325,13 @@ namespace {
 		}
 
 		// do we have a albedo?
-		if (input.textures[shader::ShaderTextureIdx::DIFFUSE].name.isEmpty()) {
+		if (input.textures[render::shader::ShaderTextureIdx::DIFFUSE].name.isEmpty()) {
 			X_WARNING("Mtl", "material has no albedo texture defined");
 		}
 
-		if (input.textures[shader::ShaderTextureIdx::BUMP].name.isEmpty()) {
+		if (input.textures[render::shader::ShaderTextureIdx::BUMP].name.isEmpty()) {
 			X_WARNING("Mtl", "material has no bump map assigning identity");
-			input.textures[shader::ShaderTextureIdx::BUMP].name = texture::TEX_DEFAULT_BUMP;
+			input.textures[render::shader::ShaderTextureIdx::BUMP].name = texture::TEX_DEFAULT_BUMP;
 
 		}
 
@@ -748,9 +748,9 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 		if (hdr.isValid())
 		{
 			// read the file entries.
-			MaterialTexture texture[shader::ShaderTextureIdx::ENUM_COUNT];
+			MaterialTexture texture[render::shader::ShaderTextureIdx::ENUM_COUNT];
 
-			uint32_t Num = core::Min<uint32_t>(hdr.numTextures, shader::ShaderTextureIdx::ENUM_COUNT);
+			uint32_t Num = core::Min<uint32_t>(hdr.numTextures, render::shader::ShaderTextureIdx::ENUM_COUNT);
 
 			if (file.readObjs(texture, Num) == Num)
 			{
@@ -767,7 +767,7 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 				
 				for (i = 0; i < Num; i++)
 				{
-					X_ASSERT(texture[i].type < static_cast<int32_t>(shader::ShaderTextureIdx::ENUM_COUNT),
+					X_ASSERT(texture[i].type < static_cast<int32_t>(render::shader::ShaderTextureIdx::ENUM_COUNT),
 						"invalid texture type")();
 					input.textures[texture[i].type].name = texture[i].name.c_str();
 				}
@@ -820,7 +820,7 @@ bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 	hdr.shineness = pRes->getSpecularShininess();
 
 	XTextureResource* pTex = nullptr;
-	MaterialTexture textures[shader::ShaderTextureIdx::ENUM_COUNT];
+	MaterialTexture textures[render::shader::ShaderTextureIdx::ENUM_COUNT];
 
 	core::zero_object(textures);
 
