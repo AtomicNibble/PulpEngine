@@ -3,6 +3,7 @@
 #include <Containers\HashMap.h>
 #include <IDirectoryWatcher.h>
 
+#include "TextureVars.h"
 
 X_NAMESPACE_DECLARE(core,
 	struct IConsoleCmdArgs;
@@ -50,6 +51,7 @@ private:
 private:
 	core::MemoryArenaBase* arena_;
 	TextureMap textures_;
+	TextureVars vars_;
 
 private:
 	Texture* pTexDefault_;

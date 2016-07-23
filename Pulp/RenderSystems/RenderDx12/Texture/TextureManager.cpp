@@ -66,8 +66,7 @@ X_NAMESPACE_BEGIN(texture)
 
 	void TextureManager::registerVars(void)
 	{
-
-
+		vars_.RegisterVars();
 	}
 
 	void TextureManager::registerCmds(void)
