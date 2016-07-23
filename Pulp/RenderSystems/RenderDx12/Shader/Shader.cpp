@@ -45,28 +45,6 @@ namespace shader
 //
 
 
-namespace 
-{
-	
-
-	template<typename TFlags>
-	void AppendFlagTillEqual(const Flags<TFlags>& srcflags, Flags<TFlags>& dest)
-	{
-		if (srcflags.IsAnySet() && srcflags.ToInt() != dest.ToInt())
-		{
-			for (size_t i = 0; i < 32; i++)
-			{
-				TFlags::Enum flag = static_cast<TFlags::Enum>(1 << i);
-				if (srcflags.IsSet(flag) && !dest.IsSet(flag)) {
-					dest.Set(flag);
-					return;
-				}
-			}
-		}
-	}
-
-}
-
 
 BlendType::Enum BlendType::typeFromStr(const char* _str)
 {
@@ -187,104 +165,6 @@ const int32_t XShader::release(void)
 
 	return ref;
 }
-
-
-
-
-
-
-#if 0
-
-
-
-#endif
-
-// -------------------------------------------
-
-
-// --------------------------- Shader Manager --------------------------- 
-
-#if 0
-
-
-
-XShaderResources* XShaderManager::createShaderResources(const XInputShaderResources& input)
-{
-	int i;
-
-	XShaderResources* pRes = X_NEW_ALIGNED(XShaderResources, g_rendererArena, "ShaderResource", 8);
-
-	pRes->diffuse = input.material.diffuse;
-	pRes->emissive = input.material.emissive;
-	pRes->spec = input.material.specular;
-	pRes->specShine = input.material.specShininess;
-	pRes->opacity = input.opacity;
-
-	for (i = 0; i < shader::ShaderTextureIdx::ENUM_COUNT; i++)
-	{
-		const XTextureResource& res = input.textures[i];
-
-		if (!res.name.isEmpty())
-		{
-			X_ASSERT_NOT_IMPLEMENTED();
-		//	pRes->pTextures[i] = textureResourceForName(res.name);
-		}
-	}
-
-	return pRes;
-}
-
-
-#endif 
-
-
-// -----------------------------------------------
-
-#if 0
-
-XShaderResources::XShaderResources()
-{
-	core::zero_object(pTextures);
-
-	specShine = 0.f;
-	glow = 0.f;
-	opacity = 0.f;
-}
-
-
-XShaderResources::~XShaderResources()
-{
-	freeAssets();
-}
-
-void XShaderResources::release(void)
-{
-	X_ASSERT_NOT_IMPLEMENTED();
-}
-
-// called from render thread.
-void XShaderResources::RT_Release(void)
-{
-	freeAssets();
-
-	X_DELETE(this,g_rendererArena);
-}
-
-void XShaderResources::freeAssets(void)
-{
-	int i;
-
-	for (i = 0; i < ShaderTextureIdx::ENUM_COUNT; i++)
-	{
-		if (pTextures[i]) {
-			core::Mem::DeleteAndNull(pTextures[i], g_rendererArena);
-		}
-	}
-}
-
-#endif
-
-// -----------------------------------------------
 
 
 
