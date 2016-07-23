@@ -122,7 +122,7 @@ namespace shader
 
 
 
-	bool XShaderManager::Init(void)
+	bool XShaderManager::init(void)
 	{
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pCore);
@@ -159,7 +159,7 @@ namespace shader
 		return true;
 	}
 
-	bool XShaderManager::Shutdown(void)
+	bool XShaderManager::shutdown(void)
 	{
 		X_LOG0("ShadersManager", "Shutting Down");
 		X_ASSERT_NOT_NULL(gEnv);
@@ -449,7 +449,7 @@ namespace shader
 					pSourceFile->setFileData(str);
 
 					// load any files it includes.
-					ParseIncludesAndPrePro_r(pSourceFile, pSourceFile->getIncludeArr(), reload);
+					parseIncludesAndPrePro_r(pSourceFile, pSourceFile->getIncludeArr(), reload);
 
 					return pSourceFile;
 				}
@@ -465,7 +465,7 @@ namespace shader
 					sourcebin_.insert(std::make_pair(pSourceFile->getFileName(), pSourceFile));
 
 					// load any files it includes.
-					ParseIncludesAndPrePro_r(pSourceFile, pSourceFile->getIncludeArr());
+					parseIncludesAndPrePro_r(pSourceFile, pSourceFile->getIncludeArr());
 
 					return pSourceFile;
 				}
@@ -476,7 +476,7 @@ namespace shader
 	}
 
 
-	void XShaderManager::ParseIncludesAndPrePro_r(SourceFile* pSourceFile,
+	void XShaderManager::parseIncludesAndPrePro_r(SourceFile* pSourceFile,
 		core::Array<SourceFile*>& includedFiles, bool reload)
 	{
 		X_ASSERT_NOT_NULL(pSourceFile);
@@ -535,7 +535,7 @@ namespace shader
 									== includedFiles.end())
 								{
 									// check if for includes.
-									ParseIncludesAndPrePro_r(pChildSourceFile, includedFiles);
+									parseIncludesAndPrePro_r(pChildSourceFile, includedFiles);
 
 									// add the include files crc to this one.
 									// only after parsing for child includes so that

@@ -37,8 +37,8 @@ namespace shader
 		XShaderManager(core::MemoryArenaBase* arena);
 		~XShaderManager();
 
-		bool Init(void);
-		bool Shutdown(void);
+		bool init(void);
+		bool shutdown(void);
 
 		// loads shader if not already loaded.
 		XShader* forName(const char* pName);
@@ -60,7 +60,7 @@ namespace shader
 		ShaderSourceFile* loadShaderFile(const char* pName, bool reload = false);
 		SourceFile* loadRawSourceFile(const char* pName, bool reload = false);
 
-		void ParseIncludesAndPrePro_r(SourceFile* file, core::Array<SourceFile*>& includedFiles,
+		void parseIncludesAndPrePro_r(SourceFile* file, core::Array<SourceFile*>& includedFiles,
 			bool reload = false);
 
 		XShader* createShader(const char* pName);

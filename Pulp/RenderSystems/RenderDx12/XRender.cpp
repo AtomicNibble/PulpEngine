@@ -209,7 +209,7 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 
 
-	if (!shaderMan_.Init()) {
+	if (!shaderMan_.init()) {
 		X_ERROR("Render", "failed to init shader system");
 		return false;
 	}
@@ -230,7 +230,7 @@ void XRender::ShutDown(void)
 		X_DELETE_AND_NULL(pTextureMan_, arena_);
 	}
 
-	shaderMan_.Shutdown();
+	shaderMan_.shutdown();
 
 	cmdListManager_.shutdown();
 
