@@ -20,6 +20,7 @@ namespace texture
 
 	bool TextureManager::init(void)
 	{
+		X_LOG1("TextureManager", "Starting");
 
 
 
@@ -28,6 +29,7 @@ namespace texture
 
 	bool TextureManager::shutDown(void)
 	{
+		X_LOG1("TextureManager", "Shutting Down");
 
 
 
