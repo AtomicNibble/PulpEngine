@@ -8,7 +8,7 @@ namespace shader
 
 
 	// input layout tree nodes.
-	class ILTreeNode
+	X_ALIGNED_SYMBOL(class ILTreeNode, 64) // not important, but size is very close to multiple of 64 in both 32 and 64.
 	{
 		static const size_t MAX_IL_NODE_CHILDREN = 4;
 		typedef core::Array<ILTreeNode> childVec;
@@ -32,12 +32,9 @@ namespace shader
 		core::StackString<64> sematicName_;
 		InputLayoutFormat::Enum fmt_;
 		childVec children_; // never gonna be that many children.
-		bool ___pad[8];
 	};
 
-	// it's so close to 128 might as well pad it.
-	// just cus i like power of 2, these are pretty much read only post creation.
-	X_ENSURE_SIZE(ILTreeNode, 128);
+
 
 } // namespace shader
 
