@@ -69,7 +69,7 @@ namespace shader
 
 		XHWShader* hwForName(ShaderType::Enum type, const char* pShaderName, const core::string& entry,
 			SourceFile* pSourceFile, const TechFlags techFlags,
-			 Flags<ILFlag> ILFlags);
+			ILFlags ILFlags);
 
 	private:
 		bool freeSourcebin(void);

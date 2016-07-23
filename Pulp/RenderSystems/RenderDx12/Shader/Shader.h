@@ -110,7 +110,7 @@ public:
 
 public:
 	TechFlags techFlags;
-	Flags<ILFlag> ILFlags;
+	ILFlags ILFlags;
 	InputLayoutFormat::Enum IlFmt;
 
 	XHWShader* pVertexShader;

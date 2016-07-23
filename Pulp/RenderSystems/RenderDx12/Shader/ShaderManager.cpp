@@ -50,7 +50,7 @@ namespace shader
 		};
 
 
-		static bool ILFlagFromStr(const char* pStr, Flags<ILFlag>& flagOut)
+		static bool ILFlagFromStr(const char* pStr, ILFlags& flagOut)
 		{
 			const size_t num = sizeof(g_ILFlags) / sizeof(const char*);
 			size_t i;
@@ -661,9 +661,9 @@ namespace shader
 			// I might use only the HLSL crc, do .shader changes matter?
 			// for now use hlsl + .shader
 			// uint32_t crc = source->pHlslFile->sourceCrc32;
-			Flags<TechFlag> techFlags;
-			Flags<ILFlag> ILFlags;
-			Flags<ILFlag> ILFlagSrc = pSource->pHlslFile_->getILFlags();
+			TechFlags techFlags;
+			ILFlags ILflags;
+			const ILFlags ILflagSrc = pSource->pHlslFile_->getILFlags();
 
 			for (j = 0; j < numTecs; j++)
 			{
@@ -673,7 +673,7 @@ namespace shader
 
 				// for every input layout we compile all the techFlags 
 				// plus one without flags passed.
-				uint32_t numILFlags = core::bitUtil::CountBits(ILFlagSrc.ToInt());
+				uint32_t numILFlags = core::bitUtil::CountBits(ILflagSrc.ToInt());
 				uint32_t numTechFlags = core::bitUtil::CountBits(tech.techFlags.ToInt());
 				uint32_t i, x;
 				for (i = 0; i < numILFlags + 1; i++)
@@ -687,14 +687,14 @@ namespace shader
 						// create the hardware shaders.
 						hwTech.pVertexShader = hwForName(ShaderType::Vertex, pName,
 							srcTech.getVertexFunc(),
-							pSource->pHlslFile_, techFlags, ILFlags);
+							pSource->pHlslFile_, techFlags, ILflags);
 
 						hwTech.pPixelShader = hwForName(ShaderType::Pixel, pName,
 							srcTech.getPixelFunc(),
-							pSource->pHlslFile_, techFlags,  ILFlags);
+							pSource->pHlslFile_, techFlags,  ILflags);
 
 						hwTech.techFlags = techFlags;
-						hwTech.ILFlags = ILFlags;
+						hwTech.ILFlags = ILflags;
 						hwTech.IlFmt = hwTech.pVertexShader->getILFormat();
 						tech.append(hwTech);
 
@@ -703,7 +703,7 @@ namespace shader
 					}
 
 					// add in the next flag.
-					AppendFlagTillEqual(ILFlagSrc, ILFlags);
+					AppendFlagTillEqual(ILflagSrc, ILflags);
 				}
 
 			}
@@ -756,12 +756,12 @@ namespace shader
 						// tech flags may have changed.
 						// IL flags won't have tho.
 						TechFlags techFlags;
-						Flags<ILFlag> ILFlags;
-						Flags<ILFlag> ILFlagSrc = pShaderSource->pHlslFile_->getILFlags();
+						ILFlags ILflags;
+						const ILFlags ILflagSrc = pShaderSource->pHlslFile_->getILFlags();
 
 						// for every input layout we compile all the techFlags 
 						// plus one without flags passed.
-						uint32_t numILFlags = core::bitUtil::CountBits(ILFlagSrc.ToInt());
+						uint32_t numILFlags = core::bitUtil::CountBits(ILflagSrc.ToInt());
 						uint32_t numTechFlags = core::bitUtil::CountBits(tech.techFlags.ToInt());
 						uint32_t j;
 						for (x = 0; x < numILFlags + 1; x++)
@@ -774,13 +774,13 @@ namespace shader
 
 								// create the hardware shaders.
 								hwTech.pVertexShader = hwForName(ShaderType::Vertex, name, srcTech.getVertexFunc(),
-									pShaderSource->pHlslFile_, techFlags, ILFlags);
+									pShaderSource->pHlslFile_, techFlags, ILflags);
 
 								hwTech.pPixelShader = hwForName(ShaderType::Pixel, name, srcTech.getPixelFunc(), 
-									pShaderSource->pHlslFile_, techFlags, ILFlags);
+									pShaderSource->pHlslFile_, techFlags, ILflags);
 
 								hwTech.techFlags = techFlags;
-								hwTech.ILFlags = ILFlags;
+								hwTech.ILFlags = ILflags;
 								hwTech.IlFmt = hwTech.pVertexShader->getILFormat();
 								tech.append(hwTech);
 
@@ -789,7 +789,7 @@ namespace shader
 							}
 
 							// add in the next flag.
-							AppendFlagTillEqual(ILFlagSrc, ILFlags);
+							AppendFlagTillEqual(ILflagSrc, ILflags);
 						}
 					}
 				}
@@ -893,7 +893,7 @@ namespace shader
 
 	XHWShader* XShaderManager::hwForName(ShaderType::Enum type, const char* pShaderName, 
 		const core::string& entry, SourceFile* pSourceFile,
-		const Flags<TechFlag> techFlags, Flags<ILFlag> ILFlags)
+		const TechFlags techFlags, ILFlags ILFlags)
 	{
 		X_ASSERT_NOT_NULL(pShaderName);
 		X_ASSERT_NOT_NULL(pSourceFile);

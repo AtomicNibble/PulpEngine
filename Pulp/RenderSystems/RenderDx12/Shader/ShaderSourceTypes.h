@@ -43,7 +43,7 @@ namespace shader
 		X_INLINE uint32_t getSourceCrc32(void) const;
 		X_INLINE const IncludedSourceArr& getIncludeArr(void) const;
 		X_INLINE IncludedSourceArr& getIncludeArr(void);
-		X_INLINE Flags<ILFlag> getILFlags(void);
+		X_INLINE ILFlags getILFlags(void);
 
 		X_INLINE void setName(const core::string& name);
 		X_INLINE void setFileName(const core::string& name);
@@ -59,7 +59,7 @@ namespace shader
 		IncludedSourceArr includedFiles_;
 		PreProArr prePros_;
 		RefrenceMap refrences_;
-		Flags<ILFlag> ILFlags_;
+		ILFlags ILFlags_;
 		uint32_t sourceCrc32_;
 	};
 

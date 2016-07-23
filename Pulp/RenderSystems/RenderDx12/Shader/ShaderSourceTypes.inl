@@ -35,7 +35,7 @@ namespace shader
 		return includedFiles_;
 	}
 
-	X_INLINE Flags<ILFlag> SourceFile::getILFlags(void)
+	X_INLINE ILFlags SourceFile::getILFlags(void)
 	{
 		return ILFlags_;
 	}
