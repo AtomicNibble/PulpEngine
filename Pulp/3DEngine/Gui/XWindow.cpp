@@ -1632,8 +1632,8 @@ void XWindow::drawBackground(const Rectf& drawRect)
 
 		pRender_->setGUIShader(true);
 
-		shader::XShaderItem& item = pBackgroundMat_->getShaderItem();
-		shader::XTextureResource* texRes = item.pResources_->getTexture(shader::ShaderTextureIdx::DIFFUSE);
+		render::shader::XShaderItem& item = pBackgroundMat_->getShaderItem();
+		render::shader::XTextureResource* texRes = item.pResources_->getTexture(render::shader::ShaderTextureIdx::DIFFUSE);
 		texture::TexID texId = texRes->pITex->getTexID();
 
 		pRender_->DrawQuadImageSS(drawRect, texId, col);

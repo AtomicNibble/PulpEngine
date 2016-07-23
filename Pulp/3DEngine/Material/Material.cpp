@@ -405,7 +405,7 @@ bool XMaterial::ProcessMaterialXML(XMaterial* pMaterial,
 		for (texture = textures->first_node("texture"); texture;
 			texture = texture->next_sibling())
 		{
-			shader::ShaderTextureIdx::Enum texId;
+			render::shader::ShaderTextureIdx::Enum texId;
 			core::StackString<256> name;
 
 			attr = texture->first_attribute("type", 4);
