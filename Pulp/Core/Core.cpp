@@ -160,7 +160,7 @@ void XCore::ShutDown()
 
 	if (env_.pPhysics)
 	{
-		env_.pPhysics->ShutDown();
+		env_.pPhysics->shutDown();
 		core::SafeRelease(env_.pPhysics);
 	}
 
