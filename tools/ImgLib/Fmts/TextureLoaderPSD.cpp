@@ -259,6 +259,10 @@ namespace PSD
 	}
 
 	// ITextureFmt
+	const char* XTexLoaderPSD::getExtension(void) const
+	{
+		return PSD_FILE_EXTENSION;
+	}
 
 	bool XTexLoaderPSD::canLoadFile(const core::Path<char>& path) const
 	{

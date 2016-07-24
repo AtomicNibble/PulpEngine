@@ -179,9 +179,14 @@ namespace PNG
 	}
 
 	// ITextureFmt
+	const char* XTexLoaderPNG::getExtension(void) const
+	{
+		return PNG_FILE_EXTENSION;
+	}
+
 	bool XTexLoaderPNG::canLoadFile(const core::Path<char>& path) const
 	{
-		return  core::strUtil::IsEqual(PNG_FILE_EXTENSION, path.extension());
+		return core::strUtil::IsEqual(PNG_FILE_EXTENSION, path.extension());
 	}
 
 	bool XTexLoaderPNG::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)

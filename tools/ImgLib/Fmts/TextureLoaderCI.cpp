@@ -31,9 +31,14 @@ namespace CI
 	}
 
 	// ITextureFmt
+	const char* XTexLoaderCI::getExtension(void) const
+	{
+		return CI_FILE_EXTENSION;
+	}
+
 	bool XTexLoaderCI::canLoadFile(const core::Path<char>& path) const
 	{
-		return  core::strUtil::IsEqual(CI_FILE_EXTENSION, path.extension());
+		return core::strUtil::IsEqual(CI_FILE_EXTENSION, path.extension());
 	}
 
 	bool XTexLoaderCI::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)

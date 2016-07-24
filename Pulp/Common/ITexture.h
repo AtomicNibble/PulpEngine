@@ -314,6 +314,7 @@ struct ITextureFmt
 {
 	virtual ~ITextureFmt() {}
 
+	virtual const char* getExtension(void) const X_ABSTRACT;
 	virtual bool canLoadFile(const core::Path<char>& path) const X_ABSTRACT;
 	virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_ABSTRACT;
 
@@ -324,6 +325,7 @@ struct ITextureFmt
 		X_ASSERT_UNREACHABLE();
 		return false;
 	};
+
 };
 
 

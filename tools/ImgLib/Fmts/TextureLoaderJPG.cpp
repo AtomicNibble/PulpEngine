@@ -149,9 +149,14 @@ namespace JPG
 	}
 
 	// ITextureFmt
+	const char* XTexLoaderJPG::getExtension(void) const
+	{
+		return JPG_FILE_EXTENSION;
+	}
+
 	bool XTexLoaderJPG::canLoadFile(const core::Path<char>& path) const
 	{
-		return  core::strUtil::IsEqual(JPG_FILE_EXTENSION, path.extension());
+		return core::strUtil::IsEqual(JPG_FILE_EXTENSION, path.extension());
 	}
 
 	bool XTexLoaderJPG::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)

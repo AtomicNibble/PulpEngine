@@ -565,6 +565,10 @@ namespace DDS
 	}
 
 	// ITextureFmt
+	const char* XTexLoaderDDS::getExtension(void) const
+	{
+		return DDS_FILE_EXTENSION;
+	}
 
 	bool XTexLoaderDDS::canLoadFile(const core::Path<char>& path) const
 	{
