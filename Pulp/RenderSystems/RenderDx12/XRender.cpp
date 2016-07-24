@@ -95,6 +95,11 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 	populateFeatureInfo();
 
+	if (!deviceIsSupported()) {
+		X_ERROR("Dx12", "The device does not meet the minimum requirements.");
+		return false;
+	}
+
 	{
 		ID3D12InfoQueue* pInfoQueue = nullptr;
 		if (SUCCEEDED(pDevice_->QueryInterface(IID_PPV_ARGS(&pInfoQueue))))
@@ -458,6 +463,42 @@ void XRender::populateFeatureInfo(void)
 	features_.depthTextureSupport = true;
 	// o.o
 	features_.fpColorSupport = true;
+
+	features_.init = true;
+}
+
+bool XRender::deviceIsSupported(void) const
+{
+	X_ASSERT(features_.init, "Feature info must be init before checking if device meets requirements")();
+
+	// check the device supports like max dimensions we support.
+	// if this is ever a problem the engine just needs to support dropping higer dimensions at runtime.
+	// that might get built in anyway as part of quality options.
+	{
+		if (features_.maxTextureWidth < texture::TEX_MAX_DIMENSIONS) {
+			X_ERROR("Dx12", "Decide does not support required texture width: %i supported: %i",
+				texture::TEX_MAX_DIMENSIONS, features_.maxTextureWidth);
+			return false;
+		}
+		if (features_.maxTextureHeight < texture::TEX_MAX_DIMENSIONS) {
+			X_ERROR("Dx12", "Decide does not support required texture height: %i supported: %i",
+				texture::TEX_MAX_DIMENSIONS, features_.maxTextureHeight);
+			return false;
+		}
+		if (features_.maxTextureDepth < texture::TEX_MAX_DEPTH) {
+			X_ERROR("Dx12", "Decide does not support required depth size: %i supported: %i",
+				texture::TEX_MAX_DEPTH, features_.maxTextureDepth);
+			return false;
+		}
+		if (features_.maxTextureCubeSize < texture::TEX_MAX_FACES) {
+			X_ERROR("Dx12", "Decide does not support required cube size: %i supported: %i",
+				texture::TEX_MAX_FACES, features_.maxTextureCubeSize);
+			return false;
+		}
+	}
+
+
+	return true;
 }
 
 X_NAMESPACE_END

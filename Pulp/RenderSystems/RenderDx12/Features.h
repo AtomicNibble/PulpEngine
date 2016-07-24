@@ -70,6 +70,8 @@ struct GpuFeatures
 	bool csSupport : 1;
 	bool hsSupport : 1;
 	bool dsSupport : 1;
+
+	bool init : 1;
 };
 
 

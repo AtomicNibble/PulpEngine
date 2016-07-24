@@ -50,6 +50,7 @@ private:
 	bool resize(uint32_t width, uint32_t height);
 	void handleResolutionChange(void);
 	void populateFeatureInfo(void);
+	bool deviceIsSupported(void) const;
 
 private:
 	core::MemoryArenaBase* arena_;
