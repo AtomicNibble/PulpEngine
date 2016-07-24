@@ -124,12 +124,12 @@ XPhysics::~XPhysics()
 }
 
 // IPhysics
-void XPhysics::RegisterVars(void)
+void XPhysics::registerVars(void)
 {
 	vars_.RegisterVars();
 }
 
-void XPhysics::RegisterCmds(void)
+void XPhysics::registerCmds(void)
 {
 	ADD_COMMAND_MEMBER("phys_toggle_pvd", this, XPhysics, &XPhysics::cmd_TogglePvd, core::VarFlag::SYSTEM,
 		"Toggles PVD connection");
@@ -144,7 +144,7 @@ void XPhysics::RegisterCmds(void)
 		"Toggles physics visualization");
 }
 
-bool XPhysics::Init(void)
+bool XPhysics::init(void)
 {
 	X_LOG0("PhysicsSys", "Starting");
 
@@ -273,7 +273,7 @@ bool XPhysics::Init(void)
 	return true;
 }
 
-void XPhysics::ShutDown(void)
+void XPhysics::shutDown(void)
 {
 	X_LOG0("PhysicsSys", "Shutting Down");
 
