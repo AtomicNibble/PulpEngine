@@ -11,6 +11,7 @@
 #include "DescriptorAllocator.h"
 #include "DynamicDescriptorHeap.h"
 #include "ColorBuffer.h"
+#include "Features.h"
 
 #include "Shader\ShaderManager.h"
 
@@ -48,7 +49,7 @@ private:
 	bool initRenderBuffers(Vec2<uint32_t> res);
 	bool resize(uint32_t width, uint32_t height);
 	void handleResolutionChange(void);
-
+	void populateFeatureInfo(void);
 
 private:
 	core::MemoryArenaBase* arena_;
@@ -90,6 +91,9 @@ private:
 	SamplerDescriptor samplerPointClamp_;
 	SamplerDescriptor samplerPointBorder_;
 	SamplerDescriptor samplerLinearBorder_;
+
+	D3D_FEATURE_LEVEL featureLvl_;
+	GpuFeatures features_;
 };
 
 

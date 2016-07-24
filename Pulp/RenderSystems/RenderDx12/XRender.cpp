@@ -70,6 +70,8 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 				continue;
 			}
 
+			featureLvl_ = D3D_FEATURE_LEVEL_11_0;
+
 			hr = D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice_));
 			if (SUCCEEDED(hr))
 			{
@@ -91,14 +93,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 		return false;
 	}
 
-	{
-		D3D12_FEATURE_DATA_ARCHITECTURE archFeature;
-		archFeature.NodeIndex = 0;
-		pDevice_->CheckFeatureSupport(D3D12_FEATURE_ARCHITECTURE, &archFeature, sizeof(archFeature));
-
-		archFeature.CacheCoherentUMA;
-		archFeature.TileBasedRenderer;
-	}
+	populateFeatureInfo();
 
 	{
 		ID3D12InfoQueue* pInfoQueue = nullptr;
@@ -371,6 +366,98 @@ void XRender::handleResolutionChange(void)
 
 	// re int buffers
 	initRenderBuffers(targetNativeRes_);
+}
+
+void XRender::populateFeatureInfo(void)
+{
+	switch (featureLvl_)
+	{
+	case D3D_FEATURE_LEVEL_12_1:
+	case D3D_FEATURE_LEVEL_12_0:
+	case D3D_FEATURE_LEVEL_11_1:
+	case D3D_FEATURE_LEVEL_11_0:
+		features_.maxShaderModel = (featureLvl_ >= D3D_FEATURE_LEVEL_12_0) ? ShaderModel(5, 1) : ShaderModel(5, 0);
+		features_.maxTextureWidth = features_.maxTextureHeight = D3D12_REQ_TEXTURE2D_U_OR_V_DIMENSION;
+		features_.maxTextureDepth = D3D12_REQ_TEXTURE3D_U_V_OR_W_DIMENSION;
+		features_.maxTextureCubeSize = D3D12_REQ_TEXTURECUBE_DIMENSION;
+		features_.maxTextureArrayLength = D3D12_REQ_TEXTURE2D_ARRAY_AXIS_DIMENSION;
+		features_.maxVertexTextureUnits = D3D12_COMMONSHADER_SAMPLER_SLOT_COUNT;
+		features_.maxPixelTextureUnits = D3D12_COMMONSHADER_SAMPLER_SLOT_COUNT;
+		features_.maxGeometryTextureUnits = D3D12_COMMONSHADER_SAMPLER_SLOT_COUNT;
+		features_.maxSimultaneousRts = D3D12_SIMULTANEOUS_RENDER_TARGET_COUNT;
+		features_.maxSimultaneousUavs = D3D12_PS_CS_UAV_REGISTER_COUNT;
+		features_.csSupport = true;
+		break;
+
+	default:
+		X_ASSERT_NOT_IMPLEMENTED();
+		break;
+	}
+
+	switch (featureLvl_)
+	{
+	case D3D_FEATURE_LEVEL_12_1:
+	case D3D_FEATURE_LEVEL_12_0:
+	case D3D_FEATURE_LEVEL_11_1:
+	case D3D_FEATURE_LEVEL_11_0:
+		features_.maxVertexStreams = D3D12_STANDARD_VERTEX_ELEMENT_COUNT;
+		break;
+
+	default:
+		X_ASSERT_NOT_IMPLEMENTED();
+		break;
+	}
+	switch (featureLvl_)
+	{
+	case D3D_FEATURE_LEVEL_12_1:
+	case D3D_FEATURE_LEVEL_12_0:
+	case D3D_FEATURE_LEVEL_11_1:
+	case D3D_FEATURE_LEVEL_11_0:
+		features_.maxTextureAnisotropy = D3D12_MAX_MAXANISOTROPY;
+		break;
+
+	default:
+		X_ASSERT_NOT_IMPLEMENTED();
+		break;
+	}
+
+
+	{
+		D3D12_FEATURE_DATA_ARCHITECTURE archFeature;
+		archFeature.NodeIndex = 0;
+		pDevice_->CheckFeatureSupport(D3D12_FEATURE_ARCHITECTURE, &archFeature, sizeof(archFeature));
+
+		features_.isTbdr = archFeature.TileBasedRenderer ? true : false;
+		features_.isUMA = archFeature.UMA ? true : false;
+	}
+
+	features_.hwInstancingSupport = true;
+	features_.instanceIdSupport = true;
+	features_.streamOutputSupport = true;
+	features_.alphaToCoverageSupport = true;
+	features_.primitiveRestartSupport = true;
+	features_.multithreadRenderingSupport = true;
+	features_.multithreadResCreatingSupport = true;
+	features_.mrtIndependentBitDepthsSupport = true;
+	features_.standardDerivativesSupport = true;
+	features_.shaderTextureLodSupport = true;
+	features_.logicOpSupport = true;
+	features_.independentBlendSupport = true;
+	features_.drawIndirectSupport = true;
+	features_.noOverwriteSupport = true;
+	features_.fullNpotTextureSupport = true;
+	features_.renderToTextureArraySupport = true;
+	features_.gsSupport = true;
+	features_.hsSupport = true;
+	features_.dsSupport = true;
+
+
+	// R32f / R16f
+	features_.packToRgbaRequired = false;
+	// D24S8 / D16
+	features_.depthTextureSupport = true;
+	// o.o
+	features_.fpColorSupport = true;
 }
 
 X_NAMESPACE_END
