@@ -335,6 +335,7 @@
     <ClInclude Include="DepthBuffer.h" />
     <ClInclude Include="DescriptorAllocator.h" />
     <ClInclude Include="DynamicDescriptorHeap.h" />
+    <ClInclude Include="Features.h" />
     <ClInclude Include="GpuBuffer.h" />
     <ClInclude Include="GpuResource.h" />
     <ClInclude Include="LinearAllocator.h" />
