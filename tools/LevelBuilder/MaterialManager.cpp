@@ -235,9 +235,9 @@ engine::IMaterial* MatManager::loadMaterialCompiled(const char* MtlName)
 		if (hdr.isValid())
 		{
 			// read the file entries.
-			engine::MaterialTexture texture[shader::ShaderTextureIdx::ENUM_COUNT];
+			engine::MaterialTexture texture[render::shader::ShaderTextureIdx::ENUM_COUNT];
 
-			uint32_t Num = core::Min<uint32_t>(hdr.numTextures, shader::ShaderTextureIdx::ENUM_COUNT);
+			uint32_t Num = core::Min<uint32_t>(hdr.numTextures, render::shader::ShaderTextureIdx::ENUM_COUNT);
 
 			if (file.readObjs(texture, Num) == Num)
 			{
