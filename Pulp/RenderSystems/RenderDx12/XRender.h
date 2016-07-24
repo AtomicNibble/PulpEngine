@@ -19,6 +19,9 @@
 X_NAMESPACE_DECLARE(texture,
 	class TextureManager;
 )
+X_NAMESPACE_DECLARE(core,
+	struct IConsoleCmdArgs;
+)
 
 X_NAMESPACE_BEGIN(render)
 
@@ -51,6 +54,10 @@ private:
 	void handleResolutionChange(void);
 	void populateFeatureInfo(void);
 	bool deviceIsSupported(void) const;
+
+private:
+	void Cmd_ListDeviceFeatures(core::IConsoleCmdArgs* pCmd);
+
 
 private:
 	core::MemoryArenaBase* arena_;

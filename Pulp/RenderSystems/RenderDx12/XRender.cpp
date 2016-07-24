@@ -3,6 +3,7 @@
 
 #include "Texture\TextureManager.h"
 
+#include <IConsole.h>
 
 X_NAMESPACE_BEGIN(render)
 
@@ -285,6 +286,9 @@ void XRender::registerVars(void)
 void XRender::registerCmds(void)
 {
 
+	ADD_COMMAND_MEMBER("r_list_device_features", this, XRender, &XRender::Cmd_ListDeviceFeatures,
+		core::VarFlag::SYSTEM, "List the gpu devices features");
+
 
 }
 
@@ -499,6 +503,22 @@ bool XRender::deviceIsSupported(void) const
 
 
 	return true;
+}
+
+void XRender::Cmd_ListDeviceFeatures(core::IConsoleCmdArgs* pCmd)
+{
+	X_UNUSED(pCmd);
+
+
+	X_LOG0("Dx12", "------ Device Info ------");
+	X_LOG0("Dx12", "Name: \"%ls\"", deviceName_.c_str());
+	X_LOG0("Dx12", "MaxTextureWidth: %" PRIu32, features_.maxTextureWidth);
+	X_LOG0("Dx12", "MaxTextureHeight: %" PRIu32, features_.maxTextureHeight);
+	X_LOG0("Dx12", "MaxTextureDepth: %" PRIu32, features_.maxTextureDepth);
+	X_LOG0("Dx12", "MaxTextureCubeSize: %" PRIu32, features_.maxTextureCubeSize);
+	X_LOG0("Dx12", "MaxTextureCubeSize: %" PRIu32, features_.maxTextureArrayLength);
+
+	X_LOG0("Dx12", "-------------------------");
 }
 
 X_NAMESPACE_END
