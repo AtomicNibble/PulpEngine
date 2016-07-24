@@ -639,12 +639,12 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 		uint32_t width = pWindow_->GetClientWidth();
 		uint32_t height = pWindow_->GetClientHeight();
 
-		if (!env_.pRender2->Init(hWnd, width, height)) {
+		if (!env_.pRender2->init(hWnd, width, height)) {
 			X_ERROR("Core", "Failed to init render system");
 			return false;
 		}
 
-		env_.pRender2->ShutDown();
+		env_.pRender2->shutDown();
 
 		X_LOG0("Core", "render init: ^6%gms");
 	}
