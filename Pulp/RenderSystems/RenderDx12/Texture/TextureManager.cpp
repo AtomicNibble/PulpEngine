@@ -9,7 +9,7 @@ X_NAMESPACE_BEGIN(texture)
 
 	TextureManager::TextureManager(core::MemoryArenaBase* arena) :
 		arena_(arena),
-		textures_(arena, 2048),
+		textures_(arena, TEX_MAX_LOADED_IMAGES),
 		pTexDefault_(nullptr),
 		pTexDefaultBump_(nullptr),
 		ptexMipMapDebug_(nullptr)
