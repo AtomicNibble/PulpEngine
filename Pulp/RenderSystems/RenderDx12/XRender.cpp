@@ -476,22 +476,22 @@ bool XRender::deviceIsSupported(void) const
 	// that might get built in anyway as part of quality options.
 	{
 		if (features_.maxTextureWidth < texture::TEX_MAX_DIMENSIONS) {
-			X_ERROR("Dx12", "Decide does not support required texture width: %i supported: %i",
+			X_ERROR("Dx12", "Device does not support required texture width: %i supported: %i",
 				texture::TEX_MAX_DIMENSIONS, features_.maxTextureWidth);
 			return false;
 		}
 		if (features_.maxTextureHeight < texture::TEX_MAX_DIMENSIONS) {
-			X_ERROR("Dx12", "Decide does not support required texture height: %i supported: %i",
+			X_ERROR("Dx12", "Device does not support required texture height: %i supported: %i",
 				texture::TEX_MAX_DIMENSIONS, features_.maxTextureHeight);
 			return false;
 		}
 		if (features_.maxTextureDepth < texture::TEX_MAX_DEPTH) {
-			X_ERROR("Dx12", "Decide does not support required depth size: %i supported: %i",
+			X_ERROR("Dx12", "Device does not support required depth size: %i supported: %i",
 				texture::TEX_MAX_DEPTH, features_.maxTextureDepth);
 			return false;
 		}
 		if (features_.maxTextureCubeSize < texture::TEX_MAX_FACES) {
-			X_ERROR("Dx12", "Decide does not support required cube size: %i supported: %i",
+			X_ERROR("Dx12", "Device does not support required cube size: %i supported: %i",
 				texture::TEX_MAX_FACES, features_.maxTextureCubeSize);
 			return false;
 		}
