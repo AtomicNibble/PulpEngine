@@ -405,12 +405,15 @@ struct IRender2
 {
 	virtual ~IRender2() {};
 
-	virtual bool Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height) X_ABSTRACT;
-	virtual void ShutDown(void) X_ABSTRACT;
+	virtual bool init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height) X_ABSTRACT;
+	virtual void shutDown(void) X_ABSTRACT;
 	virtual void freeResources(void) X_ABSTRACT;
 
-	virtual void RenderBegin(void) X_ABSTRACT;
-	virtual void RenderEnd(void) X_ABSTRACT;
+	virtual void registerVars(void) X_ABSTRACT;
+	virtual void registerCmds(void) X_ABSTRACT;
+
+	virtual void renderBegin(void) X_ABSTRACT;
+	virtual void renderEnd(void) X_ABSTRACT;
 
 };
 

@@ -32,19 +32,22 @@ public:
 	XRender(core::MemoryArenaBase* arena);
 	~XRender();
 
-	bool Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height) X_OVERRIDE;
-	void ShutDown(void) X_OVERRIDE;
+	bool init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height) X_OVERRIDE;
+	void shutDown(void) X_OVERRIDE;
 	void freeResources(void) X_OVERRIDE;
 
-	void RenderBegin(void) X_OVERRIDE;
-	void RenderEnd(void) X_OVERRIDE;
+	void registerVars(void) X_OVERRIDE;
+	void registerCmds(void) X_OVERRIDE;
+
+	void renderBegin(void) X_OVERRIDE;
+	void renderEnd(void) X_OVERRIDE;
 
 private:
-	bool FreeSwapChainResources(void);
+	bool freeSwapChainResources(void);
 
-	bool InitRenderBuffers(Vec2<uint32_t> res);
-	bool Resize(uint32_t width, uint32_t height);
-	void HandleResolutionChange(void);
+	bool initRenderBuffers(Vec2<uint32_t> res);
+	bool resize(uint32_t width, uint32_t height);
+	void handleResolutionChange(void);
 
 
 private:

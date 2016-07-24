@@ -29,7 +29,7 @@ XRender::~XRender()
 	}
 }
 
-bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
+bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 {
 	if (hWnd == static_cast<HWND>(0)) {
 		X_ERROR("dx10", "target window is not valid");
@@ -89,6 +89,15 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	if (!pDevice_) {
 		X_ERROR("Dx12", "Failed to CreateDevice: %" PRIu32, hr);
 		return false;
+	}
+
+	{
+		D3D12_FEATURE_DATA_ARCHITECTURE archFeature;
+		archFeature.NodeIndex = 0;
+		pDevice_->CheckFeatureSupport(D3D12_FEATURE_ARCHITECTURE, &archFeature, sizeof(archFeature));
+
+		archFeature.CacheCoherentUMA;
+		archFeature.TileBasedRenderer;
 	}
 
 	{
@@ -223,7 +232,7 @@ bool XRender::Init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	return true;
 }
 
-void XRender::ShutDown(void)
+void XRender::shutDown(void)
 {
 	if (pTextureMan_) {
 		pTextureMan_->shutDown();
@@ -234,7 +243,7 @@ void XRender::ShutDown(void)
 
 	cmdListManager_.shutdown();
 
-	FreeSwapChainResources();
+	freeSwapChainResources();
 
 	if (pDescriptorAllocator_) {
 		pDescriptorAllocator_->destoryAllHeaps();
@@ -266,12 +275,25 @@ void XRender::freeResources(void)
 
 }
 
-void XRender::RenderBegin(void)
+
+void XRender::registerVars(void)
+{
+
+
+}
+
+void XRender::registerCmds(void)
+{
+
+
+}
+
+void XRender::renderBegin(void)
 {
 
 }
 
-void XRender::RenderEnd(void)
+void XRender::renderEnd(void)
 {
 	currentBufferIdx_ = (currentBufferIdx_ + 1) % SWAP_CHAIN_BUFFER_COUNT;
 
@@ -281,12 +303,12 @@ void XRender::RenderEnd(void)
 		X_ERROR("Dx12", "Present failed. err: %" PRIu32, hr);
 	}
 
-	HandleResolutionChange();
+	handleResolutionChange();
 }
 
 
 
-bool XRender::FreeSwapChainResources(void)
+bool XRender::freeSwapChainResources(void)
 {
 	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i) {
 		displayPlane_[i].destroy();
@@ -296,7 +318,7 @@ bool XRender::FreeSwapChainResources(void)
 }
 
 
-bool XRender::InitRenderBuffers(Vec2<uint32_t> res)
+bool XRender::initRenderBuffers(Vec2<uint32_t> res)
 {
 
 
@@ -304,7 +326,7 @@ bool XRender::InitRenderBuffers(Vec2<uint32_t> res)
 }
 
 
-bool XRender::Resize(uint32_t width, uint32_t height)
+bool XRender::resize(uint32_t width, uint32_t height)
 {
 	X_LOG1("Dx12", "Resizing display res to: x:%x y:%x", width, height);
 	X_ASSERT_NOT_NULL(pSwapChain_);
@@ -313,7 +335,7 @@ bool XRender::Resize(uint32_t width, uint32_t height)
 	displayRes_.x = width;
 	displayRes_.y = height;
 
-	FreeSwapChainResources();
+	freeSwapChainResources();
 
 	pSwapChain_->ResizeBuffers(SWAP_CHAIN_BUFFER_COUNT, displayRes_.x, displayRes_.y, SWAP_CHAIN_FORMAT, 0);
 
@@ -332,7 +354,7 @@ bool XRender::Resize(uint32_t width, uint32_t height)
 	return true;
 }
 
-void XRender::HandleResolutionChange(void)
+void XRender::handleResolutionChange(void)
 {
 	if (currentNativeRes_ == targetNativeRes_) {
 		return;
@@ -348,7 +370,7 @@ void XRender::HandleResolutionChange(void)
 	cmdListManager_.idleGPU();
 
 	// re int buffers
-	InitRenderBuffers(targetNativeRes_);
+	initRenderBuffers(targetNativeRes_);
 }
 
 X_NAMESPACE_END
