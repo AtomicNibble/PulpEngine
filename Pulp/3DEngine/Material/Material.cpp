@@ -186,8 +186,9 @@ XMaterial::~XMaterial()
 
 void XMaterial::ShutDown(void)
 {
-	core::SafeRelease(shaderItem_.pShader_);
-	core::SafeRelease(shaderItem_.pResources_);
+	X_ASSERT_NOT_IMPLEMENTED();
+//	core::SafeRelease(shaderItem_.pShader_);
+//	core::SafeRelease(shaderItem_.pResources_);
 
 	// free my nipples!
 	if (getMaterialManager()) {
@@ -297,7 +298,7 @@ void XMaterial::setCoverage(MaterialCoverage::Enum coverage)
 	coverage_ = coverage;
 }
 
-
+#if 0
 void XMaterial::setShaderItem(shader::XShaderItem& item)
 {
 	core::SafeRelease(shaderItem_.pShader_);
@@ -305,6 +306,7 @@ void XMaterial::setShaderItem(shader::XShaderItem& item)
 
 	shaderItem_ = item;
 }
+#endif
 
 
 bool XMaterial::isDefault() const

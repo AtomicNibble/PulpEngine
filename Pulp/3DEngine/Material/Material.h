@@ -72,8 +72,8 @@ public:
 	virtual MaterialCoverage::Enum getCoverage(void) const X_OVERRIDE;
 	virtual void setCoverage(MaterialCoverage::Enum coverage) X_OVERRIDE;
 
-	virtual void setShaderItem(shader::XShaderItem& item) X_OVERRIDE;
-	virtual shader::XShaderItem& getShaderItem(void) X_OVERRIDE{ return shaderItem_; }
+//	virtual void setShaderItem(shader::XShaderItem& item) X_OVERRIDE;
+//	virtual shader::XShaderItem& getShaderItem(void) X_OVERRIDE{ return shaderItem_; }
 
 	virtual bool isDefault() const X_OVERRIDE;
 
@@ -97,7 +97,7 @@ protected:
 	MaterialType::Enum		MatType_;
 	MaterialCoverage::Enum  coverage_;
 
-	shader::XShaderItem     shaderItem_;
+//	shader::XShaderItem     shaderItem_;
 
 };
 

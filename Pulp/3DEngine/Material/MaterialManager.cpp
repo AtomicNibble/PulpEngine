@@ -394,7 +394,11 @@ namespace {
 		// anything else?
 		XShaderItem item = gEnv->pRender->LoadShaderItem(input);
 
+#if 1
+		X_ASSERT_NOT_IMPLEMENTED();
+#else
 		pMaterial->setShaderItem(item);
+#endif
 
 		return true;
 	}
@@ -529,7 +533,11 @@ void XMaterialManager::InitDefaults(void)
 		// load the shader / textures needed.
 		XShaderItem item = gEnv->pRender->LoadShaderItem(input);
 
+#if 1 
+		X_ASSERT_NOT_IMPLEMENTED();
+#else
 		pDefaultMtl_->setShaderItem(item);
+#endif
 		pDefaultMtl_->setCoverage(MaterialCoverage::OPAQUE);
 	}
 }
@@ -775,7 +783,11 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 				// load the shader / textures needed.
 				XShaderItem item = gEnv->pRender->LoadShaderItem(input);
 
+#if 1
+				X_ASSERT_NOT_IMPLEMENTED();
+#else
 				pMat->setShaderItem(item);
+#endif
 
 			}
 			else
@@ -795,6 +807,10 @@ IMaterial* XMaterialManager::loadMaterialCompiled(const char* MtlName)
 bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 {
 	X_ASSERT_NOT_NULL(pMat_);
+
+#if 1
+	X_ASSERT_NOT_IMPLEMENTED();
+#else
 	core::Path<char> path;
 	XMaterial* pMat;
 	MaterialHeader hdr;
@@ -850,6 +866,7 @@ bool XMaterialManager::saveMaterialCompiled(IMaterial* pMat_)
 		return true;
 	}
 
+#endif
 	return false;
 }
 

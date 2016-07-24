@@ -1628,6 +1628,9 @@ void XWindow::drawBackground(const Rectf& drawRect)
 	}
 	else if (style_ == WindowStyle::SHADER || style_ == WindowStyle::DVAR_SHADER)
 	{
+#if 1
+		X_ASSERT_NOT_IMPLEMENTED();
+#else
 		const Color& col = backColor_;
 
 		pRender_->setGUIShader(true);
@@ -1637,6 +1640,7 @@ void XWindow::drawBackground(const Rectf& drawRect)
 		texture::TexID texId = texRes->pITex->getTexID();
 
 		pRender_->DrawQuadImageSS(drawRect, texId, col);
+#endif
 	}
 }
 
