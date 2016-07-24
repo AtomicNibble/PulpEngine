@@ -16,6 +16,7 @@ class Texture;
 class TextureManager : public core::IXHotReload
 {
 	typedef core::HashMap<core::string, Texture*> TextureMap;
+	typedef core::FixedArray<ITextureFmt*, 8> TextureLoadersArr;
 
 public:
 	TextureManager(core::MemoryArenaBase* arena);
@@ -40,6 +41,8 @@ private:
 	bool loadDefaultTextures(void);
 	void releaseDefaultTextures(void);
 
+	bool loadFromFile(const char* pPath);
+
 	// IXHotReload
 	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
 	// ~IXHotReload
@@ -53,6 +56,9 @@ private:
 	core::MemoryArenaBase* arena_;
 	TextureMap textures_;
 	TextureVars vars_;
+
+	ITextureFmt* pCILoader_;
+	TextureLoadersArr textureLoaders_;
 
 private:
 	Texture* pTexDefault_;

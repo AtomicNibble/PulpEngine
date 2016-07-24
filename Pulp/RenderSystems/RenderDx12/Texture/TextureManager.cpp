@@ -2,6 +2,7 @@
 #include "TextureManager.h"
 #include "Texture.h"
 
+#include <ICi.h>
 #include <IConsole.h>
 
 X_NAMESPACE_BEGIN(texture)
@@ -28,6 +29,14 @@ X_NAMESPACE_BEGIN(texture)
 		X_ASSERT_NOT_NULL(gEnv->pConsole);
 		X_LOG1("TextureManager", "Starting");
 
+		pCILoader_ = X_NEW(CI::XTexLoaderCI, arena_, "CILoader");
+
+		textureLoaders_.append(pCILoader_);
+		textureLoaders_.append(X_NEW(DDS::XTexLoaderDDS, arena_, "DDSLoader"));
+		textureLoaders_.append(X_NEW(JPG::XTexLoaderJPG, arena_, "JPGLoader"));
+		textureLoaders_.append(X_NEW(PNG::XTexLoaderPNG, arena_, "PNGLoader"));
+		textureLoaders_.append(X_NEW(PSD::XTexLoaderPSD, arena_, "PSDLoader"));
+		textureLoaders_.append(X_NEW(TGA::XTexLoaderTGA, arena_, "TGALoader"));
 
 
 		auto hotReload = gEnv->pHotReload;
@@ -59,6 +68,10 @@ X_NAMESPACE_BEGIN(texture)
 		hotReload->addfileType(nullptr, "tga");
 
 		releaseDefaultTextures();
+
+		for (auto tl : textureLoaders_) {
+			X_DELETE(tl, arena_);
+		}
 
 		return true;
 	}
@@ -181,8 +194,57 @@ X_NAMESPACE_BEGIN(texture)
 		core::SafeRelease(pTexDefault_);
 		core::SafeRelease(pTexDefaultBump_);
 		core::SafeRelease(ptexMipMapDebug_);
-
 	}
+
+	bool TextureManager::loadFromFile(const char* pPath)
+	{
+		X_ASSERT_NOT_NULL(pCILoader_);
+		X_ASSERT_NOT_NULL(pPath);
+
+		core::IFileSys::fileModeFlags mode;
+		mode.Set(core::IFileSys::fileMode::READ);
+
+		core::Path<char> path(pPath);
+		path.toLower(); // lower case file names only.
+		path.setExtension(CI_FILE_EXTENSION);
+
+		XTextureFile imgFile(arena_);
+		core::XFileScoped file;
+
+		if (file.openFile(path.c_str(), mode)) 	
+		{
+			if (!pCILoader_->loadTexture(file.GetFile(), imgFile, arena_)) {
+				X_WARNING("Texture", "Failed to load: \"%s\"", pPath);
+				return false;
+			}
+
+			return true;
+		}
+
+		if (!vars_.allowRawImgLoading()) {
+			return false;
+		}
+
+		// try loading none compiled.
+		core::IFileSys* pFileSys = gEnv->pFileSys;
+		for (auto pLoader : textureLoaders_)
+		{
+			path.setExtension(pLoader->getExtension());
+
+			if (pFileSys->fileExists(path.c_str()))
+			{
+				if (!pLoader->loadTexture(file.GetFile(), imgFile, arena_)) {
+					X_WARNING("Texture", "Failed to load: \"%s\"", pPath);
+					return false;
+				}
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 
 	void TextureManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 	{
