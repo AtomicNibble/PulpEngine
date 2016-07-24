@@ -29,16 +29,6 @@ X_NAMESPACE_BEGIN(texture)
 		X_ASSERT_NOT_NULL(gEnv->pConsole);
 		X_LOG1("TextureManager", "Starting");
 
-		pCILoader_ = X_NEW(CI::XTexLoaderCI, arena_, "CILoader");
-
-		textureLoaders_.append(pCILoader_);
-		textureLoaders_.append(X_NEW(DDS::XTexLoaderDDS, arena_, "DDSLoader"));
-		textureLoaders_.append(X_NEW(JPG::XTexLoaderJPG, arena_, "JPGLoader"));
-		textureLoaders_.append(X_NEW(PNG::XTexLoaderPNG, arena_, "PNGLoader"));
-		textureLoaders_.append(X_NEW(PSD::XTexLoaderPSD, arena_, "PSDLoader"));
-		textureLoaders_.append(X_NEW(TGA::XTexLoaderTGA, arena_, "TGALoader"));
-
-
 		auto hotReload = gEnv->pHotReload;
 		hotReload->addfileType(this, "ci");
 		hotReload->addfileType(this, "dds");
@@ -49,6 +39,26 @@ X_NAMESPACE_BEGIN(texture)
 
 		registerVars();
 		registerCmds();
+
+
+		pCILoader_ = X_NEW(CI::XTexLoaderCI, arena_, "CILoader");
+
+		textureLoaders_.append(pCILoader_);
+		if (vars_.allowFmtDDS()) {
+			textureLoaders_.append(X_NEW(DDS::XTexLoaderDDS, arena_, "DDSLoader"));
+		}
+		if (vars_.allowFmtJPG()) {
+			textureLoaders_.append(X_NEW(JPG::XTexLoaderJPG, arena_, "JPGLoader"));
+		}
+		if (vars_.allowFmtPNG()) {
+			textureLoaders_.append(X_NEW(PNG::XTexLoaderPNG, arena_, "PNGLoader"));
+		}
+		if (vars_.allowFmtPSD()) {
+			textureLoaders_.append(X_NEW(PSD::XTexLoaderPSD, arena_, "PSDLoader"));
+		}
+		if (vars_.allowFmtTGA()) {
+			textureLoaders_.append(X_NEW(TGA::XTexLoaderTGA, arena_, "TGALoader"));
+		}
 
 		loadDefaultTextures();
 
