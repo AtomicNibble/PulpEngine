@@ -19,6 +19,9 @@
     <Filter Include="FreeType\Modules">
       <UniqueIdentifier>{9db581a7-b443-4fa8-8e54-91593e3c9687}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\EngineModule">
+      <UniqueIdentifier>{fc51956f-9c3e-4683-8c97-b0f40afbca67}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -51,9 +54,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Font.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="IXFont.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="XFontTexture.cpp">
@@ -199,6 +199,9 @@
     </ClCompile>
     <ClCompile Include="FontXml.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Module.cpp">
+      <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

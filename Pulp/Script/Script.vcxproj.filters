@@ -18,6 +18,9 @@
     <Filter Include="Lua\src">
       <UniqueIdentifier>{26a6a525-0647-49de-9880-873633e9330d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\EngineModule">
+      <UniqueIdentifier>{890ea6ce-2b7b-4a13-ae10-b2c3b93e525a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -128,9 +131,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ScriptSys.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="IPScriptSys.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="binds\ScriptBinds.cpp">
@@ -261,6 +261,9 @@
     </ClCompile>
     <ClCompile Include="binds\ScriptableBase.cpp">
       <Filter>Binds</Filter>
+    </ClCompile>
+    <ClCompile Include="Module.cpp">
+      <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -349,7 +349,7 @@
     <ClCompile Include="BaseInput.cpp" />
     <ClCompile Include="InputCVars.cpp" />
     <ClCompile Include="InputDevice.cpp" />
-    <ClCompile Include="IPInput.cpp" />
+    <ClCompile Include="Module.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>

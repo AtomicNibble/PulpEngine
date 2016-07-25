@@ -357,7 +357,7 @@
     <ClCompile Include="DebugRenderLine.cpp" />
     <ClCompile Include="DebugRenderPoints.cpp" />
     <ClCompile Include="DebugRenderTriangle.cpp" />
-    <ClCompile Include="IXPhysics.cpp" />
+    <ClCompile Include="Module.cpp" />
     <ClCompile Include="Logger.cpp" />
     <ClCompile Include="PhysicsVars.cpp" />
     <ClCompile Include="stdafx.cpp">

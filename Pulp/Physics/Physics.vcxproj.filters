@@ -27,6 +27,9 @@
     <Filter Include="Source Files\DebugRender">
       <UniqueIdentifier>{0509623a-efb0-4c19-ac28-4031c29b8d0c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\EngineModule">
+      <UniqueIdentifier>{2074c190-9e17-48b0-861f-980b4ca2b208}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -73,9 +76,6 @@
     <ClCompile Include="XPhysics.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IXPhysics.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Stepper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -102,6 +102,9 @@
     </ClCompile>
     <ClCompile Include="DebugRenderTriangle.cpp">
       <Filter>Source Files\DebugRender</Filter>
+    </ClCompile>
+    <ClCompile Include="Module.cpp">
+      <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

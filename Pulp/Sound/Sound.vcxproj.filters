@@ -24,6 +24,9 @@
     <Filter Include="Source Files\Vars">
       <UniqueIdentifier>{b872ce1c-4554-4f09-8dcf-cd05dd133261}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\EngineModule">
+      <UniqueIdentifier>{30866814-56a6-45c1-9750-192eefcea609}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -52,14 +55,14 @@
     <ClCompile Include="XSound.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IPSound.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="IO\AkIoHook.cpp">
       <Filter>Source Files\IO</Filter>
     </ClCompile>
     <ClCompile Include="Vars\SoundVars.cpp">
       <Filter>Source Files\Vars</Filter>
+    </ClCompile>
+    <ClCompile Include="Module.cpp">
+      <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

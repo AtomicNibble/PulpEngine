@@ -19,6 +19,9 @@
     <Filter Include="Source Files\win32">
       <UniqueIdentifier>{31bf5c31-32f1-4c43-b82b-5d2c5f4fdaa6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\EngineModule">
+      <UniqueIdentifier>{c31632cd-ccb7-4c27-9ae3-db74f90a2b00}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -53,9 +56,6 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="IPInput.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="InputCVars.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -76,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="win32\Win32Input.cpp">
       <Filter>Source Files\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Module.cpp">
+      <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

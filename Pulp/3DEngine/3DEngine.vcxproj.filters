@@ -25,9 +25,6 @@
     <ClCompile Include="X3DEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="RenderEngine.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -54,6 +51,9 @@
     </ClCompile>
     <ClCompile Include="Drawing\CmdBucket.cpp">
       <Filter>Source Files\Drawing</Filter>
+    </ClCompile>
+    <ClCompile Include="Module.cpp">
+      <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -142,6 +142,9 @@
     </Filter>
     <Filter Include="Source Files\Drawing">
       <UniqueIdentifier>{876cd417-e7a9-4f96-b538-6d48eeea928d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\EngineModule">
+      <UniqueIdentifier>{01ba8cbc-4be9-4335-b3b3-936c4abb977e}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

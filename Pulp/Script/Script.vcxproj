@@ -386,7 +386,7 @@
     <ClCompile Include="binds\ScriptBinds_script.cpp" />
     <ClCompile Include="binds\ScriptBinds_sound.cpp" />
     <ClCompile Include="FunctionHandler.cpp" />
-    <ClCompile Include="IPScriptSys.cpp" />
+    <ClCompile Include="Module.cpp" />
     <ClCompile Include="lua\lapi.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">NotUsing</PrecompiledHeader>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>

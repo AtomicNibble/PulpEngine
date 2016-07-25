@@ -1674,7 +1674,7 @@
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Level3</WarningLevel>
       <WarningLevel Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Level3</WarningLevel>
     </ClCompile>
-    <ClCompile Include="IXFont.cpp" />
+    <ClCompile Include="Module.cpp" />
     <ClCompile Include="XFontRender.cpp" />
     <ClCompile Include="XGlyphBitmap.cpp" />
     <ClCompile Include="XNullfont.cpp" />
