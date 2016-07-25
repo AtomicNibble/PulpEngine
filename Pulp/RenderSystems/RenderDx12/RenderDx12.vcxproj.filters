@@ -134,6 +134,9 @@
     <ClInclude Include="Features.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AuxRender.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -220,6 +223,9 @@
     <ClCompile Include="Texture\TextureVars.cpp">
       <Filter>Source Files\Texture</Filter>
     </ClCompile>
+    <ClCompile Include="AuxRender.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
@@ -287,6 +293,9 @@
     </None>
     <None Include="Texture\TextureVars.inl">
       <Filter>Header Files\Texture</Filter>
+    </None>
+    <None Include="AuxRender.inl">
+      <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
 </Project>
