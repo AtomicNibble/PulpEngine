@@ -22,6 +22,18 @@ namespace
 }
 
 
+// -------------------------------------------------------
+
+RenderAux::AuxGeomCBRawData::AuxGeomCBRawData(core::MemoryArenaBase* arena) :
+	auxPushArr(arena),
+	auxVertexArr(arena),
+	auxIndexArr(arena),
+	auxDrawObjParamArr(arena),
+	auxOrthoMatrices(arena)
+{
+
+}
+
 
 void RenderAux::AuxGeomCBRawData::getSortedPushBuffer(size_t begin, size_t end,
 	AuxSortedPushArr& auxSortedPushBuffer) const
