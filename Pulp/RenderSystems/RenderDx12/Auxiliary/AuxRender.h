@@ -7,14 +7,13 @@
 
 X_NAMESPACE_BEGIN(render)
 
-struct XAuxGeomCBRawDataPackaged;
+struct AuxGeomCBRawDataPackaged;
 
 struct IRenderAuxImpl
 {
 public:
 	virtual ~IRenderAuxImpl() {}
-	virtual void Flush(const XAuxGeomCBRawDataPackaged& data, size_t begin, size_t end) X_ABSTRACT;
-	virtual void RT_Flush(const XAuxGeomCBRawDataPackaged& data, size_t begin, size_t end) X_ABSTRACT;
+	virtual void flush(const AuxGeomCBRawDataPackaged& data, size_t begin, size_t end) X_ABSTRACT;
 };
 
 struct AuxDrawObjParams
@@ -30,9 +29,12 @@ struct AuxDrawObjParams
 	bool _pad[4];
 };
 
-
+class RenderAuxImp;
 class RenderAux : public IRenderAux
 {
+	friend class RenderAuxImp;
+	friend struct AuxGeomCBRawDataPackaged;
+
 	X_DECLARE_ENUM(DrawObjType)(Sphere, Cone, Cylinder);
 	X_DECLARE_ENUM(PrimType)(Invalid, PtList, LineList, LineListInd, TriList, TriListInd, Obj);
 
@@ -85,6 +87,7 @@ class RenderAux : public IRenderAux
 	typedef core::Array<AuxDrawObjParams> AuxDrawObjParamArr;
 	typedef core::Array<Matrix44f> AuxOrthoMatrixArr;
 
+protected:
 	struct AuxGeomCBRawData
 	{
 	public:

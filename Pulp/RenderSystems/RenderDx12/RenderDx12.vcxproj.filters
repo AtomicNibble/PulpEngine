@@ -143,6 +143,9 @@
     <ClInclude Include="Auxiliary\AuxRender.h">
       <Filter>Header Files\Auxiliary</Filter>
     </ClInclude>
+    <ClInclude Include="Auxiliary\AuxRenderImp.h">
+      <Filter>Header Files\Auxiliary</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -232,6 +235,9 @@
     <ClCompile Include="Auxiliary\AuxRender.cpp">
       <Filter>Source Files\Auxiliary</Filter>
     </ClCompile>
+    <ClCompile Include="Auxiliary\AuxRenderImp.cpp">
+      <Filter>Source Files\Auxiliary</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
@@ -301,6 +307,9 @@
       <Filter>Header Files\Texture</Filter>
     </None>
     <None Include="Auxiliary\AuxRender.inl">
+      <Filter>Header Files\Auxiliary</Filter>
+    </None>
+    <None Include="Auxiliary\AuxRenderImp.inl">
       <Filter>Header Files\Auxiliary</Filter>
     </None>
   </ItemGroup>
