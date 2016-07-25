@@ -327,7 +327,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="AuxRender.h" />
+    <ClInclude Include="Auxiliary\AuxRender.h" />
     <ClInclude Include="ColorBuffer.h" />
     <ClInclude Include="CommandAllocatorPool.h" />
     <ClInclude Include="CommandContex.h" />
@@ -361,7 +361,7 @@
     <ClInclude Include="XRender.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="AuxRender.cpp" />
+    <ClCompile Include="Auxiliary\AuxRender.cpp" />
     <ClCompile Include="ColorBuffer.cpp" />
     <ClCompile Include="CommandAllocatorPool.cpp" />
     <ClCompile Include="CommandContex.cpp" />
@@ -403,7 +403,7 @@
     <ClCompile Include="XRender.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="AuxRender.inl" />
+    <None Include="Auxiliary\AuxRender.inl" />
     <None Include="ColorBuffer.inl" />
     <None Include="CommandAllocatorPool.inl" />
     <None Include="CommandContex.inl" />

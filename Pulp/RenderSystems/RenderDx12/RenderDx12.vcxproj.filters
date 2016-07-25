@@ -39,6 +39,12 @@
     <Filter Include="Source Files\Texture">
       <UniqueIdentifier>{2b92c334-4bfc-4797-bc8b-d27c649bda7d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Auxiliary">
+      <UniqueIdentifier>{a26dabc2-6f1f-4a57-91cb-2aa2ed88bacb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Auxiliary">
+      <UniqueIdentifier>{a76ee69f-2a9e-4804-84c4-03af50d9084e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -134,8 +140,8 @@
     <ClInclude Include="Features.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AuxRender.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="Auxiliary\AuxRender.h">
+      <Filter>Header Files\Auxiliary</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -223,8 +229,8 @@
     <ClCompile Include="Texture\TextureVars.cpp">
       <Filter>Source Files\Texture</Filter>
     </ClCompile>
-    <ClCompile Include="AuxRender.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Auxiliary\AuxRender.cpp">
+      <Filter>Source Files\Auxiliary</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -294,8 +300,8 @@
     <None Include="Texture\TextureVars.inl">
       <Filter>Header Files\Texture</Filter>
     </None>
-    <None Include="AuxRender.inl">
-      <Filter>Header Files</Filter>
+    <None Include="Auxiliary\AuxRender.inl">
+      <Filter>Header Files\Auxiliary</Filter>
     </None>
   </ItemGroup>
 </Project>
