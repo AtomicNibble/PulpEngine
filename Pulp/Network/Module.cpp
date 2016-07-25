@@ -25,7 +25,7 @@ class XEngineModule_Network : public IEngineModule
 	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Network, "Engine_Network");
 
 	//////////////////////////////////////////////////////////////////////////
-	virtual const char *GetName() X_OVERRIDE { return "Network"; };
+	virtual const char* GetName(void) X_OVERRIDE { return "Network"; };
 
 	//////////////////////////////////////////////////////////////////////////
 	virtual bool Initialize(SCoreGlobals &env, const SCoreInitParams &initParams) X_OVERRIDE

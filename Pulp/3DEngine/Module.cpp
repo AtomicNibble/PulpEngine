@@ -36,7 +36,7 @@ class XEngineModule_3DEngine : public IEngineModule
 {
 	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_3DEngine, "Engine_3DEngine");
 	//////////////////////////////////////////////////////////////////////////
-	virtual const char *GetName() X_OVERRIDE{ return "3DEngine"; };
+	virtual const char* GetName(void) X_OVERRIDE{ return "3DEngine"; };
 
 	//////////////////////////////////////////////////////////////////////////
 	virtual bool Initialize(SCoreGlobals &env, const SCoreInitParams &initParams) X_OVERRIDE

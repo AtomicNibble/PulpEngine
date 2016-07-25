@@ -70,7 +70,7 @@ class XEngineModule_Render : public IEngineModule
 {
 	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Render, "Engine_RenderNull");
 	//////////////////////////////////////////////////////////////////////////
-	virtual const char *GetName() X_OVERRIDE{ return "RenderNull"; };
+	virtual const char* GetName(void) X_OVERRIDE{ return "RenderNull"; };
 
 	//////////////////////////////////////////////////////////////////////////
 	virtual bool Initialize(SCoreGlobals& env, const SCoreInitParams& initParams) X_OVERRIDE

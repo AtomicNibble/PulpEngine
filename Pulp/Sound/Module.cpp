@@ -40,7 +40,7 @@ class XEngineModule_Sound : public IEngineModule
 {
 	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Sound, "Engine_Sound");
 	//////////////////////////////////////////////////////////////////////////
-	virtual const char *GetName() X_OVERRIDE{ return "Sound"; };
+	virtual const char* GetName(void) X_OVERRIDE{ return "Sound"; };
 
 	//////////////////////////////////////////////////////////////////////////
 	virtual bool Initialize(SCoreGlobals &env, const SCoreInitParams &initParams) X_OVERRIDE

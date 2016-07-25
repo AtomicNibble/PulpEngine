@@ -37,7 +37,7 @@ class XEngineModule_Script : public IEngineModule
 {
 	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Script, "Engine_Script");
 	//////////////////////////////////////////////////////////////////////////
-	virtual const char *GetName() X_OVERRIDE{ return "Script"; };
+	virtual const char* GetName(void) X_OVERRIDE{ return "Script"; };
 
 	//////////////////////////////////////////////////////////////////////////
 	virtual bool Initialize(SCoreGlobals &env, const SCoreInitParams &initParams) X_OVERRIDE

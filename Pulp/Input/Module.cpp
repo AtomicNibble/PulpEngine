@@ -40,7 +40,7 @@ class XEngineModule_Input : public IEngineModule
 {
 	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Input, "Engine_Input");
 	//////////////////////////////////////////////////////////////////////////
-	virtual const char *GetName() X_OVERRIDE{ return "Input"; };
+	virtual const char* GetName(void) X_OVERRIDE{ return "Input"; };
 
 	//////////////////////////////////////////////////////////////////////////
 	virtual bool Initialize(SCoreGlobals &env, const SCoreInitParams &initParams) X_OVERRIDE

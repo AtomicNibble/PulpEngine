@@ -27,7 +27,7 @@ class XEngineModule_Font : public IEngineModule
 	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Font, "Engine_Font");
 
 	//////////////////////////////////////////////////////////////////////////
-	virtual const char *GetName() X_OVERRIDE { return "Font"; };
+	virtual const char* GetName(void) X_OVERRIDE { return "Font"; };
 
 	//////////////////////////////////////////////////////////////////////////
 	virtual bool Initialize(SCoreGlobals &env, const SCoreInitParams &initParams) X_OVERRIDE
