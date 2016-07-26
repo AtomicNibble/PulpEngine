@@ -483,6 +483,7 @@
     <ClCompile Include="Platform\win32\Pipe.cpp" />
     <ClCompile Include="Platform\win32\SystemInfo.cpp" />
     <ClCompile Include="Platform\win32\TrayIcon.cpp" />
+    <ClCompile Include="Sorting\RadixSort.cpp" />
     <ClCompile Include="Time\win32\StopWatch.cpp" />
     <ClCompile Include="Util\Delegate.gen">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>

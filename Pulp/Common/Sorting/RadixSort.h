@@ -269,6 +269,45 @@ namespace Sorting
 		radix_sort_uint64_buf(pIn, pEnd, sortedIndexes, tempIndexArena);
 	}
 
+
+
+	
+	class RadixSort
+	{
+	public:
+		RadixSort(core::MemoryArenaBase* arena);
+		~RadixSort();
+
+		RadixSort& sort(const uint32* pInput, size_t num);
+
+		std::pair<const uint32_t*, size_t> getRanks(void) const;
+
+	private:
+		void checkSize(size_t num);
+
+	private:
+		core::Array<uint32_t> histogram_;
+		core::Array<uint32_t*> buckets_;
+
+		core::Array<uint32_t> ranks_;
+		core::Array<uint32_t> ranks2_;
+
+		// pointers to above arrays that are swapped.
+		// could just swap the arrays if i wanted.
+		uint32_t* pRanks_;
+		uint32_t* pRanks2_;
+
+		size_t currentSize_;
+		size_t allocatedSize_;
+
+		bool ranksValid_;
+	};
+
+
+
+
+
+
 } // namespace Sorting
 
 X_NAMESPACE_END

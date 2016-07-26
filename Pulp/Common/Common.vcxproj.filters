@@ -202,6 +202,9 @@
     <Filter Include="Headers\Sorting">
       <UniqueIdentifier>{606c6d95-146f-4382-94c2-011809357955}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SourceFiles\Sorting">
+      <UniqueIdentifier>{c5f7a20b-16f3-459a-956f-ded67ee7cf9f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -1712,6 +1715,9 @@
     </ClCompile>
     <ClCompile Include="Memory\MemUtil.cpp">
       <Filter>SourceFiles\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Sorting\RadixSort.cpp">
+      <Filter>SourceFiles\Sorting</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
