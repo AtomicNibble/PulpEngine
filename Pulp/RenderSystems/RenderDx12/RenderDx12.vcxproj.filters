@@ -74,18 +74,6 @@
     <ClInclude Include="CommandContex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="DescriptorAllocator.h">
-      <Filter>Header Files\Allocators</Filter>
-    </ClInclude>
-    <ClInclude Include="CommandAllocatorPool.h">
-      <Filter>Header Files\Allocators</Filter>
-    </ClInclude>
-    <ClInclude Include="DynamicDescriptorHeap.h">
-      <Filter>Header Files\Allocators</Filter>
-    </ClInclude>
-    <ClInclude Include="LinearAllocator.h">
-      <Filter>Header Files\Allocators</Filter>
-    </ClInclude>
     <ClInclude Include="Shader\Shader.h">
       <Filter>Header Files\Shader</Filter>
     </ClInclude>
@@ -149,6 +137,18 @@
     <ClInclude Include="Buffers\PixelBuffer.h">
       <Filter>Header Files\Buffers</Filter>
     </ClInclude>
+    <ClInclude Include="Allocators\CommandAllocatorPool.h">
+      <Filter>Header Files\Allocators</Filter>
+    </ClInclude>
+    <ClInclude Include="Allocators\DescriptorAllocator.h">
+      <Filter>Header Files\Allocators</Filter>
+    </ClInclude>
+    <ClInclude Include="Allocators\DynamicDescriptorHeap.h">
+      <Filter>Header Files\Allocators</Filter>
+    </ClInclude>
+    <ClInclude Include="Allocators\LinearAllocator.h">
+      <Filter>Header Files\Allocators</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -180,18 +180,6 @@
     </ClCompile>
     <ClCompile Include="CommandContex.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DescriptorAllocator.cpp">
-      <Filter>Source Files\Allocators</Filter>
-    </ClCompile>
-    <ClCompile Include="CommandAllocatorPool.cpp">
-      <Filter>Source Files\Allocators</Filter>
-    </ClCompile>
-    <ClCompile Include="DynamicDescriptorHeap.cpp">
-      <Filter>Source Files\Allocators</Filter>
-    </ClCompile>
-    <ClCompile Include="LinearAllocator.cpp">
-      <Filter>Source Files\Allocators</Filter>
     </ClCompile>
     <ClCompile Include="Shader\Shader.cpp">
       <Filter>Source Files\Shader</Filter>
@@ -247,6 +235,18 @@
     <ClCompile Include="Buffers\PixelBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
     </ClCompile>
+    <ClCompile Include="Allocators\CommandAllocatorPool.cpp">
+      <Filter>Source Files\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="Allocators\DescriptorAllocator.cpp">
+      <Filter>Source Files\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="Allocators\DynamicDescriptorHeap.cpp">
+      <Filter>Source Files\Allocators</Filter>
+    </ClCompile>
+    <ClCompile Include="Allocators\LinearAllocator.cpp">
+      <Filter>Source Files\Allocators</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
@@ -269,18 +269,6 @@
     </None>
     <None Include="CommandContex.inl">
       <Filter>Header Files</Filter>
-    </None>
-    <None Include="CommandAllocatorPool.inl">
-      <Filter>Header Files\Allocators</Filter>
-    </None>
-    <None Include="DynamicDescriptorHeap.inl">
-      <Filter>Header Files\Allocators</Filter>
-    </None>
-    <None Include="DescriptorAllocator.inl">
-      <Filter>Header Files\Allocators</Filter>
-    </None>
-    <None Include="LinearAllocator.inl">
-      <Filter>Header Files\Allocators</Filter>
     </None>
     <None Include="Shader\HWShader.inl">
       <Filter>Header Files\Shader</Filter>
@@ -320,6 +308,18 @@
     </None>
     <None Include="Buffers\PixelBuffer.inl">
       <Filter>Header Files\Buffers</Filter>
+    </None>
+    <None Include="Allocators\CommandAllocatorPool.inl">
+      <Filter>Header Files\Allocators</Filter>
+    </None>
+    <None Include="Allocators\DescriptorAllocator.inl">
+      <Filter>Header Files\Allocators</Filter>
+    </None>
+    <None Include="Allocators\DynamicDescriptorHeap.inl">
+      <Filter>Header Files\Allocators</Filter>
+    </None>
+    <None Include="Allocators\LinearAllocator.inl">
+      <Filter>Header Files\Allocators</Filter>
     </None>
   </ItemGroup>
 </Project>

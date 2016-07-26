@@ -327,6 +327,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Allocators\CommandAllocatorPool.h" />
+    <ClInclude Include="Allocators\DescriptorAllocator.h" />
+    <ClInclude Include="Allocators\DynamicDescriptorHeap.h" />
+    <ClInclude Include="Allocators\LinearAllocator.h" />
     <ClInclude Include="Auxiliary\AuxRender.h" />
     <ClInclude Include="Auxiliary\AuxRenderImp.h" />
     <ClInclude Include="Buffers\ColorBuffer.h" />
@@ -334,15 +338,11 @@
     <ClInclude Include="Buffers\GpuBuffer.h" />
     <ClInclude Include="Buffers\PixelBuffer.h" />
     <ClInclude Include="Buffers\ShadowBuffer.h" />
-    <ClInclude Include="CommandAllocatorPool.h" />
     <ClInclude Include="CommandContex.h" />
     <ClInclude Include="CommandList.h" />
     <ClInclude Include="CommandSignature.h" />
-    <ClInclude Include="DescriptorAllocator.h" />
-    <ClInclude Include="DynamicDescriptorHeap.h" />
     <ClInclude Include="Features.h" />
     <ClInclude Include="GpuResource.h" />
-    <ClInclude Include="LinearAllocator.h" />
     <ClInclude Include="PipelineState.h" />
     <ClInclude Include="RootSignature.h" />
     <ClInclude Include="SamplerDesc.h" />
@@ -363,6 +363,10 @@
     <ClInclude Include="XRender.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Allocators\CommandAllocatorPool.cpp" />
+    <ClCompile Include="Allocators\DescriptorAllocator.cpp" />
+    <ClCompile Include="Allocators\DynamicDescriptorHeap.cpp" />
+    <ClCompile Include="Allocators\LinearAllocator.cpp" />
     <ClCompile Include="Auxiliary\AuxRender.cpp" />
     <ClCompile Include="Auxiliary\AuxRenderImp.cpp" />
     <ClCompile Include="Auxiliary\AuxRenderImpLods.cpp" />
@@ -371,14 +375,10 @@
     <ClCompile Include="Buffers\GpuBuffer.cpp" />
     <ClCompile Include="Buffers\PixelBuffer.cpp" />
     <ClCompile Include="Buffers\ShadowBuffer.cpp" />
-    <ClCompile Include="CommandAllocatorPool.cpp" />
     <ClCompile Include="CommandContex.cpp" />
     <ClCompile Include="CommandList.cpp" />
     <ClCompile Include="CommandSignature.cpp" />
-    <ClCompile Include="DescriptorAllocator.cpp" />
-    <ClCompile Include="DynamicDescriptorHeap.cpp" />
     <ClCompile Include="GpuResource.cpp" />
-    <ClCompile Include="LinearAllocator.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="PipelineState.cpp" />
     <ClCompile Include="RootSignature.cpp" />
@@ -408,20 +408,20 @@
     <ClCompile Include="XRender.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Allocators\CommandAllocatorPool.inl" />
+    <None Include="Allocators\DescriptorAllocator.inl" />
+    <None Include="Allocators\DynamicDescriptorHeap.inl" />
+    <None Include="Allocators\LinearAllocator.inl" />
     <None Include="Auxiliary\AuxRender.inl" />
     <None Include="Auxiliary\AuxRenderImp.inl" />
     <None Include="Buffers\ColorBuffer.inl" />
     <None Include="Buffers\DepthBuffer.inl" />
     <None Include="Buffers\GpuBuffer.inl" />
     <None Include="Buffers\PixelBuffer.inl" />
-    <None Include="CommandAllocatorPool.inl" />
     <None Include="CommandContex.inl" />
     <None Include="CommandList.inl" />
     <None Include="CommandSignature.inl" />
-    <None Include="DescriptorAllocator.inl" />
-    <None Include="DynamicDescriptorHeap.inl" />
     <None Include="GpuResource.inl" />
-    <None Include="LinearAllocator.inl" />
     <None Include="PipelineState.inl" />
     <None Include="RootSignature.inl" />
     <None Include="SamplerDesc.inl" />
