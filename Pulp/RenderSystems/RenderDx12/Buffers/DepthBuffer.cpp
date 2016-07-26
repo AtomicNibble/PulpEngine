@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "DepthBuffer.h"
-#include "DescriptorAllocator.h"
+#include "Allocators\DescriptorAllocator.h"
 
 
 X_NAMESPACE_BEGIN(render)

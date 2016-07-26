@@ -4,7 +4,7 @@
 #ifndef X_COMMAND_QUE_H_
 #define X_COMMAND_QUE_H_
 
-#include "CommandAllocatorPool.h"
+#include "Allocators\CommandAllocatorPool.h"
 #include <Threading\CriticalSection.h>
 
 X_NAMESPACE_BEGIN(render)

@@ -2,8 +2,8 @@
 
 
 #include "GpuResource.h"
-#include "DynamicDescriptorHeap.h"
-#include "LinearAllocator.h"
+#include "Allocators\DynamicDescriptorHeap.h"
+#include "Allocators\LinearAllocator.h"
 
 #include <Math\XViewPort.h>
 

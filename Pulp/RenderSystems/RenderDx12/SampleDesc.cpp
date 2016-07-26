@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "SamplerDesc.h"
 
-#include "DescriptorAllocator.h"
+#include "Allocators\DescriptorAllocator.h"
 
 X_NAMESPACE_BEGIN(render)
 

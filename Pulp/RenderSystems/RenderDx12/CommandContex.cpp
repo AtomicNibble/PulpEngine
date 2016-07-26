@@ -3,12 +3,12 @@
 #include "CommandList.h"
 #include "CommandSignature.h"
 #include "RootSignature.h"
-#include "GpuBuffer.h"
-#include "ColorBuffer.h"
-#include "DepthBuffer.h"
+#include "Buffers\GpuBuffer.h"
+#include "Buffers\ColorBuffer.h"
+#include "Buffers\DepthBuffer.h"
 #include "PipelineState.h"
 
-#include "DynamicDescriptorHeap.h"
+#include "Allocators\DynamicDescriptorHeap.h"
 
 
 X_NAMESPACE_BEGIN(render)

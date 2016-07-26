@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "GpuBuffer.h"
 
-#include "DescriptorAllocator.h"
+#include "Allocators\DescriptorAllocator.h"
 #include "CommandContex.h"
 
 X_NAMESPACE_BEGIN(render)

@@ -8,9 +8,9 @@
 
 #include "CommandList.h"
 #include "SamplerDesc.h"
-#include "DescriptorAllocator.h"
-#include "DynamicDescriptorHeap.h"
-#include "ColorBuffer.h"
+#include "Allocators\DescriptorAllocator.h"
+#include "Allocators\DynamicDescriptorHeap.h"
+#include "Buffers\ColorBuffer.h"
 #include "Features.h"
 
 #include "Shader\ShaderManager.h"
