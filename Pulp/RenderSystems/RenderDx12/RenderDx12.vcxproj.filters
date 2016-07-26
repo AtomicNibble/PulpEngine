@@ -238,6 +238,9 @@
     <ClCompile Include="Auxiliary\AuxRenderImp.cpp">
       <Filter>Source Files\Auxiliary</Filter>
     </ClCompile>
+    <ClCompile Include="Auxiliary\AuxRenderImpLods.cpp">
+      <Filter>Source Files\Auxiliary</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">

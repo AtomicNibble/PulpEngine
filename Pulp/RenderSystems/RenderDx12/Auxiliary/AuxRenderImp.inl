@@ -3,6 +3,40 @@
 X_NAMESPACE_BEGIN(render)
 
 
+X_INLINE AuxGeomCBRawDataPackaged::AuxGeomCBRawDataPackaged(const RenderAux::AuxGeomCBRawData* pData)
+	: pData_(pData)
+{
+	X_ASSERT_NOT_NULL(pData_);
+}
+
+// -------------------------------------------------------------
+
+X_INLINE AuxObjVertex::AuxObjVertex(const Vec3f& pos_, const Vec3f& normal_) :
+	pos(pos_),
+	normal(normal_)
+{
+
+}
+
+// -------------------------------------------------------------
+
+X_INLINE AuxObjMesh::AuxObjMesh() :
+	numVertices(0),
+	numFaces(0),
+	VBid(0),
+	IBid(0)
+{
+
+}
+
+X_INLINE AuxObjMesh::~AuxObjMesh()
+{
+
+}
+
+// -------------------------------------------------------------
+
+
 X_INLINE const Matrix44f& RenderAuxImp::getCurrentView(void) const
 {
 	return matrices_.matView;

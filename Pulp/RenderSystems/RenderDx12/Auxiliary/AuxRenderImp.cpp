@@ -5,15 +5,49 @@
 X_NAMESPACE_BEGIN(render)
 
 
-namespace {
+void AuxObjMesh::release(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+}
 
-	static Matrix44f identiy_mat(Matrix44f::identity());
 
-	const float c_clipThres = 0.1f;
+// -----------------------------------------------------
+
+const int32_t RenderAuxImp::AUX_GEOM_VBSIZE = 32768;
+const int32_t RenderAuxImp::AUX_GEOM_IBSIZE = AUX_GEOM_IBSIZE * 2;
+const float32_t RenderAuxImp::CLIP_THRESHOLD = .1f;
 
 
-} // namespace
+RenderAuxImp::RenderAuxImp(core::MemoryArenaBase* arena) :
+	arena_(arena),
+	auxSortedPushArr_(arena)
+{
 
+}
+
+RenderAuxImp::~RenderAuxImp()
+{
+
+}
+
+
+
+bool RenderAuxImp::init(void)
+{
+	if (!createLods(arena_)) {
+		X_ERROR("Dx12", "Failed to create Aux object lods");
+		return false;
+	}
+
+	return true;
+}
+
+
+void RenderAuxImp::shutDown(void)
+{
+	releaseLods();
+
+}
 
 void RenderAuxImp::flush(const AuxGeomCBRawDataPackaged& data, size_t begin, size_t end)
 {
@@ -233,8 +267,8 @@ void RenderAuxImp::prepareThickLines3D(RenderAux::AuxSortedPushArr::ConstIterato
 
 					if (vt[0].z != 0.0f && vt[1].z != 0.0f)
 					{
-						vt[0].z = fsel(-vt[0].z - c_clipThres, vt[0].z, -c_clipThres);
-						vt[1].z = fsel(-vt[1].z - c_clipThres, vt[1].z, -c_clipThres);
+						vt[0].z = fsel(-vt[0].z - CLIP_THRESHOLD, vt[0].z, -CLIP_THRESHOLD);
+						vt[1].z = fsel(-vt[1].z - CLIP_THRESHOLD, vt[1].z, -CLIP_THRESHOLD);
 
 						Vec2f delta(((vt[1] / vt[1].z) - (vt[0] / vt[0].z)).xy());
 
@@ -318,8 +352,8 @@ void RenderAuxImp::prepareThickLines3D(RenderAux::AuxSortedPushArr::ConstIterato
 bool RenderAuxImp::clipLine(Vec3f v[2], Color8u c[2])
 {
 	// get clipping flags
-	const bool bV0Behind = (-(nearPlane_.getNormal().dot(v[0]) + nearPlane_.getDistance()) < c_clipThres);
-	const bool bV1Behind = (-(nearPlane_.getNormal().dot(v[1]) + nearPlane_.getDistance()) < c_clipThres);
+	const bool bV0Behind = (-(nearPlane_.getNormal().dot(v[0]) + nearPlane_.getDistance()) < CLIP_THRESHOLD);
+	const bool bV1Behind = (-(nearPlane_.getNormal().dot(v[1]) + nearPlane_.getDistance()) < CLIP_THRESHOLD);
 
 	// proceed only if both are not behind near clipping plane
 	if (!bV0Behind || !bV1Behind)
@@ -353,7 +387,7 @@ bool RenderAuxImp::clipLine(Vec3f v[2], Color8u c[2])
 Vec3f RenderAuxImp::intersectLinePlane(const Vec3f& o, const Vec3f& d,
 	const Planef& p, float& t)
 {
-	t = -(p.getNormal().dot(o) + (p.getDistance() + c_clipThres)) / p.getNormal().dot(d);
+	t = -(p.getNormal().dot(o) + (p.getDistance() + CLIP_THRESHOLD)) / p.getNormal().dot(d);
 	return (o + d * t);
 }
 

@@ -7,32 +7,29 @@ X_NAMESPACE_BEGIN(render)
 
 struct AuxGeomCBRawDataPackaged
 {
-	AuxGeomCBRawDataPackaged(const RenderAux::AuxGeomCBRawData* pData)
-		: pData_(pData)
-	{
-		X_ASSERT_NOT_NULL(pData_);
-	}
+	X_INLINE AuxGeomCBRawDataPackaged(const RenderAux::AuxGeomCBRawData* pData);
 
 	const RenderAux::AuxGeomCBRawData* pData_;
 };
 
 
+struct AuxObjVertex
+{
+	X_INLINE AuxObjVertex() = default;
+	X_INLINE AuxObjVertex(const Vec3f& pos, const Vec3f& normal);
+
+	Vec3f pos;
+	Vec3f normal;
+};
+
+
+
 struct AuxObjMesh
 {
-	AuxObjMesh() 
-	{
-	}
+	X_INLINE AuxObjMesh();
+	X_INLINE ~AuxObjMesh();
 
-	~AuxObjMesh()
-	{
-		
-	}
-
-	void release(void)
-	{
-	
-	}
-
+	void release(void);
 
 	uint32 numVertices;
 	uint32 numFaces;
@@ -41,6 +38,7 @@ struct AuxObjMesh
 };
 
 
+// this should move somewhere more common
 struct PrimitiveType
 {
 	enum Enum
@@ -59,10 +57,14 @@ class RenderAuxImp : public IRenderAuxImpl
 	static const int32_t AUX_OBJ_NUM_LOD = 5;
 	static const int32_t AUX_GEOM_VBSIZE;
 	static const int32_t AUX_GEOM_IBSIZE;
+	static const float32_t CLIP_THRESHOLD;
 
 public:
-	RenderAuxImp();
+	RenderAuxImp(core::MemoryArenaBase* arena);
 	~RenderAuxImp() X_OVERRIDE;
+
+	bool init(void);
+	void shutDown(void);
 
 	// IRenderAuxImpl
 	virtual void flush(const AuxGeomCBRawDataPackaged& data, size_t begin, size_t end) X_OVERRIDE;
@@ -95,6 +97,14 @@ private:
 	void prepareThickLines3D(RenderAux::AuxSortedPushArr::ConstIterator itBegin, RenderAux::AuxSortedPushArr::ConstIterator itEnd);
 
 private:
+	bool createLods(core::MemoryArenaBase* arena);
+	void releaseLods(void);
+
+	template< typename TMeshFunc >
+	bool createMesh(core::MemoryArenaBase* arena, AuxObjMesh& mesh, TMeshFunc meshFunc);
+
+
+private:
 	bool clipLine(Vec3f v[2], Color8u c[2]);
 
 	static X_INLINE Color8u clipColor(const Color8u& c0, const Color8u& c1, float32_t t);
@@ -114,6 +124,8 @@ private:
 	};
 
 private:
+	core::MemoryArenaBase* arena_;
+
 	RenderAux::PrimType::Enum curPrimType_;
 	AuxGeom_DrawInFrontMode::Enum curDrawInFrontMode_;
 	const RenderAux::AuxGeomCBRawData* pCurCBRawData_;

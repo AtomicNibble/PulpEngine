@@ -364,6 +364,7 @@
   <ItemGroup>
     <ClCompile Include="Auxiliary\AuxRender.cpp" />
     <ClCompile Include="Auxiliary\AuxRenderImp.cpp" />
+    <ClCompile Include="Auxiliary\AuxRenderImpLods.cpp" />
     <ClCompile Include="ColorBuffer.cpp" />
     <ClCompile Include="CommandAllocatorPool.cpp" />
     <ClCompile Include="CommandContex.cpp" />
