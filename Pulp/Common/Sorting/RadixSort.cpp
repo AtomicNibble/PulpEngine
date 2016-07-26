@@ -10,12 +10,10 @@ namespace Sorting
 	RadixSort::RadixSort(core::MemoryArenaBase* arena) :
 		histogram_(arena, 256 * 4),
 		buckets_(arena, 256),
-		ranks_(arena),
-		ranks2_(arena),
-		pRanks_(nullptr),
-		pRanks2_(nullptr),
-		currentSize_(0),
-		allocatedSize_(0),
+		indexes_(arena),
+		indexes2_(arena),
+		pIndexes_(nullptr),
+		pIndexes2_(nullptr),
 		ranksValid_(false)
 	{
 
@@ -53,7 +51,7 @@ namespace Sorting
 			// calculate the histogram while checking if already in order.
 			while (pCur != pEnd)
 			{
-				const uint32 val = *pRunning;
+				const uint32 val = *pRunning++;
 
 				if (val < prevVal) {
 					alreadySorted = false;
@@ -72,7 +70,7 @@ namespace Sorting
 			if (alreadySorted)
 			{                                                                                  
 				for (uint32_t i = 0; i < num; i++) {
-					pRanks_[i] = i;
+					pIndexes_[i] = i;
 				}
 
 				return *this;                                                                    
@@ -84,7 +82,7 @@ namespace Sorting
 			// if everythings still sorted no need to sort.
 			// for example when sorting the scene if the camera don't move
 			// the list we be the same and eveything sorted from last frames indexes already.
-			uint32* pIndices = pRanks_;
+			uint32* pIndices = pIndexes_;
 			uint32 prevVal = pInput[*pIndices];
 
 			while (pCur != pEnd)
@@ -140,7 +138,7 @@ namespace Sorting
 			{
 				// setup bucket pointers.
 				{
-					uint32_t* pBucketDest = pRanks2_;
+					uint32_t* pBucketDest = pIndexes2_;
 					for (uint32 i = 0; i < 256; pBucketDest += pCurCount[i++]) {
 						buckets_[i] = pBucketDest;
 					}
@@ -160,8 +158,8 @@ namespace Sorting
 				}
 				else
 				{
-					const uint32* pIndices = pRanks_;
-					const uint32* pIndicesEnd = &ranks_[num];
+					const uint32* pIndices = pIndexes_;
+					const uint32* pIndicesEnd = &pIndexes_[num];
 
 					while (pIndices != pIndicesEnd) {
 						const uint32 id = *pIndices++;
@@ -170,45 +168,35 @@ namespace Sorting
 
 				}
 
-				core::Swap(pRanks_, pRanks2_);
+				core::Swap(pIndexes_, pIndexes2_);
 			}
 		}
 
 		return *this;
 	}
 
-	std::pair<const uint32_t*, size_t> RadixSort::getRanks(void) const
+	std::pair<const uint32_t*, size_t> RadixSort::getIndexes(void) const
 	{
-		X_ASSERT_NOT_NULL(pRanks_);
+		X_ASSERT_NOT_NULL(pIndexes_);
 
-		return std::make_pair(pRanks_, currentSize_);
+		return std::make_pair(pIndexes_, indexes_.size());
 	}
 
 	void RadixSort::checkSize(size_t num)
 	{
-		if (num != currentSize_)
+		if (num != indexes_.size())
 		{
-			// bigger?
-			if (num > currentSize_)
-			{
-				if (num > allocatedSize_)
-				{
-					ranks_.resize(num);
-					ranks2_.resize(num);
+			// shrinks
+			indexes_.resize(num);
+			indexes2_.resize(num);
 
-					// set pointers
-					pRanks_ = ranks_.data();
-					pRanks2_ = ranks2_.data();
-				}
-
-				std::memset(ranks_.data(), 0, ranks_.size() * sizeof(uint32_t));
-				std::memset(ranks2_.data(), 0, ranks2_.size() * sizeof(uint32_t));
-			}
+			// set pointers (may have changed)
+			pIndexes_ = indexes_.data();
+			pIndexes2_ = indexes2_.data();
 
 			// invalid after size change.
 			ranksValid_ = false; 
 		}
-
 	}
 
 

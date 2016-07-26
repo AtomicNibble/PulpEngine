@@ -147,3 +147,39 @@ TYPED_TEST(RadixSort, index32_64bit)
 		lastValue = val;
 	}
 }
+
+
+TEST(RadixSort, cachedSort)
+{
+	core::Array<uint32_t> vec(gEnv->pArena);
+
+	// 4096 or the max of type if lower.
+	const uint32_t num = static_cast<uint32_t>(core::Min<size_t>(4096 * 8,
+		std::numeric_limits<uint32_t>::max()));
+
+	vec.resize(num);
+	for (auto& v : vec) {
+		v = (static_cast<uint32_t>(rand()) << 0) ^
+			(static_cast<uint32_t>(rand()) << 16);
+	}
+
+	core::Sorting::RadixSort radix(g_arena);
+
+	radix.sort(vec.data(), vec.size());
+
+	auto sorted = radix.getIndexes();
+
+	// it should ensure the sizes match
+	ASSERT_EQ(vec.size(), sorted.second);
+
+	// validate the indexes give us sorted data.
+	uint32_t lastValue = std::numeric_limits<uint32_t>::min();
+	for(size_t i=0; i<sorted.second; i++)
+	{
+		const auto idx = sorted.first[i];
+		const auto val = vec[idx];
+
+		ASSERT_GE(val, lastValue);
+		lastValue = val;
+	}
+}

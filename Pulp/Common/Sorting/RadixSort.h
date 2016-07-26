@@ -280,7 +280,7 @@ namespace Sorting
 
 		RadixSort& sort(const uint32* pInput, size_t num);
 
-		std::pair<const uint32_t*, size_t> getRanks(void) const;
+		std::pair<const uint32_t*, size_t> getIndexes(void) const;
 
 	private:
 		void checkSize(size_t num);
@@ -289,18 +289,16 @@ namespace Sorting
 		core::Array<uint32_t> histogram_;
 		core::Array<uint32_t*> buckets_;
 
-		core::Array<uint32_t> ranks_;
-		core::Array<uint32_t> ranks2_;
+		core::Array<uint32_t> indexes_;
+		core::Array<uint32_t> indexes2_;
 
 		// pointers to above arrays that are swapped.
 		// could just swap the arrays if i wanted.
-		uint32_t* pRanks_;
-		uint32_t* pRanks2_;
-
-		size_t currentSize_;
-		size_t allocatedSize_;
+		uint32_t* pIndexes_;
+		uint32_t* pIndexes2_;
 
 		bool ranksValid_;
+		bool _pad[3];
 	};
 
 
