@@ -609,7 +609,7 @@ bool XCore::InitScriptSys(const SCoreInitParams& initParams)
 
 bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 {
-#if 1
+#if 0
 	if (initParams.bTesting)
 	{
 		if (!IntializeEngineModule(DLL_RENDER_NULL, "Engine_RenderNull", initParams))
