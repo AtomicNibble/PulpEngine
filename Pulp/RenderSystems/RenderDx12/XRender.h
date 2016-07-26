@@ -25,6 +25,7 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(render)
 
+class RenderAuxImp;
 
 class XRender : public IRender2
 {
@@ -67,6 +68,7 @@ private:
 
 	shader::XShaderManager shaderMan_; // might make this allocoated, just so can forward declare like tex man.
 	texture::TextureManager* pTextureMan_;
+	RenderAuxImp* pAuxRender_;
 
 	CommandListManger cmdListManager_;
 

@@ -2,6 +2,7 @@
 #include "XRender.h"
 
 #include "Texture\TextureManager.h"
+#include "Auxiliary\AuxRenderImp.h"
 
 #include <IConsole.h>
 
@@ -14,6 +15,7 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	pDebug_(nullptr),
 	pSwapChain_(nullptr),
 	pTextureMan_(nullptr),
+	pAuxRender_(nullptr),
 	shaderMan_(arena),
 	cmdListManager_(arena),
 	dedicatedvideoMemory_(0),
@@ -230,6 +232,12 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 		return false;
 	}
 
+	pAuxRender_ = X_NEW(RenderAuxImp, arena_, "AuxRenderer")(arena_);
+	if (!pAuxRender_->init()) {
+		X_ERROR("Render", "failed to init aux render system");
+		return false;
+	}
+ 
 	return true;
 }
 
@@ -238,6 +246,11 @@ void XRender::shutDown(void)
 	if (pTextureMan_) {
 		pTextureMan_->shutDown();
 		X_DELETE_AND_NULL(pTextureMan_, arena_);
+	}
+
+	if (pAuxRender_) {
+		pAuxRender_->shutDown();
+		X_DELETE_AND_NULL(pAuxRender_, arena_);
 	}
 
 	shaderMan_.shutdown();
