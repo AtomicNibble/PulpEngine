@@ -329,6 +329,7 @@
   <ItemGroup>
     <ClInclude Include="Auxiliary\AuxRender.h" />
     <ClInclude Include="Auxiliary\AuxRenderImp.h" />
+    <ClInclude Include="Buffers\ShadowBuffer.h" />
     <ClInclude Include="ColorBuffer.h" />
     <ClInclude Include="CommandAllocatorPool.h" />
     <ClInclude Include="CommandContex.h" />
@@ -365,6 +366,7 @@
     <ClCompile Include="Auxiliary\AuxRender.cpp" />
     <ClCompile Include="Auxiliary\AuxRenderImp.cpp" />
     <ClCompile Include="Auxiliary\AuxRenderImpLods.cpp" />
+    <ClCompile Include="Buffers\ShadowBuffer.cpp" />
     <ClCompile Include="ColorBuffer.cpp" />
     <ClCompile Include="CommandAllocatorPool.cpp" />
     <ClCompile Include="CommandContex.cpp" />

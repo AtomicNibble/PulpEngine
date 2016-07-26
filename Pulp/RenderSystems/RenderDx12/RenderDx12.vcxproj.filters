@@ -146,6 +146,9 @@
     <ClInclude Include="Auxiliary\AuxRenderImp.h">
       <Filter>Header Files\Auxiliary</Filter>
     </ClInclude>
+    <ClInclude Include="Buffers\ShadowBuffer.h">
+      <Filter>Header Files\Buffers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -240,6 +243,9 @@
     </ClCompile>
     <ClCompile Include="Auxiliary\AuxRenderImpLods.cpp">
       <Filter>Source Files\Auxiliary</Filter>
+    </ClCompile>
+    <ClCompile Include="Buffers\ShadowBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
