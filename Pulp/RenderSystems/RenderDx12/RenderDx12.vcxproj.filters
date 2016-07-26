@@ -74,18 +74,6 @@
     <ClInclude Include="CommandContex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GpuBuffer.h">
-      <Filter>Header Files\Buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="ColorBuffer.h">
-      <Filter>Header Files\Buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="PixelBuffer.h">
-      <Filter>Header Files\Buffers</Filter>
-    </ClInclude>
-    <ClInclude Include="DepthBuffer.h">
-      <Filter>Header Files\Buffers</Filter>
-    </ClInclude>
     <ClInclude Include="DescriptorAllocator.h">
       <Filter>Header Files\Allocators</Filter>
     </ClInclude>
@@ -149,6 +137,18 @@
     <ClInclude Include="Buffers\ShadowBuffer.h">
       <Filter>Header Files\Buffers</Filter>
     </ClInclude>
+    <ClInclude Include="Buffers\ColorBuffer.h">
+      <Filter>Header Files\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffers\DepthBuffer.h">
+      <Filter>Header Files\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffers\GpuBuffer.h">
+      <Filter>Header Files\Buffers</Filter>
+    </ClInclude>
+    <ClInclude Include="Buffers\PixelBuffer.h">
+      <Filter>Header Files\Buffers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -180,18 +180,6 @@
     </ClCompile>
     <ClCompile Include="CommandContex.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ColorBuffer.cpp">
-      <Filter>Source Files\Buffers</Filter>
-    </ClCompile>
-    <ClCompile Include="GpuBuffer.cpp">
-      <Filter>Source Files\Buffers</Filter>
-    </ClCompile>
-    <ClCompile Include="PixelBuffer.cpp">
-      <Filter>Source Files\Buffers</Filter>
-    </ClCompile>
-    <ClCompile Include="DepthBuffer.cpp">
-      <Filter>Source Files\Buffers</Filter>
     </ClCompile>
     <ClCompile Include="DescriptorAllocator.cpp">
       <Filter>Source Files\Allocators</Filter>
@@ -247,6 +235,18 @@
     <ClCompile Include="Buffers\ShadowBuffer.cpp">
       <Filter>Source Files\Buffers</Filter>
     </ClCompile>
+    <ClCompile Include="Buffers\ColorBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Buffers\DepthBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Buffers\GpuBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
+    <ClCompile Include="Buffers\PixelBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
@@ -270,15 +270,6 @@
     <None Include="CommandContex.inl">
       <Filter>Header Files</Filter>
     </None>
-    <None Include="GpuBuffer.inl">
-      <Filter>Header Files\Buffers</Filter>
-    </None>
-    <None Include="ColorBuffer.inl">
-      <Filter>Header Files\Buffers</Filter>
-    </None>
-    <None Include="DepthBuffer.inl">
-      <Filter>Header Files\Buffers</Filter>
-    </None>
     <None Include="CommandAllocatorPool.inl">
       <Filter>Header Files\Allocators</Filter>
     </None>
@@ -287,9 +278,6 @@
     </None>
     <None Include="DescriptorAllocator.inl">
       <Filter>Header Files\Allocators</Filter>
-    </None>
-    <None Include="PixelBuffer.inl">
-      <Filter>Header Files\Buffers</Filter>
     </None>
     <None Include="LinearAllocator.inl">
       <Filter>Header Files\Allocators</Filter>
@@ -320,6 +308,18 @@
     </None>
     <None Include="Auxiliary\AuxRenderImp.inl">
       <Filter>Header Files\Auxiliary</Filter>
+    </None>
+    <None Include="Buffers\ColorBuffer.inl">
+      <Filter>Header Files\Buffers</Filter>
+    </None>
+    <None Include="Buffers\DepthBuffer.inl">
+      <Filter>Header Files\Buffers</Filter>
+    </None>
+    <None Include="Buffers\GpuBuffer.inl">
+      <Filter>Header Files\Buffers</Filter>
+    </None>
+    <None Include="Buffers\PixelBuffer.inl">
+      <Filter>Header Files\Buffers</Filter>
     </None>
   </ItemGroup>
 </Project>
