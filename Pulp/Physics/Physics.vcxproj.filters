@@ -56,15 +56,6 @@
     <ClInclude Include="DebugRender.h">
       <Filter>Header Files\DebugRender</Filter>
     </ClInclude>
-    <ClInclude Include="DebugRenderPoints.h">
-      <Filter>Header Files\DebugRender</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugRenderLine.h">
-      <Filter>Header Files\DebugRender</Filter>
-    </ClInclude>
-    <ClInclude Include="DebugRenderTriangle.h">
-      <Filter>Header Files\DebugRender</Filter>
-    </ClInclude>
     <ClInclude Include="MathHelpers.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
@@ -92,15 +83,6 @@
       <Filter>Source Files\Vars</Filter>
     </ClCompile>
     <ClCompile Include="DebugRender.cpp">
-      <Filter>Source Files\DebugRender</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugRenderPoints.cpp">
-      <Filter>Source Files\DebugRender</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugRenderLine.cpp">
-      <Filter>Source Files\DebugRender</Filter>
-    </ClCompile>
-    <ClCompile Include="DebugRenderTriangle.cpp">
       <Filter>Source Files\DebugRender</Filter>
     </ClCompile>
     <ClCompile Include="Module.cpp">
