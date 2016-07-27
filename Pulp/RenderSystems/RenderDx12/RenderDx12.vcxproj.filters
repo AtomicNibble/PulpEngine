@@ -45,6 +45,12 @@
     <Filter Include="Source Files\Auxiliary">
       <UniqueIdentifier>{a76ee69f-2a9e-4804-84c4-03af50d9084e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Vars">
+      <UniqueIdentifier>{51c0198f-eaed-42ec-967d-dd59fd4a24e8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vars">
+      <UniqueIdentifier>{c3529064-ca71-4b49-88f4-371923a95451}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -149,6 +155,9 @@
     <ClInclude Include="Allocators\LinearAllocator.h">
       <Filter>Header Files\Allocators</Filter>
     </ClInclude>
+    <ClInclude Include="Vars\RenderVars.h">
+      <Filter>Header Files\Vars</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -247,6 +256,9 @@
     <ClCompile Include="Allocators\LinearAllocator.cpp">
       <Filter>Source Files\Allocators</Filter>
     </ClCompile>
+    <ClCompile Include="Vars\RenderVars.cpp">
+      <Filter>Source Files\Vars</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
@@ -320,6 +332,9 @@
     </None>
     <None Include="Allocators\LinearAllocator.inl">
       <Filter>Header Files\Allocators</Filter>
+    </None>
+    <None Include="Vars\RenderVars.inl">
+      <Filter>Header Files\Vars</Filter>
     </None>
   </ItemGroup>
 </Project>
