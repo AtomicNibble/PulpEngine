@@ -139,6 +139,7 @@ struct IRenderAux
 	virtual ~IRenderAux() {}
 
 	virtual void flush(void) X_ABSTRACT;
+	virtual void clear(void) X_ABSTRACT;
 
 	virtual void setRenderFlags(const XAuxGeomRenderFlags& renderFlags) X_ABSTRACT;
 	virtual XAuxGeomRenderFlags getRenderFlags() X_ABSTRACT;
@@ -155,6 +156,7 @@ struct IRenderAux
 	// Triangles
 	virtual void drawTriangle(const Vec3f& v0, const Color8u& c0, const Vec3f& v1, const Color8u& c1, 
 				const Vec3f& v2, const Color8u& c2 ) X_ABSTRACT;
+	virtual void drawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, const Color8u& col) X_ABSTRACT;
 
 	virtual void drawTriangle(const Vec3f* points, uint32_t numPoints, const Color8u& c0) X_ABSTRACT;
 	virtual void drawTriangle(const Vec3f* points, uint32_t numPoints, const Color8u* pCol) X_ABSTRACT;

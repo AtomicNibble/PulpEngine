@@ -112,6 +112,7 @@ public:
 	~RenderAux() X_OVERRIDE;
 
 	void flush(void) X_OVERRIDE;
+	void clear(void) X_OVERRIDE;
 
 	X_INLINE virtual void setRenderFlags(const XAuxGeomRenderFlags& renderFlags) X_OVERRIDE;
 	X_INLINE virtual XAuxGeomRenderFlags getRenderFlags(void) X_OVERRIDE;
@@ -130,6 +131,7 @@ public:
 	// Triangles
 	void drawTriangle(const Vec3f& v0, const Color8u& c0, const Vec3f& v1, const Color8u& c1,
 		const Vec3f& v2, const Color8u& c2) X_OVERRIDE;
+	virtual void drawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, const Color8u& col) X_OVERRIDE;
 
 	void drawTriangle(const Vec3f* points, uint32_t numPoints, const Color8u& c0) X_OVERRIDE;
 	void drawTriangle(const Vec3f* points, uint32_t numPoints, const Color8u* pCol) X_OVERRIDE;

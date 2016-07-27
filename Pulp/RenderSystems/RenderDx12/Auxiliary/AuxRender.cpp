@@ -97,6 +97,12 @@ void RenderAux::flush(void)
 
 }
 
+void RenderAux::clear(void)
+{
+	data_.reset();
+}
+
+
 // Lines
 
 void RenderAux::drawLine(const Vec3f& v0, const Color8u& c0,
@@ -254,6 +260,22 @@ void RenderAux::drawTriangle(const Vec3f& v0, const Color8u& col0,
 
 	pVertices[2].pos = v2;
 	pVertices[2].color = col2;
+}
+
+void RenderAux::drawTriangle(const Vec3f& v0, const Vec3f& v1,
+	const Vec3f& v2, const Color8u& col)
+{
+	XAuxVertex* pVertices = nullptr;
+	addPrimitive(pVertices, 3, createTriangleRenderFlags(false));
+
+	pVertices[0].pos = v0;
+	pVertices[0].color = col;
+
+	pVertices[1].pos = v1;
+	pVertices[1].color = col;
+
+	pVertices[2].pos = v2;
+	pVertices[2].color = col;
 }
 
 
