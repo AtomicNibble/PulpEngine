@@ -182,4 +182,22 @@ TEST(RadixSort, cachedSort)
 		ASSERT_GE(val, lastValue);
 		lastValue = val;
 	}
+
+	radix.sort(vec.data(), vec.size());
+
+	sorted = radix.getIndexes();
+
+	// it should ensure the sizes match
+	ASSERT_EQ(vec.size(), sorted.second);
+
+	// validate the indexes give us sorted data.
+	lastValue = std::numeric_limits<uint32_t>::min();
+	for (size_t i = 0; i<sorted.second; i++)
+	{
+		const auto idx = sorted.first[i];
+		const auto val = vec[idx];
+
+		ASSERT_GE(val, lastValue);
+		lastValue = val;
+	}
 }
