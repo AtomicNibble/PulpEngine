@@ -14,6 +14,7 @@
 #include "Features.h"
 
 #include "Shader\ShaderManager.h"
+#include "Vars\RenderVars.h"
 
 
 X_NAMESPACE_DECLARE(texture,
@@ -65,6 +66,8 @@ private:
 	ID3D12Device* pDevice_;
 	ID3D12Debug* pDebug_;
 	IDXGISwapChain1* pSwapChain_;
+
+	RenderVars vars_;
 
 	shader::XShaderManager shaderMan_; // might make this allocoated, just so can forward declare like tex man.
 	texture::TextureManager* pTextureMan_;

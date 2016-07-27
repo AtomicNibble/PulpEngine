@@ -292,8 +292,7 @@ void XRender::freeResources(void)
 
 void XRender::registerVars(void)
 {
-
-
+	vars_.registerVars();
 }
 
 void XRender::registerCmds(void)
