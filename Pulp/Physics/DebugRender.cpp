@@ -22,11 +22,23 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
 {
 	render::IRenderAux& aux = *pAuxRender_;
 
+	// be better if we could send everything at once.
+	// since each call will make auxRender resize etc.
+	// might be faster to just make vectors here, populate them
+	// then pass them to aux render, would use more memory but likley much faster.
+
 	// Points
 	const uint32_t numPoints = debugRenderable.getNbPoints();
 	if (numPoints)
 	{
-		X_ASSERT_NOT_IMPLEMENTED();
+		const physx::PxDebugPoint* PX_RESTRICT points = debugRenderable.getPoints();
+
+		for (uint32_t i = 0; i<numPoints; i++)
+		{
+			const physx::PxDebugPoint& point = points[i];
+			const Color8u col = Color8u::hexA(point.color);
+			aux.drawPoint(Vec3FromPhysx(point.pos), col);
+		}
 	}
 
 	// Lines
