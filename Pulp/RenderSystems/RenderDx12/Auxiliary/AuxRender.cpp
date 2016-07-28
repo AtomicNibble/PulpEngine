@@ -79,8 +79,7 @@ void RenderAux::AuxGeomCBRawData::free(void)
 
 // -------------------------------------------------------
 
-RenderAux::RenderAux(core::MemoryArenaBase* arena, IRenderAuxImpl* pRenderAugImp) :
-	pRenderAuxGeom_(pRenderAugImp),
+RenderAux::RenderAux(core::MemoryArenaBase* arena) :
 	data_(arena)
 {
 
@@ -309,7 +308,7 @@ void RenderAux::drawTriangle(const Vec3f* points, uint32_t numPoints, const Colo
 	}
 }
 
-void RenderAux::drawTriangle(const Vec3f* points, uint32_t numPoints,
+void RenderAux::drawTriangle(const Vec3f* pPoints, uint32_t numPoints,
 	const uint16_t* indices, uint32_t numIndices, const Color8u& col)
 {
 	XAuxVertex* pVertices = nullptr;
@@ -321,14 +320,14 @@ void RenderAux::drawTriangle(const Vec3f* points, uint32_t numPoints,
 	uint32 i;
 	for (i = 0; i < numPoints; ++i)
 	{
-		pVertices[i].pos = points[i];
+		pVertices[i].pos = pPoints[i];
 		pVertices[i].color = color;
 	}
 
-	memcpy(pIndices, indices, sizeof(uint16_t)* numIndices);
+	memcpy(pIndices, indices, sizeof(uint16_t) * numIndices);
 }
 
-void RenderAux::drawTriangle(const Vec3f* points, uint32_t numPoints,
+void RenderAux::drawTriangle(const Vec3f* pPoints, uint32_t numPoints,
 	const uint16_t* indices, uint32_t numIndices, const Color8u* pCol)
 {
 	XAuxVertex* pVertices = nullptr;
@@ -336,14 +335,48 @@ void RenderAux::drawTriangle(const Vec3f* points, uint32_t numPoints,
 	addIndexedPrimitive(pVertices, numPoints, pIndices, numIndices,
 		createTriangleRenderFlags(true));
 
-	uint32 i;
-	for (i = 0; i < numPoints; ++i)
+	for (uint32 i = 0; i < numPoints; ++i)
 	{
-		pVertices[i].pos = points[i];
+		pVertices[i].pos = pPoints[i];
 		pVertices[i].color = pCol[i];
 	}
 
 	memcpy(pIndices, indices, sizeof(uint16_t)* numIndices);
+}
+
+// ---------------------------- Point ----------------------------
+
+void RenderAux::drawPoint(const Vec3f &pos, const Color8u& col, uint8_t size)
+{
+	XAuxVertex* pVertices = nullptr;
+	addPrimitive(pVertices, 1, createPointRenderFlags(size));
+
+	pVertices->pos = pos;
+	pVertices->color = col;
+}
+
+void RenderAux::drawPoints(Vec3f* pPoints, uint32_t numPoints, const Color8u& col, uint8_t size)
+{
+	XAuxVertex* pVertices = nullptr;
+	addPrimitive(pVertices, numPoints, createPointRenderFlags(size));
+
+	for (uint32 i = 0; i < numPoints; ++i)
+	{
+		pVertices[i].pos = pPoints[i];
+		pVertices[i].color = col;
+	}
+}
+
+void RenderAux::drawPoints(Vec3f* pPoints, uint32_t numPoints, Color8u* pCol, uint8_t size)
+{
+	XAuxVertex* pVertices = nullptr;
+	addPrimitive(pVertices, numPoints, createPointRenderFlags(size));
+
+	for (uint32 i = 0; i < numPoints; ++i)
+	{
+		pVertices[i].pos = pPoints[i];
+		pVertices[i].color = pCol[i];
+	}
 }
 
 
@@ -1421,6 +1454,27 @@ void RenderAux::drawFrustum(const XFrustum& frustum, const Color8u& nearCol, con
 
 // --------------------------------------------------------------------------
 
+void RenderAux::drawArrow(const Vec3f& posA, const Vec3f& posB, const Color8u& color)
+{
+	const Vec3f t0 = (posB - posA).normalized();
+	const Vec3f a = math<float32_t>::abs(t0.x) < 0.707f ? Vec3f(1, 0, 0) : Vec3f(0, 1, 0);
+	const Vec3f t1 = t0.cross(a).normalized();
+	const Vec3f t2 = t0.cross(t1).normalized();
+
+	Vec3f points[10] = {
+		posA, posB,
+		posB, posB - t0 * 0.15f + t1 * 0.15f,
+		posB, posB - t0 * 0.15f - t1 * 0.15f,
+		posB, posB - t0 * 0.15f + t2 * 0.15f,
+		posB, posB - t0 * 0.15f - t2 * 0.15f
+	};
+
+	drawLines(points, 10, color);
+}
+
+
+// --------------------------------------------------------------------------
+
 
 
 void RenderAux::addPushBufferEntry(uint32 numVertices, uint32 numIndices,
@@ -1431,7 +1485,7 @@ void RenderAux::addPushBufferEntry(uint32 numVertices, uint32 numIndices,
 
 	if (auxPushArr.isNotEmpty() &&
 		auxPushArr[auxPushArr.size() - 1].renderFlags == renderFlags &&
-		(PrimType::PtList == primType || PrimType::LineList == primType || PrimType::TriList == primType))
+		(PrimType::PointList == primType || PrimType::LineList == primType || PrimType::TriList == primType))
 	{
 		// Perform a runtime optimization (pre-merging) which effectively reduces the number of PB entries created.
 		// We can merge this entry with the previous one as its render flags match with the ones of the previous entry

@@ -36,7 +36,7 @@ class RenderAux : public IRenderAux
 	friend struct AuxGeomCBRawDataPackaged;
 
 	X_DECLARE_ENUM(DrawObjType)(Sphere, Cone, Cylinder);
-	X_DECLARE_ENUM(PrimType)(Invalid, PtList, LineList, LineListInd, TriList, TriListInd, Obj);
+	X_DECLARE_ENUM(PrimType)(Invalid, PointList, LineList, LineListInd, TriList, TriListInd, Obj);
 
 	struct AuxGeomPrivateBitMasks
 	{
@@ -108,7 +108,7 @@ protected:
 	};
 
 public:
-	RenderAux(core::MemoryArenaBase* arena, IRenderAuxImpl* pRenderAugImp);
+	RenderAux(core::MemoryArenaBase* arena);
 	~RenderAux() X_OVERRIDE;
 
 	void flush(void) X_OVERRIDE;
@@ -120,26 +120,31 @@ public:
 	// Lines
 	void drawLine(const Vec3f& v0, const Color8u& c0, const Vec3f& v1, const Color8u& c1, float thickness = 1.f) X_OVERRIDE;
 
-	void drawLines(Vec3f* points, uint32_t numPoints, const Color8u& col, float thickness = 1.f) X_OVERRIDE;
-	void drawLines(Vec3f* points, uint32_t numPoints, Color8u* col, float thickness = 1.f) X_OVERRIDE;
+	void drawLines(Vec3f* pPoints, uint32_t numPoints, const Color8u& col, float thickness = 1.f) X_OVERRIDE;
+	void drawLines(Vec3f* pPoints, uint32_t numPoints, Color8u* col, float thickness = 1.f) X_OVERRIDE;
 
-	void drawLines(Vec3f* points, uint32_t numPoints, uint16_t* indices,
+	void drawLines(Vec3f* pPoints, uint32_t numPoints, uint16_t* pIndices,
 		uint32_t numIndices, const Color8u& col, float thickness = 1.f) X_OVERRIDE;
-	void drawLines(Vec3f* points, uint32_t numPoints, uint16_t* indices,
-		uint32_t numIndices, Color8u* col, float thickness = 1.f) X_OVERRIDE;
+	void drawLines(Vec3f* pPoints, uint32_t numPoints, uint16_t* pIndices,
+		uint32_t numIndices, Color8u* pCol, float thickness = 1.f) X_OVERRIDE;
 
 	// Triangles
 	void drawTriangle(const Vec3f& v0, const Color8u& c0, const Vec3f& v1, const Color8u& c1,
 		const Vec3f& v2, const Color8u& c2) X_OVERRIDE;
 	virtual void drawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, const Color8u& col) X_OVERRIDE;
 
-	void drawTriangle(const Vec3f* points, uint32_t numPoints, const Color8u& c0) X_OVERRIDE;
-	void drawTriangle(const Vec3f* points, uint32_t numPoints, const Color8u* pCol) X_OVERRIDE;
+	void drawTriangle(const Vec3f* pPoints, uint32_t numPoints, const Color8u& c0) X_OVERRIDE;
+	void drawTriangle(const Vec3f* pPoints, uint32_t numPoints, const Color8u* pCol) X_OVERRIDE;
 
-	void drawTriangle(const Vec3f* points, uint32_t numPoints, const uint16_t* indices,
+	void drawTriangle(const Vec3f* pPoints, uint32_t numPoints, const uint16_t* pIndices,
 		uint32_t numIndices, const Color8u& c0) X_OVERRIDE;
-	void drawTriangle(const Vec3f* points, uint32_t numPoints, const uint16_t* indices,
+	void drawTriangle(const Vec3f* pPoints, uint32_t numPoints, const uint16_t* pIndices,
 		uint32_t numIndices, const Color8u* pCol) X_OVERRIDE;
+
+	// Point
+	void drawPoint(const Vec3f &pos, const Color8u& col, uint8_t size = 1) X_OVERRIDE;
+	void drawPoints(Vec3f* pPoints, uint32_t numPoints, const Color8u& col, uint8_t size = 1) X_OVERRIDE;
+	void drawPoints(Vec3f* pPoints, uint32_t numPoints, Color8u* pCol, uint8_t size = 1) X_OVERRIDE;
 
 	// AABB
 	void drawAABB(const AABB& aabb, bool solid, const Color8u& col) X_OVERRIDE;
@@ -165,8 +170,10 @@ public:
 	void drawBone(const Matrix34f& rParent, const Matrix34f& rBone, const Color8u& col) X_OVERRIDE;
 
 	// Frustum
-	void drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol, bool drawShaded = false) X_FINAL;
+	void drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol, bool drawShaded = false) X_OVERRIDE;
 
+	// Arrow
+	void drawArrow(const Vec3f& posA, const Vec3f& posB, const Color8u& color) X_OVERRIDE;
 
 
 private:
@@ -199,7 +206,6 @@ private:
 private:
 	XAuxGeomRenderFlags curRenderFlags_;
 	AuxGeomCBRawData data_;
-	IRenderAuxImpl* pRenderAuxGeom_;
 };
 
 

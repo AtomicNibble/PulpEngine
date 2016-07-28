@@ -166,6 +166,12 @@ struct IRenderAux
 	virtual void drawTriangle(const Vec3f* points, uint32_t numPoints, 
 		const uint16_t* indices, uint32_t numIndices, const Color8u* pCol) X_ABSTRACT;
 
+	// Point
+	virtual void drawPoint(const Vec3f &pos, const Color8u& col, uint8_t size = 1) X_ABSTRACT;
+	virtual void drawPoints(Vec3f* pPoints, uint32_t numPoints, const Color8u& col, uint8_t size = 1) X_ABSTRACT;
+	virtual void drawPoints(Vec3f* pPoints, uint32_t numPoints, Color8u* pCol, uint8_t size = 1) X_ABSTRACT;
+
+
 	// AABB
 	virtual void drawAABB(const AABB& aabb, bool solid, const Color8u& col) X_ABSTRACT;
 	virtual void drawAABB(const AABB& aabb, const Vec3f& pos, bool solid, const Color8u& col) X_ABSTRACT;
@@ -191,6 +197,9 @@ struct IRenderAux
 
 	// Frustum - Sexyyyyyyyyyy
 	virtual void drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol, bool drawShaded = false) X_ABSTRACT;
+
+	// Arrow
+	virtual void drawArrow(const Vec3f& posA, const Vec3f& posB, const Color8u& color) X_ABSTRACT;
 };
 
 

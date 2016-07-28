@@ -69,6 +69,12 @@ X_INLINE XAuxGeomRenderFlags RenderAux::getRenderFlags(void)
 // ---------------------------------------------------
 
 
+X_INLINE uint32 RenderAux::createPointRenderFlags(uint8_t size)
+{
+	return (curRenderFlags_ | (PrimType::PointList << AuxGeomPrivateBitMasks::PrimTypeShift) | size);
+}
+
+
 X_INLINE uint32 RenderAux::createLineRenderFlags(bool indexed)
 {
 	if (indexed) {
@@ -100,7 +106,7 @@ X_INLINE RenderAux::PrimType::Enum RenderAux::getPrimType(const XAuxGeomRenderFl
 	uint32 primType = ((renderFlags & AuxGeomPrivateBitMasks::PrimTypeMask) >> AuxGeomPrivateBitMasks::PrimTypeShift);
 	switch (primType)
 	{
-	case PrimType::PtList:
+	case PrimType::PointList:
 	case PrimType::LineList:
 	case PrimType::LineListInd:
 	case PrimType::TriList:
@@ -157,13 +163,11 @@ X_INLINE RenderAux::DrawObjType::Enum RenderAux::getAuxObjType(const XAuxGeomRen
 X_INLINE uint8 RenderAux::getPointSize(const XAuxGeomRenderFlags& renderFlags)
 {
 	PrimType::Enum primType = getPrimType(renderFlags);
-	X_ASSERT(PrimType::PtList == primType, "invalid primtype")(primType);
+	X_ASSERT(PrimType::PointList == primType, "invalid primtype")(primType);
 
-	if (PrimType::PtList == primType)
+	if (PrimType::PointList == primType)
 	{
-		// this is not correct.
-		X_ASSERT_NOT_IMPLEMENTED();
-		// return (renderFlags & AuxGeomPrivateBitMasks::PrivateRenderflagsMask);
+		return (renderFlags & AuxGeomPrivateBitMasks::PrivateRenderflagsMask);
 	}
 
 	return 0;

@@ -92,7 +92,7 @@ void RenderAuxImp::flush(const AuxGeomCBRawDataPackaged& data, size_t begin, siz
 		// draw push buffer entries
 		switch (primType)
 		{
-		case RenderAux::PrimType::PtList:
+		case RenderAux::PrimType::PointList:
 		case RenderAux::PrimType::LineList:
 		case RenderAux::PrimType::TriList:	
 			drawAuxPrimitives(itCur, it, primType);
@@ -118,7 +118,7 @@ void RenderAuxImp::determineAuxPrimitveFlags(uint32& d3dNumPrimDivider, Primitiv
 {
 	switch (primType)
 	{
-	case RenderAux::PrimType::PtList:
+	case RenderAux::PrimType::PointList:
 		d3dNumPrimDivider = 1;
 		d3dPrim = PrimitiveType::PointList;
 		break;
