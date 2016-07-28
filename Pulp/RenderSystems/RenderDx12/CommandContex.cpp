@@ -185,7 +185,7 @@ void CommandContext::reset(CommandListManger& cmdMng)
 	// We only call Reset() on previously freed contexts. The command list persists, but we must
 	// request a new allocator.
 	X_ASSERT_NOT_NULL(pCommandList_);
-	X_ASSERT_NOT_NULL(pCurrentAllocator_);
+	X_ASSERT(pCurrentAllocator_ == nullptr, "Command allocator should be null")(pCurrentAllocator_);
 
 	pCurrentAllocator_ = cmdMng.getQueue(type_).requestAllocator();
 	pCommandList_->Reset(pCurrentAllocator_, nullptr);
