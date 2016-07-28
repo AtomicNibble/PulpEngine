@@ -20,7 +20,8 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	cmdListManager_(arena),
 	dedicatedvideoMemory_(0),
 	pDescriptorAllocator_(nullptr),
-	pDescriptorAllocatorPool_(nullptr)
+	pDescriptorAllocatorPool_(nullptr),
+	auxQues_ {arena, arena} 
 {
 
 }
@@ -238,6 +239,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 		return false;
 	}
  
+
 	return true;
 }
 
@@ -322,6 +324,11 @@ void XRender::renderEnd(void)
 	handleResolutionChange();
 }
 
+
+IRenderAux* XRender::getAuxRender(AuxRenderer::Enum user)
+{
+	return &auxQues_[user];
+}
 
 
 bool XRender::freeSwapChainResources(void)

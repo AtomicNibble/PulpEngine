@@ -15,6 +15,7 @@
 
 #include "Shader\ShaderManager.h"
 #include "Vars\RenderVars.h"
+#include "Auxiliary\AuxRender.h"
 
 
 X_NAMESPACE_DECLARE(texture,
@@ -47,6 +48,9 @@ public:
 
 	void renderBegin(void) X_OVERRIDE;
 	void renderEnd(void) X_OVERRIDE;
+
+	IRenderAux* getAuxRender(AuxRenderer::Enum user) X_OVERRIDE;
+
 
 private:
 	bool freeSwapChainResources(void);
@@ -107,6 +111,8 @@ private:
 
 	D3D_FEATURE_LEVEL featureLvl_;
 	GpuFeatures features_;
+
+	RenderAux auxQues_[AuxRenderer::ENUM_COUNT];
 };
 
 

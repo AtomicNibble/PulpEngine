@@ -403,6 +403,10 @@ typedef HWND PLATFORM_HWND;
 
 struct IRender2
 {
+	// physics has it's own Aux render que so to speak, other que's can be added.
+	// they are not thread safe, but it's fine to populate diffrent aux instances in diffrent threads.
+	X_DECLARE_ENUM(AuxRenderer)(MISC, PHYSICS);
+
 	virtual ~IRender2() {};
 
 	virtual bool init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height) X_ABSTRACT;
@@ -415,6 +419,8 @@ struct IRender2
 	virtual void renderBegin(void) X_ABSTRACT;
 	virtual void renderEnd(void) X_ABSTRACT;
 
+	// each enum has a instance, and you don't own the pointer.
+	virtual IRenderAux* getAuxRender(AuxRenderer::Enum user) X_ABSTRACT;
 };
 
 
