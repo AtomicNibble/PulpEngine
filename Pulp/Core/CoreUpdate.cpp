@@ -225,7 +225,7 @@ void XCore::RenderBegin(core::FrameData& frameData)
 	X_PROFILE_BEGIN("CoreRenderBegin", core::ProfileSubSys::CORE);
 	X_UNUSED(frameData);
 
-	env_.pRender->RenderBegin();
+	env_.pRender->renderBegin();
 	env_.p3DEngine->OnFrameBegin();
 }
 
@@ -246,7 +246,7 @@ void XCore::RenderEnd(core::FrameData& frameData)
 			pConsole->draw(frameData.timeInfo);
 		}
 		
-		env_.pRender->RenderEnd();
+		env_.pRender->renderEnd();
 	}
 	// End
 	profileSys_.OnFrameEnd();

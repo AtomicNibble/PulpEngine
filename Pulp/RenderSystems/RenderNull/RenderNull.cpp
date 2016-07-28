@@ -10,7 +10,7 @@ X_NAMESPACE_BEGIN(render)
 RenderNull g_NullRender;
 
 
-bool RenderNull::Init(HWND hWnd, 
+bool RenderNull::init(HWND hWnd, 
 	uint32_t width, uint32_t hieght)
 {
 	X_UNUSED(hWnd);
@@ -20,7 +20,7 @@ bool RenderNull::Init(HWND hWnd,
 	return true;
 }
 
-void RenderNull::ShutDown()
+void RenderNull::shutDown()
 {
 
 }
@@ -30,16 +30,37 @@ void RenderNull::freeResources()
 
 }
 
-
-void RenderNull::RenderBegin()
+void RenderNull::release()
 {
 
 }
 
-void RenderNull::RenderEnd()
+void RenderNull::registerVars()
 {
 
 }
+
+void RenderNull::registerCmds()
+{
+
+}
+
+void RenderNull::renderBegin()
+{
+
+}
+
+void RenderNull::renderEnd()
+{
+
+}
+
+IRenderAux* RenderNull::getAuxRender(AuxRenderer::Enum user)
+{
+	X_UNUSED(user);
+	return nullptr;
+}
+
 
 void RenderNull::SetState(StateFlag state)
 {

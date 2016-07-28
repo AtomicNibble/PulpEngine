@@ -10,13 +10,24 @@ class RenderNull : public IRender
 {
 public:
 
-	virtual bool Init(HWND hWnd, uint32_t width, uint32_t hieght) X_OVERRIDE;
-	virtual void ShutDown() X_OVERRIDE;
-	virtual void freeResources() X_OVERRIDE;
+	virtual bool init(HWND hWnd, uint32_t width, uint32_t hieght) X_OVERRIDE;
+	virtual void shutDown(void) X_OVERRIDE;
+	virtual void freeResources(void) X_OVERRIDE;
+	
+	virtual void release(void) X_OVERRIDE;
+
+	virtual void registerVars(void) X_OVERRIDE;
+	virtual void registerCmds(void) X_OVERRIDE;
+
+	virtual void renderBegin(void) X_OVERRIDE;
+	virtual void renderEnd(void) X_OVERRIDE;
+
+	virtual IRenderAux* getAuxRender(AuxRenderer::Enum user) X_OVERRIDE;
 
 
-	virtual void RenderBegin() X_OVERRIDE;
-	virtual void RenderEnd() X_OVERRIDE;
+	// =============================================
+	// ============== OLD API ======================
+	// =============================================
 
 	virtual void SetState(StateFlag state) X_OVERRIDE;
 	virtual void SetStencilState(StencilState::Value ss) X_OVERRIDE;
@@ -29,25 +40,25 @@ public:
 	virtual void SetViewport(const Recti& rect) X_OVERRIDE;
 
 
-	virtual int getWidth(void) const X_FINAL;
-	virtual int getHeight(void) const X_FINAL;
-	virtual float getWidthf(void) const X_FINAL;
-	virtual float getHeightf(void) const X_FINAL;
+	virtual int getWidth(void) const X_OVERRIDE;
+	virtual int getHeight(void) const X_OVERRIDE;
+	virtual float getWidthf(void) const X_OVERRIDE;
+	virtual float getHeightf(void) const X_OVERRIDE;
 	// ~ViewPort
 
 	// scales from 800x600 range to what ever res.
 	// 400(x) on 1650x1050 becomes 825
-	virtual float ScaleCoordX(float value) const X_FINAL;
-	virtual float ScaleCoordY(float value) const X_FINAL;
-	virtual void ScaleCoord(float& x, float& y) const X_FINAL;
-	virtual void ScaleCoord(Vec2f& xy) const X_FINAL;
+	virtual float ScaleCoordX(float value) const X_OVERRIDE;
+	virtual float ScaleCoordY(float value) const X_OVERRIDE;
+	virtual void ScaleCoord(float& x, float& y) const X_OVERRIDE;
+	virtual void ScaleCoord(Vec2f& xy) const X_OVERRIDE;
 
 
 	virtual void  SetCamera(const XCamera& cam) X_OVERRIDE;
 	virtual const XCamera& GetCamera() X_OVERRIDE;
 	
 	// AuxGeo
-	virtual IRenderAux* GetIRenderAuxGeo(void) X_FINAL;
+	virtual IRenderAux* GetIRenderAuxGeo(void) X_OVERRIDE;
 	// ~AuxGeo
 
 	// Textures 
@@ -96,9 +107,9 @@ public:
 	virtual void DrawTextQueued(Vec3f pos, const XDrawTextInfo& ti, const char* text) X_OVERRIDE;
 
 	virtual void DrawAllocStats(Vec3f pos, const XDrawTextInfo& ti,
-		const core::MemoryAllocatorStatistics& allocStats, const char* title) X_FINAL;
+		const core::MemoryAllocatorStatistics& allocStats, const char* title) X_OVERRIDE;
 
-	virtual void FlushTextBuffer(void) X_FINAL;
+	virtual void FlushTextBuffer(void) X_OVERRIDE;
 	// ~Drawing
 
 	// Font

@@ -279,11 +279,11 @@ bool XPhysics::init(void)
 bool XPhysics::initRenderResources(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->pRender2);
+	X_ASSERT_NOT_NULL(gEnv->pRender);
 
 	X_ASSERT(!pDebugRender_, "Debug render already init")(pDebugRender_);
 
-	render::IRenderAux* pAux = gEnv->pRender2->getAuxRender(render::IRender2::AuxRenderer::PHYSICS);
+	render::IRenderAux* pAux = gEnv->pRender->getAuxRender(render::IRender::AuxRenderer::PHYSICS);
 	pDebugRender_ = X_NEW(DebugRender, arena_, "PhysDebugRender")(pAux);
 
 	return true;

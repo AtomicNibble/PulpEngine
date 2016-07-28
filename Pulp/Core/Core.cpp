@@ -233,9 +233,9 @@ void XCore::ShutDown()
 
 	if (env_.pRender)
 	{
-		env_.pRender->ShutDown();
-		// We don't delete it's static in DLL.
-	//	DeleteAndNull(env_.pRender);
+		env_.pRender->shutDown();
+
+		core::SafeRelease(env_.pRender);
 	}
 
 

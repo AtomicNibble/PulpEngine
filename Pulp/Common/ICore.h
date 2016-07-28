@@ -53,7 +53,6 @@ X_NAMESPACE_DECLARE(sound, struct ISound)
 X_NAMESPACE_DECLARE(script, struct IScriptSys)
 X_NAMESPACE_DECLARE(render, 
 struct IRender;
-struct IRender2;
 )
 X_NAMESPACE_DECLARE(engine,
 struct I3DEngine;
@@ -260,7 +259,6 @@ struct SCoreGlobals // obbject is zerod on start.
 //	core::IProfileSys*			pProfileSys;
 	script::IScriptSys*			pScriptSys;
 	render::IRender*			pRender;
-	render::IRender2*			pRender2;
 	engine::I3DEngine*			p3DEngine;
 	physics::IPhysics*			pPhysics;
 	game::IGame*				pGame;

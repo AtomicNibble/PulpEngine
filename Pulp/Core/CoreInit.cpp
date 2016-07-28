@@ -666,7 +666,7 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 
 	if (initParams.bTesting)
 	{
-		env_.pRender->Init(NULL, 0, 0);
+		env_.pRender->init(NULL, 0, 0);
 
 	}
 	else
@@ -679,7 +679,7 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 		uint32_t width = pWindow_->GetClientWidth();
 		uint32_t height = pWindow_->GetClientHeight();
 
-		if (!env_.pRender->Init(hWnd, width, height)) {
+		if (!env_.pRender->init(hWnd, width, height)) {
 			X_ERROR("Core", "Failed to init render system");
 			return false;
 		}

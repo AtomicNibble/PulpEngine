@@ -59,7 +59,7 @@ class XEngineModule_Render : public IEngineModule
 		X_UNUSED(initParams);
 
 		ICore* pCore = env.pCore;
-		IRender2* pRender = nullptr;
+		IRender* pRender = nullptr;
 
 		g_rendererArena = X_NEW_ALIGNED(RendererArena, gEnv->pArena, "RendererArena", 8)(&g_RenderAlloc, "RendererArena");
 		g_textureDataArena = X_NEW(TextureArena, gEnv->pArena, "TextureArena")(&g_TextureDataAlloc, "TextureArena");
@@ -70,7 +70,7 @@ class XEngineModule_Render : public IEngineModule
 			return false;
 		}
 
-		env.pRender2 = pRender;
+		env.pRender = pRender;
 		return true;
 	}
 
