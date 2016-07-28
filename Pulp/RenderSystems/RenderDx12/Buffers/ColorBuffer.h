@@ -25,6 +25,7 @@ public:
 	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getRTV(void) const;
 	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getUAV(void) const;
 
+	X_INLINE void setClearColor(const Colorf& col);
 	X_INLINE Colorf getClearColor(void) const;
 
 protected:
