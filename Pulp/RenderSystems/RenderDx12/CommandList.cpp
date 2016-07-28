@@ -58,6 +58,8 @@ bool CommandQue::create(ID3D12Device* pDevice)
 		return false;
 	}
 
+	allocatorPool_.create(pDevice);
+
 	// meow
 	return true;
 }
