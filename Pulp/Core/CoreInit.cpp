@@ -61,7 +61,8 @@ X_USING_NAMESPACE;
 #define DLL_FONT			"Engine_Font"
 #define DLL_SOUND			"Engine_Sound"
 #define DLL_SCRIPT			"Engine_Script"
-#define DLL_RENDER			"Engine_RenderDx10"
+#define DLL_RENDER			"Engine_RenderDx12"
+#define DLL_RENDER_CLASS	"Engine_RenderDx12"
 #define DLL_RENDER_NULL		"Engine_RenderNull"
 #define DLL_3D_ENGINE		"Engine_3DEngine"
 #define DLL_GAME_DLL		"Engine_GameDLL"
@@ -609,7 +610,6 @@ bool XCore::InitScriptSys(const SCoreInitParams& initParams)
 
 bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 {
-#if 0
 	if (initParams.bTesting)
 	{
 		if (!IntializeEngineModule(DLL_RENDER_NULL, "Engine_RenderNull", initParams))
@@ -617,47 +617,7 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 	}
 	else
 	{
-		if (!IntializeEngineModule("Engine_RenderDx12", "Engine_RenderDx12", initParams))
-			return false;
-	}
-
-	if (!env_.pRender2)
-		return false;
-
-	if (initParams.bTesting)
-	{
-		env_.pRender->Init(NULL, 0, 0);
-
-	}
-	else
-	{
-		if (!pWindow_) {
-			return false;
-		}
-
-		HWND hWnd = pWindow_->GetNativeWindow();
-		uint32_t width = pWindow_->GetClientWidth();
-		uint32_t height = pWindow_->GetClientHeight();
-
-		if (!env_.pRender2->init(hWnd, width, height)) {
-			X_ERROR("Core", "Failed to init render system");
-			return false;
-		}
-
-		env_.pRender2->shutDown();
-
-		X_LOG0("Core", "render init: ^6%gms");
-	}
-
-#else
-	if (initParams.bTesting)
-	{
-		if (!IntializeEngineModule(DLL_RENDER_NULL, "Engine_RenderNull", initParams))
-			return false;
-	}
-	else
-	{
-		if (!IntializeEngineModule(DLL_RENDER, "Engine_RenderDx10", initParams))
+		if (!IntializeEngineModule(DLL_RENDER, DLL_RENDER_CLASS, initParams))
 			return false;
 	}
 
@@ -686,7 +646,6 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 
 		X_LOG0("Core", "render init: ^6%gms");
 	}
-#endif
 
 	return true;
 }
