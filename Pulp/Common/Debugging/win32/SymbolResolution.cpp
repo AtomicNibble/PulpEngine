@@ -92,9 +92,14 @@ namespace symbolResolution
 		HANDLE hProcess = GetCurrentProcess();
 
 		if (!SymFromAddr(hProcess, reinterpret_cast<DWORD64>(address), &displacement64, &sip.si)) {
-			core::lastError::Description Dsc;
-			X_ERROR("Symbols", "SymFromAddr failed. Err: %s", core::lastError::ToString(Dsc));
-			return SymbolInfo("function", "filename", 0);
+
+			// refresh and try again.
+			core::symbolResolution::Refresh();
+			if (!SymFromAddr(hProcess, reinterpret_cast<DWORD64>(address), &displacement64, &sip.si)) {
+				core::lastError::Description Dsc;
+				X_ERROR("Symbols", "SymFromAddr failed. Err: %s", core::lastError::ToString(Dsc));
+				return SymbolInfo("function", "filename", 0);
+			}
 		}
 		if (!SymGetLineFromAddr64(hProcess, reinterpret_cast<DWORD64>(address), &displacement, &line)) {
 			core::lastError::Description Dsc;
