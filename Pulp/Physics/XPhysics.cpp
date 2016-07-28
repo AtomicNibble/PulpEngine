@@ -3,6 +3,7 @@
 #include "MathHelpers.h"
 
 #include <IConsole.h>
+#include <IRender.h>
 
 #include <pvd\PxVisualDebugger.h>
 #include <common\windows\PxWindowsDelayLoadHook.h>
@@ -85,6 +86,7 @@ XPhysics::PvdParameters::PvdParameters() :
 // ---------------------------------
 
 XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena) :
+	arena_(arena),
 	jobDispatcher_(*pJobSys),
 	allocator_(arena),
 	foundation_(nullptr),
@@ -108,6 +110,7 @@ XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::Mem
 	fixedStepper_(0.016666660f, maxSubSteps),
 	invertedFixedStepper_(0.016666660f, maxSubSteps),
 	variableStepper_(1.0f / 80.0f, 1.0f / 40.0f, maxSubSteps)
+
 {
 	X_ASSERT_NOT_NULL(arena);
 
@@ -273,9 +276,26 @@ bool XPhysics::init(void)
 	return true;
 }
 
+bool XPhysics::initRenderResources(void)
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pRender2);
+
+	X_ASSERT(!pDebugRender_, "Debug render already init")(pDebugRender_);
+
+	render::IRenderAux* pAux = gEnv->pRender2->getAuxRender(render::IRender2::AuxRenderer::PHYSICS);
+	pDebugRender_ = X_NEW(DebugRender, arena_, "PhysDebugRender")(pAux);
+
+	return true;
+}
+
 void XPhysics::shutDown(void)
 {
 	X_LOG0("PhysicsSys", "Shutting Down");
+
+	if (pDebugRender_) {
+		X_DELETE(pDebugRender_, arena_);
+	}
 
 	debugStepper_.shutdown();
 	fixedStepper_.shutdown();
@@ -356,12 +376,12 @@ void XPhysics::onTickPostRender(float dtime)
 	}
 
 	// debug Vis
-	if (scene_ && vars_.DebugDrawEnabled())
+	if (scene_ && vars_.DebugDrawEnabled() && pDebugRender_)
 	{
 		const physx::PxRenderBuffer& debugRenderable = scene_->getRenderBuffer();
 
-		debugRender_.clear();
-		debugRender_.update(debugRenderable);
+		pDebugRender_->clear();
+		pDebugRender_->update(debugRenderable);
 
 		updateRenderObjectsDebug(dtime);
 	}
@@ -378,9 +398,9 @@ void XPhysics::onTickPostRender(float dtime)
 
 void XPhysics::render(void)
 {
-	if (vars_.DebugDrawEnabled())
+	if (vars_.DebugDrawEnabled() && pDebugRender_)
 	{
-		debugRender_.queueForRender();
+		pDebugRender_->queueForRender();
 	}
 }
 

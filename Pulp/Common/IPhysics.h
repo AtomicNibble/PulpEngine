@@ -16,6 +16,7 @@ struct IPhysics
 	virtual void registerCmds(void) X_ABSTRACT;
 
 	virtual bool init(void) X_ABSTRACT;
+	virtual bool initRenderResources(void) X_ABSTRACT; // allocates a Aux render
 	virtual void shutDown(void) X_ABSTRACT;
 	virtual void release(void) X_ABSTRACT;
 

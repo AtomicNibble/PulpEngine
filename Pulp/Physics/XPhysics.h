@@ -55,6 +55,7 @@ public:
 	void registerCmds(void) X_FINAL;
 
 	bool init(void) X_FINAL;
+	bool initRenderResources(void) X_FINAL;
 	void shutDown(void) X_FINAL;
 	void release(void) X_FINAL;
 
@@ -112,6 +113,8 @@ private:
 	void cmd_ToggleVis(core::IConsoleCmdArgs* pArgs);
 
 private:
+	core::MemoryArenaBase* arena_;
+
 	PhysxCpuDispacher jobDispatcher_;
 	PhysxArenaAllocator	allocator_;
 	PhysxLogger logger_;
@@ -146,7 +149,7 @@ private:
 
 	PhysXVars vars_;
 
-	DebugRender debugRender_;
+	DebugRender* pDebugRender_;
 };
 
 
