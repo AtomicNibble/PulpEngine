@@ -38,6 +38,11 @@ ContextManager::~ContextManager()
 
 }
 
+GraphicsContext* ContextManager::allocateGraphicsContext(CommandListManger& cmdListMan)
+{
+	return reinterpret_cast<GraphicsContext*>(allocateContext(cmdListMan, D3D12_COMMAND_LIST_TYPE_DIRECT));
+}
+
 CommandContext* ContextManager::allocateContext(CommandListManger& cmdListMan, D3D12_COMMAND_LIST_TYPE type)
 {
 	core::CriticalSection::ScopedLock lock(cs_);

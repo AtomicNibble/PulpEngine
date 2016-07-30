@@ -38,6 +38,8 @@ struct Param
 };
 
 
+class GraphicsContext;
+class ComputeContext;
 
 class ContextManager
 {
@@ -48,7 +50,9 @@ public:
 		DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan);
 	~ContextManager();
 
+	GraphicsContext* allocateGraphicsContext(CommandListManger& cmdListMan);
 	CommandContext* allocateContext(CommandListManger& cmdListMan, D3D12_COMMAND_LIST_TYPE type);
+
 	void freeContext(CommandContext* pContex);
 	void destroyAllContexts(void);
 
@@ -62,6 +66,7 @@ private:
 	core::Array<CommandContext*> contextPool_[COMMAND_LIST_TYPE_NUM];
 	std::queue<CommandContext*> availableContexts_[COMMAND_LIST_TYPE_NUM];
 };
+
 
 class CommandContext
 {
@@ -77,6 +82,10 @@ public:
 	virtual ~CommandContext(void);
 
 	X_INLINE D3D12_COMMAND_LIST_TYPE getType(void) const;
+
+	X_INLINE GraphicsContext& getGraphicsContext(void);
+	X_INLINE ComputeContext& getComputeContext(void);
+
 
 	// Flush existing commands to the GPU but keep the context alive
 	uint64_t flush(CommandListManger& cmdMng, bool waitForCompletion = false);

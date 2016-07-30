@@ -38,4 +38,15 @@ X_INLINE D3D12_COMMAND_LIST_TYPE CommandContext::getType(void) const
 	return type_;
 }
 
+X_INLINE GraphicsContext& CommandContext::getGraphicsContext(void)
+{
+	X_ASSERT(type_ != D3D12_COMMAND_LIST_TYPE_COMPUTE, "Cannot convert async compute context to graphics")(type_);
+	return reinterpret_cast<GraphicsContext&>(*this);
+}
+
+X_INLINE ComputeContext& CommandContext::getComputeContext(void)
+{
+	return reinterpret_cast<ComputeContext&>(*this);
+}
+
 X_NAMESPACE_END
