@@ -21,6 +21,7 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	dedicatedvideoMemory_(0),
 	pDescriptorAllocator_(nullptr),
 	pDescriptorAllocatorPool_(nullptr),
+	currentBufferIdx_(0),
 	auxQues_ {arena, arena} 
 {
 
