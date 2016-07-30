@@ -7,10 +7,12 @@ X_NAMESPACE_BEGIN(render)
 
 class DescriptorCache;
 
+
+// makes use of g_rendererArena
 class RootParameter
 {
 public:
-	X_INLINE RootParameter();
+	X_INLINE explicit RootParameter();
 	X_INLINE ~RootParameter();
 
 	X_INLINE void clear(void);
@@ -20,17 +22,17 @@ public:
 	X_INLINE void initAsConstantBuffer(uint32_t Register, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
 	X_INLINE void initAsBufferSRV(uint32_t Register, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
 	X_INLINE void initAsBufferUAV(uint32_t Register, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
-	X_INLINE void initAsDescriptorRange(core::MemoryArenaBase* arena, D3D12_DESCRIPTOR_RANGE_TYPE type, uint32_t Register,
+	X_INLINE void initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE type, uint32_t Register,
 		 	uint32_t Count, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
-	X_INLINE void initAsDescriptorTable(core::MemoryArenaBase* arena, uint32_t rangeCount, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
+	X_INLINE void initAsDescriptorTable(uint32_t rangeCount, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
 	X_INLINE void setTableRange(uint32_t rangeIndex, D3D12_DESCRIPTOR_RANGE_TYPE type,
 		uint32_t Register, uint32_t Count, uint32_t space = 0);
 	 
 	X_INLINE const D3D12_ROOT_PARAMETER& operator() (void) const;
 
 protected:
+	// 1:1 mapping of D3D12_ROOT_PARAMETER, so can't add any extra members.
 	D3D12_ROOT_PARAMETER rootParam_;
-	core::MemoryArenaBase* arena_;
 };
 
 

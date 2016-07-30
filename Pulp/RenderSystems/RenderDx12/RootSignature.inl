@@ -3,7 +3,7 @@ X_NAMESPACE_BEGIN(render)
 
 
 
-X_INLINE RootParameter::RootParameter()
+X_INLINE RootParameter::RootParameter() 
 {
 	rootParam_.ParameterType = static_cast<D3D12_ROOT_PARAMETER_TYPE>(0xFFFFFFFF);
 }
@@ -18,8 +18,7 @@ X_INLINE void RootParameter::clear(void)
 	if (rootParam_.ParameterType == D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE) {
 		D3D12_DESCRIPTOR_RANGE* pRange = const_cast<D3D12_DESCRIPTOR_RANGE*>(rootParam_.DescriptorTable.pDescriptorRanges);
 
-		X_DELETE_ARRAY(pRange, arena_);
-		arena_ = nullptr;
+		X_DELETE_ARRAY(pRange, g_rendererArena);
 	}
 
 	rootParam_.ParameterType = static_cast<D3D12_ROOT_PARAMETER_TYPE>(0xFFFFFFFF);
@@ -58,23 +57,19 @@ X_INLINE void RootParameter::initAsBufferUAV(uint32_t Register, D3D12_SHADER_VIS
 	rootParam_.Descriptor.RegisterSpace = 0;
 }
 
-X_INLINE void RootParameter::initAsDescriptorRange(core::MemoryArenaBase* arena, D3D12_DESCRIPTOR_RANGE_TYPE Type, uint32_t Register,
+X_INLINE void RootParameter::initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE Type, uint32_t Register,
 	uint32_t Count, D3D12_SHADER_VISIBILITY visibility)
 {
-	initAsDescriptorTable(arena, 1, visibility);
+	initAsDescriptorTable(1, visibility);
 	setTableRange(0, Type, Register, Count);
 }
 
-X_INLINE void RootParameter::initAsDescriptorTable(core::MemoryArenaBase* arena, uint32_t rangeCount, D3D12_SHADER_VISIBILITY visibility)
+X_INLINE void RootParameter::initAsDescriptorTable(uint32_t rangeCount, D3D12_SHADER_VISIBILITY visibility)
 {
-	X_ASSERT(arena_ == nullptr, "Arena must already be null")();
-	X_ASSERT_NOT_NULL(arena);
-
-	arena_ = arena;
 	rootParam_.ParameterType = D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE;
 	rootParam_.ShaderVisibility = visibility;
 	rootParam_.DescriptorTable.NumDescriptorRanges = rangeCount;
-	rootParam_.DescriptorTable.pDescriptorRanges = X_NEW_ARRAY(D3D12_DESCRIPTOR_RANGE, rangeCount, arena, "DescriptorTable");
+	rootParam_.DescriptorTable.pDescriptorRanges = X_NEW_ARRAY(D3D12_DESCRIPTOR_RANGE, rangeCount, g_rendererArena, "DescriptorTable");
 }
 
 X_INLINE void RootParameter::setTableRange(uint32_t rangeIndex, D3D12_DESCRIPTOR_RANGE_TYPE Type,
@@ -102,6 +97,8 @@ X_INLINE RootSignature::RootSignature(core::MemoryArenaBase* arena, size_t numRo
 	samplesInitCount_(0),
 	pSignature_(nullptr)
 {
+	samplers_.setGranularity(1);
+
 	// should be safe to leave these un-init.
 	descriptorTableBitMap_ = 0;
 	maxDescriptorCacheHandleCount_ = 0;
