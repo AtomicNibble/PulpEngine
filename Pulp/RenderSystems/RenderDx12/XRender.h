@@ -53,6 +53,8 @@ public:
 
 	IRenderAux* getAuxRender(AuxRenderer::Enum user) X_OVERRIDE;
 
+	Vec2<uint32_t> getDisplayRes(void) const X_OVERRIDE;
+	Vec2<float32_t> getDisplayResf(void) const X_OVERRIDE;
 
 	// =============================================
 	// ============== OLD API ======================

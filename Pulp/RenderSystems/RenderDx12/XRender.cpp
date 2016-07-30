@@ -336,6 +336,17 @@ IRenderAux* XRender::getAuxRender(AuxRenderer::Enum user)
 }
 
 
+Vec2<uint32_t> XRender::getDisplayRes(void) const
+{
+	return displayRes_;
+}
+
+Vec2<float32_t> XRender::getDisplayResf(void) const
+{
+	return Vec2<float32_t>(static_cast<float32_t>(displayRes_.x), static_cast<float32_t>(displayRes_.y));
+}
+
+
 bool XRender::freeSwapChainResources(void)
 {
 	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i) {

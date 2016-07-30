@@ -426,6 +426,10 @@ struct IRender
 	// each enum has a instance, and you don't own the pointer.
 	virtual IRenderAux* getAuxRender(AuxRenderer::Enum user) X_ABSTRACT;
 
+
+	virtual Vec2<uint32_t> getDisplayRes(void) const X_ABSTRACT;
+	virtual Vec2<float32_t> getDisplayResf(void) const X_ABSTRACT;
+
 	// =============================================
 	// ============== OLD API ======================
 	// =============================================
