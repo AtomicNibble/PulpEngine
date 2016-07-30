@@ -91,6 +91,7 @@ public:
 
 	X_INLINE LinearAllocationPage* requestPage(LinearAllocatorType::Enum type);
 	X_INLINE void discardPages(LinearAllocatorType::Enum type, uint64_t fenceID, const core::Array<LinearAllocationPage*>& pages);
+	void destroy(void);
 
 private:
 	std::array<LinearAllocatorPageManager, LinearAllocatorType::ENUM_COUNT> pageAllocators_;

@@ -157,10 +157,19 @@ LinearAllocatorManager::LinearAllocatorManager(core::MemoryArenaBase* arena, ID3
 	CommandListManger& cmdMan) :
 	pageAllocators_{{
 		{ arena, pDevice, cmdMan, LinearAllocatorType::GPU_EXCLUSIVE },
-		{arena, pDevice, cmdMan, LinearAllocatorType::CPU_WRITABLE },
+		{ arena, pDevice, cmdMan, LinearAllocatorType::CPU_WRITABLE },
 	}}
 {
 
+}
+
+
+void LinearAllocatorManager::destroy(void)
+{
+	for (auto& lapm : pageAllocators_)
+	{
+		lapm.destroy();
+	}
 }
 
 // --------------------------------------------------------------------
@@ -225,7 +234,6 @@ void LinearAllocator::cleanupUsedPages(uint64_t fenceID)
 	manager_.discardPages(allocationType_, fenceID, retiredPages_);
 	retiredPages_.clear();
 }
-
 
 
 
