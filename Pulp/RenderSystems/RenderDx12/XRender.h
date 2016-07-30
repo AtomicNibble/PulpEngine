@@ -170,9 +170,11 @@ private:
 	DescriptorAllocator* pDescriptorAllocator_;
 	DescriptorAllocatorPool* pDescriptorAllocatorPool_;
 
-	Vec2<uint32_t> currentNativeRes_;
-	Vec2<uint32_t> targetNativeRes_;
-	Vec2<uint32_t> displayRes_;
+
+	Vec2<uint32_t> currentNativeRes_;	// the resolution we render to.
+	Vec2<uint32_t> targetNativeRes_;	// if diffrent, the render buffers we be resized to this next frame.
+	Vec2<uint32_t> displayRes_;			// the resolution of the final screen
+
 	ColorBuffer displayPlane_[SWAP_CHAIN_BUFFER_COUNT];
 	uint32_t currentBufferIdx_;
 
