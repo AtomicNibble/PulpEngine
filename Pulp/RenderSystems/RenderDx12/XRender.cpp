@@ -305,6 +305,10 @@ void XRender::release(void)
 void XRender::registerVars(void)
 {
 	vars_.registerVars();
+
+
+	vars_.setNativeRes(currentNativeRes_);
+	vars_.setRes(displayRes_);
 }
 
 void XRender::registerCmds(void)
@@ -378,6 +382,7 @@ bool XRender::resize(uint32_t width, uint32_t height)
 
 	displayRes_.x = width;
 	displayRes_.y = height;
+	vars_.setRes(displayRes_);
 
 	freeSwapChainResources();
 
@@ -409,6 +414,7 @@ void XRender::handleResolutionChange(void)
 		targetNativeRes_.x, targetNativeRes_.y);
 
 	currentNativeRes_ = targetNativeRes_;
+	vars_.setNativeRes(currentNativeRes_);
 
 	// wait till gpu idle.
 	cmdListManager_.idleGPU();
