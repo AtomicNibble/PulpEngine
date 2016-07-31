@@ -61,6 +61,16 @@ IRenderAux* RenderNull::getAuxRender(AuxRenderer::Enum user)
 	return nullptr;
 }
 
+Vec2<uint32_t> RenderNull::getDisplayRes(void) const
+{
+	return Vec2<uint32_t>::zero();
+}
+
+Vec2<float32_t> RenderNull::getDisplayResf(void) const
+{
+	return Vec2<float32_t>::zero();
+}
+
 
 void RenderNull::SetState(StateFlag state)
 {
