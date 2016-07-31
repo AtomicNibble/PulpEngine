@@ -189,6 +189,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 		}
 
 		displayPlane_[i].createFromSwapChain(pDevice_, descriptorAllocator, pDisplayPlane);
+		displayPlane_[i].setClearColor(vars_.getClearCol());
 	}
 
 
