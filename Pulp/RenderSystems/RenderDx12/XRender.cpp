@@ -695,13 +695,13 @@ IRenderAux* XRender::GetIRenderAuxGeo(void)
 
 
 // Textures 
-texture::ITexture* XRender::LoadTexture(const char* path, texture::TextureFlags flags)
+::texture::ITexture* XRender::LoadTexture(const char* pPath, texture::TextureFlags flags)
 {
-	X_ASSERT_NOT_NULL(path);
-	X_UNUSED(path);
-	X_UNUSED(flags);
+	X_ASSERT_NOT_NULL(pPath);
 
-	return nullptr;
+	texture::Texture* pText = pTextureMan_->forName(pPath, flags);
+
+	return pText;
 }
 
 
