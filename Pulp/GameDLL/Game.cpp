@@ -54,15 +54,12 @@ bool XGame::Init(void)
 	del.Bind<XGame, &XGame::OnFovChanged>(this);
 	pFovVar_->SetOnChangeCallback(del);
 
-	uint32_t width, height;
+	auto deimension = gEnv->pRender->getDisplayRes();
 
-	height = static_cast<uint32_t>(gEnv->pRender->getHeight());
-	width = static_cast<uint32_t>(gEnv->pRender->getWidth());
-	
-	X_ASSERT(height > 0, "height is not valid")(height);
-	X_ASSERT(width > 0, "height is not valid")(width);
+	X_ASSERT(deimension.x > 0, "height is not valid")(deimension.x);
+	X_ASSERT(deimension.y > 0, "height is not valid")(deimension.y);
 
-	cam_.SetFrustum(width, height, DEFAULT_FOV, 0.25f, 512.f);
+	cam_.SetFrustum(deimension.x, deimension.y, DEFAULT_FOV, 0.25f, 512.f);
 
 	return true;
 }
