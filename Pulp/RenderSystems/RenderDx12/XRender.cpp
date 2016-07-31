@@ -376,7 +376,7 @@ bool XRender::initRenderBuffers(Vec2<uint32_t> res)
 
 bool XRender::resize(uint32_t width, uint32_t height)
 {
-	X_LOG1("Dx12", "Resizing display res to: x:%x y:%x", width, height);
+	X_LOG1("Dx12", "Resizing display res to: x:%" PRIu32 " y:%" , width, height);
 	X_ASSERT_NOT_NULL(pSwapChain_);
 	X_ASSERT_NOT_NULL(pDescriptorAllocator_);
 
@@ -409,7 +409,7 @@ void XRender::handleResolutionChange(void)
 		return;
 	}
 
-	X_LOG1("Dx12", "Changing native res from: x:%x y:%x to: x:%x y:%x", 
+	X_LOG1("Dx12", "Changing native res from: x:%" PRIu32 " y:%" PRIu32 " to: x:%" PRIu32 " y:%" PRIu32,
 		currentNativeRes_.x, currentNativeRes_.y,
 		targetNativeRes_.x, targetNativeRes_.y);
 
