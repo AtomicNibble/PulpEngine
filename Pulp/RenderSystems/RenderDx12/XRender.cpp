@@ -2,7 +2,11 @@
 #include "XRender.h"
 
 #include "Texture\TextureManager.h"
+#include "Texture\Texture.h"
 #include "Auxiliary\AuxRenderImp.h"
+
+#include "Allocators\LinearAllocator.h"
+#include "CommandContex.h"
 
 #include <IConsole.h>
 
@@ -17,10 +21,12 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	pTextureMan_(nullptr),
 	pAuxRender_(nullptr),
 	shaderMan_(arena),
+	pContextMan_(nullptr),
 	cmdListManager_(arena),
 	dedicatedvideoMemory_(0),
 	pDescriptorAllocator_(nullptr),
 	pDescriptorAllocatorPool_(nullptr),
+	presentRS_(arena),
 	currentBufferIdx_(0),
 	auxQues_ {arena, arena} 
 {
@@ -141,6 +147,11 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	pDescriptorAllocatorPool_ = X_NEW(DescriptorAllocatorPool, arena_, "DescriptorAllocatorPool")(arena_, pDevice_, cmdListManager_);
 
 	DescriptorAllocator& descriptorAllocator = *pDescriptorAllocator_;
+	DescriptorAllocatorPool& descriptorAllocatorPool = *pDescriptorAllocatorPool_;
+
+	pLinearAllocatorMan_ = X_NEW(LinearAllocatorManager, arena_, "LinAlocMan")(arena_, pDevice_, cmdListManager_);
+	pContextMan_ = X_NEW(ContextManager, arena_, "ContextMan")(arena_, pDevice_, descriptorAllocatorPool, *pLinearAllocatorMan_);
+
 
 
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
@@ -226,6 +237,15 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	samplerLinearBorderDesc_.setBorderColor(Colorf(0.0f, 0.0f, 0.0f, 0.0f));
 	samplerLinearBorder_.create(pDevice_, descriptorAllocator, samplerLinearBorderDesc_);
 
+	// RootSig
+	presentRS_.reset(4, 2);
+	presentRS_[0].initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 2);
+	presentRS_[1].initAsConstants(0, 6, D3D12_SHADER_VISIBILITY_PIXEL);
+	presentRS_[2].initAsBufferSRV(2, D3D12_SHADER_VISIBILITY_PIXEL);
+	presentRS_[3].initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
+	presentRS_.initStaticSampler(0, samplerLinearClampDesc_, D3D12_SHADER_VISIBILITY_PIXEL);
+	presentRS_.initStaticSampler(1, samplerPointClampDesc_, D3D12_SHADER_VISIBILITY_PIXEL);
+	presentRS_.finalize(pDevice_);
 
 
 	if (!shaderMan_.init()) {
@@ -244,7 +264,6 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 		X_ERROR("Render", "failed to init aux render system");
 		return false;
 	}
- 
 
 	return true;
 }
@@ -261,6 +280,17 @@ void XRender::shutDown(void)
 		X_DELETE_AND_NULL(pAuxRender_, arena_);
 	}
 
+	if (pContextMan_) {
+		pContextMan_->destroyAllContexts();
+		X_DELETE_AND_NULL(pContextMan_, arena_);
+	}
+
+	if (pLinearAllocatorMan_) {
+		pLinearAllocatorMan_->destroy();
+		X_DELETE_AND_NULL(pLinearAllocatorMan_, arena_);
+	}
+
+
 	shaderMan_.shutdown();
 
 	cmdListManager_.shutdown();
@@ -274,6 +304,7 @@ void XRender::shutDown(void)
 	if (pDescriptorAllocatorPool_) {
 		X_DELETE_AND_NULL(pDescriptorAllocatorPool_, arena_);
 	}
+
 
 	core::SafeReleaseDX(pSwapChain_);
 
@@ -323,13 +354,29 @@ void XRender::registerCmds(void)
 
 void XRender::renderBegin(void)
 {
+	D3D12_CPU_DESCRIPTOR_HANDLE RTVs[] = {
+		displayPlane_[currentBufferIdx_].getRTV()
+	};
 
+	GraphicsContext* pContext = pContextMan_->allocateGraphicsContext(cmdListManager_);
+
+	pContext->transitionResource(displayPlane_[currentBufferIdx_], D3D12_RESOURCE_STATE_RENDER_TARGET);
+	pContext->setViewportAndScissor(0, 0, currentNativeRes_.x, currentNativeRes_.y);
+	pContext->setRootSignature(presentRS_);
+
+	pContext->setRenderTargets(_countof(RTVs), RTVs);
+	pContext->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	pContext->draw(3);
+
+
+	pContext->clearColor(displayPlane_[currentBufferIdx_]);
+	pContext->transitionResource(displayPlane_[currentBufferIdx_], D3D12_RESOURCE_STATE_PRESENT);
+	pContext->finish(cmdListManager_, false);
 }
 
 void XRender::renderEnd(void)
 {
 	currentBufferIdx_ = (currentBufferIdx_ + 1) % SWAP_CHAIN_BUFFER_COUNT;
-
 
 	HRESULT hr = pSwapChain_->Present(0, 0);
 	if (FAILED(hr)) {

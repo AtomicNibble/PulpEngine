@@ -16,7 +16,7 @@
 #include "Shader\ShaderManager.h"
 #include "Vars\RenderVars.h"
 #include "Auxiliary\AuxRender.h"
-
+#include "RootSignature.h"
 
 X_NAMESPACE_DECLARE(texture,
 	class TextureManager;
@@ -28,6 +28,8 @@ X_NAMESPACE_DECLARE(core,
 X_NAMESPACE_BEGIN(render)
 
 class RenderAuxImp;
+class ContextManager;
+class LinearAllocatorManager;
 
 class XRender : public IRender
 {
@@ -162,14 +164,14 @@ private:
 	texture::TextureManager* pTextureMan_;
 	RenderAuxImp* pAuxRender_;
 
+	LinearAllocatorManager* pLinearAllocatorMan_;
+	ContextManager* pContextMan_;
 	CommandListManger cmdListManager_;
-
-	core::StackString<128, wchar_t> deviceName_;
-	size_t dedicatedvideoMemory_;
 
 	DescriptorAllocator* pDescriptorAllocator_;
 	DescriptorAllocatorPool* pDescriptorAllocatorPool_;
 
+	RootSignature presentRS_;
 
 	Vec2<uint32_t> currentNativeRes_;	// the resolution we render to.
 	Vec2<uint32_t> targetNativeRes_;	// if diffrent, the render buffers we be resized to this next frame.
@@ -198,6 +200,9 @@ private:
 
 	D3D_FEATURE_LEVEL featureLvl_;
 	GpuFeatures features_;
+
+	core::StackString<128, wchar_t> deviceName_;
+	size_t dedicatedvideoMemory_;
 
 	RenderAux auxQues_[AuxRenderer::ENUM_COUNT];
 };
