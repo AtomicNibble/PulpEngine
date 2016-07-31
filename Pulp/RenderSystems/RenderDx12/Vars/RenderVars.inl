@@ -9,7 +9,8 @@ X_INLINE bool RenderVars::drawAux(void) const
 
 X_INLINE const Colorf& RenderVars::getClearCol(void) const
 {
-	return r_clear_color;
+	return clearColor_;
 }
+
 
 X_NAMESPACE_END

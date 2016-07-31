@@ -19,9 +19,15 @@ public:
 	X_INLINE bool drawAux(void) const;
 	X_INLINE const Colorf& getClearCol(void) const;
 
+	void setNativeRes(const Vec2<uint32_t>& res);
+	void setRes(const Vec2<uint32_t>& res);
+
 private:
 	int32_t drawAux_;
-	Colorf r_clear_color;
+	Colorf clearColor_;
+
+	core::ICVar* pNativeRes_;
+	core::ICVar* pRes_;
 };
 
 
