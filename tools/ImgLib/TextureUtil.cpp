@@ -229,8 +229,9 @@ namespace Util
 				// scale to 4x4 pixel blocks.
 				size += core::Max(bytes_per_block, ((width + 3) / 4) * ((height + 3) / 4) * bytes_per_block);
 			}
-			else
+			else {
 				size += ((bits_per_pixel * width) * height) / 8;
+			}
 
 			// shift
 			width >>= 1;
