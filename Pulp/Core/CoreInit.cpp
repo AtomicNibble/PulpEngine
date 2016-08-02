@@ -635,6 +635,8 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 			return false;
 		}
 
+		core::StopWatch timer;
+
 		HWND hWnd = pWindow_->GetNativeWindow();
 		uint32_t width = pWindow_->GetClientWidth();
 		uint32_t height = pWindow_->GetClientHeight();
@@ -644,7 +646,7 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 			return false;
 		}
 
-		X_LOG0("Core", "render init: ^6%gms");
+		X_LOG0("Core", "render init: ^6%gms", timer.GetMilliSeconds());
 	}
 
 	return true;
