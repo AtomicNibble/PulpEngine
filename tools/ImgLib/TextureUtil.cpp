@@ -241,6 +241,84 @@ namespace Util
 		return size;
 	}
 
+	size_t rowBytes(uint32_t width, uint32_t height, Texturefmt::Enum fmt)
+	{
+		size_t rowBytes = 0;
+
+		bool blockComp = false;
+		bool packed = false;
+		bool planar = false;
+		size_t bytesPerElem = 0;
+
+		switch (fmt)
+		{
+		case Texturefmt::BC1:
+		case Texturefmt::BC1_SRGB:
+		case Texturefmt::BC1_TYPELESS:
+		case Texturefmt::BC4:
+		case Texturefmt::BC4_SNORM:
+		case Texturefmt::BC4_TYPELESS:
+			blockComp = true;
+			bytesPerElem = 8;
+			break;
+
+		case Texturefmt::BC2:
+		case Texturefmt::BC2_SRGB:
+		case Texturefmt::BC2_TYPELESS:
+		case Texturefmt::BC3:
+		case Texturefmt::BC3_SRGB:
+		case Texturefmt::BC3_TYPELESS:
+		case Texturefmt::BC5:
+		case Texturefmt::BC5_SNORM:
+		case Texturefmt::BC5_TYPELESS:
+		case Texturefmt::BC6:
+		case Texturefmt::BC6_TYPELESS:
+		case Texturefmt::BC6_SF16:
+		case Texturefmt::BC7:
+		case Texturefmt::BC7_TYPELESS:
+		case Texturefmt::BC7_SRGB:
+
+		case Texturefmt::ATI2:
+		case Texturefmt::ATI2_XY:
+			blockComp = true;
+			bytesPerElem = 16;
+			break;
+
+		default:
+			break;
+		}
+
+		if (blockComp)
+		{
+			size_t numBlocksWide = 0;
+			if (width > 0)
+			{
+				numBlocksWide = core::Max<size_t>(1, (width + 3) / 4);
+			}
+			size_t numBlocksHigh = 0;
+			if (height > 0)
+			{
+				numBlocksHigh = core::Max<size_t>(1, (height + 3) / 4);
+			}
+			rowBytes = numBlocksWide * bytesPerElem;
+		}
+		else if (packed)
+		{
+			rowBytes = ((width + 1) >> 1) * bytesPerElem;
+		}
+		else if (planar)
+		{
+			rowBytes = ((width + 1) >> 1) * bytesPerElem;
+		}
+		else
+		{
+			size_t bpp = bitsPerPixel(fmt);
+			rowBytes = (width * bpp + 7) / 8; // round up to nearest byte
+		}
+
+		return rowBytes;
+	}
+
 
 	void faceInfo(uint32_t width, uint32_t height, Texturefmt::Enum fmt,
 		size_t* pOutNumBytes, size_t* pOutRowBytes, size_t* pOutNumRows)
@@ -296,7 +374,6 @@ namespace Util
 		default:
 			break;
 		}
-
 
 		if (blockComp)
 		{
