@@ -16,6 +16,7 @@
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <OpenMPSupport>false</OpenMPSupport>
+      <AdditionalOptions>/std:c++latest%(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
 	<Link>
 		<TreatLinkerWarningAsErrors>true</TreatLinkerWarningAsErrors>
