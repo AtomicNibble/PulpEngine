@@ -20,6 +20,19 @@ namespace D3DDebug
 #endif
 	}
 
+	X_INLINE void SetDebugObjectName(ID3D12Object* pResource, const char* pName)
+	{
+#if X_DEBUG
+		wchar_t wideName[256];
+		core::strUtil::Convert(pName, wideName, sizeof(wideName));
+
+		pResource->SetName(wideName);
+#else
+		UNREFERENCED_PARAMETER(pResource);
+		UNREFERENCED_PARAMETER(pName);
+#endif
+	}
+
 	template<size_t TNameLength>
 	X_INLINE void SetDebugObjectName(ID3D12Object* pResource, const wchar_t(&name)[TNameLength])
 	{
