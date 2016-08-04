@@ -282,8 +282,6 @@ void CommandContext::writeBuffer(GpuResource& dest, size_t destOffset, const voi
 
 void CommandContext::fillBuffer(GpuResource& dest, size_t destOffset, Param val, size_t numBytes)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
-
 	DynAlloc tempSpace = cpuLinearAllocator_.allocate(numBytes, 512);
 	__m128 VectorValue = _mm_set1_ps(val.fval);
 
@@ -395,17 +393,6 @@ void CommandContext::insertAliasBarrier(GpuResource& before, GpuResource& after,
 	}
 }
 
-
-void CommandContext::insertTimeStamp(ID3D12QueryHeap* pQueryHeap, uint32_t queryIdx)
-{
-	pCommandList_->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, queryIdx);
-}
-
-void CommandContext::resolveTimeStamps(ID3D12Resource* pReadbackHeap, ID3D12QueryHeap* pQueryHeap, 
-	uint32_t numQueries)
-{
-	pCommandList_->ResolveQueryData(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 0, numQueries, pReadbackHeap, 0);
-}
 
 void CommandContext::setDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type, ID3D12DescriptorHeap* pHeapPtr)
 {
