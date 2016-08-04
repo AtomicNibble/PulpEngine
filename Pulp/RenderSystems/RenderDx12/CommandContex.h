@@ -114,6 +114,9 @@ public:
 
 	X_INLINE void insertTimeStamp(ID3D12QueryHeap* pQueryHeap, uint32_t queryIdx);
 	X_INLINE void resolveTimeStamps(ID3D12Resource* pReadbackHeap, ID3D12QueryHeap* pQueryHeap, uint32_t numQueries);
+	void pIXBeginEvent(const wchar_t* pLabel);
+	void pIXEndEvent(void);
+	void pIXSetMarker(const wchar_t* pLabel);
 
 	void setDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type, ID3D12DescriptorHeap* pHeapPtr);
 	void setDescriptorHeaps(uint32_t heapCount, D3D12_DESCRIPTOR_HEAP_TYPE* pType, ID3D12DescriptorHeap** pHeapPtrs);

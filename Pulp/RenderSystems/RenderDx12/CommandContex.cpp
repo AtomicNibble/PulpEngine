@@ -11,6 +11,11 @@
 #include "Allocators\DynamicDescriptorHeap.h"
 
 
+#if X_DEBUG && _MSC_VER >= 1800
+#include <pix.h>
+#endif
+
+
 X_NAMESPACE_BEGIN(render)
 
 namespace
@@ -391,6 +396,32 @@ void CommandContext::insertAliasBarrier(GpuResource& before, GpuResource& after,
 	if (flushImmediate) {
 		flushResourceBarriers();
 	}
+}
+
+
+void CommandContext::pIXBeginEvent(const wchar_t* pLabel)
+{
+#if !X_DEBUG || _MSC_VER < 1800
+	(label);
+#else
+	::PIXBeginEvent(pCommandList_, 0, pLabel);
+#endif
+}
+
+void CommandContext::pIXEndEvent(void)
+{
+#if X_DEBUG && _MSC_VER >= 1800
+	::PIXEndEvent(pCommandList_);
+#endif
+}
+
+void CommandContext::pIXSetMarker(const wchar_t* pLabel)
+{
+#if !X_DEBUG || _MSC_VER < 1800
+	(label);
+#else
+	::PIXSetMarker(pCommandList_, 0, pLabel);
+#endif
 }
 
 
