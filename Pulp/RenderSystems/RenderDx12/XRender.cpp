@@ -239,10 +239,10 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 	// RootSig
 	presentRS_.reset(4, 2);
-	presentRS_[0].initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 2);
-	presentRS_[1].initAsConstants(0, 6, D3D12_SHADER_VISIBILITY_PIXEL);
-	presentRS_[2].initAsBufferSRV(2, D3D12_SHADER_VISIBILITY_PIXEL);
-	presentRS_[3].initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
+	presentRS_.getParamRef(0).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 2);
+	presentRS_.getParamRef(1).initAsConstants(0, 6, D3D12_SHADER_VISIBILITY_PIXEL);
+	presentRS_.getParamRef(2).initAsBufferSRV(2, D3D12_SHADER_VISIBILITY_PIXEL);
+	presentRS_.getParamRef(3).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
 	presentRS_.initStaticSampler(0, samplerLinearClampDesc_, D3D12_SHADER_VISIBILITY_PIXEL);
 	presentRS_.initStaticSampler(1, samplerPointClampDesc_, D3D12_SHADER_VISIBILITY_PIXEL);
 	presentRS_.finalize(pDevice_);

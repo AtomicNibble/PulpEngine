@@ -135,12 +135,12 @@ X_INLINE size_t RootSignature::numParams(void) const
 	return params_.size();
 }
 
-X_INLINE RootParameter& RootSignature::operator[] (size_t idx)
+X_INLINE RootParameter& RootSignature::getParamRef(size_t idx)
 {
 	return params_[idx];
 }
 
-X_INLINE const RootParameter& RootSignature::operator[] (size_t idx) const
+X_INLINE const RootParameter& RootSignature::getParamRef(size_t idx) const
 {
 	return params_[idx];
 }

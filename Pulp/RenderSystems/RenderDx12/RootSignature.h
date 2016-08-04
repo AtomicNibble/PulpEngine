@@ -63,8 +63,8 @@ public:
 	void finalize(ID3D12Device* pDevice, D3D12_ROOT_SIGNATURE_FLAGS flags = D3D12_ROOT_SIGNATURE_FLAG_NONE);
 
 	X_INLINE size_t numParams(void) const;
-	X_INLINE RootParameter& operator[] (size_t idx);
-	X_INLINE const RootParameter& operator[] (size_t idx) const;
+	X_INLINE RootParameter& getParamRef(size_t idx);
+	X_INLINE const RootParameter& getParamRef(size_t idx) const;
 	X_INLINE ID3D12RootSignature* getSignature(void) const;
 
 	X_INLINE uint32_t descriptorTableBitMap(void) const;
