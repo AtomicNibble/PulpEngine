@@ -435,11 +435,6 @@ void CommandContext::setDescriptorHeaps(uint32_t heapCount, D3D12_DESCRIPTOR_HEA
 	}
 }
 
-void CommandContext::setPredication(ID3D12Resource* pBuffer, uint64_t bufferOffset, 
-	D3D12_PREDICATION_OP op)
-{
-	pCommandList_->SetPredication(pBuffer, bufferOffset, op);
-}
 
 
 void CommandContext::flushResourceBarriers(void)

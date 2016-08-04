@@ -33,6 +33,28 @@ X_INLINE void Param::operator= (int32_t i)
 // ----------------------------------
 
 
+
+X_INLINE void CommandContext::insertTimeStamp(ID3D12QueryHeap* pQueryHeap, uint32_t queryIdx)
+{
+	pCommandList_->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, queryIdx);
+}
+
+X_INLINE void CommandContext::resolveTimeStamps(ID3D12Resource* pReadbackHeap, ID3D12QueryHeap* pQueryHeap,
+	uint32_t numQueries)
+{
+	pCommandList_->ResolveQueryData(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, 0, numQueries, pReadbackHeap, 0);
+}
+
+
+X_INLINE void CommandContext::setPredication(ID3D12Resource* pBuffer, uint64_t bufferOffset,
+	D3D12_PREDICATION_OP op)
+{
+	pCommandList_->SetPredication(pBuffer, bufferOffset, op);
+}
+
+// ----------------------------------
+
+
 X_INLINE D3D12_COMMAND_LIST_TYPE CommandContext::getType(void) const
 {
 	return type_;

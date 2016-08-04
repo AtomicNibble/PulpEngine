@@ -112,12 +112,12 @@ public:
 	void insertUAVBarrier(GpuResource& resource, bool flushImmediate = false);
 	void insertAliasBarrier(GpuResource& before, GpuResource& after, bool flushImmediate = false);
 
-	void insertTimeStamp(ID3D12QueryHeap* pQueryHeap, uint32_t queryIdx);
-	void resolveTimeStamps(ID3D12Resource* pReadbackHeap, ID3D12QueryHeap* pQueryHeap, uint32_t numQueries);
+	X_INLINE void insertTimeStamp(ID3D12QueryHeap* pQueryHeap, uint32_t queryIdx);
+	X_INLINE void resolveTimeStamps(ID3D12Resource* pReadbackHeap, ID3D12QueryHeap* pQueryHeap, uint32_t numQueries);
 
 	void setDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type, ID3D12DescriptorHeap* pHeapPtr);
 	void setDescriptorHeaps(uint32_t heapCount, D3D12_DESCRIPTOR_HEAP_TYPE* pType, ID3D12DescriptorHeap** pHeapPtrs);
-	void setPredication(ID3D12Resource* pBuffer, uint64_t bufferOffset, D3D12_PREDICATION_OP op);
+	X_INLINE void setPredication(ID3D12Resource* pBuffer, uint64_t bufferOffset, D3D12_PREDICATION_OP op);
 
 	void flushResourceBarriers(void);
 
