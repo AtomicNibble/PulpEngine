@@ -13,6 +13,29 @@
 
 X_NAMESPACE_BEGIN(render)
 
+namespace
+{
+
+	X_INLINE void memcpySubresource(const D3D12_MEMCPY_DEST* pDest, const D3D12_SUBRESOURCE_DATA* pSrc,
+		size_t rowSizeInBytes, uint32_t numRows, uint32_t numSlices)
+	{
+		for (uint32_t z = 0; z < numSlices; ++z)
+		{
+			BYTE* pDestSlice = reinterpret_cast<BYTE*>(pDest->pData) + pDest->SlicePitch * z;
+			const BYTE* pSrcSlice = reinterpret_cast<const BYTE*>(pSrc->pData) + pSrc->SlicePitch * z;
+
+			for (uint32_t y = 0; y < numRows; ++y)
+			{
+				memcpy(
+					pDestSlice + pDest->RowPitch * y,
+					pSrcSlice + pSrc->RowPitch * y,
+					rowSizeInBytes
+				);
+			}
+		}
+	}
+}
+
 
 const uint32_t CommandContext::VALID_COMPUTE_QUEUE_RESOURCE_STATES = (D3D12_RESOURCE_STATE_UNORDERED_ACCESS |
 	D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE |
@@ -398,7 +421,7 @@ void CommandContext::setDescriptorHeaps(uint32_t heapCount, D3D12_DESCRIPTOR_HEA
 {
 	bool anyChanged = false;
 
-	for (UINT i = 0; i < heapCount; ++i)
+	for (uint32_t i = 0; i < heapCount; ++i)
 	{
 		if (pCurrentDescriptorHeaps_[pTypes[i]] != pHeapPtrs[i])
 		{
@@ -448,6 +471,98 @@ void CommandContext::bindDescriptorHeaps(void)
 
 		pCommandList_->SetDescriptorHeaps(nonNullHeaps, pHeapsToBind);
 	}
+}
+
+uint64_t CommandContext::updateSubresources(
+	GpuResource& dest,
+	ID3D12Resource* pIntermediate,
+	uint32_t firstSubresource,
+	uint32_t numSubresources,
+	uint64_t requiredSize,
+	const D3D12_PLACED_SUBRESOURCE_FOOTPRINT* pLayouts,
+	const uint32_t* pNumRows,
+	const uint64_t* pRowSizesInBytes,
+	const D3D12_SUBRESOURCE_DATA* pSrcData)
+{
+	ID3D12Resource* pDestinationResource = dest.getResource();
+
+	// Minor validation
+	const D3D12_RESOURCE_DESC intermediateDesc = pIntermediate->GetDesc();
+	const D3D12_RESOURCE_DESC destinationDesc = pDestinationResource->GetDesc();
+
+	{
+		const uint64_t requiredWidth = requiredSize + pLayouts[0].Offset;
+
+		if (intermediateDesc.Width < requiredWidth) {
+			X_ERROR("CmdContex", "intermidiate width is less than required width: %" PRIu64" required: %" PRIu64,
+				intermediateDesc.Width, requiredWidth);
+			return 0;
+		}
+
+		if (intermediateDesc.Dimension != D3D12_RESOURCE_DIMENSION_BUFFER) {
+			X_ERROR("CmdContex", "intermidiate dimension is not of type buffer");
+			return 0;
+		}
+
+		// if D3D12_RESOURCE_DIMENSION_BUFFER
+		// numSubRes should be 1
+		// firstSub should not be zero
+		if (destinationDesc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER &&
+			(firstSubresource != 0 || numSubresources != 1)) {
+			X_ERROR("CmdContex", "you done fucked up!");
+			return 0;
+		}
+	}
+
+	{
+		BYTE* pData;
+		HRESULT hr = pIntermediate->Map(0, NULL, reinterpret_cast<void**>(&pData));
+		if (FAILED(hr))
+		{
+			X_ERROR("CmdContex", "failed to map intermediate buffer. err: %" PRIu32, hr);
+			return 0;
+		}
+
+		for (uint32_t i = 0; i < numSubresources; ++i)
+		{
+			if (pRowSizesInBytes[i] > std::numeric_limits<size_t>::max()) {
+				return 0;
+			}
+
+			D3D12_MEMCPY_DEST DestData = {
+				pData + pLayouts[i].Offset,
+				pLayouts[i].Footprint.RowPitch,
+				pLayouts[i].Footprint.RowPitch * pNumRows[i]
+			};
+
+			memcpySubresource(&DestData, &pSrcData[i], safe_static_cast<size_t, uint64_t>(pRowSizesInBytes[i]),
+				pNumRows[i], pLayouts[i].Footprint.Depth);
+		}
+
+		pIntermediate->Unmap(0, NULL);
+	}
+
+	if (destinationDesc.Dimension == D3D12_RESOURCE_DIMENSION_BUFFER)
+	{
+		CD3DX12_BOX SrcBox(
+			uint32_t(pLayouts[0].Offset),
+			uint32_t(pLayouts[0].Offset + pLayouts[0].Footprint.Width)
+		);
+		
+		pCommandList_->CopyBufferRegion(pDestinationResource, 0, pIntermediate,
+			pLayouts[0].Offset, pLayouts[0].Footprint.Width);
+	}
+	else
+	{
+		for (uint32_t i = 0; i < numSubresources; ++i)
+		{
+			CD3DX12_TEXTURE_COPY_LOCATION dst(pDestinationResource, i + firstSubresource);
+			CD3DX12_TEXTURE_COPY_LOCATION src(pIntermediate, pLayouts[i]);
+
+			pCommandList_->CopyTextureRegion(&dst, 0, 0, 0, &src, nullptr);
+		}
+	}
+	return requiredSize;
 }
 
 // --------------------------------------------------------
@@ -877,7 +992,7 @@ void ComputeContext::clearUAV(GpuBuffer& target)
 	// After binding a UAV, we can get a GPU handle that is required to clear it as a UAV (because it essentially runs
 	// a shader to set all of the values).
 	D3D12_GPU_DESCRIPTOR_HANDLE GpuVisibleHandle = dynamicDescriptorHeap_.uploadDirect(target.getUAV());
-	const UINT clearColor[4] = {};
+	const uint32_t clearColor[4] = {};
 	pCommandList_->ClearUnorderedAccessViewUint(GpuVisibleHandle, target.getUAV(), target.getResource(), clearColor, 0, nullptr);
 }
 

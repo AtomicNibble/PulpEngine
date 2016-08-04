@@ -122,8 +122,17 @@ public:
 	void flushResourceBarriers(void);
 
 
+	template <uint32_t maxSubresources>
+	X_INLINE uint64_t updateSubresources(GpuResource& dest, ID3D12Resource* pIntermediate,
+		uint64_t intermediateOffset, uint32_t firstSubresource, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSrcData);
+
 protected:
 	void bindDescriptorHeaps(void);
+
+	uint64_t updateSubresources(GpuResource& dest, ID3D12Resource* pIntermediate,
+		uint32_t firstSubresource, uint32_t numSubresources, uint64_t requiredSize,
+		const D3D12_PLACED_SUBRESOURCE_FOOTPRINT* pLayouts,
+		const uint32_t* pNumRows, const uint64_t* pRowSizesInBytes, const D3D12_SUBRESOURCE_DATA* pSrcData);
 
 protected:
 	ContextManager& contextManager_;
