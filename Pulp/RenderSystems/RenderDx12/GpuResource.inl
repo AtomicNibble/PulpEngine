@@ -48,6 +48,12 @@ X_INLINE const ID3D12Resource* GpuResource::getResource(void) const
 	return pResource_;
 }
 
+
+X_INLINE ID3D12Resource*& GpuResource::getResourcePtrRef(void)
+{
+	return pResource_;
+}
+
 X_INLINE D3D12_GPU_VIRTUAL_ADDRESS GpuResource::getGpuVirtualAddress(void) const
 {
 	return gpuVirtualAddress_;

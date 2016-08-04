@@ -19,6 +19,8 @@ public:
 	X_INLINE ID3D12Resource* getResource(void);
 	X_INLINE const ID3D12Resource* getResource(void) const;
 
+	X_INLINE ID3D12Resource*& getResourcePtrRef(void);
+
 	X_INLINE D3D12_GPU_VIRTUAL_ADDRESS getGpuVirtualAddress(void) const;
 
 	X_INLINE D3D12_RESOURCE_STATES getUsageState(void) const;
