@@ -402,7 +402,7 @@ void CommandContext::insertAliasBarrier(GpuResource& before, GpuResource& after,
 void CommandContext::pIXBeginEvent(const wchar_t* pLabel)
 {
 #if !X_DEBUG || _MSC_VER < 1800
-	(label);
+	X_UNUSED(pLabel);
 #else
 	::PIXBeginEvent(pCommandList_, 0, pLabel);
 #endif
@@ -418,7 +418,7 @@ void CommandContext::pIXEndEvent(void)
 void CommandContext::pIXSetMarker(const wchar_t* pLabel)
 {
 #if !X_DEBUG || _MSC_VER < 1800
-	(label);
+	X_UNUSED(pLabel);
 #else
 	::PIXSetMarker(pCommandList_, 0, pLabel);
 #endif
