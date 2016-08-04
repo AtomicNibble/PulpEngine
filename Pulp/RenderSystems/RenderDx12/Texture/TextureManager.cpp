@@ -254,6 +254,13 @@ X_NAMESPACE_BEGIN(texture)
 	{
 		// ummm check shit like generating mip maps and limits?
 		// or converting a format if it's not support :S ?
+		pTex->setFormat(imgFile.getFormat());
+		pTex->setType(imgFile.getType());
+		pTex->setWidth(imgFile.getWidth());
+		pTex->setHeight(imgFile.getHeight());
+		pTex->setDepth(imgFile.getDepth());
+		pTex->setNumFaces(imgFile.getNumFaces());
+		pTex->setNumMips(imgFile.getNumMips());
 
 		const auto flags = pTex->getFlags();
 		if (flags.IsSet(TextureFlags::FORCE_MIPS))
