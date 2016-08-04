@@ -30,6 +30,8 @@ public:
 	 
 	X_INLINE const D3D12_ROOT_PARAMETER& operator() (void) const;
 
+	X_INLINE D3D12_ROOT_PARAMETER_TYPE getType(void) const;
+
 protected:
 	// 1:1 mapping of D3D12_ROOT_PARAMETER, so can't add any extra members.
 	D3D12_ROOT_PARAMETER rootParam_;

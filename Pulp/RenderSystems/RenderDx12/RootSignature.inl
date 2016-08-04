@@ -88,7 +88,10 @@ X_INLINE const D3D12_ROOT_PARAMETER& RootParameter::operator() (void) const
 	return rootParam_;
 }
 
-
+X_INLINE D3D12_ROOT_PARAMETER_TYPE RootParameter::getType(void) const
+{
+	return rootParam_.ParameterType;
+}
 // -----------------------------------------------------------------
 
 X_INLINE RootSignature::RootSignature(core::MemoryArenaBase* arena, size_t numRootParams, size_t numStaticSamplers) :
