@@ -2,6 +2,13 @@
 
 #include <ITexture.h>
 
+#include "GpuResource.h"
+
+
+X_NAMESPACE_DECLARE(render,
+	class DescriptorAllocator;
+);
+
 X_NAMESPACE_BEGIN(texture)
 
 
@@ -11,6 +18,8 @@ X_NAMESPACE_BEGIN(texture)
 	public:
 		Texture(const char* pName, TextureFlags flags);
 		~Texture();
+
+		void destroy(void);
 
 		// temp maybe
 		X_INLINE const int addRef() X_OVERRIDE { return 1; }
@@ -36,7 +45,16 @@ X_NAMESPACE_BEGIN(texture)
 		X_INLINE const TextureFlags getFlags(void) const X_OVERRIDE;
 		X_INLINE const Texturefmt::Enum getFormat(void) const X_OVERRIDE;
 
+	public:
+		X_INLINE render::GpuResource& getGpuResource(void);
+
+		X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getSRV(void) const;
+		X_INLINE void setSRV(D3D12_CPU_DESCRIPTOR_HANDLE& srv);
+
 	private:
+		render::GpuResource	resource_;
+		D3D12_CPU_DESCRIPTOR_HANDLE hCpuDescriptorHandle_;
+
 		core::string		fileName_;
 		Vec2<uint16_t>		dimensions_;
 		uint32_t			datasize_; // size of the higest mip in bytes.

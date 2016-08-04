@@ -68,4 +68,23 @@ X_NAMESPACE_BEGIN(texture)
 		return format_;
 	}
 
+
+	X_INLINE render::GpuResource& Texture::getGpuResource(void)
+	{
+		return resource_;
+	}
+
+	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& Texture::getSRV(void) const
+	{
+		return hCpuDescriptorHandle_;
+	}
+
+	X_INLINE void Texture::setSRV(D3D12_CPU_DESCRIPTOR_HANDLE& srv)
+	{
+		hCpuDescriptorHandle_ = srv;
+	}
+
+
+
+
 X_NAMESPACE_END

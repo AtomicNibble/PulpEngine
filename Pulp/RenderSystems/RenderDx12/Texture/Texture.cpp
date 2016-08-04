@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Texture.h"
 
+#include "Allocators\DescriptorAllocator.h"
 
 X_NAMESPACE_BEGIN(texture)
 
@@ -9,6 +10,7 @@ X_NAMESPACE_BEGIN(texture)
 		fileName_(pName),
 		flags_(flags)
 	{
+		hCpuDescriptorHandle_.ptr = render::D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 		dimensions_ = Vec2<uint16_t>::zero();
 		datasize_ = 0;
 		type_ = TextureType::UNKNOWN;
@@ -24,7 +26,11 @@ X_NAMESPACE_BEGIN(texture)
 
 	}
 
-
+	void Texture::destroy(void)
+	{
+		resource_.destroy();
+		hCpuDescriptorHandle_.ptr = 0;
+	}
 
 
 X_NAMESPACE_END
