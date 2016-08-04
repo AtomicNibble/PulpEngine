@@ -51,7 +51,15 @@ private:
 	bool loadDefaultTextures(void);
 	void releaseDefaultTextures(void);
 
-	bool loadFromFile(const char* pPath);
+	bool stream(Texture* pTex);
+	bool load(Texture* pTex);
+	bool loadFromFile(XTextureFile& imgFile, const char* pPath);
+	bool processImgFile(Texture* pTex, XTextureFile& imgFile);
+	bool createDeviceTexture(Texture* pTex, XTextureFile& imgFile);
+	bool initializeTexture(render::GpuResource& dest, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSubData);
+
+	uint64_t getRequiredIntermediateSize(ID3D12Resource* pDestinationResource,
+		UINT FirstSubresource, UINT NumSubresources);
 
 	// IXHotReload
 	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
