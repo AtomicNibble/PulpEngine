@@ -9,9 +9,17 @@ X_NAMESPACE_DECLARE(core,
 	struct IConsoleCmdArgs;
 )
 
+X_NAMESPACE_DECLARE(render,
+	class ContextManager;
+	class CommandListManger;
+	class DescriptorAllocator;
+	class GpuResource;
+);
+
 X_NAMESPACE_BEGIN(texture)
 
 class Texture;
+class XTextureFile;
 
 class TextureManager : public core::IXHotReload
 {
@@ -19,7 +27,9 @@ class TextureManager : public core::IXHotReload
 	typedef core::FixedArray<ITextureFmt*, 8> TextureLoadersArr;
 
 public:
-	TextureManager(core::MemoryArenaBase* arena);
+	TextureManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice, 
+		render::ContextManager& contextMan,
+		render::CommandListManger& cmdListManager, render::DescriptorAllocator& descriptorAlloc);
 	~TextureManager();
 
 	bool init(void);
@@ -55,6 +65,11 @@ private:
 	static DXGI_FORMAT DXGIFormatFromTexFmt(Texturefmt::Enum fmt);
 
 private:
+	ID3D12Device* pDevice_;
+	render::ContextManager& contextMan_;
+	render::CommandListManger& cmdListManager_;
+	render::DescriptorAllocator& descriptorAlloc_;
+
 	core::MemoryArenaBase* arena_;
 	TextureMap textures_;
 	TextureVars vars_;

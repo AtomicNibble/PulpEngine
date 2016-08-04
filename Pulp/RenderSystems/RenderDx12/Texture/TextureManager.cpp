@@ -5,10 +5,18 @@
 #include <ICi.h>
 #include <IConsole.h>
 
+#include "Allocators\DescriptorAllocator.h"
+#include "CommandContex.h"
+
 X_NAMESPACE_BEGIN(texture)
 
 
-	TextureManager::TextureManager(core::MemoryArenaBase* arena) :
+	TextureManager::TextureManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice, render::ContextManager& contextMan,
+		render::CommandListManger& cmdListManager, render::DescriptorAllocator& descriptorAlloc) :
+		contextMan_(contextMan),
+		cmdListManager_(cmdListManager),
+		pDevice_(pDevice),
+		descriptorAlloc_(descriptorAlloc),
 		arena_(arena),
 		textures_(arena, TEX_MAX_LOADED_IMAGES),
 		pTexDefault_(nullptr),
