@@ -25,19 +25,15 @@ static const uint32_t	 TEX_MAX_FACES = 6; // cubes (vol's not supported yet)
 static const uint32_t	 TEX_MAX_DEPTH = 1; 
 static const uint32_t	 TEX_MAX_LOADED_IMAGES = 1 << 13; // max images that can be loaded.
 
-struct TextureType
-{
-	enum Enum : uint8_t
-	{
-		TCube = 1,
-		T1D,
-		T2D,
-		T3D,
 
-		UNKNOWN
-	};
-};
+X_DECLARE_ENUM8(TextureType) (
+	TCube,
+	T1D,
+	T2D,
+	T3D,
 
+	UNKNOWN
+);
 
 // these are UNORM by default.
 // except bc6 which is uf16, so yer every things unsigned by default.
