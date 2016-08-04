@@ -602,6 +602,8 @@ void GraphicsContext::clearUAV(ColorBuffer& target)
 		target.getClearColor(), 1, &ClearRect);
 }
 
+
+// not inline so can forward declare.
 void GraphicsContext::clearColor(ColorBuffer& target)
 {
 	pCommandList_->ClearRenderTargetView(target.getRTV(), target.getClearColor(), 0, nullptr);
@@ -626,27 +628,6 @@ void GraphicsContext::clearDepthAndStencil(DepthBuffer& target)
 }
 
 
-void GraphicsContext::beginQuery(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE type, 
-	uint32_t heapIndex)
-{
-	pCommandList_->BeginQuery(pQueryHeap, type, heapIndex);
-}
-
-void GraphicsContext::endQuery(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE type,
-	uint32_t heapIndex)
-{
-	pCommandList_->EndQuery(pQueryHeap, type, heapIndex);
-}
-
-void GraphicsContext::resolveQueryData(ID3D12QueryHeap* pQueryHeap, D3D12_QUERY_TYPE type, 
-	uint32_t startIndex, uint32_t numQueries, ID3D12Resource* pDestinationBuffer, 
-	uint64_t destinationBufferOffset)
-{
-	pCommandList_->ResolveQueryData(pQueryHeap, type, startIndex, numQueries, pDestinationBuffer,
-		destinationBufferOffset);
-}
-
-	 
 void GraphicsContext::setRootSignature(const RootSignature& rootSig)
 {
 	if (rootSig.getSignature() == pCurGraphicsRootSignature_) {
@@ -658,124 +639,6 @@ void GraphicsContext::setRootSignature(const RootSignature& rootSig)
 	dynamicDescriptorHeap_.parseGraphicsRootSignature(rootSig);
 }
 
-	 
-void GraphicsContext::setRenderTargets(uint32_t numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE* pRTVs)
-{
-	pCommandList_->OMSetRenderTargets(numRTVs, pRTVs, FALSE, nullptr);
-}
-
-void GraphicsContext::setRenderTargets(uint32_t numRTVs, const D3D12_CPU_DESCRIPTOR_HANDLE* pRTVs, 
-	D3D12_CPU_DESCRIPTOR_HANDLE DSV)
-{
-	pCommandList_->OMSetRenderTargets(numRTVs, pRTVs, FALSE, &DSV);
-}
-
-void GraphicsContext::setRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE RTV)
-{
-	setRenderTargets(1, &RTV);
-}
-
-void GraphicsContext::setRenderTarget(D3D12_CPU_DESCRIPTOR_HANDLE RTV, 
-	D3D12_CPU_DESCRIPTOR_HANDLE DSV)
-{
-	setRenderTargets(1, &RTV, DSV);
-}
-
-void GraphicsContext::setDepthStencilTarget(D3D12_CPU_DESCRIPTOR_HANDLE DSV)
-{
-	setRenderTargets(0, nullptr, DSV);
-}
-
-
-void GraphicsContext::setViewport(const XViewPort& vp)
-{
-	D3D12_VIEWPORT dvp;
-	dvp.Width = vp.getWidthf();
-	dvp.Height = vp.getHeightf();
-	dvp.TopLeftX = 0;
-	dvp.TopLeftY = 0;
-	dvp.MinDepth = vp.getZNear();
-	dvp.MaxDepth = vp.getZFar();
-
-	pCommandList_->RSSetViewports(1, &dvp);
-}
-	 
-void GraphicsContext::setViewport(const D3D12_VIEWPORT& vp)
-{
-	pCommandList_->RSSetViewports(1, &vp);
-}
-
-void GraphicsContext::setViewport(float32_t x, float32_t y, float32_t w, float32_t h, 
-	float32_t minDepth, float32_t maxDepth)
-{
-	D3D12_VIEWPORT vp;
-	vp.Width = w;
-	vp.Height = h;
-	vp.MinDepth = minDepth;
-	vp.MaxDepth = maxDepth;
-	vp.TopLeftX = x;
-	vp.TopLeftY = y;
-	pCommandList_->RSSetViewports(1, &vp);
-}
-
-void GraphicsContext::setScissor(const D3D12_RECT& rect)
-{
-	X_ASSERT(rect.left < rect.right && rect.top < rect.bottom, "Invalid rect")();
-	pCommandList_->RSSetScissorRects(1, &rect);
-}
-
-void GraphicsContext::setScissor(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom)
-{
-	D3D12_RECT rect;
-	rect.left = left;
-	rect.right = right;
-	rect.top = top;
-	rect.bottom = bottom;
-	setScissor(rect);
-}
-
-void GraphicsContext::setViewportAndScissor(const XViewPort& vp, const D3D12_RECT& rect)
-{
-	X_ASSERT(rect.left < rect.right && rect.top < rect.bottom, "Invalid rect")();
-	setViewport(vp);
-	pCommandList_->RSSetScissorRects(1, &rect);
-}
-
-
-void GraphicsContext::setViewportAndScissor(const D3D12_VIEWPORT& vp, const D3D12_RECT& rect)
-{
-	X_ASSERT(rect.left < rect.right && rect.top < rect.bottom, "Invalid rect")();
-	pCommandList_->RSSetViewports(1, &vp);
-	pCommandList_->RSSetScissorRects(1, &rect);
-}
-
-void GraphicsContext::setViewportAndScissor(uint32_t x, uint32_t y, uint32_t w, uint32_t h)
-{
-	setViewport(static_cast<float32_t>(x), static_cast<float32_t>(y),
-		static_cast<float32_t>(w), static_cast<float32_t>(h));
-	setScissor(x, y, x + w, y + h);
-}
-
-void GraphicsContext::setStencilRef(uint32_t stencilRef)
-{
-	pCommandList_->OMSetStencilRef(stencilRef);
-}
-
-void GraphicsContext::setBlendFactor(Color8u blendFactor)
-{
-	Colorf col(blendFactor);
-	pCommandList_->OMSetBlendFactor(col);
-}
-
-void GraphicsContext::setBlendFactor(const Colorf& blendFactor)
-{
-	pCommandList_->OMSetBlendFactor(blendFactor);
-}
-
-void GraphicsContext::setPrimitiveTopology(D3D12_PRIMITIVE_TOPOLOGY topology)
-{
-	pCommandList_->IASetPrimitiveTopology(topology);
-}
 
 void GraphicsContext::setPipelineState(const GraphicsPSO& PSO)
 {
@@ -788,42 +651,6 @@ void GraphicsContext::setPipelineState(const GraphicsPSO& PSO)
 	pCurComputePipelineState_ = pPipelineState;
 }
 
-void GraphicsContext::setConstants(uint32_t rootIndex, uint32_t numConstants, 
-	const void* pConstants)
-{
-	pCommandList_->SetComputeRoot32BitConstants(rootIndex, numConstants, pConstants, 0);
-}
-
-void GraphicsContext::setConstants(uint32_t rootIndex, Param X)
-{
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
-}
-
-void GraphicsContext::setConstants(uint32_t rootIndex, Param X, Param Y)
-{
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Y.uint, 1);
-}
-
-void GraphicsContext::setConstants(uint32_t rootIndex, Param X, Param Y, Param Z)
-{
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Y.uint, 1);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Z.uint, 2);
-}
-
-void GraphicsContext::setConstants(uint32_t rootIndex, Param X, Param Y, Param Z, Param W)
-{
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Y.uint, 1);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Z.uint, 2);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, W.uint, 3);
-}
-
-void GraphicsContext::setConstantBuffer(uint32_t rootIndex, D3D12_GPU_VIRTUAL_ADDRESS CBV)
-{
-	pCommandList_->SetComputeRootConstantBufferView(rootIndex, CBV);
-}
 
 void GraphicsContext::setDynamicConstantBufferView(uint32_t RootIndex, size_t BufferSize, 
 	const void* pBufferData)
@@ -852,40 +679,6 @@ void GraphicsContext::setBufferUAV(uint32_t rootIndex, const GpuBuffer& UAV, uin
 	pCommandList_->SetGraphicsRootUnorderedAccessView(rootIndex, UAV.getGpuVirtualAddress());
 }
 
-void GraphicsContext::setDescriptorTable(uint32_t rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE firstHandle)
-{
-	pCommandList_->SetGraphicsRootDescriptorTable(rootIndex, firstHandle);
-}
-	 
-void GraphicsContext::setDynamicDescriptor(uint32_t rootIndex, uint32_t offset, 
-	D3D12_CPU_DESCRIPTOR_HANDLE handle)
-{
-	setDynamicDescriptors(rootIndex, offset, 1, &handle);
-}
-
-
-void GraphicsContext::setDynamicDescriptors(uint32_t rootIndex, uint32_t offset, uint32_t count, 
-	const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles)
-{
-	dynamicDescriptorHeap_.setGraphicsDescriptorHandles(rootIndex, offset, count, pHandles);
-}
-
-	 
-void GraphicsContext::setIndexBuffer(const D3D12_INDEX_BUFFER_VIEW& IBView)
-{
-	pCommandList_->IASetIndexBuffer(&IBView);
-}
-
-void GraphicsContext::setVertexBuffer(uint32_t slot, const D3D12_VERTEX_BUFFER_VIEW& VBView)
-{
-	pCommandList_->IASetVertexBuffers(slot, 1, &VBView);
-}
-
-void GraphicsContext::setVertexBuffers(uint32_t startSlot, uint32_t count, 
-	const D3D12_VERTEX_BUFFER_VIEW* pVBViews)
-{
-	pCommandList_->IASetVertexBuffers(startSlot, count, pVBViews);
-}
 
 void GraphicsContext::setDynamicVB(uint32_t slot, size_t numVertices, size_t vertexStride, 
 	const void* pVBData)
@@ -937,36 +730,7 @@ void GraphicsContext::setDynamicSRV(uint32_t rootIndex, size_t bufferSize, const
 	pCommandList_->SetGraphicsRootShaderResourceView(rootIndex, cb.getGpuAddress());
 }
 
-	 
-void GraphicsContext::draw(uint32_t vertexCount, uint32_t vertexStartOffset)
-{
-	drawInstanced(vertexCount, 1, vertexStartOffset, 0);
-}
-
-void GraphicsContext::drawIndexed(uint32_t indexCount, uint32_t startIndexLocation, 
-	int32_t baseVertexLocation)
-{
-	drawIndexedInstanced(indexCount, 1, startIndexLocation, baseVertexLocation, 0);
-}
-
-void GraphicsContext::drawInstanced(uint32_t vertexCountPerInstance, uint32_t instanceCount,
-		uint32_t startVertexLocation, uint32_t startInstanceLocation)
-{
-	flushResourceBarriers();
-	dynamicDescriptorHeap_.commitGraphicsRootDescriptorTables(pCommandList_);
-	pCommandList_->DrawInstanced(vertexCountPerInstance, instanceCount, 
-		startVertexLocation, startInstanceLocation);
-}
-
-void GraphicsContext::drawIndexedInstanced(uint32_t indexCountPerInstance, uint32_t instanceCount, 
-	uint32_t startIndexLocation, int32_t baseVertexLocation, uint32_t startInstanceLocation)
-{
-	flushResourceBarriers();
-	dynamicDescriptorHeap_.commitGraphicsRootDescriptorTables(pCommandList_);
-	pCommandList_->DrawIndexedInstanced(indexCountPerInstance, instanceCount,
-		startIndexLocation, baseVertexLocation, startInstanceLocation);
-}
-
+	
 void GraphicsContext::drawIndirect(CommandSignature& drawIndirectCmdSig, GpuBuffer& argumentBuffer, size_t argumentBufferOffset)
 {
 	flushResourceBarriers();
@@ -974,9 +738,7 @@ void GraphicsContext::drawIndirect(CommandSignature& drawIndirectCmdSig, GpuBuff
 
 	pCommandList_->ExecuteIndirect(drawIndirectCmdSig.getSignature(), 1, argumentBuffer.getResource(),
 		static_cast<uint64_t>(argumentBufferOffset), nullptr, 0);
-
 }
-
 
 // ------------------------------------------------------
 
@@ -1014,7 +776,6 @@ void ComputeContext::setRootSignature(const RootSignature& rootSig)
 	}
 
 	pCommandList_->SetComputeRootSignature(pCurComputeRootSignature_ = rootSig.getSignature());
-
 	dynamicDescriptorHeap_.parseComputeRootSignature(rootSig);
 }
 
@@ -1027,42 +788,6 @@ void ComputeContext::setPipelineState(const ComputePSO& PSO)
 
 	pCommandList_->SetPipelineState(pPipelineState);
 	pCurComputePipelineState_ = pPipelineState;
-}
-
-void ComputeContext::setConstants(uint32_t rootIndex, uint32_t numConstants, const void* pConstants)
-{
-	pCommandList_->SetComputeRoot32BitConstants(rootIndex, numConstants, pConstants, 0);
-}
-
-void ComputeContext::setConstants(uint32_t rootIndex, Param X)
-{
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
-}
-
-void ComputeContext::setConstants(uint32_t rootIndex, Param X, Param Y)
-{
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Y.uint, 1);
-}
-
-void ComputeContext::setConstants(uint32_t rootIndex, Param X, Param Y, Param Z)
-{
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Y.uint, 1);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Z.uint, 2);
-}
-
-void ComputeContext::setConstants(uint32_t rootIndex, Param X, Param Y, Param Z, Param W)
-{
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, X.uint, 0);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Y.uint, 1);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, Z.uint, 2);
-	pCommandList_->SetComputeRoot32BitConstant(rootIndex, W.uint, 3);
-}
-
-void ComputeContext::setConstantBuffer(uint32_t rootIndex, D3D12_GPU_VIRTUAL_ADDRESS CBV)
-{
-	pCommandList_->SetComputeRootConstantBufferView(rootIndex, CBV);
 }
 
 void ComputeContext::setDynamicConstantBufferView(uint32_t rootIndex, size_t bufferSize, const void* pBufferData)
@@ -1086,6 +811,7 @@ void ComputeContext::setDynamicSRV(uint32_t rootIndex, size_t bufferSize, const 
 	pCommandList_->SetComputeRootShaderResourceView(rootIndex, cb.getGpuAddress());
 }
 
+
 void ComputeContext::setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset)
 {
 	X_ASSERT(core::bitUtil::IsBitFlagSet(SRV.getUsageState(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE), "NON_PIXEL_SHADER_RESOURCE flag missing")(SRV.getUsageState());
@@ -1100,56 +826,6 @@ void ComputeContext::setBufferUAV(uint32_t rootIndex, const GpuBuffer& UAV, uint
 	pCommandList_->SetComputeRootUnorderedAccessView(rootIndex, UAV.getGpuVirtualAddress());
 }
 
-void ComputeContext::setDescriptorTable(uint32_t rootIndex, D3D12_GPU_DESCRIPTOR_HANDLE firstHandle)
-{
-	pCommandList_->SetComputeRootDescriptorTable(rootIndex, firstHandle);
-}
-
-	 
-void ComputeContext::setDynamicDescriptor(uint32_t rootIndex, uint32_t offset, D3D12_CPU_DESCRIPTOR_HANDLE handle)
-{
-	setDynamicDescriptors(rootIndex, offset, 1, &handle);
-}
-
-void ComputeContext::setDynamicDescriptors(uint32_t rootIndex, uint32_t offset, uint32_t count, const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles)
-{
-	dynamicDescriptorHeap_.setGraphicsDescriptorHandles(rootIndex, offset, count, pHandles);
-}
-
-	 
-void ComputeContext::dispatch(size_t groupCountX, size_t groupCountY, size_t groupCountZ)
-{
-	flushResourceBarriers();
-	
-	dynamicDescriptorHeap_.commitComputeRootDescriptorTables(pCommandList_);
-
-	pCommandList_->Dispatch(
-		safe_static_cast<uint32_t, size_t>(groupCountX),
-		safe_static_cast<uint32_t, size_t>(groupCountY),
-		safe_static_cast<uint32_t, size_t>(groupCountZ)
-	);
-}
-
-void ComputeContext::dispatch1D(size_t threadCountX, size_t groupSizeX)
-{
-	dispatch(divideByMultiple(threadCountX, groupSizeX), 1, 1);
-}
-
-void ComputeContext::dispatch2D(size_t threadCountX, size_t threadCountY, size_t groupSizeX, size_t groupSizeY )
-{
-	dispatch(
-		divideByMultiple(threadCountX, groupSizeX),
-		divideByMultiple(threadCountY, groupSizeY), 1);
-}
-
-void ComputeContext::dispatch3D(size_t threadCountX, size_t threadCountY, size_t threadCountZ,
-	size_t groupSizeX, size_t groupSizeY, size_t groupSizeZ)
-{
-	dispatch(
-		divideByMultiple(threadCountX, groupSizeX),
-		divideByMultiple(threadCountY, groupSizeY),
-		divideByMultiple(threadCountZ, groupSizeZ));
-}
 
 void ComputeContext::dispatchIndirect(CommandSignature& dispatchCmdSig, GpuBuffer& argumentBuffer, size_t argumentBufferOffset)
 {
@@ -1160,6 +836,7 @@ void ComputeContext::dispatchIndirect(CommandSignature& dispatchCmdSig, GpuBuffe
 	pCommandList_->ExecuteIndirect(dispatchCmdSig.getSignature(), 1, argumentBuffer.getResource(),
 		static_cast<uint64_t>(argumentBufferOffset), nullptr, 0);
 }
+
 
 
 
