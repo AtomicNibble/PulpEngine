@@ -404,13 +404,17 @@ X_NAMESPACE_BEGIN(texture)
 		X_ASSERT_NOT_NULL(pCILoader_);
 		X_ASSERT_NOT_NULL(pPath);
 
+		core::IFileSys* pFileSys = gEnv->pFileSys;
+
 		core::IFileSys::fileModeFlags mode;
 		mode.Set(core::IFileSys::fileMode::READ);
+		mode.Set(core::IFileSys::fileMode::SHARE);
 
 		core::Path<char> path(pPath);
 		path.toLower(); // lower case file names only.
 		path.setExtension(CI_FILE_EXTENSION);
 
+		if (pFileSys->fileExists(path.c_str()))
 		{
 			core::XFileScoped file;
 
@@ -430,7 +434,6 @@ X_NAMESPACE_BEGIN(texture)
 		}
 
 		// try loading none compiled.
-		core::IFileSys* pFileSys = gEnv->pFileSys;
 		for (auto pLoader : textureLoaders_)
 		{
 			path.setExtension(pLoader->getExtension());
