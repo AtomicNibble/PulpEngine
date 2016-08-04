@@ -52,6 +52,8 @@ private:
 	void Cmd_ReloadTextures(core::IConsoleCmdArgs* pCmd);
 	void Cmd_ReloadTexture(core::IConsoleCmdArgs* pCmd);
 
+	static DXGI_FORMAT DXGIFormatFromTexFmt(Texturefmt::Enum fmt);
+
 private:
 	core::MemoryArenaBase* arena_;
 	TextureMap textures_;

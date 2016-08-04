@@ -283,6 +283,69 @@ X_NAMESPACE_BEGIN(texture)
 		reloadForName(pName);
 	}
 
+	DXGI_FORMAT TextureManager::DXGIFormatFromTexFmt(Texturefmt::Enum fmt)
+	{
+		switch (fmt)
+		{
+		case Texturefmt::R8G8B8:
+			return DXGI_FORMAT_R8G8B8A8_UNORM;
+		case Texturefmt::R8G8B8A8:
+			return DXGI_FORMAT_R8G8B8A8_UNORM;
 
+		case Texturefmt::B8G8R8A8:
+			return DXGI_FORMAT_B8G8R8A8_UNORM;
+
+		case Texturefmt::A8:
+			return DXGI_FORMAT_A8_UNORM;
+
+		case Texturefmt::A8R8G8B8:
+			return DXGI_FORMAT_R8G8B8A8_UNORM;
+
+		case Texturefmt::BC1:
+			return DXGI_FORMAT_BC1_UNORM;
+		case Texturefmt::BC2:
+			return DXGI_FORMAT_BC2_UNORM;
+		case Texturefmt::BC3:
+			return DXGI_FORMAT_BC3_UNORM;
+		case Texturefmt::BC4:
+			return DXGI_FORMAT_BC4_UNORM;
+		case Texturefmt::BC4_SNORM:
+			return DXGI_FORMAT_BC4_SNORM;
+
+		case Texturefmt::BC5:
+		case Texturefmt::ATI2:
+			return DXGI_FORMAT_BC5_UNORM;
+		case Texturefmt::BC5_SNORM:
+			return DXGI_FORMAT_BC5_SNORM;
+
+		case Texturefmt::BC6:
+			return DXGI_FORMAT_BC6H_UF16; // HDR BAbbbbbbbbby!
+		case Texturefmt::BC6_SF16:
+			return DXGI_FORMAT_BC6H_SF16;
+		case Texturefmt::BC6_TYPELESS:
+			return DXGI_FORMAT_BC6H_TYPELESS;
+
+		case Texturefmt::BC7:
+			return DXGI_FORMAT_BC7_UNORM;
+		case Texturefmt::BC7_SRGB:
+			return DXGI_FORMAT_BC7_UNORM_SRGB;
+		case Texturefmt::BC7_TYPELESS:
+			return DXGI_FORMAT_BC7_TYPELESS;
+
+		case Texturefmt::R16G16_FLOAT:
+			return DXGI_FORMAT_R16G16_FLOAT;
+		case Texturefmt::R10G10B10A2:
+			return DXGI_FORMAT_R10G10B10A2_TYPELESS;
+
+#if X_DEBUG
+		default:
+			X_ASSERT_UNREACHABLE();
+			break;
+#else
+			X_NO_SWITCH_DEFAULT;
+#endif // !X_DEBUG
+		}
+		return DXGI_FORMAT_UNKNOWN;
+	}
 
 X_NAMESPACE_END
