@@ -39,6 +39,13 @@ protected:
 class RootSignature
 {
 public:
+	// Maximum 64 DWORDS divied up amongst all root parameters. (Dx12 limit)
+	// Root constants = 1 DWORD * NumConstants
+	// Root descriptor (CBV, SRV, or UAV) = 2 DWORDs each
+	// Descriptor table pointer = 1 DWORD
+	// Static samplers = 0 DWORDS (compiled into shader)
+
+	static const size_t MAX_DWORDS = 64;
 
 public:
 	X_INLINE RootSignature(core::MemoryArenaBase* arena, size_t numRootParams = 0, size_t numStaticSamplers = 0);
