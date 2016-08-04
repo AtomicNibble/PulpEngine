@@ -98,6 +98,38 @@ void RootSignature::finalize(ID3D12Device* pDevice, D3D12_ROOT_SIGNATURE_FLAGS f
 	rootDesc.pStaticSamplers = reinterpret_cast<const D3D12_STATIC_SAMPLER_DESC*>(samplers_.data());
 	rootDesc.Flags = flags;
 
+#if X_DEBUG
+	// check we below 64 DWORDS.
+	uint32_t numDwords = 0;
+	for (const auto& param : params_)
+	{
+		const D3D12_ROOT_PARAMETER& rp = param();
+
+		switch (param.getType())
+		{
+		case D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE:
+			++numDwords;
+			break;
+		case D3D12_ROOT_PARAMETER_TYPE_32BIT_CONSTANTS:
+			numDwords += rp.Constants.Num32BitValues;
+			break;
+		case D3D12_ROOT_PARAMETER_TYPE_CBV:
+		case D3D12_ROOT_PARAMETER_TYPE_SRV:
+		case D3D12_ROOT_PARAMETER_TYPE_UAV:
+			numDwords += 2;
+			break;
+		default:
+			X_ASSERT_UNREACHABLE();
+			break;
+		}
+	}
+
+	if (numDwords > MAX_DWORDS) {
+		X_FATAL("Dx12", "rootSig parameters size exceeds limit. num: %" PRIu32, " max: %" PRIuS, numDwords, MAX_DWORDS );
+		return;
+	}
+
+#endif // !X_DEBUG
 
 	ID3DBlob* pOutBlob;
 	ID3DBlob* pErrorBlob;
