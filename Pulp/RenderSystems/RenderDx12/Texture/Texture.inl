@@ -46,6 +46,7 @@ X_NAMESPACE_BEGIN(texture)
 	X_INLINE const bool Texture::isLoaded(void) const
 	{
 		return !flags_.IsSet(TextureFlags::LOAD_FAILED);
+
 	}
 
 	X_INLINE const bool Texture::IsStreamable(void) const
@@ -85,6 +86,41 @@ X_NAMESPACE_BEGIN(texture)
 	}
 
 
+
+	X_INLINE void Texture::setFormat(Texturefmt::Enum fmt)
+	{
+		format_ = fmt;
+	}
+
+	X_INLINE void Texture::setType(TextureType::Enum type)
+	{
+		type_ = type;
+	}
+
+	X_INLINE void Texture::setWidth(uint16_t width)
+	{
+		dimensions_.x = width;
+	}
+
+	X_INLINE void Texture::setHeight(uint16_t height)
+	{
+		dimensions_.y = height;
+	}
+
+	X_INLINE void Texture::setDepth(uint8_t depth)
+	{
+		depth_ = depth;
+	}
+
+	X_INLINE void Texture::setNumFaces(uint8_t faces)
+	{
+		numFaces_ = faces;
+	}
+
+	X_INLINE void Texture::setNumMips(uint8_t mips)
+	{
+		numMips_ = mips;
+	}
 
 
 X_NAMESPACE_END

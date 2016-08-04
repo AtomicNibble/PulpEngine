@@ -11,9 +11,11 @@ X_NAMESPACE_DECLARE(render,
 
 X_NAMESPACE_BEGIN(texture)
 
+class TextureManager;
 
 	class X_ALIGNED_SYMBOL(Texture, 64) : public ::texture::ITexture
 	{
+		friend TextureManager;
 
 	public:
 		Texture(const char* pName, TextureFlags flags);
@@ -45,11 +47,20 @@ X_NAMESPACE_BEGIN(texture)
 		X_INLINE const TextureFlags getFlags(void) const X_OVERRIDE;
 		X_INLINE const Texturefmt::Enum getFormat(void) const X_OVERRIDE;
 
-	public:
-		X_INLINE render::GpuResource& getGpuResource(void);
-
 		X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getSRV(void) const;
+
+	protected:
+		X_INLINE render::GpuResource& getGpuResource(void);
 		X_INLINE void setSRV(D3D12_CPU_DESCRIPTOR_HANDLE& srv);
+
+		X_INLINE void setFormat(Texturefmt::Enum fmt);
+		X_INLINE void setType(TextureType::Enum type);
+		X_INLINE void setWidth(uint16_t width);
+		X_INLINE void setHeight(uint16_t height);
+		X_INLINE void setDepth(uint8_t depth);
+		X_INLINE void setNumFaces(uint8_t faces);
+		X_INLINE void setNumMips(uint8_t mips);
+
 
 	private:
 		render::GpuResource	resource_;
