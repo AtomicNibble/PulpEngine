@@ -652,12 +652,15 @@ void GraphicsContext::setPipelineState(const GraphicsPSO& PSO)
 }
 
 
-void GraphicsContext::setDynamicConstantBufferView(uint32_t RootIndex, size_t BufferSize, 
+void GraphicsContext::setDynamicConstantBufferView(uint32_t rootIndex, size_t bufferSize, 
 	const void* pBufferData)
 {
 	X_ASSERT_NOT_NULL(pBufferData);
 	X_ASSERT_ALIGNMENT(pBufferData, 16, 0);
 
+	DynAlloc cb = cpuLinearAllocator_.allocate(bufferSize);
+	memcpy(cb.getCpuData(), pBufferData, bufferSize);
+	pCommandList_->SetComputeRootConstantBufferView(rootIndex, cb.getGpuAddress());
 }
 
 void GraphicsContext::setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset)
