@@ -12,14 +12,17 @@ namespace Hash
 	class xxHash32
 	{
 	public:
+		typedef uint32_t HashVal;
+
+	public:
 		xxHash32();
 		~xxHash32() = default;
 
 		void reset(uint32_t seed);
 		bool update(const void* pBuf, size_t length);
-		uint32_t finalize(void);
+		HashVal finalize(void);
 
-		static uint32_t getHash(const void* pInput, size_t length, uint32_t seed);
+		static HashVal getHash(const void* pInput, size_t length, uint32_t seed);
 	
 	private:
 		struct { long long ll[6]; } state_;
@@ -29,14 +32,17 @@ namespace Hash
 	class xxHash64
 	{
 	public:
+		typedef uint64_t HashVal;
+
+	public:
 		xxHash64();
 		~xxHash64() = default;
 
 		void reset(uint64_t seed);
 		bool update(const void* pBuf, size_t length);
-		uint64_t finalize(void);
+		HashVal finalize(void);
 
-		static uint64_t getHash(const void* pInput, size_t length, uint64_t seed);
+		static HashVal getHash(const void* pInput, size_t length, uint64_t seed);
 
 	private:
 		struct { long long ll[11]; } state_;
