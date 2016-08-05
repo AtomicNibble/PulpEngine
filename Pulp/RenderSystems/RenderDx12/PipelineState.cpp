@@ -53,6 +53,8 @@ PSODeviceCache::~PSODeviceCache()
 
 void PSODeviceCache::destoryAll(void)
 {
+	core::CriticalSection::ScopedLock lock(cacheLock_);
+
 	auto it = cache_.begin();
 	for (; it != cache_.end(); ++it) {
 		it->second->Release();
@@ -71,19 +73,43 @@ bool PSODeviceCache::compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, const
 	// set after calculating hash.
 	gpsoDesc.InputLayout.pInputElementDescs = il.data();
 
-	auto it = cache_.find(hash);
-	if (it != cache_.end()) {
-		*pPSO = it->second;
-		return true;
+	ID3D12PipelineState** pPSORef = nullptr;
+	bool notCompiled = false;
+	{
+		core::CriticalSection::ScopedLock lock(cacheLock_);
+
+		auto it = cache_.find(hash);
+		if (it != cache_.end()) {
+			// get ref of hash location.
+			// which might have a value of null.
+			pPSORef = &it->second;
+		}
+		else {
+			notCompiled = true;
+			// insert the entry for this hash, before we start compile.
+			// that way we don't have to lock for whole compile time.
+			auto insertIt = cache_.insert(std::make_pair(hash, *pPSO));
+
+			pPSORef = &insertIt.first->second;
+		}
 	}
 
+	if(notCompiled)
 	{
 		HRESULT hr = pDevice_->CreateGraphicsPipelineState(&gpsoDesc, IID_PPV_ARGS(pPSO));
 		if (FAILED(hr)) {
 			X_FATAL("Dx12", "Failed to create graphics PSO: %" PRIu32, hr);
 		}
 
-		cache_.insert(std::make_pair(hash, *pPSO));
+		*pPSORef = *pPSO;
+	}
+	else
+	{
+		// if might of been inserted but not finished compiling, so wait.
+		while (*pPSORef == nullptr) {
+			core::Thread::Yield();
+		}
+		*pPSO = *pPSORef;
 	}
 
 	return true;
@@ -93,19 +119,38 @@ bool PSODeviceCache::compile(D3D12_COMPUTE_PIPELINE_STATE_DESC& cpsoDesc, ID3D12
 {
 	HashVal hash = getHash(cpsoDesc);
 
-	auto it = cache_.find(hash);
-	if (it != cache_.end()) {
-		*pPSO = it->second;
-		return true;
+	ID3D12PipelineState** pPSORef = nullptr;
+	bool notCompiled = false;
+	{
+		core::CriticalSection::ScopedLock lock(cacheLock_);
+
+		auto it = cache_.find(hash);
+		if (it != cache_.end()) {
+			*pPSO = it->second;
+			return true;
+		}
+		else {
+			notCompiled = true;
+			auto insertIt = cache_.insert(std::make_pair(hash, *pPSO));
+			pPSORef = &insertIt.first->second;
+		}
 	}
 
+	if (notCompiled)
 	{
 		HRESULT hr = pDevice_->CreateComputePipelineState(&cpsoDesc, IID_PPV_ARGS(pPSO));
 		if (FAILED(hr)) {
 			X_FATAL("Dx12", "Failed to create compute PSO: %" PRIu32, hr);
 		}
 
-		cache_.insert(std::make_pair(hash, *pPSO));
+		*pPSORef = *pPSO;
+	}
+	else
+	{
+		while (*pPSORef == nullptr) {
+			core::Thread::Yield();
+		}
+		*pPSO = *pPSORef;
 	}
 
 	return true;

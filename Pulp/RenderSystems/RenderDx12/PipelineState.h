@@ -101,6 +101,7 @@ private:
 	static HashVal getHash(D3D12_COMPUTE_PIPELINE_STATE_DESC& cpsoDesc);
 
 private:
+	core::CriticalSection cacheLock_;
 	ID3D12Device* pDevice_;
 	PSOMap cache_;
 };
