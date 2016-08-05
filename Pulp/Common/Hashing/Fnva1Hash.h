@@ -17,7 +17,9 @@ namespace Hash
 
 	namespace Int64
 	{
-		uint64_t Fnv1aHash(const void* key, size_t length);
+		typedef uint64_t Fnv1aVal;
+
+		Fnv1aVal Fnv1aHash(const void* key, size_t length);
 	}
 }
 
