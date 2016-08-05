@@ -20,6 +20,9 @@ namespace Hash
 
 		void reset(uint32_t seed);
 		bool update(const void* pBuf, size_t length);
+		template<typename T>
+		X_INLINE bool update(const T* pType, size_t numT);
+
 		HashVal finalize(void);
 
 		static HashVal getHash(const void* pInput, size_t length, uint32_t seed);
@@ -39,7 +42,11 @@ namespace Hash
 		~xxHash64() = default;
 
 		void reset(uint64_t seed);
+
 		bool update(const void* pBuf, size_t length);
+		template<typename T>
+		X_INLINE bool update(const T* pType, size_t numT);
+
 		HashVal finalize(void);
 
 		static HashVal getHash(const void* pInput, size_t length, uint64_t seed);
@@ -49,6 +56,19 @@ namespace Hash
 	};
 
 
+	template<typename T>
+	X_INLINE bool xxHash32::update(const T* pType, size_t numT)
+	{
+		static_assert(core::compileTime::IsPOD<T>::Value, "hashing of none POD type");
+		return update(static_cast<const void*>(pType), numT * sizeof(T));
+	}
+
+	template<typename T>
+	X_INLINE bool xxHash64::update(const T* pType, size_t numT)
+	{
+		static_assert(core::compileTime::IsPOD<T>::Value, "hashing of none POD type");
+		return update(static_cast<const void*>(pType), numT * sizeof(T));
+	}
 
 } // namespace Hash
 
