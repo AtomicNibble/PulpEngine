@@ -12,14 +12,13 @@ RootSignatureDeviceCache::RootSignatureDeviceCache(core::MemoryArenaBase* arena,
 
 RootSignatureDeviceCache::~RootSignatureDeviceCache()
 {
-
+	destoryAll();
 }
 
 void RootSignatureDeviceCache::destoryAll(void)
 {
 	auto it = cache_.begin();
-	for (; it != cache_.end(); ++it)
-	{
+	for (; it != cache_.end(); ++it) {
 		it->second->Release();
 	}
 
@@ -125,7 +124,6 @@ void RootSignature::free(void)
 
 	params_.free();
 	samplers_.free();
-
 }
 
 
@@ -190,6 +188,7 @@ void RootSignature::initStaticSampler(uint32_t Register, const D3D12_SAMPLER_DES
 void RootSignature::finalize(RootSignatureDeviceCache& cache, D3D12_ROOT_SIGNATURE_FLAGS flags)
 {
 	if (pSignature_) {
+		X_WARNING("Dx12", "finalize called on a rootSig that already has a device object");
 		return;
 	}
 
