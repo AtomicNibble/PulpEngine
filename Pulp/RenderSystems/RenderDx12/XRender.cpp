@@ -151,6 +151,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 	pLinearAllocatorMan_ = X_NEW(LinearAllocatorManager, arena_, "LinAlocMan")(arena_, pDevice_, cmdListManager_);
 	pContextMan_ = X_NEW(ContextManager, arena_, "ContextMan")(arena_, pDevice_, descriptorAllocatorPool, *pLinearAllocatorMan_);
+	pRootSigCache_ = X_NEW(RootSignatureDeviceCache, arena_, "RootSignatureDeviceCache")(arena_, pDevice_);
 
 
 
@@ -245,7 +246,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	presentRS_.getParamRef(3).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
 	presentRS_.initStaticSampler(0, samplerLinearClampDesc_, D3D12_SHADER_VISIBILITY_PIXEL);
 	presentRS_.initStaticSampler(1, samplerPointClampDesc_, D3D12_SHADER_VISIBILITY_PIXEL);
-	presentRS_.finalize(pDevice_);
+	presentRS_.finalize(*pRootSigCache_);
 
 
 	if (!shaderMan_.init()) {
@@ -288,6 +289,11 @@ void XRender::shutDown(void)
 	if (pLinearAllocatorMan_) {
 		pLinearAllocatorMan_->destroy();
 		X_DELETE_AND_NULL(pLinearAllocatorMan_, arena_);
+	}
+
+	if (pRootSigCache_) {
+		pRootSigCache_->destoryAll();
+		X_DELETE_AND_NULL(pRootSigCache_, arena_);
 	}
 
 

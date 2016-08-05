@@ -171,6 +171,8 @@ private:
 	DescriptorAllocator* pDescriptorAllocator_;
 	DescriptorAllocatorPool* pDescriptorAllocatorPool_;
 
+	RootSignatureDeviceCache* pRootSigCache_;
+
 	RootSignature presentRS_;
 
 	Vec2<uint32_t> currentNativeRes_;	// the resolution we render to.
