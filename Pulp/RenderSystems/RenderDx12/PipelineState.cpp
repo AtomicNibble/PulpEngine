@@ -39,6 +39,103 @@ namespace
 } // namespace
 
 
+PSODeviceCache::PSODeviceCache(core::MemoryArenaBase* arena, ID3D12Device* pDevice) :
+	pDevice_(pDevice),
+	cache_(arena, 32)
+{
+
+}
+
+PSODeviceCache::~PSODeviceCache()
+{
+	destoryAll();
+}
+
+void PSODeviceCache::destoryAll(void)
+{
+	auto it = cache_.begin();
+	for (; it != cache_.end(); ++it) {
+		it->second->Release();
+	}
+
+	cache_.clear();
+}
+
+bool PSODeviceCache::compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, const GraphicsPSO::InputLayoutArr& il, 
+	ID3D12PipelineState** pPSO)
+{
+	X_ASSERT(gpsoDesc.InputLayout.NumElements == il.size(), "Input element size mismatch")(gpsoDesc.InputLayout.NumElements, il.size());
+
+	HashVal hash = getHash(gpsoDesc, il);
+
+	// set after calculating hash.
+	gpsoDesc.InputLayout.pInputElementDescs = il.data();
+
+	auto it = cache_.find(hash);
+	if (it != cache_.end()) {
+		*pPSO = it->second;
+		return true;
+	}
+
+	{
+		HRESULT hr = pDevice_->CreateGraphicsPipelineState(&gpsoDesc, IID_PPV_ARGS(pPSO));
+		if (FAILED(hr)) {
+			X_FATAL("Dx12", "Failed to create graphics PSO: %" PRIu32, hr);
+		}
+
+		cache_.insert(std::make_pair(hash, *pPSO));
+	}
+
+	return true;
+}
+
+bool PSODeviceCache::compile(D3D12_COMPUTE_PIPELINE_STATE_DESC& cpsoDesc, ID3D12PipelineState** pPSO)
+{
+	HashVal hash = getHash(cpsoDesc);
+
+	auto it = cache_.find(hash);
+	if (it != cache_.end()) {
+		*pPSO = it->second;
+		return true;
+	}
+
+	{
+		HRESULT hr = pDevice_->CreateComputePipelineState(&cpsoDesc, IID_PPV_ARGS(pPSO));
+		if (FAILED(hr)) {
+			X_FATAL("Dx12", "Failed to create compute PSO: %" PRIu32, hr);
+		}
+
+		cache_.insert(std::make_pair(hash, *pPSO));
+	}
+
+	return true;
+}
+
+PSODeviceCache::HashVal PSODeviceCache::getHash(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, const GraphicsPSO::InputLayoutArr& il)
+{
+	core::Hash::xxHash64 hasher;
+
+	// we don't want to include the pointer in the hash.
+	// we have root sig pointer but that's ok.
+	gpsoDesc.InputLayout.pInputElementDescs = nullptr;
+
+	hasher.reset(0x52652);
+	hasher.update(&gpsoDesc, 1);
+	hasher.update(il.data(), il.size());
+
+	return hasher.finalize();
+}
+
+PSODeviceCache::HashVal PSODeviceCache::getHash(D3D12_COMPUTE_PIPELINE_STATE_DESC& cpsoDesc)
+{
+	core::Hash::xxHash64 hasher;
+	
+	hasher.reset(0x79371); // diffrent seed to graphics desc.
+	hasher.update(&cpsoDesc, 1);
+
+	return hasher.finalize();
+}
+
 // --------------------------------------------------
 
 void PSO::setRootSignature(const RootSignature& BindMappings)
@@ -66,20 +163,14 @@ GraphicsPSO::~GraphicsPSO()
 }
 
 
-void GraphicsPSO::finalize(ID3D12Device* pDevice)
+void GraphicsPSO::finalize(PSODeviceCache& cache)
 {
 	// Make sure the root signature is finalized first
 	PSODesc_.pRootSignature = pRootSignature_->getSignature();
 
 	X_ASSERT(PSODesc_.pRootSignature != nullptr, "root signature must be finalized before finalize PSO")();
 
-	PSODesc_.InputLayout.pInputElementDescs = nullptr;
-	PSODesc_.InputLayout.pInputElementDescs = inputLayouts_.data();
-
-	HRESULT hr = pDevice->CreateGraphicsPipelineState(&PSODesc_, IID_PPV_ARGS(&pPSO_));
-	if (FAILED(hr)) {
-		X_FATAL("Dx12", "Failed to create graphics PSO: %" PRIu32, hr);
-	}
+	cache.compile(PSODesc_, inputLayouts_, &pPSO_);
 }
 
 
@@ -184,18 +275,14 @@ void GraphicsPSO::setDomainShader(const void* pBinary, size_t Size)
 
 // ----------------------------------------
 
-void ComputePSO::finalize(ID3D12Device* pDevice)
+void ComputePSO::finalize(PSODeviceCache& cache)
 {
 	// Make sure the root signature is finalized first
 	PSODesc_.pRootSignature = pRootSignature_->getSignature();
 
 	X_ASSERT(PSODesc_.pRootSignature != nullptr, "root signature must be finalized before finalize PSO")();
 
-
-	HRESULT hr = pDevice->CreateComputePipelineState(&PSODesc_, IID_PPV_ARGS(&pPSO_));
-	if (FAILED(hr)) {
-		X_FATAL("Dx12", "Failed to create compute PSO: %" PRIu32, hr);
-	}
+	cache.compile(PSODesc_, &pPSO_);
 }
 
 

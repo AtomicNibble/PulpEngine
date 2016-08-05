@@ -1,8 +1,12 @@
 #pragma once
 
+#include <Containers\HashMap.h>
+#include <Hashing\xxHash.h>
+
 X_NAMESPACE_BEGIN(render)
 
 class RootSignature;
+class PSODeviceCache;
 
 class PSO
 {
@@ -22,14 +26,15 @@ protected:
 };
 
 
-
 class GraphicsPSO : public PSO
 {
+public:
+	typedef core::Array<D3D12_INPUT_ELEMENT_DESC> InputLayoutArr;
 public:
 	X_INLINE GraphicsPSO(core::MemoryArenaBase* arena);
 	X_INLINE ~GraphicsPSO();
 
-	void finalize(ID3D12Device* pDevice);
+	void finalize(PSODeviceCache& cache);
 
 	void setBlendState(const D3D12_BLEND_DESC& blendDesc);
 	void setRasterizerState(const D3D12_RASTERIZER_DESC& rasterizerDesc);
@@ -58,10 +63,8 @@ public:
 
 private:
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC PSODesc_;
-	core::Array<D3D12_INPUT_ELEMENT_DESC> inputLayouts_;
+	InputLayoutArr inputLayouts_;
 };
-
-
 
 class ComputePSO : public PSO
 {
@@ -69,15 +72,39 @@ public:
 	X_INLINE ComputePSO();
 	X_INLINE ~ComputePSO();
 
-	void finalize(ID3D12Device* pDevice);
+	void finalize(PSODeviceCache& cache);
 
 	void setComputeShader(const void* pBinary, size_t size);
 	X_INLINE void setComputeShader(const D3D12_SHADER_BYTECODE& binary);
 
 private:
-
 	D3D12_COMPUTE_PIPELINE_STATE_DESC PSODesc_;
 };
+
+
+
+class PSODeviceCache
+{
+	typedef core::Hash::xxHash64::HashVal HashVal;
+	typedef core::HashMap<HashVal, ID3D12PipelineState* > PSOMap;
+public:
+	PSODeviceCache(core::MemoryArenaBase* arena, ID3D12Device* pDevice);
+	~PSODeviceCache();
+
+	void destoryAll(void);
+
+	bool compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, const GraphicsPSO::InputLayoutArr& il, ID3D12PipelineState** pPSO);
+	bool compile(D3D12_COMPUTE_PIPELINE_STATE_DESC& cpsoDesc, ID3D12PipelineState** pPSO);
+
+private:
+	static HashVal getHash(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, const GraphicsPSO::InputLayoutArr& il);
+	static HashVal getHash(D3D12_COMPUTE_PIPELINE_STATE_DESC& cpsoDesc);
+
+private:
+	ID3D12Device* pDevice_;
+	PSOMap cache_;
+};
+
 
 
 X_NAMESPACE_END
