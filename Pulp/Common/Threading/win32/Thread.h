@@ -115,6 +115,7 @@ public:
 	static void Sleep(uint32_t milliSeconds);
 	static void Yield(void);
 	static void YieldProcessor(void);
+	static void Join(uint32_t threadId);
 	static uint32_t GetCurrentID(void);
 	static void SetName(uint32_t threadId, const char* name);
 

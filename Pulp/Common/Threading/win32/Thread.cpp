@@ -183,6 +183,23 @@ void Thread::YieldProcessor(void)
 }
 
 
+
+void Thread::Join(uint32_t threadId)
+{
+	HANDLE hThread = ::OpenThread(THREAD_ALL_ACCESS, FALSE, threadId);
+	if (hThread == NULL) {
+		lastError::Description Dsc;
+		X_ERROR("Thread", "Failed to get thread handle for id: % " PRIu32 ". Error: %s", threadId, lastError::ToString(Dsc));
+		return;
+	}
+
+	if (WaitForSingleObject(hThread, INFINITE) == WAIT_FAILED) {
+		lastError::Description Dsc;
+		X_ERROR("Thread", "thread join failed. Erorr: %s", lastError::ToString(Dsc));
+	}
+}
+
+
 uint32_t Thread::GetCurrentID(void)
 {
 	return ::GetCurrentThreadId();
