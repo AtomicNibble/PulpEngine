@@ -56,8 +56,8 @@ private:
 	static HashVal getHash(D3D12_ROOT_SIGNATURE_DESC& rootDesc, D3D12_ROOT_SIGNATURE_FLAGS flags);
 
 private:
+	core::CriticalSection cacheLock_;
 	ID3D12Device* pDevice_;
-
 	SigMap cache_;
 };
 

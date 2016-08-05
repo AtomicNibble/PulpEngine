@@ -32,12 +32,23 @@ bool RootSignatureDeviceCache::compile(D3D12_ROOT_SIGNATURE_DESC& rootDesc, D3D1
 
 	HashVal hash = getHash(rootDesc, flags);
 
-	auto it = cache_.find(hash);
-	if (it != cache_.end()) {
-		*pSignature = it->second;
-		return true;
+	ID3D12RootSignature** pRootSigRef = nullptr;
+	bool notCompiled = false;
+	{
+		core::CriticalSection::ScopedLock lock(cacheLock_);
+
+		auto it = cache_.find(hash);
+		if (it != cache_.end()) {
+			pRootSigRef = &it->second;
+		}
+		else {
+			notCompiled = true;
+			auto insertIt = cache_.insert(std::make_pair(hash, nullptr));
+			pRootSigRef = &insertIt.first->second;
+		}
 	}
 
+	if (notCompiled)
 	{
 		ID3DBlob* pOutBlob;
 		ID3DBlob* pErrorBlob;
@@ -62,12 +73,20 @@ bool RootSignatureDeviceCache::compile(D3D12_ROOT_SIGNATURE_DESC& rootDesc, D3D1
 
 		D3DDebug::SetDebugObjectName(*pSignature, L"RootSignature");
 
-
-		cache_.insert(std::make_pair(hash, *pSignature));
-
 		core::SafeReleaseDX(pOutBlob);
 		core::SafeReleaseDX(pErrorBlob);
+
+		*pRootSigRef = *pSignature;
 	}
+	else
+	{
+		// if might of been inserted but not finished compiling, so wait.
+		while (*pRootSigRef == nullptr) {
+			core::Thread::Yield();
+		}
+		*pSignature = *pRootSigRef;
+	}
+
 	return true;
 }
 
