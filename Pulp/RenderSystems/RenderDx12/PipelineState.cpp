@@ -39,6 +39,17 @@ namespace
 } // namespace
 
 
+// --------------------------------------------------
+
+void PSO::setRootSignature(const RootSignature& BindMappings)
+{
+	pRootSignature_ = &BindMappings;
+}
+
+
+// --------------------------------------------------
+
+
 GraphicsPSO::GraphicsPSO(core::MemoryArenaBase* arena) :
 	inputLayouts_(arena)
 {

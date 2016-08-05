@@ -12,6 +12,12 @@ X_INLINE PSO::~PSO()
 }
 
 
+X_INLINE const RootSignature& PSO::getRootSignature(void) const
+{
+	X_ASSERT_NOT_NULL(pRootSignature_);
+	return *pRootSignature_;
+}
+
 X_INLINE ID3D12PipelineState* PSO::getPipelineStateObject(void) const
 {
 	return pPSO_;

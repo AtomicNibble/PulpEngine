@@ -10,6 +10,10 @@ public:
 	X_INLINE PSO();
 	X_INLINE ~PSO();
 
+
+	void setRootSignature(const RootSignature& BindMappings);
+	X_INLINE const RootSignature& getRootSignature(void) const;
+
 	X_INLINE ID3D12PipelineState* getPipelineStateObject(void) const;
 
 protected:
