@@ -36,22 +36,22 @@ public:
 
 	void finalize(PSODeviceCache& cache);
 
-	void setBlendState(const D3D12_BLEND_DESC& blendDesc);
-	void setRasterizerState(const D3D12_RASTERIZER_DESC& rasterizerDesc);
-	void setDepthStencilState(const D3D12_DEPTH_STENCIL_DESC& depthStencilDesc);
-	void setSampleMask(uint32_t sampleMask);
-	void setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType);
-	void setRenderTargetFormat(DXGI_FORMAT RTVFormat, DXGI_FORMAT DSVFormat, uint32_t msaaCount = 1, uint32_t msaaQuality = 0);
+	X_INLINE void setBlendState(const D3D12_BLEND_DESC& blendDesc);
+	X_INLINE void setRasterizerState(const D3D12_RASTERIZER_DESC& rasterizerDesc);
+	X_INLINE void setDepthStencilState(const D3D12_DEPTH_STENCIL_DESC& depthStencilDesc);
+	X_INLINE void setSampleMask(uint32_t sampleMask);
+	X_INLINE void setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType);
+	X_INLINE void setRenderTargetFormat(DXGI_FORMAT RTVFormat, DXGI_FORMAT DSVFormat, uint32_t msaaCount = 1, uint32_t msaaQuality = 0);
 	void setRenderTargetFormats(uint32_t numRTVs, const DXGI_FORMAT* pRTVFormats,
 		DXGI_FORMAT DSVFormat, uint32_t MsaaCount = 1, uint32_t MsaaQuality = 0);
 	void setInputLayout(uint32_t numElements, const D3D12_INPUT_ELEMENT_DESC* pInputElementDescs);
-	void setPrimitiveRestart(D3D12_INDEX_BUFFER_STRIP_CUT_VALUE IBProps);
+	X_INLINE void setPrimitiveRestart(D3D12_INDEX_BUFFER_STRIP_CUT_VALUE IBProps);
 
-	void setVertexShader(const void* pBinary, size_t Size);
-	void setPixelShader(const void* pBinary, size_t Size);
-	void setGeometryShader(const void* pBinary, size_t Size);
-	void setHullShader(const void* pBinary, size_t Size);
-	void setDomainShader(const void* pBinary, size_t Size);
+	X_INLINE void setVertexShader(const void* pBinary, size_t Size);
+	X_INLINE void setPixelShader(const void* pBinary, size_t Size);
+	X_INLINE void setGeometryShader(const void* pBinary, size_t Size);
+	X_INLINE void setHullShader(const void* pBinary, size_t Size);
+	X_INLINE void setDomainShader(const void* pBinary, size_t Size);
 	
 	X_INLINE void setVertexShader(const D3D12_SHADER_BYTECODE& binary);
 	X_INLINE void setPixelShader(const D3D12_SHADER_BYTECODE& binary);

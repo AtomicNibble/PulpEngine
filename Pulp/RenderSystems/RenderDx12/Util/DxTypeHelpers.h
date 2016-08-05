@@ -116,4 +116,32 @@ struct CD3DX12_TEXTURE_COPY_LOCATION : public D3D12_TEXTURE_COPY_LOCATION
 };
 
 
+//------------------------------------------------------------------------------------------------
+
+struct CD3D12_SHADER_BYTECODE : public D3D12_SHADER_BYTECODE
+{
+	CD3D12_SHADER_BYTECODE()
+	{
+	}
+
+	explicit CD3D12_SHADER_BYTECODE(const D3D12_SHADER_BYTECODE& o) :
+		D3D12_SHADER_BYTECODE(o)
+	{
+	}
+
+	explicit CD3D12_SHADER_BYTECODE(const void* _pShaderBytecode, SIZE_T _BytecodeLength)
+	{
+		pShaderBytecode = _pShaderBytecode;
+		BytecodeLength = _BytecodeLength;
+	}
+
+	~CD3D12_SHADER_BYTECODE()
+	{
+	}
+
+	operator const D3D12_SHADER_BYTECODE&() const {
+		return *this;
+	}
+};
+
 X_NAMESPACE_END

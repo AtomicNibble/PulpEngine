@@ -6,39 +6,6 @@
 X_NAMESPACE_BEGIN(render)
 
 
-namespace
-{
-
-	struct CD3D12_SHADER_BYTECODE : public D3D12_SHADER_BYTECODE
-	{
-		CD3D12_SHADER_BYTECODE()
-		{
-		}
-
-		explicit CD3D12_SHADER_BYTECODE(const D3D12_SHADER_BYTECODE& o) :
-			D3D12_SHADER_BYTECODE(o)
-		{
-		}
-
-		explicit CD3D12_SHADER_BYTECODE(const void* _pShaderBytecode, SIZE_T _BytecodeLength)
-		{
-			pShaderBytecode = _pShaderBytecode;
-			BytecodeLength = _BytecodeLength;
-		}
-
-		~CD3D12_SHADER_BYTECODE() 
-		{
-		}
-
-		operator const D3D12_SHADER_BYTECODE&() const { 
-			return *this; 
-		}
-	};
-
-
-} // namespace
-
-
 PSODeviceCache::PSODeviceCache(core::MemoryArenaBase* arena, ID3D12Device* pDevice) :
 	pDevice_(pDevice),
 	cache_(arena, 32)
@@ -218,37 +185,6 @@ void GraphicsPSO::finalize(PSODeviceCache& cache)
 }
 
 
-void GraphicsPSO::setBlendState(const D3D12_BLEND_DESC& blendDesc)
-{
-	PSODesc_.BlendState = blendDesc;
-}
-
-void GraphicsPSO::setRasterizerState(const D3D12_RASTERIZER_DESC& rasterizerDesc)
-{
-	PSODesc_.RasterizerState = rasterizerDesc;
-}
-
-void GraphicsPSO::setDepthStencilState(const D3D12_DEPTH_STENCIL_DESC& depthStencilDesc)
-{
-	PSODesc_.DepthStencilState = depthStencilDesc;
-}
-
-void GraphicsPSO::setSampleMask(uint32_t sampleMask)
-{
-	PSODesc_.SampleMask = sampleMask;
-}
-
-void GraphicsPSO::setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType)
-{
-	PSODesc_.PrimitiveTopologyType = topologyType;
-}
-
-void GraphicsPSO::setRenderTargetFormat(DXGI_FORMAT RTVFormat, DXGI_FORMAT DSVFormat,
-	uint32_t msaaCount, uint32_t msaaQuality)
-{
-	setRenderTargetFormats(1, &RTVFormat, DSVFormat, msaaCount, msaaQuality);
-}
-
 void GraphicsPSO::setRenderTargetFormats(uint32_t numRTVs, const DXGI_FORMAT* pRTVFormats,
 	DXGI_FORMAT DSVFormat, uint32_t MsaaCount , uint32_t MsaaQuality)
 {
@@ -282,38 +218,6 @@ void GraphicsPSO::setInputLayout(uint32_t numElements, const D3D12_INPUT_ELEMENT
 	else {
 		inputLayouts_.clear();
 	}
-}
-
-void GraphicsPSO::setPrimitiveRestart(D3D12_INDEX_BUFFER_STRIP_CUT_VALUE IBProps)
-{
-	PSODesc_.IBStripCutValue = IBProps;
-}
-
-
-
-void GraphicsPSO::setVertexShader(const void* pBinary, size_t Size)
-{
-	PSODesc_.VS = CD3D12_SHADER_BYTECODE(pBinary, Size);
-}
-
-void GraphicsPSO::setPixelShader(const void* pBinary, size_t Size)
-{
-	PSODesc_.PS = CD3D12_SHADER_BYTECODE(pBinary, Size);
-}
-
-void GraphicsPSO::setGeometryShader(const void* pBinary, size_t Size)
-{
-	PSODesc_.GS = CD3D12_SHADER_BYTECODE(pBinary, Size);
-}
-
-void GraphicsPSO::setHullShader(const void* pBinary, size_t Size)
-{
-	PSODesc_.HS = CD3D12_SHADER_BYTECODE(pBinary, Size);
-}
-
-void GraphicsPSO::setDomainShader(const void* pBinary, size_t Size)
-{
-	PSODesc_.DS = CD3D12_SHADER_BYTECODE(pBinary, Size);
 }
 
 

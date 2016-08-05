@@ -26,6 +26,69 @@ X_INLINE ID3D12PipelineState* PSO::getPipelineStateObject(void) const
 // ----------------------------------------
 
 
+X_INLINE void GraphicsPSO::setBlendState(const D3D12_BLEND_DESC& blendDesc)
+{
+	PSODesc_.BlendState = blendDesc;
+}
+
+X_INLINE void GraphicsPSO::setRasterizerState(const D3D12_RASTERIZER_DESC& rasterizerDesc)
+{
+	PSODesc_.RasterizerState = rasterizerDesc;
+}
+
+X_INLINE void GraphicsPSO::setDepthStencilState(const D3D12_DEPTH_STENCIL_DESC& depthStencilDesc)
+{
+	PSODesc_.DepthStencilState = depthStencilDesc;
+}
+
+X_INLINE void GraphicsPSO::setSampleMask(uint32_t sampleMask)
+{
+	PSODesc_.SampleMask = sampleMask;
+}
+
+X_INLINE void GraphicsPSO::setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE topologyType)
+{
+	PSODesc_.PrimitiveTopologyType = topologyType;
+}
+
+X_INLINE void GraphicsPSO::setRenderTargetFormat(DXGI_FORMAT RTVFormat, DXGI_FORMAT DSVFormat,
+	uint32_t msaaCount, uint32_t msaaQuality)
+{
+	setRenderTargetFormats(1, &RTVFormat, DSVFormat, msaaCount, msaaQuality);
+}
+
+
+X_INLINE void GraphicsPSO::setPrimitiveRestart(D3D12_INDEX_BUFFER_STRIP_CUT_VALUE IBProps)
+{
+	PSODesc_.IBStripCutValue = IBProps;
+}
+
+X_INLINE void GraphicsPSO::setVertexShader(const void* pBinary, size_t Size)
+{
+	PSODesc_.VS = CD3D12_SHADER_BYTECODE(pBinary, Size);
+}
+
+X_INLINE void GraphicsPSO::setPixelShader(const void* pBinary, size_t Size)
+{
+	PSODesc_.PS = CD3D12_SHADER_BYTECODE(pBinary, Size);
+}
+
+X_INLINE void GraphicsPSO::setGeometryShader(const void* pBinary, size_t Size)
+{
+	PSODesc_.GS = CD3D12_SHADER_BYTECODE(pBinary, Size);
+}
+
+X_INLINE void GraphicsPSO::setHullShader(const void* pBinary, size_t Size)
+{
+	PSODesc_.HS = CD3D12_SHADER_BYTECODE(pBinary, Size);
+}
+
+X_INLINE void GraphicsPSO::setDomainShader(const void* pBinary, size_t Size)
+{
+	PSODesc_.DS = CD3D12_SHADER_BYTECODE(pBinary, Size);
+}
+
+
 X_INLINE void GraphicsPSO::setVertexShader(const D3D12_SHADER_BYTECODE& binary)
 {
 	PSODesc_.VS = binary;
