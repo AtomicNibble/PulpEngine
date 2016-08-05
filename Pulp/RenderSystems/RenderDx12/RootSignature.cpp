@@ -75,6 +75,7 @@ RootSignatureDeviceCache::HashVal RootSignatureDeviceCache::getHash(D3D12_ROOT_S
 {
 	core::Hash::xxHash64 hasher;
 
+	hasher.reset(0);
  	hasher.update(rootDesc.pStaticSamplers, rootDesc.NumStaticSamplers);
 
 	for (uint32_t param = 0; param < rootDesc.NumParameters; ++param)
