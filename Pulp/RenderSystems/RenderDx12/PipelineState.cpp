@@ -88,7 +88,7 @@ bool PSODeviceCache::compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, const
 			notCompiled = true;
 			// insert the entry for this hash, before we start compile.
 			// that way we don't have to lock for whole compile time.
-			auto insertIt = cache_.insert(std::make_pair(hash, *pPSO));
+			auto insertIt = cache_.insert(std::make_pair(hash, nullptr));
 
 			pPSORef = &insertIt.first->second;
 		}
@@ -131,7 +131,7 @@ bool PSODeviceCache::compile(D3D12_COMPUTE_PIPELINE_STATE_DESC& cpsoDesc, ID3D12
 		}
 		else {
 			notCompiled = true;
-			auto insertIt = cache_.insert(std::make_pair(hash, *pPSO));
+			auto insertIt = cache_.insert(std::make_pair(hash, nullptr));
 			pPSORef = &insertIt.first->second;
 		}
 	}
