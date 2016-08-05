@@ -126,8 +126,7 @@ bool PSODeviceCache::compile(D3D12_COMPUTE_PIPELINE_STATE_DESC& cpsoDesc, ID3D12
 
 		auto it = cache_.find(hash);
 		if (it != cache_.end()) {
-			*pPSO = it->second;
-			return true;
+			pPSORef = &it->second;
 		}
 		else {
 			notCompiled = true;
