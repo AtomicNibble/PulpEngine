@@ -31,6 +31,10 @@ class RenderAuxImp;
 class ContextManager;
 class LinearAllocatorManager;
 
+class RootSignatureDeviceCache;
+class PSODeviceCache;
+
+
 class XRender : public IRender
 {
 	static const uint32_t SWAP_CHAIN_BUFFER_COUNT = 3;
@@ -172,6 +176,8 @@ private:
 	DescriptorAllocatorPool* pDescriptorAllocatorPool_;
 
 	RootSignatureDeviceCache* pRootSigCache_;
+	PSODeviceCache* pPSOCache_;
+
 
 	RootSignature presentRS_;
 

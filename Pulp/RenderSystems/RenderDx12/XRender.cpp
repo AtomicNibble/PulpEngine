@@ -7,6 +7,7 @@
 
 #include "Allocators\LinearAllocator.h"
 #include "CommandContex.h"
+#include "PipelineState.h"
 
 #include <IConsole.h>
 
@@ -152,8 +153,9 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	pLinearAllocatorMan_ = X_NEW(LinearAllocatorManager, arena_, "LinAlocMan")(arena_, pDevice_, cmdListManager_);
 	pContextMan_ = X_NEW(ContextManager, arena_, "ContextMan")(arena_, pDevice_, descriptorAllocatorPool, *pLinearAllocatorMan_);
 	pRootSigCache_ = X_NEW(RootSignatureDeviceCache, arena_, "RootSignatureDeviceCache")(arena_, pDevice_);
+	pPSOCache_ = X_NEW(PSODeviceCache, arena_, "PSODeviceCache")(arena_, pDevice_);
 
-
+	
 
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
 	core::zero_object(swapChainDesc);
@@ -291,6 +293,10 @@ void XRender::shutDown(void)
 		X_DELETE_AND_NULL(pLinearAllocatorMan_, arena_);
 	}
 
+	if (pPSOCache_) {
+		pPSOCache_->destoryAll();
+		X_DELETE_AND_NULL(pPSOCache_, arena_);
+	}
 	if (pRootSigCache_) {
 		pRootSigCache_->destoryAll();
 		X_DELETE_AND_NULL(pRootSigCache_, arena_);
