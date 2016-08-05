@@ -35,6 +35,7 @@ bool RootSignatureDeviceCache::compile(D3D12_ROOT_SIGNATURE_DESC& rootDesc, D3D1
 	auto it = cache_.find(hash);
 	if (it != cache_.end()) {
 		*pSignature = it->second;
+		return true;
 	}
 
 	{
