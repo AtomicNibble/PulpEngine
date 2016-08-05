@@ -3,6 +3,111 @@
 
 X_NAMESPACE_BEGIN(render)
 
+RootSignatureDeviceCache::RootSignatureDeviceCache(core::MemoryArenaBase* arena, ID3D12Device* pDevice) :
+	pDevice_(pDevice),
+	cache_(arena, 32)
+{
+
+}
+
+RootSignatureDeviceCache::~RootSignatureDeviceCache()
+{
+
+}
+
+void RootSignatureDeviceCache::destoryAll(void)
+{
+	auto it = cache_.begin();
+	for (; it != cache_.end(); ++it)
+	{
+		it->second->Release();
+	}
+
+	cache_.clear();
+}
+
+bool RootSignatureDeviceCache::compile(D3D12_ROOT_SIGNATURE_DESC& rootDesc, D3D12_ROOT_SIGNATURE_FLAGS flags, 
+	ID3D12RootSignature** pSignature)
+{
+	X_ASSERT_NOT_NULL(pSignature);
+
+	HashVal hash = getHash(rootDesc, flags);
+
+	auto it = cache_.find(hash);
+	if (it != cache_.end()) {
+		*pSignature = it->second;
+	}
+
+	{
+		ID3DBlob* pOutBlob;
+		ID3DBlob* pErrorBlob;
+
+		HRESULT hr = D3D12SerializeRootSignature(&rootDesc, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob);
+		if (FAILED(hr)) {
+			const char* pErr = "<na>";
+			if (pErrorBlob) {
+				pErr = static_cast<const char*>(pErrorBlob->GetBufferPointer());
+			}
+
+			X_FATAL("Dx12", "Failed to serialize root signature: %" PRIu32 " Err: \"%s\"", hr, pErr);
+			core::SafeReleaseDX(pOutBlob);
+			core::SafeReleaseDX(pErrorBlob);
+			return false;
+		}
+
+		hr = pDevice_->CreateRootSignature(1, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS(pSignature));
+		if (FAILED(hr)) {
+			X_FATAL("Dx12", "Failed to create root signature: %" PRIu32, hr);
+		}
+
+		D3DDebug::SetDebugObjectName(*pSignature, L"RootSignature");
+
+
+		cache_.insert(std::make_pair(hash, *pSignature));
+
+		core::SafeReleaseDX(pOutBlob);
+		core::SafeReleaseDX(pErrorBlob);
+	}
+	return true;
+}
+
+RootSignatureDeviceCache::HashVal RootSignatureDeviceCache::getHash(D3D12_ROOT_SIGNATURE_DESC& rootDesc,
+	D3D12_ROOT_SIGNATURE_FLAGS flags)
+{
+	core::Hash::xxHash64 hasher;
+
+ 	hasher.update(rootDesc.pStaticSamplers, rootDesc.NumStaticSamplers);
+
+	for (uint32_t param = 0; param < rootDesc.NumParameters; ++param)
+	{
+		const auto& rootParam = rootDesc.pParameters[param];
+
+		if (rootParam.ParameterType == D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE)
+		{
+			X_ASSERT_NOT_NULL(rootParam.DescriptorTable.pDescriptorRanges);
+
+			hasher.update(rootParam.DescriptorTable.pDescriptorRanges, rootParam.DescriptorTable.NumDescriptorRanges);
+
+			// We don't care about sampler descriptor tables.  We don't cache them
+			if (rootParam.DescriptorTable.pDescriptorRanges->RangeType == D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER) {
+				continue;
+			}
+
+			// ...
+		}
+		else
+		{
+			hasher.update(&rootParam, 1);
+		}
+	}
+
+	// include flags?
+	hasher.update(&flags, 1);
+
+	return hasher.finalize();
+}
+
+// --------------------------------------------------------
 
 void RootSignature::clear(void)
 {
@@ -82,13 +187,12 @@ void RootSignature::initStaticSampler(uint32_t Register, const D3D12_SAMPLER_DES
 	}
 }
 
-void RootSignature::finalize(ID3D12Device* pDevice, D3D12_ROOT_SIGNATURE_FLAGS flags)
+void RootSignature::finalize(RootSignatureDeviceCache& cache, D3D12_ROOT_SIGNATURE_FLAGS flags)
 {
 	if (pSignature_) {
 		return;
 	}
-	
-	X_ASSERT_NOT_NULL(pDevice);
+
 	X_ASSERT(samplesInitCount_ == static_cast<uint32_t>(samplers_.size()), "Not all samplers are init")(samplesInitCount_, samplers_.size());
 
 	D3D12_ROOT_SIGNATURE_DESC rootDesc;
@@ -131,32 +235,10 @@ void RootSignature::finalize(ID3D12Device* pDevice, D3D12_ROOT_SIGNATURE_FLAGS f
 
 #endif // !X_DEBUG
 
-	ID3DBlob* pOutBlob;
-	ID3DBlob* pErrorBlob;
 
-	HRESULT hr = D3D12SerializeRootSignature(&rootDesc, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob);
-	if (FAILED(hr)) {
-
-		const char* pErr = "<na>";
-		if (pErrorBlob) {
-			pErr = static_cast<const char*>(pErrorBlob->GetBufferPointer());
-		}
-
-		X_FATAL("Dx12", "Failed to serialize root signature: %" PRIu32 " Err: \"%s\"", hr, pErr);
-		core::SafeReleaseDX(pOutBlob);
-		core::SafeReleaseDX(pErrorBlob);
-		return;
+	if (!cache.compile(rootDesc, flags, &pSignature_)) {
+		X_ERROR("Dx12", "Failed to compile root sig");
 	}
-
-	hr = pDevice->CreateRootSignature(1, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS(&pSignature_));
-	if (FAILED(hr)) {
-		X_FATAL("Dx12", "Failed to create root signature: %" PRIu32, hr);
-	}
-
-	D3DDebug::SetDebugObjectName(pSignature_, L"RootSignature");
-
-	core::SafeReleaseDX(pOutBlob);
-	core::SafeReleaseDX(pErrorBlob);
 }
 
 

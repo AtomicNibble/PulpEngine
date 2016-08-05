@@ -1,6 +1,8 @@
 #pragma once
 
+#include <Containers\HashMap.h>
 
+#include <Hashing\xxHash.h>
 
 X_NAMESPACE_BEGIN(render)
 
@@ -37,6 +39,27 @@ protected:
 	D3D12_ROOT_PARAMETER rootParam_;
 };
 
+class RootSignatureDeviceCache
+{
+	typedef core::Hash::xxHash64::HashVal HashVal;
+	typedef core::HashMap<HashVal, ID3D12RootSignature* > SigMap;
+
+public:
+	RootSignatureDeviceCache(core::MemoryArenaBase* arena, ID3D12Device* pDevice);
+	~RootSignatureDeviceCache();
+
+	void destoryAll(void);
+
+	bool compile(D3D12_ROOT_SIGNATURE_DESC& rootDesc, D3D12_ROOT_SIGNATURE_FLAGS flags, ID3D12RootSignature** pSignature);
+	
+private:
+	static HashVal getHash(D3D12_ROOT_SIGNATURE_DESC& rootDesc, D3D12_ROOT_SIGNATURE_FLAGS flags);
+
+private:
+	ID3D12Device* pDevice_;
+
+	SigMap cache_;
+};
 
 class RootSignature
 {
@@ -60,7 +83,7 @@ public:
 	void initStaticSampler(uint32_t Register, const D3D12_SAMPLER_DESC& nonStaticSamplerDesc,
 		D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
 
-	void finalize(ID3D12Device* pDevice, D3D12_ROOT_SIGNATURE_FLAGS flags = D3D12_ROOT_SIGNATURE_FLAG_NONE);
+	void finalize(RootSignatureDeviceCache& cache, D3D12_ROOT_SIGNATURE_FLAGS flags = D3D12_ROOT_SIGNATURE_FLAG_NONE);
 
 	X_INLINE size_t numParams(void) const;
 	X_INLINE RootParameter& getParamRef(size_t idx);
