@@ -618,13 +618,15 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 {
 	if (initParams.bTesting)
 	{
-		if (!IntializeEngineModule(DLL_RENDER_NULL, "Engine_RenderNull", initParams))
+		if (!IntializeEngineModule(DLL_RENDER_NULL, "Engine_RenderNull", initParams)) {
 			return false;
+		}
 	}
 	else
 	{
-		if (!IntializeEngineModule(DLL_RENDER, DLL_RENDER_CLASS, initParams)) 
+		if (!IntializeEngineModule(DLL_RENDER, DLL_RENDER_CLASS, initParams)) {
 			return false;
+		}
 	}
 
 	if (!env_.pRender) {
@@ -669,8 +671,9 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 
 bool XCore::Init3DEngine(const SCoreInitParams& initParams)
 {
-	if (!IntializeEngineModule(DLL_3D_ENGINE, "Engine_3DEngine", initParams))
+	if (!IntializeEngineModule(DLL_3D_ENGINE, "Engine_3DEngine", initParams)) {
 		return false;
+	}
 
 	if (env_.p3DEngine) {
 		if (!env_.p3DEngine->Init()) {
@@ -687,8 +690,9 @@ bool XCore::Init3DEngine(const SCoreInitParams& initParams)
 
 bool XCore::InitGameDll(const SCoreInitParams& initParams)
 {
-	if (!IntializeEngineModule(DLL_GAME_DLL, "Engine_Game", initParams))
+	if (!IntializeEngineModule(DLL_GAME_DLL, "Engine_Game", initParams)) {
 		return false;
+	}
 
 	if (env_.pGame) {
 		if (!env_.pGame->Init()) {
