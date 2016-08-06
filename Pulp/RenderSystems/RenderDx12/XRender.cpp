@@ -630,6 +630,42 @@ void XRender::Cmd_ListDeviceFeatures(core::IConsoleCmdArgs* pCmd)
 	X_LOG0("Dx12", "MaxTextureCubeSize: %" PRIu32, features_.maxTextureCubeSize);
 	X_LOG0("Dx12", "MaxTextureCubeSize: %" PRIu32, features_.maxTextureArrayLength);
 
+	X_LOG0("Dx12", "MaxVertexTextureUnits: %" PRIu8, features_.maxVertexTextureUnits);
+	X_LOG0("Dx12", "MaxPixelTextureUnits: %" PRIu8, features_.maxPixelTextureUnits);
+	X_LOG0("Dx12", "MaxGeometryTextureUnits: %" PRIu8, features_.maxGeometryTextureUnits);
+	X_LOG0("Dx12", "MaxSimultaneousRts: %" PRIu8, features_.maxSimultaneousRts);
+	X_LOG0("Dx12", "MaxSimultaneousUavs: %" PRIu8, features_.maxSimultaneousUavs);
+	X_LOG0("Dx12", "MaxVertexStreams: %" PRIu8, features_.maxVertexStreams);
+	X_LOG0("Dx12", "MaxTextureAnisotropy: %" PRIu8, features_.maxTextureAnisotropy);
+
+	X_LOG0("Dx12", "TileBasedRenderer: %s", features_.isTbdr ? "true" : "false");
+	X_LOG0("Dx12", "UnifiedMemoryArchitecture: %s", features_.isUMA ? "true" : "false");
+
+	X_LOG0("Dx12", "hwInstancingSupport: %s", features_.hwInstancingSupport ? "true" : "false");
+	X_LOG0("Dx12", "instanceIdSupport: %s", features_.instanceIdSupport ? "true" : "false");
+	X_LOG0("Dx12", "streamOutputSupport: %s", features_.streamOutputSupport ? "true" : "false");
+	X_LOG0("Dx12", "alphaToCoverageSupport: %s", features_.alphaToCoverageSupport ? "true" : "false");
+	X_LOG0("Dx12", "primitiveRestartSupport: %s", features_.primitiveRestartSupport ? "true" : "false");
+	X_LOG0("Dx12", "multithreadRenderingSupport: %s", features_.multithreadRenderingSupport ? "true" : "false");
+	X_LOG0("Dx12", "multithreadResCreatingSupport: %s", features_.multithreadResCreatingSupport ? "true" : "false");
+	X_LOG0("Dx12", "mrtIndependentBitDepthsSupport: %s", features_.mrtIndependentBitDepthsSupport ? "true" : "false");
+	X_LOG0("Dx12", "standardDerivativesSupport: %s", features_.standardDerivativesSupport ? "true" : "false");
+	X_LOG0("Dx12", "shaderTextureLodSupport: %s", features_.shaderTextureLodSupport ? "true" : "false");
+	X_LOG0("Dx12", "logicOpSupport: %s", features_.logicOpSupport ? "true" : "false");
+	X_LOG0("Dx12", "independentBlendSupport: %s", features_.independentBlendSupport ? "true" : "false");
+	X_LOG0("Dx12", "depthTextureSupport: %s", features_.depthTextureSupport ? "true" : "false");
+	X_LOG0("Dx12", "fpColorSupport: %s", features_.fpColorSupport ? "true" : "false");
+	X_LOG0("Dx12", "packToRgbaRequired: %s", features_.packToRgbaRequired ? "true" : "false");
+	X_LOG0("Dx12", "drawIndirectSupport: %s", features_.drawIndirectSupport ? "true" : "false");
+	X_LOG0("Dx12", "noOverwriteSupport: %s", features_.noOverwriteSupport ? "true" : "false");
+	X_LOG0("Dx12", "fullNpotTextureSupport: %s", features_.fullNpotTextureSupport ? "true" : "false");
+	X_LOG0("Dx12", "renderToTextureArraySupport: %s", features_.renderToTextureArraySupport ? "true" : "false");
+	X_LOG0("Dx12", "gsSupport: %s", features_.gsSupport ? "true" : "false");
+	X_LOG0("Dx12", "csSupport: %s", features_.csSupport ? "true" : "false");
+	X_LOG0("Dx12", "hsSupport: %s", features_.hsSupport ? "true" : "false");
+	X_LOG0("Dx12", "dsSupport: %s", features_.dsSupport ? "true" : "false");
+
+
 	X_LOG0("Dx12", "-------------------------");
 }
 
