@@ -318,12 +318,12 @@ XSound::~XSound()
 
 
 
-void XSound::RegisterVars(void)
+void XSound::registerVars(void)
 {
 	vars_.RegisterVars();
 }
 
-void XSound::RegisterCmds(void)
+void XSound::registerCmds(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pConsole);
