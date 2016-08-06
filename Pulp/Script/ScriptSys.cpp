@@ -204,7 +204,7 @@ XScriptSys::~XScriptSys()
 }
 
 
-void XScriptSys::Init()
+bool XScriptSys::Init()
 {
 	X_LOG0("Script", "Starting script system");
 
@@ -243,6 +243,7 @@ void XScriptSys::Init()
 
 
 	initialised_ = true;
+	return true;
 }
 
 void XScriptSys::InitCommands()
