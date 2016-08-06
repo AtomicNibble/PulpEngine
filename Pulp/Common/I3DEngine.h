@@ -11,9 +11,12 @@ struct I3DEngine
 {
 	virtual ~I3DEngine(){};
 
+	virtual void registerVars(void) X_ABSTRACT;
+	virtual void registerCmds(void) X_ABSTRACT;
+
 	virtual bool Init(void) X_ABSTRACT;
 	virtual void ShutDown(void) X_ABSTRACT;
-	virtual int release(void) X_ABSTRACT;
+	virtual void release(void) X_ABSTRACT;
 
 	virtual void OnFrameBegin(void) X_ABSTRACT;
 

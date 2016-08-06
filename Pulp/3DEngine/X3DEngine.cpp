@@ -14,6 +14,10 @@
 #include "Material\MaterialManager.h"
 #include "Model\ModelManager.h"
 
+#include "Drawing\CmdBucket.h"
+
+#include <Time\StopWatch.h>
+
 X_NAMESPACE_BEGIN(engine)
 
 ICore* X3DEngine::pCore_ = nullptr;
@@ -71,6 +75,31 @@ void Command_DevMap(core::IConsoleCmdArgs* Cmd)
 
 // ~Commands
 
+
+X3DEngine::X3DEngine()
+{
+
+}
+
+X3DEngine::~X3DEngine()
+{
+
+}
+
+
+void X3DEngine::registerVars(void)
+{
+
+}
+
+void X3DEngine::registerCmds(void)
+{
+	ADD_COMMAND("map", Command_Map, core::VarFlag::SYSTEM, "Loads a map");
+	ADD_COMMAND("devmap", Command_DevMap, core::VarFlag::SYSTEM, "Loads a map in developer mode");
+
+
+}
+
 bool X3DEngine::Init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
@@ -98,7 +127,6 @@ bool X3DEngine::Init(void)
 	pModelManager_ = X_NEW(model::XModelManager, g_3dEngineArena, "ModelManager");
 	pModelManager_->Init();
 
-	RegisterCmds();
 
 	guisMan_.Init();
 
@@ -132,10 +160,9 @@ void X3DEngine::ShutDown(void)
 	level::Level::ShutDown();
 }
 
-int X3DEngine::release(void)
+void X3DEngine::release(void)
 {
 	X_DELETE(this,g_3dEngineArena);
-	return 0;
 }
 
 
@@ -148,12 +175,41 @@ void X3DEngine::OnFrameBegin(void)
 		level_.render();
 	}
 
-
 	// draw me some gui baby
 	if (gui) {
 		pRender_->setGUIShader();
 		gui->Redraw();
 	}
+
+#if 0
+	XCamera cam;
+	CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, 0x4000 * 64);
+
+	cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
+
+	CommandBucket<uint16_t> testBucket(g_3dEngineArena, cmdBucketAllocator, 0x4000, cam);
+
+	core::StopWatch timer;
+
+	for (size_t i = 0; i < 0x4000; i++)
+	{
+		Commands::Draw* pDraw = testBucket.addCommand<Commands::Draw>(13, 0);
+		pDraw->indexBuffer = 0;
+		pDraw->vertexBuffer = 0;
+	}
+
+	const core::TimeVal addTime = timer.GetTimeVal();
+	timer.Start();
+
+	testBucket.sort();
+
+	const core::TimeVal sortTime = timer.GetTimeVal();
+
+	X_LOG0("test", "addTime: %fms", addTime.GetMilliSeconds());
+	X_LOG0("test", "sortTime: %fms", sortTime.GetMilliSeconds());
+
+	testBucket.submit();
+#endif
 }
 
 void X3DEngine::Update(void)
@@ -173,13 +229,6 @@ void X3DEngine::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<c
 
 // =======================================
 
-void X3DEngine::RegisterCmds(void)
-{
-	ADD_COMMAND("map", Command_Map, core::VarFlag::SYSTEM, "Loads a map");
-	ADD_COMMAND("devmap", Command_DevMap, core::VarFlag::SYSTEM, "Loads a map in developer mode");
-
-
-}
 
 
 void X3DEngine::LoadMap(const char* mapName)

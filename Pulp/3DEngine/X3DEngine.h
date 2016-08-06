@@ -18,12 +18,19 @@ X_NAMESPACE_BEGIN(engine)
 
 
 
-struct X3DEngine : public I3DEngine, public XEngineBase, public core::IXHotReload
+class X3DEngine : public I3DEngine, public XEngineBase, public core::IXHotReload
 {
+public:
+	X3DEngine();
+	virtual ~X3DEngine() X_OVERRIDE;
+
+	virtual void registerVars(void) X_OVERRIDE;
+	virtual void registerCmds(void) X_OVERRIDE;
+
 
 	virtual bool Init(void) X_OVERRIDE;
 	virtual void ShutDown(void) X_OVERRIDE;
-	virtual int release(void) X_OVERRIDE;
+	virtual void release(void) X_OVERRIDE;
 
 	virtual void OnFrameBegin(void) X_OVERRIDE;
 	virtual void Update(void) X_OVERRIDE;
@@ -34,7 +41,6 @@ struct X3DEngine : public I3DEngine, public XEngineBase, public core::IXHotReloa
 	// ~IXHotReload
 
 private:
-	void RegisterCmds(void);
 
 	void LoadMap(const char* mapName);
 	void LoadDevMap(const char* mapName);
