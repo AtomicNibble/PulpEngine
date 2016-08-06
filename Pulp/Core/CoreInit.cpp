@@ -646,6 +646,9 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 			return false;
 		}
 
+		env_.pRender->registerVars();
+		env_.pRender->registerCmds();
+
 		X_LOG0("Core", "render init: ^6%gms", timer.GetMilliSeconds());
 	}
 
