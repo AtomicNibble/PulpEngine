@@ -19,7 +19,7 @@ class XSound : public ISound, public ICoreEventListener
 {
 public:
 	XSound();
-	virtual ~XSound();
+	virtual ~XSound() X_OVERRIDE;
 
 	virtual void registerVars(void) X_OVERRIDE;
 	virtual void registerCmds(void) X_OVERRIDE;
