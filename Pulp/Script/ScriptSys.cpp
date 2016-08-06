@@ -207,6 +207,7 @@ XScriptSys::~XScriptSys()
 bool XScriptSys::Init()
 {
 	X_LOG0("Script", "Starting script system");
+	X_ASSERT(initialised_ == false, "Already init")(initialised_);
 
 	pFileSys_ = gEnv->pFileSys;
 
