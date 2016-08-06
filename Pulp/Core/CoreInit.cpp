@@ -666,6 +666,9 @@ bool XCore::Init3DEngine(const SCoreInitParams& initParams)
 			X_ERROR("Core", "Failed to init 3DENninge");
 			return false;
 		}
+
+		env_.p3DEngine->registerVars();
+		env_.p3DEngine->registerCmds();
 	}
 
 	return env_.p3DEngine != nullptr;
