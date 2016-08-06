@@ -45,10 +45,6 @@ X_NAMESPACE_BEGIN(texture)
 		hotReload->addfileType(this, "psd");
 		hotReload->addfileType(this, "tga");
 
-		registerVars();
-		registerCmds();
-
-
 		pCILoader_ = X_NEW(CI::XTexLoaderCI, arena_, "CILoader");
 		
 		textureLoaders_.append(pCILoader_);
@@ -328,9 +324,7 @@ X_NAMESPACE_BEGIN(texture)
 
 		pDevice_->CreateShaderResourceView(gpuResource.getResource(), nullptr, pTex->getSRV());
 
-
 		render::D3DDebug::SetDebugObjectName(gpuResource.getResource(), pTex->getName());
-
 
 		return true;
 	}

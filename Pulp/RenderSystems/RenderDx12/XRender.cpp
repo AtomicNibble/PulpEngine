@@ -353,6 +353,10 @@ void XRender::registerVars(void)
 
 	vars_.setNativeRes(currentNativeRes_);
 	vars_.setRes(displayRes_);
+
+	if (pTextureMan_) {
+		pTextureMan_->registerVars();
+	}
 }
 
 void XRender::registerCmds(void)
@@ -361,7 +365,9 @@ void XRender::registerCmds(void)
 	ADD_COMMAND_MEMBER("r_list_device_features", this, XRender, &XRender::Cmd_ListDeviceFeatures,
 		core::VarFlag::SYSTEM, "List the gpu devices features");
 
-
+	if (pTextureMan_) {
+		pTextureMan_->registerCmds();
+	}
 }
 
 void XRender::renderBegin(void)
