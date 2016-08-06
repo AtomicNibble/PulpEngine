@@ -633,8 +633,12 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 
 	if (initParams.bTesting)
 	{
-		env_.pRender->init(NULL, 0, 0);
-
+		// should never fail since it's null render system.
+		// but it may get changed later that it can fail so check.
+		if (!env_.pRender->init(NULL, 0, 0)) {
+			X_ERROR("Core", "Failed to init render system");
+			return false;
+		}
 	}
 	else
 	{
