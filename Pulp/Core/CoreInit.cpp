@@ -539,22 +539,26 @@ bool XCore::InitInput(const SCoreInitParams &initParams)
 		return true;
 	}
 
-	if (!IntializeEngineModule(DLL_INPUT, "Engine_Input", initParams))
+	if (!IntializeEngineModule(DLL_INPUT, "Engine_Input", initParams)) {
 		return false;
+	}
 
 	return env_.pInput != nullptr;
 }
 
 bool XCore::InitFont(const SCoreInitParams &initParams)
 {
-	if (!IntializeEngineModule(DLL_FONT, "Engine_Font", initParams))
+	if (!IntializeEngineModule(DLL_FONT, "Engine_Font", initParams)) {
 		return false;
+	}
 
-	if (!env_.pFont)
+	if (!env_.pFont) {
 		return false;
+	}
 
-	if (gEnv->IsDedicated()) // don't need a font for dedicated.
+	if (gEnv->IsDedicated()) { // don't need a font for dedicated.
 		return true;
+	}
 
 	// load a default font.
 	font::IFFont* font = env_.pFont->NewFont("default");
@@ -564,8 +568,7 @@ bool XCore::InitFont(const SCoreInitParams &initParams)
 		return false;
 	}
 
-	if(!font->loadFont())
-	{
+	if(!font->loadFont()) {
 		X_ERROR("Font", "failed to load default font");
 		return false;
 	}
@@ -580,8 +583,9 @@ bool XCore::InitSound(const SCoreInitParams& initParams)
 		return true;
 	}
 
-	if (!IntializeEngineModule(DLL_SOUND, "Engine_Sound", initParams))
+	if (!IntializeEngineModule(DLL_SOUND, "Engine_Sound", initParams)) {
 		return false;
+	}
 
 	return env_.pSound != nullptr;
 }
@@ -597,11 +601,13 @@ bool XCore::InitPhysics(const SCoreInitParams& initParams)
 
 bool XCore::InitScriptSys(const SCoreInitParams& initParams)
 {
-	if (!IntializeEngineModule(DLL_SCRIPT, "Engine_Script", initParams))
+	if (!IntializeEngineModule(DLL_SCRIPT, "Engine_Script", initParams)) {
 		return false;
+	}
 
-	if (!env_.pScriptSys)
+	if (!env_.pScriptSys) {
 		return false;
+	}
 
 	env_.pScriptSys->Init();
 
@@ -617,12 +623,13 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 	}
 	else
 	{
-		if (!IntializeEngineModule(DLL_RENDER, DLL_RENDER_CLASS, initParams))
+		if (!IntializeEngineModule(DLL_RENDER, DLL_RENDER_CLASS, initParams)) 
 			return false;
 	}
 
-	if (!env_.pRender)
+	if (!env_.pRender) {
 		return false;
+	}
 
 	if (initParams.bTesting)
 	{
