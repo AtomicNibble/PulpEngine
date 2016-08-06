@@ -609,7 +609,10 @@ bool XCore::InitScriptSys(const SCoreInitParams& initParams)
 		return false;
 	}
 
-	env_.pScriptSys->Init();
+	if (!env_.pScriptSys->Init()) {
+		X_ERROR("Font", "failed to init script system");
+		return false;
+	}
 
 	return true;
 }
