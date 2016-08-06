@@ -39,6 +39,9 @@ protected:
 	D3D12_ROOT_PARAMETER rootParam_;
 };
 
+static_assert(sizeof(RootParameter) == sizeof(D3D12_ROOT_PARAMETER), "rootParam must have same size as d3d type");
+
+
 class RootSignatureDeviceCache
 {
 	typedef core::Hash::xxHash64::HashVal HashVal;
