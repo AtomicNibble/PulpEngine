@@ -17,8 +17,9 @@ X_NAMESPACE_BEGIN(render)
 XRender::XRender(core::MemoryArenaBase* arena) :
 	arena_(arena),
 	pDevice_(nullptr),
-	pDebug_(nullptr),
+	pAdapter_(nullptr),
 	pSwapChain_(nullptr),
+	pDebug_(nullptr),
 	pTextureMan_(nullptr),
 	pAuxRender_(nullptr),
 	shaderMan_(arena),
@@ -27,6 +28,8 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	dedicatedvideoMemory_(0),
 	pDescriptorAllocator_(nullptr),
 	pDescriptorAllocatorPool_(nullptr),
+	pRootSigCache_(nullptr),
+	pPSOCache_(nullptr),
 	presentRS_(arena),
 	currentBufferIdx_(0),
 	auxQues_ {arena, arena} 
