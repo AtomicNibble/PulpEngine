@@ -793,6 +793,32 @@ namespace shader
 		return "";
 	}
 
+	std::pair<uint8_t, uint8_t> XHWShader::getProfileVersionForType(ShaderType::Enum type)
+	{
+		uint8_t major, minor;
+
+		major = 0;
+		minor = 0;
+
+		switch (type)
+		{
+		case ShaderType::Vertex:
+		case ShaderType::Pixel:
+		case ShaderType::Geometry:
+		case ShaderType::Hull:
+		case ShaderType::Domain:
+			major = 5;
+			minor = 0;
+			break;
+
+		default:
+			X_ASSERT_UNREACHABLE();
+			break;
+		}
+
+		return std::make_pair(major, minor);
+	}
+
 
 	// -----------------------------------------------
 
