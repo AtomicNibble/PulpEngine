@@ -287,6 +287,8 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 		return false;
 	}
 
+	initILDescriptions();
+
 	return true;
 }
 
@@ -454,9 +456,258 @@ bool XRender::freeSwapChainResources(void)
 }
 
 
+void XRender::initILDescriptions(void)
+{
+	const uint32_t num = shader::VertexFormat::Num;
+
+	D3D12_INPUT_ELEMENT_DESC elem_pos = { "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	D3D12_INPUT_ELEMENT_DESC elem_nor101010 = { "NORMAL", 0, DXGI_FORMAT_R10G10B10_XR_BIAS_A2_UNORM, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	//6	D3D11_INPUT_ELEMENT_DESC elem_nor8888 = { "NORMAL", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	D3D12_INPUT_ELEMENT_DESC elem_nor323232 = { "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	D3D12_INPUT_ELEMENT_DESC elem_col8888 = { "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	D3D12_INPUT_ELEMENT_DESC elem_uv3232 = { "TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	D3D12_INPUT_ELEMENT_DESC elem_uv1616 = { "TEXCOORD", 0, DXGI_FORMAT_R16G16_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	//	D3D11_INPUT_ELEMENT_DESC elem_uv32323232 = { "TEXCOORD", 0, DXGI_FORMAT_R16G16_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
+	D3D12_INPUT_ELEMENT_DESC elem_t3f = { "TEXCOORD", 0, DXGI_FORMAT_R32G32B32A32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
+	D3D12_INPUT_ELEMENT_DESC elem_tagent101010 = { "TANGENT", 0, DXGI_FORMAT_R10G10B10A2_TYPELESS, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	D3D12_INPUT_ELEMENT_DESC elem_tagent323232 = { "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	D3D12_INPUT_ELEMENT_DESC elem_biNormal101010 = { "BINORMAL", 0, DXGI_FORMAT_R10G10B10A2_TYPELESS, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+	D3D12_INPUT_ELEMENT_DESC elem_biNormal323232 = { "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 };
+
+
+	for (uint32_t i = 0; i < num; i++)
+	{
+		auto& layout = ilDescriptions_[i];
+
+		// for now all positions are just 32bit floats baby!
+		elem_pos.AlignedByteOffset = 0;
+		elem_pos.SemanticIndex = 0;
+		elem_uv3232.SemanticIndex = 0;
+		layout.emplace_back(elem_pos);
+
+		if (i == shader::VertexFormat::P3F_T2S || i == shader::VertexFormat::P3F_T2S_C4B ||
+			i == shader::VertexFormat::P3F_T2S_C4B_N3F || i == shader::VertexFormat::P3F_T2S_C4B_N3F_TB3F ||
+			i == shader::VertexFormat::P3F_T2S_C4B_N10 || i == shader::VertexFormat::P3F_T2S_C4B_N10_TB10)
+		{
+			elem_uv1616.AlignedByteOffset = 12;
+			layout.emplace_back(elem_uv1616);
+		}
+		if (i == shader::VertexFormat::P3F_T2S_C4B ||
+			i == shader::VertexFormat::P3F_T2S_C4B_N3F || i == shader::VertexFormat::P3F_T2S_C4B_N3F_TB3F ||
+			i == shader::VertexFormat::P3F_T2S_C4B_N10 || i == shader::VertexFormat::P3F_T2S_C4B_N10_TB10)
+		{
+			elem_col8888.AlignedByteOffset = 12 + 4;
+			layout.emplace_back(elem_col8888);
+		}
+
+		if (i == shader::VertexFormat::P3F_T2S_C4B_N3F || i == shader::VertexFormat::P3F_T2S_C4B_N3F_TB3F)
+		{
+			elem_nor323232.AlignedByteOffset = 12 + 4 + 4;
+			layout.emplace_back(elem_nor323232); // 12 bytes
+		}
+		if (i == shader::VertexFormat::P3F_T2S_C4B_N3F_TB3F)
+		{
+			elem_tagent323232.AlignedByteOffset = 12 + 4 + 4 + 12;
+			layout.emplace_back(elem_tagent323232); // 12 bytes
+
+			elem_biNormal323232.AlignedByteOffset = 12 + 4 + 4 + 12 + 12;
+			layout.emplace_back(elem_biNormal323232); // 12 bytes
+		}
+
+		if (i == shader::VertexFormat::P3F_T2F_C4B)
+		{
+			elem_uv3232.AlignedByteOffset = 12;
+			layout.emplace_back(elem_uv3232);
+
+			elem_col8888.AlignedByteOffset = 20;
+			layout.emplace_back(elem_col8888);
+
+		}
+		else if (i == shader::VertexFormat::P3F_T3F)
+		{
+			elem_t3f.AlignedByteOffset = 12;
+			layout.emplace_back(elem_t3f);
+		}
+
+
+		if (i == shader::VertexFormat::P3F_T2S_C4B_N10 || i == shader::VertexFormat::P3F_T2S_C4B_N10_TB10)
+		{
+			// 12 + 4 + 4
+			elem_nor101010.AlignedByteOffset = 20;
+			layout.emplace_back(elem_nor101010);
+		}
+		if (i == shader::VertexFormat::P3F_T2S_C4B_N10_TB10)
+		{
+			elem_tagent101010.AlignedByteOffset = 24;
+			layout.emplace_back(elem_tagent101010);
+			elem_biNormal101010.AlignedByteOffset = 28;
+			layout.emplace_back(elem_biNormal101010);
+		}
+
+		if (i == shader::VertexFormat::P3F_T4F_C4B_N3F)
+		{
+			// big man texcoords
+			elem_uv3232.AlignedByteOffset = 12;
+			layout.emplace_back(elem_uv3232);
+
+			// two of them
+			elem_uv3232.AlignedByteOffset = 20;
+			elem_uv3232.SemanticIndex = 1;
+			layout.emplace_back(elem_uv3232);
+			elem_uv3232.SemanticIndex = 0;
+
+			// byte offset is zero since diffrent stream.
+			elem_col8888.AlignedByteOffset = 28;
+			layout.emplace_back(elem_col8888);
+
+			elem_nor323232.AlignedByteOffset = 32;
+			layout.emplace_back(elem_nor323232);
+		}
+
+	}
+
+
+	// Streams
+
+	// color stream
+	static D3D11_INPUT_ELEMENT_DESC elem_stream_color[] =
+	{
+		{ "COLOR", 0, DXGI_FORMAT_R8G8B8A8_UNORM, VertexStream::COLOR, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	// normals stream
+	static D3D11_INPUT_ELEMENT_DESC elem_stream_normals[] =
+	{
+		{ "NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, VertexStream::NORMALS, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	// Tangent / binormal stream
+	static D3D11_INPUT_ELEMENT_DESC elem_stream_tangents[] =
+	{
+		{ "TANGENT", 0, DXGI_FORMAT_R32G32B32_FLOAT, VertexStream::TANGENT_BI, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+		{ "BINORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, VertexStream::TANGENT_BI, 12, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+
+	for (uint32_t i = 0; i < num; i++)
+	{
+		auto& layout = ilStreamedDescriptions_[i];
+
+		// Streams
+		// Vert + uv
+		// Color
+		// Normal
+		// Tan + Bi
+
+		elem_pos.AlignedByteOffset = 0;
+		elem_pos.SemanticIndex = 0;
+		elem_uv3232.SemanticIndex = 0;
+		layout.emplace_back(elem_pos);
+
+		// uv
+		if (i == shader::VertexFormat::P3F_T2S || i == shader::VertexFormat::P3F_T2S_C4B ||
+			i == shader::VertexFormat::P3F_T2S_C4B_N3F || i == shader::VertexFormat::P3F_T2S_C4B_N3F_TB3F ||
+			i == shader::VertexFormat::P3F_T2S_C4B_N10 || i == shader::VertexFormat::P3F_T2S_C4B_N10_TB10)
+		{
+			elem_uv1616.AlignedByteOffset = 12;
+			layout.emplace_back(elem_uv1616);
+		}
+
+		// col
+		if (i == shader::VertexFormat::P3F_T2S_C4B ||
+			i == shader::VertexFormat::P3F_T2S_C4B_N3F || i == shader::VertexFormat::P3F_T2S_C4B_N3F_TB3F ||
+			i == shader::VertexFormat::P3F_T2S_C4B_N10 || i == shader::VertexFormat::P3F_T2S_C4B_N10_TB10)
+		{
+			// seperate stream
+			elem_col8888.AlignedByteOffset = 0;
+			elem_col8888.InputSlot = 1;
+			layout.emplace_back(elem_col8888);
+		}
+
+		// nor
+		if (i == shader::VertexFormat::P3F_T2S_C4B_N3F || i == shader::VertexFormat::P3F_T2S_C4B_N3F_TB3F)
+		{
+			elem_nor323232.AlignedByteOffset = 0;
+			elem_nor323232.InputSlot = 2;
+			layout.emplace_back(elem_nor323232); // 12 bytes
+		}
+		//  tan + bi
+		if (i == shader::VertexFormat::P3F_T2S_C4B_N3F_TB3F)
+		{
+			elem_tagent323232.InputSlot = 3;
+			elem_tagent323232.AlignedByteOffset = 0;
+			layout.emplace_back(elem_tagent323232); // 12 bytes
+
+			elem_biNormal323232.InputSlot = 3;
+			elem_biNormal323232.AlignedByteOffset = 12;
+			layout.emplace_back(elem_biNormal323232); // 12 bytes
+		}
+
+		// 32 bit floats
+		if (i == shader::VertexFormat::P3F_T2F_C4B)
+		{
+			elem_uv3232.AlignedByteOffset = 12;
+			layout.emplace_back(elem_uv3232);
+
+			elem_col8888.InputSlot = 1;
+			elem_col8888.AlignedByteOffset = 0;
+			layout.emplace_back(elem_col8888);
+		}
+		else if (i == shader::VertexFormat::P3F_T3F)
+		{
+			elem_t3f.AlignedByteOffset = 12;
+			layout.emplace_back(elem_t3f);
+		}
+
+
+		if (i == shader::VertexFormat::P3F_T2S_C4B_N10 || i == shader::VertexFormat::P3F_T2S_C4B_N10_TB10)
+		{
+			// 12 + 4 + 4
+			elem_nor101010.InputSlot = 2;
+			elem_nor101010.AlignedByteOffset = 0;
+			layout.emplace_back(elem_nor101010);
+		}
+		if (i == shader::VertexFormat::P3F_T2S_C4B_N10_TB10)
+		{
+			elem_tagent101010.InputSlot = 3;
+			elem_tagent101010.AlignedByteOffset = 0;
+			layout.emplace_back(elem_tagent101010);
+
+			elem_biNormal101010.InputSlot = 3;
+			elem_biNormal101010.AlignedByteOffset = 4;
+			layout.emplace_back(elem_biNormal101010);
+		}
+
+		if (i == shader::VertexFormat::P3F_T4F_C4B_N3F)
+		{
+			// big man texcoords
+			elem_uv3232.AlignedByteOffset = 12;
+			layout.emplace_back(elem_uv3232);
+
+			// two of them
+			elem_uv3232.AlignedByteOffset = 20;
+			elem_uv3232.SemanticIndex = 1;
+			layout.emplace_back(elem_uv3232);
+			elem_uv3232.SemanticIndex = 0;
+
+			// byte offset is zero since diffrent stream.
+			elem_col8888.AlignedByteOffset = 0;
+			elem_col8888.InputSlot = 1;
+			layout.emplace_back(elem_col8888);
+
+			elem_nor323232.AlignedByteOffset = 0;
+			elem_nor323232.InputSlot = 2;
+			layout.emplace_back(elem_nor323232);
+		}
+	}
+
+
+}
+
 bool XRender::initRenderBuffers(Vec2<uint32_t> res)
 {
-
 
 	return true;
 }

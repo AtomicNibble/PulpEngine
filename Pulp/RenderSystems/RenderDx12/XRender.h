@@ -41,6 +41,9 @@ class XRender : public IRender
 
 	static const DXGI_FORMAT SWAP_CHAIN_FORMAT = DXGI_FORMAT_R10G10B10A2_UNORM;
 
+	typedef core::FixedArray<D3D12_INPUT_ELEMENT_DESC, 12> VertexLayoutDescArr;
+	typedef std::array<VertexLayoutDescArr, shader::VertexFormat::Num> VertexFormatILArr;
+
 public:
 	XRender(core::MemoryArenaBase* arena);
 	~XRender();
@@ -146,6 +149,7 @@ public:
 private:
 	bool freeSwapChainResources(void);
 
+	void initILDescriptions(void);
 	bool initRenderBuffers(Vec2<uint32_t> res);
 	bool resize(uint32_t width, uint32_t height);
 	void handleResolutionChange(void);
@@ -206,6 +210,10 @@ private:
 	SamplerDescriptor samplerPointClamp_;
 	SamplerDescriptor samplerPointBorder_;
 	SamplerDescriptor samplerLinearBorder_;
+
+	// pre created IL descriptinos for each supported vertex format.
+	VertexFormatILArr ilDescriptions_;
+	VertexFormatILArr ilStreamedDescriptions_;
 
 	D3D_FEATURE_LEVEL featureLvl_;
 	GpuFeatures features_;
