@@ -1727,5 +1727,8 @@
     <Natvis Include="FixedArray.natvis">
       <Filter>Natvis</Filter>
     </Natvis>
+    <Natvis Include="Math.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

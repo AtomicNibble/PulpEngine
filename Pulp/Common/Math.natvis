@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Quat&lt;*&gt;">
+    <Expand>
+      <Item Name="X">v.x</Item>
+      <Item Name="Y">v.y</Item>
+      <Item Name="Z">v.z</Item>
+      <Item Name="W">w</Item>
+      <Item Name="LengthSquared">v.x*v.x+v.y*v.y+v.z*v.z+w*w</Item>
+      <Synthetic Name="Matrix">
+        <Expand>
+          <Synthetic Name="Row: 0">
+            <DisplayString>[{2*(v.x*v.x+w*w)-1}, {2*(v.y*v.x+v.z*w)}, {2*(v.z*v.x-v.y*w)}]</DisplayString>
+          </Synthetic>
+          <Synthetic Name="Row: 1">
+            <DisplayString>[{2*(v.x*v.y-v.z*w)}, {2*(v.y*v.y+w*w)-1}, {2*(v.z*v.y+v.x*w)}]</DisplayString>
+          </Synthetic>
+          <Synthetic Name="Row: 2">
+            <DisplayString>[{2*(v.x*v.z+v.y*w)}, {2*(v.y*v.z-v.x*w)}, {2*(v.z*v.z+w*w)-1}]</DisplayString>
+          </Synthetic>
+        </Expand>
+      </Synthetic>
+    </Expand>
+  </Type>
+  <Type Name="Matrix22&lt;*&gt;">
+    <AlternativeType Name="Matrix22" />
+    <DisplayString>~ Matrix2x2</DisplayString>
+    <Expand>
+      <Synthetic Name="Row: 0">
+        <DisplayString>[{m00}, {m01}]</DisplayString>
+      </Synthetic>
+      <Synthetic Name="Row: 1">
+        <DisplayString>[{m10}, {m11}]</DisplayString>
+      </Synthetic>
+    </Expand>
+  </Type>
+  <Type Name="Matrix33&lt;*&gt;">
+    <AlternativeType Name="Matrix33" />
+    <DisplayString>~ Matrix3x3</DisplayString>
+    <Expand>
+      <Synthetic Name="Row: 0">
+        <DisplayString>[{m00}, {m01}, {m02}]</DisplayString>
+      </Synthetic>
+      <Synthetic Name="Row: 1">
+        <DisplayString>[{m10}, {m11}, {m12}]</DisplayString>
+      </Synthetic>
+      <Synthetic Name="Row: 2">
+        <DisplayString>[{m20}, {m21}, {m22}]</DisplayString>
+      </Synthetic>
+    </Expand>
+  </Type>
+  <Type Name="Matrix34&lt;*&gt;">
+    <AlternativeType Name="Matrix34" />
+    <DisplayString>~ Matrix3x4</DisplayString>
+    <Expand>
+      <Synthetic Name="Row: 0">
+        <DisplayString>[{m00}, {m01}, {m02}, {m03}]</DisplayString>
+      </Synthetic>
+      <Synthetic Name="Row: 1">
+        <DisplayString>[{m10}, {m11}, {m12}, {m13}]</DisplayString>
+      </Synthetic>
+      <Synthetic Name="Row: 2">
+        <DisplayString>[{m20}, {m21}, {m22}, {m23}]</DisplayString>
+      </Synthetic>
+    </Expand>
+  </Type>
+  <Type Name="Matrix44&lt;*&gt;">
+    <AlternativeType Name="Matrix44" />
+    <DisplayString>~ Matrix4x4</DisplayString>
+    <Expand>
+      <Synthetic Name="Row: 0">
+        <DisplayString>[{m00}, {m01}, {m02}, {m03}]</DisplayString>
+      </Synthetic>
+      <Synthetic Name="Row: 1">
+        <DisplayString>[{m10}, {m11}, {m12}, {m13}]</DisplayString>
+      </Synthetic>
+      <Synthetic Name="Row: 2">
+        <DisplayString>[{m20}, {m21}, {m22}, {m23}]</DisplayString>
+      </Synthetic>
+      <Synthetic Name="Row: 3">
+        <DisplayString>[{m30}, {m31}, {m32}, {m33}]</DisplayString>
+      </Synthetic>
+    </Expand>
+  </Type>
+</AutoVisualizer>
