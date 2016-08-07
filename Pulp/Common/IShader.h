@@ -102,7 +102,7 @@ struct ShaderParamFreq
 };
 
 
-X_DECLARE_ENUM(ShaderType)(UnKnown, Vertex, Pixel, Geometry);
+X_DECLARE_ENUM(ShaderType)(UnKnown, Vertex, Pixel, Geometry, Hull, Domain);
 X_DECLARE_ENUM(ShaderTextureIdx)(DIFFUSE, BUMP, SPEC);
 
 X_DECLARE_FLAGS(ILFlag)(Normal, BiNormal, Color);
