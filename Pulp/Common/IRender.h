@@ -44,6 +44,7 @@ X_DECLARE_ENUM(PrimitiveTypePublic)(
 
 
 
+
 struct StencilOperation
 {
 	enum Enum
@@ -400,8 +401,6 @@ struct IRender
 };
 #else
 
-
-typedef HWND PLATFORM_HWND;
 
 struct IRender
 {

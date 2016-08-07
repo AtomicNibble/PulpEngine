@@ -42,6 +42,8 @@
 #undef UINT
 #endif
 
+typedef HWND PLATFORM_HWND;
+
 typedef unsigned long       DWORD;
 typedef long				LONG;
 typedef unsigned short      WORD;
