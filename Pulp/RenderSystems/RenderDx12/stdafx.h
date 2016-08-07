@@ -15,6 +15,7 @@ X_DISABLE_WARNING(4005)
 #include <../../3rdparty/source/directx/d3dx10.h>
 
 #include <dxgi1_4.h>
+#include <wrl/client.h>
 
 X_ENABLE_WARNING(4005)
 
