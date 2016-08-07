@@ -781,9 +781,9 @@ namespace shader
 		case ShaderType::Geometry:
 			return "gs_5_0";
 		case ShaderType::Hull:
-			return "gs_5_0";
+			return "hs_5_0";
 		case ShaderType::Domain:
-			return "gs_5_0";
+			return "ds_5_0";
 
 		case ShaderType::UnKnown:
 			break;
