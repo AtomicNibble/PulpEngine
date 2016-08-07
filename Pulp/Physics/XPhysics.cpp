@@ -109,7 +109,9 @@ XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::Mem
 	debugStepper_(0.016666660f),
 	fixedStepper_(0.016666660f, maxSubSteps),
 	invertedFixedStepper_(0.016666660f, maxSubSteps),
-	variableStepper_(1.0f / 80.0f, 1.0f / 40.0f, maxSubSteps)
+	variableStepper_(1.0f / 80.0f, 1.0f / 40.0f, maxSubSteps),
+
+	pDebugRender_(nullptr)
 
 {
 	X_ASSERT_NOT_NULL(arena);
