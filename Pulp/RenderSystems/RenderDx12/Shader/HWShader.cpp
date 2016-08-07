@@ -775,11 +775,15 @@ namespace shader
 		switch (type)
 		{
 		case ShaderType::Vertex:
-			return "vs_4_0";
+			return "vs_5_0";
 		case ShaderType::Pixel:
-			return "ps_4_0";
+			return "ps_5_0";
 		case ShaderType::Geometry:
-			return "gs_4_0";
+			return "gs_5_0";
+		case ShaderType::Hull:
+			return "gs_5_0";
+		case ShaderType::Domain:
+			return "gs_5_0";
 
 		case ShaderType::UnKnown:
 			break;
