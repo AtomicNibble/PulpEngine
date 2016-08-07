@@ -109,7 +109,7 @@ X_INLINE CommandT* CommandBucket<KeyT>::addCommand(Key key, size_t auxMemorySize
 	}
 
 	CommandPacket::storeNextCommandPacket(pPacket, nullptr);
-	CommandPacket::storeBackendDispatchFunction(pPacket, CommandT::DISPATCH_FUNCTION);
+	CommandPacket::storeCommandType(pPacket, CommandT::CMD);
 
 	return CommandPacket::getCommand<CommandT>(pPacket);
 }
@@ -127,7 +127,7 @@ X_INLINE CommandT* CommandBucket<KeyT>::appendCommand(ParentCmdT* pCommand, size
 	CommandPacket::storeNextCommandPacket<ParentCmdT>(pCommand, pPacket);
 				   
 	CommandPacket::storeNextCommandPacket(packet, nullptr);
-	CommandPacket::storeBackendDispatchFunction(pPacket, CommandT::DISPATCH_FUNCTION);
+	CommandPacket::storeCommandType(pPacket, CommandT::CMD);
 
 	return CommandPacket::getCommand<CommandT>(pPacket);
 }
