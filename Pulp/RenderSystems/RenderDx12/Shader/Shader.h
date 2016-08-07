@@ -116,6 +116,8 @@ public:
 	XHWShader* pVertexShader;
 	XHWShader* pPixelShader;
 	XHWShader* pGeoShader;
+	XHWShader* pHullShader;
+	XHWShader* pDomainShader;
 };
 
 class XShaderTechnique

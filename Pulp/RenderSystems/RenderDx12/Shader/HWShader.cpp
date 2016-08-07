@@ -802,6 +802,8 @@ namespace shader
 		core::SafeRelease(pVertexShader);
 		core::SafeRelease(pPixelShader);
 		core::SafeRelease(pGeoShader);
+		core::SafeRelease(pHullShader);
+		core::SafeRelease(pDomainShader);
 	}
 
 	bool XShaderTechniqueHW::canDraw(void) const
@@ -816,6 +818,12 @@ namespace shader
 		}
 		if (pGeoShader) {
 			canDraw &= pGeoShader->getStatus() == ShaderStatus::ReadyToRock;
+		}
+		if (pHullShader) {
+			canDraw &= pHullShader->getStatus() == ShaderStatus::ReadyToRock;
+		}
+		if (pDomainShader) {
+			canDraw &= pDomainShader->getStatus() == ShaderStatus::ReadyToRock;
 		}
 
 		return canDraw;
