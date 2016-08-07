@@ -292,6 +292,8 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 void XRender::shutDown(void)
 {
+	presentRS_.free();
+
 	if (pTextureMan_) {
 		pTextureMan_->shutDown();
 		X_DELETE_AND_NULL(pTextureMan_, arena_);
