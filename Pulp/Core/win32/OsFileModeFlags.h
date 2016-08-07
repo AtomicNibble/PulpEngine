@@ -91,9 +91,14 @@ namespace mode
 		if (mode.IsSet(fileMode::WRITE_FLUSH)) {
 			flag |= FILE_FLAG_WRITE_THROUGH;
 		}
+		if (mode.IsSet(fileMode::NOBUFFER)) {
+			flag |= FILE_FLAG_NO_BUFFERING;
+		}
 		if (async) { // dirty potato !
 			flag |= FILE_FLAG_OVERLAPPED;
 		}
+
+		
 		//	if (flag == FILE_FLAG_SEQUENTIAL_SCAN && mode.IsSet(fileMode::WRITE))
 		//		return FILE_ATTRIBUTE_NORMAL;
 
