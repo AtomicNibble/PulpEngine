@@ -63,18 +63,19 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 
 	// Obtain the DXGI factory
-	IDXGIFactory4* pDxgiFactory;
-	hr = CreateDXGIFactory2(0, __uuidof(IDXGIFactory4), reinterpret_cast<void**>(&pDxgiFactory));
+	Microsoft::WRL::ComPtr<IDXGIFactory4> dxgiFactory;
+	hr = CreateDXGIFactory2(0, IID_PPV_ARGS(&dxgiFactory));
 
-	if (!pDxgiFactory) {
+	if (FAILED(hr)) {
 		X_ERROR("Dx12", "Failed to create DXGI Factory");
 		return false;
 	}
 
 	// Create the D3D graphics device
 	{
-		IDXGIAdapter1* pAdapter;
-		for (uint32_t Idx = 0; DXGI_ERROR_NOT_FOUND != pDxgiFactory->EnumAdapters1(Idx, &pAdapter); ++Idx)
+		Microsoft::WRL::ComPtr<IDXGIAdapter1> pAdapter;
+
+		for (uint32_t Idx = 0; DXGI_ERROR_NOT_FOUND != dxgiFactory->EnumAdapters1(Idx, &pAdapter); ++Idx)
 		{
 			DXGI_ADAPTER_DESC1 desc;
 			pAdapter->GetDesc1(&desc);
@@ -84,7 +85,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 			featureLvl_ = D3D_FEATURE_LEVEL_11_0;
 
-			hr = D3D12CreateDevice(pAdapter, D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice_));
+			hr = D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice_));
 			if (SUCCEEDED(hr))
 			{
 				X_LOG0("Dx12", "D3D12-capable hardware found: \"%ls\" (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
@@ -186,7 +187,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	}
 
 
-	hr = pDxgiFactory->CreateSwapChainForHwnd(cmdListManager_.getCommandQueue(), hWnd,
+	hr = dxgiFactory->CreateSwapChainForHwnd(cmdListManager_.getCommandQueue(), hWnd,
 		&swapChainDesc, nullptr, nullptr, &pSwapChain_);
 	if (FAILED(hr)) {
 		X_ERROR("Dx12", "failed to create swap chain: %" PRId32, hr);
@@ -195,14 +196,14 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i)
 	{
-		ID3D12Resource* pDisplayPlane;
-		hr = pSwapChain_->GetBuffer(i, IID_PPV_ARGS(&pDisplayPlane));
+		Microsoft::WRL::ComPtr<ID3D12Resource> displayPlane;
+		hr = pSwapChain_->GetBuffer(i, IID_PPV_ARGS(&displayPlane));
 		if (FAILED(hr)) {
 			X_ERROR("Dx12", "failed to get swap chain buffer: %" PRId32, hr);
 			return false;
 		}
 
-		displayPlane_[i].createFromSwapChain(pDevice_, descriptorAllocator, pDisplayPlane);
+		displayPlane_[i].createFromSwapChain(pDevice_, descriptorAllocator, displayPlane.Detach());
 		displayPlane_[i].setClearColor(vars_.getClearCol());
 	}
 
