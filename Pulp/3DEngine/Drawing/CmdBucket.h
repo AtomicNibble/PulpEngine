@@ -9,68 +9,17 @@
 
 #include <Memory\AllocationPolicies\LinearAllocator.h>
 
+#include <IRender.h>
 
 X_NAMESPACE_BEGIN(engine)
-
-
-namespace Commands
-{
-	typedef core::traits::Function<void(const void*)> BackendDispatchFunction;
-	typedef void* VertexLayoutHandle;
-	typedef void* VertexBufferHandle;
-	typedef void* IndexBufferHandle;
-	typedef void* ConstantBufferHandle;
-
-
-	struct Draw
-	{
-		static const BackendDispatchFunction::Pointer DISPATCH_FUNCTION;
-
-		uint32_t vertexCount;
-		uint32_t startVertex;
-
-		VertexLayoutHandle vertexLayoutHandle;
-		VertexBufferHandle vertexBuffer;
-		IndexBufferHandle indexBuffer;
-	};
-
-	struct DrawIndexed
-	{
-		static const BackendDispatchFunction::Pointer DISPATCH_FUNCTION;
-
-		uint32_t indexCount;
-		uint32_t startIndex;
-		uint32_t baseVertex;
-
-		VertexLayoutHandle vertexLayoutHandle;
-		VertexBufferHandle vertexBuffer;
-		IndexBufferHandle indexBuffer;
-	};
-
-	struct CopyConstantBufferData
-	{
-		static const BackendDispatchFunction::Pointer DISPATCH_FUNCTION;
-
-		ConstantBufferHandle constantBuffer;
-		void* data;
-		uint32_t size;
-	};
-
-	static_assert(core::compileTime::IsPOD<Draw>::Value, "Draw command must be POD");
-	static_assert(core::compileTime::IsPOD<DrawIndexed>::Value, "DrawIndexed command must be POD");
-	static_assert(core::compileTime::IsPOD<CopyConstantBufferData>::Value, "CopyConstantBufferData command must be POD");
-
-} // namespace Commands
-
-
 
 namespace CommandPacket
 {
 	typedef void* Packet;
-	typedef Commands::BackendDispatchFunction BackendDispatchFunction;
+	typedef render::Commands::Command Command;
 	const size_t OFFSET_NEXT_COMMAND_PACKET = 0u;
-	const size_t OFFSET_BACKEND_DISPATCH_FUNCTION = OFFSET_NEXT_COMMAND_PACKET + sizeof(Packet);
-	const size_t OFFSET_COMMAND = OFFSET_BACKEND_DISPATCH_FUNCTION + sizeof(BackendDispatchFunction::Pointer);
+	const size_t OFFSET_COMMAND_TYPE = OFFSET_NEXT_COMMAND_PACKET + sizeof(Packet);
+	const size_t OFFSET_COMMAND = OFFSET_COMMAND_TYPE + sizeof(Command::Enum);
 
 	template <typename CommandT>
 	X_INLINE size_t getPacketSize(size_t auxMemorySize);
@@ -80,7 +29,7 @@ namespace CommandPacket
 	template <typename CommandT>
 	X_INLINE Packet* getNextCommandPacket(CommandT* command);
 
-	BackendDispatchFunction::Pointer* getBackendDispatchFunction(Packet pPacket);
+	Command::Enum* getCommandType(Packet pPacket);
 
 	template <typename CommandT>
 	X_INLINE CommandT* getCommand(Packet packet);
@@ -92,9 +41,9 @@ namespace CommandPacket
 	template <typename CommandT>
 	X_INLINE void storeNextCommandPacket(CommandT* command, Packet nextPacket);
 
-	void storeBackendDispatchFunction(Packet pPacket, BackendDispatchFunction::Pointer dispatchFunction);
+	void storeCommandType(Packet pPacket, Command::Enum dispatchFunction);
 	const Packet loadNextCommandPacket(const Packet pPacket);
-	const BackendDispatchFunction::Pointer loadBackendDispatchFunction(const Packet pPacket);
+	const Command::Enum loadCommandType(const Packet pPacket);
 	const void* loadCommand(const Packet pPacket);
 
 } // namespace CommandPacket

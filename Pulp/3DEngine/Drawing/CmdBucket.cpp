@@ -6,41 +6,6 @@
 X_NAMESPACE_BEGIN(engine)
 
 
-namespace backendDispatch
-{
-	void Draw(const void* pData)
-	{
-		const Commands::Draw* pCmdData = union_cast<const Commands::Draw*>(pData);
-	
-		X_UNUSED(pCmdData);
-	}
-
-	void DrawIndexed(const void* pData)
-	{
-		const Commands::DrawIndexed* pCmdData = union_cast<const Commands::DrawIndexed*>(pData);
-	
-		X_UNUSED(pCmdData);
-	}
-
-	void CopyConstantBufferData(const void* pData)
-	{
-		const Commands::CopyConstantBufferData* pCmdData = union_cast<const Commands::CopyConstantBufferData*>(pData);
-
-		X_UNUSED(pCmdData);
-	}
-
-} // namespace backendDispatch
-
-
-namespace Commands
-{
-	const BackendDispatchFunction::Pointer Draw::DISPATCH_FUNCTION = backendDispatch::Draw;
-	const BackendDispatchFunction::Pointer DrawIndexed::DISPATCH_FUNCTION = backendDispatch::DrawIndexed;
-	const BackendDispatchFunction::Pointer CopyConstantBufferData::DISPATCH_FUNCTION = backendDispatch::CopyConstantBufferData;
-
-
-} // namespace Commands
-
 
 namespace CommandPacket
 {
@@ -50,9 +15,9 @@ namespace CommandPacket
 		return union_cast<Packet*>(reinterpret_cast<char*>(pPacket) + OFFSET_NEXT_COMMAND_PACKET);
 	}
 
-	BackendDispatchFunction::Pointer* CommandPacket::getBackendDispatchFunction(Packet pPacket)
+	Command::Enum* CommandPacket::getCommandType(Packet pPacket)
 	{
-		return union_cast<BackendDispatchFunction::Pointer*>(reinterpret_cast<char*>(pPacket) + OFFSET_BACKEND_DISPATCH_FUNCTION);
+		return union_cast<Command::Enum*>(reinterpret_cast<char*>(pPacket) + OFFSET_COMMAND_TYPE);
 	}
 
 	void storeNextCommandPacket(Packet pPacket, Packet nextPacket)
@@ -60,9 +25,9 @@ namespace CommandPacket
 		*getNextCommandPacket(pPacket) = nextPacket;
 	}
 
-	void storeBackendDispatchFunction(CommandPacket::Packet pPacket, BackendDispatchFunction::Pointer dispatchFunction)
+	void storeCommandType(CommandPacket::Packet pPacket, Command::Enum type)
 	{
-		*getBackendDispatchFunction(pPacket) = dispatchFunction;
+		*getCommandType(pPacket) = type;
 	}
 
 	const Packet loadNextCommandPacket(const Packet pPacket)
@@ -70,9 +35,9 @@ namespace CommandPacket
 		return *getNextCommandPacket(pPacket);
 	}
 
-	const BackendDispatchFunction::Pointer loadBackendDispatchFunction(const Packet pPacket)
+	const Command::Enum loadBackendDispatchFunction(const Packet pPacket)
 	{
-		return *getBackendDispatchFunction(pPacket);
+		return *getCommandType(pPacket);
 	}
 
 	const void* loadCommand(const Packet pPacket)
@@ -207,9 +172,10 @@ void CommandBucket<KeyT>::setMatrices(void)
 template <typename KeyT>
 void CommandBucket<KeyT>::submitPacket(const CommandPacket::Packet pPacket)
 {
-	const CommandPacket::BackendDispatchFunction::Pointer pFunc = CommandPacket::loadBackendDispatchFunction(pPacket);
-	const void* pCmd = CommandPacket::loadCommand(pPacket);
-	pFunc(pCmd);
+	X_UNUSED(pPacket);
+//	const CommandPacket::BackendDispatchFunction::Pointer pFunc = CommandPacket::loadBackendDispatchFunction(pPacket);
+//	const void* pCmd = CommandPacket::loadCommand(pPacket);
+//	pFunc(pCmd);
 }
 
 

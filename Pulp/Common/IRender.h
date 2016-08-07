@@ -402,6 +402,55 @@ struct IRender
 #else
 
 
+namespace Commands
+{
+	typedef void* VertexLayoutHandle;
+	typedef void* VertexBufferHandle;
+	typedef void* IndexBufferHandle;
+	typedef void* ConstantBufferHandle;
+
+	X_DECLARE_ENUM(Command)(DRAW, DRAW_INDEXED, COPY_CONST_BUF_DATA);
+
+	struct Draw
+	{
+		Command::Enum cmd;
+
+		uint32_t vertexCount;
+		uint32_t startVertex;
+
+		VertexLayoutHandle vertexLayoutHandle;
+		VertexBufferHandle vertexBuffer;
+		IndexBufferHandle indexBuffer;
+	};
+
+	struct DrawIndexed
+	{
+		uint32_t indexCount;
+		uint32_t startIndex;
+		uint32_t baseVertex;
+
+		VertexLayoutHandle vertexLayoutHandle;
+		VertexBufferHandle vertexBuffer;
+		IndexBufferHandle indexBuffer;
+	};
+
+	struct CopyConstantBufferData
+	{
+		ConstantBufferHandle constantBuffer;
+		void* data;
+		uint32_t size;
+	};
+
+	static_assert(core::compileTime::IsPOD<Draw>::Value, "Draw command must be POD");
+	static_assert(core::compileTime::IsPOD<DrawIndexed>::Value, "DrawIndexed command must be POD");
+	static_assert(core::compileTime::IsPOD<CopyConstantBufferData>::Value, "CopyConstantBufferData command must be POD");
+
+} // namespace Commands
+
+
+
+
+
 struct IRender
 {
 	// physics has it's own Aux render que so to speak, other que's can be added.
