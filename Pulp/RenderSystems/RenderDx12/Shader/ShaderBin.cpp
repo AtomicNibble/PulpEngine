@@ -18,12 +18,15 @@ namespace shader
 		struct ShaderBinHeader
 		{
 			static const uint32_t X_SHADER_BIN_FOURCC = X_TAG('X', 'S', 'C', 'B');
-			static const uint32_t X_SHADER_BIN_VERSION = 3; // change this to force all shaders to be recompiled.
+			static const uint32_t X_SHADER_BIN_VERSION = 4; // change this to force all shaders to be recompiled.
 
 
 			uint32_t forcc;
 			uint8_t version;
-			uint8_t unused[3];
+			// the version it was compiled against.
+			uint8_t profileMajorVersion;		
+			uint8_t profileMinorVersion;		
+			uint8_t unused[1];
 			uint32_t crc32;
 			uint32_t sourceCRC32;
 			uint32_t blobLength;
@@ -75,10 +78,16 @@ bool ShaderBin::saveShader(const char* pPath, const XHWShader* pShader)
 	const auto& byteCode = pShader->getShaderByteCode();
 	const auto& bindVars = pShader->getBindVars();
 
+	// for now every shader for a given type is compiled with same version.
+	// if diffrent shaders have diffrent versions this will ned changing.
+	auto profileVersion = XHWShader::getProfileVersionForType(pShader->getType());
+
 	ShaderBinHeader hdr;
 	core::zero_object(hdr);
 	hdr.forcc = ShaderBinHeader::X_SHADER_BIN_FOURCC;
 	hdr.version = ShaderBinHeader::X_SHADER_BIN_VERSION;
+	hdr.profileMajorVersion = profileVersion.first;
+	hdr.profileMinorVersion = profileVersion.second;
 	hdr.modifed = core::dateTimeStampSmall::systemDateTime();
 	hdr.crc32 = gEnv->pCore->GetCrc32()->GetCRC32(byteCode.data(), byteCode.size());
 	hdr.sourceCRC32 = pShader->getSourceCrc32();
