@@ -413,7 +413,7 @@ namespace Commands
 
 	struct Draw
 	{
-		Command::Enum cmd;
+		static const Command::Enum CMD = Command::DRAW;
 
 		uint32_t vertexCount;
 		uint32_t startVertex;
@@ -425,6 +425,8 @@ namespace Commands
 
 	struct DrawIndexed
 	{
+		static const Command::Enum CMD = Command::DRAW_INDEXED;
+
 		uint32_t indexCount;
 		uint32_t startIndex;
 		uint32_t baseVertex;
@@ -436,6 +438,8 @@ namespace Commands
 
 	struct CopyConstantBufferData
 	{
+		static const Command::Enum CMD = Command::COPY_CONST_BUF_DATA;
+
 		ConstantBufferHandle constantBuffer;
 		void* data;
 		uint32_t size;
