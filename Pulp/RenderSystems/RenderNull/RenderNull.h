@@ -27,6 +27,9 @@ public:
 	virtual Vec2<uint32_t> getDisplayRes(void) const X_OVERRIDE;
 	virtual Vec2<float32_t> getDisplayResf(void) const X_OVERRIDE;
 
+	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
+	shader::IShader* getShader(const char* pName) X_OVERRIDE;
+
 	// =============================================
 	// ============== OLD API ======================
 	// =============================================
@@ -64,7 +67,7 @@ public:
 	// ~AuxGeo
 
 	// Textures 
-	virtual texture::ITexture* LoadTexture(const char* path, texture::TextureFlags flags) X_OVERRIDE;
+//	virtual texture::ITexture* LoadTexture(const char* path, texture::TextureFlags flags) X_OVERRIDE;
 
 	virtual void ReleaseTexture(texture::TexID id) X_OVERRIDE;
 	virtual bool SetTexture(texture::TexID texId) X_OVERRIDE;

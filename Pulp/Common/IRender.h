@@ -28,6 +28,10 @@ X_NAMESPACE_BEGIN(render)
 
 struct IRenderAux;
 
+namespace shader
+{
+	struct IShader;
+} // namespace shader
 
 X_DECLARE_ENUM(CullMode)(
 	NONE,
@@ -454,7 +458,6 @@ namespace Commands
 
 
 
-
 struct IRender
 {
 	// physics has it's own Aux render que so to speak, other que's can be added.
@@ -481,6 +484,10 @@ struct IRender
 
 	virtual Vec2<uint32_t> getDisplayRes(void) const X_ABSTRACT;
 	virtual Vec2<float32_t> getDisplayResf(void) const X_ABSTRACT;
+
+
+	virtual texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_ABSTRACT;
+	virtual shader::IShader* getShader(const char* pName) X_ABSTRACT;
 
 	// =============================================
 	// ============== OLD API ======================
@@ -520,7 +527,7 @@ struct IRender
 	// ~AuxGeo
 
 	// Textures 
-	virtual texture::ITexture* LoadTexture(const char* path, texture::TextureFlags flags) X_ABSTRACT;
+//	virtual texture::ITexture* LoadTexture(const char* path, texture::TextureFlags flags) X_ABSTRACT;
 
 	virtual void ReleaseTexture(texture::TexID id) X_ABSTRACT;
 

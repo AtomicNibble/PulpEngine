@@ -464,7 +464,7 @@ void XConsole::LoadRenderResources(void)
 	X_ASSERT_NOT_NULL(pRender_);
 
 	// load a texture baby!
-	pBackground_ = pRender_->LoadTexture("Textures/white.dds",
+	pBackground_ = pRender_->getTexture("Textures/white.dds",
 		texture::TextureFlags::DONT_STREAM);
 }
 

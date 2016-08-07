@@ -3,6 +3,7 @@
 
 #include "Texture\TextureManager.h"
 #include "Texture\Texture.h"
+#include "Shader\Shader.h"
 #include "Auxiliary\AuxRenderImp.h"
 
 #include "Allocators\LinearAllocator.h"
@@ -443,6 +444,22 @@ Vec2<uint32_t> XRender::getDisplayRes(void) const
 Vec2<float32_t> XRender::getDisplayResf(void) const
 {
 	return Vec2<float32_t>(static_cast<float32_t>(displayRes_.x), static_cast<float32_t>(displayRes_.y));
+}
+
+
+::texture::ITexture* XRender::getTexture(const char* pName, texture::TextureFlags flags)
+{
+	texture::Texture* pText = pTextureMan_->forName(pName, flags);
+
+	return pText;
+}
+
+shader::IShader* XRender::getShader(const char* pName)
+{
+	shader::XShader* pShader = shaderMan_.forName(pName);
+
+
+	return pShader;
 }
 
 
@@ -1069,15 +1086,6 @@ IRenderAux* XRender::GetIRenderAuxGeo(void)
 
 
 // Textures 
-::texture::ITexture* XRender::LoadTexture(const char* pPath, texture::TextureFlags flags)
-{
-	X_ASSERT_NOT_NULL(pPath);
-
-	texture::Texture* pText = pTextureMan_->forName(pPath, flags);
-
-	return pText;
-}
-
 
 void XRender::ReleaseTexture(texture::TexID id)
 {

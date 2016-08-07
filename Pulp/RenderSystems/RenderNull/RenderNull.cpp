@@ -72,6 +72,22 @@ Vec2<float32_t> RenderNull::getDisplayResf(void) const
 }
 
 
+texture::ITexture* RenderNull::getTexture(const char* path, texture::TextureFlags flags)
+{
+	X_ASSERT_NOT_NULL(path);
+	X_UNUSED(path);
+	X_UNUSED(flags);
+
+	return nullptr;
+}
+
+shader::IShader* RenderNull::getShader(const char* path)
+{
+	X_ASSERT_NOT_NULL(path);
+
+	return nullptr;
+}
+
 void RenderNull::SetState(StateFlag state)
 {
 	X_UNUSED(state);
@@ -189,15 +205,6 @@ IRenderAux* RenderNull::GetIRenderAuxGeo(void)
 
 
 // Textures 
-texture::ITexture* RenderNull::LoadTexture(const char* path, texture::TextureFlags flags)
-{
-	X_ASSERT_NOT_NULL(path);
-	X_UNUSED(path);
-	X_UNUSED(flags);
-
-	return nullptr;
-}
-
 
 void RenderNull::ReleaseTexture(texture::TexID id)
 {
