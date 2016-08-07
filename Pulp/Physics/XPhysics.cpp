@@ -89,14 +89,14 @@ XPhysics::XPhysics(uint32_t maxSubSteps, core::V2::JobSystem* pJobSys, core::Mem
 	arena_(arena),
 	jobDispatcher_(*pJobSys),
 	allocator_(arena),
-	foundation_(nullptr),
-	profileZoneManager_(nullptr),
-	controllerManager_(nullptr),
-	physics_(nullptr),
-	cooking_(nullptr),
-	scene_(nullptr),
-	material_(nullptr),
-	cpuDispatcher_(nullptr),
+	pFoundation_(nullptr),
+	pProfileZoneManager_(nullptr),
+	pControllerManager_(nullptr),
+	pPhysics_(nullptr),
+	pCooking_(nullptr),
+	pScene_(nullptr),
+	pMaterial_(nullptr),
+	pCpuDispatcher_(nullptr),
 	pScratchBlock_(nullptr),
 	scratchBlockSize_(0),
 	initialDebugRender_(false),
@@ -156,7 +156,7 @@ bool XPhysics::init(void)
 	physx::PxSetPhysXDelayLoadHook(&gDelayLoadHook);
 	physx::PxSetPhysXCookingDelayLoadHook(&gDelayLoadHook);
 
-	foundation_ = PxCreateFoundation(PX_PHYSICS_VERSION, 
+	pFoundation_ = PxCreateFoundation(PX_PHYSICS_VERSION, 
 #if PHYSX_DEFAULT_ALLOCATOR
 		gDefaultAllocatorCallback,
 #else
@@ -165,15 +165,15 @@ bool XPhysics::init(void)
 		logger_
 	);
 
-	if (!foundation_) {
+	if (!pFoundation_) {
 		X_ERROR("Physics", "Failed to create foundation");
 		return false;
 	}
 
 
 #if !X_SUPER
-	profileZoneManager_ = &physx::PxProfileZoneManager::createProfileZoneManager(foundation_);
-	if (!profileZoneManager_) {
+	pProfileZoneManager_ = &physx::PxProfileZoneManager::createProfileZoneManager(pFoundation_);
+	if (!pProfileZoneManager_) {
 		X_ERROR("Physics", "Failed to create profile zone manager");
 		return false;
 	}
@@ -185,16 +185,16 @@ bool XPhysics::init(void)
 	customizeTolerances(scale);
 
 
-	physics_ = PxCreatePhysics(PX_PHYSICS_VERSION, *foundation_,
-		scale, recordMemoryAllocations, profileZoneManager_);
+	pPhysics_ = PxCreatePhysics(PX_PHYSICS_VERSION, *pFoundation_,
+		scale, recordMemoryAllocations, pProfileZoneManager_);
 
-	if (!physics_) {
+	if (!pPhysics_) {
 		X_ERROR("Physics", "PxCreatePhysics failed!");
 		return false;
 	}	
 
 
-	if (!PxInitExtensions(*physics_)) {
+	if (!PxInitExtensions(*pPhysics_)) {
 		X_ERROR("Physics", "Failed to init extensions");
 		return false;
 	}
@@ -206,30 +206,30 @@ bool XPhysics::init(void)
 		physx::PxMeshPreprocessingFlag::eREMOVE_UNREFERENCED_VERTICES |
 		physx::PxMeshPreprocessingFlag::eREMOVE_DUPLICATED_TRIANGLES);
 
-	cooking_ = PxCreateCooking(PX_PHYSICS_VERSION, *foundation_, params);
-	if (!cooking_) {
+	pCooking_ = PxCreateCooking(PX_PHYSICS_VERSION, *pFoundation_, params);
+	if (!pCooking_) {
 		X_ERROR("Physics", "PxCreateCooking failed!");
 		return false;
 	}
 
 
-	if (physics_->getPvdConnectionManager()) {
-		physics_->getPvdConnectionManager()->addHandler(*this);
+	if (pPhysics_->getPvdConnectionManager()) {
+		pPhysics_->getPvdConnectionManager()->addHandler(*this);
 	}
 
 	togglePvdConnection();
 
-	physics_->registerDeletionListener(*this, physx::PxDeletionEventFlag::eUSER_RELEASE);
+	pPhysics_->registerDeletionListener(*this, physx::PxDeletionEventFlag::eUSER_RELEASE);
 
 
-	material_ = physics_->createMaterial(0.5f, 0.5f, 0.1f);
-	if (!material_) {
+	pMaterial_ = pPhysics_->createMaterial(0.5f, 0.5f, 0.1f);
+	if (!pMaterial_) {
 		X_ERROR("Physics", "Failed to create material");
 		return false;
 	}
 
 
-	physx::PxSceneDesc sceneDesc(physics_->getTolerancesScale());
+	physx::PxSceneDesc sceneDesc(pPhysics_->getTolerancesScale());
 	sceneDesc.gravity = physx::PxVec3(0.0f, -9.81f, 0.0f);
 	getDefaultSceneDesc(sceneDesc);
 	customizeSceneDesc(sceneDesc);
@@ -254,19 +254,19 @@ bool XPhysics::init(void)
 		sceneDesc.simulationOrder = physx::PxSimulationOrder::eSOLVE_COLLIDE;
 	}
 
-	scene_ = physics_->createScene(sceneDesc);
-	if (!scene_) {
+	pScene_ = pPhysics_->createScene(sceneDesc);
+	if (!pScene_) {
 		X_ERROR("PhysicsSys", "Failed to create scene");
 		return false;
 	}
 
-	physx::PxSceneWriteLock scopedLock(*scene_);
-	scene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, initialDebugRender_ ? debugRenderScale_ : 0.0f);
-	scene_->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
+	physx::PxSceneWriteLock scopedLock(*pScene_);
+	pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eSCALE, initialDebugRender_ ? debugRenderScale_ : 0.0f);
+	pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eCOLLISION_SHAPES, 1.0f);
 
 
-	controllerManager_ = PxCreateControllerManager(*scene_);
-	if (!controllerManager_) {
+	pControllerManager_ = PxCreateControllerManager(*pScene_);
+	if (!pControllerManager_) {
 		X_ERROR("PhysicsSys", "Failed to create controller manager");
 		return false;
 	}
@@ -304,25 +304,25 @@ void XPhysics::shutDown(void)
 	invertedFixedStepper_.shutdown();
 	variableStepper_.shutdown();
 
-	if (scene_) {
-		scene_->fetchResults(true);
+	if (pScene_) {
+		pScene_->fetchResults(true);
 	}
-	if (physics_) {
-		physics_->unregisterDeletionListener(*this);
+	if (pPhysics_) {
+		pPhysics_->unregisterDeletionListener(*this);
 	}
 
-	core::SafeRelease(controllerManager_);
+	core::SafeRelease(pControllerManager_);
 
-	core::SafeRelease(scene_);
-	core::SafeRelease(cpuDispatcher_);
-	core::SafeRelease(material_);
-	core::SafeRelease(cooking_);
+	core::SafeRelease(pScene_);
+	core::SafeRelease(pCpuDispatcher_);
+	core::SafeRelease(pMaterial_);
+	core::SafeRelease(pCooking_);
 
 	PxCloseExtensions();
 
-	core::SafeRelease(physics_);
-	core::SafeRelease(profileZoneManager_);
-	core::SafeRelease(foundation_);
+	core::SafeRelease(pPhysics_);
+	core::SafeRelease(pProfileZoneManager_);
+	core::SafeRelease(pFoundation_);
 }
 
 void XPhysics::release(void)
@@ -345,10 +345,10 @@ void XPhysics::onTickPreRender(float dtime)
 
 		waitForResults_ = false;
 
-		if (scene_)
+		if (pScene_)
 		{
 
-			waitForResults_ = pStepper->advance(scene_, dtime, pScratchBlock_,
+			waitForResults_ = pStepper->advance(pScene_, dtime, pScratchBlock_,
 				safe_static_cast<uint32_t, size_t>(scratchBlockSize_));
 
 			// tells the stepper shape data is not going to be accessed until next frame 
@@ -363,10 +363,10 @@ void XPhysics::onTickPreRender(float dtime)
 
 void XPhysics::onTickPostRender(float dtime)
 {
-	if (!IsPaused() && scene_ && waitForResults_)
+	if (!IsPaused() && pScene_ && waitForResults_)
 	{
 		Stepper* pStepper = getStepper();
-		pStepper->wait(scene_);
+		pStepper->wait(pScene_);
 
 		core::TimeVal simTime = pStepper->getSimulationTime();
 
@@ -378,9 +378,9 @@ void XPhysics::onTickPostRender(float dtime)
 	}
 
 	// debug Vis
-	if (scene_ && vars_.DebugDrawEnabled() && pDebugRender_)
+	if (pScene_ && vars_.DebugDrawEnabled() && pDebugRender_)
 	{
-		const physx::PxRenderBuffer& debugRenderable = scene_->getRenderBuffer();
+		const physx::PxRenderBuffer& debugRenderable = pScene_->getRenderBuffer();
 
 		pDebugRender_->clear();
 		pDebugRender_->update(debugRenderable);
@@ -417,9 +417,9 @@ void XPhysics::onPvdConnected(PVD::PvdConnection& conn)
 	X_UNUSED(conn);
 
 	//setup joint visualization.  This gets piped to pvd.
-	physics_->getVisualDebugger()->setVisualizeConstraints(true);
-	physics_->getVisualDebugger()->setVisualDebuggerFlag(physx::PxVisualDebuggerFlag::eTRANSMIT_CONTACTS, true);
-	physics_->getVisualDebugger()->setVisualDebuggerFlag(physx::PxVisualDebuggerFlag::eTRANSMIT_SCENEQUERIES, true);
+	pPhysics_->getVisualDebugger()->setVisualizeConstraints(true);
+	pPhysics_->getVisualDebugger()->setVisualDebuggerFlag(physx::PxVisualDebuggerFlag::eTRANSMIT_CONTACTS, true);
+	pPhysics_->getVisualDebugger()->setVisualDebuggerFlag(physx::PxVisualDebuggerFlag::eTRANSMIT_SCENEQUERIES, true);
 }
 
 void XPhysics::onPvdDisconnected(PVD::PvdConnection& conn)
@@ -471,11 +471,11 @@ void XPhysics::onSubstepSetup(float dtime, physx::PxBaseTask* cont)
 
 void XPhysics::togglePvdConnection(void)
 {
-	if (!physics_->getPvdConnectionManager())
+	if (!pPhysics_->getPvdConnectionManager())
 		return;
 
-	if (physics_->getPvdConnectionManager()->isConnected()) {
-		physics_->getPvdConnectionManager()->disconnect();
+	if (pPhysics_->getPvdConnectionManager()->isConnected()) {
+		pPhysics_->getPvdConnectionManager()->disconnect();
 	}
 	else {
 		createPvdConnection();
@@ -484,7 +484,7 @@ void XPhysics::togglePvdConnection(void)
 
 void XPhysics::createPvdConnection(void)
 {
-	physx::PxVisualDebuggerConnectionManager* pvd = physics_->getPvdConnectionManager();
+	physx::PxVisualDebuggerConnectionManager* pvd = pPhysics_->getPvdConnectionManager();
 	if (!pvd) {
 		X_ERROR("PhysicsSys", "Failed to get PVD connection manager");
 		return;
@@ -602,23 +602,23 @@ void XPhysics::setScratchBlockSize(size_t size)
 
 void XPhysics::toggleVisualizationParam(physx::PxVisualizationParameter::Enum param)
 {
-	if (scene_) {
-		physx::PxSceneWriteLock scopedLock(*scene_);
-		const bool visualization = scene_->getVisualizationParameter(param) == 1.0f;
-		scene_->setVisualizationParameter(param, visualization ? 0.0f : 1.0f);
+	if (pScene_) {
+		physx::PxSceneWriteLock scopedLock(*pScene_);
+		const bool visualization = pScene_->getVisualizationParameter(param) == 1.0f;
+		pScene_->setVisualizationParameter(param, visualization ? 0.0f : 1.0f);
 	}
 }
 
 void XPhysics::setVisualizationCullingBox(AABB& box)
 {
-	if (scene_) {
+	if (pScene_) {
 
 		physx::PxBounds3 bounds;
 		bounds.minimum = Px3FromVec3(box.min);
 		bounds.maximum = Px3FromVec3(box.max);
 
-		scene_->setVisualizationCullingBox(bounds);
-		scene_->setVisualizationParameter(physx::PxVisualizationParameter::eCULL_BOX, 1.0f);
+		pScene_->setVisualizationCullingBox(bounds);
+		pScene_->setVisualizationParameter(physx::PxVisualizationParameter::eCULL_BOX, 1.0f);
 	}
 }
 

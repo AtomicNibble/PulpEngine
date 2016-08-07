@@ -119,15 +119,15 @@ private:
 	PhysxArenaAllocator	allocator_;
 	PhysxLogger logger_;
 
-	physx::PxFoundation*			foundation_;
-	physx::PxProfileZoneManager*	profileZoneManager_;
-	physx::PxControllerManager*		controllerManager_;
+	physx::PxFoundation*			pFoundation_;
+	physx::PxProfileZoneManager*	pProfileZoneManager_;
+	physx::PxControllerManager*		pControllerManager_;
 
-	physx::PxPhysics*				physics_;
-	physx::PxCooking*				cooking_;
-	physx::PxScene*					scene_;
-	physx::PxMaterial*				material_;
-	physx::PxDefaultCpuDispatcher*	cpuDispatcher_;
+	physx::PxPhysics*				pPhysics_;
+	physx::PxCooking*				pCooking_;
+	physx::PxScene*					pScene_;
+	physx::PxMaterial*				pMaterial_;
+	physx::PxDefaultCpuDispatcher*	pCpuDispatcher_;
 
 	uint8_t*	pScratchBlock_;
 	size_t		scratchBlockSize_;
