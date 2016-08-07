@@ -180,6 +180,16 @@ bool ShaderBin::loadShader(const char* pPath, XHWShader* pShader)
 				return false;
 			}
 
+			// validate the profile version.
+			auto profileVersion = XHWShader::getProfileVersionForType(pShader->getType());
+			if (profileVersion.first != hdr.profileMajorVersion || profileVersion.second != hdr.profileMinorVersion)
+			{
+				X_WARNING("Shader", "bin shader is stale, compiled with diffrent shader mode: %" PRIu8 "_%" PRIu8
+					" requested: %" PRIu8 "_%" PRIu8,
+					hdr.profileMajorVersion, hdr.profileMinorVersion, profileVersion.first, profileVersion.second);
+				return false;
+			}
+
 			// clear status, as we edit members.
 			pShader->status_ = ShaderStatus::NotCompiled;
 
