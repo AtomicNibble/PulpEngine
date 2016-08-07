@@ -73,25 +73,32 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 	// Create the D3D graphics device
 	{
-		Microsoft::WRL::ComPtr<IDXGIAdapter1> pAdapter;
+		Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
 
-		for (uint32_t Idx = 0; DXGI_ERROR_NOT_FOUND != dxgiFactory->EnumAdapters1(Idx, &pAdapter); ++Idx)
+		for (uint32_t Idx = 0; DXGI_ERROR_NOT_FOUND != dxgiFactory->EnumAdapters1(Idx, &adapter); ++Idx)
 		{
 			DXGI_ADAPTER_DESC1 desc;
-			pAdapter->GetDesc1(&desc);
+			adapter->GetDesc1(&desc);
 			if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) {
 				continue;
 			}
 
 			featureLvl_ = D3D_FEATURE_LEVEL_11_0;
 
-			hr = D3D12CreateDevice(pAdapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice_));
+			hr = D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice_));
 			if (SUCCEEDED(hr))
 			{
 				X_LOG0("Dx12", "D3D12-capable hardware found: \"%ls\" (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
 
 				deviceName_.set(desc.Description);
 				dedicatedvideoMemory_ = desc.DedicatedVideoMemory;
+
+				{
+					Microsoft::WRL::ComPtr<IDXGIAdapter3> adapter3;
+					adapter.As(&adapter3);
+
+					pAdapter_ = adapter3.Detach();
+				}
 				break;
 			}
 			else
@@ -186,13 +193,21 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 		return false;
 	}
 
-
+	Microsoft::WRL::ComPtr<IDXGISwapChain1> swapChain;
 	hr = dxgiFactory->CreateSwapChainForHwnd(cmdListManager_.getCommandQueue(), hWnd,
-		&swapChainDesc, nullptr, nullptr, &pSwapChain_);
+		&swapChainDesc, nullptr, nullptr, &swapChain);
 	if (FAILED(hr)) {
 		X_ERROR("Dx12", "failed to create swap chain: %" PRId32, hr);
 		return false;
 	}
+
+	{
+		Microsoft::WRL::ComPtr<IDXGISwapChain3> swapChain3;
+		swapChain.As(&swapChain3);
+
+		pSwapChain_ = swapChain3.Detach();
+	}
+
 
 	for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i)
 	{
@@ -320,6 +335,7 @@ void XRender::shutDown(void)
 
 
 	core::SafeReleaseDX(pSwapChain_);
+	core::SafeReleaseDX(pAdapter_);
 
 	ID3D12DebugDevice* pDebugInterface;
 	if (SUCCEEDED(pDevice_->QueryInterface(&pDebugInterface)))

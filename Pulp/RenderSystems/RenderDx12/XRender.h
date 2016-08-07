@@ -159,8 +159,9 @@ private:
 private:
 	core::MemoryArenaBase* arena_;
 	ID3D12Device* pDevice_;
+	IDXGIAdapter3* pAdapter_;
+	IDXGISwapChain3* pSwapChain_;
 	ID3D12Debug* pDebug_;
-	IDXGISwapChain1* pSwapChain_;
 
 	RenderVars vars_;
 
