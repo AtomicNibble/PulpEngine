@@ -408,7 +408,6 @@ struct IRender
 
 namespace Commands
 {
-	typedef void* VertexLayoutHandle;
 	typedef void* VertexBufferHandle;
 	typedef void* IndexBufferHandle;
 	typedef void* ConstantBufferHandle;
@@ -422,7 +421,7 @@ namespace Commands
 		uint32_t vertexCount;
 		uint32_t startVertex;
 
-		VertexLayoutHandle vertexLayoutHandle;
+		shader::VertexFormat::Enum vertexLayout;
 		VertexBufferHandle vertexBuffer;
 		IndexBufferHandle indexBuffer;
 	};
@@ -435,7 +434,7 @@ namespace Commands
 		uint32_t startIndex;
 		uint32_t baseVertex;
 
-		VertexLayoutHandle vertexLayoutHandle;
+		shader::VertexFormat::Enum vertexLayout;
 		VertexBufferHandle vertexBuffer;
 		IndexBufferHandle indexBuffer;
 	};
