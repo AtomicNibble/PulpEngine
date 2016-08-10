@@ -98,6 +98,7 @@ private:
 		CommandListManger& cmdListMan, DescriptorAllocator& allocator) X_OVERRIDE;
 
 private:
+	// the RWStructuredBuffer hidden counter.
 	ByteAddressBuffer counterBuffer_;
 };
 
