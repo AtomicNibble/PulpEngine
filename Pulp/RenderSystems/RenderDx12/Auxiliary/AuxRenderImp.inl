@@ -22,9 +22,7 @@ X_INLINE AuxObjVertex::AuxObjVertex(const Vec3f& pos_, const Vec3f& normal_) :
 
 X_INLINE AuxObjMesh::AuxObjMesh() :
 	numVertices(0),
-	numFaces(0),
-	VBid(0),
-	IBid(0)
+	numFaces(0)
 {
 
 }

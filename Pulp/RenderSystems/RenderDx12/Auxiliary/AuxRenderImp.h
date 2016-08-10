@@ -3,6 +3,8 @@
 #include "AuxRender.h"
 #include <Math\XPlane.h>
 
+#include "Buffers\GpuBuffer.h"
+
 X_NAMESPACE_BEGIN(render)
 
 struct AuxGeomCBRawDataPackaged
@@ -33,8 +35,9 @@ struct AuxObjMesh
 
 	uint32 numVertices;
 	uint32 numFaces;
-	uint32 VBid;
-	uint32 IBid;
+
+	StructuredBuffer vertexBuf;
+	ByteAddressBuffer indexBuf;
 };
 
 
@@ -63,7 +66,7 @@ public:
 	RenderAuxImp(core::MemoryArenaBase* arena);
 	~RenderAuxImp() X_OVERRIDE;
 
-	bool init(void);
+	bool init(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, DescriptorAllocator& allocator);
 	void shutDown(void);
 
 	// IRenderAuxImpl
@@ -97,11 +100,14 @@ private:
 	void prepareThickLines3D(RenderAux::AuxSortedPushArr::ConstIterator itBegin, RenderAux::AuxSortedPushArr::ConstIterator itEnd);
 
 private:
-	bool createLods(core::MemoryArenaBase* arena);
+	bool createLods(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, 
+		DescriptorAllocator& allocator, core::MemoryArenaBase* arena);
+
 	void releaseLods(void);
 
 	template< typename TMeshFunc >
-	bool createMesh(core::MemoryArenaBase* arena, AuxObjMesh& mesh, TMeshFunc meshFunc);
+	bool createMesh(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, DescriptorAllocator& allocator,
+		core::MemoryArenaBase* arena, AuxObjMesh& mesh, TMeshFunc meshFunc);
 
 
 private:

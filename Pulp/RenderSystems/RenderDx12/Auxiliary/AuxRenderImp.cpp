@@ -7,7 +7,8 @@ X_NAMESPACE_BEGIN(render)
 
 void AuxObjMesh::release(void)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
+	vertexBuf.destroy();
+	indexBuf.destroy();
 }
 
 
@@ -32,9 +33,9 @@ RenderAuxImp::~RenderAuxImp()
 
 
 
-bool RenderAuxImp::init(void)
+bool RenderAuxImp::init(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, DescriptorAllocator& allocator)
 {
-	if (!createLods(arena_)) {
+	if (!createLods(pDevice, contexMan, cmdListMan, allocator, arena_)) {
 		X_ERROR("Dx12", "Failed to create Aux object lods");
 		return false;
 	}

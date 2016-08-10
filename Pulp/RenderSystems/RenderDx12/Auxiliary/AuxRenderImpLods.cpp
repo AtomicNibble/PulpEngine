@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "AuxRenderImp.h"
 
+#include "Containers\AlignedArray.h"
+
 
 X_NAMESPACE_BEGIN(render)
 
@@ -8,8 +10,8 @@ X_NAMESPACE_BEGIN(render)
 namespace
 {
 
-	typedef core::Array<AuxObjVertex> AuxObjVertexArr;
-	typedef core::Array<uint16> AuxObjIndexArr;
+	typedef core::AlignedArray<AuxObjVertex> AuxObjVertexArr;
+	typedef core::AlignedArray<uint16> AuxObjIndexArr;
 
 	// function to generate a sphere mesh
 	static void CreateSphere(AuxObjVertexArr& vb, AuxObjIndexArr& ib,
@@ -334,12 +336,15 @@ namespace
   // The functor needs to provide a CreateMesh function which accepts an 
   // AuxObjVertexBuffer and AuxObjIndexBuffer to stored the resulting mesh.
 template< typename TMeshFunc >
-bool RenderAuxImp::createMesh(core::MemoryArenaBase* arena, AuxObjMesh& mesh, TMeshFunc meshFunc)
+bool RenderAuxImp::createMesh(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, DescriptorAllocator& descptorAlloc,
+	core::MemoryArenaBase* arena, AuxObjMesh& mesh, TMeshFunc meshFunc)
 {
 	// create mesh
-//	uint32_t ibID, vbID;
 	AuxObjVertexArr vb(arena);
 	AuxObjIndexArr ib(arena);
+
+	vb.setBaseAlignment(16);
+	ib.setBaseAlignment(16);
 
 	meshFunc.CreateMesh(vb, ib);
 
@@ -348,34 +353,38 @@ bool RenderAuxImp::createMesh(core::MemoryArenaBase* arena, AuxObjMesh& mesh, TM
 		return false;
 	}
 
+	X_ASSERT_ALIGNMENT(vb.data(), 16, 0);
+	X_ASSERT_ALIGNMENT(ib.data(), 16, 0);
+
 
 	// write mesh info
-	X_ASSERT_NOT_IMPLEMENTED();
-	mesh.VBid = 0;
-	mesh.IBid = 0;
 	mesh.numVertices = safe_static_cast<uint32, size_t>(vb.size());
 	mesh.numFaces = safe_static_cast<uint32, size_t>(ib.size() / 3);
+
+	mesh.vertexBuf.create(pDevice, contexMan, cmdListMan, descptorAlloc, mesh.numVertices, sizeof(AuxObjVertexArr::Type), vb.data());
+	mesh.indexBuf.create(pDevice, contexMan, cmdListMan, descptorAlloc, mesh.numFaces * 3, sizeof(AuxObjIndexArr::Type), ib.data());
 	return true;
 }
 
 
 
 
-bool RenderAuxImp::createLods(core::MemoryArenaBase* arena)
+bool RenderAuxImp::createLods(ID3D12Device* pDevice, ContextManager& contexMan, 
+	CommandListManger& cmdListMan, DescriptorAllocator& allocator, core::MemoryArenaBase* arena)
 {
 	for (uint32 i = 0; i < AUX_OBJ_NUM_LOD; ++i)
 	{
-		if (!createMesh(arena, sphereObj_[i], SphereMeshCreateFunc(1.0f, 9 + 4 * i, 9 + 4 * i)))
+		if (!createMesh(pDevice, contexMan, cmdListMan, allocator, arena, sphereObj_[i], SphereMeshCreateFunc(1.0f, 9 + 4 * i, 9 + 4 * i)))
 		{
 			return false;
 		}
 
-		if (!createMesh(arena, coneObj_[i], ConeMeshCreateFunc(1.0f, 1.0f, 10 + i * 6)))
+		if (!createMesh(pDevice, contexMan, cmdListMan, allocator, arena, coneObj_[i], ConeMeshCreateFunc(1.0f, 1.0f, 10 + i * 6)))
 		{
 			return false;
 		}
 
-		if (!createMesh(arena, cylinderObj_[i], CylinderMeshCreateFunc(1.0f, 1.0f, 10 + i * 6)))
+		if (!createMesh(pDevice, contexMan, cmdListMan, allocator, arena, cylinderObj_[i], CylinderMeshCreateFunc(1.0f, 1.0f, 10 + i * 6)))
 		{
 			return false;
 		}
