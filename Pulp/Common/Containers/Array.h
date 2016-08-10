@@ -9,6 +9,9 @@
 
 X_NAMESPACE_BEGIN(core)
 
+class MemoryArenaBase;
+struct XFile;
+
 template <typename T>
 class Array
 {
@@ -123,7 +126,7 @@ public:
 	bool SLoad(XFile* pFile);
 	// ~ISerialize
 
-private:
+protected:
 	// used to make sure buffer is large enougth.
 	// if it grows exsisting values are copyied into new buffer.
 	void ensureSize(size_type size);
@@ -132,6 +135,7 @@ private:
 	X_INLINE void DeleteArr(T* pArr);
 	X_INLINE T* Allocate(size_type size);
 
+private:
 	T*				list_;			// pointer to memory block
 	size_type		num_;			// num elemets stored in the list
 	size_type		size_;			// the current allocated size
