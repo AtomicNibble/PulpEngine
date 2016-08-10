@@ -7,6 +7,8 @@ X_NAMESPACE_BEGIN(render)
 
 class CommandContext;
 class DescriptorAllocator;
+class ContextManager;
+class CommandListManger;
 
 class GpuBuffer : public GpuResource
 {
@@ -17,11 +19,13 @@ public:
 	virtual void destroy(void);
 
 	// Create a buffer. If initial data is provided, it will be copied into the buffer using the default command context.
-	void create(ID3D12Device* pDevice, DescriptorAllocator& allocator, uint32_t numElements, uint32_t elementSize,
+	void create(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan,
+		DescriptorAllocator& allocator, uint32_t numElements, uint32_t elementSize,
 		const void* pInitialData = nullptr);
 
 	// Sub-Allocate a buffer out of a pre-allocated heap. If initial data is provided, it will be copied into the buffer using the default command context.
-	void createPlaced(ID3D12Device* pDevice, DescriptorAllocator& allocator, ID3D12Heap* pBackingHeap, uint32_t heapOffset,
+	void createPlaced(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan,
+		DescriptorAllocator& allocator, ID3D12Heap* pBackingHeap, uint32_t heapOffset,
 		uint32_t numElements, uint32_t elementSize, const void* pInitialData = nullptr);
 
 	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getUAV(void) const;
@@ -37,9 +41,15 @@ public:
 	D3D12_INDEX_BUFFER_VIEW indexBufferView(size_t offset, uint32_t size, bool b32Bit = false) const;
 	X_INLINE D3D12_INDEX_BUFFER_VIEW indexBufferView(size_t startIndex = 0) const;
 
+
 private:
 	D3D12_RESOURCE_DESC describeBuffer(void);
-	virtual void createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator& allocator) X_ABSTRACT;
+	void initializeBuffer(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, 
+		const void* pData, size_t numBytes, bool useOffset = false, size_t offset = 0);
+
+private:
+	virtual void createDerivedViews(ID3D12Device* pDevice, ContextManager& contexMan,
+		CommandListManger& cmdListMan, DescriptorAllocator& allocator) X_ABSTRACT;
 
 protected:
 	D3D12_CPU_DESCRIPTOR_HANDLE UAV_;
@@ -58,7 +68,8 @@ public:
 	virtual ~ByteAddressBuffer() X_OVERRIDE = default;
 
 private:
-	void createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator& allocator) X_OVERRIDE;
+	void createDerivedViews(ID3D12Device* pDevice, ContextManager& contexMan, 
+		CommandListManger& cmdListMan, DescriptorAllocator& allocator) X_OVERRIDE;
 };
 
 class IndirectArgsBuffer : public ByteAddressBuffer
@@ -83,7 +94,8 @@ public:
 	const D3D12_CPU_DESCRIPTOR_HANDLE& getCounterUAV(CommandContext& context);
 
 private:
-	void createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator& allocator) X_OVERRIDE;
+	void createDerivedViews(ID3D12Device* pDevice, ContextManager& contexMan, 
+		CommandListManger& cmdListMan, DescriptorAllocator& allocator) X_OVERRIDE;
 
 private:
 	ByteAddressBuffer counterBuffer_;
@@ -96,7 +108,8 @@ public:
 	TypedBuffer(DXGI_FORMAT format);
 
 private:
-	void createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator& allocator) X_OVERRIDE;
+	void createDerivedViews(ID3D12Device* pDevice, ContextManager& contexMan, 
+		CommandListManger& cmdListMan, DescriptorAllocator& allocator) X_OVERRIDE;
 
 protected:
 	DXGI_FORMAT dataFormat_;

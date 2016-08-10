@@ -27,7 +27,8 @@ void GpuBuffer::destroy(void)
 	GpuResource::destroy();
 }
 
-void GpuBuffer::create(ID3D12Device* pDevice, DescriptorAllocator& allocator, uint32_t numElements, uint32_t elementSize,
+void GpuBuffer::create(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, 
+	DescriptorAllocator& allocator, uint32_t numElements, uint32_t elementSize,
 	const void* pInitialData)
 {
 	bufferSize_ = numElements * elementSize;
@@ -54,13 +55,14 @@ void GpuBuffer::create(ID3D12Device* pDevice, DescriptorAllocator& allocator, ui
 	gpuVirtualAddress_ = pResource_->GetGPUVirtualAddress();
 
 	if (pInitialData) {
-	//	CommandContext::InitializeBuffer(*this, initialData, bufferSize_);
+		initializeBuffer(pDevice, contexMan, cmdListMan, pInitialData, bufferSize_);	
 	}
 
-	createDerivedViews(pDevice, allocator);
+	createDerivedViews(pDevice, contexMan, cmdListMan, allocator);
 }
 
-void GpuBuffer::createPlaced(ID3D12Device* pDevice, DescriptorAllocator& allocator, ID3D12Heap* pBackingHeap,
+void GpuBuffer::createPlaced(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, 
+	DescriptorAllocator& allocator, ID3D12Heap* pBackingHeap,
 	uint32_t heapOffset, uint32_t numElements, uint32_t elementSize, const void* pInitialData)
 {
 	bufferSize_ = numElements * elementSize;
@@ -79,10 +81,10 @@ void GpuBuffer::createPlaced(ID3D12Device* pDevice, DescriptorAllocator& allocat
 	gpuVirtualAddress_ = pResource_->GetGPUVirtualAddress();
 
 	if (pInitialData) {
-	//	CommandContext::InitializeBuffer(*this, initialData, m_BufferSize);
+		initializeBuffer(pDevice, contexMan, cmdListMan, pInitialData, bufferSize_);
 	}
 
-	createDerivedViews(pDevice, allocator);
+	createDerivedViews(pDevice, contexMan, cmdListMan, allocator);
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE GpuBuffer::createConstantBufferView(ID3D12Device* pDevice, DescriptorAllocator& allocator,
@@ -139,11 +141,74 @@ D3D12_RESOURCE_DESC GpuBuffer::describeBuffer(void)
 	return desc;
 }
 
+
+void GpuBuffer::initializeBuffer(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan,
+	const void* pData, size_t numBytes, bool useOffset, size_t offset)
+{
+	D3D12_HEAP_PROPERTIES heapProps;
+	heapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
+	heapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+	heapProps.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+	heapProps.CreationNodeMask = 1;
+	heapProps.VisibleNodeMask = 1;
+
+	D3D12_RESOURCE_DESC bufferDesc;
+	bufferDesc.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER;
+	bufferDesc.Alignment = 0;
+	bufferDesc.Width = numBytes;
+	bufferDesc.Height = 1;
+	bufferDesc.DepthOrArraySize = 1;
+	bufferDesc.MipLevels = 1;
+	bufferDesc.Format = DXGI_FORMAT_UNKNOWN;
+	bufferDesc.SampleDesc.Count = 1;
+	bufferDesc.SampleDesc.Quality = 0;
+	bufferDesc.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR;
+	bufferDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
+
+	ID3D12Resource* pUploadBuffer;
+
+	HRESULT hr = pDevice->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE,
+		&bufferDesc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&pUploadBuffer));
+	if (FAILED(hr)) {
+		X_FATAL("Dx12", "Failed to create commited resource: %" PRIu32, hr);
+	}
+
+	void* pDestAddress;
+	pUploadBuffer->Map(0, nullptr, &pDestAddress);
+	core::SIMDMemCopy(pDestAddress, pData, divideByMultiple(numBytes, 16));
+	pUploadBuffer->Unmap(0, nullptr);
+
+
+	render::CommandContext* pContext = contexMan.allocateContext(cmdListMan, D3D12_COMMAND_LIST_TYPE_DIRECT);
+
+	// copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
+	pContext->transitionResource(*this, D3D12_RESOURCE_STATE_COPY_DEST, true);
+
+	if (useOffset) {
+		pContext->copyBufferRegionRaw(*this, offset, pUploadBuffer, 0, numBytes);
+	}
+	else {
+		pContext->copyResourceRaw(*this,  pUploadBuffer);
+	}
+
+	pContext->transitionResource(*this, D3D12_RESOURCE_STATE_GENERIC_READ, true);
+
+	// Execute the command list and wait for it to finish so we can release the upload buffer
+	pContext->finish(true);
+
+	pUploadBuffer->Release();
+}
+
+
 // -------------------------------------------------
 
 
-void ByteAddressBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator& allocator)
+void ByteAddressBuffer::createDerivedViews(ID3D12Device* pDevice, ContextManager& contexMan, 
+	CommandListManger& cmdListMan, DescriptorAllocator& allocator)
 {
+	X_UNUSED(contexMan);
+	X_UNUSED(cmdListMan);
+
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc;
 	core::zero_object(SRVDesc);
@@ -200,7 +265,8 @@ const D3D12_CPU_DESCRIPTOR_HANDLE& StructuredBuffer::getCounterUAV(CommandContex
 }
 
 
-void StructuredBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator& allocator)
+void StructuredBuffer::createDerivedViews(ID3D12Device* pDevice, ContextManager& contexMan, 
+	CommandListManger& cmdListMan, DescriptorAllocator& allocator)
 {
 	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc;
 	core::zero_object(SRVDesc);
@@ -225,7 +291,7 @@ void StructuredBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAlloc
 	UAVDesc.Buffer.StructureByteStride = elementSize_;
 	UAVDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
 
-	counterBuffer_.create(pDevice, allocator, 1, 4);
+	counterBuffer_.create(pDevice, contexMan, cmdListMan, allocator, 1, 4);
 
 	if (UAV_.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN) {
 		UAV_ = allocator.allocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -243,8 +309,12 @@ TypedBuffer::TypedBuffer(DXGI_FORMAT format) :
 }
 
 
-void TypedBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator& allocator)
+void TypedBuffer::createDerivedViews(ID3D12Device* pDevice, ContextManager& contexMan, 
+	CommandListManger& cmdListMan, DescriptorAllocator& allocator)
 {
+	X_UNUSED(contexMan);
+	X_UNUSED(cmdListMan);
+
 	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc;
 	core::zero_object(SRVDesc);
 	SRVDesc.ViewDimension = D3D12_SRV_DIMENSION_BUFFER;
