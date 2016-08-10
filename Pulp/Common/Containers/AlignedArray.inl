@@ -51,9 +51,9 @@ X_INLINE AlignedArray<T>::AlignedArray(MemoryArenaBase* arena, size_type size, c
 
 template<typename T>
 X_INLINE AlignedArray<T>::AlignedArray(MemoryArenaBase* arena, std::initializer_list<T> iList) :
-	align_(X_ALIGN_OF(T)),
-	Array(arena)
+	AlignedArray(arena)
 {
+	align_ = X_ALIGN_OF(T);
 	size_t size = iList.size();
 	std::initializer_list<T>::const_iterator pList = iList.begin();
 
@@ -71,7 +71,7 @@ X_INLINE AlignedArray<T>::AlignedArray(const AlignedArray<T>& oth) :
 	granularity_(16),
 	list_(nullptr),
 	num_(0),
-	size_(0)
+	size_(0),
 	align_(X_ALIGN_OF(T))
 {
 	*this = oth;
@@ -84,7 +84,7 @@ X_INLINE AlignedArray<T>::AlignedArray(AlignedArray<T>&& oth) :
 	list_(nullptr),
 	num_(0),
 	size_(0),
-	align_(X_ALIGN_OF(T)),
+	align_(X_ALIGN_OF(T))
 {
 	list_ = oth.list_;
 	num_ = oth.num_;
@@ -304,7 +304,8 @@ template <typename T>
 X_INLINE void AlignedArray<T>::setBaseAlignment(size_type newAlign)
 {
 	X_ASSERT(X_ALIGN_OF(T) <= newAlign, "custom base alignment but be a multiple of type alignment")(X_ALIGN_OF(T), newAlign);
-	X_ASSERT(isEmpty(), "array must be empty before changing base alignment")(isEmpty())
+	X_ASSERT(isEmpty(), "array must be empty before changing base alignment")(isEmpty());
+
 	align_ = newAlign;
 }
 

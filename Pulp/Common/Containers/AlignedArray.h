@@ -1,6 +1,9 @@
 #pragma once
 
 
+#include <ISerialize.h>
+
+
 #include "CompileTime\IsPOD.h"
 
 
