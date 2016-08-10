@@ -283,7 +283,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	}
 
 	pAuxRender_ = X_NEW(RenderAuxImp, arena_, "AuxRenderer")(arena_);
-	if (!pAuxRender_->init()) {
+	if (!pAuxRender_->init(pDevice_, *pContextMan_, cmdListManager_, descriptorAllocator)) {
 		X_ERROR("Render", "failed to init aux render system");
 		return false;
 	}
@@ -414,7 +414,7 @@ void XRender::renderBegin(void)
 
 	pContext->clearColor(displayPlane_[currentBufferIdx_]);
 	pContext->transitionResource(displayPlane_[currentBufferIdx_], D3D12_RESOURCE_STATE_PRESENT);
-	pContext->finish(cmdListManager_, false);
+	pContext->finish(false);
 }
 
 void XRender::renderEnd(void)

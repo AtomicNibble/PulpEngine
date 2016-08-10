@@ -372,7 +372,7 @@ X_NAMESPACE_BEGIN(texture)
 		pContext->transitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST, true);
 		pContext->updateSubresources<16>(dest, pUploadBuffer, 0, 0, numSubresources, pSubData);
 		pContext->transitionResource(dest, D3D12_RESOURCE_STATE_GENERIC_READ, true);
-		pContext->finish(cmdListManager_, true);
+		pContext->finish(true);
 
 		pUploadBuffer->Release();
 

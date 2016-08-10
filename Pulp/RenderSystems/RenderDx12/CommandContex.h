@@ -77,7 +77,7 @@ class CommandContext
 	static const uint32_t VALID_COMPUTE_QUEUE_RESOURCE_STATES;
 
 public:
-	CommandContext(ContextManager& contexMan, core::MemoryArenaBase* arena, ID3D12Device* pDevice,
+	CommandContext(ContextManager& contexMan, CommandListManger& cmdListMan, core::MemoryArenaBase* arena, ID3D12Device* pDevice,
 		 DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan, D3D12_COMMAND_LIST_TYPE type);
 	virtual ~CommandContext(void);
 
@@ -88,13 +88,13 @@ public:
 
 
 	// Flush existing commands to the GPU but keep the context alive
-	uint64_t flush(CommandListManger& cmdMng, bool waitForCompletion = false);
+	uint64_t flush(bool waitForCompletion = false);
 	// Flush existing commands and release the current context
-	uint64_t finish(CommandListManger& cmdMng, bool waitForCompletion = false);
+	uint64_t finish(bool waitForCompletion = false);
 
 	// Prepare to render by reserving a command list and command allocator
-	void initialize(CommandListManger& cmdMng);
-	void reset(CommandListManger& cmdMng);
+	void initialize(void);
+	void reset(void);
 
 
 	void copyBuffer(GpuResource& dest, GpuResource& src);
@@ -139,6 +139,7 @@ protected:
 
 protected:
 	ContextManager& contextManager_;
+	CommandListManger& cmdListMan_;
 
 	ID3D12GraphicsCommandList* pCommandList_;
 	ID3D12CommandAllocator* pCurrentAllocator_;

@@ -80,15 +80,15 @@ CommandContext* ContextManager::allocateContext(CommandListManger& cmdListMan, D
 	CommandContext* pRet = nullptr;
 	if (availableContexts.empty())
 	{
-		pRet = X_NEW(CommandContext, arena_, "CmdContex")(*this, arena_, pDevice_, pool_, linAllocMan_, type);
+		pRet = X_NEW(CommandContext, arena_, "CmdContex")(*this, cmdListMan, arena_, pDevice_, pool_, linAllocMan_, type);
 		contextPool_[type].emplace_back(pRet);
-		pRet->initialize(cmdListMan);
+		pRet->initialize();
 	}
 	else
 	{
 		pRet = availableContexts.front();
 		availableContexts.pop();
-		pRet->reset(cmdListMan);
+		pRet->reset();
 	}
 
 	X_ASSERT_NOT_NULL(pRet);
@@ -117,9 +117,10 @@ void ContextManager::destroyAllContexts(void)
 // --------------------------------------------------------------------
 
 
-CommandContext::CommandContext(ContextManager& contexMan, core::MemoryArenaBase* arena, ID3D12Device* pDevice,
+CommandContext::CommandContext(ContextManager& contexMan, CommandListManger& cmdListMan, core::MemoryArenaBase* arena, ID3D12Device* pDevice,
 		DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan, D3D12_COMMAND_LIST_TYPE type) :
 	contextManager_(contexMan),
+	cmdListMan_(cmdListMan),
 	type_(type),
 	pCommandList_(nullptr),
 	pCurrentAllocator_(nullptr),
@@ -143,16 +144,16 @@ CommandContext::~CommandContext(void)
 }
 
 
-uint64_t CommandContext::flush(CommandListManger& cmdMng, bool waitForCompletion)
+uint64_t CommandContext::flush(bool waitForCompletion)
 {
 	flushResourceBarriers();
 
 	X_ASSERT_NOT_NULL(pCurrentAllocator_);
 
-	uint64_t fenceValue = cmdMng.getQueue(type_).executeCommandList(pCommandList_);
+	uint64_t fenceValue = cmdListMan_.getQueue(type_).executeCommandList(pCommandList_);
 
 	if (waitForCompletion) {
-		cmdMng.waitForFence(fenceValue);
+		cmdListMan_.waitForFence(fenceValue);
 	}
 
 	// Reset the command list and restore previous state
@@ -175,14 +176,14 @@ uint64_t CommandContext::flush(CommandListManger& cmdMng, bool waitForCompletion
 	return fenceValue;
 }
 
-uint64_t CommandContext::finish(CommandListManger& cmdMng, bool waitForCompletion)
+uint64_t CommandContext::finish(bool waitForCompletion)
 {
 	X_ASSERT(type_ == D3D12_COMMAND_LIST_TYPE_DIRECT || type_ == D3D12_COMMAND_LIST_TYPE_COMPUTE, "Invalid type")(type_);
 	X_ASSERT_NOT_NULL(pCurrentAllocator_);
 
 	flushResourceBarriers();
 
-	CommandQue& queue = cmdMng.getQueue(type_);
+	CommandQue& queue = cmdListMan_.getQueue(type_);
 	uint64_t fenceValue = queue.executeCommandList(pCommandList_);
 	
 
@@ -195,7 +196,7 @@ uint64_t CommandContext::finish(CommandListManger& cmdMng, bool waitForCompletio
 	dynamicDescriptorHeap_.cleanupUsedHeaps(fenceValue);
 
 	if (waitForCompletion) {
-		cmdMng.waitForFence(fenceValue);
+		cmdListMan_.waitForFence(fenceValue);
 	}
 
 	contextManager_.freeContext(this);
@@ -204,23 +205,23 @@ uint64_t CommandContext::finish(CommandListManger& cmdMng, bool waitForCompletio
 }
 
 
-void CommandContext::initialize(CommandListManger& cmdMng)
+void CommandContext::initialize(void)
 {
 	X_ASSERT(pCommandList_ == nullptr, "Command list already set")();
 	X_ASSERT(pCurrentAllocator_ == nullptr, "Command allocator already set")();
 
-	cmdMng.createNewCommandList(type_, &pCommandList_, &pCurrentAllocator_);
+	cmdListMan_.createNewCommandList(type_, &pCommandList_, &pCurrentAllocator_);
 }
 
 
-void CommandContext::reset(CommandListManger& cmdMng)
+void CommandContext::reset(void)
 {
 	// We only call Reset() on previously freed contexts. The command list persists, but we must
 	// request a new allocator.
 	X_ASSERT_NOT_NULL(pCommandList_);
 	X_ASSERT(pCurrentAllocator_ == nullptr, "Command allocator should be null")(pCurrentAllocator_);
 
-	pCurrentAllocator_ = cmdMng.getQueue(type_).requestAllocator();
+	pCurrentAllocator_ = cmdListMan_.getQueue(type_).requestAllocator();
 	pCommandList_->Reset(pCurrentAllocator_, nullptr);
 
 	pCurGraphicsRootSignature_ = nullptr;
@@ -250,6 +251,7 @@ void CommandContext::copyBufferRegion(GpuResource& dest, size_t destOffset,
 
 	pCommandList_->CopyBufferRegion(dest.getResource(), destOffset, src.getResource(), srcOffset, numBytes);
 }
+
 
 void CommandContext::copySubresource(GpuResource& dest, uint32_t destSubIndex, GpuResource& src, uint32_t srcSubIndex)
 {
