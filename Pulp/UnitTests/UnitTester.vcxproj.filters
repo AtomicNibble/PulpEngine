@@ -325,6 +325,9 @@
     <ClCompile Include="UT_RadixSort.cpp">
       <Filter>Source Files\tests\Sorting</Filter>
     </ClCompile>
+    <ClCompile Include="UT_C_AlignedArray.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">
