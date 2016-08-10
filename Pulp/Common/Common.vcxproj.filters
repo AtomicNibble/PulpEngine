@@ -1123,6 +1123,9 @@
     <ClInclude Include="Memory\MemUtil.h">
       <Filter>Headers\Memory</Filter>
     </ClInclude>
+    <ClInclude Include="Containers\AlignedArray.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1400,6 +1403,9 @@
     </None>
     <None Include="Math\XViewPort.inl">
       <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="Containers\AlignedArray.inl">
+      <Filter>Headers\Containers</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
