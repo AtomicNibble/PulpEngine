@@ -100,6 +100,10 @@ public:
 	void copyBuffer(GpuResource& dest, GpuResource& src);
 	void copyBufferRegion(GpuResource& dest, size_t destOffset, GpuResource& src, size_t srcOffset, size_t numBytes);
 	void copySubresource(GpuResource& dest, uint32_t destSubIndex, GpuResource& src, uint32_t srcSubIndex);
+
+	X_INLINE void copyBufferRegionRaw(GpuResource& dest, size_t destOffset, ID3D12Resource* pSrc, size_t srcOffset, size_t numBytes);
+	X_INLINE void copyResourceRaw(GpuResource& dest, ID3D12Resource* pSrc);
+
 //	void copyCounter(GpuResource& dest, size_t destOffset, StructuredBuffer& Src);
 //	void resetCounter(StructuredBuffer& Buf, uint32_t Value = 0);
 

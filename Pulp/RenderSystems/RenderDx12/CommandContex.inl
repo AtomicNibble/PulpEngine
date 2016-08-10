@@ -32,7 +32,16 @@ X_INLINE void Param::operator= (int32_t i)
 
 // ----------------------------------
 
+X_INLINE void CommandContext::copyBufferRegionRaw(GpuResource& dest, size_t destOffset, ID3D12Resource* pSrc,
+	size_t srcOffset, size_t numBytes)
+{
+	pCommandList_->CopyBufferRegion(dest.getResource(), destOffset, pSrc, srcOffset, numBytes);
+}
 
+X_INLINE void CommandContext::copyResourceRaw(GpuResource& dest, ID3D12Resource* pSrc)
+{
+	pCommandList_->CopyResource(dest.getResource(), pSrc);
+}
 
 X_INLINE void CommandContext::insertTimeStamp(ID3D12QueryHeap* pQueryHeap, uint32_t queryIdx)
 {
