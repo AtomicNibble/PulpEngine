@@ -277,6 +277,21 @@ void CommandContext::copySubresource(GpuResource& dest, uint32_t destSubIndex, G
 	pCommandList_->CopyTextureRegion(&destLocation, 0, 0, 0, &srcLocation, nullptr);
 }
 
+// used for compute shaders
+void CommandContext::copyCounter(GpuResource& dest, size_t destOffset, StructuredBuffer& src)
+{
+	transitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST);
+	transitionResource(src.getCounterBuffer(), D3D12_RESOURCE_STATE_COPY_SOURCE);
+	flushResourceBarriers();
+	pCommandList_->CopyBufferRegion(dest.getResource(), destOffset, src.getCounterBuffer().getResource(), 0, 4);
+}
+
+void CommandContext::resetCounter(StructuredBuffer& buf, uint32_t value)
+{
+	fillBuffer(buf.getCounterBuffer(), 0, Param(value), sizeof(value));
+	transitionResource(buf.getCounterBuffer(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS);
+}
+
 void CommandContext::writeBuffer(GpuResource& dest, size_t destOffset, const void* pData, size_t numBytes)
 {
 	X_ASSERT_NOT_NULL(pData);

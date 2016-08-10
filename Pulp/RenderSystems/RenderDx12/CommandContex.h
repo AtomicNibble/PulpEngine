@@ -16,6 +16,7 @@ class RootSignature;
 class GpuBuffer;
 class ColorBuffer;
 class DepthBuffer;
+class StructuredBuffer;
 class GraphicsPSO;
 class ComputePSO;
 class DescriptorAllocatorPool;
@@ -104,8 +105,9 @@ public:
 	X_INLINE void copyBufferRegionRaw(GpuResource& dest, size_t destOffset, ID3D12Resource* pSrc, size_t srcOffset, size_t numBytes);
 	X_INLINE void copyResourceRaw(GpuResource& dest, ID3D12Resource* pSrc);
 
-//	void copyCounter(GpuResource& dest, size_t destOffset, StructuredBuffer& Src);
-//	void resetCounter(StructuredBuffer& Buf, uint32_t Value = 0);
+	// used for compute shaders
+	void copyCounter(GpuResource& dest, size_t destOffset, StructuredBuffer& src);
+	void resetCounter(StructuredBuffer& buf, uint32_t value = 0);
 
 	void writeBuffer(GpuResource& dest, size_t destOffset, const void* pData, size_t numBytes);
 	void fillBuffer(GpuResource& dest, size_t destOffset, Param val, size_t numBytes);
