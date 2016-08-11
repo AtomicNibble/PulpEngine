@@ -53,6 +53,13 @@ X_INLINE CommandQue& CommandListManger::getQueue(D3D12_COMMAND_LIST_TYPE Type)
 
 }
 
+X_INLINE void CommandListManger::createNewCommandList(D3D12_COMMAND_LIST_TYPE type,
+	ID3D12GraphicsCommandList** pListOut, ID3D12CommandAllocator** pAllocatorOut)
+{
+	createNewCommandList(type, nullptr, pListOut, pAllocatorOut);
+}
+
+
 X_INLINE ID3D12CommandQueue* CommandListManger::getCommandQueue(void)
 {
 	return graphicsQueue_.getCommandQueue();

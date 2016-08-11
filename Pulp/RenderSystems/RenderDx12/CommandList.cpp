@@ -217,13 +217,6 @@ void CommandListManger::createNewCommandList(D3D12_COMMAND_LIST_TYPE type, PSO& 
 	createNewCommandList(type, initialPso.getPipelineStateObject(), pListOut, pAllocatorOut);
 }
 
-void CommandListManger::createNewCommandList(D3D12_COMMAND_LIST_TYPE type,
-	ID3D12GraphicsCommandList** pListOut, ID3D12CommandAllocator** pAllocatorOut)
-{
-	createNewCommandList(type, nullptr, pListOut, pAllocatorOut);
-}
-
-
 void CommandListManger::createNewCommandList(D3D12_COMMAND_LIST_TYPE type, ID3D12PipelineState* pInitialPso,
 	ID3D12GraphicsCommandList** pListOut, ID3D12CommandAllocator** pAllocatorOut)
 {
