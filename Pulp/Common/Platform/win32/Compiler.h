@@ -12,7 +12,7 @@ extern "C" void* _ReturnAddress(void);
 
 #define X_ABSTRACT									abstract
 #define X_OVERRIDE									override
-#define X_FINAL										final 
+#define X_FINAL										override final 
 
 #define X_PRAGMA(pragma)							__pragma(pragma)
 #define X_PUSH_WARNING_LEVEL(level)					X_PRAGMA(warning(push, level))
