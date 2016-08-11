@@ -58,4 +58,26 @@ X_INLINE ID3D12CommandQueue* CommandListManger::getCommandQueue(void)
 	return graphicsQueue_.getCommandQueue();
 }
 
+X_INLINE bool CommandListManger::isFenceComplete(uint64_t fenceValue)
+{
+	CommandQue& que = getQueue(D3D12_COMMAND_LIST_TYPE(fenceValue >> 56));
+
+	return que.isFenceComplete(fenceValue);
+}
+
+X_INLINE void CommandListManger::waitForFence(uint64_t fenceValue)
+{
+	CommandQue& que = getQueue(D3D12_COMMAND_LIST_TYPE(fenceValue >> 56));
+
+	que.waitForFence(fenceValue);
+}
+
+X_INLINE void CommandListManger::idleGPU(void)
+{
+	graphicsQueue_.waitForIdle();
+	computeQueue_.waitForIdle();
+	copyQueue_.waitForIdle();
+}
+
+
 X_NAMESPACE_END

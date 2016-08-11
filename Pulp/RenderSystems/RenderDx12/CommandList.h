@@ -9,6 +9,8 @@
 
 X_NAMESPACE_BEGIN(render)
 
+class PSO;
+
 class CommandQue
 {
 public:
@@ -63,12 +65,19 @@ public:
 
 	X_INLINE ID3D12CommandQueue* getCommandQueue(void);
 
+	void createNewCommandList(D3D12_COMMAND_LIST_TYPE type, PSO& initialPso,
+		ID3D12GraphicsCommandList** pListOut, ID3D12CommandAllocator** pAllocatorOut);
 	void createNewCommandList(D3D12_COMMAND_LIST_TYPE type,
 		ID3D12GraphicsCommandList** pListOut, ID3D12CommandAllocator** pAllocatorOut);
 
-	bool isFenceComplete(uint64_t fenceValue);
-	void waitForFence(uint64_t fenceValue);
-	void idleGPU(void);
+
+	X_INLINE bool isFenceComplete(uint64_t fenceValue);
+	X_INLINE void waitForFence(uint64_t fenceValue);
+	X_INLINE void idleGPU(void);
+
+private:
+	void createNewCommandList(D3D12_COMMAND_LIST_TYPE type, ID3D12PipelineState* pInitialPso,
+		ID3D12GraphicsCommandList** pListOut, ID3D12CommandAllocator** pAllocatorOut);
 
 private:
 	ID3D12Device* pDevice_;

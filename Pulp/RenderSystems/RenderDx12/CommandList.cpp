@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "CommandList.h"
 
+#include "PipelineState.h"
+
 X_NAMESPACE_BEGIN(render)
 
 CommandQue::CommandQue(core::MemoryArenaBase* arena, D3D12_COMMAND_LIST_TYPE type) :
@@ -209,7 +211,20 @@ void CommandListManger::shutdown(void)
 	copyQueue_.shutdown();
 }
 
+void CommandListManger::createNewCommandList(D3D12_COMMAND_LIST_TYPE type, PSO& initialPso,
+	ID3D12GraphicsCommandList** pListOut, ID3D12CommandAllocator** pAllocatorOut)
+{
+	createNewCommandList(type, initialPso.getPipelineStateObject(), pListOut, pAllocatorOut);
+}
+
 void CommandListManger::createNewCommandList(D3D12_COMMAND_LIST_TYPE type,
+	ID3D12GraphicsCommandList** pListOut, ID3D12CommandAllocator** pAllocatorOut)
+{
+	createNewCommandList(type, nullptr, pListOut, pAllocatorOut);
+}
+
+
+void CommandListManger::createNewCommandList(D3D12_COMMAND_LIST_TYPE type, ID3D12PipelineState* pInitialPso,
 	ID3D12GraphicsCommandList** pListOut, ID3D12CommandAllocator** pAllocatorOut)
 {
 	X_ASSERT(type != D3D12_COMMAND_LIST_TYPE_BUNDLE, "Bundles are not yet supported")(type);
@@ -222,7 +237,7 @@ void CommandListManger::createNewCommandList(D3D12_COMMAND_LIST_TYPE type,
 	case D3D12_COMMAND_LIST_TYPE_COPY: *pAllocatorOut = copyQueue_.requestAllocator(); break;
 	}
 
-	HRESULT hr = pDevice_->CreateCommandList(1, type, *pAllocatorOut, nullptr, IID_PPV_ARGS(pListOut));
+	HRESULT hr = pDevice_->CreateCommandList(1, type, *pAllocatorOut, pInitialPso, IID_PPV_ARGS(pListOut));
 	if (FAILED(hr)) {
 		X_FATAL("Dx12", "Failed to create command list: %" PRIu32, hr);
 	}
@@ -230,25 +245,5 @@ void CommandListManger::createNewCommandList(D3D12_COMMAND_LIST_TYPE type,
 	D3DDebug::SetDebugObjectName((*pListOut), L"CommandList");
 }
 
-bool CommandListManger::isFenceComplete(uint64_t fenceValue)
-{
-	CommandQue& que = getQueue(D3D12_COMMAND_LIST_TYPE(fenceValue >> 56));
-	
-	return que.isFenceComplete(fenceValue);
-}
-
-void CommandListManger::waitForFence(uint64_t fenceValue)
-{
-	CommandQue& que = getQueue(D3D12_COMMAND_LIST_TYPE(fenceValue >> 56));
-
-	que.waitForFence(fenceValue);
-}
-
-void CommandListManger::idleGPU(void)
-{
-	graphicsQueue_.waitForIdle();
-	computeQueue_.waitForIdle();
-	copyQueue_.waitForIdle();
-}
 
 X_NAMESPACE_END
