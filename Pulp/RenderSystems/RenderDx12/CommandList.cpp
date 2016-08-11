@@ -214,6 +214,9 @@ void CommandListManger::shutdown(void)
 void CommandListManger::createNewCommandList(D3D12_COMMAND_LIST_TYPE type, PSO& initialPso,
 	ID3D12GraphicsCommandList** pListOut, ID3D12CommandAllocator** pAllocatorOut)
 {
+	// you stupid fuck, pso needs to be a finalized().
+	X_ASSERT_NOT_NULL(initialPso.getPipelineStateObject());
+
 	createNewCommandList(type, initialPso.getPipelineStateObject(), pListOut, pAllocatorOut);
 }
 
