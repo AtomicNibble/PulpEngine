@@ -53,6 +53,6 @@ private:
 
 X_NAMESPACE_END
 
-#include "CommandList.inl"
+#include "CommandListManger.inl"
 
 #endif // !X_COMMAND_QUE_H_

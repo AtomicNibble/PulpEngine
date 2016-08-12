@@ -339,7 +339,7 @@
     <ClInclude Include="Buffers\PixelBuffer.h" />
     <ClInclude Include="Buffers\ShadowBuffer.h" />
     <ClInclude Include="CommandContex.h" />
-    <ClInclude Include="CommandList.h" />
+    <ClInclude Include="CommandListManger.h" />
     <ClInclude Include="CommandQue.h" />
     <ClInclude Include="CommandSignature.h" />
     <ClInclude Include="Features.h" />
@@ -379,7 +379,7 @@
     <ClCompile Include="Buffers\PixelBuffer.cpp" />
     <ClCompile Include="Buffers\ShadowBuffer.cpp" />
     <ClCompile Include="CommandContex.cpp" />
-    <ClCompile Include="CommandList.cpp" />
+    <ClCompile Include="CommandListManger.cpp" />
     <ClCompile Include="CommandQue.cpp" />
     <ClCompile Include="CommandSignature.cpp" />
     <ClCompile Include="GpuResource.cpp" />
@@ -425,7 +425,7 @@
     <None Include="Buffers\GpuBuffer.inl" />
     <None Include="Buffers\PixelBuffer.inl" />
     <None Include="CommandContex.inl" />
-    <None Include="CommandList.inl" />
+    <None Include="CommandListManger.inl" />
     <None Include="CommandQue.inl" />
     <None Include="CommandSignature.inl" />
     <None Include="GpuResource.inl" />

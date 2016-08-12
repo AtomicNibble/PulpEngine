@@ -65,9 +65,6 @@
     <ClInclude Include="XRender.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CommandList.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="CommandSignature.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -170,6 +167,9 @@
     <ClInclude Include="CommandQue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CommandListManger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -179,9 +179,6 @@
       <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
     <ClCompile Include="XRender.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CommandList.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="CommandSignature.cpp">
@@ -277,11 +274,11 @@
     <ClCompile Include="CommandQue.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="CommandListManger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="CommandList.inl">
-      <Filter>Header Files</Filter>
-    </None>
     <None Include="CommandSignature.inl">
       <Filter>Header Files</Filter>
     </None>
@@ -355,6 +352,9 @@
       <Filter>Header Files\Vars</Filter>
     </None>
     <None Include="CommandQue.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="CommandListManger.inl">
       <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
