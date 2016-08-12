@@ -5,9 +5,9 @@
 #define X_COMMAND_ALLOCATOR_POOL_H_
 
 #include <Containers\Array.h>
+#include <Containers\Fifo.h>
 #include <Threading\CriticalSection.h>
 
-#include <queue>
 
 X_NAMESPACE_BEGIN(render)
 
@@ -32,7 +32,7 @@ private:
 	const D3D12_COMMAND_LIST_TYPE commandListType_;
 
 	core::Array<ID3D12CommandAllocator*> allocatorPool_;
-	std::queue<std::pair<uint64_t, ID3D12CommandAllocator*>> readyAllocator_;
+	core::Fifo<std::pair<uint64_t, ID3D12CommandAllocator*>> readyAllocator_;
 	core::CriticalSection cs_;
 };
 

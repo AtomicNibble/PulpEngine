@@ -10,7 +10,8 @@ X_NAMESPACE_BEGIN(render)
 CommandAllocatorPool::CommandAllocatorPool(core::MemoryArenaBase* arena, D3D12_COMMAND_LIST_TYPE type) :
 	pDevice_(nullptr),
 	commandListType_(type),
-	allocatorPool_(arena)
+	allocatorPool_(arena),
+	readyAllocator_(arena)
 {
 
 }
@@ -26,6 +27,8 @@ void CommandAllocatorPool::create(ID3D12Device* pDevice)
 	X_ASSERT_NOT_NULL(pDevice);
 	pDevice_ = pDevice;
 
+
+
 }
 
 void CommandAllocatorPool::shutdown(void)
@@ -39,15 +42,15 @@ void CommandAllocatorPool::shutdown(void)
 
 ID3D12CommandAllocator* CommandAllocatorPool::requestAllocator(uint64_t CompletedFenceValue)
 {
-	X_ASSERT_NOT_NULL(pDevice); // check init was called.
+	X_ASSERT_NOT_NULL(pDevice_); // check init was called.
 
 	core::CriticalSection::ScopedLock lock(cs_);
 
 	ID3D12CommandAllocator* pAllocator = nullptr;
 
-	if (!readyAllocator_.empty())
+	if (readyAllocator_.isNotEmpty())
 	{
-		const std::pair<uint64_t, ID3D12CommandAllocator*>& allocatorPair = readyAllocator_.front();
+		const std::pair<uint64_t, ID3D12CommandAllocator*>& allocatorPair = readyAllocator_.peek();
 
 		if (allocatorPair.first <= CompletedFenceValue) // check it's safe to use / gpu done with it.
 		{
