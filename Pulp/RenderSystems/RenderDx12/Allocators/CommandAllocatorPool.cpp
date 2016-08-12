@@ -27,8 +27,8 @@ void CommandAllocatorPool::create(ID3D12Device* pDevice)
 	X_ASSERT_NOT_NULL(pDevice);
 	pDevice_ = pDevice;
 
-
-
+	allocatorPool_.reserve(32);
+	readyAllocator_.reserve(32);
 }
 
 void CommandAllocatorPool::shutdown(void)
