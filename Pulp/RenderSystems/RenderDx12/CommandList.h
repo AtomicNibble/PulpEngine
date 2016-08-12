@@ -22,11 +22,11 @@ public:
 
 	X_INLINE bool IsReady(void) const;
 	uint64_t incrementFence(void);
-	uint64_t getNextFenceValue(void);
+	X_INLINE uint64_t getNextFenceValue(void);
 	bool isFenceComplete(uint64_t fenceValue);
 	void stallForProducer(CommandQue& producer);
 	void waitForFence(uint64_t fenceValue);
-	void waitForIdle(void);
+	X_INLINE void waitForIdle(void);
 
 	uint64_t executeCommandList(ID3D12CommandList* pList);
 

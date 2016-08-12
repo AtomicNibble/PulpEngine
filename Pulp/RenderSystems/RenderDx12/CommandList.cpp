@@ -94,11 +94,6 @@ uint64_t CommandQue::incrementFence(void)
 	return nextFenceValue_++;
 }
 
-uint64_t CommandQue::getNextFenceValue(void)
-{
-	return nextFenceValue_;
-}
-
 bool CommandQue::isFenceComplete(uint64_t fenceValue)
 {
 	// Avoid querying the fence value by testing against the last one seen.
@@ -136,11 +131,6 @@ void CommandQue::waitForFence(uint64_t fenceValue)
 		WaitForSingleObject(fenceEventHandle_, INFINITE);
 		lastCompletedFenceValue_ = fenceValue;
 	}
-}
-
-void CommandQue::waitForIdle(void)
-{
-	waitForFence(nextFenceValue_ - 1);
 }
 
 uint64_t CommandQue::executeCommandList(ID3D12CommandList* pList)
