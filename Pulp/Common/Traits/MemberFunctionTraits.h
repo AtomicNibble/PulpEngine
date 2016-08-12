@@ -69,6 +69,62 @@ namespace traits
 			typedef R (C::*Pointer)(A0, A1, A2, A3, A4, A5);
 			typedef R (C::*ConstPointer)(A0, A1, A2, A3, A4, A5) const;
 		};
+
+		/// Internal struct used by \ref traits::MemberFunction.
+		template <class C, typename R>
+		struct MemberFunctionStd : public FunctionSignature<R>
+		{
+			typedef R(__stdcall C::*Pointer)(void);
+			typedef R(__stdcall C::*ConstPointer)(void) const;
+		};
+
+		/// Internal struct used by \ref traits::MemberFunction.
+		template <class C, typename R, typename A0>
+		struct MemberFunctionStd0 : public FunctionSignature0<R, A0>
+		{
+			typedef R(__stdcall C::*Pointer)(A0);
+			typedef R(__stdcall C::*ConstPointer)(A0) const;
+		};
+
+		/// Internal struct used by \ref traits::MemberFunction.
+		template <class C, typename R, typename A0, typename A1>
+		struct MemberFunctionStd1 : public FunctionSignature1<R, A0, A1>
+		{
+			typedef R(__stdcall C::*Pointer)(A0, A1);
+			typedef R(__stdcall C::*ConstPointer)(A0, A1) const;
+		};
+
+		/// Internal struct used by \ref traits::MemberFunction.
+		template <class C, typename R, typename A0, typename A1, typename A2>
+		struct MemberFunctionStd2 : public FunctionSignature2<R, A0, A1, A2>
+		{
+			typedef R(__stdcall C::*Pointer)(A0, A1, A2);
+			typedef R(__stdcall C::*ConstPointer)(A0, A1, A2) const;
+		};
+
+		/// Internal struct used by \ref traits::MemberFunction.
+		template <class C, typename R, typename A0, typename A1, typename A2, typename A3>
+		struct MemberFunctionStd3 : public FunctionSignature3<R, A0, A1, A2, A3>
+		{
+			typedef R(__stdcall C::*Pointer)(A0, A1, A2, A3);
+			typedef R(__stdcall C::*ConstPointer)(A0, A1, A2, A3) const;
+		};
+
+		/// Internal struct used by \ref traits::MemberFunction.
+		template <class C, typename R, typename A0, typename A1, typename A2, typename A3, typename A4>
+		struct MemberFunctionStd4 : public FunctionSignature4<R, A0, A1, A2, A3, A4>
+		{
+			typedef R(__stdcall C::*Pointer)(A0, A1, A2, A3, A4);
+			typedef R(__stdcall C::*ConstPointer)(A0, A1, A2, A3, A4) const;
+		};
+
+		/// Internal struct used by \ref traits::MemberFunction.
+		template <class C, typename R, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
+		struct MemberFunctionStd5 : public FunctionSignature5<R, A0, A1, A2, A3, A4, A5>
+		{
+			typedef R(__stdcall C::*Pointer)(A0, A1, A2, A3, A4, A5);
+			typedef R(__stdcall C::*ConstPointer)(A0, A1, A2, A3, A4, A5) const;
+		};
 	}
 
 
@@ -187,6 +243,54 @@ namespace traits
 	/// \sa MemberFunction
 	template <class C, typename R, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
 	struct MemberFunction<C, R (C::*)(A0, A1, A2, A3, A4, A5)> : public internal::MemberFunction5<C, R, A0, A1, A2, A3, A4, A5>{};
+
+
+	// Explicit STD convention
+	template <class C, typename T>
+	struct MemberFunctionStd {};
+
+	template <class C, typename R>
+	struct MemberFunctionStd<C, R(void)> : public internal::MemberFunctionStd<C, R> {};
+
+	template <class C, typename R>
+	struct MemberFunctionStd<C, R(C::*)(void)> : public internal::MemberFunctionStd<C, R> {};
+
+	template <class C, typename R, typename A0>
+	struct MemberFunctionStd<C, R(A0)> : public internal::MemberFunctionStd0<C, R, A0> {};
+
+	template <class C, typename R, typename A0>
+	struct MemberFunctionStd<C, R(C::*)(A0)> : public internal::MemberFunctionStd0<C, R, A0> {};
+
+	template <class C, typename R, typename A0, typename A1>
+	struct MemberFunctionStd<C, R(A0, A1)> : public internal::MemberFunctionStd1<C, R, A0, A1> {};
+
+	template <class C, typename R, typename A0, typename A1>
+	struct MemberFunctionStd<C, R(C::*)(A0, A1)> : public internal::MemberFunctionStd1<C, R, A0, A1> {};
+
+	template <class C, typename R, typename A0, typename A1, typename A2>
+	struct MemberFunctionStd<C, R(A0, A1, A2)> : public internal::MemberFunctionStd2<C, R, A0, A1, A2> {};
+
+	template <class C, typename R, typename A0, typename A1, typename A2>
+	struct MemberFunctionStd<C, R(C::*)(A0, A1, A2)> : public internal::MemberFunctionStd2<C, R, A0, A1, A2> {};
+
+	template <class C, typename R, typename A0, typename A1, typename A2, typename A3>
+	struct MemberFunctionStd<C, R(A0, A1, A2, A3)> : public internal::MemberFunctionStd3<C, R, A0, A1, A2, A3> {};
+
+	template <class C, typename R, typename A0, typename A1, typename A2, typename A3>
+	struct MemberFunctionStd<C, R(C::*)(A0, A1, A2, A3)> : public internal::MemberFunctionStd3<C, R, A0, A1, A2, A3> {};
+
+	template <class C, typename R, typename A0, typename A1, typename A2, typename A3, typename A4>
+	struct MemberFunctionStd<C, R(A0, A1, A2, A3, A4)> : public internal::MemberFunctionStd4<C, R, A0, A1, A2, A3, A4> {};
+
+	template <class C, typename R, typename A0, typename A1, typename A2, typename A3, typename A4>
+	struct MemberFunctionStd<C, R(C::*)(A0, A1, A2, A3, A4)> : public internal::MemberFunctionStd4<C, R, A0, A1, A2, A3, A4> {};
+
+	template <class C, typename R, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
+	struct MemberFunctionStd<C, R(A0, A1, A2, A3, A4, A5)> : public internal::MemberFunctionStd5<C, R, A0, A1, A2, A3, A4, A5> {};
+
+	template <class C, typename R, typename A0, typename A1, typename A2, typename A3, typename A4, typename A5>
+	struct MemberFunctionStd<C, R(C::*)(A0, A1, A2, A3, A4, A5)> : public internal::MemberFunctionStd5<C, R, A0, A1, A2, A3, A4, A5> {};
+
 }
 
 X_NAMESPACE_END
