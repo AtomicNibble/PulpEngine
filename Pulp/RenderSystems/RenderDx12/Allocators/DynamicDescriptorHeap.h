@@ -33,6 +33,9 @@ private:
 
 class DynamicDescriptorHeap
 {
+	typedef core::traits::MemberFunctionStd<ID3D12GraphicsCommandList, 
+		void(uint32_t, D3D12_GPU_DESCRIPTOR_HANDLE)>::Pointer SetRootDescriptorfunctionPtr;
+private:
 
 	// Describes a descriptor table entry:  a region of the handle cache and which handles have been set
 	struct DescriptorTableCache
@@ -48,6 +51,7 @@ class DynamicDescriptorHeap
 	{
 		static const uint32_t MAXNUM_DESCRIPTOR_TABLES = 16;
 		static const uint32_t MAXNUM_DESCRIPTORS = 256;
+		static const uint32_t MAX_DESCRIPTORS_PER_COPY = 16;
 
 	public:
 		DescriptorHandleCache();
@@ -55,8 +59,8 @@ class DynamicDescriptorHeap
 		void clearCache(void);
 
 		uint32_t computeStagedSize(void);
-		void copyAndBindStaleTables(DescriptorHandle DestHandleStart, ID3D12GraphicsCommandList* pCmdList,
-			void (STDMETHODCALLTYPE ID3D12GraphicsCommandList::*pSetFunc)(uint32_t, D3D12_GPU_DESCRIPTOR_HANDLE));
+		void copyAndBindStaleTables(ID3D12Device* pDevice, DescriptorHandle DestHandleStart, 
+			uint32_t descriptorSize, ID3D12GraphicsCommandList* pCmdList, SetRootDescriptorfunctionPtr pSetFunc);
 
 
 		void unbindAllValid(void);
@@ -108,8 +112,8 @@ private:
 
 	DescriptorHandle allocate(uint32_t count);
 
-	void copyAndBindStagedTables(DescriptorHandleCache& handleCache, ID3D12GraphicsCommandList* pCmdList,
-		void (STDMETHODCALLTYPE ID3D12GraphicsCommandList::*pSetFunc)(uint32_t, D3D12_GPU_DESCRIPTOR_HANDLE));
+	void copyAndBindStagedTables(DescriptorHandleCache& handleCache, ID3D12GraphicsCommandList* pCmdList, 
+		SetRootDescriptorfunctionPtr pSetFunc);
 
 	// Mark all descriptors in the cache as stale and in need of re-uploading.
 	void unbindAllValid(void);
