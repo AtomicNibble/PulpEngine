@@ -114,6 +114,7 @@ public:
 
 	// any items?
 	X_INLINE bool isEmpty(void) const;
+	X_INLINE bool isNotEmpty(void) const;
 
 
 	// STL iterators.

@@ -254,6 +254,13 @@ bool Fifo<T>::isEmpty(void) const
 	return num_ == 0;
 }
 
+template<typename T>
+bool Fifo<T>::isNotEmpty(void) const
+{
+	return num_ != 0;
+}
+// ----------------------------------------------
+
 // STL iterators.
 template<typename T>
 typename Fifo<T>::iterator Fifo<T>::begin(void)
