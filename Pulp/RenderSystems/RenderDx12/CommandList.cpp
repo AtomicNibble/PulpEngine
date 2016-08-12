@@ -49,6 +49,9 @@ bool CommandQue::create(ID3D12Device* pDevice)
 	}
 
 	D3DDebug::SetDebugObjectName(pFence_, L"CommandListManager::pFence_");
+
+	// we store the queue type in the top 8 msb's of the fence value.
+	// that way we can get the queue type from fence value.
 	pFence_->Signal((uint64_t)type_ << 56);
 
 
