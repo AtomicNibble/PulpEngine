@@ -39,6 +39,8 @@ void CommandAllocatorPool::shutdown(void)
 
 ID3D12CommandAllocator* CommandAllocatorPool::requestAllocator(uint64_t CompletedFenceValue)
 {
+	X_ASSERT_NOT_NULL(pDevice); // check init was called.
+
 	core::CriticalSection::ScopedLock lock(cs_);
 
 	ID3D12CommandAllocator* pAllocator = nullptr;
