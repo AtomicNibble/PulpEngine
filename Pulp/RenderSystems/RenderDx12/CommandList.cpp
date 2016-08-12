@@ -39,7 +39,7 @@ bool CommandQue::create(ID3D12Device* pDevice)
 			return false;
 		}
 
-		D3DDebug::SetDebugObjectName(pCommandQueue_, L"CommandListManager::m_CommandQueue");
+		D3DDebug::SetDebugObjectName(pCommandQueue_, L"CommandListManager::pCommandQueue_");
 	}
 
 	HRESULT hr = pDevice->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&pFence_));
@@ -48,7 +48,7 @@ bool CommandQue::create(ID3D12Device* pDevice)
 		return false;
 	}
 
-	D3DDebug::SetDebugObjectName(pFence_, L"CommandListManager::m_pFence");
+	D3DDebug::SetDebugObjectName(pFence_, L"CommandListManager::pFence_");
 	pFence_->Signal((uint64_t)type_ << 56);
 
 
