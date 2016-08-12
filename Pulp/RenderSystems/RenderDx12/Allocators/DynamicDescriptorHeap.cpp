@@ -56,12 +56,12 @@ ID3D12DescriptorHeap* DescriptorAllocatorPool::requestDescriptorHeap(void)
 	}
 }
 
-void DescriptorAllocatorPool::discardDescriptorHeaps(uint64_t FenceValue, const core::Array<ID3D12DescriptorHeap*>& UsedHeaps)
+void DescriptorAllocatorPool::discardDescriptorHeaps(uint64_t fenceValue, const core::Array<ID3D12DescriptorHeap*>& usedHeaps)
 {
 	core::CriticalSection::ScopedLock lock(cs_);
 
-	for (auto iter = UsedHeaps.begin(); iter != UsedHeaps.end(); ++iter) {
-		retiredDescriptorHeaps_.push(std::make_pair(FenceValue, *iter));
+	for (auto iter = usedHeaps.begin(); iter != usedHeaps.end(); ++iter) {
+		retiredDescriptorHeaps_.push(std::make_pair(fenceValue, *iter));
 	}
 }
 
