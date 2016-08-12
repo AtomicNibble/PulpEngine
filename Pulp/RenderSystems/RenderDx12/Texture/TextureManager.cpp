@@ -12,9 +12,8 @@ X_NAMESPACE_BEGIN(texture)
 
 
 	TextureManager::TextureManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice, render::ContextManager& contextMan,
-		render::CommandListManger& cmdListManager, render::DescriptorAllocator& descriptorAlloc) :
+		render::DescriptorAllocator& descriptorAlloc) :
 		contextMan_(contextMan),
-		cmdListManager_(cmdListManager),
 		pDevice_(pDevice),
 		descriptorAlloc_(descriptorAlloc),
 		arena_(arena),

@@ -28,8 +28,7 @@ class TextureManager : public core::IXHotReload
 
 public:
 	TextureManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice, 
-		render::ContextManager& contextMan,
-		render::CommandListManger& cmdListManager, render::DescriptorAllocator& descriptorAlloc);
+		render::ContextManager& contextMan, render::DescriptorAllocator& descriptorAlloc);
 	~TextureManager();
 
 	bool init(void);
@@ -75,7 +74,6 @@ private:
 private:
 	ID3D12Device* pDevice_;
 	render::ContextManager& contextMan_;
-	render::CommandListManger& cmdListManager_;
 	render::DescriptorAllocator& descriptorAlloc_;
 
 	core::MemoryArenaBase* arena_;
