@@ -11,6 +11,15 @@ X_INLINE PSO::~PSO()
 
 }
 
+X_INLINE bool PSO::isRootSigSet(void) const
+{
+	return pRootSignature_ != 0;
+}
+
+X_INLINE bool PSO::isDeviceObjectValid(void) const
+{
+	return pPSO_ != 0;
+}
 
 X_INLINE const RootSignature& PSO::getRootSignature(void) const
 {

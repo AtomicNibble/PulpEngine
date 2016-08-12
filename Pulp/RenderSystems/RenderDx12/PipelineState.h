@@ -14,6 +14,9 @@ public:
 	X_INLINE PSO();
 	X_INLINE ~PSO();
 
+	X_INLINE bool isRootSigSet(void) const;
+	X_INLINE bool isDeviceObjectValid(void) const;
+
 
 	void setRootSignature(const RootSignature& BindMappings);
 	X_INLINE const RootSignature& getRootSignature(void) const;
