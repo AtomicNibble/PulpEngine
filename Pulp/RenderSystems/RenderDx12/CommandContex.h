@@ -57,6 +57,10 @@ public:
 	void freeContext(CommandContext* pContex);
 	void destroyAllContexts(void);
 
+
+	X_INLINE const CommandListManger& getCmdListMan(void) const;
+	X_INLINE CommandListManger& getCmdListMan(void);
+
 private:
 	core::MemoryArenaBase* arena_;
 	ID3D12Device* pDevice_;
@@ -80,7 +84,7 @@ class CommandContext
 	static const uint32_t VALID_COMPUTE_QUEUE_RESOURCE_STATES;
 
 public:
-	CommandContext(ContextManager& contexMan, CommandListManger& cmdListMan, core::MemoryArenaBase* arena, ID3D12Device* pDevice,
+	CommandContext(ContextManager& contexMan, core::MemoryArenaBase* arena, ID3D12Device* pDevice,
 		 DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan, D3D12_COMMAND_LIST_TYPE type);
 	virtual ~CommandContext(void);
 
@@ -147,7 +151,6 @@ protected:
 
 protected:
 	ContextManager& contextManager_;
-	CommandListManger& cmdListMan_;
 
 	ID3D12GraphicsCommandList* pCommandList_;
 	ID3D12CommandAllocator* pCurrentAllocator_;

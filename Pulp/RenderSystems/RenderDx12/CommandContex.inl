@@ -29,6 +29,19 @@ X_INLINE void Param::operator= (int32_t i)
 	sint = i;
 }
 
+// ----------------------------------
+
+
+X_INLINE const CommandListManger& ContextManager::getCmdListMan(void) const
+{
+	return cmdListMan_;
+}
+
+X_INLINE CommandListManger& ContextManager::getCmdListMan(void)
+{
+	return cmdListMan_;
+}
+
 
 // ----------------------------------
 

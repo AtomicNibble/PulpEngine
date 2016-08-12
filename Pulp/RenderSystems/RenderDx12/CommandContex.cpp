@@ -81,7 +81,7 @@ CommandContext* ContextManager::allocateContext(D3D12_COMMAND_LIST_TYPE type)
 	CommandContext* pRet = nullptr;
 	if (availableContexts.empty())
 	{
-		pRet = X_NEW(CommandContext, arena_, "CmdContex")(*this, cmdListMan_, arena_, pDevice_, pool_, linAllocMan_, type);
+		pRet = X_NEW(CommandContext, arena_, "CmdContex")(*this, arena_, pDevice_, pool_, linAllocMan_, type);
 		contextPool_[type].emplace_back(pRet);
 		pRet->initialize();
 	}
@@ -118,10 +118,9 @@ void ContextManager::destroyAllContexts(void)
 // --------------------------------------------------------------------
 
 
-CommandContext::CommandContext(ContextManager& contexMan, CommandListManger& cmdListMan, core::MemoryArenaBase* arena, ID3D12Device* pDevice,
+CommandContext::CommandContext(ContextManager& contexMan, core::MemoryArenaBase* arena, ID3D12Device* pDevice,
 		DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan, D3D12_COMMAND_LIST_TYPE type) :
 	contextManager_(contexMan),
-	cmdListMan_(cmdListMan),
 	type_(type),
 	pCommandList_(nullptr),
 	pCurrentAllocator_(nullptr),
@@ -151,10 +150,11 @@ uint64_t CommandContext::flush(bool waitForCompletion)
 
 	X_ASSERT_NOT_NULL(pCurrentAllocator_);
 
-	uint64_t fenceValue = cmdListMan_.getQueue(type_).executeCommandList(pCommandList_);
+	auto& cmdListMan = contextManager_.getCmdListMan();
+	uint64_t fenceValue = cmdListMan.getQueue(type_).executeCommandList(pCommandList_);
 
 	if (waitForCompletion) {
-		cmdListMan_.waitForFence(fenceValue);
+		cmdListMan.waitForFence(fenceValue);
 	}
 
 	// Reset the command list and restore previous state
@@ -184,7 +184,8 @@ uint64_t CommandContext::finish(bool waitForCompletion)
 
 	flushResourceBarriers();
 
-	CommandQue& queue = cmdListMan_.getQueue(type_);
+	auto& cmdListMan = contextManager_.getCmdListMan();
+	CommandQue& queue = cmdListMan.getQueue(type_);
 	uint64_t fenceValue = queue.executeCommandList(pCommandList_);
 	
 
@@ -197,7 +198,7 @@ uint64_t CommandContext::finish(bool waitForCompletion)
 	dynamicDescriptorHeap_.cleanupUsedHeaps(fenceValue);
 
 	if (waitForCompletion) {
-		cmdListMan_.waitForFence(fenceValue);
+		cmdListMan.waitForFence(fenceValue);
 	}
 
 	contextManager_.freeContext(this);
@@ -211,7 +212,9 @@ void CommandContext::initialize(void)
 	X_ASSERT(pCommandList_ == nullptr, "Command list already set")();
 	X_ASSERT(pCurrentAllocator_ == nullptr, "Command allocator already set")();
 
-	cmdListMan_.createNewCommandList(type_, &pCommandList_, &pCurrentAllocator_);
+	auto& cmdListMan = contextManager_.getCmdListMan();
+
+	cmdListMan.createNewCommandList(type_, &pCommandList_, &pCurrentAllocator_);
 }
 
 
@@ -222,7 +225,9 @@ void CommandContext::reset(void)
 	X_ASSERT_NOT_NULL(pCommandList_);
 	X_ASSERT(pCurrentAllocator_ == nullptr, "Command allocator should be null")(pCurrentAllocator_);
 
-	pCurrentAllocator_ = cmdListMan_.getQueue(type_).requestAllocator();
+	auto& cmdListMan = contextManager_.getCmdListMan();
+
+	pCurrentAllocator_ = cmdListMan.getQueue(type_).requestAllocator();
 	pCommandList_->Reset(pCurrentAllocator_, nullptr);
 
 	pCurGraphicsRootSignature_ = nullptr;
