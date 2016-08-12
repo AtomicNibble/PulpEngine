@@ -33,9 +33,9 @@ RenderAuxImp::~RenderAuxImp()
 
 
 
-bool RenderAuxImp::init(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, DescriptorAllocator& allocator)
+bool RenderAuxImp::init(ID3D12Device* pDevice, ContextManager& contexMan, DescriptorAllocator& allocator)
 {
-	if (!createLods(pDevice, contexMan, cmdListMan, allocator, arena_)) {
+	if (!createLods(pDevice, contexMan, allocator, arena_)) {
 		X_ERROR("Dx12", "Failed to create Aux object lods");
 		return false;
 	}

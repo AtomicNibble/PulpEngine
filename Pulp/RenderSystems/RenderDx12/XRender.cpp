@@ -283,7 +283,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	}
 
 	pAuxRender_ = X_NEW(RenderAuxImp, arena_, "AuxRenderer")(arena_);
-	if (!pAuxRender_->init(pDevice_, *pContextMan_, cmdListManager_, descriptorAllocator)) {
+	if (!pAuxRender_->init(pDevice_, *pContextMan_, descriptorAllocator)) {
 		X_ERROR("Render", "failed to init aux render system");
 		return false;
 	}

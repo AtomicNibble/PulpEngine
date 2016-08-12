@@ -336,7 +336,7 @@ namespace
   // The functor needs to provide a CreateMesh function which accepts an 
   // AuxObjVertexBuffer and AuxObjIndexBuffer to stored the resulting mesh.
 template< typename TMeshFunc >
-bool RenderAuxImp::createMesh(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, DescriptorAllocator& descptorAlloc,
+bool RenderAuxImp::createMesh(ID3D12Device* pDevice, ContextManager& contexMan, DescriptorAllocator& descptorAlloc,
 	core::MemoryArenaBase* arena, AuxObjMesh& mesh, TMeshFunc meshFunc)
 {
 	// create mesh
@@ -361,8 +361,8 @@ bool RenderAuxImp::createMesh(ID3D12Device* pDevice, ContextManager& contexMan, 
 	mesh.numVertices = safe_static_cast<uint32, size_t>(vb.size());
 	mesh.numFaces = safe_static_cast<uint32, size_t>(ib.size() / 3);
 
-	mesh.vertexBuf.create(pDevice, contexMan, cmdListMan, descptorAlloc, mesh.numVertices, sizeof(AuxObjVertexArr::Type), vb.data());
-	mesh.indexBuf.create(pDevice, contexMan, cmdListMan, descptorAlloc, mesh.numFaces * 3, sizeof(AuxObjIndexArr::Type), ib.data());
+	mesh.vertexBuf.create(pDevice, contexMan, descptorAlloc, mesh.numVertices, sizeof(AuxObjVertexArr::Type), vb.data());
+	mesh.indexBuf.create(pDevice, contexMan, descptorAlloc, mesh.numFaces * 3, sizeof(AuxObjIndexArr::Type), ib.data());
 	return true;
 }
 
@@ -370,21 +370,21 @@ bool RenderAuxImp::createMesh(ID3D12Device* pDevice, ContextManager& contexMan, 
 
 
 bool RenderAuxImp::createLods(ID3D12Device* pDevice, ContextManager& contexMan, 
-	CommandListManger& cmdListMan, DescriptorAllocator& allocator, core::MemoryArenaBase* arena)
+	DescriptorAllocator& allocator, core::MemoryArenaBase* arena)
 {
 	for (uint32 i = 0; i < AUX_OBJ_NUM_LOD; ++i)
 	{
-		if (!createMesh(pDevice, contexMan, cmdListMan, allocator, arena, sphereObj_[i], SphereMeshCreateFunc(1.0f, 9 + 4 * i, 9 + 4 * i)))
+		if (!createMesh(pDevice, contexMan, allocator, arena, sphereObj_[i], SphereMeshCreateFunc(1.0f, 9 + 4 * i, 9 + 4 * i)))
 		{
 			return false;
 		}
 
-		if (!createMesh(pDevice, contexMan, cmdListMan, allocator, arena, coneObj_[i], ConeMeshCreateFunc(1.0f, 1.0f, 10 + i * 6)))
+		if (!createMesh(pDevice, contexMan, allocator, arena, coneObj_[i], ConeMeshCreateFunc(1.0f, 1.0f, 10 + i * 6)))
 		{
 			return false;
 		}
 
-		if (!createMesh(pDevice, contexMan, cmdListMan, allocator, arena, cylinderObj_[i], CylinderMeshCreateFunc(1.0f, 1.0f, 10 + i * 6)))
+		if (!createMesh(pDevice, contexMan, allocator, arena, cylinderObj_[i], CylinderMeshCreateFunc(1.0f, 1.0f, 10 + i * 6)))
 		{
 			return false;
 		}

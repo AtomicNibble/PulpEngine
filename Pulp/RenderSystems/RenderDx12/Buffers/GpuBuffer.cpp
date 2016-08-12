@@ -27,7 +27,7 @@ void GpuBuffer::destroy(void)
 	GpuResource::destroy();
 }
 
-void GpuBuffer::create(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, 
+void GpuBuffer::create(ID3D12Device* pDevice, ContextManager& contexMan,
 	DescriptorAllocator& allocator, uint32_t numElements, uint32_t elementSize,
 	const void* pInitialData)
 {
@@ -55,13 +55,13 @@ void GpuBuffer::create(ID3D12Device* pDevice, ContextManager& contexMan, Command
 	gpuVirtualAddress_ = pResource_->GetGPUVirtualAddress();
 
 	if (pInitialData) {
-		initializeBuffer(pDevice, contexMan, cmdListMan, pInitialData, bufferSize_);	
+		initializeBuffer(pDevice, contexMan, pInitialData, bufferSize_);	
 	}
 
-	createDerivedViews(pDevice, contexMan, cmdListMan, allocator);
+	createDerivedViews(pDevice, contexMan, allocator);
 }
 
-void GpuBuffer::createPlaced(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, 
+void GpuBuffer::createPlaced(ID3D12Device* pDevice, ContextManager& contexMan,
 	DescriptorAllocator& allocator, ID3D12Heap* pBackingHeap,
 	uint32_t heapOffset, uint32_t numElements, uint32_t elementSize, const void* pInitialData)
 {
@@ -81,10 +81,10 @@ void GpuBuffer::createPlaced(ID3D12Device* pDevice, ContextManager& contexMan, C
 	gpuVirtualAddress_ = pResource_->GetGPUVirtualAddress();
 
 	if (pInitialData) {
-		initializeBuffer(pDevice, contexMan, cmdListMan, pInitialData, bufferSize_);
+		initializeBuffer(pDevice, contexMan, pInitialData, bufferSize_);
 	}
 
-	createDerivedViews(pDevice, contexMan, cmdListMan, allocator);
+	createDerivedViews(pDevice, contexMan, allocator);
 }
 
 D3D12_CPU_DESCRIPTOR_HANDLE GpuBuffer::createConstantBufferView(ID3D12Device* pDevice, DescriptorAllocator& allocator,
@@ -142,7 +142,7 @@ D3D12_RESOURCE_DESC GpuBuffer::describeBuffer(void)
 }
 
 
-void GpuBuffer::initializeBuffer(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan,
+void GpuBuffer::initializeBuffer(ID3D12Device* pDevice, ContextManager& contexMan,
 	const void* pData, size_t numBytes, bool useOffset, size_t offset)
 {
 	D3D12_HEAP_PROPERTIES heapProps;
@@ -204,10 +204,9 @@ void GpuBuffer::initializeBuffer(ID3D12Device* pDevice, ContextManager& contexMa
 
 
 void ByteAddressBuffer::createDerivedViews(ID3D12Device* pDevice, ContextManager& contexMan, 
-	CommandListManger& cmdListMan, DescriptorAllocator& allocator)
+	DescriptorAllocator& allocator)
 {
 	X_UNUSED(contexMan);
-	X_UNUSED(cmdListMan);
 
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc;
@@ -266,7 +265,7 @@ const D3D12_CPU_DESCRIPTOR_HANDLE& StructuredBuffer::getCounterUAV(CommandContex
 
 
 void StructuredBuffer::createDerivedViews(ID3D12Device* pDevice, ContextManager& contexMan, 
-	CommandListManger& cmdListMan, DescriptorAllocator& allocator)
+	DescriptorAllocator& allocator)
 {
 	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc;
 	core::zero_object(SRVDesc);
@@ -291,7 +290,7 @@ void StructuredBuffer::createDerivedViews(ID3D12Device* pDevice, ContextManager&
 	UAVDesc.Buffer.StructureByteStride = elementSize_;
 	UAVDesc.Buffer.Flags = D3D12_BUFFER_UAV_FLAG_NONE;
 
-	counterBuffer_.create(pDevice, contexMan, cmdListMan, allocator, 1, 4);
+	counterBuffer_.create(pDevice, contexMan, allocator, 1, 4);
 
 	if (UAV_.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN) {
 		UAV_ = allocator.allocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -310,10 +309,9 @@ TypedBuffer::TypedBuffer(DXGI_FORMAT format) :
 
 
 void TypedBuffer::createDerivedViews(ID3D12Device* pDevice, ContextManager& contexMan, 
-	CommandListManger& cmdListMan, DescriptorAllocator& allocator)
+	DescriptorAllocator& allocator)
 {
 	X_UNUSED(contexMan);
-	X_UNUSED(cmdListMan);
 
 	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc;
 	core::zero_object(SRVDesc);

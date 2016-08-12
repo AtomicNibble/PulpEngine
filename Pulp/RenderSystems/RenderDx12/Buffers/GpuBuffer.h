@@ -19,12 +19,12 @@ public:
 	virtual void destroy(void);
 
 	// Create a buffer. If initial data is provided, it will be copied into the buffer using the default command context.
-	void create(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan,
+	void create(ID3D12Device* pDevice, ContextManager& contexMan,
 		DescriptorAllocator& allocator, uint32_t numElements, uint32_t elementSize,
 		const void* pInitialData = nullptr);
 
 	// Sub-Allocate a buffer out of a pre-allocated heap. If initial data is provided, it will be copied into the buffer using the default command context.
-	void createPlaced(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan,
+	void createPlaced(ID3D12Device* pDevice, ContextManager& contexMan,
 		DescriptorAllocator& allocator, ID3D12Heap* pBackingHeap, uint32_t heapOffset,
 		uint32_t numElements, uint32_t elementSize, const void* pInitialData = nullptr);
 
@@ -44,12 +44,12 @@ public:
 
 private:
 	D3D12_RESOURCE_DESC describeBuffer(void);
-	void initializeBuffer(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, 
+	void initializeBuffer(ID3D12Device* pDevice, ContextManager& contexMan,
 		const void* pData, size_t numBytes, bool useOffset = false, size_t offset = 0);
 
 private:
 	virtual void createDerivedViews(ID3D12Device* pDevice, ContextManager& contexMan,
-		CommandListManger& cmdListMan, DescriptorAllocator& allocator) X_ABSTRACT;
+		DescriptorAllocator& allocator) X_ABSTRACT;
 
 protected:
 	D3D12_CPU_DESCRIPTOR_HANDLE UAV_;
@@ -69,7 +69,7 @@ public:
 
 private:
 	void createDerivedViews(ID3D12Device* pDevice, ContextManager& contexMan, 
-		CommandListManger& cmdListMan, DescriptorAllocator& allocator) X_OVERRIDE;
+		DescriptorAllocator& allocator) X_OVERRIDE;
 };
 
 class IndirectArgsBuffer : public ByteAddressBuffer
@@ -95,7 +95,7 @@ public:
 
 private:
 	void createDerivedViews(ID3D12Device* pDevice, ContextManager& contexMan, 
-		CommandListManger& cmdListMan, DescriptorAllocator& allocator) X_OVERRIDE;
+		DescriptorAllocator& allocator) X_OVERRIDE;
 
 private:
 	// the RWStructuredBuffer hidden counter.
@@ -110,7 +110,7 @@ public:
 
 private:
 	void createDerivedViews(ID3D12Device* pDevice, ContextManager& contexMan, 
-		CommandListManger& cmdListMan, DescriptorAllocator& allocator) X_OVERRIDE;
+		DescriptorAllocator& allocator) X_OVERRIDE;
 
 protected:
 	DXGI_FORMAT dataFormat_;

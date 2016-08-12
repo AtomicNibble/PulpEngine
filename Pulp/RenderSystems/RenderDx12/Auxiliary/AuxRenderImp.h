@@ -66,7 +66,7 @@ public:
 	RenderAuxImp(core::MemoryArenaBase* arena);
 	~RenderAuxImp() X_OVERRIDE;
 
-	bool init(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, DescriptorAllocator& allocator);
+	bool init(ID3D12Device* pDevice, ContextManager& contexMan, DescriptorAllocator& allocator);
 	void shutDown(void);
 
 	// IRenderAuxImpl
@@ -100,13 +100,13 @@ private:
 	void prepareThickLines3D(RenderAux::AuxSortedPushArr::ConstIterator itBegin, RenderAux::AuxSortedPushArr::ConstIterator itEnd);
 
 private:
-	bool createLods(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, 
+	bool createLods(ID3D12Device* pDevice, ContextManager& contexMan,
 		DescriptorAllocator& allocator, core::MemoryArenaBase* arena);
 
 	void releaseLods(void);
 
 	template< typename TMeshFunc >
-	bool createMesh(ID3D12Device* pDevice, ContextManager& contexMan, CommandListManger& cmdListMan, DescriptorAllocator& allocator,
+	bool createMesh(ID3D12Device* pDevice, ContextManager& contexMan, DescriptorAllocator& allocator,
 		core::MemoryArenaBase* arena, AuxObjMesh& mesh, TMeshFunc meshFunc);
 
 
