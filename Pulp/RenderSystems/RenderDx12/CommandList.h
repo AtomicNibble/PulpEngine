@@ -22,7 +22,7 @@ public:
 
 	X_INLINE bool IsReady(void) const;
 	uint64_t incrementFence(void);
-	X_INLINE uint64_t getNextFenceValue(void);
+	X_INLINE uint64_t getNextFenceValue(void) const;
 	bool isFenceComplete(uint64_t fenceValue);
 	void stallForProducer(CommandQue& producer);
 	void waitForFence(uint64_t fenceValue);

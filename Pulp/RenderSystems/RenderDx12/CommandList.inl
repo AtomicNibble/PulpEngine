@@ -13,7 +13,7 @@ X_INLINE ID3D12CommandQueue* CommandQue::getCommandQueue(void)
 	return pCommandQueue_;
 }
 
-X_INLINE uint64_t CommandQue::getNextFenceValue(void)
+X_INLINE uint64_t CommandQue::getNextFenceValue(void) const
 {
 	return nextFenceValue_;
 }
