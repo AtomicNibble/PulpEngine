@@ -46,6 +46,8 @@ namespace CommandPacket
 template <typename CommandT>
 X_INLINE CommandPacket::Packet CmdPacketAllocator::create(size_t threadIdx, size_t auxMemorySize)
 {
+	static_assert(core::compileTime::IsPOD<CommandT>::Value, "Command packet type must be POD");
+
 	// we have linera allocators for each thread.
 	ThreadAllocator& allocator = *allocators_[threadIdx];
 
@@ -77,6 +79,8 @@ template <typename KeyT>
 template <typename CommandT>
 X_INLINE CommandT* CommandBucket<KeyT>::addCommand(Key key, size_t auxMemorySize)
 {
+	static_assert(core::compileTime::IsPOD<CommandT>::Value, "Command packet type must be POD");
+
 	size_t threadIdx = packetAlloc_.getThreadIdx();
 
 	CommandPacket::Packet pPacket = packetAlloc_.create<CommandT>(threadIdx, auxMemorySize);
@@ -119,6 +123,8 @@ template <typename KeyT>
 template <typename CommandT, typename ParentCmdT>
 X_INLINE CommandT* CommandBucket<KeyT>::appendCommand(ParentCmdT* pCommand, size_t auxMemorySize)
 {
+	static_assert(core::compileTime::IsPOD<CommandT>::Value, "Command packet type must be POD");
+
 	uint32_t threadIdx = packetAlloc_.getThreadIdx();
 
 	CommandPacket::Packet pPacket = packetAlloc_.create<CommandT>(threadIdx, auxMemorySize);
