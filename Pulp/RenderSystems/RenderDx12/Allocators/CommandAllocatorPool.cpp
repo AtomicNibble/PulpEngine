@@ -47,9 +47,9 @@ ID3D12CommandAllocator* CommandAllocatorPool::requestAllocator(uint64_t Complete
 
 	if (!readyAllocator_.empty())
 	{
-		std::pair<uint64_t, ID3D12CommandAllocator*>& allocatorPair = readyAllocator_.front();
+		const std::pair<uint64_t, ID3D12CommandAllocator*>& allocatorPair = readyAllocator_.front();
 
-		if (allocatorPair.first <= CompletedFenceValue)
+		if (allocatorPair.first <= CompletedFenceValue) // check it's safe to use / gpu done with it.
 		{
 			pAllocator = allocatorPair.second;
 			HRESULT hr = pAllocator->Reset();
