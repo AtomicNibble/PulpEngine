@@ -61,6 +61,26 @@ X_INLINE void CommandContext::setPredication(ID3D12Resource* pBuffer, uint64_t b
 	pCommandList_->SetPredication(pBuffer, bufferOffset, op);
 }
 
+
+X_INLINE void CommandContext::setDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type, ID3D12DescriptorHeap* pHeapPtr)
+{
+	if (pCurrentDescriptorHeaps_[type] != pHeapPtr)
+	{
+		pCurrentDescriptorHeaps_[type] = pHeapPtr;
+		bindDescriptorHeaps();
+	}
+}
+
+X_INLINE void CommandContext::flushResourceBarriers(void)
+{
+	if (numBarriersToFlush_ > 0) {
+		X_ASSERT_NOT_NULL(pCommandList_);
+
+		pCommandList_->ResourceBarrier(numBarriersToFlush_, resourceBarrierBuffer);
+		numBarriersToFlush_ = 0;
+	}
+}
+
 // ----------------------------------
 
 

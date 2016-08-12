@@ -74,7 +74,8 @@ class CommandContext
 	X_NO_COPY(CommandContext);
 	X_NO_ASSIGN(CommandContext);
 
-	static const size_t RESOURCE_BARRIER_BUF = 16;
+	// buffer some resource barries untill we perform a operation that needs them flushed or we reach this count.
+	static const size_t RESOURCE_BARRIER_BUF = 16; 
 	static const uint32_t VALID_COMPUTE_QUEUE_RESOURCE_STATES;
 
 public:
@@ -124,11 +125,11 @@ public:
 	void pIXEndEvent(void);
 	void pIXSetMarker(const wchar_t* pLabel);
 
-	void setDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type, ID3D12DescriptorHeap* pHeapPtr);
+	X_INLINE void setDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type, ID3D12DescriptorHeap* pHeapPtr);
 	void setDescriptorHeaps(uint32_t heapCount, D3D12_DESCRIPTOR_HEAP_TYPE* pType, ID3D12DescriptorHeap** pHeapPtrs);
 	X_INLINE void setPredication(ID3D12Resource* pBuffer, uint64_t bufferOffset, D3D12_PREDICATION_OP op);
 
-	void flushResourceBarriers(void);
+	X_INLINE void flushResourceBarriers(void);
 
 
 	template <uint32_t maxSubresources>

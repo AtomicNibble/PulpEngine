@@ -442,14 +442,6 @@ void CommandContext::pIXSetMarker(const wchar_t* pLabel)
 }
 
 
-void CommandContext::setDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type, ID3D12DescriptorHeap* pHeapPtr)
-{
-	if (pCurrentDescriptorHeaps_[type] != pHeapPtr)
-	{
-		pCurrentDescriptorHeaps_[type] = pHeapPtr;
-		bindDescriptorHeaps();
-	}
-}
 
 void CommandContext::setDescriptorHeaps(uint32_t heapCount, D3D12_DESCRIPTOR_HEAP_TYPE* pTypes, 
 	ID3D12DescriptorHeap** pHeapPtrs)
@@ -470,17 +462,6 @@ void CommandContext::setDescriptorHeaps(uint32_t heapCount, D3D12_DESCRIPTOR_HEA
 	}
 }
 
-
-
-void CommandContext::flushResourceBarriers(void)
-{
-	if (numBarriersToFlush_ > 0) {
-		X_ASSERT_NOT_NULL(pCommandList_);
-
-		pCommandList_->ResourceBarrier(numBarriersToFlush_, resourceBarrierBuffer);
-		numBarriersToFlush_ = 0;
-	}
-}
 
 void CommandContext::bindDescriptorHeaps(void)
 {
