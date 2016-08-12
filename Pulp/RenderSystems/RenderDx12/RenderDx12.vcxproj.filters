@@ -167,6 +167,9 @@
     <ClInclude Include="Model\Mesh.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
+    <ClInclude Include="CommandQue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -271,6 +274,9 @@
     <ClCompile Include="Model\Mesh.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
+    <ClCompile Include="CommandQue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="CommandList.inl">
@@ -347,6 +353,9 @@
     </None>
     <None Include="Vars\RenderVars.inl">
       <Filter>Header Files\Vars</Filter>
+    </None>
+    <None Include="CommandQue.inl">
+      <Filter>Header Files</Filter>
     </None>
   </ItemGroup>
 </Project>

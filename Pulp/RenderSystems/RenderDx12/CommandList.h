@@ -4,49 +4,11 @@
 #ifndef X_COMMAND_QUE_H_
 #define X_COMMAND_QUE_H_
 
-#include "Allocators\CommandAllocatorPool.h"
-#include <Threading\CriticalSection.h>
+#include "CommandQue.h"
 
 X_NAMESPACE_BEGIN(render)
 
 class PSO;
-
-class CommandQue
-{
-public:
-	CommandQue(core::MemoryArenaBase* arena, D3D12_COMMAND_LIST_TYPE type);
-	~CommandQue();
-
-	bool create(ID3D12Device* pDevice);
-	void shutdown(void);
-
-	X_INLINE bool IsReady(void) const;
-	uint64_t incrementFence(void);
-	X_INLINE uint64_t getNextFenceValue(void) const;
-	bool isFenceComplete(uint64_t fenceValue);
-	void stallForProducer(CommandQue& producer);
-	void waitForFence(uint64_t fenceValue);
-	X_INLINE void waitForIdle(void);
-
-	uint64_t executeCommandList(ID3D12CommandList* pList);
-
-	X_INLINE ID3D12CommandQueue* getCommandQueue(void);
-	ID3D12CommandAllocator* requestAllocator(void);
-	void discardAllocator(uint64_t FenceValue, ID3D12CommandAllocator* Allocator);
-
-private:
-	ID3D12CommandQueue* pCommandQueue_;
-	ID3D12Fence* pFence_;
-	const D3D12_COMMAND_LIST_TYPE type_;
-	CommandAllocatorPool allocatorPool_;
-
-	core::CriticalSection eventCs_;
-	core::CriticalSection fenceCs_;
-
-	uint64_t nextFenceValue_;
-	uint64_t lastCompletedFenceValue_;
-	HANDLE fenceEventHandle_;
-};
 
 
 class CommandListManger
@@ -85,7 +47,6 @@ private:
 	CommandQue graphicsQueue_;
 	CommandQue computeQueue_;
 	CommandQue copyQueue_;
-
 };
 
 
