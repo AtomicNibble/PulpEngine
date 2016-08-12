@@ -179,7 +179,7 @@ void GpuBuffer::initializeBuffer(ID3D12Device* pDevice, ContextManager& contexMa
 	pUploadBuffer->Unmap(0, nullptr);
 
 
-	render::CommandContext* pContext = contexMan.allocateContext(cmdListMan, D3D12_COMMAND_LIST_TYPE_DIRECT);
+	render::CommandContext* pContext = contexMan.allocateContext(D3D12_COMMAND_LIST_TYPE_DIRECT);
 
 	// copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
 	pContext->transitionResource(*this, D3D12_RESOURCE_STATE_COPY_DEST, true);

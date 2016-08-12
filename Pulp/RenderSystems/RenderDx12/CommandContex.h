@@ -48,11 +48,11 @@ class ContextManager
 
 public:
 	ContextManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
-		DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan);
+		CommandListManger& cmdListMan, DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan);
 	~ContextManager();
 
-	GraphicsContext* allocateGraphicsContext(CommandListManger& cmdListMan);
-	CommandContext* allocateContext(CommandListManger& cmdListMan, D3D12_COMMAND_LIST_TYPE type);
+	GraphicsContext* allocateGraphicsContext(void);
+	CommandContext* allocateContext(D3D12_COMMAND_LIST_TYPE type);
 
 	void freeContext(CommandContext* pContex);
 	void destroyAllContexts(void);
@@ -60,6 +60,7 @@ public:
 private:
 	core::MemoryArenaBase* arena_;
 	ID3D12Device* pDevice_;
+	CommandListManger& cmdListMan_;
 	DescriptorAllocatorPool& pool_;
 	LinearAllocatorManager& linAllocMan_;
 

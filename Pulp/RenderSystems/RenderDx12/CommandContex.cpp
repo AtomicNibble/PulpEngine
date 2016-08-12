@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "CommandContex.h"
-#include "CommandList.h"
+#include "CommandListManger.h"
 #include "CommandSignature.h"
 #include "RootSignature.h"
 #include "Buffers\GpuBuffer.h"
@@ -51,9 +51,10 @@ X_DISABLE_WARNING(4355) // 'this': used in base member initializer list
 
 
 ContextManager::ContextManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
-		DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan) :
+	CommandListManger& cmdListMan, DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan) :
 	arena_(arena),
 	pDevice_(pDevice),
+	cmdListMan_(cmdListMan),
 	pool_(pool),
 	linAllocMan_(linAllocMan),
 	contextPool_{ arena, arena, arena, arena }
@@ -66,12 +67,12 @@ ContextManager::~ContextManager()
 
 }
 
-GraphicsContext* ContextManager::allocateGraphicsContext(CommandListManger& cmdListMan)
+GraphicsContext* ContextManager::allocateGraphicsContext(void)
 {
-	return reinterpret_cast<GraphicsContext*>(allocateContext(cmdListMan, D3D12_COMMAND_LIST_TYPE_DIRECT));
+	return reinterpret_cast<GraphicsContext*>(allocateContext(D3D12_COMMAND_LIST_TYPE_DIRECT));
 }
 
-CommandContext* ContextManager::allocateContext(CommandListManger& cmdListMan, D3D12_COMMAND_LIST_TYPE type)
+CommandContext* ContextManager::allocateContext(D3D12_COMMAND_LIST_TYPE type)
 {
 	core::CriticalSection::ScopedLock lock(cs_);
 
@@ -80,7 +81,7 @@ CommandContext* ContextManager::allocateContext(CommandListManger& cmdListMan, D
 	CommandContext* pRet = nullptr;
 	if (availableContexts.empty())
 	{
-		pRet = X_NEW(CommandContext, arena_, "CmdContex")(*this, cmdListMan, arena_, pDevice_, pool_, linAllocMan_, type);
+		pRet = X_NEW(CommandContext, arena_, "CmdContex")(*this, cmdListMan_, arena_, pDevice_, pool_, linAllocMan_, type);
 		contextPool_[type].emplace_back(pRet);
 		pRet->initialize();
 	}

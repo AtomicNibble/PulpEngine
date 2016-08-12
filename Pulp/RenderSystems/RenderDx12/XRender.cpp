@@ -163,7 +163,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 	DescriptorAllocatorPool& descriptorAllocatorPool = *pDescriptorAllocatorPool_;
 
 	pLinearAllocatorMan_ = X_NEW(LinearAllocatorManager, arena_, "LinAlocMan")(arena_, pDevice_, cmdListManager_);
-	pContextMan_ = X_NEW(ContextManager, arena_, "ContextMan")(arena_, pDevice_, descriptorAllocatorPool, *pLinearAllocatorMan_);
+	pContextMan_ = X_NEW(ContextManager, arena_, "ContextMan")(arena_, pDevice_, cmdListManager_, descriptorAllocatorPool, *pLinearAllocatorMan_);
 	pRootSigCache_ = X_NEW(RootSignatureDeviceCache, arena_, "RootSignatureDeviceCache")(arena_, pDevice_);
 	pPSOCache_ = X_NEW(PSODeviceCache, arena_, "PSODeviceCache")(arena_, pDevice_);
 
@@ -401,7 +401,7 @@ void XRender::renderBegin(void)
 		displayPlane_[currentBufferIdx_].getRTV()
 	};
 
-	GraphicsContext* pContext = pContextMan_->allocateGraphicsContext(cmdListManager_);
+	GraphicsContext* pContext = pContextMan_->allocateGraphicsContext();
 
 	pContext->transitionResource(displayPlane_[currentBufferIdx_], D3D12_RESOURCE_STATE_RENDER_TARGET);
 	pContext->setViewportAndScissor(0, 0, currentNativeRes_.x, currentNativeRes_.y);

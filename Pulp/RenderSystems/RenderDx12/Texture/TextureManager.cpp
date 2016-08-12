@@ -366,7 +366,7 @@ X_NAMESPACE_BEGIN(texture)
 		}
 
 		// we going todo this sync, but could keep hold of the resource and release when done.
-		render::CommandContext* pContext = contextMan_.allocateContext(cmdListManager_, D3D12_COMMAND_LIST_TYPE_DIRECT);
+		render::CommandContext* pContext = contextMan_.allocateContext(D3D12_COMMAND_LIST_TYPE_DIRECT);
 
 		// copy data to the intermediate upload heap and then schedule a copy from the upload heap to the default texture
 		pContext->transitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST, true);
