@@ -7,9 +7,12 @@
 
 X_NAMESPACE_BEGIN(render)
 
-DescriptorAllocatorPool::DescriptorAllocatorPool(core::MemoryArenaBase* arena, ID3D12Device* pDevice, CommandListManger& commandManager) :
+DescriptorAllocatorPool::DescriptorAllocatorPool(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
+	CommandListManger& commandManager) :
 	pDevice_(pDevice),
 	commandManager_(commandManager),
+	retiredDescriptorHeaps_(arena),
+	availableDescriptorHeaps_(arena),
 	descriptorHeapPool_(arena)
 {
 
@@ -24,15 +27,15 @@ ID3D12DescriptorHeap* DescriptorAllocatorPool::requestDescriptorHeap(void)
 {
 	core::CriticalSection::ScopedLock lock(cs_);
 
-	while (!retiredDescriptorHeaps_.empty() && commandManager_.isFenceComplete(retiredDescriptorHeaps_.front().first))
+	while(retiredDescriptorHeaps_.isNotEmpty() && commandManager_.isFenceComplete(retiredDescriptorHeaps_.peek().first))
 	{
-		availableDescriptorHeaps_.push(retiredDescriptorHeaps_.front().second);
+		availableDescriptorHeaps_.push(retiredDescriptorHeaps_.peek().second);
 		retiredDescriptorHeaps_.pop();
 	}
 
-	if (!availableDescriptorHeaps_.empty())
+	if (availableDescriptorHeaps_.isNotEmpty())
 	{
-		ID3D12DescriptorHeap* pHeapPtr = availableDescriptorHeaps_.front();
+		ID3D12DescriptorHeap* pHeapPtr = availableDescriptorHeaps_.peek();
 		availableDescriptorHeaps_.pop();
 		return pHeapPtr;
 	}

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "DescriptorAllocator.h" // DescriptorHandle
-#include <queue>
+#include <Containers\Fifo.h>
 
 X_NAMESPACE_BEGIN(render)
 
@@ -26,8 +26,8 @@ private:
 	CommandListManger& commandManager_;
 
 	core::CriticalSection cs_;
-	std::queue<std::pair<uint64_t, ID3D12DescriptorHeap*>> retiredDescriptorHeaps_;
-	std::queue<ID3D12DescriptorHeap*> availableDescriptorHeaps_;
+	core::Fifo<std::pair<uint64_t, ID3D12DescriptorHeap*>> retiredDescriptorHeaps_;
+	core::Fifo<ID3D12DescriptorHeap*> availableDescriptorHeaps_;
 	core::Array<ID3D12DescriptorHeap*> descriptorHeapPool_;
 };
 
