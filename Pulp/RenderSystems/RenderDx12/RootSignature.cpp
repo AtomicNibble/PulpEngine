@@ -50,8 +50,8 @@ bool RootSignatureDeviceCache::compile(D3D12_ROOT_SIGNATURE_DESC& rootDesc, D3D1
 
 	if (notCompiled)
 	{
-		ID3DBlob* pOutBlob;
-		ID3DBlob* pErrorBlob;
+		Microsoft::WRL::ComPtr<ID3DBlob> pOutBlob;
+		Microsoft::WRL::ComPtr<ID3DBlob> pErrorBlob;
 
 		HRESULT hr = D3D12SerializeRootSignature(&rootDesc, D3D_ROOT_SIGNATURE_VERSION_1, &pOutBlob, &pErrorBlob);
 		if (FAILED(hr)) {
@@ -61,20 +61,16 @@ bool RootSignatureDeviceCache::compile(D3D12_ROOT_SIGNATURE_DESC& rootDesc, D3D1
 			}
 
 			X_FATAL("Dx12", "Failed to serialize root signature: %" PRIu32 " Err: \"%s\"", hr, pErr);
-			core::SafeReleaseDX(pOutBlob);
-			core::SafeReleaseDX(pErrorBlob);
 			return false;
 		}
 
 		hr = pDevice_->CreateRootSignature(1, pOutBlob->GetBufferPointer(), pOutBlob->GetBufferSize(), IID_PPV_ARGS(pSignature));
 		if (FAILED(hr)) {
 			X_FATAL("Dx12", "Failed to create root signature: %" PRIu32, hr);
+			return false;
 		}
 
 		D3DDebug::SetDebugObjectName(*pSignature, L"RootSignature");
-
-		core::SafeReleaseDX(pOutBlob);
-		core::SafeReleaseDX(pErrorBlob);
 
 		*pRootSigRef = *pSignature;
 	}
