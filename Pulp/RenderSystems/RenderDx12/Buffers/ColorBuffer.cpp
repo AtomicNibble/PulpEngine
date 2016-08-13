@@ -20,6 +20,7 @@ void ColorBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator&
 	DXGI_FORMAT format, uint32_t arraySize, uint32_t numMips)
 {
 	X_ASSERT(arraySize == 1 || numMips == 1, "auto-mips on texture arrays not supported")(arraySize, numMips);
+	X_ASSERT(numMips < texture::TEX_MAX_MIPS, "numMips exceeds max")(numMips, texture::TEX_MAX_MIPS)
 
 	numMipMaps_ = numMips - 1;
 
