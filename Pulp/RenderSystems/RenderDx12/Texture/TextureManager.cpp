@@ -379,14 +379,14 @@ X_NAMESPACE_BEGIN(texture)
 	}
 
 	uint64_t TextureManager::getRequiredIntermediateSize(ID3D12Resource* pDestinationResource,
-		UINT FirstSubresource, UINT NumSubresources)
+		uint32_t firstSubresource, uint32_t numSubresources)
 	{
 		const D3D12_RESOURCE_DESC desc = pDestinationResource->GetDesc();
 		uint64_t requiredSize = 0;
 
 		ID3D12Device* pDevice;
 		pDestinationResource->GetDevice(__uuidof(*pDevice), reinterpret_cast<void**>(&pDevice));
-		pDevice->GetCopyableFootprints(&desc, FirstSubresource, NumSubresources, 0, nullptr, nullptr, nullptr, &requiredSize);
+		pDevice->GetCopyableFootprints(&desc, firstSubresource, numSubresources, 0, nullptr, nullptr, nullptr, &requiredSize);
 		pDevice->Release();
 
 		return requiredSize;
