@@ -241,7 +241,7 @@ void DynamicDescriptorHeap::DescriptorHandleCache::stageDescriptorHandles(uint32
 
 	DescriptorTableCache& tableCache = rootDescriptorTable_[rootIndex];
 	D3D12_CPU_DESCRIPTOR_HANDLE* pCopyDest = tableCache.pTableStart + offset;
-	for (UINT i = 0; i < numHandles; ++i) {
+	for (uint32_t i = 0; i < numHandles; ++i) {
 		pCopyDest[i] = pHandles[i];
 	}
 
