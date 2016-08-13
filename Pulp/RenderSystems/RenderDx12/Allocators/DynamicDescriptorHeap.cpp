@@ -367,7 +367,7 @@ void DynamicDescriptorHeap::retireCurrentHeap(void)
 	{
 		// we should not of allocated a heap if we never used it.
 		// currently this will leak.
-		X_ASSERT(pCurrentHeapPtr_ == nullptr, "Current heap pointer should not be null")(pCurrentHeapPtr_);
+		X_ASSERT(pCurrentHeapPtr_ == nullptr, "Heap was allocated but never used")(pCurrentHeapPtr_);
 		return;
 	}
 
