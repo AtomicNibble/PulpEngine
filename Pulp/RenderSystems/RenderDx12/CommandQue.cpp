@@ -140,7 +140,11 @@ uint64_t CommandQue::executeCommandList(ID3D12CommandList* pList)
 	core::CriticalSection::ScopedLock lock(fenceCs_);
 	X_ASSERT_NOT_NULL(pList);
 
-	static_cast<ID3D12GraphicsCommandList*>(pList)->Close();
+	HRESULT hr = static_cast<ID3D12GraphicsCommandList*>(pList)->Close();
+	if (FAILED(hr)) {
+		X_FATAL("Dx12", "Command list failed to close!");
+		return 0;
+	}
 
 	// Kickoff the command list
 	pCommandQueue_->ExecuteCommandLists(1, &pList);
