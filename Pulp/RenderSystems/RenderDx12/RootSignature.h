@@ -44,7 +44,9 @@ static_assert(sizeof(RootParameter) == sizeof(D3D12_ROOT_PARAMETER), "rootParam 
 
 class RootSignatureDeviceCache
 {
+public:
 	typedef core::Hash::xxHash64::HashVal HashVal;
+private:
 	typedef core::HashMap<HashVal, ID3D12RootSignature* > SigMap;
 
 public:
@@ -53,10 +55,8 @@ public:
 
 	void destoryAll(void);
 
-	bool compile(D3D12_ROOT_SIGNATURE_DESC& rootDesc, D3D12_ROOT_SIGNATURE_FLAGS flags, ID3D12RootSignature** pSignature);
-	
-private:
-	static HashVal getHash(D3D12_ROOT_SIGNATURE_DESC& rootDesc, D3D12_ROOT_SIGNATURE_FLAGS flags);
+	bool compile(D3D12_ROOT_SIGNATURE_DESC& rootDesc, RootSignatureDeviceCache::HashVal hash,
+		D3D12_ROOT_SIGNATURE_FLAGS flags, ID3D12RootSignature** pSignature);
 
 private:
 	core::CriticalSection cacheLock_;
@@ -95,6 +95,11 @@ public:
 
 	X_INLINE uint32_t descriptorTableBitMap(void) const;
 	X_INLINE uint32_t descriptorTableSize(size_t idx) const;
+
+private:
+	RootSignatureDeviceCache::HashVal gethashAndPopulateDescriptorTableMap(D3D12_ROOT_SIGNATURE_DESC& rootDesc, 
+		D3D12_ROOT_SIGNATURE_FLAGS flags);
+
 
 protected:
 	core::Array<RootParameter> params_;

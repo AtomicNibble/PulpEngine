@@ -25,12 +25,10 @@ void RootSignatureDeviceCache::destoryAll(void)
 	cache_.clear();
 }
 
-bool RootSignatureDeviceCache::compile(D3D12_ROOT_SIGNATURE_DESC& rootDesc, D3D12_ROOT_SIGNATURE_FLAGS flags, 
-	ID3D12RootSignature** pSignature)
+bool RootSignatureDeviceCache::compile(D3D12_ROOT_SIGNATURE_DESC& rootDesc, RootSignatureDeviceCache::HashVal hash, 
+	D3D12_ROOT_SIGNATURE_FLAGS flags, ID3D12RootSignature** pSignature)
 {
 	X_ASSERT_NOT_NULL(pSignature);
-
-	HashVal hash = getHash(rootDesc, flags);
 
 	ID3D12RootSignature** pRootSigRef = nullptr;
 	bool notCompiled = false;
@@ -84,43 +82,6 @@ bool RootSignatureDeviceCache::compile(D3D12_ROOT_SIGNATURE_DESC& rootDesc, D3D1
 	}
 
 	return true;
-}
-
-RootSignatureDeviceCache::HashVal RootSignatureDeviceCache::getHash(D3D12_ROOT_SIGNATURE_DESC& rootDesc,
-	D3D12_ROOT_SIGNATURE_FLAGS flags)
-{
-	core::Hash::xxHash64 hasher;
-
-	hasher.reset(0);
- 	hasher.update(rootDesc.pStaticSamplers, rootDesc.NumStaticSamplers);
-
-	for (uint32_t param = 0; param < rootDesc.NumParameters; ++param)
-	{
-		const auto& rootParam = rootDesc.pParameters[param];
-
-		if (rootParam.ParameterType == D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE)
-		{
-			X_ASSERT_NOT_NULL(rootParam.DescriptorTable.pDescriptorRanges);
-
-			hasher.update(rootParam.DescriptorTable.pDescriptorRanges, rootParam.DescriptorTable.NumDescriptorRanges);
-
-			// We don't care about sampler descriptor tables.  We don't cache them
-			if (rootParam.DescriptorTable.pDescriptorRanges->RangeType == D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER) {
-				continue;
-			}
-
-			// ...
-		}
-		else
-		{
-			hasher.update(&rootParam, 1);
-		}
-	}
-
-	// include flags?
-	hasher.update(&flags, 1);
-
-	return hasher.finalize();
 }
 
 // --------------------------------------------------------
@@ -251,10 +212,56 @@ void RootSignature::finalize(RootSignatureDeviceCache& cache, D3D12_ROOT_SIGNATU
 
 #endif // !X_DEBUG
 
+	auto hash = gethashAndPopulateDescriptorTableMap(rootDesc, flags);
 
-	if (!cache.compile(rootDesc, flags, &pSignature_)) {
+	if (!cache.compile(rootDesc, hash, flags, &pSignature_)) {
 		X_ERROR("Dx12", "Failed to compile root sig");
 	}
+}
+
+
+RootSignatureDeviceCache::HashVal RootSignature::gethashAndPopulateDescriptorTableMap(D3D12_ROOT_SIGNATURE_DESC& rootDesc,
+	D3D12_ROOT_SIGNATURE_FLAGS flags)
+{
+	core::Hash::xxHash64 hasher;
+
+	hasher.reset(0);
+	hasher.update(rootDesc.pStaticSamplers, rootDesc.NumStaticSamplers);
+
+	for (uint32_t param = 0; param < rootDesc.NumParameters; ++param)
+	{
+		const auto& rootParam = rootDesc.pParameters[param];
+
+		if (rootParam.ParameterType == D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE)
+		{
+			X_ASSERT_NOT_NULL(rootParam.DescriptorTable.pDescriptorRanges);
+
+			hasher.update(rootParam.DescriptorTable.pDescriptorRanges, rootParam.DescriptorTable.NumDescriptorRanges);
+
+			// We don't care about sampler descriptor tables.  We don't cache them
+			if (rootParam.DescriptorTable.pDescriptorRanges->RangeType == D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER) {
+				continue;
+			}
+
+			// ...
+			descriptorTableBitMap_ |= (1 << param);
+
+			for (uint32_t tableRange = 0; tableRange < rootParam.DescriptorTable.NumDescriptorRanges; ++tableRange) {
+				descriptorTableSize_[param] += rootParam.DescriptorTable.pDescriptorRanges[tableRange].NumDescriptors;
+			}
+
+			maxDescriptorCacheHandleCount_ += descriptorTableSize_[param];
+		}
+		else
+		{
+			hasher.update(&rootParam, 1);
+		}
+	}
+
+	// include flags?
+	hasher.update(&flags, 1);
+
+	return hasher.finalize();
 }
 
 
