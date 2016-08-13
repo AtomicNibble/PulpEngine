@@ -10,7 +10,10 @@ ColorBuffer::ColorBuffer(Colorf clearCol) :
 {
 	SRVHandle_.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 	RTVHandle_.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
-	core::zero_object(UAVHandle_);
+
+	// set these to value of D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN
+	static_assert(D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN == -1, "Memset needs updating to set correct unkown address");
+	std::memset(UAVHandle_, 0xFF, sizeof(UAVHandle_));
 }
 
 void ColorBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator& allocator, 
