@@ -250,6 +250,12 @@ RootSignatureDeviceCache::HashVal RootSignature::gethashAndPopulateDescriptorTab
 				descriptorTableSize_[param] += rootParam.DescriptorTable.pDescriptorRanges[tableRange].NumDescriptors;
 			}
 
+			if (descriptorTableSize_[param] > 32) {
+				// this is due to 32bit flags in DecriptorCache
+				X_ERROR("Dx12", "RootSig param %" PRIu32" table size %" PRIu32 " > 32, which exceeds the artifical limit", 
+					param, descriptorTableSize_[param]);
+			}
+
 			maxDescriptorCacheHandleCount_ += descriptorTableSize_[param];
 		}
 		else
