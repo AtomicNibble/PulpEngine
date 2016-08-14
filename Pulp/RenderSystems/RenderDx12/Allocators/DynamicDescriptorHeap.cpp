@@ -432,6 +432,16 @@ void DynamicDescriptorHeap::copyAndBindStagedTables(DescriptorHandleCache& handl
 	{
 		retireCurrentHeap();
 		unbindAllValid();
+
+#if X_DEBUG
+		getHeapPointer();
+		if (!hasSpace(neededSize))
+		{
+			// not even a empty heap can fit the request :(
+			X_ASSERT_UNREACHABLE();
+			return;
+		}
+#endif // !X_DEBUG
 	}
 
 	// This can trigger the creation of a new heap
