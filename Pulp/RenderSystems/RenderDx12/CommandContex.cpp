@@ -456,6 +456,9 @@ void CommandContext::setDescriptorHeaps(uint32_t heapCount, D3D12_DESCRIPTOR_HEA
 
 	for (uint32_t i = 0; i < heapCount; ++i)
 	{
+		X_ASSERT(pTypes[i] != D3D12_DESCRIPTOR_HEAP_TYPE_RTV, "Heap type RTV not allowed on command list")(pTypes[i]);
+		X_ASSERT(pTypes[i] != D3D12_DESCRIPTOR_HEAP_TYPE_DSV, "Heap type DSV not allowed on command list")(pTypes[i]);
+
 		if (pCurrentDescriptorHeaps_[pTypes[i]] != pHeapPtrs[i])
 		{
 			pCurrentDescriptorHeaps_[pTypes[i]] = pHeapPtrs[i];
@@ -471,11 +474,15 @@ void CommandContext::setDescriptorHeaps(uint32_t heapCount, D3D12_DESCRIPTOR_HEA
 
 void CommandContext::bindDescriptorHeaps(void)
 {
-
 	uint32_t nonNullHeaps = 0;
-	ID3D12DescriptorHeap* pHeapsToBind[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
+	ID3D12DescriptorHeap* pHeapsToBind[MAX_DISTRIPTOR_HEAP_TYPES];
 
-	for (uint32_t i = 0; i < D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES; ++i)
+	// make sure the enum's we allow are as expected.
+	// if not we need to change how we cache / store them in pCurrentDescriptorHeaps_
+	static_assert(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV == 0, "Enum changed");
+	static_assert(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER == 1, "Enum changed");
+
+	for (uint32_t i = 0; i < MAX_DISTRIPTOR_HEAP_TYPES; ++i)
 	{
 		ID3D12DescriptorHeap* HeapIter = pCurrentDescriptorHeaps_[i];
 		if (HeapIter != nullptr) {

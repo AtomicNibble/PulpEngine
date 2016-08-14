@@ -77,6 +77,9 @@ X_INLINE void CommandContext::setPredication(ID3D12Resource* pBuffer, uint64_t b
 
 X_INLINE void CommandContext::setDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type, ID3D12DescriptorHeap* pHeapPtr)
 {
+	X_ASSERT(type != D3D12_DESCRIPTOR_HEAP_TYPE_RTV, "Heap type RTV not allowed on command list")(type);
+	X_ASSERT(type != D3D12_DESCRIPTOR_HEAP_TYPE_DSV, "Heap type DSV not allowed on command list")(type);
+
 	if (pCurrentDescriptorHeaps_[type] != pHeapPtr)
 	{
 		pCurrentDescriptorHeaps_[type] = pHeapPtr;

@@ -80,9 +80,9 @@ class CommandContext
 	X_NO_ASSIGN(CommandContext);
 
 	// buffer some resource barries untill we perform a operation that needs them flushed or we reach this count.
+	static const size_t MAX_DISTRIPTOR_HEAP_TYPES = 2;
 	static const size_t RESOURCE_BARRIER_BUF = 16; 
 	static const uint32_t VALID_COMPUTE_QUEUE_RESOURCE_STATES;
-
 public:
 	CommandContext(ContextManager& contexMan, core::MemoryArenaBase* arena, ID3D12Device* pDevice,
 		 DescriptorAllocatorPool& pool, LinearAllocatorManager& linAllocMan, D3D12_COMMAND_LIST_TYPE type);
@@ -170,7 +170,8 @@ protected:
 	uint32_t numBarriersToFlush_;
 	D3D12_RESOURCE_BARRIER resourceBarrierBuffer[RESOURCE_BARRIER_BUF];
 
-	ID3D12DescriptorHeap* pCurrentDescriptorHeaps_[D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES];
+	// we only allow: SBC_SRV_UAV & SAMPLER
+	ID3D12DescriptorHeap* pCurrentDescriptorHeaps_[MAX_DISTRIPTOR_HEAP_TYPES];
 
 	D3D12_COMMAND_LIST_TYPE type_;
 };
