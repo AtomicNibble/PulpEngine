@@ -41,3 +41,29 @@ extern core::MemoryArenaBase* g_rendererArena;
 extern core::MemoryArenaBase* g_textureDataArena;
 
 X_NAMESPACE_END
+
+
+/*
+
+Some notes about dx12, mostly about what's thread safe / thread free
+as the info is spread all over the docs.
+
+notes:
+
+Threading:
+	* All methods for creating descriptors are free threaded.
+
+	* The ID3D12Device::CopyDescriptors and ID3D12Device::CopyDescriptorsSimple methods on the device interface
+	use the CPU to immediately copy descriptors. They can be called free threaded as long as multiple threads 
+	on the CPU or GPU do not perform any potentially conflicting writes.
+
+
+	* Create PSOs on worker threads asynchronously
+	PSO creation is where shaders compilation and related stalls happen
+
+
+
+
+links: https://developer.nvidia.com/dx12-dos-and-donts
+
+*/
