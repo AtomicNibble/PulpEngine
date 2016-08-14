@@ -359,6 +359,7 @@
     <ClInclude Include="Texture\Texture.h" />
     <ClInclude Include="Texture\TextureManager.h" />
     <ClInclude Include="Texture\TextureVars.h" />
+    <ClInclude Include="Util\Config.h" />
     <ClInclude Include="Util\Constants.h" />
     <ClInclude Include="Util\DebugNameUtil.h" />
     <ClInclude Include="Util\DxTypeHelpers.h" />

@@ -19,6 +19,7 @@ X_DISABLE_WARNING(4005)
 
 X_ENABLE_WARNING(4005)
 
+#include "Util/Config.h"
 #include "Util/Constants.h"
 #include "Util/DxTypeHelpers.h"
 #include "Util/DebugNameUtil.h"
@@ -62,6 +63,8 @@ Threading:
 	PSO creation is where shaders compilation and related stalls happen
 
 
+
+Descriptor heap useful: https://msdn.microsoft.com/en-us/library/windows/desktop/mt709128(v=vs.85).aspx
 
 
 links: https://developer.nvidia.com/dx12-dos-and-donts
