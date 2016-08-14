@@ -126,7 +126,10 @@ void DynamicDescriptorHeap::DescriptorHandleCache::copyAndBindStaleTables(ID3D12
 	uint32_t neededSpace = 0;
 	uint32_t rootIndex;
 
-
+#if X_DEBUG
+	core::fill_object(tableSize, 0xFF);
+	core::fill_object(rootIndices, 0xFF);
+#endif // !X_DEBUG
 
 	// Sum the maximum assigned offsets of stale descriptor tables to determine total needed space.
 	uint32_t staleParams = staleRootParamsBitMap_;
@@ -146,6 +149,9 @@ void DynamicDescriptorHeap::DescriptorHandleCache::copyAndBindStaleTables(ID3D12
 
 	X_ASSERT(staleParamCount <= DescriptorHandleCache::MAXNUM_DESCRIPTOR_TABLES,
 		"We're only equipped to handle so many descriptor tables")(staleParamCount);
+	// you should not be calling this function if nothing is stale!
+	X_ASSERT(staleParamCount > 0, "No params are stale")(staleParamCount);
+
 
 	staleRootParamsBitMap_ = 0;
 
@@ -156,6 +162,13 @@ void DynamicDescriptorHeap::DescriptorHandleCache::copyAndBindStaleTables(ID3D12
 	uint32_t numSrcDescriptorRanges = 0;
 	D3D12_CPU_DESCRIPTOR_HANDLE pSrcDescriptorRangeStarts[DescriptorHandleCache::MAX_DESCRIPTORS_PER_COPY];
 	uint32_t pSrcDescriptorRangeSizes[DescriptorHandleCache::MAX_DESCRIPTORS_PER_COPY];
+
+#if X_DEBUG
+	// is this a good idea, might causes a bug to apepar only in release mode :S
+	// instead of zero i'll set to -1
+	core::fill_object(pDestDescriptorRangeSizes, 0xFF);
+	core::fill_object(pSrcDescriptorRangeSizes, 0xFF);
+#endif // !X_DEBUG
 
 	for (uint32_t i = 0; i < staleParamCount; ++i)
 	{
@@ -184,6 +197,7 @@ void DynamicDescriptorHeap::DescriptorHandleCache::copyAndBindStaleTables(ID3D12
 			// If we run out of temp room, copy what we've got so far
 			if (numSrcDescriptorRanges + descriptorCount > DescriptorHandleCache::MAX_DESCRIPTORS_PER_COPY)
 			{
+				// thread free
 				pDevice->CopyDescriptors(
 					numDestDescriptorRanges, pDestDescriptorRangeStarts, pDestDescriptorRangeSizes,
 					numSrcDescriptorRanges, pSrcDescriptorRangeStarts, pSrcDescriptorRangeSizes,
@@ -212,6 +226,8 @@ void DynamicDescriptorHeap::DescriptorHandleCache::copyAndBindStaleTables(ID3D12
 		}
 	}
 
+
+	// thread free
 	pDevice->CopyDescriptors(
 		numDestDescriptorRanges, pDestDescriptorRangeStarts, pDestDescriptorRangeSizes,
 		numSrcDescriptorRanges, pSrcDescriptorRangeStarts, pSrcDescriptorRangeSizes,
@@ -339,6 +355,7 @@ D3D12_GPU_DESCRIPTOR_HANDLE DynamicDescriptorHeap::uploadDirect(D3D12_CPU_DESCRI
 	DescriptorHandle destHandle = firstDescriptor_ + currentOffset_ * getDescriptorSize();
 	currentOffset_ += 1;
 
+	// thread free
 	pDevice_->CopyDescriptorsSimple(1, destHandle.getCpuHandle(), handle, D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 
 	return destHandle.getGpuHandle();
