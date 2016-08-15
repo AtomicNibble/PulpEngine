@@ -15,6 +15,9 @@
     <Filter Include="Source Files\AssetDB">
       <UniqueIdentifier>{e25271b1-d938-405b-9ae4-65a6fc120c52}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\EngineModule">
+      <UniqueIdentifier>{f5d914e0-47dc-4da1-9417-f8eac7bfb540}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -34,8 +37,8 @@
     <ClCompile Include="AssetDB.cpp">
       <Filter>Source Files\AssetDB</Filter>
     </ClCompile>
-    <ClCompile Include="AssetDBLib.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Module.cpp">
+      <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -330,7 +330,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssetDB.cpp" />
-    <ClCompile Include="AssetDBLib.cpp" />
+    <ClCompile Include="Module.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
