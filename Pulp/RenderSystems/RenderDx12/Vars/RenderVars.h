@@ -16,6 +16,7 @@ public:
 
 	void registerVars(void);
 
+	X_INLINE bool enableDebugLayer(void) const;
 	X_INLINE bool drawAux(void) const;
 	X_INLINE const Colorf& getClearCol(void) const;
 
@@ -23,6 +24,7 @@ public:
 	void setRes(const Vec2<uint32_t>& res);
 
 private:
+	int32_t debugLayer_;
 	int32_t drawAux_;
 	Colorf clearColor_;
 

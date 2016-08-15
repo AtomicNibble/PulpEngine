@@ -10,6 +10,7 @@ RenderVars::RenderVars() :
 	pRes_(nullptr)
 {
 	// defaults
+	debugLayer_ = 0; // the debug override is not done here, otherwise it would not override config values.
 	drawAux_ = 0;
 
 	clearColor_ = Color(0.057f, 0.221f, 0.400f);
@@ -18,6 +19,9 @@ RenderVars::RenderVars() :
 
 void RenderVars::registerVars(void)
 {
+	ADD_CVAR_REF("r_d3d_debug_layer", debugLayer_, debugLayer_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+		"Enable d3d debug layer");
+
 	ADD_CVAR_REF("r_draw_aux", drawAux_, drawAux_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Enable drawing of aux shapes");
 
