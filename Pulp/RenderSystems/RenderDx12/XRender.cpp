@@ -20,7 +20,6 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	pDevice_(nullptr),
 	pAdapter_(nullptr),
 	pSwapChain_(nullptr),
-	pDebug_(nullptr),
 	pTextureMan_(nullptr),
 	pAuxRender_(nullptr),
 	shaderMan_(arena),
@@ -57,13 +56,14 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 	HRESULT hr;
 
-	hr = D3D12GetDebugInterface(IID_PPV_ARGS(&pDebug_));
+	Microsoft::WRL::ComPtr<ID3D12Debug> debugInterface;
+	hr = D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface));
 	if (FAILED(hr)) {
 		X_ERROR("Dx12", "Failed to CreateDevice: 0x%x", hr);
 		return false;
 	}
 
-	pDebug_->EnableDebugLayer();
+	debugInterface->EnableDebugLayer();
 
 
 	// Obtain the DXGI factory
@@ -357,7 +357,6 @@ void XRender::shutDown(void)
 	}
 
 	core::SafeReleaseDX(pDevice_);
-	core::SafeReleaseDX(pDebug_);
 }
 
 void XRender::freeResources(void)

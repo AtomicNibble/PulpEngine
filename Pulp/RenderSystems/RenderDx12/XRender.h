@@ -170,7 +170,6 @@ private:
 	ID3D12Device* pDevice_;
 	IDXGIAdapter3* pAdapter_;
 	IDXGISwapChain3* pSwapChain_;
-	ID3D12Debug* pDebug_;
 
 	RenderVars vars_;
 
