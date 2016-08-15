@@ -56,14 +56,21 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 
 	HRESULT hr;
 
-	Microsoft::WRL::ComPtr<ID3D12Debug> debugInterface;
-	hr = D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface));
-	if (FAILED(hr)) {
-		X_ERROR("Dx12", "Failed to CreateDevice: 0x%x", hr);
-		return false;
-	}
+#if X_DEBUG && 1
+	// force enable debug layer.
+#else
+	if (vars_.enableDebugLayer())
+#endif // |_DEBUG
+	{
+		Microsoft::WRL::ComPtr<ID3D12Debug> debugInterface;
+		hr = D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface));
+		if (FAILED(hr)) {
+			X_ERROR("Dx12", "Failed to CreateDevice: 0x%x", hr);
+			return false;
+		}
 
-	debugInterface->EnableDebugLayer();
+		debugInterface->EnableDebugLayer();
+	}
 
 
 	// Obtain the DXGI factory
@@ -345,15 +352,23 @@ void XRender::shutDown(void)
 	core::SafeReleaseDX(pSwapChain_);
 	core::SafeReleaseDX(pAdapter_);
 
-	ID3D12DebugDevice* pDebugInterface;
-	if (SUCCEEDED(pDevice_->QueryInterface(&pDebugInterface)))
+
+#if X_DEBUG && 1
+	// force enable debug layer.
+#else
+	if (vars_.enableDebugLayer())
+#endif // |_DEBUG
 	{
-		pDebugInterface->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL);
-		pDebugInterface->Release();
-	}
-	else
-	{
-		X_ERROR("dx12", "Failed to get debug device interface");
+		ID3D12DebugDevice* pDebugInterface;
+		if (SUCCEEDED(pDevice_->QueryInterface(&pDebugInterface)))
+		{
+			pDebugInterface->ReportLiveDeviceObjects(D3D12_RLDO_DETAIL | D3D12_RLDO_IGNORE_INTERNAL);
+			pDebugInterface->Release();
+		}
+		else
+		{
+			X_ERROR("dx12", "Failed to get debug device interface");
+		}
 	}
 
 	core::SafeReleaseDX(pDevice_);
