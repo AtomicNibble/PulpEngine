@@ -657,12 +657,14 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 		uint32_t width = pWindow_->GetClientWidth();
 		uint32_t height = pWindow_->GetClientHeight();
 
+		// vars required pre init.
+		env_.pRender->registerVars();
+
 		if (!env_.pRender->init(hWnd, width, height)) {
 			X_ERROR("Core", "Failed to init render system");
 			return false;
 		}
 
-		env_.pRender->registerVars();
 		env_.pRender->registerCmds();
 
 		X_LOG0("Core", "render init: ^6%gms", timer.GetMilliSeconds());
