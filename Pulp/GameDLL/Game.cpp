@@ -30,7 +30,7 @@ XGame::~XGame()
 
 }
 
-bool XGame::Init(void)
+bool XGame::init(void)
 {
 	X_LOG0("Game", "init");
 	X_ASSERT_NOT_NULL(gEnv->pInput);
@@ -42,18 +42,6 @@ bool XGame::Init(void)
 	pRender_ = gEnv->pRender;
 
 
-	// register some vars
-	ADD_CVAR_REF_VEC3("cam_pos", cameraPos_, s_DefaultCamPosition, core::VarFlag::STATIC, 
-		"camera position");
-	ADD_CVAR_REF_VEC3("cam_angle", cameraAngle_, s_DefaultCamAngle, core::VarFlag::STATIC, 
-		"camera angle(radians)");
-	pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.0001f, ::toDegrees(PIf), 
-		core::VarFlag::SAVE_IF_CHANGED, "camera fov");
-
-	core::ConsoleVarFunc del;
-	del.Bind<XGame, &XGame::OnFovChanged>(this);
-	pFovVar_->SetOnChangeCallback(del);
-
 	auto deimension = gEnv->pRender->getDisplayRes();
 
 	X_ASSERT(deimension.x > 0, "height is not valid")(deimension.x);
@@ -64,7 +52,7 @@ bool XGame::Init(void)
 	return true;
 }
 
-bool XGame::ShutDown(void)
+bool XGame::shutDown(void)
 {
 	X_LOG0("Game", "Shutting Down");
 
@@ -77,7 +65,7 @@ bool XGame::ShutDown(void)
 	return true;
 }
 
-bool XGame::Update(core::FrameData& frame)
+bool XGame::update(core::FrameData& frame)
 {
 	X_PROFILE_BEGIN("Update", core::ProfileSubSys::GAME);
 	X_UNUSED(frame);
@@ -111,6 +99,31 @@ bool XGame::Update(core::FrameData& frame)
 
 	return true;
 }
+
+
+void XGame::registerVars(void)
+{
+
+	// register some vars
+	ADD_CVAR_REF_VEC3("cam_pos", cameraPos_, s_DefaultCamPosition, core::VarFlag::STATIC,
+		"camera position");
+	ADD_CVAR_REF_VEC3("cam_angle", cameraAngle_, s_DefaultCamAngle, core::VarFlag::STATIC,
+		"camera angle(radians)");
+	pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.0001f, ::toDegrees(PIf),
+		core::VarFlag::SAVE_IF_CHANGED, "camera fov");
+
+	core::ConsoleVarFunc del;
+	del.Bind<XGame, &XGame::OnFovChanged>(this);
+	pFovVar_->SetOnChangeCallback(del);
+
+
+}
+
+void XGame::registerCmds(void)
+{
+
+}
+
 
 void XGame::release(void)
 {

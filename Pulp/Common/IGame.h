@@ -15,9 +15,13 @@ struct IGame
 	virtual ~IGame() {};
 
 
-	virtual bool Init(void) X_ABSTRACT;
-	virtual bool ShutDown(void) X_ABSTRACT;
-	virtual bool Update(core::FrameData& frame) X_ABSTRACT;
+	virtual bool init(void) X_ABSTRACT;
+	virtual bool shutDown(void) X_ABSTRACT;
+	virtual bool update(core::FrameData& frame) X_ABSTRACT;
+
+	virtual void registerVars(void) X_ABSTRACT;
+	virtual void registerCmds(void) X_ABSTRACT;
+
 
 	virtual void release(void) X_ABSTRACT;
 

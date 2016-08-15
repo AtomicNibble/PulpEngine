@@ -700,7 +700,11 @@ bool XCore::InitGameDll(const SCoreInitParams& initParams)
 	}
 
 	if (env_.pGame) {
-		if (!env_.pGame->Init()) {
+
+		env_.pGame->registerVars();
+		env_.pGame->registerCmds();
+
+		if (!env_.pGame->init()) {
 			X_ERROR("Core", "Failed to init Game");
 			return false;
 		}

@@ -145,7 +145,7 @@ void XCore::ShutDown()
 
 	if (env_.pGame)
 	{
-		env_.pGame->ShutDown();
+		env_.pGame->shutDown();
 		core::SafeRelease(env_.pGame);
 	}
 

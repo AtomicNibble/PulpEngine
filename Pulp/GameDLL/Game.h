@@ -25,9 +25,13 @@ public:
 	~XGame() X_FINAL;
 
 	// IGame
-	bool Init(void) X_FINAL;
-	bool ShutDown(void) X_FINAL;
-	bool Update(core::FrameData& frame) X_FINAL;
+	bool init(void) X_FINAL;
+	bool shutDown(void) X_FINAL;
+	bool update(core::FrameData& frame) X_FINAL;
+
+	void registerVars(void) X_FINAL;
+	void registerCmds(void) X_FINAL;
+
 	void release(void) X_FINAL;
 	// ~IGame
 

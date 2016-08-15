@@ -109,7 +109,7 @@ bool XCore::Update(void)
 
 
 	if (env_.pGame) {
-		env_.pGame->Update(frameData);
+		env_.pGame->update(frameData);
 	}
 
 	if (env_.p3DEngine) {
