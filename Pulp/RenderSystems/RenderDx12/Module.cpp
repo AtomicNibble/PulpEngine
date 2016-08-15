@@ -56,10 +56,15 @@ class XEngineModule_Render : public IEngineModule
 
 	virtual bool Initialize(SCoreGlobals &env, const SCoreInitParams &initParams) X_OVERRIDE
 	{
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pArena);
 		X_UNUSED(initParams);
 
 		ICore* pCore = env.pCore;
 		IRender* pRender = nullptr;
+
+		LinkModule(pCore, "Render");
+
 
 		g_rendererArena = X_NEW_ALIGNED(RendererArena, gEnv->pArena, "RendererArena", 8)(&g_RenderAlloc, "RendererArena");
 		g_textureDataArena = X_NEW(TextureArena, gEnv->pArena, "TextureArena")(&g_TextureDataAlloc, "TextureArena");
