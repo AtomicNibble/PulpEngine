@@ -9,6 +9,8 @@ RenderVars::RenderVars() :
 	pNativeRes_(nullptr),
 	pRes_(nullptr)
 {
+	varsRegisterd_ = false;
+
 	// defaults
 	debugLayer_ = 0; // the debug override is not done here, otherwise it would not override config values.
 	drawAux_ = 0;
@@ -19,6 +21,8 @@ RenderVars::RenderVars() :
 
 void RenderVars::registerVars(void)
 {
+	X_ASSERT(!varsRegisterd_, "Vars already init")(varsRegisterd_);
+
 	ADD_CVAR_REF("r_d3d_debug_layer", debugLayer_, debugLayer_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 		"Enable d3d debug layer");
 
@@ -32,6 +36,8 @@ void RenderVars::registerVars(void)
 		"The final render resolution");
 	pRes_ = ADD_CVAR_STRING("r_res", "", core::VarFlag::SYSTEM | core::VarFlag::STATIC,
 		"The render buffer resolution, scaled to 'r_native_res'");
+
+	varsRegisterd_ = true;
 }
 
 
