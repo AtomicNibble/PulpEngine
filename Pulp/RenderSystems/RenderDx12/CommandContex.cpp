@@ -134,6 +134,11 @@ CommandContext::CommandContext(ContextManager& contexMan, core::MemoryArenaBase*
 	numBarriersToFlush_(0)
 {
 	core::zero_object(pCurrentDescriptorHeaps_);
+
+
+#if X_DEBUG
+	contexFreed_ = 0;
+#endif // !X_DEBUG
 }
 
 X_ENABLE_WARNING(4355)
@@ -141,6 +146,13 @@ X_ENABLE_WARNING(4355)
 CommandContext::~CommandContext(void)
 {
 	core::SafeReleaseDX(pCommandList_);
+
+#if X_DEBUG
+	// can't just go out of scope, must manually call finishAndFree()
+	// not sure i Like this..
+	// might make a commandContext scope helper.
+	X_ASSERT(contexFreed_ == 1, "COmmandContext was not freed correct.")(contexFreed_);
+#endif // !X_DEBUG
 }
 
 
@@ -177,7 +189,7 @@ uint64_t CommandContext::flush(bool waitForCompletion)
 	return fenceValue;
 }
 
-uint64_t CommandContext::finish(bool waitForCompletion)
+uint64_t CommandContext::finishAndFree(bool waitForCompletion)
 {
 	X_ASSERT(type_ == D3D12_COMMAND_LIST_TYPE_DIRECT || type_ == D3D12_COMMAND_LIST_TYPE_COMPUTE, "Invalid type")(type_);
 	X_ASSERT_NOT_NULL(pCurrentAllocator_);
@@ -201,6 +213,10 @@ uint64_t CommandContext::finish(bool waitForCompletion)
 		cmdListMan.waitForFence(fenceValue);
 	}
 
+#if X_DEBUG
+	contexFreed_ = 1;
+#endif // !X_DEBUG
+
 	contextManager_.freeContext(this);
 
 	return fenceValue;
@@ -215,6 +231,10 @@ void CommandContext::initialize(void)
 	auto& cmdListMan = contextManager_.getCmdListMan();
 
 	cmdListMan.createNewCommandList(type_, &pCommandList_, &pCurrentAllocator_);
+
+#if X_DEBUG
+	contexFreed_ = 0;
+#endif // !X_DEBUG
 }
 
 
@@ -237,6 +257,10 @@ void CommandContext::reset(void)
 	numBarriersToFlush_ = 0;
 
 	bindDescriptorHeaps();
+
+#if X_DEBUG
+	contexFreed_ = 0;
+#endif // !X_DEBUG
 }
 
 

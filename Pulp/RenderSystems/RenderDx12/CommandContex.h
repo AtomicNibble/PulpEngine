@@ -97,7 +97,7 @@ public:
 	// Flush existing commands to the GPU but keep the context alive
 	uint64_t flush(bool waitForCompletion = false);
 	// Flush existing commands and release the current context
-	uint64_t finish(bool waitForCompletion = false);
+	uint64_t finishAndFree(bool waitForCompletion = false);
 
 	// Prepare to render by reserving a command list and command allocator
 	void initialize(void);
@@ -174,6 +174,10 @@ protected:
 	ID3D12DescriptorHeap* pCurrentDescriptorHeaps_[MAX_DISTRIPTOR_HEAP_TYPES];
 
 	D3D12_COMMAND_LIST_TYPE type_;
+
+#if X_DEBUG
+	int32_t contexFreed_;
+#endif // !X_DEBUG
 };
 
 

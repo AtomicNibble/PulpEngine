@@ -430,7 +430,7 @@ void XRender::renderBegin(void)
 
 	pContext->clearColor(displayPlane_[currentBufferIdx_]);
 	pContext->transitionResource(displayPlane_[currentBufferIdx_], D3D12_RESOURCE_STATE_PRESENT);
-	pContext->finish(false);
+	pContext->finishAndFree(false);
 }
 
 void XRender::renderEnd(void)

@@ -194,7 +194,7 @@ void GpuBuffer::initializeBuffer(ID3D12Device* pDevice, ContextManager& contexMa
 	pContext->transitionResource(*this, D3D12_RESOURCE_STATE_GENERIC_READ, true);
 
 	// Execute the command list and wait for it to finish so we can release the upload buffer
-	pContext->finish(true);
+	pContext->finishAndFree(true);
 
 	pUploadBuffer->Release();
 }
