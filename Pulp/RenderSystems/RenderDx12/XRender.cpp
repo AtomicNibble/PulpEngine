@@ -417,6 +417,8 @@ void XRender::renderBegin(void)
 		displayPlane_[currentBufferIdx_].getRTV()
 	};
 
+	displayPlane_[currentBufferIdx_].setClearColor(vars_.getClearCol());
+
 	GraphicsContext* pContext = pContextMan_->allocateGraphicsContext();
 
 	pContext->transitionResource(displayPlane_[currentBufferIdx_], D3D12_RESOURCE_STATE_RENDER_TARGET);
@@ -426,7 +428,6 @@ void XRender::renderBegin(void)
 	pContext->setRenderTargets(_countof(RTVs), RTVs);
 	pContext->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	pContext->draw(3);
-
 
 	pContext->clearColor(displayPlane_[currentBufferIdx_]);
 	pContext->transitionResource(displayPlane_[currentBufferIdx_], D3D12_RESOURCE_STATE_PRESENT);
