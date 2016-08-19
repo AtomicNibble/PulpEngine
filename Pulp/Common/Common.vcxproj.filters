@@ -205,6 +205,9 @@
     <Filter Include="SourceFiles\Sorting">
       <UniqueIdentifier>{c5f7a20b-16f3-459a-956f-ded67ee7cf9f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfaces_h\Render">
+      <UniqueIdentifier>{bbb6e295-8bcd-41ef-9af2-a5108d5fe859}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -577,9 +580,6 @@
     <ClInclude Include="Memory\MemInfo.h">
       <Filter>Headers\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="IRender.h">
-      <Filter>Interfaces_h</Filter>
-    </ClInclude>
     <ClInclude Include="Platform\Window.h">
       <Filter>Headers\Platform</Filter>
     </ClInclude>
@@ -588,9 +588,6 @@
     </ClInclude>
     <ClInclude Include="resource.h">
       <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="ITexture.h">
-      <Filter>Interfaces_h</Filter>
     </ClInclude>
     <ClInclude Include="Threading\Atomic.h">
       <Filter>Headers\Threading</Filter>
@@ -778,9 +775,6 @@
     <ClInclude Include="Hashing\crc32.inl">
       <Filter>Headers\Hashing</Filter>
     </ClInclude>
-    <ClInclude Include="IMaterial.h">
-      <Filter>Interfaces_h</Filter>
-    </ClInclude>
     <ClInclude Include="Math\XVecCompressed.h">
       <Filter>Headers\Math</Filter>
     </ClInclude>
@@ -792,9 +786,6 @@
     </ClInclude>
     <ClInclude Include="Containers\ByteStreamFifo.h">
       <Filter>Headers\Containers</Filter>
-    </ClInclude>
-    <ClInclude Include="IShader.h">
-      <Filter>Interfaces_h</Filter>
     </ClInclude>
     <ClInclude Include="Debugging\AbortHandler.h">
       <Filter>Headers\Debugging</Filter>
@@ -868,9 +859,6 @@
     <ClInclude Include="Containers\FixedRingBuffer.h">
       <Filter>Headers\Containers</Filter>
     </ClInclude>
-    <ClInclude Include="IRenderAux.h">
-      <Filter>Interfaces_h</Filter>
-    </ClInclude>
     <ClInclude Include="Traits\UnsignedTypes.h">
       <Filter>Headers\Traits</Filter>
     </ClInclude>
@@ -894,9 +882,6 @@
     </ClInclude>
     <ClInclude Include="Util\FloatIEEEUtil.h">
       <Filter>Headers\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="IRenderMesh.h">
-      <Filter>Interfaces_h</Filter>
     </ClInclude>
     <ClInclude Include="IGame.h">
       <Filter>Interfaces_h</Filter>
@@ -1125,6 +1110,24 @@
     </ClInclude>
     <ClInclude Include="Containers\AlignedArray.h">
       <Filter>Headers\Containers</Filter>
+    </ClInclude>
+    <ClInclude Include="IRender.h">
+      <Filter>Interfaces_h\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderMesh.h">
+      <Filter>Interfaces_h\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderAux.h">
+      <Filter>Interfaces_h\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="IShader.h">
+      <Filter>Interfaces_h\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="ITexture.h">
+      <Filter>Interfaces_h\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="IMaterial.h">
+      <Filter>Interfaces_h\Render</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
