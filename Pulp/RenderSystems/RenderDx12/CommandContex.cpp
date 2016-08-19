@@ -388,7 +388,7 @@ void CommandContext::transitionResource(GpuResource& resource, D3D12_RESOURCE_ST
 void CommandContext::beginResourceTransition(GpuResource& resource, D3D12_RESOURCE_STATES newState, bool flushImmediate)
 {
 	// If it's already transitioning, finish that transition
-	if (resource.getTransitioningStateState() != (D3D12_RESOURCE_STATES)-1) {
+	if (resource.getTransitioningStateState() != static_cast<D3D12_RESOURCE_STATES>(-1)) {
 		transitionResource(resource, resource.getTransitioningStateState());
 	}
 
