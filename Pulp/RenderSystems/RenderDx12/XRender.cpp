@@ -455,6 +455,10 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands:
 	const auto& packets = cmdBucket.getPackets();
 	const auto& keys = cmdBucket.getKeys();
 
+	const auto& viewMat = cmdBucket.getViewMatrix();
+	const auto& projMat = cmdBucket.getProjMatrix();
+	const auto& viewport = cmdBucket.getViewport();
+
 	GraphicsContext* pContext = pContextMan_->allocateGraphicsContext();
 
 	// we need to setup stuff like render targets.
@@ -463,6 +467,8 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands:
 	//	for the PSO should i just make one each frame knowing the device object will get cached.
 	//  instead of explicitly selecting a PSO object.
 	//  I'll do it the dynamic way and see if it's slow, would be nice to keep fully dynamic.
+
+	pContext->setViewportAndScissor(0, 0, viewport.getWidth(), viewport.getHeight());
 
 
 	for (size_t i = 0; i < sortedIdx.size(); ++i)
