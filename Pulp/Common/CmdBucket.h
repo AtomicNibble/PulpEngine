@@ -125,6 +125,7 @@ private:
 
 public:
 	typedef KeyT Key;
+	typedef core::Array<Key> KeyArr;
 
 public:
 	CommandBucket(core::MemoryArenaBase* arena, // used to allocate key and packet arrays
@@ -142,6 +143,8 @@ public:
 	template <typename CommandT, typename ParentCmdT>
 	X_INLINE CommandT* appendCommand(ParentCmdT* pCommand, size_t auxMemorySize);
 
+public:
+	X_INLINE const KeyArr& getKeys(void);
 
 private:
 	core::AtomicInt current_;	

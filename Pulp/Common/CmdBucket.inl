@@ -123,5 +123,10 @@ X_INLINE CommandT* CommandBucket<KeyT>::appendCommand(ParentCmdT* pCommand, size
 	return CommandPacket::getCommand<CommandT>(pPacket);
 }
 
+template <typename KeyT>
+X_INLINE const typename CommandBucket<KeyT>::KeyArr& CommandBucket<KeyT>::getKeys(void)
+{
+	return keys_;
+}
 
 X_NAMESPACE_END
