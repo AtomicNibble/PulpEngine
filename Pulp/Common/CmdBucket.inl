@@ -6,6 +6,12 @@ X_NAMESPACE_BEGIN(render)
 
  // -------------------------------------------------------
 
+X_INLINE void CommandBucketBase::appendRenderTarget(IRenderTarget* pRTV)
+{
+	rtvs_.push_back(pRTV);
+}
+
+
 X_INLINE const Matrix44f& CommandBucketBase::getViewMatrix(void)
 {
 	return view_;
@@ -19,6 +25,11 @@ X_INLINE const Matrix44f& CommandBucketBase::getProjMatrix(void)
 X_INLINE const XViewPort& CommandBucketBase::getViewport(void)
 {
 	return viewport_;
+}
+
+X_INLINE const CommandBucketBase::RenderTargetsArr& CommandBucketBase::getRTVS(void)
+{
+	return rtvs_;
 }
 
 X_INLINE const CommandBucketBase::SortedIdxArr& CommandBucketBase::getSortedIdx(void)

@@ -25,7 +25,15 @@
 // but other CommandBucket get populated while sorting first list.
 
 
+// I might make the command buckets take a RadixSort object, that way the buckets can be thrown instead of reset.
+// making it more easy for the command buckets to use frame temp memory and change size each frame easy.
+
+
 X_NAMESPACE_BEGIN(render)
+
+
+
+
 
 class CmdPacketAllocator 
 {
@@ -83,16 +91,22 @@ class CommandBucketBase
 
 	typedef core::Array<CommandPacket::Packet> PacketArr;
 	typedef core::Array<uint32_t> SortedIdxArr;
+	typedef core::FixedArray<IRenderTarget*, MAX_RENDER_TARGETS> RenderTargetsArr;
 
 protected:
 	CommandBucketBase(core::MemoryArenaBase* arena, size_t size, const XCamera& cam, const XViewPort& viewport);
 	~CommandBucketBase() = default;
 
 public:
+
+	X_INLINE void appendRenderTarget(IRenderTarget* pRTV);
+
 	X_INLINE const Matrix44f& getViewMatrix(void);
 	X_INLINE const Matrix44f& getProjMatrix(void);
 	X_INLINE const XViewPort& getViewport(void);
-
+	
+	
+	X_INLINE const RenderTargetsArr& getRTVS(void);
 	X_INLINE const SortedIdxArr& getSortedIdx(void);
 	X_INLINE const PacketArr& getPackets(void);
 
@@ -101,6 +115,7 @@ protected:
 	Matrix44f view_;
 	Matrix44f proj_;
 	XViewPort viewport_;
+	RenderTargetsArr rtvs_;
 
 	core::AtomicInt current_;
 	core::Array<CommandPacket::Packet> packets_;
