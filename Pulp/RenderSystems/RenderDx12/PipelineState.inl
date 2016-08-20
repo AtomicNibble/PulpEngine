@@ -35,6 +35,21 @@ X_INLINE ID3D12PipelineState* PSO::getPipelineStateObject(void) const
 // ----------------------------------------
 
 
+X_INLINE GraphicsPSO::GraphicsPSO(core::MemoryArenaBase* arena) :
+	inputLayouts_(arena)
+{
+	core::zero_object(PSODesc_);
+	PSODesc_.NodeMask = 1;
+	PSODesc_.SampleMask = 0xFFFFFFFFu;
+	PSODesc_.SampleDesc.Count = 1;
+	PSODesc_.InputLayout.NumElements = 0;
+}
+
+X_INLINE GraphicsPSO::~GraphicsPSO()
+{
+
+}
+
 X_INLINE void GraphicsPSO::setBlendState(const D3D12_BLEND_DESC& blendDesc)
 {
 	PSODesc_.BlendState = blendDesc;

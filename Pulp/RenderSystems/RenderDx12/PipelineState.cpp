@@ -157,23 +157,6 @@ void PSO::setRootSignature(const RootSignature& BindMappings)
 
 // --------------------------------------------------
 
-
-GraphicsPSO::GraphicsPSO(core::MemoryArenaBase* arena) :
-	inputLayouts_(arena)
-{
-	core::zero_object(PSODesc_);
-	PSODesc_.NodeMask = 1;
-	PSODesc_.SampleMask = 0xFFFFFFFFu;
-	PSODesc_.SampleDesc.Count = 1;
-	PSODesc_.InputLayout.NumElements = 0;
-}
-
-GraphicsPSO::~GraphicsPSO()
-{
-
-}
-
-
 void GraphicsPSO::finalize(PSODeviceCache& cache)
 {
 	// Make sure the root signature is finalized first
