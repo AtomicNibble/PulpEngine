@@ -57,24 +57,6 @@ X_DECLARE_ENUM(PrimitiveTypePublic)(
 );
 
 
-
-
-struct StencilOperation
-{
-	enum Enum
-	{
-		KEEP = 1,
-		ZERO = 2,
-		REPLACE = 3,
-		INCR_SAT = 4,
-		DECR_SAT = 5,
-		INVERT = 6,
-		INCR = 7,
-		DECR = 8
-	};
-};
-
-
 #if 0
 X_DECLARE_FLAGS8(StencilOperation)( KEEP, ZERO, REPLACE, INCR_SAT, DECR_SAT, INVERT, INCR, DECR );
 X_DECLARE_FLAGS8(StencilFunc)(NEVER, LESS, EQUAL, LESS_EQUAL, GREATER, NOT_EQUAL, GREATER_EQUAL, ALWAYS);
