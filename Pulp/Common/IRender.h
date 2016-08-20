@@ -25,20 +25,23 @@ struct IRenderMesh;
 struct MeshHeader;
 )
 
+X_NAMESPACE_DECLARE(render,
+struct IRenderAux;
+template<typename>
+class CommandBucket;
+
+namespace shader {
+	struct IShader;
+} // namespace shader
+
+)
 
 
 X_NAMESPACE_BEGIN(render)
 
-struct IRenderAux;
 
-template<typename>
-class CommandBucket;
+static const uint32_t MAX_RENDER_TARGETS = 8;
 
-
-namespace shader
-{
-	struct IShader;
-} // namespace shader
 
 X_DECLARE_ENUM(CullMode)(
 	NONE,
