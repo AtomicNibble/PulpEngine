@@ -10,6 +10,8 @@
 #include "CommandContex.h"
 #include "PipelineState.h"
 
+#include "CmdBucket.h"
+
 #include <IConsole.h>
 
 X_NAMESPACE_BEGIN(render)
@@ -444,6 +446,46 @@ void XRender::renderEnd(void)
 	}
 
 	handleResolutionChange();
+}
+
+
+void XRender::submitCommandPackets(CommandBucketBase& cmdBucket)
+{
+	const auto& sortedIdx = cmdBucket.getSortedIdx();
+	const auto& packets = cmdBucket.getPackets();
+
+	for (int32_t i = 0; i < sortedIdx.size(); ++i)
+	{
+		CommandPacket::Packet pPacket = packets[sortedIdx[i]];
+		while (pPacket != nullptr)
+		{
+			submitPacket(pPacket);
+			pPacket = CommandPacket::loadNextCommandPacket(pPacket);
+		}
+	}
+}
+
+
+void XRender::submitPacket(const CommandPacket::Packet pPacket)
+{
+	const CommandPacket::Command::Enum cmdType = *CommandPacket::getCommandType(pPacket);
+	const void* pCmd = CommandPacket::loadCommand(pPacket);
+	
+	switch (cmdType)
+	{
+	case Commands::Command::DRAW:
+	case Commands::Command::DRAW_INDEXED:
+	case Commands::Command::COPY_CONST_BUF_DATA:
+		break;
+
+#if X_DEBUG
+	default:
+		X_ASSERT_NOT_IMPLEMENTED();
+		break;
+#else
+		X_NO_SWITCH_DEFAULT;
+#endif // !X_DEBUG
+	}
 }
 
 

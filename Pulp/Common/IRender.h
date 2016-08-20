@@ -6,6 +6,8 @@
 #include <ITexture.h>
 #include <IShader.h>
 
+#include <Containers\Array.h>
+
 #include <Util\Flags.h>
 
 typedef void* WIN_HWND;
@@ -27,6 +29,8 @@ struct MeshHeader;
 X_NAMESPACE_BEGIN(render)
 
 struct IRenderAux;
+
+class CommandBucketBase;
 
 namespace shader
 {
@@ -406,62 +410,13 @@ struct IRender
 #else
 
 
-namespace Commands
-{
-	typedef void* VertexBufferHandle;
-	typedef void* IndexBufferHandle;
-	typedef void* ConstantBufferHandle;
-
-	X_DECLARE_ENUM(Command)(DRAW, DRAW_INDEXED, COPY_CONST_BUF_DATA);
-
-	struct Draw
-	{
-		static const Command::Enum CMD = Command::DRAW;
-
-		uint32_t vertexCount;
-		uint32_t startVertex;
-
-		shader::VertexFormat::Enum vertexLayout;
-		VertexBufferHandle vertexBuffer;
-		IndexBufferHandle indexBuffer;
-	};
-
-	struct DrawIndexed
-	{
-		static const Command::Enum CMD = Command::DRAW_INDEXED;
-
-		uint32_t indexCount;
-		uint32_t startIndex;
-		uint32_t baseVertex;
-
-		shader::VertexFormat::Enum vertexLayout;
-		VertexBufferHandle vertexBuffer;
-		IndexBufferHandle indexBuffer;
-	};
-
-	struct CopyConstantBufferData
-	{
-		static const Command::Enum CMD = Command::COPY_CONST_BUF_DATA;
-
-		ConstantBufferHandle constantBuffer;
-		void* data;
-		uint32_t size;
-	};
-
-	static_assert(core::compileTime::IsPOD<Draw>::Value, "Draw command must be POD");
-	static_assert(core::compileTime::IsPOD<DrawIndexed>::Value, "DrawIndexed command must be POD");
-	static_assert(core::compileTime::IsPOD<CopyConstantBufferData>::Value, "CopyConstantBufferData command must be POD");
-
-} // namespace Commands
-
-
-
-
 struct IRender
 {
 	// physics has it's own Aux render que so to speak, other que's can be added.
 	// they are not thread safe, but it's fine to populate diffrent aux instances in diffrent threads.
 	X_DECLARE_ENUM(AuxRenderer)(MISC, PHYSICS);
+	X_DECLARE_FLAGS(CpuAccess)(WRITE, READ);
+	typedef Flags<CpuAccess> CpuAccessFlags;
 
 	virtual ~IRender() {};
 
@@ -477,6 +432,8 @@ struct IRender
 	virtual void renderBegin(void) X_ABSTRACT;
 	virtual void renderEnd(void) X_ABSTRACT;
 
+	virtual void submitCommandPackets(CommandBucketBase& cmdBucket) X_ABSTRACT;
+
 	// each enum has a instance, and you don't own the pointer.
 	virtual IRenderAux* getAuxRender(AuxRenderer::Enum user) X_ABSTRACT;
 
@@ -484,6 +441,11 @@ struct IRender
 	virtual Vec2<uint32_t> getDisplayRes(void) const X_ABSTRACT;
 	virtual Vec2<float32_t> getDisplayResf(void) const X_ABSTRACT;
 
+
+//	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, CpuAccessFlags accessFlag) X_ABSTRACT;
+//	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag) X_ABSTRACT;
+//	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, CpuAccessFlags accessFlag) X_ABSTRACT;
+//	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag) X_ABSTRACT;
 
 	virtual texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_ABSTRACT;
 	virtual shader::IShader* getShader(const char* pName) X_ABSTRACT;

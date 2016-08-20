@@ -55,6 +55,11 @@ void RenderNull::renderEnd()
 
 }
 
+void RenderNull::submitCommandPackets(CommandBucketBase& cmdBucket)
+{
+	X_UNUSED(cmdBucket);
+}
+
 IRenderAux* RenderNull::getAuxRender(AuxRenderer::Enum user)
 {
 	X_UNUSED(user);

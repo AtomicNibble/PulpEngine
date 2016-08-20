@@ -208,6 +208,9 @@
     <Filter Include="Interfaces_h\Render">
       <UniqueIdentifier>{bbb6e295-8bcd-41ef-9af2-a5108d5fe859}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfaces_h\3DEngine">
+      <UniqueIdentifier>{26e0a600-191d-45bd-9ea2-f6b86895ef02}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -781,9 +784,6 @@
     <ClInclude Include="Util\EndianUtil.h">
       <Filter>Headers\Util</Filter>
     </ClInclude>
-    <ClInclude Include="I3DEngine.h">
-      <Filter>Interfaces_h</Filter>
-    </ClInclude>
     <ClInclude Include="Containers\ByteStreamFifo.h">
       <Filter>Headers\Containers</Filter>
     </ClInclude>
@@ -1129,6 +1129,15 @@
     <ClInclude Include="IMaterial.h">
       <Filter>Interfaces_h\Render</Filter>
     </ClInclude>
+    <ClInclude Include="I3DEngine.h">
+      <Filter>Interfaces_h\3DEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="CmdBucket.h">
+      <Filter>Interfaces_h\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="IRenderCommands.h">
+      <Filter>Interfaces_h\Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1409,6 +1418,9 @@
     </None>
     <None Include="Containers\AlignedArray.inl">
       <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="CmdBucket.inl">
+      <Filter>Interfaces_h\Render</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1727,6 +1739,9 @@
     </ClCompile>
     <ClCompile Include="Sorting\RadixSort.cpp">
       <Filter>SourceFiles\Sorting</Filter>
+    </ClCompile>
+    <ClCompile Include="CmdBucket.cpp">
+      <Filter>Interfaces_h\Render</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

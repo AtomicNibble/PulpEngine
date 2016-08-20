@@ -5,6 +5,7 @@
 #define X_RENDER_DX12_H_
 
 #include <IRender.h>
+#include <IRenderCommands.h>
 
 #include "CommandListManger.h"
 #include "SamplerDesc.h"
@@ -34,6 +35,8 @@ class LinearAllocatorManager;
 class RootSignatureDeviceCache;
 class PSODeviceCache;
 
+class CommandBucketBase;
+
 
 class XRender : public IRender
 {
@@ -59,6 +62,8 @@ public:
 
 	void renderBegin(void) X_OVERRIDE;
 	void renderEnd(void) X_OVERRIDE;
+
+	void submitCommandPackets(CommandBucketBase& cmdBucket) X_OVERRIDE;
 
 	IRenderAux* getAuxRender(AuxRenderer::Enum user) X_OVERRIDE;
 
@@ -150,6 +155,10 @@ public:
 
 	// =============================================
 	// =============================================
+
+private:
+	void submitPacket(const CommandPacket::Packet pPacket);
+
 
 private:
 	bool freeSwapChainResources(void);

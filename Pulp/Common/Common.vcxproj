@@ -46,6 +46,7 @@
     <ClInclude Include="Assets\AssertContainer.h" />
     <ClInclude Include="Casts\safe_static_cast.h" />
     <ClInclude Include="Casts\union_cast.h" />
+    <ClInclude Include="CmdBucket.h" />
     <ClInclude Include="CompileTime\ClassInfo.h" />
     <ClInclude Include="CompileTime\ExtractCount.h" />
     <ClInclude Include="CompileTime\ExtractType.h" />
@@ -125,6 +126,7 @@
     <ClInclude Include="IAssetDb.h" />
     <ClInclude Include="IAssetPak.h" />
     <ClInclude Include="ICi.h" />
+    <ClInclude Include="IRenderCommands.h" />
     <ClInclude Include="ICompression.h" />
     <ClInclude Include="IConsole.h" />
     <ClInclude Include="IConverterModule.h" />
@@ -375,6 +377,7 @@
   <ItemGroup>
     <None Include="Casts\safe_static_cast.inl" />
     <None Include="Casts\union_cast.inl" />
+    <None Include="CmdBucket.inl" />
     <None Include="Containers\AlignedArray.inl" />
     <None Include="Containers\BitStream.inl" />
     <None Include="Containers\ByteStream.inl" />
@@ -476,6 +479,7 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Default</BasicRuntimeChecks>
       <SmallerTypeCheck Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</SmallerTypeCheck>
     </ClCompile>
+    <ClCompile Include="CmdBucket.cpp" />
     <ClCompile Include="Hashing\xxHash.cpp" />
     <ClCompile Include="Math\MatrixStack.cpp" />
     <ClCompile Include="Math\XAabb.cpp" />

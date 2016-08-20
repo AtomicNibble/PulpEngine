@@ -1,52 +1,10 @@
-#include "stdafx.h"
+#include "EngineCommon.h"
 #include "CmdBucket.h"
 
 #include <Sorting\RadixSort.h>
 
-X_NAMESPACE_BEGIN(engine)
+X_NAMESPACE_BEGIN(render)
 
-
-
-namespace CommandPacket
-{
-
-	Packet* CommandPacket::getNextCommandPacket(Packet pPacket)
-	{
-		return union_cast<Packet*>(reinterpret_cast<char*>(pPacket) + OFFSET_NEXT_COMMAND_PACKET);
-	}
-
-	Command::Enum* CommandPacket::getCommandType(Packet pPacket)
-	{
-		return union_cast<Command::Enum*>(reinterpret_cast<char*>(pPacket) + OFFSET_COMMAND_TYPE);
-	}
-
-	void storeNextCommandPacket(Packet pPacket, Packet nextPacket)
-	{
-		*getNextCommandPacket(pPacket) = nextPacket;
-	}
-
-	void storeCommandType(CommandPacket::Packet pPacket, Command::Enum type)
-	{
-		*getCommandType(pPacket) = type;
-	}
-
-	const Packet loadNextCommandPacket(const Packet pPacket)
-	{
-		return *getNextCommandPacket(pPacket);
-	}
-
-	const Command::Enum loadBackendDispatchFunction(const Packet pPacket)
-	{
-		return *getCommandType(pPacket);
-	}
-
-	const void* loadCommand(const Packet pPacket)
-	{
-		return reinterpret_cast<char*>(pPacket) + OFFSET_COMMAND;
-	}
-
-
-} // namespace CommandPacket
 
 
 // -------------------------------------------------------
@@ -101,17 +59,23 @@ CmdPacketAllocator::ThreadAllocator::ThreadAllocator(void* pStart, void* pEnd) :
 
 // -------------------------------------------------------
 
-template <typename KeyT>
-CommandBucket<KeyT>::CommandBucket(core::MemoryArenaBase* arena, CmdPacketAllocator& packetAlloc, 
-	size_t size, const XCamera& cam) :
+CommandBucketBase::CommandBucketBase(core::MemoryArenaBase* arena, size_t size, const XCamera& cam) :
 	current_(0),
-	packetAlloc_(packetAlloc),
-	arena_(arena),
-	keys_(arena, size),
 	packets_(arena, size),
 	sortedIdx_(arena, size)
 {
 	X_UNUSED(cam);
+}
+
+
+template <typename KeyT>
+CommandBucket<KeyT>::CommandBucket(core::MemoryArenaBase* arena, CmdPacketAllocator& packetAlloc, 
+	size_t size, const XCamera& cam) :
+	CommandBucketBase(arena, size, cam),
+	packetAlloc_(packetAlloc),
+	arena_(arena),
+	keys_(arena, size)
+{
 
 	X_ASSERT_ALIGNMENT(&threadSlotsInfo_, 64, 0);
 
@@ -139,43 +103,9 @@ void CommandBucket<KeyT>::sort(void)
 }
 
 template <typename KeyT>
-void CommandBucket<KeyT>::submit(void)
+void CommandBucket<KeyT>::clear(void)
 {
-	setRenderTargets();
-	setMatrices();
-
-	const int32_t current = current_;
-
-	for (int32_t i = 0; i < current_; ++i)
-	{
-		CommandPacket::Packet pPacket = packets_[sortedIdx_[i]];
-		while (pPacket != nullptr)
-		{
-			submitPacket(pPacket);
-			pPacket = CommandPacket::loadNextCommandPacket(pPacket);
-		}
-	}
-}
-
-template <typename KeyT>
-void CommandBucket<KeyT>::setRenderTargets(void)
-{
-
-}
-
-template <typename KeyT>
-void CommandBucket<KeyT>::setMatrices(void)
-{
-
-}
-
-template <typename KeyT>
-void CommandBucket<KeyT>::submitPacket(const CommandPacket::Packet pPacket)
-{
-	X_UNUSED(pPacket);
-//	const CommandPacket::BackendDispatchFunction::Pointer pFunc = CommandPacket::loadBackendDispatchFunction(pPacket);
-//	const void* pCmd = CommandPacket::loadCommand(pPacket);
-//	pFunc(pCmd);
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 

@@ -22,6 +22,8 @@ public:
 	virtual void renderBegin(void) X_OVERRIDE;
 	virtual void renderEnd(void) X_OVERRIDE;
 
+	virtual void submitCommandPackets(CommandBucketBase& cmdBucket) X_OVERRIDE;
+
 	virtual IRenderAux* getAuxRender(AuxRenderer::Enum user) X_OVERRIDE;
 
 	virtual Vec2<uint32_t> getDisplayRes(void) const X_OVERRIDE;

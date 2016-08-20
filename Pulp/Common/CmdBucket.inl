@@ -1,47 +1,32 @@
 #pragma once
 
 
-X_NAMESPACE_BEGIN(engine)
+X_NAMESPACE_BEGIN(render)
 
 
-namespace CommandPacket
+ // -------------------------------------------------------
+
+X_INLINE const Matrix44f& CommandBucketBase::getViewMatrix(void)
 {
-	template <typename CommandT>
-	X_INLINE size_t getPacketSize(size_t auxMemorySize)
-	{
-		return OFFSET_COMMAND + sizeof(CommandT) + auxMemorySize;
-	}
+	return view_;
+}
 
-	template <typename CommandT>
-	X_INLINE Packet* getNextCommandPacket(CommandT* command)
-	{
-		return union_cast<Packet*>(reinterpret_cast<char*>(command) - OFFSET_COMMAND + OFFSET_NEXT_COMMAND_PACKET);
-	}
+X_INLINE const Matrix44f& CommandBucketBase::getProjMatrix(void)
+{
+	return proj_;
+}
 
-	template <typename CommandT>
-	X_INLINE CommandT* getCommand(Packet packet)
-	{
-		return union_cast<CommandT*>(reinterpret_cast<char*>(packet) + OFFSET_COMMAND);
-	}
+X_INLINE const CommandBucketBase::SortedIdxArr& CommandBucketBase::getSortedIdx(void)
+{
+	return sortedIdx_;
+}
 
-	template <typename CommandT>
-	X_INLINE char* getAuxiliaryMemory(CommandT* command)
-	{
-		return reinterpret_cast<char*>(command) + sizeof(CommandT);
-	}
-
-	template <typename CommandT>
-	X_INLINE void storeNextCommandPacket(CommandT* command, Packet nextPacket)
-	{
-		*getNextCommandPacket<CommandT>(command) = nextPacket;
-	}
-
-} // namespace CommandPacket
-
-
+X_INLINE const CommandBucketBase::PacketArr& CommandBucketBase::getPackets(void)
+{
+	return packets_;
+}
 
 // -------------------------------------------------------
-
 
 template <typename CommandT>
 X_INLINE CommandPacket::Packet CmdPacketAllocator::create(size_t threadIdx, size_t auxMemorySize)

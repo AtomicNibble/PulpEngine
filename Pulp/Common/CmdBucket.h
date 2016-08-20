@@ -9,46 +9,21 @@
 
 #include <Memory\AllocationPolicies\LinearAllocator.h>
 
+#include <Containers\Array.h>
+
 #include <IRender.h>
-
-X_NAMESPACE_BEGIN(engine)
-
-namespace CommandPacket
-{
-	typedef void* Packet;
-	typedef render::Commands::Command Command;
-	const size_t OFFSET_NEXT_COMMAND_PACKET = 0u;
-	const size_t OFFSET_COMMAND_TYPE = OFFSET_NEXT_COMMAND_PACKET + sizeof(Packet);
-	const size_t OFFSET_COMMAND = OFFSET_COMMAND_TYPE + sizeof(Command::Enum);
-
-	template <typename CommandT>
-	X_INLINE size_t getPacketSize(size_t auxMemorySize);
-
-	Packet* getNextCommandPacket(Packet pPacket);
-
-	template <typename CommandT>
-	X_INLINE Packet* getNextCommandPacket(CommandT* command);
-
-	Command::Enum* getCommandType(Packet pPacket);
-
-	template <typename CommandT>
-	X_INLINE CommandT* getCommand(Packet packet);
-
-	template <typename CommandT>
-	X_INLINE char* getAuxiliaryMemory(CommandT* command);
-	void storeNextCommandPacket(Packet pPacket, Packet nextPacket);
-
-	template <typename CommandT>
-	X_INLINE void storeNextCommandPacket(CommandT* command, Packet nextPacket);
-
-	void storeCommandType(Packet pPacket, Command::Enum dispatchFunction);
-	const Packet loadNextCommandPacket(const Packet pPacket);
-	const Command::Enum loadCommandType(const Packet pPacket);
-	const void* loadCommand(const Packet pPacket);
-
-} // namespace CommandPacket
+#include <IRenderCommands.h>
 
 
+// A single CommandBucket can and should be populated using multiple jobs.
+// as it is designed to scale well.
+// sorting is performed in a single thread, but performs caching so will early out if list is same as last time.
+// sorting of multiple CommandBucket's at the same time is allowed.
+// ideally a hierarchy or jobs should be created so that important CommandBucket's get populated and sorted first.
+// but other CommandBucket get populated while sorting first list.
+
+
+X_NAMESPACE_BEGIN(render)
 
 class CmdPacketAllocator 
 {
@@ -98,8 +73,38 @@ private:
 	ThreadAllocator* allocators_[MAX_THREAD_COUNT];
 };
 
+
+class CommandBucketBase
+{
+	X_NO_COPY(CommandBucketBase);
+	X_NO_ASSIGN(CommandBucketBase);
+
+	typedef core::Array<CommandPacket::Packet> PacketArr;
+	typedef core::Array<uint32_t> SortedIdxArr;
+
+protected:
+	CommandBucketBase(core::MemoryArenaBase* arena, size_t size, const XCamera& cam);
+	~CommandBucketBase() = default;
+
+public:
+	X_INLINE const Matrix44f& getViewMatrix(void);
+	X_INLINE const Matrix44f& getProjMatrix(void);
+
+	X_INLINE const SortedIdxArr& getSortedIdx(void);
+	X_INLINE const PacketArr& getPackets(void);
+
+
+protected:
+	Matrix44f view_;
+	Matrix44f proj_;
+
+	core::AtomicInt current_;
+	core::Array<CommandPacket::Packet> packets_;
+	core::Array<uint32_t> sortedIdx_;
+};
+
 template <typename KeyT>
-class CommandBucket
+class CommandBucket : public CommandBucketBase
 {
 	// number of slots to fetch for each thread, should be atleast 32 to prevent fales sharing.
 	// could make this number based on the size of KeyT.
@@ -129,7 +134,7 @@ public:
 	~CommandBucket();
 
 	void sort(void);
-	void submit(void);
+	void clear(void); // reset's with same size, keeping sorting info.
 
 	template <typename CommandT>
 	X_INLINE CommandT* addCommand(Key key, size_t auxMemorySize);
@@ -137,24 +142,14 @@ public:
 	template <typename CommandT, typename ParentCmdT>
 	X_INLINE CommandT* appendCommand(ParentCmdT* pCommand, size_t auxMemorySize);
 
-private:
-	void setRenderTargets(void);
-	void setMatrices(void);
-	void submitPacket(const CommandPacket::Packet packet);
-
 
 private:
-	Matrix44f view_;
-	Matrix44f proj_;
-
 	core::AtomicInt current_;	
 
 	// offset and coutns for each thread adding commands
 	X_ALIGNED_SYMBOL(AlignedIntArr, 64) threadSlotsInfo_;
 
 	core::Array<Key> keys_;
-	core::Array<CommandPacket::Packet> packets_;
-	core::Array<uint32_t> sortedIdx_;
 
 	CmdPacketAllocator& packetAlloc_;
 	core::MemoryArenaBase* arena_;
