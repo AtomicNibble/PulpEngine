@@ -217,6 +217,10 @@ struct States
 		BLEND_OP_MIN		= 0x00008000,
 		BLEND_OP_MAX		= 0x00010000,
 
+		CULL_BACK			= 0x00000000,
+		CULL_FRONT			= 0x00020000,
+		CULL_NONE			= 0x00040000,
+
 		DEPTHFUNC_LEQUAL	= 0x00000000,
 		DEPTHFUNC_EQUAL		= 0x00100000,
 		DEPTHFUNC_GREAT		= 0x00200000,
@@ -241,6 +245,8 @@ struct States
 		BLEND_MASK			= 0x000000ff,
 		BLEND_OP_MASK		= 0x0001F000,
 
+		CULL_MASK			= 0x00060000,
+
 		DEPTHFUNC_MASK		= 0x00700000,
 		ALPHATEST_MASK		= 0xf0000000,
 	};
@@ -256,7 +262,8 @@ struct States
 		uint32_t BIT_no_depth_test : 1;
 		uint32_t BIT_stencil : 1;
 		uint32_t BIT_blendOP : 5;
-		uint32_t BIT_pad8 : 3;
+		uint32_t BIT_cull : 2;
+		uint32_t BIT_pad8 : 1;
 		uint32_t BIT_depthFuncMask : 3;
 		uint32_t BIT_pad1 : 5;
 		uint32_t BIT_alphaTestMask : 4;
@@ -407,6 +414,14 @@ struct IRender
 	// ~Model
 };
 #else
+
+
+struct IRenderTarget
+{
+	virtual ~IRenderTarget() {};
+
+
+};
 
 
 struct IRender
