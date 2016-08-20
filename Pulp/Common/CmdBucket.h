@@ -118,7 +118,7 @@ private:
 	X_DISABLE_WARNING(4324)
 	struct X_ALIGNED_SYMBOL(ThreadSlotInfo, 64)
 	{
-		X_INLINE ThreadSlotInfo() : offset(0), remaining(0) {};
+		X_INLINE ThreadSlotInfo();
 
 		uint32_t offset;
 		uint32_t remaining;

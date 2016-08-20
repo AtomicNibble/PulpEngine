@@ -64,6 +64,12 @@ X_INLINE size_t CmdPacketAllocator::getThreadIdx(void)
 
 // -------------------------------------------------------
 
+template <typename KeyT>
+X_INLINE CommandBucket<KeyT>::ThreadSlotInfo::ThreadSlotInfo() :
+	offset(0),
+	remaining(0) 
+{
+}
 
 template <typename KeyT>
 template <typename CommandT>
