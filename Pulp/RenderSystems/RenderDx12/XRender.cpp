@@ -1000,6 +1000,240 @@ bool XRender::deviceIsSupported(void) const
 	return true;
 }
 
+void XRender::createDescFromState(StateFlag state, D3D12_BLEND_DESC& blendDesc)
+{
+	blendDesc.IndependentBlendEnable = FALSE;
+	blendDesc.AlphaToCoverageEnable = state.IsSet(States::ALPHATEST_MASK);
+
+	if (state.IsSet(States::BLEND_MASK))
+	{
+		for (size_t i = 0; i < 8; ++i) {
+			blendDesc.RenderTarget[i].BlendEnable = TRUE;
+			// A combination of D3D12_COLOR_WRITE_ENABLE-typed values that are combined by using a bitwise OR operation.
+			blendDesc.RenderTarget[i].RenderTargetWriteMask = 0;
+		}
+
+		// Blend Src.
+		if (state.IsSet(States::BLEND_SRC_MASK))
+		{
+			switch (state.ToInt() & States::BLEND_SRC_MASK)
+			{
+			case States::BLEND_SRC_ZERO:
+				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ZERO;
+				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ZERO;
+				break;
+			case States::BLEND_SRC_ONE:
+				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_ONE;
+				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_ONE;
+				break;
+			case States::BLEND_SRC_DEST_COLOR:
+				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_DEST_COLOR;
+				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_DEST_ALPHA;
+				break;
+			case States::BLEND_SRC_INV_DEST_COLOR:
+				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_COLOR;
+				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
+				break;
+			case States::BLEND_SRC_SRC_ALPHA:
+				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA;
+				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_SRC_ALPHA;
+				break;
+			case States::BLEND_SRC_INV_SRC_ALPHA:
+				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_SRC_ALPHA;
+				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
+				break;
+			case States::BLEND_SRC_DEST_ALPHA:
+				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_DEST_ALPHA;
+				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_DEST_ALPHA;
+				break;
+			case States::BLEND_SRC_INV_DEST_ALPHA:
+				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_INV_DEST_ALPHA;
+				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
+				break;
+			case States::BLEND_SRC_ALPHA_SAT:
+				blendDesc.RenderTarget[0].SrcBlend = D3D12_BLEND_SRC_ALPHA_SAT;
+				blendDesc.RenderTarget[0].SrcBlendAlpha = D3D12_BLEND_SRC_ALPHA_SAT;
+				break;
+			}
+		}
+
+		// Blend Dst.
+		if (state.IsSet(States::BLEND_DEST_MASK))
+		{
+			switch (state.ToInt() & States::BLEND_DEST_MASK)
+			{
+			case States::BLEND_DEST_ZERO:
+				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ZERO;
+				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ZERO;
+				break;
+			case States::BLEND_DEST_ONE:
+				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_ONE;
+				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_ONE;
+				break;
+			case States::BLEND_DEST_SRC_COLOR:
+				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_COLOR;
+				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_SRC_ALPHA;
+				break;
+			case States::BLEND_DEST_INV_SRC_COLOR:
+				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_COLOR;
+				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
+				break;
+			case States::BLEND_DEST_SRC_ALPHA:
+				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_SRC_ALPHA;
+				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_SRC_ALPHA;
+				break;
+			case States::BLEND_DEST_INV_SRC_ALPHA:
+				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_SRC_ALPHA;
+				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_SRC_ALPHA;
+				break;
+			case States::BLEND_DEST_DEST_ALPHA:
+				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_DEST_ALPHA;
+				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_DEST_ALPHA;
+				break;
+			case States::BLEND_DEST_INV_DEST_ALPHA:
+				blendDesc.RenderTarget[0].DestBlend = D3D12_BLEND_INV_DEST_ALPHA;
+				blendDesc.RenderTarget[0].DestBlendAlpha = D3D12_BLEND_INV_DEST_ALPHA;
+				break;
+			}
+
+		}
+
+		//Blending operation
+		D3D12_BLEND_OP blendOperation = D3D12_BLEND_OP_ADD;
+
+		switch (state.ToInt() & States::BLEND_OP_MASK)
+		{
+		case States::BLEND_OP_ADD:
+			blendOperation = D3D12_BLEND_OP_ADD;
+			break;
+		case States::BLEND_OP_SUB:
+			blendOperation = D3D12_BLEND_OP_SUBTRACT;
+			break;
+		case States::BLEND_OP_REB_SUB:
+			blendOperation = D3D12_BLEND_OP_REV_SUBTRACT;
+			break;
+		case States::BLEND_OP_MIN:
+			blendOperation = D3D12_BLEND_OP_MIN;
+			break;
+		case States::BLEND_OP_MAX:
+			blendOperation = D3D12_BLEND_OP_MAX;
+			break;
+		}
+
+		// todo: add separate alpha blend support for mrt
+		for (size_t i = 0; i < 8; ++i) {
+			blendDesc.RenderTarget[i].BlendOp = blendOperation;
+			blendDesc.RenderTarget[i].BlendOpAlpha = blendOperation;
+		}
+	}
+	else
+	{
+		// disable blending.
+		for (size_t i = 0; i < 8; ++i) {
+			blendDesc.RenderTarget[i].BlendEnable = FALSE;
+		}
+	}
+
+}
+
+void XRender::createDescFromState(StateFlag state, D3D12_RASTERIZER_DESC& rasterizerDesc)
+{
+	rasterizerDesc.FillMode = D3D12_FILL_MODE_SOLID;
+	rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+	rasterizerDesc.FrontCounterClockwise = TRUE;
+	rasterizerDesc.DepthBias = D3D12_DEFAULT_DEPTH_BIAS;
+	rasterizerDesc.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP;
+	rasterizerDesc.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS;
+	rasterizerDesc.DepthClipEnable = TRUE;
+	rasterizerDesc.MultisampleEnable = FALSE;
+	rasterizerDesc.AntialiasedLineEnable = FALSE;
+	rasterizerDesc.ForcedSampleCount = 0;
+	rasterizerDesc.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF;
+
+	if (state.IsSet(StateFlag::WIREFRAME)) {
+		rasterizerDesc.FillMode = D3D12_FILL_MODE_WIREFRAME;
+	}
+
+	if (state.IsSet(States::CULL_MASK))
+	{
+		switch (state.ToInt() & States::CULL_MASK)
+		{
+		case States::CULL_NONE:
+			rasterizerDesc.CullMode = D3D12_CULL_MODE_NONE;
+			break;
+		case States::CULL_FRONT:
+			rasterizerDesc.CullMode = D3D12_CULL_MODE_FRONT;
+			break;
+		case States::CULL_BACK:
+			rasterizerDesc.CullMode = D3D12_CULL_MODE_BACK;
+			break;
+		}
+	}
+}
+
+void XRender::createDescFromState(StateFlag state, D3D12_DEPTH_STENCIL_DESC& depthStencilDesc)
+{
+	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
+	depthStencilDesc.DepthEnable = TRUE;
+	depthStencilDesc.StencilEnable = FALSE;
+	depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+	depthStencilDesc.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK;
+	depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
+
+	// Stencil operations if pixel is front-facing.
+	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_INCR;
+	depthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	depthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_REPLACE;
+	depthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+
+	// Stencil operations if pixel is back-facing.
+	depthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_DECR;
+	depthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
+	depthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_REPLACE;
+	depthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+
+	if (state.IsSet(StateFlag::DEPTHWRITE)) {
+		depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;
+	}
+	if (state.IsSet(StateFlag::NO_DEPTH_TEST)) {
+		depthStencilDesc.DepthEnable = FALSE;
+	}
+	if (state.IsSet(StateFlag::STENCIL)) {
+		depthStencilDesc.StencilEnable = TRUE;
+	}
+
+	switch (state.ToInt() & States::DEPTHFUNC_MASK)
+	{
+	case States::DEPTHFUNC_LEQUAL:
+		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS_EQUAL;
+		break;
+	case States::DEPTHFUNC_EQUAL:
+		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_EQUAL;
+		break;
+	case States::DEPTHFUNC_GREAT:
+		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER;
+		break;
+	case States::DEPTHFUNC_LESS:
+		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_LESS;
+		break;
+	case States::DEPTHFUNC_GEQUAL:
+		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+		break;
+	case States::DEPTHFUNC_NOTEQUAL:
+		depthStencilDesc.DepthFunc = D3D12_COMPARISON_FUNC_NOT_EQUAL;
+		break;
+
+#if X_DEBUG
+	default:
+		X_ASSERT_UNREACHABLE();
+		break;
+#else
+		X_NO_SWITCH_DEFAULT;
+#endif // !X_DEBUG
+	}
+}
+
+
 void XRender::Cmd_ListDeviceFeatures(core::IConsoleCmdArgs* pCmd)
 {
 	X_UNUSED(pCmd);
