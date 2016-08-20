@@ -14,7 +14,7 @@
 #include "Material\MaterialManager.h"
 #include "Model\ModelManager.h"
 
-#include "Drawing\CmdBucket.h"
+#include "CmdBucket.h"
 
 #include <Time\StopWatch.h>
 
@@ -193,7 +193,7 @@ void X3DEngine::OnFrameBegin(void)
 
 	for (size_t i = 0; i < 0x4000; i++)
 	{
-		Commands::Draw* pDraw = testBucket.addCommand<Commands::Draw>(13, 0);
+		render::Commands::Draw* pDraw = testBucket.addCommand<render::Commands::Draw>(13, 0);
 		pDraw->indexBuffer = 0;
 		pDraw->vertexBuffer = 0;
 	}
