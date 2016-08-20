@@ -454,7 +454,7 @@ void XRender::submitCommandPackets(CommandBucketBase& cmdBucket)
 	const auto& sortedIdx = cmdBucket.getSortedIdx();
 	const auto& packets = cmdBucket.getPackets();
 
-	for (int32_t i = 0; i < sortedIdx.size(); ++i)
+	for (size_t i = 0; i < sortedIdx.size(); ++i)
 	{
 		CommandPacket::Packet pPacket = packets[sortedIdx[i]];
 		while (pPacket != nullptr)
