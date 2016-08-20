@@ -16,6 +16,36 @@
 
 X_NAMESPACE_BEGIN(render)
 
+namespace
+{
+	static const uint8 g_StencilFuncLookup[9] =
+	{
+		D3D12_COMPARISON_FUNC_NEVER, // pad
+		D3D12_COMPARISON_FUNC_NEVER,
+		D3D12_COMPARISON_FUNC_LESS,
+		D3D12_COMPARISON_FUNC_LESS_EQUAL,
+		D3D12_COMPARISON_FUNC_GREATER,
+		D3D12_COMPARISON_FUNC_GREATER_EQUAL,
+		D3D12_COMPARISON_FUNC_EQUAL,
+		D3D12_COMPARISON_FUNC_NOT_EQUAL,
+		D3D12_COMPARISON_FUNC_ALWAYS,
+	};
+
+	static const uint8 g_StencilOpLookup[9] =
+	{
+		D3D12_STENCIL_OP_KEEP, // pad
+		D3D12_STENCIL_OP_KEEP,
+		D3D12_STENCIL_OP_ZERO,
+		D3D12_STENCIL_OP_REPLACE,
+		D3D12_STENCIL_OP_INCR_SAT,
+		D3D12_STENCIL_OP_DECR_SAT,
+		D3D12_STENCIL_OP_INVERT,
+		D3D12_STENCIL_OP_INCR,
+		D3D12_STENCIL_OP_DECR,
+	};
+
+} // namespace
+
 
 XRender::XRender(core::MemoryArenaBase* arena) :
 	arena_(arena),
@@ -1171,7 +1201,7 @@ void XRender::createDescFromState(StateFlag state, D3D12_RASTERIZER_DESC& raster
 	}
 }
 
-void XRender::createDescFromState(StateFlag state, D3D12_DEPTH_STENCIL_DESC& depthStencilDesc)
+void XRender::createDescFromState(StateFlag state, StencilState stencilState, D3D12_DEPTH_STENCIL_DESC& depthStencilDesc)
 {
 	depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ZERO;
 	depthStencilDesc.DepthEnable = TRUE;
@@ -1181,16 +1211,27 @@ void XRender::createDescFromState(StateFlag state, D3D12_DEPTH_STENCIL_DESC& dep
 	depthStencilDesc.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK;
 
 	// Stencil operations if pixel is front-facing.
-	depthStencilDesc.FrontFace.StencilDepthFailOp = D3D12_STENCIL_OP_INCR;
-	depthStencilDesc.FrontFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-	depthStencilDesc.FrontFace.StencilPassOp = D3D12_STENCIL_OP_REPLACE;
-	depthStencilDesc.FrontFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	{
+		auto& frontFace = depthStencilDesc.FrontFace;
+		const auto& state = stencilState.front;
+
+		frontFace.StencilDepthFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.ZFailOp.ToInt()]);
+		frontFace.StencilFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.FailOp.ToInt()]);
+		frontFace.StencilPassOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.PassOp.ToInt()]);
+		frontFace.StencilFunc = static_cast<D3D12_COMPARISON_FUNC>(g_StencilFuncLookup[state.StencilFunc.ToInt()]);
+	}
 
 	// Stencil operations if pixel is back-facing.
-	depthStencilDesc.BackFace.StencilDepthFailOp = D3D12_STENCIL_OP_DECR;
-	depthStencilDesc.BackFace.StencilFailOp = D3D12_STENCIL_OP_KEEP;
-	depthStencilDesc.BackFace.StencilPassOp = D3D12_STENCIL_OP_REPLACE;
-	depthStencilDesc.BackFace.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS;
+	{
+		auto& backFace = depthStencilDesc.BackFace;
+		const auto& state = stencilState.back;
+
+		backFace.StencilDepthFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.ZFailOp.ToInt()]);
+		backFace.StencilFailOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.FailOp.ToInt()]);
+		backFace.StencilPassOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.PassOp.ToInt()]);
+		backFace.StencilFunc = static_cast<D3D12_COMPARISON_FUNC>(g_StencilFuncLookup[state.StencilFunc.ToInt()]);
+	}
+
 
 	if (state.IsSet(StateFlag::DEPTHWRITE)) {
 		depthStencilDesc.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL;

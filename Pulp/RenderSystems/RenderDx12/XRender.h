@@ -177,7 +177,7 @@ private:
 
 	static void createDescFromState(StateFlag state, D3D12_BLEND_DESC& blendDesc);
 	static void createDescFromState(StateFlag state, D3D12_RASTERIZER_DESC& rasterizerDesc);
-	static void createDescFromState(StateFlag state, D3D12_DEPTH_STENCIL_DESC& depthStencilDesc);
+	static void createDescFromState(StateFlag state, StencilState stencilState, D3D12_DEPTH_STENCIL_DESC& depthStencilDesc);
 
 private:
 	void Cmd_ListDeviceFeatures(core::IConsoleCmdArgs* pCmd);
