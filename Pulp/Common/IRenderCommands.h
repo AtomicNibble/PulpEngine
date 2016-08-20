@@ -47,6 +47,23 @@ namespace Commands
 		uint32_t size;
 	};
 
+	namespace Key
+	{
+		// this will be for creating the G buffer.
+		// we will sort by depth first.
+		// 
+		// we also need the material id to support the number of materials we have.
+		X_DECLARE_ENUM(Type)(DEPTH);
+
+		struct DepthPass
+		{
+			uint32_t depth : 18; // 0 - 262143
+			uint32_t materialId : 14; // 16383 - the real id of the material.
+
+		};
+
+	}
+
 	static_assert(core::compileTime::IsPOD<Draw>::Value, "Draw command must be POD");
 	static_assert(core::compileTime::IsPOD<DrawIndexed>::Value, "DrawIndexed command must be POD");
 	static_assert(core::compileTime::IsPOD<CopyConstantBufferData>::Value, "CopyConstantBufferData command must be POD");
