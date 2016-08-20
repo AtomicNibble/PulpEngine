@@ -99,6 +99,8 @@ protected:
 
 public:
 
+	// Maybe allowing diffrent index's to be set is better idea.
+	// and what ever is not null is set.
 	X_INLINE void appendRenderTarget(IRenderTarget* pRTV);
 
 	X_INLINE const Matrix44f& getViewMatrix(void);
