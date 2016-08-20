@@ -7,7 +7,7 @@ X_NAMESPACE_BEGIN(render)
 
 class DescriptorAllocator;
 
-class ColorBuffer : public PixelBuffer
+class ColorBuffer : public PixelBuffer, public IRenderTarget
 {
 public:
 	ColorBuffer(Colorf clearCol = Colorf::zero());
