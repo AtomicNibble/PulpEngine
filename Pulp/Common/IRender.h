@@ -173,10 +173,6 @@ struct StencilState
 };
 
 
-#define SET_STENCIL_FUNC(StencilFnc) (StencilFnc)
-#define SET_STENCIL_FAIL(StencilOp) (StencilOp << 4)
-#define SET_STENCIL_ZFAIL(StencilOp) (StencilOp << 8)
-#define SET_STENCIL_PASS(StencilOp) (StencilOp << 12)
 
 
 #endif
