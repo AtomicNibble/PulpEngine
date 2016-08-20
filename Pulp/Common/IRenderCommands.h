@@ -147,7 +147,7 @@ namespace CommandPacket
 		return *getNextCommandPacket(pPacket);
 	}
 
-	X_INLINE const Command::Enum loadBackendDispatchFunction(const Packet pPacket)
+	X_INLINE const Command::Enum loadCommandType(const Packet pPacket)
 	{
 		return *getCommandType(pPacket);
 	}
