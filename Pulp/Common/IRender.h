@@ -57,17 +57,28 @@ X_DECLARE_ENUM(PrimitiveTypePublic)(
 );
 
 
-#if 0
+#if 1
 X_DECLARE_FLAGS8(StencilOperation)( KEEP, ZERO, REPLACE, INCR_SAT, DECR_SAT, INVERT, INCR, DECR );
 X_DECLARE_FLAGS8(StencilFunc)(NEVER, LESS, EQUAL, LESS_EQUAL, GREATER, NOT_EQUAL, GREATER_EQUAL, ALWAYS);
 
-struct StencilState
+struct StencilDesc
 {
 	Flags8<StencilFunc> StencilFunc;
 	Flags8<StencilOperation> FailOp;
 	Flags8<StencilOperation> ZFailOp;
 	Flags8<StencilOperation> PassOp;
 };
+
+struct StencilState
+{
+	StencilDesc front;
+	StencilDesc back;
+};
+
+
+X_ENSURE_SIZE(StencilDesc, 4);
+X_ENSURE_SIZE(StencilState, 8);
+
 
 #else
 struct StencilState
@@ -455,7 +466,7 @@ struct IRender
 
 	// everying is depriciated.
 	virtual void SetState(StateFlag state) X_ABSTRACT;
-	virtual void SetStencilState(StencilState::Value ss) X_ABSTRACT;
+//	virtual void SetStencilState(StencilState::Value ss) X_ABSTRACT;
 	virtual void SetCullMode(CullMode::Enum mode) X_ABSTRACT;
 	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_ABSTRACT;
 

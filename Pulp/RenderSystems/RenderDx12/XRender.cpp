@@ -1300,10 +1300,10 @@ void XRender::SetState(StateFlag state)
 	X_UNUSED(state);
 }
 
-void XRender::SetStencilState(StencilState::Value ss)
-{
-	X_UNUSED(ss);
-}
+//void XRender::SetStencilState(StencilState::Value ss)
+//{
+//	X_UNUSED(ss);
+//}
 
 void XRender::SetCullMode(CullMode::Enum mode)
 {

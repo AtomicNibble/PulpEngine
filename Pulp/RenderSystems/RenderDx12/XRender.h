@@ -83,7 +83,7 @@ public:
 	// =============================================
 
 	virtual void SetState(StateFlag state) X_OVERRIDE;
-	virtual void SetStencilState(StencilState::Value ss) X_OVERRIDE;
+//	virtual void SetStencilState(StencilState::Value ss) X_OVERRIDE;
 	virtual void SetCullMode(CullMode::Enum mode) X_OVERRIDE;
 	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_OVERRIDE;
 	virtual void GetViewport(int* x, int* y, int* width, int* height) X_OVERRIDE;
