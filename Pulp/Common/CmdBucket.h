@@ -11,6 +11,8 @@
 
 #include <Containers\Array.h>
 
+#include <Math\XViewPort.h>
+
 #include <IRender.h>
 #include <IRenderCommands.h>
 
@@ -83,12 +85,13 @@ class CommandBucketBase
 	typedef core::Array<uint32_t> SortedIdxArr;
 
 protected:
-	CommandBucketBase(core::MemoryArenaBase* arena, size_t size, const XCamera& cam);
+	CommandBucketBase(core::MemoryArenaBase* arena, size_t size, const XCamera& cam, const XViewPort& viewport);
 	~CommandBucketBase() = default;
 
 public:
 	X_INLINE const Matrix44f& getViewMatrix(void);
 	X_INLINE const Matrix44f& getProjMatrix(void);
+	X_INLINE const XViewPort& getViewport(void);
 
 	X_INLINE const SortedIdxArr& getSortedIdx(void);
 	X_INLINE const PacketArr& getPackets(void);
@@ -97,6 +100,7 @@ public:
 protected:
 	Matrix44f view_;
 	Matrix44f proj_;
+	XViewPort viewport_;
 
 	core::AtomicInt current_;
 	core::Array<CommandPacket::Packet> packets_;
@@ -131,7 +135,7 @@ public:
 	CommandBucket(core::MemoryArenaBase* arena, // used to allocate key and packet arrays
 		CmdPacketAllocator& packetAlloc,		// used to allocate the packets, needs to be thread safe
 		size_t size,							// number of keys / packets.
-		const XCamera& cam);
+		const XCamera& cam, const XViewPort& viewport);
 	~CommandBucket();
 
 	void sort(void);

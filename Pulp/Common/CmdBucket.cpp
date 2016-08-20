@@ -59,10 +59,11 @@ CmdPacketAllocator::ThreadAllocator::ThreadAllocator(void* pStart, void* pEnd) :
 
 // -------------------------------------------------------
 
-CommandBucketBase::CommandBucketBase(core::MemoryArenaBase* arena, size_t size, const XCamera& cam) :
+CommandBucketBase::CommandBucketBase(core::MemoryArenaBase* arena, size_t size, const XCamera& cam, const XViewPort& viewport) :
 	current_(0),
 	packets_(arena, size),
-	sortedIdx_(arena, size)
+	sortedIdx_(arena, size),
+	viewport_(viewport)
 {
 	X_UNUSED(cam);
 }
@@ -70,8 +71,8 @@ CommandBucketBase::CommandBucketBase(core::MemoryArenaBase* arena, size_t size, 
 
 template <typename KeyT>
 CommandBucket<KeyT>::CommandBucket(core::MemoryArenaBase* arena, CmdPacketAllocator& packetAlloc, 
-	size_t size, const XCamera& cam) :
-	CommandBucketBase(arena, size, cam),
+	size_t size, const XCamera& cam, const XViewPort& viewport) :
+	CommandBucketBase(arena, size, cam, viewport),
 	packetAlloc_(packetAlloc),
 	arena_(arena),
 	keys_(arena, size)

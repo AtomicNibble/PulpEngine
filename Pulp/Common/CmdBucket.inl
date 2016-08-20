@@ -16,6 +16,11 @@ X_INLINE const Matrix44f& CommandBucketBase::getProjMatrix(void)
 	return proj_;
 }
 
+X_INLINE const XViewPort& CommandBucketBase::getViewport(void)
+{
+	return viewport_;
+}
+
 X_INLINE const CommandBucketBase::SortedIdxArr& CommandBucketBase::getSortedIdx(void)
 {
 	return sortedIdx_;
