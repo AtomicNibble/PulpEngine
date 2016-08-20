@@ -22,7 +22,7 @@ public:
 	virtual void renderBegin(void) X_OVERRIDE;
 	virtual void renderEnd(void) X_OVERRIDE;
 
-	virtual void submitCommandPackets(CommandBucketBase& cmdBucket) X_OVERRIDE;
+	virtual void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands::Key::Type::Enum keyType) X_OVERRIDE;
 
 	virtual IRenderAux* getAuxRender(AuxRenderer::Enum user) X_OVERRIDE;
 
@@ -37,7 +37,7 @@ public:
 	// =============================================
 
 	virtual void SetState(StateFlag state) X_OVERRIDE;
-	virtual void SetStencilState(StencilState::Value ss) X_OVERRIDE;
+//	virtual void SetStencilState(StencilState::Value ss) X_OVERRIDE;
 	virtual void SetCullMode(CullMode::Enum mode) X_OVERRIDE;
 	virtual void Set2D(bool value, float znear = -1e10f, float zfar = 1e10f) X_OVERRIDE;
 

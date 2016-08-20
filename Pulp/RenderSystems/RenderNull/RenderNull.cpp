@@ -55,9 +55,10 @@ void RenderNull::renderEnd()
 
 }
 
-void RenderNull::submitCommandPackets(CommandBucketBase& cmdBucket)
+void RenderNull::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands::Key::Type::Enum keyType)
 {
 	X_UNUSED(cmdBucket);
+	X_UNUSED(keyType);
 }
 
 IRenderAux* RenderNull::getAuxRender(AuxRenderer::Enum user)
@@ -96,11 +97,6 @@ shader::IShader* RenderNull::getShader(const char* path)
 void RenderNull::SetState(StateFlag state)
 {
 	X_UNUSED(state);
-}
-
-void RenderNull::SetStencilState(StencilState::Value ss)
-{
-	X_UNUSED(ss);
 }
 
 void RenderNull::SetCullMode(CullMode::Enum mode)
