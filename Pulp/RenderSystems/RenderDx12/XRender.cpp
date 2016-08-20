@@ -468,7 +468,7 @@ void XRender::submitCommandPackets(CommandBucketBase& cmdBucket)
 
 void XRender::submitPacket(const CommandPacket::Packet pPacket)
 {
-	const CommandPacket::Command::Enum cmdType = *CommandPacket::getCommandType(pPacket);
+	const CommandPacket::Command::Enum cmdType = CommandPacket::loadCommandType(pPacket);
 	const void* pCmd = CommandPacket::loadCommand(pPacket);
 	
 	switch (cmdType)
