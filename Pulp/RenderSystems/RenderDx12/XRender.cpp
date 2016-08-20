@@ -449,24 +449,40 @@ void XRender::renderEnd(void)
 }
 
 
-void XRender::submitCommandPackets(CommandBucketBase& cmdBucket)
+void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands::Key::Type::Enum keyType)
 {
 	const auto& sortedIdx = cmdBucket.getSortedIdx();
 	const auto& packets = cmdBucket.getPackets();
+	const auto& keys = cmdBucket.getKeys();
+
+	GraphicsContext* pContext = pContextMan_->allocateGraphicsContext();
+
+	// we need to setup stuff like render targets.
+	// viewPort
+	// RootSig / PSO
+	//	for the PSO should i just make one each frame knowing the device object will get cached.
+	//  instead of explicitly selecting a PSO object.
+	//  I'll do it the dynamic way and see if it's slow, would be nice to keep fully dynamic.
+
 
 	for (size_t i = 0; i < sortedIdx.size(); ++i)
 	{
+		const uint32_t key = keys[i];
 		CommandPacket::Packet pPacket = packets[sortedIdx[i]];
+
 		while (pPacket != nullptr)
 		{
-			submitPacket(pPacket);
+			submitPacket(*pContext, pPacket);
 			pPacket = CommandPacket::loadNextCommandPacket(pPacket);
 		}
 	}
+
+	pContext->finishAndFree(false);
+
 }
 
 
-void XRender::submitPacket(const CommandPacket::Packet pPacket)
+void XRender::submitPacket(GraphicsContext& context, const CommandPacket::Packet pPacket)
 {
 	const CommandPacket::Command::Enum cmdType = CommandPacket::loadCommandType(pPacket);
 	const void* pCmd = CommandPacket::loadCommand(pPacket);
@@ -474,7 +490,19 @@ void XRender::submitPacket(const CommandPacket::Packet pPacket)
 	switch (cmdType)
 	{
 	case Commands::Command::DRAW:
+	{
+		const Commands::Draw& draw = *reinterpret_cast<const Commands::Draw*>(pCmd);
+
+		context.draw(draw.vertexCount, draw.startVertex);
+		break;
+	}
 	case Commands::Command::DRAW_INDEXED:
+	{
+		const Commands::DrawIndexed& draw = *reinterpret_cast<const Commands::DrawIndexed*>(pCmd);
+
+		context.drawIndexed(draw.indexCount, draw.startIndex, draw.baseVertex);
+		break;
+	}
 	case Commands::Command::COPY_CONST_BUF_DATA:
 		break;
 

@@ -5,6 +5,7 @@
 
 #include <ITexture.h>
 #include <IShader.h>
+#include <IRenderCommands.h>
 
 #include <Containers\Array.h>
 
@@ -30,7 +31,9 @@ X_NAMESPACE_BEGIN(render)
 
 struct IRenderAux;
 
-class CommandBucketBase;
+template<typename>
+class CommandBucket;
+
 
 namespace shader
 {
@@ -432,7 +435,7 @@ struct IRender
 	virtual void renderBegin(void) X_ABSTRACT;
 	virtual void renderEnd(void) X_ABSTRACT;
 
-	virtual void submitCommandPackets(CommandBucketBase& cmdBucket) X_ABSTRACT;
+	virtual void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands::Key::Type::Enum keyType) X_ABSTRACT;
 
 	// each enum has a instance, and you don't own the pointer.
 	virtual IRenderAux* getAuxRender(AuxRenderer::Enum user) X_ABSTRACT;

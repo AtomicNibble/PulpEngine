@@ -35,7 +35,10 @@ class LinearAllocatorManager;
 class RootSignatureDeviceCache;
 class PSODeviceCache;
 
-class CommandBucketBase;
+class GraphicsContext;
+
+template<typename>
+class CommandBucket;
 
 
 class XRender : public IRender
@@ -63,7 +66,7 @@ public:
 	void renderBegin(void) X_OVERRIDE;
 	void renderEnd(void) X_OVERRIDE;
 
-	void submitCommandPackets(CommandBucketBase& cmdBucket) X_OVERRIDE;
+	void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands::Key::Type::Enum keyType) X_OVERRIDE;
 
 	IRenderAux* getAuxRender(AuxRenderer::Enum user) X_OVERRIDE;
 
@@ -157,7 +160,7 @@ public:
 	// =============================================
 
 private:
-	void submitPacket(const CommandPacket::Packet pPacket);
+	void submitPacket(GraphicsContext& context, const CommandPacket::Packet pPacket);
 
 
 private:
