@@ -588,6 +588,15 @@ Commands::IndexBufferHandle XRender::createIndexBuffer(uint32_t size, const void
 	return pBuffMan_->createIndexBuf(size, pInitialData, usage, accessFlag);
 }
 
+
+void XRender::destoryVertexBuffer(Commands::VertexBufferHandle handle)
+{
+	pBuffMan_->freeVB(handle);
+}
+
+void XRender::destoryIndexBuffer(Commands::IndexBufferHandle handle)
+{
+	pBuffMan_->freeIB(handle);
 }
 
 

@@ -463,6 +463,8 @@ struct IRender
 	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
 	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
 
+	virtual void destoryVertexBuffer(Commands::VertexBufferHandle handle) X_ABSTRACT;
+	virtual void destoryIndexBuffer(Commands::IndexBufferHandle handle) X_ABSTRACT;
 
 	virtual texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_ABSTRACT;
 	virtual shader::IShader* getShader(const char* pName) X_ABSTRACT;
