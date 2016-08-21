@@ -333,6 +333,7 @@
     <ClInclude Include="Allocators\LinearAllocator.h" />
     <ClInclude Include="Auxiliary\AuxRender.h" />
     <ClInclude Include="Auxiliary\AuxRenderImp.h" />
+    <ClInclude Include="Buffers\BufferManager.h" />
     <ClInclude Include="Buffers\ColorBuffer.h" />
     <ClInclude Include="Buffers\DepthBuffer.h" />
     <ClInclude Include="Buffers\GpuBuffer.h" />
@@ -374,6 +375,7 @@
     <ClCompile Include="Auxiliary\AuxRender.cpp" />
     <ClCompile Include="Auxiliary\AuxRenderImp.cpp" />
     <ClCompile Include="Auxiliary\AuxRenderImpLods.cpp" />
+    <ClCompile Include="Buffers\BufferManager.cpp" />
     <ClCompile Include="Buffers\ColorBuffer.cpp" />
     <ClCompile Include="Buffers\DepthBuffer.cpp" />
     <ClCompile Include="Buffers\GpuBuffer.cpp" />

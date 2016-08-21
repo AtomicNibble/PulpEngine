@@ -173,6 +173,9 @@
     <ClInclude Include="Util\Config.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Buffers\BufferManager.h">
+      <Filter>Header Files\Buffers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -279,6 +282,9 @@
     </ClCompile>
     <ClCompile Include="CommandListManger.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Buffers\BufferManager.cpp">
+      <Filter>Source Files\Buffers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
