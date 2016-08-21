@@ -439,7 +439,7 @@ struct IShader
 
 
 	virtual const char* getName() const X_ABSTRACT;
-	virtual VertexFormat::Enum getVertexFmt() X_ABSTRACT;
+//	virtual VertexFormat::Enum getVertexFmt() X_ABSTRACT;
 //	virtual ShaderType::Enum getType() X_ABSTRACT;
 
 };

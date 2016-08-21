@@ -158,7 +158,7 @@ public:
 	const int32_t release(void) X_OVERRIDE;
 	
 	X_INLINE const char* getName(void) const X_OVERRIDE;
-	X_INLINE VertexFormat::Enum getVertexFmt(void) X_OVERRIDE;
+//	X_INLINE VertexFormat::Enum getVertexFmt(void) X_OVERRIDE;
 
 	X_INLINE size_t numTechs(void) const;
 
@@ -166,7 +166,7 @@ private:
 	core::string name_;
 	uint32_t sourceCrc32_;
 	uint32_t hlslSourceCrc32_;
-	VertexFormat::Enum vertexFmt_;
+//	VertexFormat::Enum vertexFmt_;
 	SourceFile* pHlslFile_;
 	core::Array<XShaderTechnique> techs_;
 };

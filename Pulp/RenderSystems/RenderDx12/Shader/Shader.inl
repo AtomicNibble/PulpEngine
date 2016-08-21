@@ -20,10 +20,10 @@ namespace shader
 		return name_.c_str(); 
 	}
 
-	X_INLINE VertexFormat::Enum XShader::getVertexFmt(void)
-	{ 
-		return vertexFmt_; 
-	}
+	//X_INLINE VertexFormat::Enum XShader::getVertexFmt(void)
+	//{ 
+	//	return vertexFmt_; 
+	//}
 
 
 	X_INLINE size_t XShader::numTechs(void) const 

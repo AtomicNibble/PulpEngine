@@ -140,7 +140,7 @@ XShader::XShader(core::MemoryArenaBase* arena) :
 	sourceCrc32_ = 0;
 	hlslSourceCrc32_ = 0;
 
-	vertexFmt_ = VertexFormat::P3F_T2F_C4B;
+	// vertexFmt_ = VertexFormat::P3F_T2F_C4B;
 
 	pHlslFile_ = nullptr;
 }
