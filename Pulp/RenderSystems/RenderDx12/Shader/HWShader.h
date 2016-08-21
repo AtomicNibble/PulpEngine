@@ -140,7 +140,7 @@ namespace shader
 		X_INLINE bool isCompiling(void) const;
 
 		X_INLINE const core::Array<XShaderParam> getBindVars(void) const;
-		X_INLINE const core::Array<uint8_t>& getShaderByteCode(void) const;
+		X_INLINE const ByteArr& getShaderByteCode(void) const;
 
 	public:
 		bool compile(ShaderBin& shaderBin);
