@@ -9,9 +9,9 @@ X_NAMESPACE_BEGIN(render)
 
 namespace Commands
 {
-	typedef void* VertexBufferHandle;
-	typedef void* IndexBufferHandle;
-	typedef void* ConstantBufferHandle;
+	typedef uintptr_t VertexBufferHandle;
+	typedef uintptr_t IndexBufferHandle;
+	typedef uintptr_t ConstantBufferHandle;
 
 	X_DECLARE_ENUM(Command)(DRAW, DRAW_INDEXED, COPY_CONST_BUF_DATA);
 
