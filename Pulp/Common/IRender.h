@@ -426,6 +426,13 @@ struct IRender
 	// they are not thread safe, but it's fine to populate diffrent aux instances in diffrent threads.
 	X_DECLARE_ENUM(AuxRenderer)(MISC, PHYSICS);
 	X_DECLARE_FLAGS(CpuAccess)(WRITE, READ);
+
+	X_DECLARE_ENUM(BufUsage)(
+		IMMUTABLE,  // never changes
+		STATIC,	    // changes sometimes not every frame.
+		DYNAMIC		// stuff that changes every frame
+	);
+
 	typedef Flags<CpuAccess> CpuAccessFlags;
 
 	virtual ~IRender() {};
@@ -451,10 +458,10 @@ struct IRender
 	virtual Vec2<uint32_t> getDisplayRes(void) const X_ABSTRACT;
 
 
-	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, CpuAccessFlags accessFlag) X_ABSTRACT;
-	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag) X_ABSTRACT;
-	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, CpuAccessFlags accessFlag) X_ABSTRACT;
-	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag) X_ABSTRACT;
+	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
+	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
+	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
+	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
 
 
 	virtual texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_ABSTRACT;

@@ -10,7 +10,9 @@ BufferManager::Stats::Stats()
 }
 
 BufferManager::BufferManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice) :
-	pDevice_(pDevice)
+	pDevice_(pDevice),
+	idLookup_(arena),
+	freeIds_(arena)
 {
 	X_UNUSED(arena);
 }
@@ -20,17 +22,29 @@ BufferManager::~BufferManager()
 
 }
 
-void* BufferManager::createVertexBuf(uint32_t size, const void* pInitialData, IRender::CpuAccessFlags accessFlag)
+BufferManager::VertexBufferHandle BufferManager::createVertexBuf(uint32_t size, const void* pInitialData,
+	IRender::BufUsage::Enum usage, IRender::CpuAccessFlags accessFlag)
 {
 
-	return nullptr;
+	return 0;
 }
 
 
-void* BufferManager::createIndexBuf(uint32_t size, const void* pInitialData, IRender::CpuAccessFlags accessFlag)
+BufferManager::IndexBufferHandle BufferManager::createIndexBuf(uint32_t size, const void* pInitialData,
+	IRender::BufUsage::Enum usage, IRender::CpuAccessFlags accessFlag)
 {
 
-	return nullptr;
+	return 0;
+}
+
+void BufferManager::freeIB(IndexBufferHandle IBHandle)
+{
+	X_UNUSED(IBHandle);
+}
+
+void BufferManager::freeVB(VertexBufferHandle VBHandle)
+{
+	X_UNUSED(VBHandle);
 }
 
 

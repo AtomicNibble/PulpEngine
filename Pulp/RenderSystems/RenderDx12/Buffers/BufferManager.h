@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Containers\Array.h>
+#include <Containers\Fifo.h>
 
 
 X_NAMESPACE_BEGIN(render)
@@ -14,6 +16,10 @@ X_NAMESPACE_BEGIN(render)
 class BufferManager
 {
 public:
+	typedef Commands::VertexBufferHandle VertexBufferHandle;
+	typedef Commands::IndexBufferHandle IndexBufferHandle;
+
+
 	struct Stats
 	{
 		Stats();
@@ -33,11 +39,16 @@ public:
 	BufferManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice);
 	~BufferManager();
 
+	VertexBufferHandle createVertexBuf(uint32_t size, const void* pInitialData, IRender::BufUsage::Enum usage, IRender::CpuAccessFlags accessFlag);
+	IndexBufferHandle createIndexBuf(uint32_t size, const void* pInitialData, IRender::BufUsage::Enum usage, IRender::CpuAccessFlags accessFlag);
 
-	X_INLINE void* createVertexBuf(uint32_t size, IRender::CpuAccessFlags accessFlag);
-	void* createVertexBuf(uint32_t size, const void* pInitialData, IRender::CpuAccessFlags accessFlag);
-	X_INLINE void* createIndexBuf(uint32_t size, IRender::CpuAccessFlags accessFlag);
-	void* createIndexBuf(uint32_t size, const void* pInitialData, IRender::CpuAccessFlags accessFlag);
+	// free from ID
+	void freeIB(IndexBufferHandle IBHandle);
+	void freeVB(VertexBufferHandle VBHandle);
+
+	// get the buffer from a ID
+	void* IBFromHandle(IndexBufferHandle bufHandle) const;
+	void* VBFromHandle(VertexBufferHandle bufHandle) const;
 
 
 	Stats getStats(void) const;
@@ -46,20 +57,16 @@ public:
 private:
 	ID3D12Device* pDevice_;
 
+	// id'x are index into this buf.
+	core::Array<void*> idLookup_;
+	// contains empty slots.
+	core::Fifo<uint32_t> freeIds_;
+
 private:
 #if VID_MEMORY_STATS
 	Stats stats_;
 #endif // !VID_MEMORY_STATS
 };
 
-X_INLINE void* BufferManager::createVertexBuf(uint32_t size, IRender::CpuAccessFlags accessFlag)
-{
-	return createVertexBuf(size, nullptr, accessFlag);
-}
-
-X_INLINE void* BufferManager::createIndexBuf(uint32_t size, IRender::CpuAccessFlags accessFlag)
-{
-	return createIndexBuf(size, nullptr, accessFlag);
-}
 
 X_NAMESPACE_END

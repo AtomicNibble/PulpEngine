@@ -568,24 +568,26 @@ Vec2<uint32_t> XRender::getDisplayRes(void) const
 }
 
 
-Commands::VertexBufferHandle XRender::createVertexBuffer(uint32_t size, CpuAccessFlags accessFlag)
+Commands::VertexBufferHandle XRender::createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
-	return pBuffMan_->createVertexBuf(size, accessFlag);
+	return pBuffMan_->createVertexBuf(size, nullptr, usage, accessFlag);
 }
 
-Commands::VertexBufferHandle XRender::createVertexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag)
+Commands::VertexBufferHandle XRender::createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
-	return pBuffMan_->createVertexBuf(size, pInitialData, accessFlag);
+	return pBuffMan_->createVertexBuf(size, pInitialData, usage, accessFlag);
 }
 
-Commands::IndexBufferHandle XRender::createIndexBuffer(uint32_t size, CpuAccessFlags accessFlag)
+Commands::IndexBufferHandle XRender::createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
-	return pBuffMan_->createIndexBuf(size, accessFlag);
+	return pBuffMan_->createIndexBuf(size, nullptr, usage, accessFlag);
 }
 
-Commands::IndexBufferHandle XRender::createIndexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag)
+Commands::IndexBufferHandle XRender::createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
-	return pBuffMan_->createIndexBuf(size, pInitialData, accessFlag);
+	return pBuffMan_->createIndexBuf(size, pInitialData, usage, accessFlag);
+}
+
 }
 
 

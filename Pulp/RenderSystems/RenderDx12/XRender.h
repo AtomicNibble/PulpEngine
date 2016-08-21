@@ -73,10 +73,11 @@ public:
 	Vec2<uint32_t> getDisplayRes(void) const X_OVERRIDE;
 
 
-	Commands::VertexBufferHandle createVertexBuffer(uint32_t size, CpuAccessFlags accessFlag) X_OVERRIDE;
-	Commands::VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag) X_OVERRIDE;
-	Commands::IndexBufferHandle createIndexBuffer(uint32_t size, CpuAccessFlags accessFlag) X_OVERRIDE;
-	Commands::IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag) X_OVERRIDE;
+	Commands::VertexBufferHandle createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+	Commands::VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+	Commands::IndexBufferHandle createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+	Commands::IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+
 
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
 	shader::IShader* getShader(const char* pName) X_OVERRIDE;
