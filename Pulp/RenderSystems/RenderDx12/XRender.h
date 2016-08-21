@@ -31,7 +31,7 @@ X_NAMESPACE_BEGIN(render)
 class RenderAuxImp;
 class ContextManager;
 class LinearAllocatorManager;
-
+class BufferManager;
 class RootSignatureDeviceCache;
 class PSODeviceCache;
 
@@ -72,6 +72,11 @@ public:
 
 	Vec2<uint32_t> getDisplayRes(void) const X_OVERRIDE;
 
+
+	Commands::VertexBufferHandle createVertexBuffer(uint32_t size, CpuAccessFlags accessFlag) X_OVERRIDE;
+	Commands::VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag) X_OVERRIDE;
+	Commands::IndexBufferHandle createIndexBuffer(uint32_t size, CpuAccessFlags accessFlag) X_OVERRIDE;
+	Commands::IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag) X_OVERRIDE;
 
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
 	shader::IShader* getShader(const char* pName) X_OVERRIDE;
@@ -197,12 +202,13 @@ private:
 	LinearAllocatorManager* pLinearAllocatorMan_;
 	ContextManager* pContextMan_;
 	CommandListManger cmdListManager_;
-
+	BufferManager* pBuffMan_;
 	DescriptorAllocator* pDescriptorAllocator_;
 	DescriptorAllocatorPool* pDescriptorAllocatorPool_;
 
 	RootSignatureDeviceCache* pRootSigCache_;
 	PSODeviceCache* pPSOCache_;
+
 
 
 	RootSignature presentRS_;

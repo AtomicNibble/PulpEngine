@@ -7,6 +7,7 @@
 #include "Auxiliary\AuxRenderImp.h"
 
 #include "Allocators\LinearAllocator.h"
+#include "Buffers\BufferManager.h"
 #include "CommandContex.h"
 #include "PipelineState.h"
 
@@ -57,6 +58,7 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	shaderMan_(arena),
 	pContextMan_(nullptr),
 	cmdListManager_(arena),
+	pBuffMan_(nullptr),
 	dedicatedvideoMemory_(0),
 	pDescriptorAllocator_(nullptr),
 	pDescriptorAllocatorPool_(nullptr),
@@ -197,6 +199,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 		}
 	}
 
+	pBuffMan_ = X_NEW(BufferManager, arena_, "BufferManager")(arena_, pDevice_);
 	pDescriptorAllocator_ = X_NEW(DescriptorAllocator, arena_, "DescriptorAllocator")(arena_, pDevice_);
 	pDescriptorAllocatorPool_ = X_NEW(DescriptorAllocatorPool, arena_, "DescriptorAllocatorPool")(arena_, pDevice_, cmdListManager_);
 
@@ -562,6 +565,27 @@ IRenderAux* XRender::getAuxRender(AuxRenderer::Enum user)
 Vec2<uint32_t> XRender::getDisplayRes(void) const
 {
 	return displayRes_;
+}
+
+
+Commands::VertexBufferHandle XRender::createVertexBuffer(uint32_t size, CpuAccessFlags accessFlag)
+{
+	return pBuffMan_->createVertexBuf(size, accessFlag);
+}
+
+Commands::VertexBufferHandle XRender::createVertexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag)
+{
+	return pBuffMan_->createVertexBuf(size, pInitialData, accessFlag);
+}
+
+Commands::IndexBufferHandle XRender::createIndexBuffer(uint32_t size, CpuAccessFlags accessFlag)
+{
+	return pBuffMan_->createIndexBuf(size, accessFlag);
+}
+
+Commands::IndexBufferHandle XRender::createIndexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag)
+{
+	return pBuffMan_->createIndexBuf(size, pInitialData, accessFlag);
 }
 
 

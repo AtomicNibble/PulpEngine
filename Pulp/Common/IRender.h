@@ -451,9 +451,11 @@ struct IRender
 	virtual Vec2<uint32_t> getDisplayRes(void) const X_ABSTRACT;
 
 
-//	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag) X_ABSTRACT;
-//	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, CpuAccessFlags accessFlag) X_ABSTRACT;
-//	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag) X_ABSTRACT;
+	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, CpuAccessFlags accessFlag) X_ABSTRACT;
+	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag) X_ABSTRACT;
+	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, CpuAccessFlags accessFlag) X_ABSTRACT;
+	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag) X_ABSTRACT;
+
 
 	virtual texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_ABSTRACT;
 	virtual shader::IShader* getShader(const char* pName) X_ABSTRACT;
