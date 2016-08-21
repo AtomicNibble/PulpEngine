@@ -4,6 +4,7 @@
 #include "Texture\TextureManager.h"
 #include "Texture\Texture.h"
 #include "Shader\Shader.h"
+#include "Shader\HWShader.h"
 #include "Auxiliary\AuxRenderImp.h"
 
 #include "Allocators\LinearAllocator.h"
@@ -491,18 +492,101 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands:
 	const auto& viewMat = cmdBucket.getViewMatrix();
 	const auto& projMat = cmdBucket.getProjMatrix();
 	const auto& viewport = cmdBucket.getViewport();
+	const auto& rtvs = cmdBucket.getRTVS();
+
+	const uint32_t numRtvs = safe_static_cast<uint32_t, size_t>(rtvs.size());
+
+	// will we ever not need one?
+	if (rtvs.isEmpty()) {
+		X_FATAL("Dx12", "atleast one rt is required");
+		return;
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE RTVs[MAX_RENDER_TARGETS];
+	DXGI_FORMAT RTVFormats[MAX_RENDER_TARGETS];
+
+	core::zero_object(RTVs);
+	core::zero_object(RTVFormats);
+
+	for (size_t i = 0; i < rtvs.size(); i++) {
+		const ColorBuffer& rtv = *static_cast<ColorBuffer*>(rtvs[i]);
+		RTVs[i] = rtv.getSRV();
+		RTVFormats[i] = rtv.getFormat();
+	}
+
+	StateFlag state;
+	StencilState stencilState;
+
+	// create a PSO object for this slut.
+	D3D12_BLEND_DESC blendDesc;
+	D3D12_RASTERIZER_DESC rasterizerDesc;
+	D3D12_DEPTH_STENCIL_DESC depthStencilDesc;
+
+	createDescFromState(state, blendDesc);
+	createDescFromState(state, rasterizerDesc);
+	createDescFromState(state, stencilState, depthStencilDesc);
+
+	// this will either be global or set via a command.
+	// since we will have some buckets where everything is sent to same shader.
+	// not much will switch shaders between draws.
+	shader::XShader* pShader = nullptr;
+	shader::XShaderTechnique* pTech = nullptr;
+	shader::XShaderTechniqueHW* pHWTech = nullptr; 
+
+	shader::VertexFormat::Enum vertexFmt = shader::VertexFormat::P3F_T2S_C4B;
+
+	RootSignature rootSig(arena_, 0, 0);
+	// what to populate this with?
+	// well more where do we get the info from to populate this.
+	// from the shader?
+	// or somewhre else.
+	//	If it's the shader the engine will have to know the size
+	rootSig.finalize(*pRootSigCache_,
+		D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
+	);
+
+	GraphicsPSO pso(arena_);
+	pso.setRootSignature(rootSig);
+	pso.setBlendState(blendDesc);
+	pso.setRasterizerState(rasterizerDesc);
+	pso.setDepthStencilState(depthStencilDesc);
+	pso.setSampleMask(0xFFFFFFFF);
+	pso.setRenderTargetFormats(numRtvs, RTVFormats, DXGI_FORMAT_UNKNOWN);
+	pso.setPrimitiveTopologyType(D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE);
+
+	const auto& inputDesc = ilDescriptions_[vertexFmt];
+	pso.setInputLayout(safe_static_cast<uint32_t, size_t>(inputDesc.size()), inputDesc.ptr());
+
+	// we should handle stuff like checking if compiled and not rendering
+	if (!pHWTech->canDraw()) {
+		return;
+	}
+
+	if (pHWTech->pVertexShader) {
+		const auto& byteCode = pHWTech->pVertexShader->getShaderByteCode();
+		pso.setVertexShader(byteCode.data(), byteCode.size());
+	}
+	if (pHWTech->pPixelShader) {
+		const auto& byteCode = pHWTech->pPixelShader->getShaderByteCode();
+		pso.setPixelShader(byteCode.data(), byteCode.size());
+	}
+
+
+	pso.finalize(*pPSOCache_);
 
 	GraphicsContext* pContext = pContextMan_->allocateGraphicsContext();
 
-	// we need to setup stuff like render targets.
-	// viewPort
-	// RootSig / PSO
-	//	for the PSO should i just make one each frame knowing the device object will get cached.
-	//  instead of explicitly selecting a PSO object.
-	//  I'll do it the dynamic way and see if it's slow, would be nice to keep fully dynamic.
 
+	pContext->setRootSignature(rootSig);
+	pContext->setPipelineState(pso);
 	pContext->setViewportAndScissor(0, 0, viewport.getWidth(), viewport.getHeight());
 
+	for (size_t i = 0; i < rtvs.size(); i++) {
+		ColorBuffer& rtv = *static_cast<ColorBuffer*>(rtvs[i]);
+		pContext->transitionResource(rtv, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	}
+	
+	pContext->setRenderTargets(numRtvs, RTVs);
 
 	for (size_t i = 0; i < sortedIdx.size(); ++i)
 	{
@@ -516,7 +600,8 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands:
 		}
 	}
 
-	pContext->finishAndFree(false);
+	// for now wait.
+	pContext->finishAndFree(true);
 
 }
 
@@ -532,6 +617,19 @@ void XRender::submitPacket(GraphicsContext& context, const CommandPacket::Packet
 	{
 		const Commands::Draw& draw = *reinterpret_cast<const Commands::Draw*>(pCmd);
 
+		// could add a seperate vert stream command if not many things use streams.
+		// but pretty much all models are using streams.
+		uint32_t numVertexStreams = 0;
+		D3D12_VERTEX_BUFFER_VIEW vertexViews[VertexStream::ENUM_COUNT] = { 0 };
+		for (size_t i = 0; i < VertexStream::ENUM_COUNT; i++) {
+			if (draw.vertexBuffers[i]) {
+				StructuredBuffer* pVertDeviceBuf = nullptr;
+				vertexViews[i] = pVertDeviceBuf->vertexBufferView();
+				numVertexStreams++;
+			}
+		}
+
+		context.setVertexBuffers(0, numVertexStreams, vertexViews);
 		context.draw(draw.vertexCount, draw.startVertex);
 		break;
 	}
@@ -539,6 +637,20 @@ void XRender::submitPacket(GraphicsContext& context, const CommandPacket::Packet
 	{
 		const Commands::DrawIndexed& draw = *reinterpret_cast<const Commands::DrawIndexed*>(pCmd);
 
+		ByteAddressBuffer* pIndexBuf = nullptr;
+
+		uint32_t numVertexStreams = 0;
+		D3D12_VERTEX_BUFFER_VIEW vertexViews[VertexStream::ENUM_COUNT] = { 0 };
+		for (size_t i = 0; i < VertexStream::ENUM_COUNT; i++) {
+			if (draw.vertexBuffers[i]) {
+				StructuredBuffer* pVertDeviceBuf = nullptr;
+				vertexViews[i] = pVertDeviceBuf->vertexBufferView();
+				numVertexStreams++;
+			}
+		}
+
+		context.setIndexBuffer(pIndexBuf->indexBufferView());
+		context.setVertexBuffers(0, numVertexStreams, vertexViews);
 		context.drawIndexed(draw.indexCount, draw.startIndex, draw.baseVertex);
 		break;
 	}
@@ -1261,6 +1373,7 @@ void XRender::createDescFromState(StateFlag state, StencilState stencilState, D3
 		backFace.StencilPassOp = static_cast<D3D12_STENCIL_OP>(g_StencilOpLookup[state.PassOp.ToInt()]);
 		backFace.StencilFunc = static_cast<D3D12_COMPARISON_FUNC>(g_StencilFuncLookup[state.StencilFunc.ToInt()]);
 	}
+
 
 
 	if (state.IsSet(StateFlag::DEPTHWRITE)) {
