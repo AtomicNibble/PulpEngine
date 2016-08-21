@@ -447,12 +447,10 @@ struct IRender
 	// each enum has a instance, and you don't own the pointer.
 	virtual IRenderAux* getAuxRender(AuxRenderer::Enum user) X_ABSTRACT;
 
-
+	// display res is stored as int, if you want float cast this.
 	virtual Vec2<uint32_t> getDisplayRes(void) const X_ABSTRACT;
-	virtual Vec2<float32_t> getDisplayResf(void) const X_ABSTRACT;
 
 
-//	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, CpuAccessFlags accessFlag) X_ABSTRACT;
 //	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag) X_ABSTRACT;
 //	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, CpuAccessFlags accessFlag) X_ABSTRACT;
 //	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, CpuAccessFlags accessFlag) X_ABSTRACT;
