@@ -1,6 +1,8 @@
 #pragma once
 
 
+#include <Math\VertexFormats.h>
+
 X_NAMESPACE_BEGIN(render)
 
 
@@ -20,8 +22,9 @@ namespace Commands
 		uint32_t vertexCount;
 		uint32_t startVertex;
 
-		shader::VertexFormat::Enum vertexLayout;
-		VertexBufferHandle vertexBuffer;
+	// not supporting for now till i have a need.
+	//	shader::VertexFormat::Enum vertexLayout;
+		VertexBufferHandle vertexBuffers[VertexStream::ENUM_COUNT];
 		IndexBufferHandle indexBuffer;
 	};
 
@@ -33,8 +36,8 @@ namespace Commands
 		uint32_t startIndex;
 		uint32_t baseVertex;
 
-		shader::VertexFormat::Enum vertexLayout;
-		VertexBufferHandle vertexBuffer;
+	//	shader::VertexFormat::Enum vertexLayout;
+		VertexBufferHandle vertexBuffers[VertexStream::ENUM_COUNT];
 		IndexBufferHandle indexBuffer;
 	};
 
