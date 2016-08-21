@@ -433,12 +433,16 @@ struct IShader
 {
 	virtual ~IShader() {}
 
-	virtual ShaderID getID() X_ABSTRACT;
-	virtual const int addRef() X_ABSTRACT;
-	virtual const int release() X_ABSTRACT;
+	virtual ShaderID getID(void) X_ABSTRACT;
+	virtual const int32_t addRef(void) X_ABSTRACT;
+	virtual const int32_t release(void) X_ABSTRACT;
+
+	virtual const char* getName(void) const X_ABSTRACT;
 
 
-	virtual const char* getName() const X_ABSTRACT;
+	// tech stuff.
+
+	
 //	virtual VertexFormat::Enum getVertexFmt() X_ABSTRACT;
 //	virtual ShaderType::Enum getType() X_ABSTRACT;
 
