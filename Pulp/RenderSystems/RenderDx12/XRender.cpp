@@ -623,8 +623,9 @@ void XRender::submitPacket(GraphicsContext& context, const CommandPacket::Packet
 		D3D12_VERTEX_BUFFER_VIEW vertexViews[VertexStream::ENUM_COUNT] = { 0 };
 		for (size_t i = 0; i < VertexStream::ENUM_COUNT; i++) {
 			if (draw.vertexBuffers[i]) {
-				StructuredBuffer* pVertDeviceBuf = nullptr;
-				vertexViews[i] = pVertDeviceBuf->vertexBufferView();
+				auto pVertBuf = pBuffMan_->VBFromHandle(draw.vertexBuffers[i]);
+
+				vertexViews[i] = pVertBuf->getBuf().vertexBufferView();
 				numVertexStreams++;
 			}
 		}
@@ -637,19 +638,20 @@ void XRender::submitPacket(GraphicsContext& context, const CommandPacket::Packet
 	{
 		const Commands::DrawIndexed& draw = *reinterpret_cast<const Commands::DrawIndexed*>(pCmd);
 
-		ByteAddressBuffer* pIndexBuf = nullptr;
-
 		uint32_t numVertexStreams = 0;
 		D3D12_VERTEX_BUFFER_VIEW vertexViews[VertexStream::ENUM_COUNT] = { 0 };
 		for (size_t i = 0; i < VertexStream::ENUM_COUNT; i++) {
 			if (draw.vertexBuffers[i]) {
-				StructuredBuffer* pVertDeviceBuf = nullptr;
-				vertexViews[i] = pVertDeviceBuf->vertexBufferView();
+				auto pVertBuf = pBuffMan_->VBFromHandle(draw.vertexBuffers[i]);
+
+				vertexViews[i] = pVertBuf->getBuf().vertexBufferView();
 				numVertexStreams++;
 			}
 		}
 
-		context.setIndexBuffer(pIndexBuf->indexBufferView());
+		auto pIBuf = pBuffMan_->IBFromHandle(draw.indexBuffer);
+
+		context.setIndexBuffer(pIBuf->getBuf().indexBufferView());
 		context.setVertexBuffers(0, numVertexStreams, vertexViews);
 		context.drawIndexed(draw.indexCount, draw.startIndex, draw.baseVertex);
 		break;
