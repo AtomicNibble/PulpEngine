@@ -366,5 +366,8 @@
     <None Include="CommandListManger.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="Buffers\BufferManager.inl">
+      <Filter>Header Files\Buffers</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -423,6 +423,7 @@
     <None Include="Allocators\LinearAllocator.inl" />
     <None Include="Auxiliary\AuxRender.inl" />
     <None Include="Auxiliary\AuxRenderImp.inl" />
+    <None Include="Buffers\BufferManager.inl" />
     <None Include="Buffers\ColorBuffer.inl" />
     <None Include="Buffers\DepthBuffer.inl" />
     <None Include="Buffers\GpuBuffer.inl" />

@@ -3,6 +3,17 @@
 #include <Containers\Array.h>
 #include <Containers\Fifo.h>
 
+#include <Memory\HeapArea.h>
+#include <Memory\AllocationPolicies\PoolAllocator.h>
+#include <Memory\ThreadPolicies\SingleThreadPolicy.h>
+#include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
+#include <Memory\MemoryTaggingPolicies\NoMemoryTagging.h>
+#include <Memory\MemoryTaggingPolicies\SimpleMemoryTagging.h>
+#include <Memory\MemoryTrackingPolicies\SimpleMemoryTracking.h>
+#include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
+#include <Memory\MemoryArena.h>
+
+#include "Buffers\GpuBuffer.h"
 
 X_NAMESPACE_BEGIN(render)
 
@@ -13,11 +24,45 @@ X_NAMESPACE_BEGIN(render)
 // or maybe it's better if the 2d engine has to do it via the render system.
 // then i might be able to track changes a bit better to resources.
 
+class X3DBuffer
+{
+public:
+	X3DBuffer();
+	~X3DBuffer();
+
+	X_INLINE const ByteAddressBuffer& getBuf(void) const;
+
+private:
+
+	uint32_t sizeBytes_;
+	uint32_t offset_;
+	uint32_t size_;
+	uint32_t unPaddedSize_;
+
+	ByteAddressBuffer* pBuffer_;
+	ID3D12Heap* pBackingHeap_;
+};
+
 class BufferManager
 {
 public:
+	static const size_t MAX_BUFFERS = 4096;
+
 	typedef Commands::VertexBufferHandle VertexBufferHandle;
 	typedef Commands::IndexBufferHandle IndexBufferHandle;
+	typedef Commands::IndexBufferHandle BufferHandle;
+
+	typedef core::MemoryArena<core::PoolAllocator,
+		core::SingleThreadPolicy,
+		core::NoBoundsChecking,
+#if X_DEBUG
+		core::SimpleMemoryTracking,
+		core::SimpleMemoryTagging
+#else
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+#endif !X_DEBUG
+	> PoolArena;
 
 
 	struct Stats
@@ -47,20 +92,25 @@ public:
 	void freeVB(VertexBufferHandle VBHandle);
 
 	// get the buffer from a ID
-	void* IBFromHandle(IndexBufferHandle bufHandle) const;
-	void* VBFromHandle(VertexBufferHandle bufHandle) const;
-
+	X3DBuffer* IBFromHandle(IndexBufferHandle bufHandle) const;
+	X3DBuffer* VBFromHandle(VertexBufferHandle bufHandle) const;
 
 	Stats getStats(void) const;
 
+private:
+	// Internal create
+	X3DBuffer* Int_CreateVB(uint32_t size);
+	X3DBuffer* Int_CreateIB(uint32_t size);
+
+	BufferHandle createHandleForBuffer(X3DBuffer* pBuf);
+	X3DBuffer* bufferForHandle(BufferHandle handle) const;
 
 private:
 	ID3D12Device* pDevice_;
 
-	// id'x are index into this buf.
-	core::Array<void*> idLookup_;
-	// contains empty slots.
-	core::Fifo<uint32_t> freeIds_;
+	core::HeapArea heap_;
+	core::PoolAllocator pool_;
+	PoolArena arena_;
 
 private:
 #if VID_MEMORY_STATS
@@ -70,3 +120,6 @@ private:
 
 
 X_NAMESPACE_END
+
+
+#include "BufferManager.inl"
