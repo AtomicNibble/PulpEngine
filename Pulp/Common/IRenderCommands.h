@@ -13,7 +13,13 @@ namespace Commands
 	typedef uintptr_t IndexBufferHandle;
 	typedef uintptr_t ConstantBufferHandle;
 
-	X_DECLARE_ENUM(Command)(DRAW, DRAW_INDEXED, COPY_CONST_BUF_DATA);
+	X_DECLARE_ENUM(Command)(
+		DRAW, 
+		DRAW_INDEXED, 
+		COPY_CONST_BUF_DATA,
+		COPY_INDEXES_BUF_DATA,
+		COPY_VERTEX_BUF_DATA
+	);
 
 	struct Draw
 	{
@@ -46,9 +52,31 @@ namespace Commands
 		static const Command::Enum CMD = Command::COPY_CONST_BUF_DATA;
 
 		ConstantBufferHandle constantBuffer;
-		void* data;
+		void* pData;
 		uint32_t size;
 	};
+
+	// these should only be used for updating not init of buf data.
+	// the buffers must be none IMMUTABLE
+	struct CopyIndexBufferData
+	{
+		static const Command::Enum CMD = Command::COPY_INDEXES_BUF_DATA;
+
+		IndexBufferHandle indexBuffer;
+		void* pData; // you own this, safe to clear after submitCommandPackets
+		uint32_t size;
+	};
+
+	struct CopyVertexBufferData
+	{
+		static const Command::Enum CMD = Command::COPY_VERTEX_BUF_DATA;
+
+		VertexBufferHandle vertexBuffer;
+		void* pData; // you own this, safe to clear after submitCommandPackets
+		uint32_t size;
+	};
+	//~
+
 
 	namespace Key
 	{
