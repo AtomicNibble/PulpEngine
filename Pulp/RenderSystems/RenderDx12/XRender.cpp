@@ -658,6 +658,26 @@ void XRender::submitPacket(GraphicsContext& context, const CommandPacket::Packet
 	}
 	case Commands::Command::COPY_CONST_BUF_DATA:
 		break;
+	case Commands::Command::COPY_INDEXES_BUF_DATA:
+	{
+		const Commands::CopyIndexBufferData& updateIB = *reinterpret_cast<const Commands::CopyIndexBufferData*>(pCmd);
+		auto pIBuf = pBuffMan_->IBFromHandle(updateIB.indexBuffer);
+
+		X_ASSERT(pIBuf->getUsage() != IRender::BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pIBuf->getUsage());
+
+		context.writeBuffer(pIBuf->getBuf(), 0, updateIB.pData, updateIB.size);
+	}
+		break;
+	case Commands::Command::COPY_VERTEX_BUF_DATA:
+	{
+		const Commands::CopyVertexBufferData& updateVB = *reinterpret_cast<const Commands::CopyVertexBufferData*>(pCmd);
+		auto pVBuf = pBuffMan_->IBFromHandle(updateVB.vertexBuffer);
+
+		X_ASSERT(pVBuf->getUsage() != IRender::BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pVBuf->getUsage());
+
+		context.writeBuffer(pVBuf->getBuf(), 0, updateVB.pData, updateVB.size);
+	}
+		break;
 
 #if X_DEBUG
 	default:
