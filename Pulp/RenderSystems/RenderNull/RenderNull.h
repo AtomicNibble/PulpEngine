@@ -27,7 +27,15 @@ public:
 	virtual IRenderAux* getAuxRender(AuxRenderer::Enum user) X_OVERRIDE;
 
 	virtual Vec2<uint32_t> getDisplayRes(void) const X_OVERRIDE;
-	virtual Vec2<float32_t> getDisplayResf(void) const X_OVERRIDE;
+
+	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+
+	virtual void destoryVertexBuffer(Commands::VertexBufferHandle handle) X_OVERRIDE;
+	virtual void destoryIndexBuffer(Commands::IndexBufferHandle handle) X_OVERRIDE;
+
 
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
 	shader::IShader* getShader(const char* pName) X_OVERRIDE;

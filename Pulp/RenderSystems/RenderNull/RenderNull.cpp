@@ -72,10 +72,54 @@ Vec2<uint32_t> RenderNull::getDisplayRes(void) const
 	return Vec2<uint32_t>::zero();
 }
 
-Vec2<float32_t> RenderNull::getDisplayResf(void) const
+Commands::VertexBufferHandle RenderNull::createVertexBuffer(uint32_t size,
+	BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
-	return Vec2<float32_t>::zero();
+	X_UNUSED(size);
+	X_UNUSED(usage);
+	X_UNUSED(accessFlag);
+	return 0;
 }
+
+Commands::VertexBufferHandle RenderNull::createVertexBuffer(uint32_t size,
+	const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
+{
+	X_UNUSED(size);
+	X_UNUSED(pInitialData);
+	X_UNUSED(usage);
+	X_UNUSED(accessFlag);
+	return 0;
+}
+
+Commands::IndexBufferHandle RenderNull::createIndexBuffer(uint32_t size,
+	BufUsage::Enum usage, CpuAccessFlags accessFlag)
+{
+	X_UNUSED(size);
+	X_UNUSED(usage);
+	X_UNUSED(accessFlag);
+	return 0;
+}
+
+Commands::IndexBufferHandle RenderNull::createIndexBuffer(uint32_t size,
+	const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
+{
+	X_UNUSED(size);
+	X_UNUSED(pInitialData);
+	X_UNUSED(usage);
+	X_UNUSED(accessFlag);
+	return 0;
+}
+
+void RenderNull::destoryVertexBuffer(Commands::VertexBufferHandle handle)
+{
+	X_UNUSED(handle);
+}
+
+void RenderNull::destoryIndexBuffer(Commands::IndexBufferHandle handle)
+{
+	X_UNUSED(handle);
+}
+
 
 
 texture::ITexture* RenderNull::getTexture(const char* path, texture::TextureFlags flags)
