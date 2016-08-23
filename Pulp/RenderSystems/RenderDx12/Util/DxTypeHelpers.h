@@ -144,4 +144,65 @@ struct CD3D12_SHADER_BYTECODE : public D3D12_SHADER_BYTECODE
 	}
 };
 
+
+//------------------------------------------------------------------------------------------------
+struct CD3DX12_HEAP_PROPERTIES : public D3D12_HEAP_PROPERTIES
+{
+	CD3DX12_HEAP_PROPERTIES()
+	{
+	}
+
+	explicit CD3DX12_HEAP_PROPERTIES(const D3D12_HEAP_PROPERTIES &o) :
+		D3D12_HEAP_PROPERTIES(o)
+	{
+	}
+
+	CD3DX12_HEAP_PROPERTIES(
+		D3D12_CPU_PAGE_PROPERTY cpuPageProperty,
+		D3D12_MEMORY_POOL memoryPoolPreference,
+		UINT creationNodeMask = 1,
+		UINT nodeMask = 1)
+	{
+		Type = D3D12_HEAP_TYPE_CUSTOM;
+		CPUPageProperty = cpuPageProperty;
+		MemoryPoolPreference = memoryPoolPreference;
+		CreationNodeMask = creationNodeMask;
+		VisibleNodeMask = nodeMask;
+	}
+
+	explicit CD3DX12_HEAP_PROPERTIES(
+		D3D12_HEAP_TYPE type,
+		UINT creationNodeMask = 1,
+		UINT nodeMask = 1)
+	{
+		Type = type;
+		CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
+		MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN;
+		CreationNodeMask = creationNodeMask;
+		VisibleNodeMask = nodeMask;
+	}
+
+	operator const D3D12_HEAP_PROPERTIES&() const { return *this; }
+	
+	bool IsCPUAccessible() const
+	{
+		return Type == D3D12_HEAP_TYPE_UPLOAD || Type == D3D12_HEAP_TYPE_READBACK || (Type == D3D12_HEAP_TYPE_CUSTOM &&
+			(CPUPageProperty == D3D12_CPU_PAGE_PROPERTY_WRITE_COMBINE || CPUPageProperty == D3D12_CPU_PAGE_PROPERTY_WRITE_BACK));
+	}
+};
+
+X_INLINE bool operator==(const D3D12_HEAP_PROPERTIES& l, const D3D12_HEAP_PROPERTIES& r)
+{
+	return l.Type == r.Type && l.CPUPageProperty == r.CPUPageProperty &&
+		l.MemoryPoolPreference == r.MemoryPoolPreference &&
+		l.CreationNodeMask == r.CreationNodeMask &&
+		l.VisibleNodeMask == r.VisibleNodeMask;
+}
+
+X_INLINE bool operator!=(const D3D12_HEAP_PROPERTIES& l, const D3D12_HEAP_PROPERTIES& r)
+{
+	return !(l == r);
+}
+
+
 X_NAMESPACE_END
