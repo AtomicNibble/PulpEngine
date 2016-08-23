@@ -10,6 +10,18 @@ X_INLINE const ByteAddressBuffer& X3DBuffer::getBuf(void) const
 	return *pBuffer_;
 }
 
+
+X_INLINE ByteAddressBuffer& X3DBuffer::getBuf(void)
+{
+	X_ASSERT_NOT_NULL(pBuffer_);
+	return *pBuffer_;
+}
+
+X_INLINE IRender::BufUsage::Enum X3DBuffer::getUsage(void) const
+{
+	return usage_;
+}
+
 // ------------------------------------------
 
 

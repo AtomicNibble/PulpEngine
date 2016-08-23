@@ -31,14 +31,19 @@ public:
 	~X3DBuffer();
 
 	X_INLINE const ByteAddressBuffer& getBuf(void) const;
+	X_INLINE ByteAddressBuffer& getBuf(void);
+
+	X_INLINE IRender::BufUsage::Enum getUsage(void) const;
 
 private:
+	IRender::BufUsage::Enum usage_;
 
 	uint32_t sizeBytes_;
 	uint32_t offset_;
 	uint32_t size_;
 	uint32_t unPaddedSize_;
 
+	// this will always be set, it might be placed if created from a backing heap.
 	ByteAddressBuffer* pBuffer_;
 	ID3D12Heap* pBackingHeap_;
 };
@@ -46,7 +51,11 @@ private:
 class BufferManager
 {
 public:
-	static const size_t MAX_BUFFERS = 4096;
+	static const size_t MIN_DEVICE_BUF_SIZE = 1024 * 64;
+	static const size_t POOL_SIZE = 8192;
+	static const size_t POOL_ALLOCATION_SIZE = core::Max(sizeof(X3DBuffer), sizeof(ByteAddressBuffer));
+	static const size_t POOL_ALLOCATION_ALIGN = core::Max(X_ALIGN_OF(X3DBuffer), X_ALIGN_OF(ByteAddressBuffer));
+
 
 	typedef Commands::VertexBufferHandle VertexBufferHandle;
 	typedef Commands::IndexBufferHandle IndexBufferHandle;
