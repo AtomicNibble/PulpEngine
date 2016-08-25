@@ -33,10 +33,12 @@ public:
 	X_INLINE const ByteAddressBuffer& getBuf(void) const;
 	X_INLINE ByteAddressBuffer& getBuf(void);
 
-	X_INLINE IRender::BufUsage::Enum getUsage(void) const;
+	X_INLINE BufUsage::Enum getUsage(void) const;
+
+	X_INLINE uint32_t getSize(void) const;
 
 private:
-	IRender::BufUsage::Enum usage_;
+	BufUsage::Enum usage_;
 
 	uint32_t sizeBytes_;
 	uint32_t offset_;
@@ -93,16 +95,18 @@ public:
 	BufferManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice);
 	~BufferManager();
 
-	VertexBufferHandle createVertexBuf(uint32_t size, const void* pInitialData, IRender::BufUsage::Enum usage, IRender::CpuAccessFlags accessFlag);
-	IndexBufferHandle createIndexBuf(uint32_t size, const void* pInitialData, IRender::BufUsage::Enum usage, IRender::CpuAccessFlags accessFlag);
+	VertexBufferHandle createVertexBuf(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag);
+	IndexBufferHandle createIndexBuf(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag);
 
 	// free from ID
 	void freeIB(IndexBufferHandle IBHandle);
 	void freeVB(VertexBufferHandle VBHandle);
 
 	// get the buffer from a ID
-	X3DBuffer* IBFromHandle(IndexBufferHandle bufHandle) const;
-	X3DBuffer* VBFromHandle(VertexBufferHandle bufHandle) const;
+	X_INLINE X3DBuffer* IBFromHandle(IndexBufferHandle bufHandle) const;
+	X_INLINE X3DBuffer* VBFromHandle(VertexBufferHandle bufHandle) const;
+
+	void getBufSize(BufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize) const;
 
 	Stats getStats(void) const;
 

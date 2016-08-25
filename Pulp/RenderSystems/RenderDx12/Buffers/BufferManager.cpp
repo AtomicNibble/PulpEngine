@@ -51,7 +51,7 @@ BufferManager::~BufferManager()
 }
 
 BufferManager::VertexBufferHandle BufferManager::createVertexBuf(uint32_t size, const void* pInitialData,
-	IRender::BufUsage::Enum usage, IRender::CpuAccessFlags accessFlag)
+	BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
 	X3DBuffer* pBuf = Int_CreateVB(size);
 
@@ -61,7 +61,7 @@ BufferManager::VertexBufferHandle BufferManager::createVertexBuf(uint32_t size, 
 
 
 BufferManager::IndexBufferHandle BufferManager::createIndexBuf(uint32_t size, const void* pInitialData,
-	IRender::BufUsage::Enum usage, IRender::CpuAccessFlags accessFlag)
+	BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
 	X3DBuffer* pBuf = Int_CreateVB(size);
 
@@ -92,6 +92,21 @@ void BufferManager::freeVB(VertexBufferHandle VBHandle)
 	
 	X_DELETE(pBuf, &arena_);
 }
+
+void BufferManager::getBufSize(BufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize) const
+{
+	X3DBuffer* pBuf = bufferForHandle(handle);
+	X_ASSERT_NOT_NULL(pBuf);
+	X_ASSERT_NOT_NULL(pOriginal);
+
+	*pOriginal = pBuf->getSize();
+
+	// for now just the same.
+	if (pDeviceSize) {
+		*pDeviceSize = pBuf->getSize();
+	}
+}
+
 
 
 BufferManager::Stats BufferManager::getStats(void) const

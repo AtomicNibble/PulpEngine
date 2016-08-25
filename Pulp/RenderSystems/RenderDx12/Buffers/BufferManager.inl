@@ -17,9 +17,14 @@ X_INLINE ByteAddressBuffer& X3DBuffer::getBuf(void)
 	return *pBuffer_;
 }
 
-X_INLINE IRender::BufUsage::Enum X3DBuffer::getUsage(void) const
+X_INLINE BufUsage::Enum X3DBuffer::getUsage(void) const
 {
 	return usage_;
+}
+
+X_INLINE uint32_t X3DBuffer::getSize(void) const
+{
+	return size_;
 }
 
 // ------------------------------------------
