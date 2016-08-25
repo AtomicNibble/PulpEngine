@@ -13,8 +13,6 @@
 #include "XFindData.h"
 
 #include <IAssetPak.h>
-#include <IModel.h>
-#include <IAnimation.h>
 
 #include <Memory\VirtualMem.h>
 #include <Threading\JobSystem2.h>
