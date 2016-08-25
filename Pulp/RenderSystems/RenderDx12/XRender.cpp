@@ -665,7 +665,7 @@ void XRender::submitPacket(GraphicsContext& context, const CommandPacket::Packet
 		const Commands::CopyIndexBufferData& updateIB = *reinterpret_cast<const Commands::CopyIndexBufferData*>(pCmd);
 		auto pIBuf = pBuffMan_->IBFromHandle(updateIB.indexBuffer);
 
-		X_ASSERT(pIBuf->getUsage() != IRender::BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pIBuf->getUsage());
+		X_ASSERT(pIBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pIBuf->getUsage());
 
 		context.writeBuffer(pIBuf->getBuf(), 0, updateIB.pData, updateIB.size);
 	}
@@ -675,7 +675,7 @@ void XRender::submitPacket(GraphicsContext& context, const CommandPacket::Packet
 		const Commands::CopyVertexBufferData& updateVB = *reinterpret_cast<const Commands::CopyVertexBufferData*>(pCmd);
 		auto pVBuf = pBuffMan_->IBFromHandle(updateVB.vertexBuffer);
 
-		X_ASSERT(pVBuf->getUsage() != IRender::BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pVBuf->getUsage());
+		X_ASSERT(pVBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pVBuf->getUsage());
 
 		context.writeBuffer(pVBuf->getBuf(), 0, updateVB.pData, updateVB.size);
 	}

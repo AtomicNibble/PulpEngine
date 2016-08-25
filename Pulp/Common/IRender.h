@@ -418,21 +418,22 @@ struct IRenderTarget
 
 };
 
+X_DECLARE_ENUM(AuxRenderer)(MISC, PHYSICS);
+X_DECLARE_FLAGS(CpuAccess)(WRITE, READ);
+X_DECLARE_ENUM(BufUsage)(
+	IMMUTABLE,  // never changes
+	STATIC,	    // changes sometimes not every frame.
+	DYNAMIC		// stuff that changes every frame
+);
+
+typedef Flags<CpuAccess> CpuAccessFlags;
+
 
 struct IRender
 {
 	// physics has it's own Aux render que so to speak, other que's can be added.
 	// they are not thread safe, but it's fine to populate diffrent aux instances in diffrent threads.
-	X_DECLARE_ENUM(AuxRenderer)(MISC, PHYSICS);
-	X_DECLARE_FLAGS(CpuAccess)(WRITE, READ);
 
-	X_DECLARE_ENUM(BufUsage)(
-		IMMUTABLE,  // never changes
-		STATIC,	    // changes sometimes not every frame.
-		DYNAMIC		// stuff that changes every frame
-	);
-
-	typedef Flags<CpuAccess> CpuAccessFlags;
 
 	virtual ~IRender() {};
 
@@ -463,13 +464,17 @@ struct IRender
 //	virtual IRenderTarget* createRenderTarget() X_ABSTRACT;
 //	virtual void destoryRenderTarget(IRenderTarget* pRT) X_ABSTRACT;
 
-	virtual VertexBufferHandle createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
-	virtual VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
-	virtual IndexBufferHandle createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
-	virtual IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
+	virtual VertexBufferHandle createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag = 0) X_ABSTRACT;
+	virtual VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag = 0) X_ABSTRACT;
+	virtual IndexBufferHandle createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag = 0) X_ABSTRACT;
+	virtual IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag = 0) X_ABSTRACT;
 
 	virtual void destoryVertexBuffer(VertexBufferHandle handle) X_ABSTRACT;
 	virtual void destoryIndexBuffer(IndexBufferHandle handle) X_ABSTRACT;
+
+	virtual void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_ABSTRACT;
+	virtual void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_ABSTRACT;
+
 
 	virtual texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_ABSTRACT;
 	virtual shader::IShader* getShader(const char* pName) X_ABSTRACT;
