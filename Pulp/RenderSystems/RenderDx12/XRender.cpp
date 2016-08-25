@@ -734,6 +734,16 @@ void XRender::destoryIndexBuffer(IndexBufferHandle handle)
 	pBuffMan_->freeIB(handle);
 }
 
+void XRender::getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize)
+{
+	pBuffMan_->getBufSize(handle, pOriginal, pDeviceSize);
+}
+
+void XRender::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize)
+{
+	pBuffMan_->getBufSize(handle, pOriginal, pDeviceSize);
+}
+
 
 ::texture::ITexture* XRender::getTexture(const char* pName, texture::TextureFlags flags)
 {

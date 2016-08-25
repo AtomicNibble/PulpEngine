@@ -81,6 +81,10 @@ public:
 	void destoryVertexBuffer(VertexBufferHandle handle) X_OVERRIDE;
 	void destoryIndexBuffer(IndexBufferHandle handle) X_OVERRIDE;
 
+	void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_OVERRIDE;
+	void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_OVERRIDE;
+
+
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
 	shader::IShader* getShader(const char* pName) X_OVERRIDE;
 
