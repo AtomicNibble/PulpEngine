@@ -12,6 +12,8 @@
 #include "String\GrowingStringTable.h"
 #include "Threading\JobList.h"
 
+#include "Model\XModel.h"
+
 X_NAMESPACE_DECLARE(model,
 struct MeshHeader;
 )
@@ -113,6 +115,8 @@ public:
 	int32_t areaNum;
 	// points the the area's mesh header.
 	model::MeshHeader* pMesh;
+	// the gpu buffers for the area mesh.
+	model::XRenderMesh renderMesh;
 	// portals leading out this area.
 	AreaPortalArr portals;
 	// plane collections for this area.
