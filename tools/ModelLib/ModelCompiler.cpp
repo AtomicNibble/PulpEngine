@@ -583,6 +583,28 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 	header.numMesh = safe_static_cast<uint8_t, size_t>(totalMeshes());
 	header.modified = core::dateTimeStampSmall::systemDateTime();
 
+	header.vertexFmt = render::shader::VertexFormat::P3F_T2S;
+
+	if (streamsFlags.IsSet(model::StreamType::COLOR) 
+		&& !streamsFlags.IsSet(model::StreamType::NORMALS)
+		&& !streamsFlags.IsSet(model::StreamType::TANGENT_BI)) {
+		header.vertexFmt = render::shader::VertexFormat::P3F_T2S_C4B;
+	}
+	else if (streamsFlags.IsSet(model::StreamType::NORMALS)
+		&& streamsFlags.IsSet(model::StreamType::NORMALS)
+		&& !streamsFlags.IsSet(model::StreamType::TANGENT_BI)) {
+		header.vertexFmt = render::shader::VertexFormat::P3F_T2S_C4B_N3F;
+	}
+	else if (streamsFlags.IsSet(model::StreamType::TANGENT_BI)
+		&& streamsFlags.IsSet(model::StreamType::NORMALS)
+		&& streamsFlags.IsSet(model::StreamType::TANGENT_BI)) {
+		header.vertexFmt = render::shader::VertexFormat::P3F_T2S_C4B_N3F_TB3F;
+	}
+	else {
+		X_ASSERT_NOT_IMPLEMENTED();
+		return false;
+	}
+
 	// Sizes
 	header.tagNameDataSize = safe_static_cast<uint16_t, size_t>(
 		this->calculateTagNameDataSize());
