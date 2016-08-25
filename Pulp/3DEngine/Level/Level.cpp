@@ -318,10 +318,12 @@ bool Level::render(void)
 
 		pAux_->setRenderFlags(flags);
 
-		if(s_var_detechCam_ == 1)
-			pAux_->drawFrustum(cam_, Color8u(255,255,255,128), Color8u(200, 0, 0, 100), true);
-		else
+		if (s_var_detechCam_ == 1) {
+			pAux_->drawFrustum(cam_, Color8u(255, 255, 255, 128), Color8u(200, 0, 0, 100), true);
+		}
+		else {
 			pAux_->drawFrustum(cam_, Color8u(255, 255, 255, 255), Color8u(200, 0, 0, 255), false);
+		}
 
 	}
 
