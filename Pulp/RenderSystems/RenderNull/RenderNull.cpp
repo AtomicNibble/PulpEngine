@@ -72,7 +72,7 @@ Vec2<uint32_t> RenderNull::getDisplayRes(void) const
 	return Vec2<uint32_t>::zero();
 }
 
-Commands::VertexBufferHandle RenderNull::createVertexBuffer(uint32_t size,
+VertexBufferHandle RenderNull::createVertexBuffer(uint32_t size,
 	BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
 	X_UNUSED(size);
@@ -81,7 +81,7 @@ Commands::VertexBufferHandle RenderNull::createVertexBuffer(uint32_t size,
 	return 0;
 }
 
-Commands::VertexBufferHandle RenderNull::createVertexBuffer(uint32_t size,
+VertexBufferHandle RenderNull::createVertexBuffer(uint32_t size,
 	const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
 	X_UNUSED(size);
@@ -91,7 +91,7 @@ Commands::VertexBufferHandle RenderNull::createVertexBuffer(uint32_t size,
 	return 0;
 }
 
-Commands::IndexBufferHandle RenderNull::createIndexBuffer(uint32_t size,
+IndexBufferHandle RenderNull::createIndexBuffer(uint32_t size,
 	BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
 	X_UNUSED(size);
@@ -100,7 +100,7 @@ Commands::IndexBufferHandle RenderNull::createIndexBuffer(uint32_t size,
 	return 0;
 }
 
-Commands::IndexBufferHandle RenderNull::createIndexBuffer(uint32_t size,
+IndexBufferHandle RenderNull::createIndexBuffer(uint32_t size,
 	const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
 	X_UNUSED(size);
@@ -110,14 +110,29 @@ Commands::IndexBufferHandle RenderNull::createIndexBuffer(uint32_t size,
 	return 0;
 }
 
-void RenderNull::destoryVertexBuffer(Commands::VertexBufferHandle handle)
+void RenderNull::destoryVertexBuffer(VertexBufferHandle handle)
 {
 	X_UNUSED(handle);
 }
 
-void RenderNull::destoryIndexBuffer(Commands::IndexBufferHandle handle)
+void RenderNull::destoryIndexBuffer(IndexBufferHandle handle)
 {
 	X_UNUSED(handle);
+}
+
+
+void RenderNull::getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize)
+{
+	X_UNUSED(handle);
+	X_UNUSED(pOriginal);
+	X_UNUSED(pDeviceSize);
+}
+
+void RenderNull::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize)
+{
+	X_UNUSED(handle);
+	X_UNUSED(pOriginal);
+	X_UNUSED(pDeviceSize);
 }
 
 
@@ -630,26 +645,7 @@ bool RenderNull::setGUIShader(bool textured)
 // ~Shader Stuff
 
 // Model
-model::IRenderMesh* RenderNull::createRenderMesh(void)
-{
-	return nullptr;
-}
 
-model::IRenderMesh* RenderNull::createRenderMesh(const model::MeshHeader* pMesh,
-	shader::VertexFormat::Enum fmt, const char* name)
-{
-	X_UNUSED(pMesh);
-	X_UNUSED(fmt);
-	X_UNUSED(name);
-
-	return nullptr;
-}
-
-void RenderNull::freeRenderMesh(model::IRenderMesh* pMesh)
-{
-	X_UNUSED(pMesh);
-
-}
 
 void RenderNull::SetModelMatrix(const Matrix44f& mat)
 {

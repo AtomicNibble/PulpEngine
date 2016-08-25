@@ -28,13 +28,16 @@ public:
 
 	virtual Vec2<uint32_t> getDisplayRes(void) const X_OVERRIDE;
 
-	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
-	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
-	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
-	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+	virtual VertexBufferHandle createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+	virtual VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+	virtual IndexBufferHandle createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+	virtual IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
 
-	virtual void destoryVertexBuffer(Commands::VertexBufferHandle handle) X_OVERRIDE;
-	virtual void destoryIndexBuffer(Commands::IndexBufferHandle handle) X_OVERRIDE;
+	virtual void destoryVertexBuffer(VertexBufferHandle handle) X_OVERRIDE;
+	virtual void destoryIndexBuffer(IndexBufferHandle handle) X_OVERRIDE;
+
+	virtual void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_OVERRIDE;
+	virtual void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_OVERRIDE;
 
 
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
@@ -154,10 +157,6 @@ public:
 	// ~Shader Stuff
 
 	// Model
-	virtual model::IRenderMesh* createRenderMesh(void) X_OVERRIDE;
-	virtual model::IRenderMesh* createRenderMesh(const model::MeshHeader* pMesh,
-		shader::VertexFormat::Enum fmt, const char* name) X_OVERRIDE;
-	virtual void freeRenderMesh(model::IRenderMesh* pMesh) X_OVERRIDE;
 
 	virtual void SetModelMatrix(const Matrix44f& mat) X_OVERRIDE;
 	// ~Model
