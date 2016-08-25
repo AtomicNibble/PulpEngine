@@ -94,7 +94,7 @@ X_NAMESPACE_BEGIN(model)
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
 #define X_MODEL_MTL_LOWER_CASE_NAMES 1
 
-static const uint32_t	 MODEL_VERSION = 11;
+static const uint32_t	 MODEL_VERSION = 12;
 static const uint32_t	 MODEL_MAX_BONES = 255;
 static const uint32_t	 MODEL_MAX_BONE_NAME_LENGTH = 64;
 static const uint32_t	 MODEL_MAX_MESH = 64;
@@ -485,6 +485,8 @@ struct IModelManager
 };
 
 
+X_PACK_PUSH(4)
+
 struct ModelHeader // File header.
 {
 	uint8_t version;
@@ -502,6 +504,11 @@ struct ModelHeader // File header.
 	uint16_t materialNameDataSize;	// size of material name block
 	uint16_t tagNameDataSize;		// size of tag name block.
 
+	
+	// the format of the merged streams.
+	// 4 bytes currently, shrink it down to 1 if other things needed adding 
+	render::shader::VertexFormat::Enum vertexFmt;
+
 	// do i need this?
 	// the lods store one for each mesh so kinda redundant.
 	AABB boundingBox;
@@ -512,6 +519,7 @@ struct ModelHeader // File header.
 	bool isValid(void) const;
 };
 
+X_PACK_POP
 
 // check sizes., what ever is using these structs
 // needs to be compiling these as same size so they can be loaded correct.
@@ -539,7 +547,7 @@ X_ENSURE_SIZE(Face, 6);
 X_ENSURE_SIZE(SubMeshHeader, 128);
 X_ENSURE_SIZE(MeshHeader, 128);
 X_ENSURE_SIZE(LODHeader, sizeof(MeshHeader)+8);
-X_ENSURE_SIZE(ModelHeader, (sizeof(LODHeader)*MODEL_MAX_LODS) + 48);
+X_ENSURE_SIZE(ModelHeader, (sizeof(LODHeader)*MODEL_MAX_LODS) + 52);
 
 
 
