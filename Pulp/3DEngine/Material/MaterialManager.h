@@ -30,7 +30,7 @@ public:
 	XMaterialManager();
 	virtual ~XMaterialManager();
 
-	void Init(void);
+	bool Init(void);
 	void ShutDown(void);
 
 	// IMaterialManager

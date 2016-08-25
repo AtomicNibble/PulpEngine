@@ -121,14 +121,19 @@ bool X3DEngine::Init(void)
 	gEnv->pHotReload->addfileType(this, "map");
 
 	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager");
-	pMaterialManager_->Init();
-	pGuiManger_ = &guisMan_;
+	if (!pMaterialManager_->Init()) {
+		return false;
+	}
 
 	pModelManager_ = X_NEW(model::XModelManager, g_3dEngineArena, "ModelManager");
-	pModelManager_->Init();
+	if (!pModelManager_->Init()) {
+		return false;
+	}
 
-
-	guisMan_.Init();
+	pGuiManger_ = &guisMan_;
+	if (!guisMan_.Init()) {
+		return false;
+	}
 
 	level::Level::Init();
 

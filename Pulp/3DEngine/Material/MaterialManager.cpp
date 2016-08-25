@@ -395,7 +395,7 @@ namespace {
 		XShaderItem item = gEnv->pRender->LoadShaderItem(input);
 
 #if 1
-		X_ASSERT_NOT_IMPLEMENTED();
+	//	X_ASSERT_NOT_IMPLEMENTED();
 #else
 		pMaterial->setShaderItem(item);
 #endif
@@ -443,7 +443,7 @@ XMaterialManager::~XMaterialManager()
 }
 
 
-void XMaterialManager::Init(void)
+bool XMaterialManager::Init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
@@ -456,6 +456,8 @@ void XMaterialManager::Init(void)
 	// hotreload support.
 	gEnv->pHotReload->addfileType(this, MTL_FILE_EXTENSION);
 	gEnv->pHotReload->addfileType(this, MTL_B_FILE_EXTENSION);
+
+	return true;
 }
 
 
@@ -533,8 +535,8 @@ void XMaterialManager::InitDefaults(void)
 		// load the shader / textures needed.
 		XShaderItem item = gEnv->pRender->LoadShaderItem(input);
 
-#if 1 
-		X_ASSERT_NOT_IMPLEMENTED();
+#if 1
+	//	X_ASSERT_NOT_IMPLEMENTED();
 #else
 		pDefaultMtl_->setShaderItem(item);
 #endif

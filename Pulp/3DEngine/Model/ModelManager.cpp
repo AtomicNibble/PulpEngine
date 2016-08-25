@@ -82,7 +82,7 @@ XModelManager::~XModelManager()
 
 }
 
-void XModelManager::Init(void)
+bool XModelManager::Init(void)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
@@ -102,7 +102,10 @@ void XModelManager::Init(void)
 	pDefaultModel_ = loadModelSync("default");
 	if (!pDefaultModel_) {
 		X_ERROR("ModelManager", "Failed to load default model");
+		return false;
 	}
+
+	return true;
 }
 
 

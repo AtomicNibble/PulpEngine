@@ -17,14 +17,14 @@ public:
 	XModelManager();
 	virtual ~XModelManager() X_OVERRIDE;
 
-	void Init(void);
+	bool Init(void);
 	void ShutDown(void);
 
 	// IModelManager
 
 	IModel* findModel(const char* ModelName) const X_FINAL;
-	// if material is found adds ref and returns, if not try's to load the material file.
-	// if file can't be loaded or error it return the default material.
+	// this only performs cpu loading, and currently loads all lods at once.
+	// as well as resolving materials, will alwyas return a instance, but might contain default data.
 	IModel* loadModel(const char* ModelName) X_FINAL;
 
 	IModel* getDefaultModel(void) X_FINAL;
