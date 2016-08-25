@@ -143,8 +143,16 @@ struct IModelLib : public IConverter
 // FULL_VERT: the vertex data is not compressed.
 // STREAMS: more than just vertex stream. (a stream info block is included)
 // ANIMATED: model has bind data.
-X_DECLARE_FLAGS8(ModelFlags)(LOOSE, FULL_VERT, STREAMS, ANIMATED);
-X_DECLARE_FLAGS(MeshState)(SYS_MEMORY, VIDEO_MEMORY);
+X_DECLARE_FLAGS8(ModelFlag)(LOOSE, FULL_VERT, STREAMS, ANIMATED);
+X_DECLARE_FLAGS(MeshFlag)(
+	SYS_MEMORY, 
+	VIDEO_MEMORY, 
+	// nothing sets this or checks this, i need to decide how i want to implement the 32bit index support.
+	// per lod or per mesh?
+	// can i use 16bit indexes for a lod if all sub mesh have less than 65k verts?
+	// depends how i handle drawing etc.
+	BIG_INDEX
+); 
 
 // VertexStream from vertexformats.h is has a copy also, but it is enum not flags.
 // we have flags here for checking what streams are provided.
@@ -153,6 +161,9 @@ X_DECLARE_FLAGS(MeshState)(SYS_MEMORY, VIDEO_MEMORY);
 X_DECLARE_FLAGS8(StreamType)(COLOR, NORMALS, TANGENT_BI);
 X_DECLARE_ENUM8(StreamFmt)(VERT,VERT_FULL,VEC2,VEC216,VEC3,VEC3COMP);
 
+typedef Flags8<ModelFlag> ModelFlags;
+typedef Flags<MeshFlag> MeshFlags;
+typedef Flags8<StreamType> StreamTypeFlags;
 
 X_PACK_PUSH(1)
 
@@ -399,7 +410,7 @@ struct MeshHeader
 
 	// 4
 	uint16_t	numSubMeshes; // levels support 65k sub meshes
-	Flags8<StreamType> streamsFlag; // flags for what steams are avalible
+	StreamTypeFlags streamsFlag; // flags for what streams are avalible
 	uint8_t	_blank;
 
 	// 8 total of all sub-meshes.
@@ -409,7 +420,7 @@ struct MeshHeader
 	uint32_t	numIndexes;
 
 	// 4 + 4
-	Flags<MeshState> state;
+	MeshFlags flags;
 	uint32_t __blank;
 
 	// 8
@@ -490,7 +501,7 @@ X_PACK_PUSH(4)
 struct ModelHeader // File header.
 {
 	uint8_t version;
-	Flags8<ModelFlags> flags;
+	ModelFlags flags;
 	uint8_t numBones;
 	uint8_t numBlankBones;
 	uint8_t numMesh;
