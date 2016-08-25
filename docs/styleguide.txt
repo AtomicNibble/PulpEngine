@@ -182,6 +182,13 @@ Flags:
         Exceptions to the rule are flags that are more complete, having things like masks to allow
         for none power of 2 flags to be store in the flag.
 
+        Flags should be define with the following style:
+
+            X_DECLARE_FLAGS(MyFlag)(FLAG1, FLAG2);
+            typedef Flags<MyFlag> MyFlags;
+
+            So the flags define is singular only a typedef of Flags<T> is plural.
+
 Data types that are written to file:
 
     Any structure or type that is written out to a file should have a X_ENSURE_SIZE macro.
