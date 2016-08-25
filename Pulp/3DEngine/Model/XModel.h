@@ -8,6 +8,7 @@
 #include "EngineBase.h"
 
 #include <IRenderMesh.h>
+#include <IRender.h>
 
 X_NAMESPACE_DECLARE(core,
 	namespace V2 {
@@ -21,6 +22,12 @@ X_NAMESPACE_BEGIN(model)
 class XModel : public IModel, public core::XBaseAsset, public engine::XEngineBase
 {
 	typedef core::StackString<MODEL_MAX_NAME_LENGTH> ModelName;
+
+	struct LodRenderInfo
+	{
+		render::VertexBufferHandle vertexStreams_[VertexStream::ENUM_COUNT];
+		render::IndexBufferHandle indexStream_;
+	};
 
 public:
 	XModel();
@@ -78,7 +85,7 @@ private:
 private:
 	ModelName name_;
 
-	model::IRenderMesh* pLodRenderMeshes_[MODEL_MAX_LODS];
+	LodRenderInfo lodRenderMeshes_[MODEL_MAX_LODS];
 	LODHeader lodInfo_[MODEL_MAX_LODS];
 
 	// runtime pointers.

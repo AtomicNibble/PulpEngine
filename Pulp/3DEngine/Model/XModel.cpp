@@ -18,7 +18,7 @@ Colorf XModel::model_bones_col;
 
 XModel::XModel()
 {
-	core::zero_object(pLodRenderMeshes_);
+	core::zero_object(lodRenderMeshes_);
 
 	pTagNames_ = nullptr;
 	pTagTree_ = nullptr;
@@ -124,14 +124,7 @@ const Sphere& XModel::boundingSphere(size_t lodIdx) const
 
 void XModel::Render(void)
 {
-	if (pLodRenderMeshes_[0] == nullptr) {
-		pLodRenderMeshes_[0] = getRender()->createRenderMesh(&getLodMeshHdr(0),
-			render::shader::VertexFormat::P3F_T2S_C4B, getName());
 
-		pLodRenderMeshes_[0]->uploadToGpu();
-	}
-
-	pLodRenderMeshes_[0]->render();
 }
 
 // ~IModel
@@ -231,7 +224,7 @@ void XModel::AssignDefault(void)
 
 
 	for (size_t i = 0; i < MODEL_MAX_LODS; i++) {
-		pLodRenderMeshes_[i] = pDefault->pLodRenderMeshes_[i];
+		lodRenderMeshes_[i] = pDefault->lodRenderMeshes_[i];
 	}
 	for (size_t i = 0; i < MODEL_MAX_LODS; i++) {
 		lodInfo_[i] = pDefault->lodInfo_[i];
@@ -388,7 +381,7 @@ void XModel::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core
 	pFileSys_->AddIoRequestToQue(req);
 
 	// temp, unassign the render meshes so new ones get made.
-	core::zero_object(pLodRenderMeshes_);
+	core::zero_object(lodRenderMeshes_);
 }
 
 
