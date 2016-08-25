@@ -9,6 +9,8 @@ typedef uintptr_t VertexBufferHandle;
 typedef uintptr_t IndexBufferHandle;
 typedef uintptr_t ConstantBufferHandle;
 
+static const uintptr_t INVALID_BUF_HANLDE = 0;
+
 namespace Commands
 {
 	X_DECLARE_ENUM(Command)(
