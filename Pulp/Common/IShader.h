@@ -141,7 +141,7 @@ struct VertexFormat
 	// Layout:
 	//         Type | Num | Format
 	// Eg: P3F -> Position 3 floats.
-	enum Enum
+	enum Enum : uint32_t
 	{		
 		P3F_T3F, // used in Aux Geo.
 
