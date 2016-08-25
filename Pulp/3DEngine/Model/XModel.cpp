@@ -7,19 +7,21 @@
 #include <IRender.h>
 #include <IRenderAux.h>
 #include <IConsole.h>
+#include <IShader.h>
 
 #include <Threading\JobSystem2.h>
 
 
 X_NAMESPACE_BEGIN(model)
 
+
+
 int32_t XModel::model_bones_draw;
 Colorf XModel::model_bones_col;
 
+
 XModel::XModel()
 {
-	core::zero_object(lodRenderMeshes_);
-
 	pTagNames_ = nullptr;
 	pTagTree_ = nullptr;
 	pBoneAngles_ = nullptr;
@@ -62,8 +64,9 @@ const int XModel::release(void)
 const int XModel::forceRelease(void)
 {
 	for (;;) {
-		if (release() <= 0)
+		if (release() <= 0) {
 			break;
+		}
 	}
 	return 0;
 }
@@ -124,15 +127,19 @@ const Sphere& XModel::boundingSphere(size_t lodIdx) const
 
 void XModel::Render(void)
 {
+	// this will be removed soon.
+	// there will be no way to global render somthing must be slapped in a list.
 
 }
 
-// ~IModel
 
 void XModel::RenderBones(const Matrix44f& modelMat)
 {
 	using namespace render;
 
+	// should move this out tbh.
+	// save a call for every model when this is disabled.
+	// check should be done once for a collection
 	if (!model_bones_draw) {
 		return;
 	}
@@ -177,6 +184,29 @@ void XModel::RenderBones(const Matrix44f& modelMat)
 	}
 }
 
+// ~IModel
+
+bool XModel::createRenderBuffersForLod(size_t idx)
+{
+	const auto& raw = lodInfo_[idx];
+
+	return renderMeshes_[idx].createRenderBuffers(pRender_, hdr_.vertexFmt, raw);
+}
+
+void XModel::releaseLodRenderBuffers(size_t idx)
+{
+	auto& renderInfo = renderMeshes_[idx];
+
+	renderInfo.releaseRenderBuffers(pRender_);
+}
+
+bool XModel::canRenderLod(size_t idx) const
+{
+	const auto& render = renderMeshes_[idx];
+
+	return render.canRender();
+}
+
 void XModel::RegisterVars(void)
 {	
 	ADD_CVAR_REF_NO_NAME(model_bones_draw, 0, 0, 1, 
@@ -191,6 +221,12 @@ const LODHeader& XModel::getLod(size_t idx) const
 {
 	X_ASSERT(idx < static_cast<size_t>(numLods_), "invalid lod index")(numLods(), idx);
 	return lodInfo_[idx];
+}
+
+const XRenderMesh& XModel::getLodRenderMesh(size_t idx) const
+{
+	X_ASSERT(idx < static_cast<size_t>(numLods_), "invalid lod index")(numLods(), idx);
+	return renderMeshes_[idx];
 }
 
 const MeshHeader& XModel::getLodMeshHdr(size_t idx) const
@@ -224,7 +260,7 @@ void XModel::AssignDefault(void)
 
 
 	for (size_t i = 0; i < MODEL_MAX_LODS; i++) {
-		lodRenderMeshes_[i] = pDefault->lodRenderMeshes_[i];
+		renderMeshes_[i] = pDefault->renderMeshes_[i];
 	}
 	for (size_t i = 0; i < MODEL_MAX_LODS; i++) {
 		lodInfo_[i] = pDefault->lodInfo_[i];
@@ -381,7 +417,7 @@ void XModel::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core
 	pFileSys_->AddIoRequestToQue(req);
 
 	// temp, unassign the render meshes so new ones get made.
-	core::zero_object(lodRenderMeshes_);
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 
@@ -441,8 +477,9 @@ bool XModel::LoadModel(const char* name)
 	path.setExtension(".model");
 
 	// open the file.
-	if (!file.openFile(path.c_str(), core::fileMode::READ))
+	if (!file.openFile(path.c_str(), core::fileMode::READ)) {
 		return false;
+	}
 
 	path.removeExtension();
 
@@ -461,12 +498,11 @@ bool XModel::LoadModel(core::XFile* file)
 	}
 
 #if X_DEBUG // debug only.
-	int i;
 
 	// quick check that model is somewhat valid.
 	// we make a few assumptions, since this is my format.
 	// and if this is not right, there is a tool issue
-	for (i = 0; i < hdr_.numLod; i++)
+	for (uint32_t i = 0; i < hdr_.numLod; i++)
 	{
 		LODHeader& lod = hdr_.lodInfo[i];
 
@@ -630,8 +666,9 @@ void XModel::ProcessData(char* pData)
 				name.append(mat_name_cursor.getSeek<char>(), 1);
 			}
 
-			if (!mat_name_cursor.isEof())
+			if (!mat_name_cursor.isEof()) {
 				++mat_name_cursor;
+			}
 
 			name.clear();
 		}
@@ -649,8 +686,9 @@ void XModel::ProcessData(char* pData)
 			}
 
 			// TODO: add these names to the string table.
-			if (!tag_name_cursor.isEof())
+			if (!tag_name_cursor.isEof()) {
 				++tag_name_cursor;
+			}
 
 			name.clear();
 		}
@@ -678,8 +716,9 @@ bool XModel::ReadHeader(ModelHeader& hdr, core::XFile* file)
 {
 	X_ASSERT_NOT_NULL(file);
 
-	if (file->readObj(hdr) != sizeof(hdr))
+	if (file->readObj(hdr) != sizeof(hdr)) {
 		return false;
+	}
 
 	// bit more info for material info.
 	// even tho it's handled in isValid()

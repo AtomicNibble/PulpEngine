@@ -7,7 +7,8 @@
 #include "Assets\AssertContainer.h"
 #include "EngineBase.h"
 
-#include <IRenderMesh.h>
+#include "RenderMesh.h"
+// #include <IRenderMesh.h>
 #include <IRender.h>
 
 X_NAMESPACE_DECLARE(core,
@@ -19,15 +20,10 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(model)
 
+
 class XModel : public IModel, public core::XBaseAsset, public engine::XEngineBase
 {
 	typedef core::StackString<MODEL_MAX_NAME_LENGTH> ModelName;
-
-	struct LodRenderInfo
-	{
-		render::VertexBufferHandle vertexStreams_[VertexStream::ENUM_COUNT];
-		render::IndexBufferHandle indexStream_;
-	};
 
 public:
 	XModel();
@@ -56,10 +52,16 @@ public:
 
 	// ~IModel
 
+	// can upload each lod individually.
+	bool createRenderBuffersForLod(size_t idx);
+	void releaseLodRenderBuffers(size_t idx);
+	bool canRenderLod(size_t idx) const;
+
 	static void RegisterVars(void);
 
 
 	const LODHeader& getLod(size_t idx) const;
+	const XRenderMesh& getLodRenderMesh(size_t idx) const;
 	const MeshHeader& getLodMeshHdr(size_t idx) const;
 	const SubMeshHeader* getMeshHead(size_t idx) const;
 
@@ -85,7 +87,7 @@ private:
 private:
 	ModelName name_;
 
-	LodRenderInfo lodRenderMeshes_[MODEL_MAX_LODS];
+	XRenderMesh renderMeshes_[MODEL_MAX_LODS];
 	LODHeader lodInfo_[MODEL_MAX_LODS];
 
 	// runtime pointers.
