@@ -1034,6 +1034,9 @@ bool XRender::resize(uint32_t width, uint32_t height)
 	X_ASSERT_NOT_NULL(pSwapChain_);
 	X_ASSERT_NOT_NULL(pDescriptorAllocator_);
 
+	// wait till gpu idle.
+	cmdListManager_.idleGPU();
+
 	displayRes_.x = width;
 	displayRes_.y = height;
 	vars_.setRes(displayRes_);
