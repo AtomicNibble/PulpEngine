@@ -559,6 +559,8 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands:
 
 	// we should handle stuff like checking if compiled and not rendering
 	if (!pHWTech->canDraw()) {
+
+		pHWTech->tryCompile();
 		return;
 	}
 
@@ -701,34 +703,33 @@ Vec2<uint32_t> XRender::getDisplayRes(void) const
 	return displayRes_;
 }
 
-
-Commands::VertexBufferHandle XRender::createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag)
+VertexBufferHandle XRender::createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
 	return pBuffMan_->createVertexBuf(size, nullptr, usage, accessFlag);
 }
 
-Commands::VertexBufferHandle XRender::createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
+VertexBufferHandle XRender::createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
 	return pBuffMan_->createVertexBuf(size, pInitialData, usage, accessFlag);
 }
 
-Commands::IndexBufferHandle XRender::createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag)
+IndexBufferHandle XRender::createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
 	return pBuffMan_->createIndexBuf(size, nullptr, usage, accessFlag);
 }
 
-Commands::IndexBufferHandle XRender::createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
+IndexBufferHandle XRender::createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
 	return pBuffMan_->createIndexBuf(size, pInitialData, usage, accessFlag);
 }
 
 
-void XRender::destoryVertexBuffer(Commands::VertexBufferHandle handle)
+void XRender::destoryVertexBuffer(VertexBufferHandle handle)
 {
 	pBuffMan_->freeVB(handle);
 }
 
-void XRender::destoryIndexBuffer(Commands::IndexBufferHandle handle)
+void XRender::destoryIndexBuffer(IndexBufferHandle handle)
 {
 	pBuffMan_->freeIB(handle);
 }

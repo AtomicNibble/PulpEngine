@@ -57,9 +57,9 @@ public:
 	static const size_t POOL_ALLOCATION_ALIGN = core::Max(X_ALIGN_OF(X3DBuffer), X_ALIGN_OF(ByteAddressBuffer));
 
 
-	typedef Commands::VertexBufferHandle VertexBufferHandle;
-	typedef Commands::IndexBufferHandle IndexBufferHandle;
-	typedef Commands::IndexBufferHandle BufferHandle;
+	typedef VertexBufferHandle VertexBufferHandle;
+	typedef IndexBufferHandle IndexBufferHandle;
+	typedef IndexBufferHandle BufferHandle;
 
 	typedef core::MemoryArena<core::PoolAllocator,
 		core::SingleThreadPolicy,

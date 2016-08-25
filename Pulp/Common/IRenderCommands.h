@@ -5,14 +5,12 @@
 
 X_NAMESPACE_BEGIN(render)
 
-
+typedef uintptr_t VertexBufferHandle;
+typedef uintptr_t IndexBufferHandle;
+typedef uintptr_t ConstantBufferHandle;
 
 namespace Commands
 {
-	typedef uintptr_t VertexBufferHandle;
-	typedef uintptr_t IndexBufferHandle;
-	typedef uintptr_t ConstantBufferHandle;
-
 	X_DECLARE_ENUM(Command)(
 		DRAW, 
 		DRAW_INDEXED, 

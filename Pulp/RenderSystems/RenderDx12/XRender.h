@@ -73,13 +73,13 @@ public:
 	Vec2<uint32_t> getDisplayRes(void) const X_OVERRIDE;
 
 
-	Commands::VertexBufferHandle createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
-	Commands::VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
-	Commands::IndexBufferHandle createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
-	Commands::IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+	VertexBufferHandle createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+	VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+	IndexBufferHandle createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
+	IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
 
-	void destoryVertexBuffer(Commands::VertexBufferHandle handle) X_OVERRIDE;
-	void destoryIndexBuffer(Commands::IndexBufferHandle handle) X_OVERRIDE;
+	void destoryVertexBuffer(VertexBufferHandle handle) X_OVERRIDE;
+	void destoryIndexBuffer(IndexBufferHandle handle) X_OVERRIDE;
 
 	texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_OVERRIDE;
 	shader::IShader* getShader(const char* pName) X_OVERRIDE;

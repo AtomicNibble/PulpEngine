@@ -457,14 +457,20 @@ struct IRender
 	// display res is stored as int, if you want float cast this.
 	virtual Vec2<uint32_t> getDisplayRes(void) const X_ABSTRACT;
 
+	// should the render system not know about the render targets?
+	// and just do as it's told?
+	// how will we handle buffer resize?
 
-	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
-	virtual Commands::VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
-	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
-	virtual Commands::IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
+//	virtual IRenderTarget* createRenderTarget() X_ABSTRACT;
+//	virtual void destoryRenderTarget(IRenderTarget* pRT) X_ABSTRACT;
 
-	virtual void destoryVertexBuffer(Commands::VertexBufferHandle handle) X_ABSTRACT;
-	virtual void destoryIndexBuffer(Commands::IndexBufferHandle handle) X_ABSTRACT;
+	virtual VertexBufferHandle createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
+	virtual VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
+	virtual IndexBufferHandle createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
+	virtual IndexBufferHandle createIndexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_ABSTRACT;
+
+	virtual void destoryVertexBuffer(VertexBufferHandle handle) X_ABSTRACT;
+	virtual void destoryIndexBuffer(IndexBufferHandle handle) X_ABSTRACT;
 
 	virtual texture::ITexture* getTexture(const char* pName, texture::TextureFlags flags) X_ABSTRACT;
 	virtual shader::IShader* getShader(const char* pName) X_ABSTRACT;
