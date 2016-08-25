@@ -52,6 +52,9 @@
     <ClCompile Include="Module.cpp">
       <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
+    <ClCompile Include="Model\RenderMesh.cpp">
+      <Filter>Source Files\Model</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gui\XWindow.h">
@@ -98,6 +101,9 @@
     </ClInclude>
     <ClInclude Include="Level\Level.h">
       <Filter>Header Files\Level</Filter>
+    </ClInclude>
+    <ClInclude Include="Model\RenderMesh.h">
+      <Filter>Header Files\Model</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -150,6 +156,9 @@
     </None>
     <None Include="Gui\Gui.inl">
       <Filter>Header Files\Gui</Filter>
+    </None>
+    <None Include="Model\RenderMesh.inl">
+      <Filter>Header Files\Model</Filter>
     </None>
   </ItemGroup>
 </Project>

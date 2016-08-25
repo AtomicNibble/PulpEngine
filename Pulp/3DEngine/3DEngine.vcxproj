@@ -380,6 +380,7 @@
     <ClInclude Include="Material\Material.h" />
     <ClInclude Include="Material\MaterialManager.h" />
     <ClInclude Include="Model\ModelManager.h" />
+    <ClInclude Include="Model\RenderMesh.h" />
     <ClInclude Include="Model\XModel.h" />
     <ClInclude Include="X3DEngine.h" />
     <ClInclude Include="stdafx.h" />
@@ -398,6 +399,7 @@
     <ClCompile Include="Material\Material.cpp" />
     <ClCompile Include="Material\MaterialManager.cpp" />
     <ClCompile Include="Model\ModelManager.cpp" />
+    <ClCompile Include="Model\RenderMesh.cpp" />
     <ClCompile Include="Model\XModel.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -418,6 +420,7 @@
     <None Include="Gui\Gui.inl" />
     <None Include="Gui\SimpleWindow.inl" />
     <None Include="Gui\XWindow.inl" />
+    <None Include="Model\RenderMesh.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
