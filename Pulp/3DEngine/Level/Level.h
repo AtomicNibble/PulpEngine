@@ -14,7 +14,6 @@
 
 X_NAMESPACE_DECLARE(model,
 struct MeshHeader;
-struct IRenderMesh;
 )
 
 
@@ -114,8 +113,6 @@ public:
 	int32_t areaNum;
 	// points the the area's mesh header.
 	model::MeshHeader* pMesh;
-	// the render mesh for the area's model.
-	model::IRenderMesh* pRenderMesh;
 	// portals leading out this area.
 	AreaPortalArr portals;
 	// plane collections for this area.

@@ -35,7 +35,8 @@ AreaNode::AreaNode()
 
 // --------------------------------
 
-AreaPortal::AreaPortal() : debugVerts(g_3dEngineArena)
+AreaPortal::AreaPortal() : 
+	debugVerts(g_3dEngineArena)
 {
 	areaTo = -1;
 	pWinding = nullptr;
@@ -50,20 +51,19 @@ AreaPortal::~AreaPortal()
 
 // --------------------------------
 
-Area::Area() : portals(g_3dEngineArena), visPortalPlanes(g_3dEngineArena)
+Area::Area() : 
+	portals(g_3dEngineArena), 
+	visPortalPlanes(g_3dEngineArena)
 {
 	areaNum = -1;
 	pMesh = nullptr;
-	pRenderMesh = nullptr;
 }
 
 Area::~Area()
 {
 	pMesh = nullptr; // Area() don't own the memory.
 
-	if (pRenderMesh) {
-		pRenderMesh->release();
-	}
+
 }
 
 bool Area::CullEnt(const AABB& wBounds, const Sphere& wSphere) const
@@ -563,7 +563,6 @@ void Level::DrawArea(const Area& area)
 	}
 
 	frameStats_.visibleVerts += area.pMesh->numVerts;
-	area.pRenderMesh->render();
 }
 
 void Level::DrawMultiAreaModels(void)

@@ -2000,6 +2000,7 @@ bool XRender::setGUIShader(bool textured)
 // ~Shader Stuff
 
 // Model
+#if 0
 model::IRenderMesh* XRender::createRenderMesh(void)
 {
 	return nullptr;
@@ -2020,6 +2021,7 @@ void XRender::freeRenderMesh(model::IRenderMesh* pMesh)
 	X_UNUSED(pMesh);
 
 }
+#endif
 
 void XRender::SetModelMatrix(const Matrix44f& mat)
 {

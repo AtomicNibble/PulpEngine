@@ -11,6 +11,8 @@ X_NAMESPACE_BEGIN(model)
 
 // a mesh that can have both system and video memory.
 
+#if 0
+
 struct IRenderMesh
 {
 	virtual ~IRenderMesh() {};
@@ -42,7 +44,7 @@ struct IRenderMesh
 
 
 
-
+#endif
 
 
 

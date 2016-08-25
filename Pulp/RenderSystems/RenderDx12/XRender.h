@@ -157,10 +157,10 @@ public:
 	virtual bool DefferedEnd(void) X_OVERRIDE;
 	virtual bool SetWorldShader(void) X_OVERRIDE;
 	virtual bool setGUIShader(bool textured = false) X_OVERRIDE;
-	virtual model::IRenderMesh* createRenderMesh(void) X_OVERRIDE;
-	virtual model::IRenderMesh* createRenderMesh(const model::MeshHeader* pMesh,
-		shader::VertexFormat::Enum fmt, const char* name) X_OVERRIDE;
-	virtual void freeRenderMesh(model::IRenderMesh* pMesh) X_OVERRIDE;
+//	virtual model::IRenderMesh* createRenderMesh(void) X_OVERRIDE;
+//	virtual model::IRenderMesh* createRenderMesh(const model::MeshHeader* pMesh,
+//		shader::VertexFormat::Enum fmt, const char* name) X_OVERRIDE;
+//	virtual void freeRenderMesh(model::IRenderMesh* pMesh) X_OVERRIDE;
 	virtual void SetModelMatrix(const Matrix44f& mat) X_OVERRIDE;
 
 	// =============================================
