@@ -86,6 +86,11 @@ bool Converter::ConvertAll(void)
 		return false;
 	}
 
+	int32_t numAssets = 0;
+	if (db_.GetNumAssets(&numAssets)) {
+		X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
+	}
+
 	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;
 	func.Bind<Converter, &Converter::Convert>(this);
 
@@ -104,6 +109,11 @@ bool Converter::ConvertAll(AssetType::Enum assType)
 	if (!db_.OpenDB()) {
 		X_ERROR("Converter", "Failed to open AssetDb");
 		return false;
+	}
+
+	int32_t numAssets = 0;
+	if (db_.GetNumAssets(assType, &numAssets)) {
+		X_LOG0("Converter", "%" PRIi32 " asset(s)", numAssets);
 	}
 
 	core::Delegate<bool(AssetType::Enum, const core::string& name)> func;

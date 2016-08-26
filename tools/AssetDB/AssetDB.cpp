@@ -180,7 +180,27 @@ bool AssetDB::ListAssets(AssetType::Enum type)
 	return true;
 }
 
-bool AssetDB::GetNumAssetType(AssetType::Enum type, int32_t* pNumOut)
+
+bool AssetDB::GetNumAssets(int32_t* pNumOut)
+{
+	X_ASSERT_NOT_NULL(pNumOut);
+	sql::SqlLiteQuery qry(db_, "SELECT COUNT(*) FROM file_ids");
+
+	auto it = qry.begin();
+	if (it != qry.end())
+	{
+		auto row = *it;
+
+		const int32_t count = row.get<int32_t>(0);
+
+		*pNumOut = count;
+		return true;
+	}
+
+	return false;
+}
+
+bool AssetDB::GetNumAssets(AssetType::Enum type, int32_t* pNumOut)
 {
 	X_ASSERT_NOT_NULL(pNumOut);
 	sql::SqlLiteQuery qry(db_, "SELECT COUNT(*) FROM file_ids WHERE type = ?");

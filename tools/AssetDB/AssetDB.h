@@ -52,7 +52,8 @@ public:
 
 	bool ListAssets(void);
 	bool ListAssets(AssetType::Enum type);
-	bool GetNumAssetType(AssetType::Enum type, int32_t* pNumOut);
+	bool GetNumAssets(int32_t* pNumOut);
+	bool GetNumAssets(AssetType::Enum type, int32_t* pNumOut);
 
 	Result::Enum AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
 	Result::Enum DeleteAsset(AssetType::Enum type, const core::string& name);
