@@ -107,7 +107,9 @@ public:
 	Area();
 	~Area();
 
+	void destoryRenderMesh(render::IRender* pRender);
 	bool CullEnt(const AABB& bounds, const Sphere& sphere) const;
+
 
 public:
 	typedef core::Array<AreaPortal> AreaPortalArr;

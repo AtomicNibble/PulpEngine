@@ -66,6 +66,11 @@ Area::~Area()
 
 }
 
+void Area::destoryRenderMesh(render::IRender* pRender)
+{
+	renderMesh.releaseRenderBuffers(pRender);
+}
+
 bool Area::CullEnt(const AABB& wBounds, const Sphere& wSphere) const
 {
 	X_UNUSED(wBounds);
@@ -253,18 +258,13 @@ void Level::update(void)
 
 void Level::free(void)
 {
+	X_ASSERT_NOT_NULL(pRender_);
+
 	canRender_ = false;
 
-#if 0
-	// clear render mesh.
-	core::Array<AreaModel>::ConstIterator it = areaModels_.begin();
-	for (; it != areaModels_.end(); ++it)
-	{
-		it->pRenderMesh->release();
+	for (auto& area : areas_) {
+		area.destoryRenderMesh(pRender_);
 	}
-
-	areaModels_.free();
-#endif
 
 	areas_.free();
 	areaNodes_.free();
