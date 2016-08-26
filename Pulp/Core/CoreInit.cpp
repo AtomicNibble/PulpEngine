@@ -682,7 +682,7 @@ bool XCore::Init3DEngine(const SCoreInitParams& initParams)
 
 	if (env_.p3DEngine) {
 		if (!env_.p3DEngine->Init()) {
-			X_ERROR("Core", "Failed to init 3DENninge");
+			X_ERROR("Core", "Failed to init 3DEngine");
 			return false;
 		}
 
