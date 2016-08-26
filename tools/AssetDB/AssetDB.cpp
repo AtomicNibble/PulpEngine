@@ -24,6 +24,7 @@ const char* AssetDB::RAW_FILES_FOLDER = "raw_files";
 
 
 AssetDB::AssetDB() :
+	modId_(-1),
 	open_(false)
 {
 
@@ -67,6 +68,15 @@ void AssetDB::CloseDB(void)
 
 bool AssetDB::CreateTables(void)
 {
+	if (!db_.execute("CREATE TABLE IF NOT EXISTS mods ("
+		"mod_id INTEGER PRIMARY KEY,"
+		"name TEXT COLLATE NOCASE,"
+		"out_dir TEXT"
+		");")) {
+		X_ERROR("AssetDB", "Failed to create 'mods' table");
+		return false;
+	}
+
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS file_ids ("
 		" file_id INTEGER PRIMARY KEY,"
 		"name TEXT COLLATE NOCASE," // names are not unique since we allow same name for diffrent type.
@@ -76,6 +86,8 @@ bool AssetDB::CreateTables(void)
 		"raw_file INTEGER,"
 		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,"
 		"lastUpdateTime TIMESTAMP"
+		"mod_id INTEGER,"
+		"FOREIGN KEY(mod_id) REFERENCES mods(mod_id)"
 		");")) {
 		X_ERROR("AssetDB", "Failed to create 'file_ids' table");
 		return false;
@@ -104,9 +116,158 @@ bool AssetDB::DropTables(void)
 	if (!db_.execute("DROP TABLE IF EXISTS raw_files;")) {
 		return false;
 	}
+	if (!db_.execute("DROP TABLE IF EXISTS mods;")) {
+		return false;
+	}
 
 	return true;
 }
+
+AssetDB::Result::Enum AssetDB::AddMod(const core::string& name, core::Path<char>& outDir)
+{
+	if (ModExsists(name)) {
+		X_ERROR("AssetDB", "Mod with name \"%s\" already exists", name.c_str());
+		return Result::NAME_TAKEN;
+	}
+
+	sql::SqlLiteTransaction trans(db_);
+	sql::SqlLiteCmd cmd(db_, "INSERT INTO mods (name, out_dir) VALUES(?,?)");
+	cmd.bind(1, name.c_str());
+	cmd.bind(2, outDir.c_str());
+
+	int32_t res = cmd.execute();
+	if (res != 0) {
+		return Result::ERROR;
+	}
+
+	trans.commit();
+	return Result::OK;
+}
+
+bool AssetDB::SetMod(const core::string& name)
+{
+	sql::SqlLiteTransaction trans(db_, true);
+	sql::SqlLiteQuery qry(db_, "SELECT mod_id, name FROM mods WHERE name = ?");
+	qry.bind(0, name.c_str());
+
+	sql::SqlLiteQuery::iterator it = qry.begin();
+
+	if (it != qry.end())
+	{
+		modId_ = (*it).get<int32_t>(0);
+
+		X_LOG0("AssetDB", "Mod set: \"%s\" id: %i", name.c_str(), modId_);
+		return true;
+	}
+
+	X_ERROR("AssetDB", "Failed to set mod no mod called \"%s\" exsists", name.c_str());
+	return false;
+}
+
+bool AssetDB::ModExsists(const core::string& name, ModId* pModId)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT mod_id FROM mods WHERE name = ?");
+	qry.bind(1, name.c_str());
+
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
+		return false;
+	}
+	if (pModId) {
+		*pModId = (*it).get<int32_t>(0);
+	}
+
+	return true;
+}
+
+bool AssetDB::SetModPath(const core::string& name, const core::Path<char>& outDir)
+{
+	ModId id;
+	if (!ModExsists(name, &id)) {
+		X_ERROR("AssetDB", "Failed to set mod id, mod \"%s\" don't exsist");
+		return false;
+	}
+
+	return SetModPath(id, outDir);
+}
+
+
+bool AssetDB::SetModPath(ModId modId, const core::Path<char>& outDir)
+{
+	sql::SqlLiteTransaction trans(db_);
+	sql::SqlLiteCmd cmd(db_, "UPDATE mods SET out_dir = ? WHERE mod_id = ?");
+	cmd.bind(1, outDir.c_str());
+	cmd.bind(2, modId);
+
+	sql::Result::Enum res = cmd.execute();
+	if (res != sql::Result::OK) {
+		return false;
+	}
+
+	trans.commit();
+	return true;
+}
+
+AssetDB::ModId AssetDB::GetModId(const core::string& name)
+{
+	ModId id;
+
+	if (!ModExsists(name, &id)) {
+		// tut tut!
+		X_ERROR("AssetDB", "Mod \"%s\" is not a valid mod name", name.c_str());
+		return INVALID_MOD_ID;
+	}
+
+	return id;
+}
+
+AssetDB::ModId AssetDB::GetcurrentModId(void) const
+{
+	return modId_;
+}
+
+bool AssetDB::GetModOutPath(ModId id, core::Path<char>& outDir)
+{
+	sql::SqlLiteTransaction trans(db_, true);
+	sql::SqlLiteQuery qry(db_, "SELECT out_dir, name FROM mods WHERE mod_id = ?");
+	qry.bind(0, id);
+
+	sql::SqlLiteQuery::iterator it = qry.begin();
+
+	if (it != qry.end())
+	{
+		auto row = *it;
+		const char* pOutPath = row.get<const char*>(0);
+		outDir.set(pOutPath);
+		return true;
+	}
+
+	X_ERROR("AssetDB", "Failed to get mod dir for modId %" PRIi32, id);
+	return false;
+}
+
+
+bool AssetDB::IterateMods(core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> func)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT mod_id, name, out_dir, lastUpdateTime FROM mods");
+
+	auto it = qry.begin();
+	for (; it != qry.end(); ++it)
+	{
+		auto row = *it;
+
+		const int32_t modId = row.get<int32_t>(0);
+		const char* pName = row.get<const char*>(1);
+		const char* pOutdir = row.get<const char*>(2);
+
+
+		func.Invoke(static_cast<ModId>(modId), X_CONST_STRING(pName), core::Path<char>(pOutdir));
+	}
+
+	return true;
+}
+
 
 bool AssetDB::IterateAssets(core::Delegate<bool(AssetType::Enum, const core::string& name)> func)
 {
@@ -226,11 +387,17 @@ AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string
 	if (AssetExsists(type, name)) {
 		return Result::NAME_TAKEN;
 	}
+	if (!isModSet()) {
+		X_ERROR("AssetDB", "Mod must be set before calling AddAsset!");
+		return Result::ERROR;
+	}
 
 	sql::SqlLiteTransaction trans(db_);
-	sql::SqlLiteCmd cmd(db_, "INSERT INTO file_ids (name, type) VALUES(?,?)");
+	sql::SqlLiteCmd cmd(db_, "INSERT INTO file_ids (name, type, mod_id) VALUES(?,?,?)");
 	cmd.bind(1, name.c_str());
 	cmd.bind(2, type);
+	cmd.bind(3, modId_);
+
 
 	sql::Result::Enum res = cmd.execute();
 	if (res != sql::Result::OK) {
@@ -694,6 +861,11 @@ bool AssetDB::MergeArgs(int32_t assetId, core::string& argsInOut)
 
 	argsInOut = core::string(s.GetString(), s.GetSize());
 	return true;
+}
+
+bool AssetDB::isModSet(void) const
+{
+	return modId_ >= 0 && modId_ != INVALID_MOD_ID;
 }
 
 const char* AssetDB::AssetTypeRawFolder(AssetType::Enum type)

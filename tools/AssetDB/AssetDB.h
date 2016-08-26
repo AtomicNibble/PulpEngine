@@ -28,6 +28,10 @@ class DLL_EXPORT AssetDB
 	};
 
 public:
+	typedef int32_t ModId;
+
+	static const ModId INVALID_MOD_ID = -1;
+
 	typedef assetDb::AssetType AssetType;
 	X_DECLARE_ENUM(Result)(
 		OK, 
@@ -46,7 +50,19 @@ public:
 	bool CreateTables(void);
 	bool DropTables(void);
 
+	Result::Enum AddMod(const core::string& name, core::Path<char>& outDir);
+	// must exsists.
+	bool SetMod(const core::string& name);
+	bool ModExsists(const core::string& name, ModId* pModId = nullptr);
+	bool SetModPath(const core::string& name, const core::Path<char>& outDir);
+	bool SetModPath(ModId modId, const core::Path<char>& outDir);
+	ModId GetModId(const core::string& name);
+	ModId GetcurrentModId(void) const;
+
+	bool GetModOutPath(ModId id, core::Path<char>& outDir);
+
 public:
+	bool IterateMods(core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> func);
 	bool IterateAssets(core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
 	bool IterateAssets(AssetType::Enum type, core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
 
@@ -74,6 +90,7 @@ public:
 private:
 	bool GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId = nullptr);
 	bool MergeArgs(int32_t assetId, core::string& argsInOut);
+	bool isModSet(void) const;
 
 	static const char* AssetTypeRawFolder(AssetType::Enum type);
 	static void AssetPathForName(AssetType::Enum type, const core::string& name, core::Path<char>& pathOut);
@@ -81,6 +98,7 @@ private:
 
 private:
 	sql::SqlLiteDb db_;
+	int32_t modId_;
 	bool open_;
 };
 
