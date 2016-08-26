@@ -291,6 +291,7 @@ const size_t ModelCompiler::Binds::dataSizeTotal(void) const
 // ---------------------------------------------------------------
 
 ModelCompiler::Mesh::Mesh(const Mesh& mesh) :
+	arena_(mesh.arena_),
 	name_(mesh.name_),
 	displayName_(mesh.displayName_),
 	verts_(mesh.verts_),
@@ -304,6 +305,7 @@ ModelCompiler::Mesh::Mesh(const Mesh& mesh) :
 }
 
 ModelCompiler::Mesh::Mesh(core::MemoryArenaBase* arena) :
+	arena_(arena),
 	verts_(arena),
 	faces_(arena),
 	binds_(arena),
@@ -348,7 +350,7 @@ ModelCompiler::ColMesh::ColMesh(const ColMesh& oth) :
 
 
 ModelCompiler::ColMesh::ColMesh(const Mesh& oth) : 
-	Mesh(nullptr),
+	Mesh(oth.arena_),
 	type_(ColMeshType::CONVEX)
 {
 

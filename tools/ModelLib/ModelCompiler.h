@@ -126,6 +126,7 @@ public:
 		void calBoundingbox(void);
 
 	public:
+		core::MemoryArenaBase* arena_;
 		NameString name_;
 		NameString displayName_;
 
