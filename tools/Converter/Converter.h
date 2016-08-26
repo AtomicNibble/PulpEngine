@@ -34,6 +34,7 @@ public:
 
 	bool Convert(AssetType::Enum assType, const core::string& name);
 	bool ConvertAll(void);
+	bool ConvertAll(AssetType::Enum assType);
 
 	// IConverterHost
 	virtual bool GetAssetData(const char* pAssetName, AssetType::Enum assType, core::Array<uint8_t>& dataOut) X_OVERRIDE;

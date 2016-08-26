@@ -126,6 +126,24 @@ bool AssetDB::IterateAssets(core::Delegate<bool(AssetType::Enum, const core::str
 	return true;
 }
 
+bool AssetDB::IterateAssets(AssetType::Enum assType, core::Delegate<bool(AssetType::Enum, const core::string& name)> func)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT name, lastUpdateTime FROM file_ids WHERE type = ?");
+	qry.bind(1, assType);
+
+	auto it = qry.begin();
+	for (; it != qry.end(); ++it)
+	{
+		auto row = *it;
+
+		const char* pName = row.get<const char*>(0);
+
+		func.Invoke(assType, X_CONST_STRING(pName));
+	}
+
+	return true;
+}
+
 bool AssetDB::ListAssets(void)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT name, type, lastUpdateTime FROM file_ids");

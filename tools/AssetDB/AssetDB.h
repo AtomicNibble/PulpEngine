@@ -48,6 +48,7 @@ public:
 
 public:
 	bool IterateAssets(core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
+	bool IterateAssets(AssetType::Enum assType, core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
 
 	bool ListAssets(void);
 	Result::Enum AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);

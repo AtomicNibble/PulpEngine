@@ -169,7 +169,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 			if (mode == ConvertMode::ALL)
 			{
-				if (!con.ConvertAll()) {
+				if (GetAssetType(assType)) {
+					if (!con.ConvertAll(assType)) {
+						X_ERROR("Convert", "Conversion failed..");
+					}
+				}
+				else if (!con.ConvertAll()) {
 					X_ERROR("Convert", "Conversion failed..");
 				}
 			}
