@@ -49,6 +49,7 @@ public:
 	void CloseDB(void);
 	bool CreateTables(void);
 	bool DropTables(void);
+	bool AddDefaultMods(void);
 
 	Result::Enum AddMod(const core::string& name, core::Path<char>& outDir);
 	// must exsists.

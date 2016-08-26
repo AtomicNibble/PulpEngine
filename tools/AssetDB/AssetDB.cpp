@@ -56,8 +56,19 @@ bool AssetDB::OpenDB(void)
 	if (!db_.connect(dbPath.c_str())) {
 		return false;
 	}
-	
-	return CreateTables();
+
+	if(!CreateTables()) {
+		return false;
+	}
+
+	if (!AddDefaultMods()) {
+		return false;
+	}
+
+	// set the mod to base
+	SetMod(core::string("base"));
+
+	return true;
 }
 
 void AssetDB::CloseDB(void)
@@ -85,7 +96,7 @@ bool AssetDB::CreateTables(void)
 		"argsHash INTEGER,"
 		"raw_file INTEGER,"
 		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,"
-		"lastUpdateTime TIMESTAMP"
+		"lastUpdateTime TIMESTAMP,"
 		"mod_id INTEGER,"
 		"FOREIGN KEY(mod_id) REFERENCES mods(mod_id)"
 		");")) {
@@ -103,8 +114,6 @@ bool AssetDB::CreateTables(void)
 		X_ERROR("AssetDB", "Failed to create 'raw_files' table");
 		return false;
 	}
-
-
 	return true;
 }
 
@@ -122,6 +131,22 @@ bool AssetDB::DropTables(void)
 
 	return true;
 }
+
+bool AssetDB::AddDefaultMods(void)
+{
+	core::string core("core");
+	core::string base("base");
+
+	if (!ModExsists(core)) {
+		AddMod(core, core::Path<char>("core_assets"));
+	}
+	if (!ModExsists(base)) {
+		AddMod(base, core::Path<char>("base_assets"));
+	}
+
+	return true;
+}
+
 
 AssetDB::Result::Enum AssetDB::AddMod(const core::string& name, core::Path<char>& outDir)
 {
