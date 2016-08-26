@@ -120,6 +120,7 @@ public:
 
 	public:
 		Mesh(const Mesh& mesh);
+		Mesh(Mesh&& mesh);
 		Mesh(core::MemoryArenaBase* arena);
 		~Mesh() = default;
 

@@ -304,6 +304,20 @@ ModelCompiler::Mesh::Mesh(const Mesh& mesh) :
 
 }
 
+ModelCompiler::Mesh::Mesh(Mesh&& mesh) :
+	arena_(std::move(mesh.arena_)),
+	name_(std::move(mesh.name_)),
+	displayName_(std::move(mesh.displayName_)),
+	verts_(std::move(mesh.verts_)),
+	faces_(std::move(mesh.faces_)),
+	binds_(std::move(mesh.binds_)),
+	colMeshes_(std::move(mesh.colMeshes_)),
+	material_(std::move(mesh.material_)),
+	boundingBox_(std::move(mesh.boundingBox_))
+{
+
+}
+
 ModelCompiler::Mesh::Mesh(core::MemoryArenaBase* arena) :
 	arena_(arena),
 	verts_(arena),
