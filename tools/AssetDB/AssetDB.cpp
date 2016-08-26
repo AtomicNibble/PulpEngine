@@ -126,10 +126,10 @@ bool AssetDB::IterateAssets(core::Delegate<bool(AssetType::Enum, const core::str
 	return true;
 }
 
-bool AssetDB::IterateAssets(AssetType::Enum assType, core::Delegate<bool(AssetType::Enum, const core::string& name)> func)
+bool AssetDB::IterateAssets(AssetType::Enum type, core::Delegate<bool(AssetType::Enum, const core::string& name)> func)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT name, lastUpdateTime FROM file_ids WHERE type = ?");
-	qry.bind(1, assType);
+	qry.bind(1, type);
 
 	auto it = qry.begin();
 	for (; it != qry.end(); ++it)
@@ -138,7 +138,7 @@ bool AssetDB::IterateAssets(AssetType::Enum assType, core::Delegate<bool(AssetTy
 
 		const char* pName = row.get<const char*>(0);
 
-		func.Invoke(assType, X_CONST_STRING(pName));
+		func.Invoke(type, X_CONST_STRING(pName));
 	}
 
 	return true;
@@ -161,6 +161,45 @@ bool AssetDB::ListAssets(void)
 	
 	return true;
 }
+
+bool AssetDB::ListAssets(AssetType::Enum type)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT name, lastUpdateTime FROM file_ids WHERE type = ?");
+	qry.bind(1, type);
+
+	auto it = qry.begin();
+	for (; it != qry.end(); ++it)
+	{
+		auto row = *it;
+
+		const char* pName = row.get<const char*>(0);
+
+		X_LOG0("AssetDB", "name: ^6%s^0", pName);
+	}
+
+	return true;
+}
+
+bool AssetDB::GetNumAssetType(AssetType::Enum type, int32_t* pNumOut)
+{
+	X_ASSERT_NOT_NULL(pNumOut);
+	sql::SqlLiteQuery qry(db_, "SELECT COUNT(*) FROM file_ids WHERE type = ?");
+	qry.bind(1, type);
+
+	auto it = qry.begin();
+	if (it != qry.end())
+	{
+		auto row = *it;
+
+		const int32_t count = row.get<int32_t>(0);
+
+		*pNumOut = count;
+		return true;
+	}
+
+	return false;
+}
+
 
 AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId)
 {
