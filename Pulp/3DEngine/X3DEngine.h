@@ -48,8 +48,8 @@ private:
 
 private:
 	// vars / cmds
-	friend void Command_Map(core::IConsoleCmdArgs* Cmd);
-	friend void Command_DevMap(core::IConsoleCmdArgs* Cmd);
+	void Command_Map(core::IConsoleCmdArgs* Cmd);
+	void Command_DevMap(core::IConsoleCmdArgs* Cmd);
 
 
 	//~

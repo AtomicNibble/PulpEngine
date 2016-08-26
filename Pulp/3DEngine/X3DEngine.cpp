@@ -37,44 +37,6 @@ gui::XGuiManager* X3DEngine::pGuiManger_ = nullptr;
 //------------------------------------------
 gui::IGui* gui = nullptr;
 
-// Commands
-
-void Command_Map(core::IConsoleCmdArgs* Cmd)
-{
-	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->p3DEngine);
-
-	if (Cmd->GetArgCount() != 2)
-	{
-		X_WARNING("3DEngine", "map <mapname>");
-		return;
-	}
-
-	const char* mapName = Cmd->GetArg(1);
-
-	X3DEngine* p3DEngine = reinterpret_cast<X3DEngine*>(gEnv->p3DEngine);
-	p3DEngine->LoadMap(mapName);
-}
-
-void Command_DevMap(core::IConsoleCmdArgs* Cmd)
-{
-	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->p3DEngine);
-
-	if (Cmd->GetArgCount() != 2)
-	{
-		X_WARNING("3DEngine", "devmap <mapname>");
-		return;
-	}
-
-	const char* mapName = Cmd->GetArg(1);
-
-	X3DEngine* p3DEngine = reinterpret_cast<X3DEngine*>(gEnv->p3DEngine);
-	p3DEngine->LoadDevMap(mapName);
-}
-
-// ~Commands
-
 
 X3DEngine::X3DEngine()
 {
@@ -94,8 +56,8 @@ void X3DEngine::registerVars(void)
 
 void X3DEngine::registerCmds(void)
 {
-	ADD_COMMAND("map", Command_Map, core::VarFlag::SYSTEM, "Loads a map");
-	ADD_COMMAND("devmap", Command_DevMap, core::VarFlag::SYSTEM, "Loads a map in developer mode");
+	ADD_COMMAND_MEMBER("map", this, X3DEngine, &X3DEngine::Command_Map, core::VarFlag::SYSTEM, "Loads a map");
+	ADD_COMMAND_MEMBER("devmap", this, X3DEngine, &X3DEngine::Command_DevMap, core::VarFlag::SYSTEM, "Loads a map in developer mode");
 
 
 }
@@ -137,9 +99,6 @@ bool X3DEngine::Init(void)
 
 	level::Level::Init();
 
-//	level_.Load("boxmap");
-//	level_.Load("portal_test");
-//	level_.Load("entity_test");
 	return true;
 }
 
@@ -236,22 +195,59 @@ void X3DEngine::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<c
 
 
 
-void X3DEngine::LoadMap(const char* mapName)
+void X3DEngine::LoadMap(const char* pMapName)
 {
-	X_ASSERT_NOT_NULL(mapName);
+	X_ASSERT_NOT_NULL(pMapName);
 
-	level_.Load(mapName);
+	level_.Load(pMapName);
 }
 
-void X3DEngine::LoadDevMap(const char* mapName)
+void X3DEngine::LoadDevMap(const char* pMapName)
 {
-	X_ASSERT_NOT_NULL(mapName);
+	X_ASSERT_NOT_NULL(pMapName);
 
 	// this should not really duplicate anything.
 	// set some vars then just load the map normaly tbh.
 
-	LoadMap(mapName);
+	LoadMap(pMapName);
 }
 
+
+
+// Commands
+
+void X3DEngine::Command_Map(core::IConsoleCmdArgs* Cmd)
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->p3DEngine);
+
+	if (Cmd->GetArgCount() != 2)
+	{
+		X_WARNING("3DEngine", "map <mapname>");
+		return;
+	}
+
+	const char* pMapName = Cmd->GetArg(1);
+
+	LoadMap(pMapName);
+}
+
+void X3DEngine::Command_DevMap(core::IConsoleCmdArgs* Cmd)
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->p3DEngine);
+
+	if (Cmd->GetArgCount() != 2)
+	{
+		X_WARNING("3DEngine", "devmap <mapname>");
+		return;
+	}
+
+	const char* pMapName = Cmd->GetArg(1);
+
+	LoadDevMap(pMapName);
+}
+
+// ~Commands
 
 X_NAMESPACE_END
