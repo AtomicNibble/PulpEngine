@@ -252,7 +252,6 @@ IModel* XModelManager::loadModelSync(const char* ModelName)
 
 IModel* XModelManager::getDefaultModel(void)
 {
-	X_ASSERT_NOT_NULL(pDefaultModel_);
 	return pDefaultModel_;
 }
 
