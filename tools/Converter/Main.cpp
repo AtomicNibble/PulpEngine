@@ -78,7 +78,7 @@ namespace
 		return false;
 	}
 
-	bool GetAssetType(converter::AssetType::Enum& assType)
+	bool GetAssetType(converter::AssetType::Enum& assType, bool slient = false)
 	{
 		const wchar_t* pAssetType = gEnv->pCore->GetCommandLineArgForVarW(L"type");
 		if (pAssetType)
@@ -108,11 +108,11 @@ namespace
 			return true;
 		}
 	
-		X_ERROR("Converter", "missing asset type");
+		X_ERROR_IF(!slient, "Converter", "missing asset type");
 		return false;
 	}
 
-	bool GetAssetName(core::string& name)
+	bool GetAssetName(core::string& name, bool slient = false)
 	{
 		const wchar_t* pAssetName = gEnv->pCore->GetCommandLineArgForVarW(L"name");
 		if (pAssetName)
@@ -122,7 +122,7 @@ namespace
 			return true;
 		}
 
-		X_ERROR("Converter", "missing asset name");
+		X_ERROR_IF(!slient, "Converter", "missing asset name");
 		return false;
 	}
 
@@ -169,7 +169,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 			if (mode == ConvertMode::ALL)
 			{
-				if (GetAssetType(assType)) {
+				// optionaly convert all asset of Type X
+				if (GetAssetType(assType, true)) {
 					if (!con.ConvertAll(assType)) {
 						X_ERROR("Convert", "Conversion failed..");
 					}
