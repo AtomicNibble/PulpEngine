@@ -43,6 +43,10 @@
 //	It can be done as a job since it has real dependancies.
 //
 
+X_NAMESPACE_DECLARE(engine,
+	class IPrimativeContext;
+);
+
 X_NAMESPACE_BEGIN(gui)
 
 static const char*	GUI_FILE_EXTENSION = "gui";
@@ -187,8 +191,8 @@ struct IGui
 	virtual float getCursorPosY(void) X_ABSTRACT;
 
 	// repaints the ui
-	virtual void Redraw() X_ABSTRACT;
-	virtual void DrawCursor(void) X_ABSTRACT;
+	virtual void Redraw(engine::IPrimativeContext* pDrawCon) X_ABSTRACT;
+	virtual void DrawCursor(engine::IPrimativeContext* pDrawCon) X_ABSTRACT;
 
 	// dose shit.
 	virtual const char* Activate(bool activate, int time) X_ABSTRACT;
