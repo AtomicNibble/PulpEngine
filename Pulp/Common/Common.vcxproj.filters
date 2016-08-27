@@ -1138,6 +1138,9 @@
     <ClInclude Include="IRenderCommands.h">
       <Filter>Interfaces_h\Render</Filter>
     </ClInclude>
+    <ClInclude Include="IPrimativeContext.h">
+      <Filter>Interfaces_h\3DEngine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1421,6 +1424,9 @@
     </None>
     <None Include="CmdBucket.inl">
       <Filter>Interfaces_h\Render</Filter>
+    </None>
+    <None Include="IPrimativeContext.inl">
+      <Filter>Interfaces_h\3DEngine</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -1742,6 +1748,9 @@
     </ClCompile>
     <ClCompile Include="CmdBucket.cpp">
       <Filter>Interfaces_h\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="IPrimativeContext.cpp">
+      <Filter>Interfaces_h\3DEngine</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

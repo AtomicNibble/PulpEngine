@@ -269,6 +269,7 @@
     <ClInclude Include="Prepro\PreproStringize.h" />
     <ClInclude Include="Prepro\PreproToBool.h" />
     <ClInclude Include="Prepro\PreproUniqueName.h" />
+    <ClInclude Include="IPrimativeContext.h" />
     <ClInclude Include="Profile\ProfilerTypes.h" />
     <ClInclude Include="Random\MultiplyWithCarry.h" />
     <ClInclude Include="Random\XorShift.h" />
@@ -434,6 +435,7 @@
     <None Include="Memory\ThreadPolicies\MultiThreadPolicy.inl" />
     <None Include="Platform\win32\Console.inl" />
     <None Include="Platform\win32\Window.inl" />
+    <None Include="IPrimativeContext.inl" />
     <None Include="Random\MultiplyWithCarry.inl" />
     <None Include="Random\XorShift.inl" />
     <ClInclude Include="String\CmdArgs.inl">
@@ -489,6 +491,7 @@
     <ClCompile Include="Platform\win32\Pipe.cpp" />
     <ClCompile Include="Platform\win32\SystemInfo.cpp" />
     <ClCompile Include="Platform\win32\TrayIcon.cpp" />
+    <ClCompile Include="IPrimativeContext.cpp" />
     <ClCompile Include="Sorting\RadixSort.cpp" />
     <ClCompile Include="Time\win32\StopWatch.cpp" />
     <ClCompile Include="Util\Delegate.gen">

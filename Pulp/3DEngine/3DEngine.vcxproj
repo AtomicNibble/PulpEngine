@@ -368,6 +368,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="Drawing\PrimativeContext.h" />
     <ClInclude Include="EngineBase.h" />
     <ClInclude Include="Gui\Gui.h" />
     <ClInclude Include="Gui\GuiManger.h" />
@@ -386,6 +387,7 @@
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Drawing\PrimativeContext.cpp" />
     <ClCompile Include="Gui\Gui.cpp" />
     <ClCompile Include="Gui\GuiManger.cpp" />
     <ClCompile Include="Gui\GuiScript.cpp" />
