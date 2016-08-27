@@ -172,8 +172,8 @@ AssetDB::Result::Enum AssetDB::AddMod(const core::string& name, core::Path<char>
 bool AssetDB::SetMod(const core::string& name)
 {
 	sql::SqlLiteTransaction trans(db_, true);
-	sql::SqlLiteQuery qry(db_, "SELECT mod_id, name FROM mods WHERE name = ?");
-	qry.bind(0, name.c_str());
+	sql::SqlLiteQuery qry(db_, "SELECT mod_id FROM mods WHERE name = ?");
+	qry.bind(1, name.c_str());
 
 	sql::SqlLiteQuery::iterator it = qry.begin();
 
@@ -256,7 +256,7 @@ bool AssetDB::GetModInfo(ModId id, Mod& modOut)
 {
 	sql::SqlLiteTransaction trans(db_, true);
 	sql::SqlLiteQuery qry(db_, "SELECT out_dir, name FROM mods WHERE mod_id = ?");
-	qry.bind(0, id);
+	qry.bind(1, id);
 
 	sql::SqlLiteQuery::iterator it = qry.begin();
 
