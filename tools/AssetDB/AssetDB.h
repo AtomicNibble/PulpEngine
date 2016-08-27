@@ -94,6 +94,7 @@ public:
 
 	bool GetArgsForAsset(int32_t assetId, core::string& argsOut);
 	bool GetArgsHashForAsset(int32_t idassetId, uint32_t& argsHashOut);
+	bool GetModIdForAsset(int32_t idassetId, ModId& modIdOut);
 
 	bool GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& dataOut);
 
