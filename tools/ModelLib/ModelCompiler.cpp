@@ -991,8 +991,9 @@ size_t ModelCompiler::calculateBoneDataSize(void) const
 	size_t size = 0;
 
 
-	size_t fullbones = bones_.size();
-	size_t totalbones = fullbones; // +(tagOrigin_.keep ? 1 : 0);
+	const size_t fullbones = bones_.size();
+	const size_t blankBones = bones_.isEmpty() ? 1 : 0;
+	const size_t totalbones = fullbones + blankBones;
 
 	// don't store pos,angle,hier for blank bones currently.
 	size += (fullbones * sizeof(uint8_t)); // hierarchy
