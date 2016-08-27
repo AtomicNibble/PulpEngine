@@ -7,6 +7,7 @@
 
 #include <IRender.h>
 #include <IConsole.h>
+#include <IPrimativeContext.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -27,11 +28,9 @@ void XProfileSys::Render(void)
 	}
 
 	pRender_ = gEnv->pRender;
-	if (!pRender_) {
+	if (!pRender_ || !pPrimCon_) {
 		return;
 	}
-
-	pRender_->FlushTextBuffer();
 
 	UpdateSubSystemInfo(); // calculate avg's
 
@@ -54,7 +53,6 @@ void XProfileSys::Render(void)
 
 	Vec2f xy(X_START, Y_START);
 
-	pRender_->Set2D(true);
 	{
 		// each block can grow based on it's contents.
 		
@@ -98,13 +96,9 @@ void XProfileSys::Render(void)
 		}
 
 	}
-	pRender_->Set2D(false);
 
 	ClearSubSystems(); // reset for next frame.
 
-
-	// so console is on top.
-	pRender_->FlushTextBuffer();
 }
 
 Vec2f XProfileSys::RenderSubSysInfo(const Vec2f& pos, const float maxWidth)
@@ -125,14 +119,14 @@ Vec2f XProfileSys::RenderSubSysInfo(const Vec2f& pos, const float maxWidth)
 	sizeOut.y += item_padding; // bottom badding
 	sizeOut.y += title_height;
 
-	pRender_->DrawQuad(pos.x, pos.y, width, sizeOut.y, Color(0.1f, 0.1f, 0.1f, 0.6f),
+	pPrimCon_->drawQuad(pos.x, pos.y, width, sizeOut.y, Color(0.1f, 0.1f, 0.1f, 0.6f),
 		Color(0.01f, 0.01f, 0.01f, 0.8f));
 
 	Vec3f txtPos(pos.x + (width / 2), pos.y, 1);
 	XDrawTextInfo ti;
 	ti.col = Col_Red;
 	ti.flags = DrawTextFlags::POS_2D | DrawTextFlags::MONOSPACE | DrawTextFlags::CENTER;
-	pRender_->DrawTextQueued(txtPos, ti, "Sub Systems");
+	pPrimCon_->drawTextQueued(txtPos, ti, "Sub Systems");
 
 	float percent;
 	float total;
@@ -182,7 +176,7 @@ Vec2f XProfileSys::RenderMemoryInfo(const Vec2f& pos, float height)
 		height = 200.f;
 	}
 
-	pRender_->DrawQuad(pos.x, pos.y, width, height, Color(0.1f, 0.1f, 0.1f, 0.6f),
+	pPrimCon_->drawQuad(pos.x, pos.y, width, height, Color(0.1f, 0.1f, 0.1f, 0.6f),
 		Color(0.01f, 0.01f, 0.01f, 0.8f));
 
 	DrawLabel(pos.x + (width / 2), pos.y, "Combined Mem Stats(Sys)", Col_Red,
@@ -206,7 +200,7 @@ Vec2f XProfileSys::RenderMemoryInfo(const Vec2f& pos, float height)
 	str.appendFmt("WasteUnused:%s\n", core::HumanSize::toString(temp, allocStats.wasteUnused_));
 	str.appendFmt("Overhead:%s\n", core::HumanSize::toString(temp, allocStats.internalOverhead_));
 
-	pRender_->DrawQuad(stringPos.x, stringPos.y, width, height, Color(0.1f, 0.1f, 0.1f, 0.6f),
+	pPrimCon_->drawQuad(stringPos.x, stringPos.y, width, height, Color(0.1f, 0.1f, 0.1f, 0.6f),
 		Color(0.01f, 0.01f, 0.01f, 0.8f));
 
 	DrawLabel(stringPos.x + (width / 2), stringPos.y, "String Memory Stats(Sys)", Col_Red,
@@ -243,9 +237,9 @@ Vec2f XProfileSys::RenderProfileData(const Vec2f& pos, const float width)
 	};
 
 	// draw the block.
-	pRender_->DrawQuad(x, y, width, height, Color(0.1f, 0.1f, 0.1f, 0.6f),
+	pPrimCon_->drawQuad(x, y, width, height, Color(0.1f, 0.1f, 0.1f, 0.6f),
 		Color(0.01f, 0.01f, 0.01f, 0.8f));
-	pRender_->DrawLines(points, 6, Color(0.2f, 0.2f, 0.2f, 1.f));
+	pPrimCon_->drawLines(points, 6, Color(0.2f, 0.2f, 0.2f, 1.f));
 
 
 	float x_pos = x + 5;
@@ -290,7 +284,7 @@ Vec2f XProfileSys::RenderProfileDataHeader(const Vec2f& pos, const float width)
 	const float header_height = 20;
 	const float header_padding = 0;
 
-	pRender_->DrawQuad(pos.x, pos.y, width, header_height, Color(0.2f, 0.2f, 0.2f, 0.6f),
+	pPrimCon_->drawQuad(pos.x, pos.y, width, header_height, Color(0.2f, 0.2f, 0.2f, 0.6f),
 		Color(0.01f, 0.01f, 0.01f, 0.8f));
 
 	// draw the text slut.
@@ -323,7 +317,7 @@ Vec2f XProfileSys::RenderFrameTimes(const Vec2f& pos, const float width, const f
 
 	uint32_t i, num = 0;
 
-	pRender_->DrawQuad(pos.x, pos.y, rect.getWidth(), rect.getHeight(), Color(0.1f, 0.1f, 0.1f, 0.6f),
+	pPrimCon_->drawQuad(pos.x, pos.y, rect.getWidth(), rect.getHeight(), Color(0.1f, 0.1f, 0.1f, 0.6f),
 		Color(0.1f, 0.01f, 0.01f, 0.8f));
 
 	FrameTimes::reverse_iterator it = frameTimeHistory_.rbegin();
@@ -352,7 +346,7 @@ Vec2f XProfileSys::RenderFrameTimes(const Vec2f& pos, const float width, const f
 		}
 	}
 
-	pRender_->DrawBarChart(rect, num, heights, bar_padding, X_PROFILE_FRAME_TIME_HISTORY_SIZE);
+	pPrimCon_->drawBarChart(rect, num, heights, bar_padding, X_PROFILE_FRAME_TIME_HISTORY_SIZE, Col_Coral);
 
 	return Vec2f(rect.getWidth(), rect.getHeight());
 }
@@ -365,7 +359,7 @@ void XProfileSys::DrawLabel(float x, float y, const char* pStr, const Color& col
 	XDrawTextInfo ti;
 	ti.col = col;
 	ti.flags = DrawTextFlags::POS_2D | DrawTextFlags::MONOSPACE;
-	pRender_->DrawTextQueued(pos, ti, pStr);
+	pPrimCon_->drawTextQueued(pos, ti, pStr);
 }
 
 void XProfileSys::DrawLabel(float x, float y, const char* pStr, const Color& col, Flags<DrawTextFlags> flags)
@@ -375,7 +369,7 @@ void XProfileSys::DrawLabel(float x, float y, const char* pStr, const Color& col
 	ti.col = col;
 	ti.flags = DrawTextFlags::POS_2D | DrawTextFlags::MONOSPACE;
 	ti.flags |= flags;
-	pRender_->DrawTextQueued(pos, ti, pStr);
+	pPrimCon_->drawTextQueued(pos, ti, pStr);
 }
 
 
@@ -407,8 +401,8 @@ void XProfileSys::DrawPercentageBlock(float x, float y,
 	percentStr.appendFmt("%s %.2fms (%.1f%%)", name, ms, percent * 100);
 
 
-	pRender_->DrawQuad(x, y, width, height, back);
-	pRender_->DrawQuad(x, y, width * percent, height, fill);
+	pPrimCon_->drawQuad(x, y, width, height, back);
+	pPrimCon_->drawQuad(x, y, width * percent, height, fill);
 	// 2.5% offset
 	DrawLabel(x + (width / 40.f), y + (height / 2.f), percentStr.c_str(), Col_Whitesmoke,
 		DrawTextFlags::CENTER_VER);

@@ -9,6 +9,11 @@
 
 X_NAMESPACE_DECLARE(render, struct IRender);
 
+X_NAMESPACE_DECLARE(engine,
+	class IPrimativeContext;
+);
+
+
 #define X_PROFILE_FRAME_TIME_HISTORY_SIZE 64
 
 X_NAMESPACE_BEGIN(core)
@@ -132,6 +137,7 @@ private:
 
 	ICore*		pCore_;
 	render::IRender* pRender_;
+	engine::IPrimativeContext* pPrimCon_;
 
 	Profilers	profiles_;
 	DisplayInfo displayInfo_;

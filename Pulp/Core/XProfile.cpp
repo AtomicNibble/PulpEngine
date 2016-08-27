@@ -63,6 +63,8 @@ XProfileSys* XProfileSys::s_this = nullptr;
 
 XProfileSys::XProfileSys() :
 	pCore_(nullptr),
+	pRender_(nullptr),
+	pPrimCon_(nullptr),
 	profiles_(nullptr),
 	displayInfo_(nullptr),
 	// --------
