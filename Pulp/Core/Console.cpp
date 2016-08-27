@@ -17,6 +17,7 @@
 #include <ICore.h>
 #include <IFileSys.h>
 #include <IFrameData.h>
+#include <IPrimativeContext.h>
 
 #include "Platform\Window.h"
 
@@ -357,6 +358,7 @@ XConsole::XConsole() :
 	pCore_ = nullptr;
 	pFont_ = nullptr;
 	pRender_ = nullptr;
+	pPrimContext_ = nullptr;
 	pInput_ = nullptr;
 	pBackground_ = nullptr;
 
@@ -1905,9 +1907,8 @@ consoleState::Enum XConsole::getVisState(void) const
 
 size_t XConsole::MaxVisibleLogLines(void) const
 {
-	size_t height = pRender_->getHeight() - 40;
-
-	size_t scaledLogHeight = static_cast<size_t>(
+	const size_t height = pRender_->getDisplayRes().y - 40;
+	const size_t scaledLogHeight = static_cast<size_t>(
 		static_cast<float>(CONSOLE_LOG_LINE_HIEGHT)* 0.8f);
 
 	return height / scaledLogHeight;
@@ -1919,6 +1920,11 @@ void XConsole::DrawBuffer(void)
 		return;
 	}
 
+	if (!pPrimContext_) {
+		return;
+	}
+
+
 	font::XTextDrawConect ctx;
 	ctx.SetColor(Col_Khaki);
 	ctx.SetProportional(false);
@@ -1926,34 +1932,30 @@ void XConsole::DrawBuffer(void)
 	ctx.SetCharWidthScale(0.5f);
 //	ctx.SetScaleFrom800x600(true);
 
-	float width = pRender_->getWidthf() - 10;
-	float height = pRender_->getHeightf() - 40;
+	Vec2f res;
+	res = pRender_->getDisplayRes();
 
-	if (pRender_)
+	const float width = res.x - 10;
+	const float height = res.y - 40;
+
 	{
-		pRender_->Set2D(true);
-		pRender_->DrawQuad(5, 5, width, 24, console_input_box_color);
-		pRender_->DrawRect(5, 5, width, 24, console_input_box_color_border);
-
-	//	pRender_->DrawQuad(5, 35, 790, 24, console_input_box_color);
-
+		pPrimContext_->drawQuad(5, 5, width, 24, console_input_box_color);
+		pPrimContext_->drawRect(5, 5, width, 24, console_input_box_color_border);
 
 		if (isExpanded()) {
 
 			// draw a channel colum?
-			if (console_output_draw_channel)
-				pRender_->DrawQuad(5, 35, 11 * ctx.GetCharWidthScaled(), height, console_output_box_channel_color);
+			if (console_output_draw_channel) {
+				pPrimContext_->drawQuad(5, 35, 11 * ctx.GetCharWidthScaled(), height, console_output_box_channel_color);
+			}
 
-			pRender_->DrawQuad(5, 35, width, height, console_output_box_color);
-			pRender_->DrawRect(5, 35, width, height, console_output_box_color_border);
+			pPrimContext_->drawQuad(5, 35, width, height, console_output_box_color);
+			pPrimContext_->drawRect(5, 35, width, height, console_output_box_color_border);
 
 			DrawScrollBar();
 		}
-
-		pRender_->Set2D(false);	
 	}
 
-	if (pFont_ && pRender_)
 	{
 		const char* txt = X_ENGINE_NAME " Engine " X_BUILD_STRING ">";
 
@@ -2014,9 +2016,7 @@ void XConsole::DrawBuffer(void)
 
 		// draw the auto complete
 		DrawInputTxt(pos);
-
 	}
-
 }
 
 void XConsole::DrawScrollBar(void)
@@ -2025,11 +2025,14 @@ void XConsole::DrawScrollBar(void)
 		return;
 	}
 
-	if(pFont_ && pRender_)
+	if(pFont_ && pPrimContext_ && pRender_)
 	{
 		// oooo shit nuggger wuggger.
-		float width = pRender_->getWidthf() - 10;
-		float height = pRender_->getHeightf() - 40;
+		Vec2f res;
+		res = pRender_->getDisplayRes();
+
+		const float width = res.x - 10;
+		const float height = res.y - 40;
 
 		const float barWidth = 6;
 		const float marging = 5;
@@ -2057,9 +2060,8 @@ void XConsole::DrawScrollBar(void)
 			slider_y = start_y;
 		}
 
-		pRender_->DrawQuad(start_x, start_y, barWidth, barHeight, console_output_scroll_bar_color);
-		pRender_->DrawQuad(slider_x, slider_y, slider_width, slider_height, console_output_scroll_bar_slider_color);
-
+		pPrimContext_->drawQuad(start_x, start_y, barWidth, barHeight, console_output_scroll_bar_color);
+		pPrimContext_->drawQuad(slider_x, slider_y, slider_width, slider_height, console_output_scroll_bar_slider_color);
 	}
 }
 
@@ -2073,7 +2075,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 	Color txtCol = Col_White;
 	Vec2f txtPos = start;
 
-	if (pFont_ && pRender_)
+	if (pFont_ && pPrimContext_)
 	{
 		const char* inputBegin = InputBuffer_.begin();
 		const char* inputEnd = InputBuffer_.end();
@@ -2343,11 +2345,10 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				}
 
 				// Draw the boxes
-				pRender_->Set2D(true);
-				pRender_->DrawQuad(xpos, ypos, width, height, col);
-				pRender_->DrawRect(xpos, ypos, width, height, console_input_box_color_border);
-				pRender_->DrawQuad(xpos, ypos + height + box2Offset, width2, height2, col);
-				pRender_->DrawRect(xpos, ypos + height + box2Offset, width2, height2, console_input_box_color_border);
+				pPrimContext_->drawQuad(xpos, ypos, width, height, col);
+				pPrimContext_->drawRect(xpos, ypos, width, height, console_input_box_color_border);
+				pPrimContext_->drawQuad(xpos, ypos + height + box2Offset, width2, height2, col);
+				pPrimContext_->drawRect(xpos, ypos + height + box2Offset, width2, height2, console_input_box_color_border);
 
 				if (isColorVar)
 				{
@@ -2358,14 +2359,14 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 					// draw the colors :D !
 					CVarColRef* PColVar = static_cast<CVarColRef*>(pCvar);
 
-					pRender_->DrawQuad(colxpos, colypos, colorBoxWidth, colHeight, PColVar->GetColor());
-					pRender_->DrawRect(colxpos, colypos, colorBoxWidth, colHeight, Col_Black);
+					pPrimContext_->drawQuad(colxpos, colypos, colorBoxWidth, colHeight, PColVar->GetColor());
+					pPrimContext_->drawRect(colxpos, colypos, colorBoxWidth, colHeight, Col_Black);
 
 					// 2nd box.
 					colypos += fCharHeight;
 
-					pRender_->DrawQuad(colxpos, colypos, colorBoxWidth, colHeight, PColVar->GetDefaultColor());
-					pRender_->DrawRect(colxpos, colypos, colorBoxWidth, colHeight, Col_Black);
+					pPrimContext_->drawQuad(colxpos, colypos, colorBoxWidth, colHeight, PColVar->GetDefaultColor());
+					pPrimContext_->drawRect(colxpos, colypos, colorBoxWidth, colHeight, Col_Black);
 
 
 					// How about a preview of the new color?
@@ -2390,13 +2391,12 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 							if (CVarColRef::ColorFromString(colorStr.c_str(), previewCol))
 							{
 								// draw a box on the end cus i'm a goat.
-								pRender_->DrawQuad(xpos + width + 5, ypos, height, height, previewCol);
-								pRender_->DrawRect(xpos + width + 5, ypos, height, height, Col_Black);
+								pPrimContext_->drawQuad(xpos + width + 5, ypos, height, height, previewCol);
+								pPrimContext_->drawRect(xpos + width + 5, ypos, height, height, Col_Black);
 							}
 						}
 					}
 				}
-				pRender_->Set2D(false);
 
 				// draw da text baby!
 				xpos += 5;
@@ -2435,12 +2435,10 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				height += fCharHeight;
 
 
-				pRender_->Set2D(true);
-				pRender_->DrawQuadImage(xpos, ypos, width, height, this->pBackground_->getTexID(), col);
-				pRender_->DrawRect(xpos, ypos, width, height, console_output_box_color_border);
-				pRender_->DrawQuad(xpos, ypos + height + box2Offset, descWidth, height, col);
-				pRender_->DrawRect(xpos, ypos + height + box2Offset, descWidth, height, console_input_box_color_border);
-				pRender_->Set2D(false);
+				pPrimContext_->drawQuadImage(xpos, ypos, width, height, this->pBackground_->getTexID(), col);
+				pPrimContext_->drawRect(xpos, ypos, width, height, console_output_box_color_border);
+				pPrimContext_->drawQuad(xpos, ypos + height + box2Offset, descWidth, height, col);
+				pPrimContext_->drawRect(xpos, ypos + height + box2Offset, descWidth, height, console_input_box_color_border);
 
 				xpos += 5.f;
 
@@ -2470,10 +2468,8 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 				width += 10; // add a few pixels.
 		//		height += 5; // add a few pixels.
 
-				pRender_->Set2D(true);
-				pRender_->DrawQuadImage(xpos, ypos, width, height, this->pBackground_->getTexID(), col);
-				pRender_->DrawRect(xpos, ypos, width, height, console_output_box_color_border);
-				pRender_->Set2D(false);
+				pPrimContext_->drawQuadImage(xpos, ypos, width, height, this->pBackground_->getTexID(), col);
+				pPrimContext_->drawRect(xpos, ypos, width, height, console_output_box_color_border);
 
 				xpos += 5;
 

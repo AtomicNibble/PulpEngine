@@ -35,6 +35,10 @@ X_ENABLE_WARNING(4702)
 
 #include <Memory\AllocationPolicies\PoolAllocator.h>
 
+X_NAMESPACE_DECLARE(engine,
+	class IPrimativeContext;
+);
+
 
 X_NAMESPACE_BEGIN(core)
 
@@ -352,6 +356,7 @@ private:
 	ICore*					pCore_;
 	font::IFFont*			pFont_;
 	render::IRender*		pRender_;
+	engine::IPrimativeContext* pPrimContext_;
 	input::IInput*			pInput_;
 
 	texture::ITexture*		pBackground_;
