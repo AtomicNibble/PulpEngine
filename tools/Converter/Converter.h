@@ -35,12 +35,15 @@ public:
 	bool Convert(AssetType::Enum assType, const core::string& name);
 	bool ConvertAll(void);
 	bool ConvertAll(AssetType::Enum assType);
+	bool CleanAll(const char* pMod = nullptr);
 
 	// IConverterHost
 	virtual bool GetAssetData(const char* pAssetName, AssetType::Enum assType, core::Array<uint8_t>& dataOut) X_OVERRIDE;
 	// ~IConverterHost
 
 private:
+	bool CleanMod(assetDb::AssetDB::ModId id, const core::string& name, core::Path<char>& outDir);
+
 	bool Convert_int(AssetType::Enum assType, ConvertArgs& args, const core::Array<uint8_t>& fileData,
 		const OutPath& pathOut);
 

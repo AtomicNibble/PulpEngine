@@ -127,6 +127,34 @@ bool Converter::ConvertAll(AssetType::Enum assType)
 	return true;
 }
 
+bool Converter::CleanAll(const char* pMod)
+{
+	// this is for cleaning all asset that don't have a entry.
+	// optionally limit it to a mod.
+	assetDb::AssetDB::ModId modId;
+	if (pMod) {
+		if (!db_.ModExsists(core::string(pMod), &modId)) {
+			X_ERROR("Converter", "Can't clean mod \"%s\" does not exsist", pMod);
+			return false;
+		}
+	}
+
+	core::Delegate<bool(assetDb::AssetDB::ModId id, const core::string& name, core::Path<char>& outDir)> func;
+	func.Bind<Converter, &Converter::CleanMod>(this);
+
+	return db_.IterateMods(func);
+}
+
+
+bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name, core::Path<char>& outDir)
+{
+	// should we just get all the assets build a hash and then check all file names
+	// have a valid entry.
+	// OR we can iterate the files on disk and check the DB.
+
+	X_ASSERT_NOT_IMPLEMENTED();
+	return true;
+}
 
 bool Converter::Convert_int(AssetType::Enum assType, ConvertArgs& args, const core::Array<uint8_t>& fileData,
 	const OutPath& pathOut)
