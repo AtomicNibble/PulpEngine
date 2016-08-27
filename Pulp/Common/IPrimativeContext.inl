@@ -81,5 +81,13 @@ X_INLINE void IPrimativeContext::drawQuad(Vec2<float> pos, float width, float he
 }
 
 
+X_INLINE void IPrimativeContext::drawTextQueued(Vec3f pos, const render::XDrawTextInfo& ti, const char* pFormat, va_list args)
+{
+	core::StackString<2048> temp;
+	temp.appendFmt(pFormat, args);
+
+	drawTextQueued(pos, ti, temp.c_str());
+}
+
 
 X_NAMESPACE_END

@@ -58,6 +58,13 @@ public:
 	void drawBarChart(const Rectf& rect, uint32_t num, float* pHeights,
 		float padding, uint32_t max);
 
+
+	// format buffer is 2048 in size.
+	X_INLINE void drawTextQueued(Vec3f pos, const render::XDrawTextInfo& ti, const char* pFormat, va_list args);
+	// no limit for text length.
+	virtual void drawTextQueued(Vec3f pos, const render::XDrawTextInfo& ti, const char* pText) X_ABSTRACT;
+
+
 private:
 	X_INLINE void drawImage(float xpos, float ypos, float z, float w, float h,
 		texture::TexID texture_id, float s0, float t0, float s1, float t1, const Colorf& col, bool filtered = true);
