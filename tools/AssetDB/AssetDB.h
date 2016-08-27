@@ -90,7 +90,7 @@ public:
 	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, 
 		core::Array<uint8_t>& data, const core::string& argsOpt);
 
-	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
+	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pIdOut = nullptr, ModId* pModIdOut = nullptr);
 
 	bool GetArgsForAsset(int32_t assetId, core::string& argsOut);
 	bool GetArgsHashForAsset(int32_t idassetId, uint32_t& argsHashOut);

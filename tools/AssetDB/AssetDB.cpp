@@ -718,9 +718,9 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 }
  
 
-bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pId)
+bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pIdOut, ModId* pModIdOut)
 {
-	sql::SqlLiteQuery qry(db_, "SELECT file_id, name, type FROM file_ids WHERE type = ? AND name = ?");
+	sql::SqlLiteQuery qry(db_, "SELECT file_id, mod_id FROM file_ids WHERE type = ? AND name = ?");
 	qry.bind(1, type);
 	qry.bind(2, name.c_str());
 
@@ -730,8 +730,11 @@ bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, int32
 		return false;
 	}
 
-	if (pId){
-		*pId = (*it).get<int32_t>(0);
+	if (pIdOut){
+		*pIdOut = (*it).get<int32_t>(0);
+	}
+	if (pModIdOut) {
+		*pModIdOut = (*it).get<int32_t>(1);
 	}
 
 	return true;
