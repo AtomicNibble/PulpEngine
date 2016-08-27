@@ -65,6 +65,7 @@ public:
 public:
 	bool IterateMods(core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> func);
 	bool IterateAssets(core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
+	bool IterateAssets(ModId modId, core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
 	bool IterateAssets(AssetType::Enum type, core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
 
 	bool ListAssets(void);
@@ -86,7 +87,6 @@ public:
 	bool GetArgsHashForAsset(int32_t idassetId, uint32_t& argsHashOut);
 
 	bool GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& dataOut);
-
 
 private:
 	bool GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId = nullptr);
