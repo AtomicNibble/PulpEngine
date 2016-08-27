@@ -68,6 +68,7 @@ bool AssetDB::OpenDB(void)
 	// set the mod to base
 	SetMod(core::string("base"));
 
+	open_ = true;
 	return true;
 }
 
