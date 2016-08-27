@@ -720,7 +720,7 @@ bool ModelCompiler::SaveModel(core::Path<wchar_t>& outFile)
 
 		// space for name index data.
 		{
-			uint16_t blankData[255] = { 0 };
+			uint16_t blankData[MODEL_MAX_BONES] = { 0 };
 			const size_t boneNameIndexBytes = sizeof(uint16_t) * (header.numBones + header.numBlankBones);
 
 			if (file.write(blankData, boneNameIndexBytes) != boneNameIndexBytes) {
