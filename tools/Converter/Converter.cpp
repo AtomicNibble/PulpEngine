@@ -137,6 +137,17 @@ bool Converter::CleanAll(const char* pMod)
 			X_ERROR("Converter", "Can't clean mod \"%s\" does not exsist", pMod);
 			return false;
 		}
+
+		core::string name;
+		core::Path<char> outPath;
+
+		if (!db_.GetModName(modId, name)
+		|| !db_.GetModOutPath(modId, outPath)) {
+			X_ERROR("Converter", "Failed to get mod info");
+			return false;
+		}
+
+		return CleanMod(modId, name, outPath);
 	}
 
 	core::Delegate<bool(assetDb::AssetDB::ModId id, const core::string& name, core::Path<char>& outDir)> func;
