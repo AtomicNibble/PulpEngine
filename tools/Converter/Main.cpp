@@ -50,7 +50,7 @@ core::MemoryArenaBase* g_arena = nullptr;
 
 namespace
 {
-	X_DECLARE_ENUM(ConvertMode)(SINGLE, ALL);
+	X_DECLARE_ENUM(ConvertMode)(SINGLE, ALL, CLEAN);
 
 
 	bool GetMode(ConvertMode::Enum& mode)
@@ -65,6 +65,10 @@ namespace
 			else if (core::strUtil::IsEqualCaseInsen(pMode, L"all"))
 			{
 				mode = ConvertMode::ALL;
+			}
+			else if (core::strUtil::IsEqualCaseInsen(pMode, L"clean"))
+			{
+				mode = ConvertMode::CLEAN;
 			}
 			else
 			{
@@ -167,7 +171,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 			core::StopWatch timer;
 
-			if (mode == ConvertMode::ALL)
+
+			if (mode == ConvertMode::CLEAN)
+			{
+				con.CleanAll();
+
+			}
+			else if (mode == ConvertMode::ALL)
 			{
 				// optionaly convert all asset of Type X
 				if (GetAssetType(assType, true)) {
