@@ -56,7 +56,7 @@ public:
 
 	// ya fucking what!
 	void drawBarChart(const Rectf& rect, uint32_t num, float* pHeights,
-		float padding, uint32_t max);
+		float padding, uint32_t max, const Color& col);
 
 
 	// format buffer is 2048 in size.

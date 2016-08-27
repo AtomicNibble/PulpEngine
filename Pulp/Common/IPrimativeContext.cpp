@@ -313,7 +313,8 @@ void IPrimativeContext::drawRect(float x, float y, float width, float height, co
 	drawLineColor(tr, col, br, col);
 }
 
-void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, float* pHeights, float padding, uint32_t max)
+void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, float* pHeights, 
+	float padding, uint32_t max, const Color& col)
 {
 	X_ASSERT_NOT_NULL(pHeights);
 	X_ASSERT(num <= max, "Darw Chart has more items than max")(num, max);
@@ -328,7 +329,7 @@ void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, float* pHe
 	const float height = rect.getHeight();
 	float right = rect.getX2();
 
-	const Color8u col8(Col_Coral);
+	const Color8u col8(col);
 
 	Vertex_P3F_T2F_C4B* pQuads = addPrimative(num * 6, PrimitiveType::LineList);
 
