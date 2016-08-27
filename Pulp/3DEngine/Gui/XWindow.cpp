@@ -6,6 +6,7 @@
 #include <IRender.h>
 #include <IRenderAux.h>
 #include <IFileSys.h>
+#include <IPrimativeContext.h>
 
 #include "GuiManger.h"
 
@@ -163,7 +164,7 @@ void XWindow::reset(void)
 // -------------- Parsing ---------------
 void XWindow::SaveExpressionParseState()
 {
-	pSaveTemps_ = (bool*)X_NEW_ARRAY(bool, MAX_EXPRESSION_REGISTERS, g_3dEngineArena, "ParseState");
+	pSaveTemps_ = X_NEW_ARRAY(bool, MAX_EXPRESSION_REGISTERS, g_3dEngineArena, "ParseState");
 	memcpy(pSaveTemps_, s_registerIsTemporary, MAX_EXPRESSION_REGISTERS * sizeof(bool));
 }
 
@@ -1279,7 +1280,7 @@ XWinVar* XWindow::GetWinVarByName(const char* name)
 // ----------------------------------------
 
 // Drawing
-void XWindow::reDraw(void)
+void XWindow::reDraw(engine::IPrimativeContext* pDrawCon)
 {
 	X_PROFILE_BEGIN("GuiDraw", core::ProfileSubSys::ENGINE3D);
 	X_ASSERT_NOT_IMPLEMENTED();
@@ -1290,8 +1291,9 @@ void XWindow::reDraw(void)
 		RunTimeEvents(time);
 	}
 
-	if (!visable_)
+	if (!visable_) {
 		return;
+	}
 
 	calcClientRect();
 
@@ -1310,20 +1312,20 @@ void XWindow::reDraw(void)
 
 	if (style_ != WindowStyle::EMPTY)
 	{
-		drawBackground(rectDraw_);
-		drawBorder(rectDraw_);
+		drawBackground(pDrawCon, rectDraw_);
+		drawBorder(pDrawCon, rectDraw_);
 	}
 
-	draw(time, rectClient_.x1, rectClient_.y1);
+	draw(pDrawCon, time, rectClient_.x1, rectClient_.y1);
 
 	if (getGuiManager()->ShowDeubug()) {
-		drawDebug();
+		drawDebug(pDrawCon);
 	}
 
 	Childit it = children_.begin();
 	for (; it != children_.end(); ++it)
 	{
-		(*it)->reDraw();
+		(*it)->reDraw(pDrawCon);
 	}
 
 	// now draw cursor
@@ -1331,14 +1333,13 @@ void XWindow::reDraw(void)
 	{
 		if (!flags_.IsSet(WindowFlag::MOVEABLE) && !hideCursor_)
 		{
-			pGui_->DrawCursor();
+			pGui_->DrawCursor(pDrawCon);
 		}
 	}
 }
 
-void XWindow::drawDebug(void)
+void XWindow::drawDebug(engine::IPrimativeContext* pDrawCon)
 {
-	using namespace render;
 	core::StackString<2048> str;
 	render::XDrawTextInfo ti;
 	Vec3f pos;
@@ -1354,41 +1355,40 @@ void XWindow::drawDebug(void)
 	float v = (backColor_.r() + backColor_.g() + backColor_.b()) / 3.f > 0.5f ? 0.f : 1.f;
 
 	ti.col = Color(v, v, v);
-	ti.flags = DrawTextFlags::MONOSPACE;
+	ti.flags = render::DrawTextFlags::MONOSPACE;
 
 	// pos :Z?
 	pos = Vec3f(rectClient_.getUpperLeft());
 	pos.x += 3.f;
 	pos.y += 3.f;
 
-	pRender_->DrawTextQueued(pos, ti, str.c_str());
+	pDrawCon->drawTextQueued(pos, ti, str.c_str());
 }
 
 
 
-void XWindow::drawBorder(const Rectf& drawRect)
+void XWindow::drawBorder(engine::IPrimativeContext* pDrawCon, const Rectf& drawRect)
 {
 	if (flags_.IsSet(WindowFlag::BORDER))
 	{
 		if (borderColor_.a() > 0.f)
 		{
-			pRender_->setGUIShader(false);
 
 			switch (borderStyle_)
 			{
 				case WindowBorderStyle::FULL:
-					pRender_->DrawRectSS(drawRect, borderColor_);
+					pDrawCon->drawRectSS(drawRect, borderColor_);
 					break;
 				case WindowBorderStyle::HORZ:
-					pRender_->DrawLineColorSS(drawRect.getUpperLeft(), borderColor_,
+					pDrawCon->drawLineColorSS(drawRect.getUpperLeft(), borderColor_,
 						drawRect.getUpperRight(), borderColor_);
-					pRender_->DrawLineColorSS(drawRect.getLowerLeft(), borderColor_,
+					pDrawCon->drawLineColorSS(drawRect.getLowerLeft(), borderColor_,
 						drawRect.getLowerRight(), borderColor_);
 					break;
 				case WindowBorderStyle::VERT:
-					pRender_->DrawLineColorSS(drawRect.getUpperLeft(), borderColor_,
+					pDrawCon->drawLineColorSS(drawRect.getUpperLeft(), borderColor_,
 						drawRect.getLowerLeft(), borderColor_);
-					pRender_->DrawLineColorSS(drawRect.getUpperRight(), borderColor_,
+					pDrawCon->drawLineColorSS(drawRect.getUpperRight(), borderColor_,
 						drawRect.getLowerRight(), borderColor_);
 					break;
 				case WindowBorderStyle::GRADIENT:
@@ -1404,16 +1404,16 @@ void XWindow::drawBorder(const Rectf& drawRect)
 					BRColor.shade(-30.f);
 
 					// top
-					pRender_->DrawLineColorSS(drawRect.getUpperLeft(), LTColor,
+					pDrawCon->drawLineColorSS(drawRect.getUpperLeft(), LTColor,
 						drawRect.getUpperRight(), LTColor);
 					// bottom
-					pRender_->DrawLineColorSS(drawRect.getLowerLeft(), BRColor,
+					pDrawCon->drawLineColorSS(drawRect.getLowerLeft(), BRColor,
 						drawRect.getLowerRight(), BRColor);
 					// left
-					pRender_->DrawLineColorSS(drawRect.getUpperLeft(), LTColor,
+					pDrawCon->drawLineColorSS(drawRect.getUpperLeft(), LTColor,
 						drawRect.getLowerLeft(), LTColor);
 					// right
-					pRender_->DrawLineColorSS(drawRect.getUpperRight(), BRColor,
+					pDrawCon->drawLineColorSS(drawRect.getUpperRight(), BRColor,
 						drawRect.getLowerRight(), BRColor);
 					
 					break;
@@ -1426,16 +1426,16 @@ void XWindow::drawBorder(const Rectf& drawRect)
 					LTColor.shade(-30.f);
 
 					// top
-					pRender_->DrawLineColorSS(drawRect.getUpperLeft(), LTColor,
+					pDrawCon->drawLineColorSS(drawRect.getUpperLeft(), LTColor,
 						drawRect.getUpperRight(), LTColor);
 					// bottom
-					pRender_->DrawLineColorSS(drawRect.getLowerLeft(), BRColor,
+					pDrawCon->drawLineColorSS(drawRect.getLowerLeft(), BRColor,
 						drawRect.getLowerRight(), BRColor);
 					// left
-					pRender_->DrawLineColorSS(drawRect.getUpperLeft(), LTColor,
+					pDrawCon->drawLineColorSS(drawRect.getUpperLeft(), LTColor,
 						drawRect.getLowerLeft(), LTColor);
 					// right
-					pRender_->DrawLineColorSS(drawRect.getUpperRight(), BRColor,
+					pDrawCon->drawLineColorSS(drawRect.getUpperRight(), BRColor,
 						drawRect.getLowerRight(), BRColor);
 					
 					break;
@@ -1498,11 +1498,14 @@ void XWindow::calcClientRect(void)
 // -------------- Overrides ---------------
 
 
-void XWindow::draw(core::TimeVal time, float x_, float y_)
+void XWindow::draw(engine::IPrimativeContext* pDrawCon, core::TimeVal time, float x_, float y_)
 {
+	X_UNUSED(pDrawCon);
+
 	// draw the text.
-	if (text_.getLength() == 0)
+	if (text_.getLength() == 0) {
 		return;
+	}
 
 	Rectf rect = rectClient_;
 
@@ -1615,12 +1618,11 @@ void XWindow::draw(core::TimeVal time, float x_, float y_)
 	pFont_->DrawString(Vec3f(x, y, 0.f), text_, contex);
 }
 
-void XWindow::drawBackground(const Rectf& drawRect)
+void XWindow::drawBackground(engine::IPrimativeContext* pDrawCon, const Rectf& drawRect)
 {
 	if (style_ == WindowStyle::FILLED)
 	{
-		pRender_->setGUIShader(false);
-		pRender_->DrawQuadSS(drawRect, backColor_);
+		pDrawCon->drawQuadSS(drawRect, backColor_);
 	}
 	else if (style_ == WindowStyle::GRADIENT)
 	{

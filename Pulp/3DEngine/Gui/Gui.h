@@ -9,6 +9,10 @@
 #include <IInput.h>
 
 
+X_NAMESPACE_DECLARE(engine,
+	class IPrimativeContext;
+);
+
 
 X_NAMESPACE_BEGIN(gui)
 
@@ -33,8 +37,8 @@ public:
 	float getCursorPosY(void) X_FINAL;
 
 	// repaints the ui
-	void Redraw() X_FINAL;
-	void DrawCursor(void) X_FINAL;
+	void Redraw(engine::IPrimativeContext* pDrawCon) X_FINAL;
+	void DrawCursor(engine::IPrimativeContext* pDrawCon) X_FINAL;
 
 	const char* Activate(bool activate, int time) X_FINAL;
 

@@ -6,6 +6,8 @@
 
 #include <IFileSys.h>
 #include <IRender.h>
+#include <IPrimativeContext.h>
+
 #include "GuiManger.h"
 
 #include <Hashing\crc32.h>
@@ -28,13 +30,14 @@ XGui::~XGui()
 
 }
 
-void XGui::Redraw()
+void XGui::Redraw(engine::IPrimativeContext* pDrawCon)
 {
-	if (isDeskTopValid())
-		pDesktop_->reDraw();
+	if (isDeskTopValid()) {
+		pDesktop_->reDraw(pDrawCon);
+	}
 }
 
-void XGui::DrawCursor(void)
+void XGui::DrawCursor(engine::IPrimativeContext* pDrawCon)
 {
 	// windows call this function when they want the cursor draw.
 	// the position of the mouse is: cursorPos_
@@ -45,22 +48,26 @@ void XGui::DrawCursor(void)
 	texture::ITexture* pCursorArrow = getGuiManager()->GetCursor();
 	render::IRender* pRender = getRender();
 
+
 	render::XDrawTextInfo ti;
 	ti.col = Col_Red;
 	core::StackString<64> posStr;
 	posStr.appendFmt("Pos: %g x %g", cursorPos_.x, cursorPos_.y);
-	pRender->DrawTextQueued(Vec3f(300, 10, 0), ti, posStr.c_str());
 
+	pDrawCon->drawTextQueued(Vec3f(300, 10, 0), ti, posStr.c_str());
 
-	const float width = pRender->getWidthf();
-	const float height = pRender->getHeightf();
+	Vec2f rect;
+	rect = pRender->getDisplayRes();
 
-	pRender->DrawQuadImageSS(
+	const float width = rect.x;
+	const float height = rect.y;
+
+	pDrawCon->drawQuadImageSS(
 		cursorPos_.x / width, cursorPos_.y / height,
 		0.1f,0.1f,
 		pCursorArrow->getTexID(),
 		Col_White
-		);
+	);
 }
 
 const char* XGui::Activate(bool activate, int time)

@@ -20,6 +20,12 @@
 
 #include "SimpleWindow.h"
 
+X_NAMESPACE_DECLARE(engine,
+	class IPrimativeContext;
+);
+
+
+
 X_NAMESPACE_BEGIN(gui)
 
 const int MAX_EXPRESSION_REGISTERS = 4096;
@@ -156,8 +162,8 @@ public:
 	X_INLINE const char* getName(void) const;
 
 	// Drawing
-	void reDraw(void);
-	void drawDebug(void);
+	void reDraw(engine::IPrimativeContext* pDrawCon);
+	void drawDebug(engine::IPrimativeContext* pDrawCon);
 
 	// input
 	bool OnInputEvent(const input::InputEvent& event);
@@ -167,8 +173,8 @@ public:
 	virtual bool Parse(core::XParser& lex);
 	virtual bool Parse(core::XFile* pFile);
 	virtual bool WriteToFile(core::XFile* pFile);
-	virtual void draw(core::TimeVal time, float x, float y);
-	virtual void drawBackground(const Rectf& drawRect);
+	virtual void draw(engine::IPrimativeContext* pDrawCon, core::TimeVal time, float x, float y);
+	virtual void drawBackground(engine::IPrimativeContext* pDrawCon, const Rectf& drawRect);
 	virtual void activate(bool activate);
 	virtual void gainFocus(void);
 	virtual void loseFocus(void);
@@ -187,7 +193,7 @@ public:
 
 private:
 	// some none public drawing shiz.
-	void drawBorder(const Rectf& drawRect);
+	void drawBorder(engine::IPrimativeContext* pDrawCon, const Rectf& drawRect);
 
 
 	void calcClientRect(void);
@@ -287,19 +293,19 @@ protected:
 	XWindow* pOverChild_;		// if a child window has mouse capture
 
 	font::IFFont* 			pFont_;
-	engine::IMaterial* 	pBackgroundMat_;
+	engine::IMaterial*		pBackgroundMat_;
 
 	XGuiScriptList* 		scripts_[ScriptFunction::ENUM_COUNT];
 
-	Children											children_;
-	core::Array<XDrawWin>					drawWindows_;
+	Children						children_;
+	core::Array<XDrawWin>			drawWindows_;
 
 	core::Array<XTimeLineEvent*>	timeLineEvents_;
 	core::Array<XTransitionData>	transitions_;
 
-	core::Array<xOpt>							ops_;
-	core::Array<float>						expressionRegisters_;
-	XRegisterList									regList_;
+	core::Array<xOpt>				ops_;
+	core::Array<float>				expressionRegisters_;
+	XRegisterList					regList_;
 
 	XGui* pGui_;
 

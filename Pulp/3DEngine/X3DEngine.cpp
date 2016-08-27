@@ -141,8 +141,8 @@ void X3DEngine::OnFrameBegin(void)
 
 	// draw me some gui baby
 	if (gui) {
-		pRender_->setGUIShader();
-		gui->Redraw();
+	//	pRender_->setGUIShader();
+	//	gui->Redraw();
 	}
 
 #if 0
