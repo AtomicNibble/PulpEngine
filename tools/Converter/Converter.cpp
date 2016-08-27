@@ -59,7 +59,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 
 	assetDb::AssetDB::Mod modInfo;
 	if (!db_.GetModInfo(modId, modInfo)) {
-		X_ERROR("Converter", "Failed to get modId");
+		X_ERROR("Converter", "Failed to get mod info");
 		return false;
 	}
 
