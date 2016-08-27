@@ -255,7 +255,7 @@ AssetDB::ModId AssetDB::GetcurrentModId(void) const
 bool AssetDB::GetModOutPath(ModId id, core::Path<char>& outDir)
 {
 	sql::SqlLiteTransaction trans(db_, true);
-	sql::SqlLiteQuery qry(db_, "SELECT out_dir, name FROM mods WHERE mod_id = ?");
+	sql::SqlLiteQuery qry(db_, "SELECT out_dir FROM mods WHERE mod_id = ?");
 	qry.bind(0, id);
 
 	sql::SqlLiteQuery::iterator it = qry.begin();
@@ -269,6 +269,26 @@ bool AssetDB::GetModOutPath(ModId id, core::Path<char>& outDir)
 	}
 
 	X_ERROR("AssetDB", "Failed to get mod dir for modId %" PRIi32, id);
+	return false;
+}
+
+bool AssetDB::GetModName(ModId id, core::string& name)
+{
+	sql::SqlLiteTransaction trans(db_, true);
+	sql::SqlLiteQuery qry(db_, "SELECT name FROM mods WHERE mod_id = ?");
+	qry.bind(0, id);
+
+	sql::SqlLiteQuery::iterator it = qry.begin();
+
+	if (it != qry.end())
+	{
+		auto row = *it;
+		const char* pName = row.get<const char*>(0);
+		name = pName;
+		return true;
+	}
+
+	X_ERROR("AssetDB", "Failed to get mod name for modId %" PRIi32, id);
 	return false;
 }
 

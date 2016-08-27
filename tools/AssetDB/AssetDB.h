@@ -61,6 +61,7 @@ public:
 	ModId GetcurrentModId(void) const;
 
 	bool GetModOutPath(ModId id, core::Path<char>& outDir);
+	bool GetModName(ModId id, core::string& outName);
 
 public:
 	bool IterateMods(core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> func);
