@@ -28,6 +28,15 @@ class DLL_EXPORT AssetDB
 	};
 
 public:
+	struct Mod
+	{
+		int32_t modId;
+		core::string name;
+		core::Path<char> outDir;
+	};
+
+
+public:
 	typedef int32_t ModId;
 
 	static const ModId INVALID_MOD_ID = -1;
@@ -60,8 +69,7 @@ public:
 	ModId GetModId(const core::string& name);
 	ModId GetcurrentModId(void) const;
 
-	bool GetModOutPath(ModId id, core::Path<char>& outDir);
-	bool GetModName(ModId id, core::string& outName);
+	bool GetModInfo(ModId id, Mod& modOut);
 
 public:
 	bool IterateMods(core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> func);

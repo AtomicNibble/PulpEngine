@@ -138,16 +138,14 @@ bool Converter::CleanAll(const char* pMod)
 			return false;
 		}
 
-		core::string name;
-		core::Path<char> outPath;
+		assetDb::AssetDB::Mod mod;
 
-		if (!db_.GetModName(modId, name)
-		|| !db_.GetModOutPath(modId, outPath)) {
+		if (!db_.GetModInfo(modId, mod)) {
 			X_ERROR("Converter", "Failed to get mod info");
 			return false;
 		}
 
-		return CleanMod(modId, name, outPath);
+		return CleanMod(modId, mod.name, mod.outDir);
 	}
 
 	core::Delegate<bool(assetDb::AssetDB::ModId id, const core::string& name, core::Path<char>& outDir)> func;
