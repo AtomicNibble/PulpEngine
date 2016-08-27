@@ -45,7 +45,8 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 	}
 
 	int32_t assetId = -1;
-	if (!db_.AssetExsists(assType, name, &assetId)) {
+	assetDb::AssetDB::ModId modId;
+	if (!db_.AssetExsists(assType, name, &assetId, &modId)) {
 		X_ERROR("Converter", "Asset does not exists");
 		return false;
 	}
@@ -53,6 +54,12 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 	core::string argsStr;
 	if (!db_.GetArgsForAsset(assetId, argsStr)) {
 		X_ERROR("Converter", "Failed to get conversion args");
+		return false;
+	}
+
+	assetDb::AssetDB::Mod modInfo;
+	if (!db_.GetModInfo(modId, modInfo)) {
+		X_ERROR("Converter", "Failed to get modId");
 		return false;
 	}
 
@@ -66,7 +73,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 	X_LOG1("Converter", "Loaded rawfile in: ^6%gms", timer.GetMilliSeconds());
 
 	core::Path<char> pathOut;
-	GetOutputPathForAsset(assType, name, pathOut);
+	GetOutputPathForAsset(assType, name, modInfo.outDir, pathOut);
 
 	timer.Start();
 
@@ -129,6 +136,13 @@ bool Converter::ConvertAll(AssetType::Enum assType)
 
 bool Converter::CleanAll(const char* pMod)
 {
+	if (pMod) {
+		X_LOG0("Converter", "Cleaning all untracked assets for mod: \"%s\"", pMod);
+	}
+	else {
+		X_LOG0("Converter", "Cleaning all untracked assets");
+	}
+
 	// this is for cleaning all asset that don't have a entry.
 	// optionally limit it to a mod.
 	assetDb::AssetDB::ModId modId;
@@ -297,9 +311,10 @@ void* Converter::LoadDLL(const char* dllName)
 }
 
 void Converter::GetOutputPathForAsset(AssetType::Enum assType, const core::string& name,
-	core::Path<char>& pathOut)
+	const core::Path<char>& modPath, core::Path<char>& pathOut)
 {
 	pathOut.clear();
+	pathOut /= modPath;
 	pathOut /= AssetType::ToString(assType);
 	pathOut /= "s";
 	pathOut.toLower();
