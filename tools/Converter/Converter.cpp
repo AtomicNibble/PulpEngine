@@ -315,6 +315,7 @@ void Converter::GetOutputPathForAsset(AssetType::Enum assType, const core::strin
 {
 	pathOut.clear();
 	pathOut /= modPath;
+	pathOut.ensureSlash();
 	pathOut /= AssetType::ToString(assType);
 	pathOut /= "s";
 	pathOut.toLower();
