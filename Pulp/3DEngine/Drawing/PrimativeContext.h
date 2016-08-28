@@ -9,30 +9,32 @@ class PrimativeContext : public IPrimativeContext
 public:
 	typedef Vertex_P3F_T2F_C4B PrimVertex;
 
+	struct PrimFlagBitMasks
+	{
+		enum Enum : uint32_t
+		{
+			TextureIdShift = 0,
+			TextureIdMask = 0xFFFFF << TextureIdShift,
+
+			PrimTypeShift = 20,
+			PrimTypeMask = 0x7 << PrimTypeShift,
+		};
+	};
+
+	static_assert(PrimitiveType::ENUM_COUNT < 7, "Primt enum count don't fit in prim type mask");
 
 	struct PrimRenderFlags
 	{
 		X_INLINE PrimRenderFlags(PrimitiveType::Enum type, texture::TexID textureId);
 
-
 		X_INLINE bool operator ==(const PrimRenderFlags& rhs) const;
 		X_INLINE bool operator !=(const PrimRenderFlags& rhs) const;
 
-		X_INLINE operator uint64_t();
-		X_INLINE operator const uint64_t() const;
+		X_INLINE operator uint32_t();
+		X_INLINE operator const uint32_t() const;
 
-		// could store both type and flags in a 32bit int if I decide I need to store flags.
-		// we sort by type then texture.
-		X_DISABLE_WARNING(4201)
-		union {
-			struct {
-				PrimitiveType::Enum type;
-				texture::TexID textureId;
-			};
-			uint64_t flags;
-		};
-		X_ENABLE_WARNING(4201)
-
+	private:
+		uint32_t flags;
 	};
 
 	struct PushBufferEntry
