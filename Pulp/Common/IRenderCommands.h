@@ -31,7 +31,6 @@ namespace Commands
 	// not supporting for now till i have a need.
 	//	shader::VertexFormat::Enum vertexLayout;
 		VertexBufferHandle vertexBuffers[VertexStream::ENUM_COUNT];
-		IndexBufferHandle indexBuffer;
 	};
 
 	struct DrawIndexed
