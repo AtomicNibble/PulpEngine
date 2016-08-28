@@ -51,7 +51,7 @@ void PrimativeContext::drawTextQueued(Vec3f pos, const render::XDrawTextInfo& ti
 
 }
 
-Vertex_P3F_T2F_C4B* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType, texture::TexID textureId)
+PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType, texture::TexID textureId)
 {
 	PrimRenderFlags flags(primType, textureId);
 
@@ -89,7 +89,7 @@ Vertex_P3F_T2F_C4B* PrimativeContext::addPrimative(uint32_t numVertices, Primiti
 	return &vertexArr[oldVBSize];
 }
 
-Vertex_P3F_T2F_C4B* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType)
+PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType)
 {
 	return addPrimative(numVertices, primType, 0);
 }
