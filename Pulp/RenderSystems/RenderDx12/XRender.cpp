@@ -501,6 +501,11 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands:
 
 	const uint32_t numRtvs = safe_static_cast<uint32_t, size_t>(rtvs.size());
 
+	// anything to do?
+	if (sortedIdx.isEmpty()) {
+		return;
+	}
+
 	// will we ever not need one?
 	if (rtvs.isEmpty()) {
 		X_FATAL("Dx12", "atleast one rt is required");
