@@ -10,13 +10,7 @@ X_NAMESPACE_BEGIN(engine)
 class IPrimativeContext
 {
 protected:
-	X_DECLARE_ENUM(PrimitiveType) (
-		TriangleList,
-		TriangleStrip,
-		LineList,
-		LineStrip,
-		PointList
-	);
+	typedef render::PrimitiveTypePublic PrimitiveType;
 
 public:
 	IPrimativeContext();
