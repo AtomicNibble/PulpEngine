@@ -28,6 +28,10 @@ public:
 
 	virtual Vec2<uint32_t> getDisplayRes(void) const X_OVERRIDE;
 
+	virtual IRenderTarget* createRenderTarget() X_OVERRIDE;
+	virtual void destoryRenderTarget(IRenderTarget* pRT) X_OVERRIDE;
+	virtual IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_OVERRIDE;
+
 	virtual VertexBufferHandle createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
 	virtual VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
 	virtual IndexBufferHandle createIndexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;

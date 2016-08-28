@@ -72,6 +72,24 @@ Vec2<uint32_t> RenderNull::getDisplayRes(void) const
 	return Vec2<uint32_t>::zero();
 }
 
+IRenderTarget* RenderNull::createRenderTarget()
+{
+	return nullptr;
+}
+
+void RenderNull::destoryRenderTarget(IRenderTarget* pRT)
+{
+	X_UNUSED(pRT);
+}
+
+IRenderTarget* RenderNull::getCurBackBuffer(uint32_t* pIdx)
+{
+	X_UNUSED(pIdx);
+
+	return nullptr;
+}
+
+
 VertexBufferHandle RenderNull::createVertexBuffer(uint32_t size,
 	BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
