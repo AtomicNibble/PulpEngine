@@ -139,7 +139,7 @@ X_INLINE CommandT* CommandBucket<KeyT>::appendCommand(ParentCmdT* pCommand, size
 	// append this command to the given one
 	CommandPacket::storeNextCommandPacket<ParentCmdT>(pCommand, pPacket);
 				   
-	CommandPacket::storeNextCommandPacket(packet, nullptr);
+	CommandPacket::storeNextCommandPacket(pPacket, nullptr);
 	CommandPacket::storeCommandType(pPacket, CommandT::CMD);
 
 	return CommandPacket::getCommand<CommandT>(pPacket);
