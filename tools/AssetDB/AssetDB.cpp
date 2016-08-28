@@ -53,6 +53,10 @@ bool AssetDB::OpenDB(void)
 		return false;
 	}
 
+	if (!db_.execute("PRAGMA synchronous = OFF; PRAGMA page_size = 4096; PRAGMA journal_mode=wal;")) {
+		return false;
+	}
+
 	if (!db_.connect(dbPath.c_str())) {
 		return false;
 	}
@@ -82,7 +86,7 @@ bool AssetDB::CreateTables(void)
 {
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS mods ("
 		"mod_id INTEGER PRIMARY KEY,"
-		"name TEXT COLLATE NOCASE,"
+		"name TEXT COLLATE NOCASE UNIQUE,"
 		"out_dir TEXT"
 		");")) {
 		X_ERROR("AssetDB", "Failed to create 'mods' table");

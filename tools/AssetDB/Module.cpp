@@ -36,6 +36,13 @@ class XEngineModule_AssetDB : public IEngineModule
 		LinkModule(pCore, "AssetDB");
 		
 		g_AssetDBArena = X_NEW(AssetDBArena, gEnv->pArena, "AssetDBArena")(&g_AssetDBAlloc, "AssetDBArena");
+
+
+		// Link the SqLite here?
+		if (!pCore->IntializeLoadedEngineModule("Engine_SqLite", "Engine_SqLite")) {
+			return false;
+		}
+
 		return true;
 	}
 
