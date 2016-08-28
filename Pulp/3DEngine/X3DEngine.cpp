@@ -183,6 +183,11 @@ void X3DEngine::Update(void)
 
 }
 
+IPrimativeContext* X3DEngine::getPrimContext(PrimContext::Enum user)
+{
+	return &primContexts_[user];
+}
+
 void X3DEngine::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {
 	// do nothing for now.

@@ -7,6 +7,10 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+X_DECLARE_ENUM(PrimContext)(CONSOLE, GUI, PROFILE);
+
+class IPrimativeContext;
+
 struct I3DEngine
 {
 	virtual ~I3DEngine(){};
@@ -23,6 +27,8 @@ struct I3DEngine
 	virtual void Update(void) X_ABSTRACT;
 
 
+	// each enum has a instance, and you don't own the pointer.
+	virtual IPrimativeContext* getPrimContext(PrimContext::Enum user) X_ABSTRACT;
 
 };
 

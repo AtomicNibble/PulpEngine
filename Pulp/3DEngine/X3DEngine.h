@@ -12,6 +12,8 @@
 
 #include "Gui\GuiManger.h"
 
+#include "Drawing\PrimativeContext.h"
+
 X_NAMESPACE_BEGIN(engine)
 
 
@@ -24,17 +26,18 @@ public:
 	X3DEngine();
 	virtual ~X3DEngine() X_OVERRIDE;
 
-	virtual void registerVars(void) X_OVERRIDE;
-	virtual void registerCmds(void) X_OVERRIDE;
+	void registerVars(void) X_OVERRIDE;
+	void registerCmds(void) X_OVERRIDE;
+
+	bool Init(void) X_OVERRIDE;
+	void ShutDown(void) X_OVERRIDE;
+	void release(void) X_OVERRIDE;
+
+	void OnFrameBegin(void) X_OVERRIDE;
+	void Update(void) X_OVERRIDE;
 
 
-	virtual bool Init(void) X_OVERRIDE;
-	virtual void ShutDown(void) X_OVERRIDE;
-	virtual void release(void) X_OVERRIDE;
-
-	virtual void OnFrameBegin(void) X_OVERRIDE;
-	virtual void Update(void) X_OVERRIDE;
-
+	IPrimativeContext* getPrimContext(PrimContext::Enum user) X_OVERRIDE;
 
 	// IXHotReload
 	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
@@ -53,10 +56,12 @@ private:
 
 
 	//~
-
 	gui::XGuiManager guisMan_;
 
 	level::Level level_;
+
+
+	PrimativeContext primContexts_[PrimContext::ENUM_COUNT];
 };
 
 
