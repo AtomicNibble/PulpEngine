@@ -34,6 +34,13 @@
 	X_LOG2_IF X_PP_PASS_ARGS(((autoLogCount++ % N) == 0), channel, format, __VA_ARGS__);							\
 	X_MULTILINE_MACRO_END
 
+#	define X_WARNING_EVERY_N(N, channel, format, ...)																		\
+	X_MULTILINE_MACRO_BEGIN																							\
+	static unsigned int autoLogCount = 0;																			\
+	X_WARNING_IF X_PP_PASS_ARGS(((autoLogCount++ % N) == 0), channel, format, __VA_ARGS__);							\
+	X_MULTILINE_MACRO_END
+
+
 #	define X_LOG_BULLET				core::ILog::Bullet X_PP_UNIQUE_NAME(bullet)(gEnv ? gEnv->pLog : 0);
 
 
