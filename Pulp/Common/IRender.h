@@ -462,8 +462,9 @@ struct IRender
 	// and just do as it's told?
 	// how will we handle buffer resize?
 
-//	virtual IRenderTarget* createRenderTarget() X_ABSTRACT;
-//	virtual void destoryRenderTarget(IRenderTarget* pRT) X_ABSTRACT;
+	virtual IRenderTarget* createRenderTarget() X_ABSTRACT;
+	virtual void destoryRenderTarget(IRenderTarget* pRT) X_ABSTRACT;
+	virtual IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_ABSTRACT;
 
 	virtual VertexBufferHandle createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag = 0) X_ABSTRACT;
 	virtual VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag = 0) X_ABSTRACT;

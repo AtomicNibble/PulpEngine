@@ -708,6 +708,26 @@ Vec2<uint32_t> XRender::getDisplayRes(void) const
 	return displayRes_;
 }
 
+IRenderTarget* XRender::createRenderTarget()
+{
+	return nullptr;
+}
+
+
+void XRender::destoryRenderTarget(IRenderTarget* pRT)
+{
+	X_UNUSED(pRT);
+}
+
+IRenderTarget* XRender::getCurBackBuffer(uint32_t* pIdx)
+{
+	if (pIdx) {
+		*pIdx = currentBufferIdx_;
+	}
+
+	return &displayPlane_[currentBufferIdx_];
+}
+
 VertexBufferHandle XRender::createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
 	return pBuffMan_->createVertexBuf(size, nullptr, usage, accessFlag);

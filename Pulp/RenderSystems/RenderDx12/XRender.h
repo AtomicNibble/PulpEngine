@@ -72,6 +72,10 @@ public:
 
 	Vec2<uint32_t> getDisplayRes(void) const X_OVERRIDE;
 
+	IRenderTarget* createRenderTarget() X_OVERRIDE;
+	void destoryRenderTarget(IRenderTarget* pRT) X_OVERRIDE;
+	IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_OVERRIDE;
+
 
 	VertexBufferHandle createVertexBuffer(uint32_t size, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
 	VertexBufferHandle createVertexBuffer(uint32_t size, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag) X_OVERRIDE;
