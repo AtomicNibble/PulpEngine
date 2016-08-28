@@ -53,11 +53,11 @@ bool AssetDB::OpenDB(void)
 		return false;
 	}
 
-	if (!db_.execute("PRAGMA synchronous = OFF; PRAGMA page_size = 4096; PRAGMA journal_mode=wal;")) {
+	if (!db_.connect(dbPath.c_str())) {
 		return false;
 	}
 
-	if (!db_.connect(dbPath.c_str())) {
+	if (!db_.execute("PRAGMA synchronous = OFF; PRAGMA page_size = 4096; PRAGMA journal_mode=wal;")) {
 		return false;
 	}
 
@@ -143,10 +143,10 @@ bool AssetDB::AddDefaultMods(void)
 	core::string base("base");
 
 	if (!ModExsists(core)) {
-		AddMod(core, core::Path<char>("core_assets"));
+		AddMod(core, core::Path<char>(R"(C:\Users\WinCat\Documents\code\WinCat\engine\potatoengine\game_folder\mod)"));
 	}
 	if (!ModExsists(base)) {
-		AddMod(base, core::Path<char>("base_assets"));
+		AddMod(base, core::Path<char>(R"(C:\Users\WinCat\Documents\code\WinCat\engine\potatoengine\game_folder\core_assets)"));
 	}
 
 	return true;
