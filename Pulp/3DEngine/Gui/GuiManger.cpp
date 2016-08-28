@@ -100,8 +100,9 @@ void XGuiManager::Shutdown(void)
 
 	gEnv->pInput->RemoveEventListener(this);
 
-	if (pCursorArrow_)
+	if (pCursorArrow_) {
 		pCursorArrow_->release();
+	}
 }
 
 IGui* XGuiManager::loadGui(const char* name)
@@ -117,8 +118,7 @@ IGui* XGuiManager::loadGui(const char* name)
 	// try load it :|
 	pGui = X_NEW(XGui, g_3dEngineArena, "GuiInterface");
 
-	if (pGui->InitFromFile(name))
-	{
+	if (pGui->InitFromFile(name)) {
 		guis_.append(pGui);
 		return pGui;
 	}
@@ -136,10 +136,8 @@ IGui* XGuiManager::findGui(const char* name)
 	const char* nameBegin = name;
 	const char* nameEnd = name + core::strUtil::strlen(name);
 
-	for (it = guis_.begin(); it != guis_.end(); ++it)
-	{
-		if (core::strUtil::IsEqual(nameBegin, nameEnd, (*it)->getName()))
-		{
+	for (it = guis_.begin(); it != guis_.end(); ++it) {
+		if (core::strUtil::IsEqual(nameBegin, nameEnd, (*it)->getName())) {
 			return (*it);
 		}
 	}
@@ -161,8 +159,7 @@ void XGuiManager::listGuis(const char* wildcardSearch) const
 	{
 		XGui* pGui = *itrGui;
 
-		if (!wildcardSearch || core::strUtil::WildCompare(wildcardSearch, pGui->getName()))
-		{
+		if (!wildcardSearch || core::strUtil::WildCompare(wildcardSearch, pGui->getName())) {
 			sorted_guis.append(pGui);
 		}
 	}
@@ -226,8 +223,9 @@ bool XGuiManager::OnInputEvent(const input::InputEvent& event)
 {
 	Guis::Iterator it;
 	for (it = guis_.begin(); it != guis_.end(); ++it) {
-		if ((*it)->OnInputEvent(event))
+		if ((*it)->OnInputEvent(event)) {
 			return true;
+		}
 	}
 	return false;
 }
@@ -236,8 +234,9 @@ bool XGuiManager::OnInputEventChar(const input::InputEvent& event)
 {
 	Guis::Iterator it;
 	for (it = guis_.begin(); it != guis_.end(); ++it) {
-		if ((*it)->OnInputEventChar(event))
+		if ((*it)->OnInputEventChar(event)) {
 			return true;
+		}
 	}
 	return false;
 }
