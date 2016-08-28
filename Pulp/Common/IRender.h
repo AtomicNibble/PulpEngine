@@ -52,7 +52,8 @@ X_DECLARE_ENUM(PrimitiveTypePublic)(
 	TriangleList,
 	TriangleStrip,
 	LineList,
-	LineStrip
+	LineStrip,
+	PointList
 );
 
 
