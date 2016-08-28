@@ -18,6 +18,7 @@
 #include <IFileSys.h>
 #include <IFrameData.h>
 #include <IPrimativeContext.h>
+#include <I3DEngine.h>
 
 #include "Platform\Window.h"
 
@@ -456,14 +457,16 @@ void XConsole::LoadRenderResources(void)
 {
 	X_ASSERT_NOT_NULL(pCore_);
 	X_ASSERT_NOT_NULL(pCore_->GetIFontSys());
+	X_ASSERT_NOT_NULL(pCore_->GetIRender());
+	X_ASSERT_NOT_NULL(pCore_->Get3DEngine());
+
 
 	pFont_ = pCore_->GetIFontSys()->GetFont("default");
 
 	X_ASSERT_NOT_NULL(pFont_);
 
 	pRender_ = pCore_->GetIRender();
-
-	X_ASSERT_NOT_NULL(pRender_);
+	pPrimContext_ = pCore_->Get3DEngine()->getPrimContext(engine::PrimContext::CONSOLE);
 
 	// load a texture baby!
 	pBackground_ = pRender_->getTexture("Textures/white.dds",
