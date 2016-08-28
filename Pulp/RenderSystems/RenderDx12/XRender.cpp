@@ -168,6 +168,11 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 		return false;
 	}
 
+#if X_DEBUG && 1
+	// force enable debug layer.
+#else
+	if (vars_.enableDebugLayer())
+#endif // |_DEBUG
 	{
 		ID3D12InfoQueue* pInfoQueue = nullptr;
 		if (SUCCEEDED(pDevice_->QueryInterface(IID_PPV_ARGS(&pInfoQueue))))
