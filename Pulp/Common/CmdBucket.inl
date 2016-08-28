@@ -88,7 +88,7 @@ X_INLINE CommandT* CommandBucket<KeyT>::addCommand(Key key, size_t auxMemorySize
 {
 	static_assert(core::compileTime::IsPOD<CommandT>::Value, "Command packet type must be POD");
 
-	size_t threadIdx = packetAlloc_.getThreadIdx();
+	const auto threadIdx = packetAlloc_.getThreadIdx();
 
 	CommandPacket::Packet pPacket = packetAlloc_.create<CommandT>(threadIdx, auxMemorySize);
 
@@ -132,7 +132,7 @@ X_INLINE CommandT* CommandBucket<KeyT>::appendCommand(ParentCmdT* pCommand, size
 {
 	static_assert(core::compileTime::IsPOD<CommandT>::Value, "Command packet type must be POD");
 
-	uint32_t threadIdx = packetAlloc_.getThreadIdx();
+	const auto threadIdx = packetAlloc_.getThreadIdx();
 
 	CommandPacket::Packet pPacket = packetAlloc_.create<CommandT>(threadIdx, auxMemorySize);
 
