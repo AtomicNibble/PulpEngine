@@ -50,7 +50,7 @@ class XEngineModule_3DEngine : public IEngineModule
 		g_3dEngineArena = X_NEW_ALIGNED(Engine3DArena, gEnv->pArena, "3DEngineArena", 8)(&g_3dEngineAlloc, "3DEngineArena");
 
 
-		engine = X_NEW_ALIGNED(engine::X3DEngine, g_3dEngineArena, "3DEngine", X_ALIGN_OF(engine::X3DEngine));
+		engine = X_NEW(engine::X3DEngine, g_3dEngineArena, "3DEngine")(g_3dEngineArena);
 
 		env.p3DEngine = engine;
 		return true;

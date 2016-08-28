@@ -38,7 +38,8 @@ gui::XGuiManager* X3DEngine::pGuiManger_ = nullptr;
 gui::IGui* gui = nullptr;
 
 
-X3DEngine::X3DEngine()
+X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
+	primContexts_{ arena, arena, arena }
 {
 
 }

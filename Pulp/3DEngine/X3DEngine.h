@@ -23,7 +23,7 @@ X_NAMESPACE_BEGIN(engine)
 class X3DEngine : public I3DEngine, public XEngineBase, public core::IXHotReload
 {
 public:
-	X3DEngine();
+	X3DEngine(core::MemoryArenaBase* arena);
 	virtual ~X3DEngine() X_OVERRIDE;
 
 	void registerVars(void) X_OVERRIDE;
