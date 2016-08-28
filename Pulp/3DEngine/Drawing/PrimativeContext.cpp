@@ -5,9 +5,13 @@
 
 X_NAMESPACE_BEGIN(engine)
 
-PrimativeContext::PrimativeContext()
+PrimativeContext::PrimativeContext(core::MemoryArenaBase* arena) :
+	pushBufferArr_(arena),
+	vertexArr_(arena)
 {
-
+	
+	pushBufferArr_.reserve(64);
+	vertexArr_.reserve(256);
 }
 
 PrimativeContext::~PrimativeContext() 
@@ -15,9 +19,28 @@ PrimativeContext::~PrimativeContext()
 
 }
 
+void PrimativeContext::reset(void)
+{
+	pushBufferArr_.clear();
+	vertexArr_.clear();
+}
 
+void PrimativeContext::getSortedBuffer(SortedPushBufferArr& sortedPushBuffer) const
+{
+	sortedPushBuffer.reserve(pushBufferArr_.size());
+	sortedPushBuffer.resize(0);
 
+	for (const auto& ap : pushBufferArr_) {
+		sortedPushBuffer.push_back(&ap);
+	}
 
+	std::sort(sortedPushBuffer.begin(), sortedPushBuffer.end(),
+		[](const PushBufferEntry* lhs, const PushBufferEntry* rhs)
+		{
+			return lhs->flags < rhs->flags;
+		}
+	);
+}
 
 
 void PrimativeContext::drawTextQueued(Vec3f pos, const render::XDrawTextInfo& ti, const char* pText)
@@ -28,21 +51,47 @@ void PrimativeContext::drawTextQueued(Vec3f pos, const render::XDrawTextInfo& ti
 
 }
 
-Vertex_P3F_T2F_C4B* PrimativeContext::addPrimative(uint32_t num, PrimitiveType::Enum type, texture::TexID texture_id)
+Vertex_P3F_T2F_C4B* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType, texture::TexID textureId)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
-	X_UNUSED(num);
-	X_UNUSED(type);
-	X_UNUSED(texture_id);
-	return nullptr;
+	PrimRenderFlags flags(primType, textureId);
+
+	// if the last entry was the same type
+	// just merge the verts in.
+	if (pushBufferArr_.isNotEmpty() && pushBufferArr_.back().flags == flags &&
+		(PrimitiveType::PointList == primType || PrimitiveType::LineList == primType || PrimitiveType::TriangleList == primType))
+	{
+		auto& lastEntry = pushBufferArr_.back();
+		lastEntry.numVertices += numVertices;
+	}
+	else
+	{
+		pushBufferArr_.emplace_back(numVertices,
+			safe_static_cast<uint32_t, size_t>(vertexArr_.size()),
+			flags
+		);
+	}
+
+#if X_DEBUG
+	// if flushing is never performed this will just keep growing.
+	// so lets check we not going over some fairly large count.
+	// if we exceede this and it's ok increase the check.
+	if (pushBufferArr_.size() > 4096)
+	{
+		X_LOG0_EVERY_N(50, "PrimContext", "PRimContext has %i entryies did you forget to flush?", pushBufferArr_.size());
+	}
+#endif // !X_DEBUG
+
+	// resize and return.
+	auto& vertexArr = vertexArr_;
+	const auto oldVBSize = vertexArr.size();
+	vertexArr.resize(oldVBSize + numVertices);
+
+	return &vertexArr[oldVBSize];
 }
 
-Vertex_P3F_T2F_C4B* PrimativeContext::addPrimative(uint32_t num, PrimitiveType::Enum type)
+Vertex_P3F_T2F_C4B* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
-	X_UNUSED(num);
-	X_UNUSED(type);
-	return nullptr;
+	return addPrimative(numVertices, primType, 0);
 }
 
 X_NAMESPACE_END

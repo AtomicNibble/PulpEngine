@@ -166,5 +166,8 @@
     <None Include="Model\RenderMesh.inl">
       <Filter>Header Files\Model</Filter>
     </None>
+    <None Include="Drawing\PrimativeContext.inl">
+      <Filter>Header Files\Drawing</Filter>
+    </None>
   </ItemGroup>
 </Project>

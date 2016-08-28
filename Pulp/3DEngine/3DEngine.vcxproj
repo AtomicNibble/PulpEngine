@@ -419,6 +419,7 @@
     <ClCompile Include="X3DEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Drawing\PrimativeContext.inl" />
     <None Include="Gui\Gui.inl" />
     <None Include="Gui\SimpleWindow.inl" />
     <None Include="Gui\XWindow.inl" />

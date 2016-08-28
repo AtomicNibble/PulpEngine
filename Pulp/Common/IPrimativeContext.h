@@ -22,6 +22,7 @@ public:
 	IPrimativeContext();
 	virtual ~IPrimativeContext();
 
+	virtual void reset(void) X_ABSTRACT;
 
 	// Screen Space Draw: range 0-2 width / h is also scrrenspace size not pixels
 	void drawQuadSS(float x, float y, float width, float height, const Color& col);
