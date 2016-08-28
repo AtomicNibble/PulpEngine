@@ -27,6 +27,11 @@ X_INLINE sound::ISound* XCore::GetISound(void)
 	return env_.pSound;
 }
 
+X_INLINE engine::I3DEngine* XCore::Get3DEngine(void)
+{
+	return env_.p3DEngine;
+}
+
 X_INLINE script::IScriptSys* XCore::GetISscriptSys(void)
 {
 	return env_.pScriptSys;

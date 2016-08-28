@@ -342,6 +342,7 @@ struct ICore
 	virtual core::IConsole* GetIConsole(void) X_ABSTRACT;
 	virtual core::IFileSys* GetIFileSys(void) X_ABSTRACT;
 	virtual sound::ISound* GetISound(void) X_ABSTRACT;
+	virtual engine::I3DEngine* Get3DEngine(void) X_ABSTRACT;
 	virtual script::IScriptSys* GetISscriptSys(void) X_ABSTRACT;
 	virtual render::IRender* GetIRender(void) X_ABSTRACT;
 	virtual font::IXFontSys* GetIFontSys(void) X_ABSTRACT;

@@ -122,6 +122,7 @@ public:
 	X_INLINE core::IConsole* GetIConsole(void) X_OVERRIDE;
 	X_INLINE core::IFileSys* GetIFileSys(void) X_OVERRIDE;
 	X_INLINE sound::ISound* GetISound(void) X_OVERRIDE;
+	X_INLINE engine::I3DEngine* Get3DEngine(void) X_OVERRIDE;
 	X_INLINE script::IScriptSys* GetISscriptSys(void) X_OVERRIDE;
 	X_INLINE render::IRender* GetIRender(void) X_OVERRIDE;
 	X_INLINE font::IXFontSys* GetIFontSys(void) X_OVERRIDE;
