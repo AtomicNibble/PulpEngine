@@ -46,6 +46,10 @@ void PrimativeContext::getSortedBuffer(SortedPushBufferArr& sortedPushBuffer) co
 	);
 }
 
+const PrimativeContext::PushBufferArr& PrimativeContext::getUnsortedBuffer(void) const
+{
+	return pushBufferArr_;
+}
 
 void PrimativeContext::drawTextQueued(Vec3f pos, const render::XDrawTextInfo& ti, const char* pText)
 {
