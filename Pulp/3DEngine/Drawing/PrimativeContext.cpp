@@ -77,7 +77,7 @@ Vertex_P3F_T2F_C4B* PrimativeContext::addPrimative(uint32_t numVertices, Primiti
 	// if we exceede this and it's ok increase the check.
 	if (pushBufferArr_.size() > 4096)
 	{
-		X_LOG0_EVERY_N(50, "PrimContext", "PRimContext has %i entryies did you forget to flush?", pushBufferArr_.size());
+		X_WARNING_EVERY_N(50, "PrimContext", "PrimContext has %i entryies did you forget to flush?", pushBufferArr_.size());
 	}
 #endif // !X_DEBUG
 
