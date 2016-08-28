@@ -567,6 +567,8 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket, Commands:
 	const auto& inputDesc = ilDescriptions_[vertexFmt];
 	pso.setInputLayout(safe_static_cast<uint32_t, size_t>(inputDesc.size()), inputDesc.ptr());
 
+	X_ASSERT_NOT_NULL(pHWTech);
+
 	// we should handle stuff like checking if compiled and not rendering
 	if (!pHWTech->canDraw()) {
 
