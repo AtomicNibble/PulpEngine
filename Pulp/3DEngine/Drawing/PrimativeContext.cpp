@@ -25,6 +25,11 @@ void PrimativeContext::reset(void)
 	vertexArr_.clear();
 }
 
+bool PrimativeContext::isEmpty(void) const
+{
+	return pushBufferArr_.isEmpty();
+}
+
 void PrimativeContext::getSortedBuffer(SortedPushBufferArr& sortedPushBuffer) const
 {
 	sortedPushBuffer.reserve(pushBufferArr_.size());
@@ -35,8 +40,7 @@ void PrimativeContext::getSortedBuffer(SortedPushBufferArr& sortedPushBuffer) co
 	}
 
 	std::sort(sortedPushBuffer.begin(), sortedPushBuffer.end(),
-		[](const PushBufferEntry* lhs, const PushBufferEntry* rhs)
-		{
+		[](const PushBufferEntry* lhs, const PushBufferEntry* rhs) {
 			return lhs->flags < rhs->flags;
 		}
 	);

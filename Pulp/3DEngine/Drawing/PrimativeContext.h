@@ -59,6 +59,8 @@ public:
 	~PrimativeContext() X_OVERRIDE;
 
 	void reset(void) X_FINAL;
+	
+	bool isEmpty(void) const;
 	void getSortedBuffer(SortedPushBufferArr& sortedPushBuffer) const;
 
 	void drawTextQueued(Vec3f pos, const render::XDrawTextInfo& ti, const char* pText) X_FINAL;
