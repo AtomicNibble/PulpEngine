@@ -92,19 +92,19 @@ bool XGui::OnInputEvent(const input::InputEvent& event)
 		}
 	}
 
-	if (isDeskTopValid())
-	{
+	if (isDeskTopValid()) {
 		pDesktop_->OnInputEvent(event);
 	}
+
 	return false;
 }
 
 bool XGui::OnInputEventChar(const input::InputEvent& event)
 {
-	if (isDeskTopValid())
-	{
+	if (isDeskTopValid()) {
 		pDesktop_->OnInputEventChar(event);
 	}
+
 	return false;
 }
 
