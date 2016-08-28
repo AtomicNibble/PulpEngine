@@ -45,7 +45,7 @@ private:
 		core::LinearAllocator,
 		core::SingleThreadPolicy,
 		core::SimpleBoundsChecking,
-		core::SimpleMemoryTracking,
+		core::NoMemoryTracking,
 		core::SimpleMemoryTagging
 	> LinearArena;
 
