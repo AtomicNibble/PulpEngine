@@ -6,6 +6,7 @@
 #include <String\HumanSize.h>
 
 #include <IRender.h>
+#include <I3DEngine.h>
 #include <IConsole.h>
 #include <IPrimativeContext.h>
 
@@ -28,9 +29,12 @@ void XProfileSys::Render(void)
 	}
 
 	pRender_ = gEnv->pRender;
+	pPrimCon_ = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
 	if (!pRender_ || !pPrimCon_) {
 		return;
 	}
+
+	pPrimCon_->reset();
 
 	UpdateSubSystemInfo(); // calculate avg's
 
