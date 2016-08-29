@@ -54,14 +54,14 @@ SqlLiteDb::SqlLiteDb() :
 }
 
 SqlLiteDb::SqlLiteDb(SqlLiteDb&& oth) :
-	db_(nullptr),
-	bh_(oth.bh_),
-	ch_(oth.ch_),
-	rh_(oth.rh_),
-	uh_(oth.uh_),
-	ah_(oth.ah_)
+	db_(std::move(oth.db_)),
+	bh_(std::move(oth.bh_)),
+	ch_(std::move(oth.ch_)),
+	rh_(std::move(oth.rh_)),
+	uh_(std::move(oth.uh_)),
+	ah_(std::move(oth.ah_))
 {
-
+	oth.db_ = nullptr;
 }
 
 
