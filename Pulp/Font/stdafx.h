@@ -34,3 +34,10 @@ typedef core::MemoryArena<
 
 extern FontArena* g_fontArena;
 
+
+#if X_DEBUG
+X_LINK_LIB("freetype265d");
+#else
+X_LINK_LIB("freetype265");
+#endif // !X_DEBUG
+
