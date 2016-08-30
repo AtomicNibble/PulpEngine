@@ -7,7 +7,6 @@
 
 X_NAMESPACE_BEGIN(font)
 
-#define	X_FONT_GLYPH_CACHE_SIZE		(1)
 // the glyph spacing in font texels between characters in proportional font mode (more correct would be to take the value in the character)
 // #define X_FONT_GLYPH_PROP_SPACING		(1)
 // the size of a rendered space, this value gets multiplied by the default characted width
@@ -86,6 +85,7 @@ class XFontTexture
 	typedef XTextureSlotTable::iterator					XTextureSlotTableItor;
 	typedef XTextureSlotTable::const_iterator			XTextureSlotTableItorConst;
 
+	static const uint32_t FONT_GLYPH_CACHE_SIZE = 128; // todo make var?
 
 public:
 	XFontTexture(core::MemoryArenaBase* arena);
@@ -141,6 +141,8 @@ private:
 	int32_t UpdateSlot(int32_t slot, uint16 slotUsage, wchar_t cChar);
 
 private:
+	core::MemoryArenaBase* textureSlotArea_;
+
 	int32_t width_;
 	int32_t height_;
 

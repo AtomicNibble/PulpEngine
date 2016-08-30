@@ -231,7 +231,7 @@ bool XGlyphCache::UnCacheGlyph(wchar_t cChar)
 
 	if (pItor != cacheTable_.end())
 	{
-		XCacheSlot *pSlot = pItor->second;
+		XCacheSlot* pSlot = pItor->second;
 		pSlot->reset();
 		cacheTable_.erase(pItor);
 		return true;
@@ -304,8 +304,8 @@ XCacheSlot* XGlyphCache::GetMRUSlot(void)
 
 //------------------------------------------------------------------------------------------------- 
 
-bool XGlyphCache::GetGlyph(XGlyphBitmap** pGlyph, int32_t* piWidth, int32_t* piHeight, 
-	int8_t& iCharOffsetX, int8_t& iCharOffsetY, wchar_t cChar)
+bool XGlyphCache::GetGlyph(XGlyphBitmap** pGlyph, int32_t* pWidth, int32_t* pHeight, 
+	int8_t& charOffsetX, int8_t& charOffsetY, wchar_t cChar)
 {
 	XCacheTable::iterator pItor = cacheTable_.find(cChar);
 
@@ -326,16 +326,16 @@ bool XGlyphCache::GetGlyph(XGlyphBitmap** pGlyph, int32_t* piWidth, int32_t* piH
 	pItor->second->usage = usage_++;
 	(*pGlyph) = &pItor->second->pGlyphBitmap;
 
-	if (piWidth) {
-		*piWidth = pItor->second->charWidth;
+	if (pWidth) {
+		*pWidth = pItor->second->charWidth;
 	}
 
-	if (piHeight) {
-		*piHeight = pItor->second->charHeight;
+	if (pHeight) {
+		*pHeight = pItor->second->charHeight;
 	}
 
-	iCharOffsetX = pItor->second->charOffsetX;
-	iCharOffsetY = pItor->second->charOffsetY;
+	charOffsetX = pItor->second->charOffsetX;
+	charOffsetY = pItor->second->charOffsetY;
 
 	return true;
 }

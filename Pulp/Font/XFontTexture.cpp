@@ -6,6 +6,9 @@
 X_NAMESPACE_BEGIN(font)
 
 XFontTexture::XFontTexture(core::MemoryArenaBase* arena) :
+
+textureSlotArea_(arena),
+
 width_(0),
 height_(0),
 pBuffer_(nullptr),
@@ -42,7 +45,7 @@ XFontTexture::~XFontTexture()
 }
 
 
-int32_t XFontTexture::Release()
+int32_t XFontTexture::Release(void)
 {
 	X_DELETE_ARRAY(pBuffer_, g_fontArena);
 	pBuffer_ = nullptr;
@@ -57,9 +60,9 @@ int32_t XFontTexture::Release()
 	return 1;
 }
 
-bool XFontTexture::CreateFromMemory(BYTE* pFileData, size_t dataLength, int32_t iWidth,
-	int32_t iHeight, int32_t smoothMethod, int32_t smoothAmount,
-	float fSizeRatio, int32_t iWidthCharCount, int32_t iHeightCharCount)
+bool XFontTexture::CreateFromMemory(BYTE* pFileData, size_t dataLength, int32_t width,
+	int32_t height, int32_t smoothMethod, int32_t smoothAmount,
+	float sizeRatio, int32_t widthCharCount, int32_t heightCharCount)
 {
 	if (!glyphCache_.LoadFontFromMemory(pFileData, dataLength))
 	{
@@ -67,32 +70,32 @@ bool XFontTexture::CreateFromMemory(BYTE* pFileData, size_t dataLength, int32_t 
 		return false;
 	}
 
-	if (!Create(iWidth, iHeight, smoothMethod, smoothAmount,
-		fSizeRatio, iWidthCharCount, iHeightCharCount)) {
+	if (!Create(width, height, smoothMethod, smoothAmount,
+		sizeRatio, widthCharCount, heightCharCount)) {
 		return false;
 	}
 
 	return true;
 }
 
-bool XFontTexture::Create(int32_t iWidth, int32_t iHeight, int32_t smoothMethod, int32_t smoothAmount,
-	float fSizeRatio, int32_t iWidthCellCount, int32_t iHeightCellCount)
+bool XFontTexture::Create(int32_t width, int32_t height, int32_t smoothMethod, int32_t smoothAmount,
+	float sizeRatio, int32_t widthCellCount, int32_t heightCellCount)
 {
-	pBuffer_ = X_NEW_ARRAY(uint8, iWidth * iHeight, g_fontArena, "fontTexture");
+	pBuffer_ = X_NEW_ARRAY(uint8, width * height, g_fontArena, "fontTexture");
 	if (!pBuffer_) {
 		return false;
 	}
 
-	std::memset(pBuffer_, 0, iWidth * iHeight * sizeof(uint8));
+	std::memset(pBuffer_, 0, width * height * sizeof(uint8));
 	
-	width_ = iWidth;
-	height_ = iHeight;
-	invWidth_ = 1.0f / static_cast<float>(iWidth);
-	invHeight_ = 1.0f / static_cast<float>(iHeight);
+	width_ = width;
+	height_ = height;
+	invWidth_ = 1.0f / static_cast<float>(width);
+	invHeight_ = 1.0f / static_cast<float>(height);
 
-	widthCellCount_ = iWidthCellCount;
-	heightCellCount_ = iHeightCellCount;
-	textureSlotCount_ = iWidthCellCount * iHeightCellCount;
+	widthCellCount_ = widthCellCount;
+	heightCellCount_ = heightCellCount;
+	textureSlotCount_ = widthCellCount * heightCellCount;
 
 #if 0
 	smoothMethod_ = X_FONT_SMOOTH_SUPERSAMPLE;
@@ -103,17 +106,17 @@ bool XFontTexture::Create(int32_t iWidth, int32_t iHeight, int32_t smoothMethod,
 	smoothAmount_ = smoothAmount;
 #endif
 
-	cellWidth_ = iWidth / iWidthCellCount;
-	cellHeight_ = iHeight / iHeightCellCount;
+	cellWidth_ = width / widthCellCount;
+	cellHeight_ = height / heightCellCount;
 
 	textureCellWidth_ = cellWidth_ * invWidth_;
 	textureCellHeight_ = cellHeight_ * invHeight_;
 
 	
-	if (!glyphCache_.Create(X_FONT_GLYPH_CACHE_SIZE,
+	if (!glyphCache_.Create(FONT_GLYPH_CACHE_SIZE,
 		cellWidth_, cellHeight_, 
 		smoothMethod_, smoothAmount_, 
-		fSizeRatio))
+		sizeRatio))
 	{
 		Release();
 		return false;
@@ -229,7 +232,7 @@ XTextureSlot* XFontTexture::GetLRUSlot(void)
 }
 
 //-------------------------------------------------------------------------------------------------
-XTextureSlot *XFontTexture::GetMRUSlot(void)
+XTextureSlot* XFontTexture::GetMRUSlot(void)
 {
 	uint16 wMaxSlotUsage = 0;
 	XTextureSlot *pMRUSlot = 0;
@@ -257,13 +260,13 @@ XTextureSlot *XFontTexture::GetMRUSlot(void)
 }
 
 
-int32_t XFontTexture::CreateSlotList(int32_t iListSize)
+int32_t XFontTexture::CreateSlotList(int32_t listSize)
 {
 	int32_t y, x;
 
-	for (int32_t i = 0; i < iListSize; i++)
+	for (int32_t i = 0; i < listSize; i++)
 	{
-		XTextureSlot* pTextureSlot = X_NEW(XTextureSlot, g_fontArena,"fontTexSlot");
+		XTextureSlot* pTextureSlot = X_NEW(XTextureSlot, textureSlotArea_,"fontTexSlot");
 
 		if (!pTextureSlot) {
 			return 0;
@@ -292,7 +295,7 @@ int32_t XFontTexture::ReleaseSlotList(void)
 
 	for (; pItor != slotList_.end(); ++pItor)
 	{
-		X_DELETE((*pItor), g_fontArena);
+		X_DELETE((*pItor), textureSlotArea_);
 	}
 
 	slotList_.free();
