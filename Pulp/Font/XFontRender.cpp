@@ -134,11 +134,11 @@ bool	XFontRender::GetGlyph(XGlyphBitmap *pGlyphBitmap, uint8 *iGlyphWidth, uint8
 	unsigned char* pBuffer = pGlyphBitmap->GetBuffer();
 	uint32 dwGlyphWidth = pGlyphBitmap->GetWidth();
 
-	for (int i = 0; i < pGlyph_->bitmap.rows; i++)
+	for (uint32_t i = 0; i < pGlyph_->bitmap.rows; i++)
 	{
 		int iNewY = i + iY;
 
-		for (int j = 0; j < pGlyph_->bitmap.width; j++)
+		for (uint32_t j = 0; j < pGlyph_->bitmap.width; j++)
 		{
 			unsigned char	cColor = pGlyph_->bitmap.buffer[(i * pGlyph_->bitmap.width) + j];
 			int				iOffset = iNewY * dwGlyphWidth + iX + j;
