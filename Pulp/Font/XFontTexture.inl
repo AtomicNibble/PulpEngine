@@ -23,27 +23,27 @@ X_INLINE uint8* XFontTexture::GetBuffer(void)
 
 X_INLINE float XFontTexture::GetTextureCellWidth(void) const
 { 
-	return fTextureCellWidth_;
+	return textureCellWidth_;
 }
 
 X_INLINE float XFontTexture::GetTextureCellHeight(void) const 
 { 
-	return fTextureCellHeight_;
+	return textureCellHeight_;
 }
 
 X_INLINE int32_t XFontTexture::WidthCellCellCount(void) const
 { 
-	return iWidthCellCount_; 
+	return widthCellCount_; 
 }
 
 X_INLINE int32_t XFontTexture::HeightCellCount(void) const
 { 
-	return iHeightCellCount_; 
+	return heightCellCount_; 
 }
 
 X_INLINE int32_t XFontTexture::GetSlotUsage(void)
 { 
-	return wSlotUsage_; 
+	return slotUsage_; 
 }
 
 X_NAMESPACE_END

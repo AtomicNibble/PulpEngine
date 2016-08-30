@@ -17,26 +17,26 @@ giving much faster text rendering at the cost of some memory.
 
 struct XCacheSlot
 {
-	uint32			uUsage;
-	int				iCacheSlot;
-	wchar_t			cCurrentChar;
+	uint32			usage;
+	int				cacheSlot;
+	wchar_t			currentChar;
 
-	uint8_t			iCharWidth;					// size in pixel
-	uint8_t			iCharHeight;				// size in pixel
-	int8_t			iCharOffsetX;
-	int8_t			iCharOffsetY;
+	uint8_t			charWidth;					// size in pixel
+	uint8_t			charHeight;				// size in pixel
+	int8_t			charOffsetX;
+	int8_t			charOffsetY;
 
 	XGlyphBitmap	pGlyphBitmap;
 
 	void reset(void)
 	{
-		uUsage = 0;
-		cCurrentChar = static_cast<wchar_t>(~0);
+		usage = 0;
+		currentChar = static_cast<wchar_t>(~0);
 
-		iCharWidth = 0;
-		iCharHeight = 0;
-		iCharOffsetX = 0;
-		iCharOffsetY = 0;
+		charWidth = 0;
+		charHeight = 0;
+		charOffsetX = 0;
+		charOffsetY = 0;
 
 		pGlyphBitmap.Clear();
 	}
@@ -83,26 +83,26 @@ public:
 	X_INLINE FT_Encoding GetEncoding(void) const;
 
 private:
-	bool			CreateSlotList(size_t listSize);
-	void			ReleaseSlotList(void);
+	bool CreateSlotList(size_t listSize);
+	void ReleaseSlotList(void);
 
 private:
 	core::MemoryArenaBase* arena_;
 
-	int32_t			iGlyphBitmapWidth_;
-	int32_t			iGlyphBitmapHeight_;
+	int32_t			glyphBitmapWidth_;
+	int32_t			glyphBitmapHeight_;
 	float			fSizeRatio_;
 
-	XCacheSlotList	SlotList_;
-	XCacheTable		CacheTable_;
+	XCacheSlotList	slotList_;
+	XCacheTable		cacheTable_;
 
 	XGlyphBitmap*	pScaleBitmap_;
 	XFontRender		fontRenderer_;
 
-	uint32_t		uUsage_;
+	uint32_t		usage_;
 
-	int32_t			iSmoothMethod_;
-	int32_t			iSmoothAmount_;
+	int32_t			smoothMethod_;
+	int32_t			smoothAmount_;
 };
 
 X_NAMESPACE_END

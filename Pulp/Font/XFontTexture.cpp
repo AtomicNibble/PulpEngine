@@ -10,24 +10,24 @@ width_(0),
 height_(0),
 pBuffer_(nullptr),
 
-fInvWidth_(0),
-fInvHeight_(0),
+invWidth_(0),
+invHeight_(0),
 
-iCellWidth_(0),
-iCellHeight_(0),
+cellWidth_(0),
+cellHeight_(0),
 
-fTextureCellWidth_(0),
-fTextureCellHeight_(0),
+textureCellWidth_(0),
+textureCellHeight_(0),
 
-iWidthCellCount_(0),
-iHeightCellCount_(0),
+widthCellCount_(0),
+heightCellCount_(0),
 
-nTextureSlotCount_(0),
+textureSlotCount_(0),
 
-iSmoothMethod_(0),
-iSmoothAmount_(0),
+smoothMethod_(0),
+smoothAmount_(0),
 
-wSlotUsage_(1), // space for gradiant.
+slotUsage_(1), // space for gradiant.
 
 glyphCache_(arena),
 slotList_(arena),
@@ -58,7 +58,7 @@ int32_t XFontTexture::Release()
 }
 
 bool XFontTexture::CreateFromMemory(BYTE* pFileData, size_t dataLength, int32_t iWidth,
-	int32_t iHeight, int32_t iSmoothMethod, int32_t iSmoothAmount,
+	int32_t iHeight, int32_t smoothMethod, int32_t smoothAmount,
 	float fSizeRatio, int32_t iWidthCharCount, int32_t iHeightCharCount)
 {
 	if (!glyphCache_.LoadFontFromMemory(pFileData, dataLength))
@@ -67,7 +67,7 @@ bool XFontTexture::CreateFromMemory(BYTE* pFileData, size_t dataLength, int32_t 
 		return false;
 	}
 
-	if (!Create(iWidth, iHeight, iSmoothMethod, iSmoothAmount,
+	if (!Create(iWidth, iHeight, smoothMethod, smoothAmount,
 		fSizeRatio, iWidthCharCount, iHeightCharCount)) {
 		return false;
 	}
@@ -75,7 +75,7 @@ bool XFontTexture::CreateFromMemory(BYTE* pFileData, size_t dataLength, int32_t 
 	return true;
 }
 
-bool XFontTexture::Create(int32_t iWidth, int32_t iHeight, int32_t iSmoothMethod, int32_t iSmoothAmount,
+bool XFontTexture::Create(int32_t iWidth, int32_t iHeight, int32_t smoothMethod, int32_t smoothAmount,
 	float fSizeRatio, int32_t iWidthCellCount, int32_t iHeightCellCount)
 {
 	pBuffer_ = X_NEW_ARRAY(uint8, iWidth * iHeight, g_fontArena, "fontTexture");
@@ -87,39 +87,39 @@ bool XFontTexture::Create(int32_t iWidth, int32_t iHeight, int32_t iSmoothMethod
 	
 	width_ = iWidth;
 	height_ = iHeight;
-	fInvWidth_ = 1.0f / static_cast<float>(iWidth);
-	fInvHeight_ = 1.0f / static_cast<float>(iHeight);
+	invWidth_ = 1.0f / static_cast<float>(iWidth);
+	invHeight_ = 1.0f / static_cast<float>(iHeight);
 
-	iWidthCellCount_ = iWidthCellCount;
-	iHeightCellCount_ = iHeightCellCount;
-	nTextureSlotCount_ = iWidthCellCount * iHeightCellCount;
+	widthCellCount_ = iWidthCellCount;
+	heightCellCount_ = iHeightCellCount;
+	textureSlotCount_ = iWidthCellCount * iHeightCellCount;
 
 #if 0
-	iSmoothMethod_ = X_FONT_SMOOTH_SUPERSAMPLE;
-	iSmoothAmount_ = X_FONT_SMOOTH_AMOUNT_4X;
+	smoothMethod_ = X_FONT_SMOOTH_SUPERSAMPLE;
+	smoothAmount_ = X_FONT_SMOOTH_AMOUNT_4X;
 
 #else
-	iSmoothMethod_ = iSmoothMethod;
-	iSmoothAmount_ = iSmoothAmount;
+	smoothMethod_ = smoothMethod;
+	smoothAmount_ = smoothAmount;
 #endif
 
-	iCellWidth_ = iWidth / iWidthCellCount;
-	iCellHeight_ = iHeight / iHeightCellCount;
+	cellWidth_ = iWidth / iWidthCellCount;
+	cellHeight_ = iHeight / iHeightCellCount;
 
-	fTextureCellWidth_ = iCellWidth_ * fInvWidth_;
-	fTextureCellHeight_ = iCellHeight_ * fInvHeight_;
+	textureCellWidth_ = cellWidth_ * invWidth_;
+	textureCellHeight_ = cellHeight_ * invHeight_;
 
 	
 	if (!glyphCache_.Create(X_FONT_GLYPH_CACHE_SIZE,
-		iCellWidth_, iCellHeight_, 
-		iSmoothMethod_, iSmoothAmount_, 
+		cellWidth_, cellHeight_, 
+		smoothMethod_, smoothAmount_, 
 		fSizeRatio))
 	{
 		Release();
 		return false;
 	}
 
-	if (!CreateSlotList(nTextureSlotCount_))
+	if (!CreateSlotList(textureSlotCount_))
 	{
 		Release();
 		return false;
@@ -131,7 +131,7 @@ bool XFontTexture::Create(int32_t iWidth, int32_t iHeight, int32_t iSmoothMethod
 
 int32_t XFontTexture::PreCacheString(const wchar_t* szString, int32_t* pUpdated)
 {
-	uint16 wSlotUsage = wSlotUsage_++;
+	uint16 wSlotUsage = slotUsage_++;
 	size_t length = core::strUtil::strlen(szString);
 	size_t iUpdated = 0;
 
@@ -149,7 +149,7 @@ int32_t XFontTexture::PreCacheString(const wchar_t* szString, int32_t* pUpdated)
 				return 0;
 			}
 
-			if (!UpdateSlot(pSlot->iTextureSlot, wSlotUsage, cChar)) {
+			if (!UpdateSlot(pSlot->textureSlot, wSlotUsage, cChar)) {
 				return 0;
 			}
 
@@ -157,7 +157,7 @@ int32_t XFontTexture::PreCacheString(const wchar_t* szString, int32_t* pUpdated)
 		}
 		else
 		{
-			pSlot->wSlotUsage = wSlotUsage;
+			pSlot->slotUsage = wSlotUsage;
 		}
 	}
 
@@ -175,7 +175,7 @@ int32_t XFontTexture::PreCacheString(const wchar_t* szString, int32_t* pUpdated)
 //-------------------------------------------------------------------------------------------------
 wchar_t XFontTexture::GetSlotChar(int32_t slot) const
 {
-	return slotList_[slot]->cCurrentChar;
+	return slotList_[slot]->currentChar;
 }
 
 //-------------------------------------------------------------------------------------------------
@@ -209,16 +209,16 @@ XTextureSlot* XFontTexture::GetLRUSlot()
 	{
 		pSlot = *pItor;
 
-		if (pSlot->wSlotUsage == 0)
+		if (pSlot->slotUsage == 0)
 		{
 			return pSlot;
 		}
 		else
 		{
-			if (pSlot->wSlotUsage < wMinSlotUsage)
+			if (pSlot->slotUsage  < wMinSlotUsage)
 			{
 				pLRUSlot = pSlot;
-				wMinSlotUsage = pSlot->wSlotUsage;
+				wMinSlotUsage = pSlot->slotUsage;
 			}
 		}
 
@@ -229,7 +229,7 @@ XTextureSlot* XFontTexture::GetLRUSlot()
 }
 
 //-------------------------------------------------------------------------------------------------
-XTextureSlot *XFontTexture::GetMRUSlot()
+XTextureSlot *XFontTexture::GetMRUSlot(void)
 {
 	uint16 wMaxSlotUsage = 0;
 	XTextureSlot *pMRUSlot = 0;
@@ -241,12 +241,12 @@ XTextureSlot *XFontTexture::GetMRUSlot()
 	{
 		pSlot = *pItor;
 
-		if (pSlot->wSlotUsage != 0)
+		if (pSlot->slotUsage != 0)
 		{
-			if (pSlot->wSlotUsage > wMaxSlotUsage)
+			if (pSlot->slotUsage  > wMaxSlotUsage)
 			{
 				pMRUSlot = pSlot;
-				wMaxSlotUsage = pSlot->wSlotUsage;
+				wMaxSlotUsage = pSlot->slotUsage;
 			}
 		}
 
@@ -269,14 +269,14 @@ int32_t XFontTexture::CreateSlotList(int32_t iListSize)
 			return 0;
 		}
 
-		pTextureSlot->iTextureSlot = i;
+		pTextureSlot->textureSlot = i;
 		pTextureSlot->reset();
 
-		y = i / iWidthCellCount_;
-		x = i % iWidthCellCount_;
+		y = i / widthCellCount_;
+		x = i % widthCellCount_;
 
-		pTextureSlot->vTexCoord[0] = static_cast<float>((x * fTextureCellWidth_) + (0.5f / static_cast<float>(width_)));
-		pTextureSlot->vTexCoord[1] = static_cast<float>((y * fTextureCellHeight_) + (0.5f / static_cast<float>(height_)));
+		pTextureSlot->texCoord[0] = static_cast<float>((x * textureCellWidth_) + (0.5f / static_cast<float>(width_)));
+		pTextureSlot->texCoord[1] = static_cast<float>((y * textureCellHeight_) + (0.5f / static_cast<float>(height_)));
 
 		// TODO: crashes in super dynamic x64 O.o
 		slotList_.push_back(pTextureSlot);
@@ -300,15 +300,15 @@ int32_t XFontTexture::ReleaseSlotList(void)
 }
 
 //-------------------------------------------------------------------------------------------------
-int32_t XFontTexture::UpdateSlot(int32_t iSlot, uint16 wSlotUsage, wchar_t cChar)
+int32_t XFontTexture::UpdateSlot(int32_t slot, uint16 wSlotUsage, wchar_t cChar)
 {
-	XTextureSlot* pSlot = slotList_[iSlot];
+	XTextureSlot* pSlot = slotList_[slot];
 
 	if (!pSlot) {
 		return 0;
 	}
 
-	XTextureSlotTableItor pItor = slotTable_.find(pSlot->cCurrentChar);
+	XTextureSlotTableItor pItor = slotTable_.find(pSlot->currentChar);
 
 	if (pItor != slotTable_.end()) {
 		slotTable_.erase(pItor);
@@ -316,32 +316,32 @@ int32_t XFontTexture::UpdateSlot(int32_t iSlot, uint16 wSlotUsage, wchar_t cChar
 
 	slotTable_.insert(std::pair<wchar_t, XTextureSlot*>(cChar, pSlot));
 
-	pSlot->wSlotUsage = wSlotUsage;
-	pSlot->cCurrentChar = cChar;
+	pSlot->slotUsage = wSlotUsage;
+	pSlot->currentChar = cChar;
 
 	int32_t iWidth = 0;
 	int32_t iHeight = 0;
 
 	// blit the char glyph into the texture
-	const int32_t x = pSlot->iTextureSlot % iWidthCellCount_;
-	const int32_t y = pSlot->iTextureSlot / iWidthCellCount_;
+	const int32_t x = pSlot->textureSlot % widthCellCount_;
+	const int32_t y = pSlot->textureSlot / widthCellCount_;
 
 	XGlyphBitmap *pGlyphBitmap;
 
 	if (!glyphCache_.GetGlyph(&pGlyphBitmap,
 		&iWidth, &iHeight,
-		pSlot->iCharOffsetX, pSlot->iCharOffsetY,
+		pSlot->charOffsetX, pSlot->charOffsetY,
 		cChar)) {
 		return 0;
 	}
 
-	pSlot->iCharWidth = safe_static_cast<uint8_t, int32_t>(iWidth);
-	pSlot->iCharHeight = safe_static_cast<uint8_t, int32_t>(iHeight);
+	pSlot->charWidth = safe_static_cast<uint8_t, int32_t>(iWidth);
+	pSlot->charHeight = safe_static_cast<uint8_t, int32_t>(iHeight);
 
 	pGlyphBitmap->BlitTo8(pBuffer_, 
 		0, 0,
 		iWidth, iHeight, 
-		x * iCellWidth_, y * iCellHeight_, 
+		x * cellWidth_, y * cellHeight_, 
 		width_);
 
 	return 1;
@@ -352,22 +352,22 @@ void XFontTexture::CreateGradientSlot()
 	XTextureSlot* pSlot = GetGradientSlot();				
 	
 	// 0 needs to be unused spot
-	X_ASSERT(pSlot->cCurrentChar == (uint16)~0, "slot idx zero needs to be empty")();		
+	X_ASSERT(pSlot->currentChar == static_cast<wchar_t>(~0), "slot idx zero needs to be empty")(pSlot->currentChar);
 
 	pSlot->reset();
-	pSlot->iCharWidth = safe_static_cast<uint8_t, int32_t>(iCellWidth_ - 2);
-	pSlot->iCharHeight = safe_static_cast<uint8_t, int32_t>(iCellHeight_ - 2);
+	pSlot->charWidth = safe_static_cast<uint8_t, int32_t>(cellWidth_ - 2);
+	pSlot->charHeight = safe_static_cast<uint8_t, int32_t>(cellHeight_ - 2);
 	pSlot->setNotReusable();
 
-	const int32_t x = pSlot->iTextureSlot % iWidthCellCount_;
-	const int32_t y = pSlot->iTextureSlot / iWidthCellCount_;
+	const int32_t x = pSlot->textureSlot % widthCellCount_;
+	const int32_t y = pSlot->textureSlot / widthCellCount_;
 
-	uint8* pBuffer = &pBuffer_[x*iCellWidth_ + y*iCellHeight_*height_];
+	uint8* pBuffer = &pBuffer_[x*cellWidth_ + y*cellHeight_*height_];
 
-	for (uint32 dwY = 0; dwY < pSlot->iCharHeight; ++dwY) {
-		for (uint32 dwX = 0; dwX < pSlot->iCharWidth; ++dwX) {
+	for (uint32 dwY = 0; dwY < pSlot->charHeight; ++dwY) {
+		for (uint32 dwX = 0; dwX < pSlot->charWidth; ++dwX) {
 			pBuffer[dwX + dwY*width_] = safe_static_cast<uint8_t, uint32_t>(
-				dwY * 255 / (pSlot->iCharHeight - 1));
+				dwY * 255 / (pSlot->charHeight - 1));
 		}
 	}
 }
@@ -406,7 +406,7 @@ bool XFontTexture::WriteToFile(const char* filename)
 		pInfoHeader.biCompression = 0;
 		pInfoHeader.biSizeImage = width_ * height_ * 3;
 
-		file.write(pHeader);
+		file.write(pHeader); 
 		file.write(pInfoHeader);
 
 		unsigned char cRGB[3];
@@ -449,7 +449,7 @@ int32_t XFontTexture::GetCharacterWidth(wchar_t cChar) const
 
 	const XTextureSlot &rSlot = *pItor->second;
 
-	return rSlot.iCharWidth + 1; // extra pixel for nicer bilinear filter
+	return rSlot.charWidth + 1; // extra pixel for nicer bilinear filter
 }
 
 void XFontTexture::GetTextureCoord(XTextureSlot* pSlot, XCharCords& cords) const
@@ -458,21 +458,21 @@ void XFontTexture::GetTextureCoord(XTextureSlot* pSlot, XCharCords& cords) const
 		return;	// expected behavior
 	}
 
-	const int32_t iChWidth = pSlot->iCharWidth;
-	const int32_t iChHeight = pSlot->iCharHeight;
-	const float slotCoord0 = pSlot->vTexCoord[0];
-	const float slotCoord1 = pSlot->vTexCoord[1];
+	const int32_t chWidth = pSlot->charWidth;
+	const int32_t chHeight = pSlot->charHeight;
+	const float slotCoord0 = pSlot->texCoord[0];
+	const float slotCoord1 = pSlot->texCoord[1];
 
 
-	cords.texCoords[0] = slotCoord0 - fInvWidth_;		// extra pixel for nicer bilinear filter
-	cords.texCoords[1] = slotCoord1 - fInvHeight_;		// extra pixel for nicer bilinear filter
-	cords.texCoords[2] = slotCoord0 + static_cast<float>(iChWidth * fInvWidth_);
-	cords.texCoords[3] = slotCoord1 + static_cast<float>(iChHeight * fInvHeight_);
+	cords.texCoords[0] = slotCoord0 - invWidth_;		// extra pixel for nicer bilinear filter
+	cords.texCoords[1] = slotCoord1 - invHeight_;		// extra pixel for nicer bilinear filter
+	cords.texCoords[2] = slotCoord0 + static_cast<float>(chWidth * invWidth_);
+	cords.texCoords[3] = slotCoord1 + static_cast<float>(chHeight * invHeight_);
 
-	cords.size[0] = iChWidth + 1;		// extra pixel for nicer bilinear filter
-	cords.size[1] = iChHeight + 1;		// extra pixel for nicer bilinear filter
-	cords.offset[0] = pSlot->iCharOffsetX;
-	cords.offset[1] = pSlot->iCharOffsetY;
+	cords.size[0] = chWidth + 1;		// extra pixel for nicer bilinear filter
+	cords.size[1] = chHeight + 1;		// extra pixel for nicer bilinear filter
+	cords.offset[0] = pSlot->charOffsetX;
+	cords.offset[1] = pSlot->charOffsetY;
 }
 
 

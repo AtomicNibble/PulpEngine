@@ -43,27 +43,27 @@ struct FontSmoothAmount
 
 struct XTextureSlot
 {
-	uint16		wSlotUsage;			// for LRU strategy, 0xffff is never released
-	wchar_t		cCurrentChar;		// ~0 if not used for characters
-	int			iTextureSlot;		
-	float		vTexCoord[2];		// character position in the texture (not yet half texel corrected)
-	uint8		iCharWidth;			// size in pixel
-	uint8		iCharHeight;		// size in pixel
-	int8_t		iCharOffsetX;
-	int8_t		iCharOffsetY;
+	uint16		slotUsage;			// for LRU strategy, 0xffff is never released
+	wchar_t		currentChar;		// ~0 if not used for characters
+	int32_t		textureSlot;		
+	float		texCoord[2];		// character position in the texture (not yet half texel corrected)
+	uint8		charWidth;			// size in pixel
+	uint8		charHeight;		// size in pixel
+	int8_t		charOffsetX;
+	int8_t		charOffsetY;
 
 	void reset(void)
 	{
-		wSlotUsage = 0;
-		cCurrentChar = static_cast<wchar_t>(~0);
-		iCharWidth = 0;
-		iCharHeight = 0;
-		iCharOffsetX = 0;
-		iCharOffsetY = 0;
+		slotUsage = 0;
+		currentChar = static_cast<wchar_t>(~0);
+		charWidth = 0;
+		charHeight = 0;
+		charOffsetX = 0;
+		charOffsetY = 0;
 	}
 
 	void setNotReusable(void) { // this slot can't be reused for somthing else.
-		wSlotUsage = 0xffff;
+		slotUsage = 0xffff;
 	}
 
 };
@@ -71,7 +71,7 @@ struct XTextureSlot
 
 struct XCharCords
 {
-	Vec4<float >texCoords;
+	Vec4<float> texCoords;
 	Vec2<int> size;
 	Vec2<int> offset;
 };
@@ -79,10 +79,10 @@ struct XCharCords
 
 class XFontTexture
 {
-	typedef core::Array<XTextureSlot *>					XTextureSlotList;
-	typedef core::Array<XTextureSlot *>::Iterator		XTextureSlotListItor;
+	typedef core::Array<XTextureSlot*>					XTextureSlotList;
+	typedef core::Array<XTextureSlot*>::Iterator		XTextureSlotListItor;
 
-	typedef core::HashMap<uint16, XTextureSlot *>		XTextureSlotTable;
+	typedef core::HashMap<uint16, XTextureSlot*>		XTextureSlotTable;
 	typedef XTextureSlotTable::iterator					XTextureSlotTableItor;
 	typedef XTextureSlotTable::const_iterator			XTextureSlotTableItorConst;
 
@@ -93,13 +93,13 @@ public:
 
 	int32_t Release(void);
 
-	bool CreateFromMemory(uint8_t* pFileData, size_t iDataSize, int iWidth,
-			int32_t iHeight, int32_t iSmoothMethod, int32_t iSmoothAmount,
-			float fSizeRatio = 0.875f, int32_t iWidthCharCount = 16,
-		int32_t iHeightCharCount = 16);
+	bool CreateFromMemory(uint8_t* pFileData, size_t dataSize, int32_t width,
+			int32_t height, int32_t smoothMethod, int32_t smoothAmount,
+			float sizeRatio = 0.875f, int32_t widthCharCount = 16,
+		int32_t heightCharCount = 16);
 
-	bool Create(int32_t iWidth, int32_t iHeight, int32_t iSmoothMethod, int32_t iSmoothAmount,
-		float fSizeRatio = 0.8f, int32_t iWidthCharCount = 16, int32_t iHeightCharCount = 16);
+	bool Create(int32_t width, int32_t height, int32_t smoothMethod, int32_t smoothAmount,
+		float sizeRatio = 0.8f, int32_t widthCharCount = 16, int32_t heightCharCount = 16);
 
 	// returns 1 if texture updated, returns 2 if texture not updated, returns 0 on error
 	// pUpdated is the number of slots updated
@@ -110,8 +110,8 @@ public:
 
 
 	X_INLINE const Vec2i GetSize(void) const;
-	X_INLINE const int GetWidth(void) const;
-	X_INLINE const int GetHeight(void) const;
+	X_INLINE const int32_t GetWidth(void) const;
+	X_INLINE const int32_t GetHeight(void) const;
 	X_INLINE uint8* GetBuffer(void);
 
 	X_INLINE float GetTextureCellWidth(void) const;
@@ -125,7 +125,7 @@ public:
 	// useful for special feature rendering interleaved with fonts (e.g. box behind the text)
 	void CreateGradientSlot(void);
 
-	wchar_t GetSlotChar(int slot) const;
+	wchar_t GetSlotChar(int32_t slot) const;
 	XTextureSlot* GetCharSlot(wchar_t cChar);
 	XTextureSlot* GetGradientSlot(void);
 	XTextureSlot* GetLRUSlot(void);
@@ -136,9 +136,9 @@ public:
 	bool WriteToFile(const char* filename);
 
 private:
-	int32_t CreateSlotList(int iListSize);
-	int32_t ReleaseSlotList();
-	int32_t UpdateSlot(int iSlot, uint16 wSlotUsage, wchar_t cChar);
+	int32_t CreateSlotList(int32_t listSize);
+	int32_t ReleaseSlotList(void);
+	int32_t UpdateSlot(int32_t slot, uint16 slotUsage, wchar_t cChar);
 
 private:
 	int32_t width_;
@@ -146,28 +146,28 @@ private:
 
 	uint8*	pBuffer_;
 
-	float		fInvWidth_;
-	float		fInvHeight_;
+	float		invWidth_;
+	float		invHeight_;
 
-	int32_t		iCellWidth_;
-	int32_t		iCellHeight_;
+	int32_t		cellWidth_;
+	int32_t		cellHeight_;
 
-	float		fTextureCellWidth_;
-	float		fTextureCellHeight_;
+	float		textureCellWidth_;
+	float		textureCellHeight_;
 
-	int32_t		iWidthCellCount_;
-	int32_t		iHeightCellCount_;
+	int32_t		widthCellCount_;
+	int32_t		heightCellCount_;
 
-	int32_t		nTextureSlotCount_;
+	int32_t		textureSlotCount_;
 
-	int32_t		iSmoothMethod_;
-	int32_t		iSmoothAmount_;
+	int32_t		smoothMethod_;
+	int32_t		smoothAmount_;
 
 	XGlyphCache			glyphCache_;
 	XTextureSlotList	slotList_;
 	XTextureSlotTable	slotTable_;
 
-	uint16				wSlotUsage_;
+	uint16		slotUsage_;
 };
 
 

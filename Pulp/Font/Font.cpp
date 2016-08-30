@@ -100,7 +100,7 @@ bool XFFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 	uint8_t* pBuffer = nullptr;
 	size_t len = 0;
 
-	unsigned int flags = 0;
+	uint32_t flags = 0;
 	const int32_t iSmoothMethod = (flags & TTFFLAG_SMOOTH_MASK) >> TTFFLAG_SMOOTH_SHIFT;
 	const int32_t iSmoothAmount = (flags & TTFFLAG_SMOOTH_AMOUNT_MASK) >> TTFFLAG_SMOOTH_AMOUNT_SHIFT;
 
@@ -251,10 +251,10 @@ void XFFont::GetGradientTextureCoord(float& minU, float& minV, float& maxU, floa
 	const float invHeight = 1.0f / static_cast<float>(pFontTexture_->GetHeight());
 
 	// deflate by one pixel to avoid bilinear filtering on the borders
-	minU = pSlot->vTexCoord[0] + invWidth;
-	minV = pSlot->vTexCoord[1] + invHeight;
-	maxU = pSlot->vTexCoord[0] + (pSlot->iCharWidth - 1) * invWidth;
-	maxV = pSlot->vTexCoord[1] + (pSlot->iCharHeight - 1) * invHeight;
+	minU = pSlot->texCoord[0] + invWidth;
+	minV = pSlot->texCoord[1] + invHeight;
+	maxU = pSlot->texCoord[0] + (pSlot->charWidth - 1) * invWidth;
+	maxV = pSlot->texCoord[1] + (pSlot->charHeight - 1) * invHeight;
 }
 
 // =======================================================================================
