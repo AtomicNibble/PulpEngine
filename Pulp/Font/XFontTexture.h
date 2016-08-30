@@ -91,21 +91,21 @@ public:
 	XFontTexture(core::MemoryArenaBase* arena);
 	~XFontTexture();
 
-	int Release();
+	int32_t Release(void);
 
-	bool CreateFromMemory(BYTE *pFileData, size_t iDataSize, int iWidth,
-			int iHeight, int iSmoothMethod, int iSmoothAmount, 
-			float fSizeRatio = 0.875f, int iWidthCharCount = 16, 
-			int iHeightCharCount = 16);
+	bool CreateFromMemory(uint8_t* pFileData, size_t iDataSize, int iWidth,
+			int32_t iHeight, int32_t iSmoothMethod, int32_t iSmoothAmount,
+			float fSizeRatio = 0.875f, int32_t iWidthCharCount = 16,
+		int32_t iHeightCharCount = 16);
 
-	bool Create(int iWidth, int iHeight, int iSmoothMethod, int iSmoothAmount,
-		float fSizeRatio = 0.8f, int iWidthCharCount = 16, int iHeightCharCount = 16);
+	bool Create(int32_t iWidth, int32_t iHeight, int32_t iSmoothMethod, int32_t iSmoothAmount,
+		float fSizeRatio = 0.8f, int32_t iWidthCharCount = 16, int32_t iHeightCharCount = 16);
 
 	// returns 1 if texture updated, returns 2 if texture not updated, returns 0 on error
 	// pUpdated is the number of slots updated
-	int PreCacheString(const wchar_t* szString, int* pUpdated = 0);
+	int32_t PreCacheString(const wchar_t* szString, int32_t* pUpdated = 0);
 
-	int GetCharacterWidth(wchar_t cChar) const;
+	int32_t GetCharacterWidth(wchar_t cChar) const;
 	void GetTextureCoord(XTextureSlot* pSlot, XCharCords& cords) const;
 
 
@@ -117,10 +117,10 @@ public:
 	X_INLINE float GetTextureCellWidth(void) const;
 	X_INLINE float GetTextureCellHeight(void) const;
 
-	X_INLINE int WidthCellCellCount(void) const;
-	X_INLINE int HeightCellCount(void) const;
+	X_INLINE int32_t WidthCellCellCount(void) const;
+	X_INLINE int32_t HeightCellCount(void) const;
 
-	X_INLINE int GetSlotUsage(void);
+	X_INLINE int32_t GetSlotUsage(void);
 
 	// useful for special feature rendering interleaved with fonts (e.g. box behind the text)
 	void CreateGradientSlot(void);
@@ -136,32 +136,32 @@ public:
 	bool WriteToFile(const char* filename);
 
 private:
-	int CreateSlotList(int iListSize);
-	int ReleaseSlotList();
-	int UpdateSlot(int iSlot, uint16 wSlotUsage, wchar_t cChar);
+	int32_t CreateSlotList(int iListSize);
+	int32_t ReleaseSlotList();
+	int32_t UpdateSlot(int iSlot, uint16 wSlotUsage, wchar_t cChar);
 
 private:
-	int width_;
-	int height_;
+	int32_t width_;
+	int32_t height_;
 
-	uint8* pBuffer_;
+	uint8*	pBuffer_;
 
 	float		fInvWidth_;
 	float		fInvHeight_;
 
-	int			iCellWidth_;
-	int			iCellHeight_;
+	int32_t		iCellWidth_;
+	int32_t		iCellHeight_;
 
 	float		fTextureCellWidth_;
 	float		fTextureCellHeight_;
 
-	int			iWidthCellCount_;
-	int			iHeightCellCount_;
+	int32_t		iWidthCellCount_;
+	int32_t		iHeightCellCount_;
 
-	int			nTextureSlotCount_;
+	int32_t		nTextureSlotCount_;
 
-	int			iSmoothMethod_;
-	int			iSmoothAmount_;
+	int32_t		iSmoothMethod_;
+	int32_t		iSmoothAmount_;
 
 	XGlyphCache			glyphCache_;
 	XTextureSlotList	slotList_;

@@ -42,7 +42,7 @@ XFontTexture::~XFontTexture()
 }
 
 
-int XFontTexture::Release()
+int32_t XFontTexture::Release()
 {
 	X_DELETE_ARRAY(pBuffer_, g_fontArena);
 	pBuffer_ = nullptr;
@@ -57,9 +57,9 @@ int XFontTexture::Release()
 	return 1;
 }
 
-bool XFontTexture::CreateFromMemory(BYTE* pFileData, size_t dataLength, int iWidth,
-	int iHeight, int iSmoothMethod, int iSmoothAmount,
-	float fSizeRatio, int iWidthCharCount, int iHeightCharCount)
+bool XFontTexture::CreateFromMemory(BYTE* pFileData, size_t dataLength, int32_t iWidth,
+	int32_t iHeight, int32_t iSmoothMethod, int32_t iSmoothAmount,
+	float fSizeRatio, int32_t iWidthCharCount, int32_t iHeightCharCount)
 {
 	if (!glyphCache_.LoadFontFromMemory(pFileData, dataLength))
 	{
@@ -75,8 +75,8 @@ bool XFontTexture::CreateFromMemory(BYTE* pFileData, size_t dataLength, int iWid
 	return true;
 }
 
-bool XFontTexture::Create(int iWidth, int iHeight, int iSmoothMethod, int iSmoothAmount,
-	float fSizeRatio, int iWidthCellCount, int iHeightCellCount)
+bool XFontTexture::Create(int32_t iWidth, int32_t iHeight, int32_t iSmoothMethod, int32_t iSmoothAmount,
+	float fSizeRatio, int32_t iWidthCellCount, int32_t iHeightCellCount)
 {
 	pBuffer_ = X_NEW_ARRAY(uint8, iWidth * iHeight, g_fontArena, "fontTexture");
 	if (!pBuffer_) {
@@ -129,7 +129,7 @@ bool XFontTexture::Create(int iWidth, int iHeight, int iSmoothMethod, int iSmoot
 }
 
 
-int XFontTexture::PreCacheString(const wchar_t* szString, int* pUpdated)
+int32_t XFontTexture::PreCacheString(const wchar_t* szString, int32_t* pUpdated)
 {
 	uint16 wSlotUsage = wSlotUsage_++;
 	size_t length = core::strUtil::strlen(szString);
@@ -173,7 +173,7 @@ int XFontTexture::PreCacheString(const wchar_t* szString, int* pUpdated)
 }
 
 //-------------------------------------------------------------------------------------------------
-wchar_t XFontTexture::GetSlotChar(int slot) const
+wchar_t XFontTexture::GetSlotChar(int32_t slot) const
 {
 	return slotList_[slot]->cCurrentChar;
 }
@@ -257,11 +257,11 @@ XTextureSlot *XFontTexture::GetMRUSlot()
 }
 
 
-int XFontTexture::CreateSlotList(int iListSize)
+int32_t XFontTexture::CreateSlotList(int32_t iListSize)
 {
 	int32_t y, x;
 
-	for (int i = 0; i < iListSize; i++)
+	for (int32_t i = 0; i < iListSize; i++)
 	{
 		XTextureSlot* pTextureSlot = X_NEW(XTextureSlot, g_fontArena,"fontTexSlot");
 
@@ -286,7 +286,7 @@ int XFontTexture::CreateSlotList(int iListSize)
 }
 
 //-------------------------------------------------------------------------------------------------
-int XFontTexture::ReleaseSlotList(void)
+int32_t XFontTexture::ReleaseSlotList(void)
 {
 	XTextureSlotListItor pItor = slotList_.begin();
 
@@ -300,7 +300,7 @@ int XFontTexture::ReleaseSlotList(void)
 }
 
 //-------------------------------------------------------------------------------------------------
-int XFontTexture::UpdateSlot(int iSlot, uint16 wSlotUsage, wchar_t cChar)
+int32_t XFontTexture::UpdateSlot(int32_t iSlot, uint16 wSlotUsage, wchar_t cChar)
 {
 	XTextureSlot* pSlot = slotList_[iSlot];
 
@@ -319,8 +319,8 @@ int XFontTexture::UpdateSlot(int iSlot, uint16 wSlotUsage, wchar_t cChar)
 	pSlot->wSlotUsage = wSlotUsage;
 	pSlot->cCurrentChar = cChar;
 
-	int iWidth = 0;
-	int iHeight = 0;
+	int32_t iWidth = 0;
+	int32_t iHeight = 0;
 
 	// blit the char glyph into the texture
 	const int32_t x = pSlot->iTextureSlot % iWidthCellCount_;
@@ -335,8 +335,8 @@ int XFontTexture::UpdateSlot(int iSlot, uint16 wSlotUsage, wchar_t cChar)
 		return 0;
 	}
 
-	pSlot->iCharWidth = safe_static_cast<uint8_t, int>(iWidth);
-	pSlot->iCharHeight = safe_static_cast<uint8_t, int>(iHeight);
+	pSlot->iCharWidth = safe_static_cast<uint8_t, int32_t>(iWidth);
+	pSlot->iCharHeight = safe_static_cast<uint8_t, int32_t>(iHeight);
 
 	pGlyphBitmap->BlitTo8(pBuffer_, 
 		0, 0,
@@ -415,9 +415,9 @@ bool XFontTexture::WriteToFile(const char* filename)
 
 		stream.resize(height_ * width_* 3);
 
-		for (int i = height_ - 1; i >= 0; i--)
+		for (int32_t i = height_ - 1; i >= 0; i--)
 		{
-			for (int j = 0; j < width_; j++)
+			for (int32_t j = 0; j < width_; j++)
 			{
 				cRGB[0] = pBuffer_[(i * width_) + j];
 				cRGB[1] = *cRGB;
@@ -439,7 +439,7 @@ bool XFontTexture::WriteToFile(const char* filename)
 //-------------------------------------------------------------------------------------------------
 
 
-int XFontTexture::GetCharacterWidth(wchar_t cChar) const
+int32_t XFontTexture::GetCharacterWidth(wchar_t cChar) const
 {
 	XTextureSlotTableItorConst pItor = slotTable_.find(cChar);
 
