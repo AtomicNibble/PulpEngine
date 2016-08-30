@@ -83,13 +83,22 @@ namespace Commands
 		// we will sort by depth first.
 		// 
 		// we also need the material id to support the number of materials we have.
-		X_DECLARE_ENUM(Type)(DEPTH);
+		X_DECLARE_ENUM(Type)(DEPTH, PRIM);
 
 		struct DepthPass
 		{
 			uint32_t depth : 18; // 0 - 262143
 			uint32_t materialId : 14; // 16383 - the real id of the material.
 
+		};
+
+		struct Prim
+		{
+			uint32_t layer : 3; // 0 - layers
+			uint32_t pad : 6; 
+			uint32_t primType : 3; // 0 - layers
+			uint32_t textureId : 20; // 0 - layers
+			// rest unused.
 		};
 
 	}
