@@ -103,7 +103,7 @@ public:
 
 	// returns 1 if texture updated, returns 2 if texture not updated, returns 0 on error
 	// pUpdated is the number of slots updated
-	int32_t PreCacheString(const wchar_t* szString, int32_t* pUpdated = 0);
+	int32_t PreCacheString(const wchar_t* pString, int32_t* pUpdated = 0);
 
 	int32_t GetCharacterWidth(wchar_t cChar) const;
 	void GetTextureCoord(XTextureSlot* pSlot, XCharCords& cords) const;

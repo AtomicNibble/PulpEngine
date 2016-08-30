@@ -129,15 +129,15 @@ bool XFontTexture::Create(int32_t iWidth, int32_t iHeight, int32_t smoothMethod,
 }
 
 
-int32_t XFontTexture::PreCacheString(const wchar_t* szString, int32_t* pUpdated)
+int32_t XFontTexture::PreCacheString(const wchar_t* pString, int32_t* pUpdated)
 {
 	uint16 wSlotUsage = slotUsage_++;
-	size_t length = core::strUtil::strlen(szString);
+	size_t length = core::strUtil::strlen(pString);
 	size_t iUpdated = 0;
 
 	for (size_t i = 0; i < length; i++)
 	{
-		wchar_t cChar = szString[i];
+		const wchar_t cChar = pString[i];
 
 		XTextureSlot* pSlot = GetCharSlot(cChar);
 
@@ -191,13 +191,13 @@ XTextureSlot* XFontTexture::GetCharSlot(wchar_t cChar)
 }
 
 //-------------------------------------------------------------------------------------------------
-XTextureSlot* XFontTexture::GetGradientSlot()
+XTextureSlot* XFontTexture::GetGradientSlot(void)
 {
 	return slotList_[0];
 }
 
 //-------------------------------------------------------------------------------------------------
-XTextureSlot* XFontTexture::GetLRUSlot()
+XTextureSlot* XFontTexture::GetLRUSlot(void)
 {
 	uint16 wMinSlotUsage = 0xffff;
 	XTextureSlot* pLRUSlot = nullptr;
@@ -300,7 +300,7 @@ int32_t XFontTexture::ReleaseSlotList(void)
 }
 
 //-------------------------------------------------------------------------------------------------
-int32_t XFontTexture::UpdateSlot(int32_t slot, uint16 wSlotUsage, wchar_t cChar)
+int32_t XFontTexture::UpdateSlot(int32_t slot, uint16 slotUsage, wchar_t cChar)
 {
 	XTextureSlot* pSlot = slotList_[slot];
 
@@ -314,9 +314,9 @@ int32_t XFontTexture::UpdateSlot(int32_t slot, uint16 wSlotUsage, wchar_t cChar)
 		slotTable_.erase(pItor);
 	}
 
-	slotTable_.insert(std::pair<wchar_t, XTextureSlot*>(cChar, pSlot));
+	slotTable_.insert(std::make_pair(cChar, pSlot));
 
-	pSlot->slotUsage = wSlotUsage;
+	pSlot->slotUsage = slotUsage;
 	pSlot->currentChar = cChar;
 
 	int32_t iWidth = 0;
@@ -347,7 +347,7 @@ int32_t XFontTexture::UpdateSlot(int32_t slot, uint16 wSlotUsage, wchar_t cChar)
 	return 1;
 }
 
-void XFontTexture::CreateGradientSlot()
+void XFontTexture::CreateGradientSlot(void)
 {
 	XTextureSlot* pSlot = GetGradientSlot();				
 	
