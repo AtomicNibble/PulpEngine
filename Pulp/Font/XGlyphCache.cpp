@@ -359,7 +359,7 @@ bool XGlyphCache::CreateSlotList(size_t listSize)
 		}
 
 		pCacheSlot->reset();
-		pCacheSlot->cacheSlot = i;
+		pCacheSlot->cacheSlot = static_cast<uint32_t>(i);
 
 		slotList_.push_back(pCacheSlot);
 	}

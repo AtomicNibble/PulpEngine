@@ -18,7 +18,7 @@ giving much faster text rendering at the cost of some memory.
 struct XCacheSlot
 {
 	uint32			usage;
-	int				cacheSlot;
+	int32_t			cacheSlot;
 	wchar_t			currentChar;
 
 	uint8_t			charWidth;					// size in pixel

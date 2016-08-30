@@ -136,7 +136,7 @@ int32_t XFontTexture::PreCacheString(const wchar_t* pString, int32_t* pUpdated)
 {
 	uint16 wSlotUsage = slotUsage_++;
 	size_t length = core::strUtil::strlen(pString);
-	size_t iUpdated = 0;
+	int32_t updated = 0;
 
 	for (size_t i = 0; i < length; i++)
 	{
@@ -156,7 +156,7 @@ int32_t XFontTexture::PreCacheString(const wchar_t* pString, int32_t* pUpdated)
 				return 0;
 			}
 
-			++iUpdated;
+			++updated;
 		}
 		else
 		{
@@ -165,10 +165,10 @@ int32_t XFontTexture::PreCacheString(const wchar_t* pString, int32_t* pUpdated)
 	}
 
 	if (pUpdated) {
-		*pUpdated = iUpdated;
+		*pUpdated = updated;
 	}
 
-	if (iUpdated) {
+	if (updated) {
 		return 1;
 	}
 

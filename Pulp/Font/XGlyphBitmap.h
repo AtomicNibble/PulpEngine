@@ -41,8 +41,8 @@ public:
 
 private:
 	uint8_t*	pBuffer_;
-	int32_t			width_;
-	int32_t			height_;
+	int32_t		width_;
+	int32_t		height_;
 };
 
 X_NAMESPACE_END
