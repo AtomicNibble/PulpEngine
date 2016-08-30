@@ -182,6 +182,72 @@ void X3DEngine::Update(void)
 	X_PROFILE_BEGIN("3DUpdate", core::ProfileSubSys::ENGINE3D);
 
 
+	// ok so lets dump out the primative context.
+	// I will need to have some sort of known time that it's 
+	// safe to start creating gpu commands for the context.
+	// since te
+
+	XCamera cam;
+	XViewPort viewPort;
+
+	render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, 0x1000 * 64);
+	cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
+	render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, 0x1000, cam, viewPort);
+
+
+	primBucket.appendRenderTarget(pRender_->getCurBackBuffer());
+
+	// we could populate this command bucket with a job for each primContext.
+	// and just shove the index at MSB of key to keep order.
+	size_t totalElems = 0;
+
+	for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++) 
+	{
+		auto& context = primContexts_[i];
+		if (!context.isEmpty()) 
+		{
+			const auto& elems = context.getUnsortedBuffer();
+
+			totalElems += elems.size();
+
+			render::VertexBufferHandle vertexBuf = 0;
+
+			const auto& front = elems.front();
+			uint32_t curFlags = front.flags;
+
+			render::Commands::Draw* pDraw = primBucket.addCommand<render::Commands::Draw>(curFlags, 0);
+			pDraw->startVertex = front.vertexOffs;
+			pDraw->vertexCount = front.numVertices;
+
+			for(size_t x=1; x< elems.size(); x++)
+			{
+				const auto& elem = elems[x];
+				uint32_t flags = elem.flags;
+
+				// while the flags don't change, we append.
+				if (flags == curFlags)
+				{
+					render::Commands::Draw* pChild = primBucket.appendCommand<render::Commands::Draw>(pDraw, 0);
+					pChild->startVertex = elem.vertexOffs;
+					pChild->vertexCount = elem.numVertices;
+					pChild->vertexBuffers[VertexStream::VERT] = vertexBuf;
+				}
+				else
+				{
+					pDraw = primBucket.addCommand<render::Commands::Draw>(flags, 0);
+					pDraw->startVertex = elem.vertexOffs;
+					pDraw->vertexCount = elem.numVertices;
+					pDraw->vertexBuffers[VertexStream::VERT] = vertexBuf;
+					// update flags.
+					curFlags = flags;
+				}
+			}
+		}
+	}
+
+	if (totalElems > 0) {
+		pRender_->submitCommandPackets(primBucket, render::Commands::Key::Type::PRIM);
+	}
 }
 
 IPrimativeContext* X3DEngine::getPrimContext(PrimContext::Enum user)
