@@ -92,15 +92,6 @@ build:x64_super:
     - windows
 
 
-build:maya_plugins:
-  stage: build
-  script:
-    - echo building...
-    - msbuild solutions/PulpEngine.sln /t:Tools\MayaExport /p:Configuration=Super_2013;Platform=x64
-  tags:
-    - windows
-  when: manual
-
 
 
 test:win32_debug:
