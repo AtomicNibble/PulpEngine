@@ -78,4 +78,15 @@
       <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="XFontRender.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="XFontTexture.inl">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="XGlyphCache.inl">
+      <Filter>Header Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>

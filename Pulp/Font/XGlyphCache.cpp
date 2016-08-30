@@ -6,7 +6,7 @@
 X_NAMESPACE_BEGIN(font)
 
 
-XGlyphCache::XGlyphCache() :
+XGlyphCache::XGlyphCache(core::MemoryArenaBase* arena) :
 
 iGlyphBitmapWidth_(0),
 iGlyphBitmapHeight_(0),
@@ -17,7 +17,10 @@ pScaleBitmap_(nullptr),
 uUsage_(0),
 
 iSmoothMethod_(0),
-iSmoothAmount_(0)
+iSmoothAmount_(0),
+
+SlotList_(arena),
+CacheTable_(arena, 8)
 {
 
 }
@@ -27,8 +30,8 @@ XGlyphCache::~XGlyphCache()
 
 }
 
-bool XGlyphCache::Create(int iCacheSize, int iGlyphBitmapWidth, int iGlyphBitmapHeight, 
-						int iSmoothMethod, int iSmoothAmount, float fSizeRatio)
+bool XGlyphCache::Create(int32_t iCacheSize, int32_t iGlyphBitmapWidth, int32_t iGlyphBitmapHeight,
+	int32_t iSmoothMethod, int32_t iSmoothAmount, float fSizeRatio)
 {
 	fSizeRatio_ = fSizeRatio;
 
@@ -44,8 +47,8 @@ bool XGlyphCache::Create(int iCacheSize, int iGlyphBitmapWidth, int iGlyphBitmap
 		return false;
 	}
 
-	int iScaledGlyphWidth = 0;
-	int iScaledGlyphHeight = 0;
+	int32_t iScaledGlyphWidth = 0;
+	int32_t iScaledGlyphHeight = 0;
 
 	switch (iSmoothAmount_)
 	{
@@ -71,7 +74,7 @@ bool XGlyphCache::Create(int iCacheSize, int iGlyphBitmapWidth, int iGlyphBitmap
 	// Scaled?
 	if (iScaledGlyphWidth)
 	{
-		pScaleBitmap_ = X_NEW(XGlyphBitmap, g_fontArena,"BitMap");
+		pScaleBitmap_ = X_NEW(XGlyphBitmap, arena_,"BitMap");
 
 		if (!pScaleBitmap_)
 		{
@@ -85,17 +88,17 @@ bool XGlyphCache::Create(int iCacheSize, int iGlyphBitmapWidth, int iGlyphBitmap
 			return false;
 		}
 
-		FontRenderer_.SetGlyphBitmapSize(iScaledGlyphWidth, iScaledGlyphHeight);
+		fontRenderer_.SetGlyphBitmapSize(iScaledGlyphWidth, iScaledGlyphHeight);
 	}
 	else
 	{
-		FontRenderer_.SetGlyphBitmapSize(32, 32);
+		fontRenderer_.SetGlyphBitmapSize(32, 32);
 	}
 
 	return true;
 }
 
-void XGlyphCache::Release()
+void XGlyphCache::Release(void)
 {
 	ReleaseSlotList();
 
@@ -105,7 +108,7 @@ void XGlyphCache::Release()
 	{
 		pScaleBitmap_->Release();
 
-		X_DELETE_AND_NULL(pScaleBitmap_, g_fontArena);
+		X_DELETE_AND_NULL(pScaleBitmap_, arena_);
 	}
 
 	iGlyphBitmapWidth_ = 0;
@@ -113,26 +116,24 @@ void XGlyphCache::Release()
 	fSizeRatio_ = 0.8f;
 }
 
-void XGlyphCache::ReleaseFont()
+void XGlyphCache::ReleaseFont(void)
 {
-	FontRenderer_.Release();
+	fontRenderer_.Release();
 }
 
-bool XGlyphCache::LoadFontFromMemory(unsigned char *pFileBuffer, size_t iDataSize)
+bool XGlyphCache::LoadFontFromMemory(uint8_t* pFileBuffer, size_t iDataSize)
 {
-	return FontRenderer_.LoadFromMemory(pFileBuffer, iDataSize);
+	return fontRenderer_.LoadFromMemory(pFileBuffer, iDataSize);
 }
 
 
-void XGlyphCache::GetGlyphBitmapSize(int *pWidth, int *pHeight) const
+void XGlyphCache::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
 {
-	if (pWidth)
-	{
+	if (pWidth) {
 		*pWidth = iGlyphBitmapWidth_;
 	}
 
-	if (pHeight)
-	{
+	if (pHeight) {
 		*pHeight = iGlyphBitmapHeight_;
 	}
 }
@@ -180,7 +181,7 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 
 		pScaleBitmap_->Clear();
 
-		if (!FontRenderer_.GetGlyph(pScaleBitmap_, &pSlot->iCharWidth, &pSlot->iCharHeight, 
+		if (!fontRenderer_.GetGlyph(pScaleBitmap_, &pSlot->iCharWidth, &pSlot->iCharHeight,
 				pSlot->iCharOffsetX, pSlot->iCharOffsetY, 0, 0, cChar))
 		{
 			// failed to render
@@ -202,7 +203,7 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 	}
 	else
 	{
-		if (!FontRenderer_.GetGlyph(&pSlot->pGlyphBitmap, &pSlot->iCharWidth, &pSlot->iCharHeight,
+		if (!fontRenderer_.GetGlyph(&pSlot->pGlyphBitmap, &pSlot->iCharWidth, &pSlot->iCharHeight,
 			pSlot->iCharOffsetX, pSlot->iCharOffsetY, 0, 0, cChar))
 		{
 			// failed to render
@@ -230,7 +231,7 @@ bool XGlyphCache::UnCacheGlyph(wchar_t cChar)
 	if (pItor != CacheTable_.end())
 	{
 		XCacheSlot *pSlot = pItor->second;
-		pSlot->Reset();
+		pSlot->reset();
 		CacheTable_.erase(pItor);
 		return true;
 	}
@@ -275,7 +276,7 @@ XCacheSlot* XGlyphCache::GetLRUSlot()
 
 //------------------------------------------------------------------------------------------------- 
 
-XCacheSlot* XGlyphCache::GetMRUSlot()
+XCacheSlot* XGlyphCache::GetMRUSlot(void)
 {
 	unsigned int	dwMaxUsage = 0;
 	XCacheSlot		*pMRUSlot = 0;
@@ -302,7 +303,8 @@ XCacheSlot* XGlyphCache::GetMRUSlot()
 
 //------------------------------------------------------------------------------------------------- 
 
-bool XGlyphCache::GetGlyph(XGlyphBitmap **pGlyph, int *piWidth, int *piHeight, char &iCharOffsetX, char &iCharOffsetY, wchar_t cChar)
+bool XGlyphCache::GetGlyph(XGlyphBitmap** pGlyph, int32_t* piWidth, int32_t* piHeight, 
+	int8_t& iCharOffsetX, int8_t& iCharOffsetY, wchar_t cChar)
 {
 	XCacheTable::iterator pItor = CacheTable_.find(cChar);
 
@@ -337,11 +339,11 @@ bool XGlyphCache::GetGlyph(XGlyphBitmap **pGlyph, int *piWidth, int *piHeight, c
 
 //------------------------------------------------------------------------------------------------- 
 
-bool XGlyphCache::CreateSlotList(int listSize)
+bool XGlyphCache::CreateSlotList(size_t listSize)
 {
-	for (int i = 0; i < listSize; i++)
+	for (size_t i = 0; i < listSize; i++)
 	{
-		XCacheSlot* pCacheSlot = X_NEW(XCacheSlot,g_fontArena, "GlyphCache");
+		XCacheSlot* pCacheSlot = X_NEW(XCacheSlot, arena_, "GlyphCache");
 
 		if (!pCacheSlot) {
 			return false;
@@ -349,11 +351,11 @@ bool XGlyphCache::CreateSlotList(int listSize)
 
 		if (!pCacheSlot->pGlyphBitmap.Create(iGlyphBitmapWidth_, iGlyphBitmapHeight_))
 		{
-			X_DELETE(pCacheSlot,g_fontArena);
+			X_DELETE(pCacheSlot, arena_);
 			return false;
 		}
 
-		pCacheSlot->Reset();
+		pCacheSlot->reset();
 		pCacheSlot->iCacheSlot = i;
 
 		SlotList_.push_back(pCacheSlot);
@@ -364,16 +366,20 @@ bool XGlyphCache::CreateSlotList(int listSize)
 
 //------------------------------------------------------------------------------------------------- 
 
-void XGlyphCache::ReleaseSlotList()
+void XGlyphCache::ReleaseSlotList(void)
 {
 	XCacheSlotListItor pItor = SlotList_.begin();
 
 	while (pItor != SlotList_.end())
 	{
-		(*pItor)->pGlyphBitmap.Release();
-		X_DELETE( (*pItor), g_fontArena);
-		pItor = SlotList_.erase(pItor);
+		XCacheSlot* pSlot = (*pItor);
+		++pItor;
+
+		pSlot->pGlyphBitmap.Release();
+		X_DELETE((*pItor), arena_);
 	}
+
+	SlotList_.free();
 }
 
 

@@ -24,7 +24,7 @@ XFontRender::~XFontRender()
 }
 
 
-bool XFontRender::Release()
+bool XFontRender::Release(void)
 {
 	FT_Done_Face(pFace_);
 	FT_Done_FreeType(pLibrary_);
@@ -68,14 +68,14 @@ bool XFontRender::LoadFromMemory(BYTE* pBuffer, size_t bufferLength)
 }
 
 
-void XFontRender::SetGlyphBitmapSize(int width, int height)
+void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height)
 {
 	iGlyphBitmapWidth_ = width;
 	iGlyphBitmapHeight_ = height;
 
-	int err = FT_Set_Pixel_Sizes(pFace_, 
-		(int)(iGlyphBitmapWidth_ * fSizeRatio_),
-		(int)(iGlyphBitmapHeight_ * fSizeRatio_));
+	const int32_t err = FT_Set_Pixel_Sizes(pFace_, 
+		static_cast<int32_t>(iGlyphBitmapWidth_ * fSizeRatio_),
+		static_cast<int32_t>(iGlyphBitmapHeight_ * fSizeRatio_));
 
 	if (err)
 	{
@@ -83,12 +83,14 @@ void XFontRender::SetGlyphBitmapSize(int width, int height)
 	}
 }
 
-void XFontRender::GetGlyphBitmapSize(int* pWidth, int* pHeight) const
+void XFontRender::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
 {
-	if (pWidth)
+	if (pWidth) {
 		*pWidth = iGlyphBitmapWidth_;
-	if (pHeight)
+	} 
+	if (pHeight) {
 		*pHeight = iGlyphBitmapHeight_;
+	}
 }
 
 
@@ -102,8 +104,8 @@ bool XFontRender::SetEncoding(FT_Encoding pEncoding)
 }
 
 
-bool	XFontRender::GetGlyph(XGlyphBitmap *pGlyphBitmap, uint8 *iGlyphWidth, uint8 *iGlyphHeight,
-		char &iCharOffsetX, char &iCharOffsetY, int iX, int iY, int iCharCode)
+bool XFontRender::GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8* pGlyphHeight,
+	int8_t& iCharOffsetX, int8_t& iCharOffsetY, int32_t iX, int32_t iY, int32_t iCharCode)
 { 
 	int iError = FT_Load_Char(pFace_, iCharCode, FT_LOAD_DEFAULT);
 
@@ -119,17 +121,17 @@ bool	XFontRender::GetGlyph(XGlyphBitmap *pGlyphBitmap, uint8 *iGlyphWidth, uint8
 		return false;
 	}
 
-	if (iGlyphWidth) {
-		*iGlyphWidth = safe_static_cast<uint8_t, int>(pGlyph_->bitmap.width);
+	if (pGlyphWidth) {
+		*pGlyphWidth = safe_static_cast<uint8_t, int32_t>(pGlyph_->bitmap.width);
 	}
-	if (iGlyphHeight) {
-		*iGlyphHeight = safe_static_cast<uint8_t, int>(pGlyph_->bitmap.rows);
+	if (pGlyphHeight) {
+		*pGlyphHeight = safe_static_cast<uint8_t, int32_t>(pGlyph_->bitmap.rows);
 	}
 
 //	int iTopOffset = (iGlyphBitmapHeight_ - (int)(iGlyphBitmapHeight_ * fSizeRatio_)) + pGlyph_->bitmap_top;
 
-	iCharOffsetX = (char)pGlyph_->bitmap_left;
-	iCharOffsetY = (char)((int)(iGlyphBitmapHeight_ * fSizeRatio_) - pGlyph_->bitmap_top);		// is that correct? - we need the baseline
+	iCharOffsetX = safe_static_cast<int8_t>(pGlyph_->bitmap_left);
+	iCharOffsetY = safe_static_cast<int8_t>(static_cast<uint32_t>(iGlyphBitmapHeight_ * fSizeRatio_) - pGlyph_->bitmap_top);		// is that correct? - we need the baseline
 
 	unsigned char* pBuffer = pGlyphBitmap->GetBuffer();
 	uint32 dwGlyphWidth = pGlyphBitmap->GetWidth();

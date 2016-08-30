@@ -49,10 +49,10 @@ struct XTextureSlot
 	float		vTexCoord[2];		// character position in the texture (not yet half texel corrected)
 	uint8		iCharWidth;			// size in pixel
 	uint8		iCharHeight;		// size in pixel
-	char		iCharOffsetX;
-	char		iCharOffsetY;
+	int8_t		iCharOffsetX;
+	int8_t		iCharOffsetY;
 
-	void Reset(void)
+	void reset(void)
 	{
 		wSlotUsage = 0;
 		cCurrentChar = static_cast<wchar_t>(~0);
@@ -62,19 +62,12 @@ struct XTextureSlot
 		iCharOffsetY = 0;
 	}
 
-	void SetNotReusable(void) { // this slot can't be reused for somthing else.
+	void setNotReusable(void) { // this slot can't be reused for somthing else.
 		wSlotUsage = 0xffff;
 	}
 
 };
 
-
-typedef core::Array<XTextureSlot *>								XTextureSlotList;
-typedef core::Array<XTextureSlot *>::Iterator					XTextureSlotListItor;
-
-typedef std::unordered_map<uint16, XTextureSlot *>					XTextureSlotTable;
-typedef std::unordered_map<uint16, XTextureSlot *>::iterator		XTextureSlotTableItor;
-typedef std::unordered_map<uint16, XTextureSlot *>::const_iterator	XTextureSlotTableItorConst;
 
 struct XCharCords
 {
@@ -86,8 +79,16 @@ struct XCharCords
 
 class XFontTexture
 {
+	typedef core::Array<XTextureSlot *>					XTextureSlotList;
+	typedef core::Array<XTextureSlot *>::Iterator		XTextureSlotListItor;
+
+	typedef core::HashMap<uint16, XTextureSlot *>		XTextureSlotTable;
+	typedef XTextureSlotTable::iterator					XTextureSlotTableItor;
+	typedef XTextureSlotTable::const_iterator			XTextureSlotTableItorConst;
+
+
 public:
-	XFontTexture();
+	XFontTexture(core::MemoryArenaBase* arena);
 	~XFontTexture();
 
 	int Release();
@@ -108,27 +109,27 @@ public:
 	void GetTextureCoord(XTextureSlot* pSlot, XCharCords& cords) const;
 
 
-	X_INLINE const Vec2i GetSize() const { return Vec2i(width_, height_); }
-	X_INLINE const int GetWidth() const { return width_; }
-	X_INLINE const int GetHeight() const{ return height_; }
-	X_INLINE uint8* GetBuffer() { return pBuffer_; }
+	X_INLINE const Vec2i GetSize(void) const;
+	X_INLINE const int GetWidth(void) const;
+	X_INLINE const int GetHeight(void) const;
+	X_INLINE uint8* GetBuffer(void);
 
-	X_INLINE float GetTextureCellWidth(void) const { return fTextureCellWidth_; }
-	X_INLINE float GetTextureCellHeight(void) const { return fTextureCellHeight_; }
+	X_INLINE float GetTextureCellWidth(void) const;
+	X_INLINE float GetTextureCellHeight(void) const;
 
-	X_INLINE int WidthCellCellCount(void) const { return iWidthCellCount_; }
-	X_INLINE int HeightCellCount(void) const { return iHeightCellCount_; }
+	X_INLINE int WidthCellCellCount(void) const;
+	X_INLINE int HeightCellCount(void) const;
 
-	X_INLINE int GetSlotUsage(void) { return wSlotUsage_; }
+	X_INLINE int GetSlotUsage(void);
 
 	// useful for special feature rendering interleaved with fonts (e.g. box behind the text)
-	void CreateGradientSlot();
+	void CreateGradientSlot(void);
 
 	wchar_t GetSlotChar(int slot) const;
 	XTextureSlot* GetCharSlot(wchar_t cChar);
-	XTextureSlot* GetGradientSlot();
-	XTextureSlot* GetLRUSlot();
-	XTextureSlot* GetMRUSlot();
+	XTextureSlot* GetGradientSlot(void);
+	XTextureSlot* GetLRUSlot(void);
+	XTextureSlot* GetMRUSlot(void);
 
 public:
 	// writes the texture to a file.
@@ -162,14 +163,16 @@ private:
 	int			iSmoothMethod_;
 	int			iSmoothAmount_;
 
-	XGlyphCache			GlyphCache_;
-	XTextureSlotList	pSlotList_;
-	XTextureSlotTable	pSlotTable_;
+	XGlyphCache			glyphCache_;
+	XTextureSlotList	slotList_;
+	XTextureSlotTable	slotTable_;
 
 	uint16				wSlotUsage_;
 };
 
 
 X_NAMESPACE_END
+
+#include "XFontTexture.inl"
 
 #endif // !_X_FONT_TEXTURE_H_

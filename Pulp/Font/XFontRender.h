@@ -32,20 +32,20 @@ public:
 	~XFontRender();
 
 	bool LoadFromMemory(BYTE* pBuffer, size_t bufferLength);
-	bool Release(); 
+	bool Release(void); 
 
-	bool GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* iGlyphWidth, uint8* iGlyphHeight, 
-		char &iCharOffsetX, char &iCharOffsetY, int iX, int iY, int iCharCode);
+	bool GetGlyph(XGlyphBitmap* pGlyphBitmap, uint8* pGlyphWidth, uint8* pGlyphHeight, 
+		int8_t& iCharOffsetX, int8_t& iCharOffsetY, int32_t iX, int32_t iY, int32_t iCharCode);
 
 	// scale the glyphs.
-	X_INLINE void			SetSizeRatio(float fSizeRatio) { fSizeRatio_ = fSizeRatio; };
-	X_INLINE float			GetSizeRatio() const { return fSizeRatio_; };
+	X_INLINE void SetSizeRatio(float fSizeRatio);
+	X_INLINE float GetSizeRatio(void) const;
 	
-	bool					SetEncoding(FT_Encoding pEncoding);
-	X_INLINE FT_Encoding	GetEncoding() const { return pEncoding_; };
+	bool SetEncoding(FT_Encoding pEncoding);
+	X_INLINE FT_Encoding GetEncoding(void) const;
 
-	void					SetGlyphBitmapSize(int iWidth, int iHeight);
-	void					GetGlyphBitmapSize(int* pWidth, int* pHeight) const;
+	void SetGlyphBitmapSize(int32_t iWidth, int32_t iHeight);
+	void GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const;
 
 
 private:
@@ -56,11 +56,13 @@ private:
 
 	float			fSizeRatio_;
 
-	int				iGlyphBitmapWidth_;
-	int				iGlyphBitmapHeight_;
+	int32_t			iGlyphBitmapWidth_;
+	int32_t			iGlyphBitmapHeight_;
 };
 
 
 X_NAMESPACE_END
+
+#include "XFontRender.inl"
 
 #endif // !_X_FONT_RENDER_H_

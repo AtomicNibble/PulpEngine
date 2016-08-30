@@ -5,7 +5,7 @@
 
 X_NAMESPACE_BEGIN(font)
 
-XFontTexture::XFontTexture() :
+XFontTexture::XFontTexture(core::MemoryArenaBase* arena) :
 width_(0),
 height_(0),
 pBuffer_(nullptr),
@@ -29,7 +29,9 @@ iSmoothAmount_(0),
 
 wSlotUsage_(1), // space for gradiant.
 
-pSlotList_(g_fontArena)
+glyphCache_(arena),
+slotList_(arena),
+slotTable_(arena)
 {
 
 }
@@ -50,7 +52,7 @@ int XFontTexture::Release()
 
 	ReleaseSlotList();
 
-	GlyphCache_.Release();
+	glyphCache_.Release();
 
 	return 1;
 }
@@ -59,15 +61,16 @@ bool XFontTexture::CreateFromMemory(BYTE* pFileData, size_t dataLength, int iWid
 	int iHeight, int iSmoothMethod, int iSmoothAmount,
 	float fSizeRatio, int iWidthCharCount, int iHeightCharCount)
 {
-	if (!GlyphCache_.LoadFontFromMemory(pFileData, dataLength))
+	if (!glyphCache_.LoadFontFromMemory(pFileData, dataLength))
 	{
 		Release();
 		return false;
 	}
 
-	if (!Create(iWidth, iHeight, iSmoothMethod, iSmoothAmount, 
-		fSizeRatio, iWidthCharCount, iHeightCharCount))
+	if (!Create(iWidth, iHeight, iSmoothMethod, iSmoothAmount,
+		fSizeRatio, iWidthCharCount, iHeightCharCount)) {
 		return false;
+	}
 
 	return true;
 }
@@ -76,15 +79,16 @@ bool XFontTexture::Create(int iWidth, int iHeight, int iSmoothMethod, int iSmoot
 	float fSizeRatio, int iWidthCellCount, int iHeightCellCount)
 {
 	pBuffer_ = X_NEW_ARRAY(uint8, iWidth * iHeight, g_fontArena, "fontTexture");
-	if (!pBuffer_)
+	if (!pBuffer_) {
 		return false;
+	}
 
-	memset(pBuffer_, 0, iWidth * iHeight * sizeof(uint8));
+	std::memset(pBuffer_, 0, iWidth * iHeight * sizeof(uint8));
 	
 	width_ = iWidth;
 	height_ = iHeight;
-	fInvWidth_ = 1.0f / (float)iWidth;
-	fInvHeight_ = 1.0f / (float)iHeight;
+	fInvWidth_ = 1.0f / static_cast<float>(iWidth);
+	fInvHeight_ = 1.0f / static_cast<float>(iHeight);
 
 	iWidthCellCount_ = iWidthCellCount;
 	iHeightCellCount_ = iHeightCellCount;
@@ -106,7 +110,7 @@ bool XFontTexture::Create(int iWidth, int iHeight, int iSmoothMethod, int iSmoot
 	fTextureCellHeight_ = iCellHeight_ * fInvHeight_;
 
 	
-	if (!GlyphCache_.Create(X_FONT_GLYPH_CACHE_SIZE, 
+	if (!glyphCache_.Create(X_FONT_GLYPH_CACHE_SIZE,
 		iCellWidth_, iCellHeight_, 
 		iSmoothMethod_, iSmoothAmount_, 
 		fSizeRatio))
@@ -128,10 +132,10 @@ bool XFontTexture::Create(int iWidth, int iHeight, int iSmoothMethod, int iSmoot
 int XFontTexture::PreCacheString(const wchar_t* szString, int* pUpdated)
 {
 	uint16 wSlotUsage = wSlotUsage_++;
-	int iLength = (int)wcslen(szString);
-	int iUpdated = 0;
+	size_t length = core::strUtil::strlen(szString);
+	size_t iUpdated = 0;
 
-	for (int i = 0; i < iLength; i++)
+	for (size_t i = 0; i < length; i++)
 	{
 		wchar_t cChar = szString[i];
 
@@ -141,11 +145,13 @@ int XFontTexture::PreCacheString(const wchar_t* szString, int* pUpdated)
 		{
 			pSlot = GetLRUSlot();
 
-			if (!pSlot)
+			if (!pSlot) {
 				return 0;
+			}
 
-			if (!UpdateSlot(pSlot->iTextureSlot, wSlotUsage, cChar))
+			if (!UpdateSlot(pSlot->iTextureSlot, wSlotUsage, cChar)) {
 				return 0;
+			}
 
 			++iUpdated;
 		}
@@ -155,11 +161,13 @@ int XFontTexture::PreCacheString(const wchar_t* szString, int* pUpdated)
 		}
 	}
 
-	if (pUpdated)
+	if (pUpdated) {
 		*pUpdated = iUpdated;
+	}
 
-	if (iUpdated)
+	if (iUpdated) {
 		return 1;
+	}
 
 	return 2;
 }
@@ -167,16 +175,17 @@ int XFontTexture::PreCacheString(const wchar_t* szString, int* pUpdated)
 //-------------------------------------------------------------------------------------------------
 wchar_t XFontTexture::GetSlotChar(int slot) const
 {
-	return pSlotList_[slot]->cCurrentChar;
+	return slotList_[slot]->cCurrentChar;
 }
 
 //-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetCharSlot(wchar_t cChar)
 {
-	XTextureSlotTableItor pItor = pSlotTable_.find(cChar);
+	XTextureSlotTableItor pItor = slotTable_.find(cChar);
 
-	if (pItor != pSlotTable_.end())
+	if (pItor != slotTable_.end()) {
 		return pItor->second;
+	}
 
 	return nullptr;
 }
@@ -184,19 +193,19 @@ XTextureSlot* XFontTexture::GetCharSlot(wchar_t cChar)
 //-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetGradientSlot()
 {
-	return pSlotList_[0];
+	return slotList_[0];
 }
 
 //-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetLRUSlot()
 {
 	uint16 wMinSlotUsage = 0xffff;
-	XTextureSlot	*pLRUSlot = 0;
-	XTextureSlot	*pSlot;
+	XTextureSlot* pLRUSlot = nullptr;
+	XTextureSlot* pSlot;
 
-	XTextureSlotListItor pItor = pSlotList_.begin();
+	XTextureSlotListItor pItor = slotList_.begin();
 
-	while (pItor != pSlotList_.end())
+	while (pItor != slotList_.end())
 	{
 		pSlot = *pItor;
 
@@ -226,9 +235,9 @@ XTextureSlot *XFontTexture::GetMRUSlot()
 	XTextureSlot *pMRUSlot = 0;
 	XTextureSlot *pSlot;
 
-	XTextureSlotListItor pItor = pSlotList_.begin();
+	XTextureSlotListItor pItor = slotList_.begin();
 
-	while (pItor != pSlotList_.end())
+	while (pItor != slotList_.end())
 	{
 		pSlot = *pItor;
 
@@ -250,59 +259,62 @@ XTextureSlot *XFontTexture::GetMRUSlot()
 
 int XFontTexture::CreateSlotList(int iListSize)
 {
-	int y, x;
+	int32_t y, x;
 
 	for (int i = 0; i < iListSize; i++)
 	{
-		XTextureSlot *pTextureSlot = X_NEW(XTextureSlot, g_fontArena,"fontTexSlot");
+		XTextureSlot* pTextureSlot = X_NEW(XTextureSlot, g_fontArena,"fontTexSlot");
 
-		if (!pTextureSlot)
+		if (!pTextureSlot) {
 			return 0;
+		}
 
 		pTextureSlot->iTextureSlot = i;
-		pTextureSlot->Reset();
+		pTextureSlot->reset();
 
 		y = i / iWidthCellCount_;
 		x = i % iWidthCellCount_;
 
-		pTextureSlot->vTexCoord[0] = (float)(x * fTextureCellWidth_) + (0.5f / (float)width_);
-		pTextureSlot->vTexCoord[1] = (float)(y * fTextureCellHeight_) + (0.5f / (float)height_);
+		pTextureSlot->vTexCoord[0] = static_cast<float>((x * fTextureCellWidth_) + (0.5f / static_cast<float>(width_)));
+		pTextureSlot->vTexCoord[1] = static_cast<float>((y * fTextureCellHeight_) + (0.5f / static_cast<float>(height_)));
 
 		// TODO: crashes in super dynamic x64 O.o
-		pSlotList_.push_back(pTextureSlot);
+		slotList_.push_back(pTextureSlot);
 	}
 
 	return 1;
 }
 
 //-------------------------------------------------------------------------------------------------
-int XFontTexture::ReleaseSlotList()
+int XFontTexture::ReleaseSlotList(void)
 {
-	XTextureSlotListItor pItor = pSlotList_.begin();
+	XTextureSlotListItor pItor = slotList_.begin();
 
-	for (; pItor != pSlotList_.end(); ++pItor)
+	for (; pItor != slotList_.end(); ++pItor)
 	{
 		X_DELETE((*pItor), g_fontArena);
 	}
 
-	pSlotList_.free();
+	slotList_.free();
 	return 1;
 }
 
 //-------------------------------------------------------------------------------------------------
 int XFontTexture::UpdateSlot(int iSlot, uint16 wSlotUsage, wchar_t cChar)
 {
-	XTextureSlot *pSlot = pSlotList_[iSlot];
+	XTextureSlot* pSlot = slotList_[iSlot];
 
-	if (!pSlot)
+	if (!pSlot) {
 		return 0;
+	}
 
-	XTextureSlotTableItor pItor = pSlotTable_.find(pSlot->cCurrentChar);
+	XTextureSlotTableItor pItor = slotTable_.find(pSlot->cCurrentChar);
 
-	if (pItor != pSlotTable_.end())
-		pSlotTable_.erase(pItor);
+	if (pItor != slotTable_.end()) {
+		slotTable_.erase(pItor);
+	}
 
-	pSlotTable_.insert(std::pair<wchar_t, XTextureSlot*>(cChar, pSlot));
+	slotTable_.insert(std::pair<wchar_t, XTextureSlot*>(cChar, pSlot));
 
 	pSlot->wSlotUsage = wSlotUsage;
 	pSlot->cCurrentChar = cChar;
@@ -311,16 +323,17 @@ int XFontTexture::UpdateSlot(int iSlot, uint16 wSlotUsage, wchar_t cChar)
 	int iHeight = 0;
 
 	// blit the char glyph into the texture
-	int x = pSlot->iTextureSlot % iWidthCellCount_;
-	int y = pSlot->iTextureSlot / iWidthCellCount_;
+	const int32_t x = pSlot->iTextureSlot % iWidthCellCount_;
+	const int32_t y = pSlot->iTextureSlot / iWidthCellCount_;
 
 	XGlyphBitmap *pGlyphBitmap;
 
-	if (!GlyphCache_.GetGlyph(&pGlyphBitmap, 
-		&iWidth, &iHeight, 
-		pSlot->iCharOffsetX, pSlot->iCharOffsetY, 
-		cChar))
+	if (!glyphCache_.GetGlyph(&pGlyphBitmap,
+		&iWidth, &iHeight,
+		pSlot->iCharOffsetX, pSlot->iCharOffsetY,
+		cChar)) {
 		return 0;
+	}
 
 	pSlot->iCharWidth = safe_static_cast<uint8_t, int>(iWidth);
 	pSlot->iCharHeight = safe_static_cast<uint8_t, int>(iHeight);
@@ -341,13 +354,13 @@ void XFontTexture::CreateGradientSlot()
 	// 0 needs to be unused spot
 	X_ASSERT(pSlot->cCurrentChar == (uint16)~0, "slot idx zero needs to be empty")();		
 
-	pSlot->Reset();
-	pSlot->iCharWidth = safe_static_cast<uint8_t, int>(iCellWidth_ - 2);
-	pSlot->iCharHeight = safe_static_cast<uint8_t, int>(iCellHeight_ - 2);
-	pSlot->SetNotReusable();
+	pSlot->reset();
+	pSlot->iCharWidth = safe_static_cast<uint8_t, int32_t>(iCellWidth_ - 2);
+	pSlot->iCharHeight = safe_static_cast<uint8_t, int32_t>(iCellHeight_ - 2);
+	pSlot->setNotReusable();
 
-	int x = pSlot->iTextureSlot % iWidthCellCount_;
-	int y = pSlot->iTextureSlot / iWidthCellCount_;
+	const int32_t x = pSlot->iTextureSlot % iWidthCellCount_;
+	const int32_t y = pSlot->iTextureSlot / iWidthCellCount_;
 
 	uint8* pBuffer = &pBuffer_[x*iCellWidth_ + y*iCellHeight_*height_];
 
@@ -428,10 +441,11 @@ bool XFontTexture::WriteToFile(const char* filename)
 
 int XFontTexture::GetCharacterWidth(wchar_t cChar) const
 {
-	XTextureSlotTableItorConst pItor = pSlotTable_.find(cChar);
+	XTextureSlotTableItorConst pItor = slotTable_.find(cChar);
 
-	if (pItor == pSlotTable_.end())
+	if (pItor == slotTable_.end()) {
 		return 0;
+	}
 
 	const XTextureSlot &rSlot = *pItor->second;
 
@@ -440,19 +454,20 @@ int XFontTexture::GetCharacterWidth(wchar_t cChar) const
 
 void XFontTexture::GetTextureCoord(XTextureSlot* pSlot, XCharCords& cords) const
 {
-	if (!pSlot)
+	if (!pSlot) {
 		return;	// expected behavior
+	}
 
-	int iChWidth = pSlot->iCharWidth;
-	int iChHeight = pSlot->iCharHeight;
-	float slotCoord0 = pSlot->vTexCoord[0];
-	float slotCoord1 = pSlot->vTexCoord[1];
+	const int32_t iChWidth = pSlot->iCharWidth;
+	const int32_t iChHeight = pSlot->iCharHeight;
+	const float slotCoord0 = pSlot->vTexCoord[0];
+	const float slotCoord1 = pSlot->vTexCoord[1];
 
 
 	cords.texCoords[0] = slotCoord0 - fInvWidth_;		// extra pixel for nicer bilinear filter
 	cords.texCoords[1] = slotCoord1 - fInvHeight_;		// extra pixel for nicer bilinear filter
-	cords.texCoords[2] = slotCoord0 + (float)iChWidth * fInvWidth_;
-	cords.texCoords[3] = slotCoord1 + (float)iChHeight * fInvHeight_;
+	cords.texCoords[2] = slotCoord0 + static_cast<float>(iChWidth * fInvWidth_);
+	cords.texCoords[3] = slotCoord1 + static_cast<float>(iChHeight * fInvHeight_);
 
 	cords.size[0] = iChWidth + 1;		// extra pixel for nicer bilinear filter
 	cords.size[1] = iChHeight + 1;		// extra pixel for nicer bilinear filter

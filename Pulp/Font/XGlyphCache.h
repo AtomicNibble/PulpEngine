@@ -3,8 +3,6 @@
 #ifndef _X_FONT_GLYPH_CACHE_H_
 #define _X_FONT_GLYPH_CACHE_H_
 
-#include <vector>
-#include <unordered_map>
 
 #include "XGlyphBitmap.h"
 #include "XFontRender.h"
@@ -23,14 +21,14 @@ struct XCacheSlot
 	int				iCacheSlot;
 	wchar_t			cCurrentChar;
 
-	uint8			iCharWidth;					// size in pixel
-	uint8			iCharHeight;				// size in pixel
-	char			iCharOffsetX;
-	char			iCharOffsetY;
+	uint8_t			iCharWidth;					// size in pixel
+	uint8_t			iCharHeight;				// size in pixel
+	int8_t			iCharOffsetX;
+	int8_t			iCharOffsetY;
 
 	XGlyphBitmap	pGlyphBitmap;
 
-	void			Reset()
+	void reset(void)
 	{
 		uUsage = 0;
 		cCurrentChar = static_cast<wchar_t>(~0);
@@ -45,11 +43,6 @@ struct XCacheSlot
 };
 
 
-typedef std::unordered_map<uint16, XCacheSlot *>	XCacheTable;
-typedef std::vector<XCacheSlot *>					XCacheSlotList;
-typedef std::vector<XCacheSlot *>::iterator			XCacheSlotListItor;
-
-
 #ifdef WIN64
 #undef GetCharWidth
 #undef GetCharHeight
@@ -57,53 +50,63 @@ typedef std::vector<XCacheSlot *>::iterator			XCacheSlotListItor;
 
 class XGlyphCache
 {
+	typedef core::HashMap<uint16, XCacheSlot *>			XCacheTable;
+	typedef core::Array<XCacheSlot *>					XCacheSlotList;
+	typedef core::Array<XCacheSlot *>::Iterator			XCacheSlotListItor;
+
+
 public:
-	XGlyphCache();
+	XGlyphCache(core::MemoryArenaBase* arena);
 	~XGlyphCache();
 
-	bool Create(int iCacheSize, int iGlyphBitmapWidth, int iGlyphBitmapHeight, int iSmoothMethod, int iSmoothAmount, float fSizeRatio = 0.8f);
-	void Release();
+	bool Create(int32_t iCacheSize, int32_t iGlyphBitmapWidth, int32_t iGlyphBitmapHeight,
+		int32_t iSmoothMethod, int32_t iSmoothAmount, float fSizeRatio = 0.8f);
+	void Release(void);
 
-	bool LoadFontFromMemory(unsigned char *pFileBuffer, size_t iDataSize);
-	void ReleaseFont();
+	bool LoadFontFromMemory(uint8_t* pFileBuffer, size_t iDataSize);
+	void ReleaseFont(void);
 
-	void GetGlyphBitmapSize(int *pWidth, int *pHeight) const;
+	void GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const;
 
 	bool PreCacheGlyph(wchar_t cChar);
 	bool UnCacheGlyph(wchar_t cChar);
 	bool GlyphCached(wchar_t cChar);
 
-	XCacheSlot* GetLRUSlot();
-	XCacheSlot* GetMRUSlot();
+	XCacheSlot* GetLRUSlot(void);
+	XCacheSlot* GetMRUSlot(void);
 
-	bool GetGlyph(XGlyphBitmap **pGlyph, int *piWidth, int *piHeight,
-				char &iCharOffsetX, char &iCharOffsetY, wchar_t cChar);
+	bool GetGlyph(XGlyphBitmap** pGlyph, int32_t* piWidth, int32_t* piHeight,
+		int8_t& iCharOffsetX, int8_t& iCharOffsetY, wchar_t cChar);
 
 
-	X_INLINE int SetEncoding(FT_Encoding pEncoding) { return FontRenderer_.SetEncoding(pEncoding); };
-	X_INLINE FT_Encoding GetEncoding() const { return FontRenderer_.GetEncoding(); };
-
-private:
-	bool			CreateSlotList(int listSize);
-	void			ReleaseSlotList();
+	X_INLINE int SetEncoding(FT_Encoding pEncoding);
+	X_INLINE FT_Encoding GetEncoding(void) const;
 
 private:
-	int				iGlyphBitmapWidth_;
-	int				iGlyphBitmapHeight_;
+	bool			CreateSlotList(size_t listSize);
+	void			ReleaseSlotList(void);
+
+private:
+	core::MemoryArenaBase* arena_;
+
+	int32_t			iGlyphBitmapWidth_;
+	int32_t			iGlyphBitmapHeight_;
 	float			fSizeRatio_;
 
 	XCacheSlotList	SlotList_;
 	XCacheTable		CacheTable_;
 
-	XGlyphBitmap	*pScaleBitmap_;
-	XFontRender		FontRenderer_;
+	XGlyphBitmap*	pScaleBitmap_;
+	XFontRender		fontRenderer_;
 
 	uint32_t		uUsage_;
 
-	int				iSmoothMethod_;
-	int				iSmoothAmount_;
+	int32_t			iSmoothMethod_;
+	int32_t			iSmoothAmount_;
 };
 
 X_NAMESPACE_END
+
+#include "XGlyphCache.inl"
 
 #endif // !_X_FONT_GLYPH_CACHE_H_

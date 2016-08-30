@@ -15,10 +15,6 @@ X_NAMESPACE_BEGIN(font)
 
 namespace
 {
-	static const int FONT_QUAD_BUFFER_SIZE = 6 * 64;
-	static const float FONT_SPACE_SIZE = 0.2f;
-	static const float FONT_GLYPH_PROP_SPACING = 1.f;
-	static const int FONT_TAB_CHAR_NUM = 4;
 
 	Color8u g_ColorTable[10] = {
 		Color8u(0, 0, 0),			// ^0 black
@@ -32,17 +28,11 @@ namespace
 		Color8u(0, 255, 0),			// ^8 green
 		Color8u(255, 0, 255)
 	};
-}
+} // namespace
 
-void ByteToWide(const char* pStr, wchar_t* pOut, const size_t buflen)
-{
-	size_t len = core::Min<size_t>(buflen, strlen(pStr));
+const float XFFont::FONT_SPACE_SIZE = 0.2f;
+const float XFFont::FONT_GLYPH_PROP_SPACING = 1.f;
 
-	for (size_t i = 0; i < len; ++i) {
-		pOut[i] = (uint8_t)pStr[i];
-	}
-	pOut[len] = 0;
-}
 
 XFFont::XFFont(ICore* pCore, XFont* pXFont, const char* pFontName) :
 	pCore_(pCore),
@@ -111,8 +101,8 @@ bool XFFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 	size_t len = 0;
 
 	unsigned int flags = 0;
-	int iSmoothMethod = (flags & TTFFLAG_SMOOTH_MASK) >> TTFFLAG_SMOOTH_SHIFT;
-	int iSmoothAmount = (flags & TTFFLAG_SMOOTH_AMOUNT_MASK) >> TTFFLAG_SMOOTH_AMOUNT_SHIFT;
+	const int32_t iSmoothMethod = (flags & TTFFLAG_SMOOTH_MASK) >> TTFFLAG_SMOOTH_SHIFT;
+	const int32_t iSmoothAmount = (flags & TTFFLAG_SMOOTH_AMOUNT_MASK) >> TTFFLAG_SMOOTH_AMOUNT_SHIFT;
 
 	if (!pFilePath) {
 		return false;
@@ -139,7 +129,7 @@ bool XFFont::loadTTF(const char* pFilePath, uint32_t width, uint32_t height)
 	}
 
 	if (!pFontTexture_) {
-		pFontTexture_ = X_NEW(XFontTexture, g_fontArena, "FontTexture");
+		pFontTexture_ = X_NEW(XFontTexture, g_fontArena, "FontTexture")(g_fontArena);
 	}
 
 	if (!pFontTexture_->CreateFromMemory(pBuffer, len, width, height, iSmoothMethod, iSmoothAmount)) {
@@ -257,8 +247,8 @@ void XFFont::GetGradientTextureCoord(float& minU, float& minV, float& maxU, floa
 	const XTextureSlot* pSlot = pFontTexture_->GetGradientSlot();
 	X_ASSERT_NOT_NULL(pSlot);
 
-	float invWidth = 1.0f / static_cast<float>(pFontTexture_->GetWidth());
-	float invHeight = 1.0f / static_cast<float>(pFontTexture_->GetHeight());
+	const float invWidth = 1.0f / static_cast<float>(pFontTexture_->GetWidth());
+	const float invHeight = 1.0f / static_cast<float>(pFontTexture_->GetHeight());
 
 	// deflate by one pixel to avoid bilinear filtering on the borders
 	minU = pSlot->vTexCoord[0] + invWidth;
@@ -509,7 +499,7 @@ size_t XFFont::GetTextLengthW(const wchar_t* pStr, const bool asciiMultiLine) co
 	return size;
 }
 
-bool XFFont::InitCache()
+bool XFFont::InitCache(void)
 {
 	pFontTexture_->CreateGradientSlot();
 
@@ -840,11 +830,11 @@ void XFFont::RenderCallback(const Vec3f& pos, const wchar_t* pStr, const XTextDr
 }
 
 
-bool XFFont::InitTexture()
+bool XFFont::InitTexture(void)
 {
 	texID_ = gEnv->pRender->FontCreateTexture(
 		pFontTexture_->GetSize(), 
-		(BYTE*)pFontTexture_->GetBuffer(), 
+		pFontTexture_->GetBuffer(), 
 		texture::Texturefmt::A8);
 
 	if (texID_ <= 0) {
@@ -854,5 +844,15 @@ bool XFFont::InitTexture()
 	return texID_ >= 0;
 }
 
+
+void XFFont::ByteToWide(const char* pStr, wchar_t* pOut, const size_t buflen)
+{
+	const size_t len = core::Min<size_t>(buflen, strlen(pStr));
+
+	for (size_t i = 0; i < len; ++i) {
+		pOut[i] = static_cast<uint8_t>(pStr[i]);
+	}
+	pOut[len] = 0;
+}
 
 X_NAMESPACE_END

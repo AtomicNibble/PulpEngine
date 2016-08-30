@@ -21,6 +21,12 @@ public:
 
 	static const size_t MAX_TXT_SIZE = 1024;
 	static const size_t MAX_FONT_PASS = 4;
+	static const int32_t FONT_QUAD_BUFFER_SIZE = 6 * 64;
+	static const int32_t FONT_TAB_CHAR_NUM = 4;
+	static const float FONT_SPACE_SIZE;
+	static const float FONT_GLYPH_PROP_SPACING;
+
+
 public:
 	XFFont(ICore* pCore, XFont* pXFont, const char* pFontName);
 	~XFFont();
@@ -46,7 +52,7 @@ public:
 	virtual void FreeTexture(void) X_OVERRIDE;
 
 //	virtual bool loadTTF(const char* pFilePath, uint32_t width, uint32_t height) X_OVERRIDE;
-	virtual bool loadFont() X_OVERRIDE;
+	virtual bool loadFont(void) X_OVERRIDE;
 
 	virtual void DrawString(const Vec2f& pos, const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
 	virtual void DrawString(float x, float y, const char* pStr, const XTextDrawConect& contex) X_OVERRIDE;
@@ -78,12 +84,15 @@ private:
 	void DrawStringWInternal(const Vec3f& pos, const wchar_t* pStr, const XTextDrawConect& contex);
 	Vec2f GetTextSizeWInternal(const wchar_t* pStr, const XTextDrawConect& contex);
 
-	bool InitTexture();
-	bool InitCache();
+	bool InitTexture(void);
+	bool InitCache(void);
 	void Prepare(const wchar_t* pStr, bool updateTexture);
 	void Reload(void);
 
 	bool loadTTF(const char* pFilePath, uint32_t width, uint32_t height);
+
+private:
+	static void ByteToWide(const char* pStr, wchar_t* pOut, const size_t buflen);
 
 
 private:
