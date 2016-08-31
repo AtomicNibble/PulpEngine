@@ -257,8 +257,7 @@ bool AssetServer::Client::listen(void)
 
 bool AssetServer::Client::readRequest(ProtoBuf::AssetDB::Request& request)
 {
-	const size_t bufLength = 0x200;
-	uint8_t buffer[bufLength];
+	uint8_t buffer[BUF_LENGTH];
 
 	size_t bytesRead;
 	bool cleanEof;
@@ -312,14 +311,13 @@ bool AssetServer::Client::readBuf(core::Array<uint8_t>& buf, size_t size)
 
 bool AssetServer::Client::sendRequestFail(std::string& errMsg)
 {
-	const size_t bufLength = 0x200;
-	uint8_t buffer[bufLength];
+	uint8_t buffer[BUF_LENGTH];
 
 	ProtoBuf::AssetDB::Reponse response;
 	response.set_error(errMsg);
 	response.set_result(ProtoBuf::AssetDB::Reponse_Result_ERROR);
 
-	google::protobuf::io::ArrayOutputStream arrayOutput(buffer, bufLength);
+	google::protobuf::io::ArrayOutputStream arrayOutput(buffer, BUF_LENGTH);
 	if (!WriteDelimitedTo(response, &arrayOutput)) {
 		X_ERROR("AssetServer", "Failed to create response msg");
 		return false;
@@ -330,14 +328,13 @@ bool AssetServer::Client::sendRequestFail(std::string& errMsg)
 
 bool AssetServer::Client::sendRequestOk(ProtoBuf::AssetDB::Reponse_Result res)
 {
-	const size_t bufLength = 0x200;
-	uint8_t buffer[bufLength];
+	uint8_t buffer[BUF_LENGTH];
 
 	ProtoBuf::AssetDB::Reponse response;
 	response.set_error("");
 	response.set_result(res);
 
-	google::protobuf::io::ArrayOutputStream arrayOutput(buffer, bufLength);
+	google::protobuf::io::ArrayOutputStream arrayOutput(buffer, BUF_LENGTH);
 	if (!WriteDelimitedTo(response, &arrayOutput)) {
 		X_ERROR("AssetServer", "Failed to create response msg");
 		return false;

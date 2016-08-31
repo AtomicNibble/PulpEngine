@@ -25,6 +25,9 @@ X_NAMESPACE_BEGIN(assetServer)
 
 class AssetServer : public core::ThreadAbstract
 {
+	// used for reading / writing msg's
+	static const size_t BUF_LENGTH = 0x200;
+
 	class Client
 	{
 	public:
