@@ -525,6 +525,9 @@ AssetDB::Result::Enum AssetDB::DeleteAsset(AssetType::Enum type, const core::str
 		return Result::HAS_REFS; // technically it has refs by been a parent, so reuse this and who ever gets the error should just work it out.
 	}
 
+	// If we are a child, it don't matter currently
+	// as the child stores the link, not the parent.
+
 	sql::SqlLiteTransaction trans(db_);
 	sql::SqlLiteCmd cmd(db_, "DELETE FROM file_ids WHERE file_id = ? AND type = ? AND name = ?");
 	cmd.bind(1, assetId); // make sure it's same one we found above.
