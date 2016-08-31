@@ -513,9 +513,16 @@ AssetDB::Result::Enum AssetDB::DeleteAsset(AssetType::Enum type, const core::str
 	}
 
 	if (numRefs > 0) {
-		X_ERROR("AssetDB", "Failed to delete asset: %s:%s %" PRIu32 " assets are referencing it"
-			, AssetType::ToString(type), name.c_str(), numRefs);
+		X_ERROR("AssetDB", "Failed to delete asset: %s:%s %" PRIu32 " assets are referencing it", 
+			AssetType::ToString(type), name.c_str(), numRefs);
 		return Result::HAS_REFS;
+	}
+
+	// are we a parent?
+	if (AssetIsParent(assetId)) {
+		X_ERROR("AssetDB", "Failed to delete asset: %s:%s %" PRIu32 " it has child assets",
+			AssetType::ToString(type), name.c_str());
+		return Result::HAS_REFS; // technically it has refs by been a parent, so reuse this and who ever gets the error should just work it out.
 	}
 
 	sql::SqlLiteTransaction trans(db_);
