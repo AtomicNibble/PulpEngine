@@ -497,10 +497,30 @@ AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string
 
 AssetDB::Result::Enum AssetDB::DeleteAsset(AssetType::Enum type, const core::string& name)
 {
+	int32_t assetId;
+	if (AssetExsists(type, name, &assetId)) {
+		X_ERROR("AssetDB", "Failed to delete asset: %s:%s it does not exist", AssetType::ToString(type), name.c_str());
+		return Result::ERROR;
+	}
+
+	// do we have any refs ?
+	uint32_t numRefs;
+	if (!GetAssetRefCount(assetId, numRefs)) {
+		X_ERROR("AssetDB", "Failed to delete asset: %s:%s error getting ref count", AssetType::ToString(type), name.c_str());
+		return Result::ERROR;
+	}
+
+	if (numRefs > 0) {
+		X_ERROR("AssetDB", "Failed to delete asset: %s:%s %" PRIu32 " assets are referencing it"
+			, AssetType::ToString(type), name.c_str(), numRefs);
+		return Result::ERROR;
+	}
+
 	sql::SqlLiteTransaction trans(db_);
-	sql::SqlLiteCmd cmd(db_, "DELETE FROM file_ids WHERE type = ? AND name = ?");
-	cmd.bind(1, type);
-	cmd.bind(2, name.c_str());
+	sql::SqlLiteCmd cmd(db_, "DELETE FROM file_ids WHERE file_id = ? AND type = ? AND name = ?");
+	cmd.bind(1, assetId); // make sure it's same one we found above.
+	cmd.bind(2, type);
+	cmd.bind(3, name.c_str());
 
 	sql::Result::Enum res = cmd.execute();
 	if (res != sql::Result::OK) {
@@ -897,7 +917,8 @@ bool AssetDB::GetAssetRefCount(int32_t assetId, uint32_t& refCountOut)
 		return true;
 	}
 
-	return false;
+	refCountOut = 0;
+	return true;
 }
 
 bool AssetDB::IterateAssetRefs(int32_t assetId, core::Delegate<bool(int32_t)> func)
