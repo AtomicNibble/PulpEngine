@@ -47,6 +47,7 @@ public:
 		NOT_FOUND,
 		NAME_TAKEN,
 		UNCHANGED,
+		HAS_REFS,
 		ERROR
 	);
 

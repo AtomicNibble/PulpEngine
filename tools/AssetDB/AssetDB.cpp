@@ -513,7 +513,7 @@ AssetDB::Result::Enum AssetDB::DeleteAsset(AssetType::Enum type, const core::str
 	if (numRefs > 0) {
 		X_ERROR("AssetDB", "Failed to delete asset: %s:%s %" PRIu32 " assets are referencing it"
 			, AssetType::ToString(type), name.c_str(), numRefs);
-		return Result::ERROR;
+		return Result::HAS_REFS;
 	}
 
 	sql::SqlLiteTransaction trans(db_);
