@@ -705,7 +705,7 @@ namespace RawModel
 
 			for (const auto& mesh : lod.meshes_)
 			{
-				if (!WriteMaterials(dataArr, mesh.material_)) {
+				if (!WriteMaterial(dataArr, mesh.material_)) {
 					return false;
 				}
 			}
@@ -860,7 +860,7 @@ namespace RawModel
 		return true;
 	}
 
-	bool Model::WriteMaterials(ModelDataStrArr& dataArr, const Material& mat) const
+	bool Model::WriteMaterial(ModelDataStrArr& dataArr, const Material& mat) const
 	{
 		const Color& col = mat.col_;
 		const Color& tansparency = mat.tansparency_;

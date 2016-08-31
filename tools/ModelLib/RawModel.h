@@ -77,7 +77,7 @@ namespace RawModel
 		bool WriteMeshes(ModelDataStrArr& arr, const Lod& lod) const;
 		// static as job version makes use of it, to reduce code duplication.
 		static bool WriteMesh(ModelDataStrArr& arr, const Mesh& mesh, core::MemoryArenaBase* arena);
-		bool WriteMaterials(ModelDataStrArr& arr, const Material& mat) const;
+		bool WriteMaterial(ModelDataStrArr& arr, const Material& mat) const;
 		
 	protected:
 		static bool isColisionMesh(const RawModel::Mesh::NameString& name);
