@@ -116,6 +116,8 @@ namespace RawModel
 
 		void merge(const Mesh& oth);
 
+		const Material& getMaterial(void) const;
+
 	public:
 		NameString name_;
 		NameString displayName_;
@@ -136,6 +138,8 @@ namespace RawModel
 		size_t numMeshes(void) const;
 		size_t totalVerts(void) const;
 		size_t totalTris(void) const;
+
+		const Mesh& getMesh(size_t idx) const;
 
 	public:
 		MeshArr meshes_;

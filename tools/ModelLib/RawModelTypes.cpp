@@ -54,6 +54,11 @@ namespace RawModel
 		}
 	}
 
+	const Material& Mesh::getMaterial(void) const
+	{
+		return material_;
+	}
+
 	Lod::Lod(core::MemoryArenaBase* arena) :
 		meshes_(arena)
 	{
@@ -88,7 +93,11 @@ namespace RawModel
 	}
 
 
-
+	const Mesh& Lod::getMesh(size_t idx) const
+	{
+		X_ASSERT(idx < numMeshes(), "Invalid mesh idx")(idx, numMeshes());
+		return meshes_[idx];
+	}
 
 } // namespace RawModel
 

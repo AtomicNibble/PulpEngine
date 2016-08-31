@@ -52,12 +52,15 @@ namespace RawModel
 		bool SaveRawModel(core::Array<uint8_t>& data);
 
 		size_t totalMeshes(void) const;
+		size_t numLods(void) const;
 		bool hasColMeshes(void) const;
 
 		size_t getNumBones(void) const;
 		const char* getBoneName(size_t idx) const;
 		const Quatf getBoneAngle(size_t idx) const;
 		const Vec3f getBonePos(size_t idx) const;
+
+		const Lod& getLod(size_t idx) const;
 
 	private:
 

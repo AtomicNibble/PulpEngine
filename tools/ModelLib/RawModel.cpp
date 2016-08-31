@@ -59,6 +59,11 @@ namespace RawModel
 		return num;
 	}
 
+	size_t Model::numLods(void) const
+	{
+		return lods_.size();
+	}
+
 	bool Model::hasColMeshes(void) const
 	{
 		return hasColisionMeshes_;
@@ -84,6 +89,11 @@ namespace RawModel
 		return bones_[idx].worldPos_;
 	}
 
+	const Lod& Model::getLod(size_t idx) const
+	{
+		X_ASSERT(idx < numLods(), "Invalid lod idx")(idx, numLods());
+		return lods_[idx];
+	}
 
 	bool Model::LoadRawModel(core::Path<char>& path)
 	{
