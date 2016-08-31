@@ -124,11 +124,29 @@ bool AssetDB::CreateTables(void)
 		X_ERROR("AssetDB", "Failed to create 'raw_files' table");
 		return false;
 	}
+
+	// this table contains a list of assets refrences.
+	// so if a material is refrenced by 2 models there we be two entries
+	// with a toId matching the id of the material.
+	if (!db_.execute("CREATE TABLE IF NOT EXISTS refs ("
+		"ref_id INTEGER PRIMARY KEY,"
+		"toId INTEGER," 
+		"fromId INTEGER,"
+		"FOREIGN KEY(ref_id) REFERENCES file_ids(file_id),"
+		"FOREIGN KEY(fromId) REFERENCES file_ids(file_id)"
+		");")) {
+		X_ERROR("AssetDB", "Failed to create 'refs' table");
+		return false;
+	}
+
 	return true;
 }
 
 bool AssetDB::DropTables(void)
 {
+	if (!db_.execute("DROP TABLE IF EXISTS refs;")) {
+		return false;
+	}
 	if (!db_.execute("DROP TABLE IF EXISTS gdt_files;")) {
 		return false;
 	}
