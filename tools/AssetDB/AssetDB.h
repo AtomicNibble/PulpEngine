@@ -95,8 +95,14 @@ public:
 	bool GetArgsForAsset(int32_t assetId, core::string& argsOut);
 	bool GetArgsHashForAsset(int32_t idassetId, uint32_t& argsHashOut);
 	bool GetModIdForAsset(int32_t idassetId, ModId& modIdOut);
-
 	bool GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& dataOut);
+
+	// some assetRef stuff.
+	bool GetAssetRefCount(int32_t assetId, uint32_t& refCountOut);
+	bool IterateAssetRefs(int32_t assetId, core::Delegate<bool(int32_t)> func);
+	Result::Enum AddAssertRef(int32_t assetId, int32_t targetAssetId);
+	Result::Enum RemoveAssertRef(int32_t assetId, int32_t targetAssetId);
+
 
 private:
 	bool GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId = nullptr);

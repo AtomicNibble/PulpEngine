@@ -880,6 +880,104 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& data
 	return false;
 }
 
+
+bool AssetDB::GetAssetRefCount(int32_t assetId, uint32_t& refCountOut)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT COUNT(*) from refs WHERE toId = ?");
+	qry.bind(1, assetId);
+
+	auto it = qry.begin();
+	if (it != qry.end())
+	{
+		auto row = *it;
+
+		const int32_t count = row.get<int32_t>(0);
+
+		refCountOut = count;
+		return true;
+	}
+
+	return false;
+}
+
+bool AssetDB::IterateAssetRefs(int32_t assetId, core::Delegate<bool(int32_t)> func)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT fromId from refs WHERE toId = ?");
+	qry.bind(1, assetId);
+
+	auto it = qry.begin();
+	for (; it != qry.end(); ++it)
+	{
+		auto row = *it;
+
+		const int32_t refId = row.get<int32_t>(0);
+
+		func.Invoke(refId);
+	}
+
+	return true;
+}
+
+AssetDB::Result::Enum AssetDB::AddAssertRef(int32_t assetId, int32_t targetAssetId)
+{
+	// check if we already have a ref.
+	{
+		sql::SqlLiteQuery qry(db_, "SELECT ref_id from refs WHERE toId = ? AND fromId = ?");
+		qry.bind(1, targetAssetId);
+		qry.bind(2, assetId);
+
+		if (qry.begin() != qry.end())
+		{
+			X_ERROR("AssetDB", "Failed to add assert ref %" PRIi32 " -> %" PRIi32 " as a ref already exists", assetId, targetAssetId);
+			return Result::ERROR;
+		}
+	}
+
+	// check for circular ref
+	{
+		sql::SqlLiteQuery qry(db_, "SELECT ref_id from refs WHERE toId = ? AND fromId = ?");
+		qry.bind(1, assetId);
+		qry.bind(2, targetAssetId);
+
+		if (qry.begin() != qry.end())
+		{
+			X_ERROR("AssetDB", "Failed to add assert ref %" PRIi32 " -> %" PRIi32 " would create circular dep", assetId, targetAssetId );
+			return Result::ERROR;
+		}
+	}
+
+	sql::SqlLiteTransaction trans(db_);
+	sql::SqlLiteCmd cmd(db_, "INSERT INTO refs (fromId, toId) VALUES(?,?)");
+	cmd.bind(1, assetId);
+	cmd.bind(2, targetAssetId);
+
+	sql::Result::Enum res = cmd.execute();
+	if (res != sql::Result::OK) {
+		return Result::ERROR;
+	}
+
+	trans.commit();
+	return Result::OK;
+}
+
+
+AssetDB::Result::Enum AssetDB::RemoveAssertRef(int32_t assetId, int32_t targetAssetId)
+{
+	sql::SqlLiteTransaction trans(db_);
+	sql::SqlLiteCmd cmd(db_, "DELETE FROM refs WHERE fromId = ? AND toId = ?");
+	cmd.bind(1, assetId);
+	cmd.bind(2, targetAssetId);
+
+	sql::Result::Enum res = cmd.execute();
+	if (res != sql::Result::OK) {
+		return Result::ERROR;
+	}
+
+	trans.commit();
+	return Result::OK;
+}
+
+
 bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
 {
 	// we get the raw_id from the asset.
