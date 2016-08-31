@@ -32,7 +32,7 @@ struct IConverterHost
 	virtual ~IConverterHost() {}
 
 	virtual bool GetAssetData(const char* pAssetName, assetDb::AssetType::Enum assType, core::Array<uint8_t>& dataOut) X_ABSTRACT;
-
+	virtual bool AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType) X_ABSTRACT;
 };
 
 struct IConverter

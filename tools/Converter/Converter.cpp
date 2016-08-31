@@ -207,6 +207,16 @@ bool Converter::GetAssetData(const char* pAssetName, AssetType::Enum assType, co
 	return true;
 }
 
+bool Converter::AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType)
+{
+	if (!db_.AssetExsists(assType, core::string(pAssetName))) {
+		return false;
+	}
+
+	return true;
+}
+
+
 IConverter* Converter::GetConverter(AssetType::Enum assType)
 {
 	if (!EnsureLibLoaded(assType)) {
