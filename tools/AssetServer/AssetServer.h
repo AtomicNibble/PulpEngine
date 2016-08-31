@@ -37,7 +37,7 @@ class AssetServer : public core::ThreadAbstract
 
 	private:
 		bool readRequest(ProtoBuf::AssetDB::Request& request);
-		bool AssetServer::Client::readBuf(core::Array<uint8_t>& buf, size_t size);
+		bool readBuf(core::Array<uint8_t>& buf, size_t size);
 
 		bool sendRequestFail(std::string& errMsg);
 		bool sendRequestOk(ProtoBuf::AssetDB::Reponse_Result res);
