@@ -1000,6 +1000,79 @@ AssetDB::Result::Enum AssetDB::RemoveAssertRef(int32_t assetId, int32_t targetAs
 	return Result::OK;
 }
 
+bool AssetDB::AssetHasParent(int32_t assetId, int32_t* pParentId)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT parent_id FROM file_ids WHERE file_ids.file_id = ?");
+	qry.bind(1, assetId);
+
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
+		// humm should not happen, you given me bad asset id!
+		X_ERROR("AssetDB", "Failed to get asset info for id: %" PRIi32, assetId);
+		return false;
+	}
+
+	if ((*it).columnType(0) != sql::ColumType::SNULL) {
+		*pParentId = static_cast<int32_t>((*it).get<int32_t>(0));
+		return true;
+	}
+
+	return false;
+}
+
+bool AssetDB::AssetIsParent(int32_t assetId)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT file_id FROM file_ids WHERE file_ids.parent_id = ?");
+	qry.bind(1, assetId);
+
+	if (qry.begin() == qry.end()) {
+		return false;
+	}
+
+	return true;
+}
+
+
+AssetDB::Result::Enum AssetDB::SetAssetParent(int32_t assetId, int32_t parentAssetIt)
+{
+	// we don't allow parent updating.
+	// you must explicity remove parent then add new to change.
+	if (AssetHasParent(assetId)) {
+		X_ERROR("AssetDB", "Failed to set asset %" PRIi32 " parent, it already has a parent", assetId);
+		return Result::ERROR;
+	}
+
+	sql::SqlLiteTransaction trans(db_);
+
+	sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET parent_id = ? WHERE file_ids.file_id = ?");
+	cmd.bind(1, parentAssetIt);
+	cmd.bind(2, assetId);
+
+	sql::Result::Enum res = cmd.execute();
+	if (res != sql::Result::OK) {
+		return Result::ERROR;
+	}
+
+	trans.commit();
+	return Result::OK;
+}
+
+AssetDB::Result::Enum AssetDB::RemoveAssetParent(int32_t assetId)
+{
+	sql::SqlLiteTransaction trans(db_);
+
+	sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET parent_id = NULL WHERE file_ids.file_id = ?");
+	cmd.bind(1, assetId);
+
+	sql::Result::Enum res = cmd.execute();
+	if (res != sql::Result::OK) {
+		return Result::ERROR;
+	}
+
+	trans.commit();
+	return Result::OK;
+}
 
 bool AssetDB::GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId)
 {

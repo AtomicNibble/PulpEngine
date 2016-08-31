@@ -104,6 +104,12 @@ public:
 	Result::Enum AddAssertRef(int32_t assetId, int32_t targetAssetId);
 	Result::Enum RemoveAssertRef(int32_t assetId, int32_t targetAssetId);
 
+	// parent
+	bool AssetHasParent(int32_t assetId, int32_t* pParentId = nullptr);
+	bool AssetIsParent(int32_t assetId); // check if this asset has a parent.
+	Result::Enum SetAssetParent(int32_t assetId, int32_t parentAssetIt);
+	Result::Enum RemoveAssetParent(int32_t assetId);
+
 
 private:
 	bool GetRawfileForId(int32_t assetId, RawFile& dataOut, int32_t* pId = nullptr);
