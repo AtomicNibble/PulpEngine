@@ -95,7 +95,7 @@ bool XModelLib::Convert(IConverterHost& host, ConvertArgs& args,
 			if (!host.AssetExists(material.name_.c_str(), assetDb::AssetType::MATERIAL))
 			{
 				// using a material we don't have yet..
-				X_WARNING("Model", "Model lod: %" PRIuS " mesh: %" PRIuS " has a unkown material: \"%s\"",
+				X_WARNING("Model", "Model lod: %" PRIuS " mesh: %" PRIuS " has a unknown material: \"%s\"",
 					i, m, material.name_.c_str());
 			}
 		}
