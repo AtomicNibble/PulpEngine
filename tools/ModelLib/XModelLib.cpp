@@ -82,6 +82,25 @@ bool XModelLib::Convert(IConverterHost& host, ConvertArgs& args,
 		return false;
 	}
 
+	// check materials.
+	for (size_t i = 0; i < model.numLods(); i++)
+	{
+		const auto& lod = model.getLod(i);
+
+		for (size_t m = 0; m < lod.numMeshes(); m++)
+		{
+			const auto& mesh = lod.getMesh(m);
+			const auto& material = mesh.getMaterial();
+
+			if (!host.AssetExists(material.name_.c_str(), assetDb::AssetType::MATERIAL))
+			{
+				// using a material we don't have yet..
+				X_WARNING("Model", "Model lod: %" PRIuS " mesh: %" PRIuS " has a unkown material: \"%s\"",
+					i, m, material.name_.c_str());
+			}
+		}
+	}
+
 	// set lod distances.
 	for (size_t i = 0; i < model::MODEL_MAX_LODS; i++)
 	{
