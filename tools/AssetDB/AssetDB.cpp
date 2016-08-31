@@ -53,6 +53,11 @@ bool AssetDB::OpenDB(void)
 		return false;
 	}
 
+	if (!gEnv->pFileSys->fileExists(dbPath.c_str())) {
+		X_WARNING("AssetDB", "Failed to find exsisting asset_db creating a new one");
+	}
+
+
 	if (!db_.connect(dbPath.c_str())) {
 		return false;
 	}
