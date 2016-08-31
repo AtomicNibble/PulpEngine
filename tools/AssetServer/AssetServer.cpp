@@ -79,7 +79,6 @@ namespace
 			// direct-to-array serialization path.
 			message.SerializeWithCachedSizesToArray(buffer);
 		}
-
 		else
 		{
 			// Slightly-slower path when the message is multiple buffers.
@@ -264,6 +263,13 @@ bool AssetServer::Client::readRequest(ProtoBuf::AssetDB::Request& request)
 
 	if (!pipe_.read(buffer, sizeof(buffer), &bytesRead)) {
 		X_ERROR("AssetServer", "Failed to read msg");
+		return false;
+	}
+
+	// we on;y read buffer size, so if we get a message that fills buffer
+	// I don't think we handle reciving it in sections so error.
+	if (bytesRead >= BUF_LENGTH) {
+		X_ERROR("AssetServer", "Msg too big, increase bugger size: %" PRIuS " recived: %" PRIuS, BUF_LENGTH, bytesRead);
 		return false;
 	}
 
