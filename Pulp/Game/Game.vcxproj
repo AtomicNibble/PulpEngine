@@ -127,6 +127,7 @@
     <Import Project="..\..\solutions\_engine_inc_wwise_debug.props" />
     <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
     <Import Project="..\..\solutions\_engine_inc_physx_debug.props" />
+    <Import Project="..\..\solutions\_engine_inc_ispc_debug.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -137,6 +138,7 @@
     <Import Project="..\..\solutions\_engine_inc_wwise_debug.props" />
     <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
     <Import Project="..\..\solutions\_engine_inc_physx_debug.props" />
+    <Import Project="..\..\solutions\_engine_inc_ispc_debug.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -162,6 +164,7 @@
     <Import Project="..\..\solutions\_engine_inc_wwise_release.props" />
     <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
     <Import Project="..\..\solutions\_engine_inc_physx_release.props" />
+    <Import Project="..\..\solutions\_engine_inc_ispc_release.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -172,6 +175,7 @@
     <Import Project="..\..\solutions\_engine_inc_wwise_release.props" />
     <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
     <Import Project="..\..\solutions\_engine_inc_physx_release.props" />
+    <Import Project="..\..\solutions\_engine_inc_ispc_release.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -181,6 +185,7 @@
     <Import Project="..\..\solutions\_engine_inc_wwise_super.props" />
     <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
     <Import Project="..\..\solutions\_engine_inc_physx_super.props" />
+    <Import Project="..\..\solutions\_engine_inc_ispc_super.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super|x64'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -190,6 +195,7 @@
     <Import Project="..\..\solutions\_engine_inc_wwise_super.props" />
     <Import Project="..\..\solutions\_engine_delay_load_dlls.props" />
     <Import Project="..\..\solutions\_engine_inc_physx_super.props" />
+    <Import Project="..\..\solutions\_engine_inc_ispc_super.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
