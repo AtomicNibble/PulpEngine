@@ -36,3 +36,14 @@ extern ImgLibArena* g_ImgLibArena;
 #endif // !IMG_LIB_EXPORT
 #endif // X_LIB
 
+
+
+namespace ispc
+{
+
+#include <../../3rdparty/source/ispc_texcomp/ispc_texcomp.h>
+
+} // namespace ispc
+
+
+X_LINK_LIB("ispc_texcomp");
