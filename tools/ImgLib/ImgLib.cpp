@@ -13,3 +13,48 @@ namespace
 } // namespace
 
 ImgLibArena* g_ImgLibArena = nullptr;
+
+
+class XConverterLib_Img : public IConverterModule
+{
+	X_POTATO_GENERATE_SINGLETONCLASS(XConverterLib_Img, "Engine_ImgLib");
+
+	virtual const char* GetName(void) X_OVERRIDE
+	{
+		return "Img";
+	}
+
+	virtual IConverter* Initialize(void) X_OVERRIDE
+	{
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pArena);
+
+		g_ImgLibArena = X_NEW(ImgLibArena, gEnv->pArena, "ImgLibArena")(&g_ImgLibAlloc, "ImgLibArena");
+
+		// nothing yet.
+		X_ASSERT_NOT_IMPLEMENTED();
+		return nullptr;
+	}
+
+	virtual bool ShutDown(IConverter* pCon) X_OVERRIDE
+	{
+		X_ASSERT_NOT_NULL(gEnv);
+		X_ASSERT_NOT_NULL(gEnv->pArena);
+
+
+		X_DELETE_AND_NULL(pCon, gEnv->pArena);
+		X_DELETE_AND_NULL(g_ImgLibArena, gEnv->pArena);
+		return true;
+	}
+};
+
+X_POTATO_REGISTER_CLASS(XConverterLib_Img);
+
+
+XConverterLib_Img::XConverterLib_Img()
+{
+}
+
+XConverterLib_Img::~XConverterLib_Img()
+{
+}
