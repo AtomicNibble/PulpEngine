@@ -18,6 +18,12 @@
     <Filter Include="Header Files\Lib">
       <UniqueIdentifier>{48127ffc-e9ee-4429-97a2-b27fa56be898}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ConverterModule">
+      <UniqueIdentifier>{a899a0df-906f-4e85-bd62-5a7450c01360}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Lib">
+      <UniqueIdentifier>{2ca87345-2aef-4ac2-827b-96fb595e9213}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -47,18 +53,15 @@
     <ClInclude Include="TextureUtil.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ImgLib.h">
-      <Filter>Header Files\Lib</Filter>
-    </ClInclude>
     <ClInclude Include="Fmts\CI_Img.h">
       <Filter>Header Files\Fmts</Filter>
+    </ClInclude>
+    <ClInclude Include="ImgLib.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ImgLib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Fmts\TextureLoaderCI.cpp">
@@ -87,6 +90,9 @@
     </ClCompile>
     <ClCompile Include="Fmts\CIWritter.cpp">
       <Filter>Source Files\Fmts</Filter>
+    </ClCompile>
+    <ClCompile Include="ImgLib.cpp">
+      <Filter>Source Files\ConverterModule</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

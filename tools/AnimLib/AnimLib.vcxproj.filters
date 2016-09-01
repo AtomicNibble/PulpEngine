@@ -27,6 +27,12 @@
     <Filter Include="Source Files\Lib">
       <UniqueIdentifier>{8ebc46e7-6180-4a1b-bb13-054b9b51ee1e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ConverterModule">
+      <UniqueIdentifier>{9b52d8fc-5a30-4964-864a-054edf0703f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Lib">
+      <UniqueIdentifier>{3b783eb7-a2ec-4f20-b8eb-b3793204721c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -35,11 +41,11 @@
     <ClInclude Include="anim_inter.h">
       <Filter>Header Files\anim_inter</Filter>
     </ClInclude>
-    <ClInclude Include="XAnimLib.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="AnimCompiler.h">
       <Filter>Header Files\anim</Filter>
+    </ClInclude>
+    <ClInclude Include="XAnimLib.h">
+      <Filter>Header Files\Lib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -49,20 +55,20 @@
     <ClCompile Include="anim_inter.cpp">
       <Filter>Source Files\anim_inter</Filter>
     </ClCompile>
-    <ClCompile Include="XAnimLib.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="dllmain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AnimCompiler.cpp">
       <Filter>Source Files\anim</Filter>
     </ClCompile>
-    <ClCompile Include="ConverterLib.cpp">
-      <Filter>Source Files\Lib</Filter>
-    </ClCompile>
     <ClCompile Include="..\ModelLib\ModelSkeleton.cpp">
       <Filter>Source Files\model</Filter>
+    </ClCompile>
+    <ClCompile Include="ConverterLib.cpp">
+      <Filter>Source Files\ConverterModule</Filter>
+    </ClCompile>
+    <ClCompile Include="XAnimLib.cpp">
+      <Filter>Source Files\Lib</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

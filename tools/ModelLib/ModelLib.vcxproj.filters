@@ -24,12 +24,15 @@
     <Filter Include="Source Files\Lib">
       <UniqueIdentifier>{fc269000-baeb-4a36-a332-ed437891a8de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ConverterModule">
+      <UniqueIdentifier>{951ff969-c05d-408d-89cb-67e3a11616a7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Lib">
+      <UniqueIdentifier>{97c6cbdb-58ac-4605-9650-15a6c544c845}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="XModelLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="RawModelTypes.h">
@@ -47,15 +50,15 @@
     <ClInclude Include="FaceOptermize.h">
       <Filter>Header Files\model</Filter>
     </ClInclude>
+    <ClInclude Include="XModelLib.h">
+      <Filter>Header Files\Lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="dllmain.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="XModelLib.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="RawModel.cpp">
@@ -67,14 +70,17 @@
     <ClCompile Include="ModelCompiler.cpp">
       <Filter>Source Files\model</Filter>
     </ClCompile>
-    <ClCompile Include="ConverterLib.cpp">
-      <Filter>Source Files\Lib</Filter>
-    </ClCompile>
     <ClCompile Include="ModelSkeleton.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FaceOptermize.cpp">
       <Filter>Source Files\model</Filter>
+    </ClCompile>
+    <ClCompile Include="ConverterLib.cpp">
+      <Filter>Source Files\ConverterModule</Filter>
+    </ClCompile>
+    <ClCompile Include="XModelLib.cpp">
+      <Filter>Source Files\Lib</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
