@@ -85,7 +85,7 @@ class XFontTexture
 	typedef XTextureSlotTable::iterator					XTextureSlotTableItor;
 	typedef XTextureSlotTable::const_iterator			XTextureSlotTableItorConst;
 
-	static const uint32_t FONT_GLYPH_CACHE_SIZE = 128; // todo make var?
+	static const uint32_t FONT_GLYPH_CACHE_SIZE = 256; // todo make var?
 
 public:
 	XFontTexture(core::MemoryArenaBase* arena);
