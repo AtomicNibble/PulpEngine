@@ -8,6 +8,8 @@ X_NAMESPACE_BEGIN(font)
 
 XGlyphCache::XGlyphCache(core::MemoryArenaBase* arena) :
 
+arena_(arena),
+
 glyphBitmapWidth_(0),
 glyphBitmapHeight_(0),
 fSizeRatio_(0.8f),
