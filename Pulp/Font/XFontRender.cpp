@@ -46,7 +46,7 @@ bool XFontRender::LoadFromMemory(BYTE* pBuffer, size_t bufferLength)
 	if (pFace_)
 	{
 		FT_Done_Face(pFace_);
-		pFace_ = 0;
+		pFace_ = nullptr;
 	}
 
 	err = FT_New_Memory_Face(
@@ -55,7 +55,7 @@ bool XFontRender::LoadFromMemory(BYTE* pBuffer, size_t bufferLength)
 		safe_static_cast<int,size_t>(bufferLength), 
 		0, 
 		&pFace_
-		);
+	);
 
 	if (err)
 	{
