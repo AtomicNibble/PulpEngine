@@ -12,18 +12,30 @@
     <Filter Include="Source Files\ConverterModule">
       <UniqueIdentifier>{e7c688b5-b1dd-4245-a552-574f71d29f36}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Lib">
+      <UniqueIdentifier>{4a842895-9243-4dbc-bf43-86bc4662c9b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Lib">
+      <UniqueIdentifier>{2a3996ba-05c2-471c-a14d-8cc646189388}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Lib\MaterialLib.h">
+      <Filter>Header Files\Lib</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MatLib.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="Lib\MaterialLib.cpp">
+      <Filter>Source Files\Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="ConverterLib.cpp">
+      <Filter>Source Files\ConverterModule</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

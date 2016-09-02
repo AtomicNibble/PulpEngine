@@ -5,6 +5,8 @@
 #include <ModuleExports.h> // needed for gEnv
 
 
+#include "Lib\MaterialLib.h"
+
 namespace
 {
 
@@ -31,9 +33,8 @@ class XConverterLib_Material : public IConverterModule
 
 		g_MatLibArena = X_NEW(MatLibrena, gEnv->pArena, "MaterialLibArena")(&g_MatLibAlloc, "MaterialLibArena");
 
-		// nothing yet.
-		X_ASSERT_NOT_IMPLEMENTED();
-		return nullptr;
+		return X_NEW(engine::MaterialLib, g_MatLibArena, "IMaterialLib")();
+
 	}
 
 	virtual bool ShutDown(IConverter* pCon) X_OVERRIDE

@@ -4,6 +4,7 @@
 #define _X_MATERIAL_I_H_
 
 #include <IShader.h>
+#include <IConverterModule.h>
 #include "Util\GenericUtil.h"
 
 X_NAMESPACE_BEGIN(engine)
@@ -19,6 +20,16 @@ static const char*		 MTL_DEFAULT_NAME = "default";
 
 static const float POLY_DECAL_OFFSET = 0.05f;
 static const float POLY_WEAPON_IMPACT_OFFSET = 0.1f;
+
+
+
+
+struct IMaterialLib : public IConverter
+{
+
+};
+
+
 
 X_DECLARE_FLAGS(MtlXmlFlags)(NAME, FLAGS, SURFACETYPE, COVERAGE);
 
