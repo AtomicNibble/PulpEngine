@@ -4,6 +4,7 @@
 #include <Extension\XExtensionMacros.h>
 #include <ModuleExports.h> // needed for gEnv
 
+#include "Lib\ImgLib.h"
 
 namespace
 {
@@ -31,9 +32,7 @@ class XConverterLib_Img : public IConverterModule
 
 		g_ImgLibArena = X_NEW(ImgLibArena, gEnv->pArena, "ImgLibArena")(&g_ImgLibAlloc, "ImgLibArena");
 
-		// nothing yet.
-		X_ASSERT_NOT_IMPLEMENTED();
-		return nullptr;
+		return X_NEW(texture::ImgLib, g_ImgLibArena, "ImgLib")();
 	}
 
 	virtual bool ShutDown(IConverter* pCon) X_OVERRIDE

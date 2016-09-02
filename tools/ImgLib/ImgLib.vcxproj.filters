@@ -59,6 +59,9 @@
     <ClInclude Include="ImgLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Lib\ImgLib.h">
+      <Filter>Header Files\Lib</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -91,8 +94,11 @@
     <ClCompile Include="Fmts\CIWritter.cpp">
       <Filter>Source Files\Fmts</Filter>
     </ClCompile>
-    <ClCompile Include="ImgLib.cpp">
+    <ClCompile Include="ConverterLib.cpp">
       <Filter>Source Files\ConverterModule</Filter>
+    </ClCompile>
+    <ClCompile Include="Lib\ImgLib.cpp">
+      <Filter>Source Files\Lib</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -9,6 +9,9 @@
 #include <Util\GenericUtil.h>
 #include <String\Path.h>
 
+#include <IConverterModule.h>
+
+
 X_NAMESPACE_DECLARE(core,
 struct XFile;
 )
@@ -24,6 +27,14 @@ static const uint32_t	 TEX_MAX_MIPS = 13;
 static const uint32_t	 TEX_MAX_FACES = 6; // cubes (vol's not supported yet)
 static const uint32_t	 TEX_MAX_DEPTH = 1; 
 static const uint32_t	 TEX_MAX_LOADED_IMAGES = 1 << 13; // max images that can be loaded.
+
+
+
+struct IImgLib : public IConverter
+{
+
+};
+
 
 
 X_DECLARE_ENUM8(TextureType) (

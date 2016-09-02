@@ -341,6 +341,7 @@
     <ClInclude Include="Fmts\TextureLoaderPSD.h" />
     <ClInclude Include="Fmts\TextureLoaderTGA.h" />
     <ClInclude Include="ImgLib.h" />
+    <ClInclude Include="Lib\ImgLib.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TextureFile.h" />
     <ClInclude Include="TextureUtil.h" />
@@ -353,7 +354,8 @@
     <ClCompile Include="Fmts\TextureLoaderPNG.cpp" />
     <ClCompile Include="Fmts\TextureLoaderPSD.cpp" />
     <ClCompile Include="Fmts\TextureLoaderTGA.cpp" />
-    <ClCompile Include="ImgLib.cpp" />
+    <ClCompile Include="ConverterLib.cpp" />
+    <ClCompile Include="Lib\ImgLib.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>
