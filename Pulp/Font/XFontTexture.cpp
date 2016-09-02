@@ -34,7 +34,7 @@ slotUsage_(1), // space for gradiant.
 
 glyphCache_(arena),
 slotList_(arena),
-slotTable_(arena)
+slotTable_(arena, 8)
 {
 
 }
