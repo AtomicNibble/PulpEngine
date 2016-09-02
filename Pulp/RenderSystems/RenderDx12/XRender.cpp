@@ -136,7 +136,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height)
 			hr = D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice_));
 			if (SUCCEEDED(hr))
 			{
-				X_LOG0("Dx12", "D3D12-capable hardware found: \"%ls\" (%u MB)\n", desc.Description, desc.DedicatedVideoMemory >> 20);
+				X_LOG0("Dx12", "D3D12-capable hardware found: \"%ls\" (%u MB)", desc.Description, desc.DedicatedVideoMemory >> 20);
 
 				deviceName_.set(desc.Description);
 				dedicatedvideoMemory_ = desc.DedicatedVideoMemory;
