@@ -188,7 +188,6 @@ namespace Converter
 				imgFlags.Set(TexFlag::FORCE_STREAM);
 			}
 			if (flags.IsSet(CompileFlag::NOMIPS)) {
-				// should STREAMBLE be set for force steam... hummm
 				imgFlags.Set(TexFlag::NOMIPS);
 			}
 
@@ -212,6 +211,13 @@ namespace Converter
 
 	bool ImgConveter::Convert(Texturefmt::Enum targetFmt)
 	{
+		if (targetFmt == srcImg_.getFormat()) {
+			X_LOG1("Img", "Skipping texture conversion, src format matches target fmt of: %s",
+				Texturefmt::ToString(targetFmt));
+			return true;
+		}
+
+
 
 
 		return true;
