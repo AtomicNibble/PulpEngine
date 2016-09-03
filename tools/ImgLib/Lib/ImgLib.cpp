@@ -88,7 +88,7 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 
 	if (d.HasMember("noMips")) {
 		if (d["noMips"].GetBool()) {
-			flags.Set(CompileFlag::NO_MIPS);
+			flags.Set(CompileFlag::NOMIPS);
 		}
 	}
 	if (d.HasMember("preMulAlpha")) {
@@ -221,7 +221,7 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 	//  Where do we perform premultiply alpha?
 	// 
 
-	if (!flags.IsSet(CompileFlag::NO_MIPS)) {
+	if (!flags.IsSet(CompileFlag::NOMIPS)) {
 		if (!con.CreateMips(mipFilter, wrapMode)) {
 			X_ERROR("Img", "Failed to create mips for image");
 			return false;

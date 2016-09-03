@@ -14,7 +14,7 @@ X_NAMESPACE_BEGIN(texture)
 namespace Converter
 {
 	X_DECLARE_FLAGS(CompileFlag)(
-		NO_MIPS,
+		NOMIPS,
 		PREMULTIPLY_ALPHA,
 		ALLOW_NONE_POW2,
 
