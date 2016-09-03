@@ -268,7 +268,7 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 	}
 
 	if (!con.SaveImg(destPath, flags, outputFileFmt)) {
-		X_ERROR("Img", "Failed to create mips for image");
+		X_ERROR("Img", "Failed to save converterd image");
 		return false;
 	}
 
