@@ -216,6 +216,17 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 			X_ASSERT_NOT_IMPLEMENTED();
 			return false;
 		}
+
+		if (Util::isDxt(src.getFormat()) && 
+			dstImgFmt != src.getFormat()) // if we already in target format is not a issue, so no warning.
+		{
+			// this texture is already dxt block compressed.
+			// either we fail or save as this format.
+			X_WARNING("Img", "Source image is already: %s compressed, skipping conversion to: %s",
+				Texturefmt::ToString(src.getFormat()), Texturefmt::ToString(dstImgFmt));
+
+			dstImgFmt = src.getFormat();
+		}
 	}
 
 
