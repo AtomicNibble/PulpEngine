@@ -28,6 +28,7 @@ namespace CI
 		hdr.Mips = imgFile.getNumMips();
 		hdr.Faces = imgFile.getNumFaces();
 		hdr.Flags = imgFile.getFlags();
+		hdr.Flags.Set(TexFlag::CI_IMG);
 
 		hdr.width = safe_static_cast<uint16_t, int32_t>(imgFile.getWidth());
 		hdr.height = safe_static_cast<uint16_t, int32_t>(imgFile.getHeight());
