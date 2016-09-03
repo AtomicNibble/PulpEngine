@@ -138,7 +138,7 @@ namespace Converter
 		return res;
 	}
 
-	bool ImgConveter::SaveImg(const core::Path<char>& outPath, CompileFlag flags, ImgFileFormat::Enum dstFileFmt)
+	bool ImgConveter::SaveImg(const core::Path<char>& outPath, CompileFlags flags, ImgFileFormat::Enum dstFileFmt)
 	{
 		core::XFileScoped file;
 		core::fileModeFlags mode;
@@ -163,7 +163,40 @@ namespace Converter
 			return false;
 		}
 
-		bool res = pFmt->saveTexture( file.GetFile(), srcImg_);
+		// add in flags.
+		{
+			auto imgFlags = srcImg_.getFlags();
+
+			// check for flags that should not be set.
+			CompileFlags::Description flagDsc;
+			X_ASSERT(imgFlags.IsSet(TexFlag::LOAD_FAILED), "Load faild flag set")(flags.ToString(flagDsc));
+
+			// clear some. (temp)
+			imgFlags.Set(TexFlag::CI_IMG);
+			imgFlags.Set(TexFlag::ALPHA);
+			imgFlags.Set(TexFlag::NORMAL);
+
+			if (flags.IsSet(CompileFlag::STREAMABLE)) {
+				imgFlags.Set(TexFlag::STREAMABLE);
+			}
+			if (flags.IsSet(CompileFlag::HI_MIP_STREAMING)) {
+				X_ASSERT(imgFlags.IsSet(TexFlag::STREAMABLE), "HimipStreaming set without streamable flag")(flags.ToString(flagDsc));
+				imgFlags.Set(TexFlag::HI_MIP_STREAMING);
+			}
+			if (flags.IsSet(CompileFlag::FORCE_STREAM)) {
+				// should STREAMBLE be set for force steam... hummm
+				imgFlags.Set(TexFlag::FORCE_STREAM);
+			}
+			if (flags.IsSet(CompileFlag::NOMIPS)) {
+				// should STREAMBLE be set for force steam... hummm
+				imgFlags.Set(TexFlag::NOMIPS);
+			}
+
+			srcImg_.setFlags(imgFlags);
+		}
+
+
+		bool res = pFmt->saveTexture(file.GetFile(), srcImg_);
 
 		core::Mem::Destruct<ITextureFmt>(pFmt);
 		return res;
@@ -184,6 +217,10 @@ namespace Converter
 		return true;
 	}
 
+	const XTextureFile& ImgConveter::getTextFile(void) const
+	{
+		return srcImg_;
+	}
 
 	bool ImgConveter::ParseImgFmt(const char* pImgFmt, Texturefmt::Enum& fmtOut)
 	{

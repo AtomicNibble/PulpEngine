@@ -71,15 +71,16 @@ namespace Converter
 
 		bool LoadImg(const core::Array<uint8_t>& fileData, ImgFileFormat::Enum inputFileFmt);
 		bool LoadImg(core::XFile* pFile, ImgFileFormat::Enum inputFileFmt);
-		bool SaveImg(const core::Path<char>& outPath, CompileFlag flags, ImgFileFormat::Enum dstFileFmt);
+		bool SaveImg(const core::Path<char>& outPath, CompileFlags flags, ImgFileFormat::Enum dstFileFmt);
 
 		bool CreateMips(MipFilter::Enum filter, WrapMode::Enum wrap);
 		bool Convert(Texturefmt::Enum targetFmt);
 
-		static bool ParseImgFmt(const char* pImgFmt, Texturefmt::Enum& fmtOut);
-		static ITextureFmt* Allocfmt(core::LinearAllocator* pAllocator, ImgFileFormat::Enum inputFileFmt);
+		const XTextureFile& getTextFile(void) const;
 
+		static bool ParseImgFmt(const char* pImgFmt, Texturefmt::Enum& fmtOut);
 	private:
+		static ITextureFmt* Allocfmt(core::LinearAllocator* pAllocator, ImgFileFormat::Enum inputFileFmt);
 
 	private:
 		core::MemoryArenaBase* swapArena_;
