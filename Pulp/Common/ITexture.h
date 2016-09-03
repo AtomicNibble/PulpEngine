@@ -127,8 +127,14 @@ X_DECLARE_FLAGS(TexFlag)(
 	FORCE_MIPS,
 	ALPHA,
 	NORMAL, 
-	DONT_STREAM,
-	STREAMING,
+
+//	DONT_STREAM,
+	STREAMING,			// streaming in progress
+	STREAMABLE,			// can be streamed
+	HI_MIP_STREAMING,	// only high mips can be streamed.
+	FORCE_STREAM,		// force stream even if only one mip
+
+
 	TEX_FONT, 
 	FILTER_POINT, FILTER_LINEAR, FILTER_BILINEAR, FILTER_TRILINEAR, 
 	RENDER_TARGET, 

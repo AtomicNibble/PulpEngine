@@ -80,7 +80,7 @@ bool XGuiManager::Init(void)
 
 	// what you pointing at? rude..
 	pCursorArrow_ = gEnv->pRender->getTexture("Textures/cursor_arrow.dds",
-		texture::TextureFlags::DONT_STREAM | texture::TextureFlags::NOMIPS);
+		texture::TextureFlags::NOMIPS);
 
 	if (!pCursorArrow_) {
 		X_FATAL("Gui", "failed to load main cursor");

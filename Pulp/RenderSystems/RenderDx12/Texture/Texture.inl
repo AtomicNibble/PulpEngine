@@ -51,7 +51,7 @@ X_NAMESPACE_BEGIN(texture)
 
 	X_INLINE const bool Texture::IsStreamable(void) const
 	{
-		return !flags_.IsSet(TextureFlags::DONT_STREAM);
+		return flags_.IsSet(TextureFlags::STREAMABLE);
 	}
 
 	X_INLINE const TextureType::Enum Texture::getTextureType(void) const
