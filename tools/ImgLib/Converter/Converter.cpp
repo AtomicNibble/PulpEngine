@@ -204,6 +204,26 @@ namespace Converter
 
 	bool ImgConveter::CreateMips(MipFilter::Enum filter, WrapMode::Enum wrap)
 	{
+		const uint32_t curMips = srcImg_.getNumMips();
+		const uint32_t requiredMips = Util::maxMipsForSize(srcImg_.getWidth(), srcImg_.getHeight());
+
+		// if we have mips and it's the correct count return ok.
+		// later on we might want to discard them and generate with a diffrent filter.
+		// for now i could not give a shit, since we can always reprocess every image in one click.
+		if (curMips > 1 && curMips == requiredMips) {
+			return true;
+		}
+
+		if (curMips > 1) {
+			X_WARNING("Img", "Image has incorrect mip count of: %" PRIu32, " should be: %" PRIu32 " regenerating",
+				curMips, requiredMips);
+
+			// check this logic.
+			X_ASSERT_NOT_IMPLEMENTED();
+		}
+
+
+		// create mips.
 
 
 		return true;
