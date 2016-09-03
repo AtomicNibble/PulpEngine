@@ -85,7 +85,10 @@ namespace Converter
 	private:
 		core::MemoryArenaBase* swapArena_;
 		XTextureFile srcImg_;
+		XTextureFile dstImg_;
 
+		// save out src.
+		bool useSrc_;
 	};
 
 

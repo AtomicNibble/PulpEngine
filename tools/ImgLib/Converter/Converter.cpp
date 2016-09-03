@@ -106,7 +106,9 @@ namespace Converter
 
 	ImgConveter::ImgConveter(core::MemoryArenaBase* imgArena, core::MemoryArenaBase* swapArena) :
 		swapArena_(swapArena),
-		srcImg_(imgArena)
+		srcImg_(imgArena),
+		dstImg_(imgArena),
+		useSrc_(false)
 	{
 
 	}
@@ -129,12 +131,13 @@ namespace Converter
 		X_ALIGNED_SYMBOL(char buf[MAX_FMT_CLASS_SIZE], 16);
 		core::LinearAllocator allocator(buf, buf + sizeof(buf));
 
+		useSrc_ = false;
+
 		ITextureFmt* pFmt = Allocfmt(&allocator, inputFileFmt);
 
 		bool res = pFmt->loadTexture(pFile, srcImg_, swapArena_);
 
 		core::Mem::Destruct<ITextureFmt>(pFmt);
-
 		return res;
 	}
 
@@ -164,12 +167,19 @@ namespace Converter
 		}
 
 		// add in flags.
+		auto& img = useSrc_ ? srcImg_ : dstImg_;
+
+		if (!img.isValid()) {
+			X_ERROR("Img", "Failed to save img it's invalid");
+			return false;
+		}
+
 		{
-			auto imgFlags = srcImg_.getFlags();
+			auto imgFlags = img.getFlags();
 
 			// check for flags that should not be set.
 			CompileFlags::Description flagDsc;
-			X_ASSERT(imgFlags.IsSet(TexFlag::LOAD_FAILED), "Load faild flag set")(flags.ToString(flagDsc));
+			X_ASSERT(!imgFlags.IsSet(TexFlag::LOAD_FAILED), "Load faild flag set")(flags.ToString(flagDsc));
 
 			// clear some. (temp)
 			imgFlags.Set(TexFlag::CI_IMG);
@@ -191,11 +201,11 @@ namespace Converter
 				imgFlags.Set(TexFlag::NOMIPS);
 			}
 
-			srcImg_.setFlags(imgFlags);
+			img.setFlags(imgFlags);
 		}
 
 
-		bool res = pFmt->saveTexture(file.GetFile(), srcImg_);
+		bool res = pFmt->saveTexture(file.GetFile(), img);
 
 		core::Mem::Destruct<ITextureFmt>(pFmt);
 		return res;
@@ -234,10 +244,115 @@ namespace Converter
 		if (targetFmt == srcImg_.getFormat()) {
 			X_LOG1("Img", "Skipping texture conversion, src format matches target fmt of: %s",
 				Texturefmt::ToString(targetFmt));
+			useSrc_ = true;
 			return true;
 		}
 
 
+		dstImg_.setSize(srcImg_.getSize());
+		dstImg_.setFormat(targetFmt);
+		dstImg_.setType(TextureType::T2D);
+		dstImg_.setNumMips(srcImg_.getNumMips());
+		// no cube or vol at no.
+		dstImg_.setNumFaces(1);
+		dstImg_.setDepth(1);
+		dstImg_.resize();
+
+
+		Vec2<uint16_t> size = srcImg_.getSize();
+
+		// time to convert a pickle.
+		// we will need some sort of profile selection.
+		// i guess that should be a arg, as to the quality level.
+		if (targetFmt == Texturefmt::BC7)
+		{
+			ispc::bc7_enc_settings settings;													
+			ispc::GetProfile_veryfast(&settings);
+
+			for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+			{
+				// for each mip
+				ispc::rgba_surface inputImg;
+				inputImg.ptr = srcImg_.getFace(i);
+				inputImg.width = size.x;
+				inputImg.height = size.y;
+				inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
+
+				uint8_t* pOut = dstImg_.getFace(i);
+
+				ispc::CompressBlocksBC7(&inputImg, pOut, &settings);
+
+				size.x >>= 1;
+				size.y >>= 1;
+			}
+		}
+		else if (targetFmt == Texturefmt::BC6)
+		{
+			ispc::bc6h_enc_settings settings;
+			ispc::GetProfile_bc6h_veryfast(&settings);
+
+			for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+			{
+				// for each mip
+				ispc::rgba_surface inputImg;
+				inputImg.ptr = srcImg_.getFace(i);
+				inputImg.width = size.x;
+				inputImg.height = size.y;
+				inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
+
+				uint8_t* pOut = dstImg_.getFace(i);
+
+				ispc::CompressBlocksBC6H(&inputImg, pOut, &settings);
+
+				size.x >>= 1;
+				size.y >>= 1;
+			}
+		}
+		else if (targetFmt == Texturefmt::BC3)
+		{
+			for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+			{
+				// for each mip
+				ispc::rgba_surface inputImg;
+				inputImg.ptr = srcImg_.getFace(i);
+				inputImg.width = size.x;
+				inputImg.height = size.y;
+				inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
+
+				uint8_t* pOut = dstImg_.getFace(i);
+
+				ispc::CompressBlocksBC3(&inputImg, pOut);
+
+				size.x >>= 1;
+				size.y >>= 1;
+			}
+		}
+		else if (targetFmt == Texturefmt::BC1)
+		{
+			for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+			{
+				// for each mip
+				ispc::rgba_surface inputImg;
+				inputImg.ptr = srcImg_.getFace(i);
+				inputImg.width = size.x;
+				inputImg.height = size.y;
+				inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
+
+				uint8_t* pOut = dstImg_.getFace(i);
+
+				ispc::CompressBlocksBC1(&inputImg, pOut);
+
+				size.x >>= 1;
+				size.y >>= 1;
+			}
+		}
+		else
+		{
+			// ye fooking wut?
+			X_ERROR("Img", "Converting to %s not currently supported", Texturefmt::ToString(targetFmt));
+			dstImg_.clear();
+			return false;
+		}
 
 
 		return true;
