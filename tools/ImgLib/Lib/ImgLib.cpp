@@ -195,6 +195,29 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 		return false;
 	}
 
+	{
+		const auto& src = con.getTextFile();
+
+		X_ASSERT(src.isValid(), "Src img not valid after successful loading")(src.isValid());
+
+		if (!core::bitUtil::IsPowerOfTwo(src.getWidth()) ||
+			!core::bitUtil::IsPowerOfTwo(src.getHeight()))
+		{
+			// none pow 2 img :|
+
+			if (!flags.IsSet(CompileFlag::ALLOW_NONE_POW2))
+			{
+				X_ERROR("Img", "Image is not power of two: %" PRIi32 "x%" PRIi32, src.getWidth(), src.getHeight());
+				return false;
+			}
+
+			// when allowing none pow2 images, we need to make sure block formats are processed correct.
+			// throw this here for now.
+			X_ASSERT_NOT_IMPLEMENTED();
+			return false;
+		}
+	}
+
 
 	// now what :(
 	// the main things that is going to be a pain is taking N formats and allow converting to N formats.
