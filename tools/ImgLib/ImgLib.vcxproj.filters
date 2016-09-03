@@ -24,6 +24,12 @@
     <Filter Include="Source Files\Lib">
       <UniqueIdentifier>{2ca87345-2aef-4ac2-827b-96fb595e9213}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Converter">
+      <UniqueIdentifier>{a266ab3a-9fcc-4aac-acff-28cb6e423a9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Converter">
+      <UniqueIdentifier>{eefba1b1-a45b-43b0-95dc-c1684d120519}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -62,6 +68,9 @@
     <ClInclude Include="Lib\ImgLib.h">
       <Filter>Header Files\Lib</Filter>
     </ClInclude>
+    <ClInclude Include="Converter\Converter.h">
+      <Filter>Header Files\Converter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -99,6 +108,9 @@
     </ClCompile>
     <ClCompile Include="Lib\ImgLib.cpp">
       <Filter>Source Files\Lib</Filter>
+    </ClCompile>
+    <ClCompile Include="Converter\Converter.cpp">
+      <Filter>Source Files\Converter</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

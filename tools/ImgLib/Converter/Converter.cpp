@@ -1,0 +1,254 @@
+#include "stdafx.h"
+#include "Converter.h"
+
+
+#include <String\StringHash.h>
+
+#include "Fmts\TextureLoaderCI.h"
+#include "Fmts\TextureLoaderDDS.h"
+#include "Fmts\TextureLoaderJPG.h"
+#include "Fmts\TextureLoaderPNG.h"
+#include "Fmts\TextureLoaderPSD.h"
+#include "Fmts\TextureLoaderTGA.h"
+
+
+#include <Memory/AllocationPolicies/LinearAllocator.h>
+
+
+X_NAMESPACE_BEGIN(texture)
+
+
+namespace Converter
+{
+
+
+	namespace
+	{
+		struct FmtStr
+		{
+			core::StrHash nameHash;
+			const char* pName;
+			Texturefmt::Enum fmt;
+		};
+
+		FmtStr formats[] =
+		{
+			{ core::StrHash("A8"), "A8", Texturefmt::A8 },
+			{ core::StrHash("R8G8"), "R8G8", Texturefmt::R8G8 },
+			{ core::StrHash("R8G8_TYPELESS"), "R8G8_TYPELESS", Texturefmt::R8G8_TYPELESS },
+			{ core::StrHash("R8G8_SNORM"), "R8G8_SNORM", Texturefmt::R8G8_SNORM },
+			{ core::StrHash("R8G8_UNIT"), "R8G8_UNIT", Texturefmt::R8G8_UNIT },
+			{ core::StrHash("R8G8_SINT"), "R8G8_SINT", Texturefmt::R8G8_SINT },
+			{ core::StrHash("R16G16_FLOAT"), "R16G16_FLOAT", Texturefmt::R16G16_FLOAT },
+			{ core::StrHash("R16G16"), "R16G16", Texturefmt::R16G16 },
+			{ core::StrHash("R16G16_SRGB"), "R16G16_SRGB", Texturefmt::R16G16_SRGB },
+			{ core::StrHash("R16G16_SNORM"), "R16G16_SNORM", Texturefmt::R16G16_SNORM },
+			{ core::StrHash("R16G16_SINT"), "R16G16_SINT", Texturefmt::R16G16_SINT },
+			{ core::StrHash("R16G16_UINT"), "R16G16_UINT", Texturefmt::R16G16_UINT },
+			{ core::StrHash("R16G16_TYPELESS"), "R16G16_TYPELESS", Texturefmt::R16G16_TYPELESS },
+			{ core::StrHash("R8G8B8"), "R8G8B8", Texturefmt::R8G8B8 },
+			{ core::StrHash("B8G8R8"), "B8G8R8", Texturefmt::B8G8R8 },
+			{ core::StrHash("R8G8B8A8"), "R8G8B8A8", Texturefmt::R8G8B8A8 },
+			{ core::StrHash("R8G8B8A8_SRGB"), "R8G8B8A8_SRGB", Texturefmt::R8G8B8A8_SRGB },
+			{ core::StrHash("R8G8B8A8_SNORM"), "R8G8B8A8_SNORM", Texturefmt::R8G8B8A8_SNORM },
+			{ core::StrHash("R8G8B8A8_TYPELESS"), "R8G8B8A8_TYPELESS", Texturefmt::R8G8B8A8_TYPELESS },
+			{ core::StrHash("R8G8B8A8_TYPELESS"), "R8G8B8A8_TYPELESS", Texturefmt::R8G8B8A8_TYPELESS },
+			{ core::StrHash("R8G8B8A8_SINT"), "R8G8B8A8_SINT", Texturefmt::R8G8B8A8_SINT },
+			{ core::StrHash("R8G8B8A8_UINT"), "R8G8B8A8_UINT", Texturefmt::R8G8B8A8_UINT },
+			{ core::StrHash("A8R8G8B8"), "A8R8G8B8", Texturefmt::A8R8G8B8 },
+			{ core::StrHash("B8G8R8A8"), "B8G8R8A8", Texturefmt::B8G8R8A8 },
+			{ core::StrHash("B8G8R8A8_SRGB"), "B8G8R8A8_SRGB", Texturefmt::B8G8R8A8_SRGB },
+			{ core::StrHash("B8G8R8A8_TYPELESS"), "B8G8R8A8_TYPELESS", Texturefmt::B8G8R8A8_TYPELESS },
+			{ core::StrHash("ATI2"), "ATI2", Texturefmt::ATI2 },
+			{ core::StrHash("ATI2_XY"), "ATI2_XY", Texturefmt::ATI2_XY },
+			{ core::StrHash("BC1"), "BC1", Texturefmt::BC1 },
+			{ core::StrHash("BC1_SRGB"), "BC1_SRGB", Texturefmt::BC1_SRGB },
+			{ core::StrHash("BC1_TYPELESS"), "BC1_TYPELESS", Texturefmt::BC1_TYPELESS },
+			{ core::StrHash("BC2"), "BC2", Texturefmt::BC2 },
+			{ core::StrHash("BC2_SRGB"), "BC2_SRGB", Texturefmt::BC2_SRGB },
+			{ core::StrHash("BC2_TYPELESS"), "BC2_TYPELESS", Texturefmt::BC2_TYPELESS },
+			{ core::StrHash("BC3"), "BC3", Texturefmt::BC3 },
+			{ core::StrHash("BC3_SRGB"), "BC3_SRGB", Texturefmt::BC3_SRGB },
+			{ core::StrHash("BC3_TYPELESS"), "BC3_TYPELESS", Texturefmt::BC3_TYPELESS },
+			{ core::StrHash("BC4"), "BC4", Texturefmt::BC4 },
+			{ core::StrHash("BC4_SNORM"), "BC4_SNORM", Texturefmt::BC4_SNORM },
+			{ core::StrHash("BC4_TYPELESS"), "BC4_TYPELESS", Texturefmt::BC4_TYPELESS },
+			{ core::StrHash("BC5"), "BC5", Texturefmt::BC5 },
+			{ core::StrHash("BC5_SNORM"), "BC5_SNORM", Texturefmt::BC5_SNORM },
+			{ core::StrHash("BC5_TYPELESS"), "BC5_TYPELESS", Texturefmt::BC5_TYPELESS },
+			{ core::StrHash("BC6"), "BC6", Texturefmt::BC6 },
+			{ core::StrHash("BC6_SF16"), "BC6_SF16", Texturefmt::BC6_SF16 },
+			{ core::StrHash("BC6_TYPELESS"), "BC6_TYPELESS", Texturefmt::BC6_TYPELESS },
+			{ core::StrHash("BC7"), "BC7", Texturefmt::BC7 },
+			{ core::StrHash("BC7_SRGB"), "BC7_SRGB", Texturefmt::BC7_SRGB },
+			{ core::StrHash("BC7_TYPELESS"), "BC7_TYPELESS", Texturefmt::BC7_TYPELESS },
+			{ core::StrHash("R10G10B10A2"), "R10G10B10A2", Texturefmt::R10G10B10A2 },
+		};
+
+
+	} // namespace
+
+
+	const size_t ImgConveter::MAX_FMT_CLASS_SIZE = core::Max<size_t>(
+		core::Max(
+			core::Max(
+				core::Max(
+					core::Max(
+						core::Max(
+							sizeof(DDS::XTexLoaderDDS),
+							sizeof(CI::XTexLoaderCI)),
+						sizeof(JPG::XTexLoaderJPG)),
+					sizeof(TGA::XTexLoaderTGA)),
+				sizeof(PSD::XTexLoaderPSD)),
+			sizeof(PNG::XTexLoaderPNG)),
+		16) + 256;
+
+
+	ImgConveter::ImgConveter(core::MemoryArenaBase* imgArena, core::MemoryArenaBase* swapArena) :
+		swapArena_(swapArena),
+		srcImg_(imgArena)
+	{
+
+	}
+
+	ImgConveter::~ImgConveter()
+	{
+
+	}
+
+
+	bool ImgConveter::LoadImg(const core::Array<uint8_t>& fileData, ImgFileFormat::Enum inputFileFmt)
+	{
+		core::XFileBuf file(fileData.begin(), fileData.end());
+
+		return LoadImg(&file, inputFileFmt);
+	}
+
+	bool ImgConveter::LoadImg(core::XFile* pFile, ImgFileFormat::Enum inputFileFmt)
+	{
+		X_ALIGNED_SYMBOL(char buf[MAX_FMT_CLASS_SIZE], 16);
+		core::LinearAllocator allocator(buf, buf + sizeof(buf));
+
+		ITextureFmt* pFmt = Allocfmt(&allocator, inputFileFmt);
+
+		bool res = pFmt->loadTexture(pFile, srcImg_, swapArena_);
+
+		core::Mem::Destruct<ITextureFmt>(pFmt);
+
+		return res;
+	}
+
+	bool ImgConveter::SaveImg(const core::Path<char>& outPath, CompileFlag flags, ImgFileFormat::Enum dstFileFmt)
+	{
+		core::XFileScoped file;
+		core::fileModeFlags mode;
+		mode.Set(core::fileMode::WRITE);
+		mode.Set(core::fileMode::RECREATE);
+
+		X_ALIGNED_SYMBOL(char buf[MAX_FMT_CLASS_SIZE], 16);
+		core::LinearAllocator allocator(buf, buf + sizeof(buf));
+		ITextureFmt* pFmt = Allocfmt(&allocator, dstFileFmt);
+
+		if (!pFmt->canWrite()) {
+			core::Mem::Destruct<ITextureFmt>(pFmt);
+			X_ERROR("Img", "Writing to fmt: %s is not supported", ImgFileFormat::ToString(dstFileFmt));
+			return false;
+		}
+
+		std::remove_const_t<std::remove_reference_t<decltype(outPath)>> path(outPath);
+		path.setExtension(pFmt->getExtension());
+
+		if (!file.openFile(path.c_str(), mode)) {
+			core::Mem::Destruct<ITextureFmt>(pFmt);
+			return false;
+		}
+
+		bool res = pFmt->saveTexture( file.GetFile(), srcImg_);
+
+		core::Mem::Destruct<ITextureFmt>(pFmt);
+		return res;
+	}
+
+
+	bool ImgConveter::CreateMips(MipFilter::Enum filter, WrapMode::Enum wrap)
+	{
+
+
+		return true;
+	}
+
+	bool ImgConveter::Convert(Texturefmt::Enum targetFmt)
+	{
+
+
+		return true;
+	}
+
+
+	bool ImgConveter::ParseImgFmt(const char* pImgFmt, Texturefmt::Enum& fmtOut)
+	{
+		fmtOut = Texturefmt::UNKNOWN;
+
+		core::StackString<128> imgFmt(pImgFmt);
+		imgFmt.toUpper();
+
+		// everything is 2 or mroe currently.
+		if (imgFmt.length() < 2) {
+			return false;
+		}
+
+		const core::StrHash nameHash(imgFmt.begin(), imgFmt.length());
+		const size_t numFmts = sizeof(formats) / sizeof(FmtStr);
+
+		for (size_t i = 0; i < numFmts; i++)
+		{
+			const auto& fmt = formats[i];
+
+			if (fmt.nameHash == nameHash)
+			{
+				if (imgFmt.isEqual(fmt.pName))
+				{
+					fmtOut = fmt.fmt;
+					return true;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	ITextureFmt* ImgConveter::Allocfmt(core::LinearAllocator* pAllocator, ImgFileFormat::Enum inputFileFmt)
+	{
+		ITextureFmt* pFmt = nullptr;
+
+		switch (inputFileFmt)
+		{
+		case ImgFileFormat::DDS:
+			pFmt = core::Mem::Construct<DDS::XTexLoaderDDS>(pAllocator->allocate(sizeof(DDS::XTexLoaderDDS), X_ALIGN_OF(DDS::XTexLoaderDDS), 0));
+			break;
+		case ImgFileFormat::CI:
+			pFmt = core::Mem::Construct<CI::XTexLoaderCI>(pAllocator->allocate(sizeof(CI::XTexLoaderCI), X_ALIGN_OF(CI::XTexLoaderCI), 0));
+			break;
+		case ImgFileFormat::JPG:
+			pFmt = core::Mem::Construct<JPG::XTexLoaderJPG>(pAllocator->allocate(sizeof(JPG::XTexLoaderJPG), X_ALIGN_OF(JPG::XTexLoaderJPG), 0));
+			break;
+		case ImgFileFormat::TGA:
+			pFmt = core::Mem::Construct<TGA::XTexLoaderTGA>(pAllocator->allocate(sizeof(TGA::XTexLoaderTGA), X_ALIGN_OF(TGA::XTexLoaderTGA), 0));
+			break;
+		case ImgFileFormat::PSD:
+			pFmt = core::Mem::Construct<PSD::XTexLoaderPSD>(pAllocator->allocate(sizeof(PSD::XTexLoaderPSD), X_ALIGN_OF(PSD::XTexLoaderPSD), 0));
+			break;
+		case ImgFileFormat::PNG:
+			pFmt = core::Mem::Construct<PNG::XTexLoaderPNG>(pAllocator->allocate(sizeof(PNG::XTexLoaderPNG), X_ALIGN_OF(PNG::XTexLoaderPNG), 0));
+			break;
+		}
+
+		return pFmt;
+	}
+
+} // namespace Converter
+
+
+
+
+X_NAMESPACE_END
