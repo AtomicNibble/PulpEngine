@@ -552,6 +552,7 @@ namespace DDS
 		} // namespace pixel_util
 
 		X_ENSURE_SIZE(DDS_header, 128);
+		X_ENSURE_SIZE(DDS_DX10_header, 20);
 	}
 
 	XTexLoaderDDS::XTexLoaderDDS()
