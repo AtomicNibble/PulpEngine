@@ -74,6 +74,9 @@
     <ClInclude Include="Converter\Filters.h">
       <Filter>Header Files\Converter</Filter>
     </ClInclude>
+    <ClInclude Include="Converter\FloatImage.h">
+      <Filter>Header Files\Converter</Filter>
+    </ClInclude>
     <ClInclude Include="Converter\Types.h">
       <Filter>Header Files\Converter</Filter>
     </ClInclude>
@@ -121,12 +124,18 @@
     <ClCompile Include="Converter\Filters.cpp">
       <Filter>Source Files\Converter</Filter>
     </ClCompile>
+    <ClCompile Include="Converter\FloatImage.cpp">
+      <Filter>Source Files\Converter</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="TextureFile.inl">
       <Filter>Header Files</Filter>
     </None>
     <None Include="Converter\Filters.inl">
+      <Filter>Header Files\Converter</Filter>
+    </None>
+    <None Include="Converter\FloatImage.inl">
       <Filter>Header Files\Converter</Filter>
     </None>
   </ItemGroup>
