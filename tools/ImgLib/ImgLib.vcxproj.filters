@@ -71,6 +71,9 @@
     <ClInclude Include="Converter\Converter.h">
       <Filter>Header Files\Converter</Filter>
     </ClInclude>
+    <ClInclude Include="Converter\Filters.h">
+      <Filter>Header Files\Converter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -110,6 +113,9 @@
       <Filter>Source Files\Lib</Filter>
     </ClCompile>
     <ClCompile Include="Converter\Converter.cpp">
+      <Filter>Source Files\Converter</Filter>
+    </ClCompile>
+    <ClCompile Include="Converter\Filters.cpp">
       <Filter>Source Files\Converter</Filter>
     </ClCompile>
   </ItemGroup>
