@@ -74,6 +74,9 @@
     <ClInclude Include="Converter\Filters.h">
       <Filter>Header Files\Converter</Filter>
     </ClInclude>
+    <ClInclude Include="Converter\Types.h">
+      <Filter>Header Files\Converter</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

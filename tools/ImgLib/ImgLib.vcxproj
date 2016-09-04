@@ -335,6 +335,7 @@
   <ItemGroup>
     <ClInclude Include="Converter\Converter.h" />
     <ClInclude Include="Converter\Filters.h" />
+    <ClInclude Include="Converter\Types.h" />
     <ClInclude Include="Fmts\CI_Img.h" />
     <ClInclude Include="Fmts\TextureLoaderCI.h" />
     <ClInclude Include="Fmts\TextureLoaderDDS.h" />
