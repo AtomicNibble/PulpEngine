@@ -124,6 +124,9 @@ namespace Util
 		case Texturefmt::R10G10B10A2:	
 			return 32;
 
+		case Texturefmt::R16G16B16A16_FLOAT:
+			return 64;
+
 		default:
 			break;
 		}
@@ -540,6 +543,9 @@ namespace Util
 
 		if (core::strUtil::IsEqualCaseInsen("R10G10B10A2", pStr))
 			return Texturefmt::R10G10B10A2;
+
+		if (core::strUtil::IsEqualCaseInsen("R16G16B16A16_FLOAT", pStr))
+			return Texturefmt::R16G16B16A16_FLOAT;
 
 
 

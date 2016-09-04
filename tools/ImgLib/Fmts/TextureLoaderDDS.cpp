@@ -40,6 +40,9 @@ namespace DDS
 		{
 			PIXEL_FMT_INVALID = 0,
 
+			PIXEL_FMT_R16G16 = 0x70,
+			PIXEL_FMT_A16B16G16R16F = 0x71,
+
 			PIXEL_FMT_DXT1 = PIXEL_FMT_FOURCC('D', 'X', 'T', '1'),
 			PIXEL_FMT_DXT2 = PIXEL_FMT_FOURCC('D', 'X', 'T', '2'),
 			PIXEL_FMT_DXT3 = PIXEL_FMT_FOURCC('D', 'X', 'T', '3'),
@@ -371,6 +374,7 @@ namespace DDS
 				case PIXEL_FMT_DXT5_xGxR: return 8;
 				case PIXEL_FMT_DXT5_xGBR: return 8;
 				case PIXEL_FMT_DXT5_AGBR: return 8;
+				case PIXEL_FMT_A16B16G16R16F: return 64;
 				case PIXEL_FMT_DX10_HEADER:
 					switch (dxFmt)
 					{
@@ -496,6 +500,10 @@ namespace DDS
 
 				case PIXEL_FMT_3DC:
 					return Texturefmt::ATI2;
+
+
+				case PIXEL_FMT_A16B16G16R16F:
+					return Texturefmt::R16G16B16A16_FLOAT;
 
 				case PIXEL_FMT_DX10_HEADER:
 					switch (dxFmt)
@@ -779,6 +787,10 @@ namespace DDS
 					}
 
 					break;		
+
+				case PIXEL_FMT_A16B16G16R16F:
+					format = PIXEL_FMT_A16B16G16R16F;
+					break;
 
 				default:
 				{				
