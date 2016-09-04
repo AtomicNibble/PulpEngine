@@ -393,6 +393,7 @@ namespace DDS
 				default:
 					break;
 				}
+				X_ASSERT_UNREACHABLE();
 				return 0;
 			};
 
@@ -636,7 +637,7 @@ namespace DDS
 		if (!core::bitUtil::IsPowerOfTwo(hdr.dwHeight) || !core::bitUtil::IsPowerOfTwo(hdr.dwWidth))
 		{
 			X_ERROR("DDSLoader", "invalid image dimensions, must be power of two. provided: %ix%i", hdr.dwHeight, hdr.dwWidth);
-			return false;
+		//	return false;
 		}
 		
 
