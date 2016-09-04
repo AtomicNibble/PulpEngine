@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Containers\Array.h>
+
 X_NAMESPACE_BEGIN(texture)
 
 namespace Converter
@@ -134,6 +136,79 @@ namespace Converter
 	};
 
 
+
+	// A 1D kernel. Used to precompute filter weights.
+	class Kernel1
+	{
+		X_NO_COPY(Kernel1);
+
+	public:
+		Kernel1(core::MemoryArenaBase* arena, const Filter& f, int iscale, int samples = 32);
+		~Kernel1();
+
+		X_INLINE float valueAt(uint32_t x) const;
+		X_INLINE int32_t windowSize(void) const;
+		X_INLINE float width(void) const;
+
+		void debugPrint(void) const;
+
+	private:
+		int32_t windowSize_;
+		float width_;
+		core::Array<float> data_;
+	};
+
+
+	// A 2D kernel.
+	class Kernel2
+	{
+	public:
+		explicit Kernel2(core::MemoryArenaBase* arena, uint32_t width);
+		Kernel2(core::MemoryArenaBase* arena, uint32_t width, const float* pData);
+		Kernel2(const Kernel2& k);
+		~Kernel2();
+
+		void normalize(void);
+		void transpose(void);
+
+		X_INLINE float valueAt(uint x, uint y) const;
+		X_INLINE uint32_t windowSize(void) const;
+
+		void initLaplacian(void);
+		void initEdgeDetection(void);
+		void initSobel(void);
+		void initPrewitt(void);
+
+		void initBlendedSobel(const Vec4f& scale);
+
+	private:
+		const uint32_t windowSize_;
+		core::Array<float> data_;
+	};
+
+
+	// A 1D polyphase kernel
+	class PolyphaseKernel
+	{
+		X_NO_COPY(PolyphaseKernel);
+
+	public:
+		PolyphaseKernel(core::MemoryArenaBase* arena, const Filter& f, uint32_t srcLength, uint32_t dstLength, int32_t samples = 32);
+		~PolyphaseKernel();
+
+		X_INLINE float valueAt(uint32_t column, uint32_t x) const;
+		X_INLINE int32_t windowSize(void) const;
+		X_INLINE float width(void) const;
+		X_INLINE uint32_t length(void) const;
+
+		void debugPrint(void) const;
+
+	private:
+		int32_t windowSize_;
+		uint32_t length_;
+		float width_;
+		core::Array<float> data_;
+	};
 
 
 } // namespace Converter
