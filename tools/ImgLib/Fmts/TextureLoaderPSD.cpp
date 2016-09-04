@@ -51,19 +51,18 @@ namespace PSD
 			uint16 depth;			// Bits/channel
 			uint16 mode;			// Color mode of the file (Bitmap/Grayscale..)
 
-			void EdianFlip() {
-				using namespace core;
+			void EdianFlip(void) {
 
-				fourCC = Endian::swap(fourCC);
-				version = Endian::swap(version);
-				channels = Endian::swap(channels);
-				height = Endian::swap(height);
-				width = Endian::swap(width);
-				depth = Endian::swap(depth);
-				mode = Endian::swap(mode);
+				fourCC = core::Endian::swap(fourCC);
+				version = core::Endian::swap(version);
+				channels = core::Endian::swap(channels);
+				height = core::Endian::swap(height);
+				width = core::Endian::swap(width);
+				depth = core::Endian::swap(depth);
+				mode = core::Endian::swap(mode);
 			}
 
-			X_INLINE bool isValid() const
+			X_INLINE bool isValid(void) const
 			{
 				return fourCC == PSD_FILE_FOURCC;
 			}
