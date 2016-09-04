@@ -139,3 +139,5 @@ namespace Converter
 } // namespace Converter
 
 X_NAMESPACE_END
+
+#include "Filters.inl"
