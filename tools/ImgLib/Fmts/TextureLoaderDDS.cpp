@@ -611,8 +611,19 @@ namespace DDS
 
 		if (hdr.dwSize != DDSSizeofDDSurfaceDesc2)
 		{
-			X_ERROR("DDSLoader", "image header surface size is invalid. provided: %i epected: 124", hdr.dwSize);
-			return false;
+			// i've seen a dds file with valid size if ignore the 16 MSB's
+			// lets support it, even if unvalid.
+			uint16_t size16 = static_cast<uint16_t>(hdr.dwSize & 0xFFFF);
+
+			if (size16 != DDSSizeofDDSurfaceDesc2)
+			{
+				X_ERROR("DDSLoader", "image header surface size is invalid. provided: %i epected: 124", hdr.dwSize);
+				return false;
+			}
+			else
+			{
+				X_WARNING("DDSLoader", "Image has malformed size field, contains data in MSB's");
+			}
 		}
 
 		if (hdr.dwHeight > DDSMaxImageDimensions && hdr.dwWidth > DDSMaxImageDimensions)
