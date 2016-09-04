@@ -203,7 +203,7 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 		if (!core::bitUtil::IsPowerOfTwo(src.getWidth()) ||
 			!core::bitUtil::IsPowerOfTwo(src.getHeight()))
 		{
-			// none pow 2 img :|
+			// none pow 2 img :| https://winpic.co/MAbde113843b.gif
 
 			if (!flags.IsSet(CompileFlag::ALLOW_NONE_POW2))
 			{
@@ -217,15 +217,38 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 			return false;
 		}
 
-		if (Util::isDxt(src.getFormat()) && 
-			dstImgFmt != src.getFormat()) // if we already in target format is not a issue, so no warning.
+		if (flags.IsSet(CompileFlag::NO_COMPRESSION))
 		{
-			// this texture is already dxt block compressed.
-			// either we fail or save as this format.
-			X_WARNING("Img", "Source image is already: %s compressed, skipping conversion to: %s",
-				Texturefmt::ToString(src.getFormat()), Texturefmt::ToString(dstImgFmt));
+			// you want none compressed but gave me a block format, fuck you!
+			if (Util::isDxt(src.getFormat()))
+			{
+				X_ERROR("Img", "No compression requested, but source format(%s) is already block compressed. bitch please..",
+					Texturefmt::ToString(src.getFormat()));
+				return false;
+			}
 
+			// just leave as src format?
+			// I suspect it would be nice to convert these to sane formats based on profiles.
+			// something for later..
 			dstImgFmt = src.getFormat();
+		}
+
+
+		if (Util::isDxt(src.getFormat())) 
+		{
+			if (dstImgFmt != src.getFormat())
+			{
+				X_WARNING("Img", "Source image is already: %s compressed, skipping conversion to: %s",
+					Texturefmt::ToString(src.getFormat()), Texturefmt::ToString(dstImgFmt));
+
+				dstImgFmt = src.getFormat();
+			}
+			else
+			{
+				// warn about provided block formats as raw, but it's currently our target fmt for this img, so proceed.
+				X_WARNING("Img", "Source image is already: %s compressed",
+					Texturefmt::ToString(src.getFormat()));
+			}
 		}
 	}
 
