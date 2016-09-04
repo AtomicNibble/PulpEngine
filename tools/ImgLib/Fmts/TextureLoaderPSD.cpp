@@ -9,12 +9,34 @@
 
 X_NAMESPACE_BEGIN(texture)
 
+#ifdef RGB
+#undef RGB
+#endif // !RGB
+
+#ifdef CMYK
+#undef CMYK
+#endif // !CMYK
+
+
 namespace PSD
 {
 	namespace
 	{
 		static const char* PSD_FILE_EXTENSION = ".psd";
 		static const uint32 PSD_FILE_FOURCC =  X_TAG('S','P','B','8'); // reser cus it's it's got edian
+
+		X_DECLARE_ENUM(PsdColorMode)(	
+			Bitmap,
+			GrayScale,
+			Indexed,
+			RGB,
+			CMYK,
+			MultiChannel,
+			DuoTone,
+			LabColor
+		);
+
+		static_assert(PsdColorMode::RGB == 3, "Rgb must be 3");
 
 
 		X_PRAGMA(pack(push, 1))
@@ -291,7 +313,7 @@ namespace PSD
 			return false;
 		}
 
-		if (hdr.mode != 3) {
+		if (hdr.mode != PsdColorMode::RGB) {
 			X_ERROR("TexturePSD", "PSD color mode is not supported. providied: %i required: 3", hdr.mode);
 			return false;
 		}
