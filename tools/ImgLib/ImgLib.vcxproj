@@ -376,6 +376,7 @@
     <ClCompile Include="TextureUtil.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Converter\Filters.inl" />
     <None Include="TextureFile.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -123,5 +123,8 @@
     <None Include="TextureFile.inl">
       <Filter>Header Files</Filter>
     </None>
+    <None Include="Converter\Filters.inl">
+      <Filter>Header Files\Converter</Filter>
+    </None>
   </ItemGroup>
 </Project>
