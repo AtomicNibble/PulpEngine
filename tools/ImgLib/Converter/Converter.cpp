@@ -329,6 +329,11 @@ namespace Converter
 				{
 					ispc::CompressBlocksBC1(&inputImg, pOut);
 				}
+				else
+				{
+					// you twat!
+					X_ASSERT_NOT_IMPLEMENTED();
+				}
 
 				size.x >>= 1;
 				size.y >>= 1;
