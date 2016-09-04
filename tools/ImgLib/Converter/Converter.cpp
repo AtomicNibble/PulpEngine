@@ -281,7 +281,7 @@ namespace Converter
 		dstImg_.setType(TextureType::T2D);
 		dstImg_.setNumMips(srcImg_.getNumMips());
 		// no cube or vol at no.
-		dstImg_.setNumFaces(1);
+		dstImg_.setNumFaces(srcImg_.getNumFaces());
 		dstImg_.setDepth(1);
 		dstImg_.resize();
 
@@ -295,21 +295,24 @@ namespace Converter
 			ispc::bc7_enc_settings settings;													
 			ispc::GetProfile_veryfast(&settings);
 
-			for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+			for (size_t faceIdx = 0; faceIdx < srcImg_.getNumFaces(); faceIdx++)
 			{
-				// for each mip
-				ispc::rgba_surface inputImg;
-				inputImg.ptr = srcImg_.getLevel(0, i);
-				inputImg.width = size.x;
-				inputImg.height = size.y;
-				inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
-	
-				uint8_t* pOut = dstImg_.getLevel(0, i);
+				for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+				{
+					// for each mip
+					ispc::rgba_surface inputImg;
+					inputImg.ptr = srcImg_.getLevel(faceIdx, i);
+					inputImg.width = size.x;
+					inputImg.height = size.y;
+					inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
 
-				ispc::CompressBlocksBC7(&inputImg, pOut, &settings);
-				
-				size.x >>= 1;
-				size.y >>= 1;
+					uint8_t* pOut = dstImg_.getLevel(faceIdx, i);
+
+					ispc::CompressBlocksBC7(&inputImg, pOut, &settings);
+
+					size.x >>= 1;
+					size.y >>= 1;
+				}
 			}
 		}
 		else if (targetFmt == Texturefmt::BC6)
@@ -317,59 +320,68 @@ namespace Converter
 			ispc::bc6h_enc_settings settings;
 			ispc::GetProfile_bc6h_veryfast(&settings);
 
-			for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+			for (size_t faceIdx = 0; faceIdx < srcImg_.getNumFaces(); faceIdx++)
 			{
-				// for each mip
-				ispc::rgba_surface inputImg;
-				inputImg.ptr = srcImg_.getLevel(0, i);
-				inputImg.width = size.x;
-				inputImg.height = size.y;
-				inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
+				for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+				{
+					// for each mip
+					ispc::rgba_surface inputImg;
+					inputImg.ptr = srcImg_.getLevel(faceIdx, i);
+					inputImg.width = size.x;
+					inputImg.height = size.y;
+					inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
 
-				uint8_t* pOut = dstImg_.getLevel(0, i);
+					uint8_t* pOut = dstImg_.getLevel(faceIdx, i);
 
-				ispc::CompressBlocksBC6H(&inputImg, pOut, &settings);
+					ispc::CompressBlocksBC6H(&inputImg, pOut, &settings);
 
-				size.x >>= 1;
-				size.y >>= 1;
+					size.x >>= 1;
+					size.y >>= 1;
+				}
 			}
 		}
 		else if (targetFmt == Texturefmt::BC3)
 		{
-			for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+			for (size_t faceIdx = 0; faceIdx < srcImg_.getNumFaces(); faceIdx++)
 			{
-				// for each mip
-				ispc::rgba_surface inputImg;
-				inputImg.ptr = srcImg_.getLevel(0, i);
-				inputImg.width = size.x;
-				inputImg.height = size.y;
-				inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
+				for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+				{
+					// for each mip
+					ispc::rgba_surface inputImg;
+					inputImg.ptr = srcImg_.getLevel(faceIdx, i);
+					inputImg.width = size.x;
+					inputImg.height = size.y;
+					inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
 
-				uint8_t* pOut = dstImg_.getLevel(0, i);
+					uint8_t* pOut = dstImg_.getLevel(faceIdx, i);
 
-				ispc::CompressBlocksBC3(&inputImg, pOut);
+					ispc::CompressBlocksBC3(&inputImg, pOut);
 
-				size.x >>= 1;
-				size.y >>= 1;
+					size.x >>= 1;
+					size.y >>= 1;
+				}
 			}
 		}
 		else if (targetFmt == Texturefmt::BC1)
 		{
-			for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+			for (size_t faceIdx = 0; faceIdx < srcImg_.getNumFaces(); faceIdx++)
 			{
-				// for each mip
-				ispc::rgba_surface inputImg;
-				inputImg.ptr = srcImg_.getLevel(0, i);
-				inputImg.width = size.x;
-				inputImg.height = size.y;
-				inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
+				for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+				{
+					// for each mip
+					ispc::rgba_surface inputImg;
+					inputImg.ptr = srcImg_.getLevel(faceIdx, i);
+					inputImg.width = size.x;
+					inputImg.height = size.y;
+					inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
 
-				uint8_t* pOut = dstImg_.getLevel(0, i);;
+					uint8_t* pOut = dstImg_.getLevel(faceIdx, i);;
 
-				ispc::CompressBlocksBC1(&inputImg, pOut);
+					ispc::CompressBlocksBC1(&inputImg, pOut);
 
-				size.x >>= 1;
-				size.y >>= 1;
+					size.x >>= 1;
+					size.y >>= 1;
+				}
 			}
 		}
 		else
