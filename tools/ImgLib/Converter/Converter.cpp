@@ -275,10 +275,15 @@ namespace Converter
 		}
 
 
+		if (srcImg_.getDepth() > 1) {
+			X_ERROR("Img", "Converting cube images is not supported");
+			return false;
+		}
+
 
 		dstImg_.setSize(srcImg_.getSize());
 		dstImg_.setFormat(targetFmt);
-		dstImg_.setType(TextureType::T2D);
+		dstImg_.setType(srcImg_.getType());
 		dstImg_.setNumMips(srcImg_.getNumMips());
 		// no cube or vol at no.
 		dstImg_.setNumFaces(srcImg_.getNumFaces());
@@ -290,108 +295,45 @@ namespace Converter
 		// time to convert a pickle.
 		// we will need some sort of profile selection.
 		// i guess that should be a arg, as to the quality level.
-		if (targetFmt == Texturefmt::BC7)
+		ispc::bc7_enc_settings settingsbc7;
+		ispc::GetProfile_veryfast(&settingsbc7);
+		ispc::bc6h_enc_settings settingsbc6;
+		ispc::GetProfile_bc6h_veryfast(&settingsbc6);
+
+		for (size_t faceIdx = 0; faceIdx < srcImg_.getNumFaces(); faceIdx++)
 		{
-			ispc::bc7_enc_settings settings;													
-			ispc::GetProfile_veryfast(&settings);
-
-			for (size_t faceIdx = 0; faceIdx < srcImg_.getNumFaces(); faceIdx++)
+			for (size_t i = 0; i < srcImg_.getNumMips(); i++)
 			{
-				for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+				// for each mip
+				ispc::rgba_surface inputImg;
+				inputImg.ptr = srcImg_.getLevel(faceIdx, i);
+				inputImg.width = size.x;
+				inputImg.height = size.y;
+				inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
+
+				uint8_t* pOut = dstImg_.getLevel(faceIdx, i);
+
+				if (targetFmt == Texturefmt::BC7)
 				{
-					// for each mip
-					ispc::rgba_surface inputImg;
-					inputImg.ptr = srcImg_.getLevel(faceIdx, i);
-					inputImg.width = size.x;
-					inputImg.height = size.y;
-					inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
-
-					uint8_t* pOut = dstImg_.getLevel(faceIdx, i);
-
-					ispc::CompressBlocksBC7(&inputImg, pOut, &settings);
-
-					size.x >>= 1;
-					size.y >>= 1;
+					ispc::CompressBlocksBC7(&inputImg, pOut, &settingsbc7);
 				}
-			}
-		}
-		else if (targetFmt == Texturefmt::BC6)
-		{
-			ispc::bc6h_enc_settings settings;
-			ispc::GetProfile_bc6h_veryfast(&settings);
-
-			for (size_t faceIdx = 0; faceIdx < srcImg_.getNumFaces(); faceIdx++)
-			{
-				for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+				else if (targetFmt == Texturefmt::BC6)
 				{
-					// for each mip
-					ispc::rgba_surface inputImg;
-					inputImg.ptr = srcImg_.getLevel(faceIdx, i);
-					inputImg.width = size.x;
-					inputImg.height = size.y;
-					inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
-
-					uint8_t* pOut = dstImg_.getLevel(faceIdx, i);
-
-					ispc::CompressBlocksBC6H(&inputImg, pOut, &settings);
-
-					size.x >>= 1;
-					size.y >>= 1;
+					ispc::CompressBlocksBC6H(&inputImg, pOut, &settingsbc6);
 				}
-			}
-		}
-		else if (targetFmt == Texturefmt::BC3)
-		{
-			for (size_t faceIdx = 0; faceIdx < srcImg_.getNumFaces(); faceIdx++)
-			{
-				for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+				else if (targetFmt == Texturefmt::BC3)
 				{
-					// for each mip
-					ispc::rgba_surface inputImg;
-					inputImg.ptr = srcImg_.getLevel(faceIdx, i);
-					inputImg.width = size.x;
-					inputImg.height = size.y;
-					inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
-
-					uint8_t* pOut = dstImg_.getLevel(faceIdx, i);
-
 					ispc::CompressBlocksBC3(&inputImg, pOut);
-
-					size.x >>= 1;
-					size.y >>= 1;
 				}
-			}
-		}
-		else if (targetFmt == Texturefmt::BC1)
-		{
-			for (size_t faceIdx = 0; faceIdx < srcImg_.getNumFaces(); faceIdx++)
-			{
-				for (size_t i = 0; i < srcImg_.getNumMips(); i++)
+				else if (targetFmt == Texturefmt::BC1)
 				{
-					// for each mip
-					ispc::rgba_surface inputImg;
-					inputImg.ptr = srcImg_.getLevel(faceIdx, i);
-					inputImg.width = size.x;
-					inputImg.height = size.y;
-					inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
-
-					uint8_t* pOut = dstImg_.getLevel(faceIdx, i);;
-
 					ispc::CompressBlocksBC1(&inputImg, pOut);
-
-					size.x >>= 1;
-					size.y >>= 1;
 				}
+
+				size.x >>= 1;
+				size.y >>= 1;
 			}
 		}
-		else
-		{
-			// ye fooking wut?
-			X_ERROR("Img", "Converting to %s not currently supported", Texturefmt::ToString(targetFmt));
-			dstImg_.clear();
-			return false;
-		}
-
 
 		return true;
 	}
