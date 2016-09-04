@@ -263,7 +263,7 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 	}
 
 	if (!con.Convert(dstImgFmt)) {
-		X_ERROR("Img", "Failed to create mips for image");
+		X_ERROR("Img", "Failed to convert image");
 		return false;
 	}
 
