@@ -48,6 +48,12 @@ X_DECLARE_ENUM8(TextureType) (
 
 // these are UNORM by default.
 // except bc6 which is uf16, so yer every things unsigned by default.
+// !! this is not safe to edit without all CI image rebuild. !!
+// !! adding stuff at end is safe !!
+// Few places need updating after changes here:
+// * ImgLib::Converter.cpp
+// * ImgLib::TextureUtil.cpp
+// * RenderDll::TextureManager.cpp
 X_DECLARE_ENUM8(Texturefmt) (
 
 A8,
@@ -65,6 +71,9 @@ R16G16_SNORM,
 R16G16_SINT,
 R16G16_UINT,
 R16G16_TYPELESS,
+
+// for HDR / BC6 input
+R16G16B16A16_FLOAT,
 
 R8G8B8,
 
