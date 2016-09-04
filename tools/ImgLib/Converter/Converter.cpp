@@ -248,6 +248,31 @@ namespace Converter
 			return true;
 		}
 
+		// input must be 32bit/pixel sRGB
+		// for HDR is 64bit/pixel half floats.
+		if (targetFmt == Texturefmt::BC7 || targetFmt == Texturefmt::BC3 || targetFmt == Texturefmt::BC1)
+		{
+			if (srcImg_.getFormat() != Texturefmt::R8G8B8A8)
+			{
+				X_ERROR("Img", "Converting to %s requires R8G8B8A8 src", Texturefmt::ToString(targetFmt));
+				return false;
+			}
+		}
+		else if (targetFmt == Texturefmt::BC6)
+		{
+			if (srcImg_.getFormat() != Texturefmt::R16G16B16A16_FLOAT)
+			{
+				X_ERROR("Img", "Converting to %s requires R16G16B16A16 src", Texturefmt::ToString(targetFmt));
+				return false;
+			}
+		}
+		else
+		{
+			X_ERROR("Img", "Converting to %s not currently supported", Texturefmt::ToString(targetFmt));
+			return false;
+		}
+
+
 
 		dstImg_.setSize(srcImg_.getSize());
 		dstImg_.setFormat(targetFmt);
@@ -257,7 +282,6 @@ namespace Converter
 		dstImg_.setNumFaces(1);
 		dstImg_.setDepth(1);
 		dstImg_.resize();
-
 
 		Vec2<uint16_t> size = srcImg_.getSize();
 
@@ -273,15 +297,15 @@ namespace Converter
 			{
 				// for each mip
 				ispc::rgba_surface inputImg;
-				inputImg.ptr = srcImg_.getFace(i);
+				inputImg.ptr = srcImg_.getLevel(0, i);
 				inputImg.width = size.x;
 				inputImg.height = size.y;
 				inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
-
-				uint8_t* pOut = dstImg_.getFace(i);
+	
+				uint8_t* pOut = dstImg_.getLevel(0, i);
 
 				ispc::CompressBlocksBC7(&inputImg, pOut, &settings);
-
+				
 				size.x >>= 1;
 				size.y >>= 1;
 			}
@@ -295,12 +319,12 @@ namespace Converter
 			{
 				// for each mip
 				ispc::rgba_surface inputImg;
-				inputImg.ptr = srcImg_.getFace(i);
+				inputImg.ptr = srcImg_.getLevel(0, i);
 				inputImg.width = size.x;
 				inputImg.height = size.y;
 				inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
 
-				uint8_t* pOut = dstImg_.getFace(i);
+				uint8_t* pOut = dstImg_.getLevel(0, i);
 
 				ispc::CompressBlocksBC6H(&inputImg, pOut, &settings);
 
@@ -314,12 +338,12 @@ namespace Converter
 			{
 				// for each mip
 				ispc::rgba_surface inputImg;
-				inputImg.ptr = srcImg_.getFace(i);
+				inputImg.ptr = srcImg_.getLevel(0, i);
 				inputImg.width = size.x;
 				inputImg.height = size.y;
 				inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
 
-				uint8_t* pOut = dstImg_.getFace(i);
+				uint8_t* pOut = dstImg_.getLevel(0, i);
 
 				ispc::CompressBlocksBC3(&inputImg, pOut);
 
@@ -333,12 +357,12 @@ namespace Converter
 			{
 				// for each mip
 				ispc::rgba_surface inputImg;
-				inputImg.ptr = srcImg_.getFace(i);
+				inputImg.ptr = srcImg_.getLevel(0, i);
 				inputImg.width = size.x;
 				inputImg.height = size.y;
 				inputImg.stride = safe_static_cast<uint32_t, size_t>(Util::rowBytes(size.x, size.y, srcImg_.getFormat()));
 
-				uint8_t* pOut = dstImg_.getFace(i);
+				uint8_t* pOut = dstImg_.getLevel(0, i);;
 
 				ispc::CompressBlocksBC1(&inputImg, pOut);
 
