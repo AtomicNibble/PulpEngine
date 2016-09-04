@@ -252,9 +252,10 @@ namespace Converter
 		// for HDR is 64bit/pixel half floats.
 		if (targetFmt == Texturefmt::BC7 || targetFmt == Texturefmt::BC3 || targetFmt == Texturefmt::BC1)
 		{
-			if (srcImg_.getFormat() != Texturefmt::R8G8B8A8)
+			if (srcImg_.getFormat() != Texturefmt::R8G8B8A8 && srcImg_.getFormat() != Texturefmt::B8G8R8A8)
 			{
-				X_ERROR("Img", "Converting to %s requires R8G8B8A8 src", Texturefmt::ToString(targetFmt));
+				X_ERROR("Img", "Converting to %s requires R8G8B8A8 src. have: %s", 
+					Texturefmt::ToString(targetFmt), Texturefmt::ToString(srcImg_.getFormat()));
 				return false;
 			}
 		}
@@ -262,7 +263,8 @@ namespace Converter
 		{
 			if (srcImg_.getFormat() != Texturefmt::R16G16B16A16_FLOAT)
 			{
-				X_ERROR("Img", "Converting to %s requires R16G16B16A16 src", Texturefmt::ToString(targetFmt));
+				X_ERROR("Img", "Converting to %s requires R16G16B16A16 src. have: %s", 
+					Texturefmt::ToString(targetFmt), Texturefmt::ToString(srcImg_.getFormat()));
 				return false;
 			}
 		}
