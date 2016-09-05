@@ -174,6 +174,23 @@ X_INLINE size_t XTextureFile::getFaceSize(void) const
 	return data_.size() / numFaces_;
 }
 
+X_INLINE size_t XTextureFile::getLevelSize(size_t mip) const
+{
+	if (mip == (numMips_ - 1)) 
+	{
+		// have to calculate if last.
+		uint32_t width = size_.x;
+		uint32_t height = size_.y;
+
+		width >>= mip;
+		height >>= mip;
+
+		return Util::dataSize(core::Max(1u,width), core::Max(1u, height), depth_, format_);
+	}
+
+	return mipOffsets_[mip + 1] - mipOffsets_[mip];
+}
+
 
 X_INLINE void XTextureFile::setSize(const Vec2<uint16_t> size)
 { 
