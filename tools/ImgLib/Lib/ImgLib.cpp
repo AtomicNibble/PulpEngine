@@ -295,7 +295,7 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 		return false;
 	}
 
-	// all good in the good BOI!
+	// all good in the hood BOI!
 	return true;
 }
 
