@@ -16,6 +16,8 @@ namespace Converter
 
 	class FloatImage
 	{
+	public:
+		typedef core::Array<float> ImgData;
 			
 	public:
 		FloatImage(core::MemoryArenaBase* arena);
@@ -77,7 +79,7 @@ namespace Converter
 		uint16_t height_;
 		uint16_t depth_;
 		uint32_t pixelCount_;
-		core::Array<float> data_;
+		ImgData data_;
 	};
 
 
