@@ -43,7 +43,9 @@ namespace Converter
 	);
 
 	X_DECLARE_ENUM(MipFilter) (
-		DEFAULT
+		Box,
+		Triangle,
+		Kaiser
 	);
 
 	X_DECLARE_ENUM(WrapMode) (
