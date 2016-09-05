@@ -27,7 +27,7 @@ namespace Converter
 		bool LoadImg(core::XFile* pFile, ImgFileFormat::Enum inputFileFmt);
 		bool SaveImg(const core::Path<char>& outPath, CompileFlags flags, ImgFileFormat::Enum dstFileFmt);
 
-		bool CreateMips(MipFilter::Enum filter, WrapMode::Enum wrap);
+		bool CreateMips(MipFilter::Enum filter, WrapMode::Enum wrap, bool ignoreSrcMips = false);
 		bool Convert(Texturefmt::Enum targetFmt);
 
 		const XTextureFile& getTextFile(void) const;

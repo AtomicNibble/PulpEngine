@@ -279,7 +279,7 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 	// 
 
 	if (!flags.IsSet(CompileFlag::NOMIPS)) {
-		if (!con.CreateMips(mipFilter, wrapMode)) {
+		if (!con.CreateMips(mipFilter, wrapMode, flags.IsSet(CompileFlag::IGNORE_SRC_MIPS))) {
 			X_ERROR("Img", "Failed to create mips for image");
 			return false;
 		}

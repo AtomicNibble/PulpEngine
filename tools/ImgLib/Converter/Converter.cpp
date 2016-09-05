@@ -212,7 +212,7 @@ namespace Converter
 	}
 
 
-	bool ImgConveter::CreateMips(MipFilter::Enum filter, WrapMode::Enum wrap)
+	bool ImgConveter::CreateMips(MipFilter::Enum filter, WrapMode::Enum wrap, bool ignoreSrcMips)
 	{
 		const uint32_t curMips = srcImg_.getNumMips();
 		const uint32_t requiredMips = Util::maxMipsForSize(srcImg_.getWidth(), srcImg_.getHeight());
