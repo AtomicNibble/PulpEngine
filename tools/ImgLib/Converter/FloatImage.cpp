@@ -881,6 +881,15 @@ namespace Converter
 		}
 	}
 
+	void FloatImage::swap(FloatImage& oth)
+	{
+		core::Swap(componentCount_, oth.componentCount_);
+		core::Swap(width_, oth.width_);
+		core::Swap(height_, oth.height_);
+		core::Swap(depth_, oth.depth_);
+		core::Swap(pixelCount_, oth.pixelCount_);
+		data_.swap(oth.data_);
+	}
 
 	uint32_t FloatImage::index(int32_t x, int32_t y, int32_t z, WrapMode::Enum wm) const
 	{

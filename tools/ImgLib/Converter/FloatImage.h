@@ -51,6 +51,8 @@ namespace Converter
 		void flipY(void);
 		void flipZ(void);
 
+		void swap(FloatImage& oth);
+
 		X_INLINE uint32_t width(void) const;
 		X_INLINE uint32_t height(void) const;
 		X_INLINE uint32_t depth(void) const;
