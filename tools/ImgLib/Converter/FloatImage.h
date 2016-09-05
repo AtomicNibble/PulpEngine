@@ -59,7 +59,6 @@ namespace Converter
 		X_INLINE uint32_t componentCount(void) const;
 		X_INLINE uint32_t pixelCount(void) const;
 
-	private:
 		X_INLINE const float* channel(uint32_t component) const;
 		X_INLINE float* channel(uint32_t component);
 
@@ -69,6 +68,7 @@ namespace Converter
 		X_INLINE const float* scanline(uint32_t component, uint32_t y, uint32_t z) const;
 		X_INLINE float* scanline(uint32_t component, uint32_t y, uint32_t z);
 
+	private:
 		X_INLINE uint32_t index(uint32_t x, uint32_t y, uint32_t z) const;
 		uint32_t index(int32_t x, int32_t y, int32_t z, WrapMode::Enum wm) const;
 		uint32_t indexClamp(int32_t x, int32_t y, int32_t z) const;
