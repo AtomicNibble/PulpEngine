@@ -101,6 +101,29 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 			flags.Set(CompileFlag::ALLOW_NONE_POW2);
 		}
 	}
+	if (d.HasMember("alpha")) {
+		if (d["alpha"].GetBool()) {
+			flags.Set(CompileFlag::ALPHA);
+		}
+	}
+	if (d.HasMember("mipFilter")) {
+		const char* pMipFilter = d["mipFilter"].GetString();
+
+		if (core::strUtil::IsEqualCaseInsen(pMipFilter, "Box")) {
+			mipFilter = MipFilter::Box;
+		}
+		else if (core::strUtil::IsEqualCaseInsen(pMipFilter, "Triangle")) {
+			mipFilter = MipFilter::Triangle;
+		}
+		else if (core::strUtil::IsEqualCaseInsen(pMipFilter, "Kaiser")) {
+			mipFilter = MipFilter::Kaiser;
+		}
+		else {
+			X_ERROR("Img", "Invalid mipfilter: \"%s\"", pMipFilter);
+			return false;
+		}
+	}
+
 	if (d.HasMember("scale")) {
 		const char* pScaleFactor = d["scale"].GetString();
 
