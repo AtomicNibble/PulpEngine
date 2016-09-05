@@ -115,6 +115,13 @@ X_INLINE void Array<T>::setArena(MemoryArenaBase* arena, size_type capacity)
 	reserve(capacity);
 }
 
+template<typename T>
+X_INLINE core::MemoryArenaBase*  Array<T>::getArena(void) const
+{
+	return arena_;
+}
+
+
 // ---------------------------------------------------------
 
 template<typename T>

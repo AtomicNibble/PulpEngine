@@ -39,6 +39,7 @@ public:
 
 	void setArena(MemoryArenaBase* arena);
 	void setArena(MemoryArenaBase* arena, size_type capacity);
+	core::MemoryArenaBase* getArena(void) const; // have one use case for this currently lol.
 
 	Array<T>& operator=(std::initializer_list<T> iList);
 	Array<T>& operator=(const Array<T>& oth);
