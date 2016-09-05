@@ -119,6 +119,7 @@ struct math<int>
 	X_INLINE static  int	ceil(int x)					{ return ::ceil(double(x)); }
 	X_INLINE static  int	abs(int x)					{ return ::fabs(double(x)); }
 	X_INLINE static  int	floor(int x)				{ return ::floor(double(x)); }
+	X_INLINE static  int	clamp(int x, int min = 0, int max = 1) { return (x < min) ? min : ((x > max) ? max : x); }
 
 	X_INLINE static int32 isneg(int32 x) 
 	{
