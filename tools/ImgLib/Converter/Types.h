@@ -9,6 +9,7 @@ namespace Converter
 
 	X_DECLARE_FLAGS(CompileFlag)(
 		NOMIPS,
+		IGNORE_SRC_MIPS,
 		PREMULTIPLY_ALPHA,
 		ALLOW_NONE_POW2,
 
