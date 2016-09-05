@@ -28,13 +28,13 @@ namespace Converter
 		void allocate(uint32_t channels, uint32_t width, uint32_t heigth, uint32_t depth = 1);
 		void free(void);
 
-		void fastDownSample(void) const;
-		void downSample(const Filter& filter, WrapMode::Enum wm) const;
-		void downSample(const Filter& filter, WrapMode::Enum wm, uint32_t alphaChannel) const;
-		void resize(const Filter& filter, uint32_t w, uint32_t h, WrapMode::Enum wm) const;
-		void resize(const Filter& filter, uint32_t w, uint32_t h, uint32_t d, WrapMode::Enum wm) const;
-		void resize(const Filter& filter, uint32_t w, uint32_t h, WrapMode::Enum wm, uint32_t alphaChannel) const;
-		void resize(const Filter& filter, uint32_t w, uint32_t h, uint32_t d, WrapMode::Enum wm, uint32_t alphaChannel) const;
+		void fastDownSample(FloatImage& dst) const;
+		void downSample(FloatImage& dst, core::MemoryArenaBase* arena, const Filter& filter, WrapMode::Enum wm) const;
+		void downSample(FloatImage& dst, core::MemoryArenaBase* arena, const Filter& filter, WrapMode::Enum wm, uint32_t alphaChannel) const;
+		void resize(FloatImage& dst, core::MemoryArenaBase* arena, const Filter& filter, uint32_t w, uint32_t h, WrapMode::Enum wm) const;
+		void resize(FloatImage& dst, core::MemoryArenaBase* arena, const Filter& filter, uint32_t w, uint32_t h, uint32_t d, WrapMode::Enum wm) const;
+		void resize(FloatImage& dst, core::MemoryArenaBase* arena, const Filter& filter, uint32_t w, uint32_t h, WrapMode::Enum wm, uint32_t alphaChannel) const;
+		void resize(FloatImage& dst, core::MemoryArenaBase* arena, const Filter& filter, uint32_t w, uint32_t h, uint32_t d, WrapMode::Enum wm, uint32_t alphaChannel) const;
 
 		float applyKernelXY(const Kernel2* k, int32_t x, int32_t y, int32_t z, uint32_t c, WrapMode::Enum wm) const;
 		float applyKernelX(const Kernel1* k, int32_t x, int32_t y, int32_t z, uint32_t c, WrapMode::Enum wm) const;
@@ -72,6 +72,8 @@ namespace Converter
 		uint32_t indexClamp(int32_t x, int32_t y, int32_t z) const;
 		uint32_t indexRepeat(int32_t x, int32_t y, int32_t z) const;
 		uint32_t indexMirror(int32_t x, int32_t y, int32_t z) const;
+
+		static size_t getAllocationSize(uint32_t channels, uint32_t width, uint32_t height, uint32_t depth);
 
 	private:
 		uint16_t componentCount_; // R, G, B, A ..

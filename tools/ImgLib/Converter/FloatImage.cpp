@@ -95,7 +95,7 @@ namespace Converter
 		}
 	}
 
-	void FloatImage::allocate(uint32_t channels, uint32_t width, uint32_t height, uint32_t depth )
+	void FloatImage::allocate(uint32_t channels, uint32_t width, uint32_t height, uint32_t depth)
 	{
 		if (componentCount_!= channels || width_ != width || height_ != height || depth_ != depth)
 		{
@@ -106,7 +106,7 @@ namespace Converter
 			depth_ = depth;
 			componentCount_ = channels;
 			pixelCount_ = width * height * depth;
-			data_.resize(pixelCount_);
+			data_.resize(getAllocationSize(channels, width, height, depth));
 		}
 	}
 
@@ -115,47 +115,423 @@ namespace Converter
 		data_.free();
 	}
 
-	void FloatImage::fastDownSample(void) const
+	void FloatImage::fastDownSample(FloatImage& dst) const
 	{
+		const uint32_t newWidth = core::Max(1, width_ / 2);
+		const uint32_t newHeight = core::Max(1, height_ / 2);
+		dst.allocate(componentCount_, newWidth, newHeight);
 
+
+		// 1D box filter.
+		if (width_ == 1 || height_ == 1)
+		{
+			const uint32_t num = newWidth * newHeight;
+
+			if ((width_ * height_) & 1)
+			{
+				const float scale = 1.0f / (2 * num + 1);
+
+				for (uint32_t c = 0; c < componentCount_; c++)
+				{
+					const float* pSrc = channel(c);
+					float* pDst = dst.channel(c);
+
+					for (uint32_t x = 0; x < num; x++)
+					{
+						const float w1 = float(num - 0);
+						const float w0 = float(num - x);
+						const float w2 = float(1 + x);
+
+						*pDst++ = scale * (w0 * pSrc[0] + w1 * pSrc[1] + w2 * pSrc[2]);
+						pSrc += 2;
+					}
+				}
+			}
+			else
+			{
+				for (uint32_t c = 0; c < componentCount_; c++)
+				{
+					const float* pSrc = channel(c);
+					float* pDst = dst.channel(c);
+
+					for (uint32_t x = 0; x < num; x++)
+					{
+						*pDst = 0.5f * (pSrc[0] + pSrc[1]);
+						pDst++;
+						pSrc += 2;
+					}
+				}
+			}
+		}
+		// Regular box filter.
+		else if ((width_ & 1) == 0 && (height_ & 1) == 0)
+		{
+			for (uint32_t c = 0; c < componentCount_; c++)
+			{
+				const float* pSrc = channel(c);
+				float * pDst = dst.channel(c);
+
+				for (uint32_t y = 0; y < newHeight; y++)
+				{
+					for (uint32_t x = 0; x < newWidth; x++)
+					{
+						*pDst = 0.25f * (pSrc[0] + pSrc[1] + pSrc[width_] + pSrc[width_ + 1]);
+						pDst++;
+						pSrc += 2;
+					}
+
+					pSrc += width_;
+				}
+			}
+		}
+		// Polyphase filters.
+		else if (width_ & 1 && height_ & 1)
+		{
+			X_ASSERT(width_ == 2 * newWidth + 1, "")(width_, newWidth);
+			X_ASSERT(height_ == 2 * newHeight + 1, "")(height_, newHeight);
+
+			const float scale = 1.0f / (width_ * height_);
+
+			for (uint32_t c = 0; c < componentCount_; c++)
+			{
+				const float* pSrc = channel(c);
+				float* pDst = dst.channel(c);
+
+				for (uint32_t y = 0; y < newHeight; y++)
+				{
+					const float v0 = float(newHeight - y);
+					const float v1 = float(newHeight - 0);
+					const float v2 = float(1 + y);
+
+					for (uint32_t x = 0; x < newWidth; x++)
+					{
+						const float w0 = float(newWidth - x);
+						const float w1 = float(newWidth - 0);
+						const float w2 = float(1 + x);
+
+						float f = 0.0f;
+						f += v0 * (w0 * pSrc[0 * width_ + 2 * x] + w1 * pSrc[0 * width_ + 2 * x + 1] + w2 * pSrc[0 * width_ + 2 * x + 2]);
+						f += v1 * (w0 * pSrc[1 * width_ + 2 * x] + w1 * pSrc[1 * width_ + 2 * x + 1] + w2 * pSrc[1 * width_ + 2 * x + 2]);
+						f += v2 * (w0 * pSrc[2 * width_ + 2 * x] + w1 * pSrc[2 * width_ + 2 * x + 1] + w2 * pSrc[2 * width_ + 2 * x + 2]);
+
+						*pDst = f * scale;
+						pDst++;
+					}
+
+					pSrc += 2 * width_;
+				}
+			}
+		}
+		else if (width_ & 1)
+		{
+			X_ASSERT(width_ == 2 * newWidth + 1, "")(width_, newWidth);
+			const float scale = 1.0f / (2 * width_);
+
+			for (uint32_t c = 0; c < componentCount_; c++)
+			{
+				const float* pSrc = channel(c);
+				float* pDst = dst.channel(c);
+
+				for (uint32_t y = 0; y < newHeight; y++)
+				{
+					for (uint32_t x = 0; x < newWidth; x++)
+					{
+						const float w0 = float(newWidth - x);
+						const float w1 = float(newWidth - 0);
+						const float w2 = float(1 + x);
+
+						float f = 0.0f;
+						f += w0 * (pSrc[2 * x + 0] + pSrc[width_ + 2 * x + 0]);
+						f += w1 * (pSrc[2 * x + 1] + pSrc[width_ + 2 * x + 1]);
+						f += w2 * (pSrc[2 * x + 2] + pSrc[width_ + 2 * x + 2]);
+
+						*pDst = f * scale;
+						pDst++;
+					}
+
+					pSrc += 2 * width_;
+				}
+			}
+		}
+		else if (height_ & 1)
+		{
+			X_ASSERT(height_ == 2 * newHeight + 1, "")(height_, newHeight);
+
+			const float scale = 1.0f / (2 * height_);
+
+			for (uint32_t c = 0; c < componentCount_; c++)
+			{
+				const float* pSrc = channel(c);
+				float* pDst = dst.channel(c);
+
+				for (uint32_t y = 0; y < newHeight; y++)
+				{
+					const float v0 = float(newHeight - y);
+					const float v1 = float(newHeight - 0);
+					const float v2 = float(1 + y);
+
+					for (uint32_t x = 0; x < newWidth; x++)
+					{
+						float f = 0.0f;
+						f += v0 * (pSrc[0 * width_ + 2 * x] + pSrc[0 * width_ + 2 * x + 1]);
+						f += v1 * (pSrc[1 * width_ + 2 * x] + pSrc[1 * width_ + 2 * x + 1]);
+						f += v2 * (pSrc[2 * width_ + 2 * x] + pSrc[2 * width_ + 2 * x + 1]);
+
+						*pDst = f * scale;
+						pDst++;
+					}
+
+					pSrc += 2 * width_;
+				}
+			}
+		}
+		else
+		{
+			X_ASSERT_UNREACHABLE();
+		}
 	}
 
-	void FloatImage::downSample(const Filter& filter, WrapMode::Enum wm) const
+	void FloatImage::downSample(FloatImage& dst, core::MemoryArenaBase* arena, const Filter& filter, WrapMode::Enum wm) const
 	{
 		const uint32_t w = core::Max(1, width_ / 2);
 		const uint32_t h = core::Max(1, height_ / 2);
 		const uint32_t d = core::Max(1, depth_ / 2);
 
-		return resize(filter, w, h, d, wm);
+		return resize(dst, arena, filter, w, h, d, wm);
 	}
 
-	void FloatImage::downSample(const Filter& filter, WrapMode::Enum wm, uint32_t alphaChannel) const
+	void FloatImage::downSample(FloatImage& dst, core::MemoryArenaBase* arena, const Filter& filter, WrapMode::Enum wm, uint32_t alphaChannel) const
 	{
 		const uint32_t w = core::Max(1, width_ / 2);
 		const uint32_t h = core::Max(1, height_ / 2);
 		const uint32_t d = core::Max(1, depth_ / 2);
 
-		return resize(filter, w, h, d, wm, alphaChannel);
+		return resize(dst, arena, filter, w, h, d, wm, alphaChannel);
 	}
 
-	void FloatImage::resize(const Filter& filter, uint32_t w, uint32_t h, WrapMode::Enum wm) const
+	void FloatImage::resize(FloatImage& dst, core::MemoryArenaBase* arena, const Filter& filter, uint32_t w, uint32_t h, WrapMode::Enum wm) const
 	{
+		FloatImage tmpImage(arena);
 
+		PolyphaseKernel xkernel(arena, filter, width_, w, 32);
+		PolyphaseKernel ykernel(arena, filter, height_, h, 32);
+
+		{
+			tmpImage.allocate(componentCount_, w, height_);
+			dst.allocate(componentCount_, w, h);
+
+			// @@ We could avoid this allocation, write directly to dst_plane.
+			core::Array<float> tmpColumn(arena, h);
+			tmpColumn.resize(h);
+
+			for (uint32_t c = 0; c < componentCount_; c++)
+			{
+				for (uint32_t z = 0; z < depth_; z++)
+				{
+					float* pTmpPlane = tmpImage.plane(c, z);
+
+					for (uint32_t y = 0; y < height_; y++) {
+						this->applyKernelX(xkernel, y, z, c, wm, pTmpPlane + y * w);
+					}
+
+					float* pDstPlane = dst.plane(c, z);
+
+					for (uint32_t x = 0; x < w; x++) {
+						tmpImage.applyKernelY(ykernel, x, z, c, wm, tmpColumn.data());
+
+						// @@ We could avoid this copy, write directly to dst_plane.
+						for (uint32_t y = 0; y < h; y++) {
+							pDstPlane[y * w + x] = tmpColumn[y];
+						}
+					}
+				}
+			}
+		}
 	}
 
-	void FloatImage::resize(const Filter& filter, uint32_t w, uint32_t h, uint32_t d, WrapMode::Enum wm) const
+	void FloatImage::resize(FloatImage& dst, core::MemoryArenaBase* arena, const Filter& filter, uint32_t w, uint32_t h, uint32_t d, WrapMode::Enum wm) const
 	{
+		// @@ Use monophase filters when frac(m_width / w) == 0
 
+		// Use the existing 2d version if we are not resizing in the Z axis:
+		if (depth_ == d) {
+			return resize(dst, arena, filter, w, h, wm);
+		}
+
+		FloatImage tmpImage(arena);
+		FloatImage tmpImage2(arena);
+
+		PolyphaseKernel xkernel(arena, filter, width_, w, 32);
+		PolyphaseKernel ykernel(arena, filter, height_, h, 32);
+		PolyphaseKernel zkernel(arena, filter, depth_, d, 32);
+
+		tmpImage.allocate(componentCount_, w, height_, depth_);
+		tmpImage.allocate(componentCount_, w, height_, d);
+		dst.allocate(componentCount_, w, h, d);
+
+		core::Array<float> tmpColumn(arena, h);
+		tmpColumn.resize(h);
+
+		for (uint32_t c = 0; c < componentCount_; c++)
+		{
+			float* pTmpChannel = tmpImage.channel(c);
+
+			// split width in half
+			for (uint32_t z = 0; z < depth_; z++) {
+				for (uint32_t y = 0; y < height_; y++) {
+					this->applyKernelX(xkernel, y, z, c, wm, pTmpChannel + z * height_ * w + y * w);
+				}
+			}
+
+			// split depth in half
+			float* pTmp2Channel = tmpImage2.channel(c);
+			for (uint32_t y = 0; y < height_; y++) {
+				for (uint32_t x = 0; x < w; x++) {
+					tmpImage.applyKernelZ(zkernel, x, y, c, wm, tmpColumn.data());
+
+					for (uint32_t z = 0; z < d; z++) {
+						pTmp2Channel[z * height_ * w + y * w + x] = tmpColumn[z];
+					}
+				}
+			}
+
+			// split height in half
+			float* pDstChannel = dst.channel(c);
+
+			for (uint32_t z = 0; z < d; z++) {
+				for (uint32_t x = 0; x < w; x++) {
+					tmpImage2.applyKernelY(ykernel, x, z, c, wm, tmpColumn.data());
+
+					for (uint32_t y = 0; y < h; y++) {
+						pDstChannel[z * h * w + y * w + x] = tmpColumn[y];
+					}
+				}
+			}
+		}
 	}
 
-	void FloatImage::resize(const Filter& filter, uint32_t w, uint32_t h, WrapMode::Enum wm, uint32_t alphaChannel) const
+	void FloatImage::resize(FloatImage& dst, core::MemoryArenaBase* arena, const Filter& filter, uint32_t w, uint32_t h, WrapMode::Enum wm, uint32_t alphaChannel) const
 	{
+		X_ASSERT(alphaChannel < componentCount_, "Invalid alpha channel index")(alphaChannel, componentCount_);
 
+		FloatImage tmpImage(arena);
+
+		PolyphaseKernel xkernel(arena, filter, width_, w, 32);
+		PolyphaseKernel ykernel(arena, filter, height_, h, 32);
+
+		{
+			tmpImage.allocate(componentCount_, w, height_);
+			dst.allocate(componentCount_, w, h);
+
+			core::Array<float> tmpColumn(arena, h);
+			tmpColumn.resize(h);
+
+			for (uint32_t i = 0; i < componentCount_; i++)
+			{
+				// Process alpha channel first.
+				uint32_t c;
+				if (i == 0) {
+					c = alphaChannel;
+				}
+				else if (i > alphaChannel) {
+					c = i;
+				}
+				else {
+					c = i - 1;
+				}
+
+				for (uint32_t z = 0; z < depth_; z++)
+				{
+					float * tmp_plane = tmpImage.plane(c, z);
+
+					for (uint32_t y = 0; y < height_; y++) {
+						this->applyKernelX(xkernel, y, z, c, wm, tmp_plane + y * w);
+					}
+
+					float * dst_plane = tmpImage.plane(c, z);
+
+					for (uint32_t x = 0; x < w; x++) {
+						tmpImage.applyKernelY(ykernel, x, z, c, wm, tmpColumn.data());
+
+						// @@ Avoid this copy, write directly to dst_plane.
+						for (uint32_t y = 0; y < h; y++) {
+							dst_plane[y * w + x] = tmpColumn[y];
+						}
+					}
+				}
+			}
+		}
 	}
 
-	void FloatImage::resize(const Filter& filter, uint32_t w, uint32_t h, uint32_t d, WrapMode::Enum wm, uint32_t alphaChannel) const
+	void FloatImage::resize(FloatImage& dst, core::MemoryArenaBase* arena, const Filter& filter, 
+		uint32_t w, uint32_t h, uint32_t d, WrapMode::Enum wm, uint32_t alphaChannel) const
 	{
+		X_ASSERT(alphaChannel < componentCount_, "Invalid alpha channel index")(alphaChannel, componentCount_);
 
+		// use the existing 2d version if we are a 2d image:
+		if (depth_ == d) {
+			return resize(dst, arena, filter, w, h, wm, alphaChannel);
+		}
+
+		FloatImage tmpImage(arena);
+		FloatImage tmpImage2(arena);
+
+		PolyphaseKernel xkernel(arena, filter, width_, w, 32);
+		PolyphaseKernel ykernel(arena, filter, height_, h, 32);
+		PolyphaseKernel zkernel(arena, filter, depth_, d, 32);
+
+		tmpImage.allocate(componentCount_, w, height_, depth_);
+		tmpImage2.allocate(componentCount_, w, height_, d);
+		dst.allocate(componentCount_, w, h, d);
+
+		core::Array<float> tmpColumn(arena, h);
+		tmpColumn.resize(h);
+
+		for (uint32_t i = 0; i < componentCount_; i++)
+		{
+			// Process alpha channel first.
+			uint32_t c;
+			if (i == 0) {
+				c = alphaChannel;
+			}
+			else if (i > alphaChannel) {
+				c = i;
+			}
+			else {
+				c = i - 1;
+			}
+
+			float* pTmpChannel = tmpImage.channel(c);
+
+			for (uint32_t z = 0; z < depth_; z++) {
+				for (uint32_t y = 0; y < height_; y++) {
+					this->applyKernelX(xkernel, y, z, c, wm, pTmpChannel + z * height_ * w + y * w);
+				}
+			}
+
+			float* pTmp2Channel = tmpImage2.channel(c);
+			for (uint32_t y = 0; y < height_; y++) {
+				for (uint32_t x = 0; x < w; x++) {
+					tmpImage.applyKernelZ(zkernel, x, y, c, wm, tmpColumn.data());
+
+					for (uint32_t z = 0; z < d; z++) {
+						pTmp2Channel[z * height_ * w + y * w + x] = tmpColumn[z];
+					}
+				}
+			}
+
+			float* pDstChannel = dst.channel(c);
+
+			for (uint32_t z = 0; z < d; z++) {
+				for (uint32_t x = 0; x < w; x++) {
+					tmpImage2.applyKernelY(ykernel, x, z, c, wm, tmpColumn.data());
+
+					for (uint32_t y = 0; y < h; y++) {
+						pDstChannel[z * h * w + y * w + x] = tmpColumn[y];
+					}
+				}
+			}
+		}
 	}
 
 
@@ -543,6 +919,11 @@ namespace Converter
 		y = wrapMirror(y, height_);
 		z = wrapMirror(z, depth_);
 		return index(x, y, z);
+	}
+
+	size_t FloatImage::getAllocationSize(uint32_t channels, uint32_t width, uint32_t height, uint32_t depth)
+	{
+		return ((width * height) * depth) * channels;
 	}
 
 } // namespace Converter
