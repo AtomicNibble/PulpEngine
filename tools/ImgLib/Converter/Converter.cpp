@@ -202,6 +202,9 @@ namespace Converter
 			if (flags.IsSet(CompileFlag::NOMIPS)) {
 				imgFlags.Set(TexFlag::NOMIPS);
 			}
+			if (flags.IsSet(CompileFlag::ALPHA)) {
+				imgFlags.Set(TexFlag::ALPHA);
+			}
 
 			img.setFlags(imgFlags);
 		}
