@@ -13,6 +13,8 @@ namespace Converter
 		PREMULTIPLY_ALPHA,
 		ALLOW_NONE_POW2,
 
+		ALPHA,
+
 		STREAMABLE,			// can be streamed
 		HI_MIP_STREAMING,	// only high mips can be streamed.
 		FORCE_STREAM,		// force stream even if only one mip
