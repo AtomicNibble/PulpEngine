@@ -53,6 +53,9 @@ X_INLINE void XTextureFile::resize(void)
 
 			width >>= 1;
 			height >>= 1;
+
+			X_ASSERT(width > 0, "zero width")(width);
+			X_ASSERT(height > 0, "zero height")(height);
 		}
 	}
 
@@ -62,6 +65,33 @@ X_INLINE void XTextureFile::resize(void)
 		faceOffsets_[i] = faceOffsets_[i - 1] + facesize;
 	}
 }
+
+X_INLINE void XTextureFile::allocMipBuffers(void)
+{
+	const uint32_t mipCnt = Util::maxMipsForSize(size_.x, size_.y);
+
+	if (mipCnt == numMips_) {
+		return;
+	}
+
+	// not gonna support growing a mip count of say 3 to correct count of 9, can be added if needed.
+	X_ASSERT(numMips_ == 1, "Mips greater than one")(numMips_);
+
+	const uint32_t faceSize = Util::dataSize(size_.x, size_.y, mipCnt, format_);
+	const uint32_t faceSize1 = Util::dataSize(size_.x, size_.y, 1, format_);
+	const uint32_t requiredBytes = faceSize * numFaces_;
+
+
+	core::Array<uint8_t> newBuf(data_.getArena());
+	newBuf.resize(requiredBytes);
+
+	// copy top mip.
+	std::memcpy(newBuf.data(), data_.data(), getLevelSize(0));
+
+	data_.swap(newBuf);
+	numMips_ = mipCnt;
+}
+
 
 X_INLINE void XTextureFile::clear(void)
 {

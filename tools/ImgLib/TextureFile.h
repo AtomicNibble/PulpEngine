@@ -20,6 +20,7 @@ public:
 public:
 	// allocatos memory to hold (N mips) * N faces
 	X_INLINE void resize(void);
+	X_INLINE void allocMipBuffers(void); // resizes the buffer to have space for all mip lvl's, keeping data from top mip.
 	X_INLINE void clear(void);
 	X_INLINE void free(void);
 	X_INLINE const bool isValid(void) const;
