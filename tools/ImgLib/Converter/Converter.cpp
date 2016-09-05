@@ -380,6 +380,30 @@ namespace Converter
 		return false;
 	}
 
+	void ImgConveter::getDefaultFilterWidthAndParams(MipFilter::Enum filter, MipMapFilterParams& params)
+	{
+		if (filter == MipFilter::Box) {
+			params.filterWidth = 0.5f;
+			params.params[0] = 0.f;
+			params.params[1] = 0.f;
+		}
+		else if (filter == MipFilter::Triangle) {
+			params.filterWidth = 1.0f;
+			params.params[0] = 0.f;
+			params.params[1] = 0.f;
+		}
+		else if (filter == MipFilter::Kaiser)
+		{
+			params.filterWidth = 3.0f;
+			params.params[0] = 4.0f;
+			params.params[1] = 1.0f;
+		}
+		else {
+			X_ASSERT_NOT_IMPLEMENTED();
+		}
+	}
+
+
 	ITextureFmt* ImgConveter::Allocfmt(core::LinearAllocator* pAllocator, ImgFileFormat::Enum inputFileFmt)
 	{
 		ITextureFmt* pFmt = nullptr;
