@@ -93,13 +93,12 @@ X_INLINE void SafeReleaseDX(T*& pVal)
 }
 
 
-
 template<class T>
 X_INLINE void Swap(T& left, T& right)
 {
-	T tmp = left;
-	left = right; 
-	right = tmp;
+	T tmp = std::move(left);
+	left = std::move(right);
+	right = std::move(tmp);
 }
 
 template<class T, class OtherT = T> 
