@@ -53,14 +53,19 @@ namespace Converter
 
 	}
 
-	void FloatImage::initFrom(const XTextureFile& img)
+	void FloatImage::initFrom(const XTextureFile& img, int32_t face, int32_t mip)
 	{
 		// init from rgb8 for now.
-		if (img.getFormat() != Texturefmt::R8G8B8A8 || img.getFormat() != Texturefmt::A8R8G8B8) {
+		if (img.getFormat() != Texturefmt::R8G8B8A8 && img.getFormat() != Texturefmt::B8G8R8A8) {
 			return;
 		}
 
 		// one face.
+		if (face != 0 && mip != 0) {
+			// alloc logic needs doing.
+			X_ASSERT_NOT_IMPLEMENTED();
+			return;
+		}
 
 		allocate(4, img.getWidth(), img.getHeight(), 1);
 
@@ -70,9 +75,9 @@ namespace Converter
 		float* pAlpha_channel = channel(3);
 
 		// lets do each channel one by one.
-		const uint8_t* pData = img.getLevel(0,0);
+		const uint8_t* pData = img.getLevel(face,mip);
 
-		const uint32_t count = 0;
+		const uint32_t count = pixelCount_;
 		for (uint32_t i = 0; i < count; i++)
 		{
 			uint8_t red = pData[i * 4];
