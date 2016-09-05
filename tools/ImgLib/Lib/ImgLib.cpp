@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ImgLib.h"
 
+#include <Time\StopWatch.h>
 
 #include <String\StringHash.h>
 #include "Converter\Converter.h"
@@ -306,10 +307,14 @@ bool ImgLib::Convert(IConverterHost& host, ConvertArgs& args, const core::Array<
 		MipMapFilterParams filterParams;
 		ImgConveter::getDefaultFilterWidthAndParams(mipFilter, filterParams);
 
+		core::StopWatch timer;
+
 		if (!con.CreateMips(mipFilter, filterParams, wrapMode, flags.IsSet(CompileFlag::ALPHA), flags.IsSet(CompileFlag::IGNORE_SRC_MIPS))) {
 			X_ERROR("Img", "Failed to create mips for image");
 			return false;
 		}
+
+		X_LOG1("Img", "Mipmap creation took: ^6%gms", timer.GetMilliSeconds());
 	}
 
 	if (!con.Convert(dstImgFmt)) {
