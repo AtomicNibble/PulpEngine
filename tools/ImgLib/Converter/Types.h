@@ -59,6 +59,12 @@ namespace Converter
 	typedef Flags<CompileFlag> CompileFlags;
 
 
+	struct MipMapFilterParams
+	{
+		float filterWidth;
+		float params[2];
+	};
+
 } // namespace Converter
 
 X_NAMESPACE_END
