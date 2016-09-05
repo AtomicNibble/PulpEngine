@@ -66,6 +66,16 @@ namespace Converter
 		return plane(component, z) + y * width_;
 	}
 
+	X_INLINE uint32_t FloatImage::index(uint32_t x, uint32_t y, uint32_t z) const
+	{
+		X_ASSERT(x < width_,"Width index out of range")(x, width_);
+		X_ASSERT(y < height_,"Height index out of range")(y, height_);
+		X_ASSERT(z < depth_,"Depth index out of range")(z, depth_);
+		const uint32_t idx = (z * height_ + y) * width_ + x;
+		X_ASSERT(idx < pixelCount_, "Pixel index out of range")(idx, pixelCount_);
+		return idx;
+	}
+
 } // namespace Converter
 
 X_NAMESPACE_END
