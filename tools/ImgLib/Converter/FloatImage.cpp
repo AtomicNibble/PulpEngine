@@ -56,23 +56,32 @@ namespace Converter
 	void FloatImage::initFrom(const XTextureFile& img, int32_t face, int32_t mip)
 	{
 		// init from rgb8 for now.
-		if (img.getFormat() != Texturefmt::R8G8B8A8 && img.getFormat() != Texturefmt::B8G8R8A8) {
+		if (img.getFormat() != Texturefmt::R8G8B8A8 && 
+			img.getFormat() != Texturefmt::B8G8R8A8 &&
+			img.getFormat() != Texturefmt::R8G8B8 &&
+			img.getFormat() != Texturefmt::B8G8R8) {
 			return;
 		}
 
-		// one face.
-		if (face != 0 && mip != 0) {
-			// alloc logic needs doing.
-			X_ASSERT_NOT_IMPLEMENTED();
-			return;
+		// need to get width of the mip.
+		{
+			const uint32_t mipWidth = core::Max<uint32_t>(1u, img.getWidth() >> mip);
+			const uint32_t mipHeight = core::Max<uint32_t>(1u, img.getHeight() >> mip);
+			allocate(4, mipWidth, mipHeight, 1);
 		}
-
-		allocate(4, img.getWidth(), img.getHeight(), 1);
 
 		float* pRed_channel = channel(0);
 		float* pGreen_channel = channel(1);
 		float* pBlue_channel = channel(2);
 		float* pAlpha_channel = channel(3);
+
+		uint32_t pixelStride = 4;
+
+		if (img.getFormat() == Texturefmt::R8G8B8 ||
+			img.getFormat() == Texturefmt::B8G8R8)
+		{
+			pixelStride = 3;
+		}
 
 		// lets do each channel one by one.
 		const uint8_t* pData = img.getLevel(face,mip);
@@ -80,24 +89,37 @@ namespace Converter
 		const uint32_t count = pixelCount_;
 		for (uint32_t i = 0; i < count; i++)
 		{
-			uint8_t red = pData[i * 4];
+			uint8_t red = pData[i * pixelStride];
 			pRed_channel[i] = static_cast<float>(red) / 255.f;
 		}
 		for (uint32_t i = 0; i < count; i++)
 		{
-			uint8_t green = pData[(i * 4) + 1];
+			uint8_t green = pData[(i * pixelStride) + 1];
 			pGreen_channel[i] = static_cast<float>(green) / 255.f;
 		}
 		for (uint32_t i = 0; i < count; i++)
 		{
-			uint8_t blue = pData[(i * 4) + 2];
+			uint8_t blue = pData[(i * pixelStride) + 2];
 			pBlue_channel[i] = static_cast<float>(blue) / 255.f;
 		}
-		for (uint32_t i = 0; i < count; i++)
+
+		if (img.getFormat() != Texturefmt::R8G8B8 ||
+			img.getFormat() != Texturefmt::B8G8R8)
 		{
-			uint8_t alpha = pData[(i * 4) + 3];
-			pAlpha_channel[i] = static_cast<float>(alpha) / 255.f;
+			for (uint32_t i = 0; i < count; i++)
+			{
+				uint8_t alpha = pData[(i * pixelStride) + 3];
+				pAlpha_channel[i] = static_cast<float>(alpha) / 255.f;
+			}
 		}
+		else
+		{
+			for (uint32_t i = 0; i < count; i++)
+			{
+				pAlpha_channel[i] = 1.f;
+			}
+		}
+
 	}
 
 	void FloatImage::allocate(uint32_t channels, uint32_t width, uint32_t height, uint32_t depth)
