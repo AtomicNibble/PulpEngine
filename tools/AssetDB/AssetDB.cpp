@@ -310,7 +310,7 @@ bool AssetDB::GetModInfo(ModId id, Mod& modOut)
 
 bool AssetDB::IterateMods(core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> func)
 {
-	sql::SqlLiteQuery qry(db_, "SELECT mod_id, name, out_dir, lastUpdateTime FROM mods");
+	sql::SqlLiteQuery qry(db_, "SELECT mod_id, name, out_dir FROM mods");
 
 	auto it = qry.begin();
 	for (; it != qry.end(); ++it)
