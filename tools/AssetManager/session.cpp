@@ -26,7 +26,7 @@ public:
     QString sessionName_;
     bool virginSession_;
 
-    mutable QStringList m_sessions;
+    mutable QStringList sessions_;
 
     Project *startupProject_;
     QList<Project *> projects_;
@@ -49,8 +49,6 @@ SessionManager::SessionManager(QObject *parent)
 
 SessionManager::~SessionManager()
 {
-    emit instance_->aboutToUnloadSession(d->sessionName_);
-
     delete d;
 }
 
@@ -84,7 +82,6 @@ void SessionManager::setStartupProject(Project *startupProject)
     }
 
     d->startupProject_ = startupProject;
-    emit instance_->startupProjectChanged(startupProject);
 }
 
 Project *SessionManager::startupProject()
@@ -107,23 +104,12 @@ void SessionManager::addProjects(const QList<Project*> &projects)
             d->projects_.append(pro);
             d->sessionNode_->addProjectNodes(QList<ProjectNode *>() << pro->rootProjectNode());
 
-            connect(pro, SIGNAL(fileListChanged()),
-                    instance_, SLOT(clearProjectFileCache()));
 
             connect(pro, SIGNAL(displayNameChanged()),
                     instance_, SLOT(projectDisplayNameChanged()));
 
-
             qDebug() << "SessionManager - adding project " << pro->displayName();
         }
-    }
-
-    foreach (Project *pro, clearedList) {
-        emit instance_->projectAdded(pro);
-    }
-
-    if (clearedList.count() == 1) {
-        emit instance_->singleProjectAdded(clearedList.first());
     }
 }
 
@@ -141,26 +127,6 @@ void SessionManager::removeProject(Project *project)
 void SessionManager::removeProjects(QList<Project *> remove)
 {
 
-}
-
-bool SessionManager::save()
-{
-    qDebug() << "SessionManager - saving session" << d->sessionName_;
-
-    emit instance_->aboutToSaveSession();
-
-    bool result = true;
-
-
-   qDebug() << "SessionManager - saving session returned " << result;
-
-    return result;
-}
-
-void SessionManager::closeAllProjects()
-{
-  setStartupProject(0);
-  removeProjects(projects());
 }
 
 const QList<Project *> &SessionManager::projects()
@@ -181,37 +147,9 @@ QString SessionManager::activeSession()
 
 QStringList SessionManager::sessions()
 {
-    return d->m_sessions;
+    return d->sessions_;
 }
 
-
-
-bool SessionManager::createSession(const QString &session)
-{
-    if (sessions().contains(session))
-        return false;
-    Q_ASSERT(d->m_sessions.size() > 0);
-    d->m_sessions.insert(1, session);
-    return true;
-}
-
-
-
-bool SessionManager::loadSession(const QString &session)
-{
-    if (session == d->sessionName_ && !isDefaultVirgin())
-        return true;
-
-    if (!sessions().contains(session))
-        return false;
-
-
-    // Allow everyone to set something in the session and before saving
-    emit instance_->aboutToUnloadSession(d->sessionName_);
-
-
-    return true;
-}
 
 QString SessionManager::lastSession()
 {
@@ -224,6 +162,21 @@ SessionNode *SessionManager::sessionNode()
     return d->sessionNode_;
 }
 
+
+
+void SessionManager::projectDisplayNameChanged()
+{
+    Project *pro = qobject_cast<Project*>(instance_->sender());
+    if (pro) {
+
+        QList<ProjectNode *> nodes;
+        nodes << pro->rootProjectNode();
+        d->sessionNode_->removeProjectNodes(nodes);
+        d->sessionNode_->addProjectNodes(nodes);
+
+        emit instance_->projectDisplayNameChanged(pro);
+    }
+}
 
 
 } // namespace AssetExplorer

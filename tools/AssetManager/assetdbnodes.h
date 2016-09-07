@@ -68,7 +68,7 @@ public:
     NodeType nodeType(void) const;
     ProjectNode *projectNode(void) const;     // managing project
     FolderNode *parentFolderNode(void) const; // parent folder or project
-    QString path(void) const;                 // file system path
+    QString name(void) const;                 // file system path
     int line(void) const;
     virtual QString displayName(void) const;
     virtual QString tooltip(void) const;
@@ -76,13 +76,13 @@ public:
 
     virtual QList<ProjectAction> supportedActions(Node *node) const;
 
-    void setPath(const QString &path);
+    void setName(const QString &name);
     void setLine(int line);
-    void setPathAndLine(const QString &path, int line);
+    void setNameAndLine(const QString &name, int line);
     void emitNodeUpdated(void);
 
 protected:
-    Node(NodeType nodeType, const QString &path, int line = -1);
+    Node(NodeType nodeType, const QString &name, int line = -1);
 
     void setNodeType(NodeType type);
     void setProjectNode(ProjectNode *project);
@@ -95,7 +95,7 @@ private:
     NodeType nodeType_;
     ProjectNode *projectNode_;
     FolderNode *folderNode_;
-    QString path_;
+    QString name_;
     int line_;
 };
 
@@ -195,16 +195,12 @@ class ProjectNode : public FolderNode
     Q_OBJECT
 
 public:
-    QString vcsTopic() const;
 
     // all subFolders that are projects
     QList<ProjectNode*> subProjectNodes() const;
 
     // determines if the project will be shown in the flat view
     // TODO find a better name
-    void aboutToChangeHasBuildTargets();
-    void hasBuildTargetsChanged();
-    virtual bool hasBuildTargets() const = 0;
 
     virtual bool canAddSubProject(const QString &proFilePath) const = 0;
 
@@ -214,9 +210,6 @@ public:
 
     // by default returns false
     virtual bool deploysFolder(const QString &folder) const;
-
-    // TODO node parameter not really needed
-    //virtual QList<ProjectExplorer::RunConfiguration *> runConfigurationsFor(Node *node) = 0;
 
 
     QList<NodesWatcher*> watchers(void) const;

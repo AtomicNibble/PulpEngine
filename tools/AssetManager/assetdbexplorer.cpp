@@ -14,6 +14,10 @@
 #include <QMessageBox>
 #include <QMimeDatabase>
 
+namespace {
+bool debug = false;
+}
+
 
 namespace AssetExplorer {
 
@@ -43,7 +47,7 @@ bool AssetExplorer::init(QString *errorMessage)
     Q_UNUSED(errorMessage);
 
 
-    QObject *sessionManager = new SessionManager(this);
+    SessionManager *sessionManager = new SessionManager(this);
 
     connect(sessionManager, SIGNAL(projectAdded(AssetExplorer::Project*)),
             this, SIGNAL(fileListChanged()));
@@ -328,19 +332,6 @@ void AssetExplorer::startupProjectChanged(void)
     updateActions();
 }
 
-
-
-void AssetExplorer::closeAllProjects(void)
-{
-
-        qDebug() << "AssetExplorer::closeAllProject";
-
-//    if (!EditorManager::closeAllEditors())
-//        return; // Action has been cancelled
-
-    SessionManager::closeAllProjects();
-    updateActions();
-}
 
 
 void AssetExplorer::newProject(void)

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/assetDb">
+        <file>img/Mod_Project_Node_32.png</file>
+    </qresource>
+</RCC>

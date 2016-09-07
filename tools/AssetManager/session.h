@@ -28,13 +28,7 @@ public:
     static QString lastSession();
     static QStringList sessions();
 
-    static bool createSession(const QString &session);
-
-    static bool loadSession(const QString &session);
-
-    static bool save();
-    static void closeAllProjects();
-
+    // Projects are mostlys Mod's but they are named projects as I might add use thm for others things than mods.
     static void addProject(Project *project);
     static void addProjects(const QList<Project*> &projects);
     static void removeProject(Project *project);
@@ -57,16 +51,11 @@ signals:
     void aboutToRemoveProject(Project *project);
     void projectDisplayNameChanged(Project *project);
     void projectRemoved(Project *project);
+    void startupProjectChanged(Project* project);
 
-    void startupProjectChanged(Project *project);
-
-    void sessionLoaded(QString sessionName);
-    void aboutToUnloadSession(QString sessionName);
-    void aboutToLoadSession(QString sessionName);
-    void aboutToSaveSession();
 
 private slots:
-
+    static void projectDisplayNameChanged();
 };
 
 } // namespace AssetExplorer

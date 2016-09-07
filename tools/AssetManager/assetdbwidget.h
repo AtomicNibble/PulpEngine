@@ -6,6 +6,7 @@
 #include <QTreeView>
 
 class QLineEdit;
+class AssetDb;
 
 namespace AssetExplorer
 {
@@ -38,7 +39,7 @@ class AssetDbViewWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AssetDbViewWidget(QWidget *parent = 0);
+    explicit AssetDbViewWidget(AssetDb* pDb, QWidget *parent = 0);
 
 signals:
 

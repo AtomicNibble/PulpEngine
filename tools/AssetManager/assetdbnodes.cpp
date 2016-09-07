@@ -11,12 +11,12 @@ namespace AssetExplorer
 
 
 Node::Node(NodeType nodeType,
-           const QString &filePath, int line)
+           const QString &name, int line)
         : QObject(),
           nodeType_(nodeType),
           projectNode_(0),
           folderNode_(0),
-          path_(filePath),
+          name_(name),
           line_(line)
 {
 
@@ -44,13 +44,13 @@ void Node::emitNodeSortKeyChanged()
  * This function does not emit any signals. That has to be done by the calling
  * class.
  */
-void Node::setPath(const QString &path)
+void Node::setName(const QString &name)
 {
-    if (path_ == path)
+    if (name_ == name)
         return;
 
     emitNodeSortKeyAboutToChange();
-    path_ = path;
+    name_ = name;
     emitNodeSortKeyChanged();
     emitNodeUpdated();
 }
@@ -65,12 +65,12 @@ void Node::setLine(int line)
     emitNodeUpdated();
 }
 
-void Node::setPathAndLine(const QString &path, int line)
+void Node::setNameAndLine(const QString &name, int line)
 {
-    if (path_ == path && line_ == line)
+    if (name_ == name && line_ == line)
         return;
     emitNodeSortKeyAboutToChange();
-    path_ = path;
+    name_ = name;
     line_ = line;
     emitNodeSortKeyChanged();
     emitNodeUpdated();
@@ -98,12 +98,9 @@ FolderNode *Node::parentFolderNode() const
     return folderNode_;
 }
 
-/*!
-  The path of the file or folder in the filesystem the node represents.
-  */
-QString Node::path() const
+QString Node::name() const
 {
-    return path_;
+    return name_;
 }
 
 int Node::line() const
@@ -113,12 +110,12 @@ int Node::line() const
 
 QString Node::displayName() const
 {
-    return QFileInfo(path()).fileName();
+    return name();
 }
 
 QString Node::tooltip() const
 {
-    return QDir::toNativeSeparators(path());
+    return name();
 }
 
 bool Node::isEnabled() const
@@ -201,9 +198,6 @@ QString FolderNode::displayName() const
 
 QIcon FolderNode::icon(bool expanded) const
 {
-    // Instantiating the Icon provider is expensive.
-  //  if (m_icon.isNull())
-  //      m_icon = Core::FileIconProvider::icon(QFileIconProvider::Folder);
     if(expanded && !iconexpanded_.isNull())
         return iconexpanded_;
     return icon_;
@@ -241,19 +235,19 @@ void FolderNode::setIconExpanded(const QIcon &icon)
 }
 
 
-FileNode *FolderNode::findFile(const QString &path)
+FileNode *FolderNode::findFile(const QString &name)
 {
     foreach (FileNode *n, fileNodes()) {
-        if (n->path() == path)
+        if (n->name() == name)
             return n;
     }
     return 0;
 }
 
-FolderNode *FolderNode::findSubFolder(const QString &path)
+FolderNode *FolderNode::findSubFolder(const QString &name)
 {
     foreach (FolderNode *n, subFolderNodes()) {
-        if (n->path() == path)
+        if (n->name() == name)
             return n;
     }
     return 0;
@@ -290,7 +284,7 @@ bool FolderNode::renameFile(const QString &filePath, const QString &newFilePath)
 FolderNode::AddNewInformation FolderNode::addNewInformation(const QStringList &files) const
 {
     Q_UNUSED(files);
-    return AddNewInformation(QFileInfo(path()).fileName(), 100);
+    return AddNewInformation(name(), 100);
 }
 
 
@@ -459,16 +453,6 @@ ProjectNode::ProjectNode(const QString &projectFilePath)
 
 }
 
-QString ProjectNode::vcsTopic() const
-{
-    const QString dir = QFileInfo(path()).absolutePath();
-
- //   if (Core::IVersionControl *const vc =
- //           Core::VcsManager::findVersionControlForDirectory(dir))
- //       return vc->vcsTopic(dir);
-
-    return QString();
-}
 
 QList<ProjectNode*> ProjectNode::subProjectNodes() const
 {

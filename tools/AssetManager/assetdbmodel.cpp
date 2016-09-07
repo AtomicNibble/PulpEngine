@@ -2,6 +2,7 @@
 #include "assert.h"
 
 #include "assetdbnodes.h"
+#include "assetdb.h"
 
 #include <QSqlQueryModel>
 #include <QDebug>
@@ -35,8 +36,8 @@ bool sortNodes(Node *n1, Node *n2)
     FileNode *file2 = qobject_cast<FileNode*>(n2);
     if (file1 && file1->fileType() == FileType::ProjectFileType) {
         if (file2 && file2->fileType() == FileType::ProjectFileType) {
-            const QString fileName1 = QFileInfo(file1->path()).fileName();
-            const QString fileName2 = QFileInfo(file2->path()).fileName();
+            const QString fileName1 = file1->name();
+            const QString fileName2 = file2->name();
 
             int result = caseFriendlyCompare(fileName1, fileName2);
             if (result != 0)
@@ -78,7 +79,7 @@ bool sortNodes(Node *n1, Node *n2)
                 return true;
             if (folder1->priority() < folder2->priority())
                 return false;
-            int result = caseFriendlyCompare(folder1->path(), folder2->path());
+            int result = caseFriendlyCompare(folder1->name(), folder2->name());
             if (result != 0)
                 return result < 0;
             else
@@ -97,7 +98,7 @@ bool sortNodes(Node *n1, Node *n2)
             FolderNode *folder1 = static_cast<FolderNode*>(n1);
             FolderNode *folder2 = static_cast<FolderNode*>(n2);
 
-            int result = caseFriendlyCompare(folder1->path(), folder2->path());
+            int result = caseFriendlyCompare(folder1->name(), folder2->name());
             if (result != 0)
                 return result < 0;
             else
@@ -111,24 +112,12 @@ bool sortNodes(Node *n1, Node *n2)
 
     // must be file nodes
     {
-        const QString filePath1 = n1->path();
-        const QString filePath2 = n2->path();
-
-        const QString fileName1 = QFileInfo(filePath1).fileName();
-        const QString fileName2 = QFileInfo(filePath2).fileName();
+        const QString fileName1 = n1->name();
+        const QString fileName2 = n2->name();
 
         int result = caseFriendlyCompare(fileName1, fileName2);
-        if (result != 0) {
-            return result < 0; // sort by filename
-        } else {
-            result = caseFriendlyCompare(filePath1, filePath2);
-            if (result != 0)
-                return result < 0; // sort by filepath
 
-            if (n1->line() != n2->line())
-                return n1->line() < n2->line(); // sort by line numbers
-            return n1 < n2; // sort by pointer value
-        }
+        return result < 0; // sort by filename
     }
     return false;
 }
@@ -137,35 +126,25 @@ bool sortNodes(Node *n1, Node *n2)
 
 
 
-AssetDBModel::AssetDBModel(SessionNode *rootNode, QObject *parent) :
+AssetDBModel::AssetDBModel(SessionNode *rootNode, AssetDb* pDb, QObject *parent) :
     QAbstractItemModel(parent),
     treeview_(nullptr),
     startupProject_(nullptr),
-    rootNode_(rootNode)
+    rootNode_(rootNode),
+    db_(pDb)
 {
 
 }
 
+AssetDBModel::~AssetDBModel()
+{
 
-void AssetDBModel::SetTreeView(QTreeView* pTree)
+}
+
+void AssetDBModel::setTreeView(QTreeView* pTree)
 {
     treeview_ = pTree;
 }
-
-bool AssetDBModel::connect(const QString& path)
-{
-    db_ = QSqlDatabase::addDatabase("QSQLITE");
-    db_.setDatabaseName(path);
-
-    db_.open();
-
-    // setQuery("SELECT name FROM file_ids");
-    // setHeaderData(0, Qt::Horizontal, tr("Name"));
-
-    return true;
-}
-
-
 
 void AssetDBModel::setStartupProject(ProjectNode *projectNode)
 {
@@ -204,10 +183,12 @@ QModelIndex AssetDBModel::index(int row, int column, const QModelIndex &parent) 
             it = childNodes_.constFind(parentNode);
         }
 
-        if (row < it.value().size())
+        if (row < it.value().size()) {
             result = createIndex(row, 0, it.value().at(row));
+        }
     }
-//    qDebug() << "index of " << row << column << parent.data(Project::FilePathRole) << " is " << result.data(Project::FilePathRole);
+
+ //   qDebug() << "index of " << row << column << parent.data() << " is " << result.data();
     return result;
 }
 
@@ -235,7 +216,7 @@ QModelIndex AssetDBModel::parent(const QModelIndex &idx) const
         }
     }
 
-//    qDebug() << "parent of " << idx.data(Project::FilePathRole) << " is " << parentIndex.data(Project::FilePathRole);
+ //   qDebug() << "parent of " << idx.data() << " is " << parentIndex.data();
     return parentIndex;
 }
 
@@ -253,20 +234,13 @@ QVariant AssetDBModel::data(const QModelIndex &index, int role) const
             {
                 QString name = node->displayName();
 
-                if (node->nodeType() == NodeType::ProjectNodeType
-                        && node->parentFolderNode()
-                        && node->parentFolderNode()->nodeType() == NodeType::SessionNodeType) {
-                    const QString vcsTopic = static_cast<ProjectNode *>(node)->vcsTopic();
 
-                    if (!vcsTopic.isEmpty())
-                        name += QLatin1String(" [") + vcsTopic + QLatin1Char(']');
-                }
 
                 result = name;
                 break;
             }
             case Qt::EditRole: {
-                result = QFileInfo(node->path()).fileName();
+                result = node->name();
                 break;
             }
             case Qt::ToolTipRole: {
@@ -274,7 +248,14 @@ QVariant AssetDBModel::data(const QModelIndex &index, int role) const
                 break;
             }
             case Qt::DecorationRole: {
+                if (folderNode) {
+                    bool expanded = false;
+                    if(treeview_) {
+                        expanded = treeview_->isExpanded(index);
+                    }
 
+                    result = folderNode->icon(expanded);
+                }
                 break;
             }
             case Qt::FontRole: {

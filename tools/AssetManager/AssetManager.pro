@@ -20,7 +20,11 @@ SOURCES += main.cpp\
     assetdbwidget.cpp \
     session.cpp \
     project.cpp \
-    assetdbexplorer.cpp
+    assetdbexplorer.cpp \
+    assetdb.cpp \
+    logging.cpp \
+    modprojectnodes.cpp \
+    modproject.cpp
 
 HEADERS  += assetmanager.h \
     assetdbnodes.h \
@@ -29,7 +33,11 @@ HEADERS  += assetmanager.h \
     assetdbwidget.h \
     session.h \
     project.h \
-    assetdbexplorer.h
+    assetdbexplorer.h \
+    assetdb.h \
+    logging.h \
+    modprojectnodes.h \
+    modproject.h
 
 FORMS    += assetmanager.ui
 
@@ -44,3 +52,6 @@ contains(QT_ARCH, i386) {
    Release:DESTDIR = ../../../../build/x64/Release
    Debug:DESTDIR = ../../../../build/x64/Debug
 }
+
+RESOURCES += \
+    resources.qrc

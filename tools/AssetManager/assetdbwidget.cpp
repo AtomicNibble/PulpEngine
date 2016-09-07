@@ -7,6 +7,8 @@
 #include "session.h"
 #include "project.h"
 
+#include "logging.h"
+
 #include <QtWidgets>
 #include <QHeaderView>
 #include <QFocusEvent>
@@ -44,15 +46,10 @@ AssetDbTreeView::AssetDbTreeView(QWidget *parent)
     setTextElideMode(Qt::ElideNone);
     setAttribute(Qt::WA_MacShowFocusRect, false);
 
-  //  setHeaderHidden(true);
+    setHeaderHidden(true);
 
     setEditTriggers(QAbstractItemView::EditKeyPressed);
     setContextMenuPolicy(Qt::CustomContextMenu);
-
-  //  m_context = new IContext(this);
-  //  m_context->setContext(Context(Constants::C_PROJECT_TREE));
- //   m_context->setWidget(this);
- //   ICore::addContextObject(m_context);
 
     // We let the column adjust to contents, but note
     // the setting of a minimum size in resizeEvent()
@@ -90,7 +87,7 @@ void AssetDbTreeView::resizeEvent(QResizeEvent *event)
 
 
 
-AssetDbViewWidget::AssetDbViewWidget(QWidget *parent) :
+AssetDbViewWidget::AssetDbViewWidget(AssetDb* pDb, QWidget *parent) :
     QWidget(parent),
     explorer_(AssetExplorer::instance()),
     model_(nullptr),
@@ -98,11 +95,11 @@ AssetDbViewWidget::AssetDbViewWidget(QWidget *parent) :
     search_(nullptr),
     autoExpand_(true)
 {
-    model_ = new AssetDBModel(SessionManager::sessionNode(), this);
+    model_ = new AssetDBModel(SessionManager::sessionNode(), pDb, this);
 
-    Project *pro = SessionManager::startupProject();
-    if (pro)
-        model_->setStartupProject(pro->rootProjectNode());
+  //  Project *pro = SessionManager::startupProject();
+  //  if (pro)
+   //     model_->setStartupProject(pro->rootProjectNode());
 
     NodesWatcher *watcher = new NodesWatcher(this);
     SessionManager::sessionNode()->registerWatcher(watcher);
@@ -122,7 +119,7 @@ AssetDbViewWidget::AssetDbViewWidget(QWidget *parent) :
     setFocusProxy(view_);
     initView();
 
-    model_->SetTreeView(view_);
+    model_->setTreeView(view_);
 
 
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
@@ -141,20 +138,6 @@ AssetDbViewWidget::AssetDbViewWidget(QWidget *parent) :
             this, SLOT(openItem(QModelIndex)));
     connect(view_, SIGNAL(customContextMenuRequested(QPoint)),
         this, SLOT(showContextMenu(QPoint)));
-
-
-    QObject *sessionManager = SessionManager::instance();
-    connect(sessionManager, SIGNAL(singleProjectAdded(ProjectExplorer::Project*)),
-            this, SLOT(handleProjectAdded(ProjectExplorer::Project*)));
-    connect(sessionManager, SIGNAL(startupProjectChanged(ProjectExplorer::Project*)),
-            this, SLOT(startupProjectChanged(ProjectExplorer::Project*)));
-
-    connect(sessionManager, SIGNAL(aboutToLoadSession(QString)),
-            this, SLOT(disableAutoExpand()));
-    connect(sessionManager, SIGNAL(sessionLoaded(QString)),
-            this, SLOT(loadExpandData()));
-    connect(sessionManager, SIGNAL(aboutToSaveSession()),
-            this, SLOT(saveExpandData()));
 
 }
 
@@ -184,12 +167,12 @@ void AssetDbViewWidget::initView()
 
 void AssetDbViewWidget::setCurrentItem(Node *node, Project *project)
 {
-//    if (debug)
-//        qDebug() << "ProjectTreeWidget::setCurrentItem(" << (project ? project->displayName() : QLatin1String("0"))
-//                << ", " <<  (node ? node->path() : QLatin1String("0")) << ")";
+   qCDebug(logCatAssetDbView) << "ProjectTreeWidget::setCurrentItem(" << (project ? project->displayName() : QLatin1String("0"))
+          << ", " <<  (node ? node->name() : QLatin1String("0")) << ")";
 
-    if (!project)
+    if (!project) {
         return;
+    }
 
     const QModelIndex mainIndex = model_->indexForNode(node);
 
@@ -199,7 +182,7 @@ void AssetDbViewWidget::setCurrentItem(Node *node, Project *project)
             view_->scrollTo(mainIndex);
         }
     } else {
-        qDebug() << "clear selection";
+        qCDebug(logCatAssetDbView) << "clear selection";
         view_->clearSelection();
     }
 }
@@ -218,8 +201,9 @@ void AssetDbViewWidget::collapseAll()
 
 void AssetDbViewWidget::editCurrentItem()
 {
-    if (view_->selectionModel()->currentIndex().isValid())
+    if (view_->selectionModel()->currentIndex().isValid()) {
         view_->edit(view_->selectionModel()->currentIndex());
+    }
 }
 
 
@@ -255,7 +239,7 @@ void AssetDbViewWidget::openItem(const QModelIndex &mainIndex)
     if (editor && node->line() >= 0)
         editor->gotoLine(node->line());
 */
-    qDebug() << "Open file: " << node->path();
+    qDebug() << "Open file: " << node->name();
 }
 
 

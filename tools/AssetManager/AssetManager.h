@@ -4,6 +4,7 @@
 #include <QMainWindow>
 
 class QGridLayout;
+class AssetDb;
 
 namespace AssetExplorer {
     class AssetDbViewWidget;
@@ -21,6 +22,7 @@ public:
 private:
     QGridLayout* layout_;
 
+    AssetDb* db_;
     AssetExplorer::AssetDbViewWidget* assetViewWidget_;
     AssetExplorer::AssetExplorer* assetDbexplorer_;
 

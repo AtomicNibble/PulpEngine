@@ -3,11 +3,12 @@
 
 #include <QObject>
 
-class ProjectNode;
 
+class ModProjectNode;
 
 namespace AssetExplorer {
 
+class ProjectNode;
 
 class Project : public QObject
 {
@@ -15,22 +16,22 @@ class Project : public QObject
 public:
     typedef uint32_t Id;
 
-    Project();
+public:
+    Project(Id id);
     virtual ~Project();
 
-    virtual QString displayName() const = 0;
+    virtual QString displayName(void) const = 0;
     Id id(void) const;
-    virtual ProjectNode *rootProjectNode() const = 0;
+    virtual ProjectNode* rootProjectNode() const = 0;
 
 signals:
     void displayNameChanged();
+    void fileListChanged();
 
 protected:
-     void setId(Id id);
-
-     Id m_id;
-     QString m_Path;
+    Id id_;
 };
+
 
 } // namespace AssetExplorer
 

@@ -1,8 +1,5 @@
-#ifndef ASSETDB_H
-#define ASSETDB_H
-
-#include <QSqlDatabase>
-#include <QSqlQueryModel>
+#ifndef ASSETDB_MODEL_H
+#define ASSETDB_MODEL_H
 
 #include <QAbstractItemModel>
 #include <QModelIndex>
@@ -12,6 +9,8 @@
 #include <QHash>
 
 class QTreeView;
+
+class AssetDb;
 
 namespace AssetExplorer
 {
@@ -28,10 +27,10 @@ class AssetDBModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    AssetDBModel(SessionNode *rootNode, QObject *parent = nullptr);
+    AssetDBModel(SessionNode *rootNode, AssetDb* pDb, QObject *parent = nullptr);
+    ~AssetDBModel();
 
-    void SetTreeView(QTreeView* pTree);
-    bool connect(const QString& path);
+    void setTreeView(QTreeView* pTree);
 
     void reset();
     void setStartupProject(ProjectNode *projectNode);
@@ -71,10 +70,10 @@ private:
    SessionNode* rootNode_;
    mutable QHash<FolderNode*, QList<Node*> > childNodes_;
 
-   QSqlDatabase db_;
+   AssetDb* db_;
 };
 
 } // namespace AssetExplorer
 
 
-#endif // ASSETDB_H
+#endif // ASSETDB_MODEL_H
