@@ -239,7 +239,8 @@ private:
 };
 
 
-class SessionNode : public FolderNode {
+class SessionNode : public FolderNode
+{
     Q_OBJECT
     friend class SessionManager;
 public:
@@ -268,7 +269,8 @@ private:
 };
 
 
-class NodesWatcher : public QObject {
+class NodesWatcher : public QObject
+{
     Q_OBJECT
 public:
     explicit NodesWatcher(QObject *parent = 0);

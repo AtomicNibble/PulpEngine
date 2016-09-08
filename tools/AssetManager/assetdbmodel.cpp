@@ -234,7 +234,7 @@ QVariant AssetDBModel::data(const QModelIndex &index, int role) const
     QVariant result;
     if (Node *node = nodeForIndex(index))
     {
-        FolderNode *folderNode = qobject_cast<FolderNode*>(node);
+        FolderNode* folderNode = qobject_cast<FolderNode*>(node);
         switch (role)
         {
             case Qt::DisplayRole:
@@ -285,17 +285,21 @@ Qt::ItemFlags AssetDBModel::flags(const QModelIndex &index) const
         return 0;
     }
 
-    Qt::ItemFlags f = Qt::ItemIsSelectable|Qt::ItemIsEnabled;
-    if (Node *node = nodeForIndex(index)) {
-         if (node == rootNode_)
-             return 0; // no flags for session node...
-         if (!qobject_cast<ProjectNode *>(node)) {
-             // either folder or file node
-             if (node->supportedActions(node).contains(ProjectAction::Rename)) {
-                 f = f | Qt::ItemIsEditable;
-             }
-         }
-     }
+    Qt::ItemFlags f = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
+    if (Node *node = nodeForIndex(index))
+    {
+        if (node == rootNode_) {
+            return 0; // no flags for session node...
+        }
+
+        if (!qobject_cast<ProjectNode*>(node))
+        {
+            // either folder or file node
+            if (node->supportedActions(node).contains(ProjectAction::Rename)) {
+                f = f | Qt::ItemIsEditable;
+            }
+        }
+    }
     return f;
 }
 
@@ -310,22 +314,23 @@ bool AssetDBModel::setData(const QModelIndex &index, const QVariant &value, int 
 int AssetDBModel::rowCount(const QModelIndex & parent) const
 {
     int rows = 0;
-     if (!parent.isValid()) {
-         rows = 1;
-     } else
-     {
-         FolderNode *folderNode = qobject_cast<FolderNode*>(nodeForIndex(parent));
-         if (folderNode && childNodes_.contains(folderNode)) {
-             // if we have a cache node list for this folder.
-             // we know how many children it has.
-             rows = childNodes_.value(folderNode).size();
-         }
+    if (!parent.isValid()) {
+        rows = 1;
+    }
+    else
+    {
+        FolderNode* pFolderNode = qobject_cast<FolderNode*>(nodeForIndex(parent));
+        if (pFolderNode  && childNodes_.contains(pFolderNode )) {
+            // if we have a cache node list for this folder.
+            // we know how many children it has.
+            rows = childNodes_.value(pFolderNode ).size();
+        }
 
-         if(folderNode) {
-              qDebug() << folderNode->displayName() << " Rows" << rows;
-         }
-     }
-     return rows;
+        if(pFolderNode ) {
+            qDebug() << pFolderNode ->displayName() << " Rows" << rows;
+        }
+    }
+    return rows;
 }
 
 int AssetDBModel::columnCount(const QModelIndex & parent) const
@@ -340,22 +345,22 @@ bool AssetDBModel::hasChildren(const QModelIndex & parent) const
         return true;
     }
 
-    FolderNode *folderNode = qobject_cast<FolderNode*>(nodeForIndex(parent));
-    if (!folderNode) {
+    FolderNode *pFolderNode = qobject_cast<FolderNode*>(nodeForIndex(parent));
+    if (!pFolderNode) {
         return false;
     }
 
-
     // if a folder node has lazy children we return true without loading them.
-    if(folderNode->hasLazyChildren()) {
+    if(pFolderNode->hasLazyChildren()) {
         return true;
     }
 
-    QHash<FolderNode*, QList<Node*> >::const_iterator it = childNodes_.constFind(folderNode);
+    // only way to know if we have childen now is to get the children.
     // if this folder not in child cache, populate it.
+    auto it = childNodes_.constFind(pFolderNode);
     if (it == childNodes_.constEnd()) {
-        fetchMore(folderNode);
-        it = childNodes_.constFind(folderNode);
+        fetchMore(pFolderNode);
+        it = childNodes_.constFind(pFolderNode);
     }
 
     // check if this node's cache is empty.
@@ -367,10 +372,12 @@ bool AssetDBModel::canFetchMore(const QModelIndex & parent) const
 {
     if (!parent.isValid()) {
         return false;
-    } else {
-        if (FolderNode *folderNode = qobject_cast<FolderNode*>(nodeForIndex(parent))) {
+    }
+    else
+    {
+        if (FolderNode* pFolderNode = qobject_cast<FolderNode*>(nodeForIndex(parent))) {
             // if the folder is not in the cache we can fetch more.
-            return !childNodes_.contains(folderNode);
+            return !childNodes_.contains(pFolderNode);
         }
         else {
             return false;
@@ -380,75 +387,76 @@ bool AssetDBModel::canFetchMore(const QModelIndex & parent) const
 
 void AssetDBModel::fetchMore(const QModelIndex &parent)
 {
-    FolderNode *folderNode = qobject_cast<FolderNode*>(nodeForIndex(parent));
-    Q_ASSERT(folderNode);
+    FolderNode* pFolderNode = qobject_cast<FolderNode*>(nodeForIndex(parent));
+    Q_ASSERT(pFolderNode);
 
     // required?
    // beginInsertRows(parent, 0, 0);
 
-    fetchMore(folderNode);
+    fetchMore(pFolderNode);
 
    // endInsertRows();
 }
 
 
-void AssetDBModel::fetchMore(FolderNode *folderNode) const
+void AssetDBModel::fetchMore(FolderNode* pFolderNode) const
 {
-    BUG_CHECK(folderNode);
-    BUG_CHECK(!childNodes_.contains(folderNode));
+    BUG_CHECK(pFolderNode);
+    BUG_CHECK(!childNodes_.contains(pFolderNode));
 
-    QList<Node*> nodeList = childNodes(folderNode);
-    childNodes_.insert(folderNode, nodeList);
+    // this gets all the folders child nodes and places then in a cache.
+    QList<Node*> nodeList = childNodes(pFolderNode);
+    childNodes_.insert(pFolderNode, nodeList);
 }
 
 
-Node *AssetDBModel::nodeForIndex(const QModelIndex &index) const
+Node* AssetDBModel::nodeForIndex(const QModelIndex &index) const
 {
     if (index.isValid()) {
         return (Node*)index.internalPointer();
     }
-    return 0;
+    return nullptr;
 }
 
-QModelIndex AssetDBModel::indexForNode(const Node *node_)
+QModelIndex AssetDBModel::indexForNode(const Node* node_)
 {
     // We assume that we are only called for nodes that are represented
 
     // we use non-const pointers internally
-    Node *node = const_cast<Node*>(node_);
-    if (!node) {
+    Node* pNode = const_cast<Node*>(node_);
+    if (!pNode) {
         return QModelIndex();
     }
 
-    if (node == rootNode_) {
+    if (pNode == rootNode_) {
         return createIndex(0, 0, rootNode_);
     }
 
-    FolderNode *parentNode = visibleFolderNode(node->parentFolderNode());
+    FolderNode *parentNode = visibleFolderNode(pNode->parentFolderNode());
 
     // Do we have the parent mapped?
-    QHash<FolderNode*, QList<Node*> >::const_iterator it = childNodes_.constFind(parentNode);
+    auto it = childNodes_.constFind(parentNode);
     if (it == childNodes_.constEnd()) {
         fetchMore(parentNode);
         it = childNodes_.constFind(parentNode);
     }
     if (it != childNodes_.constEnd()) {
-        const int row = it.value().indexOf(node);
+        const int row = it.value().indexOf(pNode);
         if (row != -1) {
-            return createIndex(row, 0, node);
+            return createIndex(row, 0, pNode);
         }
     }
     return QModelIndex();
 }
 
-FolderNode *AssetDBModel::visibleFolderNode(FolderNode *node) const
+FolderNode *AssetDBModel::visibleFolderNode(FolderNode* pNode) const
 {
-    if (!node) {
+    if (!pNode) {
         return 0;
     }
 
     // search parents till we get a visible folder node that's not filterd.
-    for (FolderNode *folderNode = node;
+    for (FolderNode *folderNode = pNode;
          folderNode;
          folderNode = folderNode->parentFolderNode())
     {
