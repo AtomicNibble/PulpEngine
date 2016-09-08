@@ -68,7 +68,7 @@ public:
     NodeType nodeType(void) const;
     ProjectNode *projectNode(void) const;     // managing project
     FolderNode *parentFolderNode(void) const; // parent folder or project
-    QString name(void) const;                 // file system path
+    QString name(void) const;                 // name
     int line(void) const;
     virtual QString displayName(void) const;
     virtual QString tooltip(void) const;
@@ -197,7 +197,7 @@ class ProjectNode : public FolderNode
 public:
 
     // all subFolders that are projects
-    QList<ProjectNode*> subProjectNodes() const;
+    QList<ProjectNode*> subProjectNodes(void) const;
 
     // determines if the project will be shown in the flat view
     // TODO find a better name
@@ -207,9 +207,6 @@ public:
     virtual bool addSubProjects(const QStringList &proFilePaths) = 0;
 
     virtual bool removeSubProjects(const QStringList &proFilePaths) = 0;
-
-    // by default returns false
-    virtual bool deploysFolder(const QString &folder) const;
 
 
     QList<NodesWatcher*> watchers(void) const;

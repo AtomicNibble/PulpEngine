@@ -49,18 +49,18 @@ bool AssetExplorer::init(QString *errorMessage)
 
     SessionManager *sessionManager = new SessionManager(this);
 
-    connect(sessionManager, SIGNAL(projectAdded(AssetExplorer::Project*)),
+    connect(sessionManager, SIGNAL(projectAdded(Project*)),
             this, SIGNAL(fileListChanged()));
-    connect(sessionManager, SIGNAL(projectRemoved(AssetExplorer::Project*)),
+    connect(sessionManager, SIGNAL(projectRemoved(Project*)),
             this, SIGNAL(fileListChanged()));
-    connect(sessionManager, SIGNAL(projectAdded(AssetExplorer::Project*)),
-            this, SLOT(projectAdded(AssetExplorer::Project*)));
-    connect(sessionManager, SIGNAL(projectRemoved(AssetExplorer::Project*)),
-            this, SLOT(projectRemoved(AssetExplorer::Project*)));
-    connect(sessionManager, SIGNAL(startupProjectChanged(AssetExplorer::Project*)),
+    connect(sessionManager, SIGNAL(projectAdded(Project*)),
+            this, SLOT(projectAdded(Project*)));
+    connect(sessionManager, SIGNAL(projectRemoved(Project*)),
+            this, SLOT(projectRemoved(Project*)));
+    connect(sessionManager, SIGNAL(startupProjectChanged(Project*)),
             this, SLOT(startupProjectChanged()));
-    connect(sessionManager, SIGNAL(projectDisplayNameChanged(AssetExplorer::Project*)),
-            this, SLOT(projectDisplayNameChanged(AssetExplorer::Project*)));
+    connect(sessionManager, SIGNAL(projectDisplayNameChanged(Project*)),
+            this, SLOT(projectDisplayNameChanged(Project*)));
 
 
 #if 0
@@ -235,19 +235,9 @@ Project *AssetExplorer::currentProject(void)
 
 void AssetExplorer::unloadProject(void)
 {
+    qDebug() << "AssetExplorer::unloadProject";
 
-        qDebug() << "AssetExplorer::unloadProject";
 
-/*
-    IDocument *document = m_currentProject->document();
-
-    if (!document || document->filePath().isEmpty()) //nothing to save?
-        return;
-
-    if (!DocumentManager::saveModifiedDocumentSilently(document))
-        return;
-
-    addToRecentProjects(document->filePath(), m_currentProject->displayName());*/
     unloadProject(currentProject_);
 }
 
@@ -285,18 +275,12 @@ void AssetExplorer::updateContextMenuActions(void)
 
 void AssetExplorer::projectAdded(Project *pro)
 {
-//    if (m_projectsMode)
-//        m_projectsMode->setEnabled(true);
-    // more specific action en and disabling ?
     connect(pro, SIGNAL(buildConfigurationEnabledChanged()),
             this, SLOT(updateActions()));
 }
 
 void AssetExplorer::projectRemoved(Project * pro)
 {
-//    if (m_projectsMode)
-//        m_projectsMode->setEnabled(SessionManager::hasProjects());
-    // more specific action en and disabling ?
     disconnect(pro, SIGNAL(buildConfigurationEnabledChanged()),
                this, SLOT(updateActions()));
 }
@@ -310,8 +294,8 @@ void AssetExplorer::projectDisplayNameChanged(Project *pro)
 void AssetExplorer::startupProjectChanged(void)
 {
     static QPointer<Project> previousStartupProject = 0;
-    Project *project = SessionManager::startupProject();
-    if (project == previousStartupProject) {
+    Project* pProject = SessionManager::startupProject();
+    if (pProject  == previousStartupProject) {
         return;
     }
 
@@ -320,10 +304,10 @@ void AssetExplorer::startupProjectChanged(void)
     //               this, SLOT(activeTargetChanged()));
     }
 
-    previousStartupProject = project;
+    previousStartupProject = pProject ;
 
 
-    if (project) {
+    if (pProject ) {
     //    connect(project, SIGNAL(activeTargetChanged(AssetExplorer::Target*)),
      //           this, SLOT(activeTargetChanged()));
     }
@@ -336,11 +320,9 @@ void AssetExplorer::startupProjectChanged(void)
 
 void AssetExplorer::newProject(void)
 {
+    qDebug() << "AssetExplorer::newProject";
 
-        qDebug() << "AssetExplorer::newProject";
 
-//    ICore::showNewItemDialog(tr("New Project", "Title of dialog"),
-//                              IWizard::wizardsOfKind(IWizard::ProjectWizard));
     updateActions();
 }
 
@@ -350,14 +332,14 @@ void AssetExplorer::setStartupProject(void)
     setStartupProject(currentProject_);
 }
 
-void AssetExplorer::setStartupProject(Project *project)
+void AssetExplorer::setStartupProject(Project* pProject)
 {
+    qDebug() << "AssetExplorerPlugin::setStartupProject";
 
-        qDebug() << "AssetExplorerPlugin::setStartupProject";
-
-    if (!project)
+    if (!pProject) {
         return;
-    SessionManager::setStartupProject(project);
+    }
+    SessionManager::setStartupProject(pProject);
     updateActions();
 }
 

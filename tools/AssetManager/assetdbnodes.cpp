@@ -460,12 +460,6 @@ QList<ProjectNode*> ProjectNode::subProjectNodes() const
 }
 
 
-bool ProjectNode::deploysFolder(const QString &folder) const
-{
-    Q_UNUSED(folder);
-    return false;
-}
-
 QList<NodesWatcher*> ProjectNode::watchers() const
 {
     return watchers_;

@@ -27,11 +27,7 @@ public:
 
     bool init(QString *errorMessage);
 
-    Project *openProject(const QString &fileName);
-    Project *openProject(const QString &fileName, QString *error);
-    QList<Project *> openProjects(const QStringList &fileNames, QString *error);
     void unloadProject(Project *project);
-
 
     static Project *currentProject(void);
     Node *currentNode(void) const;

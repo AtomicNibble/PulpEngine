@@ -57,8 +57,8 @@ private slots:
     void handleProjectAdded(Project *project);
     void startupProjectChanged(Project *project);
 
-    void foldersAboutToBeRemoved(FolderNode *, const QList<FolderNode*> &);
-    void filesAboutToBeRemoved(FolderNode *, const QList<FileNode*> &);
+    void foldersAboutToBeRemoved(FolderNode*, const QList<FolderNode*> &);
+    void filesAboutToBeRemoved(FolderNode*, const QList<FileNode*> &);
 
     void disableAutoExpand();
 
