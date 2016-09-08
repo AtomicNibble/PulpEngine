@@ -297,34 +297,41 @@ void FolderNode::addFileNodes(const QList<FileNode *> &files)
 {
     Q_ASSERT(projectNode());
     ProjectNode *pn = projectNode();
-    if (files.isEmpty())
+
+    if (files.isEmpty()) {
         return;
+    }
 
-    foreach (NodesWatcher *watcher, pn->watchers())
+    foreach (NodesWatcher *watcher, pn->watchers()) {
         emit watcher->filesAboutToBeAdded(this, files);
+    }
 
-    foreach (FileNode *file, files) {
+    foreach (FileNode *file, files)
+    {
         BUG_ASSERT(!file->parentFolderNode(),
                    qDebug("File node has already a parent folder"));
 
         file->setParentFolderNode(this);
         file->setProjectNode(pn);
+
         // Now find the correct place to insert file
-        if (fileNodes_.count() == 0
-                || fileNodes_.last() < file) {
+        if (fileNodes_.count() == 0 || fileNodes_.last() < file)
+        {
             // empty list or greater then last node
             fileNodes_.append(file);
-        } else {
-            QList<FileNode *>::iterator it
-                    = qLowerBound(fileNodes_.begin(),
+        } else
+        {
+            auto it = qLowerBound(fileNodes_.begin(),
                                   fileNodes_.end(),
                                   file);
+
             fileNodes_.insert(it, file);
         }
     }
 
-    foreach (NodesWatcher *watcher, pn->watchers())
+    foreach (NodesWatcher *watcher, pn->watchers()) {
         emit watcher->filesAdded();
+    }
 }
 
 
@@ -333,29 +340,36 @@ void FolderNode::removeFileNodes(const QList<FileNode *> &files)
     Q_ASSERT(projectNode());
     ProjectNode *pn = projectNode();
 
-    if (files.isEmpty())
+    if (files.isEmpty()) {
         return;
+    }
 
     QList<FileNode*> toRemove = files;
     qSort(toRemove.begin(), toRemove.end());
 
-    foreach (NodesWatcher *watcher, pn->watchers())
+    foreach (NodesWatcher *watcher, pn->watchers()) {
         emit watcher->filesAboutToBeRemoved(this, toRemove);
+    }
 
     QList<FileNode*>::const_iterator toRemoveIter = toRemove.constBegin();
     QList<FileNode*>::iterator filesIter = fileNodes_.begin();
-    for (; toRemoveIter != toRemove.constEnd(); ++toRemoveIter) {
-        while (*filesIter != *toRemoveIter) {
+    for (; toRemoveIter != toRemove.constEnd(); ++toRemoveIter)
+    {
+        while (*filesIter != *toRemoveIter)
+        {
             ++filesIter;
+
             BUG_ASSERT(filesIter != fileNodes_.end(),
                        qDebug("File to remove is not part of specified folder!"));
         }
+
         delete *filesIter;
         filesIter = fileNodes_.erase(filesIter);
     }
 
-    foreach (NodesWatcher *watcher, pn->watchers())
+    foreach (NodesWatcher *watcher, pn->watchers()) {
         emit watcher->filesRemoved();
+    }
 }
 
 void FolderNode::addFolderNodes(const QList<FolderNode*> &subFolders)
@@ -363,29 +377,33 @@ void FolderNode::addFolderNodes(const QList<FolderNode*> &subFolders)
     Q_ASSERT(projectNode());
     ProjectNode *pn = projectNode();
 
-    if (subFolders.isEmpty())
+    if (subFolders.isEmpty()) {
         return;
+    }
 
-    foreach (NodesWatcher *watcher, pn->watchers())
+    foreach (NodesWatcher *watcher, pn->watchers()) {
         watcher->foldersAboutToBeAdded(this, subFolders);
+    }
 
-    foreach (FolderNode *folder, subFolders) {
+    foreach (FolderNode *folder, subFolders)
+    {
         BUG_ASSERT(!folder->parentFolderNode(),
                    qDebug("Project node has already a parent folder"));
         folder->setParentFolderNode(this);
         folder->setProjectNode(pn);
 
         // Find the correct place to insert
-        if (subFolderNodes_.count() == 0
-                || subFolderNodes_.last() < folder) {
+        if (subFolderNodes_.count() == 0 || subFolderNodes_.last() < folder)
+        {
             // empty list or greater then last node
             subFolderNodes_.append(folder);
-        } else {
+        } else
+        {
             // Binary Search for insertion point
-            QList<FolderNode*>::iterator it
-                    = qLowerBound(subFolderNodes_.begin(),
+            auto it = qLowerBound(subFolderNodes_.begin(),
                                   subFolderNodes_.end(),
                                   folder);
+
             subFolderNodes_.insert(it, folder);
         }
 
@@ -394,8 +412,9 @@ void FolderNode::addFolderNodes(const QList<FolderNode*> &subFolders)
                    qDebug("project nodes have to be added via addProjectNodes"));
     }
 
-    foreach (NodesWatcher *watcher, pn->watchers())
+    foreach (NodesWatcher *watcher, pn->watchers()) {
         emit watcher->foldersAdded();
+    }
 }
 
 
@@ -404,36 +423,45 @@ void FolderNode::removeFolderNodes(const QList<FolderNode*> &subFolders)
     Q_ASSERT(projectNode());
     ProjectNode *pn = projectNode();
 
-    if (subFolders.isEmpty())
+    if (subFolders.isEmpty()) {
         return;
+    }
 
     QList<FolderNode*> toRemove = subFolders;
     qSort(toRemove.begin(), toRemove.end());
 
-    foreach (NodesWatcher *watcher, pn->watchers())
+    foreach (NodesWatcher *watcher, pn->watchers()) {
         emit watcher->foldersAboutToBeRemoved(this, toRemove);
+    }
 
     QList<FolderNode*>::const_iterator toRemoveIter = toRemove.constBegin();
     QList<FolderNode*>::iterator folderIter = subFolderNodes_.begin();
-    for (; toRemoveIter != toRemove.constEnd(); ++toRemoveIter) {
+    for (; toRemoveIter != toRemove.constEnd(); ++toRemoveIter)
+    {
         BUG_ASSERT((*toRemoveIter)->nodeType() != NodeType::ProjectNodeType,
                    qDebug("project nodes have to be removed via removeProjectNodes"));
-        while (*folderIter != *toRemoveIter) {
+
+        while (*folderIter != *toRemoveIter)
+        {
             ++folderIter;
+
             BUG_ASSERT(folderIter != subFolderNodes_.end(),
                        qDebug("Folder to remove is not part of specified folder!"));
         }
+
         delete *folderIter;
         folderIter = subFolderNodes_.erase(folderIter);
     }
 
-    foreach (NodesWatcher *watcher, pn->watchers())
+    foreach (NodesWatcher *watcher, pn->watchers()) {
         emit watcher->foldersRemoved();
+    }
 }
 
 
 VirtualFolderNode::VirtualFolderNode(const QString &name, int priority)
-    : FolderNode(name, NodeType::VirtualFolderNodeType), priority_(priority)
+    : FolderNode(name, NodeType::VirtualFolderNodeType),
+      priority_(priority)
 {
 }
 
@@ -503,7 +531,8 @@ void ProjectNode::unregisterWatcher(NodesWatcher *watcher)
 
 void ProjectNode::addProjectNodes(const QList<ProjectNode*> &subProjects)
 {
-    if (!subProjects.isEmpty()) {
+    if (!subProjects.isEmpty())
+    {
         QList<FolderNode*> folderNodes;
         foreach (ProjectNode *projectNode, subProjects) {
             folderNodes << projectNode;
@@ -513,12 +542,17 @@ void ProjectNode::addProjectNodes(const QList<ProjectNode*> &subProjects)
             emit watcher->foldersAboutToBeAdded(this, folderNodes);
         }
 
-        foreach (ProjectNode *project, subProjects) {
+        foreach (ProjectNode *project, subProjects)
+        {
             BUG_ASSERT(!project->parentFolderNode() || project->parentFolderNode() == this,
                        qDebug("Project node has already a parent"));
+
             project->setParentFolderNode(this);
-            foreach (NodesWatcher *watcher, watchers_)
+
+            foreach (NodesWatcher *watcher, watchers_) {
                 project->registerWatcher(watcher);
+            }
+
             subFolderNodes_.append(project);
             subProjectNodes_.append(project);
         }
@@ -535,7 +569,8 @@ void ProjectNode::addProjectNodes(const QList<ProjectNode*> &subProjects)
 
 void ProjectNode::removeProjectNodes(const QList<ProjectNode*> &subProjects)
 {
-    if (!subProjects.isEmpty()) {
+    if (!subProjects.isEmpty())
+    {
         QList<FolderNode*> toRemove;
         foreach (ProjectNode *projectNode, subProjects) {
             toRemove << projectNode;
@@ -550,17 +585,22 @@ void ProjectNode::removeProjectNodes(const QList<ProjectNode*> &subProjects)
         QList<FolderNode*>::const_iterator toRemoveIter = toRemove.constBegin();
         QList<FolderNode*>::iterator folderIter = subFolderNodes_.begin();
         QList<ProjectNode*>::iterator projectIter = subProjectNodes_.begin();
-        for (; toRemoveIter != toRemove.constEnd(); ++toRemoveIter) {
-            while (*projectIter != *toRemoveIter) {
+        for (; toRemoveIter != toRemove.constEnd(); ++toRemoveIter)
+        {
+            while (*projectIter != *toRemoveIter)
+            {
                 ++projectIter;
                 BUG_ASSERT(projectIter != subProjectNodes_.end(),
                     qDebug("Project to remove is not part of specified folder!"));
             }
-            while (*folderIter != *toRemoveIter) {
+
+            while (*folderIter != *toRemoveIter)
+            {
                 ++folderIter;
                 BUG_ASSERT(folderIter != subFolderNodes_.end(),
                     qDebug("Project to remove is not part of specified folder!"));
             }
+
             delete *projectIter;
             projectIter = subProjectNodes_.erase(projectIter);
             folderIter = subFolderNodes_.erase(folderIter);
@@ -603,7 +643,9 @@ void SessionNode::registerWatcher(NodesWatcher *watcher)
     }
     connect(watcher, SIGNAL(destroyed(QObject*)),
             this, SLOT(watcherDestroyed(QObject*)));
+
     watchers_.append(watcher);
+
     foreach (ProjectNode *project, projectNodes_) {
         project->registerWatcher(watcher);
     }
@@ -615,7 +657,9 @@ void SessionNode::unregisterWatcher(NodesWatcher *watcher)
     if (!watcher) {
         return;
     }
+
     watchers_.removeOne(watcher);
+
     foreach (ProjectNode *project, projectNodes_) {
         project->unregisterWatcher(watcher);
     }
@@ -628,7 +672,8 @@ QList<ProjectNode*> SessionNode::projectNodes() const
 
 void SessionNode::addProjectNodes(const QList<ProjectNode*> &projectNodes)
 {
-    if (!projectNodes.isEmpty()) {
+    if (!projectNodes.isEmpty())
+    {
         QList<FolderNode*> folderNodes;
         foreach (ProjectNode *projectNode, projectNodes) {
             folderNodes << projectNode;
@@ -638,10 +683,13 @@ void SessionNode::addProjectNodes(const QList<ProjectNode*> &projectNodes)
             emit watcher->foldersAboutToBeAdded(this, folderNodes);
         }
 
-        foreach (ProjectNode *project, projectNodes) {
+        foreach (ProjectNode *project, projectNodes)
+        {
             BUG_ASSERT(!project->parentFolderNode(),
                 qDebug("Project node has already a parent folder"));
+
             project->setParentFolderNode(this);
+
             foreach (NodesWatcher *watcher, watchers_) {
                 project->registerWatcher(watcher);
             }
@@ -660,7 +708,8 @@ void SessionNode::addProjectNodes(const QList<ProjectNode*> &projectNodes)
 
 void SessionNode::removeProjectNodes(const QList<ProjectNode*> &projectNodes)
 {
-    if (!projectNodes.isEmpty()) {
+    if (!projectNodes.isEmpty())
+    {
         QList<FolderNode*> toRemove;
         foreach (ProjectNode *projectNode, projectNodes) {
             toRemove << projectNode;
@@ -675,13 +724,17 @@ void SessionNode::removeProjectNodes(const QList<ProjectNode*> &projectNodes)
         QList<FolderNode*>::const_iterator toRemoveIter = toRemove.constBegin();
         QList<FolderNode*>::iterator folderIter = subFolderNodes_.begin();
         QList<ProjectNode*>::iterator projectIter = projectNodes_.begin();
-        for (; toRemoveIter != toRemove.constEnd(); ++toRemoveIter) {
-            while (*projectIter != *toRemoveIter) {
+        for (; toRemoveIter != toRemove.constEnd(); ++toRemoveIter)
+        {
+            while (*projectIter != *toRemoveIter)
+            {
                 ++projectIter;
                 BUG_ASSERT(projectIter != projectNodes_.end(),
                     qDebug("Project to remove is not part of specified folder!"));
             }
-            while (*folderIter != *toRemoveIter) {
+
+            while (*folderIter != *toRemoveIter)
+            {
                 ++folderIter;
                 BUG_ASSERT(folderIter != subFolderNodes_.end(),
                     qDebug("Project to remove is not part of specified folder!"));
