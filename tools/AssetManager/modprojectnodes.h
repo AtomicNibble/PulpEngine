@@ -29,30 +29,11 @@ class ModVirtualFolderNode : public AssetExplorer::VirtualFolderNode
 
 public:
     explicit ModVirtualFolderNode(const QString &name, int priority, const QString& displayName,
-                                  AssetType::Enum assType, int32_t numAssets) :
-        VirtualFolderNode(name, priority),
-        displayName_(displayName),
-        assetType_(assType),
-        numAssets_(numAssets)
-    {
+                                  AssetType::Enum assType, int32_t numAssets);
 
-    }
-
-    QString displayName() const override
-    {
-        return displayName_;
-    }
-
-    QString tooltip() const override
-    {
-        return QString("%1 (%2)").arg(AssetType::ToString(assetType_), QString::number(numAssets_));
-    }
-
-
-    bool hasLazyChildren(void) const override
-    {
-        return numAssets_ > 0;
-    }
+    QString displayName() const override;
+    QString tooltip() const override;
+    bool hasLazyChildren(void) const override;
 
 private:
     QString displayName_;

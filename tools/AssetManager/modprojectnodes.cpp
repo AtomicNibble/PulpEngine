@@ -28,3 +28,33 @@ bool ModProjectNode::removeSubProjects(const QStringList &proFilePaths)
     Q_UNUSED(proFilePaths);
     return false;
 }
+
+
+// -------------------------------------------------------------------
+
+
+ModVirtualFolderNode::ModVirtualFolderNode(const QString &name, int priority, const QString& displayName,
+                              AssetType::Enum assType, int32_t numAssets) :
+    VirtualFolderNode(name, priority),
+    displayName_(displayName),
+    assetType_(assType),
+    numAssets_(numAssets)
+{
+
+}
+
+QString ModVirtualFolderNode::displayName() const
+{
+    return displayName_;
+}
+
+QString ModVirtualFolderNode::tooltip() const
+{
+    return QString("%1 (%2)").arg(AssetType::ToString(assetType_), QString::number(numAssets_));
+}
+
+
+bool ModVirtualFolderNode::hasLazyChildren(void) const
+{
+    return numAssets_ > 0;
+}
