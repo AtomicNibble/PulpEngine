@@ -87,7 +87,7 @@ void AssetDbTreeView::resizeEvent(QResizeEvent *event)
 
 
 
-AssetDbViewWidget::AssetDbViewWidget(AssetDb* pDb, QWidget *parent) :
+AssetDbViewWidget::AssetDbViewWidget(AssetDb& db, QWidget *parent) :
     QWidget(parent),
     explorer_(AssetExplorer::instance()),
     model_(nullptr),
@@ -95,7 +95,7 @@ AssetDbViewWidget::AssetDbViewWidget(AssetDb* pDb, QWidget *parent) :
     search_(nullptr),
     autoExpand_(true)
 {
-    model_ = new AssetDBModel(SessionManager::sessionNode(), pDb, this);
+    model_ = new AssetDBModel(SessionManager::sessionNode(), db, this);
 
   //  Project *pro = SessionManager::startupProject();
   //  if (pro)
@@ -149,13 +149,13 @@ void AssetDbViewWidget::initView()
     // hide root folder
     view_->setRootIndex(sessionIndex);
 
-    while (model_->canFetchMore(sessionIndex)) {
-        model_->fetchMore(sessionIndex);
-    }
+ //   while (model_->canFetchMore(sessionIndex)) {
+  //      model_->fetchMore(sessionIndex);
+  //  }
 
     // expand top level projects
-    for (int i = 0; i < model_->rowCount(sessionIndex); ++i)
-        view_->expand(model_->index(i, 0, sessionIndex));
+ //   for (int i = 0; i < model_->rowCount(sessionIndex); ++i)
+ //      view_->expand(model_->index(i, 0, sessionIndex));
 
     setCurrentItem(explorer_->currentNode(), AssetExplorer::currentProject());
 

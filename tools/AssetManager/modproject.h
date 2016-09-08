@@ -3,25 +3,48 @@
 
 
 #include <QObject>
+#include <QIcon>
+
+#include <array>
 
 #include "project.h"
 
 class ModProjectNode;
+class AssetDb;
 
 class ModProject : public AssetExplorer::Project
 {
     Q_OBJECT
 
+    struct AssetTypeInfo
+    {
+        const char* pNickName;
+        QIcon icon;
+        QIcon iconExpanded;
+    };
+
+    typedef std::array<AssetTypeInfo, X_NAMESPACE(assetDb)::AssetType::ENUM_COUNT> AssetTypeInfoArr;
+
 public:
-    ModProject(const QString &name, int32_t id);
+    ModProject(AssetDb& db, const QString &name, int32_t id);
     ~ModProject() override;
 
+    void loadAssetTypeNodes(void);
+
     QString displayName(void) const override;
+    int32_t modId(void) const;
     AssetExplorer::ProjectNode* rootProjectNode() const override;
 
 private:
+    void initAssetTypeInfo(void);
+
+private:
+    AssetDb& db_;
     QString name_;
+    int32_t modId_;
     ModProjectNode* rootNode_;
+
+    AssetTypeInfoArr assetDisplayInfo_;
 };
 
 

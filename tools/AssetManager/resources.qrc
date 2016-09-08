@@ -1,5 +1,18 @@
 <RCC>
     <qresource prefix="/assetDb">
         <file>img/Mod_Project_Node_32.png</file>
+        <file>img/File_default.png</file>
+        <file>img/File_mesh.png</file>
+        <file>img/Folder.Closed.png</file>
+        <file>img/Folder.Open.png</file>
+    </qresource>
+    <qresource prefix="/style">
+        <file>img/vline.png</file>
+        <file>img/branch_closed.gif</file>
+        <file>img/branch_open.gif</file>
+        <file>img/branch-closed.png</file>
+        <file>img/branch-end.png</file>
+        <file>img/branch-more.png</file>
+        <file>img/branch-open.png</file>
     </qresource>
 </RCC>

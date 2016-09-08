@@ -1,5 +1,5 @@
 #include "assetdbnodes.h"
-#include "assert.h"
+#include "assert_qt.h"
 
 #include <QFileInfo>
 #include <QDir>
@@ -177,9 +177,9 @@ bool FileNode::isGenerated() const
     return generated_;
 }
 
-FolderNode::FolderNode(const QString &folderPath, NodeType nodeType)  :
-    Node(nodeType, folderPath),
-    displayName_(QDir::toNativeSeparators(folderPath))
+FolderNode::FolderNode(const QString &name, NodeType nodeType)  :
+    Node(nodeType, name),
+    displayName_(QDir::toNativeSeparators(name))
 {
 }
 
@@ -251,6 +251,11 @@ FolderNode *FolderNode::findSubFolder(const QString &name)
             return n;
     }
     return 0;
+}
+
+bool FolderNode::hasLazyChildren(void) const
+{
+    return false;
 }
 
 bool FolderNode::addFiles(const QStringList &filePaths, QStringList *notAdded)
@@ -427,8 +432,8 @@ void FolderNode::removeFolderNodes(const QList<FolderNode*> &subFolders)
 }
 
 
-VirtualFolderNode::VirtualFolderNode(const QString &folderPath, int priority)
-    : FolderNode(folderPath, NodeType::VirtualFolderNodeType), priority_(priority)
+VirtualFolderNode::VirtualFolderNode(const QString &name, int priority)
+    : FolderNode(name, NodeType::VirtualFolderNodeType), priority_(priority)
 {
 }
 

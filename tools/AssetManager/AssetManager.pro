@@ -15,7 +15,6 @@ TEMPLATE = app
 SOURCES += main.cpp\
         assetmanager.cpp \
     assetdbnodes.cpp \
-    assert.cpp \
     assetdbmodel.cpp \
     assetdbwidget.cpp \
     session.cpp \
@@ -24,11 +23,11 @@ SOURCES += main.cpp\
     assetdb.cpp \
     logging.cpp \
     modprojectnodes.cpp \
-    modproject.cpp
+    modproject.cpp \
+    assert_qt.cpp
 
 HEADERS  += assetmanager.h \
     assetdbnodes.h \
-    assert.h \
     assetdbmodel.h \
     assetdbwidget.h \
     session.h \
@@ -37,13 +36,21 @@ HEADERS  += assetmanager.h \
     assetdb.h \
     logging.h \
     modprojectnodes.h \
-    modproject.h
+    modproject.h \
+    stdafx.h \
+    assert_qt.h
 
 FORMS    += assetmanager.ui
 
 
 INCLUDEPATH += "../../"
+INCLUDEPATH += "../../Pulp/Common"
 
+QMAKE_CXXFLAGS += -std:c++latest
+
+# precompressed header, used for engine headers.
+CONFIG += precompile_header
+PRECOMPILED_HEADER = stdafx.h
 
 contains(QT_ARCH, i386) {
    Release:DESTDIR = ../../../../build/win32/Release

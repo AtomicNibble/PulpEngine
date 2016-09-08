@@ -39,6 +39,41 @@ void AssetDb::CloseDB(void)
 }
 
 
+bool AssetDb::getAssetTypeCounts(ModId modId, AssetTypeCountsArray& counts)
+{
+    for(size_t i=0; i<AssetType::ENUM_COUNT; i++) {
+        counts[i] = 0;
+    }
+
+    if(!isOpen()) {
+        qCCritical(logCatAssetDb) << "Can't get asset counts, the db is not open";
+        return false;
+    }
+
+    QSqlQuery query(db_);
+    query.prepare("SELECT type, COUNT(*) FROM file_ids WHERE mod_id = ? GROUP BY type");
+    query.bindValue(0, modId);
+
+    bool res = query.exec();
+    if(res)
+    {
+        while (query.next()) {
+             int32_t type = query.value(0).toInt();
+             int32_t count = query.value(1).toInt();
+
+             if(type >= AssetType::ENUM_COUNT) {
+                 qCCritical(logCatAssetDb) << "Asset type out of range: " << type;
+                 return false;
+             }
+             counts[type] = count;
+         }
+    }else {
+        qCCritical(logCatAssetDb) << "Failed to iterateMods: " << query.lastError().text();
+    }
+    return res;
+}
+
+
 bool AssetDb::IterateMods(std::function<bool(ModId id, const QString& name, QDir& outDir)> func)
 {
     if(!isOpen()) {
@@ -64,7 +99,7 @@ bool AssetDb::IterateMods(std::function<bool(ModId id, const QString& name, QDir
     return res;
 }
 
-bool AssetDb::IterateAssets(std::function<bool(AssetType type, const QString& name)> func)
+bool AssetDb::IterateAssets(std::function<bool(AssetType::Enum type, const QString& name)> func)
 {
     if(!isOpen()) {
         qCCritical(logCatAssetDb) << "Can't iterate assets, the db is not open";
@@ -78,7 +113,7 @@ bool AssetDb::IterateAssets(std::function<bool(AssetType type, const QString& na
     {
         while (query.next()) {
              QString name = query.value(0).toString();
-             AssetType type = static_cast<AssetType>(query.value(1).toInt());
+             AssetType::Enum type = static_cast<AssetType::Enum>(query.value(1).toInt());
 
              func(type, name);
          }
@@ -88,7 +123,7 @@ bool AssetDb::IterateAssets(std::function<bool(AssetType type, const QString& na
     return res;
 }
 
-bool AssetDb::IterateAssets(ModId modId, std::function<bool(AssetType, const QString& name)> func)
+bool AssetDb::IterateAssets(ModId modId, std::function<bool(AssetType::Enum, const QString& name)> func)
 {
     if(!isOpen()) {
         qCCritical(logCatAssetDb) << "Can't iterate assets, the db is not open";
@@ -104,7 +139,7 @@ bool AssetDb::IterateAssets(ModId modId, std::function<bool(AssetType, const QSt
     {
         while (query.next()) {
              QString name = query.value(0).toString();
-             AssetType type = static_cast<AssetType>(query.value(1).toInt());
+             AssetType::Enum type = static_cast<AssetType::Enum>(query.value(1).toInt());
 
              func(type, name);
          }
@@ -114,7 +149,7 @@ bool AssetDb::IterateAssets(ModId modId, std::function<bool(AssetType, const QSt
     return res;
 }
 
-bool AssetDb::IterateAssets(AssetType type, std::function<bool(AssetType, const QString& name)> func)
+bool AssetDb::IterateAssets(AssetType::Enum type, std::function<bool(AssetType::Enum, const QString& name)> func)
 {
     if(!isOpen()) {
         qCCritical(logCatAssetDb) << "Can't iterate assets, the db is not open";
@@ -130,7 +165,7 @@ bool AssetDb::IterateAssets(AssetType type, std::function<bool(AssetType, const 
     {
         while (query.next()) {
              QString name = query.value(0).toString();
-             AssetType type = static_cast<AssetType>(query.value(1).toInt());
+             AssetType::Enum type = static_cast<AssetType::Enum>(query.value(1).toInt());
 
              func(type, name);
          }

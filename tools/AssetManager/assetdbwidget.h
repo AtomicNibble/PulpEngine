@@ -39,7 +39,7 @@ class AssetDbViewWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AssetDbViewWidget(AssetDb* pDb, QWidget *parent = 0);
+    explicit AssetDbViewWidget(AssetDb& db, QWidget *parent = 0);
 
 signals:
 

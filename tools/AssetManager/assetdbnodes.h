@@ -105,7 +105,7 @@ class FileNode : public Node
 {
     Q_OBJECT
 public:
-    FileNode(const QString &filePath, const FileType fileType, bool generated, int line = -1);
+    FileNode(const QString &name, const FileType fileType, bool generated, int line = -1);
 
     FileType fileType(void) const;
     bool isGenerated(void) const;
@@ -124,7 +124,7 @@ class FolderNode : public Node
 {
     Q_OBJECT
 public:
-    explicit FolderNode(const QString &folderPath, NodeType nodeType = NodeType::FolderNodeType);
+    explicit FolderNode(const QString &name, NodeType nodeType = NodeType::FolderNodeType);
     virtual ~FolderNode();
 
     QString displayName(void) const;
@@ -139,6 +139,8 @@ public:
 
     FileNode *findFile(const QString &path);
     FolderNode *findSubFolder(const QString &path);
+
+    virtual bool hasLazyChildren(void) const;
 
     virtual bool addFiles(const QStringList &filePaths, QStringList *notAdded = 0);
     virtual bool removeFiles(const QStringList &filePaths, QStringList *notRemoved = 0);
@@ -180,7 +182,7 @@ class VirtualFolderNode : public FolderNode
 {
     Q_OBJECT
 public:
-    explicit VirtualFolderNode(const QString &folderPath, int priority);
+    explicit VirtualFolderNode(const QString &name, int priority);
     virtual ~VirtualFolderNode();
 
     int priority(void) const;

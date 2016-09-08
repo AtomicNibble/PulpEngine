@@ -2,6 +2,7 @@
 #include "assetdbwidget.h"
 
 #include "assetdbexplorer.h"
+#include "assetdbnodes.h"
 #include "assetdb.h"
 
 #include "session.h"
@@ -32,13 +33,16 @@ AssetManager::AssetManager(QWidget *parent) :
     }
 
     db_->IterateMods([&](AssetDb::ModId id, const QString& name, QDir& outDir)-> bool {
-            AssetExplorer::SessionManager::addProject(new ModProject(name, id));
+            Q_UNUSED(outDir);
+            ModProject* pMod = new ModProject(*db_, name, id);
+            pMod->loadAssetTypeNodes();
+            AssetExplorer::SessionManager::addProject(pMod);
             return true;
         }
     );
 
     layout_ = new QGridLayout();
-    layout_->addWidget(new AssetExplorer::AssetDbViewWidget(db_));
+    layout_->addWidget(new AssetExplorer::AssetDbViewWidget(*db_));
 
 
     QWidget *window = new QWidget();

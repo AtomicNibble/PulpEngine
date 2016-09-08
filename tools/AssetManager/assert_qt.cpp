@@ -1,12 +1,12 @@
-#include "assert.h"
+#include "assert_qt.h"
 
 #include <QDebug>
 
-namespace Utils {
+namespace Internal {
 
 void writeAssertLocation(const char *msg)
 {
     qDebug("SOFT ASSERT: %s", msg);
 }
 
-} // namespace Utils
+} // namespace Internal

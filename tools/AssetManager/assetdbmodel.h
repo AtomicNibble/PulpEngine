@@ -27,7 +27,7 @@ class AssetDBModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    AssetDBModel(SessionNode *rootNode, AssetDb* pDb, QObject *parent = nullptr);
+    AssetDBModel(SessionNode *rootNode, AssetDb& db, QObject *parent = nullptr);
     ~AssetDBModel();
 
     void setTreeView(QTreeView* pTree);
@@ -36,15 +36,15 @@ public:
     void setStartupProject(ProjectNode *projectNode);
 
 
-    QModelIndex index(int row, int column, const QModelIndex & parent = QModelIndex()) const;
-    QModelIndex parent(const QModelIndex &index) const;
-    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
-    Qt::ItemFlags flags(const QModelIndex &index) const;
-    bool setData(const QModelIndex &index, const QVariant &value, int role);
+    QModelIndex index(int row, int column, const QModelIndex & parent = QModelIndex()) const override;
+    QModelIndex parent(const QModelIndex &index) const override;
+    QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+    Qt::ItemFlags flags(const QModelIndex &index) const override;
+    bool setData(const QModelIndex &index, const QVariant &value, int role) override;
 
-    int rowCount(const QModelIndex & parent = QModelIndex()) const;
-    int columnCount(const QModelIndex & parent = QModelIndex()) const;
-    bool hasChildren(const QModelIndex & parent = QModelIndex()) const;
+    int rowCount(const QModelIndex & parent = QModelIndex()) const override;
+    int columnCount(const QModelIndex & parent = QModelIndex()) const override;
+    bool hasChildren(const QModelIndex & parent = QModelIndex()) const override;
 
 
 
@@ -53,14 +53,18 @@ public:
     void removeFromCache(QList<FolderNode *> list);
     void changedSortKey(FolderNode *folderNode, Node *node);
 
-    bool canFetchMore(const QModelIndex & parent) const;
-    void fetchMore(const QModelIndex & parent);
+    bool canFetchMore(const QModelIndex & parent) const override;
+    void fetchMore(const QModelIndex & parent) override;
     void fetchMore(FolderNode *foldernode) const;
 
     Node *nodeForIndex(const QModelIndex &index) const;
     QModelIndex indexForNode(const Node *node);
 
-    QList<Node*> childNodes(FolderNode *parentNode, const QSet<Node*> &blackList = QSet<Node*>()) const;
+    void recursiveAddFolderNodes(FolderNode* pStartNode, QList<Node*>* pList) const;
+    void recursiveAddFolderNodesImpl(FolderNode* pStartNode, QList<Node*>* pList) const;
+    void recursiveAddFileNodes(FolderNode* pStartNode, QList<Node*>* pList) const;
+    QList<Node*> childNodes(FolderNode *parentNode) const;
+
     FolderNode *visibleFolderNode(FolderNode *node) const;
     bool filter(Node *node) const;
 
@@ -70,7 +74,7 @@ private:
    SessionNode* rootNode_;
    mutable QHash<FolderNode*, QList<Node*> > childNodes_;
 
-   AssetDb* db_;
+   AssetDb& db_;
 };
 
 } // namespace AssetExplorer
