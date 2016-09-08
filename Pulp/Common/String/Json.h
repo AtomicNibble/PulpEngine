@@ -9,6 +9,8 @@
 #define RAPIDJSON_NAMESPACE_BEGIN namespace X_NAMESPACE_NAME { namespace core {  namespace json {
 #define RAPIDJSON_NAMESPACE_END   } } }
 
+#define RAPIDJSON_ASSERT(x) X_ASSERT(x,"Json")(x);
+
 #if X_64
 	#define RAPIDJSON_SSE2
 #endif // !X_^$
