@@ -11,13 +11,13 @@ namespace AssetExplorer
 
 
 Node::Node(NodeType nodeType,
-           const QString &name, int line)
-        : QObject(),
-          nodeType_(nodeType),
-          projectNode_(0),
-          folderNode_(0),
-          name_(name),
-          line_(line)
+           const QString &name, int line) :
+    QObject(),
+    nodeType_(nodeType),
+    projectNode_(0),
+    folderNode_(0),
+    name_(name),
+    line_(line)
 {
 
 }
@@ -25,16 +25,18 @@ Node::Node(NodeType nodeType,
 void Node::emitNodeSortKeyAboutToChange()
 {
     if (ProjectNode *project = projectNode()) {
-        foreach (NodesWatcher *watcher, project->watchers())
+        foreach (NodesWatcher *watcher, project->watchers()) {
             emit watcher->nodeSortKeyAboutToChange(this);
+        }
     }
 }
 
 void Node::emitNodeSortKeyChanged()
 {
     if (ProjectNode *project = projectNode()) {
-        foreach (NodesWatcher *watcher, project->watchers())
+        foreach (NodesWatcher *watcher, project->watchers()) {
             emit watcher->nodeSortKeyChanged();
+        }
     }
 }
 
@@ -46,8 +48,9 @@ void Node::emitNodeSortKeyChanged()
  */
 void Node::setName(const QString &name)
 {
-    if (name_ == name)
+    if (name_ == name) {
         return;
+    }
 
     emitNodeSortKeyAboutToChange();
     name_ = name;
@@ -57,8 +60,10 @@ void Node::setName(const QString &name)
 
 void Node::setLine(int line)
 {
-    if (line_ == line)
+    if (line_ == line) {
         return;
+    }
+
     emitNodeSortKeyAboutToChange();
     line_ = line;
     emitNodeSortKeyChanged();
@@ -67,8 +72,10 @@ void Node::setLine(int line)
 
 void Node::setNameAndLine(const QString &name, int line)
 {
-    if (name_ == name && line_ == line)
+    if (name_ == name && line_ == line) {
         return;
+    }
+
     emitNodeSortKeyAboutToChange();
     name_ = name;
     line_ = line;
@@ -157,12 +164,12 @@ void Node::setParentFolderNode(FolderNode *parentFolder)
 
 
 
-FileNode::FileNode(const QString &filePath,
+FileNode::FileNode(const QString &name,
                    const FileType fileType,
-                   bool generated, int line)
-        : Node(NodeType::FileNodeType, filePath, line),
-          fileType_(fileType),
-          generated_(generated)
+                   bool generated, int line) :
+    Node(NodeType::FileNodeType, name, line),
+    fileType_(fileType),
+    generated_(generated)
 {
 }
 
@@ -198,8 +205,9 @@ QString FolderNode::displayName() const
 
 QIcon FolderNode::icon(bool expanded) const
 {
-    if(expanded && !iconexpanded_.isNull())
+    if(expanded && !iconexpanded_.isNull()) {
         return iconexpanded_;
+    }
     return icon_;
 }
 
@@ -216,8 +224,10 @@ QList<FolderNode*> FolderNode::subFolderNodes() const
 
 void FolderNode::setDisplayName(const QString &name)
 {
-    if (displayName_ == name)
+    if (displayName_ == name) {
         return;
+    }
+
     emitNodeSortKeyAboutToChange();
     displayName_ = name;
     emitNodeSortKeyChanged();
@@ -238,8 +248,9 @@ void FolderNode::setIconExpanded(const QIcon &icon)
 FileNode *FolderNode::findFile(const QString &name)
 {
     foreach (FileNode *n, fileNodes()) {
-        if (n->name() == name)
+        if (n->name() == name) {
             return n;
+        }
     }
     return 0;
 }
@@ -247,8 +258,9 @@ FileNode *FolderNode::findFile(const QString &name)
 FolderNode *FolderNode::findSubFolder(const QString &name)
 {
     foreach (FolderNode *n, subFolderNodes()) {
-        if (n->name() == name)
+        if (n->name() == name) {
             return n;
+        }
     }
     return 0;
 }
@@ -319,7 +331,8 @@ void FolderNode::addFileNodes(const QList<FileNode *> &files)
         {
             // empty list or greater then last node
             fileNodes_.append(file);
-        } else
+        }
+        else
         {
             auto it = qLowerBound(fileNodes_.begin(),
                                   fileNodes_.end(),
