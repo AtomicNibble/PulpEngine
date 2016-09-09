@@ -64,6 +64,7 @@ public:
 	Result::Enum AddMod(const core::string& name, core::Path<char>& outDir);
 	// must exsists.
 	bool SetMod(const core::string& name);
+	bool SetMod(ModId id);
 	bool ModExsists(const core::string& name, ModId* pModId = nullptr);
 	bool SetModPath(const core::string& name, const core::Path<char>& outDir);
 	bool SetModPath(ModId modId, const core::Path<char>& outDir);

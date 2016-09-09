@@ -219,6 +219,28 @@ bool AssetDB::SetMod(const core::string& name)
 	return false;
 }
 
+bool AssetDB::SetMod(ModId id)
+{
+	sql::SqlLiteTransaction trans(db_, true);
+	sql::SqlLiteQuery qry(db_, "SELECT name FROM mods WHERE mod_id = ?");
+	qry.bind(1, id);
+
+	sql::SqlLiteQuery::iterator it = qry.begin();
+
+	if (it != qry.end())
+	{
+		const char* pName = (*it).get<const char*>(0);
+
+		modId_ = id;
+		X_LOG0("AssetDB", "Mod set: \"%s\" id: %i", pName, modId_);
+		return true;
+	}
+
+	X_ERROR("AssetDB", "Failed to set mod no mod with id \"%" PRIu32 "\" exsists", id);
+	return false;
+}
+
+
 bool AssetDB::ModExsists(const core::string& name, ModId* pModId)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT mod_id FROM mods WHERE name = ?");
