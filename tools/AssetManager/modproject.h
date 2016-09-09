@@ -19,6 +19,7 @@ class ModProject : public AssetExplorer::Project
     struct AssetTypeInfo
     {
         const char* pNickName;
+        int priority; // for sorting.
         QIcon icon;
         QIcon iconExpanded;
     };

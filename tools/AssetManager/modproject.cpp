@@ -37,7 +37,7 @@ void ModProject::loadAssetTypeNodes(void)
         {
             const auto& info = assetDisplayInfo_[i];
 
-            ModVirtualFolderNode* pFolder = new ModVirtualFolderNode(info.pNickName, 0, info.pNickName,
+            ModVirtualFolderNode* pFolder = new ModVirtualFolderNode(info.pNickName, info.priority, info.pNickName,
                 static_cast<AssetDb::AssetType::Enum>(i), counts[i]);
 
             pFolder->setIcon(info.icon);
@@ -73,6 +73,7 @@ void ModProject::initAssetTypeInfo(void)
 
     for(size_t i=0; i<AssetDb::AssetType::ENUM_COUNT; i++) {
         assetDisplayInfo_[i].pNickName = "<AssetNickName missing>";
+        assetDisplayInfo_[i].priority = 0;
         assetDisplayInfo_[i].icon = defaultIcon;
         assetDisplayInfo_[i].iconExpanded = defaultIconExpanded;
     }
@@ -80,6 +81,8 @@ void ModProject::initAssetTypeInfo(void)
     typedef X_NAMESPACE(assetDb)::AssetType assetType;
 
     assetDisplayInfo_[assetType::MODEL].pNickName = "Model";
+    // can make certain asset types sort above others.
+   // assetDisplayInfo_[assetType::MODEL].priority = 1;
   //  assetDisplayInfo_[assetType::MODEL].icon = QIcon(":/assetDb/img/File_mesh.png");
     assetDisplayInfo_[assetType::ANIM].pNickName = "Anim";
     assetDisplayInfo_[assetType::MATERIAL].pNickName = "Material";
