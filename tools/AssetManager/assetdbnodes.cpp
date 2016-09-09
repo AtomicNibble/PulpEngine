@@ -270,6 +270,13 @@ bool FolderNode::hasLazyChildren(void) const
     return false;
 }
 
+
+bool FolderNode::preFetch()
+{
+    return true;
+}
+
+
 bool FolderNode::addFiles(const QStringList &filePaths, QStringList *notAdded)
 {
     if (projectNode())
@@ -296,12 +303,6 @@ bool FolderNode::renameFile(const QString &filePath, const QString &newFilePath)
     if (projectNode())
         return projectNode()->renameFile(filePath, newFilePath);
     return false;
-}
-
-FolderNode::AddNewInformation FolderNode::addNewInformation(const QStringList &files) const
-{
-    Q_UNUSED(files);
-    return AddNewInformation(name(), 100);
 }
 
 
@@ -410,7 +411,8 @@ void FolderNode::addFolderNodes(const QList<FolderNode*> &subFolders)
         {
             // empty list or greater then last node
             subFolderNodes_.append(folder);
-        } else
+        }
+        else
         {
             // Binary Search for insertion point
             auto it = qLowerBound(subFolderNodes_.begin(),

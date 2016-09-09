@@ -141,23 +141,12 @@ public:
     FolderNode *findSubFolder(const QString &path);
 
     virtual bool hasLazyChildren(void) const;
+    virtual bool preFetch(void);
 
     virtual bool addFiles(const QStringList &filePaths, QStringList *notAdded = 0);
     virtual bool removeFiles(const QStringList &filePaths, QStringList *notRemoved = 0);
     virtual bool deleteFiles(const QStringList &filePaths);
     virtual bool renameFile(const QString &filePath, const QString &newFilePath);
-
-    class AddNewInformation
-    {
-    public:
-        AddNewInformation(const QString &name, int p)
-            :displayName(name), priority(p)
-        {}
-        QString displayName;
-        int priority;
-    };
-
-    virtual AddNewInformation addNewInformation(const QStringList &files) const;
 
     void addFileNodes(const QList<FileNode*> &files);
     void removeFileNodes(const QList<FileNode*> &files);
