@@ -204,6 +204,8 @@ bool AssetDB::AddDefaultMods(void)
 		AddMod(base, core::Path<char>(R"(C:\Users\WinCat\Documents\code\WinCat\engine\potatoengine\game_folder\core_assets)"));
 	}
 
+	return true;
+}
 
 bool AssetDB::AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts)
 {
