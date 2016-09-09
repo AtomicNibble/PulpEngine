@@ -180,6 +180,11 @@ bool AssetDB::AddDefaultMods(void)
 
 AssetDB::Result::Enum AssetDB::AddMod(const core::string& name, core::Path<char>& outDir)
 {
+	if (name.isEmpty()) {
+		X_ERROR("AssetDB", "Mod with empty name not allowed");
+		return Result::ERROR;
+	}
+
 	if (ModExsists(name)) {
 		X_ERROR("AssetDB", "Mod with name \"%s\" already exists", name.c_str());
 		return Result::NAME_TAKEN;
