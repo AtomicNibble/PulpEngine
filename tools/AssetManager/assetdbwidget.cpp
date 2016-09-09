@@ -232,8 +232,10 @@ void AssetDbViewWidget::startupProjectChanged(Project *project)
 void AssetDbViewWidget::openItem(const QModelIndex &mainIndex)
 {
     Node *node = model_->nodeForIndex(mainIndex);
-    if (node->nodeType() != NodeType::FileNodeType)
+    if (node->nodeType() != NodeType::FileNodeType) {
         return;
+    }
+
     /*
     IEditor *editor = EditorManager::openEditor(node->path());
     if (editor && node->line() >= 0)
@@ -245,8 +247,7 @@ void AssetDbViewWidget::openItem(const QModelIndex &mainIndex)
 
 void AssetDbViewWidget::foldersAboutToBeRemoved(FolderNode *, const QList<FolderNode*> &list)
 {
-    /*
-    Node *n = m_explorer->currentNode();
+    Node *n = explorer_->currentNode();
     while (n) {
         if (FolderNode *fn = qobject_cast<FolderNode *>(n)) {
             if (list.contains(fn)) {
@@ -255,23 +256,21 @@ void AssetDbViewWidget::foldersAboutToBeRemoved(FolderNode *, const QList<Folder
                 while (list.contains(pn)) {
                     pn = pn->parentFolderNode()->projectNode();
                 }
-                m_explorer->setCurrentNode(pn);
+                explorer_->setCurrentNode(pn);
                 break;
             }
         }
         n = n->parentFolderNode();
     }
-    */
 }
 
 void AssetDbViewWidget::filesAboutToBeRemoved(FolderNode *, const QList<FileNode*> &list)
 {
-    /*
-    if (FileNode *fileNode = qobject_cast<FileNode *>(m_explorer->currentNode())) {
+    if (FileNode *fileNode = qobject_cast<FileNode *>(explorer_->currentNode())) {
         if (list.contains(fileNode)) {
-            m_explorer->setCurrentNode(fileNode->projectNode());
+            explorer_->setCurrentNode(fileNode->projectNode());
         }
-    }*/
+    }
 }
 
 

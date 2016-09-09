@@ -58,3 +58,16 @@ bool ModVirtualFolderNode::hasLazyChildren(void) const
 {
     return numAssets_ > 0;
 }
+
+bool ModVirtualFolderNode::preFetch(void)
+{
+    // our children are about to be requested.
+    // this is called so we can populate them if not already.
+
+  /*  ModProjectNode* project = projectNode();
+    if(project)
+    {
+        project->pProject_->modId();
+    }*/
+    return true;
+}

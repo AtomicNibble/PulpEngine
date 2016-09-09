@@ -23,7 +23,7 @@ namespace AssetExplorer {
 
 
 
-AssetExplorer *AssetExplorer::instance_ = 0;
+AssetExplorer *AssetExplorer::instance_ = nullptr;
 AssetExplorer *AssetExplorer::instance()
 {
     return instance_;
@@ -31,8 +31,8 @@ AssetExplorer *AssetExplorer::instance()
 
 
 AssetExplorer::AssetExplorer()  :
-    currentProject_(0),
-    m_currentNode(0)
+    currentProject_(nullptr),
+    currentNode_(nullptr)
 {
     instance_ = this;
 }
@@ -225,48 +225,51 @@ Project *AssetExplorer::currentProject(void)
     Project *project = instance_->currentProject_;
 
         if (project)
-            qDebug() << "AssetExplorerPlugin::currentProject returns " << project->displayName();
+            qDebug() << "AssetExplorer::currentProject returns " << project->displayName();
         else
-            qDebug() << "AssetExplorerPlugin::currentProject returns 0";
+            qDebug() << "AssetExplorer::currentProject returns 0";
 
     return project;
 }
 
-
-void AssetExplorer::unloadProject(void)
+Node *AssetExplorer::currentNode(void) const
 {
-    qDebug() << "AssetExplorer::unloadProject";
-
-
-    unloadProject(currentProject_);
+    return currentNode_;
 }
 
-void AssetExplorer::unloadProject(Project *project)
+void AssetExplorer::setCurrentNode(Node* node)
 {
-    SessionManager::removeProject(project);
-    updateActions();
+    setCurrent(SessionManager::projectForNode(node), QString(), node);
 }
 
 
-Node *AssetExplorer::currentNode() const
+void AssetExplorer::setCurrent(Project *project, QString name, Node *node)
 {
-    return m_currentNode;
+    if (debug) {
+        qDebug() << "ProjectExplorer - setting path to " << (name)
+                << " and project to " << (project ? project->displayName() : QLatin1String("0"));
+    }
+
+
 }
 
 
 void AssetExplorer::showContextMenu(QWidget *view, const QPoint &globalPos, Node *node)
 {
+    qDebug() << "AssetExplorer::showContextMenu";
 
 }
 
 
 void AssetExplorer::updateActions(void)
 {
+    qDebug() << "AssetExplorer::updateActions";
 
 }
 
 void AssetExplorer::updateContextMenuActions(void)
 {
+    qDebug() << "AssetExplorer::updateContextMenuActions";
 
 
 }
@@ -300,19 +303,19 @@ void AssetExplorer::startupProjectChanged(void)
     }
 
     if (previousStartupProject) {
-     //   disconnect(previousStartupProject, SIGNAL(activeTargetChanged(AssetExplorer::Target*)),
-    //               this, SLOT(activeTargetChanged()));
+        disconnect(previousStartupProject, SIGNAL(activeTargetChanged(AssetExplorer::Target*)),
+                   this, SLOT(activeTargetChanged()));
     }
 
-    previousStartupProject = pProject ;
+    previousStartupProject = pProject;
 
 
     if (pProject ) {
-    //    connect(project, SIGNAL(activeTargetChanged(AssetExplorer::Target*)),
-     //           this, SLOT(activeTargetChanged()));
+        connect(pProject, SIGNAL(activeTargetChanged(AssetExplorer::Target*)),
+                this, SLOT(activeTargetChanged()));
     }
 
-//    activeTargetChanged();
+ //   activeTargetChanged();
     updateActions();
 }
 
@@ -334,7 +337,7 @@ void AssetExplorer::setStartupProject(void)
 
 void AssetExplorer::setStartupProject(Project* pProject)
 {
-    qDebug() << "AssetExplorerPlugin::setStartupProject";
+    qDebug() << "AssetExplorer::setStartupProject";
 
     if (!pProject) {
         return;

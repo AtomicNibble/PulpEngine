@@ -45,6 +45,8 @@ public:
     static bool isDefaultVirgin();
     static bool isDefaultSession(const QString &session);
 
+    static Project *projectForNode(Node *node);
+
 signals:
     void projectAdded(Project *project);
     void singleProjectAdded(Project *project);

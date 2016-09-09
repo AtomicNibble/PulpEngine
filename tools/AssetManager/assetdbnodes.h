@@ -268,10 +268,6 @@ signals:
     // Emited whenever the model needs to send a update signal.
      void nodeUpdated(Node *node);
 
-     // projects
-     void aboutToChangeHasBuildTargets(ProjectNode* node);
-     void hasBuildTargetsChanged(ProjectNode *node);
-
     // folders & projects
     void foldersAboutToBeAdded(FolderNode *parentFolder,
                                const QList<FolderNode*> &newFolders);

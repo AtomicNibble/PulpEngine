@@ -2,12 +2,17 @@
 #include "assetdbnodes.h"
 
 #include "project.h"
+#include "assetdbexplorer.h"
 
 #include <QStringList>
 #include <QDir>
 #include <QMap>
 
 namespace AssetExplorer {
+
+namespace {
+bool debug = false;
+}
 
 
 class SessionManagerPrivate
@@ -177,6 +182,34 @@ void SessionManager::projectDisplayNameChanged()
         emit instance_->projectDisplayNameChanged(pro);
     }
 }
+
+
+Project *SessionManager::projectForNode(Node *node)
+{
+    if (!node) {
+        return nullptr;
+    }
+
+    FolderNode *rootProjectNode = qobject_cast<FolderNode*>(node);
+    if (!rootProjectNode) {
+        rootProjectNode = node->parentFolderNode();
+    }
+
+    while (rootProjectNode && rootProjectNode->parentFolderNode() != d->sessionNode_) {
+        rootProjectNode = rootProjectNode->parentFolderNode();
+    }
+
+    Q_ASSERT(rootProjectNode);
+
+    foreach (Project *p, d->projects_) {
+        if (p->rootProjectNode() == rootProjectNode) {
+            return p;
+        }
+    }
+
+    return nullptr;
+}
+
 
 
 } // namespace AssetExplorer
