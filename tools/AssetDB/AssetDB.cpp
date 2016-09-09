@@ -912,6 +912,23 @@ bool AssetDB::GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& data
 	return false;
 }
 
+bool AssetDB::GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT type FROM file_ids WHERE file_ids.file_id = ?");
+	qry.bind(1, assetId);
+
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
+		return false;
+	}
+
+	if ((*it).columnType(0) != sql::ColumType::SNULL) {
+		typeOut = static_cast<AssetType::Enum>((*it).get<int32_t>(0));
+	}
+	return true;
+}
+
 
 bool AssetDB::GetAssetRefCount(int32_t assetId, uint32_t& refCountOut)
 {
@@ -1044,7 +1061,7 @@ bool AssetDB::AssetIsParent(int32_t assetId)
 }
 
 
-AssetDB::Result::Enum AssetDB::SetAssetParent(int32_t assetId, int32_t parentAssetIt)
+AssetDB::Result::Enum AssetDB::SetAssetParent(int32_t assetId, int32_t parentAssetId)
 {
 	// we don't allow parent updating.
 	// you must explicity remove parent then add new to change.
@@ -1053,10 +1070,27 @@ AssetDB::Result::Enum AssetDB::SetAssetParent(int32_t assetId, int32_t parentAss
 		return Result::ERROR;
 	}
 
-	sql::SqlLiteTransaction trans(db_);
+	{
+		AssetType::Enum type, parentType;
+		if (GetTypeForAsset(assetId, type)) {
+			X_ERROR("AssetDB", "Failed to get asset %" PRIi32 " type", assetId);
+			return Result::ERROR;
+		}
+		if (GetTypeForAsset(parentAssetId, parentType)) {
+			X_ERROR("AssetDB", "Failed to get asset %" PRIi32 " type", parentAssetId);
+			return Result::ERROR;
+		}
 
+		if (type != parentType) {
+			X_ERROR("AssetDB", "Failed to set asset %" PRIi32 " parent, the parent is a diffrent asset type: %s -> %s",
+				assetId, AssetType::ToString(type), AssetType::ToString(parentType));
+			return Result::ERROR;
+		}
+	}
+
+	sql::SqlLiteTransaction trans(db_);
 	sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET parent_id = ? WHERE file_ids.file_id = ?");
-	cmd.bind(1, parentAssetIt);
+	cmd.bind(1, parentAssetId);
 	cmd.bind(2, assetId);
 
 	sql::Result::Enum res = cmd.execute();
