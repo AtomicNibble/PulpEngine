@@ -404,6 +404,8 @@ void AssetDBModel::fetchMore(FolderNode* pFolderNode) const
     BUG_CHECK(pFolderNode);
     BUG_CHECK(!childNodes_.contains(pFolderNode));
 
+    pFolderNode->preFetch();
+
     // this gets all the folders child nodes and places then in a cache.
     QList<Node*> nodeList = childNodes(pFolderNode);
     childNodes_.insert(pFolderNode, nodeList);
