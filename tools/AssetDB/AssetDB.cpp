@@ -467,6 +467,11 @@ bool AssetDB::GetNumAssets(AssetType::Enum type, int32_t* pNumOut)
 
 AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId)
 {
+	if (name.isEmpty()) {
+		X_ERROR("AssetDB", "Asset with empty name not allowed");
+		return Result::ERROR;
+	}
+
 	if (AssetExsists(type, name)) {
 		return Result::NAME_TAKEN;
 	}
@@ -549,6 +554,11 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 {
 	int32_t assetId;
 
+	if (newName.isEmpty()) {
+		X_ERROR("AssetDB", "Can't rename asset \"%s\" to Blank name", newName.c_str());
+		return Result::ERROR;
+	}
+
 	if (!AssetExsists(type, name, &assetId)) {
 		return Result::NOT_FOUND;
 	}
@@ -617,6 +627,11 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	core::Array<uint8_t>& data, const core::string& argsOpt)
 {
 	int32_t assetId, rawId;
+
+	if (name.isEmpty()) {
+		X_ERROR("AssetDB", "Can't update asset with empty name");
+		return Result::ERROR;
+	}
 
 #if X_ENABLE_ASSERTIONS
 	assetId = std::numeric_limits<int32_t>::max();
@@ -780,6 +795,10 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 
 bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pIdOut, ModId* pModIdOut)
 {
+	if (name.isEmpty()) {
+		return false;
+	}
+
 	sql::SqlLiteQuery qry(db_, "SELECT file_id, mod_id FROM file_ids WHERE type = ? AND name = ?");
 	qry.bind(1, type);
 	qry.bind(2, name.c_str());
