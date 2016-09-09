@@ -30,6 +30,7 @@ namespace
 			"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
 			"abcdefghijklmnopqrstuvwxyz";
 
+		const size_t charSetNum = sizeof(charSet) - 1;
 		const size_t len = core::random::MultiplyWithCarry(assetNameLenMin, assetNameLenMax);
 
 		core::string name;
@@ -37,7 +38,7 @@ namespace
 
 		for (size_t i = 0; i < len; i++)
 		{
-			name += charSet[core::random::MultiplyWithCarry() % sizeof(charSet)];
+			name += charSet[core::random::MultiplyWithCarry() % charSetNum];
 		}
 
 		return name;
