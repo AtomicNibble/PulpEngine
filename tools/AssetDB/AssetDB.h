@@ -51,6 +51,8 @@ public:
 		ERROR
 	);
 
+	typedef std::array<size_t, AssetType::ENUM_COUNT> AssetTypeCountsArr;
+
 public:
 	AssetDB();
 	~AssetDB();
@@ -60,6 +62,7 @@ public:
 	bool CreateTables(void);
 	bool DropTables(void);
 	bool AddDefaultMods(void);
+	bool AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts);
 
 	Result::Enum AddMod(const core::string& name, core::Path<char>& outDir);
 	// must exsists.

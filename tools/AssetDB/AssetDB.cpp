@@ -13,10 +13,39 @@
 
 #include <String\Json.h>
 
+#include <Random\MultiplyWithCarry.h>
 
 X_LINK_LIB("engine_SqLite")
 
 X_NAMESPACE_BEGIN(assetDb)
+
+namespace
+{
+
+	core::string randomAssetName(uint32_t assetNameLenMin, uint32_t assetNameLenMax)
+	{
+		static const char charSet[] =
+			"0123456789"
+			"_"
+			"ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+			"abcdefghijklmnopqrstuvwxyz";
+
+		const size_t len = core::random::MultiplyWithCarry(assetNameLenMin, assetNameLenMax);
+
+		core::string name;
+		name.reserve(len);
+
+		for (size_t i = 0; i < len; i++)
+		{
+			name += charSet[core::random::MultiplyWithCarry() % sizeof(charSet)];
+		}
+
+		return name;
+	}
+
+
+} // namespace
+
 
 const char* AssetDB::ASSET_DB_FOLDER = "asset_db";
 const char* AssetDB::DB_NAME = X_ENGINE_NAME"_asset.db";
@@ -174,6 +203,45 @@ bool AssetDB::AddDefaultMods(void)
 		AddMod(base, core::Path<char>(R"(C:\Users\WinCat\Documents\code\WinCat\engine\potatoengine\game_folder\core_assets)"));
 	}
 
+
+bool AssetDB::AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts)
+{
+	// adds a load of junk data for testing.
+
+	core::StackString512 modName("testMod_");
+	core::Path<char> outDir("testMod_");
+
+	const uint32_t assetNameLenMin = 4;
+	const uint32_t assetNameLenMax = 16;
+
+	for (size_t i = 0; i < numMods; i++) {
+		modName.appendFmt("%" PRIuS, i);
+		outDir.appendFmt("%" PRIuS "_out", i);
+
+		AddMod(core::string(modName.c_str()), outDir);
+
+		SetMod(core::string(modName.c_str()));
+
+		for (size_t x = 0; x < AssetType::ENUM_COUNT; x++) 
+		{
+			// add assets.
+			if (assetCounts[x])
+			{
+				AssetType::Enum type = static_cast<AssetType::Enum>(x);
+				for (size_t j = 0; j < assetCounts[x]; j++)
+				{
+					core::string name = randomAssetName(assetNameLenMin, assetNameLenMax);
+
+					auto result = AddAsset(type, name);
+					while (result == Result::NAME_TAKEN) {
+						name = randomAssetName(assetNameLenMin, assetNameLenMax);
+						result = AddAsset(type, name);
+					}
+				}
+			}
+		}
+	}
+	
 	return true;
 }
 
