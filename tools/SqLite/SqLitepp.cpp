@@ -132,6 +132,8 @@ bool SqlLiteDb::connect(const char* pDb, ThreadMode::Enum threadMode)
 		return false;
 	}
 
+	setBusyHandler(defaultBusyHandler);
+
 	return true;
 }
 
@@ -270,7 +272,11 @@ Result::Enum SqlLiteDb::setConfig(int32_t config)
 	return static_cast<Result::Enum>(sqlite3_config(config));
 }
 
-
+int32_t SqlLiteDb::defaultBusyHandler(int32_t count)
+{
+	X_WARNING("SqlLiteDb", "Busy handler called %" PRIi32 " times", count);
+	return 0;
+}
 // ----------------------------------------------------
 
 SqlLiteStateMnt::SqlLiteStateMnt(SqlLiteDb& db, const char* pStmt) : 

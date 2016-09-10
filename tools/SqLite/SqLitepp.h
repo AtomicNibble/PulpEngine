@@ -130,6 +130,7 @@ public:
 
 private:
 	static Result::Enum setConfig(int32_t config);
+	static int32_t defaultBusyHandler(int32_t count);
 
 private:
 	sqlite3* db_;
