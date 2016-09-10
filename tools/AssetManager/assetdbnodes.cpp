@@ -97,35 +97,32 @@ ProjectNode *Node::projectNode() const
     return projectNode_;
 }
 
-/*!
-  The parent in the node hierarchy.
-  */
 FolderNode *Node::parentFolderNode() const
 {
     return folderNode_;
 }
 
-QString Node::name() const
+QString Node::name(void) const
 {
     return name_;
 }
 
-int Node::line() const
+int32_t Node::line(void) const
 {
     return -1;
 }
 
-QString Node::displayName() const
+QString Node::displayName(void) const
 {
     return name();
 }
 
-QString Node::tooltip() const
+QString Node::tooltip(void) const
 {
     return name();
 }
 
-bool Node::isEnabled() const
+bool Node::isEnabled(void) const
 {
     return parentFolderNode()->isEnabled();
 }
@@ -147,7 +144,7 @@ void Node::setProjectNode(ProjectNode *project)
     projectNode_ = project;
 }
 
-void Node::emitNodeUpdated()
+void Node::emitNodeUpdated(void)
 {
     if (ProjectNode *node = projectNode()) {
         foreach (NodesWatcher* pWatcher, node->watchers()) {
@@ -172,7 +169,7 @@ FileNode::FileNode(const QString& name,
 {
 }
 
-FileType FileNode::fileType() const
+FileType FileNode::fileType(void) const
 {
     return fileType_;
 }
@@ -271,50 +268,50 @@ bool FolderNode::loadChildren(void)
 }
 
 
-void FolderNode::addFileNodes(const QList<FileNode *>& files)
+void FolderNode::addFileNodes(const QList<FileNod *>& files)
 {
     Q_ASSERT(projectNode());
-    ProjectNode *pn = projectNode();
+    ProjectNode* pProjectNode = projectNode();
 
     if (files.isEmpty()) {
         return;
     }
 
-    foreach (NodesWatcher* pWatcher, pn->watchers()) {
+    for (NodesWatcher* pWatcher : pProjectNode->watchers()) {
         emit pWatcher->filesAboutToBeAdded(this, files);
     }
 
-    foreach (FileNode *file, files)
+	for (FileNode* pFile : files)
     {
-        BUG_ASSERT(!file->parentFolderNode(),
+        BUG_ASSERT(!pFile->parentFolderNode(),
                    qDebug("File node has already a parent folder"));
 
-        file->setParentFolderNode(this);
-        file->setProjectNode(pn);
+		pFile->setParentFolderNode(this);
+		pFile->setProjectNode(pProjectNode);
 
         // Now find the correct place to insert file
-        if (fileNodes_.count() == 0 || fileNodes_.last() < file)
+        if (fileNodes_.count() == 0 || fileNodes_.last() < pFile)
         {
             // empty list or greater then last node
-            fileNodes_.append(file);
+            fileNodes_.append(pFile);
         }
         else
         {
             auto it = qLowerBound(fileNodes_.begin(),
                                   fileNodes_.end(),
-                                  file);
+								  pFile);
 
-            fileNodes_.insert(it, file);
+            fileNodes_.insert(it, pFile);
         }
     }
 
-    foreach (NodesWatcher* pWatcher, pn->watchers()) {
+	for (NodesWatcher* pWatcher : pProjectNode->watchers()) {
         emit pWatcher->filesAdded();
     }
 }
 
 
-void FolderNode::removeFileNodes(const QList<FileNode *>& files)
+void FolderNode::removeFileNodes(const QList<FileNode*>& files)
 {
     Q_ASSERT(projectNode());
     ProjectNode *pn = projectNode();
@@ -354,45 +351,45 @@ void FolderNode::removeFileNodes(const QList<FileNode *>& files)
 void FolderNode::addFolderNodes(const QList<FolderNode*>& subFolders)
 {
     Q_ASSERT(projectNode());
-    ProjectNode *pn = projectNode();
+    ProjectNode* pProjectNode = projectNode();
 
     if (subFolders.isEmpty()) {
         return;
     }
 
-    foreach (NodesWatcher* pWatcher, pn->watchers()) {
+    for (NodesWatcher* pWatcher : pProjectNode->watchers()) {
 		pWatcher->foldersAboutToBeAdded(this, subFolders);
     }
 
-    foreach (FolderNode *folder, subFolders)
+    for (FolderNode* pFolder : subFolders)
     {
-        BUG_ASSERT(!folder->parentFolderNode(),
+        BUG_ASSERT(!pFolder->parentFolderNode(),
                    qDebug("Project node has already a parent folder"));
-        folder->setParentFolderNode(this);
-        folder->setProjectNode(pn);
+		pFolder->setParentFolderNode(this);
+		pFolder->setProjectNode(pProjectNode);
 
         // Find the correct place to insert
-        if (subFolderNodes_.count() == 0 || subFolderNodes_.last() < folder)
+        if (subFolderNodes_.count() == 0 || subFolderNodes_.last() < pFolder)
         {
             // empty list or greater then last node
-            subFolderNodes_.append(folder);
+            subFolderNodes_.append(pFolder);
         }
         else
         {
             // Binary Search for insertion point
             auto it = qLowerBound(subFolderNodes_.begin(),
                                   subFolderNodes_.end(),
-                                  folder);
+								  pFolder);
 
-            subFolderNodes_.insert(it, folder);
+            subFolderNodes_.insert(it, pFolder);
         }
 
         // project nodes have to be added via addProjectNodes
-        BUG_ASSERT(folder->nodeType() != NodeType::ProjectNodeType,
+        BUG_ASSERT(pFolder->nodeType() != NodeType::ProjectNodeType,
                    qDebug("project nodes have to be added via addProjectNodes"));
     }
 
-    foreach (NodesWatcher* pWatcher, pn->watchers()) {
+    for (NodesWatcher* pWatcher : pProjectNode->watchers()) {
         emit pWatcher->foldersAdded();
     }
 }

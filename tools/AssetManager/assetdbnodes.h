@@ -69,7 +69,7 @@ public:
     ProjectNode *projectNode(void) const;     // managing project
     FolderNode *parentFolderNode(void) const; // parent folder or project
     QString name(void) const;                 // name
-    int line(void) const;
+    int32_t line(void) const;
     virtual QString displayName(void) const;
     virtual QString tooltip(void) const;
     virtual bool isEnabled(void) const;
