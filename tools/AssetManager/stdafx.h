@@ -7,5 +7,7 @@
 #include <Pulp/Common/IAssetDb.h>
 
 
+#pragma comment(lib, "Dwrite")
+
 #endif // PCH_H
 
