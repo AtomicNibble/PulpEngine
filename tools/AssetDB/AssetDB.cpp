@@ -140,7 +140,8 @@ bool AssetDB::CreateTables(void)
 		"parent_id INTEGER NULL,"
 		"mod_id INTEGER,"
 		"FOREIGN KEY(parent_id) REFERENCES mods(mod_id),"
-		"FOREIGN KEY(mod_id) REFERENCES file_ids(file_id)"
+		"FOREIGN KEY(mod_id) REFERENCES file_ids(file_id),"
+		"unique(name, type)"
 		");")) {
 		X_ERROR("AssetDB", "Failed to create 'file_ids' table");
 		return false;
@@ -567,6 +568,46 @@ bool AssetDB::GetNumAssets(AssetType::Enum type, int32_t* pNumOut)
 }
 
 
+AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, AssetType::Enum type, const core::string& name, int32_t* pId)
+{
+	if (name.isEmpty()) {
+		X_ERROR("AssetDB", "Asset with empty name not allowed");
+		return Result::ERROR;
+	}
+	if (!ValidName(name)) {
+		X_ERROR("AssetDB", "Asset name \"%s\" has invalid characters", name.c_str());
+		return Result::ERROR;
+	}
+
+	if (!isModSet()) {
+		X_ERROR("AssetDB", "Mod must be set before calling AddAsset!");
+		return Result::ERROR;
+	}
+
+	sql::SqlLiteCmd cmd(db_, "INSERT INTO file_ids (name, type, mod_id) VALUES(?,?,?)");
+	cmd.bind(1, name.c_str());
+	cmd.bind(2, type);
+	cmd.bind(3, modId_);
+
+
+	sql::Result::Enum res = cmd.execute();
+	if (res != sql::Result::OK)
+	{
+		if (res == sql::Result::CONSTRAINT) {
+			return Result::NAME_TAKEN;
+		}
+
+		return Result::ERROR;
+	}
+
+	if (pId) {
+		*pId = safe_static_cast<int32_t, sql::SqlLiteDb::RowId>(db_.lastInsertRowid());
+	}
+
+	return Result::OK;
+}
+
+
 AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId)
 {
 	if (name.isEmpty()) {
@@ -578,9 +619,6 @@ AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string
 		return Result::ERROR;
 	}
 
-	if (AssetExsists(type, name)) {
-		return Result::NAME_TAKEN;
-	}
 	if (!isModSet()) {
 		X_ERROR("AssetDB", "Mod must be set before calling AddAsset!");
 		return Result::ERROR;
@@ -594,7 +632,12 @@ AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string
 
 
 	sql::Result::Enum res = cmd.execute();
-	if (res != sql::Result::OK) {
+	if (res != sql::Result::OK) 
+	{
+		if (res == sql::Result::CONSTRAINT) {
+			return Result::NAME_TAKEN;
+		}
+
 		return Result::ERROR;
 	}
 
