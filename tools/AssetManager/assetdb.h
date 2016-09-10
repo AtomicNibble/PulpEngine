@@ -24,6 +24,15 @@ public:
         ERROR
     };
 
+    struct AssetInfo
+    {
+        int32_t id;
+        int32_t parentId;
+        QString name;
+    };
+
+
+
     typedef X_NAMESPACE(assetDb)::AssetType AssetType;
 
     typedef std::array<int32_t, AssetType::ENUM_COUNT> AssetTypeCountsArray;
@@ -39,6 +48,8 @@ public:
     ModId GetModId(const QString& name);
 
     bool getAssetTypeCounts(ModId modId, AssetTypeCountsArray& counts);
+
+    bool getAssetList(ModId modId, AssetType::Enum type, QList<AssetInfo>& assetsOut);
 
 public:
     bool IterateMods(std::function<bool(ModId id, const QString& name, QDir& outDir)> func);

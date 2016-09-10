@@ -67,12 +67,42 @@ bool AssetDb::getAssetTypeCounts(ModId modId, AssetTypeCountsArray& counts)
              }
              counts[type] = count;
          }
-    }else {
+    } else {
         qCCritical(logCatAssetDb) << "Failed to iterateMods: " << query.lastError().text();
     }
     return res;
 }
 
+
+bool AssetDb::getAssetList(ModId modId, AssetType::Enum type, QList<AssetInfo>& assetsOut)
+{
+    if(!isOpen()) {
+        qCCritical(logCatAssetDb) << "Can't get asset counts, the db is not open";
+        return false;
+    }
+
+    QSqlQuery query(db_);
+    query.prepare("SELECT file_id, name, parent_id FROM file_ids WHERE mod_id = ? AND type = ?");
+    query.bindValue(0, modId);
+    query.bindValue(1, type);
+
+    bool res = query.exec();
+    if(res)
+    {
+        while (query.next()) {
+
+             AssetInfo info;
+             info.id = query.value(0).toInt();
+             info.name = query.value(1).toString();
+             info.parentId = query.value(2).toInt();
+
+             assetsOut.append(info);
+         }
+    } else {
+        qCCritical(logCatAssetDb) << "Failed to iterateMods: " << query.lastError().text();
+    }
+    return res;
+}
 
 bool AssetDb::IterateMods(std::function<bool(ModId id, const QString& name, QDir& outDir)> func)
 {
@@ -93,7 +123,7 @@ bool AssetDb::IterateMods(std::function<bool(ModId id, const QString& name, QDir
 
              func(id, name, QDir(dir));
          }
-    }else {
+    } else {
         qCCritical(logCatAssetDb) << "Failed to iterateMods: " << query.lastError().text();
     }
     return res;
@@ -117,7 +147,7 @@ bool AssetDb::IterateAssets(std::function<bool(AssetType::Enum type, const QStri
 
              func(type, name);
          }
-    }else {
+    } else {
         qCCritical(logCatAssetDb) << "Failed to iterateAssets: " << query.lastError().text();
     }
     return res;
@@ -143,7 +173,7 @@ bool AssetDb::IterateAssets(ModId modId, std::function<bool(AssetType::Enum, con
 
              func(type, name);
          }
-    }else {
+    } else {
         qCCritical(logCatAssetDb) << "Failed to iterateAssets: " << query.lastError().text();
     }
     return res;
