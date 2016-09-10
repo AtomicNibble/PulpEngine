@@ -86,8 +86,6 @@ void ModProject::initAssetTypeInfo(void)
     typedef X_NAMESPACE(assetDb)::AssetType assetType;
 
     assetDisplayInfo_[assetType::MODEL].pNickName = "Model";
-    // can make certain asset types sort above others.
-   // assetDisplayInfo_[assetType::MODEL].priority = 1;
   //  assetDisplayInfo_[assetType::MODEL].icon = QIcon(":/assetDb/img/File_mesh.png");
     assetDisplayInfo_[assetType::ANIM].pNickName = "Anim";
     assetDisplayInfo_[assetType::MATERIAL].pNickName = "Material";
@@ -101,5 +99,10 @@ void ModProject::initAssetTypeInfo(void)
     assetDisplayInfo_[assetType::CHARACTER].pNickName = "Character";
     assetDisplayInfo_[assetType::VEHICLE].pNickName = "Vehicle";
     assetDisplayInfo_[assetType::CAMERA].pNickName = "Cameras";
+
+    // can make certain asset types sort above others.
+    assetDisplayInfo_[assetType::MODEL].priority = 3;
+    assetDisplayInfo_[assetType::ANIM].priority = 2;
+    assetDisplayInfo_[assetType::IMG].priority = 1;
 
 }
