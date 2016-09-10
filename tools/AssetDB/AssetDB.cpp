@@ -255,6 +255,10 @@ AssetDB::Result::Enum AssetDB::AddMod(const core::string& name, core::Path<char>
 		X_ERROR("AssetDB", "Mod with empty name not allowed");
 		return Result::ERROR;
 	}
+	if (!ValidName(name)) {
+		X_ERROR("AssetDB", "Mod name \"%s\" has invalid characters", name.c_str());
+		return Result::ERROR;
+	}
 
 	if (ModExsists(name)) {
 		X_ERROR("AssetDB", "Mod with name \"%s\" already exists", name.c_str());
@@ -569,6 +573,10 @@ AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string
 		X_ERROR("AssetDB", "Asset with empty name not allowed");
 		return Result::ERROR;
 	}
+	if (!ValidName(name)) {
+		X_ERROR("AssetDB", "Asset name \"%s\" has invalid characters", name.c_str());
+		return Result::ERROR;
+	}
 
 	if (AssetExsists(type, name)) {
 		return Result::NAME_TAKEN;
@@ -654,6 +662,11 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 
 	if (newName.isEmpty()) {
 		X_ERROR("AssetDB", "Can't rename asset \"%s\" to Blank name", newName.c_str());
+		return Result::ERROR;
+	}
+
+	if (!ValidName(newName)) {
+		X_ERROR("AssetDB", "Can't rename asset \"%s\" to \"%s\" new name has invalid characters", name.c_str(), newName.c_str());
 		return Result::ERROR;
 	}
 
@@ -1352,6 +1365,20 @@ void AssetDB::AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut)
 }
 
 
+bool AssetDB::ValidName(const core::string& name)
+{
+	for (size_t i = 0; i < name.length(); i++)
+	{
+		// are you valid!?
+		char ch = name[i];
 
+		bool valid = core::strUtil::IsAlphaNum(ch) || core::strUtil::IsDigit(ch) || ch == '_';
+		if (valid) {
+			return false;
+		}
+	}
+
+	return true;
+}
 
 X_NAMESPACE_END
