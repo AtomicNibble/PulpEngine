@@ -15,7 +15,7 @@ int main(int argc, char *argv[])
     a.setOrganizationDomain("Potato - Engine");
 
 #if 1
-   QFile f("qdarkstyle\\style.qss");
+   QFile f("style\\style.qss");
    if (!f.exists())
    {
        qDebug() << "Can't load style sheet";
