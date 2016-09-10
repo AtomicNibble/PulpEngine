@@ -271,35 +271,6 @@ bool FolderNode::preFetch()
 }
 
 
-bool FolderNode::addFiles(const QStringList &filePaths, QStringList *notAdded)
-{
-    if (projectNode())
-        return projectNode()->addFiles(filePaths, notAdded);
-    return false;
-}
-
-bool FolderNode::removeFiles(const QStringList &filePaths, QStringList *notRemoved)
-{
-    if (projectNode())
-        return projectNode()->removeFiles(filePaths, notRemoved);
-    return false;
-}
-
-bool FolderNode::deleteFiles(const QStringList &filePaths)
-{
-    if (projectNode())
-        return projectNode()->deleteFiles(filePaths);
-    return false;
-}
-
-bool FolderNode::renameFile(const QString &filePath, const QString &newFilePath)
-{
-    if (projectNode())
-        return projectNode()->renameFile(filePath, newFilePath);
-    return false;
-}
-
-
 void FolderNode::addFileNodes(const QList<FileNode *> &files)
 {
     Q_ASSERT(projectNode());

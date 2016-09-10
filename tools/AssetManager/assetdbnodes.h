@@ -141,10 +141,6 @@ public:
     virtual bool hasLazyChildren(void) const;
     virtual bool preFetch(void);
 
-    virtual bool addFiles(const QStringList &filePaths, QStringList *notAdded = 0);
-    virtual bool removeFiles(const QStringList &filePaths, QStringList *notRemoved = 0);
-    virtual bool deleteFiles(const QStringList &filePaths);
-    virtual bool renameFile(const QString &filePath, const QString &newFilePath);
 
     void addFileNodes(const QList<FileNode*> &files);
     void removeFileNodes(const QList<FileNode*> &files);
