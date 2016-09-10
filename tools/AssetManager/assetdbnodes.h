@@ -105,10 +105,9 @@ class FileNode : public Node
 {
     Q_OBJECT
 public:
-    FileNode(const QString &name, const FileType fileType, bool generated, int line = -1);
+    FileNode(const QString &name, const FileType fileType, int line = -1);
 
     FileType fileType(void) const;
-    bool isGenerated(void) const;
 
 private:
     // managed by ProjectNode
@@ -116,7 +115,6 @@ private:
     friend class ProjectNode;
 
     FileType fileType_;
-    bool generated_;
 };
 
 

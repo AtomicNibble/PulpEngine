@@ -166,10 +166,9 @@ void Node::setParentFolderNode(FolderNode *parentFolder)
 
 FileNode::FileNode(const QString &name,
                    const FileType fileType,
-                   bool generated, int line) :
+                   int line) :
     Node(NodeType::FileNodeType, name, line),
-    fileType_(fileType),
-    generated_(generated)
+    fileType_(fileType)
 {
 }
 
@@ -178,11 +177,6 @@ FileType FileNode::fileType() const
     return fileType_;
 }
 
-
-bool FileNode::isGenerated() const
-{
-    return generated_;
-}
 
 FolderNode::FolderNode(const QString &name, NodeType nodeType)  :
     Node(nodeType, name),
