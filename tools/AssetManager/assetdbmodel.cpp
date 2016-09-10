@@ -311,7 +311,7 @@ bool AssetDBModel::setData(const QModelIndex &index, const QVariant &value, int 
     return false;
 }
 
-int AssetDBModel::rowCount(const QModelIndex & parent) const
+int AssetDBModel::rowCount(const QModelIndex& parent) const
 {
     int rows = 0;
     if (!parent.isValid()) {
@@ -327,7 +327,7 @@ int AssetDBModel::rowCount(const QModelIndex & parent) const
         }
 
         if(pFolderNode ) {
-            qDebug() << pFolderNode ->displayName() << " Rows" << rows;
+         //   qDebug() << pFolderNode ->displayName() << " Rows" << rows;
         }
     }
     return rows;
