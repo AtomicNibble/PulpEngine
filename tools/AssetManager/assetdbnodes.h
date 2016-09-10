@@ -138,9 +138,8 @@ public:
     FileNode *findFile(const QString &path);
     FolderNode *findSubFolder(const QString &path);
 
-    virtual bool hasLazyChildren(void) const;
-    virtual bool preFetch(void);
-
+    virtual bool hasUnLoadedChildren(void) const;
+    virtual bool loadChildren(void);
 
     void addFileNodes(const QList<FileNode*> &files);
     void removeFileNodes(const QList<FileNode*> &files);
@@ -188,9 +187,7 @@ public:
     // TODO find a better name
 
     virtual bool canAddSubProject(const QString &proFilePath) const = 0;
-
     virtual bool addSubProjects(const QStringList &proFilePaths) = 0;
-
     virtual bool removeSubProjects(const QStringList &proFilePaths) = 0;
 
 

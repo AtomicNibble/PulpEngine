@@ -37,8 +37,8 @@ public:
 
     QString displayName() const override;
     QString tooltip() const override;
-    bool hasLazyChildren(void) const override;
-    bool preFetch(void) override;
+    bool hasUnLoadedChildren(void) const override;
+    bool loadChildren(void) override;
 
 private:
     QString displayName_;

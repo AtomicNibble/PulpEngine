@@ -61,20 +61,33 @@ QString ModVirtualFolderNode::tooltip() const
 }
 
 
-bool ModVirtualFolderNode::hasLazyChildren(void) const
+bool ModVirtualFolderNode::hasUnLoadedChildren(void) const
 {
-    return numAssets_ > 0;
+    return numAssets_ > fileNodes_.size();
 }
 
-bool ModVirtualFolderNode::preFetch(void)
+bool ModVirtualFolderNode::loadChildren(void)
 {
-    // our children are about to be requested.
-    // this is called so we can populate them if not already.
-
-  /*  ModProjectNode* project = projectNode();
-    if(project)
+    ModProjectNode* pProjectNode = qobject_cast<ModProjectNode*>(projectNode());
+    if(pProjectNode)
     {
-        project->pProject_->modId();
-    }*/
+      // the mod project knows has the db handle we need to query.
+      // should we just ask it for the list of files?
+      // we basically need to make a fileNodes list and foldersNode list.
+      ModProject* pProject = pProjectNode->getModProject();
+
+      QList<AssetExplorer::FileNode*> files;
+      QList<ModProject::AssetInfo> assetsOut;
+      pProject->getAssetList(assetType_, assetsOut);
+
+      foreach (const ModProject::AssetInfo& asset, assetsOut)
+      {
+        // for now just add file nodes.
+
+        files.append(new AssetExplorer::FileNode(asset.name, AssetExplorer::FileType::SourceType));
+      }
+
+      this->addFileNodes(files);
+    }
     return true;
 }

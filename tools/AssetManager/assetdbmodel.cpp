@@ -351,7 +351,7 @@ bool AssetDBModel::hasChildren(const QModelIndex & parent) const
     }
 
     // if a folder node has lazy children we return true without loading them.
-    if(pFolderNode->hasLazyChildren()) {
+    if(pFolderNode->hasUnLoadedChildren()) {
         return true;
     }
 
@@ -404,7 +404,9 @@ void AssetDBModel::fetchMore(FolderNode* pFolderNode) const
     BUG_CHECK(pFolderNode);
     BUG_CHECK(!childNodes_.contains(pFolderNode));
 
-    pFolderNode->preFetch();
+    if(pFolderNode->hasUnLoadedChildren()) {
+        pFolderNode->loadChildren();
+    }
 
     // this gets all the folders child nodes and places then in a cache.
     QList<Node*> nodeList = childNodes(pFolderNode);

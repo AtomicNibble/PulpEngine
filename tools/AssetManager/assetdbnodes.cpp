@@ -259,13 +259,13 @@ FolderNode *FolderNode::findSubFolder(const QString &name)
     return 0;
 }
 
-bool FolderNode::hasLazyChildren(void) const
+bool FolderNode::hasUnLoadedChildren(void) const
 {
     return false;
 }
 
 
-bool FolderNode::preFetch()
+bool FolderNode::loadChildren()
 {
     return true;
 }
