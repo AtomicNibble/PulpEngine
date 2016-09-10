@@ -39,28 +39,28 @@ class AssetDbViewWidget : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AssetDbViewWidget(AssetDb& db, QWidget *parent = 0);
+    explicit AssetDbViewWidget(AssetDb& db, QWidget* parent = 0);
 
 signals:
 
 public slots:
-    void collapseAll();
-    void editCurrentItem();
+    void collapseAll(void);
+    void editCurrentItem(void);
 
 private slots:
-    void initView();
+    void initView(void);
 
     void showContextMenu(const QPoint &pos);
 
-    void setCurrentItem(Node *node, Project *project);
+    void setCurrentItem(Node* pNode, Project* pProject);
     void openItem(const QModelIndex &mainIndex);
-    void handleProjectAdded(Project *project);
-    void startupProjectChanged(Project *project);
+    void handleProjectAdded(Project* pProject);
+    void startupProjectChanged(Project* pProject);
 
     void foldersAboutToBeRemoved(FolderNode*, const QList<FolderNode*> &);
     void filesAboutToBeRemoved(FolderNode*, const QList<FileNode*> &);
 
-    void disableAutoExpand();
+    void disableAutoExpand(void);
 
 private:
     AssetExplorer* explorer_;

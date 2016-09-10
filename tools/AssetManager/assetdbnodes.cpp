@@ -25,8 +25,8 @@ Node::Node(NodeType nodeType,
 void Node::emitNodeSortKeyAboutToChange()
 {
     if (ProjectNode *project = projectNode()) {
-        foreach (NodesWatcher *watcher, project->watchers()) {
-            emit watcher->nodeSortKeyAboutToChange(this);
+        foreach (NodesWatcher* pWatcher, project->watchers()) {
+            emit pWatcher->nodeSortKeyAboutToChange(this);
         }
     }
 }
@@ -34,8 +34,8 @@ void Node::emitNodeSortKeyAboutToChange()
 void Node::emitNodeSortKeyChanged()
 {
     if (ProjectNode *project = projectNode()) {
-        foreach (NodesWatcher *watcher, project->watchers()) {
-            emit watcher->nodeSortKeyChanged();
+        foreach (NodesWatcher* pWatcher, project->watchers()) {
+            emit pWatcher->nodeSortKeyChanged();
         }
     }
 }
@@ -46,7 +46,7 @@ void Node::emitNodeSortKeyChanged()
  * This function does not emit any signals. That has to be done by the calling
  * class.
  */
-void Node::setName(const QString &name)
+void Node::setName(const QString& name)
 {
     if (name_ == name) {
         return;
@@ -70,7 +70,7 @@ void Node::setLine(int line)
     emitNodeUpdated();
 }
 
-void Node::setNameAndLine(const QString &name, int line)
+void Node::setNameAndLine(const QString& name, int line)
 {
     if (name_ == name && line_ == line) {
         return;
@@ -150,8 +150,8 @@ void Node::setProjectNode(ProjectNode *project)
 void Node::emitNodeUpdated()
 {
     if (ProjectNode *node = projectNode()) {
-        foreach (NodesWatcher *watcher, node->watchers()) {
-            emit watcher->nodeUpdated(this);
+        foreach (NodesWatcher* pWatcher, node->watchers()) {
+            emit pWatcher->nodeUpdated(this);
         }
     }
 }
@@ -164,7 +164,7 @@ void Node::setParentFolderNode(FolderNode *parentFolder)
 
 
 
-FileNode::FileNode(const QString &name,
+FileNode::FileNode(const QString& name,
                    const FileType fileType,
                    int line) :
     Node(NodeType::FileNodeType, name, line),
@@ -178,7 +178,7 @@ FileType FileNode::fileType() const
 }
 
 
-FolderNode::FolderNode(const QString &name, NodeType nodeType)  :
+FolderNode::FolderNode(const QString& name, NodeType nodeType)  :
     Node(nodeType, name),
     displayName_(QDir::toNativeSeparators(name))
 {
@@ -191,7 +191,7 @@ FolderNode::~FolderNode()
 }
 
 
-QString FolderNode::displayName() const
+QString FolderNode::displayName(void) const
 {
     return displayName_;
 }
@@ -205,12 +205,12 @@ QIcon FolderNode::icon(bool expanded) const
     return icon_;
 }
 
-QList<FileNode*> FolderNode::fileNodes() const
+QList<FileNode*> FolderNode::fileNodes(void) const
 {
     return fileNodes_;
 }
 
-QList<FolderNode*> FolderNode::subFolderNodes() const
+QList<FolderNode*> FolderNode::subFolderNodes(void) const
 {
     return subFolderNodes_;
 }
@@ -228,18 +228,18 @@ void FolderNode::setDisplayName(const QString &name)
     emitNodeUpdated();
 }
 
-void FolderNode::setIcon(const QIcon &icon)
+void FolderNode::setIcon(const QIcon& icon)
 {
     icon_ = icon;
 }
 
-void FolderNode::setIconExpanded(const QIcon &icon)
+void FolderNode::setIconExpanded(const QIcon& icon)
 {
     iconexpanded_ = icon;
 }
 
 
-FileNode *FolderNode::findFile(const QString &name)
+FileNode *FolderNode::findFile(const QString& name)
 {
     foreach (FileNode *n, fileNodes()) {
         if (n->name() == name) {
@@ -249,7 +249,7 @@ FileNode *FolderNode::findFile(const QString &name)
     return 0;
 }
 
-FolderNode *FolderNode::findSubFolder(const QString &name)
+FolderNode *FolderNode::findSubFolder(const QString& name)
 {
     foreach (FolderNode *n, subFolderNodes()) {
         if (n->name() == name) {
@@ -265,13 +265,13 @@ bool FolderNode::hasUnLoadedChildren(void) const
 }
 
 
-bool FolderNode::loadChildren()
+bool FolderNode::loadChildren(void)
 {
     return true;
 }
 
 
-void FolderNode::addFileNodes(const QList<FileNode *> &files)
+void FolderNode::addFileNodes(const QList<FileNode *>& files)
 {
     Q_ASSERT(projectNode());
     ProjectNode *pn = projectNode();
@@ -280,8 +280,8 @@ void FolderNode::addFileNodes(const QList<FileNode *> &files)
         return;
     }
 
-    foreach (NodesWatcher *watcher, pn->watchers()) {
-        emit watcher->filesAboutToBeAdded(this, files);
+    foreach (NodesWatcher* pWatcher, pn->watchers()) {
+        emit pWatcher->filesAboutToBeAdded(this, files);
     }
 
     foreach (FileNode *file, files)
@@ -308,13 +308,13 @@ void FolderNode::addFileNodes(const QList<FileNode *> &files)
         }
     }
 
-    foreach (NodesWatcher *watcher, pn->watchers()) {
-        emit watcher->filesAdded();
+    foreach (NodesWatcher* pWatcher, pn->watchers()) {
+        emit pWatcher->filesAdded();
     }
 }
 
 
-void FolderNode::removeFileNodes(const QList<FileNode *> &files)
+void FolderNode::removeFileNodes(const QList<FileNode *>& files)
 {
     Q_ASSERT(projectNode());
     ProjectNode *pn = projectNode();
@@ -326,8 +326,8 @@ void FolderNode::removeFileNodes(const QList<FileNode *> &files)
     QList<FileNode*> toRemove = files;
     qSort(toRemove.begin(), toRemove.end());
 
-    foreach (NodesWatcher *watcher, pn->watchers()) {
-        emit watcher->filesAboutToBeRemoved(this, toRemove);
+    foreach (NodesWatcher* pWatcher, pn->watchers()) {
+        emit pWatcher->filesAboutToBeRemoved(this, toRemove);
     }
 
     QList<FileNode*>::const_iterator toRemoveIter = toRemove.constBegin();
@@ -346,12 +346,12 @@ void FolderNode::removeFileNodes(const QList<FileNode *> &files)
         filesIter = fileNodes_.erase(filesIter);
     }
 
-    foreach (NodesWatcher *watcher, pn->watchers()) {
-        emit watcher->filesRemoved();
+    foreach (NodesWatcher* pWatcher, pn->watchers()) {
+        emit pWatcher->filesRemoved();
     }
 }
 
-void FolderNode::addFolderNodes(const QList<FolderNode*> &subFolders)
+void FolderNode::addFolderNodes(const QList<FolderNode*>& subFolders)
 {
     Q_ASSERT(projectNode());
     ProjectNode *pn = projectNode();
@@ -360,8 +360,8 @@ void FolderNode::addFolderNodes(const QList<FolderNode*> &subFolders)
         return;
     }
 
-    foreach (NodesWatcher *watcher, pn->watchers()) {
-        watcher->foldersAboutToBeAdded(this, subFolders);
+    foreach (NodesWatcher* pWatcher, pn->watchers()) {
+		pWatcher->foldersAboutToBeAdded(this, subFolders);
     }
 
     foreach (FolderNode *folder, subFolders)
@@ -392,13 +392,13 @@ void FolderNode::addFolderNodes(const QList<FolderNode*> &subFolders)
                    qDebug("project nodes have to be added via addProjectNodes"));
     }
 
-    foreach (NodesWatcher *watcher, pn->watchers()) {
-        emit watcher->foldersAdded();
+    foreach (NodesWatcher* pWatcher, pn->watchers()) {
+        emit pWatcher->foldersAdded();
     }
 }
 
 
-void FolderNode::removeFolderNodes(const QList<FolderNode*> &subFolders)
+void FolderNode::removeFolderNodes(const QList<FolderNode*>& subFolders)
 {
     Q_ASSERT(projectNode());
     ProjectNode *pn = projectNode();
@@ -410,8 +410,8 @@ void FolderNode::removeFolderNodes(const QList<FolderNode*> &subFolders)
     QList<FolderNode*> toRemove = subFolders;
     qSort(toRemove.begin(), toRemove.end());
 
-    foreach (NodesWatcher *watcher, pn->watchers()) {
-        emit watcher->foldersAboutToBeRemoved(this, toRemove);
+    foreach (NodesWatcher* pWatcher, pn->watchers()) {
+        emit pWatcher->foldersAboutToBeRemoved(this, toRemove);
     }
 
     QList<FolderNode*>::const_iterator toRemoveIter = toRemove.constBegin();
@@ -433,29 +433,29 @@ void FolderNode::removeFolderNodes(const QList<FolderNode*> &subFolders)
         folderIter = subFolderNodes_.erase(folderIter);
     }
 
-    foreach (NodesWatcher *watcher, pn->watchers()) {
-        emit watcher->foldersRemoved();
+    foreach (NodesWatcher* pWatcher, pn->watchers()) {
+        emit pWatcher->foldersRemoved();
     }
 }
 
 
-VirtualFolderNode::VirtualFolderNode(const QString &name, int priority)
+VirtualFolderNode::VirtualFolderNode(const QString& name, int priority)
     : FolderNode(name, NodeType::VirtualFolderNodeType),
       priority_(priority)
 {
 }
 
-VirtualFolderNode::~VirtualFolderNode()
+VirtualFolderNode::~VirtualFolderNode(void)
 {
 }
 
-int VirtualFolderNode::priority() const
+int VirtualFolderNode::priority(void) const
 {
     return priority_;
 }
 
 
-ProjectNode::ProjectNode(const QString &projectFilePath)
+ProjectNode::ProjectNode(const QString& projectFilePath)
         : FolderNode(projectFilePath, NodeType::ProjectNodeType)
 {
     // project node "manages" itself
@@ -467,49 +467,49 @@ ProjectNode::ProjectNode(const QString &projectFilePath)
 }
 
 
-QList<ProjectNode*> ProjectNode::subProjectNodes() const
+QList<ProjectNode*> ProjectNode::subProjectNodes(void) const
 {
     return subProjectNodes_;
 }
 
 
-QList<NodesWatcher*> ProjectNode::watchers() const
+QList<NodesWatcher*> ProjectNode::watchers(void) const
 {
     return watchers_;
 }
 
 
-void ProjectNode::registerWatcher(NodesWatcher *watcher)
+void ProjectNode::registerWatcher(NodesWatcher* pWatcher)
 {
-    if (!watcher) {
+    if (!pWatcher) {
         return;
     }
 
-    connect(watcher, SIGNAL(destroyed(QObject*)),
+    connect(pWatcher, SIGNAL(destroyed(QObject*)),
             this, SLOT(watcherDestroyed(QObject*)));
 
-    watchers_.append(watcher);
+    watchers_.append(pWatcher);
 
-    foreach (ProjectNode *subProject, subProjectNodes_) {
-        subProject->registerWatcher(watcher);
+    foreach (ProjectNode* pSubProject, subProjectNodes_) {
+		pSubProject->registerWatcher(pWatcher);
     }
 }
 
-void ProjectNode::unregisterWatcher(NodesWatcher *watcher)
+void ProjectNode::unregisterWatcher(NodesWatcher* pWatcher)
 {
-    if (!watcher) {
+    if (!pWatcher) {
         return;
     }
 
-    watchers_.removeOne(watcher);
+    watchers_.removeOne(pWatcher);
 
-    foreach (ProjectNode *subProject, subProjectNodes_) {
-        subProject->unregisterWatcher(watcher);
+    foreach (ProjectNode* pSubProject, subProjectNodes_) {
+		pSubProject->unregisterWatcher(pWatcher);
     }
 }
 
 
-void ProjectNode::addProjectNodes(const QList<ProjectNode*> &subProjects)
+void ProjectNode::addProjectNodes(const QList<ProjectNode*>& subProjects)
 {
     if (!subProjects.isEmpty())
     {
@@ -518,8 +518,8 @@ void ProjectNode::addProjectNodes(const QList<ProjectNode*> &subProjects)
             folderNodes << projectNode;
         }
 
-        foreach (NodesWatcher *watcher, watchers_) {
-            emit watcher->foldersAboutToBeAdded(this, folderNodes);
+        foreach (NodesWatcher* pWatcher, watchers_) {
+            emit pWatcher->foldersAboutToBeAdded(this, folderNodes);
         }
 
         foreach (ProjectNode *project, subProjects)
@@ -529,8 +529,8 @@ void ProjectNode::addProjectNodes(const QList<ProjectNode*> &subProjects)
 
             project->setParentFolderNode(this);
 
-            foreach (NodesWatcher *watcher, watchers_) {
-                project->registerWatcher(watcher);
+            foreach (NodesWatcher* pWatcher, watchers_) {
+                project->registerWatcher(pWatcher);
             }
 
             subFolderNodes_.append(project);
@@ -540,14 +540,14 @@ void ProjectNode::addProjectNodes(const QList<ProjectNode*> &subProjects)
         qSort(subFolderNodes_.begin(), subFolderNodes_.end());
         qSort(subProjectNodes_.begin(), subProjectNodes_.end());
 
-        foreach (NodesWatcher *watcher, watchers_) {
-            emit watcher->foldersAdded();
+        foreach (NodesWatcher* pWatcher, watchers_) {
+            emit pWatcher->foldersAdded();
         }
     }
 }
 
 
-void ProjectNode::removeProjectNodes(const QList<ProjectNode*> &subProjects)
+void ProjectNode::removeProjectNodes(const QList<ProjectNode*>& subProjects)
 {
     if (!subProjects.isEmpty())
     {
@@ -558,8 +558,8 @@ void ProjectNode::removeProjectNodes(const QList<ProjectNode*> &subProjects)
 
         qSort(toRemove.begin(), toRemove.end());
 
-        foreach (NodesWatcher *watcher, watchers_) {
-            emit watcher->foldersAboutToBeRemoved(this, toRemove);
+        foreach (NodesWatcher* pWatcher, watchers_) {
+            emit pWatcher->foldersAboutToBeRemoved(this, toRemove);
         }
 
         QList<FolderNode*>::const_iterator toRemoveIter = toRemove.constBegin();
@@ -586,16 +586,16 @@ void ProjectNode::removeProjectNodes(const QList<ProjectNode*> &subProjects)
             folderIter = subFolderNodes_.erase(folderIter);
         }
 
-        foreach (NodesWatcher *watcher, watchers_) {
-            emit watcher->foldersRemoved();
+        foreach (NodesWatcher* pWatcher, watchers_) {
+            emit pWatcher->foldersRemoved();
         }
     }
 }
 
-void ProjectNode::watcherDestroyed(QObject *watcher)
+void ProjectNode::watcherDestroyed(QObject* pWatcher)
 {
     // cannot use qobject_cast here
-    unregisterWatcher(static_cast<NodesWatcher*>(watcher));
+    unregisterWatcher(static_cast<NodesWatcher*>(pWatcher));
 }
 
 
@@ -611,37 +611,38 @@ QList<ProjectAction> SessionNode::supportedActions(Node *node) const
     return QList<ProjectAction>();
 }
 
-QList<NodesWatcher*> SessionNode::watchers() const
+QList<NodesWatcher*> SessionNode::watchers(void) const
 {
     return watchers_;
 }
 
-void SessionNode::registerWatcher(NodesWatcher *watcher)
+void SessionNode::registerWatcher(NodesWatcher* pWatcher)
 {
-    if (!watcher) {
+    if (!pWatcher) {
         return;
     }
-    connect(watcher, SIGNAL(destroyed(QObject*)),
+
+    connect(pWatcher, SIGNAL(destroyed(QObject*)),
             this, SLOT(watcherDestroyed(QObject*)));
 
-    watchers_.append(watcher);
+    watchers_.append(pWatcher);
 
     foreach (ProjectNode *project, projectNodes_) {
-        project->registerWatcher(watcher);
+        project->registerWatcher(pWatcher);
     }
 }
 
 
-void SessionNode::unregisterWatcher(NodesWatcher *watcher)
+void SessionNode::unregisterWatcher(NodesWatcher* pWatcher)
 {
-    if (!watcher) {
+    if (!pWatcher) {
         return;
     }
 
-    watchers_.removeOne(watcher);
+    watchers_.removeOne(pWatcher);
 
     foreach (ProjectNode *project, projectNodes_) {
-        project->unregisterWatcher(watcher);
+        project->unregisterWatcher(pWatcher);
     }
 }
 
@@ -650,7 +651,7 @@ QList<ProjectNode*> SessionNode::projectNodes() const
     return projectNodes_;
 }
 
-void SessionNode::addProjectNodes(const QList<ProjectNode*> &projectNodes)
+void SessionNode::addProjectNodes(const QList<ProjectNode*>& projectNodes)
 {
     if (!projectNodes.isEmpty())
     {
@@ -659,8 +660,8 @@ void SessionNode::addProjectNodes(const QList<ProjectNode*> &projectNodes)
             folderNodes << projectNode;
         }
 
-        foreach (NodesWatcher *watcher, watchers_) {
-            emit watcher->foldersAboutToBeAdded(this, folderNodes);
+        foreach (NodesWatcher* pWatcher, watchers_) {
+            emit pWatcher->foldersAboutToBeAdded(this, folderNodes);
         }
 
         foreach (ProjectNode *project, projectNodes)
@@ -670,8 +671,8 @@ void SessionNode::addProjectNodes(const QList<ProjectNode*> &projectNodes)
 
             project->setParentFolderNode(this);
 
-            foreach (NodesWatcher *watcher, watchers_) {
-                project->registerWatcher(watcher);
+            foreach (NodesWatcher* pWatcher, watchers_) {
+                project->registerWatcher(pWatcher);
             }
             subFolderNodes_.append(project);
             projectNodes_.append(project);
@@ -680,13 +681,13 @@ void SessionNode::addProjectNodes(const QList<ProjectNode*> &projectNodes)
         qSort(subFolderNodes_);
         qSort(projectNodes_);
 
-        foreach (NodesWatcher *watcher, watchers_) {
-            emit watcher->foldersAdded();
+        foreach (NodesWatcher* pWatcher, watchers_) {
+            emit pWatcher->foldersAdded();
         }
    }
 }
 
-void SessionNode::removeProjectNodes(const QList<ProjectNode*> &projectNodes)
+void SessionNode::removeProjectNodes(const QList<ProjectNode*>& projectNodes)
 {
     if (!projectNodes.isEmpty())
     {
@@ -697,8 +698,8 @@ void SessionNode::removeProjectNodes(const QList<ProjectNode*> &projectNodes)
 
         qSort(toRemove);
 
-        foreach (NodesWatcher *watcher, watchers_) {
-            emit watcher->foldersAboutToBeRemoved(this, toRemove);
+        foreach (NodesWatcher* pWatcher, watchers_) {
+            emit pWatcher->foldersAboutToBeRemoved(this, toRemove);
         }
 
         QList<FolderNode*>::const_iterator toRemoveIter = toRemove.constBegin();
@@ -723,16 +724,16 @@ void SessionNode::removeProjectNodes(const QList<ProjectNode*> &projectNodes)
             folderIter = subFolderNodes_.erase(folderIter);
         }
 
-        foreach (NodesWatcher *watcher, watchers_) {
-            emit watcher->foldersRemoved();
+        foreach (NodesWatcher* pWatcher, watchers_) {
+            emit pWatcher->foldersRemoved();
         }
     }
 }
 
-void SessionNode::watcherDestroyed(QObject *watcher)
+void SessionNode::watcherDestroyed(QObject* pWatcher)
 {
     // cannot use qobject_cast here
-    unregisterWatcher(static_cast<NodesWatcher*>(watcher));
+    unregisterWatcher(static_cast<NodesWatcher*>(pWatcher));
 }
 
 

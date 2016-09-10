@@ -165,16 +165,16 @@ void AssetDbViewWidget::initView()
     );
 }
 
-void AssetDbViewWidget::setCurrentItem(Node *node, Project *project)
+void AssetDbViewWidget::setCurrentItem(Node* pNode, Project* pProject)
 {
-   qCDebug(logCatAssetDbView) << "ProjectTreeWidget::setCurrentItem(" << (project ? project->displayName() : QLatin1String("0"))
-          << ", " <<  (node ? node->name() : QLatin1String("0")) << ")";
+   qCDebug(logCatAssetDbView) << "ProjectTreeWidget::setCurrentItem(" << (pProject ? pProject->displayName() : QLatin1String("0"))
+          << ", " <<  (pNode ? pNode->name() : QLatin1String("0")) << ")";
 
-    if (!project) {
+    if (!pProject) {
         return;
     }
 
-    const QModelIndex mainIndex = model_->indexForNode(node);
+    const QModelIndex mainIndex = model_->indexForNode(pNode);
 
     if (mainIndex.isValid()) {
         if (mainIndex != view_->selectionModel()->currentIndex()) {
@@ -190,16 +190,16 @@ void AssetDbViewWidget::setCurrentItem(Node *node, Project *project)
 void AssetDbViewWidget::showContextMenu(const QPoint &pos)
 {
     QModelIndex index = view_->indexAt(pos);
-    Node *node = model_->nodeForIndex(index);
- //   explorer_->showContextMenu(this, m_view->mapToGlobal(pos), node);
+    Node* pNode = model_->nodeForIndex(index);
+    explorer_->showContextMenu(this, view_->mapToGlobal(pos), pNode);
 }
 
-void AssetDbViewWidget::collapseAll()
+void AssetDbViewWidget::collapseAll(void)
 {
     view_->collapseAll();
 }
 
-void AssetDbViewWidget::editCurrentItem()
+void AssetDbViewWidget::editCurrentItem(void)
 {
     if (view_->selectionModel()->currentIndex().isValid()) {
         view_->edit(view_->selectionModel()->currentIndex());
@@ -207,23 +207,24 @@ void AssetDbViewWidget::editCurrentItem()
 }
 
 
-void AssetDbViewWidget::handleProjectAdded(Project *project)
+void AssetDbViewWidget::handleProjectAdded(Project *pProject)
 {
-     Node *node = project->rootProjectNode();
-     QModelIndex idx = model_->indexForNode(node);
-     if (autoExpand_) // disabled while session restoring
-        view_->setExpanded(idx, true);
+     Node* pNode = pProject->rootProjectNode();
+     QModelIndex idx = model_->indexForNode(pNode);
+	 if (autoExpand_) {// disabled while session restoring
+		 view_->setExpanded(idx, true);
+	 }
     view_->setCurrentIndex(idx);
 }
 
 
-void AssetDbViewWidget::startupProjectChanged(Project *project)
+void AssetDbViewWidget::startupProjectChanged(Project* pProject)
 {
-    if (project) {
-        ProjectNode *node = project->rootProjectNode();
-        model_->setStartupProject(node);
+    if (pProject) {
+        ProjectNode* pNode = pProject->rootProjectNode();
+        model_->setStartupProject(pNode);
     } else {
-        model_->setStartupProject(0);
+        model_->setStartupProject(nullptr);
     }
 }
 
