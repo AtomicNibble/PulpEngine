@@ -83,16 +83,40 @@ SqlLiteDb& SqlLiteDb::operator=(SqlLiteDb&& oth)
 	return *this;
 }
 
-bool SqlLiteDb::connect(const char* pDb)
+bool SqlLiteDb::connect(const char* pDb, ThreadMode::Enum threadMode)
 {
 	X_ASSERT_NOT_NULL(pDb);
 
-	int ret;
 
 	if (!disconnect()) {
 		X_ERROR("SqlLiteDb", "Failed to disconeect beofre conencting to new db: \"%s\"", pDb);
 		return false;
 	}
+
+	{
+		Result::Enum res = Result::OK;
+		if (threadMode == ThreadMode::SINGLE) {
+			res = setConfig(SQLITE_CONFIG_SINGLETHREAD);
+		}
+		else if (threadMode == ThreadMode::MULTI) {
+			res = setConfig(SQLITE_CONFIG_MULTITHREAD);
+		}
+		else if (threadMode == ThreadMode::SERIALIZED) {
+			// why are you using this mode you twat.
+			X_WARNING("SqlLiteDb", "Enabling multi threading for single db connection, are you sure you want this? (answer is no.)");
+			res = setConfig(SQLITE_CONFIG_SERIALIZED);
+		}
+		else {
+			X_ASSERT_UNREACHABLE();
+		}
+
+		if (res != Result::OK) {
+			X_ERROR("SqlLiteDb", "Failed to set threading mode: %d", res);
+			return false;
+		}
+	}
+
+	int ret;
 
 	if (Result::OK != (ret = sqlite3_initialize()))
 	{
@@ -239,6 +263,11 @@ void SqlLiteDb::setAuthorizeHandler(AuthorizeHandler::Pointer h)
 {
 	ah_ = h;
 	sqlite3_set_authorizer(db_, ah_ ? authorizer_impl : 0, &ah_);
+}
+
+Result::Enum SqlLiteDb::setConfig(int32_t config)
+{
+	return static_cast<Result::Enum>(sqlite3_config(config));
 }
 
 

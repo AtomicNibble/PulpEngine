@@ -79,6 +79,14 @@ class DLL_EXPORT SqlLiteDb
 	friend class SqlLiteStateMnt;
 
 public:
+
+	X_DECLARE_ENUM(ThreadMode)(
+		SINGLE, // one thread only
+		MULTI,	// one thread per DB connection
+		SERIALIZED	// many threads one db.
+	);
+
+public:
 	typedef int64_t RowId;
 
 	typedef core::traits::Function<int(int)> BusyHandler;
@@ -94,7 +102,7 @@ public:
 
 	SqlLiteDb& operator=(SqlLiteDb&&);
 
-	bool connect(const char* pDb);
+	bool connect(const char* pDb, ThreadMode::Enum threadMode = ThreadMode::SINGLE);
 	bool disconnect(void);
 
 	Result::Enum enableForeignKeys(bool enable = true);
@@ -120,6 +128,8 @@ public:
 	void setUpdateHandler(UpdateHandler::Pointer h);
 	void setAuthorizeHandler(AuthorizeHandler::Pointer h);
 
+private:
+	static Result::Enum setConfig(int32_t config);
 
 private:
 	sqlite3* db_;
