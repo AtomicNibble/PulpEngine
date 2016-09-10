@@ -39,7 +39,7 @@ public:
 
     QString displayName(void) const override;
     int32_t modId(void) const;
-    AssetExplorer::ProjectNode* rootProjectNode() const override;
+    AssetExplorer::ProjectNode* rootProjectNode(void) const override;
 
     bool getAssetList(AssetType::Enum type, QList<AssetInfo>& assetsOut) const;
 

@@ -60,7 +60,7 @@ int32_t ModProject::modId(void) const
     return modId_;
 }
 
-AssetExplorer::ProjectNode* ModProject::rootProjectNode() const
+AssetExplorer::ProjectNode* ModProject::rootProjectNode(void) const
 {
     return rootNode_;
 }
