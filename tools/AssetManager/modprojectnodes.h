@@ -9,6 +9,8 @@ class ModProject;
 
 class ModProjectNode : public AssetExplorer::ProjectNode
 {
+    Q_OBJECT
+
 public:
     ModProjectNode(ModProject* pProject);
 
