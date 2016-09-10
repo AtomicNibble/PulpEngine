@@ -226,6 +226,8 @@ bool AssetDB::AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts)
 
 		SetMod(core::string(modName.c_str()));
 
+		sql::SqlLiteTransaction trans(db_);
+
 		for (size_t x = 0; x < AssetType::ENUM_COUNT; x++) 
 		{
 			// add assets.
@@ -236,14 +238,16 @@ bool AssetDB::AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts)
 				{
 					core::string name = randomAssetName(assetNameLenMin, assetNameLenMax);
 
-					auto result = AddAsset(type, name);
+					auto result = AddAsset(trans, type, name);
 					while (result == Result::NAME_TAKEN) {
 						name = randomAssetName(assetNameLenMin, assetNameLenMax);
-						result = AddAsset(type, name);
+						result = AddAsset(trans, type, name);
 					}
 				}
 			}
 		}
+
+		trans.commit();
 	}
 	
 	return true;
