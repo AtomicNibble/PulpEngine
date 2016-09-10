@@ -1419,7 +1419,7 @@ bool AssetDB::ValidName(const core::string& name)
 		// are you valid!?
 		char ch = name[i];
 
-		bool valid = core::strUtil::IsAlphaNum(ch) || core::strUtil::IsDigit(ch) || ch == '_';
+		bool valid = core::strUtil::IsAlphaNum(ch) || core::strUtil::IsDigit(ch) || ch == '_' || ch == ASSET_NAME_SLASH;
 		if (!valid) {
 			return false;
 		}
