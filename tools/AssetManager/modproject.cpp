@@ -66,6 +66,11 @@ AssetExplorer::ProjectNode* ModProject::rootProjectNode() const
 }
 
 
+bool ModProject::getAssetList(AssetType::Enum type, QList<AssetInfo>& assetsOut) const
+{
+    return db_.getAssetList(modId_, type, assetsOut);
+}
+
 void ModProject::initAssetTypeInfo(void)
 {
     QIcon defaultIcon(":/assetDb/img/Folder.Closed.png");

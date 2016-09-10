@@ -8,6 +8,7 @@
 #include <array>
 
 #include "project.h"
+#include "assetdb.h"
 
 class ModProjectNode;
 class AssetDb;
@@ -27,6 +28,10 @@ class ModProject : public AssetExplorer::Project
     typedef std::array<AssetTypeInfo, X_NAMESPACE(assetDb)::AssetType::ENUM_COUNT> AssetTypeInfoArr;
 
 public:
+    typedef X_NAMESPACE(assetDb)::AssetType AssetType;
+    typedef AssetDb::AssetInfo AssetInfo;
+
+public:
     ModProject(AssetDb& db, const QString &name, int32_t id);
     ~ModProject() override;
 
@@ -35,6 +40,8 @@ public:
     QString displayName(void) const override;
     int32_t modId(void) const;
     AssetExplorer::ProjectNode* rootProjectNode() const override;
+
+    bool getAssetList(AssetType::Enum type, QList<AssetInfo>& assetsOut) const;
 
 private:
     void initAssetTypeInfo(void);
