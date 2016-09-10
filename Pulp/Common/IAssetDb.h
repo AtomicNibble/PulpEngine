@@ -5,6 +5,9 @@
 X_NAMESPACE_BEGIN(assetDb)
 
 
+static const char ASSET_NAME_SLASH = '/';
+
+
 X_DECLARE_ENUM(AssetType)(
 	MODEL, 
 	ANIM,
