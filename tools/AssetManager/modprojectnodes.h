@@ -18,6 +18,8 @@ public:
     virtual bool addSubProjects(const QStringList &proFilePaths) override;
     virtual bool removeSubProjects(const QStringList &proFilePaths) override;
 
+
+    ModProject* getModProject(void);
 private:
 
 private:

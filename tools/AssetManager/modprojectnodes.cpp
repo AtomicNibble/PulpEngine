@@ -30,6 +30,13 @@ bool ModProjectNode::removeSubProjects(const QStringList &proFilePaths)
 }
 
 
+
+ModProject* ModProjectNode::getModProject(void)
+{
+    return pProject_;
+}
+
+
 // -------------------------------------------------------------------
 
 
