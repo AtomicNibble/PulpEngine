@@ -145,8 +145,8 @@ bool Converter::CleanAll(const char* pMod)
 
 	// this is for cleaning all asset that don't have a entry.
 	// optionally limit it to a mod.
-	assetDb::AssetDB::ModId modId;
 	if (pMod) {
+		assetDb::AssetDB::ModId modId;
 		if (!db_.ModExsists(core::string(pMod), &modId)) {
 			X_ERROR("Converter", "Can't clean mod \"%s\" does not exsist", pMod);
 			return false;
