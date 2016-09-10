@@ -1373,7 +1373,7 @@ bool AssetDB::ValidName(const core::string& name)
 		char ch = name[i];
 
 		bool valid = core::strUtil::IsAlphaNum(ch) || core::strUtil::IsDigit(ch) || ch == '_';
-		if (valid) {
+		if (!valid) {
 			return false;
 		}
 	}
