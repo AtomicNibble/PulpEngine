@@ -103,17 +103,16 @@ void SessionManager::addProjects(const QList<Project*> &projects)
 {
     d->virginSession_ = false;
     QList<Project*> clearedList;
-    foreach (Project *pro, projects) {
-        if (!d->projects_.contains(pro)) {
-            clearedList.append(pro);
-            d->projects_.append(pro);
-            d->sessionNode_->addProjectNodes(QList<ProjectNode *>() << pro->rootProjectNode());
+	for (Project* pPro : projects) {
+        if (!d->projects_.contains(pPro)) {
+            clearedList.append(pPro);
+            d->projects_.append(pPro);
+            d->sessionNode_->addProjectNodes(QList<ProjectNode*>() << pPro->rootProjectNode());
 
-
-            connect(pro, SIGNAL(displayNameChanged()),
+            connect(pPro, SIGNAL(displayNameChanged()),
                     instance_, SLOT(projectDisplayNameChanged()));
 
-            qDebug() << "SessionManager - adding project " << pro->displayName();
+            qDebug() << "SessionManager - adding project " << pPro->displayName();
         }
     }
 }
@@ -171,15 +170,15 @@ SessionNode *SessionManager::sessionNode()
 
 void SessionManager::projectDisplayNameChanged()
 {
-    Project *pro = qobject_cast<Project*>(instance_->sender());
-    if (pro) {
+    Project* pPro = qobject_cast<Project*>(instance_->sender());
+    if (pPro) {
 
-        QList<ProjectNode *> nodes;
-        nodes << pro->rootProjectNode();
+        QList<ProjectNode*> nodes;
+        nodes << pPro->rootProjectNode();
         d->sessionNode_->removeProjectNodes(nodes);
         d->sessionNode_->addProjectNodes(nodes);
 
-        emit instance_->projectDisplayNameChanged(pro);
+        emit instance_->projectDisplayNameChanged(pPro);
     }
 }
 
@@ -190,20 +189,20 @@ Project *SessionManager::projectForNode(Node *node)
         return nullptr;
     }
 
-    FolderNode *rootProjectNode = qobject_cast<FolderNode*>(node);
-    if (!rootProjectNode) {
-        rootProjectNode = node->parentFolderNode();
+    FolderNode* pRootProjectNode = qobject_cast<FolderNode*>(node);
+    if (!pRootProjectNode) {
+		pRootProjectNode = node->parentFolderNode();
     }
 
-    while (rootProjectNode && rootProjectNode->parentFolderNode() != d->sessionNode_) {
-        rootProjectNode = rootProjectNode->parentFolderNode();
+    while (pRootProjectNode && pRootProjectNode->parentFolderNode() != d->sessionNode_) {
+		pRootProjectNode = pRootProjectNode->parentFolderNode();
     }
 
-    Q_ASSERT(rootProjectNode);
+    Q_ASSERT(pRootProjectNode);
 
-    foreach (Project *p, d->projects_) {
-        if (p->rootProjectNode() == rootProjectNode) {
-            return p;
+    for (Project* pProject : d->projects_) {
+        if (pProject->rootProjectNode() == pRootProjectNode) {
+            return pProject;
         }
     }
 

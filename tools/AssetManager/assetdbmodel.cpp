@@ -473,7 +473,7 @@ FolderNode *AssetDBModel::visibleFolderNode(FolderNode* pNode) const
 
 void AssetDBModel::recursiveAddFolderNodes(FolderNode* pStartNode, QList<Node*>* pList) const
 {
-    foreach (FolderNode *folderNode, pStartNode->subFolderNodes()) {
+	for (FolderNode *folderNode : pStartNode->subFolderNodes()) {
         if (folderNode) {
             recursiveAddFolderNodesImpl(folderNode, pList);
         }
@@ -488,7 +488,7 @@ void AssetDBModel::recursiveAddFolderNodesImpl(FolderNode* pStartNode, QList<Nod
     }
     else
     {
-        foreach (FolderNode *folderNode, pStartNode->subFolderNodes()) {
+        for (FolderNode *folderNode : pStartNode->subFolderNodes()) {
             if (folderNode) {
                 recursiveAddFolderNodesImpl(folderNode, pList);
             }
@@ -498,10 +498,10 @@ void AssetDBModel::recursiveAddFolderNodesImpl(FolderNode* pStartNode, QList<Nod
 
 void AssetDBModel::recursiveAddFileNodes(FolderNode* pStartNode, QList<Node*>* pList) const
 {
-    foreach (FolderNode *subFolderNode, pStartNode->subFolderNodes()) {
+	for (FolderNode *subFolderNode : pStartNode->subFolderNodes()) {
         recursiveAddFileNodes(subFolderNode, pList);
     }
-    foreach (Node *node, pStartNode->fileNodes()) {
+	for (Node *node : pStartNode->fileNodes()) {
         if (!filter(node)) {
             pList->append(node);
         }

@@ -80,7 +80,7 @@ bool ModVirtualFolderNode::loadChildren(void)
       QList<ModProject::AssetInfo> assetsOut;
       pProject->getAssetList(assetType_, assetsOut);
 
-      foreach (const ModProject::AssetInfo& asset, assetsOut)
+      for (const ModProject::AssetInfo& asset : assetsOut)
       {
         // for now just add file nodes.
 
