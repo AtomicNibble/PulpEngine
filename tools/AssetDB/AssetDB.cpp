@@ -36,9 +36,16 @@ namespace
 		core::string name;
 		name.reserve(len);
 
+		bool addSlash = (core::random::MultiplyWithCarry() % 10) == 5;
+
 		for (size_t i = 0; i < len; i++)
 		{
-			name += charSet[core::random::MultiplyWithCarry() % charSetNum];
+			if (addSlash && i < (len - 2) && name.length() > 2 && (core::random::MultiplyWithCarry() % 20) == 1) {
+				name += ASSET_NAME_SLASH;
+			}
+			else {
+				name += charSet[core::random::MultiplyWithCarry() % charSetNum];
+			}
 		}
 
 		return name;
