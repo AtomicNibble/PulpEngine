@@ -52,7 +52,7 @@ ModVirtualFolderNode::ModVirtualFolderNode(const QString &name, int priority, co
 
 QString ModVirtualFolderNode::displayName() const
 {
-    return displayName_;
+    return tooltip();
 }
 
 QString ModVirtualFolderNode::tooltip() const
@@ -63,7 +63,7 @@ QString ModVirtualFolderNode::tooltip() const
 
 bool ModVirtualFolderNode::hasUnLoadedChildren(void) const
 {
-    return numAssets_ > fileNodes_.size();
+    return numAssets_ > (fileNodes_.size() + subFolderNodes_.size());
 }
 
 bool ModVirtualFolderNode::loadChildren(void)
@@ -76,18 +76,99 @@ bool ModVirtualFolderNode::loadChildren(void)
       // we basically need to make a fileNodes list and foldersNode list.
       ModProject* pProject = pProjectNode->getModProject();
 
-      QList<AssetExplorer::FileNode*> files;
+	  QList<AssetExplorer::FileNode*> files;
+	//  QList<AssetExplorer::FolderNode*> folders;
+
       QList<ModProject::AssetInfo> assetsOut;
       pProject->getAssetList(assetType_, assetsOut);
+	  
+	  // we need to break this down into files and folders.
+	  // we do it based on slashes :D
+	  QChar slash(X_NAMESPACE(assetDb)::ASSET_NAME_SLASH);
+
+
+	  QIcon folderIcon(":/assetDb/img/Folder.Closed.png");
+	  QIcon folderIconExpanded(":/assetDb/img/Folder.Open.png");
 
       for (const ModProject::AssetInfo& asset : assetsOut)
       {
-        // for now just add file nodes.
+          // for now just add file nodes.
+		  const auto& name =  asset.name;
 
-        files.append(new AssetExplorer::FileNode(asset.name, AssetExplorer::FileType::SourceType));
+		  if (name.contains(slash, Qt::CaseSensitive))
+		  {
+#if 1
+			  // make it a folder.
+			 auto parts = name.split(slash);
+			 QStringListIterator it(parts);
+
+			 AssetExplorer::FolderNode* pCurrentNode = this;
+
+			 // we want to just populate the whole tree.
+			 // when we reach a folder we need to build all the nodes.
+			 // whats a good way to add the folders tho?
+			 // we only expose the methods for adding nodes, as it performs parenting logic.
+
+			 while (it.hasNext())
+			 {
+				 const QString& key = it.next();
+
+				 if (it.hasNext()) // directory
+				 {
+					 auto pFolder = new ModFolderNode(key);
+					 pFolder->setIcon(folderIcon);
+					 pFolder->setIconExpanded(folderIconExpanded);
+
+
+					 QList<AssetExplorer::FolderNode*> foldersChild;
+					 foldersChild.append(pFolder);
+
+					 // i want to add all these folder nodes at once.
+					 // but then you can't add the children.
+					 // untill they are added to parent.
+					 // as they fail to get a project node.
+
+
+					// pCurrentNode->addFolderNodes(foldersChild);
+					// pCurrentNode = pFolder;
+				 }
+				 else
+				 {
+					 // file.
+					 auto pFile = new AssetExplorer::FileNode(key, AssetExplorer::FileType::SourceType);
+					 pFile->setIcon(pProject->getIconForAssetType(assetType_));
+
+					 QList<AssetExplorer::FileNode*> filesChild;
+					 filesChild.append(pFile);
+
+					 pCurrentNode->addFileNodes(filesChild);
+				 }
+			 }
+
+#endif
+		  }
+		  else
+		  {
+			  auto pFile = new AssetExplorer::FileNode(asset.name, AssetExplorer::FileType::SourceType);
+			  pFile->setIcon(pProject->getIconForAssetType(assetType_));
+
+			  files.append(pFile);
+		  }
       }
 
-      this->addFileNodes(files);
+	 this->addFileNodes(files);
+	//  this->addFolderNodes(folders);
     }
+
     return true;
+}
+
+
+// -------------------------------------------------------------------
+
+
+ModFolderNode::ModFolderNode(const QString &name) :
+	FolderNode(name)
+{
+
 }

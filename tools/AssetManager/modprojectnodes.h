@@ -46,6 +46,17 @@ private:
     int32_t numAssets_;
 };
 
+class ModFolderNode : public AssetExplorer::FolderNode
+{
+	typedef X_NAMESPACE(assetDb)::AssetType AssetType;
 
+public:
+	explicit ModFolderNode(const QString &name);
+
+//	QString tooltip() const override;
+
+
+private:
+};
 
 #endif // MODPROJECTNODES_H
