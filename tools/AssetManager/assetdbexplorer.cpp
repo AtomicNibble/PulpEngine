@@ -42,7 +42,7 @@ AssetExplorer::~AssetExplorer()
 }
 
 
-bool AssetExplorer::init(QString *errorMessage)
+bool AssetExplorer::init(QString* errorMessage)
 {
     Q_UNUSED(errorMessage);
 
@@ -220,19 +220,21 @@ bool AssetExplorer::init(QString *errorMessage)
 
 
 
-Project *AssetExplorer::currentProject(void)
+Project* AssetExplorer::currentProject(void)
 {
-    Project *project = instance_->currentProject_;
+    Project* pProject = instance_->currentProject_;
 
-        if (project)
-            qDebug() << "AssetExplorer::currentProject returns " << project->displayName();
-        else
-            qDebug() << "AssetExplorer::currentProject returns 0";
+	if (pProject) {
+		qDebug() << "AssetExplorer::currentProject returns " << pProject->displayName();
+	}
+	else {
+		qDebug() << "AssetExplorer::currentProject returns 0";
+	}
 
-    return project;
+    return pProject;
 }
 
-Node *AssetExplorer::currentNode(void) const
+Node* AssetExplorer::currentNode(void) const
 {
     return currentNode_;
 }

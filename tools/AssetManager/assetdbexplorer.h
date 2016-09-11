@@ -23,7 +23,7 @@ public:
     AssetExplorer();
     ~AssetExplorer();
 
-    static AssetExplorer *instance(void);
+    static AssetExplorer* instance(void);
 
     bool init(QString* errorMessage);
 
@@ -31,20 +31,20 @@ public:
     Node *currentNode(void) const;
     void setCurrentNode(Node* node);
 
-    void renameFile(Node* node, const QString &to);
+    void renameFile(Node* pNode, const QString &to);
 
-    void showContextMenu(QWidget* view, const QPoint &globalPos, Node* node);
+    void showContextMenu(QWidget* view, const QPoint &globalPos, Node* pNode);
 
 signals:
 
-    void aboutToShowContextMenu(Project *project, Node* node);
+    void aboutToShowContextMenu(Project* pProject, Node* pNode);
 
     // Is emitted when a project has been added/removed,
     // or the file list of a specific project has changed.
     void fileListChanged(void);
 
-    void currentProjectChanged(Project *project);
-    void currentNodeChanged(Node *node, Project *project);
+    void currentProjectChanged(Project* pProject);
+    void currentNodeChanged(Node* pNode, Project* pProject);
 
     void recentProjectsChanged(void);
 
@@ -52,37 +52,37 @@ public slots:
 
 private slots:
     void setStartupProject(void);
-    void setStartupProject(Project* project);
+    void setStartupProject(Project* pProject);
     void newProject(void);
 
-    void projectAdded(Project* pro);
-    void projectRemoved(Project* pro);
-    void projectDisplayNameChanged(Project* pro);
+    void projectAdded(Project* pProject);
+    void projectRemoved(Project* pProject);
+    void projectDisplayNameChanged(Project* pProject);
     void startupProjectChanged(void); // Calls updateRunAction
 
     void updateActions(void);
 
 private:
-    void setCurrent(Project *project, QString filePath, Node *node);
+    void setCurrent(Project* pProject, QString filePath, Node* pNode);
 
     void updateContextMenuActions(void);
 
-    void addToRecentProjects(const QString &fileName, const QString &displayName);
+    void addToRecentProjects(const QString& fileName, const QString& displayName);
 
 private:
-    QMenu *m_projectMenu;
-    QMenu *m_folderMenu;
-    QMenu *m_fileMenu;
+    QMenu* projectMenu_;
+    QMenu* folderMenu_;
+    QMenu* fileMenu_;
 
-    QAction* m_addNewFileAction;
-    QAction* m_addExistingFilesAction;
-    QAction *m_removeFileAction;
-    QAction *m_deleteFileAction;
-    QAction *m_renameFileAction;
-    QAction *m_openFileAction;
-    QAction *m_openContaingFolderAction;
-    QAction *m_projectTreeCollapseAllAction;
-    QAction *m_unloadAction;
+    QAction* addNewFileAction_;
+    QAction* addExistingFilesAction_;
+    QAction* removeFileAction_;
+    QAction* deleteFileAction_;
+    QAction* renameFileAction_;
+    QAction* openFileAction_;
+    QAction* openContaingFolderAction_;
+    QAction* projectTreeCollapseAllAction_;
+    QAction* unloadAction_;
 
 private:
     Project* currentProject_;
