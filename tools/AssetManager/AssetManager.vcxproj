@@ -38,7 +38,7 @@
     <PlatformToolSet>v140</PlatformToolSet>
     <OutputDirectory>..\..\..\..\build\win32\Debug\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
-    <CharacterSet>NotSet</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <ConfigurationType>Application</ConfigurationType>
     <IntermediateDirectory>debug\</IntermediateDirectory>
     <PrimaryOutput>AssetManager</PrimaryOutput>
@@ -47,7 +47,7 @@
     <PlatformToolSet>v140</PlatformToolSet>
     <OutputDirectory>..\..\..\..\build\win32\Release\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
-    <CharacterSet>NotSet</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <ConfigurationType>Application</ConfigurationType>
     <IntermediateDirectory>release\</IntermediateDirectory>
     <PrimaryOutput>AssetManager</PrimaryOutput>
@@ -56,7 +56,7 @@
     <PlatformToolSet>v140</PlatformToolSet>
     <OutputDirectory>..\..\..\..\build\win32\Release\</OutputDirectory>
     <ATLMinimizesCRunTimeLibraryUsage>false</ATLMinimizesCRunTimeLibraryUsage>
-    <CharacterSet>NotSet</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
     <ConfigurationType>Application</ConfigurationType>
     <IntermediateDirectory>release\</IntermediateDirectory>
     <PrimaryOutput>AssetManager</PrimaryOutput>
