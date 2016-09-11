@@ -49,6 +49,7 @@ AssetManager::AssetManager(QWidget *parent) :
     window->setLayout(layout_);
 
     setCentralWidget(window);
+	setMinimumSize(480, 480);
 
 
 }
