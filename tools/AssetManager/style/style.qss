@@ -18,56 +18,6 @@ QWidget:item:selected {
 	background-color:QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #9b9b9b, stop: 1 #636262);
 }
 
-#EditorView
-{
-	border: none;
-}
-
-#EditorViewLayout
-{
-	border: none;
-}
-
-#EditorViewContainer
-{
-	border: none;
-}
-
-#codetab
-{
-
-}
-
-Codetabview::pane {
-	border-top: 2px solid #2074DB;
-}
-
-#codetabBar::tab {
-	background-color:#323232;
-	color: #eee;
-	padding: 0px 5px 0px 5px;
-	border-top-left-radius: 0px;
-	border-top-right-radius: 0px;
-	margin-left: 0px;
-	border: 0;
-}
-
-#codetabBar::tab:selected {
-	background-color:#2074DB;
-}
-
-#codetabBar::tab:!selected:hover {
-	background-color:#1B61B7;
-}
-
-#codetabBar::close-button {
-	image: url(:/style/img/Close.png);
-}
-
-#codetabBar::close-button:hover {
-	image: url(:/style/img/Close-hover.png);
-}
-
 
 QTabBar::tab {
 	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #343837, stop: 0.51 #37393a, stop: 1 #2d2d30);
@@ -289,34 +239,6 @@ QComboBox::item:selected {
 QComboBox QAbstractItemView {
     outline:none;
 }
-
-
-
-
-
-#OptionsCatList {
-	background-color: #1a1a1a;
-}
-
-#OptionsCatList::item{
-	color: #c0c0c0;
-	background-color:#202020;
-}
-
-#OptionsCatList::item:selected:active, #OptionsCatList::item:selected:!active{
-	background-color:#395FAD;
-}
-
-#OptionsCatList:item:hover {
-	color: #c0c0c0;
-	background-color:#203763;
-}
-
-#OptionsCatList {
-	background-color: #201F1F;
-	outline: 0;
-}
-
 
 
 
