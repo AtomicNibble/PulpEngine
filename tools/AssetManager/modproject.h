@@ -21,8 +21,9 @@ class ModProject : public AssetExplorer::Project
     {
         const char* pNickName;
         int priority; // for sorting.
-        QIcon icon;
-        QIcon iconExpanded;
+		QIcon icon;
+        QIcon folderIcon;
+        QIcon folderIconExpanded;
     };
 
     typedef std::array<AssetTypeInfo, X_NAMESPACE(assetDb)::AssetType::ENUM_COUNT> AssetTypeInfoArr;
@@ -42,6 +43,8 @@ public:
     AssetExplorer::ProjectNode* rootProjectNode(void) const override;
 
     bool getAssetList(AssetType::Enum type, QList<AssetInfo>& assetsOut) const;
+
+	QIcon getIconForAssetType(AssetType::Enum type);
 
 private:
     void initAssetTypeInfo(void);

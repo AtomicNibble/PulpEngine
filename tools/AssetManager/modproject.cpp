@@ -40,8 +40,8 @@ void ModProject::loadAssetTypeNodes(void)
             ModVirtualFolderNode* pFolder = new ModVirtualFolderNode(info.pNickName, info.priority, info.pNickName,
                 static_cast<AssetDb::AssetType::Enum>(i), counts[i]);
 
-            pFolder->setIcon(info.icon);
-            pFolder->setIconExpanded(info.iconExpanded);
+            pFolder->setIcon(info.folderIcon);
+            pFolder->setIconExpanded(info.folderIconExpanded);
 
             folders << pFolder;
         }
@@ -71,6 +71,11 @@ bool ModProject::getAssetList(AssetType::Enum type, QList<AssetInfo>& assetsOut)
     return db_.getAssetList(modId_, type, assetsOut);
 }
 
+QIcon ModProject::getIconForAssetType(AssetType::Enum type)
+{
+	return assetDisplayInfo_[type].icon;
+}
+
 void ModProject::initAssetTypeInfo(void)
 {
     QIcon defaultIcon(":/assetDb/img/Folder.Closed.png");
@@ -79,17 +84,19 @@ void ModProject::initAssetTypeInfo(void)
     for(size_t i=0; i<AssetDb::AssetType::ENUM_COUNT; i++) {
         assetDisplayInfo_[i].pNickName = "<AssetNickName missing>";
         assetDisplayInfo_[i].priority = 0;
-        assetDisplayInfo_[i].icon = defaultIcon;
-        assetDisplayInfo_[i].iconExpanded = defaultIconExpanded;
+        assetDisplayInfo_[i].folderIcon = defaultIcon;
+        assetDisplayInfo_[i].folderIconExpanded = defaultIconExpanded;
     }
 
     typedef X_NAMESPACE(assetDb)::AssetType assetType;
 
     assetDisplayInfo_[assetType::MODEL].pNickName = "Model";
-  //  assetDisplayInfo_[assetType::MODEL].icon = QIcon(":/assetDb/img/File_mesh.png");
+    assetDisplayInfo_[assetType::MODEL].icon = QIcon(":/assetDb/img/File_mesh.png");
     assetDisplayInfo_[assetType::ANIM].pNickName = "Anim";
     assetDisplayInfo_[assetType::MATERIAL].pNickName = "Material";
+	assetDisplayInfo_[assetType::MATERIAL].icon = QIcon(":/assetDb/img/File_material.png");
     assetDisplayInfo_[assetType::IMG].pNickName = "Images";
+	assetDisplayInfo_[assetType::IMG].icon = QIcon(":/assetDb/img/File_img.png");
     assetDisplayInfo_[assetType::WEAPON].pNickName = "Weapon";
     assetDisplayInfo_[assetType::TURRET].pNickName = "Turret";
     assetDisplayInfo_[assetType::LIGHT].pNickName = "Light";
