@@ -27,6 +27,9 @@ public:
 	/// Frees memory previously allocated by Allocate().
 	virtual void free(void* ptr) X_ABSTRACT;
 
+	/// Frees memory previously allocated by Allocate().
+	virtual size_t getSize(void* ptr) X_ABSTRACT;
+
 	/// Returns statistics regarding the allocations made by the memory arena.
 	virtual MemoryArenaStatistics getStatistics(void) const X_ABSTRACT;
 

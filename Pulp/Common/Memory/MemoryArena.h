@@ -86,6 +86,8 @@ public:
 	/// Frees memory previously allocated by Allocate().
 	virtual void free(void* ptr) X_OVERRIDE;
 
+	virtual size_t getSize(void* ptr) X_OVERRIDE;
+
 	/// Returns statistics regarding the allocations made by the memory arena.
 	virtual MemoryArenaStatistics getStatistics(void) const X_OVERRIDE;
 
