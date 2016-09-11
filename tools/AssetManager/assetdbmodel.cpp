@@ -232,26 +232,24 @@ QModelIndex AssetDBModel::parent(const QModelIndex &idx) const
 QVariant AssetDBModel::data(const QModelIndex &index, int role) const
 {
     QVariant result;
-    if (Node *node = nodeForIndex(index))
+    if (Node* pNode = nodeForIndex(index))
     {
-        FolderNode* folderNode = qobject_cast<FolderNode*>(node);
+       FolderNode* folderNode = qobject_cast<FolderNode*>(pNode);
         switch (role)
         {
             case Qt::DisplayRole:
             {
-                QString name = node->displayName();
-
-
+                QString name = pNode->displayName();
 
                 result = name;
                 break;
             }
             case Qt::EditRole: {
-                result = node->name();
+                result = pNode->name();
                 break;
             }
             case Qt::ToolTipRole: {
-                result = node->tooltip();
+                result = pNode->tooltip();
                 break;
             }
             case Qt::DecorationRole: {
@@ -267,7 +265,7 @@ QVariant AssetDBModel::data(const QModelIndex &index, int role) const
             }
             case Qt::FontRole: {
                 QFont font;
-                if (node == startupProject_) {
+                if (pNode == startupProject_) {
                     font.setBold(true);
                 }
                 result = font;
