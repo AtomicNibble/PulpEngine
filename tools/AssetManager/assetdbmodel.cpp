@@ -287,16 +287,16 @@ Qt::ItemFlags AssetDBModel::flags(const QModelIndex& index) const
     }
 
     Qt::ItemFlags f = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
-    if (Node *node = nodeForIndex(index))
+    if (Node* pNode = nodeForIndex(index))
     {
-        if (node == rootNode_) {
+        if (pNode == rootNode_) {
             return 0; // no flags for session node...
         }
 
-        if (!qobject_cast<ProjectNode*>(node))
+        if (!qobject_cast<ProjectNode*>(pNode))
         {
             // either folder or file node
-            if (node->supportedActions(node).contains(ProjectAction::Rename)) {
+            if (pNode->supportedActions(pNode).contains(ProjectAction::Rename)) {
                 f = f | Qt::ItemIsEditable;
             }
         }
