@@ -7,6 +7,11 @@
         <file>img/Folder.Open.png</file>
         <file>img/File_img.png</file>
         <file>img/File_material.png</file>
+        <file>img/File_anim.png</file>
+        <file>img/File_character.png</file>
+        <file>img/File_light.png</file>
+        <file>img/File_cam.png</file>
+        <file>img/File_vehicle.png</file>
     </qresource>
     <qresource prefix="/style">
         <file>img/vline.png</file>
