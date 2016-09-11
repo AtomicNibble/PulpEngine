@@ -279,7 +279,7 @@ QVariant AssetDBModel::data(const QModelIndex &index, int role) const
     return result;
 }
 
-Qt::ItemFlags AssetDBModel::flags(const QModelIndex &index) const
+Qt::ItemFlags AssetDBModel::flags(const QModelIndex& index) const
 {
     if (!index.isValid()) {
         return 0;
@@ -303,7 +303,7 @@ Qt::ItemFlags AssetDBModel::flags(const QModelIndex &index) const
     return f;
 }
 
-bool AssetDBModel::setData(const QModelIndex &index, const QVariant &value, int role)
+bool AssetDBModel::setData(const QModelIndex& index, const QVariant& value, int role)
 {
     Q_UNUSED(index);
     Q_UNUSED(value);
@@ -333,13 +333,13 @@ int AssetDBModel::rowCount(const QModelIndex& parent) const
     return rows;
 }
 
-int AssetDBModel::columnCount(const QModelIndex & parent) const
+int AssetDBModel::columnCount(const QModelIndex& parent) const
 {
     Q_UNUSED(parent);
     return 1;
 }
 
-bool AssetDBModel::hasChildren(const QModelIndex & parent) const
+bool AssetDBModel::hasChildren(const QModelIndex& parent) const
 {
     if (!parent.isValid()) {
         return true;
@@ -368,7 +368,7 @@ bool AssetDBModel::hasChildren(const QModelIndex & parent) const
 }
 
 
-bool AssetDBModel::canFetchMore(const QModelIndex & parent) const
+bool AssetDBModel::canFetchMore(const QModelIndex& parent) const
 {
     if (!parent.isValid()) {
         return false;
