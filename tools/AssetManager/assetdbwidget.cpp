@@ -115,7 +115,7 @@ AssetDbViewWidget::AssetDbViewWidget(AssetDb& db, QWidget *parent) :
 
     view_ = new AssetDbTreeView(this);
     view_->setModel(model_);
-    view_->setItemDelegate(new AssetDbTreeItemDelegate(this));
+  //  view_->setItemDelegate(new AssetDbTreeItemDelegate(this));
     setFocusProxy(view_);
     initView();
 
