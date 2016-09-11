@@ -126,7 +126,7 @@ bool sortNodes(Node *n1, Node *n2)
 
 
 
-AssetDBModel::AssetDBModel(SessionNode *rootNode, AssetDb& db, QObject *parent) :
+AssetDBModel::AssetDBModel(SessionNode* rootNode, AssetDb& db, QObject* parent) :
     QAbstractItemModel(parent),
     treeview_(nullptr),
     startupProject_(nullptr),
@@ -146,12 +146,12 @@ void AssetDBModel::setTreeView(QTreeView* pTree)
     treeview_ = pTree;
 }
 
-void AssetDBModel::setStartupProject(ProjectNode *projectNode)
+void AssetDBModel::setStartupProject(ProjectNode* pProjectNode)
 {
-    if (startupProject_ != projectNode) {
+    if (startupProject_ != pProjectNode) {
         QModelIndex oldIndex = (startupProject_ ? indexForNode(startupProject_) : QModelIndex());
-        QModelIndex newIndex = (projectNode ? indexForNode(projectNode) : QModelIndex());
-        startupProject_ = projectNode;
+        QModelIndex newIndex = (pProjectNode ? indexForNode(pProjectNode) : QModelIndex());
+        startupProject_ = pProjectNode;
         if (oldIndex.isValid()) {
             emit dataChanged(oldIndex, oldIndex);
         }
@@ -175,11 +175,12 @@ QModelIndex AssetDBModel::index(int row, int column, const QModelIndex &parent) 
 
     if (!parent.isValid() && row == 0 && column == 0) { // session
         result = createIndex(0, 0, rootNode_);
-    } else if (parent.isValid() && column == 0)
+    }
+	else if (parent.isValid() && column == 0)
     {
         FolderNode *parentNode = qobject_cast<FolderNode*>(nodeForIndex(parent));
         Q_ASSERT(parentNode);
-        QHash<FolderNode*, QList<Node*> >::const_iterator it = childNodes_.constFind(parentNode);
+		auto it = childNodes_.constFind(parentNode);
         if (it == childNodes_.constEnd())
         {
             fetchMore(parentNode);
@@ -198,25 +199,27 @@ QModelIndex AssetDBModel::index(int row, int column, const QModelIndex &parent) 
 QModelIndex AssetDBModel::parent(const QModelIndex &idx) const
 {
     QModelIndex parentIndex;
-    if (Node *node = nodeForIndex(idx))
+    if (Node* pNode = nodeForIndex(idx))
     {
-        FolderNode *parentNode = visibleFolderNode(node->parentFolderNode());
-        if (parentNode)
+        FolderNode* pParentNode = visibleFolderNode(pNode->parentFolderNode());
+        if (pParentNode)
         {
-            FolderNode *grandParentNode = visibleFolderNode(parentNode->parentFolderNode());
-            if (grandParentNode)
+            FolderNode* pGrandParentNode = visibleFolderNode(pParentNode->parentFolderNode());
+            if (pGrandParentNode)
             {
-                QHash<FolderNode*, QList<Node*> >::const_iterator it = childNodes_.constFind(grandParentNode);
+                auto it = childNodes_.constFind(pGrandParentNode);
                 if (it == childNodes_.constEnd())
                 {
-                    fetchMore(grandParentNode);
-                    it = childNodes_.constFind(grandParentNode);
+                    fetchMore(pGrandParentNode);
+                    it = childNodes_.constFind(pGrandParentNode);
                 }
                 Q_ASSERT(it != childNodes_.constEnd());
-                const int row = it.value().indexOf(parentNode);
+                const int32_t row = it.value().indexOf(pParentNode);
                 Q_ASSERT(row >= 0);
-                parentIndex = createIndex(row, 0, parentNode);
-            } else {
+                parentIndex = createIndex(row, 0, pParentNode);
+            } 
+			else 
+			{
                 // top level node, parent is session
                 parentIndex = index(0, 0, QModelIndex());
             }
@@ -321,13 +324,13 @@ int AssetDBModel::rowCount(const QModelIndex& parent) const
     else
     {
         FolderNode* pFolderNode = qobject_cast<FolderNode*>(nodeForIndex(parent));
-        if (pFolderNode  && childNodes_.contains(pFolderNode )) {
+        if (pFolderNode && childNodes_.contains(pFolderNode)) {
             // if we have a cache node list for this folder.
             // we know how many children it has.
-            rows = childNodes_.value(pFolderNode ).size();
+            rows = childNodes_.value(pFolderNode).size();
         }
 
-        if(pFolderNode ) {
+        if(pFolderNode) {
          //   qDebug() << pFolderNode ->displayName() << " Rows" << rows;
         }
     }
@@ -346,7 +349,7 @@ bool AssetDBModel::hasChildren(const QModelIndex& parent) const
         return true;
     }
 
-    FolderNode *pFolderNode = qobject_cast<FolderNode*>(nodeForIndex(parent));
+    FolderNode* pFolderNode = qobject_cast<FolderNode*>(nodeForIndex(parent));
     if (!pFolderNode) {
         return false;
     }
@@ -374,19 +377,16 @@ bool AssetDBModel::canFetchMore(const QModelIndex& parent) const
     if (!parent.isValid()) {
         return false;
     }
-    else
-    {
-        if (FolderNode* pFolderNode = qobject_cast<FolderNode*>(nodeForIndex(parent))) {
-            // if the folder is not in the cache we can fetch more.
-            return !childNodes_.contains(pFolderNode);
-        }
-        else {
-            return false;
-        }
-    }
+
+	if (FolderNode* pFolderNode = qobject_cast<FolderNode*>(nodeForIndex(parent))) {
+		// if the folder is not in the cache we can fetch more.
+		return !childNodes_.contains(pFolderNode);
+	}
+
+	return false;
 }
 
-void AssetDBModel::fetchMore(const QModelIndex &parent)
+void AssetDBModel::fetchMore(const QModelIndex& parent)
 {
     FolderNode* pFolderNode = qobject_cast<FolderNode*>(nodeForIndex(parent));
     Q_ASSERT(pFolderNode);
@@ -415,7 +415,7 @@ void AssetDBModel::fetchMore(FolderNode* pFolderNode) const
 }
 
 
-Node* AssetDBModel::nodeForIndex(const QModelIndex &index) const
+Node* AssetDBModel::nodeForIndex(const QModelIndex& index) const
 {
     if (index.isValid()) {
         return (Node*)index.internalPointer();
@@ -437,13 +437,13 @@ QModelIndex AssetDBModel::indexForNode(const Node* node_)
         return createIndex(0, 0, rootNode_);
     }
 
-    FolderNode *parentNode = visibleFolderNode(pNode->parentFolderNode());
+    FolderNode* pParentNode = visibleFolderNode(pNode->parentFolderNode());
 
     // Do we have the parent mapped?
-    auto it = childNodes_.constFind(parentNode);
+    auto it = childNodes_.constFind(pParentNode);
     if (it == childNodes_.constEnd()) {
-        fetchMore(parentNode);
-        it = childNodes_.constFind(parentNode);
+        fetchMore(pParentNode);
+        it = childNodes_.constFind(pParentNode);
     }
     if (it != childNodes_.constEnd()) {
         const int row = it.value().indexOf(pNode);
@@ -454,29 +454,27 @@ QModelIndex AssetDBModel::indexForNode(const Node* node_)
     return QModelIndex();
 }
 
-FolderNode *AssetDBModel::visibleFolderNode(FolderNode* pNode) const
+FolderNode* AssetDBModel::visibleFolderNode(FolderNode* pNode) const
 {
     if (!pNode) {
-        return 0;
+        return nullptr;
     }
 
     // search parents till we get a visible folder node that's not filterd.
-    for (FolderNode *folderNode = pNode;
-         folderNode;
-         folderNode = folderNode->parentFolderNode())
+    for (FolderNode* pFolderNode = pNode; pFolderNode; pFolderNode = pFolderNode->parentFolderNode())
     {
-        if (!filter(folderNode)) {
-            return folderNode;
+        if (!filter(pFolderNode)) {
+            return pFolderNode;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 void AssetDBModel::recursiveAddFolderNodes(FolderNode* pStartNode, QList<Node*>* pList) const
 {
-	for (FolderNode *folderNode : pStartNode->subFolderNodes()) {
-        if (folderNode) {
-            recursiveAddFolderNodesImpl(folderNode, pList);
+	for (FolderNode* pFolderNode : pStartNode->subFolderNodes()) {
+        if (pFolderNode) {
+            recursiveAddFolderNodesImpl(pFolderNode, pList);
         }
     }
 }
@@ -489,9 +487,9 @@ void AssetDBModel::recursiveAddFolderNodesImpl(FolderNode* pStartNode, QList<Nod
     }
     else
     {
-        for (FolderNode *folderNode : pStartNode->subFolderNodes()) {
-            if (folderNode) {
-                recursiveAddFolderNodesImpl(folderNode, pList);
+        for (FolderNode* pFolderNode : pStartNode->subFolderNodes()) {
+            if (pFolderNode) {
+                recursiveAddFolderNodesImpl(pFolderNode, pList);
             }
         }
     }
@@ -499,12 +497,12 @@ void AssetDBModel::recursiveAddFolderNodesImpl(FolderNode* pStartNode, QList<Nod
 
 void AssetDBModel::recursiveAddFileNodes(FolderNode* pStartNode, QList<Node*>* pList) const
 {
-	for (FolderNode *subFolderNode : pStartNode->subFolderNodes()) {
-        recursiveAddFileNodes(subFolderNode, pList);
+	for (FolderNode* pSubFolderNode : pStartNode->subFolderNodes()) {
+        recursiveAddFileNodes(pSubFolderNode, pList);
     }
-	for (Node *node : pStartNode->fileNodes()) {
-        if (!filter(node)) {
-            pList->append(node);
+	for (Node* pNode : pStartNode->fileNodes()) {
+        if (!filter(pNode)) {
+            pList->append(pNode);
         }
     }
 }
@@ -516,10 +514,10 @@ QList<Node*> AssetDBModel::childNodes(FolderNode *parentNode) const
 
     if (parentNode->nodeType() == NodeType::SessionNodeType)
     {
-        SessionNode *sessionNode = static_cast<SessionNode*>(parentNode);
-        QList<ProjectNode*> projectList = sessionNode->projectNodes();
-        for (int i = 0; i < projectList.size(); ++i) {
-            nodeList << projectList.at(i);
+        SessionNode* pSessionNode = static_cast<SessionNode*>(parentNode);
+        QList<ProjectNode*> projectList = pSessionNode->projectNodes();
+        for (int32_t i = 0; i < projectList.size(); ++i) {
+            nodeList.append(projectList.at(i));
         }
     }
     else
