@@ -78,14 +78,16 @@ QIcon ModProject::getIconForAssetType(AssetType::Enum type)
 
 void ModProject::initAssetTypeInfo(void)
 {
-    QIcon defaultIcon(":/assetDb/img/Folder.Closed.png");
-    QIcon defaultIconExpanded(":/assetDb/img/Folder.Open.png");
+    QIcon defaultFolderIcon(":/assetDb/img/Folder.Closed.png");
+    QIcon defaultFolderIconExpanded(":/assetDb/img/Folder.Open.png");
+	QIcon defaultIcon(":/assetDb/img/File_default.png");
 
     for(size_t i=0; i<AssetDb::AssetType::ENUM_COUNT; i++) {
         assetDisplayInfo_[i].pNickName = "<AssetNickName missing>";
         assetDisplayInfo_[i].priority = 0;
-        assetDisplayInfo_[i].folderIcon = defaultIcon;
-        assetDisplayInfo_[i].folderIconExpanded = defaultIconExpanded;
+        assetDisplayInfo_[i].folderIcon = defaultFolderIcon;
+        assetDisplayInfo_[i].folderIconExpanded = defaultFolderIconExpanded;
+		assetDisplayInfo_[i].icon = defaultIcon;
     }
 
     typedef X_NAMESPACE(assetDb)::AssetType assetType;
@@ -93,6 +95,7 @@ void ModProject::initAssetTypeInfo(void)
     assetDisplayInfo_[assetType::MODEL].pNickName = "Model";
     assetDisplayInfo_[assetType::MODEL].icon = QIcon(":/assetDb/img/File_mesh.png");
     assetDisplayInfo_[assetType::ANIM].pNickName = "Anim";
+	assetDisplayInfo_[assetType::ANIM].icon = QIcon(":/assetDb/img/File_anim.png");
     assetDisplayInfo_[assetType::MATERIAL].pNickName = "Material";
 	assetDisplayInfo_[assetType::MATERIAL].icon = QIcon(":/assetDb/img/File_material.png");
     assetDisplayInfo_[assetType::IMG].pNickName = "Images";
@@ -100,12 +103,16 @@ void ModProject::initAssetTypeInfo(void)
     assetDisplayInfo_[assetType::WEAPON].pNickName = "Weapon";
     assetDisplayInfo_[assetType::TURRET].pNickName = "Turret";
     assetDisplayInfo_[assetType::LIGHT].pNickName = "Light";
+	assetDisplayInfo_[assetType::LIGHT].icon = QIcon(":/assetDb/img/File_light.png");
     assetDisplayInfo_[assetType::FX].pNickName = "Fx";
     assetDisplayInfo_[assetType::RUMBLE].pNickName = "Rumble";
     assetDisplayInfo_[assetType::SHELLSHOCK].pNickName = "ShellShock";
     assetDisplayInfo_[assetType::CHARACTER].pNickName = "Character";
+	assetDisplayInfo_[assetType::CHARACTER].icon = QIcon(":/assetDb/img/File_character.png");
     assetDisplayInfo_[assetType::VEHICLE].pNickName = "Vehicle";
+	assetDisplayInfo_[assetType::VEHICLE].icon = QIcon(":/assetDb/img/File_vehicle.png");
     assetDisplayInfo_[assetType::CAMERA].pNickName = "Cameras";
+	assetDisplayInfo_[assetType::CAMERA].icon = QIcon(":/assetDb/img/File_cam.png");
 
     // can make certain asset types sort above others.
     assetDisplayInfo_[assetType::MODEL].priority = 3;
