@@ -5,6 +5,8 @@
         <file>img/File_mesh.png</file>
         <file>img/Folder.Closed.png</file>
         <file>img/Folder.Open.png</file>
+        <file>img/File_img.png</file>
+        <file>img/File_material.png</file>
     </qresource>
     <qresource prefix="/style">
         <file>img/vline.png</file>
