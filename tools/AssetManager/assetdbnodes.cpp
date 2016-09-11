@@ -11,7 +11,7 @@ namespace AssetExplorer
 
 
 Node::Node(NodeType nodeType,
-           const QString &name, int line) :
+           const QString &name, int32_t line) :
     QObject(),
     nodeType_(nodeType),
     projectNode_(0),
@@ -22,7 +22,7 @@ Node::Node(NodeType nodeType,
 
 }
 
-void Node::emitNodeSortKeyAboutToChange()
+void Node::emitNodeSortKeyAboutToChange(void)
 {
     if (ProjectNode *project = projectNode()) {
         foreach (NodesWatcher* pWatcher, project->watchers()) {
@@ -31,7 +31,7 @@ void Node::emitNodeSortKeyAboutToChange()
     }
 }
 
-void Node::emitNodeSortKeyChanged()
+void Node::emitNodeSortKeyChanged(void)
 {
     if (ProjectNode *project = projectNode()) {
         foreach (NodesWatcher* pWatcher, project->watchers()) {
@@ -58,7 +58,7 @@ void Node::setName(const QString& name)
     emitNodeUpdated();
 }
 
-void Node::setLine(int line)
+void Node::setLine(int32_t line)
 {
     if (line_ == line) {
         return;
@@ -70,7 +70,7 @@ void Node::setLine(int line)
     emitNodeUpdated();
 }
 
-void Node::setNameAndLine(const QString& name, int line)
+void Node::setNameAndLine(const QString& name, int32_t line)
 {
     if (name_ == name && line_ == line) {
         return;
@@ -83,7 +83,7 @@ void Node::setNameAndLine(const QString& name, int line)
     emitNodeUpdated();
 }
 
-NodeType Node::nodeType() const
+NodeType Node::nodeType(void) const
 {
     return nodeType_;
 }
@@ -92,12 +92,12 @@ NodeType Node::nodeType() const
   The project that owns and manages the node. It is the first project in the list
   of ancestors.
   */
-ProjectNode *Node::projectNode() const
+ProjectNode* Node::projectNode(void) const
 {
     return projectNode_;
 }
 
-FolderNode *Node::parentFolderNode() const
+FolderNode* Node::parentFolderNode(void) const
 {
     return folderNode_;
 }
@@ -144,7 +144,7 @@ void Node::setNodeType(NodeType type)
     nodeType_ = type;
 }
 
-void Node::setProjectNode(ProjectNode *project)
+void Node::setProjectNode(ProjectNode* project)
 {
     projectNode_ = project;
 }
@@ -165,7 +165,7 @@ void Node::emitNodeUpdated(void)
 }
 
 
-void Node::setParentFolderNode(FolderNode *parentFolder)
+void Node::setParentFolderNode(FolderNode* parentFolder)
 {
     folderNode_ = parentFolder;
 }
@@ -232,7 +232,7 @@ void FolderNode::setIconExpanded(const QIcon& icon)
 	iconexpanded_ = icon;
 }
 
-void FolderNode::setDisplayName(const QString &name)
+void FolderNode::setDisplayName(const QString& name)
 {
     if (displayName_ == name) {
         return;
