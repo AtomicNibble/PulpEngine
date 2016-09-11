@@ -122,6 +122,18 @@ bool sortNodes(Node *n1, Node *n2)
     return false;
 }
 
+
+bool isSorted(const QList<Node*> &nodes)
+{
+	const int32_t size = nodes.size();
+	for (int32_t i = 0; i < size - 1; ++i) {
+		if (!sortNodes(nodes.at(i), nodes.at(i + 1))) {
+			return false;
+		}
+	}
+	return true;
+}
+
 } // namnespace
 
 
@@ -133,6 +145,19 @@ AssetDBModel::AssetDBModel(SessionNode* rootNode, AssetDb& db, QObject* parent) 
     rootNode_(rootNode),
     db_(db)
 {
+	NodesWatcher* pWatcher = new NodesWatcher(this);
+	rootNode_->registerWatcher(pWatcher);
+
+
+	connect(pWatcher, SIGNAL(foldersAboutToBeAdded(FolderNode*, QList<FolderNode*>)),
+		this, SLOT(foldersAboutToBeAdded(FolderNode*, QList<FolderNode*>)));
+	connect(pWatcher, SIGNAL(foldersAdded()),
+		this, SLOT(foldersAdded()));
+
+	connect(pWatcher, SIGNAL(filesAboutToBeAdded(FolderNode*, QList<FileNode*>)),
+		this, SLOT(filesAboutToBeAdded(FolderNode*, QList<FileNode*>)));
+	connect(pWatcher, SIGNAL(filesAdded()),
+		this, SLOT(filesAdded()));
 
 }
 
@@ -391,12 +416,9 @@ void AssetDBModel::fetchMore(const QModelIndex& parent)
     FolderNode* pFolderNode = qobject_cast<FolderNode*>(nodeForIndex(parent));
     Q_ASSERT(pFolderNode);
 
-    // required?
-   // beginInsertRows(parent, 0, 0);
+   // beginInsertRows is called in added();
 
     fetchMore(pFolderNode);
-
-   // endInsertRows();
 }
 
 
@@ -453,6 +475,130 @@ QModelIndex AssetDBModel::indexForNode(const Node* node_)
     }
     return QModelIndex();
 }
+
+
+void AssetDBModel::added(FolderNode* pFolderNode, const QList<Node*>& newNodeList)
+{
+	QModelIndex parentIndex = indexForNode(pFolderNode);
+
+	// Old  list
+	auto it = childNodes_.constFind(pFolderNode);
+	if (it == childNodes_.constEnd()) {
+		return;
+	}
+
+	QList<Node*> oldNodeList = it.value();
+
+	// Compare lists and emit signals, and modify childNodes_ on the fly
+	auto oldIter = oldNodeList.constBegin();
+	auto newIter = newNodeList.constBegin();
+
+	Q_ASSERT(isSorted(oldNodeList));
+	Q_ASSERT(isSorted(newNodeList));
+
+
+	QSet<Node*> emptyDifference;
+	emptyDifference = oldNodeList.toSet();
+	emptyDifference.subtract(newNodeList.toSet());
+
+	if (!emptyDifference.isEmpty()) 
+	{
+		// This should not happen...
+		qDebug() << "FlatModel::added, old Node list should be subset of newNode list, found files in old list which were not part of new list";
+		for(Node* pNode : emptyDifference) {
+			qDebug() << pNode->name();
+		}
+		Q_ASSERT(false);
+	}
+
+	// optimization, check for old list is empty
+	if (oldIter == oldNodeList.constEnd()) 
+	{
+		// New Node List is empty, nothing added which intrest us
+		if (newIter == newNodeList.constEnd()) {
+			return;
+		}
+		// So all we need to do is easy
+		beginInsertRows(parentIndex, 0, newNodeList.size() - 1);
+		childNodes_.insert(pFolderNode, newNodeList);
+		endInsertRows();
+		return;
+	}
+
+	while (true) 
+	{
+		// Skip all that are the same
+		while (*oldIter == *newIter) 
+		{
+			++oldIter;
+			++newIter;
+			if (oldIter == oldNodeList.constEnd())
+			{
+				// At end of oldNodeList, sweep up rest of newNodeList
+				QList<Node *>::const_iterator startOfBlock = newIter;
+				newIter = newNodeList.constEnd();
+				int32_t pos = oldIter - oldNodeList.constBegin();
+				int32_t count = newIter - startOfBlock;
+				if (count > 0) 
+				{
+					beginInsertRows(parentIndex, pos, pos + count - 1);
+						while (startOfBlock != newIter) 
+						{
+							oldNodeList.insert(pos, *startOfBlock);
+							++pos;
+							++startOfBlock;
+						}
+						childNodes_.insert(pFolderNode, oldNodeList);
+					endInsertRows();
+				}
+				return; // Done with the lists, leave the function
+			}
+		}
+
+		QList<Node *>::const_iterator startOfBlock = newIter;
+		while (*oldIter != *newIter) {
+			++newIter;
+		}
+
+		// startOfBlock is the first that was diffrent
+		// newIter points to the new position of oldIter
+		// newIter - startOfBlock is number of new items
+		// oldIter is the position where those are...
+		int32_t pos = oldIter - oldNodeList.constBegin();
+		int32_t count = newIter - startOfBlock;
+
+		beginInsertRows(parentIndex, pos, pos + count - 1);
+			while (startOfBlock != newIter) 
+			{
+				oldNodeList.insert(pos, *startOfBlock);
+				++pos;
+				++startOfBlock;
+			}
+			childNodes_.insert(pFolderNode, oldNodeList);
+		endInsertRows();
+
+		oldIter = oldNodeList.constBegin() + pos;
+	}
+}
+
+void AssetDBModel::removed(FolderNode* pParentNode, const QList<Node*>& newNodeList)
+{
+	BUG_ASSERT_NOT_IMPLEMENTED();
+}
+
+void AssetDBModel::removeFromCache(QList<FolderNode*> list)
+{
+	for (FolderNode* pFolderNode : list) {
+		removeFromCache(pFolderNode->subFolderNodes());
+		childNodes_.remove(pFolderNode);
+	}
+}
+
+void AssetDBModel::changedSortKey(FolderNode* pFolderNode, Node* pNode)
+{
+	BUG_ASSERT_NOT_IMPLEMENTED();
+}
+
 
 FolderNode* AssetDBModel::visibleFolderNode(FolderNode* pNode) const
 {
@@ -549,6 +695,44 @@ bool AssetDBModel::filter(Node *node) const
 #endif
 
     return isHidden;
+}
+
+
+// 
+
+void AssetDBModel::filesAboutToBeAdded(FolderNode* pFolder, const QList<FileNode*>& newFiles)
+{
+	Q_UNUSED(newFiles)
+	pParentFolderForChange_ = pFolder;
+}
+
+
+void AssetDBModel::filesAdded(void)
+{
+	// First find out what the folder is that we are adding the files to
+	FolderNode* pFolderNode = visibleFolderNode(pParentFolderForChange_);
+
+	// Now get the new List for that folder
+	QList<Node *> newNodeList = childNodes(pFolderNode);
+
+	added(pFolderNode, newNodeList);
+}
+
+void AssetDBModel::foldersAboutToBeAdded(FolderNode* pParentFolder, const QList<FolderNode*>& newFolders)
+{
+	Q_UNUSED(newFolders)
+	pParentFolderForChange_ = pParentFolder;
+}
+
+void AssetDBModel::foldersAdded(void)
+{
+	// First found out what the folder is that we are adding the files to
+	FolderNode* pFolderNode = visibleFolderNode(pParentFolderForChange_);
+
+	// Now get the new list for that folder
+	QList<Node*> newNodeList = childNodes(pFolderNode);
+
+	added(pFolderNode, newNodeList);
 }
 
 } // namespace AssetExplorer
