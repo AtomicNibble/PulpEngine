@@ -260,7 +260,10 @@ QVariant AssetDBModel::data(const QModelIndex &index, int role) const
                     }
 
                     result = folderNode->icon(expanded);
-                }
+				}
+				else {
+					result = pNode->icon();
+				}
                 break;
             }
             case Qt::FontRole: {
