@@ -98,40 +98,38 @@ void MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTra
 	X_ASSERT_NOT_NULL(ptr);
 	X_ASSERT(!isFrozen_, "Memory arena \"%s\" is frozen, no memory can be freed.", name_)();
 
-	if (ptr)
+	threadGuard_.Enter();
+
+	union
 	{
-		threadGuard_.Enter();
+		void* as_void;
+		char* as_char;
+	};
 
-		union
-		{
-			void* as_void;
-			char* as_char;
-		};
+	// remember that the user allocation does not necessarily point to the original raw allocation.
+	// bytes at front and at the back could be guard bytes used by the bounds checker.
+	as_void = ptr;
 
-		// remember that the user allocation does not necessarily point to the original raw allocation.
-		// bytes at front and at the back could be guard bytes used by the bounds checker.
-		as_void = ptr;
+	char* frontGuard = as_char - BoundsCheckingPolicy::SIZE_FRONT;
+	char* originalRawMemory = frontGuard;
+	const size_t allocationSize = allocator_->getSize(originalRawMemory);
+	char* backGuard = frontGuard + allocationSize - BoundsCheckingPolicy::SIZE_BACK;
 
-		char* frontGuard = as_char - BoundsCheckingPolicy::SIZE_FRONT;
-		char* originalRawMemory = frontGuard;
-		const size_t allocationSize = allocator_->getSize(originalRawMemory);
-		char* backGuard = frontGuard + allocationSize - BoundsCheckingPolicy::SIZE_BACK;
+	boundsChecker_.CheckFront(frontGuard);
+	boundsChecker_.CheckBack(backGuard);
+	memoryTracker_.OnDeallocation(originalRawMemory);
+	memoryTagger_.TagDeallocation(ptr, allocationSize - BoundsCheckingPolicy::SIZE_FRONT - BoundsCheckingPolicy::SIZE_BACK);
 
-		boundsChecker_.CheckFront(frontGuard);
-		boundsChecker_.CheckBack(backGuard);
-		memoryTracker_.OnDeallocation(originalRawMemory);
-		memoryTagger_.TagDeallocation(ptr, allocationSize - BoundsCheckingPolicy::SIZE_FRONT - BoundsCheckingPolicy::SIZE_BACK);
-
-		allocator_->free(originalRawMemory);
+	allocator_->free(originalRawMemory);
 
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
-		statistics_.allocatorStatistics_ = allocator_->getStatistics();
-		statistics_.trackingOverhead_ -= MemoryTrackingPolicy::PER_ALLOCATION_OVERHEAD;
-		statistics_.boundsCheckingOverhead_ -= BoundsCheckingPolicy::SIZE_FRONT + BoundsCheckingPolicy::SIZE_BACK;
+	statistics_.allocatorStatistics_ = allocator_->getStatistics();
+	statistics_.trackingOverhead_ -= MemoryTrackingPolicy::PER_ALLOCATION_OVERHEAD;
+	statistics_.boundsCheckingOverhead_ -= BoundsCheckingPolicy::SIZE_FRONT + BoundsCheckingPolicy::SIZE_BACK;
 #endif
 
-		threadGuard_.Leave();
-	}
+	threadGuard_.Leave();
+
 }
 
 
