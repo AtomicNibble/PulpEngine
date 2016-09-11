@@ -112,6 +112,11 @@ int32_t Node::line(void) const
     return -1;
 }
 
+QIcon Node::icon(void) const
+{
+	return icon_;
+}
+
 QString Node::displayName(void) const
 {
     return name();
@@ -143,6 +148,12 @@ void Node::setProjectNode(ProjectNode *project)
 {
     projectNode_ = project;
 }
+
+void Node::setIcon(const QIcon& icon)
+{
+	icon_ = icon;
+}
+
 
 void Node::emitNodeUpdated(void)
 {
@@ -193,13 +204,17 @@ QString FolderNode::displayName(void) const
     return displayName_;
 }
 
-
 QIcon FolderNode::icon(bool expanded) const
 {
-    if(expanded && !iconexpanded_.isNull()) {
-        return iconexpanded_;
-    }
-    return icon_;
+	if (expanded && !iconexpanded_.isNull()) {
+		return iconexpanded_;
+	}
+	return Node::icon();
+}
+
+QIcon FolderNode::iconExpanded(void) const
+{
+	return iconexpanded_;
 }
 
 QList<FileNode*> FolderNode::fileNodes(void) const
@@ -212,6 +227,10 @@ QList<FolderNode*> FolderNode::subFolderNodes(void) const
     return subFolderNodes_;
 }
 
+void FolderNode::setIconExpanded(const QIcon& icon)
+{
+	iconexpanded_ = icon;
+}
 
 void FolderNode::setDisplayName(const QString &name)
 {
@@ -225,35 +244,24 @@ void FolderNode::setDisplayName(const QString &name)
     emitNodeUpdated();
 }
 
-void FolderNode::setIcon(const QIcon& icon)
+FileNode* FolderNode::findFile(const QString& name)
 {
-    icon_ = icon;
-}
-
-void FolderNode::setIconExpanded(const QIcon& icon)
-{
-    iconexpanded_ = icon;
-}
-
-
-FileNode *FolderNode::findFile(const QString& name)
-{
-    foreach (FileNode *n, fileNodes()) {
-        if (n->name() == name) {
-            return n;
+    for (FileNode* pNode : fileNodes()) {
+        if (pNode->name() == name) {
+            return pNode;
         }
     }
-    return 0;
+    return nullptr;
 }
 
-FolderNode *FolderNode::findSubFolder(const QString& name)
+FolderNode* FolderNode::findSubFolder(const QString& name)
 {
-    foreach (FolderNode *n, subFolderNodes()) {
-        if (n->name() == name) {
-            return n;
+    for (FolderNode* pNode : subFolderNodes()) {
+        if (pNode->name() == name) {
+            return pNode;
         }
     }
-    return 0;
+    return nullptr;
 }
 
 bool FolderNode::hasUnLoadedChildren(void) const

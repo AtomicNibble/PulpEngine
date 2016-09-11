@@ -70,6 +70,7 @@ public:
     FolderNode *parentFolderNode(void) const; // parent folder or project
     QString name(void) const;                 // name
     int32_t line(void) const;
+	QIcon icon(void) const;
     virtual QString displayName(void) const;
     virtual QString tooltip(void) const;
     virtual bool isEnabled(void) const;
@@ -79,6 +80,7 @@ public:
     void setName(const QString& name);
     void setLine(int line);
     void setNameAndLine(const QString& name, int line);
+	void setIcon(const QIcon& icon);
     void emitNodeUpdated(void);
 
 protected:
@@ -96,7 +98,8 @@ private:
     ProjectNode *projectNode_;
     FolderNode *folderNode_;
     QString name_;
-    int line_;
+	mutable QIcon icon_;
+    int32_t line_;
 };
 
 
@@ -125,15 +128,15 @@ public:
     explicit FolderNode(const QString& name, NodeType nodeType = NodeType::FolderNodeType);
     virtual ~FolderNode();
 
-    QString displayName(void) const;
-    QIcon icon(bool expanded) const;
+    QString displayName(void) const override;
+	QIcon icon(bool expanded) const;
+	QIcon iconExpanded(void) const;
 
     QList<FileNode*> fileNodes(void) const;
     QList<FolderNode*> subFolderNodes(void) const;
 
+	void setIconExpanded(const QIcon& icon);
     void setDisplayName(const QString& name);
-    void setIcon(const QIcon& icon);
-    void setIconExpanded(const QIcon& icon);
 
     FileNode* findFile(const QString& path);
     FolderNode* findSubFolder(const QString& path);
@@ -155,8 +158,7 @@ private:
     // managed by ProjectNode
     friend class ProjectNode;
     QString displayName_;
-    mutable QIcon icon_;
-    mutable QIcon iconexpanded_;
+	mutable QIcon iconexpanded_;
 };
 
 
