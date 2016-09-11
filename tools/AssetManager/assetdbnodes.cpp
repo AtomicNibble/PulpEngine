@@ -268,7 +268,7 @@ bool FolderNode::loadChildren(void)
 }
 
 
-void FolderNode::addFileNodes(const QList<FileNod *>& files)
+void FolderNode::addFileNodes(const QList<FileNode*>& files)
 {
     Q_ASSERT(projectNode());
     ProjectNode* pProjectNode = projectNode();
