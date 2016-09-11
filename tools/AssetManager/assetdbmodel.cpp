@@ -583,6 +583,8 @@ void AssetDBModel::added(FolderNode* pFolderNode, const QList<Node*>& newNodeLis
 
 void AssetDBModel::removed(FolderNode* pParentNode, const QList<Node*>& newNodeList)
 {
+	X_UNUSED(pParentNode);
+	X_UNUSED(newNodeList);
 	BUG_ASSERT_NOT_IMPLEMENTED();
 }
 
@@ -596,6 +598,8 @@ void AssetDBModel::removeFromCache(QList<FolderNode*> list)
 
 void AssetDBModel::changedSortKey(FolderNode* pFolderNode, Node* pNode)
 {
+	X_UNUSED(pFolderNode);
+	X_UNUSED(pNode);
 	BUG_ASSERT_NOT_IMPLEMENTED();
 }
 

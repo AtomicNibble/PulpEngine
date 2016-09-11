@@ -237,26 +237,33 @@ Node *AssetExplorer::currentNode(void) const
     return currentNode_;
 }
 
-void AssetExplorer::setCurrentNode(Node* node)
+void AssetExplorer::setCurrentNode(Node* pNode)
 {
-    setCurrent(SessionManager::projectForNode(node), QString(), node);
+    setCurrent(SessionManager::projectForNode(pNode), QString(), pNode);
 }
 
 
-void AssetExplorer::setCurrent(Project *project, QString name, Node *node)
+void AssetExplorer::setCurrent(Project* pProject, QString name, Node* pNode)
 {
+	X_UNUSED(pProject);
+	X_UNUSED(name);
+	X_UNUSED(pNode);
+
     if (debug) {
         qDebug() << "ProjectExplorer - setting path to " << (name)
-                << " and project to " << (project ? project->displayName() : QLatin1String("0"));
+                << " and project to " << (pProject ? pProject->displayName() : QLatin1String("0"));
     }
 
 
 }
 
 
-void AssetExplorer::showContextMenu(QWidget *view, const QPoint &globalPos, Node *node)
+void AssetExplorer::showContextMenu(QWidget* pView, const QPoint &globalPos, Node* pNode)
 {
     qDebug() << "AssetExplorer::showContextMenu";
+	X_UNUSED(pView);
+	X_UNUSED(globalPos);
+	X_UNUSED(pNode);
 
 }
 
@@ -276,20 +283,21 @@ void AssetExplorer::updateContextMenuActions(void)
 
 
 
-void AssetExplorer::projectAdded(Project *pro)
+void AssetExplorer::projectAdded(Project* pPro)
 {
-    connect(pro, SIGNAL(buildConfigurationEnabledChanged()),
+    connect(pPro, SIGNAL(buildConfigurationEnabledChanged()),
             this, SLOT(updateActions()));
 }
 
-void AssetExplorer::projectRemoved(Project * pro)
+void AssetExplorer::projectRemoved(Project* pPro)
 {
-    disconnect(pro, SIGNAL(buildConfigurationEnabledChanged()),
+    disconnect(pPro, SIGNAL(buildConfigurationEnabledChanged()),
                this, SLOT(updateActions()));
 }
 
-void AssetExplorer::projectDisplayNameChanged(Project *pro)
+void AssetExplorer::projectDisplayNameChanged(Project* pPro)
 {
+	X_UNUSED(pPro);
     updateActions();
 }
 
