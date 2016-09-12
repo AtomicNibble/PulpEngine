@@ -267,7 +267,7 @@ bool AssetDB::AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts)
 			if (assetCounts[x])
 			{
 				AssetType::Enum type = static_cast<AssetType::Enum>(x);
-				for (size_t j = 0; j < assetCounts[x]; j++)
+				for (int32_t j = 0; j < assetCounts[x]; j++)
 				{
 					core::string name = randomAssetName(assetNameLenMin, assetNameLenMax);
 
