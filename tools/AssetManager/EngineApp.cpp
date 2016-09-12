@@ -81,6 +81,8 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 
 	pICore_->RegisterAssertHandler(this);
 
+	LinkModule(pICore_, "AssetManager");
+
 	// AssetDB
 	if (!pICore_->IntializeLoadedEngineModule("Engine_AssetDB", "Engine_AssetDB")) {
 		return false;
