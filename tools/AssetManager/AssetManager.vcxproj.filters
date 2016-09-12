@@ -188,6 +188,9 @@
     <ClCompile Include="Release\moc_assetdbexplorer.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="EngineApp.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assert_qt.h">
@@ -231,6 +234,9 @@
     </CustomBuild>
     <ClInclude Include="GeneratedFiles\ui_assetmanager.h">
       <Filter>Generated Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EngineApp.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
