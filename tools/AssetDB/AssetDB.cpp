@@ -55,6 +55,32 @@ namespace
 } // namespace
 
 
+AssetDB::AssetInfo::AssetInfo() :
+	id(-1),
+	parentId(-1)
+{
+
+}
+AssetDB::AssetInfo::AssetInfo(int32_t id, int32_t parentId, const char* pName) :
+	id(-1),
+	parentId(-1),
+	name(pName)
+{
+
+}
+
+AssetDB::AssetInfo::AssetInfo(int32_t id, int32_t parentId, const core::string& name_) :
+	id(-1),
+	parentId(-1),
+	name(name_)
+{
+
+}
+
+// -----------------------------------------------------
+
+
+
 const char* AssetDB::ASSET_DB_FOLDER = "asset_db";
 const char* AssetDB::DB_NAME = X_ENGINE_NAME"_asset.db";
 const char* AssetDB::RAW_FILES_FOLDER = "raw_files";
@@ -421,6 +447,91 @@ bool AssetDB::GetModInfo(ModId id, Mod& modOut)
 }
 
 
+bool AssetDB::GetAssetTypeCounts(ModId modId, AssetTypeCountsArr& countsOut)
+{
+	for (size_t i = 0; i<AssetType::ENUM_COUNT; i++) {
+		countsOut[i] = 0;
+	}
+
+	sql::SqlLiteQuery qry(db_, "SELECT type, COUNT(*) FROM file_ids WHERE mod_id = ? GROUP BY type");
+	qry.bind(1, modId);
+
+	auto it = qry.begin();
+	if (it == qry.end()) {
+		return false;
+	}
+
+	for (; it != qry.end(); ++it)
+	{
+		auto row = *it;
+
+		const int32_t type = row.get<int32_t>(0);
+		const int32_t count = row.get<int32_t>(1);
+
+		if (type >= AssetType::ENUM_COUNT) {
+			X_ERROR("", "Asset type out of range: %s", AssetType::ToString(type));
+			return false;
+		}
+
+		countsOut[type] = count;
+	}
+
+	return true;
+}
+
+bool AssetDB::GetAssetTypeCount(ModId modId, AssetType::Enum type, int32_t& countOut)
+{
+	countOut = -1; // meow
+
+	sql::SqlLiteTransaction trans(db_, true);
+	sql::SqlLiteQuery qry(db_, "SELECT COUNT(*) FROM file_ids WHERE mod_id = ? AND TYPE = ?");
+	qry.bind(1, modId);
+	qry.bind(2, type);
+
+	sql::SqlLiteQuery::iterator it = qry.begin();
+	if (it != qry.end())
+	{
+		const auto row = *it;
+		const int32_t count = row.get<int32_t>(0);
+
+		countOut = count;
+		return true;
+	}
+
+	X_ERROR("AssetDB", "Failed to get asset count for mod: %" PRIu32 " Asset type: %s", modId, AssetType::ToString(type));
+	return false;
+}
+
+
+bool AssetDB::GetAssetList(ModId modId, AssetType::Enum type, core::Array<AssetInfo>& assetsOut)
+{
+	int32_t count;
+	if (!GetAssetTypeCount(modId, type, count)) {
+		return false;
+	}
+
+	// how confident are we count always be correct..
+	// could resize if so.
+	assetsOut.reserve(count);
+
+	sql::SqlLiteQuery qry(db_, "SELECT file_id, name, parent_id FROM file_ids WHERE mod_id = ? AND type = ?");
+	qry.bind(1, modId);
+	qry.bind(2, type);
+
+	auto it = qry.begin();
+	for (; it != qry.end(); ++it)
+	{
+		auto row = *it;
+
+		const int32_t id = row.get<int32_t>(0);
+		const int32_t parentId = row.get<int32_t>(0);
+		const char* pName = row.get<const char*>(1);
+
+		assetsOut.emplace_back(id, parentId, pName);
+	}
+
+	return true;
+}
 
 bool AssetDB::IterateMods(core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> func)
 {

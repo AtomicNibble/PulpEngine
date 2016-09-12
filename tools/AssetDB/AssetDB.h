@@ -35,6 +35,17 @@ public:
 		core::Path<char> outDir;
 	};
 
+	struct AssetInfo
+	{
+		AssetInfo();
+		AssetInfo(int32_t id, int32_t parentId, const char* pName);
+		AssetInfo(int32_t id, int32_t parentId, const core::string& name);
+
+		int32_t id;
+		int32_t parentId;
+		core::string name;
+	};
+
 
 public:
 	typedef int32_t ModId;
@@ -51,7 +62,7 @@ public:
 		ERROR
 	);
 
-	typedef std::array<size_t, AssetType::ENUM_COUNT> AssetTypeCountsArr;
+	typedef std::array<int32_t, AssetType::ENUM_COUNT> AssetTypeCountsArr;
 
 public:
 	AssetDB();
@@ -75,6 +86,10 @@ public:
 	ModId GetcurrentModId(void) const;
 
 	bool GetModInfo(ModId id, Mod& modOut);
+
+	bool GetAssetTypeCounts(ModId modId, AssetTypeCountsArr& countsOut);
+	bool GetAssetTypeCount(ModId modId, AssetType::Enum type, int32_t& countOut);
+	bool GetAssetList(ModId modId, AssetType::Enum type, core::Array<AssetInfo>& assetsOut);
 
 public:
 	bool IterateMods(core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> func);
