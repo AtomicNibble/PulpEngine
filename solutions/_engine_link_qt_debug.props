@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_PropertySheetDisplayName>Engine Link QT Debug</_PropertySheetDisplayName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\tools\ModelLib;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+    </ClCompile>
+  <Link>
+    <AdditionalDependencies>$(QTDIR)\lib\qtmaind.lib; $(QTDIR)\lib\Qt5Widgetsd.lib; $(QTDIR)\lib\Qt5Sqld.lib; $(QTDIR)\lib\Qt5PlatformSupportd.lib; $(QTDIR)\lib\Qt5DBusd.lib; $(QTDIR)\lib\qtfreetyped.lib; $(QTDIR)\lib\Qt5Guid.lib; $(QTDIR)\lib\qtharfbuzzngd.lib; $(QTDIR)\lib\Qt5Cored.lib; $(QTDIR)\lib\qtpcred.lib; $(QTDIR)\plugins/platforms\qwindowsd.lib; $(QTDIR)\plugins/imageformats\qddsd.lib; $(QTDIR)\plugins/imageformats\qicnsd.lib; $(QTDIR)\plugins/imageformats\qicod.lib; $(QTDIR)\plugins/imageformats\qjp2d.lib; $(QTDIR)\plugins/imageformats\qmngd.lib; $(QTDIR)\plugins/imageformats\qtgad.lib; $(QTDIR)\plugins/imageformats\qtiffd.lib; $(QTDIR)\plugins/imageformats\qwbmpd.lib; $(QTDIR)\plugins/imageformats\qwebpd.lib; opengl32.lib; ws2_32.lib; imm32.lib; %(AdditionalDependencies)</AdditionalDependencies>
+  </Link>
+  </ItemDefinitionGroup>
+</Project>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <_PropertySheetDisplayName>Engine Link QT</_PropertySheetDisplayName>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\tools\ModelLib;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+    </ClCompile>
+  <Link>
+    <AdditionalDependencies>$(QTDIR)\lib\qtmain.lib;  $(QTDIR)\lib\Qt5Widgets.lib;  $(QTDIR)\lib\Qt5Sql.lib;  $(QTDIR)\plugins/platforms\qwindows.lib;  $(QTDIR)\lib\Qt5PlatformSupport.lib;  $(QTDIR)\lib\Qt5DBus.lib;  $(QTDIR)\lib\qtfreetype.lib;  $(QTDIR)\plugins/imageformats\qdds.lib;  $(QTDIR)\plugins/imageformats\qicns.lib;  $(QTDIR)\plugins/imageformats\qico.lib;  $(QTDIR)\plugins/imageformats\qjp2.lib;  $(QTDIR)\plugins/imageformats\qmng.lib;  $(QTDIR)\plugins/imageformats\qtga.lib;  $(QTDIR)\plugins/imageformats\qtiff.lib;  $(QTDIR)\plugins/imageformats\qwbmp.lib;  $(QTDIR)\plugins/imageformats\qwebp.lib;  $(QTDIR)\lib\Qt5Gui.lib;  $(QTDIR)\lib\qtharfbuzzng.lib;  $(QTDIR)\lib\Qt5Core.lib;  $(QTDIR)\lib\qtpcre.lib; opengl32.lib; ws2_32.lib; imm32.lib; %(AdditionalDependencies)</AdditionalDependencies>
+  </Link>
+  </ItemDefinitionGroup>
+</Project>

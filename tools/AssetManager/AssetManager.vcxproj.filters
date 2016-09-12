@@ -55,6 +55,11 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Generated Files\Super">
+      <UniqueIdentifier>{ce6357fb-1d9d-4e87-bae8-f3934414778c}</UniqueIdentifier>
+      <Extensions>cpp;moc</Extensions>
+      <SourceControlFiles>False</SourceControlFiles>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="assert_qt.cpp">
@@ -99,53 +104,11 @@
     <ClCompile Include="session.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Debug\moc_assetdbexplorer.cpp">
-      <Filter>Generated Files\Debug</Filter>
+    <ClCompile Include="GeneratedFiles\qrc_resources.cpp">
+      <Filter>Generated Files</Filter>
     </ClCompile>
-    <ClCompile Include="Release\moc_assetdbexplorer.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_assetdbmodel.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_assetdbmodel.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_assetdbnodes.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_assetdbnodes.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_assetdbwidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_assetdbwidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_assetmanager.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_assetmanager.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_modproject.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_modproject.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_modprojectnodes.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_modprojectnodes.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_project.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_project.cpp">
-      <Filter>Generated Files\Release</Filter>
+    <ClCompile Include="Super\moc_session.cpp">
+      <Filter>Generated Files\Super</Filter>
     </ClCompile>
     <ClCompile Include="Debug\moc_session.cpp">
       <Filter>Generated Files\Debug</Filter>
@@ -153,8 +116,77 @@
     <ClCompile Include="Release\moc_session.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\qrc_resources.cpp">
-      <Filter>Generated Files</Filter>
+    <ClCompile Include="Super\moc_project.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_project.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_project.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_modprojectnodes.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_modprojectnodes.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_modprojectnodes.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_modproject.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_modproject.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_modproject.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_assetmanager.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_assetmanager.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_assetmanager.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_assetdbwidget.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_assetdbwidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_assetdbwidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_assetdbnodes.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_assetdbnodes.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_assetdbnodes.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_assetdbmodel.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_assetdbmodel.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_assetdbmodel.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_assetdbexplorer.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_assetdbexplorer.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_assetdbexplorer.cpp">
+      <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
