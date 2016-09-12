@@ -24,6 +24,3 @@ private:
 	core::Module::Handle hSystemHandle_;
 	ICore* pICore_;
 };
-
-
-extern core::MemoryArenaBase* g_arena;

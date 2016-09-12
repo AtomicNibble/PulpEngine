@@ -18,13 +18,15 @@ HINSTANCE g_hInstance = 0;
 struct XRegFactoryNode* g_pHeadToRegFactories = 0;
 
 X_LINK_LIB("engine_Core")
-X_LINK_LIB("engine_AssetDb")
 X_LINK_LIB("engine_SqLite")
 
 X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_AssetDB@@0V12@A")
 X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_SqLite@@0V12@A")
 
 #endif // !X_LIB
+
+
+X_LINK_LIB("engine_AssetDb")
 
 
 typedef core::MemoryArena<

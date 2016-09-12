@@ -6,7 +6,11 @@
 #include <QTreeView>
 
 class QLineEdit;
-class AssetDb;
+
+X_NAMESPACE_DECLARE(assetDb,
+	class AssetDB;
+);
+
 
 namespace AssetExplorer
 {
@@ -38,8 +42,12 @@ class AssetDBModel;
 class AssetDbViewWidget : public QWidget
 {
     Q_OBJECT
+
 public:
-    explicit AssetDbViewWidget(AssetDb& db, QWidget* parent = 0);
+	typedef X_NAMESPACE(assetDb)::AssetDB AssetDB;
+
+public:
+    explicit AssetDbViewWidget(AssetDB& db, QWidget* parent = 0);
 
 signals:
 

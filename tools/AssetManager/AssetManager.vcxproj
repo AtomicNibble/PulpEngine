@@ -662,7 +662,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="assert_qt.cpp" />
-    <ClCompile Include="assetdb.cpp" />
     <ClCompile Include="assetdbexplorer.cpp" />
     <ClCompile Include="assetdbmodel.cpp" />
     <ClCompile Include="assetdbnodes.cpp" />
@@ -1151,7 +1150,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assert_qt.h" />
-    <ClInclude Include="assetdb.h" />
     <CustomBuild Include="assetdbexplorer.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
 if errorlevel 1 goto VCEnd

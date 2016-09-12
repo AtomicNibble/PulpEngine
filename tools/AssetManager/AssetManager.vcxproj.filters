@@ -75,9 +75,6 @@
     <ClCompile Include="assert_qt.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="assetdb.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="assetdbexplorer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -258,9 +255,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assert_qt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="assetdb.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <CustomBuild Include="assetdbexplorer.h">

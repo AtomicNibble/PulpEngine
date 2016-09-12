@@ -2,7 +2,6 @@
 #include "assert_qt.h"
 
 #include "assetdbnodes.h"
-#include "assetdb.h"
 
 #include <QSqlQueryModel>
 #include <QDebug>
@@ -138,7 +137,7 @@ bool isSorted(const QList<Node*> &nodes)
 
 
 
-AssetDBModel::AssetDBModel(SessionNode* rootNode, AssetDb& db, QObject* parent) :
+AssetDBModel::AssetDBModel(SessionNode* rootNode, AssetDB& db, QObject* parent) :
     QAbstractItemModel(parent),
     treeview_(nullptr),
     startupProject_(nullptr),

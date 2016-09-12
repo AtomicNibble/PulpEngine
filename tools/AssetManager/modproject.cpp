@@ -1,12 +1,10 @@
 #include "modproject.h"
 #include "modprojectnodes.h"
 
-#include "assetdb.h"
-
 
 // ----------------------------------
 
-ModProject::ModProject(AssetDb& db, const QString &name, int32_t id) :
+ModProject::ModProject(AssetDB& db, const QString &name, int32_t id) :
     Project(id),
     db_(db),
     name_(name),
@@ -26,19 +24,19 @@ ModProject::~ModProject()
 
 void ModProject::loadAssetTypeNodes(void)
 {
-    AssetDb::AssetTypeCountsArray counts;
-    db_.getAssetTypeCounts(modId_, counts);
+	X_NAMESPACE(assetDb)::AssetDB::AssetTypeCountsArr counts;
+    db_.GetAssetTypeCounts(modId_, counts);
 
     QList<AssetExplorer::FolderNode*> folders;
 
-    for(size_t i=0; i<AssetDb::AssetType::ENUM_COUNT; i++)
+    for(size_t i=0; i<AssetType::ENUM_COUNT; i++)
     {
         if(counts[i] > 0)
         {
             const auto& info = assetDisplayInfo_[i];
 
             ModVirtualFolderNode* pFolder = new ModVirtualFolderNode(info.pNickName, info.priority, info.pNickName,
-                static_cast<AssetDb::AssetType::Enum>(i), counts[i]);
+                static_cast<AssetType::Enum>(i), counts[i]);
 
             pFolder->setIcon(info.folderIcon);
             pFolder->setIconExpanded(info.folderIconExpanded);
@@ -66,9 +64,9 @@ AssetExplorer::ProjectNode* ModProject::rootProjectNode(void) const
 }
 
 
-bool ModProject::getAssetList(AssetType::Enum type, QList<AssetInfo>& assetsOut) const
+bool ModProject::getAssetList(AssetType::Enum type, core::Array<AssetInfo>& assetsOut) const
 {
-    return db_.getAssetList(modId_, type, assetsOut);
+    return db_.GetAssetList(modId_, type, assetsOut);
 }
 
 QIcon ModProject::getIconForAssetType(AssetType::Enum type)
@@ -82,7 +80,7 @@ void ModProject::initAssetTypeInfo(void)
     QIcon defaultFolderIconExpanded(":/assetDb/img/Folder.Open.png");
 	QIcon defaultIcon(":/assetDb/img/File_default.png");
 
-    for(size_t i=0; i<AssetDb::AssetType::ENUM_COUNT; i++) {
+    for(size_t i=0; i<AssetDB::AssetType::ENUM_COUNT; i++) {
         assetDisplayInfo_[i].pNickName = "<AssetNickName missing>";
         assetDisplayInfo_[i].priority = 0;
         assetDisplayInfo_[i].folderIcon = defaultFolderIcon;

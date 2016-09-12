@@ -8,10 +8,13 @@
 #include <array>
 
 #include "project.h"
-#include "assetdb.h"
+#include <../AssetDB/AssetDB.h>
 
 class ModProjectNode;
-class AssetDb;
+
+X_NAMESPACE_DECLARE(assetDb,
+class AssetDB;
+);
 
 class ModProject : public AssetExplorer::Project
 {
@@ -30,10 +33,11 @@ class ModProject : public AssetExplorer::Project
 
 public:
     typedef X_NAMESPACE(assetDb)::AssetType AssetType;
-    typedef AssetDb::AssetInfo AssetInfo;
+	typedef X_NAMESPACE(assetDb)::AssetDB::AssetInfo AssetInfo;
+	typedef X_NAMESPACE(assetDb)::AssetDB AssetDB;
 
 public:
-    ModProject(AssetDb& db, const QString &name, int32_t id);
+    ModProject(AssetDB& db, const QString &name, int32_t id);
     ~ModProject() override;
 
     void loadAssetTypeNodes(void);
@@ -42,7 +46,7 @@ public:
     int32_t modId(void) const;
     AssetExplorer::ProjectNode* rootProjectNode(void) const override;
 
-    bool getAssetList(AssetType::Enum type, QList<AssetInfo>& assetsOut) const;
+    bool getAssetList(AssetType::Enum type, core::Array<AssetInfo>& assetsOut) const;
 
 	QIcon getIconForAssetType(AssetType::Enum type);
 
@@ -50,7 +54,7 @@ private:
     void initAssetTypeInfo(void);
 
 private:
-    AssetDb& db_;
+	AssetDB& db_;
     QString name_;
     int32_t modId_;
     ModProjectNode* rootNode_;

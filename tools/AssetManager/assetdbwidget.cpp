@@ -87,7 +87,7 @@ void AssetDbTreeView::resizeEvent(QResizeEvent *event)
 
 
 
-AssetDbViewWidget::AssetDbViewWidget(AssetDb& db, QWidget *parent) :
+AssetDbViewWidget::AssetDbViewWidget(AssetDB& db, QWidget *parent) :
     QWidget(parent),
     explorer_(AssetExplorer::instance()),
     model_(nullptr),

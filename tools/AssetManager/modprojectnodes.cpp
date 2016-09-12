@@ -80,7 +80,12 @@ bool ModVirtualFolderNode::loadChildren(void)
 	//  QList<AssetExplorer::FolderNode*> folders;
 
       QList<ModProject::AssetInfo> assetsOut;
-      pProject->getAssetList(assetType_, assetsOut);
+	  {
+		  core::Array<ModProject::AssetInfo> assetsOutTmp(g_arena);
+		  pProject->getAssetList(assetType_, assetsOutTmp);
+
+
+	  }
 	  
 	  // we need to break this down into files and folders.
 	  // we do it based on slashes :D
@@ -94,12 +99,13 @@ bool ModVirtualFolderNode::loadChildren(void)
       {
           // for now just add file nodes.
 		  const auto& name =  asset.name;
+		  const QString qName = QString::fromUtf8(name.c_str());
 
-		  if (name.contains(slash, Qt::CaseSensitive))
+		  if (name.find(X_NAMESPACE(assetDb)::ASSET_NAME_SLASH))
 		  {
 #if 1
 			  // make it a folder.
-			 auto parts = name.split(slash);
+			 auto parts = qName.split(slash);
 			 QStringListIterator it(parts);
 
 			 AssetExplorer::FolderNode* pCurrentNode = this;
@@ -149,7 +155,7 @@ bool ModVirtualFolderNode::loadChildren(void)
 		  }
 		  else
 		  {
-			  auto pFile = new AssetExplorer::FileNode(asset.name, AssetExplorer::FileType::SourceType);
+			  auto pFile = new AssetExplorer::FileNode(qName, AssetExplorer::FileType::SourceType);
 			  pFile->setIcon(pProject->getIconForAssetType(assetType_));
 
 			  files.append(pFile);

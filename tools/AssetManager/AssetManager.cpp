@@ -3,7 +3,7 @@
 
 #include "assetdbexplorer.h"
 #include "assetdbnodes.h"
-#include "assetdb.h"
+#include <../AssetDB/AssetDB.h>
 
 #include "session.h"
 #include "project.h"
@@ -14,6 +14,8 @@
 #include <QGridLayout>
 
 
+X_USING_NAMESPACE;
+
 AssetManager::AssetManager(QWidget *parent) :
     QMainWindow(parent),
     layout_(nullptr),
@@ -21,8 +23,8 @@ AssetManager::AssetManager(QWidget *parent) :
     assetViewWidget_(nullptr),
     assetDbexplorer_(nullptr)
 {
-    db_ = new AssetDb();
-    db_->OpenDB("C:\\Users\\WinCat\\Documents\\code\\WinCat\\engine\\potatoengine\\game_folder\\asset_db\\potato_asset.db");
+    db_ = new X_NAMESPACE(assetDb)::AssetDB();
+    db_->OpenDB();
 
     QString errorMessage;
     assetDbexplorer_ = new AssetExplorer::AssetExplorer();
@@ -31,15 +33,13 @@ AssetManager::AssetManager(QWidget *parent) :
     if (!errorMessage.isEmpty()) {
         QMessageBox::critical(this, tr("Error"), errorMessage);
     }
-
-    db_->IterateMods([&](AssetDb::ModId id, const QString& name, QDir& outDir)-> bool {
-            Q_UNUSED(outDir);
-            ModProject* pMod = new ModProject(*db_, name, id);
-            pMod->loadAssetTypeNodes();
-            AssetExplorer::SessionManager::addProject(pMod);
-            return true;
-        }
-    );
+	
+	{
+		core::Delegate<bool(assetDb::AssetDB::ModId id, const core::string& name, core::Path<char>& outDir)> func;
+		func.Bind<AssetManager, &AssetManager::addMod>(this);
+		db_->IterateMods(func);
+	}
+	
 
     layout_ = new QGridLayout();
     layout_->addWidget(new AssetExplorer::AssetDbViewWidget(*db_));
@@ -50,11 +50,21 @@ AssetManager::AssetManager(QWidget *parent) :
 
     setCentralWidget(window);
 	setMinimumSize(600, 800);
-
-
 }
 
 AssetManager::~AssetManager()
 {
 
+}
+
+
+bool AssetManager::addMod(AssetDB::ModId modId, const core::string& name, core::Path<char>& outDir)
+{
+	Q_UNUSED(outDir);
+
+	ModProject* pMod = new ModProject(*db_, QString::fromUtf8(name.c_str()), modId);
+	pMod->loadAssetTypeNodes();
+	AssetExplorer::SessionManager::addProject(pMod);
+
+	return true;
 }

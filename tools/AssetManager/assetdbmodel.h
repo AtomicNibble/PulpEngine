@@ -10,7 +10,12 @@
 
 class QTreeView;
 
-class AssetDb;
+
+X_NAMESPACE_DECLARE(assetDb,
+	class AssetDB;
+);
+
+
 
 namespace AssetExplorer
 {
@@ -27,7 +32,10 @@ class AssetDBModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-    AssetDBModel(SessionNode *rootNode, AssetDb& db, QObject *parent = nullptr);
+	typedef X_NAMESPACE(assetDb)::AssetDB AssetDB;
+
+public:
+    AssetDBModel(SessionNode *rootNode, AssetDB& db, QObject *parent = nullptr);
     ~AssetDBModel();
 
     void setTreeView(QTreeView* pTree);
@@ -86,7 +94,7 @@ private:
 
    FolderNode* pParentFolderForChange_;
 
-   AssetDb& db_;
+   AssetDB& db_;
 };
 
 } // namespace AssetExplorer
