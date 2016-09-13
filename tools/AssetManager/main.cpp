@@ -1,10 +1,9 @@
 #include "assetmanager.h"
 #include <QApplication>
 #include <QFile>
-#include <QTextStream>
+#include <qstylefactory.h>
+
 #include "logging.h"
-
-
 #include "EngineApp.h"
 
 #define _LAUNCHER
@@ -49,6 +48,8 @@ int main(int argc, char *argv[])
     a.setApplicationVersion("0.0.0.1");
 	a.setOrganizationName("Tom Crowley");
 	a.setOrganizationDomain("Potato - Engine");
+	a.setWindowIcon(QIcon(":/misc/img/icon.png"));
+//	a.setStyle(QStyleFactory::create("Fusion"));
 
 #if 1
 	QFile f("style\\style.qss");

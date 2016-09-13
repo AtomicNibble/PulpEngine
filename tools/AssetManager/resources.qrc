@@ -22,4 +22,7 @@
         <file>img/branch-more.png</file>
         <file>img/branch-open.png</file>
     </qresource>
+    <qresource prefix="/misc">
+        <file>img/icon.png</file>
+    </qresource>
 </RCC>

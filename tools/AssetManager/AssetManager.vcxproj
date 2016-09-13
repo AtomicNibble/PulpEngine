@@ -1162,6 +1162,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assert_qt.h" />
+    <ClInclude Include="resource.h" />
     <CustomBuild Include="assetdbexplorer.h">
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">setlocal
 if errorlevel 1 goto VCEnd
@@ -2503,6 +2504,12 @@ echo #include "stdafx.h"&gt;&gt;stdafx.h.cpp</Command>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">true</ExcludedFromBuild>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="AssetManager.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="img\icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
