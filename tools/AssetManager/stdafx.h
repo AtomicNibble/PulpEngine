@@ -35,6 +35,20 @@ extern core::MemoryArenaBase* g_arena;
 #include <QHash>
 #include <QWidget>
 #include <QTreeView>
+#include <QDir>
+#include <QMap>
 
+
+#include <QMenu>
+#include <QAction>
+#include <QPoint>
+#include <QPointer>
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QMimeDatabase>
 
 #include <array>
+
+
+#include "logging.h"
+#include "assert_qt.h"

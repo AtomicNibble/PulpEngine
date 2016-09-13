@@ -2,21 +2,8 @@
 #include "session.h"
 
 #include "project.h"
+#include "assetdbnodes.h"
 
-
-#include <QApplication>
-#include <QMenu>
-#include <QAction>
-#include <QPoint>
-#include <QDebug>
-#include <QPointer>
-#include <QFileDialog>
-#include <QMessageBox>
-#include <QMimeDatabase>
-
-namespace {
-bool debug = false;
-}
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -48,19 +35,17 @@ bool AssetExplorer::init(QString* errorMessage)
     Q_UNUSED(errorMessage);
 
 
-    SessionManager *sessionManager = new SessionManager(this);
+    SessionManager* pSessionManager = new SessionManager(this);
 
-    connect(sessionManager, SIGNAL(projectAdded(Project*)),
+    connect(pSessionManager, SIGNAL(projectAdded(Project*)),
             this, SIGNAL(fileListChanged()));
-    connect(sessionManager, SIGNAL(projectRemoved(Project*)),
+    connect(pSessionManager, SIGNAL(projectRemoved(Project*)),
             this, SIGNAL(fileListChanged()));
-    connect(sessionManager, SIGNAL(projectAdded(Project*)),
+    connect(pSessionManager, SIGNAL(projectAdded(Project*)),
             this, SLOT(projectAdded(Project*)));
-    connect(sessionManager, SIGNAL(projectRemoved(Project*)),
+    connect(pSessionManager, SIGNAL(projectRemoved(Project*)),
             this, SLOT(projectRemoved(Project*)));
-    connect(sessionManager, SIGNAL(startupProjectChanged(Project*)),
-            this, SLOT(startupProjectChanged()));
-    connect(sessionManager, SIGNAL(projectDisplayNameChanged(Project*)),
+    connect(pSessionManager, SIGNAL(projectDisplayNameChanged(Project*)),
             this, SLOT(projectDisplayNameChanged(Project*)));
 
 
@@ -246,30 +231,38 @@ void AssetExplorer::setCurrentNode(Node* pNode)
 }
 
 
-void AssetExplorer::setCurrent(Project* pProject, QString name, Node* pNode)
+void AssetExplorer::setCurrent(Project* pProject, const QString& name, Node* pNode)
 {
 	X_UNUSED(pProject);
 	X_UNUSED(name);
 	X_UNUSED(pNode);
 
-    if (debug) {
+    if (debugLogging) {
         qDebug() << "ProjectExplorer - setting path to " << (name)
                 << " and project to " << (pProject ? pProject->displayName() : QLatin1String("0"));
     }
 
 
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 
-void AssetExplorer::showContextMenu(QWidget* pView, const QPoint &globalPos, Node* pNode)
+void AssetExplorer::showContextMenu(QWidget* pView, const QPoint& globalPos, Node* pNode)
 {
     qDebug() << "AssetExplorer::showContextMenu";
 	X_UNUSED(pView);
 	X_UNUSED(globalPos);
 	X_UNUSED(pNode);
 
+
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
+
+void AssetExplorer::renameFile(Node* pNode, const QString& to)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+}
 
 void AssetExplorer::updateActions(void)
 {
@@ -281,7 +274,7 @@ void AssetExplorer::updateContextMenuActions(void)
 {
     qDebug() << "AssetExplorer::updateContextMenuActions";
 
-
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 
@@ -305,33 +298,6 @@ void AssetExplorer::projectDisplayNameChanged(Project* pPro)
 }
 
 
-void AssetExplorer::startupProjectChanged(void)
-{
-    static QPointer<Project> previousStartupProject = 0;
-    Project* pProject = SessionManager::startupProject();
-    if (pProject  == previousStartupProject) {
-        return;
-    }
-
-    if (previousStartupProject) {
-        disconnect(previousStartupProject, SIGNAL(activeTargetChanged(AssetExplorer::Target*)),
-                   this, SLOT(activeTargetChanged()));
-    }
-
-    previousStartupProject = pProject;
-
-
-    if (pProject ) {
-        connect(pProject, SIGNAL(activeTargetChanged(AssetExplorer::Target*)),
-                this, SLOT(activeTargetChanged()));
-    }
-
- //   activeTargetChanged();
-    updateActions();
-}
-
-
-
 void AssetExplorer::newProject(void)
 {
     qDebug() << "AssetExplorer::newProject";
@@ -353,6 +319,7 @@ void AssetExplorer::setStartupProject(Project* pProject)
     if (!pProject) {
         return;
     }
+
     SessionManager::setStartupProject(pProject);
     updateActions();
 }

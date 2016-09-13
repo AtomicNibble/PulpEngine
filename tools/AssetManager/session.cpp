@@ -4,18 +4,11 @@
 #include "project.h"
 #include "assetdbexplorer.h"
 
-#include <QStringList>
-#include <QDir>
-#include <QMap>
 
 X_NAMESPACE_BEGIN(assman)
 
 namespace AssetExplorer 
 {
-
-namespace {
-bool debug = false;
-}
 
 
 class SessionManagerPrivate
@@ -24,93 +17,95 @@ public:
     SessionManagerPrivate() :
         sessionName_(QLatin1String("default")),
         virginSession_(true),
-        startupProject_(nullptr)
-    {}
-
-    bool projectContainsFile(Project *p, const QString &fileName) const;
+		pSessionNode_(nullptr),
+		pStartupProject_(nullptr)
+    {
+	}
 
 public:
-    SessionNode *sessionNode_;
+    SessionNode* pSessionNode_;
     QString sessionName_;
     bool virginSession_;
 
     mutable QStringList sessions_;
 
-    Project *startupProject_;
-    QList<Project *> projects_;
+    Project* pStartupProject_;
+    QList<Project*> projects_;
 };
 
 
-static SessionManager *instance_ = 0;
-static SessionManagerPrivate *d = 0;
+static SessionManager* instance_ = 0;
+static SessionManagerPrivate* d = 0;
 
 
-SessionManager::SessionManager(QObject *parent)
-  : QObject(parent)
+SessionManager::SessionManager(QObject* pParent)
+  : QObject(pParent)
 {
     instance_ = this;
     d = new SessionManagerPrivate;
-    d->sessionNode_ = new SessionNode(this);
-
+    d->pSessionNode_ = new SessionNode(this);
 }
 
 
 SessionManager::~SessionManager()
 {
-    delete d;
+	delete d;
 }
 
-QObject *SessionManager::instance()
+QObject* SessionManager::instance(void)
 {
-   return instance_;
+	X_ASSERT_NOT_NULL(instance_);
+	return instance_;
 }
 
 
-bool SessionManager::isDefaultVirgin()
+bool SessionManager::isDefaultVirgin(void)
 {
     return isDefaultSession(d->sessionName_) && d->virginSession_;
 }
 
-bool SessionManager::isDefaultSession(const QString &session)
+bool SessionManager::isDefaultSession(const QString& session)
 {
     return session == QLatin1String("default");
 }
 
 
-void SessionManager::setStartupProject(Project *startupProject)
+void SessionManager::setStartupProject(Project* pStartupProject)
 {
-    qDebug() << Q_FUNC_INFO << (startupProject ? startupProject->displayName() : QLatin1String("0"));
+    qDebug() << Q_FUNC_INFO << (pStartupProject ? pStartupProject->displayName() : QLatin1String("0"));
 
-    if (startupProject) {
-        Q_ASSERT(d->projects_.contains(startupProject));
+    if (pStartupProject) {
+        X_ASSERT(d->projects_.contains(pStartupProject), "Attempted to set startup project to a instance that is not in the projects list")();
     }
 
-    if (d->startupProject_ == startupProject) {
+    if (d->pStartupProject_ == pStartupProject) {
         return;
     }
 
-    d->startupProject_ = startupProject;
+    d->pStartupProject_ = pStartupProject;
 }
 
-Project *SessionManager::startupProject()
+Project* SessionManager::startupProject(void)
 {
-    return d->startupProject_;
+    return d->pStartupProject_;
 }
 
-void SessionManager::addProject(Project *project)
+void SessionManager::addProject(Project* pProject)
 {
-    addProjects(QList<Project*>() << project);
+    addProjects(QList<Project*>() << pProject);
 }
 
-void SessionManager::addProjects(const QList<Project*> &projects)
+void SessionManager::addProjects(const QList<Project*>& projects)
 {
     d->virginSession_ = false;
     QList<Project*> clearedList;
-	for (Project* pPro : projects) {
-        if (!d->projects_.contains(pPro)) {
+	for (Project* pPro : projects) 
+	{
+        if (!d->projects_.contains(pPro)) 
+		{
             clearedList.append(pPro);
             d->projects_.append(pPro);
-            d->sessionNode_->addProjectNodes(QList<ProjectNode*>() << pPro->rootProjectNode());
+            d->pSessionNode_->addProjectNodes(QList<ProjectNode*>() << pPro->rootProjectNode());
 
             connect(pPro, SIGNAL(displayNameChanged()),
                     instance_, SLOT(projectDisplayNameChanged()));
@@ -120,56 +115,52 @@ void SessionManager::addProjects(const QList<Project*> &projects)
     }
 }
 
-void SessionManager::removeProject(Project *project)
+void SessionManager::removeProject(Project* pProject)
 {
     d->virginSession_ = false;
-    if (project == 0) {
+    if (pProject == nullptr) {
         qDebug() << "SessionManager::removeProject(0)";
         return;
     }
-    removeProjects(QList<Project*>() << project);
+    removeProjects(QList<Project*>() << pProject);
 }
 
 
-void SessionManager::removeProjects(QList<Project *> remove)
+void SessionManager::removeProjects(QList<Project*> remove)
 {
-
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
-const QList<Project *> &SessionManager::projects()
+const QList<Project *> &SessionManager::projects(void)
 {
     return d->projects_;
 }
 
-bool SessionManager::hasProjects()
+bool SessionManager::hasProjects(void)
 {
     return !d->projects_.isEmpty();
 }
 
-
-QString SessionManager::activeSession()
+QString SessionManager::activeSession(void)
 {
     return d->sessionName_;
 }
 
-QStringList SessionManager::sessions()
+QStringList SessionManager::sessions(void)
 {
     return d->sessions_;
 }
 
-
-QString SessionManager::lastSession()
+QString SessionManager::lastSession(void)
 {
     return "game"; // ICore::settings()->value(QLatin1String("ProjectExplorer/StartupSession")).toString();
 }
 
 
-SessionNode *SessionManager::sessionNode()
+SessionNode* SessionManager::sessionNode(void)
 {
-    return d->sessionNode_;
+    return d->pSessionNode_;
 }
-
-
 
 void SessionManager::projectDisplayNameChanged()
 {
@@ -178,30 +169,30 @@ void SessionManager::projectDisplayNameChanged()
 
         QList<ProjectNode*> nodes;
         nodes << pPro->rootProjectNode();
-        d->sessionNode_->removeProjectNodes(nodes);
-        d->sessionNode_->addProjectNodes(nodes);
+        d->pSessionNode_->removeProjectNodes(nodes);
+        d->pSessionNode_->addProjectNodes(nodes);
 
         emit instance_->projectDisplayNameChanged(pPro);
     }
 }
 
 
-Project *SessionManager::projectForNode(Node *node)
+Project* SessionManager::projectForNode(Node* pNode)
 {
-    if (!node) {
+    if (!pNode) {
         return nullptr;
     }
 
-    FolderNode* pRootProjectNode = qobject_cast<FolderNode*>(node);
+    FolderNode* pRootProjectNode = qobject_cast<FolderNode*>(pNode);
     if (!pRootProjectNode) {
-		pRootProjectNode = node->parentFolderNode();
+		pRootProjectNode = pNode->parentFolderNode();
     }
 
-    while (pRootProjectNode && pRootProjectNode->parentFolderNode() != d->sessionNode_) {
+    while (pRootProjectNode && pRootProjectNode->parentFolderNode() != d->pSessionNode_) {
 		pRootProjectNode = pRootProjectNode->parentFolderNode();
     }
 
-    Q_ASSERT(pRootProjectNode);
+	X_ASSERT_NOT_NULL(pRootProjectNode);
 
     for (Project* pProject : d->projects_) {
         if (pProject->rootProjectNode() == pRootProjectNode) {

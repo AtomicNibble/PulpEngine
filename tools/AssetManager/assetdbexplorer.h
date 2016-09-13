@@ -29,19 +29,19 @@ public:
     bool init(QString* errorMessage);
 
     static Project* currentProject(void);
-    Node *currentNode(void) const;
+    Node* currentNode(void) const;
     void setCurrentNode(Node* node);
 
-    void renameFile(Node* pNode, const QString &to);
+    void showContextMenu(QWidget* view, const QPoint& globalPos, Node* pNode);
 
-    void showContextMenu(QWidget* view, const QPoint &globalPos, Node* pNode);
+	void renameFile(Node* pNode, const QString& to);
 
 signals:
 
     void aboutToShowContextMenu(Project* pProject, Node* pNode);
 
     // Is emitted when a project has been added/removed,
-    // or the file list of a specific project has changed.
+    // or the file list of a specific project has changed.	
     void fileListChanged(void);
 
     void currentProjectChanged(Project* pProject);
@@ -59,16 +59,12 @@ private slots:
     void projectAdded(Project* pProject);
     void projectRemoved(Project* pProject);
     void projectDisplayNameChanged(Project* pProject);
-    void startupProjectChanged(void); // Calls updateRunAction
 
     void updateActions(void);
 
 private:
-    void setCurrent(Project* pProject, QString filePath, Node* pNode);
-
+    void setCurrent(Project* pProject, const QString& filePath, Node* pNode);
     void updateContextMenuActions(void);
-
-    void addToRecentProjects(const QString& fileName, const QString& displayName);
 
 private:
     QMenu* projectMenu_;

@@ -20,46 +20,45 @@ class SessionManager : public QObject
 {
     Q_OBJECT
 public:
-    explicit SessionManager(QObject *parent = 0);
+    explicit SessionManager(QObject* pParent = nullptr);
     ~SessionManager();
 
-    static QObject *instance();
+    static QObject* instance(void);
 
     // higher level session management
-    static QString activeSession();
-    static QString lastSession();
-    static QStringList sessions();
+    static QString activeSession(void);
+    static QString lastSession(void);
+    static QStringList sessions(void);
 
     // Projects are mostlys Mod's but they are named projects as I might add use thm for others things than mods.
-    static void addProject(Project *project);
-    static void addProjects(const QList<Project*> &projects);
-    static void removeProject(Project *project);
-    static void removeProjects(QList<Project *> remove);
+    static void addProject(Project* pProject);
+    static void addProjects(const QList<Project*>& projects);
+    static void removeProject(Project* pProject);
+    static void removeProjects(QList<Project*> remove);
 
-    static void setStartupProject(Project *startupProject);
+    static void setStartupProject(Project* pStartupProject);
 
-    static SessionNode *sessionNode();
-    static Project *startupProject();
+    static SessionNode* sessionNode(void);
+    static Project* startupProject(void);
 
-    static const QList<Project *> &projects();
-    static bool hasProjects();
+    static const QList<Project*>& projects(void);
+    static bool hasProjects(void);
 
-    static bool isDefaultVirgin();
-    static bool isDefaultSession(const QString &session);
+    static bool isDefaultVirgin(void);
+    static bool isDefaultSession(const QString& session);
 
-    static Project *projectForNode(Node *node);
+    static Project* projectForNode(Node* pNode);
 
 signals:
-    void projectAdded(Project *project);
-    void singleProjectAdded(Project *project);
-    void aboutToRemoveProject(Project *project);
-    void projectDisplayNameChanged(Project *project);
-    void projectRemoved(Project *project);
-    void startupProjectChanged(Project* project);
-
+    void projectAdded(Project* pProject);
+    void singleProjectAdded(Project* pProject);
+    void aboutToRemoveProject(Project* pProject);
+    void projectDisplayNameChanged(Project* pProject);
+    void projectRemoved(Project* pProject);
+    void startupProjectChanged(Project* pProject);
 
 private slots:
-    static void projectDisplayNameChanged();
+    static void projectDisplayNameChanged(void);
 };
 
 } // namespace AssetExplorer

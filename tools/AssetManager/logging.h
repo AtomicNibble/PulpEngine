@@ -7,4 +7,6 @@
 Q_DECLARE_LOGGING_CATEGORY(logCatAssetDb)
 Q_DECLARE_LOGGING_CATEGORY(logCatAssetDbView)
 
+extern bool debugLogging;
+
 #endif // LOGGING_H
