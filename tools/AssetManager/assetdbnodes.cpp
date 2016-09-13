@@ -17,8 +17,8 @@ Node::Node(NodeType nodeType,
            const QString &name, int32_t line) :
     QObject(),
     nodeType_(nodeType),
-    projectNode_(0),
-    folderNode_(0),
+    pProjectNode_(0),
+	pFolderNode_(0),
     name_(name),
     line_(line)
 {
@@ -27,8 +27,8 @@ Node::Node(NodeType nodeType,
 
 void Node::emitNodeSortKeyAboutToChange(void)
 {
-    if (ProjectNode *project = projectNode()) {
-        foreach (NodesWatcher* pWatcher, project->watchers()) {
+    if (ProjectNode* pProject = projectNode()) {
+        foreach (NodesWatcher* pWatcher, pProject->watchers()) {
             emit pWatcher->nodeSortKeyAboutToChange(this);
         }
     }
@@ -36,8 +36,8 @@ void Node::emitNodeSortKeyAboutToChange(void)
 
 void Node::emitNodeSortKeyChanged(void)
 {
-    if (ProjectNode *project = projectNode()) {
-        foreach (NodesWatcher* pWatcher, project->watchers()) {
+    if (ProjectNode* pProject = projectNode()) {
+        foreach (NodesWatcher* pWatcher, pProject->watchers()) {
             emit pWatcher->nodeSortKeyChanged();
         }
     }
@@ -97,12 +97,12 @@ NodeType Node::nodeType(void) const
   */
 ProjectNode* Node::projectNode(void) const
 {
-    return projectNode_;
+    return pProjectNode_;
 }
 
 FolderNode* Node::parentFolderNode(void) const
 {
-    return folderNode_;
+    return pFolderNode_;
 }
 
 QString Node::name(void) const
@@ -149,7 +149,7 @@ void Node::setNodeType(NodeType type)
 
 void Node::setProjectNode(ProjectNode* project)
 {
-    projectNode_ = project;
+    pProjectNode_ = project;
 }
 
 void Node::setIcon(const QIcon& icon)
@@ -170,14 +170,14 @@ void Node::emitNodeUpdated(void)
 
 void Node::setParentFolderNode(FolderNode* parentFolder)
 {
-    folderNode_ = parentFolder;
+    pFolderNode_ = parentFolder;
 }
 
 
 
 FileNode::FileNode(const QString& name,
                    const FileType fileType,
-                   int line) :
+                   int32_t line) :
     Node(NodeType::FileNodeType, name, line),
     fileType_(fileType)
 {
@@ -447,7 +447,7 @@ void FolderNode::removeFolderNodes(const QList<FolderNode*>& subFolders)
 }
 
 
-VirtualFolderNode::VirtualFolderNode(const QString& name, int priority)
+VirtualFolderNode::VirtualFolderNode(const QString& name, int32_t priority)
     : FolderNode(name, NodeType::VirtualFolderNodeType),
       priority_(priority)
 {
@@ -606,6 +606,13 @@ void ProjectNode::watcherDestroyed(QObject* pWatcher)
     unregisterWatcher(static_cast<NodesWatcher*>(pWatcher));
 }
 
+bool ProjectNode::isEnabled(void) const
+{
+	return true;
+}
+
+
+// ----------------------------------------------------------------------
 
 SessionNode::SessionNode(QObject *parentObject)
     : FolderNode(QLatin1String("session"), NodeType::SessionNodeType)

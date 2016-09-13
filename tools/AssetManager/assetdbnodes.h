@@ -65,8 +65,8 @@ class Node : public QObject
     Q_OBJECT
 public:
     NodeType nodeType(void) const;
-    ProjectNode *projectNode(void) const;     // managing project
-    FolderNode *parentFolderNode(void) const; // parent folder or project
+    ProjectNode* projectNode(void) const;     // managing project
+    FolderNode* parentFolderNode(void) const; // parent folder or project
     QString name(void) const;                 // name
     int32_t line(void) const;
 	QIcon icon(void) const;
@@ -77,25 +77,25 @@ public:
     virtual QList<ProjectAction> supportedActions(Node *node) const;
 
     void setName(const QString& name);
-    void setLine(int line);
-    void setNameAndLine(const QString& name, int line);
+    void setLine(int32_t line);
+    void setNameAndLine(const QString& name, int32_t line);
 	void setIcon(const QIcon& icon);
     void emitNodeUpdated(void);
 
 protected:
-    Node(NodeType nodeType, const QString& name, int line = -1);
+    Node(NodeType nodeType, const QString& name, int32_t line = -1);
 
     void setNodeType(NodeType type);
-    void setProjectNode(ProjectNode *project);
-    void setParentFolderNode(FolderNode *parentFolder);
+    void setProjectNode(ProjectNode* pProject);
+    void setParentFolderNode(FolderNode* pParentFolder);
 
     void emitNodeSortKeyAboutToChange(void);
     void emitNodeSortKeyChanged(void);
 
 private:
     NodeType nodeType_;
-    ProjectNode *projectNode_;
-    FolderNode *folderNode_;
+    ProjectNode* pProjectNode_;
+    FolderNode* pFolderNode_;
     QString name_;
 	mutable QIcon icon_;
     int32_t line_;
@@ -107,7 +107,7 @@ class FileNode : public Node
 {
     Q_OBJECT
 public:
-    FileNode(const QString& name, const FileType fileType, int line = -1);
+    FileNode(const QString& name, const FileType fileType, int32_t line = -1);
 
     FileType fileType(void) const;
 
@@ -165,12 +165,12 @@ class VirtualFolderNode : public FolderNode
 {
     Q_OBJECT
 public:
-    explicit VirtualFolderNode(const QString& name, int priority);
+    explicit VirtualFolderNode(const QString& name, int32_t priority);
     virtual ~VirtualFolderNode(void);
 
-    int priority(void) const;
+	int32_t priority(void) const;
 private:
-    int priority_;
+	int32_t priority_;
 };
 
 
@@ -187,16 +187,16 @@ public:
     // determines if the project will be shown in the flat view
     // TODO find a better name
 
-    virtual bool canAddSubProject(const QString& proFilePath) const = 0;
-    virtual bool addSubProjects(const QStringList& proFilePaths) = 0;
-    virtual bool removeSubProjects(const QStringList& proFilePaths) = 0;
+    virtual bool canAddSubProject(const QString& proFilePath) const X_ABSTRACT;
+    virtual bool addSubProjects(const QStringList& proFilePaths) X_ABSTRACT;
+    virtual bool removeSubProjects(const QStringList& proFilePaths) X_ABSTRACT;
 
 
     QList<NodesWatcher*> watchers(void) const;
     void registerWatcher(NodesWatcher* pWatcher);
     void unregisterWatcher(NodesWatcher* pWatcher);
 
-    bool isEnabled(void) const { return true; }
+	bool isEnabled(void) const X_OVERRIDE;
 
     // to be called in implementation of
     // the corresponding public functions
