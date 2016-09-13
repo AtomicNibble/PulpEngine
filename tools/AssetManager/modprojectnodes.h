@@ -10,41 +10,39 @@ class ModProject;
 
 class ModProjectNode : public AssetExplorer::ProjectNode
 {
-    Q_OBJECT
+	Q_OBJECT
 
 public:
-    ModProjectNode(ModProject* pProject);
+	ModProjectNode(ModProject* pProject);
 
-    virtual bool canAddSubProject(const QString &proFilePath) const override;
-    virtual bool addSubProjects(const QStringList &proFilePaths) override;
-    virtual bool removeSubProjects(const QStringList &proFilePaths) override;
+	bool canAddSubProject(const QString &proFilePath) const X_OVERRIDE;
+	bool addSubProjects(const QStringList &proFilePaths) X_OVERRIDE;
+	bool removeSubProjects(const QStringList &proFilePaths) X_OVERRIDE;
 
-
-    ModProject* getModProject(void);
-private:
+	ModProject* getModProject(void);
 
 private:
-    ModProject* pProject_;
+	ModProject* pProject_;
 };
 
 
 class ModVirtualFolderNode : public AssetExplorer::VirtualFolderNode
 {
-    typedef assetDb::AssetType AssetType;
+	typedef assetDb::AssetType AssetType;
 
 public:
-    explicit ModVirtualFolderNode(const QString &name, int priority, const QString& displayName,
-                                  AssetType::Enum assType, int32_t numAssets);
+	explicit ModVirtualFolderNode(const QString &name, int32_t priority, const QString& displayName,
+		AssetType::Enum assType, int32_t numAssets);
 
-    QString displayName() const override;
-    QString tooltip() const override;
-    bool hasUnLoadedChildren(void) const override;
-    bool loadChildren(void) override;
+	QString displayName(void) const X_OVERRIDE;
+	QString tooltip(void) const X_OVERRIDE;
+	bool hasUnLoadedChildren(void) const X_OVERRIDE;
+	bool loadChildren(void) X_OVERRIDE;
 
 private:
-    QString displayName_;
-    AssetType::Enum assetType_;
-    int32_t numAssets_;
+	QString displayName_;
+	AssetType::Enum assetType_;
+	int32_t numAssets_;
 };
 
 class ModFolderNode : public AssetExplorer::FolderNode
@@ -52,10 +50,7 @@ class ModFolderNode : public AssetExplorer::FolderNode
 	typedef assetDb::AssetType AssetType;
 
 public:
-	explicit ModFolderNode(const QString &name);
-
-//	QString tooltip() const override;
-
+	explicit ModFolderNode(const QString& name);
 
 private:
 };

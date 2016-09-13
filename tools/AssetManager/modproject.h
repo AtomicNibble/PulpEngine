@@ -8,7 +8,7 @@
 class ModProjectNode;
 
 X_NAMESPACE_DECLARE(assetDb,
-class AssetDB;
+	class AssetDB;
 );
 
 X_NAMESPACE_BEGIN(assman)
@@ -16,48 +16,48 @@ X_NAMESPACE_BEGIN(assman)
 
 class ModProject : public AssetExplorer::Project
 {
-    Q_OBJECT
+	Q_OBJECT
 
-    struct AssetTypeInfo
-    {
-        const char* pNickName;
-        int priority; // for sorting.
+		struct AssetTypeInfo
+	{
+		const char* pNickName;
+		int priority; // for sorting.
 		QIcon icon;
-        QIcon folderIcon;
-        QIcon folderIconExpanded;
-    };
+		QIcon folderIcon;
+		QIcon folderIconExpanded;
+	};
 
-    typedef std::array<AssetTypeInfo, assetDb::AssetType::ENUM_COUNT> AssetTypeInfoArr;
+	typedef std::array<AssetTypeInfo, assetDb::AssetType::ENUM_COUNT> AssetTypeInfoArr;
 
 public:
-    typedef assetDb::AssetType AssetType;
+	typedef assetDb::AssetType AssetType;
 	typedef assetDb::AssetDB::AssetInfo AssetInfo;
 	typedef assetDb::AssetDB AssetDB;
 
 public:
-    ModProject(AssetDB& db, const QString &name, int32_t id);
-    ~ModProject() override;
+	ModProject(AssetDB& db, const QString &name, int32_t id);
+	~ModProject() override;
 
-    void loadAssetTypeNodes(void);
+	void loadAssetTypeNodes(void);
 
-    QString displayName(void) const override;
-    int32_t modId(void) const;
-    AssetExplorer::ProjectNode* rootProjectNode(void) const override;
+	QString displayName(void) const override;
+	int32_t modId(void) const;
+	AssetExplorer::ProjectNode* rootProjectNode(void) const override;
 
-    bool getAssetList(AssetType::Enum type, core::Array<AssetInfo>& assetsOut) const;
+	bool getAssetList(AssetType::Enum type, core::Array<AssetInfo>& assetsOut) const;
 
 	QIcon getIconForAssetType(AssetType::Enum type);
 
 private:
-    void initAssetTypeInfo(void);
+	void initAssetTypeInfo(void);
 
 private:
 	AssetDB& db_;
-    QString name_;
-    int32_t modId_;
-    ModProjectNode* rootNode_;
+	QString name_;
+	int32_t modId_;
+	ModProjectNode* rootNode_;
 
-    AssetTypeInfoArr assetDisplayInfo_;
+	AssetTypeInfoArr assetDisplayInfo_;
 };
 
 X_NAMESPACE_END

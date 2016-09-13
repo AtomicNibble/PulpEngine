@@ -29,8 +29,8 @@ private:
     QGridLayout* pLayout_;
 
 	assetDb::AssetDB* pDb_;
-    AssetExplorer::AssetDbViewWidget* assetViewWidget_;
-    AssetExplorer::AssetExplorer* assetDbexplorer_;
+	AssetExplorer::AssetDbViewWidget* pAssetViewWidget_;
+    AssetExplorer::AssetExplorer* pAssetDbexplorer_;
 
 };
 

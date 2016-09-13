@@ -142,13 +142,13 @@ namespace
 
 AssetDBModel::AssetDBModel(SessionNode* pRootNode, AssetDB& db, QObject* pParent) :
     QAbstractItemModel(pParent),
-    treeview_(nullptr),
-    startupProject_(nullptr),
-    rootNode_(pRootNode),
+    pTreeview_(nullptr),
+    pStartupProject_(nullptr),
+    pRootNode_(pRootNode),
     db_(db)
 {
 	NodesWatcher* pWatcher = new NodesWatcher(this);
-	rootNode_->registerWatcher(pWatcher);
+	pRootNode_->registerWatcher(pWatcher);
 
 
 	connect(pWatcher, SIGNAL(foldersAboutToBeAdded(FolderNode*, QList<FolderNode*>)),
@@ -170,15 +170,15 @@ AssetDBModel::~AssetDBModel()
 
 void AssetDBModel::setTreeView(QTreeView* pTree)
 {
-    treeview_ = pTree;
+    pTreeview_ = pTree;
 }
 
 void AssetDBModel::setStartupProject(ProjectNode* pProjectNode)
 {
-    if (startupProject_ != pProjectNode) {
-        QModelIndex oldIndex = (startupProject_ ? indexForNode(startupProject_) : QModelIndex());
+    if (pStartupProject_ != pProjectNode) {
+        QModelIndex oldIndex = (pStartupProject_ ? indexForNode(pStartupProject_) : QModelIndex());
         QModelIndex newIndex = (pProjectNode ? indexForNode(pProjectNode) : QModelIndex());
-        startupProject_ = pProjectNode;
+        pStartupProject_ = pProjectNode;
         if (oldIndex.isValid()) {
             emit dataChanged(oldIndex, oldIndex);
         }
@@ -201,7 +201,7 @@ QModelIndex AssetDBModel::index(int32_t row, int32_t column, const QModelIndex& 
     QModelIndex result;
 
     if (!parent.isValid() && row == 0 && column == 0) { // session
-        result = createIndex(0, 0, rootNode_);
+        result = createIndex(0, 0, pRootNode_);
     }
 	else if (parent.isValid() && column == 0)
     {
@@ -264,7 +264,6 @@ QVariant AssetDBModel::data(const QModelIndex& index, int32_t role) const
     QVariant result;
     if (Node* pNode = nodeForIndex(index))
     {
-       FolderNode* folderNode = qobject_cast<FolderNode*>(pNode);
         switch (role)
         {
             case Qt::DisplayRole:
@@ -283,13 +282,14 @@ QVariant AssetDBModel::data(const QModelIndex& index, int32_t role) const
                 break;
             }
             case Qt::DecorationRole: {
-                if (folderNode) {
+				FolderNode* pFolderNode = qobject_cast<FolderNode*>(pNode);
+                if (pFolderNode) {
                     bool expanded = false;
-                    if(treeview_) {
-                        expanded = treeview_->isExpanded(index);
+                    if(pTreeview_) {
+                        expanded = pTreeview_->isExpanded(index);
                     }
 
-                    result = folderNode->icon(expanded);
+                    result = pFolderNode->icon(expanded);
 				}
 				else {
 					result = pNode->icon();
@@ -298,7 +298,7 @@ QVariant AssetDBModel::data(const QModelIndex& index, int32_t role) const
             }
             case Qt::FontRole: {
                 QFont font;
-                if (pNode == startupProject_) {
+                if (pNode == pStartupProject_) {
                     font.setBold(true);
                 }
                 result = font;
@@ -319,7 +319,7 @@ Qt::ItemFlags AssetDBModel::flags(const QModelIndex& index) const
     Qt::ItemFlags f = Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     if (Node* pNode = nodeForIndex(index))
     {
-        if (pNode == rootNode_) {
+        if (pNode == pRootNode_) {
             return 0; // no flags for session node...
         }
 
@@ -457,8 +457,8 @@ QModelIndex AssetDBModel::indexForNode(const Node* node_)
         return QModelIndex();
     }
 
-    if (pNode == rootNode_) {
-        return createIndex(0, 0, rootNode_);
+    if (pNode == pRootNode_) {
+        return createIndex(0, 0, pRootNode_);
     }
 
     FolderNode* pParentNode = visibleFolderNode(pNode->parentFolderNode());

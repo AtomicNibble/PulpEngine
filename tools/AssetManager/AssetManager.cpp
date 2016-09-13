@@ -11,24 +11,25 @@ AssetManager::AssetManager(QWidget* pParent) :
 	QMainWindow(pParent),
 	pLayout_(nullptr),
 	pDb_(nullptr),
-	assetViewWidget_(nullptr),
-	assetDbexplorer_(nullptr)
+	pAssetDbexplorer_(nullptr)
 {
 	pDb_ = new assetDb::AssetDB();
 	if (!pDb_->OpenDB()) {
 		QMessageBox::critical(this, tr("Error"), "Failed to open AssetDB");
 	}
 
-	assetDbexplorer_ = new AssetExplorer::AssetExplorer(*pDb_);
-	if (!assetDbexplorer_->init()) {
+	pAssetDbexplorer_ = new AssetExplorer::AssetExplorer(*pDb_);
+	if (!pAssetDbexplorer_->init()) {
 		QMessageBox::critical(this, tr("Error"), "Failed to init AssetExpolrer");
 	}
+	pAssetDbexplorer_->loadMods();
 
-	assetDbexplorer_->loadMods();
+
+	pAssetViewWidget_ = new AssetExplorer::AssetDbViewWidget(*pDb_);
 
 
 	pLayout_ = new QGridLayout();
-	pLayout_->addWidget(new AssetExplorer::AssetDbViewWidget(*pDb_));
+	pLayout_->addWidget(pAssetViewWidget_);
 
 
 	QWidget* pWindow = new QWidget();
@@ -45,8 +46,8 @@ AssetManager::~AssetManager()
 		delete pDb_;
 	}
 
-	if (assetDbexplorer_) {
-		delete assetDbexplorer_;
+	if (pAssetDbexplorer_) {
+		delete pAssetDbexplorer_;
 	}
 }
 

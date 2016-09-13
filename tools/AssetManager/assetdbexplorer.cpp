@@ -328,6 +328,7 @@ void AssetExplorer::newProject(void)
 {
     qDebug() << "AssetExplorer::newProject";
 
+	X_ASSERT_NOT_IMPLEMENTED();
 
     updateActions();
 }

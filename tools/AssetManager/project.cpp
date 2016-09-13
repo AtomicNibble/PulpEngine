@@ -5,19 +5,19 @@
 X_NAMESPACE_BEGIN(assman)
 
 
-namespace AssetExplorer 
+namespace AssetExplorer
 {
 
-Project::Project(Id id) :
-    id_(id)
-{
+	Project::Project(Id id) :
+		id_(id)
+	{
 
-}
+	}
 
-Project::~Project()
-{
+	Project::~Project()
+	{
 
-}
+	}
 
 } // namespace AssetExplorer
 

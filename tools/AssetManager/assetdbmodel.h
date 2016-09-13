@@ -80,9 +80,9 @@ namespace AssetExplorer
 
 
 	private:
-		QTreeView* treeview_;
-		ProjectNode* startupProject_;
-		SessionNode* rootNode_;
+		QTreeView* pTreeview_;
+		ProjectNode* pStartupProject_;
+		SessionNode* pRootNode_;
 		mutable QHash<FolderNode*, QList<Node*> > childNodes_;
 
 		FolderNode* pParentFolderForChange_;

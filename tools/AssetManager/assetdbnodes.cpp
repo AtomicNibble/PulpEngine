@@ -173,7 +173,7 @@ void Node::setParentFolderNode(FolderNode* parentFolder)
     pFolderNode_ = parentFolder;
 }
 
-
+// ------------------------------------------------------------------
 
 FileNode::FileNode(const QString& name,
                    const FileType fileType,
@@ -446,6 +446,8 @@ void FolderNode::removeFolderNodes(const QList<FolderNode*>& subFolders)
     }
 }
 
+// ------------------------------------------------------------------
+
 
 VirtualFolderNode::VirtualFolderNode(const QString& name, int32_t priority)
     : FolderNode(name, NodeType::VirtualFolderNodeType),
@@ -457,10 +459,13 @@ VirtualFolderNode::~VirtualFolderNode(void)
 {
 }
 
-int VirtualFolderNode::priority(void) const
+int32_t VirtualFolderNode::priority(void) const
 {
     return priority_;
 }
+
+
+// ------------------------------------------------------------------
 
 
 ProjectNode::ProjectNode(const QString& projectFilePath)
@@ -614,15 +619,15 @@ bool ProjectNode::isEnabled(void) const
 
 // ----------------------------------------------------------------------
 
-SessionNode::SessionNode(QObject *parentObject)
+SessionNode::SessionNode(QObject* pParentObject)
     : FolderNode(QLatin1String("session"), NodeType::SessionNodeType)
 {
-    setParent(parentObject);
+    setParent(pParentObject);
 }
 
-QList<ProjectAction> SessionNode::supportedActions(Node *node) const
+QList<ProjectAction> SessionNode::supportedActions(Node* pNode) const
 {
-    Q_UNUSED(node)
+	X_UNUSED(pNode);
     return QList<ProjectAction>();
 }
 
@@ -661,7 +666,13 @@ void SessionNode::unregisterWatcher(NodesWatcher* pWatcher)
     }
 }
 
-QList<ProjectNode*> SessionNode::projectNodes() const
+bool SessionNode::isEnabled(void) const
+{
+	return true;
+}
+
+
+QList<ProjectNode*> SessionNode::projectNodes(void) const
 {
     return projectNodes_;
 }
@@ -707,8 +718,8 @@ void SessionNode::removeProjectNodes(const QList<ProjectNode*>& projectNodes)
     if (!projectNodes.isEmpty())
     {
         QList<FolderNode*> toRemove;
-        foreach (ProjectNode *projectNode, projectNodes) {
-            toRemove << projectNode;
+        foreach (ProjectNode* pProjectNode, projectNodes) {
+            toRemove << pProjectNode;
         }
 
         qSort(toRemove);
@@ -752,8 +763,8 @@ void SessionNode::watcherDestroyed(QObject* pWatcher)
 }
 
 
-NodesWatcher::NodesWatcher(QObject *parent)
-        : QObject(parent)
+NodesWatcher::NodesWatcher(QObject* pParent)
+        : QObject(pParent)
 {
 }
 

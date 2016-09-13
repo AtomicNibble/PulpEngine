@@ -7,32 +7,32 @@ X_NAMESPACE_BEGIN(assman)
 
 class ModProjectNode;
 
-namespace AssetExplorer 
+namespace AssetExplorer
 {
 
-class ProjectNode;
+	class ProjectNode;
 
-class Project : public QObject
-{
-    Q_OBJECT
-public:
-    typedef uint32_t Id;
+	class Project : public QObject
+	{
+		Q_OBJECT
+	public:
+		typedef uint32_t Id;
 
-public:
-    Project(Id id);
-    virtual ~Project();
+	public:
+		explicit Project(Id id);
+		virtual ~Project();
 
-    virtual QString displayName(void) const = 0;
-    Id id(void) const;
-    virtual ProjectNode* rootProjectNode() const = 0;
+		virtual QString displayName(void) const X_ABSTRACT;
+		Id id(void) const;
+		virtual ProjectNode* rootProjectNode(void) const X_ABSTRACT;
 
-signals:
-    void displayNameChanged();
-    void fileListChanged();
+	signals:
+		void displayNameChanged(void);
+		void fileListChanged(void);
 
-protected:
-    Id id_;
-};
+	protected:
+		Id id_;
+	};
 
 
 } // namespace AssetExplorer

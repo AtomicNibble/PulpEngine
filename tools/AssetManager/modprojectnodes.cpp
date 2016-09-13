@@ -44,7 +44,7 @@ ModProject* ModProjectNode::getModProject(void)
 // -------------------------------------------------------------------
 
 
-ModVirtualFolderNode::ModVirtualFolderNode(const QString &name, int priority, const QString& displayName,
+ModVirtualFolderNode::ModVirtualFolderNode(const QString &name, int32_t priority, const QString& displayName,
                               AssetType::Enum assType, int32_t numAssets) :
     VirtualFolderNode(name, priority),
     displayName_(displayName),
@@ -54,12 +54,12 @@ ModVirtualFolderNode::ModVirtualFolderNode(const QString &name, int priority, co
 
 }
 
-QString ModVirtualFolderNode::displayName() const
+QString ModVirtualFolderNode::displayName(void) const
 {
     return tooltip();
 }
 
-QString ModVirtualFolderNode::tooltip() const
+QString ModVirtualFolderNode::tooltip(void) const
 {
     return QString("%1 (%2)").arg(AssetType::ToString(assetType_), QString::number(numAssets_));
 }
