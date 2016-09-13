@@ -21,14 +21,14 @@ class AssetManager : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit AssetManager(QWidget *parent = 0);
+    explicit AssetManager(QWidget* pParent = nullptr);
     ~AssetManager();
 
 
 private:
-    QGridLayout* layout_;
+    QGridLayout* pLayout_;
 
-	assetDb::AssetDB* db_;
+	assetDb::AssetDB* pDb_;
     AssetExplorer::AssetDbViewWidget* assetViewWidget_;
     AssetExplorer::AssetExplorer* assetDbexplorer_;
 

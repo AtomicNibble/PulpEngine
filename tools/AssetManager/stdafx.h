@@ -39,6 +39,12 @@ extern core::MemoryArenaBase* g_arena;
 #include <QMap>
 
 
+#include <QtWidgets>
+#include <QColor.h>
+#include <QGridLayout>
+
+
+
 #include <QMenu>
 #include <QAction>
 #include <QPoint>
