@@ -86,5 +86,6 @@ int main(int argc, char *argv[])
 		}
 	}
 
+	g_arena = nullptr;
 	return res;
 }
