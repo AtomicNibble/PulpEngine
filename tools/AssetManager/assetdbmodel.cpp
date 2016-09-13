@@ -140,11 +140,11 @@ namespace
 
 
 
-AssetDBModel::AssetDBModel(SessionNode* rootNode, AssetDB& db, QObject* parent) :
-    QAbstractItemModel(parent),
+AssetDBModel::AssetDBModel(SessionNode* pRootNode, AssetDB& db, QObject* pParent) :
+    QAbstractItemModel(pParent),
     treeview_(nullptr),
     startupProject_(nullptr),
-    rootNode_(rootNode),
+    rootNode_(pRootNode),
     db_(db)
 {
 	NodesWatcher* pWatcher = new NodesWatcher(this);
@@ -188,7 +188,7 @@ void AssetDBModel::setStartupProject(ProjectNode* pProjectNode)
     }
 }
 
-void AssetDBModel::reset()
+void AssetDBModel::reset(void)
 {
     beginResetModel();
     childNodes_.clear();
@@ -196,7 +196,7 @@ void AssetDBModel::reset()
 }
 
 
-QModelIndex AssetDBModel::index(int row, int column, const QModelIndex &parent) const
+QModelIndex AssetDBModel::index(int32_t row, int32_t column, const QModelIndex& parent) const
 {
     QModelIndex result;
 
@@ -223,7 +223,7 @@ QModelIndex AssetDBModel::index(int row, int column, const QModelIndex &parent) 
     return result;
 }
 
-QModelIndex AssetDBModel::parent(const QModelIndex &idx) const
+QModelIndex AssetDBModel::parent(const QModelIndex& idx) const
 {
     QModelIndex parentIndex;
     if (Node* pNode = nodeForIndex(idx))
@@ -259,7 +259,7 @@ QModelIndex AssetDBModel::parent(const QModelIndex &idx) const
 
 
 
-QVariant AssetDBModel::data(const QModelIndex &index, int role) const
+QVariant AssetDBModel::data(const QModelIndex& index, int32_t role) const
 {
     QVariant result;
     if (Node* pNode = nodeForIndex(index))
@@ -334,7 +334,7 @@ Qt::ItemFlags AssetDBModel::flags(const QModelIndex& index) const
     return f;
 }
 
-bool AssetDBModel::setData(const QModelIndex& index, const QVariant& value, int role)
+bool AssetDBModel::setData(const QModelIndex& index, const QVariant& value, int32_t role)
 {
     Q_UNUSED(index);
     Q_UNUSED(value);
@@ -344,7 +344,7 @@ bool AssetDBModel::setData(const QModelIndex& index, const QVariant& value, int 
 
 int AssetDBModel::rowCount(const QModelIndex& parent) const
 {
-    int rows = 0;
+	int32_t rows = 0;
     if (!parent.isValid()) {
         rows = 1;
     }

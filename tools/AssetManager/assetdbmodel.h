@@ -28,12 +28,12 @@ namespace AssetExplorer
 		typedef assetDb::AssetDB AssetDB;
 
 	public:
-		AssetDBModel(SessionNode *rootNode, AssetDB& db, QObject *parent = nullptr);
+		AssetDBModel(SessionNode* pRootNode, AssetDB& db, QObject* pParent = nullptr);
 		~AssetDBModel();
 
 		void setTreeView(QTreeView* pTree);
 
-		void reset();
+		void reset(void);
 		void setStartupProject(ProjectNode *projectNode);
 
 
