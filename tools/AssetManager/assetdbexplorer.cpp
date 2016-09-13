@@ -2,7 +2,9 @@
 #include "session.h"
 
 #include "project.h"
+#include "modproject.h"
 #include "assetdbnodes.h"
+#include <../AssetDB/AssetDB.h>
 
 
 X_NAMESPACE_BEGIN(assman)
@@ -18,7 +20,8 @@ AssetExplorer *AssetExplorer::instance()
 }
 
 
-AssetExplorer::AssetExplorer()  :
+AssetExplorer::AssetExplorer(assetDb::AssetDB& db)  :
+	db_(db),
     currentProject_(nullptr),
     currentNode_(nullptr)
 {
@@ -30,10 +33,8 @@ AssetExplorer::~AssetExplorer()
 }
 
 
-bool AssetExplorer::init(QString* errorMessage)
+bool AssetExplorer::init(void)
 {
-    Q_UNUSED(errorMessage);
-
 
     SessionManager* pSessionManager = new SessionManager(this);
 
@@ -205,6 +206,28 @@ bool AssetExplorer::init(QString* errorMessage)
 }
 
 
+bool AssetExplorer::loadMods(void)
+{
+	core::Delegate<bool(assetDb::AssetDB::ModId id, const core::string& name, core::Path<char>& outDir)> func;
+	func.Bind<AssetExplorer, &AssetExplorer::addMod>(this);
+	if (!db_.IterateMods(func)) {
+		X_ERROR("AssetExplor", "Failed to iterate mods");
+		return false;
+	}
+
+	return true;
+}
+
+bool AssetExplorer::addMod(assetDb::AssetDB::ModId modId, const core::string& name, core::Path<char>& outDir)
+{
+	X_UNUSED(outDir);
+
+	ModProject* pMod = new ModProject(db_, QString::fromUtf8(name.c_str()), modId);
+	pMod->loadAssetTypeNodes();
+	SessionManager::addProject(pMod);
+
+	return true;
+}
 
 Project* AssetExplorer::currentProject(void)
 {
@@ -261,6 +284,9 @@ void AssetExplorer::showContextMenu(QWidget* pView, const QPoint& globalPos, Nod
 
 void AssetExplorer::renameFile(Node* pNode, const QString& to)
 {
+	X_UNUSED(pNode);
+	X_UNUSED(to);
+
 	X_ASSERT_NOT_IMPLEMENTED();
 }
 

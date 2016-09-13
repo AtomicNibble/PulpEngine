@@ -8,6 +8,10 @@ class QPoint;
 class QMenu;
 class QAction;
 
+X_NAMESPACE_DECLARE(assetDb,
+	class AssetDB;
+);
+
 X_NAMESPACE_BEGIN(assman)
 
 namespace AssetExplorer {
@@ -21,12 +25,14 @@ class AssetExplorer : public QObject
 {
     Q_OBJECT
 public:
-    AssetExplorer();
+    AssetExplorer(assetDb::AssetDB& db);
     ~AssetExplorer();
 
     static AssetExplorer* instance(void);
 
-    bool init(QString* errorMessage);
+    bool init(void);
+	bool loadMods(void);
+	bool addMod(int32_t modId, const core::string& name, core::Path<char>& outDir);
 
     static Project* currentProject(void);
     Node* currentNode(void) const;
@@ -46,10 +52,8 @@ signals:
 
     void currentProjectChanged(Project* pProject);
     void currentNodeChanged(Node* pNode, Project* pProject);
-
     void recentProjectsChanged(void);
 
-public slots:
 
 private slots:
     void setStartupProject(void);
@@ -82,6 +86,7 @@ private:
     QAction* unloadAction_;
 
 private:
+	assetDb::AssetDB& db_;
     Project* currentProject_;
     Node* currentNode_;
 

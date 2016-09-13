@@ -5,11 +5,9 @@
 
 class QGridLayout;
 
-
 X_NAMESPACE_DECLARE(assetDb,
 	class AssetDB;
 );
-
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -23,20 +21,14 @@ class AssetManager : public QMainWindow
     Q_OBJECT
 
 public:
-	typedef assetDb::AssetDB AssetDB;
-
-public:
     explicit AssetManager(QWidget *parent = 0);
     ~AssetManager();
-
-private:
-	bool addMod(int32_t modId, const core::string& name, core::Path<char>& outDir);
 
 
 private:
     QGridLayout* layout_;
 
-	AssetDB* db_;
+	assetDb::AssetDB* db_;
     AssetExplorer::AssetDbViewWidget* assetViewWidget_;
     AssetExplorer::AssetExplorer* assetDbexplorer_;
 
