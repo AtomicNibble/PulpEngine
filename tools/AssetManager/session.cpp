@@ -8,7 +8,10 @@
 #include <QDir>
 #include <QMap>
 
-namespace AssetExplorer {
+X_NAMESPACE_BEGIN(assman)
+
+namespace AssetExplorer 
+{
 
 namespace {
 bool debug = false;
@@ -212,3 +215,5 @@ Project *SessionManager::projectForNode(Node *node)
 
 
 } // namespace AssetExplorer
+
+X_NAMESPACE_END

@@ -5,9 +5,11 @@
 
 #include <QObject>
 
+X_NAMESPACE_BEGIN(assman)
 
 
-namespace AssetExplorer {
+namespace AssetExplorer
+{
 
 class Project;
 class Node;
@@ -61,5 +63,7 @@ private slots:
 };
 
 } // namespace AssetExplorer
+
+X_NAMESPACE_END
 
 #endif // SESSION_H

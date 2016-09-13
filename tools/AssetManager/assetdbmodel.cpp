@@ -9,129 +9,132 @@
 #include <QFileInfo>
 #include <QStringList>
 
+X_NAMESPACE_BEGIN(assman)
+
 namespace AssetExplorer
 {
 
-namespace {
-
-int caseFriendlyCompare(const QString &a, const QString &b)
+namespace
 {
-    int result = a.compare(b, Qt::CaseInsensitive);
-    if (result != 0) {
-        return result;
-    }
-    return a.compare(b, Qt::CaseSensitive);
-}
 
-bool sortNodes(Node *n1, Node *n2)
-{
-    // Ordering is: project files, project, folder, file
-
-    const NodeType n1Type = n1->nodeType();
-    const NodeType n2Type = n2->nodeType();
-
-    // project files
-    FileNode *file1 = qobject_cast<FileNode*>(n1);
-    FileNode *file2 = qobject_cast<FileNode*>(n2);
-    if (file1 && file1->fileType() == FileType::ProjectFileType) {
-        if (file2 && file2->fileType() == FileType::ProjectFileType) {
-            const QString fileName1 = file1->name();
-            const QString fileName2 = file2->name();
-
-            int result = caseFriendlyCompare(fileName1, fileName2);
-            if (result != 0)
-                return result < 0;
-            else
-                return file1 < file2;
-        } else {
-            return true; // project file is before everything else
-        }
-    } else {
-        if (file2 && file2->fileType() == FileType::ProjectFileType)
-            return false;
-    }
-
-    // projects
-    if (n1Type == NodeType::ProjectNodeType) {
-        if (n2Type == NodeType::ProjectNodeType) {
-            ProjectNode *project1 = static_cast<ProjectNode*>(n1);
-            ProjectNode *project2 = static_cast<ProjectNode*>(n2);
-
-            int result = caseFriendlyCompare(project1->displayName(), project2->displayName());
-            if (result != 0)
-                return result < 0;
-            else
-                return project1 < project2; // sort by pointer value
-        } else {
-           return true; // project is before folder & file
-       }
-    }
-    if (n2Type == NodeType::ProjectNodeType)
-        return false;
-
-    if (n1Type == NodeType::VirtualFolderNodeType) {
-        if (n2Type == NodeType::VirtualFolderNodeType) {
-            VirtualFolderNode *folder1 = static_cast<VirtualFolderNode *>(n1);
-            VirtualFolderNode *folder2 = static_cast<VirtualFolderNode *>(n2);
-
-            if (folder1->priority() > folder2->priority())
-                return true;
-            if (folder1->priority() < folder2->priority())
-                return false;
-            int result = caseFriendlyCompare(folder1->name(), folder2->name());
-            if (result != 0)
-                return result < 0;
-            else
-                return folder1 < folder2;
-        } else {
-            return true; // virtual folder is before folder
-        }
-    }
-
-    if (n2Type == NodeType::VirtualFolderNodeType)
-        return false;
-
-
-    if (n1Type == NodeType::FolderNodeType) {
-        if (n2Type == NodeType::FolderNodeType) {
-            FolderNode *folder1 = static_cast<FolderNode*>(n1);
-            FolderNode *folder2 = static_cast<FolderNode*>(n2);
-
-            int result = caseFriendlyCompare(folder1->name(), folder2->name());
-            if (result != 0)
-                return result < 0;
-            else
-                return folder1 < folder2;
-        } else {
-            return true; // folder is before file
-        }
-    }
-    if (n2Type == NodeType::FolderNodeType)
-        return false;
-
-    // must be file nodes
-    {
-        const QString fileName1 = n1->name();
-        const QString fileName2 = n2->name();
-
-        int result = caseFriendlyCompare(fileName1, fileName2);
-
-        return result < 0; // sort by filename
-    }
-    return false;
-}
-
-
-bool isSorted(const QList<Node*> &nodes)
-{
-	const int32_t size = nodes.size();
-	for (int32_t i = 0; i < size - 1; ++i) {
-		if (!sortNodes(nodes.at(i), nodes.at(i + 1))) {
-			return false;
+	int caseFriendlyCompare(const QString &a, const QString &b)
+	{
+		int result = a.compare(b, Qt::CaseInsensitive);
+		if (result != 0) {
+			return result;
 		}
+		return a.compare(b, Qt::CaseSensitive);
 	}
-	return true;
-}
+
+	bool sortNodes(Node *n1, Node *n2)
+	{
+		// Ordering is: project files, project, folder, file
+
+		const NodeType n1Type = n1->nodeType();
+		const NodeType n2Type = n2->nodeType();
+
+		// project files
+		FileNode *file1 = qobject_cast<FileNode*>(n1);
+		FileNode *file2 = qobject_cast<FileNode*>(n2);
+		if (file1 && file1->fileType() == FileType::ProjectFileType) {
+			if (file2 && file2->fileType() == FileType::ProjectFileType) {
+				const QString fileName1 = file1->name();
+				const QString fileName2 = file2->name();
+
+				int result = caseFriendlyCompare(fileName1, fileName2);
+				if (result != 0)
+					return result < 0;
+				else
+					return file1 < file2;
+			} else {
+				return true; // project file is before everything else
+			}
+		} else {
+			if (file2 && file2->fileType() == FileType::ProjectFileType)
+				return false;
+		}
+
+		// projects
+		if (n1Type == NodeType::ProjectNodeType) {
+			if (n2Type == NodeType::ProjectNodeType) {
+				ProjectNode *project1 = static_cast<ProjectNode*>(n1);
+				ProjectNode *project2 = static_cast<ProjectNode*>(n2);
+
+				int result = caseFriendlyCompare(project1->displayName(), project2->displayName());
+				if (result != 0)
+					return result < 0;
+				else
+					return project1 < project2; // sort by pointer value
+			} else {
+			   return true; // project is before folder & file
+		   }
+		}
+		if (n2Type == NodeType::ProjectNodeType)
+			return false;
+
+		if (n1Type == NodeType::VirtualFolderNodeType) {
+			if (n2Type == NodeType::VirtualFolderNodeType) {
+				VirtualFolderNode *folder1 = static_cast<VirtualFolderNode *>(n1);
+				VirtualFolderNode *folder2 = static_cast<VirtualFolderNode *>(n2);
+
+				if (folder1->priority() > folder2->priority())
+					return true;
+				if (folder1->priority() < folder2->priority())
+					return false;
+				int result = caseFriendlyCompare(folder1->name(), folder2->name());
+				if (result != 0)
+					return result < 0;
+				else
+					return folder1 < folder2;
+			} else {
+				return true; // virtual folder is before folder
+			}
+		}
+
+		if (n2Type == NodeType::VirtualFolderNodeType)
+			return false;
+
+
+		if (n1Type == NodeType::FolderNodeType) {
+			if (n2Type == NodeType::FolderNodeType) {
+				FolderNode *folder1 = static_cast<FolderNode*>(n1);
+				FolderNode *folder2 = static_cast<FolderNode*>(n2);
+
+				int result = caseFriendlyCompare(folder1->name(), folder2->name());
+				if (result != 0)
+					return result < 0;
+				else
+					return folder1 < folder2;
+			} else {
+				return true; // folder is before file
+			}
+		}
+		if (n2Type == NodeType::FolderNodeType)
+			return false;
+
+		// must be file nodes
+		{
+			const QString fileName1 = n1->name();
+			const QString fileName2 = n2->name();
+
+			int result = caseFriendlyCompare(fileName1, fileName2);
+
+			return result < 0; // sort by filename
+		}
+		return false;
+	}
+
+
+	bool isSorted(const QList<Node*> &nodes)
+	{
+		const int32_t size = nodes.size();
+		for (int32_t i = 0; i < size - 1; ++i) {
+			if (!sortNodes(nodes.at(i), nodes.at(i + 1))) {
+				return false;
+			}
+		}
+		return true;
+	}
 
 } // namnespace
 
@@ -740,3 +743,4 @@ void AssetDBModel::foldersAdded(void)
 
 } // namespace AssetExplorer
 
+X_NAMESPACE_END

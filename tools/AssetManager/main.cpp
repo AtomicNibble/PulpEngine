@@ -39,7 +39,7 @@ typedef core::MemoryArena<
 
 core::MemoryArenaBase* g_arena = nullptr;
 
-
+X_USING_NAMESPACE;
 
 int main(int argc, char *argv[])
 {
@@ -79,7 +79,7 @@ int main(int argc, char *argv[])
 
 		if (app.Init(::GetCommandLineW()))
 		{
-			AssetManager w;
+			assman::AssetManager w;
 			w.show();
 
 			res = a.exec();

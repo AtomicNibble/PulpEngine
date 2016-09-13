@@ -2,6 +2,8 @@
 #include "modprojectnodes.h"
 
 
+X_NAMESPACE_BEGIN(assman)
+
 // ----------------------------------
 
 ModProject::ModProject(AssetDB& db, const QString &name, int32_t id) :
@@ -24,7 +26,7 @@ ModProject::~ModProject()
 
 void ModProject::loadAssetTypeNodes(void)
 {
-	X_NAMESPACE(assetDb)::AssetDB::AssetTypeCountsArr counts;
+	assetDb::AssetDB::AssetTypeCountsArr counts;
     db_.GetAssetTypeCounts(modId_, counts);
 
     QList<AssetExplorer::FolderNode*> folders;
@@ -88,7 +90,7 @@ void ModProject::initAssetTypeInfo(void)
 		assetDisplayInfo_[i].icon = defaultIcon;
     }
 
-    typedef X_NAMESPACE(assetDb)::AssetType assetType;
+    typedef assetDb::AssetType assetType;
 
     assetDisplayInfo_[assetType::MODEL].pNickName = "Model";
     assetDisplayInfo_[assetType::MODEL].icon = QIcon(":/assetDb/img/File_mesh.png");
@@ -118,3 +120,6 @@ void ModProject::initAssetTypeInfo(void)
     assetDisplayInfo_[assetType::IMG].priority = 1;
 
 }
+
+
+X_NAMESPACE_END

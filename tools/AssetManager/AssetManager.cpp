@@ -13,8 +13,7 @@
 #include <QColor.h>
 #include <QGridLayout>
 
-
-X_USING_NAMESPACE;
+X_NAMESPACE_BEGIN(assman)
 
 AssetManager::AssetManager(QWidget *parent) :
     QMainWindow(parent),
@@ -23,7 +22,7 @@ AssetManager::AssetManager(QWidget *parent) :
     assetViewWidget_(nullptr),
     assetDbexplorer_(nullptr)
 {
-    db_ = new X_NAMESPACE(assetDb)::AssetDB();
+    db_ = new assetDb::AssetDB();
     db_->OpenDB();
 
     QString errorMessage;
@@ -68,3 +67,5 @@ bool AssetManager::addMod(AssetDB::ModId modId, const core::string& name, core::
 
 	return true;
 }
+
+X_NAMESPACE_END

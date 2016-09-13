@@ -8,6 +8,7 @@ class QPoint;
 class QMenu;
 class QAction;
 
+X_NAMESPACE_BEGIN(assman)
 
 namespace AssetExplorer {
 
@@ -92,8 +93,8 @@ private:
 };
 
 
-
 } // namespace AssetExplorer
 
+X_NAMESPACE_END
 
 #endif // ASSETDBEXPLORER_H

@@ -3,10 +3,12 @@
 
 #include <QObject>
 
+X_NAMESPACE_BEGIN(assman)
 
 class ModProjectNode;
 
-namespace AssetExplorer {
+namespace AssetExplorer 
+{
 
 class ProjectNode;
 
@@ -34,5 +36,8 @@ protected:
 
 
 } // namespace AssetExplorer
+
+X_NAMESPACE_END
+
 
 #endif // PROJECT_H

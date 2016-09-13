@@ -2,11 +2,6 @@
 #define MODPROJECT_H
 
 
-#include <QObject>
-#include <QIcon>
-
-#include <array>
-
 #include "project.h"
 #include <../AssetDB/AssetDB.h>
 
@@ -15,6 +10,9 @@ class ModProjectNode;
 X_NAMESPACE_DECLARE(assetDb,
 class AssetDB;
 );
+
+X_NAMESPACE_BEGIN(assman)
+
 
 class ModProject : public AssetExplorer::Project
 {
@@ -29,12 +27,12 @@ class ModProject : public AssetExplorer::Project
         QIcon folderIconExpanded;
     };
 
-    typedef std::array<AssetTypeInfo, X_NAMESPACE(assetDb)::AssetType::ENUM_COUNT> AssetTypeInfoArr;
+    typedef std::array<AssetTypeInfo, assetDb::AssetType::ENUM_COUNT> AssetTypeInfoArr;
 
 public:
-    typedef X_NAMESPACE(assetDb)::AssetType AssetType;
-	typedef X_NAMESPACE(assetDb)::AssetDB::AssetInfo AssetInfo;
-	typedef X_NAMESPACE(assetDb)::AssetDB AssetDB;
+    typedef assetDb::AssetType AssetType;
+	typedef assetDb::AssetDB::AssetInfo AssetInfo;
+	typedef assetDb::AssetDB AssetDB;
 
 public:
     ModProject(AssetDB& db, const QString &name, int32_t id);
@@ -62,6 +60,7 @@ private:
     AssetTypeInfoArr assetDisplayInfo_;
 };
 
+X_NAMESPACE_END
 
 
 #endif // MODPROJECT_H

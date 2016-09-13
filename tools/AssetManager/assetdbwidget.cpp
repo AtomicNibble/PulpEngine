@@ -14,28 +14,30 @@
 #include <QFocusEvent>
 #include <QAbstractItemModel>
 
+X_NAMESPACE_BEGIN(assman)
 
 namespace AssetExplorer
 {
 
-namespace {
-
-class AssetDbTreeItemDelegate : public QStyledItemDelegate
+namespace
 {
-public:
-    AssetDbTreeItemDelegate(QObject *parent) : QStyledItemDelegate(parent)
-    { }
 
-    void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
-    {
-        QStyleOptionViewItem opt = option;
-      //  if (!index.data(ProjectExplorer::Project::EnabledRole).toBool())
-            opt.state &= ~QStyle::State_Enabled;
-        QStyledItemDelegate::paint(painter, opt, index);
-    }
-};
+	class AssetDbTreeItemDelegate : public QStyledItemDelegate
+	{
+	public:
+		AssetDbTreeItemDelegate(QObject *parent) : QStyledItemDelegate(parent)
+		{ }
 
-}
+		void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+		{
+			QStyleOptionViewItem opt = option;
+		  //  if (!index.data(ProjectExplorer::Project::EnabledRole).toBool())
+				opt.state &= ~QStyle::State_Enabled;
+			QStyledItemDelegate::paint(painter, opt, index);
+		}
+	};
+
+} // namespace
 
 AssetDbTreeView::AssetDbTreeView(QWidget *parent)
     : QTreeView(parent)
@@ -282,7 +284,6 @@ void AssetDbViewWidget::disableAutoExpand()
 
 
 
-
-
-
 } // namespace AssetExplorer
+
+X_NAMESPACE_END

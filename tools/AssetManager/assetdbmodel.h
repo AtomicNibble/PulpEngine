@@ -1,13 +1,6 @@
 #ifndef ASSETDB_MODEL_H
 #define ASSETDB_MODEL_H
 
-#include <QAbstractItemModel>
-#include <QModelIndex>
-#include <QVariant>
-#include <QList>
-#include <QSet>
-#include <QHash>
-
 class QTreeView;
 
 
@@ -15,7 +8,7 @@ X_NAMESPACE_DECLARE(assetDb,
 	class AssetDB;
 );
 
-
+X_NAMESPACE_BEGIN(assman)
 
 namespace AssetExplorer
 {
@@ -32,7 +25,7 @@ class AssetDBModel : public QAbstractItemModel
     Q_OBJECT
 
 public:
-	typedef X_NAMESPACE(assetDb)::AssetDB AssetDB;
+	typedef assetDb::AssetDB AssetDB;
 
 public:
     AssetDBModel(SessionNode *rootNode, AssetDB& db, QObject *parent = nullptr);
@@ -98,6 +91,8 @@ private:
 };
 
 } // namespace AssetExplorer
+
+X_NAMESPACE_END
 
 
 #endif // ASSETDB_MODEL_H

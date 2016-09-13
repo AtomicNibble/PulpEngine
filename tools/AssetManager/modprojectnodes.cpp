@@ -1,6 +1,10 @@
 #include "modprojectnodes.h"
 #include "modproject.h"
 
+
+X_NAMESPACE_BEGIN(assman)
+
+
 ModProjectNode::ModProjectNode(ModProject* pProject) :
     ProjectNode(""),
     pProject_(pProject)
@@ -89,7 +93,7 @@ bool ModVirtualFolderNode::loadChildren(void)
 	  
 	  // we need to break this down into files and folders.
 	  // we do it based on slashes :D
-	  QChar slash(X_NAMESPACE(assetDb)::ASSET_NAME_SLASH);
+	  QChar slash(assetDb::ASSET_NAME_SLASH);
 
 
 	  QIcon folderIcon(":/assetDb/img/Folder.Closed.png");
@@ -101,7 +105,7 @@ bool ModVirtualFolderNode::loadChildren(void)
 		  const auto& name =  asset.name;
 		  const QString qName = QString::fromUtf8(name.c_str());
 
-		  if (name.find(X_NAMESPACE(assetDb)::ASSET_NAME_SLASH))
+		  if (name.find(assetDb::ASSET_NAME_SLASH))
 		  {
 #if 1
 			  // make it a folder.
@@ -178,3 +182,6 @@ ModFolderNode::ModFolderNode(const QString &name) :
 {
 
 }
+
+
+X_NAMESPACE_END

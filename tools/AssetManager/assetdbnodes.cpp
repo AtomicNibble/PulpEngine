@@ -6,6 +6,9 @@
 #include <QIcon>
 #include <QStyle>
 
+X_NAMESPACE_BEGIN(assman)
+
+
 namespace AssetExplorer
 {
 
@@ -748,6 +751,6 @@ NodesWatcher::NodesWatcher(QObject *parent)
 }
 
 
-
-
 } // namespace AssetExplorer
+
+X_NAMESPACE_END

@@ -3,6 +3,7 @@
 
 #include "assetdbnodes.h"
 
+X_NAMESPACE_BEGIN(assman)
 
 
 class ModProject;
@@ -29,7 +30,7 @@ private:
 
 class ModVirtualFolderNode : public AssetExplorer::VirtualFolderNode
 {
-    typedef X_NAMESPACE(assetDb)::AssetType AssetType;
+    typedef assetDb::AssetType AssetType;
 
 public:
     explicit ModVirtualFolderNode(const QString &name, int priority, const QString& displayName,
@@ -48,7 +49,7 @@ private:
 
 class ModFolderNode : public AssetExplorer::FolderNode
 {
-	typedef X_NAMESPACE(assetDb)::AssetType AssetType;
+	typedef assetDb::AssetType AssetType;
 
 public:
 	explicit ModFolderNode(const QString &name);
@@ -58,5 +59,8 @@ public:
 
 private:
 };
+
+
+X_NAMESPACE_END
 
 #endif // MODPROJECTNODES_H

@@ -18,9 +18,10 @@ namespace {
 bool debug = false;
 }
 
+X_NAMESPACE_BEGIN(assman)
 
-namespace AssetExplorer {
-
+namespace AssetExplorer
+{
 
 
 AssetExplorer *AssetExplorer::instance_ = nullptr;
@@ -361,3 +362,4 @@ void AssetExplorer::setStartupProject(Project* pProject)
 
 } // namespace AssetExplorer
 
+X_NAMESPACE_END

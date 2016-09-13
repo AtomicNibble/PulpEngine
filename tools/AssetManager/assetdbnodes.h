@@ -1,13 +1,12 @@
 #ifndef ASSETDBNODES_H
 #define ASSETDBNODES_H
 
-#include <QIcon>
-#include <QObject>
-#include <QStringList>
-#include <QDebug>
+
+X_NAMESPACE_BEGIN(assman)
 
 namespace AssetExplorer
 {
+
 
 enum class NodeType {
     FileNodeType = 1,
@@ -291,5 +290,7 @@ private:
 };
 
 } // namespace AssetExplorer
+
+X_NAMESPACE_END
 
 #endif // ASSETDBNODES_H

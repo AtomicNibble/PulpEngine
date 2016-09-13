@@ -11,6 +11,7 @@ X_NAMESPACE_DECLARE(assetDb,
 	class AssetDB;
 );
 
+X_NAMESPACE_BEGIN(assman)
 
 namespace AssetExplorer
 {
@@ -44,7 +45,7 @@ class AssetDbViewWidget : public QWidget
     Q_OBJECT
 
 public:
-	typedef X_NAMESPACE(assetDb)::AssetDB AssetDB;
+	typedef assetDb::AssetDB AssetDB;
 
 public:
     explicit AssetDbViewWidget(AssetDB& db, QWidget* parent = 0);
@@ -82,6 +83,8 @@ private:
 
 
 } // namespace AssetExplorer
+
+X_NAMESPACE_END
 
 
 #endif // ASSETDBWIDGET_H
