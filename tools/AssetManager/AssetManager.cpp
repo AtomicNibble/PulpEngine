@@ -22,6 +22,9 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pCoreImpl_ = new ICore(this);
 	pActionManager_ = new ActionManager(this);
 
+	connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*, QWidget*)),
+		this, SLOT(updateFocusWidget(QWidget*, QWidget*)));
+
 
 	pDb_ = new assetDb::AssetDB();
 	if (!pDb_->OpenDB()) {
@@ -116,6 +119,40 @@ void AssetManager::removeContextObject(IContext* pContex)
 	}
 }
 
+void AssetManager::updateFocusWidget(QWidget* old, QWidget* now)
+{
+	X_UNUSED(old);
+
+	// Prevent changing the context object just because the menu or a menu item is activated
+	if (qobject_cast<QMenuBar*>(now) || qobject_cast<QMenu*>(now)) {
+		qDebug() << "new context objects is menu";
+		return;
+	}
+
+	if (debugLogging && now && now->metaObject()) {
+		qDebug() << "Name: " << now->metaObject()->className();
+	}
+
+
+	QList<IContext*> newContext;
+	if (QWidget* pWidget = qApp->focusWidget())
+	{
+		IContext* pContext = nullptr;
+		while (pWidget)
+		{
+			pContext = contextWidgets_.value(pWidget);
+			if (pContext) {
+				newContext.append(pContext);
+			}
+			pWidget = pWidget->parentWidget();
+		}
+	}
+
+	// ignore toplevels that define no context, like popups without parent
+	if (!newContext.isEmpty() || qApp->focusWidget() == focusWidget()) {
+		updateContextObject(newContext);
+	}
+}
 
 void AssetManager::updateContextObject(const QList<IContext*>& context)
 {

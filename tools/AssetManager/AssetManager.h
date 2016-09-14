@@ -45,6 +45,9 @@ public slots:
 	void raiseWindow(void);
 
 
+private slots:
+	void updateFocusWidget(QWidget* pOld, QWidget* pNow);
+
 private:
     QGridLayout* pLayout_;
 
