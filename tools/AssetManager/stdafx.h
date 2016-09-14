@@ -11,7 +11,6 @@
 
 #pragma comment(lib, "Dwrite")
 
-#endif // PCH_H
 
 #define QT_BEGIN_MOC_NAMESPACE X_NAMESPACE_BEGIN(assman)
 #define QT_END_MOC_NAMESPACE X_NAMESPACE_END
@@ -37,6 +36,8 @@ extern core::MemoryArenaBase* g_arena;
 #include <QTreeView>
 #include <QDir>
 #include <QMap>
+#include <QHash>
+#include <QMultiHash>
 
 
 #include <QtWidgets>
@@ -55,6 +56,10 @@ extern core::MemoryArenaBase* g_arena;
 
 #include <array>
 
-
+#include "Constants.h"
 #include "logging.h"
 #include "assert_qt.h"
+#include "id.h"
+#include "IAssManCore.h"
+
+#endif // PCH_H

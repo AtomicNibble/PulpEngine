@@ -1,6 +1,8 @@
 #pragma once
 
 #include <QObject>
+#include <QWidget>
+#include <QPointer>
 
 #include "Id.h"
 

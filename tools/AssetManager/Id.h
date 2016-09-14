@@ -42,6 +42,11 @@ private:
 	int32_t id_;
 };
 
+static X_INLINE uint qHash(const Id& id) 
+{ 
+	return id.uniqueIdentifier();
+}
+
 
 X_NAMESPACE_END
 
