@@ -16,7 +16,9 @@ ActionContainer::ActionContainer(Id id) :
 	id_(id), 
 	updateRequested_(false)
 {
-
+	appendGroup(Constants::G_DEFAULT_ONE);
+	appendGroup(Constants::G_DEFAULT_TWO);
+	appendGroup(Constants::G_DEFAULT_THREE);
 	scheduleUpdate();
 }
 
