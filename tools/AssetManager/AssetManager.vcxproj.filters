@@ -414,9 +414,6 @@
     <ClCompile Include="IAssManCore.cpp">
       <Filter>Source Files\Interfaces</Filter>
     </ClCompile>
-    <ClCompile Include="ProxyAction.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Debug Dynamic\moc_ProxyAction.cpp">
       <Filter>Generated Files\Debug Dynamic</Filter>
     </ClCompile>
@@ -431,6 +428,9 @@
     </ClCompile>
     <ClCompile Include="Release\moc_ProxyAction.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="ProxyAction.cpp">
+      <Filter>Source Files\Actions</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -520,7 +520,7 @@
       <Filter>Header Files\Interfaces</Filter>
     </CustomBuild>
     <CustomBuild Include="ProxyAction.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Actions</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
