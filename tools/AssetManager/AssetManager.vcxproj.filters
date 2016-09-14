@@ -70,6 +70,12 @@
       <Extensions>cpp;moc</Extensions>
       <SourceControlFiles>False</SourceControlFiles>
     </Filter>
+    <Filter Include="Header Files\Contex">
+      <UniqueIdentifier>{c5824743-8f94-4dce-8cb6-2e4d5d420448}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Contex">
+      <UniqueIdentifier>{6f8c8f5c-3d8e-45b5-8031-1459255b81a4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="assert_qt.cpp">
@@ -252,6 +258,27 @@
     <ClCompile Include="Release\moc_assetdbexplorer.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_Context.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_Context.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_Context.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_Context.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_Context.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Context.cpp">
+      <Filter>Source Files\Contex</Filter>
+    </ClCompile>
+    <ClCompile Include="Id.cpp">
+      <Filter>Source Files\Contex</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assert_qt.h">
@@ -309,6 +336,12 @@
     <CustomBuild Include="assetmanager.ui">
       <Filter>Form Files</Filter>
     </CustomBuild>
+    <CustomBuild Include="Context.h">
+      <Filter>Header Files\Contex</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Id.h">
+      <Filter>Header Files\Contex</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <None Include="img\File_default.png">
@@ -349,6 +382,12 @@
     </CustomBuild>
     <None Include="img\vline.png">
       <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Id.inl">
+      <Filter>Header Files\Contex</Filter>
+    </None>
+    <None Include="Context.inl">
+      <Filter>Header Files\Contex</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
