@@ -27,7 +27,7 @@ void ActionContainer::setOnAllDisabledBehavior(OnAllDisabledBehavior behavior)
 	onAllDisabledBehavior_ = behavior;
 }
 
-ActionContainer::OnAllDisabledBehavior ActionContainer::onAllDisabledBehavior() const
+ActionContainer::OnAllDisabledBehavior ActionContainer::onAllDisabledBehavior(void) const
 {
 	return onAllDisabledBehavior_;
 }
