@@ -61,6 +61,14 @@ AssetManager::~AssetManager()
 	if (pAssetDbexplorer_) {
 		delete pAssetDbexplorer_;
 	}
+
+	if (pCoreImpl_) {
+		delete pCoreImpl_;
+	}
+
+	if (pActionManager_) {
+		delete pActionManager_;
+	}
 }
 
 
