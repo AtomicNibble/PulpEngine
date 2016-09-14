@@ -162,7 +162,7 @@ SessionNode* SessionManager::sessionNode(void)
     return d->pSessionNode_;
 }
 
-void SessionManager::projectDisplayNameChanged()
+void SessionManager::projectDisplayNameChanged(void)
 {
     Project* pPro = qobject_cast<Project*>(instance_->sender());
     if (pPro) {
