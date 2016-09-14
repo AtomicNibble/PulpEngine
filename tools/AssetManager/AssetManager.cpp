@@ -16,7 +16,8 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pCoreImpl_(nullptr),
 	pActionManager_(nullptr),
 	pDb_(nullptr),
-	pAssetDbexplorer_(nullptr)
+	pAssetDbexplorer_(nullptr),
+	additionalContexts_(Constants::C_GLOBAL) // always have global contex
 {
 	pCoreImpl_ = new ICore(this);
 	pActionManager_ = new ActionManager(this);
