@@ -33,6 +33,7 @@ public:
 
 private:
 	void createActions(void);
+	void createMenus(void);
 	void createStatusBar(void);
 	void createDockWindows(void);
 
@@ -47,6 +48,25 @@ public slots:
 
 private slots:
 	void updateFocusWidget(QWidget* pOld, QWidget* pNow);
+
+
+	// File Slots
+	void about(void);
+	void destroyAboutDialog(void);
+
+protected:
+	virtual void changeEvent(QEvent* e) X_OVERRIDE;
+	virtual void closeEvent(QCloseEvent *event) X_OVERRIDE;
+
+
+private:
+
+	// Quit
+	QAction* pQuitAct_;
+	// Help
+	QAction* pAboutAct_;
+	QAction* pAboutQtAct_;
+
 
 private:
     QGridLayout* pLayout_;

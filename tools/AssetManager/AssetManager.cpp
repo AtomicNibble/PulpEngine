@@ -3,6 +3,7 @@
 #include "assetdbexplorer.h"
 #include "ActionManager.h"
 
+#include "ActionContainer.h"
 
 
 #include <../AssetDB/AssetDB.h>
@@ -48,10 +49,13 @@ AssetManager::AssetManager(QWidget* pParent) :
 	QWidget* pWindow = new QWidget();
 	pWindow->setLayout(pLayout_);
 
+	createActions();
+	createMenus();
+	createStatusBar();
+	createDockWindows();
+
 	setCentralWidget(pWindow);
 	setMinimumSize(600, 800);
-
-
 
 }
 
@@ -196,8 +200,90 @@ void AssetManager::updateContext(void)
 
 void AssetManager::createActions(void)
 {
+	// File
+	pQuitAct_ = new QAction(QIcon(":/img/quit.png"), tr("Quit"), this);
+	pQuitAct_->setStatusTip(tr("Quit the application"));
+	connect(pQuitAct_, SIGNAL(triggered()), this, SLOT(close()));
+
+
+	// Help
+	pAboutAct_ = new QAction(tr("About AssetManager"), this);
+	pAboutAct_->setStatusTip(tr("Show the AssetManager's' About box"));
+	connect(pAboutAct_, SIGNAL(triggered()), this, SLOT(about()));
+
+	pAboutQtAct_ = new QAction(tr("About &Qt"), this);
+	pAboutQtAct_->setStatusTip(tr("Show the Qt library's About box"));
+	connect(pAboutQtAct_, SIGNAL(triggered()), qApp, SLOT(aboutQt()));
 
 }
+
+void AssetManager::createMenus(void)
+{
+	ActionContainer* pMenuBar = ActionManager::createMenuBar(Constants::MENU_BAR);
+
+	pMenuBar->appendGroup(Constants::G_FILE);
+	pMenuBar->appendGroup(Constants::G_EDIT);
+	pMenuBar->appendGroup(Constants::G_VIEW);
+	pMenuBar->appendGroup(Constants::G_DEBUG);
+	pMenuBar->appendGroup(Constants::G_TOOLS);
+	pMenuBar->appendGroup(Constants::G_WINDOW);
+	pMenuBar->appendGroup(Constants::G_HELP);
+
+	Context globalContext(Constants::C_GLOBAL);
+
+	ICommand* pCmd = nullptr;
+
+	// File Menu
+	{
+		ActionContainer *filemenu = ActionManager::createMenu(Constants::M_FILE);
+		pMenuBar->addMenu(filemenu, Constants::G_FILE);
+		filemenu->menu()->setTitle(tr("File"));
+
+		// Groups
+		filemenu->appendGroup(Constants::G_FILE_NEW);
+		filemenu->appendGroup(Constants::G_FILE_OPEN);
+		filemenu->appendGroup(Constants::G_FILE_SAVE);
+		filemenu->appendGroup(Constants::G_FILE_RECENT);
+		filemenu->appendGroup(Constants::G_FILE_CLOSE);
+
+		// File menu separators
+		filemenu->addSeparator(globalContext, Constants::G_FILE_SAVE);
+		filemenu->addSeparator(globalContext, Constants::G_FILE_RECENT);
+		filemenu->addSeparator(globalContext, Constants::G_FILE_CLOSE);
+
+
+		// Exit
+		pCmd = ActionManager::registerAction(pQuitAct_, Constants::EXIT, globalContext);
+		filemenu->addAction(pCmd, Constants::G_FILE_CLOSE);
+	}
+
+
+	// Help
+	{
+		ActionContainer *helpmenu = ActionManager::createMenu(Constants::M_HELP);
+		pMenuBar->addMenu(helpmenu, Constants::G_HELP);
+		helpmenu->menu()->setTitle(tr("Help"));
+
+		// Groups
+		helpmenu->appendGroup(Constants::G_HELP_HELP);
+		helpmenu->appendGroup(Constants::G_HELP_ABOUT);
+
+		// Help menu separators
+		helpmenu->addSeparator(globalContext, Constants::G_HELP_HELP);
+		helpmenu->addSeparator(globalContext, Constants::G_HELP_ABOUT);
+
+		// About group items
+		pCmd = ActionManager::registerAction(pAboutAct_, Constants::SHOW_ABOUT, globalContext);
+		helpmenu->addAction(pCmd, Constants::G_HELP_ABOUT);
+
+
+	}
+
+
+
+	setMenuBar(pMenuBar->menuBar());
+}
+
 
 void AssetManager::createStatusBar(void)
 {
@@ -214,6 +300,49 @@ void AssetManager::raiseWindow(void)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
 
+}
+
+
+// =======================  Help Menu Actions =======================
+
+void AssetManager::about(void)
+{
+
+}
+
+void AssetManager::destroyAboutDialog(void)
+{
+
+}
+
+
+// ----------------------------------------------------
+
+
+void AssetManager::changeEvent(QEvent *e)
+{
+	QWidget::changeEvent(e);
+	if (e->type() == QEvent::ActivationChange)
+	{
+		bool active = isActiveWindow();
+
+		if (active) {
+		//	emit windowActivated();
+		}
+	}
+}
+
+
+void AssetManager::closeEvent(QCloseEvent *event)
+{
+	// tell the goats
+	if (!pCoreImpl_->callCoreCloseListners(event)) {
+		return;
+	}
+
+	emit pCoreImpl_->coreAboutToClose();
+
+	event->accept();
 }
 
 
