@@ -28,5 +28,8 @@
         <file>img/options.png</file>
         <file>img/Paste.png</file>
         <file>img/quit.png</file>
+        <file>img/Cut.png</file>
+        <file>img/NewFile.png</file>
+        <file>img/build.png</file>
     </qresource>
 </RCC>
