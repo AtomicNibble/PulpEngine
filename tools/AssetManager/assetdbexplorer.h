@@ -64,12 +64,16 @@ namespace AssetExplorer {
 		void projectRemoved(Project* pProject);
 		void projectDisplayNameChanged(Project* pProject);
 
-		void addNewFile(void);
-		void openFile(void);
-		void removeFile(void);
-		void deleteFile(void);
-		void renameFile(void);
+		void openAsset(void);
+		void renameAsset(void);
+		void deleteAsset(void);
+		void cutAsset(void);
+		void copyAsset(void);
+		void pasteAsset(void);
+		void copyAssetName(void);
 
+		void addNewAsset(void);
+		void addNewAssetType(void);
 
 		void updateActions(void);
 
@@ -82,10 +86,18 @@ namespace AssetExplorer {
 		QMenu* folderMenu_;
 		QMenu* fileMenu_;
 
-		QAction* addNewFileAction_;
-		QAction* deleteFileAction_;
-		QAction* renameFileAction_;
-		QAction* openFileAction_;
+		// actions for a Asset
+		QAction* openAssetAction_;
+		QAction* renameAssetAction_;
+		QAction* deleteAssetAction_;
+		QAction* cutAssetAction_;
+		QAction* copyAssetAction_;
+		QAction* pasteAssetAction_;
+		QAction* copyAssetNameAction_;
+
+
+		QAction* addNewAssetAction_;
+		QAction* addNewAssetTypeAction_;
 		QAction* projectTreeCollapseAllAction_;
 		QAction* buildAction_;
 

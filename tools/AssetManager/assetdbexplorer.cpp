@@ -61,18 +61,31 @@ bool AssetExplorer::init(void)
     Context projecTreeContext(Constants::C_ASSETDB_EXPLORER);
 
 
-	addNewFileAction_ = new QAction(tr("Add New..."), this);
-	deleteFileAction_ = new QAction(tr("Delete File..."), this);
-	renameFileAction_ = new QAction(tr("Rename..."), this);
-	openFileAction_ = new QAction(tr("Open File"), this);
+	// asset actions
+	openAssetAction_ = new QAction(tr("Open"), this);
+	renameAssetAction_ = new QAction(tr("Rename..."), this);
+	deleteAssetAction_ = new QAction(tr("Delete"), this);
+	cutAssetAction_ = new QAction(QIcon(":/misc/img/Cut.png"), tr("Cut"), this);
+	copyAssetAction_ = new QAction(QIcon(":/misc/img/Copy.png"), tr("Copy"), this);
+	copyAssetNameAction_ = new QAction(QIcon(":/misc/img/Copy.png"), tr("Copy Asset Name"), this);
+	pasteAssetAction_ = new QAction(QIcon(":/misc/img/Paste.png"), tr("Paste"), this);
+
+
+	connect(openAssetAction_, SIGNAL(triggered()), this, SLOT(openAsset()));
+	connect(renameAssetAction_, SIGNAL(triggered()), this, SLOT(renameAsset()));
+	connect(deleteAssetAction_, SIGNAL(triggered()), this, SLOT(deleteAsset()));
+	connect(cutAssetAction_, SIGNAL(triggered()), this, SLOT(cutAsset()));
+	connect(copyAssetAction_, SIGNAL(triggered()), this, SLOT(copyAsset()));
+	connect(pasteAssetAction_, SIGNAL(triggered()), this, SLOT(pasteAsset()));
+	connect(copyAssetNameAction_, SIGNAL(triggered()), this, SLOT(copyAssetName()));
+
+	addNewAssetAction_ = new QAction(QIcon(":/misc/img/NewFile.png"), tr("New Asset..."), this);
+	addNewAssetTypeAction_ = new QAction(QIcon(":/misc/img/NewFile.png"), tr("New ?..."), this);
 	projectTreeCollapseAllAction_ = new QAction(tr("Collapse All"), this);
-	buildAction_ = new QAction(tr("Build"), this);
+	buildAction_ = new QAction(QIcon(":/misc/img/build.png"), tr("Build"), this);
 
-
-    connect(addNewFileAction_, SIGNAL(triggered()), this, SLOT(addNewFile()));
-    connect(deleteFileAction_, SIGNAL(triggered()), this, SLOT(deleteFile()));
-    connect(renameFileAction_, SIGNAL(triggered()), this, SLOT(renameFile()));
-	connect(openFileAction_, SIGNAL(triggered()), this, SLOT(openFile()));
+	connect(addNewAssetAction_, SIGNAL(triggered()), this, SLOT(addNewAsset()));
+	connect(addNewAssetTypeAction_, SIGNAL(triggered()), this, SLOT(addNewAssetType()));
 	connect(buildAction_, SIGNAL(triggered()), this, SLOT(build()));
 
     ICommand* pCmd = nullptr;
@@ -104,7 +117,8 @@ bool AssetExplorer::init(void)
 
     // Separators
     mprojectContextMenu->addSeparator(globalcontext, Constants::G_PROJECT_FILES);
-    mfileContextMenu->addSeparator(globalcontext, Constants::G_FILE_OTHER);
+	mfileContextMenu->addSeparator(globalcontext, Constants::G_FILE_OPEN);
+	mfileContextMenu->addSeparator(globalcontext, Constants::G_FILE_OTHER);
 
     // Collapse All.
     {
@@ -121,26 +135,53 @@ bool AssetExplorer::init(void)
         mfileContextMenu->addAction(pCmd, treeGroup);
     }
 
+	// Shieeeeeeeeet for the file.
 
-    // add new file action
-	pCmd = ActionManager::registerAction(addNewFileAction_, assman::AssetExplorer::Constants::ADDNEWFILE, projecTreeContext);
-    mprojectContextMenu->addAction(pCmd, Constants::G_PROJECT_FILES);
-    mfolderContextMenu->addAction(pCmd, Constants::G_FOLDER_FILES);
+	pCmd = ActionManager::registerAction(openAssetAction_, assman::AssetExplorer::Constants::OPEN_ASSET, projecTreeContext);
+	pCmd->setDefaultKeySequence(QKeySequence::Open);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OPEN);
 
-    // delete file action
-    pCmd = ActionManager::registerAction(deleteFileAction_, assman::AssetExplorer::Constants::DELETEFILE, projecTreeContext);
-    pCmd->setDefaultKeySequence(QKeySequence::Delete);
-    mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
 
-    // renamefile action
-    pCmd = ActionManager::registerAction(renameFileAction_, assman::AssetExplorer::Constants::RENAMEFILE, projecTreeContext);
-    mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+	pCmd = ActionManager::registerAction(renameAssetAction_, assman::AssetExplorer::Constants::RENAME_ASSET, projecTreeContext);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
 
+	pCmd = ActionManager::registerAction(deleteAssetAction_, assman::AssetExplorer::Constants::DELETE_ASSET, projecTreeContext);
+	pCmd->setDefaultKeySequence(QKeySequence::Delete);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+
+	pCmd = ActionManager::registerAction(cutAssetAction_, assman::AssetExplorer::Constants::CUT_ASSET, projecTreeContext);
+	pCmd->setDefaultKeySequence(QKeySequence::Cut);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+
+	pCmd = ActionManager::registerAction(copyAssetAction_, assman::AssetExplorer::Constants::COPY_ASSET, projecTreeContext);
+	pCmd->setDefaultKeySequence(QKeySequence::Copy);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+
+	pCmd = ActionManager::registerAction(pasteAssetAction_, assman::AssetExplorer::Constants::PASTE_ASSET, projecTreeContext);
+	pCmd->setDefaultKeySequence(QKeySequence::Paste);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+
+	pCmd = ActionManager::registerAction(copyAssetNameAction_, assman::AssetExplorer::Constants::COPY_ASSET_NAME, projecTreeContext);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+
+
+	// add new
+	pCmd = ActionManager::registerAction(addNewAssetAction_, assman::AssetExplorer::Constants::NEW_ASSET, projecTreeContext);
+	mprojectContextMenu->addAction(pCmd, Constants::G_PROJECT_FIRST);
+	mfolderContextMenu->addAction(pCmd, Constants::G_FOLDER_FILES);
+
+	// add new Type
+	pCmd = ActionManager::registerAction(addNewAssetTypeAction_, assman::AssetExplorer::Constants::NEW_ASSET_TYPE, projecTreeContext);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+	mfolderContextMenu->addAction(pCmd, Constants::G_FOLDER_FILES);
+
+	
 	// build action
 	pCmd = ActionManager::registerAction(buildAction_, assman::AssetExplorer::Constants::BUILD, projecTreeContext);
 	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
-	mfolderContextMenu->addAction(pCmd, Constants::G_FOLDER_FILES);
+	mfolderContextMenu->addAction(pCmd, Constants::G_FOLDER_CONFIG);
 	mprojectContextMenu->addAction(pCmd, Constants::G_PROJECT_FILES);
+
 
 
     updateActions();
@@ -314,9 +355,9 @@ void AssetExplorer::updateContextMenuActions(void)
 {
     qDebug() << "AssetExplorer::updateContextMenuActions";
 
-	addNewFileAction_->setEnabled(false);
-	deleteFileAction_->setEnabled(false);
-	renameFileAction_->setEnabled(false);
+//	addNewFileAction_->setEnabled(false);
+//	deleteFileAction_->setEnabled(false);
+//	renameFileAction_->setEnabled(false);
 
 	if (currentNode_ && currentNode_->projectNode())
 	{
@@ -335,11 +376,15 @@ void AssetExplorer::updateContextMenuActions(void)
 
 			}
 		}
-		if (qobject_cast<FolderNode*>(currentNode_))
+		if (FolderNode* pFolderName = qobject_cast<FolderNode*>(currentNode_))
 		{
+			// i want to know asset type.
+			// and update the name.
+
 			// Also handles ProjectNode
-			addNewFileAction_->setEnabled(actions.contains(ProjectAction::AddNewFile));
-			renameFileAction_->setEnabled(actions.contains(ProjectAction::Rename));
+			addNewAssetAction_->setEnabled(actions.contains(ProjectAction::AddNewFile));
+			addNewAssetTypeAction_->setEnabled(actions.contains(ProjectAction::AddNewFile));
+			renameAssetAction_->setEnabled(actions.contains(ProjectAction::Rename));
 		}
 		else if (qobject_cast<FileNode*>(currentNode_))
 		{
@@ -350,10 +395,8 @@ void AssetExplorer::updateContextMenuActions(void)
 			// If only deleteFile is enable only show it
 			bool enableDelete = actions.contains(ProjectAction::EraseFile);
 
-			deleteFileAction_->setEnabled(enableDelete);
-			deleteFileAction_->setVisible(enableDelete);
-
-			renameFileAction_->setEnabled(actions.contains(ProjectAction::Rename));
+			deleteAssetAction_->setEnabled(enableDelete);
+			renameAssetAction_->setEnabled(actions.contains(ProjectAction::Rename));
 		}
 	}
 }
@@ -413,35 +456,61 @@ void AssetExplorer::setStartupProject(Project* pProject)
     updateActions();
 }
 
-void AssetExplorer::addNewFile(void)
+void AssetExplorer::openAsset(void)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
 
 }
 
-void AssetExplorer::openFile(void)
+void AssetExplorer::renameAsset(void)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
 
 }
 
-void AssetExplorer::removeFile(void)
+void AssetExplorer::deleteAsset(void)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
 
 }
 
-void AssetExplorer::deleteFile(void)
+void AssetExplorer::cutAsset(void)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
 
 }
 
-void AssetExplorer::renameFile(void)
+void AssetExplorer::copyAsset(void)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
 
 }
+
+void AssetExplorer::pasteAsset(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+
+}
+
+void AssetExplorer::copyAssetName(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+
+}
+
+void AssetExplorer::addNewAsset(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+
+}
+
+void AssetExplorer::addNewAssetType(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+
+}
+
+
 
 
 

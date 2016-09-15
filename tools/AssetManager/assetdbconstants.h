@@ -11,13 +11,15 @@ namespace AssetExplorer
 		const char C_ASSETDB_EXPLORER[] = "AssetDB Context";
 
 
-		const char ADDNEWFILE[] = "AssetDB.AddNewFile";
-
-
-		const char OPENFILE[] = "AssetDB.OpenFile";
-		const char REMOVEFILE[] = "AssetDB.RemoveFile";
-		const char DELETEFILE[] = "AssetDB.DeleteFile";
-		const char RENAMEFILE[] = "AssetDB.RenameFile";
+		const char NEW_ASSET[] = "AssetDB.NewAsset";
+		const char NEW_ASSET_TYPE[] = "AssetDB.NewAssetType";
+		const char OPEN_ASSET[] = "AssetDB.OpenAsset";
+		const char DELETE_ASSET[] = "AssetDB.DeleteAsset";
+		const char RENAME_ASSET[] = "AssetDB.RenameAsset";
+		const char COPY_ASSET[] = "AssetDB.CopyAsset";
+		const char COPY_ASSET_NAME[] = "AssetDB.CopyAsserName";
+		const char CUT_ASSET[] = "AssetDB.CutAsset";
+		const char PASTE_ASSET[] = "AssetDB.PasteAsset";
 		const char BUILD[] = "AssetDB.Build";
 		const char PROJECTTREE_COLLAPSE_ALL[] = "AssetDB.CollapseAll";
 
