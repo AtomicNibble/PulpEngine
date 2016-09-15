@@ -106,6 +106,12 @@
     <Filter Include="Source Files\Projects">
       <UniqueIdentifier>{b4c73cb2-e68d-4a9e-b5d9-2a28b088db95}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Dialogs">
+      <UniqueIdentifier>{2a39591a-c923-479e-a98c-7fe7909d751b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Dialogs">
+      <UniqueIdentifier>{11af5ceb-f7df-45f1-a5b4-3355a863e8c3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="assetmanager.cpp">
@@ -447,6 +453,24 @@
     <ClCompile Include="project.cpp">
       <Filter>Source Files\Projects</Filter>
     </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_VersionDialog.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_VersionDialog.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_VersionDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_VersionDialog.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_VersionDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="VersionDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -481,6 +505,9 @@
     </CustomBuild>
     <CustomBuild Include="project.h">
       <Filter>Header Files\Projects</Filter>
+    </CustomBuild>
+    <CustomBuild Include="VersionDialog.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

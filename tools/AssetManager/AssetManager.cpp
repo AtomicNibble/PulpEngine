@@ -4,7 +4,7 @@
 #include "ActionManager.h"
 
 #include "ActionContainer.h"
-
+#include "VersionDialog.h"
 
 #include <../AssetDB/AssetDB.h>
 
@@ -13,6 +13,7 @@ X_NAMESPACE_BEGIN(assman)
 
 AssetManager::AssetManager(QWidget* pParent) :
 	QMainWindow(pParent),
+	pVersionDialog_(nullptr),
 	pLayout_(nullptr),
 	pCoreImpl_(nullptr),
 	pActionManager_(nullptr),
@@ -307,12 +308,21 @@ void AssetManager::raiseWindow(void)
 
 void AssetManager::about(void)
 {
+	if (!pVersionDialog_) {
+		pVersionDialog_ = new VersionDialog(this);
 
+		connect(pVersionDialog_, SIGNAL(finished(int)), this, SLOT(destroyAboutDialog()));
+	}
+
+	pVersionDialog_->show();
 }
 
 void AssetManager::destroyAboutDialog(void)
 {
-
+	if (pVersionDialog_) {
+		pVersionDialog_->deleteLater();
+		pVersionDialog_ = 0;
+	}
 }
 
 

@@ -35,7 +35,7 @@ ICore* ICore::instance(void)
 
 QString ICore::versionString(void)
 {
-	return tr("Lady Bug %1").arg(QLatin1String(Constants::IDE_VERSION_LONG));
+	return tr("Asset Manager %1").arg(QLatin1String(Constants::ASSMAN_VERSION_LONG));
 }
 
 QWidget* ICore::mainWindow(void)

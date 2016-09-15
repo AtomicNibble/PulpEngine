@@ -7,9 +7,9 @@ X_NAMESPACE_BEGIN(assman)
 namespace Constants
 {
 
-	const char* const IDE_VERSION_LONG = "1.0.0.0";
-	const char* const IDE_AUTHOR = "Tom Crowley";
-	const char* const IDE_YEAR = "2016";
+	const char* const ASSMAN_VERSION_LONG = "1.0.0.0";
+	const char* const ASSMAN_AUTHOR = "Tom Crowley";
+	const char* const ASSMAN_YEAR = "2016";
 
 
 	// Default groups
@@ -77,6 +77,11 @@ namespace Constants
 
 	// Help Actions
 	const char SHOW_ABOUT[] = "Help.About";
+
+	// Icons
+	const char ICON_LOGO_32[] = ":/misc/img/icon.png";
+	const char ICON_LOGO_64[] = ":/misc/img/icon.png";
+	const char ICON_LOGO_128[] = ":/misc/img/icon.png";
 
 
 } // namespace 

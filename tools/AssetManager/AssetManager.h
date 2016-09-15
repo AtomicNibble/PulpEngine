@@ -12,6 +12,7 @@ X_NAMESPACE_DECLARE(assetDb,
 X_NAMESPACE_BEGIN(assman)
 
 class ActionManager;
+class VersionDialog;
 
 namespace AssetExplorer {
     class AssetDbViewWidget;
@@ -67,6 +68,9 @@ private:
 	QAction* pAboutAct_;
 	QAction* pAboutQtAct_;
 
+
+private:
+	VersionDialog* pVersionDialog_;
 
 private:
     QGridLayout* pLayout_;
