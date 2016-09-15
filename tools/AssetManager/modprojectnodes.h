@@ -17,9 +17,9 @@ public:
 
 	QList<AssetExplorer::ProjectAction> supportedActions(Node* pNode) const X_OVERRIDE;
 
-	bool canAddSubProject(const QString &proFilePath) const X_OVERRIDE;
-	bool addSubProjects(const QStringList &proFilePaths) X_OVERRIDE;
-	bool removeSubProjects(const QStringList &proFilePaths) X_OVERRIDE;
+	bool canAddSubProject(const QString& projectName) const X_OVERRIDE;
+	bool addSubProjects(const QStringList& projectNames) X_OVERRIDE;
+	bool removeSubProjects(const QStringList& projectNames) X_OVERRIDE;
 
 	ModProject* getModProject(void);
 

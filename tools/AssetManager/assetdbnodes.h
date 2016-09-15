@@ -178,9 +178,9 @@ namespace AssetExplorer
 		// determines if the project will be shown in the flat view
 		// TODO find a better name
 
-		virtual bool canAddSubProject(const QString& proFilePath) const X_ABSTRACT;
-		virtual bool addSubProjects(const QStringList& proFilePaths) X_ABSTRACT;
-		virtual bool removeSubProjects(const QStringList& proFilePaths) X_ABSTRACT;
+		virtual bool canAddSubProject(const QString& projectName) const X_ABSTRACT;
+		virtual bool addSubProjects(const QStringList& projectNames) X_ABSTRACT;
+		virtual bool removeSubProjects(const QStringList& projectNames) X_ABSTRACT;
 
 
 		QList<NodesWatcher*> watchers(void) const;
@@ -197,7 +197,7 @@ namespace AssetExplorer
 	protected:
 		// this is just the in-memory representation, a subclass
 		// will add the persistent stuff
-		explicit ProjectNode(const QString& projectFilePath);
+		explicit ProjectNode(const QString& projectName);
 
 	private slots:
 		void watcherDestroyed(QObject* pWatcher);

@@ -24,21 +24,21 @@ QList<AssetExplorer::ProjectAction> ModProjectNode::supportedActions(Node* pNode
 		<< AssetExplorer::ProjectAction::Rename;
 }
 
-bool ModProjectNode::canAddSubProject(const QString &proFilePath) const
+bool ModProjectNode::canAddSubProject(const QString& projectName) const
 {
-    Q_UNUSED(proFilePath);
+    Q_UNUSED(projectName);
     return false;
 }
 
-bool ModProjectNode::addSubProjects(const QStringList &proFilePaths)
+bool ModProjectNode::addSubProjects(const QStringList& projectNames)
 {
-    Q_UNUSED(proFilePaths);
+    Q_UNUSED(projectNames);
     return false;
 }
 
-bool ModProjectNode::removeSubProjects(const QStringList &proFilePaths)
+bool ModProjectNode::removeSubProjects(const QStringList& projectNames)
 {
-    Q_UNUSED(proFilePaths);
+    Q_UNUSED(projectNames);
     return false;
 }
 
@@ -53,7 +53,7 @@ ModProject* ModProjectNode::getModProject(void)
 // -------------------------------------------------------------------
 
 
-ModVirtualFolderNode::ModVirtualFolderNode(const QString &name, int32_t priority, const QString& displayName,
+ModVirtualFolderNode::ModVirtualFolderNode(const QString& name, int32_t priority, const QString& displayName,
                               AssetType::Enum assType, int32_t numAssets) :
     VirtualFolderNode(name, priority),
     displayName_(displayName),
