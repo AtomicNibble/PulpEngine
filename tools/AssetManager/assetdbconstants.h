@@ -11,15 +11,15 @@ namespace AssetExplorer
 		const char C_ASSETDB_EXPLORER[] = "AssetDB Context";
 
 
-		const char ADDNEWFILE[] = "ProjectExplorer.AddNewFile";
+		const char ADDNEWFILE[] = "AssetDB.AddNewFile";
 
 
-		const char OPENFILE[] = "ProjectExplorer.OpenFile";
-		const char REMOVEFILE[] = "ProjectExplorer.RemoveFile";
-		const char DELETEFILE[] = "ProjectExplorer.DeleteFile";
-		const char RENAMEFILE[] = "ProjectExplorer.RenameFile";
-		const char BUILD[] = "ProjectExplorer.Build";
-		const char PROJECTTREE_COLLAPSE_ALL[] = "ProjectExplorer.CollapseAll";
+		const char OPENFILE[] = "AssetDB.OpenFile";
+		const char REMOVEFILE[] = "AssetDB.RemoveFile";
+		const char DELETEFILE[] = "AssetDB.DeleteFile";
+		const char RENAMEFILE[] = "AssetDB.RenameFile";
+		const char BUILD[] = "AssetDB.Build";
+		const char PROJECTTREE_COLLAPSE_ALL[] = "AssetDB.CollapseAll";
 
 
 
