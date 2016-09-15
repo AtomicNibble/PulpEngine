@@ -24,5 +24,9 @@
     </qresource>
     <qresource prefix="/misc">
         <file>img/icon.png</file>
+        <file>img/Copy.png</file>
+        <file>img/options.png</file>
+        <file>img/Paste.png</file>
+        <file>img/quit.png</file>
     </qresource>
 </RCC>
