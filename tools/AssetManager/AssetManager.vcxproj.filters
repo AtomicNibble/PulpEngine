@@ -91,42 +91,27 @@
     <Filter Include="Source Files\Interfaces">
       <UniqueIdentifier>{672b9968-076d-494d-ae50-7962152d2a3c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\AssetDB">
+      <UniqueIdentifier>{7fac3484-70b3-4280-a6fd-2cd61299c9b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AssetDB">
+      <UniqueIdentifier>{30d18b26-8a66-4c53-8f5a-cdc9f39c74bc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Misc">
+      <UniqueIdentifier>{4fd4b28f-59bd-4a81-b934-24fca2c2b5b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Projects">
+      <UniqueIdentifier>{76f1cf33-baed-4959-8075-6cbe7c9d5726}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Projects">
+      <UniqueIdentifier>{b4c73cb2-e68d-4a9e-b5d9-2a28b088db95}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="assert_qt.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="assetdbexplorer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="assetdbmodel.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="assetdbnodes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="assetdbwidget.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="assetmanager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="assetmanager_plugin_import.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="logging.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="modproject.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="modprojectnodes.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="project.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="session.cpp">
@@ -432,36 +417,39 @@
     <ClCompile Include="ProxyAction.cpp">
       <Filter>Source Files\Actions</Filter>
     </ClCompile>
+    <ClCompile Include="assetdbexplorer.cpp">
+      <Filter>Source Files\AssetDB</Filter>
+    </ClCompile>
+    <ClCompile Include="assetdbmodel.cpp">
+      <Filter>Source Files\AssetDB</Filter>
+    </ClCompile>
+    <ClCompile Include="assetdbnodes.cpp">
+      <Filter>Source Files\AssetDB</Filter>
+    </ClCompile>
+    <ClCompile Include="assetdbwidget.cpp">
+      <Filter>Source Files\AssetDB</Filter>
+    </ClCompile>
+    <ClCompile Include="assert_qt.cpp">
+      <Filter>Source Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="logging.cpp">
+      <Filter>Source Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="assetmanager_plugin_import.cpp">
+      <Filter>Source Files\Misc</Filter>
+    </ClCompile>
+    <ClCompile Include="modproject.cpp">
+      <Filter>Source Files\Projects</Filter>
+    </ClCompile>
+    <ClCompile Include="modprojectnodes.cpp">
+      <Filter>Source Files\Projects</Filter>
+    </ClCompile>
+    <ClCompile Include="project.cpp">
+      <Filter>Source Files\Projects</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="assert_qt.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <CustomBuild Include="assetdbexplorer.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="assetdbmodel.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="assetdbnodes.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="assetdbwidget.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="assetmanager.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <ClInclude Include="logging.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <CustomBuild Include="modproject.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="modprojectnodes.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="project.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
     <CustomBuild Include="session.h">
@@ -483,8 +471,17 @@
       <Filter>Header Files\Misc</Filter>
     </ClInclude>
     <ClInclude Include="assetdbconstants.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\AssetDB</Filter>
     </ClInclude>
+    <CustomBuild Include="modproject.h">
+      <Filter>Header Files\Projects</Filter>
+    </CustomBuild>
+    <CustomBuild Include="modprojectnodes.h">
+      <Filter>Header Files\Projects</Filter>
+    </CustomBuild>
+    <CustomBuild Include="project.h">
+      <Filter>Header Files\Projects</Filter>
+    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.h.cpp">
@@ -524,6 +521,18 @@
     </CustomBuild>
     <CustomBuild Include="ProxyAction.h">
       <Filter>Header Files\Actions</Filter>
+    </CustomBuild>
+    <CustomBuild Include="assetdbexplorer.h">
+      <Filter>Header Files\AssetDB</Filter>
+    </CustomBuild>
+    <CustomBuild Include="assetdbmodel.h">
+      <Filter>Header Files\AssetDB</Filter>
+    </CustomBuild>
+    <CustomBuild Include="assetdbnodes.h">
+      <Filter>Header Files\AssetDB</Filter>
+    </CustomBuild>
+    <CustomBuild Include="assetdbwidget.h">
+      <Filter>Header Files\AssetDB</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -585,5 +594,13 @@
     <Image Include="img\icon.ico">
       <Filter>Resource Files</Filter>
     </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="assert_qt.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="logging.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
