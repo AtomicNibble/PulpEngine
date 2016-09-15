@@ -19,6 +19,7 @@ namespace Constants
 
 
 	const char C_GLOBAL[] = "AssMan Context";
+	
 
 	// Menubar
 	const char MENU_BAR[] = "MenuBar";
@@ -57,6 +58,13 @@ namespace Constants
 	const char G_FILE_SAVE[] = "Group.File.Save";
 	const char G_FILE_RECENT[] = "Group.File.Recent";
 	const char G_FILE_CLOSE[] = "Group.File.Close";
+
+	// Edit menu groups
+	const char G_EDIT_UNDOREDO[] = "Bug.Group.Edit.UndoRedo";
+	const char G_EDIT_COPYPASTE[] = "Bug.Group.Edit.CopyPaste";
+	const char G_EDIT_SELECTALL[] = "Bug.Group.Edit.SelectAll";
+	const char G_EDIT_FIND[] = "Bug.Group.Edit.Find";
+
 
 	// Help menu groups
 	const char G_HELP_HELP[] = "Group.Help.Help";

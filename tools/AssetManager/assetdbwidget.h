@@ -72,6 +72,7 @@ namespace AssetExplorer
 		void disableAutoExpand(void);
 
 	private:
+		IContext* pContext_;
 		AssetExplorer* explorer_;
 		AssetDBModel* model_;
 		AssetDbTreeView*  view_;

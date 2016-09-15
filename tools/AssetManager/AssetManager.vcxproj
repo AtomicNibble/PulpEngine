@@ -1934,6 +1934,7 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
+    <ClInclude Include="assetdbconstants.h" />
     <ClInclude Include="Constants.h" />
     <CustomBuild Include="ICommand.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

@@ -55,7 +55,7 @@ namespace AssetExplorer {
 		void recentProjectsChanged(void);
 
 
-		private slots:
+	private slots:
 		void setStartupProject(void);
 		void setStartupProject(Project* pProject);
 		void newProject(void);
@@ -63,6 +63,13 @@ namespace AssetExplorer {
 		void projectAdded(Project* pProject);
 		void projectRemoved(Project* pProject);
 		void projectDisplayNameChanged(Project* pProject);
+
+		void addNewFile(void);
+		void openFile(void);
+		void removeFile(void);
+		void deleteFile(void);
+		void renameFile(void);
+
 
 		void updateActions(void);
 
@@ -76,14 +83,11 @@ namespace AssetExplorer {
 		QMenu* fileMenu_;
 
 		QAction* addNewFileAction_;
-		QAction* addExistingFilesAction_;
 		QAction* removeFileAction_;
 		QAction* deleteFileAction_;
 		QAction* renameFileAction_;
 		QAction* openFileAction_;
-		QAction* openContaingFolderAction_;
 		QAction* projectTreeCollapseAllAction_;
-		QAction* unloadAction_;
 
 	private:
 		assetDb::AssetDB& db_;

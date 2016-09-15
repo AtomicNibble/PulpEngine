@@ -201,7 +201,7 @@ void AssetManager::updateContext(void)
 void AssetManager::createActions(void)
 {
 	// File
-	pQuitAct_ = new QAction(QIcon(":/img/quit.png"), tr("Quit"), this);
+	pQuitAct_ = new QAction(QIcon(":/misc/img/quit.png"), tr("Quit"), this);
 	pQuitAct_->setStatusTip(tr("Quit the application"));
 	connect(pQuitAct_, SIGNAL(triggered()), this, SLOT(close()));
 

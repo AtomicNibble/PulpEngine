@@ -482,6 +482,9 @@
     <ClInclude Include="Constants.h">
       <Filter>Header Files\Misc</Filter>
     </ClInclude>
+    <ClInclude Include="assetdbconstants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.h.cpp">
