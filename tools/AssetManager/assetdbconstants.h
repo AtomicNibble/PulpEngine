@@ -18,6 +18,7 @@ namespace AssetExplorer
 		const char REMOVEFILE[] = "ProjectExplorer.RemoveFile";
 		const char DELETEFILE[] = "ProjectExplorer.DeleteFile";
 		const char RENAMEFILE[] = "ProjectExplorer.RenameFile";
+		const char BUILD[] = "ProjectExplorer.Build";
 		const char PROJECTTREE_COLLAPSE_ALL[] = "ProjectExplorer.CollapseAll";
 
 

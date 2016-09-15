@@ -83,11 +83,12 @@ namespace AssetExplorer {
 		QMenu* fileMenu_;
 
 		QAction* addNewFileAction_;
-		QAction* removeFileAction_;
 		QAction* deleteFileAction_;
 		QAction* renameFileAction_;
 		QAction* openFileAction_;
 		QAction* projectTreeCollapseAllAction_;
+		QAction* buildAction_;
+
 
 	private:
 		assetDb::AssetDB& db_;

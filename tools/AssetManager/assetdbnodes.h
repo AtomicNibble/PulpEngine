@@ -32,15 +32,6 @@ namespace AssetExplorer
 		// Let's the user select to which project file
 		// the file is added
 		AddNewFile,
-		AddExistingFile,
-		// Add files, which match user defined filters,
-		// from an existing directory and its subdirectories
-		AddExistingDirectory,
-		// Removes a file from the project, optionally also
-		// delete it on disc
-		RemoveFile,
-		// Deletes a file from the file system, informs the project
-		// that a file was deleted
 		// DeleteFile is a define on windows...
 		EraseFile,
 		Rename,

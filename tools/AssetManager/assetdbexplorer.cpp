@@ -62,18 +62,18 @@ bool AssetExplorer::init(void)
 
 
 	addNewFileAction_ = new QAction(tr("Add New..."), this);
-	removeFileAction_ = new QAction(tr("Remove File..."), this);
 	deleteFileAction_ = new QAction(tr("Delete File..."), this);
 	renameFileAction_ = new QAction(tr("Rename..."), this);
 	openFileAction_ = new QAction(tr("Open File"), this);
 	projectTreeCollapseAllAction_ = new QAction(tr("Collapse All"), this);
+	buildAction_ = new QAction(tr("Build"), this);
 
 
     connect(addNewFileAction_, SIGNAL(triggered()), this, SLOT(addNewFile()));
-    connect(removeFileAction_, SIGNAL(triggered()), this, SLOT(removeFile()));
     connect(deleteFileAction_, SIGNAL(triggered()), this, SLOT(deleteFile()));
     connect(renameFileAction_, SIGNAL(triggered()), this, SLOT(renameFile()));
-    connect(openFileAction_, SIGNAL(triggered()), this, SLOT(openFile()));
+	connect(openFileAction_, SIGNAL(triggered()), this, SLOT(openFile()));
+	connect(buildAction_, SIGNAL(triggered()), this, SLOT(build()));
 
     ICommand* pCmd = nullptr;
 
@@ -127,11 +127,6 @@ bool AssetExplorer::init(void)
     mprojectContextMenu->addAction(pCmd, Constants::G_PROJECT_FILES);
     mfolderContextMenu->addAction(pCmd, Constants::G_FOLDER_FILES);
 
-    // remove file action
-    pCmd = ActionManager::registerAction(removeFileAction_, assman::AssetExplorer::Constants::REMOVEFILE, projecTreeContext);
-    pCmd->setDefaultKeySequence(QKeySequence::Delete);
-    mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
-
     // delete file action
     pCmd = ActionManager::registerAction(deleteFileAction_, assman::AssetExplorer::Constants::DELETEFILE, projecTreeContext);
     pCmd->setDefaultKeySequence(QKeySequence::Delete);
@@ -141,7 +136,13 @@ bool AssetExplorer::init(void)
     pCmd = ActionManager::registerAction(renameFileAction_, assman::AssetExplorer::Constants::RENAMEFILE, projecTreeContext);
     mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
 
- 
+	// build action
+	pCmd = ActionManager::registerAction(buildAction_, assman::AssetExplorer::Constants::BUILD, projecTreeContext);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+	mfolderContextMenu->addAction(pCmd, Constants::G_FOLDER_FILES);
+	mprojectContextMenu->addAction(pCmd, Constants::G_PROJECT_FILES);
+
+
     updateActions();
     return true;
 }
@@ -314,7 +315,6 @@ void AssetExplorer::updateContextMenuActions(void)
     qDebug() << "AssetExplorer::updateContextMenuActions";
 
 	addNewFileAction_->setEnabled(false);
-	removeFileAction_->setEnabled(false);
 	deleteFileAction_->setEnabled(false);
 	renameFileAction_->setEnabled(false);
 
@@ -326,7 +326,9 @@ void AssetExplorer::updateContextMenuActions(void)
 		{
 			if (pn == currentProject_->rootProjectNode())
 			{
-				
+				buildAction_->setVisible(true);
+				buildAction_->setEnabled(true);
+
 			}
 			else
 			{
@@ -346,11 +348,7 @@ void AssetExplorer::updateContextMenuActions(void)
 			// If both are enabled show both (can't happen atm)
 			// If only removeFile is enabled only show it
 			// If only deleteFile is enable only show it
-			bool enableRemove = actions.contains(ProjectAction::RemoveFile);
 			bool enableDelete = actions.contains(ProjectAction::EraseFile);
-
-			removeFileAction_->setEnabled(enableRemove);
-			removeFileAction_->setVisible(!enableDelete || enableRemove);
 
 			deleteFileAction_->setEnabled(enableDelete);
 			deleteFileAction_->setVisible(enableDelete);

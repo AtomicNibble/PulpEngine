@@ -14,6 +14,15 @@ ModProjectNode::ModProjectNode(ModProject* pProject) :
     setIcon(QIcon(":/assetDb/img/Mod_Project_Node_32.png"));
 }
 
+QList<AssetExplorer::ProjectAction> ModProjectNode::supportedActions(Node* pNode) const
+{
+	X_UNUSED(pNode);
+
+	return QList<AssetExplorer::ProjectAction>()
+		<< AssetExplorer::ProjectAction::AddNewFile
+		<< AssetExplorer::ProjectAction::EraseFile
+		<< AssetExplorer::ProjectAction::Rename;
+}
 
 bool ModProjectNode::canAddSubProject(const QString &proFilePath) const
 {
@@ -53,6 +62,17 @@ ModVirtualFolderNode::ModVirtualFolderNode(const QString &name, int32_t priority
 {
 
 }
+
+QList<AssetExplorer::ProjectAction> ModVirtualFolderNode::supportedActions(Node* pNode) const
+{
+	X_UNUSED(pNode);
+
+	return QList<AssetExplorer::ProjectAction>()
+		<< AssetExplorer::ProjectAction::AddNewFile
+		<< AssetExplorer::ProjectAction::EraseFile
+		<< AssetExplorer::ProjectAction::Rename;
+}
+
 
 QString ModVirtualFolderNode::displayName(void) const
 {
