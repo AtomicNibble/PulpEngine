@@ -494,8 +494,12 @@ void AssetExplorer::pasteAsset(void)
 
 void AssetExplorer::copyAssetName(void)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
+	BUG_ASSERT(currentNode_ && currentNode_->nodeType() == NodeType::FileNodeType, return);
 
+	FileNode* pFileNode = qobject_cast<FileNode*>(currentNode_);
+
+	QClipboard* pClipboard = QApplication::clipboard();
+	pClipboard->setText(pFileNode->name());
 }
 
 void AssetExplorer::addNewAsset(void)

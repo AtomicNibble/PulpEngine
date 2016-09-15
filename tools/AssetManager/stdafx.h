@@ -53,6 +53,7 @@ extern core::MemoryArenaBase* g_arena;
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QMimeDatabase>
+#include <QClipboard>
 
 #include <array>
 
