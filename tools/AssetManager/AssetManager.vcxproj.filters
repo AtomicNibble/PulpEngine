@@ -471,6 +471,21 @@
     <ClCompile Include="VersionDialog.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_IEditor.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_IEditor.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_IEditor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_IEditor.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_IEditor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -508,6 +523,9 @@
     </CustomBuild>
     <CustomBuild Include="VersionDialog.h">
       <Filter>Header Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="IEditor.h">
+      <Filter>Header Files\Interfaces</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -610,6 +628,9 @@
     </None>
     <None Include="Command.inl">
       <Filter>Header Files\Actions</Filter>
+    </None>
+    <None Include="IEditor.inl">
+      <Filter>Header Files\Interfaces</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
