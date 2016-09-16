@@ -43,7 +43,7 @@ CustomTabWidgetBar::CustomTabWidgetBar(CustomTabWidget *widget) :
 	inMove_(false),
 	tabIdx_(-1)
 {
-	setObjectName("codetabBar");
+	setObjectName("assEntryBar");
 	setAcceptDrops(true);
 
 	setElideMode(Qt::ElideRight);
