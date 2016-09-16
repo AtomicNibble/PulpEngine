@@ -588,9 +588,6 @@
     <ClCompile Include="AssetEntryModel.cpp">
       <Filter>Source Files\AssetEntry</Filter>
     </ClCompile>
-    <ClCompile Include="AssetEntryManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Debug Dynamic\moc_AssetEntryManager.cpp">
       <Filter>Generated Files\Debug Dynamic</Filter>
     </ClCompile>
@@ -605,6 +602,9 @@
     </ClCompile>
     <ClCompile Include="Release\moc_AssetEntryManager.cpp">
       <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetEntryManager.cpp">
+      <Filter>Source Files\AssetEntry</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -663,7 +663,7 @@
       <Filter>Header Files\AssetEntry</Filter>
     </CustomBuild>
     <CustomBuild Include="AssetEntryManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\AssetEntry</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
