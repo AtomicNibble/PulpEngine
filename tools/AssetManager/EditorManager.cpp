@@ -916,6 +916,7 @@ IEditor* EditorManager::createEditor(const Id& editorId, const QString& fileName
 
 
 	if (!editorId.isValid()) {
+		X_ERROR("Editor", "Can't create editor for invalid editorId");
 		return nullptr;
 	}
 
