@@ -19,6 +19,47 @@ QWidget:item:selected {
 }
 
 
+#EditorView
+{
+	border: none;
+}
+
+#EditorViewLayout
+{
+	border: none;
+}
+
+#EditorViewContainer
+{
+	border: none;
+}
+
+#assEntryBar::tab {
+	background-color:#323232;
+	color: #eee;
+	padding: 0px 5px 0px 5px;
+	border-top-left-radius: 0px;
+	border-top-right-radius: 0px;
+	margin-left: 0px;
+	border: 0;
+}
+
+#assEntryBar::tab:selected {
+	background-color:#2074DB;
+}
+
+#assEntryBar::tab:!selected:hover {
+	background-color:#1B61B7;
+}
+
+#assEntryBar::close-button {
+	image: url(:/img/Close.png);
+}
+
+#assEntryBar::close-button:hover {
+	image: url(:/img/Close-hover.png);
+}
+
 QTabBar::tab {
 	background: qlineargradient(x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #343837, stop: 0.51 #37393a, stop: 1 #2d2d30);
 	border: 1px solid #505053;
@@ -589,5 +630,4 @@ QListView#newtemplates::item:selected:active {
 QListView#newtemplates::item:hover {
      background: #3F3F40;
 }
-
 
