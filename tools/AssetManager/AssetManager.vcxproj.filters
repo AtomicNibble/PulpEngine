@@ -124,6 +124,12 @@
     <Filter Include="Source Files\AssetEntry">
       <UniqueIdentifier>{55e2c069-08bb-43d8-9a59-c10d38c83904}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Editor\Types">
+      <UniqueIdentifier>{d8a925b4-74ea-4c38-aa39-bd63067f22e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Editor\Types">
+      <UniqueIdentifier>{ae44c3ea-1acf-40f5-8f42-d9a26ec4835e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="assetmanager.cpp">
@@ -636,6 +642,24 @@
     <ClCompile Include="Release\moc_IEditorFactory.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="AssetPropertyEditor.cpp">
+      <Filter>Source Files\Editor\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_AssetPropertyEditor.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_AssetPropertyEditor.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_AssetPropertyEditor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_AssetPropertyEditor.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_AssetPropertyEditor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -700,6 +724,9 @@
     </CustomBuild>
     <CustomBuild Include="IAssetEntryFactory.h">
       <Filter>Header Files\Interfaces</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AssetPropertyEditor.h">
+      <Filter>Header Files\Editor\Types</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

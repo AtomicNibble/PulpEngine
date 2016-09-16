@@ -104,6 +104,15 @@ namespace Constants
 	const char ICON_LOGO_128[] = ":/misc/img/icon.png";
 
 
+
+	// Editors
+	const char ASSETPROP_EDITOR_ID[] = "AssetProp.Editor";
+	const char C_ASSETPROP_EDITOR[] = "AssetPropEditor";
+	const char C_ASSETPROP_EDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "AssetProp Editor");
+
+
+
+
 } // namespace 
 
 
