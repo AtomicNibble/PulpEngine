@@ -4,18 +4,74 @@
 X_NAMESPACE_BEGIN(assman)
 
 
-AssetPropertyEditorFactory::AssetPropertyEditorFactory(QObject *parent) :
-	IEditorFactory(parent)
+
+
+AssetPropertEditorWidget::AssetPropertEditorWidget(QWidget *parent) :
+	QScrollArea(parent),
+	pEditor_(nullptr)
 {
-	setId(Constants::ASSETPROP_EDITOR_ID);
-	setDisplayName(tr(Constants::C_ASSETPROP_EDITOR_DISPLAY_NAME));
+
+}
+
+AssetPropertEditorWidget::~AssetPropertEditorWidget()
+{
 
 }
 
 
-IEditor* AssetPropertyEditorFactory::createEditor(void)
+
+bool AssetPropertEditorWidget::open(QString* pErrorString, const QString& fileName)
+{
+	X_UNUSED(pErrorString);
+	X_UNUSED(fileName);
+	return true;
+}
+
+AssetPropertEditor* AssetPropertEditorWidget::editor(void)
+{
+	if (!pEditor_) {
+		pEditor_ = createEditor();
+	}
+
+	return pEditor_;
+}
+
+AssetPropertEditor* AssetPropertEditorWidget::createEditor(void)
+{
+	return new AssetPropertEditor(this);
+}
+
+// ------------------------------------------
+
+
+AssetPropertEditor::AssetPropertEditor(AssetPropertEditorWidget* editor) :
+	pEditorWidget_(editor)
+{
+	setWidget(pEditorWidget_);
+
+
+}
+
+AssetPropertEditor::~AssetPropertEditor()
+{
+	delete pEditorWidget_;
+}
+
+
+bool AssetPropertEditor::open(QString* pErrorString, const QString& fileName)
+{
+	return pEditorWidget_->open(pErrorString, fileName);
+}
+
+IAssetEntry* AssetPropertEditor::assetEntry(void)
 {
 	return nullptr;
 }
+
+Id AssetPropertEditor::id(void) const
+{
+	return Id(Constants::ASSETPROP_EDITOR_ID);
+}
+
 
 X_NAMESPACE_END

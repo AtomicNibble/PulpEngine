@@ -1,21 +1,47 @@
 #pragma once
 
 #include <QObject>
-#include "IEditorFactory.h"
+#include "IEditor.h"
+
 
 X_NAMESPACE_BEGIN(assman)
 
-class AssetPropertyEditorFactory : public IEditorFactory
+class AssetPropertEditor;
+class AssetPropertEditorWidget : public QScrollArea
 {
 	Q_OBJECT
-
 public:
-	AssetPropertyEditorFactory(QObject *parent);
+	AssetPropertEditorWidget(QWidget *parent = nullptr);
+	~AssetPropertEditorWidget();
 
-	IEditor* createEditor(void);
+
+	bool open(QString* pErrorString, const QString& fileName);
+
+	AssetPropertEditor* editor(void);
+
+protected:
+	AssetPropertEditor* createEditor(void);
+
+
+private:
+	AssetPropertEditor* pEditor_;
 };
 
 
+class AssetPropertEditor : public IEditor
+{
+	Q_OBJECT
+public:
+	AssetPropertEditor(AssetPropertEditorWidget* editorWidget);
+	~AssetPropertEditor();
+
+	bool open(QString* pErrorString, const QString& fileName) X_OVERRIDE;
+	IAssetEntry* assetEntry(void) X_OVERRIDE;
+	Id id(void) const X_OVERRIDE;
+
+private:
+	AssetPropertEditorWidget* pEditorWidget_;
+};
 
 
 

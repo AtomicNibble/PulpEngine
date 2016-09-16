@@ -660,6 +660,24 @@
     <ClCompile Include="Release\moc_AssetPropertyEditor.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_AssetPropertyEditorFactory.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_AssetPropertyEditorFactory.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_AssetPropertyEditorFactory.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_AssetPropertyEditorFactory.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_AssetPropertyEditorFactory.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetPropertyEditorFactory.cpp">
+      <Filter>Source Files\Editor\Types</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -726,6 +744,9 @@
       <Filter>Header Files\Interfaces</Filter>
     </CustomBuild>
     <CustomBuild Include="AssetPropertyEditor.h">
+      <Filter>Header Files\Editor\Types</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AssetPropertyEditorFactory.h">
       <Filter>Header Files\Editor\Types</Filter>
     </CustomBuild>
   </ItemGroup>
