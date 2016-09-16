@@ -15,8 +15,6 @@ class IAssetEntryFactory : public QObject
 public:
 	X_INLINE IAssetEntryFactory(QObject *parent = 0);
 
-	virtual IAssetEntry* open(const QString& fileName) X_ABSTRACT;
-
 	X_INLINE Id id(void) const;
 	X_INLINE QString displayName(void) const;
 

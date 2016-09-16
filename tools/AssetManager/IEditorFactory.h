@@ -16,7 +16,6 @@ public:
 	X_INLINE  IEditorFactory(QObject *parent = 0);
 
 	virtual IEditor* createEditor(void) X_ABSTRACT;
-	virtual IAssetEntry* open(const QString& fileName);
 };
 
 X_INLINE IEditorFactory::IEditorFactory(QObject *parent) :
