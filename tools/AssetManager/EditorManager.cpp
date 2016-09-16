@@ -3,6 +3,8 @@
 
 #include "IAssetEntry.h"
 #include "IEditor.h"
+#include "IEditorFactory.h"
+
 #include "EditorView.h"
 #include "CustomTabWidget.h"
 
@@ -42,10 +44,24 @@ namespace
 		return -1;
 	}
 
-	static QString autoSaveName(const QString &fileName)
+	static QString autoSaveName(const QString& fileName)
 	{
 		return fileName + QLatin1String(".bak");
 	}
+
+	template <class EditorFactoryLike>
+	X_INLINE EditorFactoryLike* findById(const Id &id)
+	{
+		const QList<EditorFactoryLike *>& factories = d->factories_;
+		foreach(EditorFactoryLike *efl, factories) {
+			if (id == efl->id()) {
+				return efl;
+			}
+		}
+
+		return nullptr;
+	}
+
 
 
 	class EditorManagerPrivate
@@ -607,7 +623,48 @@ IEditor *EditorManager::openEditor(EditorView* pView, const QString& fileName,
 	X_UNUSED(flags);
 	X_UNUSED(pNewEditor);
 
-	return nullptr;
+	QString fn = fileName;
+
+	if (fn.isEmpty()) {
+		X_WARNING("Editor", "Can't open editor for empty name");
+		return nullptr;
+	}
+	if (pNewEditor) {
+		*pNewEditor = false;
+	}
+
+
+	IEditor* pEditor = createEditor(editorId, fn);
+	if (!pEditor)
+	{
+		X_ERROR("Editor", "Failed to createEditor for: \"%s\"", qPrintable(fn));
+		return nullptr;
+	}
+
+	IEditor* pResult = nullptr;
+
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+	{
+		QString errorString;
+		if (!pEditor->open(&errorString, fn))
+		{
+			QApplication::restoreOverrideCursor();
+			QMessageBox::critical(ICore::mainWindow(), tr("File Error"), errorString);
+			delete pEditor;
+			return nullptr;
+		}
+
+		addEditor(pEditor);
+
+		if (pNewEditor) {
+			*pNewEditor = true;
+		}
+
+		pResult = activateEditor(pView, pEditor, flags);
+	}
+	QApplication::restoreOverrideCursor();
+
+	return pResult;
 
 #else
 	QString fn = fileName;
@@ -847,32 +904,39 @@ EditorManager::editorFactories(const QMimeType& mimeType, bool bestMatchOnly)
 	return rc;
 }
 
-/* For something that has a 'QString id' (IEditorFactory
-* or IExternalEditor), find the one matching a id. */
-template <class EditorFactoryLike>
-EditorFactoryLike *findById(const Id &id)
-{
-	const QList<EditorFactoryLike *>& factories = d->factories_;
-	foreach(EditorFactoryLike *efl, factories) {
-		if (id == efl->id()) {
-			return efl;
-		}
-	}
 
-	return nullptr;
-}
-
-
-
-IEditor* EditorManager::createEditor(const Id &editorId, const QString &fileName)
+IEditor* EditorManager::createEditor(const Id& editorId, const QString& fileName)
 {
 	if (debugLogging) {
 		qDebug() << Q_FUNC_INFO << editorId.name() << fileName;
 	}
 
 #if 1
+	EditorFactoryList factories;
 
-	return nullptr;
+
+	if (!editorId.isValid()) {
+		return nullptr;
+	}
+
+	if (IEditorFactory* factory = findById<IEditorFactory>(editorId)) {
+		factories.push_back(factory);
+	}
+
+	if (factories.empty())
+	{
+		qWarning("%s: unable to find an editor factory for the file '%s', editor Id '%s'.",
+			Q_FUNC_INFO, fileName.toUtf8().constData(), editorId.name().constData());
+		return nullptr;
+	}
+
+	IEditor* pEditor = factories.front()->createEditor();
+
+	if (pEditor) {
+		emit pInstance_->editorCreated(pEditor, fileName);
+	}
+
+	return pEditor;
 
 #else
 

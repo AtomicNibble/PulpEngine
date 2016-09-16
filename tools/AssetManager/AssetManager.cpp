@@ -71,6 +71,8 @@ AssetManager::AssetManager(QWidget* pParent) :
 	createDockWindows();
 
 
+	EditorManager::openEditor("test");
+
 }
 
 AssetManager::~AssetManager()

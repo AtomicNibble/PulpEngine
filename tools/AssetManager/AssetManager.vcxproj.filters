@@ -606,6 +606,36 @@
     <ClCompile Include="AssetEntryManager.cpp">
       <Filter>Source Files\AssetEntry</Filter>
     </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_IEditorFactory.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_IAssetEntryFactory.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_IAssetEntryFactory.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_IAssetEntryFactory.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_IAssetEntryFactory.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_IAssetEntryFactory.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_IEditorFactory.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_IEditorFactory.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_IEditorFactory.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_IEditorFactory.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -664,6 +694,12 @@
     </CustomBuild>
     <CustomBuild Include="AssetEntryManager.h">
       <Filter>Header Files\AssetEntry</Filter>
+    </CustomBuild>
+    <CustomBuild Include="IEditorFactory.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </CustomBuild>
+    <CustomBuild Include="IAssetEntryFactory.h">
+      <Filter>Header Files\Interfaces</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
