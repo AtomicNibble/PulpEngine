@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
 	a.setOrganizationName("Tom Crowley");
 	a.setOrganizationDomain("Potato - Engine");
 	a.setWindowIcon(QIcon(":/misc/img/icon.png"));
-//	a.setStyle(QStyleFactory::create("Fusion"));
+	a.setStyle(QStyleFactory::create("Fusion"));
 
 #if 1
 	QFile f("style\\style.qss");
