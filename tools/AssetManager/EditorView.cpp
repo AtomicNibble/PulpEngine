@@ -230,8 +230,9 @@ void EditorView::setParentSplitterOrView(SplitterOrView *splitterOrView)
 
 void EditorView::showContextMenu(const QPoint& point)
 {
-	if (point.isNull())
+	if (point.isNull()) {
 		return;
+	}
 
 	int32_t idx = pContainer_->tabBar()->tabAt(point);
 

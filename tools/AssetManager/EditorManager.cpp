@@ -1691,18 +1691,18 @@ void EditorManager::addNativeDirActions(QMenu *contextMenu, IEditor *editor)
 }
 
 
-void EditorManager::addFloatActions(QMenu *contextMenu, IEditor *editor)
+void EditorManager::addFloatActions(QMenu *contextMenu, IEditor* pEditor)
 {
 	BUG_ASSERT(contextMenu, return);
 
 	// we need to know if a window is floated.
-	if (EditorView *view = viewForEditor(editor)) {
-		SplitterOrView *splitter = view->parentSplitterOrView();
+	if (EditorView* pView = viewForEditor(pEditor)) {
+		SplitterOrView* pSplitter = pView->parentSplitterOrView();
 
-		if (splitter) {
+		if (pSplitter) {
 
 			int32_t rootidx = -1;
-			findRoot(view, &rootidx);
+			findRoot(pView, &rootidx);
 
 			if (rootidx != 0) {
 				contextMenu->addAction(d->DockEditorMainContextAction_);
@@ -1713,15 +1713,16 @@ void EditorManager::addFloatActions(QMenu *contextMenu, IEditor *editor)
 
 			contextMenu->addSeparator();
 
-			if (!splitter->isView())
+			if (!pSplitter->isView()) {
 				return;
+			}
 
-			int32_t num_editors = splitter->view()->editorCount();
+			int32_t num_editors = pSplitter->view()->editorCount();
 
 			// if the view is part of a splitter already we don't allow split again.
-			splitter = splitter->findParentSplitter();
+			pSplitter = pSplitter->findParentSplitter();
 
-			if (!splitter) {
+			if (!pSplitter) {
 				// we can only move to new if move than 1 baby
 				if (num_editors > 1) {
 					contextMenu->addAction(d->moveToNewHozTabGroupContextAction_);
