@@ -19,7 +19,7 @@ namespace Constants
 
 
 	const char C_GLOBAL[] = "AssMan Context";
-	
+	const char C_EDITORMANAGER[] = "Bug.EditorManager";
 
 	// Menubar
 	const char MENU_BAR[] = "MenuBar";
@@ -65,15 +65,35 @@ namespace Constants
 	const char G_EDIT_SELECTALL[] = "Bug.Group.Edit.SelectAll";
 	const char G_EDIT_FIND[] = "Bug.Group.Edit.Find";
 
+	// Window menu groups
+	const char G_WINDOW_LAYOUT[] = "Bug.Group.Window.Layout";
+	const char G_WINDOW_SPLIT[] = "Bug.Group.Window.Split";
+	const char G_WINDOW_DOCUMENT[] = "Bug.Group.Window.Documents";
+	const char G_WINDOW_WINDOWS[] = "Bug.Group.Window.Windows";
+	const char G_WINDOW_PANES[] = "Bug.Group.Window.Panes";
 
 	// Help menu groups
 	const char G_HELP_HELP[] = "Group.Help.Help";
 	const char G_HELP_ABOUT[] = "Group.Help.About";
 
 
-	// Actions
-	const char EXIT[] = "Exit";
+	// Window Actions
+	const char CLOSE_ALLDOCS[] = "Window.CloseAlldocs";
+	const char RESET_LAYTOUT[] = "Window.ResetLayout";
 
+	const char SPLIT[] = "Window.Split";
+	const char SPLIT_SIDE_BY_SIDE[] = "Window.SplitSideBySide";
+	const char SPLIT_NEW_WINDOW[] = "Window.SplitNewWindow";
+	const char REMOVE_CURRENT_SPLIT[] = "Window.RemoveCurrentSplit";
+	const char REMOVE_ALL_SPLITS[] = "Window.RemoveAllSplits";
+
+
+
+	// Actions
+	const char SAVE[] = "Bug.Save";
+	const char SAVEAS[] = "Bug.SaveAs";
+	const char SAVEALL[] = "Bug.SaveAll";
+	const char EXIT[] = "Exit";
 
 	// Help Actions
 	const char SHOW_ABOUT[] = "Help.About";

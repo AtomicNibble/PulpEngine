@@ -1,0 +1,2013 @@
+#include "stdafx.h"
+#include "EditorManager.h"
+
+#include "IAssetEntry.h"
+#include "IEditor.h"
+#include "EditorView.h"
+#include "CustomTabWidget.h"
+
+#include "ActionManager.h"
+#include "ActionContainer.h"
+#include "Command.h"
+
+#include "AssetEntryModel.h"
+#include "AssetEntryManager.h"
+
+X_NAMESPACE_BEGIN(assman)
+
+
+namespace 
+{
+	static int32_t extractLineNumber(QString *fileName)
+	{
+		int32_t i = fileName->length() - 1;
+		for (; i >= 0; --i) {
+			if (!fileName->at(i).isNumber()) {
+				break;
+			}
+		}
+		if (i == -1) {
+			return -1;
+		}
+		const QChar c = fileName->at(i);
+		if (c == QLatin1Char(':') || c == QLatin1Char('+')) {
+			bool ok;
+			const QString suffix = fileName->mid(i + 1);
+			const int32_t result = suffix.toInt(&ok);
+			if (suffix.isEmpty() || ok) {
+				fileName->truncate(i);
+				return result;
+			}
+		}
+		return -1;
+	}
+
+	static QString autoSaveName(const QString &fileName)
+	{
+		return fileName + QLatin1String(".bak");
+	}
+
+
+	class EditorManagerPrivate
+	{
+	public:
+		explicit EditorManagerPrivate(QWidget *parent);
+		~EditorManagerPrivate();
+
+	public:
+		QList<SplitterOrView *> root_;
+		QList<IContext *> rootContext_;
+
+		QPointer<IEditor> currentEditor_;
+		QPointer<IEditor> scheduledCurrentEditor_;
+		QPointer<EditorView> currentView_;
+
+		QTimer* autoSaveTimer_;
+
+		// actions
+		QAction* revertToSavedAction_;
+		QAction* saveAction_;
+		QAction* saveAsAction_;
+		QAction* closeCurrentEditorAction_;
+		QAction* closeAllEditorsAction_;
+		QAction* closeOtherEditorsAction_;
+		IEditor* contextMenuEntry_;
+
+		// context actions
+		QAction* saveCurrentEditorContextAction_;
+		QAction* saveAsCurrentEditorContextAction_;
+		QAction* closeCurrentEditorContextAction_;
+		QAction* closeAllEditorsContextAction_;
+		QAction* closeOtherEditorsContextAction_;
+		QAction* copyFullPathContextAction_;
+
+		QAction* FloatEditorContextAction_;
+		QAction* DockEditorMainContextAction_;
+		QAction* moveToNewHozTabGroupContextAction_;
+		QAction* moveToNewVerTabGroupContextAction_;
+
+		QAction* splitHozTabGroupContextAction_;
+		QAction* splitVerTabGroupContextAction_;
+
+
+		// sexy split shit
+		QAction* splitAction_;
+		QAction* splitSideBySideAction_;
+		QAction* splitNewWindowAction_;
+		QAction* removeCurrentSplitAction_;
+		QAction* removeAllSplitsAction_;
+
+		QString titleAddition_;
+		QString titleVcsTopic_;
+
+		QMap<QString, QVariant> editorStates_;
+
+		EditorManager::EditorFactoryList factories_;
+		AssetEntryModel* pAssetEntryModel_;;
+
+	//	QPointer<Overlay> overlay_;
+	//	QPointer<EditorView> dropTargetView_;
+
+		int32_t autoSaveInterval_;
+		bool autoSaveEnabled_;
+	};
+
+
+	EditorManagerPrivate::EditorManagerPrivate(QWidget *parent) :
+		autoSaveTimer_(0),
+		revertToSavedAction_(new QAction(EditorManager::tr("Revert to Saved"), parent)),
+		saveAction_(new QAction(parent)),
+		saveAsAction_(new QAction(parent)),
+		closeCurrentEditorAction_(new QAction(EditorManager::tr("Close"), parent)),
+		closeAllEditorsAction_(new QAction(EditorManager::tr("Close All Documents"), parent)),
+		closeOtherEditorsAction_(new QAction(EditorManager::tr("Close All But This"), parent)),
+
+		saveCurrentEditorContextAction_(new QAction(EditorManager::tr("&Save"), parent)),
+		saveAsCurrentEditorContextAction_(new QAction(EditorManager::tr("Save &As..."), parent)),
+		closeCurrentEditorContextAction_(new QAction(EditorManager::tr("Close"), parent)),
+		closeAllEditorsContextAction_(new QAction(EditorManager::tr("Close All Documents"), parent)),
+		closeOtherEditorsContextAction_(new QAction(EditorManager::tr("Close All But This"), parent)),
+		copyFullPathContextAction_(new QAction(EditorManager::tr("Copy Full Path"), parent)),
+
+		FloatEditorContextAction_(new QAction(EditorManager::tr("Float to New Window"), parent)),
+		DockEditorMainContextAction_(new QAction("Dock To Main View", parent)),
+
+		moveToNewHozTabGroupContextAction_(new QAction("Move to New Horizontal Tab Group", parent)),
+		moveToNewVerTabGroupContextAction_(new QAction("Move to New Vertical Tab Group", parent)),
+
+		splitHozTabGroupContextAction_(new QAction("Duplicate In New Horizontal Tab Group", parent)),
+		splitVerTabGroupContextAction_(new QAction("Duplicate In New Vertical Tab Group", parent)),
+
+		autoSaveEnabled_(true),
+		autoSaveInterval_(5),
+		currentEditor_(nullptr),
+		currentView_(nullptr),
+		pAssetEntryModel_(nullptr)
+	{
+
+		pAssetEntryModel_ = new AssetEntryModel(parent);
+	}
+
+	EditorManagerPrivate::~EditorManagerPrivate()
+	{
+
+	}
+
+} // namespace
+
+static EditorManager* pInstance_ = nullptr;
+static EditorManagerPrivate* d = nullptr;
+
+
+
+EditorManager* EditorManager::instance(void) 
+{ 
+	return pInstance_; 
+}
+
+EditorManager::EditorManager(QWidget *parent) :
+	QWidget(parent)
+{
+	d = new EditorManagerPrivate(parent);
+	pInstance_ = this;
+
+	setObjectName("EditorView");
+
+	connect(ICore::instance(), SIGNAL(contextAboutToChange(QList<IContext*>)),
+		this, SLOT(handleContextChange(QList<IContext*>)));
+
+	const Context editManagerContext(Constants::C_EDITORMANAGER);
+
+	// Save Action
+	ActionManager::registerAction(d->saveAction_, Constants::SAVE, editManagerContext);
+	connect(d->saveAction_, SIGNAL(triggered()), this, SLOT(saveDocument()));
+
+	// Save As Action
+	ActionManager::registerAction(d->saveAsAction_, Constants::SAVEAS, editManagerContext);
+	connect(d->saveAsAction_, SIGNAL(triggered()), this, SLOT(saveDocumentAs()));
+
+
+	// Window Menu
+	ActionContainer* mwindow = ActionManager::actionContainer(Constants::M_WINDOW);
+
+	// Window menu separators
+	mwindow->addSeparator(editManagerContext, Constants::G_WINDOW_SPLIT);
+
+
+	d->splitAction_ = new QAction(tr("Split"), this);
+	ICommand *cmd = ActionManager::registerAction(d->splitAction_, Constants::SPLIT, editManagerContext);
+	cmd->setDefaultKeySequence(QKeySequence(tr("Ctrl+E,2")));
+	mwindow->addAction(cmd, Constants::G_WINDOW_SPLIT);
+	connect(d->splitAction_, SIGNAL(triggered()), this, SLOT(split()));
+
+	d->splitSideBySideAction_ = new QAction(tr("Split Side by Side"), this);
+	cmd = ActionManager::registerAction(d->splitSideBySideAction_, Constants::SPLIT_SIDE_BY_SIDE, editManagerContext);
+	cmd->setDefaultKeySequence(QKeySequence(tr("Ctrl+E,3")));
+	mwindow->addAction(cmd, Constants::G_WINDOW_SPLIT);
+	connect(d->splitSideBySideAction_, SIGNAL(triggered()), this, SLOT(splitSideBySide()));
+
+	d->splitNewWindowAction_ = new QAction(tr("Open in New Window"), this);
+	cmd = ActionManager::registerAction(d->splitNewWindowAction_, Constants::SPLIT_NEW_WINDOW, editManagerContext);
+	cmd->setDefaultKeySequence(QKeySequence(tr("Ctrl+E,4")));
+	mwindow->addAction(cmd, Constants::G_WINDOW_SPLIT);
+	connect(d->splitNewWindowAction_, SIGNAL(triggered()), this, SLOT(splitNewWindow()));
+
+	d->removeCurrentSplitAction_ = new QAction(tr("Remove Current Split"), this);
+	cmd = ActionManager::registerAction(d->removeCurrentSplitAction_, Constants::REMOVE_CURRENT_SPLIT, editManagerContext);
+	cmd->setDefaultKeySequence(QKeySequence(tr("Ctrl+E,0")));
+	mwindow->addAction(cmd, Constants::G_WINDOW_SPLIT);
+	connect(d->removeCurrentSplitAction_, SIGNAL(triggered()), this, SLOT(removeCurrentSplit()));
+
+	d->removeAllSplitsAction_ = new QAction(tr("Remove All Splits"), this);
+	cmd = ActionManager::registerAction(d->removeAllSplitsAction_, Constants::REMOVE_ALL_SPLITS, editManagerContext);
+	cmd->setDefaultKeySequence(QKeySequence(tr("Ctrl+E,1")));
+	mwindow->addAction(cmd, Constants::G_WINDOW_SPLIT);
+	connect(d->removeAllSplitsAction_, SIGNAL(triggered()), this, SLOT(removeAllSplits()));
+
+
+	//Save XXX Context Actions
+	connect(d->saveCurrentEditorContextAction_, SIGNAL(triggered()), this, SLOT(saveDocumentFromContextMenu()));
+	connect(d->saveAsCurrentEditorContextAction_, SIGNAL(triggered()), this, SLOT(saveDocumentAsFromContextMenu()));
+
+	// Close XXX Context Actions
+	connect(d->closeAllEditorsContextAction_, SIGNAL(triggered()), this, SLOT(closeAllEditors()));
+	connect(d->closeCurrentEditorContextAction_, SIGNAL(triggered()), this, SLOT(closeEditorFromContextMenu()));
+	connect(d->closeOtherEditorsContextAction_, SIGNAL(triggered()), this, SLOT(closeOtherEditorsFromContextMenu()));
+
+	// shizz
+	connect(d->copyFullPathContextAction_, SIGNAL(triggered()), this, SLOT(copyFullPath()));
+
+	// float
+	connect(d->FloatEditorContextAction_, SIGNAL(triggered()), this, SLOT(floatEditor()));
+	connect(d->DockEditorMainContextAction_, SIGNAL(triggered()), this, SLOT(dockEditorMain()));
+
+	// Move to a new group (NOT duplicated)
+	connect(d->moveToNewHozTabGroupContextAction_, SIGNAL(triggered()), this, SLOT(moveNewHozTabGroup()));
+	connect(d->moveToNewVerTabGroupContextAction_, SIGNAL(triggered()), this, SLOT(moveNewVerTabGroup()));
+
+	// Duplication (splits)
+	connect(d->splitHozTabGroupContextAction_, SIGNAL(triggered()), this, SLOT(newHozTabGroup()));
+	connect(d->splitVerTabGroupContextAction_, SIGNAL(triggered()), this, SLOT(newVerTabGroup()));
+
+
+
+	ActionContainer* mfile = ActionManager::actionContainer(Constants::M_FILE);
+
+	connect(mfile->menu(), SIGNAL(aboutToShow()), pInstance_, SLOT(updateActions()));
+
+
+	IContext *context = new IContext;
+	context->setContext(Context(Constants::C_EDITORMANAGER));
+	context->setWidget(this);
+	ICore::addContextObject(context);
+
+	// other setup
+	SplitterOrView *firstRoot = new SplitterOrView();
+	d->root_.append(firstRoot);
+	d->rootContext_.append(context);
+	d->currentView_ = firstRoot->view();
+
+
+	QHBoxLayout *layout = new QHBoxLayout(this);
+	layout->setMargin(0);
+	layout->setSpacing(0);
+	layout->addWidget(firstRoot);
+
+
+	updateActions();
+
+	d->autoSaveTimer_ = new QTimer(this);
+	connect(d->autoSaveTimer_, SIGNAL(timeout()), SLOT(autoSave()));
+	updateAutoSave();
+}
+
+EditorManager::~EditorManager(void)
+{
+	pInstance_ = nullptr;
+
+
+	// close all extra windows
+	for (int32_t i = 1; i < d->root_.size(); ++i)
+	{
+		SplitterOrView *root = d->root_.at(i);
+		disconnect(root, SIGNAL(destroyed(QObject*)), this, SLOT(rootDestroyed(QObject*)));
+		IContext *rootContext = d->rootContext_.at(i);
+		ICore::removeContextObject(rootContext);
+		delete root;
+		delete rootContext;
+	}
+
+	d->root_.clear();
+	d->rootContext_.clear();
+
+	delete d;
+}
+
+
+void EditorManager::AddFactory(IEditorFactory* factory)
+{
+	d->factories_.push_back(factory);
+
+
+}
+
+
+void EditorManager::init(void)
+{
+
+
+
+}
+
+void EditorManager::updateAutoSave(void)
+{
+	if (d->autoSaveEnabled_) {
+		d->autoSaveTimer_->start(d->autoSaveInterval_ * (60 * 1000));
+	}
+	else {
+		d->autoSaveTimer_->stop();
+	}
+}
+
+
+
+SplitterOrView *EditorManager::findRoot(const EditorView* pView, int32_t* pRootIndex)
+{
+	SplitterOrView* pCurrent = pView->parentSplitterOrView();
+	while (pCurrent)
+	{
+		int32_t index = d->root_.indexOf(pCurrent);
+		if (index >= 0) {
+			if (pRootIndex) {
+				*pRootIndex = index;
+			}
+			return pCurrent;
+		}
+		pCurrent = pCurrent->findParentSplitter();
+	}
+	BUG_CHECK(false); // we should never have views without a root
+	return nullptr;
+}
+
+
+
+IAssetEntry* EditorManager::currentAssetEntry(void)
+{
+	return d->currentEditor_ ? d->currentEditor_->assetEntry() : 0;
+}
+
+IEditor *EditorManager::currentEditor(void)
+{
+	return d->currentEditor_;
+}
+
+QList<IEditor*> EditorManager::visibleEditors(void)
+{
+	QList<IEditor *> editors;
+	for(SplitterOrView* pRoot : d->root_) 
+	{
+		if (pRoot->isSplitter())
+		{
+			EditorView* firstView = pRoot->findFirstView();
+			EditorView* view = firstView;
+			if (view) 
+			{
+				do {
+					if (view->currentEditor()) {
+						editors.append(view->currentEditor());
+					}
+					view = view->findNextView();
+					BUG_ASSERT(view != firstView, break); // we start with firstView and shouldn't have cycles
+				} while (view);
+			}
+		}
+		else {
+			if (pRoot->editor()) {
+				editors.append(pRoot->editor());
+			}
+		}
+	}
+	return editors;
+}
+
+QList<EditorView*> EditorManager::visibleViews(void)
+{
+	QList<EditorView *> views;
+	for (SplitterOrView* pRoot : d->root_)
+	{
+		if (pRoot->isSplitter())
+		{
+			EditorView *firstView = pRoot->findFirstView();
+			EditorView *view = firstView;
+			if (view) 
+			{
+				do {
+					views.append(view);
+					view = view->findNextView();
+				} while (view);
+			}
+		}
+		else
+		{
+			if (pRoot->isView()) {
+				views.append(pRoot->view());
+			}
+		}
+	}
+	return views;
+}
+
+
+
+QList<IEditor*> EditorManager::openEditorsList(void)
+{
+	QList<IEditor *> editors;
+	for (SplitterOrView* pRoot : d->root_)
+	{
+		if (pRoot->isSplitter()) 
+		{
+			EditorView *firstView = pRoot->findFirstView();
+			EditorView *view = firstView;
+
+			if (view) 
+			{
+				do {
+					editors.append(view->editors());
+					view = view->findNextView();
+
+				} while (view);
+			}
+
+		}
+		else {
+			editors.append(pRoot->editors());
+		}
+	}
+	return editors;
+}
+
+
+
+IEditor *EditorManager::openEditor(const QString &fileName, const Id &editorId,
+	OpenEditorFlags flags, bool *newEditor)
+{
+	return pInstance_->openEditor(pInstance_->currentEditorView(),
+		fileName, editorId, flags, newEditor);
+}
+
+IEditor *EditorManager::openEditorAt(const QString &fileName, int32_t line, int32_t column,
+	const Id &editorId, OpenEditorFlags flags, bool *newEditor)
+{
+	IEditor* pEditor = EditorManager::openEditor(fileName, editorId, flags, newEditor);
+
+	if (pEditor && line != -1) {
+		pEditor->gotoLine(line, column);
+	}
+	return pEditor;
+}
+
+
+void EditorManager::addEditor(IEditor *editor)
+{
+	if (!editor) {
+		return;
+	}
+
+	ICore::addContextObject(editor);
+
+	bool isNewDocument = false;
+	d->pAssetEntryModel_->addEditor(editor, &isNewDocument);
+	if (isNewDocument) 
+	{
+		const bool isTemporary = editor->assetEntry()->isTemporary();
+		AssetEntryManager::addAssetEntry(editor->assetEntry());
+		if (!isTemporary) {
+			AssetEntryManager::addToRecentFiles(editor->assetEntry()->name(), editor->id());
+		}
+	}
+	emit pInstance_->editorOpened(editor);
+}
+
+void EditorManager::removeEditor(IEditor *editor)
+{
+	bool lastOneForDocument = false;
+	d->pAssetEntryModel_->removeEditor(editor, &lastOneForDocument);
+	if (lastOneForDocument) {
+		AssetEntryManager::removeAssetEntry(editor->assetEntry());
+	}
+
+	ICore::removeContextObject(editor);
+}
+
+
+void EditorManager::handleContextChange(const QList<IContext *> &context)
+{
+	//    if (debugLogging)
+	//        qDebug() << Q_FUNC_INFO;
+
+	d->scheduledCurrentEditor_ = 0;
+	IEditor *editor = 0;
+	foreach(IContext *c, context) 
+	{
+		if ((editor = qobject_cast<IEditor*>(c))) {
+			break;
+		}
+	}
+
+	if (editor && editor != d->currentEditor_) {
+		// Delay actually setting the current editor to after the current event queue has been handled
+		// Without doing this, e.g. clicking into projects tree or locator would always open editors
+		// in the main window. That is because clicking anywhere in the main window (even over e.g.
+		// the locator line edit) first activates the window and sets focus to its focus widget.
+		// Only afterwards the focus is shifted to the widget that received the click.
+		//    qDebug() << "editor changed";
+		d->scheduledCurrentEditor_ = editor;
+		QTimer::singleShot(0, pInstance_, SLOT(setCurrentEditorFromContextChange()));
+	}
+	else {
+		updateActions();
+	}
+}
+
+void EditorManager::setCurrentEditorFromContextChange(void)
+{
+	if (!d->scheduledCurrentEditor_) {
+		return;
+	}
+
+	IEditor *newCurrent = d->scheduledCurrentEditor_;
+	d->scheduledCurrentEditor_ = nullptr;
+	setCurrentEditor(newCurrent);
+}
+
+
+EditorView* EditorManager::currentEditorView(void)
+{
+	EditorView* view = d->currentView_;
+	if (!view) 
+	{
+		if (d->currentEditor_) {
+			view = viewForEditor(d->currentEditor_);
+			BUG_ASSERT(view, view = d->root_.first()->findFirstView());
+		}
+		BUG_CHECK(view);
+		if (!view) { // should not happen, we should always have either currentview or currentAssetEntry
+			foreach(SplitterOrView *root, d->root_) {
+				if (root->window()->isActiveWindow()) {
+					view = root->findFirstView();
+					break;
+				}
+			}
+			BUG_ASSERT(view, view = d->root_.first()->findFirstView());
+		}
+	}
+	return view;
+}
+
+
+bool EditorManager::isAutoSaveFile(const QString &fileName)
+{
+	return fileName.endsWith(QLatin1String(".bak"));
+}
+
+void EditorManager::setAutoSaveEnabled(bool enabled)
+{
+	d->autoSaveEnabled_ = enabled;
+	updateAutoSave();
+}
+
+bool EditorManager::autoSaveEnabled(void)
+{
+	return d->autoSaveEnabled_;
+}
+
+void EditorManager::setAutoSaveInterval(int32_t interval)
+{
+	d->autoSaveInterval_ = interval;
+	updateAutoSave();
+}
+
+int32_t EditorManager::autoSaveInterval(void)
+{
+	return d->autoSaveInterval_;
+}
+
+
+IEditor *EditorManager::openEditor(EditorView* pView, const QString& fileName,
+	const Id &editorId, OpenEditorFlags flags, bool* pNewEditor)
+{
+	if (debugLogging) {
+		qDebug() << Q_FUNC_INFO << fileName << editorId.name();
+	}
+
+#if 1
+	X_UNUSED(pView);
+	X_UNUSED(fileName);
+	X_UNUSED(editorId);
+	X_UNUSED(flags);
+	X_UNUSED(pNewEditor);
+
+	return nullptr;
+
+#else
+	QString fn = fileName;
+	QFileInfo fi(fn);
+	int32_t lineNumber = -1;
+
+	if (!fi.exists())
+	{
+		lineNumber = extractLineNumber(&fn);
+		if (lineNumber != -1)
+			fi.setFile(fn);
+	}
+
+	if (fn.isEmpty()) {
+		return 0;
+	}
+
+	if (newEditor) {
+		*newEditor = false;
+	}
+
+
+	QString realFn = autoSaveName(fn);
+	QFileInfo rfi(realFn);
+	if (!fi.exists() || !rfi.exists() || fi.lastModified() >= rfi.lastModified()) {
+		QFile::remove(realFn);
+		realFn = fn;
+	}
+
+	IEditor *editor = createEditor(editorId, fn);
+	// If we could not open the file in the requested editor, fall
+	// back to the default editor:
+	if (!editor)
+	{
+		Q_ASSERT(false);
+		return 0;
+	}
+
+	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
+	QString errorString;
+	if (!editor->open(&errorString, fn, realFn))
+	{
+		QApplication::restoreOverrideCursor();
+		QMessageBox::critical(ICore::mainWindow(), tr("File Error"), errorString);
+		delete editor;
+		return 0;
+	}
+
+	addEditor(editor);
+
+	if (newEditor) {
+		*newEditor = true;
+	}
+
+	IEditor *result = activateEditor(view, editor, flags);
+	//     if (editor == result)
+	//       restoreEditorState(editor);
+
+	if (flags & EditorManager::CanContainLineNumber)
+		editor->gotoLine(lineNumber, -1);
+
+	QApplication::restoreOverrideCursor();
+
+	return result;
+#endif
+}
+
+
+void EditorManager::activateEditor(IEditor *editor, OpenEditorFlags flags)
+{
+	BUG_ASSERT(editor, return);
+	EditorView *view = viewForEditor(editor);
+	// an IEditor doesn't have to belong to a view, it might be kept in storage by the editor model
+	if (!view) {
+		view = pInstance_->currentEditorView();
+	}
+	pInstance_->activateEditor(view, editor, flags);
+}
+
+
+IEditor *EditorManager::activateEditor(EditorView *view, IEditor *editor, OpenEditorFlags flags)
+{
+	Q_ASSERT(view);
+
+	//    if(debugLogging)
+	//        qDebug() << Q_FUNC_INFO;
+
+	if (!editor) {
+		if (!d->currentEditor_) {
+			setCurrentEditor(0, (flags & IgnoreNavigationHistory));
+		}
+		return nullptr;
+	}
+
+	editor = placeEditor(view, editor);
+
+	if (!(flags & DoNotChangeCurrentEditor)) 
+	{
+		setCurrentEditor(editor, (flags & IgnoreNavigationHistory));
+		if (!(flags & DoNotMakeVisible)) 
+		{
+			int32_t rootIndex;
+			findRoot(view, &rootIndex);
+
+			editor->widget()->setFocus();
+			ICore::raiseWindow(editor->widget());
+		}
+	}
+	else if (!(flags & DoNotMakeVisible)) {
+		view->setCurrentEditor(editor);
+	}
+	return editor;
+}
+
+
+IEditor *EditorManager::placeEditor(EditorView *view, IEditor *editor)
+{
+	Q_ASSERT(view && editor);
+
+	if (view->hasEditor(editor)) {
+		return editor;
+	}
+	if (IEditor *e = view->editorForAssetEntry(editor->assetEntry())) {
+		return e;
+	}
+
+
+	// try duplication or pull editor over to new view
+	bool duplicateSupported = editor->duplicateSupported();
+	if (EditorView *sourceView = viewForEditor(editor)) 
+	{
+		if (editor != sourceView->currentEditor() || !duplicateSupported) 
+		{
+			// pull the IEditor over to the new view
+			sourceView->removeEditor(editor);
+			view->addEditor(editor);
+			view->setCurrentEditor(editor);
+			if (!sourceView->currentEditor()) {
+				//        EditorView *replacementView = 0;
+				//        if (IEditor *replacement = pickUnusedEditor(&replacementView)) {
+				//            if (replacementView)
+				//               replacementView->removeEditor(replacement);
+				//            sourceView->addEditor(replacement);
+				//            sourceView->setCurrentEditor(replacement);
+				//        }
+			}
+			return editor;
+		}
+		else if (duplicateSupported) {
+			qDebug() << "placeEditor:: duplicating";
+			editor = duplicateEditor(editor);
+			Q_ASSERT(editor);
+		}
+	}
+	view->addEditor(editor);
+	return editor;
+}
+
+
+
+EditorView *EditorManager::viewForEditor(IEditor *editor)
+{
+	QWidget *w = editor->widget();
+	while (w) 
+	{
+		w = w->parentWidget();
+		if (EditorView *view = qobject_cast<EditorView *>(w)) {
+			return view;
+		}
+	}
+	return nullptr;
+}
+
+
+void EditorManager::setCurrentEditor(IEditor *editor, bool ignoreNavigationHistory)
+{
+	Q_UNUSED(ignoreNavigationHistory);
+
+	if (editor) {
+		setCurrentView(nullptr);
+	}
+
+	if (d->currentEditor_ == editor) {
+		return;
+	}
+
+	d->currentEditor_ = editor;
+	if (editor) {
+		if (EditorView *view = viewForEditor(editor)) {
+			view->setCurrentEditor(editor);
+		}
+	}
+
+	updateActions();
+	updateWindowTitle();
+	emit pInstance_->currentEditorChanged(editor);
+}
+
+
+void EditorManager::setCurrentView(EditorView *view)
+{
+	if (view == d->currentView_) {
+		return;
+	}
+
+	EditorView *old = d->currentView_;
+	d->currentView_ = view;
+
+	if (old) {
+		old->update();
+	}
+	if (view) {
+		view->update();
+	}
+
+	if (view && !view->currentEditor()) {
+		view->setFocus();
+		ICore::raiseWindow(view);
+	}
+}
+
+
+
+EditorManager::EditorFactoryList
+EditorManager::editorFactories(const QMimeType& mimeType, bool bestMatchOnly)
+{
+	X_UNUSED(mimeType);
+	X_UNUSED(bestMatchOnly);
+
+
+	EditorFactoryList rc;
+//	const EditorFactoryList& allFactories = d->factories_;
+//	mimeTypeFactoryRecursion(mimeType, allFactories, bestMatchOnly, &rc);
+	if (debugLogging) {
+		qDebug() << Q_FUNC_INFO << mimeType.name() << " returns " << rc;
+	}
+	return rc;
+}
+
+/* For something that has a 'QString id' (IEditorFactory
+* or IExternalEditor), find the one matching a id. */
+template <class EditorFactoryLike>
+EditorFactoryLike *findById(const Id &id)
+{
+	const QList<EditorFactoryLike *>& factories = d->factories_;
+	foreach(EditorFactoryLike *efl, factories) {
+		if (id == efl->id()) {
+			return efl;
+		}
+	}
+
+	return nullptr;
+}
+
+
+
+IEditor* EditorManager::createEditor(const Id &editorId, const QString &fileName)
+{
+	if (debugLogging) {
+		qDebug() << Q_FUNC_INFO << editorId.name() << fileName;
+	}
+
+#if 1
+
+	return nullptr;
+
+#else
+
+	EditorFactoryList factories;
+
+	if (!editorId.isValid())
+	{
+		//    const QFileInfo fileInfo(fileName);
+		// Find by mime type
+		QMimeDatabase db;
+		QMimeType mimeType = db.mimeTypeForFile(fileName);
+
+		if (!mimeType.isValid())
+		{
+			qWarning("%s unable to determine mime type of %s/%s. Falling back to text/plain",
+				Q_FUNC_INFO, fileName.toUtf8().constData(), editorId.name().constData());
+			return nullptr;
+		}
+
+		factories = editorFactories(mimeType, true);
+	}
+	else
+	{
+		// Find by editor id
+		if (IEditorFactory *factory = findById<IEditorFactory>(editorId)) {
+			factories.push_back(factory);
+		}
+	}
+	if (factories.empty()) 
+	{
+		qWarning("%s: unable to find an editor factory for the file '%s', editor Id '%s'.",
+			Q_FUNC_INFO, fileName.toUtf8().constData(), editorId.name().constData());
+		return nullptr;
+	}
+
+	IEditor* pEditor = factories.front()->createEditor();
+	//    if (editor)
+	//        connect(editor->widget(), SIGNAL(textChanged()), pInstance_, SLOT(handleDocumentStateChange()));
+	if (pEditor) {
+		emit pInstance_->editorCreated(pEditor, fileName);
+	}
+
+	return pEditor;
+#endif
+}
+
+
+void EditorManager::rootDestroyed(QObject *root)
+{
+	QWidget *activeWin = qApp->activeWindow();
+	SplitterOrView *newActiveRoot = 0;
+	for (int32_t i = 0; i < d->root_.size(); ++i) {
+		SplitterOrView *r = d->root_.at(i);
+		if (r == root) {
+			d->root_.removeAt(i);
+			IContext *context = d->rootContext_.takeAt(i);
+			ICore::removeContextObject(context);
+			delete context;
+			--i; // we removed the current one
+		}
+		else if (r->window() == activeWin) {
+			newActiveRoot = r;
+		}
+	}
+	// check if the destroyed root had the current view or current editor
+	if (d->currentEditor_ || (d->currentView_ && d->currentView_->parentSplitterOrView() != root))
+		return;
+	// we need to set a new current editor or view
+	if (!newActiveRoot) {
+		// some window managers behave weird and don't activate another window
+		// or there might be a LadyBug toplevel activated that doesn't have editor windows
+		newActiveRoot = d->root_.first();
+	}
+
+	// check if the focusWidget points to some view
+	SplitterOrView *focusSplitterOrView = 0;
+	QWidget *candidate = newActiveRoot->focusWidget();
+	while (candidate && candidate != newActiveRoot) {
+		if ((focusSplitterOrView = qobject_cast<SplitterOrView *>(candidate)))
+			break;
+		candidate = candidate->parentWidget();
+	}
+	// focusWidget might have been 0
+	if (!focusSplitterOrView)
+		focusSplitterOrView = newActiveRoot->findFirstView()->parentSplitterOrView();
+	BUG_ASSERT(focusSplitterOrView, focusSplitterOrView = newActiveRoot);
+	EditorView *focusView = focusSplitterOrView->findFirstView(); // can be just focusSplitterOrView
+	BUG_ASSERT(focusView, focusView = newActiveRoot->findFirstView());
+	BUG_ASSERT(focusView, return);
+	if (focusView->currentEditor())
+		setCurrentEditor(focusView->currentEditor());
+	else
+		setCurrentView(focusView);
+}
+
+
+
+void EditorManager::closeEditor(IEditor *editor, bool askAboutModifiedEditors)
+{
+	if (!editor)
+		return;
+	closeEditors(QList<IEditor *>() << editor, askAboutModifiedEditors);
+}
+
+//void EditorManager::closeEditor(DocumentModel::Entry *entry)
+//{
+//	if (!entry)
+//		return;
+//	if (entry->document)
+//		closeEditors(d->pAssetEntryModel_->editorsForDocument(entry->document));
+//	else
+//		d->pAssetEntryModel_->removeEntry(entry);
+//}
+
+
+bool EditorManager::closeEditors(const QList<IEditor*> &editorsToClose, bool askAboutModifiedEditors)
+{
+	Q_UNUSED(askAboutModifiedEditors);
+
+	if (editorsToClose.isEmpty()) {
+		return true;
+	}
+
+	// EditorView *currentView = currentEditorView();
+
+	bool closingFailed = false;
+	QSet<IEditor*> acceptedEditors;
+	QSet<IAssetEntry*> acceptedDocuments;
+	//ask all core listeners to check whether the editor can be closed
+	const QList<ICoreListener*> listeners = ICore::getCoreListners();
+
+	foreach(IEditor *editor, editorsToClose) {
+		bool editorAccepted = true;
+		foreach(ICoreListener *listener, listeners) {
+			if (!listener->editorAboutToClose(editor)) {
+				editorAccepted = false;
+				closingFailed = true;
+				break;
+			}
+		}
+		if (editorAccepted) {
+			acceptedEditors += editor;
+
+			QList<IEditor*> goats;
+			goats = d->pAssetEntryModel_->editorsForAssetEntry(editor->assetEntry());
+			goats.removeAll(editor);
+
+			// i only want to kill the pAssetEntry if it's the last view.
+			if (goats.size() == 0) {
+				acceptedDocuments.insert(editor->assetEntry());
+				qDebug() << "removing pAssetEntry: " << editor->assetEntry()->displayName();
+			}
+			else
+			{
+				X_ASSERT_NOT_IMPLEMENTED();
+			//	IEditor* ed = goats.front();
+				// make sure the pAssetEntry has a valid widget.
+				//if (BaseTextDocument* doc = qobject_cast<BaseTextDocument*>(ed->assetEntry()))
+				//{
+				//	doc->SetWidget(ed->widget());
+				//}
+			}
+		}
+	}
+
+
+
+	if (acceptedEditors.isEmpty()) {
+		return false;
+	}
+
+	//ask whether to save modified files
+	if (askAboutModifiedEditors)
+	{
+		bool cancelled = false;
+		QList<IAssetEntry *> list;
+		AssetEntryManager::saveModifiedAssetEntrys(acceptedDocuments.toList(), QString(), &cancelled, QString(), 0, &list);
+		if (cancelled)
+			return false;
+		if (!list.isEmpty()) {
+			closingFailed = true;
+			acceptedDocuments.subtract(list.toSet());
+			QSet<IEditor*> skipSet = d->pAssetEntryModel_->editorsForAssetEntrys(list).toSet();
+			acceptedEditors = acceptedEditors.subtract(skipSet);
+		}
+	}
+	if (acceptedEditors.isEmpty()) {
+		return false;
+	}
+
+	QList<EditorView*> closedViews;
+
+
+	// remove the editors
+	foreach(IEditor *editor, acceptedEditors) {
+		emit pInstance_->editorAboutToClose(editor);
+		if (!editor->assetEntry()->name().isEmpty()
+			&& !editor->assetEntry()->isTemporary()) {
+			QByteArray state = editor->saveState();
+			if (!state.isEmpty()) {
+				d->editorStates_.insert(editor->assetEntry()->name(), QVariant(state));
+			}
+		}
+
+		removeEditor(editor);
+		if (EditorView *view = viewForEditor(editor)) 
+		{
+			if (editor == view->currentEditor()) {
+				closedViews += view;
+			}
+			if (d->currentEditor_ == editor) {
+				// avoid having a current editor without view
+				setCurrentView(view);
+				setCurrentEditor(0);
+			}
+			view->removeEditor(editor);
+		}
+	}
+
+	foreach(EditorView *view, closedViews)
+	{
+		int32_t editors = view->editorCount();
+
+		qDebug() << "editors left in view: " << editors;
+
+		if (editors == 0)
+		{
+			SplitterOrView *splitter = view->parentSplitterOrView();
+
+			BUG_CHECK(splitter);
+
+#if 0
+			// if the parent is a custom window we just close the window.
+			// which causes it to be remvoed from the root.
+			if (CustomWindow* window = qobject_cast<CustomWindow*>(splitter->parent()))
+			{
+				qDebug() << "closing editor window";
+				window->close();
+			}
+			// if the view is empty and is not the root view
+			// we want to remove the split.
+			else
+
+#endif
+			{
+				SplitterOrView* parent = splitter->findParentSplitter();
+				if (parent && parent->isSplitter()) {
+					parent->unsplit(splitter);
+				}
+			}
+		}
+	}
+
+	/*
+	bool currentViewHandled = false;
+	foreach (EditorView *view, closedViews)
+	{
+	OpenEditorFlags flags;
+	if (view == currentView)
+	currentViewHandled = true;
+	else
+	flags = OpenEditorFlags(DoNotChangeCurrentEditor);
+	IEditor *newCurrent = view->currentEditor();
+
+	if (!newCurrent)
+	newCurrent = pickUnusedEditor();
+	if (newCurrent) {
+	activateEditor(view, newCurrent, flags);
+	}
+	else
+	{
+	DocumentModel::Entry *entry = d->pAssetEntryModel_->firstRestoredDocument();
+	if (entry)
+	{
+	activateEditorForEntry(view, entry, flags);
+	} else
+	{
+	// no "restored" ones, so any entry left should have a document
+	const QList<DocumentModel::Entry *> documents = d->pAssetEntryModel_->documents();
+	if (!documents.isEmpty()) {
+	IDocument *document = documents.last()->document;
+	if (document)
+	activateEditorForDocument(view, document, flags);
+	}
+	}
+	}
+	}*/
+
+
+	emit pInstance_->editorsClosed(acceptedEditors.toList());
+
+	foreach(IEditor *editor, acceptedEditors) {
+		delete editor;
+	}
+
+	if (!currentEditor()) {
+		emit pInstance_->currentEditorChanged(0);
+		updateActions();
+		updateWindowTitle();
+	}
+
+
+	return !closingFailed;
+}
+
+
+IEditor* EditorManager::pickUnusedEditor(EditorView **foundView)
+{
+	foreach(IEditor *editor, d->pAssetEntryModel_->editorsForAssetEntrys(d->pAssetEntryModel_->openedAssetEntrys())) 
+	{
+		EditorView *view = viewForEditor(editor);
+		if (!view || view->currentEditor() != editor) {
+			if (foundView) {
+				*foundView = view;
+			}
+			return editor;
+		}
+	}
+	return nullptr;
+}
+
+
+void EditorManager::activateEditorForEntry(AssetEntryModel::Entry *entry, OpenEditorFlags flags)
+{
+	activateEditorForEntry(currentEditorView(), entry, flags);
+}
+
+
+void EditorManager::activateEditorForEntry(EditorView *view, AssetEntryModel::Entry *entry, OpenEditorFlags flags)
+{
+	BUG_ASSERT(view, return);
+	if (!entry) { // no pAssetEntry
+		view->setCurrentEditor(0);
+		setCurrentView(view);
+		setCurrentEditor(0);
+		return;
+	}
+	IAssetEntry* pAssetEntry = entry->pAssetEntry_;
+	if (pAssetEntry) {
+		activateEditorForAssetEntry(view, pAssetEntry, flags);
+		return;
+	}
+
+	if (!openEditor(view, entry->fileName(), entry->id(), flags)) {
+		d->pAssetEntryModel_->removeEntry(entry);
+	}
+}
+
+
+IEditor *EditorManager::activateEditorForAssetEntry(IAssetEntry* pAssetEntry, OpenEditorFlags flags)
+{
+	return activateEditorForAssetEntry(currentEditorView(), pAssetEntry, flags);
+}
+
+IEditor *EditorManager::activateEditorForAssetEntry(EditorView *view, IAssetEntry* pAssetEntry, OpenEditorFlags flags)
+{
+	Q_ASSERT(view);
+	IEditor *editor = view->editorForAssetEntry(pAssetEntry);
+	if (!editor) 
+	{
+		const QList<IEditor*> editors = d->pAssetEntryModel_->editorsForAssetEntry(pAssetEntry);
+		if (editors.isEmpty()) {
+			return nullptr;
+		}
+		editor = editors.first();
+	}
+	return activateEditor(view, editor, flags);
+}
+
+//DocumentModel *EditorManager::documentModel(void)
+//{
+//	return d->pAssetEntryModel_;
+//}
+
+bool EditorManager::closeAssetEntrys(const QList<IAssetEntry*>& assetEntrys, bool askAboutModifiedEditors)
+{
+	return pInstance_->closeEditors(d->pAssetEntryModel_->editorsForAssetEntrys(assetEntrys), askAboutModifiedEditors);
+}
+
+
+IEditor *EditorManager::duplicateEditor(IEditor *editor)
+{
+	if (!editor->duplicateSupported()) {
+		return nullptr;
+	}
+
+	IEditor *duplicate = editor->duplicate();
+	duplicate->restoreState(editor->saveState());
+	emit pInstance_->editorCreated(duplicate, duplicate->assetEntry()->name());
+	addEditor(duplicate);
+	return duplicate;
+}
+
+qint64 EditorManager::maxTextFileSize(void)
+{
+	return qint64(3) << 24;
+}
+
+void EditorManager::setWindowTitleAddition(const QString& addition)
+{
+	d->titleAddition_ = addition;
+	updateWindowTitle();
+}
+
+QString EditorManager::windowTitleAddition(void)
+{
+	return d->titleAddition_;
+}
+
+void EditorManager::setWindowTitleVcsTopic(const QString& topic)
+{
+	d->titleVcsTopic_ = topic;
+	pInstance_->updateWindowTitle();
+}
+
+QString EditorManager::windowTitleVcsTopic(void)
+{
+	return d->titleVcsTopic_;
+}
+
+bool EditorManager::saveEditor(IEditor *editor)
+{
+	return saveAssetEntry(editor->assetEntry());
+}
+
+bool EditorManager::saveAssetEntry(IAssetEntry* pAssetEntryParam)
+{
+	IAssetEntry* pAssetEntry = pAssetEntryParam;
+	if (!pAssetEntry && currentAssetEntry()) {
+		pAssetEntry = currentAssetEntry();
+	}
+	if (!pAssetEntry) {
+		return false;
+	}
+
+//	pAssetEntry->checkPermissions();
+
+	const QString& fileName = pAssetEntry->name();
+
+	if (fileName.isEmpty()) {
+		return saveAssetEntryAs(pAssetEntry);
+	}
+
+	bool success = false;
+	bool isReadOnly;
+
+	// try saving, no matter what isReadOnly tells us
+	success = AssetEntryManager::saveAssetEntry(pAssetEntry, QString(), &isReadOnly);
+
+	if (!success && isReadOnly) {
+		/*
+		MakeWritableResult answer = makeFileWritable(document);
+		if (answer == Failed)
+		return false;
+		if (answer == SavedAs)
+		return true;
+
+		document->checkPermissions();
+
+		success = AssetEntryManager::saveDocument(document);
+		*/
+	}
+
+	if (success) {
+		addAssetEntryToRecentFiles(pAssetEntry);
+	}
+
+	return success;
+}
+
+
+bool EditorManager::saveAssetEntryAs(IAssetEntry* pAssetEntryParam)
+{
+	IAssetEntry* pAssetEntry = pAssetEntryParam;
+	if (!pAssetEntry && currentAssetEntry()) {
+		pAssetEntry = currentAssetEntry();
+	}
+	if (!pAssetEntry) {
+		return false;
+	}
+
+	const QString filter; // = MimeDatabase::allFiltersString();
+	QString selectedFilter; // = MimeDatabase::findByFile(QFileInfo(document->filePath())).filterString();
+	const QString &fileName = AssetEntryManager::getSaveAsFileName(pAssetEntry, filter, &selectedFilter);
+
+	if (fileName.isEmpty()) {
+		return false;
+	}
+
+	if (fileName != pAssetEntry->name()) {
+		// close existing editors for the new file name
+		IAssetEntry* pOtherAssetEntry = d->pAssetEntryModel_->assetEntryForFileName(fileName);
+		if (pOtherAssetEntry) {
+			closeAssetEntrys(QList<IAssetEntry *>() << pOtherAssetEntry, false);
+		}
+	}
+
+	const bool success = AssetEntryManager::saveAssetEntry(pAssetEntry, fileName);
+//	pAssetEntry->checkPermissions();
+
+
+	if (success) {
+		addAssetEntryToRecentFiles(pAssetEntry);
+	}
+
+	updateActions();
+	return success;
+}
+
+/* Adds the file name to the recent files if there is at least one non-temporary editor for it */
+void EditorManager::addAssetEntryToRecentFiles(IAssetEntry* pAssetEntry)
+{
+	if (pAssetEntry->isTemporary()) {
+		return;
+	}
+
+	AssetEntryModel::Entry* pEntry = d->pAssetEntryModel_->entryForAssetEntry(pAssetEntry);
+	if (!pEntry) {
+		return;
+	}
+
+	AssetEntryManager::addToRecentFiles(pAssetEntry->name(), pEntry->id());
+}
+
+void EditorManager::autoSave(void)
+{
+	// QStringList errors;
+	// save the open AssetEntrys.
+	QStringList errors;
+
+	// FIXME: the saving should be staggered
+	foreach(IAssetEntry* pAssetEntry, d->pAssetEntryModel_->openedAssetEntrys())
+	{
+		if (!pAssetEntry->isModified() || !pAssetEntry->shouldAutoSave()) {
+			continue;
+		}
+		if (pAssetEntry->name().isEmpty()) { // FIXME: save them to a dedicated directory
+			continue;
+		}
+
+		QString errorString;
+		if (!pAssetEntry->autoSave(&errorString, autoSaveName(pAssetEntry->name()))) {
+			errors << errorString;
+		}
+	}
+
+	if (!errors.isEmpty()) {
+		QMessageBox::critical(ICore::mainWindow(), tr("File Error"), errors.join(QLatin1String("\n")));
+	}
+
+	// Also save settings while accessing the disk anyway:
+	//ICore::saveSettings();
+}
+
+void EditorManager::updateWindowTitle(void)
+{
+	QString windowTitle = tr("LadyBug");
+	const QString dashSep = QLatin1String(" - ");
+	QString vcsTopic;
+	IAssetEntry* pAssetEntry = currentAssetEntry();
+
+	//    EditorManagerPrivate* temp = d;
+
+	if (!d->titleVcsTopic_.isEmpty()) {
+		vcsTopic = QLatin1String(" [") + d->titleVcsTopic_ + QLatin1Char(']');
+	}
+
+	if (!d->titleAddition_.isEmpty()) {
+		windowTitle.prepend(dashSep);
+		if (!pAssetEntry) {
+			windowTitle.prepend(vcsTopic);
+		}
+		windowTitle.prepend(d->titleAddition_);
+	}
+
+	if (pAssetEntry) {
+		const QString assetEntryName = pAssetEntry->displayName();
+		if (!assetEntryName.isEmpty()) {
+			windowTitle.prepend(assetEntryName + vcsTopic + dashSep);
+		}
+
+		QString fileName = pAssetEntry->name();
+		if (!fileName.isEmpty()) {
+			ICore::mainWindow()->setWindowFilePath(fileName);
+		}
+	}
+	else {
+		ICore::mainWindow()->setWindowFilePath(QString());
+	}
+	ICore::mainWindow()->setWindowTitle(windowTitle);
+}
+
+
+
+void EditorManager::closeView(EditorView* pView)
+{
+	if (!pView) {
+		return;
+	}
+
+	emptyView(pView);
+
+	SplitterOrView *splitterOrView = pView->parentSplitterOrView();
+	Q_ASSERT(splitterOrView);
+	Q_ASSERT(splitterOrView->view() == pView);
+	SplitterOrView *splitter = splitterOrView->findParentSplitter();
+	Q_ASSERT(splitterOrView->hasEditors() == false);
+	splitterOrView->hide();
+
+#if 0
+	// check if it was a custom window.
+	CustomWindow* window = qobject_cast<CustomWindow *>(splitterOrView->parent());
+
+	delete splitterOrView;
+
+	if (!splitter)
+	{
+		if (window)
+		{
+			window->close();
+		}
+		return;
+	}
+#endif
+
+	splitter->unsplit();
+
+	EditorView *newCurrent = splitter->findFirstView();
+	if (newCurrent) {
+		if (IEditor *e = newCurrent->currentEditor())
+			activateEditor(newCurrent, e);
+		else
+			setCurrentView(newCurrent);
+	}
+}
+
+
+bool EditorManager::closeAllEditors(bool askAboutModifiedEditors)
+{
+	if (closeAssetEntrys(d->pAssetEntryModel_->openedAssetEntrys(), askAboutModifiedEditors)) {
+		return true;
+	}
+	return false;
+}
+
+
+void EditorManager::closeOtherEditors(IAssetEntry* pAssetEntry)
+{
+	QList<IAssetEntry*> assetEntrysToClose = d->pAssetEntryModel_->openedAssetEntrys();
+	assetEntrysToClose.removeAll(pAssetEntry);
+	closeAssetEntrys(assetEntrysToClose, true);
+}
+
+
+void EditorManager::emptyView(EditorView *view)
+{
+	if (!view) {
+		return;
+	}
+
+	EditorManager* pInstance = pInstance_;
+	if (!pInstance)
+	{
+		qDebug() << "emptyview called after editormanger closed";
+		return;
+	}
+
+	QList<IEditor*> editors = view->editors();
+	foreach(IEditor *editor, editors)
+	{
+		if (d->pAssetEntryModel_->editorsForAssetEntry(editor->assetEntry()).size() == 1)
+		{
+			// it's the only editor for that file
+			// so we need to keep it around (--> in the editor model)
+			if (currentEditor() == editor) {
+				// we don't want a current editor that is not open in a view
+				setCurrentView(view);
+				setCurrentEditor(nullptr);
+			}
+			editors.removeAll(editor);
+			view->removeEditor(editor);
+			continue; // don't close the editor
+		}
+		emit pInstance_->editorAboutToClose(editor);
+		removeEditor(editor);
+		view->removeEditor(editor);
+	}
+
+	if (!editors.isEmpty()) {
+		emit pInstance_->editorsClosed(editors);
+		foreach(IEditor *editor, editors) {
+			delete editor;
+		}
+	}
+}
+
+
+void EditorManager::updateActions(void)
+{
+	IAssetEntry *curDocument = currentAssetEntry();
+	int32_t openedCount = d->pAssetEntryModel_->assetEntryCount();
+
+	foreach(SplitterOrView *root, d->root_) {
+		setCloseSplitEnabled(root, root->isSplitter());
+	}
+
+	QString quotedName;
+	if (curDocument) {
+		quotedName = QLatin1Char('"') + curDocument->displayName() + QLatin1Char('"');
+	}
+	setupSaveActions(curDocument, d->saveAction_, d->saveAsAction_, 0);
+
+
+	d->closeCurrentEditorAction_->setEnabled(curDocument);
+	d->closeCurrentEditorAction_->setText(tr("Close %1").arg(quotedName));
+	d->closeAllEditorsAction_->setEnabled(openedCount > 0);
+	d->closeOtherEditorsAction_->setEnabled(openedCount > 1);
+	d->closeOtherEditorsAction_->setText(tr("Close All But This"));
+
+}
+
+void EditorManager::setCloseSplitEnabled(SplitterOrView *splitterOrView, bool enable)
+{
+	//  this function currently dose jack shit lol.
+	//    if (splitterOrView->isView())
+	//        splitterOrView->view()->setCloseSplitEnabled(enable);
+
+	QSplitter *splitter = splitterOrView->splitter();
+	if (splitter) {
+		for (int32_t i = 0; i < splitter->count(); ++i) {
+			if (SplitterOrView *subSplitterOrView = qobject_cast<SplitterOrView*>(splitter->widget(i))) {
+				setCloseSplitEnabled(subSplitterOrView, enable);
+			}
+		}
+	}
+}
+
+
+void EditorManager::setupSaveActions(IAssetEntry* pAssetEntry, QAction *saveAction, QAction *saveAsAction, QAction *revertToSavedAction)
+{
+	if (debugLogging) {
+		qDebug() << Q_FUNC_INFO;
+	}
+
+	saveAction->setEnabled(pAssetEntry != nullptr && pAssetEntry->isModified());
+	saveAsAction->setEnabled(pAssetEntry != nullptr && pAssetEntry->isSaveAsAllowed());
+	if (revertToSavedAction) {
+		revertToSavedAction->setEnabled(pAssetEntry != nullptr && !pAssetEntry->name().isEmpty());
+	}
+
+	const QString assetEntryName = pAssetEntry ? pAssetEntry->displayName() : QString();
+	QString quotedName;
+
+	if (!assetEntryName.isEmpty()) {
+		quotedName = QLatin1Char('"') + assetEntryName + QLatin1Char('"');
+		saveAction->setText(tr("&Save %1").arg(quotedName));
+		saveAsAction->setText(tr("Save %1 As...").arg(quotedName));
+	}
+}
+
+
+
+static void assignAction(QAction *self, QAction *other)
+{
+	self->setText(other->text());
+	self->setIcon(other->icon());
+	self->setShortcut(other->shortcut());
+	self->setEnabled(other->isEnabled());
+	self->setIconVisibleInMenu(other->isIconVisibleInMenu());
+}
+
+void EditorManager::addSaveAndCloseEditorActions(QMenu *contextMenu, IEditor *editor)
+{
+	BUG_ASSERT(contextMenu, return);
+	d->contextMenuEntry_ = editor;
+
+	assignAction(d->saveCurrentEditorContextAction_, ActionManager::command(Constants::SAVE)->action());
+	assignAction(d->saveAsCurrentEditorContextAction_, ActionManager::command(Constants::SAVEAS)->action());
+
+	IAssetEntry* pAssetEntry = editor ? editor->assetEntry() : nullptr;
+
+	setupSaveActions(pAssetEntry,
+		d->saveCurrentEditorContextAction_,
+		d->saveAsCurrentEditorContextAction_,
+		0
+	);
+
+	contextMenu->addAction(d->saveCurrentEditorContextAction_);
+	contextMenu->addAction(d->saveAsCurrentEditorContextAction_);
+	contextMenu->addAction(ActionManager::command(Constants::SAVEALL)->action());
+
+	contextMenu->addSeparator();
+
+	d->closeCurrentEditorContextAction_->setText(pAssetEntry
+		? tr("Close \"%1\"").arg(pAssetEntry->displayName())
+		: tr("Close Editor"));
+	d->closeOtherEditorsContextAction_->setText(tr("Close All But This"));
+	d->closeCurrentEditorContextAction_->setEnabled(pAssetEntry != nullptr);
+	d->closeOtherEditorsContextAction_->setEnabled(pAssetEntry != nullptr);
+	d->closeAllEditorsContextAction_->setEnabled(!d->pAssetEntryModel_->assetEntrys().isEmpty());
+	contextMenu->addAction(d->closeCurrentEditorContextAction_);
+	contextMenu->addAction(d->closeAllEditorsContextAction_);
+	contextMenu->addAction(d->closeOtherEditorsContextAction_);
+}
+
+void EditorManager::addNativeDirActions(QMenu *contextMenu, IEditor *editor)
+{
+	BUG_ASSERT(contextMenu, return);
+	X_UNUSED(editor);
+//	bool enabled = editor && !editor->assetEntry()->name().isEmpty();
+
+//	d->openGraphicalShellAction_->setEnabled(enabled);
+
+	contextMenu->addAction(d->copyFullPathContextAction_);
+//	contextMenu->addAction(d->openGraphicalShellAction_);
+}
+
+
+void EditorManager::addFloatActions(QMenu *contextMenu, IEditor *editor)
+{
+	BUG_ASSERT(contextMenu, return);
+
+	// we need to know if a window is floated.
+	if (EditorView *view = viewForEditor(editor)) {
+		SplitterOrView *splitter = view->parentSplitterOrView();
+
+		if (splitter) {
+
+			int32_t rootidx = -1;
+			findRoot(view, &rootidx);
+
+			if (rootidx != 0) {
+				contextMenu->addAction(d->DockEditorMainContextAction_);
+			}
+			else {
+				contextMenu->addAction(d->FloatEditorContextAction_);
+			}
+
+			contextMenu->addSeparator();
+
+			if (!splitter->isView())
+				return;
+
+			int32_t num_editors = splitter->view()->editorCount();
+
+			// if the view is part of a splitter already we don't allow split again.
+			splitter = splitter->findParentSplitter();
+
+			if (!splitter) {
+				// we can only move to new if move than 1 baby
+				if (num_editors > 1) {
+					contextMenu->addAction(d->moveToNewHozTabGroupContextAction_);
+					contextMenu->addAction(d->moveToNewVerTabGroupContextAction_);
+					contextMenu->addSeparator();
+				}
+
+				contextMenu->addAction(d->splitHozTabGroupContextAction_);
+				contextMenu->addAction(d->splitVerTabGroupContextAction_);
+			}
+
+		}
+	}
+}
+
+
+
+void EditorManager::saveAssetEntryFromContextMenu(void)
+{
+	IAssetEntry* pAssetEntry = d->contextMenuEntry_ ? d->contextMenuEntry_->assetEntry() : nullptr;
+	if (pAssetEntry) {
+		saveAssetEntry(pAssetEntry);
+	}
+}
+
+void EditorManager::saveAssetEntryAsFromContextMenu(void)
+{
+	IAssetEntry* pAssetEntry = d->contextMenuEntry_ ? d->contextMenuEntry_->assetEntry() : nullptr;
+	if (pAssetEntry) {
+		saveAssetEntryAs(pAssetEntry);
+	}
+}
+
+void EditorManager::closeEditorFromContextMenu(void)
+{
+	IAssetEntry* pAssetEntry = d->contextMenuEntry_ ? d->contextMenuEntry_->assetEntry() : nullptr;
+	if (pAssetEntry) {
+		closeEditors(d->pAssetEntryModel_->editorsForAssetEntry(pAssetEntry));
+	}
+}
+
+void EditorManager::closeOtherEditorsFromContextMenu(void)
+{
+	IAssetEntry* pAssetEntry = d->contextMenuEntry_ ? d->contextMenuEntry_->assetEntry() : nullptr;
+	closeOtherEditors(pAssetEntry);
+}
+
+void EditorManager::copyFullPath(void)
+{
+	if (!d->contextMenuEntry_ || d->contextMenuEntry_->assetEntry()->name().isEmpty()) {
+		return;
+	}
+
+	QApplication::clipboard()->setText(d->contextMenuEntry_->assetEntry()->name());
+}
+
+
+
+// =============== Split me ====================
+
+void EditorManager::RemoveSplitIfEmpty(EditorView *view)
+{
+	if (view->editorCount() != 0) {
+		return;
+	}
+
+	// the views view object.
+	SplitterOrView* splitView = view->parentSplitterOrView();
+
+	// the parent needs to be a split to remove the split :@)
+	if (SplitterOrView* splitter = splitView->findParentSplitter())
+	{
+		if (splitter->isSplitter())
+		{
+			// remove split, passing the view we want removed.
+			splitter->unsplit(splitView);
+		}
+	}
+}
+
+void EditorManager::split(Qt::Orientation orientation, IEditor *editor)
+{
+	EditorView* view = currentEditorView();
+
+	if (editor) {
+		view = viewForEditor(editor);
+	}
+
+	if (view) {
+		view->parentSplitterOrView()->split(orientation);
+	}
+
+	updateActions();
+}
+
+void EditorManager::split(void)
+{
+	split(Qt::Vertical);
+}
+
+void EditorManager::splitSideBySide(void)
+{
+	split(Qt::Horizontal);
+}
+
+void EditorManager::splitNewWindow(void)
+{
+	splitNewWindow(currentEditorView());
+}
+
+void EditorManager::splitNewWindow(IEditor *editor)
+{
+	if (EditorView *view = viewForEditor(editor)) {
+		splitNewWindow(view, editor);
+	}
+}
+
+void EditorManager::splitNewWindow(EditorView* pView, IEditor* pEditor)
+{
+	X_UNUSED(pView);
+	X_UNUSED(pEditor);
+
+}
+
+
+void EditorManager::removeCurrentSplit(void)
+{
+	EditorView *viewToClose = currentEditorView();
+
+	BUG_ASSERT(viewToClose, return);
+	BUG_ASSERT(!d->root_.contains(viewToClose->parentSplitterOrView()), return);
+
+	closeView(viewToClose);
+	updateActions();
+}
+
+
+void EditorManager::removeAllSplits(void)
+{
+	EditorView *view = currentEditorView();
+	BUG_ASSERT(view, return);
+	SplitterOrView *root = findRoot(view);
+	BUG_ASSERT(root, return);
+	root->unsplitAll();
+}
+
+
+void EditorManager::floatEditor(void)
+{
+	if (d->contextMenuEntry_) {
+		splitNewWindow(d->contextMenuEntry_);
+	}
+}
+
+void EditorManager::dockEditorMain(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+}
+
+void EditorManager::newHozTabGroup(void)
+{
+	// qt has lost the plot, Vertical is (real)Horizontal jews!
+	if (d->contextMenuEntry_) {
+		split(Qt::Horizontal, d->contextMenuEntry_);
+	}
+}
+
+void EditorManager::newVerTabGroup(void)
+{
+	if (d->contextMenuEntry_) {
+		split(Qt::Vertical, d->contextMenuEntry_);
+	}
+}
+
+
+// =============== Move me ====================
+
+void EditorManager::moveNewHozTabGroup(void)
+{
+	if (d->contextMenuEntry_) {
+		moveEditor(Qt::Horizontal, d->contextMenuEntry_);
+	}
+}
+
+void EditorManager::moveNewVerTabGroup(void)
+{
+	if (d->contextMenuEntry_) {
+		moveEditor(Qt::Vertical, d->contextMenuEntry_);
+	}
+}
+
+
+void EditorManager::moveEditor(Qt::Orientation orientation, IEditor *editor, Direction side)
+{
+	// we want to move the editor to a new group.
+	// the orientation is the direction of the new spit.
+	// this dose require there to be atleast 2 editors in the EditorView
+	BUG_ASSERT(editor, return);
+
+	EditorView *view = viewForEditor(editor);
+
+	BUG_CHECK(view);
+
+	if (view)
+	{
+		if (view->editorCount() > 1)
+		{
+			// ok we want to remove the view.
+			// then do a split and place it in new view.
+			SplitterOrView* splitter = view->parentSplitterOrView();
+
+			BUG_ASSERT(splitter, return);
+
+			splitter->moveEditor(orientation, editor, side);
+		}
+		else
+		{
+			qDebug() << "need alteast 2 editors in tabview to perform a move.";
+		}
+	}
+}
+
+
+// =============== UnDock me ====================
+
+
+SplitterOrView* EditorManager::undockEditor(IEditor* editor, QPoint& pos)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+	X_UNUSED(editor);
+	X_UNUSED(pos);
+
+	return nullptr;
+}
+
+void EditorManager::splitDragEnd(SplitterOrView*)
+{
+
+}
+
+void EditorManager::AddEditorsToView(EditorView *source, EditorView* target, QList<IEditor*>& editors)
+{
+	foreach(IEditor* editor, editors)
+	{
+		source->removeEditor(editor);
+
+		OpenEditorFlags flags = IgnoreNavigationHistory | DoNotChangeCurrentEditor;
+
+		pInstance_->activateEditor(target, editor, flags);
+
+		if (editor == editors.last()) {
+			target->setCurrentEditor(editor);
+		}
+	}
+}
+
+
+void EditorManager::AddEditorsToView(SplitterOrView* splitter, EditorView* target)
+{
+	if (!splitter->isSplitter()) {
+		return; // could redirect it to above function.
+	}
+
+	QSplitter* split = splitter->splitter();
+
+	for (int32_t i = 0; i< split->count(); i++) 
+	{
+		SplitterOrView* s = qobject_cast<SplitterOrView*>(split->widget(i));
+
+		if (s) {
+			if (s->isView()) {
+				AddEditorsToView(s->view(), target, s->editors());
+			}
+			else if (s->isSplitter()) {
+				AddEditorsToView(s, target);
+			}
+		}
+	}
+}
+
+void EditorManager::floatDockCheck(SplitterOrView *splitter, const QPoint& pos)
+{
+	X_UNUSED(splitter);
+	X_UNUSED(pos);
+
+}
+
+
+X_NAMESPACE_END

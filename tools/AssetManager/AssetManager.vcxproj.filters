@@ -112,6 +112,18 @@
     <Filter Include="Source Files\Dialogs">
       <UniqueIdentifier>{11af5ceb-f7df-45f1-a5b4-3355a863e8c3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Editor">
+      <UniqueIdentifier>{03624ce3-7205-47db-bca4-e5c88ab4df6b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Editor">
+      <UniqueIdentifier>{749a4276-a7d1-49de-bbea-ac2918ad828a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AssetEntry">
+      <UniqueIdentifier>{e42d1c28-450a-40d8-9fcb-c2024de8359d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AssetEntry">
+      <UniqueIdentifier>{55e2c069-08bb-43d8-9a59-c10d38c83904}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="assetmanager.cpp">
@@ -468,9 +480,6 @@
     <ClCompile Include="Release\moc_VersionDialog.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="VersionDialog.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Debug Dynamic\moc_IEditor.cpp">
       <Filter>Generated Files\Debug Dynamic</Filter>
     </ClCompile>
@@ -484,6 +493,117 @@
       <Filter>Generated Files\Super Dynamic</Filter>
     </ClCompile>
     <ClCompile Include="Release\moc_IEditor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_EditorView.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_EditorView.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_EditorView.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_EditorView.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_EditorView.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorView.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="CustomTabWidget.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="VersionDialog.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_CustomTabWidget.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_CustomTabWidget.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_CustomTabWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_CustomTabWidget.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_CustomTabWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_EditorManager.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_EditorManager.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_EditorManager.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_EditorManager.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_EditorManager.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorManager.cpp">
+      <Filter>Source Files\Editor</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_IAssetEntry.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_IAssetEntry.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_IAssetEntry.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_IAssetEntry.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_IAssetEntry.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="IAssetEntry.cpp">
+      <Filter>Source Files\Interfaces</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_AssetEntryModel.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_AssetEntryModel.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_AssetEntryModel.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_AssetEntryModel.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_AssetEntryModel.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetEntryModel.cpp">
+      <Filter>Source Files\AssetEntry</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetEntryManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_AssetEntryManager.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_AssetEntryManager.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_AssetEntryManager.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_AssetEntryManager.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_AssetEntryManager.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
   </ItemGroup>
@@ -521,11 +641,29 @@
     <CustomBuild Include="project.h">
       <Filter>Header Files\Projects</Filter>
     </CustomBuild>
-    <CustomBuild Include="VersionDialog.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="IEditor.h">
       <Filter>Header Files\Interfaces</Filter>
+    </CustomBuild>
+    <CustomBuild Include="EditorView.h">
+      <Filter>Header Files\Editor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="VersionDialog.h">
+      <Filter>Header Files\Dialogs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="CustomTabWidget.h">
+      <Filter>Header Files\Editor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="EditorManager.h">
+      <Filter>Header Files\Editor</Filter>
+    </CustomBuild>
+    <CustomBuild Include="IAssetEntry.h">
+      <Filter>Header Files\Interfaces</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AssetEntryModel.h">
+      <Filter>Header Files\AssetEntry</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AssetEntryManager.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -632,6 +770,9 @@
     <None Include="IEditor.inl">
       <Filter>Header Files\Interfaces</Filter>
     </None>
+    <None Include="EditorView.inl">
+      <Filter>Header Files\Editor</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="AssetManager.rc">
@@ -649,6 +790,9 @@
     </ClInclude>
     <ClInclude Include="logging.h">
       <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionConstants.h">
+      <Filter>Header Files\Editor</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

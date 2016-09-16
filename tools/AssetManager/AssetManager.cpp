@@ -2,7 +2,7 @@
 #include "assetdbwidget.h"
 #include "assetdbexplorer.h"
 #include "ActionManager.h"
-
+#include "EditorManager.h"
 #include "ActionContainer.h"
 #include "VersionDialog.h"
 
@@ -17,6 +17,7 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pLayout_(nullptr),
 	pCoreImpl_(nullptr),
 	pActionManager_(nullptr),
+	pEditorManager_(nullptr),
 	pDb_(nullptr),
 	pAssetDbexplorer_(nullptr),
 	additionalContexts_(Constants::C_GLOBAL) // always have global contex
@@ -24,39 +25,51 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pCoreImpl_ = new ICore(this);
 	pActionManager_ = new ActionManager(this);
 
-	connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*, QWidget*)),
-		this, SLOT(updateFocusWidget(QWidget*, QWidget*)));
 
-
-	pDb_ = new assetDb::AssetDB();
-	if (!pDb_->OpenDB()) {
-		QMessageBox::critical(this, tr("Error"), "Failed to open AssetDB");
+	{
+		pDb_ = new assetDb::AssetDB();
+		if (!pDb_->OpenDB()) {
+			QMessageBox::critical(this, tr("Error"), "Failed to open AssetDB");
+		}
 	}
 
-	pAssetDbexplorer_ = new AssetExplorer::AssetExplorer(*pDb_);
-	if (!pAssetDbexplorer_->init()) {
-		QMessageBox::critical(this, tr("Error"), "Failed to init AssetExpolrer");
-	}
-	pAssetDbexplorer_->loadMods();
-
-
-	pAssetViewWidget_ = new AssetExplorer::AssetDbViewWidget(*pDb_);
-
-
-	pLayout_ = new QGridLayout();
-	pLayout_->addWidget(pAssetViewWidget_);
-
-
-	QWidget* pWindow = new QWidget();
-	pWindow->setLayout(pLayout_);
+	// ----------------------------------
 
 	createActions();
 	createMenus();
 	createStatusBar();
+
+	// ----------------------------------
+
+	// needs to be done after menu's created
+	pEditorManager_ = new EditorManager(this);
+	pEditorManager_->init();
+
+	{
+		pAssetDbexplorer_ = new AssetExplorer::AssetExplorer(*pDb_);
+		if (!pAssetDbexplorer_->init()) {
+			QMessageBox::critical(this, tr("Error"), "Failed to init AssetExpolrer");
+		}
+		pAssetDbexplorer_->loadMods();
+	}
+
+	{
+	//	pLayout_ = new QGridLayout();
+	//	pLayout_->addWidget(pAssetViewWidget_);
+	//
+	//	QWidget* pWindow = new QWidget();
+	//	pWindow->setLayout(pLayout_);
+
+		setCentralWidget(pEditorManager_);
+		setMinimumSize(600, 800);
+	}
+
+	connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*, QWidget*)),
+		this, SLOT(updateFocusWidget(QWidget*, QWidget*)));
+
+
 	createDockWindows();
 
-	setCentralWidget(pWindow);
-	setMinimumSize(600, 800);
 
 }
 
@@ -258,6 +271,28 @@ void AssetManager::createMenus(void)
 		filemenu->addAction(pCmd, Constants::G_FILE_CLOSE);
 	}
 
+	// Window
+	{
+		ActionContainer *windowmenu = ActionManager::createMenu(Constants::M_WINDOW);
+		pMenuBar->addMenu(windowmenu, Constants::G_WINDOW);
+		windowmenu->menu()->setTitle(tr("Window"));
+
+		// Groups
+		windowmenu->appendGroup(Constants::G_WINDOW_LAYOUT);
+		windowmenu->appendGroup(Constants::G_WINDOW_SPLIT);
+		windowmenu->appendGroup(Constants::G_WINDOW_DOCUMENT);
+		windowmenu->appendGroup(Constants::G_WINDOW_PANES);
+		windowmenu->appendGroup(Constants::G_WINDOW_WINDOWS);
+
+
+		// Window menu separators
+		windowmenu->addSeparator(globalContext, Constants::G_WINDOW_LAYOUT);
+		windowmenu->addSeparator(globalContext, Constants::G_WINDOW_DOCUMENT);
+		windowmenu->addSeparator(globalContext, Constants::G_WINDOW_WINDOWS);
+
+
+
+	}
 
 	// Help
 	{
@@ -291,8 +326,42 @@ void AssetManager::createStatusBar(void)
 
 }
 
+template<class T>
+T* AssetManager::AddDockItem(const char* pName, Qt::DockWidgetAreas areas, Qt::DockWidgetArea start)
+{
+	QDockWidget* pDock = new QDockWidget(tr(pName), this);
+	pDock->setAllowedAreas(areas);
+
+	T* pItem = new T(pDock);
+
+	pDock->setWidget(pItem);
+
+	addDockWidget(start, pDock);
+
+	return pItem;
+}
+
+template<class T>
+void AssetManager::AddDockItem(const char* pName, T* pWidget, Qt::DockWidgetAreas areas, Qt::DockWidgetArea start)
+{
+	QDockWidget* pDock = new QDockWidget(tr(pName), this);
+	pDock->setAllowedAreas(areas);
+
+	pDock->setWidget(pWidget);
+
+	addDockWidget(start, pDock);
+}
+
+
 void AssetManager::createDockWindows(void)
 {
+	pAssetViewWidget_ = new AssetExplorer::AssetDbViewWidget(*pDb_);
+
+
+	Qt::DockWidgetAreas all = Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea;
+
+	AddDockItem<AssetExplorer::AssetDbViewWidget>("Asset Explorer", pAssetViewWidget_, all, Qt::LeftDockWidgetArea);
+
 
 }
 

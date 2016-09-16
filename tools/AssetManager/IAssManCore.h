@@ -5,6 +5,8 @@
 
 X_NAMESPACE_BEGIN(assman)
 
+class IEditor;
+
 class ICoreListener : public QObject
 {
 	Q_OBJECT
@@ -12,6 +14,7 @@ public:
 	ICoreListener(QObject* pParent = nullptr) : QObject(pParent) {}
 	virtual ~ICoreListener() = default;
 
+	virtual bool editorAboutToClose(IEditor* pEditor) { return true; }
 	virtual bool coreAboutToClose(void) { return true; }
 };
 

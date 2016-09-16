@@ -12,6 +12,7 @@ X_NAMESPACE_DECLARE(assetDb,
 X_NAMESPACE_BEGIN(assman)
 
 class ActionManager;
+class EditorManager;
 class VersionDialog;
 
 namespace AssetExplorer {
@@ -42,6 +43,10 @@ private:
 	void updateContextObject(const QList<IContext*>& context);
 	void updateContext(void);
 
+	template<class T>
+	T* AddDockItem(const char* pName, Qt::DockWidgetAreas areas, Qt::DockWidgetArea initial);
+	template<class T>
+	void AddDockItem(const char* pName, T* pWidget, Qt::DockWidgetAreas areas, Qt::DockWidgetArea start);
 
 public slots:
 	void raiseWindow(void);
@@ -79,6 +84,7 @@ private:
 	Context additionalContexts_;
 
 	ActionManager* pActionManager_;
+	EditorManager* pEditorManager_;
 
 	// context baby, do you speak it!
 	QList<IContext*>           activeContext_;
