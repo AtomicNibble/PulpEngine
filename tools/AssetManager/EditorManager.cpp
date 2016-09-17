@@ -1567,10 +1567,12 @@ void EditorManager::closeView(EditorView* pView)
 
 	EditorView *newCurrent = splitter->findFirstView();
 	if (newCurrent) {
-		if (IEditor *e = newCurrent->currentEditor())
+		if (IEditor *e = newCurrent->currentEditor()) {
 			activateEditor(newCurrent, e);
-		else
+		}
+		else {
 			setCurrentView(newCurrent);
+		}
 	}
 }
 
