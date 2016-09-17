@@ -49,6 +49,8 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pEditorManager_ = new EditorManager(this);
 	pEditorManager_->init();
 
+	pEditorManager_->AddFactory(new AssetPropertyEditorFactory(this));
+
 	{
 		pAssetDbexplorer_ = new AssetExplorer::AssetExplorer(*pDb_);
 		if (!pAssetDbexplorer_->init()) {
