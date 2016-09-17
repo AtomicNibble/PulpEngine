@@ -71,7 +71,7 @@ BaseWindow::BaseWindow(QWidget * parent) :
 	mainLayout_(this),
 	centralWidget_(nullptr)
 {
-	setMinimumSize(128, 64);
+	setMinimumSize(196, 96);
 //	setWindowFlags(Qt::FramelessWindowHint | Qt::WindowMinimizeButtonHint);
 	setObjectName("BaseWindow");
 
