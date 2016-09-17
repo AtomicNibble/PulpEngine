@@ -102,6 +102,10 @@ AssetManager::~AssetManager()
 		delete pDb_;
 	}
 
+	if (pAssetEntryManager_) {
+		delete pAssetEntryManager_;
+	}
+
 	if (pAssetDbexplorer_) {
 		delete pAssetDbexplorer_;
 	}
@@ -113,6 +117,11 @@ AssetManager::~AssetManager()
 	if (pActionManager_) {
 		delete pActionManager_;
 	}
+
+	if (pEditorManager_) {
+		delete pEditorManager_;
+	}
+
 }
 
 
