@@ -67,7 +67,6 @@ private slots:
 	void destroyAboutDialog(void);
 
 protected:
-	virtual void changeEvent(QEvent* e) X_OVERRIDE;
 	virtual void closeEvent(QCloseEvent *event) X_OVERRIDE;
 
 

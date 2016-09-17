@@ -579,20 +579,6 @@ void AssetManager::destroyAboutDialog(void)
 // ----------------------------------------------------
 
 
-void AssetManager::changeEvent(QEvent *e)
-{
-	QWidget::changeEvent(e);
-	if (e->type() == QEvent::ActivationChange)
-	{
-		bool active = isActiveWindow();
-
-		if (active) {
-		//	emit windowActivated();
-		}
-	}
-}
-
-
 void AssetManager::closeEvent(QCloseEvent *event)
 {
 	// tell the goats
