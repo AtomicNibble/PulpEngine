@@ -141,9 +141,9 @@ namespace
 		closeAllEditorsAction_(new QAction(EditorManager::tr("Close All Documents"), parent)),
 		closeOtherEditorsAction_(new QAction(EditorManager::tr("Close All But This"), parent)),
 
-		saveCurrentEditorContextAction_(new QAction(EditorManager::tr("&Save"), parent)),
-		saveAsCurrentEditorContextAction_(new QAction(EditorManager::tr("Save &As..."), parent)),
-		closeCurrentEditorContextAction_(new QAction(EditorManager::tr("Close"), parent)),
+		saveCurrentEditorContextAction_(new QAction(QIcon(":/misc/img/Savea.png"), EditorManager::tr("&Save"), parent)),
+		saveAsCurrentEditorContextAction_(new QAction(QIcon(":/misc/img/Save.png"), EditorManager::tr("Save &As..."), parent)),
+		closeCurrentEditorContextAction_(new QAction(QIcon(":/misc/img/quit.png"), EditorManager::tr("Close"), parent)),
 		closeAllEditorsContextAction_(new QAction(EditorManager::tr("Close All Documents"), parent)),
 		closeOtherEditorsContextAction_(new QAction(EditorManager::tr("Close All But This"), parent)),
 		copyFullPathContextAction_(new QAction(EditorManager::tr("Copy Full Path"), parent)),
