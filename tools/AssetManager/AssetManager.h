@@ -2,6 +2,7 @@
 #define ASSETMANAGER_H
 
 #include <QMainWindow>
+#include "BaseWindow.h"
 
 class QGridLayout;
 
@@ -21,7 +22,7 @@ namespace AssetExplorer {
     class AssetExplorer;
 }
 
-class AssetManager : public QMainWindow
+class AssetManager : public BaseWindow
 {
     Q_OBJECT
 
@@ -48,9 +49,6 @@ private:
 	T* AddDockItem(const char* pName, Qt::DockWidgetAreas areas, Qt::DockWidgetArea initial);
 	template<class T>
 	void AddDockItem(const char* pName, T* pWidget, Qt::DockWidgetAreas areas, Qt::DockWidgetArea start);
-
-public slots:
-	void raiseWindow(void);
 
 
 private slots:
@@ -81,7 +79,9 @@ private:
 
 private:
     QGridLayout* pLayout_;
+	QMainWindow* pDockArea_;
 
+private:
 	ICore*  pCoreImpl_;
 	Context additionalContexts_;
 

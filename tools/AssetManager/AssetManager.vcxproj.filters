@@ -678,6 +678,24 @@
     <ClCompile Include="AssetPropertyEditorFactory.cpp">
       <Filter>Source Files\Editor\Types</Filter>
     </ClCompile>
+    <ClCompile Include="BaseWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_BaseWindow.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_BaseWindow.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_BaseWindow.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_BaseWindow.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_BaseWindow.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -748,6 +766,9 @@
     </CustomBuild>
     <CustomBuild Include="AssetPropertyEditorFactory.h">
       <Filter>Header Files\Editor\Types</Filter>
+    </CustomBuild>
+    <CustomBuild Include="BaseWindow.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

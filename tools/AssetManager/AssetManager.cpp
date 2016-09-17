@@ -16,7 +16,7 @@
 X_NAMESPACE_BEGIN(assman)
 
 AssetManager::AssetManager(QWidget* pParent) :
-	QMainWindow(pParent),
+	BaseWindow(pParent),
 	pVersionDialog_(nullptr),
 	pLayout_(nullptr),
 	pCoreImpl_(nullptr),
@@ -29,6 +29,9 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pCoreImpl_ = new ICore(this);
 	pActionManager_ = new ActionManager(this);
 	pAssetEntryManager_ = new AssetEntryManager(this);
+
+	pLayout_ = new QGridLayout();
+	pDockArea_ = new QMainWindow();
 
 	{
 		pDb_ = new assetDb::AssetDB();
@@ -66,8 +69,8 @@ AssetManager::AssetManager(QWidget* pParent) :
 	//	QWidget* pWindow = new QWidget();
 	//	pWindow->setLayout(pLayout_);
 
-		setCentralWidget(pEditorManager_);
-		setMinimumSize(600, 800);
+	//	setCentralWidget(pEditorManager_);
+	//	setMinimumSize(600, 800);
 	}
 
 	connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*, QWidget*)),
@@ -77,7 +80,18 @@ AssetManager::AssetManager(QWidget* pParent) :
 	createDockWindows();
 
 
-	EditorManager::openEditor("test");
+	pDockArea_->setCentralWidget(pEditorManager_);
+	pLayout_->addItem(new QSpacerItem(2, 2), 0, 0, 1, 1); // left
+	pLayout_->addWidget(pDockArea_, 0, 1, 1, 1); // center
+	pLayout_->addItem(new QSpacerItem(2, 2), 0, 2, 1, 1); // right
+//	setStatusBar(&m_StatusBar);
+	setCentralWidget(pLayout_);
+	setMinimumSize(600, 800);
+
+
+	EditorManager::openEditor("test", Constants::ASSETPROP_EDITOR_ID);
+	EditorManager::openEditor("test1", Constants::ASSETPROP_EDITOR_ID);
+	EditorManager::openEditor("test2", Constants::ASSETPROP_EDITOR_ID);
 
 }
 
@@ -333,7 +347,7 @@ void AssetManager::createMenus(void)
 
 
 
-	setMenuBar(pMenuBar->menuBar());
+	pDockArea_->setMenuBar(pMenuBar->menuBar());
 }
 
 
@@ -352,7 +366,7 @@ T* AssetManager::AddDockItem(const char* pName, Qt::DockWidgetAreas areas, Qt::D
 
 	pDock->setWidget(pItem);
 
-	addDockWidget(start, pDock);
+	pDockArea_->addDockWidget(start, pDock);
 
 	return pItem;
 }
@@ -365,7 +379,7 @@ void AssetManager::AddDockItem(const char* pName, T* pWidget, Qt::DockWidgetArea
 
 	pDock->setWidget(pWidget);
 
-	addDockWidget(start, pDock);
+	pDockArea_->addDockWidget(start, pDock);
 }
 
 
@@ -381,12 +395,6 @@ void AssetManager::createDockWindows(void)
 
 }
 
-
-void AssetManager::raiseWindow(void)
-{
-	X_ASSERT_NOT_IMPLEMENTED();
-
-}
 
 
 // =======================  Help Menu Actions =======================
