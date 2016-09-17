@@ -10,6 +10,9 @@
 #include "AssetPropertyEditorFactory.h"
 #include "Command.h"
 
+#include "IEditor.h"
+#include "IAssetEntry.h"
+
 #include <../AssetDB/AssetDB.h>
 
 
@@ -256,6 +259,15 @@ void AssetManager::createActions(void)
 	connect(pQuitAct_, SIGNAL(triggered()), this, SLOT(close()));
 
 
+	// View
+	pViewAssetDbExpoAct_ = new QAction(tr("AssetDB Explorer"), this);
+
+
+	// Window
+	pWindowResetLayoutAct_ = new QAction(tr("Reset Layout"), this);
+	connect(pWindowResetLayoutAct_, SIGNAL(triggered()), this, SLOT(resetLayout()));
+
+
 	// Help
 	pAboutAct_ = new QAction(tr("About AssetManager"), this);
 	pAboutAct_->setStatusTip(tr("Show the AssetManager's' About box"));
@@ -310,9 +322,42 @@ void AssetManager::createMenus(void)
 		filemenu->addAction(pCmd, Constants::G_FILE_CLOSE);
 	}
 
+	// View
+	{
+		ActionContainer *viewmenu = ActionManager::createMenu(Constants::M_VIEW);
+		pMenuBar->addMenu(viewmenu, Constants::G_VIEW);
+		viewmenu->menu()->setTitle(tr("View"));
+
+		// Groups
+		viewmenu->appendGroup(Constants::G_VIEW_CODE);
+		viewmenu->appendGroup(Constants::G_VIEW_DOCKED);
+		viewmenu->appendGroup(Constants::G_VIEW_TOOLBARS);
+
+		// File menu separators
+		viewmenu->addSeparator(globalContext, Constants::G_VIEW_CODE);
+		viewmenu->addSeparator(globalContext, Constants::G_VIEW_DOCKED);
+		viewmenu->addSeparator(globalContext, Constants::G_VIEW_TOOLBARS);
+
+		// Creat Child menu's
+		ActionContainer *mToolBar = ActionManager::createMenu(Constants::M_VIEW_TOOLBAR);
+
+		mToolBar->menu()->setTitle("ToolBars");
+		mToolBar->setOnAllDisabledBehavior(ActionContainer::OnAllDisabledBehavior::Show);
+		viewmenu->addMenu(mToolBar, Constants::G_VIEW_TOOLBARS);
+
+
+	//	// docks
+	//	pCmd = ActionManager::registerAction(pViewAssetDbExpoAct_, Constants::VIEW_ASSETDBEXPLORER, globalContext);
+	//	viewmenu->addAction(pCmd, Constants::G_VIEW_DOCKED);
+
+
+		// connect shit
+		connect(viewmenu->menu(), SIGNAL(aboutToShow()), this, SLOT(aboutToShowViewMenu()));
+	}
+
 	// Window
 	{
-		ActionContainer *windowmenu = ActionManager::createMenu(Constants::M_WINDOW);
+		ActionContainer* windowmenu = ActionManager::createMenu(Constants::M_WINDOW);
 		pMenuBar->addMenu(windowmenu, Constants::G_WINDOW);
 		windowmenu->menu()->setTitle(tr("Window"));
 
@@ -329,7 +374,20 @@ void AssetManager::createMenus(void)
 		windowmenu->addSeparator(globalContext, Constants::G_WINDOW_DOCUMENT);
 		windowmenu->addSeparator(globalContext, Constants::G_WINDOW_WINDOWS);
 
+		// Layout group items
+		pCmd = ActionManager::registerAction(pWindowResetLayoutAct_, Constants::RESET_LAYTOUT, globalContext);
+		windowmenu->addAction(pCmd, Constants::G_WINDOW_LAYOUT);
 
+		// Windows group items
+		ActionContainer* mWindows = ActionManager::createMenu(Constants::M_WINDOW_WINDOWS);
+
+		mWindows->menu()->setTitle(tr("Windows"));
+		mWindows->setOnAllDisabledBehavior(ActionContainer::OnAllDisabledBehavior::Show);
+
+		windowmenu->addMenu(mWindows, Constants::G_WINDOW_WINDOWS);
+
+		// connect shit
+		connect(windowmenu->menu(), SIGNAL(aboutToShow()), this, SLOT(aboutToShowWindowMenu()));
 
 	}
 
@@ -402,6 +460,96 @@ void AssetManager::createDockWindows(void)
 	AddDockItem<AssetExplorer::AssetDbViewWidget>("Asset Explorer", pAssetViewWidget_, all, Qt::LeftDockWidgetArea);
 
 
+}
+
+// =======================  View Menu Actions =======================
+
+void AssetManager::aboutToShowViewMenu(void)
+{
+	ActionContainer* pActionContainer = ActionManager::actionContainer(Constants::M_VIEW);
+	ActionContainer* pActionContainerToolBar = ActionManager::actionContainer(Constants::M_VIEW_TOOLBAR);
+
+	pActionContainer->menu()->clear();
+
+	{
+		ActionContainer* pActionContainer = ActionManager::actionContainer(Constants::M_VIEW);
+
+		QList<QDockWidget*> dockwidgets = pDockArea_->findChildren<QDockWidget*>();
+
+		foreach(QDockWidget * dockwidget, dockwidgets)
+		{
+			pActionContainer->menu()->addAction(dockwidget->toggleViewAction());
+		}
+	}
+	{
+		QList<QToolBar*> toolbars = pDockArea_->findChildren<QToolBar *>();
+		foreach(QToolBar* pBar, toolbars)
+		{
+			pActionContainerToolBar->menu()->addAction(pBar->toggleViewAction());
+		}
+
+		pActionContainerToolBar->menu()->setEnabled(!toolbars.empty());
+
+		qDebug() << "Num Toolbars: " << pActionContainer->menu()->actions().size();
+	}
+
+
+	pActionContainer->addMenu(pActionContainerToolBar, Constants::G_VIEW_TOOLBARS);
+}
+
+// =======================  Window Menu Actions =======================
+
+void AssetManager::resetLayout(void)
+{
+
+
+}
+
+void AssetManager::aboutToShowWindowMenu(void)
+{
+	// show list of open editors.
+	ActionContainer* pActionContainer = ActionManager::actionContainer(Constants::M_WINDOW_WINDOWS);
+	pActionContainer->menu()->clear();
+
+	bool hasOpenFiles = false;
+
+	foreach(IEditor* pEditor, EditorManager::openEditorsList()) 
+	{
+		hasOpenFiles = true;
+
+		QAction* pAction = pActionContainer->menu()->addAction(pEditor->assetEntry()->displayName());
+		pAction->setData(qVariantFromValue(pEditor));
+
+		if (pEditor == EditorManager::currentEditor()) {
+			pAction->setCheckable(true);
+			pAction->setChecked(true);
+		}
+
+		connect(pAction, SIGNAL(triggered()), this, SLOT(windowListSetActiveEditor()));
+	}
+
+	pActionContainer->menu()->setEnabled(hasOpenFiles);
+
+	// don't think i want a clear menu here since it's kinda duplicate of close all documents.
+	if (hasOpenFiles)
+	{
+		//    aci->menu()->addSeparator();
+		//    QAction *action = aci->menu()->addAction(Constants::CLEAR_MENU);
+		//    connect(action, SIGNAL(triggered()), EditorManager::instance(), SLOT(closeAllEditors()));
+	}
+}
+
+
+
+void AssetManager::windowListSetActiveEditor(void)
+{
+	QAction* pAction = qobject_cast<QAction *>(sender());
+	if (pAction)
+	{
+		IEditor* editor = pAction->data().value<IEditor*>();
+
+		EditorManager::activateEditor(editor);
+	}
 }
 
 

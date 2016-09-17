@@ -54,6 +54,13 @@ private:
 private slots:
 	void updateFocusWidget(QWidget* pOld, QWidget* pNow);
 
+	// View Slots
+	void aboutToShowViewMenu(void);
+
+	// Window Slots
+	void resetLayout(void);
+	void aboutToShowWindowMenu(void);
+	void windowListSetActiveEditor(void);
 
 	// File Slots
 	void about(void);
@@ -69,6 +76,13 @@ private:
 	// File
 	QAction* pSaveAllAct_;
 	QAction* pQuitAct_;
+
+	// View
+	QAction* pViewAssetDbExpoAct_;
+
+	// Window
+	QAction* pWindowResetLayoutAct_;
+
 	// Help
 	QAction* pAboutAct_;
 	QAction* pAboutQtAct_;
