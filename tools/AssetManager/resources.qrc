@@ -34,4 +34,12 @@
         <file>img/NewFile.png</file>
         <file>img/build.png</file>
     </qresource>
+    <qresource prefix="/dock">
+        <file>img/box_center.png</file>
+        <file>img/dock_bottom.png</file>
+        <file>img/dock_left.png</file>
+        <file>img/dock_right.png</file>
+        <file>img/dock_top.png</file>
+        <file>img/drag_box_main.png</file>
+    </qresource>
 </RCC>
