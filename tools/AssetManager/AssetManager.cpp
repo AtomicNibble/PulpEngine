@@ -28,7 +28,7 @@ AssetManager::AssetManager(QWidget* pParent) :
 {
 	pCoreImpl_ = new ICore(this);
 	pActionManager_ = new ActionManager(this);
-	pAssetEntryManager_ new AssetEntryManager(this);
+	pAssetEntryManager_ = new AssetEntryManager(this);
 
 	{
 		pDb_ = new assetDb::AssetDB();
