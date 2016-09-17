@@ -12,6 +12,7 @@ X_NAMESPACE_DECLARE(assetDb,
 X_NAMESPACE_BEGIN(assman)
 
 class ActionManager;
+class AssetEntryManager;
 class EditorManager;
 class VersionDialog;
 
@@ -85,6 +86,7 @@ private:
 	Context additionalContexts_;
 
 	ActionManager* pActionManager_;
+	AssetEntryManager* pAssetEntryManager_;
 	EditorManager* pEditorManager_;
 
 	// context baby, do you speak it!

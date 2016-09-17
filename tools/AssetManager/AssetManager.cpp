@@ -6,7 +6,10 @@
 #include "ActionContainer.h"
 #include "VersionDialog.h"
 
+#include "AssetEntryManager.h"
+#include "AssetPropertyEditorFactory.h"
 #include "Command.h"
+
 #include <../AssetDB/AssetDB.h>
 
 
@@ -25,7 +28,7 @@ AssetManager::AssetManager(QWidget* pParent) :
 {
 	pCoreImpl_ = new ICore(this);
 	pActionManager_ = new ActionManager(this);
-
+	pAssetEntryManager_ new AssetEntryManager(this);
 
 	{
 		pDb_ = new assetDb::AssetDB();
