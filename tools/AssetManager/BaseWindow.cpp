@@ -70,9 +70,11 @@ void BaseWindow::NcCursorPosCalculator::recalculate(const QPoint& globalMousePos
 
 BaseWindow::BaseWindow(QWidget * parent) :
 	QWidget(parent),
+	leftButtonPressed_(false),
+	cursorShapeChanged_(false),
+	customFrame_(true),
 	mainLayout_(this),
 	centralWidget_(nullptr),
-	customFrame_(true),
 	pCustomTitleBar_(nullptr)
 {
 	setMinimumSize(196, 96);
