@@ -36,6 +36,8 @@
         <file>img/logo_64.png</file>
         <file>img/logo_128.png</file>
         <file>img/logo_cry_128.png</file>
+        <file>img/Save.png</file>
+        <file>img/Saveall.png</file>
     </qresource>
     <qresource prefix="/dock">
         <file>img/box_center.png</file>
