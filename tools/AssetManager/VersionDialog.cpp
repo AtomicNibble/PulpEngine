@@ -38,7 +38,7 @@ VersionDialog::VersionDialog(QWidget *parent)
 	connect(pButtonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
 	QLabel* pLogoLabel = new QLabel;
-	pLogoLabel->setPixmap(QPixmap(QLatin1String(Constants::ICON_LOGO_64)));
+	pLogoLabel->setPixmap(QPixmap(QLatin1String(Constants::ICON_LOGO_CRY_128)));
 	pLayout->addWidget(pLogoLabel, 0, 0, 1, 1);
 	pLayout->addWidget(pCopyRightLabel, 0, 1, 4, 4);
 	pLayout->addWidget(pButtonBox, 4, 0, 1, 5);
