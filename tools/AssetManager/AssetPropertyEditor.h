@@ -7,6 +7,26 @@
 X_NAMESPACE_BEGIN(assman)
 
 class AssetPropertEditor;
+class AssetPropertEditorWidget;
+
+
+class AssetProperties : public IAssetEntry
+{
+public:
+	AssetProperties(AssetPropertEditorWidget* widget);
+	virtual ~AssetProperties();
+
+
+	bool isModified(void) const X_OVERRIDE;
+	bool isSaveAsAllowed(void) const X_OVERRIDE;
+
+
+private:
+
+
+};
+
+
 class AssetPropertEditorWidget : public QScrollArea
 {
 	Q_OBJECT
