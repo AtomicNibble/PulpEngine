@@ -67,7 +67,8 @@ protected:
 
 private:
 
-	// Quit
+	// File
+	QAction* pSaveAllAct_;
 	QAction* pQuitAct_;
 	// Help
 	QAction* pAboutAct_;

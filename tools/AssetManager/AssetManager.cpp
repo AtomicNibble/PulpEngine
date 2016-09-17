@@ -6,6 +6,7 @@
 #include "ActionContainer.h"
 #include "VersionDialog.h"
 
+#include "Command.h"
 #include <../AssetDB/AssetDB.h>
 
 
@@ -217,6 +218,11 @@ void AssetManager::updateContext(void)
 void AssetManager::createActions(void)
 {
 	// File
+	pSaveAllAct_ = new QAction(QIcon(":/img/Saveall.png"), tr("Save all"), this);
+	pSaveAllAct_->setStatusTip(tr("Save all open documents"));
+	connect(pSaveAllAct_, SIGNAL(triggered()), this, SLOT(saveAll()));
+
+
 	pQuitAct_ = new QAction(QIcon(":/misc/img/quit.png"), tr("Quit"), this);
 	pQuitAct_->setStatusTip(tr("Quit the application"));
 	connect(pQuitAct_, SIGNAL(triggered()), this, SLOT(close()));
@@ -267,6 +273,9 @@ void AssetManager::createMenus(void)
 		filemenu->addSeparator(globalContext, Constants::G_FILE_RECENT);
 		filemenu->addSeparator(globalContext, Constants::G_FILE_CLOSE);
 
+		pCmd = ActionManager::registerAction(pSaveAllAct_, Constants::SAVEALL, globalContext);
+		pCmd->setDefaultKeySequence(QKeySequence("Ctrl+Shift+S"));
+		filemenu->addAction(pCmd, Constants::G_FILE_SAVE);
 
 		// Exit
 		pCmd = ActionManager::registerAction(pQuitAct_, Constants::EXIT, globalContext);
