@@ -2,7 +2,7 @@
 
 #include <QObject>
 #include "IEditor.h"
-
+#include "IAssetEntry.h"
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -32,12 +32,15 @@ class AssetPropertEditorWidget : public QScrollArea
 	Q_OBJECT
 public:
 	AssetPropertEditorWidget(QWidget *parent = nullptr);
+	AssetPropertEditorWidget(AssetProperties* pAssetEntry, QWidget *parent = nullptr);
+	AssetPropertEditorWidget(AssetPropertEditorWidget* pOther);
 	~AssetPropertEditorWidget();
 
 
 	bool open(QString* pErrorString, const QString& fileName);
 
 	AssetPropertEditor* editor(void);
+	AssetProperties* assetProperties(void) const;
 
 protected:
 	AssetPropertEditor* createEditor(void);
@@ -45,6 +48,7 @@ protected:
 
 private:
 	AssetPropertEditor* pEditor_;
+	QSharedPointer<AssetProperties> assetProps_;
 };
 
 
