@@ -26,7 +26,7 @@ namespace
 	{
 		AssetEntryManagerPrivate();
 
-		static const int32_t m_maxRecentFiles = 7;
+		static const int32_t MMAX_RECENT_FILES = 7;
 
 	public:
 		QMap<QString, FileState> states_;
@@ -45,8 +45,8 @@ namespace
 
 	}
 
-	static AssetEntryManager* m_instance;
-	static AssetEntryManagerPrivate *d;
+	static AssetEntryManager* pInstance_ = nullptr;
+	static AssetEntryManagerPrivate* d = nullptr;
 
 
 } // namespace
@@ -55,7 +55,7 @@ AssetEntryManager::AssetEntryManager(QObject *parent) :
 	QObject(parent)
 {
 	d = new AssetEntryManagerPrivate;
-	m_instance = this;
+	pInstance_ = this;
 
 	connect(ICore::instance(), SIGNAL(contextChanged(QList<IContext*>, Context)),
 		this, SLOT(syncWithEditor(QList<IContext*>)));
@@ -69,7 +69,7 @@ AssetEntryManager::~AssetEntryManager()
 
 QObject* AssetEntryManager::instance(void)
 {
-	return m_instance;
+	return pInstance_;
 }
 
 
@@ -80,8 +80,8 @@ void AssetEntryManager::addAssetEntry(const QList<IAssetEntry*>& assetEntrys)
 	{
 		if (pAssetEntry && !d->assetEntrys_.contains(pAssetEntry))
 		{
-			connect(pAssetEntry, SIGNAL(destroyed(QObject*)), m_instance, SLOT(assetEntryDestroyed(QObject*)));
-			connect(pAssetEntry, SIGNAL(filePathChanged(QString, QString)), m_instance, SLOT(filePathChanged(QString, QString)));
+			connect(pAssetEntry, SIGNAL(destroyed(QObject*)), pInstance_, SLOT(assetEntryDestroyed(QObject*)));
+			connect(pAssetEntry, SIGNAL(filePathChanged(QString, QString)), pInstance_, SLOT(filePathChanged(QString, QString)));
 			d->assetEntrys_.append(pAssetEntry);
 		}
 	}
@@ -100,15 +100,15 @@ bool AssetEntryManager::removeAssetEntry(IAssetEntry* pAssetEntry)
 	if (!d->assetEntrys_.removeOne(pAssetEntry))
 	{
 	//	removeFileInfo(pAssetEntry);
-		disconnect(pAssetEntry, SIGNAL(changed()), m_instance, SLOT(checkForNewFileName()));
+		disconnect(pAssetEntry, SIGNAL(changed()), pInstance_, SLOT(checkForNewFileName()));
 	}
 
-	disconnect(pAssetEntry, SIGNAL(destroyed(QObject*)), m_instance, SLOT(assetEntryDestroyed(QObject*)));
+	disconnect(pAssetEntry, SIGNAL(destroyed(QObject*)), pInstance_, SLOT(assetEntryDestroyed(QObject*)));
 
 	return true;
 }
 
-QList<IAssetEntry*> AssetEntryManager::modifiedAssetEntry(void)
+QList<IAssetEntry*> AssetEntryManager::modifiedAssetEntrys(void)
 {
 	QList<IAssetEntry *> modified;
 
@@ -129,18 +129,6 @@ void AssetEntryManager::renamedFile(const QString& from, const QString& to)
 }
 
 
-void AssetEntryManager::expectFileChange(const QString& fileName)
-{
-	X_UNUSED(fileName);
-
-}
-
-void AssetEntryManager::unexpectFileChange(const QString& fileName)
-{
-	X_UNUSED(fileName);
-
-}
-
 
 // recent files
 void AssetEntryManager::addToRecentFiles(const QString& fileName, const Id& editorId)
@@ -160,7 +148,7 @@ void AssetEntryManager::addToRecentFiles(const QString& fileName, const Id& edit
 		}
 	}
 
-	if (d->recentFiles_.count() > d->m_maxRecentFiles) {
+	if (d->recentFiles_.count() > d->MMAX_RECENT_FILES) {
 		d->recentFiles_.removeLast();
 	}
 
@@ -186,7 +174,7 @@ void AssetEntryManager::setCurrentFile(const QString& fileName)
 		return;
 	}
 	d->currentFile_ = fileName;
-	emit m_instance->currentFileChanged(d->currentFile_);
+	emit pInstance_->currentFileChanged(d->currentFile_);
 }
 
 QString AssetEntryManager::currentFile(void)
@@ -224,16 +212,7 @@ QString AssetEntryManager::getSaveFileName(const QString& title, const QString& 
 	return QString();
 }
 
-QString AssetEntryManager::getSaveFileNameWithExtension(const QString& title, const QString& pathIn,
-	const QString& filter)
-{
-	X_ASSERT_NOT_IMPLEMENTED();
-	X_UNUSED(title);
-	X_UNUSED(pathIn);
-	X_UNUSED(filter);
 
-	return QString();
-}
 
 QString AssetEntryManager::getSaveAsFileName(const IAssetEntry* pAssetEntry, const QString& filter,
 	QString* pSelectedFilter)
@@ -247,54 +226,52 @@ QString AssetEntryManager::getSaveAsFileName(const IAssetEntry* pAssetEntry, con
 }
 
 
+bool AssetEntryManager::saveAllModifiedAssetEntrysSilently(bool* pCanceled,
+	QList<IAssetEntry*>* pFailedToClose)
+{
+	return saveModifiedAssetEntrysSilently(modifiedAssetEntrys(), pCanceled, pFailedToClose);
+}
+
+bool AssetEntryManager::saveModifiedAssetEntrysSilently(const QList<IAssetEntry*>& assetEntrys, bool* pCanceled,
+	QList<IAssetEntry*>* pFailedToClose)
+{
+	return saveModifiedFilesHelper(assetEntrys, QString(), pCanceled, true, QString(), 0, pFailedToClose);
+}
+
+bool AssetEntryManager::saveModifiedAssetEntrySilently(IAssetEntry* pAssetEntry, bool* pCanceled,
+	QList<IAssetEntry*>* pFailedToClose)
+{
+	return saveModifiedAssetEntrysSilently(QList<IAssetEntry*>() << pAssetEntry, pCanceled, pFailedToClose);
+}
+
 
 bool AssetEntryManager::saveAllModifiedAssetEntrys(const QString& message, bool *canceled,
 	const QString& alwaysSaveMessage,
 	bool *alwaysSave,
-	QList<IAssetEntry *> *failedToClose )
+	QList<IAssetEntry *>* failedToClose )
 {
-	X_ASSERT_NOT_IMPLEMENTED();
-	X_UNUSED(message);
-	X_UNUSED(canceled);
-	X_UNUSED(alwaysSaveMessage);
-	X_UNUSED(alwaysSave);
-	X_UNUSED(failedToClose);
-
-	return false;
+	return saveModifiedAssetEntrys(modifiedAssetEntrys(), message, canceled,
+		alwaysSaveMessage, alwaysSave, failedToClose);
 }
 
-bool AssetEntryManager::saveModifiedAssetEntrys(const QList<IAssetEntry *>& assetEntrys,
+bool AssetEntryManager::saveModifiedAssetEntrys(const QList<IAssetEntry*>& assetEntrys,
 	const QString& message, bool *canceled,
 	const QString& alwaysSaveMessage,
 	bool *alwaysSave,
 	QList<IAssetEntry *> *failedToClose)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
-	X_UNUSED(assetEntrys);
-	X_UNUSED(message);
-	X_UNUSED(canceled);
-	X_UNUSED(alwaysSaveMessage);
-	X_UNUSED(alwaysSave);
-	X_UNUSED(failedToClose);
-
-	return false;
+	return saveModifiedFilesHelper(assetEntrys, message, canceled, false,
+		alwaysSaveMessage, alwaysSave, failedToClose);
 }
 
-bool AssetEntryManager::saveModifiedAssetEntry(IAssetEntry *pAssetEntry,
+bool AssetEntryManager::saveModifiedAssetEntry(IAssetEntry* pAssetEntry,
 	const QString& message, bool *canceled,
 	const QString& alwaysSaveMessage,
 	bool *alwaysSave,
 	QList<IAssetEntry *> *failedToClose)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
-	X_UNUSED(pAssetEntry);
-	X_UNUSED(message);
-	X_UNUSED(canceled);
-	X_UNUSED(alwaysSaveMessage);
-	X_UNUSED(alwaysSave);
-	X_UNUSED(failedToClose);
-
-	return false;
+	return saveModifiedAssetEntrys(QList<IAssetEntry*>() << pAssetEntry, message, canceled,
+		alwaysSaveMessage, alwaysSave, failedToClose);
 }
 
 
@@ -328,5 +305,23 @@ void AssetEntryManager::syncWithEditor(const QList<IContext*>& context)
 	}
 }
 
+
+
+bool AssetEntryManager::saveModifiedFilesHelper(const QList<IAssetEntry*>& assetEntrys,
+	const QString& message, bool* pCancelled, bool silently,
+	const QString& alwaysSaveMessage, bool* pAlwaysSave,
+	QList<IAssetEntry*>* pFailedToSave)
+{
+	X_UNUSED(assetEntrys);
+	X_UNUSED(message);
+	X_UNUSED(pCancelled);
+	X_UNUSED(silently);
+	X_UNUSED(alwaysSaveMessage);
+	X_UNUSED(pAlwaysSave);
+	X_UNUSED(pFailedToSave);
+
+
+	return false;
+}
 
 X_NAMESPACE_END

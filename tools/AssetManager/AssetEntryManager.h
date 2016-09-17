@@ -26,12 +26,9 @@ public:
 	static void addAssetEntry(const QList<IAssetEntry*>& assetEntrys);
 	static void addAssetEntry(IAssetEntry* pAssetEntry);
 	static bool removeAssetEntry(IAssetEntry* pAssetEntry);
-	static QList<IAssetEntry*> modifiedAssetEntry(void);
+	static QList<IAssetEntry*> modifiedAssetEntrys(void);
 
 	static void renamedFile(const QString& from, const QString& to);
-
-	static void expectFileChange(const QString& fileName);
-	static void unexpectFileChange(const QString& fileName);
 
 	// recent files
 	static void addToRecentFiles(const QString& fileName, const Id &editorId = Id());
@@ -53,26 +50,33 @@ public:
 
 	static QString getSaveFileName(const QString& title, const QString& pathIn,
 		const QString& filter = QString(), QString* selectedFilter = nullptr);
-	static QString getSaveFileNameWithExtension(const QString& title, const QString& pathIn,
-		const QString& filter);
 	static QString getSaveAsFileName(const IAssetEntry* pAssetEntry, const QString& filter = QString(),
 		QString* pSelectedFilter = nullptr);
 
 
-	static bool saveAllModifiedAssetEntrys(const QString& message = QString(), bool *canceled = nullptr,
+
+	static bool saveAllModifiedAssetEntrysSilently(bool* pCanceled = nullptr,
+		QList<IAssetEntry*>* pFailedToClose = nullptr);
+	static bool saveModifiedAssetEntrysSilently(const QList<IAssetEntry *>& assetEntrys, bool* pCanceled = nullptr,
+		QList<IAssetEntry*>* pFailedToClose = nullptr);
+	static bool saveModifiedAssetEntrySilently(IAssetEntry* pAssetEntry, bool* pCanceled = nullptr,
+		QList<IAssetEntry*>* pFailedToClose = nullptr);
+
+
+	static bool saveAllModifiedAssetEntrys(const QString& message = QString(), bool* pCanceled = nullptr,
 		const QString& alwaysSaveMessage = QString(),
-		bool *alwaysSave = nullptr,
-		QList<IAssetEntry *> *failedToClose = nullptr);
+		bool* pAlwaysSave = nullptr,
+		QList<IAssetEntry *> *pFailedToClose = nullptr);
 	static bool saveModifiedAssetEntrys(const QList<IAssetEntry *>& assetEntrys,
-		const QString& message = QString(), bool *canceled = nullptr,
+		const QString& message = QString(), bool* pCanceled = nullptr,
 		const QString& alwaysSaveMessage = QString(),
-		bool *alwaysSave = nullptr,
-		QList<IAssetEntry *> *failedToClose = nullptr);
-	static bool saveModifiedAssetEntry(IAssetEntry *pAssetEntry,
-		const QString& message = QString(), bool *canceled = nullptr,
+		bool* pAlwaysSave = nullptr,
+		QList<IAssetEntry *> *pFailedToClose = nullptr);
+	static bool saveModifiedAssetEntry(IAssetEntry* pAssetEntry,
+		const QString& message = QString(), bool* pCanceled = nullptr,
 		const QString& alwaysSaveMessage = QString(),
-		bool *alwaysSave = nullptr,
-		QList<IAssetEntry *> *failedToClose = nullptr);
+		bool* pAlwaysSave = nullptr,
+		QList<IAssetEntry *>* pFailedToClose = nullptr);
 
 
 signals:
@@ -85,6 +89,12 @@ private slots:
 	void assetEntryDestroyed(QObject* pObj);
 	void syncWithEditor(const QList<IContext *>& context);
 
+
+private:
+	static bool saveModifiedFilesHelper(const QList<IAssetEntry*>& assetEntrys,
+		const QString& message, bool* pCancelled, bool silently,
+		const QString& alwaysSaveMessage, bool* pAlwaysSave,
+		QList<IAssetEntry*>* pFailedToSave);
 
 };
 
