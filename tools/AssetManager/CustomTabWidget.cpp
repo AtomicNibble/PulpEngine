@@ -46,7 +46,7 @@ CustomTabWidgetBar::CustomTabWidgetBar(CustomTabWidget *widget) :
 	setObjectName("assEntryBar");
 	setAcceptDrops(true);
 
-	setElideMode(Qt::ElideRight);
+//	setElideMode(Qt::ElideRight);
 	setSelectionBehaviorOnRemove(QTabBar::SelectLeftTab);
 }
 
