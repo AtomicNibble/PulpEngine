@@ -14,7 +14,7 @@ public:
 
 	typedef QPair<QString, Id> RecentFile;
 
-private:
+public:
 	explicit AssetEntryManager(QObject *parent);
 	~AssetEntryManager();
 
