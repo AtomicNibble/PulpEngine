@@ -1922,7 +1922,7 @@ void EditorManager::splitNewWindow(EditorView* pView, IEditor* pEditor)
 
 	RemoveSplitIfEmpty(pView);
 
-	pNewWindow->setWindowTitle("AssetManager - " + pEditor->assetEntry()->displayName());
+	pNewWindow->setWindowTitle(pEditor->assetEntry()->displayName() + " - AssetManager");
 	pNewWindow->setAttribute(Qt::WA_DeleteOnClose);
 	pNewWindow->setAttribute(Qt::WA_QuitOnClose, false); // close when main window closes.
 	pNewWindow->resize(size);
@@ -2225,7 +2225,7 @@ void EditorManager::splitDragEnd(SplitterOrView* pSplitter)
 		// ok we add the pickle to a new window.
 		BaseWindow* pNewWindow = new BaseWindow;
 
-		pNewWindow->setWindowTitle("AssetManager - " + editor->assetEntry()->displayName());
+		pNewWindow->setWindowTitle(editor->assetEntry()->displayName() + " - AssetManager");
 		pNewWindow->setAttribute(Qt::WA_DeleteOnClose);
 		pNewWindow->setAttribute(Qt::WA_QuitOnClose, false); // close when main window closes.
 		pNewWindow->resize(size);
