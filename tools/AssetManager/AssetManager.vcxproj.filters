@@ -711,9 +711,6 @@
     <ClCompile Include="Release\moc_WindowTileBar.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="WindowTileBar.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Debug Dynamic\moc_WindowButton.cpp">
       <Filter>Generated Files\Debug Dynamic</Filter>
     </ClCompile>
@@ -730,7 +727,10 @@
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="WindowButton.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
+    <ClCompile Include="WindowTileBar.cpp">
+      <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -806,11 +806,11 @@
     <CustomBuild Include="BaseWindow.h">
       <Filter>Header Files\Dialogs</Filter>
     </CustomBuild>
-    <CustomBuild Include="WindowTileBar.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="WindowButton.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Dialogs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="WindowTileBar.h">
+      <Filter>Header Files\Dialogs</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
