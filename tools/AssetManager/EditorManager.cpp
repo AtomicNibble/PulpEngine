@@ -1494,7 +1494,7 @@ void EditorManager::autoSave(void)
 
 void EditorManager::updateWindowTitle(void)
 {
-	QString windowTitle = tr("LadyBug");
+	QString windowTitle = tr("AssetManager");
 	const QString dashSep = QLatin1String(" - ");
 	QString vcsTopic;
 	IAssetEntry* pAssetEntry = currentAssetEntry();
