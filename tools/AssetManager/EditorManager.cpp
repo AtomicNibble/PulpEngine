@@ -1319,7 +1319,7 @@ bool EditorManager::closeAssetEntrys(const QList<IAssetEntry*>& assetEntrys, boo
 }
 
 
-IEditor *EditorManager::duplicateEditor(IEditor *editor)
+IEditor* EditorManager::duplicateEditor(IEditor *editor)
 {
 	if (!editor->duplicateSupported()) {
 		return nullptr;
@@ -1762,7 +1762,8 @@ void EditorManager::addFloatActions(QMenu *contextMenu, IEditor* pEditor)
 	BUG_ASSERT(contextMenu, return);
 
 	// we need to know if a window is floated.
-	if (EditorView* pView = viewForEditor(pEditor)) {
+	if (EditorView* pView = viewForEditor(pEditor)) 
+	{
 		SplitterOrView* pSplitter = pView->parentSplitterOrView();
 
 		if (pSplitter) {
@@ -1796,8 +1797,10 @@ void EditorManager::addFloatActions(QMenu *contextMenu, IEditor* pEditor)
 					contextMenu->addSeparator();
 				}
 
-				contextMenu->addAction(d->splitHozTabGroupContextAction_);
-				contextMenu->addAction(d->splitVerTabGroupContextAction_);
+				if (pEditor->duplicateSupported()) {
+					contextMenu->addAction(d->splitHozTabGroupContextAction_);
+					contextMenu->addAction(d->splitVerTabGroupContextAction_);
+				}
 			}
 
 		}
