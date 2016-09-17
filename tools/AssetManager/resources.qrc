@@ -21,6 +21,8 @@
         <file>img/branch-end.png</file>
         <file>img/branch-more.png</file>
         <file>img/branch-open.png</file>
+        <file>img/Close.png</file>
+        <file>img/Close-hover.png</file>
     </qresource>
     <qresource prefix="/misc">
         <file>img/icon.png</file>
