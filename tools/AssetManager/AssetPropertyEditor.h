@@ -6,14 +6,14 @@
 
 X_NAMESPACE_BEGIN(assman)
 
-class AssetPropertEditor;
-class AssetPropertEditorWidget;
+class AssetPropertyEditor;
+class AssetPropertyEditorWidget;
 
 
 class AssetProperties : public IAssetEntry
 {
 public:
-	AssetProperties(AssetPropertEditorWidget* widget);
+	AssetProperties(AssetPropertyEditorWidget* widget);
 	virtual ~AssetProperties();
 
 
@@ -27,44 +27,44 @@ private:
 };
 
 
-class AssetPropertEditorWidget : public QScrollArea
+class AssetPropertyEditorWidget : public QScrollArea
 {
 	Q_OBJECT
 public:
-	AssetPropertEditorWidget(QWidget *parent = nullptr);
-	AssetPropertEditorWidget(AssetProperties* pAssetEntry, QWidget *parent = nullptr);
-	AssetPropertEditorWidget(AssetPropertEditorWidget* pOther);
-	~AssetPropertEditorWidget();
+	AssetPropertyEditorWidget(QWidget *parent = nullptr);
+	AssetPropertyEditorWidget(AssetProperties* pAssetEntry, QWidget *parent = nullptr);
+	AssetPropertyEditorWidget(AssetPropertyEditorWidget* pOther);
+	~AssetPropertyEditorWidget();
 
 
 	bool open(QString* pErrorString, const QString& fileName);
 
-	AssetPropertEditor* editor(void);
+	AssetPropertyEditor* editor(void);
 	AssetProperties* assetProperties(void) const;
 
 protected:
-	AssetPropertEditor* createEditor(void);
+	AssetPropertyEditor* createEditor(void);
 
 
 private:
-	AssetPropertEditor* pEditor_;
+	AssetPropertyEditor* pEditor_;
 	QSharedPointer<AssetProperties> assetProps_;
 };
 
 
-class AssetPropertEditor : public IEditor
+class AssetPropertyEditor : public IEditor
 {
 	Q_OBJECT
 public:
-	AssetPropertEditor(AssetPropertEditorWidget* editorWidget);
-	~AssetPropertEditor();
+	AssetPropertyEditor(AssetPropertyEditorWidget* editorWidget);
+	~AssetPropertyEditor();
 
 	bool open(QString* pErrorString, const QString& fileName) X_OVERRIDE;
 	IAssetEntry* assetEntry(void) X_OVERRIDE;
 	Id id(void) const X_OVERRIDE;
 
 private:
-	AssetPropertEditorWidget* pEditorWidget_;
+	AssetPropertyEditorWidget* pEditorWidget_;
 };
 
 

@@ -4,7 +4,7 @@
 X_NAMESPACE_BEGIN(assman)
 
 
-AssetProperties::AssetProperties(AssetPropertEditorWidget* widget) :
+AssetProperties::AssetProperties(AssetPropertyEditorWidget* widget) :
 	IAssetEntry(widget)
 {
 
@@ -29,7 +29,7 @@ bool AssetProperties::isSaveAsAllowed(void) const
 // ----------------------------------------------------------------
 
 
-AssetPropertEditorWidget::AssetPropertEditorWidget(QWidget *parent) :
+AssetPropertyEditorWidget::AssetPropertyEditorWidget(QWidget *parent) :
 	QScrollArea(parent),
 	pEditor_(nullptr)
 {
@@ -37,7 +37,7 @@ AssetPropertEditorWidget::AssetPropertEditorWidget(QWidget *parent) :
 
 }
 
-AssetPropertEditorWidget::AssetPropertEditorWidget(AssetProperties* pAssetEntry, QWidget *parent) :
+AssetPropertyEditorWidget::AssetPropertyEditorWidget(AssetProperties* pAssetEntry, QWidget *parent) :
 	QScrollArea(parent),
 	pEditor_(nullptr)
 {
@@ -45,27 +45,27 @@ AssetPropertEditorWidget::AssetPropertEditorWidget(AssetProperties* pAssetEntry,
 
 }
 
-AssetPropertEditorWidget::AssetPropertEditorWidget(AssetPropertEditorWidget* pOther) :
+AssetPropertyEditorWidget::AssetPropertyEditorWidget(AssetPropertyEditorWidget* pOther) :
 	pEditor_(nullptr)
 {
 	assetProps_ = pOther->assetProps_;
 }
 
-AssetPropertEditorWidget::~AssetPropertEditorWidget()
+AssetPropertyEditorWidget::~AssetPropertyEditorWidget()
 {
 
 }
 
 
 
-bool AssetPropertEditorWidget::open(QString* pErrorString, const QString& fileName)
+bool AssetPropertyEditorWidget::open(QString* pErrorString, const QString& fileName)
 {
 	X_UNUSED(pErrorString);
 	X_UNUSED(fileName);
 	return true;
 }
 
-AssetPropertEditor* AssetPropertEditorWidget::editor(void)
+AssetPropertyEditor* AssetPropertyEditorWidget::editor(void)
 {
 	if (!pEditor_) {
 		pEditor_ = createEditor();
@@ -74,20 +74,20 @@ AssetPropertEditor* AssetPropertEditorWidget::editor(void)
 	return pEditor_;
 }
 
-AssetProperties* AssetPropertEditorWidget::assetProperties(void) const
+AssetProperties* AssetPropertyEditorWidget::assetProperties(void) const
 {
 	return assetProps_.data();
 }
 
-AssetPropertEditor* AssetPropertEditorWidget::createEditor(void)
+AssetPropertyEditor* AssetPropertyEditorWidget::createEditor(void)
 {
-	return new AssetPropertEditor(this);
+	return new AssetPropertyEditor(this);
 }
 
 // ----------------------------------------------------------------
 
 
-AssetPropertEditor::AssetPropertEditor(AssetPropertEditorWidget* editor) :
+AssetPropertyEditor::AssetPropertyEditor(AssetPropertyEditorWidget* editor) :
 	pEditorWidget_(editor)
 {
 	setWidget(pEditorWidget_);
@@ -95,23 +95,23 @@ AssetPropertEditor::AssetPropertEditor(AssetPropertEditorWidget* editor) :
 
 }
 
-AssetPropertEditor::~AssetPropertEditor()
+AssetPropertyEditor::~AssetPropertyEditor()
 {
 	delete pEditorWidget_;
 }
 
 
-bool AssetPropertEditor::open(QString* pErrorString, const QString& fileName)
+bool AssetPropertyEditor::open(QString* pErrorString, const QString& fileName)
 {
 	return pEditorWidget_->open(pErrorString, fileName);
 }
 
-IAssetEntry* AssetPropertEditor::assetEntry(void)
+IAssetEntry* AssetPropertyEditor::assetEntry(void)
 {
 	return pEditorWidget_->assetProperties();
 }
 
-Id AssetPropertEditor::id(void) const
+Id AssetPropertyEditor::id(void) const
 {
 	return Id(Constants::ASSETPROP_EDITOR_ID);
 }

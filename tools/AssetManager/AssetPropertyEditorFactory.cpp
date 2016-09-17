@@ -16,7 +16,7 @@ AssetPropertyEditorFactory::AssetPropertyEditorFactory(QObject *parent) :
 
 IEditor* AssetPropertyEditorFactory::createEditor(void)
 {
-	AssetPropertEditorWidget* editor = new AssetPropertEditorWidget;
+	AssetPropertyEditorWidget* editor = new AssetPropertyEditorWidget;
 	return editor->editor();
 }
 
