@@ -43,8 +43,8 @@ X_USING_NAMESPACE;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    a.setApplicationDisplayName("AssetManager");
-    a.setApplicationName("AssetManager");
+  //  a.setApplicationDisplayName("AssetManager");
+//    a.setApplicationName("AssetManager");
     a.setApplicationVersion("0.0.0.1");
 	a.setOrganizationName("Tom Crowley");
 	a.setOrganizationDomain("Potato - Engine");
