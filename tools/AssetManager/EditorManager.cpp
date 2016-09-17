@@ -169,10 +169,10 @@ namespace
 
 	}
 
-} // namespace
+	static EditorManager* pInstance_ = nullptr;
+	static EditorManagerPrivate* d = nullptr;
 
-static EditorManager* pInstance_ = nullptr;
-static EditorManagerPrivate* d = nullptr;
+} // namespace
 
 
 
