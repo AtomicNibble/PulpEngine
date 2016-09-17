@@ -85,6 +85,7 @@ namespace Constants
 	//  ----------- Actions -----------
 	
 	// File Actions
+	const char NEW_ASSET[] = "NewAsset";
 	const char SAVE[] = "Save";
 	const char SAVEAS[] = "SaveAs";
 	const char SAVEALL[] = "SaveAll";

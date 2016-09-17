@@ -85,7 +85,7 @@ AssetManager::AssetManager(QWidget* pParent) :
 
 	pDockArea_->setCentralWidget(pEditorManager_);
 	pLayout_->addItem(new QSpacerItem(2, 2), 0, 0, 1, 1); // left
-	pLayout_->addWidget(pDockArea_, 0, 1, 1, 1); // center
+	pLayout_->addWidget(pDockArea_, 0, 1, 1, 1); // center`
 	pLayout_->addItem(new QSpacerItem(2, 2), 0, 2, 1, 1); // right
 //	setStatusBar(&m_StatusBar);
 	setCentralWidget(pLayout_);
@@ -249,7 +249,12 @@ void AssetManager::updateContext(void)
 void AssetManager::createActions(void)
 {
 	// File
-	pSaveAllAct_ = new QAction(QIcon(":/img/Saveall.png"), tr("Save all"), this);
+	pNewFileAct_ = new QAction(QIcon(":/misc/img/NewFile.png"), tr("New Asset..."), this);
+	pNewFileAct_->setStatusTip(tr("Create a new asset"));
+	connect(pNewFileAct_, SIGNAL(triggered()), this, SLOT(newFile()));
+
+
+	pSaveAllAct_ = new QAction(QIcon(":/misc/img/Saveall.png"), tr("Save all"), this);
 	pSaveAllAct_->setStatusTip(tr("Save all open documents"));
 	connect(pSaveAllAct_, SIGNAL(triggered()), this, SLOT(saveAll()));
 
@@ -312,6 +317,11 @@ void AssetManager::createMenus(void)
 		filemenu->addSeparator(globalContext, Constants::G_FILE_SAVE);
 		filemenu->addSeparator(globalContext, Constants::G_FILE_RECENT);
 		filemenu->addSeparator(globalContext, Constants::G_FILE_CLOSE);
+
+		pCmd = ActionManager::registerAction(pNewFileAct_, Constants::NEW_ASSET, globalContext);
+		pCmd->setDefaultKeySequence(QKeySequence::New);
+		filemenu->addAction(pCmd, Constants::G_FILE_NEW);
+
 
 		pCmd = ActionManager::registerAction(pSaveAllAct_, Constants::SAVEALL, globalContext);
 		pCmd->setDefaultKeySequence(QKeySequence("Ctrl+Shift+S"));

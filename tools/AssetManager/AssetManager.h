@@ -73,6 +73,7 @@ protected:
 private:
 
 	// File
+	QAction* pNewFileAct_;
 	QAction* pSaveAllAct_;
 	QAction* pQuitAct_;
 
