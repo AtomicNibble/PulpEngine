@@ -62,6 +62,10 @@ bool AssetPropertyEditorWidget::open(QString* pErrorString, const QString& fileN
 {
 	X_UNUSED(pErrorString);
 	X_UNUSED(fileName);
+
+	AssetProperties* pProbs = assetProps_.data();
+
+	pProbs->setDisplayName(fileName);
 	return true;
 }
 

@@ -5,8 +5,209 @@
 #include "IAssetEntry.h"
 #include "CustomTabWidget.h"
 #include "EditorManager.h"
+#include "BaseWindow.h"
 
 X_NAMESPACE_BEGIN(assman)
+
+
+DiamondBut::DiamondBut(QWidget* parent) : 
+	QLabel(parent),
+	active_(false)
+{
+}
+
+void DiamondBut::setImage(QString filename)
+{
+	QPixmap img(filename);
+
+	hover_ = img;
+
+	QPainter p;
+	p.begin(&img);
+	p.setCompositionMode(QPainter::CompositionMode_DestinationIn);
+	p.fillRect(img.rect(), QColor(0, 0, 0, 150));
+	p.end();
+
+	img_ = img;
+
+	this->setPixmap(img_);
+}
+
+void DiamondBut::setActive(bool b)
+{
+	if (active_ != b)
+	{
+		setPixmap(b ? hover_ : img_);
+	}
+
+	active_ = b;
+}
+
+
+// --------------------------------------------------------
+
+
+Overlay::Overlay(QWidget * parent) :
+	QWidget(parent),
+	curButton_(CurButton::Invalid),
+	lastButton_(CurButton::Invalid)
+{
+	setAttribute(Qt::WA_NoSystemBackground);
+	setAttribute(Qt::WA_TransparentForMouseEvents);
+	setAttribute(Qt::WA_TranslucentBackground, true);
+	setWindowFlags(Qt::FramelessWindowHint | Qt::Tool | Qt::WindowStaysOnTopHint);
+
+
+	img_.load(":/dock/img/drag_box_main.png");
+
+	// QColor overlay_col(8,33,58,192);
+	QGridLayout* diamond = new QGridLayout;
+
+
+	DiamondBut* center = new DiamondBut;
+	center->setImage(":/dock/img/box_center.png");
+	center->setMaximumSize(32, 32);
+
+	DiamondBut* top = new DiamondBut;
+	top->setImage(":/dock/img/dock_top.png");
+	top->setMaximumSize(32, 32);
+
+	DiamondBut* left = new DiamondBut;
+	left->setImage(":/dock/img/dock_left.png");
+	left->setMaximumSize(32, 32);
+
+	DiamondBut* right = new DiamondBut;
+	right->setImage(":/dock/img/dock_right.png");
+	right->setMaximumSize(32, 32);
+
+	DiamondBut* bottom = new DiamondBut;
+	bottom->setImage(":/dock/img/dock_bottom.png");
+	bottom->setMaximumSize(32, 32);
+
+	buttons_[static_cast<int32_t>(CurButton::Top)] = top;
+	buttons_[static_cast<int32_t>(CurButton::Left)] = left;
+	buttons_[static_cast<int32_t>(CurButton::Right)] = right;
+	buttons_[static_cast<int32_t>(CurButton::Bottom)] = bottom;
+	buttons_[static_cast<int32_t>(CurButton::Center)] = center;
+
+	diamond->setMargin(0);
+	diamond->setSpacing(4);
+	diamond->addWidget(center, 1, 1, 1, 1);
+	diamond->addWidget(top, 0, 1, 1, 1);
+	diamond->addWidget(left, 1, 0, 1, 1);
+	diamond->addWidget(right, 1, 2, 1, 1);
+	diamond->addWidget(bottom, 2, 1, 1, 1);
+
+
+	QLabel* back = new QLabel;
+	back->setPixmap(img_);
+	back->setMaximumSize(128, 128);
+	back->setLayout(diamond);
+	back->setAttribute(Qt::WA_TranslucentBackground, true);
+
+	QGridLayout* grid = new QGridLayout(this);
+	grid->setMargin(0);
+	grid->setSpacing(0);
+	grid->addWidget(back, 1, 1);
+}
+
+Overlay::CurButton Overlay::getActiveButton(void)
+{
+	return curButton_;
+}
+
+void Overlay::updatePos(const QRect& rect)
+{
+	// check if mouse under any nipples.
+	QPoint pos = QCursor::pos();
+
+	curButton_ = CurButton::Invalid;
+
+	for (int i = 0; i<5; i++)
+	{
+		DiamondBut* but = buttons_[i];
+		QRect rec = but->rect();
+
+		rec.moveTopLeft(but->mapToGlobal(rec.topLeft()));
+
+		bool contains = rec.contains(pos);
+
+		but->setActive(contains);
+
+		if (contains)
+		{
+			// umm need to draw a overlay :)
+			curButton_ = (CurButton)i;
+		}
+	}
+
+	this->setGeometry(rect);
+}
+
+void Overlay::paintEvent(QPaintEvent *e)
+{
+	if (curButton_ == CurButton::Invalid /*|| m_lastButton == m_curButton*/) {
+		e->accept();
+		return;
+	}
+
+	lastButton_ = curButton_;
+
+	QPainter p(this);
+	QRect r = rect();
+
+	p.setPen(QPen(QColor(80, 80, 80, 128), 6));
+	p.setBrush(QBrush(QColor(32, 116, 220, 128)));
+
+	if (curButton_ == CurButton::Center)
+	{
+		const int tab_height = 20;
+		const int tab_width = 90;
+
+		const QPoint points[6] = {
+			QPoint(0, 0),
+			QPoint(tab_width, 0),
+			QPoint(tab_width, tab_height),
+			QPoint(r.width(), tab_height),
+			QPoint(r.width(), r.height()),
+			QPoint(0, r.height()),
+		};
+
+
+		p.setRenderHint(QPainter::Antialiasing, true);
+		p.drawPolygon(points, 6);
+		update();
+		return;
+	}
+
+	switch (curButton_)
+	{
+	case CurButton::Top:
+		r.setHeight(r.height() / 2);
+		break;
+	case CurButton::Bottom:
+		r.setHeight(r.height() / 2);
+		r.moveTop(r.top() + r.height());
+		break;
+	case CurButton::Left:
+		r.setWidth(r.width() / 2);
+		break;
+	case CurButton::Right:
+		r.setWidth(r.width() / 2);
+		r.moveLeft(r.left() + r.width());
+		break;
+	}
+
+	//   qDebug() << "draw overlay: " << r;
+
+	p.drawRect(r);
+	update();
+}
+
+
+
+
+// --------------------------------------------------------
 
 
 EditorView::EditorView(SplitterOrView *parentSplitterOrView, QWidget *parent) :
@@ -294,6 +495,21 @@ void EditorView::titleChanged(QString title)
 
 // --------------------------------------------------------
 
+SplitterOrView::SplitterOrView(BaseWindow* pWindow)
+{
+	dragging_ = false;
+	floated_ = true;
+	pLayout_ = new QStackedLayout(this);
+	pLayout_->setSizeConstraint(QLayout::SetNoConstraint);
+	pView_ = new EditorView(this, pWindow);
+
+	pSplitter_ = nullptr;
+	pLayout_->addWidget(pView_);
+
+	pWindow->setCentralWidget(this);
+
+}
+
 SplitterOrView::SplitterOrView(IEditor *editor)
 {
 	dragging_ = false;
@@ -304,7 +520,7 @@ SplitterOrView::SplitterOrView(IEditor *editor)
 	if (editor) {
 		pView_->addEditor(editor);
 	}
-	pSplitter_ = 0;
+	pSplitter_ = nullptr;
 	pLayout_->addWidget(pView_);
 }
 
@@ -317,7 +533,7 @@ SplitterOrView::SplitterOrView(EditorView *view)
 	pLayout_->setSizeConstraint(QLayout::SetNoConstraint);
 	pView_ = view;
 	pView_->setParentSplitterOrView(this);
-	pSplitter_ = 0;
+	pSplitter_ = nullptr;
 	pLayout_->addWidget(pView_);
 }
 

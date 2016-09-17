@@ -15,6 +15,9 @@
 #include "AssetEntryModel.h"
 #include "AssetEntryManager.h"
 
+#include "DirectionConstants.h"
+#include "BaseWindow.h"
+
 X_NAMESPACE_BEGIN(assman)
 
 
@@ -121,8 +124,8 @@ namespace
 		EditorManager::EditorFactoryList factories_;
 		AssetEntryModel* pAssetEntryModel_;;
 
-	//	QPointer<Overlay> overlay_;
-	//	QPointer<EditorView> dropTargetView_;
+		QPointer<Overlay> overlay_;
+		QPointer<EditorView> dropTargetView_;
 
 		int32_t autoSaveInterval_;
 		bool autoSaveEnabled_;
@@ -162,6 +165,7 @@ namespace
 	{
 
 		pAssetEntryModel_ = new AssetEntryModel(parent);
+		overlay_ = new Overlay();
 	}
 
 	EditorManagerPrivate::~EditorManagerPrivate()
@@ -1169,10 +1173,9 @@ bool EditorManager::closeEditors(const QList<IEditor*> &editorsToClose, bool ask
 
 			BUG_CHECK(splitter);
 
-#if 0
 			// if the parent is a custom window we just close the window.
 			// which causes it to be remvoed from the root.
-			if (CustomWindow* window = qobject_cast<CustomWindow*>(splitter->parent()))
+			if (BaseWindow* window = qobject_cast<BaseWindow*>(splitter->parent()))
 			{
 				qDebug() << "closing editor window";
 				window->close();
@@ -1180,8 +1183,6 @@ bool EditorManager::closeEditors(const QList<IEditor*> &editorsToClose, bool ask
 			// if the view is empty and is not the root view
 			// we want to remove the split.
 			else
-
-#endif
 			{
 				SplitterOrView* parent = splitter->findParentSplitter();
 				if (parent && parent->isSplitter()) {
@@ -1547,9 +1548,8 @@ void EditorManager::closeView(EditorView* pView)
 	Q_ASSERT(splitterOrView->hasEditors() == false);
 	splitterOrView->hide();
 
-#if 0
 	// check if it was a custom window.
-	CustomWindow* window = qobject_cast<CustomWindow *>(splitterOrView->parent());
+	BaseWindow* window = qobject_cast<BaseWindow*>(splitterOrView->parent());
 
 	delete splitterOrView;
 
@@ -1561,7 +1561,6 @@ void EditorManager::closeView(EditorView* pView)
 		}
 		return;
 	}
-#endif
 
 	splitter->unsplit();
 
@@ -1909,9 +1908,45 @@ void EditorManager::splitNewWindow(IEditor *editor)
 
 void EditorManager::splitNewWindow(EditorView* pView, IEditor* pEditor)
 {
-	X_UNUSED(pView);
-	X_UNUSED(pEditor);
+	BaseWindow* pNewWindow = new BaseWindow;
 
+	pEditor = pEditor ? pEditor : pView->currentEditor();
+
+	pView->removeEditor(pEditor);
+
+	QSize size = pView->geometry().size();
+	size += QSize(12, 40);
+
+	RemoveSplitIfEmpty(pView);
+
+	pNewWindow->setWindowTitle("AssetManager - " + pEditor->assetEntry()->displayName());
+	pNewWindow->setAttribute(Qt::WA_DeleteOnClose);
+	pNewWindow->setAttribute(Qt::WA_QuitOnClose, false); // close when main window closes.
+	pNewWindow->resize(size);
+
+	SplitterOrView* splitter = new SplitterOrView(pNewWindow);
+
+	IContext *context = new IContext;
+	context->setContext(Context(Constants::C_EDITORMANAGER));
+	context->setWidget(pNewWindow);
+	ICore::addContextObject(context);
+
+	d->root_.append(splitter);
+	d->rootContext_.append(context);
+
+	connect(splitter, SIGNAL(destroyed(QObject*)), pInstance_, SLOT(rootDestroyed(QObject*)));
+
+	pNewWindow->show();
+	ICore::raiseWindow(pNewWindow);
+
+	if (pEditor) {
+		pInstance_->activateEditor(splitter->view(), pEditor, IgnoreNavigationHistory);
+	}
+	else {
+		splitter->view()->setFocus();
+	}
+
+	pInstance_->updateActions();
 }
 
 
@@ -1946,7 +1981,46 @@ void EditorManager::floatEditor(void)
 
 void EditorManager::dockEditorMain(void)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
+	IEditor* editor = d->contextMenuEntry_;
+
+	BUG_ASSERT(editor, return);
+
+	if (EditorView* pView = viewForEditor(editor)) 
+	{
+		// we remove the editor and place it in main view
+		// if the editor is the only one in the float we remove the float window.
+		SplitterOrView* pSplitter = pView->parentSplitterOrView();
+
+		BUG_ASSERT(pSplitter, return);
+
+		pView->removeEditor(editor);
+
+
+		int32_t count = pView->editorCount();
+		qDebug() << "editor count: " << count;
+
+		if (count == 0) {
+			if (BaseWindow* window = qobject_cast<BaseWindow*>(pSplitter->parent())) {
+				qDebug() << "closing editor window";
+				window->close();
+			}
+			else {
+				RemoveSplitIfEmpty(pView);
+			}
+		}
+
+		// Add to the main edtior.
+		SplitterOrView* pNewView = d->root_.at(0);
+
+		// if main is split we need to find the first non split and slap it there.
+		if (pNewView->isSplitter()) {
+			pNewView = pNewView->findFirstView()->parentSplitterOrView();
+		}
+
+		pInstance_->activateEditor(pNewView->view(), editor, IgnoreNavigationHistory);
+
+		pNewView->view()->setCurrentEditor(editor);
+	}
 }
 
 void EditorManager::newHozTabGroup(void)
@@ -2018,16 +2092,193 @@ void EditorManager::moveEditor(Qt::Orientation orientation, IEditor *editor, Dir
 
 SplitterOrView* EditorManager::undockEditor(IEditor* editor, QPoint& pos)
 {
-	X_ASSERT_NOT_IMPLEMENTED();
-	X_UNUSED(editor);
-	X_UNUSED(pos);
+	BUG_ASSERT(editor, return 0);
 
-	return nullptr;
+	// slap a chicken.
+	EditorView* pView = viewForEditor(editor);
+
+	BUG_ASSERT(pView, return 0);
+
+	pView->removeEditor(editor);
+
+	QSize size = pView->size();
+	size += QSize(0, 40);
+
+
+	if (pView->editorCount() == 0)
+	{
+		SplitterOrView* parent = pView->parentSplitterOrView();
+		if (BaseWindow* window = qobject_cast<BaseWindow*>(parent->parent())) {
+			delete window;
+		}
+		else {
+			RemoveSplitIfEmpty(pView);
+		}
+	}
+
+	// it has no context or anything yet.
+	// since this is only for dragging around.
+	SplitterOrView *splitter = new SplitterOrView(editor);
+	splitter->SetDragMode(pos);
+	splitter->resize(size);
+	splitter->move(QCursor::pos() - pos);
+	splitter->show();
+	splitter->grabMouse(Qt::ArrowCursor);
+
+	return splitter;
 }
 
-void EditorManager::splitDragEnd(SplitterOrView*)
-{
 
+void EditorManager::splitDragEndWindow(BaseWindow* window, SplitterOrView *splitter)
+{
+	// hide the overlay.
+	d->overlay_->hide();
+
+	Overlay::CurButton button = d->overlay_->getActiveButton();
+	EditorView* target = d->dropTargetView_;
+
+
+	if (button != Overlay::CurButton::Invalid && target)
+	{
+		// if not center we want to keep the layout.
+		// all we need to do really is take the splitter
+		// and place it in the layout of the target
+		// the location is dependant on selected button.
+		if (button != Overlay::CurButton::Center)
+		{
+			SplitterOrView *target_split = target->parentSplitterOrView();
+
+			if (target_split)
+			{
+				switch (button)
+				{
+				case Overlay::CurButton::Right:
+					target_split->addSplitter(splitter, Qt::Horizontal, Direction::Right);
+					break;
+				case Overlay::CurButton::Left:
+					target_split->addSplitter(splitter, Qt::Horizontal, Direction::Left);
+					break;
+
+				case Overlay::CurButton::Top:
+					target_split->addSplitter(splitter, Qt::Vertical, Direction::Top);
+					break;
+				case Overlay::CurButton::Bottom:
+					target_split->addSplitter(splitter, Qt::Vertical, Direction::Bottom);
+					break;
+				}
+
+			}
+		}
+		// if it's center we want to add all the views as tabs o.o !
+		else
+		{
+			if (splitter->isView())
+			{
+				AddEditorsToView(splitter->view(), target, splitter->editors());
+			}
+			else
+			{
+				// some fuck nut be dropping a window that's got splits in it yo !
+				AddEditorsToView(splitter, target);
+			}
+		}
+
+		//   m_instance->updateActions();
+		//   delete oldSplitter;
+		//   delete window;
+		window->deleteLater();
+	}
+}
+
+void EditorManager::splitDragEnd(SplitterOrView* pSplitter)
+{
+	BUG_ASSERT(pSplitter->isDrag(), return);
+	BUG_ASSERT(pSplitter->isView(), return);
+
+	// hide the overlay.
+	d->overlay_->hide();
+
+	Overlay::CurButton button = d->overlay_->getActiveButton();
+
+
+	SplitterOrView *oldSplitter = pSplitter;
+	IEditor* editor;
+	EditorView *view;
+	QSize size;
+	QPoint pos;
+
+	// we should also have only one editor.
+	editor = pSplitter->editor();
+	view = pSplitter->view();
+
+	pos = pSplitter->pos();
+	pos -= QPoint(5, 32);
+	size = pSplitter->size();
+
+	view->removeEditor(editor);
+
+	if (button == Overlay::CurButton::Invalid || !d->dropTargetView_)
+	{
+		// ok we add the pickle to a new window.
+		BaseWindow* pNewWindow = new BaseWindow;
+
+		pNewWindow->setWindowTitle("AssetManager - " + editor->assetEntry()->displayName());
+		pNewWindow->setAttribute(Qt::WA_DeleteOnClose);
+		pNewWindow->setAttribute(Qt::WA_QuitOnClose, false); // close when main window closes.
+		pNewWindow->resize(size);
+
+		pSplitter = new SplitterOrView(pNewWindow);
+
+		IContext *context = new IContext;
+		context->setContext(Context(Constants::C_EDITORMANAGER));
+		context->setWidget(pNewWindow);
+		ICore::addContextObject(context);
+
+		d->root_.append(pSplitter);
+		d->rootContext_.append(context);
+
+		connect(pSplitter, SIGNAL(destroyed(QObject*)), pInstance_, SLOT(rootDestroyed(QObject*)));
+
+		pNewWindow->show();
+		pNewWindow->move(pos);
+
+		pInstance_->activateEditor(pSplitter->view(), editor, IgnoreNavigationHistory);
+	}
+	else
+	{
+		EditorView* target = d->dropTargetView_;
+
+		// ok so we want to add the editor to this view
+		// then move it to a new split basically.
+		pInstance_->activateEditor(target, editor, IgnoreNavigationHistory);
+
+
+		// check for hte diffrent types
+		switch (button)
+		{
+		case Overlay::CurButton::Right:
+			moveEditor(Qt::Horizontal, editor, Direction::Right);
+			break;
+		case Overlay::CurButton::Left:
+			moveEditor(Qt::Horizontal, editor, Direction::Left);
+			break;
+
+		case Overlay::CurButton::Top:
+			moveEditor(Qt::Vertical, editor, Direction::Top);
+			break;
+		case Overlay::CurButton::Bottom:
+			moveEditor(Qt::Vertical, editor, Direction::Bottom);
+			break;
+
+		default:
+			target->setCurrentEditor(editor);
+			break;
+		}
+	}
+
+
+	pInstance_->updateActions();
+	delete oldSplitter;
 }
 
 void EditorManager::AddEditorsToView(EditorView *source, EditorView* target, QList<IEditor*>& editors)
@@ -2072,9 +2323,54 @@ void EditorManager::AddEditorsToView(SplitterOrView* splitter, EditorView* targe
 
 void EditorManager::floatDockCheck(SplitterOrView *splitter, const QPoint& pos)
 {
-	X_UNUSED(splitter);
-	X_UNUSED(pos);
+	// ok get all the editor views that are visable.
+	QList<EditorView*> views = visibleViews();
 
+	//    qDebug() << "Num visabel views: " << views.count();
+	d->dropTargetView_ = nullptr;
+
+	if (!views.empty())
+	{
+		bool fnd = false;
+		QRect rect;
+
+		// lets just make sure a view never shows drop overlay on itself.
+		if (splitter->isView())
+			views.removeOne(splitter->view());
+
+		foreach(EditorView* view, views)
+		{
+			// we need to check if we are over that editor.
+			if (view->rect().contains(view->mapFromGlobal(pos)))
+			{
+				fnd = true;
+				rect = view->rect();
+				rect.moveTopLeft(view->mapToGlobal(view->rect().topLeft()));
+
+				d->dropTargetView_ = view;
+				break;
+			}
+		}
+
+		ShowDropOverlay(fnd, rect);
+	}
+}
+
+void EditorManager::ShowDropOverlay(bool show, const QRect& rect)
+{
+	if (show) {
+		d->overlay_->updatePos(rect);
+	}
+
+	if (d->overlay_)
+	{
+		if (show && !d->overlay_->isVisible()) {
+			d->overlay_->show();
+		}
+		else if (!show && d->overlay_->isVisible()) {
+			d->overlay_->hide();
+		}
+	}
 }
 
 

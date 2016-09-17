@@ -12,6 +12,7 @@ class IEditor;
 class IEditorFactory;
 class EditorView;
 class SplitterOrView;
+class BaseWindow;
 
 
 class EditorManager : public QWidget
@@ -188,18 +189,20 @@ private:
 	static void setupSaveActions(IAssetEntry* pAssetEntry, QAction* saveAction, QAction* saveAsAction, QAction* revertToSavedAction);
 
 	static SplitterOrView* undockEditor(IEditor* editor, QPoint& pos);
+	static void splitDragEndWindow(BaseWindow*, SplitterOrView*);
 	static void splitDragEnd(SplitterOrView*);
 
 	static void AddEditorsToView(EditorView* source, EditorView* target, QList<IEditor*>& editors);
 	static void AddEditorsToView(SplitterOrView* splitter, EditorView* target);
 
-//	static void ShowDropOverlay(bool show, const QRect& rect);
+	static void ShowDropOverlay(bool show, const QRect& rect);
 
 	friend class AssetManager;
 	friend class SplitterOrView;
 	friend class EditorView;
 	friend class CustomTabWidget;
 	friend class CustomTabWidgetBar;
+	friend class BaseWindow;
 
 };
 

@@ -7,10 +7,62 @@
 X_NAMESPACE_BEGIN(assman)
 
 
+class BaseWindow;
 class CustomTabWidget;
 class SplitterOrView;
 class IEditor;
 class IAssetEntry;
+
+
+
+
+class DiamondBut : public QLabel
+{
+	Q_OBJECT
+public:
+	DiamondBut(QWidget* parent = 0);
+
+	void setImage(QString filename);
+	void setActive(bool b);
+
+protected:
+	QPixmap img_;
+	QPixmap hover_;
+	bool    active_;
+};
+
+
+class Overlay : public QWidget
+{
+public:
+	enum class CurButton {
+		Top,
+		Left,
+		Right,
+		Bottom,
+		Center,
+		Invalid = 0xff
+	};
+
+public:
+	Overlay(QWidget * parent = 0);
+
+	void updatePos(const QRect& rect);
+
+	CurButton getActiveButton(void);
+
+protected:
+	void paintEvent(QPaintEvent *);
+
+private:
+	QPixmap img_;
+
+	CurButton   curButton_;
+	CurButton   lastButton_;
+	DiamondBut* buttons_[5];
+};
+
+
 
 class EditorView : public QWidget
 {
@@ -75,6 +127,7 @@ class SplitterOrView : public QWidget
 
 
 public:
+	explicit SplitterOrView(BaseWindow *window);
 	explicit SplitterOrView(IEditor* pEditor = nullptr);
 	explicit SplitterOrView(EditorView* pView);
 	~SplitterOrView();
