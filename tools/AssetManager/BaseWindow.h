@@ -7,6 +7,8 @@ class QStatusBar;
 
 X_NAMESPACE_BEGIN(assman)
 
+class WindowTitleBar;
+
 class BaseWindow : public  QWidget
 {
 	Q_OBJECT
@@ -34,8 +36,8 @@ class BaseWindow : public  QWidget
 
 public:
 	static const int borderWidth = 4;
-	static const int borderWidthGUI = 2;
-	static const int borderHeightGUI = 2;
+	static const int borderWidthGUI = 6;
+	static const int borderHeightGUI = 6;
 
 public:
 	BaseWindow(QWidget* Parent = 0);
@@ -51,8 +53,8 @@ public:
 protected:
 //	void showEvent(QShowEvent * event);
 
-	void changeEvent(QEvent *e);
-	bool eventFilter(QObject *o, QEvent *e);
+	void changeEvent(QEvent *e) X_OVERRIDE;
+	bool eventFilter(QObject *o, QEvent *e) X_OVERRIDE;
 
 	void handleMouseDblClickEvent(QMouseEvent* e);
 	void handleMousePressEvent(QMouseEvent* event);
@@ -78,11 +80,13 @@ private:
 
 	bool leftButtonPressed_;
 	bool cursorShapeChanged_;
+	bool customFrame_;
 
-	QPoint           dragPos_;
-	QPoint           diff_;
+	QPoint      dragPos_;
+	QPoint      diff_;
 	QGridLayout	mainLayout_;
 	QWidget*	centralWidget_;
+	WindowTitleBar* pCustomTitleBar_;
 };
 
 

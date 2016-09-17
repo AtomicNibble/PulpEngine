@@ -4,6 +4,8 @@
 #include "EditorView.h"
 #include "EditorManager.h"
 
+#include "WindowTileBar.h"
+
 #include <QStatusBar>
 
 
@@ -69,16 +71,33 @@ void BaseWindow::NcCursorPosCalculator::recalculate(const QPoint& globalMousePos
 BaseWindow::BaseWindow(QWidget * parent) :
 	QWidget(parent),
 	mainLayout_(this),
-	centralWidget_(nullptr)
+	centralWidget_(nullptr),
+	customFrame_(true),
+	pCustomTitleBar_(nullptr)
 {
 	setMinimumSize(196, 96);
-//	setWindowFlags(Qt::FramelessWindowHint | Qt::WindowMinimizeButtonHint);
+
+	if (customFrame_) {
+		pCustomTitleBar_ = new WindowTitleBar();
+		setWindowFlags(Qt::FramelessWindowHint | Qt::WindowMinimizeButtonHint);
+	}
+
 	setObjectName("BaseWindow");
 
 	mainLayout_.setMargin(0);   //  No  space  between  window's  element  and  the  border
 	mainLayout_.setSpacing(0);  //  No  space  between  window's  element
 	setLayout(&mainLayout_);
 
+	if (pCustomTitleBar_) {
+		mainLayout_.addWidget(pCustomTitleBar_, 0, 0, 1, 3);
+
+		connect(this, SIGNAL(WindowTitleChanged()),
+			pCustomTitleBar_, SLOT(UpdateWindowTitle()));
+		connect(this, SIGNAL(windowTitleChanged(QString)),
+			pCustomTitleBar_, SLOT(UpdateWindowTitle()));
+
+		pCustomTitleBar_->installEventFilter(this);
+	}
 
 	// left/right spacer
 	mainLayout_.addItem(new QSpacerItem(borderWidthGUI, borderWidthGUI), 1, 0, 1, 1);
@@ -96,7 +115,9 @@ BaseWindow::BaseWindow(QWidget * parent) :
 
 BaseWindow::~BaseWindow()
 {
-
+	if (pCustomTitleBar_) {
+		delete pCustomTitleBar_;
+	}
 }
 
 
@@ -136,9 +157,11 @@ void BaseWindow::changeEvent(QEvent *e)
 	QWidget::changeEvent(e);
 	if (e->type() == QEvent::ActivationChange)
 	{
-	//	bool active = isActiveWindow();
+		bool active = isActiveWindow();
 
-	//	m_TitleBar.Focus(active);
+		if (pCustomTitleBar_) {
+			pCustomTitleBar_->Focus(active);
+		}
 
 		if (isActiveWindow()) {
 			//    if (debugMainWindow)
@@ -305,14 +328,14 @@ void BaseWindow::resizeWidget(const QPoint& globalMousePos)
 {
 	QRect origRect = frameGeometry();
 
-	int left = origRect.left();
-	int top = origRect.top();
-	int right = origRect.right();
-	int bottom = origRect.bottom();
+	int32_t left = origRect.left();
+	int32_t top = origRect.top();
+	int32_t right = origRect.right();
+	int32_t bottom = origRect.bottom();
 	origRect.getCoords(&left, &top, &right, &bottom);
 
-	int minWidth = minimumWidth();
-	int minHeight = minimumHeight();
+	int32_t minWidth = minimumWidth();
+	int32_t minHeight = minimumHeight();
 
 	if (mousePos_.onTopLeftEdge)
 	{
