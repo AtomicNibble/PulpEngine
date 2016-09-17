@@ -33,6 +33,8 @@
         <file>img/Cut.png</file>
         <file>img/NewFile.png</file>
         <file>img/build.png</file>
+        <file>img/logo_64.png</file>
+        <file>img/logo_128.png</file>
     </qresource>
     <qresource prefix="/dock">
         <file>img/box_center.png</file>
