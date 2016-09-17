@@ -54,6 +54,10 @@ private:
 private slots:
 	void updateFocusWidget(QWidget* pOld, QWidget* pNow);
 
+	// file Closes
+	void newFile(void);
+	void saveAll(void);
+
 	// View Slots
 	void aboutToShowViewMenu(void);
 

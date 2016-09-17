@@ -507,6 +507,18 @@ void AssetManager::aboutToShowViewMenu(void)
 	pActionContainer->addMenu(pActionContainerToolBar, Constants::G_VIEW_TOOLBARS);
 }
 
+// ======================= File Menu Actions =======================
+
+void AssetManager::newFile(void)
+{
+
+}
+
+void AssetManager::saveAll(void)
+{
+	AssetEntryManager::saveAllModifiedAssetEntrysSilently();
+}
+
 // =======================  Window Menu Actions =======================
 
 void AssetManager::resetLayout(void)
