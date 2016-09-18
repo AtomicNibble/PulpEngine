@@ -126,6 +126,7 @@ void AssetEntryManager::renamedFile(const QString& from, const QString& to)
 {
 	X_UNUSED(from);
 	X_UNUSED(to);
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 
@@ -196,7 +197,6 @@ bool AssetEntryManager::saveAssetEntry(IAssetEntry* pAssetEntry, const QString& 
 	X_UNUSED(isReadOnly);
 
 	return false;
-
 }
 
 
