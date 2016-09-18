@@ -713,6 +713,8 @@
     <ClCompile Include="assetmanager_plugin_import.cpp" />
     <ClCompile Include="AssetPropertyEditor.cpp" />
     <ClCompile Include="AssetPropertyEditorFactory.cpp" />
+    <ClCompile Include="assetscript\scriptbuilder.cpp" />
+    <ClCompile Include="assetscript\scriptstdstring.cpp" />
     <ClCompile Include="BaseWindow.cpp" />
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="Context.cpp" />
@@ -3059,6 +3061,8 @@
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
     </CustomBuild>
+    <ClInclude Include="assetscript\scriptbuilder.h" />
+    <ClInclude Include="assetscript\scriptstdstring.h" />
     <ClInclude Include="Constants.h" />
     <CustomBuild Include="ICommand.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

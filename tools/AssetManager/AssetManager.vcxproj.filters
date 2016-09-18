@@ -130,6 +130,18 @@
     <Filter Include="Source Files\Editor\Types">
       <UniqueIdentifier>{ae44c3ea-1acf-40f5-8f42-d9a26ec4835e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\AssetScript">
+      <UniqueIdentifier>{8fe7c15e-69fb-437e-8197-2aa685414083}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AssetScript">
+      <UniqueIdentifier>{7b0e4ad4-6c1e-41c4-b1fd-b777c007e1e5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\AssetScript\modules">
+      <UniqueIdentifier>{b841e4b0-f92c-4064-993e-fbf6b7d7a59b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\AssetScript\modules">
+      <UniqueIdentifier>{9b60db6a-cdeb-46f6-9d06-862c9ab15d11}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="assetmanager.cpp">
@@ -732,6 +744,12 @@
     <ClCompile Include="WindowTileBar.cpp">
       <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="assetscript\scriptstdstring.cpp">
+      <Filter>Source Files\AssetScript\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="assetscript\scriptbuilder.cpp">
+      <Filter>Source Files\AssetScript\modules</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -940,6 +958,12 @@
     </ClInclude>
     <ClInclude Include="DirectionConstants.h">
       <Filter>Header Files\Editor</Filter>
+    </ClInclude>
+    <ClInclude Include="assetscript\scriptstdstring.h">
+      <Filter>Header Files\AssetScript\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="assetscript\scriptbuilder.h">
+      <Filter>Header Files\AssetScript\modules</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
