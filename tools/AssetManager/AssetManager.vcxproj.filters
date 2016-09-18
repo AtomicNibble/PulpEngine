@@ -744,11 +744,17 @@
     <ClCompile Include="WindowTileBar.cpp">
       <Filter>Source Files\Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="AssetScript.cpp">
+      <Filter>Source Files\AssetScript</Filter>
+    </ClCompile>
     <ClCompile Include="assetscript\scriptstdstring.cpp">
       <Filter>Source Files\AssetScript\modules</Filter>
     </ClCompile>
     <ClCompile Include="assetscript\scriptbuilder.cpp">
       <Filter>Source Files\AssetScript\modules</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetScriptTypes.cpp">
+      <Filter>Source Files\AssetScript</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -959,11 +965,17 @@
     <ClInclude Include="DirectionConstants.h">
       <Filter>Header Files\Editor</Filter>
     </ClInclude>
+    <ClInclude Include="AssetScript.h">
+      <Filter>Header Files\AssetScript</Filter>
+    </ClInclude>
     <ClInclude Include="assetscript\scriptstdstring.h">
       <Filter>Header Files\AssetScript\modules</Filter>
     </ClInclude>
     <ClInclude Include="assetscript\scriptbuilder.h">
       <Filter>Header Files\AssetScript\modules</Filter>
+    </ClInclude>
+    <ClInclude Include="AssetScriptTypes.h">
+      <Filter>Header Files\AssetScript</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
