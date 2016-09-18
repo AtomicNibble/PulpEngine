@@ -117,7 +117,7 @@ void AssetPropsScript::shutdown(void)
 }
 
 
-bool AssetPropsScript::getAssetPropsForType(assetDb::AssetType::Enum type, AssetProps& props, bool reload)
+bool AssetPropsScript::getAssetPropsForType(AssetProps& props, assetDb::AssetType::Enum type, bool reload)
 {
 	if (!reload && loadFromCache(props, type)) {
 		return true;

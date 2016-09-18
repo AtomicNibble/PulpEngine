@@ -24,7 +24,7 @@ public:
 	void shutdown(void);
 
 	
-	bool getAssetPropsForType(assetDb::AssetType::Enum type, AssetProps& props, bool reload = false);
+	bool getAssetPropsForType(AssetProps& props, assetDb::AssetType::Enum type, bool reload = false);
 
 private:
 	bool loadFromCache(AssetProps& props, assetDb::AssetType::Enum type);
