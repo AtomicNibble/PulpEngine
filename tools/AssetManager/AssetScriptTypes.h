@@ -28,17 +28,33 @@ public:
 	AssetProperty();
 	~AssetProperty();
 
-	AssetProperty& operator=(const AssetProperty& oth);
+	AssetProperty& operator=(const AssetProperty& oth) = default;
 
 	void addRef(void);
 	void release(void);
 
+	void SetPropertyName(const std::string& property);
 	void SetType(PropertyType type);
 
 	AssetProperty& SetTitle(const std::string& title);
 	AssetProperty& SetToolTip(const std::string& toolTip);
+	AssetProperty& SetIcon(const std::string& icon);
+	AssetProperty& SetFontColor(float r, float g, float b);
+	AssetProperty& SetBold(bool bold);
+	AssetProperty& SetStep(double step);
 	AssetProperty& SetEnabled(bool enable);
-	AssetProperty& SetVisible(bool enable);
+	AssetProperty& SetVisible(bool vis);
+
+	AssetProperty& SetValue(const std::string& val);
+	AssetProperty& SetBool(bool val);
+	AssetProperty& SetInt(int32_t val);
+	AssetProperty& SetFloat(float val);
+
+	std::string GetTitle(void) const;
+	std::string GetToolTip(void) const;
+	std::string GetValue(void) const;
+	bool GetBool(void) const;
+
 
 public:
 	static AssetProperty* factory(void);
@@ -50,19 +66,22 @@ private:
 
 	bool enabled_;
 	bool visible_;
-	bool _pad[2];
+	bool checked_;
+	bool boldText_;
 
 	PropertyType type_;
+	std::string property_;
 	std::string title_;
 	std::string toolTip_;
+	std::string icon_;
+	std::string strValue_;
+
+	QColor fontCol_;
+	double step_;
 
 public:
 
-	std::string strValue_;
-
 	union {
-		bool checked;
-		float vec[4];
 
 		struct {
 			bool checked;
@@ -75,11 +94,16 @@ public:
 		} Int;
 
 		struct {
-			float value;
-			float min;
-			float max;
+			double value;
+			double min;
+			double max;
 		} Float;
 
+		struct {
+			double x, y, z, w;
+			double min;
+			double max;
+		} Vec;
 	};
 };
 
@@ -91,17 +115,25 @@ public:
 	~Asset();
 
 
-	Asset& operator=(const Asset& oth);
+	Asset& operator=(const Asset& oth) = default;
 
 	void addRef(void);
 	void release(void);
+
+	bool createGui(QWidget* pParent);
 
 public:
 	AssetProperty& AddTexture(const std::string& key, const std::string& default);
 	AssetProperty& AddCombo(const std::string& key, const std::string& values);
 	AssetProperty& AddCheckBox(const std::string& key, bool default);
 	AssetProperty& AddInt(const std::string& key, int32_t default, int32_t min, int32_t max);
-	AssetProperty& AddFloat(const std::string& key, float default, float min, float max);
+	AssetProperty& AddFloat(const std::string& key, double default, double min, double max);
+	AssetProperty& AddVec2(const std::string& key, double x, double y, double min, double max);
+	AssetProperty& AddVec3(const std::string& key, double x, double y, double z, double min, double max);
+	AssetProperty& AddVec4(const std::string& key, double x, double y, double z, double w, double min, double max);
+	AssetProperty& AddText(const std::string& key, const std::string& value);
+	AssetProperty& AddPath(const std::string& key, const std::string& value);
+
 
 	void BeginGroup(const std::string& groupName);
 	void EndGroup(const std::string& groupName);
@@ -115,7 +147,9 @@ private:
 
 private:
 
-	QMap<std::string, AssetProperty> items_;
+	QList<AssetProperty> items_;
+	QMap<std::string, int32_t> itemsLookup_;
+
 	int32_t refCount_;
 };
 

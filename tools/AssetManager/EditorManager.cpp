@@ -119,7 +119,7 @@ namespace
 		QString titleAddition_;
 		QString titleVcsTopic_;
 
-		QMap<QString, QVariant> editorStates_;
+		// QMap<QString, QVariant> editorStates_;
 
 		EditorManager::EditorFactoryList factories_;
 		AssetEntryModel* pAssetEntryModel_;;
@@ -1138,13 +1138,6 @@ bool EditorManager::closeEditors(const QList<IEditor*> &editorsToClose, bool ask
 	// remove the editors
 	foreach(IEditor *editor, acceptedEditors) {
 		emit pInstance_->editorAboutToClose(editor);
-		if (!editor->assetEntry()->name().isEmpty()
-			&& !editor->assetEntry()->isTemporary()) {
-			QByteArray state = editor->saveState();
-			if (!state.isEmpty()) {
-				d->editorStates_.insert(editor->assetEntry()->name(), QVariant(state));
-			}
-		}
 
 		removeEditor(editor);
 		if (EditorView *view = viewForEditor(editor)) 
