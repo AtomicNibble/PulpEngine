@@ -17,7 +17,11 @@ AssetProperty* AssetProperty::copyFactory(const AssetProperty& oth)
 
 AssetProperty::AssetProperty() :
 	refCount_(1),
-	enabled_(true)
+	enabled_(true),
+	visible_(true),
+	checked_(false),
+	boldText_(false),
+	step_(0.0001)
 {
 
 }
