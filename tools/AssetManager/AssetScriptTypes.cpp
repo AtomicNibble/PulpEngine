@@ -154,41 +154,41 @@ bool AssetProperty::GetBool(void) const
 
 
 
-Asset::Asset() :
+AssetProps::AssetProps() :
 	refCount_(1)
 {
 
 }
 
-Asset::~Asset()
+AssetProps::~AssetProps()
 {
 
 }
 
 
-void Asset::addRef(void)
+void AssetProps::addRef(void)
 {
 	++refCount_;
 }
 
-void Asset::release(void)
+void AssetProps::release(void)
 {
 	if (--refCount_ == 0) {
 		delete this;
 	}
 }
 
-Asset* Asset::factory(void)
+AssetProps* AssetProps::factory(void)
 {
-	return new Asset();
+	return new AssetProps();
 }
 
-Asset* Asset::copyFactory(const Asset& oth)
+AssetProps* AssetProps::copyFactory(const AssetProps& oth)
 {
-	return new Asset(oth);
+	return new AssetProps(oth);
 }
 
-bool Asset::createGui(QWidget* pParent)
+bool AssetProps::createGui(QWidget* pParent)
 {
 	X_UNUSED(pParent);
 
@@ -197,28 +197,28 @@ bool Asset::createGui(QWidget* pParent)
 	return true;
 }
 
-AssetProperty& Asset::AddTexture(const std::string& key, const std::string& default)
+AssetProperty& AssetProps::AddTexture(const std::string& key, const std::string& default)
 {
 	AssetProperty& item = getItem(key, AssetProperty::PropertyType::IMAGE);
 	item.SetValue(default);
 	return item;
 }
 
-AssetProperty& Asset::AddCombo(const std::string& key, const std::string& values)
+AssetProperty& AssetProps::AddCombo(const std::string& key, const std::string& values)
 {
 	AssetProperty& item = getItem(key, AssetProperty::PropertyType::COMBOBOX);
 	item.SetValue(values);
 	return item;
 }
 
-AssetProperty& Asset::AddCheckBox(const std::string& key, bool default)
+AssetProperty& AssetProps::AddCheckBox(const std::string& key, bool default)
 {
 	AssetProperty& item = getItem(key, AssetProperty::PropertyType::CHECKBOX);
 	item.CheckBox.checked = default;
 	return item;
 }
 
-AssetProperty& Asset::AddInt(const std::string& key, int32_t default, int32_t min, int32_t max)
+AssetProperty& AssetProps::AddInt(const std::string& key, int32_t default, int32_t min, int32_t max)
 {
 	AssetProperty& item = getItem(key, AssetProperty::PropertyType::INT);
 	item.Int.value = default;
@@ -227,7 +227,7 @@ AssetProperty& Asset::AddInt(const std::string& key, int32_t default, int32_t mi
 	return item;
 }
 
-AssetProperty& Asset::AddFloat(const std::string& key, double default, double min, double max)
+AssetProperty& AssetProps::AddFloat(const std::string& key, double default, double min, double max)
 {
 	AssetProperty& item = getItem(key, AssetProperty::PropertyType::FLOAT);
 	item.Float.value = default;
@@ -236,7 +236,7 @@ AssetProperty& Asset::AddFloat(const std::string& key, double default, double mi
 	return item;
 }
 
-AssetProperty& Asset::AddVec2(const std::string& key, double x, double y, double min, double max)
+AssetProperty& AssetProps::AddVec2(const std::string& key, double x, double y, double min, double max)
 {
 	AssetProperty& item = getItem(key, AssetProperty::PropertyType::VEC2);
 	item.Vec.x = x;
@@ -248,7 +248,7 @@ AssetProperty& Asset::AddVec2(const std::string& key, double x, double y, double
 	return item;
 }
 
-AssetProperty& Asset::AddVec3(const std::string& key, double x, double y, double z, double min, double max)
+AssetProperty& AssetProps::AddVec3(const std::string& key, double x, double y, double z, double min, double max)
 {
 	AssetProperty& item = getItem(key, AssetProperty::PropertyType::VEC3);
 	item.Vec.x = x;
@@ -260,7 +260,7 @@ AssetProperty& Asset::AddVec3(const std::string& key, double x, double y, double
 	return item;
 }
 
-AssetProperty& Asset::AddVec4(const std::string& key, double x, double y, double z, double w, double min, double max)
+AssetProperty& AssetProps::AddVec4(const std::string& key, double x, double y, double z, double w, double min, double max)
 {
 	AssetProperty& item = getItem(key, AssetProperty::PropertyType::VEC4);
 	item.Vec.x = x;
@@ -272,14 +272,14 @@ AssetProperty& Asset::AddVec4(const std::string& key, double x, double y, double
 	return item;
 }
 
-AssetProperty& Asset::AddText(const std::string& key, const std::string& value)
+AssetProperty& AssetProps::AddText(const std::string& key, const std::string& value)
 {
 	AssetProperty& item = getItem(key, AssetProperty::PropertyType::TEXT);
 	item.SetValue(value);
 	return item;
 }
 
-AssetProperty& Asset::AddPath(const std::string& key, const std::string& value)
+AssetProperty& AssetProps::AddPath(const std::string& key, const std::string& value)
 {
 	AssetProperty& item = getItem(key, AssetProperty::PropertyType::PATH);
 	item.SetValue(value);
@@ -287,19 +287,19 @@ AssetProperty& Asset::AddPath(const std::string& key, const std::string& value)
 }
 
 
-void Asset::BeginGroup(const std::string& groupName)
+void AssetProps::BeginGroup(const std::string& groupName)
 {
 	X_UNUSED(groupName);
 
 }
 
-void Asset::EndGroup(const std::string& groupName)
+void AssetProps::EndGroup(const std::string& groupName)
 {
 	X_UNUSED(groupName);
 
 }
 
-AssetProperty& Asset::getItem(const std::string& key, AssetProperty::PropertyType type)
+AssetProperty& AssetProps::getItem(const std::string& key, AssetProperty::PropertyType type)
 {
 	if (itemsLookup_.contains(key)) {
 		return items_[itemsLookup_.value(key)];

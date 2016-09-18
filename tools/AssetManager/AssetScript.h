@@ -7,18 +7,32 @@ struct asSMessageInfo;
 
 X_NAMESPACE_BEGIN(assman)
 
+class AssetProps;
 
-class AssetScript
+class AssetPropsScript
 {
+	typedef std::array<AssetProps*, assetDb::AssetType::ENUM_COUNT> PropsCaheArr;
+
+	static const char* ASSET_PROPS_SCRIPT_EXT;
+	static const char* SCRIPT_ENTRY;
+
 public:
-	AssetScript();
-	~AssetScript();
+	AssetPropsScript();
+	~AssetPropsScript();
 
 	bool init(void);
 	void shutdown(void);
 
+	
+	bool getAssetPropsForType(assetDb::AssetType::Enum type, AssetProps& props, bool reload = false);
 
-	bool processScript(const char* pFileName);
+private:
+	bool loadFromCache(AssetProps& props, assetDb::AssetType::Enum type);
+	void setCache(AssetProps& props, assetDb::AssetType::Enum type);
+	void clearCache(void);
+
+	bool processScriptForType(AssetProps& props, assetDb::AssetType::Enum type);
+	bool processScript(AssetProps& props, const char* pFileName);
 
 private:
 	static void messageCallback(const asSMessageInfo *msg, void *param);
@@ -26,7 +40,7 @@ private:
 
 private:
 	asIScriptEngine* pEngine_;
-
+	PropsCaheArr cache_;
 };
 
 

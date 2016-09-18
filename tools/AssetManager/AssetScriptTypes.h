@@ -108,14 +108,14 @@ public:
 };
 
 
-class Asset
+class AssetProps
 {
 public:
-	Asset();
-	~Asset();
+	AssetProps();
+	~AssetProps();
 
 
-	Asset& operator=(const Asset& oth) = default;
+	AssetProps& operator=(const AssetProps& oth) = default;
 
 	void addRef(void);
 	void release(void);
@@ -139,8 +139,8 @@ public:
 	void EndGroup(const std::string& groupName);
 
 public:
-	static Asset* factory(void);
-	static Asset* copyFactory(const Asset& oth);
+	static AssetProps* factory(void);
+	static AssetProps* copyFactory(const AssetProps& oth);
 
 private:
 	AssetProperty& getItem(const std::string& key, AssetProperty::PropertyType type);
