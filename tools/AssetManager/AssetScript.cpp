@@ -18,9 +18,10 @@ const char* AssetPropsScript::ASSET_PROPS_SCRIPT_EXT = "aps";
 const char* AssetPropsScript::SCRIPT_ENTRY = "void GenerateUI(asset& AssetProps)";
 
 
-AssetPropsScript::AssetPropsScript()
+AssetPropsScript::AssetPropsScript() :
+	pEngine_(nullptr)
 {
-
+	cache_.fill(nullptr);
 }
 
 AssetPropsScript::~AssetPropsScript()
@@ -167,9 +168,10 @@ void AssetPropsScript::clearCache(void)
 bool AssetPropsScript::processScriptForType(AssetProps& props, assetDb::AssetType::Enum type)
 {
 	core::Path<char> path;
-	path.append("assetscripts");
+	path.appendFmt("assetscripts%c", core::Path<char>::NATIVE_SLASH);
 	path.append(assetDb::AssetType::ToString(type));
 	path.setExtension(ASSET_PROPS_SCRIPT_EXT);
+	path.toLower();
 
 	return processScript(props, path.c_str());
 }
