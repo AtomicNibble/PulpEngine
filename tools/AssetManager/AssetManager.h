@@ -71,6 +71,9 @@ private slots:
 	void about(void);
 	void destroyAboutDialog(void);
 
+	// misc
+	void fileChanged(const QString& path);
+
 protected:
 	virtual void closeEvent(QCloseEvent *event) X_OVERRIDE;
 
@@ -102,6 +105,8 @@ private:
 	QMainWindow* pDockArea_;
 
 private:
+	QFileSystemWatcher* pWatcher_;
+
 	ICore*  pCoreImpl_;
 	Context additionalContexts_;
 

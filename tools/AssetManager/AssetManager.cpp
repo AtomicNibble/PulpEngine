@@ -15,6 +15,7 @@
 
 #include <../AssetDB/AssetDB.h>
 
+#include <qfilesystemwatcher.h>
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -23,12 +24,14 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pVersionDialog_(nullptr),
 	pLayout_(nullptr),
 	pCoreImpl_(nullptr),
+	pWatcher_(nullptr),
 	pActionManager_(nullptr),
 	pEditorManager_(nullptr),
 	pDb_(nullptr),
 	pAssetDbexplorer_(nullptr),
 	additionalContexts_(Constants::C_GLOBAL) // always have global contex
 {
+	pWatcher_ = new QFileSystemWatcher(this);
 	pCoreImpl_ = new ICore(this);
 	pActionManager_ = new ActionManager(this);
 	pAssetEntryManager_ = new AssetEntryManager(this);
@@ -42,6 +45,11 @@ AssetManager::AssetManager(QWidget* pParent) :
 			QMessageBox::critical(this, tr("Error"), "Failed to open AssetDB");
 		}
 	}
+
+	connect(pWatcher_, SIGNAL(fileChanged(const QString &)),
+		this, SLOT(fileChanged(const QString &)));
+
+	pWatcher_->addPath("style\\style.qss");
 
 	// ----------------------------------
 
@@ -621,6 +629,27 @@ void AssetManager::destroyAboutDialog(void)
 	}
 }
 
+// =======================  Misc Slots =======================
+
+void AssetManager::fileChanged(const QString& path)
+{
+	if (path.contains(".qss"))
+	{
+		QFile f(path);
+		if (!f.exists())
+		{
+			qDebug() << "Can't load style sheet: " << path;
+		}
+		else
+		{
+			f.open(QFile::ReadOnly | QFile::Text);
+			QTextStream ts(&f);
+
+			QApplication* pApp = (static_cast<QApplication *>(QCoreApplication::instance()));
+			pApp->setStyleSheet(ts.readAll());
+		}
+	}
+}
 
 // ----------------------------------------------------
 
