@@ -1,5 +1,6 @@
 #include "AssetScriptTypes.h"
 
+#include <String\Json.h>
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -352,15 +353,88 @@ void AssetProps::clear(void)
 	keys_.clear();
 }
 
-AssetProps* AssetProps::factory(void)
+bool AssetProps::parseArgs(const std::string& jsonStr)
 {
-	return new AssetProps();
+	core::json::Document d;
+	d.Parse(jsonStr.c_str());
+
+	std::string name;
+
+	for (auto itr = d.MemberBegin(); itr != d.MemberEnd(); ++itr)
+	{
+		name = itr->name.GetString();
+
+		// add it :D
+		auto& item = addItem(name, AssetProperty::PropertyType::UNCLASSIFIED);
+		const auto& val = itr->value;
+
+		switch (val.GetType())
+		{
+		case core::json::Type::kFalseType:
+			item.SetBool(false);
+			break;
+		case core::json::Type::kTrueType:
+			item.SetBool(true);
+			break;
+		case core::json::Type::kStringType:
+			item.SetValue(std::string(val.GetString(), val.GetStringLength()));
+			break;
+		case core::json::Type::kNumberType:
+			if (val.IsBool()) {
+				item.SetBool(val.GetBool());
+			}
+			if (val.IsInt()) {
+				item.SetFloat(val.GetInt());
+			}
+			else if (val.IsFloat()) {
+				item.SetFloat(val.GetFloat());
+			}
+			else {
+				// default to double
+				item.SetDouble(val.GetDouble());
+			}
+			break;
+
+		// ye fooking wut
+		case core::json::Type::kObjectType:
+		case core::json::Type::kArrayType:
+			X_ERROR("AssetProps", "Unsupported value type for arg: %i", val.GetType());
+			break;
+
+		default:
+			X_ERROR("AssetProps", "Unknown value type for arg: %i", val.GetType());
+			break;
+		}
+	}
+
+	return true;
 }
 
-AssetProps* AssetProps::copyFactory(const AssetProps& oth)
+bool AssetProps::extractArgs(std::string& jsonStrOut) const
 {
-	return new AssetProps(oth);
+	core::json::StringBuffer s;
+	core::json::Writer<core::json::StringBuffer> writer(s);
+	
+	writer.SetMaxDecimalPlaces(5);
+	writer.StartObject();
+
+	auto end = keys_.cend();
+	for (auto it = keys_.cbegin(); it != end; ++it)
+	{
+		const auto& key = it.key();
+		const auto& val = it.value()->GetValue();
+
+		writer.Key(key.c_str());
+		// do we want to try work out a better type?
+		writer.String(val.c_str());
+	}
+
+	writer.EndObject();
+
+	jsonStrOut = s.GetString();
+	return true;
 }
+
 
 bool AssetProps::createGui(QWidget* pParent)
 {
@@ -574,6 +648,17 @@ AssetProperty& AssetProps::addItem(const std::string& key, AssetProperty::Proper
 	return *pItem;
 }
 
+// -----------------------------------------------------------
+
+AssetProps* AssetProps::factory(void)
+{
+	return new AssetProps();
+}
+
+AssetProps* AssetProps::copyFactory(const AssetProps& oth)
+{
+	return new AssetProps(oth);
+}
 
 
 

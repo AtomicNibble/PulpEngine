@@ -147,6 +147,8 @@ public:
 	void release(void);
 	void clear(void);
 
+	bool parseArgs(const std::string& jsonStr);
+	bool extractArgs(std::string& jsonStrOut) const;
 	bool createGui(QWidget* pParent);
 
 
@@ -174,16 +176,14 @@ public:
 	int32_t getPropValueInt(const std::string& key);
 	bool getPropValueBool(const std::string& key);
 
+private:
+	AssetProperty& addItem(const std::string& key, AssetProperty::PropertyType::Enum type);
 
 public:
 	static AssetProps* factory(void);
 	static AssetProps* copyFactory(const AssetProps& oth);
 
 private:
-	AssetProperty& addItem(const std::string& key, AssetProperty::PropertyType::Enum type);
-
-private:
-
 	AssetProperty root_;
 	AssetProperty* pCur_;
 
