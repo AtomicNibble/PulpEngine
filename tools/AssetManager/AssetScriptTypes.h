@@ -166,7 +166,6 @@ public:
 	AssetProperty& AddPath(const std::string& key, const std::string& value);
 
 	void BeginGroup(const std::string& groupName);
-	void SetDefaultGroup(void);
 
 public:
 	AssetProperty& getItem(const std::string& key);
