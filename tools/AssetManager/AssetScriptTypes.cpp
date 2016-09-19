@@ -3,6 +3,29 @@
 
 X_NAMESPACE_BEGIN(assman)
 
+namespace
+{
+	template<typename TStr>
+	void tokenize(std::vector<TStr>& tokensOut, const TStr& str, const TStr& delimiter)
+	{
+		TStr::size_type start = 0, end = 0;
+
+		tokensOut.clear();
+
+		while (end != TStr::npos)
+		{
+			end = str.find(delimiter, start);
+
+			TStr::size_type subEnd = (end == TStr::npos) ? TStr::npos : end - start;
+			tokensOut.push_back(str.substr(start, subEnd));
+
+			start = ((end > (TStr::npos - delimiter.size()))
+				? TStr::npos : end + delimiter.size());
+		}
+	}
+
+} // namespace
+
 AssetProperty* AssetProperty::factory(void)
 {
 	return new AssetProperty();
@@ -41,15 +64,32 @@ void AssetProperty::release(void)
 	}
 }
 
-void AssetProperty::SetPropertyName(const std::string& property)
+void AssetProperty::SetKey(const std::string& key)
 {
-	property_ = property;
+	key_ = key;
 }
 
 void AssetProperty::SetType(PropertyType::Enum type)
 {
 	type_ = type;
 }
+
+void AssetProperty::AddChild(AssetProperty* pChild)
+{
+	children_.push_back(pChild);
+}
+
+
+AssetProperty::ConstIterator AssetProperty::begin(void) const
+{
+	return children_.cbegin();
+}
+
+AssetProperty::ConstIterator AssetProperty::end(void) const
+{
+	return children_.cend();
+}
+
 
 AssetProperty& AssetProperty::SetTitle(const std::string& title)
 {
@@ -230,6 +270,12 @@ AssetProperty::PropertyType::Enum AssetProperty::GetType(void) const
 	return type_;
 }
 
+
+std::string AssetProperty::GetKey(void) const
+{
+	return key_;
+}
+
 std::string AssetProperty::GetTitle(void) const
 {
 	return title_;
@@ -264,11 +310,10 @@ bool AssetProperty::GetValueBool(void) const
 // ----------------------------------------------------------
 
 
-
-AssetProps::AssetProps() :
+AssetProps::AssetProps() : 
+	pCur_(&root_),
 	refCount_(1)
 {
-
 }
 
 AssetProps::~AssetProps()
@@ -411,26 +456,44 @@ AssetProperty& AssetProps::AddPath(const std::string& key, const std::string& va
 
 void AssetProps::BeginGroup(const std::string& groupName)
 {
-	X_UNUSED(groupName);
+	std::vector<std::string> tokens;	
+	tokenize<std::string>(tokens, groupName, ".");
 
-}
-
-void AssetProps::EndGroup(const std::string& groupName)
-{
-	X_UNUSED(groupName);
-
-}
-
-AssetProperty& AssetProps::getItem(const std::string& key)
-{
-	if (itemsLookup_.contains(key)) {
-		auto& item = items_[itemsLookup_.value(key)];;
-	
-		return item;
+	if (tokens.empty()) {
+		return;
 	}
 
-	static AssetProperty notFnd;
-	return notFnd;
+	if (!pCur_) {
+		root_.SetKey(tokens[0]);
+		root_.SetType(AssetProperty::PropertyType::GROUPBOX);
+		pCur_ = &root_;
+	}
+
+	for (const auto& token : tokens)
+	{
+		for (auto& pChild : *pCur_)
+		{
+			if (pChild->GetType() == AssetProperty::PropertyType::GROUPBOX && pChild->GetKey() == tokens[0])
+			{
+				// we found the group.
+				pCur_ = pChild;
+				goto groupExsists;
+			}
+		}
+
+		// no child that's a group with curren tokens name
+		// add and set as current.
+		AssetProperty* pGroup = new AssetProperty();
+		pGroup->SetKey(token);
+		pGroup->SetType(AssetProperty::PropertyType::GROUPBOX);
+
+		// add group as child.
+		pCur_->AddChild(pGroup);
+		// set as current
+		pCur_ = pGroup;
+
+	groupExsists:;
+	}
 }
 
 std::string AssetProps::getPropValue(const std::string& key)
@@ -453,26 +516,44 @@ bool AssetProps::getPropValueBool(const std::string& key)
 	return getItem(key).GetValueBool();
 }
 
-AssetProperty& AssetProps::addItem(const std::string& key, AssetProperty::PropertyType::Enum type)
+AssetProperty& AssetProps::getItem(const std::string& key)
 {
-	if (itemsLookup_.contains(key)) {
-		auto& item = items_[itemsLookup_.value(key)];;
-		if (item.GetType() != type) {
-			X_WARNING("AssetProps", "Prop request with diffrent types for key \"%s\" initialType: \"%s\" requestedType: \"%s\"",
-				key.c_str(), AssetProperty::PropertyType::ToString(item.GetType()), AssetProperty::PropertyType::ToString(type));
-		}
-		return item;
+	auto it = keys_.find(key);
+	if (it != keys_.end()) {
+		return **it;
 	}
 
-	items_.push_back(AssetProperty());
-	const int32_t idx = items_.size() - 1;
+	X_ERROR("AssetProps", "Requested undefined entry \"%s\"", key.c_str());
 
-	itemsLookup_[key] = idx;
+	// umm what todo, since we can't add it as we don't know the type.
+	// just return empty object? 
+	static AssetProperty empty;
+	empty.SetValue("");
+	return empty;
+}
 
-	AssetProperty& item = items_[idx];
-	item.SetPropertyName(key);
-	item.SetType(type);
-	return item;
+
+AssetProperty& AssetProps::addItem(const std::string& key, AssetProperty::PropertyType::Enum type)
+{
+	auto it = keys_.find(key);
+	if (it != keys_.end()) 
+	{
+		auto& pItem = *it;
+		if (pItem->GetType() != AssetProperty::PropertyType::UNCLASSIFIED && pItem->GetType() != type) {
+			X_WARNING("AssetProps", "Prop request with diffrent types for key \"%s\" initialType: \"%s\" requestedType: \"%s\"",
+				key.c_str(), AssetProperty::PropertyType::ToString(pItem->GetType()), AssetProperty::PropertyType::ToString(type));
+		}
+		return *pItem;
+	}
+
+	AssetProperty* pItem = new AssetProperty();
+	pItem->SetKey(key);
+	pItem->SetType(type);
+
+	pCur_->AddChild(pItem);
+
+	keys_[key] = pItem;
+	return *pItem;
 }
 
 

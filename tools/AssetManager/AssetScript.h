@@ -49,7 +49,7 @@ public:
 	bool init(void);
 	void shutdown(void);
 
-	
+	// runs the script against the props instance.
 	bool runScriptForProps(AssetProps& props, assetDb::AssetType::Enum type);
 
 	void clearCache(bool byteCodeOnly = false);

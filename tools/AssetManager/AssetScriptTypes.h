@@ -12,6 +12,8 @@ class AssetProperty
 {
 public:
 	X_DECLARE_ENUM(PropertyType)(
+		UNCLASSIFIED, // has no visual representation.
+
 		CHECKBOX,
 		COMBOBOX,
 		TEXT,
@@ -23,7 +25,9 @@ public:
 		VEC4,
 
 		IMAGE,
-		PATH
+		PATH,
+
+		GROUPBOX // used to start a group box.
 	);
 
 	X_DECLARE_FLAGS(Setting) (
@@ -35,6 +39,10 @@ public:
 	);
 
 	typedef Flags<Setting> Settings;
+	typedef QList<AssetProperty*> ChildrenVec;
+
+	typedef ChildrenVec::ConstIterator ConstIterator;
+	typedef ChildrenVec::Iterator Iterator;
 
 public:
 	AssetProperty();
@@ -45,8 +53,12 @@ public:
 	void addRef(void);
 	void release(void);
 
-	void SetPropertyName(const std::string& property);
+	void SetKey(const std::string& key);
 	void SetType(PropertyType::Enum type);
+	void AddChild(AssetProperty* pChild);
+
+	ConstIterator begin(void) const;
+	ConstIterator end(void) const;
 
 	AssetProperty& SetTitle(const std::string& title);
 	AssetProperty& SetToolTip(const std::string& toolTip);
@@ -72,12 +84,15 @@ public:
 	void SetMinMax(double min, double max);
 
 	PropertyType::Enum GetType(void) const;
+	std::string GetKey(void) const;
 	std::string GetTitle(void) const;
 	std::string GetToolTip(void) const;
 	std::string GetValue(void) const;
 	double GetValueFloat(void) const;
 	int32_t GetValueInt(void) const;
 	bool GetValueBool(void) const;
+
+
 
 public:
 	static AssetProperty* factory(void);
@@ -88,7 +103,7 @@ private:
 	Settings settings_;
 
 	PropertyType::Enum type_;
-	std::string property_;
+	std::string key_; // copy of the Key for this P
 
 	std::string title_;
 	std::string toolTip_;
@@ -111,15 +126,18 @@ private:
 	double min_;
 	double max_;
 	double step_;
+
+	ChildrenVec children_;
 };
 
 
 class AssetProps
 {
+	typedef QMap<std::string, AssetProperty*> KeyMap;
+
 public:
 	AssetProps();
 	~AssetProps();
-
 
 	AssetProps& operator=(const AssetProps& oth) = default;
 
@@ -127,6 +145,7 @@ public:
 	void release(void);
 
 	bool createGui(QWidget* pParent);
+
 
 public:
 	AssetProperty& AddTexture(const std::string& key, const std::string& default);
@@ -144,7 +163,7 @@ public:
 	AssetProperty& AddPath(const std::string& key, const std::string& value);
 
 	void BeginGroup(const std::string& groupName);
-	void EndGroup(const std::string& groupName);
+	void SetDefaultGroup(void);
 
 public:
 	AssetProperty& getItem(const std::string& key);
@@ -163,9 +182,10 @@ private:
 
 private:
 
-	QList<AssetProperty> items_;
-	QMap<std::string, int32_t> itemsLookup_;
+	AssetProperty root_;
+	AssetProperty* pCur_;
 
+	KeyMap keys_;
 	int32_t refCount_;
 };
 

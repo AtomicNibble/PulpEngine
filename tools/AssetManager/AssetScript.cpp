@@ -166,7 +166,6 @@ bool AssetPropsScript::init(void)
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddText(const string& in, const string& in)", asMETHOD(AssetProps, AddText), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddPath(const string& in, const string& in)", asMETHOD(AssetProps, AddPath), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "void BeginGroup(const string& in)", asMETHOD(AssetProps, BeginGroup), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "void EndGroup(const string& in)", asMETHOD(AssetProps, EndGroup), asCALL_THISCALL); BUG_CHECK(r >= 0);
 
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& getItem(const string& in)", asMETHOD(AssetProps, getItem), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "string getPropValue(const string& in)", asMETHOD(AssetProps, getPropValue), asCALL_THISCALL); BUG_CHECK(r >= 0);
