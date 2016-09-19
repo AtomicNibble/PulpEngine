@@ -13,6 +13,64 @@ namespace
 
 } // namepace 
 
+AssetPropsScript::ByteCodeStream::ByteCodeStream() :
+	readPos_(0)
+{
+
+}
+
+bool AssetPropsScript::ByteCodeStream::isNotEmpty(void) const
+{
+	return !data_.empty();
+}
+
+void AssetPropsScript::ByteCodeStream::clear(void)
+{
+	readPos_ = 0;
+	data_.clear();
+}
+
+void AssetPropsScript::ByteCodeStream::resetRead(void)
+{
+	readPos_ = 0;
+}
+
+
+void AssetPropsScript::ByteCodeStream::Write(const void *ptr, asUINT size)
+{
+	if (size == 0) {
+		return;
+	}
+
+	const size_t writePos = data_.size();
+	data_.resize(data_.size() + size);
+	std::memcpy(&data_[writePos], ptr, size);
+}
+
+void AssetPropsScript::ByteCodeStream::Read(void *ptr, asUINT size)
+{
+	if (size == 0) {
+		return;
+	}
+
+	if ((size + readPos_) > data_.size()) {
+		size = static_cast<uint32_t>( data_.size() - readPos_);
+	}
+
+	std::memcpy(ptr, &data_[readPos_], size);
+}
+
+// ----------------------------------------------------------
+
+void AssetPropsScript::Scriptcache::clear(bool byteCodeOnly)
+{
+	if (!byteCodeOnly) {
+		text.clear();
+	}
+	byteCode.clear();
+}
+
+// ----------------------------------------------------------
 
 const char* AssetPropsScript::ASSET_PROPS_SCRIPT_EXT = "aps";
 const char* AssetPropsScript::SCRIPT_ENTRY = "void GenerateUI(asset& AssetProps)";
@@ -133,44 +191,42 @@ void AssetPropsScript::shutdown(void)
 
 bool AssetPropsScript::runScriptForProps(AssetProps& props, assetDb::AssetType::Enum type)
 {
-	ensureCache(type);
-
-	if (cacheValid(type)) {
-		return processScript(props, cache_[type]);
+	if (!ensureSourceCache(type)) {
+		X_ERROR("AssetScript", "Failed to get assetProps for asset type: \"%s\"", assetDb::AssetType::ToString(type));
+		return false;
 	}
 
-	X_ERROR("AssetScript", "Failed to get assetProps for asset type: \"%s\"", assetDb::AssetType::ToString(type));
-	return false;
+	return processScript(props, cache_[type]);
 }
 
 
-void AssetPropsScript::clearCache(void)
+void AssetPropsScript::clearCache(bool byteCodeOnly)
 {
 	for(auto& entry : cache_) {
-		entry.clear();
+		entry.clear(byteCodeOnly);
 	}
 }
 
-void AssetPropsScript::clearCache(assetDb::AssetType::Enum type)
+void AssetPropsScript::clearCache(assetDb::AssetType::Enum type, bool byteCodeOnly)
 {
-	cache_[type].clear();
+	cache_[type].clear(byteCodeOnly);
 }
 
-bool AssetPropsScript::cacheValid(assetDb::AssetType::Enum type) const
+bool AssetPropsScript::sourceCacheValid(assetDb::AssetType::Enum type) const
 {
-	return !cache_[type].empty();
+	return !cache_[type].text.empty();
 }
 
-bool AssetPropsScript::ensureCache(assetDb::AssetType::Enum type, bool reload)
+bool AssetPropsScript::ensureSourceCache(assetDb::AssetType::Enum type, bool reload)
 {
-	if (!reload && cacheValid(type)) {
+	if (!reload && sourceCacheValid(type)) {
 		return true;
 	}
 
-	bool res = loadScript(type, cache_[type]);
+	bool res = loadScript(type, cache_[type].text);
 	if (!res) {
 		// make sure it's emopty
-		cache_[type].clear();
+		cache_[type].clear(false);
 	}
 	return res;
 }
@@ -218,7 +274,20 @@ bool AssetPropsScript::loadScript(const core::Path<char>& path, std::string& out
 	return true;
 }
 
-bool AssetPropsScript::processScript(AssetProps& props, const std::string& script)
+bool AssetPropsScript::processScript(AssetProps& props, Scriptcache& cache)
+{
+	if (cache.byteCode.isNotEmpty()) {
+		return processScript(props, cache.byteCode);
+	}
+
+	if (cache.text.empty()) {
+		return false;
+	}
+
+	return processScript(props, cache.text, &cache.byteCode);
+}
+
+bool AssetPropsScript::processScript(AssetProps& props, const std::string& script, ByteCodeStream* pCacheOut)
 {
 	X_ASSERT_NOT_NULL(pEngine_);
 
@@ -240,6 +309,48 @@ bool AssetPropsScript::processScript(AssetProps& props, const std::string& scrip
 		return false;
 	}
 
+	if (pCacheOut) {
+		pCacheOut->clear();
+
+		r = pMod->SaveByteCode(pCacheOut);
+		if (r < 0) {
+			X_WARNING("AssetScript", "Failed to save byte code %" PRIi32, r);
+			pCacheOut->clear(); // re clear 
+		}
+	}
+
+	return execScript(props, pMod);
+}
+
+
+bool AssetPropsScript::processScript(AssetProps& props, ByteCodeStream& byteCode)
+{
+	X_ASSERT_NOT_NULL(pEngine_);
+
+	asIScriptModule* pMod = pEngine_->GetModule("AssetScriptModule", asGM_ALWAYS_CREATE);
+	if (!pMod) {
+		X_FATAL("AssetScript", "Unrecoverable error while starting a new module.");
+		return false;
+	}
+
+	int32_t r = pMod->LoadByteCode(&byteCode);
+	if (r < 0) {
+		X_ERROR("AssetScript", "Please correct the errors in script and try again. Err: %" PRIi32, r);
+		return false;
+	}
+
+	r = pMod->Build();
+	if (r < 0) {
+		X_ERROR("AssetScript", "Please correct the errors in script and try again. Err: %" PRIi32, r);
+		return false;
+	}
+
+	return execScript(props, pMod);
+}
+
+
+bool AssetPropsScript::execScript(AssetProps& props, asIScriptModule* pMod)
+{
 	asIScriptFunction* pFunc = pMod->GetFunctionByDecl(SCRIPT_ENTRY);
 	if (!pFunc)
 	{
@@ -251,7 +362,7 @@ bool AssetPropsScript::processScript(AssetProps& props, const std::string& scrip
 	pCtx->Prepare(pFunc);
 	pCtx->SetArgObject(0, &props);
 
-	r = pCtx->Execute();
+	int32_t r = pCtx->Execute();
 	if (r != asEXECUTION_FINISHED)
 	{
 		X_ERROR("AssetScript", "Failed to execute script Err: %" PRIu32, r);
@@ -264,8 +375,6 @@ bool AssetPropsScript::processScript(AssetProps& props, const std::string& scrip
 
 	return true;
 }
-
-
 
 void AssetPropsScript::messageCallback(const asSMessageInfo* msg, void* param)
 {
