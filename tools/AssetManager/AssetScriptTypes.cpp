@@ -52,6 +52,59 @@ AssetProperty::~AssetProperty()
 	clear();
 }
 
+void AssetProperty::appendGui(QLayout* pParent)
+{
+	// why hello :D
+	QWidget* pWidget = nullptr;
+	switch (type_)
+	{
+	case PropertyType::CHECKBOX:
+		pWidget = asCheckBox();
+		break;
+	case PropertyType::GROUPBOX:
+		pWidget = asGroupBox();
+		break;
+
+	default:
+		break;
+	}
+
+	if (pWidget) {
+		pParent->addWidget(pWidget);
+	}
+}
+
+QWidget* AssetProperty::asCheckBox(void)
+{
+	QCheckBox* pCheckBox = new QCheckBox();
+	pCheckBox->setText(QString::fromStdString(title_));
+
+	if (!icon_.empty()) {
+		QIcon icon(QString::fromStdString(icon_));
+		pCheckBox->setIcon(icon);
+	}
+	
+	return pCheckBox;
+}
+
+QWidget* AssetProperty::asGroupBox(void)
+{
+	QGroupBox* pGroupBox = new QGroupBox();
+	pGroupBox->setTitle(QString::fromStdString(title_));
+
+	// add all the items.
+	QVBoxLayout* pLayout = new QVBoxLayout;
+	for (auto& pChild : children_)
+	{
+		pChild->appendGui(pLayout);
+	}
+
+	pGroupBox->setLayout(pLayout);
+	return pGroupBox;
+}
+
+
+
 
 void AssetProperty::addRef(void)
 {
@@ -460,11 +513,16 @@ bool AssetProps::extractArgs(std::string& jsonStrOut) const
 }
 
 
-bool AssetProps::createGui(QWidget* pParent)
+bool AssetProps::appendGui(QLayout* pLayout)
 {
-	X_UNUSED(pParent);
 
-
+	// hellow my little goat.
+	// what to give the children!
+	// candy? or 50 lashes!?
+	for (const auto& pChild : root_)
+	{
+		pChild->appendGui(pLayout);
+	}
 
 	return true;
 }

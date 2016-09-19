@@ -50,6 +50,8 @@ public:
 
 	AssetProperty& operator=(const AssetProperty& oth) = default;
 
+	void appendGui(QLayout* pLayout);
+
 	void addRef(void);
 	void release(void);
 	void clear(void);
@@ -93,6 +95,10 @@ public:
 	int32_t GetValueInt(void) const;
 	bool GetValueBool(void) const;
 
+
+private:
+	QWidget* asCheckBox(void);
+	QWidget* asGroupBox(void);
 
 
 public:
@@ -149,7 +155,7 @@ public:
 
 	bool parseArgs(const std::string& jsonStr);
 	bool extractArgs(std::string& jsonStrOut) const;
-	bool createGui(QWidget* pParent);
+	bool appendGui(QLayout* pLayout);
 
 
 public:
