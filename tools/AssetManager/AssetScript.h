@@ -11,7 +11,7 @@ class AssetProps;
 
 class AssetPropsScript
 {
-	typedef std::array<AssetProps*, assetDb::AssetType::ENUM_COUNT> PropsCaheArr;
+	typedef std::array<std::string, assetDb::AssetType::ENUM_COUNT> StrictCacheArr;
 
 	static const char* ASSET_PROPS_SCRIPT_EXT;
 	static const char* SCRIPT_ENTRY;
@@ -24,15 +24,17 @@ public:
 	void shutdown(void);
 
 	
-	bool getAssetPropsForType(AssetProps& props, assetDb::AssetType::Enum type, bool reload = false);
+	bool runScriptForProps(AssetProps& props, assetDb::AssetType::Enum type);
+
+	void clearCache(void);
+	void clearCache(assetDb::AssetType::Enum type);
 
 private:
-	bool loadFromCache(AssetProps& props, assetDb::AssetType::Enum type);
-	void setCache(AssetProps& props, assetDb::AssetType::Enum type);
-	void clearCache(void);
-
-	bool processScriptForType(AssetProps& props, assetDb::AssetType::Enum type);
-	bool processScript(AssetProps& props, const char* pFileName);
+	bool cacheValid(assetDb::AssetType::Enum type) const;
+	bool ensureCache(assetDb::AssetType::Enum type, bool reload = false);
+	bool loadScript(assetDb::AssetType::Enum type, std::string& out);
+	bool loadScript(const core::Path<char>& path, std::string& out);
+	bool processScript(AssetProps& props, const std::string& script);
 
 private:
 	static void messageCallback(const asSMessageInfo *msg, void *param);
@@ -40,7 +42,7 @@ private:
 
 private:
 	asIScriptEngine* pEngine_;
-	PropsCaheArr cache_;
+	StrictCacheArr cache_;
 };
 
 

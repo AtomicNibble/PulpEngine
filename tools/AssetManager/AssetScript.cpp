@@ -21,7 +21,7 @@ const char* AssetPropsScript::SCRIPT_ENTRY = "void GenerateUI(asset& AssetProps)
 AssetPropsScript::AssetPropsScript() :
 	pEngine_(nullptr)
 {
-	cache_.fill(nullptr);
+	// cache_.fill(nullptr);
 }
 
 AssetPropsScript::~AssetPropsScript()
@@ -131,54 +131,51 @@ void AssetPropsScript::shutdown(void)
 }
 
 
-bool AssetPropsScript::getAssetPropsForType(AssetProps& props, assetDb::AssetType::Enum type, bool reload)
+bool AssetPropsScript::runScriptForProps(AssetProps& props, assetDb::AssetType::Enum type)
 {
-	if (!reload && loadFromCache(props, type)) {
-		return true;
-	}
+	ensureCache(type);
 
-	if (processScriptForType(props, type)) {
-		setCache(props, type);
-		return true;
+	if (cacheValid(type)) {
+		return processScript(props, cache_[type]);
 	}
-
-	// fallback to cache if present even tho reload was specified?
-	// ...
 
 	X_ERROR("AssetScript", "Failed to get assetProps for asset type: \"%s\"", assetDb::AssetType::ToString(type));
 	return false;
 }
 
-bool AssetPropsScript::loadFromCache(AssetProps& props, assetDb::AssetType::Enum type)
-{
-	if (cache_[type]) {
-		props = *cache_[type];
-		return true;
-	}
-	return false;
-}
-
-void AssetPropsScript::setCache(AssetProps& props, assetDb::AssetType::Enum type)
-{
-	if (!cache_[type]) {
-		cache_[type] = new AssetProps(props);
-	}
-	else {
-		*cache_[type] = props;
-	}
-}
 
 void AssetPropsScript::clearCache(void)
 {
-	for(auto& pEntry : cache_) {
-		if (pEntry) {
-			delete pEntry;
-			pEntry = nullptr;
-		}
+	for(auto& entry : cache_) {
+		entry.clear();
 	}
 }
 
-bool AssetPropsScript::processScriptForType(AssetProps& props, assetDb::AssetType::Enum type)
+void AssetPropsScript::clearCache(assetDb::AssetType::Enum type)
+{
+	cache_[type].clear();
+}
+
+bool AssetPropsScript::cacheValid(assetDb::AssetType::Enum type) const
+{
+	return !cache_[type].empty();
+}
+
+bool AssetPropsScript::ensureCache(assetDb::AssetType::Enum type, bool reload)
+{
+	if (!reload && cacheValid(type)) {
+		return true;
+	}
+
+	bool res = loadScript(type, cache_[type]);
+	if (!res) {
+		// make sure it's emopty
+		cache_[type].clear();
+	}
+	return res;
+}
+
+bool AssetPropsScript::loadScript(assetDb::AssetType::Enum type, std::string& out)
 {
 	core::Path<char> path;
 	path.appendFmt("assetscripts%c", core::Path<char>::NATIVE_SLASH);
@@ -186,43 +183,67 @@ bool AssetPropsScript::processScriptForType(AssetProps& props, assetDb::AssetTyp
 	path.setExtension(ASSET_PROPS_SCRIPT_EXT);
 	path.toLower();
 
-	return processScript(props, path.c_str());
+	return loadScript(path, out);
 }
 
+bool AssetPropsScript::loadScript(const core::Path<char>& path, std::string& out)
+{
+	FILE* f = nullptr;
+	fopen_s(&f, path.c_str(), "rb");
 
-bool AssetPropsScript::processScript(AssetProps& props, const char* pFileName)
+	if (!f) {
+		X_ERROR("AssetScript", "Failed to load file: \"%s\"", path.c_str());
+		return false;
+	}
+
+	fseek(f, 0, SEEK_END);
+	const int32_t len = ftell(f);
+	fseek(f, 0, SEEK_SET);
+
+	int32_t read = 0;
+	if (len > 0)
+	{
+		out.resize(len);
+		read = static_cast<int32_t>(fread(const_cast<char*>(out.data()), 1, len, f));
+	}
+
+	fclose(f);
+
+	if (read != len) {
+		out.clear();
+		X_ERROR("AssetScript", "Failed to read all of file: \"%s\" requested: % " PRIi32 " got: %" PRIi32, path.c_str(), len, read);
+		return false;
+	}
+
+	return true;
+}
+
+bool AssetPropsScript::processScript(AssetProps& props, const std::string& script)
 {
 	X_ASSERT_NOT_NULL(pEngine_);
 
-	CScriptBuilder builder;
-	int32_t r = builder.StartNewModule(pEngine_, "AssetScriptModule");
-	if (r < 0)
-	{
-		X_FATAL("AssetScript", "Unrecoverable error while starting a new module. Err: %" PRIi32, r);
+	asIScriptModule* pMod = pEngine_->GetModule("AssetScriptModule", asGM_ALWAYS_CREATE);
+	if (!pMod) {
+		X_FATAL("AssetScript", "Unrecoverable error while starting a new module.");
 		return false;
 	}
 
-	r = builder.AddSectionFromFile(pFileName);
-	if (r < 0)
-	{
-		X_ERROR("AssetScript", "Please correct the errors in \"%s\" script and try again. Err: %" PRIi32, pFileName, r);
-		return false;
-	}
-	r = builder.BuildModule();
-	if (r < 0)
-	{
-		X_ERROR("AssetScript", "Please correct the errors in \"%s\" script and try again. Err: %" PRIi32, pFileName, r);
+	int32_t r = pMod->AddScriptSection("AssetScriptModule", script.c_str(), script.size());
+	if (r < 0) {
+		X_ERROR("AssetScript", "Please correct the errors in script and try again. Err: %" PRIi32, r);
 		return false;
 	}
 
-	// Find the function that is to be called. 
-	asIScriptModule* pMod = pEngine_->GetModule("AssetScriptModule");
-	X_ASSERT_NOT_NULL(pMod);
+	r = pMod->Build();
+	if (r < 0) {
+		X_ERROR("AssetScript", "Please correct the errors in script and try again. Err: %" PRIi32, r);
+		return false;
+	}
+
 	asIScriptFunction* pFunc = pMod->GetFunctionByDecl(SCRIPT_ENTRY);
 	if (!pFunc)
 	{
-		X_ERROR("AssetScript", "The script \"%s\" must have the function 'void GenerateUI(asset& ass)'. Please add it and try again.",
-			pFileName, SCRIPT_ENTRY);
+		X_ERROR("AssetScript", "The script must have the following entry point 'void GenerateUI(asset& ass)'", SCRIPT_ENTRY);
 		return false;
 	}
 
@@ -233,8 +254,7 @@ bool AssetPropsScript::processScript(AssetProps& props, const char* pFileName)
 	r = pCtx->Execute();
 	if (r != asEXECUTION_FINISHED)
 	{
-		X_ERROR("AssetScript", "Failed to execute script \"%s\" Err: %" PRIu32, pFileName, r);
-
+		X_ERROR("AssetScript", "Failed to execute script Err: %" PRIu32, r);
 		if (r == asEXECUTION_EXCEPTION) {
 			printExceptionInfo(pCtx);
 		}
@@ -244,6 +264,7 @@ bool AssetPropsScript::processScript(AssetProps& props, const char* pFileName)
 
 	return true;
 }
+
 
 
 void AssetPropsScript::messageCallback(const asSMessageInfo* msg, void* param)
