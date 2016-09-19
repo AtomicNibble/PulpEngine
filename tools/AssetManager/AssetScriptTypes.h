@@ -101,20 +101,23 @@ public:
 private:
 	int32_t refCount_;
 	Settings settings_;
-
 	PropertyType::Enum type_;
-	std::string key_; // copy of the Key for this P
 
+	// ordered to try group hot members.
+	ChildrenVec children_;
+
+	std::string key_; 
 	std::string title_;
+	std::string strValue_;
+	std::string defaultValue_; 
 	std::string toolTip_;
 	std::string icon_;
 
-	std::string defaultValue_; 
-	std::string strValue_;
+
+	// seperate at bottom to try try improve cache hits for common access members
 	std::string strValueY_;
 	std::string strValueZ_;
 	std::string strValueW_;
-
 	std::string labelsX_;
 	std::string labelsY_;
 	std::string labelsZ_;
@@ -126,8 +129,6 @@ private:
 	double min_;
 	double max_;
 	double step_;
-
-	ChildrenVec children_;
 };
 
 
