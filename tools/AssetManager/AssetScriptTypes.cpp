@@ -422,11 +422,35 @@ bool AssetProps::extractArgs(std::string& jsonStrOut) const
 	for (auto it = keys_.cbegin(); it != end; ++it)
 	{
 		const auto& key = it.key();
-		const auto& val = it.value()->GetValue();
+		const auto& item = *it.value();
 
 		writer.Key(key.c_str());
 		// do we want to try work out a better type?
-		writer.String(val.c_str());
+		
+		switch (item.GetType())
+		{
+		case AssetProperty::PropertyType::BOOL:
+			writer.Bool(item.GetValueBool());
+			break;
+		case AssetProperty::PropertyType::INT:
+			writer.Int(item.GetValueInt());
+			break;
+		case AssetProperty::PropertyType::FLOAT:
+			writer.Double(item.GetValueFloat());
+			break;
+		case AssetProperty::PropertyType::CHECKBOX:
+			writer.Bool(item.GetValueBool());
+			break;
+
+		case AssetProperty::PropertyType::TEXT:
+		case AssetProperty::PropertyType::IMAGE:
+		case AssetProperty::PropertyType::PATH:
+		case AssetProperty::PropertyType::COMBOBOX:
+		default:
+			writer.String(item.GetValue().c_str());
+			break;
+		}
+
 	}
 
 	writer.EndObject();
