@@ -322,7 +322,7 @@ bool AssetProperty::GetValueBool(void) const
 
 
 AssetProps::AssetProps() : 
-	pCur_(&root_),
+	pCur_(nullptr),
 	refCount_(1)
 {
 }
@@ -579,17 +579,13 @@ void AssetProps::BeginGroup(const std::string& groupName)
 		return;
 	}
 
-	if (!pCur_) {
-		root_.SetKey(tokens[0]);
-		root_.SetType(AssetProperty::PropertyType::GROUPBOX);
-		pCur_ = &root_;
-	}
+	pCur_ = &root_;
 
 	for (const auto& token : tokens)
 	{
 		for (auto& pChild : *pCur_)
 		{
-			if (pChild->GetType() == AssetProperty::PropertyType::GROUPBOX && pChild->GetKey() == tokens[0])
+			if (pChild->GetType() == AssetProperty::PropertyType::GROUPBOX && pChild->GetKey() == token)
 			{
 				// we found the group.
 				pCur_ = pChild;
@@ -601,6 +597,7 @@ void AssetProps::BeginGroup(const std::string& groupName)
 		// add and set as current.
 		AssetProperty* pGroup = new AssetProperty();
 		pGroup->SetKey(token);
+		pGroup->SetTitle(token);
 		pGroup->SetType(AssetProperty::PropertyType::GROUPBOX);
 
 		// add group as child.
@@ -670,6 +667,10 @@ AssetProperty& AssetProps::addItem(const std::string& key, AssetProperty::Proper
 	AssetProperty* pItem = new AssetProperty();
 	pItem->SetKey(key);
 	pItem->SetType(type);
+
+	if (!pCur_) {
+		BeginGroup("");
+	}
 
 	pCur_->AddChild(pItem);
 
