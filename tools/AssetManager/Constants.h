@@ -99,7 +99,8 @@ namespace Constants
 
 	// Window Actions
 	const char CLOSE_ALLDOCS[] = "Window.CloseAlldocs";
-	const char RESET_LAYTOUT[] = "Window.ResetLayout";
+	const char RESET_LAYOUT[] = "Window.ResetLayout";
+	const char RELOAD_STYLE[] = "Window.ReloadStyle";
 
 	const char SPLIT[] = "Window.Split";
 	const char SPLIT_SIDE_BY_SIDE[] = "Window.SplitSideBySide";

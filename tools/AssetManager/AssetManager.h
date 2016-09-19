@@ -63,6 +63,7 @@ private slots:
 
 	// Window Slots
 	void resetLayout(void);
+	void reloadStyle(void);
 	void aboutToShowWindowMenu(void);
 	void windowListSetActiveEditor(void);
 
@@ -86,6 +87,7 @@ private:
 
 	// Window
 	QAction* pWindowResetLayoutAct_;
+	QAction* pReloadStyleAct_;
 
 	// Help
 	QAction* pAboutAct_;

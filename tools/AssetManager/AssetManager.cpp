@@ -272,6 +272,8 @@ void AssetManager::createActions(void)
 	pWindowResetLayoutAct_ = new QAction(tr("Reset Layout"), this);
 	connect(pWindowResetLayoutAct_, SIGNAL(triggered()), this, SLOT(resetLayout()));
 
+	pReloadStyleAct_ = new QAction(tr("Reload stylesheet"), this);
+	connect(pReloadStyleAct_, SIGNAL(triggered()), this, SLOT(reloadStyle()));
 
 	// Help
 	pAboutAct_ = new QAction(tr("About AssetManager"), this);
@@ -385,7 +387,11 @@ void AssetManager::createMenus(void)
 		windowmenu->addSeparator(globalContext, Constants::G_WINDOW_WINDOWS);
 
 		// Layout group items
-		pCmd = ActionManager::registerAction(pWindowResetLayoutAct_, Constants::RESET_LAYTOUT, globalContext);
+		pCmd = ActionManager::registerAction(pWindowResetLayoutAct_, Constants::RESET_LAYOUT, globalContext);
+		windowmenu->addAction(pCmd, Constants::G_WINDOW_LAYOUT);
+
+		pCmd = ActionManager::registerAction(pReloadStyleAct_, Constants::RELOAD_STYLE, globalContext);
+		pCmd->setDefaultKeySequence(QKeySequence::Refresh);
 		windowmenu->addAction(pCmd, Constants::G_WINDOW_LAYOUT);
 
 		// Windows group items
@@ -525,6 +531,24 @@ void AssetManager::resetLayout(void)
 {
 
 
+}
+
+
+void AssetManager::reloadStyle(void)
+{
+	QFile f("style\\style.qss");
+	if (!f.exists())
+	{
+		qDebug() << "Can't load style sheet";
+	}
+	else
+	{
+		f.open(QFile::ReadOnly | QFile::Text);
+		QTextStream ts(&f);
+
+		QApplication* pApp = (static_cast<QApplication *>(QCoreApplication::instance()));
+		pApp->setStyleSheet(ts.readAll());
+	}
 }
 
 void AssetManager::aboutToShowWindowMenu(void)
