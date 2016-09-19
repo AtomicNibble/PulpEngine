@@ -52,6 +52,7 @@ public:
 
 	void addRef(void);
 	void release(void);
+	void clear(void);
 
 	void SetKey(const std::string& key);
 	void SetType(PropertyType::Enum type);
@@ -144,6 +145,7 @@ public:
 
 	void addRef(void);
 	void release(void);
+	void clear(void);
 
 	bool createGui(QWidget* pParent);
 

@@ -48,7 +48,7 @@ AssetProperty::AssetProperty() :
 
 AssetProperty::~AssetProperty()
 {
-
+	clear();
 }
 
 
@@ -62,6 +62,16 @@ void AssetProperty::release(void)
 	if (--refCount_ == 0) {
 		delete this;
 	}
+}
+
+void AssetProperty::clear(void)
+{
+	for (auto pChild : children_)
+	{
+		delete pChild;
+	}
+	
+	children_.clear();
 }
 
 void AssetProperty::SetKey(const std::string& key)
@@ -318,7 +328,7 @@ AssetProps::AssetProps() :
 
 AssetProps::~AssetProps()
 {
-
+	clear();
 }
 
 
@@ -332,6 +342,14 @@ void AssetProps::release(void)
 	if (--refCount_ == 0) {
 		delete this;
 	}
+}
+
+void AssetProps::clear(void)
+{
+	root_.clear();
+
+	// kill keys?
+	keys_.clear();
 }
 
 AssetProps* AssetProps::factory(void)
