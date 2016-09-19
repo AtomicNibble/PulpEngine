@@ -631,7 +631,12 @@ AssetProperty& AssetProps::addItem(const std::string& key, AssetProperty::Proper
 	if (it != keys_.end()) 
 	{
 		auto& pItem = *it;
-		if (pItem->GetType() != AssetProperty::PropertyType::UNCLASSIFIED && pItem->GetType() != type) {
+
+		if (pItem->GetType() == AssetProperty::PropertyType::UNCLASSIFIED)
+		{
+			pItem->SetType(type);
+		}
+		else if (pItem->GetType() != type) {
 			X_WARNING("AssetProps", "Prop request with diffrent types for key \"%s\" initialType: \"%s\" requestedType: \"%s\"",
 				key.c_str(), AssetProperty::PropertyType::ToString(pItem->GetType()), AssetProperty::PropertyType::ToString(type));
 		}
