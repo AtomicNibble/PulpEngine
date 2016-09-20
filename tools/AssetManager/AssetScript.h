@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QObject>
 
 class asIScriptEngine;
 class asIScriptContext;
@@ -9,8 +10,10 @@ X_NAMESPACE_BEGIN(assman)
 
 class AssetProps;
 
-class AssetPropsScript
+class AssetPropsScript : QObject
 {
+	Q_OBJECT
+
 	class ByteCodeStream : public asIBinaryStream
 	{
 	public:
@@ -39,6 +42,7 @@ class AssetPropsScript
 
 	typedef std::array<Scriptcache, assetDb::AssetType::ENUM_COUNT> ScriptCacheArr;
 
+	static const char* ASSET_PROPS_SCRIPT_DIR;
 	static const char* ASSET_PROPS_SCRIPT_EXT;
 	static const char* SCRIPT_ENTRY;
 
@@ -46,7 +50,7 @@ public:
 	AssetPropsScript();
 	~AssetPropsScript();
 
-	bool init(void);
+	bool init(bool enableHotReload = true);
 	void shutdown(void);
 
 	// runs the script against the props instance.
@@ -66,13 +70,17 @@ private:
 	bool processScript(AssetProps& props, ByteCodeStream& cache);
 	bool execScript(AssetProps& props, asIScriptModule* pMod);
 
-
 private:
 	static void messageCallback(const asSMessageInfo *msg, void *param);
 	static void printExceptionInfo(asIScriptContext *ctx);
 
+private slots:
+	// misc
+	void fileChanged(const QString& path);
+
 private:
 	asIScriptEngine* pEngine_;
+	QFileSystemWatcher* pWatcher_;
 	ScriptCacheArr cache_;
 };
 

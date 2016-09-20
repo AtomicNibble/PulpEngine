@@ -756,6 +756,21 @@
     <ClCompile Include="AssetScriptTypes.cpp">
       <Filter>Source Files\AssetScript</Filter>
     </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_AssetScript.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_AssetScript.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_AssetScript.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_AssetScript.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_AssetScript.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -835,6 +850,9 @@
     </CustomBuild>
     <CustomBuild Include="WindowTileBar.h">
       <Filter>Header Files\Dialogs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AssetScript.h">
+      <Filter>Header Files\AssetScript</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
@@ -964,9 +982,6 @@
     </ClInclude>
     <ClInclude Include="DirectionConstants.h">
       <Filter>Header Files\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="AssetScript.h">
-      <Filter>Header Files\AssetScript</Filter>
     </ClInclude>
     <ClInclude Include="assetscript\scriptstdstring.h">
       <Filter>Header Files\AssetScript\modules</Filter>

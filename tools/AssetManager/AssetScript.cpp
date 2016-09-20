@@ -72,12 +72,14 @@ void AssetPropsScript::Scriptcache::clear(bool byteCodeOnly)
 
 // ----------------------------------------------------------
 
+const char* AssetPropsScript::ASSET_PROPS_SCRIPT_DIR = "assetscripts";
 const char* AssetPropsScript::ASSET_PROPS_SCRIPT_EXT = "aps";
 const char* AssetPropsScript::SCRIPT_ENTRY = "void GenerateUI(asset& AssetProps)";
 
 
 AssetPropsScript::AssetPropsScript() :
-	pEngine_(nullptr)
+	pEngine_(nullptr),
+	pWatcher_(nullptr)
 {
 	// cache_.fill(nullptr);
 }
@@ -85,10 +87,22 @@ AssetPropsScript::AssetPropsScript() :
 AssetPropsScript::~AssetPropsScript()
 {
 	shutdown();
+
+	if (pWatcher_) {
+		delete pWatcher_;
+	}
 }
 
-bool AssetPropsScript::init(void)
+bool AssetPropsScript::init(bool enableHotReload)
 {
+	if (enableHotReload && !pWatcher_) {
+		pWatcher_ = new QFileSystemWatcher(this);
+
+		connect(pWatcher_, SIGNAL(fileChanged(const QString &)),
+			this, SLOT(fileChanged(const QString &)));
+	}
+
+
 	int32_t r;
 
 	pEngine_ = asCreateScriptEngine();
@@ -230,15 +244,21 @@ bool AssetPropsScript::ensureSourceCache(assetDb::AssetType::Enum type, bool rel
 	return res;
 }
 
-bool AssetPropsScript::loadScript(assetDb::AssetType::Enum type, std::string& out)
+bool AssetPropsScript::loadScript(assetDb::AssetType::Enum type, std::string& Out)
 {
 	core::Path<char> path;
-	path.appendFmt("assetscripts%c", core::Path<char>::NATIVE_SLASH);
+	path.appendFmt("%s%c", ASSET_PROPS_SCRIPT_DIR, core::Path<char>::NATIVE_SLASH);
 	path.append(assetDb::AssetType::ToString(type));
 	path.setExtension(ASSET_PROPS_SCRIPT_EXT);
 	path.toLower();
 
-	return loadScript(path, out);
+	bool res = loadScript(path, Out);
+
+	if(res && pWatcher_) {
+		pWatcher_->addPath(path.c_str());
+	}
+
+	return res;
 }
 
 bool AssetPropsScript::loadScript(const core::Path<char>& path, std::string& out)
@@ -408,5 +428,40 @@ void AssetPropsScript::printExceptionInfo(asIScriptContext * pCtx)
 	X_ERROR("AssetScript", "sect: %s", function->GetScriptSectionName());
 	X_ERROR("AssetScript", "line: %d", pCtx->GetExceptionLineNumber());
 }
+
+
+void AssetPropsScript::fileChanged(const QString& path)
+{
+	X_UNUSED(path);
+
+	// we only watch files we have loaded
+	// so it's going to be a aps.
+
+	// just map name to type.
+	QFile file(path);
+	QFileInfo fileInfo(file);
+	QString fileName = fileInfo.fileName();
+	fileName.toLower();
+
+	qDebug() << "Aps script edited: " << fileName;
+
+	for (uint32_t i=0; i<assetDb::AssetType::ENUM_COUNT; i++)
+	{
+		QString typeFileName(assetDb::AssetType::ToString(static_cast<assetDb::AssetType::Enum>(i)));
+		typeFileName = typeFileName.toLower();
+		typeFileName.append('.');
+		typeFileName.append(ASSET_PROPS_SCRIPT_EXT);
+		
+		if (fileName == typeFileName)
+		{
+			qDebug() << "Cache cleared for aps for type: " << assetDb::AssetType::ToString(i);
+
+			cache_[i].clear(false);
+			break;
+		}
+	}
+}
+
+
 
 X_NAMESPACE_END
