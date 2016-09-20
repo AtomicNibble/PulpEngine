@@ -50,7 +50,7 @@ public:
 
 	AssetProperty& operator=(const AssetProperty& oth) = default;
 
-	void appendGui(QLayout* pLayout);
+	void appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth, int32_t groupDepth);
 
 	void addRef(void);
 	void release(void);
@@ -97,8 +97,13 @@ public:
 
 
 private:
-	QWidget* asCheckBox(void);
-	QWidget* asGroupBox(void);
+	void setLabelText(QLabel* pLabel) const;
+
+	void asGroupBox(QGridLayout* pLayout, int32_t& row, int32_t depth, int32_t groupDepth);
+	void asCheckBox(QGridLayout* pLayout, int32_t row, int32_t depth, int32_t groupDepth);
+	void asText(QGridLayout* pLayout, int32_t row, int32_t depth, int32_t groupDepth);
+	void asIntSpin(QGridLayout* pLayout, int32_t row, int32_t depth, int32_t groupDepth);
+	void asFloatSpin(QGridLayout* pLayout, int32_t row, int32_t depth, int32_t groupDepth);
 
 
 public:
@@ -155,7 +160,7 @@ public:
 
 	bool parseArgs(const std::string& jsonStr);
 	bool extractArgs(std::string& jsonStrOut) const;
-	bool appendGui(QLayout* pLayout);
+	bool appendGui(QGridLayout* pLayout);
 
 
 public:
@@ -194,6 +199,7 @@ private:
 	AssetProperty* pCur_;
 
 	KeyMap keys_;
+	int32_t groupDepth_;
 	int32_t refCount_;
 };
 

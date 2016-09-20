@@ -52,55 +52,144 @@ AssetProperty::~AssetProperty()
 	clear();
 }
 
-void AssetProperty::appendGui(QLayout* pParent)
+void AssetProperty::appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth, int32_t groupDepth)
 {
-	// why hello :D
-	QWidget* pWidget = nullptr;
 	switch (type_)
 	{
 	case PropertyType::CHECKBOX:
-		pWidget = asCheckBox();
-		break;
+		asCheckBox(pLayout, row, depth, groupDepth);
+		return;
+	case PropertyType::TEXT:
+		asText(pLayout, row, depth, groupDepth);
+		return;
+	case PropertyType::INT:
+		asIntSpin(pLayout, row, depth, groupDepth);
+		return;
+	case PropertyType::FLOAT:
+		asFloatSpin(pLayout, row, depth, groupDepth);
+		return;
 	case PropertyType::GROUPBOX:
-		pWidget = asGroupBox();
-		break;
-
+		asGroupBox(pLayout, row, depth, groupDepth);
+		return;
 	default:
 		break;
 	}
 
-	if (pWidget) {
-		pParent->addWidget(pWidget);
+	// add label.
+	QLabel* pLabel = new QLabel();
+	setLabelText(pLabel);
+
+	QLabel* pNoTypeLabel = new QLabel();
+	pNoTypeLabel->setText(PropertyType::ToString(type_));
+
+	pLayout->addWidget(pLabel, row, depth);
+	pLayout->addWidget(pNoTypeLabel, row, groupDepth);
+}
+
+void AssetProperty::setLabelText(QLabel* pLabel) const
+{
+	if (!title_.empty()) {
+		pLabel->setText(QString::fromStdString(title_));
+	}
+	else {
+		pLabel->setText(QString::fromStdString(key_));
 	}
 }
 
-QWidget* AssetProperty::asCheckBox(void)
+void AssetProperty::asGroupBox(QGridLayout* pLayout, int32_t& row, int32_t depth, int32_t groupDepth)
 {
+	QToolButton* pExpandButton = new QToolButton();
+	pExpandButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	pExpandButton->setAutoRaise(true);
+	pExpandButton->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+	pExpandButton->setText(QString::fromStdString(title_));
+
+	auto font = pExpandButton->font();
+	font.setBold(true);
+	pExpandButton->setFont(font);
+
+	// font.setPixelSize(;)
+	{
+		pExpandButton->setIcon(QIcon(":/misc/img/collapse.png"));
+
+		pExpandButton->setIconSize(QSize(12, 12));
+	}
+
+
+	pLayout->addWidget(pExpandButton, row++, depth);
+
+	// add all the items.
+	for (auto& pChild : children_)
+	{
+		pChild->appendGui(pLayout, row, depth + 1, groupDepth);
+		row += 1;
+	}
+}
+
+
+
+void AssetProperty::asCheckBox(QGridLayout* pLayout, int32_t row,  int32_t depth, int32_t groupDepth)
+{
+	X_UNUSED(groupDepth);
+
 	QCheckBox* pCheckBox = new QCheckBox();
-	pCheckBox->setText(QString::fromStdString(title_));
+	if (!title_.empty()) {
+		pCheckBox->setText(QString::fromStdString(title_));
+	}
+	else {
+		pCheckBox->setText(QString::fromStdString(key_));
+	}
 
 	if (!icon_.empty()) {
 		QIcon icon(QString::fromStdString(icon_));
 		pCheckBox->setIcon(icon);
 	}
-	
-	return pCheckBox;
+
+	pLayout->addWidget(pCheckBox, row, depth);
 }
 
-QWidget* AssetProperty::asGroupBox(void)
-{
-	QGroupBox* pGroupBox = new QGroupBox();
-	pGroupBox->setTitle(QString::fromStdString(title_));
 
-	// add all the items.
-	QVBoxLayout* pLayout = new QVBoxLayout;
-	for (auto& pChild : children_)
-	{
-		pChild->appendGui(pLayout);
+void AssetProperty::asText(QGridLayout* pLayout, int32_t row, int32_t depth, int32_t groupDepth)
+{
+	QLineEdit* pLineEdit = new QLineEdit();
+	if (!strValue_.empty()) {
+		pLineEdit->setText(QString::fromStdString(strValue_));
 	}
 
-	pGroupBox->setLayout(pLayout);
-	return pGroupBox;
+	QLabel* pLabel = new QLabel();
+	setLabelText(pLabel);
+
+	pLayout->addWidget(pLabel, row, depth);
+	pLayout->addWidget(pLineEdit, row, groupDepth);
+}
+
+void AssetProperty::asIntSpin(QGridLayout* pLayout, int32_t row, int32_t depth, int32_t groupDepth)
+{
+	QSpinBox* pSpin = new QSpinBox();
+	pSpin->setValue(GetValueInt());
+	pSpin->setRange(static_cast<int32_t>(min_), static_cast<int32_t>(max_));
+	pSpin->setSingleStep(static_cast<int32_t>(step_));
+
+	QLabel* pLabel = new QLabel();
+	setLabelText(pLabel);
+
+	pLayout->addWidget(pLabel, row, depth);
+	pLayout->addWidget(pSpin, row, groupDepth);
+}
+
+void AssetProperty::asFloatSpin(QGridLayout* pLayout, int32_t row, int32_t depth, int32_t groupDepth)
+{
+	QDoubleSpinBox* pSpin = new QDoubleSpinBox();
+	pSpin->setValue(GetValueInt());
+	pSpin->setRange(min_, max_);
+	pSpin->setSingleStep(step_);
+
+	QLabel* pLabel = new QLabel();
+	setLabelText(pLabel);
+
+
+	pLayout->addWidget(pLabel, row, depth);
+	pLayout->addWidget(pSpin, row, groupDepth);
 }
 
 
@@ -376,7 +465,8 @@ bool AssetProperty::GetValueBool(void) const
 
 AssetProps::AssetProps() : 
 	pCur_(nullptr),
-	refCount_(1)
+	refCount_(1),
+	groupDepth_(1)
 {
 }
 
@@ -513,15 +603,22 @@ bool AssetProps::extractArgs(std::string& jsonStrOut) const
 }
 
 
-bool AssetProps::appendGui(QLayout* pLayout)
+bool AssetProps::appendGui(QGridLayout* pLayout)
 {
+	for (int32_t i = 0; i < 12; i++) {
+		pLayout->setColumnMinimumWidth(i, 2);
+	}
 
 	// hellow my little goat.
 	// what to give the children!
 	// candy? or 50 lashes!?
+	int32_t row = 0;
+	int32_t depth = 0;
+
 	for (const auto& pChild : root_)
 	{
-		pChild->appendGui(pLayout);
+		pChild->appendGui(pLayout, row, depth, groupDepth_);
+		row += 1;
 	}
 
 	return true;
@@ -638,6 +735,8 @@ void AssetProps::BeginGroup(const std::string& groupName)
 	}
 
 	pCur_ = &root_;
+
+	groupDepth_ = core::Max(groupDepth_, core::Max(1, static_cast<int32_t>(tokens.size()))) + 1;
 
 	for (const auto& token : tokens)
 	{
