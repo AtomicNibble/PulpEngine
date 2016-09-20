@@ -38,6 +38,8 @@
         <file>img/logo_cry_128.png</file>
         <file>img/Save.png</file>
         <file>img/Saveall.png</file>
+        <file>img/collapse.png</file>
+        <file>img/expand.png</file>
     </qresource>
     <qresource prefix="/dock">
         <file>img/box_center.png</file>
