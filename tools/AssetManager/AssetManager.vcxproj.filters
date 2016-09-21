@@ -771,6 +771,9 @@
     <ClCompile Include="Release\moc_AssetScript.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
+    <ClCompile Include="StatusBar.cpp">
+      <Filter>Source Files\Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -853,6 +856,9 @@
     </CustomBuild>
     <CustomBuild Include="AssetScript.h">
       <Filter>Header Files\AssetScript</Filter>
+    </CustomBuild>
+    <CustomBuild Include="StatusBar.h">
+      <Filter>Header Files\Dialogs</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

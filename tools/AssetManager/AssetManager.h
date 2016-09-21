@@ -16,6 +16,7 @@ class ActionManager;
 class AssetEntryManager;
 class EditorManager;
 class VersionDialog;
+class MyStatusBar;
 
 namespace AssetExplorer {
     class AssetDbViewWidget;
@@ -103,6 +104,7 @@ private:
 private:
     QGridLayout* pLayout_;
 	QMainWindow* pDockArea_;
+	MyStatusBar* pStatusBar_;
 
 private:
 	QFileSystemWatcher* pWatcher_;

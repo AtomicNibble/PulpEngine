@@ -5,6 +5,7 @@
 #include "EditorManager.h"
 #include "ActionContainer.h"
 #include "VersionDialog.h"
+#include "StatusBar.h"
 
 #include "AssetEntryManager.h"
 #include "AssetPropertyEditorFactory.h"
@@ -31,6 +32,7 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pAssetDbexplorer_(nullptr),
 	additionalContexts_(Constants::C_GLOBAL) // always have global contex
 {
+	pStatusBar_ = new MyStatusBar();
 	pWatcher_ = new QFileSystemWatcher(this);
 	pCoreImpl_ = new ICore(this);
 	pActionManager_ = new ActionManager(this);
@@ -95,7 +97,7 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pLayout_->addItem(new QSpacerItem(2, 2), 0, 0, 1, 1); // left
 	pLayout_->addWidget(pDockArea_, 0, 1, 1, 1); // center`
 	pLayout_->addItem(new QSpacerItem(2, 2), 0, 2, 1, 1); // right
-//	setStatusBar(&m_StatusBar);
+	setStatusBar(pStatusBar_);
 	setCentralWidget(pLayout_);
 	setMinimumSize(600, 800);
 
