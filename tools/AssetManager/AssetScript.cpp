@@ -353,6 +353,8 @@ bool AssetPropsScript::processScript(AssetProps& props, ByteCodeStream& byteCode
 		return false;
 	}
 
+	byteCode.resetRead();
+
 	int32_t r = pMod->LoadByteCode(&byteCode);
 	if (r < 0) {
 		X_ERROR("AssetScript", "Please correct the errors in script and try again. Err: %" PRIi32, r);
