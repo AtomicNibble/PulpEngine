@@ -58,6 +58,7 @@ void AssetPropsScript::ByteCodeStream::Read(void *ptr, asUINT size)
 	}
 
 	std::memcpy(ptr, &data_[readPos_], size);
+	readPos_ += size;
 }
 
 // ----------------------------------------------------------
