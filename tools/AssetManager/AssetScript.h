@@ -10,7 +10,7 @@ X_NAMESPACE_BEGIN(assman)
 
 class AssetProps;
 
-class AssetPropsScript : QObject
+class AssetPropsScriptManager : QObject
 {
 	Q_OBJECT
 
@@ -47,8 +47,8 @@ class AssetPropsScript : QObject
 	static const char* SCRIPT_ENTRY;
 
 public:
-	AssetPropsScript();
-	~AssetPropsScript();
+	AssetPropsScriptManager();
+	~AssetPropsScriptManager();
 
 	bool init(bool enableHotReload = true);
 	void shutdown(void);

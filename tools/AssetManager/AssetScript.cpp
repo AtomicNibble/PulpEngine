@@ -13,30 +13,30 @@ namespace
 
 } // namepace 
 
-AssetPropsScript::ByteCodeStream::ByteCodeStream() :
+AssetPropsScriptManager::ByteCodeStream::ByteCodeStream() :
 	readPos_(0)
 {
 
 }
 
-bool AssetPropsScript::ByteCodeStream::isNotEmpty(void) const
+bool AssetPropsScriptManager::ByteCodeStream::isNotEmpty(void) const
 {
 	return !data_.empty();
 }
 
-void AssetPropsScript::ByteCodeStream::clear(void)
+void AssetPropsScriptManager::ByteCodeStream::clear(void)
 {
 	readPos_ = 0;
 	data_.clear();
 }
 
-void AssetPropsScript::ByteCodeStream::resetRead(void)
+void AssetPropsScriptManager::ByteCodeStream::resetRead(void)
 {
 	readPos_ = 0;
 }
 
 
-void AssetPropsScript::ByteCodeStream::Write(const void *ptr, asUINT size)
+void AssetPropsScriptManager::ByteCodeStream::Write(const void *ptr, asUINT size)
 {
 	if (size == 0) {
 		return;
@@ -47,7 +47,7 @@ void AssetPropsScript::ByteCodeStream::Write(const void *ptr, asUINT size)
 	std::memcpy(&data_[writePos], ptr, size);
 }
 
-void AssetPropsScript::ByteCodeStream::Read(void *ptr, asUINT size)
+void AssetPropsScriptManager::ByteCodeStream::Read(void *ptr, asUINT size)
 {
 	if (size == 0) {
 		return;
@@ -63,7 +63,7 @@ void AssetPropsScript::ByteCodeStream::Read(void *ptr, asUINT size)
 
 // ----------------------------------------------------------
 
-void AssetPropsScript::Scriptcache::clear(bool byteCodeOnly)
+void AssetPropsScriptManager::Scriptcache::clear(bool byteCodeOnly)
 {
 	if (!byteCodeOnly) {
 		text.clear();
@@ -73,19 +73,19 @@ void AssetPropsScript::Scriptcache::clear(bool byteCodeOnly)
 
 // ----------------------------------------------------------
 
-const char* AssetPropsScript::ASSET_PROPS_SCRIPT_DIR = "assetscripts";
-const char* AssetPropsScript::ASSET_PROPS_SCRIPT_EXT = "aps";
-const char* AssetPropsScript::SCRIPT_ENTRY = "void GenerateUI(asset& AssetProps)";
+const char* AssetPropsScriptManager::ASSET_PROPS_SCRIPT_DIR = "assetscripts";
+const char* AssetPropsScriptManager::ASSET_PROPS_SCRIPT_EXT = "aps";
+const char* AssetPropsScriptManager::SCRIPT_ENTRY = "void GenerateUI(asset& AssetProps)";
 
 
-AssetPropsScript::AssetPropsScript() :
+AssetPropsScriptManager::AssetPropsScriptManager() :
 	pEngine_(nullptr),
 	pWatcher_(nullptr)
 {
 	// cache_.fill(nullptr);
 }
 
-AssetPropsScript::~AssetPropsScript()
+AssetPropsScriptManager::~AssetPropsScriptManager()
 {
 	shutdown();
 
@@ -94,7 +94,7 @@ AssetPropsScript::~AssetPropsScript()
 	}
 }
 
-bool AssetPropsScript::init(bool enableHotReload)
+bool AssetPropsScriptManager::init(bool enableHotReload)
 {
 	if (enableHotReload && !pWatcher_) {
 		pWatcher_ = new QFileSystemWatcher(this);
@@ -175,6 +175,7 @@ bool AssetPropsScript::init(bool enableHotReload)
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddCheckBox(const string& in, bool)", asMETHOD(AssetProps, AddCheckBox), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddInt(const string& in, uint, uint, uint)", asMETHOD(AssetProps, AddInt), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddFloat(const string& in, double val, double min, double max)", asMETHOD(AssetProps, AddFloat), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddColor(const string& in, double r, double g, double b, double a)", asMETHOD(AssetProps, AddColor), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddVec2(const string& in, const string& in, double x, double y,  double min, double max)", asMETHOD(AssetProps, AddVec2), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddVec3(const string& in, const string& in, const string& in, double x, double y, double z, double min, double max)", asMETHOD(AssetProps, AddVec3), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddVec4(const string& in, const string& in, const string& in, const string& in, double x, double y, double z, double w, double min, double max)", asMETHOD(AssetProps, AddVec4), asCALL_THISCALL); BUG_CHECK(r >= 0);
@@ -192,7 +193,7 @@ bool AssetPropsScript::init(bool enableHotReload)
 	return true;
 }
 
-void AssetPropsScript::shutdown(void)
+void AssetPropsScriptManager::shutdown(void)
 {
 	if (pEngine_) {
 		pEngine_->ShutDownAndRelease();
@@ -203,7 +204,7 @@ void AssetPropsScript::shutdown(void)
 }
 
 
-bool AssetPropsScript::runScriptForProps(AssetProps& props, assetDb::AssetType::Enum type)
+bool AssetPropsScriptManager::runScriptForProps(AssetProps& props, assetDb::AssetType::Enum type)
 {
 	if (!ensureSourceCache(type)) {
 		X_ERROR("AssetScript", "Failed to get assetProps for asset type: \"%s\"", assetDb::AssetType::ToString(type));
@@ -214,24 +215,24 @@ bool AssetPropsScript::runScriptForProps(AssetProps& props, assetDb::AssetType::
 }
 
 
-void AssetPropsScript::clearCache(bool byteCodeOnly)
+void AssetPropsScriptManager::clearCache(bool byteCodeOnly)
 {
 	for(auto& entry : cache_) {
 		entry.clear(byteCodeOnly);
 	}
 }
 
-void AssetPropsScript::clearCache(assetDb::AssetType::Enum type, bool byteCodeOnly)
+void AssetPropsScriptManager::clearCache(assetDb::AssetType::Enum type, bool byteCodeOnly)
 {
 	cache_[type].clear(byteCodeOnly);
 }
 
-bool AssetPropsScript::sourceCacheValid(assetDb::AssetType::Enum type) const
+bool AssetPropsScriptManager::sourceCacheValid(assetDb::AssetType::Enum type) const
 {
 	return !cache_[type].text.empty();
 }
 
-bool AssetPropsScript::ensureSourceCache(assetDb::AssetType::Enum type, bool reload)
+bool AssetPropsScriptManager::ensureSourceCache(assetDb::AssetType::Enum type, bool reload)
 {
 	if (!reload && sourceCacheValid(type)) {
 		return true;
@@ -245,7 +246,7 @@ bool AssetPropsScript::ensureSourceCache(assetDb::AssetType::Enum type, bool rel
 	return res;
 }
 
-bool AssetPropsScript::loadScript(assetDb::AssetType::Enum type, std::string& Out)
+bool AssetPropsScriptManager::loadScript(assetDb::AssetType::Enum type, std::string& Out)
 {
 	core::Path<char> path;
 	path.appendFmt("%s%c", ASSET_PROPS_SCRIPT_DIR, core::Path<char>::NATIVE_SLASH);
@@ -262,7 +263,7 @@ bool AssetPropsScript::loadScript(assetDb::AssetType::Enum type, std::string& Ou
 	return res;
 }
 
-bool AssetPropsScript::loadScript(const core::Path<char>& path, std::string& out)
+bool AssetPropsScriptManager::loadScript(const core::Path<char>& path, std::string& out)
 {
 	FILE* f = nullptr;
 	fopen_s(&f, path.c_str(), "rb");
@@ -294,7 +295,7 @@ bool AssetPropsScript::loadScript(const core::Path<char>& path, std::string& out
 	return true;
 }
 
-bool AssetPropsScript::processScript(AssetProps& props, Scriptcache& cache)
+bool AssetPropsScriptManager::processScript(AssetProps& props, Scriptcache& cache)
 {
 	if (cache.byteCode.isNotEmpty()) {
 		return processScript(props, cache.byteCode);
@@ -307,7 +308,7 @@ bool AssetPropsScript::processScript(AssetProps& props, Scriptcache& cache)
 	return processScript(props, cache.text, &cache.byteCode);
 }
 
-bool AssetPropsScript::processScript(AssetProps& props, const std::string& script, ByteCodeStream* pCacheOut)
+bool AssetPropsScriptManager::processScript(AssetProps& props, const std::string& script, ByteCodeStream* pCacheOut)
 {
 	X_ASSERT_NOT_NULL(pEngine_);
 
@@ -343,7 +344,7 @@ bool AssetPropsScript::processScript(AssetProps& props, const std::string& scrip
 }
 
 
-bool AssetPropsScript::processScript(AssetProps& props, ByteCodeStream& byteCode)
+bool AssetPropsScriptManager::processScript(AssetProps& props, ByteCodeStream& byteCode)
 {
 	X_ASSERT_NOT_NULL(pEngine_);
 
@@ -372,7 +373,7 @@ bool AssetPropsScript::processScript(AssetProps& props, ByteCodeStream& byteCode
 }
 
 
-bool AssetPropsScript::execScript(AssetProps& props, asIScriptModule* pMod)
+bool AssetPropsScriptManager::execScript(AssetProps& props, asIScriptModule* pMod)
 {
 	asIScriptFunction* pFunc = pMod->GetFunctionByDecl(SCRIPT_ENTRY);
 	if (!pFunc)
@@ -399,7 +400,7 @@ bool AssetPropsScript::execScript(AssetProps& props, asIScriptModule* pMod)
 	return true;
 }
 
-void AssetPropsScript::messageCallback(const asSMessageInfo* msg, void* param)
+void AssetPropsScriptManager::messageCallback(const asSMessageInfo* msg, void* param)
 {
 	X_UNUSED(param);
 
@@ -421,7 +422,7 @@ void AssetPropsScript::messageCallback(const asSMessageInfo* msg, void* param)
 	}
 }
 
-void AssetPropsScript::printExceptionInfo(asIScriptContext * pCtx)
+void AssetPropsScriptManager::printExceptionInfo(asIScriptContext * pCtx)
 {
 	const asIScriptFunction *function = pCtx->GetExceptionFunction();
 
@@ -434,7 +435,7 @@ void AssetPropsScript::printExceptionInfo(asIScriptContext * pCtx)
 }
 
 
-void AssetPropsScript::fileChanged(const QString& path)
+void AssetPropsScriptManager::fileChanged(const QString& path)
 {
 	X_UNUSED(path);
 
