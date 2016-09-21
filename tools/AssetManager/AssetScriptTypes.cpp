@@ -222,6 +222,12 @@ void AssetProperty::SetKey(const std::string& key)
 	key_ = key;
 }
 
+void AssetProperty::SetParentKey(const std::string& key)
+{
+	parentKey_ = key;
+}
+
+
 void AssetProperty::SetType(PropertyType::Enum type)
 {
 	type_ = type;
@@ -427,6 +433,11 @@ AssetProperty::PropertyType::Enum AssetProperty::GetType(void) const
 std::string AssetProperty::GetKey(void) const
 {
 	return key_;
+}
+
+std::string AssetProperty::GetParentKey(void) const
+{
+	return parentKey_;
 }
 
 std::string AssetProperty::GetTitle(void) const

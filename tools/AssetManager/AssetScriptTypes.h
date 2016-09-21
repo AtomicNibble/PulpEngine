@@ -57,6 +57,7 @@ public:
 	void clear(void);
 
 	void SetKey(const std::string& key);
+	void SetParentKey(const std::string& key);
 	void SetType(PropertyType::Enum type);
 	void AddChild(AssetProperty* pChild);
 
@@ -88,6 +89,7 @@ public:
 
 	PropertyType::Enum GetType(void) const;
 	std::string GetKey(void) const;
+	std::string GetParentKey(void) const;
 	std::string GetTitle(void) const;
 	std::string GetToolTip(void) const;
 	std::string GetValue(void) const;
@@ -127,6 +129,8 @@ private:
 
 
 	// seperate at bottom to try try improve cache hits for common access members
+	std::string parentKey_;
+
 	std::string strValueY_;
 	std::string strValueZ_;
 	std::string strValueW_;
