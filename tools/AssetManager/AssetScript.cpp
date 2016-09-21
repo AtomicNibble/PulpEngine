@@ -358,11 +358,12 @@ bool AssetPropsScript::processScript(AssetProps& props, ByteCodeStream& byteCode
 		return false;
 	}
 
-	r = pMod->Build();
-	if (r < 0) {
-		X_ERROR("AssetScript", "Please correct the errors in script and try again. Err: %" PRIi32, r);
-		return false;
-	}
+// don't need to rebuild byte code.
+//	r = pMod->Build();
+//	if (r < 0) {
+//		X_ERROR("AssetScript", "Please correct the errors in script and try again. Err: %" PRIi32, r);
+//		return false;
+//	}
 
 	return execScript(props, pMod);
 }
