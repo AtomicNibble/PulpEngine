@@ -20,6 +20,7 @@ public:
 		INT,
 		BOOL,
 		FLOAT,
+		COLOR,
 		VEC2,
 		VEC3,
 		VEC4,
@@ -44,13 +45,16 @@ public:
 	typedef ChildrenVec::ConstIterator ConstIterator;
 	typedef ChildrenVec::Iterator Iterator;
 
+	static const int32_t MAX_COL_IDX = 10;
+
+
 public:
 	AssetProperty();
 	~AssetProperty();
 
 	AssetProperty& operator=(const AssetProperty& oth) = default;
 
-	void appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth, int32_t groupDepth);
+	void appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth);
 
 	void addRef(void);
 	void release(void);
@@ -101,14 +105,16 @@ public:
 private:
 	void setLabelText(QLabel* pLabel) const;
 
-	void asGroupBox(QGridLayout* pLayout, int32_t& row, int32_t depth, int32_t groupDepth);
-	void asCheckBox(QGridLayout* pLayout, int32_t row, int32_t depth, int32_t groupDepth);
-	void asText(QGridLayout* pLayout, int32_t row, int32_t depth, int32_t groupDepth);
-	void asIntSpin(QGridLayout* pLayout, int32_t row, int32_t depth, int32_t groupDepth);
-	void asFloatSpin(QGridLayout* pLayout, int32_t row, int32_t depth, int32_t groupDepth);
+	void asGroupBox(QGridLayout* pLayout, int32_t& row, int32_t depth);
+	void asCheckBox(QGridLayout* pLayout, int32_t row, int32_t depth);
+	void asText(QGridLayout* pLayout, int32_t row, int32_t depth);
+	void asIntSpin(QGridLayout* pLayout, int32_t row, int32_t depth);
+	void asFloatSpin(QGridLayout* pLayout, int32_t row, int32_t depth);
+	void asColor(QGridLayout* pLayout, int32_t row, int32_t depth);
 
 
 public:
+	static int32_t colSpanForCol(int32_t startCol);
 	static AssetProperty* factory(void);
 	static AssetProperty* copyFactory(const AssetProperty& oth);
 
@@ -173,6 +179,7 @@ public:
 	AssetProperty& AddCheckBox(const std::string& key, bool default);
 	AssetProperty& AddInt(const std::string& key, int32_t default, int32_t min, int32_t max);
 	AssetProperty& AddFloat(const std::string& key, double default, double min, double max);
+	AssetProperty& AddColor(const std::string& key, double r, double g, double b, double a);
 	AssetProperty& AddVec2(const std::string& keyX, const std::string& keyY,
 		double x, double y, double min, double max);
 	AssetProperty& AddVec3(const std::string& keyX, const std::string& keyY, const std::string& keyZ, 

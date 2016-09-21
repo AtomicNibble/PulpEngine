@@ -52,24 +52,27 @@ AssetProperty::~AssetProperty()
 	clear();
 }
 
-void AssetProperty::appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth, int32_t groupDepth)
+void AssetProperty::appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth)
 {
 	switch (type_)
 	{
 	case PropertyType::CHECKBOX:
-		asCheckBox(pLayout, row, depth, groupDepth);
+		asCheckBox(pLayout, row, depth);
 		return;
 	case PropertyType::TEXT:
-		asText(pLayout, row, depth, groupDepth);
+		asText(pLayout, row, depth);
 		return;
 	case PropertyType::INT:
-		asIntSpin(pLayout, row, depth, groupDepth);
+		asIntSpin(pLayout, row, depth);
 		return;
 	case PropertyType::FLOAT:
-		asFloatSpin(pLayout, row, depth, groupDepth);
+		asFloatSpin(pLayout, row, depth);
+		return;
+	case PropertyType::COLOR:
+		asColor(pLayout, row, depth);
 		return;
 	case PropertyType::GROUPBOX:
-		asGroupBox(pLayout, row, depth, groupDepth);
+		asGroupBox(pLayout, row, depth);
 		return;
 	default:
 		break;
@@ -80,10 +83,15 @@ void AssetProperty::appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth,
 	setLabelText(pLabel);
 
 	QLabel* pNoTypeLabel = new QLabel();
-	pNoTypeLabel->setText(PropertyType::ToString(type_));
+	pNoTypeLabel->setText(QString("No widget for type: ") + PropertyType::ToString(type_));
+	pNoTypeLabel->setStyleSheet("QLabel { color : red; }");
 
-	pLayout->addWidget(pLabel, row, depth);
-	pLayout->addWidget(pNoTypeLabel, row, groupDepth);
+	auto font = pNoTypeLabel->font();
+	font.setBold(true);
+	pNoTypeLabel->setFont(font);
+
+	pLayout->addWidget(pLabel, row, depth, 1, colSpanForCol(depth));
+	pLayout->addWidget(pNoTypeLabel, row, MAX_COL_IDX);
 }
 
 void AssetProperty::setLabelText(QLabel* pLabel) const
@@ -96,10 +104,10 @@ void AssetProperty::setLabelText(QLabel* pLabel) const
 	}
 }
 
-void AssetProperty::asGroupBox(QGridLayout* pLayout, int32_t& row, int32_t depth, int32_t groupDepth)
+void AssetProperty::asGroupBox(QGridLayout* pLayout, int32_t& row, int32_t depth)
 {
 	QToolButton* pExpandButton = new QToolButton();
-	pExpandButton->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
+	pExpandButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	pExpandButton->setAutoRaise(true);
 	pExpandButton->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
 	pExpandButton->setText(QString::fromStdString(title_));
@@ -116,22 +124,20 @@ void AssetProperty::asGroupBox(QGridLayout* pLayout, int32_t& row, int32_t depth
 	}
 
 
-	pLayout->addWidget(pExpandButton, row++, depth);
+	pLayout->addWidget(pExpandButton, row++, depth, 1, -1);
 
 	// add all the items.
 	for (auto& pChild : children_)
 	{
-		pChild->appendGui(pLayout, row, depth + 1, groupDepth);
+		pChild->appendGui(pLayout, row, depth + 1);
 		row += 1;
 	}
 }
 
 
 
-void AssetProperty::asCheckBox(QGridLayout* pLayout, int32_t row,  int32_t depth, int32_t groupDepth)
+void AssetProperty::asCheckBox(QGridLayout* pLayout, int32_t row,  int32_t depth)
 {
-	X_UNUSED(groupDepth);
-
 	QCheckBox* pCheckBox = new QCheckBox();
 	if (!title_.empty()) {
 		pCheckBox->setText(QString::fromStdString(title_));
@@ -145,25 +151,28 @@ void AssetProperty::asCheckBox(QGridLayout* pLayout, int32_t row,  int32_t depth
 		pCheckBox->setIcon(icon);
 	}
 
-	pLayout->addWidget(pCheckBox, row, depth);
+	pLayout->addWidget(pCheckBox, row, depth, 1, -1); // -1 spans to far right col.
 }
 
 
-void AssetProperty::asText(QGridLayout* pLayout, int32_t row, int32_t depth, int32_t groupDepth)
+void AssetProperty::asText(QGridLayout* pLayout, int32_t row, int32_t depth)
 {
 	QLineEdit* pLineEdit = new QLineEdit();
 	if (!strValue_.empty()) {
 		pLineEdit->setText(QString::fromStdString(strValue_));
 	}
+	else if(!defaultValue_.empty()) {
+		pLineEdit->setText(QString::fromStdString(defaultValue_));
+	}
 
 	QLabel* pLabel = new QLabel();
 	setLabelText(pLabel);
 
-	pLayout->addWidget(pLabel, row, depth);
-	pLayout->addWidget(pLineEdit, row, groupDepth);
+	pLayout->addWidget(pLabel, row, depth, 1, colSpanForCol(depth));
+	pLayout->addWidget(pLineEdit, row, MAX_COL_IDX);
 }
 
-void AssetProperty::asIntSpin(QGridLayout* pLayout, int32_t row, int32_t depth, int32_t groupDepth)
+void AssetProperty::asIntSpin(QGridLayout* pLayout, int32_t row, int32_t depth)
 {
 	QSpinBox* pSpin = new QSpinBox();
 	pSpin->setValue(GetValueInt());
@@ -173,11 +182,11 @@ void AssetProperty::asIntSpin(QGridLayout* pLayout, int32_t row, int32_t depth, 
 	QLabel* pLabel = new QLabel();
 	setLabelText(pLabel);
 
-	pLayout->addWidget(pLabel, row, depth);
-	pLayout->addWidget(pSpin, row, groupDepth);
+	pLayout->addWidget(pLabel, row, depth, 1, colSpanForCol(depth));
+	pLayout->addWidget(pSpin, row, MAX_COL_IDX);
 }
 
-void AssetProperty::asFloatSpin(QGridLayout* pLayout, int32_t row, int32_t depth, int32_t groupDepth)
+void AssetProperty::asFloatSpin(QGridLayout* pLayout, int32_t row, int32_t depth)
 {
 	QDoubleSpinBox* pSpin = new QDoubleSpinBox();
 	pSpin->setValue(GetValueInt());
@@ -187,12 +196,58 @@ void AssetProperty::asFloatSpin(QGridLayout* pLayout, int32_t row, int32_t depth
 	QLabel* pLabel = new QLabel();
 	setLabelText(pLabel);
 
-
-	pLayout->addWidget(pLabel, row, depth);
-	pLayout->addWidget(pSpin, row, groupDepth);
+	pLayout->addWidget(pLabel, row, depth, 1, colSpanForCol(depth));
+	pLayout->addWidget(pSpin, row, MAX_COL_IDX);
 }
 
 
+void AssetProperty::asColor(QGridLayout* pLayout, int32_t row, int32_t depth)
+{
+	QHBoxLayout* pChildLayout = new QHBoxLayout();
+	pChildLayout->setContentsMargins(0, 0, 0, 0);
+	{
+		QLabel* pColLabel = new QLabel();
+		pColLabel->setFrameStyle(QFrame::Box | QFrame::Panel | QFrame::Plain | QFrame::Raised);
+		pColLabel->setAlignment(Qt::AlignCenter);
+		pColLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+		pColLabel->setMinimumWidth(64);
+
+		pChildLayout->addWidget(pColLabel);
+
+		QToolButton* pButton = new QToolButton();
+		pButton->setToolTip("Color Picker");
+		pButton->setIcon(QIcon(":/misc/img/colorpicker.png"));
+
+		pChildLayout->addWidget(pButton);
+
+		const char* pLabels[4] = { "R", "G", "B", "A" };
+
+		for (int32_t i = 0; i < 4; i++)
+		{
+			QLabel* pLabel = new QLabel();
+			pLabel->setText(pLabels[i]);
+
+			QLineEdit* pLineEdit = new QLineEdit();
+			pLineEdit->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+			pLineEdit->setMaximumWidth(64);
+			pLineEdit->setValidator(new QIntValidator(0, 255));
+
+			pChildLayout->addWidget(pLabel, 0);
+			pChildLayout->addWidget(pLineEdit, 0);
+		}
+	}
+
+	QLabel* pLabel = new QLabel();
+	setLabelText(pLabel);
+
+	pLayout->addWidget(pLabel, row, depth, 1, colSpanForCol(depth));
+	pLayout->addLayout(pChildLayout, row, MAX_COL_IDX);
+}
+
+int32_t AssetProperty::colSpanForCol(int32_t startCol)
+{
+	return MAX_COL_IDX - startCol;
+}
 
 
 void AssetProperty::addRef(void)
@@ -462,6 +517,10 @@ double AssetProperty::GetValueFloat(void) const
 
 int32_t AssetProperty::GetValueInt(void) const
 {
+	if (strValue_.empty()) {
+		return 0;
+	}
+
 	return std::stoi(strValue_);
 }
 
@@ -616,8 +675,8 @@ bool AssetProps::extractArgs(std::string& jsonStrOut) const
 
 bool AssetProps::appendGui(QGridLayout* pLayout)
 {
-	for (int32_t i = 0; i < 12; i++) {
-		pLayout->setColumnMinimumWidth(i, 2);
+	for (int32_t i = 0; i < groupDepth_; i++) {
+		pLayout->setColumnMinimumWidth(i, 16);
 	}
 
 	// hellow my little goat.
@@ -628,7 +687,7 @@ bool AssetProps::appendGui(QGridLayout* pLayout)
 
 	for (const auto& pChild : root_)
 	{
-		pChild->appendGui(pLayout, row, depth, groupDepth_);
+		pChild->appendGui(pLayout, row, depth);
 		row += 1;
 	}
 
@@ -672,53 +731,58 @@ AssetProperty& AssetProps::AddFloat(const std::string& key, double default, doub
 	return item;
 }
 
+AssetProperty& AssetProps::AddColor(const std::string& key, double r, double g, double b, double a)
+{
+	AssetProperty& item = addItem(key, AssetProperty::PropertyType::COLOR);
+
+	QString temp = QString("%1 %2 %3 %4").arg(
+		QString::number(r),
+		QString::number(g),
+		QString::number(b),
+		QString::number(a)
+	);
+
+	item.SetDefaultValue(temp.toStdString());
+	return item;
+}
+
 AssetProperty& AssetProps::AddVec2(const std::string& keyX, const std::string& keyY,
 	double x, double y, double min, double max)
 {
-	AssetProperty& item = addItem(keyX, AssetProperty::PropertyType::VEC2);
-	X_UNUSED(keyY);
-	X_UNUSED(x);
-	X_UNUSED(y);
-	X_UNUSED(min);
-	X_UNUSED(max);
+	auto& itemX = AddFloat(keyX, x, min, max);
+	auto& itemY = AddFloat(keyY, y, min, max);
 
-	return item;
+	itemY.SetParentKey(keyX);
+
+	return itemX;
 }
 
 AssetProperty& AssetProps::AddVec3(const std::string& keyX, const std::string& keyY, const std::string& keyZ,
 	double x, double y, double z, double min, double max)
 {
-	AssetProperty& item = addItem(keyX, AssetProperty::PropertyType::VEC2);
-	X_UNUSED(keyY);
-	X_UNUSED(keyZ);
-	X_UNUSED(x);
-	X_UNUSED(y);
-	X_UNUSED(z);
-	X_UNUSED(min);
-	X_UNUSED(max);
+	auto& itemX = AddFloat(keyX, x, min, max);
+	auto& itemY = AddFloat(keyY, y, min, max);
+	auto& itemZ = AddFloat(keyZ, z, min, max);
 
-	return item;
+	itemY.SetParentKey(keyX);
+	itemZ.SetParentKey(keyX);
+
+	return itemX;
 }
 
 AssetProperty& AssetProps::AddVec4(const std::string& keyX, const std::string& keyY, const std::string& keyZ, const std::string& keyW,
 	double x, double y, double z, double w, double min, double max)
 {
-	AssetProperty& item = addItem(keyX, AssetProperty::PropertyType::VEC2);
-	X_UNUSED(keyY);
-	X_UNUSED(keyZ);
-	X_UNUSED(keyW);
-	X_UNUSED(x);
-	X_UNUSED(y);
-	X_UNUSED(z);
-	X_UNUSED(w);
-	X_UNUSED(min);
-	X_UNUSED(max);
+	auto& itemX = AddFloat(keyX, x, min, max);
+	auto& itemY = AddFloat(keyY, y, min, max);
+	auto& itemZ = AddFloat(keyZ, z, min, max);
+	auto& itemW = AddFloat(keyW, w, min, max);
 
+	itemY.SetParentKey(keyX);
+	itemZ.SetParentKey(keyX);
+	itemW.SetParentKey(keyX);
 
-	// we give each item it's own key.
-	// just need to decide how best to organise it so the gui ends up grouped.
-
-	return item;
+	return itemX;
 }
 
 AssetProperty& AssetProps::AddText(const std::string& key, const std::string& value)
@@ -837,7 +901,7 @@ AssetProperty& AssetProps::addItem(const std::string& key, AssetProperty::Proper
 	pItem->SetType(type);
 
 	if (!pCur_) {
-		BeginGroup("");
+		BeginGroup("xmodel");
 	}
 
 	pCur_->AddChild(pItem);
