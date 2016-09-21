@@ -16,6 +16,7 @@ class ActionManager;
 class AssetEntryManager;
 class EditorManager;
 class VersionDialog;
+class AssetPropsScriptManager;
 class MyStatusBar;
 
 namespace AssetExplorer {
@@ -115,6 +116,7 @@ private:
 	ActionManager* pActionManager_;
 	AssetEntryManager* pAssetEntryManager_;
 	EditorManager* pEditorManager_;
+	AssetPropsScriptManager* pAssetScripts_;
 
 	// context baby, do you speak it!
 	QList<IContext*>           activeContext_;

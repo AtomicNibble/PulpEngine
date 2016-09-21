@@ -9,6 +9,7 @@
 
 #include "AssetEntryManager.h"
 #include "AssetPropertyEditorFactory.h"
+#include "AssetScript.h"
 #include "Command.h"
 
 #include "IEditor.h"
@@ -60,6 +61,11 @@ AssetManager::AssetManager(QWidget* pParent) :
 	createStatusBar();
 
 	// ----------------------------------
+
+	pAssetScripts_ = new AssetPropsScriptManager();
+	if (!pAssetScripts_->init()) {
+		QMessageBox::critical(this, tr("Error"), "Failed to init AssetScript manager");
+	}
 
 	// needs to be done after menu's created
 	pEditorManager_ = new EditorManager(this);
