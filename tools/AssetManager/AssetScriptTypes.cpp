@@ -697,28 +697,33 @@ bool AssetProps::appendGui(QGridLayout* pLayout)
 AssetProperty& AssetProps::AddTexture(const std::string& key, const std::string& default)
 {
 	AssetProperty& item = addItem(key, AssetProperty::PropertyType::IMAGE);
-	item.SetValue(default);
+	item.SetDefaultValue(default);
 	return item;
 }
 
 AssetProperty& AssetProps::AddCombo(const std::string& key, const std::string& values)
 {
 	AssetProperty& item = addItem(key, AssetProperty::PropertyType::COMBOBOX);
-	item.SetValue(values);
+	item.SetDefaultValue(values);
 	return item;
 }
 
 AssetProperty& AssetProps::AddCheckBox(const std::string& key, bool default)
 {
 	AssetProperty& item = addItem(key, AssetProperty::PropertyType::CHECKBOX);
-	item.SetBool(default);
+	if(default) {
+		item.SetDefaultValue("1");
+	}
+	else {
+		item.SetDefaultValue("0");
+	}
 	return item;
 }
 
 AssetProperty& AssetProps::AddInt(const std::string& key, int32_t default, int32_t min, int32_t max)
 {
 	AssetProperty& item = addItem(key, AssetProperty::PropertyType::INT);
-	item.SetInt(default);
+	item.SetDefaultValue(std::to_string(default));
 	item.SetMinMax(min, max);
 	return item;
 }
@@ -726,7 +731,7 @@ AssetProperty& AssetProps::AddInt(const std::string& key, int32_t default, int32
 AssetProperty& AssetProps::AddFloat(const std::string& key, double default, double min, double max)
 {
 	AssetProperty& item = addItem(key, AssetProperty::PropertyType::FLOAT);
-	item.SetDouble(default); // it's double but yeh.. fuck you!
+	item.SetDefaultValue(std::to_string(default));
 	item.SetMinMax(min, max);
 	return item;
 }
@@ -788,14 +793,14 @@ AssetProperty& AssetProps::AddVec4(const std::string& keyX, const std::string& k
 AssetProperty& AssetProps::AddText(const std::string& key, const std::string& value)
 {
 	AssetProperty& item = addItem(key, AssetProperty::PropertyType::TEXT);
-	item.SetValue(value);
+	item.SetDefaultValue(value);
 	return item;
 }
 
 AssetProperty& AssetProps::AddPath(const std::string& key, const std::string& value)
 {
 	AssetProperty& item = addItem(key, AssetProperty::PropertyType::PATH);
-	item.SetValue(value);
+	item.SetDefaultValue(value);
 	return item;
 }
 
