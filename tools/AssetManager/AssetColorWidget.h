@@ -4,6 +4,7 @@
 
 X_NAMESPACE_BEGIN(assman)
 
+class ColorSelector;
 
 class AssetColorWidget : public QWidget
 {
@@ -15,6 +16,7 @@ public:
 
 
 private:
+	ColorSelector* pColPreview_;
 	QLineEdit* pRGBAValueWidgets_[4];
 };
 

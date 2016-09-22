@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "AssetColorWidget.h"
 
+#include "ColorSelectorWidget.h"
+
 X_NAMESPACE_BEGIN(assman)
 
 
@@ -11,18 +13,15 @@ AssetColorWidget::AssetColorWidget(QWidget *parent, const std::string& value)
 	pChildLayout->setContentsMargins(0, 0, 0, 0);
 
 	{
-		QLabel* pColLabel = new QLabel();
-		pColLabel->setFrameStyle(QFrame::Box | QFrame::Panel | QFrame::Plain | QFrame::Raised);
-		pColLabel->setAlignment(Qt::AlignCenter);
-		pColLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-		pColLabel->setMinimumWidth(64);
+		pColPreview_ = new ColorSelector();
+		pColPreview_->setMinimumWidth(64);
 
-		pChildLayout->addWidget(pColLabel);
 
 		QToolButton* pButton = new QToolButton();
 		pButton->setToolTip("Color Picker");
 		pButton->setIcon(QIcon(":/misc/img/colorpicker.png"));
 
+		pChildLayout->addWidget(pColPreview_);
 		pChildLayout->addWidget(pButton);
 
 		const char* pLabels[4] = { "R", "G", "B", "A" };
@@ -47,19 +46,29 @@ AssetColorWidget::AssetColorWidget(QWidget *parent, const std::string& value)
 	QString tmp = QString::fromStdString(value);
 	QStringList values = tmp.split(QChar(' '));
 
-	float vlaues[4] = { 255.f };
+	float vlaues[4] = { 1.f };
+	int32_t i;
 
-	for (int32_t i = 0; i < values.size(); i++)
-	{
+	for (i = 0; i < values.size(); i++) {
 		vlaues[i] = values[i].toFloat();
-		vlaues[i] = math<float>::floor(vlaues[i] * 255.f);
+	}
+	for (; i < 4; i++) {
+		vlaues[i] = 1.f;
 	}
 
-	for (int32_t i = 0; i < 4; i++)
+	for (i = 0; i < 4; i++)
 	{
 		pRGBAValueWidgets_[i]->blockSignals(true);
-		pRGBAValueWidgets_[i]->setText(QString::number(vlaues[i]));
+		pRGBAValueWidgets_[i]->setText(QString::number(math<float>::floor(vlaues[i] * 255.f)));
 		pRGBAValueWidgets_[i]->blockSignals(false);
+	}
+
+	{
+		QColor col;
+		col.setRgbF(vlaues[0], vlaues[1], vlaues[2], vlaues[3]);
+
+		pColPreview_->setColor(col);
+		pColPreview_->setDisplayMode(ColorPreview::DisplayMode::SplitAlpha); // it don't split if alpha solid.
 	}
 
 	setLayout(pChildLayout);
