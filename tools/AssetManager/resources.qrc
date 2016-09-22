@@ -49,6 +49,7 @@
         <file>img/collapse.png</file>
         <file>img/expand.png</file>
         <file>img/colorpicker.png</file>
+        <file>img/alphaback.png</file>
     </qresource>
     <qresource prefix="/dock">
         <file>img/box_center.png</file>
