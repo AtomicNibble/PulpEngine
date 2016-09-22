@@ -11,15 +11,21 @@ AssetGroupWidget::AssetGroupWidget(QWidget *parent)
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	setAutoRaise(true);
 	setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-//	setText(QString::fromStdString(title_));
+	setCheckable(true);
 
 	auto f = font();
 	f.setBold(true);
 	setFont(f);
 
-	// font.setPixelSize(;)
 	{
-		setIcon(QIcon(":/misc/img/collapse.png"));
+		QPixmap collapsePix(":/misc/img/collapse.png");
+		QPixmap expandPix(":/misc/img/expand.png");
+
+		QIcon icon;
+		icon.addPixmap(collapsePix, QIcon::Normal, QIcon::Off);
+		icon.addPixmap(expandPix, QIcon::Normal, QIcon::On);
+
+		setIcon(icon);
 		setIconSize(QSize(12, 12));
 	}
 
@@ -39,7 +45,7 @@ void AssetGroupWidget::buttonClicked(bool )
 	int goat = 0;
 	goat = 1;
 
-	this->setVisible(false);
+//	this->setVisible(false);
 }
 
 X_NAMESPACE_END
