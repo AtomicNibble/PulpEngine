@@ -1,5 +1,7 @@
 #pragma once
 
+#include <qobject.h>
+
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -8,7 +10,7 @@ X_NAMESPACE_BEGIN(assman)
 #endif // !TEXT
 
 
-class AssetProperty
+class AssetProperty 
 {
 public:
 	X_DECLARE_ENUM(PropertyType)(
@@ -17,6 +19,7 @@ public:
 		CHECKBOX,
 		COMBOBOX,
 		TEXT,
+		STRING,
 		INT,
 		BOOL,
 		FLOAT,
@@ -36,7 +39,8 @@ public:
 		VISIBLE,
 		SHOW_JUMP_TO_ASSET,
 		BOLD_TEXT,
-		UPDATE_ON_CHANGE
+		UPDATE_ON_CHANGE,
+		EDITIABLE
 	);
 
 	typedef Flags<Setting> Settings;
@@ -50,6 +54,7 @@ public:
 
 public:
 	AssetProperty();
+	AssetProperty(const AssetProperty& oth) = default;
 	~AssetProperty();
 
 	AssetProperty& operator=(const AssetProperty& oth) = default;
@@ -59,6 +64,7 @@ public:
 	void addRef(void);
 	void release(void);
 	void clear(void);
+	void show(bool vis);
 
 	void SetKey(const std::string& key);
 	void SetParentKey(const std::string& key);
@@ -90,6 +96,7 @@ public:
 
 	void SetMinMax(int32_t min, int32_t max);
 	void SetMinMax(double min, double max);
+	void SetEditable(bool canEdit);
 
 	PropertyType::Enum GetType(void) const;
 	std::string GetKey(void) const;
@@ -106,11 +113,6 @@ private:
 	void setLabelText(QLabel* pLabel) const;
 
 	void asGroupBox(QGridLayout* pLayout, int32_t& row, int32_t depth);
-	void asCheckBox(QGridLayout* pLayout, int32_t row, int32_t depth);
-	void asText(QGridLayout* pLayout, int32_t row, int32_t depth);
-	void asIntSpin(QGridLayout* pLayout, int32_t row, int32_t depth);
-	void asFloatSpin(QGridLayout* pLayout, int32_t row, int32_t depth);
-	void asColor(QGridLayout* pLayout, int32_t row, int32_t depth);
 
 
 public:
@@ -123,7 +125,7 @@ private:
 	Settings settings_;
 	PropertyType::Enum type_;
 
-	// ordered to try group hot members.
+//	// ordered to try group hot members.
 	ChildrenVec children_;
 
 	std::string key_; 
@@ -132,6 +134,9 @@ private:
 	std::string defaultValue_; 
 	std::string toolTip_;
 	std::string icon_;
+
+	QWidget* pLabel_;
+	QWidget* pItem_;
 
 
 	// seperate at bottom to try try improve cache hits for common access members
@@ -175,7 +180,7 @@ public:
 
 public:
 	AssetProperty& AddTexture(const std::string& key, const std::string& default);
-	AssetProperty& AddCombo(const std::string& key, const std::string& values);
+	AssetProperty& AddCombo(const std::string& key, const std::string& values, bool editiable = false);
 	AssetProperty& AddCheckBox(const std::string& key, bool default);
 	AssetProperty& AddInt(const std::string& key, int32_t default, int32_t min, int32_t max);
 	AssetProperty& AddFloat(const std::string& key, double default, double min, double max);
@@ -187,6 +192,7 @@ public:
 	AssetProperty& AddVec4(const std::string& keyX, const std::string& keyY, const std::string& keyZ, const std::string& keyW,
 		double x, double y, double z, double w, double min, double max);
 	AssetProperty& AddText(const std::string& key, const std::string& value);
+	AssetProperty& AddString(const std::string& key, const std::string& value);
 	AssetProperty& AddPath(const std::string& key, const std::string& value);
 
 	void BeginGroup(const std::string& groupName);
@@ -199,7 +205,8 @@ public:
 	bool getPropValueBool(const std::string& key);
 
 private:
-	AssetProperty& addItem(const std::string& key, AssetProperty::PropertyType::Enum type);
+	AssetProperty& addItem(const std::string& key);
+	AssetProperty& addItemIU(const std::string& key, AssetProperty::PropertyType::Enum type);
 
 public:
 	static AssetProps* factory(void);
@@ -210,7 +217,6 @@ private:
 	AssetProperty* pCur_;
 
 	KeyMap keys_;
-	int32_t groupDepth_;
 	int32_t refCount_;
 };
 

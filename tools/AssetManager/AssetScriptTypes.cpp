@@ -2,6 +2,18 @@
 
 #include <String\Json.h>
 
+#include "AssetColorWidget.h"
+#include "AssetComboBoxWidget.h"
+#include "AssetCheckBoxWidget.h"
+#include "AssetSpinBoxWidget.h"
+#include "AssetStringWidget.h"
+#include "AssetLineEditWidget.h"
+#include "AssetTextWidget.h"
+#include "AssetTextureWidget.h"
+#include "AssetGroupWidget.h"
+#include "AssetPathWidget.h"
+
+
 X_NAMESPACE_BEGIN(assman)
 
 namespace
@@ -41,7 +53,10 @@ AssetProperty* AssetProperty::copyFactory(const AssetProperty& oth)
 
 AssetProperty::AssetProperty() :
 	refCount_(1),
-	step_(0.0001)
+	step_(0.0001),
+	type_(PropertyType::UNCLASSIFIED),
+	pLabel_(nullptr),
+	pItem_(nullptr)
 {
 	settings_.Set(Setting::VISIBLE);
 	settings_.Set(Setting::ENABLED);
@@ -56,21 +71,9 @@ void AssetProperty::appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth)
 {
 	switch (type_)
 	{
-	case PropertyType::CHECKBOX:
-		asCheckBox(pLayout, row, depth);
-		return;
-	case PropertyType::TEXT:
-		asText(pLayout, row, depth);
-		return;
-	case PropertyType::INT:
-		asIntSpin(pLayout, row, depth);
-		return;
-	case PropertyType::FLOAT:
-		asFloatSpin(pLayout, row, depth);
-		return;
-	case PropertyType::COLOR:
-		asColor(pLayout, row, depth);
-		return;
+//	case PropertyType::CHECKBOX:
+//		asCheckBox(pLayout, row, depth);
+//		return;
 	case PropertyType::GROUPBOX:
 		asGroupBox(pLayout, row, depth);
 		return;
@@ -78,20 +81,51 @@ void AssetProperty::appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth)
 		break;
 	}
 
+	// new 
+	QWidget* pParent = nullptr;
+	QWidget* pWidget = nullptr;
+
 	// add label.
 	QLabel* pLabel = new QLabel();
 	setLabelText(pLabel);
 
-	QLabel* pNoTypeLabel = new QLabel();
-	pNoTypeLabel->setText(QString("No widget for type: ") + PropertyType::ToString(type_));
-	pNoTypeLabel->setStyleSheet("QLabel { color : red; }");
+	const std::string& val = defaultValue_;
 
-	auto font = pNoTypeLabel->font();
-	font.setBold(true);
-	pNoTypeLabel->setFont(font);
+	switch (type_)
+	{
+	case PropertyType::CHECKBOX:
+		pWidget = new AssetCheckBoxWidget(nullptr, val);
+		break;
+	case PropertyType::INT:
+		pWidget = new AssetSpinBoxWidget(nullptr, GetValueInt(), min_, max_, step_);
+		break;
+	case PropertyType::FLOAT:
+		pWidget = new AssetDoubleSpinBoxWidget(nullptr, GetValueFloat(), min_, max_, step_);
+		break;
+	case PropertyType::PATH:
+		pWidget = new AssetPathWidget(pParent, val);
+		break;
+	case PropertyType::TEXT:
+		pWidget = new AssetTextWidget(pParent, val);
+		break;
+	case PropertyType::IMAGE:
+		pWidget = new AssetTextureWidget(pParent);
+		break;
+	case PropertyType::STRING:
+		pWidget = new AssetStringWidget(pParent, val);
+		break;
+	case PropertyType::COLOR:
+		pWidget = new AssetColorWidget(pParent, val);
+		break;
+	case PropertyType::COMBOBOX:
+		pWidget = new AssetComboBoxWidget(pParent, val, settings_.IsSet(Setting::EDITIABLE));
+		break;
+	default:
+		break;
+	}
 
 	pLayout->addWidget(pLabel, row, depth, 1, colSpanForCol(depth));
-	pLayout->addWidget(pNoTypeLabel, row, MAX_COL_IDX);
+	pLayout->addWidget(pWidget, row, MAX_COL_IDX);
 }
 
 void AssetProperty::setLabelText(QLabel* pLabel) const
@@ -106,22 +140,21 @@ void AssetProperty::setLabelText(QLabel* pLabel) const
 
 void AssetProperty::asGroupBox(QGridLayout* pLayout, int32_t& row, int32_t depth)
 {
-	QToolButton* pExpandButton = new QToolButton();
-	pExpandButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-	pExpandButton->setAutoRaise(true);
-	pExpandButton->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+	AssetGroupWidget* pExpandButton = new AssetGroupWidget();
+//	pExpandButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+//	pExpandButton->setAutoRaise(true);
+//	pExpandButton->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
 	pExpandButton->setText(QString::fromStdString(title_));
 
-	auto font = pExpandButton->font();
-	font.setBold(true);
-	pExpandButton->setFont(font);
-
-	// font.setPixelSize(;)
-	{
-		pExpandButton->setIcon(QIcon(":/misc/img/collapse.png"));
-
-		pExpandButton->setIconSize(QSize(12, 12));
-	}
+//	auto font = pExpandButton->font();
+//	font.setBold(true);
+//	pExpandButton->setFont(font);
+//
+//	// font.setPixelSize(;)
+//	{
+//		pExpandButton->setIcon(QIcon(":/misc/img/collapse.png"));
+//		pExpandButton->setIconSize(QSize(12, 12));
+//	}
 
 
 	pLayout->addWidget(pExpandButton, row++, depth, 1, -1);
@@ -135,114 +168,6 @@ void AssetProperty::asGroupBox(QGridLayout* pLayout, int32_t& row, int32_t depth
 }
 
 
-
-void AssetProperty::asCheckBox(QGridLayout* pLayout, int32_t row,  int32_t depth)
-{
-	QCheckBox* pCheckBox = new QCheckBox();
-	if (!title_.empty()) {
-		pCheckBox->setText(QString::fromStdString(title_));
-	}
-	else {
-		pCheckBox->setText(QString::fromStdString(key_));
-	}
-
-	if (!icon_.empty()) {
-		QIcon icon(QString::fromStdString(icon_));
-		pCheckBox->setIcon(icon);
-	}
-
-	pLayout->addWidget(pCheckBox, row, depth, 1, -1); // -1 spans to far right col.
-}
-
-
-void AssetProperty::asText(QGridLayout* pLayout, int32_t row, int32_t depth)
-{
-	QLineEdit* pLineEdit = new QLineEdit();
-	if (!strValue_.empty()) {
-		pLineEdit->setText(QString::fromStdString(strValue_));
-	}
-	else if(!defaultValue_.empty()) {
-		pLineEdit->setText(QString::fromStdString(defaultValue_));
-	}
-
-	QLabel* pLabel = new QLabel();
-	setLabelText(pLabel);
-
-	pLayout->addWidget(pLabel, row, depth, 1, colSpanForCol(depth));
-	pLayout->addWidget(pLineEdit, row, MAX_COL_IDX);
-}
-
-void AssetProperty::asIntSpin(QGridLayout* pLayout, int32_t row, int32_t depth)
-{
-	QSpinBox* pSpin = new QSpinBox();
-	pSpin->setValue(GetValueInt());
-	pSpin->setRange(static_cast<int32_t>(min_), static_cast<int32_t>(max_));
-	pSpin->setSingleStep(static_cast<int32_t>(step_));
-
-	QLabel* pLabel = new QLabel();
-	setLabelText(pLabel);
-
-	pLayout->addWidget(pLabel, row, depth, 1, colSpanForCol(depth));
-	pLayout->addWidget(pSpin, row, MAX_COL_IDX);
-}
-
-void AssetProperty::asFloatSpin(QGridLayout* pLayout, int32_t row, int32_t depth)
-{
-	QDoubleSpinBox* pSpin = new QDoubleSpinBox();
-	pSpin->setValue(GetValueInt());
-	pSpin->setRange(min_, max_);
-	pSpin->setSingleStep(step_);
-
-	QLabel* pLabel = new QLabel();
-	setLabelText(pLabel);
-
-	pLayout->addWidget(pLabel, row, depth, 1, colSpanForCol(depth));
-	pLayout->addWidget(pSpin, row, MAX_COL_IDX);
-}
-
-
-void AssetProperty::asColor(QGridLayout* pLayout, int32_t row, int32_t depth)
-{
-	QHBoxLayout* pChildLayout = new QHBoxLayout();
-	pChildLayout->setContentsMargins(0, 0, 0, 0);
-	{
-		QLabel* pColLabel = new QLabel();
-		pColLabel->setFrameStyle(QFrame::Box | QFrame::Panel | QFrame::Plain | QFrame::Raised);
-		pColLabel->setAlignment(Qt::AlignCenter);
-		pColLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-		pColLabel->setMinimumWidth(64);
-
-		pChildLayout->addWidget(pColLabel);
-
-		QToolButton* pButton = new QToolButton();
-		pButton->setToolTip("Color Picker");
-		pButton->setIcon(QIcon(":/misc/img/colorpicker.png"));
-
-		pChildLayout->addWidget(pButton);
-
-		const char* pLabels[4] = { "R", "G", "B", "A" };
-
-		for (int32_t i = 0; i < 4; i++)
-		{
-			QLabel* pLabel = new QLabel();
-			pLabel->setText(pLabels[i]);
-
-			QLineEdit* pLineEdit = new QLineEdit();
-			pLineEdit->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
-			pLineEdit->setMaximumWidth(64);
-			pLineEdit->setValidator(new QIntValidator(0, 255));
-
-			pChildLayout->addWidget(pLabel, 0);
-			pChildLayout->addWidget(pLineEdit, 0);
-		}
-	}
-
-	QLabel* pLabel = new QLabel();
-	setLabelText(pLabel);
-
-	pLayout->addWidget(pLabel, row, depth, 1, colSpanForCol(depth));
-	pLayout->addLayout(pChildLayout, row, MAX_COL_IDX);
-}
 
 int32_t AssetProperty::colSpanForCol(int32_t startCol)
 {
@@ -271,6 +196,28 @@ void AssetProperty::clear(void)
 	
 	children_.clear();
 }
+
+
+void AssetProperty::show(bool vis)
+{
+	// how to make these simple to show hide?
+	if (pLabel_) {
+		pLabel_->setVisible(vis);
+	}
+	if (pItem_) {
+		pItem_->setVisible(vis);
+	}
+
+	if (type_ == PropertyType::GROUPBOX)
+	{
+		for (auto& pChild : children_)
+		{
+			pChild->show(vis);
+		}
+	}
+		
+}
+
 
 void AssetProperty::SetKey(const std::string& key)
 {
@@ -365,6 +312,7 @@ AssetProperty& AssetProperty::SetEnabled(bool enable)
 	else {
 		settings_.Remove(Setting::ENABLED);
 	}
+
 	return *this;
 }
 
@@ -479,6 +427,16 @@ void AssetProperty::SetMinMax(double min, double max)
 	}
 }
 
+void AssetProperty::SetEditable(bool canEdit)
+{
+	if (canEdit) {
+		settings_.Set(Setting::EDITIABLE);
+	}
+	else {
+		settings_.Remove(Setting::EDITIABLE);
+	}
+}
+
 AssetProperty::PropertyType::Enum AssetProperty::GetType(void) const
 {
 	return type_;
@@ -512,6 +470,10 @@ std::string AssetProperty::GetValue(void) const
 
 double AssetProperty::GetValueFloat(void) const
 {
+	if (strValue_.empty()) {
+		return 0;
+	}
+
 	return std::stod(strValue_);
 }
 
@@ -535,8 +497,7 @@ bool AssetProperty::GetValueBool(void) const
 
 AssetProps::AssetProps() : 
 	pCur_(nullptr),
-	refCount_(1),
-	groupDepth_(1)
+	refCount_(1)
 {
 }
 
@@ -578,7 +539,7 @@ bool AssetProps::parseArgs(const std::string& jsonStr)
 		name = itr->name.GetString();
 
 		// add it :D
-		auto& item = addItem(name, AssetProperty::PropertyType::UNCLASSIFIED);
+		auto& item = addItem(name);
 		const auto& val = itr->value;
 
 		switch (val.GetType())
@@ -675,13 +636,11 @@ bool AssetProps::extractArgs(std::string& jsonStrOut) const
 
 bool AssetProps::appendGui(QGridLayout* pLayout)
 {
-	for (int32_t i = 0; i < groupDepth_; i++) {
+	for (int32_t i = 0; i < 12; i++) {
 		pLayout->setColumnMinimumWidth(i, 16);
 	}
 
-	// hellow my little goat.
-	// what to give the children!
-	// candy? or 50 lashes!?
+
 	int32_t row = 0;
 	int32_t depth = 0;
 
@@ -696,21 +655,22 @@ bool AssetProps::appendGui(QGridLayout* pLayout)
 
 AssetProperty& AssetProps::AddTexture(const std::string& key, const std::string& default)
 {
-	AssetProperty& item = addItem(key, AssetProperty::PropertyType::IMAGE);
+	AssetProperty& item = addItemIU(key, AssetProperty::PropertyType::IMAGE);
 	item.SetDefaultValue(default);
 	return item;
 }
 
-AssetProperty& AssetProps::AddCombo(const std::string& key, const std::string& values)
+AssetProperty& AssetProps::AddCombo(const std::string& key, const std::string& values, bool editiable)
 {
-	AssetProperty& item = addItem(key, AssetProperty::PropertyType::COMBOBOX);
+	AssetProperty& item = addItemIU(key, AssetProperty::PropertyType::COMBOBOX);
 	item.SetDefaultValue(values);
+	item.SetEditable(editiable);
 	return item;
 }
 
 AssetProperty& AssetProps::AddCheckBox(const std::string& key, bool default)
 {
-	AssetProperty& item = addItem(key, AssetProperty::PropertyType::CHECKBOX);
+	AssetProperty& item = addItemIU(key, AssetProperty::PropertyType::CHECKBOX);
 	if(default) {
 		item.SetDefaultValue("1");
 	}
@@ -722,7 +682,7 @@ AssetProperty& AssetProps::AddCheckBox(const std::string& key, bool default)
 
 AssetProperty& AssetProps::AddInt(const std::string& key, int32_t default, int32_t min, int32_t max)
 {
-	AssetProperty& item = addItem(key, AssetProperty::PropertyType::INT);
+	AssetProperty& item = addItemIU(key, AssetProperty::PropertyType::INT);
 	item.SetDefaultValue(std::to_string(default));
 	item.SetMinMax(min, max);
 	return item;
@@ -730,7 +690,7 @@ AssetProperty& AssetProps::AddInt(const std::string& key, int32_t default, int32
 
 AssetProperty& AssetProps::AddFloat(const std::string& key, double default, double min, double max)
 {
-	AssetProperty& item = addItem(key, AssetProperty::PropertyType::FLOAT);
+	AssetProperty& item = addItemIU(key, AssetProperty::PropertyType::FLOAT);
 	item.SetDefaultValue(std::to_string(default));
 	item.SetMinMax(min, max);
 	return item;
@@ -738,7 +698,7 @@ AssetProperty& AssetProps::AddFloat(const std::string& key, double default, doub
 
 AssetProperty& AssetProps::AddColor(const std::string& key, double r, double g, double b, double a)
 {
-	AssetProperty& item = addItem(key, AssetProperty::PropertyType::COLOR);
+	AssetProperty& item = addItemIU(key, AssetProperty::PropertyType::COLOR);
 
 	QString temp = QString("%1 %2 %3 %4").arg(
 		QString::number(r),
@@ -792,14 +752,21 @@ AssetProperty& AssetProps::AddVec4(const std::string& keyX, const std::string& k
 
 AssetProperty& AssetProps::AddText(const std::string& key, const std::string& value)
 {
-	AssetProperty& item = addItem(key, AssetProperty::PropertyType::TEXT);
+	AssetProperty& item = addItemIU(key, AssetProperty::PropertyType::TEXT);
+	item.SetDefaultValue(value);
+	return item;
+}
+
+AssetProperty& AssetProps::AddString(const std::string& key, const std::string& value)
+{
+	AssetProperty& item = addItemIU(key, AssetProperty::PropertyType::STRING);
 	item.SetDefaultValue(value);
 	return item;
 }
 
 AssetProperty& AssetProps::AddPath(const std::string& key, const std::string& value)
 {
-	AssetProperty& item = addItem(key, AssetProperty::PropertyType::PATH);
+	AssetProperty& item = addItemIU(key, AssetProperty::PropertyType::PATH);
 	item.SetDefaultValue(value);
 	return item;
 }
@@ -815,8 +782,6 @@ void AssetProps::BeginGroup(const std::string& groupName)
 	}
 
 	pCur_ = &root_;
-
-	groupDepth_ = core::Max(groupDepth_, core::Max(1, static_cast<int32_t>(tokens.size()))) + 1;
 
 	for (const auto& token : tokens)
 	{
@@ -883,13 +848,32 @@ AssetProperty& AssetProps::getItem(const std::string& key)
 }
 
 
-AssetProperty& AssetProps::addItem(const std::string& key, AssetProperty::PropertyType::Enum type)
+AssetProperty& AssetProps::addItem(const std::string& key)
 {
 	auto it = keys_.find(key);
 	if (it != keys_.end()) 
 	{
-		auto& pItem = *it;
+		X_WARNING("AssetProps", "duplicate item for key: \"%s\"", key.c_str());
+		return **it;
+	}
 
+	AssetProperty* pItem = new AssetProperty();
+	pItem->SetKey(key);
+
+	keys_[key] = pItem;
+	return *pItem;
+}
+
+AssetProperty& AssetProps::addItemIU(const std::string& key, AssetProperty::PropertyType::Enum type)
+{
+	AssetProperty* pItem = nullptr;
+
+
+	auto it = keys_.find(key);
+	if (it != keys_.end())
+	{
+		pItem = *it;
+		
 		if (pItem->GetType() == AssetProperty::PropertyType::UNCLASSIFIED)
 		{
 			pItem->SetType(type);
@@ -898,12 +882,16 @@ AssetProperty& AssetProps::addItem(const std::string& key, AssetProperty::Proper
 			X_WARNING("AssetProps", "Prop request with diffrent types for key \"%s\" initialType: \"%s\" requestedType: \"%s\"",
 				key.c_str(), AssetProperty::PropertyType::ToString(pItem->GetType()), AssetProperty::PropertyType::ToString(type));
 		}
-		return *pItem;
+	}
+	else
+	{
+		// new
+		pItem = new AssetProperty();
+		pItem->SetKey(key);
+		pItem->SetType(type);
+		keys_[key] = pItem;
 	}
 
-	AssetProperty* pItem = new AssetProperty();
-	pItem->SetKey(key);
-	pItem->SetType(type);
 
 	if (!pCur_) {
 		BeginGroup("xmodel");
@@ -911,7 +899,6 @@ AssetProperty& AssetProps::addItem(const std::string& key, AssetProperty::Proper
 
 	pCur_->AddChild(pItem);
 
-	keys_[key] = pItem;
 	return *pItem;
 }
 

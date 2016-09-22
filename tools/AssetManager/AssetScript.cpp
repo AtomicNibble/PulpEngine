@@ -171,7 +171,7 @@ bool AssetPropsScriptManager::init(bool enableHotReload)
 	
 	r = pEngine_->RegisterObjectMethod("asset", "asset &opAssign(const asset &in)", asMETHODPR(AssetProps, operator=, (const AssetProps&), AssetProps&), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddTexture(const string& in, const string& in)", asMETHOD(AssetProps, AddTexture), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddCombo(const string& in, const string)", asMETHOD(AssetProps, AddCombo), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddCombo(const string& in, const string, bool editiable = false)", asMETHOD(AssetProps, AddCombo), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddCheckBox(const string& in, bool)", asMETHOD(AssetProps, AddCheckBox), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddInt(const string& in, uint, uint, uint)", asMETHOD(AssetProps, AddInt), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddFloat(const string& in, double val, double min, double max)", asMETHOD(AssetProps, AddFloat), asCALL_THISCALL); BUG_CHECK(r >= 0);
@@ -181,6 +181,7 @@ bool AssetPropsScriptManager::init(bool enableHotReload)
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddVec4(const string& in, const string& in, const string& in, const string& in, double x, double y, double z, double w, double min, double max)", asMETHOD(AssetProps, AddVec4), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddText(const string& in, const string& in)", asMETHOD(AssetProps, AddText), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddPath(const string& in, const string& in)", asMETHOD(AssetProps, AddPath), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddString(const string& in, const string& in)", asMETHOD(AssetProps, AddString), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "void BeginGroup(const string& in)", asMETHOD(AssetProps, BeginGroup), asCALL_THISCALL); BUG_CHECK(r >= 0);
 
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp& getItem(const string& in)", asMETHOD(AssetProps, getItem), asCALL_THISCALL); BUG_CHECK(r >= 0);
