@@ -23,6 +23,14 @@
         <file>img/branch-open.png</file>
         <file>img/Close.png</file>
         <file>img/Close-hover.png</file>
+        <file>img/down_arrow.png</file>
+        <file>img/down_arrow_disabled.png</file>
+        <file>img/checkbox_checked.png</file>
+        <file>img/checkbox_checked_hover.png</file>
+        <file>img/checkbox_checked_pressed.png</file>
+        <file>img/checkbox_unchecked.png</file>
+        <file>img/checkbox_unchecked_hover.png</file>
+        <file>img/checkbox_unchecked_pressed.png</file>
     </qresource>
     <qresource prefix="/misc">
         <file>img/icon.png</file>
