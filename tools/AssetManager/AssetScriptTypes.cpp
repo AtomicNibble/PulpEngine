@@ -139,8 +139,8 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 		pCheckBoxWidget_->setToolTip(toolTip);
 
 		// checkbox icon hype.
-		if (!icon_.empty()) {
-			const QString iconPath = QString::fromStdString(icon_);
+		if (!icon_.isEmpty()) {
+			const QString& iconPath = icon_;
 			QIcon icon(iconPath);
 
 			if (icon.pixmap(QSize(16, 16)).isNull()) {
@@ -396,16 +396,16 @@ AssetProperty& AssetProperty::SetToolTip(const std::string& toolTip)
 AssetProperty& AssetProperty::SetLabels(const std::string& labelX, const std::string& labelY,
 	const std::string& labelZ, const std::string& labelW)
 {
-	labelsX_ = labelX;
-	labelsY_ = labelY;
-	labelsZ_ = labelZ;
-	labelsW_ = labelW;
+	labelsX_ = QString::fromStdString(labelX);
+	labelsY_ = QString::fromStdString(labelY);
+	labelsZ_ = QString::fromStdString(labelZ);
+	labelsW_ = QString::fromStdString(labelW);
 	return *this;
 }
 
 AssetProperty& AssetProperty::SetIcon(const std::string& icon)
 {
-	icon_ = icon;
+	icon_ = QString::fromStdString(icon);
 	return *this;
 }
 

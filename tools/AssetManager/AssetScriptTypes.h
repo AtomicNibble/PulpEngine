@@ -146,20 +146,17 @@ private:
 	std::string strValue_;
 	std::string defaultValue_; 
 	std::string toolTip_;
-	std::string icon_;
-
-
+	QString icon_;
 
 	// seperate at bottom to try try improve cache hits for common access members
 	std::string parentKey_;
 
-	std::string strValueY_;
-	std::string strValueZ_;
-	std::string strValueW_;
-	std::string labelsX_;
-	std::string labelsY_;
-	std::string labelsZ_;
-	std::string labelsW_;
+	// used qstring here as not set often
+	// and qstring not using short string optermisation so much smaller.
+	QString labelsX_;
+	QString labelsY_;
+	QString labelsZ_;
+	QString labelsW_;
 
 	QColor fontCol_;
 
