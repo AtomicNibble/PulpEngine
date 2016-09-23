@@ -1,15 +1,15 @@
 [submodule "tools/Ladybug"]
 	path = tools/Ladybug
-	url = ../../root/ladybug.git
+	url = ../../WinCat /ladybug.git
 [submodule "game_folder/mod"]
 	path = game_folder/mod
-	url = ../../root/PotatoEngine-TestAssets.git
+	url = ../../WinCat /PotatoEngine-TestAssets.git
 [submodule "game_folder/art_source"]
 	path = game_folder/art_source
-	url = ../../root/PotatoEngine-ArtSource.git
+	url = ../../WinCat /PotatoEngine-ArtSource.git
 [submodule "3rdparty/Wwise_libs"]
 	path = 3rdparty/Wwise_libs
-	url = ../../root/WwiseLibs.git
+	url = ../../WinCat /WwiseLibs.git
 [submodule "3rdparty/Physx_libs"]
 	path = 3rdparty/Physx_libs
-	url = ../../root/Physx.git
+	url = ../../WinCat /Physx.git
