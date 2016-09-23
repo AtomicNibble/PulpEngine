@@ -56,7 +56,7 @@ AssetProperty::AssetProperty() :
 	step_(0.0001),
 	type_(PropertyType::UNCLASSIFIED),
 	pLabel_(nullptr),
-	pItem_(nullptr)
+	pWidget_(nullptr)
 {
 	settings_.Set(Setting::VISIBLE);
 	settings_.Set(Setting::ENABLED);
@@ -67,66 +67,128 @@ AssetProperty::~AssetProperty()
 	clear();
 }
 
-void AssetProperty::appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth)
+void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth)
 {
-	switch (type_)
-	{
+//	switch (type_)
+//	{
 //	case PropertyType::CHECKBOX:
 //		asCheckBox(pLayout, row, depth);
 //		return;
-	case PropertyType::GROUPBOX:
-		asGroupBox(pLayout, row, depth);
-		return;
-	default:
-		break;
-	}
+//	case PropertyType::GROUPBOX:
+//		asGroupBox(pParent, pLayout, row, depth);
+//		return;
+//	default:
+//		break;
+//	}
 
 	// new 
-	QWidget* pParent = nullptr;
-	QWidget* pWidget = nullptr;
-
-	// add label.
-	QLabel* pLabel = new QLabel();
-	setLabelText(pLabel);
+//	QWidget* pParent = nullptr;
 
 	const std::string& val = defaultValue_;
 
 	switch (type_)
 	{
 	case PropertyType::CHECKBOX:
-		pWidget = new AssetCheckBoxWidget(nullptr, val);
+		pCheckBoxWidget_ = new AssetCheckBoxWidget(pParent, val);
 		break;
 	case PropertyType::INT:
-		pWidget = new AssetSpinBoxWidget(nullptr, GetValueInt(), min_, max_, step_);
+		pSpinBoxWidget_ = new AssetSpinBoxWidget(pParent, GetValueInt(), min_, max_, step_);
 		break;
 	case PropertyType::FLOAT:
-		pWidget = new AssetDoubleSpinBoxWidget(nullptr, GetValueFloat(), min_, max_, step_);
+		pDoubleSpinBoxWidget_ = new AssetDoubleSpinBoxWidget(pParent, GetValueFloat(), min_, max_, step_);
 		break;
 	case PropertyType::PATH:
-		pWidget = new AssetPathWidget(pParent, val);
+		pPathWidget_ = new AssetPathWidget(pParent, val);
 		break;
 	case PropertyType::TEXT:
-		pWidget = new AssetTextWidget(pParent, val);
+		pTextWidget_ = new AssetTextWidget(pParent, val);
 		break;
 	case PropertyType::IMAGE:
-		pWidget = new AssetTextureWidget(pParent);
+		pTextureWidget_ = new AssetTextureWidget(pParent);
 		break;
 	case PropertyType::STRING:
-		pWidget = new AssetStringWidget(pParent, val);
+		pStringWidget_ = new AssetStringWidget(pParent, val);
 		break;
 	case PropertyType::COLOR:
-		pWidget = new AssetColorWidget(pParent, val);
+		pColorWidget_ = new AssetColorWidget(pParent, val);
 		break;
 	case PropertyType::COMBOBOX:
-		pWidget = new AssetComboBoxWidget(pParent, val, settings_.IsSet(Setting::EDITIABLE));
+		pComboBoxWidget_ = new AssetComboBoxWidget(pParent, val, settings_.IsSet(Setting::EDITIABLE));
+		break;
+	case PropertyType::GROUPBOX:
+		pGroupWidget_ = new AssetGroupWidget(pParent);
 		break;
 	default:
 		break;
 	}
 
-	pLayout->addWidget(pLabel, row, depth, 1, colSpanForCol(depth));
-	pLayout->addWidget(pWidget, row, MAX_COL_IDX);
+	// SetTile / SettoolTip
+	const QString toolTip = QString::fromStdString(toolTip_);
+	QString title;;
+
+	if (!title_.empty()) {
+		title = QString::fromStdString(title_);
+	}
+	else {
+		title = QString::fromStdString(key_);
+	}
+
+	if (type_ == PropertyType::CHECKBOX)
+	{
+		pCheckBoxWidget_->setText(title);
+		pCheckBoxWidget_->setToolTip(toolTip);
+
+		pLayout->addWidget(pWidget_, row, depth, 1, colSpanForCol(depth));
+	}
+	else if (type_ == PropertyType::GROUPBOX)
+	{
+		pGroupWidget_->setText(title);
+		pGroupWidget_->setToolTip(toolTip);
+
+		pLayout->addWidget(pGroupWidget_, row++, depth, 1, -1);
+
+		for (auto& pChild : children_)
+		{
+			pChild->appendGui(pGroupWidget_, pLayout, row, depth + 1);
+			row += 1;
+		}
+	}
+	else
+	{	// add label.
+		pLabel_ = new QLabel();
+		pLabel_->setText(title);
+		pLabel_->setToolTip(toolTip);
+
+		pLayout->addWidget(pLabel_, row, depth, 1, colSpanForCol(depth));
+		pLayout->addWidget(pWidget_, row, MAX_COL_IDX);
+	}
+
+	
+	if (!settings_.IsSet(Setting::ENABLED)) {
+		enable(false);
+	}
 }
+
+#if 0
+void AssetProperty::asGroupBox(QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth)
+{
+	AssetGroupWidget* pExpandButton = new AssetGroupWidget(pParent);
+	pExpandButton->setText(QString::fromStdString(title_));
+
+
+
+	pLayout->addWidget(pExpandButton, row++, depth, 1, -1);
+
+	// add all the items.
+	for (auto& pChild : children_)
+	{
+		pChild->appendGui(pExpandButton, pLayout, row, depth + 1);
+		row += 1;
+	}
+}
+#endif
+
+
 
 void AssetProperty::setLabelText(QLabel* pLabel) const
 {
@@ -137,36 +199,6 @@ void AssetProperty::setLabelText(QLabel* pLabel) const
 		pLabel->setText(QString::fromStdString(key_));
 	}
 }
-
-void AssetProperty::asGroupBox(QGridLayout* pLayout, int32_t& row, int32_t depth)
-{
-	AssetGroupWidget* pExpandButton = new AssetGroupWidget();
-//	pExpandButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-//	pExpandButton->setAutoRaise(true);
-//	pExpandButton->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
-	pExpandButton->setText(QString::fromStdString(title_));
-
-//	auto font = pExpandButton->font();
-//	font.setBold(true);
-//	pExpandButton->setFont(font);
-//
-//	// font.setPixelSize(;)
-//	{
-//		pExpandButton->setIcon(QIcon(":/misc/img/collapse.png"));
-//		pExpandButton->setIconSize(QSize(12, 12));
-//	}
-
-
-	pLayout->addWidget(pExpandButton, row++, depth, 1, -1);
-
-	// add all the items.
-	for (auto& pChild : children_)
-	{
-		pChild->appendGui(pLayout, row, depth + 1);
-		row += 1;
-	}
-}
-
 
 
 int32_t AssetProperty::colSpanForCol(int32_t startCol)
@@ -198,24 +230,103 @@ void AssetProperty::clear(void)
 }
 
 
-void AssetProperty::show(bool vis)
+void AssetProperty::setVisible(bool vis)
 {
-	// how to make these simple to show hide?
 	if (pLabel_) {
 		pLabel_->setVisible(vis);
 	}
-	if (pItem_) {
-		pItem_->setVisible(vis);
+
+	// how to make these simple to show hide?
+	switch (type_)
+	{
+	case PropertyType::CHECKBOX:
+		pCheckBoxWidget_->setVisible(vis);
+		break;
+	case PropertyType::INT:
+		pSpinBoxWidget_->setVisible(vis);
+		break;
+	case PropertyType::FLOAT:
+		pDoubleSpinBoxWidget_->setVisible(vis);
+		break;
+	case PropertyType::PATH:
+		pPathWidget_->setVisible(vis);
+		break;
+	case PropertyType::TEXT:
+		pTextWidget_->setVisible(vis);
+		break;
+	case PropertyType::IMAGE:
+		pTextureWidget_->setVisible(vis);
+		break;
+	case PropertyType::STRING:
+		pStringWidget_->setVisible(vis);
+		break;
+	case PropertyType::COLOR:
+		pColorWidget_->setVisible(vis);
+		break;
+	case PropertyType::COMBOBOX:
+		pComboBoxWidget_->setVisible(vis);
+		break;
+	case PropertyType::GROUPBOX:
+		pGroupWidget_->setVisible(vis);
+		break;
+	default:
+		X_ASSERT_NOT_IMPLEMENTED();
+		break;
 	}
 
 	if (type_ == PropertyType::GROUPBOX)
 	{
 		for (auto& pChild : children_)
 		{
-			pChild->show(vis);
+			pChild->setVisible(vis);
 		}
 	}
 		
+
+
+void AssetProperty::enable(bool val)
+{
+	if (pLabel_) {
+		pLabel_->setEnabled(val);
+	}
+
+	switch (type_)
+	{
+	case PropertyType::CHECKBOX:
+		pCheckBoxWidget_->setEnabled(val);
+		break;
+	case PropertyType::INT:
+		pSpinBoxWidget_->setEnabled(val);
+		break;
+	case PropertyType::FLOAT:
+		pDoubleSpinBoxWidget_->setEnabled(val);
+		break;
+	case PropertyType::PATH:
+		pPathWidget_->setEnabled(val);
+		break;
+	case PropertyType::TEXT:
+		pTextWidget_->setEnabled(val);
+		break;
+	case PropertyType::IMAGE:
+		pTextureWidget_->setEnabled(val);
+		break;
+	case PropertyType::STRING:
+		pStringWidget_->setEnabled(val);
+		break;
+	case PropertyType::COLOR:
+		pColorWidget_->setEnabled(val);
+		break;
+	case PropertyType::COMBOBOX:
+		pComboBoxWidget_->setEnabled(val);
+		break;
+	case PropertyType::GROUPBOX:
+		pGroupWidget_->setEnabled(val);
+		break;
+	default:
+		X_ASSERT_NOT_IMPLEMENTED();
+		break;
+	}
+
 }
 
 
@@ -646,7 +757,7 @@ bool AssetProps::appendGui(QGridLayout* pLayout)
 
 	for (const auto& pChild : root_)
 	{
-		pChild->appendGui(pLayout, row, depth);
+		pChild->appendGui(nullptr, pLayout, row, depth);
 		row += 1;
 	}
 

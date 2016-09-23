@@ -10,6 +10,19 @@ X_NAMESPACE_BEGIN(assman)
 #endif // !TEXT
 
 
+
+class AssetCheckBoxWidget;
+class AssetSpinBoxWidget;
+class AssetDoubleSpinBoxWidget;
+class AssetPathWidget;
+class AssetTextWidget;
+class AssetTextureWidget;
+class AssetStringWidget;
+class AssetColorWidget;
+class AssetComboBoxWidget;
+class AssetGroupWidget;
+
+
 class AssetProperty 
 {
 public:
@@ -59,12 +72,13 @@ public:
 
 	AssetProperty& operator=(const AssetProperty& oth) = default;
 
-	void appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth);
+	void appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth);
 
 	void addRef(void);
 	void release(void);
 	void clear(void);
-	void show(bool vis);
+	void setVisible(bool vis);
+	void enable(bool val);
 
 	void SetKey(const std::string& key);
 	void SetParentKey(const std::string& key);
@@ -112,7 +126,6 @@ public:
 private:
 	void setLabelText(QLabel* pLabel) const;
 
-	void asGroupBox(QGridLayout* pLayout, int32_t& row, int32_t depth);
 
 
 public:
@@ -135,8 +148,6 @@ private:
 	std::string toolTip_;
 	std::string icon_;
 
-	QWidget* pLabel_;
-	QWidget* pItem_;
 
 
 	// seperate at bottom to try try improve cache hits for common access members
@@ -151,6 +162,25 @@ private:
 	std::string labelsW_;
 
 	QColor fontCol_;
+
+	QLabel* pLabel_;
+
+	union
+	{
+		QWidget* pWidget_; // keep?
+
+		AssetCheckBoxWidget* pCheckBoxWidget_;
+		AssetSpinBoxWidget* pSpinBoxWidget_;
+		AssetDoubleSpinBoxWidget* pDoubleSpinBoxWidget_;
+		AssetPathWidget* pPathWidget_;
+		AssetTextWidget* pTextWidget_;
+		AssetTextureWidget* pTextureWidget_;
+		AssetStringWidget* pStringWidget_;
+		AssetColorWidget* pColorWidget_;
+		AssetComboBoxWidget* pComboBoxWidget_;
+		AssetGroupWidget* pGroupWidget_;
+	};
+
 
 	// we used these for both real and int min / max
 	double min_;
