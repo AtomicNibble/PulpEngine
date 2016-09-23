@@ -17,7 +17,7 @@ private slots:
 	void textChanged(void);
 
 private:
-
+	QPlainTextEdit* pTextEdit_;
 
 };
 

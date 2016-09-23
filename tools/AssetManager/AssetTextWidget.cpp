@@ -10,21 +10,21 @@ AssetTextWidget::AssetTextWidget(QWidget *parent, const std::string& value)
 	pLayout->setContentsMargins(0, 0, 0, 0);
 
 	// lin edit for path.
-	QPlainTextEdit* pEdit = new QPlainTextEdit();
-	pEdit->setAcceptDrops(true); // can drag file onto lineedit and it gets path.
+	pTextEdit_ = new QPlainTextEdit();
+	pTextEdit_->setAcceptDrops(true); // can drag file onto lineedit and it gets path.
 
-	connect(this, SIGNAL(textChanged(bool)), pEdit, SLOT(textChanged()));
+	connect(this, SIGNAL(textChanged(bool)), pTextEdit_, SLOT(textChanged()));
 
-	pLayout->addWidget(pEdit);
+	pLayout->addWidget(pTextEdit_);
 
-	pEdit->blockSignals(true);
+	pTextEdit_->blockSignals(true);
 	{
 		QString text = QString::fromStdString(value);
 		text.replace("\\r\\n", "\n");
 
-		pEdit->setPlainText(text);
+		pTextEdit_->setPlainText(text);
 	}
-	pEdit->blockSignals(false);
+	pTextEdit_->blockSignals(false);
 
 	setLayout(pLayout);
 }
@@ -35,7 +35,6 @@ AssetTextWidget::~AssetTextWidget()
 
 void AssetTextWidget::textChanged(void)
 {
-
 
 }
 
