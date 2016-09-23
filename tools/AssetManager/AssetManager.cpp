@@ -116,6 +116,10 @@ AssetManager::AssetManager(QWidget* pParent) :
 
 AssetManager::~AssetManager()
 {
+	if (pAssetScripts_) {
+		delete pAssetScripts_;
+	}
+
 	if (pDb_) {
 		pDb_->CloseDB();
 		delete pDb_;
