@@ -104,7 +104,7 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 		pTextWidget_ = new AssetTextWidget(pParent, val);
 		break;
 	case PropertyType::IMAGE:
-		pTextureWidget_ = new AssetTextureWidget(pParent);
+		pTextureWidget_ = new AssetTextureWidget(pParent, val);
 		break;
 	case PropertyType::STRING:
 		pStringWidget_ = new AssetStringWidget(pParent, val);
@@ -124,7 +124,7 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 
 	// SetTile / SettoolTip
 	const QString toolTip = QString::fromStdString(toolTip_);
-	QString title;;
+	QString title;
 
 	if (!title_.empty()) {
 		title = QString::fromStdString(title_);
