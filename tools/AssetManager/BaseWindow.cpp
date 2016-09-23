@@ -246,7 +246,7 @@ void BaseWindow::handleMouseMoveEvent(QMouseEvent* event)
 	// and do a dock check baby!
 	// rekt.
 	// the central widget is a view if it's floating.
-	if (centralWidget_)
+	if (!mousePos_.onEdges && centralWidget_)
 	{
 		SplitterOrView *Splitter = qobject_cast<SplitterOrView *>(centralWidget_);
 		if (Splitter) {
