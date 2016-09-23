@@ -281,7 +281,7 @@ void AssetProperty::setVisible(bool vis)
 			pChild->setVisible(vis);
 		}
 	}
-		
+}
 
 
 void AssetProperty::enable(bool val)
