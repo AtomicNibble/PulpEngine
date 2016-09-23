@@ -16,8 +16,24 @@ public:
 
 
 private:
+	void setColorInternal(QColor col);
+
+private slots:
+	void colPickerClicked(void);
+	void editingFinished(void);
+
+protected:
+	void mouseReleaseEvent(QMouseEvent *event) X_OVERRIDE;
+	void mouseMoveEvent(QMouseEvent *event) X_OVERRIDE;
+
+private:
+	static QColor getScreenColor(const QPoint& globalPos);
+
+private:
 	ColorSelector* pColPreview_;
 	QLineEdit* pRGBAValueWidgets_[4];
+
+	bool picking_;
 };
 
 X_NAMESPACE_END
