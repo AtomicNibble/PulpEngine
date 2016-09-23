@@ -53,8 +53,9 @@ private:
 	QString makeDialogTitle(const QString& title);
 
 protected:
-	void dragEnterEvent(QDragEnterEvent *event);
-	void dropEvent(QDropEvent* event);
+	bool eventFilter(QObject* pObject, QEvent* pEvent) X_OVERRIDE;
+	void dragEnterEvent(QDragEnterEvent *event) X_OVERRIDE;
+	void dropEvent(QDropEvent* event) X_OVERRIDE;
 
 private slots:
 	void browseClicked(void);

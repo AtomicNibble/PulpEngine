@@ -13,8 +13,9 @@ AssetPathWidget::AssetPathWidget(QWidget *parent, const std::string& value)
 	pLayout->setContentsMargins(0, 0, 0, 0);
 
 	// lin edit for path.
-	pLineEdit_ = new QLineEdit();
-	pLineEdit_->setAcceptDrops(true); // can drag file onto lineedit and it gets path.
+	pLineEdit_ = new QLineEdit(this);
+	pLineEdit_->setAcceptDrops(true); // id have todo draw handeling diffrent to support just this accepting dorps.
+	pLineEdit_->installEventFilter(this);
 
 	// browse button
 	QToolButton* pBrowse = new QToolButton();
@@ -30,8 +31,6 @@ AssetPathWidget::AssetPathWidget(QWidget *parent, const std::string& value)
 	pLineEdit_->setText(QString::fromStdString(value));
 	pLineEdit_->blockSignals(false);
 
-	// drops!
-	setAcceptDrops(true);
 
 	setLayout(pLayout);
 }
@@ -154,6 +153,26 @@ QString AssetPathWidget::makeDialogTitle(const QString& title)
 
 	return dialogTitleOverride_;
 }
+
+bool AssetPathWidget::eventFilter(QObject* pObject, QEvent* pEvent)
+{
+	const auto type = pEvent->type();
+
+	if (pObject == pLineEdit_)
+	{
+		if (type == QEvent::DragEnter)
+		{
+			dragEnterEvent(static_cast<QDragEnterEvent*>(pEvent));
+		}
+		else if (type == QEvent::Drop)
+		{
+			dropEvent(static_cast<QDropEvent*>(pEvent));
+		}
+	}
+
+	return false;
+}
+
 
 void AssetPathWidget::dragEnterEvent(QDragEnterEvent *event)
 {
