@@ -138,6 +138,24 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 		pCheckBoxWidget_->setText(title);
 		pCheckBoxWidget_->setToolTip(toolTip);
 
+		// checkbox icon hype.
+		if (!icon_.empty()) {
+			const QString iconPath = QString::fromStdString(icon_);
+			QIcon icon(iconPath);
+
+			if (icon.pixmap(QSize(16, 16)).isNull()) {
+				pCheckBoxWidget_->setIcon(QIcon(":/misc/img/warning_32.png"));
+
+				// o baby you so sexy.
+				QString missingIconTip = " (icon \"" + iconPath + "\" not fnd)";
+
+				pCheckBoxWidget_->setToolTip(toolTip + missingIconTip);
+			}
+			else {
+				pCheckBoxWidget_->setIcon(icon);
+			}
+		}
+
 		pLayout->addWidget(pWidget_, row, depth, 1, colSpanForCol(depth));
 	}
 	else if (type_ == PropertyType::GROUPBOX)
