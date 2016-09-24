@@ -8,6 +8,8 @@ X_NAMESPACE_BEGIN(assetDb)
 static const char ASSET_NAME_SLASH = '/';
 static const size_t ASSET_NAME_MAX_LENGTH = 128;
 
+// Valid chars for asset name are:
+// [a-z0-9_] & ASSET_NAME_SLASH Upper case is not allowed!!!
 
 
 X_DECLARE_ENUM(AssetType)(
