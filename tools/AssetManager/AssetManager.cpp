@@ -147,10 +147,6 @@ AssetManager::~AssetManager()
 		delete pAssetDbexplorer_;
 	}
 
-	if (pCoreImpl_) {
-		delete pCoreImpl_;
-	}
-
 	if (pActionManager_) {
 		delete pActionManager_;
 	}
@@ -159,6 +155,11 @@ AssetManager::~AssetManager()
 		delete pEditorManager_;
 	}
 
+
+	 // needs to be after editorman.
+	if (pCoreImpl_) {
+		delete pCoreImpl_;
+	}
 }
 
 
