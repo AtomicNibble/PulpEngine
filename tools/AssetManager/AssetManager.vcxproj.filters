@@ -1140,6 +1140,24 @@
     <ClCompile Include="AddAssetDialog.cpp">
       <Filter>Source Files\Widgets\Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_RenameAssetDialog.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_RenameAssetDialog.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_RenameAssetDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_RenameAssetDialog.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_RenameAssetDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="RenameAssetDialog.cpp">
+      <Filter>Source Files\Widgets\Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -1284,6 +1302,9 @@
       <Filter>Header Files\Widgets</Filter>
     </CustomBuild>
     <CustomBuild Include="AddAssetDialog.h">
+      <Filter>Header Files\Widgets\Dialogs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="RenameAssetDialog.h">
       <Filter>Header Files\Widgets\Dialogs</Filter>
     </CustomBuild>
   </ItemGroup>
