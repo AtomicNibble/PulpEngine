@@ -754,6 +754,11 @@ AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, As
 
 AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId)
 {
+	return AddAsset(modId_, type, name, pId);
+}
+
+AssetDB::Result::Enum AssetDB::AddAsset(ModId modId, AssetType::Enum type, const core::string& name, int32_t* pId)
+{
 	if (name.isEmpty()) {
 		X_ERROR("AssetDB", "Asset with empty name not allowed");
 		return Result::ERROR;
@@ -772,11 +777,11 @@ AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string
 	sql::SqlLiteCmd cmd(db_, "INSERT INTO file_ids (name, type, mod_id) VALUES(?,?,?)");
 	cmd.bind(1, name.c_str());
 	cmd.bind(2, type);
-	cmd.bind(3, modId_);
+	cmd.bind(3, modId);
 
 
 	sql::Result::Enum res = cmd.execute();
-	if (res != sql::Result::OK) 
+	if (res != sql::Result::OK)
 	{
 		if (res == sql::Result::CONSTRAINT) {
 			return Result::NAME_TAKEN;

@@ -109,6 +109,7 @@ public:
 	// AddAsset with grouped transation, trans is not just touched, just required to make sure you call it with one.
 	Result::Enum AddAsset(const sql::SqlLiteTransaction& trans, AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
 	Result::Enum AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
+	Result::Enum AddAsset(ModId modId, AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
 	Result::Enum DeleteAsset(AssetType::Enum type, const core::string& name);
 	Result::Enum RenameAsset(AssetType::Enum type, const core::string& name,
 		const core::string& newName);
