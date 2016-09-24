@@ -5,6 +5,7 @@
 #include "EditorManager.h"
 #include "ActionContainer.h"
 #include "VersionDialog.h"
+#include "AddAssetDialog.h"
 #include "StatusBar.h"
 #include "OutputPaneManagerWidget.h"
 #include "OutputWindowWidget.h"
