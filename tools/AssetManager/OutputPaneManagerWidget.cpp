@@ -268,7 +268,9 @@ void OutputPaneManager::init(void)
 
 void OutputPaneManager::addPane(IOutputPane* pPane)
 {
-	panes_.append(pPane);
+	if (!panes_.contains(pPane)) {
+		panes_.append(pPane);
+	}
 }
 
 
