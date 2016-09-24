@@ -550,7 +550,9 @@ void AssetManager::aboutToShowViewMenu(void)
 
 void AssetManager::newFile(void)
 {
+	AddAssetDialog dialog(ICore::mainWindow(), *pDb_);
 
+	dialog.exec();
 }
 
 void AssetManager::saveAll(void)
