@@ -166,8 +166,6 @@ void BaseWindow::changeEvent(QEvent *e)
 		}
 
 		if (isActiveWindow()) {
-			//    if (debugMainWindow)
-			//      qDebug() << "window activated";
 			emit windowActivated();
 		}
 	}
@@ -180,26 +178,18 @@ bool BaseWindow::eventFilter(QObject *o, QEvent *event)
 
 	switch (event->type())
 	{
-	default:
-		//    qDebug() << "Event = " << event;
-		break;
-
 	case QEvent::MouseButtonPress:
 		handleMousePressEvent(static_cast<QMouseEvent*>(event));
 		break;
-
 	case QEvent::MouseButtonRelease:
 		handleMouseReleaseEvent(static_cast<QMouseEvent*>(event));
 		break;
-
 	case QEvent::MouseMove:
 		handleMouseMoveEvent(static_cast<QMouseEvent*>(event));
 		break;
-
 	case QEvent::Leave:
 		handleLeaveEvent(event);
 		break;
-
 	case QEvent::HoverMove:
 		handleHoverMoveEvent(static_cast<QHoverEvent*>(event));
 		break;
@@ -218,8 +208,6 @@ void BaseWindow::handleMousePressEvent(QMouseEvent* event)
 		mousePos_.recalculate(event->globalPos(), frameRect);
 
 		dragPos_ = event->globalPos() - frameRect.topLeft();
-
-		qDebug() << "mouse pressed";
 	}
 }
 
