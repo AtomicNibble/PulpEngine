@@ -773,6 +773,11 @@ AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, As
 
 AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId)
 {
+	if (!isModSet()) {
+		X_ERROR("AssetDB", "Mod must be set before calling AddAsset!");
+		return Result::ERROR;
+	}
+
 	return AddAsset(modId_, type, name, pId);
 }
 
@@ -784,11 +789,6 @@ AssetDB::Result::Enum AssetDB::AddAsset(ModId modId, AssetType::Enum type, const
 	}
 	if (!ValidName(name)) {
 		X_ERROR("AssetDB", "Asset name \"%s\" is invalid", name.c_str());
-		return Result::ERROR;
-	}
-
-	if (!isModSet()) {
-		X_ERROR("AssetDB", "Mod must be set before calling AddAsset!");
 		return Result::ERROR;
 	}
 
