@@ -571,19 +571,7 @@ void AssetManager::resetLayout(void)
 
 void AssetManager::reloadStyle(void)
 {
-	QFile f("style\\style.qss");
-	if (!f.exists())
-	{
-		qDebug() << "Can't load style sheet";
-	}
-	else
-	{
-		f.open(QFile::ReadOnly | QFile::Text);
-		QTextStream ts(&f);
-
-		QApplication* pApp = (static_cast<QApplication *>(QCoreApplication::instance()));
-		pApp->setStyleSheet(ts.readAll());
-	}
+	reloadStyle("style\\style.qss");
 }
 
 void AssetManager::aboutToShowWindowMenu(void)
@@ -660,22 +648,7 @@ void AssetManager::destroyAboutDialog(void)
 
 void AssetManager::fileChanged(const QString& path)
 {
-	if (path.contains(".qss"))
-	{
-		QFile f(path);
-		if (!f.exists())
-		{
-			qDebug() << "Can't load style sheet: " << path;
-		}
-		else
-		{
-			f.open(QFile::ReadOnly | QFile::Text);
-			QTextStream ts(&f);
-
-			QApplication* pApp = (static_cast<QApplication *>(QCoreApplication::instance()));
-			pApp->setStyleSheet(ts.readAll());
-		}
-	}
+	reloadStyle(path);
 }
 
 // ----------------------------------------------------
@@ -691,6 +664,35 @@ void AssetManager::closeEvent(QCloseEvent *event)
 	emit pCoreImpl_->coreAboutToClose();
 
 	event->accept();
+}
+
+// ----------------------------------------------------
+
+
+void AssetManager::reloadStyle(const QString& path)
+{
+	if (path.contains(".qss"))
+	{
+		QFile f(path);
+
+		if (f.open(QFile::ReadOnly | QFile::Text))
+		{
+			QTextStream ts(&f);
+
+			QApplication* pApp = (static_cast<QApplication *>(QCoreApplication::instance()));
+			pApp->setStyleSheet(ts.readAll());
+
+			X_LOG1("AssetManager", "style reloaded..");
+		}
+		else
+		{
+			X_ERROR("AssetManager", "Failed to load style sheet: \"%ls\"", path.data());
+		}
+	}
+	else
+	{
+		X_ERROR("AssetManager", "Failed to load style sheet, invalid extension: \"%ls\"", path.data());
+	}
 }
 
 
