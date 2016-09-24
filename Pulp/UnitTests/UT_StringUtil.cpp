@@ -174,6 +174,51 @@ TEST(StringUtil, IsAlphaNumU)
 	}
 }
 
+TEST(StringUtil, IsAlpha)
+{
+	// check every char.
+	const char min = std::numeric_limits<char>::lowest();
+	const char max = std::numeric_limits<char>::max();
+
+	const int a = 'a';
+	const int z = 'z';
+	const int A = 'A';
+	const int Z = 'Z';
+
+	for (int c = min; c <= max; ++c)
+	{
+		bool is_alpha_low = c >= a && c <= z;
+		bool is_alpha_high = c >= A && c <= Z;
+
+		bool is_alpha = is_alpha_low || is_alpha_high;
+
+		EXPECT_TRUE(strUtil::IsAlpha(static_cast<char>(c)) == is_alpha);
+	}
+}
+
+TEST(StringUtil, IsAlphaU)
+{
+	// check every char.
+	const char min = std::numeric_limits<uint8_t>::lowest();
+	const char max = std::numeric_limits<uint8_t>::max();
+
+	const int a = 'a';
+	const int z = 'z';
+	const int A = 'A';
+	const int Z = 'Z';
+
+	for (int c = min; c <= max; ++c)
+	{
+		bool is_alpha_low = c >= a && c <= z;
+		bool is_alpha_high = c >= A && c <= Z;
+
+		bool is_alpha = is_alpha_low || is_alpha_high;
+
+		EXPECT_TRUE(strUtil::IsAlpha(static_cast<uint8_t>(c)) == is_alpha);
+	}
+}
+
+
 TEST(StringUtil, Digit) {
 
 	// check every char.
