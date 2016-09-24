@@ -111,10 +111,6 @@ void CustomTabWidgetBar::mouseMoveEvent(QMouseEvent* event)
 		return;
 	}
 
-	if (debugLogging) {
-		qDebug() << "You wanna drag this tab baby?";
-	}
-
 	// Ok now we know your not a smelly dog with 7 legs we can proceed.
 	// we need to work out the direction o.o
 	// well we get here when the mouse is outside the geo
@@ -137,10 +133,6 @@ void CustomTabWidgetBar::mouseMoveEvent(QMouseEvent* event)
 				result = DRAG_MOVE_RIGHT;
 			}
 		}
-	}
-
-	if (debugLogging) {
-		qDebug() << "DragResult: " << DragResultToString(result);
 	}
 
 	if (result == DRAG_DETACH && inMove_) {
