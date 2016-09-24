@@ -1023,7 +1023,7 @@ AssetProperty& AssetProps::addItemIU(const std::string& key, AssetProperty::Prop
 
 
 	if (!pCur_) {
-		BeginGroup("xmodel");
+		BeginGroup("model");
 	}
 
 	pCur_->AddChild(pItem);
