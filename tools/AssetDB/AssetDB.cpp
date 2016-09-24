@@ -697,7 +697,7 @@ AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, As
 		return Result::ERROR;
 	}
 	if (!ValidName(name)) {
-		X_ERROR("AssetDB", "Asset name \"%s\" has invalid characters", name.c_str());
+		X_ERROR("AssetDB", "Asset name \"%s\" is invalid", name.c_str());
 		return Result::ERROR;
 	}
 
@@ -737,7 +737,7 @@ AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string
 		return Result::ERROR;
 	}
 	if (!ValidName(name)) {
-		X_ERROR("AssetDB", "Asset name \"%s\" has invalid characters", name.c_str());
+		X_ERROR("AssetDB", "Asset name \"%s\" is invalid", name.c_str());
 		return Result::ERROR;
 	}
 
@@ -831,7 +831,7 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 	}
 
 	if (!ValidName(newName)) {
-		X_ERROR("AssetDB", "Can't rename asset \"%s\" to \"%s\" new name has invalid characters", name.c_str(), newName.c_str());
+		X_ERROR("AssetDB", "Can't rename asset \"%s\" to \"%s\" new name is invalid", name.c_str(), newName.c_str());
 		return Result::ERROR;
 	}
 
@@ -1533,6 +1533,8 @@ void AssetDB::AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut)
 bool AssetDB::ValidName(const core::string& name)
 {
 	if (name.length() > ASSET_NAME_MAX_LENGTH) {
+		X_ERROR("AssetDB", "Asset name \"%s\" with length %" PRIuS " exceeds max lenght of %" PRIuS, 
+			name.c_str(), name.length(), ASSET_NAME_MAX_LENGTH);
 		return false;
 	}
 
@@ -1543,6 +1545,7 @@ bool AssetDB::ValidName(const core::string& name)
 
 		bool valid = core::strUtil::IsAlphaNum(ch) || core::strUtil::IsDigit(ch) || ch == '_' || ch == ASSET_NAME_SLASH;
 		if (!valid) {
+			X_ERROR("AssetDB", "Asset name \"%s\" has invalid character at position %" PRIuS, name.c_str(), i);
 			return false;
 		}
 	}
