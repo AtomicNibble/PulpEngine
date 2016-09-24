@@ -6,6 +6,8 @@ X_NAMESPACE_BEGIN(assetDb)
 
 
 static const char ASSET_NAME_SLASH = '/';
+static const size_t ASSET_NAME_MAX_LENGTH = 128;
+
 
 
 X_DECLARE_ENUM(AssetType)(
