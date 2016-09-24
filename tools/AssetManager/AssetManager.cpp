@@ -96,17 +96,6 @@ AssetManager::AssetManager(QWidget* pParent) :
 		pAssetDbexplorer_->loadMods();
 	}
 
-	{
-	//	pLayout_ = new QGridLayout();
-	//	pLayout_->addWidget(pAssetViewWidget_);
-	//
-	//	QWidget* pWindow = new QWidget();
-	//	pWindow->setLayout(pLayout_);
-
-	//	setCentralWidget(pEditorManager_);
-	//	setMinimumSize(600, 800);
-	}
-
 	connect(QApplication::instance(), SIGNAL(focusChanged(QWidget*, QWidget*)),
 		this, SLOT(updateFocusWidget(QWidget*, QWidget*)));
 
