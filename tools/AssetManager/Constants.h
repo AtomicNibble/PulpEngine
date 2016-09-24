@@ -20,6 +20,7 @@ namespace Constants
 
 	const char C_GLOBAL[] = "AssMan Context";
 	const char C_EDITORMANAGER[] = "EditorManager";
+	const char C_GENERAL_OUTPUT_PANE[] = "GeneralOutputPane";
 
 	// Menubar
 	const char MENU_BAR[] = "MenuBar";
@@ -91,6 +92,14 @@ namespace Constants
 	const char SAVEALL[] = "SaveAll";
 	const char EXIT[] = "Exit";
 
+	// Edit Actions
+	const char EDIT_UNDO[] = "Undo";
+	const char EDIT_REDO[] = "Redo";
+	const char EDIT_COPY[] = "Copy";
+	const char EDIT_PASTE[] = "Paste";
+	const char EDIT_CUT[] = "Cut";
+	const char EDIT_CUTDELETE[] = "Delete";
+	const char EDIT_SELECTALL[] = "SelectAll";
 
 	// View Actions
 	const char VIEW_CODE[] = "View.Code";
