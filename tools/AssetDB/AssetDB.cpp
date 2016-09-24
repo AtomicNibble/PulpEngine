@@ -194,8 +194,8 @@ bool AssetDB::CreateTables(void)
 		"lastUpdateTime TIMESTAMP,"
 		"parent_id INTEGER NULL,"
 		"mod_id INTEGER,"
-		"FOREIGN KEY(parent_id) REFERENCES mods(mod_id),"
-		"FOREIGN KEY(mod_id) REFERENCES file_ids(file_id),"
+		"FOREIGN KEY(parent_id) REFERENCES file_ids(file_id),"
+		"FOREIGN KEY(mod_id) REFERENCES mods(mod_id),"
 		"unique(name, type)"
 		");")) {
 		X_ERROR("AssetDB", "Failed to create 'file_ids' table");
