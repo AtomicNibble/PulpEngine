@@ -30,6 +30,10 @@ class DLL_EXPORT AssetDB
 public:
 	struct Mod
 	{
+		Mod() = default;
+		Mod(int32_t modId, core::string, core::Path<char>& path);
+		Mod(int32_t modId, const char* pName, const char* pOutDir);
+
 		int32_t modId;
 		core::string name;
 		core::Path<char> outDir;
