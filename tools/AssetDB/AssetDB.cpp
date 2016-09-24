@@ -147,7 +147,7 @@ bool AssetDB::OpenDB(void)
 		return false;
 	}
 
-	if (!db_.execute("PRAGMA synchronous = OFF; PRAGMA page_size = 4096; PRAGMA journal_mode=wal;")) {
+	if (!db_.execute("PRAGMA synchronous = OFF; PRAGMA page_size = 4096; PRAGMA journal_mode=wal; PRAGMA foreign_keys = ON;")) {
 		return false;
 	}
 
