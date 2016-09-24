@@ -1538,6 +1538,13 @@ bool AssetDB::ValidName(const core::string& name)
 		return false;
 	}
 
+	if (name.length() < ASSET_NAME_MIN_LENGTH) {
+		X_ERROR("AssetDB", "Asset name \"%s\" with length %" PRIuS " is shorter than min lenght of %" PRIuS,
+			name.c_str(), name.length(), ASSET_NAME_MIN_LENGTH);
+		return false;
+	}
+
+
 	for (size_t i = 0; i < name.length(); i++)
 	{
 		// are you valid!?
