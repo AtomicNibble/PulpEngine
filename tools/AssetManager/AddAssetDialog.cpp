@@ -130,10 +130,22 @@ void AddAssetDialog::accept(void)
 		type = static_cast<assetDb::AssetType::Enum>(index);
 	}
 
-	// mod
+	// mod  
 	{
-		const int32_t index = pAssetType_->currentIndex();
-		auto variant = pAssetType_->itemData(index);
+		const int32_t index = pMod_->currentIndex();
+
+		if (index < 0) {
+			QMessageBox::critical(this, "Add Asset", "Invalid mod index", QMessageBox::Ok);
+			return;
+		}
+
+		auto variant = pMod_->itemData(index);
+
+		// make sure it's valid, as during inital testing it was not, giving me modId of zero.
+		if (!variant.isValid()) {
+			QMessageBox::critical(this, "Add Asset", "Failed to decode selected mod", QMessageBox::Ok);
+			return;
+		}
 
 		modId = variant.toInt();
 	}
