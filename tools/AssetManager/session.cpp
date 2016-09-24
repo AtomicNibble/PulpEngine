@@ -34,8 +34,8 @@ public:
 };
 
 
-static SessionManager* instance_ = 0;
-static SessionManagerPrivate* d = 0;
+static SessionManager* instance_ = nullptr;
+static SessionManagerPrivate* d = nullptr;
 
 
 SessionManager::SessionManager(QObject* pParent)
