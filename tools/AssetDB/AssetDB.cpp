@@ -1532,6 +1532,10 @@ void AssetDB::AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut)
 
 bool AssetDB::ValidName(const core::string& name)
 {
+	if (name.length() > ASSET_NAME_MAX_LENGTH) {
+		return false;
+	}
+
 	for (size_t i = 0; i < name.length(); i++)
 	{
 		// are you valid!?
