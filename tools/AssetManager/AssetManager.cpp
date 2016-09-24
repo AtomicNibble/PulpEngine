@@ -211,14 +211,14 @@ void AssetManager::updateFocusWidget(QWidget* old, QWidget* now)
 
 	// Prevent changing the context object just because the menu or a menu item is activated
 	if (qobject_cast<QMenuBar*>(now) || qobject_cast<QMenu*>(now)) {
-		qDebug() << "new context objects is menu";
 		return;
 	}
 
+#if X_DEBUG
 	if (debugLogging && now && now->metaObject()) {
 		qDebug() << "Name: " << now->metaObject()->className();
 	}
-
+#endif // ¬X_DEBUG
 
 	QList<IContext*> newContext;
 	if (QWidget* pWidget = qApp->focusWidget())
@@ -248,12 +248,14 @@ void AssetManager::updateContextObject(const QList<IContext*>& context)
 
 	updateContext();
 
+#if X_DEBUG
 	if (debugLogging) 
 	{
 		qDebug() << "new context objects =" << context;
 		foreach(IContext *c, context)
 			qDebug() << (c ? c->widget() : 0) << (c ? c->widget()->metaObject()->className() : 0);
 	}
+#endif // !X_DEBUG
 }
 
 void AssetManager::updateContext(void)
