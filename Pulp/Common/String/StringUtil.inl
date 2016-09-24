@@ -25,6 +25,16 @@ namespace strUtil
 		return isalnum(static_cast<int>(c)) != 0;
 	}
 
+	inline bool IsAlpha(const char c)
+	{
+		return c >= -1 && isalpha(static_cast<int>(c)) != 0;
+	}
+
+	inline bool IsAlpha(const uint8_t c)
+	{
+		return isalpha(static_cast<int>(c)) != 0;
+	}
+
 	inline bool IsDigit(const char character)
 	{
 		return ((character >= '0') && (character <= '9'));

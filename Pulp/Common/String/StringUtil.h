@@ -39,6 +39,10 @@ namespace strUtil
 	inline bool IsAlphaNum(const char str);
 	inline bool IsAlphaNum(const uint8_t str);
 
+	// reutrns if character is upper / lower case letter.
+	inline bool IsAlpha(const char str);
+	inline bool IsAlpha(const uint8_t str);
+
 	/// Returns whether or not the given character is a digit.
 	inline bool IsDigit(const char character);
 	inline bool IsDigitW(const wchar_t character);
