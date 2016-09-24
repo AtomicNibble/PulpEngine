@@ -34,7 +34,11 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 	params.pCmdLine = sInCmdLine;
 	params.bSkipInput = true;
 	params.bSkipSound = true;
+#if X_DEBUG
 	params.bVsLog = true;
+#else
+	params.bVsLog = false;
+#endif
 	params.bConsoleLog = false;
 	params.bTesting = false;
 	params.bCoreOnly = true;
