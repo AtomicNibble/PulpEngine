@@ -4,6 +4,12 @@
 #include <QMainWindow>
 #include "BaseWindow.h"
 
+// Logging
+#include "Logging\Logger.h"
+#include "Logging\FilterPolicies\LoggerNoFilterPolicy.h"
+#include "Logging\FormatPolicies\LoggerSimpleFormatPolicy.h"
+#include "LoggerOutputWindowWritePolicy.h"
+
 class QGridLayout;
 
 X_NAMESPACE_DECLARE(assetDb,
@@ -18,6 +24,16 @@ class EditorManager;
 class VersionDialog;
 class AssetPropsScriptManager;
 class MyStatusBar;
+
+
+class OutputWindow;
+
+typedef core::Logger<
+	core::LoggerNoFilterPolicy,
+	core::LoggerSimpleFormatPolicy,
+	assman::LoggerOutputWindowWritePolicy>
+	OutputWindowWrtiePolicy;
+
 
 namespace AssetExplorer {
     class AssetDbViewWidget;
@@ -106,6 +122,8 @@ private:
     QGridLayout* pLayout_;
 	QMainWindow* pDockArea_;
 	MyStatusBar* pStatusBar_;
+	OutputWindow* pOutputWindow_;
+	OutputWindowWrtiePolicy* pLoggerPolicy_;
 
 private:
 	QFileSystemWatcher* pWatcher_;

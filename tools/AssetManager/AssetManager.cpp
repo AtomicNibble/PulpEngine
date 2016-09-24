@@ -6,6 +6,9 @@
 #include "ActionContainer.h"
 #include "VersionDialog.h"
 #include "StatusBar.h"
+#include "OutputPaneManagerWidget.h"
+#include "OutputWindowWidget.h"
+#include "OutputWindowPane.h"
 
 #include "AssetEntryManager.h"
 #include "AssetPropertyEditorFactory.h"
@@ -38,6 +41,18 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pCoreImpl_ = new ICore(this);
 	pActionManager_ = new ActionManager(this);
 	pAssetEntryManager_ = new AssetEntryManager(this);
+
+	// Logging.
+	pOutputWindow_ = new OutputWindow(Context(Constants::C_GENERAL_OUTPUT_PANE));
+	pOutputWindow_->setWordWrapEnabled(false);
+	pLoggerPolicy_ = new OutputWindowWrtiePolicy(
+		OutputWindowWrtiePolicy::FilterPolicy(),
+		OutputWindowWrtiePolicy::FormatPolicy(),
+		OutputWindowWrtiePolicy::WritePolicy(pOutputWindow_)
+	);
+	gEnv->pLog->AddLogger(pLoggerPolicy_);
+
+	OutputPaneManager::create();
 
 	pLayout_ = new QGridLayout();
 	pDockArea_ = new QMainWindow();
@@ -98,6 +113,8 @@ AssetManager::AssetManager(QWidget* pParent) :
 
 	createDockWindows();
 
+	OutputPaneManager::instance()->addPane(new OutputWindowPane(pOutputWindow_));
+	OutputPaneManager::instance()->init();
 
 	pDockArea_->setCentralWidget(pEditorManager_);
 	pLayout_->addItem(new QSpacerItem(2, 2), 0, 0, 1, 1); // left
@@ -116,6 +133,13 @@ AssetManager::AssetManager(QWidget* pParent) :
 
 AssetManager::~AssetManager()
 {
+	if (pLoggerPolicy_) {
+		gEnv->pLog->RemoveLogger(pLoggerPolicy_);
+		delete pLoggerPolicy_;
+	}
+
+	OutputPaneManager::destroy();
+
 	if (pAssetScripts_) {
 		delete pAssetScripts_;
 	}
@@ -494,7 +518,7 @@ void AssetManager::createDockWindows(void)
 	Qt::DockWidgetAreas all = Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea | Qt::BottomDockWidgetArea;
 
 	AddDockItem<AssetExplorer::AssetDbViewWidget>("Asset Explorer", pAssetViewWidget_, all, Qt::LeftDockWidgetArea);
-
+	AddDockItem<OutputPaneManager>("Output", OutputPaneManager::instance(), all, Qt::BottomDockWidgetArea);
 
 }
 
