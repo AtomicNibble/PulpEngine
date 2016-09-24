@@ -1548,6 +1548,12 @@ bool AssetDB::ValidName(const core::string& name)
 			X_ERROR("AssetDB", "Asset name \"%s\" has invalid character at position %" PRIuS, name.c_str(), i);
 			return false;
 		}
+
+		// provide more info when it's case error.
+		if (!core::strUtil::IsLower(ch)) {
+			X_ERROR("AssetDB", "Asset name \"%s\" has invalid upper-case character at position %" PRIuS, name.c_str(), i);
+			return false;
+		}
 	}
 
 	return true;
