@@ -555,6 +555,25 @@ bool AssetDB::GetAssetList(ModId modId, AssetType::Enum type, core::Array<AssetI
 	return true;
 }
 
+bool AssetDB::GetModsList(ModsArr& arrOut)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT mod_id, name, out_dir FROM mods");
+
+	auto it = qry.begin();
+	for (; it != qry.end(); ++it)
+	{
+		auto row = *it;
+
+		const int32_t modId = row.get<int32_t>(0);
+		const char* pName = row.get<const char*>(1);
+		const char* pOutdir = row.get<const char*>(2);
+
+		arrOut.emplace_back(modId, pName, pOutdir);
+	}
+
+	return true;
+}
+
 bool AssetDB::IterateMods(core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> func)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT mod_id, name, out_dir FROM mods");

@@ -67,6 +67,7 @@ public:
 	);
 
 	typedef std::array<int32_t, AssetType::ENUM_COUNT> AssetTypeCountsArr;
+	typedef core::Array<Mod> ModsArr;
 
 public:
 	AssetDB();
@@ -96,6 +97,7 @@ public:
 	bool GetAssetList(ModId modId, AssetType::Enum type, core::Array<AssetInfo>& assetsOut);
 
 public:
+	bool GetModsList(ModsArr& arrOut);
 	bool IterateMods(core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> func);
 	bool IterateAssets(core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
 	bool IterateAssets(ModId modId, core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
