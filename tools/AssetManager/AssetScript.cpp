@@ -449,7 +449,7 @@ void AssetPropsScriptManager::fileChanged(const QString& path)
 	QString fileName = fileInfo.fileName();
 	fileName.toLower();
 
-	qDebug() << "Aps script edited: " << fileName;
+	X_LOG1("AssetScript", "Aps script edited: %ls", fileName.data());
 
 	for (uint32_t i=0; i<assetDb::AssetType::ENUM_COUNT; i++)
 	{
@@ -460,7 +460,7 @@ void AssetPropsScriptManager::fileChanged(const QString& path)
 		
 		if (fileName == typeFileName)
 		{
-			qDebug() << "Cache cleared for aps for type: " << assetDb::AssetType::ToString(i);
+			X_LOG1("AssetScript", "Cache cleared for aps for type: %s ",assetDb::AssetType::ToString(i));
 
 			cache_[i].clear(false);
 			break;
