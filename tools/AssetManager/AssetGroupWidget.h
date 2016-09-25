@@ -21,6 +21,7 @@ public:
 
 	void appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth);
 
+	void clear(void);
 	void show(bool visible);
 
 	void AddChild(AssetProperty* pChild);

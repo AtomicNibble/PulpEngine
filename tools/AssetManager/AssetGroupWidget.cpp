@@ -48,6 +48,16 @@ void AssetGroupWidget::appendGui(QGridLayout* pLayout, int32_t& row, int32_t dep
 	}
 }
 
+void AssetGroupWidget::clear(void)
+{
+	for (auto& pChild : children_)
+	{
+		delete pChild;
+	}
+
+	children_.clear();
+}
+
 void AssetGroupWidget::show(bool visible)
 {
 	QToolButton::setVisible(visible);
