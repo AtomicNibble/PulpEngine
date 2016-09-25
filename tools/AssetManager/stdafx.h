@@ -36,6 +36,23 @@ X_LINK_LIB("angelscript");
 
 // ----------------------------
 
+#if X_DEBUG
+// #define QT_NO_DEBUG_OUTPUT
+// #define QT_NO_INFO_OUTPUT
+// #define QT_NO_WARNING_OUTPUT
+#elif X_RELEASE
+#define QT_NO_DEBUG_OUTPUT
+#define QT_NO_INFO_OUTPUT
+#define QT_NO_WARNING_OUTPUT
+#elif X_SUPER
+#define QT_NO_DEBUG_OUTPUT
+#define QT_NO_INFO_OUTPUT
+#define QT_NO_WARNING_OUTPUT
+#elif 
+#error "unknown config."
+#endif
+
+
 #include <QIcon>
 #include <QObject>
 #include <QStringList>
