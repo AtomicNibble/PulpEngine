@@ -124,10 +124,10 @@ public:
 	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pIdOut = nullptr, ModId* pModIdOut = nullptr);
 
 	bool GetArgsForAsset(int32_t assetId, core::string& argsOut);
-	bool GetArgsHashForAsset(int32_t idassetId, uint32_t& argsHashOut);
-	bool GetModIdForAsset(int32_t idassetId, ModId& modIdOut);
+	bool GetArgsHashForAsset(int32_t assetId, uint32_t& argsHashOut);
+	bool GetModIdForAsset(int32_t assetId, ModId& modIdOut);
 	bool GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& dataOut);
-	bool GetTypeForAsset(int32_t idassetId, AssetType::Enum& typeOut);
+	bool GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut);
 
 	// some assetRef stuff.
 	bool GetAssetRefCount(int32_t assetId, uint32_t& refCountOut);
