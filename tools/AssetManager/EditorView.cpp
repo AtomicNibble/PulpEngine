@@ -540,14 +540,14 @@ SplitterOrView::SplitterOrView(EditorView *view)
 SplitterOrView::~SplitterOrView()
 {
 	delete pLayout_;
-	pLayout_ = 0;
+	pLayout_ = nullptr;
 	if (pView_) {
 		EditorManager::emptyView(pView_);
 	}
 	delete pView_;
-	pView_ = 0;
+	pView_ = nullptr;
 	delete pSplitter_;
-	pSplitter_ = 0;
+	pSplitter_ = nullptr;
 }
 
 EditorView *SplitterOrView::findFirstView(void)
@@ -658,7 +658,7 @@ void SplitterOrView::moveEditor(Qt::Orientation orientation, IEditor *editor, Di
 	EditorView *editorView = pView_;
 	pView_ = 0;
 
-	SplitterOrView *otherView = 0;
+	SplitterOrView *otherView = nullptr;
 
 	int32_t idx = 0;
 	if (side == Direction::Default || side == Direction::Right || side == Direction::Bottom) {
@@ -688,7 +688,7 @@ void SplitterOrView::addSplitter(SplitterOrView* split, Qt::Orientation orientat
 	pLayout_->addWidget(pSplitter_);
 	pLayout_->removeWidget(pView_);
 	EditorView *editorView = pView_;
-	pView_ = 0;
+	pView_ = nullptr;
 
 
 	int32_t idx = 0;
