@@ -132,8 +132,8 @@ bool AssetDB::CreateTables(void)
 {
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS mods ("
 		"mod_id INTEGER PRIMARY KEY,"
-		"name TEXT COLLATE NOCASE UNIQUE,"
-		"out_dir TEXT"
+		"name TEXT COLLATE NOCASE UNIQUE NOT NULL,"
+		"out_dir TEXT NOT NULL"
 		");")) {
 		X_ERROR("AssetDB", "Failed to create 'mods' table");
 		return false;
@@ -141,15 +141,15 @@ bool AssetDB::CreateTables(void)
 
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS file_ids ("
 		" file_id INTEGER PRIMARY KEY,"
-		"name TEXT COLLATE NOCASE," // names are not unique since we allow same name for diffrent type.
-		"type INTEGER,"
+		"name TEXT COLLATE NOCASE NOT NULL," // names are not unique since we allow same name for diffrent type.
+		"type INTEGER NOT NULL,"
 		"args TEXT,"
 		"argsHash INTEGER,"
 		"raw_file INTEGER,"
 		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,"
 		"lastUpdateTime TIMESTAMP,"
 		"parent_id INTEGER NULL,"
-		"mod_id INTEGER,"
+		"mod_id INTEGER NOT NULL,"
 		"FOREIGN KEY(parent_id) REFERENCES file_ids(file_id),"
 		"FOREIGN KEY(mod_id) REFERENCES mods(mod_id),"
 		"unique(name, type)"
@@ -160,9 +160,9 @@ bool AssetDB::CreateTables(void)
 
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS raw_files ("
 		"file_id INTEGER PRIMARY KEY,"
-		"path TEXT,"
-		"size INTEGER,"
-		"hash INTEGER,"
+		"path TEXT NOT NULL,"
+		"size INTEGER NOT NULL,"
+		"hash INTEGER NOT NULL,"
 		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL"
 		");")) {
 		X_ERROR("AssetDB", "Failed to create 'raw_files' table");
@@ -174,8 +174,8 @@ bool AssetDB::CreateTables(void)
 	// with a toId matching the id of the material.
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS refs ("
 		"ref_id INTEGER PRIMARY KEY,"
-		"toId INTEGER," 
-		"fromId INTEGER,"
+		"toId INTEGER NOT NULL," 
+		"fromId INTEGER NOT NULL,"
 		"FOREIGN KEY(ref_id) REFERENCES file_ids(file_id),"
 		"FOREIGN KEY(fromId) REFERENCES file_ids(file_id)"
 		");")) {
@@ -1108,6 +1108,7 @@ bool AssetDB::GetArgsForAsset(int32_t assetId, core::string& argsOut)
 		return false;
 	}
 
+	// args can be null.
 	if ((*it).columnType(0) != sql::ColumType::SNULL) {
 		argsOut = (*it).get<const char*>(0);
 	}
@@ -1129,8 +1130,12 @@ bool AssetDB::GetArgsHashForAsset(int32_t assetId, uint32_t& argsHashOut)
 		return false;
 	}
 
+	// args can be null.
 	if ((*it).columnType(0) != sql::ColumType::SNULL) {
 		argsHashOut = static_cast<uint32_t>((*it).get<int32_t>(0));
+	}
+	else {
+		argsHashOut = 0;
 	}
 	return true;
 }
@@ -1147,9 +1152,7 @@ bool AssetDB::GetModIdForAsset(int32_t assetId, ModId& modIdOut)
 		return false;
 	}
 
-	if ((*it).columnType(0) != sql::ColumType::SNULL) {
-		modIdOut = static_cast<ModId>((*it).get<int32_t>(0));
-	}
+	modIdOut = static_cast<ModId>((*it).get<int32_t>(0));
 	return true;
 }
 
@@ -1217,11 +1220,6 @@ bool AssetDB::GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut)
 	const auto it = qry.begin();
 
 	if (it == qry.end()) {
-		return false;
-	}
-
-	// is this check neccessary, smells of copy pasta!
-	if ((*it).columnType(0) == sql::ColumType::SNULL) {
 		return false;
 	}
 
@@ -1380,12 +1378,17 @@ bool AssetDB::AssetHasParent(int32_t assetId, int32_t* pParentId)
 		return false;
 	}
 
-	if ((*it).columnType(0) != sql::ColumType::SNULL) {
-		*pParentId = static_cast<int32_t>((*it).get<int32_t>(0));
-		return true;
+	if (pParentId) { // null check for the plebs
+		if ((*it).columnType(0) != sql::ColumType::SNULL) {
+			*pParentId = static_cast<int32_t>((*it).get<int32_t>(0));
+
+		}
+		else {
+			*pParentId = -1;
+		}
 	}
 
-	return false;
+	return true;
 }
 
 bool AssetDB::AssetIsParent(int32_t assetId)
