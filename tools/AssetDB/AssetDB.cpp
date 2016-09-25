@@ -1220,9 +1220,12 @@ bool AssetDB::GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut)
 		return false;
 	}
 
-	if ((*it).columnType(0) != sql::ColumType::SNULL) {
-		typeOut = static_cast<AssetType::Enum>((*it).get<int32_t>(0));
+	// is this check neccessary, smells of copy pasta!
+	if ((*it).columnType(0) == sql::ColumType::SNULL) {
+		return false;
 	}
+
+	typeOut = static_cast<AssetType::Enum>((*it).get<int32_t>(0));
 	return true;
 }
 
