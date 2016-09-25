@@ -30,20 +30,21 @@ class DLL_EXPORT AssetDB
 public:
 	struct Mod
 	{
-		Mod() = default;
-		Mod(int32_t modId, core::string, core::Path<char>& path);
-		Mod(int32_t modId, const char* pName, const char* pOutDir);
+		X_INLINE Mod() = default;
+		X_INLINE Mod(int32_t modId, core::string, core::Path<char>& path);
+		X_INLINE Mod(int32_t modId, const char* pName, const char* pOutDir);
 
 		int32_t modId;
 		core::string name;
 		core::Path<char> outDir;
 	};
 
+	// add type?
 	struct AssetInfo
 	{
-		AssetInfo();
-		AssetInfo(int32_t id, int32_t parentId, const char* pName);
-		AssetInfo(int32_t id, int32_t parentId, const core::string& name);
+		X_INLINE AssetInfo();
+		X_INLINE AssetInfo(int32_t id, int32_t parentId, const char* pName);
+		X_INLINE AssetInfo(int32_t id, int32_t parentId, const core::string& name);
 
 		int32_t id;
 		int32_t parentId;

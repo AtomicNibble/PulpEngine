@@ -55,52 +55,8 @@ namespace
 } // namespace
 
 
-// -----------------------------------------------------
-
-
-AssetDB::Mod::Mod(int32_t modId, core::string name_, core::Path<char>& outdir) :
-	modId(modId),
-	name(name_),
-	outDir(outdir)
-{
-
-}
-
-AssetDB::Mod::Mod(int32_t modId, const char* pName, const char* pOutDir) :
-	modId(modId),
-	name(pName),
-	outDir(pOutDir)
-{
-
-}
 
 // -----------------------------------------------------
-
-
-AssetDB::AssetInfo::AssetInfo() :
-	id(-1),
-	parentId(-1)
-{
-
-}
-AssetDB::AssetInfo::AssetInfo(int32_t id, int32_t parentId, const char* pName) :
-	id(-1),
-	parentId(-1),
-	name(pName)
-{
-
-}
-
-AssetDB::AssetInfo::AssetInfo(int32_t id, int32_t parentId, const core::string& name_) :
-	id(-1),
-	parentId(-1),
-	name(name_)
-{
-
-}
-
-// -----------------------------------------------------
-
 
 
 const char* AssetDB::ASSET_DB_FOLDER = "asset_db";
