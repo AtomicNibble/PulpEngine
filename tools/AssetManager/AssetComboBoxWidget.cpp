@@ -45,7 +45,10 @@ AssetComboBoxWidget::AssetComboBoxWidget(QWidget *parent, const std::string& val
 	if (editable)
 	{
 		setEditable(1);
-		connect(this, SIGNAL(returnPressed(int)), this, SLOT(returnPressed()));
+		QLineEdit* pLineEdit = lineEdit();
+		if (pLineEdit) {
+			connect(pLineEdit, SIGNAL(returnPressed()), this, SLOT(returnPressed()));
+		}
 	}
 
 	// cosnt Qstring& version also
@@ -57,7 +60,7 @@ AssetComboBoxWidget::~AssetComboBoxWidget()
 {
 }
 
-void AssetComboBoxWidget::currentIndexChanged(int32_t index)
+void AssetComboBoxWidget::currentIndexChanged(int index)
 {
 	X_UNUSED(index);
 

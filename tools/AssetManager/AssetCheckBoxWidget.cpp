@@ -7,7 +7,7 @@ AssetCheckBoxWidget::AssetCheckBoxWidget(QWidget *parent, const std::string& val
 	: QCheckBox(parent)
 {
 
-	connect(this, SIGNAL(stateChanged(int)), this, SLOT(stateChanged(int)));
+	connect(this, SIGNAL(toggled(bool)), this, SLOT(toggled(bool)));
 
 	blockSignals(true);
 	
@@ -26,9 +26,9 @@ AssetCheckBoxWidget::~AssetCheckBoxWidget()
 }
 
 
-void AssetCheckBoxWidget::stateChanged(int32_t state)
+void AssetCheckBoxWidget::toggled(bool checked)
 {
-	X_UNUSED(state);
+	X_UNUSED(checked);
 
 
 

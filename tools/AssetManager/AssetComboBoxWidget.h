@@ -16,7 +16,7 @@ public:
 	~AssetComboBoxWidget();
 
 private slots:
-	void currentIndexChanged(int32_t index);
+	void currentIndexChanged(int index);
 	void returnPressed(void);
 
 };

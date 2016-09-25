@@ -14,7 +14,7 @@ public:
 	~AssetCheckBoxWidget();
 
 private slots:
-	void stateChanged(int32_t state);
+	void toggled(bool checked);
 	
 
 };

@@ -80,7 +80,7 @@ private slots:
 	void updateNavigateState(void);
 	void popupMenu(void);
 
-	void setCurrentIndex(int32_t idx);
+	void setCurrentIndex(int idx);
 
 
 private:

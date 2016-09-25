@@ -227,8 +227,8 @@ EditorView::EditorView(SplitterOrView *parentSplitterOrView, QWidget *parent) :
 
 	connect(pContainer_, SIGNAL(customContextMenuRequested(const QPoint &)),
 		this, SLOT(showContextMenu(const QPoint &)));
-	connect(pContainer_, SIGNAL(tabCloseRequested(int32_t)),
-		this, SLOT(tabCloseRequested(int32_t)));
+	connect(pContainer_, SIGNAL(tabCloseRequested(int)),
+		this, SLOT(tabCloseRequested(int)));
 }
 
 EditorView::~EditorView()

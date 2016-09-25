@@ -156,7 +156,7 @@ OutputPaneManager::OutputPaneManager(QWidget *parent) :
 {
 	setWindowTitle(tr("Output"));
 
-	connect(ICore::instance(), SIGNAL(saveSettingsRequested()), this, SLOT(saveSettings()));
+//	connect(ICore::instance(), SIGNAL(saveSettingsRequested()), this, SLOT(saveSettings()));
 
 	QVBoxLayout* mainlayout = new QVBoxLayout;
 	mainlayout->setSpacing(0);
@@ -232,9 +232,9 @@ void OutputPaneManager::init(void)
 		const int32_t idx = pOutputWidgetPane_->addWidget(pOutPane->outputWidget(this));
 		BUG_CHECK(idx == i);
 
-		connect(pOutPane, SIGNAL(showPage(int)), this, SLOT(showPage(int)));
+		connect(pOutPane, SIGNAL(showPage(int32_t)), this, SLOT(showPage(int32_t)));
 		connect(pOutPane, SIGNAL(hidePage()), this, SLOT(slotHide()));
-		connect(pOutPane, SIGNAL(togglePage(int)), this, SLOT(togglePage(int)));
+		connect(pOutPane, SIGNAL(togglePage(int32_t)), this, SLOT(togglePage(int32_t)));
 		connect(pOutPane, SIGNAL(navigateStateUpdate()), this, SLOT(updateNavigateState()));
 
 

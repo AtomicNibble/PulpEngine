@@ -13,7 +13,7 @@ AssetTextWidget::AssetTextWidget(QWidget *parent, const std::string& value)
 	pTextEdit_ = new QPlainTextEdit();
 	pTextEdit_->setAcceptDrops(true); // can drag file onto lineedit and it gets path.
 
-	connect(this, SIGNAL(textChanged(bool)), pTextEdit_, SLOT(textChanged()));
+	connect(pTextEdit_, SIGNAL(textChanged(void)), this, SLOT(textChanged(void)));
 
 	pLayout->addWidget(pTextEdit_);
 

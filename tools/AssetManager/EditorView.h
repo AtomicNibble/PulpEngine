@@ -104,7 +104,7 @@ private slots:
 	void closeSplit(void);
 
 	void showContextMenu(const QPoint& point);
-	void tabCloseRequested(int32_t index);
+	void tabCloseRequested(int index);
 
 	void titleChanged(QString title);
 

@@ -28,7 +28,7 @@ public:
 	~AssetSpinBoxWidget();
 
 private slots:
-	void valueChanged(int32_t d);
+	void valueChanged(int d);
 
 };
 
