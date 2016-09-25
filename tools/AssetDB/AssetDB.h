@@ -122,6 +122,7 @@ public:
 	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, 
 		core::Array<uint8_t>& data, const core::string& argsOpt);
 
+	// if you want to get a assets id use this.
 	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pIdOut = nullptr, ModId* pModIdOut = nullptr);
 
 	bool GetArgsForAsset(int32_t assetId, core::string& argsOut);
