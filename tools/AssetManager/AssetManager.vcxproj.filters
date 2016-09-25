@@ -1176,6 +1176,24 @@
     <ClCompile Include="DeleteAssetDialog.cpp">
       <Filter>Source Files\Widgets\Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_ShowRefsDialog.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_ShowRefsDialog.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_ShowRefsDialog.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_ShowRefsDialog.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_ShowRefsDialog.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="ShowRefsDialog.cpp">
+      <Filter>Source Files\Widgets\Dialogs</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -1326,6 +1344,9 @@
       <Filter>Header Files\Widgets\Dialogs</Filter>
     </CustomBuild>
     <CustomBuild Include="DeleteAssetDialog.h">
+      <Filter>Header Files\Widgets\Dialogs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="ShowRefsDialog.h">
       <Filter>Header Files\Widgets\Dialogs</Filter>
     </CustomBuild>
   </ItemGroup>
