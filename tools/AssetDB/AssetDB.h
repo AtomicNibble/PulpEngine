@@ -159,3 +159,6 @@ private:
 };
 
 X_NAMESPACE_END
+
+
+#include "AssetDB.inl"
