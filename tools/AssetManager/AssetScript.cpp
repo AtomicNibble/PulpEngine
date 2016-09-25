@@ -212,6 +212,8 @@ bool AssetPropsScriptManager::runScriptForProps(AssetProps& props, assetDb::Asse
 		return false;
 	}
 
+	props.setAssetType(type);
+
 	return processScript(props, cache_[type]);
 }
 
