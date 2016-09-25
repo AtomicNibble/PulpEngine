@@ -70,6 +70,7 @@ public:
 	typedef std::array<int32_t, AssetType::ENUM_COUNT> AssetTypeCountsArr;
 	typedef core::Array<Mod> ModsArr;
 	typedef core::Array<AssetInfo> AssetInfoArr;
+	typedef core::Array<int32_t> AssetIdArr;
 
 public:
 	AssetDB();
@@ -133,6 +134,7 @@ public:
 	// some assetRef stuff.
 	bool GetAssetRefCount(int32_t assetId, uint32_t& refCountOut);
 	bool IterateAssetRefs(int32_t assetId, core::Delegate<bool(int32_t)> func);
+	bool GetAssetRefs(int32_t assetId, AssetIdArr& refsOut);
 	Result::Enum AddAssertRef(int32_t assetId, int32_t targetAssetId);
 	Result::Enum RemoveAssertRef(int32_t assetId, int32_t targetAssetId);
 
