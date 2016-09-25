@@ -3,6 +3,7 @@
 #include <QFile>
 #include <qstylefactory.h>
 
+
 #include "logging.h"
 #include "EngineApp.h"
 
@@ -39,6 +40,9 @@ typedef core::MemoryArena<
 core::MemoryArenaBase* g_arena = nullptr;
 
 X_USING_NAMESPACE;
+
+
+#define REDIRECT_QT_LOGGS 0
 
 int main(int argc, char *argv[])
 {
@@ -80,10 +84,18 @@ int main(int argc, char *argv[])
 
 		if (app.Init(::GetCommandLineW()))
 		{
+#if REDIRECT_QT_LOGGS 
+			const QtMessageHandler oldMsgHandler = qInstallMessageHandler(redirectQtMsgToEngineLog);
+#endif // REDIRECT_QT_LOGGS 
+
 			assman::AssetManager w;
 			w.show();
 
 			res = a.exec();
+
+#if REDIRECT_QT_LOGGS 
+			qInstallMessageHandler(oldMsgHandler);
+#endif // !REDIRECT_QT_LOGGS 
 		}
 	}
 
