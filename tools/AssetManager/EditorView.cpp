@@ -711,7 +711,7 @@ void SplitterOrView::addSplitter(SplitterOrView* split, Qt::Orientation orientat
 	pLayout_->setCurrentWidget(pSplitter_);
 }
 
-void SplitterOrView::unsplitAll()
+void SplitterOrView::unsplitAll(void)
 {
 	BUG_ASSERT(pSplitter_, return);
 	// avoid focus changes while unsplitting is in progress
@@ -858,7 +858,7 @@ void SplitterOrView::SetDragMode(QPoint& pos)
 	setAttribute(Qt::WA_TranslucentBackground);
 }
 
-void SplitterOrView::dragMakeNewWindow()
+void SplitterOrView::dragMakeNewWindow(void)
 {
 	setAttribute(Qt::WA_TranslucentBackground, false);
 	setWindowFlags((windowFlags() & ~Qt::FramelessWindowHint));
