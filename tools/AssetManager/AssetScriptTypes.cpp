@@ -719,9 +719,13 @@ bool AssetProps::extractArgs(std::string& jsonStrOut) const
 			break;
 
 		case AssetProperty::PropertyType::TEXT:
-		case AssetProperty::PropertyType::IMAGE:
 		case AssetProperty::PropertyType::PATH:
+		case AssetProperty::PropertyType::IMAGE:
 		case AssetProperty::PropertyType::COMBOBOX:
+		case AssetProperty::PropertyType::COLOR:
+		case AssetProperty::PropertyType::VEC2:
+		case AssetProperty::PropertyType::VEC3:
+		case AssetProperty::PropertyType::VEC4:
 		default:
 			writer.String(item.GetValue().c_str());
 			break;
