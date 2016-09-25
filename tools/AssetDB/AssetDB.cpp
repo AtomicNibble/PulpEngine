@@ -1226,6 +1226,24 @@ bool AssetDB::GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut)
 	return true;
 }
 
+bool AssetDB::GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT name, file_id, parent_id FROM file_ids WHERE file_ids.file_id = ?");
+	qry.bind(1, assetId);
+
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
+		infoOut = AssetInfo();
+		return false;
+	}
+
+	infoOut.name = (*it).get<const char*>(0);
+	infoOut.id = static_cast<AssetType::Enum>((*it).get<int32_t>(1));
+	infoOut.parentId = static_cast<AssetType::Enum>((*it).get<int32_t>(2));
+	return true;
+}
+
 
 bool AssetDB::GetAssetRefCount(int32_t assetId, uint32_t& refCountOut)
 {

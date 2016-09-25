@@ -128,6 +128,7 @@ public:
 	bool GetModIdForAsset(int32_t assetId, ModId& modIdOut);
 	bool GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& dataOut);
 	bool GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut);
+	bool GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut);
 
 	// some assetRef stuff.
 	bool GetAssetRefCount(int32_t assetId, uint32_t& refCountOut);
