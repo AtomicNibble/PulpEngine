@@ -197,6 +197,7 @@ public:
 	void addRef(void);
 	void release(void);
 	void clear(void);
+	void setAssetType(assetDb::AssetType::Enum type);
 
 	bool parseArgs(const std::string& jsonStr);
 	bool extractArgs(std::string& jsonStrOut) const;

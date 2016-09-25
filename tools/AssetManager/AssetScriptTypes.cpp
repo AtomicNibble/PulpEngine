@@ -629,6 +629,20 @@ void AssetProps::clear(void)
 	keys_.clear();
 }
 
+
+void AssetProps::setAssetType(assetDb::AssetType::Enum type)
+{
+	const char* pStr = assetDb::AssetType::ToString(type);
+
+	std::string catName(pStr);
+	std::transform(catName.begin(), catName.end(), catName.begin(), ::tolower);
+
+	if (!pCur_) {
+		BeginGroup(catName);
+	}
+}
+
+
 bool AssetProps::parseArgs(const std::string& jsonStr)
 {
 	core::json::Document d;
@@ -997,11 +1011,6 @@ AssetProperty& AssetProps::addItemIU(const std::string& key, AssetProperty::Prop
 		pItem->SetKey(key);
 		pItem->SetType(type);
 		keys_[key] = pItem;
-	}
-
-
-	if (!pCur_) {
-		BeginGroup("model");
 	}
 
 	pCur_->AddChild(pItem);
