@@ -69,21 +69,6 @@ AssetProperty::~AssetProperty()
 
 void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth)
 {
-//	switch (type_)
-//	{
-//	case PropertyType::CHECKBOX:
-//		asCheckBox(pLayout, row, depth);
-//		return;
-//	case PropertyType::GROUPBOX:
-//		asGroupBox(pParent, pLayout, row, depth);
-//		return;
-//	default:
-//		break;
-//	}
-
-	// new 
-//	QWidget* pParent = nullptr;
-
 	const std::string& val = defaultValue_;
 
 	switch (type_)
@@ -116,7 +101,9 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 		pComboBoxWidget_ = new AssetComboBoxWidget(pParent, val, settings_.IsSet(Setting::EDITIABLE));
 		break;
 	case PropertyType::GROUPBOX:
-		pGroupWidget_ = new AssetGroupWidget(pParent);
+		X_ASSERT(pGroupWidget_, "Group not valid")(pGroupWidget_);
+
+		// pGroupWidget_ = new AssetGroupWidget(pParent);
 		break;
 	default:
 		break;
@@ -165,11 +152,8 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 
 		pLayout->addWidget(pGroupWidget_, row++, depth, 1, -1);
 
-		for (auto& pChild : children_)
-		{
-			pChild->appendGui(pGroupWidget_, pLayout, row, depth + 1);
-			row += 1;
-		}
+
+		pGroupWidget_->appendGui(pLayout, row, depth);
 	}
 	else
 	{	// add label.
@@ -181,31 +165,10 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 		pLayout->addWidget(pWidget_, row, MAX_COL_IDX);
 	}
 
-	
 	if (!settings_.IsSet(Setting::ENABLED)) {
 		enable(false);
 	}
 }
-
-#if 0
-void AssetProperty::asGroupBox(QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth)
-{
-	AssetGroupWidget* pExpandButton = new AssetGroupWidget(pParent);
-	pExpandButton->setText(QString::fromStdString(title_));
-
-
-
-	pLayout->addWidget(pExpandButton, row++, depth, 1, -1);
-
-	// add all the items.
-	for (auto& pChild : children_)
-	{
-		pChild->appendGui(pExpandButton, pLayout, row, depth + 1);
-		row += 1;
-	}
-}
-#endif
-
 
 
 void AssetProperty::setLabelText(QLabel* pLabel) const
@@ -239,16 +202,11 @@ void AssetProperty::release(void)
 
 void AssetProperty::clear(void)
 {
-	for (auto pChild : children_)
-	{
-		delete pChild;
-	}
-	
-	children_.clear();
+
 }
 
 
-void AssetProperty::setVisible(bool vis)
+void AssetProperty::show(bool vis)
 {
 	if (pLabel_) {
 		pLabel_->setVisible(vis);
@@ -285,19 +243,11 @@ void AssetProperty::setVisible(bool vis)
 		pComboBoxWidget_->setVisible(vis);
 		break;
 	case PropertyType::GROUPBOX:
-		pGroupWidget_->setVisible(vis);
+		pGroupWidget_->show(vis);
 		break;
 	default:
 		X_ASSERT_NOT_IMPLEMENTED();
 		break;
-	}
-
-	if (type_ == PropertyType::GROUPBOX)
-	{
-		for (auto& pChild : children_)
-		{
-			pChild->setVisible(vis);
-		}
 	}
 }
 
@@ -362,22 +312,43 @@ void AssetProperty::SetParentKey(const std::string& key)
 void AssetProperty::SetType(PropertyType::Enum type)
 {
 	type_ = type;
+
+	if (type_ == PropertyType::GROUPBOX) {
+		X_ASSERT(!pGroupWidget_, "Group already init")(pGroupWidget_);
+
+		pGroupWidget_ = new AssetGroupWidget();
+	}
 }
 
 void AssetProperty::AddChild(AssetProperty* pChild)
 {
-	children_.push_back(pChild);
+	if (type_ == PropertyType::GROUPBOX) {
+		pGroupWidget_->AddChild(pChild);
+	}
+	else {
+		X_ASSERT_UNREACHABLE();
+	}
 }
 
 
 AssetProperty::ConstIterator AssetProperty::begin(void) const
 {
-	return children_.cbegin();
+	if (type_ == PropertyType::GROUPBOX) {
+		return pGroupWidget_->begin();
+	}
+
+	X_ASSERT_UNREACHABLE();
+	return AssetProperty::ConstIterator();
 }
 
 AssetProperty::ConstIterator AssetProperty::end(void) const
 {
-	return children_.cend();
+	if (type_ == PropertyType::GROUPBOX) {
+		return pGroupWidget_->end();
+	}
+
+	X_ASSERT_UNREACHABLE();
+	return AssetProperty::ConstIterator();
 }
 
 
@@ -628,6 +599,8 @@ AssetProps::AssetProps() :
 	pCur_(nullptr),
 	refCount_(1)
 {
+	root_.SetType(AssetProperty::PropertyType::GROUPBOX);
+
 }
 
 AssetProps::~AssetProps()
@@ -909,6 +882,7 @@ void AssetProps::BeginGroup(const std::string& groupName)
 	if (tokens.empty()) {
 		return;
 	}
+
 
 	pCur_ = &root_;
 

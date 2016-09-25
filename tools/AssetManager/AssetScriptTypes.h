@@ -77,7 +77,7 @@ public:
 	void addRef(void);
 	void release(void);
 	void clear(void);
-	void setVisible(bool vis);
+	void show(bool vis);
 	void enable(bool val);
 
 	void SetKey(const std::string& key);
@@ -139,8 +139,6 @@ private:
 	PropertyType::Enum type_;
 
 //	// ordered to try group hot members.
-	ChildrenVec children_;
-
 	std::string key_; 
 	std::string title_;
 	std::string strValue_;

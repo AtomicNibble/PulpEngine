@@ -4,17 +4,34 @@
 
 X_NAMESPACE_BEGIN(assman)
 
+class AssetProperty;
+
 class AssetGroupWidget : public QToolButton
 {
 	Q_OBJECT
+
+	typedef QList<AssetProperty*> ChildrenVec;
+
+	typedef ChildrenVec::ConstIterator ConstIterator;
+	typedef ChildrenVec::Iterator Iterator;
 
 public:
 	AssetGroupWidget(QWidget *parent = nullptr);
 	~AssetGroupWidget();
 
+	void appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth);
+
+	void show(bool visible);
+
+	void AddChild(AssetProperty* pChild);
+	ConstIterator begin(void) const;
+	ConstIterator end(void) const;
+
 private slots:
 	void buttonClicked(bool);
 
+private:
+	ChildrenVec children_;
 };
 
 

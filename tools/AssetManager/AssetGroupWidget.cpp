@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "AssetGroupWidget.h"
 
+#include "AssetScriptTypes.h"
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -38,14 +39,49 @@ AssetGroupWidget::~AssetGroupWidget()
 {
 }
 
-
-void AssetGroupWidget::buttonClicked(bool )
+void AssetGroupWidget::appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth)
 {
+	for (auto& pChild : children_)
+	{
+		pChild->appendGui(this, pLayout, row, depth + 1);
+		row += 1;
+	}
+}
 
-	int goat = 0;
-	goat = 1;
+void AssetGroupWidget::show(bool visible)
+{
+	QToolButton::setVisible(visible);
+	QToolButton::setChecked(false);
 
-//	this->setVisible(false);
+	for (auto& pChild : children_)
+	{
+		pChild->show(visible);
+	}
+}
+
+void AssetGroupWidget::AddChild(AssetProperty* pChild)
+{
+	return children_.append(pChild);
+}
+
+AssetGroupWidget::ConstIterator AssetGroupWidget::begin(void) const
+{
+	return children_.begin();
+}
+
+AssetGroupWidget::ConstIterator AssetGroupWidget::end(void) const
+{
+	return children_.end();
+}
+
+
+
+void AssetGroupWidget::buttonClicked(bool checked)
+{
+	for (auto& pChild : children_)
+	{
+		pChild->show(!checked);
+	}
 }
 
 X_NAMESPACE_END
