@@ -69,6 +69,7 @@ public:
 
 	typedef std::array<int32_t, AssetType::ENUM_COUNT> AssetTypeCountsArr;
 	typedef core::Array<Mod> ModsArr;
+	typedef core::Array<AssetInfo> AssetInfoArr;
 
 public:
 	AssetDB();
@@ -95,7 +96,7 @@ public:
 
 	bool GetAssetTypeCounts(ModId modId, AssetTypeCountsArr& countsOut);
 	bool GetAssetTypeCount(ModId modId, AssetType::Enum type, int32_t& countOut);
-	bool GetAssetList(ModId modId, AssetType::Enum type, core::Array<AssetInfo>& assetsOut);
+	bool GetAssetList(ModId modId, AssetType::Enum type, AssetInfoArr& assetsOut);
 
 public:
 	bool GetModsList(ModsArr& arrOut);

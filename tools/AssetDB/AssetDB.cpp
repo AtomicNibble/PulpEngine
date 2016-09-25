@@ -481,7 +481,7 @@ bool AssetDB::GetAssetTypeCount(ModId modId, AssetType::Enum type, int32_t& coun
 }
 
 
-bool AssetDB::GetAssetList(ModId modId, AssetType::Enum type, core::Array<AssetInfo>& assetsOut)
+bool AssetDB::GetAssetList(ModId modId, AssetType::Enum type, AssetInfoArr& assetsOut)
 {
 	int32_t count;
 	if (!GetAssetTypeCount(modId, type, count)) {
