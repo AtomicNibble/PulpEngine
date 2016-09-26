@@ -25,6 +25,14 @@ AssetProperties::~AssetProperties()
 }
 
 
+void AssetProperties::setWidget(QWidget* widget)
+{
+	if (AssetPropertyEditorWidget* wid = qobject_cast<AssetPropertyEditorWidget*>(widget))
+	{
+		pWidget_ = wid;
+	}
+}
+
 bool AssetProperties::isModified(void) const
 {
 	return false;
@@ -35,6 +43,47 @@ bool AssetProperties::isSaveAsAllowed(void) const
 	return false;
 }
 
+bool AssetProperties::loadProps(QString& errorString, const QString& assetName, assetDb::AssetType::Enum type)
+{
+	// we want to load the args from the db.
+	X_UNUSED(assetName);
+	auto narrowName = assetName.toLocal8Bit();
+	core::string name(narrowName.data());
+
+	int32_t assetId;
+	if (!db_.AssetExsists(type, name, &assetId)) {
+		errorString = "Asset `" + assetName + "` does not exsist";
+		return false;
+	}
+
+	core::string args;
+	if (!db_.GetArgsForAsset(assetId, args)) {
+		errorString = "Failed to get asset '" + assetName + "' props";
+		return false;
+	}
+
+	props_.setAssetType(type);
+	if (!props_.parseArgs(args)) {
+		errorString = "Error parsing asset '" + assetName + "' props";
+		return false;
+	}
+
+	if (!pPropScriptMan_->runScriptForProps(props_, assetDb::AssetType::IMG)) {
+		errorString = "Error running property script for asset '" + assetName + "'";
+		return false;
+	}
+
+	QWidget* pCon = new QWidget();
+	QGridLayout* pLayout = new QGridLayout();
+
+	props_.appendGui(pLayout);
+
+	pCon->setLayout(pLayout);
+	pWidget_->setWidget(pCon);	
+
+
+	return true;
+}
 
 AssetPropertyEditorWidget* AssetProperties::getEditor(void)
 {
@@ -87,7 +136,13 @@ bool AssetPropertyEditorWidget::open(QString* pErrorString, const QString& fileN
 
 	AssetProperties* pProbs = assetProps_.data();
 
+	// loads the props
+	pProbs->setType(type);
 	pProbs->setDisplayName(fileName);
+	if (!pProbs->loadProps(*pErrorString, fileName, type)) {
+		return false;
+	}
+
 	return true;
 }
 

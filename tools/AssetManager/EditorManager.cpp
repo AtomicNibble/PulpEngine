@@ -465,11 +465,11 @@ QList<IEditor*> EditorManager::openEditorsList(void)
 
 
 
-IEditor *EditorManager::openEditor(const QString &fileName, const Id &editorId,
+IEditor *EditorManager::openEditor(const QString &fileName, assetDb::AssetType::Enum type, const Id &editorId,
 	OpenEditorFlags flags, bool *newEditor)
 {
 	return pInstance_->openEditor(pInstance_->currentEditorView(),
-		fileName, editorId, flags, newEditor);
+		fileName, type, editorId, flags, newEditor);
 }
 
 
@@ -599,7 +599,7 @@ int32_t EditorManager::autoSaveInterval(void)
 }
 
 
-IEditor *EditorManager::openEditor(EditorView* pView, const QString& fileName,
+IEditor *EditorManager::openEditor(EditorView* pView, const QString& fileName, assetDb::AssetType::Enum type,
 	const Id &editorId, OpenEditorFlags flags, bool* pNewEditor)
 {
 	if (debugLogging) {
@@ -636,7 +636,7 @@ IEditor *EditorManager::openEditor(EditorView* pView, const QString& fileName,
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	{
 		QString errorString;
-		if (!pEditor->open(&errorString, fn))
+		if (!pEditor->open(&errorString, fn, type))
 		{
 			QApplication::restoreOverrideCursor();
 			QMessageBox::critical(ICore::mainWindow(), tr("File Error"), errorString);
@@ -1261,7 +1261,7 @@ void EditorManager::activateEditorForEntry(EditorView *view, AssetEntryModel::En
 		return;
 	}
 
-	if (!openEditor(view, entry->fileName(), entry->id(), flags)) {
+	if (!openEditor(view, entry->assetName(), entry->type(), entry->id(), flags)) {
 		d->pAssetEntryModel_->removeEntry(entry);
 	}
 }
@@ -1355,11 +1355,7 @@ bool EditorManager::saveAssetEntry(IAssetEntry* pAssetEntryParam)
 
 //	pAssetEntry->checkPermissions();
 
-	const QString& fileName = pAssetEntry->name();
-
-	if (fileName.isEmpty()) {
-		return saveAssetEntryAs(pAssetEntry);
-	}
+//	const QString& fileName = pAssetEntry->name();
 
 	bool success = false;
 	bool isReadOnly;
@@ -1378,7 +1374,7 @@ bool EditorManager::saveAssetEntry(IAssetEntry* pAssetEntryParam)
 		document->checkPermissions();
 
 		success = AssetEntryManager::saveDocument(document);
-		*/
+		*/ 
 	}
 
 	if (success) {
@@ -1389,43 +1385,6 @@ bool EditorManager::saveAssetEntry(IAssetEntry* pAssetEntryParam)
 }
 
 
-bool EditorManager::saveAssetEntryAs(IAssetEntry* pAssetEntryParam)
-{
-	IAssetEntry* pAssetEntry = pAssetEntryParam;
-	if (!pAssetEntry && currentAssetEntry()) {
-		pAssetEntry = currentAssetEntry();
-	}
-	if (!pAssetEntry) {
-		return false;
-	}
-
-	const QString filter; // = MimeDatabase::allFiltersString();
-	QString selectedFilter; // = MimeDatabase::findByFile(QFileInfo(document->filePath())).filterString();
-	const QString &fileName = AssetEntryManager::getSaveAsFileName(pAssetEntry, filter, &selectedFilter);
-
-	if (fileName.isEmpty()) {
-		return false;
-	}
-
-	if (fileName != pAssetEntry->name()) {
-		// close existing editors for the new file name
-		IAssetEntry* pOtherAssetEntry = d->pAssetEntryModel_->assetEntryForFileName(fileName);
-		if (pOtherAssetEntry) {
-			closeAssetEntrys(QList<IAssetEntry *>() << pOtherAssetEntry, false);
-		}
-	}
-
-	const bool success = AssetEntryManager::saveAssetEntry(pAssetEntry, fileName);
-//	pAssetEntry->checkPermissions();
-
-
-	if (success) {
-		addAssetEntryToRecentFiles(pAssetEntry);
-	}
-
-	updateActions();
-	return success;
-}
 
 /* Adds the file name to the recent files if there is at least one non-temporary editor for it */
 void EditorManager::addAssetEntryToRecentFiles(IAssetEntry* pAssetEntry)

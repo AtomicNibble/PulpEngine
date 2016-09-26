@@ -27,10 +27,12 @@ public:
 	AssetProperties(assetDb::AssetDB& db, AssetPropsScriptManager* pPropScriptMan, AssetPropertyEditorWidget* widget);
 	virtual ~AssetProperties();
 
+	void setWidget(QWidget* widget);
 
 	bool isModified(void) const X_OVERRIDE;
 	bool isSaveAsAllowed(void) const X_OVERRIDE;
 
+	bool loadProps(QString& errorString, const QString& fileName, assetDb::AssetType::Enum type);
 
 
 	const assman::AssetProps& props(void) const;

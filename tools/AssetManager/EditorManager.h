@@ -41,7 +41,7 @@ public:
 	static QList<IEditor*> openEditorsList(void);
 	static QList<EditorView*> visibleViews(void);
 
-	static IEditor* openEditor(const QString& fileName, const Id& editorId = Id(),
+	static IEditor* openEditor(const QString& fileName, assetDb::AssetType::Enum type, const Id& editorId = Id(),
 		OpenEditorFlags flags = 0, bool* pNewEditor = nullptr);
 
 
@@ -103,7 +103,6 @@ public slots:
 	static bool closeAllEditors(bool askAboutModifiedEditors = true);
 
 	static bool saveAssetEntry(IAssetEntry* pAssetEntry = nullptr);
-	static bool saveAssetEntryAs(IAssetEntry* pAssetEntry = nullptr);
 
 
 private slots:
@@ -158,7 +157,7 @@ private:
 	static void addEditor(IEditor* pEditor);
 	static void removeEditor(IEditor* pEditor);
 
-	static IEditor* openEditor(EditorView* pView, const QString& fileName,
+	static IEditor* openEditor(EditorView* pView, const QString& fileName, assetDb::AssetType::Enum type,
 		const Id& id = Id(), OpenEditorFlags flags = 0, bool *newEditor = nullptr);
 
 	static IEditor* placeEditor(EditorView* pView, IEditor* pEditor);
