@@ -94,7 +94,6 @@ namespace
 
 		// context actions
 		QAction* saveCurrentEditorContextAction_;
-		QAction* saveAsCurrentEditorContextAction_;
 		QAction* closeCurrentEditorContextAction_;
 		QAction* closeAllEditorsContextAction_;
 		QAction* closeOtherEditorsContextAction_;
@@ -142,7 +141,6 @@ namespace
 		closeOtherEditorsAction_(new QAction(EditorManager::tr("Close All But This"), parent)),
 
 		saveCurrentEditorContextAction_(new QAction(QIcon(":/misc/img/Savea.png"), EditorManager::tr("&Save"), parent)),
-		saveAsCurrentEditorContextAction_(new QAction(QIcon(":/misc/img/Save.png"), EditorManager::tr("Save &As..."), parent)),
 		closeCurrentEditorContextAction_(new QAction(QIcon(":/misc/img/quit.png"), EditorManager::tr("Close"), parent)),
 		closeAllEditorsContextAction_(new QAction(EditorManager::tr("Close All Documents"), parent)),
 		closeOtherEditorsContextAction_(new QAction(EditorManager::tr("Close All But This"), parent)),
@@ -247,7 +245,6 @@ EditorManager::EditorManager(QWidget *parent) :
 
 	//Save XXX Context Actions
 	connect(d->saveCurrentEditorContextAction_, SIGNAL(triggered()), this, SLOT(saveDocumentFromContextMenu()));
-	connect(d->saveAsCurrentEditorContextAction_, SIGNAL(triggered()), this, SLOT(saveDocumentAsFromContextMenu()));
 
 	// Close XXX Context Actions
 	connect(d->closeAllEditorsContextAction_, SIGNAL(triggered()), this, SLOT(closeAllEditors()));
@@ -1631,7 +1628,7 @@ void EditorManager::updateActions(void)
 	if (curDocument) {
 		quotedName = QLatin1Char('"') + curDocument->displayName() + QLatin1Char('"');
 	}
-	setupSaveActions(curDocument, d->saveAction_, d->saveAsAction_, 0);
+	setupSaveActions(curDocument, d->saveAction_, nullptr);
 
 
 	d->closeCurrentEditorAction_->setEnabled(curDocument);
@@ -1659,14 +1656,13 @@ void EditorManager::setCloseSplitEnabled(SplitterOrView *splitterOrView, bool en
 }
 
 
-void EditorManager::setupSaveActions(IAssetEntry* pAssetEntry, QAction *saveAction, QAction *saveAsAction, QAction *revertToSavedAction)
+void EditorManager::setupSaveActions(IAssetEntry* pAssetEntry, QAction *saveAction, QAction *revertToSavedAction)
 {
-	if (debugLogging) {
-		qDebug() << Q_FUNC_INFO;
-	}
+//	if (debugLogging) {
+//		qDebug() << Q_FUNC_INFO;
+//	}
 
 	saveAction->setEnabled(pAssetEntry != nullptr && pAssetEntry->isModified());
-	saveAsAction->setEnabled(pAssetEntry != nullptr && pAssetEntry->isSaveAsAllowed());
 	if (revertToSavedAction) {
 		revertToSavedAction->setEnabled(pAssetEntry != nullptr && !pAssetEntry->name().isEmpty());
 	}
@@ -1677,7 +1673,6 @@ void EditorManager::setupSaveActions(IAssetEntry* pAssetEntry, QAction *saveActi
 	if (!assetEntryName.isEmpty()) {
 		quotedName = QLatin1Char('"') + assetEntryName + QLatin1Char('"');
 		saveAction->setText(tr("&Save %1").arg(quotedName));
-		saveAsAction->setText(tr("Save %1 As...").arg(quotedName));
 	}
 }
 
@@ -1698,18 +1693,15 @@ void EditorManager::addSaveAndCloseEditorActions(QMenu *contextMenu, IEditor *ed
 	d->contextMenuEntry_ = editor;
 
 	assignAction(d->saveCurrentEditorContextAction_, ActionManager::command(Constants::SAVE)->action());
-	assignAction(d->saveAsCurrentEditorContextAction_, ActionManager::command(Constants::SAVEAS)->action());
 
 	IAssetEntry* pAssetEntry = editor ? editor->assetEntry() : nullptr;
 
 	setupSaveActions(pAssetEntry,
 		d->saveCurrentEditorContextAction_,
-		d->saveAsCurrentEditorContextAction_,
-		0
+		nullptr
 	);
 
 	contextMenu->addAction(d->saveCurrentEditorContextAction_);
-	contextMenu->addAction(d->saveAsCurrentEditorContextAction_);
 	contextMenu->addAction(ActionManager::command(Constants::SAVEALL)->action());
 
 	contextMenu->addSeparator();
@@ -1796,14 +1788,6 @@ void EditorManager::saveAssetEntryFromContextMenu(void)
 	IAssetEntry* pAssetEntry = d->contextMenuEntry_ ? d->contextMenuEntry_->assetEntry() : nullptr;
 	if (pAssetEntry) {
 		saveAssetEntry(pAssetEntry);
-	}
-}
-
-void EditorManager::saveAssetEntryAsFromContextMenu(void)
-{
-	IAssetEntry* pAssetEntry = d->contextMenuEntry_ ? d->contextMenuEntry_->assetEntry() : nullptr;
-	if (pAssetEntry) {
-		saveAssetEntryAs(pAssetEntry);
 	}
 }
 

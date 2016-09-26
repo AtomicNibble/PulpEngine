@@ -119,7 +119,6 @@ private slots:
 
 	// Context Menu
 	static void saveAssetEntryFromContextMenu(void);
-	static void saveAssetEntryAsFromContextMenu(void);
 
 	static void closeEditorFromContextMenu(void);
 	static void closeOtherEditorsFromContextMenu(void);
@@ -183,7 +182,7 @@ private:
 	static void addAssetEntryToRecentFiles(IAssetEntry* pAssetEntry);
 	static void updateAutoSave(void);
 	static void setCloseSplitEnabled(SplitterOrView* splitterOrView, bool enable);
-	static void setupSaveActions(IAssetEntry* pAssetEntry, QAction* saveAction, QAction* saveAsAction, QAction* revertToSavedAction);
+	static void setupSaveActions(IAssetEntry* pAssetEntry, QAction* saveAction, QAction* revertToSavedAction);
 
 	static SplitterOrView* undockEditor(IEditor* editor, QPoint& pos);
 	static void splitDragEndWindow(BaseWindow*, SplitterOrView*);
