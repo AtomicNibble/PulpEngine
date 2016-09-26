@@ -475,17 +475,6 @@ IEditor *EditorManager::openEditor(const QString &fileName, const Id &editorId,
 		fileName, editorId, flags, newEditor);
 }
 
-IEditor *EditorManager::openEditorAt(const QString &fileName, int32_t line, int32_t column,
-	const Id &editorId, OpenEditorFlags flags, bool *newEditor)
-{
-	IEditor* pEditor = EditorManager::openEditor(fileName, editorId, flags, newEditor);
-
-	if (pEditor && line != -1) {
-		pEditor->gotoLine(line, column);
-	}
-	return pEditor;
-}
-
 
 void EditorManager::addEditor(IEditor *editor)
 {

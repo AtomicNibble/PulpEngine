@@ -44,9 +44,6 @@ public:
 	static IEditor* openEditor(const QString& fileName, const Id& editorId = Id(),
 		OpenEditorFlags flags = 0, bool* pNewEditor = nullptr);
 
-	static IEditor* openEditorAt(const QString& fileName, int line, int column = 0,
-		const Id& editorId = Id(), OpenEditorFlags flags = 0, bool* pNewEditor = nullptr);
-
 
 
 	static void activateEditor(IEditor* pEditor, OpenEditorFlags flags = 0);
