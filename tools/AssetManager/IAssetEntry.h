@@ -18,7 +18,7 @@ public:
 
 	QString name(void) const;
 	QString displayName(void) const;
-	void setDisplayName(const QString& name);
+	void setAssetName(const QString& name);
 	assetDb::AssetType::Enum type(void) const;
 	void setType(assetDb::AssetType::Enum type);
 
@@ -40,7 +40,7 @@ signals:
 
 
 private:
-	QString displayName_;
+	QString assetName_;
 	assetDb::AssetType::Enum type_;
 	bool temporary_;
 

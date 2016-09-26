@@ -20,18 +20,18 @@ IAssetEntry::~IAssetEntry()
 
 QString IAssetEntry::name(void) const
 {
-	return displayName_;
+	return assetName_;
 }
 
 QString IAssetEntry::displayName(void) const
 {
-	return displayName_;
+	return assetName_;
 }
 
 
-void IAssetEntry::setDisplayName(const QString& name)
+void IAssetEntry::setAssetName(const QString& name)
 {
-	displayName_ = name;
+	assetName_ = name;
 }
 
 assetDb::AssetType::Enum IAssetEntry::type(void) const

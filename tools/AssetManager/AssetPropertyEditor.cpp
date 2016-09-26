@@ -138,7 +138,7 @@ bool AssetPropertyEditorWidget::open(QString* pErrorString, const QString& fileN
 
 	// loads the props
 	pProbs->setType(type);
-	pProbs->setDisplayName(fileName);
+	pProbs->setAssetName(fileName);
 	if (!pProbs->loadProps(*pErrorString, fileName, type)) {
 		return false;
 	}
