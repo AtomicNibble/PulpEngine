@@ -142,5 +142,15 @@ Id AssetPropertyEditor::id(void) const
 	return Id(Constants::ASSETPROP_EDITOR_ID);
 }
 
+void AssetPropertyEditor::modificationChanged(bool modified)
+{
+	QString title = assetEntry()->displayName();
+
+	if (modified) {
+		title += "*";
+	}
+
+	emit titleChanged(title);
+}
 
 X_NAMESPACE_END

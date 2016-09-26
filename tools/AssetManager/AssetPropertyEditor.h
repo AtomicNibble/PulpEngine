@@ -87,6 +87,9 @@ public:
 	IAssetEntry* assetEntry(void) X_OVERRIDE;
 	Id id(void) const X_OVERRIDE;
 
+private slots:
+	void modificationChanged(bool);
+
 private:
 	AssetPropertyEditorWidget* pEditorWidget_;
 };
