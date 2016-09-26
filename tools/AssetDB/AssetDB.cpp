@@ -1114,6 +1114,9 @@ bool AssetDB::GetArgsForAsset(int32_t assetId, core::string& argsOut)
 	}
 	else {
 		argsOut.clear();
+
+		// should we return valid json?
+		argsOut = "{}";
 	}
 	return true;
 }
