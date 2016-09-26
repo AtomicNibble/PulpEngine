@@ -571,11 +571,6 @@ EditorView* EditorManager::currentEditorView(void)
 }
 
 
-bool EditorManager::isAutoSaveFile(const QString &fileName)
-{
-	return fileName.endsWith(QLatin1String(".bak"));
-}
-
 void EditorManager::setAutoSaveEnabled(bool enabled)
 {
 	d->autoSaveEnabled_ = enabled;
@@ -655,71 +650,6 @@ IEditor *EditorManager::openEditor(EditorView* pView, const QString& fileName, a
 	QApplication::restoreOverrideCursor();
 
 	return pResult;
-
-#else
-	QString fn = fileName;
-	QFileInfo fi(fn);
-	int32_t lineNumber = -1;
-
-	if (!fi.exists())
-	{
-		lineNumber = extractLineNumber(&fn);
-		if (lineNumber != -1)
-			fi.setFile(fn);
-	}
-
-	if (fn.isEmpty()) {
-		return 0;
-	}
-
-	if (newEditor) {
-		*newEditor = false;
-	}
-
-
-	QString realFn = autoSaveName(fn);
-	QFileInfo rfi(realFn);
-	if (!fi.exists() || !rfi.exists() || fi.lastModified() >= rfi.lastModified()) {
-		QFile::remove(realFn);
-		realFn = fn;
-	}
-
-	IEditor *editor = createEditor(editorId, fn);
-	// If we could not open the file in the requested editor, fall
-	// back to the default editor:
-	if (!editor)
-	{
-		Q_ASSERT(false);
-		return 0;
-	}
-
-	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-	QString errorString;
-	if (!editor->open(&errorString, fn, realFn))
-	{
-		QApplication::restoreOverrideCursor();
-		QMessageBox::critical(ICore::mainWindow(), tr("File Error"), errorString);
-		delete editor;
-		return 0;
-	}
-
-	addEditor(editor);
-
-	if (newEditor) {
-		*newEditor = true;
-	}
-
-	IEditor *result = activateEditor(view, editor, flags);
-	//     if (editor == result)
-	//       restoreEditorState(editor);
-
-	if (flags & EditorManager::CanContainLineNumber)
-		editor->gotoLine(lineNumber, -1);
-
-	QApplication::restoreOverrideCursor();
-
-	return result;
-#endif
 }
 
 
@@ -878,32 +808,13 @@ void EditorManager::setCurrentView(EditorView *view)
 
 
 
-EditorManager::EditorFactoryList
-EditorManager::editorFactories(const QMimeType& mimeType, bool bestMatchOnly)
-{
-	X_UNUSED(mimeType);
-	X_UNUSED(bestMatchOnly);
-
-
-	EditorFactoryList rc;
-//	const EditorFactoryList& allFactories = d->factories_;
-//	mimeTypeFactoryRecursion(mimeType, allFactories, bestMatchOnly, &rc);
-	if (debugLogging) {
-		qDebug() << Q_FUNC_INFO << mimeType.name() << " returns " << rc;
-	}
-	return rc;
-}
-
-
 IEditor* EditorManager::createEditor(const Id& editorId, const QString& fileName)
 {
 	if (debugLogging) {
 		qDebug() << Q_FUNC_INFO << editorId.name() << fileName;
 	}
 
-#if 1
 	EditorFactoryList factories;
-
 
 	if (!editorId.isValid()) {
 		X_ERROR("Editor", "Can't create editor for invalid editorId");
@@ -924,54 +835,10 @@ IEditor* EditorManager::createEditor(const Id& editorId, const QString& fileName
 	IEditor* pEditor = factories.front()->createEditor();
 
 	if (pEditor) {
-		emit pInstance_->editorCreated(pEditor, fileName);
+		emit pInstance_->editorCreated(pEditor, assetName);
 	}
 
 	return pEditor;
-
-#else
-
-	EditorFactoryList factories;
-
-	if (!editorId.isValid())
-	{
-		//    const QFileInfo fileInfo(fileName);
-		// Find by mime type
-		QMimeDatabase db;
-		QMimeType mimeType = db.mimeTypeForFile(fileName);
-
-		if (!mimeType.isValid())
-		{
-			qWarning("%s unable to determine mime type of %s/%s. Falling back to text/plain",
-				Q_FUNC_INFO, fileName.toUtf8().constData(), editorId.name().constData());
-			return nullptr;
-		}
-
-		factories = editorFactories(mimeType, true);
-	}
-	else
-	{
-		// Find by editor id
-		if (IEditorFactory *factory = findById<IEditorFactory>(editorId)) {
-			factories.push_back(factory);
-		}
-	}
-	if (factories.empty()) 
-	{
-		qWarning("%s: unable to find an editor factory for the file '%s', editor Id '%s'.",
-			Q_FUNC_INFO, fileName.toUtf8().constData(), editorId.name().constData());
-		return nullptr;
-	}
-
-	IEditor* pEditor = factories.front()->createEditor();
-	//    if (editor)
-	//        connect(editor->widget(), SIGNAL(textChanged()), pInstance_, SLOT(handleDocumentStateChange()));
-	if (pEditor) {
-		emit pInstance_->editorCreated(pEditor, fileName);
-	}
-
-	return pEditor;
-#endif
 }
 
 

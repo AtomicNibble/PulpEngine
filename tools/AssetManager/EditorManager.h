@@ -61,7 +61,6 @@ public:
 	static bool closeEditors(const QList<IEditor *>& editorsToClose, bool askAboutModifiedEditors = true);
 	static void closeEditor(IEditor* pEditor, bool askAboutModifiedEditors = true);
 
-	static EditorFactoryList editorFactories(const QMimeType& mimeType, bool bestMatchOnly = true);
 
 	static qint64 maxTextFileSize(void);
 
@@ -85,7 +84,6 @@ public:
 	static bool autoSaveEnabled(void);
 	static void setAutoSaveInterval(int interval);
 	static int autoSaveInterval(void);
-	static bool isAutoSaveFile(const QString& fileName);
 
 	static void floatDockCheck(SplitterOrView* pSplitter, const QPoint& pos);
 
