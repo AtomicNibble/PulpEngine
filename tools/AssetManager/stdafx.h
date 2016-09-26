@@ -91,6 +91,7 @@ X_LINK_LIB("angelscript");
 #include <QClipboard>
 
 #include <array>
+#include <algorithm>
 
 #include "Constants.h"
 #include "logging.h"
