@@ -199,8 +199,8 @@ public:
 	void clear(void);
 	void setAssetType(assetDb::AssetType::Enum type);
 
-	bool parseArgs(const std::string& jsonStr);
-	bool extractArgs(std::string& jsonStrOut) const;
+	bool parseArgs(const core::string& jsonStr);
+	bool extractArgs(core::string& jsonStrOut) const;
 	bool appendGui(QGridLayout* pLayout);
 
 

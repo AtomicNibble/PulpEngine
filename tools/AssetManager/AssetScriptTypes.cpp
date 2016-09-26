@@ -643,8 +643,10 @@ void AssetProps::setAssetType(assetDb::AssetType::Enum type)
 }
 
 
-bool AssetProps::parseArgs(const std::string& jsonStr)
+bool AssetProps::parseArgs(const core::string& jsonStr)
 {
+	X_ASSERT(jsonStr.isNotEmpty(), "Args string should not be empty")(jsonStr.isNotEmpty());
+
 	core::json::Document d;
 	d.Parse(jsonStr.c_str());
 
@@ -700,7 +702,7 @@ bool AssetProps::parseArgs(const std::string& jsonStr)
 	return true;
 }
 
-bool AssetProps::extractArgs(std::string& jsonStrOut) const
+bool AssetProps::extractArgs(core::string& jsonStrOut) const
 {
 	core::json::StringBuffer s;
 	core::json::Writer<core::json::StringBuffer> writer(s);
@@ -749,7 +751,7 @@ bool AssetProps::extractArgs(std::string& jsonStrOut) const
 
 	writer.EndObject();
 
-	jsonStrOut = s.GetString();
+	jsonStrOut = core::string(s.GetString(), s.GetSize());
 	return true;
 }
 
