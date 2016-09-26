@@ -16,7 +16,7 @@ public:
 	IEditor(QObject* pParent = nullptr) : IContext(pParent) {};
 	virtual ~IEditor() = default;
 
-	virtual bool open(QString* pErrorString, const QString& fileName) X_ABSTRACT;
+	virtual bool open(QString* pErrorString, const QString& assetName, assetDb::AssetType::Enum type) X_ABSTRACT;
 	virtual IAssetEntry* assetEntry(void) X_ABSTRACT;
 	virtual Id id(void) const X_ABSTRACT;;
 
