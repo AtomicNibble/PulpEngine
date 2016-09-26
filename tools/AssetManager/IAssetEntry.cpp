@@ -28,9 +28,20 @@ QString IAssetEntry::displayName(void) const
 	return displayName_;
 }
 
+
 void IAssetEntry::setDisplayName(const QString& name)
 {
 	displayName_ = name;
+}
+
+assetDb::AssetType::Enum IAssetEntry::type(void) const
+{
+	return type_;
+}
+
+void IAssetEntry::setType(assetDb::AssetType::Enum type)
+{
+	type_ = type;
 }
 
 

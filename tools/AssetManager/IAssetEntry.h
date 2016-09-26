@@ -19,6 +19,9 @@ public:
 	QString name(void) const;
 	QString displayName(void) const;
 	void setDisplayName(const QString& name);
+	assetDb::AssetType::Enum type(void) const;
+	void setType(assetDb::AssetType::Enum type);
+
 
 	virtual bool isFileReadOnly(void) const;
 	bool isTemporary(void) const;
@@ -38,6 +41,7 @@ signals:
 
 private:
 	QString displayName_;
+	assetDb::AssetType::Enum type_;
 	bool temporary_;
 
 };
