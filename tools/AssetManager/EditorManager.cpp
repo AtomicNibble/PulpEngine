@@ -437,11 +437,11 @@ QList<IEditor*> EditorManager::openEditorsList(void)
 
 
 
-IEditor *EditorManager::openEditor(const QString &fileName, assetDb::AssetType::Enum type, const Id &editorId,
+IEditor *EditorManager::openEditor(const QString &assetName, assetDb::AssetType::Enum type, const Id &editorId,
 	OpenEditorFlags flags, bool *newEditor)
 {
 	return pInstance_->openEditor(pInstance_->currentEditorView(),
-		fileName, type, editorId, flags, newEditor);
+		assetName, type, editorId, flags, newEditor);
 }
 
 
@@ -566,21 +566,14 @@ int32_t EditorManager::autoSaveInterval(void)
 }
 
 
-IEditor *EditorManager::openEditor(EditorView* pView, const QString& fileName, assetDb::AssetType::Enum type,
+IEditor *EditorManager::openEditor(EditorView* pView, const QString& assetName, assetDb::AssetType::Enum type,
 	const Id &editorId, OpenEditorFlags flags, bool* pNewEditor)
 {
 	if (debugLogging) {
-		qDebug() << Q_FUNC_INFO << fileName << editorId.name();
+		qDebug() << Q_FUNC_INFO << assetName << editorId.name();
 	}
 
-#if 1
-	X_UNUSED(pView);
-	X_UNUSED(fileName);
-	X_UNUSED(editorId);
-	X_UNUSED(flags);
-	X_UNUSED(pNewEditor);
-
-	QString fn = fileName;
+	const QString fn = assetName;
 
 	if (fn.isEmpty()) {
 		X_WARNING("Editor", "Can't open editor for empty name");
@@ -779,11 +772,10 @@ void EditorManager::setCurrentView(EditorView *view)
 }
 
 
-
-IEditor* EditorManager::createEditor(const Id& editorId, const QString& fileName)
+IEditor* EditorManager::createEditor(const Id& editorId, const QString& assetName)
 {
 	if (debugLogging) {
-		qDebug() << Q_FUNC_INFO << editorId.name() << fileName;
+		qDebug() << Q_FUNC_INFO << editorId.name() << assetName;
 	}
 
 	EditorFactoryList factories;
@@ -800,7 +792,7 @@ IEditor* EditorManager::createEditor(const Id& editorId, const QString& fileName
 	if (factories.empty())
 	{
 		qWarning("%s: unable to find an editor factory for the file '%s', editor Id '%s'.",
-			Q_FUNC_INFO, fileName.toUtf8().constData(), editorId.name().constData());
+			Q_FUNC_INFO, assetName.toUtf8().constData(), editorId.name().constData());
 		return nullptr;
 	}
 
@@ -1297,9 +1289,9 @@ void EditorManager::updateWindowTitle(void)
 			windowTitle.prepend(assetEntryName + vcsTopic + dashSep);
 		}
 
-		QString fileName = pAssetEntry->name();
-		if (!fileName.isEmpty()) {
-			ICore::mainWindow()->setWindowFilePath(fileName);
+		QString assetName = pAssetEntry->name();
+		if (!assetName.isEmpty()) {
+			ICore::mainWindow()->setWindowFilePath(assetName);
 		}
 	}
 	else {
