@@ -1,11 +1,20 @@
 #include "stdafx.h"
 #include "AssetPropertyEditor.h"
 
+#include "AssetScript.h"
+#include "AssetScriptTypes.h"
+
+
+#include <../AssetDB/AssetDB.h>
+
 X_NAMESPACE_BEGIN(assman)
 
 
-AssetProperties::AssetProperties(AssetPropertyEditorWidget* widget) :
-	IAssetEntry(widget)
+AssetProperties::AssetProperties(assetDb::AssetDB& db, AssetPropsScriptManager* pPropScriptMan, AssetPropertyEditorWidget* widget) :
+	IAssetEntry(widget),
+	db_(db),
+	pPropScriptMan_(pPropScriptMan),
+	pWidget_(widget)
 {
 
 }
@@ -26,19 +35,29 @@ bool AssetProperties::isSaveAsAllowed(void) const
 	return false;
 }
 
+
+AssetPropertyEditorWidget* AssetProperties::getEditor(void)
+{
+	return pWidget_;
+}
+
 // ----------------------------------------------------------------
 
 
-AssetPropertyEditorWidget::AssetPropertyEditorWidget(QWidget *parent) :
+
+AssetPropertyEditorWidget::AssetPropertyEditorWidget(assetDb::AssetDB& db, AssetPropsScriptManager* pPropScriptMan, QWidget *parent) :
 	QScrollArea(parent),
+	db_(db),
+	pPropScriptMan_(pPropScriptMan),
 	pEditor_(nullptr)
 {
-	assetProps_ = QSharedPointer<AssetProperties>(new AssetProperties(this));
-
+	assetProps_ = QSharedPointer<AssetProperties>(new AssetProperties(db, pPropScriptMan, this));
 }
 
-AssetPropertyEditorWidget::AssetPropertyEditorWidget(AssetProperties* pAssetEntry, QWidget *parent) :
+AssetPropertyEditorWidget::AssetPropertyEditorWidget(assetDb::AssetDB& db, AssetPropsScriptManager* pPropScriptMan, AssetProperties* pAssetEntry, QWidget *parent) :
 	QScrollArea(parent),
+	db_(db),
+	pPropScriptMan_(pPropScriptMan),
 	pEditor_(nullptr)
 {
 	assetProps_ = QSharedPointer<AssetProperties>(pAssetEntry);
@@ -46,6 +65,8 @@ AssetPropertyEditorWidget::AssetPropertyEditorWidget(AssetProperties* pAssetEntr
 }
 
 AssetPropertyEditorWidget::AssetPropertyEditorWidget(AssetPropertyEditorWidget* pOther) :
+	pPropScriptMan_(pOther->pPropScriptMan_),
+	db_(pOther->db_),
 	pEditor_(nullptr)
 {
 	assetProps_ = pOther->assetProps_;
@@ -58,10 +79,11 @@ AssetPropertyEditorWidget::~AssetPropertyEditorWidget()
 
 
 
-bool AssetPropertyEditorWidget::open(QString* pErrorString, const QString& fileName)
+bool AssetPropertyEditorWidget::open(QString* pErrorString, const QString& fileName, assetDb::AssetType::Enum type)
 {
 	X_UNUSED(pErrorString);
 	X_UNUSED(fileName);
+	X_UNUSED(type);
 
 	AssetProperties* pProbs = assetProps_.data();
 
@@ -105,9 +127,9 @@ AssetPropertyEditor::~AssetPropertyEditor()
 }
 
 
-bool AssetPropertyEditor::open(QString* pErrorString, const QString& fileName)
+bool AssetPropertyEditor::open(QString* pErrorString, const QString& fileName, assetDb::AssetType::Enum type)
 {
-	return pEditorWidget_->open(pErrorString, fileName);
+	return pEditorWidget_->open(pErrorString, fileName, type);
 }
 
 IAssetEntry* AssetPropertyEditor::assetEntry(void)

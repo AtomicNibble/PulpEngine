@@ -4,16 +4,27 @@
 #include "IEditor.h"
 #include "IAssetEntry.h"
 
+#include "AssetScriptTypes.h"
+
+
+
+X_NAMESPACE_DECLARE(assetDb,
+	class AssetDB;
+);
+
 X_NAMESPACE_BEGIN(assman)
 
 class AssetPropertyEditor;
 class AssetPropertyEditorWidget;
+class AssetPropsScriptManager;
 
 
 class AssetProperties : public IAssetEntry
 {
+	Q_OBJECT
+
 public:
-	AssetProperties(AssetPropertyEditorWidget* widget);
+	AssetProperties(assetDb::AssetDB& db, AssetPropsScriptManager* pPropScriptMan, AssetPropertyEditorWidget* widget);
 	virtual ~AssetProperties();
 
 
@@ -21,9 +32,20 @@ public:
 	bool isSaveAsAllowed(void) const X_OVERRIDE;
 
 
+
+	const assman::AssetProps& props(void) const;
+
+signals:
+	void contentsChanged(void);
+
 private:
+	AssetPropertyEditorWidget* getEditor(void);
 
-
+private:
+	assetDb::AssetDB& db_;
+	AssetPropsScriptManager* pPropScriptMan_;
+	AssetPropertyEditorWidget* pWidget_;
+	AssetProps props_;
 };
 
 
@@ -31,13 +53,13 @@ class AssetPropertyEditorWidget : public QScrollArea
 {
 	Q_OBJECT
 public:
-	AssetPropertyEditorWidget(QWidget *parent = nullptr);
-	AssetPropertyEditorWidget(AssetProperties* pAssetEntry, QWidget *parent = nullptr);
+	AssetPropertyEditorWidget(assetDb::AssetDB& db, AssetPropsScriptManager* pPropScriptMan, QWidget *parent = nullptr);
+	AssetPropertyEditorWidget(assetDb::AssetDB& db, AssetPropsScriptManager* pPropScriptMan, AssetProperties* pAssetEntry, QWidget *parent = nullptr);
 	AssetPropertyEditorWidget(AssetPropertyEditorWidget* pOther);
 	~AssetPropertyEditorWidget();
 
 
-	bool open(QString* pErrorString, const QString& fileName);
+	bool open(QString* pErrorString, const QString& data, assetDb::AssetType::Enum type);
 
 	AssetPropertyEditor* editor(void);
 	AssetProperties* assetProperties(void) const;
@@ -47,6 +69,8 @@ protected:
 
 
 private:
+	assetDb::AssetDB& db_;
+	AssetPropsScriptManager* pPropScriptMan_;
 	AssetPropertyEditor* pEditor_;
 	QSharedPointer<AssetProperties> assetProps_;
 };
@@ -59,7 +83,7 @@ public:
 	AssetPropertyEditor(AssetPropertyEditorWidget* editorWidget);
 	~AssetPropertyEditor();
 
-	bool open(QString* pErrorString, const QString& fileName) X_OVERRIDE;
+	bool open(QString* pErrorString, const QString& fileName, assetDb::AssetType::Enum type) X_OVERRIDE;
 	IAssetEntry* assetEntry(void) X_OVERRIDE;
 	Id id(void) const X_OVERRIDE;
 
