@@ -1,0 +1,97 @@
+#include "stdafx.h"
+#include "AssetGroupWidget.h"
+
+#include "AssetScriptTypes.h"
+
+X_NAMESPACE_BEGIN(assman)
+
+AssetGroupWidget::AssetGroupWidget(QWidget *parent)
+	: QToolButton(parent)
+{
+
+	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	setAutoRaise(true);
+	setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonTextBesideIcon);
+	setCheckable(true);
+
+	auto f = font();
+	f.setBold(true);
+	setFont(f);
+
+	{
+		QPixmap collapsePix(":/misc/img/collapse.png");
+		QPixmap expandPix(":/misc/img/expand.png");
+
+		QIcon icon;
+		icon.addPixmap(collapsePix, QIcon::Normal, QIcon::Off);
+		icon.addPixmap(expandPix, QIcon::Normal, QIcon::On);
+
+		setIcon(icon);
+		setIconSize(QSize(12, 12));
+	}
+
+
+	connect(this, SIGNAL(clicked(bool)), this, SLOT(buttonClicked(bool)));
+
+}
+
+AssetGroupWidget::~AssetGroupWidget()
+{
+}
+
+void AssetGroupWidget::appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth)
+{
+	for (auto& pChild : children_)
+	{
+		pChild->appendGui(this, pLayout, row, depth + 1);
+		row += 1;
+	}
+}
+
+void AssetGroupWidget::clear(void)
+{
+	for (auto& pChild : children_)
+	{
+		delete pChild;
+	}
+
+	children_.clear();
+}
+
+void AssetGroupWidget::show(bool visible)
+{
+	QToolButton::setVisible(visible);
+	QToolButton::setChecked(false);
+
+	for (auto& pChild : children_)
+	{
+		pChild->show(visible);
+	}
+}
+
+void AssetGroupWidget::AddChild(AssetProperty* pChild)
+{
+	return children_.append(pChild);
+}
+
+AssetGroupWidget::ConstIterator AssetGroupWidget::begin(void) const
+{
+	return children_.begin();
+}
+
+AssetGroupWidget::ConstIterator AssetGroupWidget::end(void) const
+{
+	return children_.end();
+}
+
+
+
+void AssetGroupWidget::buttonClicked(bool checked)
+{
+	for (auto& pChild : children_)
+	{
+		pChild->show(!checked);
+	}
+}
+
+X_NAMESPACE_END

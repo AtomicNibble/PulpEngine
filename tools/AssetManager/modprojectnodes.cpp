@@ -14,22 +14,31 @@ ModProjectNode::ModProjectNode(ModProject* pProject) :
     setIcon(QIcon(":/assetDb/img/Mod_Project_Node_32.png"));
 }
 
-
-bool ModProjectNode::canAddSubProject(const QString &proFilePath) const
+QList<AssetExplorer::ProjectAction> ModProjectNode::supportedActions(Node* pNode) const
 {
-    Q_UNUSED(proFilePath);
+	X_UNUSED(pNode);
+
+	return QList<AssetExplorer::ProjectAction>()
+		<< AssetExplorer::ProjectAction::AddNewFile
+		<< AssetExplorer::ProjectAction::EraseFile
+		<< AssetExplorer::ProjectAction::Rename;
+}
+
+bool ModProjectNode::canAddSubProject(const QString& projectName) const
+{
+    Q_UNUSED(projectName);
     return false;
 }
 
-bool ModProjectNode::addSubProjects(const QStringList &proFilePaths)
+bool ModProjectNode::addSubProjects(const QStringList& projectNames)
 {
-    Q_UNUSED(proFilePaths);
+    Q_UNUSED(projectNames);
     return false;
 }
 
-bool ModProjectNode::removeSubProjects(const QStringList &proFilePaths)
+bool ModProjectNode::removeSubProjects(const QStringList& projectNames)
 {
-    Q_UNUSED(proFilePaths);
+    Q_UNUSED(projectNames);
     return false;
 }
 
@@ -44,7 +53,7 @@ ModProject* ModProjectNode::getModProject(void)
 // -------------------------------------------------------------------
 
 
-ModVirtualFolderNode::ModVirtualFolderNode(const QString &name, int32_t priority, const QString& displayName,
+ModVirtualFolderNode::ModVirtualFolderNode(const QString& name, int32_t priority, const QString& displayName,
                               AssetType::Enum assType, int32_t numAssets) :
     VirtualFolderNode(name, priority),
     displayName_(displayName),
@@ -53,6 +62,17 @@ ModVirtualFolderNode::ModVirtualFolderNode(const QString &name, int32_t priority
 {
 
 }
+
+QList<AssetExplorer::ProjectAction> ModVirtualFolderNode::supportedActions(Node* pNode) const
+{
+	X_UNUSED(pNode);
+
+	return QList<AssetExplorer::ProjectAction>()
+		<< AssetExplorer::ProjectAction::AddNewFile
+		<< AssetExplorer::ProjectAction::EraseFile
+		<< AssetExplorer::ProjectAction::Rename;
+}
+
 
 QString ModVirtualFolderNode::displayName(void) const
 {

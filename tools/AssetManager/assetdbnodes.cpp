@@ -468,15 +468,14 @@ int32_t VirtualFolderNode::priority(void) const
 // ------------------------------------------------------------------
 
 
-ProjectNode::ProjectNode(const QString& projectFilePath)
-        : FolderNode(projectFilePath, NodeType::ProjectNodeType)
+ProjectNode::ProjectNode(const QString& projectName)
+        : FolderNode(projectName, NodeType::ProjectNodeType)
 {
     // project node "manages" itself
     setProjectNode(this);
-    setDisplayName(QFileInfo(projectFilePath).fileName());
+    setDisplayName(projectName);
 
     setObjectName("projectnode");
-
 }
 
 

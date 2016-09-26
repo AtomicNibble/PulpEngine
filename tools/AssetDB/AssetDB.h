@@ -30,16 +30,21 @@ class DLL_EXPORT AssetDB
 public:
 	struct Mod
 	{
+		X_INLINE Mod() = default;
+		X_INLINE Mod(int32_t modId, core::string, core::Path<char>& path);
+		X_INLINE Mod(int32_t modId, const char* pName, const char* pOutDir);
+
 		int32_t modId;
 		core::string name;
 		core::Path<char> outDir;
 	};
 
+	// add type?
 	struct AssetInfo
 	{
-		AssetInfo();
-		AssetInfo(int32_t id, int32_t parentId, const char* pName);
-		AssetInfo(int32_t id, int32_t parentId, const core::string& name);
+		X_INLINE AssetInfo();
+		X_INLINE AssetInfo(int32_t id, int32_t parentId, const char* pName);
+		X_INLINE AssetInfo(int32_t id, int32_t parentId, const core::string& name);
 
 		int32_t id;
 		int32_t parentId;
@@ -63,6 +68,9 @@ public:
 	);
 
 	typedef std::array<int32_t, AssetType::ENUM_COUNT> AssetTypeCountsArr;
+	typedef core::Array<Mod> ModsArr;
+	typedef core::Array<AssetInfo> AssetInfoArr;
+	typedef core::Array<int32_t> AssetIdArr;
 
 public:
 	AssetDB();
@@ -89,9 +97,10 @@ public:
 
 	bool GetAssetTypeCounts(ModId modId, AssetTypeCountsArr& countsOut);
 	bool GetAssetTypeCount(ModId modId, AssetType::Enum type, int32_t& countOut);
-	bool GetAssetList(ModId modId, AssetType::Enum type, core::Array<AssetInfo>& assetsOut);
+	bool GetAssetList(ModId modId, AssetType::Enum type, AssetInfoArr& assetsOut);
 
 public:
+	bool GetModsList(ModsArr& arrOut);
 	bool IterateMods(core::Delegate<bool(ModId id, const core::string& name, core::Path<char>& outDir)> func);
 	bool IterateAssets(core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
 	bool IterateAssets(ModId modId, core::Delegate<bool(AssetType::Enum, const core::string& name)> func);
@@ -105,6 +114,7 @@ public:
 	// AddAsset with grouped transation, trans is not just touched, just required to make sure you call it with one.
 	Result::Enum AddAsset(const sql::SqlLiteTransaction& trans, AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
 	Result::Enum AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
+	Result::Enum AddAsset(ModId modId, AssetType::Enum type, const core::string& name, int32_t* pId = nullptr);
 	Result::Enum DeleteAsset(AssetType::Enum type, const core::string& name);
 	Result::Enum RenameAsset(AssetType::Enum type, const core::string& name,
 		const core::string& newName);
@@ -112,17 +122,20 @@ public:
 	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, 
 		core::Array<uint8_t>& data, const core::string& argsOpt);
 
+	// if you want to get a assets id use this.
 	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pIdOut = nullptr, ModId* pModIdOut = nullptr);
 
 	bool GetArgsForAsset(int32_t assetId, core::string& argsOut);
-	bool GetArgsHashForAsset(int32_t idassetId, uint32_t& argsHashOut);
-	bool GetModIdForAsset(int32_t idassetId, ModId& modIdOut);
+	bool GetArgsHashForAsset(int32_t assetId, uint32_t& argsHashOut);
+	bool GetModIdForAsset(int32_t assetId, ModId& modIdOut);
 	bool GetRawFileDataForAsset(int32_t assetId, core::Array<uint8_t>& dataOut);
-	bool GetTypeForAsset(int32_t idassetId, AssetType::Enum& typeOut);
+	bool GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut);
+	bool GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut);
 
 	// some assetRef stuff.
 	bool GetAssetRefCount(int32_t assetId, uint32_t& refCountOut);
 	bool IterateAssetRefs(int32_t assetId, core::Delegate<bool(int32_t)> func);
+	bool GetAssetRefs(int32_t assetId, AssetIdArr& refsOut);
 	Result::Enum AddAssertRef(int32_t assetId, int32_t targetAssetId);
 	Result::Enum RemoveAssertRef(int32_t assetId, int32_t targetAssetId);
 
@@ -150,3 +163,6 @@ private:
 };
 
 X_NAMESPACE_END
+
+
+#include "AssetDB.inl"

@@ -4,6 +4,13 @@
 #include "project.h"
 #include "modproject.h"
 #include "assetdbnodes.h"
+#include "ActionManager.h"
+#include "ActionContainer.h"
+#include "Command.h"
+
+#include "Constants.h"
+#include "assetdbconstants.h"
+
 #include <../AssetDB/AssetDB.h>
 
 
@@ -50,45 +57,48 @@ bool AssetExplorer::init(void)
             this, SLOT(projectDisplayNameChanged(Project*)));
 
 
-#if 0
-    Context globalcontext(Bug::Constants::C_GLOBAL);
-    Context projecTreeContext(Constants::C_PROJECT_TREE);
+    Context globalcontext(assman::Constants::C_GLOBAL);
+    Context projecTreeContext(Constants::C_ASSETDB_EXPLORER);
 
 
-    m_addNewFileAction = new QAction(tr("Add New..."), this);
-    m_addExistingFilesAction = new QAction(tr("Add Existing Files..."), this);
-    m_removeFileAction = new QAction(tr("Remove File..."), this);
-    m_deleteFileAction = new QAction(tr("Delete File..."), this);
-    m_renameFileAction = new QAction(tr("Rename..."), this);
-    m_openFileAction = new QAction(tr("Open File"), this);
-    m_openContaingFolderAction = new QAction(tr("Open Containing Folder"), this);
-    m_projectTreeCollapseAllAction = new QAction(tr("Collapse All"), this);
-    m_unloadAction = new QAction(tr("Unload Project"), this);
+	// asset actions
+	openAssetAction_ = new QAction(tr("Open"), this);
+	renameAssetAction_ = new QAction(tr("Rename..."), this);
+	deleteAssetAction_ = new QAction(tr("Delete"), this);
+	cutAssetAction_ = new QAction(QIcon(":/misc/img/Cut.png"), tr("Cut"), this);
+	copyAssetAction_ = new QAction(QIcon(":/misc/img/Copy.png"), tr("Copy"), this);
+	copyAssetNameAction_ = new QAction(QIcon(":/misc/img/Copy.png"), tr("Copy Asset Name"), this);
+	pasteAssetAction_ = new QAction(QIcon(":/misc/img/Paste.png"), tr("Paste"), this);
 
-    m_setStartupProjectAction = new Utils::ParameterAction(tr("Set as Active Project"),
-                                                              tr("Set \"%1\" as Active Project"),
-                                                              Utils::ParameterAction::AlwaysEnabled, this);
 
-    connect(m_addNewFileAction, SIGNAL(triggered()), this, SLOT(addNewFile()));
-    connect(m_addExistingFilesAction, SIGNAL(triggered()), this, SLOT(addExistingFiles()));
-    connect(m_removeFileAction, SIGNAL(triggered()), this, SLOT(removeFile()));
-    connect(m_deleteFileAction, SIGNAL(triggered()), this, SLOT(deleteFile()));
-    connect(m_renameFileAction, SIGNAL(triggered()), this, SLOT(renameFile()));
-    connect(m_openFileAction, SIGNAL(triggered()), this, SLOT(openFile()));
-    connect(m_setStartupProjectAction, SIGNAL(triggered()), this, SLOT(setStartupProject()));
-    connect(m_unloadAction, SIGNAL(triggered()), this, SLOT(unloadProject()));
+	connect(openAssetAction_, SIGNAL(triggered()), this, SLOT(openAsset()));
+	connect(renameAssetAction_, SIGNAL(triggered()), this, SLOT(renameAsset()));
+	connect(deleteAssetAction_, SIGNAL(triggered()), this, SLOT(deleteAsset()));
+	connect(cutAssetAction_, SIGNAL(triggered()), this, SLOT(cutAsset()));
+	connect(copyAssetAction_, SIGNAL(triggered()), this, SLOT(copyAsset()));
+	connect(pasteAssetAction_, SIGNAL(triggered()), this, SLOT(pasteAsset()));
+	connect(copyAssetNameAction_, SIGNAL(triggered()), this, SLOT(copyAssetName()));
 
-    Command* cmd;
+	addNewAssetAction_ = new QAction(QIcon(":/misc/img/NewFile.png"), tr("New Asset..."), this);
+	addNewAssetTypeAction_ = new QAction(QIcon(":/misc/img/NewFile.png"), tr("New ?..."), this);
+	projectTreeCollapseAllAction_ = new QAction(tr("Collapse All"), this);
+	buildAction_ = new QAction(QIcon(":/misc/img/build.png"), tr("Build"), this);
+
+	connect(addNewAssetAction_, SIGNAL(triggered()), this, SLOT(addNewAsset()));
+	connect(addNewAssetTypeAction_, SIGNAL(triggered()), this, SLOT(addNewAssetType()));
+	connect(buildAction_, SIGNAL(triggered()), this, SLOT(build()));
+
+    ICommand* pCmd = nullptr;
 
     // context menus
-    ActionContainer *mprojectContextMenu = ActionManager::createMenu(Constants::M_PROJECTCONTEXT);
-    ActionContainer *mfolderContextMenu = ActionManager::createMenu(Constants::M_FOLDERCONTEXT);
-    ActionContainer *mfileContextMenu = ActionManager::createMenu(Constants::M_FILECONTEXT);
+    ActionContainer* mprojectContextMenu = ActionManager::createMenu(Constants::M_PROJECTCONTEXT);
+    ActionContainer* mfolderContextMenu = ActionManager::createMenu(Constants::M_FOLDERCONTEXT);
+    ActionContainer* mfileContextMenu = ActionManager::createMenu(Constants::M_FILECONTEXT);
 
 
-    m_projectMenu = mprojectContextMenu->menu();
-    m_folderMenu = mfolderContextMenu->menu();
-    m_fileMenu = mfileContextMenu->menu();
+	projectMenu_ = mprojectContextMenu->menu();
+	folderMenu_ = mfolderContextMenu->menu();
+	fileMenu_ = mfileContextMenu->menu();
 
     // Groups
     mprojectContextMenu->appendGroup(Constants::G_PROJECT_FIRST);
@@ -107,101 +117,74 @@ bool AssetExplorer::init(void)
 
     // Separators
     mprojectContextMenu->addSeparator(globalcontext, Constants::G_PROJECT_FILES);
-    mfileContextMenu->addSeparator(globalcontext, Constants::G_FILE_OTHER);
+	mfileContextMenu->addSeparator(globalcontext, Constants::G_FILE_OPEN);
+	mfileContextMenu->addSeparator(globalcontext, Constants::G_FILE_OTHER);
 
     // Collapse All.
     {
         const Id treeGroup = Constants::G_PROJECT_TREE;
 
-        cmd = ActionManager::registerAction(m_projectTreeCollapseAllAction,
+		pCmd = ActionManager::registerAction(projectTreeCollapseAllAction_,
                                Constants::PROJECTTREE_COLLAPSE_ALL, projecTreeContext);
 
         mprojectContextMenu->addSeparator(globalcontext, treeGroup);
-        mprojectContextMenu->addAction(cmd, treeGroup);
+        mprojectContextMenu->addAction(pCmd, treeGroup);
         mfolderContextMenu->addSeparator(globalcontext, treeGroup);
-        mfolderContextMenu->addAction(cmd, treeGroup);
+        mfolderContextMenu->addAction(pCmd, treeGroup);
         mfileContextMenu->addSeparator(globalcontext, treeGroup);
-        mfileContextMenu->addAction(cmd, treeGroup);
+        mfileContextMenu->addAction(pCmd, treeGroup);
     }
 
+	// Shieeeeeeeeet for the file.
 
-    // add new file action
-    cmd = ActionManager::registerAction(m_addNewFileAction, AssetExplorer::Constants::ADDNEWFILE, projecTreeContext);
-    mprojectContextMenu->addAction(cmd, Constants::G_PROJECT_FILES);
-    mfolderContextMenu->addAction(cmd, Constants::G_FOLDER_FILES);
-
-
-    // add existing file action
-    cmd = ActionManager::registerAction(m_addExistingFilesAction, AssetExplorer::Constants::ADDEXISTINGFILES, projecTreeContext);
-    mprojectContextMenu->addAction(cmd, Constants::G_PROJECT_FILES);
-    mfolderContextMenu->addAction(cmd, Constants::G_FOLDER_FILES);
-
-    // Open file
-    cmd = ActionManager::registerAction(m_openFileAction, AssetExplorer::Constants::OPENFILE, projecTreeContext);
-    mfileContextMenu->addAction(cmd, Constants::G_FILE_OPEN);
-
-    // Open Containing Folder
-    cmd = ActionManager::registerAction(m_openContaingFolderAction, AssetExplorer::Constants::OPENCONTAININGFOLDER, projecTreeContext);
-    mfileContextMenu->addAction(cmd, Constants::G_FILE_OPEN);
-    mfolderContextMenu->addAction(cmd, Constants::G_FOLDER_FILES);
-
-    // remove file action
-    cmd = ActionManager::registerAction(m_removeFileAction, AssetExplorer::Constants::REMOVEFILE, projecTreeContext);
-    cmd->setDefaultKeySequence(QKeySequence::Delete);
-    mfileContextMenu->addAction(cmd, Constants::G_FILE_OTHER);
-
-    // delete file action
-    cmd = ActionManager::registerAction(m_deleteFileAction, AssetExplorer::Constants::DELETEFILE, projecTreeContext);
-    cmd->setDefaultKeySequence(QKeySequence::Delete);
-    mfileContextMenu->addAction(cmd, Constants::G_FILE_OTHER);
-
-    // renamefile action
-    cmd = ActionManager::registerAction(m_renameFileAction, AssetExplorer::Constants::RENAMEFILE, projecTreeContext);
-    mfileContextMenu->addAction(cmd, Constants::G_FILE_OTHER);
-
-    // Unload Project
-    cmd = ActionManager::registerAction(m_unloadAction, AssetExplorer::Constants::UNLOADPROJECT, globalcontext);
-    mprojectContextMenu->addAction(cmd, Constants::G_PROJECT_LAST);
-
-    // Set start up project
-    cmd = ActionManager::registerAction(m_setStartupProjectAction, AssetExplorer::Constants::SETSTARTUP, projecTreeContext);
-    cmd->setAttribute(Command::CA_UpdateText);
-    cmd->setDescription(m_setStartupProjectAction->text());
-    mprojectContextMenu->addAction(cmd, Constants::G_PROJECT_FIRST);
-
-    QSettings *s = ICore::settings();
-
-    // Load recent projects.
-    m_recentProjects = s->value(QLatin1String("recentProjectList")).toStringList();
+	pCmd = ActionManager::registerAction(openAssetAction_, assman::AssetExplorer::Constants::OPEN_ASSET, projecTreeContext);
+	pCmd->setDefaultKeySequence(QKeySequence::Open);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OPEN);
 
 
-     // Get the file menu
-    ActionContainer *mfile = ActionManager::actionContainer(Bug::Constants::M_FILE);
+	pCmd = ActionManager::registerAction(renameAssetAction_, assman::AssetExplorer::Constants::RENAME_ASSET, projecTreeContext);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
 
-    // add recent projects menu
-    ActionContainer *mrecent = ActionManager::createMenu(Constants::M_RECENTPROJECTS);
-    mrecent->menu()->setTitle(tr("Recent P&rojects"));
-    mrecent->setOnAllDisabledBehavior(ActionContainer::Show);
+	pCmd = ActionManager::registerAction(deleteAssetAction_, assman::AssetExplorer::Constants::DELETE_ASSET, projecTreeContext);
+	pCmd->setDefaultKeySequence(QKeySequence::Delete);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
 
-    // Add the menu File->recent Project->*
-    mfile->addMenu(mrecent, Bug::Constants::G_FILE_RECENT);
-    connect(mfile->menu(), SIGNAL(aboutToShow()), this, SLOT(updateRecentProjectMenu()));
+	pCmd = ActionManager::registerAction(cutAssetAction_, assman::AssetExplorer::Constants::CUT_ASSET, projecTreeContext);
+	pCmd->setDefaultKeySequence(QKeySequence::Cut);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+
+	pCmd = ActionManager::registerAction(copyAssetAction_, assman::AssetExplorer::Constants::COPY_ASSET, projecTreeContext);
+	pCmd->setDefaultKeySequence(QKeySequence::Copy);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+
+	pCmd = ActionManager::registerAction(pasteAssetAction_, assman::AssetExplorer::Constants::PASTE_ASSET, projecTreeContext);
+	pCmd->setDefaultKeySequence(QKeySequence::Paste);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+
+	pCmd = ActionManager::registerAction(copyAssetNameAction_, assman::AssetExplorer::Constants::COPY_ASSET_NAME, projecTreeContext);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
 
 
-    // We have settings that can be saved.
-    connect(ICore::instance(), SIGNAL(saveSettingsRequested()),
-        this, SLOT(savePersistentSettings()));
+	// add new
+	pCmd = ActionManager::registerAction(addNewAssetAction_, assman::AssetExplorer::Constants::NEW_ASSET, projecTreeContext);
+	mprojectContextMenu->addAction(pCmd, Constants::G_PROJECT_FIRST);
+	mfolderContextMenu->addAction(pCmd, Constants::G_FOLDER_FILES);
 
+	// add new Type
+	pCmd = ActionManager::registerAction(addNewAssetTypeAction_, assman::AssetExplorer::Constants::NEW_ASSET_TYPE, projecTreeContext);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+	mfolderContextMenu->addAction(pCmd, Constants::G_FOLDER_FILES);
 
-    d->m_AssetExplorerSettings.environmentId =
-            QUuid(s->value(QLatin1String("AssetExplorer/Settings/EnvironmentId")).toByteArray());
-    if (d->m_AssetExplorerSettings.environmentId.isNull())
-        d->m_AssetExplorerSettings.environmentId = QUuid::createUuid();
+	
+	// build action
+	pCmd = ActionManager::registerAction(buildAction_, assman::AssetExplorer::Constants::BUILD, projecTreeContext);
+	mfileContextMenu->addAction(pCmd, Constants::G_FILE_OTHER);
+	mfolderContextMenu->addAction(pCmd, Constants::G_FOLDER_CONFIG);
+	mprojectContextMenu->addAction(pCmd, Constants::G_PROJECT_FILES);
 
 
 
     updateActions();
-#endif
     return true;
 }
 
@@ -254,19 +237,52 @@ void AssetExplorer::setCurrentNode(Node* pNode)
 }
 
 
-void AssetExplorer::setCurrent(Project* pProject, const QString& name, Node* pNode)
+void AssetExplorer::setCurrent(Project* pProject, const QString& name_, Node* pNode)
 {
-	X_UNUSED(pProject);
-	X_UNUSED(name);
-	X_UNUSED(pNode);
-
     if (debugLogging) {
-        qDebug() << "ProjectExplorer - setting path to " << (name)
+        qDebug() << "ProjectExplorer - setting path to " << (name_)
                 << " and project to " << (pProject ? pProject->displayName() : QLatin1String("0"));
     }
 
+	QString name(name_);
 
-	X_ASSERT_NOT_IMPLEMENTED();
+	if (pNode) {
+		name = pNode->name();
+	}
+	else {
+	//	pNode = SessionManager::no(filePath, project);
+	}
+
+	bool projectChanged = false;
+	if (currentProject_ != pProject)
+	{
+		if (currentProject_) {
+
+		}
+		if (pProject) {
+
+		}
+		projectChanged = true;
+	}
+
+	currentProject_ = pProject;
+
+	if (projectChanged || currentNode_ != pNode) {
+		currentNode_ = pNode;
+		if (debugLogging) {
+			qDebug() << "ProjectExplorer - currentNodeChanged(" << (pNode ? pNode->name() : QLatin1String("0")) << ", " << (pProject ? pProject->displayName() : QLatin1String("0")) << ')';
+		}
+		emit currentNodeChanged(currentNode_, pProject);
+		updateContextMenuActions();
+	}
+	if (projectChanged) {
+		if (debugLogging) {
+			qDebug() << "ProjectExplorer - currentProjectChanged(" << (pProject ? pProject->displayName() : QLatin1String("0")) << ')';
+		}
+		emit currentProjectChanged(pProject);
+		updateActions();
+	}
+
 }
 
 
@@ -278,7 +294,51 @@ void AssetExplorer::showContextMenu(QWidget* pView, const QPoint& globalPos, Nod
 	X_UNUSED(pNode);
 
 
-	X_ASSERT_NOT_IMPLEMENTED();
+	QMenu* pContextMenu = nullptr;
+
+	if (!pNode) {
+		pNode = SessionManager::sessionNode();
+	}
+
+	if (pNode->nodeType() != NodeType::SessionNodeType)
+	{
+		Project* pProject = SessionManager::projectForNode(pNode);
+		setCurrentNode(pNode);
+
+		emit aboutToShowContextMenu(pProject, pNode);
+		switch (pNode->nodeType())
+		{
+		case NodeType::ProjectNodeType:
+			//    if (node->parentFolderNode() == SessionManager::sessionNode())
+			pContextMenu = projectMenu_;
+			//     else
+			//         contextMenu = m_subProjectMenu;
+			break;
+		case NodeType::VirtualFolderNodeType:
+		case NodeType::FolderNodeType:
+			pContextMenu = folderMenu_;
+			break;
+		case NodeType::FileNodeType:
+			//        populateOpenWithMenu();
+			pContextMenu = fileMenu_;
+			break;
+		default:
+			qWarning("ProjectExplorerPlugin::showContextMenu - Missing handler for node type");
+		}
+	}
+	else { // session item
+		   //   emit aboutToShowContextMenu(0, node);
+		   //   contextMenu = m_sessionContextMenu;
+	}
+
+	updateContextMenuActions();
+
+	projectTreeCollapseAllAction_->disconnect(SIGNAL(triggered()));
+	connect(projectTreeCollapseAllAction_, SIGNAL(triggered()), pView, SLOT(collapseAll()));
+
+	if (pContextMenu && pContextMenu->actions().count() > 0) {
+		pContextMenu->popup(globalPos);
+	}
 }
 
 
@@ -290,17 +350,55 @@ void AssetExplorer::renameFile(Node* pNode, const QString& to)
 	X_ASSERT_NOT_IMPLEMENTED();
 }
 
-void AssetExplorer::updateActions(void)
-{
-    qDebug() << "AssetExplorer::updateActions";
-
-}
 
 void AssetExplorer::updateContextMenuActions(void)
 {
     qDebug() << "AssetExplorer::updateContextMenuActions";
 
-	X_ASSERT_NOT_IMPLEMENTED();
+//	addNewFileAction_->setEnabled(false);
+//	deleteFileAction_->setEnabled(false);
+//	renameFileAction_->setEnabled(false);
+
+	if (currentNode_ && currentNode_->projectNode())
+	{
+		auto actions = currentNode_->supportedActions(currentNode_);
+
+		if (ProjectNode* pn = qobject_cast<ProjectNode*>(currentNode_))
+		{
+			if (pn == currentProject_->rootProjectNode())
+			{
+				buildAction_->setVisible(true);
+				buildAction_->setEnabled(true);
+
+			}
+			else
+			{
+
+			}
+		}
+		if (FolderNode* pFolderName = qobject_cast<FolderNode*>(currentNode_))
+		{
+			// i want to know asset type.
+			// and update the name.
+
+			// Also handles ProjectNode
+			addNewAssetAction_->setEnabled(actions.contains(ProjectAction::AddNewFile));
+			addNewAssetTypeAction_->setEnabled(actions.contains(ProjectAction::AddNewFile));
+			renameAssetAction_->setEnabled(actions.contains(ProjectAction::Rename));
+		}
+		else if (qobject_cast<FileNode*>(currentNode_))
+		{
+			// Enable and show remove / delete in magic ways:
+			// If both are disabled show Remove
+			// If both are enabled show both (can't happen atm)
+			// If only removeFile is enabled only show it
+			// If only deleteFile is enable only show it
+			bool enableDelete = actions.contains(ProjectAction::EraseFile);
+
+			deleteAssetAction_->setEnabled(enableDelete);
+			renameAssetAction_->setEnabled(actions.contains(ProjectAction::Rename));
+		}
+	}
 }
 
 
@@ -309,17 +407,24 @@ void AssetExplorer::projectAdded(Project* pPro)
 {
     connect(pPro, SIGNAL(buildConfigurationEnabledChanged()),
             this, SLOT(updateActions()));
+
+	X_ASSERT_NOT_IMPLEMENTED();
 }
 
 void AssetExplorer::projectRemoved(Project* pPro)
 {
     disconnect(pPro, SIGNAL(buildConfigurationEnabledChanged()),
                this, SLOT(updateActions()));
+
+	X_ASSERT_NOT_IMPLEMENTED();
+
 }
 
 void AssetExplorer::projectDisplayNameChanged(Project* pPro)
 {
 	X_UNUSED(pPro);
+	X_ASSERT_NOT_IMPLEMENTED();
+
     updateActions();
 }
 
@@ -351,6 +456,80 @@ void AssetExplorer::setStartupProject(Project* pProject)
     updateActions();
 }
 
+void AssetExplorer::openAsset(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+
+}
+
+void AssetExplorer::renameAsset(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+
+}
+
+void AssetExplorer::deleteAsset(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+
+}
+
+void AssetExplorer::cutAsset(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+
+}
+
+void AssetExplorer::copyAsset(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+
+}
+
+void AssetExplorer::pasteAsset(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+
+}
+
+void AssetExplorer::copyAssetName(void)
+{
+	BUG_ASSERT(currentNode_ && currentNode_->nodeType() == NodeType::FileNodeType, return);
+
+	FileNode* pFileNode = qobject_cast<FileNode*>(currentNode_);
+
+	QClipboard* pClipboard = QApplication::clipboard();
+	pClipboard->setText(pFileNode->name());
+}
+
+void AssetExplorer::addNewAsset(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+
+}
+
+void AssetExplorer::addNewAssetType(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+
+}
+
+
+
+
+
+void AssetExplorer::updateActions(void)
+{
+	qDebug() << "AssetExplorer::updateActions";
+
+	Project* pProject = SessionManager::startupProject();
+	QString projectName = pProject ? pProject->displayName() : QString();
+	QString projectNameContextMenu = currentProject_ ? currentProject_->displayName() : QString();
+
+
+	qDebug() << "Project name: " << projectName;
+	qDebug() << "Contex name: " << projectNameContextMenu;
+}
 
 
 

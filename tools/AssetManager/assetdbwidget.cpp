@@ -3,6 +3,7 @@
 #include "assetdbnodes.h"
 #include "assetdbmodel.h"
 #include "assetdbexplorer.h"
+#include "assetdbconstants.h"
 
 #include "session.h"
 #include "project.h"
@@ -103,14 +104,19 @@ AssetDbViewWidget::AssetDbViewWidget(AssetDB& db, QWidget *parent) :
   //  if (pro)
    //     model_->setStartupProject(pro->rootProjectNode());
 
-    NodesWatcher *watcher = new NodesWatcher(this);
-    SessionManager::sessionNode()->registerWatcher(watcher);
+    NodesWatcher* pWatcher = new NodesWatcher(this);
+    SessionManager::sessionNode()->registerWatcher(pWatcher);
 
-    connect(watcher, SIGNAL(foldersAboutToBeRemoved(FolderNode*,QList<FolderNode*>)),
+    connect(pWatcher, SIGNAL(foldersAboutToBeRemoved(FolderNode*,QList<FolderNode*>)),
             this, SLOT(foldersAboutToBeRemoved(FolderNode*,QList<FolderNode*>)));
-    connect(watcher, SIGNAL(filesAboutToBeRemoved(FolderNode*,QList<FileNode*>)),
+    connect(pWatcher, SIGNAL(filesAboutToBeRemoved(FolderNode*,QList<FileNode*>)),
             this, SLOT(filesAboutToBeRemoved(FolderNode*,QList<FileNode*>)));
 
+	QObject* pSessionManager = SessionManager::instance();
+	connect(pSessionManager, SIGNAL(singleProjectAdded(Project*)),
+		this, SLOT(handleProjectAdded(Project*)));
+	connect(pSessionManager, SIGNAL(startupProjectChanged(Project*)),
+		this, SLOT(startupProjectChanged(Project*)));
 
     search_ = new QLineEdit(this);
     search_->setPlaceholderText("Search..");
@@ -124,22 +130,26 @@ AssetDbViewWidget::AssetDbViewWidget(AssetDB& db, QWidget *parent) :
     model_->setTreeView(view_);
 
 
-    QVBoxLayout* mainLayout = new QVBoxLayout(this);
+	connect(model_, SIGNAL(modelReset()),
+		this, SLOT(initView()));
+	connect(view_, SIGNAL(activated(QModelIndex)),
+		this, SLOT(openItem(QModelIndex)));
+	connect(view_, SIGNAL(customContextMenuRequested(QPoint)),
+		this, SLOT(showContextMenu(QPoint)));
 
+
+	// make whole widget have assDB context, not just the tree.
+	pContext_ = new IContext(this);
+	pContext_->setContext(Context(assman::AssetExplorer::Constants::C_ASSETDB_EXPLORER));
+	pContext_->setWidget(this);
+	ICore::addContextObject(pContext_);
+
+    QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(view_);
     mainLayout->addWidget(search_);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setMargin(0);
-
     setLayout(mainLayout);
-
-
-    connect(model_, SIGNAL(modelReset()),
-            this, SLOT(initView()));
-    connect(view_, SIGNAL(activated(QModelIndex)),
-            this, SLOT(openItem(QModelIndex)));
-    connect(view_, SIGNAL(customContextMenuRequested(QPoint)),
-        this, SLOT(showContextMenu(QPoint)));
 
 }
 

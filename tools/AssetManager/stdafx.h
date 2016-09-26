@@ -9,9 +9,7 @@
 
 #include <Containers\Array.h>
 
-#pragma comment(lib, "Dwrite")
 
-#endif // PCH_H
 
 #define QT_BEGIN_MOC_NAMESPACE X_NAMESPACE_BEGIN(assman)
 #define QT_END_MOC_NAMESPACE X_NAMESPACE_END
@@ -19,6 +17,40 @@
 
 extern core::MemoryArenaBase* g_arena;
 
+// ----------------------------
+
+#define ANGELSCRIPT_DLL_LIBRARY_IMPORT
+#define AS_PROCESS_METADATA 0
+#include <angelscript\include\angelscript.h>
+
+#if X_DEBUG
+X_LINK_LIB("angelscriptd");
+#else
+X_LINK_LIB("angelscript");
+#endif // !X_DEBUG
+
+// ----------------------------
+
+// qt wants this..
+#pragma comment(lib, "Dwrite")
+
+// ----------------------------
+
+#if X_DEBUG
+// #define QT_NO_DEBUG_OUTPUT
+// #define QT_NO_INFO_OUTPUT
+// #define QT_NO_WARNING_OUTPUT
+#elif X_RELEASE
+#define QT_NO_DEBUG_OUTPUT
+#define QT_NO_INFO_OUTPUT
+#define QT_NO_WARNING_OUTPUT
+#elif X_SUPER
+#define QT_NO_DEBUG_OUTPUT
+#define QT_NO_INFO_OUTPUT
+#define QT_NO_WARNING_OUTPUT
+#elif 
+#error "unknown config."
+#endif
 
 
 #include <QIcon>
@@ -37,6 +69,8 @@ extern core::MemoryArenaBase* g_arena;
 #include <QTreeView>
 #include <QDir>
 #include <QMap>
+#include <QHash>
+#include <QMultiHash>
 
 
 #include <QtWidgets>
@@ -52,9 +86,14 @@ extern core::MemoryArenaBase* g_arena;
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QMimeDatabase>
+#include <QClipboard>
 
 #include <array>
 
-
+#include "Constants.h"
 #include "logging.h"
 #include "assert_qt.h"
+#include "id.h"
+#include "IAssManCore.h"
+
+#endif // PCH_H

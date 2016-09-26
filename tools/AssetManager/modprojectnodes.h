@@ -15,9 +15,11 @@ class ModProjectNode : public AssetExplorer::ProjectNode
 public:
 	ModProjectNode(ModProject* pProject);
 
-	bool canAddSubProject(const QString &proFilePath) const X_OVERRIDE;
-	bool addSubProjects(const QStringList &proFilePaths) X_OVERRIDE;
-	bool removeSubProjects(const QStringList &proFilePaths) X_OVERRIDE;
+	QList<AssetExplorer::ProjectAction> supportedActions(Node* pNode) const X_OVERRIDE;
+
+	bool canAddSubProject(const QString& projectName) const X_OVERRIDE;
+	bool addSubProjects(const QStringList& projectNames) X_OVERRIDE;
+	bool removeSubProjects(const QStringList& projectNames) X_OVERRIDE;
 
 	ModProject* getModProject(void);
 
@@ -33,6 +35,8 @@ class ModVirtualFolderNode : public AssetExplorer::VirtualFolderNode
 public:
 	explicit ModVirtualFolderNode(const QString &name, int32_t priority, const QString& displayName,
 		AssetType::Enum assType, int32_t numAssets);
+
+	QList<AssetExplorer::ProjectAction> supportedActions(Node* pNode) const X_OVERRIDE;
 
 	QString displayName(void) const X_OVERRIDE;
 	QString tooltip(void) const X_OVERRIDE;

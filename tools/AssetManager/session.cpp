@@ -34,8 +34,8 @@ public:
 };
 
 
-static SessionManager* instance_ = 0;
-static SessionManagerPrivate* d = 0;
+static SessionManager* instance_ = nullptr;
+static SessionManagerPrivate* d = nullptr;
 
 
 SessionManager::SessionManager(QObject* pParent)
@@ -162,7 +162,7 @@ SessionNode* SessionManager::sessionNode(void)
     return d->pSessionNode_;
 }
 
-void SessionManager::projectDisplayNameChanged()
+void SessionManager::projectDisplayNameChanged(void)
 {
     Project* pPro = qobject_cast<Project*>(instance_->sender());
     if (pPro) {

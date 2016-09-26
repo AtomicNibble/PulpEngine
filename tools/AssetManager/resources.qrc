@@ -21,8 +21,45 @@
         <file>img/branch-end.png</file>
         <file>img/branch-more.png</file>
         <file>img/branch-open.png</file>
+        <file>img/Close.png</file>
+        <file>img/Close-hover.png</file>
+        <file>img/down_arrow.png</file>
+        <file>img/down_arrow_disabled.png</file>
+        <file>img/checkbox_checked.png</file>
+        <file>img/checkbox_checked_hover.png</file>
+        <file>img/checkbox_checked_pressed.png</file>
+        <file>img/checkbox_unchecked.png</file>
+        <file>img/checkbox_unchecked_hover.png</file>
+        <file>img/checkbox_unchecked_pressed.png</file>
     </qresource>
     <qresource prefix="/misc">
         <file>img/icon.png</file>
+        <file>img/Copy.png</file>
+        <file>img/options.png</file>
+        <file>img/Paste.png</file>
+        <file>img/quit.png</file>
+        <file>img/Cut.png</file>
+        <file>img/NewFile.png</file>
+        <file>img/build.png</file>
+        <file>img/logo_64.png</file>
+        <file>img/logo_128.png</file>
+        <file>img/logo_cry_128.png</file>
+        <file>img/Save.png</file>
+        <file>img/Saveall.png</file>
+        <file>img/collapse.png</file>
+        <file>img/expand.png</file>
+        <file>img/colorpicker.png</file>
+        <file>img/alphaback.png</file>
+        <file>img/warning_32.png</file>
+        <file>img/Zoom.png</file>
+        <file>img/ZoomOut.png</file>
+    </qresource>
+    <qresource prefix="/dock">
+        <file>img/box_center.png</file>
+        <file>img/dock_bottom.png</file>
+        <file>img/dock_left.png</file>
+        <file>img/dock_right.png</file>
+        <file>img/dock_top.png</file>
+        <file>img/drag_box_main.png</file>
     </qresource>
 </RCC>

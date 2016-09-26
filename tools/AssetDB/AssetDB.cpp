@@ -55,30 +55,8 @@ namespace
 } // namespace
 
 
-AssetDB::AssetInfo::AssetInfo() :
-	id(-1),
-	parentId(-1)
-{
-
-}
-AssetDB::AssetInfo::AssetInfo(int32_t id, int32_t parentId, const char* pName) :
-	id(-1),
-	parentId(-1),
-	name(pName)
-{
-
-}
-
-AssetDB::AssetInfo::AssetInfo(int32_t id, int32_t parentId, const core::string& name_) :
-	id(-1),
-	parentId(-1),
-	name(name_)
-{
-
-}
 
 // -----------------------------------------------------
-
 
 
 const char* AssetDB::ASSET_DB_FOLDER = "asset_db";
@@ -125,7 +103,7 @@ bool AssetDB::OpenDB(void)
 		return false;
 	}
 
-	if (!db_.execute("PRAGMA synchronous = OFF; PRAGMA page_size = 4096; PRAGMA journal_mode=wal;")) {
+	if (!db_.execute("PRAGMA synchronous = OFF; PRAGMA page_size = 4096; PRAGMA journal_mode=wal; PRAGMA foreign_keys = ON;")) {
 		return false;
 	}
 
@@ -154,8 +132,8 @@ bool AssetDB::CreateTables(void)
 {
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS mods ("
 		"mod_id INTEGER PRIMARY KEY,"
-		"name TEXT COLLATE NOCASE UNIQUE,"
-		"out_dir TEXT"
+		"name TEXT COLLATE NOCASE UNIQUE NOT NULL,"
+		"out_dir TEXT NOT NULL"
 		");")) {
 		X_ERROR("AssetDB", "Failed to create 'mods' table");
 		return false;
@@ -163,17 +141,17 @@ bool AssetDB::CreateTables(void)
 
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS file_ids ("
 		" file_id INTEGER PRIMARY KEY,"
-		"name TEXT COLLATE NOCASE," // names are not unique since we allow same name for diffrent type.
-		"type INTEGER,"
+		"name TEXT COLLATE NOCASE NOT NULL," // names are not unique since we allow same name for diffrent type.
+		"type INTEGER NOT NULL,"
 		"args TEXT,"
 		"argsHash INTEGER,"
 		"raw_file INTEGER,"
 		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,"
 		"lastUpdateTime TIMESTAMP,"
 		"parent_id INTEGER NULL,"
-		"mod_id INTEGER,"
-		"FOREIGN KEY(parent_id) REFERENCES mods(mod_id),"
-		"FOREIGN KEY(mod_id) REFERENCES file_ids(file_id),"
+		"mod_id INTEGER NOT NULL,"
+		"FOREIGN KEY(parent_id) REFERENCES file_ids(file_id),"
+		"FOREIGN KEY(mod_id) REFERENCES mods(mod_id),"
 		"unique(name, type)"
 		");")) {
 		X_ERROR("AssetDB", "Failed to create 'file_ids' table");
@@ -182,9 +160,9 @@ bool AssetDB::CreateTables(void)
 
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS raw_files ("
 		"file_id INTEGER PRIMARY KEY,"
-		"path TEXT,"
-		"size INTEGER,"
-		"hash INTEGER,"
+		"path TEXT NOT NULL,"
+		"size INTEGER NOT NULL,"
+		"hash INTEGER NOT NULL,"
 		"add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL"
 		");")) {
 		X_ERROR("AssetDB", "Failed to create 'raw_files' table");
@@ -196,8 +174,8 @@ bool AssetDB::CreateTables(void)
 	// with a toId matching the id of the material.
 	if (!db_.execute("CREATE TABLE IF NOT EXISTS refs ("
 		"ref_id INTEGER PRIMARY KEY,"
-		"toId INTEGER," 
-		"fromId INTEGER,"
+		"toId INTEGER NOT NULL," 
+		"fromId INTEGER NOT NULL,"
 		"FOREIGN KEY(ref_id) REFERENCES file_ids(file_id),"
 		"FOREIGN KEY(fromId) REFERENCES file_ids(file_id)"
 		");")) {
@@ -503,7 +481,7 @@ bool AssetDB::GetAssetTypeCount(ModId modId, AssetType::Enum type, int32_t& coun
 }
 
 
-bool AssetDB::GetAssetList(ModId modId, AssetType::Enum type, core::Array<AssetInfo>& assetsOut)
+bool AssetDB::GetAssetList(ModId modId, AssetType::Enum type, AssetInfoArr& assetsOut)
 {
 	int32_t count;
 	if (!GetAssetTypeCount(modId, type, count)) {
@@ -528,6 +506,25 @@ bool AssetDB::GetAssetList(ModId modId, AssetType::Enum type, core::Array<AssetI
 		const char* pName = row.get<const char*>(1);
 
 		assetsOut.emplace_back(id, parentId, pName);
+	}
+
+	return true;
+}
+
+bool AssetDB::GetModsList(ModsArr& arrOut)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT mod_id, name, out_dir FROM mods");
+
+	auto it = qry.begin();
+	for (; it != qry.end(); ++it)
+	{
+		auto row = *it;
+
+		const int32_t modId = row.get<int32_t>(0);
+		const char* pName = row.get<const char*>(1);
+		const char* pOutdir = row.get<const char*>(2);
+
+		arrOut.emplace_back(modId, pName, pOutdir);
 	}
 
 	return true;
@@ -697,7 +694,7 @@ AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, As
 		return Result::ERROR;
 	}
 	if (!ValidName(name)) {
-		X_ERROR("AssetDB", "Asset name \"%s\" has invalid characters", name.c_str());
+		X_ERROR("AssetDB", "Asset name \"%s\" is invalid", name.c_str());
 		return Result::ERROR;
 	}
 
@@ -732,17 +729,22 @@ AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, As
 
 AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string& name, int32_t* pId)
 {
+	if (!isModSet()) {
+		X_ERROR("AssetDB", "Mod must be set before calling AddAsset!");
+		return Result::ERROR;
+	}
+
+	return AddAsset(modId_, type, name, pId);
+}
+
+AssetDB::Result::Enum AssetDB::AddAsset(ModId modId, AssetType::Enum type, const core::string& name, int32_t* pId)
+{
 	if (name.isEmpty()) {
 		X_ERROR("AssetDB", "Asset with empty name not allowed");
 		return Result::ERROR;
 	}
 	if (!ValidName(name)) {
-		X_ERROR("AssetDB", "Asset name \"%s\" has invalid characters", name.c_str());
-		return Result::ERROR;
-	}
-
-	if (!isModSet()) {
-		X_ERROR("AssetDB", "Mod must be set before calling AddAsset!");
+		X_ERROR("AssetDB", "Asset name \"%s\" is invalid", name.c_str());
 		return Result::ERROR;
 	}
 
@@ -750,11 +752,11 @@ AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string
 	sql::SqlLiteCmd cmd(db_, "INSERT INTO file_ids (name, type, mod_id) VALUES(?,?,?)");
 	cmd.bind(1, name.c_str());
 	cmd.bind(2, type);
-	cmd.bind(3, modId_);
+	cmd.bind(3, modId);
 
 
 	sql::Result::Enum res = cmd.execute();
-	if (res != sql::Result::OK) 
+	if (res != sql::Result::OK)
 	{
 		if (res == sql::Result::CONSTRAINT) {
 			return Result::NAME_TAKEN;
@@ -831,7 +833,7 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 	}
 
 	if (!ValidName(newName)) {
-		X_ERROR("AssetDB", "Can't rename asset \"%s\" to \"%s\" new name has invalid characters", name.c_str(), newName.c_str());
+		X_ERROR("AssetDB", "Can't rename asset \"%s\" to \"%s\" new name is invalid", name.c_str(), newName.c_str());
 		return Result::ERROR;
 	}
 
@@ -1106,6 +1108,7 @@ bool AssetDB::GetArgsForAsset(int32_t assetId, core::string& argsOut)
 		return false;
 	}
 
+	// args can be null.
 	if ((*it).columnType(0) != sql::ColumType::SNULL) {
 		argsOut = (*it).get<const char*>(0);
 	}
@@ -1127,8 +1130,12 @@ bool AssetDB::GetArgsHashForAsset(int32_t assetId, uint32_t& argsHashOut)
 		return false;
 	}
 
+	// args can be null.
 	if ((*it).columnType(0) != sql::ColumType::SNULL) {
 		argsHashOut = static_cast<uint32_t>((*it).get<int32_t>(0));
+	}
+	else {
+		argsHashOut = 0;
 	}
 	return true;
 }
@@ -1145,9 +1152,7 @@ bool AssetDB::GetModIdForAsset(int32_t assetId, ModId& modIdOut)
 		return false;
 	}
 
-	if ((*it).columnType(0) != sql::ColumType::SNULL) {
-		modIdOut = static_cast<ModId>((*it).get<int32_t>(0));
-	}
+	modIdOut = static_cast<ModId>((*it).get<int32_t>(0));
 	return true;
 }
 
@@ -1218,9 +1223,25 @@ bool AssetDB::GetTypeForAsset(int32_t assetId, AssetType::Enum& typeOut)
 		return false;
 	}
 
-	if ((*it).columnType(0) != sql::ColumType::SNULL) {
-		typeOut = static_cast<AssetType::Enum>((*it).get<int32_t>(0));
+	typeOut = static_cast<AssetType::Enum>((*it).get<int32_t>(0));
+	return true;
+}
+
+bool AssetDB::GetAssetInfoForAsset(int32_t assetId, AssetInfo& infoOut)
+{
+	sql::SqlLiteQuery qry(db_, "SELECT name, file_id, parent_id FROM file_ids WHERE file_ids.file_id = ?");
+	qry.bind(1, assetId);
+
+	const auto it = qry.begin();
+
+	if (it == qry.end()) {
+		infoOut = AssetInfo();
+		return false;
 	}
+
+	infoOut.name = (*it).get<const char*>(0);
+	infoOut.id = static_cast<AssetType::Enum>((*it).get<int32_t>(1));
+	infoOut.parentId = static_cast<AssetType::Enum>((*it).get<int32_t>(2));
 	return true;
 }
 
@@ -1262,6 +1283,28 @@ bool AssetDB::IterateAssetRefs(int32_t assetId, core::Delegate<bool(int32_t)> fu
 
 	return true;
 }
+
+
+bool AssetDB::GetAssetRefs(int32_t assetId, AssetIdArr& refsOut)
+{
+	refsOut.clear();
+
+	sql::SqlLiteQuery qry(db_, "SELECT fromId from refs WHERE toId = ?");
+	qry.bind(1, assetId);
+
+	auto it = qry.begin();
+	for (; it != qry.end(); ++it)
+	{
+		auto row = *it;
+
+		const int32_t refId = row.get<int32_t>(0);
+
+		refsOut.emplace_back(refId);
+	}
+
+	return true;
+}
+
 
 AssetDB::Result::Enum AssetDB::AddAssertRef(int32_t assetId, int32_t targetAssetId)
 {
@@ -1335,12 +1378,17 @@ bool AssetDB::AssetHasParent(int32_t assetId, int32_t* pParentId)
 		return false;
 	}
 
-	if ((*it).columnType(0) != sql::ColumType::SNULL) {
-		*pParentId = static_cast<int32_t>((*it).get<int32_t>(0));
-		return true;
+	if (pParentId) { // null check for the plebs
+		if ((*it).columnType(0) != sql::ColumType::SNULL) {
+			*pParentId = static_cast<int32_t>((*it).get<int32_t>(0));
+
+		}
+		else {
+			*pParentId = -1;
+		}
 	}
 
-	return false;
+	return true;
 }
 
 bool AssetDB::AssetIsParent(int32_t assetId)
@@ -1532,6 +1580,19 @@ void AssetDB::AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut)
 
 bool AssetDB::ValidName(const core::string& name)
 {
+	if (name.length() > ASSET_NAME_MAX_LENGTH) {
+		X_ERROR("AssetDB", "Asset name \"%s\" with length %" PRIuS " exceeds max lenght of %" PRIuS, 
+			name.c_str(), name.length(), ASSET_NAME_MAX_LENGTH);
+		return false;
+	}
+
+	if (name.length() < ASSET_NAME_MIN_LENGTH) {
+		X_ERROR("AssetDB", "Asset name \"%s\" with length %" PRIuS " is shorter than min lenght of %" PRIuS,
+			name.c_str(), name.length(), ASSET_NAME_MIN_LENGTH);
+		return false;
+	}
+
+
 	for (size_t i = 0; i < name.length(); i++)
 	{
 		// are you valid!?
@@ -1539,6 +1600,14 @@ bool AssetDB::ValidName(const core::string& name)
 
 		bool valid = core::strUtil::IsAlphaNum(ch) || core::strUtil::IsDigit(ch) || ch == '_' || ch == ASSET_NAME_SLASH;
 		if (!valid) {
+			X_ERROR("AssetDB", "Asset name \"%s\" has invalid character at position %" PRIuS, name.c_str(), i + 1);
+			return false;
+		}
+
+		// provide more info when it's case error.
+		if (core::strUtil::IsAlpha(ch) && !core::strUtil::IsLower(ch)) {
+			X_ERROR("AssetDB", "Asset name \"%s\" has invalid upper-case character at position %" PRIuS, name.c_str(), 
+				i + 1); // make it none 0 index based for the plebs.
 			return false;
 		}
 	}
