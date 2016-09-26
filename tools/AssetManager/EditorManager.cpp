@@ -23,34 +23,6 @@ X_NAMESPACE_BEGIN(assman)
 
 namespace 
 {
-	static int32_t extractLineNumber(QString *fileName)
-	{
-		int32_t i = fileName->length() - 1;
-		for (; i >= 0; --i) {
-			if (!fileName->at(i).isNumber()) {
-				break;
-			}
-		}
-		if (i == -1) {
-			return -1;
-		}
-		const QChar c = fileName->at(i);
-		if (c == QLatin1Char(':') || c == QLatin1Char('+')) {
-			bool ok;
-			const QString suffix = fileName->mid(i + 1);
-			const int32_t result = suffix.toInt(&ok);
-			if (suffix.isEmpty() || ok) {
-				fileName->truncate(i);
-				return result;
-			}
-		}
-		return -1;
-	}
-
-	static QString autoSaveName(const QString& fileName)
-	{
-		return fileName + QLatin1String(".bak");
-	}
 
 	template <class EditorFactoryLike>
 	X_INLINE EditorFactoryLike* findById(const Id &id)
@@ -1285,7 +1257,7 @@ void EditorManager::autoSave(void)
 		}
 
 		QString errorString;
-		if (!pAssetEntry->autoSave(&errorString, autoSaveName(pAssetEntry->name()))) {
+		if (!pAssetEntry->autoSave(&errorString)) {
 			errors << errorString;
 		}
 	}

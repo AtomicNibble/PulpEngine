@@ -31,7 +31,7 @@ public:
 	virtual bool isModified(void) const X_ABSTRACT;
 	virtual bool isSaveAsAllowed(void) const X_ABSTRACT;
 
-	bool autoSave(QString* pErrorString, const QString& fileName);
+	bool autoSave(QString* pErrorString);
 
 signals:
 	void changed(void);

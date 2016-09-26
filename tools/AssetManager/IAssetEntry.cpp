@@ -68,12 +68,12 @@ bool IAssetEntry::shouldAutoSave(void) const
 }
 
 
-bool IAssetEntry::autoSave(QString* pErrorString, const QString& fileName)
+bool IAssetEntry::autoSave(QString* pErrorString)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
 	X_UNUSED(pErrorString);
-	X_UNUSED(fileName);
 
+	// save to db or sumen?
 	return false;
 }
 
