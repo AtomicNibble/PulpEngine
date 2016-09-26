@@ -18,15 +18,17 @@ public:
 	{
 		Entry();
 
-		QString fileName(void) const;
+		QString assetName(void) const;
 		QString displayName(void) const;
+		assetDb::AssetType::Enum type(void) const;
 		Id id(void) const;
 
 	public:
 		IAssetEntry* pAssetEntry_;
 		QWidget* pEditorWidget_;
-		QString fileName_;
 		QString displayName_;
+		QString assetName_;
+		assetDb::AssetType::Enum type_;
 		Id id_;
 	};
 
@@ -45,19 +47,19 @@ public:
 	int32_t assetEntryCount(void) const;
 	QList<Entry*> assetEntrys(void) const;
 	int32_t indexOfAssetEntry(IAssetEntry* pAssetEntry) const;
-	int32_t indexOfFileName(const QString& fileName) const;
+	int32_t indexOfAsset(const QString& assetName, assetDb::AssetType::Enum type) const;
 	Entry* entryForAssetEntry(IAssetEntry* pAssetEntry) const;
 	QList<IAssetEntry*> openedAssetEntrys(void) const;
 
-	IAssetEntry* assetEntryForFileName(const QString& fileName) const;
-	QList<IEditor*> editorsForFileName(const QString& fileName) const;
+	IAssetEntry* assetEntryForAsset(const QString& assetName, assetDb::AssetType::Enum type) const;
+	QList<IEditor*> editorsForAsset(const QString& assetName, assetDb::AssetType::Enum type) const;
 	QList<IEditor*> editorsForAssetEntry(IAssetEntry* pAssetEntry) const;
 	QList<IEditor*> editorsForAssetEntrys(const QList<IAssetEntry*>& assetEntrys) const;
 
 	// editor manager related functions, nobody else should call it
 	void addEditor(IEditor* pEditor, bool* pIsNewDocument);
 	void removeEditor(IEditor* pEditor, bool* pLastOneForDocument);
-	void removeAssetEntry(const QString& fileName);
+	void removeAssetEntry(const QString& assetName, assetDb::AssetType::Enum type);
 	void removeEntry(Entry* pEntry);
 
 

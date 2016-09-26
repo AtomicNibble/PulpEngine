@@ -14,14 +14,19 @@ AssetEntryModel::Entry::Entry() :
 
 }
 
-QString AssetEntryModel::Entry::fileName(void) const
+QString AssetEntryModel::Entry::assetName(void) const
 {
-	return fileName_;
+	return assetName_;
 }
 
 QString AssetEntryModel::Entry::displayName(void) const
 {
 	return displayName_;
+}
+
+assetDb::AssetType::Enum AssetEntryModel::Entry::type(void) const
+{
+	return type_;
 }
 
 Id AssetEntryModel::Entry::id(void) const
@@ -96,14 +101,15 @@ int32_t AssetEntryModel::indexOfAssetEntry(IAssetEntry* pAssetEntry) const
 	return -1;
 }
 
-int32_t AssetEntryModel::indexOfFileName(const QString& fileName) const
+int32_t AssetEntryModel::indexOfAsset(const QString& assetName, assetDb::AssetType::Enum type) const
 {
-	if (fileName.isEmpty()) {
+	if (assetName.isEmpty()) {
 		return -1;
 	}
 
 	for (int32_t i = 0; i < assetEntrys_.count(); ++i) {
-		if (assetEntrys_.at(i)->fileName() == fileName) {
+		auto pEntry = assetEntrys_.at(i);
+		if (pEntry->assetName() == assetName && pEntry->type() == type) {
 			return i;
 		}
 	}
@@ -125,18 +131,18 @@ QList<IAssetEntry*> AssetEntryModel::openedAssetEntrys(void) const
 	return editors_.keys();
 }
 
-IAssetEntry* AssetEntryModel::assetEntryForFileName(const QString& fileName) const
+IAssetEntry* AssetEntryModel::assetEntryForAsset(const QString& assetName, assetDb::AssetType::Enum type) const
 {
-	int32_t index = indexOfFileName(fileName);
+	int32_t index = indexOfAsset(assetName, type);
 	if (index < 0) {
 		return nullptr;
 	}
 	return assetEntrys_.at(index)->pAssetEntry_;
 }
 
-QList<IEditor*> AssetEntryModel::editorsForFileName(const QString& fileName) const
+QList<IEditor*> AssetEntryModel::editorsForAsset(const QString& assetName, assetDb::AssetType::Enum type) const
 {
-	IAssetEntry *pAssetEntry = assetEntryForFileName(fileName);
+	IAssetEntry *pAssetEntry = assetEntryForAsset(assetName, type);
 	if (pAssetEntry) {
 		return editorsForAssetEntry(pAssetEntry);
 	}
@@ -207,9 +213,9 @@ void AssetEntryModel::removeEditor(IEditor* pEditor, bool* pLastOneForDocument)
 	}
 }
 
-void AssetEntryModel::removeAssetEntry(const QString& fileName)
+void AssetEntryModel::removeAssetEntry(const QString& assetName, assetDb::AssetType::Enum type)
 {
-	int32_t index = indexOfFileName(fileName);
+	int32_t index = indexOfAsset(assetName, type);
 
 	BUG_ASSERT(!assetEntrys_.at(index)->pAssetEntry_, return); // we wouldn't know what to do with the associated editors
 
@@ -227,10 +233,11 @@ void AssetEntryModel::removeEntry(Entry* pEntry)
 
 void AssetEntryModel::addEntry(Entry* pEntry)
 {
-	QString fileName = pEntry->fileName();
+	QString assetName = pEntry->assetName();
+	auto type = pEntry->type();
 
 	// replace a non-loaded entry (aka 'restored') if possible
-	int32_t previousIndex = indexOfFileName(fileName);
+	int32_t previousIndex = indexOfAsset(assetName, type);
 	if (previousIndex >= 0) 
 	{
 		if (pEntry->pAssetEntry_ && assetEntrys_.at(previousIndex)->pAssetEntry_ == nullptr)
@@ -337,7 +344,7 @@ QVariant AssetEntryModel::data(const QModelIndex &index, int32_t role) const
 		return showLock ? lockedIcon_ : QIcon();
 	}
 	case Qt::ToolTipRole:
-		return pEntry->fileName().isEmpty() ? pEntry->displayName()  : QDir::toNativeSeparators(pEntry->fileName());
+		return pEntry->assetName().isEmpty() ? pEntry->displayName()  : QDir::toNativeSeparators(pEntry->assetName());
 
 	default:
 		return QVariant();
