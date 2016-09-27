@@ -1069,6 +1069,54 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 	trans.commit();
 	return Result::OK;
 }
+
+
+AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core::string& name, const core::string& argsOpt)
+{
+	int32_t assetId;
+
+	if (name.isEmpty()) {
+		X_ERROR("AssetDB", "Can't update asset args with empty name");
+		return Result::ERROR;
+	}
+
+	if (!AssetExsists(type, name, &assetId))  {
+		// I don't allow adding of asset if not providing raw data also.
+		X_WARNING("AssetDB", "Failed to update asset args, asset not found");
+		return Result::NOT_FOUND;
+	}
+
+	core::string args(argsOpt);
+
+	if (!MergeArgs(assetId, args)) {
+		X_WARNING("AssetDB", "Failed to merge args");
+		return Result::ERROR;
+	}
+
+	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
+	const uint32_t argsCrc = pCrc32->GetCRC32(args.c_str(), args.length());
+
+	sql::SqlLiteTransaction trans(db_);
+	core::string stmt;
+
+	stmt = "UPDATE file_ids SET lastUpdateTime = DateTime('now'), args = :args, argsHash = :argsHash"
+		" WHERE type = :t AND name = :n ";
+
+	sql::SqlLiteCmd cmd(db_, stmt.c_str());
+	cmd.bind(":t", type);
+	cmd.bind(":n", name.c_str());
+	cmd.bind(":args", args.c_str());
+	cmd.bind(":argsHash", static_cast<int32_t>(argsCrc));
+
+
+	sql::Result::Enum res = cmd.execute();
+	if (res != sql::Result::OK) {
+		return Result::ERROR;
+	}
+
+	trans.commit();
+	return Result::OK;
+}
  
 
 bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pIdOut, ModId* pModIdOut)
