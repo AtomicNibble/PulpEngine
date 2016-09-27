@@ -168,6 +168,9 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 	if (!settings_.IsSet(Setting::ENABLED)) {
 		enable(false);
 	}
+	if (!settings_.IsSet(Setting::VISIBLE)) {
+		show(false);
+	}
 }
 
 
