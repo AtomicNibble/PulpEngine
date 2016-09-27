@@ -810,14 +810,6 @@ AssetProperty& AssetProps::AddInt(const std::string& key, int32_t default, int32
 	return item;
 }
 
-AssetProperty& AssetProps::AddFloat(const std::string& key, double default, double min, double max)
-{
-	AssetProperty& item = addItemIU(key, AssetProperty::PropertyType::FLOAT);
-	item.SetDefaultValue(std::to_string(default));
-	item.SetMinMax(min, max);
-	return item;
-}
-
 AssetProperty& AssetProps::AddColor(const std::string& key, double r, double g, double b, double a)
 {
 	AssetProperty& item = addItemIU(key, AssetProperty::PropertyType::COLOR);
@@ -830,6 +822,14 @@ AssetProperty& AssetProps::AddColor(const std::string& key, double r, double g, 
 	);
 
 	item.SetDefaultValue(temp.toStdString());
+	return item;
+}
+
+AssetProperty& AssetProps::AddFloat(const std::string& key, double default, double min, double max)
+{
+	AssetProperty& item = addItemIU(key, AssetProperty::PropertyType::FLOAT);
+	item.SetDefaultValue(std::to_string(default));
+	item.SetMinMax(min, max);
 	return item;
 }
 

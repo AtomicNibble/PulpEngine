@@ -209,8 +209,8 @@ public:
 	AssetProperty& AddCombo(const std::string& key, const std::string& values, bool editiable = false);
 	AssetProperty& AddCheckBox(const std::string& key, bool default);
 	AssetProperty& AddInt(const std::string& key, int32_t default, int32_t min, int32_t max);
-	AssetProperty& AddFloat(const std::string& key, double default, double min, double max);
 	AssetProperty& AddColor(const std::string& key, double r, double g, double b, double a);
+	AssetProperty& AddFloat(const std::string& key, double default, double min, double max);
 	AssetProperty& AddVec2(const std::string& keyX, const std::string& keyY,
 		double x, double y, double min, double max);
 	AssetProperty& AddVec3(const std::string& keyX, const std::string& keyY, const std::string& keyZ, 
