@@ -98,7 +98,7 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 		pColorWidget_ = new AssetColorWidget(pParent, val);
 		break;
 	case PropertyType::COMBOBOX:
-		pComboBoxWidget_ = new AssetComboBoxWidget(pParent, val, settings_.IsSet(Setting::EDITIABLE));
+		pComboBoxWidget_ = new AssetComboBoxWidget(pParent, val, values_, settings_.IsSet(Setting::EDITIABLE));
 		break;
 	case PropertyType::GROUPBOX:
 		X_ASSERT(pGroupWidget_, "Group not valid")(pGroupWidget_);
@@ -449,6 +449,10 @@ AssetProperty& AssetProperty::UpdateOnChange(bool update)
 	return *this;
 }
 
+void AssetProperty::SetValues(const std::string& val)
+{
+	values_ = val;
+}
 
 AssetProperty& AssetProperty::SetValue(const std::string& val)
 {
@@ -796,11 +800,30 @@ AssetProperty& AssetProps::AddTexture(const std::string& key, const std::string&
 	return item;
 }
 
-AssetProperty& AssetProps::AddCombo(const std::string& key, const std::string& values, bool editiable)
+AssetProperty& AssetProps::AddCombo(const std::string& key, const std::string& valuesStr, bool editiable)
 {
 	AssetProperty& item = addItemIU(key, AssetProperty::PropertyType::COMBOBOX);
-	item.SetDefaultValue(values);
 	item.SetEditable(editiable);
+
+	// we pick frist from list for default.
+	AssetComboBoxWidget::ComboEntryArr values;
+	if (AssetComboBoxWidget::splitValues(valuesStr, values))
+	{
+		if (!values.isEmpty())
+		{
+			const auto& first = values.first();
+
+			// do we want to set the override or the title?
+			if (first.hasOverRide()) {
+				item.SetDefaultValue(first.valueOverride.toStdString());
+			}
+			else {
+				item.SetDefaultValue(first.title.toStdString());
+			}
+		}
+	}
+
+	item.SetValues(valuesStr);
 	return item;
 }
 

@@ -102,6 +102,7 @@ public:
 	AssetProperty& ShowJumpToAsset(bool show);
 	AssetProperty& UpdateOnChange(bool update);
 
+	void SetValues(const std::string& val);
 	AssetProperty& SetValue(const std::string& val);
 	AssetProperty& SetDefaultValue(const std::string& val);
 	AssetProperty& SetBool(bool val);
@@ -145,7 +146,8 @@ private:
 	std::string key_; 
 	std::string title_;
 	std::string strValue_;
-	std::string defaultValue_; 
+	std::string defaultValue_;
+	std::string values_; // used by combox box.
 	std::string toolTip_;
 	QString icon_;
 
