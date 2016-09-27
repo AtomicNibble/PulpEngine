@@ -459,6 +459,10 @@ AssetProperty& AssetProperty::SetValue(const std::string& val)
 AssetProperty& AssetProperty::SetDefaultValue(const std::string& val)
 {
 	defaultValue_ = val;
+
+	if (isNewProp()) {
+		SetValue(val);
+	}
 	return *this;
 }
 
@@ -535,6 +539,16 @@ void AssetProperty::SetEditable(bool canEdit)
 	else {
 		settings_.Remove(Setting::EDITIABLE);
 	}
+}
+
+void AssetProperty::SetNewProp(void)
+{
+	settings_.Set(Setting::NEW_PROP);
+}
+
+bool AssetProperty::isNewProp(void) const
+{
+	return settings_.IsSet(Setting::NEW_PROP);
 }
 
 AssetProperty::PropertyType::Enum AssetProperty::GetType(void) const
@@ -1012,6 +1026,7 @@ AssetProperty& AssetProps::addItemIU(const std::string& key, AssetProperty::Prop
 		pItem = new AssetProperty();
 		pItem->SetKey(key);
 		pItem->SetType(type);
+		pItem->SetNewProp();
 		keys_[key] = pItem;
 	}
 

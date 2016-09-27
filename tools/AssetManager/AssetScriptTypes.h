@@ -53,7 +53,8 @@ public:
 		SHOW_JUMP_TO_ASSET,
 		BOLD_TEXT,
 		UPDATE_ON_CHANGE,
-		EDITIABLE
+		EDITIABLE,
+		NEW_PROP // property was not in input props.
 	);
 
 	typedef Flags<Setting> Settings;
@@ -111,6 +112,8 @@ public:
 	void SetMinMax(int32_t min, int32_t max);
 	void SetMinMax(double min, double max);
 	void SetEditable(bool canEdit);
+	void SetNewProp(void);
+	bool isNewProp(void) const;
 
 	PropertyType::Enum GetType(void) const;
 	std::string GetKey(void) const;
