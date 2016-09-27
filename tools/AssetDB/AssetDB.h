@@ -56,6 +56,7 @@ public:
 	typedef int32_t ModId;
 
 	static const ModId INVALID_MOD_ID = -1;
+	static const ModId INVALID_ASSET_ID = -1;
 
 	typedef assetDb::AssetType AssetType;
 	X_DECLARE_ENUM(Result)(
