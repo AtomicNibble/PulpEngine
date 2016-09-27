@@ -53,6 +53,8 @@
         <file>img/warning_32.png</file>
         <file>img/Zoom.png</file>
         <file>img/ZoomOut.png</file>
+        <file>img/Redo.png</file>
+        <file>img/Undo.png</file>
     </qresource>
     <qresource prefix="/dock">
         <file>img/box_center.png</file>
