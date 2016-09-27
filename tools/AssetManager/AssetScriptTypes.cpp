@@ -69,7 +69,7 @@ AssetProperty::~AssetProperty()
 
 void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth)
 {
-	const std::string& val = defaultValue_;
+	const std::string& val = strValue_;
 
 	switch (type_)
 	{
