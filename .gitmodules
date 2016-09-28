@@ -6,7 +6,7 @@
 	url = ../../root/PotatoEngine-TestAssets.git
 [submodule "game_folder/art_source"]
 	path = game_folder/art_source
-	url = ../../root/PotatoEngine-ArtSource.git
+	url = ../../root/PotatoEngineArtSource.git
 [submodule "3rdparty/Wwise_libs"]
 	path = 3rdparty/Wwise_libs
 	url = ../../root/WwiseLibs.git
