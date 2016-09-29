@@ -1,5 +1,4 @@
 #include "stdafx.h"
-#include "Converter.h"
 #include "EngineApp.h"
 
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
@@ -13,7 +12,9 @@
 
 #include <IAnimation.h>
 
-#include "Converter.h"
+#include <../ConverterLib/ConverterLib.h>
+X_LINK_LIB("engine_ConverterLib")
+
 
 HINSTANCE g_hInstance = 0;
 
@@ -26,15 +27,6 @@ X_LINK_LIB("engine_RenderNull")
 
 X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
 
-X_LINK_LIB("engine_ModelLib")
-X_LINK_LIB("engine_AnimLib")
-X_LINK_LIB("engine_ImgLib")
-X_LINK_LIB("engine_MaterialLib")
-
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XConverterLib_Model@@0V12@A")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XConverterLib_Anim@@0V12@A")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XConverterLib_Img@@0V12@A")
-X_FORCE_SYMBOL_LINK("?factory__@XFactory@XConverterLib_Material@@0V12@A")
 
 
 #endif // !X_LIB
@@ -162,7 +154,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		if (app.Init(lpCmdLine, Console))
 		{
-			converter::Converter con;
+			converter::Converter con(g_arena);
 			converter::AssetType::Enum assType;
 			ConvertMode::Enum mode;
 			core::string assName;
