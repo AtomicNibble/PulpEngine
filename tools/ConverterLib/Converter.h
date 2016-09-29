@@ -19,7 +19,9 @@ X_NAMESPACE_BEGIN(converter)
 
 typedef assetDb::AssetDB::AssetType AssetType;
 
-class CONVERTERLIB_EXPORT Converter : public IConverterHost
+class Converter 
+	/* CONVERTERLIB_EXPORT <- shows all my privates in export list :/ */
+	: public IConverterHost
 {
 	typedef core::traits::Function<void *(ICore *pSystem, const char *moduleName)> ModuleLinkfunc;
 public:
@@ -27,19 +29,19 @@ public:
 	typedef IConverter::OutPath OutPath;
 
 public:
-	Converter(core::MemoryArenaBase* scratchArea);
-	~Converter();
+	CONVERTERLIB_EXPORT Converter(core::MemoryArenaBase* scratchArea);
+	CONVERTERLIB_EXPORT ~Converter();
 
-	void PrintBanner(void);
+	CONVERTERLIB_EXPORT void PrintBanner(void);
 
-	bool Convert(AssetType::Enum assType, const core::string& name);
-	bool ConvertAll(void);
-	bool ConvertAll(AssetType::Enum assType);
-	bool CleanAll(const char* pMod = nullptr);
+	CONVERTERLIB_EXPORT bool Convert(AssetType::Enum assType, const core::string& name);
+	CONVERTERLIB_EXPORT bool ConvertAll(void);
+	CONVERTERLIB_EXPORT bool ConvertAll(AssetType::Enum assType);
+	CONVERTERLIB_EXPORT bool CleanAll(const char* pMod = nullptr);
 
 	// IConverterHost
-	virtual bool GetAssetData(const char* pAssetName, AssetType::Enum assType, core::Array<uint8_t>& dataOut) X_OVERRIDE;
-	virtual bool AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType) X_OVERRIDE;
+	CONVERTERLIB_EXPORT virtual bool GetAssetData(const char* pAssetName, AssetType::Enum assType, core::Array<uint8_t>& dataOut) X_OVERRIDE;
+	CONVERTERLIB_EXPORT virtual bool AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType) X_OVERRIDE;
 	// ~IConverterHost
 
 private:
