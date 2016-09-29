@@ -324,6 +324,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Converter.h" />
+    <ClInclude Include="ConverterLib.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
