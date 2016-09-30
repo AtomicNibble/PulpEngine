@@ -676,7 +676,6 @@ AssetProperties::AssetProperties(assetDb::AssetDB& db, AssetPropsScriptManager* 
 {
 	root_.SetType(AssetProperty::PropertyType::GROUPBOX);
 		
-	modifiedCount_ = 0;
 }
 
 AssetProperties::~AssetProperties()
@@ -1015,15 +1014,11 @@ void AssetProperties::propModified(void)
 	AssetProperty* pProp = qobject_cast<AssetProperty*>(sender());
 	if (pProp)
 	{
-		if (pProp->isModified()) {
-			++modifiedCount_;
-		}
-		else {
-			--modifiedCount_;
-		}
+		// now we don't want to count a props that's modified twice
+		// so it needs to be per prop.
+		bool modified = isModified();
 
-
-		emit modificationChanged(modifiedCount_ > 0);
+		emit modificationChanged(modified);
 	}
 }
 

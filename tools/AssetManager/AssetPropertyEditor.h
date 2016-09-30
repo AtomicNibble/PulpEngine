@@ -261,7 +261,6 @@ private:
 
 	KeyMap keys_;
 	KeyValueMap values_;
-	int32_t modifiedCount_;
 };
 
 
