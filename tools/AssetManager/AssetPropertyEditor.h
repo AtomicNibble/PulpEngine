@@ -241,6 +241,8 @@ private:
 public:
 	AssetProperty& addItemIU(const std::string& key, AssetProperty::PropertyType::Enum type);
 
+private slots:
+	void propModified(void);
 
 signals:
 	void modificationChanged(bool);
@@ -272,7 +274,10 @@ public:
 	AssetPropertyEditorWidget(AssetPropertyEditorWidget* pOther);
 	~AssetPropertyEditorWidget();
 
+private:
+	void ctor(const QSharedPointer<AssetProperties>& props);
 
+public:
 	bool open(QString* pErrorString, const QString& data, assetDb::AssetType::Enum type);
 
 	AssetPropertyEditor* editor(void);
@@ -302,6 +307,9 @@ public:
 	bool open(QString* pErrorString, const QString& fileName, assetDb::AssetType::Enum type) X_OVERRIDE;
 	IAssetEntry* assetEntry(void) X_OVERRIDE;
 	Id id(void) const X_OVERRIDE;
+
+	bool duplicateSupported(void) const X_OVERRIDE;
+	IEditor* duplicate(void) X_OVERRIDE;
 
 private slots:
 	void modificationChanged(bool);

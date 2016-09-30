@@ -709,14 +709,20 @@ void AssetProperties::setAssetType(assetDb::AssetType::Enum type)
 
 void AssetProperties::setWidget(QWidget* widget)
 {
-	if (AssetPropertyEditorWidget* wid = qobject_cast<AssetPropertyEditorWidget*>(widget))
-	{
+	if (AssetPropertyEditorWidget* wid = qobject_cast<AssetPropertyEditorWidget*>(widget)) {
 		pWidget_ = wid;
 	}
 }
 
 bool AssetProperties::isModified(void) const
 {
+	// humm use the cached value or really check.
+	for (auto it = keys_.begin(); it != keys_.end(); ++it) {
+		if ((*it)->isModified()) {
+			return true;
+		}
+	}
+
 	return false;
 }
 
@@ -729,8 +735,8 @@ bool AssetProperties::loadProps(QString& errorString, const QString& assetName, 
 {
 	// we want to load the args from the db.
 	X_UNUSED(assetName);
-	auto narrowName = assetName.toLocal8Bit();
-	core::string name(narrowName.data());
+	const auto narrowName = assetName.toLocal8Bit();
+	const core::string name(narrowName.data());
 
 	int32_t assetId;
 	if (!db_.AssetExsists(type, name, &assetId)) {
@@ -750,7 +756,7 @@ bool AssetProperties::loadProps(QString& errorString, const QString& assetName, 
 		return false;
 	}
 
-	if (!pPropScriptMan_->runScriptForProps(*this, assetDb::AssetType::IMG)) {
+	if (!pPropScriptMan_->runScriptForProps(*this, type)) {
 		errorString = "Error running property script for asset '" + assetName + "'";
 		return false;
 	}
@@ -977,7 +983,7 @@ AssetProperty& AssetProperties::addItemIU(const std::string& key, AssetProperty:
 		{
 			pItem->SetType(type);
 
-			connect(this, SIGNAL(modified(void)), pItem, SLOT(propModified(void)));
+			connect(pItem, SIGNAL(modified(void)), this, SLOT(propModified(void)));
 		}
 		else if (pItem->GetType() != type) {
 			X_WARNING("AssetProps", "Prop request with diffrent types for key \"%s\" initialType: \"%s\" requestedType: \"%s\"",
@@ -993,7 +999,7 @@ AssetProperty& AssetProperties::addItemIU(const std::string& key, AssetProperty:
 		pItem->SetNewProp();
 
 		// CONNECT :D !
-		connect(this, SIGNAL(modified(void)), pItem, SLOT(propModified(void)));
+		connect(pItem, SIGNAL(modified(void)), this, SLOT(propModified(void)));
 
 		keys_[key] = pItem;
 	}
@@ -1001,6 +1007,24 @@ AssetProperty& AssetProperties::addItemIU(const std::string& key, AssetProperty:
 	pCur_->AddChild(pItem);
 
 	return *pItem;
+}
+
+void AssetProperties::propModified(void)
+{
+	// a prop was modified.
+	AssetProperty* pProp = qobject_cast<AssetProperty*>(sender());
+	if (pProp)
+	{
+		if (pProp->isModified()) {
+			++modifiedCount_;
+		}
+		else {
+			--modifiedCount_;
+		}
+
+
+		emit modificationChanged(modifiedCount_ > 0);
+	}
 }
 
 
@@ -1019,10 +1043,7 @@ AssetPropertyEditorWidget::AssetPropertyEditorWidget(assetDb::AssetDB& db, Asset
 	pPropScriptMan_(pPropScriptMan),
 	pEditor_(nullptr)
 {
-	assetProps_ = QSharedPointer<AssetProperties>(new AssetProperties(db, pPropScriptMan, this));
-
-	connect(assetProps_.data(), SIGNAL(modificationChanged(bool)),
-		this, SIGNAL(modificationChanged(bool)));
+	ctor(QSharedPointer<AssetProperties>(new AssetProperties(db, pPropScriptMan, this)));
 }
 
 AssetPropertyEditorWidget::AssetPropertyEditorWidget(assetDb::AssetDB& db, AssetPropsScriptManager* pPropScriptMan, AssetProperties* pAssetEntry, QWidget *parent) :
@@ -1031,28 +1052,29 @@ AssetPropertyEditorWidget::AssetPropertyEditorWidget(assetDb::AssetDB& db, Asset
 	pPropScriptMan_(pPropScriptMan),
 	pEditor_(nullptr)
 {
-	assetProps_ = QSharedPointer<AssetProperties>(pAssetEntry);
-
-
-	connect(assetProps_.data(), SIGNAL(modificationChanged(bool)),
-		this, SIGNAL(modificationChanged(bool)));
+	ctor(QSharedPointer<AssetProperties>(pAssetEntry));
 }
 
 AssetPropertyEditorWidget::AssetPropertyEditorWidget(AssetPropertyEditorWidget* pOther) :
-	pPropScriptMan_(pOther->pPropScriptMan_),
 	db_(pOther->db_),
+	pPropScriptMan_(pOther->pPropScriptMan_),
 	pEditor_(nullptr)
 {
-	assetProps_ = pOther->assetProps_;
-
-
-	connect(assetProps_.data(), SIGNAL(modificationChanged(bool)),
-		this, SIGNAL(modificationChanged(bool)));
+	ctor(pOther->assetProps_);
 }
 
 AssetPropertyEditorWidget::~AssetPropertyEditorWidget()
 {
 
+}
+
+void AssetPropertyEditorWidget::ctor(const QSharedPointer<AssetProperties>& props)
+{
+	assetProps_ = props;
+
+
+	connect(assetProps_.data(), SIGNAL(modificationChanged(bool)),
+		this, SIGNAL(modificationChanged(bool)));
 }
 
 
@@ -1125,6 +1147,20 @@ IAssetEntry* AssetPropertyEditor::assetEntry(void)
 Id AssetPropertyEditor::id(void) const
 {
 	return Id(Constants::ASSETPROP_EDITOR_ID);
+}
+
+bool AssetPropertyEditor::duplicateSupported(void) const
+{
+	// could be supported, just need to setup widgets and shit for duplicated
+	// prop view.
+	return false;
+}
+
+IEditor* AssetPropertyEditor::duplicate(void)
+{
+	AssetPropertyEditorWidget* ret = new AssetPropertyEditorWidget(pEditorWidget_);
+
+	return ret->editor();
 }
 
 void AssetPropertyEditor::modificationChanged(bool modified)
