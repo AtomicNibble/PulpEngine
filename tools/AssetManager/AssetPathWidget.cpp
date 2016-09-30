@@ -167,6 +167,7 @@ bool AssetPathWidget::eventFilter(QObject* pObject, QEvent* pEvent)
 		else if (type == QEvent::Drop)
 		{
 			dropEvent(static_cast<QDropEvent*>(pEvent));
+			return true;
 		}
 	}
 
