@@ -53,6 +53,8 @@ AssetProperty* AssetProperty::copyFactory(const AssetProperty& oth)
 
 AssetProperty::AssetProperty() :
 	refCount_(1),
+	min_(std::numeric_limits<float>::min()),
+	max_(std::numeric_limits<float>::max()),
 	step_(0.0001),
 	type_(PropertyType::UNCLASSIFIED),
 	pLabel_(nullptr),
