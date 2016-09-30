@@ -16,7 +16,7 @@ public:
 
 
 private:
-	void setColorInternal(QColor col);
+	void setColorInternal(QColor col, bool force = false);
 
 signals:
 	void valueChanged(const std::string& value);
@@ -40,6 +40,7 @@ private:
 	ColorSelector* pColPreview_;
 	QLineEdit* pRGBAValueWidgets_[4];
 
+	QColor curCol_;
 	bool picking_;
 };
 

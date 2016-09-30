@@ -70,18 +70,19 @@ void AssetColorWidget::setValue(const std::string& value)
 	}
 
 	QColor col;
-	col.setRgbF(
-		values[0].toFloat(),
-		values[1].toFloat(),
-		values[2].toFloat(),
-		values[3].toFloat());
+	col.setRgb(
+		static_cast<int32_t>(values[0].toDouble() * 255),
+		static_cast<int32_t>(values[1].toDouble() * 255),
+		static_cast<int32_t>(values[2].toDouble() * 255),
+		static_cast<int32_t>(values[3].toDouble() * 255)
+	);
 
 	blockSignals(true);
 	for (int32_t i = 0; i < 4; i++) {
 		pRGBAValueWidgets_[i]->blockSignals(true);
 	}
 
-	setColorInternal(col);
+	setColorInternal(col, true);
 
 	for (int32_t i = 0; i < 4; i++) {
 		pRGBAValueWidgets_[i]->blockSignals(false);
@@ -89,8 +90,14 @@ void AssetColorWidget::setValue(const std::string& value)
 	blockSignals(false);
 }
 
-void AssetColorWidget::setColorInternal(QColor col)
+void AssetColorWidget::setColorInternal(QColor col, bool force)
 {
+	if (!force && curCol_ == col) {
+		return;
+	}
+
+	curCol_ = col;
+
 	int32_t colors[4] = { col.red(), col.green(), col.blue(), col.alpha() };
 	
 	for (int32_t i = 0; i < 4; i++)	{
@@ -101,10 +108,10 @@ void AssetColorWidget::setColorInternal(QColor col)
 
 	// back to string xD
 	QString temp = QString("%1 %2 %3 %4").arg(
-		QString::number(col.redF()),
-		QString::number(col.greenF()),
-		QString::number(col.blueF()),
-		QString::number(col.alphaF())
+		QString::number(static_cast<double>(colors[0]) / 255, 'f', 4),
+		QString::number(static_cast<double>(colors[1]) / 255, 'f', 4),
+		QString::number(static_cast<double>(colors[2]) / 255, 'f', 4),
+		QString::number(static_cast<double>(colors[3]) / 255, 'f', 4)
 	);
 
 	emit valueChanged(temp.toStdString());
