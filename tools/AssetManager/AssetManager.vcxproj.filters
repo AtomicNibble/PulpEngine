@@ -1194,21 +1194,6 @@
     <ClCompile Include="ShowRefsDialog.cpp">
       <Filter>Source Files\Widgets\Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetScriptTypes.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetScriptTypes.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetScriptTypes.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetScriptTypes.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetScriptTypes.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">

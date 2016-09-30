@@ -1,5 +1,6 @@
 #include "AssetScript.h"
 #include "AssetScriptTypes.h"
+#include "AssetPropertyEditor.h"
 
 #include "assetscript\scriptstdstring.h"
 #include "assetscript\scriptbuilder.h"
@@ -204,7 +205,7 @@ void AssetPropsScriptManager::shutdown(void)
 }
 
 
-bool AssetPropsScriptManager::runScriptForProps(AssetProps& props, assetDb::AssetType::Enum type)
+bool AssetPropsScriptManager::runScriptForProps(AssetProperties& props, assetDb::AssetType::Enum type)
 {
 	if (!ensureSourceCache(type)) {
 		X_ERROR("AssetScript", "Failed to get assetProps for asset type: \"%s\"", assetDb::AssetType::ToString(type));
@@ -297,7 +298,7 @@ bool AssetPropsScriptManager::loadScript(const core::Path<char>& path, std::stri
 	return true;
 }
 
-bool AssetPropsScriptManager::processScript(AssetProps& props, Scriptcache& cache)
+bool AssetPropsScriptManager::processScript(AssetProperties& props, Scriptcache& cache)
 {
 	if (cache.byteCode.isNotEmpty()) {
 		return processScript(props, cache.byteCode);
@@ -310,7 +311,7 @@ bool AssetPropsScriptManager::processScript(AssetProps& props, Scriptcache& cach
 	return processScript(props, cache.text, &cache.byteCode);
 }
 
-bool AssetPropsScriptManager::processScript(AssetProps& props, const std::string& script, ByteCodeStream* pCacheOut)
+bool AssetPropsScriptManager::processScript(AssetProperties& props, const std::string& script, ByteCodeStream* pCacheOut)
 {
 	X_ASSERT_NOT_NULL(pEngine_);
 
@@ -346,7 +347,7 @@ bool AssetPropsScriptManager::processScript(AssetProps& props, const std::string
 }
 
 
-bool AssetPropsScriptManager::processScript(AssetProps& props, ByteCodeStream& byteCode)
+bool AssetPropsScriptManager::processScript(AssetProperties& props, ByteCodeStream& byteCode)
 {
 	X_ASSERT_NOT_NULL(pEngine_);
 
@@ -375,7 +376,7 @@ bool AssetPropsScriptManager::processScript(AssetProps& props, ByteCodeStream& b
 }
 
 
-bool AssetPropsScriptManager::execScript(AssetProps& props, asIScriptModule* pMod)
+bool AssetPropsScriptManager::execScript(AssetProperties& props, asIScriptModule* pMod)
 {
 	asIScriptFunction* pFunc = pMod->GetFunctionByDecl(SCRIPT_ENTRY);
 	if (!pFunc)
