@@ -324,6 +324,21 @@ void AssetProperty::SetModified(bool modified)
 {
 	QString style;
 
+	if (settings_.IsSet(Setting::MODIFIED)) {
+		if (modified) {
+			return;
+		}
+
+		settings_.Remove(Setting::MODIFIED);
+	}
+	else {
+		if (!modified) {
+			return;
+		}
+
+		settings_.Set(Setting::MODIFIED);
+	}
+
 	if (type_ == PropertyType::CHECKBOX)
 	{
 		if (modified) {
@@ -581,6 +596,11 @@ void AssetProperty::SetNewProp(void)
 bool AssetProperty::isNewProp(void) const
 {
 	return settings_.IsSet(Setting::NEW_PROP);
+}
+
+bool AssetProperty::isModified(void) const
+{
+	return settings_.IsSet(Setting::MODIFIED);
 }
 
 AssetProperty::PropertyType::Enum AssetProperty::GetType(void) const

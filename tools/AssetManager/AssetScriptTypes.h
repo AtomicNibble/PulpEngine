@@ -60,6 +60,7 @@ public:
 		BOLD_TEXT,
 		UPDATE_ON_CHANGE,
 		EDITIABLE,
+		MODIFIED,
 		NEW_PROP // property was not in input props.
 	);
 
@@ -119,8 +120,9 @@ public:
 	void SetMinMax(double min, double max);
 	void SetEditable(bool canEdit);
 	void SetNewProp(void);
-	bool isNewProp(void) const;
 
+	bool isNewProp(void) const;
+	bool isModified(void) const;
 	PropertyType::Enum GetType(void) const;
 	const std::string& GetKey(void) const;
 	const std::string& GetParentKey(void) const;
