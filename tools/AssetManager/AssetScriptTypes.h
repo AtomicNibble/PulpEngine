@@ -218,34 +218,10 @@ public:
 	bool extractArgs(core::string& jsonStrOut) const;
 	bool appendGui(QGridLayout* pLayout);
 
-
 	bool isModified(void) const;
 
 public:
-	AssetProperty& AddTexture(const std::string& key, const std::string& default);
-	AssetProperty& AddCombo(const std::string& key, const std::string& values, bool editiable = false);
-	AssetProperty& AddCheckBox(const std::string& key, bool default);
-	AssetProperty& AddInt(const std::string& key, int32_t default, int32_t min, int32_t max);
-	AssetProperty& AddColor(const std::string& key, double r, double g, double b, double a);
-	AssetProperty& AddFloat(const std::string& key, double default, double min, double max);
-	AssetProperty& AddVec2(const std::string& keyX, const std::string& keyY,
-		double x, double y, double min, double max);
-	AssetProperty& AddVec3(const std::string& keyX, const std::string& keyY, const std::string& keyZ, 
-		double x, double y, double z, double min, double max);
-	AssetProperty& AddVec4(const std::string& keyX, const std::string& keyY, const std::string& keyZ, const std::string& keyW,
-		double x, double y, double z, double w, double min, double max);
-	AssetProperty& AddText(const std::string& key, const std::string& value);
-	AssetProperty& AddString(const std::string& key, const std::string& value);
-	AssetProperty& AddPath(const std::string& key, const std::string& value);
-
 	void BeginGroup(const std::string& groupName);
-
-public:
-	AssetProperty& getItem(const std::string& key);
-	std::string getPropValue(const std::string& key);
-	double getPropValueFloat(const std::string& key);
-	int32_t getPropValueInt(const std::string& key);
-	bool getPropValueBool(const std::string& key);
 
 public:
 	AssetProperty& addItem(const std::string& key);
