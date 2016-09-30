@@ -13,6 +13,8 @@
 #include "AssetGroupWidget.h"
 #include "AssetPathWidget.h"
 
+#include "AssetPropertyEditor.h"
+
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -39,16 +41,6 @@ namespace
 
 } // namespace
 
-AssetProperty* AssetProperty::factory(void)
-{
-	return new AssetProperty();
-}
-
-
-AssetProperty* AssetProperty::copyFactory(const AssetProperty& oth)
-{
-	return new AssetProperty(oth);
-}
 
 
 AssetProperty::AssetProperty() :
@@ -79,16 +71,19 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 		pCheckBoxWidget_ = new AssetCheckBoxWidget(pParent, val);
 		break;
 	case PropertyType::INT:
-		pSpinBoxWidget_ = new AssetSpinBoxWidget(pParent, GetValueInt(), min_, max_, step_);
+		pSpinBoxWidget_ = new AssetSpinBoxWidget(pParent, val, min_, max_, step_);
 		break;
 	case PropertyType::FLOAT:
-		pDoubleSpinBoxWidget_ = new AssetDoubleSpinBoxWidget(pParent, GetValueFloat(), min_, max_, step_);
+		pDoubleSpinBoxWidget_ = new AssetDoubleSpinBoxWidget(pParent, val, min_, max_, step_);
 		break;
 	case PropertyType::PATH:
 		pPathWidget_ = new AssetPathWidget(pParent, val);
 		break;
 	case PropertyType::TEXT:
 		pTextWidget_ = new AssetTextWidget(pParent, val);
+		break;
+	case PropertyType::LINEEDIT:
+		pLineEditWidget_ = new AssetLineEditWidget(pParent, val);
 		break;
 	case PropertyType::IMAGE:
 		pTextureWidget_ = new AssetTextureWidget(pParent, val);
@@ -100,7 +95,7 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 		pColorWidget_ = new AssetColorWidget(pParent, val);
 		break;
 	case PropertyType::COMBOBOX:
-		pComboBoxWidget_ = new AssetComboBoxWidget(pParent, val, values_, settings_.IsSet(Setting::EDITIABLE));
+		pComboBoxWidget_ = new AssetComboBoxWidget(pParent, val, initData_, settings_.IsSet(Setting::EDITIABLE));
 		break;
 	case PropertyType::GROUPBOX:
 		X_ASSERT(pGroupWidget_, "Group not valid")(pGroupWidget_);
@@ -110,6 +105,24 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 	default:
 		break;
 	}
+
+	switch (type_)
+	{
+	case PropertyType::CHECKBOX:
+	case PropertyType::COMBOBOX:
+	case PropertyType::COLOR:
+	case PropertyType::STRING:
+	case PropertyType::INT:
+	case PropertyType::FLOAT:
+	case PropertyType::PATH:
+	case PropertyType::IMAGE:
+	case PropertyType::LINEEDIT:
+		connect(pWidget_, SIGNAL(valueChanged(const std::string&)), this, SLOT(valueChanged(const std::string&)));
+		break;
+
+	default:
+		break;
+	};
 
 	// SetTile / SettoolTip
 	const QString toolTip = QString::fromStdString(toolTip_);
@@ -175,17 +188,20 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 	}
 }
 
-
-void AssetProperty::setLabelText(QLabel* pLabel) const
+void AssetProperty::valueChanged(const std::string& value)
 {
-	if (!title_.empty()) {
-		pLabel->setText(QString::fromStdString(title_));
-	}
-	else {
-		pLabel->setText(QString::fromStdString(key_));
-	}
-}
+	X_UNUSED(value);
+	X_LOG0("Meow", "meow: %s", value.c_str());
 
+	// so this prop was changed :D
+	bool isModified = GetDefaultValue() != value;
+	SetValue(value);
+	SetModified(isModified);
+
+//	SetValue(value);
+
+	emit modified();
+}
 
 int32_t AssetProperty::colSpanForCol(int32_t startCol)
 {
@@ -207,7 +223,9 @@ void AssetProperty::release(void)
 
 void AssetProperty::clear(void)
 {
-
+	if (type_ == PropertyType::GROUPBOX) {
+	//	pGroupWidget_->clear();
+	}
 }
 
 
@@ -302,6 +320,30 @@ void AssetProperty::enable(bool val)
 
 }
 
+void AssetProperty::SetModified(bool modified)
+{
+	QString style;
+
+	if (type_ == PropertyType::CHECKBOX)
+	{
+		if (modified) {
+			pCheckBoxWidget_->setStyleSheet("QCheckBox { color: #a00020 }");
+		}
+		else {
+			pCheckBoxWidget_->setStyleSheet("");
+		}
+	}
+	else if(pLabel_)
+	{
+		if (modified) {
+			pLabel_->setStyleSheet("QLabel { color: #a00020 }");
+		}
+		else {
+			pLabel_->setStyleSheet("");
+		}
+	}
+}
+
 
 void AssetProperty::SetKey(const std::string& key)
 {
@@ -357,41 +399,36 @@ AssetProperty::ConstIterator AssetProperty::end(void) const
 }
 
 
-AssetProperty& AssetProperty::SetTitle(const std::string& title)
+void AssetProperty::SetTitle(const std::string& title)
 {
 	title_ = title;
-	return *this;
 }
 
-AssetProperty& AssetProperty::SetToolTip(const std::string& toolTip)
+void AssetProperty::SetToolTip(const std::string& toolTip)
 {
 	toolTip_ = toolTip;
-	return *this;
 }
 
-AssetProperty& AssetProperty::SetLabels(const std::string& labelX, const std::string& labelY,
+void AssetProperty::SetLabels(const std::string& labelX, const std::string& labelY,
 	const std::string& labelZ, const std::string& labelW)
 {
 	labelsX_ = QString::fromStdString(labelX);
 	labelsY_ = QString::fromStdString(labelY);
 	labelsZ_ = QString::fromStdString(labelZ);
 	labelsW_ = QString::fromStdString(labelW);
-	return *this;
 }
 
-AssetProperty& AssetProperty::SetIcon(const std::string& icon)
+void AssetProperty::SetIcon(const std::string& icon)
 {
 	icon_ = QString::fromStdString(icon);
-	return *this;
 }
 
-AssetProperty& AssetProperty::SetFontColor(float r, float g, float b)
+void AssetProperty::SetFontColor(float r, float g, float b)
 {
 	fontCol_.setRgbF(r, g, b);
-	return *this;
 }
 
-AssetProperty& AssetProperty::SetBold(bool bold)
+void AssetProperty::SetBold(bool bold)
 {
 	if (bold) {
 		settings_.Set(Setting::BOLD_TEXT);
@@ -399,17 +436,15 @@ AssetProperty& AssetProperty::SetBold(bool bold)
 	else {
 		settings_.Remove(Setting::BOLD_TEXT);
 	}
-	return *this;
 }
 
-AssetProperty& AssetProperty::SetStep(double step)
+void AssetProperty::SetStep(double step)
 {
 	step_ = step;
-	return *this;
 }
 
 
-AssetProperty& AssetProperty::SetEnabled(bool enable)
+void AssetProperty::SetEnabled(bool enable)
 {
 	if (enable) {
 		settings_.Set(Setting::ENABLED);
@@ -417,11 +452,9 @@ AssetProperty& AssetProperty::SetEnabled(bool enable)
 	else {
 		settings_.Remove(Setting::ENABLED);
 	}
-
-	return *this;
 }
 
-AssetProperty& AssetProperty::SetVisible(bool vis)
+void AssetProperty::SetVisible(bool vis)
 {
 	if (vis) {
 		settings_.Set(Setting::VISIBLE);
@@ -429,10 +462,9 @@ AssetProperty& AssetProperty::SetVisible(bool vis)
 	else {
 		settings_.Remove(Setting::VISIBLE);
 	}
-	return *this;
 }
 
-AssetProperty& AssetProperty::ShowJumpToAsset(bool show)
+void AssetProperty::ShowJumpToAsset(bool show)
 {
 	if (show) {
 		settings_.Set(Setting::SHOW_JUMP_TO_ASSET);
@@ -440,10 +472,9 @@ AssetProperty& AssetProperty::ShowJumpToAsset(bool show)
 	else {
 		settings_.Remove(Setting::SHOW_JUMP_TO_ASSET);
 	}
-	return *this;
 }
 
-AssetProperty& AssetProperty::UpdateOnChange(bool update)
+void AssetProperty::UpdateOnChange(bool update)
 {
 	if (update) {
 		settings_.Set(Setting::UPDATE_ON_CHANGE);
@@ -451,31 +482,28 @@ AssetProperty& AssetProperty::UpdateOnChange(bool update)
 	else {
 		settings_.Remove(Setting::UPDATE_ON_CHANGE);
 	}
-	return *this;
 }
 
-void AssetProperty::SetValues(const std::string& val)
+void AssetProperty::SetInitData(const std::string& val)
 {
-	values_ = val;
+	initData_ = val;
 }
 
-AssetProperty& AssetProperty::SetValue(const std::string& val)
+void AssetProperty::SetValue(const std::string& val)
 {
 	strValue_ = val;
-	return *this;
 }
 
-AssetProperty& AssetProperty::SetDefaultValue(const std::string& val)
+void AssetProperty::SetDefaultValue(const std::string& val)
 {
 	defaultValue_ = val;
 
 	if (isNewProp()) {
 		SetValue(val);
 	}
-	return *this;
 }
 
-AssetProperty& AssetProperty::SetBool(bool val)
+void AssetProperty::SetBool(bool val)
 {
 	if (val) {
 		strValue_ = "1";
@@ -483,26 +511,21 @@ AssetProperty& AssetProperty::SetBool(bool val)
 	else {
 		strValue_ = "0";
 	}
-
-	return *this;
 }
 
-AssetProperty& AssetProperty::SetInt(int32_t val)
+void AssetProperty::SetInt(int32_t val)
 {
 	strValue_ = std::to_string(val);
-	return *this;
 }
 
-AssetProperty& AssetProperty::SetFloat(float val)
+void AssetProperty::SetFloat(float val)
 {
 	strValue_ = std::to_string(val);
-	return *this;
 }
 
-AssetProperty& AssetProperty::SetDouble(double val)
+void AssetProperty::SetDouble(double val)
 {
 	strValue_ = std::to_string(val);
-	return *this;
 }
 
 
@@ -591,6 +614,11 @@ std::string AssetProperty::GetValue(void) const
 	return strValue_;
 }
 
+std::string AssetProperty::GetDefaultValue(void) const
+{
+	return defaultValue_;
+}
+
 double AssetProperty::GetValueFloat(void) const
 {
 	if (strValue_.empty()) {
@@ -618,12 +646,14 @@ bool AssetProperty::GetValueBool(void) const
 // ----------------------------------------------------------
 
 
-AssetProps::AssetProps() : 
+AssetProps::AssetProps(AssetProperties* pProps) :
 	pCur_(nullptr),
 	refCount_(1)
 {
 	root_.SetType(AssetProperty::PropertyType::GROUPBOX);
 
+	pProps_ = pProps;
+	modifiedCount_ = 0;
 }
 
 AssetProps::~AssetProps()
@@ -759,6 +789,7 @@ bool AssetProps::extractArgs(core::string& jsonStrOut) const
 
 		case AssetProperty::PropertyType::TEXT:
 		case AssetProperty::PropertyType::PATH:
+		case AssetProperty::PropertyType::LINEEDIT:
 		case AssetProperty::PropertyType::IMAGE:
 		case AssetProperty::PropertyType::COMBOBOX:
 		case AssetProperty::PropertyType::COLOR:
@@ -798,6 +829,11 @@ bool AssetProps::appendGui(QGridLayout* pLayout)
 	return true;
 }
 
+bool AssetProps::isModified(void) const
+{
+	return modifiedCount_ > 0;
+}
+
 AssetProperty& AssetProps::AddTexture(const std::string& key, const std::string& default)
 {
 	AssetProperty& item = addItemIU(key, AssetProperty::PropertyType::IMAGE);
@@ -817,18 +853,11 @@ AssetProperty& AssetProps::AddCombo(const std::string& key, const std::string& v
 		if (!values.isEmpty())
 		{
 			const auto& first = values.first();
-
-			// do we want to set the override or the title?
-			if (first.hasOverRide()) {
-				item.SetDefaultValue(first.valueOverride.toStdString());
-			}
-			else {
-				item.SetDefaultValue(first.title.toStdString());
-			}
+			item.SetDefaultValue(first.title.toStdString());
 		}
 	}
 
-	item.SetValues(valuesStr);
+	item.SetInitData(valuesStr);
 	return item;
 }
 
@@ -1012,7 +1041,6 @@ AssetProperty& AssetProps::getItem(const std::string& key)
 	return empty;
 }
 
-
 AssetProperty& AssetProps::addItem(const std::string& key)
 {
 	auto it = keys_.find(key);
@@ -1032,7 +1060,6 @@ AssetProperty& AssetProps::addItem(const std::string& key)
 AssetProperty& AssetProps::addItemIU(const std::string& key, AssetProperty::PropertyType::Enum type)
 {
 	AssetProperty* pItem = nullptr;
-
 
 	auto it = keys_.find(key);
 	if (it != keys_.end())
@@ -1063,8 +1090,10 @@ AssetProperty& AssetProps::addItemIU(const std::string& key, AssetProperty::Prop
 	return *pItem;
 }
 
+
 // -----------------------------------------------------------
 
+#if 0
 AssetProps* AssetProps::factory(void)
 {
 	return new AssetProps();
@@ -1076,6 +1105,459 @@ AssetProps* AssetProps::copyFactory(const AssetProps& oth)
 }
 
 
+#endif
+
+// -----------------------------------------------------------
+
+AssetScriptProperty::AssetScriptProperty() :
+	pProp_(nullptr),
+	refCount_(1)
+{
+	pProp_ = new AssetProperty();
+}
+
+AssetScriptProperty::AssetScriptProperty(AssetProperty* prop) :
+	pProp_(nullptr),
+	refCount_(1)
+{
+	pProp_ = prop;
+}
+
+AssetScriptProperty::AssetScriptProperty(const AssetScriptProperty& oth) 
+{
+	pProp_ = oth.pProp_;
+	refCount_ = oth.refCount_;
+}
+
+AssetScriptProperty::~AssetScriptProperty()
+{
+#if X_DEBUG
+	pProp_ = nullptr;
+	refCount_ = 0;
+#endif // !X_DEBUG
+}
+
+AssetScriptProperty& AssetScriptProperty::operator=(const AssetScriptProperty& oth)
+{
+	pProp_ = oth.pProp_;
+	refCount_ = oth.refCount_;
+	return *this;
+}
+
+AssetProperty& AssetScriptProperty::prop(void)
+{
+	return *pProp_;
+}
+
+void AssetScriptProperty::addRef(void)
+{
+	++refCount_;
+}
+
+void AssetScriptProperty::release(void)
+{
+	if (--refCount_ == 0) {
+		delete this;
+	}
+}
+
+
+AssetScriptProperty* AssetScriptProperty::SetTitle(const std::string& title)
+{
+	pProp_->SetTitle(title);
+
+	addRef();
+	return this;
+}
+
+AssetScriptProperty* AssetScriptProperty::SetToolTip(const std::string& toolTip)
+{
+	pProp_->SetToolTip(toolTip);
+
+	addRef();
+	return this;
+}
+
+AssetScriptProperty* AssetScriptProperty::SetLabels(const std::string& labelX, const std::string& labelY,
+	const std::string& labelZ, const std::string& labelW)
+{
+	pProp_->SetLabels(labelX, labelY, labelZ, labelW);
+
+	addRef();
+	return this;
+}
+
+AssetScriptProperty* AssetScriptProperty::SetIcon(const std::string& icon)
+{
+	pProp_->SetIcon(icon);
+
+	addRef();
+	return this;
+}
+
+AssetScriptProperty*AssetScriptProperty::SetFontColor(float r, float g, float b)
+{
+	pProp_->SetFontColor(r,g,b);
+
+	addRef();
+	return this;
+}
+
+AssetScriptProperty* AssetScriptProperty::SetBold(bool bold)
+{
+	pProp_->SetBold(bold);
+
+	addRef();
+	return this;
+}
+
+AssetScriptProperty* AssetScriptProperty::SetStep(double step)
+{
+	pProp_->SetStep(step);
+
+	addRef();
+	return this;
+}
+
+AssetScriptProperty* AssetScriptProperty::SetEnabled(bool enable)
+{
+	pProp_->SetEnabled(enable);
+
+	addRef();
+	return this;
+}
+
+AssetScriptProperty* AssetScriptProperty::SetVisible(bool vis)
+{
+	pProp_->SetVisible(vis);
+
+	addRef();
+	return this;
+}
+
+AssetScriptProperty* AssetScriptProperty::ShowJumpToAsset(bool show)
+{
+	pProp_->ShowJumpToAsset(show);
+
+	addRef();
+	return this;
+}
+
+AssetScriptProperty* AssetScriptProperty::UpdateOnChange(bool update)
+{
+	pProp_->UpdateOnChange(update);
+
+	addRef();
+	return this;
+}
+
+
+AssetScriptProperty* AssetScriptProperty::SetValue(const std::string& val)
+{
+	pProp_->SetValue(val);
+
+	addRef();
+	return this;
+}
+
+AssetScriptProperty* AssetScriptProperty::SetDefaultValue(const std::string& val)
+{
+	pProp_->SetDefaultValue(val);
+
+	addRef();
+	return this;
+}
+
+AssetScriptProperty* AssetScriptProperty::SetBool(bool val)
+{
+	pProp_->SetBool(val);
+
+	addRef();
+	return this;
+}
+
+AssetScriptProperty* AssetScriptProperty::SetInt(int32_t val)
+{
+	pProp_->SetInt(val);
+
+	addRef();
+	return this;
+}
+
+AssetScriptProperty* AssetScriptProperty::SetFloat(float val)
+{
+	pProp_->SetFloat(val);
+
+	addRef();
+	return this;
+}
+
+AssetScriptProperty* AssetScriptProperty::SetDouble(double val)
+{
+	pProp_->SetDouble(val);
+
+	addRef();
+	return this;
+}
+
+
+std::string AssetScriptProperty::GetTitle(void) const
+{
+	return pProp_->GetTitle();
+}
+
+std::string AssetScriptProperty::GetToolTip(void) const
+{
+	return pProp_->GetToolTip();
+}
+
+std::string AssetScriptProperty::GetValue(void) const
+{
+	return pProp_->GetValue();
+}
+
+double AssetScriptProperty::GetValueFloat(void) const
+{
+	return pProp_->GetValueFloat();
+}
+
+int32_t AssetScriptProperty::GetValueInt(void) const
+{
+	return pProp_->GetValueBool();
+}
+
+bool AssetScriptProperty::GetValueBool(void) const
+{
+	return pProp_->GetValueBool();
+}
+
+
+AssetScriptProperty* AssetScriptProperty::factory(void)
+{
+	return new AssetScriptProperty();
+}
+
+AssetScriptProperty* AssetScriptProperty::copyFactory(const AssetScriptProperty& oth)
+{
+	return new AssetScriptProperty(oth);
+}
+
+
+// -----------------------------------------------------------
+
+
+AssetScriptProps::AssetScriptProps(AssetProps& props) :
+	props_(props),
+	refCount_(1)
+{
+
+}
+
+AssetScriptProps::~AssetScriptProps()
+{
+
+}
+
+void AssetScriptProps::addRef(void)
+{
+
+}
+
+void AssetScriptProps::release(void)
+{
+
+}
+
+AssetScriptProperty* AssetScriptProps::AddTexture(const std::string& key, const std::string& default)
+{
+	auto pProp = getProperty(key, AssetProperty::PropertyType::IMAGE);
+	pProp->prop().SetDefaultValue(default);
+	return pProp;
+}
+
+AssetScriptProperty* AssetScriptProps::AddCombo(const std::string& key, const std::string& valuesStr, bool editiable)
+{
+	auto pProp = getProperty(key, AssetProperty::PropertyType::COMBOBOX);
+	pProp->prop().SetEditable(editiable);
+
+	// we pick frist from list for default.
+	AssetComboBoxWidget::ComboEntryArr values;
+	if (AssetComboBoxWidget::splitValues(valuesStr, values))
+	{
+		if (!values.isEmpty())
+		{
+			const auto& first = values.first();
+
+			pProp->prop().SetDefaultValue(first.title.toStdString());
+		}
+	}
+
+	pProp->prop().SetInitData(valuesStr);
+	return pProp;
+}
+
+AssetScriptProperty* AssetScriptProps::AddCheckBox(const std::string& key, bool default)
+{
+	auto pProp = getProperty(key, AssetProperty::PropertyType::CHECKBOX);
+	if (default) {
+		pProp->prop().SetDefaultValue("1");
+	}
+	else {
+		pProp->prop().SetDefaultValue("0");
+	}
+	return pProp;
+}
+
+AssetScriptProperty* AssetScriptProps::AddInt(const std::string& key, int32_t default, int32_t min, int32_t max)
+{
+	auto pProp = getProperty(key, AssetProperty::PropertyType::INT);
+	pProp->prop().SetDefaultValue(std::to_string(default));
+	pProp->prop().SetMinMax(min, max);
+	return pProp;
+}
+
+AssetScriptProperty* AssetScriptProps::AddColor(const std::string& key, double r, double g, double b, double a)
+{
+	auto pProp = getProperty(key, AssetProperty::PropertyType::COLOR);
+
+	QString temp = QString("%1 %2 %3 %4").arg(
+		QString::number(r),
+		QString::number(g),
+		QString::number(b),
+		QString::number(a)
+	);
+
+	pProp->prop().SetDefaultValue(temp.toStdString());
+	return pProp;
+}
+
+AssetScriptProperty* AssetScriptProps::AddFloat(const std::string& key, double default, double min, double max)
+{
+	auto pProp = getProperty(key, AssetProperty::PropertyType::FLOAT);
+	pProp->prop().SetDefaultValue(std::to_string(default));
+	pProp->prop().SetMinMax(min, max);
+	return pProp;
+}
+
+AssetScriptProperty* AssetScriptProps::AddVec2(const std::string& keyX, const std::string& keyY,
+	double x, double y, double min, double max)
+{
+	auto itemX = AddFloat(keyX, x, min, max);
+	auto itemY = AddFloat(keyY, y, min, max);
+
+	itemY->prop().SetParentKey(keyX);
+
+	return itemX;
+}
+
+AssetScriptProperty* AssetScriptProps::AddVec3(const std::string& keyX, const std::string& keyY, const std::string& keyZ,
+	double x, double y, double z, double min, double max)
+{
+	auto itemX = AddFloat(keyX, x, min, max);
+	auto itemY = AddFloat(keyY, y, min, max);
+	auto itemZ = AddFloat(keyZ, z, min, max);
+
+	itemY->prop().SetParentKey(keyX);
+	itemZ->prop().SetParentKey(keyX);
+
+	return itemX;
+}
+
+AssetScriptProperty* AssetScriptProps::AddVec4(const std::string& keyX, const std::string& keyY, const std::string& keyZ, const std::string& keyW,
+	double x, double y, double z, double w, double min, double max)
+{
+	auto itemX = AddFloat(keyX, x, min, max);
+	auto itemY = AddFloat(keyY, y, min, max);
+	auto itemZ = AddFloat(keyZ, z, min, max);
+	auto itemW = AddFloat(keyW, w, min, max);
+
+	itemY->prop().SetParentKey(keyX);
+	itemZ->prop().SetParentKey(keyX);
+	itemW->prop().SetParentKey(keyX);
+
+	return itemX;
+}
+
+AssetScriptProperty* AssetScriptProps::AddText(const std::string& key, const std::string& value)
+{
+	auto pProp = getProperty(key, AssetProperty::PropertyType::IMAGE);
+	pProp->prop().SetDefaultValue(value);
+	return pProp;
+}
+
+AssetScriptProperty* AssetScriptProps::AddString(const std::string& key, const std::string& value)
+{
+	auto pProp = getProperty(key, AssetProperty::PropertyType::STRING);
+	pProp->prop().SetDefaultValue(value);
+	return pProp;
+}
+
+AssetScriptProperty* AssetScriptProps::AddPath(const std::string& key, const std::string& value)
+{
+	auto pProp = getProperty(key, AssetProperty::PropertyType::PATH);
+	pProp->prop().SetDefaultValue(value);
+	return pProp;
+}
+
+void AssetScriptProps::BeginGroup(const std::string& groupName)
+{
+	props_.BeginGroup(groupName);
+}
+
+
+AssetScriptProperty* AssetScriptProps::getItem(const std::string& key)
+{
+	X_UNUSED(key);
+	X_ASSERT_NOT_IMPLEMENTED();
+
+	return nullptr;
+}
+
+std::string AssetScriptProps::getPropValue(const std::string& key)
+{
+	return getItem(key)->GetValue();
+}
+
+double AssetScriptProps::getPropValueFloat(const std::string& key)
+{
+	return getItem(key)->GetValueFloat();
+}
+
+int32_t AssetScriptProps::getPropValueInt(const std::string& key)
+{
+	return getItem(key)->GetValueInt();
+}
+
+bool AssetScriptProps::getPropValueBool(const std::string& key)
+{
+	return getItem(key)->GetValueBool();
+}
+
+
+AssetScriptProperty* AssetScriptProps::getProperty(const std::string& key, AssetProperty::PropertyType::Enum type)
+{
+	X_UNUSED(type);
+
+	AssetScriptProperty* pScriptProp = nullptr;
+
+	auto it = map_.find(key);
+	if (it == map_.end()) {
+			
+		auto& prop = props_.addItemIU(key, type);
+
+		pScriptProp = new AssetScriptProperty(&prop);
+
+
+		map_[key] = pScriptProp;
+	}
+	else {
+		pScriptProp = *it;
+	}
+
+
+	pScriptProp->addRef();
+	return pScriptProp;
+}
 
 
 X_NAMESPACE_END

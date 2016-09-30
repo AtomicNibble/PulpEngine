@@ -21,10 +21,15 @@ class AssetStringWidget;
 class AssetColorWidget;
 class AssetComboBoxWidget;
 class AssetGroupWidget;
+class AssetLineEditWidget;
 
+class AssetProperties;
 
-class AssetProperty 
+class AssetProps;
+class AssetProperty : public QObject
 {
+	Q_OBJECT
+
 public:
 	X_DECLARE_ENUM(PropertyType)(
 		UNCLASSIFIED, // has no visual representation.
@@ -33,6 +38,7 @@ public:
 		COMBOBOX,
 		TEXT,
 		STRING,
+		LINEEDIT,
 		INT,
 		BOOL,
 		FLOAT,
@@ -68,10 +74,8 @@ public:
 
 public:
 	AssetProperty();
-	AssetProperty(const AssetProperty& oth) = default;
 	~AssetProperty();
 
-	AssetProperty& operator=(const AssetProperty& oth) = default;
 
 	void appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth);
 
@@ -80,6 +84,7 @@ public:
 	void clear(void);
 	void show(bool vis);
 	void enable(bool val);
+	void SetModified(bool modified);
 
 	void SetKey(const std::string& key);
 	void SetParentKey(const std::string& key);
@@ -89,26 +94,26 @@ public:
 	ConstIterator begin(void) const;
 	ConstIterator end(void) const;
 
-	AssetProperty& SetTitle(const std::string& title);
-	AssetProperty& SetToolTip(const std::string& toolTip);
-	AssetProperty& SetLabels(const std::string& labelX, const std::string& labelY,
+	void SetTitle(const std::string& title);
+	void SetToolTip(const std::string& toolTip);
+	void SetLabels(const std::string& labelX, const std::string& labelY,
 		const std::string& labelZ, const std::string& labelW);
-	AssetProperty& SetIcon(const std::string& icon);
-	AssetProperty& SetFontColor(float r, float g, float b);
-	AssetProperty& SetBold(bool bold);
-	AssetProperty& SetStep(double step);
-	AssetProperty& SetEnabled(bool enable);
-	AssetProperty& SetVisible(bool vis);
-	AssetProperty& ShowJumpToAsset(bool show);
-	AssetProperty& UpdateOnChange(bool update);
+	void SetIcon(const std::string& icon);
+	void SetFontColor(float r, float g, float b);
+	void SetBold(bool bold);
+	void SetStep(double step);
+	void SetEnabled(bool enable);
+	void SetVisible(bool vis);
+	void ShowJumpToAsset(bool show);
+	void UpdateOnChange(bool update);
 
-	void SetValues(const std::string& val);
-	AssetProperty& SetValue(const std::string& val);
-	AssetProperty& SetDefaultValue(const std::string& val);
-	AssetProperty& SetBool(bool val);
-	AssetProperty& SetInt(int32_t val);
-	AssetProperty& SetFloat(float val);
-	AssetProperty& SetDouble(double val);
+	void SetInitData(const std::string& val);
+	void SetValue(const std::string& val);
+	void SetDefaultValue(const std::string& val);
+	void SetBool(bool val);
+	void SetInt(int32_t val);
+	void SetFloat(float val);
+	void SetDouble(double val);
 
 	void SetMinMax(int32_t min, int32_t max);
 	void SetMinMax(double min, double max);
@@ -122,20 +127,20 @@ public:
 	std::string GetTitle(void) const;
 	std::string GetToolTip(void) const;
 	std::string GetValue(void) const;
+	std::string GetDefaultValue(void) const;
 	double GetValueFloat(void) const;
 	int32_t GetValueInt(void) const;
 	bool GetValueBool(void) const;
 
+private slots:
+	void valueChanged(const std::string& value);
+
+signals:
+	void modified(void);
+
 
 private:
-	void setLabelText(QLabel* pLabel) const;
-
-
-
-public:
 	static int32_t colSpanForCol(int32_t startCol);
-	static AssetProperty* factory(void);
-	static AssetProperty* copyFactory(const AssetProperty& oth);
 
 private:
 	int32_t refCount_;
@@ -147,7 +152,7 @@ private:
 	std::string title_;
 	std::string strValue_;
 	std::string defaultValue_;
-	std::string values_; // used by combox box.
+	std::string initData_; // used by combox box.
 	std::string toolTip_;
 	QString icon_;
 
@@ -179,6 +184,7 @@ private:
 		AssetColorWidget* pColorWidget_;
 		AssetComboBoxWidget* pComboBoxWidget_;
 		AssetGroupWidget* pGroupWidget_;
+		AssetLineEditWidget* pLineEditWidget_;
 	};
 
 
@@ -189,12 +195,16 @@ private:
 };
 
 
-class AssetProps
+class AssetProps : public QObject
 {
 	typedef QMap<std::string, AssetProperty*> KeyMap;
+	typedef QMap<std::string, std::string> KeyValueMap;
 
 public:
-	AssetProps();
+	Q_OBJECT
+
+public:
+	AssetProps(AssetProperties* pProps);
 	~AssetProps();
 
 	AssetProps& operator=(const AssetProps& oth) = default;
@@ -208,6 +218,8 @@ public:
 	bool extractArgs(core::string& jsonStrOut) const;
 	bool appendGui(QGridLayout* pLayout);
 
+
+	bool isModified(void) const;
 
 public:
 	AssetProperty& AddTexture(const std::string& key, const std::string& default);
@@ -235,21 +247,122 @@ public:
 	int32_t getPropValueInt(const std::string& key);
 	bool getPropValueBool(const std::string& key);
 
-private:
+public:
 	AssetProperty& addItem(const std::string& key);
 	AssetProperty& addItemIU(const std::string& key, AssetProperty::PropertyType::Enum type);
 
-public:
-	static AssetProps* factory(void);
-	static AssetProps* copyFactory(const AssetProps& oth);
-
 private:
+	AssetProperties* pProps_;
 	AssetProperty root_;
 	AssetProperty* pCur_;
 
 	KeyMap keys_;
+	KeyValueMap values_;
+	int32_t refCount_;
+	int32_t modifiedCount_;
+};
+
+
+
+// ----------------------------------------------
+
+class AssetScriptProperty
+{
+public:
+	AssetScriptProperty();
+	AssetScriptProperty(AssetProperty* prop);
+	AssetScriptProperty(const AssetScriptProperty& oth);
+	~AssetScriptProperty();
+
+	AssetScriptProperty& operator=(const AssetScriptProperty& oth);
+
+	AssetProperty& prop(void);
+
+	void addRef(void);
+	void release(void);
+
+	AssetScriptProperty* SetTitle(const std::string& title);
+	AssetScriptProperty* SetToolTip(const std::string& toolTip);
+	AssetScriptProperty* SetLabels(const std::string& labelX, const std::string& labelY,
+		const std::string& labelZ, const std::string& labelW);
+	AssetScriptProperty* SetIcon(const std::string& icon);
+	AssetScriptProperty* SetFontColor(float r, float g, float b);
+	AssetScriptProperty* SetBold(bool bold);
+	AssetScriptProperty* SetStep(double step);
+	AssetScriptProperty* SetEnabled(bool enable);
+	AssetScriptProperty* SetVisible(bool vis);
+	AssetScriptProperty* ShowJumpToAsset(bool show);
+	AssetScriptProperty* UpdateOnChange(bool update);
+
+	AssetScriptProperty* SetValue(const std::string& val);
+	AssetScriptProperty* SetDefaultValue(const std::string& val);
+	AssetScriptProperty* SetBool(bool val);
+	AssetScriptProperty* SetInt(int32_t val);
+	AssetScriptProperty* SetFloat(float val);
+	AssetScriptProperty* SetDouble(double val);
+
+	std::string GetTitle(void) const;
+	std::string GetToolTip(void) const;
+	std::string GetValue(void) const;
+	double GetValueFloat(void) const;
+	int32_t GetValueInt(void) const;
+	bool GetValueBool(void) const;
+
+public:
+	static AssetScriptProperty* factory(void);
+	static AssetScriptProperty* copyFactory(const AssetScriptProperty& oth);
+
+private:
+	AssetProperty* pProp_;
 	int32_t refCount_;
 };
+
+
+class AssetScriptProps
+{
+	typedef QMap<std::string, AssetScriptProperty*> KeyMap;
+
+public:
+	AssetScriptProps(AssetProps& props);
+	~AssetScriptProps();
+
+	void addRef(void);
+	void release(void);
+
+
+	AssetScriptProperty* AddTexture(const std::string& key, const std::string& default);
+	AssetScriptProperty* AddCombo(const std::string& key, const std::string& values, bool editiable = false);
+	AssetScriptProperty* AddCheckBox(const std::string& key, bool default);
+	AssetScriptProperty* AddInt(const std::string& key, int32_t default, int32_t min, int32_t max);
+	AssetScriptProperty* AddColor(const std::string& key, double r, double g, double b, double a);
+	AssetScriptProperty* AddFloat(const std::string& key, double default, double min, double max);
+	AssetScriptProperty* AddVec2(const std::string& keyX, const std::string& keyY,
+		double x, double y, double min, double max);
+	AssetScriptProperty* AddVec3(const std::string& keyX, const std::string& keyY, const std::string& keyZ,
+		double x, double y, double z, double min, double max);
+	AssetScriptProperty* AddVec4(const std::string& keyX, const std::string& keyY, const std::string& keyZ, const std::string& keyW,
+		double x, double y, double z, double w, double min, double max);
+	AssetScriptProperty* AddText(const std::string& key, const std::string& value);
+	AssetScriptProperty* AddString(const std::string& key, const std::string& value);
+	AssetScriptProperty* AddPath(const std::string& key, const std::string& value);
+
+	void BeginGroup(const std::string& groupName);
+
+	AssetScriptProperty* getItem(const std::string& key);
+	std::string getPropValue(const std::string& key);
+	double getPropValueFloat(const std::string& key);
+	int32_t getPropValueInt(const std::string& key);
+	bool getPropValueBool(const std::string& key);
+
+private:
+	AssetScriptProperty* getProperty(const std::string& key, AssetProperty::PropertyType::Enum type);
+
+private:
+	AssetProps& props_;
+	KeyMap map_;
+	int32_t refCount_;
+};
+
 
 
 X_NAMESPACE_END
