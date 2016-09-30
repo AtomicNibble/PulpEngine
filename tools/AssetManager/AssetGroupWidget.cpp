@@ -5,8 +5,8 @@
 
 X_NAMESPACE_BEGIN(assman)
 
-AssetGroupWidget::AssetGroupWidget(QWidget *parent)
-	: QToolButton(parent)
+AssetGroupWidget::AssetGroupWidget(QWidget *parent) :
+	QToolButton(parent)
 {
 
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
