@@ -300,6 +300,14 @@ void AssetManager::createActions(void)
 	pQuitAct_->setStatusTip(tr("Quit the application"));
 	connect(pQuitAct_, SIGNAL(triggered()), this, SLOT(close()));
 
+	// Edit
+	pUndoAct_ = new QAction(QIcon(":/misc/img/Undo.png"), "Undo", this);
+	pUndoAct_->setStatusTip(tr("Undo the last editing action"));
+	pUndoAct_->setEnabled(false);
+
+	pRedoAct_ = new QAction(QIcon(":/misc/img/Redo.png"), "Redo", this);
+	pRedoAct_->setStatusTip("Redo");
+	pRedoAct_->setEnabled(false);
 
 	// View
 	pViewAssetDbExpoAct_ = new QAction(tr("AssetDB Explorer"), this);
@@ -369,6 +377,38 @@ void AssetManager::createMenus(void)
 		// Exit
 		pCmd = ActionManager::registerAction(pQuitAct_, Constants::EXIT, globalContext);
 		filemenu->addAction(pCmd, Constants::G_FILE_CLOSE);
+	}
+
+	// Edit
+	{
+		ActionContainer *editmenu = ActionManager::createMenu(Constants::M_EDIT);
+		pMenuBar->addMenu(editmenu, Constants::G_EDIT);
+		editmenu->menu()->setTitle(tr("Edit"));
+
+		// Groups
+		editmenu->appendGroup(Constants::G_EDIT_UNDOREDO);
+		editmenu->appendGroup(Constants::G_EDIT_COPYPASTE);
+		editmenu->appendGroup(Constants::G_EDIT_SELECTALL);
+		editmenu->appendGroup(Constants::G_EDIT_FIND);
+
+		// File menu separators
+		editmenu->addSeparator(globalContext, Constants::G_EDIT_UNDOREDO);
+		editmenu->addSeparator(globalContext, Constants::G_EDIT_COPYPASTE);
+		editmenu->addSeparator(globalContext, Constants::G_EDIT_SELECTALL);
+		editmenu->addSeparator(globalContext, Constants::G_EDIT_FIND);
+
+
+		// Undo/Redo actions
+		pCmd = ActionManager::registerAction(pUndoAct_, Constants::EDIT_UNDO, globalContext);
+		pCmd->setAttribute(Command::CommandAttribute::UpdateText);
+		pCmd->setDefaultKeySequence(QKeySequence::Undo);
+		editmenu->addAction(pCmd, Constants::G_EDIT_UNDOREDO);
+
+		pCmd = ActionManager::registerAction(pRedoAct_, Constants::EDIT_REDO, globalContext);
+		pCmd->setAttribute(Command::CommandAttribute::UpdateText);
+		pCmd->setDefaultKeySequence(QKeySequence::Redo);
+		editmenu->addAction(pCmd, Constants::G_EDIT_UNDOREDO);
+
 	}
 
 	// View

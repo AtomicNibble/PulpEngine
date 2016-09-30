@@ -105,6 +105,10 @@ private:
 	QAction* pSaveAllAct_;
 	QAction* pQuitAct_;
 
+	// Edit
+	QAction* pUndoAct_;
+	QAction* pRedoAct_;
+
 	// View
 	QAction* pViewAssetDbExpoAct_;
 
