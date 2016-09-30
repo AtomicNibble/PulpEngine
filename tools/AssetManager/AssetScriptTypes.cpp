@@ -589,32 +589,32 @@ AssetProperty::PropertyType::Enum AssetProperty::GetType(void) const
 }
 
 
-std::string AssetProperty::GetKey(void) const
+const std::string& AssetProperty::GetKey(void) const
 {
 	return key_;
 }
 
-std::string AssetProperty::GetParentKey(void) const
+const std::string& AssetProperty::GetParentKey(void) const
 {
 	return parentKey_;
 }
 
-std::string AssetProperty::GetTitle(void) const
+const std::string& AssetProperty::GetTitle(void) const
 {
 	return title_;
 }
 
-std::string AssetProperty::GetToolTip(void) const
+const std::string& AssetProperty::GetToolTip(void) const
 {
 	return toolTip_;
 }
 
-std::string AssetProperty::GetValue(void) const
+const std::string& AssetProperty::GetValue(void) const
 {
 	return strValue_;
 }
 
-std::string AssetProperty::GetDefaultValue(void) const
+const std::string& AssetProperty::GetDefaultValue(void) const
 {
 	return defaultValue_;
 }

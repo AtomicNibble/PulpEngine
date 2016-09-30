@@ -122,12 +122,12 @@ public:
 	bool isNewProp(void) const;
 
 	PropertyType::Enum GetType(void) const;
-	std::string GetKey(void) const;
-	std::string GetParentKey(void) const;
-	std::string GetTitle(void) const;
-	std::string GetToolTip(void) const;
-	std::string GetValue(void) const;
-	std::string GetDefaultValue(void) const;
+	const std::string& GetKey(void) const;
+	const std::string& GetParentKey(void) const;
+	const std::string& GetTitle(void) const;
+	const std::string& GetToolTip(void) const;
+	const std::string& GetValue(void) const;
+	const std::string& GetDefaultValue(void) const;
 	double GetValueFloat(void) const;
 	int32_t GetValueInt(void) const;
 	bool GetValueBool(void) const;
