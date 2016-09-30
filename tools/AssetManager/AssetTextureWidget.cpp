@@ -21,6 +21,7 @@ AssetTextureWidget::AssetTextureWidget(QWidget *parent, const std::string& value
 	connect(pZoom_, SIGNAL(clicked()), this, SLOT(showTextureDialog()));
 
 	QVBoxLayout* pVertLayout = new QVBoxLayout();
+	pVertLayout->setContentsMargins(0, 0, 0, 0);
 	{
 		pEditPathPad_ = new QLabel();
 
@@ -51,11 +52,7 @@ AssetTextureWidget::AssetTextureWidget(QWidget *parent, const std::string& value
 
 	showPreviewWidgets(false);
 
-	{
-		pEditPath_->blockSignals(true);
-		setPath(QString::fromStdString(value));
-		pEditPath_->blockSignals(false);
-	}
+	setValue(value);
 
 	setLayout(pLayout);
 }
@@ -103,6 +100,8 @@ void AssetTextureWidget::setPath(const QString& filePath)
 	pEditPath_->setText(curPath_);
 
 	validatePath();
+
+	emit valueChanged(curPath_.toStdString());
 }
 
 
@@ -174,6 +173,7 @@ bool AssetTextureWidget::eventFilter(QObject* pObject, QEvent* pEvent)
 		else if (type == QEvent::Drop)
 		{
 			dropEvent(static_cast<QDropEvent*>(pEvent));
+			return true;
 		}
 	}
 
@@ -220,6 +220,15 @@ void AssetTextureWidget::dropEvent(QDropEvent* event)
 			}
 		}
 	}
+}
+
+void AssetTextureWidget::setValue(const std::string& value)
+{
+	blockSignals(true);
+	pEditPath_->blockSignals(true);
+	setPath(QString::fromStdString(value));
+	pEditPath_->blockSignals(false);
+	blockSignals(false);
 }
 
 void AssetTextureWidget::editingFinished(void)

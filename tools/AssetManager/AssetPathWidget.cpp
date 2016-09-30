@@ -4,8 +4,8 @@
 X_NAMESPACE_BEGIN(assman)
 
 
-AssetPathWidget::AssetPathWidget(QWidget *parent, const std::string& value)
-	: QWidget(parent),
+AssetPathWidget::AssetPathWidget(QWidget *parent, const std::string& value) :
+	QWidget(parent),
 	pLineEdit_(nullptr),
 	acceptingKind_(Kind::File)
 {
@@ -14,23 +14,19 @@ AssetPathWidget::AssetPathWidget(QWidget *parent, const std::string& value)
 
 	// lin edit for path.
 	pLineEdit_ = new QLineEdit(this);
-	pLineEdit_->setAcceptDrops(true); // id have todo draw handeling diffrent to support just this accepting dorps.
+//	pLineEdit_->setAcceptDrops(true); // id have todo draw handeling diffrent to support just this accepting dorps.
 	pLineEdit_->installEventFilter(this);
+	connect(pLineEdit_, SIGNAL(editingFinished()), this, SLOT(editingFinished(void)));
 
 	// browse button
 	QToolButton* pBrowse = new QToolButton();
 	pBrowse->setText("...");
-
-
 	connect(pBrowse, SIGNAL(clicked()), this, SLOT(browseClicked()));
 
 	pLayout->addWidget(pLineEdit_);
 	pLayout->addWidget(pBrowse);
 
-	pLineEdit_->blockSignals(true);
-	pLineEdit_->setText(QString::fromStdString(value));
-	pLineEdit_->blockSignals(false);
-
+	setValue(value);
 
 	setLayout(pLayout);
 }
@@ -254,15 +250,15 @@ void AssetPathWidget::browseClicked(void)
 		newPath = QFileDialog::getSaveFileName(this,
 			makeDialogTitle(tr("Choose File")), predefined, dialogFilter_);
 		break;
-	case Kind::Any: 
+	case Kind::Any:
 	{
 		QFileDialog dialog(this);
 		dialog.setFileMode(QFileDialog::AnyFile);
 		dialog.setWindowTitle(makeDialogTitle(tr("Choose File")));
 
-	//	if (fi.exists()) {
-	//		dialog.setDirectory(fi.absolutePath());
-	//	}
+		//	if (fi.exists()) {
+		//		dialog.setDirectory(fi.absolutePath());
+		//	}
 
 		dialog.setNameFilter(dialogFilter_);
 		if (dialog.exec() == QDialog::Accepted) {
@@ -281,7 +277,7 @@ void AssetPathWidget::browseClicked(void)
 
 
 	// Delete trailing slashes unless it is "/"|"\\", only
-	if (!newPath.isEmpty()) 
+	if (!newPath.isEmpty())
 	{
 		newPath = QDir::toNativeSeparators(newPath);
 		if (newPath.size() > 1 && newPath.endsWith(QDir::separator())) {
@@ -291,6 +287,20 @@ void AssetPathWidget::browseClicked(void)
 		setPath(newPath);
 	}
 
+}
+
+void AssetPathWidget::editingFinished(void)
+{
+	const QString value = pLineEdit_->text();
+
+	emit valueChanged(value.toStdString());
+}
+
+void AssetPathWidget::setValue(const std::string& value)
+{
+	pLineEdit_->blockSignals(true);
+	pLineEdit_->setText(QString::fromStdString(value));
+	pLineEdit_->blockSignals(false);
 }
 
 X_NAMESPACE_END

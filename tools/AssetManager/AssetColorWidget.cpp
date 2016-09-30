@@ -6,8 +6,8 @@
 X_NAMESPACE_BEGIN(assman)
 
 
-AssetColorWidget::AssetColorWidget(QWidget *parent, const std::string& value)
-	: QWidget(parent),
+AssetColorWidget::AssetColorWidget(QWidget *parent, const std::string& value) :
+	QWidget(parent),
 	picking_(false)
 {
 	QHBoxLayout* pChildLayout = new QHBoxLayout();
@@ -17,6 +17,7 @@ AssetColorWidget::AssetColorWidget(QWidget *parent, const std::string& value)
 		pColPreview_ = new ColorSelector();
 		pColPreview_->setMinimumWidth(64);
 		pColPreview_->setDisplayMode(ColorPreview::DisplayMode::SplitAlpha); // it don't split if alpha solid.
+		connect(pColPreview_, SIGNAL(colorSelected(const QColor&)), this, SLOT(colorSelected(const QColor&)));
 
 		QToolButton* pButton = new QToolButton();
 		pButton->setToolTip("Color Picker");
@@ -49,31 +50,7 @@ AssetColorWidget::AssetColorWidget(QWidget *parent, const std::string& value)
 
 	// set the values?
 	// the string is floats space seperated.
-	{
-		QString tmp = QString::fromStdString(value);
-		QStringList values = tmp.split(QChar(' '));
-
-		while (values.size() < 4) {
-			values.append("1");
-		}
-
-		QColor col;
-		col.setRgbF(
-			values[0].toFloat(),
-			values[1].toFloat(),
-			values[2].toFloat(),
-			values[3].toFloat());
-
-		for (int32_t i = 0; i < 4; i++) {
-			pRGBAValueWidgets_[i]->blockSignals(true);
-		}
-
-		setColorInternal(col);
-
-		for (int32_t i = 0; i < 4; i++) {
-			pRGBAValueWidgets_[i]->blockSignals(false);
-		}
-	}
+	setValue(value);
 
 	setLayout(pChildLayout);
 }
@@ -83,6 +60,34 @@ AssetColorWidget::~AssetColorWidget()
 }
 
 
+void AssetColorWidget::setValue(const std::string& value)
+{
+	QString tmp = QString::fromStdString(value);
+	QStringList values = tmp.split(QChar(' '));
+
+	while (values.size() < 4) {
+		values.append("1");
+	}
+
+	QColor col;
+	col.setRgbF(
+		values[0].toFloat(),
+		values[1].toFloat(),
+		values[2].toFloat(),
+		values[3].toFloat());
+
+	blockSignals(true);
+	for (int32_t i = 0; i < 4; i++) {
+		pRGBAValueWidgets_[i]->blockSignals(true);
+	}
+
+	setColorInternal(col);
+
+	for (int32_t i = 0; i < 4; i++) {
+		pRGBAValueWidgets_[i]->blockSignals(false);
+	}
+	blockSignals(false);
+}
 
 void AssetColorWidget::setColorInternal(QColor col)
 {
@@ -93,8 +98,25 @@ void AssetColorWidget::setColorInternal(QColor col)
 	}
 
 	pColPreview_->setColor(col);
+
+	// back to string xD
+	QString temp = QString("%1 %2 %3 %4").arg(
+		QString::number(col.redF()),
+		QString::number(col.greenF()),
+		QString::number(col.blueF()),
+		QString::number(col.alphaF())
+	);
+
+	emit valueChanged(temp.toStdString());
 }
 
+// color selector changed.
+void AssetColorWidget::colorSelected(const QColor& col)
+{
+	setColorInternal(col);
+}
+
+// show the color picker
 void AssetColorWidget::colPickerClicked(void)
 {
 	picking_ = true;
@@ -105,6 +127,7 @@ void AssetColorWidget::colPickerClicked(void)
 	QGuiApplication::setOverrideCursor(cur);
 }
 
+// one of the 4 line edits changed
 void AssetColorWidget::editingFinished(void)
 {
 	// you fucking edited one of the color line edits.
@@ -139,7 +162,7 @@ void AssetColorWidget::editingFinished(void)
 		}
 	}
 
-	pColPreview_->setColor(col);
+	setColorInternal(col);
 }
 
 void AssetColorWidget::mouseReleaseEvent(QMouseEvent *event)
@@ -159,6 +182,7 @@ void AssetColorWidget::mouseMoveEvent(QMouseEvent *event)
 	X_UNUSED(event);
 
 	if (picking_) {
+	//  if want live update.
 	//	setColorInternal(getScreenColor(event->globalPos()));
 	}
 }

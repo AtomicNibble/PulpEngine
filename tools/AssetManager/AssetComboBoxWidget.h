@@ -14,10 +14,8 @@ class AssetComboBoxWidget : public QComboBox
 public:
 	struct ComboEntry
 	{
-		X_INLINE bool hasOverRide(void) const;
-
 		QString title;
-		QString valueOverride;
+		QString value;
 	};
 
 	typedef QList<ComboEntry> ComboEntryArr;
@@ -31,10 +29,11 @@ public:
 public:
 	static bool splitValues(const std::string& values, ComboEntryArr& valuesOut, QList<int32_t>* pSeperators = nullptr);
 
-private:
-	void setValue(const std::string& value);
+signals:
+	void valueChanged(const std::string& value);
 
 private slots:
+	void setValue(const std::string& value);
 	void currentIndexChanged(int index);
 	void returnPressed(void);
 
@@ -43,10 +42,6 @@ private:
 	bool editable_;
 };
 
-X_INLINE bool AssetComboBoxWidget::ComboEntry::hasOverRide(void) const
-{
-	return !valueOverride.isEmpty();
-}
 
 
 X_NAMESPACE_END

@@ -18,7 +18,14 @@ public:
 private:
 	void setColorInternal(QColor col);
 
+signals:
+	void valueChanged(const std::string& value);
+
 private slots:
+	void setValue(const std::string& value);
+
+private slots:
+	void colorSelected(const QColor& col);
 	void colPickerClicked(void);
 	void editingFinished(void);
 

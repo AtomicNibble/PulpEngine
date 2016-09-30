@@ -52,7 +52,7 @@ void AssetComboBoxWidget::setValue(const std::string& value)
 
 	// support mapping the property back to it's title so we can select by index.
 	for (const auto& val : values_) {
-		if (val.hasOverRide() && val.valueOverride == str) {
+		if (val.value == str) {
 			str = val.title;
 			break;
 		}
@@ -116,11 +116,12 @@ bool AssetComboBoxWidget::splitValues(const std::string& valuesStd, ComboEntryAr
 				if (parts.size() == 2)
 				{
 					entry.title = parts[0].trimmed();
-					entry.valueOverride = parts[1].trimmed();
+					entry.value = parts[1].trimmed();
 				}
 				else
 				{
 					entry.title = val;
+					entry.value = val;
 				}
 
 				valuesOut.append(entry);
@@ -136,8 +137,16 @@ bool AssetComboBoxWidget::splitValues(const std::string& valuesStd, ComboEntryAr
 
 void AssetComboBoxWidget::currentIndexChanged(int index)
 {
-	X_UNUSED(index);
+	if (index >= values_.size()) {
+		X_ERROR("Combo", "Index out of range %i -> %i",index, values_.size());
+		return;
+	}
 
+	const auto& entry = values_[index];
+
+	QString val = entry.value;
+
+	emit valueChanged(val.toStdString());
 }
 
 

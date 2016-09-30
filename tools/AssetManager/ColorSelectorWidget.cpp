@@ -28,7 +28,7 @@ ColorSelector::ColorSelector(QWidget *parent) :
 
 	connect(this, SIGNAL(clicked()), this, SLOT(showDialog()));
 	connect(p->pDialog, SIGNAL(rejected()), this, SLOT(rejectDialog()));
-	connect(p->pDialog, SIGNAL(colorSelected(const QColor&)), this, SLOT(colorSelected(const QColor&)));
+	connect(p->pDialog, SIGNAL(colorSelected(const QColor&)), this, SLOT(dialogColorSelected(const QColor&)));
 
 	setAcceptDrops(true);
 }
@@ -90,10 +90,12 @@ void ColorSelector::rejectDialog(void)
 	setColor(p->oldColor);
 }
 
-void ColorSelector::colorSelected(const QColor& c)
+void ColorSelector::dialogColorSelected(const QColor& c)
 {
 	setColor(c);
 	p->oldColor = c;
+
+	emit colorSelected(c);
 }
 
 
