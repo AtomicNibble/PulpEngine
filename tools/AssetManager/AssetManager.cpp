@@ -725,6 +725,12 @@ void AssetManager::fileChanged(const QString& path)
 
 void AssetManager::closeEvent(QCloseEvent *event)
 {
+	if (!AssetEntryManager::saveAllModifiedAssetEntrys()) {
+		event->ignore();
+		return;
+	}
+
+
 	// tell the goats
 	if (!pCoreImpl_->callCoreCloseListners(event)) {
 		return;
