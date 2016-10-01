@@ -17,6 +17,8 @@ AssetColorWidget::AssetColorWidget(QWidget *parent, const std::string& value) :
 		pColPreview_ = new ColorSelector();
 		pColPreview_->setMinimumWidth(64);
 		pColPreview_->setDisplayMode(ColorPreview::DisplayMode::SplitAlpha); // it don't split if alpha solid.
+		pColPreview_->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
+
 		connect(pColPreview_, SIGNAL(colorSelected(const QColor&)), this, SLOT(colorSelected(const QColor&)));
 
 		QToolButton* pButton = new QToolButton();
@@ -35,9 +37,10 @@ AssetColorWidget::AssetColorWidget(QWidget *parent, const std::string& value) :
 		{
 			QLabel* pLabel = new QLabel();
 			pLabel->setText(pLabels[i]);
+			pLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
 
 			QLineEdit* pLineEdit = pRGBAValueWidgets_[i] = new QLineEdit();
-			pLineEdit->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+			pLineEdit->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Minimum);
 			pLineEdit->setMaximumWidth(64);
 			pLineEdit->setValidator(new QIntValidator(0, 255));
 
@@ -47,6 +50,8 @@ AssetColorWidget::AssetColorWidget(QWidget *parent, const std::string& value) :
 			pChildLayout->addWidget(pLineEdit, 0);
 		}
 	}
+
+	pChildLayout->addSpacerItem(new QSpacerItem(1, 10, QSizePolicy::Expanding, QSizePolicy::Expanding));
 
 	// set the values?
 	// the string is floats space seperated.
