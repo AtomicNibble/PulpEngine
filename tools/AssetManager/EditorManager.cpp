@@ -1186,27 +1186,7 @@ bool EditorManager::saveAssetEntry(IAssetEntry* pAssetEntryParam)
 
 //	pAssetEntry->checkPermissions();
 
-//	const QString& fileName = pAssetEntry->name();
-
-	bool success = false;
-	bool isReadOnly;
-
-	// try saving, no matter what isReadOnly tells us
-	success = AssetEntryManager::saveAssetEntry(pAssetEntry, QString(), &isReadOnly);
-
-	if (!success && isReadOnly) {
-		/*
-		MakeWritableResult answer = makeFileWritable(document);
-		if (answer == Failed)
-		return false;
-		if (answer == SavedAs)
-		return true;
-
-		document->checkPermissions();
-
-		success = AssetEntryManager::saveDocument(document);
-		*/ 
-	}
+	const bool success = AssetEntryManager::saveAssetEntry(pAssetEntry);
 
 	if (success) {
 		addAssetEntryToRecentFiles(pAssetEntry);
