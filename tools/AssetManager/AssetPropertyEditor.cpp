@@ -740,6 +740,8 @@ bool AssetProperties::save(QString& errorString)
 		return false;
 	}
 
+	// meow meow meow.
+	setNotModifiedModified();
 	return true;
 }
 
@@ -969,9 +971,16 @@ bool AssetProperties::appendGui(QGridLayout* pLayout)
 void AssetProperties::setNotModifiedModified(void)
 {
 	// ya fucking wut.
+	bool wasModified = false;
 
-	for (auto it = keys_.begin(); it != keys_.end(); ++it) {
+	for (auto it = keys_.begin(); it != keys_.end(); ++it) 
+	{
+		wasModified &= (*it)->isModified();
 		(*it)->SetModified(false);
+	}
+
+	if (wasModified) {
+		emit modificationChanged(false);
 	}
 }
 
