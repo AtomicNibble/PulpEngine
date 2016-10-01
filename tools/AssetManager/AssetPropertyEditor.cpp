@@ -975,7 +975,7 @@ void AssetProperties::setNotModifiedModified(void)
 
 	for (auto it = keys_.begin(); it != keys_.end(); ++it) 
 	{
-		wasModified &= (*it)->isModified();
+		wasModified |= (*it)->isModified();
 		(*it)->SetModified(false);
 	}
 
