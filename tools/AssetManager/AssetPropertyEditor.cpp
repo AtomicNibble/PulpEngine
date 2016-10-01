@@ -943,6 +943,9 @@ bool AssetProperties::appendGui(QGridLayout* pLayout)
 		row += 1;
 	}
 
+	pLayout->setRowStretch(row, 1);
+	pLayout->setColumnStretch(AssetProperty::MAX_COL_IDX, 1);
+//	pLayout->addItem(new QSpacerItem(1, 1, QSizePolicy::Expanding, QSizePolicy::Expanding), row + 1, 0, 1, -1);
 	return true;
 }
 
