@@ -15,6 +15,7 @@ public:
 	IAssetEntry(QObject *parent);
 	~IAssetEntry();
 
+	virtual bool save(QString& errorString) X_ABSTRACT;
 
 	QString name(void) const;
 	QString displayName(void) const;

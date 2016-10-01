@@ -226,8 +226,12 @@ public:
 	void setAssetType(assetDb::AssetType::Enum type);
 	void setWidget(QWidget* widget);
 
+	// IAssetEntry
+	bool save(QString& errorString) X_OVERRIDE;
+
 	bool isModified(void) const X_OVERRIDE;
 	bool isSaveAsAllowed(void) const X_OVERRIDE;
+	// ~IAssetEntry
 
 	void collapseAll(void);
 	void expandAll(void);

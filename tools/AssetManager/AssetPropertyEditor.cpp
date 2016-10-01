@@ -732,6 +732,38 @@ void AssetProperties::setWidget(QWidget* widget)
 	}
 }
 
+bool AssetProperties::save(QString& errorString)
+{
+	const QString& assetName = assetName_;
+	const auto narrowName = assetName.toLocal8Bit();
+	const core::string name(narrowName.data());
+	const auto& type = type_;
+
+	if (name.isEmpty()) {
+		errorString = "Error saving asset props, name is invalid";
+		return false;
+	}
+
+	if (!isModified()) {
+		X_WARNING("AssetProp", "Saving props when they are not modified.");
+	}
+
+	core::string args;
+	if (!extractArgs(args)) {
+		errorString = "Error extracting asset '" + assetName + "' props";
+		return false;
+	}
+
+	auto res = db_.UpdateAssetArgs(type, name, args);
+	if (res != assetDb::AssetDB::Result::OK) {
+		errorString = "Failed to save asset '" + assetName + "' props. Error: " + assetDb::AssetDB::Result::ToString(res);
+		return false;
+	}
+
+	return true;
+}
+
+
 bool AssetProperties::isModified(void) const
 {
 	// humm use the cached value or really check.
