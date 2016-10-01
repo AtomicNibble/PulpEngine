@@ -123,10 +123,6 @@ public:
 	void SetInitData(const std::string& val);
 	void SetValue(const std::string& val);
 	void SetDefaultValue(const std::string& val);
-	void SetBool(bool val);
-	void SetInt(int32_t val);
-	void SetFloat(float val);
-	void SetDouble(double val);
 
 	void SetMinMax(int32_t min, int32_t max);
 	void SetMinMax(double min, double max);

@@ -540,32 +540,6 @@ void AssetProperty::SetDefaultValue(const std::string& val)
 	}
 }
 
-void AssetProperty::SetBool(bool val)
-{
-	if (val) {
-		strValue_ = "1";
-	}
-	else {
-		strValue_ = "0";
-	}
-}
-
-void AssetProperty::SetInt(int32_t val)
-{
-	strValue_ = std::to_string(val);
-}
-
-void AssetProperty::SetFloat(float val)
-{
-	strValue_ = std::to_string(val);
-}
-
-void AssetProperty::SetDouble(double val)
-{
-	strValue_ = std::to_string(val);
-}
-
-
 void AssetProperty::SetMinMax(int32_t min, int32_t max)
 {
 	min_ = static_cast<double>(min);
@@ -861,30 +835,32 @@ bool AssetProperties::parseArgs(const core::string& jsonStr)
 		auto& item = addItem(name);
 		const auto& val = itr->value;
 
+		std::string strVal;
+
 		switch (val.GetType())
 		{
 		case core::json::Type::kFalseType:
-			item.SetBool(false);
+			strVal = "0";
 			break;
 		case core::json::Type::kTrueType:
-			item.SetBool(true);
+			strVal = "1";
 			break;
 		case core::json::Type::kStringType:
-			item.SetValue(std::string(val.GetString(), val.GetStringLength()));
+			strVal = std::string(val.GetString(), val.GetStringLength());
 			break;
 		case core::json::Type::kNumberType:
 			if (val.IsBool()) {
-				item.SetBool(val.GetBool());
+				strVal = val.GetBool() ? "1" : "0";
 			}
 			if (val.IsInt()) {
-				item.SetFloat(val.GetInt());
+				strVal = std::to_string(val.GetInt());
 			}
 			else if (val.IsFloat()) {
-				item.SetFloat(val.GetFloat());
+				strVal = std::to_string(val.GetFloat());
 			}
 			else {
 				// default to double
-				item.SetDouble(val.GetDouble());
+				strVal = std::to_string(val.GetDouble());
 			}
 			break;
 
@@ -898,6 +874,8 @@ bool AssetProperties::parseArgs(const core::string& jsonStr)
 			X_ERROR("AssetProps", "Unknown value type for arg: %i", val.GetType());
 			break;
 		}
+
+		item.SetValue(strVal);
 	}
 
 	return true;

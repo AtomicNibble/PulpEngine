@@ -174,7 +174,7 @@ AssetScriptProperty* AssetScriptProperty::SetDefaultValue(const std::string& val
 
 AssetScriptProperty* AssetScriptProperty::SetBool(bool val)
 {
-	pProp_->SetBool(val);
+	pProp_->SetValue(val ? "1" : "0");
 
 	addRef();
 	return this;
@@ -182,7 +182,7 @@ AssetScriptProperty* AssetScriptProperty::SetBool(bool val)
 
 AssetScriptProperty* AssetScriptProperty::SetInt(int32_t val)
 {
-	pProp_->SetInt(val);
+	pProp_->SetValue(std::to_string(val));
 
 	addRef();
 	return this;
@@ -190,7 +190,7 @@ AssetScriptProperty* AssetScriptProperty::SetInt(int32_t val)
 
 AssetScriptProperty* AssetScriptProperty::SetFloat(float val)
 {
-	pProp_->SetFloat(val);
+	pProp_->SetValue(std::to_string(val));
 
 	addRef();
 	return this;
@@ -198,7 +198,7 @@ AssetScriptProperty* AssetScriptProperty::SetFloat(float val)
 
 AssetScriptProperty* AssetScriptProperty::SetDouble(double val)
 {
-	pProp_->SetDouble(val);
+	pProp_->SetValue(std::to_string(val));
 
 	addRef();
 	return this;
