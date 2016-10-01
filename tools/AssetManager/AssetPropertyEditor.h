@@ -122,6 +122,7 @@ public:
 
 	void SetInitData(const std::string& val);
 	void SetValue(const std::string& val);
+	void SetSavedValue(const std::string& val);
 	void SetDefaultValue(const std::string& val);
 
 	void SetMinMax(int32_t min, int32_t max);
@@ -160,8 +161,9 @@ private:
 	//	// ordered to try group hot members.
 	std::string key_;
 	std::string title_;
-	std::string strValue_;
-	std::string defaultValue_;
+	std::string strValue_;			// the current value
+	std::string strSavedValue_;		// the value from DB
+	std::string defaultValue_;		// default value is set by the ui script
 	std::string initData_; // used by combox box.
 	std::string toolTip_;
 	QString icon_;

@@ -337,6 +337,9 @@ void AssetProperty::SetModified(bool modified)
 			return;
 		}
 
+		// move the value to saved value.
+		strSavedValue_ = strValue_;
+
 		settings_.Remove(Setting::MODIFIED);
 	}
 	else {
@@ -529,6 +532,12 @@ void AssetProperty::SetInitData(const std::string& val)
 void AssetProperty::SetValue(const std::string& val)
 {
 	strValue_ = val;
+}
+
+void AssetProperty::SetSavedValue(const std::string& val)
+{
+	strValue_ = val;
+	strSavedValue_ = val;
 }
 
 void AssetProperty::SetDefaultValue(const std::string& val)
@@ -875,7 +884,7 @@ bool AssetProperties::parseArgs(const core::string& jsonStr)
 			break;
 		}
 
-		item.SetValue(strVal);
+		item.SetSavedValue(strVal);
 	}
 
 	return true;
