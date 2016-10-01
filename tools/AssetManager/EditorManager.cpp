@@ -170,11 +170,11 @@ EditorManager::EditorManager(QWidget *parent) :
 
 	// Save Action
 	ActionManager::registerAction(d->saveAction_, Constants::SAVE, editManagerContext);
-	connect(d->saveAction_, SIGNAL(triggered()), this, SLOT(saveDocument()));
+	connect(d->saveAction_, SIGNAL(triggered()), this, SLOT(saveAssetEntry()));
 
 	// Save As Action
 	ActionManager::registerAction(d->saveAsAction_, Constants::SAVEAS, editManagerContext);
-	connect(d->saveAsAction_, SIGNAL(triggered()), this, SLOT(saveDocumentAs()));
+	connect(d->saveAsAction_, SIGNAL(triggered()), this, SLOT(saveAssetEntryAs()));
 
 
 	// Window Menu
@@ -216,7 +216,7 @@ EditorManager::EditorManager(QWidget *parent) :
 
 
 	//Save XXX Context Actions
-	connect(d->saveCurrentEditorContextAction_, SIGNAL(triggered()), this, SLOT(saveDocumentFromContextMenu()));
+	connect(d->saveCurrentEditorContextAction_, SIGNAL(triggered()), this, SLOT(saveAssetEntryFromContextMenu()));
 
 	// Close XXX Context Actions
 	connect(d->closeAllEditorsContextAction_, SIGNAL(triggered()), this, SLOT(closeAllEditors()));
