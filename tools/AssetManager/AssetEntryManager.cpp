@@ -5,6 +5,8 @@
 #include "IEditor.h"
 #include "EditorManager.h"
 
+#include "SaveItemsDialog.h"
+
 X_NAMESPACE_BEGIN(assman)
 
 namespace
@@ -297,16 +299,82 @@ bool AssetEntryManager::saveModifiedFilesHelper(const QList<IAssetEntry*>& asset
 	const QString& alwaysSaveMessage, bool* pAlwaysSave,
 	QList<IAssetEntry*>* pFailedToSave)
 {
-	X_UNUSED(assetEntrys);
-	X_UNUSED(message);
-	X_UNUSED(pCancelled);
-	X_UNUSED(silently);
-	X_UNUSED(alwaysSaveMessage);
-	X_UNUSED(pAlwaysSave);
-	X_UNUSED(pFailedToSave);
+	if (pCancelled) {
+		*pCancelled = false;
+	}
+
+	QList<IAssetEntry*> notSaved;
+	QMap<IAssetEntry*, QString> modifiedAssetsMap;
+	QList<IAssetEntry*> modifiedAssets;
+
+	foreach(IAssetEntry* pEntry, assetEntrys)
+	{
+		if (pEntry && pEntry->isModified())
+		{
+			QString name = pEntry->name();
+
+			// There can be several IDocuments pointing to the same file
+			if (!modifiedAssetsMap.key(name, 0) || !pEntry->isFileReadOnly()) {
+				modifiedAssetsMap.insert(pEntry, name);
+			}
+		}
+	}
+
+	modifiedAssets = modifiedAssetsMap.keys();
+	if (!modifiedAssets.isEmpty())
+	{
+		QList<IAssetEntry*> assetsToSave;
+		if (silently)
+		{
+			assetsToSave = modifiedAssets;
+		}
+		else 
+		{
+			SaveItemsDialog dia(ICore::dialogParent(), modifiedAssets);
+
+			if (!message.isEmpty()) {
+				dia.setMessage(message);
+			}
+			if (!alwaysSaveMessage.isNull()) {
+				dia.setAlwaysSaveMessage(alwaysSaveMessage);
+			}
+			if (dia.exec() != QDialog::Accepted) {
+				if (pCancelled) {
+					*pCancelled = true;
+				}
+				if (pAlwaysSave) {
+					*pAlwaysSave = dia.alwaysSaveChecked();
+				}
+				if (pFailedToSave) {
+					*pFailedToSave = modifiedAssets;
+				}
+				return false;
+			}
+			if (pAlwaysSave) {
+				*pAlwaysSave = dia.alwaysSaveChecked();
+			}
+
+			assetsToSave = dia.itemsToSave();
+		}
 
 
-	return false;
+		foreach(IAssetEntry* pEntry, assetsToSave)
+		{
+			if (!EditorManager::saveAssetEntry(pEntry))
+			{
+				if (pCancelled) {
+					*pCancelled = true;
+				}
+				notSaved.append(pEntry);
+			}
+		}
+	}
+
+	if (pFailedToSave) {
+		*pFailedToSave = notSaved;
+	}
+
+	return true;
 }
 
 X_NAMESPACE_END
