@@ -826,11 +826,6 @@ bool AssetProperties::loadProps(QString& errorString, const QString& assetName, 
 		return false;
 	}
 
-	if (!extractArgs(args)) {
-		errorString = "Error extracting asset '" + assetName + "' props";
-		return false;
-	}
-
 	QWidget* pCon = new QWidget();
 	QGridLayout* pLayout = new QGridLayout();
 
