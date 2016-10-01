@@ -1121,6 +1121,58 @@ bool AssetPropertyEditorWidget::open(QString* pErrorString, const QString& fileN
 	return true;
 }
 
+
+bool AssetPropertyEditorWidget::isUndoAvailable(void) const
+{
+	return false;
+}
+
+bool AssetPropertyEditorWidget::isRedoAvailable(void) const
+{
+	return false;
+}
+
+bool AssetPropertyEditorWidget::isReadOnly(void) const
+{
+	return false;
+}
+
+void AssetPropertyEditorWidget::undo(void)
+{
+
+}
+
+void AssetPropertyEditorWidget::redo(void)
+{
+
+}
+
+void AssetPropertyEditorWidget::copy(void)
+{
+
+}
+
+void AssetPropertyEditorWidget::cut(void)
+{
+
+}
+
+void AssetPropertyEditorWidget::paste(void)
+{
+
+}
+
+void AssetPropertyEditorWidget::collapseAll(void)
+{
+	assetProps_->collapseAll();
+}
+
+void AssetPropertyEditorWidget::expandAll(void)
+{
+	assetProps_->expandAll();
+}
+
+
 AssetPropertyEditor* AssetPropertyEditorWidget::editor(void)
 {
 	if (!pEditor_) {

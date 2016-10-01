@@ -285,6 +285,20 @@ private:
 public:
 	bool open(QString* pErrorString, const QString& data, assetDb::AssetType::Enum type);
 
+	bool isUndoAvailable(void) const;
+	bool isRedoAvailable(void) const;
+	bool isReadOnly(void) const;
+
+	void undo(void);
+	void redo(void);
+	void copy(void);
+	void cut(void);
+	void paste(void);
+
+	void collapseAll(void);
+	void expandAll(void);
+
+
 	AssetPropertyEditor* editor(void);
 	AssetProperties* assetProperties(void) const;
 
