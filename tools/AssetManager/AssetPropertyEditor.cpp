@@ -799,9 +799,13 @@ void AssetProperties::expandAll(void)
 bool AssetProperties::loadProps(QString& errorString, const QString& assetName, assetDb::AssetType::Enum type)
 {
 	// we want to load the args from the db.
-	X_UNUSED(assetName);
 	const auto narrowName = assetName.toLocal8Bit();
 	const core::string name(narrowName.data());
+
+	if (name.isEmpty()) {
+		errorString = "Can't load props for asset with blank name";
+		return false;
+	}
 
 	int32_t assetId;
 	if (!db_.AssetExsists(type, name, &assetId)) {
