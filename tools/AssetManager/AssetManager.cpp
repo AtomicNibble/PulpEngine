@@ -309,6 +309,18 @@ void AssetManager::createActions(void)
 	pRedoAct_->setStatusTip("Redo");
 	pRedoAct_->setEnabled(false);
 
+	pCutAct_ = new QAction(QIcon(":/misc/img/Cut.png"), "Cut", this);
+	pCutAct_->setStatusTip("Cut");
+//	pCutAct_->setEnabled(false);
+
+	pCopyAct_ = new QAction(QIcon(":/misc/img/Copy.png"), "Copy", this);
+	pCopyAct_->setStatusTip("Copy");
+//	pCopyAct_->setEnabled(false);
+
+	pPasteAct_ = new QAction(QIcon(":/misc/img/Paste.png"), "Paste", this);
+	pPasteAct_->setStatusTip("Paste");
+//	pPasteAct_->setEnabled(false);
+
 	// View
 	pViewAssetDbExpoAct_ = new QAction(tr("AssetDB Explorer"), this);
 
@@ -409,6 +421,17 @@ void AssetManager::createMenus(void)
 		pCmd->setDefaultKeySequence(QKeySequence::Redo);
 		editmenu->addAction(pCmd, Constants::G_EDIT_UNDOREDO);
 
+		pCmd = ActionManager::registerAction(pCutAct_, Constants::EDIT_CUT, globalContext);
+		pCmd->setDefaultKeySequence(QKeySequence::Cut);
+		editmenu->addAction(pCmd, Constants::G_EDIT_COPYPASTE);
+
+		pCmd = ActionManager::registerAction(pCopyAct_, Constants::EDIT_COPY, globalContext);
+		pCmd->setDefaultKeySequence(QKeySequence::Copy);
+		editmenu->addAction(pCmd, Constants::G_EDIT_COPYPASTE);
+
+		pCmd = ActionManager::registerAction(pPasteAct_, Constants::EDIT_PASTE, globalContext);
+		pCmd->setDefaultKeySequence(QKeySequence::Paste);
+		editmenu->addAction(pCmd, Constants::G_EDIT_COPYPASTE);
 	}
 
 	// View

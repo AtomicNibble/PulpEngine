@@ -108,6 +108,9 @@ private:
 	// Edit
 	QAction* pUndoAct_;
 	QAction* pRedoAct_;
+	QAction* pCutAct_;
+	QAction* pCopyAct_;
+	QAction* pPasteAct_;
 
 	// View
 	QAction* pViewAssetDbExpoAct_;
