@@ -1191,6 +1191,10 @@ bool EditorManager::saveAssetEntry(IAssetEntry* pAssetEntryParam)
 	if (success) {
 		addAssetEntryToRecentFiles(pAssetEntry);
 	}
+	else {
+		const auto name = pAssetEntry->name().toStdString();
+		X_WARNING("EditorMan", "Failed to save asset entry: \"%s\"", name.c_str());
+	}
 
 	return success;
 }
