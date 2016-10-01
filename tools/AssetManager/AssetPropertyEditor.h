@@ -240,6 +240,8 @@ private:
 	bool parseArgs(const core::string& jsonStr);
 	bool extractArgs(core::string& jsonStrOut) const;
 	bool appendGui(QGridLayout* pLayout);
+	void setNotModifiedModified(void);
+
 
 public:
 	void BeginGroup(const std::string& groupName);

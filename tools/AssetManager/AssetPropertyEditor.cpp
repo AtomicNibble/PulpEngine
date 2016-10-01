@@ -966,6 +966,16 @@ bool AssetProperties::appendGui(QGridLayout* pLayout)
 }
 
 
+void AssetProperties::setNotModifiedModified(void)
+{
+	// ya fucking wut.
+
+	for (auto it = keys_.begin(); it != keys_.end(); ++it) {
+		(*it)->SetModified(false);
+	}
+}
+
+
 void AssetProperties::BeginGroup(const std::string& groupName)
 {
 	std::vector<std::string> tokens;
