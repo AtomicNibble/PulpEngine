@@ -11,6 +11,7 @@ X_NAMESPACE_DECLARE(assetDb,
 X_NAMESPACE_BEGIN(assman)
 
 class AssetPropsScriptManager;
+class AssetPropsEditorActionHandler;
 
 class AssetPropertyEditorFactory : public IEditorFactory
 {
@@ -18,12 +19,14 @@ class AssetPropertyEditorFactory : public IEditorFactory
 
 public:
 	AssetPropertyEditorFactory(assetDb::AssetDB& db, AssetPropsScriptManager* pPropScriptMan, QObject *parent);
+	~AssetPropertyEditorFactory();
 
 	IEditor* createEditor(void);
 
 private:
 	assetDb::AssetDB& db_;
 	AssetPropsScriptManager* pPropScriptMan_;
+	AssetPropsEditorActionHandler* pActionHandler_;
 };
 
 
