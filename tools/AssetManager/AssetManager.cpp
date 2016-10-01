@@ -293,7 +293,7 @@ void AssetManager::createActions(void)
 
 
 	pSaveAllAct_ = new QAction(QIcon(":/misc/img/Saveall.png"), tr("Save all"), this);
-	pSaveAllAct_->setStatusTip(tr("Save all open documents"));
+	pSaveAllAct_->setStatusTip(tr("Save all open assets"));
 	connect(pSaveAllAct_, SIGNAL(triggered()), this, SLOT(saveAll()));
 
 
@@ -331,6 +331,7 @@ void AssetManager::createActions(void)
 	connect(pWindowResetLayoutAct_, SIGNAL(triggered()), this, SLOT(resetLayout()));
 
 	pReloadStyleAct_ = new QAction(tr("Reload stylesheet"), this);
+	pPasteAct_->setStatusTip("Reload the stylesheet");
 	connect(pReloadStyleAct_, SIGNAL(triggered()), this, SLOT(reloadStyle()));
 
 	// Help
