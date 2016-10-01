@@ -39,7 +39,7 @@ signals:
 	void reloadFinished(bool success);
 
 
-private:
+protected:
 	QString assetName_;
 	assetDb::AssetType::Enum type_;
 	bool temporary_;
