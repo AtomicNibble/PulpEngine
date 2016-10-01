@@ -71,6 +71,8 @@ void AssetGroupWidget::show(bool visible)
 
 void AssetGroupWidget::collapseAll(void)
 {
+	QToolButton::setChecked(true);
+
 	for (auto& pChild : children_)
 	{
 		pChild->show(false);
@@ -79,6 +81,8 @@ void AssetGroupWidget::collapseAll(void)
 
 void AssetGroupWidget::expandAll(void)
 {
+	QToolButton::setChecked(false);
+
 	for (auto& pChild : children_)
 	{
 		pChild->show(true);
