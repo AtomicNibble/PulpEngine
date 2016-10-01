@@ -198,15 +198,12 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 
 void AssetProperty::valueChanged(const std::string& value)
 {
-	X_UNUSED(value);
-	X_LOG0("Meow", "meow: %s", value.c_str());
+	X_LOG0("AssetProperty", "newVal: %s", value.c_str());
 
 	// so this prop was changed :D
-	bool isModified = GetDefaultValue() != value;
+	bool isModified = strSavedValue_ != value;
 	SetValue(value);
 	SetModified(isModified);
-
-	//	SetValue(value);
 
 	emit modified();
 }
