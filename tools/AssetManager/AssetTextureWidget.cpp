@@ -24,14 +24,16 @@ AssetTextureWidget::AssetTextureWidget(QWidget *parent, const std::string& value
 	pVertLayout->setContentsMargins(0, 0, 0, 0);
 	{
 		pEditPathPad_ = new QLabel();
+		pEditPathPad_->setVisible(false);
 
 		pEditPath_ = new QLineEdit(this);
-		pEditPath_->setAcceptDrops(true); 
+	//	pEditPath_->setAcceptDrops(true); 
 		pEditPath_->installEventFilter(this);
 
 		connect(pEditPath_, SIGNAL(editingFinished()), this, SLOT(editingFinished()));
 
 		pEditDimensions_ = new QLabel();
+		pEditDimensions_->setVisible(false);
 
 		pVertLayout->addWidget(pEditPathPad_);
 		pVertLayout->addWidget(pEditPath_);
