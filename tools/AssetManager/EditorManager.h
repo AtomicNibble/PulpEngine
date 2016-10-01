@@ -101,6 +101,7 @@ public slots:
 	static bool closeAllEditors(bool askAboutModifiedEditors = true);
 
 	static bool saveAssetEntry(IAssetEntry* pAssetEntry = nullptr);
+	static bool saveAssetEntryAs(IAssetEntry* pAssetEntry = nullptr);
 
 
 private slots:

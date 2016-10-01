@@ -1216,6 +1216,13 @@ bool EditorManager::saveAssetEntry(IAssetEntry* pAssetEntryParam)
 }
 
 
+bool EditorManager::saveAssetEntryAs(IAssetEntry* pAssetEntryParam)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+	X_UNUSED(pAssetEntryParam);
+	return false;
+}
+
 
 /* Adds the file name to the recent files if there is at least one non-temporary editor for it */
 void EditorManager::addAssetEntryToRecentFiles(IAssetEntry* pAssetEntry)
