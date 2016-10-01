@@ -114,6 +114,7 @@ AssetManager::AssetManager(QWidget* pParent) :
 	setCentralWidget(pLayout_);
 	setMinimumSize(600, 800);
 
+	pStatusBar_->showMessage("Ready");
 
 	EditorManager::openEditor("test", Constants::ASSETPROP_EDITOR_ID);
 	EditorManager::openEditor("test1", Constants::ASSETPROP_EDITOR_ID);
@@ -732,6 +733,24 @@ void AssetManager::closeEvent(QCloseEvent *event)
 
 	event->accept();
 }
+
+bool AssetManager::event(QEvent *e)
+{
+	if (e->type() == QEvent::StatusTip && pStatusBar_)
+	{
+		QStatusTipEvent* ev = static_cast<QStatusTipEvent*>(e);
+		if (ev->tip().length() > 0) {
+			pStatusBar_->showMessage(ev->tip());
+		}
+		else {
+			pStatusBar_->showMessage("Ready");
+		}
+		return true;
+	}
+
+	return BaseWindow::event(e);
+}
+
 
 // ----------------------------------------------------
 

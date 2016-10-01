@@ -94,6 +94,7 @@ private slots:
 
 protected:
 	virtual void closeEvent(QCloseEvent *event) X_OVERRIDE;
+	bool event(QEvent *e) X_OVERRIDE;
 
 private:
 	void reloadStyle(const QString& path);
