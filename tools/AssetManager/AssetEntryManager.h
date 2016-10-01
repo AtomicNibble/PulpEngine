@@ -12,7 +12,30 @@ class AssetEntryManager : public QObject
 	Q_OBJECT
 public:
 
-	typedef QPair<QString, Id> RecentFile;
+	struct RecentAsset
+	{
+		RecentAsset() = default;
+		RecentAsset(QString name, assetDb::AssetType::Enum type, Id id);
+
+		bool operator==(const RecentAsset& oth) const;
+
+		QString name;
+		assetDb::AssetType::Enum type;
+		Id id;
+	};
+
+	struct AssetInfo
+	{
+		AssetInfo() = default;
+		AssetInfo(QString name, assetDb::AssetType::Enum type);
+
+		bool operator==(const AssetInfo& oth) const;
+
+		QString name;
+		assetDb::AssetType::Enum type;
+	};
+
+	// typedef QPair<QString, Id> RecentFile;
 
 public:
 	explicit AssetEntryManager(QObject *parent);
@@ -28,24 +51,17 @@ public:
 	static bool removeAssetEntry(IAssetEntry* pAssetEntry);
 	static QList<IAssetEntry*> modifiedAssetEntrys(void);
 
-	static void renamedFile(const QString& from, const QString& to);
-
 	// recent files
-	static void addToRecentFiles(const QString& fileName, const Id &editorId = Id());
+	static void addToRecentFiles(const QString& fileName, assetDb::AssetType::Enum type, const Id &editorId);
 	Q_SLOT void clearRecentFiles(void);
-	static QList<RecentFile> recentFiles(void);
+	static QList<RecentAsset> recentAssets(void);
 
-
-//	static void saveSettings(void);
 
 	// current file
-	static void setCurrentFile(const QString& fileName);
-	static QString currentFile(void);
-
+	static void setCurrentFile(const QString& fileName, assetDb::AssetType::Enum type);
+	static AssetInfo currentFile(void);
 
 	// helper functions
-	static QString fixFileName(const QString& fileName);
-
 	static bool saveAssetEntry(IAssetEntry* pAssetEntry);
 
 
@@ -74,9 +90,7 @@ public:
 
 
 signals:
-	void currentFileChanged(const QString& filePath);
-	// emitted if one AssetEntry changed its name e.g. due to save as
-	void assetEntryRenamed(IAssetEntry* pAssetEntry, const QString& from, const QString& to);
+	void currentFileChanged(const QString& name, assetDb::AssetType::Enum type);
 
 
 private slots:
@@ -93,7 +107,7 @@ private:
 };
 
 
-
+Q_DECLARE_METATYPE(AssetEntryManager::RecentAsset)
 
 
 X_NAMESPACE_END

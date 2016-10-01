@@ -460,7 +460,8 @@ void EditorManager::addEditor(IEditor *editor)
 		const bool isTemporary = editor->assetEntry()->isTemporary();
 		AssetEntryManager::addAssetEntry(editor->assetEntry());
 		if (!isTemporary) {
-			AssetEntryManager::addToRecentFiles(editor->assetEntry()->name(), editor->id());
+			const auto pEntry = editor->assetEntry();
+			AssetEntryManager::addToRecentFiles(pEntry->name(), pEntry->type(), editor->id());
 		}
 	}
 	emit pInstance_->editorOpened(editor);
@@ -1220,7 +1221,7 @@ void EditorManager::addAssetEntryToRecentFiles(IAssetEntry* pAssetEntry)
 		return;
 	}
 
-	AssetEntryManager::addToRecentFiles(pAssetEntry->name(), pEntry->id());
+	AssetEntryManager::addToRecentFiles(pAssetEntry->name(), pAssetEntry->type(), pEntry->id());
 }
 
 void EditorManager::autoSave(void)

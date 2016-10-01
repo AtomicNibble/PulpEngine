@@ -36,9 +36,9 @@ namespace
 		QSet<QString> expectedFileNames_;
 		QList<IAssetEntry*> assetEntrys_;
 
-		QList<AssetEntryManager::RecentFile> recentFiles_;
+		QList<AssetEntryManager::RecentAsset> recentAssets_;
 
-		QString currentFile_;
+		AssetEntryManager::AssetInfo currentAsset_;
 	};
 
 
@@ -52,6 +52,38 @@ namespace
 
 
 } // namespace
+
+
+AssetEntryManager::RecentAsset::RecentAsset(QString name_, assetDb::AssetType::Enum type_, Id id_) :
+	name(name_),
+	type(type_),
+	id(id_)
+{
+
+}
+
+bool AssetEntryManager::RecentAsset::operator==(const RecentAsset& oth) const
+{
+	return id == oth.id && type == oth.type && name == oth.name;
+}
+
+// -------------------------------------------------
+
+
+AssetEntryManager::AssetInfo::AssetInfo(QString name_, assetDb::AssetType::Enum type_) :
+	name(name_),
+	type(type_)
+{
+
+}
+
+bool AssetEntryManager::AssetInfo::operator==(const AssetInfo& oth) const
+{
+	return type == oth.type && name == oth.name;
+}
+
+// -------------------------------------------------
+
 
 AssetEntryManager::AssetEntryManager(QObject *parent) :
 	QObject(parent)
@@ -100,7 +132,6 @@ bool AssetEntryManager::removeAssetEntry(IAssetEntry* pAssetEntry)
 
 	if (!d->assetEntrys_.removeOne(pAssetEntry))
 	{
-	//	removeFileInfo(pAssetEntry);
 		disconnect(pAssetEntry, SIGNAL(changed()), pInstance_, SLOT(checkForNewFileName()));
 	}
 
@@ -123,73 +154,57 @@ QList<IAssetEntry*> AssetEntryManager::modifiedAssetEntrys(void)
 }
 
 
-void AssetEntryManager::renamedFile(const QString& from, const QString& to)
-{
-	X_UNUSED(from);
-	X_UNUSED(to);
-	X_ASSERT_NOT_IMPLEMENTED();
-}
-
-
-
 // recent files
-void AssetEntryManager::addToRecentFiles(const QString& fileName, const Id& editorId)
+void AssetEntryManager::addToRecentFiles(const QString& fileName, assetDb::AssetType::Enum type, const Id& editorId)
 {
 	if (fileName.isEmpty()) {
 		return;
 	}
 
-	QString unifiedForm(fixFileName(fileName));
-	QMutableListIterator<RecentFile > it(d->recentFiles_);
+	RecentAsset file(fileName, type, editorId);
+
+	QMutableListIterator<RecentAsset> it(d->recentAssets_);
 	while (it.hasNext())
 	{
-		RecentFile file = it.next();
-		QString recentUnifiedForm(fixFileName(file.first));
-		if (unifiedForm == recentUnifiedForm) {
+		if(file == it.next()) {
 			it.remove();
 		}
 	}
 
-	if (d->recentFiles_.count() > d->MMAX_RECENT_FILES) {
-		d->recentFiles_.removeLast();
+	if (d->recentAssets_.count() > d->MMAX_RECENT_FILES) {
+		d->recentAssets_.removeLast();
 	}
 
-	d->recentFiles_.prepend(RecentFile(fileName, editorId));
+	d->recentAssets_.prepend(file);
 }
 
 void AssetEntryManager::clearRecentFiles(void)
 {
-	d->recentFiles_.clear();
+	d->recentAssets_.clear();
 }
 
-QList<AssetEntryManager::RecentFile> AssetEntryManager::recentFiles(void)
+QList<AssetEntryManager::RecentAsset> AssetEntryManager::recentAssets(void)
 {
-	return d->recentFiles_;
+	return d->recentAssets_;
 }
-
 
 
 // current file
-void AssetEntryManager::setCurrentFile(const QString& fileName)
+void AssetEntryManager::setCurrentFile(const QString& name, assetDb::AssetType::Enum type)
 {
-	if (d->currentFile_ == fileName) {
+	AssetInfo asset(name, type);
+
+	if (d->currentAsset_ == asset) {
 		return;
 	}
-	d->currentFile_ = fileName;
-	emit pInstance_->currentFileChanged(d->currentFile_);
+	d->currentAsset_ = asset;
+	emit pInstance_->currentFileChanged(d->currentAsset_.name, d->currentAsset_.type);
 }
 
-QString AssetEntryManager::currentFile(void)
+AssetEntryManager::AssetInfo AssetEntryManager::currentFile(void)
 {
-	return d->currentFile_;
+	return d->currentAsset_;
 }
-
-// helper functions
-QString AssetEntryManager::fixFileName(const QString& fileName)
-{
-	return fileName;
-}
-
 
 bool AssetEntryManager::saveAssetEntry(IAssetEntry* pAssetEntry)
 {
@@ -265,9 +280,8 @@ bool AssetEntryManager::saveModifiedAssetEntry(IAssetEntry* pAssetEntry,
 void AssetEntryManager::assetEntryDestroyed(QObject *obj)
 {
 	IAssetEntry* pAssetEntry = static_cast<IAssetEntry*>(obj);
-	// Check the special unwatched first:
 	if (!d->assetEntrys_.removeOne(pAssetEntry)) {
-	//	removeFileInfo(pAssetEntry);
+		// ...
 	}
 }
 
@@ -278,7 +292,7 @@ void AssetEntryManager::syncWithEditor(const QList<IContext*>& context)
 		return;
 	}
 
-	IEditor *editor = EditorManager::currentEditor();
+	IEditor* editor = EditorManager::currentEditor();
 	if (!editor || editor->assetEntry()->isTemporary()) {
 		return;
 	}
@@ -286,7 +300,8 @@ void AssetEntryManager::syncWithEditor(const QList<IContext*>& context)
 	foreach(IContext* c, context) 
 	{
 		if (editor->widget() == c->widget()) {
-			setCurrentFile(editor->assetEntry()->name());
+			const auto pAssetEntry = editor->assetEntry();
+			setCurrentFile(pAssetEntry->name(), pAssetEntry->type());
 			break;
 		}
 	}
