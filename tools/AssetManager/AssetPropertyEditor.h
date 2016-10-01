@@ -305,8 +305,17 @@ public:
 protected:
 	AssetPropertyEditor* createEditor(void);
 
+	void contextMenuEvent(QContextMenuEvent* e);
+	void showDefaultContextMenu(QContextMenuEvent* e, const Id menuContextId);
+
+	void appendMenuActionsFromContext(QMenu *menu, const Id menuContextId);
+	void appendStandardContextMenuActions(QMenu *menu);
+
 signals:
+	void undoAvailable(bool);
+	void readOnlyChanged(void);
 	void modificationChanged(bool);
+	void copyAvailable(bool);
 
 private:
 	assetDb::AssetDB& db_;

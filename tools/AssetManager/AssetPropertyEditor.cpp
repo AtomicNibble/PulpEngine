@@ -15,6 +15,10 @@
 #include "AssetGroupWidget.h"
 #include "AssetPathWidget.h"
 
+#include "ActionContainer.h"
+#include "ActionManager.h"
+#include "Command.h"
+
 #include <String\Json.h>
 #include <../AssetDB/AssetDB.h>
 
@@ -376,6 +380,7 @@ void AssetProperty::expandAll(void)
 		pGroupWidget_->expandAll();
 	}
 }
+
 
 void AssetProperty::SetKey(const std::string& key)
 {
@@ -1192,6 +1197,61 @@ AssetPropertyEditor* AssetPropertyEditorWidget::createEditor(void)
 	return new AssetPropertyEditor(this);
 }
 
+void AssetPropertyEditorWidget::contextMenuEvent(QContextMenuEvent* e)
+{
+	showDefaultContextMenu(e, Constants::ASSETPROP_EDITOR_CONTEXT);
+}
+
+void AssetPropertyEditorWidget::showDefaultContextMenu(QContextMenuEvent* e, const Id menuContextId)
+{
+	QMenu menu;
+	appendMenuActionsFromContext(&menu, menuContextId);
+	appendStandardContextMenuActions(&menu);
+	menu.exec(e->globalPos());
+}
+
+
+
+void AssetPropertyEditorWidget::appendMenuActionsFromContext(QMenu *menu, const Id menuContextId)
+{
+	ActionContainer *mcontext = ActionManager::actionContainer(menuContextId);
+	if (mcontext) {
+		QMenu* contextMenu = mcontext->menu();
+
+		foreach(QAction *action, contextMenu->actions()) {
+			menu->addAction(action);
+		}
+	}
+}
+
+void AssetPropertyEditorWidget::appendStandardContextMenuActions(QMenu *menu)
+{
+	menu->addSeparator();
+
+	QAction* a = ActionManager::command(Constants::EDIT_UNDO)->action();
+	menu->addAction(a);
+	a = ActionManager::command(Constants::EDIT_REDO)->action();
+	menu->addAction(a);
+
+	menu->addSeparator();
+
+	a = ActionManager::command(Constants::EDIT_CUT)->action();
+	menu->addAction(a);
+	a = ActionManager::command(Constants::EDIT_COPY)->action();
+	menu->addAction(a);
+	a = ActionManager::command(Constants::EDIT_PASTE)->action();
+	menu->addAction(a);
+
+	menu->addSeparator();
+
+	a = ActionManager::command(Constants::ASSETPROP_COLLAPSE_ALL)->action();
+	menu->addAction(a);
+	a = ActionManager::command(Constants::ASSETPROP_UNCOLLAPSE_ALL)->action();
+	menu->addAction(a);
+}
+
+
+
 // ----------------------------------------------------------------
 
 
@@ -1199,6 +1259,8 @@ AssetPropertyEditor::AssetPropertyEditor(AssetPropertyEditorWidget* editor) :
 	pEditorWidget_(editor)
 {
 	setWidget(pEditorWidget_);
+
+	setContext(Context(Constants::C_ASSETPROP_EDITOR));
 
 	connect(editor, SIGNAL(modificationChanged(bool)), this, SLOT(modificationChanged(bool)));
 
