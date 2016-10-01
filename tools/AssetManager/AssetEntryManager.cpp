@@ -81,7 +81,6 @@ void AssetEntryManager::addAssetEntry(const QList<IAssetEntry*>& assetEntrys)
 		if (pAssetEntry && !d->assetEntrys_.contains(pAssetEntry))
 		{
 			connect(pAssetEntry, SIGNAL(destroyed(QObject*)), pInstance_, SLOT(assetEntryDestroyed(QObject*)));
-			connect(pAssetEntry, SIGNAL(filePathChanged(QString, QString)), pInstance_, SLOT(filePathChanged(QString, QString)));
 			d->assetEntrys_.append(pAssetEntry);
 		}
 	}
