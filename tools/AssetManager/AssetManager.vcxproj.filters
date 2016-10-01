@@ -1194,6 +1194,24 @@
     <ClCompile Include="ShowRefsDialog.cpp">
       <Filter>Source Files\Widgets\Dialogs</Filter>
     </ClCompile>
+    <ClCompile Include="AssetPropertyEditorActionHandler.cpp">
+      <Filter>Source Files\Editor\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_AssetPropertyEditorActionHandler.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_AssetPropertyEditorActionHandler.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_AssetPropertyEditorActionHandler.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_AssetPropertyEditorActionHandler.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_AssetPropertyEditorActionHandler.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -1348,6 +1366,9 @@
     </CustomBuild>
     <CustomBuild Include="ShowRefsDialog.h">
       <Filter>Header Files\Widgets\Dialogs</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AssetPropertyEditorActionHandler.h">
+      <Filter>Header Files\Editor\Types</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
