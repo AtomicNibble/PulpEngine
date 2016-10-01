@@ -805,8 +805,9 @@ bool AssetProperties::loadProps(QString& errorString, const QString& assetName, 
 	appendGui(pLayout);
 
 	pCon->setLayout(pLayout);
-	pWidget_->setWidget(pCon);	
 
+	pWidget_->setWidget(pCon);	
+	pWidget_->setWidgetResizable(true);
 
 	return true;
 }
