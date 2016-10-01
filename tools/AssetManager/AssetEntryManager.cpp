@@ -190,40 +190,22 @@ QString AssetEntryManager::fixFileName(const QString& fileName)
 }
 
 
-bool AssetEntryManager::saveAssetEntry(IAssetEntry* pAssetEntry, const QString& fileName, bool *isReadOnly)
+bool AssetEntryManager::saveAssetEntry(IAssetEntry* pAssetEntry)
 {
-	X_UNUSED(pAssetEntry);
-	X_UNUSED(fileName);
-	X_UNUSED(isReadOnly);
+	QString errorString;
+	if (!pAssetEntry->save(errorString)) 
+	{
+		auto string = errorString.toStdString();
+		X_ERROR("AssetMan", "Error saving: \"%s\"", string.c_str());
 
+		QMessageBox::critical(ICore::dialogParent(), tr("Asset Error"),
+			tr("Error while saving asset: %1").arg(errorString));
+	}
+
+	addAssetEntry(pAssetEntry);
 	return false;
 }
 
-
-QString AssetEntryManager::getSaveFileName(const QString& title, const QString& pathIn,
-	const QString& filter, QString* selectedFilter)
-{
-	X_ASSERT_NOT_IMPLEMENTED();
-	X_UNUSED(title);
-	X_UNUSED(pathIn);
-	X_UNUSED(filter);
-	X_UNUSED(selectedFilter);
-
-	return QString();
-}
-
-
-
-QString AssetEntryManager::getSaveAsFileName(const IAssetEntry* pAssetEntry, const QString& filter,
-	QString* pSelectedFilter)
-{
-	X_ASSERT_NOT_IMPLEMENTED();
-	X_UNUSED(pAssetEntry);
-	X_UNUSED(filter);
-	X_UNUSED(pSelectedFilter);
-
-	return QString();
-}
 
 
 bool AssetEntryManager::saveAllModifiedAssetEntrysSilently(bool* pCanceled,

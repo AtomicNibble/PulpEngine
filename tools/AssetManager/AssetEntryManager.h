@@ -46,13 +46,7 @@ public:
 	// helper functions
 	static QString fixFileName(const QString& fileName);
 
-	static bool saveAssetEntry(IAssetEntry* pAssetEntry, const QString& fileName = QString(), bool *isReadOnly = nullptr);
-
-	static QString getSaveFileName(const QString& title, const QString& pathIn,
-		const QString& filter = QString(), QString* selectedFilter = nullptr);
-	static QString getSaveAsFileName(const IAssetEntry* pAssetEntry, const QString& filter = QString(),
-		QString* pSelectedFilter = nullptr);
-
+	static bool saveAssetEntry(IAssetEntry* pAssetEntry);
 
 
 	static bool saveAllModifiedAssetEntrysSilently(bool* pCanceled = nullptr,
