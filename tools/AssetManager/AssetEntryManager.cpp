@@ -191,6 +191,8 @@ QString AssetEntryManager::fixFileName(const QString& fileName)
 
 bool AssetEntryManager::saveAssetEntry(IAssetEntry* pAssetEntry)
 {
+	bool res = true;
+
 	QString errorString;
 	if (!pAssetEntry->save(errorString)) 
 	{
@@ -199,10 +201,12 @@ bool AssetEntryManager::saveAssetEntry(IAssetEntry* pAssetEntry)
 
 		QMessageBox::critical(ICore::dialogParent(), tr("Asset Error"),
 			tr("Error while saving asset: %1").arg(errorString));
+
+		res = false;
 	}
 
 	addAssetEntry(pAssetEntry);
-	return false;
+	return res;
 }
 
 
