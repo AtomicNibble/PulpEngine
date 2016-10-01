@@ -69,6 +69,23 @@ void AssetGroupWidget::show(bool visible)
 	}
 }
 
+void AssetGroupWidget::collapseAll(void)
+{
+	for (auto& pChild : children_)
+	{
+		pChild->show(false);
+	}
+}
+
+void AssetGroupWidget::expandAll(void)
+{
+	for (auto& pChild : children_)
+	{
+		pChild->show(true);
+	}
+}
+
+
 void AssetGroupWidget::AddChild(AssetProperty* pChild)
 {
 	return children_.append(pChild);

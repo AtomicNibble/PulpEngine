@@ -24,6 +24,10 @@ public:
 	void clear(void);
 	void show(bool visible);
 
+	void collapseAll(void);
+	void expandAll(void);
+
+
 	void AddChild(AssetProperty* pChild);
 	ConstIterator begin(void) const;
 	ConstIterator end(void) const;
