@@ -363,6 +363,20 @@ void AssetProperty::SetModified(bool modified)
 	}
 }
 
+void AssetProperty::collapseAll(void)
+{
+	if (type_ == PropertyType::GROUPBOX) {
+		pGroupWidget_->collapseAll();
+	}
+}
+
+void AssetProperty::expandAll(void)
+{
+	if (type_ == PropertyType::GROUPBOX) {
+		pGroupWidget_->expandAll();
+	}
+}
+
 void AssetProperty::SetKey(const std::string& key)
 {
 	key_ = key;
@@ -729,6 +743,21 @@ bool AssetProperties::isSaveAsAllowed(void) const
 {
 	return false;
 }
+
+void AssetProperties::collapseAll(void)
+{
+	for (const auto& pChild : root_) {
+		pChild->collapseAll();
+	}
+}
+
+void AssetProperties::expandAll(void)
+{
+	for (const auto& pChild : root_) {
+		pChild->expandAll();
+	}
+}
+
 
 bool AssetProperties::loadProps(QString& errorString, const QString& assetName, assetDb::AssetType::Enum type)
 {

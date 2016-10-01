@@ -96,6 +96,9 @@ public:
 	void enable(bool val);
 	void SetModified(bool modified);
 
+	void collapseAll(void);
+	void expandAll(void);
+
 	void SetKey(const std::string& key);
 	void SetParentKey(const std::string& key);
 	void SetType(PropertyType::Enum type);
@@ -225,6 +228,9 @@ public:
 
 	bool isModified(void) const X_OVERRIDE;
 	bool isSaveAsAllowed(void) const X_OVERRIDE;
+
+	void collapseAll(void);
+	void expandAll(void);
 
 	bool loadProps(QString& errorString, const QString& fileName, assetDb::AssetType::Enum type);
 
