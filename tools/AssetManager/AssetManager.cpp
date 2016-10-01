@@ -291,6 +291,10 @@ void AssetManager::createActions(void)
 	pNewFileAct_->setStatusTip(tr("Create a new asset"));
 	connect(pNewFileAct_, SIGNAL(triggered()), this, SLOT(newFile()));
 
+	pNewModAct_ = new QAction(QIcon(":/img/NewFile.png"), tr("New Mod..."), this);
+	pNewModAct_->setStatusTip(tr("Create a new mod"));
+	connect(pNewModAct_, SIGNAL(triggered()), this, SLOT(newMod()));
+
 
 	pSaveAllAct_ = new QAction(QIcon(":/misc/img/Saveall.png"), tr("Save all"), this);
 	pSaveAllAct_->setStatusTip(tr("Save all open assets"));
@@ -379,8 +383,22 @@ void AssetManager::createMenus(void)
 		filemenu->addSeparator(globalContext, Constants::G_FILE_RECENT);
 		filemenu->addSeparator(globalContext, Constants::G_FILE_CLOSE);
 
+		// connect shit
+		connect(filemenu->menu(), SIGNAL(aboutToShow()), this, SLOT(aboutToShowRecentFiles()));
+
+		ActionContainer* pRecent = ActionManager::createMenu(Constants::M_FILE_RECENTFILES);
+		pRecent->menu()->setTitle(tr("Recent &Assets"));
+		pRecent->setOnAllDisabledBehavior(ActionContainer::OnAllDisabledBehavior::Show);
+
+		filemenu->addMenu(pRecent, Constants::G_FILE_RECENT);
+
+
 		pCmd = ActionManager::registerAction(pNewFileAct_, Constants::NEW_ASSET, globalContext);
 		pCmd->setDefaultKeySequence(QKeySequence::New);
+		filemenu->addAction(pCmd, Constants::G_FILE_NEW);
+
+		pCmd = ActionManager::registerAction(pNewModAct_, Constants::NEW_MOD, globalContext);
+		pCmd->setDefaultKeySequence(QKeySequence("Ctrl+Shift+N"));
 		filemenu->addAction(pCmd, Constants::G_FILE_NEW);
 
 
@@ -624,16 +642,64 @@ void AssetManager::newFile(void)
 	dialog.exec();
 }
 
+void AssetManager::newMod(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+}
+
+
 void AssetManager::saveAll(void)
 {
 	AssetEntryManager::saveAllModifiedAssetEntrysSilently();
+}
+
+void AssetManager::aboutToShowRecentFiles(void)
+{
+	ActionContainer* aci = ActionManager::actionContainer(Constants::M_FILE_RECENTFILES);
+	aci->menu()->clear();
+
+	bool hasRecentFiles = false;
+
+	foreach(const AssetEntryManager::RecentAsset& file, AssetEntryManager::recentAssets())
+	{
+		hasRecentFiles = true;
+
+		QString text = file.name;
+		QString type = assetDb::AssetType::ToString(file.type);
+		
+		text += " : " + type.toLower();
+
+		QAction* pAction = aci->menu()->addAction(text);
+
+		pAction->setData(qVariantFromValue(file));
+		connect(pAction, SIGNAL(triggered()), this, SLOT(openRecentFile()));
+	}
+
+	aci->menu()->setEnabled(hasRecentFiles);
+
+	// add the Clear Menu item
+	if (hasRecentFiles)
+	{
+		aci->menu()->addSeparator();
+		QAction* pAction = aci->menu()->addAction(Constants::CLEAR_MENU);
+		connect(pAction, SIGNAL(triggered()), AssetEntryManager::instance(), SLOT(clearRecentFiles()));
+	}
+}
+
+void AssetManager::openRecentFile(void)
+{
+	QAction *action = qobject_cast<QAction *>(sender());
+	if (action)
+	{
+		const AssetEntryManager::RecentAsset file = action->data().value<AssetEntryManager::RecentAsset>();
+		EditorManager::openEditor(file.name, file.type, file.id);
+	}
 }
 
 // =======================  Window Menu Actions =======================
 
 void AssetManager::resetLayout(void)
 {
-
 
 }
 

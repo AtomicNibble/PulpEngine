@@ -87,6 +87,7 @@ namespace Constants
 	
 	// File Actions
 	const char NEW_ASSET[] = "File.NewAsset";
+	const char NEW_MOD[] = "File.NewMod";
 	const char SAVE[] = "File.Save";
 	const char SAVEAS[] = "File.SaveAs";
 	const char SAVEALL[] = "File.SaveAll";
@@ -124,6 +125,8 @@ namespace Constants
 	const char ASSETPROP_COLLAPSE_ALL[] = "AssetProp.CollapseAll";
 	const char ASSETPROP_UNCOLLAPSE_ALL[] = "AssetProp.UnCollapseAll";
 
+	// Clear a menu
+	const char CLEAR_MENU[] = "Clear";
 
 	//  ----------- Actions -----------
 

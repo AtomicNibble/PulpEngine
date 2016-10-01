@@ -74,7 +74,11 @@ private slots:
 
 	// file Closes
 	void newFile(void);
+	void newMod(void);
 	void saveAll(void);
+
+	void aboutToShowRecentFiles(void);
+	void openRecentFile(void);
 
 	// View Slots
 	void aboutToShowViewMenu(void);
@@ -103,6 +107,7 @@ private:
 
 	// File
 	QAction* pNewFileAct_;
+	QAction* pNewModAct_;
 	QAction* pSaveAllAct_;
 	QAction* pQuitAct_;
 
