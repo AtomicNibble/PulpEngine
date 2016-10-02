@@ -169,3 +169,6 @@ user_config.cfg
 *.idb
 /3rdparty/v140/x64/Physx
 /3rdparty/v140/Win32/Physx
+
+# assMan ui scripts
+!/game_folder/assetscripts/*.aps
