@@ -10,9 +10,10 @@ X_NAMESPACE_BEGIN(assman)
 
 class AssetProperties;
 
-class AssetPropsScriptManager : QObject
+class AssetPropsScriptManager : public QObject
 {
 	Q_OBJECT
+
 
 	class ByteCodeStream : public asIBinaryStream
 	{
