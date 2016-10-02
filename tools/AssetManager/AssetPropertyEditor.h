@@ -239,7 +239,7 @@ public:
 private:
 	bool parseArgs(const core::string& jsonStr);
 	bool extractArgs(core::string& jsonStrOut) const;
-	bool appendGui(QGridLayout* pLayout);
+	bool appendGui(QWidget* pParent, QGridLayout* pLayout);
 	void setNotModifiedModified(void);
 
 

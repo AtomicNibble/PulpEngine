@@ -176,7 +176,7 @@ void AssetProperty::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& r
 		pLayout->addWidget(pGroupWidget_, row++, depth, 1, -1);
 
 
-		pGroupWidget_->appendGui(pLayout, row, depth);
+		pGroupWidget_->appendGui(pParent, pLayout, row, depth);
 	}
 	else
 	{	// add label.
@@ -815,7 +815,7 @@ bool AssetProperties::loadProps(QString& errorString, const QString& assetName, 
 	QWidget* pCon = new QWidget();
 	QGridLayout* pLayout = new QGridLayout();
 
-	appendGui(pLayout);
+	appendGui(pWidget_, pLayout);
 
 	pCon->setLayout(pLayout);
 
@@ -945,7 +945,7 @@ bool AssetProperties::extractArgs(core::string& jsonStrOut) const
 
 
 
-bool AssetProperties::appendGui(QGridLayout* pLayout)
+bool AssetProperties::appendGui(QWidget* pParent, QGridLayout* pLayout)
 {
 	for (int32_t i = 0; i < 12; i++) {
 		pLayout->setColumnMinimumWidth(i, 16);
@@ -957,7 +957,7 @@ bool AssetProperties::appendGui(QGridLayout* pLayout)
 
 	for (const auto& pChild : root_)
 	{
-		pChild->appendGui(nullptr, pLayout, row, depth);
+		pChild->appendGui(pParent, pLayout, row, depth);
 		row += 1;
 	}
 
