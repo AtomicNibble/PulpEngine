@@ -182,6 +182,8 @@ void AssetColorWidget::validateText(const QString& text)
 {
 	QObject* pSender = sender();
 
+	// i could just cast pSender to QlineEdit and set text.
+	// but i did this as I potentially might want to update the saved color, so i need to know the channel.
 	if (text.isEmpty())
 	{
 		for (int32_t i = 0; i < 4; i++)
