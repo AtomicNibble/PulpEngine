@@ -1,0 +1,102 @@
+
+
+
+void GenerateUI( asset& Asset )
+{
+    string semantics = "2d | diffuseMap | normalMap | specularMask | specularMap";
+    string autoCompMethod = "Best color compression[compressHighCol]|Better alpha compression[compressHighAlpha]|Low quality color compression with no Alpha[compressCol]|Uncompressed[noCompress]|Custom";
+    string dstFmts = "R8|R16|R16F|R32F|R8G8|R16G16|R16G16F|R32G32F|R8G8B8A8|R8G8B8A8_SRGB|R10G10B10A2|BC1|BC1_SRGB|BC2|BC2_SRGB|BC3|BC3_SRGB|BC4|BC5|BC6|BC7|BC7_SRGB";
+
+    Asset.AddTexture( "srcFile", "" ).SetTitle( "Src image" );
+    Asset.AddCombo( "semantic", semantics ).SetTitle( "Image Usage:" );
+    Asset.AddCombo( "compressionMethod", autoCompMethod ).SetTitle("Auto Compression");
+    Asset.AddCombo( "imgFmt", dstFmts ).SetTitle("Force Compression algo").SetVisible( false );
+    Asset.AddCombo( "imageType", "Texture | Cube | Volume" ).SetTitle( "Image Type" );
+
+    Asset.AddString( "customTemplate", "" ).SetTitle( "Template" );
+    Asset.AddColor("color", 1, 0, 0, 0.5).SetTitle("color1");
+    Asset.AddPath("path", "goat.text").SetTitle("path");
+
+    Asset.BeginGroup("Properties");
+    {
+        Asset.AddCombo( "mipMapAlgo", "Box | Triangle | Kaiser" ).SetTitle( "Mip Method" );
+        Asset.AddCombo( "mipWrapMode", "Mirror | Clamp | Repeat" ).SetTitle( "Mip Wrap Mode" );
+        Asset.AddCombo( "baseSize", "1/1 | 1/2 | 1/4 | 1/8" ).SetTitle( "Base Size" ).SetToolTip("Downscales src image when compiling.");
+        Asset.AddCheckBox( "ignoreSrcMips", false ).SetTitle( "Ignore src mips" );
+        Asset.AddCheckBox( "noMips",  false ).SetTitle( "ForceNoMips" );
+        Asset.AddCheckBox( "preMulAlpha",  false ).SetTitle( "PreMultiply Alpha" );
+        Asset.AddCheckBox( "streamable",  true ).SetTitle( "Can stream" ).SetToolTip("Enables the image for streaming.");
+        Asset.AddCheckBox( "hiMipStream",  true ).SetTitle( "StreamHigh mips" ).SetToolTip("Loads only the high mips via streaming.");
+        Asset.AddCheckBox( "forceStream",  false ).SetTitle( "Force stream" ).SetToolTip("Ignores any logic to sync load and forces streaming.");
+        Asset.AddCheckBox( "allowNonePow2",  false ).SetTitle( "allow none pow2" ).SetToolTip("Allows src images to be none power of 2, you really should not enable this.");
+
+    }
+}
+
+
+/*
+void GenerateUI( asset& Asset )
+{
+
+            Asset.AddInt("meow33", 5, 0, 10).SetTitle("test");
+            Asset.AddFloat("meow44", 5, 0, 10).SetTitle("test");
+
+         Asset.AddColor("color", 1, 0, 0, 0.5).SetTitle("color1");
+
+         Asset.AddPath("path", "goat.text").SetTitle("path");
+         Asset.AddText("text", "goat.text").SetTitle("text");
+         Asset.AddTexture( "cookieImage", "" ).SetTitle( "Cookie Image" ).SetEnabled(true);
+          Asset.AddString( "customTemplate", "" ).SetTitle( "Template" );
+
+            Asset.AddCombo( "type", "rigid | animated | ------ | multiplayer body | viewhands", true ).SetTitle( "Type1" );
+
+            Asset.BeginGroup("Convert Settings");
+            {
+                Asset.AddCheckBox("verbose", false).SetTitle("Verbose").SetToolTip("Verbose logging during conversion").SetEnabled(false);
+                Asset.AddCheckBox("zero_origin", false).SetTitle("Zero Origin");
+                Asset.AddCheckBox("white_vert_col", false).SetTitle("Force white vertex color");
+                Asset.AddCheckBox("merge_meshes", true).SetTitle("Merge meshes");
+                Asset.AddCheckBox("merge_verts", true).SetTitle("Merge verts");
+                Asset.AddCheckBox("ext_weights", false).SetTitle("Double vert bind limit");
+
+                 Asset.AddFloat("scale", 1, 0, 10000).SetTitle("Scale");
+                Asset.AddFloat("weight_thresh", 0.05, 0, 10000).SetTitle("Bone weight threshold");
+                Asset.AddFloat("uv_merge_thresh", 0.05, 0, 10000).SetTitle("UV merge threshold");
+                Asset.AddFloat("vert_merge_thresh", 0.05, 0, 10000).SetTitle("Vert merge threshold");
+            }
+
+
+            Asset.BeginGroup("Group1");
+            {
+                 Asset.AddCheckBox("meow2", false).SetTitle("pickle0").SetIcon(":/assetDb/img/File_material.png");
+                 Asset.AddCheckBox("meow3", false).SetTitle("pickle1").SetIcon(":/assetDb/img/File_material.png");
+                 Asset.AddCheckBox("meow4", false).SetTitle("pickle2").SetIcon(":/assetDb/img/File_material.png");
+                 Asset.AddCheckBox("meow5", false).SetTitle("pickle3").SetIcon(":/assetDb/img/File_material.png");
+                 Asset.AddCheckBox("meow6", false).SetTitle("pickle4").SetIcon(":/assetDb/img/File_material.png");
+                 Asset.AddCheckBox("meow7", false).SetTitle("pickle5").SetIcon(":/assetDb/img/File_material.png");
+             }
+
+
+            Asset.BeginGroup("Group1.SubGroup1");
+            {
+                 Asset.AddCheckBox("meow3", false).SetTitle("Camel").SetIcon(":/assetDb/img/File_material.png");
+                     Asset.AddCheckBox("meow33333", false).SetTitle("Camel1").SetIcon(":/assetDb/img/File_material.png");
+            }
+
+            Asset.BeginGroup("Group1.SubGroup2");
+            {
+                 Asset.AddCheckBox("meow4", false).SetTitle("123456");
+             Asset.AddCheckBox("meo22w33333", false).SetTitle("Camel1").SetIcon(":/assetDb/img/File_material.png");
+            }
+
+            // add a group below "Group1.SubGroup1" even tho "Group1.SubGroup2" is not the active gorup :D
+            Asset.BeginGroup("Group1.SubGroup1.SubSubGroup1");
+            {
+                 Asset.AddCheckBox("meow5", false).SetTitle("Goat ");
+
+                             Asset.AddString("meow122", "fat goat").SetTitle("MEOW :-D !");
+                            Asset.AddString("meow22222", "fat goat").SetTitle("test");
+            }
+}
+
+*/
