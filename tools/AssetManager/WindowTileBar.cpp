@@ -118,7 +118,7 @@ WindowTitleBar::WindowTitleBar(QWidget *parent) :
 
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
-	//  this->setLayout(hbox);
+	setLayout(hbox);
 
 	connect(pMinimize_, SIGNAL(clicked()),
 		this, SLOT(Minimized()));
