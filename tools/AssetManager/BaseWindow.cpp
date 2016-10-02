@@ -99,6 +99,7 @@ BaseWindow::BaseWindow(QWidget * parent) :
 			pCustomTitleBar_, SLOT(UpdateWindowTitle()));
 
 		pCustomTitleBar_->installEventFilter(this);
+		pCustomTitleBar_->setMouseTracking(true);
 	}
 
 	// left/right spacer
@@ -111,7 +112,7 @@ BaseWindow::BaseWindow(QWidget * parent) :
 
 
 	installEventFilter(this);
-
+	setMouseTracking(true);
 }
 
 
@@ -145,6 +146,7 @@ void BaseWindow::setCentralWidget(QLayout* layout)
 void BaseWindow::setStatusBar(QStatusBar* statusbar)
 {
 	mainLayout_.addWidget(statusbar, 3, 0, 1, 3);
+	statusbar->setMouseTracking(true);
 }
 
 void BaseWindow::setMainLayoutName(const QString& name)
@@ -177,7 +179,7 @@ bool BaseWindow::eventFilter(QObject *o, QEvent *event)
 	Q_UNUSED(o);
 
 	switch (event->type())
-	{
+	{ 
 	case QEvent::MouseButtonPress:
 		handleMousePressEvent(static_cast<QMouseEvent*>(event));
 		break;

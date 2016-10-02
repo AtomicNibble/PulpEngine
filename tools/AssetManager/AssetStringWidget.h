@@ -23,7 +23,11 @@ public:
 	AssetStringWidget(QWidget *parent, const std::string& value);
 	~AssetStringWidget();
 
+signals:
+	void valueChanged(const std::string& value);
+
 private slots:
+	void setValue(const std::string& value);
 	void editingFinished(void);
 
 };

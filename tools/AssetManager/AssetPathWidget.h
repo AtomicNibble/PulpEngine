@@ -4,7 +4,6 @@
 
 X_NAMESPACE_BEGIN(assman)
 
-
 class AssetPathWidget : public QWidget
 {
 	Q_OBJECT
@@ -42,6 +41,13 @@ public:
 	QString path(void) const;
 	QString rawPath(void) const; // The raw unexpanded input.
 	QString fileName(void) const;
+
+signals:
+	void valueChanged(const std::string& value);
+
+private slots:
+	void editingFinished(void);
+	void setValue(const std::string& value);
 
 private:
 	void setPath(const QString& filePath);

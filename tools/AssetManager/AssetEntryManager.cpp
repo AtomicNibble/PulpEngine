@@ -5,6 +5,8 @@
 #include "IEditor.h"
 #include "EditorManager.h"
 
+#include "SaveItemsDialog.h"
+
 X_NAMESPACE_BEGIN(assman)
 
 namespace
@@ -34,9 +36,9 @@ namespace
 		QSet<QString> expectedFileNames_;
 		QList<IAssetEntry*> assetEntrys_;
 
-		QList<AssetEntryManager::RecentFile> recentFiles_;
+		QList<AssetEntryManager::RecentAsset> recentAssets_;
 
-		QString currentFile_;
+		AssetEntryManager::AssetInfo currentAsset_;
 	};
 
 
@@ -50,6 +52,38 @@ namespace
 
 
 } // namespace
+
+
+AssetEntryManager::RecentAsset::RecentAsset(QString name_, assetDb::AssetType::Enum type_, Id id_) :
+	name(name_),
+	type(type_),
+	id(id_)
+{
+
+}
+
+bool AssetEntryManager::RecentAsset::operator==(const RecentAsset& oth) const
+{
+	return id == oth.id && type == oth.type && name == oth.name;
+}
+
+// -------------------------------------------------
+
+
+AssetEntryManager::AssetInfo::AssetInfo(QString name_, assetDb::AssetType::Enum type_) :
+	name(name_),
+	type(type_)
+{
+
+}
+
+bool AssetEntryManager::AssetInfo::operator==(const AssetInfo& oth) const
+{
+	return type == oth.type && name == oth.name;
+}
+
+// -------------------------------------------------
+
 
 AssetEntryManager::AssetEntryManager(QObject *parent) :
 	QObject(parent)
@@ -81,7 +115,6 @@ void AssetEntryManager::addAssetEntry(const QList<IAssetEntry*>& assetEntrys)
 		if (pAssetEntry && !d->assetEntrys_.contains(pAssetEntry))
 		{
 			connect(pAssetEntry, SIGNAL(destroyed(QObject*)), pInstance_, SLOT(assetEntryDestroyed(QObject*)));
-			connect(pAssetEntry, SIGNAL(filePathChanged(QString, QString)), pInstance_, SLOT(filePathChanged(QString, QString)));
 			d->assetEntrys_.append(pAssetEntry);
 		}
 	}
@@ -99,7 +132,6 @@ bool AssetEntryManager::removeAssetEntry(IAssetEntry* pAssetEntry)
 
 	if (!d->assetEntrys_.removeOne(pAssetEntry))
 	{
-	//	removeFileInfo(pAssetEntry);
 		disconnect(pAssetEntry, SIGNAL(changed()), pInstance_, SLOT(checkForNewFileName()));
 	}
 
@@ -122,108 +154,87 @@ QList<IAssetEntry*> AssetEntryManager::modifiedAssetEntrys(void)
 }
 
 
-void AssetEntryManager::renamedFile(const QString& from, const QString& to)
-{
-	X_UNUSED(from);
-	X_UNUSED(to);
-	X_ASSERT_NOT_IMPLEMENTED();
-}
-
-
-
 // recent files
-void AssetEntryManager::addToRecentFiles(const QString& fileName, const Id& editorId)
+void AssetEntryManager::addToRecentFiles(const QString& fileName, assetDb::AssetType::Enum type, const Id& editorId)
 {
 	if (fileName.isEmpty()) {
 		return;
 	}
 
-	QString unifiedForm(fixFileName(fileName));
-	QMutableListIterator<RecentFile > it(d->recentFiles_);
+	RecentAsset file(fileName, type, editorId);
+
+	QMutableListIterator<RecentAsset> it(d->recentAssets_);
 	while (it.hasNext())
 	{
-		RecentFile file = it.next();
-		QString recentUnifiedForm(fixFileName(file.first));
-		if (unifiedForm == recentUnifiedForm) {
+		if(file == it.next()) {
 			it.remove();
 		}
 	}
 
-	if (d->recentFiles_.count() > d->MMAX_RECENT_FILES) {
-		d->recentFiles_.removeLast();
+	if (d->recentAssets_.count() > d->MMAX_RECENT_FILES) {
+		d->recentAssets_.removeLast();
 	}
 
-	d->recentFiles_.prepend(RecentFile(fileName, editorId));
+	d->recentAssets_.prepend(file);
 }
 
 void AssetEntryManager::clearRecentFiles(void)
 {
-	d->recentFiles_.clear();
+	d->recentAssets_.clear();
 }
 
-QList<AssetEntryManager::RecentFile> AssetEntryManager::recentFiles(void)
+QList<AssetEntryManager::RecentAsset> AssetEntryManager::recentAssets(void)
 {
-	return d->recentFiles_;
+	return d->recentAssets_;
 }
 
 
+void AssetEntryManager::reloadUIforType(assetDb::AssetType::Enum type)
+{
+	for (IAssetEntry* pAssetEntry : d->assetEntrys_) {
+		if (pAssetEntry->type() == type) {
+			pAssetEntry->reloadUi();
+		}
+	}
+}
 
 // current file
-void AssetEntryManager::setCurrentFile(const QString& fileName)
+void AssetEntryManager::setCurrentFile(const QString& name, assetDb::AssetType::Enum type)
 {
-	if (d->currentFile_ == fileName) {
+	AssetInfo asset(name, type);
+
+	if (d->currentAsset_ == asset) {
 		return;
 	}
-	d->currentFile_ = fileName;
-	emit pInstance_->currentFileChanged(d->currentFile_);
+	d->currentAsset_ = asset;
+	emit pInstance_->currentFileChanged(d->currentAsset_.name, d->currentAsset_.type);
 }
 
-QString AssetEntryManager::currentFile(void)
+AssetEntryManager::AssetInfo AssetEntryManager::currentFile(void)
 {
-	return d->currentFile_;
+	return d->currentAsset_;
 }
 
-// helper functions
-QString AssetEntryManager::fixFileName(const QString& fileName)
+bool AssetEntryManager::saveAssetEntry(IAssetEntry* pAssetEntry)
 {
-	return fileName;
+	bool res = true;
+
+	QString errorString;
+	if (!pAssetEntry->save(errorString)) 
+	{
+		auto string = errorString.toStdString();
+		X_ERROR("AssetMan", "Error saving: \"%s\"", string.c_str());
+
+		QMessageBox::critical(ICore::dialogParent(), tr("Asset Error"),
+			tr("Error while saving asset: %1").arg(errorString));
+
+		res = false;
+	}
+
+	addAssetEntry(pAssetEntry);
+	return res;
 }
 
-
-bool AssetEntryManager::saveAssetEntry(IAssetEntry* pAssetEntry, const QString& fileName, bool *isReadOnly)
-{
-	X_UNUSED(pAssetEntry);
-	X_UNUSED(fileName);
-	X_UNUSED(isReadOnly);
-
-	return false;
-}
-
-
-QString AssetEntryManager::getSaveFileName(const QString& title, const QString& pathIn,
-	const QString& filter, QString* selectedFilter)
-{
-	X_ASSERT_NOT_IMPLEMENTED();
-	X_UNUSED(title);
-	X_UNUSED(pathIn);
-	X_UNUSED(filter);
-	X_UNUSED(selectedFilter);
-
-	return QString();
-}
-
-
-
-QString AssetEntryManager::getSaveAsFileName(const IAssetEntry* pAssetEntry, const QString& filter,
-	QString* pSelectedFilter)
-{
-	X_ASSERT_NOT_IMPLEMENTED();
-	X_UNUSED(pAssetEntry);
-	X_UNUSED(filter);
-	X_UNUSED(pSelectedFilter);
-
-	return QString();
-}
 
 
 bool AssetEntryManager::saveAllModifiedAssetEntrysSilently(bool* pCanceled,
@@ -278,9 +289,8 @@ bool AssetEntryManager::saveModifiedAssetEntry(IAssetEntry* pAssetEntry,
 void AssetEntryManager::assetEntryDestroyed(QObject *obj)
 {
 	IAssetEntry* pAssetEntry = static_cast<IAssetEntry*>(obj);
-	// Check the special unwatched first:
 	if (!d->assetEntrys_.removeOne(pAssetEntry)) {
-	//	removeFileInfo(pAssetEntry);
+		// ...
 	}
 }
 
@@ -291,7 +301,7 @@ void AssetEntryManager::syncWithEditor(const QList<IContext*>& context)
 		return;
 	}
 
-	IEditor *editor = EditorManager::currentEditor();
+	IEditor* editor = EditorManager::currentEditor();
 	if (!editor || editor->assetEntry()->isTemporary()) {
 		return;
 	}
@@ -299,7 +309,8 @@ void AssetEntryManager::syncWithEditor(const QList<IContext*>& context)
 	foreach(IContext* c, context) 
 	{
 		if (editor->widget() == c->widget()) {
-			setCurrentFile(editor->assetEntry()->name());
+			const auto pAssetEntry = editor->assetEntry();
+			setCurrentFile(pAssetEntry->name(), pAssetEntry->type());
 			break;
 		}
 	}
@@ -312,16 +323,82 @@ bool AssetEntryManager::saveModifiedFilesHelper(const QList<IAssetEntry*>& asset
 	const QString& alwaysSaveMessage, bool* pAlwaysSave,
 	QList<IAssetEntry*>* pFailedToSave)
 {
-	X_UNUSED(assetEntrys);
-	X_UNUSED(message);
-	X_UNUSED(pCancelled);
-	X_UNUSED(silently);
-	X_UNUSED(alwaysSaveMessage);
-	X_UNUSED(pAlwaysSave);
-	X_UNUSED(pFailedToSave);
+	if (pCancelled) {
+		*pCancelled = false;
+	}
+
+	QList<IAssetEntry*> notSaved;
+	QMap<IAssetEntry*, QString> modifiedAssetsMap;
+	QList<IAssetEntry*> modifiedAssets;
+
+	foreach(IAssetEntry* pEntry, assetEntrys)
+	{
+		if (pEntry && pEntry->isModified())
+		{
+			QString name = pEntry->name();
+
+			// There can be several IDocuments pointing to the same file
+			if (!modifiedAssetsMap.key(name, 0) || !pEntry->isFileReadOnly()) {
+				modifiedAssetsMap.insert(pEntry, name);
+			}
+		}
+	}
+
+	modifiedAssets = modifiedAssetsMap.keys();
+	if (!modifiedAssets.isEmpty())
+	{
+		QList<IAssetEntry*> assetsToSave;
+		if (silently)
+		{
+			assetsToSave = modifiedAssets;
+		}
+		else 
+		{
+			SaveItemsDialog dia(ICore::dialogParent(), modifiedAssets);
+
+			if (!message.isEmpty()) {
+				dia.setMessage(message);
+			}
+			if (!alwaysSaveMessage.isNull()) {
+				dia.setAlwaysSaveMessage(alwaysSaveMessage);
+			}
+			if (dia.exec() != QDialog::Accepted) {
+				if (pCancelled) {
+					*pCancelled = true;
+				}
+				if (pAlwaysSave) {
+					*pAlwaysSave = dia.alwaysSaveChecked();
+				}
+				if (pFailedToSave) {
+					*pFailedToSave = modifiedAssets;
+				}
+				return false;
+			}
+			if (pAlwaysSave) {
+				*pAlwaysSave = dia.alwaysSaveChecked();
+			}
+
+			assetsToSave = dia.itemsToSave();
+		}
 
 
-	return false;
+		foreach(IAssetEntry* pEntry, assetsToSave)
+		{
+			if (!EditorManager::saveAssetEntry(pEntry))
+			{
+				if (pCancelled) {
+					*pCancelled = true;
+				}
+				notSaved.append(pEntry);
+			}
+		}
+	}
+
+	if (pFailedToSave) {
+		*pFailedToSave = notSaved;
+	}
+
+	return true;
 }
 
 X_NAMESPACE_END

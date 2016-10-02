@@ -486,6 +486,9 @@ void AssetDBModel::added(FolderNode* pFolderNode, const QList<Node*>& newNodeLis
 	// Old  list
 	auto it = childNodes_.constFind(pFolderNode);
 	if (it == childNodes_.constEnd()) {
+		beginInsertRows(parentIndex, 0, newNodeList.size() - 1);
+		childNodes_.insert(pFolderNode, newNodeList);
+		endInsertRows();
 		return;
 	}
 

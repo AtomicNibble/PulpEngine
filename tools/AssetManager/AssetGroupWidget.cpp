@@ -5,8 +5,8 @@
 
 X_NAMESPACE_BEGIN(assman)
 
-AssetGroupWidget::AssetGroupWidget(QWidget *parent)
-	: QToolButton(parent)
+AssetGroupWidget::AssetGroupWidget(QWidget *parent) :
+	QToolButton(parent)
 {
 
 	setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -39,11 +39,11 @@ AssetGroupWidget::~AssetGroupWidget()
 {
 }
 
-void AssetGroupWidget::appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth)
+void AssetGroupWidget::appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth)
 {
 	for (auto& pChild : children_)
 	{
-		pChild->appendGui(this, pLayout, row, depth + 1);
+		pChild->appendGui(pParent, pLayout, row, depth + 1);
 		row += 1;
 	}
 }
@@ -68,6 +68,27 @@ void AssetGroupWidget::show(bool visible)
 		pChild->show(visible);
 	}
 }
+
+void AssetGroupWidget::collapseAll(void)
+{
+	QToolButton::setChecked(true);
+
+	for (auto& pChild : children_)
+	{
+		pChild->show(false);
+	}
+}
+
+void AssetGroupWidget::expandAll(void)
+{
+	QToolButton::setChecked(false);
+
+	for (auto& pChild : children_)
+	{
+		pChild->show(true);
+	}
+}
+
 
 void AssetGroupWidget::AddChild(AssetProperty* pChild)
 {

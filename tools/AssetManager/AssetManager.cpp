@@ -87,7 +87,7 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pEditorManager_ = new EditorManager(this);
 	pEditorManager_->init();
 
-	pEditorManager_->AddFactory(new AssetPropertyEditorFactory(this));
+	pEditorManager_->AddFactory(new AssetPropertyEditorFactory(*pDb_, pAssetScripts_, this));
 
 	{
 		pAssetDbexplorer_ = new AssetExplorer::AssetExplorer(*pDb_);
@@ -114,6 +114,7 @@ AssetManager::AssetManager(QWidget* pParent) :
 	setCentralWidget(pLayout_);
 	setMinimumSize(600, 800);
 
+	pStatusBar_->showMessage("Ready");
 
 	EditorManager::openEditor("test", Constants::ASSETPROP_EDITOR_ID);
 	EditorManager::openEditor("test1", Constants::ASSETPROP_EDITOR_ID);
@@ -215,11 +216,11 @@ void AssetManager::updateFocusWidget(QWidget* old, QWidget* now)
 		return;
 	}
 
-#if X_DEBUG
+#if X_DEBUG && CONTEXT_DEBUGGING
 	if (debugLogging && now && now->metaObject()) {
 		qDebug() << "Name: " << now->metaObject()->className();
 	}
-#endif // ¬X_DEBUG
+#endif // !X_DEBUG && CONTEXT_DEBUGGING
 
 	QList<IContext*> newContext;
 	if (QWidget* pWidget = qApp->focusWidget())
@@ -249,14 +250,15 @@ void AssetManager::updateContextObject(const QList<IContext*>& context)
 
 	updateContext();
 
-#if X_DEBUG
+#if X_DEBUG && CONTEXT_DEBUGGING
 	if (debugLogging) 
 	{
 		qDebug() << "new context objects =" << context;
 		foreach(IContext *c, context)
 			qDebug() << (c ? c->widget() : 0) << (c ? c->widget()->metaObject()->className() : 0);
+		qDebug() << "-----------------------";
 	}
-#endif // !X_DEBUG
+#endif // !X_DEBUG && CONTEXT_DEBUGGING
 }
 
 void AssetManager::updateContext(void)
@@ -290,9 +292,18 @@ void AssetManager::createActions(void)
 	pNewFileAct_->setStatusTip(tr("Create a new asset"));
 	connect(pNewFileAct_, SIGNAL(triggered()), this, SLOT(newFile()));
 
+	pNewModAct_ = new QAction(QIcon(":/img/NewFile.png"), tr("New Mod..."), this);
+	pNewModAct_->setStatusTip(tr("Create a new mod"));
+	connect(pNewModAct_, SIGNAL(triggered()), this, SLOT(newMod()));
+
+	pSaveAct_ = new QAction(QIcon(":/misc/img/Save.png"), tr("Save"), this);
+	pSaveAct_->setStatusTip(tr("Save the current asset"));
+	pSaveAct_->setEnabled(false);
+	// connect(pSaveAct_, SIGNAL(triggered()), this, SLOT(save()));
+
 
 	pSaveAllAct_ = new QAction(QIcon(":/misc/img/Saveall.png"), tr("Save all"), this);
-	pSaveAllAct_->setStatusTip(tr("Save all open documents"));
+	pSaveAllAct_->setStatusTip(tr("Save all open assets"));
 	connect(pSaveAllAct_, SIGNAL(triggered()), this, SLOT(saveAll()));
 
 
@@ -300,6 +311,26 @@ void AssetManager::createActions(void)
 	pQuitAct_->setStatusTip(tr("Quit the application"));
 	connect(pQuitAct_, SIGNAL(triggered()), this, SLOT(close()));
 
+	// Edit
+	pUndoAct_ = new QAction(QIcon(":/misc/img/Undo.png"), "Undo", this);
+	pUndoAct_->setStatusTip(tr("Undo the last editing action"));
+	pUndoAct_->setEnabled(false);
+
+	pRedoAct_ = new QAction(QIcon(":/misc/img/Redo.png"), "Redo", this);
+	pRedoAct_->setStatusTip("Redo");
+	pRedoAct_->setEnabled(false);
+
+	pCutAct_ = new QAction(QIcon(":/misc/img/Cut.png"), "Cut", this);
+	pCutAct_->setStatusTip("Cut");
+//	pCutAct_->setEnabled(false);
+
+	pCopyAct_ = new QAction(QIcon(":/misc/img/Copy.png"), "Copy", this);
+	pCopyAct_->setStatusTip("Copy");
+//	pCopyAct_->setEnabled(false);
+
+	pPasteAct_ = new QAction(QIcon(":/misc/img/Paste.png"), "Paste", this);
+	pPasteAct_->setStatusTip("Paste");
+//	pPasteAct_->setEnabled(false);
 
 	// View
 	pViewAssetDbExpoAct_ = new QAction(tr("AssetDB Explorer"), this);
@@ -310,6 +341,7 @@ void AssetManager::createActions(void)
 	connect(pWindowResetLayoutAct_, SIGNAL(triggered()), this, SLOT(resetLayout()));
 
 	pReloadStyleAct_ = new QAction(tr("Reload stylesheet"), this);
+	pPasteAct_->setStatusTip("Reload the stylesheet");
 	connect(pReloadStyleAct_, SIGNAL(triggered()), this, SLOT(reloadStyle()));
 
 	// Help
@@ -357,10 +389,30 @@ void AssetManager::createMenus(void)
 		filemenu->addSeparator(globalContext, Constants::G_FILE_RECENT);
 		filemenu->addSeparator(globalContext, Constants::G_FILE_CLOSE);
 
+		// connect shit
+		connect(filemenu->menu(), SIGNAL(aboutToShow()), this, SLOT(aboutToShowRecentFiles()));
+
+		ActionContainer* pRecent = ActionManager::createMenu(Constants::M_FILE_RECENTFILES);
+		pRecent->menu()->setTitle(tr("Recent &Assets"));
+		pRecent->setOnAllDisabledBehavior(ActionContainer::OnAllDisabledBehavior::Show);
+
+		filemenu->addMenu(pRecent, Constants::G_FILE_RECENT);
+
+
 		pCmd = ActionManager::registerAction(pNewFileAct_, Constants::NEW_ASSET, globalContext);
 		pCmd->setDefaultKeySequence(QKeySequence::New);
 		filemenu->addAction(pCmd, Constants::G_FILE_NEW);
 
+		pCmd = ActionManager::registerAction(pNewModAct_, Constants::NEW_MOD, globalContext);
+		pCmd->setDefaultKeySequence(QKeySequence("Ctrl+Shift+N"));
+		filemenu->addAction(pCmd, Constants::G_FILE_NEW);
+
+
+		pCmd = ActionManager::registerAction(pSaveAct_, Constants::SAVE, globalContext);
+		pCmd->setDefaultKeySequence(QKeySequence::Save);
+		pCmd->setAttribute(Command::CommandAttribute::UpdateText);
+		pCmd->setDescription(tr("Save"));
+		filemenu->addAction(pCmd, Constants::G_FILE_SAVE);
 
 		pCmd = ActionManager::registerAction(pSaveAllAct_, Constants::SAVEALL, globalContext);
 		pCmd->setDefaultKeySequence(QKeySequence("Ctrl+Shift+S"));
@@ -369,6 +421,49 @@ void AssetManager::createMenus(void)
 		// Exit
 		pCmd = ActionManager::registerAction(pQuitAct_, Constants::EXIT, globalContext);
 		filemenu->addAction(pCmd, Constants::G_FILE_CLOSE);
+	}
+
+	// Edit
+	{
+		ActionContainer *editmenu = ActionManager::createMenu(Constants::M_EDIT);
+		pMenuBar->addMenu(editmenu, Constants::G_EDIT);
+		editmenu->menu()->setTitle(tr("Edit"));
+
+		// Groups
+		editmenu->appendGroup(Constants::G_EDIT_UNDOREDO);
+		editmenu->appendGroup(Constants::G_EDIT_COPYPASTE);
+		editmenu->appendGroup(Constants::G_EDIT_SELECTALL);
+		editmenu->appendGroup(Constants::G_EDIT_FIND);
+
+		// File menu separators
+		editmenu->addSeparator(globalContext, Constants::G_EDIT_UNDOREDO);
+		editmenu->addSeparator(globalContext, Constants::G_EDIT_COPYPASTE);
+		editmenu->addSeparator(globalContext, Constants::G_EDIT_SELECTALL);
+		editmenu->addSeparator(globalContext, Constants::G_EDIT_FIND);
+
+
+		// Undo/Redo actions
+		pCmd = ActionManager::registerAction(pUndoAct_, Constants::EDIT_UNDO, globalContext);
+		pCmd->setAttribute(Command::CommandAttribute::UpdateText);
+		pCmd->setDefaultKeySequence(QKeySequence::Undo);
+		editmenu->addAction(pCmd, Constants::G_EDIT_UNDOREDO);
+
+		pCmd = ActionManager::registerAction(pRedoAct_, Constants::EDIT_REDO, globalContext);
+		pCmd->setAttribute(Command::CommandAttribute::UpdateText);
+		pCmd->setDefaultKeySequence(QKeySequence::Redo);
+		editmenu->addAction(pCmd, Constants::G_EDIT_UNDOREDO);
+
+		pCmd = ActionManager::registerAction(pCutAct_, Constants::EDIT_CUT, globalContext);
+		pCmd->setDefaultKeySequence(QKeySequence::Cut);
+		editmenu->addAction(pCmd, Constants::G_EDIT_COPYPASTE);
+
+		pCmd = ActionManager::registerAction(pCopyAct_, Constants::EDIT_COPY, globalContext);
+		pCmd->setDefaultKeySequence(QKeySequence::Copy);
+		editmenu->addAction(pCmd, Constants::G_EDIT_COPYPASTE);
+
+		pCmd = ActionManager::registerAction(pPasteAct_, Constants::EDIT_PASTE, globalContext);
+		pCmd->setDefaultKeySequence(QKeySequence::Paste);
+		editmenu->addAction(pCmd, Constants::G_EDIT_COPYPASTE);
 	}
 
 	// View
@@ -559,16 +654,69 @@ void AssetManager::newFile(void)
 	dialog.exec();
 }
 
+void AssetManager::newMod(void)
+{
+	X_ASSERT_NOT_IMPLEMENTED();
+}
+
+void AssetManager::save(void)
+{
+	EditorManager::saveAssetEntry();
+}
+
+
 void AssetManager::saveAll(void)
 {
 	AssetEntryManager::saveAllModifiedAssetEntrysSilently();
+}
+
+void AssetManager::aboutToShowRecentFiles(void)
+{
+	ActionContainer* aci = ActionManager::actionContainer(Constants::M_FILE_RECENTFILES);
+	aci->menu()->clear();
+
+	bool hasRecentFiles = false;
+
+	foreach(const AssetEntryManager::RecentAsset& file, AssetEntryManager::recentAssets())
+	{
+		hasRecentFiles = true;
+
+		QString text = file.name;
+		QString type = assetDb::AssetType::ToString(file.type);
+		
+		text += " : " + type.toLower();
+
+		QAction* pAction = aci->menu()->addAction(text);
+
+		pAction->setData(qVariantFromValue(file));
+		connect(pAction, SIGNAL(triggered()), this, SLOT(openRecentFile()));
+	}
+
+	aci->menu()->setEnabled(hasRecentFiles);
+
+	// add the Clear Menu item
+	if (hasRecentFiles)
+	{
+		aci->menu()->addSeparator();
+		QAction* pAction = aci->menu()->addAction(Constants::CLEAR_MENU);
+		connect(pAction, SIGNAL(triggered()), AssetEntryManager::instance(), SLOT(clearRecentFiles()));
+	}
+}
+
+void AssetManager::openRecentFile(void)
+{
+	QAction *action = qobject_cast<QAction *>(sender());
+	if (action)
+	{
+		const AssetEntryManager::RecentAsset file = action->data().value<AssetEntryManager::RecentAsset>();
+		EditorManager::openEditor(file.name, file.type, file.id);
+	}
 }
 
 // =======================  Window Menu Actions =======================
 
 void AssetManager::resetLayout(void)
 {
-
 
 }
 
@@ -660,6 +808,12 @@ void AssetManager::fileChanged(const QString& path)
 
 void AssetManager::closeEvent(QCloseEvent *event)
 {
+	if (!AssetEntryManager::saveAllModifiedAssetEntrys()) {
+		event->ignore();
+		return;
+	}
+
+
 	// tell the goats
 	if (!pCoreImpl_->callCoreCloseListners(event)) {
 		return;
@@ -669,6 +823,24 @@ void AssetManager::closeEvent(QCloseEvent *event)
 
 	event->accept();
 }
+
+bool AssetManager::event(QEvent *e)
+{
+	if (e->type() == QEvent::StatusTip && pStatusBar_)
+	{
+		QStatusTipEvent* ev = static_cast<QStatusTipEvent*>(e);
+		if (ev->tip().length() > 0) {
+			pStatusBar_->showMessage(ev->tip());
+		}
+		else {
+			pStatusBar_->showMessage("Ready");
+		}
+		return true;
+	}
+
+	return BaseWindow::event(e);
+}
+
 
 // ----------------------------------------------------
 

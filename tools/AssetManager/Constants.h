@@ -86,20 +86,21 @@ namespace Constants
 	//  ----------- Actions -----------
 	
 	// File Actions
-	const char NEW_ASSET[] = "NewAsset";
-	const char SAVE[] = "Save";
-	const char SAVEAS[] = "SaveAs";
-	const char SAVEALL[] = "SaveAll";
-	const char EXIT[] = "Exit";
+	const char NEW_ASSET[] = "File.NewAsset";
+	const char NEW_MOD[] = "File.NewMod";
+	const char SAVE[] = "File.Save";
+	const char SAVEAS[] = "File.SaveAs";
+	const char SAVEALL[] = "File.SaveAll";
+	const char EXIT[] = "File.Exit";
 
 	// Edit Actions
-	const char EDIT_UNDO[] = "Undo";
-	const char EDIT_REDO[] = "Redo";
-	const char EDIT_COPY[] = "Copy";
-	const char EDIT_PASTE[] = "Paste";
-	const char EDIT_CUT[] = "Cut";
-	const char EDIT_CUTDELETE[] = "Delete";
-	const char EDIT_SELECTALL[] = "SelectAll";
+	const char EDIT_UNDO[] = "Edit.Undo";
+	const char EDIT_REDO[] = "Edit.Redo";
+	const char EDIT_COPY[] = "Edit.Copy";
+	const char EDIT_PASTE[] = "Edit.Paste";
+	const char EDIT_CUT[] = "Edit.Cut";
+	const char EDIT_CUTDELETE[] = "Edit.Delete";
+	const char EDIT_SELECTALL[] = "Edit.SelectAll";
 
 	// View Actions
 	const char VIEW_CODE[] = "View.Code";
@@ -120,7 +121,12 @@ namespace Constants
 	// Help Actions
 	const char SHOW_ABOUT[] = "Help.About";
 
+	// AssetProp actions
+	const char ASSETPROP_COLLAPSE_ALL[] = "AssetProp.CollapseAll";
+	const char ASSETPROP_UNCOLLAPSE_ALL[] = "AssetProp.UnCollapseAll";
 
+	// Clear a menu
+	const char CLEAR_MENU[] = "Clear";
 
 	//  ----------- Actions -----------
 
@@ -134,6 +140,7 @@ namespace Constants
 
 	// Editors
 	const char ASSETPROP_EDITOR_ID[] = "AssetProp.Editor";
+	const char ASSETPROP_EDITOR_CONTEXT[] = "AssetProp.ContextMenu";
 	const char C_ASSETPROP_EDITOR[] = "AssetPropEditor";
 	const char C_ASSETPROP_EDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "AssetProp Editor");
 

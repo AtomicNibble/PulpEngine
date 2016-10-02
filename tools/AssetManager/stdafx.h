@@ -52,6 +52,8 @@ X_LINK_LIB("angelscript");
 #error "unknown config."
 #endif
 
+#define CONTEXT_DEBUGGING 0
+
 
 #include <QIcon>
 #include <QObject>
@@ -89,6 +91,7 @@ X_LINK_LIB("angelscript");
 #include <QClipboard>
 
 #include <array>
+#include <algorithm>
 
 #include "Constants.h"
 #include "logging.h"

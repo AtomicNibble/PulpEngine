@@ -56,6 +56,7 @@ public:
 	typedef int32_t ModId;
 
 	static const ModId INVALID_MOD_ID = -1;
+	static const ModId INVALID_ASSET_ID = -1;
 
 	typedef assetDb::AssetType AssetType;
 	X_DECLARE_ENUM(Result)(
@@ -121,6 +122,7 @@ public:
 
 	Result::Enum UpdateAsset(AssetType::Enum type, const core::string& name, 
 		core::Array<uint8_t>& data, const core::string& argsOpt);
+	Result::Enum UpdateAssetArgs(AssetType::Enum type, const core::string& name, const core::string& argsOpt);
 
 	// if you want to get a assets id use this.
 	bool AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pIdOut = nullptr, ModId* pModIdOut = nullptr);

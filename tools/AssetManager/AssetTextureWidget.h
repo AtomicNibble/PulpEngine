@@ -33,7 +33,11 @@ protected:
 	void dragEnterEvent(QDragEnterEvent* pEvent) X_OVERRIDE;
 	void dropEvent(QDropEvent* pEvent) X_OVERRIDE;
 
+signals:
+	void valueChanged(const std::string& value);
+
 private slots:
+	void setValue(const std::string& value);
 	void editingFinished(void);
 	void validatePath(void);
 	void loadPreview(void);

@@ -23,34 +23,6 @@ X_NAMESPACE_BEGIN(assman)
 
 namespace 
 {
-	static int32_t extractLineNumber(QString *fileName)
-	{
-		int32_t i = fileName->length() - 1;
-		for (; i >= 0; --i) {
-			if (!fileName->at(i).isNumber()) {
-				break;
-			}
-		}
-		if (i == -1) {
-			return -1;
-		}
-		const QChar c = fileName->at(i);
-		if (c == QLatin1Char(':') || c == QLatin1Char('+')) {
-			bool ok;
-			const QString suffix = fileName->mid(i + 1);
-			const int32_t result = suffix.toInt(&ok);
-			if (suffix.isEmpty() || ok) {
-				fileName->truncate(i);
-				return result;
-			}
-		}
-		return -1;
-	}
-
-	static QString autoSaveName(const QString& fileName)
-	{
-		return fileName + QLatin1String(".bak");
-	}
 
 	template <class EditorFactoryLike>
 	X_INLINE EditorFactoryLike* findById(const Id &id)
@@ -94,7 +66,6 @@ namespace
 
 		// context actions
 		QAction* saveCurrentEditorContextAction_;
-		QAction* saveAsCurrentEditorContextAction_;
 		QAction* closeCurrentEditorContextAction_;
 		QAction* closeAllEditorsContextAction_;
 		QAction* closeOtherEditorsContextAction_;
@@ -142,7 +113,6 @@ namespace
 		closeOtherEditorsAction_(new QAction(EditorManager::tr("Close All But This"), parent)),
 
 		saveCurrentEditorContextAction_(new QAction(QIcon(":/misc/img/Savea.png"), EditorManager::tr("&Save"), parent)),
-		saveAsCurrentEditorContextAction_(new QAction(QIcon(":/misc/img/Save.png"), EditorManager::tr("Save &As..."), parent)),
 		closeCurrentEditorContextAction_(new QAction(QIcon(":/misc/img/quit.png"), EditorManager::tr("Close"), parent)),
 		closeAllEditorsContextAction_(new QAction(EditorManager::tr("Close All Documents"), parent)),
 		closeOtherEditorsContextAction_(new QAction(EditorManager::tr("Close All But This"), parent)),
@@ -200,11 +170,11 @@ EditorManager::EditorManager(QWidget *parent) :
 
 	// Save Action
 	ActionManager::registerAction(d->saveAction_, Constants::SAVE, editManagerContext);
-	connect(d->saveAction_, SIGNAL(triggered()), this, SLOT(saveDocument()));
+	connect(d->saveAction_, SIGNAL(triggered()), this, SLOT(saveAssetEntry()));
 
 	// Save As Action
 	ActionManager::registerAction(d->saveAsAction_, Constants::SAVEAS, editManagerContext);
-	connect(d->saveAsAction_, SIGNAL(triggered()), this, SLOT(saveDocumentAs()));
+	connect(d->saveAsAction_, SIGNAL(triggered()), this, SLOT(saveAssetEntryAs()));
 
 
 	// Window Menu
@@ -246,8 +216,7 @@ EditorManager::EditorManager(QWidget *parent) :
 
 
 	//Save XXX Context Actions
-	connect(d->saveCurrentEditorContextAction_, SIGNAL(triggered()), this, SLOT(saveDocumentFromContextMenu()));
-	connect(d->saveAsCurrentEditorContextAction_, SIGNAL(triggered()), this, SLOT(saveDocumentAsFromContextMenu()));
+	connect(d->saveCurrentEditorContextAction_, SIGNAL(triggered()), this, SLOT(saveAssetEntryFromContextMenu()));
 
 	// Close XXX Context Actions
 	connect(d->closeAllEditorsContextAction_, SIGNAL(triggered()), this, SLOT(closeAllEditors()));
@@ -468,22 +437,11 @@ QList<IEditor*> EditorManager::openEditorsList(void)
 
 
 
-IEditor *EditorManager::openEditor(const QString &fileName, const Id &editorId,
+IEditor *EditorManager::openEditor(const QString &assetName, assetDb::AssetType::Enum type, const Id &editorId,
 	OpenEditorFlags flags, bool *newEditor)
 {
 	return pInstance_->openEditor(pInstance_->currentEditorView(),
-		fileName, editorId, flags, newEditor);
-}
-
-IEditor *EditorManager::openEditorAt(const QString &fileName, int32_t line, int32_t column,
-	const Id &editorId, OpenEditorFlags flags, bool *newEditor)
-{
-	IEditor* pEditor = EditorManager::openEditor(fileName, editorId, flags, newEditor);
-
-	if (pEditor && line != -1) {
-		pEditor->gotoLine(line, column);
-	}
-	return pEditor;
+		assetName, type, editorId, flags, newEditor);
 }
 
 
@@ -502,7 +460,8 @@ void EditorManager::addEditor(IEditor *editor)
 		const bool isTemporary = editor->assetEntry()->isTemporary();
 		AssetEntryManager::addAssetEntry(editor->assetEntry());
 		if (!isTemporary) {
-			AssetEntryManager::addToRecentFiles(editor->assetEntry()->name(), editor->id());
+			const auto pEntry = editor->assetEntry();
+			AssetEntryManager::addToRecentFiles(pEntry->name(), pEntry->type(), editor->id());
 		}
 	}
 	emit pInstance_->editorOpened(editor);
@@ -526,7 +485,7 @@ void EditorManager::handleContextChange(const QList<IContext *> &context)
 	//        qDebug() << Q_FUNC_INFO;
 
 	d->scheduledCurrentEditor_ = 0;
-	IEditor *editor = 0;
+	IEditor *editor = nullptr;
 	foreach(IContext *c, context) 
 	{
 		if ((editor = qobject_cast<IEditor*>(c))) {
@@ -585,11 +544,6 @@ EditorView* EditorManager::currentEditorView(void)
 }
 
 
-bool EditorManager::isAutoSaveFile(const QString &fileName)
-{
-	return fileName.endsWith(QLatin1String(".bak"));
-}
-
 void EditorManager::setAutoSaveEnabled(bool enabled)
 {
 	d->autoSaveEnabled_ = enabled;
@@ -613,21 +567,14 @@ int32_t EditorManager::autoSaveInterval(void)
 }
 
 
-IEditor *EditorManager::openEditor(EditorView* pView, const QString& fileName,
+IEditor *EditorManager::openEditor(EditorView* pView, const QString& assetName, assetDb::AssetType::Enum type,
 	const Id &editorId, OpenEditorFlags flags, bool* pNewEditor)
 {
 	if (debugLogging) {
-		qDebug() << Q_FUNC_INFO << fileName << editorId.name();
+		qDebug() << Q_FUNC_INFO << assetName << editorId.name();
 	}
 
-#if 1
-	X_UNUSED(pView);
-	X_UNUSED(fileName);
-	X_UNUSED(editorId);
-	X_UNUSED(flags);
-	X_UNUSED(pNewEditor);
-
-	QString fn = fileName;
+	const QString fn = assetName;
 
 	if (fn.isEmpty()) {
 		X_WARNING("Editor", "Can't open editor for empty name");
@@ -650,7 +597,7 @@ IEditor *EditorManager::openEditor(EditorView* pView, const QString& fileName,
 	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
 	{
 		QString errorString;
-		if (!pEditor->open(&errorString, fn))
+		if (!pEditor->open(&errorString, fn, type))
 		{
 			QApplication::restoreOverrideCursor();
 			QMessageBox::critical(ICore::mainWindow(), tr("File Error"), errorString);
@@ -669,71 +616,6 @@ IEditor *EditorManager::openEditor(EditorView* pView, const QString& fileName,
 	QApplication::restoreOverrideCursor();
 
 	return pResult;
-
-#else
-	QString fn = fileName;
-	QFileInfo fi(fn);
-	int32_t lineNumber = -1;
-
-	if (!fi.exists())
-	{
-		lineNumber = extractLineNumber(&fn);
-		if (lineNumber != -1)
-			fi.setFile(fn);
-	}
-
-	if (fn.isEmpty()) {
-		return 0;
-	}
-
-	if (newEditor) {
-		*newEditor = false;
-	}
-
-
-	QString realFn = autoSaveName(fn);
-	QFileInfo rfi(realFn);
-	if (!fi.exists() || !rfi.exists() || fi.lastModified() >= rfi.lastModified()) {
-		QFile::remove(realFn);
-		realFn = fn;
-	}
-
-	IEditor *editor = createEditor(editorId, fn);
-	// If we could not open the file in the requested editor, fall
-	// back to the default editor:
-	if (!editor)
-	{
-		Q_ASSERT(false);
-		return 0;
-	}
-
-	QApplication::setOverrideCursor(QCursor(Qt::WaitCursor));
-	QString errorString;
-	if (!editor->open(&errorString, fn, realFn))
-	{
-		QApplication::restoreOverrideCursor();
-		QMessageBox::critical(ICore::mainWindow(), tr("File Error"), errorString);
-		delete editor;
-		return 0;
-	}
-
-	addEditor(editor);
-
-	if (newEditor) {
-		*newEditor = true;
-	}
-
-	IEditor *result = activateEditor(view, editor, flags);
-	//     if (editor == result)
-	//       restoreEditorState(editor);
-
-	if (flags & EditorManager::CanContainLineNumber)
-		editor->gotoLine(lineNumber, -1);
-
-	QApplication::restoreOverrideCursor();
-
-	return result;
-#endif
 }
 
 
@@ -891,33 +773,13 @@ void EditorManager::setCurrentView(EditorView *view)
 }
 
 
-
-EditorManager::EditorFactoryList
-EditorManager::editorFactories(const QMimeType& mimeType, bool bestMatchOnly)
-{
-	X_UNUSED(mimeType);
-	X_UNUSED(bestMatchOnly);
-
-
-	EditorFactoryList rc;
-//	const EditorFactoryList& allFactories = d->factories_;
-//	mimeTypeFactoryRecursion(mimeType, allFactories, bestMatchOnly, &rc);
-	if (debugLogging) {
-		qDebug() << Q_FUNC_INFO << mimeType.name() << " returns " << rc;
-	}
-	return rc;
-}
-
-
-IEditor* EditorManager::createEditor(const Id& editorId, const QString& fileName)
+IEditor* EditorManager::createEditor(const Id& editorId, const QString& assetName)
 {
 	if (debugLogging) {
-		qDebug() << Q_FUNC_INFO << editorId.name() << fileName;
+		qDebug() << Q_FUNC_INFO << editorId.name() << assetName;
 	}
 
-#if 1
 	EditorFactoryList factories;
-
 
 	if (!editorId.isValid()) {
 		X_ERROR("Editor", "Can't create editor for invalid editorId");
@@ -931,61 +793,19 @@ IEditor* EditorManager::createEditor(const Id& editorId, const QString& fileName
 	if (factories.empty())
 	{
 		qWarning("%s: unable to find an editor factory for the file '%s', editor Id '%s'.",
-			Q_FUNC_INFO, fileName.toUtf8().constData(), editorId.name().constData());
+			Q_FUNC_INFO, assetName.toUtf8().constData(), editorId.name().constData());
 		return nullptr;
 	}
 
 	IEditor* pEditor = factories.front()->createEditor();
 
 	if (pEditor) {
-		emit pInstance_->editorCreated(pEditor, fileName);
+		connect(pEditor->assetEntry(), &IAssetEntry::changed, pInstance_, &EditorManager::handleAssetEntryStateChange);
+
+		emit pInstance_->editorCreated(pEditor, assetName);
 	}
 
 	return pEditor;
-
-#else
-
-	EditorFactoryList factories;
-
-	if (!editorId.isValid())
-	{
-		//    const QFileInfo fileInfo(fileName);
-		// Find by mime type
-		QMimeDatabase db;
-		QMimeType mimeType = db.mimeTypeForFile(fileName);
-
-		if (!mimeType.isValid())
-		{
-			qWarning("%s unable to determine mime type of %s/%s. Falling back to text/plain",
-				Q_FUNC_INFO, fileName.toUtf8().constData(), editorId.name().constData());
-			return nullptr;
-		}
-
-		factories = editorFactories(mimeType, true);
-	}
-	else
-	{
-		// Find by editor id
-		if (IEditorFactory *factory = findById<IEditorFactory>(editorId)) {
-			factories.push_back(factory);
-		}
-	}
-	if (factories.empty()) 
-	{
-		qWarning("%s: unable to find an editor factory for the file '%s', editor Id '%s'.",
-			Q_FUNC_INFO, fileName.toUtf8().constData(), editorId.name().constData());
-		return nullptr;
-	}
-
-	IEditor* pEditor = factories.front()->createEditor();
-	//    if (editor)
-	//        connect(editor->widget(), SIGNAL(textChanged()), pInstance_, SLOT(handleDocumentStateChange()));
-	if (pEditor) {
-		emit pInstance_->editorCreated(pEditor, fileName);
-	}
-
-	return pEditor;
-#endif
 }
 
 
@@ -1275,7 +1095,7 @@ void EditorManager::activateEditorForEntry(EditorView *view, AssetEntryModel::En
 		return;
 	}
 
-	if (!openEditor(view, entry->fileName(), entry->id(), flags)) {
+	if (!openEditor(view, entry->assetName(), entry->type(), entry->id(), flags)) {
 		d->pAssetEntryModel_->removeEntry(entry);
 	}
 }
@@ -1369,34 +1189,14 @@ bool EditorManager::saveAssetEntry(IAssetEntry* pAssetEntryParam)
 
 //	pAssetEntry->checkPermissions();
 
-	const QString& fileName = pAssetEntry->name();
-
-	if (fileName.isEmpty()) {
-		return saveAssetEntryAs(pAssetEntry);
-	}
-
-	bool success = false;
-	bool isReadOnly;
-
-	// try saving, no matter what isReadOnly tells us
-	success = AssetEntryManager::saveAssetEntry(pAssetEntry, QString(), &isReadOnly);
-
-	if (!success && isReadOnly) {
-		/*
-		MakeWritableResult answer = makeFileWritable(document);
-		if (answer == Failed)
-		return false;
-		if (answer == SavedAs)
-		return true;
-
-		document->checkPermissions();
-
-		success = AssetEntryManager::saveDocument(document);
-		*/
-	}
+	const bool success = AssetEntryManager::saveAssetEntry(pAssetEntry);
 
 	if (success) {
 		addAssetEntryToRecentFiles(pAssetEntry);
+	}
+	else {
+		const auto name = pAssetEntry->name().toStdString();
+		X_WARNING("EditorMan", "Failed to save asset entry: \"%s\"", name.c_str());
 	}
 
 	return success;
@@ -1405,41 +1205,23 @@ bool EditorManager::saveAssetEntry(IAssetEntry* pAssetEntryParam)
 
 bool EditorManager::saveAssetEntryAs(IAssetEntry* pAssetEntryParam)
 {
-	IAssetEntry* pAssetEntry = pAssetEntryParam;
-	if (!pAssetEntry && currentAssetEntry()) {
-		pAssetEntry = currentAssetEntry();
-	}
-	if (!pAssetEntry) {
-		return false;
-	}
-
-	const QString filter; // = MimeDatabase::allFiltersString();
-	QString selectedFilter; // = MimeDatabase::findByFile(QFileInfo(document->filePath())).filterString();
-	const QString &fileName = AssetEntryManager::getSaveAsFileName(pAssetEntry, filter, &selectedFilter);
-
-	if (fileName.isEmpty()) {
-		return false;
-	}
-
-	if (fileName != pAssetEntry->name()) {
-		// close existing editors for the new file name
-		IAssetEntry* pOtherAssetEntry = d->pAssetEntryModel_->assetEntryForFileName(fileName);
-		if (pOtherAssetEntry) {
-			closeAssetEntrys(QList<IAssetEntry *>() << pOtherAssetEntry, false);
-		}
-	}
-
-	const bool success = AssetEntryManager::saveAssetEntry(pAssetEntry, fileName);
-//	pAssetEntry->checkPermissions();
-
-
-	if (success) {
-		addAssetEntryToRecentFiles(pAssetEntry);
-	}
-
-	updateActions();
-	return success;
+	X_ASSERT_NOT_IMPLEMENTED();
+	X_UNUSED(pAssetEntryParam);
+	return false;
 }
+
+
+void EditorManager::handleAssetEntryStateChange(void)
+{
+	updateActions();
+
+	IAssetEntry* pAssetEntry = qobject_cast<IAssetEntry*>(sender());
+
+	if (EditorManager::currentAssetEntry() == pAssetEntry) {
+		emit pInstance_->currentAssetEntryStateChanged();
+	}
+}
+
 
 /* Adds the file name to the recent files if there is at least one non-temporary editor for it */
 void EditorManager::addAssetEntryToRecentFiles(IAssetEntry* pAssetEntry)
@@ -1453,7 +1235,7 @@ void EditorManager::addAssetEntryToRecentFiles(IAssetEntry* pAssetEntry)
 		return;
 	}
 
-	AssetEntryManager::addToRecentFiles(pAssetEntry->name(), pEntry->id());
+	AssetEntryManager::addToRecentFiles(pAssetEntry->name(), pAssetEntry->type(), pEntry->id());
 }
 
 void EditorManager::autoSave(void)
@@ -1473,7 +1255,7 @@ void EditorManager::autoSave(void)
 		}
 
 		QString errorString;
-		if (!pAssetEntry->autoSave(&errorString, autoSaveName(pAssetEntry->name()))) {
+		if (!pAssetEntry->autoSave(&errorString)) {
 			errors << errorString;
 		}
 	}
@@ -1513,9 +1295,9 @@ void EditorManager::updateWindowTitle(void)
 			windowTitle.prepend(assetEntryName + vcsTopic + dashSep);
 		}
 
-		QString fileName = pAssetEntry->name();
-		if (!fileName.isEmpty()) {
-			ICore::mainWindow()->setWindowFilePath(fileName);
+		QString assetName = pAssetEntry->name();
+		if (!assetName.isEmpty()) {
+			ICore::mainWindow()->setWindowFilePath(assetName);
 		}
 	}
 	else {
@@ -1642,7 +1424,7 @@ void EditorManager::updateActions(void)
 	if (curDocument) {
 		quotedName = QLatin1Char('"') + curDocument->displayName() + QLatin1Char('"');
 	}
-	setupSaveActions(curDocument, d->saveAction_, d->saveAsAction_, 0);
+	setupSaveActions(curDocument, d->saveAction_, nullptr);
 
 
 	d->closeCurrentEditorAction_->setEnabled(curDocument);
@@ -1670,14 +1452,13 @@ void EditorManager::setCloseSplitEnabled(SplitterOrView *splitterOrView, bool en
 }
 
 
-void EditorManager::setupSaveActions(IAssetEntry* pAssetEntry, QAction *saveAction, QAction *saveAsAction, QAction *revertToSavedAction)
+void EditorManager::setupSaveActions(IAssetEntry* pAssetEntry, QAction *saveAction, QAction *revertToSavedAction)
 {
-	if (debugLogging) {
-		qDebug() << Q_FUNC_INFO;
-	}
+//	if (debugLogging) {
+//		qDebug() << Q_FUNC_INFO;
+//	}
 
 	saveAction->setEnabled(pAssetEntry != nullptr && pAssetEntry->isModified());
-	saveAsAction->setEnabled(pAssetEntry != nullptr && pAssetEntry->isSaveAsAllowed());
 	if (revertToSavedAction) {
 		revertToSavedAction->setEnabled(pAssetEntry != nullptr && !pAssetEntry->name().isEmpty());
 	}
@@ -1688,7 +1469,6 @@ void EditorManager::setupSaveActions(IAssetEntry* pAssetEntry, QAction *saveActi
 	if (!assetEntryName.isEmpty()) {
 		quotedName = QLatin1Char('"') + assetEntryName + QLatin1Char('"');
 		saveAction->setText(tr("&Save %1").arg(quotedName));
-		saveAsAction->setText(tr("Save %1 As...").arg(quotedName));
 	}
 }
 
@@ -1709,18 +1489,15 @@ void EditorManager::addSaveAndCloseEditorActions(QMenu *contextMenu, IEditor *ed
 	d->contextMenuEntry_ = editor;
 
 	assignAction(d->saveCurrentEditorContextAction_, ActionManager::command(Constants::SAVE)->action());
-	assignAction(d->saveAsCurrentEditorContextAction_, ActionManager::command(Constants::SAVEAS)->action());
 
 	IAssetEntry* pAssetEntry = editor ? editor->assetEntry() : nullptr;
 
 	setupSaveActions(pAssetEntry,
 		d->saveCurrentEditorContextAction_,
-		d->saveAsCurrentEditorContextAction_,
-		0
+		nullptr
 	);
 
 	contextMenu->addAction(d->saveCurrentEditorContextAction_);
-	contextMenu->addAction(d->saveAsCurrentEditorContextAction_);
 	contextMenu->addAction(ActionManager::command(Constants::SAVEALL)->action());
 
 	contextMenu->addSeparator();
@@ -1807,14 +1584,6 @@ void EditorManager::saveAssetEntryFromContextMenu(void)
 	IAssetEntry* pAssetEntry = d->contextMenuEntry_ ? d->contextMenuEntry_->assetEntry() : nullptr;
 	if (pAssetEntry) {
 		saveAssetEntry(pAssetEntry);
-	}
-}
-
-void EditorManager::saveAssetEntryAsFromContextMenu(void)
-{
-	IAssetEntry* pAssetEntry = d->contextMenuEntry_ ? d->contextMenuEntry_->assetEntry() : nullptr;
-	if (pAssetEntry) {
-		saveAssetEntryAs(pAssetEntry);
 	}
 }
 

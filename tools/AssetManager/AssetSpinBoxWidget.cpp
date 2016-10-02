@@ -5,27 +5,24 @@
 X_NAMESPACE_BEGIN(assman)
 
 
-AssetDoubleSpinBoxWidget::AssetDoubleSpinBoxWidget(QWidget *parent, double val, double min, double max, double step)
-	: QWidget(parent)
+AssetDoubleSpinBoxWidget::AssetDoubleSpinBoxWidget(QWidget *parent, const std::string& val,
+		double min, double max, double step) :
+	QWidget(parent)
 {
 	QHBoxLayout* pLayout = new QHBoxLayout();
 	pLayout->setContentsMargins(0, 0, 0, 0);
 
 	// lin edit for path.
-	QDoubleSpinBox* pSpinBox = new QDoubleSpinBox();
-	pSpinBox->setRange(min, max);
-	pSpinBox->setSingleStep(step);
-	pSpinBox->setMinimumWidth(96);
+	pSpinBox_ = new QDoubleSpinBox();
+	pSpinBox_->setRange(min, max);
+	pSpinBox_->setSingleStep(step);
+	pSpinBox_->setMinimumWidth(96);
 
-	connect(pSpinBox, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
+	setValue(val);
 
-	pSpinBox->blockSignals(true);
-	pSpinBox->setValue(val);
-	pSpinBox->blockSignals(false);
-
-	pLayout->addWidget(pSpinBox);
+	connect(pSpinBox_, SIGNAL(valueChanged(double)), this, SLOT(valueChanged(double)));
+	pLayout->addWidget(pSpinBox_);
 	pLayout->addSpacerItem(new QSpacerItem(10, 10, QSizePolicy::Expanding));
-
 
 	setLayout(pLayout);
 }
@@ -35,11 +32,24 @@ AssetDoubleSpinBoxWidget::~AssetDoubleSpinBoxWidget()
 }
 
 
+void AssetDoubleSpinBoxWidget::setValue(const std::string& strVal)
+{
+	double val = 0;
+	if (!strVal.empty()) {
+		val = std::stod(strVal);
+	}
+
+	pSpinBox_->blockSignals(true);
+	pSpinBox_->setValue(val);
+	pSpinBox_->blockSignals(false);
+}
+
+
 void AssetDoubleSpinBoxWidget::valueChanged(double val)
 {
-	X_UNUSED(val);
+	std::string strVal = std::to_string(val);
 
-
+	emit valueChanged(strVal);
 }
 
 
@@ -47,26 +57,23 @@ void AssetDoubleSpinBoxWidget::valueChanged(double val)
 // -------------------------------------------------
 
 
-AssetSpinBoxWidget::AssetSpinBoxWidget(QWidget *parent, int32_t val, double min, double max, double step)
-	: QWidget(parent)
+AssetSpinBoxWidget::AssetSpinBoxWidget(QWidget *parent, const std::string& val, double min, double max, double step) :
+	QWidget(parent)
 {
 	QHBoxLayout* pLayout = new QHBoxLayout();
 	pLayout->setContentsMargins(0, 0, 0, 0);
 
 	// lin edit for path.
-	QSpinBox* pSpinBox = new QSpinBox();
-	pSpinBox->setRange(static_cast<int32_t>(math<double>::floor(min)), static_cast<int32_t>(math<double>::floor(max)));
-	pSpinBox->setSingleStep(static_cast<int32_t>(math<double>::floor(step)));
-	pSpinBox->setMinimumWidth(96);
+	pSpinBox_ = new QSpinBox();
+	pSpinBox_->setRange(static_cast<int32_t>(math<double>::floor(min)), static_cast<int32_t>(math<double>::floor(max)));
+	pSpinBox_->setSingleStep(static_cast<int32_t>(math<double>::floor(step)));
+	pSpinBox_->setMinimumWidth(96);
 
-	pSpinBox->blockSignals(true);
-	pSpinBox->setValue(val);
-	pSpinBox->blockSignals(false);
+	setValue(val);
 
+	connect(pSpinBox_, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
 
-	connect(pSpinBox, SIGNAL(valueChanged(int)), this, SLOT(valueChanged(int)));
-
-	pLayout->addWidget(pSpinBox);
+	pLayout->addWidget(pSpinBox_);
 	pLayout->addSpacerItem(new QSpacerItem(10, 10, QSizePolicy::Expanding));
 
 	setLayout(pLayout);
@@ -76,11 +83,24 @@ AssetSpinBoxWidget::~AssetSpinBoxWidget()
 {
 }
 
+void AssetSpinBoxWidget::setValue(const std::string& strVal)
+{
+	int val = 0;
+	if (!strVal.empty()) {
+		val = std::stoi(strVal);
+	}
+
+	pSpinBox_->blockSignals(true);
+	pSpinBox_->setValue(val);
+	pSpinBox_->blockSignals(false);
+}
+
 
 void AssetSpinBoxWidget::valueChanged(int val)
 {
-	X_UNUSED(val);
+	std::string strVal = std::to_string(val);
 
+	emit valueChanged(strVal);
 }
 
 

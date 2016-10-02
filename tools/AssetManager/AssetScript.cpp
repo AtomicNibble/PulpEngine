@@ -1,9 +1,11 @@
 #include "AssetScript.h"
 #include "AssetScriptTypes.h"
+#include "AssetPropertyEditor.h"
 
 #include "assetscript\scriptstdstring.h"
 #include "assetscript\scriptbuilder.h"
 
+#include "AssetEntryManager.h"
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -128,67 +130,66 @@ bool AssetPropsScriptManager::init(bool enableHotReload)
 	//
 
 	// assetProp
-	r = pEngine_->RegisterObjectType("assetProp", sizeof(AssetProperty), asOBJ_REF);  BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectBehaviour("assetProp", asBEHAVE_FACTORY, "assetProp@ f()", asFUNCTION(AssetProperty::factory), asCALL_CDECL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectBehaviour("assetProp", asBEHAVE_FACTORY, "assetProp@ f(const assetProp& in)", asFUNCTION(AssetProperty::copyFactory), asCALL_CDECL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectBehaviour("assetProp", asBEHAVE_ADDREF, "void f()", asMETHOD(AssetProperty, addRef), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectBehaviour("assetProp", asBEHAVE_RELEASE, "void f()", asMETHOD(AssetProperty, release), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectType("assetProp", sizeof(AssetScriptProperty), asOBJ_REF);  BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectBehaviour("assetProp", asBEHAVE_FACTORY, "assetProp@ f()", asFUNCTION(AssetScriptProperty::factory), asCALL_CDECL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectBehaviour("assetProp", asBEHAVE_FACTORY, "assetProp@ f(const assetProp& in)", asFUNCTION(AssetScriptProperty::copyFactory), asCALL_CDECL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectBehaviour("assetProp", asBEHAVE_ADDREF, "void f()", asMETHOD(AssetScriptProperty, addRef), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectBehaviour("assetProp", asBEHAVE_RELEASE, "void f()", asMETHOD(AssetScriptProperty, release), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp &opAssign(const assetProp &in)", asMETHODPR(AssetScriptProperty, operator=, (const AssetScriptProperty&), AssetScriptProperty&), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ SetTitle(const string &in)", asMETHOD(AssetScriptProperty, SetTitle), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ SetToolTip(const string &in)", asMETHOD(AssetScriptProperty, SetToolTip), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ SetLabels(const string &in, const string &in, const string &in, const string &in)", asMETHOD(AssetScriptProperty, SetLabels), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ SetIcon(const string &in)", asMETHOD(AssetScriptProperty, SetIcon), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ SetFontColor(float r, float g, float b)", asMETHOD(AssetScriptProperty, SetFontColor), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ SetBold(bool)", asMETHOD(AssetScriptProperty, SetBold), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ SetStep(double step)", asMETHOD(AssetScriptProperty, SetStep), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ SetEnabled(bool)", asMETHOD(AssetScriptProperty, SetEnabled), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ SetVisible(bool)", asMETHOD(AssetScriptProperty, SetVisible), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ ShowJumpToAsset(bool)", asMETHOD(AssetScriptProperty, ShowJumpToAsset), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ UpdateOnChange(bool)", asMETHOD(AssetScriptProperty, UpdateOnChange), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ SetValue(const string &in)", asMETHOD(AssetScriptProperty, SetValue), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ SetDefaultValue(const string &in)", asMETHOD(AssetScriptProperty, SetDefaultValue), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ SetBool(bool val)", asMETHOD(AssetScriptProperty, SetBool), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ SetInt(int val)", asMETHOD(AssetScriptProperty, SetInt), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ SetFloat(float val)", asMETHOD(AssetScriptProperty, SetFloat), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp@ SetDouble(double val)", asMETHOD(AssetScriptProperty, SetDouble), asCALL_THISCALL); BUG_CHECK(r >= 0);
 
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp &opAssign(const assetProp &in)", asMETHODPR(AssetProperty, operator=, (const AssetProperty&), AssetProperty&), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& SetTitle(const string &in)", asMETHOD(AssetProperty, SetTitle), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& SetToolTip(const string &in)", asMETHOD(AssetProperty, SetToolTip), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& SetLabels(const string &in, const string &in, const string &in, const string &in)", asMETHOD(AssetProperty, SetLabels), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& SetIcon(const string &in)", asMETHOD(AssetProperty, SetIcon), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& SetFontColor(float r, float g, float b)", asMETHOD(AssetProperty, SetFontColor), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& SetBold(bool)", asMETHOD(AssetProperty, SetBold), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& SetStep(double step)", asMETHOD(AssetProperty, SetStep), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& SetEnabled(bool)", asMETHOD(AssetProperty, SetEnabled), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& SetVisible(bool)", asMETHOD(AssetProperty, SetVisible), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& ShowJumpToAsset(bool)", asMETHOD(AssetProperty, ShowJumpToAsset), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& UpdateOnChange(bool)", asMETHOD(AssetProperty, UpdateOnChange), asCALL_THISCALL); BUG_CHECK(r >= 0);
-
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& SetValue(const string &in)", asMETHOD(AssetProperty, SetValue), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& SetDefaultValue(const string &in)", asMETHOD(AssetProperty, SetDefaultValue), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& SetBool(bool val)", asMETHOD(AssetProperty, SetBool), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& SetInt(int val)", asMETHOD(AssetProperty, SetInt), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& SetFloat(float val)", asMETHOD(AssetProperty, SetFloat), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "assetProp& SetDouble(double val)", asMETHOD(AssetProperty, SetDouble), asCALL_THISCALL); BUG_CHECK(r >= 0);
-
-	r = pEngine_->RegisterObjectMethod("assetProp", "string GetTitle()", asMETHOD(AssetProperty, GetTitle), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "string GetToolTip()", asMETHOD(AssetProperty, GetToolTip), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "string GetValue()", asMETHOD(AssetProperty, GetValue), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "double GetFloat()", asMETHOD(AssetProperty, GetValueFloat), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "int GetInt()", asMETHOD(AssetProperty, GetValueInt), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("assetProp", "bool GetBool()", asMETHOD(AssetProperty, GetValueBool), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "string GetTitle()", asMETHOD(AssetScriptProperty, GetTitle), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "string GetToolTip()", asMETHOD(AssetScriptProperty, GetToolTip), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "string GetValue()", asMETHOD(AssetScriptProperty, GetValue), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "double GetFloat()", asMETHOD(AssetScriptProperty, GetValueFloat), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "int GetInt()", asMETHOD(AssetScriptProperty, GetValueInt), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("assetProp", "bool GetBool()", asMETHOD(AssetScriptProperty, GetValueBool), asCALL_THISCALL); BUG_CHECK(r >= 0);
 
 
 	// asset
-	r = pEngine_->RegisterObjectType("asset", sizeof(AssetProps), asOBJ_REF); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectBehaviour("asset", asBEHAVE_FACTORY, "asset@ f()", asFUNCTION(AssetProps::factory), asCALL_CDECL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectBehaviour("asset", asBEHAVE_FACTORY, "asset@ f(const asset& in)", asFUNCTION(AssetProps::copyFactory), asCALL_CDECL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectBehaviour("asset", asBEHAVE_ADDREF, "void f()", asMETHOD(AssetProps, addRef), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectBehaviour("asset", asBEHAVE_RELEASE, "void f()", asMETHOD(AssetProps, release), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectType("asset", sizeof(AssetScriptProps), asOBJ_REF); BUG_CHECK(r >= 0);
+//	r = pEngine_->RegisterObjectBehaviour("asset", asBEHAVE_FACTORY, "asset@ f()", asFUNCTION(AssetScriptProps::factory), asCALL_CDECL); BUG_CHECK(r >= 0);
+//	r = pEngine_->RegisterObjectBehaviour("asset", asBEHAVE_FACTORY, "asset@ f(const asset& in)", asFUNCTION(AssetScriptProps::copyFactory), asCALL_CDECL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectBehaviour("asset", asBEHAVE_ADDREF, "void f()", asMETHOD(AssetScriptProps, addRef), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectBehaviour("asset", asBEHAVE_RELEASE, "void f()", asMETHOD(AssetScriptProps, release), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	
-	r = pEngine_->RegisterObjectMethod("asset", "asset &opAssign(const asset &in)", asMETHODPR(AssetProps, operator=, (const AssetProps&), AssetProps&), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddTexture(const string& in, const string& in)", asMETHOD(AssetProps, AddTexture), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddCombo(const string& in, const string, bool editiable = false)", asMETHOD(AssetProps, AddCombo), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddCheckBox(const string& in, bool)", asMETHOD(AssetProps, AddCheckBox), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddInt(const string& in, uint, uint, uint)", asMETHOD(AssetProps, AddInt), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddFloat(const string& in, double val, double min, double max)", asMETHOD(AssetProps, AddFloat), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddColor(const string& in, double r, double g, double b, double a)", asMETHOD(AssetProps, AddColor), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddVec2(const string& in, const string& in, double x, double y,  double min, double max)", asMETHOD(AssetProps, AddVec2), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddVec3(const string& in, const string& in, const string& in, double x, double y, double z, double min, double max)", asMETHOD(AssetProps, AddVec3), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddVec4(const string& in, const string& in, const string& in, const string& in, double x, double y, double z, double w, double min, double max)", asMETHOD(AssetProps, AddVec4), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddText(const string& in, const string& in)", asMETHOD(AssetProps, AddText), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddPath(const string& in, const string& in)", asMETHOD(AssetProps, AddPath), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "assetProp& AddString(const string& in, const string& in)", asMETHOD(AssetProps, AddString), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "void BeginGroup(const string& in)", asMETHOD(AssetProps, BeginGroup), asCALL_THISCALL); BUG_CHECK(r >= 0);
+//	r = pEngine_->RegisterObjectMethod("asset", "asset &opAssign(const asset &in)", asMETHODPR(AssetScriptProps, operator=, (const AssetScriptProps&), AssetScriptProps&), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddTexture(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddTexture), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddCombo(const string& in, const string, bool editiable = false)", asMETHOD(AssetScriptProps, AddCombo), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddCheckBox(const string& in, bool)", asMETHOD(AssetScriptProps, AddCheckBox), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddInt(const string& in, uint, uint, uint)", asMETHOD(AssetScriptProps, AddInt), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddFloat(const string& in, double val, double min, double max)", asMETHOD(AssetScriptProps, AddFloat), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddColor(const string& in, double r, double g, double b, double a)", asMETHOD(AssetScriptProps, AddColor), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddVec2(const string& in, const string& in, double x, double y,  double min, double max)", asMETHOD(AssetScriptProps, AddVec2), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddVec3(const string& in, const string& in, const string& in, double x, double y, double z, double min, double max)", asMETHOD(AssetScriptProps, AddVec3), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddVec4(const string& in, const string& in, const string& in, const string& in, double x, double y, double z, double w, double min, double max)", asMETHOD(AssetScriptProps, AddVec4), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddText(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddText), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddPath(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddPath), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddString(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddString), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "void BeginGroup(const string& in)", asMETHOD(AssetScriptProps, BeginGroup), asCALL_THISCALL); BUG_CHECK(r >= 0);
 
-	r = pEngine_->RegisterObjectMethod("asset", "assetProp& getItem(const string& in)", asMETHOD(AssetProps, getItem), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "string getPropValue(const string& in)", asMETHOD(AssetProps, getPropValue), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "double getPropValueFloat(const string& in)", asMETHOD(AssetProps, getPropValueFloat), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "int getPropValueInt(const string& in)", asMETHOD(AssetProps, getPropValueInt), asCALL_THISCALL); BUG_CHECK(r >= 0);
-	r = pEngine_->RegisterObjectMethod("asset", "bool getPropValueBool(const string& in)", asMETHOD(AssetProps, getPropValueBool), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ getItem(const string& in)", asMETHOD(AssetScriptProps, getItem), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "string getPropValue(const string& in)", asMETHOD(AssetScriptProps, getPropValue), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "double getPropValueFloat(const string& in)", asMETHOD(AssetScriptProps, getPropValueFloat), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "int getPropValueInt(const string& in)", asMETHOD(AssetScriptProps, getPropValueInt), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "bool getPropValueBool(const string& in)", asMETHOD(AssetScriptProps, getPropValueBool), asCALL_THISCALL); BUG_CHECK(r >= 0);
 
 
 	return true;
@@ -205,7 +206,7 @@ void AssetPropsScriptManager::shutdown(void)
 }
 
 
-bool AssetPropsScriptManager::runScriptForProps(AssetProps& props, assetDb::AssetType::Enum type)
+bool AssetPropsScriptManager::runScriptForProps(AssetProperties& props, assetDb::AssetType::Enum type)
 {
 	if (!ensureSourceCache(type)) {
 		X_ERROR("AssetScript", "Failed to get assetProps for asset type: \"%s\"", assetDb::AssetType::ToString(type));
@@ -298,7 +299,7 @@ bool AssetPropsScriptManager::loadScript(const core::Path<char>& path, std::stri
 	return true;
 }
 
-bool AssetPropsScriptManager::processScript(AssetProps& props, Scriptcache& cache)
+bool AssetPropsScriptManager::processScript(AssetProperties& props, Scriptcache& cache)
 {
 	if (cache.byteCode.isNotEmpty()) {
 		return processScript(props, cache.byteCode);
@@ -311,7 +312,7 @@ bool AssetPropsScriptManager::processScript(AssetProps& props, Scriptcache& cach
 	return processScript(props, cache.text, &cache.byteCode);
 }
 
-bool AssetPropsScriptManager::processScript(AssetProps& props, const std::string& script, ByteCodeStream* pCacheOut)
+bool AssetPropsScriptManager::processScript(AssetProperties& props, const std::string& script, ByteCodeStream* pCacheOut)
 {
 	X_ASSERT_NOT_NULL(pEngine_);
 
@@ -347,7 +348,7 @@ bool AssetPropsScriptManager::processScript(AssetProps& props, const std::string
 }
 
 
-bool AssetPropsScriptManager::processScript(AssetProps& props, ByteCodeStream& byteCode)
+bool AssetPropsScriptManager::processScript(AssetProperties& props, ByteCodeStream& byteCode)
 {
 	X_ASSERT_NOT_NULL(pEngine_);
 
@@ -376,7 +377,7 @@ bool AssetPropsScriptManager::processScript(AssetProps& props, ByteCodeStream& b
 }
 
 
-bool AssetPropsScriptManager::execScript(AssetProps& props, asIScriptModule* pMod)
+bool AssetPropsScriptManager::execScript(AssetProperties& props, asIScriptModule* pMod)
 {
 	asIScriptFunction* pFunc = pMod->GetFunctionByDecl(SCRIPT_ENTRY);
 	if (!pFunc)
@@ -385,12 +386,14 @@ bool AssetPropsScriptManager::execScript(AssetProps& props, asIScriptModule* pMo
 		return false;
 	}
 
+	AssetScriptProps scriptProps(props);
+
 	asIScriptContext* pCtx = pEngine_->CreateContext();
 	pCtx->Prepare(pFunc);
-	pCtx->SetArgObject(0, &props);
+	pCtx->SetArgObject(0, &scriptProps);
 
 	int32_t r = pCtx->Execute();
-	if (r != asEXECUTION_FINISHED)
+ 	if (r != asEXECUTION_FINISHED)
 	{
 		X_ERROR("AssetScript", "Failed to execute script Err: %" PRIu32, r);
 		if (r == asEXECUTION_EXCEPTION) {
@@ -455,16 +458,19 @@ void AssetPropsScriptManager::fileChanged(const QString& path)
 
 	for (uint32_t i=0; i<assetDb::AssetType::ENUM_COUNT; i++)
 	{
-		QString typeFileName(assetDb::AssetType::ToString(static_cast<assetDb::AssetType::Enum>(i)));
+		const auto type = static_cast<assetDb::AssetType::Enum>(i);
+		QString typeFileName(assetDb::AssetType::ToString(type));
 		typeFileName = typeFileName.toLower();
 		typeFileName.append('.');
 		typeFileName.append(ASSET_PROPS_SCRIPT_EXT);
 		
 		if (fileName == typeFileName)
 		{
-			X_LOG1("AssetScript", "Cache cleared for aps for type: %s ",assetDb::AssetType::ToString(i));
+			X_LOG1("AssetScript", "Cache cleared for aps for type: %s ", assetDb::AssetType::ToString(i));
 
 			cache_[i].clear(false);
+
+			AssetEntryManager::reloadUIforType(type);
 			break;
 		}
 	}

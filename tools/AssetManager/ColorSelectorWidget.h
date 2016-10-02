@@ -28,13 +28,14 @@ public:
 	void setDialogModality(Qt::WindowModality m);
 
 signals:
+	void colorSelected(const QColor& col);
 
 public slots:
 	void showDialog(void);
 
 private slots:
 	void rejectDialog(void);
-	void colorSelected(const QColor& color);
+	void dialogColorSelected(const QColor& color);
 
 protected:
 	void dragEnterEvent(QDragEnterEvent* event);

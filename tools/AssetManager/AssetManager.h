@@ -74,7 +74,12 @@ private slots:
 
 	// file Closes
 	void newFile(void);
+	void newMod(void);
+	void save(void);
 	void saveAll(void);
+
+	void aboutToShowRecentFiles(void);
+	void openRecentFile(void);
 
 	// View Slots
 	void aboutToShowViewMenu(void);
@@ -94,6 +99,7 @@ private slots:
 
 protected:
 	virtual void closeEvent(QCloseEvent *event) X_OVERRIDE;
+	bool event(QEvent *e) X_OVERRIDE;
 
 private:
 	void reloadStyle(const QString& path);
@@ -102,8 +108,17 @@ private:
 
 	// File
 	QAction* pNewFileAct_;
+	QAction* pNewModAct_;
+	QAction* pSaveAct_;
 	QAction* pSaveAllAct_;
 	QAction* pQuitAct_;
+
+	// Edit
+	QAction* pUndoAct_;
+	QAction* pRedoAct_;
+	QAction* pCutAct_;
+	QAction* pCopyAct_;
+	QAction* pPasteAct_;
 
 	// View
 	QAction* pViewAssetDbExpoAct_;

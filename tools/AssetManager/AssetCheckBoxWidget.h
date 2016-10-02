@@ -4,7 +4,6 @@
 
 X_NAMESPACE_BEGIN(assman)
 
-
 class AssetCheckBoxWidget : public QCheckBox
 {
 	Q_OBJECT
@@ -13,10 +12,14 @@ public:
 	AssetCheckBoxWidget(QWidget *parent, const std::string& val);
 	~AssetCheckBoxWidget();
 
-private slots:
-	void toggled(bool checked);
-	
+signals:
+	void valueChanged(const std::string& value);
 
+private slots:
+	void setValue(const std::string& value);
+	void toggled(bool checked);
+
+private:
 };
 
 

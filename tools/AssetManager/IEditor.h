@@ -16,7 +16,7 @@ public:
 	IEditor(QObject* pParent = nullptr) : IContext(pParent) {};
 	virtual ~IEditor() = default;
 
-	virtual bool open(QString* pErrorString, const QString& fileName) X_ABSTRACT;
+	virtual bool open(QString* pErrorString, const QString& assetName, assetDb::AssetType::Enum type) X_ABSTRACT;
 	virtual IAssetEntry* assetEntry(void) X_ABSTRACT;
 	virtual Id id(void) const X_ABSTRACT;;
 
@@ -25,11 +25,6 @@ public:
 
 	X_INLINE virtual QByteArray saveState(void) const;
 	X_INLINE virtual bool restoreState(const QByteArray&);
-
-	X_INLINE virtual int32_t currentLine(void) const;
-	X_INLINE virtual int32_t currentColumn(void) const;
-	X_INLINE virtual void gotoLine(int32_t line, int32_t column = 0);
-
 
 signals:
 	void titleChanged(QString);

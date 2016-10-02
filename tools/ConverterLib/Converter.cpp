@@ -19,7 +19,8 @@ X_LINK_LIB("engine_AssetDb")
 X_NAMESPACE_BEGIN(converter)
 
 
-Converter::Converter()
+Converter::Converter(core::MemoryArenaBase* scratchArea) :
+	scratchArea_(scratchArea)
 {
 	core::zero_object(converters_);
 }
@@ -65,8 +66,8 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 
 	core::StopWatch timer;
 
-	core::Array<uint8_t> data(g_arena);
-	if(!db_.GetRawFileDataForAsset(assetId, data)) {
+	core::Array<uint8_t> data(scratchArea_);
+	if (!db_.GetRawFileDataForAsset(assetId, data)) {
 		return false;
 	}
 
@@ -243,7 +244,7 @@ bool Converter::EnsureLibLoaded(AssetType::Enum assType)
 bool Converter::IntializeConverterModule(AssetType::Enum assType)
 {
 	const char* pAssTypeStr = nullptr;
-	
+
 	if (assType == AssetType::ANIM) {
 		pAssTypeStr = "Anim";
 	}

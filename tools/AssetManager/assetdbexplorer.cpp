@@ -63,8 +63,11 @@ bool AssetExplorer::init(void)
 
 	// asset actions
 	openAssetAction_ = new QAction(tr("Open"), this);
+	openAssetAction_->setStatusTip(tr("Open the asset in editor"));
 	renameAssetAction_ = new QAction(tr("Rename..."), this);
+	renameAssetAction_->setStatusTip(tr("Rename selected asset"));
 	deleteAssetAction_ = new QAction(tr("Delete"), this);
+	deleteAssetAction_->setStatusTip(tr("Delete the selected asset"));
 	cutAssetAction_ = new QAction(QIcon(":/misc/img/Cut.png"), tr("Cut"), this);
 	copyAssetAction_ = new QAction(QIcon(":/misc/img/Copy.png"), tr("Copy"), this);
 	copyAssetNameAction_ = new QAction(QIcon(":/misc/img/Copy.png"), tr("Copy Asset Name"), this);
@@ -80,9 +83,15 @@ bool AssetExplorer::init(void)
 	connect(copyAssetNameAction_, SIGNAL(triggered()), this, SLOT(copyAssetName()));
 
 	addNewAssetAction_ = new QAction(QIcon(":/misc/img/NewFile.png"), tr("New Asset..."), this);
+	addNewAssetAction_->setStatusTip(tr("Create new asset"));
+
 	addNewAssetTypeAction_ = new QAction(QIcon(":/misc/img/NewFile.png"), tr("New ?..."), this);
+	addNewAssetTypeAction_->setStatusTip(tr("Create new asset"));
+
 	projectTreeCollapseAllAction_ = new QAction(tr("Collapse All"), this);
+
 	buildAction_ = new QAction(QIcon(":/misc/img/build.png"), tr("Build"), this);
+	buildAction_->setStatusTip(tr("Build selected"));
 
 	connect(addNewAssetAction_, SIGNAL(triggered()), this, SLOT(addNewAsset()));
 	connect(addNewAssetTypeAction_, SIGNAL(triggered()), this, SLOT(addNewAssetType()));

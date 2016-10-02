@@ -19,10 +19,14 @@ public:
 	AssetGroupWidget(QWidget *parent = nullptr);
 	~AssetGroupWidget();
 
-	void appendGui(QGridLayout* pLayout, int32_t& row, int32_t depth);
+	void appendGui(QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth);
 
 	void clear(void);
 	void show(bool visible);
+
+	void collapseAll(void);
+	void expandAll(void);
+
 
 	void AddChild(AssetProperty* pChild);
 	ConstIterator begin(void) const;

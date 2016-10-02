@@ -15,10 +15,15 @@ public:
 	IAssetEntry(QObject *parent);
 	~IAssetEntry();
 
+	virtual bool save(QString& errorString) X_ABSTRACT;
+	virtual bool reloadUi(void) X_ABSTRACT;
 
 	QString name(void) const;
 	QString displayName(void) const;
-	void setDisplayName(const QString& name);
+	void setAssetName(const QString& name);
+	assetDb::AssetType::Enum type(void) const;
+	void setType(assetDb::AssetType::Enum type);
+
 
 	virtual bool isFileReadOnly(void) const;
 	bool isTemporary(void) const;
@@ -28,7 +33,7 @@ public:
 	virtual bool isModified(void) const X_ABSTRACT;
 	virtual bool isSaveAsAllowed(void) const X_ABSTRACT;
 
-	bool autoSave(QString* pErrorString, const QString& fileName);
+	bool autoSave(QString* pErrorString);
 
 signals:
 	void changed(void);
@@ -36,8 +41,9 @@ signals:
 	void reloadFinished(bool success);
 
 
-private:
-	QString displayName_;
+protected:
+	QString assetName_;
+	assetDb::AssetType::Enum type_;
 	bool temporary_;
 
 };

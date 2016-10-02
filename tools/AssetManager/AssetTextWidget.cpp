@@ -3,8 +3,8 @@
 
 X_NAMESPACE_BEGIN(assman)
 
-AssetTextWidget::AssetTextWidget(QWidget *parent, const std::string& value)
-	: QWidget(parent)
+AssetTextWidget::AssetTextWidget(QWidget *parent, const std::string& value) :
+	QWidget(parent)
 {
 	QHBoxLayout* pLayout = new QHBoxLayout();
 	pLayout->setContentsMargins(0, 0, 0, 0);
@@ -17,14 +17,7 @@ AssetTextWidget::AssetTextWidget(QWidget *parent, const std::string& value)
 
 	pLayout->addWidget(pTextEdit_);
 
-	pTextEdit_->blockSignals(true);
-	{
-		QString text = QString::fromStdString(value);
-		text.replace("\\r\\n", "\n");
-
-		pTextEdit_->setPlainText(text);
-	}
-	pTextEdit_->blockSignals(false);
+	setValue(value);
 
 	setLayout(pLayout);
 }
@@ -33,9 +26,24 @@ AssetTextWidget::~AssetTextWidget()
 {
 }
 
+
+void AssetTextWidget::setValue(const std::string& value)
+{
+	pTextEdit_->blockSignals(true);
+	{
+		QString text = QString::fromStdString(value);
+		text.replace("\\r\\n", "\n");
+
+		pTextEdit_->setPlainText(text);
+	}
+	pTextEdit_->blockSignals(false);
+}
+
 void AssetTextWidget::textChanged(void)
 {
+	QString str = pTextEdit_->toPlainText();
 
+	emit valueChanged(str.toStdString());
 }
 
 X_NAMESPACE_END

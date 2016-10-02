@@ -41,11 +41,8 @@ public:
 	static QList<IEditor*> openEditorsList(void);
 	static QList<EditorView*> visibleViews(void);
 
-	static IEditor* openEditor(const QString& fileName, const Id& editorId = Id(),
+	static IEditor* openEditor(const QString& assetName, assetDb::AssetType::Enum type, const Id& editorId = Id(),
 		OpenEditorFlags flags = 0, bool* pNewEditor = nullptr);
-
-	static IEditor* openEditorAt(const QString& fileName, int line, int column = 0,
-		const Id& editorId = Id(), OpenEditorFlags flags = 0, bool* pNewEditor = nullptr);
 
 
 
@@ -64,7 +61,6 @@ public:
 	static bool closeEditors(const QList<IEditor *>& editorsToClose, bool askAboutModifiedEditors = true);
 	static void closeEditor(IEditor* pEditor, bool askAboutModifiedEditors = true);
 
-	static EditorFactoryList editorFactories(const QMimeType& mimeType, bool bestMatchOnly = true);
 
 	static qint64 maxTextFileSize(void);
 
@@ -88,14 +84,13 @@ public:
 	static bool autoSaveEnabled(void);
 	static void setAutoSaveInterval(int interval);
 	static int autoSaveInterval(void);
-	static bool isAutoSaveFile(const QString& fileName);
 
 	static void floatDockCheck(SplitterOrView* pSplitter, const QPoint& pos);
 
 signals:
 	void currentEditorChanged(IEditor* pEditor);
 	void currentAssetEntryStateChanged(void);
-	void editorCreated(IEditor* pEditor, const QString& fileName);
+	void editorCreated(IEditor* pEditor, const QString& assetName);
 	void editorOpened(IEditor* pEditor);
 	void editorAboutToClose(IEditor* pEditor);
 	void editorsClosed(QList<IEditor *> editors);
@@ -108,6 +103,7 @@ public slots:
 	static bool saveAssetEntry(IAssetEntry* pAssetEntry = nullptr);
 	static bool saveAssetEntryAs(IAssetEntry* pAssetEntry = nullptr);
 
+	void handleAssetEntryStateChange(void);
 
 private slots:
 	static void autoSave(void);
@@ -122,7 +118,6 @@ private slots:
 
 	// Context Menu
 	static void saveAssetEntryFromContextMenu(void);
-	static void saveAssetEntryAsFromContextMenu(void);
 
 	static void closeEditorFromContextMenu(void);
 	static void closeOtherEditorsFromContextMenu(void);
@@ -162,7 +157,7 @@ private:
 	static void addEditor(IEditor* pEditor);
 	static void removeEditor(IEditor* pEditor);
 
-	static IEditor* openEditor(EditorView* pView, const QString& fileName,
+	static IEditor* openEditor(EditorView* pView, const QString& fileName, assetDb::AssetType::Enum type,
 		const Id& id = Id(), OpenEditorFlags flags = 0, bool *newEditor = nullptr);
 
 	static IEditor* placeEditor(EditorView* pView, IEditor* pEditor);
@@ -186,7 +181,7 @@ private:
 	static void addAssetEntryToRecentFiles(IAssetEntry* pAssetEntry);
 	static void updateAutoSave(void);
 	static void setCloseSplitEnabled(SplitterOrView* splitterOrView, bool enable);
-	static void setupSaveActions(IAssetEntry* pAssetEntry, QAction* saveAction, QAction* saveAsAction, QAction* revertToSavedAction);
+	static void setupSaveActions(IAssetEntry* pAssetEntry, QAction* saveAction, QAction* revertToSavedAction);
 
 	static SplitterOrView* undockEditor(IEditor* editor, QPoint& pos);
 	static void splitDragEndWindow(BaseWindow*, SplitterOrView*);

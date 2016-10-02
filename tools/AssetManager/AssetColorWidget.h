@@ -16,11 +16,19 @@ public:
 
 
 private:
-	void setColorInternal(QColor col);
+	void setColorInternal(QColor col, bool force = false);
+
+signals:
+	void valueChanged(const std::string& value);
 
 private slots:
+	void setValue(const std::string& value);
+
+private slots:
+	void colorSelected(const QColor& col);
 	void colPickerClicked(void);
 	void editingFinished(void);
+	void validateText(const QString &);
 
 protected:
 	void mouseReleaseEvent(QMouseEvent *event) X_OVERRIDE;
@@ -33,6 +41,7 @@ private:
 	ColorSelector* pColPreview_;
 	QLineEdit* pRGBAValueWidgets_[4];
 
+	QColor curCol_;
 	bool picking_;
 };
 

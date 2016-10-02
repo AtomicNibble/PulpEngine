@@ -8,11 +8,12 @@ struct asSMessageInfo;
 
 X_NAMESPACE_BEGIN(assman)
 
-class AssetProps;
+class AssetProperties;
 
-class AssetPropsScriptManager : QObject
+class AssetPropsScriptManager : public QObject
 {
 	Q_OBJECT
+
 
 	class ByteCodeStream : public asIBinaryStream
 	{
@@ -54,7 +55,7 @@ public:
 	void shutdown(void);
 
 	// runs the script against the props instance.
-	bool runScriptForProps(AssetProps& props, assetDb::AssetType::Enum type);
+	bool runScriptForProps(AssetProperties& props, assetDb::AssetType::Enum type);
 
 	void clearCache(bool byteCodeOnly = false);
 	void clearCache(assetDb::AssetType::Enum type, bool byteCodeOnly = false);
@@ -65,10 +66,10 @@ private:
 
 	bool loadScript(assetDb::AssetType::Enum type, std::string& out);
 	bool loadScript(const core::Path<char>& path, std::string& out);
-	bool processScript(AssetProps& props, Scriptcache& cache);
-	bool processScript(AssetProps& props, const std::string& script, ByteCodeStream* pCacheOut);
-	bool processScript(AssetProps& props, ByteCodeStream& cache);
-	bool execScript(AssetProps& props, asIScriptModule* pMod);
+	bool processScript(AssetProperties& props, Scriptcache& cache);
+	bool processScript(AssetProperties& props, const std::string& script, ByteCodeStream* pCacheOut);
+	bool processScript(AssetProperties& props, ByteCodeStream& cache);
+	bool execScript(AssetProperties& props, asIScriptModule* pMod);
 
 private:
 	static void messageCallback(const asSMessageInfo *msg, void *param);

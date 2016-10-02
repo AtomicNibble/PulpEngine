@@ -20,17 +20,28 @@ IAssetEntry::~IAssetEntry()
 
 QString IAssetEntry::name(void) const
 {
-	return displayName_;
+	return assetName_;
 }
 
 QString IAssetEntry::displayName(void) const
 {
-	return displayName_;
+	return assetName_;
 }
 
-void IAssetEntry::setDisplayName(const QString& name)
+
+void IAssetEntry::setAssetName(const QString& name)
 {
-	displayName_ = name;
+	assetName_ = name;
+}
+
+assetDb::AssetType::Enum IAssetEntry::type(void) const
+{
+	return type_;
+}
+
+void IAssetEntry::setType(assetDb::AssetType::Enum type)
+{
+	type_ = type;
 }
 
 
@@ -57,12 +68,12 @@ bool IAssetEntry::shouldAutoSave(void) const
 }
 
 
-bool IAssetEntry::autoSave(QString* pErrorString, const QString& fileName)
+bool IAssetEntry::autoSave(QString* pErrorString)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
 	X_UNUSED(pErrorString);
-	X_UNUSED(fileName);
 
+	// save to db or sumen?
 	return false;
 }
 
