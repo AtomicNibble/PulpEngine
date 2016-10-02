@@ -134,6 +134,7 @@ AssetDbFilterOptionsWidget::AssetDbFilterOptionsWidget(QWidget* parent) :
 		this, SLOT(showTypeSeelction()));
 
 	connect(pTypesFilter_, &QLineEdit::textEdited, this, &AssetDbFilterOptionsWidget::typeFilterTextEditied);
+	connect(pTypesFilter_, &QLineEdit::textEdited, this, &AssetDbFilterOptionsWidget::nameFilterTextEditied);
 
 	setLayout(pLayout);
 }
@@ -244,6 +245,12 @@ void AssetDbFilterOptionsWidget::typeFilterTextEditied(const QString& text)
 			}
 		}
 	}
+
+}
+
+void AssetDbFilterOptionsWidget::nameFilterTextEditied(const QString& text)
+{
+	X_UNUSED(text);
 
 }
 

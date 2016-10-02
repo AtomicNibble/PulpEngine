@@ -51,6 +51,7 @@ namespace AssetExplorer
 		void typeFilterChanged(QListWidgetItem* pItem);
 		void typeFilterClicked(QListWidgetItem* pItem);
 		void typeFilterTextEditied(const QString& text);
+		void nameFilterTextEditied(const QString& text);
 
 	private:
 		QCheckBox* pNameFilterEnabled_;
