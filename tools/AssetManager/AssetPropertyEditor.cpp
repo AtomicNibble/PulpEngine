@@ -739,6 +739,9 @@ bool AssetProperties::save(QString& errorString)
 		errorString = "Failed to save asset '" + assetName + "' props. Error: " + assetDb::AssetDB::Result::ToString(res);
 		return false;
 	}
+	else {
+		X_LOG2("AssetProp", "Saved \"%s\" props", name.c_str());
+	}
 
 	// meow meow meow.
 	setNotModifiedModified();
