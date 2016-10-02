@@ -16,6 +16,7 @@ public:
 	~IAssetEntry();
 
 	virtual bool save(QString& errorString) X_ABSTRACT;
+	virtual bool reloadUi(void) X_ABSTRACT;
 
 	QString name(void) const;
 	QString displayName(void) const;

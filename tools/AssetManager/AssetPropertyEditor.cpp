@@ -679,6 +679,7 @@ AssetProperties::AssetProperties(assetDb::AssetDB& db, AssetPropsScriptManager* 
 
 AssetProperties::~AssetProperties()
 {
+
 	clear();
 }
 
@@ -748,6 +749,12 @@ bool AssetProperties::save(QString& errorString)
 	return true;
 }
 
+bool AssetProperties::reloadUi(void)
+{
+	const std::string str = name().toStdString();
+	X_LOG0("AssetProperties", "UI script refresh request for: \"%s\" type: %s", str.c_str(), assetDb::AssetType::ToString(type()));
+	return false;
+}
 
 bool AssetProperties::isModified(void) const
 {
@@ -1097,7 +1104,6 @@ void AssetProperties::propModified(void)
 		emit changed();
 	}
 }
-
 
 AssetPropertyEditorWidget* AssetProperties::getEditor(void)
 {

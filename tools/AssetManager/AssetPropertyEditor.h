@@ -226,6 +226,8 @@ public:
 
 	// IAssetEntry
 	bool save(QString& errorString) X_OVERRIDE;
+	bool reloadUi(void) X_OVERRIDE;
+
 
 	bool isModified(void) const X_OVERRIDE;
 	bool isSaveAsAllowed(void) const X_OVERRIDE;
