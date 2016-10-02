@@ -45,6 +45,7 @@ AssetColorWidget::AssetColorWidget(QWidget *parent, const std::string& value) :
 			pLineEdit->setValidator(new QIntValidator(0, 255));
 
 			connect(pLineEdit, SIGNAL(editingFinished()), this, SLOT(editingFinished()));
+			connect(pLineEdit, SIGNAL(textEdited(const QString &)), this, SLOT(validateText(const QString &)));
 
 			pChildLayout->addWidget(pLabel, 0);
 			pChildLayout->addWidget(pLineEdit, 0);
@@ -176,6 +177,24 @@ void AssetColorWidget::editingFinished(void)
 
 	setColorInternal(col);
 }
+
+void AssetColorWidget::validateText(const QString& text)
+{
+	QObject* pSender = sender();
+
+	if (text.isEmpty())
+	{
+		for (int32_t i = 0; i < 4; i++)
+		{
+			if (pSender == pRGBAValueWidgets_[i])
+			{
+				pRGBAValueWidgets_[i]->setText("0");
+				break;
+			}
+		}
+	}
+}
+
 
 void AssetColorWidget::mouseReleaseEvent(QMouseEvent *event)
 {

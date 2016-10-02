@@ -28,6 +28,7 @@ private slots:
 	void colorSelected(const QColor& col);
 	void colPickerClicked(void);
 	void editingFinished(void);
+	void validateText(const QString &);
 
 protected:
 	void mouseReleaseEvent(QMouseEvent *event) X_OVERRIDE;
