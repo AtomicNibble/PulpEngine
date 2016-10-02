@@ -485,7 +485,7 @@ void EditorManager::handleContextChange(const QList<IContext *> &context)
 	//        qDebug() << Q_FUNC_INFO;
 
 	d->scheduledCurrentEditor_ = 0;
-	IEditor *editor = 0;
+	IEditor *editor = nullptr;
 	foreach(IContext *c, context) 
 	{
 		if ((editor = qobject_cast<IEditor*>(c))) {
