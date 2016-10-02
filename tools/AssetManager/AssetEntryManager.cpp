@@ -189,6 +189,15 @@ QList<AssetEntryManager::RecentAsset> AssetEntryManager::recentAssets(void)
 }
 
 
+void AssetEntryManager::reloadUIforType(assetDb::AssetType::Enum type)
+{
+	for (IAssetEntry* pAssetEntry : d->assetEntrys_) {
+		if (pAssetEntry->type() == type) {
+			pAssetEntry->reloadUi();
+		}
+	}
+}
+
 // current file
 void AssetEntryManager::setCurrentFile(const QString& name, assetDb::AssetType::Enum type)
 {

@@ -56,6 +56,8 @@ public:
 	Q_SLOT void clearRecentFiles(void);
 	static QList<RecentAsset> recentAssets(void);
 
+	// reload UI
+	static void reloadUIforType(assetDb::AssetType::Enum type);
 
 	// current file
 	static void setCurrentFile(const QString& fileName, assetDb::AssetType::Enum type);
