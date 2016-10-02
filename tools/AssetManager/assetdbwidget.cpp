@@ -86,8 +86,168 @@ void AssetDbTreeView::resizeEvent(QResizeEvent *event)
 
 // ------------------------------------------------------------------
 
+AssetDbFilterOptionsWidget::AssetDbFilterOptionsWidget(QWidget* parent) :
+	QWidget(parent)
+{
+	core::zero_object(typesEnabled_);
+
+	for (uint32_t i = 0; i < assetDb::AssetType::ENUM_COUNT; i++)
+	{
+		const char* pName = assetDb::AssetType::ToString(i);
+		QString name(pName);
+
+		typeNamesCache_[i] = name.toLower();
+	}
+
+	pNameFilterEnabled_ = new QCheckBox();
+	pNameFilterEnabled_->setText("Name");
+	pTypeFilterEnabled_ = new QCheckBox();
+	pTypeFilterEnabled_->setText("Types");
 
 
+	pNameFilter_ = new QLineEdit();
+	pNameFilter_->setPlaceholderText("Search..");
+
+	pTypesFilter_ = new QLineEdit();
+	pTypesFilter_->setPlaceholderText("model, anim ...");
+
+	pSelectTypes_ = new QToolButton();
+	pSelectTypes_->setPopupMode(QToolButton::ToolButtonPopupMode::InstantPopup);
+	pSelectTypes_->setIcon(QIcon(":/style/img/down_arrow.png"));
+
+	QGridLayout* pLayout = new QGridLayout();
+
+	// name
+	{
+		pLayout->addWidget(pNameFilterEnabled_, 0, 0);
+		pLayout->addWidget(pNameFilter_, 0, 1, 1, 2);
+	}
+
+	{
+		pLayout->addWidget(pTypeFilterEnabled_, 1, 0);
+		pLayout->addWidget(pTypesFilter_, 1, 1);
+		pLayout->addWidget(pSelectTypes_, 1, 2);
+	}
+
+
+	connect(pSelectTypes_, SIGNAL(clicked()),
+		this, SLOT(showTypeSeelction()));
+
+	connect(pTypesFilter_, &QLineEdit::textEdited, this, &AssetDbFilterOptionsWidget::typeFilterTextEditied);
+
+	setLayout(pLayout);
+}
+
+
+
+void AssetDbFilterOptionsWidget::showTypeSeelction(void)
+{
+	QWidget* pSender = qobject_cast<QWidget*>(sender());
+	BUG_ASSERT(pSender, return);
+
+	// ya done fucked it.
+	QListWidget* pList = new QListWidget();
+	pList->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+	for (uint32_t i = 0; i < assetDb::AssetType::ENUM_COUNT; i++)
+	{
+		QListWidgetItem* pItem = new QListWidgetItem(typeNamesCache_[i], pList);
+		pItem->setFlags(pItem->flags() & ~Qt::ItemIsUserCheckable);
+
+		if (typesEnabled_[i]) {
+			pItem->setCheckState(Qt::Checked);
+		}
+		else {
+			pItem->setCheckState(Qt::Unchecked);
+		}
+	}
+
+	connect(pList, SIGNAL(itemChanged(QListWidgetItem*)), this, SLOT(typeFilterChanged(QListWidgetItem*)));
+	connect(pList, &QListWidget::itemClicked, this, &AssetDbFilterOptionsWidget::typeFilterClicked);
+
+	QMenu menu;
+
+	QWidgetAction* pWidgetAction = new QWidgetAction(&menu);
+	pWidgetAction->setDefaultWidget(pList);
+
+	menu.addAction(pWidgetAction);
+	menu.exec(pSender->mapToGlobal(QPoint(0,0)));
+}
+
+void AssetDbFilterOptionsWidget::typeFilterChanged(QListWidgetItem* pItem)
+{
+	bool checked = pItem->checkState() == Qt::Checked;
+	const int32_t index = pItem->listWidget()->row(pItem);
+	BUG_ASSERT(index > 0 && index < assetDb::AssetType::ENUM_COUNT, return);
+
+
+	typesEnabled_[index] = checked;
+
+	QString text;
+
+	// just remake the text?
+	for (uint32_t i = 0; i < assetDb::AssetType::ENUM_COUNT; i++)
+	{
+		if (!typesEnabled_[i]) {
+			continue;
+		}
+
+		text += typeNamesCache_[i] + ",";
+	}
+
+	if (!text.isEmpty()) {
+		text = text.left(text.length() - 1);
+	}
+
+	pTypesFilter_->setText(text);
+}
+
+void AssetDbFilterOptionsWidget::typeFilterClicked(QListWidgetItem* pItem)
+{
+	if (pItem)
+	{
+		auto state = pItem->checkState();
+
+		if (state == Qt::Checked) {
+			pItem->setCheckState(Qt::Unchecked);
+		}
+		else {
+			pItem->setCheckState(Qt::Checked);
+		}
+	}
+}
+
+void AssetDbFilterOptionsWidget::typeFilterTextEditied(const QString& text)
+{
+	// clear everything each time.
+	// they may of passted completly diffrent filter types.
+	core::zero_object(typesEnabled_);
+
+	if (!text.isEmpty())
+	{
+		QStringList tokens = text.split(QChar(','));
+
+		// Log(t*n)
+		for (const auto& token : tokens)
+		{
+			// work out if it's a type.
+			const QString tokenLow = token.toLower();
+
+			for (int32_t i = 0; i < assetDb::AssetType::ENUM_COUNT; i++)
+			{
+				if (!typesEnabled_[i] && // early out string check.. worth it?
+					typeNamesCache_[i] == tokenLow)
+				{
+					typesEnabled_[i] = true;
+					break;
+				}
+			}
+		}
+	}
+
+}
+
+// ------------------------------------------------------------------
 
 
 AssetDbViewWidget::AssetDbViewWidget(AssetDB& db, QWidget *parent) :
@@ -95,7 +255,6 @@ AssetDbViewWidget::AssetDbViewWidget(AssetDB& db, QWidget *parent) :
     explorer_(AssetExplorer::instance()),
     model_(nullptr),
     view_(nullptr),
-    search_(nullptr),
     autoExpand_(true)
 {
     model_ = new AssetDBModel(SessionManager::sessionNode(), db, this);
@@ -117,9 +276,6 @@ AssetDbViewWidget::AssetDbViewWidget(AssetDB& db, QWidget *parent) :
 		this, SLOT(handleProjectAdded(Project*)));
 	connect(pSessionManager, SIGNAL(startupProjectChanged(Project*)),
 		this, SLOT(startupProjectChanged(Project*)));
-
-    search_ = new QLineEdit(this);
-    search_->setPlaceholderText("Search..");
 
     view_ = new AssetDbTreeView(this);
     view_->setModel(model_);
@@ -144,9 +300,11 @@ AssetDbViewWidget::AssetDbViewWidget(AssetDB& db, QWidget *parent) :
 	pContext_->setWidget(this);
 	ICore::addContextObject(pContext_);
 
+	AssetDbFilterOptionsWidget* pWSearchWidget = new AssetDbFilterOptionsWidget(this);
+
     QVBoxLayout* mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(view_);
-    mainLayout->addWidget(search_);
+    mainLayout->addWidget(pWSearchWidget);
     mainLayout->setContentsMargins(0, 0, 0, 0);
     mainLayout->setMargin(0);
     setLayout(mainLayout);

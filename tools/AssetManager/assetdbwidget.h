@@ -39,6 +39,31 @@ namespace AssetExplorer
 	class AssetExplorer;
 	class AssetDBModel;
 
+	class AssetDbFilterOptionsWidget : public QWidget
+	{
+		Q_OBJECT
+
+	public:
+		explicit AssetDbFilterOptionsWidget(QWidget* parent = nullptr);
+
+	private slots:
+		void showTypeSeelction(void);
+		void typeFilterChanged(QListWidgetItem* pItem);
+		void typeFilterClicked(QListWidgetItem* pItem);
+		void typeFilterTextEditied(const QString& text);
+
+	private:
+		QCheckBox* pNameFilterEnabled_;
+		QCheckBox* pTypeFilterEnabled_;
+
+		QLineEdit* pNameFilter_;
+		QLineEdit* pTypesFilter_;
+
+		QToolButton* pSelectTypes_;
+	
+		QString typeNamesCache_[assetDb::AssetType::ENUM_COUNT];
+		bool typesEnabled_[assetDb::AssetType::ENUM_COUNT];
+	};
 
 	class AssetDbViewWidget : public QWidget
 	{
@@ -52,11 +77,11 @@ namespace AssetExplorer
 
 	signals:
 
-		public slots :
-			void collapseAll(void);
+	public slots :
+		void collapseAll(void);
 		void editCurrentItem(void);
 
-		private slots:
+	private slots:
 		void initView(void);
 
 		void showContextMenu(const QPoint &pos);
@@ -76,8 +101,6 @@ namespace AssetExplorer
 		AssetExplorer* explorer_;
 		AssetDBModel* model_;
 		AssetDbTreeView*  view_;
-
-		QLineEdit* search_;
 
 		bool autoExpand_;
 	};
