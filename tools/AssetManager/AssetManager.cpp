@@ -295,6 +295,11 @@ void AssetManager::createActions(void)
 	pNewModAct_->setStatusTip(tr("Create a new mod"));
 	connect(pNewModAct_, SIGNAL(triggered()), this, SLOT(newMod()));
 
+	pSaveAct_ = new QAction(QIcon(":/misc/img/Save.png"), tr("Save"), this);
+	pSaveAct_->setStatusTip(tr("Save the current asset"));
+	pSaveAct_->setEnabled(false);
+	// connect(pSaveAct_, SIGNAL(triggered()), this, SLOT(save()));
+
 
 	pSaveAllAct_ = new QAction(QIcon(":/misc/img/Saveall.png"), tr("Save all"), this);
 	pSaveAllAct_->setStatusTip(tr("Save all open assets"));
@@ -401,6 +406,12 @@ void AssetManager::createMenus(void)
 		pCmd->setDefaultKeySequence(QKeySequence("Ctrl+Shift+N"));
 		filemenu->addAction(pCmd, Constants::G_FILE_NEW);
 
+
+		pCmd = ActionManager::registerAction(pSaveAct_, Constants::SAVE, globalContext);
+		pCmd->setDefaultKeySequence(QKeySequence::Save);
+		pCmd->setAttribute(Command::CommandAttribute::UpdateText);
+		pCmd->setDescription(tr("Save"));
+		filemenu->addAction(pCmd, Constants::G_FILE_SAVE);
 
 		pCmd = ActionManager::registerAction(pSaveAllAct_, Constants::SAVEALL, globalContext);
 		pCmd->setDefaultKeySequence(QKeySequence("Ctrl+Shift+S"));
@@ -645,6 +656,11 @@ void AssetManager::newFile(void)
 void AssetManager::newMod(void)
 {
 	X_ASSERT_NOT_IMPLEMENTED();
+}
+
+void AssetManager::save(void)
+{
+	EditorManager::saveAssetEntry();
 }
 
 
