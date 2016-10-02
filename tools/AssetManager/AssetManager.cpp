@@ -256,6 +256,7 @@ void AssetManager::updateContextObject(const QList<IContext*>& context)
 		qDebug() << "new context objects =" << context;
 		foreach(IContext *c, context)
 			qDebug() << (c ? c->widget() : 0) << (c ? c->widget()->metaObject()->className() : 0);
+		qDebug() << "-----------------------";
 	}
 #endif // !X_DEBUG && CONTEXT_DEBUGGING
 }
