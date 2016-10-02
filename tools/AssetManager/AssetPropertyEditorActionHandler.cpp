@@ -48,15 +48,15 @@ void AssetPropsEditorActionHandler::createActions(void)
 {
 
 	pUndoAction_ = registerAction(Constants::EDIT_UNDO,
-		SLOT(undoAction()), "Undo");
+		SLOT(undoAction()), tr("Undo"));
 	pRedoAction_ = registerAction(Constants::EDIT_REDO,
-		SLOT(redoAction()), "Redo");
+		SLOT(redoAction()), tr("Redo"));
 	pCopyAction_ = registerAction(Constants::EDIT_CUT,
-		SLOT(cutAction()), "Cut");
+		SLOT(cutAction()), tr("Cut"));
 	pCutAction_ = registerAction(Constants::EDIT_COPY,
-		SLOT(copyAction()));
+		SLOT(copyAction()), tr("Copy"));
 	pPasteAction_ = registerAction(Constants::EDIT_PASTE,
-		SLOT(pasteAction()));
+		SLOT(pasteAction()), tr("Paste"));
 
 	pCollapseAllAction_ = registerAction(Constants::ASSETPROP_COLLAPSE_ALL,
 		SLOT(collapseAll()), "Collapse All");
@@ -70,7 +70,6 @@ void AssetPropsEditorActionHandler::updateUndoRedo(void)
 
 	pUndoAction_->setEnabled(currentEditorWidget_->isUndoAvailable());
 	pRedoAction_->setEnabled(currentEditorWidget_->isRedoAvailable());
-
 }
 
 void AssetPropsEditorActionHandler::updateActions(void)
