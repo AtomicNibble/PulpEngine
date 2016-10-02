@@ -5,6 +5,7 @@
 #include "assetscript\scriptstdstring.h"
 #include "assetscript\scriptbuilder.h"
 
+#include "AssetEntryManager.h"
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -457,16 +458,19 @@ void AssetPropsScriptManager::fileChanged(const QString& path)
 
 	for (uint32_t i=0; i<assetDb::AssetType::ENUM_COUNT; i++)
 	{
-		QString typeFileName(assetDb::AssetType::ToString(static_cast<assetDb::AssetType::Enum>(i)));
+		const auto type = static_cast<assetDb::AssetType::Enum>(i);
+		QString typeFileName(assetDb::AssetType::ToString(type));
 		typeFileName = typeFileName.toLower();
 		typeFileName.append('.');
 		typeFileName.append(ASSET_PROPS_SCRIPT_EXT);
 		
 		if (fileName == typeFileName)
 		{
-			X_LOG1("AssetScript", "Cache cleared for aps for type: %s ",assetDb::AssetType::ToString(i));
+			X_LOG1("AssetScript", "Cache cleared for aps for type: %s ", assetDb::AssetType::ToString(i));
 
 			cache_[i].clear(false);
+
+			AssetEntryManager::reloadUIforType(type);
 			break;
 		}
 	}
