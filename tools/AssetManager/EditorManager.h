@@ -103,6 +103,7 @@ public slots:
 	static bool saveAssetEntry(IAssetEntry* pAssetEntry = nullptr);
 	static bool saveAssetEntryAs(IAssetEntry* pAssetEntry = nullptr);
 
+	void handleAssetEntryStateChange(void);
 
 private slots:
 	static void autoSave(void);

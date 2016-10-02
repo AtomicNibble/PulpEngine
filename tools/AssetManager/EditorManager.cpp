@@ -800,6 +800,8 @@ IEditor* EditorManager::createEditor(const Id& editorId, const QString& assetNam
 	IEditor* pEditor = factories.front()->createEditor();
 
 	if (pEditor) {
+		connect(pEditor->assetEntry(), &IAssetEntry::changed, pInstance_, &EditorManager::handleAssetEntryStateChange);
+
 		emit pInstance_->editorCreated(pEditor, assetName);
 	}
 
@@ -1206,6 +1208,18 @@ bool EditorManager::saveAssetEntryAs(IAssetEntry* pAssetEntryParam)
 	X_ASSERT_NOT_IMPLEMENTED();
 	X_UNUSED(pAssetEntryParam);
 	return false;
+}
+
+
+void EditorManager::handleAssetEntryStateChange(void)
+{
+	updateActions();
+
+	IAssetEntry* pAssetEntry = qobject_cast<IAssetEntry*>(sender());
+
+	if (EditorManager::currentAssetEntry() == pAssetEntry) {
+		emit pInstance_->currentAssetEntryStateChanged();
+	}
 }
 
 
