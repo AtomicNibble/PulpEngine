@@ -1091,6 +1091,7 @@ void AssetProperties::propModified(void)
 		bool modified = isModified();
 
 		emit modificationChanged(modified);
+		emit changed();
 	}
 }
 
