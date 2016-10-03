@@ -275,6 +275,78 @@ namespace AssetExplorer
 		friend class Node;
 	};
 
+
+
+	template<class T1, class T3>
+	X_INLINE bool isSorted(const T1 &list, T3 sorter)
+	{
+		typename T1::const_iterator it, iit, end;
+		end = list.constEnd();
+		it = list.constBegin();
+		if (it == end) {
+			return true;
+		}
+
+		iit = list.constBegin();
+		++iit;
+
+		while (iit != end) {
+			if (!sorter(*it, *iit)) {
+				return false;
+			}
+			it = iit++;
+		}
+		return true;
+	}
+
+
+	// compares old and new, and returns removed itemd and added items.
+	template <class T1, class T2, class T3>
+	X_INLINE void compareSortedLists(T1 oldList, T2 newList, T1 &removedList, T2 &addedList, T3 sorter)
+	{
+#if X_DEBUG
+		Q_ASSERT(isSorted(oldList, sorter));
+		Q_ASSERT(isSorted(newList, sorter));
+#endif // !X_DEBUG
+
+		typename T1::const_iterator oldIt, oldEnd;
+		typename T2::const_iterator newIt, newEnd;
+
+		oldIt = oldList.constBegin();
+		oldEnd = oldList.constEnd();
+
+		newIt = newList.constBegin();
+		newEnd = newList.constEnd();
+
+		addedList.reserve(newList.size());
+
+		while (oldIt != oldEnd && newIt != newEnd) {
+			if (sorter(*oldIt, *newIt)) {
+				removedList.append(*oldIt);
+				++oldIt;
+			}
+			else if (sorter(*newIt, *oldIt)) {
+				addedList.append(*newIt);
+				++newIt;
+			}
+			else {
+				++oldIt;
+				++newIt;
+			}
+		}
+
+		while (oldIt != oldEnd) {
+			removedList.append(*oldIt);
+			++oldIt;
+		}
+
+		while (newIt != newEnd) {
+			addedList.append(*newIt);
+			++newIt;
+		}
+	}
+
+
 } // namespace AssetExplorer
 
 X_NAMESPACE_END
