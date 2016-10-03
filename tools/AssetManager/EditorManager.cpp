@@ -127,7 +127,7 @@ namespace
 		splitHozTabGroupContextAction_(new QAction("Duplicate In New Horizontal Tab Group", parent)),
 		splitVerTabGroupContextAction_(new QAction("Duplicate In New Vertical Tab Group", parent)),
 
-		autoSaveEnabled_(true),
+		autoSaveEnabled_(false),
 		autoSaveInterval_(5),
 		currentEditor_(nullptr),
 		currentView_(nullptr),
