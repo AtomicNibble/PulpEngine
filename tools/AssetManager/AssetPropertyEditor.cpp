@@ -252,7 +252,7 @@ void AssetProperty::clearUI(void)
 {
 	if (type_ == PropertyType::GROUPBOX) {
 		pGroupWidget_->clearUI();
-		return;
+	//	return;
 	}
 
 	if (pWidget_) {
@@ -796,7 +796,26 @@ bool AssetProperties::reloadUi(void)
 {
 	const std::string str = name().toStdString();
 	X_LOG0("AssetProperties", "UI script refresh request for: \"%s\" type: %s", str.c_str(), assetDb::AssetType::ToString(type()));
-	return false;
+
+	pCon_->setUpdatesEnabled(false);
+
+	pCur_ = nullptr;
+	root_.clearUI();
+	root_.SetType(AssetProperty::PropertyType::GROUPBOX);
+
+	for (auto it = keys_.begin(); it != keys_.end(); ++it) {
+		(*it)->clearUI();
+	}
+
+	// run again
+	if (!pPropScriptMan_->runScriptForProps(*this, type())) {
+		return false;
+	}
+
+	appendGui(pCon_, pLayout_);
+	pCon_->setUpdatesEnabled(true);
+
+	return true;
 }
 
 bool AssetProperties::isModified(void) const
