@@ -125,7 +125,7 @@ namespace
 	}
 
 
-	bool isSorted(const QList<Node*> &nodes)
+	bool isSorted(const QList<Node*>& nodes)
 	{
 		const int32_t size = nodes.size();
 		for (int32_t i = 0; i < size - 1; ++i) {
@@ -358,7 +358,7 @@ int AssetDBModel::rowCount(const QModelIndex& parent) const
         }
 
         if(pFolderNode) {
-         //   qDebug() << pFolderNode ->displayName() << " Rows" << rows;
+        //    qDebug() << pFolderNode ->displayName() << " Rows" << rows;
         }
     }
     return rows;
